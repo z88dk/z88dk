@@ -263,16 +263,21 @@ typecheck:
     lval->is_const = 1;
 
     while (checkws() == 0 ) {
+        int loop = 0;
+
         if (cmatch('L')) {
             lval->val_type = KIND_LONG;
             if (cmatch('L'))
                 lval->val_type = KIND_LONGLONG;
+            break;
         }
         if (cmatch('U') || cmatch('u')) {
             isunsigned = 1;
             lval->const_val = (uint64_t)k;
+            loop = 1;
         } else if (cmatch('S')) {
             isunsigned = 0;
+            loop = 1;
         } else if (amatch("f16")) {
             lval->val_type = KIND_FLOAT16;
             lval->ltype = type_float16;
@@ -286,12 +291,13 @@ typecheck:
         if ( amatch("hk") || amatch("k")) {
             lval->val_type = KIND_ACCUM16;
             lval->ltype = isunsigned ? type_uaccum16 : type_accum16;
+            break;
         } else if ( amatch("lk")) {
             lval->val_type = KIND_ACCUM32;
             lval->ltype = isunsigned ? type_uaccum32 : type_accum32;
+            break;
         }
-       
-        break;
+        if (!loop) break;
     }
     if ( lval->val_type == KIND_LONGLONG ) {
         if ( isunsigned )

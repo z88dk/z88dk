@@ -13,27 +13,44 @@ static void wrapper() __naked
 {
 #asm
 #if FLOAT_IS_32BITS
-PUBLIC l_f32_ftofix16
-l_f32_ftofix16 = _convert
+PUBLIC l_f32_ftofix16s
+l_f32_ftofix16s = _convert
+PUBLIC l_f32_ftofix16u
+l_f32_ftofix16u = _convertu
 #elif FLOAT_IS_16BITS
-PUBLIC l_f16_ftofix16
-l_f16_ftofix16 = _convert
+PUBLIC l_f16_ftofix16s
+l_f16_ftofix16s = _convert
+PUBLIC l_f16_ftofix16u
+l_f16_ftofix16u = _convertu
 #elif FLOAT_IS_64BITS
-PUBLIC l_f64_ftofix16
-l_f64_ftofix16 = _convert
+PUBLIC l_f64_ftofix16s
+l_f64_ftofix16s = _convert
+PUBLIC l_f64_ftofix16u
+l_f64_ftofix16u = _convertu
 #else
-PUBLIC l_f48_ftofix16
-l_f48_ftofix16 = _convert
+PUBLIC l_f48_ftofix16s
+l_f48_ftofix16s = _convert
+PUBLIC l_f48_ftofix16u
+l_f48_ftofix16u = _convertu
 #endif
 #endasm
 }
 
 
-static fix88_t convert(FLOAT x) __z88dk_fastcall
+static fix16_t convert(FLOAT x) __z88dk_fastcall
 {
 #ifdef FLOAT_IS_16BITS
-   return FIX88_FROM_FLOAT16(x);
+   return FIX16_FROM_FLOAT16(x);
 #else
-   return FIX88_FROM_FLOAT(x);
+   return FIX16_FROM_FLOAT(x);
+#endif
+}
+
+static fix16_t convertu(FLOAT x) __z88dk_fastcall
+{
+#ifdef FLOAT_IS_16BITS
+   return FIX16u_FROM_FLOAT16(x);
+#else
+    return FIX16u_FROM_FLOAT(x);
 #endif
 }

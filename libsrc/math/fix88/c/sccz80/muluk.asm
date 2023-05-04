@@ -2,8 +2,8 @@
 
     SECTION code_clib
 
-    PUBLIC  mulk
-    PUBLIC  _mulk
+    PUBLIC  muluk
+    PUBLIC  _muluk
 
     EXTERN  asm_fix16_mulu
 

@@ -2741,12 +2741,15 @@ void zdiv(LVALUE* lval)
             callrts("l_long_div");
         Zsp += 4;
         break;
-    case KIND_FLOAT16:
     case KIND_ACCUM16:
         if ( ulvalue(lval))
             callrts("l_fix16_divu");
         else 
             callrts("l_fix16_divs");
+        Zsp += 2;
+        break;
+    case KIND_FLOAT16:
+        dcallrts("fdiv",lval->val_type);
         Zsp += 2;
         break;
     case KIND_ACCUM32:
