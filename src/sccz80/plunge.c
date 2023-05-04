@@ -163,7 +163,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
              }
 
             if ( lval2->val_type != lval->val_type ) {  // TODO, always?
-                zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+                zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned, lval->ltype->isunsigned);
                 lval2->val_type = lval->val_type;
                 lval2->ltype = lval->ltype;
             }
@@ -259,7 +259,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
                  // Convert to a float (if operator is valid for floats). fixed point allow more operators
                  if ( !kind_is_decimal(lval->val_type)) {
-                     zconvert_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned);
+                     zconvert_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned);
                      lval->val_type = lval2->val_type;
                      lval->ltype = lval2->ltype;
                  }
@@ -504,7 +504,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
             // Floatconstant +/- lvalue
             if ( lval2->val_type != lval->val_type ) {
-                zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+                zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned, lval->ltype->isunsigned);
                 lval2->val_type = lval->val_type;
                 lval2->ltype = lval->ltype;
             }
@@ -524,7 +524,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
             // LHS is constant, lets load it (after converting to the right type)
             lval->val_type = lval2->val_type;
-            lval->ltype = get_decimal_type(lval->val_type);
+            lval->ltype = get_decimal_type(lval->val_type, lval2->ltype->isunsigned);
             load_constant(lval); 
     
             /* Subtraction isn't commutative so we need to swap over' */
@@ -675,7 +675,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lval->val_type = (lhs_val_type == KIND_DOUBLE || rhs_val_type == KIND_DOUBLE) ? KIND_DOUBLE : 
                              (lhs_val_type == KIND_FLOAT16 || rhs_val_type == KIND_FLOAT16) ? KIND_FLOAT16 : 
                              (lhs_val_type == KIND_ACCUM32 || rhs_val_type == KIND_ACCUM32) ? KIND_ACCUM32 : KIND_ACCUM16;
-            lval->ltype = get_decimal_type(lval->val_type);
+            lval->ltype = get_decimal_type(lval->val_type, 0); // TODO sign?
         }
         clearstage(before, 0);  // Wipe all of the code generated
         Zsp = oldsp;

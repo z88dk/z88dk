@@ -112,9 +112,11 @@ struct _mapping {
         { "ldexp", "l_f48_ldexp", "l_f16_ldexp", "l_f32_ldexp", "l_f64_ldexp", NULL, NULL },
         { "f16tof", "l_f48_f16tof", "l_f16_f16tof", "l_f32_f16tof", "l_f64_f16tof", "l_f16_ftofix16", "l_f16_ftofix32" },
         { "ftof16", "l_f48_ftof16", "l_f16_ftof16", "l_f32_ftof16", "l_f64_ftof16", "l_fix16_fixtof16", "l_fix32_fixtofi16" },
-        { "ftofix16", "l_f48_ftofix16", "l_f16_ftofix16", "l_f32_ftofix16", "l_f64_ftofix16", NULL, "l_fix32_ftofix16" },
+        { "ftofix16s", "l_f48_ftofix16s", "l_f16_ftofix16s", "l_f32_ftofix16s", "l_f64_ftofix16s", NULL, "l_fix32_ftofix16s" },
+        { "ftofix16u", "l_f48_ftofix16u", "l_f16_ftofix16u", "l_f32_ftofix16u", "l_f64_ftofix16u", NULL, "l_fix32_ftofix16u" },
         { "fix16tof", "l_f48_fix16tof", "l_f16_fix16tof", "l_f32_fix16tof", "l_f64_fix16tof", NULL, "l_fix32_fix16tof" },
-        { "ftofix32", "l_f48_ftofix32", "l_f16_ftofix32", "l_f32_ftofix32", "l_f64_ftofix32", "l_fix16_ftofix32", NULL },
+        { "ftofix32s", "l_f48_ftofix32s", "l_f16_ftofix32s", "l_f32_ftofix32s", "l_f64_ftofix32s", "l_fix16_ftofix32s", NULL },
+        { "ftofix32u", "l_f48_ftofix32u", "l_f16_ftofix32u", "l_f32_ftofix32u", "l_f64_ftofix32u", "l_fix16_ftofix32u", NULL },
         { "fix32tof", "l_f48_fix32tof", "l_f16_fix32tof", "l_f32_fix32tof", "l_f64_fix32tof", "l_fix16_fix32tof", NULL },
         { "inversef", NULL, "l_f16_invf", "l_f32_invf", NULL, "l_fix16_inv", "l_fix32_inv" }, // Called only for IEEE mode
         { NULL }
@@ -2629,7 +2631,10 @@ void mult(LVALUE* lval)
         Zsp += 2;
         break;
     case KIND_ACCUM16:
-        dcallrts("fmul",lval->val_type);
+        if ( ulvalue(lval))
+            callrts("l_fix16_mulu");
+        else 
+            callrts("l_fix16_muls");
         Zsp += 2;
         break;
     case KIND_ACCUM32:
@@ -2738,11 +2743,17 @@ void zdiv(LVALUE* lval)
         break;
     case KIND_FLOAT16:
     case KIND_ACCUM16:
-        dcallrts("fdiv",lval->val_type);
+        if ( ulvalue(lval))
+            callrts("l_fix16_divu");
+        else 
+            callrts("l_fix16_divs");
         Zsp += 2;
         break;
     case KIND_ACCUM32:
-        dcallrts("fdiv",lval->val_type);
+      if ( ulvalue(lval))
+            callrts("l_fix32_divu");
+        else 
+            callrts("l_fix32_divs");
         Zsp += 4;
         break;
     case KIND_DOUBLE:
@@ -4002,6 +4013,12 @@ void neg(LVALUE* lval)
         ol("ld\ta,h");
         ol("xor\t128");
         ol("ld\th,a");
+        break;
+    case KIND_ACCUM32:
+        dcallrts("fnegate", KIND_ACCUM32);
+        break;
+    case KIND_ACCUM16:
+        dcallrts("fnegate", KIND_ACCUM16);
         break;
     case KIND_DOUBLE:
         switch ( c_maths_mode ) {
@@ -5762,11 +5779,11 @@ void gen_load_constant_as_float(double val, Kind to, unsigned char isunsigned)
         if ( val >= INT16_MIN && val <= UINT16_MAX &&
             (c_speed_optimisation & OPT_DOUBLE_CONST) == 0 && fmod(val,1) == 0.0 ) {
             vconst(val);
-            zconvert_to_decimal(KIND_INT,to, isunsigned);
+            zconvert_to_decimal(KIND_INT,to, isunsigned, 0);
         } else if ( val >= INT32_MIN && val <= UINT32_MAX &&
             (c_speed_optimisation & OPT_DOUBLE_CONST) == 0 && fmod(val,1) == 0.0) {
             vlongconst(val);
-            zconvert_to_decimal(KIND_LONG,to, isunsigned);
+            zconvert_to_decimal(KIND_LONG,to, isunsigned, 0);
         } else {
             lval.val_type = to;
             lval.const_val = val;
@@ -5777,14 +5794,14 @@ void gen_load_constant_as_float(double val, Kind to, unsigned char isunsigned)
 
 // Convert the value that's on the stack to a double and restore stack to appropriate state
 // We have a float in the primary register
-void zconvert_stacked_to_decimal(Kind stacked_kind, Kind float_kind, unsigned char isunsigned, int operator_is_commutative)
+void zconvert_stacked_to_decimal(Kind stacked_kind, Kind float_kind, unsigned char isunsigned, unsigned char float_unsigned, int operator_is_commutative)
 {
     if ( float_kind == KIND_FLOAT16 || float_kind == KIND_ACCUM16) {
         if ( stacked_kind == KIND_LONG ) {
             pop("de");      // LSW
             ol("ex\t(sp),hl");  // hl = MSW, stack = float
             ol("ex\tde,hl");
-            zconvert_to_decimal(stacked_kind, float_kind, isunsigned);
+            zconvert_to_decimal(stacked_kind, float_kind, isunsigned, float_unsigned);
             if (!operator_is_commutative) ol("ex\t(sp),hl");
         } else if ( stacked_kind == KIND_LONGLONG) {
             /* Pop the longlong into the accumulator */
@@ -5795,12 +5812,12 @@ void zconvert_stacked_to_decimal(Kind stacked_kind, Kind float_kind, unsigned ch
             /* Push the float */
             push("hl");
             /* And convert */
-            zconvert_to_decimal(stacked_kind, float_kind, isunsigned);
+            zconvert_to_decimal(stacked_kind, float_kind, isunsigned, float_unsigned);
             if (!operator_is_commutative)  ol("ex\t(sp),hl");
         } else {
             // 2 bytes on stack
             ol("ex\t(sp),hl");  //
-            zconvert_to_decimal(stacked_kind, float_kind, isunsigned);
+            zconvert_to_decimal(stacked_kind, float_kind, isunsigned, float_unsigned);
             if (!operator_is_commutative)  ol("ex\t(sp),hl");
         }
     } else if ( stacked_kind == KIND_LONGLONG ) {
@@ -5815,20 +5832,20 @@ void zconvert_stacked_to_decimal(Kind stacked_kind, Kind float_kind, unsigned ch
         /* Push the float */
         gen_push_float(float_kind);
         /* And convert the long */
-        zconvert_to_decimal(stacked_kind, float_kind, isunsigned);
+        zconvert_to_decimal(stacked_kind, float_kind, isunsigned, float_unsigned);
         if (!operator_is_commutative) gen_swap_float(float_kind);
     } else {
         dpush_under(stacked_kind);
         pop("hl");
         if (stacked_kind == KIND_LONG)
             zpop();
-        zconvert_to_decimal(stacked_kind, float_kind, isunsigned);
+        zconvert_to_decimal(stacked_kind, float_kind, isunsigned, float_unsigned);
         if (!operator_is_commutative) gen_swap_float(float_kind);
     }
 }
 
 
-void zconvert_to_decimal(Kind from, Kind to, unsigned char isunsigned)
+void zconvert_to_decimal(Kind from, Kind to, unsigned char isunsigned, unsigned char toissigned)
 {
    if ( from == to ) {
        return;
@@ -5853,10 +5870,12 @@ void zconvert_to_decimal(Kind from, Kind to, unsigned char isunsigned)
    } else if ( from == KIND_DOUBLE ) {
        switch ( to ) {
        case KIND_ACCUM16:
-           dcallrts("ftofix16", from);
+           if (isunsigned) dcallrts("ftofix16u", from);
+           else dcallrts("ftofix16s", from);
            break;
        case KIND_ACCUM32:
-           dcallrts("ftofix32", from);
+           if (isunsigned) dcallrts("ftofix32u", from);
+           else dcallrts("ftofix32s", from);
            break;
        default:
            dcallrts("ftof16", from);

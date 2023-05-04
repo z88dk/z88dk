@@ -87,7 +87,9 @@ typedef enum {
 #define kind_is_decimal(x)  ( kind_is_floating(x) || kind_is_fixed(x) )
 
 
-#define get_decimal_type(k) (k == KIND_ACCUM16 ? type_accum16 : k == KIND_ACCUM32 ? type_accum32  : (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16)
+#define get_decimal_type(k,us) (k == KIND_ACCUM16 ? us ? type_uaccum16 : type_accum16 \
+            : k == KIND_ACCUM32 ? us ? type_uaccum32 : type_accum32 \
+            : (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16)
 
 typedef struct {
     size_t    size;
@@ -146,6 +148,7 @@ struct type_s {
 
 extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double, *type_float16, *type_longlong, *type_ulonglong;
 extern Type *type_accum16, *type_accum32;
+extern Type *type_uaccum16, *type_uaccum32;
 
 enum ident_type {
         ID_VARIABLE = 1,

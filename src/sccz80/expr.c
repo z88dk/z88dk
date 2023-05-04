@@ -261,12 +261,12 @@ int heir1a(LVALUE* lval)
             rvalue(lval);
         /* check types of expressions and widen if necessary */
         if (kind_is_decimal(lval2.val_type) && lval2.val_type != lval->val_type) {
-            zconvert_to_decimal(lval->val_type, lval2.val_type, lval->ltype->isunsigned);
+            zconvert_to_decimal(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned);
             postlabel(endlab);
         } else if (lval2.val_type != lval->val_type && kind_is_decimal(lval->val_type)) {
             gen_jp_label(skiplab = getlabel(),0);
             postlabel(endlab);
-            zconvert_to_decimal(lval2.val_type, lval->val_type, lval2.ltype->isunsigned);
+            zconvert_to_decimal(lval2.val_type, lval->val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned);
             postlabel(skiplab);
         } else if (lval2.val_type == KIND_LONG && lval->val_type != KIND_LONG) {
             widenintegers(&lval2, lval);
