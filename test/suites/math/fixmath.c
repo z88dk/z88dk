@@ -8,7 +8,7 @@
 #include <math/math_fix88.h>
 
 #ifdef FIX16
-    #define FABS(x) fabsk(x)
+    #define FABS(x) absk(x)
     #define SQRT(x) sqrtk(x);
     #define POW(x,y) powk(x,y)
     #define MUL(x,y) mulk(x,y)

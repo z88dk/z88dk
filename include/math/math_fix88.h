@@ -35,13 +35,16 @@ typedef int16_t fix16_t;
 #define FIX16_FROM_FLOAT(x)  ((fix16_t)(x))
 #define FIX16_TO_FLOAT16(x) ((_Float16) (x))
 #define FIX16_FROM_FLOAT16(x)  ((fix16_t)(x))
+#define FIX16u_FROM_FLOAT16(x)  ((unsigned _Accum)(x))
 #else
 #define FIX16_FROM_INT(x) ( ((fix16_t)x) << 8)
 #define FIX16_TO_INT(x) ( (x) >> 8)
 #define FIX16_TO_FLOAT(x) ((float) ((x)*(1.0 / 256.0)))
 #define FIX16_FROM_FLOAT(x) ((fix16_t)((x) / (1.0 / 256.0) + ((x) >= 0 ? 0.5 : -0.5)))
+#define FIX16u_FROM_FLOAT(x) ((fix16_t)((x) / (1.0 / 256.0) + 0.5))
 #define FIX16_TO_FLOAT16(x) ((_Float16) ((x)*(1.0f16 / 256.0f16)))
 #define FIX16_FROM_FLOAT16(x) ((fix16_t)((x) / (1.0f16 / 256.0f16) + ((x) >= 0 ? 0.5f16 : -0.5f16)))
+#define FIX16u_FROM_FLOAT16(x) ((fix16_t)((x) / (1.0f16 / 256.0f16) + 0.5f16))
 #endif
 
 
@@ -82,10 +85,10 @@ extern fix16_t __LIB__ divuk_callee(fix16_t x,fix16_t y) __smallc __z88dk_callee
 
 
 /* Trigonmetric functions */
-extern fix16_t __LIB__ cosfix88 (fix16_t x);
+extern fix16_t __LIB__ cosk(fix16_t x);
 extern fix16_t __LIB__ cosk_fastcall(fix16_t x) __z88dk_fastcall;
 #define cosk(x) cosk_fastcall(x)
-extern fix16_t __LIB__ sinfix88 (fix16_t x);
+extern fix16_t __LIB__ sink(fix16_t x);
 extern fix16_t __LIB__ sink_fastcall(fix16_t x) __z88dk_fastcall;
 #define sink(x) sink_fastcall(x)
 extern fix16_t __LIB__ tank(fix16_t x);
@@ -93,11 +96,11 @@ extern fix16_t __LIB__ tank_fastcall(fix16_t x) __z88dk_fastcall;
 #define tank(x) tank_fastcall(x)
 
 
-extern fix16_t __LIB__ acosfix88 (fix16_t x);
+extern fix16_t __LIB__ acosk(fix16_t x);
 extern fix16_t __LIB__ acosk_fastcall(fix16_t x) __z88dk_fastcall;
 #define acosk(x) acosk_fastcall(x)
 
-extern fix16_t __LIB__ asinfix88 (fix16_t x);
+extern fix16_t __LIB__ asink(fix16_t x);
 extern fix16_t __LIB__ asink_fastcall(fix16_t x) __z88dk_fastcall;
 #define asink(x) asink_fastcall(x)
 
@@ -106,11 +109,11 @@ extern fix16_t __LIB__ atank_fastcall(fix16_t x) __z88dk_fastcall;
 #define atank(x) atank_fastcall(x)
 
 
-extern fix16_t __LIB__ acoshfix88 (fix16_t x);
+extern fix16_t __LIB__ acoshk(fix16_t x);
 extern fix16_t __LIB__ acoshk_fastcall(fix16_t x) __z88dk_fastcall;
 #define acoshk(x) acoshk_fastcall(x)
 
-extern fix16_t __LIB__ asinhfix88 (fix16_t x);
+extern fix16_t __LIB__ asinhk(fix16_t x);
 extern fix16_t __LIB__ asinhk_fastcall(fix16_t x) __z88dk_fastcall;
 #define asinhk(x) asinhk_fastcall(x)
 
@@ -127,20 +130,20 @@ extern fix16_t __LIB__ powk_callee(fix16_t x,fix16_t y) __smallc __z88dk_callee;
 #define powk(x,y) powk_callee(x,y)
 
 
-extern fix16_t __LIB__ pow2fix88 (fix16_t x);
+extern fix16_t __LIB__ pow2k(fix16_t x);
 extern fix16_t __LIB__ pow2k_fastcall (fix16_t x) __z88dk_fastcall;
 #define pow2k(x) pow2k_fastcall(x)
 
-extern fix16_t __LIB__ expfix88 (fix16_t x);
+extern fix16_t __LIB__ expk(fix16_t x);
 extern fix16_t __LIB__ expk_fastcall (fix16_t x) __z88dk_fastcall;
 #define expk(x) expk_fastcall(x)
 
 
-extern fix16_t __LIB__ logfix88 (fix16_t x);
+extern fix16_t __LIB__ logk(fix16_t x);
 extern fix16_t __LIB__ logk_fastcall (fix16_t x) __z88dk_fastcall;
 #define logk(x) logk_fastcall(x)
 
-extern fix16_t __LIB__ log2fix88 (fix16_t x);
+extern fix16_t __LIB__ log2k(fix16_t x);
 extern fix16_t __LIB__ log2k_fastcall (fix16_t x) __z88dk_fastcall;
 #define log2k(x) log2k_fastcall(x)
 
@@ -154,16 +157,16 @@ extern fix16_t __LIB__ sqrtk_fastcall(fix16_t x) __z88dk_fastcall;
 #define sqrtk(x) sqrtk_fastcall(x)
 
 /* Nearest integer, absolute value, and remainder functions */
-extern fix16_t __LIB__ fabsfix88 (fix16_t x) __z88dk_fastcall;
-extern fix16_t __LIB__ fabsk_fastcall (fix16_t x);
-#define fabsk(x) fabsk_fastcall(x)
+extern fix16_t __LIB__ absk(fix16_t x) __z88dk_fastcall;
+extern fix16_t __LIB__ absk_fastcall (fix16_t x);
+#define absk(x) absk_fastcall(x)
 
 
-extern fix16_t __LIB__ ceilfix88 (fix16_t x);
+extern fix16_t __LIB__ ceilk(fix16_t x);
 extern fix16_t __LIB__ ceilk_fastcall(fix16_t x) __z88dk_fastcall;
 #define ceilk(x) ceilk_fastcall(x)
 
-extern fix16_t __LIB__ floorfix88 (fix16_t x) __z88dk_fastcall;
+extern fix16_t __LIB__ floork (fix16_t x) __z88dk_fastcall;
 extern fix16_t __LIB__ floork_fastcall (fix16_t x);
 
 

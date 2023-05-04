@@ -2,13 +2,13 @@
 
     SECTION code_clib
 
-    PUBLIC  fabsk
-    PUBLIC  _fabsk
+    PUBLIC  absk
+    PUBLIC  _absk
 
     EXTERN  asm_fix16_fabs
 
-fabsk:
-_fabsk:
+absk:
+_absk:
     ld      hl,2
     add     hl,sp
     ld      a,(hl)
