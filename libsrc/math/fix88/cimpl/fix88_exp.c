@@ -1,3 +1,4 @@
+#define DISABLE_NATIVE_ACCUM 1
 #include <math/math_fix88.h>
 #include <stdlib.h>
 

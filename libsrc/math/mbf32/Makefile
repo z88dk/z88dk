@@ -5,10 +5,10 @@ include ../../Make.config
 vpath %.c ../cimpl/
 
 AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard c/asm/*.asm) $(wildcard z80/*.asm)
-CFILES  = amin.c amax.c fmod.c acos.c asin.c atan2.c atof.c cosh.c ftoa.c ftoe.c sinh.c tanh.c acosh.c asinh.c atanh.c 
+CFILES  = amin.c amax.c fmod.c acos.c asin.c atan2.c atof.c cosh.c ftoa.c ftoe.c sinh.c tanh.c acosh.c asinh.c atanh.c  tofix16.c fromfix16.c
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-CFLAGS += -fp-mode=mbf32 -D__MATH_MBF32
+CFLAGS += -fp-mode=mbf32 -D__MATH_MBF32 -DFLOAT_IS_32BITS
 
 all: dirs $(OUTPUT_DIRECTORY)/mbf32.lib $(OUTPUT_DIRECTORY)/mbf32_8080.lib $(OUTPUT_DIRECTORY)/mbf32_8085.lib $(OUTPUT_DIRECTORY)/mbf32_iy.lib $(OUTPUT_DIRECTORY)/mbf32_gbz80.lib
 

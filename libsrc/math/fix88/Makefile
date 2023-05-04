@@ -20,17 +20,17 @@ obj/z80/%.o: %.asm
 	@mv $(^:.asm=.o) $@
 
 obj/z80n/%.o: %.c
-	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
+	$(ZCC) +test -mz80n $(CFLAGS) -o $@  $^
 
 obj/z80n/%.o: %.asm
-	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC  $^
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80n -D__CLASSIC  $^
 	@mv $(^:.asm=.o) $@
 
 obj/ixiy/%.o: %.c
 	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
 
 obj/ixiy/%.o: %.asm
-	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC  $^
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -IXIY -mz80 -D__CLASSIC  $^
 	@mv $(^:.asm=.o) $@
 
 obj/r2k/%.o: %.c

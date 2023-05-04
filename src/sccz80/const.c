@@ -141,6 +141,20 @@ int fnumber(LVALUE *lval)
             lval->val_type = KIND_FLOAT16;
             lval->ltype = type_float16;
         }
+    } else if ( line[lptr] == 'h') {
+        lptr++;
+        if ( line[lptr] == 'k') {
+            lptr++;
+            lval->val_type = KIND_ACCUM16;
+            lval->ltype = type_accum16;
+        }
+    }  else if ( line[lptr] == 'l') {
+        lptr++;
+        if ( line[lptr] == 'k') {
+            lptr++;
+            lval->val_type = KIND_ACCUM32;
+            lval->ltype = type_accum32;
+        }
     }
     for ( i = 0; i < buffer_fps_num; i++ ) 
         fprintf(buffer_fps[i], "%.*s", (int)(line+lptr-start), start);
@@ -231,7 +245,7 @@ typecheck:
     }
     lval->is_const = 1;
 
-    while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f'))) {
+    while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f') || rcmatch('h') || rcmatch ('l'))) {
         if (cmatch('L')) {
             lval->val_type = KIND_LONG;
             if (cmatch('L'))
@@ -246,6 +260,13 @@ typecheck:
         if (amatch("f16")) {
             lval->val_type = KIND_FLOAT16;
             lval->ltype = type_float16;
+        }
+        if ( amatch("hk")) {
+            lval->val_type = KIND_ACCUM16;
+            lval->ltype = type_accum16;
+        } else if ( amatch("lk")) {
+            lval->val_type = KIND_ACCUM32;
+            lval->ltype = type_accum32;
         }
         if (cmatch('f')) {
             lval->val_type = KIND_DOUBLE;
@@ -1078,6 +1099,18 @@ void load_llong_into_acc(zdouble val)
     immedlit(elem->litlab,0);
     nl();
     callrts("l_i64_load");
+}
+
+
+void load_fixed(LVALUE *lval)
+{
+    if ( lval->val_type == KIND_ACCUM16) {
+        int16_t val = ((int16_t)((lval->const_val) / (1.0 / 256.0) + ((lval->const_val) >= 0 ? 0.5 : -0.5)));
+        vconst(val);
+    } else {
+        int32_t val = ((int32_t)((lval->const_val) / (1.0 / 65536.0) + ((lval->const_val) >= 0 ? 0.5 : -0.5))); 
+        vlongconst(val);
+    }
 }
 
 

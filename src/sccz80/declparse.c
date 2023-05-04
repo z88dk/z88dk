@@ -16,6 +16,8 @@ Type   *type_long = &(Type){ KIND_LONG, 4, 0, .len=1 };
 Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
 Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
 Type   *type_float16 = &(Type){ KIND_FLOAT16, 2, 0, .len=1 }; 
+Type   *type_accum16 = &(Type){ KIND_ACCUM16, 2, 0, .len=1 }; 
+Type   *type_accum32 = &(Type){ KIND_ACCUM32, 4, 0, .len=1 }; 
 Type   *type_longlong = &(Type){ KIND_LONGLONG, 8, 0, .len=1 }; 
 Type   *type_ulonglong = &(Type){ KIND_LONGLONG, 8, 1, .len=1 }; 
 
@@ -563,13 +565,30 @@ static Type *parse_type(void)
             type->isunsigned = 1;
         }
     } else if ( amatch("int") || amatch("short")) {
-        swallow("int");        
-        type->kind = KIND_INT;
-        type->size = 2;
+        if ( amatch("_Accum")) {
+            type->kind = KIND_ACCUM16;
+            type->size = 2;
+
+            if ( type->isunsigned ) {
+                warningfmt("unsupported-feature", "unsigned _Accum is not currently supported");
+                type->isunsigned = 0;
+            }
+        } else {
+            swallow("int");        
+            type->kind = KIND_INT;
+            type->size = 2;
+        }
     } else if ( amatch("long")) {
         if ( amatch("long")) {
             type->kind = KIND_LONGLONG;
             type->size = 8;
+        } else if ( amatch("_Accum")) {
+            type->kind = KIND_ACCUM32;
+            type->size = 4;
+            if ( type->isunsigned ) {
+                warningfmt("unsupported-feature", "unsigned long _Accum is not currently supported");
+                type->isunsigned = 0;
+            }
         } else {
             type->kind = KIND_LONG;
             type->size = 4;
@@ -581,6 +600,13 @@ static Type *parse_type(void)
     } else if ( amatch("_Float16")) {
         type->kind = KIND_FLOAT16;
         type->size = 2;
+    } else if ( amatch("_Accum")) {
+        type->kind = KIND_ACCUM16;
+        type->size = 2;
+        if ( type->isunsigned ) {
+            warningfmt("unsupported-feature", "unsigned _Accum is not currently supported");
+            type->isunsigned = 0;
+        }
     } else if ( amatch("void")) {
         type->kind = KIND_VOID;
         type->size = 1;
@@ -1207,12 +1233,14 @@ Type *make_type(Kind kind, Type *tag)
         break;
     case KIND_INT:
     case KIND_FLOAT16:
+    case KIND_ACCUM16:
         type->size = 2;
         break;
     case KIND_CPTR:
         type->size = 3;  // TODO: far flag
         break;
     case KIND_LONG:
+    case KIND_ACCUM32:
         type->size = 4;
         break;
     case KIND_LONGLONG:
@@ -1576,6 +1604,12 @@ void type_describe(Type *type, UT_string *output)
         break;
     case KIND_FLOAT16:
         utstring_printf(output,"_Float16 ");
+        break;
+    case KIND_ACCUM16:
+        utstring_printf(output,"_Accum ");
+        break;
+    case KIND_ACCUM32:
+        utstring_printf(output,"long _Accum ");
         break;
     case KIND_ARRAY:
         if ( type->len == -1 ) {
