@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.5.1+
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -287,17 +287,17 @@ typedef struct xLIST
  * \ingroup LinkedList
  */
 #define listGET_OWNER_OF_NEXT_ENTRY( pxTCB, pxList )                                           \
-    {                                                                                          \
+    do {                                                                                       \
         List_t * const pxConstList = ( pxList );                                               \
         /* Increment the index to the next item and return the item, ensuring */               \
         /* we don't return the marker used at the end of the list.  */                         \
         ( pxConstList )->pxIndex = ( pxConstList )->pxIndex->pxNext;                           \
         if( ( void * ) ( pxConstList )->pxIndex == ( void * ) &( ( pxConstList )->xListEnd ) ) \
         {                                                                                      \
-            ( pxConstList )->pxIndex = ( pxConstList )->pxIndex->pxNext;                       \
+            ( pxConstList )->pxIndex = ( pxConstList )->xListEnd.pxNext;                       \
         }                                                                                      \
         ( pxTCB ) = ( pxConstList )->pxIndex->pvOwner;                                         \
-    }
+    } while( 0 )
 
 /*
  * Version of uxListRemove() that does not return a value.  Provided as a slight
@@ -316,7 +316,7 @@ typedef struct xLIST
  * \ingroup LinkedList
  */
 #define listREMOVE_ITEM( pxItemToRemove ) \
-    {                                     \
+    do {                                  \
         /* The list item knows which list it is in.  Obtain the list from the list \
          * item. */                                                              \
         List_t * const pxList = ( pxItemToRemove )->pxContainer;                 \
@@ -331,7 +331,7 @@ typedef struct xLIST
                                                                                  \
         ( pxItemToRemove )->pxContainer = NULL;                                  \
         ( pxList->uxNumberOfItems )--;                                           \
-    }
+    } while( 0 )
 
 /*
  * Inline version of vListInsertEnd() to provide slight optimisation for
@@ -356,7 +356,7 @@ typedef struct xLIST
  * \ingroup LinkedList
  */
 #define listINSERT_END( pxList, pxNewListItem )           \
-    {                                                     \
+    do {                                                  \
         ListItem_t * const pxIndex = ( pxList )->pxIndex; \
                                                           \
         /* Only effective when configASSERT() is also defined, these tests may catch \
@@ -378,7 +378,7 @@ typedef struct xLIST
         ( pxNewListItem )->pxContainer = ( pxList );         \
                                                              \
         ( ( pxList )->uxNumberOfItems )++;                   \
-    }
+    } while( 0 )
 
 /*
  * Access function to obtain the owner of the first entry in a list.  Lists

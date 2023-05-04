@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.5.1+
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -56,7 +56,7 @@ include(__link__.m4)
 #define configCHECK_FOR_STACK_OVERFLOW      0
 
 #define configUSE_TRACE_FACILITY            0
-#define configUSE_16_BIT_TICKS              1
+#define configTICK_TYPE_WIDTH_IN_BITS       TICK_TYPE_WIDTH_16_BITS
 
 #define configUSE_MUTEXES                   1
 #define configUSE_RECURSIVE_MUTEXES         1

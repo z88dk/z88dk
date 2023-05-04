@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.5.1+
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -47,6 +47,7 @@
  * to make it clear that new projects should not use it, support for the port
  * specific constants has been moved into the deprecated_definitions.h header
  * file. */
+//#include <freertos/deprecated_definitions.h>
 
 /* If portENTER_CRITICAL is not defined then including deprecated_definitions.h
  * did not result in a portmacro.h header file being included - and it should be
@@ -88,18 +89,6 @@
     #define portARCH_NAME               NULL
 #endif
 
-#ifndef PRIVILEGED_FUNCTION
-    #define PRIVILEGED_FUNCTION
-#endif
-
-#ifndef PRIVILEGED_DATA
-    #define PRIVILEGED_DATA
-#endif
-
-#ifndef FREERTOS_SYSTEM_CALL
-    #define FREERTOS_SYSTEM_CALL
-#endif
-
 #ifndef configSTACK_ALLOCATION_FROM_SEPARATE_HEAP
     /* Defaults to 0 for backward compatibility. */
     #define configSTACK_ALLOCATION_FROM_SEPARATE_HEAP    0
@@ -111,7 +100,21 @@
 #endif
 /* *INDENT-ON* */
 
-/*-----------------------------------------------------------*/
+/*
+ * Extracted from <freertos/mpu_wrappers.h>
+ */
+
+#ifndef PRIVILEGED_FUNCTION
+    #define PRIVILEGED_FUNCTION
+#endif
+
+#ifndef PRIVILEGED_DATA
+    #define PRIVILEGED_DATA
+#endif
+
+#ifndef FREERTOS_SYSTEM_CALL
+    #define FREERTOS_SYSTEM_CALL
+#endif
 
 /*
  * Setup the stack of a new task so it is ready to be placed under the
@@ -126,7 +129,7 @@
                                              TaskFunction_t pxCode,
                                              void * pvParameters ) PRIVILEGED_FUNCTION;
  */
-    extern StackType_t *pxPortInitialiseStack(StackType_t * pxTopOfStack,StackType_t * pxEndOfStack,TaskFunction_t pxCode,void * pvParameters);
+        extern StackType_t *pxPortInitialiseStack(StackType_t * pxTopOfStack,StackType_t * pxEndOfStack,TaskFunction_t pxCode,void * pvParameters);
 
 
     #else
@@ -135,7 +138,7 @@
                                              TaskFunction_t pxCode,
                                              void * pvParameters ) PRIVILEGED_FUNCTION;
  */
-    extern StackType_t *pxPortInitialiseStack(StackType_t * pxTopOfStack,TaskFunction_t pxCode,void * pvParameters);
+        extern StackType_t *pxPortInitialiseStack(StackType_t * pxTopOfStack,TaskFunction_t pxCode,void * pvParameters);
 
 
     #endif
