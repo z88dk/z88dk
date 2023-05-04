@@ -4,6 +4,9 @@ target/mbc200/subcpu/mbc_getword
 target/mbc200/subcpu/mbc_rcv_rdy
 target/mbc200/subcpu/mbc_sub
 target/mbc200/subcpu/mbc_fade
+target/mbc200/subcpu/set_crtc_reg
+target/mbc200/subcpu/mbc_setcursorpos
+target/mbc200/subcpu/mbc_setcursorpos_callee
 target/mbc200/graphics/__mbc_pixel
 target/mbc200/graphics/__mbc_line
 target/mbc200/graphics/w_plotpixl
