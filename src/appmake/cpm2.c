@@ -201,6 +201,24 @@ static disc_spec mbc1000_spec = {
 };
 
 
+static disc_spec altos5_spec = {
+    .name = "Altos5",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 177,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1
+};
+
+
 static disc_spec mbc1200_spec = {
     .name = "MBC-1200",
     .disk_mode = MFM250,
@@ -737,6 +755,7 @@ static struct formats {
      void         (*extra_hook)(disc_handle *handle);
 } formats[] = {
     { "alphatro",  "Alphatronic PC",        &alphatro_spec, 0, NULL, 1 },
+    { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bw12",      "Bondwell 12/14",        &bondwell12_spec, 0, NULL, 1 },
