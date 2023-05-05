@@ -5,7 +5,7 @@
  *
  *      Stefano Bodrato - 31/01/2008
  *
- *	$Id: zxbeta.h,v 1.2 2010-09-19 00:24:08 dom Exp $
+ *	$Id: betadisk.h $
  */
 
 

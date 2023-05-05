@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - Feb. 2010
  *
- *		$Id: zxmmc.h,v 1.4 2016-06-11 19:53:08 dom Exp $
+ *		$Id: zxmmc.h $
  * 
  */
 

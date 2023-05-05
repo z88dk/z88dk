@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 3/7/2006
  *
- *	$Id: zxcurrah.h,v 1.2 2010-09-19 00:24:08 dom Exp $
+ *	$Id: currah.h $
  */
 
 
