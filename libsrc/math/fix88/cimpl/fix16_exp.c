@@ -2,9 +2,9 @@
 #include <math/math_fix88.h>
 #include <stdlib.h>
 
-fix16_t fix16_exp(fix16_t fp) __z88dk_fastcall
+Accum fix16_exp(Accum fp) __z88dk_fastcall
 {
-	fix16_t k, z, R, xp;
+	Accum k, z, R, xp;
 
 	if (fp == 0)
 		return (FIX16_ONE);

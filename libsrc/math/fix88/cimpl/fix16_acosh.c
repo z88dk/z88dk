@@ -6,7 +6,7 @@
 
 
 
-fix16_t fix16_acosh(fix16_t x) __z88dk_fastcall
+Accum fix16_acosh(Accum x) __z88dk_fastcall
 {
         return logk(
             mulk(x,FIX16_TWO) -

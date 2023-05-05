@@ -37,7 +37,7 @@ l_f48_ftofix16u = _convertu
 }
 
 
-static fix16_t convert(FLOAT x) __z88dk_fastcall
+static _Accum convert(FLOAT x) __z88dk_fastcall
 {
 #ifdef FLOAT_IS_16BITS
    return FIX16_FROM_FLOAT16(x);
@@ -46,7 +46,7 @@ static fix16_t convert(FLOAT x) __z88dk_fastcall
 #endif
 }
 
-static fix16_t convertu(FLOAT x) __z88dk_fastcall
+static unsigned _Accum convertu(FLOAT x) __z88dk_fastcall
 {
 #ifdef FLOAT_IS_16BITS
    return FIX16u_FROM_FLOAT16(x);

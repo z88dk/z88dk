@@ -13,7 +13,7 @@
     #define POW(x,y) powk(x,y)
     #define MUL(x,y) mulk(x,y)
     #define DIV(x,y) divk(x,y)
-    typedef fix16_t FIX;
+    typedef Accum FIX;
 #endif
 
 #ifdef FIX16
