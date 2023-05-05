@@ -7,7 +7,7 @@
  */
 
 #include <stdio.h>
-##include <arch/zx/zxinterface1.h>
+#include <arch/zx/zxinterface1.h>
 
 
 int rename(char *oldname, char *newname)
