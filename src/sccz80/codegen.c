@@ -82,8 +82,8 @@ struct _mapping {
         { "dstore","dstore","l_pint", "l_plong", "l_f64_store", "l_pint", "l_plong" },
         { "fadd", "dadd", "l_f16_add", "l_f32_add", "l_f64_add", NULL, NULL },
         { "fsub", "dsub", "l_f16_sub", "l_f32_sub", "l_f64_sub", NULL, NULL },
-        { "fmul", "dmul", "l_f16_mul", "l_f32_mul", "l_f64_mul", "l_fix16_mul", "l_fix32_mul" },
-        { "fdiv", "ddiv", "l_f16_div", "l_f32_div", "l_f64_div", "l_fix16_div", "l_fix32_div" },
+        { "fmul", "dmul", "l_f16_mul", "l_f32_mul", "l_f64_mul", NULL, NULL },
+        { "fdiv", "ddiv", "l_f16_div", "l_f32_div", "l_f64_div", NULL, NULL },
         { "fle",  "dleq", "l_f16_le", "l_f32_le",  "l_f64_le", NULL, NULL },
         { "flt",  "dlt",  "l_f16_lt", "l_f32_lt",  "l_f64_lt", NULL, NULL },
         { "fge",  "dge",  "l_f16_ge", "l_f32_ge",  "l_f64_ge", NULL, NULL  },
@@ -2638,7 +2638,10 @@ void mult(LVALUE* lval)
         Zsp += 2;
         break;
     case KIND_ACCUM32:
-        dcallrts("fmul",lval->val_type);
+        if ( ulvalue(lval))
+            callrts("l_fix32_mulu");
+        else 
+            callrts("l_fix32_muls");
         Zsp += 4;
         break;
     case KIND_DOUBLE:
