@@ -11,7 +11,7 @@
 	
 	Then, after run, try to PRINT b$
 	
-	$Id: zxbasic.c,v 1.3 2009-08-04 14:07:16 stefano Exp $
+	$Id: zxbasic.c $
 
 */
 
@@ -21,7 +21,7 @@
 #include <zx81.h>
 #endif
 
-#include <zxcurrah.h>
+#include <arch/zx/currah.h>
 #include <zxinterface1.h>
 #include <stdio.h>
 #include <math.h>
