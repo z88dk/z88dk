@@ -10,7 +10,7 @@
 
 #include <sys/types.h>
 #include <fcntl.h>
-#include <zxinterface1.h>
+#include <arch/zx/zxinterface1.h>
 
 
 ssize_t write(int fd, void *ptr, size_t len)
