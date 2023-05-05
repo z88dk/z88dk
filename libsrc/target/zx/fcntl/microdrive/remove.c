@@ -10,7 +10,7 @@
 //#include <fcntl.h>
 
 #include <stdio.h>
-#include <zxinterface1.h>
+#include <arch/zx/zxinterface1.h>
 
 int remove(char *name)
 {
