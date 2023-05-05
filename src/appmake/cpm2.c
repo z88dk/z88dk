@@ -357,7 +357,7 @@ static disc_spec qc10_spec = {
 };
 
 
-static disc_spec tiki100_spec = {
+static disc_spec tiki100_ss_spec = {
     .name = "Tiki100",
     .sectors_per_track = 10,
     .tracks = 40,
@@ -370,6 +370,23 @@ static disc_spec tiki100_spec = {
     .extent_size = 1024,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
+};
+
+
+static disc_spec tiki100_ds_spec = {
+    .name = "Tiki100",
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x3e,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
 };
 
 
@@ -752,11 +769,12 @@ static struct formats {
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
     { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
-    { "svi-40ss",   "SVI 40ss (174k)",      &svi40ss_spec, 0, NULL, 1 },
-    { "tiki100-40t","Tiki 100 (200k)",      &tiki100_spec, 0, NULL, 1 },
-    { "ts803",      "Televideo TS803/TPC1", &ts803_spec, 0, NULL, 1 },
-    { "vector06c",  "Vector 06c",           &vector06c_spec, 0, NULL, 1 },
-    { "z80pack",    "z80pack 8\" format",   &z80pack_spec, 0, NULL, 1 },
+    { "svi-40ss",  "SVI 40ss (174k)",      &svi40ss_spec, 0, NULL, 1 },
+    { "tiki100ss", "Tiki 100 (200k)",      &tiki100_ss_spec, 0, NULL, 1 },
+    { "tiki100ds", "Tiki 100 (400k)",      &tiki100_ds_spec, 0, NULL, 1 },
+    { "ts803",     "Televideo TS803/TPC1", &ts803_spec, 0, NULL, 1 },
+    { "vector06c", "Vector 06c",           &vector06c_spec, 0, NULL, 1 },
+    { "z80pack",   "z80pack 8\" format",   &z80pack_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
 
