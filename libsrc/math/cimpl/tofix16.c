@@ -1,7 +1,7 @@
 
 #define DISABLE_NATIVE_ACCUM 
 #include <math.h>
-#include <math/math_fix88.h>
+#include <math/math_fix16.h>
 
 #if FLOAT_IS_16BITS
 typedef _Float16 FLOAT;

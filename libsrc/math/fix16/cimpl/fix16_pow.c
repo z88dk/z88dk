@@ -1,4 +1,4 @@
-#include <math/math_fix88.h>
+#include <math/math_fix16.h>
 
 
 Accum fix16_pow(Accum x, Accum y) __z88dk_callee /* x to the power y */

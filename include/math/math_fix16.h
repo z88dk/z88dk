@@ -1,10 +1,10 @@
 /*
- * <math/math_fix88.h> provides accessed a fixed point Q8.8 library
+ * <math/math_fix16.h> provides accessed a fixed point Q8.8 library
  *
- * Usage is similar to using regular floating points, however:
- * 
- * - multiplication and division should be performed using mulk() and divk() functions.
- * - conversion to and from types should be performed using the provided macros
+ * Usage is similar to _Float16:
+ *
+ * - With sdcc you have to use mulk() and divk() functions for arithmetic ops
+ * - With sdcc use the type conversion macros
  */
 
 #ifndef MATH_MATH_FIX16_H

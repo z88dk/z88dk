@@ -2,7 +2,7 @@
  *	asin(x)
  */
 
-#include <math/math_fix88.h>
+#include <math/math_fix16.h>
 #include <stdlib.h>
 
 Accum fix16_sinh(Accum x) __z88dk_fastcall

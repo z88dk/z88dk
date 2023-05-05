@@ -2,7 +2,7 @@
  *	atanh(x)
  */
 
-#include <math/math_fix88.h>
+#include <math/math_fix16.h>
 
 
 Accum atanh(Accum x) __z88dk_fastcall
