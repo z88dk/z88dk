@@ -9,7 +9,7 @@
  */
 
 #include <fcntl.h>
-#include <zxinterface1.h>
+#include <arch/zx/zxinterface1.h>
 
 //#include <stdio.h>
 #include <malloc.h>
