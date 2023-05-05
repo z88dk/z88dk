@@ -59,7 +59,7 @@ jobs:
       run: |
         set -e -x
         eval $(perl -Mlocal::lib)
-	cp `which m4` bin/
+	which m4
         ./build.sh -v -b
     - name: Build examples
       run: |
