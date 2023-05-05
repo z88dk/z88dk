@@ -3,7 +3,7 @@
 030307	added #pragma output ZXVGS and #pragma -create-app
 020128	added #ifndef; added bnkinfo and opensound
 
-   $Id: zxvgs.h,v 1.3 2016-06-10 22:34:22 dom Exp $
+   $Id: zxvgs.h $
 */
 
 #ifndef _ZXVGS_H

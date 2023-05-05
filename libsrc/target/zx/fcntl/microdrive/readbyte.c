@@ -15,7 +15,7 @@
 
 // "stdio.h" contains definition for EOF
 #include <stdio.h>
-#include <zxinterface1.h>
+#include <arch/zx/zxinterface1.h>
 
 
 int readbyte(int fd)

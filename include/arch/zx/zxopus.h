@@ -5,7 +5,7 @@
  *
  *      Stefano Bodrato - 7/6/2006
  *
- *	$Id: zxopus.h,v 1.10 2016-06-27 19:16:33 dom Exp $
+ *	$Id: zxopus.h $
  */
 
 
