@@ -54,7 +54,7 @@
 	pop	hl
 	call	l_f48_fix16tof
 	call	dmul
-	call	l_f48_ftofix16
+	call	l_f48_ftofix16s
 	ret
 
 
@@ -63,7 +63,7 @@
 	ld	hl,2	;const
 	call	l_gintspsp	;
 	ld	hl,640	;const
-	call	l_fix16_mul
+	call	l_fix16_muls
 	ret
 
 
@@ -72,7 +72,7 @@
 	ld	hl,2	;const
 	call	l_gintspsp	;
 	ld	hl,640	;const
-	call	l_fix16_mul
+	call	l_fix16_muls
 	ret
 
 
@@ -81,7 +81,7 @@
 	ld	hl,2	;const
 	call	l_gintspsp	;
 	ld	hl,768	;const
-	call	l_fix16_mul
+	call	l_fix16_muls
 	ret
 
 
@@ -90,7 +90,7 @@
 	ld	hl,2	;const
 	call	l_gintspsp	;
 	ld	hl,768	;const
-	call	l_fix16_mul
+	call	l_fix16_muls
 	ret
 
 
@@ -99,7 +99,7 @@
 	ld	hl,2	;const
 	call	l_gintspsp	;
 	ld	hl,512	;const
-	call	l_fix16_mul
+	call	l_fix16_muls
 	ret
 
 
@@ -108,7 +108,7 @@
 	ld	hl,2	;const
 	call	l_gintspsp	;
 	ld	hl,512	;const
-	call	l_fix16_mul
+	call	l_fix16_muls
 	ret
 
 
@@ -119,7 +119,7 @@
 	call	l_gint
 	ld	bc,768	;const
 	push	bc
-	call	l_fix16_div
+	call	l_fix16_divs
 	ret
 
 
@@ -128,7 +128,7 @@
 	ld	hl,2	;const
 	call	l_gintspsp	;
 	ld	hl,768	;const
-	call	l_fix16_div
+	call	l_fix16_divs
 	ret
 
 
@@ -150,7 +150,7 @@
 	call	l_gint8sp	;
 	call	l_f48_fix16tof
 	call	dmul
-	call	l_f48_ftofix16
+	call	l_f48_ftofix16s
 	ret
 
 
@@ -165,7 +165,7 @@
 	pop	hl
 	call	l_f48_fix16tof
 	call	dmul
-	call	l_f48_ftofix16
+	call	l_f48_ftofix16s
 	ret
 
 
@@ -180,7 +180,7 @@
 	pop	hl
 	call	l_int2long_s_float
 	call	dmul
-	call	l_f48_ftofix16
+	call	l_f48_ftofix16s
 	ret
 
 
@@ -194,7 +194,7 @@
 	call	l_gint	;
 	call	l_int2long_s_float
 	call	dmul
-	call	l_f48_ftofix16
+	call	l_f48_ftofix16s
 	ret
 
 
@@ -204,7 +204,7 @@
 	call	l_gintspsp	;
 	call	l_gint6sp	;
 	call	l_fix16_sint2f
-	call	l_fix16_mul
+	call	l_fix16_muls
 	ret
 
 
@@ -215,7 +215,7 @@
 	call	l_gint4sp	;
 	ex	(sp),hl
 	call	l_fix16_sint2f
-	call	l_fix16_mul
+	call	l_fix16_muls
 	ret
 
 
@@ -227,7 +227,7 @@
 	call	l_gint8sp	;
 	call	l_f48_fix16tof
 	call	dadd
-	call	l_f48_ftofix16
+	call	l_f48_ftofix16s
 	ret
 
 
@@ -242,7 +242,7 @@
 	pop	hl
 	call	l_f48_fix16tof
 	call	dadd
-	call	l_f48_ftofix16
+	call	l_f48_ftofix16s
 	ret
 
 
@@ -257,7 +257,7 @@
 	pop	hl
 	call	l_int2long_s_float
 	call	dadd
-	call	l_f48_ftofix16
+	call	l_f48_ftofix16s
 	ret
 
 
@@ -271,7 +271,7 @@
 	call	l_gint	;
 	call	l_int2long_s_float
 	call	dadd
-	call	l_f48_ftofix16
+	call	l_f48_ftofix16s
 	ret
 
 
@@ -334,7 +334,7 @@
 	add	hl,sp
 	call	l_glong
 	call	l_fix16_slong2f
-	call	l_fix16_mul
+	call	l_fix16_muls
 	ret
 
 
@@ -348,7 +348,7 @@
 	ex	(sp),hl
 	ex	de,hl
 	call	l_fix16_slong2f
-	call	l_fix16_mul
+	call	l_fix16_muls
 	ret
 
 

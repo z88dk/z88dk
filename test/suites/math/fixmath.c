@@ -5,18 +5,18 @@
 #include <stdlib.h>
 
 #include <math.h>
-#include <math/math_fix88.h>
+#include <math/math_fix16.h>
 
-#ifdef FIX88
-    #define FABS(x) fabsfix88(x)
-    #define SQRT(x) sqrtfix88(x);
-    #define POW(x,y) powfix88(x,y)
-    #define MUL(x,y) mulfix88(x,y)
-    #define DIV(x,y) divfix88(x,y)
-    typedef fix88_t FIX;
+#ifdef FIX16
+    #define FABS(x) absk(x)
+    #define SQRT(x) sqrtk(x);
+    #define POW(x,y) powk(x,y)
+    #define MUL(x,y) mulk(x,y)
+    #define DIV(x,y) divk(x,y)
+    typedef Accum FIX;
 #endif
 
-#ifdef FIX88
+#ifdef FIX16
    #define EPSILON (0.1)
    #define TINY_POSITIVE 0x0001
 #endif
@@ -24,8 +24,8 @@
 
 void test_comparison()
 {
-     FIX a = FIX88_FROM_INT(10);
-     FIX b = FIX88_FROM_INT(-2);
+     FIX a = FIX16_FROM_INT(10);
+     FIX b = FIX16_FROM_INT(-2);
 
      Assert( a > b, "a > b");
      Assert( a >= b, "a >= b");
@@ -38,16 +38,16 @@ void test_comparison()
 
 void test_integer_constant_operations()
 {
-     FIX a = FIX88_TWO ;
+     FIX a = FIX16_TWO ;
 
-     a += FIX88_TWO;
-     Assert ( FIX88_TO_INT(a) == 4, "addition: a == 4");
-     a = MUL(a, FIX88_TWO);
-     Assert ( FIX88_TO_INT(a) == 8, "multiplication: a == 8");
-     a = DIV(a,FIX88_TWO);
-     Assert ( FIX88_TO_INT(a) == 4, "divide: a == 4");
-     a -= FIX88_TWO;
-     Assert ( FIX88_TO_INT(a) == 2, "subtract: a == 2");
+     a += FIX16_TWO;
+     Assert ( FIX16_TO_INT(a) == 4, "addition: a == 4");
+     a = MUL(a, FIX16_TWO);
+     Assert ( FIX16_TO_INT(a) == 8, "multiplication: a == 8");
+     a = DIV(a,FIX16_TWO);
+     Assert ( FIX16_TO_INT(a) == 4, "divide: a == 4");
+     a -= FIX16_TWO;
+     Assert ( FIX16_TO_INT(a) == 2, "subtract: a == 2");
 }
 
 
@@ -64,10 +64,10 @@ static int approx_equal(FIX a, FIX b, FIX epsilon)
         if ( a == 0 || b == 0 || ((absa + absb) < TINY_POSITIVE )) {
             /* a or b is zero or both are extremely close to it */
             /* relative error is less meaningful here           */
-            return diff < (mulfix88(epsilon,TINY_POSITIVE));
+            return diff < (mulk(epsilon,TINY_POSITIVE));
         } else {
             /* use relative error */
-            return divfix88(diff,(absa + absb)) < epsilon;
+            return divk(diff,(absa + absb)) < epsilon;
         }
     }
 }
@@ -76,11 +76,11 @@ static int approx_equal(FIX a, FIX b, FIX epsilon)
 
 void test_approx_equal()
 {
-    Assert( approx_equal(FIX88_ONE,FIX88_TWO,EPSILON) == 0, " 1 != 2");
-    Assert( approx_equal(FIX88_ONE,FIX88_ONE,EPSILON) == 1, " 1 == 1");
+    Assert( approx_equal(FIX16_ONE,FIX16_TWO,EPSILON) == 0, " 1 != 2");
+    Assert( approx_equal(FIX16_ONE,FIX16_ONE,EPSILON) == 1, " 1 == 1");
     //                   0.00000001
    // Assert( approx_equal(1.23456789,1.23456789,EPSILON) == 1, " 1.23456789 == 1.23456789");
-#ifdef FIX88
+#ifdef FIX16
     //                   0.005
    // Assert( approx_equal(1.24,1.22,EPSILON) == 0, " 1.24 != 1.22");
 #endif
@@ -97,10 +97,10 @@ static void run_sqrt(FIX x, FIX e)
 
 void test_sqrt()
 {
-    run_sqrt(FIX88_FROM_FLOAT(4.0), FIX88_FROM_FLOAT(2.0));
-    run_sqrt(FIX88_FROM_FLOAT(9.0), FIX88_FROM_FLOAT(3.0));
-    run_sqrt(FIX88_FROM_FLOAT(1.0), FIX88_FROM_FLOAT(1.0));
-    run_sqrt(FIX88_FROM_FLOAT(0.5), FIX88_FROM_FLOAT(0.70710678));
+    run_sqrt(FIX16_FROM_FLOAT(4.0), FIX16_FROM_FLOAT(2.0));
+    run_sqrt(FIX16_FROM_FLOAT(9.0), FIX16_FROM_FLOAT(3.0));
+    run_sqrt(FIX16_FROM_FLOAT(1.0), FIX16_FROM_FLOAT(1.0));
+    run_sqrt(FIX16_FROM_FLOAT(0.5), FIX16_FROM_FLOAT(0.70710678));
 }
 
 static void run_pow(FIX x, FIX y, FIX e)
@@ -108,16 +108,16 @@ static void run_pow(FIX x, FIX y, FIX e)
     static char   buf[100];
 
     FIX r = POW(x,y);
-    snprintf(buf,sizeof(buf),"pow(%f,%f) should be %.14f but was %.14f",FIX88_TO_FLOAT(x),FIX88_TO_FLOAT(y),FIX88_TO_FLOAT(e),FIX88_TO_FLOAT(r));
+    snprintf(buf,sizeof(buf),"pow(%f,%f) should be %.14f but was %.14f",FIX16_TO_FLOAT(x),FIX16_TO_FLOAT(y),FIX16_TO_FLOAT(e),FIX16_TO_FLOAT(r));
     Assert( approx_equal(e,r,EPSILON), buf);
 }
 
 void test_pow()
 {
-    run_pow(FIX88_FROM_FLOAT(2.0), FIX88_FROM_FLOAT(2.0), FIX88_FROM_FLOAT(4.0));
-    run_pow(FIX88_FROM_FLOAT(0.5), FIX88_FROM_FLOAT(2.0), FIX88_FROM_FLOAT(0.25));
-    run_pow(FIX88_FROM_FLOAT(2.0), FIX88_FROM_FLOAT(3.0), FIX88_FROM_FLOAT(8.0));
-    run_pow(FIX88_FROM_FLOAT(2.0), FIX88_FROM_FLOAT(0.5), FIX88_FROM_FLOAT(1.42));
+    run_pow(FIX16_FROM_FLOAT(2.0), FIX16_FROM_FLOAT(2.0), FIX16_FROM_FLOAT(4.0));
+    run_pow(FIX16_FROM_FLOAT(0.5), FIX16_FROM_FLOAT(2.0), FIX16_FROM_FLOAT(0.25));
+    run_pow(FIX16_FROM_FLOAT(2.0), FIX16_FROM_FLOAT(3.0), FIX16_FROM_FLOAT(8.0));
+    run_pow(FIX16_FROM_FLOAT(2.0), FIX16_FROM_FLOAT(0.5), FIX16_FROM_FLOAT(1.42));
 }
 
 int suite_math()

@@ -17,7 +17,9 @@ Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
 Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
 Type   *type_float16 = &(Type){ KIND_FLOAT16, 2, 0, .len=1 }; 
 Type   *type_accum16 = &(Type){ KIND_ACCUM16, 2, 0, .len=1 }; 
+Type   *type_uaccum16 = &(Type){ KIND_ACCUM16, 2, 1, .len=1 }; 
 Type   *type_accum32 = &(Type){ KIND_ACCUM32, 4, 0, .len=1 }; 
+Type   *type_uaccum32 = &(Type){ KIND_ACCUM32, 4, 1, .len=1 }; 
 Type   *type_longlong = &(Type){ KIND_LONGLONG, 8, 0, .len=1 }; 
 Type   *type_ulonglong = &(Type){ KIND_LONGLONG, 8, 1, .len=1 }; 
 
@@ -568,11 +570,6 @@ static Type *parse_type(void)
         if ( amatch("_Accum")) {
             type->kind = KIND_ACCUM16;
             type->size = 2;
-
-            if ( type->isunsigned ) {
-                warningfmt("unsupported-feature", "unsigned _Accum is not currently supported");
-                type->isunsigned = 0;
-            }
         } else {
             swallow("int");        
             type->kind = KIND_INT;
@@ -585,10 +582,6 @@ static Type *parse_type(void)
         } else if ( amatch("_Accum")) {
             type->kind = KIND_ACCUM32;
             type->size = 4;
-            if ( type->isunsigned ) {
-                warningfmt("unsupported-feature", "unsigned long _Accum is not currently supported");
-                type->isunsigned = 0;
-            }
         } else {
             type->kind = KIND_LONG;
             type->size = 4;
@@ -603,10 +596,6 @@ static Type *parse_type(void)
     } else if ( amatch("_Accum")) {
         type->kind = KIND_ACCUM16;
         type->size = 2;
-        if ( type->isunsigned ) {
-            warningfmt("unsupported-feature", "unsigned _Accum is not currently supported");
-            type->isunsigned = 0;
-        }
     } else if ( amatch("void")) {
         type->kind = KIND_VOID;
         type->size = 1;

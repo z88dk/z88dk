@@ -294,7 +294,7 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
     }
 
     if (kind_is_decimal(t1)) {
-        zconvert_to_decimal(t2, t1, isunsigned2);
+        zconvert_to_decimal(t2, t1, isunsigned2, isunsigned1);
     } else {
         if (kind_is_decimal(t2)) {
             zconvert_from_decimal(t2, t1, isunsigned1);
@@ -362,7 +362,7 @@ int widen_if_float(LVALUE* lval, LVALUE* lval2, int operator_is_commutative)
             // Both are floating but different types
             if ( lval->val_type == KIND_DOUBLE) {
                 // RHS is _Float16 or fixed, LHS is double, promote RHS
-                zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+                zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned, lval->ltype->isunsigned);
                 lval2->val_type = lval->val_type;
                 lval2->ltype = lval->ltype;
                 return 1;
@@ -371,25 +371,25 @@ int widen_if_float(LVALUE* lval, LVALUE* lval2, int operator_is_commutative)
             // Fall thrrough
         }
         if (lval->val_type != lval2->val_type ) {
-            zconvert_stacked_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned,operator_is_commutative);
+            zconvert_stacked_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned, operator_is_commutative);
             lval->val_type = lval2->val_type; /* type of result */
             lval->ltype = lval2->ltype;
         }
         return 1;
     } else if (kind_is_floating(lval->val_type)) {
-        zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+        zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned, lval->ltype->isunsigned);
         lval2->val_type = lval->val_type;
         lval2->ltype = lval->ltype;
         return 1;
     } else if ( kind_is_fixed(lval2->val_type) ) {
         if (lval->val_type != lval2->val_type ) {
-            zconvert_stacked_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned,operator_is_commutative);
+            zconvert_stacked_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned, operator_is_commutative);
             lval->val_type = lval2->val_type; /* type of result */
             lval->ltype = lval2->ltype;
         }
         return 1;
     } else if ( kind_is_fixed(lval->val_type) ) {
-        zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+        zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned, lval->ltype->isunsigned);
         lval2->val_type = lval->val_type;
         lval2->ltype = lval->ltype;
         return 1;
