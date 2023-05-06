@@ -1,0 +1,49 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+._data
+	defs	4
+	defs	1
+	defb	0x1
+	defw	i_1+0
+	defs	1
+	SECTION	code_compiler
+	SECTION	data_compiler
+._data1
+	defw	10
+	defs	2
+	defb	0x11
+	defw	i_1+0
+	SECTION	code_compiler
+	SECTION	data_compiler
+._data2
+	defw	12
+	defs	3
+	defw	i_1+0
+	SECTION	code_compiler
+
+	SECTION	rodata_compiler
+.i_1
+	defm	"hello"
+	defb	0
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_data
+	GLOBAL	_data1
+	GLOBAL	_data2
+
+
+
+
