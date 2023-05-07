@@ -110,7 +110,7 @@ int str_init(Type *tag)
 
         if ( rcmatch('.') && isalpha(line[lptr+1]) ) {
             char declname[NAMESIZE];
-            int     j, bfsize = ptr->offset;
+            int     j, bfsize = ptr->size;
             Type   *ptr2 = NULL;
 
 
@@ -128,8 +128,9 @@ int str_init(Type *tag)
                         int skip = ptr2->offset - ptr->offset;
                         // We've found a symbol
                         needchar('=');
+
                         // Storage space
-                        if ( skip > 0 ) {
+                        if ( skip > 0 && had_bitfield == 0) {
                             defstorage(); outdec(skip); nl();
                             sz += skip;
                         }
@@ -147,14 +148,13 @@ int str_init(Type *tag)
 
             if ( ptr->bit_size == 0 ) {
                 if ( had_bitfield ) {
-                    sz = bfsize;
+                    sz += bfsize;
                     // We've finished a byte/word of bitfield, we should dump it
                     outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
                     had_bitfield = 0;
                     bitfield_value = 0;
                 }
             }
-
         }
 
 

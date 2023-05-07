@@ -9,10 +9,8 @@
 	SECTION	data_compiler
 ._data
 	defs	4
-	defs	1
 	defb	0x1
 	defw	i_1+0
-	defs	1
 	SECTION	code_compiler
 	SECTION	data_compiler
 ._data1
