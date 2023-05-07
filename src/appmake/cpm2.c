@@ -743,6 +743,22 @@ static disc_spec naburn_spec = {
      .has_skew = 0,
 };
 
+static disc_spec idpfdd_spec = {
+      .name = "Iskra Delta Partner FDD",
+      .sectors_per_track = 18,
+      .tracks = 73, // 146
+      .sides = 2,
+      .sector_size = 256,
+      .gap3_length = 0x2a, //?
+      .filler_byte = 0xe5,
+      .boottracks = 2,
+      .directory_entries = 128,
+      .alternate_sides = 2,
+      .extent_size = 2048,
+      .byte_size_extents = 0, 
+      .first_sector_offset = 0,
+      .has_skew = 0
+ };
 
 
 static struct formats {
@@ -770,6 +786,7 @@ static struct formats {
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
     { "fp1100",    "Casio FP1100",          &fp1100_spec, 0, NULL, 1 },
     { "gemini",    "GeminiGalaxy",          &gemini_spec, 0, NULL, 1 },
+    { "idpfdd", "Iskra Delta Partner", &idpfdd_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
