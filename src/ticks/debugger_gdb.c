@@ -1045,7 +1045,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
                 uint8_t found_mapping = 0;
 
                 for (int i = 0; i < REGISTER_MAPPING_MAX; i++) {
-                    if (strstr(reg_name, register_mapping_names[i]) == reg_name) {
+                    if (strcmp(reg_name, register_mapping_names[i]) == 0) {
                         register_mappings[register_mappings_count++] = i;
                         found_mapping = 1;
                         break;
