@@ -19,6 +19,9 @@
     PUBLIC  cleanup         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
+    EXTERN  im1_vectors
+    EXTERN  asm_interrupt_handler
+
 
     IF      !DEFINED_CRT_ORG_CODE
         defc    CRT_ORG_CODE  = 18953
@@ -46,6 +49,9 @@ IF __CLIB_FONT_HEIGHT > 10
     defw        ERROR_FONT_HEIGHT_IS_INCORRECT
 ENDIF
 
+IF !DEFINED_CRT_DISABLE_FIRMWARE_ISR
+    defc CRT_DISABLE_FIRMWARE_ISR = 0
+ENDIF
 
 start:
     xor     a
@@ -63,15 +69,22 @@ IF DEFINED_USING_amalloc
 ENDIF
 
     di
-	ld hl,$47D0  ;INTHK - Hook Code for Interrupt
-	ld (hl),$c3  ; JP nn
-	inc hl
-	ld de,int_patch
-	ld (hl),de
-	ei
-	
+    ld      hl,$47D0  ;INTHK - Hook Code for Interrupt
+    ld      (hl),$c3  ; JP nn
+    inc     hl
+    ld      de,int_patch
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    ei
+
     call    _main
     ld      iy,$47FA
+
+    di
+    ld      a,$c9       ;ret
+    ld      ($47D0),a
+    ei
 
 cleanup:
     call    crt0_exit
@@ -87,13 +100,20 @@ l_dcal:	jp	(hl)        ;Used for function pointer calls
 
 
 int_patch:
-    ld (iy_val+2),iy	; Preserve IX
-    ld iy,$47FA
-	call $3b
-    pop iy
+    ld      (iy_val+2),iy	; Preserve IX
+IF CRT_DISABLE_FIRMWARE_ISR = 0
+    ld      iy,$47FA
+    call    $3b
+ENDIF
+    ex      (sp),hl         ;Scratch return address from OS
+    push    af
+    ld      hl,im1_vectors
+    call    asm_interrupt_handler
+    pop     af
+    pop     hl
 iy_val:
-	ld iy,0
-	ret
+    ld      iy,0
+    ret
 
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"

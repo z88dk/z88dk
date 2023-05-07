@@ -34,6 +34,17 @@
 #ifdef WIN32
 #include        <direct.h>
 #include        <process.h>
+
+#if !defined S_ISDIR
+    #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+
+#if !defined(S_ISREG) 
+    #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+#endif
+
+
+
 #else
 #include        <unistd.h>
 #endif
@@ -299,11 +310,17 @@ static char           *zcc_opt_def = "zcc_opt.def";
 
 static char           *defaultout = "a.bin";
 
+
+static char           *cfg_path = ".";
+
 #define AF_BOOL_TRUE      1
 #define AF_BOOL_FALSE     2
 #define AF_MORE           4
 #define AF_DEPRECATED     8
 
+
+static char  *c_zcc_cfg = NULL;
+static char *c_binary_dir = "";
 static char  *c_install_dir = PREFIX "/";
 static char  *c_options = NULL;
 
@@ -702,20 +719,24 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
         tstore = strlen(filelist[number]) - strlen(suffix);
         if (!needsuffix)
             filelist[number][tstore] = 0;
-        snprintf(buffer, sizeof(buffer), "%s %s \"%s\"", processor, extraargs, filelist[number]);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\"", c_binary_dir, processor, extraargs, filelist[number]);
         filelist[number][tstore] = '.';
         break;
     case outspecified:
-        snprintf(buffer, sizeof(buffer), "%s %s \"%s\" \"%s\"", processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
         break;
     case outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s %s \"%s\" -o \"%s\"", processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" -o \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
         break;
     case filter:
-        snprintf(buffer, sizeof(buffer), "%s %s < \"%s\" > \"%s\"", processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" > \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
+        break;
+    case filter_out:
+        // This is only used by copy command, which is cat/type so not a z88dk binary
+        snprintf(buffer, sizeof(buffer), "%s %s \"%s\" > \"%s\"", processor, extraargs, filelist[number], outname);
         break;
     case filter_outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s %s < \"%s\" -o \"%s\"", processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" -o \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
         break;
     }
 
@@ -804,7 +825,7 @@ int linkthem(char *linker)
 
         for (i = 0; i < nfiles; ++i)
         {
-            if (hassuffix(filelist[i], c_extension))
+            if (hassuffix(filelist[i], c_extension) || hassuffix(filelist[i],"obj"))
             {
                 fprintf(out, "%s\n", filelist[i]);
                 if (prj) fprintf(prj, "%s\n", original_filenames[i]);
@@ -835,7 +856,7 @@ int linkthem(char *linker)
 
         for (i = 0; i < nfiles; ++i)
         {
-            if (hassuffix(filelist[i], c_extension))
+            if (hassuffix(filelist[i], c_extension) )
             {
                 offs += snprintf(cmdline + offs, len - offs, " \"%s\"", filelist[i]);
                 if (prj) fprintf(prj, "%s\n", original_filenames[i]);
@@ -891,9 +912,25 @@ int main(int argc, char **argv)
         exit(1);
     }
 
+    // If argv[0] is a path and not "." and not the system install path, then we can
+    // setup variables based on that
+    snprintf(buffer,sizeof(buffer),"%s",argv[0]);
+    ptr = zdirname(buffer);
+    if ( strcmp(ptr,".") && strcmp(ptr, BINDIR)) {
+        char ccc[FILENAME_MAX+1];
+        snprintf(ccc, sizeof(ccc), "%s/../", ptr);
+        c_install_dir = muststrdup(ccc);
+        snprintf(ccc, sizeof(ccc), "%s/../lib/config/", ptr);
+        c_zcc_cfg = muststrdup(ccc);
+        snprintf(ccc, sizeof(ccc), "%s/", ptr);
+        c_binary_dir = muststrdup(ccc);
+    }
+
     /* Setup the install prefix based on ZCCCFG */
     if ((ptr = getenv("ZCCCFG")) != NULL) {
-        char ccc[1024];
+        char ccc[FILENAME_MAX+1];
+
+        c_zcc_cfg = muststrdup(ptr);
 #ifdef WIN32
         snprintf(ccc, sizeof(ccc), "%s\\..\\..\\", ptr);
 #else
@@ -906,7 +943,7 @@ int main(int argc, char **argv)
 
     char configuration[1024] = {0};
 
-    for (gargc = 1; gargc < argc; gargc++) {
+    for (gargc = 0 ; gargc < argc; gargc++) {
         char* aa = argv[gargc];
         if (aa[0] == '+') {
             strcpy(configuration, aa);
@@ -926,14 +963,15 @@ int main(int argc, char **argv)
     }
 
     if (strlen(configuration) == 0) {
-        fprintf(stderr, "A config file must be specified with +file as the first argument\n\n");
+        fprintf(stderr, "A config file must be specified with +file\n\n");
         print_help_text(argv[0]);
         exit(1);
     }
 
     find_zcc_config_fileFile(argv[0], configuration, config_filename, sizeof(config_filename));
+    cfg_path = zdirname(strdup(config_filename));
     parse_configfile(config_filename);
-
+    
 
     /* Now, parse the default options list */
     if (c_options != NULL) {
@@ -1028,7 +1066,7 @@ int main(int argc, char **argv)
             char *expanded = expand_macros(rules);
             struct stat sb;
 
-            if (stat(expanded, &sb) == 0) {
+            if (stat(expanded, &sb) == 0 && S_ISREG(sb.st_mode)) {
                 coptrules_cpu = expanded;
             }
         }
@@ -1544,6 +1582,9 @@ int main(int argc, char **argv)
                 exit(1);
             free(ptr);
             break;
+        case OBJFILE2:
+            if (process(".obj", c_extension, c_copycmd, "", filter_out, i, YES, YES))
+                exit(1);
         case OBJFILE:
             break;
         default:
@@ -2044,6 +2085,8 @@ int get_filetype_by_suffix(char *name)
         return ASMFILE;
     if (strcmp(ext, ".o") == 0)
         return OBJFILE;
+    if (strcmp(ext, ".obj") == 0)
+        return OBJFILE2;
     if (strcmp(ext, ".m4") == 0)
         return M4FILE;
     if (strcmp(ext, ".h") == 0)
@@ -2502,7 +2545,7 @@ void add_file_to_process(char *filename, char process_extension)
                 /* Add this file to the list of original files */
                 if (find_file_ext(p) == NULL) {
                     /* file without extension - see if it exists, exclude directories */
-                    if ((stat(p, &tmp) == 0) && (!(tmp.st_mode & S_IFDIR))) {
+                    if ( stat(p, &tmp) == 0 && !S_ISDIR(tmp.st_mode) ) {
                         fprintf(stderr, "Unrecognized file type %s\n", p);
                         exit(1);
                     }
@@ -2618,19 +2661,40 @@ void parse_cmdline_arg(char *arg)
 void LoadConfigFile(arg_t *argument, char *arg)
 {
     char   buf[FILENAME_MAX+1];
-    char  *cfgfile;
+    struct stat sb;
 
-    cfgfile = getenv("ZCCCFG");
-    if (cfgfile != NULL) {
-        if (strlen(cfgfile) > ( FILENAME_MAX - strlen(arg) - strlen("/") )) {
-            fprintf(stderr, "Possibly corrupt env variable ZCCCFG\n");
-            exit(1);
+    do {
+        // 1. Try a local file/absolute path
+        snprintf(buf,sizeof(buf), "%s",arg);
+        if ( stat(buf, &sb) == 0 && S_ISREG(sb.st_mode)) {
+            break;
         }
-        /* Config file in config directory */
-        snprintf(buf, sizeof(buf), "%s/%s", cfgfile, arg);
-    } else {
+
+        // 2. Try in ZCCCFG
+        if (c_zcc_cfg != NULL) {
+            /* Config file in config directory */
+            snprintf(buf, sizeof(buf), "%s/%s", c_zcc_cfg, arg);
+            if ( stat(buf, &sb) == 0 && S_ISREG(sb.st_mode)) {
+                break;
+            }
+        }
+
+        // 3. Try in cfg file path
+        snprintf(buf,sizeof(buf),"%s/%s",cfg_path,arg);
+        if ( stat(buf, &sb) == 0 && S_ISREG(sb.st_mode)) {
+            break;
+        }
+
+        // 4. Try install dir
         snprintf(buf, sizeof(buf), "%s/lib/config/%s", c_install_dir, arg);
-    }
+        if ( stat(buf, &sb) == 0 && S_ISREG(sb.st_mode)) {
+            break;
+        }
+
+        fprintf(stderr, "Can't open config file %s\n", arg);
+        exit(1);
+    } while (0);
+
     parse_configfile(buf);
 }
 
@@ -3113,7 +3177,6 @@ void tempname(char *filen)
 void find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t buflen)
 {
     FILE           *fp;
-    char           *cfgfile;
 
     /* Scan for an option file on the command line */
     if (arg[0] == '+') {
@@ -3125,14 +3188,9 @@ void find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t 
                 return;
             }
         }
-        cfgfile = getenv("ZCCCFG");
-        if (cfgfile != NULL) {
-            if (strlen(cfgfile) > ( FILENAME_MAX - strlen(arg+1) - strlen("/.cfg") )) {
-                fprintf(stderr, "Possibly corrupt env variable ZCCCFG\n");
-                exit(1);
-            }
+        if (c_zcc_cfg != NULL) {
             /* Config file in config directory */
-            snprintf(buf, buflen, "%s/%s.cfg", cfgfile, arg + 1);
+            snprintf(buf, buflen, "%s/%s.cfg", c_zcc_cfg, arg + 1);
             return;
         } else {
             snprintf(buf, buflen, "%s/lib/config/%s.cfg", c_install_dir, arg + 1);
@@ -3144,7 +3202,7 @@ void find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t 
         return;
     }
     /* Without a config file, we should just print usage and then exit */
-    fprintf(stderr, "A config file must be specified with +file as the first argument\n\n");
+    fprintf(stderr, "A config file must be specified with +file\n\n");
     print_help_text(program);
     exit(1);
 }

@@ -32,6 +32,10 @@
     EXTERN asm_im1_handler
     defc _z80_rst_38h = asm_im1_handler
 
+    defc    TAR__crt_on_exit = 0            ;Jump to 0 at finish
+    defc    TAR__crt_enable_eidi = $02      ;Enable ei on startup 
+
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     org     CRT_ORG_CODE
@@ -48,25 +52,12 @@ start:
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call	crt0_init_bss
-    ei
-
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-
-
     call    _main           ; Call user program
 cleanup:
-    push    hl              ; return code
     call    crt0_exit
-cleanup_exit:
-    pop     bc              ; return code (still not sure it is teh right one !)
-end:
-    jp      0
-
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal: 
     jp      (hl)            ;Used for function pointer calls

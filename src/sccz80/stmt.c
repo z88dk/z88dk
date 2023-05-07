@@ -537,7 +537,7 @@ void docase()
     }
     postlabel(swnext->label = getlabel());
     constexpr(&value,&valtype, 1);
-    if ( kind_is_floating(valtype)) 
+    if ( kind_is_decimal(valtype)) 
         warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
     swnext->value = value;
     needchar(':');

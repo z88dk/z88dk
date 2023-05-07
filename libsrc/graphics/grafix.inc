@@ -65,7 +65,6 @@ IF FORpc88
     defc    WANT_swapgfxbk = 0
 ENDIF
 
-
 IF FORvz
     DEFINE gotgfx
     IF BLOCKgfx
@@ -269,6 +268,12 @@ IF FOReinstein
     defc maxy    = 192
     defc fcolor    = 1
     defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORmbc200
+    DEFINE gotgfx
+    defc maxx    = 640
+    defc maxy    = 400
 ENDIF
 
 IF FORmsx

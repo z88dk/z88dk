@@ -91,6 +91,7 @@ int fnumber(LVALUE *lval)
     char* s; /* points into source code */
     char* end;
     double dval;
+
     start = s = line + lptr; /* save starting point */
     k = 1;
     minus = 1;
@@ -134,14 +135,44 @@ int fnumber(LVALUE *lval)
     lval->val_type = KIND_DOUBLE;
     lval->ltype = type_double;
 
-    if ( line[lptr] == 'f' ) {
-        lptr++;
-        if ( line[lptr] == '1' && line[lptr+1] == '6') {
-            lptr+=2;
-            lval->val_type = KIND_FLOAT16;
-            lval->ltype = type_float16;
+    do {
+        int isunsigned = 0;
+        int islong = 0;
+
+        if ( line[lptr] == 'f' ) {
+            lptr++;
+            if ( line[lptr] == '1' && line[lptr+1] == '6') {
+                lptr+=2;
+                lval->val_type = KIND_FLOAT16;
+                lval->ltype = type_float16;
+            }
+            break;
+        } 
+        
+        if ( line[lptr] == 'u' ) {
+            isunsigned = 1;
         }
-    }
+
+        if ( line[lptr] == 'l') {
+            lptr++;
+            islong = 1;
+        } else if ( line[lptr] == 'h' ) {
+            lptr++;
+        }
+
+        if ( line[lptr] == 'k') {
+            lptr++;
+            if ( islong ) {
+                lval->val_type = KIND_ACCUM32;
+                lval->ltype = isunsigned ? type_uaccum32 : type_accum32;
+            } else {
+                lval->val_type = KIND_ACCUM16;
+                lval->ltype = isunsigned ? type_uaccum16 : type_accum16;
+            }
+        }
+    } while ( 0);
+
+
     for ( i = 0; i < buffer_fps_num; i++ ) 
         fprintf(buffer_fps[i], "%.*s", (int)(line+lptr-start), start);
 
@@ -231,26 +262,42 @@ typecheck:
     }
     lval->is_const = 1;
 
-    while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f'))) {
+    while (checkws() == 0 ) {
+        int loop = 0;
+
         if (cmatch('L')) {
             lval->val_type = KIND_LONG;
             if (cmatch('L'))
                 lval->val_type = KIND_LONGLONG;
+            break;
         }
-        if (cmatch('U')) {
+        if (cmatch('U') || cmatch('u')) {
             isunsigned = 1;
             lval->const_val = (uint64_t)k;
-        }
-        if (cmatch('S'))
+            loop = 1;
+        } else if (cmatch('S')) {
             isunsigned = 0;
-        if (amatch("f16")) {
+            loop = 1;
+        } else if (amatch("f16")) {
             lval->val_type = KIND_FLOAT16;
             lval->ltype = type_float16;
-        }
-        if (cmatch('f')) {
+            break;
+        } else if (cmatch('f')) {
             lval->val_type = KIND_DOUBLE;
             lval->ltype = type_double;
+            break;
         }
+
+        if ( amatch("hk") || amatch("k")) {
+            lval->val_type = KIND_ACCUM16;
+            lval->ltype = isunsigned ? type_uaccum16 : type_accum16;
+            break;
+        } else if ( amatch("lk")) {
+            lval->val_type = KIND_ACCUM32;
+            lval->ltype = isunsigned ? type_uaccum32 : type_accum32;
+            break;
+        }
+        if (!loop) break;
     }
     if ( lval->val_type == KIND_LONGLONG ) {
         if ( isunsigned )
@@ -1078,6 +1125,18 @@ void load_llong_into_acc(zdouble val)
     immedlit(elem->litlab,0);
     nl();
     callrts("l_i64_load");
+}
+
+
+void load_fixed(LVALUE *lval)
+{
+    if ( lval->val_type == KIND_ACCUM16) {
+        int16_t val = ((int16_t)((lval->const_val) / (1.0 / 256.0) + ((lval->const_val) >= 0 ? 0.5 : -0.5)));
+        vconst(val);
+    } else {
+        int32_t val = ((int32_t)((lval->const_val) / (1.0 / 65536.0) + ((lval->const_val) >= 0 ? 0.5 : -0.5))); 
+        vlongconst(val);
+    }
 }
 
 

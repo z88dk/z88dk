@@ -151,8 +151,14 @@ void write_cdb_type(UT_string *output, Type *type,int comma)
     case KIND_SHORT:
         utstring_printf(output,"%sSI:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
         break;
+    case KIND_ACCUM16:  // Best effort
+        utstring_printf(output,"%sSI:%s", comma ? "," : "", "S"); 
+        break;
     case KIND_INT:
         utstring_printf(output,"%sSI:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
+        break;
+    case KIND_ACCUM32: // Best effort
+        utstring_printf(output,"%sSL:%s", comma ? "," : "",  "S");
         break;
     case KIND_LONG:
         utstring_printf(output,"%sSL:%s", comma ? "," : "", type->isunsigned ? "U" : "S");

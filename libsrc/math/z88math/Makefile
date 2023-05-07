@@ -5,10 +5,10 @@ include ../../Make.config
 vpath %.c ../cimpl/
 
 AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard z80/*asm)
-CFILES  = cosh.c sinh.c tanh.c modf.c 
+CFILES  = cosh.c sinh.c tanh.c modf.c tofix16.c fromfix16.c
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-CFLAGS +=  -math-z88 -D__Z88__ -D__NATIVE_MATH__
+CFLAGS +=  -math-z88 -D__Z88__ -D__NATIVE_MATH__ -DFLOAT_IS_48BITS
 
 all: dirs $(OUTPUT_DIRECTORY)/z88_math.lib $(OUTPUT_DIRECTORY)/bbc_math.lib
 all: dirs $(OUTPUT_DIRECTORY)/z88_math.lib $(OUTPUT_DIRECTORY)/bbc_math.lib $(OUTPUT_DIRECTORY)/bbc_math_iy.lib

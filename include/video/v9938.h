@@ -45,17 +45,14 @@ typedef enum {
     VDP_CMD_PSET = 0x50,
     /**
      * SRCH: Search color code from the given point towards left/right.
-     * \sa vdp_cmd_execute_SRCH()
      */
     VDP_CMD_SRCH = 0x60,
     /**
      * LINE: Draw line w/ logical operation.
-     * \sa vdp_cmd_execute_LINE()
      */
     VDP_CMD_LINE = 0x70,
     /**
      * LMMV: Fill rectangular area w/ logical operation.
-     * \sa vdp_cmd_execute_LMMV()
      */
     VDP_CMD_LMMV = 0x80,
     /**

@@ -43,6 +43,10 @@ IF CRT_DISABLE_FIRMWARE_ISR = 0
     defc CRT_EVENT_BLOCKS_NUM = 8
 ENDIF
 
+    ; Floating point accumulator needs to be in middle 32k
+    PUBLIC  fa
+    defc    fa = 0xa680
+
 
     PUBLIC  cpc_enable_fw_exx_set       ;needed by firmware interposer
     PUBLIC  cpc_enable_process_exx_set  ;needed by firmware interposer
@@ -116,9 +120,6 @@ ENDIF
     ei
 
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
     defc    CRT_MAX_HEAP_ADDRESS = 0xa600
     INCLUDE "crt/classic/crt_init_amalloc.asm"

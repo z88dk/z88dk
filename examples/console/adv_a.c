@@ -69,7 +69,7 @@
 #ifdef PICS
 #include <graphics.h>
 #include <games.h>
-#include <adv_a.h>
+#include "adv_a.h"
 int mazepic;
 #endif
 

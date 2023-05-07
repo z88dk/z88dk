@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.5.1+
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -239,7 +239,7 @@ typedef void (* PendedFunction_t)( void *,
                                 void * const pvTimerID,
                                 TimerCallbackFunction_t pxCallbackFunction ) PRIVILEGED_FUNCTION;
  */
-extern TimerHandle_t __LIB__ xTimerCreate(const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const BaseType_t xAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction) __smallc;
+    extern TimerHandle_t __LIB__ xTimerCreate(const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const BaseType_t xAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction) __smallc;
 
 
 #endif
@@ -375,7 +375,7 @@ extern TimerHandle_t __LIB__ xTimerCreate(const char * const pcTimerName,const T
                                       TimerCallbackFunction_t pxCallbackFunction,
                                       StaticTimer_t * pxTimerBuffer ) PRIVILEGED_FUNCTION;
  */
-extern TimerHandle_t __LIB__ xTimerCreate(const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const BaseType_t xAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction,StaticTimer_t * pxTimerBuffer) __smallc;
+    extern TimerHandle_t __LIB__ xTimerCreate(const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const BaseType_t xAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction,StaticTimer_t * pxTimerBuffer) __smallc;
 
 
 #endif /* configSUPPORT_STATIC_ALLOCATION */
@@ -1386,6 +1386,31 @@ extern TickType_t __LIB__ xTimerGetPeriod(TimerHandle_t xTimer) __smallc;
  */
 TickType_t xTimerGetExpiryTime( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
 
+/**
+ * BaseType_t xTimerGetStaticBuffer( TimerHandle_t xTimer,
+ *                                   StaticTimer_t ** ppxTimerBuffer );
+ *
+ * Retrieve pointer to a statically created timer's data structure
+ * buffer. This is the same buffer that is supplied at the time of
+ * creation.
+ *
+ * @param xTimer The timer for which to retrieve the buffer.
+ *
+ * @param ppxTaskBuffer Used to return a pointer to the timers's data
+ * structure buffer.
+ *
+ * @return pdTRUE if the buffer was retrieved, pdFALSE otherwise.
+ */
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+/*
+    BaseType_t xTimerGetStaticBuffer( TimerHandle_t xTimer,
+                                      StaticTimer_t ** ppxTimerBuffer ) PRIVILEGED_FUNCTION;
+ */
+    extern BaseType_t __LIB__ xTimerGetStaticBuffer(TimerHandle_t xTimer,StaticTimer_t ** ppxTimerBuffer) __smallc;
+
+
+#endif /* configSUPPORT_STATIC_ALLOCATION */
+
 /*
  * Functions beyond this part are not part of the public API and are intended
  * for use by the kernel only.
@@ -1440,6 +1465,25 @@ extern BaseType_t __LIB__ xTimerGenericCommand(TimerHandle_t xTimer,const BaseTy
                                          configSTACK_DEPTH_TYPE * puxTimerTaskStackSize );
  */
     extern void __LIB__ vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBuffer,StackType_t ** ppxTimerTaskStackBuffer,configSTACK_DEPTH_TYPE * puxTimerTaskStackSize) __smallc;
+
+
+
+#endif
+
+#if ( configUSE_DAEMON_TASK_STARTUP_HOOK != 0 )
+
+/**
+ *  timers.h
+ * @code{c}
+ * void vApplicationDaemonTaskStartupHook( void );
+ * @endcode
+ *
+ * This hook function is called from the timer task once the task starts running.
+ */
+/*
+    void vApplicationDaemonTaskStartupHook( void );
+ */
+    extern void __LIB__ vApplicationDaemonTaskStartupHook(void) __smallc;
 
 
 

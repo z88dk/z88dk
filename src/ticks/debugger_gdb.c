@@ -109,8 +109,8 @@ static const char* register_mapping_names[] = {
      * Some emulators would report this 16bit register pair, which could be used
      * to track ticks for profiling purposes
      */
-    "clockl_",
-    "clockh_",
+    "clockl",
+    "clockh",
 };
 
 static enum register_mapping_t register_mappings[32] = {0};

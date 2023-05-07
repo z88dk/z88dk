@@ -1,40 +1,53 @@
 #
-# ZX ROM FP math Makefile
-# $Id: Makefile,v 1.3 2016-07-02 15:42:55 dom Exp $
-#
 
 include ../../Make.config
 
-all: mzx_tiny m81_tiny mlambda_tiny mzx m2068 m81 mlambda
+vpath %.c ../cimpl/
 
-mzx_tiny:
-	$(RM) -f *.o* ../../mzx_tiny.lib
-	$(LIBLINKER) -DFORzx -DTINYMODE -x$(OUTPUT_DIRECTORY)/mzx_tiny @zxmlist
+AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard z80/*asm)
+CFILES  = tofix16.c fromfix16.c
+OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-m81_tiny:
-	$(RM) -f *.o* ../../m81_tiny.lib
-	$(LIBLINKER) -DFORzx81 -IXIY -DTINYMODE -x$(OUTPUT_DIRECTORY)/m81_tiny @zxmlist
+CFLAGS += -D__NATIVE_MATH__ -DFLOAT_IS_48BITS
 
-mlambda_tiny:
-	$(RM) -f *.o* ../../mlambda_tiny.lib
-	$(LIBLINKER) -DFORlambda -IXIY -DTINYMODE -x$(OUTPUT_DIRECTORY)/mlambda_tiny @zxmlist
+all: $(OUTPUT_DIRECTORY)/mzx.lib $(OUTPUT_DIRECTORY)/mzx_tiny.lib \
+	$(OUTPUT_DIRECTORY)/m2068.lib \
+	$(OUTPUT_DIRECTORY)/mlambda.lib $(OUTPUT_DIRECTORY)/mlambda_tiny.lib \
+	$(OUTPUT_DIRECTORY)/m81.lib $(OUTPUT_DIRECTORY)/m81_tiny.lib
 
-mzx:
-	$(RM) -f *.o* ../../mzx.lib
-	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/mzx @zxmlist
 
-m2068:
-	$(RM) -f *.o* ../../m2068.lib
-	$(LIBLINKER) -DFORts2068 -x$(OUTPUT_DIRECTORY)/m2068 @zxmlist
+# $(1) = flavour
+# $(2) = extra flags
+define build_lib
+$(1): $(OUTPUT_DIRECTORY)/$(1).lib
+.PHONY: $(1)
 
-m81:
-	$(RM) -f *.o* ../../m81.lib
-	$(LIBLINKER) -DFORzx81 -IXIY -x$(OUTPUT_DIRECTORY)/m81 @zxmlist
 
-mlambda:
-	$(RM) -f *.o* ../../mlambda.lib
-	$(LIBLINKER) -DFORlambda -IXIY -x$(OUTPUT_DIRECTORY)/mlambda @zxmlist
+$(1)_dir:
+	@mkdir -p obj/$(1)/c/sccz80
+.PHONY: $(1)_dir
+
+$(OUTPUT_DIRECTORY)/$(1).lib: $(1)_dir $(addprefix obj/$(1)/, $(OBJECTS))
+	TYPE=$(1) $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/$(1).lib @zxm.lst
+
+obj/$(1)/%.o: %.c
+	$(ZCC) +test $(CFLAGS) -o $$@  $$^
+
+obj/$(1)/%.o: %.asm
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $(2) $$^
+	@mv $$(^:.asm=.o) $$@
+endef
+
+$(eval $(call build_lib,mzx,-DFORzx))
+$(eval $(call build_lib,mzx_tiny,-DTINYMODE -DFORzx))
+$(eval $(call build_lib,m2068,-DFORts2068))
+$(eval $(call build_lib,m81,-IXIY -DFORzx81))
+$(eval $(call build_lib,m81_tiny,-DTINYMODE -IXIY -DFORzx81))
+$(eval $(call build_lib,mlambda,-IXIY -DFORlambda))
+$(eval $(call build_lib,mlambda_tiny,-DTINYMODE -IXIY -DFORlambda))
+
 
 clean:
-	$(RM) -f *.o* *.sym *.map *.err 
+	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt
+	$(RM) -fr obj
 

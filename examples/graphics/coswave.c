@@ -33,10 +33,10 @@ int z,buf;
 
 	for (x=-3.0; x<0; x=x+incr)
 	{
-		buf=255;
+		buf=getmaxy();
 		for (y=-3.0; y<3.0; y=y+0.2)
 		{
-			z = (unsigned char) (float)getmaxy() - (yenlarge * (y + 3.0) + yenlarge * (cos (x*x + y*y)) );
+			z = (float)getmaxy() - (yenlarge * (y + 3.0) + yenlarge * (cos (x*x + y*y)) );
 
 			if (buf>z)
 			{

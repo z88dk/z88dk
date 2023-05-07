@@ -111,6 +111,7 @@ private:
 
 	bool check_opcode(Keyword keyword, void (Preproc::* do_action)());
 	bool check_hash_directive(Keyword keyword, void (Preproc::* do_action)());
+	bool check_opt_hash_opcode(Keyword keyword, void (Preproc::* do_action)());
 	bool check_hash();
 	bool check_defl();
 	bool check_macro();

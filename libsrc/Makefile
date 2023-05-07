@@ -68,6 +68,7 @@ TOCREATE += $(call check_target,lviv,lviv_clib.lib)
 TOCREATE += $(call check_target,lynx,lynx_clib.lib)
 TOCREATE += $(call check_target,m100,m100_clib.lib)
 TOCREATE += $(call check_target,m5,m5_clib.lib)
+TOCREATE += $(call check_target,mbc200 $(CPMLIBS))
 TOCREATE += $(call check_target,mc1000,mc1000_clib.lib)
 TOCREATE += $(call check_target,micro8085,micro8085_clib.lib)
 TOCREATE += $(call check_target,mikro80,mikro80_clib.lib)
@@ -183,6 +184,7 @@ define buildcrt
 	$(MAKE) -C stdlib
 	$(MAKE) -C time
 	$(MAKE) -C z80_crt0s
+	$(MAKE) -C math/fix16
 endef
 
 #  short script to sort out ticalc dependencies
@@ -1077,6 +1079,16 @@ m5_clib.lib:
 	$(call buildgeneric,m5)
 	$(MAKE) -C video/tms9918 TARGET=m5
 	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(TARGET_DIRECTORY)/m5/m5.lst
+
+# Sanyo MBC-200 library - Stefano
+mbc200.lib:
+	@echo ''
+	@echo '--- Building Sanyo MBC-200 Library (CP/M) ---'
+	@echo ''
+	$(call buildgeneric,cpm)
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=mbc200
+	$(MAKE) -C games TARGET=cpm SUBTYPE=mbc200
+	TARGET=mbc200 TYPE=z80 $(LIBLINKER) -DFORmbc200 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mbc200.lib @$(TARGET_DIRECTORY)/mbc200/mbc200.lst
 
 # MC-1000 library - Stefano
 mc1000_clib.lib:

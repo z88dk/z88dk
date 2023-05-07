@@ -7,10 +7,10 @@ vpath %.c ../cimpl
 
 
 CFILES  = $(notdir $(wildcard ../../_DEVELOPMENT/math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
-CFILES  = atof.c ftoa.c ftoe.c
-OBJECTS = $(CFILES:.c=.o)
+CFILES  = atof.c ftoa.c ftoe.c tofix16.c fromfix16.c
+OBJECTS = $(CFILES:.c=.o) 
 
-CFLAGS += -fp-mode=ieee
+CFLAGS += -fp-mode=ieee -DFLOAT_IS_32BITS
 
 all: dirs $(OUTPUT_DIRECTORY)/math32.lib $(OUTPUT_DIRECTORY)/math32_ixiy.lib
 

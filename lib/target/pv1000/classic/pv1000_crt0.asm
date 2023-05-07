@@ -53,6 +53,8 @@
     ; The machine doesn't have NMI
     defc    TAR__crt_enable_nmi = 0
 
+    defc    TAR__crt_on_exit = 0x10001      ;Loop forever
+    defc    TAR__crt_enable_eidi = $02      ;Enable ei on startup 
 
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -72,18 +74,13 @@ program:
     call    crt0_init_bss
     ld      (exitsp),sp
     im      1
-    ei
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
     INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
     call    _main
 cleanup:
-    di
-    halt
-    jp      cleanup
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls

@@ -5,10 +5,10 @@ include ../../Make.config
 vpath %.c ../cimpl/
 
 AFILES  = $(wildcard c/sccz80/*.asm)
-CFILES  = acos.c asin.c	atan2.c	atof.c cosh.c ftoa.c ftoe.c pow.c sinh.c tanh.c acosh.c asinh.c atanh.c modf.c sqrt.c
+CFILES  = acos.c asin.c	atan2.c	atof.c cosh.c ftoa.c ftoe.c pow.c sinh.c tanh.c acosh.c asinh.c atanh.c modf.c sqrt.c tofix16.c fromfix16.c
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-CFLAGS += -fp-mode=z80
+CFLAGS += -fp-mode=z80 -DFLOAT_IS_48BITS
 
 all: dirs $(OUTPUT_DIRECTORY)/genmath.lib $(OUTPUT_DIRECTORY)/genmath_iy.lib $(OUTPUT_DIRECTORY)/genmath_zx81.lib
 

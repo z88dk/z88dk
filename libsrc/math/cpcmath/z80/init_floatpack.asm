@@ -72,6 +72,7 @@
         EXTERN        tanc
 
 .init_floatpack
+IFNDEF PORTABLE_CPC_MATH
         ld      hl,$BD65
         ld      a,(hl)
         cp      158
@@ -82,106 +83,105 @@
 
 .init_cpc464float
         ld      hl,CPCFP464_FLO_ATAN
-        ld      (atanc),hl
+        ld      (atanc+3),hl
         ld      hl,CPCFP464_FLO_COS
-        ld      (cosc),hl
+        ld      (cosc+3),hl
         ld      hl,CPCFP464_FLO_ADD
-        ld      (daddc),hl
+        ld      (daddc+3),hl
         ld      hl,CPCFP464_FLO_DIV
-        ld      (ddivc),hl
+        ld      (ddivc+3),hl
         ld      hl,CPCFP464_FLO_DEG_RAD
-        ld      (degc),hl
-        ld      (radc),hl
+        ld      (degc+3),hl
+        ld      (radc+3),hl
         ld      hl,CPCFP464_FLO_CMP
-        ld      (deqc),hl
-        ld      (dgec),hl
-        ld      (dgtc),hl
-        ld      (dleqc),hl
-        ld      (dltc),hl
-        ld      (dnec),hl
+        ld      (deqc+3),hl
+        ld      (dgec+3),hl
+        ld      (dgtc+3),hl
+        ld      (dleqc+3),hl
+        ld      (dltc+3),hl
+        ld      (dnec+3),hl
         ld      hl,CPCFP464_FLO_MUL
-        ld      (dmulc),hl
+        ld      (dmulc+3),hl
         ld      hl,CPCFP464_FLO_REV_SUB
-        ld      (dsubc),hl
+        ld      (dsubc+3),hl
         ld      hl,CPCFP464_FLO_EXP
-        ld      (expc),hl
-        ld      hl,CPCFP464_INT_2_FLO
-        ld      (floatc),hl
-        ld      hl,CPCFP464_FLO_BINFIX
-        ld      (floorc),hl
+        ld      (expc+3),hl
         ld      hl,CPCFP464_BIN_2_FLO
-        ld      (floorc2),hl
+        ld      (floatc+3),hl
+        ld      (floorc2+3),hl
+        ld      hl,CPCFP464_FLO_BINFIX
+        ld      (floorc+3),hl
         ld      hl,CPCFP464_FLO_RND
-        ld      (fprandc),hl
-        ld      hl,CPCFP464_FLO_2_INT
-        ld      (ifixc),hl
+        ld      (fprandc+3),hl
+        ld      hl,CPCFP464_FLO_BINFIX2
+        ld      (ifixc+3),hl
         ld      hl,CPCFP464_FLO_LOG10
-        ld      (log10c),hl
+        ld      (log10c+3),hl
         ld      hl,CPCFP464_FLO_LOG
-        ld      (logc),hl
+        ld      (logc+3),hl
         ld      hl,CPCFP464_FLO_INV_SGN
-        ld      (minusfac),hl
+        ld      (minusfac+3),hl
         ld      hl,CPCFP464_FLO_POW10
-        ld      (pow10c),hl
+        ld      (pow10c+3),hl
         ld      hl,CPCFP464_FLO_POW
-        ld      (powc),hl
+        ld      (powc+3),hl
         ld      hl,CPCFP464_FLO_SIN
-        ld      (sinc),hl
+        ld      (sinc+3),hl
         ld      hl,CPCFP464_FLO_SQRT
-        ld      (sqrtc),hl
+        ld      (sqrtc+3),hl
         ld      hl,CPCFP464_FLO_TAN
-        ld      (tanc),hl
+        ld      (tanc+3),hl
         ret
 
 .init_cpc664float
         ld      hl,CPCFP664_FLO_ATAN
-        ld      (atanc),hl
+        ld      (atanc+3),hl
         ld      hl,CPCFP664_FLO_COS
-        ld      (cosc),hl
+        ld      (cosc+3),hl
         ld      hl,CPCFP664_FLO_ADD
-        ld      (daddc),hl
+        ld      (daddc+3),hl
         ld      hl,CPCFP664_FLO_DIV
-        ld      (ddivc),hl
+        ld      (ddivc+3),hl
         ld      hl,CPCFP664_FLO_DEG_RAD
-        ld      (degc),hl
-        ld      (radc),hl
+        ld      (degc+3),hl
+        ld      (radc+3),hl
         ld      hl,CPCFP664_FLO_CMP
-        ld      (deqc),hl
-        ld      (dgec),hl
-        ld      (dgtc),hl
-        ld      (dleqc),hl
-        ld      (dltc),hl
-        ld      (dnec),hl
+        ld      (deqc+3),hl
+        ld      (dgec+3),hl
+        ld      (dgtc+3),hl
+        ld      (dleqc+3),hl
+        ld      (dltc+3),hl
+        ld      (dnec+3),hl
         ld      hl,CPCFP664_FLO_MUL
-        ld      (dmulc),hl
+        ld      (dmulc+3),hl
         ld      hl,CPCFP664_FLO_REV_SUB
-        ld      (dsubc),hl
+        ld      (dsubc+3),hl
         ld      hl,CPCFP664_FLO_EXP
-        ld      (expc),hl
-        ld      hl,CPCFP664_INT_2_FLO
-        ld      (floatc),hl
-        ld      hl,CPCFP664_FLO_BINFIX
-        ld      (floorc),hl
+        ld      (expc+3),hl
         ld      hl,CPCFP664_BIN_2_FLO
-        ld      (floorc2),hl
+        ld      (floatc+3),hl
+        ld      (floorc2+3),hl
+        ld      hl,CPCFP664_FLO_BINFIX
+        ld      (floorc+3),hl
         ld      hl,CPCFP664_FLO_RND
-        ld      (fprandc),hl
-        ld      hl,CPCFP664_FLO_2_INT
-        ld      (ifixc),hl
+        ld      (fprandc+3),hl
+        ld      hl,CPCFP664_FLO_BINFIX2
+        ld      (ifixc+3),hl
         ld      hl,CPCFP664_FLO_LOG10
-        ld      (log10c),hl
+        ld      (log10c+3),hl
         ld      hl,CPCFP664_FLO_LOG
-        ld      (logc),hl
+        ld      (logc+3),hl
         ld      hl,CPCFP664_FLO_INV_SGN
-        ld      (minusfac),hl
+        ld      (minusfac+3),hl
         ld      hl,CPCFP664_FLO_POW10
-        ld      (pow10c),hl
+        ld      (pow10c+3),hl
         ld      hl,CPCFP664_FLO_POW
-        ld      (powc),hl
+        ld      (powc+3),hl
         ld      hl,CPCFP664_FLO_SIN
-        ld      (sinc),hl
+        ld      (sinc+3),hl
         ld      hl,CPCFP664_FLO_SQRT
-        ld      (sqrtc),hl
+        ld      (sqrtc+3),hl
         ld      hl,CPCFP664_FLO_TAN
-        ld      (tanc),hl
+        ld      (tanc+3),hl
+ENDIF
         ret

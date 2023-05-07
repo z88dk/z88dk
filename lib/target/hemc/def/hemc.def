@@ -10,8 +10,7 @@
 ; Stack is at $fefd
 
 
-
-	defc	RESTART = $f000
-	defc	CONSOLE_IN = $f003		;Waits: Exit a = key
-	defc	CONSOLE_OUT = $f009
-	defc	CONSOLE_STAT = $f012		;z = no key pressed
+#define RESTART         0xf000 
+#define CONSOLE_IN      0xf003		;Waits: Exit a = key
+#define CONSOLE_OUT     0xf009
+#define CONSOLE_STAT    0xf012		;z = no key pressed

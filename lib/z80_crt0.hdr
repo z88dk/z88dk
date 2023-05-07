@@ -320,6 +320,33 @@
 
 	EXTERN	l_farcall	; Long call
 
+;--------------------------------------------------
+; Routines for handling 16 bit fixed point for sccz80
+;--------------------------------------------------
+
+	EXTERN	l_f16_fix16tof
+	EXTERN	l_f16_ftofix16
+	EXTERN	l_f32_fix16tof
+	EXTERN	l_f32_ftofix16
+	EXTERN	l_f48_fix16tof
+	EXTERN	l_f48_ftofix16
+	EXTERN	l_f64_fix16tof
+	EXTERN	l_f64_ftofix16
+	EXTERN	l_fix16_divu
+	EXTERN	l_fix16_divs
+	EXTERN	l_fix16_f2sint
+	EXTERN	l_fix16_f2slond
+	EXTERN	l_fix16_f2uint
+	EXTERN	l_fix16_f2ulond
+        EXTERN  l_fix16_uint2f
+        EXTERN  l_fix16_ulong2f
+        EXTERN  l_fix16_sint2f
+        EXTERN  l_fix16_slong2f
+	EXTERN	l_fix16_inv
+	EXTERN	l_fix16_mul
+	EXTERN	l_fix16_mulu
+	EXTERN	l_fix16_muls
+	EXTERN	l_fix16_negate
 
 ;--------------------------------------------------
 ; Routines for handling 64 bit integers for sccz80

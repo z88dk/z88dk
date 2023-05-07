@@ -6,21 +6,19 @@
 ;	$Id: dmul.asm,v 1.4 2016-06-22 19:50:49 dom Exp $
 ;
 
-                SECTION         smc_fp
-		INCLUDE		"target/cpc/def/cpcfirm.def"
-		INCLUDE		"target/cpc/def/cpcfp.def"
+    SECTION smc_fp
+    INCLUDE "cpcmath.inc"
 
-		PUBLIC		dmul
-		PUBLIC		dmulc
+    PUBLIC  dmul
+    PUBLIC  dmulc
 
-		EXTERN		fsetup
-		EXTERN		stkequ
-		EXTERN		fa
+    EXTERN  fsetup
+    EXTERN  stkequ
 
-.dmul						; (fa+1)=(fa+1)*(sp+3)
-		call	fsetup
-        call    firmware
-.dmulc	defw    CPCFP_FLO_MUL		; (hl)=(hl)*(de)
-		jp      stkequ
-
+; (fa+1)=(fa+1)*(sp+3)
+.dmul
+    call    fsetup
+.dmulc
+    FPCALL(CPCFP_FLO_MUL)
+    jp      stkequ
 

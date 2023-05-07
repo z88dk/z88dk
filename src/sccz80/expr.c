@@ -194,18 +194,50 @@ int heir1(LVALUE* lval)
  */
 int heir1a(LVALUE* lval)
 {
+    char *before, *start;
     int falselab, endlab, skiplab;
     LVALUE lval2={0};
     int k;
 
     k = heir2a(lval);
     if (cmatch('?')) {
+        setstage(&before,&start);
         /* evaluate condition expression */
         if (k)
             rvalue(lval);
 
         if ( lval->is_const ) {
-            vconst(lval->const_val);
+
+            if ( lval->const_val ) {
+                // Only consider the true clause
+                /* evaluate 'true' expression */
+                if (heir1(lval))
+                    rvalue(lval);
+
+                if ( lval->is_const ) {
+                    clearstage(before, 0);
+                }
+                // Now we just need to swallow the false clause
+                setstage(&before,&start);
+                needchar(':');
+                /* evaluate 'false' expression */
+                if (heir1(&lval2))
+                    rvalue(&lval2);
+                clearstage(before, 0);
+            } else {
+                // Only need to consider the false claus
+                if (heir1(&lval2))
+                    rvalue(&lval2);
+                clearstage(before,0);  // Dump true stage
+                needchar(':');
+                /* evaluate 'false' expression */
+                if (heir1(lval))
+                    rvalue(lval);
+                if ( lval->is_const ) {
+                    clearstage(before, 0);
+                }
+            }
+            return k;
         }
 
         /* test condition, jump to false expression evaluation if necessary */
@@ -228,13 +260,13 @@ int heir1a(LVALUE* lval)
         if (heir1(lval))
             rvalue(lval);
         /* check types of expressions and widen if necessary */
-        if (kind_is_floating(lval2.val_type) && lval2.val_type != lval->val_type) {
-            zconvert_to_double(lval->val_type, lval2.val_type, lval->ltype->isunsigned);
+        if (kind_is_decimal(lval2.val_type) && lval2.val_type != lval->val_type) {
+            zconvert_to_decimal(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned);
             postlabel(endlab);
-        } else if (lval2.val_type != lval->val_type && kind_is_floating(lval->val_type)) {
+        } else if (lval2.val_type != lval->val_type && kind_is_decimal(lval->val_type)) {
             gen_jp_label(skiplab = getlabel(),0);
             postlabel(endlab);
-            zconvert_to_double(lval2.val_type, lval->val_type, lval2.ltype->isunsigned);
+            zconvert_to_decimal(lval2.val_type, lval->val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned);
             postlabel(skiplab);
         } else if (lval2.val_type == KIND_LONG && lval->val_type != KIND_LONG) {
             widenintegers(&lval2, lval);
@@ -505,7 +537,10 @@ int heira(LVALUE *lval)
     } else if (cmatch('~')) {
         if (heira(lval))
             rvalue(lval);
-        intcheck(lval, lval);
+        if ( kind_is_floating(lval->val_type) )
+            errorfmt("Unary ~ operator is not valid for floating point",1);
+        if ( kind_is_fixed(lval->val_type) )
+            errorfmt("Unary ~ operator is not valid for fixed point",1);
         com(lval);
         lval->const_val = (int64_t)~(uint64_t)lval->const_val;
         lval->stage_add = NULL;

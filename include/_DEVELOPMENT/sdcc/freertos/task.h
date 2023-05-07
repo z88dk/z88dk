@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.5.1+
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -56,10 +56,10 @@
  * The tskKERNEL_VERSION_MAJOR, tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD
  * values will reflect the last released version number.
  */
-#define tskKERNEL_VERSION_NUMBER       "V10.5.0"
+#define tskKERNEL_VERSION_NUMBER       "V10.5.1+"
 #define tskKERNEL_VERSION_MAJOR        10
 #define tskKERNEL_VERSION_MINOR        5
-#define tskKERNEL_VERSION_BUILD        0
+#define tskKERNEL_VERSION_BUILD        1
 
 /* MPU region parameters passed in ulParameters
  * of MemoryRegion_t struct. */
@@ -485,7 +485,7 @@ typedef enum
                                     StackType_t * const puxStackBuffer,
                                     StaticTask_t * const pxTaskBuffer ) PRIVILEGED_FUNCTION;
  */
-    extern BaseType_t xTaskCreateStatic(TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE uxStackDepth,void * const pvParameters,UBaseType_t uxPriority,StackType_t * const puxStackBuffer,StaticTask_t * const pxTaskBuffer);
+    extern TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE uxStackDepth,void * const pvParameters,UBaseType_t uxPriority,StackType_t * const puxStackBuffer,StaticTask_t * const pxTaskBuffer);
 
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
@@ -643,7 +643,7 @@ typedef enum
  *  // Create a task from the const structure defined above.  The task handle
  *  // is requested (the second parameter is not NULL) but in this case just for
  *  // demonstration purposes as its not actually used.
- *  xTaskCreateRestricted( &xRegTest1Parameters, &xHandle );
+ *  xTaskCreateRestrictedStatic( &xRegTest1Parameters, &xHandle );
  *
  *  // Start the scheduler.
  *  vTaskStartScheduler();
@@ -677,7 +677,7 @@ typedef enum
  *
  * @param xTask The handle of the task being updated.
  *
- * @param xRegions A pointer to a MemoryRegion_t structure that contains the
+ * @param[in] pxRegions A pointer to a MemoryRegion_t structure that contains the
  * new memory region definitions.
  *
  * Example usage:
@@ -709,7 +709,7 @@ typedef enum
  *  // defined or shared regions have been declared elsewhere).
  * }
  * @endcode
- * \defgroup xTaskCreateRestricted xTaskCreateRestricted
+ * \defgroup vTaskAllocateMPURegions vTaskAllocateMPURegions
  * \ingroup Tasks
  */
 /*
@@ -1617,6 +1617,40 @@ extern TaskHandle_t xTaskGetHandle(const char * pcNameToQuery);
 
 
 /**
+ * task. h
+ * @code{c}
+ * BaseType_t xTaskGetStaticBuffers( TaskHandle_t xTask,
+ *                                   StackType_t ** ppuxStackBuffer,
+ *                                   StaticTask_t ** ppxTaskBuffer );
+ * @endcode
+ *
+ * Retrieve pointers to a statically created task's data structure
+ * buffer and stack buffer. These are the same buffers that are supplied
+ * at the time of creation.
+ *
+ * @param xTask The task for which to retrieve the buffers.
+ *
+ * @param ppuxStackBuffer Used to return a pointer to the task's stack buffer.
+ *
+ * @param ppxTaskBuffer Used to return a pointer to the task's data structure
+ * buffer.
+ *
+ * @return pdTRUE if buffers were retrieved, pdFALSE otherwise.
+ *
+ * \defgroup xTaskGetStaticBuffers xTaskGetStaticBuffers
+ * \ingroup TaskUtils
+ */
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+/*
+    BaseType_t xTaskGetStaticBuffers( TaskHandle_t xTask,
+                                      StackType_t ** ppuxStackBuffer,
+                                      StaticTask_t ** ppxTaskBuffer ) PRIVILEGED_FUNCTION;
+ */
+    extern BaseType_t xTaskGetStaticBuffers(TaskHandle_t xTask,StackType_t ** ppuxStackBuffer,StaticTask_t ** ppxTaskBuffer);
+
+#endif /* configSUPPORT_STATIC_ALLOCATION */
+
+/**
  * task.h
  * @code{c}
  * UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask );
@@ -1680,7 +1714,7 @@ extern configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark(TaskHandle_t xTask);
         void vTaskSetApplicationTaskTag( TaskHandle_t xTask,
                                          TaskHookFunction_t pxHookFunction ) PRIVILEGED_FUNCTION;
  */
-extern void vTaskSetApplicationTaskTag(TaskHandle_t xTask,TaskHookFunction_t pxHookFunction);
+        extern void vTaskSetApplicationTaskTag(TaskHandle_t xTask,TaskHookFunction_t pxHookFunction);
 
 
 /**
@@ -1696,7 +1730,7 @@ extern void vTaskSetApplicationTaskTag(TaskHandle_t xTask,TaskHookFunction_t pxH
 /*
         TaskHookFunction_t xTaskGetApplicationTaskTag( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
  */
-extern TaskHookFunction_t xTaskGetApplicationTaskTag(TaskHandle_t xTask);
+        extern TaskHookFunction_t xTaskGetApplicationTaskTag(TaskHandle_t xTask);
 
 
 /**
@@ -1711,7 +1745,7 @@ extern TaskHookFunction_t xTaskGetApplicationTaskTag(TaskHandle_t xTask);
 /*
         TaskHookFunction_t xTaskGetApplicationTaskTagFromISR( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
  */
-extern TaskHookFunction_t xTaskGetApplicationTaskTagFromISR(TaskHandle_t xTask);
+        extern TaskHookFunction_t xTaskGetApplicationTaskTagFromISR(TaskHandle_t xTask);
 
     #endif /* configUSE_APPLICATION_TASK_TAG ==1 */
 #endif /* ifdef configUSE_APPLICATION_TASK_TAG */
@@ -1730,9 +1764,9 @@ extern TaskHookFunction_t xTaskGetApplicationTaskTagFromISR(TaskHandle_t xTask);
     void * pvTaskGetThreadLocalStoragePointer( TaskHandle_t xTaskToQuery,
                                                BaseType_t xIndex ) PRIVILEGED_FUNCTION;
  */
-extern void vTaskSetThreadLocalStoragePointer(TaskHandle_t xTaskToSet,BaseType_t xIndex,void * pvValue);
+    extern void vTaskSetThreadLocalStoragePointer(TaskHandle_t xTaskToSet,BaseType_t xIndex,void * pvValue);
 
-extern void *pvTaskGetThreadLocalStoragePointer(TaskHandle_t xTaskToQuery,BaseType_t xIndex);
+    extern void *pvTaskGetThreadLocalStoragePointer(TaskHandle_t xTaskToQuery,BaseType_t xIndex);
 
 
 #endif
@@ -1742,7 +1776,7 @@ extern void *pvTaskGetThreadLocalStoragePointer(TaskHandle_t xTaskToQuery,BaseTy
 /**
  * task.h
  * @code{c}
- * void vApplicationStackOverflowHook( TaskHandle_t xTask char *pcTaskName);
+ * void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName);
  * @endcode
  *
  * The application stack overflow hook is called when a stack overflow is detected for a task.
@@ -1756,7 +1790,7 @@ extern void *pvTaskGetThreadLocalStoragePointer(TaskHandle_t xTaskToQuery,BaseTy
     void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                         char * pcTaskName );
  */
-extern void vApplicationStackOverflowHook(TaskHandle_t xTask,char * pcTaskName);
+    extern void vApplicationStackOverflowHook(TaskHandle_t xTask,char * pcTaskName);
 
 
 #endif
@@ -1774,7 +1808,7 @@ extern void vApplicationStackOverflowHook(TaskHandle_t xTask,char * pcTaskName);
 /*
     void vApplicationTickHook( void );
  */
-extern void vApplicationTickHook(void);
+    extern void vApplicationTickHook(void);
  
 
 #endif
@@ -1799,7 +1833,7 @@ extern void vApplicationTickHook(void);
                                         StackType_t ** ppxIdleTaskStackBuffer,
                                         configSTACK_DEPTH_TYPE * puxIdleTaskStackSize );
  */
-extern void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer,StackType_t ** ppxIdleTaskStackBuffer,configSTACK_DEPTH_TYPE * puxIdleTaskStackSize);
+    extern void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer,StackType_t ** ppxIdleTaskStackBuffer,configSTACK_DEPTH_TYPE * puxIdleTaskStackSize);
 
 #endif
 
@@ -2059,17 +2093,57 @@ extern void vTaskGetRunTimeStats(char * pcWriteBuffer);
 /**
  * task. h
  * @code{c}
+ * configRUN_TIME_COUNTER_TYPE ulTaskGetRunTimeCounter( const TaskHandle_t xTask );
+ * configRUN_TIME_COUNTER_TYPE ulTaskGetRunTimePercent( const TaskHandle_t xTask );
+ * @endcode
+ *
+ * configGENERATE_RUN_TIME_STATS must be defined as 1 for these functions to be
+ * available.  The application must also then provide definitions for
+ * portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() and
+ * portGET_RUN_TIME_COUNTER_VALUE() to configure a peripheral timer/counter and
+ * return the timers current count value respectively.  The counter should be
+ * at least 10 times the frequency of the tick count.
+ *
+ * Setting configGENERATE_RUN_TIME_STATS to 1 will result in a total
+ * accumulated execution time being stored for each task.  The resolution
+ * of the accumulated time value depends on the frequency of the timer
+ * configured by the portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() macro.
+ * While uxTaskGetSystemState() and vTaskGetRunTimeStats() writes the total
+ * execution time of each task into a buffer, ulTaskGetRunTimeCounter()
+ * returns the total execution time of just one task and
+ * ulTaskGetRunTimePercent() returns the percentage of the CPU time used by
+ * just one task.
+ *
+ * @return The total run time of the given task or the percentage of the total
+ * run time consumed by the given task.  This is the amount of time the task
+ * has actually been executing.  The unit of time is dependent on the frequency
+ * configured using the portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() and
+ * portGET_RUN_TIME_COUNTER_VALUE() macros.
+ *
+ * \defgroup ulTaskGetRunTimeCounter ulTaskGetRunTimeCounter
+ * \ingroup TaskUtils
+ */
+/*
+configRUN_TIME_COUNTER_TYPE ulTaskGetRunTimeCounter( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+configRUN_TIME_COUNTER_TYPE ulTaskGetRunTimePercent( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+ */
+extern configRUN_TIME_COUNTER_TYPE ulTaskGetRunTimeCounter(const TaskHandle_t xTask);
+
+extern configRUN_TIME_COUNTER_TYPE ulTaskGetRunTimePercent(const TaskHandle_t xTask);
+
+/**
+ * task. h
+ * @code{c}
  * configRUN_TIME_COUNTER_TYPE ulTaskGetIdleRunTimeCounter( void );
  * configRUN_TIME_COUNTER_TYPE ulTaskGetIdleRunTimePercent( void );
  * @endcode
  *
- * configGENERATE_RUN_TIME_STATS, configUSE_STATS_FORMATTING_FUNCTIONS and
- * INCLUDE_xTaskGetIdleTaskHandle must all be defined as 1 for these functions
- * to be available.  The application must also then provide definitions for
- * portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() and portGET_RUN_TIME_COUNTER_VALUE()
- * to configure a peripheral timer/counter and return the timers current count
- * value respectively.  The counter should be at least 10 times the frequency of
- * the tick count.
+ * configGENERATE_RUN_TIME_STATS must be defined as 1 for these functions to be
+ * available.  The application must also then provide definitions for
+ * portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() and
+ * portGET_RUN_TIME_COUNTER_VALUE() to configure a peripheral timer/counter and
+ * return the timers current count value respectively.  The counter should be
+ * at least 10 times the frequency of the tick count.
  *
  * Setting configGENERATE_RUN_TIME_STATS to 1 will result in a total
  * accumulated execution time being stored for each task.  The resolution

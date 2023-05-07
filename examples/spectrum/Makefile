@@ -1,12 +1,12 @@
 
-all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap \
+all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap hangman.tap \
 	adv_a.tap ansitest.tap enigma.tap fib.tap mm.tap rpn.tap tic.tap \
 	sorter.tap snakes.tap dstar.tap dstar_native.tap microman.tap \
-	othello.tap othello_udg.tap wall.tap gfx.tap save.tap ex10b.tap \
+	othello.tap othello_udg.tap wall.tap gfx.tap save.tap ex10b.tap diffusion.tap \
 	ccoswave.tap c3d.tap cmandel.tap csprite.tap zxbasic.tap zxcurrah.tap \
-	threading.tap globe.tap chessboard.tap mandel.tap julia.tap \
-	smallgfx.tap stencil.tap clock.tap showlib3d.tap smallgfx2.tap \
-	wintest.tap sinwave_fast.tap sinwave_small.tap coswave_fast.tap \
+	threading.tap globe.tap chessboard.tap mandel.tap julia.tap turtle.tap spirograph.tap \
+	smallgfx.tap stencil.tap clock.tap showlib3d.tap smallgfx2.tap marilyn.tap eagle.tap \
+	fern.tap thuemorse.tap wintest.tap sinwave_fast.tap sinwave_small.tap coswave_fast.tap \
 	coswave_small.tap spritest.tap smile.tap xample.tap psgtest.tap \
 	ex12.tap clicktest.tap fx.tap sndtest.tap synthdemo.tap fontexample.tap
 
@@ -71,6 +71,9 @@ save.tap: save.c
 ex10b.tap: ex10b.c
 	 zcc +zx -vn ex10b.c -o ex10b.bin -create-app  -lndos
 
+diffusion.tap: ../graphics/diffusion.c
+	zcc +zx -vn ../graphics/diffusion.c -lndos -lm -create-app -odiffusion.bin
+
 gfx.tap: gfx.c
 	zcc +zx -vn gfx.c -o gfx.bin -lndos -create-app -lm
 
@@ -95,9 +98,6 @@ zxcurrah.tap: zxcurrah.c
 threading.tap: preempt.c
 	zcc +zx -vn preempt.c -lndos -create-app -othreading.bin -lpreempt
 
-opusdump.tap: opusdump.c
-	zcc +zx -vn opusdump.c -lndos -create-app -lrs232plus -oopusdump.bin
-
 globe.tap: ../graphics/globe.c
 	zcc +zx -vn -lndos -create-app -lm ../graphics/globe.c -oglobe.bin
 
@@ -107,6 +107,9 @@ chessboard.tap: ../graphics/chessboard.c
 hawk.tap: ../graphics/hawk.c
 	zcc +zx -vn ../graphics/hawk.c -lndos -lm -create-app -DSOUND -ohawk.bin
 	
+hangman.tap: ../graphics/hangman.c
+	zcc +zx -vn ../graphics/hangman.c -lndos -create-app -clib=ansi -ohangman.bin
+
 mandel.tap: ../graphics/mandel.c
 	zcc +zx -vn ../graphics/mandel.c -lndos -lm -create-app -omandel.bin
 
@@ -115,6 +118,12 @@ julia.tap: ../graphics/julia.c
 
 smallgfx.tap: ../graphics/smallgfx.c
 	zcc +zx -vn ../graphics/smallgfx.c -lndos -lm -create-app -osmallgfx.bin
+
+turtle.tap: ../graphics/turtle.c
+	zcc +zx -vn ../graphics/turtle.c -lndos -lm -llib3d -create-app -oturtle.bin
+
+spirograph.tap: ../graphics/spirograph.c
+	zcc +zx -vn ../graphics/spirograph.c -lndos --math32 -create-app -ospirograph.bin
 
 rndsphere.tap: ../graphics/rndsphere.c
 	zcc +zx -vn ../graphics/rndsphere.c -lndos -lm -create-app -orndsphere.bin
@@ -128,20 +137,32 @@ clock.tap: ../graphics/clock.c
 showlib3d.tap: ../graphics/showlib3d.c
 	zcc +zx -vn ../graphics/showlib3d.c -lndos -lm -llib3d -create-app -oshowlib3d.bin
 
+marilyn.tap: ../graphics/marilyn.c
+	zcc +zx -vn ../graphics/marilyn.c -lndos -create-app -omarilyn.bin
+
+eagle.tap: ../graphics/eagle.c
+	zcc +zx -vn ../graphics/eagle.c -lndos -create-app -oeagle.bin
+
 smallgfx2.tap: ../graphics/smallgfx2.c
 	zcc +zx -vn ../graphics/smallgfx2.c -lndos -lm -create-app -osmallgfx2.bin
+
+fern.tap: ../graphics/fern.c
+	zcc +zx -vn ../graphics/fern.c -lndos -lm -create-app -ofern.bin
+
+thuemorse.tap: ../graphics/thuemorse.c
+	zcc +zx -vn ../graphics/thuemorse.c -lndos -create-app -llib3d -othuemorse.bin
 
 wintest.tap: ../graphics/wintest.c
 	zcc +zx -vn ../graphics/wintest.c -lndos -lm -create-app -owintest.bin
 
 sinwave_fast.tap: ../graphics/sinwave.c
-	zcc +zx -vn ../graphics/sinwave.c -lndos -lm  -create-app -osinwave_fast.bin
+	zcc +zx -vn ../graphics/sinwave.c -lndos --math32 -create-app -osinwave_fast.bin
 
 sinwave_small.tap: ../graphics/sinwave.c
 	zcc +zx -vn ../graphics/sinwave.c -lndos -lmzx_tiny -O3 -create-app -osinwave_small.bin
 
 coswave_fast.tap: ../graphics/coswave.c
-	zcc +zx -vn ../graphics/coswave.c -lndos -lm  -create-app -ocoswave_fast.bin
+	zcc +zx -vn ../graphics/coswave.c -lndos --math32  -create-app -ocoswave_fast.bin
 
 coswave_small.tap: ../graphics/coswave.c
 	zcc +zx -vn ../graphics/coswave.c -lndos -lmzx_tiny -O3 -create-app -ocoswave_small.bin

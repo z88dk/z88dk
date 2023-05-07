@@ -3,7 +3,8 @@
 
 SECTION code_clib
 PUBLIC Lqsort
-EXTERN l_jpix
+
+   EXTERN l_jpix
 
 
 ; The ansi-C qsort function sorts an array of n-byte items.
@@ -56,21 +57,19 @@ EXTERN l_jpix
 
    add hl,bc
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
-   push af
+IF __CPU_GBZ80__ || __CPU_INTEL__
    ld a,h
    rra
    ld h,a
    ld a,l
    rra
-   ld l,a
-   pop af
+   ld l,a                 ; hl = unrounded (left+right)/2
 ELSE
    rr h
    rr l                   ; hl = unrounded (left+right)/2
+   ld a,l                 ; shenanigans to ensure HL aligns on item
 ENDIF
 
-   ld a,l                 ; shenanigans to ensure HL aligns on item
    xor c
    rra
    jp nc, doswap
@@ -133,9 +132,8 @@ ENDIF
    cp e
    jp c, endlp
 
-.compare                  ; is v[i] < v[left]?  (de) < (bc) ?
-
-   call l_jpix      ; returns A<0 for less, A==0 for equals, A>0 for greater
+.compare           ; is v[i] < v[left]?  (de) < (bc) ?
+   call l_jpix            ; returns A<0 for less, A==0 for equals, A>0 for greater
 
    add a,$80
    cp $80
@@ -227,3 +225,4 @@ ENDIF
    dec hl                ; hl = last-1
 
    jp qsort2             ; qsort(l=bc=left,r=hl=last-1)
+

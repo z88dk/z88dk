@@ -6,20 +6,24 @@ z88dk v2.3 - xx.xx.202x
 Detailed but incomplete changelist:
 
 - [classic] +cpc: Interrupt support
+- [classic] +cpc: Graphics support for all 3 official modes
 - [classic] +cpm: Support for corvette boot disk
 - [classic] +cpm: Support for NabuPC
 - [classic] +cpm: Support for Gemini Galaxy
+- [classic] +cpm: Einstein 256 support added
 - [classic] +msx: tape libraries for MSX and Spectravideo
 - [classic] +msx: Support for V9938 on MSX2
 - [classic] +nabu: New target: Nabu PC
 - [classic] +z80: New target
-- [classic] Support for Tektronix and Regis graphics
+- [classic] Support for Tektronix and Regis graphic terminals
 - [classic] Shared SP1 between classic and newlib
 - [classic] Arkos Tracker available for +cpc, +msx, +zx, +zxn
 - [classic] TMS99x8 library enhancements
+- [classic] A fixed point Q8.8 maths library is available
 - [newlib] Arkos Tracker available for +zx, +zxn
 - [sccz80] 8080, 8085, gbz80 opt-code-speed: add32, sub32, longcompare
 - [sccz80] Extended quikmult cases
+- [sccz80] Initialisation improvements
 - [z80asm] Allow jr across sections
 - [zsdcc] The preprocessor has been switched over to ucpp which is C99 compatible
 - [zsdcc] Upgraded to SDCC 4.3.0 r13xxx
