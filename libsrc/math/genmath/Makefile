@@ -23,8 +23,7 @@ $(OUTPUT_DIRECTORY)/genmath_zx81.lib: $(addprefix obj/ixiy_zx81/, $(OBJECTS))
 	TYPE=ixiy_zx81 $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/genmath_zx81 @genmathzx81.lst
 
 obj/ixiy_zx81/%.o: %.asm
-	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -I$(Z88DK_LIBSRC) -IXIY -mz80 -D__CLASSIC $(AFLAGS) $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -I$(Z88DK_LIBSRC) -IXIY -mz80 -D__CLASSIC $(AFLAGS) -Oobj/ixiy_zx81 $^
 
 obj/ixiy_zx81/%.o: %.c
 	$(ZCC) +test -mz80 -Ca-IXIY -Cl-IXIY $(CFLAGS) -o $@  $^

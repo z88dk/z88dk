@@ -28,8 +28,7 @@ obj/z88/%.o: %.c
 
 
 obj/z88/%.o: %.asm
-	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC -DFORz88 $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC -DFORz88 -Oobj/z88 $^
 
 dirs:
 	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80 obj/z88/c/sccz80 obj/z80/z80 obj/ixiy/z80 obj/z88/z80 

@@ -16,29 +16,25 @@ obj/z80/%.o: %.c
 	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
 
 obj/z80/%.o: %.asm
-	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC  $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC -Oobj/z80 $^
 
 obj/z80n/%.o: %.c
 	$(ZCC) +test -mz80n $(CFLAGS) -o $@  $^
 
 obj/z80n/%.o: %.asm
-	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80n -D__CLASSIC  $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80n -D__CLASSIC -Oobj/z80n  $^
 
 obj/ixiy/%.o: %.c
 	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
 
 obj/ixiy/%.o: %.asm
-	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -IXIY -mz80 -D__CLASSIC  $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -IXIY -mz80 -D__CLASSIC -Oobj/ixiy  $^
 
 obj/r2k/%.o: %.c
 	$(ZCC) +test -clib=rabbit $(CFLAGS) -o $@  $^
 
 obj/r2k/%.o: %.asm
-	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mr2ka -D__CLASSIC  $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mr2ka -D__CLASSIC -Oobj/r2k  $^
 
 
 dirs:

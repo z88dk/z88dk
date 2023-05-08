@@ -1,6 +1,7 @@
+include ../../Make.config
 
-include ../../../Make.config
-
+SUBDIRS = 
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 TARGET ?= test
 
@@ -19,16 +20,27 @@ ASMFILES = $(wildcard *.asm)
 
 OBJECTS = $(CFILES:.c=.o) $(ASMFILES:.asm=.o)
 
-all: dirs $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)) 
+all: dirs $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)) $(SUBDIRS)
 
 obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
-	@$(ASSEMBLER) $(ASMFLAGS) -I$(Z88DK_LIB) -I$(Z88DK_LIB)/../libsrc -Oobj/$(OBJSUBDIR) $^
+	@$(ASSEMBLER) $(ASMFLAGS) -I../.. -Oobj/$(OBJSUBDIR) $^
 
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR)
 
-clean:
+clean: subdirs-clean
 	$(RM) -fr obj zcc_opt.def *.err
+
+.PHONY: $(SUBDIRS) $(SUBDIRS_CLEAN)
+
+subdirs-clean: $(CLEANDIRS)
+
+$(SUBDIRS):
+	$(MAKE) -C $@ all TARGET=$(TARGET)
+
+$(CLEANDIRS):
+	$(MAKE) -C $(@:%-clean=%) clean
+	$(RM) */*.o

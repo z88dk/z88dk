@@ -664,8 +664,8 @@ bondwell.lib:
 	@echo ''
 	@echo '--- Building Bondwell 12/14 Library ---'
 	@echo ''
-	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C games TARGET=cpm SUBTYPE=bondwell
+	$(MAKE) -C video/mc6845 TARGET=bondwell
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=bondwell
 	TARGET=bondwell TYPE=z80 $(LIBLINKER) -DFORbondwell -x$(OUTPUT_DIRECTORY)/bondwell @$(TARGET_DIRECTORY)/bondwell/bw.lst
 
@@ -902,6 +902,7 @@ svi_clib.lib:
 	$(MAKE) -C target/msx/msxbios
 	$(MAKE) -C target/svi TARGET=svi
 	$(MAKE) -C video/tms9918 TARGET=svi
+	$(MAKE) -C video/mc6845 TARGET=svi
 	$(MAKE) -C psg TARGET=svi
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(TARGET_DIRECTORY)/svi/svi.lst
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svibios @$(TARGET_DIRECTORY)/svi/arch_svibios.lst
@@ -993,10 +994,10 @@ einstein.lib:
 	@echo '--- Building Tatung Einstein Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C font
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
+	$(MAKE) -C video/mc6845 TARGET=einstein
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=einstein
 	$(MAKE) -C psg TARGET=cpm SUBTYPE=einstein
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(TARGET_DIRECTORY)/einstein/einstein.lst
@@ -1012,8 +1013,8 @@ excali64_clib.lib:
 	@echo ''
 	@echo '--- Building Excalibur 64 Library ---'
 	@echo ''
-	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,excali64,"gencon narrow")
+	$(MAKE) -C video/mc6845 TARGET=excali64
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_clib @$(TARGET_DIRECTORY)/excali64/excali64.lst
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_cpm @$(TARGET_DIRECTORY)/excali64/excali64_cpm.lst
 
@@ -1022,20 +1023,20 @@ smc777_clib.lib:
 	@echo ''
 	@echo '--- Building Sony SMC-70/SMC-777 Library ---'
 	@echo ''
-	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C gfx TARGET=smc777 FLAVOUR=wide
 	$(MAKE) -C psg TARGET=smc777
 	$(MAKE) -C games TARGET=smc777
+	$(MAKE) -C video/mc6845 TARGET=smc777
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_clib @$(TARGET_DIRECTORY)/smc777/smc777.lst
 
 smc777_cpm.lib:
 	@echo ''
 	@echo '--- Building Sony SMC-70/SMC-777 CP/M Library ---'
 	@echo ''
-	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=smc777 FLAVOUR=wide
 	$(MAKE) -C psg TARGET=cpm SUBTYPE=smc777
 	$(MAKE) -C games TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777
+	$(MAKE) -C video/mc6845 TARGET=smc777
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_cpm @$(TARGET_DIRECTORY)/smc777/smc777_cpm.lst
 
 # A5105 library
@@ -1255,9 +1256,9 @@ pasopia7_clib.lib:
 	@echo ''
 	@echo '--- Building Toshiba Pasopia7 Library ---'
 	@echo ''
-	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,pasopia7,"gencon narrow")
 	$(MAKE) -C games TARGET=pasopia7
+	$(MAKE) -C video/mc6845 TARGET=pasopia7
 	TARGET=pasopia7 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpasopia7 -x$(OUTPUT_DIRECTORY)/pasopia7_clib @$(TARGET_DIRECTORY)/pasopia7/pasopia7.lst
 
 # VTech VZ700- dom
@@ -1282,9 +1283,9 @@ super80_vduem_clib.lib:
 	@echo ''
 	@echo '--- Building Super80 VDUEM Library ---'
 	@echo ''
-	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,super80,"gencon narrow")
 	$(MAKE) -C games TARGET=super80
+	$(MAKE) -C video/mc6845 TARGET=super80
 	TARGET=super80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsuper80 -x$(OUTPUT_DIRECTORY)/super80_vduem_clib @$(TARGET_DIRECTORY)/super80/super80_vduem.lst
 
 
@@ -1295,8 +1296,8 @@ alphatro_clib.lib:
 	@echo ''
 	@echo '--- Building Triump Adler Alphatronic PC Library ---'
 	@echo ''
-	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,alphatro,"gencon narrow")
+	$(MAKE) -C video/mc6845 TARGET=alphatro
 	$(MAKE) -C games TARGET=alphatro
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_clib @$(TARGET_DIRECTORY)/alphatro/alphatro.lst
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_cpm @$(TARGET_DIRECTORY)/alphatro/alphatro_cpm.lst
@@ -1627,8 +1628,8 @@ lynx_clib.lib:
 	@echo ''
 	@echo '--- Building Camputers Lynx Library ---'
 	@echo ''
-	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,lynx,"gencon narrow")
+	$(MAKE) -C video/mc6845 TARGET=lynx
 	$(MAKE) -C games TARGET=lynx
 	TARGET=lynx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(TARGET_DIRECTORY)/lynx/lynx.lst
 
@@ -1700,9 +1701,9 @@ trs80_clib.lib:
 	@echo ''
 	@echo '--- Building TRS 80 Library ---'
 	@echo ''
-	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,trs80)
 	$(MAKE) -C games TARGET=trs80
+	$(MAKE) -C video/mc6845 TARGET=trs80
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(TARGET_DIRECTORY)/trs80/trs80.lst
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_cpm @$(TARGET_DIRECTORY)/trs80/trs80_cpm.lst
 

@@ -23,8 +23,7 @@ obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
-	@$(ASSEMBLER) $(ASMFLAGS) -I../..  $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) $(ASMFLAGS) -I../.. -Oobj/$(OBJSUBDIR) $^
 
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR)
