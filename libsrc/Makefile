@@ -601,10 +601,10 @@ ti83p_clib.lib:
 	@echo ''
 	@echo '--- Building TI83+ Library ---'
 	@echo ''
-	$(call buildgeneric,ti8x,"gray narrow")
-	$(MAKE) -C games TARGET=ti8x
-	$(MAKE) -C target/ticalc TARGET=ti8x
-	TARGET=ti8x TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti83p -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83p_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
+	$(call buildgeneric,ti83p,"gray narrow")
+	$(MAKE) -C games TARGET=ti83p
+	$(MAKE) -C target/ticalc TARGET=ti83p
+	TARGET=ti83p TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti83p -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83p_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
 
 ti85_clib.lib:
 	@echo ''
@@ -712,7 +712,6 @@ cpm8080_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Library (8080)---'
 	@echo ''
-	$(RM) target/cpm/stdio/*.o target/cpm/cpm/*.o
 	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(TARGET_DIRECTORY)/cpm/cpm_8080.lst
 
 cpmdevice.lib:
