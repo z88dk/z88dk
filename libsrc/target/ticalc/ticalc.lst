@@ -24,4 +24,14 @@ target/ticalc/games/bit_open_di
 target/ticalc/games/bit_close
 target/ticalc/games/bit_close_ei
 @games/games.lst
-
+target/ticalc/fcntl/close
+target/ticalc/fcntl/fdtell
+target/ticalc/fcntl/lseek
+target/ticalc/fcntl/open
+target/ticalc/fcntl/read
+target/ticalc/fcntl/readbyte
+target/ticalc/fcntl/remove
+target/ticalc/fcntl/rename
+target/ticalc/fcntl/write
+target/ticalc/fcntl/writebyte
+target/ticalc/fcntl/ticalc_fcntl
