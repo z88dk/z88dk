@@ -603,7 +603,7 @@ ti83p_clib.lib:
 	@echo ''
 	$(call buildgeneric,ti8x,"gray narrow")
 	$(MAKE) -C games TARGET=ti8x
-	$(MAKE) -C target/ticalc TARGET=ti83p
+	$(MAKE) -C target/ticalc TARGET=ti8x
 	TARGET=ti8x TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti83p -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83p_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
 
 ti85_clib.lib:
@@ -1214,7 +1214,6 @@ rx78_clib.lib:
 	@echo ''
 	@echo '--- Building Bandai RX78 Library ---'
 	@echo ''
-	@$(RM) -f games/*.o
 	$(call buildgeneric,rx78)
 	$(MAKE) -C games TARGET=rx78
 	TARGET=rx78 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORrx78 -x$(OUTPUT_DIRECTORY)/rx78_clib @$(TARGET_DIRECTORY)/rx78/rx78.lst
@@ -1612,9 +1611,7 @@ g800_clib.lib:
 	@echo ''
 	$(call buildgeneric,g800)
 	$(MAKE) -C games TARGET=g800
-	$(RM) target/g800/graphics/*.o
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g800_clib @$(TARGET_DIRECTORY)/g800/g800.lst
-	$(RM) target/g800/graphics/*.o
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850_clib @$(TARGET_DIRECTORY)/g800/g850.lst
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850b @$(TARGET_DIRECTORY)/g800/g850b.lst
 
