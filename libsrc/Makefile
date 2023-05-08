@@ -583,50 +583,45 @@ ti82_clib.lib:
 	@echo ''
 	@echo '--- Building TI82 Library ---'
 	@echo ''
-	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti82,"gray narrow")
-	$(RM) games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti82
+	$(MAKE) -C target/ticalc TARGET=ti82
 	TARGET=ti82 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti82 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti82_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
 
 ti83_clib.lib:
 	@echo ''
 	@echo '--- Building TI83 Library ---'
 	@echo ''
-	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti83,"gray narrow")
-	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti83
+	$(MAKE) -C target/ticalc TARGET=ti83
 	TARGET=ti83 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti83 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
 
 ti83p_clib.lib:
 	@echo ''
 	@echo '--- Building TI83+ Library ---'
 	@echo ''
-	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti8x,"gray narrow")
-	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti8x
+	$(MAKE) -C target/ticalc TARGET=ti83p
 	TARGET=ti8x TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti83p -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83p_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
 
 ti85_clib.lib:
 	@echo ''
 	@echo '--- Building TI85 Library ---'
 	@echo ''
-	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti85,"gray narrow")
-	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti85
+	$(MAKE) -C target/ticalc TARGET=ti85
 	TARGET=ti85 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti85 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti85_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
 
 ti86_clib.lib:
 	@echo ''
 	@echo '--- Building TI86 Library ---'
 	@echo ''
-	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti86,"gray narrow")
-	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti86
+	$(MAKE) -C target/ticalc TARGET=ti86
 	TARGET=ti86 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti86 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti86_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
 
 # vt100 C lib for the Sharp OZ family - stefano
@@ -673,9 +668,9 @@ bondwell2.lib:
 	@echo ''
 	@echo '--- Building Bondwell 2 Library ---'
 	@echo ''
-	@$(RM) -f video/msm6255/*.o
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=bondwell2 TARGET_CFLAGS="-Ca-IXIY -Cl-IXIY"
 	$(MAKE) -C games TARGET=cpm SUBTYPE=bondwell2
+	$(MAKE) -C video/msm6255 TARGET=cpm SUBTYPE=bondwell2
 	TARGET=bondwell2 TYPE=ixiy $(LIBLINKER) -IXIY -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(TARGET_DIRECTORY)/bondwell2/bw2.lst
 
 gfxosborne1.lib:

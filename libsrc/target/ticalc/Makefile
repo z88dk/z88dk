@@ -5,7 +5,7 @@ TARGET ?= ti82
 SUBDIRS = 
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
-ASMFILES = $(wildcard *.asm)
+ASMFILES = $(wildcard *.asm) $(wildcard */*.asm) $(wildcard */*/*.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
 
 all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
@@ -25,7 +25,7 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I../.. -Oobj/$(TARGET) $^
+	$(Q)$(ASSEMBLER) -DFOR$(TARGET) -DSTANDARDESCAPECHARS  -DPACKEDFONT -I../.. -Oobj/$(TARGET) $^
 
 dirs:
 	@mkdir -p obj/$(TARGET)
