@@ -34,8 +34,7 @@ obj/$(1)/%.o: %.c
 	$(ZCC) +test $(CFLAGS) -o $$@  $$^
 
 obj/$(1)/%.o: %.asm
-	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $(2) $$^
-	@mv $$(^:.asm=.o) $$@
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $(2) -Oobj/$(1) $$^
 endef
 
 $(eval $(call build_lib,mzx,-DFORzx))

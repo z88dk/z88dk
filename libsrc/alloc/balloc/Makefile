@@ -39,20 +39,16 @@ obj/newlib-ixiy: $(NEWLIBASM)
 
 
 obj/z80/%.o: %.asm
-	@$(ASSEMBLER) -I../ -mz80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ -mz80 -D__CLASSIC -Oobj/z80 $^
 
 obj/ixiy/%.o: %.asm
-	@$(ASSEMBLER) -I../ -IXIY -mz80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ -IXIY -mz80 -D__CLASSIC -Oobj/ixiy $^
 
 obj/r2k/%.o: %.asm
-	@$(ASSEMBLER) -I../ -mr2ka -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ -mr2ka -D__CLASSIC -Oobj/r2k $^
 
 obj/z80n/%.o: %.asm
-	@$(ASSEMBLER) -I../ -mz80n -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ -mz80n -D__CLASSIC -Oobj/z80n $^
 
 obj/z80/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o   $^

@@ -273,8 +273,7 @@ IF FORti83
         ;----
 ENDIF
 
-; Confusing name
-IF FORti8x
+IF FORti83p
         defc SOUND_ONEBIT_port   = 0
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 3

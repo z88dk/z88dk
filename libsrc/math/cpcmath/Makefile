@@ -31,24 +31,19 @@ $(OUTPUT_DIRECTORY)/cpcz80_math.lib: $(addprefix obj/portable/, $(OBJECTS))
 	TYPE=portable $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpcz80_math @cpcmath.lst
 
 obj/cpc/%.o: %.asm
-	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC -Oobj/cpc $^
 
 obj/464/%.o: %.asm
-	$(Q)$(ASSEMBLER) -DforCPC464 -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -DforCPC464 -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC -Oobj/464 $^
 
 obj/664/%.o: %.asm
-	$(Q)$(ASSEMBLER) -DforCPC664 -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -DforCPC664 -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC -Oobj/664 $^
 
 obj/6128/%.o: %.asm
-	$(Q)$(ASSEMBLER) -DforCPC6128 -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -DforCPC6128 -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC -Oobj/6128 $^
 
 obj/portable/%.o: %.asm
-	$(Q)$(ASSEMBLER) -DPORTABLE_CPC_MATH -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -DPORTABLE_CPC_MATH -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC -Oobj/portable $^
 
 obj/cpc/%.o: %.c
 	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
