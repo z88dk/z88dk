@@ -137,7 +137,16 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           out  (SOUND_ONEBIT_port),a
           ld   a,c
           exx
-        ELIF SOUND_IFF = 1
+        ELIF SOUND_OUTOUT = 1
+          exx
+          ld   c,a
+          jr nz,ASMPC+6
+          out  (SOUND_ONEBIT_port),a
+          jr  ASMPC+4
+          out  (SOUND_ONEBIT_port2),a
+          ld   a,c
+          exx
+		ELIF SOUND_IFF = 1
           jp      nz,ASMPC+4
           di
           jp      ASMPC+4
@@ -167,6 +176,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           in  a,(SOUND_ONEBIT_port)
           jr  ASMPC+4
           out  (SOUND_ONEBIT_port),a
+          ld   a,c
+          exx
+        ELIF SOUND_OUTOUT = 1
+          exx
+          ld   c,a
+          jr nz,ASMPC+6
+          out  (SOUND_ONEBIT_port),a
+          jr  ASMPC+4
+          out  (SOUND_ONEBIT_port2),a
           ld   a,c
           exx
         ELIF SOUND_IFF = 1

@@ -135,6 +135,7 @@ TOCREATE += $(call check_target,vg5k,vg5k_clib.lib)
 TOCREATE += $(call check_target,vz,vz_clib.lib)
 TOCREATE += $(call check_target,x07,x07_clib.lib)
 TOCREATE += $(call check_target,x1,x1_clib.lib x1_cpm.lib $(CPMLIBS))
+TOCREATE += $(call check_target,x820ii,x820ii.lib $(CPMLIBS))
 TOCREATE += $(call check_target,z1013,z1013_clib.lib)
 TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 8085_clib.lib r2ka_clib.lib)
 TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
@@ -184,7 +185,6 @@ define buildcrt
 	$(MAKE) -C stdlib
 	$(MAKE) -C time
 	$(MAKE) -C z80_crt0s
-	$(MAKE) -C math/fix16
 endef
 
 #  short script to sort out ticalc dependencies
@@ -694,6 +694,13 @@ x1_cpm.lib:
 	$(MAKE) -C target/x1
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=x1
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(TARGET_DIRECTORY)/x1/x1_common.lst
+
+x820ii.lib:
+	@echo ''
+	@echo '--- Building Xerox 820 II Library ---'
+	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=x820ii
+	TARGET=x820ii TYPE=z80 $(LIBLINKER) -DFORx820ii -x$(OUTPUT_DIRECTORY)/x820ii.lib @$(TARGET_DIRECTORY)/xerox820/x820ii.lst
 
 cpm_clib.lib:
 	@echo ''
