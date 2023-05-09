@@ -68,7 +68,7 @@ TOCREATE += $(call check_target,lviv,lviv_clib.lib)
 TOCREATE += $(call check_target,lynx,lynx_clib.lib)
 TOCREATE += $(call check_target,m100,m100_clib.lib)
 TOCREATE += $(call check_target,m5,m5_clib.lib)
-TOCREATE += $(call check_target,mbc200 $(CPMLIBS))
+TOCREATE += $(call check_target,mbc200,mbc200.lib $(CPMLIBS))
 TOCREATE += $(call check_target,mc1000,mc1000_clib.lib)
 TOCREATE += $(call check_target,micro8085,micro8085_clib.lib)
 TOCREATE += $(call check_target,mikro80,mikro80_clib.lib)
@@ -700,7 +700,7 @@ x820ii.lib:
 	@echo '--- Building Xerox 820 II Library ---'
 	@echo ''
 	$(MAKE) -C games TARGET=cpm SUBTYPE=x820ii
-	TARGET=x820ii TYPE=z80 $(LIBLINKER) -DFORx820ii -x$(OUTPUT_DIRECTORY)/x820ii.lib @$(TARGET_DIRECTORY)/xerox820/x820ii.lst
+	TARGET=x820ii TYPE=z80 $(LIBLINKER) -DFORx820ii -x$(OUTPUT_DIRECTORY)/x820ii.lib @$(TARGET_DIRECTORY)/x820/x820ii.lst
 
 cpm_clib.lib:
 	@echo ''
