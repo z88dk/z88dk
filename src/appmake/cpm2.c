@@ -497,6 +497,27 @@ static disc_spec bic_spec = {
 };
 
 
+// 8" floppy disk on Xerox 820 or Ferguson BigBoard
+static disc_spec bigboard_spec = {
+    .name = "Z80pack",
+    .disk_mode = FM500,
+    .sectors_per_track = 26,
+    .tracks = 77,
+    .sides = 1,
+    .sector_size = 128,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .alternate_sides = 0,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0x00, 0x06, 0x0C, 0x12, 0x18, 0x04, 0x0A, 0x10, 0x16, 0x02, 0x08, 0x0E, 0x14, 0x01, 0x07, 0x0d, 0x13, 0x19, 0x05, 0x0b, 0x11, 0x17, 0x03, 0x09, 0x0f, 0x15 }
+};
+
+
 static disc_spec excali_spec = {
     .name = "Excalibur64",
     .disk_mode = MFM300,
@@ -760,6 +781,24 @@ static disc_spec idpfdd_spec = {
       .has_skew = 0
  };
 
+static disc_spec x820_spec = {
+     .name = "Xerox820",
+     .disk_mode = FM250,
+     .sectors_per_track = 18,
+     .tracks = 40,
+     .sides = 1,
+     .sector_size = 128,
+     .gap3_length = 0x2a,
+     .filler_byte = 0xe5,
+     .boottracks = 3,
+     .directory_entries = 32,
+     .extent_size = 1024,
+     .byte_size_extents = 1,
+     .first_sector_offset = 1,
+     .has_skew = 1,
+     .skew_tab = { 0,5,10,15,2,7,12,17,4,9,14,1,6,11,16,3,8,13 }
+};
+
 
 static struct formats {
      const char    *name;
@@ -774,6 +813,7 @@ static struct formats {
     { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
+    { "bigboard",  "X820/Bigboard, 8in",    &bigboard_spec, 0, NULL, 1 },
     { "bw12",      "Bondwell 12/14",        &bondwell12_spec, 0, NULL, 1 },
     { "bw2",       "Bondwell Model 2",      &bondwell2_spec, 0, NULL, 1 },
     { "caos",      "CAOS/NANOS/z1013 CP/M", &caos_spec, 0, NULL, 1 },
@@ -786,7 +826,7 @@ static struct formats {
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
     { "fp1100",    "Casio FP1100",          &fp1100_spec, 0, NULL, 1 },
     { "gemini",    "GeminiGalaxy",          &gemini_spec, 0, NULL, 1 },
-    { "idpfdd", "Iskra Delta Partner", &idpfdd_spec, 0, NULL, 1 },
+    { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
@@ -805,12 +845,13 @@ static struct formats {
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
     { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
-    { "svi-40ss",  "SVI 40ss (174k)",      &svi40ss_spec, 0, NULL, 1 },
-    { "tiki100ss", "Tiki 100 (200k)",      &tiki100_ss_spec, 0, NULL, 1 },
-    { "tiki100ds", "Tiki 100 (400k)",      &tiki100_ds_spec, 0, NULL, 1 },
-    { "ts803",     "Televideo TS803/TPC1", &ts803_spec, 0, NULL, 1 },
-    { "vector06c", "Vector 06c",           &vector06c_spec, 0, NULL, 1 },
-    { "z80pack",   "z80pack 8\" format",   &z80pack_spec, 0, NULL, 1 },
+    { "svi-40ss",  "SVI 40ss (174k)",       &svi40ss_spec, 0, NULL, 1 },
+    { "tiki100ss", "Tiki 100 (200k)",       &tiki100_ss_spec, 0, NULL, 1 },
+    { "tiki100ds", "Tiki 100 (400k)",       &tiki100_ds_spec, 0, NULL, 1 },
+    { "ts803",     "Televideo TS803/TPC1",  &ts803_spec, 0, NULL, 1 },
+    { "vector06c", "Vector 06c",            &vector06c_spec, 0, NULL, 1 },
+    { "x820",      "Xerox 820",             &x820_spec, 0, NULL, 1 },
+    { "z80pack",   "z80pack 8\" format",    &z80pack_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
 
