@@ -6,7 +6,7 @@
 
 
     ; code_driver is low memory - we need to be below 0x3000
-    SECTION code_driver
+    SECTION code_graphics
 
     PUBLIC  generic_console_cls
     PUBLIC  generic_console_scrollup
@@ -39,8 +39,8 @@ generic_console_cls:
     call    vram_enable
     ld      hl,DISPLAY
     ld      de,DISPLAY+1
-    ld      bc,CONSOLE_ROWS * 128
-    ld      (hl),0
+    ld      bc,32 * 128
+    ld      (hl),32
     ldir
     call    vram_disable
     call    l_pop_ei
@@ -76,7 +76,7 @@ generic_console_scrollup:
     ld      hl,$3080    ;Row1
     ld      de,128  ;Characters in row
 row_loop:
-    ld      b,CONSOLE_COLUMNS
+    ld      b,128
 char_loop:
     push    hl
     ld      a,(hl)
@@ -117,24 +117,30 @@ xypos:
 
 
 vram_enable:
-    di            ; lock pio access
     in a,($1C)    ; syspio: get pio status
-    res 7,a       ; reset crt bank enable
-    ei            ; unlock pio access
+    set 7,a       ; set crt bank enable
     out ($1C),a   ; syspio
     ret
 
 
 vram_disable:
-    di            ; lock pio access
     in a,($1C)    ; syspio: get pio status
     res 7,a       ; reset crt bank enable
-    ei            ; unlock pio access
     out ($1C),a   ; syspio
     ret
 
     SECTION code_crt_init
 
     ; Reset the scroll register
-    ld      a,0
+    ld      a,0xff
     out     ($14),a
+
+    EXTERN          __BSS_END_tail
+    EXTERN          __HIMEM_head
+    EXTERN          __HIMEM_END_tail
+
+    ld      hl,__BSS_END_tail
+    ld      de,__HIMEM_head
+    ld      bc,__HIMEM_END_tail - __HIMEM_head
+    ldir
+

@@ -628,10 +628,10 @@
 #define __HARDWARE_JOY1_INDEX -1
 #define __HARDWARE_JOY2_INDEX -1
 #define __GENCON_MAX_UDGS 0
-// #define __HAVE_GFX 0
+#define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-// #define __HAVE_GFX_POINTXY 0
-// #define __HAVE_GFX_XORPLOT 0
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__COLECOADAM__)
 #define __HAVE_KEYBOARD 1
