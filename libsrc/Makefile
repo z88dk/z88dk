@@ -701,6 +701,7 @@ x820ii.lib:
 	@echo '--- Building Xerox 820 II Library ---'
 	@echo ''
 	$(MAKE) -C games TARGET=cpm SUBTYPE=x820ii
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR="narrow gencon" SUBTYPE=x820ii
 	TARGET=x820ii TYPE=z80 $(LIBLINKER) -DFORx820ii -x$(OUTPUT_DIRECTORY)/x820ii.lib @$(TARGET_DIRECTORY)/x820/x820ii.lst
 
 cpm_clib.lib:
