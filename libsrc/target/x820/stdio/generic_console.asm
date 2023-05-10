@@ -24,11 +24,13 @@
 
     defc    DISPLAY = 0x3000
 
+    PUBLIC  CLIB_GENCON_CAPS
     defc    CLIB_GENCON_CAPS = 0x00
 
+generic_console_ioctl:
+    scf
 generic_console_set_ink:
 generic_console_set_paper:
-generic_console_ioctl:
 generic_console_set_attribute:
     ret
 
