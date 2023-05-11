@@ -660,6 +660,22 @@ static disc_spec vector06c_spec = {
 };
 
 
+static disc_spec v1050_spec = {
+    .name = "Visual1050",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
 static disc_spec z80pack_spec = {
     .name = "Z80pack",
     .sectors_per_track = 26,
@@ -850,6 +866,7 @@ static struct formats {
     { "tiki100ds", "Tiki 100 (400k)",       &tiki100_ds_spec, 0, NULL, 1 },
     { "ts803",     "Televideo TS803/TPC1",  &ts803_spec, 0, NULL, 1 },
     { "vector06c", "Vector 06c",            &vector06c_spec, 0, NULL, 1 },
+    { "v1050",     "Visual 1050",           &v1050_spec, 0, NULL, 1 },
     { "x820",      "Xerox 820",             &x820_spec, 0, NULL, 1 },
     { "z80pack",   "z80pack 8\" format",    &z80pack_spec, 0, NULL, 1 },
     { NULL, NULL }
