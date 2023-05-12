@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 #ifdef __TIKI100__
-#include <tiki100.h>
+#include <arch/tiki100.h>
 #endif
 
 
