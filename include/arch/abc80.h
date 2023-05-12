@@ -1,7 +1,7 @@
 /*
  * Headerfile for ABC80 specific stuff
  *
- * $Id: abc80.h,v 1.3 2010-09-19 00:24:08 dom Exp $
+ * $Id: abc80.h $
  */
 
 #ifndef __ABC80_H__

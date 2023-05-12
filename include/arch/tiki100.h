@@ -7,7 +7,7 @@
  *		   * Added vertical scrolling library
  *
  *
- *      $Id: tiki100.h,v 1.5 2016-06-11 19:53:08 dom Exp $
+ *      $Id: tiki100.h $
  */
 
 #ifndef __TIKI100_H__

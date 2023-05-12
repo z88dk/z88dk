@@ -1,7 +1,7 @@
 /*
  * Headerfile for ABC800 specific stuff
  *
- * $Id: abc800.h,v 1.4 2016-06-11 19:53:08 dom Exp $
+ * $Id: abc800.h $
  */
 
 #ifndef __ABC800_H__
