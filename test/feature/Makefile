@@ -16,7 +16,8 @@ FEATURE_TARGETS = abc80 abc800 ace adam alphatro altair8800 aquarius aquarius_ro
 FEATURE_TARGETS += cpm_px8 cpm_px4 cpm_einstein cpm_einstein256 cpm_attache cpm_osborne1 cpm_kaypro83 cpm_kaypro84 \
 	cpm_mz2500 cpm_microbee cpm_qc10 cpm_nascom cpm_tiki100 cpm_svi cpm_dmv cpm_adam \
 	cpm_smc777 cpm_rc700 cpm_fp1100 cpm_x1 cpm_lynx cpm_bic cpm_excali64 cpm_vector06c \
-	cpm_zxplus3 cpm_bondwell cpm_bw2 cpm_8080 cpm_aussie cpm_cpc cpm_pcw40 cpm_pcw80 cpm_nabu cpm_corvette
+	cpm_zxplus3 cpm_bondwell cpm_bw2 cpm_8080 cpm_aussie cpm_cpc cpm_pcw40 cpm_pcw80 cpm_nabu cpm_corvette \
+	cpm_mbc200 cpm_mbc1100 cpm_mbc1160 cpm_mbc2000 cpm_x820 cpm_partner
 
 LDFLAGS_ace_feature = -lgfxace
 LDFLAGS_c128_feature = -lgfx128
