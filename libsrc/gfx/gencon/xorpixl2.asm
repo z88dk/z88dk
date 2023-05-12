@@ -9,4 +9,4 @@
 
 .xorpixel
     defc    NEEDxor = 1
-    INCLUDE "pixel.inc"
+    INCLUDE "pixel2.inc"

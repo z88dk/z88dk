@@ -1,7 +1,7 @@
 ;
 ;       Generic pseudo graphics routines for text-only platforms
 ;
-;       Plot pixel1 at (x,y) coordinate.
+;       Plot pixel at (x,y) coordinate.
 ;
 
 
@@ -11,4 +11,4 @@
 
 .plotpixel
     defc    NEEDplot = 1
-    INCLUDE "pixel1.inc"
+    INCLUDE "pixel2.inc"

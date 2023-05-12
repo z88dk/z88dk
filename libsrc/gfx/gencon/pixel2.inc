@@ -5,21 +5,23 @@
     EXTERN  generic_console_plotc
     EXTERN  generic_console_vpeek
     EXTERN  generic_console_pointxy
-    EXTERN  textpixl
+    EXTERN  textpixl2
+    EXTERN  getmaxy
     EXTERN  __console_w
     EXTERN  __console_h
+    EXTERN  __gfx_fatpix
     EXTERN  __gfx_coords
 
 
     ld      a,(__console_w)
-    add     a
     dec     a
     cp      h
     ret     c
 
-    ld      a,(__console_h)
-    add     a
-    dec     a
+    ex      de,hl
+    call    getmaxy     ;l = max
+    ld      a,l
+    ex      de,hl
     cp      l
     ret     c
 
@@ -43,21 +45,20 @@ ELSE
     ld      (__gfx_coords),hl
 ENDIF
     push    bc      ;save entry bc	
+    ld      c,h
+    ld      b,l
+    ld      a,(__gfx_fatpix)
+    and     a
+    jr      z,not_fatpix0
 IF __CPU_INTEL__
-    ld      a,h
-    rra
-    and     @01111111
-    ld      c,a
     ld      a,l
     rra
     and     @01111111
     ld      b,a
 ELSE
-    ld      c,h
-    ld      b,l
     srl     b
-    srl     c
 ENDIF
+not_fatpix0:
     push    bc  ;save reduced cooardinates
     push    hl  ;save original coordinates
 IF USEplotc
@@ -66,11 +67,9 @@ ELSE
     ld      e,1     ;raw mode
     call    generic_console_vpeek
 ENDIF
-    ld      e,a
-
-    ld      hl,textpixl
+    ld      hl,textpixl2
     ld      e,0
-    ld      b,16
+    ld      b,4
 .ckmap
     cp      (hl)
     jr      z,chfound
@@ -82,32 +81,18 @@ ENDIF
     ld      b,e
 
     pop     hl      ;original coordinates
-IF __CPU_INTEL__
-    ld      a,h
-    rrca
-    ld      a,1     ; the bit we want to draw
-    jr  nc,iseven
-ELSE
-    ld      a,1
-    bit     0,h
-    jr      z,iseven
-ENDIF
-    add	    a,a         ; move right the bit
 
-.iseven
-IF __CPU_INTEL__
-    ld      c,a
+    ld      a,(__gfx_fatpix)
+    and     a
+    ld      a,3
+    jr      z,not_fatpix
     ld      a,l
-    rrca
-    ld      a,c
-    jr      nc,evenrow
-ELSE
-    bit     0,l
-    jr      z,evenrow
-ENDIF
-    add     a,a
-    add     a,a		; move down the bit
-.evenrow
+    rlca
+    and     2
+    jr      nz,not_fatpix
+    inc     a
+not_fatpix:
+
 IF NEEDplot
     or      b
 ENDIF
@@ -122,19 +107,19 @@ IF NEEDpoint
     and     b
     pop     bc
 ELSE
-    ld      hl,textpixl
+    ld      hl,textpixl2
     ld      d,0
     ld      e,a
     add     hl,de
     ld      a,(hl)
-    pop     bc		;reduced coordinates
+    pop     bc              ;reduced coordinates
 IF USEplotc
     ld      d,a
     ld      e,0             ;pixel4 mode
     call    generic_console_plotc
 ELSE
     ld      d,a
-    ld      e,1		;raw mode
+    ld      e,1             ;raw mode
     call    generic_console_printc
 ENDIF
 ENDIF

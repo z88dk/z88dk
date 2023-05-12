@@ -1,7 +1,8 @@
 ;
 ;       Generic pseudo graphics routines for text-only platforms
 ;
-;       Point pixel at (x,y) coordinate.
+;       Get pixel at (x,y) coordinate.
+;
 
 
 
@@ -11,5 +12,4 @@
 
 .pointxy
     defc    NEEDpoint = 1
-    INCLUDE "pixel6.inc"
-
+    INCLUDE "pixel2.inc"
