@@ -111,25 +111,69 @@ bool remove_final_backslash(string& line) {
 	}
 }
 
-void split_lines(deque<string>& lines, const string& line) {
-	string output;
-	const char* YYMARKER{ nullptr };
-	const char* p = line.c_str();
+const char* scan_label(const char* p) {
+	const char* p0 = p;
+	const char* YYMARKER = nullptr;
+	/*!re2c
+		ws* ident ws* ':'	{ return p; }
+		ws* '.' ws* ident	{ return p; }
+		ws* ident ws* ':' ws* ('equ' | '=') { return p; }
+		ws* '.' ws* ident ws* ('equ' | '=') { return p; }
+		*					{ return p0; }
+	*/
+}
 
+const char* scan_stmt(const char* p) {
+	int conditional = 0;
+	const char* p1 = nullptr;
+	const char* yyt1 = nullptr;
+	const char* YYMARKER = nullptr;
 	while (true) {
-		const char* p0 = p;
 		/*!re2c
-			';' [^\r\n\000]*{ continue; }
-			end             { if (!output.empty()) {
-								  output += "\n"; lines.push_back(output); }
-							  return; }
-			nl | '\\'		{ output += "\n"; lines.push_back(output);
-							  output.clear(); continue; }
+			end					{ return p; }
+			@p1 ';'				{ return p1; }
+			'?'					{ conditional++; continue; }
+			@p1 ':'				{ if (conditional==0) return p1; else { conditional--; continue; } }
+			@p1 nl				{ return p1; }
+			@p1 '\\'			{ return p1; }
 			"'"  qchar* "'" |
 			'"' qqchar* '"' |
-			operand         { output += string(p0, p); continue; }
-			*               { output += string(p0, p); continue; }
+			operand				{ continue; }
+			*					{ continue; }
 		*/
+	}
+}
+
+const char* scan_comment(const char* p) {
+	const char* p0 = p;
+	/*!re2c
+		';' [^\r\n\000]*		{ return p; }
+		*						{ return p0; }
+	*/
+}
+
+const char* scan_split_line(const char* p) {
+	const char* p0 = p;
+	/*!re2c
+		nl | '\\' | ':'			{ return p; }
+		*						{ return p0; }
+	*/
+}
+
+void split_lines(deque<string>& lines, const string& line) {
+	const char* p = line.c_str();
+
+	while (*p != '\0') {
+		const char* p0 = p;
+		p = scan_label(p);
+		p = scan_stmt(p);
+		if (p != p0) {
+			string output = string(p0, p) + "\n";
+			lines.push_back(output);
+		}
+
+		p = scan_comment(p);
+		p = scan_split_line(p);
 	}
 }
 
