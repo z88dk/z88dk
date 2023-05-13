@@ -14,6 +14,7 @@ X(NotLibFile, "not a library file")
 X(NotObjFile, "not an object file")
 X(ObjFileVersion, "invalid object file version")
 X(LibFileVersion, "invalid library file version")
+X(FileRename, "file rename")
 
 // options
 X(NoSrcFile, "source file expected")

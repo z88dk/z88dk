@@ -167,6 +167,10 @@ void error_file_open(const char* filename) {
 	g_errors.error(ErrCode::FileOpen, filename);
 }
 
+void error_file_rename(const char* filename) {
+	g_errors.error(ErrCode::FileRename, filename);
+}
+
 void error_duplicate_definition(const char* name) {
 	g_errors.error(ErrCode::DuplicateDefinition, name);
 }

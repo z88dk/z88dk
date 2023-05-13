@@ -99,6 +99,7 @@ void error_duplicate_definition(const char* name);
 void error_duplicate_definition_module(const char* modulename, const char* name);
 void error_expr_recursion();
 void error_file_open(const char* filename);
+void error_file_rename(const char* filename);
 void error_illegal_ident();
 void error_int_range(int value);
 void error_invalid_char_const();
