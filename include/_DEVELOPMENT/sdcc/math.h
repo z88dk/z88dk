@@ -192,11 +192,16 @@ extern double_t atan_fastcall(double_t x) __z88dk_fastcall;
 #define atan(a) atan_fastcall(a)
 
 
+#ifdef __MATH_AM9511
+extern double_t atan2(double_t y,double_t x);
+
+#else
 extern double_t atan2(double_t y,double_t x);
 extern double_t atan2_callee(double_t y,double_t x) __z88dk_callee;
 #define atan2(a,b) atan2_callee(a,b)
 
 
+#endif
 
 extern double_t cos(double_t x);
 extern double_t cos_fastcall(double_t x) __z88dk_fastcall;
@@ -266,11 +271,6 @@ extern double_t frexp_callee(double_t value,int *exp) __z88dk_callee;
 #define frexp(a,b) frexp_callee(a,b)
 
 
-extern int ilogb(double_t x);
-extern int ilogb_fastcall(double_t x) __z88dk_fastcall;
-#define ilogb(a) ilogb_fastcall(a)
-
-
 extern double_t ldexp(double_t x,int exp);
 extern double_t ldexp_callee(double_t x,int exp) __z88dk_callee;
 #define ldexp(a,b) ldexp_callee(a,b)
@@ -284,6 +284,12 @@ extern double_t scalbn_callee(double_t x,int n) __z88dk_callee;
 extern double_t scalbln(double_t x,int n);
 extern double_t scalbln_callee(double_t x,int n) __z88dk_callee;
 #define scalbln(a,b) scalbln_callee(a,b)
+
+
+
+extern int ilogb(double_t x);
+extern int ilogb_fastcall(double_t x) __z88dk_fastcall;
+#define ilogb(a) ilogb_fastcall(a)
 
 
 
@@ -318,16 +324,23 @@ extern double_t fabs_fastcall(double_t x) __z88dk_fastcall;
 #define fabs(a) fabs_fastcall(a)
 
 
+#ifdef __MATH_AM9511
+extern double_t hypot(double_t x,double_t y);
+
+extern double_t pow(double_t x,double_t y);
+
+#else
 extern double_t hypot(double_t x,double_t y);
 extern double_t hypot_callee(double_t x,double_t y) __z88dk_callee;
 #define hypot(a,b) hypot_callee(a,b)
-
 
 
 extern double_t pow(double_t x,double_t y);
 extern double_t pow_callee(double_t x,double_t y) __z88dk_callee;
 #define pow(a,b) pow_callee(a,b)
 
+
+#endif
 
 extern double_t sqrt(double_t x);
 extern double_t sqrt_fastcall(double_t x) __z88dk_fastcall;
@@ -402,6 +415,12 @@ extern double_t trunc_fastcall(double_t x) __z88dk_fastcall;
 
 
 
+#ifdef __MATH_AM9511
+extern double_t modf(double_t value,double_t *iptr);
+
+extern double_t fmod(double_t x,double_t y);
+
+#else
 extern double_t modf(double_t value,double_t *iptr);
 extern double_t modf_callee(double_t value,double_t *iptr) __z88dk_callee;
 #define modf(a,b) modf_callee(a,b)
@@ -412,6 +431,7 @@ extern double_t fmod_callee(double_t x,double_t y) __z88dk_callee;
 #define fmod(a,b) fmod_callee(a,b)
 
 
+#endif
 extern double_t remainder(double_t x,double_t y);
 extern double_t remainder_callee(double_t x,double_t y) __z88dk_callee;
 #define remainder(a,b) remainder_callee(a,b)
@@ -451,6 +471,12 @@ extern double_t fdim_callee(double_t x,double_t y) __z88dk_callee;
 
 
 
+#ifdef __MATH_AM9511
+extern double_t fmax(double_t x,double_t y);
+
+extern double_t fmin(double_t x,double_t y);
+
+#else
 extern double_t fmax(double_t x,double_t y);
 extern double_t fmax_callee(double_t x,double_t y) __z88dk_callee;
 #define fmax(a,b) fmax_callee(a,b)
@@ -461,6 +487,7 @@ extern double_t fmin_callee(double_t x,double_t y) __z88dk_callee;
 #define fmin(a,b) fmin_callee(a,b)
 
 
+#endif
 
 extern double_t fma(double_t x,double_t y,double_t z);
 extern double_t fma_callee(double_t x,double_t y,double_t z) __z88dk_callee;

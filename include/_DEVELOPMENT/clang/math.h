@@ -186,9 +186,15 @@ extern double_t asin(double_t x);
 extern double_t atan(double_t x);
 
 
+#ifdef __MATH_AM9511
 extern double_t atan2(double_t y,double_t x);
 
 
+#else
+extern double_t atan2(double_t y,double_t x);
+
+
+#endif
 
 extern double_t cos(double_t x);
 
@@ -232,9 +238,6 @@ extern double_t expm1(double_t x);
 extern double_t frexp(double_t value,int *exp);
 
 
-extern int ilogb(double_t x);
-
-
 extern double_t ldexp(double_t x,int exp);
 
 
@@ -242,6 +245,10 @@ extern double_t scalbn(double_t x,int n);
 
 	
 extern double_t scalbln(double_t x,int n);
+
+
+
+extern int ilogb(double_t x);
 
 
 
@@ -264,12 +271,21 @@ extern double_t logb(double_t x);
 extern double_t fabs(double_t x);
 
 
+#ifdef __MATH_AM9511
 extern double_t hypot(double_t x,double_t y);
-
 
 
 extern double_t pow(double_t x,double_t y);
 
+
+#else
+extern double_t hypot(double_t x,double_t y);
+
+
+extern double_t pow(double_t x,double_t y);
+
+
+#endif
 
 extern double_t sqrt(double_t x);
 
@@ -316,12 +332,21 @@ extern double_t trunc(double_t x);
 
 
 
+#ifdef __MATH_AM9511
 extern double_t modf(double_t value,double_t *iptr);
 
 
 extern double_t fmod(double_t x,double_t y);
 
 
+#else
+extern double_t modf(double_t value,double_t *iptr);
+
+
+extern double_t fmod(double_t x,double_t y);
+
+
+#endif
 extern double_t remainder(double_t x,double_t y);
 
 
@@ -347,12 +372,21 @@ extern double_t fdim(double_t x,double_t y);
 
 
 
+#ifdef __MATH_AM9511
 extern double_t fmax(double_t x,double_t y);
 
 
 extern double_t fmin(double_t x,double_t y);
 
 
+#else
+extern double_t fmax(double_t x,double_t y);
+
+
+extern double_t fmin(double_t x,double_t y);
+
+
+#endif
 
 extern double_t fma(double_t x,double_t y,double_t z);
 

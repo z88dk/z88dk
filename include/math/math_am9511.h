@@ -41,8 +41,8 @@ extern double_t __LIB__ asin(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ acos(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ atan(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ atan2(double_t y,double_t x) __smallc;
-extern double_t __LIB__ atan2_callee(double_t y,double_t x) __smallc __z88dk_callee;
-#define atan2(a,b) atan2_callee(a,b)
+// extern double_t __LIB__ atan2_callee(double_t y,double_t x) __smallc __z88dk_callee;
+// #define atan2(a,b) atan2_callee(a,b)
 
 /* Hyperbolic functions */
 extern double_t __LIB__ sinh(double_t x) __smallc __z88dk_fastcall;
@@ -56,8 +56,8 @@ extern double_t __LIB__ atanh(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ sqr(double_t a) __smallc __z88dk_fastcall;
 extern double_t __LIB__ sqrt(double_t a)  __smallc __z88dk_fastcall;
 extern double_t __LIB__ pow(double_t x,double_t y) __smallc;
-extern double_t __LIB__ pow_callee(double_t x,double_t y) __smallc __z88dk_callee;
-#define pow(a,b) pow_callee(a,b)
+// extern double_t __LIB__ pow_callee(double_t x,double_t y) __smallc __z88dk_callee;
+// #define pow(a,b) pow_callee(a,b)
 
 
 /* Exponential */
@@ -83,28 +83,28 @@ extern double_t __LIB__ div2(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ mul2(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ mul10u(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ ldexp(double_t x,int exp) __smallc;
-extern double_t __LIB__ ldexp_callee(double_t x,int exp) __smallc __z88dk_callee;
-#define ldexp(a,b) ldexp_callee(a,b)
+// extern double_t __LIB__ ldexp_callee(double_t x,int exp) __smallc __z88dk_callee;
+// #define ldexp(a,b) ldexp_callee(a,b)
 #define scalbn(x,pw2) ldexp(x,pw2)
 extern double_t __LIB__ modf(double_t value,double_t *iptr) __smallc;
-extern double_t __LIB__ modf_callee(double_t value,double_t *iptr) __smallc __z88dk_callee;
-#define modf(a,b) modf_callee(a,b)
+// extern double_t __LIB__ modf_callee(double_t value,double_t *iptr) __smallc __z88dk_callee;
+// #define modf(a,b) modf_callee(a,b)
 extern double_t __LIB__ frexp(double_t value,int *exp) __smallc;
-extern double_t __LIB__ frexp_callee(double_t value,int *exp) __smallc __z88dk_callee;
-#define frexp(a,b) frexp_callee(a,b)
+// extern double_t __LIB__ frexp_callee(double_t value,int *exp) __smallc __z88dk_callee;
+// #define frexp(a,b) frexp_callee(a,b)
 
 /* General */
 extern double_t __LIB__ fabs(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ fmod(double_t x,double_t y) __smallc;
-extern double_t __LIB__ fmod_callee(double_t x,double_t y) __smallc __z88dk_callee;
-#define fmod(a,b) fmod_callee(a,b)
+// extern double_t __LIB__ fmod_callee(double_t x,double_t y) __smallc __z88dk_callee;
+// #define fmod(a,b) fmod_callee(a,b)
 
 extern double_t __LIB__ hypot(double_t x,double_t y) __smallc;
-extern double_t __LIB__ hypot_callee(double_t x,double_t y) __smallc __z88dk_callee;
-#define hypot(a,b) hypot_callee(a,b)
+// extern double_t __LIB__ hypot_callee(double_t x,double_t y) __smallc __z88dk_callee;
+// #define hypot(a,b) hypot_callee(a,b)
 
 /* Helper functions */
-extern double_t __LIB__ atof(char *) __smallc __z88dk_fastcall;
+extern double_t __LIB__ atof(char *) __smallc;
 extern void __LIB__ ftoa(double_t, int, char *) __smallc;
 extern void __LIB__ ftoe(double_t, int, char *) __smallc;
 
