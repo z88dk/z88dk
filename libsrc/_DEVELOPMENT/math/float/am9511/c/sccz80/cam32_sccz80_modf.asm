@@ -11,7 +11,6 @@ EXTERN _am9511_modf
     ; Stack: float left, ptr right, ret
 
     ; Reverse the stack
-IF !__CPU_INTEL__
     pop af      ;ret
     pop bc      ;ptr
     pop hl      ;float
@@ -20,5 +19,4 @@ IF !__CPU_INTEL__
     push de     ;float
     push hl
     push af     ;ret
-ENDIF
     jp _am9511_modf

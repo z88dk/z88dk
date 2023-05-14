@@ -9,7 +9,5 @@ EXTERN _am9511_fmod
 
 
 .cam32_sccz80_fmod
-IF !__CPU_INTEL__
     call asm_switch_arg
-ENDIF
     jp _am9511_fmod

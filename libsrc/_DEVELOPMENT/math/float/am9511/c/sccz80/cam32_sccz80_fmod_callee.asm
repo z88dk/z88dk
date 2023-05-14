@@ -9,9 +9,7 @@ EXTERN _am9511_fmod, asm_switch_arg
     ; Entry:
     ; Stack: float left, float right, ret
     ; Reverse the stack (not for Intel)
-IF !__CPU_INTEL__
     call asm_switch_arg
-ENDIF
     call _am9511_fmod
     pop bc
     pop af
