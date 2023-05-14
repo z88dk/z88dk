@@ -1,7 +1,7 @@
 ;       Small C+ Math Library
 
 	SECTION code_fp
-        PUBLIC amax
+        PUBLIC fmax
         
         EXTERN	ldbchl
         EXTERN	compare
@@ -10,8 +10,8 @@
 
 
 ;
-;       amax(a,b)       returns the greater of a and b
-.amax   LD      HL,8    ;offset for 1st argument
+;       fmax(a,b)       returns the greater of a and b
+.fmax   LD      HL,8    ;offset for 1st argument
         ADD     HL,SP
         CALL    ldbchl  ;bcixde := 1st argument
         CALL    compare

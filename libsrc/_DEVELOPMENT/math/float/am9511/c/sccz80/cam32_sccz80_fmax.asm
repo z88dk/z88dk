@@ -19,7 +19,10 @@ EXTERN asm_sccz80_read1, asm_sccz80_readl, asm_am9511_compare_sccz80
 
 .cam32_sccz80_fmax
     call asm_am9511_compare_sccz80  ; compare two floats on the stack
-    jp NC,asm_sccz80_readl
-    jp asm_sccz80_read1     ; enter  stack = sccz80_float left, sccz80_float right, ret
-                            ; return stack = sccz80_float left, sccz80_float right, ret
+    jr  nc,left
+    call  asm_sccz80_read1  ; enter  stack = sccz80_float left, sccz80_float right, ret
+    ret                     ; return stack = sccz80_float left, sccz80_float right, ret
                             ;         DEHL = sccz80_float max
+left:
+    call asm_sccz80_readl
+    ret

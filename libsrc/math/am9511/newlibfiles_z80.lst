@@ -163,11 +163,6 @@
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_sub.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_swap.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_zero.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_div.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_div_u.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_mod.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_mod_u.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_mult.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/log.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/log2.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/log2_fastcall.asm

@@ -1,7 +1,7 @@
 ;       Small C+ Math Library
 
         SECTION code_fp
-        PUBLIC amin
+        PUBLIC fmin
         
         EXTERN	ldbchl
         EXTERN	compare
@@ -9,9 +9,9 @@
 
 
 ;
-;       amin(a,b)
+;       fmin(a,b)
 
-.amin   LD      HL,8
+.fmin   LD      HL,8
         ADD     HL,SP
         CALL    ldbchl
         CALL    compare

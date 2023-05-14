@@ -74,6 +74,8 @@ extern double_t __LIB__ log10(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ ceil(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ floor(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ round(double_t x) __smallc __z88dk_fastcall;
+extern double_t __LIB__ fmax(double_t,double_t) __smallc;
+extern double_t __LIB__ fmin(double_t,double_t) __smallc;
 #define trunc(a) (a>0.?floor(a):ceil(a))
 //#define round(a) (a>0.?floor(a+0.5):ceil(a-0.5))
 #define rint(a) ceil(a)
@@ -181,6 +183,8 @@ extern double_t fabs(double_t x) __z88dk_fastcall;
 extern double_t fmod(double_t x,double_t y);
 extern double_t fmod_callee(double_t x,double_t y) __z88dk_callee;
 #define fmod(a,b) fmod_callee(a,b)
+
+§
 
 extern double_t hypot(double_t x,double_t y);
 extern double_t hypot_callee(double_t x,double_t y) __z88dk_callee;
