@@ -12,7 +12,9 @@ EXTERN _am9511_modf, asm_switch_arg
     ; Stack: float left, ptr right, ret
 
     ; Reverse the stack
+IF !__CPU_INTEL__
     call asm_switch_arg
+ENDIF
     call _am9511_modf
     pop af
     pop af

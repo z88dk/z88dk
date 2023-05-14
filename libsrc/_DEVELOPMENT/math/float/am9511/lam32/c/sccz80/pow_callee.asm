@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _pow_callee
-EXTERN	cam32_sdcc_pow_callee
-defc _pow_callee = cam32_sdcc_pow_callee
+defc _pow_callee = pow_callee
 ENDIF
 

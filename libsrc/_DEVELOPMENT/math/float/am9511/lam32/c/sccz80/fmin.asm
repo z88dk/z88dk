@@ -8,7 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _fmin
-EXTERN cam32_sdcc_fmin
-defc _fmin = cam32_sdcc_fmin
+defc _fmin = fmin
 ENDIF
 

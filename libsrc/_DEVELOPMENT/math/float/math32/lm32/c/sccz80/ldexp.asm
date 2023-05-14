@@ -8,7 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _ldexp
-EXTERN cm32_sdcc_ldexp
-defc _ldexp = cm32_sdcc_ldexp
+defc _ldexp = ldexp
 ENDIF
 
