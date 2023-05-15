@@ -186,11 +186,17 @@ extern double_t __LIB__ asin(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ atan(double_t x) __smallc __z88dk_fastcall;
 
 
+#ifdef __MATH_AM9511
+extern double_t __LIB__ atan2(double_t y,double_t x) __smallc;
+
+
+#else
 extern double_t __LIB__ atan2(double_t y,double_t x) __smallc;
 extern double_t __LIB__ atan2_callee(double_t y,double_t x) __smallc __z88dk_callee;
 #define atan2(a,b) atan2_callee(a,b)
 
 
+#endif
 
 extern double_t __LIB__ cos(double_t x) __smallc __z88dk_fastcall;
 
@@ -236,9 +242,6 @@ extern double_t __LIB__ frexp_callee(double_t value,int *exp) __smallc __z88dk_c
 #define frexp(a,b) frexp_callee(a,b)
 
 
-extern int __LIB__ ilogb(double_t x) __smallc __z88dk_fastcall;
-
-
 extern double_t __LIB__ ldexp(double_t x,int exp) __smallc;
 extern double_t __LIB__ ldexp_callee(double_t x,int exp) __smallc __z88dk_callee;
 #define ldexp(a,b) ldexp_callee(a,b)
@@ -252,6 +255,10 @@ extern double_t __LIB__ scalbn_callee(double_t x,int n) __smallc __z88dk_callee;
 extern double_t __LIB__ scalbln(double_t x,int n) __smallc;
 extern double_t __LIB__ scalbln_callee(double_t x,int n) __smallc __z88dk_callee;
 #define scalbln(a,b) scalbln_callee(a,b)
+
+
+
+extern int __LIB__ ilogb(double_t x) __smallc __z88dk_fastcall;
 
 
 
@@ -274,16 +281,25 @@ extern double_t __LIB__ logb(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ fabs(double_t x) __smallc __z88dk_fastcall;
 
 
+#ifdef __MATH_AM9511
+extern double_t __LIB__ hypot(double_t x,double_t y) __smallc;
+
+
+extern double_t __LIB__ pow(double_t x,double_t y) __smallc;
+
+
+#else
 extern double_t __LIB__ hypot(double_t x,double_t y) __smallc;
 extern double_t __LIB__ hypot_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define hypot(a,b) hypot_callee(a,b)
-
 
 
 extern double_t __LIB__ pow(double_t x,double_t y) __smallc;
 extern double_t __LIB__ pow_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define pow(a,b) pow_callee(a,b)
 
+
+#endif
 
 extern double_t __LIB__ sqrt(double_t x) __smallc __z88dk_fastcall;
 
@@ -330,6 +346,14 @@ extern double_t __LIB__ trunc(double_t x) __smallc __z88dk_fastcall;
 
 
 
+#ifdef __MATH_AM9511
+extern double_t __LIB__ modf(double_t value,double_t *iptr) __smallc;
+
+
+extern double_t __LIB__ fmod(double_t x,double_t y) __smallc;
+
+
+#else
 extern double_t __LIB__ modf(double_t value,double_t *iptr) __smallc;
 extern double_t __LIB__ modf_callee(double_t value,double_t *iptr) __smallc __z88dk_callee;
 #define modf(a,b) modf_callee(a,b)
@@ -340,6 +364,7 @@ extern double_t __LIB__ fmod_callee(double_t x,double_t y) __smallc __z88dk_call
 #define fmod(a,b) fmod_callee(a,b)
 
 
+#endif
 extern double_t __LIB__ remainder(double_t x,double_t y) __smallc;
 extern double_t __LIB__ remainder_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define remainder(a,b) remainder_callee(a,b)
@@ -377,6 +402,14 @@ extern double_t __LIB__ fdim_callee(double_t x,double_t y) __smallc __z88dk_call
 
 
 
+#ifdef __MATH_AM9511
+extern double_t __LIB__ fmax(double_t x,double_t y) __smallc;
+
+
+extern double_t __LIB__ fmin(double_t x,double_t y) __smallc;
+
+
+#else
 extern double_t __LIB__ fmax(double_t x,double_t y) __smallc;
 extern double_t __LIB__ fmax_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define fmax(a,b) fmax_callee(a,b)
@@ -387,6 +420,7 @@ extern double_t __LIB__ fmin_callee(double_t x,double_t y) __smallc __z88dk_call
 #define fmin(a,b) fmin_callee(a,b)
 
 
+#endif
 
 extern double_t __LIB__ fma(double_t x,double_t y,double_t z) __smallc;
 extern double_t __LIB__ fma_callee(double_t x,double_t y,double_t z) __smallc __z88dk_callee;

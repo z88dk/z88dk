@@ -5,7 +5,7 @@ include ../../Make.config
 vpath %.c ../cimpl/
 
 AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard c/asm/*.asm) $(wildcard z80/*.asm)
-CFILES  = amin.c amax.c fmod.c atan2.c	atof.c cosh.c ftoa.c ftoe.c sinh.c tanh.c acosh.c asinh.c atanh.c pow_valid.c tofix16.c fromfix16.c
+CFILES  = fmin.c fmax.c fmod.c atan2.c	atof.c cosh.c ftoa.c ftoe.c sinh.c tanh.c acosh.c asinh.c atanh.c pow_valid.c tofix16.c fromfix16.c
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -fp-mode=am9511 -D__MATH_DAI32 -DFLOAT_IS_32BITS

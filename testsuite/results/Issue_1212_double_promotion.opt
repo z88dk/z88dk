@@ -247,8 +247,8 @@
 	GLOBAL	frexp
 	GLOBAL	fabs
 	GLOBAL	fmod
-	GLOBAL	amax
-	GLOBAL	amin
+	GLOBAL	fmax
+	GLOBAL	fmin
 	GLOBAL	halfpi
 	GLOBAL	pi
 	GLOBAL	atof

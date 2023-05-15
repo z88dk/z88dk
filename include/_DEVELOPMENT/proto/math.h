@@ -178,7 +178,11 @@ typedef _Float16 half_t;
 __DPROTO(,,double_t,,acos,double_t x)
 __DPROTO(,,double_t,,asin,double_t x)
 __DPROTO(,,double_t,,atan,double_t x)
+#ifdef __MATH_AM9511
+__OPROTO(,,double_t,,atan2,double_t y,double_t x)
+#else
 __DPROTO(,,double_t,,atan2,double_t y,double_t x)
+#endif
 
 __DPROTO(,,double_t,,cos,double_t x)
 __DPROTO(,,double_t,,sin,double_t x)
@@ -196,10 +200,11 @@ __DPROTO(,,double_t,,exp,double_t x)
 __DPROTO(,,double_t,,exp2,double_t x)
 __DPROTO(,,double_t,,expm1,double_t x)
 __DPROTO(,,double_t,,frexp,double_t value,int *exp)
-__DPROTO(,,int,,ilogb,double_t x)
 __DPROTO(,,double_t,,ldexp,double_t x,int exp)
 __DPROTO(,,double_t,,scalbn,double_t x,int n)	
 __DPROTO(,,double_t,,scalbln,double_t x,int n)
+
+__DPROTO(,,int,,ilogb,double_t x)
 
 __DPROTO(,,double_t,,log,double_t x)
 __DPROTO(,,double_t,,log10,double_t x)
@@ -208,9 +213,14 @@ __DPROTO(,,double_t,,log2,double_t x)
 __DPROTO(,,double_t,,logb,double_t x)
 
 __DPROTO(,,double_t,,fabs,double_t x)
+#ifdef __MATH_AM9511
+__OPROTO(,,double_t,,hypot,double_t x,double_t y)
+__OPROTO(,,double_t,,pow,double_t x,double_t y)
+#else
 __DPROTO(,,double_t,,hypot,double_t x,double_t y)
-
 __DPROTO(,,double_t,,pow,double_t x,double_t y)
+#endif
+
 __DPROTO(,,double_t,,sqrt,double_t x)
 __DPROTO(,,double_t,,cbrt,double_t x)
 
@@ -228,8 +238,13 @@ __DPROTO(,,double_t,,round,double_t x)
 __DPROTO(,,long,,lround,double_t x)
 __DPROTO(,,double_t,,trunc,double_t x)
 
+#ifdef __MATH_AM9511
+__OPROTO(,,double_t,,modf,double_t value,double_t *iptr)
+__OPROTO(,,double_t,,fmod,double_t x,double_t y)
+#else
 __DPROTO(,,double_t,,modf,double_t value,double_t *iptr)
 __DPROTO(,,double_t,,fmod,double_t x,double_t y)
+#endif
 __DPROTO(,,double_t,,remainder,double_t x,double_t y)
 __DPROTO(,,double_t,,remquo,double_t x,double_t y,int *quo)
 
@@ -241,8 +256,13 @@ __DPROTO(,,double_t,,nexttoward,double_t x,double_t y)
 
 __DPROTO(,,double_t,,fdim,double_t x,double_t y)
 
+#ifdef __MATH_AM9511
+__OPROTO(,,double_t,,fmax,double_t x,double_t y)
+__OPROTO(,,double_t,,fmin,double_t x,double_t y)
+#else
 __DPROTO(,,double_t,,fmax,double_t x,double_t y)
 __DPROTO(,,double_t,,fmin,double_t x,double_t y)
+#endif
 
 __DPROTO(,,double_t,,fma,double_t x,double_t y,double_t z)
 

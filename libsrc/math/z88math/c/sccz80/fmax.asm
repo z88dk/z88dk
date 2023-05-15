@@ -7,11 +7,11 @@
 ;       7/12/98 djm
 
 
-;double amin(double x,double y)  
+;double fmax(double x,double y)  
 ;y is in the FA
 ;x is on the stack +8 (+2=y) 
 ;
-;returns the smaller of x and y
+;returns the larger of x and y
 
                 SECTION  code_fp
 IF FORz88
@@ -20,14 +20,14 @@ ELSE
 		INCLUDE "fpp.def"
 ENDIF
 
-                PUBLIC    amin
+                PUBLIC    fmax
 
                 EXTERN	fsetup
                 EXTERN	stkequ2
                 EXTERN    fa
 
 
-.amin
+.fmax
         ld      ix,8
         add     ix,sp
         ld      l,(ix+1)
@@ -48,9 +48,9 @@ ELSE
 	call	FPP
 ENDIF
         pop     ix
-        jp      p,amin2
+        jp      p,fmax2
         ret             ;hl is bigger than de, de on stack so okay...
-.amin2
+.fmax2
         ld      l,(ix+1)
         ld      h,(ix+2)
         exx

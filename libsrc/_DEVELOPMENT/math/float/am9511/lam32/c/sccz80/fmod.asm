@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _fmod
-EXTERN cam32_sdcc_fmod
-defc _fmod = cam32_sdcc_fmod
+defc _fmod = fmod
 ENDIF
 

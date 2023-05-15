@@ -8,7 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _fmax
-EXTERN	cam32_sdcc_fmax
-defc _fmax = cam32_sdcc_fmax
+defc _fmax = fmax
 ENDIF
 

@@ -46,6 +46,8 @@ union float_long
 
 #ifdef __SDCC
 
+#define __stdc
+
 /* Trigonometric functions */
 float sin (float x) __z88dk_fastcall;
 float cos (float x) __z88dk_fastcall;
@@ -104,7 +106,7 @@ float asin (float x) __smallc __z88dk_fastcall;
 float acos (float x) __smallc __z88dk_fastcall;
 float atan (float x) __smallc __z88dk_fastcall;
 
-float am9511_atan2 (float y, float x) __smallc;
+float am9511_atan2 (float y, float x) __stdc;
 
 /* Hyperbolic functions */
 float am9511_sinh (float x) __smallc __z88dk_fastcall;
@@ -130,17 +132,17 @@ float fabs (float x) __smallc __z88dk_fastcall;
 float floor (float x) __smallc __z88dk_fastcall;
 
 float am9511_round (float x) __smallc __z88dk_fastcall;
-float am9511_fmod (float x, float y) __smallc;
-float am9511_modf (float x, float *y) __smallc;
+float am9511_fmod (float x, float y) __stdc;
+float am9511_modf (float x, float *y) __stdc;
 
 /* Intrinsic functions */
 float mul2 (float a) __smallc __z88dk_fastcall;
 float div2 (float a) __smallc __z88dk_fastcall;
 float sqr (float a) __smallc __z88dk_fastcall;
 float sqrt (float a) __smallc __z88dk_fastcall;
-float frexp (float x, int16_t *pw2) __smallc __z88dk_callee;
-float ldexp (float x, int16_t pw2) __smallc __z88dk_callee;
-float hypot (float x, float y) __smallc __z88dk_callee;
+float frexp (float x, int16_t *pw2) __stdc __z88dk_callee;
+float ldexp (float x, int16_t pw2) __stdc __z88dk_callee;
+float hypot (float x, float y) __stdc __z88dk_callee;
 
 #endif
 

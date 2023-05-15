@@ -504,7 +504,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         if ( q == 0 ) BUF_PRINTF("%-8s%s","push",handle_register16_2(state,p, state->index));
                         else if ( q == 1 ) {
                             if ( p == 0 ) BUF_PRINTF("%-8s%s", "call", handle_addr16(state, opbuf1, sizeof(opbuf1)));
-                            else if ( p == 1 && is8085() ) BUF_PRINTF("%-8snk,%s", "jr",handle_addr16(state, opbuf1, sizeof(opbuf1))    );
+                            else if ( p == 1 && is8085() ) BUF_PRINTF("%-8snk,%s", "jp",handle_addr16(state, opbuf1, sizeof(opbuf1))    );
                             else if ( p == 1 && canindex() ) { state->index = 1; continue; }
                             else if ( p == 2 && is8085() ) BUF_PRINTF("%-8shl,(de)","ld");
                             else if ( p == 2 && canindex() ) { // ED page
@@ -668,7 +668,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     else BUF_PRINTF("nop");
                                 }
                             } else if ( p == 3 && canindex()  ) { state->index = 2; continue; }
-                            else if ( p == 3 && is8085() ) BUF_PRINTF("%-8sk,%s", "jr",handle_addr16(state, opbuf1, sizeof(opbuf1)));
+                            else if ( p == 3 && is8085() ) BUF_PRINTF("%-8sk,%s", "jp",handle_addr16(state, opbuf1, sizeof(opbuf1)));
                             else BUF_PRINTF("nop");                            
                         }
                     } else if ( z == 6 ) {
