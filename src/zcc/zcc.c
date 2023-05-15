@@ -705,11 +705,19 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
     int             status, errs;
     int             tstore;
     char            buffer[8192], *outname;
+    char           *bin_dir = c_binary_dir;
 
     errs = 0;
 
     if (!hassuffix(filelist[number], suffix))
         return (0);
+
+#ifndef WIN32
+    // On non-windows platforms m4 is a system file, so doesn't need a prefix
+    if (strcasecmp(processor,"m4") == 0) {
+        bin_dir = "";
+    }
+#endif
 
     outname = changesuffix(temporary_filenames[number], nextsuffix);
 
@@ -719,24 +727,24 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
         tstore = strlen(filelist[number]) - strlen(suffix);
         if (!needsuffix)
             filelist[number][tstore] = 0;
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\"", c_binary_dir, processor, extraargs, filelist[number]);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\"", bin_dir, processor, extraargs, filelist[number]);
         filelist[number][tstore] = '.';
         break;
     case outspecified:
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     case outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" -o \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     case filter:
-        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" > \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" > \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     case filter_out:
         // This is only used by copy command, which is cat/type so not a z88dk binary
         snprintf(buffer, sizeof(buffer), "%s %s \"%s\" > \"%s\"", processor, extraargs, filelist[number], outname);
         break;
     case filter_outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" -o \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     }
 
