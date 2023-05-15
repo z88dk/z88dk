@@ -115,6 +115,10 @@ void Args::parse_args(const vector<string>& args) {
 string Args::prepend_output_dir(const string& filename) {
 	if (m_output_dir.empty())
 		return filename;
+	else if (filename.substr(0, m_output_dir.size() + 1) == m_output_dir + "/") {
+		// #2260: may be called with an object file already with the path prepended; do not add it twice
+		return filename;
+	}
 	else {
 		// NOTE: concatenation (/) of a relative fs::path and an
 		// absolute fs::path discards the first one! Do our magic
