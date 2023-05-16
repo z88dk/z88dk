@@ -14,6 +14,7 @@
     PUBLIC  generic_console_set_attribute
     PUBLIC  generic_console_ioctl
 	
+	PUBLIC  __sanyo_attr
 
 
         EXTERN __console_x
@@ -27,7 +28,7 @@
         defc    CLIB_GENCON_CAPS = CAP_GENCON_INVERSE | CAP_GENCON_UNDERLINE 
 
 
-sanyo_attr:
+__sanyo_attr:
 		defb 0
 
 generic_console_cls:
@@ -45,12 +46,12 @@ generic_console_set_attribute:
 		jr nc,noinv
 		add 4   ; set inverse bit
 noinv:
-		ld (sanyo_attr),a
+		ld (__sanyo_attr),a
 		ld l,27
 		call mbc_sendchar
 		ld l,'t'
 		call mbc_sendchar
-		ld a,(sanyo_attr)
+		ld a,(__sanyo_attr)
 		ld l,a
 		call mbc_sendchar
 		ret
