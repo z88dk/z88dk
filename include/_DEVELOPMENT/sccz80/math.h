@@ -281,14 +281,6 @@ extern double_t __LIB__ logb(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ fabs(double_t x) __smallc __z88dk_fastcall;
 
 
-#ifdef __MATH_AM9511
-extern double_t __LIB__ hypot(double_t x,double_t y) __smallc;
-
-
-extern double_t __LIB__ pow(double_t x,double_t y) __smallc;
-
-
-#else
 extern double_t __LIB__ hypot(double_t x,double_t y) __smallc;
 extern double_t __LIB__ hypot_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define hypot(a,b) hypot_callee(a,b)
@@ -299,7 +291,6 @@ extern double_t __LIB__ pow_callee(double_t x,double_t y) __smallc __z88dk_calle
 #define pow(a,b) pow_callee(a,b)
 
 
-#endif
 
 extern double_t __LIB__ sqrt(double_t x) __smallc __z88dk_fastcall;
 

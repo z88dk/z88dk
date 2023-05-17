@@ -210,24 +210,18 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _hypot
-	GLOBAL _ldexp_callee
-	GLOBAL _frexp_callee
 	GLOBAL _sqrt_fastcall
 	GLOBAL _sqr_fastcall
 	GLOBAL _div2_fastcall
 	GLOBAL _mul2_fastcall
-	GLOBAL _am9511_fmod
-	GLOBAL _am9511_round
-	GLOBAL _fmin_callee
-	GLOBAL _fmax_callee
+	GLOBAL _fmin
+	GLOBAL _fmax
 	GLOBAL _floor_fastcall
 	GLOBAL _fabs_fastcall
 	GLOBAL _ceil_fastcall
 	GLOBAL _am9511_exp10
 	GLOBAL _am9511_exp2
 	GLOBAL _am9511_log2
-	GLOBAL _pow
 	GLOBAL _exp_fastcall
 	GLOBAL _log10_fastcall
 	GLOBAL _log_fastcall
@@ -271,8 +265,6 @@
 	GLOBAL _isgreater
 	GLOBAL _fma_callee
 	GLOBAL _fma
-	GLOBAL _fmin
-	GLOBAL _fmax
 	GLOBAL _fdim_callee
 	GLOBAL _fdim
 	GLOBAL _nexttoward_callee
@@ -314,6 +306,10 @@
 	GLOBAL _cbrt_fastcall
 	GLOBAL _cbrt
 	GLOBAL _sqrt
+	GLOBAL _pow_callee
+	GLOBAL _pow
+	GLOBAL _hypot_callee
+	GLOBAL _hypot
 	GLOBAL _fabs
 	GLOBAL _logb_fastcall
 	GLOBAL _logb
@@ -329,7 +325,9 @@
 	GLOBAL _scalbln
 	GLOBAL _scalbn_callee
 	GLOBAL _scalbn
+	GLOBAL _ldexp_callee
 	GLOBAL _ldexp
+	GLOBAL _frexp_callee
 	GLOBAL _frexp
 	GLOBAL _expm1_fastcall
 	GLOBAL _expm1

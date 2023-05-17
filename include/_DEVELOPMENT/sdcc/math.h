@@ -324,12 +324,6 @@ extern double_t fabs_fastcall(double_t x) __z88dk_fastcall;
 #define fabs(a) fabs_fastcall(a)
 
 
-#ifdef __MATH_AM9511
-extern double_t hypot(double_t x,double_t y);
-
-extern double_t pow(double_t x,double_t y);
-
-#else
 extern double_t hypot(double_t x,double_t y);
 extern double_t hypot_callee(double_t x,double_t y) __z88dk_callee;
 #define hypot(a,b) hypot_callee(a,b)
@@ -340,7 +334,6 @@ extern double_t pow_callee(double_t x,double_t y) __z88dk_callee;
 #define pow(a,b) pow_callee(a,b)
 
 
-#endif
 
 extern double_t sqrt(double_t x);
 extern double_t sqrt_fastcall(double_t x) __z88dk_fastcall;

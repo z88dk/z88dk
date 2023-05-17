@@ -8,7 +8,7 @@ EXTERN _am9511_fmod, asm_switch_arg
 .cam32_sccz80_fmod_callee
     ; Entry:
     ; Stack: float left, float right, ret
-    ; Reverse the stack (not for Intel)
+    ; Reverse the stack
     call asm_switch_arg
     call _am9511_fmod
     pop bc

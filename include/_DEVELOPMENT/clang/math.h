@@ -271,21 +271,12 @@ extern double_t logb(double_t x);
 extern double_t fabs(double_t x);
 
 
-#ifdef __MATH_AM9511
 extern double_t hypot(double_t x,double_t y);
 
 
 extern double_t pow(double_t x,double_t y);
 
 
-#else
-extern double_t hypot(double_t x,double_t y);
-
-
-extern double_t pow(double_t x,double_t y);
-
-
-#endif
 
 extern double_t sqrt(double_t x);
 

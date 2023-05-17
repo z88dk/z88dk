@@ -70,7 +70,6 @@ float am9511_atanh (float x) __z88dk_fastcall;
 float log (float x) __z88dk_fastcall;
 float log10 (float x) __z88dk_fastcall;
 float exp (float x) __z88dk_fastcall;
-float pow (float x, float y) __z88dk_callee;
 
 float am9511_log2 (float x) __z88dk_fastcall;
 float am9511_exp2 (float x) __z88dk_fastcall;
@@ -83,18 +82,11 @@ float floor (float x) __z88dk_fastcall;
 float fmax(float x,float y);
 float fmin(float x,float y);
 
-float am9511_round (float x) __z88dk_fastcall;
-float am9511_fmod (float x, float y);
-float am9511_modf (float x, float *y);
-
 /* Intrinsic functions */
 float mul2 (float a) __z88dk_fastcall;
 float div2 (float a) __z88dk_fastcall;
 float sqr (float a) __z88dk_fastcall;
 float sqrt (float a) __z88dk_fastcall;
-float frexp (float x, int16_t *pw2) __z88dk_callee;
-float ldexp (float x, int16_t pw2) __z88dk_callee;
-float hypot (float x, float y) __z88dk_callee;
 
 #endif
 
@@ -122,7 +114,6 @@ float am9511_atanh (float x) __z88dk_fastcall;
 float log (float x) __z88dk_fastcall;
 float log10 (float x) __z88dk_fastcall;
 float exp (float x) __z88dk_fastcall;
-float pow (float x, float y) __z88dk_callee;
 
 float am9511_log2 (float x) __z88dk_fastcall;
 float am9511_exp2 (float x) __z88dk_fastcall;
@@ -135,18 +126,11 @@ float floor (float x) __z88dk_fastcall;
 float fmax(float x,float y) __stdc;
 float fmin(float x,float y) __stdc;
 
-float am9511_round (float x) __z88dk_fastcall;
-float am9511_fmod (float x, float y) __stdc;
-float am9511_modf (float x, float *y) __stdc;
-
 /* Intrinsic functions */
 float mul2 (float a) __z88dk_fastcall;
 float div2 (float a) __z88dk_fastcall;
 float sqr (float a) __z88dk_fastcall;
 float sqrt (float a) __z88dk_fastcall;
-float frexp (float x, int16_t *pw2) __stdc __z88dk_callee;
-float ldexp (float x, int16_t pw2) __stdc __z88dk_callee;
-float hypot (float x, float y) __stdc __z88dk_callee;
 
 #endif
 

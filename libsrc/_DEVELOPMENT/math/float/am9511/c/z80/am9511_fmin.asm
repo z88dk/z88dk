@@ -206,28 +206,22 @@
 ;--------------------------------------------------------
 ; Public variables in this module
 ;--------------------------------------------------------
-	GLOBAL _fmin_callee
+	GLOBAL _am9511_fmin
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _hypot
-	GLOBAL _ldexp_callee
-	GLOBAL _frexp_callee
 	GLOBAL _sqrt_fastcall
 	GLOBAL _sqr_fastcall
 	GLOBAL _div2_fastcall
 	GLOBAL _mul2_fastcall
-	GLOBAL _am9511_modf
-	GLOBAL _am9511_fmod
-	GLOBAL _am9511_round
-	GLOBAL _fmax_callee
+	GLOBAL _fmin
+	GLOBAL _fmax
 	GLOBAL _floor_fastcall
 	GLOBAL _fabs_fastcall
 	GLOBAL _ceil_fastcall
 	GLOBAL _am9511_exp10
 	GLOBAL _am9511_exp2
 	GLOBAL _am9511_log2
-	GLOBAL _pow
 	GLOBAL _exp_fastcall
 	GLOBAL _log10_fastcall
 	GLOBAL _log_fastcall
@@ -271,8 +265,6 @@
 	GLOBAL _isgreater
 	GLOBAL _fma_callee
 	GLOBAL _fma
-	GLOBAL _fmin
-	GLOBAL _fmax
 	GLOBAL _fdim_callee
 	GLOBAL _fdim
 	GLOBAL _nexttoward_callee
@@ -314,6 +306,10 @@
 	GLOBAL _cbrt_fastcall
 	GLOBAL _cbrt
 	GLOBAL _sqrt
+	GLOBAL _pow_callee
+	GLOBAL _pow
+	GLOBAL _hypot_callee
+	GLOBAL _hypot
 	GLOBAL _fabs
 	GLOBAL _logb_fastcall
 	GLOBAL _logb
@@ -329,7 +325,9 @@
 	GLOBAL _scalbln
 	GLOBAL _scalbn_callee
 	GLOBAL _scalbn
+	GLOBAL _ldexp_callee
 	GLOBAL _ldexp
+	GLOBAL _frexp_callee
 	GLOBAL _frexp
 	GLOBAL _expm1_fastcall
 	GLOBAL _expm1
@@ -390,9 +388,9 @@ ENDIF
 ;--------------------------------------------------------
 	SECTION code_compiler
 ;	---------------------------------
-; Function fmin_callee
+; Function am9511_fmin
 ; ---------------------------------
-_fmin_callee:
+_am9511_fmin:
 	push	ix
 	ld	ix,0
 	add	ix,sp
@@ -411,18 +409,18 @@ _fmin_callee:
 	call	___fslt_callee
 	ld	a, l
 	or	a, a
-	jr	Z,l_fmin_callee_00102
+	jr	Z,l_am9511_fmin_00102
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	ld	e,(ix+6)
 	ld	d,(ix+7)
-	jr	l_fmin_callee_00103
-l_fmin_callee_00102:
+	jr	l_am9511_fmin_00103
+l_am9511_fmin_00102:
 	ld	l,(ix+8)
 	ld	h,(ix+9)
 	ld	e,(ix+10)
 	ld	d,(ix+11)
-l_fmin_callee_00103:
+l_am9511_fmin_00103:
 	pop	ix
 	ret
 	SECTION IGNORE

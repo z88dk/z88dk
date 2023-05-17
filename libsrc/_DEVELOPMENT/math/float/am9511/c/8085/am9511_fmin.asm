@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed May 17 15:16:07 2023
+;	Module compile time: Wed May 17 20:18:22 2023
 
 
 	C_LINE	0,"am9511_fmin.c"
@@ -145,6 +145,7 @@
 	C_LINE	56,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	57,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	58,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	59,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	64,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	65,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	66,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
@@ -160,11 +161,14 @@
 	C_LINE	85,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	86,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	87,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	88,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	91,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	94,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	95,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	99,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	100,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	104,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	105,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	109,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	110,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	111,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
@@ -174,41 +178,34 @@
 	C_LINE	39,"/home/phillip/Z80/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"am9511_math.h"
 	C_LINE	37,"am9511_math.h"
-	C_LINE	104,"am9511_math.h"
-	C_LINE	105,"am9511_math.h"
+	C_LINE	96,"am9511_math.h"
+	C_LINE	97,"am9511_math.h"
+	C_LINE	98,"am9511_math.h"
+	C_LINE	99,"am9511_math.h"
+	C_LINE	100,"am9511_math.h"
+	C_LINE	101,"am9511_math.h"
+	C_LINE	103,"am9511_math.h"
 	C_LINE	106,"am9511_math.h"
 	C_LINE	107,"am9511_math.h"
 	C_LINE	108,"am9511_math.h"
 	C_LINE	109,"am9511_math.h"
+	C_LINE	110,"am9511_math.h"
 	C_LINE	111,"am9511_math.h"
 	C_LINE	114,"am9511_math.h"
 	C_LINE	115,"am9511_math.h"
 	C_LINE	116,"am9511_math.h"
-	C_LINE	117,"am9511_math.h"
 	C_LINE	118,"am9511_math.h"
 	C_LINE	119,"am9511_math.h"
-	C_LINE	122,"am9511_math.h"
+	C_LINE	120,"am9511_math.h"
 	C_LINE	123,"am9511_math.h"
 	C_LINE	124,"am9511_math.h"
 	C_LINE	125,"am9511_math.h"
+	C_LINE	126,"am9511_math.h"
 	C_LINE	127,"am9511_math.h"
-	C_LINE	128,"am9511_math.h"
-	C_LINE	129,"am9511_math.h"
+	C_LINE	130,"am9511_math.h"
+	C_LINE	131,"am9511_math.h"
 	C_LINE	132,"am9511_math.h"
 	C_LINE	133,"am9511_math.h"
-	C_LINE	134,"am9511_math.h"
-	C_LINE	135,"am9511_math.h"
-	C_LINE	136,"am9511_math.h"
-	C_LINE	138,"am9511_math.h"
-	C_LINE	139,"am9511_math.h"
-	C_LINE	140,"am9511_math.h"
-	C_LINE	143,"am9511_math.h"
-	C_LINE	144,"am9511_math.h"
-	C_LINE	145,"am9511_math.h"
-	C_LINE	146,"am9511_math.h"
-	C_LINE	147,"am9511_math.h"
-	C_LINE	148,"am9511_math.h"
-	C_LINE	149,"am9511_math.h"
 	C_LINE	9,"am9511_fmin.c"
 	C_LINE	12,"am9511_fmin.c"
 	SECTION	code_compiler
@@ -315,7 +312,8 @@
 	GLOBAL	atanh
 	GLOBAL	_sqr
 	GLOBAL	_sqrt
-	GLOBAL	_pow
+	GLOBAL	pow
+	GLOBAL	pow_callee
 	GLOBAL	_exp
 	GLOBAL	exp2
 	GLOBAL	exp10
@@ -330,12 +328,15 @@
 	GLOBAL	_div2
 	GLOBAL	_mul2
 	GLOBAL	mul10u
-	GLOBAL	_ldexp
+	GLOBAL	ldexp
+	GLOBAL	ldexp_callee
 	GLOBAL	modf
-	GLOBAL	_frexp
+	GLOBAL	frexp
+	GLOBAL	frexp_callee
 	GLOBAL	_fabs
 	GLOBAL	fmod
-	GLOBAL	_hypot
+	GLOBAL	hypot
+	GLOBAL	hypot_callee
 	GLOBAL	atof
 	GLOBAL	ftoa
 	GLOBAL	ftoe
@@ -352,9 +353,6 @@
 	GLOBAL	_am9511_log2
 	GLOBAL	_am9511_exp2
 	GLOBAL	_am9511_exp10
-	GLOBAL	_am9511_round
-	GLOBAL	_am9511_fmod
-	GLOBAL	_am9511_modf
 	GLOBAL	_am9511_fmin
 
 

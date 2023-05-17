@@ -213,13 +213,8 @@ __DPROTO(,,double_t,,log2,double_t x)
 __DPROTO(,,double_t,,logb,double_t x)
 
 __DPROTO(,,double_t,,fabs,double_t x)
-#ifdef __MATH_AM9511
-__OPROTO(,,double_t,,hypot,double_t x,double_t y)
-__OPROTO(,,double_t,,pow,double_t x,double_t y)
-#else
 __DPROTO(,,double_t,,hypot,double_t x,double_t y)
 __DPROTO(,,double_t,,pow,double_t x,double_t y)
-#endif
 
 __DPROTO(,,double_t,,sqrt,double_t x)
 __DPROTO(,,double_t,,cbrt,double_t x)
