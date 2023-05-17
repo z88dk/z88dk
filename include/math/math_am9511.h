@@ -41,8 +41,6 @@ extern double_t __LIB__ asin(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ acos(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ atan(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ atan2(double_t y,double_t x) __smallc;
-// extern double_t __LIB__ atan2_callee(double_t y,double_t x) __smallc __z88dk_callee;
-// #define atan2(a,b) atan2_callee(a,b)
 
 /* Hyperbolic functions */
 extern double_t __LIB__ sinh(double_t x) __smallc __z88dk_fastcall;
@@ -87,9 +85,8 @@ extern double_t __LIB__ ldexp(double_t x,int exp) __smallc;
 extern double_t __LIB__ ldexp_callee(double_t x,int exp) __smallc __z88dk_callee;
 #define ldexp(a,b) ldexp_callee(a,b)
 #define scalbn(x,pw2) ldexp(x,pw2)
+
 extern double_t __LIB__ modf(double_t value,double_t *iptr) __smallc;
-// extern double_t __LIB__ modf_callee(double_t value,double_t *iptr) __smallc __z88dk_callee;
-// #define modf(a,b) modf_callee(a,b)
 extern double_t __LIB__ frexp(double_t value,int *exp) __smallc;
 extern double_t __LIB__ frexp_callee(double_t value,int *exp) __smallc __z88dk_callee;
 #define frexp(a,b) frexp_callee(a,b)
@@ -97,9 +94,6 @@ extern double_t __LIB__ frexp_callee(double_t value,int *exp) __smallc __z88dk_c
 /* General */
 extern double_t __LIB__ fabs(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ fmod(double_t x,double_t y) __smallc;
-// extern double_t __LIB__ fmod_callee(double_t x,double_t y) __smallc __z88dk_callee;
-// #define fmod(a,b) fmod_callee(a,b)
-
 extern double_t __LIB__ hypot(double_t x,double_t y) __smallc;
 extern double_t __LIB__ hypot_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define hypot(a,b) hypot_callee(a,b)
@@ -125,8 +119,6 @@ extern double_t asin(double_t x)  __z88dk_fastcall;
 extern double_t acos(double_t x)  __z88dk_fastcall;
 extern double_t atan(double_t x)  __z88dk_fastcall;
 extern double_t atan2(double_t y,double_t x);
-extern double_t atan2_callee(double_t y,double_t x) __z88dk_callee;
-#define atan2(a,b) atan2_callee(a,b)
 
 /* Hyperbolic functions */
 extern double_t sinh(double_t x) __z88dk_fastcall;
@@ -172,8 +164,6 @@ extern double_t ldexp_callee(double_t x,int exp) __z88dk_callee;
 #define ldexp(a,b) ldexp_callee(a,b)
 #define scalbn(x,pw2) ldexp(x,pw2)
 extern double_t modf(double_t value,double_t *iptr);
-extern double_t modf_callee(double_t value,double_t *iptr) __z88dk_callee;
-#define modf(a,b) modf_callee(a,b)
 extern double_t frexp(double_t value,int *exp);
 extern double_t frexp_callee(double_t value,int *exp) __z88dk_callee;
 #define frexp(a,b) frexp_callee(a,b)
@@ -181,9 +171,6 @@ extern double_t frexp_callee(double_t value,int *exp) __z88dk_callee;
 /* General */
 extern double_t fabs(double_t x) __z88dk_fastcall;
 extern double_t fmod(double_t x,double_t y);
-extern double_t fmod_callee(double_t x,double_t y) __z88dk_callee;
-#define fmod(a,b) fmod_callee(a,b)
-
 extern double_t hypot(double_t x,double_t y);
 extern double_t hypot_callee(double_t x,double_t y) __z88dk_callee;
 #define hypot(a,b) hypot_callee(a,b)

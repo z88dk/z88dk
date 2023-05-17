@@ -8,7 +8,6 @@ math/float/am9511/lam32/c/sdcc/asinh
 math/float/am9511/lam32/c/sdcc/asinh_fastcall
 math/float/am9511/lam32/c/sdcc/atan
 math/float/am9511/lam32/c/sdcc/atan2
-math/float/am9511/lam32/c/sdcc/atan2_callee
 math/float/am9511/lam32/c/sdcc/atan_fastcall
 math/float/am9511/lam32/c/sdcc/atanh
 math/float/am9511/lam32/c/sdcc/atanh_fastcall

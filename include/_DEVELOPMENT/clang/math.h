@@ -338,6 +338,7 @@ extern double_t fmod(double_t x,double_t y);
 
 
 #endif
+
 extern double_t remainder(double_t x,double_t y);
 
 

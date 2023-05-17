@@ -356,6 +356,7 @@ extern double_t __LIB__ fmod_callee(double_t x,double_t y) __smallc __z88dk_call
 
 
 #endif
+
 extern double_t __LIB__ remainder(double_t x,double_t y) __smallc;
 extern double_t __LIB__ remainder_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define remainder(a,b) remainder_callee(a,b)

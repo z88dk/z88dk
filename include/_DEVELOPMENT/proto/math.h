@@ -240,6 +240,7 @@ __OPROTO(,,double_t,,fmod,double_t x,double_t y)
 __DPROTO(,,double_t,,modf,double_t value,double_t *iptr)
 __DPROTO(,,double_t,,fmod,double_t x,double_t y)
 #endif
+
 __DPROTO(,,double_t,,remainder,double_t x,double_t y)
 __DPROTO(,,double_t,,remquo,double_t x,double_t y,int *quo)
 

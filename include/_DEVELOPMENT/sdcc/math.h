@@ -425,6 +425,7 @@ extern double_t fmod_callee(double_t x,double_t y) __z88dk_callee;
 
 
 #endif
+
 extern double_t remainder(double_t x,double_t y);
 extern double_t remainder_callee(double_t x,double_t y) __z88dk_callee;
 #define remainder(a,b) remainder_callee(a,b)
