@@ -16,16 +16,12 @@ PUBLIC cam32_sccz80_dload
     ;
     ; uses  : bc, de, hl, bc', de', hl'
 
-    ld c,(hl)
-    inc hl
-    ld b,(hl)
-    inc hl
-    ld e,(hl)
-    inc hl
+    ld c,(hl+)
+    ld b,(hl+)
+    ld e,(hl+)
     ld d,(hl)                   ; DEBC = sccz80_float
 
-    ld l,c
-    ld h,b
+    ld hl,bc
 
     exx
     ret                         ; DEHL' = sccz80_float

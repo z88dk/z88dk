@@ -46,8 +46,6 @@ union float_long
 
 #ifdef __SDCC
 
-#define __stdc
-
 /* Trigonometric functions */
 float sin (float x) __z88dk_fastcall;
 float cos (float x) __z88dk_fastcall;

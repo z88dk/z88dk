@@ -19,7 +19,11 @@ EXTERN cm32_sccz80_fsread1, cm32_sccz80_fsreadl, m32_compare
 
 .cm32_sccz80_fmin
     call m32_compare        ; compare two floats on the stack
-    jp NC,cm32_sccz80_fsreadl
-    jp cm32_sccz80_fsread1  ; enter  stack = sccz80_float left, sccz80_float right, ret
-                            ; return stack = sccz80_float left, sccz80_float right, ret
+    jp NC,left
+    call cm32_sccz80_fsread1; enter  stack = sccz80_float left, sccz80_float right, ret
+    ret                     ; return stack = sccz80_float left, sccz80_float right, ret
                             ;         DEHL = sccz80_float min
+
+.left
+    call cm32_sccz80_fsreadl
+    ret

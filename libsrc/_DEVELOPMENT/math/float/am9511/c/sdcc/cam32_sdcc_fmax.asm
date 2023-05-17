@@ -19,8 +19,11 @@ EXTERN asm_sdcc_read1, asm_sdcc_readr, asm_am9511_compare
 
 .cam32_sdcc_fmax
     call asm_am9511_compare ; compare two floats on the stack
-    jp C,asm_sdcc_readr
-    jp asm_sdcc_read1       ; enter  stack = sdcc_float right, sdcc_float left, ret
-                            ; return stack = sdcc_float right, sdcc_float left
+    jp C,right
+    call asm_sdcc_read1     ; enter  stack = sdcc_float right, sdcc_float left, ret
+    ret                     ; return stack = sdcc_float right, sdcc_float left
                             ;         DEHL = sdcc_float max
 
+.right
+    call asm_sdcc_readr
+    ret
