@@ -1,4 +1,4 @@
- #Ah, that'd be nice, a library makefile!
+# Ah, that'd be nice, a library makefile!
 #
 # Problems? Contact the person to blame(!) above the section
 # for the library
@@ -130,6 +130,7 @@ TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
 TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxeg2000.lib grafyx4_3.lib grafyx4.lib gfxhrg1.lib)
 TOCREATE += $(call check_target,ts2068, ts2068_clib.lib m2068.lib)
 TOCREATE += $(call check_target,tvc,tvc_clib.lib tvc_romgfx.lib)
+TOCREATE += $(call check_target,v1050,v1050.lib $(CPMLIBS))
 TOCREATE += $(call check_target,vector06c,vector06c_clib.lib)
 TOCREATE += $(call check_target,vg5k,vg5k_clib.lib)
 TOCREATE += $(call check_target,vz,vz_clib.lib)
@@ -437,6 +438,15 @@ px8.lib:
 	@echo ''
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=px8 FLAVOUR="wide"
 	TARGET=px8 TYPE=z80 $(LIBLINKER) -DFORpx8 -x$(OUTPUT_DIRECTORY)/px8 @$(TARGET_DIRECTORY)/px8/px8.lst
+
+# Visual 1050 library - Stefano
+v1050.lib:
+	@echo ''
+	@echo '--- Building Visual 1050 Library (CP/M) ---'
+	@echo ''
+	$(call buildgeneric,cpm)
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=v1050
+	TARGET=v1050 TYPE=z80 $(LIBLINKER) -DFORv1050 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/v1050.lib @$(TARGET_DIRECTORY)/v1050/v1050.lst
 
 # VZ200/300 lib - Stefano
 vz_clib.lib:

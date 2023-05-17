@@ -276,6 +276,12 @@ IF FORmbc200
     defc maxy    = 400
 ENDIF
 
+IF FORv1050
+    DEFINE gotgfx
+    defc maxx    = 640
+    defc maxy    = 300
+ENDIF
+
 IF FORmsx
     DEFINE gotgfx
     defc maxx    = 256
