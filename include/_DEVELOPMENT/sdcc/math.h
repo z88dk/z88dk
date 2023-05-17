@@ -471,6 +471,12 @@ extern double_t fdim_callee(double_t x,double_t y) __z88dk_callee;
 
 
 
+#ifdef __MATH_AM9511
+extern double_t fmax(double_t x,double_t y);
+
+extern double_t fmin(double_t x,double_t y);
+
+#else
 extern double_t fmax(double_t x,double_t y);
 extern double_t fmax_callee(double_t x,double_t y) __z88dk_callee;
 #define fmax(a,b) fmax_callee(a,b)
@@ -481,6 +487,7 @@ extern double_t fmin_callee(double_t x,double_t y) __z88dk_callee;
 #define fmin(a,b) fmin_callee(a,b)
 
 
+#endif
 
 extern double_t fma(double_t x,double_t y,double_t z);
 extern double_t fma_callee(double_t x,double_t y,double_t z) __z88dk_callee;

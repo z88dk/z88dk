@@ -256,8 +256,13 @@ __DPROTO(,,double_t,,nexttoward,double_t x,double_t y)
 
 __DPROTO(,,double_t,,fdim,double_t x,double_t y)
 
+#ifdef __MATH_AM9511
+__OPROTO(,,double_t,,fmax,double_t x,double_t y)
+__OPROTO(,,double_t,,fmin,double_t x,double_t y)
+#else
 __DPROTO(,,double_t,,fmax,double_t x,double_t y)
 __DPROTO(,,double_t,,fmin,double_t x,double_t y)
+#endif
 
 __DPROTO(,,double_t,,fma,double_t x,double_t y,double_t z)
 

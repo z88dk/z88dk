@@ -159,8 +159,8 @@ extern double_t log10(double_t x) __z88dk_fastcall;
 extern double_t ceil(double_t x) __z88dk_fastcall;
 extern double_t floor(double_t x) __z88dk_fastcall;
 extern double_t round(double_t x) __z88dk_fastcall;
-extern double_t fmax(double_t,double_t) __z88dk_callee;
-extern double_t  fmin(double_t,double_t) __z88dk_callee;
+extern double_t fmax(double_t,double_t);
+extern double_t fmin(double_t,double_t);
 #define trunc(a) (a>0.?floor(a):ceil(a))
 //#define round(a) (a>0.?floor(a+0.5):ceil(a-0.5))
 #define rint(a) ceil(a)

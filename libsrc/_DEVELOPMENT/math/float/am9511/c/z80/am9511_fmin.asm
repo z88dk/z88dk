@@ -206,7 +206,7 @@
 ;--------------------------------------------------------
 ; Public variables in this module
 ;--------------------------------------------------------
-	GLOBAL _am9511_atan2
+	GLOBAL _fmin_callee
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
@@ -220,7 +220,6 @@
 	GLOBAL _am9511_modf
 	GLOBAL _am9511_fmod
 	GLOBAL _am9511_round
-	GLOBAL _fmin_callee
 	GLOBAL _fmax_callee
 	GLOBAL _floor_fastcall
 	GLOBAL _fabs_fastcall
@@ -238,6 +237,7 @@
 	GLOBAL _am9511_tanh
 	GLOBAL _am9511_cosh
 	GLOBAL _am9511_sinh
+	GLOBAL _am9511_atan2
 	GLOBAL _atan_fastcall
 	GLOBAL _acos_fastcall
 	GLOBAL _asin_fastcall
@@ -390,17 +390,17 @@ ENDIF
 ;--------------------------------------------------------
 	SECTION code_compiler
 ;	---------------------------------
-; Function am9511_atan2
+; Function fmin_callee
 ; ---------------------------------
-_am9511_atan2:
+_fmin_callee:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -5
-	add	hl, sp
-	ld	sp, hl
-	ld	hl,0x0000
+	ld	l,(ix+10)
+	ld	h,(ix+11)
 	push	hl
+	ld	l,(ix+8)
+	ld	h,(ix+9)
 	push	hl
 	ld	l,(ix+6)
 	ld	h,(ix+7)
@@ -409,167 +409,20 @@ _am9511_atan2:
 	ld	h,(ix+5)
 	push	hl
 	call	___fslt_callee
-	ld	(ix-5),l
-	ld	a,(ix+11)
-	and	a,0x7f
-	or	a,(ix+10)
-	or	a,(ix+9)
-	or	a,(ix+8)
-	jp	Z, l_am9511_atan2_00118
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	ld	e,(ix+10)
-	ld	d,(ix+11)
-	call	_fabs_fastcall
-	ld	(ix-4),l
-	ld	(ix-3),h
-	ld	(ix-2),e
-	ld	(ix-1),d
+	ld	a, l
+	or	a, a
+	jr	Z,l_fmin_callee_00102
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	ld	e,(ix+6)
 	ld	d,(ix+7)
-	call	_fabs_fastcall
-	push	de
-	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	call	___fslt_callee
-	bit	0,l
-	jr	NZ,l_am9511_atan2_00110
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
+	jr	l_fmin_callee_00103
+l_fmin_callee_00102:
 	ld	l,(ix+8)
 	ld	h,(ix+9)
-	push	hl
-	ld	l,(ix+6)
-	ld	h,(ix+7)
-	push	hl
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	push	hl
-	call	___fsdiv_callee
-	call	_atan_fastcall
-	push	hl
-	push	de
-	ld	hl,0x0000
-	push	hl
-	push	hl
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	call	___fslt_callee
-	ld	a, l
-	pop	de
-	pop	bc
-	or	a, a
-	jp	Z, l_am9511_atan2_00111
-	bit	0,(ix-5)
-	jr	NZ,l_am9511_atan2_00102
-	ld	hl,0x4049
-	push	hl
-	ld	hl,0x0fdb
-	push	hl
-	push	de
-	push	bc
-	call	___fsadd_callee
-	ld	c, l
-	ld	b, h
-	jr	l_am9511_atan2_00111
-l_am9511_atan2_00102:
-	ld	hl,0x4049
-	push	hl
-	ld	hl,0x0fdb
-	push	hl
-	push	de
-	push	bc
-	call	___fssub_callee
-	ld	c, l
-	ld	b, h
-	jr	l_am9511_atan2_00111
-l_am9511_atan2_00110:
-	ld	l,(ix+6)
-	ld	h,(ix+7)
-	push	hl
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	push	hl
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	call	___fsdiv_callee
-	call	_atan_fastcall
-	ld	a, d
-	xor	a,0x80
-	ld	d, a
-	ld	a,(ix-5)
-	or	a, a
-	jr	Z,l_am9511_atan2_00107
-	ld	bc,0x3fc9
-	push	bc
-	ld	bc,0x0fdb
-	push	bc
-	push	de
-	push	hl
-	call	___fssub_callee
-	ld	c, l
-	ld	b, h
-	jr	l_am9511_atan2_00111
-l_am9511_atan2_00107:
-	ld	bc,0x3fc9
-	push	bc
-	ld	bc,0x0fdb
-	push	bc
-	push	de
-	push	hl
-	call	___fsadd_callee
-	ld	c, l
-	ld	b, h
-l_am9511_atan2_00111:
-	ld	l, c
-	ld	h, b
-	jr	l_am9511_atan2_00120
-l_am9511_atan2_00118:
-	ld	l,(ix+6)
-	ld	h,(ix+7)
-	push	hl
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	hl
-	call	___fslt_callee
-	ld	a, l
-	or	a, a
-	jr	Z,l_am9511_atan2_00115
-	ld	de,0x3fc9
-	ld	hl,0x0fdb
-	jr	l_am9511_atan2_00120
-l_am9511_atan2_00115:
-	ld	a,(ix-5)
-	or	a, a
-	jr	Z,l_am9511_atan2_00119
-	ld	de,0xbfc9
-	ld	hl,0x0fdb
-	jr	l_am9511_atan2_00120
-l_am9511_atan2_00119:
-	ld	hl,0x0000
-	ld	e,l
-	ld	d,h
-l_am9511_atan2_00120:
-	ld	sp, ix
+	ld	e,(ix+10)
+	ld	d,(ix+11)
+l_fmin_callee_00103:
 	pop	ix
 	ret
 	SECTION IGNORE

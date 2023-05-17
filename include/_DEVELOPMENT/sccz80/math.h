@@ -402,6 +402,14 @@ extern double_t __LIB__ fdim_callee(double_t x,double_t y) __smallc __z88dk_call
 
 
 
+#ifdef __MATH_AM9511
+extern double_t __LIB__ fmax(double_t x,double_t y) __smallc;
+
+
+extern double_t __LIB__ fmin(double_t x,double_t y) __smallc;
+
+
+#else
 extern double_t __LIB__ fmax(double_t x,double_t y) __smallc;
 extern double_t __LIB__ fmax_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define fmax(a,b) fmax_callee(a,b)
@@ -412,6 +420,7 @@ extern double_t __LIB__ fmin_callee(double_t x,double_t y) __smallc __z88dk_call
 #define fmin(a,b) fmin_callee(a,b)
 
 
+#endif
 
 extern double_t __LIB__ fma(double_t x,double_t y,double_t z) __smallc;
 extern double_t __LIB__ fma_callee(double_t x,double_t y,double_t z) __smallc __z88dk_callee;

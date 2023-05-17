@@ -210,7 +210,7 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _hypot_callee
+	GLOBAL _hypot
 	GLOBAL _ldexp_callee
 	GLOBAL _frexp_callee
 	GLOBAL _sqrt_fastcall
@@ -219,13 +219,15 @@
 	GLOBAL _mul2_fastcall
 	GLOBAL _am9511_modf
 	GLOBAL _am9511_round
+	GLOBAL _fmin_callee
+	GLOBAL _fmax_callee
 	GLOBAL _floor_fastcall
 	GLOBAL _fabs_fastcall
 	GLOBAL _ceil_fastcall
 	GLOBAL _am9511_exp10
 	GLOBAL _am9511_exp2
 	GLOBAL _am9511_log2
-	GLOBAL _pow_callee
+	GLOBAL _pow
 	GLOBAL _exp_fastcall
 	GLOBAL _log10_fastcall
 	GLOBAL _log_fastcall
@@ -269,9 +271,7 @@
 	GLOBAL _isgreater
 	GLOBAL _fma_callee
 	GLOBAL _fma
-	GLOBAL _fmin_callee
 	GLOBAL _fmin
-	GLOBAL _fmax_callee
 	GLOBAL _fmax
 	GLOBAL _fdim_callee
 	GLOBAL _fdim
@@ -287,9 +287,7 @@
 	GLOBAL _remquo
 	GLOBAL _remainder_callee
 	GLOBAL _remainder
-	GLOBAL _fmod_callee
 	GLOBAL _fmod
-	GLOBAL _modf_callee
 	GLOBAL _modf
 	GLOBAL _trunc_fastcall
 	GLOBAL _trunc
@@ -316,8 +314,6 @@
 	GLOBAL _cbrt_fastcall
 	GLOBAL _cbrt
 	GLOBAL _sqrt
-	GLOBAL _pow
-	GLOBAL _hypot
 	GLOBAL _fabs
 	GLOBAL _logb_fastcall
 	GLOBAL _logb
@@ -327,13 +323,13 @@
 	GLOBAL _log1p
 	GLOBAL _log10
 	GLOBAL _log
+	GLOBAL _ilogb_fastcall
+	GLOBAL _ilogb
 	GLOBAL _scalbln_callee
 	GLOBAL _scalbln
 	GLOBAL _scalbn_callee
 	GLOBAL _scalbn
 	GLOBAL _ldexp
-	GLOBAL _ilogb_fastcall
-	GLOBAL _ilogb
 	GLOBAL _frexp
 	GLOBAL _expm1_fastcall
 	GLOBAL _expm1
@@ -355,7 +351,6 @@
 	GLOBAL _tan
 	GLOBAL _sin
 	GLOBAL _cos
-	GLOBAL _atan2_callee
 	GLOBAL _atan2
 	GLOBAL _atan
 	GLOBAL _asin
