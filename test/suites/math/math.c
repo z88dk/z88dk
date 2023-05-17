@@ -225,6 +225,7 @@ void test_fmod()
     run_fmod(10.123, 3, 1.123);
 }
 
+#ifndef SKIPFMINMAX
 static void run_fmin(FLOAT x, FLOAT y, FLOAT e)
 {
     static char   buf[100];
@@ -254,6 +255,8 @@ void test_fmax()
     run_fmax(3.0, 2.0, 3.0);
     run_fmax(3.0,-1.0, 3.0);
 }
+
+#endif
 #endif
 
 int suite_math()
