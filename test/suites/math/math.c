@@ -224,6 +224,7 @@ void test_fmod()
     run_fmod(10.5, 2.0, 0.5);
     run_fmod(10.123, 3, 1.123);
 }
+
 static void run_fmin(FLOAT x, FLOAT y, FLOAT e)
 {
     static char   buf[100];

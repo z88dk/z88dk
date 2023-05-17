@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed May 17 14:51:44 2023
+;	Module compile time: Wed May 17 15:16:07 2023
 
 
 	C_LINE	0,"am9511_fmax.c"
@@ -213,12 +213,12 @@
 	C_LINE	12,"am9511_fmax.c"
 	SECTION	code_compiler
 
-; Function fmax flags 0x00000000 __stdc 
-; double fmax(double x, double y)
+; Function am9511_fmax flags 0x00000000 __stdc 
+; double am9511_fmax(double x, double y)
 ; parameter 'double x' at 2 size(4)
 ; parameter 'double y' at 6 size(4)
-	C_LINE	13,"am9511_fmax.c::fmax::0::1"
-._fmax
+	C_LINE	13,"am9511_fmax.c::am9511_fmax::0::1"
+._am9511_fmax
 	ld	de,sp+2
 	ex	de,hl
 	call	l_glong2sp
@@ -355,6 +355,7 @@
 	GLOBAL	_am9511_round
 	GLOBAL	_am9511_fmod
 	GLOBAL	_am9511_modf
+	GLOBAL	_am9511_fmax
 
 
 ; --- End of Scope Defns ---

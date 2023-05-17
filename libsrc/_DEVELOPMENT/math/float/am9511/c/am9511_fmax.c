@@ -9,7 +9,7 @@
 #include "am9511_math.h"
 
 
-float fmax(float x,float y) __stdc
+float am9511_fmax(float x,float y) __stdc
 {
     if ( x > y )
         return x;

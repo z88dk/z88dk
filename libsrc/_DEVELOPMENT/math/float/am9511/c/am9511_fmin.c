@@ -9,7 +9,7 @@
 #include "am9511_math.h"
 
 
-float fmin(float x,float y) __stdc
+float am9511_fmin(float x,float y) __stdc
 {
     if ( x < y )
         return x;
