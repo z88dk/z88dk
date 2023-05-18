@@ -9,9 +9,16 @@
 #include "am9511_math.h"
 
 
-float am9511_fmin(float x,float y) __stdc
+float am9511_fmin_callee(float x,float y) __z88dk_callee
 {
-    if ( x < y )
-        return x;
-    return y;
+    float i = x;
+    float j = y;
+    if ( i < j )
+        return i;
+    return j;
+}
+
+float am9511_fmin(float x,float y)
+{
+    return am9511_fmin_callee(x,y);
 }

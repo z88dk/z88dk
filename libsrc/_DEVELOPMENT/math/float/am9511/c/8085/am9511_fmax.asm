@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed May 17 20:18:22 2023
+;	Module compile time: Thu May 18 13:38:04 2023
 
 
 	C_LINE	0,"am9511_fmax.c"
@@ -136,45 +136,45 @@
 	C_LINE	41,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	42,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	43,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	46,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	47,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	48,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	49,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	50,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	51,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	52,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	53,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	54,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	55,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	56,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	57,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	58,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	59,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	61,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	62,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	63,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	64,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	65,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	66,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	67,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	68,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	69,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	71,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	72,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	73,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	74,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	75,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	76,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	77,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	78,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	81,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	82,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	83,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	84,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	85,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	86,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	87,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	88,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	89,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	90,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	91,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	94,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	95,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	99,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	100,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	96,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	97,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	98,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	102,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	103,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	104,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	105,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	109,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	110,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	111,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	113,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	114,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	211,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	106,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	107,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	194,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	39,"/home/phillip/Z80/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"am9511_math.h"
 	C_LINE	37,"am9511_math.h"
@@ -210,32 +210,78 @@
 	C_LINE	12,"am9511_fmax.c"
 	SECTION	code_compiler
 
-; Function am9511_fmax flags 0x00000000 __stdc 
-; double am9511_fmax(double x, double y)
-; parameter 'double x' at 2 size(4)
-; parameter 'double y' at 6 size(4)
-	C_LINE	13,"am9511_fmax.c::am9511_fmax::0::1"
-._am9511_fmax
-	ld	de,sp+2
+; Function am9511_fmax_callee flags 0x00000240 __smallc __z88dk_callee 
+; double am9511_fmax_callee(double x, double y)
+; parameter 'double y' at sp+2 size(4)
+; parameter 'double x' at sp+6 size(4)
+	C_LINE	13,"am9511_fmax.c::am9511_fmax_callee::0::0"
+._am9511_fmax_callee
+	ld	de,sp+6
 	ex	de,hl
 	call	l_glong2sp
-	ld	de,sp+10
+	ld	de,sp+6
+	ex	de,hl
+	call	l_glong2sp
+	ld	de,sp+4
+	ex	de,hl
+	call	l_glong2sp
+	ld	de,sp+4
 	ex	de,hl
 	call	l_glong
 	call	l_f32_gt
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	ld	de,sp+2
+	ld	de,sp+4
 	ex	de,hl
 	call	l_glong
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	push	bc
 	ret
 
 
 .i_2
+	ld	de,sp+0
+	ex	de,hl
+	call	l_glong
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	push	bc
+	ret
+
+
+	C_LINE	21,"am9511_fmax.c::am9511_fmax_callee::0::1"
+
+; Function am9511_fmax flags 0x00000200 __smallc 
+; double am9511_fmax(double x, double y)
+; parameter 'double y' at sp+2 size(4)
+; parameter 'double x' at sp+6 size(4)
+	C_LINE	22,"am9511_fmax.c::am9511_fmax::0::1"
+._am9511_fmax
+	ld	de,sp+6
+	ex	de,hl
+	call	l_glong2sp
 	ld	de,sp+6
 	ex	de,hl
 	call	l_glong
+	push	de
+	push	hl
+	call	_am9511_fmax_callee
 	ret
 
 
@@ -353,6 +399,7 @@
 	GLOBAL	_am9511_log2
 	GLOBAL	_am9511_exp2
 	GLOBAL	_am9511_exp10
+	GLOBAL	_am9511_fmax_callee
 	GLOBAL	_am9511_fmax
 
 

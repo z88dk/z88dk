@@ -207,6 +207,7 @@
 ; Public variables in this module
 ;--------------------------------------------------------
 	GLOBAL _am9511_fmin
+	GLOBAL _am9511_fmin_callee
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
@@ -214,8 +215,8 @@
 	GLOBAL _sqr_fastcall
 	GLOBAL _div2_fastcall
 	GLOBAL _mul2_fastcall
-	GLOBAL _fmin
-	GLOBAL _fmax
+	GLOBAL _fmin_callee
+	GLOBAL _fmax_callee
 	GLOBAL _floor_fastcall
 	GLOBAL _fabs_fastcall
 	GLOBAL _ceil_fastcall
@@ -265,6 +266,8 @@
 	GLOBAL _isgreater
 	GLOBAL _fma_callee
 	GLOBAL _fma
+	GLOBAL _fmin
+	GLOBAL _fmax
 	GLOBAL _fdim_callee
 	GLOBAL _fdim
 	GLOBAL _nexttoward_callee
@@ -388,6 +391,61 @@ ENDIF
 ;--------------------------------------------------------
 	SECTION code_compiler
 ;	---------------------------------
+; Function am9511_fmin_callee
+; ---------------------------------
+_am9511_fmin_callee:
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	push	af
+	push	af
+	ld	hl,0
+	add	hl, sp
+	ex	de, hl
+	ld	hl,8
+	add	hl, sp
+	ld	bc,4
+	ldir
+	ld	c,(ix+8)
+	ld	b,(ix+9)
+	ld	e,(ix+10)
+	ld	d,(ix+11)
+	push	bc
+	push	de
+	push	de
+	push	bc
+	ld	l,(ix-2)
+	ld	h,(ix-1)
+	push	hl
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	push	hl
+	call	___fslt_callee
+	ld	a, l
+	pop	de
+	pop	bc
+	or	a, a
+	jr	Z,l_am9511_fmin_callee_00102
+	pop	hl
+	push	hl
+	ld	e,(ix-2)
+	ld	d,(ix-1)
+	jr	l_am9511_fmin_callee_00103
+l_am9511_fmin_callee_00102:
+	ld	l, c
+	ld	h, b
+l_am9511_fmin_callee_00103:
+	ld	sp, ix
+	pop	ix
+	pop	bc
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	push	bc
+	ret
+	SECTION code_compiler
+;	---------------------------------
 ; Function am9511_fmin
 ; ---------------------------------
 _am9511_fmin:
@@ -406,21 +464,7 @@ _am9511_fmin:
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	push	hl
-	call	___fslt_callee
-	ld	a, l
-	or	a, a
-	jr	Z,l_am9511_fmin_00102
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	ld	e,(ix+6)
-	ld	d,(ix+7)
-	jr	l_am9511_fmin_00103
-l_am9511_fmin_00102:
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	ld	e,(ix+10)
-	ld	d,(ix+11)
-l_am9511_fmin_00103:
+	call	_am9511_fmin_callee
 	pop	ix
 	ret
 	SECTION IGNORE

@@ -6,6 +6,14 @@ SECTION code_fp_am9511
 
 PUBLIC cam32_sccz80_fmax_callee
 
+IFDEF __CPU_8085__
+
+EXTERN _am9511_fmax_callee
+defc cam32_sccz80_fmax_callee = _am9511_fmax_callee
+
+ELSE
+
+
 EXTERN  asm_am9511_compare_sccz80
 
     ; maximum of two sccz80 floats
@@ -35,3 +43,5 @@ EXTERN  asm_am9511_compare_sccz80
     pop de
     push bc
     ret                     ; return DEHL = sccz80_float max
+
+ENDIF

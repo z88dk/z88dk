@@ -6,6 +6,13 @@ SECTION code_fp_am9511
 
 PUBLIC cam32_sccz80_fmin
 
+IFDEF __CPU_8085__
+
+EXTERN _am9511_fmin
+defc cam32_sccz80_fmin = _am9511_fmin
+
+ELSE
+
 EXTERN asm_sccz80_read1, asm_sccz80_readl, asm_am9511_compare_sccz80
 
     ; minimum of two sccz80 floats
@@ -27,3 +34,5 @@ EXTERN asm_sccz80_read1, asm_sccz80_readl, asm_am9511_compare_sccz80
 .left
     call asm_sccz80_readl
     ret
+
+ENDIF
