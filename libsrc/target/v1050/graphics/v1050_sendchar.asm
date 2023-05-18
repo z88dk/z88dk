@@ -9,17 +9,31 @@
 
 	SECTION	code_clib
 	PUBLIC	v1050_sendchar
+	PUBLIC	_v1050_sendchar
+	PUBLIC	v1050_sendchar_fast
+	PUBLIC	_v1050_sendchar_fast
 
 .v1050_sendchar
-
-;	ld c,l
+._v1050_sendchar
 
 ; ..using the BIOS
-;	ld   de,9	; shift ptr to CONOUT
-;	ld   hl,(1)	; WBOOT (BIOS)
-;	add  hl,de
-;	jp   (hl)
+	push bc
+	push de
+	ld c,l
+	ld   de,9	; shift ptr to CONOUT
+	ld   hl,(1)	; WBOOT (BIOS)
+	add  hl,de
+	call __chl
+	pop de
+	pop bc
+	ret
+	
+__chl:
+	jp   (hl)
 
+
+.v1050_sendchar_fast
+._v1050_sendchar_fast
 ; ..direct I/O
 MDSPOT:
 	IN   A,(86h)     ; [P_DISP_C]  GET STATUS
