@@ -324,12 +324,6 @@ extern double_t fabs_fastcall(double_t x) __z88dk_fastcall;
 #define fabs(a) fabs_fastcall(a)
 
 
-#ifdef __MATH_AM9511
-extern double_t hypot(double_t x,double_t y);
-
-extern double_t pow(double_t x,double_t y);
-
-#else
 extern double_t hypot(double_t x,double_t y);
 extern double_t hypot_callee(double_t x,double_t y) __z88dk_callee;
 #define hypot(a,b) hypot_callee(a,b)
@@ -340,7 +334,6 @@ extern double_t pow_callee(double_t x,double_t y) __z88dk_callee;
 #define pow(a,b) pow_callee(a,b)
 
 
-#endif
 
 extern double_t sqrt(double_t x);
 extern double_t sqrt_fastcall(double_t x) __z88dk_fastcall;
@@ -432,6 +425,7 @@ extern double_t fmod_callee(double_t x,double_t y) __z88dk_callee;
 
 
 #endif
+
 extern double_t remainder(double_t x,double_t y);
 extern double_t remainder_callee(double_t x,double_t y) __z88dk_callee;
 #define remainder(a,b) remainder_callee(a,b)
@@ -470,13 +464,6 @@ extern double_t fdim_callee(double_t x,double_t y) __z88dk_callee;
 #define fdim(a,b) fdim_callee(a,b)
 
 
-
-#ifdef __MATH_AM9511
-extern double_t fmax(double_t x,double_t y);
-
-extern double_t fmin(double_t x,double_t y);
-
-#else
 extern double_t fmax(double_t x,double_t y);
 extern double_t fmax_callee(double_t x,double_t y) __z88dk_callee;
 #define fmax(a,b) fmax_callee(a,b)
@@ -487,7 +474,6 @@ extern double_t fmin_callee(double_t x,double_t y) __z88dk_callee;
 #define fmin(a,b) fmin_callee(a,b)
 
 
-#endif
 
 extern double_t fma(double_t x,double_t y,double_t z);
 extern double_t fma_callee(double_t x,double_t y,double_t z) __z88dk_callee;

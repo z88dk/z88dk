@@ -210,6 +210,7 @@ void test_pow()
 }
 
 #ifndef MATH16
+
 static void run_fmod(FLOAT x, FLOAT y, FLOAT e)
 {
     static char   buf[100];
@@ -224,6 +225,7 @@ void test_fmod()
     run_fmod(10.5, 2.0, 0.5);
     run_fmod(10.123, 3, 1.123);
 }
+
 static void run_fmin(FLOAT x, FLOAT y, FLOAT e)
 {
     static char   buf[100];
@@ -253,6 +255,7 @@ void test_fmax()
     run_fmax(3.0, 2.0, 3.0);
     run_fmax(3.0,-1.0, 3.0);
 }
+
 #endif
 
 int suite_math()
@@ -271,10 +274,8 @@ int suite_math()
     suite_add_test(test_pow);
 #ifndef MATH16
     suite_add_test(test_fmod);
-#ifndef SKIPFMINMAX
     suite_add_test(test_fmin);
     suite_add_test(test_fmax);
-#endif
 #endif
     return suite_run();
 }

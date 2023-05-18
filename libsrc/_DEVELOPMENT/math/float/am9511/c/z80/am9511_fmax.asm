@@ -206,7 +206,8 @@
 ;--------------------------------------------------------
 ; Public variables in this module
 ;--------------------------------------------------------
-	GLOBAL _am9511_fmod
+	GLOBAL _am9511_fmax
+	GLOBAL _am9511_fmax_callee
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
@@ -214,8 +215,8 @@
 	GLOBAL _sqr_fastcall
 	GLOBAL _div2_fastcall
 	GLOBAL _mul2_fastcall
-	GLOBAL _fmin
-	GLOBAL _fmax
+	GLOBAL _fmin_callee
+	GLOBAL _fmax_callee
 	GLOBAL _floor_fastcall
 	GLOBAL _fabs_fastcall
 	GLOBAL _ceil_fastcall
@@ -265,6 +266,8 @@
 	GLOBAL _isgreater
 	GLOBAL _fma_callee
 	GLOBAL _fma
+	GLOBAL _fmin
+	GLOBAL _fmax
 	GLOBAL _fdim_callee
 	GLOBAL _fdim
 	GLOBAL _nexttoward_callee
@@ -388,94 +391,80 @@ ENDIF
 ;--------------------------------------------------------
 	SECTION code_compiler
 ;	---------------------------------
-; Function am9511_fmod
+; Function am9511_fmax_callee
 ; ---------------------------------
-_am9511_fmod:
+_am9511_fmax_callee:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	a,(ix+11)
-	and	a,0x7f
-	or	a,(ix+10)
-	or	a,(ix+9)
-	or	a,(ix+8)
-	jr	NZ,l_am9511_fmod_00102
-	ld	hl,0x0000
-	ld	e,l
-	ld	d,h
-	jp	l_am9511_fmod_00103
-l_am9511_fmod_00102:
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	ld	l,(ix+6)
-	ld	h,(ix+7)
-	push	hl
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	push	hl
-	call	___fsdiv_callee
-	push	de
-	push	hl
-	call	___fs2slong_callee
-	push	de
-	push	hl
-	call	___slong2fs_callee
-	ld	c, l
-	ld	l,(ix+10)
-	ld	b,h
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	push	de
+	push	af
+	push	af
+	ld	hl,0
+	add	hl, sp
+	ex	de, hl
+	ld	hl,8
+	add	hl, sp
+	ld	bc,4
+	ldir
+	ld	c,(ix+8)
+	ld	b,(ix+9)
+	ld	e,(ix+10)
+	ld	d,(ix+11)
 	push	bc
-	call	___fsmul_callee
 	push	de
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	push	hl
-	ld	l,(ix+6)
-	ld	h,(ix+7)
-	push	hl
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	push	hl
-	call	___fssub_callee
-	push	hl
-	ld	c,l
-	ld	b,h
-	push	de
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	push	hl
 	push	de
 	push	bc
 	call	___fslt_callee
+	ld	a, l
 	pop	de
 	pop	bc
-	bit	0, l
-	jr	NZ,l_am9511_fmod_00105
+	or	a, a
+	jr	Z,l_am9511_fmax_callee_00102
+	pop	hl
+	push	hl
+	ld	e,(ix-2)
+	ld	d,(ix-1)
+	jr	l_am9511_fmax_callee_00103
+l_am9511_fmax_callee_00102:
+	ld	l, c
+	ld	h, b
+l_am9511_fmax_callee_00103:
+	ld	sp, ix
+	pop	ix
+	pop	bc
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	push	bc
+	ret
+	SECTION code_compiler
+;	---------------------------------
+; Function am9511_fmax
+; ---------------------------------
+_am9511_fmax:
+	push	ix
+	ld	ix,0
+	add	ix,sp
 	ld	l,(ix+10)
 	ld	h,(ix+11)
 	push	hl
 	ld	l,(ix+8)
 	ld	h,(ix+9)
 	push	hl
-	push	de
-	push	bc
-	call	___fssub_callee
-	jr	l_am9511_fmod_00106
-l_am9511_fmod_00105:
-	ld	l, c
-	ld	h, b
-l_am9511_fmod_00106:
-l_am9511_fmod_00103:
+	ld	l,(ix+6)
+	ld	h,(ix+7)
+	push	hl
+	ld	l,(ix+4)
+	ld	h,(ix+5)
+	push	hl
+	call	_am9511_fmax_callee
 	pop	ix
 	ret
 	SECTION IGNORE

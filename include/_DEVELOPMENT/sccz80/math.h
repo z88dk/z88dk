@@ -281,14 +281,6 @@ extern double_t __LIB__ logb(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ fabs(double_t x) __smallc __z88dk_fastcall;
 
 
-#ifdef __MATH_AM9511
-extern double_t __LIB__ hypot(double_t x,double_t y) __smallc;
-
-
-extern double_t __LIB__ pow(double_t x,double_t y) __smallc;
-
-
-#else
 extern double_t __LIB__ hypot(double_t x,double_t y) __smallc;
 extern double_t __LIB__ hypot_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define hypot(a,b) hypot_callee(a,b)
@@ -299,7 +291,6 @@ extern double_t __LIB__ pow_callee(double_t x,double_t y) __smallc __z88dk_calle
 #define pow(a,b) pow_callee(a,b)
 
 
-#endif
 
 extern double_t __LIB__ sqrt(double_t x) __smallc __z88dk_fastcall;
 
@@ -365,6 +356,7 @@ extern double_t __LIB__ fmod_callee(double_t x,double_t y) __smallc __z88dk_call
 
 
 #endif
+
 extern double_t __LIB__ remainder(double_t x,double_t y) __smallc;
 extern double_t __LIB__ remainder_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define remainder(a,b) remainder_callee(a,b)
@@ -401,15 +393,6 @@ extern double_t __LIB__ fdim_callee(double_t x,double_t y) __smallc __z88dk_call
 #define fdim(a,b) fdim_callee(a,b)
 
 
-
-#ifdef __MATH_AM9511
-extern double_t __LIB__ fmax(double_t x,double_t y) __smallc;
-
-
-extern double_t __LIB__ fmin(double_t x,double_t y) __smallc;
-
-
-#else
 extern double_t __LIB__ fmax(double_t x,double_t y) __smallc;
 extern double_t __LIB__ fmax_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define fmax(a,b) fmax_callee(a,b)
@@ -420,7 +403,6 @@ extern double_t __LIB__ fmin_callee(double_t x,double_t y) __smallc __z88dk_call
 #define fmin(a,b) fmin_callee(a,b)
 
 
-#endif
 
 extern double_t __LIB__ fma(double_t x,double_t y,double_t z) __smallc;
 extern double_t __LIB__ fma_callee(double_t x,double_t y,double_t z) __smallc __z88dk_callee;

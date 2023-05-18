@@ -213,13 +213,8 @@ __DPROTO(,,double_t,,log2,double_t x)
 __DPROTO(,,double_t,,logb,double_t x)
 
 __DPROTO(,,double_t,,fabs,double_t x)
-#ifdef __MATH_AM9511
-__OPROTO(,,double_t,,hypot,double_t x,double_t y)
-__OPROTO(,,double_t,,pow,double_t x,double_t y)
-#else
 __DPROTO(,,double_t,,hypot,double_t x,double_t y)
 __DPROTO(,,double_t,,pow,double_t x,double_t y)
-#endif
 
 __DPROTO(,,double_t,,sqrt,double_t x)
 __DPROTO(,,double_t,,cbrt,double_t x)
@@ -245,6 +240,7 @@ __OPROTO(,,double_t,,fmod,double_t x,double_t y)
 __DPROTO(,,double_t,,modf,double_t value,double_t *iptr)
 __DPROTO(,,double_t,,fmod,double_t x,double_t y)
 #endif
+
 __DPROTO(,,double_t,,remainder,double_t x,double_t y)
 __DPROTO(,,double_t,,remquo,double_t x,double_t y,int *quo)
 
@@ -255,14 +251,8 @@ __DPROTO(,,double_t,,nextafter,double_t x,double_t y)
 __DPROTO(,,double_t,,nexttoward,double_t x,double_t y)
 
 __DPROTO(,,double_t,,fdim,double_t x,double_t y)
-
-#ifdef __MATH_AM9511
-__OPROTO(,,double_t,,fmax,double_t x,double_t y)
-__OPROTO(,,double_t,,fmin,double_t x,double_t y)
-#else
 __DPROTO(,,double_t,,fmax,double_t x,double_t y)
 __DPROTO(,,double_t,,fmin,double_t x,double_t y)
-#endif
 
 __DPROTO(,,double_t,,fma,double_t x,double_t y,double_t z)
 

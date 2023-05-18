@@ -5,7 +5,7 @@ SECTION code_fp_math32
 PUBLIC cm32_sccz80_fsreadl
 PUBLIC cm32_sccz80_fsread1
 
-EXTERN cm32_sccz80_fsload
+EXTERN m32_fsload
 
 .cm32_sccz80_fsreadl
 
@@ -24,7 +24,7 @@ EXTERN cm32_sccz80_fsload
     ld hl,8                     ; stack sccz80_float left
     add hl,sp
 
-    jp cm32_sccz80_fsload         ; return DEHL = sccz80_float left
+    jp m32_fsload               ; return DEHL = sccz80_float left
 
 
 .cm32_sccz80_fsread1
@@ -44,4 +44,4 @@ EXTERN cm32_sccz80_fsload
     ld hl,4                     ; stack sccz80_float
     add hl,sp
 
-    jp cm32_sccz80_fsload         ; return DEHL = sccz80_float
+    jp m32_fsload               ; return DEHL = sccz80_float

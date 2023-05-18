@@ -1,9 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 19569-078eaec31-20220528
+;  Version: 20991-4398ebbb5d-20230509
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Fri Jan 27 20:24:10 2023
+;	Module compile time: Wed May 17 20:18:22 2023
 
 
 	C_LINE	0,"am9511_atanh.c"
@@ -136,7 +136,6 @@
 	C_LINE	41,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	42,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	43,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	44,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	48,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	49,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	50,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
@@ -156,62 +155,57 @@
 	C_LINE	74,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	75,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	76,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	82,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	83,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	77,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	78,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	84,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	85,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	86,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	89,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	90,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	92,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	93,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	97,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	98,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	87,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	88,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	91,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	94,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	95,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	99,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	102,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	103,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	107,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	108,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	100,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	104,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	105,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	109,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	110,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	111,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	112,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	205,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	113,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	114,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	211,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	39,"/home/phillip/Z80/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"am9511_math.h"
 	C_LINE	37,"am9511_math.h"
+	C_LINE	96,"am9511_math.h"
+	C_LINE	97,"am9511_math.h"
+	C_LINE	98,"am9511_math.h"
+	C_LINE	99,"am9511_math.h"
 	C_LINE	100,"am9511_math.h"
 	C_LINE	101,"am9511_math.h"
-	C_LINE	102,"am9511_math.h"
 	C_LINE	103,"am9511_math.h"
-	C_LINE	104,"am9511_math.h"
-	C_LINE	105,"am9511_math.h"
+	C_LINE	106,"am9511_math.h"
 	C_LINE	107,"am9511_math.h"
+	C_LINE	108,"am9511_math.h"
+	C_LINE	109,"am9511_math.h"
 	C_LINE	110,"am9511_math.h"
 	C_LINE	111,"am9511_math.h"
-	C_LINE	112,"am9511_math.h"
-	C_LINE	113,"am9511_math.h"
 	C_LINE	114,"am9511_math.h"
 	C_LINE	115,"am9511_math.h"
+	C_LINE	116,"am9511_math.h"
 	C_LINE	118,"am9511_math.h"
 	C_LINE	119,"am9511_math.h"
 	C_LINE	120,"am9511_math.h"
-	C_LINE	121,"am9511_math.h"
 	C_LINE	123,"am9511_math.h"
 	C_LINE	124,"am9511_math.h"
 	C_LINE	125,"am9511_math.h"
-	C_LINE	128,"am9511_math.h"
-	C_LINE	129,"am9511_math.h"
+	C_LINE	126,"am9511_math.h"
+	C_LINE	127,"am9511_math.h"
 	C_LINE	130,"am9511_math.h"
+	C_LINE	131,"am9511_math.h"
 	C_LINE	132,"am9511_math.h"
 	C_LINE	133,"am9511_math.h"
-	C_LINE	134,"am9511_math.h"
-	C_LINE	137,"am9511_math.h"
-	C_LINE	138,"am9511_math.h"
-	C_LINE	139,"am9511_math.h"
-	C_LINE	140,"am9511_math.h"
-	C_LINE	141,"am9511_math.h"
-	C_LINE	142,"am9511_math.h"
-	C_LINE	143,"am9511_math.h"
 	C_LINE	5,"am9511_atanh.c"
 	C_LINE	7,"am9511_atanh.c"
 	SECTION	code_compiler
@@ -311,7 +305,6 @@
 	GLOBAL	_acos
 	GLOBAL	_atan
 	GLOBAL	atan2
-	GLOBAL	atan2_callee
 	GLOBAL	sinh
 	GLOBAL	cosh
 	GLOBAL	tanh
@@ -321,7 +314,7 @@
 	GLOBAL	_sqr
 	GLOBAL	_sqrt
 	GLOBAL	pow
-	GLOBAL	_pow_callee
+	GLOBAL	pow_callee
 	GLOBAL	_exp
 	GLOBAL	exp2
 	GLOBAL	exp10
@@ -331,20 +324,20 @@
 	GLOBAL	_ceil
 	GLOBAL	_floor
 	GLOBAL	round
+	GLOBAL	_fmax
+	GLOBAL	_fmin
 	GLOBAL	_div2
 	GLOBAL	_mul2
 	GLOBAL	mul10u
 	GLOBAL	ldexp
-	GLOBAL	_ldexp_callee
+	GLOBAL	ldexp_callee
 	GLOBAL	modf
-	GLOBAL	modf_callee
 	GLOBAL	frexp
-	GLOBAL	_frexp_callee
+	GLOBAL	frexp_callee
 	GLOBAL	_fabs
 	GLOBAL	fmod
-	GLOBAL	fmod_callee
 	GLOBAL	hypot
-	GLOBAL	_hypot_callee
+	GLOBAL	hypot_callee
 	GLOBAL	atof
 	GLOBAL	ftoa
 	GLOBAL	ftoe
@@ -361,9 +354,6 @@
 	GLOBAL	_am9511_log2
 	GLOBAL	_am9511_exp2
 	GLOBAL	_am9511_exp10
-	GLOBAL	_am9511_round
-	GLOBAL	_am9511_fmod
-	GLOBAL	_am9511_modf
 
 
 ; --- End of Scope Defns ---
