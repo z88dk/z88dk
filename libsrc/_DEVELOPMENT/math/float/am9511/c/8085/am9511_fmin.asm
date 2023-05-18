@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu May 18 13:38:04 2023
+;	Module compile time: Thu May 18 15:08:34 2023
 
 
 	C_LINE	0,"am9511_fmin.c"
@@ -232,7 +232,7 @@
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	ld	de,sp+4
+	ld	de,sp+14
 	ex	de,hl
 	call	l_glong
 	pop	bc
@@ -249,7 +249,7 @@
 
 
 .i_2
-	ld	de,sp+0
+	ld	de,sp+10
 	ex	de,hl
 	call	l_glong
 	pop	bc
