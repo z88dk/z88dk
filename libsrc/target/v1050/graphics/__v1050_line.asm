@@ -38,7 +38,7 @@ __v1050_line:
 		; Draw a line from cursor to (X,Y); ESC ? x ; y L
 
 		ld l,27
-		call v1050_sendchar_fast
+		call v1050_sendchar
 		ld l,'?'
 		call v1050_sendchar_fast
 		
@@ -48,7 +48,7 @@ __v1050_line:
 
 
 		ld l,';'
-		call v1050_sendchar
+		call v1050_sendchar_fast
 
 		; Y
 		ex de,hl
