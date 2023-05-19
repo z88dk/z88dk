@@ -5,7 +5,7 @@ include ../../Make.config
 vpath %.c ../cimpl/
 
 AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard z80/*asm)
-CFILES  = cosh.c sinh.c tanh.c modf.c tofix16.c fromfix16.c
+CFILES  = cosh.c sinh.c tanh.c modf.c tofix16.c fromfix16.c fmin.c fmax.c
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS +=  -math-z88 -D__Z88__ -D__NATIVE_MATH__ -DFLOAT_IS_48BITS
