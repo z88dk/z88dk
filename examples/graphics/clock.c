@@ -14,6 +14,8 @@
  *  zcc +ts2068 -pragma-define:CLIB_ZX_CONIO32=1 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -DDETAILED -create-app -llib3d -Dhires clock.c
  * SANYO MBC-200, very high resolution
  *  zcc +cpm -subtype=mbc200 -DDETAILED -DFULL_HRG -create-app -lndos -llib3d -lm clock.c
+ * Visual 1050, very high resolution, CP/M 3 supports time/date
+ *  zcc +cpm -subtype=v1050 -DDETAILED -DFULL_HRG -Dhires -create-app -lndos -llib3d -lm -DHAVE_TIME clock.c
 
  *  Add -DHAVE_TIME if the machine has a hardware clock that can be read
 

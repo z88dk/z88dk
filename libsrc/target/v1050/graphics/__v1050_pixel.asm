@@ -54,7 +54,7 @@ __v1050_pixel:
 
 		;Set drawing mode: ESC ? m ; t T
 		ld l,27
-		call v1050_sendchar_fast
+		call v1050_sendchar
 		ld l,'?'
 		call v1050_sendchar_fast
 		ld a,'8'
@@ -71,13 +71,22 @@ noxor:
 		call v1050_sendchar
 		ld l,';'
 		call v1050_sendchar
+
 		; Force drawing type to "solid", thus "255".
-		ld l,'2'
+		;ld l,'2'
+		;call v1050_sendchar
+		;ld l,'5'
+		;call v1050_sendchar
+		;ld l,'5'
+		;call v1050_sendchar
+		ld l,'='
 		call v1050_sendchar
-		ld l,'5'
+		ld l,255
+		call v1050_sendchar_fast
+		ld l,0
 		call v1050_sendchar
-		ld l,'5'
-		call v1050_sendchar
+
+
 		ld l,'T'
 		call v1050_sendchar
 		
@@ -94,7 +103,7 @@ noxor:
 
 
 		ld l,';'
-		call v1050_sendchar
+		call v1050_sendchar_fast
 
 		; Y
 		ex de,hl
