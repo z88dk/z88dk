@@ -161,10 +161,14 @@ dirs: $(DIRS)
 
 .PHONY: dirs
 
+include adt-newlib/adtnewlib.mak
 include assert/assert.mak
 include ctype/ctype.mak
+include libgen/libgen.mak
+include rect/rect.mak
 include regex/regex.mak
 include setjmp/setjmp.mak
+include time/time.mak
 
 
 # Arg1: target
@@ -176,25 +180,19 @@ endef
 
 define buildcrt
 	$(MAKE) -C stdio
-	$(MAKE) -C time
 	$(MAKE) -C font
 	$(MAKE) -C input
 	$(MAKE) -C stdlib
-	$(MAKE) -C libgen
 	$(MAKE) -C strings
 	$(MAKE) -C interrupts
-	$(MAKE) -C setjmp
 	$(MAKE) -C debug
 	$(MAKE) -C font
 	$(MAKE) -C compress
 	$(MAKE) -C alloc
 	$(MAKE) -C adt
-	$(MAKE) -C adt-newlib
 	$(MAKE) -C algorithm
-	$(MAKE) -C rect
 	$(MAKE) -C arch
 	$(MAKE) -C stdlib
-	$(MAKE) -C time
 	$(MAKE) -C z80_crt0s
 	$(MAKE) -C gfx/x11
 	$(MAKE) -C gfx/portable
@@ -2091,17 +2089,12 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C fcntl clean
 	$(MAKE) -C math clean
 	$(MAKE) -C interrupts clean
-	$(MAKE) -C libgen clean
-	$(MAKE) -C setjmp clean
 	$(MAKE) -C stdio clean
 	$(MAKE) -C stdlib clean
 	$(MAKE) -C strings clean
-	$(MAKE) -C time clean
 	$(MAKE) -C z80_crt0s clean
 	$(MAKE) -C adt clean
-	$(MAKE) -C adt-newlib clean
 	$(MAKE) -C alloc clean
-	$(MAKE) -C rect clean
 	$(MAKE) -C algorithm clean
 	$(MAKE) -C debug clean
 	$(MAKE) -C lib3d clean
