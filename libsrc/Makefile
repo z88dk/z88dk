@@ -149,24 +149,24 @@ TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81
 TOCREATE += $(call check_target,zxn, zxn_clib.lib zxfcntl)
 
 
-TOCREATE += $(GENLIBS)
+TOCREATE += 
 
-all: $(TOCREATE)
+all: $(GENLIBS) $(TOCREATE)
 
 
 # Arg1: target
 # Arg2: Graphics flavour
 define buildgeneric
-	$(MAKE) -C stdio
-	$(MAKE) -C time
-	$(MAKE) -C font
-	$(MAKE) -C input
-	$(MAKE) -C stdlib
 	$(MAKE) -C gfx TARGET=$(1) FLAVOUR=$(if $(2),$(2),narrow)
 	$(MAKE) -C psg TARGET=$(1)
 endef
 
 define buildcrt
+	$(MAKE) -C stdio
+	$(MAKE) -C time
+	$(MAKE) -C font
+	$(MAKE) -C input
+	$(MAKE) -C stdlib
 	$(MAKE) -C ctype
 	$(MAKE) -C libgen
 	$(MAKE) -C strings
@@ -186,6 +186,8 @@ define buildcrt
 	$(MAKE) -C stdlib
 	$(MAKE) -C time
 	$(MAKE) -C z80_crt0s
+	$(MAKE) -C gfx/x11
+	$(MAKE) -C gfx/portable
 	$(MAKE) -C math/fix16
 endef
 
