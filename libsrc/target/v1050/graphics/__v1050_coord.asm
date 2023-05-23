@@ -5,9 +5,6 @@
 
 	PUBLIC    __v1050_coord
 
-	EXTERN     l_cmp
-
-	EXTERN    __gfx_coords
 	EXTERN    v1050_sendchar
 	EXTERN    v1050_sendchar_fast
 
@@ -15,14 +12,6 @@
 ;       $Id: __v1050_coord.asm $
 ;
 
-
-;;--------------------------------------------------
-;; Binary to BCD conversion
-;;
-;;
-;; input: HL = unsigned integer to convert
-;; output: C:DE = 4-digit BCD number
-;;--------------------------------------------------
 
 __v1050_coord:
 
@@ -39,6 +28,13 @@ __v1050_coord:
 	ret
 	
 ;; Alternative way, ASCII-decimal values
+;;--------------------------------------------------
+;; Binary to BCD conversion
+;;
+;; input: HL = unsigned integer to convert
+;; output: C:DE = 4-digit BCD number
+;; (C is commented out, 3 BCD digit will suffice)
+;;--------------------------------------------------
 ;
 ;	push de
 ;
