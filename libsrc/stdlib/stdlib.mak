@@ -46,8 +46,6 @@ STDLIB_GBZ80_NEWLIBGLOBS = $(STDLIB_8080_NEWLIBGLOBS)
 STDLIB_GBZ80_NEWLIBGLOBS_ex = $(STDLIB_8080_NEWLIBGLOBS_ex)
 
 
-STDLIB_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*.asm"
-STDLIB_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/stdlib/z80/*.asm
 
 STDLIB_NEWLIB_TARGETS := stdlib/obj/newlib-z80-stdlib stdlib/obj/newlib-z80n-stdlib stdlib/obj/newlib-r2k-stdlib stdlib/obj/newlib-ixiy-stdlib stdlib/obj/newlib-8080-stdlib stdlib/obj/newlib-gbz80-stdlib
 
@@ -103,7 +101,7 @@ stdlib/obj/newlib-gbz80-stdlib: $(STDLIB_GBZ80_NEWLIBGLOBS_ex)
 
 
 stdlib-dirs:
-	@mkdir -p stdlib/obj/z80 stdlib/obj/r2k stdlib/obj/8080 stdlib/obj/gbz80 stdlib/obj/z80n stdlib/obj/ixiy stdlib/obj/8080/8080 stdlib/obj/gbz80/8080
+	@mkdir -p stdlib/obj/z80 stdlib/obj/r2k stdlib/obj/8080/8080 stdlib/obj/gbz80/8080 stdlib/obj/z80n stdlib/obj/ixiy 
 
 stdlib-clean:
 	$(RM) -fr stdlib/obj
