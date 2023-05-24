@@ -164,6 +164,10 @@ dirs: $(DIRS)
 include adt-newlib/adtnewlib.mak
 include assert/assert.mak
 include ctype/ctype.mak
+include font/font_4x8/font_4x8.mak
+include font/font_8x8/font_8x8.mak
+include font/font_8x10/font_8x10.mak
+include font/fzx/fzx.mak
 include libgen/libgen.mak
 include rect/rect.mak
 include regex/regex.mak
@@ -182,11 +186,9 @@ endef
 
 define buildcrt
 	$(MAKE) -C stdio
-	$(MAKE) -C font
 	$(MAKE) -C input
 	$(MAKE) -C interrupts
 	$(MAKE) -C debug
-	$(MAKE) -C font
 	$(MAKE) -C compress
 	$(MAKE) -C alloc
 	$(MAKE) -C adt
@@ -1016,7 +1018,6 @@ einstein.lib:
 	@echo '--- Building Tatung Einstein Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	$(MAKE) -C font
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/mc6845 TARGET=einstein
@@ -2103,7 +2104,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C games clean
 	$(MAKE) -C math clean
 	$(MAKE) -C compress clean
-	$(MAKE) -C font clean
 	$(MAKE) -C arch clean
 	$(MAKE) -C target clean
 	$(MAKE) -C video clean
