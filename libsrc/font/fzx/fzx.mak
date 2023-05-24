@@ -1,5 +1,5 @@
 FZX_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/font/fzx/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/font/fzx/z80/*.asm" "$(NEWLIB_DIRECTORY)/font/fzx/fonts/**/*.asm" "$(NEWLIB_DIRECTORY)/font/fzx/zx/z80/*.asm"
-FZX_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/font/fzx/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/font/fzx/z80/*.asm $(NEWLIB_DIRECTORY)/font/fzx/fonts/*/*/*.asm $(NEWLIB_DIRECTORY)/font/fzx/fonts/*/*/*/*.asm $(NEWLIB_DIRECTORY)/font/fzx/zx/z80/*.asm
+FZX_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/font/fzx/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/font/fzx/z80/*.asm $(NEWLIB_DIRECTORY)/font/fzx/fonts/*/*/*.asm $(NEWLIB_DIRECTORY)/font/fzx/fonts/*/*.asm $(NEWLIB_DIRECTORY)/font/fzx/zx/z80/*.asm
 
 FZX_NEWLIB_TARGETS := font/fzx/obj/newlib-z80-fzx font/fzx/obj/newlib-z80n-fzx 
 
