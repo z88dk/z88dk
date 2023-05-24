@@ -164,6 +164,7 @@ dirs: $(DIRS)
 include adt-newlib/adtnewlib.mak
 include assert/assert.mak
 include ctype/ctype.mak
+include debug/debug.mak
 include font/font_4x8/font_4x8.mak
 include font/font_8x8/font_8x8.mak
 include font/font_8x10/font_8x10.mak
@@ -188,7 +189,6 @@ endef
 define buildcrt
 	$(MAKE) -C stdio
 	$(MAKE) -C interrupts
-	$(MAKE) -C debug
 	$(MAKE) -C compress
 	$(MAKE) -C alloc
 	$(MAKE) -C adt
@@ -2094,7 +2094,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C adt clean
 	$(MAKE) -C alloc clean
 	$(MAKE) -C algorithm clean
-	$(MAKE) -C debug clean
 	$(MAKE) -C lib3d clean
 	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean

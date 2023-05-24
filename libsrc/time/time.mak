@@ -11,13 +11,13 @@ TIME_OBJECTS = $(TIME_CFILES:.c=.o) $(TIME_AFILES:.asm=.o)
 
 TIME_OBJS = $(addprefix time/obj/z80/, $(TIME_OBJECTS)) $(addprefix time/obj/r2k/,$(TIME_OBJECTS)) $(addprefix time/obj/ixiy/,$(TIME_OBJECTS))  $(addprefix time/obj/z80n/,$(TIME_OBJECTS)) $(addprefix time/obj/8080/,$(TIME_OBJECTS))  $(addprefix time/obj/gbz80/,$(TIME_OBJECTS))
 
+
 OBJS += $(TIME_OBJS) $(TIME_NEWLIB_TARGETS)
-DIRS += time-dirs
 CLEAN += time-clean
 
-time: time-dirs $(TIME_OBJS) $(TIME_NEWLIB_TARGETS)
+time: $(TIME_OBJS) $(TIME_NEWLIB_TARGETS)
 
-.PHONY: time time-dirs time-clean
+.PHONY: time time-clean
 
 $(eval $(call buildbit,time,z80,test))
 $(eval $(call buildbit,time,ixiy,test,-Ca-IXIY))
@@ -57,9 +57,8 @@ time/obj/newlib-gbz80-time: $(TIME_NEWLIBGLOBS_ex)
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=time/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(TIME_NEWLIBGLOBS)
 
-
-time-dirs:
-	@mkdir -p time/obj/z80 time/obj/r2k time/obj/8080 time/obj/gbz80 time/obj/z80n time/obj/ixiy
+time/obj/%:
+	@mkdir -p $@
 
 time-clean:
 	$(RM) -fr time/obj

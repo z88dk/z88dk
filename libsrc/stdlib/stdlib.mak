@@ -53,13 +53,13 @@ STDLIB_OBJECTS = $(STDLIB_CFILES:.c=.o) $(STDLIB_AFILES:.asm=.o)
 
 STDLIB_OBJS = $(addprefix stdlib/obj/z80/, $(STDLIB_OBJECTS)) $(addprefix stdlib/obj/r2k/,$(STDLIB_OBJECTS)) $(addprefix stdlib/obj/ixiy/,$(STDLIB_OBJECTS))  $(addprefix stdlib/obj/z80n/,$(STDLIB_OBJECTS)) $(addprefix stdlib/obj/8080/,$(STDLIB_8080_OBJECTS))  $(addprefix stdlib/obj/gbz80/,$(STDLIB_GBZ80_OBJECTS))
 
+
 OBJS += $(STDLIB_OBJS) $(STDLIB_NEWLIB_TARGETS)
-DIRS += stdlib-dirs
 CLEAN += stdlib-clean
 
-stdlib: stdlib-dirs $(STDLIB_OBJS) $(STDLIB_NEWLIB_TARGETS)
+stdlib: $(STDLIB_OBJS) $(STDLIB_NEWLIB_TARGETS)
 
-.PHONY: stdlib stdlib-dirs stdlib-clean
+.PHONY: stdlib stdlib-clean
 
 $(eval $(call buildbit,stdlib,z80,test))
 $(eval $(call buildbit,stdlib,ixiy,test,-Ca-IXIY))
@@ -99,9 +99,6 @@ stdlib/obj/newlib-gbz80-stdlib: $(STDLIB_GBZ80_NEWLIBGLOBS_ex)
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=stdlib/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(STDLIB_GBZ80_NEWLIBGLOBS)
 
-
-stdlib-dirs:
-	@mkdir -p stdlib/obj/z80 stdlib/obj/r2k stdlib/obj/8080/8080 stdlib/obj/gbz80/8080 stdlib/obj/z80n stdlib/obj/ixiy 
 
 stdlib-clean:
 	$(RM) -fr stdlib/obj

@@ -18,12 +18,11 @@ STRINGS_OBJECTS = $(STRINGS_CFILES:.c=.o) $(STRINGS_AFILES:.asm=.o)
 STRINGS_OBJS = $(addprefix strings/obj/z80/, $(STRINGS_OBJECTS)) $(addprefix strings/obj/r2k/,$(STRINGS_OBJECTS)) $(addprefix strings/obj/ixiy/,$(STRINGS_OBJECTS))  $(addprefix strings/obj/z80n/,$(STRINGS_OBJECTS)) $(addprefix strings/obj/8080/,$(STRINGS_8080_OBJECTS))  $(addprefix strings/obj/gbz80/,$(STRINGS_GBZ80_OBJECTS))
 
 OBJS += $(STRINGS_OBJS) $(STRINGS_NEWLIB_TARGETS)
-DIRS += strings-dirs
 CLEAN += strings-clean
 
-strings: strings-dirs $(STRINGS_OBJS) $(STRINGS_NEWLIB_TARGETS)
+strings: $(STRINGS_OBJS) $(STRINGS_NEWLIB_TARGETS)
 
-.PHONY: strings strings-dirs strings-clean
+.PHONY: strings strings-clean
 
 $(eval $(call buildbit,strings,z80,test))
 $(eval $(call buildbit,strings,ixiy,test,-Ca-IXIY))
@@ -64,8 +63,6 @@ strings/obj/newlib-gbz80-strings: $(STRINGS_NEWLIBGLOBS_ex)
 	$(Q)$(ASSEMBLER) -d -O=strings/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(STRINGS_NEWLIBGLOBS)
 
 
-strings-dirs:
-	@mkdir -p strings/obj/z80 strings/obj/r2k strings/obj/8080 strings/obj/gbz80 strings/obj/z80n strings/obj/ixiy 
 
 strings-clean:
 	$(RM) -fr strings/obj
