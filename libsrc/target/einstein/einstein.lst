@@ -1,6 +1,6 @@
 @stdio/ansicore.lst
 target/einstein/stdio/generic_console
-@font/font_8x8/font_8x8.lst
+
 @video/tms9918/video_tms9918.lst
 @gfx/narrow/gfx_narrow.lst
 target/einstein/psg/asm_vt2_hardware_out

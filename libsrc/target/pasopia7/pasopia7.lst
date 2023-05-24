@@ -5,7 +5,7 @@ target/pasopia7/stdio/CRT_FONT
 target/pasopia7/stdio/generic_console
 target/pasopia7/stdio/conio_map_colour
 target/pasopia7/stdio/generic_console_ioctl
-@font/font_8x8/font_8x8.lst
+
 @stdio/stdio.lst
 @input/input_keyboard.lst
 target/pasopia7/games/joystick

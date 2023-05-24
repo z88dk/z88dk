@@ -16,7 +16,7 @@ target/vz/stdio/ansi/f_ansi_cls
 target/vz/stdio/ansi/f_ansi_dline
 target/vz/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
-@font/font_8x8/font_8x8.lst
+
 target/vz/graphics/clsgraph
 #target/vz/graphics/putsprite
 target/vz/graphics/bksave

@@ -12,7 +12,7 @@ target/cpc/stdio/bordercolour
 target/cpc/stdio/conio_map_colour
 target/cpc/stdio/conio_vars
 target/cpc/stdio/CRT_FONT
-@font/font_8x8/font_8x8.lst
+
 target/cpc/graphics/cleargraphics
 target/cpc/graphics/getmaxx
 target/cpc/graphics/getmaxy

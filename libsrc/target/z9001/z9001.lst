@@ -19,7 +19,7 @@ target/z9001/games/joystick
 @games/games.lst
 target/z9001/graphics/textpixl
 
-@font/font_8x8/font_8x8.lst
+
 
 target/z9001/graphics/cleargraphics
 target/z9001/graphics/getmaxx

@@ -179,6 +179,9 @@ include stdlib/stdlib.mak
 include time/time.mak
 
 
+# Targets depend on some common code + target specific (include stdio in here)
+TARGET_CLIB_OBJS = 
+
 # Arg1: target
 # Arg2: Graphics flavour
 define buildgeneric
@@ -313,7 +316,7 @@ zxfcntl:
 # ansi flags
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-zx_clib.lib:
+zx_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''

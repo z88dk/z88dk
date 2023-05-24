@@ -5,8 +5,8 @@
 target/shared/clock
 @target/zx/gfxspectrum.lst
 @font/fzx/fzx.lst
-@font/font_4x8/font_4x8.lst
-@font/font_8x8/font_8x8.lst
+
+
 target/zx/games/obj/${TARGET}/joystick
 target/zx/games/obj/${TARGET}/bit_open
 target/zx/games/obj/${TARGET}/bit_open_di

@@ -10,7 +10,7 @@ target/spc1000/stdio/printc_MODE1
 target/spc1000/stdio/printc_MODE2
 target/spc1000/stdio/conio_vars
 target/spc1000/stdio/CRT_FONT
-@font/font_8x8/font_8x8.lst
+
 @stdio/stdio.lst
 @input/input_keyboard.lst
 target/spc1000/tms9918

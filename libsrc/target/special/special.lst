@@ -11,7 +11,7 @@ target/special/stdio/fgetc_cons
 stdio/inkey/getk
 stdio/inkey/fgetc_cons
 
-@font/font_8x8/font_8x8.lst
+
 target/special/graphics/clg
 target/special/graphics/w_pixladdr
 target/special/graphics/w_plotpixl

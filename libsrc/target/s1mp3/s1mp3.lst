@@ -1,4 +1,4 @@
 @stdio/stdio.lst
 
-@font/font_8x8/font_8x8.lst
+
 target/s1mp3/**/*.o

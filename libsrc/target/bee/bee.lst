@@ -14,7 +14,7 @@ target/bee/stdio/conio_map_colour
 target/bee/stdio/conio_vars
 target/bee/stdio/CRT_FONT
 target/shared/copy_font
-@font/font_8x8/font_8x8.lst
+
 @stdio/stdio.lst
 target/bee/games/joystick
 @games/games.lst

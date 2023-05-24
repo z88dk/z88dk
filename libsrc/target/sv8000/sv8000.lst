@@ -6,7 +6,7 @@ target/sv8000/stdio/vpeek_MODE1
 target/sv8000/stdio/conio_vars
 target/sv8000/stdio/CRT_FONT
 @stdio/stdio.lst
-@font/font_8x8/font_8x8.lst
+
 target/sv8000/graphics/clsgraph
 target/sv8000/graphics/getmaxx
 target/sv8000/graphics/getmaxy
