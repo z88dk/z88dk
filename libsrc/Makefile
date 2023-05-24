@@ -168,6 +168,7 @@ include libgen/libgen.mak
 include rect/rect.mak
 include regex/regex.mak
 include setjmp/setjmp.mak
+include stdlib/stdlib.mak
 include time/time.mak
 
 
@@ -182,7 +183,6 @@ define buildcrt
 	$(MAKE) -C stdio
 	$(MAKE) -C font
 	$(MAKE) -C input
-	$(MAKE) -C stdlib
 	$(MAKE) -C strings
 	$(MAKE) -C interrupts
 	$(MAKE) -C debug
@@ -192,7 +192,6 @@ define buildcrt
 	$(MAKE) -C adt
 	$(MAKE) -C algorithm
 	$(MAKE) -C arch
-	$(MAKE) -C stdlib
 	$(MAKE) -C z80_crt0s
 	$(MAKE) -C gfx/x11
 	$(MAKE) -C gfx/portable
@@ -2090,7 +2089,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C math clean
 	$(MAKE) -C interrupts clean
 	$(MAKE) -C stdio clean
-	$(MAKE) -C stdlib clean
 	$(MAKE) -C strings clean
 	$(MAKE) -C z80_crt0s clean
 	$(MAKE) -C adt clean
