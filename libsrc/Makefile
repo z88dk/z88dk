@@ -168,6 +168,7 @@ include font/font_4x8/font_4x8.mak
 include font/font_8x8/font_8x8.mak
 include font/font_8x10/font_8x10.mak
 include font/fzx/fzx.mak
+include input/input.mak
 include libgen/libgen.mak
 include rect/rect.mak
 include regex/regex.mak
@@ -186,7 +187,6 @@ endef
 
 define buildcrt
 	$(MAKE) -C stdio
-	$(MAKE) -C input
 	$(MAKE) -C interrupts
 	$(MAKE) -C debug
 	$(MAKE) -C compress
@@ -2096,7 +2096,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C algorithm clean
 	$(MAKE) -C debug clean
 	$(MAKE) -C lib3d clean
-	$(MAKE) -C input clean
 	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
