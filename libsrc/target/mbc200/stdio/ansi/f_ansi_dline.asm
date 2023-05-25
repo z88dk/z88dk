@@ -1,23 +1,25 @@
 ;
 ; 	ANSI Video handling for the Sanyo computers
+;
+;	Stefano Bodrato - 2023
+;
 
 ; in:	A = text row number
 
         SECTION code_clib
 		
-		EXTERN __console_h
+        PUBLIC  ansi_del_line
         EXTERN    mbc_sendchar
 
-        PUBLIC  ansi_del_line
 
 ansi_del_line:
-		; place cursor at the bottom row..
+		ld h,a
 		ld l,27
 		call mbc_sendchar
 		ld l,'='
 		call mbc_sendchar
-		ld a,(__console_h)
-		add 32
+		ld a,32
+		add h
 		ld l,a
 		call mbc_sendchar
 		ld l,32
