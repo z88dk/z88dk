@@ -782,7 +782,6 @@ mz_clib.lib:
 	@echo ''
 	@echo '--- Building Sharp MZ Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C target/mz
 	$(MAKE) -C games TARGET=mz
 	$(call buildgeneric,mz)
@@ -968,7 +967,6 @@ mtx_clib.lib:
 	@echo ''
 	@echo '--- Building Memotech MTX Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(call buildgeneric,mtx)
 	$(MAKE) -C target/mtx
 	$(MAKE) -C games TARGET=mtx
@@ -1027,7 +1025,6 @@ einstein.lib:
 	@echo ''
 	@echo '--- Building Tatung Einstein Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/mc6845 TARGET=einstein
@@ -1096,7 +1093,6 @@ adam.lib:
 	@echo ''
 	@echo '--- Building Coleco Adam Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=cpm SUBTYPE=coleco
 	$(MAKE) -C video/tms9918 TARGET=coleco
 	$(MAKE) -C gfx TARGET=coleco FLAVOUR=narrow
@@ -1108,7 +1104,6 @@ m5_clib.lib:
 	@echo ''
 	@echo '--- Building SORD M5 Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=m5
 	$(call buildgeneric,m5)
 	$(MAKE) -C video/tms9918 TARGET=m5
@@ -1339,7 +1334,6 @@ spc1000_clib.lib:
 	@echo ''
 	@echo '--- Building Samsung SPC-1000 Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(call buildgeneric,spc1000)
 	$(MAKE) -C video/tms9918 TARGET=spc1000
 	$(MAKE) -C games TARGET=spc1000
@@ -1359,7 +1353,6 @@ pv2000_clib.lib:
 	@echo ''
 	@echo '--- Building Casio PV-2000 Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=pv2000
 	$(call buildgeneric,pv2000)
 	$(MAKE) -C games TARGET=pv2000
@@ -1371,7 +1364,6 @@ myvision_clib.lib:
 	@echo ''
 	@echo '--- Building Nichibutsu My Vision Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=myvision
 	$(call buildgeneric,myvision)
 	$(MAKE) -C games TARGET=myvision
@@ -1392,7 +1384,6 @@ coleco_clib.lib:
 	@echo ''
 	@echo '--- Building Colecovision Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=coleco
 	$(call buildgeneric,coleco)
 	$(MAKE) -C video/tms9918 TARGET=coleco
@@ -1411,7 +1402,6 @@ pencil2_clib.lib:
 	@echo ''
 	@echo '--- Building Pencil II Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=pencil2
 	$(call buildgeneric,pencil2)
 	$(MAKE) -C video/tms9918 TARGET=pencil2
@@ -1422,7 +1412,6 @@ lm80c_clib.lib:
 	@echo ''
 	@echo '--- Building LM80-C Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=lm80c
 	$(call buildgeneric,lm80c)
 	$(MAKE) -C target/lm80c
@@ -1434,7 +1423,6 @@ nabu_clib.lib:
 	@echo ''
 	@echo '--- Building Nabu Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=nabu
 	$(call buildgeneric,nabu)
 	$(MAKE) -C target/nabu
@@ -1445,7 +1433,6 @@ nabu_cpm.lib:
 	@echo ''
 	@echo '--- Building Nabu CP/M Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=nabu
 	$(call buildgeneric,nabu)
 	$(MAKE) -C target/nabu
@@ -1668,7 +1655,6 @@ sms_clib.lib:
 	@echo ''
 	@echo '--- Building Sega Master System Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=sms
 	$(call buildgeneric,sms)
 	$(MAKE) -C video/tms9918 TARGET=sms
@@ -1679,7 +1665,6 @@ sc3000_clib.lib:
 	@echo ''
 	@echo '--- Building SC-3000 System Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=sc3000
 	$(call buildgeneric,sc3000)
 	$(MAKE) -C video/tms9918 TARGET=sc3000
