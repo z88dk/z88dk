@@ -169,6 +169,11 @@ include adt-newlib/adtnewlib.mak
 include algorithm/AStarSearch/astar.mak
 include arch/z80/z80.mak
 include assert/assert.mak
+include compress/aplib/aplib.mak
+include compress/zx0/zx0.mak
+include compress/zx1/zx1.mak
+include compress/zx2/zx2.mak
+include compress/zx7/zx7.mak
 include ctype/ctype.mak
 include debug/debug.mak
 include font/font_4x8/font_4x8.mak
@@ -198,7 +203,6 @@ endef
 define buildcrt
 	$(MAKE) -C stdio
 	$(MAKE) -C interrupts
-	$(MAKE) -C compress
 	$(MAKE) -C alloc
 	$(MAKE) -C z80_crt0s
 	$(MAKE) -C gfx/x11
@@ -2105,7 +2109,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C games clean
 	$(MAKE) -C math clean
-	$(MAKE) -C compress clean
 	$(MAKE) -C target clean
 	$(MAKE) -C video clean
 	$(MAKE) -C gfx clean
