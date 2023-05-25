@@ -14,11 +14,11 @@ regex: $(REGEX_OBJS)
 .PHONY: regex regex-clean
 
 $(eval $(call buildbit,regex,z80,test))
-$(eval $(call buildbit,regex,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,regex,8080,test,-clib=8080))
-$(eval $(call buildbit,regex,gbz80,test,-clib=gbz80))
-$(eval $(call buildbit,regex,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,regex,z80n,test,-clib=z80n))
+$(eval $(call buildbit,regex,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,regex,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,regex,gbz80,test,-clib=gbz80,-mgbz80))
+$(eval $(call buildbit,regex,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,regex,z80n,test,-clib=z80n,-mz80n))
 
 
 regex-clean:

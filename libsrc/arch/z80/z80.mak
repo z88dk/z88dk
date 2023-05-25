@@ -27,9 +27,9 @@ arch-z80: $(ARCHZ80_OBJS) $(ARCHZ80_NEWLIB_TARGETS)
 .PHONY: arch/z80 arch/z80-clean
 
 $(eval $(call buildbit,arch/z80,z80,test))
-$(eval $(call buildbit,arch/z80,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,arch/z80,z80n,test,-clib=z80n))
-$(eval $(call buildbit,arch/z80,r2k,test,-clib=rabbit))
+$(eval $(call buildbit,arch/z80,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,arch/z80,z80n,test,-clib=z80n,-mz80n))
+$(eval $(call buildbit,arch/z80,r2k,test,-clib=rabbit,-mr2ka))
 
 
 arch/z80/obj/newlib-z80-arch-z80: $(ARCHZ80_NEWLIBGLOBS_ex)

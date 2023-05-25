@@ -14,11 +14,11 @@ input: $(INPUT_OBJS)
 .PHONY: input input-clean
 
 $(eval $(call buildbit,input,z80,test))
-$(eval $(call buildbit,input,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,input,8080,test,-clib=8080))
-$(eval $(call buildbit,input,gbz80,test,-clib=gbz80))
-$(eval $(call buildbit,input,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,input,z80n,test,-clib=z80n))
+$(eval $(call buildbit,input,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,input,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,input,gbz80,test,-clib=gbz80,-mgbz80))
+$(eval $(call buildbit,input,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,input,z80n,test,-clib=z80n,-mz80n))
 
 
 

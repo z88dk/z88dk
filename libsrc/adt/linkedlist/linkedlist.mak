@@ -16,9 +16,9 @@ adt-linkedlist: $(LINKEDLIST_OBJS) $(LINKEDLIST_NEWLIB_TARGETS)
 .PHONY: adt-linkedlist adt-linkedlist-clean
 
 $(eval $(call buildbit,adt/linkedlist,z80,test))
-$(eval $(call buildbit,adt/linkedlist,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,adt/linkedlist,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,adt/linkedlist,z80n,test,-clib=z80n))
+$(eval $(call buildbit,adt/linkedlist,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,adt/linkedlist,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,adt/linkedlist,z80n,test,-clib=z80n,-mz80n))
 
 
 adt-linkedlist-clean:

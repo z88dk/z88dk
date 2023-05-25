@@ -25,11 +25,11 @@ strings: $(STRINGS_OBJS) $(STRINGS_NEWLIB_TARGETS)
 .PHONY: strings strings-clean
 
 $(eval $(call buildbit,strings,z80,test))
-$(eval $(call buildbit,strings,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,strings,8080,test,-clib=8080))
-$(eval $(call buildbit,strings,gbz80,test,-clib=gbz80))
-$(eval $(call buildbit,strings,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,strings,z80n,test,-clib=z80n))
+$(eval $(call buildbit,strings,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,strings,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,strings,gbz80,test,-clib=gbz80,-mgbz80))
+$(eval $(call buildbit,strings,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,strings,z80n,test,-clib=z80n,-mz80n))
 
 
 strings/obj/newlib-z80-strings: $(STRINGS_NEWLIBGLOBS_ex)

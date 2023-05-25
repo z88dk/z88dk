@@ -14,11 +14,11 @@ rect: $(RECT_OBJS)
 .PHONY: rect rect-clean
 
 $(eval $(call buildbit,rect,z80,test))
-$(eval $(call buildbit,rect,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,rect,8080,test,-clib=8080))
-$(eval $(call buildbit,rect,gbz80,test,-clib=gbz80))
-$(eval $(call buildbit,rect,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,rect,z80n,test,-clib=z80n))
+$(eval $(call buildbit,rect,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,rect,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,rect,gbz80,test,-clib=gbz80,-mgbz80))
+$(eval $(call buildbit,rect,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,rect,z80n,test,-clib=z80n,-mz80n))
 
 
 rect-clean:

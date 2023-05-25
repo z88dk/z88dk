@@ -14,9 +14,9 @@ debug: $(DEBUG_OBJS)
 .PHONY: debug debug-clean
 
 $(eval $(call buildbit,debug,z80,test))
-$(eval $(call buildbit,debug,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,debug,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,debug,z80n,test,-clib=z80n))
+$(eval $(call buildbit,debug,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,debug,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,debug,z80n,test,-clib=z80n,-mz80n))
 
 
 debug-clean:

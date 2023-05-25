@@ -62,11 +62,11 @@ stdlib: $(STDLIB_OBJS) $(STDLIB_NEWLIB_TARGETS)
 .PHONY: stdlib stdlib-clean
 
 $(eval $(call buildbit,stdlib,z80,test))
-$(eval $(call buildbit,stdlib,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,stdlib,8080,test,-clib=8080))
-$(eval $(call buildbit,stdlib,gbz80,test,-clib=gbz80))
-$(eval $(call buildbit,stdlib,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,stdlib,z80n,test,-clib=z80n))
+$(eval $(call buildbit,stdlib,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,stdlib,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,stdlib,gbz80,test,-clib=gbz80,-mgbz80))
+$(eval $(call buildbit,stdlib,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,stdlib,z80n,test,-clib=z80n,-mz80n))
 
 
 stdlib/obj/newlib-z80-stdlib: $(STDLIB_NEWLIBGLOBS_ex)

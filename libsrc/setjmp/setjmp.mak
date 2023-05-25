@@ -14,11 +14,11 @@ setjmp: $(SETJMP_OBJS)
 .PHONY: setjmp setjmp-clean
 
 $(eval $(call buildbit,setjmp,z80,test))
-$(eval $(call buildbit,setjmp,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,setjmp,8080,test,-clib=8080))
-$(eval $(call buildbit,setjmp,gbz80,test,-clib=gbz80))
-$(eval $(call buildbit,setjmp,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,setjmp,z80n,test,-clib=z80n))
+$(eval $(call buildbit,setjmp,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,setjmp,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,setjmp,gbz80,test,-clib=gbz80,-mgbz80))
+$(eval $(call buildbit,setjmp,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,setjmp,z80n,test,-clib=z80n,-mz80n))
 
 
 setjmp-clean:

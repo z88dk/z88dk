@@ -16,9 +16,9 @@ algorithm-astar: $(ASTAR_OBJS) $(ASTAR_NEWLIB_TARGETS)
 .PHONY: algorithm-start algorithm-astar-clean
 
 $(eval $(call buildbit,algorithm/AStarSearch,z80,test))
-$(eval $(call buildbit,algorithm/AStarSearch,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,algorithm/AStarSearch,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,algorithm/AStarSearch,z80n,test,-clib=z80n))
+$(eval $(call buildbit,algorithm/AStarSearch,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,algorithm/AStarSearch,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,algorithm/AStarSearch,z80n,test,-clib=z80n,-mz80n))
 
 
 algorithm/AStarSearch/obj/%:

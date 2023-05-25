@@ -14,11 +14,11 @@ assert: $(ASSERT_OBJS)
 .PHONY: assert assert-clean
 
 $(eval $(call buildbit,assert,z80,test))
-$(eval $(call buildbit,assert,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,assert,8080,test,-clib=8080))
-$(eval $(call buildbit,assert,gbz80,test,-clib=gbz80))
-$(eval $(call buildbit,assert,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,assert,z80n,test,-clib=z80n))
+$(eval $(call buildbit,assert,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,assert,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,assert,gbz80,test,-clib=gbz80,mgbz80))
+$(eval $(call buildbit,assert,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,assert,z80n,test,-clib=z80n,-mz80n))
 
 
 assert-clean:

@@ -16,9 +16,9 @@ adt-queue: $(QUEUE_OBJS) $(QUEUE_NEWLIB_TARGETS)
 .PHONY: adt-queue adt-queue-clean
 
 $(eval $(call buildbit,adt/queue,z80,test))
-$(eval $(call buildbit,adt/queue,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,adt/queue,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,adt/queue,z80n,test,-clib=z80n))
+$(eval $(call buildbit,adt/queue,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,adt/queue,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,adt/queue,z80n,test,-clib=z80n,-mz80n))
 
 
 adt-queue-clean:

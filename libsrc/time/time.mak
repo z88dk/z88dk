@@ -20,11 +20,11 @@ time: $(TIME_OBJS) $(TIME_NEWLIB_TARGETS)
 .PHONY: time time-clean
 
 $(eval $(call buildbit,time,z80,test))
-$(eval $(call buildbit,time,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,time,8080,test,-clib=8080))
-$(eval $(call buildbit,time,gbz80,test,-clib=gbz80))
-$(eval $(call buildbit,time,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,time,z80n,test,-clib=z80n))
+$(eval $(call buildbit,time,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,time,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,time,gbz80,test,-clib=gbz80,-mgbz80))
+$(eval $(call buildbit,time,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,time,z80n,test,-clib=z80n,-mz80n))
 
 
 time/obj/newlib-z80-time: $(TIME_NEWLIBGLOBS_ex)

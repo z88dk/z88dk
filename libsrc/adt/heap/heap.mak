@@ -16,9 +16,9 @@ adt-heap: $(HEAP_OBJS) $(HEAP_NEWLIB_TARGETS)
 .PHONY: adt-heap adt-heap-clean
 
 $(eval $(call buildbit,adt/heap,z80,test))
-$(eval $(call buildbit,adt/heap,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,adt/heap,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,adt/heap,z80n,test,-clib=z80n))
+$(eval $(call buildbit,adt/heap,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,adt/heap,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,adt/heap,z80n,test,-clib=z80n,-mz80n))
 
 
 adt-heap-clean:

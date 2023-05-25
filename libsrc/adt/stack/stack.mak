@@ -16,9 +16,9 @@ adt-stack: $(STACK_OBJS) $(STACK_NEWLIB_TARGETS)
 .PHONY: adt-stack adt-stack-clean
 
 $(eval $(call buildbit,adt/stack,z80,test))
-$(eval $(call buildbit,adt/stack,ixiy,test,-Ca-IXIY))
-$(eval $(call buildbit,adt/stack,r2k,test,-clib=rabbit))
-$(eval $(call buildbit,adt/stack,z80n,test,-clib=z80n))
+$(eval $(call buildbit,adt/stack,ixiy,test,-Ca-IXIY,-IXIY))
+$(eval $(call buildbit,adt/stack,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,adt/stack,z80n,test,-clib=z80n,-mz80n))
 
 
 adt-stack-clean:
