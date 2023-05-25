@@ -162,6 +162,7 @@ dirs: $(DIRS)
 .PHONY: dirs
 
 include adt-newlib/adtnewlib.mak
+include arch/z80/z80.mak
 include assert/assert.mak
 include ctype/ctype.mak
 include debug/debug.mak
@@ -196,7 +197,6 @@ define buildcrt
 	$(MAKE) -C alloc
 	$(MAKE) -C adt
 	$(MAKE) -C algorithm
-	$(MAKE) -C arch
 	$(MAKE) -C z80_crt0s
 	$(MAKE) -C gfx/x11
 	$(MAKE) -C gfx/portable
@@ -2105,7 +2105,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C games clean
 	$(MAKE) -C math clean
 	$(MAKE) -C compress clean
-	$(MAKE) -C arch clean
 	$(MAKE) -C target clean
 	$(MAKE) -C video clean
 	$(MAKE) -C gfx clean
