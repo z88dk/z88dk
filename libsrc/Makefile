@@ -162,6 +162,7 @@ dirs: $(DIRS)
 .PHONY: dirs
 
 include adt-newlib/adtnewlib.mak
+include algorithm/AStarSearch/astar.mak
 include arch/z80/z80.mak
 include assert/assert.mak
 include ctype/ctype.mak
@@ -196,7 +197,6 @@ define buildcrt
 	$(MAKE) -C compress
 	$(MAKE) -C alloc
 	$(MAKE) -C adt
-	$(MAKE) -C algorithm
 	$(MAKE) -C z80_crt0s
 	$(MAKE) -C gfx/x11
 	$(MAKE) -C gfx/portable
@@ -2096,7 +2096,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C z80_crt0s clean
 	$(MAKE) -C adt clean
 	$(MAKE) -C alloc clean
-	$(MAKE) -C algorithm clean
 	$(MAKE) -C lib3d clean
 	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean
