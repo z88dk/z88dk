@@ -13,7 +13,7 @@ CLEAN += algorithm-astar-clean
 
 algorithm-astar: $(ASTAR_OBJS) $(ASTAR_NEWLIB_TARGETS)
 
-.PHONY: algorithm/AStarSearch algorithm/AStarSearch-clean
+.PHONY: algorithm-start algorithm-astar-clean
 
 $(eval $(call buildbit,algorithm/AStarSearch,z80,test))
 $(eval $(call buildbit,algorithm/AStarSearch,ixiy,test,-Ca-IXIY))
