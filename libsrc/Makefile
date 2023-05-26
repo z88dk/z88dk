@@ -755,7 +755,7 @@ cpm_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=gsx FLAVOUR=wide
 	TARGET=gsx TYPE=z80 $(LIBLINKER) -DFORcpm -DFORgsx -x$(OUTPUT_DIRECTORY)/gfxgsx @$(TARGET_DIRECTORY)/cpm/gfxgsx.lst
 
-cpm8080_clib.lib: $(TARGET_CLIB_OBJS)
+cpm8080_clib.lib: $(TARGET_CLIB_OBJS) cpm_clib.lib
 	@echo ''
 	@echo '--- Building CP/M Library (8080)---'
 	@echo ''
@@ -2014,63 +2014,63 @@ z80_crt0.lib: $(DIRS) $(OBJS)
 	$(call buildcrt)
 	TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
 
-z80iy_crt0.lib: $(DIRS) $(OBJS)
+z80iy_crt0.lib: $(DIRS) $(OBJS) z80_crt0.lib
 	@echo ''
 	@echo '--- Building ixiy crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=ixiy $(LIBLINKER) -mz80 -IXIY -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80iy_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
 
-8080_crt0.lib: $(DIRS) $(OBJS)
+8080_crt0.lib: $(DIRS) $(OBJS) z80iy_crt0.lib
 	@echo ''
 	@echo '--- Building 8080 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8080_crt0 @$(LISTFILE_DIRECTORY)/8080.lst
 
-8080_opt.lib: $(DIRS) $(OBJS)
+8080_opt.lib: $(DIRS) $(OBJS) 8080_crt0.lib
 	@echo ''
 	@echo '--- Building 8080 optimised crt routines---'
 	@echo ''
 	$(MAKE) -C z80_crt0s
 	TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8080_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-8085_opt.lib: $(DIRS) $(OBJS)
+8085_opt.lib: $(DIRS) $(OBJS) 8080_opt.lib
 	@echo ''
 	@echo '--- Building 8085 optimised crt routines---'
 	@echo ''
 	$(MAKE) -C z80_crt0s
 	TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8085_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-z180_opt.lib: $(DIRS) $(OBJS)
+z180_opt.lib: $(DIRS) $(OBJS) 8085_opt.lib
 	@echo ''
 	@echo '--- Building z180 optimised crt routines---'
 	@echo ''
 	$(MAKE) -C z80_crt0s
 	TYPE=z180 $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z180_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-ez80_opt.lib: $(DIRS) $(OBJS)
+ez80_opt.lib: $(DIRS) $(OBJS) z180_opt.lib
 	@echo ''
 	@echo '--- Building ez80 optimised crt routines---'
 	@echo ''
 	$(MAKE) -C z80_crt0s
 	TYPE=ez80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ez80_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-z80n_crt0.lib: $(DIRS) $(OBJS)
+z80n_crt0.lib: $(DIRS) $(OBJS) ez80_opt.lib
 	@echo ''
 	@echo '--- Building z80n crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=z80n $(LIBLINKER) -mz80n -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80n_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
 
-gbz80_crt0.lib: $(DIRS) $(OBJS)
+gbz80_crt0.lib: $(DIRS) $(OBJS) z80n_crt0.lib
 	@echo ''
 	@echo '--- Building gbz80 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=gbz80 $(LIBLINKER) -mgbz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gbz80_crt0 @$(LISTFILE_DIRECTORY)/gbz80.lst
 
-r2k_crt0.lib: $(DIRS) $(OBJS)
+r2k_crt0.lib: $(DIRS) $(OBJS) gbz80_crt0.lib
 	@echo ''
 	@echo '--- Building r2k crt Library ---'
 	@echo ''
