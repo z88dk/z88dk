@@ -451,7 +451,7 @@ pps_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(TARGET_DIRECTORY)/pps/pps.lst
 
 # Epson PX4 lib - Stefano
-px4.lib:
+px4.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building PX-4/HC-40 Library ---'
 	@echo ''
@@ -459,7 +459,7 @@ px4.lib:
 	TARGET=px4 TYPE=z80 $(LIBLINKER) -DFORpx4 -x$(OUTPUT_DIRECTORY)/px4 @$(TARGET_DIRECTORY)/px4/px4.lst
 
 # Epson PX8 lib - Stefano
-px8.lib:
+px8.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building PX-8/Geneva Library ---'
 	@echo ''
@@ -467,11 +467,10 @@ px8.lib:
 	TARGET=px8 TYPE=z80 $(LIBLINKER) -DFORpx8 -x$(OUTPUT_DIRECTORY)/px8 @$(TARGET_DIRECTORY)/px8/px8.lst
 
 # Visual 1050 library - Stefano
-v1050.lib:
+v1050.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Visual 1050 Library (CP/M) ---'
 	@echo ''
-	$(call buildgeneric,cpm)
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=v1050
 	TARGET=v1050 TYPE=z80 $(LIBLINKER) -DFORv1050 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/v1050.lib @$(TARGET_DIRECTORY)/v1050/v1050.lst
 
@@ -675,7 +674,7 @@ ozansi_clib.lib: $(TARGET_CLIB_OBJS)
 
 # CPM lib - Stefano/dom
 
-gfxkp.lib:
+gfxkp.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Kaypro graphics Library ---'
 	@echo ''
@@ -684,7 +683,7 @@ gfxkp.lib:
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=kaypro83
 	TARGET=kaypro83 TYPE=z80 $(LIBLINKER) -DFORkaypro83 -I$(Z88DK_LIB) -x$(OUTPUT_DIRECTORY)/gfxkp83 @$(TARGET_DIRECTORY)/kaypro83/gfxkp83.lst
 
-attache.lib:
+attache.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Otrona Attache Library ---'
 	@echo ''
@@ -693,7 +692,7 @@ attache.lib:
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=attache
 	TARGET=attache TYPE=z80 $(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/attache @$(TARGET_DIRECTORY)/attache/attache.lst
 
-bondwell.lib:
+bondwell.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Bondwell 12/14 Library ---'
 	@echo ''
@@ -702,7 +701,7 @@ bondwell.lib:
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=bondwell
 	TARGET=bondwell TYPE=z80 $(LIBLINKER) -DFORbondwell -x$(OUTPUT_DIRECTORY)/bondwell @$(TARGET_DIRECTORY)/bondwell/bw.lst
 
-bondwell2.lib:
+bondwell2.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Bondwell 2 Library ---'
 	@echo ''
@@ -711,21 +710,21 @@ bondwell2.lib:
 	$(MAKE) -C video/msm6255 TARGET=cpm SUBTYPE=bondwell2
 	TARGET=bondwell2 TYPE=ixiy $(LIBLINKER) -IXIY -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(TARGET_DIRECTORY)/bondwell2/bw2.lst
 
-gfxosborne1.lib:
+gfxosborne1.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Osborne 1 graphics Library ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=osborne1
 	TARGET=osborne1 TYPE=z80 $(LIBLINKER) -DFORosborne1 -x$(OUTPUT_DIRECTORY)/gfxosborne1 @$(TARGET_DIRECTORY)/osborne1/gfxosborne1.lst
 
-rc700.lib:
+rc700.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building RC-700 Library ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=rc700
 	TARGET=rc700 TYPE=z80 $(LIBLINKER) -DFORrc700 -x$(OUTPUT_DIRECTORY)/rc700 @$(TARGET_DIRECTORY)/rc700/rc700.lst
 
-x1_cpm.lib:
+x1_cpm.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Sharp X1 Library ---'
 	@echo ''
@@ -733,7 +732,7 @@ x1_cpm.lib:
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=x1
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(TARGET_DIRECTORY)/x1/x1_common.lst
 
-x820ii.lib:
+x820ii.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Xerox 820 II Library ---'
 	@echo ''
@@ -894,11 +893,10 @@ microbee.lib:
 	TARGET=beehr512 TYPE=z80 $(LIBLINKER) -DFORbeehr512 -x$(OUTPUT_DIRECTORY)/gfxbee512.lib @$(TARGET_DIRECTORY)/bee/beegfxhr512.lst
 
 # Gemini Galaxy library - Stefano
-gemini.lib:
+gemini.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Gemini Galaxy Library (CP/M & graphics) ---'
 	@echo ''
-	$(call buildgeneric,cpm)
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="narrow" SUBTYPE=gemini
 	TARGET=gemini TYPE=z80 $(LIBLINKER) -DFORgemini -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gemini.lib @$(TARGET_DIRECTORY)/gemini/gemini.lst
 
@@ -1076,7 +1074,7 @@ smc777_cpm.lib:
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_cpm @$(TARGET_DIRECTORY)/smc777/smc777_cpm.lst
 
 # A5105 library
-bic.lib:
+bic.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building A5105 Library ---'
 	@echo ''
@@ -1085,7 +1083,7 @@ bic.lib:
 	TARGET=bic TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORbic -x$(OUTPUT_DIRECTORY)/bic @$(TARGET_DIRECTORY)/bic/bic.lst
 
 # QX10 library
-qx10.lib:
+qx10.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Epsom qx10 Library ---'
 	@echo ''
@@ -1095,7 +1093,7 @@ qx10.lib:
 
 
 # Coleco Adam library
-adam.lib:
+adam.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Coleco Adam Library ---'
 	@echo ''
@@ -1116,11 +1114,10 @@ m5_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(TARGET_DIRECTORY)/m5/m5.lst
 
 # Sanyo MBC-200 library - Stefano
-mbc200.lib:
+mbc200.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Sanyo MBC-200 Library (CP/M) ---'
 	@echo ''
-	$(call buildgeneric,cpm)
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=mbc200
 	$(MAKE) -C games TARGET=cpm SUBTYPE=mbc200
 	TARGET=mbc200 TYPE=z80 $(LIBLINKER) -DFORmbc200 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mbc200.lib @$(TARGET_DIRECTORY)/mbc200/mbc200.lst
@@ -1435,7 +1432,7 @@ nabu_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C video/tms9918 TARGET=nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_clib @$(TARGET_DIRECTORY)/nabu/nabu.lst
 
-nabu_cpm.lib:
+nabu_cpm.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Nabu CP/M Library ---'
 	@echo ''
@@ -1531,7 +1528,7 @@ cpc_math.lib:
 	$(MAKE) -C math/cpcmath
 
 # Amstrad PCW libraries - Stefano
-pcw.lib:
+pcw.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Amstrad PCW Library ---'
 	@echo ''
@@ -1601,11 +1598,10 @@ newbrain_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_cpm @$(TARGET_DIRECTORY)/newbrain/newbrain_cpm.lst
 
 # TIKI-100 library - Stefano
-tiki100.lib:
+tiki100.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building TIKI-100 Library ---'
 	@echo ''
-	$(call buildgeneric,cpm)
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=tiki100
 	$(MAKE) -C psg TARGET=cpm SUBTYPE=tiki100
 	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(TARGET_DIRECTORY)/tiki100/tiki100.lst
