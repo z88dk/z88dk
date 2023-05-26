@@ -324,8 +324,9 @@ static disc_spec mz2500cpm_spec = {
 };
 
 
-static disc_spec ts803_spec = {
-    .name = "TS803",
+static disc_spec televideo_spec = {
+    .name = "Televideo",
+    .disk_mode = MFM250,
     .sectors_per_track = 18,
     .tracks = 40,
     .sides = 2,
@@ -864,7 +865,7 @@ static struct formats {
     { "svi-40ss",  "SVI 40ss (174k)",       &svi40ss_spec, 0, NULL, 1 },
     { "tiki100ss", "Tiki 100 (200k)",       &tiki100_ss_spec, 0, NULL, 1 },
     { "tiki100ds", "Tiki 100 (400k)",       &tiki100_ds_spec, 0, NULL, 1 },
-    { "ts803",     "Televideo TS803/TPC1",  &ts803_spec, 0, NULL, 1 },
+    { "televideo", "Televideo TS80x/TPC1",  &televideo_spec, 0, NULL, 1 },
     { "vector06c", "Vector 06c",            &vector06c_spec, 0, NULL, 1 },
     { "v1050",     "Visual 1050",           &v1050_spec, 0, NULL, 1 },
     { "x820",      "Xerox 820",             &x820_spec, 0, NULL, 1 },
