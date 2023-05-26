@@ -193,6 +193,7 @@ include interrupts/nmi/nmi.mak
 include libgen/libgen.mak
 include rect/rect.mak
 include regex/regex.mak
+include sdcard/sdcard.mak
 include setjmp/setjmp.mak
 include strings/strings.mak
 include stdlib/stdlib.mak
@@ -200,7 +201,8 @@ include time/time.mak
 
 
 # Targets depend on some common code + target specific (include stdio in here)
-TARGET_CLIB_OBJS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS)
+# Depend on z80_crt0.lib as a proxy for stdio (temporary)
+TARGET_CLIB_OBJS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) z80_crt0.lib
 
 # Arg1: target
 # Arg2: Graphics flavour
@@ -497,7 +499,7 @@ zx80_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) zx81deps
 
 # ZX81 lib - Stefano
-zx81_clib.lib: $(TARGET_CLIB_OBJS)
+zx81_clib.lib: $(TARGET_CLIB_OBJS) zx80_clib.lib
 	@echo ''
 	@echo '--- Building ZX81 Library ---'
 	@echo ''
@@ -508,7 +510,7 @@ zx81_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) zx81deps
 
 # Lambda 8300 lib - Stefano
-lambda_clib.lib: $(TARGET_CLIB_OBJS)
+lambda_clib.lib: $(TARGET_CLIB_OBJS) zx81_clib.lib
 	@echo ''
 	@echo '--- Building Lambda 8300 Library ---'
 	@echo ''
@@ -519,7 +521,7 @@ lambda_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) zx81deps
 
 # ZX81 std graphics lib - Stefano
-gfx81.lib: $(TARGET_CLIB_OBJS)
+gfx81.lib: $(TARGET_CLIB_OBJS) lambda_clib.lib
 	@echo ''
 	@echo '--- Building ZX81 Standard Graphics Library ---'
 	@echo ''
@@ -535,7 +537,7 @@ gfx81.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) zx81deps
 
 # Lambda 8300 graphics lib - Stefano
-gfxlambda.lib: $(TARGET_CLIB_OBJS)
+gfxlambda.lib: $(TARGET_CLIB_OBJS) gfx81.lib
 	@echo ''
 	@echo '--- Building Lambda 8300 Graphics Library ---'
 	@echo ''
@@ -545,7 +547,7 @@ gfxlambda.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) zx81deps
 
 # ZX81 UDG based graphics lib - Stefano
-gfx81udg.lib: $(TARGET_CLIB_OBJS)
+gfx81udg.lib: $(TARGET_CLIB_OBJS) gfxlambda.lib
 	@echo ''
 	@echo '--- Building ZX81 UDG based Graphics Library ---'
 	@echo ''
@@ -555,7 +557,7 @@ gfx81udg.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) zx81deps
 
 # ZX81 HR graphics lib - Stefano
-gfx81hr64.lib: $(TARGET_CLIB_OBJS)
+gfx81hr64.lib: $(TARGET_CLIB_OBJS) gfx81udg.lib
 	@echo ''
 	@echo '--- Building ZX81 High Resolution Libraries (64 rows)  ---'
 	@echo ''
@@ -570,7 +572,7 @@ gfx81hr64.lib: $(TARGET_CLIB_OBJS)
 	TARGET=zx81mt64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81mt64 -DMTHRG -x$(OUTPUT_DIRECTORY)/gfx81mt64 @$(TARGET_DIRECTORY)/zx81/gfx81mt.lst
 	$(MAKE) zx81deps
 
-gfx81hr192.lib: $(TARGET_CLIB_OBJS)
+gfx81hr192.lib: $(TARGET_CLIB_OBJS) gfx81hr64.lib
 	@echo ''
 	@echo '--- Building ZX81 High Resolution Libraries (192 rows)  ---'
 	@echo ''
@@ -860,7 +862,7 @@ gfxaq48.lib: $(TARGET_CLIB_OBJS)
 	TARGET=aq48 TYPE=z80 $(LIBLINKER) -DFORaq48 -x$(OUTPUT_DIRECTORY)/gfxaq48 @$(TARGET_DIRECTORY)/aquarius/gfxaq48.lst
 
 # Aussie Byte library - Stefano
-aussie.lib:
+aussie.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Aussie Byte Library ---'
 	@echo ''
@@ -877,7 +879,7 @@ bee_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C games TARGET=bee
 	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/bee_clib.lib @$(TARGET_DIRECTORY)/bee/bee.lst
 
-microbee.lib:
+microbee.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building MicroBee Library (CP/M & graphics) ---'
 	@echo ''
@@ -929,7 +931,7 @@ sam_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(TARGET_DIRECTORY)/sam/sam.lst
 
 # Spectravideo SVI library - Stefano
-svi_clib.lib: $(TARGET_CLIB_OBJS)
+svi_clib.lib: $(TARGET_CLIB_OBJS) msx_clib.lib
 	@echo ''
 	@echo '--- Building Spectravideo Library ---'
 	@echo ''
@@ -989,7 +991,7 @@ tvc_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_clib @$(TARGET_DIRECTORY)/tvc/tvc.lst
 
 # Videoton TV Computer ROM implemented graphics library - Sandor
-tvc_romgfx.lib:
+tvc_romgfx.lib: tvc_clib.lib
 	@echo ''
 	@echo '--- Building Videoton TV Computer ROM based Gfx Library ---'
 	@echo ''
@@ -1025,7 +1027,7 @@ gfxephr.lib: $(TARGET_CLIB_OBJS)
 	TARGET=enterprisehr TYPE=z80 $(LIBLINKER) -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(TARGET_DIRECTORY)/enterprise/gfxephr.lst
 
 # Einstein library - Stefano
-einstein.lib:
+einstein.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Tatung Einstein Library ---'
 	@echo ''
@@ -1036,7 +1038,7 @@ einstein.lib:
 	$(MAKE) -C psg TARGET=cpm SUBTYPE=einstein
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(TARGET_DIRECTORY)/einstein/einstein.lst
 
-einstein256.lib:
+einstein256.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Einstein 256 video Library ---'
 	@echo ''
@@ -1063,7 +1065,7 @@ smc777_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C video/mc6845 TARGET=smc777
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_clib @$(TARGET_DIRECTORY)/smc777/smc777.lst
 
-smc777_cpm.lib:
+smc777_cpm.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Sony SMC-70/SMC-777 CP/M Library ---'
 	@echo ''
@@ -1393,7 +1395,7 @@ coleco_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -x$(OUTPUT_DIRECTORY)/coleco_clib @$(TARGET_DIRECTORY)/coleco/coleco.lst
 
 # Bit90 (colecovision clone + enhancements) - dom/stefano
-bit90.lib:
+bit90.lib: coleco_clib.lib
 	@echo ''
 	@echo '--- Building Bit-90 Library ---'
 	@echo ''
@@ -1442,7 +1444,7 @@ nabu_cpm.lib: cpm_clib.lib
 	$(MAKE) -C video/tms9918 TARGET=nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_cpm @$(TARGET_DIRECTORY)/nabu/nabu_cpm.lst
 
-nabu_int.lib:
+nabu_int.lib: nabu_clib.lib
 	@echo ''
 	@echo '--- Building Nabu Interrupt Library ---'
 	@echo ''
@@ -1745,7 +1747,7 @@ gfxhrg1.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=hrg1
 	TARGET=hrg1 TYPE=z80 $(LIBLINKER) -DFORhrg1 -x$(OUTPUT_DIRECTORY)/gfxhrg1 @$(TARGET_DIRECTORY)/trs80/gfxhrg1.lst
 
-grafyx4_3.lib:
+grafyx4_3.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building GrafyxSolution (M4 on Model III) Libraries ---'
 	@echo ''
@@ -1753,7 +1755,7 @@ grafyx4_3.lib:
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=grafyx3
 	TARGET=grafyx3 TYPE=z80 $(LIBLINKER) -DFORgrafyx3 -x$(OUTPUT_DIRECTORY)/grafyx4_3 @$(TARGET_DIRECTORY)/trs80/grafyx.lst
 
-grafyx4.lib:
+grafyx4.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building GrafyxSolution (M4 on Model 4) Libraries ---'
 	@echo ''
@@ -2092,7 +2094,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
-	$(MAKE) -C sdcard clean
 	$(MAKE) -C games clean
 	$(MAKE) -C math clean
 	$(MAKE) -C target clean
