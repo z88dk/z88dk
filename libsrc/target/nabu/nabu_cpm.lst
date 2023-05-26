@@ -1,5 +1,5 @@
 @stdio/ansicore.lst
-@font/font_8x8/font_8x8.lst
+
 @video/tms9918/video_tms9918.lst
 @stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst

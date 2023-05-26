@@ -1,4 +1,4 @@
-@font/font_8x8/font_8x8.lst
+
 target/v1050/stdio/CRT_FONT.asm
 target/v1050/stdio/__v1050_byte
 target/v1050/stdio/asm_load_charset

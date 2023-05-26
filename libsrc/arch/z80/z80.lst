@@ -1,2 +1,1 @@
 arch/z80/obj/${TYPE}/**/*.o
-arch/z80/AsmCall.o

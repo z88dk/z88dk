@@ -10,7 +10,7 @@ target/laser500/stdio/conio_map_colour
 target/laser500/stdio/bordercolour
 target/laser500/stdio/CRT_FONT
 @stdio/stdio.lst
-@font/font_8x8/font_8x8.lst
+
 @input/input_keyboard.lst
 target/laser500/graphics/clg
 target/laser500/graphics/getmaxx

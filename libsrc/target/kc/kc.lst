@@ -7,7 +7,7 @@ target/kc/stdio/generic_console_vpeek
 target/kc/stdio/conio_map_colour
 target/kc/stdio/CRT_FONT
 @stdio/stdio_ixiy.lst
-@font/font_8x8/font_8x8.lst
+
 games/joystick
 target/kc/graphics/clg
 target/kc/graphics/w_pixladdr

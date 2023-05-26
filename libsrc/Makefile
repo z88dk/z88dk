@@ -151,8 +151,54 @@ TOCREATE += $(call check_target,zxn, zxn_clib.lib zxfcntl)
 
 TOCREATE += 
 
+OBJS = 
+DIRS =
+CLEAN = 
+
 all: $(GENLIBS) $(TOCREATE)
 
+dirs: $(DIRS)
+
+.PHONY: dirs
+
+include adt/heap/heap.mak
+include adt/linkedlist/linkedlist.mak
+include adt/queue/queue.mak
+include adt/stack/stack.mak
+include adt-newlib/adtnewlib.mak
+include algorithm/AStarSearch/astar.mak
+include alloc/balloc/balloc.mak
+include alloc/malloc-classic/malloc.mak
+include alloc/obstack/obstack.mak
+include arch/z80/z80.mak
+include assert/assert.mak
+include compress/aplib/aplib.mak
+include compress/zx0/zx0.mak
+include compress/zx1/zx1.mak
+include compress/zx2/zx2.mak
+include compress/zx7/zx7.mak
+include ctype/ctype.mak
+include debug/debug.mak
+include font/font_4x8/font_4x8.mak
+include font/font_8x8/font_8x8.mak
+include font/font_8x10/font_8x10.mak
+include font/fzx/fzx.mak
+include input/input.mak
+include interrupts/common/common.mak
+include interrupts/im1/im1.mak
+include interrupts/im2/im2.mak
+include interrupts/nmi/nmi.mak
+include libgen/libgen.mak
+include rect/rect.mak
+include regex/regex.mak
+include setjmp/setjmp.mak
+include strings/strings.mak
+include stdlib/stdlib.mak
+include time/time.mak
+
+
+# Targets depend on some common code + target specific (include stdio in here)
+TARGET_CLIB_OBJS = $(STDIO_OBJS)
 
 # Arg1: target
 # Arg2: Graphics flavour
@@ -163,28 +209,6 @@ endef
 
 define buildcrt
 	$(MAKE) -C stdio
-	$(MAKE) -C time
-	$(MAKE) -C font
-	$(MAKE) -C input
-	$(MAKE) -C stdlib
-	$(MAKE) -C ctype
-	$(MAKE) -C libgen
-	$(MAKE) -C strings
-	$(MAKE) -C interrupts
-	$(MAKE) -C regex
-	$(MAKE) -C setjmp
-	$(MAKE) -C debug
-	$(MAKE) -C assert
-	$(MAKE) -C font
-	$(MAKE) -C compress
-	$(MAKE) -C alloc
-	$(MAKE) -C adt
-	$(MAKE) -C adt-newlib
-	$(MAKE) -C algorithm
-	$(MAKE) -C rect
-	$(MAKE) -C arch
-	$(MAKE) -C stdlib
-	$(MAKE) -C time
 	$(MAKE) -C z80_crt0s
 	$(MAKE) -C gfx/x11
 	$(MAKE) -C gfx/portable
@@ -279,7 +303,7 @@ gendos.lib:
 	$(MAKE) -C fcntl/gen_rnd
 
 # micro8085 library - ahjelm
-micro8085_clib.lib:
+micro8085_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building micro8085 Library ---'
 	@echo ''
@@ -287,11 +311,12 @@ micro8085_clib.lib:
 	TARGET=micro8085 TYPE=8085 $(LIBLINKER) -m8085 -DFORmicro8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/micro8085_clib @$(TARGET_DIRECTORY)/micro8085/micro8085.lst
 
 # z88 library - dom
-z88_clib.lib:
+z88_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Z88 Library ---'
 	@echo ''
 	$(call buildgeneric,z88)
+	$(MAKE) -C alloc/farz88
 	$(MAKE) -C games TARGET=z88
 	$(MAKE) -C target/z88
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(TARGET_DIRECTORY)/z88/z88.lst
@@ -304,7 +329,7 @@ zxfcntl:
 # ansi flags
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-zx_clib.lib:
+zx_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
@@ -315,7 +340,7 @@ zx_clib.lib:
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(TARGET_DIRECTORY)/zx/zx.lst
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
 
-zxn_clib.lib:
+zxn_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building ZX Spectrum Next Library ---'
 	@echo ''
@@ -329,7 +354,7 @@ zxn_clib.lib:
 # 64/32 column library for TS2068 - dom/stefano/alvin
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-ts2068_clib.lib:
+ts2068_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building TS2068 (Spectrum clone) Library ---'
 	@echo ''
@@ -378,7 +403,7 @@ m2068.lib:
 	$(MAKE) -C math/zxmath m2068
 
 # PacMan lib - Stefano
-pacman_clib.lib:
+pacman_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building PacMan HW Library ---'
 	@echo ''
@@ -387,7 +412,7 @@ pacman_clib.lib:
 	TARGET=pacman TYPE=z80 $(LIBLINKER) -DFORpacman -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pacman_clib @$(TARGET_DIRECTORY)/pacman/pacman.lst
 
 # Philips P2000 lib - Stefano
-p2000_clib.lib:
+p2000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Philips P2000 Library ---'
 	@echo ''
@@ -396,7 +421,7 @@ p2000_clib.lib:
 	TARGET=p2000 TYPE=z80 $(LIBLINKER) -DFORp2000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/p2000_clib @$(TARGET_DIRECTORY)/p2000/p2000.lst
 
 # PC6001 lib - Stefano
-pc6001_clib.lib:
+pc6001_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building PC6001 Library ---'
 	@echo ''
@@ -405,7 +430,7 @@ pc6001_clib.lib:
 	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(TARGET_DIRECTORY)/pc6001/pc6001.lst
 
 # PC8801 lib - Stefano
-pc88_clib.lib:
+pc88_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building PC8801 Library ---'
 	@echo ''
@@ -415,7 +440,7 @@ pc88_clib.lib:
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(TARGET_DIRECTORY)/pc88/pc88.lst
 
 # Native for sprinter - dom
-pps_clib.lib:
+pps_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sprinter Library ---'
 	@echo ''
@@ -451,7 +476,7 @@ v1050.lib:
 	TARGET=v1050 TYPE=z80 $(LIBLINKER) -DFORv1050 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/v1050.lib @$(TARGET_DIRECTORY)/v1050/v1050.lst
 
 # VZ200/300 lib - Stefano
-vz_clib.lib:
+vz_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building VZ200/300 Library ---'
 	@echo ''
@@ -461,7 +486,7 @@ vz_clib.lib:
 
 
 # ZX80 lib - Stefano
-zx80_clib.lib:
+zx80_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building ZX80 Library ---'
 	@echo ''
@@ -473,7 +498,7 @@ zx80_clib.lib:
 	$(MAKE) zx81deps
 
 # ZX81 lib - Stefano
-zx81_clib.lib:
+zx81_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building ZX81 Library ---'
 	@echo ''
@@ -484,7 +509,7 @@ zx81_clib.lib:
 	$(MAKE) zx81deps
 
 # Lambda 8300 lib - Stefano
-lambda_clib.lib:
+lambda_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Lambda 8300 Library ---'
 	@echo ''
@@ -592,7 +617,7 @@ mlambda_tiny.lib:
 
 # Texas Instrument's calculators: - stefano/henk
 # almost the same lib code with different -D flag set
-ti82_clib.lib:
+ti82_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building TI82 Library ---'
 	@echo ''
@@ -601,7 +626,7 @@ ti82_clib.lib:
 	$(MAKE) -C target/ticalc TARGET=ti82
 	TARGET=ti82 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti82 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti82_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
 
-ti83_clib.lib:
+ti83_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building TI83 Library ---'
 	@echo ''
@@ -610,7 +635,7 @@ ti83_clib.lib:
 	$(MAKE) -C target/ticalc TARGET=ti83
 	TARGET=ti83 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti83 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
 
-ti83p_clib.lib:
+ti83p_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building TI83+ Library ---'
 	@echo ''
@@ -619,7 +644,7 @@ ti83p_clib.lib:
 	$(MAKE) -C target/ticalc TARGET=ti83p
 	TARGET=ti83p TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti83p -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83p_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
 
-ti85_clib.lib:
+ti85_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building TI85 Library ---'
 	@echo ''
@@ -628,7 +653,7 @@ ti85_clib.lib:
 	$(MAKE) -C target/ticalc TARGET=ti85
 	TARGET=ti85 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti85 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti85_clib @$(TARGET_DIRECTORY)/ticalc/ticalc.lst
 
-ti86_clib.lib:
+ti86_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building TI86 Library ---'
 	@echo ''
@@ -639,7 +664,7 @@ ti86_clib.lib:
 
 # vt100 C lib for the Sharp OZ family - stefano
 # use -DPACKEDFONT for tiny 50->80 column modes
-ozansi_clib.lib:
+ozansi_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sharp OZ family ANSI Library ---'
 	@echo ''
@@ -716,7 +741,7 @@ x820ii.lib:
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="narrow gencon" SUBTYPE=x820ii
 	TARGET=x820ii TYPE=z80 $(LIBLINKER) -DFORx820ii -x$(OUTPUT_DIRECTORY)/x820ii.lib @$(TARGET_DIRECTORY)/x820/x820ii.lst
 
-cpm_clib.lib:
+cpm_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building CP/M Library ---'
 	@echo ''
@@ -729,7 +754,7 @@ cpm_clib.lib:
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=gsx FLAVOUR=wide
 	TARGET=gsx TYPE=z80 $(LIBLINKER) -DFORcpm -DFORgsx -x$(OUTPUT_DIRECTORY)/gfxgsx @$(TARGET_DIRECTORY)/cpm/gfxgsx.lst
 
-cpm8080_clib.lib:
+cpm8080_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building CP/M Library (8080)---'
 	@echo ''
@@ -749,7 +774,7 @@ cpmdevice_8080.lib:
 
 
 # Sorcerer Exidy lib - Stefano
-srr_clib.lib:
+srr_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sorcerer Exidy Library ---'
 	@echo ''
@@ -759,18 +784,17 @@ srr_clib.lib:
 	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/srr_clib @$(TARGET_DIRECTORY)/srr/srr.lst
 
 # Sharp MZ lib - Stefano
-mz_clib.lib:
+mz_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sharp MZ Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C target/mz
 	$(MAKE) -C games TARGET=mz
 	$(call buildgeneric,mz)
 	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz -x$(OUTPUT_DIRECTORY)/mz_clib @$(TARGET_DIRECTORY)/mz/mz.lst
 
 # Sharp MZ2500 lib - Stefano
-mz2500_clib.lib:
+mz2500_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sharp MZ-2500 Library ---'
 	@echo ''
@@ -778,7 +802,7 @@ mz2500_clib.lib:
 	TARGET=mz2500 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz2500 -x$(OUTPUT_DIRECTORY)/mz2500_clib @$(TARGET_DIRECTORY)/mz2500/mz2500.lst
 
 # ABC80 Library - Stefano
-abc80_clib.lib:
+abc80_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building ABC80 Library ---'
 	@echo ''
@@ -787,7 +811,7 @@ abc80_clib.lib:
 	TARGET=abc80 TYPE=z80 $(LIBLINKER)  -DFORabc80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc80_clib @$(TARGET_DIRECTORY)/abc80/abc80.lst
 
 # ABC800 library - Stefano
-abc800_clib.lib:
+abc800_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building ABC800 Library ---'
 	@echo ''
@@ -797,7 +821,7 @@ abc800_clib.lib:
 	TARGET=abc800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc800_clib @$(TARGET_DIRECTORY)/abc800/abc800.lst
 
 # Jupiter ACE library - Stefano
-ace_clib.lib:
+ace_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Jupiter Ace Library ---'
 	@echo ''
@@ -821,7 +845,7 @@ gfxaceudg.lib:
 	TARGET=aceudg TYPE=z80 $(LIBLINKER) -DFORaceudg -x$(OUTPUT_DIRECTORY)/gfxaceudg @$(TARGET_DIRECTORY)/ace/gfxaceudg.lst
 
 # Mattel Aquarius library - Stefano
-aquarius_clib.lib:
+aquarius_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Mattel Aquarius Library (& 80x72 GFX) ---'
 	@echo ''
@@ -846,7 +870,7 @@ aussie.lib:
 	TARGET=aussie TYPE=z80 $(LIBLINKER) -DFORaussie -x$(OUTPUT_DIRECTORY)/aussie.lib @$(TARGET_DIRECTORY)/aussie/aussie.lst
 
 # Applied Technology MicroBee library - Stefano
-bee_clib.lib:
+bee_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building MicroBee Library ---'
 	@echo ''
@@ -879,7 +903,7 @@ gemini.lib:
 	TARGET=gemini TYPE=z80 $(LIBLINKER) -DFORgemini -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gemini.lib @$(TARGET_DIRECTORY)/gemini/gemini.lst
 
 # Philips Videopac C7420 library - Stefano
-c7420_clib.lib:
+c7420_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Philips Videopac C7420 Library ---'
 	@echo ''
@@ -887,7 +911,7 @@ c7420_clib.lib:
 	TARGET=c7420 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORc7420 -x$(OUTPUT_DIRECTORY)/c7420_clib.lib @$(TARGET_DIRECTORY)/c7420/c7420.lst
 
 # Xircom REX 6000 library - Dominic
-rex_clib.lib:
+rex_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Xircom Rex Library ---'
 	@echo ''
@@ -896,7 +920,7 @@ rex_clib.lib:
 	TARGET=rex TYPE=z80 $(LIBLINKER) -DFORrex -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(TARGET_DIRECTORY)/rex/rex6000.lst
 
 # Sam Coupe library - Stefano & Frode
-sam_clib.lib:
+sam_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sam Coupe Library ---'
 	@echo ''
@@ -907,7 +931,7 @@ sam_clib.lib:
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(TARGET_DIRECTORY)/sam/sam.lst
 
 # Spectravideo SVI library - Stefano
-svi_clib.lib:
+svi_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Spectravideo Library ---'
 	@echo ''
@@ -923,7 +947,7 @@ svi_clib.lib:
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svibios @$(TARGET_DIRECTORY)/svi/arch_svibios.lst
 
 # MSX library - Stefano
-msx_clib.lib:
+msx_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building MSX Library ---'
 	@echo ''
@@ -945,11 +969,10 @@ msx2.lib:
 	TARGET=msx2 TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx2 -x$(OUTPUT_DIRECTORY)/msx2 @$(TARGET_DIRECTORY)/msx/msx2.lst
 
 # MTX library - Stefano
-mtx_clib.lib:
+mtx_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Memotech MTX Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(call buildgeneric,mtx)
 	$(MAKE) -C target/mtx
 	$(MAKE) -C games TARGET=mtx
@@ -957,7 +980,7 @@ mtx_clib.lib:
 	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(TARGET_DIRECTORY)/mtx/mtx.lst
 
 # Videoton TV Computer library - Sandor
-tvc_clib.lib:
+tvc_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Videoton TV Computer Library ---'
 	@echo ''
@@ -976,7 +999,7 @@ tvc_romgfx.lib:
 	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_romgfx @$(TARGET_DIRECTORY)/tvc/tvc_romgfx.lst
 
 # Enterprise library - Stefano
-enterprise_clib.lib:
+enterprise_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Enterprise 64/128 Library ---'
 	@echo ''
@@ -1008,8 +1031,6 @@ einstein.lib:
 	@echo ''
 	@echo '--- Building Tatung Einstein Library ---'
 	@echo ''
-	$(MAKE) msxdeps
-	$(MAKE) -C font
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/mc6845 TARGET=einstein
@@ -1024,7 +1045,7 @@ einstein256.lib:
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein256
 	TARGET=einstein256 TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein256 -x$(OUTPUT_DIRECTORY)/einstein256 @$(TARGET_DIRECTORY)/einstein/einstein256.lst
 
-excali64_clib.lib:
+excali64_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Excalibur 64 Library ---'
 	@echo ''
@@ -1034,7 +1055,7 @@ excali64_clib.lib:
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_cpm @$(TARGET_DIRECTORY)/excali64/excali64_cpm.lst
 
 # SMC-777 library
-smc777_clib.lib:
+smc777_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sony SMC-70/SMC-777 Library ---'
 	@echo ''
@@ -1078,7 +1099,6 @@ adam.lib:
 	@echo ''
 	@echo '--- Building Coleco Adam Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=cpm SUBTYPE=coleco
 	$(MAKE) -C video/tms9918 TARGET=coleco
 	$(MAKE) -C gfx TARGET=coleco FLAVOUR=narrow
@@ -1086,11 +1106,10 @@ adam.lib:
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORadam -x$(OUTPUT_DIRECTORY)/adam @$(TARGET_DIRECTORY)/adam/adam.lst
 
 # SORD M5 library - Stefano
-m5_clib.lib:
+m5_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building SORD M5 Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=m5
 	$(call buildgeneric,m5)
 	$(MAKE) -C video/tms9918 TARGET=m5
@@ -1107,7 +1126,7 @@ mbc200.lib:
 	TARGET=mbc200 TYPE=z80 $(LIBLINKER) -DFORmbc200 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mbc200.lib @$(TARGET_DIRECTORY)/mbc200/mbc200.lst
 
 # MC-1000 library - Stefano
-mc1000_clib.lib:
+mc1000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building CCE MC-1000 Library ---'
 	@echo ''
@@ -1116,7 +1135,7 @@ mc1000_clib.lib:
 	TARGET=mc1000 TYPE=z80 $(LIBLINKER) -DFORmc1000 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(TARGET_DIRECTORY)/mc1000/mc1000.lst
 
 # NASCOM library - Stefano
-nascom_clib.lib:
+nascom_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building NASCOM Library (std and CP/M)---'
 	@echo ''
@@ -1125,7 +1144,7 @@ nascom_clib.lib:
 	TARGET=nascom TYPE=z80 $(LIBLINKER) -DFORnascom -DFORnascomcpm -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascomcpm @$(TARGET_DIRECTORY)/nascom/nascomcpm.lst
 
 # Robotron Z1013 library - Stefano
-z1013_clib.lib:
+z1013_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Robotron Z1013 Library ---'
 	@echo ''
@@ -1135,7 +1154,7 @@ z1013_clib.lib:
 	TARGET=z1013 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(TARGET_DIRECTORY)/z1013/z1013.lst
 
 # Robotron KC85/1, Z9001 library - Stefano
-z9001_clib.lib:
+z9001_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Robotron KC85/1, KC/87, Z9001 Library ---'
 	@echo ''
@@ -1145,7 +1164,7 @@ z9001_clib.lib:
 	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(TARGET_DIRECTORY)/z9001/z9001.lst
 
 # Barebone z80 clib
-z80_clib.lib:
+z80_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building +z80 Library ---'
 	@echo ''
@@ -1153,7 +1172,7 @@ z80_clib.lib:
 	TARGET=z80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/z80_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Barebone z80 (ixiy swapped)clib
-ixiy_clib.lib:
+ixiy_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building +z80 (ixiy) Library ---'
 	@echo ''
@@ -1161,7 +1180,7 @@ ixiy_clib.lib:
 	TARGET=z80 TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/ixiy_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Barebone z80/8080 clib
-8080_clib.lib:
+8080_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building +z80 (8080) Library ---'
 	@echo ''
@@ -1169,7 +1188,7 @@ ixiy_clib.lib:
 	TARGET=z80 TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8080_clib @$(TARGET_DIRECTORY)/z80/808x.lst
 
 # Barebone z80/8085 clib
-8085_clib.lib:
+8085_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building +z80 (8085) Library ---'
 	@echo ''
@@ -1177,7 +1196,7 @@ ixiy_clib.lib:
 	TARGET=z80 TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8085_clib @$(TARGET_DIRECTORY)/z80/808x.lst
 
 # Barebone z80/r2k clib
-r2ka_clib.lib:
+r2ka_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building +z80 (r2ka) Library ---'
 	@echo ''
@@ -1185,7 +1204,7 @@ r2ka_clib.lib:
 	TARGET=z80 TYPE=r2k $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/r2ka_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
-kc_clib.lib:
+kc_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building VEB Mikroelektronik KC85/2..5 Library ---'
 	@echo ''
@@ -1194,7 +1213,7 @@ kc_clib.lib:
 	TARGET=kc TYPE=ixiy $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(TARGET_DIRECTORY)/kc/kc.lst
 
 # Hübler/Evert-MC - dom
-hemc_clib.lib:
+hemc_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Hübler/Evert-MC Library ---'
 	@echo ''
@@ -1202,7 +1221,7 @@ hemc_clib.lib:
 	TARGET=hemc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhemc -x$(OUTPUT_DIRECTORY)/hemc_clib @$(TARGET_DIRECTORY)/hemc/hemc.lst
 
 # Kramer-MC - dom
-kramermc_clib.lib:
+kramermc_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Kramer-MC Library ---'
 	@echo ''
@@ -1210,7 +1229,7 @@ kramermc_clib.lib:
 	TARGET=kramermc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORkramermc -x$(OUTPUT_DIRECTORY)/kramermc_clib @$(TARGET_DIRECTORY)/kramermc/kramermc.lst
 
 # Hübler Grafik MC - dom
-hgmc_clib.lib:
+hgmc_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Hübler Grafik MC Library ---'
 	@echo ''
@@ -1219,7 +1238,7 @@ hgmc_clib.lib:
 	TARGET=hgmc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhgmc -x$(OUTPUT_DIRECTORY)/hgmc_clib @$(TARGET_DIRECTORY)/hgmc/hgmc.lst
 
 # Primo A-32/64 - dom
-primo_clib.lib:
+primo_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Primo A-32/48/64 Library ---'
 	@echo ''
@@ -1230,7 +1249,7 @@ primo_clib.lib:
 
 
 # Bandai RX78 - dom
-rx78_clib.lib:
+rx78_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Bandai RX78 Library ---'
 	@echo ''
@@ -1239,7 +1258,7 @@ rx78_clib.lib:
 	TARGET=rx78 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORrx78 -x$(OUTPUT_DIRECTORY)/rx78_clib @$(TARGET_DIRECTORY)/rx78/rx78.lst
 
 # Casio FP-1100- dom
-fp1100_clib.lib:
+fp1100_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Casio FP-1100 Library ---'
 	@echo ''
@@ -1247,7 +1266,7 @@ fp1100_clib.lib:
 	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_clib @$(TARGET_DIRECTORY)/fp1100/fp1100.lst
 
 # Z80 TV Game
-z80tvgame_clib.lib:
+z80tvgame_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Z80 TV Game Library ---'
 	@echo ''
@@ -1257,7 +1276,7 @@ z80tvgame_clib.lib:
 
 
 # Mitsubishi Multi8 - dom
-multi8_clib.lib:
+multi8_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Mitsubishi Multi8 Library ---'
 	@echo ''
@@ -1266,7 +1285,7 @@ multi8_clib.lib:
 	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(TARGET_DIRECTORY)/multi8/multi8.lst
 
 # Pasopia7 Multi8 - dom
-pasopia7_clib.lib:
+pasopia7_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Toshiba Pasopia7 Library ---'
 	@echo ''
@@ -1276,7 +1295,7 @@ pasopia7_clib.lib:
 	TARGET=pasopia7 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpasopia7 -x$(OUTPUT_DIRECTORY)/pasopia7_clib @$(TARGET_DIRECTORY)/pasopia7/pasopia7.lst
 
 # VTech VZ700- dom
-laser500_clib.lib:
+laser500_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building VTech Laser 350/500/700 Library ---'
 	@echo ''
@@ -1285,7 +1304,7 @@ laser500_clib.lib:
 	TARGET=laser500 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlaser500 -x$(OUTPUT_DIRECTORY)/laser500_clib @$(TARGET_DIRECTORY)/laser500/laser500.lst
 
 # Dick Smith Super80 - dom
-super80_clib.lib:
+super80_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Super80 Library ---'
 	@echo ''
@@ -1293,7 +1312,7 @@ super80_clib.lib:
 	$(MAKE) -C games TARGET=super80
 	TARGET=super80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsuper80 -x$(OUTPUT_DIRECTORY)/super80_clib @$(TARGET_DIRECTORY)/super80/super80.lst
 
-super80_vduem_clib.lib:
+super80_vduem_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Super80 VDUEM Library ---'
 	@echo ''
@@ -1306,7 +1325,7 @@ super80_vduem_clib.lib:
 
 
 # Triumph Adler Alphatronic PC - dom
-alphatro_clib.lib:
+alphatro_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Triump Adler Alphatronic PC Library ---'
 	@echo ''
@@ -1317,18 +1336,17 @@ alphatro_clib.lib:
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_cpm @$(TARGET_DIRECTORY)/alphatro/alphatro_cpm.lst
 
 # SPC-1000 - dom
-spc1000_clib.lib:
+spc1000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Samsung SPC-1000 Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(call buildgeneric,spc1000)
 	$(MAKE) -C video/tms9918 TARGET=spc1000
 	$(MAKE) -C games TARGET=spc1000
 	TARGET=spc1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORspc1000 -x$(OUTPUT_DIRECTORY)/spc1000_clib @$(TARGET_DIRECTORY)/spc1000/spc1000.lst
 
 # Casio PV1000 - dom
-pv1000_clib.lib:
+pv1000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Casio PV-1000 Library ---'
 	@echo ''
@@ -1337,11 +1355,10 @@ pv1000_clib.lib:
 	TARGET=pv1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpv1000 -x$(OUTPUT_DIRECTORY)/pv1000_clib @$(TARGET_DIRECTORY)/pv1000/pv1000.lst
 
 # Casio PV2000 - dom/stefano
-pv2000_clib.lib:
+pv2000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Casio PV-2000 Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=pv2000
 	$(call buildgeneric,pv2000)
 	$(MAKE) -C games TARGET=pv2000
@@ -1349,11 +1366,10 @@ pv2000_clib.lib:
 	TARGET=pv2000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpv2000 -x$(OUTPUT_DIRECTORY)/pv2000_clib @$(TARGET_DIRECTORY)/pv2000/pv2000.lst
 
 # Nichibutsu My Vision- dom/stefano
-myvision_clib.lib:
+myvision_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Nichibutsu My Vision Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=myvision
 	$(call buildgeneric,myvision)
 	$(MAKE) -C games TARGET=myvision
@@ -1361,7 +1377,7 @@ myvision_clib.lib:
 	TARGET=myvision TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmyvision -x$(OUTPUT_DIRECTORY)/myvision_clib @$(TARGET_DIRECTORY)/myvision/myvision.lst
 
 # Bandai Supervision 8000 - dom
-sv8000_clib.lib:
+sv8000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Bandai Supervision 8000 Library ---'
 	@echo ''
@@ -1370,11 +1386,10 @@ sv8000_clib.lib:
 	TARGET=sv8000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsv8000 -x$(OUTPUT_DIRECTORY)/sv8000_clib @$(TARGET_DIRECTORY)/sv8000/sv8000.lst
 
 # Colecovision - dom/stefano
-coleco_clib.lib:
+coleco_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Colecovision Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=coleco
 	$(call buildgeneric,coleco)
 	$(MAKE) -C video/tms9918 TARGET=coleco
@@ -1389,22 +1404,20 @@ bit90.lib:
 	TARGET=bit90 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORbit90 -x$(OUTPUT_DIRECTORY)/bit90 @$(TARGET_DIRECTORY)/bit90/bit90.lst
 
 # Pencil II - dom/stefano
-pencil2_clib.lib:
+pencil2_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Pencil II Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=pencil2
 	$(call buildgeneric,pencil2)
 	$(MAKE) -C video/tms9918 TARGET=pencil2
 	TARGET=pencil2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpencil2 -x$(OUTPUT_DIRECTORY)/pencil2_clib @$(TARGET_DIRECTORY)/pencil2/pencil2.lst
 
 # LM80C - dom/stefano
-lm80c_clib.lib:
+lm80c_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building LM80-C Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=lm80c
 	$(call buildgeneric,lm80c)
 	$(MAKE) -C target/lm80c
@@ -1412,11 +1425,10 @@ lm80c_clib.lib:
 	TARGET=lm80c TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlm80c -x$(OUTPUT_DIRECTORY)/lm80c_clib @$(TARGET_DIRECTORY)/lm80c/lm80c.lst
 
 # NabuPC
-nabu_clib.lib:
+nabu_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Nabu Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=nabu
 	$(call buildgeneric,nabu)
 	$(MAKE) -C target/nabu
@@ -1427,7 +1439,6 @@ nabu_cpm.lib:
 	@echo ''
 	@echo '--- Building Nabu CP/M Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=nabu
 	$(call buildgeneric,nabu)
 	$(MAKE) -C target/nabu
@@ -1443,7 +1454,7 @@ nabu_int.lib:
 
 
 # Genius Leader 2000/4000 - dom
-gl_clib.lib:
+gl_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Genius Leader 2000/4000 Library ---'
 	@echo ''
@@ -1453,7 +1464,7 @@ gl_clib.lib:
 
 
 # Genius Leader 6000 - dom
-gl6000_clib.lib:
+gl6000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Genius Leader 6000 Library ---'
 	@echo ''
@@ -1464,7 +1475,7 @@ gl6000_clib.lib:
 
 
 # Untested C lib for NC100 machines - dom
-nc_clib.lib:
+nc_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Amstrad NC100 Library ---'
 	@echo ''
@@ -1496,7 +1507,7 @@ gfxnc200.lib:
 	TARGET=nc200 TYPE=z80 $(LIBLINKER) -DFORnc200 -x$(OUTPUT_DIRECTORY)/gfxnc200 @$(TARGET_DIRECTORY)/nc100/gfxnc.lst
 
 # Amstrad CPC library - Stefano
-cpc_clib.lib:
+cpc_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Amstrad CPC Library ---'
 	@echo ''
@@ -1528,7 +1539,7 @@ pcw.lib:
 	TARGET=pcw TYPE=z80 $(LIBLINKER) -DFORpcw -x$(OUTPUT_DIRECTORY)/pcw @$(TARGET_DIRECTORY)/pcw/pcw.lst
 
 # Commodore 128 (Z80 mode) library - Stefano
-c128ansi_clib.lib:
+c128ansi_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Commodore 128 ANSI Library ---'
 	@echo ''
@@ -1580,7 +1591,7 @@ gfx128hr480.lib:
 	TARGET=c128hr480 TYPE=z80 $(LIBLINKER) -DFORc128hr480 -x$(OUTPUT_DIRECTORY)/gfx128hr480 @$(TARGET_DIRECTORY)/c128/gfx128hr480.lst
 
 # Grundy NewBrain library - Stefano
-newbrain_clib.lib:
+newbrain_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Grundy NewBrain Library ---'
 	@echo ''
@@ -1600,7 +1611,7 @@ tiki100.lib:
 	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(TARGET_DIRECTORY)/tiki100/tiki100.lst
 
 # RCM2/3000 lib
-rcmx000_clib.lib:
+rcmx000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building RCM2/3000 Library ---'
 	@echo ''
@@ -1608,7 +1619,7 @@ rcmx000_clib.lib:
 	TARGET=rcmx000 TYPE=r2k $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(TARGET_DIRECTORY)/rcmx000/rcmx000.lst
 
 # embedded target - contributed by Daniel Wallner
-embedded_clib.lib:
+embedded_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Embedded (ns16450) Library ---'
 	@echo ''
@@ -1616,7 +1627,7 @@ embedded_clib.lib:
 	TARGET=embedded TYPE=z80 $(LIBLINKER) -DFORembedded -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/embedded_clib @$(TARGET_DIRECTORY)/embedded/embedded.lst
 
 # Galaksija - Stefano Bodrato
-gal_clib.lib:
+gal_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Galaksija Library ---'
 	@echo ''
@@ -1625,7 +1636,7 @@ gal_clib.lib:
 	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(TARGET_DIRECTORY)/gal/gal.lst
 
 # Sharp PC-G8xx/E2xx - Stefano Bodrato
-g800_clib.lib:
+g800_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sharp PC-G8xx/E2xx Library ---'
 	@echo ''
@@ -1636,7 +1647,7 @@ g800_clib.lib:
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850b @$(TARGET_DIRECTORY)/g800/g850b.lst
 
 # Camputers Lynx - Stefano Bodrato
-lynx_clib.lib:
+lynx_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Camputers Lynx Library ---'
 	@echo ''
@@ -1646,29 +1657,27 @@ lynx_clib.lib:
 	TARGET=lynx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(TARGET_DIRECTORY)/lynx/lynx.lst
 
 # Sega Master system - contributed by Haroldo O. Pinheiro
-sms_clib.lib:
+sms_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sega Master System Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=sms
 	$(call buildgeneric,sms)
 	$(MAKE) -C video/tms9918 TARGET=sms
 	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(TARGET_DIRECTORY)/sms/sms.lst
 
 # Sega SC-3000 - stefano
-sc3000_clib.lib:
+sc3000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building SC-3000 System Library ---'
 	@echo ''
-	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=sc3000
 	$(call buildgeneric,sc3000)
 	$(MAKE) -C video/tms9918 TARGET=sc3000
 	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -DFORsc3000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(TARGET_DIRECTORY)/sc3000/sc3000.lst
 
 # Gameboy - dom
-gb_clib.lib:
+gb_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Gameboy Library ---'
 	@echo ''
@@ -1679,28 +1688,28 @@ gb_clib.lib:
 
 
 # Test platform - dom
-test_clib.lib:
+test_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Test System Library ---'
 	@echo ''
 	$(call buildgeneric,test)
 	TARGET=test TYPE=z80 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test_clib @$(TARGET_DIRECTORY)/test/test.lst
 
-testrcm_clib.lib:
+testrcm_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Test System Library (Rabbit) ---'
 	@echo ''
 	$(call buildgeneric,test)
 	TARGET=test TYPE=r2k $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
 
-test8080_clib.lib:
+test8080_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Test System Library (8080) ---'
 	@echo ''
 	$(call buildgeneric,test)
 	TARGET=test TYPE=8080 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test8080_clib @$(TARGET_DIRECTORY)/test/test8080.lst
 
-testgbz80_clib.lib:
+testgbz80_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Test System Library (gbz80) ---'
 	@echo ''
@@ -1709,7 +1718,7 @@ testgbz80_clib.lib:
 
 
 # TRS 80 - stefano
-trs80_clib.lib:
+trs80_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building TRS 80 Library ---'
 	@echo ''
@@ -1760,7 +1769,7 @@ trsdos.lib:
 	$(MAKE) -C target/trs80/fcntl
 
 # Canon X-07 lib - Stefano
-x07_clib.lib:
+x07_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Canon X-07 Library ---'
 	@echo ''
@@ -1768,7 +1777,7 @@ x07_clib.lib:
 	TARGET=x07 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(TARGET_DIRECTORY)/x07/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
-x1_clib.lib:
+x1_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sharp X1 Library ---'
 	@echo ''
@@ -1778,7 +1787,7 @@ x1_clib.lib:
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_clib @$(TARGET_DIRECTORY)/x1/x1.lst
 
 # Philips VG5000 lib - Joaopa, Stefano
-vg5k_clib.lib:
+vg5k_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Philips VG5000 Library ---'
 	@echo ''
@@ -1787,7 +1796,7 @@ vg5k_clib.lib:
 	TARGET=vg5k TYPE=ixiy $(LIBLINKER) -IXIY -DFORvg5k -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vg5k_clib @$(TARGET_DIRECTORY)/vg5k/vg5k.lst
 
 # S-OS (The Sentinel) - Stefano
-sos_clib.lib:
+sos_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building S-OS (The Sentinel) Library ---'
 	@echo ''
@@ -1796,7 +1805,7 @@ sos_clib.lib:
 	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(TARGET_DIRECTORY)/sos/sos.lst
 
 # OSCA / FLOS - Stefano
-osca_clib.lib:
+osca_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Old School Computer Architecture Library ---'
 	@echo ''
@@ -1806,7 +1815,7 @@ osca_clib.lib:
 	TARGET=osca TYPE=z80 $(LIBLINKER) -DFORosca -DSTANDARDESCAPECHARS -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(TARGET_DIRECTORY)/osca/osca.lst
 
 # s1mp3
-s1mp3_clib.lib:
+s1mp3_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building s1mp3 Library ---'
 	@echo ''
@@ -1814,7 +1823,7 @@ s1mp3_clib.lib:
 	$(MAKE) -C target/s1mp3
 	TARGET=s1mp3 TYPE=z80 $(LIBLINKER) -DFORs1mp3 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/s1mp3_clib.lib @$(TARGET_DIRECTORY)/s1mp3/s1mp3.lst
 
-pmd85_clib.lib:
+pmd85_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building pmd85 Library ---'
 	@echo ''
@@ -1822,7 +1831,7 @@ pmd85_clib.lib:
 	$(MAKE) -C games TARGET=pmd85
 	TARGET=pmd85 TYPE=8080 $(LIBLINKER) -m8080 -DFORpmd85 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pmd85_clib @$(TARGET_DIRECTORY)/pmd85/pmd85.lst
 
-mikro80_clib.lib:
+mikro80_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Mikro80 Library ---'
 	@echo ''
@@ -1830,14 +1839,14 @@ mikro80_clib.lib:
 	$(MAKE) -C games TARGET=mikro80
 	TARGET=mikro80 TYPE=8080 $(LIBLINKER) -m8080 -DFORmikro80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mikro80_clib @$(TARGET_DIRECTORY)/mikro80/mikro80.lst
 
-special_clib.lib:
+special_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Specialist Library ---'
 	@echo ''
 	$(call buildgeneric,special,"wide portable")
 	TARGET=special TYPE=8080 $(LIBLINKER) -m8080 -DFORspecial -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/special_clib.lib @$(TARGET_DIRECTORY)/special/special.lst
 
-m100_clib.lib:
+m100_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building m100 Library ---'
 	@echo ''
@@ -1845,7 +1854,7 @@ m100_clib.lib:
 	$(MAKE) -C games TARGET=m100
 	TARGET=m100 TYPE=8080 $(LIBLINKER) -m8085 -DFORm100 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_clib @$(TARGET_DIRECTORY)/m100/m100.lst
 
-vector06c_clib.lib:
+vector06c_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Vector06c Library ---'
 	@echo ''
@@ -1854,7 +1863,7 @@ vector06c_clib.lib:
 	$(MAKE) -C games TARGET=vector06c
 	TARGET=vector06c TYPE=8080 $(LIBLINKER) -m8080 -DFORvector06c -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vector06c_clib @$(TARGET_DIRECTORY)/vector06c/vector06c.lst
 
-pk8000_clib.lib:
+pk8000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building PK8000 Library ---'
 	@echo ''
@@ -1863,7 +1872,7 @@ pk8000_clib.lib:
 	#$(MAKE) -C games TARGET=vector06c
 	TARGET=pk8000 TYPE=8080 $(LIBLINKER) -m8080 -DFORpk8000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pk8000_clib @$(TARGET_DIRECTORY)/pk8000/pk8000.lst
 
-lviv_clib.lib:
+lviv_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building PK-01 Lviv/Lvov Library ---'
 	@echo ''
@@ -1871,14 +1880,14 @@ lviv_clib.lib:
 	$(MAKE) -C games TARGET=lviv
 	TARGET=lviv TYPE=8080 $(LIBLINKER) -m8080 -DFORlviv -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/lviv_clib @$(TARGET_DIRECTORY)/lviv/lviv.lst
 
-altair8800_clib.lib:
+altair8800_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Altair8800 Library ---'
 	@echo ''
 	$(call buildgeneric,altair8800,portable)
 	TARGET=altair8800 TYPE=8080 $(LIBLINKER) -m8080 -DFORaltair8800 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/altair8800_clib @$(TARGET_DIRECTORY)/altair8800/altair8800.lst
 
-sol20_clib.lib:
+sol20_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building SOL20 Library ---'
 	@echo ''
@@ -1887,14 +1896,14 @@ sol20_clib.lib:
 	TARGET=sol20 TYPE=8080 $(LIBLINKER) -m8080 -DFORsol20 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sol20_clib @$(TARGET_DIRECTORY)/sol20/sol20.lst
 
 
-dai_clib.lib:
+dai_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building DAI Library ---'
 	@echo ''
 	$(call buildgeneric,dai,portable)
 	TARGET=dai TYPE=8080 $(LIBLINKER) -m8080 -DFORdai -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/dai_clib @$(TARGET_DIRECTORY)/dai/dai.lst
 
-ondra_clib.lib:
+ondra_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Ondra Library ---'
 	@echo ''
@@ -1903,7 +1912,7 @@ ondra_clib.lib:
 	TARGET=ondra TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORondra -x$(OUTPUT_DIRECTORY)/ondra_clib @$(TARGET_DIRECTORY)/ondra/ondra.lst
 
 # Homelab 3/4 - dom
-homelab_clib.lib:
+homelab_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Homelab Library ---'
 	@echo ''
@@ -1912,7 +1921,7 @@ homelab_clib.lib:
 	TARGET=homelab TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhomelab -x$(OUTPUT_DIRECTORY)/homelab_clib @$(TARGET_DIRECTORY)/homelab/homelab.lst
 
 # Homelab2  - dom
-homelab2_clib.lib:
+homelab2_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Homelab2 Library ---'
 	@echo ''
@@ -1920,7 +1929,7 @@ homelab2_clib.lib:
 	$(MAKE) -C games TARGET=homelab2
 	TARGET=homelab2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhomelab2 -x$(OUTPUT_DIRECTORY)/homelab2_clib @$(TARGET_DIRECTORY)/homelab2/homelab2.lst
 
-krokha_clib.lib:
+krokha_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Krokha (tiny) Library ---'
 	@echo ''
@@ -1928,7 +1937,7 @@ krokha_clib.lib:
 	$(MAKE) -C games TARGET=krokha
 	TARGET=krokha TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORkrokha -x$(OUTPUT_DIRECTORY)/krokha_clib @$(TARGET_DIRECTORY)/krokha/krokha.lst
 
-radio86_clib.lib:
+radio86_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Radio86 Library ---'
 	@echo ''
@@ -1936,7 +1945,7 @@ radio86_clib.lib:
 	TARGET=radio86 TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORradio86 -x$(OUTPUT_DIRECTORY)/radio86_clib @$(TARGET_DIRECTORY)/radio86/radio86.lst
 
 # RC2014 (newlib target) using 8085 CPU Module - feilipu
-rc2014-8085_clib.lib:
+rc2014-8085_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building RC2014-8085 Library ---'
 	@echo ''
@@ -2000,70 +2009,70 @@ sp1-all:
 sp1-clean:
 	$(MAKE) -C sprites/software/sp1 clean
 
-z80_crt0.lib:
+z80_crt0.lib: $(DIRS) $(OBJS)
 	@echo ''
 	@echo '--- Building z80 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
 
-z80iy_crt0.lib:
+z80iy_crt0.lib: $(DIRS) $(OBJS)
 	@echo ''
 	@echo '--- Building ixiy crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=ixiy $(LIBLINKER) -mz80 -IXIY -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80iy_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
 
-8080_crt0.lib:
+8080_crt0.lib: $(DIRS) $(OBJS)
 	@echo ''
 	@echo '--- Building 8080 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8080_crt0 @$(LISTFILE_DIRECTORY)/8080.lst
 
-8080_opt.lib:
+8080_opt.lib: $(DIRS) $(OBJS)
 	@echo ''
 	@echo '--- Building 8080 optimised crt routines---'
 	@echo ''
 	$(MAKE) -C z80_crt0s
 	TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8080_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-8085_opt.lib:
+8085_opt.lib: $(DIRS) $(OBJS)
 	@echo ''
 	@echo '--- Building 8085 optimised crt routines---'
 	@echo ''
 	$(MAKE) -C z80_crt0s
 	TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8085_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-z180_opt.lib:
+z180_opt.lib: $(DIRS) $(OBJS)
 	@echo ''
 	@echo '--- Building z180 optimised crt routines---'
 	@echo ''
 	$(MAKE) -C z80_crt0s
 	TYPE=z180 $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z180_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-ez80_opt.lib:
+ez80_opt.lib: $(DIRS) $(OBJS)
 	@echo ''
 	@echo '--- Building ez80 optimised crt routines---'
 	@echo ''
 	$(MAKE) -C z80_crt0s
 	TYPE=ez80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ez80_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-z80n_crt0.lib:
+z80n_crt0.lib: $(DIRS) $(OBJS)
 	@echo ''
 	@echo '--- Building z80n crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=z80n $(LIBLINKER) -mz80n -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80n_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
 
-gbz80_crt0.lib:
+gbz80_crt0.lib: $(DIRS) $(OBJS)
 	@echo ''
 	@echo '--- Building gbz80 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=gbz80 $(LIBLINKER) -mgbz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gbz80_crt0 @$(LISTFILE_DIRECTORY)/gbz80.lst
 
-r2k_crt0.lib:
+r2k_crt0.lib: $(DIRS) $(OBJS)
 	@echo ''
 	@echo '--- Building r2k crt Library ---'
 	@echo ''
@@ -2077,37 +2086,19 @@ clean: classic-clean new-clean
 
 install-clean: classic-clean new-install-clean
 
-classic-clean:
-	$(MAKE) -C assert clean
-	$(MAKE) -C ctype clean
+classic-clean: $(CLEAN)
 	$(MAKE) -C fcntl clean
 	$(MAKE) -C math clean
-	$(MAKE) -C interrupts clean
-	$(MAKE) -C libgen clean
-	$(MAKE) -C setjmp clean
 	$(MAKE) -C stdio clean
-	$(MAKE) -C stdlib clean
-	$(MAKE) -C strings clean
-	$(MAKE) -C regex clean
-	$(MAKE) -C time clean
 	$(MAKE) -C z80_crt0s clean
-	$(MAKE) -C adt clean
-	$(MAKE) -C adt-newlib clean
-	$(MAKE) -C alloc clean
-	$(MAKE) -C rect clean
-	$(MAKE) -C algorithm clean
-	$(MAKE) -C debug clean
+	$(MAKE) -C alloc/farz88 clean
 	$(MAKE) -C lib3d clean
-	$(MAKE) -C input clean
 	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C games clean
 	$(MAKE) -C math clean
-	$(MAKE) -C compress clean
-	$(MAKE) -C font clean
-	$(MAKE) -C arch clean
 	$(MAKE) -C target clean
 	$(MAKE) -C video clean
 	$(MAKE) -C gfx clean

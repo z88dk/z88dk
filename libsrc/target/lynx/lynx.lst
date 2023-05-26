@@ -7,7 +7,7 @@ target/lynx/stdio/generic_console_vpeek
 target/lynx/stdio/conio_map_colour
 target/lynx/stdio/conio_vars
 target/lynx/stdio/CRT_FONT
-@font/font_8x8/font_8x8.lst
+
 @input/input_keyboard.lst
 @stdio/stdio.lst
 target/lynx/graphics/textpixl

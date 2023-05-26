@@ -18,7 +18,7 @@ target/pc6001/stdio/ansi/f_ansi_cls
 target/pc6001/stdio/ansi/f_ansi_dline
 target/pc6001/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
-@font/font_8x8/font_8x8.lst
+
 target/pc6001/games/joystick
 games/obj/pc6001/joystick_type
 target/pc6001/graphics/clsgraph

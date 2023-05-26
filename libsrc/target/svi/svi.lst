@@ -2,7 +2,7 @@ target/msx/stdio/fgetc_cons
 target/msx/stdio/getk
 target/msx/stdio/fputc_cons
 target/svi/stdio/generic_console
-@font/font_8x8/font_8x8.lst
+
 @stdio/ansicore.lst
 @input/input_keyboard.lst
 target/msx/time/clock

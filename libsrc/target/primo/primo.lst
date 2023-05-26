@@ -8,7 +8,7 @@ target/primo/stdio/fputc_cons_native
 stdio/inkey/getk
 stdio/inkey/fgetc_cons
 @input/input_keyboard.lst
-@font/font_8x8/font_8x8.lst
+
 target/primo/graphics/pixladdr
 target/primo/graphics/clg
 @gfx/narrow/gfx_narrow.lst

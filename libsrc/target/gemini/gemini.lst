@@ -13,7 +13,7 @@ target/gemini/stdio/generic_console
 target/gemini/stdio/generic_console_ioctl
 target/gemini/stdio/conio_vars
 target/gemini/stdio/CRT_FONT
-@font/font_8x8/font_8x8.lst
+
 @stdio/stdio.lst
 target/gemini/graphics/clg
 target/gemini/graphics/clsgraph
