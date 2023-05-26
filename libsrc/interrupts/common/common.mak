@@ -24,4 +24,4 @@ $(eval $(call buildbit,interrupts/common,gbz80,test,-clib=gbz80,-mgbz80))
 
 
 interrupts-common-clean:
-	$(RM) -fr interrupts/common/obj
+	$(RM) -fr interrupts/common/obj interrupts/common/*.o

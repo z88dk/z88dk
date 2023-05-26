@@ -25,4 +25,4 @@ algorithm/AStarSearch/obj/%:
 	@mkdir -p $@
 
 algorithm-astar-clean:
-	$(RM) -fr algorithm/AStarSearch/obj
+	$(RM) -fr algorithm/AStarSearch/obj algorithm/AStarSearch/*.o

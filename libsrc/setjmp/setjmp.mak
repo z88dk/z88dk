@@ -22,4 +22,4 @@ $(eval $(call buildbit,setjmp,z80n,test,-clib=z80n,-mz80n))
 
 
 setjmp-clean:
-	$(RM) -fr setjmp/obj
+	$(RM) -fr setjmp/obj setjmp/*.o

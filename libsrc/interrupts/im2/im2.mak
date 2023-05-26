@@ -21,4 +21,4 @@ $(eval $(call buildbit,interrupts/im2,z80n,test,-clib=z80n,-mz80n))
 
 
 interrupts-im2-clean:
-	$(RM) -fr interrupts/im2/obj
+	$(RM) -fr interrupts/im2/obj interrupts/im2/*.o

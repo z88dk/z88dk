@@ -25,4 +25,4 @@ $(eval $(call buildbit,interrupts/im1,gbz80,test,-clib=gbz80,-mgbz80))
 
 
 interrupts-im1-clean:
-	$(RM) -fr interrupts/im1/obj
+	$(RM) -fr interrupts/im1/obj interrupts/im1/*.o

@@ -167,6 +167,9 @@ include adt/queue/queue.mak
 include adt/stack/stack.mak
 include adt-newlib/adtnewlib.mak
 include algorithm/AStarSearch/astar.mak
+include alloc/balloc/balloc.mak
+include alloc/malloc-classic/malloc.mak
+include alloc/obstack/obstack.mak
 include arch/z80/z80.mak
 include assert/assert.mak
 include compress/aplib/aplib.mak
@@ -206,7 +209,6 @@ endef
 
 define buildcrt
 	$(MAKE) -C stdio
-	$(MAKE) -C alloc
 	$(MAKE) -C z80_crt0s
 	$(MAKE) -C gfx/x11
 	$(MAKE) -C gfx/portable
@@ -314,6 +316,7 @@ z88_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building Z88 Library ---'
 	@echo ''
 	$(call buildgeneric,z88)
+	$(MAKE) -C farz88
 	$(MAKE) -C games TARGET=z88
 	$(MAKE) -C target/z88
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(TARGET_DIRECTORY)/z88/z88.lst
@@ -2088,7 +2091,7 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C math clean
 	$(MAKE) -C stdio clean
 	$(MAKE) -C z80_crt0s clean
-	$(MAKE) -C alloc clean
+	$(MAKE) -C alloc/farz88 clean
 	$(MAKE) -C lib3d clean
 	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean

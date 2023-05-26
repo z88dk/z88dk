@@ -65,4 +65,4 @@ strings/obj/newlib-gbz80-strings: $(STRINGS_NEWLIBGLOBS_ex)
 
 
 strings-clean:
-	$(RM) -fr strings/obj
+	$(RM) -fr strings/obj strings/*.o

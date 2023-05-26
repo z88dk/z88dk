@@ -61,4 +61,4 @@ time/obj/%:
 	@mkdir -p $@
 
 time-clean:
-	$(RM) -fr time/obj
+	$(RM) -fr time/obj time/*.o

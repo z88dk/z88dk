@@ -101,4 +101,4 @@ stdlib/obj/newlib-gbz80-stdlib: $(STDLIB_GBZ80_NEWLIBGLOBS_ex)
 
 
 stdlib-clean:
-	$(RM) -fr stdlib/obj
+	$(RM) -fr stdlib/obj stdlib/*.o

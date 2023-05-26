@@ -22,4 +22,4 @@ $(eval $(call buildbit,adt/stack,z80n,test,-clib=z80n,-mz80n))
 
 
 adt-stack-clean:
-	$(RM) -fr adt/stack/obj
+	$(RM) -fr adt/stack/obj adt/stack/*.o

@@ -22,4 +22,4 @@ $(eval $(call buildbit,regex,z80n,test,-clib=z80n,-mz80n))
 
 
 regex-clean:
-	$(RM) -fr regex/obj
+	$(RM) -fr regex/obj regex/*.o

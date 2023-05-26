@@ -22,4 +22,4 @@ $(eval $(call buildbit,adt/queue,z80n,test,-clib=z80n,-mz80n))
 
 
 adt-queue-clean:
-	$(RM) -fr adt/queue/obj
+	$(RM) -fr adt/queue/obj adt/queue/*.o

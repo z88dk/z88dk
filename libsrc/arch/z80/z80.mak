@@ -50,4 +50,4 @@ arch/z80/obj/newlib-ixiy-arch-z80: $(ARCHZ80_NEWLIBGLOBS_ex)
 
 
 arch-z80-clean:
-	$(RM) -fr arch/z80/obj
+	$(RM) -fr arch/z80/obj arch/z80/*.o

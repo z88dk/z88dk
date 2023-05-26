@@ -22,4 +22,4 @@ $(eval $(call buildbit,adt/heap,z80n,test,-clib=z80n,-mz80n))
 
 
 adt-heap-clean:
-	$(RM) -fr adt/heap/obj
+	$(RM) -fr adt/heap/obj adt/heap/*.o

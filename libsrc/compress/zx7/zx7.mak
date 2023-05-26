@@ -23,4 +23,4 @@ $(eval $(call buildbit,compress/zx7,gbz80,test,-clib=gbz80,-mgbz80))
 
 
 compress-zx7-clean:
-	$(RM) -fr compress/zx7/obj
+	$(RM) -fr compress/zx7/obj compress/zx7/*.o

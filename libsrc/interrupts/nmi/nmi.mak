@@ -23,4 +23,4 @@ $(eval $(call buildbit,interrupts/nmi,gbz80,test,-clib=gbz80,-mgbz80))
 
 
 interrupts-nmi-clean:
-	$(RM) -fr interrupts/nmi/obj
+	$(RM) -fr interrupts/nmi/obj interrupts/nmi/*.o

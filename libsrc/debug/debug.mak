@@ -20,4 +20,4 @@ $(eval $(call buildbit,debug,z80n,test,-clib=z80n,-mz80n))
 
 
 debug-clean:
-	$(RM) -fr debug/obj
+	$(RM) -fr debug/obj debug/*.o

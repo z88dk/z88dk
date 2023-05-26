@@ -47,4 +47,4 @@ compress/aplib/obj/newlib-gbz80-compress-aplib: $(APLIB_8080_NEWLIBGLOBS_ex)
 
 
 compress-aplib-clean:
-	$(RM) -fr compress/aplib/obj
+	$(RM) -fr compress/aplib/obj 

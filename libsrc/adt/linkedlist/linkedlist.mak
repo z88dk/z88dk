@@ -22,4 +22,4 @@ $(eval $(call buildbit,adt/linkedlist,z80n,test,-clib=z80n,-mz80n))
 
 
 adt-linkedlist-clean:
-	$(RM) -fr adt/linkedlist/obj
+	$(RM) -fr adt/linkedlist/obj adt/linkedlist/*.o

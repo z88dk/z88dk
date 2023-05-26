@@ -23,4 +23,4 @@ $(eval $(call buildbit,input,z80n,test,-clib=z80n,-mz80n))
 
 
 input-clean:
-	$(RM) -fr input/obj
+	$(RM) -fr input/obj input/*.o

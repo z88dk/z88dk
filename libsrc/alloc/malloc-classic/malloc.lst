@@ -23,6 +23,6 @@ alloc/malloc-classic/obj/${TYPE}/realloc
 alloc/malloc-classic/obj/${TYPE}/realloc_callee
 alloc/malloc-classic/obj/${TYPE}/sbrk
 alloc/malloc-classic/obj/${TYPE}/sbrk_callee
-alloc/malloc-classic/obj/${TYPE}/strings/strdup
+alloc/malloc-classic/obj/${TYPE}/strdup
 alloc/malloc-classic/obj/${TYPE}/asm_realloc
 alloc/malloc-classic/obj/${TYPE}/asm_free

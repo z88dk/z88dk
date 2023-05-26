@@ -22,4 +22,4 @@ $(eval $(call buildbit,assert,z80n,test,-clib=z80n,-mz80n))
 
 
 assert-clean:
-	$(RM) -fr assert/obj
+	$(RM) -fr assert/obj assert/*.o

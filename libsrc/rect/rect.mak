@@ -22,4 +22,4 @@ $(eval $(call buildbit,rect,z80n,test,-clib=z80n,-mz80n))
 
 
 rect-clean:
-	$(RM) -fr rect/obj
+	$(RM) -fr rect/obj rect/*.o
