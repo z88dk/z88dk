@@ -79,8 +79,12 @@ static disc_spec attache_spec = {
 };
 
 
+// SSSD osborne 1 disks, see section 7.7 of the Osborne 1 technical manual
+// http://dunfield.classiccmp.org/osborne/o1techm.pdf
+
 static disc_spec osborne_spec = {
-    .name = "Osborne",
+    .name = "Osborne_DD",
+    .disk_mode = MFM300,
     .sectors_per_track = 5,
     .tracks = 40,
     .sides = 1,
@@ -92,6 +96,24 @@ static disc_spec osborne_spec = {
     .extent_size = 1024,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
+};
+
+static disc_spec osborne_sd_spec = {
+    .name = "Osborne_SD",
+    .disk_mode = FM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 }
 };
 
 
@@ -872,7 +894,8 @@ static struct formats {
     { "nabupc",    "Nabu PC",               &nabupc_spec, 0, NULL, 1 },
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
-    { "osborne1",  "Osborne 1",             &osborne_spec, 0, NULL, 1 },
+    { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
+    { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
     { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "pcw40",     "Amstrad PCW, 40T",      &pcw40_spec, 16, "\x00\x00\x28\x09\x02\x01\x03\x02\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "plus3",     "Spectrum +3 173k",      &plus3_spec, 0, NULL, 1 },
