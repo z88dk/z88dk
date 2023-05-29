@@ -65,6 +65,7 @@ static disc_spec einstein_spec = {
 
 static disc_spec attache_spec = {
     .name = "Attache",
+    .disk_mode = MFM300,	
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 2,
@@ -315,6 +316,7 @@ static disc_spec bondwell2_spec = {
 
 static disc_spec kayproii_spec = {
     .name = "KayproII",
+    .disk_mode = MFM300,
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 1,
