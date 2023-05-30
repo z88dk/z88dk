@@ -119,7 +119,8 @@ static disc_spec osborne_sd_spec = {
 
 
 static disc_spec dmv_spec = {
-    .name = "NEC DMV",
+    .name = "NCR DMV",
+    .disk_mode = MFM300,
     .sectors_per_track = 8,
     .tracks = 40,
     .sides = 2,
