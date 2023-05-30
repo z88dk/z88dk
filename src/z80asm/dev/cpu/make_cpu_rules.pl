@@ -29,6 +29,8 @@ for my $asm (sort keys %opcodes) {
 open(my $rules, ">", "cpu_rules.h") or die $!;
 
 for my $tokens (sort keys %parser) {
+	#say $tokens;
+	
 	print $rules $tokens, ' @{', "\n";
 	print $rules merge_cpu($parser{$tokens});
 	print $rules '}', "\n\n";
@@ -77,13 +79,56 @@ sub parse_code {
 			"asm_LABEL_offset(end_label, 6);";
 	}
 	# handle special case of dec b;jr nz, %j
-	elsif (@ops==2 && $ops[0][0] == 0x05 && $ops[1][1] eq '%j') {
+	elsif (@ops==2 && $ops[0][0] =~ /^\d+$/ && 
+	       $ops[0][0] == 0x05 && $ops[1][1] eq '%j') {
 		my $opc = "0x".fmthex($ops[1][0]);
 		push @code, 
 			"DO_stmt(0x05);",
 			# compensate for extra byte
 			"add_opcode_jr_n($opc, pop_expr(ctx), 1);";	
 	}
+	# handle {ADL0}? xxx : xxx
+	elsif ($ops[0][0] eq '{ADL0}?') {
+		my(@adl0, @adl1);
+		shift @ops;
+		while (@ops && $ops[0][0] ne ':') {
+			push @adl0, shift @ops;
+		}
+		shift @ops;
+		@adl1 = @ops;
+		
+		push @code, 
+			"if (option_ez80_adl() == false) {",
+			parse_code($cpu, $asm, @adl0),
+			"}",
+			"else {",
+			parse_code($cpu, $asm, @adl1),
+			"}";
+	}
+	# handle {ADLn}
+	elsif ($ops[0][0] =~ /\{ADL(\d)\}/) {
+		my $value = $1 ? "true" : "false";
+		shift @ops;
+		push @code,
+			"if (option_ez80_adl() != $value) {",
+			"    error_illegal_ident(); ",
+			"}",
+			"else {",
+			parse_code($cpu, $asm, @ops),
+			"}";
+	}
+	# handle rst[.l] %c
+	elsif ($asm =~ /^rst((\.[ls])?) %c/) {
+		if ($1) {
+			push @code, 
+				"DO_STMT_LABEL();",
+				"DO_stmt(".sprintf("0x%02X", $ops[0][0]).");";
+			shift @ops;
+		}
+		for my $bin (@ops) {
+			push @code, parse_code_opcode($cpu, $asm, @$bin);
+		}
+	}		
 	else {
 		for my $bin (@ops) {
 			push @code, parse_code_opcode($cpu, $asm, @$bin);
@@ -97,6 +142,8 @@ sub parse_code_opcode {
 	my($cpu, $asm, @bin) = @_;
 	my @bin0 = @bin;
 	my @code;
+
+	#say "$cpu\t$asm\t@bin";
 	
 	# check for argument type
 	my($stmt, $extra_arg) = ("", "");
@@ -108,7 +155,7 @@ sub parse_code_opcode {
 			"DO_STMT_LABEL();",
 			"add_call_emul_func(\"$func\");";
 	}
-	elsif ($asm =~ /^rst /) {
+	elsif ($asm =~ /^rst((\.[ls])?) %c/) {
 		push @code, 
 			"DO_STMT_LABEL();",
 			"if (expr_error) { error_expected_const_expr(); } else {",
@@ -158,6 +205,9 @@ sub parse_code_opcode {
 	}
 	elsif ($bin =~ s/ %h$//) {
 		$stmt = "DO_stmt_h";
+	}
+	elsif ($bin =~ s/ %m %m %m$//) {
+		$stmt = "DO_stmt_nnn";
 	}
 	elsif ($bin =~ s/ %m %m$//) {
 		$stmt = "DO_stmt_nn";
@@ -288,32 +338,13 @@ sub merge_parens {
 				parse_code($cpu, @{$t->{expr_no_parens}});
 	}
 	elsif ($t->{expr_no_parens} && $t->{expr_in_parens}) {
-		my($common, $in_parens, $no_parens) = 
-			extract_common(parse_code($cpu, @{$t->{expr_in_parens}}),
-						   parse_code($cpu, @{$t->{expr_no_parens}}));
-		return $common.
-				"if (expr_in_parens) { $in_parens } else { $no_parens }";
+		my $in_parens = parse_code($cpu, @{$t->{expr_in_parens}});
+		my $no_parens = parse_code($cpu, @{$t->{expr_no_parens}});
+		return "if (expr_in_parens) { $in_parens } else { $no_parens }";
 	}
 	else {
 		die;
 	}
-}
-
-sub extract_common {
-	my($a, $b) = @_;
-	my $common = '';
-	
-	while ($a =~ /(.*?[;}])/s && 
-			substr($a, 0, length($1)) eq
-			substr($b, 0, length($1)) ) {
-		$common .= $1;
-		
-		$a = substr($a, length($&));
-		$b = substr($b, length($&));
-	}
-	$common .= "\n" if $common;
-	
-	return ($common, $a, $b);
 }
 
 sub fmthex {

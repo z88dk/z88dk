@@ -9,6 +9,7 @@ Z88DK Z80 Module Assembler Change Log
 2023-05-13 Fix #2254: move the object file into place once it's been generated
 2023-05-13 Fix #2251: accept ':' as statement separator
 2023-05-18 Fix #2260: output dir prepended twice
+2023-06--9 Fix #2279: add support to ez80, both z80 memory mode and ADL memory mode
 
 2022
 ----

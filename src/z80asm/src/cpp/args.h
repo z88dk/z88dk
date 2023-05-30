@@ -25,6 +25,8 @@ public:
 	const string& cpu_name() const { return m_cpu_name; }
 	bool ti83() const { return m_ti83; }
 	bool ti83plus() const { return m_ti83plus; }
+	bool ez80_adl() const { return m_ez80_adl; }
+	void set_ez80_adl(bool f) { m_ez80_adl = f; }
 	bool opt_speed() const { return m_opt_speed; }
 	bool debug() const { return m_debug; }
 	const string& lib_file() const { return m_lib_file; }
@@ -74,6 +76,7 @@ private:
 	string			m_cpu_name{ CPU_Z80_NAME };	
 	bool			m_ti83{ false };			// -mti83 option
 	bool			m_ti83plus{ false };		// -mti83plus option
+	bool			m_ez80_adl{ false }; 		// .ASSUME ADL=<n>
 	bool			m_opt_speed{ false };		// -opt-speed option
 	bool			m_debug{ false };			// -debug option
 	string			m_lib_file;					// -x option

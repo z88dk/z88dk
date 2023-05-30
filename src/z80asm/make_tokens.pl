@@ -32,7 +32,7 @@ my @tokens = (
 	'IND_BC', 'IND_DE', 'IND_HL', 'IND_SP', 'IND_IX', 'IND_IY', 'IND_HLI', 'IND_HLD',
 	
 	# Assembly keywords
-	'ASMPC',
+	'ASMPC', 
 	
 	# Flags, C register
 	'NZ', 'Z', 'NC', 'C', 'PO', 'PE', 'P', 'M', 
@@ -48,8 +48,15 @@ my @tokens = (
 	# alternate registers
 	'B1', 'C1', 'D1', 'E1', 'H1', 'L1', 'A1', 'F1', 'BC1', 'DE1', 'HL1', 'AF1',
 	
+	# EZ80 specific keywords
+	'ADL', 'S', 'IS', 'IL', 'SIS', 'LIL', 'MB',
+	'LEA', 'PEA', 'RSMIX', 'STMIX',
+	'INI2', 'INI2R', 'IND2', 'IND2R', 'INIM', 'INIMR', 'INDM', 'INDMR', 'INIRX', 'INDRX',
+	'OTD2R', 'OTDRX', 'OTI2R', 'OTIRX', 'OUTD2', 'OUTI2',
+
 	# Assembly directives
-	'ALIGN', 'ASSERT', 'BYTE', 'C_LINE', 'DB', 'DC', 'DDB', 'DEFB', 'DEFC', 
+	'ALIGN', 'ASSERT', 'ASSUME', 
+	'BYTE', 'C_LINE', 'DB', 'DC', 'DDB', 'DEFB', 'DEFC', 
 	'DEFDB', 'DEFGROUP', 'DEFINE', 'DEFM', 'DEFP', 'DEFQ', 'DEFS', 'DEFVARS', 
 	'DEFW', 'DEPHASE', 'DM', 'DP', 'DQ', 'DS', 'DW', 'DWORD', 'EQU', 'EXTERN', 
 	'GLOBAL', 'LIB', 'LINE', 'LSTOFF', 'LSTON', 'MODULE', 'ORG', 'PHASE', 'PTR', 
@@ -80,6 +87,8 @@ my @tokens = (
 	# Z180 specific opcodes
 	'SLP', 'MLT', 'IN0', 'OUT0', 'OTIM', 'OTIMR', 'OTDM', 'OTDMR', 'TST', 'TSTIO',
 
+	# EZ80 specific opcodes
+	
 	# Rabbit 2000/3000 specific opcodes
 	'ALTD', 'BOOL', 'IOE', 'IOI', 'IPRES', 'IPSET', 'IDET', 'LDDSR', 'LDISR', 
 	'LDP', 'LSDR', 'LSIR', 'LSDDR', 'LSIDR', 'MUL', 'IP', 'SU', 'RDMODE', 
