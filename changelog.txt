@@ -6,8 +6,15 @@ z88dk v2.3 - xx.xx.202x
 
 Detailed but incomplete changelist:
 
+appmake: VT-180 CP/M disk format 
 - [classic] +cpc: Interrupt support
 - [classic] +cpc: Graphics support for all 3 official modes
+- [classic] +cpm: Support for Xerox 820 and sound on 820ii
+- [classic] +cpm: IMD disk option added to several targets
+- [classic] +cpm: Support for Visual 1050
+- [classic] +cpm: Support for Sanyo MBC-200/MBC-1200 models
+- [classic] +cpm: Sanyo MBC disk formats (several models)
+- [classic] +cpm: VT-180 "Robin" disk format
 - [classic] +cpm: Support for corvette boot disk
 - [classic] +cpm: Support for NabuPC
 - [classic] +cpm: Support for Gemini Galaxy
