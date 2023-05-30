@@ -26,6 +26,9 @@ Detailed but incomplete changelist:
 - [sccz80] Extended quikmult cases
 - [sccz80] Initialisation improvements
 - [z80asm] Allow jr across sections
+- [z80asm] Convert address difference to constant
+- [z80asm] Support #ifdef/#endif etc in assembler
+- [z80asm] Accept ':' as statement separator
 - [zcc] +config at any place, support for -xc
 - [make] add cmake support
 
