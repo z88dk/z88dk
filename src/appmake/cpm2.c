@@ -63,6 +63,25 @@ static disc_spec einstein_spec = {
 };
 
 
+static disc_spec actrix_spec = {
+    .name = "Actrix",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0x55,
+    .boottracks = 2,
+    .directory_entries = 32,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 6, 1, 4, 7, 2, 5, 8 }
+};
+
+
 static disc_spec ampro_spec = {
     .name = "Ampro",
     .disk_mode = MFM300,	
@@ -887,6 +906,7 @@ static struct formats {
      char           force_com_extension;
      void         (*extra_hook)(disc_handle *handle);
 } formats[] = {
+    { "actrix",    "Actrix Access",         &actrix_spec, 0, NULL, 1 },
     { "alphatro",  "Alphatronic PC",        &alphatro_spec, 0, NULL, 1 },
     { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
     { "ampro",     "Ampro 48tpi",           &ampro_spec, 0, NULL, 1 },
