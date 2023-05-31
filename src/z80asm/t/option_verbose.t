@@ -51,7 +51,6 @@ ${test}.asm:
      3                          	nop
         0002  00                      + nop
      4                          
-                                      +
 END
 
 check_text_file("${test}.def", <<END);

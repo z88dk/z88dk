@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _poly_callee
-EXTERN	cm32_sdcc_fspoly_callee
-defc _poly_callee = cm32_sdcc_fspoly_callee
+defc _poly_callee = poly_callee
 ENDIF
 

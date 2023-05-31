@@ -14,7 +14,7 @@ target/gal/scrolluptxt
 target/gal/scrolldowntxt
 target/gal/invtxt
 target/gal/filltxt
-@font/font_8x8/font_8x8.lst
+
 @stdio/ansicore.lst
 target/gal/stdio/ansi/f_ansi_attr
 target/gal/stdio/ansi/f_ansi_char

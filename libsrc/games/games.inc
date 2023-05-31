@@ -9,6 +9,7 @@
 ;       else 8 bit io
 ;
 ;       However.... SOUND_INOUT = toggle speaker with in/out (+ace only)
+;                   SOUND_OUTOUT = toggle speaker accessing to 2 different port addresses (x820ii only)
 ;                   SOUND_IFF = toggle speaker with ei/di cycle (+sol20 only)
 ;
 ;       $Id: games.inc $
@@ -273,8 +274,7 @@ IF FORti83
         ;----
 ENDIF
 
-; Confusing name
-IF FORti8x
+IF FORti83p
         defc SOUND_ONEBIT_port   = 0
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 3
@@ -585,21 +585,39 @@ IF FORgl6000
 ENDIF
 
 IF FORprimo
-    defc SOUND_ONEBIT_port	= $00 ;
-    defc SOUND_ONEBIT_bit    = 4
-    defc SOUND_ONEBIT_mask   = $10        ;
+        defc SOUND_ONEBIT_port	= $00 ;
+        defc SOUND_ONEBIT_bit    = 4
+        defc SOUND_ONEBIT_mask   = $10        ;
 ENDIF
 
 IF FORmikro80
-    defc SOUND_ONEBIT_port	= $4 ;
-    defc SOUND_ONEBIT_bit    = 1
-    defc SOUND_ONEBIT_mask   = $2	;
+        defc SOUND_ONEBIT_port	= $4 ;
+        defc SOUND_ONEBIT_bit    = 1
+        defc SOUND_ONEBIT_mask   = $2	;
 ENDIF
 
 IF FORtvc
-    defc SOUND_ONEBIT_port      = $06           ; PORT 6 sets volume
-    defc SOUND_ONEBIT_mask      = @00111100     ; 4 bit wide volume: 0 or 1 -> 0000 or 1111
-    defc SOUND_ONEBIT_bit       = 5             ; bit 5 is just fine to test (could be bit 2-5)
+        defc SOUND_ONEBIT_port      = $06           ; PORT 6 sets volume
+        defc SOUND_ONEBIT_mask      = @00111100     ; 4 bit wide volume: 0 or 1 -> 0000 or 1111
+        defc SOUND_ONEBIT_bit       = 5             ; bit 5 is just fine to test (could be bit 2-5)
+ENDIF
+
+IF FORx820ii
+        defc SOUND_OUTOUT = 1
+        defc SOUND_ONEBIT_port   = $28
+        defc SOUND_ONEBIT_port2   = $29
+        defc SOUND_ONEBIT_bit    = 0
+        defc SOUND_ONEBIT_mask   = 1         ; (2^SOUND_ONEBIT_bit)
+        ;----
+        defc PLAY_DATA_LEAD    = 186   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 51    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 5     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 62    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 69    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc LDR_DATA_TIMING   = 34
+        defc PLAY_MSXDATA_HI     = 12914    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 26408    ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
 ENDIF
 
 
@@ -744,7 +762,7 @@ ENDIF
 ; **********************************************************
 
 MACRO ONEBITOUT
-LOCAL l1, l2, l3, l4
+LOCAL l1, l2, l3, l4, l5, l6
 IF SOUND_INOUT = 1
     ld      c,a
     and     SOUND_ONEBIT_mask
@@ -761,6 +779,14 @@ ELIF SOUND_IFF = 1
 l3: jp      l4
     ei
 l4: ld      a,c
+ELIF SOUND_OUTOUT = 1
+    ld      c,a
+    and     SOUND_ONEBIT_mask
+    jr      nz,l5
+    out     (SOUND_ONEBIT_port),a
+    jr      l6
+l5: out     (SOUND_ONEBIT_port2),a 
+l6: ld      a,c
 ELIF SOUND_ONEBIT_port >= 256
     exx
     out     (c),a
@@ -774,7 +800,7 @@ ENDM
 
 
 MACRO ONEBITOUT2
-LOCAL l1, l2, l3, l4
+LOCAL l1, l2, l3, l4, l5, l6
 IF SOUND_INOUT = 1
     ld      c,a
     and     SOUND_ONEBIT_mask
@@ -791,6 +817,14 @@ ELIF SOUND_IFF = 1
 l3: jp      l4
     ei
 l4: ld      a,c
+ELIF SOUND_OUTOUT = 1
+    ld      c,a
+    and     SOUND_ONEBIT_mask
+    jr      nz,l5
+    out     (SOUND_ONEBIT_port),a
+    jr      l6
+l5: out     (SOUND_ONEBIT_port2),a
+l6: ld      a,c
 ELIF SOUND_ONEBIT_port >= 256
     out     (c),a
 ELIF SOUND_ONEBIT_port < 0

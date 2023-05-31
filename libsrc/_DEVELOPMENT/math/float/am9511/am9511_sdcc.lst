@@ -3,7 +3,6 @@ math/float/am9511/c/sdcc/cam32_sdcc_acosh
 math/float/am9511/c/sdcc/cam32_sdcc_asin
 math/float/am9511/c/sdcc/cam32_sdcc_asinh
 math/float/am9511/c/sdcc/cam32_sdcc_atan
-math/float/am9511/c/sdcc/cam32_sdcc_atan2_callee
 math/float/am9511/c/sdcc/cam32_sdcc_atanh
 math/float/am9511/c/sdcc/cam32_sdcc_ceil
 math/float/am9511/c/sdcc/cam32_sdcc_cos

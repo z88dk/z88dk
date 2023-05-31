@@ -1,0 +1,19 @@
+
+
+defc SPORT  = 10H             ;system port 10H  (OUT/IN)
+defc KBPORT = 20H             ;keyboad scanning (sensing) port  (IN)
+defc SPORT2 = 20H             ;system port 20H  (OUT)
+defc SPORT3 = 30H             ;system port 30H  (IN)
+defc LPTPT  = 30H             ;LPT data output port  (OUT)
+defc IOPRT0 = 40H             ;serial I/O port (8251)  (IN/OUT)
+defc IOPRT1 = 41H             ;
+defc CRTPT0 = 50H             ;CRTC (HD46505) register set port (OUT)
+defc CRTPT1 = 51H             ;               data port (IN/OUT)
+defc DMAAD  = 64H             ;DMA (8257) channel-2 address  (IN/OUT)
+defc DMATC  = 65H             ;DMA, TC and mode  (IN/OUT)
+defc DMARG  = 68H             ;DMA, mode set and status register  (IN/OUT)
+defc PIC70  = 70H             ;PIC (i8259),  ICW1, OCW2, OCW3  (OUT)
+defc PIC71  = 71H             ;ICW2, OCW1  (OUT)
+defc FDCNTL = 0F0H            ;flopy disk controller port
+defc FDCDT  = 0F8H            ;FDC data port
+defc FDCST  = 0F9H            ;FDC status port

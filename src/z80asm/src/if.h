@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // interface between C and C++ components
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -99,6 +99,7 @@ void error_duplicate_definition(const char* name);
 void error_duplicate_definition_module(const char* modulename, const char* name);
 void error_expr_recursion();
 void error_file_open(const char* filename);
+void error_file_rename(const char* filename);
 void error_illegal_ident();
 void error_int_range(int value);
 void error_invalid_char_const();

@@ -5,7 +5,7 @@ target/super80/stdio/generic_console_vduem_ioctl
 target/super80/stdio/conio_map_colour
 target/super80/stdio/CRT_FONT
 target/shared/copy_font
-@font/font_8x8/font_8x8.lst
+
 target/super80/graphics/textpixl
 @gfx/gencon/gfx_gencon.lst
 @input/input_keyboard.lst

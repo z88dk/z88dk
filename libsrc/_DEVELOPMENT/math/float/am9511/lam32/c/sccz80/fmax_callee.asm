@@ -8,6 +8,5 @@
 IF __CLASSIC
     ; SDCC bridge for Classic
     PUBLIC  _fmax_callee
-    EXTERN  cam32_sdcc_fmax_callee
-    defc    _fmax_callee = cam32_sdcc_fmax_callee
+    defc    _fmax_callee = fmax_callee
 ENDIF

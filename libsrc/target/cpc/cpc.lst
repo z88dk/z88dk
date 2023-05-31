@@ -8,7 +8,7 @@ target/cpc/stdio/bordercolour
 target/cpc/stdio/conio_map_colour
 target/cpc/stdio/conio_vars
 target/cpc/stdio/CRT_FONT
-@font/font_8x8/font_8x8.lst
+
 @stdio/ansicore.lst
 target/cpc/stdio/ansi/f_ansi_attr
 target/cpc/stdio/ansi/f_ansi_bel

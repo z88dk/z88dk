@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -165,6 +165,10 @@ void set_error_expanded_line(const char* line) {
 //-----------------------------------------------------------------------------
 void error_file_open(const char* filename) {
 	g_errors.error(ErrCode::FileOpen, filename);
+}
+
+void error_file_rename(const char* filename) {
+	g_errors.error(ErrCode::FileRename, filename);
 }
 
 void error_duplicate_definition(const char* name) {

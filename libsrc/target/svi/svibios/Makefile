@@ -11,8 +11,7 @@ all: dirs $(addprefix obj/$(TARGET)/,$(OBJECTS))
 
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I$(Z88DK_LIB)/../libsrc/ -I$(Z88DK_LIB) $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -DFOR$(TARGET) -I$(Z88DK_LIB)/../libsrc/ -I$(Z88DK_LIB) -Oobj/$(TARGET) $^
 
 dirs:
 	@mkdir -p obj/$(TARGET)

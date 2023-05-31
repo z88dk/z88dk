@@ -1,6 +1,15 @@
 Z88DK Z80 Module Assembler Change Log
 =====================================
 
+2023
+----
+2023-03-16 Fix #2066: Use boost::filesystem as fallback to std::filesystem from C++17
+2023-03-19 Fix nightly build failure - z80asm cannot find std::filesystem dll entry point
+2023-04-17 Fix #2227: Support #ifdef/#endif etc in assembler
+2023-05-13 Fix #2254: move the object file into place once it's been generated
+2023-05-13 Fix #2251: accept ':' as statement separator
+2023-05-18 Fix #2260: output dir prepended twice
+
 2022
 ----
 - 2022-01-04 Add support for '#include' C style include directive
@@ -9,14 +18,29 @@ Z88DK Z80 Module Assembler Change Log
 - 2022-01-07 z80asm is now a Macro Assembler
 - 2022-01-07 Issue #18 remove INVOKE directive unless -mti83 or -mti83plus is passed in the comand line
 - 2022-01-08 Fix #16: -Opath was added twice to consolidated object file name
-- 2022-01-09 Fix #1573 now map and def files use same basename as bin file
+- 2022-01-09 Fix #1573: now map and def files use same basename as bin file
 - 2022-06-14 Several fixes to compound assembly instructions
 - 2022-06-15 Add table of recognized opcodes to the wiki
-- 2022-06-25 Fix #2036 build and test on Windows
-- 2022-06-27 Fix #2040 allow options and filenames in @ files
-- 2022-07-01 Fix #2043 z80asm: deletion of empty binary files except first not always working
+- 2022-06-25 Fix #2036: build and test on Windows
+- 2022-06-27 Fix #2040: allow options and filenames in @ files
+- 2022-07-01 Fix #2043: z80asm: deletion of empty binary files except first not always working
 - 2022-07-04 Parallelize z80asm tests
-- 2022-07-07 Fix #2045 ignore ORG statements when producing a binary for appmake
+- 2022-07-07 Fix #2045: ignore ORG statements when producing a binary for appmake
+- 2022-07-23 Implement swap IX/IY at preprocessor level
+- 2022-07-23 Fix #2052 check which of .o or .asm to use and -d option during argument parsing
+- 2022-08-02 Exit with error message if fseek() fails
+- 2022-08-07 Too many debug symbols being created
+- 2022-08-09 Fix #2065: gcc including local dirent.h
+- 2022-08-13 Issue #2066 link libc and libc++ statically when cross-compiling
+- 2022-08-16 Fix #2068: fix str_path_canon()
+- 2022-08-18 Fix #2070: continue assembling after errors in one file
+- 2022-08-24 Issue #2066 link libc and libc++ statically when cross-compiling
+- 2022-09-03 Remove restriction of JR jumps not being cross-section
+- 2022-11-06 Fix #2120: make .lis file addresses 4 digit long
+- 2022-12-10 Fix #2118: cygwin build - chocolatey failure
+- 2022-12-27 Fix #2146: Convert address difference to constant
+- 2022-12-27 Fix #1574: recognize difference of addresses as constant
+- 2022-12-27 Fix #1177: fix case with two groups of parens, e.g. ld "bc, (1) + (2)"
 
 2021
 ----

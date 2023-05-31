@@ -14,7 +14,7 @@ stdio/ansi/generic/f_ansi_dline
 target/ace/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
 target/ace/time/clock
-@font/font_8x8/font_8x8.lst
+
 target/ace/games/joystick
 @games/games.lst
 @target/ace/ace/ace.lst

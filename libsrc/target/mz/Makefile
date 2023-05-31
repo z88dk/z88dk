@@ -24,8 +24,7 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	$(Q)$(ASSEMBLER) -DFOR$(TARGET) -I../.. -I../../../lib/ $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -DFOR$(TARGET) -I../.. -I../../../lib/ -Oobj/$(TARGET) $^
 
 dirs:
 	@mkdir -p obj/$(TARGET)

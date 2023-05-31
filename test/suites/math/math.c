@@ -15,6 +15,9 @@
     #define FABS(x) fabs(x)
     #define SQRT(x) sqrt(x);
     #define POW(x,y) pow(x,y)
+    #define FMOD(x,y) fmod(x,y)
+    #define FMIN(x,y) fmin(x,y)
+    #define FMAX(x,y) fmax(x,y)
     typedef double FLOAT;
 #endif
 
@@ -206,6 +209,58 @@ void test_pow()
     run_pow(2, 0.5, 1.41421356);
 }
 
+#ifndef MATH16
+
+static void run_fmod(FLOAT x, FLOAT y, FLOAT e)
+{
+    static char   buf[100];
+
+    FLOAT r = FMOD(x,y);
+    snprintf(buf,sizeof(buf),"fmod(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
+    Assert( approx_equal(e,r,EPSILON), buf);
+}
+
+void test_fmod()
+{
+    run_fmod(10.5, 2.0, 0.5);
+    run_fmod(10.123, 3, 1.123);
+}
+
+static void run_fmin(FLOAT x, FLOAT y, FLOAT e)
+{
+    static char   buf[100];
+
+    FLOAT r = FMIN(x,y);
+    snprintf(buf,sizeof(buf),"fmin(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
+    Assert( approx_equal(e,r,EPSILON), buf);
+}
+
+void test_fmin()
+{
+    run_fmin(3.0, 2.0, 2.0);
+    run_fmin(3.0,-1.0, -1.0);
+    run_fmin(-3.0,1.0, -3.0);
+}
+
+static void run_fmax(FLOAT x, FLOAT y, FLOAT e)
+{
+    static char   buf[100];
+
+    FLOAT r = FMAX(x,y);
+    snprintf(buf,sizeof(buf),"fmax(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
+    Assert( approx_equal(e,r,EPSILON), buf);
+}
+
+void test_fmax()
+{
+    run_fmax(3.0, 2.0, 3.0);
+    run_fmax(3.0,-1.0, 3.0);
+    run_fmax(-3.0,1.0, 1.0);
+
+}
+
+#endif
+
 int suite_math()
 {
     suite_setup(MATH_LIBRARY " Tests");
@@ -220,6 +275,11 @@ int suite_math()
     suite_add_test(test_approx_equal);
     suite_add_test(test_sqrt);
     suite_add_test(test_pow);
+#ifndef MATH16
+    suite_add_test(test_fmod);
+    suite_add_test(test_fmin);
+    suite_add_test(test_fmax);
+#endif
     return suite_run();
 }
 

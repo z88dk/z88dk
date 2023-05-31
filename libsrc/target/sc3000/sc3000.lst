@@ -1,7 +1,7 @@
 target/sc3000/stdio/fgetc_cons
 target/sc3000/stdio/getk
 @stdio/ansicore.lst
-@font/font_8x8/font_8x8.lst
+
 target/sc3000/time/clock
 @input/input_keyboard.lst
 @video/tms9918/video_tms9918.lst

@@ -1,0 +1,4 @@
+target/x820/stdio/generic_console
+@games/games.lst
+target/x820/graphics/textpixl2
+@gfx/gencon/gfx_gencon2.lst

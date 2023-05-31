@@ -23,7 +23,6 @@ math/float/math32/c/sdcc/cm32_sdcc___ulong2fs
 math/float/math32/c/sdcc/cm32_sdcc___ulong2fs_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsread
 math/float/math32/c/sdcc/cm32_sdcc_fsread_callee
-math/float/math32/c/sdcc/cm32_sdcc_fsload
 math/float/math32/c/sdcc/cm32_sdcc_fsadd
 math/float/math32/c/sdcc/cm32_sdcc_fsadd_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsdiv

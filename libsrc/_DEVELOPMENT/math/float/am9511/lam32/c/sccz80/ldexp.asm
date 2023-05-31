@@ -8,7 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _ldexp
-EXTERN cam32_sdcc_ldexp
-defc _ldexp = cam32_sdcc_ldexp
+defc _ldexp = ldexp
 ENDIF
 

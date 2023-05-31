@@ -16,12 +16,9 @@ cm32_sccz80_dloadb:
     ;
     ; uses  : bc, de, hl, bc', de', hl'
 
-    ld d,(hl)
-    dec hl
-    ld e,(hl)
-    dec hl
-    ld b,(hl)
-    dec hl
+    ld d,(hl-)
+    ld e,(hl-)
+    ld b,(hl-)
     ld l,(hl)
     ld h,b
 

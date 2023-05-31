@@ -21,7 +21,7 @@ END_ERR
 	z80asm_nok("", "", ".aa: $equ 1,", <<END_ERR);
 $test.asm:1: error: syntax error
   ^---- .aa: $equ 1,
-      ^---- aa::$equ${space}1,
+      ^---- $equ${space}1,
 END_ERR
 
 	z80asm_ok("", "", "", 

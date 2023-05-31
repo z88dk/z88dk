@@ -9,7 +9,7 @@ stdio/inkey/getk
 stdio/inkey/fgetc_cons
 
 @input/input_keyboard.lst
-@font/font_8x8/font_8x8.lst
+
 target/pmd85/games/joystick
 target/pmd85/games/keys_joystick
 @games/games.lst

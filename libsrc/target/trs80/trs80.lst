@@ -6,7 +6,7 @@ target/trs80/stdio/generic_console_ioctl
 target/trs80/stdio/conio_map_colour
 target/trs80/stdio/CRT_FONT
 @stdio/stdio.lst
-@font/font_8x8/font_8x8.lst
+
 @input/input_keyboard.lst
 target/trs80/psg/set_psg
 target/trs80/psg/set_psg_callee

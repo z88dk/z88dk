@@ -17,12 +17,10 @@ obj/svi/%.o: %.c
 	$(ZCC) +svi $(CFLAGS) -o $@  $^
 
 obj/msx/%.o: %.asm
-	@$(ASSEMBLER) -DFORmsx -I$(Z88DK_LIB) -I$(Z88DK_LIB)/../libsrc  $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -DFORmsx -I$(Z88DK_LIB) -I$(Z88DK_LIB)/../libsrc -Oobj/msx $^
 
 obj/svi/%.o: %.asm
-	@$(ASSEMBLER) -DFORsvi -I$(Z88DK_LIB) -I$(Z88DK_LIB)/../libsrc $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -DFORsvi -I$(Z88DK_LIB) -I$(Z88DK_LIB)/../libsrc -Oobj/svi $^
 
 dirs:
 	@mkdir -p obj/svi obj/msx

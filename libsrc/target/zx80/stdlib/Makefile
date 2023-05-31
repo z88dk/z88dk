@@ -26,8 +26,7 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I../..  $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -DFOR$(TARGET) -I../.. -Oobj/$(TARGET) $^
 
 obj/$(TARGET)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@ $^

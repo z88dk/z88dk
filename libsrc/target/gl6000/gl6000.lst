@@ -10,7 +10,7 @@ target/gl6000/graphics/pixladdr.asm
 gfx/narrow/obj/gl6000/stencil_render
 gfx/narrow/obj/gl6000/putsprite
 @gfx/narrow/gfx_narrow.lst
-@font/font_8x8/font_8x8.lst
+
 @input/input_keyboard.lst
 target/gl6000/games/keys_joystick
 @games/games.lst

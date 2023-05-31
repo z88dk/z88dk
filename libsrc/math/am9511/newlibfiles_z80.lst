@@ -108,7 +108,6 @@
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/asinh_fastcall.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/atan.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/atan2.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/atan2_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/atan_fastcall.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/atanh.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/atanh_fastcall.asm
@@ -138,7 +137,6 @@
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/fmin.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/fmin_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/fmod.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/fmod_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/fpclassify.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/frexp.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/frexp_callee.asm
@@ -163,11 +161,6 @@
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_sub.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_swap.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_zero.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_div.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_div_u.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_mod.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_mod_u.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_mult.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/log.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/log2.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/log2_fastcall.asm
@@ -175,7 +168,6 @@
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/log10_fastcall.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/log_fastcall.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/modf.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/modf_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/mul2.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/mul2_fastcall.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/mul10u.asm
@@ -276,7 +268,6 @@
 ../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_asin.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_asinh.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_atan.asm
-../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_atan2_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_atanh.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_ceil.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_cos.asm
@@ -369,7 +360,6 @@
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_asinh.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_atan.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_atan2.asm
-../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_atan2_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_atanh.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_ceil.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_cos.asm
@@ -392,7 +382,6 @@
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_fmin.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_fmin_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_fmod.asm
-../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_fmod_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_fmul.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_fmul_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_fmul2.asm
@@ -415,7 +404,6 @@
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_log2.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_log10.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_modf.asm
-../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_modf_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_neg.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_pow.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_pow_callee.asm

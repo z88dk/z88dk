@@ -50,7 +50,6 @@
 		EXTERN		generic_console_set_ink
 		EXTERN		generic_console_set_paper
 		EXTERN		generic_console_set_attribute
-		EXTERN		generic_console_set_attribute
 		EXTERN		__console_x
 		EXTERN		__console_y
 		EXTERN		__console_w

@@ -6,7 +6,7 @@ target/m5/stdio/fputc_cons_rom
 @video/tms9918/video_tms9918.lst
 @stdio/ansicore.lst
 @stdio/stdio.lst
-@font/font_8x8/font_8x8.lst
+
 @input/input_keyboard.lst
 @gfx/narrow/gfx_narrow.lst
 target/m5/games/joystick

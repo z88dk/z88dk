@@ -49,7 +49,6 @@ __mbc_pixel:
         ld      (__gfx_coords+2),de    ; store Y: COORDS must be 2 bytes wider
 		
 		push hl
-		ld h,c
 		
 		ld l,27
 		call mbc_sendchar
@@ -68,4 +67,3 @@ __mbc_pixel:
 		call mbc_sendchar
 		ld l,e
 		jp mbc_sendchar
-

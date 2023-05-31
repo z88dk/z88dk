@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _fpclassify
-EXTERN  cam32_sdcc_fpclassify
-defc _fpclassify = cam32_sdcc_fpclassify
+defc _fpclassify = fpclassify
 ENDIF
 

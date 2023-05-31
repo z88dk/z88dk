@@ -1,7 +1,7 @@
 
 #include "am9511_math.h"
 
-float am9511_atan2 (float y, float x)
+float am9511_atan2 (float y, float x) __stdc
 {
     float v;
 

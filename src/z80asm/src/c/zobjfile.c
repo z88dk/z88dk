@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2023
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -229,10 +229,15 @@ void write_obj_file(const char* source_filename)
 	/* open file */
 	obj_filename = get_o_filename(source_filename);
 
+	// #2254 - write temp file
+	UT_string* temp_filename;
+	utstring_new(temp_filename);
+	utstring_printf(temp_filename, "%s~", obj_filename);
+
 	if (option_verbose())
 		printf("Writing object file '%s'\n", path_canon(obj_filename));
 
-	fp = xfopen(obj_filename, "wb");
+	fp = xfopen(utstring_body(temp_filename), "wb");
 
 	/* write header */
 	xfwrite_cstr(Z80objhdr, fp);
@@ -259,6 +264,14 @@ void write_obj_file(const char* source_filename)
 
 	/* close temp file and rename to object file */
 	xfclose(fp);
+
+	// #2254 - rename temp file
+	remove(obj_filename);
+	int rv = rename(utstring_body(temp_filename), obj_filename);
+	if (rv != 0) 
+		error_file_rename(utstring_body(temp_filename));
+
+	utstring_free(temp_filename);
 }
 
 

@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _frexp
-EXTERN cam32_sdcc_frexp
-defc _frexp = cam32_sdcc_frexp
+defc _frexp = frexp
 ENDIF
 

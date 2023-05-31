@@ -30,7 +30,7 @@
 
 #include "am9511_math.h"
 
-float am9511_modf (float x, float * y) 
+float am9511_modf (float x, float * y) __stdc
 {
     if ( x < 0 ) *y = ceil(x);
     else *y = floor(x);

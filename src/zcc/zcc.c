@@ -567,7 +567,7 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     {{ "-mr3k"   , "-mr3k"   , "-mr3ka"  , "-mr3k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1"   }},          /* CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-m8080"  , "-m8080"  , "-mz80"   , "-m8080", "DESTDIR/lib/arch/8080/8080_rules.1"  }},          /* CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-m8085"  , "-m8085"  , "-mz80"   , "-m8085", "DESTDIR/lib/arch/8085/8085_rules.1"  }},          /* CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mgbz80" , "-mgbz80" , "-mgbz80" , "-mgbz80", "DESTDIR/lib/arch/gbz80/gbz80_rules.1" }},       /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mgbz80" , "-mgbz80" , "-msm83" , "-mgbz80", "DESTDIR/lib/arch/gbz80/gbz80_rules.1" }},       /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mz80"   , "-mz80" ,  "-mz80" ,    "-mez80", "DESTDIR/lib/arch/ez80/ez80_rules.1" }}           /* CPU_TYPE_EZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
 };
 
@@ -705,11 +705,19 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
     int             status, errs;
     int             tstore;
     char            buffer[8192], *outname;
+    char           *bin_dir = c_binary_dir;
 
     errs = 0;
 
     if (!hassuffix(filelist[number], suffix))
         return (0);
+
+#ifndef WIN32
+    // On non-windows platforms m4 is a system file, so doesn't need a prefix
+    if (strcasecmp(processor,"m4") == 0) {
+        bin_dir = "";
+    }
+#endif
 
     outname = changesuffix(temporary_filenames[number], nextsuffix);
 
@@ -719,24 +727,24 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
         tstore = strlen(filelist[number]) - strlen(suffix);
         if (!needsuffix)
             filelist[number][tstore] = 0;
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\"", c_binary_dir, processor, extraargs, filelist[number]);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\"", bin_dir, processor, extraargs, filelist[number]);
         filelist[number][tstore] = '.';
         break;
     case outspecified:
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     case outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" -o \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     case filter:
-        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" > \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" > \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     case filter_out:
         // This is only used by copy command, which is cat/type so not a z88dk binary
         snprintf(buffer, sizeof(buffer), "%s %s \"%s\" > \"%s\"", processor, extraargs, filelist[number], outname);
         break;
     case filter_outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" -o \"%s\"", c_binary_dir, processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     }
 
