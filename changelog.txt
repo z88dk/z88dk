@@ -14,7 +14,7 @@ appmake: VT-180 CP/M disk format
 - [classic] +cpm: Support for Visual 1050
 - [classic] +cpm: Support for Sanyo MBC-200/MBC-1200 models
 - [classic] +cpm: Sanyo MBC disk formats (several models)
-- [classic] +cpm: VT-180 "Robin" disk format
+- [classic] +cpm: VT-180 "Robin", Morrow, Ampro & Actrix disk formats
 - [classic] +cpm: Support for corvette boot disk
 - [classic] +cpm: Support for NabuPC
 - [classic] +cpm: Support for Gemini Galaxy

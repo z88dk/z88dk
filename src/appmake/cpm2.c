@@ -63,6 +63,43 @@ static disc_spec einstein_spec = {
 };
 
 
+static disc_spec actrix_spec = {
+    .name = "Actrix",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0x55,
+    .boottracks = 2,
+    .directory_entries = 32,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 6, 1, 4, 7, 2, 5, 8 }
+};
+
+
+static disc_spec ampro_spec = {
+    .name = "Ampro",
+    .disk_mode = MFM300,	
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 17,
+    .alternate_sides = 1,
+};
+
+
 static disc_spec attache_spec = {
     .name = "Attache",
     .disk_mode = MFM300,	
@@ -202,6 +239,45 @@ static disc_spec microbee_spec = {
     .has_skew = 1,
     .skew_track_start = 5,
     .skew_tab = { 1, 4, 7, 0, 3, 6, 9, 2, 5, 8 }
+};
+
+
+static disc_spec md2_spec = {
+    .name = "Morrow_MD2",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 1, 4, 2 }
+};
+
+// Tested on ampro emulator, works also in MFM300 mode
+static disc_spec md3_spec = {
+    .name = "Morrow_MD3",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 1, 4, 2 }
 };
 
 
@@ -869,8 +945,10 @@ static struct formats {
      char           force_com_extension;
      void         (*extra_hook)(disc_handle *handle);
 } formats[] = {
+    { "actrix",    "Actrix Access",         &actrix_spec, 0, NULL, 1 },
     { "alphatro",  "Alphatronic PC",        &alphatro_spec, 0, NULL, 1 },
     { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
+    { "ampro",     "Ampro 48tpi",           &ampro_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bigboard",  "X820/Bigboard, 8in",    &bigboard_spec, 0, NULL, 1 },
@@ -890,6 +968,8 @@ static struct formats {
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
+    { "morrow2",   "Morrow MD 2 (SS)",      &md2_spec, 0, NULL, 1 },
+    { "morrow3",   "Morrow MD 3 (DS)",      &md3_spec, 0, NULL, 1 },
     { "mbc1000",   "Sanyo MBC-1000/1150",   &mbc1000_spec, 0, NULL, 1 },
     { "mbc1200",   "Sanyo MBC-200/1250",    &mbc1200_spec, 0, NULL, 1 },
     { "mbc2000",   "Sanyo MBC-2000",        &mbc2000_spec, 0, NULL, 1 },
