@@ -242,6 +242,25 @@ static disc_spec microbee_spec = {
 };
 
 
+static disc_spec md2_spec = {
+    .name = "Morrow_MD2",
+    .disk_mode = MFM250,	
+    .sectors_per_track = 5,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 1, 4, 2 }
+};
+
+
 static disc_spec mbc1000_spec = {
     .name = "MBC-1000",
     .disk_mode = MFM250,
@@ -929,6 +948,7 @@ static struct formats {
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
+    { "morrow2",   "Morrow MD 2",           &md2_spec, 0, NULL, 1 },
     { "mbc1000",   "Sanyo MBC-1000/1150",   &mbc1000_spec, 0, NULL, 1 },
     { "mbc1200",   "Sanyo MBC-200/1250",    &mbc1200_spec, 0, NULL, 1 },
     { "mbc2000",   "Sanyo MBC-2000",        &mbc2000_spec, 0, NULL, 1 },
