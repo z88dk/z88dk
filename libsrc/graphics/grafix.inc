@@ -564,7 +564,7 @@ ENDIF
 
 IF FORalphatro
     DEFINE gotgfx
-    defc maxx    = 80
+    defc maxx    = 160
     defc maxy    = 72
     defc blankch    = 32
     defc    WANT_swapgfxbk = 0
