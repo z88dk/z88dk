@@ -2,6 +2,7 @@
 #define CPU_H
 
 extern int c_cpu;
+extern int c_adl_mode;
 
 #define CPU_Z80      1
 #define CPU_Z180     2

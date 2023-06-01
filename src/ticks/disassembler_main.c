@@ -16,6 +16,7 @@ static void disassemble_loop(int start, int end);
 
 unsigned char *mem;
 int  c_cpu = CPU_Z80;
+int  c_adl_mode = 0;
 int  inverted = 0;
 int  c_autolabel = 0;
 
@@ -31,7 +32,8 @@ static void usage(char *program)
     printf("  -e <addr>      Address to stop disassembling at\n\n");
     printf("  -mz80          Disassemble z80 code\n");
     printf("  -mz180         Disassemble z180 code\n");
-    printf("  -mez80         Disassemble ez80 code (short mode)\n");
+    printf("  -mez80         Disassemble ez80 (short) code\n");
+    printf("  -mez80a        Dissamble ez80 ADL code\n");
     printf("  -mz80n         Disassemble z80n code\n");
     printf("  -mr2ka         Disassemble Rabbit 2000A code\n");
     printf("  -mr3k          Disassemble Rabbit 3000 code\n");
@@ -39,7 +41,7 @@ static void usage(char *program)
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
     printf("  -m8080         Disassemble 8080 code (with z80 mnenomics)\n");
     printf("  -m8085         Disassemble 8085 code (with z80 mnenomics)\n");
-
+    
     exit(1);
 }
 
@@ -117,6 +119,10 @@ int main(int argc, char **argv)
                     c_cpu = CPU_8085;
                 } else if ( strcmp(&argv[0][1],"mez80") == 0 ) {
                     c_cpu = CPU_EZ80;
+                    c_adl_mode = 0;
+                } else if ( strcmp(&argv[0][1],"mez80a") == 0 ) {
+                    c_cpu = CPU_EZ80;
+                    c_adl_mode = 1;
                 } else {
                     printf("Unknown CPU: %s\n",&argv[0][2]);
                 }
