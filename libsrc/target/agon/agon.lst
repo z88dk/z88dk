@@ -1,0 +1,5 @@
+target/agon/stdio/fputc_cons_native
+target/agon/stdio/fgetc_cons
+target/agon/stdio/generic_console
+target/agon/stdio/__agon_putc
+@stdio/stdio.lst

@@ -632,7 +632,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                             break;
                                         case 5:
                                             if ( israbbit() && y == 0 ) BUF_PRINTF("lret");
-                                            if ( y == 1 ) { BUF_PRINTF("%10s", handle_ez80_am(state, "reti"));; dolf=1; }
+                                            if ( y == 1 ) { BUF_PRINTF("%-10s", handle_ez80_am(state, "reti"));; dolf=1; }
                                             else if ( israbbit() && y == 3 ) BUF_PRINTF("ipres");
                                             else if ( israbbit() && y == 4 ) BUF_PRINTF("%-10s(%s),hl","ldp", handle_addr16(state, opbuf1, sizeof(opbuf1)));
                                             else if ( israbbit() && y == 5 ) BUF_PRINTF("%-10shl,(%s)","ldp", handle_addr16(state, opbuf1, sizeof(opbuf1)));
