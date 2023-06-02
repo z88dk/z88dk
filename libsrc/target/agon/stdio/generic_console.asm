@@ -6,7 +6,6 @@
     PUBLIC  generic_console_vpeek
     PUBLIC  generic_console_scrollup
     PUBLIC  generic_console_printc
-    PUBLIC  generic_console_ioctl
     PUBLIC  generic_console_set_ink
     PUBLIC  generic_console_set_paper
     PUBLIC  generic_console_set_attribute
@@ -19,10 +18,9 @@
     INCLUDE "ioctl.def"
     INCLUDE "target/agon/def/mos_api.inc"
     PUBLIC  CLIB_GENCON_CAPS
-    defc    CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+    defc    CLIB_GENCON_CAPS = CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
 
-generic_console_ioctl:
-    scf
+
 generic_console_set_attribute:
     ret
 
@@ -47,7 +45,9 @@ generic_console_cls:
 generic_console_scrollup:
     push    de
     push    bc
-
+    ld      hl,scroll
+    ld      b,5
+    call    prstr
     pop     bc
     pop     de
     ret
@@ -121,6 +121,9 @@ vpeekbuf:
     defb    vdp_scrchar
     defw    0           ;x
     defw    0           ;y
+
+scroll:
+    defb    23, 7, 1, 3, 8
 
     SECTION rodata_clib
 

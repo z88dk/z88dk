@@ -1,5 +1,10 @@
 target/agon/stdio/fputc_cons_native
 target/agon/stdio/fgetc_cons
 target/agon/stdio/generic_console
+target/agon/stdio/generic_console_ioctl
 target/agon/stdio/__agon_putc
+target/agon/graphics/__gfx_vars
+target/agon/graphics/__agon_setmode
+target/agon/graphics/getmaxx
+target/agon/graphics/getmaxy
 @stdio/stdio.lst

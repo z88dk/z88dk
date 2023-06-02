@@ -431,7 +431,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             state->index = 0;
                             handle_register8(state, y, opbuf1, sizeof(opbuf1));  
                         }
-                        BUF_PRINTF("%-10s%s,%s", "ld", opbuf1, opbuf2);
+                        BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state,"ld"), opbuf1, opbuf2);
                     }
                     break;
                 case 2: /* x = 2 */
@@ -494,21 +494,21 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     z = 6;
                                 }
                                 if ( !cancbundoc() && state->index && z != 6 ) BUF_PRINTF("nop");
-                                else BUF_PRINTF("%-10s%d,%s", "bit", y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
+                                else BUF_PRINTF("%-10s%d,%s", handle_ez80_am(state,"bit"), y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                             } else if ( x == 2 ) {
                                 if ( state->index && z != 6 ) {
                                     handle_register8(state, z, opbuf1, sizeof(opbuf1));
                                     handle_register8(state, 6, opbuf2, sizeof(opbuf2));
                                     if ( cancbundoc() ) BUF_PRINTF("%-10s%s,%s %d,%s","ld", opbuf1, "res",y, opbuf2);
                                     else BUF_PRINTF("nop");
-                                } else BUF_PRINTF("%-10s%d,%s", "res", y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
+                                } else BUF_PRINTF("%-10s%d,%s", handle_ez80_am(state,"res"), y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                             } else if ( x == 3 ) {
                                 if ( cancbundoc() && state->index && z != 6 ) {
                                     handle_register8(state, z, opbuf1, sizeof(opbuf1));
                                     handle_register8(state, 6, opbuf2, sizeof(opbuf2));
                                     if ( cancbundoc() ) BUF_PRINTF("%-10s%s,%s %d,%s","ld", opbuf1, "set",y, opbuf2);
                                     else BUF_PRINTF("nop");
-                                } else BUF_PRINTF("%-10s%d,%s", "set", y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
+                                } else BUF_PRINTF("%-10s%d,%s", handle_ez80_am(state,"set"), y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                             }
                             state->prefix = 0;
                         } else if ( y == 2 ) {
