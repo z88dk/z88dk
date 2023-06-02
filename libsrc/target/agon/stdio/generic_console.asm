@@ -36,8 +36,16 @@ set_colour:
     ld      a,17
     call    __agon_putc
     pop     af
+    call    __agon_putc
+    ld      c,a
+    ; Set graphics colours as well
+    ld      a,18
+    call    __agon_putc
+    xor     a           ;graphic mode
+    call    __agon_putc
+    ld      a,c
     jp      __agon_putc
-
+    
 generic_console_cls:
     ld      a,12
     jp      __agon_putc
