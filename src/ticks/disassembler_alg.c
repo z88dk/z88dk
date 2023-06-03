@@ -431,7 +431,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             state->index = 0;
                             handle_register8(state, y, opbuf1, sizeof(opbuf1));  
                         }
-                        BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state,"ld"), opbuf1, opbuf2);
+                        BUF_PRINTF("%-10s%s,%s", y == 6 || z == 6 ? handle_ez80_am(state,"ld") : "ld", opbuf1, opbuf2);
                     }
                     break;
                 case 2: /* x = 2 */
@@ -521,7 +521,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             else BUF_PRINTF("nop");
                         } else if ( y == 4 ) {
                             if ( israbbit() && state->index == 0 ) BUF_PRINTF("%-10sde',hl","ex");
-                            else if ( !isgbz80() ) BUF_PRINTF("%-10s(sp),%s",  "ex", handle_register16(state, 2, state->index)); 
+                            else if ( !isgbz80() ) BUF_PRINTF("%-10s(sp),%s",  handle_ez80_am(state,"ex"), handle_register16(state, 2, state->index)); 
                             else BUF_PRINTF("nop");
                         } else if ( y == 5 ) {
                             if ( !isgbz80() ) BUF_PRINTF("%-10s%s,%s","ex","de","hl");
@@ -605,8 +605,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                             }
                                             break;                     
                                         case 2:
-                                            if ( q == 0 ) BUF_PRINTF("%-10shl,%s", "sbc", handle_register16(state, p, state->index));
-                                            else BUF_PRINTF("%-10shl,%s", "adc", handle_register16(state, p, state->index));
+                                            if ( q == 0 ) BUF_PRINTF("%-10shl,%s", handle_ez80_am(state,"sbc"), handle_register16(state, p, state->index));
+                                            else BUF_PRINTF("%-10shl,%s",handle_ez80_am(state,"adc"), handle_register16(state, p, state->index));
                                             break;
                                         case 3:
                                             if ( q == 0 ) BUF_PRINTF("%-10s(%s),%s", handle_ez80_am(state, "ld"), handle_addr16(state, opbuf1, sizeof(opbuf1)), handle_register16(state, p, state->index));

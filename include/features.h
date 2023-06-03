@@ -1426,7 +1426,7 @@
 // #define __HAVE_INTERRUPTS 0
 #define __NEED_INTERRUPT_INIT 0
 // #define __HAVE_RS232 0
-// #define __HAVE_FILEIO 0
+#define __HAVE_FILEIO 1
 // #define __HAVE_TIME 0
 // #define __HAVE_VIDEO_MC6847 0
 // #define __HAVE_VIDEO_MC6845 0
@@ -1441,7 +1441,7 @@
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
 #define __HAVE_GFX_POINTXY 1
-// #define __HAVE_GFX_XORPLOT 0
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__ALPHATRO__)
 #define __HAVE_KEYBOARD 1
