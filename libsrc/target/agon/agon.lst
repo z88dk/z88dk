@@ -24,3 +24,4 @@ target/agon/fcntl/mkdir
 target/agon/fcntl/chdir
 @stdio/stdio.lst
 @gfx/wide/gfx_wide.lst
+@games/games.lst

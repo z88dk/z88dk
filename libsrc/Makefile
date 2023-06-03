@@ -1899,7 +1899,7 @@ agon_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building Agon Light Library ---'
 	@echo ''
 	$(call buildgeneric,agon,"wide")
-#	$(MAKE) -C games TARGET=agon
+	$(MAKE) -C games TARGET=agon
 	TARGET=agon TYPE=z80 $(LIBLINKER) -mz80 -DFORagon -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/agon_clib @$(TARGET_DIRECTORY)/agon/agon.lst
 
 dai_clib.lib: $(TARGET_CLIB_OBJS)
