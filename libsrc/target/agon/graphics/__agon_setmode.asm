@@ -70,3 +70,19 @@ ck:
     and     a
     pop     ix
     ret
+
+    SECTION rodata_clib
+
+initscr:
+    defb    23, 0, $c0, 0       ;Unset logical coordinates
+    defb    23, 1, 0            ;Hide cursor
+
+    SECTION code_crt_init
+
+    ld      hl,initscr
+    ld      b,7
+loop:
+    ld      a,(hl)
+    call    __agon_putc
+    inc     hl
+    djnz    loop

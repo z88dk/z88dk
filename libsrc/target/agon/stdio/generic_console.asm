@@ -10,9 +10,8 @@
     PUBLIC  generic_console_set_paper
     PUBLIC  generic_console_set_attribute
 
-    EXTERN  __console_w
-    EXTERN  CONSOLE_COLUMNS
-    EXTERN  CONSOLE_ROWS
+    EXTERN  __agon_bgcol
+    EXTERN  __agon_fgcol
     EXTERN  __agon_putc
 
     INCLUDE "ioctl.def"
@@ -26,25 +25,20 @@ generic_console_set_attribute:
 
 generic_console_set_ink:
     and     63
+    ld      (__agon_fgcol),a
     jr      set_colour
 
 generic_console_set_paper:
     and     63
+    ld      (__agon_bgcol),a
     or      $80
 set_colour:
     push    af
     ld      a,17
     call    __agon_putc
     pop     af
-    call    __agon_putc
-    ld      c,a
-    ; Set graphics colours as well
-    ld      a,18
-    call    __agon_putc
-    xor     a           ;graphic mode
-    call    __agon_putc
-    ld      a,c
     jp      __agon_putc
+
     
 generic_console_cls:
     ld      a,12
@@ -136,12 +130,11 @@ scroll:
     SECTION rodata_clib
 
 init:
-        db 22, 1 ;; Mode 1
         db 23, 1, 0 ;; Hide cursor
 
 
    SECTION code_crt_init
 
    ld      hl,init
-   ld      b,5
+   ld      b,3
    call    prstr

@@ -6,6 +6,11 @@ target/agon/stdio/generic_console_ioctl
 target/agon/stdio/__agon_putc
 target/agon/graphics/__gfx_vars
 target/agon/graphics/__agon_setmode
+target/agon/graphics/clg
 target/agon/graphics/getmaxx
 target/agon/graphics/getmaxy
+target/agon/graphics/w_plotpixl
+target/agon/graphics/w_respixl
+target/agon/graphics/w_pointxy
 @stdio/stdio.lst
+@gfx/wide/gfx_wide.lst
