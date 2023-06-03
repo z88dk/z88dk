@@ -85,7 +85,10 @@ start:
     call    crt0_init_bss
     ld      (exitsp),sp
 
-    ; Set mode twice...
+    defb    0x5b	;LIL
+    ld      a,(iy+8)
+    ld      (__agon_mbase),a
+
     ld      a,CLIB_DEFAULT_SCREEN_MODE
     call    asm_agon_setmode
 
@@ -98,7 +101,9 @@ cleanup:
     pop     iy
     defb    0x5b    ;LIL
     pop     ix
+    defb    $5b
     ld      hl,0
+    defb    0
     defb    $49     ;LIS
     ret
 
@@ -107,11 +112,50 @@ l_dcal:
     jp      (hl)
 
 
+    PUBLIC  __agon_hl24
+    PUBLIC  __agon_de24
+
+__agon_hl24:
+    defb    $5b     ;lil
+    push    hl
+    defb    $5b
+    ld      hl,2    
+    defb    0
+    defb    $5b
+    add     hl,sp
+    ld      a,(__agon_mbase)
+    defb    $5b
+    ld      (hl),a
+    defb    $5b
+    pop     hl
+    ret
+
+__agon_de24:
+    defb    $5b     ;lil
+    push    de
+    defb    $5b
+    ld      hl,2    
+    defb    0
+    defb    $5b
+    add     hl,sp
+    ld      a,(__agon_mbase)
+    defb    $5b
+    ld      (hl),a
+    defb    $5b
+    pop     de
+    ret
+
+
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
+
 
     ; If we were given a model then use it
 IF DEFINED_CRT_MODEL
     defc __crt_model = CRT_MODEL
 ENDIF
     INCLUDE	"crt/classic/crt_section.asm"
+
+    SECTION bss_crt
+PUBLIC __agon_mbase
+__agon_mbase: defb 0
