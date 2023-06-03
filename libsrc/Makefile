@@ -27,6 +27,7 @@ TOCREATE += $(call check_target,ace,ace_clib.lib gfxace.lib gfxaceudg.lib)
 TOCREATE += $(call check_target,abc80,abc80_clib.lib)
 TOCREATE += $(call check_target,abc800,abc800_clib.lib)
 TOCREATE += $(call check_target,adam,adam.lib $(CPMLIBS))
+TOCREATE += $(call check_target,agon,agon_clib.lib)
 TOCREATE += $(call check_target,alphatro,alphatro_clib.lib)
 TOCREATE += $(call check_target,aquarius,aquarius_clib.lib gfxaq48.lib)
 TOCREATE += $(call check_target,attache,attache.lib $(CPMLIBS))
@@ -726,7 +727,7 @@ rc700.lib: cpm_clib.lib
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=rc700
 	TARGET=rc700 TYPE=z80 $(LIBLINKER) -DFORrc700 -x$(OUTPUT_DIRECTORY)/rc700 @$(TARGET_DIRECTORY)/rc700/rc700.lst
 
-x1_cpm.lib: cpm_clib.lib
+x1_cpm.lib: x1_clib.lib
 	@echo ''
 	@echo '--- Building Sharp X1 Library ---'
 	@echo ''
@@ -1065,7 +1066,7 @@ smc777_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C video/mc6845 TARGET=smc777
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_clib @$(TARGET_DIRECTORY)/smc777/smc777.lst
 
-smc777_cpm.lib: cpm_clib.lib
+smc777_cpm.lib: smc777_clib.lib
 	@echo ''
 	@echo '--- Building Sony SMC-70/SMC-777 CP/M Library ---'
 	@echo ''
@@ -1095,7 +1096,7 @@ qx10.lib: cpm_clib.lib
 
 
 # Coleco Adam library
-adam.lib: cpm_clib.lib
+adam.lib: coleco_clib.lib
 	@echo ''
 	@echo '--- Building Coleco Adam Library ---'
 	@echo ''
@@ -1434,7 +1435,7 @@ nabu_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C video/tms9918 TARGET=nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_clib @$(TARGET_DIRECTORY)/nabu/nabu.lst
 
-nabu_cpm.lib: cpm_clib.lib
+nabu_cpm.lib: nabu_clib.lib
 	@echo ''
 	@echo '--- Building Nabu CP/M Library ---'
 	@echo ''
@@ -1893,6 +1894,13 @@ sol20_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C games TARGET=sol20
 	TARGET=sol20 TYPE=8080 $(LIBLINKER) -m8080 -DFORsol20 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sol20_clib @$(TARGET_DIRECTORY)/sol20/sol20.lst
 
+agon_clib.lib: $(TARGET_CLIB_OBJS)
+	@echo ''
+	@echo '--- Building Agon Light Library ---'
+	@echo ''
+	$(call buildgeneric,agon,"wide")
+#	$(MAKE) -C games TARGET=agon
+	TARGET=agon TYPE=z80 $(LIBLINKER) -mz80 -DFORagon -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/agon_clib @$(TARGET_DIRECTORY)/agon/agon.lst
 
 dai_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
