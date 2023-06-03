@@ -11,6 +11,8 @@ EXTERN  __gfx_coords
 EXTERN  __agon_putword
 EXTERN  __agon_bgcol
 
+INCLUDE "target/agon/def/mos_api.inc"
+
 
 w_pointxy:
     push	hl		;save x
@@ -31,8 +33,31 @@ w_pointxy:
     ld      (__gfx_coords),hl	;x
     ld      (__gfx_coords+2),de	;y
     push    bc
-    
-    ;; TODO
+
+
+    push    ix
+    MOSCALL(mos_sysvars)
+    defb    $5b     ;LIL
+    res     2,(ix+sysvar_vpd_pflags)
+
+
+    ld      a,23
+    call    __agon_putc
+    xor     a
+    call    __agon_putc
+    ld      a,$84
+    call    __agon_putc
+    call    __agon_putword
+    ex      de,hl
+    call    __agon_putword
+
+ck:
+    defb    $5b     ;LIL
+    bit     2,(ix+sysvar_vpd_pflags)
+    jr      z,ck
+    defb    $5b     ;LIL
+    ld      a,(ix+ sysvar_scrpixelIndex)
+    and     a
+    pop     ix
     pop     bc
     ret
-

@@ -809,6 +809,12 @@ IF FORregis
    defc maxy = 480
 ENDIF
 
+IF FORagin
+   DEFINE gotgfx
+   defc maxx = 2560
+   defc maxy = 1600
+ENDIF
+
 ; Catch all to sort things out
 
 IF !gotgfx
