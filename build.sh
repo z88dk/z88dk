@@ -43,7 +43,7 @@ case `uname -s` in                      # Insert default values for MAKE and INS
     INSTALL="ginstall"
     export INSTALL
     ;;
-  OpenBSD|NetBSD|FreeBSD)
+  OpenBSD|NetBSD|FreeBSD|Darwin)
     MAKE="gmake"
     INSTALL="install"
     export INSTALL
