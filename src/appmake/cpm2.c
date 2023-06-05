@@ -510,6 +510,27 @@ static disc_spec tiki100_ds_spec = {
 };
 
 
+// TRS80 Model II Lifeboat CP/M
+static disc_spec lifeboat_spec = {
+    .name = "Lifeboat",
+    .disk_mode = MFM500,
+    .sectors_per_track = 8,
+    .tracks = 77,
+    .sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 3, 6, 1, 4, 7, 2, 5 }
+};
+
+// TRS80 Model 4 Montezuma CP/M
 static disc_spec montezuma_spec = {
     .name = "Montezuma",
     .disk_mode = MFM250,
@@ -1009,6 +1030,7 @@ static struct formats {
     { "televideo", "Televideo TS80x/TPC1",  &televideo_spec, 0, NULL, 1 },
     { "tiki100ss", "Tiki 100 (200k)",       &tiki100_ss_spec, 0, NULL, 1 },
     { "tiki100ds", "Tiki 100 (400k)",       &tiki100_ds_spec, 0, NULL, 1 },
+    { "lifeboat",  "TRS80 Lifeboat CP/M",   &lifeboat_spec, 0, NULL, 1 },
     { "montezuma", "TRS80 Montezuma CP/M",  &montezuma_spec, 0, NULL, 1 },
     { "vector06c", "Vector 06c",            &vector06c_spec, 0, NULL, 1 },
     { "v1050",     "Visual 1050",           &v1050_spec, 0, NULL, 1 },
