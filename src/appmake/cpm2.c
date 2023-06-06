@@ -510,6 +510,25 @@ static disc_spec tiki100_ds_spec = {
 };
 
 
+// TRS80 Model I Omikron Mapper CP/M
+static disc_spec omikron_spec = {
+    .name = "Omikron",
+    .disk_mode = FM250,
+    .sectors_per_track = 18,
+    .tracks = 35,
+    .sides = 1,
+    .sector_size = 128,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 4, 8, 12, 16, 2, 6, 10, 14, 1, 5, 9, 13, 17, 3, 7, 11, 15 }
+};
+
 // TRS80 Model II Lifeboat CP/M
 static disc_spec lifeboat_spec = {
     .name = "Lifeboat",
@@ -1030,8 +1049,9 @@ static struct formats {
     { "televideo", "Televideo TS80x/TPC1",  &televideo_spec, 0, NULL, 1 },
     { "tiki100ss", "Tiki 100 (200k)",       &tiki100_ss_spec, 0, NULL, 1 },
     { "tiki100ds", "Tiki 100 (400k)",       &tiki100_ds_spec, 0, NULL, 1 },
-    { "lifeboat",  "TRS80 Lifeboat CP/M",   &lifeboat_spec, 0, NULL, 1 },
-    { "montezuma", "TRS80 Montezuma CP/M",  &montezuma_spec, 0, NULL, 1 },
+    { "omikron",   "TRS80 I Omikron",       &omikron_spec, 0, NULL, 1 },
+    { "lifeboat",  "TRS80 II Lifeboat",     &lifeboat_spec, 0, NULL, 1 },
+    { "montezuma", "TRS80 4 Montezuma",     &montezuma_spec, 0, NULL, 1 },
     { "vector06c", "Vector 06c",            &vector06c_spec, 0, NULL, 1 },
     { "v1050",     "Visual 1050",           &v1050_spec, 0, NULL, 1 },
     { "vt180",     "DEC VT-180",            &vt180_spec, 0, NULL, 1 },
