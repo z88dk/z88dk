@@ -9,12 +9,15 @@ target/agon/graphics/__agon_setmode
 target/agon/graphics/__agon_draw
 target/agon/graphics/__agon_drawto
 target/agon/graphics/__agon_drawr
+target/agon/graphics/__agon_drawcircle
 target/agon/graphics/w_draw
 target/agon/graphics/w_undraw
 target/agon/graphics/w_drawto
 target/agon/graphics/w_undrawto
 target/agon/graphics/w_drawr
 target/agon/graphics/w_undrawr
+target/agon/graphics/w_circle
+target/agon/graphics/w_uncircle
 target/agon/graphics/clg
 target/agon/graphics/getmaxx
 target/agon/graphics/getmaxy
