@@ -6,7 +6,7 @@ z88dk v2.3 - xx.xx.202x
 
 Detailed but incomplete changelist:
 
-appmake: VT-180 CP/M disk format 
+- [classic] +agon: New target
 - [classic] +cpc: Interrupt support
 - [classic] +cpc: Graphics support for all 3 official modes
 - [classic] +cpm: Support for Xerox 820 and sound on 820ii
