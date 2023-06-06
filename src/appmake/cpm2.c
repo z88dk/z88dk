@@ -549,6 +549,23 @@ static disc_spec lifeboat_spec = {
     .skew_tab = { 0, 3, 6, 1, 4, 7, 2, 5 }
 };
 
+// TRS80 Model II Pickles & Trout. CP/M
+static disc_spec ptcpm_spec = {
+    .name = "Pickles&Trout",
+    .disk_mode = MFM500,
+    .sectors_per_track = 16,
+    .tracks = 77,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+};
+
 // TRS80 Model 4 Montezuma CP/M
 static disc_spec montezuma_spec = {
     .name = "Montezuma",
@@ -1051,6 +1068,7 @@ static struct formats {
     { "tiki100ds", "Tiki 100 (400k)",       &tiki100_ds_spec, 0, NULL, 1 },
     { "omikron",   "TRS80 I Omikron",       &omikron_spec, 0, NULL, 1 },
     { "lifeboat",  "TRS80 II Lifeboat",     &lifeboat_spec, 0, NULL, 1 },
+    { "ptcpm",     "TRS80 II PickelsTrout", &ptcpm_spec, 0, NULL, 1 },
     { "montezuma", "TRS80 4 Montezuma",     &montezuma_spec, 0, NULL, 1 },
     { "vector06c", "Vector 06c",            &vector06c_spec, 0, NULL, 1 },
     { "v1050",     "Visual 1050",           &v1050_spec, 0, NULL, 1 },
