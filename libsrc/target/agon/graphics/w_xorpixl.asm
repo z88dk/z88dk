@@ -9,6 +9,9 @@ EXTERN  l_cmp
 EXTERN  __agon_putc
 EXTERN  __gfx_coords
 EXTERN  __agon_putword
+EXTERN  __agon_fgcol
+
+INCLUDE "target/agon/def/mos_api.inc"
 
 
 w_xorpixel:
@@ -77,6 +80,5 @@ ck:
     call    __agon_putword
     ld      hl,(__gfx_coords+2) ;y
     call    __agon_putword
-    ;; TODO
     pop     bc
     ret

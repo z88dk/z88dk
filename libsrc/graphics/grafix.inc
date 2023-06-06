@@ -801,6 +801,7 @@ IF FORtek
    DEFINE gotgfx
    defc maxx = 1024
    defc maxy = 768
+   defc    WANT_swapgfxbk = 0
 ENDIF
 
 IF FORregis
@@ -809,10 +810,11 @@ IF FORregis
    defc maxy = 480
 ENDIF
 
-IF FORagin
+IF FORagon
    DEFINE gotgfx
-   defc maxx = 2560
-   defc maxy = 1600
+   defc maxx = 1024
+   defc maxy = 768
+   defc    WANT_swapgfxbk = 0
 ENDIF
 
 ; Catch all to sort things out
