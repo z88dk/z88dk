@@ -568,7 +568,7 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     {{ "-m8080"  , "-m8080"  , "-mz80"   , "-m8080", "DESTDIR/lib/arch/8080/8080_rules.1"  }},          /* CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-m8085"  , "-m8085"  , "-mz80"   , "-m8085", "DESTDIR/lib/arch/8085/8085_rules.1"  }},          /* CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mgbz80" , "-mgbz80" , "-msm83" , "-mgbz80", "DESTDIR/lib/arch/gbz80/gbz80_rules.1" }},       /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mz80"   , "-mz80" ,  "-mz80" ,    "-mez80", "DESTDIR/lib/arch/ez80/ez80_rules.1" }}           /* CPU_TYPE_EZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mz80"   , "-mez80" ,  "-mez80_z80" ,   "-mez80", "DESTDIR/lib/arch/ez80/ez80_rules.1" }}           /* CPU_TYPE_EZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
 };
 
 

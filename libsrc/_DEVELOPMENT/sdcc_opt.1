@@ -605,3 +605,95 @@ __xinit_%0
 =
 	call	banked_call
 	defq	%2
+
+;; 
+;; ez80 instructions
+
+
+	ld	bc,(iy%1)
+=
+	defb	0xfd, 0x07, %1	;ld bc,(ix%1)
+
+	ld	de,(iy%1)
+=
+	defb	0xfd, 0x17, %1	;ld de,(ix%1)
+
+	ld	hl,(iy%1)
+=
+	defb	0xfd, 0x27, %1	;ld hl,(ix%1)
+
+	ld	(iy%1),bc
+=
+	defb	0xfd, 0x0f, %1	;ld (ix%1),bc
+
+	ld	(iy%1),de
+=
+	defb	0xfd, 0x1f, %1	;ld (ix%1),de
+
+	ld	(iy%1),hl
+=
+	defb	0xfd, 0x2f, %1	;ld (ix%1),hl
+
+	ld	bc,(ix%1)
+=
+	defb	0xdd, 0x07, %1	;ld bc,(ix%1)
+
+	ld	de,(ix%1)
+=
+	defb	0xdd, 0x17, %1	;ld de,(ix%1)
+
+	ld	hl,(ix%1)
+=
+	defb	0xdd, 0x27, %1	;ld hl,(ix%1)
+
+	ld	(ix%1),bc
+=
+	defb	0xdd, 0x0f, %1	;ld (ix%1),bc
+
+	ld	(ix%1),de
+=
+	defb	0xdd, 0x1f, %1	;ld (ix%1),de
+
+	ld	(ix%1),hl
+=
+	defb	0xdd, 0x2f, %1	;ld (ix%1),hl
+
+	ld	bc, (hl)
+=
+	defb	0xed, 0x07	;ld bc,(hl)
+
+	ld	de, (hl)
+=
+	defb	0xed, 0x17	;ld de,(hl)
+
+	ld	hl, (hl)
+=
+	defb	0xed, 0x27	;ld hl,(hl)
+
+	ld	ix, (hl)
+=
+	defb	0xed, 0x37	;ld ix,(hl)
+
+	ld	(hl), bc
+=
+	defb	0xed, 0x0f	;ld (hl),bc
+
+	ld	(hl), de
+=
+	defb	0xed, 0x1f	;ld (hl),de
+
+	ld	(hl), hl
+=
+	defb	0xed, 0x2f	;ld (hl),hl
+
+	lea	hl, ix, %1
+=
+	defb	0xed, 0x22, %1	;lea hl, ix%1
+
+	lea	de, ix, %1
+=
+	defb	0xed, 0x12, %1	;lea de, ix%1
+
+	lea	bc, ix, %1
+=
+	defb	0xed, 0x02, %1	;lea de, ix%1
