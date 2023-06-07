@@ -1,0 +1,15 @@
+${NEWLIB_ROOT}/l/sccz80/4-ez80/l_getptr
+${NEWLIB_ROOT}/l/sccz80/4-ez80/l_gint
+${NEWLIB_ROOT}/l/sccz80/4-ez80/l_glong
+${NEWLIB_ROOT}/l/sccz80/4-ez80/l_glongsp
+${NEWLIB_ROOT}/l/sccz80/4-ez80/l_pint_pop
+${NEWLIB_ROOT}/l/sccz80/4-ez80/l_plong
+${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_gchar
+${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_gint
+${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_gptr
+${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_glong
+${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_pchar
+${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_pint
+${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_pptr
+${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_plong
+@${NEWLIB_ROOT}/l/sccz80/z180.lst
