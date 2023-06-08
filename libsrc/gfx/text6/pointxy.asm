@@ -1,6 +1,6 @@
 ;
 ;       Generic pseudo graphics routines for text-only platforms
-;	Version for the 2x3 graphics symbols
+;       Version for the 2x3 or 1x3 graphics symbols
 ;
 ;       Written by Stefano Bodrato 05/09/2007
 ;
@@ -8,7 +8,7 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.7 2016-07-02 09:01:36 dom Exp $
+;	$Id: pointxy.asm $
 ;
 
 
@@ -49,15 +49,20 @@
 			ld	a,(hl)
 			ld	c,a	; y/3
 			
+IF !GFXTEXT3
 			srl	b	; x/2
-			
+ENDIF
 			ld	hl,(base_graphics)
 			ld	a,c
 			ld	c,b	; !!
 			
 			and	a
 			
+IF GFXTEXT3
+			ld	de,maxx
+ELSE
 			ld	de,maxx/2
+ENDIF
 			sbc	hl,de
 
 			jr	z,r_zero
@@ -80,7 +85,11 @@
 			push	bc		; keep y/3
 			ld	hl,textpixl
 			ld	e,0
+IF GFXTEXT3
+			ld	b,8
+ELSE
 			ld	b,64		; whole symbol table size
+ENDIF
 .ckmap			cp	(hl)		; compare symbol with the one in map
 			jr	z,chfound
 			inc	hl
@@ -108,18 +117,23 @@
 			jr	z,iszero
 			bit	0,l
 			jr	nz,is1
+IF !GFXTEXT3
 			add	a,a
+ENDIF
 			add	a,a
 .is1
+IF !GFXTEXT3
 			add	a,a
+ENDIF
 			add	a,a
 .iszero
 			
+IF !GFXTEXT3
 			bit	0,h
 			jr	z,evenrow
 			add	a,a		; move down the bit
 .evenrow
-			
+ENDIF
 			
 			and	c
 			
