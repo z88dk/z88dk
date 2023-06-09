@@ -432,7 +432,9 @@ spew("$test.asm", <<'END_ASM');
 		if __CPU_Z80__				: defb  1  : endif
 		if __CPU_Z80N__				: defb  2  : endif
 		if __CPU_Z180__				: defb  3  : endif
-		if __CPU_EZ80__				: defb  31 : endif
+		if __CPU_EZ80__				: defb  15 : endif
+		if __CPU_EZ80_ADL__			: defb  16 : endif
+		if __CPU_EZ80_Z80__			: defb  17 : endif
 		if __CPU_R2KA__				: defb  4  : endif
 		if __CPU_R3K__				: defb  5  : endif
 		if __CPU_8080__				: defb  6  : endif
@@ -485,10 +487,16 @@ capture_ok("z88dk-z80asm -b -mz180 -IXIY $test.asm", "");
 check_bin_file("$test.bin", bytes(3, 9, 12, 20));
 
 capture_ok("z88dk-z80asm -b -mez80 $test.asm", "");
-check_bin_file("$test.bin", bytes(31, 9, 20));
+check_bin_file("$test.bin", bytes(15, 16, 9, 20));
 
 capture_ok("z88dk-z80asm -b -mez80 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(31, 9, 12, 20));
+check_bin_file("$test.bin", bytes(15, 16, 9, 12, 20));
+
+capture_ok("z88dk-z80asm -b -mez80_z80 $test.asm", "");
+check_bin_file("$test.bin", bytes(15, 17, 9, 20));
+
+capture_ok("z88dk-z80asm -b -mez80_z80 -IXIY $test.asm", "");
+check_bin_file("$test.bin", bytes(15, 17, 9, 12, 20));
 
 capture_ok("z88dk-z80asm -b -mr2ka $test.asm", "");
 check_bin_file("$test.bin", bytes(4, 10, 20));

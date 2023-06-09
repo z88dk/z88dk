@@ -660,6 +660,12 @@ void Args::set_cpu(const string& name) {
 	else if (name == CPU_EZ80_NAME) {
 		m_cpu = CPU_EZ80;
 		m_cpu_name = CPU_EZ80_NAME;
+		set_ez80_adl_option(true);
+	}
+	else if (name == CPU_EZ80_Z80_NAME) {
+		m_cpu = CPU_EZ80;
+		m_cpu_name = CPU_EZ80_Z80_NAME;
+		set_ez80_adl_option(false);
 	}
 	else if (name == CPU_R2KA_NAME) {
 		m_cpu = CPU_R2KA;
@@ -699,6 +705,7 @@ void Args::set_cpu(const string& name) {
 		error += CPU_Z80N_NAME		",";
 		error += CPU_Z180_NAME		",";
 		error += CPU_EZ80_NAME		",";
+		error += CPU_EZ80_Z80_NAME	",";
 		error += CPU_R2KA_NAME		",";
 		error += CPU_R3K_NAME		",";
 		error += CPU_8080_NAME		",";
@@ -841,6 +848,10 @@ void Args::define_assembly_defines() {
 		break;
 	case CPU_EZ80:
 		define_static_def_sym("__CPU_EZ80__", 1);
+		if (option_ez80_adl()) 
+			define_static_def_sym("__CPU_EZ80_ADL__", 1);
+		else
+			define_static_def_sym("__CPU_EZ80_Z80__", 1);
 		define_static_def_sym("__CPU_ZILOG__", 1);
 		break;
 	case CPU_R2KA:
