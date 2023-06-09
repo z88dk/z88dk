@@ -39,6 +39,7 @@ Define rules for a ragel-based parser.
 #define DO_stmt_s_0(opcode)	_DO_stmt_(s_0, opcode)
 #define DO_stmt_d(  opcode)	_DO_stmt_(d,   opcode)
 #define DO_stmt_nn( opcode)	_DO_stmt_(nn,  opcode)
+#define DO_stmt_nnn( opcode)_DO_stmt_(nnn, opcode)
 #define DO_stmt_NN( opcode)	_DO_stmt_(NN,  opcode)
 #define DO_stmt_idx(opcode)	_DO_stmt_(idx, opcode)
 
@@ -571,6 +572,21 @@ Define rules for a ragel-based parser.
 		| label? _TK_CU_NOP _TK_NEWLINE @{
 			DO_STMT_LABEL();
 			add_copper_unit_nop();
+		}
+
+		/*---------------------------------------------------------------------
+		*   ez80
+		*--------------------------------------------------------------------*/
+
+		| _TK_ASSUME _TK_ADL _TK_EQUAL const_expr _TK_NEWLINE @{
+			if (option_cpu() != CPU_EZ80)
+				error_illegal_ident();
+			else if (expr_error)
+				error_expected_const_expr();
+			else if (expr_value != 0 && expr_value != 1)
+				error_int_range(expr_value);
+			else
+				set_ez80_adl_option(expr_value);
 		}
 
 		;

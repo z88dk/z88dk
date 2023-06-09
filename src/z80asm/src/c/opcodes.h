@@ -40,6 +40,9 @@ void add_opcode_d(int opcode, struct Expr1 *expr);
 /* add opcode followed by 16-bit expression */
 void add_opcode_nn(int opcode, struct Expr1 *expr);
 
+/* add opcode followed by 24-bit expression */
+void add_opcode_nnn(int opcode, struct Expr1 *expr);
+
 /* add opcode followed by big-endian 16-bit expression */
 void add_opcode_NN(int opcode, struct Expr1 *expr);
 
@@ -70,7 +73,7 @@ void add_copper_unit_stop();
 void add_copper_unit_nop();
 
 /* assert we are on a Z80 */
-#define _Z80_ONLY(x)		(!(option_cpu() & (CPU_Z80|CPU_Z80N)) ? \
+#define _Z80_ONLY(x)		(!(option_cpu() & (CPU_Z80|CPU_Z80N|CPU_EZ80)) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 #define _EXCEPT_Z80(x)		((option_cpu() & (CPU_Z80|CPU_Z80N)) ? \

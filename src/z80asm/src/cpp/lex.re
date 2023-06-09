@@ -29,7 +29,7 @@ using namespace std;
 			  'b\''   | 'c\''   | 'd\''   | 'e\''    | 'h\''   | 'l\''    | 'a\'' |
 			  'af\''  | 'bc\''  | 'de\''  | 'hl\''   |
 			  'ccf\'' | 'scf\'' | 'rra\'' | 'rrca\'' | 'rla\'' | 'rlca\'' |
-			  'ds.b'  | 'ds.w'  | 'ds.p'  | 'ds.q';
+			  'ds.b'  | 'ds.w'  | 'ds.p'  | 'ds.q' ;
 	bin		= [0-1];
 	oct		= [0-7];
 	dec		= [0-9];
@@ -388,8 +388,12 @@ void Lexer::set(const string& text) {
 							  continue; }
 
 			'.' ws* @p1 ident @p2 {
-							  if (first_token) {
-								  string str = ident_change_case(string(p1, p2));
+							  string str = ident_change_case(string(p1, p2));
+							  Keyword keyword = lu_keyword(str);
+							  if (keyword == Keyword::ASSUME) {
+							      m_tokens.emplace_back(TType::Ident, str, keyword);
+							  }
+							  else if (first_token) {
 								  m_tokens.emplace_back(TType::Label, str);
 							  }
 							  else {
@@ -410,7 +414,7 @@ void Lexer::set(const string& text) {
 								  if (keyword == Keyword::ASMPC)
 									  m_tokens.emplace_back(TType::ASMPC);
 								  else
-								  m_tokens.emplace_back(TType::Ident, str, keyword);
+								      m_tokens.emplace_back(TType::Ident, str, keyword);
 							  }
 							  m_tokens.back().col = col;
 							  continue; }

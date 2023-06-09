@@ -36,6 +36,7 @@ Detailed but incomplete changelist:
 - [z80asm] Convert address difference to constant
 - [z80asm] Support #ifdef/#endif etc in assembler
 - [z80asm] Accept ':' as statement separator
+- [z80asm] add support to ez80, both z80 memory mode and ADL memory mode
 - [zcc] +config at any place, support for -xc
 - [make] add cmake support
 

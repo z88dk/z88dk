@@ -2604,8 +2604,12 @@ yy260:
 			p1 = yyt1;
 			p2 = p;
 			{
-							  if (first_token) {
-								  string str = ident_change_case(string(p1, p2));
+							  string str = ident_change_case(string(p1, p2));
+							  Keyword keyword = lu_keyword(str);
+							  if (keyword == Keyword::ASSUME) {
+							      m_tokens.emplace_back(TType::Ident, str, keyword);
+							  }
+							  else if (first_token) {
 								  m_tokens.emplace_back(TType::Label, str);
 							  }
 							  else {
@@ -2819,7 +2823,7 @@ yy282:
 								  if (keyword == Keyword::ASMPC)
 									  m_tokens.emplace_back(TType::ASMPC);
 								  else
-								  m_tokens.emplace_back(TType::Ident, str, keyword);
+								      m_tokens.emplace_back(TType::Ident, str, keyword);
 							  }
 							  m_tokens.back().col = col;
 							  continue; }

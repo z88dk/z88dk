@@ -121,6 +121,12 @@ void add_opcode_nn(int opcode, Expr1 *expr)
 	Pass2infoExpr(RANGE_WORD, expr);
 }
 
+/* add opcode followed by 24-bit expression */
+void add_opcode_nnn(int opcode, struct Expr1 *expr) {
+	add_opcode(opcode);
+	Pass2infoExpr(RANGE_PTR24, expr);
+}
+
 /* add opcode followed by big-endian 16-bit expression */
 void add_opcode_NN(int opcode, struct Expr1 *expr)
 {

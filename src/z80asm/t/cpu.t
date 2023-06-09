@@ -6,11 +6,11 @@ use Modern::Perl;
 
 # test error
 z80asm_nok("-mcc", "", "", <<END);
-error: invalid cpu: cc; expected: z80,z80n,z180,r2ka,r3k,8080,8085,gbz80,ti83,ti83plus
+error: invalid cpu: cc; expected: z80,z80n,z180,ez80,ez80_z80,r2ka,r3k,8080,8085,gbz80,ti83,ti83plus
 END
 
 z80asm_nok("-m=cc", "", "", <<END);
-error: invalid cpu: cc; expected: z80,z80n,z180,r2ka,r3k,8080,8085,gbz80,ti83,ti83plus
+error: invalid cpu: cc; expected: z80,z80n,z180,ez80,ez80_z80,r2ka,r3k,8080,8085,gbz80,ti83,ti83plus
 END
 
 # Test cpu opcode files created by ../dev/cpu/cpu.pl
@@ -20,7 +20,8 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	my $base = path($file)->basename(".asm");
 	my $ok = $base =~ s/_ok//; $base =~ s/_err//;
 	my $ixiy = $base =~ s/_ixiy//;
-	my($cpu) = $base =~ /cpu_test(?:old)?_(\w+)$/; $cpu =~ tr/_/-/;
+	$base =~ s/_adl\d//;
+	my($cpu) = $base =~ /cpu_test_(\w+)$/; $cpu =~ tr/_/-/;
 	
 	# build command line
 	my $cmd = "z88dk-z80asm -m$cpu ".
@@ -43,7 +44,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		{
 			local(@ARGV) = $file;
 			while (<>) {
-				s/.*;//;
+				s/.*;// or next;
 				for (split(' ', $_)) {
 					if (/^@(\w+)/) {
 						push @patch, [$addr, $1];
@@ -100,8 +101,13 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	}
 	else {
 		# check that all lines have error messages
-		my $num_lines = (slurp($file) =~ tr/\n/\n/);
+		my @lines = path($file)->lines;
+		my $num_lines = scalar @lines;
 		my @err_lines;
+		
+		if ($lines[0] =~ /\.assume/i) {
+			$err_lines[1]++;
+		}
 		
 		# run assembler
 		run_nok($cmd);
