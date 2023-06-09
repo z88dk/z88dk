@@ -464,7 +464,7 @@ static option options[] = {
     { 0, "mr2ka", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000", &c_cpu, NULL, CPU_TYPE_R2K },
     { 0, "mr3k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 3000", &c_cpu, NULL, CPU_TYPE_R3K },
     { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the gbz80", &c_cpu, NULL, CPU_TYPE_GBZ80 },
-    { 0, "mez80", OPT_ASSIGN|OPT_INT, "Generate output for the ez80", &c_cpu, NULL, CPU_TYPE_EZ80 },
+    { 0, "mez80_z80", OPT_ASSIGN|OPT_INT, "Generate output for the ez80 (z80 mode)", &c_cpu, NULL, CPU_TYPE_EZ80 },
 
     { 0, "", OPT_HEADER, "Target options:", NULL, NULL, 0 },
     { 0, "subtype", OPT_STRING,  "Set the target subtype" , &c_subtype, NULL, 0},
@@ -568,7 +568,7 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     {{ "-m8080"  , "-m8080"  , "-mz80"   , "-m8080", "DESTDIR/lib/arch/8080/8080_rules.1"  }},          /* CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-m8085"  , "-m8085"  , "-mz80"   , "-m8085", "DESTDIR/lib/arch/8085/8085_rules.1"  }},          /* CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mgbz80" , "-mgbz80" , "-msm83" , "-mgbz80", "DESTDIR/lib/arch/gbz80/gbz80_rules.1" }},       /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mz80"   , "-mez80_z80" ,  "-mez80_z80" ,   "-mez80", "DESTDIR/lib/arch/ez80/ez80_rules.1" }}           /* CPU_TYPE_EZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mez80_z80"   , "-mez80_z80" ,  "-mez80_z80" ,   "-mez80", "DESTDIR/lib/arch/ez80/ez80_rules.1" }}           /* CPU_TYPE_EZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
 };
 
 

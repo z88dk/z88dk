@@ -42,7 +42,7 @@ ENDIF
 	inc	de
 	inc	de	; points to +fp_flags
 	ld	a,(de)
-IF __CPU_Z80N__ | __CPU_Z180__
+IF __CPU_Z80N__ | __CPU_Z180__| __CPU_EZ80__
 	tst	_IOSYSTEM
 	scf
 	ret	z

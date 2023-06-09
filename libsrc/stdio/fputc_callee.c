@@ -88,7 +88,7 @@ asm_fputc_callee:
 	dec	de
 	ld	(ix+fp_extra),e
 	ld	(ix+fp_extra+1),d
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
 	ld	hl,(ix+fp_desc)
 ELSE
 	ld	l,(ix+fp_desc)
@@ -96,7 +96,7 @@ ELSE
 ENDIF
 	ld	(hl),c
 	inc	hl
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
 	ld	(ix+fp_desc),hl
 ELSE
 	ld	(ix+fp_desc),l
@@ -109,7 +109,7 @@ ENDIF
 	ld	a,(ix+fp_flags)
 	and	_IOEXTRA
 	jr	z,no_net
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
 	ld	hl,(ix+fp_extra)
 ELSE
 	ld	l,(ix+fp_extra)
@@ -132,7 +132,7 @@ ENDIF
 	ret
 .no_cons
 ; Output to file
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
 	ld	hl,(ix+fp_desc)
 ELSE
 	ld	l,(ix+fp_desc)

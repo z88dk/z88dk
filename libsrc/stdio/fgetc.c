@@ -183,7 +183,7 @@ ELSE
     ld      a,(ix+fp_flags)
     and	_IOSTRING
     jr      z,no_string	;not a string
-  IF __CPU_R2KA__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      hl,(ix+fp_extra)	; check the length
   ELSE
     ld      l,(ix+fp_extra)	; check the length
@@ -193,14 +193,14 @@ ELSE
     or      l
     jp      z,is_eof
     dec     hl
-  IF __CPU_R2KA__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      (ix+fp_extra),hl
   ELSE
     ld      (ix+fp_extra),l
     ld      (ix+fp_extra+1),h
   ENDIF
 
-  IF __CPU_R2KA__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      hl,(ix+fp_desc)
   ELSE
     ld      l,(ix+fp_desc)
@@ -208,7 +208,7 @@ ELSE
   ENDIF
     ld      a,(hl)
     inc     hl
-  IF __CPU_R2KA__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      (ix+fp_desc),hl
   ELSE
     ld      (ix+fp_desc),l
@@ -223,7 +223,7 @@ ELSE
     ld      a,(ix+fp_flags)
     and     _IOEXTRA
     jr      z,not_extra_fp
-  IF __CPU_R2KA__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      hl,(ix + fp_extra)
   ELSE
     ld      l,(ix+fp_extra)

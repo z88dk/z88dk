@@ -91,7 +91,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	ld	bc,0
 	ld	a,SEEK_CUR
 	ex	af,af
-  IF __CPU_R2KA__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
 	ld	hl,(ix+fp_extra)
   ELSE
 	ld	l,(ix+fp_extra)
