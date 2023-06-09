@@ -27,7 +27,7 @@ stdio/ansi/ansifont_f8
 @rect/rect.lst
 @algorithm/alg.lst
 @arch/z80/z80.lst
-; @interrupts/interrupts.lst
+@interrupts/interrupts.lst
 @time/time.lst
 @math/fix16/fix16.lst
 @z80_crt0s/crt0.lst

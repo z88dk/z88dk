@@ -18,7 +18,7 @@ check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(
 
 CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxvio.lib
 GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2k_crt0.lib ez80_z80__crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib lib3d.lib fastmath.lib preempt.lib sp1-all
-GENLIBS += 8080_opt.lib 8085_opt.lib z180_opt.lib ez80_opt.lib
+GENLIBS += 8080_opt.lib 8085_opt.lib z180_opt.lib 
 GENLIBS += gfxtek.lib gfxregis.lib
 
 
@@ -2063,13 +2063,6 @@ z180_opt.lib: $(DIRS) $(OBJS) 8085_opt.lib
 	@echo ''
 	$(MAKE) -C z80_crt0s
 	TYPE=z180 $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z180_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
-
-ez80_opt.lib: $(DIRS) $(OBJS) z180_opt.lib
-	@echo ''
-	@echo '--- Building ez80 optimised crt routines---'
-	@echo ''
-	$(MAKE) -C z80_crt0s
-	TYPE=ez80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ez80_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
 z80n_crt0.lib: $(DIRS) $(OBJS) ez80_opt.lib
 	@echo ''
