@@ -1,6 +1,8 @@
 
 STDIO_CFILES = $(notdir $(wildcard stdio/*.c))
-STDIO_AFILES = $(notdir $(wildcard stdio/*.asm))
+STDIO_AFILES = $(notdir $(wildcard stdio/*.asm))  $(patsubst conio/%,%,$(wildcard stdlib/conio/*.asm))
+
+STDIO_8080_AFILES = $(STDIO_AFILES)
 
 STDIO_OBJECTS = $(STDIO_CFILES:.c=.o) $(STDIO_AFILES:.asm=.o)
 
