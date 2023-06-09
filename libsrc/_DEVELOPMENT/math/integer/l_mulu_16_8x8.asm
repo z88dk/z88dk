@@ -9,7 +9,7 @@ PUBLIC l_mulu_16_8x8
    ; compute:  hl = l * e
    ; alters :  af, bc, de, hl
 
-IF __CPU_Z180__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+IF (__CPU_Z180__ || __CPU_EZ80__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
 l_mulu_16_8x8:
 

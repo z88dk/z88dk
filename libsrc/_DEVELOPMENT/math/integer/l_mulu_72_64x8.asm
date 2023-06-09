@@ -16,7 +16,7 @@ PUBLIC l_mulu_72_64x8
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-IF __CPU_Z180__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+IF (__CPU_Z180__ || __CPU_EZ80__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
    EXTERN l_z180_mulu_72_64x8
    defc l_mulu_72_64x8 = l_z180_mulu_72_64x8
