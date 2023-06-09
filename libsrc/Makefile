@@ -2064,7 +2064,7 @@ z180_opt.lib: $(DIRS) $(OBJS) 8085_opt.lib
 	$(MAKE) -C z80_crt0s
 	TYPE=z180 $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z180_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-z80n_crt0.lib: $(DIRS) $(OBJS) ez80_opt.lib
+z80n_crt0.lib: $(DIRS) $(OBJS) z180_opt.lib
 	@echo ''
 	@echo '--- Building z80n crt Library ---'
 	@echo ''
