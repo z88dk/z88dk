@@ -18,7 +18,7 @@ jobs:
         submodules: 'true'
     - name: Install homebrew dependencies
       run: |
-        brew install perl dos2unix boost ragel re2c
+        brew install perl dos2unix boost ragel re2c make
     - name: Install perl prerequisites
       run: |
         export PATH=/usr/local/bin:$PATH
