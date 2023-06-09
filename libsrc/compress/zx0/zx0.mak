@@ -48,7 +48,7 @@ compress/zx0/obj/newlib-gbz80-compress-zx0: $(ZX0_8080_NEWLIBGLOBS_ex)
 compress/zx0/obj/newlib-ez80_z80-compress-zx0: $(ZX0_NEWLIBGLOBS_ex)
 	@mkdir -p compress/zx0/obj
 	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=compress/ez80_z80/obj/ixiy/x -I.. -mez80_z80 -D__CLASSIC $(ZX0_NEWLIBGLOBS)
+	$(Q)$(ASSEMBLER) -d -O=compress/zx0/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(ZX0_NEWLIBGLOBS)
 
 compress-zx0-clean:
 	$(RM) -fr compress/zx0/obj
