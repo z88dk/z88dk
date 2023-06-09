@@ -101,6 +101,7 @@ void error_division_by_zero();
 void error_duplicate_definition(const char* name);
 void error_duplicate_definition_module(const char* modulename, const char* name);
 void error_expr_recursion();
+void error_file_not_found(const char* filename);
 void error_file_open(const char* filename);
 void error_file_rename(const char* filename);
 void error_illegal_ident();

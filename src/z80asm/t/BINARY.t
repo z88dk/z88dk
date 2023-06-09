@@ -86,7 +86,7 @@ END
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		binary "test.dat"
 END_ASM
-$test.asm:1: error: file open: test.dat
+$test.asm:1: error: file not found: test.dat
   ^---- binary "test.dat"
 END_ERR
 

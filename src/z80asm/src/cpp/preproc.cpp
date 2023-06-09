@@ -179,14 +179,21 @@ bool Preproc::open(const string& filename_, bool search_include_path) {
 	}
 
 	// open file
-	ifstream ifs(found_filename, ios::binary);
-	if (!ifs.is_open()) {
-		g_errors.error(ErrCode::FileOpen, found_filename);
+	if (!fs::is_regular_file(fs::path(found_filename))) {
+		g_errors.error(ErrCode::FileNotFound, found_filename);
 		return false;
 	}
 	else {
-		m_files.emplace_back(found_filename, ifs);
-		return true;
+		ifstream ifs(found_filename, ios::binary);
+		if (!ifs.is_open()) {
+			g_errors.error(ErrCode::FileOpen, found_filename);
+			perror(found_filename.c_str());
+			return false;
+		}
+		else {
+			m_files.emplace_back(found_filename, ifs);
+			return true;
+		}
 	}
 }
 
@@ -682,26 +689,31 @@ void Preproc::do_binary() {
 			string found_filename = search_includes(filename.c_str());
 
 			// open file
-			ifstream ifs(found_filename, ios::binary);
-			if (!ifs.is_open())
-				g_errors.error(ErrCode::FileOpen, found_filename);
+			if (!fs::is_regular_file(fs::path(found_filename))) {
+				g_errors.error(ErrCode::FileNotFound, found_filename);
+			}
 			else {
-				// output DEFB lines
-				const int line_len = 16;
-				unsigned char bytes[line_len];
+				ifstream ifs(found_filename, ios::binary);
+				if (!ifs.is_open())
+					g_errors.error(ErrCode::FileOpen, found_filename);
+				else {
+					// output DEFB lines
+					const int line_len = 16;
+					unsigned char bytes[line_len];
 
-				while (!ifs.eof()) {
-					ifs.read(reinterpret_cast<char*>(bytes), line_len);
-					size_t num_read = static_cast<size_t>(ifs.gcount());
-					if (num_read > 0) {
-						string line = "defb ";
-						string separator = "";
-						for (size_t i = 0; i < num_read; i++) {
-							line += separator + std::to_string(bytes[i]);
-							separator = ",";
+					while (!ifs.eof()) {
+						ifs.read(reinterpret_cast<char*>(bytes), line_len);
+						size_t num_read = static_cast<size_t>(ifs.gcount());
+						if (num_read > 0) {
+							string line = "defb ";
+							string separator = "";
+							for (size_t i = 0; i < num_read; i++) {
+								line += separator + std::to_string(bytes[i]);
+								separator = ",";
+							}
+							line += "\n";
+							m_output.push_back(line);
 						}
-						line += "\n";
-						m_output.push_back(line);
 					}
 				}
 			}

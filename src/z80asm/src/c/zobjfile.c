@@ -540,6 +540,12 @@ bool check_obj_lib_file(const char* filename,
 {
 	FILE* fp = NULL;
 
+	// file exists?
+	if (!file_exists(filename)) {
+		error_file_not_found(filename);
+		goto error;
+	}
+
 	// can read file?
 	fp = fopen(filename, "rb");
 	if (fp == NULL) {

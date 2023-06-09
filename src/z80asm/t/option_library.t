@@ -36,7 +36,7 @@ for my $ext ('', '.lib') {
 
 	# no -L, only file name : error
 	z80asm_nok("-b -l${test}${ext}", "", $asm, <<END);
-error: file open: ${test}.lib
+error: file not found: ${test}.lib
 END
 
 	# -L : OK

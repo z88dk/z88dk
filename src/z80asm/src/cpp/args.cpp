@@ -414,7 +414,7 @@ void Args::expand_list_glob(const string& pattern) {
 		if (fs::is_regular_file(fs::path(pattern)))
 			files.push_back(fs::path(pattern));		// only one file
 		else
-			g_errors.error(ErrCode::FileOpen, pattern);
+			g_errors.error(ErrCode::FileNotFound, pattern);
 	}
 	else {
 		expand_glob(files, pattern);			// list of files
@@ -478,7 +478,7 @@ string Args::search_source(const string& filename) {
 
 	// not found, avoid cascade of errors
 	if (g_errors.count() == 0)
-		g_errors.error(ErrCode::FileOpen, filename);
+		g_errors.error(ErrCode::FileNotFound, filename);
 
 	return fs::path(filename).generic_string();
 }

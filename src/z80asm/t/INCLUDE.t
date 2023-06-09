@@ -75,7 +75,7 @@ END
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		include "test.inc"
 END_ASM
-$test.asm:1: error: file open: test.inc
+$test.asm:1: error: file not found: test.inc
   ^---- include "test.inc"
 END_ERR
 
@@ -121,7 +121,7 @@ unlink "$test.inc";
 z80asm_nok("-x$test.lib", "", <<END_ASM, <<END_ERR);
 		include "$test.inc"
 END_ASM
-$test.asm:1: error: file open: $test.inc
+$test.asm:1: error: file not found: $test.inc
   ^---- include "$test.inc"
 END_ERR
 ok ! -f "$test.lib", "$test.lib does not exist";
