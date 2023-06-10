@@ -54,7 +54,7 @@ $(OUTPUT_DIRECTORY)/fastmath_z180.lib: fastmath.lst
 	TYPE=z180 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_z180.lib @fastmath.lst
 
 $(OUTPUT_DIRECTORY)/fastmath_ez80_z80.lib: fastmath.lst
-	TYPE=ez80_Z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_ez80_z80.lib @fastmath.lst
+	TYPE=ez80_z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_ez80_z80.lib @fastmath.lst
 
 $(OUTPUT_DIRECTORY)/fastmath_ixiy.lib: fastmath.lst
 	TYPE=ixiy $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_ixiy.lib @fastmath.lst
