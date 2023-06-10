@@ -5,14 +5,16 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_gint, l_gint1, l_gint2, l_gint3
+PUBLIC l_gintsp, l_gintsp_gint
 
-l_gint3:
-    inc     hl
-l_gint2:
-    inc     hl
-l_gint1:
-    inc     hl
-l_gint:
-    ld      hl,(hl)
-    ret
+l_gintsp:
+
+   add hl,sp
+   inc hl
+   inc hl
+
+l_gintsp_gint:
+
+   ld hl,(hl)
+   
+   ret

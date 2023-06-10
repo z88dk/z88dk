@@ -10,13 +10,13 @@ PUBLIC    l_glonghlp
 
 ; Pick up long from (*hl)
 .l_glonghlp
-   defb	$ed, $27	;ld hl,(hl)
+   ld hl,(hl)
 
 ;Fetch long dehl from (hl)
 .l_glong
-   defb $ed, $17	;ld de,(hl)
+   ld de,(hl)
    inc hl
    inc hl
-   defb $ed, $27	;ld hl,(hl)
+   ld hl,(hl)
    ex de,hl
    ret
