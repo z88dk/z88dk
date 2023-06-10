@@ -5,11 +5,11 @@ TIME_AFILES = $(notdir $(wildcard time/*.asm))
 TIME_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/time/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/time/z80/*.asm"
 TIME_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/time/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/time/z80/*.asm
 
-TIME_NEWLIB_TARGETS := time/obj/newlib-z80-time time/obj/newlib-z80n-time time/obj/newlib-r2k-time time/obj/newlib-ixiy-time time/obj/newlib-8080-time time/obj/newlib-gbz80-time
+TIME_NEWLIB_TARGETS := time/obj/newlib-z80-time time/obj/newlib-z80n-time time/obj/newlib-r2k-time time/obj/newlib-ixiy-time time/obj/newlib-8080-time time/obj/newlib-gbz80-time time/obj/newlib-ez80_z80-time
 
 TIME_OBJECTS = $(TIME_CFILES:.c=.o) $(TIME_AFILES:.asm=.o)
 
-TIME_OBJS = $(addprefix time/obj/z80/, $(TIME_OBJECTS)) $(addprefix time/obj/r2k/,$(TIME_OBJECTS)) $(addprefix time/obj/ixiy/,$(TIME_OBJECTS))  $(addprefix time/obj/z80n/,$(TIME_OBJECTS)) $(addprefix time/obj/8080/,$(TIME_OBJECTS))  $(addprefix time/obj/gbz80/,$(TIME_OBJECTS))
+TIME_OBJS = $(addprefix time/obj/z80/, $(TIME_OBJECTS)) $(addprefix time/obj/r2k/,$(TIME_OBJECTS)) $(addprefix time/obj/ixiy/,$(TIME_OBJECTS))  $(addprefix time/obj/z80n/,$(TIME_OBJECTS)) $(addprefix time/obj/8080/,$(TIME_OBJECTS))  $(addprefix time/obj/gbz80/,$(TIME_OBJECTS)) $(addprefix time/obj/ez80_z80/,$(TIME_OBJECTS))
 
 
 OBJS += $(TIME_OBJS) $(TIME_NEWLIB_TARGETS)
@@ -25,6 +25,7 @@ $(eval $(call buildbit,time,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,time,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,time,r2k,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,time,z80n,test,-clib=z80n,-mz80n))
+$(eval $(call buildbit,time,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 
 
 time/obj/newlib-z80-time: $(TIME_NEWLIBGLOBS_ex)
@@ -56,6 +57,11 @@ time/obj/newlib-gbz80-time: $(TIME_NEWLIBGLOBS_ex)
 	@mkdir -p time/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=time/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(TIME_NEWLIBGLOBS)
+
+time/obj/newlib-ez80_z80-time: $(TIME_NEWLIBGLOBS_ex)
+	@mkdir -p time/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=time/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(TIME_NEWLIBGLOBS)
 
 time/obj/%:
 	@mkdir -p $@

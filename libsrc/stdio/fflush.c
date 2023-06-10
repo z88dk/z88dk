@@ -38,7 +38,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !_CPU_GBZ80__
 	dec	hl
 	dec	hl	;hl = fp
 IF __CPU_R2KA__ | __CPU_R3K__
-	ld	hl,ix
+	ld	ix,hl
 	ld	hl,(ix+fp_extra)
 ELSE
 	push	hl

@@ -85,7 +85,7 @@ ELSE
     ld      (ix-6),a
 ENDIF
 
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      hl,(ix+4)
 ELIF __CPU_INTEL__
     ld      hl,(__scanf_context)
@@ -258,7 +258,7 @@ IF __CPU_INTEL__
     inc     hl
     ld      d,(hl)
     ex      de,hl
-ELIF __CPU_R2KA__ | __CPU_R3K__
+ELIF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      hl,(ix+2)
 ELSE
     ld      l,(ix+2)
@@ -294,7 +294,7 @@ IF __CPU_INTEL__
     ld      (hl),d
     ex      de,hl
     pop     de
-ELIF __CPU_R2KA__ | __CPU_R3K__
+ELIF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      (ix+2),hl
 ELSE
     ld      (ix+2),l
@@ -316,7 +316,7 @@ __scanf_getchar:
     push    hl        ;fmt
 IF __CPU_INTEL__
     call    __scanf_get_fp
-ELIF __CPU_R2KA__ | __CPU_R3K__
+ELIF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      hl,(ix+8)
 ELSE
     ld      l,(ix+8)    ;fp

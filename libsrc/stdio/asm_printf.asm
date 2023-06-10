@@ -114,10 +114,15 @@ ELSE
 	ld	hl,-80
 	add	hl,sp
 	ld	sp,hl
+   IF __CPU_EZ80__
+        ld      de,(ix+2)
+        ld      hl,(ix+4)
+   ELSE
 	ld	e,(ix+2)	;arg pointer
 	ld	d,(ix+3)
 	ld	l,(ix+4)	;format pointer
 	ld	h,(ix+5)
+   ENDIF
   ENDIF
 	xor	a
 	ld	(ix-1),a

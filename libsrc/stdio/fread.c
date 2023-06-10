@@ -65,20 +65,30 @@ IF __CPU_R2KA__ | __CPU_R3K__
 ELSE
 	ld	ix,0
 	add	ix,sp
+  IF __CPU_EZ80__
+        ld      hl,(ix+6)
+        ld      de,(ix+8)
+  ELSE
 	ld	l,(ix+6)	;nmemb
 	ld	h,(ix+7)
 	ld	e,(ix+8)	;size
 	ld	d,(ix+9)
+  ENDIF
 	call	l_mult		;hl = nmemb * size
 	ld	a,h
 	or	l
 	jp	z,fread_exit
 	ld	c,l
 	ld	b,h
+  IF __CPU_EZ80__
+        ld      hl,(ix+10)
+        ld      de,(ix+4)
+  ELSE
 	ld	l,(ix+10)	;ptr
 	ld	h,(ix+11)
 	ld	e,(ix+4)	;fp
 	ld	d,(ix+5)
+  ENDIF
 	push	de	
 	pop	ix		;ix = fp
 ENDIF
@@ -130,8 +140,12 @@ IF __CPU_R2KA__ | __CPU_R3K__
 ELSE
 	ld	ix,0
 	add	ix,sp
+  IF __CPU_EZ80__
+        ld      hl,(ix+8)
+  ELSE
 	ld	l,(ix+8)	;size
 	ld	h,(ix+9)
+  ENDIF
 ENDIF
 	call	l_div_u		;hl = de/hl = bytes_read/size
 fread_exit:
@@ -171,7 +185,7 @@ fread1:
         bit	5,(ix+fp_flags)	; _IOEXTRA
         jr      z,fread_direct
         ; Calling via the extra hook
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
         ld    hl,(ix+fp_extra)
 ELSE
         ld      l,(ix+fp_extra)
@@ -180,7 +194,7 @@ ENDIF
         ld      a,__STDIO_MSG_READ
         jp      l_jphl
 fread_direct:
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
         ld    hl,(ix+fp_desc)
 ELSE
         ld      l,(ix+fp_desc)

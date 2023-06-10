@@ -6,7 +6,7 @@ APLIB_8080_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/compress/aplib//c/sccz80/*.asm 
 
 APLIB_NEWLIB_TARGETS := compress/aplib/obj/newlib-z80-compress-aplib compress/aplib/obj/newlib-z80n-compress-aplib \
 		compress/aplib/obj/newlib-ixiy-compress-aplib compress/aplib/obj/newlib-8080-compress-aplib \
-		compress/aplib/obj/newlib-gbz80-compress-aplib
+		compress/aplib/obj/newlib-gbz80-compress-aplib compress/aplib/obj/newlib-ez80_z80-compress-aplib
 
 OBJS += $(APLIB_NEWLIB_TARGETS)
 CLEAN += compress-aplib-clean
@@ -45,6 +45,10 @@ compress/aplib/obj/newlib-gbz80-compress-aplib: $(APLIB_8080_NEWLIBGLOBS_ex)
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=compress/aplib/obj/gbz80/x -I.. -Icompress/aplib -mgbz80 -D__CLASSIC $(APLIB_8080_NEWLIBGLOBS)
 
+compress/aplib/obj/newlib-ez80_z80-compress-aplib: $(APLIB_NEWLIBGLOBS_ex)
+	@mkdir -p compress/aplib/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=compress/aplib/obj/ez80_z80/x -I.. -Icompress/aplib -mez80_z80 -D__CLASSIC $(APLIB_NEWLIBGLOBS)
 
 compress-aplib-clean:
 	$(RM) -fr compress/aplib/obj 

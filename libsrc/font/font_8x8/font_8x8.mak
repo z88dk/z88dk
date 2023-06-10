@@ -1,8 +1,7 @@
 FONT8x8_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/font/font_8x8/*.asm"
 FONT8x8_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/font/font_8x8/*.asm
 
-FONT8x8_NEWLIB_TARGETS := font/font_8x8/obj/newlib-z80-font_8x8 font/font_8x8/obj/newlib-z80n-font_8x8 font/font_8x8/obj/newlib-r2k-font_8x8 \
-		 font/font_8x8/obj/newlib-ixiy-font_8x8 font/font_8x8/obj/newlib-8080-font_8x8 font/font_8x8/obj/newlib-gbz80-font_8x8
+FONT8x8_NEWLIB_TARGETS := font/font_8x8/obj/newlib-z80-font_8x8
 
 OBJS += $(FONT8x8_NEWLIB_TARGETS)
 CLEAN += font_8x8-clean
