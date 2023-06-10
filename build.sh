@@ -43,8 +43,19 @@ case `uname -s` in                      # Insert default values for MAKE and INS
     INSTALL="ginstall"
     export INSTALL
     ;;
-  OpenBSD|NetBSD|FreeBSD|Darwin)
+  OpenBSD|NetBSD|FreeBSD)
     MAKE="gmake"
+    INSTALL="install"
+    export INSTALL
+    ;;
+  Darwin)
+    if ! command -v gmake &> /dev/null
+    then
+        MAKE="make"
+        echo "Using gmake is recommended on MacOS"
+    else
+        MAKE="gmake"
+    fi
     INSTALL="install"
     export INSTALL
     ;;
