@@ -478,6 +478,14 @@ IF FORtrs80
     defc    WANT_swapgfxbk = 0
 ENDIF
 
+IF FORtrs80m2
+    DEFINE gotgfx
+    defc maxx    = 80
+    defc maxy    = 72
+    defc blankch    = 32
+    defc GFXTEXT3 = 1
+ENDIF
+
 IF FOReg2000
     DEFINE gotgfx
     defc maxx    = 160
