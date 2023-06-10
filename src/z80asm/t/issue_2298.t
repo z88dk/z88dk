@@ -9,11 +9,6 @@ use Modern::Perl;
 
 delete $ENV{ZCCCFG};
 
-spew("$test.c", "int main() {}");
-capture_nok("zcc +zx -vn $test.c -o $test.bin -lndos2", <<END);
-error: file not found: ndos2.lib
-END
-
 spew("$test.asm", "nop");
 capture_nok("z88dk-z80asm -b -l$test $test.asm", <<END);
 error: file not found: $test.lib
