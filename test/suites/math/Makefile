@@ -36,11 +36,11 @@ test_cpcmath.bin: $(FPSOURCES)
 	$(runtest)
 
 test_mbf32_8080.bin: $(FPSOURCES)
-	$(call compile_8080, -DMBF32 --math-mbf32_8080 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
+	$(call compile_8080, -DMBF32 --math-mbf32 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
 	$(runtest_8080)
 
 test_mbf32_8085.bin: $(FPSOURCES)
-	$(call compile_8085, -DMBF32 --math-mbf32_8085 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
+	$(call compile_8085, -DMBF32 --math-mbf32 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
 	$(runtest_8085)
 
 test_9511.bin: $(FPSOURCES)
@@ -48,11 +48,11 @@ test_9511.bin: $(FPSOURCES)
 	$(runtest)
 
 test_9511_8085.bin: $(FPSOURCES)
-	$(call compile_8085, -DAM9511 --math-am9511_8085 -DMATH_LIBRARY="\"\\\"AM9511-8085\\\"\"")
+	$(call compile_8085, -DAM9511 --math-am9511 -DMATH_LIBRARY="\"\\\"AM9511-8085\\\"\"")
 	$(runtest_8085)
 
 test_mbf32_gbz80.bin: $(FPSOURCES)
-	$(call compile_gbz80, -DMBF32 --math-mbf32_gbz80 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
+	$(call compile_gbz80, -DMBF32 --math-mbf32 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
 	$(runtest_gbz80)
 
 test_math48.bin: $(FPSOURCES)
