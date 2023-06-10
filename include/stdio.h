@@ -191,7 +191,7 @@ extern FILE __LIB__ *funopen(const void     *cookie, int (*readfn)(void *, char 
 extern int __LIB__  fclose(FILE *fp);
 extern int __LIB__  fflush(FILE *);
 
-extern void __LIB__ closeall();
+extern void __LIB__ closeall(void);
 
 
 #ifdef SIMPLIFIED_STDIO
@@ -310,10 +310,10 @@ extern int __LIB__ fchkstd(FILE *);
 /* All functions below here are machine specific */
 
 /* Get a key press using the default keyboard driver */
-extern int __LIB__ fgetc_cons();
+extern int __LIB__ fgetc_cons(void);
 
 /* Get a key press using the "inkey" keyboard driver */
-extern int __LIB__ fgetc_cons_inkey();
+extern int __LIB__ fgetc_cons_inkey(void);
 
 /* Output a character to the console using the default driver */
 extern int __LIB__ fputc_cons(char c);
@@ -335,9 +335,9 @@ extern int __LIB__ remove(const char *name);
 
 
 /* Scan for a keypress using the default keyboard driver */
-extern int __LIB__ getk();
+extern int __LIB__ getk(void);
 /* Scan for a keypress using the "inkey" keyboard driver */
-extern int __LIB__ getk_inkey();
+extern int __LIB__ getk_inkey(void);
 #define getkey() fgetc_cons()
 
 /* Print a formatted string directly to the console using the default driver */
