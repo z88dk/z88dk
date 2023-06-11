@@ -101,7 +101,7 @@ void ucpp_error(long line, char *fmt, ...)
 
 	va_start(ap, fmt);
 	if (line > 0)
-		fprintf(stderr, "%s: line %ld: ", current_filename, line);
+		fprintf(stderr, "%s:%ld: ", current_filename, line);
 	else if (line == 0) fprintf(stderr, "%s: ", current_filename);
 	vfprintf(stderr, fmt, ap);
 	fprintf(stderr, "\n");
@@ -127,7 +127,7 @@ void ucpp_warning(long line, char *fmt, ...)
 
 	va_start(ap, fmt);
 	if (line > 0)
-		fprintf(stderr, "%s: warning: line %ld: ",
+		fprintf(stderr, "%s:%ld: warning: ",
 			current_filename, line);
 	else if (line == 0)
 		fprintf(stderr, "%s: warning: ", current_filename);
@@ -676,12 +676,16 @@ static FILE *find_file(char *name, int localdir)
 			: current_filename;
 
 		for (i = strlen(rfn) - 1; i >= 0; i --)
-#ifdef MSDOS
+#if defined _WIN32
+			if (rfn[i] == '\\' || rfn[i] == '/') break;
+#elif defined MSDOS
 			if (rfn[i] == '\\') break;
 #else
 			if (rfn[i] == '/') break;
 #endif
-#if defined MSDOS
+#if defined _WIN32
+		if (i >= 0 && *name != '\\' && *name != '/' && (nl < 2 || name[1] != ':'))
+#elif defined MSDOS
 		if (i >= 0 && *name != '\\' && (nl < 2 || name[1] != ':'))
 #elif defined AMIGA
 		if (i >= 0 && *name != '/' && (nl < 2 || name[1] != ':'))
@@ -698,7 +702,7 @@ static FILE *find_file(char *name, int localdir)
 			 */
 			s = getmem(i + 2 + nl);
 			mmv(s, rfn, i);
-#ifdef MSDOS
+#if defined MSDOS || defined _WIN32
 			s[i] = '\\';
 #else
 			s[i] = '/';
@@ -1289,7 +1293,7 @@ include_last_chance:
 	if (alt_ls.pbuf < alt_ls.ebuf) goto include_error;
 		/* tokenizing failed */
 	goto include_macro2;
-	
+
 include_error:
 	error(l, "invalid '#include'");
 	return 1;
@@ -1563,7 +1567,27 @@ static void handle_error(struct lexer_state *ls)
 		wan(buf, p, (unsigned char)c, lp);
 	}
 	wan(buf, p, 0, lp);
-	error(l, "#error%s", buf);
+	error(l, "error:%s", buf);
+	freemem(buf);
+}
+
+/*
+ * a #warning directive: we emit the message without any modification
+ * (except the usual backslash+newline and trigraphs)
+ */
+static void handle_warning(struct lexer_state *ls)
+{
+	int c;
+	size_t p = 0, lp = 128;
+	long l = ls->line;
+	unsigned char *buf = getmem(lp);
+
+	while ((c = grap_char(ls)) >= 0 && c != '\n') {
+		discard_char(ls);
+		wan(buf, p, (unsigned char)c, lp);
+	}
+	wan(buf, p, 0, lp);
+	warning(l, "%s", buf + 1);
 	freemem(buf);
 }
 
@@ -1719,7 +1743,7 @@ static int handle_cpp(struct lexer_state *ls, int sharp_type)
 				   some source files, and they are legal */
 				warning(l, "null cpp directive");
 			}
-			if (!(ls->flags & LEXER)) put_char(ls, '\n');
+			//if (!(ls->flags & LEXER)) put_char(ls, '\n');
 			goto handle_exit2;
 		case NAME:
 			break;
@@ -1882,6 +1906,10 @@ static int handle_cpp(struct lexer_state *ls, int sharp_type)
 			} else if (!strcmp(ls->ctok->name, "error")) {
 				ret = 1;
 				handle_error(ls);
+				goto handle_exit;
+			} else if (!strcmp(ls->ctok->name, "warning")) {
+				ret = 0;
+				handle_warning(ls);
 				goto handle_exit;
 			} else if (!strcmp(ls->ctok->name, "line")) {
 				ret = handle_line(ls, save_flags);
@@ -2465,7 +2493,7 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 		} else if (argv[i][1] != 'I' && argv[i][1] != 'J'
 			&& argv[i][1] != 'D' && argv[i][1] != 'U'
 			&& argv[i][1] != 'A' && argv[i][1] != 'B'
-			&& strncmp(argv[i]+1,"isystem",7) 
+			&& strncmp(argv[i]+1,"isystem",7)
 			&& strncmp(argv[i]+1,"iquote",6) )
 			warning(-1, "unknown option '%s'", argv[i]);
 	} else {
@@ -2546,7 +2574,7 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 	for (i = 1; i < argc; i ++) {
 		if (argv[i][0] == '-' && argv[i][1] == 'J')
 			add_incpath(argv[i][2] ? argv[i] + 2 : argv[i + 1]);
-		if (strncmp(argv[i],"-isystem",8) == 0 ) 
+		if (strncmp(argv[i],"-isystem",8) == 0 )
 			add_incpath(argv[i][8] ? argv[i] + 8 : argv[i + 1]);
 
         }

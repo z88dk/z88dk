@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.2.0 #13131 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -67,6 +67,10 @@
 	EXTERN __rrslonglong_callee
 	EXTERN __rrulonglong
 	EXTERN __rrulonglong_callee
+	EXTERN ___mulsint2slong
+	EXTERN ___mulsint2slong_callee
+	EXTERN ___muluint2ulong
+	EXTERN ___muluint2ulong_callee
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
@@ -257,6 +261,8 @@
 	GLOBAL _inv
 	GLOBAL _sqr_fastcall
 	GLOBAL _sqr
+	GLOBAL _neg_fastcall
+	GLOBAL _neg
 	GLOBAL _isunordered_callee
 	GLOBAL _isunordered
 	GLOBAL _islessgreater_callee
@@ -436,11 +442,11 @@ _m32_exp2f:
 	jr	NZ,l_m32_exp2f_00102
 	ld	de,0x3f80
 	ld	hl,0x0000
-	jp	l_m32_exp2f_00103
+	jr	l_m32_exp2f_00103
 l_m32_exp2f_00102:
 	ld	hl,0x3f00
 	push	hl
-	ld	hl,0x0000
+	ld	h, l
 	push	hl
 	ld	l,(ix-6)
 	ld	h,(ix-5)
@@ -453,12 +459,8 @@ l_m32_exp2f_00102:
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
-	ld	l, e
 	ld	(ix-1),d
-	ld	h,d
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
+	push	de
 	push	hl
 	ld	l,(ix-6)
 	ld	h,(ix-5)
@@ -487,13 +489,11 @@ l_m32_exp2f_00102:
 	push	de
 	push	bc
 	call	_m32_polyf
-	ld	c, l
-	ld	l,(ix-2)
-	ld	b,h
-	ld	h,(ix-1)
-	push	hl
-	push	de
+	ld	c,(ix-2)
+	ld	b,(ix-1)
 	push	bc
+	push	de
+	push	hl
 	call	_m32_ldexpf
 l_m32_exp2f_00103:
 	ld	sp, ix

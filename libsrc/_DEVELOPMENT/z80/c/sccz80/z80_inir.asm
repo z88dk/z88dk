@@ -22,3 +22,10 @@ z80_inir:
 
    ld b,e
    jp asm_z80_inir
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _z80_inir
+defc _z80_inir = z80_inir
+ENDIF
+

@@ -5,6 +5,7 @@
 
 	defc	div2_fastcall = asm_am9511_fdiv2_fastcall
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _div2_fastcall

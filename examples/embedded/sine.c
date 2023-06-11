@@ -15,7 +15,9 @@ int main(void)
 	char	res;
 	char	p;
 
+#if defined(__EMBEDDED)
 	init_uart(0,1);
+#endif
 
 	while (1)
 	{

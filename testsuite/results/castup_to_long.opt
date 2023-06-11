@@ -1,0 +1,67 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._branch
+	push	hl
+	ld	a,l
+	and	a
+	jp	nz,i_2	;
+	ld	hl,(_pc)
+	ld	de,(_pc+2)
+	push	de
+	push	hl
+	ld	hl,(_pc)
+	ld	de,(_pc+2)
+	call	_effective
+	call	l_ghtonsint
+	call	l_int2long_s
+	call	l_long_add
+	ld	(_pc),hl
+	ld	(_pc+2),de
+	jp	i_3	;EOS
+.i_2
+	ld	hl,(_pc)
+	ld	de,(_pc+2)
+	push	de
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	a,l
+	rla
+	sbc	a
+	ld	h,a
+	ld	d,a
+	ld	e,a
+	call	l_long_add
+	ld	(_pc),hl
+	ld	(_pc+2),de
+.i_3
+	pop	bc
+	ret
+
+
+
+
+
+	SECTION	bss_compiler
+._pc	defs	4
+	SECTION	code_compiler
+
+
+
+	GLOBAL	intrinsic_swap_endian_16
+	GLOBAL	_pc
+	GLOBAL	_effective
+	GLOBAL	_branch
+
+
+
+

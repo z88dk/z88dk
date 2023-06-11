@@ -9,8 +9,6 @@
  * have to do a nasty kludge around them
  */
 
-extern int ftoa_fudgeit(double x, double scale);
-
 
 void ftoa(x,f,str)
 double x;       /* the number to be converted */
@@ -18,8 +16,8 @@ int f;          /* number of digits to follow decimal point */
 char *str;      /* output string */
 {
         double scale;           /* scale factor */
-        int i,                          /* copy of f, and # digits before decimal point */
-                d;                              /* a digit */
+        int i,                  /* copy of f, and # digits before decimal point */
+            d;                  /* a digit */
 
         if( x < 0.0 ) {
                 *str++ = '-' ;
@@ -37,20 +35,16 @@ char *str;      /* output string */
                 scale *= 10.0 ;
                 i++ ;
         }
-	if ( i == 0 )
-	    *str++ = '0';
+        if ( i == 0 )
+                *str++ = '0';
 
         while ( i-- ) {
                 /* output digits before decimal */
-	        x = fabs(x);
+                x = fabs(x);
                 scale = floor(0.5 + scale * 0.1 ) ;
-#ifdef MUST_ROUND
-                d = ftoa_fudgeit(x, scale);
-#else
-                d = x /scale;
-#endif
+                d = x / scale ;
                 *str++ = d + '0' ;
-                x = x - ((double)d *scale);
+                x = x - ((double)d * scale) ;
         }
         if ( f <= 0 ) {
                 *str = 0;
@@ -59,11 +53,11 @@ char *str;      /* output string */
         *str++ = '.' ;
         while ( f-- ) {
                 /* output digits after decimal */
-	        x = fabs(x);
+                x = fabs(x) ;
                 x *= 10.0 ;
                 d = x;
                 *str++ = d + '0' ;
                 x -= (double)d ;
         }
-        *str = 0;
+        *str = 0 ;
 }

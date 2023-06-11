@@ -74,8 +74,8 @@ FUNCTIONS
  
 Each of these functions return a double: 
  
-amin(x,y) double x,y;	returns the smaller of x, y
-amax(x,y) double x,y;	returns the larger of x, y
+fmin(x,y) double x,y;	returns the smaller of x, y
+fmax(x,y) double x,y;	returns the larger of x, y
 float(x); double x;	integer to floating point conversion 
 fmod(x,y); double x,y;	mod(x,y) 
 			if 0 < y then 0 <= mod(x,y) < y and  
@@ -94,4 +94,3 @@ int ifix(x); double x;	floating point to integer
 The floating point package also includes the two constants:
 
 double pi, halfpi ;	constant values of pi and pi/2
-

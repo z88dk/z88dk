@@ -112,6 +112,7 @@
 	dec	hl
 	push	hl
 
+%notcpu 8085
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
@@ -173,6 +174,7 @@
 	push	hl
 	push	de
 
+%notcpu 8085
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
@@ -378,7 +380,7 @@
 =
 	ld	hl,%1	;const
 
-	add	hl,%1	
+	add	hl,%1
 	ld	hl,%2	;const
 =
 	ld	hl,%2	;const
@@ -446,12 +448,12 @@
 	ld	hl,(_%1)
 
 %notcpu gbz80
-%notcpu 8080
 	ld	hl,_%1
 	call	l_glong
 =
+	ld	hl,(_%1+2)
+	ex	de,hl
 	ld	hl,(_%1)
-	ld	de,(_%1+2)
 
 %notcpu gbz80
 	ld	hl,_%1
@@ -780,7 +782,7 @@
 	jp	nz,%1	;%3
 	ld	hl,1	;const
 =
-	ld	a,h	
+	ld	a,h
 	or	l
 	jp	nz,%1	;%3
 	inc	hl
@@ -841,6 +843,7 @@
 	ld	d,0
 	ld	hl,%1	;const
 
+%notcpu 8085
 	call	l_gint	;%9
 	push	hl
 	ld	hl,%1
@@ -1289,7 +1292,7 @@
 	or	l
 	jp	z,%3	;%4
 =
-	jr	%1_%2
+	jp	%1_%2
 .%2
 	jp	%3	;%4
 .%1_%2
@@ -1396,6 +1399,7 @@
 	push	bc
 	ld	hl,%1	;const
 
+%notcpu 8085
 %notcpu gbz80
 	push	hl
 	ld	hl,%1	;const
@@ -1409,6 +1413,7 @@
 	call	l_gint	;%9
 
 %notcpu 8080
+%notcpu 8085
 %notcpu gbz80
 	ld	hl,%1
 	ex	de,hl
@@ -1723,7 +1728,7 @@
 =
 	jp	c,%3	;%8
 .%1
-	jr	%1_%2
+	jp	%1_%2
 .%2
 	ld	a,h
 	or	l
@@ -1746,6 +1751,8 @@
 =
 ;
 
+%notcpu 8080
+%notcpu 8085
 	ld	hl,0	;const
 	call	l_lt
 	jp	nc,%1	;%3
@@ -1755,6 +1762,8 @@
 	jp	z,%1	;%3
 	ld	hl,%2
 
+%notcpu 8080
+%notcpu 8085
 	ld	hl,0	;const
 	call	l_lt
 	jp	c,%1	;%3
@@ -1764,6 +1773,8 @@
 	jp	nz,%1	;%3
 	ld	hl,%2
 
+%notcpu 8080
+%notcpu 8085
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -1805,7 +1816,6 @@
 	ld	de,%1
 	add	hl,de
 
-%notcpu 8080
 	ld	hl,%1
 	push	hl
 	pop	bc
@@ -2018,6 +2028,32 @@
 	jp	z,%3	;%5
 	ld	hl,%4
 
+%title Optimise int <= 0
+	jr	c,ASMPC+6
+	or	l
+	jr	nz,ASMPC+3
+	scf
+	jp	c,%1	;%2
+=
+	jp	c,%1
+	or	l
+	jp	z,%1
+
+%title Optimise long <= 0
+	jr	c,ASMPC+8
+	or	e
+	or	h
+	or	l
+	jr	nz,ASMPC+3
+	scf
+	jp	c,%1	;%2
+=
+	jp	c,%1
+	or	e
+	or	h
+	or	l
+	jp	z,%1
+
 	jr	z,ASMPC+3
 	scf
 	call	c,%2
@@ -2214,6 +2250,7 @@
 	ld	e,l
 
 %notcpu 8080
+%notcpu 8085
 	push	hl
 	call	l_gint	;
 	inc	hl
@@ -2229,6 +2266,7 @@
 	ld	l,a
 
 %notcpu 8080
+%notcpu 8085
 	push	hl
 	call	l_gint	;
 	dec	hl
@@ -2343,6 +2381,7 @@
 	ld	hl,%2
 
 %notcpu 8080
+%notcpu 8085
 	ld	hl,%1
 	push	hl
 	ld	hl,%2
@@ -2392,6 +2431,7 @@
 	and	a
 	jr	%1
 
+%notcpu 8085
 	call	l_gint	;%2
 	ld	de,%1
 	ex	de,hl
@@ -2425,7 +2465,6 @@
 =
 	ld	sp,hl
 
-%notcpu 8080
 %notcpu gbz80
 	call	memset
 	pop	bc
@@ -2434,7 +2473,6 @@
 =
 	call	memset_callee
 
-%notcpu 8080
 %notcpu gbz80
 	call	memcpy
 	pop	bc
@@ -2541,6 +2579,7 @@
 	push	hl
 
 %notcpu 8080
+%notcpu 8085
 	ld	hl,(%1)
 	pop	de
 	push	de
@@ -2701,6 +2740,7 @@
 	ld	h,0
 	ex	de,hl
 
+$notcpu 8085
 	call	l_gint	;
 	call	l_glong
 =
@@ -2776,6 +2816,7 @@
 	call	l_glong2sp
 	ld	hl,%1
 
+%notcpu 8085
 %notcpu gbz80
 	call	l_glonghlp
 	push	de
@@ -2859,6 +2900,7 @@
 	pop	hl
 	push	hl
 
+%notcpu 8085
 	push	de
 	ld	hl,%1	;const
 	add	hl,sp
@@ -2906,6 +2948,7 @@
 	ld	hl,%2
 
 %notcpu 8080
+%notcpu 8085
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
@@ -2921,6 +2964,7 @@
 	ld	l,0
 
 %notcpu 8080
+%notcpu 8085
 	ld	h,0
 	srl	l
 	add	hl,hl
@@ -2930,6 +2974,7 @@
 	add	hl,hl
 
 %notcpu 8080
+%notcpu 8085
 	ld	h,0
 	srl	h
 	rr	l
@@ -2938,6 +2983,7 @@
 	srl	l
 
 %notcpu 8080
+%notcpu 8085
 	ld	h,0
 	srl	l
 	srl	h
@@ -2975,6 +3021,7 @@
 	ld	h,0
 
 %notcpu 8080
+%notcpu 8085
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,2
@@ -3023,6 +3070,7 @@
 	ld	l,a
 
 %notcpu 8080
+%notcpu 8085
 	ld	l,0
 	ld	a,1
 	call	l_long_aslo
@@ -3500,7 +3548,7 @@
 =
 	ld	a,(_%1)
 	ld	l,a
-	rla	
+	rla
 	sbc	a
 	ld	h,a
 
@@ -3591,6 +3639,7 @@
 	ex	de,hl
 
 %notcpu 8080
+%notcpu 8085
 	push	hl
 	ld	l,(hl)
 	ld	h,0
@@ -3634,7 +3683,7 @@
 	and	%2
 	ld	l,a
 	ld	h,0
-	push	hl	
+	push	hl
 
 	scf
 	jr	z,ASMPC+3
@@ -3706,8 +3755,9 @@
 	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 
-%check 0 <= %1 <= 7
 %notcpu 8080
+%notcpu 8085
+%check 0 <= %1 <= 7
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -3901,7 +3951,7 @@
 	pop	bc
 	call	l_plong
 =
-	call	l_glong	
+	call	l_glong
 
 	ld	l,(hl)
 	ld	h,l
@@ -3944,6 +3994,7 @@
 	jp	%2z,%1	;%5
 
 %notcpu 8080
+%notcpu 8085
 	push	hl
 	call	l_gint	;
 	res	%1,l
@@ -4521,6 +4572,7 @@
 =
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	or	128
 	ld	(hl),a
@@ -4585,7 +4637,6 @@
 	and	a
 	jp	%1z,%2	;%3
 	ld	hl,%4
-
 
 %check 0 <= %1 <= 255
 	ld	a,l
@@ -4766,6 +4817,7 @@
 	push	hl
 
 %notcpu 8080
+%notcpu 8085
 %notcpu gbz80
 	ld	hl,(%1)
 	ld	de,(%1+2)
@@ -4786,6 +4838,7 @@
 	ex	de,hl
 
 %notcpu 8080
+%notcpu 8085
 %notcpu gbz80
 	ld	hl,(%1)
 	ld	de,(%1+2)
@@ -4864,21 +4917,26 @@
 	push	hl
 	push	bc
 
-	jp	i_%1	;%5
-.%2
-	jp	i_%3	;%6
-=
-	jp	i_%1	;%5
-	defc	%2 = i_%3
-
 	jr	c,%1
 .%2
 	jp	i_%3	;%5
 .%1
 =
-	jp	nc,i_%3	;%5
-	defc	%2 = i_%3
+%activate
+	jr	c,%1
+.%2
+	jp	i_%3	;%5
 .%1
+=
+%once
+	jp	nc,i_%3	;%5
+.%1
+%activate
+; --- Start of Optimiser additions ---
+=
+%once
+; --- Start of Optimiser additions ---
+	defc	%2 = i_%3
 
 	push	hl
 	ld	hl,%2	;const
@@ -4895,7 +4953,17 @@
 .i_%1
 	jp	i_%2	;%5
 =
+%activate
+.i_%1
 	jp	i_%2	;%5
+=
+%once
+	jp	i_%2	;%5
+%activate
+; --- Start of Optimiser additions ---
+=
+%once
+; --- Start of Optimiser additions ---
 	defc	i_%1 = i_%2
 
 	jr	i_%2
@@ -4903,19 +4971,18 @@
 =
 	jr	i_%2
 
-	jp	i_%2	;%4
-	jp	i_%3	;%5
+	jp	i_%2
+	jp	i_%3
 =
-	jp	i_%2	;%4
+	jp	i_%2
 
-	jr	i_%1
-	defc	%2
+	j%"r|p"0	i_%1
 .i_%1
 =
-	defc	%2
 .i_%1
 
 %notcpu 8080
+%notcpu 8085
 %notcpu gbz80
 	call	l_gint	;%1
 	call	l_pint
@@ -4945,11 +5012,11 @@
 	%3c	hl
 	pop	de
 =
-	ld	de,_%1
 	ld	hl,%eval(%2 2 -)	;const
 	add	hl,sp
 	call	l_gint	;%4
 	%3c	hl
+	ld	de,_%1
 
 	call	l_gint	;
 	ld	a,h
@@ -4964,13 +5031,9 @@
 	pop	hl
 
 	jp	i_%1	;%4
-	defc	%2
 	jp	i_%3	;%5
-	defc	%6
 =
 	jp	i_%1	;%4
-	defc	%2
-	defc	%6
 
 	ld	hl,%1	;const
 	call	l_gintspsp	;%2
@@ -4988,6 +5051,7 @@
 	add	hl,sp
 	call	l_gint	;%4
 
+%notcpu 8085
 	ex	de,hl
 	call	l_pint
 =
@@ -4996,6 +5060,7 @@
 	ld	(hl),d
 	ex	de,hl
 
+%notcpu 8085
 	call	l_gint	;%1
 	ld	bc,%2
 	add	hl,bc
@@ -5098,6 +5163,7 @@
 	ld	(hl),a
 
 %notcpu 8080
+%notcpu 8085
 	rlca
 	and	1
 	jp	%5,%1	;%4
@@ -5106,6 +5172,7 @@
 	jp	%5,%1	;%4
 
 %notcpu 8080
+%notcpu 8085
 	rlca
 	bit	%2,a
 	jp	%5,%1	;%4
@@ -5132,6 +5199,7 @@
 	ld	hl,%6
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	1
 	jp	%2z,%3
@@ -5142,6 +5210,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	2
 	jp	%2z,%3
@@ -5152,6 +5221,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	4
 	jp	%2z,%3
@@ -5162,6 +5232,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	8
 	jp	%2z,%3
@@ -5172,6 +5243,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	16
 	jp	%2z,%3
@@ -5182,6 +5254,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	32
 	jp	%2z,%3
@@ -5190,8 +5263,9 @@
 	bit	5,(hl)
 	jp	%2z,%3
 	ld	hl,%4
- 
+
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	64
 	jp	%2z,%3
@@ -5202,6 +5276,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	128
 	jp	%2z,%3
@@ -5304,7 +5379,7 @@
 	ld	hl,%5	;const
 
 %check 1 <= %1 <= 255
-%title 16bit >= becomes 8bit >= 
+%title 16bit >= becomes 8bit >=
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,%1	;const
@@ -5458,6 +5533,7 @@
 	ld	hl,%4
 
 %title Load 8 bit value into integer
+%notcpu 8085
 	ld	l,(hl)
 	ld	h,0
 	pop	de
@@ -5649,6 +5725,8 @@
 	jp	c,%2
 
 %title Clean up setting bit in char
+%notcpu 8080
+%notcpu 8085
 	push	hl
 	call	l_gchar
 	set	%1,l
@@ -5818,7 +5896,7 @@
 	ld	h,0
 =
 	ld	a,(_%1)
-	add	%eval(%2 256 %%)
+	add	%eval(%2 256 + 256 %%)
 	ld	l,a
 	ld	h,0
 
@@ -5870,7 +5948,7 @@
 	ld	(de),a
 	ld	hl,%1
 =
-	ld	l,(hl)
+	ld	a,(hl)
 	pop	de
 	ld	(de),a
 	ld	hl,%1
@@ -6034,3 +6112,942 @@
 	and	%2
 	jp	%3
 	ld	hl,%4
+
+	ld	hl,_%1
+	inc	h
+=
+	ld	hl,_%1 + 256
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	%2,%3	;EOS
+.%4
+	ld	hl,%5
+=
+	ld	a,(_%1)
+	and	a
+	jp	%2,%3	;EOS
+.%4
+	ld	hl,%5
+
+%title Eliminate redundant load of a
+	ld	a,%1
+	cp	%2
+	jp	%3,%4	;%5
+	ld	a,(%1)
+=
+	ld	a,%1
+	cp	%2
+	jp	%3,%4	;%5
+
+%title Eliminate jp over ret (z)
+	jp	z,%1	;%2
+	ret
+
+
+.%1
+=
+	ret	nz
+.%1
+
+	ld	a,h
+	or	l
+	ret	%1
+.%2
+	ret
+=
+.%2
+	ret
+
+%title Pointless clearing top byte
+	ld	h,0
+	ld	a,%1
+	sub	%2
+	jp	%3c,%5	;
+	ld	hl,%8	;const
+	jr	%6
+.%5
+	ld	hl,%7	;const
+=
+	ld	a,%1
+	sub	%2
+	jp	%3c,%5	;
+	ld	hl,%8	;const
+	jr	%6
+.%5
+	ld	hl,%7	;const
+
+%title Store uint8 inline rather than extend
+	ld	hl,(_%1)
+	ld	h,0
+	call	l_pint
+	jp	%2	;EOS
+=
+	ld	a,(_%1)
+	ld	(de),a
+	jp	%2	;EOS
+
+%title Use 8 bit load for comparison
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	cp	%2
+	jp	z,%3	;%4
+	ld	hl,%5
+=
+	ld	a,(_%1)
+	cp	%2
+	jp	z,%3	;%4
+	ld	hl,%5
+
+%title Remove jump over
+	jp	nz,%1
+	jr	%2
+.%1
+=
+	jr	z,%2
+.%1
+
+	ld	a,(_%1)
+	cp	%2
+	jp	%3	;
+	ld	a,(_%1)
+=
+	ld	a,(_%1)
+	cp	%2
+	jp	%3	;
+
+%title Simplify char comparison
+	scf
+	jr	z,ASMPC+3
+	ccf
+	jp	c,%1	;%2
+=
+	jp	z,%1	;%2
+
+%title Remove dangling jp
+	ret
+
+
+	jp	%1	;EOS
+=
+	ret
+
+%title Trailing statement increment uchar
+	ld	hl,(_%1)
+	ld	h,0
+	inc	hl
+	ld	a,l
+	ld	(_%1),a
+	jp	%2	;EOS
+=
+	ld	hl,_%1
+	inc	(hl)
+	jp	%2	;EOS
+
+%title Assign uchar from stack variable
+	call	l_gint	;
+	ld	a,l
+	ld	(_%1),a
+	jp	%2	;EOS
+=
+	ld	a,(hl)
+	ld	(_%1),a
+	jp	%2	;EOS
+
+%title Tidy up logic
+	ld	hl,1	;const
+	jr	%2
+.%3
+	ld	hl,0	;const
+.%2
+	ld	a,h
+	or	l
+	jr	z,%5
+.%6
+	ld	hl,1	;const
+.%5
+=
+.%6
+	ld	hl,1	;const
+	jr	%5
+.%3
+	ld	hl,0	;const
+.%5
+
+%title Redundant hl load
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	ld	(_%1),a
+.%2
+	ld	hl,%3
+=
+	ld	a,(hl)
+	ld	(_%1),a
+.%2
+	ld	hl,%3
+
+%title remove redundant hl load at EOS
+	ld	l,(hl)
+	ld	a,l
+	ld	(_%1),a
+	jp	%2	;EOS
+=
+	ld	a,(hl)
+	ld	(_%1),a
+	jp	%2	;EOS
+
+%title Redundant uchar extension
+	ld	h,0
+	ld	a,l
+	sub	%1
+	jp	%2
+	ld	hl,%3
+=
+	ld	a,l
+	sub	%1
+	jp	%2
+	ld	hl,%3
+
+%title Remove forced uchar conversion of true/false
+	ld	hl,1	;const
+	jr	%2
+.%3
+	ld	hl,0	;const
+.%2
+	ld	h,0
+	ret
+=
+	ld	hl,1	;const
+	ret
+.%3
+	ld	hl,0	;const
+	ret
+
+%title Redundant push around load of static uint8
+	push	de
+	ld	hl,(_%1)
+	ld	h,0
+	pop	de
+=
+	ld	hl,(_%1)
+	ld	h,0
+
+%title Increment memory not via hl
+	ld	hl,(_%1)
+	ld	h,0
+	%2c	hl
+	ld	a,l
+	ld	(_%1),a
+.i_%3
+	ld	hl,%4
+=
+	ld	hl,_%1
+	%2c	(hl)
+.i_%3
+	ld	hl,%4
+
+%title Redundant sign extnsion
+	ld	l,(hl)
+	ld	h,0
+	call	l_%"xor|and|or"2
+	ld	a,l
+	call	l_sxt
+	pop	de
+	ld	a,l
+	ld	(de),a
+=
+	ld	a,(hl)
+	%2	e
+	pop	de
+	ld	(de),a
+
+	ld	hl,(_%1)
+	ld	h,0
+	ex	de,hl
+	ld	hl,(_%2)
+	ld	h,0
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	jp	%3c,%4	;
+	ld	hl,%5
+=
+	ld	hl,(_%2)
+	ld	a,(_%1)
+	sub	l
+	jp	%3c,%4	;
+	ld	hl,%5
+
+%notcpu gbz80
+	pop	bc
+	ld	hl,%1
+	push	hl
+	call	_%2
+=
+	ld	hl,%1
+	ex	(sp),hl
+	call	_%2
+
+	ld	l,(hl)
+	ld	h,0
+	ld	bc,%1
+	add	hl,bc
+	ld	a,l
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+=
+	ld	a,(hl)
+	add	%eval(%1 256 + 256 %%)
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+
+%eval 1 = %3 %1 -
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	(hl),%2
+	ld	hl,%3	;const
+	add	hl,sp
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	(hl),%2
+	inc	hl
+
+%eval 2 = %3 %1 -
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	(hl),%2
+	ld	hl,%3	;const
+	add	hl,sp
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	(hl),%2
+	inc	hl
+	inc	hl
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	%2,%3	;EOS
+=
+	ld	a,(_%1)
+	and	a
+	jp	%2,%3	;EOS
+
+
+%check 0 <= %1 <= 255
+%check 0 <= %2 <= 255
+	ld	hl,%1	;const
+	push	hl
+	ld	hl,%2	;const
+=
+	ld	hl,%1	;const
+	push	hl
+	ld	l,%2
+
+	push	hl
+	ld	hl,(_%1)
+	ld	h,0
+	add	hl,hl
+	pop	de
+	add	hl,de
+=
+	ex	de,hl
+	ld	hl,(_%1)
+	ld	h,0
+	add	hl,hl
+	add	hl,de
+
+	call	l_gchar
+	pop	de
+	ld	a,l
+	ld	(de),a
+.%1
+	ld	hl,%2
+=
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+.%1
+	ld	hl,%2
+
+%notcpu gbz80
+	ld	hl,_%1
+	inc	(hl)
+	ld	a,(hl)
+	inc	hl
+	jr	nz,ASMPC+3
+	inc	(hl)
+	jp	%2	;EOS
+=
+	ld	hl,(_%1)
+	inc	hl
+	ld	(_%1),hl
+	jp	%2	;EOS
+
+%notcpu gbz80
+	ld	hl,_%1
+	inc	(hl)
+	ld	a,(hl)
+	inc	hl
+	jr	nz,ASMPC+3
+	inc	(hl)
+	ld	hl,%2
+=
+	ld	hl,(_%1)
+	inc	hl
+	ld	(_%1),hl
+	ld	hl,%2
+
+%notcpu gbz80
+	ld	hl,_%1
+	dec	(hl)
+	ld	a,(hl)
+	inc	hl
+	cp	255
+	jr	nz,ASMPC+3
+	dec	(hl)
+	ld	hl,%2
+=
+	ld	hl,(_%1)
+	dec	hl
+	ld	(_%1),hl
+	ld	hl,%2
+
+%notcpu gbz80
+	ld	hl,_%1
+	dec	(hl)
+	ld	a,(hl)
+	inc	hl
+	cp	255
+	jr	nz,ASMPC+3
+	dec	(hl)
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(_%1)
+	dec	hl
+	ld	(_%1),hl
+
+%check 0 <= %2 <= 65535
+%check 0 <= %3 <= 65535
+	add	hl,%2
+	add	hl,%3
+=
+	add	hl,%eval(%2 %3 +)
+
+%check 0 <= %2 <= 65535
+	ld	hl,_%1
+	add	hl,%2
+=
+	ld	hl,_%1+%2
+
+%check 0 <= %1 <= 255
+	ld	l,(hl)
+	ld	h,0
+	ld	de,%1
+	and	a
+	sbc	hl,de
+	jp	nz,%3	;
+	ld	hl,%4
+=
+	ld	a,(hl)
+	cp	%1
+	jp	nz,%3	;
+	ld	hl,%4
+
+%check 0 <= %1 <= 255
+	pop	hl
+	push	hl
+	ld	l,h
+	ld	h,0
+	ld	de,%1
+	and	a
+	sbc	hl,de
+	jp	nz,%3	;
+	add	hl,sp
+=
+	ld	hl,1	;const
+	add	hl,sp
+	ld	a,(hl)
+	cp	%1
+	jp	nz,%3	;
+	ld	hl,0	;const
+	add	hl,sp
+
+	pop	hl
+	push	hl
+	ld	l,h
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	%2,%3	;
+	ld	hl,%4
+=
+	ld	hl,1	;const
+	add	hl,sp
+	ld	a,(hl)
+	and	a
+	jp	%2,%3	;
+	ld	hl,%4
+
+%check 0 <= %2 <= 255
+	ld	hl,(_%1)
+	ld	h,0
+	ld	de,%2
+	and	a
+	sbc	hl,de
+	jp	z,%3	;
+=
+	ld	a,(_%1)
+	cp	%2
+	jp	z,%3	;
+
+%title Kill redundant upper 8 cleaning (14b -> 12b)
+	ld	hl,%1
+	ld	h,0
+	ld	a,%2
+	sub	l
+	jp	%3c,%4
+	ld	hl,%5
+=
+	ld	hl,%1
+	ld	a,%2
+	sub	l
+	jp	%3c,%4
+	ld	hl,%5
+
+%title Inline sint8 -> sint16 can be extended to sint32
+	ld	a,l
+	rla
+	sbc	a
+	ld	h,a
+	call	l_int2long_s
+=
+	ld	a,l
+	rla
+	sbc	a
+	ld	h,a
+	ld	d,a
+	ld	e,a
+
+%title Redundant h,0 removed
+	ld	h,0
+	ld	a,l
+	and	a
+	jp	%2z,%3
+	ld	hl,%4
+=
+	ld	a,l
+	and	a
+	jp	%2z,%3
+	ld	hl,%4
+
+%title Redundant swap
+	ld	l,h
+	ld	a,l
+	and	a
+	jp	%1,%2	;
+	ld	hl,%3
+=
+	ld	a,h
+	and	a
+	jp	%1,%2	;
+	ld	hl,%3
+
+	ld	a,l
+	ld	(%1),a
+	ld	a,l
+=
+	ld	a,l
+	ld	(%1),a
+
+%title De-dupe labels
+%eval 0 = %2 %1 - !
+.i_%1
+.i_%2
+=
+%activate
+.i_%1
+.i_%2
+=
+%once
+.i_%2
+%activate
+; --- Start of Optimiser additions ---
+=
+%once
+; --- Start of Optimiser additions ---
+	defc	i_%1 = i_%2
+
+%title Jump to ret
+.i_%1
+	ret
+=
+%activate
+	j%"p|r"	i_%1	;%%2
+=
+	ret
+%activate
+	j%"p|r"	%%2,i_%1	;%%3
+=
+	ret	%%2
+
+%title Moved from z80rules.0, structure setting
+%check 0 <= %1 <= 65535
+%check 0 <= %3 <= 65535
+	pop	hl
+	push	hl
+	ld	bc,%1
+	add	hl,bc
+	ld	(hl),%2
+	inc	hl
+	ld	(hl),%4
+	pop	hl
+	push	hl
+	ld	bc,%3
+	add	hl,bc
+=
+	pop	hl
+	push	hl
+	ld	bc,%1
+	add	hl,bc
+	ld	(hl),%2
+	inc	hl
+	ld	(hl),%4
+	ld	bc,%eval(%3 %1 - 1 -)
+	add	hl,bc
+
+%title Moved from z80rules.0, structure setting
+%check 0 <= %1 <= 65535
+%check 0 <= %3 <= 65535
+	pop	hl
+	push	hl
+	ld	bc,%1
+	add	hl,bc
+	ld	(hl),%2
+	pop	hl
+	push	hl
+	ld	bc,%3
+	add	hl,bc
+=
+	pop	hl
+	push	hl
+	ld	bc,%1
+	add	hl,bc
+	ld	(hl),%2
+	ld	bc,%eval(%3 %1 -)
+	add	hl,bc
+
+%title moved from z80rules.0 inc/dec
+%notcpu gbz80
+	ld	hl,_%1
+	push	hl
+	call	l_gint	;%2
+	%3c	hl
+	pop	de
+	call	l_pint
+=
+	ld	hl,(_%1)
+	%3c	hl
+	ld	(_%1),hl
+
+%title Moved from z80rules.0 static uint8_t inc/dec
+	ld	hl,(_%1)
+	ld	h,0
+	%2c	hl
+	ld	a,l
+	ld	(_%1),hl
+	ld	hl,%3
+=
+	ld	hl,_%1
+	%2c	hl
+	ld	hl,%3
+
+%title Moved from z80rules.0, redundant uint8 load
+	ld	l,(hl)
+	ld	h,0
+	ld	hl,%1
+=
+	ld	hl,%1
+
+%title Moved from z80rules.0 optimise 8 bit increment
+	ld	hl,(%1)
+	ld	h,0
+	%3c	hl
+	ld	a,l
+	ld	(%1),a
+	ld	hl,%2
+=
+	ld	hl,%1
+	%3c	(hl)
+	ld	hl,%2
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	inc	hl
+	inc	hl
+	call	l_gint	;
+=
+	call	l_gint3	;
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	inc	hl
+	call	l_gint	;
+=
+	call	l_gint2	;
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	call	l_gint	;
+=
+	call	l_gint1	;
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+%check 4 <= %1 <= 8
+	ld	bc,%1
+	add	hl,bc
+	call	l_gint	;
+=
+	call	l_gint%1	;
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+%notcpu gbz80
+%check 1 <= %1 <= 8
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint%1sp	;
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	inc	hl
+	inc	hl
+	call	l_gchar
+=
+	call	l_gchar3
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	inc	hl
+	call	l_gchar
+=
+	call	l_gchar2
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	call	l_gchar
+=
+	call	l_gchar1
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+%check 4 <= %1 <= 8
+	ld	bc,%1
+	add	hl,bc
+	call	l_gchar
+=
+	call	l_gchar%1
+
+%title Truncating long
+	call	l_glong
+	ex	de,hl
+	ld	hl,%1	;const
+	push	de
+	ex	de,hl
+	ld	hl,%2	;const
+=
+	call	l_gint
+	push	hl
+	ld	de,%1	;const
+	ld	hl,%2	;const
+
+%title Reverse primary/secondary load
+%check 4 <= %2 <= 8
+	ld	hl,%1	;const
+	push	hl
+	call	l_gint%2sp	;
+	pop	de
+=
+	call	l_gint%eval(%2 2-)sp	;
+	ld	de,%1
+
+%title Optimise secondary load (perf)
+	ld	hl,(_%1)	X
+	ld	h,0
+	ex	de,hl
+	ld	hl,%2	;const
+=
+	ld	a,(_%1)
+	ld	e,a
+	ld	d,0
+	ld	hl,%2	;const
+
+%title Use 8 bit addition
+%check 0 <= %2 <= 256
+	ld	hl,(_%1)
+	ld	h,0
+	ld	bc,%2
+	add	hl,bc
+	ld	h,0
+=
+	ld	a,(_%1)
+	add	%eval(%2 256 + 256 %%)
+	ld	l,a
+	ld	h,0
+
+%title Load directly into a rather than via hl
+	ld	hl,_%1
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+=
+	ld	a,(_%1)
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+
+	ld	hl,_%1
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	ld	l,a
+=
+	ld	a,(_%1)
+	pop	de
+	ld	(de),a
+	ld	l,a
+
+%notcpu gbz80
+	push	hl
+	ld	a,%1
+	pop	de
+=
+	ex	de,hl
+	ld	a,%1
+
+%title Remove redundant ld h,0
+	ld	h,0
+	ld	bc,%1
+	add	hl,bc
+	ld	h,0
+=
+	ld	bc,%1
+	add	hl,bc
+	ld	h,0
+
+%title Tidy up function tail
+	pop	bc
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+=
+	ld	hl,%eval(%1 2 +)	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+
+%title Better sdccdecl handling 1
+	ld	h,0
+	ld	b,l
+	push	bc
+	inc	sp
+	ld	hl,%1
+=
+	ld	a,l
+	push	af
+	inc	sp
+	ld	hl,%1
+
+%title Better sdccdecl handling - global
+	ld	hl,(_%1)
+	ld	a,l
+	push	af
+	inc	sp
+	ld	hl,%2
+=
+	ld	a,(_%1)
+	push	af
+	inc	sp
+	ld	hl,%2
+
+%title Better sdccdecl handling - local
+	ld	l,(hl)
+	ld	a,l
+	push	af
+	inc	sp
+	ld	hl,%2
+=
+	ld	a,(hl)
+	push	af
+	inc	sp
+	ld	hl,%2
+
+
+%title Better sdccdecl handling - local 2
+%eval 2 = %2 %1 -
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	a,(hl)
+	push	af
+	inc	sp
+	ld	hl,%2	;const
+	add	hl,sp
+	ld	a,(hl)
+	push	af
+	inc	sp
+	ld	hl,%3
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	d,(hl)
+	inc	hl
+	ld	e,(hl)
+	push	de
+	ld	hl,%3
+
+%title Char parameter passing
+%eval 3 = %2 %1 -
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	push	hl
+	ld	hl,%2	;const
+	add	hl,sp
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	c,(hl)
+	ld	b,0
+	push	bc
+	inc	hl

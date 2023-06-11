@@ -1,0 +1,3 @@
+@${NEWLIB_ROOT}l/sccz80/r2k.lst
+@${NEWLIB_ROOT}l/util/r2k.lst
+@${NEWLIB_ROOT}l/sdcc.lst

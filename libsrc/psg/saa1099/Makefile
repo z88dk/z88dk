@@ -16,7 +16,7 @@ endif
 GENOBJECTS = 
 
 ifeq ($(SUBSET),)
-ASMFILES = $(wildcard *.asm) $(wildcard etracker/*.asm)
+ASMFILES = $(wildcard *.asm) $(wildcard etracker/*.asm) ayemul/saa_ayemul.asm
 else
 ASMFILES = $(SUBSET)
 endif
@@ -36,7 +36,7 @@ obj/$(OBJSUBDIR)/%.o: %.asm
 
 
 dirs:
-	@mkdir -p obj/$(OBJSUBDIR) obj/$(OBJSUBDIR)/etracker
+	@mkdir -p obj/$(OBJSUBDIR) obj/$(OBJSUBDIR)/etracker obj/$(OBJSUBDIR)/ayemul
 
 clean:
 	$(RM) -fr obj

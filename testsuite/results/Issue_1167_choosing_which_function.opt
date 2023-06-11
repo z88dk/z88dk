@@ -22,13 +22,12 @@
 	ld	hl,_func2
 .i_3
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	ex	(sp),hl
 	call	l_jphl
 	pop	bc
 	ret
+
 
 
 

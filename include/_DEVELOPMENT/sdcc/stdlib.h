@@ -10,18 +10,18 @@
 
 // DATA STRUCTURES
 
-#ifndef _SIZE_T_DEFINED
-#define _SIZE_T_DEFINED
+#ifndef _SIZE_T
+#define _SIZE_T
 typedef unsigned int  size_t;
 #endif
 
-#ifndef _WCHAR_T_DEFINED
-#define _WCHAR_T_DEFINED
+#ifndef _WCHAR_T
+#define _WCHAR_T
 typedef unsigned char wchar_t;
 #endif
 
-#ifndef _FLOAT_T_DEFINED
-#define _FLOAT_T_DEFINED
+#ifndef _FLOAT_T
+#define _FLOAT_T
 
    #ifdef __CLANG
    
@@ -43,8 +43,8 @@ typedef unsigned char wchar_t;
    
 #endif
 
-#ifndef _DOUBLE_T_DEFINED
-#define _DOUBLE_T_DEFINED
+#ifndef _DOUBLE_T
+#define _DOUBLE_T
 
    #ifdef __CLANG
    
@@ -365,7 +365,7 @@ extern char *utoa_callee(uint16_t num,char *buf,int radix) __z88dk_callee;
 
 
 
-#ifndef _ALLOC_MALLOC_H
+#ifndef __ALLOC_MALLOC_H__
 
 extern void *aligned_alloc(size_t alignment,size_t size);
 extern void *aligned_alloc_callee(size_t alignment,size_t size) __z88dk_callee;
@@ -450,6 +450,39 @@ extern void _lldivu__callee(lldivu_t *ld,unsigned long long numer,unsigned long 
 #define _lldivu_(a,b,c) _lldivu__callee(a,b,c)
 
 
+
+extern long long llabs(long long i);
+extern long long llabs_callee(long long i) __z88dk_callee;
+#define llabs(a) llabs_callee(a)
+   
+extern char *lltoa(long long num,char *buf,int radix);
+extern char *lltoa_callee(long long num,char *buf,int radix) __z88dk_callee;
+#define lltoa(a,b,c) lltoa_callee(a,b,c)
+
+
+extern long long strtoll(char *nptr,char **endptr,int base);
+extern long long strtoll_callee(char *nptr,char **endptr,int base) __z88dk_callee;
+#define strtoll(a,b,c) strtoll_callee(a,b,c)
+
+
+extern unsigned long long strtoull(char *nptr,char **endptr,int base);
+extern unsigned long long strtoull_callee(char *nptr,char **endptr,int base) __z88dk_callee;
+#define strtoull(a,b,c) strtoull_callee(a,b,c)
+
+
+extern char *ulltoa(unsigned long long num,char *buf,int radix);
+extern char *ulltoa_callee(unsigned long long num,char *buf,int radix) __z88dk_callee;
+#define ulltoa(a,b,c) ulltoa_callee(a,b,c)
+
+
+
+#endif
+
+#ifdef __SCCZ80
+
+extern long long atoll(char *buf);
+extern long long atoll_callee(char *buf) __z88dk_callee;
+#define atoll(a) atoll_callee(a)
 
 extern long long llabs(long long i);
 extern long long llabs_callee(long long i) __z88dk_callee;

@@ -81,9 +81,7 @@ PUBLIC  m32_compare, m32_compare_callee
     rr d
     rr e
 
-    ld a,l
-    and 0fch            ;remove least significant 2 bits
-    ld l,a
+    res 0,l             ;remove least significant bit
 
     exx                 ;left
     sla e
@@ -107,8 +105,9 @@ PUBLIC  m32_compare, m32_compare_callee
     rr d
     rr e
 
+    res 0,l             ;remove least significant bit
+
     ld a,l
-    and 0fch            ;remove least significant 2 bits
 
     exx                 ;right
     sub l

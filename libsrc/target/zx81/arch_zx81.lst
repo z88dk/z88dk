@@ -27,6 +27,7 @@ target/zx81/zx81/basic/zx_basic_length
 target/zx81/zx81/basic/zx_getint
 target/zx81/zx81/basic/zx_getstr
 target/zx81/zx81/basic/zx_getstr_callee
+target/zx81/zx81/basic/zx_goto
 target/zx81/zx81/basic/zx_line
 target/zx81/zx81/basic/zx_setint
 target/zx81/zx81/basic/zx_locatenum

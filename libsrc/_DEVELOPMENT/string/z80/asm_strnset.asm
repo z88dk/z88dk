@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Jan 2015
+; Jan 2015 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; char *strnset(char *s, int c, size_t n)
@@ -27,31 +27,38 @@ asm_strnset:
    
    ld a,b
    or c
-   ret z
-   
-   push hl
-   xor a
-   
-loop:
+   ret Z
 
+   push hl
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+
+loop:
+   xor a
    cp (hl)
-   jr z, exit
-   
+   jr Z,exit
+
+   ld (hl),e
+   inc hl
+
+   dec bc
+   ld a,b
+   or c
+   jr NZ,loop
+
+ELSE
+   xor a
+loop:
+   cp (hl)
+   jr Z,exit
+
    ld (hl),e
 
-IF __CPU_GBZ80__
-   EXTERN __z80asm__cpi
-   call __z80asm__cpi
-   ld a,b
-   or c 
-   ld a,0
-   jr nz,loop
-ELSE
    cpi                         ; hl++, bc--
-   jp pe, loop
+   jp PE,loop
+
 ENDIF
 
 exit:
-
    pop hl
    ret

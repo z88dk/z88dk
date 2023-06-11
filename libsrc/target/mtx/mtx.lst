@@ -1,0 +1,14 @@
+target/mtx/stdio/fputc_cons
+target/mtx/stdio/fgetc_cons
+target/mtx/stdio/getk
+@stdio/ansicore.lst
+
+target/mtx/time/clock
+@video/tms9918/video_tms9918.lst
+@stdio/stdio.lst
+@gfx/narrow/gfx_narrow.lst
+target/mtx/games/joystick
+@psg/sn76489/sn76489.lst
+@games/games.lst
+@target/mtx/rs232/rs232.lst
+

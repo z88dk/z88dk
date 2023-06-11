@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; void *memmove(void *s1, const void *s2, size_t n)
@@ -32,7 +32,7 @@ asm_memmove:
 
    ld a,b
    or c
-   jp z, asm1_memcpy
+   jp Z,asm1_memcpy
    
    ; Because of the possibility of overlap between
    ; dst and src, we have two scenarios:
@@ -41,51 +41,53 @@ asm_memmove:
    ; 2 - (dst>src) in which case must lddr from end
 
    ; 8-bit compares faster most of the time
-   
+
    ld a,d
    cp h
-   jp c, asm0_memcpy
-   jr nz, use_lddr
-   
+   jp C,asm0_memcpy
+   jr NZ,use_lddr
+
    ld a,e
    cp l
-   jp c, asm0_memcpy
-   
-   jp z, asm1_memcpy           ; if dst == src, do nothing
+   jp C,asm0_memcpy
+
+   jp Z,asm1_memcpy           ; if dst == src, do nothing
 
 use_lddr:
+   push de
+   dec bc
+
+   add hl,bc
+   ex de,hl
+   add hl,bc
+   ex de,hl
 
    push de
-   dec bc
-   
-   add hl,bc
-   ex de,hl
-   add hl,bc
-   ex de,hl
-   
-   push de
-   
-   inc bc
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
+
+   inc b
+   inc c
+
 loop:
- IF __CPU_GBZ80__
    ld a,(hl-)
- ELSE
-   ld a,(hl)
-   dec hl
- ENDIF
-   ld (de),a
-   dec de
-   dec bc
-   ld a,b
-   or c
-   jr nz,loop
+   ld (de-),a
+
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
 ELSE
+
+   inc bc
    lddr
+
 ENDIF
-   
+
    pop de
    inc de
-   
+
    pop hl
    ret
+

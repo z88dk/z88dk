@@ -16,3 +16,10 @@ sms_aplib_depack_vram_callee:
    push af
    
    jp asm_sms_aplib_depack_vram
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sms_aplib_depack_vram_callee
+defc _sms_aplib_depack_vram_callee = sms_aplib_depack_vram_callee
+ENDIF
+

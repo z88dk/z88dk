@@ -18,13 +18,13 @@
 		ld	b,50		; Horrible workaround...
 .sillyloop
 		push	bc
-		call	12020		; Wait for Key release
+		call	$2efd		; Wait for Key release
 		pop	bc
 		and	a
 		djnz	sillyloop
 		jr	nz,fgetc_cons
 .fgetc_cons1
-		call	12020		; Wait for Key press, now
+		call	$2efd		; Wait for Key press, now
 		and	a
 		jr	z,fgetc_cons1
 

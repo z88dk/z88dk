@@ -6,7 +6,7 @@
 
 ; address = 0x0008
 
-   defs 0x0008 - ASMPC
+   ALIGN 0x0008
 
 IF ((__crt_enable_rst & $0202) = $02)
 
@@ -38,7 +38,7 @@ ENDIF
 
 ; address = 0x0010
 
-   defs 0x0010 - ASMPC
+   ALIGN 0x0010
 
 IF ((__crt_enable_rst & $0404) = $04)
 
@@ -66,11 +66,11 @@ IF ((__crt_enable_rst & $0404) != $0404)
       
 ENDIF
 
-   defm "2.00"
+   defm "2.20"
 
 ; address = 0x0018
 
-   defs 0x0018 - ASMPC
+   ALIGN 0x0018
 
 IF ((__crt_enable_rst & $0808) = $08)
 
@@ -110,7 +110,7 @@ l_dec_de:
 
 ; address = 0x0020
 
-   defs 0x0020 - ASMPC
+   ALIGN 0x0020
 
 IF ((__crt_enable_rst & $1010) = $10)
 
@@ -150,7 +150,7 @@ l_dec_bc:
 
 ; address = 0x0028
 
-   defs 0x0028 - ASMPC
+   ALIGN 0x0028
 
 IF ((__crt_enable_rst & $2020) = $20)
 
@@ -190,7 +190,7 @@ l_ret:
 
 ; address = 0x0030
 
-   defs 0x0030 - ASMPC
+   ALIGN 0x0030
 
 IF ((__crt_enable_rst & $4040) = $40)
 
@@ -263,7 +263,7 @@ ENDIF
 ; address = 0x0038
 ; im 1 isr
 
-   defs 0x0038 - ASMPC
+   ALIGN 0x0038
 
 IF ((__crt_enable_rst & $8080) = $80)
 
@@ -354,7 +354,7 @@ l_inc_hl:
 
 ; address = 0x0066
 
-   defs 0x0066 - ASMPC
+   ALIGN 0x0066
 
 IF (__crt_enable_nmi = 1)
 
@@ -383,7 +383,7 @@ IF (__crt_enable_nmi <= 1)
       
 ENDIF
 
-IF __crt_org_vector_table = -0x0080
+IF (__crt_org_vector_table = -0x0080)
 
 ; place vector table at address 0x0080
 
@@ -417,13 +417,11 @@ error_zc:
 
 ; address = 0x80
 
-   defs 0x80 - ASMPC
+   ALIGN 0x0080
 
 section code_crt_start
 
-ENDIF
-
-IF (__crt_org_vector_table = -0x0100)
+ELIF (__crt_org_vector_table = -0x0100)
 
 ; place vector table at address 0x0100
 
@@ -679,9 +677,13 @@ l_offset_ix_bc:
 
 ; address = 0x100
 
-   defs 0x100 - ASMPC
+   ALIGN 0x0100
 
 section code_crt_start
+
+ELSE
+
+section code_crt_init
 
 ENDIF
 

@@ -2,7 +2,7 @@ include ../../../Make.config
 
 TARGET = sos
 
-SUBDIRS = tape
+SUBDIRS = 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 ASMFILES = $(wildcard *.asm)
@@ -23,8 +23,7 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I../..  $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -DFOR$(TARGET) -I../.. -Oobj/$(TARGET) $^
 
 dirs:
 	@mkdir -p obj/$(TARGET)

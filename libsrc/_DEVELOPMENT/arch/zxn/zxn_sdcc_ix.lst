@@ -12,3 +12,4 @@
 arch/zxn/sysvar/system_variables
 @arch/zx/tape/tape_sdcc_ix.lst
 @arch/zxn/version/version_sdcc.lst
+@arch/zxn/arkos/arkos_sdcc_ix.lst

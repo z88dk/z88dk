@@ -21,7 +21,7 @@ The performance metric is time to complete in minutes and seconds.
 
 /*
  * COMMAND LINE DEFINES
- * 
+ *
  * -DSTATIC
  * Use static variables instead of locals.
  *
@@ -60,73 +60,73 @@ RESULTS - PI.C (NO LDIV)
 ========================
 
 1.
-Z88DK March 2, 2017
+Z88DK April 4, 2022
 sccz80 / new c library / fast int math
-8999 bytes less page zero
+9049 bytes less page zero
 
-cycle count  = 1696878309
-time @ 4MHz  = 1696878309 / 4*10^6 =  7 min 04 sec
+cycle count  = 1766815709
+time @ 4MHz  = 1766815709 / 4*10^6 =  7 min 22 sec
 
 2.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library / fast int math
-8997 bytes less page zero
+Z88DK April 4, 2022
+zsdcc #13131 / new c library / fast int math
+9049 bytes less page zero
 
-cycle count  = 1756864232
-time @ 4MHz  = 1756864232 / 4*10^6 =  7 min 19 sec
+cycle count  = 1736106244
+time @ 4MHz  = 1736106244 / 4*10^6 =  7 min 14 sec
 
 3.
-Z88DK April 20, 2020
+Z88DK April 4, 2022
 sccz80 / new c library / small int math
-6269 bytes less page zero
+6340 bytes less page zero
 
-cycle count  = 4012440735
-time @ 4MHz  = 4012440735 / 4*10^6 = 16 min 43 sec
+cycle count  = 4028061102
+time @ 4MHz  = 4028061102 / 4*10^6 = 16 min 47 sec
 
 4.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library / small int math
-6246 bytes less page zero
+Z88DK April 4, 2022
+zsdcc #13131 / new c library / small int math
+6299 bytes less page zero
 
-cycle count  = 4067517071
-time @ 4MHz  = 4067517071 / 4*10^6 = 16 min 57 sec
+cycle count  = 4011979932
+time @ 4MHz  = 4011979932 / 4*10^6 = 16 min 43 sec
 
 5.
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-6600 bytes less page zero
+Z88DK April 4, 2022
+zsdcc #13131 / classic c library
+7146 bytes less page zero
 
-cycle count  = 4169137078
-time @ 4MHz  = 4169137078 / 4*10^6 = 17 min 22 sec
+cycle count  = 4013954322
+time @ 4MHz  = 4013954322 / 4*10^6 = 16 min 43 sec
 
 6.
-Z88DK April 20, 2020
+Z88DK April 4, 2022
 sccz80 / classic c library
-6508 bytes less page zero
+7154 bytes less page zero
 
-cycle count  = 4012440830
-time @ 4MHz  = 4012440830 / 4*10^6 = 16 min 43 sec
+cycle count  = 4028061102
+time @ 4MHz  = 4028061102 / 4*10^6 = 16 min 47 sec
 
 7.
-HITECH C MSDOS V750
-6337 bytes exact
+HITECH C MSDOS V780pl2
+6593 bytes exact
 
-cycle count  = 5520768427
-time @ 4MHz  = 5520768427 / 4x10^6 = 23 min 00 sec
+cycle count  = 5528979464
+time @ 4MHz  = 5528979464 / 4x10^6 = 23 min 02 sec
 
 8.
-HITECH C CPM V309
-6793 bytes less cpm overhead
+HITECH C CPM V309-15
+8342 bytes exact
 
-cycle count  = 5531933581
-time @ 4MHz  = 5531933581 / 4*10^6 = 23 min 03 sec
+cycle count  = 5532347800
+time @ 4MHz  = 5532347800 / 4*10^6 = 23 min 03 sec
 
 9.
-SDCC 3.6.5 #9842 (MINGW64)
-6844 bytes less page zero
+SDCC 4.2.0 Linux
+6591 bytes less page zero
 
-cycle count  = 8700157418
-time @ 4MHz  = 8700157418 / 4*10^6 = 36 min 15 sec
+cycle count  = 6649404381
+time @ 4MHz  = 6649404381 / 4*10^6 = 27 min 42 sec
 
 SDCC implements its 32-bit math in C.
 
@@ -139,48 +139,55 @@ time @ 4MHz  = 8762223085 / 4*10^6 = 36 min 31 sec
 
 It looks like IAR implements its 32-bit math in C.
 
+11.
+Z88DK December 12, 2022
+sccz80 / classic c library / 8085 CPU
+7335 bytes less page zero
+
+cycle count  = 7824146079
+time @ 4MHz  = 7824146079 / 4*10^6 = 32 min 36 sec
 
 RESULTS - PI_LDIV.C (LDIV USED)
 ===============================
 
 1.
-Z88DK April 4, 2020
+Z88DK April 4, 2022
 sccz80 / new c library / fast int math
-9131 bytes less page zero
+9139 bytes less page zero
 
-cycle count  = 1301832933
-time @ 4MHz  = 1301832933 / 4*10^6 =  5 min 25 sec
+cycle count  = 1358535133
+time @ 4MHz  = 1358535133 / 4*10^6 =  5 min 39 sec
 
 2.
-Z88DK April 4, 2020
-zsdcc #11566 / new c library / fast int math
-9097 bytes less page zero
+Z88DK April 4, 2022
+zsdcc #13131 / new c library / fast int math
+9123 bytes less page zero
 
-cycle count  = 1339849656
-time @ 4MHz  = 1339849656 / 4*10^6 =  5 min 35 sec
+cycle count  = 1316559068
+time @ 4MHz  = 1316559068 / 4*10^6 =  5 min 29 sec
 
 3.
-Z88DK April 20, 2020
+Z88DK April 4, 2022
 sccz80 / new c library / small int math
-6400 bytes less page zero
+6428 bytes less page zero
 
-cycle count  = 2576381983
-time @ 4MHz  = 2576381983 / 4*10^6 = 10 min 44 sec
+cycle count  = 2578767150
+time @ 4MHz  = 2578767150 / 4*10^6 = 10 min 45 sec
 
 4.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library / small int math
-6388 bytes less page zero
+Z88DK April 4, 2022
+zsdcc #13131 / new c library / small int math
+6391 bytes less page zero
 
-cycle count  = 2609489119
-time @ 4MHz  = 2609489119 / 4*10^6 = 10 min 52 sec
+cycle count  = 2551419380
+time @ 4MHz  = 2551419380 / 4*10^6 = 10 min 38 sec
 
 5.
-HITECH C MSDOS V750
-6486 bytes exact
+HITECH C MSDOS V780pl2
+6728 bytes exact
 
-cycle count  = 5884356227
-time @ 4MHz  = 5884356227 / 4x10^6 = 24 min 31 sec
+cycle count  = 5892567264
+time @ 4MHz  = 5892567264 / 4x10^6 = 24 min 33 sec
 
 It looks like HTC implements ldiv() as two separate divisions.
 

@@ -16,6 +16,10 @@ Type   *type_long = &(Type){ KIND_LONG, 4, 0, .len=1 };
 Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
 Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
 Type   *type_float16 = &(Type){ KIND_FLOAT16, 2, 0, .len=1 }; 
+Type   *type_accum16 = &(Type){ KIND_ACCUM16, 2, 0, .len=1 }; 
+Type   *type_uaccum16 = &(Type){ KIND_ACCUM16, 2, 1, .len=1 }; 
+Type   *type_accum32 = &(Type){ KIND_ACCUM32, 4, 0, .len=1 }; 
+Type   *type_uaccum32 = &(Type){ KIND_ACCUM32, 4, 1, .len=1 }; 
 Type   *type_longlong = &(Type){ KIND_LONGLONG, 8, 0, .len=1 }; 
 Type   *type_ulonglong = &(Type){ KIND_LONGLONG, 8, 1, .len=1 }; 
 
@@ -278,7 +282,7 @@ static Type *parse_enum(Type *type)
     type->size = 2;
     type->isunsigned = c_default_unsigned;
     if ( symname(sname) == 0 )
-        snprintf(sname, sizeof(sname),"0__anonenum_%d", num_enums_defined++);
+        snprintf(sname, sizeof(sname),"0__anonenum_%d_%d", lineno, num_enums_defined++);
     
     if ( (ptr = find_enum(sname)) == NULL ) {
         ptr = make_enum(sname);
@@ -401,7 +405,7 @@ Type *parse_struct(Type *type, char isstruct)
     } else {
         // Anonymous struct
         str = CALLOC(1,sizeof(*str));
-        snprintf(str->name, sizeof(str->name), "0__anon%s_%d", isstruct ? "struct" : "union", num_structs++);
+        snprintf(str->name, sizeof(str->name), "0__anon%s_%d_%d", isstruct ? "struct" : "union", lineno, num_structs++);
         str->kind = KIND_STRUCT;
         str->fields = array_init(free_type); 
         str->weak = 1;
@@ -419,6 +423,9 @@ Type *parse_struct(Type *type, char isstruct)
             elem = dodeclare2(&base_type, MODE_NONE);
             
             if ( elem != NULL ) {
+                if ( !ispointer(elem) && elem->ptr && elem->ptr->tag && elem->ptr->tag->weak ) {
+	           errorfmt("Field '%s' has incomplete type", 1, elem->name);
+                }
                 if ( strlen(elem->name) == 0 && elem->kind != KIND_STRUCT ) {
                     if ( !rcmatch(':')) {
                         errorfmt("Member variables must be named",1);
@@ -560,13 +567,21 @@ static Type *parse_type(void)
             type->isunsigned = 1;
         }
     } else if ( amatch("int") || amatch("short")) {
-        swallow("int");        
-        type->kind = KIND_INT;
-        type->size = 2;
+        if ( amatch("_Accum")) {
+            type->kind = KIND_ACCUM16;
+            type->size = 2;
+        } else {
+            swallow("int");        
+            type->kind = KIND_INT;
+            type->size = 2;
+        }
     } else if ( amatch("long")) {
         if ( amatch("long")) {
             type->kind = KIND_LONGLONG;
             type->size = 8;
+        } else if ( amatch("_Accum")) {
+            type->kind = KIND_ACCUM32;
+            type->size = 4;
         } else {
             type->kind = KIND_LONG;
             type->size = 4;
@@ -577,6 +592,9 @@ static Type *parse_type(void)
         type->size = c_fp_size;
     } else if ( amatch("_Float16")) {
         type->kind = KIND_FLOAT16;
+        type->size = 2;
+    } else if ( amatch("_Accum")) {
+        type->kind = KIND_ACCUM16;
         type->size = 2;
     } else if ( amatch("void")) {
         type->kind = KIND_VOID;
@@ -1151,14 +1169,16 @@ Type *dodeclare(enum storage_type storage)
             // If initialised, the drop name should be something different
             snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);            
             type->value = val;
-            sym->storage = EXTERNP;
+            sym->storage = storage;
             sym->initialised = 1;
+            sym->flags |= ASSIGNED_ADDR;
         }
 
         // Handle the sdcc way of declaring variables at address
         if ( ataddress != -1 ) {
             type->value = ataddress;
-            sym->storage = EXTERNP;
+            sym->storage = storage;
+            sym->flags |= ASSIGNED_ADDR;
             sym->initialised = 1;
             // If initialised, the drop name should be something different
             snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);                        
@@ -1184,7 +1204,7 @@ Type *dodeclare(enum storage_type storage)
         sym->initialised = 1;
         alloc_size = initials(drop_name, type);
 
-        if ( sym->storage == EXTERNP ) {
+        if ( sym->flags & ASSIGNED_ADDR ) {
             // Copy from local to the supplied address
             gen_switch_section(c_init_section);
             copy_to_extern(drop_name, type->name, alloc_size);
@@ -1210,12 +1230,14 @@ Type *make_type(Kind kind, Type *tag)
         break;
     case KIND_INT:
     case KIND_FLOAT16:
+    case KIND_ACCUM16:
         type->size = 2;
         break;
     case KIND_CPTR:
         type->size = 3;  // TODO: far flag
         break;
     case KIND_LONG:
+    case KIND_ACCUM32:
         type->size = 4;
         break;
     case KIND_LONGLONG:
@@ -1580,6 +1602,12 @@ void type_describe(Type *type, UT_string *output)
     case KIND_FLOAT16:
         utstring_printf(output,"_Float16 ");
         break;
+    case KIND_ACCUM16:
+        utstring_printf(output,"_Accum ");
+        break;
+    case KIND_ACCUM32:
+        utstring_printf(output,"long _Accum ");
+        break;
     case KIND_ARRAY:
         if ( type->len == -1 ) {
             snprintf(tail, sizeof(tail),"[]");
@@ -1800,6 +1828,9 @@ static void declfunc(Type *functype, enum storage_type storage)
             functype->funcattrs.params_offset = currfn->ctype->funcattrs.params_offset;
         functype->funcattrs.shortcall_rst = currfn->ctype->funcattrs.shortcall_rst;
         functype->funcattrs.shortcall_value = currfn->ctype->funcattrs.shortcall_value;
+        if (currfn->storage == EXTERNAL)
+            currfn->storage = STATIK;
+        debug_write_symbol(currfn);
     } else {
         currfn = addglb(functype->name, functype, ID_VARIABLE, functype->kind, 0, storage);
         currfn->flags = functype->flags;
@@ -1816,12 +1847,13 @@ static void declfunc(Type *functype, enum storage_type storage)
 
     infunc = 1; /* In a function for sure! */
     
-    where = 2 + currfn->ctype->funcattrs.params_offset;
+    where = c_params_offset + currfn->ctype->funcattrs.params_offset;
 
     /* If we use frame pointer we preserve previous framepointer on entry
         * to each function
         */
-    if (c_framepointer_is_ix != -1 || (functype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME )
+    if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->ctype->flags & SAVEFRAME )) &&
+            (currfn->ctype->flags & NAKED) == 0)
         where += 2;
 
     if ( functype->flags & INTERRUPT ) {

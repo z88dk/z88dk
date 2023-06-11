@@ -1,0 +1,29 @@
+2022-03-14 19:43:48  Starting test
+
+classic / sccz80
+#define Z88DK_VERSION "19388-38ebdf3b7-20220307"
+
+sort-sccz80-ran-20 82618
+sort-sccz80-ord-20 52586
+sort-sccz80-rev-20 74474
+sort-sccz80-equ-20 52586
+
+sort-sccz80-ran-5000 93581395
+sort-sccz80-ord-5000 41378393
+sort-sccz80-rev-5000 63352461
+sort-sccz80-equ-5000 41378393
+
+classic / zsdcc
+Build: 4.2.0 #13131 (Linux) Mar 10 2022
+
+sort-zsdcc-ran-20 76591
+sort-zsdcc-ord-20 48639
+sort-zsdcc-rev-20 69357
+sort-zsdcc-equ-20 48639
+
+sort-zsdcc-ran-5000 86069623
+sort-zsdcc-ord-5000 37803151
+sort-zsdcc-rev-5000 58230674
+sort-zsdcc-equ-5000 37803151
+
+2022-03-14 19:44:13  Test completed

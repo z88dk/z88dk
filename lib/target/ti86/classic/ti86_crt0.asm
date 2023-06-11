@@ -208,7 +208,7 @@ ENDIF
 
 	ld	hl,0
 	add	hl,sp
-	ld	(start1+1),hl
+	ld	(__restore_sp_onexit+1),hl
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
         call    crt0_init_bss
@@ -243,7 +243,7 @@ ENDIF
 	call	_flushallmenus
 	call	_main
 cleanup:			; exit() jumps to this point
-start1:
+__restore_sp_onexit:
 	ld	sp,0
 IF DEFINED_GRAYlib
        	ld	a,$3C		; Make sure video mem is active

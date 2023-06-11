@@ -3,7 +3,7 @@
 # Z88-DK Z80ASM - Z80 Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2019
+# Copyright (C) Paulo Custodio, 2011-2023
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #
@@ -12,17 +12,17 @@
 # Converts special tokens <NL> to "\n", <TAB> to "\t"; <CAT> concatenates.
 # Expands <MAP>(aa=>AA,bb=>BB,) .. using <A> and <B>
 
-use strict;
+use 5.020;
 use warnings;
+use autodie;
 use File::Basename;
 use File::Copy;
-use File::Slurp;
 
 my $RAGEL = "ragel -T0";
 
 my @TEMP;
 @ARGV == 1 or die "Usage: ",basename($0)," INPUT.rl";
-my $FILE = basename(shift, ".rl");
+my $FILE = dirname($ARGV[0])."/".basename($ARGV[0], ".rl");
 
 # parse loops to .rl -> .rl1
 preprocess("$FILE.rl", "$FILE.rl1");
@@ -190,4 +190,19 @@ sub expand_one_func {
 	}
 	
 	return $func->(@args);
+}
+
+# File::Slurp replacement - to be able to run this script with plain Perl without
+# additional modules
+sub read_file {
+	my($filename) = @_;
+	open(my $fh, "<", $filename);
+	local $/;
+	return <$fh>;
+}
+
+sub write_file {
+	my($filename, $text) = @_;
+	open(my $fh, ">", $filename);
+	print $fh $text;
 }

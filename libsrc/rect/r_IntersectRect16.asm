@@ -26,7 +26,7 @@ EXTERN RIntersectRect16
    ld b,(hl)
    dec hl
    ld c,(hl)
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
    push bc
    pop  ix
 ELSE

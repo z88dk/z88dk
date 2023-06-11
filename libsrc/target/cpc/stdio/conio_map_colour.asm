@@ -2,22 +2,23 @@
 ;
 
 	SECTION		code_clib
-	PUBLIC		conio_map_colour
+	PUBLIC		conio_map_colour_firmware
 	PUBLIC		cpc_set_ansi_palette
 
 	INCLUDE		"target/cpc/def/cpcfirm.def"
 
 	EXTERN		__CLIB_CONIO_NATIVE_COLOUR
 
-conio_map_colour:
+; Map ANSI colours to firmware colours
+conio_map_colour_firmware:
+	ld	hl,ansipalette
+do_mapping:
         ld      c,__CLIB_CONIO_NATIVE_COLOUR
         rr      c
         ret     c
-
         and     15
         ld      c,a
         ld      b,0
-        ld      hl,table
         add     hl,bc
         ld      a,(hl)
         ret
@@ -45,17 +46,16 @@ loop:
 	ret
 
 
+
 	SECTION rodata_clib
 
-; Mapping betwen ANSI colours 
-table:	defb	0,15,2,3,4,5,6,7,8
-	defb	9,10,11,12,13,14,1
+; Mapping to firmware colours from ANSI colours
 
 ; Colours to map into ANSI colours onto the CPC palette
 
 ansipalette:
         defb    0      ;BLACK -> BLACK
-        defb    26     ;WHITE -> WHITE
+        defb    2      ;BLUE -> BRIGHT BLUE
         defb    18     ;GREEN -> BRIGHT GREEN
         defb    10     ;CYAN -> CYAN
         defb    6      ;RED -> BRIGHT RED
@@ -69,4 +69,6 @@ ansipalette:
         defb    15     ;LIGHTRED -> ORANGE
         defb    4      ;LIGHTMAGENTA -> BRIGHT MAGENTA
         defb    24     ;YELLOW -> YELLOW
-        defb    2      ;BLUE -> BRIGHT BLUE
+        defb    26     ;WHITE -> WHITE
+
+

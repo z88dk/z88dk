@@ -10,6 +10,7 @@
 	EXTERN	l_push_di
 	EXTERN	l_pop_ei
 	EXTERN	__CLIB_PC8800_V2_ENABLED
+        EXTERN  __gfx_fatpix
 
 ; Generic code to handle the pixel commands
 ; Define NEEDxxx before including
@@ -37,7 +38,16 @@
 
 	call	w_pixeladdress
 	ld	b,a
-	ld	a,1
+        ex      af,af
+        ld      a,(__gfx_fatpix)
+        and     a
+        ld      c,@00000001
+        jr      z,not_fatpix_rotate
+        ld      c,@00000011
+        res     0,b
+not_fatpix_rotate:
+        ex      af,af
+        ld      a,c
 	jr	z, rotated 	; pixel is at bit 0...
 .plot_position	
 	rlca
@@ -108,21 +118,21 @@ ENDIF
 IF NEEDxor
 	out	($5c),a		;Switch to blue plane
 	ld	a,(hl)
-	rlc	c
+	rrc	c
 	jr	nc,noset_blue
 	xor	d
 noset_blue:
 	ld	(hl),a
 	out	($5e),a		;Switch to green plane
 	ld	a,(hl)
-	rlc	c
+	rrc	c
 	jr	nc,noset_green
 	xor	d
 noset_green:
 	ld	(hl),a
 	out	($5d),a		;Switch to red plane
 	ld	a,(hl)
-	rlc	c
+	rrc	c
 	jr	nc,noset_red
 	xor	d
 noset_red:

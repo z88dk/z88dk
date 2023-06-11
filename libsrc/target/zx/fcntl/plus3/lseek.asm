@@ -31,8 +31,8 @@
 	jr	nz,error
 	; from end		
 	ld	b,(ix+6)
-	ld	iy, DOS_GET_EOF 
 	push	ix
+	ld	ix, DOS_GET_EOF 
 	call	dodos
 	pop	ix
 	jr	nc,error
@@ -49,8 +49,8 @@ ENDIF
 
 .relative
 	ld	b,(ix+6)
-	ld	iy, DOS_GET_POSITION
 	push	ix
+	ld	ix, DOS_GET_POSITION
 	call	dodos
 	pop	ix
 	jr	nc,error
@@ -73,12 +73,12 @@ ENDIF
 .do_seek
 	push	ix		;save our feame
 	ld	b,(ix+6)
-	ld	iy,DOS_SET_POSITION
+	ld	ix,DOS_SET_POSITION
 	call	dodos
 	pop	ix		;get our frame back
 	jr	nc,error
 	ld	b,(ix+6)
-	ld	iy, DOS_GET_POSITION
+	ld	ix, DOS_GET_POSITION
 	call	dodos
 IF !idedos
 	ld	d,0

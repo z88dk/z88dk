@@ -1,29 +1,36 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-# Z88DK Z80 Macro Assembler
-#
-# Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2020
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/z88dk/z88dk/
-#
-# Test Z80ASM environment variable
+BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
-use Test::More;
-require './t/testlib.pl';
 
-unlink_testfiles();
-spew("test.asm", "jp ASMPC");
+# Test Z80ASM environment variable
+
+my $asm = "jp ASMPC";
+
+# no Z80ASM
+unlink_testfiles;
 delete $ENV{Z80ASM};
-run("z80asm -b test.asm");
-check_bin_file("test.bin", "\xC3\x00\x00");
 
+z80asm_ok("-b", "", "", $asm, bytes(0xC3, 0, 0));
+
+# with Z80ASM
+unlink_testfiles;
 $ENV{Z80ASM} = "-r0x8000";
-run("z80asm -b test.asm");
-check_bin_file("test.bin", "\xC3\x00\x80");
+
+z80asm_ok("-b", "", "", $asm, bytes(0xC3, 0, 0x80));
+
+# with quotes
+unlink_testfiles;
+$ENV{Z80ASM} = "-r'0x8000'";
+
+z80asm_ok("-b", "", "", $asm, bytes(0xC3, 0, 0x80));
+
+unlink_testfiles;
+$ENV{Z80ASM} = '-r"0x8000"';
+
+z80asm_ok("-b", "", "", $asm, bytes(0xC3, 0, 0x80));
 
 delete $ENV{Z80ASM};
-
-unlink_testfiles();
-done_testing();
+unlink_testfiles;
+done_testing;

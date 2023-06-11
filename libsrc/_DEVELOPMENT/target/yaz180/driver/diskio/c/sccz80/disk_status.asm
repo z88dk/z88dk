@@ -1,6 +1,6 @@
 SECTION code_driver
 
-PUBLIC _disk_status
+PUBLIC disk_status
 
 EXTERN asm_disk_status
 
@@ -11,7 +11,7 @@ EXTERN asm_disk_status
 
 ; get the ide drive status
 
-_disk_status:
+disk_status:
 
     pop af
     pop hl

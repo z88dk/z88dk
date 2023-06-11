@@ -8,7 +8,6 @@ math/float/am9511/lam32/c/sccz80/asinh
 math/float/am9511/lam32/c/sccz80/asinh_fastcall
 math/float/am9511/lam32/c/sccz80/atan
 math/float/am9511/lam32/c/sccz80/atan2
-math/float/am9511/lam32/c/sccz80/atan2_callee
 math/float/am9511/lam32/c/sccz80/atan_fastcall
 math/float/am9511/lam32/c/sccz80/atanh
 math/float/am9511/lam32/c/sccz80/atanh_fastcall
@@ -38,7 +37,6 @@ math/float/am9511/lam32/c/sccz80/fmax_callee
 math/float/am9511/lam32/c/sccz80/fmin
 math/float/am9511/lam32/c/sccz80/fmin_callee
 math/float/am9511/lam32/c/sccz80/fmod
-math/float/am9511/lam32/c/sccz80/fmod_callee
 math/float/am9511/lam32/c/sccz80/fpclassify
 math/float/am9511/lam32/c/sccz80/frexp
 math/float/am9511/lam32/c/sccz80/frexp_callee
@@ -74,12 +72,14 @@ math/float/am9511/lam32/c/sccz80/log2_fastcall
 math/float/am9511/lam32/c/sccz80/log10
 math/float/am9511/lam32/c/sccz80/log10_fastcall
 math/float/am9511/lam32/c/sccz80/log_fastcall
+math/float/am9511/lam32/c/sccz80/mlib2d
 math/float/am9511/lam32/c/sccz80/modf
-math/float/am9511/lam32/c/sccz80/modf_callee
 math/float/am9511/lam32/c/sccz80/mul2
 math/float/am9511/lam32/c/sccz80/mul2_fastcall
 math/float/am9511/lam32/c/sccz80/mul10u
 math/float/am9511/lam32/c/sccz80/mul10u_fastcall
+math/float/am9511/lam32/c/sccz80/neg
+math/float/am9511/lam32/c/sccz80/neg_fastcall
 math/float/am9511/lam32/c/sccz80/pow
 math/float/am9511/lam32/c/sccz80/pow_callee
 math/float/am9511/lam32/c/sccz80/round

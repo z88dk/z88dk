@@ -17,6 +17,9 @@ zsdcc/new
 zcc +zx -vn -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm -lm -create-app
 error: 2 * 10^(-9)
 
+zcc +rc2014 -subtype=cpm -vn -startup=0 -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm --math32 -m -create-app
+zcc +rc2014 -subtype=cpm -vn -startup=0 -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm --am9511 -m -create-app
+
 TIMING
 ======
 
@@ -60,14 +63,14 @@ error: 2 * 10^(-9)
 cycle count  = 8628617805
 time @ 4MHz  = 8628617805 / 4*10^6 = 35 min 57 sec
 
-Z88DK April 30, 2021
-zsdcc #12250 / new c library / math32
-5531 bytes less page zero
+Z88DK July 4, 2021
+zsdcc #12419 / new c library / math32
+5453 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 10531372867
-time @ 4MHz  = 10531372867 / 4*10^6 = 43 min 53 sec
+cycle count  = 9947615066
+time @ 4MHz  = 9947615066 / 4*10^6 = 41 min 27 sec
 
 Z88DK April 20, 2020
 sccz80 / new c library

@@ -13,7 +13,7 @@
 ; play 4 bit pulse wave encoded data using sid master volume
 
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
+IF !__CPU_GBZ80__
 
 	SECTION code_clib
 	
@@ -39,9 +39,9 @@ _playzb4:
 	push	de
 	push	bc
 
-	IF sndbit_port >= 256
+	IF SOUND_ONEBIT_port >= 256
 	  exx
-	  ld   bc,sndbit_port
+	  ld   bc,SOUND_ONEBIT_port
 	  exx
 	ENDIF
 
@@ -81,23 +81,22 @@ do_sound:
 	ld	a,(hl)
 
 ;  LOOP UNROLLING !!
+IF PLAY_DATA_LEAD >120
 	ld b,4
+ELSE
+	ld b,3
+ENDIF
 byte1:
 	  rlca
 	  ld   l,a
 	  sbc  a,a	; 0 or FF
-	  and  sndbit_mask
+	  and  SOUND_ONEBIT_mask
 	  ld   c,a
 	  ld   a,(__snd_tick)
 	  xor  c
 	  
-	IF sndbit_port >= 256
-	  exx
-	  out  (c),a                   ;9 T slower
-	  exx
-	ELSE
-	  out  (sndbit_port),a
-	ENDIF
+    ONEBITOUT
+
 
 	  ld a,l
 	djnz byte1

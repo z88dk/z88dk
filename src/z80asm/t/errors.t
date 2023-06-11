@@ -1,571 +1,419 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-# Z88DK Z80 Macro Assembler
-#
-# Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2020
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/z88dk/z88dk
-#
-# Test error messages
+BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
-use Test::More;
-use File::Copy;
-use Time::HiRes 'sleep';
-use File::Path qw(make_path remove_tree);;
-use Capture::Tiny::Extended 'capture';
-use Test::Differences;
-use Path::Tiny;
-require './t/test_utils.pl';
-
-#------------------------------------------------------------------------------
-# Black box tests
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# error_read_file
-# CH_0012 : wrappers on OS calls to raise fatal error
-unlink_testfiles();
-t_z80asm_capture(asm_file(), "",
-		"Error: cannot read file '".asm_file()."'\n",
-		1);
-
-unlink_testfiles();
-t_z80asm_error('
-	binary "'.inc_file().'"
-	',
-	"Error at file 'test.asm' line 2: cannot read file 'test.inc'",
-	"-l");
-
-unlink_testfiles();
-write_file(asm_file(), "nop");
-t_z80asm_capture("-b -lxxxx ".asm_file(), "",
-		"Error: cannot read file 'xxxx.lib'\n",
-		1);
 
 #------------------------------------------------------------------------------
 # error_expression
-unlink_testfiles();
-write_binfile(o_file(), objfile( NAME => "test",
-								   CODE => [["", -1, 1, "\0\0"]],
-								   EXPR => [ ["C", "test.asm",1, "", 0, 0, "", "*+VAL"] ] ));
-t_z80asm_capture("-b -d ".o_file(),
-				 "",
-				 "Error at file 'test.asm' line 1: syntax error in expression\n",
-				 1);
+my $obj = objfile(NAME => "test",
+				  CODE => [["", -1, 1, "\0\0"]],
+				  EXPR => [["C", "test.asm",1, "", 0, 0, "", "*+VAL"]]);
+spew("$test.o", $obj);
+capture_nok("z88dk-z80asm -b -d $test.o", <<END);
+test.asm:1: error: syntax error in expression
+  ^---- *+VAL
+END
 
 #------------------------------------------------------------------------------
 # warn_int_range / error_int_range on pass2 and multi-module assembly
-unlink_testfiles();
-
-write_file(asm_file(), <<'ASM');
-	extern G_129, G_128, G0, G127, G128, G255, G256
+#------------------------------------------------------------------------------
+spew("$test.asm", <<'END');
+		extern G_129, G_128, G0, G127, G128, G255, G256
 
 ; Byte = -129
-	ld	a, L_129
-	ld	a, G_129
-	ld	a, G0 - 129
+		ld	a, L_129
+		ld	a, G_129
+		ld	a, G0 - 129
 
 ; Byte = -128
-	ld	a, L_128
-	ld	a, G_128
-	ld	a, G0 - 128
+		ld	a, L_128
+		ld	a, G_128
+		ld	a, G0 - 128
 
 ; Byte = 255
-	ld	a, L255
-	ld	a, G255
-	ld	a, G0 + 255
+		ld	a, L255
+		ld	a, G255
+		ld	a, G0 + 255
 
 ; Byte = 256
-	ld	a, L256
-	ld	a, G256
-	ld	a, G0 + 256
+		ld	a, L256
+		ld	a, G256
+		ld	a, G0 + 256
 
 ; SignedByte = -129
-	ld	(ix + L_129), -1
-	ld	(ix + G_129), -1
-	ld	(ix + G0 -129), -1
+		ld	(ix + L_129), -1
+		ld	(ix + G_129), -1
+		ld	(ix + G0 -129), -1
 
 ; SignedByte = -128
-	ld	(ix + L_128), -1
-	ld	(ix + G_128), -1
-	ld	(ix + G0 -128), -1
+		ld	(ix + L_128), -1
+		ld	(ix + G_128), -1
+		ld	(ix + G0 -128), -1
 
 ; SignedByte = 127
-	ld	(ix + L127), -1
-	ld	(ix + G127), -1
-	ld	(ix + G0 + 127), -1
+		ld	(ix + L127), -1
+		ld	(ix + G127), -1
+		ld	(ix + G0 + 127), -1
 
 ; SignedByte = 128
-	ld	(ix + L128), -1
-	ld	(ix + G128), -1
-	ld	(ix + G0 + 128), -1
+		ld	(ix + L128), -1
+		ld	(ix + G128), -1
+		ld	(ix + G0 + 128), -1
 
 ; Local variables
-	defc L_129   = -129
-	defc L_128   = -128
-	defc L255    =  255
-	defc L256    =  256
-	defc L127    =  127
-	defc L128    =  128
-ASM
+		defc L_129   = -129
+		defc L_128   = -128
+		defc L255    =  255
+		defc L256    =  256
+		defc L127    =  127
+		defc L128    =  128
+END
 
-write_file(asm1_file(), <<'ASM1');
-
+spew("$test.1.asm", <<'END');
 ; Global variables
-	public G_129, G_128, G0, G127, G128, G255, G256
-	defc G_129   = -129
-	defc G_128   = -128
-	defc G0      =  0
-	defc G127    =  127
-	defc G128    =  128
-	defc G255    =  255
-	defc G256    =  256
-ASM1
+		public G_129, G_128, G0, G127, G128, G255, G256
+		defc G_129   = -129
+		defc G_128   = -128
+		defc G0      =  0
+		defc G127    =  127
+		defc G128    =  128
+		defc G255    =  255
+		defc G256    =  256
+END
 
-t_z80asm_capture("-b ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
-Warning at file 'test.asm' line 4: integer '-129' out of range
-Warning at file 'test.asm' line 19: integer '256' out of range
-Warning at file 'test.asm' line 24: integer '-129' out of range
-Warning at file 'test.asm' line 39: integer '128' out of range
-Warning at file 'test.asm' line 5: integer '-129' out of range
-Warning at file 'test.asm' line 6: integer '-129' out of range
-Warning at file 'test.asm' line 20: integer '256' out of range
-Warning at file 'test.asm' line 21: integer '256' out of range
-Warning at file 'test.asm' line 25: integer '-129' out of range
-Warning at file 'test.asm' line 26: integer '-129' out of range
-Warning at file 'test.asm' line 40: integer '128' out of range
-Warning at file 'test.asm' line 41: integer '128' out of range
-ERR
+run_ok("z88dk-z80asm -b $test.asm $test.1.asm 2> $test.err");
+check_text_file("$test.err", <<END);
+$test.asm:4: warning: integer range: -\$81
+  ^---- L_129
+$test.asm:19: warning: integer range: \$100
+  ^---- L256
+$test.asm:24: warning: integer range: -\$81
+  ^---- L_129
+$test.asm:39: warning: integer range: \$80
+  ^---- L128
+$test.asm:5: warning: integer range: -\$81
+  ^---- G_129
+$test.asm:6: warning: integer range: -\$81
+  ^---- G0-129
+$test.asm:20: warning: integer range: \$100
+  ^---- G256
+$test.asm:21: warning: integer range: \$100
+  ^---- G0+256
+$test.asm:25: warning: integer range: -\$81
+  ^---- G_129
+$test.asm:26: warning: integer range: -\$81
+  ^---- G0-129
+$test.asm:40: warning: integer range: \$80
+  ^---- G128
+$test.asm:41: warning: integer range: \$80
+  ^---- G0+128
+END
 
-t_binary(read_binfile(bin_file()), pack("C*",
-		0x3E, 0x7F,
-		0x3E, 0x7F,
-		0x3E, 0x7F,
-		0x3E, 0x80,
-		0x3E, 0x80,
-		0x3E, 0x80,
-		0x3E, 0xFF,
-		0x3E, 0xFF,
-		0x3E, 0xFF,
-		0x3E, 0x00,
-		0x3E, 0x00,
-		0x3E, 0x00,
-		0xDD, 0x36, 0x7F, 0xFF,
-		0xDD, 0x36, 0x7F, 0xFF,
-		0xDD, 0x36, 0x7F, 0xFF,
-		0xDD, 0x36, 0x80, 0xFF,
-		0xDD, 0x36, 0x80, 0xFF,
-		0xDD, 0x36, 0x80, 0xFF,
-		0xDD, 0x36, 0x7F, 0xFF,
-		0xDD, 0x36, 0x7F, 0xFF,
-		0xDD, 0x36, 0x7F, 0xFF,
-		0xDD, 0x36, 0x80, 0xFF,
-		0xDD, 0x36, 0x80, 0xFF,
-		0xDD, 0x36, 0x80, 0xFF,
+check_bin_file("$test.bin", bytes(
+		0x3e, 0x7f,
+		0x3e, 0x7f,
+		0x3e, 0x7f,
+		0x3e, 0x80,
+		0x3e, 0x80,
+		0x3e, 0x80,
+		0x3e, 0xff,
+		0x3e, 0xff,
+		0x3e, 0xff,
+		0x3e, 0x00,
+		0x3e, 0x00,
+		0x3e, 0x00,
+		0xdd, 0x36, 0x7f, 0xff,
+		0xdd, 0x36, 0x7f, 0xff,
+		0xdd, 0x36, 0x7f, 0xff,
+		0xdd, 0x36, 0x80, 0xff,
+		0xdd, 0x36, 0x80, 0xff,
+		0xdd, 0x36, 0x80, 0xff,
+		0xdd, 0x36, 0x7f, 0xff,
+		0xdd, 0x36, 0x7f, 0xff,
+		0xdd, 0x36, 0x7f, 0xff,
+		0xdd, 0x36, 0x80, 0xff,
+		0xdd, 0x36, 0x80, 0xff,
+		0xdd, 0x36, 0x80, 0xff,
 ));
 
-# defvar out of range - tested in directives.t
-# defs out of range - tested in opcodes.t
-# org out of range - tested in directives.t
+z80asm_nok("", "", <<END, <<END);
+		im -1
+		im 3
+		
+		call_oz 0
+END
+$test.asm:1: error: integer range: -1
+  ^---- im -1
+$test.asm:2: error: integer range: 3
+  ^---- im 3
+$test.asm:4: error: integer range: 0
+  ^---- call_oz 0
+END
 
+for my $op (qw(bit res set)) {
+	for my $bit (-1, 8) {
+		for my $reg (qw(b c d e h l a)) {
+			z80asm_nok("", "", <<END, <<END);
+				$op $bit, $reg
+END
+$test.asm:1: error: integer range: $bit
+  ^---- $op $bit, $reg
+END
+		}
+	}
+}
+			
+#------------------------------------------------------------------------------
 # JR / DJNZ
-for ([jr => chr(0x18)], [djnz => chr(0x10)])
-{
+#------------------------------------------------------------------------------
+for ([jr => 0x18], [djnz => 0x10]) {
 	my($jump, $opcode) = @$_;
 
-	t_z80asm(
-		asm		=> "$jump ASMPC+2-129",
-		err		=> "Error at file 'test.asm' line 1: integer '-129' out of range",
-	);
+	z80asm_nok("", "", "$jump ASMPC+2-129", <<END);
+$test.asm:1: error: integer range: -\$81
+  ^---- \$+2-129
+END
 
-	t_z80asm(
-		asm		=> "$jump label : defc label = ASMPC-129",
-		linkerr	=> "Error at file 'test.asm' line 1: integer '-129' out of range",
-	);
+	z80asm_nok("", "", "$jump label \n defc label = ASMPC-129", <<END);
+$test.asm:1: error: integer range: -\$81
+  ^---- label
+END
 
-	t_z80asm(
-		asm		=> "$jump ASMPC+2+128",
-		err		=> "Error at file 'test.asm' line 1: integer '128' out of range",
-	);
+	z80asm_nok("", "", "$jump ASMPC+2+128", <<END);
+$test.asm:1: error: integer range: \$80
+  ^---- \$+2+128
+END
 
-	t_z80asm(
-		asm		=> "$jump label : defc label = ASMPC+128",
-		linkerr	=> "Error at file 'test.asm' line 1: integer '128' out of range",
-	);
+	z80asm_nok("", "", "$jump label \n defc label = ASMPC+128", <<END);
+$test.asm:1: error: integer range: \$80
+  ^---- label
+END
 
 	for my $org (0, 0x8000, 0xFFFE) {
-		t_z80asm(
-			org		=> $org,
-			asm		=> "$jump ASMPC+2-128",
-			bin		=> "$opcode\x80",
-		);
+		z80asm_ok("", "", "", <<END, bytes($opcode, 0x80));
+			org $org
+			$jump ASMPC+2-128
+END
 
-		t_z80asm(
-			org		=> $org,
-			asm		=> "$jump label : defc label = ASMPC-128",
-			bin		=> "$opcode\x80",
-		);
+		z80asm_ok("", "", "", <<END, bytes($opcode, 0x80));
+			org $org
+			$jump label 
+			defc label = ASMPC-128
+END
 
-		t_z80asm(
-			org		=> $org,
-			asm		=> "$jump ASMPC+2+127",
-			bin		=> "$opcode\x7F",
-		);
+		z80asm_ok("", "", "", <<END, bytes($opcode, 0x7f));
+			org $org
+			$jump ASMPC+2+127
+END
 
-		t_z80asm(
-			org		=> $org,
-			asm		=> "$jump label : defc label = ASMPC+127",
-			bin		=> "$opcode\x7F",
-		);
-
+		z80asm_ok("", "", "", <<END, bytes($opcode, 0x7f));
+			org $org
+			$jump label
+			defc label = ASMPC+127
+END
 	}
 }
 
 #------------------------------------------------------------------------------
 # error_unbanlanced_paren
-unlink_testfiles();
-t_z80asm_ok(0, "ld a,2*(1+2)", "\x3E\x06");
-t_z80asm_ok(0, "ld a,2*[1+2]", "\x3E\x06");
-t_z80asm_error("ld a,2*(1+2", 	"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("ld a,2*(1+2]", 	"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("ld a,2*[1+2", 	"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("ld a,2*[1+2)", 	"Error at file 'test.asm' line 1: syntax error in expression");
+#------------------------------------------------------------------------------
+z80asm_ok("", "", "", "ld a,2*(1+2)", bytes(0x3e, 6));
+z80asm_ok("", "", "", "ld a,2*[1+2]", bytes(0x3e, 6));
+
+z80asm_nok("", "", "ld a,2*(1+2", <<END);
+$test.asm:1: error: syntax error in expression
+  ^---- ld a,2*(1+2
+END
+
+z80asm_nok("", "", "ld a,2*(1+2]", <<END);
+$test.asm:1: error: syntax error in expression
+  ^---- ld a,2*(1+2]
+END
+
+z80asm_nok("", "", "ld a,2*[1+2", <<END);
+$test.asm:1: error: syntax error in expression
+  ^---- ld a,2*[1+2
+END
+
+z80asm_nok("", "", "ld a,2*[1+2)", <<END);
+$test.asm:1: error: syntax error in expression
+  ^---- ld a,2*[1+2)
+END
 
 #------------------------------------------------------------------------------
-# error_not_defined
-unlink_testfiles();
-t_z80asm_error("ld a,NOSYMBOL", "Error at file 'test.asm' line 1: symbol 'NOSYMBOL' not defined");
+# undefined symbol
+#------------------------------------------------------------------------------
+z80asm_nok("", "", "ld a,NOSYMBOL", <<END);
+$test.asm:1: error: undefined symbol: NOSYMBOL
+  ^---- NOSYMBOL
+END
+
+spew("$test.asm", <<END);
+		main: ret
+END
+run_ok("z88dk-z80asm -x$test.lib $test.asm");
+z80asm_nok("-b -l$test.lib", "", <<END_ASM, <<END_ERR);
+		EXTERN main
+		call main
+END_ASM
+$test.asm:2: error: undefined symbol: main
+  ^---- main
+END_ERR
 
 #------------------------------------------------------------------------------
-# error_not_defined_expr
-my $lib = lib_file(); $lib =~ s/\.lib$/2.lib/i;
-unlink_testfiles($lib);
-write_file(asm_file(), "main: ret");
-t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
-ok -f $lib;
-write_file(asm_file(), "EXTERN main \n call main");
-t_z80asm_capture("-b -l".$lib." ".asm_file(), "",
-		"Error at file 'test.asm' line 2: symbol 'main' not defined\n",
-		1);
+# options
+#------------------------------------------------------------------------------
+capture_nok("z88dk-z80asm -b", <<END);
+error: source file expected
+END
+
+spew("$test.asm", "");
+capture_nok("z88dk-z80asm -Zillegaloption $test.asm", <<END);
+error: illegal option: -Zillegaloption
+END
+
+spew("$test.asm", "");
+capture_nok("z88dk-z80asm +Zillegaloption $test.asm", <<END);
+error: illegal option: +Zillegaloption
+END
 
 #------------------------------------------------------------------------------
-# error_no_src_file
-unlink_testfiles();
-t_z80asm_capture("-b", "",
-		"Error: source file missing\n", 1);
-
+# segment overflow
 #------------------------------------------------------------------------------
-# error_illegal_option
-unlink_testfiles();
-write_file(asm_file(), "");
-t_z80asm_capture("-Zillegaloption ".asm_file(), "",
-		"Error: illegal option: -Zillegaloption\n",
-		1);
-t_z80asm_capture("+Zillegaloption ".asm_file(), "",
-		"Error: illegal option: +Zillegaloption\n",
-		1);
 
-#------------------------------------------------------------------------------
-# fatal_max_codesize
-unlink_testfiles();
+# Assembler
+z80asm_ok("", "", "", <<END, 'a' x 65536);
+		defs 65535, 'a'
+		defm "a"
+END
 
-# DEFM
-t_z80asm_ok(0, "defs 65535, 'a' \n defm \"a\" \n",
-	    "a" x 65536);
-t_z80asm_error("defs 65536, 'a' \n defm \"a\" \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
-
-t_z80asm_ok(0, "defs 65534, 'a' \n defm \"aa\" \n",
-	    "a" x 65536);
-t_z80asm_error("defs 65535, 'a' \n defm \"aa\" \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
-
-t_z80asm_ok(0, "defs 65534, 'a' \n defm 97, \"a\" \n",
-	    "a" x 65536);
-t_z80asm_error("defs 65535, 'a' \n defm 97, \"a\" \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
-
-t_z80asm_ok(0, "defs 65534, 'a' \n defm 97 , \"a\" \n",
-	    "a" x 65536);
-t_z80asm_error("defs 65535, 'a' \n defm 97 , \"a\" \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
-
-t_z80asm_ok(0, "defs 65534, 'a' \n defm \"a\" , 97 \n",
-	    "a" x 65536);
-t_z80asm_error("defs 65535, 'a' \n defm \"a\" , 97 \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
-
-# BINARY - tested in directives.t
+z80asm_nok("", "", <<END, <<END);
+		defs 65536, 'a'
+		defm "a"
+END
+$test.asm:2: error: segment overflow
+  ^---- defm "a"
+END
 
 # Linker
-write_file(asm1_file(), "defb 0xAA");
+spew("$test.1.asm", <<END);
+		defb 0xAA
+END
 
-write_file(asm_file(), "defs 65535, 0xAA");
-t_z80asm_capture(asm_file()." ".asm1_file(), "", "", 0);
-t_z80asm_capture("-d -b ".asm_file()." ".asm1_file(), "", "", 0);
-t_binary(read_binfile(bin_file()),
-	"\xAA" x 65536);
+spew("$test.asm", <<END);
+		defs 65535, 0xAA
+END
 
-write_file(asm_file(), "defs 65536, 0xAA");
-t_z80asm_capture(asm_file()." ".asm1_file(), "", "", 0);
-t_z80asm_capture("-d -b ".asm_file()." ".asm1_file(), "",
-	"Error: max. code size of 65536 bytes reached\n", 1);
+run_ok("z88dk-z80asm -b $test.asm $test.1.asm");
+check_bin_file("$test.bin", bytes(0xAA) x 65536);
 
-# parseline
-t_z80asm_ok(0, "defs 65535, 0xAA \n defb 0xAA \n",
-	    "\xAA" x 65536);
-t_z80asm_error("defs 65536, 0xAA \n defb 0xAA \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
+spew("$test.asm", <<END);
+		defs 65536, 0xAA
+END
 
-
-#------------------------------------------------------------------------------
-# error_symbol_redefined 		-> tested in symtab.t
-# error_symbol_redefined_module	-> tested in symtab.t
-# error_symbol_decl_local  		-> tested in symtab.t
-# error_symbol_redecl			-> tested in symtab.t
-
-#------------------------------------------------------------------------------
-# error_illegal_src_filename
-unlink_testfiles();
-write_file(asm_file(), "nop");
-t_z80asm_capture(asm_file()." -IllegalFilename", "",
-		"Error: cannot read file '-IllegalFilename'\n", 1);
-
-#------------------------------------------------------------------------------
-# error_org_redefined - tested in directives.t
+run_ok("z88dk-z80asm $test.asm $test.1.asm");
+unlink("$test.asm", "$test.1.asm");
+capture_nok("z88dk-z80asm -b -d $test.o $test.1.o", <<END);
+$test.1.o: error: segment overflow
+END
 
 #------------------------------------------------------------------------------
 # error_jr_not_local
-unlink_testfiles();
+#------------------------------------------------------------------------------
+spew("$test.asm", <<END);
+		extern loop
+		jr loop
+END
 
-t_z80asm(
-	asm		=> " extern loop \n jr loop ",
-	asm1	=> " public loop \n loop: ret ",
-	bin		=> pack("C*", 0x18, 0x00, 0xc9),
-);
+spew("$test.1.asm", <<END);
+		public loop
+loop: 	ret
+END
 
-#t_z80asm_error("
-#	EXTERN loop
-#	jr loop
-#", "Error at file 'test.asm' line 3: relative jump address must be local");
+run_ok("z88dk-z80asm -b $test.asm $test.1.asm");
+check_bin_file("$test.bin", bytes(0x18, 0x00, 0xc9));
 
 #------------------------------------------------------------------------------
 # error_obj_file_version
-unlink_testfiles();
-my $obj = objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] );
-substr($obj,6,2)="99";		# change version
-write_file(o_file(), $obj);
-t_z80asm_capture("-b  ".o_file(), "", <<"END", 1);
-Error: object file 'test.o' version 99, expected version 14
+#------------------------------------------------------------------------------
+unlink_testfiles;
+$obj = objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] );
+substr($obj,6,2) = "99";		# change version
+spew("$test.o", $obj);
+capture_nok("z88dk-z80asm -b $test.o", <<END);
+error: invalid object file version: file=$test.o, found=99, expected=16
+END
+
+#------------------------------------------------------------------------------
+# error_lib_file_version
+#------------------------------------------------------------------------------
+my $lib = libfile(objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] ));
+substr($lib,6,2) = "99";		# change version
+spew("$test.lib", $lib);
+spew("$test.asm", "nop");
+capture_nok("z88dk-z80asm -b -l$test.lib $test.asm", <<END);
+error: invalid library file version: file=$test.lib, found=99, expected=16
 END
 
 #------------------------------------------------------------------------------
 # error_not_obj_file
-unlink_testfiles();
-write_file(o_file(), "not an object");
-sleep 0.500;
-write_file(asm_file(), "nop");
-t_z80asm_capture("-b -d ".asm_file(), "", "", 0);
-t_binary(read_binfile(o_file()), objfile(NAME => "test",
-										   CODE => [["", -1, 1, "\x00"]],
-										   ));
-t_binary(read_binfile(bin_file()), "\x00");
+#------------------------------------------------------------------------------
+unlink_testfiles;
+spew("$test.o", "not an object");
+capture_nok("z88dk-z80asm -b $test.o", <<END);
+error: not an object file: $test.o
+END
+
+sleep 1;
+spew("$test.asm", "nop");
+run_ok("z88dk-z80asm -b -d $test.asm");
+check_bin_file("$test.bin", bytes(0));
 
 # CreateLib uses a different error call
-unlink_testfiles();
-write_file(o_file(), "not an object");
-sleep 0.500;
-write_file(asm_file(), "nop");
-t_z80asm_capture("-x".lib_file()." -d ".asm_file(), "", "", 0);
-t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test",
-												   CODE => [["", -1, 1, "\x00"]])));
-unlink_testfiles();
-write_binfile(o_file(), objfile( NAME => "test",
-								   CODE => [["", -1, 1, "\0\0"]],
-								   SYMBOLS => [ ["Z", "Z", "", 0, "ABCD", "", 0] ] ));
-t_z80asm_capture("-b -d ".o_file(),
-				 "",
-				 "Error at module 'test': file 'test.o' not an object file\n",
-				 1);
+spew("$test.o", "not an object");
+sleep 1;
+spew("$test.asm", "nop");
+run_ok("z88dk-z80asm -x$test.lib -d $test.asm");
+check_bin_file("$test.lib",
+	libfile(objfile(NAME => $test,
+				    CODE => [["", -1, 1, "\x00"]])));
+
+spew("$test.o", 
+	objfile(NAME => $test,
+			CODE => [["", -1, 1, "\0\0"]],
+			SYMBOLS => [ ["Z", "Z", "", 0, "ABCD", "", 0] ] ));
+capture_nok("z88dk-z80asm -b -d $test.o", <<END);
+$test.asm: error: not an object file: $test.o
+END
 
 #------------------------------------------------------------------------------
 # error_not_lib_file
-unlink_testfiles();
-write_file(asm_file(), "nop");
-write_file(lib_file(), "not a library");
-t_z80asm_capture("-b -l".lib_file()." ".asm_file(), "",
-		"Error: file 'test.lib' not a library file\n",
-		1);
-
 #------------------------------------------------------------------------------
-# error_lib_file_version
-unlink_testfiles();
-$lib = libfile(objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] ));
-substr($lib,6,2)="99";		# change version
-write_file(asm_file(), "nop");
-write_file(lib_file(), $lib);
-t_z80asm_capture("-b -l".lib_file()." ".asm_file(), "", <<"END", 1);
-Error: library file 'test.lib' version 99, expected version 14
+spew("$test.asm", "nop");
+spew("$test.lib", "not a library");
+capture_nok("z88dk-z80asm -b -l$test.lib $test.asm", <<END);
+error: not a library file: $test.lib
 END
 
 #------------------------------------------------------------------------------
 # warn_expr_in_parens
-unlink_testfiles();
-write_file("test.asm", "cp (16)");
-t_z80asm_capture("-b test.asm", "",
-		"Warning at file 'test.asm' line 1: interpreting indirect value as immediate\n",
-		0);
-t_binary(read_binfile("test.bin"), "\xFE\x10");
-
-unlink_testfiles();
-write_file("test.asm", "cp +(16)");
-t_z80asm_capture("-b test.asm", "",
-		"",
-		0);
-t_binary(read_binfile("test.bin"), "\xFE\x10");
-
 #------------------------------------------------------------------------------
-# White box tests
-#------------------------------------------------------------------------------
-unlink_testfiles();
-
-my $objs = "errors.o error_func.o scan.o lib/array.o lib/class.o lib/str.o lib/strhash.o lib/list.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o options.o model.o module.o sym.o symtab.o codearea.o expr.o listfile.o lib/srcfile.o macros.o hist.o lib/dbg.o ../common/zutils.o modlink.o zobjfile.o libfile.o z80asm.o z80pass.o directives.o parse.o opcodes.o ";
-if ($^O eq 'MSWin32' || $^O eq 'msys') {
-	  $objs .= "../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o ";
-}
-
-# get init code except init() and main()
-my $init = <<'END';
-
-FILE *errfile;
-char *GetLibfile( char *filename ) {return NULL;}
-
+z80asm_ok("", "", <<END, <<END, bytes(0xfe, 0x10));
+$test.asm:1: warning: interpreting indirect value as immediate
+  ^---- cp (16)
+END
+		cp (16)
 END
 
-t_compile_module($init, <<'END', $objs);
-#define ERROR return __LINE__
-#define check_count(e) if (get_num_errors() != e) ERROR;
-
-	check_count(0);
-
-	warn("Information\n");
-	check_count(0);
-
-	warn("Warning\n");
-	warn_symbol_different("main", "MAIN");
-	check_count(0);
-
-	warn("Error\n");
-	error_syntax();
-	check_count(1);
-
-	warn("File error not caught\n");
-	error_read_file("file.asm");
-	warn("end\n");
-END
-
-t_run_module([], '', <<'ERR', 0);
-Information
-Warning
-Warning: symbol 'main' used as 'MAIN'
-Error
-Error: syntax error
-File error not caught
-Error: cannot read file 'file.asm'
-end
-ERR
-
-
-t_compile_module($init, <<'END', $objs);
-#define ERROR return __LINE__
-#define check_count(e) if (get_num_errors() != e) ERROR;
-#define SYNTAX(file,module,line) \
-	_count = get_num_errors(); \
-	set_error_file(file); \
-	set_error_module(module); \
-	set_error_line(line); \
-	error_syntax(); \
-	check_count(_count + 1)
-
-#define DOUBLE(x) #x #x
-	int _count;
-
-	check_count(0);
-
-	warn("File error\n");
-	error_read_file("file.asm");
-	check_count(1);
-
-	SYNTAX(	NULL,		NULL,	0 );
-	SYNTAX(	NULL,		NULL,	1 );
-	SYNTAX(	NULL,		"TEST",	0 );
-	SYNTAX(	NULL,		"TEST",	1 );
-	SYNTAX(	"test.asm",	NULL,	0 );
-	SYNTAX(	"test.asm",	NULL,	1 );
-	SYNTAX(	"test.asm",	"TEST",	0 );
-	SYNTAX(	"test.asm",	"TEST",	1 );
-
-	set_error_null();
-	check_count(9);
-	error_syntax();
-	check_count(10);
-
-	reset_error_count();
-	check_count(0);
-
-	open_error_file("test1.err");
-	close_error_file();
-
-	error_syntax();
-
-	open_error_file("test2.err");
-	error_syntax();
-	close_error_file();
-
-	open_error_file("test3.err");
-	error_syntax();
-
-	open_error_file("test2.err");
-	error_syntax();
-	close_error_file();
-
-END
-
-t_run_module([], '', <<'ERR', 0);
-File error
-Error: cannot read file 'file.asm'
-Error: syntax error
-Error at line 1: syntax error
-Error at module 'TEST': syntax error
-Error at module 'TEST' line 1: syntax error
-Error at file 'test.asm': syntax error
-Error at file 'test.asm' line 1: syntax error
-Error at file 'test.asm' module 'TEST': syntax error
-Error at file 'test.asm' module 'TEST' line 1: syntax error
-Error: syntax error
-Error: syntax error
-Error: syntax error
-Error: syntax error
-Error: syntax error
-ERR
-
-ok ! -f "test1.err", "no errors, file deleted";
-
-is_text( scalar(read_file('test2.err')), <<'END' );
-Error: syntax error
-Error: syntax error
-END
-
-is_text( scalar(read_file('test3.err')), <<'END' );
-Error: syntax error
+z80asm_ok("", "", "", <<END, bytes(0xfe, 0x10));
+		cp +(16)
 END
 
 #------------------------------------------------------------------------------
 # error_expected_const_expr
-unlink_testfiles();
-write_file("test.asm", <<'END');
+#------------------------------------------------------------------------------
+z80asm_nok("", "", <<END, <<END);
 	extern ZERO
 	bit ZERO,a
 	set ZERO,a
@@ -578,20 +426,105 @@ write_file("test.asm", <<'END');
 	im 	undefined
 	rst	undefined
 END
-t_z80asm_capture("-b test.asm", "", <<'ERR', 1);
-Error at file 'test.asm' line 2: expected constant expression
-Error at file 'test.asm' line 3: expected constant expression
-Error at file 'test.asm' line 4: expected constant expression
-Error at file 'test.asm' line 5: expected constant expression
-Error at file 'test.asm' line 6: expected constant expression
-Error at file 'test.asm' line 7: symbol 'undefined' not defined
-Error at file 'test.asm' line 8: symbol 'undefined' not defined
-Error at file 'test.asm' line 9: symbol 'undefined' not defined
-Error at file 'test.asm' line 10: symbol 'undefined' not defined
-Error at file 'test.asm' line 10: expected constant expression
-Error at file 'test.asm' line 11: symbol 'undefined' not defined
-Error at file 'test.asm' line 11: expected constant expression
-ERR
+$test.asm:2: error: constant expression expected
+  ^---- bit ZERO,a
+$test.asm:3: error: constant expression expected
+  ^---- set ZERO,a
+$test.asm:4: error: constant expression expected
+  ^---- res ZERO,a
+$test.asm:5: error: constant expression expected
+  ^---- im ZERO
+$test.asm:6: error: constant expression expected
+  ^---- rst ZERO
+$test.asm:7: error: undefined symbol: undefined
+  ^---- bit undefined,a
+$test.asm:8: error: undefined symbol: undefined
+  ^---- set undefined,a
+$test.asm:9: error: undefined symbol: undefined
+  ^---- res undefined,a
+$test.asm:10: error: undefined symbol: undefined
+  ^---- im undefined
+$test.asm:10: error: constant expression expected
+  ^---- im undefined
+$test.asm:11: error: undefined symbol: undefined
+  ^---- rst undefined
+$test.asm:11: error: constant expression expected
+  ^---- rst undefined
+END
 
-unlink_testfiles();
-done_testing();
+#------------------------------------------------------------------------------
+# syntax errors
+#------------------------------------------------------------------------------
+z80asm_nok("", "", <<END, <<END);
+		defb 1?
+		defb 1?2
+		defb 1?2:
+		defb 1?2:1?
+END
+$test.asm:1: error: syntax error
+  ^---- defb 1?
+$test.asm:2: error: syntax error in expression
+  ^---- defb 1?2
+$test.asm:3: error: syntax error
+  ^---- defb 1?2:
+$test.asm:4: error: syntax error
+  ^---- defb 1?2:1?
+END
+
+z80asm_nok("", "", <<END, <<END);
+		defm "hello ",
+		defm "hello "&
+		defm "hello "&"world"
+		defm "hello"&32&"world"
+		defm 32,
+END
+$test.asm:1: error: syntax error
+  ^---- defm "hello ",
+$test.asm:2: error: syntax error
+  ^---- defm "hello "&
+$test.asm:3: error: syntax error
+  ^---- defm "hello "&"world"
+$test.asm:4: error: syntax error
+  ^---- defm "hello"&32&"world"
+$test.asm:5: error: syntax error
+  ^---- defm 32,
+END
+
+#------------------------------------------------------------------------------
+# illegal identifier
+#------------------------------------------------------------------------------
+for my $x (split(' ', "ix iy")) {
+	for my $r1 (split(' ', "b c d e ${x}h ${x}l a")) {
+		for my $r2 (split(' ', "${x}h ${x}l")) {
+			ok 1, "ld $r1, $r2";
+			z80asm_nok("-b -mr2ka", "", <<END, <<END);
+				ld $r1, $r2
+				ld $r2, $r1
+				ld $r2, 1
+END
+$test.asm:1: error: illegal identifier
+  ^---- ld $r1, $r2
+$test.asm:2: error: illegal identifier
+  ^---- ld $r2, $r1
+$test.asm:3: error: illegal identifier
+  ^---- ld $r2, 1
+END
+		}
+	}
+}
+
+#------------------------------------------------------------------------------
+# syntax error
+#------------------------------------------------------------------------------
+for my $r1 (split(' ', "b c d e h l (hl) (ix+3) (iy+3) 3")) {
+	ok 1, "ld (bc), $r1";
+	z80asm_nok("", "", <<END, <<END);
+				ld (bc), $r1
+END
+$test.asm:1: error: syntax error
+  ^---- ld (bc), $r1
+END
+}
+		
+unlink_testfiles;
+done_testing;

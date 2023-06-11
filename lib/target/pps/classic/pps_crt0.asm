@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.20 2016-07-15 21:38:08 dom Exp $
+;       $Id: pps_crt0.asm $
 ;
 
 
@@ -20,6 +20,14 @@
     PUBLIC  cleanup         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
+;--------
+; Set an origin for the application (-zorg=) default to $8100
+;--------
+
+IF      !DEFINED_CRT_ORG_CODE
+	defc    CRT_ORG_CODE  = $8100
+ENDIF
+
     defc    CONSOLE_ROWS = 32
     defc    CONSOLE_COLUMNS = 80
 
@@ -30,7 +38,7 @@
     defc	__CPU_CLOCK = 6000000
     INCLUDE "crt/classic/crt_rules.inc"
 
-    org     $8100 - 512
+    org     CRT_ORG_CODE - 512
 
     defw    $5845   ;EXE signature
     defb    $45     ;Reserved (EXE type)
@@ -46,7 +54,7 @@
 
 
 start:
-    ld      (start1+1),sp	;Save entry stack
+    ld      (__restore_sp_onexit+1),sp	;Save entry stack
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
@@ -71,7 +79,7 @@ IF CRT_ENABLE_COMMANDLINE = 1
     ld      hl,(start_prefix)
     ld      a,(hl)  ;length of arguments
     and     a
-    jr      z,argv_done
+    jp      z,argv_done
     ld      c,a
     add     hl,bc   ;now points to end of arguments
 
@@ -90,7 +98,7 @@ cleanup:
     push    hl      ;save return code
     call    crt0_exit
     pop     bc
-start1:
+__restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
     ld      bc,$41  ;exit with - error code
     rst     $10

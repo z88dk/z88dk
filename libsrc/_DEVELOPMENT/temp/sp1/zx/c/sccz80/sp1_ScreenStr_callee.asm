@@ -16,4 +16,16 @@ sp1_ScreenStr_callee:
    ex (sp),hl
    ld d,l
 
-   jp asm_sp1_ScreenStr
+;   jp asm_sp1_ScreenStr
+   push ix
+   call asm_sp1_ScreenStr
+   pop ix
+   ret
+
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_ScreenStr_callee
+defc _sp1_ScreenStr_callee = sp1_ScreenStr_callee
+ENDIF
+

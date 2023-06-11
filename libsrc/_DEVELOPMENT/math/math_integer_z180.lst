@@ -1,6 +1,7 @@
 math/integer/z180/l_z180_muls_16_16x8
 math/integer/z180/l_z180_muls_16_16x16
 math/integer/z180/l_z180_muls_32_16x16
+math/integer/z180/l_z180_muls_32_32x32
 math/integer/z180/l_z180_mulu_16_16x8
 math/integer/z180/l_z180_mulu_16_16x16
 math/integer/z180/l_z180_mulu_24_16x8

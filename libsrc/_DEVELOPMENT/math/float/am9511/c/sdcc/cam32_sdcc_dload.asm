@@ -24,8 +24,7 @@ PUBLIC cam32_sdcc_dload
     inc hl
     ld d,(hl)                   ; DEBC = sdcc_float
 
-    ld l,c
-    ld h,b
+    ld hl,bc
 
     exx
     ret                         ; DEHL' = sdcc_float

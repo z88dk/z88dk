@@ -33,7 +33,7 @@
             defc    CRT_ORG_CODE = $5CCB     ; repleaces BASIC program
             defc	DEFINED_CRT_ORG_CODE = 1
         ENDIF
-        defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
+        defc REG__register_sp = 0xff57	; below UDG, keep eye when using banks
     ENDIF
 
 
@@ -58,7 +58,20 @@
     ; We default to the 64 column terminal driver
     ; Check whether to default to 32 column display
     defc    CONSOLE_ROWS = 24
-    IF !DEFINED_CLIB_ZX_CONIO32
+    IF DEFINED_CLIB_DEFAULT_SCREEN_MODE && __TS2068__
+        IF DEFINED_CLIB_ZX_CONIO32
+           defc BASE_COLS = 32
+        ELSE
+           defc CLIB_ZX_CONIO32 = 0
+           defc BASE_COLS = 64
+        ENDIF
+        IF CLIB_DEFAULT_SCREEN_MODE < 6
+           defc CONSOLE_COLUMNS = BASE_COLS
+        ELSE
+           ; Hires mode
+           defc CONSOLE_COLUMNS = BASE_COLS * 2
+        ENDIF
+    ELIF !DEFINED_CLIB_ZX_CONIO32
         defc CLIB_ZX_CONIO32 = 0
         defc CONSOLE_COLUMNS = 64
     ELSE
@@ -67,14 +80,16 @@
     PUBLIC __CLIB_ZX_CONIO32
     defc __CLIB_ZX_CONIO32 = CLIB_ZX_CONIO32
 
-    IF !CLIB_FGETC_CONS_DELAY
+    IFNDEF CLIB_FGETC_CONS_DELAY
         defc CLIB_FGETC_CONS_DELAY = 100
     ENDIF
 
     ; We use the generic driver by default
     defc    TAR__fputc_cons_generic = 1
 
-    defc    DEF__register_sp = -1
+IFNDEF TAR__register_sp
+    defc    TAR__register_sp = -1
+ENDIF
     defc    TAR__clib_exit_stack_size = 32
     defc    CRT_KEY_DEL = 12
     defc    __CPU_CLOCK = 3500000
@@ -89,7 +104,7 @@ start:
 
 IF (startup=2)
 
-    IF !CLIB_FGETC_CONS_DELAY
+    IFNDEF CLIB_FGETC_CONS_DELAY
         defc CLIB_FGETC_CONS_DELAY = 100
     ENDIF
 
@@ -127,6 +142,11 @@ init:
 ELSE
 
         ; --- startup=[default] ---
+  IF DEFINED_CLIB_DEFAULT_SCREEN_MODE && __TS2068__
+    EXTERN ts_vmod
+    ld      l,CLIB_DEFAULT_SCREEN_MODE
+    call    ts_vmod 
+  ENDIF
   IF !DEFINED_CRT_DISABLELOADER
         call   loadbanks
   ENDIF
@@ -134,7 +154,7 @@ ELSE
         ld      iy,23610        ; restore the right iy value, 
                                 ; fixing the self-relocating trick, if any
   IF !DEFINED_ZXVGS
-        ld      (start1+1),sp   ; Save entry stack
+        ld      (__restore_sp_onexit+1),sp   ; Save entry stack
   ENDIF
     INCLUDE	"crt/classic/crt_init_sp.asm"
     INCLUDE	"crt/classic/crt_init_atexit.asm"
@@ -216,7 +236,7 @@ cleanup_exit:
         ld      hl,10072        ;Restore hl' to what basic wants
         exx
         pop     bc
-start1: ld      sp,0            ;Restore stack to entry value
+__restore_sp_onexit:ld      sp,0            ;Restore stack to entry value
         ret
   ENDIF
 ENDIF
@@ -380,90 +400,103 @@ romsvc:         defs    10  ; Pointer to the end of the sysdefvars
 ENDIF
 
 
-IF __MMAP != -1
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; Define Memory Banks
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Define Memory Banks
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IFNDEF CRT_ORG_BANK_0
-      defc CRT_ORG_BANK_0 = 0x00c000
-   ENDIF
+    IFNDEF CRT_ORG_BANK_0
+        defc CRT_ORG_BANK_0 = 0xc000
+    ENDIF
 
-   IFNDEF CRT_ORG_BANK_1
-      defc CRT_ORG_BANK_1 = 0x01c000
-   ENDIF
+    IFNDEF CRT_ORG_BANK_1
+        defc CRT_ORG_BANK_1 = 0xc000
+    ENDIF
 
-   IFNDEF CRT_ORG_BANK_2
-      defc CRT_ORG_BANK_2 = 0x02c000
-   ENDIF
+    IFNDEF CRT_ORG_BANK_2
+        defc CRT_ORG_BANK_2 = 0xc000
+    ENDIF
 
-   IFNDEF CRT_ORG_BANK_3
-      defc CRT_ORG_BANK_3 = 0x03c000
-   ENDIF
+    IFNDEF CRT_ORG_BANK_3
+        defc CRT_ORG_BANK_3 = 0xc000
+    ENDIF
 
-   IFNDEF CRT_ORG_BANK_4
-      defc CRT_ORG_BANK_4 = 0x04c000
-   ENDIF
+    IFNDEF CRT_ORG_BANK_4
+        defc CRT_ORG_BANK_4 = 0xc000
+    ENDIF
 
-   IFNDEF CRT_ORG_BANK_5
-      defc CRT_ORG_BANK_5 = 0x05c000
-   ENDIF
+    IFNDEF CRT_ORG_BANK_5
+        defc CRT_ORG_BANK_5 = 0xc000
+    ENDIF
 
-   IFNDEF CRT_ORG_BANK_6
-      defc CRT_ORG_BANK_6 = 0x06c000
-   ENDIF
+    IFNDEF CRT_ORG_BANK_6
+        defc CRT_ORG_BANK_6 = 0xc000
+    ENDIF
 
-   IFNDEF CRT_ORG_BANK_7
-      defc CRT_ORG_BANK_7 = 0x07c000
-   ENDIF
-
-
-   SECTION BANK_0
-   org CRT_ORG_BANK_0
-   SECTION CODE_0
-   SECTION RODATA_0
-   SECTION BANK_0_END
-
-   SECTION BANK_1
-   org CRT_ORG_BANK_1
-   SECTION CODE_1
-   SECTION RODATA_1
-   SECTION BANK_1_END
-
-   SECTION BANK_2
-   org CRT_ORG_BANK_2
-   SECTION CODE_2
-   SECTION RODATA_2
-   SECTION BANK_2_END
+    IFNDEF CRT_ORG_BANK_7
+        defc CRT_ORG_BANK_7 = 0xc000
+    ENDIF
 
 
-   SECTION BANK_3
-   org CRT_ORG_BANK_3
-   SECTION CODE_3
-   SECTION RODATA_3
-   SECTION BANK_3_END
+    SECTION BANK_0
+    org 0x000000 + CRT_ORG_BANK_0
+    SECTION CODE_0
+    SECTION RODATA_0
+    SECTION DATA_0
+    SECTION BSS_0
+    SECTION BANK_0_END
 
-   SECTION BANK_4
-   org CRT_ORG_BANK_4
-   SECTION CODE_4
-   SECTION RODATA_4
-   SECTION BANK_4_END
+    SECTION BANK_1
+    org 0x010000 + CRT_ORG_BANK_1
+    SECTION CODE_1
+    SECTION RODATA_1
+    SECTION DATA_1
+    SECTION BSS_1
+    SECTION BANK_1_END
 
-   SECTION BANK_5
-   org CRT_ORG_BANK_5
-   SECTION CODE_5
-   SECTION RODATA_5
-   SECTION BANK_5_END
+    SECTION BANK_2
+    org 0x020000 + CRT_ORG_BANK_2
+    SECTION CODE_2
+    SECTION RODATA_2
+    SECTION DATA_2
+    SECTION BSS_2
+    SECTION BANK_2_END
 
-   SECTION BANK_6
-   org CRT_ORG_BANK_6
-   SECTION CODE_6
-   SECTION RODATA_6
-   SECTION BANK_6_END
+    SECTION BANK_3
+    org 0x030000+ CRT_ORG_BANK_3
+    SECTION CODE_3
+    SECTION RODATA_3
+    SECTION DATA_3
+    SECTION BSS_3
+    SECTION BANK_3_END
 
-   SECTION BANK_7
-   org CRT_ORG_BANK_7
-   SECTION CODE_7
-   SECTION RODATA_7
-   SECTION BANK_7_END
-ENDIF
+    SECTION BANK_4
+    org 0x040000 + CRT_ORG_BANK_4
+    SECTION CODE_4
+    SECTION RODATA_4
+    SECTION DATA_4
+    SECTION BSS_4
+    SECTION BANK_4_END
+
+    SECTION BANK_5
+    org 0x050000 + CRT_ORG_BANK_5
+    SECTION CODE_5
+    SECTION RODATA_5
+    SECTION DATA_5
+    SECTION BSS_5
+    SECTION BANK_5_END
+
+    SECTION BANK_6
+    org 0x060000 + CRT_ORG_BANK_6
+    SECTION CODE_6
+    SECTION RODATA_6
+    SECTION DATA_6
+    SECTION BSS_6
+    SECTION BANK_6_END
+
+    SECTION BANK_7
+    org 0x070000 + CRT_ORG_BANK_7
+    SECTION CODE_7
+    SECTION RODATA_7
+    SECTION DATA_7
+    SECTION BSS_7
+    SECTION BANK_7_END

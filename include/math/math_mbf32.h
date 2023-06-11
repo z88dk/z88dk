@@ -1,5 +1,5 @@
-#ifndef __MATH_MBF32_H__
-#define __MATH_MBF32_H__
+#ifndef __MATH_MBF32_H
+#define __MATH_MBF32_H
 
 #include <sys/compiler.h>
 #include <sys/types.h>
@@ -12,6 +12,15 @@
 #define DBL_MANT_DIG 23
 #define FLT_DIG      6
 #define DBL_DIG      6
+#define FLT_EPSILON  0.0000001
+#define DBL_EPSILON  0.0000001
+
+
+#define HUGE_POS_F32        (+8.507059e+37)
+#define TINY_POS_F32        (+1.175494e-38)
+#define HUGE_NEG_F32        (-8.507059e+37)
+#define TINY_NEG_F32        (-1.175494e-38)
+
 
 
 
@@ -67,10 +76,8 @@ extern double_t __LIB__ frexp(double_t x, int *pw2) __smallc;
 /* General */
 extern double_t __LIB__ fabs(double_t) __smallc;
 extern double_t __LIB__ fmod(double_t,double_t) __smallc;
-extern double_t __LIB__ amax(double_t,double_t) __smallc;
-extern double_t __LIB__ amin(double_t,double_t) __smallc;
-#define fmax(x,y) amax(x,y)
-#define fmin(x,y) amin(x,y)
+extern double_t __LIB__ fmax(double_t,double_t) __smallc;
+extern double_t __LIB__ fmin(double_t,double_t) __smallc;
 #define remainder(x,y) (x-(fabs(y)*round(x/fabs(y))))
 #define fdim(a,b) (a>b?a-b:b-a)
 
@@ -102,4 +109,4 @@ extern int __LIB__ fpclassify(double_t );
 #define fma(x,y,z) (x*y+z)
 
 
-#endif /* _MATH_MBF32_H */
+#endif /* __MATH_MBF32_H */

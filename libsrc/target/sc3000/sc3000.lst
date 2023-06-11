@@ -1,0 +1,14 @@
+target/sc3000/stdio/fgetc_cons
+target/sc3000/stdio/getk
+@stdio/ansicore.lst
+
+target/sc3000/time/clock
+@input/input_keyboard.lst
+@video/tms9918/video_tms9918.lst
+@stdio/stdio.lst
+@gfx/narrow/gfx_narrow.lst
+@psg/sn76489/sn76489.lst
+target/sc3000/games/joystick
+target/sc3000/games/keys_joystick
+@games/games.lst
+

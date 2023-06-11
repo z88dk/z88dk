@@ -53,10 +53,10 @@ ENDIF
     defc    TAR__fputc_cons_generic = 1
     defc	TAR__register_sp = -1
     defc    TAR__clib_exit_stack_size = 32
-    IF !DEFINED_CRT_COMMANDLINE_REDIRECTION
-        define  DEFINED_CRT_COMMANDLINE_REDIRECTION
-        defc    CRT_COMMANDLINE_REDIRECTION = 0
-    ENDIF
+;    IF !DEFINED_CRT_COMMANDLINE_REDIRECTION
+;        define  DEFINED_CRT_COMMANDLINE_REDIRECTION
+;        defc    CRT_COMMANDLINE_REDIRECTION = 0
+;    ENDIF
     INCLUDE	"crt/classic/crt_rules.inc"
 
     INCLUDE	"target/trs80/def/maths_mbf.def"
@@ -65,7 +65,7 @@ ENDIF
 
 start:
     ld      (cmdline+1),hl
-    ld      (start1+1),sp   ;Save entry stack
+    ld      (__restore_sp_onexit+1),sp   ;Save entry stack
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
@@ -171,7 +171,7 @@ ENDIF
 cleanup:
     call    crt0_exit
 cleanup_exit:
-start1:
+__restore_sp_onexit:
     ld      sp,0            ;Restore stack to entry value
     ret
 

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // zobjfile - manipulate z80asm object files
-// Copyright (C) Paulo Custodio, 2011-2020
+// Copyright (C) Paulo Custodio, 2011-2022
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #pragma once
@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 #define MIN_VERSION				1
-#define MAX_VERSION				14
+#define MAX_VERSION				16
 #define CUR_VERSION				MAX_VERSION
 #define SIGNATURE_SIZE			8
 #define SIGNATURE_OBJ			"Z80RMF"
@@ -52,7 +52,7 @@ typedef struct symbol_s
 	struct section_s* section;		// weak
 
 	UT_string* filename;
-	int		 line_nr;
+	int		 line_num;
 
 	struct symbol_s* next, * prev;
 } symbol_t;
@@ -75,7 +75,7 @@ typedef struct expr_s
 	UT_string* target_name;
 
 	UT_string* filename;
-	int		 line_nr;
+	int		 line_num;
 
 	struct expr_s* next, * prev;
 } expr_t;

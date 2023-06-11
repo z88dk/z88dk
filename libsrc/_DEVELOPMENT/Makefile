@@ -1,21 +1,23 @@
 #
-# make [target]       - Build libraries for target, (eg make zx)
-# make clean-[target] - Clean the target (eg make clean-zx)
+# make [target]       - Build libraries for target (eg make zx)
+# make [target]-clean - Clean the target libraries (eg make zx-clean)
 #
 
 
 Z80ASM = z88dk-z80asm
 ZX0 = z88dk-zx0
 
-TARGET = am9511 cpm hbios m math16 math32 rc2014 scz180 sms vgl yaz180 z180 z80 zx zxn
+TARGET = am9511 cpm hbios m math16 math32 rc2014 scz180 sms yaz180 z180 z80 zx zxn
 
 Z88DK_LIB := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../../lib/
+
+NEWLIB_ROOT = ./
 
 
 .PHONY: all clean install-clean
 all: $(TARGET)
 
-clean: $(addprefix clean-,$(TARGET))
+clean: $(addsuffix -clean,$(TARGET))
 	@find . -name '*.err' | xargs $(RM)
 	$(RM) config_private.inc
 
@@ -23,13 +25,12 @@ install-clean:
 	$(RM) -fr target/*/obj
 
 
-
 define config
-.PHONY: clean-$(1)
+.PHONY: $(1)-clean
 
 # +zx/+zxn use +z80 as part of the config stage so add the dependency
 target/zx/obj/config_private.inc: lib/sccz80/z80.lib
-target/zxn/obj/config_private.inc: lib/sccz80/z80.lib
+target/zxn/obj/config_private.inc: lib/sccz80/zx.lib
 
 # Convenience target (eg make zx to build the zx libraries)
 .PHONY: $(1)
@@ -97,9 +98,9 @@ lib/sdcc_iy/$(1).lib: target/$(1)/obj/config_private.inc
 endef
 
 define make_clean
-.PHONY: clean-$(1)
+.PHONY: $(1)-clean
 
-clean-$(1):
+$(1)-clean:
 	@$(RM) -r target/$(1)/obj
 	@$(RM) lib/sccz80/$(1).lib
 	@$(RM) lib/sdcc_ix/$(1).lib
@@ -119,5 +120,3 @@ define build_targets
 endef
 
 $(eval $(call build_targets,$(TARGET)))
-
-

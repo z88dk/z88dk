@@ -3,11 +3,11 @@
  *
  *	Stefano Bodrato - Feb. 2005
  *
- *	$Id: fdtell.c,v 1.1 2009-01-12 12:27:11 stefano Exp $
+ *	$Id: fdtell.c $
 */
 
 #include <fcntl.h>
-#include <zxinterface1.h>
+#include <arch/zx/zxinterface1.h>
 
 
 long fdtell(int handle)

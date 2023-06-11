@@ -1,12 +1,12 @@
 
-; double strtod(const char *nptr, char **endptr)
+; double strtod(const char *nptr, char **endptr) __smallc __z88dk_callee
 
 SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC strtod_callee
 
-EXTERN asm_strtod
+EXTERN mlib2d, asm_strtod
 
 strtod_callee:
 
@@ -14,7 +14,9 @@ strtod_callee:
    pop de
    ex (sp),hl
 
-   jp asm_strtod
+   call asm_strtod
+
+   jp mlib2d                   ; to sccz80_float
 
 ; SDCC bridge for Classic
 IF __CLASSIC

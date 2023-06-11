@@ -19,7 +19,7 @@ PUBLIC asm_mtx_destroy
 
 EXTERN l_setmem_hl
 
-asm_mtx_destroy:
+.asm_mtx_destroy
 
    xor a
    jp l_setmem_hl - 12         ; zeroed structure makes mtx_type invalid

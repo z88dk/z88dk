@@ -19,7 +19,7 @@ defc   __CONFIG_Z88DK_INC_ = 1
 
 
 
-defc __Z88DK = 2000
+defc __Z88DK = 2200
 
 
 
@@ -37,16 +37,9 @@ defc __RC2014 = 1
 defc __CPU_CLOCK = 7372800
 
 defc __IO_DIO_PORT = 0x00
-defc __IO_CF_PORT = 0x10
+defc __IO_CF_8_BIT = 0x01
+defc __IO_CF_PORT_BASE = 0x10
 defc __IO_PIO_PORT_BASE = 0x20
-defc __IO_RAM_TOGGLE = 0x30
-defc __IO_ROM_TOGGLE = 0x38
-defc __IO_LUT_PORT_BASE = 0x40
-defc __IO_APU_PORT_BASE = 0x42
-defc __IO_APU0_PORT_BASE = 0x42
-defc __IO_APU1_PORT_BASE = 0x62
-defc __IO_APU2_PORT_BASE = 0xC2
-defc __IO_APU3_PORT_BASE = 0xE2
 defc __IO_ACIA_PORT_BASE = 0x80
 defc __IO_SIO_PORT_BASE = 0x80
 defc __IO_SIO_PORT_OFFSET_A = 0x00
@@ -491,7 +484,7 @@ defc __IO_ACIA_SR_PE          = 0x40
 defc __IO_ACIA_SR_IRQ         = 0x80
 
 defc __IO_ACIA_RX_SIZE     = 0x100
-defc __IO_ACIA_RX_FULLISH  = 0xf8
+defc __IO_ACIA_RX_FULLISH  = 0xf0
 defc __IO_ACIA_RX_EMPTYISH = 0x08
 defc __IO_ACIA_TX_SIZE     = 0x10
 
@@ -611,8 +604,8 @@ defc __IO_SIO_RR1_RX_OVERRUN      = 0x20
 defc __IO_SIO_RR1_RX_FRAMING_ERROR      = 0x40
 defc __IO_SIO_RR1_SDLC_EOF      = 0x80
 
-defc __IO_SIO_RX_SIZE      = 0x100
-defc __IO_SIO_RX_FULLISH      = 0xf8
+defc __IO_SIO_RX_SIZE      = 0x80
+defc __IO_SIO_RX_FULLISH      = 0x70
 defc __IO_SIO_RX_EMPTYISH      = 0x08
 defc __IO_SIO_TX_SIZE      = 0x10
 
@@ -663,6 +656,37 @@ defc __IO_PIO_CNTL_15 = 0x9B
 
 
 
+defc __IO_CF_IDE_DATA = 0x10
+defc __IO_CF_IDE_ERROR = 0x11
+defc __IO_CF_IDE_FEATURE = 0x11
+defc __IO_CF_IDE_SEC_CNT = 0x12
+defc __IO_CF_IDE_SECTOR = 0x13
+defc __IO_CF_IDE_CYL_LSB = 0x14
+defc __IO_CF_IDE_CYL_MSB = 0x15
+defc __IO_CF_IDE_HEAD = 0x16
+defc __IO_CF_IDE_COMMAND = 0x17
+defc __IO_CF_IDE_STATUS = 0x17
+
+defc __IO_CF_IDE_CONTROL = 0x1e
+defc __IO_CF_IDE_ALT_STATUS = 0x1e
+
+defc __IO_CF_IDE_LBA0 = 0x13
+defc __IO_CF_IDE_LBA1 = 0x14
+defc __IO_CF_IDE_LBA2 = 0x15
+defc __IO_CF_IDE_LBA3 = 0x16
+
+
+
+
+
+
+
+
+
+
+
+
+
 defc __IO_PIO_IDE_LSB = 0x20
 defc __IO_PIO_IDE_MSB = 0x21
 defc __IO_PIO_IDE_CTL = 0x22
@@ -670,32 +694,33 @@ defc __IO_PIO_IDE_CONFIG = 0x23
 defc __IO_PIO_IDE_RD = 0x92
 defc __IO_PIO_IDE_WR = 0x80
 
-defc __IO_IDE_A0_LINE = 0x01
-defc __IO_IDE_A1_LINE = 0x02
-defc __IO_IDE_A2_LINE = 0x04
-defc __IO_IDE_CS0_LINE = 0x08
-defc __IO_IDE_CS1_LINE = 0x10
-defc __IO_IDE_WR_LINE = 0x20
-defc __IO_IDE_RD_LINE = 0x40
-defc __IO_IDE_RST_LINE = 0x80
+defc __IO_PIO_IDE_A0_LINE = 0x01
+defc __IO_PIO_IDE_A1_LINE = 0x02
+defc __IO_PIO_IDE_A2_LINE = 0x04
+defc __IO_PIO_IDE_CS0_LINE = 0x08
+defc __IO_PIO_IDE_CS1_LINE = 0x10
+defc __IO_PIO_IDE_WR_LINE = 0x20
+defc __IO_PIO_IDE_RD_LINE = 0x40
+defc __IO_PIO_IDE_RST_LINE = 0x80
 
-defc __IO_IDE_DATA = 0x08
-defc __IO_IDE_ERROR = 0x9
-defc __IO_IDE_SEC_CNT = 0xa
-defc __IO_IDE_SECTOR = 0xb
-defc __IO_IDE_CYL_LSB = 0xc
-defc __IO_IDE_CYL_MSB = 0xd
-defc __IO_IDE_HEAD = 0xe
-defc __IO_IDE_COMMAND = 0xf
-defc __IO_IDE_STATUS = 0xf
+defc __IO_PIO_IDE_DATA = 0x08
+defc __IO_PIO_IDE_ERROR = 0x9
+defc __IO_PIO_IDE_FEATURE = 0x9
+defc __IO_PIO_IDE_SEC_CNT = 0xa
+defc __IO_PIO_IDE_SECTOR = 0xb
+defc __IO_PIO_IDE_CYL_LSB = 0xc
+defc __IO_PIO_IDE_CYL_MSB = 0xd
+defc __IO_PIO_IDE_HEAD = 0xe
+defc __IO_PIO_IDE_COMMAND = 0xf
+defc __IO_PIO_IDE_STATUS = 0xf
 
-defc __IO_IDE_CONTROL = 0x16
-defc __IO_IDE_ALT_STATUS = 0x16
+defc __IO_PIO_IDE_CONTROL = 0x16
+defc __IO_PIO_IDE_ALT_STATUS = 0x16
 
-defc __IO_IDE_LBA0 = 0xb
-defc __IO_IDE_LBA1 = 0xc
-defc __IO_IDE_LBA2 = 0xd
-defc __IO_IDE_LBA3 = 0xe
+defc __IO_PIO_IDE_LBA0 = 0xb
+defc __IO_PIO_IDE_LBA1 = 0xc
+defc __IO_PIO_IDE_LBA2 = 0xd
+defc __IO_PIO_IDE_LBA3 = 0xe
 
 defc __IDE_CMD_READ = 0x20
 defc __IDE_CMD_WRITE = 0x30
@@ -705,6 +730,7 @@ defc __IDE_CMD_IDLE = 0xE1
 defc __IDE_CMD_SLEEP = 0xE6
 defc __IDE_CMD_CACHE_FLUSH = 0xE7
 defc __IDE_CMD_ID = 0xEC
+defc __IDE_CMD_FEATURE = 0xEF
 
 
 
@@ -718,122 +744,11 @@ defc __IDE_CMD_ID = 0xEC
 
 
 
-defc __IO_LUT_OPERAND_LATCH  = 0x40
-defc __IO_LUT_RESULT_MSB  = 0x41
-defc __IO_LUT_RESULT_LSB  = 0x40
+defc __IO_RAM_TOGGLE = 0x30
+defc __IO_ROM_TOGGLE = 0x38
+defc __IO_RAM_SHADOW_BASE  = 0x58
 
-defc __IO_LUT_MODULE_AVAILABLE  = 0x00
-
-
-
-
-
-
-
-
-
-
-
-
-
-defc __IO_APU_DATA = 0x42
-defc __IO_APU_CONTROL = 0x43
-defc __IO_APU_STATUS = 0x43
-
-defc __IO_APU_STATUS_BUSY = 0x80
-defc __IO_APU_STATUS_SIGN = 0x40
-defc __IO_APU_STATUS_ZERO = 0x20
-defc __IO_APU_STATUS_DIV0 = 0x10
-defc __IO_APU_STATUS_NEGRT = 0x08
-defc __IO_APU_STATUS_UNDFL = 0x04
-defc __IO_APU_STATUS_OVRFL = 0x02
-defc __IO_APU_STATUS_CARRY = 0x01
-
-defc __IO_APU_STATUS_ERROR = 0x1E
-
-defc __IO_APU_COMMAND_SVREQ = 0x80
-
-defc __IO_APU_OP_ENT = 0x40
-defc __IO_APU_OP_REM = 0x50
-defc __IO_APU_OP_ENT16 = 0x40
-defc __IO_APU_OP_ENT32 = 0x41
-defc __IO_APU_OP_REM16 = 0x50
-defc __IO_APU_OP_REM32 = 0x51
-
-defc __IO_APU_OP_SADD = 0x6C
-defc __IO_APU_OP_SSUB = 0x6D
-defc __IO_APU_OP_SMUL = 0x6E
-defc __IO_APU_OP_SMUU = 0x76
-defc __IO_APU_OP_SDIV = 0x6F
-
-defc __IO_APU_OP_DADD = 0x2C
-defc __IO_APU_OP_DSUB = 0x2D
-defc __IO_APU_OP_DMUL = 0x2E
-defc __IO_APU_OP_DMUU = 0x36
-defc __IO_APU_OP_DDIV = 0x2F
-
-defc __IO_APU_OP_FADD = 0x10
-defc __IO_APU_OP_FSUB = 0x11
-defc __IO_APU_OP_FMUL = 0x12
-defc __IO_APU_OP_FDIV = 0x13
-
-defc __IO_APU_OP_SQRT = 0x01
-defc __IO_APU_OP_SIN = 0x02
-defc __IO_APU_OP_COS = 0x03
-defc __IO_APU_OP_TAN = 0x04
-defc __IO_APU_OP_ASIN = 0x05
-defc __IO_APU_OP_ACOS = 0x06
-defc __IO_APU_OP_ATAN = 0x07
-defc __IO_APU_OP_LOG = 0x08
-defc __IO_APU_OP_LN = 0x09
-defc __IO_APU_OP_EXP = 0x0A
-defc __IO_APU_OP_PWR = 0x0B
-
-defc __IO_APU_OP_NOP = 0x00
-defc __IO_APU_OP_FIXS = 0x1F
-defc __IO_APU_OP_FIXD = 0x1E
-defc __IO_APU_OP_FLTS = 0x1D
-defc __IO_APU_OP_FLTD = 0x1C
-defc __IO_APU_OP_CHSS = 0x74
-defc __IO_APU_OP_CHSD = 0x34
-defc __IO_APU_OP_CHSF = 0x15
-defc __IO_APU_OP_PTOS = 0x77
-defc __IO_APU_OP_PTOD = 0x37
-defc __IO_APU_OP_PTOF = 0x17
-defc __IO_APU_OP_POPS = 0x78
-defc __IO_APU_OP_POPD = 0x38
-defc __IO_APU_OP_POPF = 0x18
-defc __IO_APU_OP_XCHS = 0x79
-defc __IO_APU_OP_XCHD = 0x39
-defc __IO_APU_OP_XCHF = 0x19
-defc __IO_APU_OP_PUPI = 0x1A
-
-
-
-
-
-
-
-
-
-
-
-
-defc __IO_APU0_DATA = 0x42
-defc __IO_APU0_CONTROL = 0x43
-defc __IO_APU0_STATUS = 0x43
-
-defc __IO_APU1_DATA = 0x62
-defc __IO_APU1_CONTROL = 0x63
-defc __IO_APU1_STATUS = 0x63
-
-defc __IO_APU2_DATA = 0xc2
-defc __IO_APU2_CONTROL = 0xc3
-defc __IO_APU2_STATUS = 0xc3
-
-defc __IO_APU3_DATA = 0xe2
-defc __IO_APU3_CONTROL = 0xe3
-defc __IO_APU3_STATUS = 0xe3
+defc __IO_RAM_SHADOW_AVAILABLE  = 0x00
 
 
 

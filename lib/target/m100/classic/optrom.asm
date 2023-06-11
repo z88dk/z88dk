@@ -4,20 +4,20 @@
 ;	Alexei Gordeev, Nov 2020
 ;
 
-	; guaranteed safe place to put some variables
-	defc ALTLCD_RAM = $FCC0
-	defc ALTLCD_LEN = 320        
-        
-        defc OPON = $FAA4
-        defc CRT_ORG_DATA = ALTLCD_RAM
-        defc CRT_ORG_CODE = $0000
+    ; guaranteed safe place to put some variables
+    defc ALTLCD_RAM = $FCC0
+    defc ALTLCD_LEN = 320        
+
+    defc OPON = $FAA4
+    defc CRT_ORG_DATA = ALTLCD_RAM
+    defc CRT_ORG_CODE = $0000
 
 IFNDEF CRT_ORG_BSS
-        defc CRT_ORG_BSS = ALTLCD_RAM ; Ram variables will be kept in safe RAM area by default
+    defc CRT_ORG_BSS = ALTLCD_RAM ; Ram variables will be kept in safe RAM area by default
 ENDIF
-        defc    __crt_org_bss = CRT_ORG_BSS
+    defc    __crt_org_bss = CRT_ORG_BSS
 
-	org	  CRT_ORG_CODE
+    org	  CRT_ORG_CODE
 rst0:
 	jp	program		; RST0 standard entry
 
@@ -144,17 +144,17 @@ exit:
 	jp	opexit
 	
 program:
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-	call    crt0_init_bss
-	ei
-	push	bc	;argv
-	push	bc	;argc
-	call	_main
-	pop	bc
-	pop	bc
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+    ei
+    push    bc	;argv
+    push    bc	;argc
+    call    _main
+    pop     bc
+    pop     bc
 cleanup:
-	push	hl
-	call	crt0_exit
-	pop	hl
-	jp exit
+    push    hl
+    call    crt0_exit
+    pop     hl
+    jp      exit

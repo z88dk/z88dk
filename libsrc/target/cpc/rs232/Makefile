@@ -2,7 +2,7 @@ include ../../../Make.config
 
 
 SUBDIRS = booster sti
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 all: subdirs-all
 
@@ -25,4 +25,4 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean

@@ -719,7 +719,7 @@ bool enemies_groupVSBullet( )
 	
 	
 	//outside enemy group
-	//test order based on probability of occuring
+	//test order based on probability of occurring
 	if ( bulletY > FIX16((ROW0_TILEY + NB_ROW*2 -1)*8 ) )	return false;
 	if ( bulletY < FIX16((ROW0_TILEY*8) - 8) )			return false;
 	

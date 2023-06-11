@@ -1,12 +1,13 @@
-SUBDIRS = genmath z88math zxmath math48 cpcmath fastmath mbf32 mbf64 math16 math32 am9511
-CLEANDIRS = $(SUBDIRS:%=clean-%)
-
 include ../Make.config
-     
+
+SUBDIRS = fastmath genmath math48 math32 math16 mbf32 daimath32 am9511 cpcmath mbf64 z88math zxmath fix16
+CLEANDIRS = $(SUBDIRS:%=%-clean)
+
+
 .PHONY: subdirs $(SUBDIRS) $(CLEANDIRS)
-     
+
 subdirs: $(SUBDIRS)
-     
+
 $(SUBDIRS):
 	$(MAKE) -C $@
 
@@ -14,4 +15,4 @@ clean: $(CLEANDIRS)
 	$(RM) */*.o
 
 $(CLEANDIRS): 
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean

@@ -4,6 +4,9 @@ CFILES = \
 	_putoffset.c \
 	bios.c \
 	bdos.c \
+	bdos_callee.c \
+	bdosh.c \
+	bdosh_callee.c \
 	cache.c \
 	close.c \
 	creat.c \
@@ -15,6 +18,7 @@ CFILES = \
 	dir_get_entry_size.c \
 	execv.c \
 	get_current_volume.c \
+	get_dpb.c \
 	get_dir_name.c \
 	fdtell.c \
 	fdgetpos.c \

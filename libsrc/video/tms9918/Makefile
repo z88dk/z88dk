@@ -1,8 +1,7 @@
-
 include ../../Make.config
 
 SUBDIRS = stdio graphics
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 TARGET ?= test
 
@@ -27,8 +26,7 @@ obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
-	@$(ASSEMBLER) $(ASMFLAGS) -I../..  $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) $(ASMFLAGS) -I../.. -Oobj/$(OBJSUBDIR)  $^
 
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR)
@@ -44,5 +42,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all TARGET=$(TARGET)
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o

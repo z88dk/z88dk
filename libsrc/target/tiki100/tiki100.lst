@@ -30,4 +30,4 @@ target/tiki100/stdio/generic_console_set_ink
 target/tiki100/stdio/generic_console_set_paper
 target/tiki100/stdio/generic_console_get_mode
 target/tiki100/stdio/conio_vars
-@font/font_8x8/font_8x8.lst
+

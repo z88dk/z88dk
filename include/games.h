@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 #ifdef __TIKI100__
-#include <tiki100.h>
+#include <arch/tiki100.h>
 #endif
 
 
@@ -44,9 +44,12 @@ extern void __LIB__ putsprite_callee(int ortype, int x, int y, void *sprite) __s
 /* Joystick (or whatever game device) control function */
 extern unsigned int __LIB__  joystick(int game_device) __z88dk_fastcall;
 
+
+/* Order fo rbelow is right, left, down, up, fire, fire2, fire3, fire4 */
 /* Internal keyboard joysticks that use inkey driver */
 extern uint8_t __LIB__ joystick_sc(int *scan_codes) __z88dk_fastcall;
-extern uint8_t __LIB__ kjoystick(uint8_t keycodes) __z88dk_fastcall;
+/* Takes an array of ascii codes to check for joystick (0 terminated) */
+extern uint8_t __LIB__ kjoystick(uint8_t *keycodes) __z88dk_fastcall;
 
 #define MOVE_RIGHT 1
 #define MOVE_LEFT  2
@@ -70,9 +73,9 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __CPC__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "QAOP-MN"};
+	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "Cursor", "hjkl-sd"};
 #endif
-	#define GAME_DEVICES 3
+	#define GAME_DEVICES 5
 #endif
 
 #ifdef __ENTERPRISE__
@@ -84,15 +87,14 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __TVC__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1/internal", "Joystick 2"};
+	const unsigned char *joystick_type[] = { "Joystick 1/internal", "Joystick 2a, §"};
 #endif
 	#define GAME_DEVICES 2
 #endif
 
-
 #ifdef __GAL__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Arrows and SPACE", "5678-0"};
+	const unsigned char *joystick_type[] = {"Arrows and SPACE", "QAOP-MN"};
 #endif
 	#define GAME_DEVICES 2
 #endif
@@ -200,6 +202,13 @@ extern const unsigned char *joystick_type[];
 #ifdef __OSCA__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = { "Cursor", "Joystick"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
+#ifdef __PACMAN__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
 #endif
 	#define GAME_DEVICES 2
 #endif
@@ -447,11 +456,25 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 1
 #endif
 
+#ifdef __Z1013__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN", "8246-05"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
 #ifdef __Z9001__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN"};
 #endif
-	#define GAME_DEVICES 2
+	#define GAME_DEVICES 3
+#endif
+
+#ifdef __NABUPC__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN", "8246-05"};
+#endif
+	#define GAME_DEVICES 4
 #endif
 
 #ifdef __GL__

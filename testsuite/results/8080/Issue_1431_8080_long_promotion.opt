@@ -25,8 +25,8 @@
 	add	hl,bc
 	jp	nc,ASMPC+4
 	inc	de
-	ld	c,l
 	ld	b,h
+	ld	c,l
 	ld	hl,0
 	ex	(sp),hl
 	ld	a,h
@@ -37,11 +37,12 @@
 	ex	(sp),hl
 .i_3
 	push	hl
-	ld	l,c
 	ld	h,b
+	ld	l,c
 	call	l_long_add
 	ld	(_points),hl
 	ret
+
 
 
 

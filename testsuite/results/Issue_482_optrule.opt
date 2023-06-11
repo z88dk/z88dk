@@ -41,9 +41,7 @@
 	sbc	hl,de
 	pop	de
 	call	l_pint
-	ld	hl,7	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint7sp	;
 	inc	sp
 	ret
 
@@ -68,19 +66,18 @@
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
-	ld	hl,2	;const
-	add	hl,sp
-	call	l_gint
+	push	de
+	call	l_gint4sp	;
+	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
 	pop	de
 	call	l_pint
-	ld	hl,8	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint8sp	;
 	pop	bc
 	ret
+
 
 
 

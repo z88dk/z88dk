@@ -8,7 +8,7 @@
 ; Library #6 by Stefano Bodrato
 ;
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
+IF !__CPU_GBZ80__ 
           SECTION    code_clib
           PUBLIC     bit_fx6
           PUBLIC     _bit_fx6
@@ -23,7 +23,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           EXTERN     bit_synth_sub    ; entry
           EXTERN     bit_synth_len    ; sound duration
 		  ; FR*_tick should hold the XOR instruction.
-		  ; FR*_tick+1 should be set to 0 or to sndbit_mask
+		  ; FR*_tick+1 should be set to 0 or to SOUND_ONEBIT_mask
           EXTERN     FR1_tick
           EXTERN     FR2_tick
           EXTERN     FR3_tick
@@ -41,7 +41,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 ._bit_fx6
 		
 		; Initialize the synthetizer
-		ld	a,sndbit_mask
+		ld	a,SOUND_ONEBIT_mask
 		ld	(FR_1+1),a
 		ld	(FR_2+1),a
 		ld	(FR_3+1),a
@@ -116,8 +116,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 		  ld    (FR_4+1),a
 
 		  ld    a,b
+IF __CPU_INTEL__
+    rrca
+    rrca
+    and     @00111111
+ELSE
 		  srl   a
 		  srl   a
+ENDIF
 		  inc   a
   		  ld    (bit_synth_len+1),a
 

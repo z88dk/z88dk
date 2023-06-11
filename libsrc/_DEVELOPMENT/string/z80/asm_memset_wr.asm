@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Feb 2021
+; Feb 2021 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; void *memset_wr(void *s, int c, size_t n)
@@ -36,22 +36,25 @@ asm_memset_wr:
    or c
 
    ld a,e
-   ld e,l
-   ld d,h
+   ld de,hl
 
-   ret z
+   ret Z
 
    push hl
-   ld   e,a
-loop:
-   ld (hl),e
-   inc hl
+
    dec bc
-   ld  a,b
-   or  c
-   jr  nz,loop
+   inc b
+   inc c
+
+loop:
+   ld (hl+),a
+
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
    ex  de,hl
    pop hl
    ret
-
 

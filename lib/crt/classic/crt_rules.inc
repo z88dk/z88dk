@@ -1,6 +1,7 @@
 
 ; Rules for setting up defaults for configuring the build
 
+   INCLUDE "crt/classic/crt_defaults.inc"
 
    IFNDEF CRT_INITIALIZE_BSS
       defc CRT_INITIALIZE_BSS = 1
@@ -21,7 +22,7 @@
    ENDIF
 
    IFNDEF TAR__crt_enable_rst
-       defc TAR__crt_enable_rst = 0x0000
+       defc TAR__crt_enable_rst = DEF__crt_enable_rst
    ENDIF
 
    IFDEF CRT_ENABLE_RST
@@ -38,6 +39,42 @@
      ENDIF
      defc __crt_enable_nmi = TAR__crt_enable_nmi
    ENDIF
+
+   IFDEF CRT_ENABLE_RESTART
+      defc __crt_enable_restart = CRT_ENABLE_RESTART
+   ELSE
+      IFDEF TAR__crt_enable_restart
+         defc __crt_enable_restart = TAR__crt_enable_restart
+      ELSE
+         defc __crt_enable_restart = DEF__crt_enable_restart
+      ENDIF
+   ENDIF
+
+  IF __crt_enable_restart
+      defc __crt_on_exit = 0x10008
+   ELSE
+      IFDEF CRT_ON_EXIT
+         defc __crt_on_exit = CRT_ON_EXIT
+      ELSE
+         IFDEF TAR__crt_on_exit
+            defc __crt_on_exit = TAR__crt_on_exit
+         ELSE
+            defc __crt_on_exit = DEF__crt_on_exit
+         ENDIF
+      ENDIF
+  ENDIF
+
+
+   IFDEF CRT_ENABLE_EIDI
+      defc __crt_enable_eidi = CRT_ENABLE_EIDI
+   ELSE
+      IFDEF TAR__crt_enable_eidi
+         defc __crt_enable_eidi = TAR__crt_enable_eidi
+      ELSE
+         defc __crt_enable_eidi = DEF__crt_enable_eidi
+      ENDIF
+   ENDIF
+
 
    ; By default we want to have stdio working for us
    IFNDEF CRT_ENABLE_STDIO
@@ -61,7 +98,7 @@
       IFDEF TAR__clib_banking_stack_size
          defc CLIB_BANKING_STACK_SIZE = TAR__clib_banking_stack_size
       ELSE
-         defc CLIB_BANKING_STACK_SIZE = 100
+         defc CLIB_BANKING_STACK_SIZE = DEF__clib_banking_stack_size
       ENDIF
    ENDIF
 
@@ -110,6 +147,15 @@
      defc __CLIB_FGETC_CONS_DELAY = 50
    ENDIF
 
+   ; Delay when kbhit/getch() returns a cached key press
+   ; Delaying slightly means that typing is possible
+   PUBLIC __CLIB_KBHIT_DELAY
+   IFDEF CLIB_KBHIT_DELAY
+     defc __CLIB_KBHIT_DELAY = CLIB_KBHIT_DELAY
+   ELSE
+     defc __CLIB_KBHIT_DELAY = 0
+   ENDIF
+
    ; Some ports (looking at you tiki100) need to have graphics routines stored out
    ; of paging harm. Normally we'd just use code_driver and keep the routines close
    ; the start of the address space. However for tiki100, we need them at the end,
@@ -133,7 +179,7 @@
    ; eg native = 40columns, CP/M = 80 columns. These should be explicitly defined
    ; if needed. So default to an unused value if not
    PUBLIC CLIB_DEFAULT_SCREEN_MODE
-   IF !DEFINED_CLIB_DEFAULT_SCREEN_MODE
+   IFNDEF CLIB_DEFAULT_SCREEN_MODE
        defc CLIB_DEFAULT_SCREEN_MODE = 0
    ENDIF
 
@@ -185,6 +231,20 @@
    ENDIF
    PUBLIC  __RND_BLOCKSIZE
    defc    __RND_BLOCKSIZE = CLIB_RND_BLOCKSIZE
+
+   ; Define the height of the font
+   IF !DEFINED_CLIB_FONT_HEIGHT
+      defc CLIB_FONT_HEIGHT = 8
+   ENDIF
+   PUBLIC __CLIB_FONT_HEIGHT
+   defc __CLIB_FONT_HEIGHT = CLIB_FONT_HEIGHT
+
+   ; Firmware click setting (MSX/SVI)
+   IF !DEFINED_CLIB_FIRMWARE_KEYBOARD_CLICK
+      defc CLIB_FIRMWARE_KEYBOARD_CLICK = -1
+   ENDIF
+   PUBLIC __CLIB_FIRMWARE_KEYBOARD_CLICK
+   defc __CLIB_FIRMWARE_KEYBOARD_CLICK = CLIB_FIRMWARE_KEYBOARD_CLICK
 
    ; Custom memory map
    IF DEFINED_MMAP

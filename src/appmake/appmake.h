@@ -35,8 +35,9 @@ extern char c_install_dir[];
 
 /* Conversion routines */
 
+typedef void (*option_cb)(char *param);
 #define OPT_BASE_MASK 127
-typedef enum { OPT_NONE, OPT_BOOL, OPT_INT, OPT_STR, OPT_INPUT=128, OPT_OUTPUT=256 } type_t;
+typedef enum { OPT_NONE, OPT_BOOL, OPT_INT, OPT_STR, OPT_FUNCTION, OPT_INPUT=128, OPT_OUTPUT=256 } type_t;
 
 #ifndef WIN32
 enum { FALSE = 0, TRUE };
@@ -67,6 +68,9 @@ extern option_t  abc80_options;
 
 extern int       acetap_exec(char *target);
 extern option_t  acetap_options;
+
+extern int       adam_exec(char *target);
+extern option_t  adam_options;
 
 extern int       aquarius_exec(char *target);
 extern option_t  aquarius_options;
@@ -221,6 +225,9 @@ extern option_t  sc3000_options;
 extern int       sms_exec(char *target);
 extern option_t  sms_options;
 
+extern int       sol20_exec(char *target);
+extern option_t  sol20_options;
+
 extern int       spc1000_exec(char *target);
 extern option_t  spc1000_options;
 
@@ -262,6 +269,9 @@ extern option_t  kc_options;
 extern int       z88_exec(char *target);
 extern option_t  z88_options;
 
+extern int       z88elf_exec(char *target);
+extern option_t  z88elf_options;
+
 extern int       z88shell_exec(char *target);
 extern option_t  z88shell_options;
 
@@ -280,6 +290,8 @@ extern option_t  zx81_options;
 extern int       tvc_exec(char *target);
 extern option_t  tvc_options;
 
+extern int       primo_exec(char *target);
+extern option_t  primo_options;
 
 
 struct {
@@ -299,6 +311,10 @@ struct {
       "Generates a .TAP for the Ace32 emulator, optional WAV file",
       NULL,
       acetap_exec,   &acetap_options },
+    { "bin2dpp",  "adam",    "(C) 2021 z88dk",
+      "Generates a .DDP for ADAM machines",
+      NULL,
+      adam_exec,   &adam_options },
     { "bin2caq",  "aquarius", "(C) 2001 Stefano Bodrato",
       "Creates a BASIC loader file and binary stored in variable array format",
       NULL,
@@ -364,7 +380,7 @@ struct {
       inject_longhelp,
       inject_exec,     &inject_options },
     { "kcc",      "kc",          "(C) 2016 Stefano Bodrato",
-      "Prapares a .KCC file for the Robotron KC85/2..KC85/4",
+      "Prapares a .KCC file for the VEB MPM KC85/2..KC85/4",
       NULL,
       kc_exec,       &kc_options },
     { "laser2cas", "laser500",     "(C) 2010-2018 Stefano Bodrato",
@@ -491,6 +507,10 @@ struct {
       "Create a SMC-777 bootable d88 disc",
       NULL,
       smc777_exec,    &smc777_options },
+    { "bin2ent",  "sol20",   "(C) 2021 z88dk",
+      "Create a Sol20 ENT file",
+      NULL,
+      sol20_exec,    &sol20_options },
     { "sentinel",  "sos",       "(C) 2013 Stefano Bodrato",
       "Add a header for S-OS (The Sentinel)",
       NULL,
@@ -547,6 +567,10 @@ struct {
       "Generate TVC .cas file from the linked binary",
       NULL,
       tvc_exec,   &tvc_options },
+    { "bin2pri",   "primo",      "(C) 2022 Sandor Vass",
+      "Generate Primo .pri/.ptp file from the linked binary",
+      NULL,
+      primo_exec,   &primo_options },
     { "bin2fdd",  "vector06c", "(C) 2020 z88dk",
       "Create a bootable vector06c disk",
       NULL,
@@ -575,6 +599,10 @@ struct {
       "Generates .63 and .62 files suitable for burning to EPROM",
       NULL,
       z88_exec,     &z88_options },
+    { "appelf",     "z88elf",      "(C) 2021 z88dk",
+      "Generates an elf file for the z88 OZ5 shell",
+      NULL,
+      z88elf_exec,     &z88elf_options },
     { "shellmak",   "z88shell", "(C) 2002,2003 Dominic Morris",   
       "Patches the header to ensure that the program is recognised by the shell",
       NULL,
@@ -723,7 +751,7 @@ struct aligned_data
 };
 
 extern void mb_create_bankspace(struct banked_memory *memory, char *bank_id);
-extern void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory, struct aligned_data *aligned);
+extern void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *memory, struct aligned_data *aligned);
 extern int  mb_find_bankspace(struct banked_memory *memory, char *bankspace_name);
 extern int  mb_remove_bankspace(struct banked_memory *memory, char *bankspace_name);
 extern int  mb_remove_bank(struct bank_space *bs, unsigned int index, int clean);
@@ -739,6 +767,7 @@ extern void mb_generate_output_binary_complete(char *binname, int ihex, int fill
 extern void mb_delete_source_binaries(struct banked_memory *memory);
 extern void mb_cleanup_memory(struct banked_memory *memory);
 extern void mb_cleanup_aligned(struct aligned_data *aligned);
+extern int mb_print_info(struct banked_memory *memory);
 
 
 /* mgt.c */
@@ -763,3 +792,10 @@ typedef enum {
 } mgt_filetype;
 extern disc_handle *mgt_create(void);
 extern void mgt_writefile(disc_handle *h, char mgt_filename[11], mgt_filetype filetype, int org, int isexec, unsigned char *data, size_t len);
+
+
+
+/* lz49.c */
+extern unsigned char *LZ49_encode(unsigned char *data, int length, int *retlength);
+extern void LZ49_decode(unsigned char *data, unsigned char *odata);
+

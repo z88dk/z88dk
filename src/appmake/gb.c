@@ -76,9 +76,9 @@ int gb_exec(char *target)
 
     // gather header info
     if (crtfile != NULL) {
-        if ((i = parameter_search(crtfile, ".sym", "GB_MBC_TYPE")) >= 0)
+        if ((i = parameter_search(crtfile, ".map", "GB_MBC_TYPE")) >= 0)
             mbc_type = i;
-        if ((i = parameter_search(crtfile, ".sym", "GB_RAM_BANKS")) >= 0)
+        if ((i = parameter_search(crtfile, ".map", "GB_RAM_BANKS")) >= 0)
             ram_banks = i;
     }
 

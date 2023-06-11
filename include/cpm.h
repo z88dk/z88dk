@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.16 2016-11-03 09:25:26 stefano Exp $
+ *    $Id: cpm.h $
  */
 
 #include <sys/compiler.h>
@@ -76,21 +76,47 @@ struct fcb {
 };
 
 struct sfcb {
-    uint8_t    drive;          /* drive code */
+    uint8_t    drive;       /* drive code */
     char    name[8];        /* file name */
     char    ext[3];         /* file type */
-    uint8_t    pwdmode;        /* Password mode (0=no pwd): bit 7-Read, bit 6-Write, bit 4-Delete */
-    char    filler[10];     /* not used */
-	int 	c_date;			/* Create or Access date/time (depends on settings) */
-	uint8_t	c_hours;
-	uint8_t	c_minutes;
-	int 	date;			/* Update date/time (days since January 1, 1978) */
-	uint8_t	hours;
-	uint8_t	minutes;
+    uint8_t    pwdmode;     /* Password mode (0=no pwd): bit 7-Read, bit 6-Write, bit 4-Delete */
+    char    filler[11];     /* not used */
+    int 	c_date;			/* Create or Access date/time (depends on settings) */
+    uint8_t	c_hours;        /* Hours and minutes are encoded as BCD */
+    uint8_t	c_minutes;
+    int 	date;			/* Update date/time (days since January 1, 1978) */
+    uint8_t	hours;
+    uint8_t	minutes;
 };
 
 
 extern struct fcb  _fcb[0];	// Has MAXFILES entries
+
+
+/* DPB and DPH related functions will probably work on CP/M v2 only.
+   block size, basing on BSH and BLM
+                 1,024     3       7
+                 2,048     4      15
+                 4,096     5      31
+                 8,192     6      63
+                16,384     7     127
+*/
+
+struct dpb {
+    int 	SPT;			/* "Sectors Per Track", total number of 128 bytes sectors per track */
+    uint8_t BSH;            /* "Block Shift Factor", number of 128 bytes sectors per "Allocation Block" */
+    uint8_t BLM;            /* "Block Mask", the values of BSH and BLM implicitly determine the data allocation size */
+    uint8_t EXM;            /* "Extent Mask", number of extents per directory entry */
+    int     DSM;            /* "Total storage capacity" of the disk drive (Number of the last Allocation Block) */
+    int     DRM;            /* "Total # of directory entries" (-1) */
+    uint8_t AL0;            /* Allocation table (MSB) */
+    uint8_t AL1;            /* Allocation table (LSB) */
+    int 	CKS;			/* "Check area Size", number of directory entries to check for disk change. */
+    uint8_t OFF;            /* "Offset", number of system reserved tracks at the beginning of the disk */
+};
+
+
+extern struct dpb __LIB__  *get_dpb(int drive)  __z88dk_fastcall;
 
 
 /* BDOS calls */
@@ -129,7 +155,57 @@ extern struct fcb  _fcb[0];	// Has MAXFILES entries
 
 /* The CPM bdos call */
 extern int __LIB__ bdos(int func,int arg) __smallc;
+extern int __LIB__ bdos_callee(int func,int arg) __smallc __z88dk_callee;
+#define bdos(a,b)   bdos_callee(a,b)
+/* As above, but on exit it passes HW error code ob MSB and error code on LSB */
+extern int __LIB__ bdosh(int func,int arg) __smallc;
+extern int __LIB__ bdosh_callee(int func,int arg) __smallc __z88dk_callee;
+#define bdosh(a,b)   bdosh_callee(a,b)
+
+
+/* Known CPM BIOS functions */
+
+#define BIOS_BOOT       0     //  Cold start routine
+#define BIOS_WBOOT      1     //  Warm boot - reload command processor
+#define BIOS_CONST      2     //  Console status
+#define BIOS_CONIN      3     //  Console input
+#define BIOS_CONOUT     4     //  Console output
+#define BIOS_LIST       5     //  Printer output
+#define BIOS_PUNCH      6     //  Paper tape punch output
+#define BIOS_JMP        7     //  Paper tape reader input
+#define BIOS_HOME       8     //  Move disc head to track 0
+#define BIOS_SELDSK     9     //  Select disc drive
+#define BIOS_SETTRK    10     //  Set track number
+#define BIOS_SETSEC    11     //  Set sector number
+#define BIOS_SETDMA    12     //  Set DMA address
+#define BIOS_READ      13     //  Read a sector
+#define BIOS_WRITE     14     //  Write a sector
+
+// CP/M 2 and later
+#define BIOS_LISTST    15     //  Status of list device
+#define BIOS_SECTRAN   16     //  Sector translation for skewing
+
+// CP/M 3
+#define BIOS_CONOST    17     //  Status of console output
+#define BIOS_AUXIST    18     //  Status of auxiliary input
+#define BIOS_AUXOST    19     //  Status of auxiliary output
+#define BIOS_DEVTBL    20     //  Address of devices table
+#define BIOS_DEVINI    21     //  Initialise a device
+#define BIOS_DRVTBL    22     //  Address of discs table
+#define BIOS_MULTIO    23     //  Read/write multiple sectors
+#define BIOS_FLUSH     24     //  Flush host buffers
+#define BIOS_MOVE      25     //  Move a block of memory
+#define BIOS_TIME      26     //  Real time clock
+#define BIOS_SELMEM    27     //  Select memory bank
+#define BIOS_SETBNK    28     //  Select bank for DMA operation
+#define BIOS_XMOVE     29     //  Preload banks for MOVE
+#define BIOS_USERF     30     //  System-depedent functions
+
+
+/* Executes the BIOS function (1-85) passing BC and DE as arguments, error status in A on exit */
 extern int __LIB__ bios(int func,int arg,int arg2) __smallc;
+/* Executes the BIOS function (1-85) passing BC and DE as arguments, gets the result value from HL on exit */
+extern int __LIB__ biosh(int func,int arg,int arg2) __smallc;
 
 
 /* Get a free FCB */
@@ -141,8 +217,8 @@ extern int __LIB__ cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int f
 extern int __LIB__ cpm_cache_flush(struct fcb *fcb);
 
 /* Fill up the filename stuff */
-extern int __LIB__ setfcb(struct fcb *fc, unsigned char *name) __smallc;
-extern void __LIB__ parsefcb(struct fcb *fc, unsigned char *name) __smallc;
+extern int __LIB__ setfcb(struct fcb *fc, char *name) __smallc;
+extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
 /* Write the file offset into the FCB */
 extern void __LIB__ putoffset(char *dest, long val) __smallc;
 
@@ -169,14 +245,14 @@ extern char __LIB__ *fc_dirbuf;
 
 /* Disk control (as for OSCA FLOS) */
 extern int __LIB__  change_volume(int volume);
-extern int __LIB__ get_current_volume();   // Current 'drive' (0..n)
+extern int __LIB__ get_current_volume(void);   // Current 'drive' (0..n)
 /* Directory related commands (as for OSCA FLOS) */
-extern int __LIB__ dir_move_first();
-extern int __LIB__ dir_move_next();
-extern int __LIB__ dir_get_entry_type();  // 0=normal, 1=directory
-extern char __LIB__ *dir_get_entry_name();
-extern unsigned long __LIB__ dir_get_entry_size();
-extern int __LIB__ get_dir_name();
+extern int __LIB__ dir_move_first(void);
+extern int __LIB__ dir_move_next(void);
+extern int __LIB__ dir_get_entry_type(void);  // 0=normal, 1=directory
+extern char __LIB__ *dir_get_entry_name(void);
+extern unsigned long __LIB__ dir_get_entry_size(void);
+extern int __LIB__ get_dir_name(void);
 
 
 /********************************/
@@ -199,7 +275,7 @@ extern int __LIB__ a_curx();
 extern int __LIB__ a_cury();
 
 /* Get Machine */
-extern int __LIB__ a_machine();
+extern int __LIB__ a_machine(void);
 #define M_CPC        0    // CPC6128
 #define M_PCW        1    // PCW8000/9000/10 series
 #define M_SPECTRUM   3    // Spectrum +3

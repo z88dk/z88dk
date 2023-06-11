@@ -94,7 +94,7 @@ z80start:
 	ld	a,$87	; Display addres at $2000...
 	out	(c),a	; ...and alternate (upper+lowercase) char set
 
-;	ld	a,11		;dark grey
+;	ld	a,15		;light grey
 	xor	a	; black
 	ld	bc,$d020
 	out	(c),a	;border
@@ -105,11 +105,11 @@ z80start:
 	ld sp,$FBFF
 ;        ld      hl,0
 ;        add     hl,sp
-        ld      (start1+1),hl
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    ld      (__restore_sp_onexit+1),hl
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
+    call	crt0_init_bss
+    ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -140,7 +140,7 @@ cleanup:
 	;xor	a
 	;out	(c),a	; back to slow speed clock
 
-start1:
+__restore_sp_onexit:
         ld  sp,0
         jp  $FFE0
 

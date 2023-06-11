@@ -1,7 +1,7 @@
 /*
- *	CP/M disc generator
+ *   CP/M disc generator
  *
- *      $Id: cpm2.c $
+ *   $Id: cpm2.c $
  */
 
 #include "appmake.h"
@@ -15,11 +15,15 @@ static char             *c_output_file      = NULL;
 static char             *c_boot_filename     = NULL;
 static char             *c_disc_container    = "dsk";
 static char             *c_extension         = NULL;
+static char            **c_additional_files  = NULL;
+static int               c_additional_files_num = 0;
 
 static char              c_force_com_extension   = 0;
 static char              c_disable_com_file_creation = 0;
 static char              help         = 0;
 
+
+static void c_add_file(char *option);
 
 /* Options that are available for this module */
 option_t cpm2_options[] = {
@@ -33,6 +37,10 @@ option_t cpm2_options[] = {
     {  0,  "extension", "Extension for the output file", OPT_STR, &c_extension},
     {  0,  "force-com-ext", "Always force COM extension", OPT_BOOL, &c_force_com_extension},
     {  0,  "no-com-file", "Don't create a separate .com file", OPT_BOOL, &c_disable_com_file_creation },
+                              /* ISO C does not require that a void pointer can be cast to a function pointer
+                                 (and vice versa), but conforming compilers are required to warn you about it.
+                                 If this is your case, you can probably ignore the warning. */
+    { 'a', "add-file", "Add additional files [hostfile:cpmfile] or [hostfile]", OPT_FUNCTION, (void *)c_add_file },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -55,8 +63,46 @@ static disc_spec einstein_spec = {
 };
 
 
+static disc_spec actrix_spec = {
+    .name = "Actrix",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0x55,
+    .boottracks = 2,
+    .directory_entries = 32,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 6, 1, 4, 7, 2, 5, 8 }
+};
+
+
+static disc_spec ampro_spec = {
+    .name = "Ampro",
+    .disk_mode = MFM300,	
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 17,
+    .alternate_sides = 1,
+};
+
+
 static disc_spec attache_spec = {
     .name = "Attache",
+    .disk_mode = MFM300,	
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 2,
@@ -71,8 +117,12 @@ static disc_spec attache_spec = {
 };
 
 
+// SSSD osborne 1 disks, see section 7.7 of the Osborne 1 technical manual
+// http://dunfield.classiccmp.org/osborne/o1techm.pdf
+
 static disc_spec osborne_spec = {
-    .name = "Osborne",
+    .name = "Osborne_DD",
+    .disk_mode = MFM300,
     .sectors_per_track = 5,
     .tracks = 40,
     .sides = 1,
@@ -86,9 +136,28 @@ static disc_spec osborne_spec = {
     .first_sector_offset = 1,
 };
 
+static disc_spec osborne_sd_spec = {
+    .name = "Osborne_SD",
+    .disk_mode = FM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 }
+};
+
 
 static disc_spec dmv_spec = {
-    .name = "NEC DMV",
+    .name = "NCR DMV",
+    .disk_mode = MFM300,
     .sectors_per_track = 8,
     .tracks = 40,
     .sides = 2,
@@ -172,6 +241,123 @@ static disc_spec microbee_spec = {
     .skew_tab = { 1, 4, 7, 0, 3, 6, 9, 2, 5, 8 }
 };
 
+
+static disc_spec md2_spec = {
+    .name = "Morrow_MD2",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 1, 4, 2 }
+};
+
+// Tested on ampro emulator, works also in MFM300 mode
+static disc_spec md3_spec = {
+    .name = "Morrow_MD3",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 1, 4, 2 }
+};
+
+
+static disc_spec mbc1000_spec = {
+    .name = "MBC-1000",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,3,6,9,12,15,2,5,8,11,14,1,4,7,10,13 }
+};
+
+
+static disc_spec altos5_spec = {
+    .name = "Altos5",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 177,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1
+};
+
+
+static disc_spec mbc1200_spec = {
+    .name = "MBC-1200",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,3,6,9,12,15,2,5,8,11,14,1,4,7,10,13 }
+};
+
+  
+static disc_spec mbc2000_spec = {
+    .name = "MBC-2000",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,5,10,15,4,9,14,3,8,13,2,7,12,1,6,11 }
+};
+
 // Unverified gap size
 static disc_spec bondwell12_spec = {
     .name = "Bondwell12",
@@ -207,6 +393,7 @@ static disc_spec bondwell2_spec = {
 
 static disc_spec kayproii_spec = {
     .name = "KayproII",
+    .disk_mode = MFM300,
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 1,
@@ -238,8 +425,9 @@ static disc_spec mz2500cpm_spec = {
 };
 
 
-static disc_spec ts803_spec = {
-    .name = "TS803",
+static disc_spec televideo_spec = {
+    .name = "Televideo",
+    .disk_mode = MFM250,
     .sectors_per_track = 18,
     .tracks = 40,
     .sides = 2,
@@ -257,6 +445,7 @@ static disc_spec ts803_spec = {
 
 static disc_spec nascom_spec = {
     .name = "Nascom",
+    .disk_mode = MFM300,
     .sectors_per_track = 10,
     .tracks = 77,
     .sides = 2,
@@ -266,7 +455,7 @@ static disc_spec nascom_spec = {
     .boottracks = 2,
     .directory_entries = 128,
     .extent_size = 2048,
-    .byte_size_extents = 1,
+    .byte_size_extents = 0,
     .first_sector_offset = 1,
 };
 
@@ -288,7 +477,7 @@ static disc_spec qc10_spec = {
 };
 
 
-static disc_spec tiki100_spec = {
+static disc_spec tiki100_ss_spec = {
     .name = "Tiki100",
     .sectors_per_track = 10,
     .tracks = 40,
@@ -301,6 +490,116 @@ static disc_spec tiki100_spec = {
     .extent_size = 1024,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
+};
+
+
+static disc_spec tiki100_ds_spec = {
+    .name = "Tiki100",
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x3e,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+};
+
+
+// TRS80 Model I Omikron Mapper CP/M
+static disc_spec omikron_spec = {
+    .name = "Omikron",
+    .disk_mode = FM250,
+    .sectors_per_track = 18,
+    .tracks = 35,
+    .sides = 1,
+    .sector_size = 128,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 4, 8, 12, 16, 2, 6, 10, 14, 1, 5, 9, 13, 17, 3, 7, 11, 15 }
+};
+
+// TRS80 Model II Lifeboat CP/M
+static disc_spec lifeboat_spec = {
+    .name = "Lifeboat",
+    .disk_mode = MFM500,
+    .sectors_per_track = 8,
+    .tracks = 77,
+    .sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 3, 6, 1, 4, 7, 2, 5 }
+};
+
+// TRS80 Model II FMG CP/M
+static disc_spec fmgcpm_spec = {
+    .name = "TRS80IIFMG",
+    .disk_mode = MFM500,
+    .sectors_per_track = 26,
+    .tracks = 77,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+// TRS80 Model II Pickles & Trout. CP/M
+static disc_spec ptcpm_spec = {
+    .name = "Pickles&Trout",
+    .disk_mode = MFM500,
+    .sectors_per_track = 16,
+    .tracks = 77,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+};
+
+// TRS80 Model 4 Montezuma CP/M
+static disc_spec montezuma_spec = {
+    .name = "Montezuma",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 10, 12, 14, 16, 1, 3, 5, 7, 9, 11, 13, 15, 17 }
 };
 
 
@@ -322,6 +621,7 @@ static disc_spec svi40ss_spec = {
 
 static disc_spec col1_spec = {
     .name = "ColAdam",
+    .disk_mode = MFM300,
     .sectors_per_track = 8,
     .tracks = 40,
     .sides = 1,
@@ -392,8 +692,30 @@ static disc_spec bic_spec = {
 };
 
 
+// 8" floppy disk on Xerox 820 or Ferguson BigBoard
+static disc_spec bigboard_spec = {
+    .name = "Z80pack",
+    .disk_mode = FM500,
+    .sectors_per_track = 26,
+    .tracks = 77,
+    .sides = 1,
+    .sector_size = 128,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .alternate_sides = 0,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0x00, 0x06, 0x0C, 0x12, 0x18, 0x04, 0x0A, 0x10, 0x16, 0x02, 0x08, 0x0E, 0x14, 0x01, 0x07, 0x0d, 0x13, 0x19, 0x05, 0x0b, 0x11, 0x17, 0x03, 0x09, 0x0f, 0x15 }
+};
+
+
 static disc_spec excali_spec = {
     .name = "Excalibur64",
+    .disk_mode = MFM300,
     .sectors_per_track = 5,
     .tracks = 80,
     .sides = 2,
@@ -411,8 +733,26 @@ static disc_spec excali_spec = {
 };
 
 
+static disc_spec gemini_spec = {
+    .name = "Gemini",
+    .sectors_per_track = 10,
+    .tracks = 35,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .alternate_sides = 1,
+};
+
+
 static disc_spec lynx_spec = {
     .name = "CampLynx",
+    .disk_mode = FM500,           // possibly wrong information gathered online, IMD format is UNTESTED
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 1,
@@ -443,6 +783,24 @@ static disc_spec rc700_spec = {
     .first_sector_offset = 0,
     .has_skew = 1,
     .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
+};
+
+
+static disc_spec alphatro_spec = {
+    .name = "Alphatronic PC",
+    .disk_mode = MFM300,           // 300 kbps MFM, visible only when using the IMD format
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
 };
 
 
@@ -497,6 +855,22 @@ static disc_spec vector06c_spec = {
 };
 
 
+static disc_spec v1050_spec = {
+    .name = "Visual1050",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
 static disc_spec z80pack_spec = {
     .name = "Z80pack",
     .sectors_per_track = 26,
@@ -515,7 +889,144 @@ static disc_spec z80pack_spec = {
     .skew_tab = { 0x00, 0x06, 0x0C, 0x12, 0x18, 0x04, 0x0A, 0x10, 0x16, 0x02, 0x08, 0x0E, 0x14, 0x01, 0x07, 0x0d, 0x13, 0x19, 0x05, 0x0b, 0x11, 0x17, 0x03, 0x09, 0x0f, 0x15 }
 };
 
+// CAOS, NANOS, Z1013 CP/M
+static disc_spec caos_spec = {
+    .name = "CAOS",
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .alternate_sides = 1,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+};
 
+static disc_spec corvette_spec = {
+     .name = "Corvette",
+     .sectors_per_track = 5,
+     .tracks = 80,
+     .sides = 2,
+     .sector_size = 1024,
+     .gap3_length = 0x2a,   //?
+     .filler_byte = 0xe5,
+     .boottracks = 1,
+     .directory_entries = 128,
+     .alternate_sides = 1,
+     .extent_size = 2048,
+     .byte_size_extents = 0,  //?
+     .first_sector_offset = 1,
+};
+
+static disc_spec corvetteBOOT_spec = {
+     .name = "Corvette-boot",
+     .sectors_per_track = 5,
+     .tracks = 80,
+     .sides = 2,
+     .sector_size = 1024,
+     .gap3_length = 0x2a,   //?
+     .filler_byte = 0xe5,
+     .boottracks = 2,
+     .directory_entries = 128,
+     .alternate_sides = 1,
+     .extent_size = 2048,
+     .byte_size_extents = 0,  //?
+     .first_sector_offset = 1,
+};
+
+
+static disc_spec nabupc_spec = {
+     .name = "Nabu PC",
+     .sectors_per_track = 5,
+     .tracks = 40,
+     .sides = 1,
+     .sector_size = 1024,
+     .gap3_length = 0x2a,   //?
+     .filler_byte = 0xe5,
+     .boottracks = 1,
+     .directory_entries = 96,
+     .alternate_sides = 0,
+     .extent_size = 1024,
+     .byte_size_extents = 1, 
+     .first_sector_offset = 0,
+     .has_skew = 1,
+     .skew_track_start = 2,
+     .skew_tab = { 0, 2, 4, 1, 3 }
+};
+
+static disc_spec naburn_spec = {
+     .name = "Nabu PC",
+     .sectors_per_track = 4,
+     .tracks = 16384,
+     .sides = 1,
+     .sector_size = 128,
+     .gap3_length = 0x2a,   //?
+     .filler_byte = 0xe5,
+     .boottracks = 0,
+     .directory_entries = 512,
+     .alternate_sides = 0,
+     .extent_size = 4096,
+     .byte_size_extents = 0, 
+     .first_sector_offset = 0,
+     .has_skew = 0,
+};
+
+static disc_spec idpfdd_spec = {
+      .name = "Iskra Delta Partner FDD",
+      .sectors_per_track = 18,
+      .tracks = 73, // 146
+      .sides = 2,
+      .sector_size = 256,
+      .gap3_length = 0x2a, //?
+      .filler_byte = 0xe5,
+      .boottracks = 2,
+      .directory_entries = 128,
+      .alternate_sides = 2,
+      .extent_size = 2048,
+      .byte_size_extents = 0, 
+      .first_sector_offset = 0,
+      .has_skew = 0
+ };
+
+static disc_spec vt180_spec = {
+    .name = "VT-180",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
+};
+
+static disc_spec x820_spec = {
+     .name = "Xerox820",
+     .disk_mode = FM250,
+     .sectors_per_track = 18,
+     .tracks = 40,
+     .sides = 1,
+     .sector_size = 128,
+     .gap3_length = 0x2a,
+     .filler_byte = 0xe5,
+     .boottracks = 3,
+     .directory_entries = 32,
+     .extent_size = 1024,
+     .byte_size_extents = 1,
+     .first_sector_offset = 1,
+     .has_skew = 1,
+     .skew_tab = { 0,5,10,15,2,7,12,17,4,9,14,1,6,11,16,3,8,13 }
+};
 
 
 static struct formats {
@@ -527,22 +1038,40 @@ static struct formats {
      char           force_com_extension;
      void         (*extra_hook)(disc_handle *handle);
 } formats[] = {
+    { "actrix",    "Actrix Access",         &actrix_spec, 0, NULL, 1 },
+    { "alphatro",  "Alphatronic PC",        &alphatro_spec, 0, NULL, 1 },
+    { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
+    { "ampro",     "Ampro 48tpi",           &ampro_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
+    { "bigboard",  "X820/Bigboard, 8in",    &bigboard_spec, 0, NULL, 1 },
     { "bw12",      "Bondwell 12/14",        &bondwell12_spec, 0, NULL, 1 },
     { "bw2",       "Bondwell Model 2",      &bondwell2_spec, 0, NULL, 1 },
+    { "caos",      "CAOS/NANOS/z1013 CP/M", &caos_spec, 0, NULL, 1 },
     { "cpcsystem", "CPC System Disc",       &cpcsystem_spec, 0, NULL, 0 },
     { "col1",      "Coleco ADAM 40T SSDD",  &col1_spec, 0, NULL, 1 },
+    { "corvette",  "Corvette", &corvette_spec, 32,         "\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8c\x01\x7f\x00\xc0\x00\x20\x00\x01\x00\x11", 1 },
+    { "corvboot",  "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
     { "fp1100",    "Casio FP1100",          &fp1100_spec, 0, NULL, 1 },
+    { "gemini",    "GeminiGalaxy",          &gemini_spec, 0, NULL, 1 },
+    { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
+    { "morrow2",   "Morrow MD 2 (SS)",      &md2_spec, 0, NULL, 1 },
+    { "morrow3",   "Morrow MD 3 (DS)",      &md3_spec, 0, NULL, 1 },
+    { "mbc1000",   "Sanyo MBC-1000/1150",   &mbc1000_spec, 0, NULL, 1 },
+    { "mbc1200",   "Sanyo MBC-200/1250",    &mbc1200_spec, 0, NULL, 1 },
+    { "mbc2000",   "Sanyo MBC-2000",        &mbc2000_spec, 0, NULL, 1 },
+    { "naburn",    "Nabu PC (8mb)",         &naburn_spec, 0, NULL, 1 },
+    { "nabupc",    "Nabu PC",               &nabupc_spec, 0, NULL, 1 },
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
-    { "osborne1",  "Osborne 1",             &osborne_spec, 0, NULL, 1 },
+    { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
+    { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
     { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "pcw40",     "Amstrad PCW, 40T",      &pcw40_spec, 16, "\x00\x00\x28\x09\x02\x01\x03\x02\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "plus3",     "Spectrum +3 173k",      &plus3_spec, 0, NULL, 1 },
@@ -550,11 +1079,20 @@ static struct formats {
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
     { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
-    { "svi-40ss",   "SVI 40ss (174k)",      &svi40ss_spec, 0, NULL, 1 },
-    { "tiki100-40t","Tiki 100 (200k)",      &tiki100_spec, 0, NULL, 1 },
-    { "ts803",      "Televideo TS803/TPC1", &ts803_spec, 0, NULL, 1 },
-    { "vector06c",  "Vector 06c",           &vector06c_spec, 0, NULL, 1 },
-    { "z80pack",    "z80pack 8\" format",   &z80pack_spec, 0, NULL, 1 },
+    { "svi-40ss",  "SVI 40ss (174k)",       &svi40ss_spec, 0, NULL, 1 },
+    { "televideo", "Televideo TS80x/TPC1",  &televideo_spec, 0, NULL, 1 },
+    { "tiki100ss", "Tiki 100 (200k)",       &tiki100_ss_spec, 0, NULL, 1 },
+    { "tiki100ds", "Tiki 100 (400k)",       &tiki100_ds_spec, 0, NULL, 1 },
+    { "omikron",   "TRS80 I Omikron",       &omikron_spec, 0, NULL, 1 },
+    { "lifeboat",  "TRS80 II Lifeboat",     &lifeboat_spec, 0, NULL, 1 },
+    { "fmgcpm",    "TRS80 II FMG CP/M",     &fmgcpm_spec, 0, NULL, 1 },
+    { "ptcpm",     "TRS80 II PickelsTrout", &ptcpm_spec, 0, NULL, 1 },
+    { "montezuma", "TRS80 4 Montezuma",     &montezuma_spec, 0, NULL, 1 },
+    { "vector06c", "Vector 06c",            &vector06c_spec, 0, NULL, 1 },
+    { "v1050",     "Visual 1050",           &v1050_spec, 0, NULL, 1 },
+    { "vt180",     "DEC VT-180",            &vt180_spec, 0, NULL, 1 },
+    { "x820",      "Xerox 820",             &x820_spec, 0, NULL, 1 },
+    { "z80pack",   "z80pack 8\" format",    &z80pack_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
 
@@ -575,6 +1113,33 @@ static void dump_formats()
     exit(1);
 }
 
+// Called for each additional file
+static void c_add_file(char *param)
+{
+    char *colon = strchr(param, ':');
+    char  cpm_filename[20];
+    char  filename[FILENAME_MAX+1];
+    int   i;
+
+    if ( colon == NULL ) {
+        // We need to create a CP/M filename from the argument given
+        char *basename;
+
+        basename = zbasename(param);
+        cpm_create_filename(basename, cpm_filename, 0, 0);
+        strcpy(filename, param);
+    } else {
+        snprintf(filename, sizeof(filename),"%.*s", (int)(colon - param), param);
+        snprintf(cpm_filename, sizeof(cpm_filename),"%s",colon+1);
+    }
+
+    i = c_additional_files_num;
+    c_additional_files_num += 2;
+    c_additional_files = realloc(c_additional_files, sizeof(c_additional_files[0]) * c_additional_files_num);
+    c_additional_files[i] = strdup(filename);
+    c_additional_files[i+1] = strdup(cpm_filename);
+}
+
 int cpm2_exec(char* target)
 {
 
@@ -589,8 +1154,10 @@ int cpm2_exec(char* target)
         dump_formats();
         return -1;
     }
+
     return cpm_write_file_to_image(c_disc_format, c_disc_container, c_output_file, c_binary_name, c_crt_filename, c_boot_filename);
 }
+
 
 // TODO: Needs bootsector handling
 disc_handle *cpm_create_with_format(const char *disc_format) 
@@ -609,6 +1176,34 @@ disc_handle *cpm_create_with_format(const char *disc_format)
         return NULL;
     }
     return cpm_create(spec);
+}
+
+static void write_extra_files(disc_handle *h)
+{
+    int     i;
+    void   *filebuf;
+    FILE   *binary_fp;
+    size_t  binlen;
+
+    for ( i = 0; i < c_additional_files_num; i+= 2) {
+        // Open the binary file
+        if ((binary_fp = fopen(c_additional_files[i], "rb")) == NULL) {
+            exit_log(1, "Can't open input file %s\n", c_additional_files[i]);
+        }
+        if (fseek(binary_fp, 0, SEEK_END)) {
+            fclose(binary_fp);
+            exit_log(1, "Couldn't determine size of file: %s\n",c_additional_files[i]);
+        }
+        binlen = ftell(binary_fp);
+        fseek(binary_fp, 0L, SEEK_SET);
+        filebuf = malloc(binlen);
+        if (1 != fread(filebuf, binlen, 1, binary_fp))  { fclose(binary_fp); exit_log(1, "Could not read required data from <%s>\n",c_additional_files[i]); }
+        fclose(binary_fp);
+
+        disc_write_file(h, c_additional_files[i+1], filebuf, binlen);
+        free(filebuf);
+    }
+
 }
 
 
@@ -695,6 +1290,8 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     if ( f->extra_hook ) {
         f->extra_hook(h);
     }
+
+    write_extra_files(h);
     
     if (writer(h, disc_name) < 0) {
         exit_log(1, "Can't write disc image\n");

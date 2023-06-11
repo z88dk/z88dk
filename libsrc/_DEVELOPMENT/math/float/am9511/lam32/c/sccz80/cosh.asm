@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _cosh
-EXTERN cam32_sdcc_dcc_cosh
-defc _cosh = cam32_sdcc_dcc_cosh
+defc _cosh = cam32_sccz80_cosh
 ENDIF
 

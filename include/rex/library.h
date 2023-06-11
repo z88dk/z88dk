@@ -12,6 +12,6 @@
 #pragma -shared-file
 
 
-#define getFuncID() asm("ld\tix,10\nadd\tix,sp\nld\tl,(ix+0)\nld\th,(ix+1)")
+#define getFuncID() __asm__("ld\tix,10\nadd\tix,sp\nld\tl,(ix+0)\nld\th,(ix+1)")
 
 #endif

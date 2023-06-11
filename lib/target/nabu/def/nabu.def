@@ -1,0 +1,31 @@
+
+
+
+defc IO_CONTROL = 0x00
+
+defc CONTROL_ROMSEL    = 0x01
+defc CONTROL_VDOBUF    = 0x02
+defc CONTROL_STROBE    = 0x04
+defc CONTROL_LED_CHECK = 0x08
+defc CONTROL_LED_ALERT = 0x10
+defc CONTROL_LED_PAUSE = 0x20
+
+
+defc IO_HCCA = 0x80
+
+defc IO_KEYBOARD = 0x90
+defc IO_KEYBOARD_STATUS = 0x91
+
+defc IO_AY_LATCH = 0x41
+defc IO_AY_DATA = 0x40
+
+defc PSG_REG_IO_A = 0x0e
+defc PSG_REG_IO_B = 0x0e
+
+defc INT_MASK_HCCARX   = 0x80
+defc INT_MASK_HCCATX   = 0x40
+defc INT_MASK_KEYBOARD = 0x20
+defc INT_MASK_VDP      = 0x10
+
+
+

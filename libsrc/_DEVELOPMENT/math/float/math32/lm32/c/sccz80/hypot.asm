@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _hypot
-EXTERN	cm32_sdcc_fshypot
-defc _hypot = cm32_sdcc_fshypot
+defc _hypot = hypot
 ENDIF
 

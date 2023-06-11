@@ -42,7 +42,5 @@ asm_zx_saddrpup:
    ld h,a
 
    and $18
-   cp $18
-
-   ccf
+   add a,$e8
    ret

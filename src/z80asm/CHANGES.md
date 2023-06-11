@@ -1,9 +1,68 @@
 Z88DK Z80 Module Assembler Change Log
 =====================================
 
+2023
+----
+2023-03-16 Fix #2066: Use boost::filesystem as fallback to std::filesystem from C++17
+2023-03-19 Fix nightly build failure - z80asm cannot find std::filesystem dll entry point
+2023-04-17 Fix #2227: Support #ifdef/#endif etc in assembler
+2023-05-13 Fix #2254: move the object file into place once it's been generated
+2023-05-13 Fix #2251: accept ':' as statement separator
+2023-05-18 Fix #2260: output dir prepended twice
+2023-06--9 Fix #2279: add support to ez80, both z80 memory mode and ADL memory mode
+
+2022
+----
+- 2022-01-04 Add support for '#include' C style include directive
+- 2022-01-05 Remove z80asm .err files, change error format to more standard file:line: error
+- 2022-01-06 Add predefined constant for -mti83plus
+- 2022-01-07 z80asm is now a Macro Assembler
+- 2022-01-07 Issue #18 remove INVOKE directive unless -mti83 or -mti83plus is passed in the comand line
+- 2022-01-08 Fix #16: -Opath was added twice to consolidated object file name
+- 2022-01-09 Fix #1573: now map and def files use same basename as bin file
+- 2022-06-14 Several fixes to compound assembly instructions
+- 2022-06-15 Add table of recognized opcodes to the wiki
+- 2022-06-25 Fix #2036: build and test on Windows
+- 2022-06-27 Fix #2040: allow options and filenames in @ files
+- 2022-07-01 Fix #2043: z80asm: deletion of empty binary files except first not always working
+- 2022-07-04 Parallelize z80asm tests
+- 2022-07-07 Fix #2045: ignore ORG statements when producing a binary for appmake
+- 2022-07-23 Implement swap IX/IY at preprocessor level
+- 2022-07-23 Fix #2052 check which of .o or .asm to use and -d option during argument parsing
+- 2022-08-02 Exit with error message if fseek() fails
+- 2022-08-07 Too many debug symbols being created
+- 2022-08-09 Fix #2065: gcc including local dirent.h
+- 2022-08-13 Issue #2066 link libc and libc++ statically when cross-compiling
+- 2022-08-16 Fix #2068: fix str_path_canon()
+- 2022-08-18 Fix #2070: continue assembling after errors in one file
+- 2022-08-24 Issue #2066 link libc and libc++ statically when cross-compiling
+- 2022-09-03 Remove restriction of JR jumps not being cross-section
+- 2022-11-06 Fix #2120: make .lis file addresses 4 digit long
+- 2022-12-10 Fix #2118: cygwin build - chocolatey failure
+- 2022-12-27 Fix #2146: Convert address difference to constant
+- 2022-12-27 Fix #1574: recognize difference of addresses as constant
+- 2022-12-27 Fix #1177: fix case with two groups of parens, e.g. ld "bc, (1) + (2)"
+
 2021
 ----
-- 2021-01-18 Fix #1671: Define INCBIN as alias to BINARY
+- 2021-01-18 Fix #1671 Define INCBIN as alias to BINARY
+- 2021-07-22 Fix #1821 create a new record type in the object file to handle gbz80 offsets to 0xff00
+- 2021-08-03 Fix #1823 add jp k et all to 8085
+- 2021-08-03 Fix #1104 Rename z80asm to z88dk-z80asm
+- 2021-08-05 Fix #1823 ld de,hl
+- 2021-08-15 Fix #1823 8085 implementation of ld hl,sp+N
+- 2021-08-16 Add DEFS len,"string" for fixed-len-filled strings (thanks @o-marshmallow)
+- 2021-08-23 replace --cpu=r2k with --cpu=r2ka
+- 2021-08-24 Ignore duplicate __CDBINFO__, __C_LINE_ / __ASM_LINE_ fixes
+- 2021-09-08 Fix #1852 accept C_LINE inside DEFVARS and DEFGROUP
+- 2021-09-15 Fix #1856 store strings in object file as word-counted strings
+- 2021-09-25 Fix #1865 emulate de-indirect loads
+- 2021-09-30 Fix #1869 detect and report symbols not defined because of circular dependencies
+- 2021-10-01 Fix #1874 illegal identifier swap a 
+- 2021-10-10 Fix #1883 zcc accepts file names starting with digits
+- 2021-12-25 Fix #1911 use faster loops in ldir and lddr emulation
+- 2021-12-25 Fix #1898 add ASSERT directive
+- 2021-12-31 Fix #305 add FLOAT directive
 
 2020
 ----
@@ -15,8 +74,10 @@ Z88DK Z80 Module Assembler Change Log
   defp, ptr, dp (24-bit pointer)
   defq, dword, dq (32-bit word)
   defs, ds (define shift)
-- 2020-08-02 Add -Dvar=nn to define a numeric variable in the command line
 - 2020-05-14 Fix #1451: link very slow on Windows
+- 2020-08-02 Add -Dvar=nn to define a numeric variable in the command line
+- 2020-08-10 Fix #1549 - Replace -i with -l
+- 2020-09-24 Fix #1572 output_dir added twice to reloc file
 
 2019
 ----
@@ -24,7 +85,11 @@ Z88DK Z80 Module Assembler Change Log
 - 2019-07-14 Convert Spectrum Next CPU to (--cpu=z80n) (thank you Phillip Stevens)
 - 2019-07-20 Support Intel 8080 with Zilog syntax (--cpu=8080) (thank you @suborb)
 - 2019-07-22 Support Intel 8080/8085 with Intel syntax, except Jump Positive (jp conflicts with Zilog jump) and Call Positive (cp conflicts with Zilog compare). Support alternative j_p and c_p for Jump Positive and Call Positive.
+- 2019-07-22 Remove '#' constant operator
+- 2019-12-03 Implement rld and rrd emulation for 8080/8085
 - 2019-12-17 Add linker support for sign-extended 8-bit values
+- 2019-12-24 Fix #1364 Fix barrel rotate instruction (brlc)
+- 2019-12-24 Fix #1364 implement missing z80n instructions, fix timings
 
 2018
 ----

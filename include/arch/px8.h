@@ -151,4 +151,21 @@ extern int __LIB__ subcpu_function(int rcvpkt_sz, void *rcvpkt, int sndpkt_sz, v
 extern int __LIB__ esc_sequence(void *cmdsequence) __z88dk_fastcall;
 
 
+// ADCVRT and 7508 sub-cpu functions
+
+// 60h = 50 C; C0h = 20 C, everything in between is more or less linear
+#define READ_TEMPERATURE(temp) (subcpu_7508(0x1C, 0, NULL, 1, &temp))
+
+typedef enum {
+    CH_ANALOG=0,
+    CH_BARCODE,
+    CH_DIP_SW,
+    CH_BATTERY,
+    CH_BUTTONS
+} adcvrt_channel_t;
+
+extern int __LIB__ adcvrt(adcvrt_channel_t channel) __z88dk_fastcall;
+
+extern void __LIB__ subcpu_7508(char cmd, char out_sz, void* out_buf, char in_sz, void* in_buf) __z88dk_sdccdecl;
+
 #endif

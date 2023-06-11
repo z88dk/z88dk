@@ -28,7 +28,7 @@ syserr(errno)
 #include <trsdos.h>
 
 
-char *_trsdos_syserrlist[50]={
+char *_trsdos_syserrlist[]={
 	"OK",
 	"FN",
 	"NO_DATA",

@@ -1,7 +1,7 @@
 
 
 
-SUBDIRS = suites
+SUBDIRS = suites feature
 
 all: subdirs-all
 

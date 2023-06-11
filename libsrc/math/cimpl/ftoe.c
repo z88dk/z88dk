@@ -12,19 +12,17 @@
  */
 
 
-extern int ftoa_fudgeit(double x, double scale);
-
 void ftoe(x,prec,str)
 double x ;              /* number to be converted */
 int prec ;              /* # digits after decimal place */
 char *str ;             /* output string */
 {
         double scale;   /* scale factor */
-        int i,                  /* counter */
-                d,                      /* a digit */
-                expon;          /* exponent */
+        int i,          /* counter */
+            d,          /* a digit */
+            expon;      /* exponent */
 
-        scale = 1.0 ;           /* scale = 10 ** prec */
+        scale = 1.0 ;   /* scale = 10 ** prec */
         i = prec ;
         while ( i-- )
         scale *= 10.0 ;
@@ -65,11 +63,7 @@ char *str ;             /* output string */
                 x = fabs(x);
                 scale = floor( 0.5 + scale * 0.1 ) ;
                 /* now, scale <= x < 10*scale */
-#ifdef MUST_ROUND
-                d = ftoa_fudgeit( x , scale ) ;
-#else
                 d = ( x / scale ) ;
-#endif
                 *str++ = d + '0' ;
                 x -= (d * scale) ;
                 if ( i++ ) continue ;
@@ -79,5 +73,5 @@ char *str ;             /* output string */
         if ( expon < 0 ) { *str++ = '-' ; expon = -expon ; }
         if(expon>9) *str++ = '0' + expon/10 ;
         *str++ = '0' + expon % 10 ;
-        *str = 0;
+        *str = 0 ;
 }

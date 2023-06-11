@@ -96,7 +96,7 @@ getmore:
         ex      de,hl
 	ld	b,DIR_CACHE_SIZE + 1	; number of entries in the buffer
 	ld	c,1		; include system files
-	ld	iy, DOS_CATALOG
+	ld	ix, DOS_CATALOG
 	call	dodos
         pop     ix
         ld      hl,0

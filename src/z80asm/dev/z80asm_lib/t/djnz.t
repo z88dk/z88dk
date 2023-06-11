@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # z80asm assembler
-# Test z80asm-*.lib
-# Copyright (C) Paulo Custodio, 2011-2019
+# Test z88dk-z80asm-*.lib
+# Copyright (C) Paulo Custodio, 2011-2023
 # License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
@@ -10,7 +10,7 @@ use Modern::Perl;
 use Test::More;
 require '../../t/testlib.pl';
 
-my @CPUS = (qw( 8080 z80 gbz80 r2k ));
+my @CPUS = (qw( 8080 z80 gbz80 r2ka ));
 
 my $test_nr;
 

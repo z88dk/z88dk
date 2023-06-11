@@ -29,17 +29,17 @@ asm_strlen:
    xor a
    ld c,a
    ld b,a
-  
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
 loop:
    ld a,(hl)
    inc hl
    dec bc
    and a
-   jr z,matched
+   jr Z,matched
    ld a,b
    or c
-   jr nz,loop
+   jr NZ,loop
 matched:
    push af
    ld a,$ff
@@ -50,6 +50,7 @@ matched:
    ld  h,a
    pop af
    ld  a,0
+
 ELSE
    cpir
    ld hl,$ffff

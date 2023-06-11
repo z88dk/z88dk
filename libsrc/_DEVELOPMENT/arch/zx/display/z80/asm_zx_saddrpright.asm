@@ -35,7 +35,5 @@ asm_zx_saddrpright:
    ret nz
    
    dec l
-   ld e,$01
-   
-   scf
+   rlc e
    ret

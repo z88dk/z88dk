@@ -6,13 +6,13 @@
     SECTION code_crt_exit
     SECTION code_crt_exit_exit
     SECTION code_driver
+    SECTION code_l		;Keep these in "low" memory
+    SECTION code_l_sdcc
+    SECTION code_l_sccz80
+    SECTION code_z80
     SECTION rodata_driver       ;Keep it in low memoey
     SECTION code_compiler
     SECTION code_clib
-    SECTION code_crt0_sccz80
-    SECTION code_l
-    SECTION code_l_sdcc
-    SECTION code_l_sccz80
     SECTION code_compress_zx7
     SECTION code_compress_zx0
     SECTION code_compress_zx1
@@ -58,11 +58,13 @@
     SECTION code_sound_ay
     SECTION code_PSGlib
     SECTION code_time
-    SECTION code_z80
     SECTION code_sprite_sp1
     SECTION code_temp_sp1
     SECTION code_splib2
+    SECTION code_sound_bit
 IF !__crt_org_graphics
     SECTION code_graphics
 ENDIF
+    SECTION code_video_vdp
     SECTION code_user
+    SECTION CODE_END

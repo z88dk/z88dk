@@ -52,7 +52,7 @@
 .ds_loop
           dec     h
           jr      nz,ds_jump
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -69,7 +69,7 @@
 .loosetime1
           djnz    loosetime1
           pop     bc
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -87,7 +87,7 @@
 .ds_jump
           dec     l
           jr      nz,ds_loop
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -104,7 +104,7 @@
 .loosetime2
           djnz    loosetime2
           pop     bc
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -134,7 +134,7 @@
           jr      nz,ss_jump
           push    hl
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           and     (hl)
           ld      l,a
@@ -152,7 +152,7 @@
 ;-----
 
           pop     hl
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -169,7 +169,7 @@
 .ss_jump
           dec     l
           jr      nz,ss_loop
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -199,7 +199,7 @@
           jr      nz,ts_jump
           push    hl
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           and     (hl)
           ld      l,a
@@ -217,7 +217,7 @@
 ;-----
 
           pop     hl
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -236,7 +236,7 @@
           jr      nz,ts_loop
           push    hl
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      l,h
           ld      h,0
           and     (hl)
@@ -255,7 +255,7 @@
 ;-----
 
           pop     hl
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -282,7 +282,7 @@
 .cs_loop
           dec     h
           jr      nz,cs_jump
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -299,7 +299,7 @@
 .cswait1
           djnz    cswait1
           pop     bc
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -316,7 +316,7 @@
 .cs_jump
           inc     l
           jr      nz,cs_loop
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -333,7 +333,7 @@
 .cswait2
           djnz    cswait2
           pop     bc
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -364,7 +364,7 @@
 .t2_loop
           dec     h
           jr      nz,t2_jump
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -381,7 +381,7 @@
 .wait1
           djnz    wait1
           pop     bc
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -403,7 +403,7 @@
           inc     a
           ld      (t2_FR_2+1),a
           pop     af
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -420,7 +420,7 @@
 .wait2
           djnz    wait2
           pop     bc
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -456,7 +456,7 @@
           inc     a
           ld      (u2_FR_1+1),a
           pop     af
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -478,7 +478,7 @@
           inc     a
           ld      (u2_FR_2+1),a
           pop     af
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -514,7 +514,7 @@
           dec     a
           ld      (qi_FR_1+1),a
           pop     af
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -536,7 +536,7 @@
           inc     a
           ld      (qi_FR_2+1),a
           pop     af
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -561,7 +561,7 @@
 .expl
           push    hl
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           and     (hl)
           ld      l,a

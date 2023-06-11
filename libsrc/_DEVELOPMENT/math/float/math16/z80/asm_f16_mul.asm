@@ -44,8 +44,6 @@ EXTERN asm_f16_f24
 EXTERN asm_f24_zero
 EXTERN asm_f24_inf
 
-EXTERN l_mulu_32_16x16
-
 PUBLIC asm_f16_mul_callee
 
 PUBLIC asm_f24_mul_callee
@@ -118,7 +116,18 @@ PUBLIC asm_f24_mul_f24
     exx
     pop de
                                 ; multiplication of two 16-bit numbers into a 32-bit product
+
+IF __CPU_Z80__
+
+    call mulu_32_16x16
+    
+ELSE
+
+    EXTERN l_mulu_32_16x16
+
     call l_mulu_32_16x16        ; exit  : de * hl = dehl  = 32-bit product
+
+ENDIF
 
     pop bc                      ; retrieve exponent and sign from stack = b,c[7]
 
@@ -155,4 +164,195 @@ PUBLIC asm_f24_mul_f24
     ex af,af                    ; get sign
     ld e,a
     jp asm_f24_zero             ; done underflow
+
+
+IF __CPU_Z80__
+
+; Made by Runer112
+; Analysed by Zeda
+; https://raw.githubusercontent.com/Zeda/z80float/master/common/mul16.z80
+; Tested by jacobly
+;
+; DE*HL --> DEHL
+;
+; enter : de   = 16-bit multiplicand  = x
+;         hl   = 16-bit multiplier = y
+;
+; exit  : dehl = 32-bit product
+;
+; uses  : af, bc, de, hl
+
+.mulu_32_16x16
+
+    ld a,d
+    ld d,0
+    ld b,h
+    ld c,l
+
+    add a,a
+    jr C,bit14
+    add a,a
+    jr C,bit13
+    add a,a
+    jr C,bit12
+    add a,a
+    jr C,bit11
+    add a,a
+    jr C,bit10
+    add a,a
+    jr C,bit9
+    add a,a
+    jr C,bit8
+    add a,a
+    jr C,bit7
+
+    ld a,e
+    and %11111110
+    add a,a
+    jr C,bit6
+    add a,a
+    jr C,bit5
+    add a,a
+    jr C,bit4
+    add a,a
+    jr C,bit3
+    add a,a
+    jr C,bit2
+    add a,a
+    jr C,bit1
+    add a,a
+    jr C,bit0
+    rr e
+    ret C
+
+    ld h,d
+    ld l,e
+    ret
+
+.bit14
+    add hl,hl
+    adc a,a
+    jr NC,bit13
+    add hl,bc
+    adc a,d
+
+.bit13
+    add hl,hl
+    adc a,a
+    jr NC,bit12
+    add hl,bc
+    adc a,d
+
+.bit12
+    add hl,hl
+    adc a,a
+    jr NC,bit11
+    add hl,bc
+    adc a,d
+
+.bit11
+    add hl,hl
+    adc a,a
+    jr NC,bit10
+    add hl,bc
+    adc a,d
+
+.bit10
+    add hl,hl
+    adc a,a
+    jr NC,bit9
+    add hl,bc
+    adc a,d
+
+.bit9
+    add hl,hl
+    adc a,a
+    jr NC,bit8
+    add hl,bc
+    adc a,d
+
+.bit8
+    add hl,hl
+    adc a,a
+    jr NC,bit7
+    add hl,bc
+    adc a,d
+
+.bit7
+    ld d,a
+    ld a,e
+    and %11111110
+    add hl,hl
+    adc a,a
+    jr NC,bit6
+    add hl,bc
+    adc a,0
+
+.bit6
+    add hl,hl
+    adc a,a
+    jr NC,bit5
+    add hl,bc
+    adc a,0
+
+.bit5
+    add hl,hl
+    adc a,a
+    jr NC,bit4
+    add hl,bc
+    adc a,0
+
+.bit4
+    add hl,hl
+    adc a,a
+    jr NC,bit3
+    add hl,bc
+    adc a,0
+
+.bit3
+    add hl,hl
+    adc a,a
+    jr NC,bit2
+    add hl,bc
+    adc a,0
+
+.bit2
+    add hl,hl
+    adc a,a
+    jr NC,bit1
+    add hl,bc
+    adc a,0
+
+.bit1
+    add hl,hl
+    adc a,a
+    jr NC,bit0
+    add hl,bc
+    adc a,0
+
+.bit0
+    add hl,hl
+    adc a,a
+    jr C,funkyCarry
+    rr e
+    ld e,a
+    ret NC
+    add hl,bc
+    ret NC
+    inc e
+    ret NZ
+    inc d
+    ret
+
+.funkyCarry
+    inc d
+    rr e
+    ld e,a
+    ret NC
+    add hl,bc
+    ret NC
+    inc e
+    ret
+
+ENDIF
 

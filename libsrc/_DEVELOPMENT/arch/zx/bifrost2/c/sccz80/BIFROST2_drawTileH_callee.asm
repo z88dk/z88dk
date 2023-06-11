@@ -22,5 +22,6 @@ BIFROST2_drawTileH_callee:
         ex (sp),hl      ; L=lin
         ld d,l          ; D=lin
         ld a,c          ; A=tile
-        
+       	and 127         ; discard BIFROST2STATIC
+
         jp asm_BIFROST2_drawTileH        ; execute 'draw_tile'

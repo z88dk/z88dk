@@ -24,9 +24,7 @@
 	pop	hl
 	push	hl
 	push	bc
-	inc	hl
-	inc	hl
-	call	l_gint	;
+	call	l_gint2	;
 	push	hl
 	call	_value
 	pop	bc
@@ -39,9 +37,7 @@
 	pop	hl
 	push	hl
 	push	bc
-	inc	hl
-	inc	hl
-	call	l_gint	;
+	call	l_gint2	;
 	push	hl
 	call	_value
 	pop	bc
@@ -62,6 +58,7 @@
 	ld	hl,(_item)
 	call	l_int2long_s
 	ret
+
 
 
 

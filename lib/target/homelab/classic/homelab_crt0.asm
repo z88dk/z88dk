@@ -22,23 +22,26 @@
     defc    TAR__register_sp = -1
     defc	CRT_KEY_DEL = 8
     defc	__CPU_CLOCK = 3000000
+
+    defc    TAR__crt_on_exit = 0            ;Jump to 0 at finish
+    defc    TAR__crt_enable_eidi = $00      ;No special behaviour
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     defc    CRT_ORG_CODE = 0x4300
 
     org     CRT_ORG_CODE
 
-program:
+start:
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
-    ld      hl,0
-    add     hl,sp
-    ld      (exitsp),hl
+    ld      (exitsp),sp
     out     ($ff),a
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     ld      hl,0
     push    hl	;argv
     push    hl	;argc
@@ -46,7 +49,7 @@ ENDIF
     pop     bc
     pop     bc
 cleanup:
-    jp      0
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal:
     jp      (hl)            ;Used for function pointer calls

@@ -24,6 +24,8 @@
 #include        <inttypes.h>
 #include        <time.h>
 #include        <sys/stat.h>
+#include        "uthash.h"
+#include        "utlist.h"
 #include        "zcc.h"
 #include        "regex/regex.h"
 #include        "dirname.h"
@@ -32,6 +34,17 @@
 #ifdef WIN32
 #include        <direct.h>
 #include        <process.h>
+
+#if !defined S_ISDIR
+    #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+
+#if !defined(S_ISREG) 
+    #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+#endif
+
+
+
 #else
 #include        <unistd.h>
 #endif
@@ -54,7 +67,9 @@ enum {
     CPU_MAP_TOOL_SCCZ80,
     CPU_MAP_TOOL_ZSDCC,
     CPU_MAP_TOOL_COPT,
-    CPU_MAP_TOOL_SIZE
+    CPU_MAP_TOOL_CPURULES,
+    CPU_MAP_TOOL_LIBNAME,
+    CPU_MAP_TOOL_SIZE,
 };
 
 enum {
@@ -66,6 +81,8 @@ enum {
     CPU_TYPE_8080,
     CPU_TYPE_8085,
     CPU_TYPE_GBZ80,
+    CPU_TYPE_EZ80,
+    CPU_TYPE_IXIY,
     CPU_TYPE_SIZE
 };
 
@@ -98,12 +115,21 @@ struct pragma_m4_s {
     const char *m4_name;
 };
 
+struct tokens_list_s
+{
+    char                *token;
+    char                 *path;
+    struct tokens_list_s *next;
+};
 
 /* All our function prototypes */
 
 static void            add_option_to_compiler(char *arg);
-static void            gather_from_list_file(char *filename);
-static void            add_file_to_process(char *filename);
+static struct tokens_list_s*    gather_from_list_file(char *filename);
+static void            add_file_to_process(char *filename, char process_extension);
+
+static void cmd_line_to_tokens(char* line, const char *path, struct tokens_list_s** tokens);
+static void cmd_free_tokens(struct tokens_list_s* tokens);
 
 static void            SetNumber(arg_t *argument, char *arg);
 static void            SetStringConfig(arg_t *argument, char *arg);
@@ -162,13 +188,12 @@ static void            apply_copt_rules(int filenumber, int num, char **rules, c
 static void            zsdcc_asm_filter_comments(int filenumber, char *ext);
 static void            remove_temporary_files(void);
 static void            remove_file_with_extension(char *file, char *suffix);
-static void            ShowErrors(char *, char *);
 static int             copyprepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
 static int             copy_file(char *src, char *src_extension, char *dest, char *dest_extension);
 static int             prepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
 static int             copy_defc_file(char *name1, char *ext1, char *name2, char *ext2);
 static void            tempname(char *);
-static int             find_zcc_config_fileFile(const char *program, char *arg, int argc, char *buf, size_t buflen);
+static void            find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t buflen);
 static void            parse_option(char *option);
 static void            add_zccopt(char *fmt, ...);
 static char           *replace_str(const char *str, const char *old, const char *new);
@@ -180,6 +205,14 @@ static char           *strip_inner_quotes(char *p);
 static char           *strip_outer_quotes(char *p);
 static int             zcc_asprintf(char **s, const char *fmt, ...);
 static int             zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *stream);
+static char           *expand_macros(char *arg);
+
+struct explicit_extension
+{
+    char* filename;
+    char* extension;
+    UT_hash_handle hh;
+};
 
 static int             createapp = 0;    /* Go the next stage and create the app */
 static int             z80verbose = 0;
@@ -191,6 +224,8 @@ static int             m4only = 0;
 static int             clangonly = 0;
 static int             llvmonly = 0;
 static int             makelib = 0;
+static int             explicit_file_type_c = 0;
+static struct explicit_extension* explicit_extensions = NULL;
 static int             build_bin = 0;
 static int             c_code_in_asm = 0;
 static int             opt_code_size = 0;
@@ -204,6 +239,7 @@ static int             mapon = 0;
 static int             globaldefon = 0;
 static char           *globaldefrefile = NULL;
 static int             preprocessonly = 0;
+static int             printmacros = 0;
 static int             relocate = 0;
 static int             relocinfo = 0;
 static int             sdcc_signed_char = 0;
@@ -211,9 +247,7 @@ static int             swallow_M = 0;
 static int             c_print_specs = 0;
 static int             c_zorg = -1;
 static int             c_sccz80_inline_ints = 0;
-static int             max_argc;
 static int             gargc;
-static char          **gargv;
 /* filelist has to stay as ** because we change suffix all the time */
 static int             nfiles = 0;
 static char          **filelist = NULL;              /* Working filenames   */
@@ -240,6 +274,7 @@ static char           *appmakeargs;
 static char           *sccz80arg = NULL;
 static char           *sdccarg = NULL;
 static char           *m4arg = NULL;
+static char           *coptarg = NULL;
 static char           *pragincname = NULL;  /* File containing pragmas to append to zcc_opt.def */
 static char           *zccopt = NULL;       /* Text to append to zcc_opt.def */
 static char           *c_subtype = NULL;
@@ -277,11 +312,17 @@ static char           *zcc_opt_def = "zcc_opt.def";
 
 static char           *defaultout = "a.bin";
 
+
+static char           *cfg_path = ".";
+
 #define AF_BOOL_TRUE      1
 #define AF_BOOL_FALSE     2
 #define AF_MORE           4
 #define AF_DEPRECATED     8
 
+
+static char  *c_zcc_cfg = NULL;
+static char *c_binary_dir = "";
 static char  *c_install_dir = PREFIX "/";
 static char  *c_options = NULL;
 
@@ -289,10 +330,10 @@ static char  *c_z80asm_exe = "z88dk-z80asm";
 
 static char  *c_clang_exe = "zclang";
 static char  *c_llvm_exe = "zllvm-cbe";
-static char  *c_sdcc_exe = "zsdcc";
-static char  *c_sccz80_exe = "sccz80";
+static char  *c_sdcc_exe = "z88dk-zsdcc";
+static char  *c_sccz80_exe = "z88dk-sccz80";
 static char  *c_cpp_exe = "z88dk-ucpp";
-static char  *c_sdcc_preproc_exe = "zsdcpp";
+static char  *c_sdcc_preproc_exe = "z88dk-zsdcpp";
 static char  *c_zpragma_exe = "z88dk-zpragma";
 static char  *c_copt_exe = "z88dk-copt";
 static char  *c_appmake_exe = "z88dk-appmake";
@@ -309,10 +350,10 @@ static char  *c_coptrules1 = NULL;
 static char  *c_coptrules2 = NULL;
 static char  *c_coptrules3 = NULL;
 static char  *c_coptrules9 = NULL;
-static char  *c_coptrules_cpu = NULL;
 static char  *c_coptrules_user = NULL;
 static char  *c_coptrules_sccz80 = NULL;
 static char  *c_coptrules_target = NULL;
+static char  *coptrules_cpu = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
@@ -381,7 +422,6 @@ static arg_t  config[] = {
     { "COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "\"DESTDIR/lib/z80rules.2\"" },
     { "COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "\"DESTDIR/lib/z80rules.0\"" },
     { "COPTRULES9", 0, SetStringConfig, &c_coptrules9, NULL, "", "\"DESTDIR/lib/z80rules.9\"" },
-    { "COPTRULESCPU", 0, SetStringConfig, &c_coptrules_cpu, NULL, "An extra copt file for CPU optimisation", NULL },
     { "COPTRULESINLINE", 0, SetStringConfig, &c_coptrules_sccz80, NULL, "Optimisation file for inlining sccz80 ops", "\"DESTDIR/lib/z80rules.8\"" },
     { "COPTRULESTARGET", 0, SetStringConfig, &c_coptrules_target, NULL, "Optimisation file for target specific operations",NULL },
     { "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1\"" },
@@ -421,11 +461,13 @@ static option options[] = {
     { 0, "m8080", OPT_ASSIGN|OPT_INT, "Generate output for the i8080", &c_cpu, NULL, CPU_TYPE_8080 },
     { 0, "m8085", OPT_ASSIGN|OPT_INT, "Generate output for the i8085", &c_cpu, NULL, CPU_TYPE_8085 },
     { 0, "mz80", OPT_ASSIGN|OPT_INT, "Generate output for the z80", &c_cpu, NULL, CPU_TYPE_Z80 },
+    { 0, "mz80_ixiy", OPT_ASSIGN|OPT_INT, "Generate output for the z80 with ix/iy swap", &c_cpu, NULL, CPU_TYPE_IXIY },
     { 0, "mz80n", OPT_ASSIGN|OPT_INT, "Generate output for the z80n", &c_cpu, NULL, CPU_TYPE_Z80N },
     { 0, "mz180", OPT_ASSIGN|OPT_INT, "Generate output for the z180", &c_cpu, NULL, CPU_TYPE_Z180 },
-    { 0, "mr2k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000", &c_cpu, NULL, CPU_TYPE_R2K },
+    { 0, "mr2ka", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000", &c_cpu, NULL, CPU_TYPE_R2K },
     { 0, "mr3k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 3000", &c_cpu, NULL, CPU_TYPE_R3K },
-    { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the Gameboy Z80", &c_cpu, NULL, CPU_TYPE_GBZ80 },
+    { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the gbz80", &c_cpu, NULL, CPU_TYPE_GBZ80 },
+    { 0, "mez80_z80", OPT_ASSIGN|OPT_INT, "Generate output for the ez80 (z80 mode)", &c_cpu, NULL, CPU_TYPE_EZ80 },
 
     { 0, "", OPT_HEADER, "Target options:", NULL, NULL, 0 },
     { 0, "subtype", OPT_STRING,  "Set the target subtype" , &c_subtype, NULL, 0},
@@ -448,10 +490,12 @@ static option options[] = {
     { 0, "", OPT_HEADER, "Lifecycle options:", NULL, NULL, 0 },
     { 0, "m4", OPT_BOOL,  "Stop after processing m4 files" , &m4only, NULL, 0},
     { 'E', "preprocess-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after preprocessing files" , &preprocessonly, NULL, 0},
+    { 0, "dD", OPT_BOOL,  "Print macro definitions in -E mode in addition to normal output" , &printmacros, NULL, 0},
     { 'c', "compile-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s .asm files to .o files" , &compileonly, NULL, 0},
     { 'a', "assemble-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s files to .asm files" , &assembleonly, NULL, 0},
     { 'S', "assemble-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s files to .asm files" , &assembleonly, NULL, 0},
     { 'x', NULL, OPT_BOOL,  "Make a library out of source files" , &makelib, NULL, 0},
+    { 0, "xc", OPT_BOOL,  "Explicitly specify file type as C" , &explicit_file_type_c, NULL, 0},
     { 0, "create-app", OPT_BOOL,  "Run appmake on the resulting binary to create emulator usable file" , &createapp, NULL, 0},
 
 
@@ -476,6 +520,7 @@ static option options[] = {
     { 0, "Cc", OPT_FUNCTION,  "Add an option to sccz80" , &sccz80arg, AddToArgs, 0},
     { 0, "set-r2l-by-default", OPT_BOOL,  "(sccz80) Use r2l calling convention by default", &c_sccz80_r2l_calling, NULL, 0},
     { 0, "O", OPT_INT,  "Set the peephole optimiser setting for copt" , &peepholeopt, NULL, 0},
+    { 0, "Ch", OPT_FUNCTION,  "Add an option to the sccz80 peepholer" , &coptarg, AddToArgs, 0},
     { 0, "", OPT_HEADER, "Compiler (sdcc) options:", NULL, NULL, 0 },
     { 0, "Cs", OPT_FUNCTION,  "Add an option to sdcc" , &sdccarg, AddToArgs, 0},
     { 0, "opt-code-size", OPT_BOOL|OPT_DOUBLE_DASH,  "Optimize for code size (sdcc only)" , &opt_code_size, NULL, 0},
@@ -511,20 +556,23 @@ static option options[] = {
     { 0, "custom-copt-rules", OPT_STRING,  "Custom user copt rules" , &c_coptrules_user, NULL, 0},
     { 'M', NULL, OPT_BOOL|OPT_PRIVATE,  "Swallow -M option in configs" , &swallow_M, NULL, 0},
     { 0, "vn", OPT_BOOL_FALSE|OPT_PRIVATE,  "Turn off command tracing" , &verbose, NULL, 0},
+    { 0, "no-cleanup", OPT_BOOL_FALSE, "Don't cleanup temporary files", &cleanup, NULL, 0 },
     { 0, "", 0, NULL },
 
 };
 
 
 cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
-    {{ "-mz80"   , "-mz80"   , "-mz80"   , ""        }},          /* CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mz80n"  , "-mz80n"  , "-mz80"   , ""        }},          /* CPU_TYPE_Z80N    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC                */
-    {{ "-mz180"  , "-mz180"  , "-mz180 -portmode=z180", "" }},    /* CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mr2k"   , "-mr2k"   , "-mr2k"   , ""        }},          /* CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mr3k"   , "-mr3k"   , "-mr3ka"  , ""        }},          /* CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-m8080"  , "-m8080"  , "-mz80"   , "-m8080"  }},          /* CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-m8085"  , "-m8085"  , "-mz80"   , "-m8080"  }},          /* CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mgbz80" , "-mgbz80" , "-mgbz80" , "-mgbz80" }}           /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mz80"   , "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", ""   }},          /* CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
+    {{ "-mz80n"  , "-mz80n"  , "-mz80n"  , "-mz80n","DESTDIR/lib/arch/z80n/z80n_rules.1", "_z80n"  }},          /* CPU_TYPE_Z80N    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC                */
+    {{ "-mz180"  , "-mz180"  , "-mz180 -portmode=z180", "-mz180", "DESTDIR/lib/arch/z180/z180_rules.1", "_z180" }},    /* CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mr2ka"  , "-mr2ka"  , "-mr2ka"  , "-mr2ka", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2k"  }},          /* CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mr3k"   , "-mr3k"   , "-mr3ka"  , "-mr3k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2k"   }},          /* CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-m8080"  , "-m8080"  , "-mz80"   , "-m8080", "DESTDIR/lib/arch/8080/8080_rules.1", "_8080"  }},          /* CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-m8085"  , "-m8085"  , "-mz80"   , "-m8085", "DESTDIR/lib/arch/8085/8085_rules.1", "_8085"  }},          /* CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mgbz80" , "-mgbz80" , "-msm83" , "-mgbz80", "DESTDIR/lib/arch/gbz80/gbz80_rules.1", "_gbz80" }},       /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mez80_z80"   , "-mez80_z80" ,  "-mez80_z80" ,   "-mez80", "DESTDIR/lib/arch/ez80/ez80_rules.1", "_ez80_z80" }},           /* CPU_TYPE_EZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mz80 -IXIY"   , "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", "_ixiy"   }},          /* CPU_TYPE_IXIY     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
 };
 
 
@@ -597,6 +645,14 @@ static int hassuffix(char *name, char *suffix)
 {
     int             nlen, slen;
 
+    {
+        struct explicit_extension* exp = NULL;
+        HASH_FIND_STR(explicit_extensions, name, exp);
+        if (exp && (strcmp(exp->extension, suffix) == 0)) {
+            return 1;
+        }
+    }
+
     nlen = strlen(name);
     slen = strlen(suffix);
 
@@ -634,16 +690,38 @@ static char *changesuffix(char *name, char *suffix)
     return (r);
 }
 
+static int explicit_file_type_defined()
+{
+    return explicit_file_type_c;
+}
+
+static char* get_explicit_file_type()
+{
+    if (explicit_file_type_c) {
+        return ".c";
+    }
+
+    return NULL;
+}
+
 int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum iostyle ios, int number, int needsuffix, int src_is_original)
 {
     int             status, errs;
     int             tstore;
     char            buffer[8192], *outname;
+    char           *bin_dir = c_binary_dir;
 
     errs = 0;
 
     if (!hassuffix(filelist[number], suffix))
         return (0);
+
+#ifndef WIN32
+    // On non-windows platforms m4 is a system file, so doesn't need a prefix
+    if (strcasecmp(processor,"m4") == 0) {
+        bin_dir = "";
+    }
+#endif
 
     outname = changesuffix(temporary_filenames[number], nextsuffix);
 
@@ -653,20 +731,24 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
         tstore = strlen(filelist[number]) - strlen(suffix);
         if (!needsuffix)
             filelist[number][tstore] = 0;
-        snprintf(buffer, sizeof(buffer), "%s %s \"%s\"", processor, extraargs, filelist[number]);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\"", bin_dir, processor, extraargs, filelist[number]);
         filelist[number][tstore] = '.';
         break;
     case outspecified:
-        snprintf(buffer, sizeof(buffer), "%s %s \"%s\" \"%s\"", processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     case outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s %s \"%s\" -o \"%s\"", processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     case filter:
-        snprintf(buffer, sizeof(buffer), "%s %s < \"%s\" > \"%s\"", processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" > \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
+        break;
+    case filter_out:
+        // This is only used by copy command, which is cat/type so not a z88dk binary
+        snprintf(buffer, sizeof(buffer), "%s %s \"%s\" > \"%s\"", processor, extraargs, filelist[number], outname);
         break;
     case filter_outspecified_flag:
-        snprintf(buffer, sizeof(buffer), "%s %s < \"%s\" -o \"%s\"", processor, extraargs, filelist[number], outname);
+        snprintf(buffer, sizeof(buffer), "%s%s %s < \"%s\" -o \"%s\"", bin_dir, processor, extraargs, filelist[number], outname);
         break;
     }
 
@@ -755,7 +837,7 @@ int linkthem(char *linker)
 
         for (i = 0; i < nfiles; ++i)
         {
-            if (hassuffix(filelist[i], c_extension))
+            if (hassuffix(filelist[i], c_extension) || hassuffix(filelist[i],"obj"))
             {
                 fprintf(out, "%s\n", filelist[i]);
                 if (prj) fprintf(prj, "%s\n", original_filenames[i]);
@@ -786,7 +868,7 @@ int linkthem(char *linker)
 
         for (i = 0; i < nfiles; ++i)
         {
-            if (hassuffix(filelist[i], c_extension))
+            if (hassuffix(filelist[i], c_extension) )
             {
                 offs += snprintf(cmdline + offs, len - offs, " \"%s\"", filelist[i]);
                 if (prj) fprintf(prj, "%s\n", original_filenames[i]);
@@ -813,7 +895,7 @@ int linkthem(char *linker)
 
 int main(int argc, char **argv)
 {
-    int             i, ft, gc;
+    int             i, ft;
     char           *ptr;
     char            config_filename[FILENAME_MAX + 1];
     char            asmarg[4096];    /* Hell, that should be long enough! */
@@ -837,27 +919,71 @@ int main(int argc, char **argv)
     atexit(remove_temporary_files);
     add_option_to_compiler("");
 
-    gc = 1;            /* Set for the first argument to scan for */
     if (argc == 1) {
         print_help_text(argv[0]);
         exit(1);
     }
 
+    // If argv[0] is a path and not "." and not the system install path, then we can
+    // setup variables based on that
+    snprintf(buffer,sizeof(buffer),"%s",argv[0]);
+    ptr = zdirname(buffer);
+    if ( strcmp(ptr,".") && strcmp(ptr, BINDIR)) {
+        char ccc[FILENAME_MAX+1];
+        snprintf(ccc, sizeof(ccc), "%s/../", ptr);
+        c_install_dir = muststrdup(ccc);
+        snprintf(ccc, sizeof(ccc), "%s/../lib/config/", ptr);
+        c_zcc_cfg = muststrdup(ccc);
+        snprintf(ccc, sizeof(ccc), "%s/", ptr);
+        c_binary_dir = muststrdup(ccc);
+    }
+
     /* Setup the install prefix based on ZCCCFG */
     if ((ptr = getenv("ZCCCFG")) != NULL) {
+        char ccc[FILENAME_MAX+1];
+
+        c_zcc_cfg = muststrdup(ptr);
 #ifdef WIN32
-        snprintf(config_filename, sizeof(config_filename), "%s\\..\\..\\", ptr);
+        snprintf(ccc, sizeof(ccc), "%s\\..\\..\\", ptr);
 #else
-        snprintf(config_filename, sizeof(config_filename), "%s/../../", ptr);
+        snprintf(ccc, sizeof(ccc), "%s/../../", ptr);
 #endif
-        c_install_dir = muststrdup(config_filename);
+        c_install_dir = muststrdup(ccc);
     }
 
     setup_default_configuration();
 
-    gc = find_zcc_config_fileFile(argv[0], argv[gc], gc, config_filename, sizeof(config_filename));
-    parse_configfile(config_filename);
+    char configuration[1024] = {0};
 
+    for (gargc = 0 ; gargc < argc; gargc++) {
+        char* aa = argv[gargc];
+        if (aa[0] == '+') {
+            strcpy(configuration, aa);
+            break;
+        } else if (aa[0] == '@') {
+            struct tokens_list_s* tokens = gather_from_list_file(aa + 1);
+
+            struct tokens_list_s* token;
+            LL_FOREACH(tokens, token) {
+                char* tk = token->token;
+                if (tk[0] == '+') {
+                    strcpy(configuration, tk);
+                }
+            }
+            cmd_free_tokens(tokens);
+        }
+    }
+
+    if (strlen(configuration) == 0) {
+        fprintf(stderr, "A config file must be specified with +file\n\n");
+        print_help_text(argv[0]);
+        exit(1);
+    }
+
+    find_zcc_config_fileFile(argv[0], configuration, config_filename, sizeof(config_filename));
+    cfg_path = zdirname(strdup(config_filename));
+    parse_configfile(config_filename);
+    
 
     /* Now, parse the default options list */
     if (c_options != NULL) {
@@ -880,18 +1006,15 @@ int main(int argc, char **argv)
         aliases[aliases_num++] = strdup(ptr);
     }
 
-    /* Now, let's parse the command line arguments */
-    max_argc = argc;
-    gargv = argv;        /* Point argv to start of command line */
-
     processing_user_command_line_arg = 1;
-    argc = option_parse(&options[0], argc - 1, &argv[1]);
-    for (gargc = 1; gargc < argc+1; gargc++) {
+    argc = option_parse(&options[0], argc, argv);
+    for (gargc = 0; gargc < argc; gargc++) {
+        char* aa = argv[gargc];
         // We have some options left over, it may well be an alias
-        if (argv[gargc][0] == '-') {
-            parse_cmdline_arg(argv[gargc]);
-        } else {
-            add_file_to_process(argv[gargc]);
+        if (aa[0] == '-') {
+            parse_cmdline_arg(aa);
+        } else if (aa[0] != '+') {
+            add_file_to_process(aa, 1);
         }
     }
     processing_user_command_line_arg = 0; 
@@ -946,6 +1069,19 @@ int main(int argc, char **argv)
 
     if (c_sccz80_inline_ints == 0 ) {
         c_coptrules_sccz80 = NULL;
+    }
+
+    // Find the CPU specific rules
+    {
+        char *rules = select_cpu(CPU_MAP_TOOL_CPURULES);
+        if ( rules ) {
+            char *expanded = expand_macros(rules);
+            struct stat sb;
+
+            if (stat(expanded, &sb) == 0 && S_ISREG(sb.st_mode)) {
+                coptrules_cpu = expanded;
+            }
+        }
     }
 
     configure_assembler();
@@ -1005,7 +1141,7 @@ int main(int argc, char **argv)
     }
 
     /* Mangle math lib name but only for classic compiles */
-    if ((c_clib == 0) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc") && !strstr(c_clib, "clang")))
+    if ((c_clib == NULL) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc") && !strstr(c_clib, "clang")))
         if (linker_linklib_first) configure_maths_library(&linker_linklib_first);   /* -lm appears here */
 
     /* Options that must be sequenced in specific order */
@@ -1042,6 +1178,10 @@ int main(int argc, char **argv)
     BuildOptions(&llvmarg, llvmarg ? "-disable-partial-libcall-inlining " : "-O2 -disable-partial-libcall-inlining ");
     BuildOptions(&llvmopt, llvmopt ? "-disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S " : "-O2 -disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S ");
 
+    if (printmacros)
+    {
+        BuildOptions(&cpparg, "-d");
+    }
 
     /* Peephole optimization level for sdcc */
     if (compiler_type == CC_SDCC && c_cpu != CPU_TYPE_GBZ80)
@@ -1118,7 +1258,7 @@ int main(int argc, char **argv)
     /* Activate target's crt file */
     if ((c_nocrt == 0) && build_bin) {
         /* append target crt to end of filelist */
-        add_file_to_process(c_crt0);
+        add_file_to_process(c_crt0, 0);
         /* move crt to front of filelist */
         ptr = original_filenames[nfiles - 1];
         memmove(&original_filenames[1], &original_filenames[0], (nfiles - 1) * sizeof(*original_filenames));
@@ -1273,12 +1413,16 @@ int main(int argc, char **argv)
                 if ( c_coptrules_target ) {
                     rules[num_rules++] = c_coptrules_target;
                 }
-                if ( c_coptrules_cpu ) {
-                    rules[num_rules++] = c_coptrules_cpu;
+
+                if ( coptrules_cpu ) {
+                    rules[num_rules++] = coptrules_cpu;
                 }
+
                 if ( c_coptrules_user ) {
                     rules[num_rules++] = c_coptrules_user;
                 }
+
+
 
                 if (peepholeopt == 0)
                     apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".s");
@@ -1311,12 +1455,16 @@ int main(int argc, char **argv)
                 if ( c_coptrules_target ) {
                     rules[num_rules++] = c_coptrules_target;
                 }
-                if ( c_coptrules_cpu ) {
-                    rules[num_rules++] = c_coptrules_cpu;
+
+
+                if ( coptrules_cpu ) {
+                    rules[num_rules++] = coptrules_cpu;
                 }
+
                 if ( c_coptrules_sccz80 ) {
                     rules[num_rules++] = c_coptrules_sccz80;
                 }
+
                 if ( c_coptrules_user ) {
                     rules[num_rules++] = c_coptrules_user;
                 }
@@ -1416,8 +1564,10 @@ int main(int argc, char **argv)
                 else
                     q = original_filenames[i];
 
-                snprintf(tmp, sizeof(tmp) - 3, "MODULE %s\n"
-                         "LINE 0, \"%s\"\n\n", q, original_filenames[i]);
+                snprintf(tmp, sizeof(tmp) - 3, 
+						 "MODULE %s%s\n"
+                         "LINE 0, \"%s\"\n\n", 
+						isdigit(*q) ? "_" : "", q, original_filenames[i]);
 
                 /* change non-alnum chars in module name to underscore */
 
@@ -1444,6 +1594,9 @@ int main(int argc, char **argv)
                 exit(1);
             free(ptr);
             break;
+        case OBJFILE2:
+            if (process(".obj", c_extension, c_copycmd, "", filter_out, i, YES, YES))
+                exit(1);
         case OBJFILE:
             break;
         default:
@@ -1488,6 +1641,15 @@ int main(int argc, char **argv)
         outputfile = tempofile;
     }
 
+    {
+        // Sort out linklibs for CPU markers (only for classic)
+        int cpu_libs = ((c_clib == NULL) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc") && !strstr(c_clib, "clang")));
+        char *tmp = replace_str(linklibs, "@{ZCC_LIBCPU}", cpu_libs ? select_cpu(CPU_MAP_TOOL_LIBNAME) : "");
+
+        free(linklibs);
+        linklibs = tmp;
+    }
+
     if (compileonly) {
         if ((nfiles > 1) && (outputfile != NULL)) {
             /* consolidated object file */
@@ -1529,20 +1691,26 @@ int main(int argc, char **argv)
 
         int status = 0;
 
+		// z80asm now generates map file with same basename as output binary, i.e. a.map
+		/*
         if (mapon && copy_file(c_crt0, ".map", filenamebuf, ".map")) {
             fprintf(stderr, "Cannot copy map file\n");
             status = 1;
         }
+		*/
 
         if (symbolson && copy_file(c_crt0, ".sym", filenamebuf, ".sym")) {
             fprintf(stderr, "Cannot copy symbols file\n");
             status = 1;
         }
 
-        if (globaldefon && copy_defc_file(c_crt0, ".def", filenamebuf, ".def")) {
+		// z80asm now generates def file with same basename as output binary, i.e. a.def
+		/*
+		if (globaldefon && copy_defc_file(c_crt0, ".def", filenamebuf, ".def")) {
             fprintf(stderr, "Cannot create global defc file\n");
             status = 1;
         }
+		*/
 
         if (lston && copy_file(c_crt0, ".lis", filenamebuf, ".lis")) {
             fprintf(stderr, "Cannot copy crt0 list file\n");
@@ -1555,7 +1723,8 @@ int main(int argc, char **argv)
 
         if (createapp) {
             /* Building an application - run the appmake command on it */
-            snprintf(buffer, sizeof(buffer), "%s %s -b \"%s\" -c \"%s\"", c_appmake_exe, appmakeargs ? appmakeargs : "", outputfile, c_crt0);
+			/* z80asm now generates map file with same basename as output binary, i.e. a.map */
+            snprintf(buffer, sizeof(buffer), "%s %s -b \"%s\" -c \"%s\"", c_appmake_exe, appmakeargs ? appmakeargs : "", outputfile, filenamebuf);
             if (verbose) {
                 printf("%s\n", buffer);
                 fflush(stdout);
@@ -1564,6 +1733,9 @@ int main(int argc, char **argv)
                 fprintf(stderr, "Building application code failed\n");
                 status = 1;
             }
+        }
+        if ( !mapon ) {
+            remove_file_with_extension(outputfile, ".map");
         }
 
         exit(status);
@@ -1592,7 +1764,7 @@ static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, 
         if ( i == (num-1) ) {
             output_ext = ext;
         }
-        snprintf(argbuf,sizeof(argbuf),"%s %s", select_cpu(CPU_MAP_TOOL_COPT), rules[i]);
+        snprintf(argbuf,sizeof(argbuf),"%s %s %s", select_cpu(CPU_MAP_TOOL_COPT), coptarg ? coptarg : "", rules[i]);
         if (process(input_ext, output_ext, c_copt_exe, argbuf, filter, filenumber, YES, NO))
             exit(1);
     }
@@ -1896,7 +2068,7 @@ int copyprepend_file(char *name1, char *ext1, char *name2, char *ext2, char *pre
     cmd = muststrdup(buffer);
 #endif
     if (verbose) {
-        printf("%s\n", buffer);
+        printf("%s\n", cmd);
         fflush(stdout);
     }
     ret = (system(cmd));
@@ -1934,6 +2106,8 @@ int get_filetype_by_suffix(char *name)
         return ASMFILE;
     if (strcmp(ext, ".o") == 0)
         return OBJFILE;
+    if (strcmp(ext, ".obj") == 0)
+        return OBJFILE2;
     if (strcmp(ext, ".m4") == 0)
         return M4FILE;
     if (strcmp(ext, ".h") == 0)
@@ -2161,7 +2335,6 @@ void BuildOptions_start(char **list, char *arg)
     char           *orig = *list;
 
     zcc_asprintf(&val, "%s %s", arg, orig ? orig : "");
-
     free(orig);
     *list = val;
 }
@@ -2199,6 +2372,15 @@ void add_option_to_compiler(char *arg)
 
 char *find_file_ext(char *filename)
 {
+    {
+        struct explicit_extension* explicit = NULL;
+        HASH_FIND_STR(explicit_extensions, filename, explicit);
+        if (explicit)
+        {
+            return explicit->extension;
+        }
+    }
+
     char *p;
 
     if ((p = last_path_char(filename)) == NULL)
@@ -2219,17 +2401,53 @@ int is_path_absolute(char *p)
 #endif
 }
 
-void gather_from_list_file(char *filename)
+static void cmd_line_to_tokens(char* line, const char *path, struct tokens_list_s** tokens)
+{
+    char* p;
+    
+    while (*line && isspace(*line))
+        line++;
+
+    if ( *line == ';' || *line == '#')
+        return;
+    
+    p = strtok(line, " \r\n\t");
+
+    while (p != NULL)
+    {
+        struct tokens_list_s* token = mustmalloc(sizeof(struct tokens_list_s));
+        token->token = strdup(p);
+        token->path = strdup(path);
+        LL_APPEND((*tokens), token);
+        p = strtok(NULL, " \r\n\t");
+    }
+}
+
+void cmd_free_tokens(struct tokens_list_s* tokens)
+{
+    struct tokens_list_s* tmp;
+    struct tokens_list_s* token;
+    LL_FOREACH_SAFE(tokens, token, tmp)
+    {
+        LL_DELETE(tokens, token);
+        free(token->path);
+        free(token->token);
+        free(token);
+    }
+}
+
+static struct tokens_list_s* gather_from_list_file(char *filename)
 {
     FILE *in;
     char *line, *p;
     unsigned int len;
     char pathname[FILENAME_MAX + 1];
-    char outname[FILENAME_MAX * 2 + 2];
+
+    struct tokens_list_s* tokens = NULL;
 
     /* reject non-filenames */
     if (((filename = strtok(filename, " \r\n\t")) == NULL) || !(*filename))
-        return;
+        return NULL;
 
     /* open list file for reading */
     if ((in = fopen(filename, "r")) == NULL) {
@@ -2246,43 +2464,7 @@ void gather_from_list_file(char *filename)
     /* read filenames from list file */
     line = NULL;
     while (zcc_getdelim(&line, &len, '\n', in) > 0) {
-        if (((p = strtok(line, " \r\n\t")) != NULL) && *p) {
-            /* check for comment line */
-            if ((*p == ';') || (*p == '#'))
-                continue;
-
-            /* clear output filename */
-            *outname = '\0';
-
-            /* prepend list file indicator if the filename is a list file */
-            if (*p == '@') {
-                strcpy(outname, "@");
-                if (((p = strtok(p + 1, " \r\n\t")) == NULL) || !(*p))
-                    continue;
-            }
-
-            /* sanity check */
-            if (strlen(p) > FILENAME_MAX) {
-                fprintf(stderr, "Filename is too long \"%s\"\n", p);
-                exit(1);
-            }
-
-            /* prepend path if filename is not absolute */
-            if (!lstcwd && !is_path_absolute(p))
-                strcat(outname, pathname);
-
-            /* append rest of filename */
-            strcat(outname, p);
-
-            /* add file to process */
-
-            if (strlen(outname) >= FILENAME_MAX) {
-                fprintf(stderr, "Filename is too long \"%s\"\n", outname);
-                exit(1);
-            }
-
-            add_file_to_process(outname);
-        }
+        cmd_line_to_tokens(line, pathname, &tokens);
     }
 
     if (!feof(in)) {
@@ -2292,9 +2474,11 @@ void gather_from_list_file(char *filename)
 
     free(line);
     fclose(in);
+
+    return tokens;
 }
 
-void add_file_to_process(char *filename)
+void add_file_to_process(char *filename, char process_extension)
 {
     FILE *fclaim;
     char tname[FILENAME_MAX + 1];
@@ -2305,8 +2489,58 @@ void add_file_to_process(char *filename)
         p = strip_outer_quotes(p);
 
         if (*p == '@') {
-            gather_from_list_file(p + 1);
-    } else if ((*p != ';') && (*p != '#')) { /* ignore filename leading with semicolon or hash */
+            struct tokens_list_s* tokens = gather_from_list_file(p + 1);
+
+            char outname[FILENAME_MAX * 2 + 2];
+
+
+            struct tokens_list_s* token;
+            LL_FOREACH(tokens, token) {
+                p = token->token;
+
+                /* check for comment line */
+                if ((*p == ';') || (*p == '#'))
+                    continue;
+
+                /* clear output filename */
+                *outname = '\0';
+
+                /* sanity check */
+                if (strlen(p) > FILENAME_MAX) {
+                    fprintf(stderr, "Filename is too long \"%s\"\n", p);
+                    exit(1);
+                }
+
+                if (p[0] == '-') {
+                    parse_cmdline_arg(p);
+                } else if (p[0] != '+') {
+
+                    if ( p[0] == '@') {
+                        strcpy(outname,"@");
+                        p++;
+                    }
+                    /* prepend path if filename is not absolute */
+                    if (!lstcwd && !is_path_absolute(p))
+                        strcat(outname, token->path);
+
+                    /* append rest of filename */
+                    strcat(outname, p);
+
+                    /* add file to process */
+
+                    if (strlen(outname) >= FILENAME_MAX) {
+                        fprintf(stderr, "Filename is too long \"%s\"\n", outname);
+                        exit(1);
+                    }
+
+                    add_file_to_process(outname, 1);
+                }
+
+                p = strtok(NULL, " \r\n\t");
+            }
+
+            cmd_free_tokens(tokens);
+        } else if ((*p != ';') && (*p != '#')) { /* ignore filename leading with semicolon or hash */
             /* Expand memory for filenames */
             if ((original_filenames = realloc(original_filenames, (nfiles + 1) * sizeof(char *))) == NULL) {
                 fprintf(stderr, "Unable to realloc memory for input filenames\n");
@@ -2321,24 +2555,32 @@ void add_file_to_process(char *filename)
                 exit(1);
             }
 
-            /* Add this file to the list of original files */
-            if (find_file_ext(p) == NULL) {
-                /* file without extension - see if it exists, exclude directories */
-                if ((stat(p, &tmp) == 0) && (!(tmp.st_mode & S_IFDIR))) {
-                    fprintf(stderr, "Unrecognized file type %s\n", p);
-                    exit(1);
-                }
-                /* input file has no extension and does not exist so assume .asm then .o then .asm.m4 */
-                original_filenames[nfiles] = mustmalloc((strlen(p) + 8) * sizeof(char));
-                strcpy(original_filenames[nfiles], p);
-                strcat(original_filenames[nfiles], ".asm");
-                if (stat(original_filenames[nfiles], &tmp) != 0) {
-                    strcpy(strrchr(original_filenames[nfiles], '.'), ".o");
-                    if (stat(original_filenames[nfiles], &tmp) != 0)
-                        strcpy(strrchr(original_filenames[nfiles], '.'), ".asm.m4");
-                }
-            } else {
+            if (process_extension && explicit_file_type_defined()) {
+                struct explicit_extension* exp = mustmalloc(sizeof(struct explicit_extension));
+                exp->filename = muststrdup(p);
+                exp->extension = get_explicit_file_type();
+                HASH_ADD_STR(explicit_extensions, filename, exp);
                 original_filenames[nfiles] = muststrdup(p);
+            } else {
+                /* Add this file to the list of original files */
+                if (find_file_ext(p) == NULL) {
+                    /* file without extension - see if it exists, exclude directories */
+                    if ( stat(p, &tmp) == 0 && !S_ISDIR(tmp.st_mode) ) {
+                        fprintf(stderr, "Unrecognized file type %s\n", p);
+                        exit(1);
+                    }
+                    /* input file has no extension and does not exist so assume .asm then .o then .asm.m4 */
+                    original_filenames[nfiles] = mustmalloc((strlen(p) + 8) * sizeof(char));
+                    strcpy(original_filenames[nfiles], p);
+                    strcat(original_filenames[nfiles], ".asm");
+                    if (stat(original_filenames[nfiles], &tmp) != 0) {
+                        strcpy(strrchr(original_filenames[nfiles], '.'), ".o");
+                        if (stat(original_filenames[nfiles], &tmp) != 0)
+                            strcpy(strrchr(original_filenames[nfiles], '.'), ".asm.m4");
+                    }
+                } else {
+                    original_filenames[nfiles] = muststrdup(p);
+                }
             }
 
             /* Working file is the original file */
@@ -2439,19 +2681,40 @@ void parse_cmdline_arg(char *arg)
 void LoadConfigFile(arg_t *argument, char *arg)
 {
     char   buf[FILENAME_MAX+1];
-    char  *cfgfile;
+    struct stat sb;
 
-    cfgfile = getenv("ZCCCFG");
-    if (cfgfile != NULL) {
-        if (strlen(cfgfile) > ( FILENAME_MAX - strlen(arg) - strlen("/") )) {
-            fprintf(stderr, "Possibly corrupt env variable ZCCCFG\n");
-            exit(1);
+    do {
+        // 1. Try a local file/absolute path
+        snprintf(buf,sizeof(buf), "%s",arg);
+        if ( stat(buf, &sb) == 0 && S_ISREG(sb.st_mode)) {
+            break;
         }
-        /* Config file in config directory */
-        snprintf(buf, sizeof(buf), "%s/%s", cfgfile, arg);
-    } else {
+
+        // 2. Try in ZCCCFG
+        if (c_zcc_cfg != NULL) {
+            /* Config file in config directory */
+            snprintf(buf, sizeof(buf), "%s/%s", c_zcc_cfg, arg);
+            if ( stat(buf, &sb) == 0 && S_ISREG(sb.st_mode)) {
+                break;
+            }
+        }
+
+        // 3. Try in cfg file path
+        snprintf(buf,sizeof(buf),"%s/%s",cfg_path,arg);
+        if ( stat(buf, &sb) == 0 && S_ISREG(sb.st_mode)) {
+            break;
+        }
+
+        // 4. Try install dir
         snprintf(buf, sizeof(buf), "%s/lib/config/%s", c_install_dir, arg);
-    }
+        if ( stat(buf, &sb) == 0 && S_ISREG(sb.st_mode)) {
+            break;
+        }
+
+        fprintf(stderr, "Can't open config file %s\n", arg);
+        exit(1);
+    } while (0);
+
     parse_configfile(buf);
 }
 
@@ -2614,8 +2877,7 @@ static void configure_compiler()
         compiler_style = filter_outspecified_flag;
         BuildOptions(&asmargs, "-D__SDCC");
         BuildOptions(&linkargs, "-D__SDCC");
-    }
-    else {
+    } else if (strcmp(c_compiler_type,"sccz80") == 0 ) {
         preprocarg = " -DSCCZ80 -DSMALL_C -D__SCCZ80";
         BuildOptions(&cpparg, preprocarg);
                 BuildOptions(&asmargs, "-D__SCCZ80");
@@ -2640,6 +2902,9 @@ static void configure_compiler()
         }
         c_compiler = c_sccz80_exe;
         compiler_style = outspecified_flag;
+    } else {
+        printf("Unknown compiler type: %s\n",c_compiler_type);
+        exit(1);
     }
 }
 
@@ -2805,6 +3070,17 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
                     free(name);
                 }
 
+                if (verbose && preprocessonly && printmacros) {
+                    FILE* f = fopen(ptr, "r");
+                    if (f) {
+                        static char buf[1024];
+                        unsigned long nread;
+                        while ((nread = fread(buf, 1, sizeof(buf), f)) > 0)
+                            fwrite(buf, 1, nread, stdout);
+                        fclose(f);
+                    }
+                }
+
                 /* copy to output directory */
                 if (copy_file(ptr, "", fname, "")) {
                     fprintf(stderr, "Couldn't copy output file %s\n", fname);
@@ -2824,12 +3100,6 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
 void remove_temporary_files(void)
 {
     int             j;
-
-    /* Show all error files */
-
-    for (j = 0; j < nfiles; j++) {
-        ShowErrors(filelist[j], original_filenames[j]);
-    }
 
     if (cleanup) {    /* Default is yes */
         for (j = 0; j < nfiles; j++) {
@@ -2851,10 +3121,10 @@ void remove_temporary_files(void)
             remove_file_with_extension(temporary_filenames[j], ".tmp");
             remove_file_with_extension(temporary_filenames[j], ".lis");
         }
+        /* Cleanup zcc_opt files */
+        remove(zcc_opt_def);
+        rmdir(zcc_opt_dir);
     }
-    /* Cleanup zcc_opt files */
-    remove(zcc_opt_def);
-    rmdir(zcc_opt_dir);
 }
 
 
@@ -2864,62 +3134,6 @@ void remove_file_with_extension(char *file, char *ext)
     temp = changesuffix(file, ext);
     remove(temp);
     free(temp);
-}
-
-
-void
-ShowErrors(char *filen, char *orig)
-{
-    char           *temp;
-    char            buffer[LINEMAX + 1];
-    char            buffer2[LINEMAX + 1];
-    char            filenamebuf[LINEMAX + 1];
-    char           *ptr_char;
-    int             j, linepos;
-    FILE           *fp, *fp2;
-
-    temp = changesuffix(filen, ".err");
-    if ((fp = fopen(temp, "r")) != NULL) {
-        if (orig) {
-            fprintf(stderr, "Errors in source file %s:\n", orig);
-        } else {
-            /* We're printing linking errors, better print a key! */
-            fprintf(stderr, "Key to filenames:\n");
-            for (j = 0; j < nfiles; j++) {
-                fprintf(stderr, "%s = %s\n", filelist[j], original_filenames[j]);
-            }
-        }
-
-        while (fgets(buffer, LINEMAX, fp) != NULL) {
-            fprintf(stderr, "%s", buffer);
-
-            /* Dig into asm source file and show the corresponding line.. */
-            if (strstr(buffer, " line ") != NULL ) {    /* ..only if a line number is given */
-                linepos = atoi(strstr(buffer, " line ") + strlen(" line "));
-                strcpy(filenamebuf, strstr(buffer, "'") + strlen("'"));
-                ptr_char = strstr(filenamebuf,"::");
-                if (ptr_char) *ptr_char = 0;
-                ptr_char = strstr(filenamebuf, "'");        /* Find second ' */
-                if (ptr_char) *ptr_char = 0;                /* End filenamebuf at second ' or at end of string */
-
-                if ((linepos > 1) && ((fp2 = fopen(filenamebuf, "r")) != NULL)) {
-                    for (j = 1; j < linepos; j++) {
-                        if (NULL == fgets(buffer2, LINEMAX, fp2)) {
-                            fprintf(stderr, "Error while reading string from %s\n", temp);
-                            exit(1);
-                        }
-                    }
-                    fprintf(stderr, "                   ^ ---- %s", fgets(buffer2, LINEMAX, fp2));
-                    fclose(fp2);
-                }
-            }
-
-        }
-        fclose(fp);
-
-    }
-    free(temp);        /* Free temp buffer */
-
 }
 
 
@@ -2980,31 +3194,24 @@ void tempname(char *filen)
 *
 *    If ZCCCFG doesn't exist then we take the c_install_dir/lib/config/zcc.cfg
 */
-int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, size_t buflen)
+void find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t buflen)
 {
     FILE           *fp;
-    char           *cfgfile;
 
     /* Scan for an option file on the command line */
     if (arg[0] == '+') {
         snprintf(buf, buflen, "%s", arg + 1);
-        gc++;        /* Increment first arg to search from */
         if (strstr(arg, ".cfg") != NULL) {
             if ((fp = fopen(buf, "r")) != NULL) {
                 /* Local config file */
                 fclose(fp);
-                return (gc);
+                return;
             }
         }
-        cfgfile = getenv("ZCCCFG");
-        if (cfgfile != NULL) {
-            if (strlen(cfgfile) > ( FILENAME_MAX - strlen(arg+1) - strlen("/.cfg") )) {
-                fprintf(stderr, "Possibly corrupt env variable ZCCCFG\n");
-                exit(1);
-            }
+        if (c_zcc_cfg != NULL) {
             /* Config file in config directory */
-            snprintf(buf, buflen, "%s/%s.cfg", cfgfile, arg + 1);
-            return (gc);
+            snprintf(buf, buflen, "%s/%s.cfg", c_zcc_cfg, arg + 1);
+            return;
         } else {
             snprintf(buf, buflen, "%s/lib/config/%s.cfg", c_install_dir, arg + 1);
         }
@@ -3012,10 +3219,10 @@ int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, 
          * User supplied invalid config file, let it fall over back
          * when
          */
-        return (gc);
+        return;
     }
     /* Without a config file, we should just print usage and then exit */
-    fprintf(stderr, "A config file must be specified with +file as the first argument\n\n");
+    fprintf(stderr, "A config file must be specified with +file\n\n");
     print_help_text(program);
     exit(1);
 }
@@ -3032,7 +3239,7 @@ void parse_option(char *option)
             if (ptr[0] == '-') {
                 parse_cmdline_arg(strip_inner_quotes(ptr));
             } else {
-                add_file_to_process(strip_outer_quotes(ptr));
+                add_file_to_process(strip_outer_quotes(ptr), 1);
             }
             ptr = qstrtok(NULL, " \t\r\n");
         }

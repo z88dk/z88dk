@@ -2,7 +2,7 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2019
+# Copyright (C) Paulo Custodio, 2011-2023
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #
 # Preprocessor that translates z80asm source code for CP/M's Z80MR, generates .i file with
@@ -26,6 +26,7 @@
 use strict;
 use warnings;
 use Capture::Tiny 'capture';
+use Config;
 use File::Basename;
 use IO::File;
 use File::Spec;
@@ -33,7 +34,6 @@ use Iterator::Simple qw( iter ienumerate iflatten imap igrep );
 use Iterator::Simple::Lookahead;
 use Regexp::Common;
 use FindBin;
-use Data::Dump 'dump';
 
 #------------------------------------------------------------------------------
 # Globals
@@ -44,6 +44,7 @@ our %MACRO;			# macros { args, local, lines }
 our %DEFL;			# variable-value macros
 our $DEFL_RE;		# match any DEFL name
 our $UCASE;			# if true all text is capitalized on reading from file
+our $VERBOSE;		# output additional information
 
 our $NAME_RE = 
 	qr/ [_a-z]  \w* /ix;
@@ -135,8 +136,7 @@ sub add_define {
 #------------------------------------------------------------------------------
 sub error {
 	my($line, $message) = @_;
-	die "Error at file ", $line->{file}, " line ", $line->{line_nr},
-		": ", $message, "\n";
+	die $line->{file},":",$line->{line_nr},": error: ",$message,"\n";
 }		
 
 #------------------------------------------------------------------------------
@@ -320,7 +320,7 @@ sub add_label_suffix {
 	return 
 		imap {
 			for ($_->{text}) {
-				if ( $_ =~ /^\s*(IF|IFDEF|IFNDEF|ELSE|ENDIF)/i ) { next; }
+				if ( $_ =~ /^\s*(IF|IFDEF|IFNDEF|ELSE|ELIF|ELIFDEF|ELIFNDEF|ENDIF)/i ) { next; }
 				s/^(\w+)\s+(\w+)/$1: $2/;
 				s/^(\w+)\s*$/$1:/;
 			}
@@ -337,8 +337,8 @@ sub parse_include_it {
 		sub {
 			defined(my $line = <$in>) or return;
 			if ( $line->{text} =~ 
-				/^ [\#\*]? \s* INCLUDE \s+ $QFILE_RE /ix ) {
-				return read_file_it($1);
+				/^ \s* [\#\*]? \s* INCLUDE \s+ $QFILE_RE /ix ) {
+				return parse_include_it(read_file_it($1));
 			}
 			return $line;
 		};
@@ -451,6 +451,14 @@ sub convert_expr_it {
 							  map {$_ eq '#' ? '1' : '0'}
 							  split(//, $+{str} ) ) )
 			  }egxi;
+			s/\\(
+				(?:[abenrt'"\\]) |             # Single char escapes
+				(?:[ul].) |                    # uc or lc next char
+				(?:x[0-9a-fA-F]{2}) |          # 2 digit hex escape
+				(?:x\{[0-9a-fA-F]+\}) |        # more than 2 digit hex
+				(?:\d{2,3}) |                  # octal
+				(?:N\{U\+[0-9a-fA-F]{2,4}\})   # unicode by hex
+				)/"qq|\\$1|"/geex;
 			s{ $QSTR_RE }{ join(",", map {ord} split(//, $+{str})) }egxi;
 			s/ (?| \b   ( \d [0-9A-F]* ) h \b 
 				 | \$   (    [0-9A-F]+ ) \b
@@ -609,15 +617,17 @@ sub assemble_file {
 	close $fh;
 	
 	# assemble, translate error messages
-	my @cmd = ('z80asm', @OPTIONS, $i_file);
-	print "@cmd\n";
-	$cmd[0] = $FindBin::Bin.'/z80asm';
+	my @cmd = ('z88dk-z80asm', @OPTIONS, $i_file);
+	$cmd[0] = $FindBin::Bin.'/z88dk-z80asm'.$Config{_exe};
+	if ($VERBOSE) {
+		print "@cmd\n";
+	}
 	my ($stdout, $stderr, $exit) = capture {
 		system @cmd;
 	};
 	
-	$stderr =~ s/(at file ')([^']+)(' line )(\d+)/
-				 $1 . $line_map[$4]{file} . $3 . $line_map[$4]{line_nr} /ge;
+	$stderr =~ s/^([^:]+):(\d+): (error|warning): /
+				 $line_map[$2]{file}.":".$line_map[$2]{line_nr}.": ".$3.": "/ge;
 	print $stdout;
 	print STDERR $stderr;
 	
@@ -630,9 +640,12 @@ while (@ARGV && $ARGV[0] =~ /^-/) {
 	if    (/^-I(.*)/ ) {					add_path($1); }
 	elsif (/^-D($NAME_RE)(?:=(.*))?/ ) {	define_defl(uc($1), $2 || 1); }
 	elsif (/^--ucase$/ ) {					$UCASE = 1; }
+	elsif (/^-c$/ ) {						; } # ignore -c (for cmake)
+	elsif (/^-o$/ ) { $_ = shift;			push @OPTIONS, "-o$_"; } # remove <space> between -o and file name
+	elsif (/^-v$/ ) {						$VERBOSE = 1; } # only be noisy if asked
 	else {									push @OPTIONS, $_; }
 }
 
-@ARGV or die "Usage: ", basename($0), " [-Ipath][-Dvar[=value]] FILE...\n";
+@ARGV or die "Usage: ", basename($0), " [-Ipath][-Dvar[=value]][-v][--ucase] FILE...\n";
 assemble_file($_) for @ARGV;
 exit 0;

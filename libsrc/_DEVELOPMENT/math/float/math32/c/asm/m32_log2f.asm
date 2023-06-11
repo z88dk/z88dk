@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.2.0 #13131 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -67,6 +67,10 @@
 	EXTERN __rrslonglong_callee
 	EXTERN __rrulonglong
 	EXTERN __rrulonglong_callee
+	EXTERN ___mulsint2slong
+	EXTERN ___mulsint2slong_callee
+	EXTERN ___muluint2ulong
+	EXTERN ___muluint2ulong_callee
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
@@ -257,6 +261,8 @@
 	GLOBAL _inv
 	GLOBAL _sqr_fastcall
 	GLOBAL _sqr
+	GLOBAL _neg_fastcall
+	GLOBAL _neg
 	GLOBAL _isunordered_callee
 	GLOBAL _isunordered
 	GLOBAL _islessgreater_callee
@@ -423,7 +429,7 @@ _m32_log2f:
 	add	ix,sp
 	ld	c, l
 	ld	b, h
-	ld	hl, -14
+	ld	hl, -18
 	add	hl, sp
 	ld	sp, hl
 	ld	(ix-6),c
@@ -442,11 +448,18 @@ _m32_log2f:
 	call	___fslt_callee
 	bit	0,l
 	jr	NZ,l_m32_log2f_00102
-	ld	de,0xff00
-	ld	hl,0x0000
+	ld	a,0xff
+	ld	(ix-18),a
+	ld	(ix-17),a
+	ld	(ix-16),a
+	ld	(ix-15),a
+	pop	hl
+	push	hl
+	ld	e,(ix-16)
+	ld	d,(ix-15)
 	jp	l_m32_log2f_00106
 l_m32_log2f_00102:
-	ld	hl,12
+	ld	hl,16
 	add	hl, sp
 	push	hl
 	ld	l,(ix-4)
@@ -467,9 +480,10 @@ l_m32_log2f_00102:
 	push	de
 	push	bc
 	call	___fslt_callee
+	ld	(ix-3),l
 	pop	de
 	pop	bc
-	ld	a,l
+	ld	a,(ix-3)
 	or	a, a
 	jr	Z,l_m32_log2f_00104
 	ld	l,(ix-2)
@@ -487,7 +501,8 @@ l_m32_log2f_00102:
 	push	de
 	push	hl
 	call	___fssub_callee
-	ex	(sp),hl
+	ld	(ix-14),l
+	ld	(ix-13),h
 	ld	(ix-12),e
 	ld	(ix-11),d
 	jr	l_m32_log2f_00105
@@ -499,7 +514,8 @@ l_m32_log2f_00104:
 	push	de
 	push	bc
 	call	___fssub_callee
-	ex	(sp),hl
+	ld	(ix-14),l
+	ld	(ix-13),h
 	ld	(ix-12),e
 	ld	(ix-11),d
 l_m32_log2f_00105:
@@ -523,16 +539,14 @@ l_m32_log2f_00105:
 	ld	h,(ix-13)
 	push	hl
 	call	_m32_polyf
-	ld	c, l
-	ld	l,(ix-8)
-	ld	b,h
-	ld	h,(ix-7)
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
-	push	de
+	ld	c,(ix-8)
+	ld	b,(ix-7)
 	push	bc
+	ld	c,(ix-10)
+	ld	b,(ix-9)
+	push	bc
+	push	de
+	push	hl
 	call	___fsmul_callee
 	ld	(ix-6),l
 	ld	(ix-5),h
@@ -555,12 +569,8 @@ l_m32_log2f_00105:
 	ld	(ix-10),l
 	ld	(ix-9),h
 	ld	(ix-8),e
-	ld	l, e
 	ld	(ix-7),d
-	ld	h,d
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
+	push	de
 	push	hl
 	ld	hl,0x3ee2
 	push	hl
@@ -571,12 +581,12 @@ l_m32_log2f_00105:
 	ld	(ix-5),h
 	ld	(ix-4),e
 	ld	(ix-3),d
-	pop	bc
-	pop	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
 	push	hl
-	push	bc
+	ld	l,(ix-14)
+	ld	h,(ix-13)
 	push	hl
-	push	bc
 	ld	hl,0x3ee2
 	push	hl
 	ld	hl,0xa8ed
@@ -591,27 +601,23 @@ l_m32_log2f_00105:
 	ld	h,(ix-5)
 	push	hl
 	call	___fsadd_callee
-	ld	c, l
-	ld	l,(ix-8)
-	ld	b,h
-	ld	h,(ix-7)
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
-	push	de
+	ld	c,(ix-8)
+	ld	b,(ix-7)
 	push	bc
+	ld	c,(ix-10)
+	ld	b,(ix-9)
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
-	ld	c, l
-	ld	l,(ix-12)
-	ld	b,h
-	ld	h,(ix-11)
-	push	hl
-	ld	l,(ix-14)
-	ld	h,(ix-13)
-	push	hl
-	push	de
+	ld	c,(ix-12)
+	ld	b,(ix-11)
 	push	bc
+	ld	c,(ix-14)
+	ld	b,(ix-13)
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
 	ld	(ix-6),l
 	ld	(ix-5),h

@@ -17,59 +17,59 @@ l_fast_mulu_72_64x8:
    ;         carry reset
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
-   
+
    push ix
-   
+
    exx
-   
+
    push de
    push hl                     ; save MS32
    push af                     ; save M8
-   
+
    exx
-   
+
    call l_fast_mulu_40_32x8    ; adehl = LS32 * M8
-   
+
    ld c,a
    ld b,0
-   
+
    exx
-   
+
    pop af                      ; a = M8
    pop hl
    pop de                      ; dehl = MS32
-   
+
    exx
-   
+
    push de
    push hl
    push bc                     ; save LS32 * M8
-   
+
    exx
-   
+
    call l_fast_mulu_40_32x8    ; adehl = MS32 * M8
-   
+
    pop bc
    add hl,bc
-   
+
    jr nc, no_propagate
-   
+
    inc e
    jr nz, no_propagate
-   
+
    inc d
    jr nz, no_propagate
-   
+
    inc a
-   
+
 no_propagate:
 
    exx
-   
+
    pop hl
    pop de                      ; a dehl'dehl = 72-bit product
-   
+
    pop ix
-   
+
    or a
    ret

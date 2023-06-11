@@ -13,7 +13,6 @@
 	EXTERN	div14
 	EXTERN	pack2
 	EXTERN	norm4
-	EXTERN	afswap
 
 	EXTERN	fa
 	EXTERN	extra

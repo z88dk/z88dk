@@ -2,7 +2,7 @@ include ../Make.config
 
 
 SUBDIRS = heap linkedlist queue stack
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 all: subdirs-all
 
@@ -20,9 +20,8 @@ subdirs-clean: $(CLEANDIRS)
 .PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
 
 
-
 $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean

@@ -1,29 +1,166 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
-z88dk v2.2 - xx.xx.xxx
+
+z88dk v2.3 - xx.xx.202x
 
 Detailed but incomplete changelist:
 
+- [classic] +agon: New target
+- [classic] +cpc: Interrupt support
+- [classic] +cpc: Graphics support for all 3 official modes
+- [classic] +cpm: Support for Xerox 820 and sound on 820ii
+- [classic] +cpm: IMD disk option added to several targets
+- [classic] +cpm: Support for Visual 1050
+- [classic] +cpm: Support for Sanyo MBC-200/MBC-1200 models
+- [classic] +cpm: Sanyo MBC disk formats (several models)
+- [classic] +cpm: VT-180 "Robin", Morrow, Ampro & Actrix disk formats
+- [classic] +cpm: Support for corvette boot disk
+- [classic] +cpm: Support for NabuPC
+- [classic] +cpm: Support for Gemini Galaxy
+- [classic] +cpm: Einstein 256 support added
+- [classic] +msx: tape libraries for MSX and Spectravideo
+- [classic] +msx: Support for V9938 on MSX2
+- [classic] +nabu: New target: Nabu PC
+- [classic] +z80: New target
+- [classic] Support for Tektronix and Regis graphic terminals
+- [classic] Shared SP1 between classic and newlib
+- [classic] Arkos Tracker available for +cpc, +msx, +zx, +zxn
+- [classic] TMS99x8 library enhancements
+- [classic] A fixed point Q8.8 maths library is available
+- [newlib] Arkos Tracker available for +zx, +zxn
+- [sccz80] 8080, 8085, gbz80 opt-code-speed: add32, sub32, longcompare
+- [sccz80] Extended quikmult cases
+- [sccz80] Initialisation improvements
+- [z80asm] Allow jr across sections
+- [z80asm] Convert address difference to constant
+- [z80asm] Support #ifdef/#endif etc in assembler
+- [z80asm] Accept ':' as statement separator
+- [z80asm] add support to ez80, both z80 memory mode and ADL memory mode
+- [zcc] +config at any place, support for -xc
+- [make] add cmake support
+
+z88dk v2.2 - 23.07.2022
+
+As usual, there's 100s of changes, the major features for this release include:
+
+* Source code debugging support for programs compiled with sccz80
+* Enhanced and optimised 8080/8085/gbz80 support
+* Macros and improvements to z80asm
+* <features.h> for cross target compatibility
+* SDCC has been upgraded to v4.2.0 r13131
+
+Targets added or improved significantly in this release are:
+
+* Sam Coupé (+sam)
+* PC88 (+pc88)
+* Micro85 (+micro85)
+* Radio 86 (+radio86)
+* Bondwell 2 (via +cpm)
+* PTC Sol 20 (+sol20)
+* GSX Graphics (+cpm)
+* RC2014 8085 support (+rc2014)
+
+Some Additional Details
+
+* z88dk-gdb - IDE debugging is now supported using CLion/VSCode with MAME, or FUSE (Spectrum Emulator).
+
+* z88dk-z80asm - Is now a MACRO assembler, supporting all of the classic macro assembly key words. Additionally many synthetic instructions have been added across all platforms. A new FLOAT directive allows the assembly of floating point numbers in any one of the library's formats. The Intel 8085 undocumented instructions are now supported, as are all Z80N extension instructions.
+
+* z88dk-zsdcc - The latest stable release SDCC 4.2.0 has been patched to support z88dk and is included. The traditional z88dk calling conventions (__z88dk_fastcall & __z88dk_callee) have been retained.
+
+* Further integration of the classic and new libraries has been completed. To a large extent Z80 machines now share the same code base across both libraries. For the other machine types found in the classic library (I8080, I8085, and GBZ80) code has been organised for hierarchical inheritance, rewritten to be re-entrant, and provide callee support wherever possible.
+
+* The floating point maths libraries have been extended, with the Microsoft mbf32 library receiving code optimisation paths with I8085 and Z80 specific instructions. The IEEE single-precision math32 Z80 support has been further performance optimised. The am9511 APU maths library now works with I8085 CPUs and the classic library.
+
+* Improved or new support for many machines including the GL6000, the homebrew Micro85, the Radio86 family, the SAM support was extensively reworked, the NEC PC-88 video was reworked, and support for the PTC Sol 20 was added. Support for the RC2014 using the I8085 CPU was added, making use of the tighter integration between classic and new libraries. The CP/M target has been extended to support disc creation for Amstrad, Televideo, and Bondwell systems, and Amstrad PCW Graphics support was added. A generalised CP/M GSX graphics library is also now available.
+
+* And finally, building z88dk from source on ARM64 (AArch64) architecture (eg Apple M1, or Raspberry Pi 3 or later) is now supported, enabling a new generation of host systems.
+
+Detailed but incomplete changelist:
+
+- [all] Compressed data can now use ZX0 compression tools
+- [all] math32 optimisations
+- [appmake] Compressed ROM data sections can now use zx0
+- [classic] features.h added for improved portability
+- [classic] ZX0,1,2 decompression functions added
+- [classic] math MBF32: 8085 and z80 instruction optimisation
+- [classic] math AM9511: support for 8085
+- [classic] sccz80 8080, 8085, gbz80 l_ primitive reentrancy
+- [classic] string function loop overhead optimisation
+- [classic] string callee functions made 8080, 8085 safe
+- [classic] +cpc: Screen driver fixes
+- [classic] +cpc: Banking support
 - [classic] +cpm: Amstrad, Televideo, Bondwell disc creation
 - [classic] +cpm: support for Bondwell 2 console and graphics
 - [classic] +cpm: Amstrad PCW Graphics library
-- [appmake] Compressed ROM data sections can now use zx0
-- [all] Compressed data can now use ZX0 compression tools
-- [classic] ZX0 decompression functions added
-- [classic] +radio86: New target for the Radio86 family
 - [classic] +cpm: New subtypes for Bondwell 12/14 and 2
+- [classic] +cpm: Removal of code that made it incompatible with the z180
 - [classic] +cpm: GSX graphics library
+- [classic] +cpm/msxdos1: fcntl speedup via caching
 - [classic] +gl: GL6000 support improved
+- [classic] +micro85: Support for the homebrew Micro85 added
+- [classic] +msx: (msxdos) Time functions now available
 - [classic] +pc88: Graphics reworked and optimised
+- [classic] +radio86: New target for the Radio86 family
 - [classic] +sam: Extensively reworked and improved
+- [classic] +sol20: Support for the PTC Sol 20 added
+- [classic] +vg5k: 8x10 fonts and UDGs now usable
+- [classic] +ts2068/zxn: "fatpix" available in hires mode
+- [classic] +z88: Support for the OZ5 apps and shell
 - [classic] +zx: Improved Interface 1/Microdrive support
+- [classic] +zx: esxdos and plus3 fcntl enhancements
 - [newlib] ZX0 decompression functions added
-- [newlib] +rc2014: Support for shadow RAM copying
-- [zsdcc] Upgraded to SDCC 4.1.4 r12250 (bugfixes)
-
+- [newlib] +rc2014: 8085 CPU support through new/classic hybrid library
+- [newlib] +zxn: dot files are now created correctly
+- [gdb] Debugger interface from ticks, connects to a gdbserver
+- [sccz80] Temporary files now removed on windows
+- [sccz80] Bug fixes + optimisations
+- [sccz80] Debug information using -debug
+- [ticks] Start of symbolic debugging
+- [z80asm] Now supports assembling undocumented 8085 instructions
+- [z80asm] Replace --cpu=r2k with --cpu=r2ka
+- [z80asm] Macros are now supported
+- [z80asm] New ASSERT directive 
+- [z80asm] New FLOAT directive
+- [zsdcc] Upgraded to SDCC 4.2.0 r13131
 
 z88dk v2.1 - 07.02.2021
+
+As usual there's hundreds of changes ranging from more targets, to changes to speed up compilation and smoothing the development experience, some highlights:
+
+There's new support for a bunch of 808x (and other) machines:
+
+* Altair8800
+* DAI32
+* Homelab 2 and Homelab3/4
+* Krokha
+* LM80-C homebrew machine
+* Lviv/Lvov PK-01
+* Ondra Vili
+* Specialist
+* Vector 06c
+* Spectrum Next
+
+There's also been some work around floating point again:
+
+* A 16 bit IEEE754 maths library
+* DAI 8080 maths library (classic)
+* AM9511 support (newlib)
+
+To create some noise, there's some tracker changes:
+
+* Imported WYZplayer (AY)
+* Imported Vortex Tracker2 (AY)
+* PSGlib is now available for other targets (SN76489)
+
+The toolchain has had some improvements too:
+
+* zsdcc has been updated to sdcc 4.0.7 r12036
+* sccz80 supports long long data types
+* Concurrent builds from same directory are now supported
+* Banking/MegaROMs supported on several targets
+* Linking is now significantly faster on Windows
 
 Detailed but incomplete changelist:
 
@@ -176,7 +313,7 @@ A more detailed (incomplete) changelist follows:
 - [classiclib] +c128 improvements
 - [classiclib] [math48] #108: Single parameter library math functions now work correctly
 - [classiclib] +rcmx000 support has been restored and optimisations applied
-- [classiclib] builtin functions are enabled for both sccz80 and zsdcc, disable thema ll
+- [classiclib] builtin functions are enabled for both sccz80 and zsdcc, disable them all
   with -D__DISABLE_BUILTIN or individually with __DISABLE_BUILTIN_[function]
 - [classiclib] +sms fixed an issue with tile corruption due to sdcc compatiblity
   code being inserted in the wrong place

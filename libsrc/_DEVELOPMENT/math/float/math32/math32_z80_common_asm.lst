@@ -2,7 +2,6 @@ math/float/math32/z80/f32_discardfraction
 math/float/math32/z80/d32_fsadd
 math/float/math32/z80/f32_fsconst
 math/float/math32/z80/d32_fsconv
-math/float/math32/z80/f32_fam9511
 math/float/math32/z80/d32_fsnormalize
 math/float/math32/z80/d32_fsutil
 math/float/math32/z80/f32_f2long
@@ -19,6 +18,7 @@ math/float/math32/z80/f32_fsfrexp
 math/float/math32/z80/f32_fshexpop
 math/float/math32/z80/f32_fshypot
 math/float/math32/z80/f32_fsldexp
+math/float/math32/z80/f32_fsload
 math/float/math32/z80/f32_fsmul
 math/float/math32/z80/f32_fsmul2
 math/float/math32/z80/f32_fsmul10u

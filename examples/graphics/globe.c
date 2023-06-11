@@ -8,6 +8,8 @@
 	A = 25.0   <- Globe inclinationh
 
 	to build:  zcc +<target> <stdio options> -lm -create-app globe.c
+	or
+	to build using math32:  zcc +<target> <stdio options> --math32 -create-app globe.c
 	
 	Examples:
 	
@@ -15,14 +17,14 @@
 	  
 	  zcc +zx -lndos -create-app -lm globe.c
 	  
-	  zcc +ts2068 -lgfx2068hr -lm -Dhires -create-app globe.c
+	  zcc +ts2068  -pragma-define:CLIB_ZX_CONIO32=1 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -lm -Dhires -create-app globe.c
 	  
 	  zcc  +enterprise  -lm -create-app -lgfxephr -Dhires -lm globe.c
 	   
 	  zcc +cpm -subtype=tiki100 -create-app -Dhires -lm globe.c
 
 	  zcc +zx81 -clib=wrx -subtype=wrx -create-app -lm -DVIEW=1 globe.c
-	  (32K) zcc +zx81 -clib=wrxansi -subtype=wrx  -lndos -create-app -lm globe.c
+	  (32K, uncommment "hrgpage") zcc +zx81 -clib=wrxansi -subtype=wrx  -lndos -create-app -lm globe.c
 	  zcc +zx81 -clib=mt  -create-app -lm globe.c
 	  (after loading to activate the G007 graphics mode type CLS 2 and SLOW 4, then RUN)
 	  zcc +zx81 -clib=g007  -create-app -lm -DVIEW=1  globe.c
@@ -223,11 +225,11 @@ char plane[] = { 83, 38, 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x20 , 0x00 , 0x00 ,
 
 
 float rsin(float x) {
-	return sin(pi()*x/180.0);
+	return sin(M_PI*x/180.0);
 }
 
 float rcos(float x) {
-	return cos(pi()*x/180.0);
+	return cos(M_PI*x/180.0);
 }
 
 void plotline()
@@ -270,6 +272,7 @@ void setorg()
 
 void main()
 {
+
 restart:
 	fputc_cons(12);
 

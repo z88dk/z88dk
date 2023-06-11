@@ -5,10 +5,10 @@
 
 	defc	mul2 = cam32_sccz80_fmul2
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _mul2
-EXTERN cam32_sdcc_fmul2
-defc _mul2 = cam32_sdcc_fmul2
+defc _mul2 = cam32_sccz80_fmul2
 ENDIF
 

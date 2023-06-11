@@ -15,8 +15,11 @@ _vsscanf:
 	ld	hl,2
 	add	hl,sp	;hl = &buf
 
+IF !__CPU_INTEL__
 	push	ix	;save callers
-
+ENDIF
+        ld      bc,65535        ;infinite length
+        push    bc
 	ld	bc,1+2+128      ;h=ungetc, l=_IOREAD|_IOSTRING|_IOUSE
 	push	bc
 	ld	c,(hl)		;get buf
@@ -48,7 +51,10 @@ _vsscanf:
 	pop	bc
 	pop	bc
 	pop	bc
-        pop     ix
+	pop	bc
+IF !__CPU_INTEL__
+    pop     ix
+ENDIF
 	ret
 
 

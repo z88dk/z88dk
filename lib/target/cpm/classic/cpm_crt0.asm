@@ -51,6 +51,18 @@
         defc    CONSOLE_COLUMNS = 80
     ENDIF
 
+    ; Default CLS to the ADM-3a code
+    PUBLIC  CLIB_FPUTC_CLS_CODE
+    IF !DEFINED_CLIB_FPUTC_CLS_CODE
+        defc    CLIB_FPUTC_CLS_CODE = 0x1a
+    ENDIF
+
+    ; fputc_cons can use vt100 codes as well
+    PUBLIC  CLIB_CPM_NATIVE_VT100
+    IF !DEFINED_CLIB_CPM_NATIVE_VT100
+        defc    CLIB_CPM_NATIVE_VT100 = 0
+    ENDIF
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     org     CRT_ORG_CODE
@@ -99,7 +111,7 @@ ENDIF
 
     ld      hl,0
     add     hl,sp
-    ld      (start1+1),hl	;Save entry stack
+    ld      (__restore_sp_onexit+1),hl	;Save entry stack
 IF (startup=3)
     ; Increase to cover +3 MEM banking
     defc    __clib_exit_stack_size_t  = __clib_exit_stack_size + 18 + 18
@@ -149,7 +161,7 @@ IF CRT_ENABLE_COMMANDLINE = 1
     ;ld      b,0
     ld      b,h
     and     a
-    jr      z,argv_done
+    jp      z,argv_done
     ;inc	hl
     ld      c,a
     add     hl,bc   ;now points to the end of the command line
@@ -175,7 +187,7 @@ cleanup:
     push    hl		;Save return value
     call    crt0_exit
     pop     bc		;Get exit() value into bc
-start1:	
+__restore_sp_onexit:
     ld      sp,0		;Pick up entry sp
     jp      0
 
@@ -240,6 +252,15 @@ ENDIF
     INCLUDE "crt/classic/crt_runtime_selection.asm"
     INCLUDE	"crt/classic/crt_section.asm"
     INCLUDE "crt/classic/crt_cpm_fcntl.asm"
+
+IF __HAVE_TMS99X8
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms9918/mode_disable.asm"
+ENDIF
+
+IF __NABUPC__
+    INCLUDE "target/nabu/classic/nabu_hccabuf.asm"
+ENDIF
 
     SECTION code_crt_init
     ld      c,25

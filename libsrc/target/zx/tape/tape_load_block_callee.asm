@@ -23,7 +23,7 @@ ENDIF
 	pop bc
 	ld a,c
 	pop de
-	pop ix
+	pop bc
 	push hl
 
 .asm_tape_load_block
@@ -32,11 +32,15 @@ ENDIF
 ;         de = len
 ;          a = type
 
+	push ix
+	push bc
+	pop ix
 	scf
 
 	IF FORts2068
 		ld		hl,$fc
         call    call_extrom
+		pop ix
         ld      hl,-1
 		ret	nc		;error
 		inc	hl		;okay
@@ -58,6 +62,7 @@ ENDIF
         pop     de
         pop     de
         ld      (23613),de      ;get back original 23613
+		pop     ix
         ret
 
 .loadblock1

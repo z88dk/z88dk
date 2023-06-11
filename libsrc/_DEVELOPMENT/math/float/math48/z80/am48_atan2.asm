@@ -90,8 +90,9 @@ greater_equal:
 ;      if (x < 0.0)
 ;      {
 ;         if (y >= 0.0)
-;            a += _pi ;
-;         else a -= _pi ;
+;            a += _pi;
+;         else
+;            a -= _pi;
 ;       }
 ;   }
 ;   else

@@ -136,9 +136,13 @@ extern int __LIB__ read_joypad2();
 extern void __LIB__ gotoxy_sms(int x, int y) __smallc;
 extern unsigned char standard_font[];  /* Actually data *not* a function */
 
-extern void __LIB__ set_vdp_reg(int reg, int value) __smallc;
-extern void __LIB__ add_raster_int(void *ptr);
-extern void __LIB__ add_pause_int(void *ptr);
+extern void __LIB__ vdp_set_reg(int reg, int value) __smallc;
+#define set_vdp_reg(reg,value)        vdp_set_reg(reg,value)
+
+#include <interrupt.h>
+
+extern void __LIB__ add_pause_int(isr_t func);
+
 extern void __LIB__ set_sound_freq(int channel, int freq) __smallc;
 extern void __LIB__ set_sound_volume(int channel, int volume) __smallc;
 

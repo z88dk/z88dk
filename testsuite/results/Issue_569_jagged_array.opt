@@ -74,11 +74,12 @@
 	add	hl,de
 	ld	(hl),12
 	jp	i_6	;EOS
-	defc	i_7 = i_3
 .i_4
 	pop	bc
 	ret
 
+
+	defc	i_7 = i_3
 
 
 

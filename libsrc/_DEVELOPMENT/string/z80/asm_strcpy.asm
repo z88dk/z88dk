@@ -25,23 +25,25 @@ asm_strcpy:
    ; uses  : af, bc, de, hl
 
    push de
-IF !__CPU_INTEL__ && !__CPU_GBZ80__
-   xor a
-ENDIF
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
 
 loop:
-IF __CPU_INTEL__ | __CPU_GBZ80__
-   ld a,(hl)
-   ld (de),a
-   inc hl
-   inc de
-   and a
+   ld a,(hl+)
+   ld (de+),a
+
+   or a
+   jr NZ,loop
+
 ELSE
+
+   xor a
+loop:
    cp (hl)
    ldi
+   jr NZ,loop
+
 ENDIF
-   jr nz, loop
-   
    pop hl
    dec de
    ret

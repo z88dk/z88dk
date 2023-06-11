@@ -5,6 +5,7 @@
 
 	defc	sinh_fastcall = _am9511_sinh
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _sinh_fastcall

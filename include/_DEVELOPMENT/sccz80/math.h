@@ -5,10 +5,12 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
+#include <stdint.h>
+
 // THE SELECTED FLOATING POINT PACKAGE MAY NOT SUPPORT ALL LISTED FUNCTIONS
 
-#ifndef _FLOAT_T_DEFINED
-#define _FLOAT_T_DEFINED
+#ifndef _FLOAT_T
+#define _FLOAT_T
 
    #ifdef __CLANG
    typedef float float_t;
@@ -24,8 +26,8 @@
    
 #endif
 
-#ifndef _DOUBLE_T_DEFINED
-#define _DOUBLE_T_DEFINED
+#ifndef _DOUBLE_T
+#define _DOUBLE_T
 
    #ifdef __CLANG
    typedef float double_t;
@@ -41,8 +43,8 @@
    
 #endif
 
-#ifndef _FLOAT16_T_DEFINED
-#define _FLOAT16_T_DEFINED
+#ifndef _FLOAT16_T
+#define _FLOAT16_T
 
    #ifndef __SCCZ80
    typedef short _Float16;      /* IEEE-754 half float type */  
@@ -123,29 +125,33 @@ typedef _Float16 half_t;
 #define MAXL10_F32              (+18.9638)
 #define MINL10_F32              (−19.5686)
 
-#define HUGE_VAL_F32           (0x7F800000)
-#define INFINITY_POS_F32       (0x7F800000)
-#define INFINITY_NEG_F32       (0xFF800000)
+#define HUGE_VAL_F32            ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32        ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32        ((unsigned long)0xFF800000)
+#define NAN_POS_F32             ((unsigned long)0x7FFFFFFF)
+#define NAN_NEG_F32             ((unsigned long)0xFFFFFFFF)
 
 #endif
 
 #ifdef __MATH_MATH32
 
-#define HUGE_POS_F32           (+3.4028234664E+38)
-#define TINY_POS_F32           (+1.1754943508E−38)
-#define HUGE_NEG_F32           (-1.7014118346E+38)
-#define TINY_NEG_F32           (-1.1754943508E-38)
+#define HUGE_POS_F32            (+3.4028234664E+38)
+#define TINY_POS_F32            (+1.1754943508E−38)
+#define HUGE_NEG_F32            (-1.7014118346E+38)
+#define TINY_NEG_F32            (-1.1754943508E-38)
 
-#define MAXL2_F32              (+127.999999914)
-#define MINL2_F32              (-126.0)
-#define MAXLOG_F32             (+88.722839052)
-#define MINLOG_F32             (−87.336544751)
-#define MAXL10_F32             (+38.230809449)
-#define MINL10_F32             (−37.929779454)
+#define MAXL2_F32               (+127.999999914)
+#define MINL2_F32               (-126.0)
+#define MAXLOG_F32              (+88.722839052)
+#define MINLOG_F32              (−87.336544751)
+#define MAXL10_F32              (+38.230809449)
+#define MINL10_F32              (−37.929779454)
 
-#define HUGE_VAL_F32           (0x7F800000)
-#define INFINITY_POS_F32       (0x7F800000)
-#define INFINITY_NEG_F32       (0xFF800000)
+#define HUGE_VAL_F32            ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32        ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32        ((unsigned long)0xFF800000)
+#define NAN_POS_F32             ((unsigned long)0x7FFFFFFF)
+#define NAN_NEG_F32             ((unsigned long)0xFFFFFFFF)
 
 #endif
 
@@ -163,9 +169,11 @@ typedef _Float16 half_t;
 #define MAXL10_F16              (+4.816)            /* 0x44D1 */
 #define MINL10_F16              (-4.215)            /* 0xC437 */
 
-#define HUGE_VAL_F16            (0x7C00)
-#define INFINITY_POS_F16        (0x7C00)
-#define INFINITY_NEG_F16        (0xFC00)
+#define HUGE_VAL_F16            ((unsigned int)0x7C00)
+#define INFINITY_POS_F16        ((unsigned int)0x7C00)
+#define INFINITY_NEG_F16        ((unsigned int)0xFC00)
+#define NAN_POS_F16             ((unsigned int)0x7FFF)
+#define NAN_NEG_F16             ((unsigned int)0xFFFF)
 
 #endif
 
@@ -178,11 +186,17 @@ extern double_t __LIB__ asin(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ atan(double_t x) __smallc __z88dk_fastcall;
 
 
+#ifdef __MATH_AM9511
+extern double_t __LIB__ atan2(double_t y,double_t x) __smallc;
+
+
+#else
 extern double_t __LIB__ atan2(double_t y,double_t x) __smallc;
 extern double_t __LIB__ atan2_callee(double_t y,double_t x) __smallc __z88dk_callee;
 #define atan2(a,b) atan2_callee(a,b)
 
 
+#endif
 
 extern double_t __LIB__ cos(double_t x) __smallc __z88dk_fastcall;
 
@@ -228,9 +242,6 @@ extern double_t __LIB__ frexp_callee(double_t value,int *exp) __smallc __z88dk_c
 #define frexp(a,b) frexp_callee(a,b)
 
 
-extern int __LIB__ ilogb(double_t x) __smallc __z88dk_fastcall;
-
-
 extern double_t __LIB__ ldexp(double_t x,int exp) __smallc;
 extern double_t __LIB__ ldexp_callee(double_t x,int exp) __smallc __z88dk_callee;
 #define ldexp(a,b) ldexp_callee(a,b)
@@ -244,6 +255,10 @@ extern double_t __LIB__ scalbn_callee(double_t x,int n) __smallc __z88dk_callee;
 extern double_t __LIB__ scalbln(double_t x,int n) __smallc;
 extern double_t __LIB__ scalbln_callee(double_t x,int n) __smallc __z88dk_callee;
 #define scalbln(a,b) scalbln_callee(a,b)
+
+
+
+extern int __LIB__ ilogb(double_t x) __smallc __z88dk_fastcall;
 
 
 
@@ -271,10 +286,10 @@ extern double_t __LIB__ hypot_callee(double_t x,double_t y) __smallc __z88dk_cal
 #define hypot(a,b) hypot_callee(a,b)
 
 
-
 extern double_t __LIB__ pow(double_t x,double_t y) __smallc;
 extern double_t __LIB__ pow_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define pow(a,b) pow_callee(a,b)
+
 
 
 extern double_t __LIB__ sqrt(double_t x) __smallc __z88dk_fastcall;
@@ -322,6 +337,14 @@ extern double_t __LIB__ trunc(double_t x) __smallc __z88dk_fastcall;
 
 
 
+#ifdef __MATH_AM9511
+extern double_t __LIB__ modf(double_t value,double_t *iptr) __smallc;
+
+
+extern double_t __LIB__ fmod(double_t x,double_t y) __smallc;
+
+
+#else
 extern double_t __LIB__ modf(double_t value,double_t *iptr) __smallc;
 extern double_t __LIB__ modf_callee(double_t value,double_t *iptr) __smallc __z88dk_callee;
 #define modf(a,b) modf_callee(a,b)
@@ -331,6 +354,8 @@ extern double_t __LIB__ fmod(double_t x,double_t y) __smallc;
 extern double_t __LIB__ fmod_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define fmod(a,b) fmod_callee(a,b)
 
+
+#endif
 
 extern double_t __LIB__ remainder(double_t x,double_t y) __smallc;
 extern double_t __LIB__ remainder_callee(double_t x,double_t y) __smallc __z88dk_callee;
@@ -366,7 +391,6 @@ extern double_t __LIB__ nexttoward_callee(double_t x,double_t y) __smallc __z88d
 extern double_t __LIB__ fdim(double_t x,double_t y) __smallc;
 extern double_t __LIB__ fdim_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define fdim(a,b) fdim_callee(a,b)
-
 
 
 extern double_t __LIB__ fmax(double_t x,double_t y) __smallc;
@@ -419,6 +443,9 @@ extern int __LIB__ isunordered_callee(double_t x,double_t y) __smallc __z88dk_ca
 
 #ifdef __MATH_MATH32
 
+extern double_t __LIB__ neg(double_t x) __smallc __z88dk_fastcall;
+
+
 extern double_t __LIB__ sqr(double_t x) __smallc __z88dk_fastcall;
 
 
@@ -454,6 +481,9 @@ extern double_t __LIB__ f32_fam9511(double_t x) __smallc __z88dk_fastcall;
 
 
 extern double_t __LIB__ fam9511_f32(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ neg(double_t x) __smallc __z88dk_fastcall;
 
 
 extern double_t __LIB__ sqr(double_t x) __smallc __z88dk_fastcall;
@@ -579,8 +609,8 @@ extern half_t __LIB__ mul2f16(half_t x) __smallc __z88dk_fastcall;
 extern half_t __LIB__ mul10f16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ frexpf16(half_t x,int8_t *pw2) __smallc;
-extern half_t __LIB__ frexpf16_callee(half_t x,int8_t *pw2) __smallc __z88dk_callee;
+extern half_t __LIB__ frexpf16(half_t x,int16_t *pw2) __smallc;
+extern half_t __LIB__ frexpf16_callee(half_t x,int16_t *pw2) __smallc __z88dk_callee;
 #define frexpf16(a,b) frexpf16_callee(a,b)
 
 
@@ -597,6 +627,11 @@ extern half_t __LIB__ asinf16(half_t x) __smallc __z88dk_fastcall;
 
 
 extern half_t __LIB__ atanf16(half_t x) __smallc __z88dk_fastcall;
+
+
+extern half_t __LIB__ atan2f16(half_t y,half_t x) __smallc;
+extern half_t __LIB__ atan2f16_callee(half_t y,half_t x) __smallc __z88dk_callee;
+#define atan2f16(a,b) atan2f16_callee(a,b)
 
 
 

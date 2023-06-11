@@ -1,8 +1,0 @@
-target/z9001/graphics/clg
-target/z9001/graphics/fill
-target/z9001/graphics/w_pixladdr
-target/z9001/graphics/w_clga
-target/z9001/graphics/w_putsprite
-target/z9001/graphics/w_stencil_render
-gfx/wide/obj/z9001krt/w_dcircle_square
-@gfx/wide/gfx_wide.lst

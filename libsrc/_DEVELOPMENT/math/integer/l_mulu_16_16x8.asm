@@ -9,7 +9,7 @@ PUBLIC l_mulu_16_16x8
    ; compute:  hl = hl * e
    ; alters :  af, bc, de, hl
 
-IF __CPU_Z180__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+IF (__CPU_Z180__ || __CPU_EZ80__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
    EXTERN l_z180_mulu_16_16x8
    defc l_mulu_16_16x8 = l_z180_mulu_16_16x8 - 1
@@ -22,13 +22,6 @@ IF __CPU_Z80N__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
    defc l_mulu_16_16x8 = l_z80n_mulu_16_16x8 - 1
 
 ELSE
-
-;IF __IO_LUT_MODULE_AVAILABLE
-;
-;   EXTERN l_lut_mulu_16_16x8
-;   defc l_mulu_16_16x8 = l_lut_mulu_16_16x8 - 1
-;
-;ELSE
 
 IF __CLIB_OPT_IMATH <= 50
 
@@ -43,8 +36,6 @@ IF __CLIB_OPT_IMATH > 50
    defc l_mulu_16_16x8 = l_fast_mulu_24_16x8
 
 ENDIF
-
-;ENDIF
 
 ENDIF
 

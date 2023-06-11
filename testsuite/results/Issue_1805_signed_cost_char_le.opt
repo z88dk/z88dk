@@ -1,0 +1,64 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._initialize_challenges
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gchar
+	ld	a,l
+	xor	128
+	sub	129
+	ret	nc
+	ld	hl,i_1+0
+	push	hl
+	call	_test
+	pop	bc
+.i_2
+	ret
+
+
+
+._main
+	ld	hl,1	;const
+	push	hl
+	dec	hl
+	push	hl
+	ld	hl,14	;const
+	push	hl
+	call	_initialize_challenges
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+	SECTION	rodata_compiler
+.i_1
+	defm	"Hello"
+	defb	10
+
+	defm	""
+	defb	0
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_test
+	GLOBAL	_initialize_challenges
+	GLOBAL	_main
+
+
+
+

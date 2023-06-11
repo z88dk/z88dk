@@ -3,7 +3,7 @@
     PUBLIC  getmaxx
     PUBLIC  _getmaxx
     EXTERN  __zx_screenmode
-    EXTERN  __sam_MODE3_fatpix
+    EXTERN  __gfx_fatpix
 
 .getmaxx
 ._getmaxx
@@ -11,7 +11,7 @@
     ld      hl,255
     cp      2
     ret     nz
-    ld      a,(__sam_MODE3_fatpix)
+    ld      a,(__gfx_fatpix)
     and     a
     ret     nz
     ld      hl,511

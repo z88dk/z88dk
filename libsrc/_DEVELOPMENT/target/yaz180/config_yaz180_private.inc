@@ -19,7 +19,7 @@ defc   __CONFIG_Z88DK_INC_ = 1
 
 
 
-defc __Z88DK = 2000
+defc __Z88DK = 2200
 
 
 
@@ -46,6 +46,8 @@ defc __COMMON_AREA_1_PHASE_DATA = 0xf000
 defc __COMMON_AREA_1_PHASE_DRIVER = 0xf5a0
 
 defc __ASCI0_RX_SIZE = 0x100
+defc __ASCI0_RX_FULLISH = 0xf0
+defc __ASCI0_RX_EMPTYISH = 0x08
 defc __ASCI0_TX_SIZE = 0x080
 
 defc __ASCI1_RX_SIZE = 0x100
@@ -753,32 +755,33 @@ defc __IO_PIO_IDE_CONFIG = 0x4003
 defc __IO_PIO_IDE_RD = 0x92
 defc __IO_PIO_IDE_WR = 0x80
 
-defc __IO_IDE_A0_LINE = 0x10
-defc __IO_IDE_A1_LINE = 0x04
-defc __IO_IDE_A2_LINE = 0x40
-defc __IO_IDE_CS0_LINE = 0x08
-defc __IO_IDE_CS1_LINE = 0x20
-defc __IO_IDE_WR_LINE = 0x01
-defc __IO_IDE_RD_LINE = 0x02
-defc __IO_IDE_RST_LINE = 0x80
+defc __IO_PIO_IDE_A0_LINE = 0x10
+defc __IO_PIO_IDE_A1_LINE = 0x04
+defc __IO_PIO_IDE_A2_LINE = 0x40
+defc __IO_PIO_IDE_CS0_LINE = 0x08
+defc __IO_PIO_IDE_CS1_LINE = 0x20
+defc __IO_PIO_IDE_WR_LINE = 0x01
+defc __IO_PIO_IDE_RD_LINE = 0x02
+defc __IO_PIO_IDE_RST_LINE = 0x80
 
-defc __IO_IDE_DATA = 0x08
-defc __IO_IDE_ERROR = 0x18
-defc __IO_IDE_SEC_CNT = 0xc
-defc __IO_IDE_SECTOR = 0x1c
-defc __IO_IDE_CYL_LSB = 0x48
-defc __IO_IDE_CYL_MSB = 0x58
-defc __IO_IDE_HEAD = 0x4c
-defc __IO_IDE_COMMAND = 0x5c
-defc __IO_IDE_STATUS = 0x5c
+defc __IO_PIO_IDE_DATA = 0x08
+defc __IO_PIO_IDE_ERROR = 0x18
+defc __IO_PIO_IDE_FEATURE = 0x18
+defc __IO_PIO_IDE_SEC_CNT = 0xc
+defc __IO_PIO_IDE_SECTOR = 0x1c
+defc __IO_PIO_IDE_CYL_LSB = 0x48
+defc __IO_PIO_IDE_CYL_MSB = 0x58
+defc __IO_PIO_IDE_HEAD = 0x4c
+defc __IO_PIO_IDE_COMMAND = 0x5c
+defc __IO_PIO_IDE_STATUS = 0x5c
 
-defc __IO_IDE_CONTROL = 0x64
-defc __IO_IDE_ALT_STATUS = 0x64
+defc __IO_PIO_IDE_CONTROL = 0x64
+defc __IO_PIO_IDE_ALT_STATUS = 0x64
 
-defc __IO_IDE_LBA0 = 0x1c
-defc __IO_IDE_LBA1 = 0x48
-defc __IO_IDE_LBA2 = 0x58
-defc __IO_IDE_LBA3 = 0x4c
+defc __IO_PIO_IDE_LBA0 = 0x1c
+defc __IO_PIO_IDE_LBA1 = 0x48
+defc __IO_PIO_IDE_LBA2 = 0x58
+defc __IO_PIO_IDE_LBA3 = 0x4c
 
 defc __IDE_CMD_READ = 0x20
 defc __IDE_CMD_WRITE = 0x30
@@ -788,6 +791,7 @@ defc __IDE_CMD_IDLE = 0xE1
 defc __IDE_CMD_SLEEP = 0xE6
 defc __IDE_CMD_CACHE_FLUSH = 0xE7
 defc __IDE_CMD_ID = 0xEC
+defc __IDE_CMD_FEATURE = 0xEF
 
 
 

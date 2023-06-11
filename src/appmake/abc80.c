@@ -4,7 +4,7 @@
  *
  *        WAV conversion taken from ABCcas - by Robert Juhasz, 2008
  *
- *        $Id: abc80.c,v 1.11 2016-06-26 00:46:54 aralbrec Exp $
+ *        $Id: abc80.c$
  */
 
 #include "appmake.h"
@@ -13,6 +13,8 @@ static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static char              audio        = 0;
+static char              fast         = 0;
+static char              khz_22       = 0;
 static char              dumb         = 0;
 static char              loud         = 0;
 static int               origin       = -1;
@@ -25,6 +27,8 @@ option_t abc80_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
+    {  0,  "fast",     "Tweak the audio tones to run a bit faster",  OPT_BOOL,  &fast },
+    {  0,  "22",       "22050hz bitrate option",     OPT_BOOL,  &khz_22 },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
@@ -35,34 +39,32 @@ option_t abc80_options[] = {
 unsigned char buffer[256];
 char name[9]="Z88DK   ";
 char ext[3]="BAC";
-static int outbit=150;
+static int outbit, ofs;
+
+void bitout(unsigned char b, FILE* f)
+{
+    int i, period;
+
+    if (fast)
+		period = 28;
+	else
+		period = 29;
+
+	for (i = 0; i < period; i++)
+        fputc(b, f);
+}
 
 void byteout(unsigned char b, FILE* f)
 {
-    int i, t = 1, ofs;
+    int i, t = 1;
 
-    ofs = 64;
     for (i = 0; i < 8; i++) {
         if (outbit)
             outbit = 0;
         else
             outbit = 150; /* flip output bit */
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
+		
+		bitout(outbit + ofs, f);
 
         if (t & b) {
             /* send "1" */
@@ -71,22 +73,8 @@ void byteout(unsigned char b, FILE* f)
             else
                 outbit = 150; /* flip output bit again if "1" */
         }
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
-        fputc(outbit + ofs, f);
+
+		bitout(outbit + ofs, f);
 
         t *= 2; /* next bit */
     }
@@ -97,13 +85,14 @@ void blockout(FILE* f)
     int i, csum;
 
     for (i = 0; i < 32; i++)
-        byteout(0, f); /* 32 0 bytes */
+        byteout(0, f); /* 32 0 bytes (leading tone for block) */
     for (i = 0; i < 3; i++)
         byteout(0x16, f); /* 3 sync bytes 16H */
+
     byteout(0x2, f); /* STX */
-    for (i = 0; i < 256; i++)
-        byteout(buffer[i], f); /* output the buffer */
+    for (i = 0; i < 256; i++)  byteout(buffer[i], f); /* output the buffer */
     byteout(0x3, f); /* ETX */
+
     csum = 0;
     for (i = 0; i < 256; i++)
         csum += buffer[i]; /* calculate the checksum */
@@ -135,36 +124,15 @@ void datablockout(FILE* fin, FILE* fout)
         buffer[0] = 0;
         buffer[1] = blcnt & 0xff;
         buffer[2] = (blcnt >> 8) & 0xff;
-        if (1 != fread(&buffer[3], 253, 1, fin)) { fclose(fin); exit_log(1, "Routine <datablockout> could not read required data from input file");  };
+		// An incomplete read will probably happen, it is not an error condition !
+        //if (1 != fread(&buffer[3], 253, 1, fin)) { fclose(fin); exit_log(1, "Routine <datablockout> could not read required data from input file\n");  };
+		fread(&buffer[3], 253, 1, fin);
         blockout(fout);
         blcnt++;
     }
 }
 
-void wavheaderout(FILE* f, int numsamp)
-{
-    int totlen, srate;
 
-    fprintf(f, "%s", "RIFF");
-    totlen = 12 - 8 + 24 + 8 + numsamp;
-    fputc((totlen & 0xff), f);
-    fputc((totlen >> 8) & 0xff, f);
-    fputc((totlen >> 16) & 0xff, f);
-    fputc((totlen >> 24) & 0xff, f);
-
-    srate = 5977 * 2 * 2;
-    fprintf(f, "%s", "WAVE");
-    fprintf(f, "%s", "fmt ");
-    fprintf(f, "%c%c%c%c", 0x10, 0, 0, 0); /* format chunk length */
-    fprintf(f, "%c%c", 0x1, 0x0); /* always 0x1 */
-    fprintf(f, "%c%c", 0x1, 0x0); /* always 0x01=Mono, 0x02=Stereo) */
-    fprintf(f, "%c%c%c%c", srate & 255, srate >> 8, 0, 0); /*  Sample Rate (Binary, in Hz)  */
-    fprintf(f, "%c%c%c%c", srate & 255, srate >> 8, 0, 0); /*  Bytes/s same as sample rate if mono 8bit  */
-    fprintf(f, "%c%c", 0x01, 0); /*  Bytes Per Sample: 1=8 bit Mono, 2=8 bit Stereo or 16 bit Mono, 4=16 bit Stereo  */
-    fprintf(f, "%c%c", 0x08, 0); /*  Bits Per Sample  */
-    fprintf(f, "%s", "data"); /*  data hdr (ASCII Characters)  */
-    fprintf(f, "%c%c%c%c", numsamp & 0xff, (numsamp >> 8) & 0xff, (numsamp >> 16) & 0xff, (numsamp >> 24) & 0xff); /*  Length Of Data To Follow */
-}
 
 void writeword(unsigned int, FILE*);
 
@@ -181,7 +149,7 @@ int abc80_exec(char* target)
     int blocks;
     int blcount;
     int pos;
-    int numsamp, numbyte;
+    int numbyte;
 
     if (help || binname == NULL || (crtfile == NULL && origin == -1))
         return -1;
@@ -193,6 +161,13 @@ int abc80_exec(char* target)
             exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
         }
     }
+
+    if (loud)
+        ofs = 70;
+    else
+        ofs = 40;
+
+    outbit = 150;
 
     if (dumb) {
         strcpy(filename, binname);
@@ -211,10 +186,10 @@ int abc80_exec(char* target)
             exit_log(1,"Can't open input file %s\n", binname);
         }
 
-        /*
-	 *        Now we try to determine the size of the file
-	 *        to be converted
-	 */
+       /*
+        *        Now we try to determine the size of the file
+        *        to be converted
+        */
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
             exit_log(1,"Couldn't determine size of file\n");
@@ -257,18 +232,18 @@ int abc80_exec(char* target)
         fclose(fpin);
         fclose(fpout);
 
-        /*
-	 *        Second pass.
-	 *        We mark every 252 bytes block (4 bytes)
-	 */
+       /*
+        *        Second pass.
+        *        We mark every 252 bytes block (4 bytes)
+        */
 
         if ((fpin = fopen(tmpname, "rb")) == NULL) {
             exit_log(1,"Can't open temp file\n");
         }
 
-        /*
-	 *        Now we try to determine the size of the tmp file
-	 */
+       /*
+        *     Now we try to determine the size of the tmp file
+        */
 
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
@@ -284,9 +259,9 @@ int abc80_exec(char* target)
             exit_log(1,"Can't open output file %s\n", tmpname);
         }
 
-        /*
-	 *        The loop
-	 */
+       /*
+        *    The loop
+        */
         blcount = 0;
         for (i = 0; i < len; i++) {
             if ((i != 0) && (i % 252 == 0)) {
@@ -329,22 +304,21 @@ int abc80_exec(char* target)
 
         strcpy(wavfile, filename);
 
-        suffix_change(wavfile, ".wav");
+        suffix_change(wavfile, ".RAW");
 
         if ((fpout = fopen(wavfile, "wb")) == NULL) {
             exit_log(1,"Can't open output waw audio file %s\n", wavfile);
         }
 
         blocks = len / 253;
-        if (len % 253)
-            blocks++; /* if not exact add block */
-        blocks++; /* add one for name block */
+        if (len % 253)  /* if not exact add block */
+            blocks++;
+        blocks++;       /* add one for name block */
 
         numbyte = (7 + 32 + 256) * blocks; /* 256+32+7 bytes per block */
-        numsamp = 32 * 8 * numbyte; /* 32 samples per bit, 8 bits per byte */
 
         if (dumb)
-            printf("Size:%d Blk:%d Byte:%d Samp:%d\n", len, blocks, numbyte, numsamp);
+            printf("Size:%d Blk:%d Byte:%d\n", len, blocks, numbyte);
 
         if (dumb)
             printf("\nAssigning name : ");
@@ -357,14 +331,18 @@ int abc80_exec(char* target)
         if (dumb)
             printf("\n\n");
 
-        wavheaderout(fpout, numsamp);
         nameblockout(fpout);
         datablockout(fpin, fpout);
 
         fclose(fpin);
         fclose(fpout);
 
-    } /* END of WAV CONVERSION BLOCK */
+        /* Now complete with the WAV header */
+        if (khz_22)
+            raw2wav_22k(wavfile,2);
+        else
+            raw2wav(wavfile);
+    }
 
     return 0;
 }

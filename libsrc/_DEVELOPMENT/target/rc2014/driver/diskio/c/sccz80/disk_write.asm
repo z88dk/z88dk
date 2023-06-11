@@ -1,6 +1,6 @@
 SECTION code_driver
 
-PUBLIC _disk_write
+PUBLIC disk_write
 
 EXTERN asm_disk_write
 
@@ -19,7 +19,7 @@ EXTERN asm_disk_write
 ; hl = the address pointer to the buffer to read from
 ;
 
-_disk_write:
+disk_write:
     inc sp      ; pop return address
 ;   inc sp
 

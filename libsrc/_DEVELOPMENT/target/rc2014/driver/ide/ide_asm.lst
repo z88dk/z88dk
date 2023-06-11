@@ -1,0 +1,14 @@
+target/rc2014/driver/ide/asm/ide_wait_ready
+target/rc2014/driver/ide/asm/ide_wait_drq
+target/rc2014/driver/ide/asm/ide_test_error
+target/rc2014/driver/ide/asm/ide_setup_lba
+target/rc2014/driver/ide/asm/ide_hard_reset
+target/rc2014/driver/ide/asm/ide_soft_reset
+target/rc2014/driver/ide/asm/ide_init
+target/rc2014/driver/ide/asm/ide_drive_id
+target/rc2014/driver/ide/asm/ide_idle
+target/rc2014/driver/ide/asm/ide_standby
+target/rc2014/driver/ide/asm/ide_sleep
+target/rc2014/driver/ide/asm/ide_cache_flush
+target/rc2014/driver/ide/asm/ide_read_sector
+target/rc2014/driver/ide/asm/ide_write_sector

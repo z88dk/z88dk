@@ -13,9 +13,7 @@
 	push	hl
 	ld	hl,6	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	push	hl
 	ld	a,3
 	call	printf
@@ -64,9 +62,7 @@
 ._s_regular
 	ld	hl,65535	;const
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	push	hl
 	call	_placeholder
 	pop	bc
@@ -97,9 +93,7 @@
 ._is_regular
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	push	hl
 	call	_placeholder
 	pop	bc
@@ -332,6 +326,7 @@
 	call	_test7
 	ld	hl,0	;const
 	ret
+
 
 
 	SECTION	rodata_compiler

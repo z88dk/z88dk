@@ -1,0 +1,80 @@
+name: build-on-windows-msys2
+
+on:
+  push:
+  pull_request:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - name: Checkout from git
+      uses: actions/checkout@v3
+      with: 
+        submodules: 'true'
+    - name: Cache multiple paths
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/perl5
+        key: ${{ runner.os }}-cache3
+    - name: Setup msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: |
+          base-devel
+          perl-modules
+          perl-doc
+          perl-YAML-Tiny
+          mingw64/mingw-w64-x86_64-gcc
+          mingw64/mingw-w64-x86_64-libxml2
+          mingw64/mingw-w64-x86_64-ragel
+          mingw64/mingw-w64-x86_64-boost
+          git
+          re2c
+          vim
+    - name: Install perl prerequisites
+      run: |
+        set -e -x
+        cpan local::lib
+        eval $(perl -Mlocal::lib)
+        # install modules that fail tests in msys2 with -f
+        cpan -f Test::Harness
+        cpan App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table
+    - name: Build binaries
+      run: |
+        set -e -x
+        eval $(perl -Mlocal::lib)
+        ./build.sh -v -l
+    - name: Build libraries
+      run: |
+        set -e -x
+        eval $(perl -Mlocal::lib)
+        cp `which m4` bin/
+        ./build.sh -v -b
+    - name: Build examples
+      run: |
+        set -e -x
+        eval $(perl -Mlocal::lib)
+        # In the github workflow for windows/msys2 zcc fails very often with the
+        # message "Building application code failed", which means the system() call
+        # to execute z88dk-appmake failed before the sub-process started 
+        # (as there is no output from appmake). The problem seems to be solved if
+        # the process is somehow delayed (by including printf() statements)
+        # Delay execution by setting z80asm to verbose mode:
+        export Z80ASM=-v
+        ./build.sh -v -b -l -e
+    - name: Run tests
+      run: |
+        set -e -x
+        eval $(perl -Mlocal::lib)
+        ./build.sh -v -b -l -t

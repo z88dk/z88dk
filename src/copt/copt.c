@@ -29,6 +29,7 @@ int rpn_eval(const char* expr, char** vars);
 #define MAXFIRECOUNT 65535L
 #define MAX_PASS 16
 
+
 int debug = 0;
 char *c_cpu = "z80";
 int global_again = 0; /* signalize that rule set has changed */
@@ -36,6 +37,9 @@ int global_again = 0; /* signalize that rule set has changed */
 #define LASTLAB 'N'
 int nextlab = 1; /* unique label counter */
 int labnum[LASTLAB - FIRSTLAB + 1]; /* unique label numbers */
+
+int c_options_num = 0;
+char **c_options = NULL;
 
 struct lnode {
     char* l_text;
@@ -508,6 +512,32 @@ struct lnode* opt(struct lnode* r)
             if (strncmp(p->l_text, "%check", 6) == 0) {
                 if (!check(p->l_text + 6, vars))
                     break;
+            } else if ( strncmp(p->l_text, "%notopt", 7) == 0 ) {
+                int   l, found = 0;
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 8)-1,p->l_text + 8);
+                for ( l = 0; l < c_options_num; l++ ) {
+                    if ( strcmp(tbuf, c_options[l]) == 0 ) {
+                        found = 1;
+                        break;
+                    }
+                }
+                if ( found ) {
+                    break;
+                }
+            } else if ( strncmp(p->l_text, "%opt", 4) == 0 ) {
+                int   l, found = 0;
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 5)-1,p->l_text + 5);
+                for ( l = 0; l < c_options_num; l++ ) {
+                    if ( strcmp(tbuf, c_options[l]) == 0 ) {
+                        found = 1;
+                        break;
+                    }
+                }
+                if ( !found ) {
+                    break;
+                }
             } else if ( strncmp(p->l_text, "%notcpu", 7) == 0 ) {
                 char  tbuf[1024];
                 snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 8)-1,p->l_text + 8);
@@ -634,7 +664,11 @@ int main(int argc, char** argv)
             debug = 1;
         else if ( strncmp(argv[i], "-m",2) == 0 )
             c_cpu = argv[i] + 2;
-        else if ((fp = fopen(argv[i], "r")) == NULL)
+        else if ( strncmp(argv[i], "-O", 2) == 0) {
+            int j = c_options_num++;
+            c_options = realloc(c_options, c_options_num * sizeof(c_options[0]));
+            c_options[j] = strdup(argv[i] + 2);
+        } else if ((fp = fopen(argv[i], "r")) == NULL)
             error("copt: can't open patterns file\n");
         else
             init(fp);

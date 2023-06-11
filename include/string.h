@@ -5,14 +5,12 @@
 #include <sys/types.h>
 
 extern int __LIB__ bcmp(const void *b1,const void *b2,size_t len) __smallc;
-#if !__GBZ80__ && !__8080__
 extern int __LIB__ bcmp_callee(const void *b1,const void *b2,size_t len) __smallc __z88dk_callee;
 #define bcmp(a,b,c) bcmp_callee(a,b,c)
-#endif
 
 
 extern void __LIB__ bcopy(const void *src,void *dst,size_t len) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern void __LIB__ bcopy_callee(const void *src,void *dst,size_t len) __smallc __z88dk_callee; 
 #define bcopy(a,b,c) bcopy_callee(a,b,c)
 #endif
@@ -39,7 +37,7 @@ extern char __LIB__ *strset_callee(char *s,int c) __smallc __z88dk_callee;
 
 
 extern char __LIB__ *strnset(char *s,int c,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern char __LIB__ *strnset_callee(char *s,int c,size_t n) __smallc __z88dk_callee;
 #define strnset(a,b,c) strnset_callee(a,b,c)
 #endif
@@ -57,7 +55,7 @@ extern char __LIB__ *_memlwr__callee(void *p,size_t n) __smallc __z88dk_callee;
 
 
 extern char __LIB__ *_memstrcpy_(void *p,const char *s,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern char __LIB__ *_memstrcpy__callee(void *p,const char *s,size_t n) __smallc __z88dk_callee;
 #define _memstrcpy_(a,b,c) _memstrcpy__callee(a,b,c)
 #endif
@@ -83,61 +81,66 @@ extern void __LIB__ *memccpy_callee(void *dst,const void *src,int c,size_t n) __
 
 
 extern void __LIB__ *memchr(const void *s,int c,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern void __LIB__ *memchr_callee(const void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memchr(a,b,c) memchr_callee(a,b,c)
 #endif
 
 
 extern int __LIB__ memcmp(const void *s1,const void *s2,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern int __LIB__ memcmp_callee(const void *s1,const void *s2,size_t n) __smallc __z88dk_callee;
 #define memcmp(a,b,c) memcmp_callee(a,b,c)
 #endif
 
 
 extern void __LIB__ *memcpy(void *dst,const void *src,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern void __LIB__ *memcpy_callee(void *dst,const void *src,size_t n) __smallc __z88dk_callee;
 #define memcpy(a,b,c) memcpy_callee(a,b,c)
 #endif
 
-
+#if !__GBZ80__ && !__8080__ && !__8085__
 extern void __LIB__ *memmem(const void *haystack,size_t haystack_len,const void *needle,size_t needle_len) __smallc;
 extern void __LIB__ *memmem_callee(const void *haystack,size_t haystack_len,const void *needle,size_t needle_len) __smallc __z88dk_callee;
 #define memmem(a,b,c,d) memmem_callee(a,b,c,d)
-
+#endif
 
 extern void __LIB__ *memmove(void *dst,const void *src,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern void __LIB__ *memmove_callee(void *dst,const void *src,size_t n) __smallc __z88dk_callee;
 #define memmove(a,b,c) memmove_callee(a,b,c)
 #endif
 
 
 extern void __LIB__ *memrchr(const void *s,int c,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern void __LIB__ *memrchr_callee(const void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memrchr(a,b,c) memrchr_callee(a,b,c)
 #endif
 
 
 extern void __LIB__ *memset(void *s,int c,size_t n) __smallc;
+#if !__GBZ80__
 extern void __LIB__ *memset_callee(void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memset(a,b,c) memset_callee(a,b,c)
+#endif
 
-/* memset_wr() is less optimised than memset, but should be used when the
- * area being cleared can't be read (eg VRAM in certain machines)
+/* memset_wr() is less optimised than memset (in Z80), but should be used when the
+ * area being cleared can't be read (eg VRAM in certain machines).
+ * for INTEL / GBZ80 it is faster than memset().
  */
 extern void __LIB__ *memset_wr(volatile void *s,int c,size_t n) __smallc;
+#if !__GBZ80__
 extern void __LIB__ *memset_wr_callee(volatile void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memset_wr(a,b,c) memset_wr_callee(a,b,c)
-
+#endif
 
 extern void __LIB__ *memswap(void *s1,void *s2,size_t n) __smallc;
+#if !__GBZ80__
 extern void __LIB__ *memswap_callee(void *s1,void *s2,size_t n) __smallc __z88dk_callee;
 #define memswap(a,b,c) memswap_callee(a,b,c)
-
+#endif
 
 extern char __LIB__ *stpcpy(char *dst,const char *src) __smallc;
 extern char __LIB__ *stpcpy_callee(char *dst,const char *src) __smallc __z88dk_callee;
@@ -145,7 +148,7 @@ extern char __LIB__ *stpcpy_callee(char *dst,const char *src) __smallc __z88dk_c
 
 
 extern char __LIB__ *stpncpy(char *dst,const char *src,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern char __LIB__ *stpncpy_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define stpncpy(a,b,c) stpncpy_callee(a,b,c)
 #endif
@@ -203,14 +206,14 @@ extern int __LIB__ stricmp_callee(const char *s1,const char *s2) __smallc __z88d
 
 
 extern size_t __LIB__ strlcat(char *dst,const char *src,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern size_t __LIB__ strlcat_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strlcat(a,b,c) strlcat_callee(a,b,c)
 #endif
 
 
 extern size_t __LIB__ strlcpy(char *dst,const char *src,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern size_t __LIB__ strlcpy_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strlcpy(a,b,c) strlcpy_callee(a,b,c)
 #endif
@@ -223,35 +226,35 @@ extern char __LIB__  *strlwr(char *s) __smallc __z88dk_fastcall;
 
 
 extern int __LIB__ strncasecmp(const char *s1,const char *s2,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern int __LIB__ strncasecmp_callee(const char *s1,const char *s2,size_t n) __smallc __z88dk_callee;
 #define strncasecmp(a,b,c) strncasecmp_callee(a,b,c)
 #endif
 
 
 extern char __LIB__ *strncat(char *dst,const char *src,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern char __LIB__ *strncat_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strncat(a,b,c) strncat_callee(a,b,c)
 #endif
 
 
 extern char __LIB__ *strnchr(const char *s,size_t n,int c) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern char __LIB__ *strnchr_callee(const char *s,size_t n,int c) __smallc __z88dk_callee;
 #define strnchr(a,b,c) strnchr_callee(a,b,c)
 #endif
 
 
 extern int __LIB__ strncmp(const char *s1,const char *s2,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern int __LIB__ strncmp_callee(const char *s1,const char *s2,size_t n) __smallc __z88dk_callee;
 #define strncmp(a,b,c) strncmp_callee(a,b,c)
 #endif
 
 
 extern char __LIB__ *strncpy(char *dst,const char *src,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern char __LIB__ *strncpy_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strncpy(a,b,c) strncpy_callee(a,b,c)
 #endif
@@ -322,7 +325,7 @@ extern char __LIB__ *strtok_callee(char *s,const char *delim) __smallc __z88dk_c
 
 
 extern char __LIB__ *strtok_r(char *s,const char *delim,char **last_s) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern char __LIB__ *strtok_r_callee(char *s,const char *delim,char **last_s) __smallc __z88dk_callee;
 #define strtok_r(a,b,c) strtok_r_callee(a,b,c)
 #endif
@@ -332,7 +335,7 @@ extern char __LIB__  *strupr(char *s) __smallc __z88dk_fastcall;
 
 
 extern size_t __LIB__ strxfrm(char *dst,const char *src,size_t n) __smallc;
-#if !__GBZ80__ && !__8080__
+#if !__GBZ80__
 extern size_t __LIB__ strxfrm_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strxfrm(a,b,c) strxfrm_callee(a,b,c)
 #endif

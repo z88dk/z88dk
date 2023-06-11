@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _polyf16
-EXTERN cm16_sdcc_poly
-defc _polyf16 = cm16_sdcc_poly
+defc _polyf16 = polyf16
 ENDIF
 

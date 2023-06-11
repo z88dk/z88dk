@@ -1,0 +1,16 @@
+target/pacman/stdio/fgetc_cons
+target/pacman/stdio/fputc_cons
+target/pacman/stdio/getk
+@stdio/stdio.lst
+target/pacman/graphics/clsgraph
+target/pacman/graphics/char_address
+target/pacman/graphics/plotpixl
+target/pacman/graphics/respixl
+target/pacman/graphics/xorpixl
+target/pacman/graphics/pointxy
+@gfx/text6/gfx_text6.lst
+target/pacman/games/joystick
+games/obj/${TARGET}/joystick_type
+
+target/pacman/time/clock
+

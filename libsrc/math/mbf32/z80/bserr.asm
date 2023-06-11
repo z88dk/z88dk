@@ -1,4 +1,8 @@
 
-		PUBLIC	BSERR
+SECTION code_fp_mbf32
 
-BSERR:	ret
+PUBLIC  BSERR
+
+EXTERN  ARET
+
+defc BSERR = ARET

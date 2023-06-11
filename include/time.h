@@ -20,10 +20,6 @@
 #define CLOCKS_PER_SEC 1
 #endif
 
-#ifdef __CPM__
-#define CLOCKS_PER_SEC 1
-#endif
-
 #ifdef __PC88__
 #define CLOCKS_PER_SEC 60
 #endif
@@ -58,6 +54,13 @@
 #ifdef __TESTTARGET__
 #define CLOCKS_PER_SEC 1000
 #endif
+
+#ifdef __CPM__
+#ifndef CLOCKS_PER_SEC
+#define CLOCKS_PER_SEC 1
+#endif
+#endif
+
 
 #ifndef CLOCKS_PER_SEC
 #define CLOCKS_PER_SEC 50

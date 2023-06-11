@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # z80asm assembler
-# Test z80asm-*.lib
-# Copyright (C) Paulo Custodio, 2011-2019
+# Test z88dk-z80asm-*.lib
+# Copyright (C) Paulo Custodio, 2011-2023
 # License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ use Test::More;
 use Path::Tiny;
 require '../../t/testlib.pl';
 
-my @CPUS = (qw( 8080 8085 gbz80 r2k z80 ));
+my @CPUS = (qw( 8080 8085 gbz80 r2ka z80 ));
 
 my $test_nr;
 
@@ -53,8 +53,14 @@ for my $cpu (@CPUS) {
                     ld      hl, sp $add_text
                     rst     0
 END
-            my $sum = $base + $add;
-            
+            my $sum;
+			if ($cpu eq '8085') {
+				$sum = $base + ($add & 0xff);		# unsigned
+			}
+			else {
+				$sum = $base + $add;				# signed
+			}
+			
             is $r->{HL}, $sum, "result";
                     
             (Test::More->builder->is_passing) or die;

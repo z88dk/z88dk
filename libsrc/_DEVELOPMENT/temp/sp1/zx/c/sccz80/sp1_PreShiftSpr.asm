@@ -35,4 +35,15 @@ sp1_PreShiftSpr:
    ld l,a
    ld a,c
    
-   jp asm_sp1_PreShiftSpr
+;   jp asm_sp1_PreShiftSpr
+   push ix
+   call asm_sp1_PreShiftSpr
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PreShiftSpr
+defc _sp1_PreShiftSpr = sp1_PreShiftSpr
+ENDIF
+

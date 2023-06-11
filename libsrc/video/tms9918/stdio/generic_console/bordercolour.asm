@@ -2,10 +2,10 @@
 ;
 ;
 
-	SECTION		code_clib
+	SECTION		code_video_vdp
 	PUBLIC		__tms9918_bordercolor
 	EXTERN		__tms9918_map_colour
-	EXTERN		msx_set_border
+	EXTERN		vdp_set_border
 
         INCLUDE "video/tms9918/vdp.inc"
 
@@ -21,4 +21,4 @@ __tms9918_bordercolor:
 	ld	a,l
 	call	__tms9918_map_colour
 	ld	l,a
-	jp	msx_set_border
+	jp	vdp_set_border

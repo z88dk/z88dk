@@ -80,6 +80,44 @@ ENDIF
 	defc	__CPU_CLOCK = 3250000
 	INCLUDE	"crt/classic/crt_rules.inc"
 
+
+        PUBLIC  __CLIB_ZX_LOWER_CASE_TRANSFORM
+        PUBLIC  __CLIB_ZX_UPPER_CASE_TRANSFORM
+        PUBLIC  __CLIB_ZX_CAPITAL_TRANSFORM
+        PUBLIC  __CLIB_ZX_INVERSE_TRANSFORM
+
+        IF !DEFINED_ZX_CHAR_XLATE_MODE
+            defc ZX_CHAR_XLATE_MODE = 0
+        ENDIF
+
+        ;ASCII A = 65
+        ;      a = 97
+        ;ZX81  A = $26
+        ;     _A_= $A6
+
+        IF ZX_CHAR_XLATE_MODE = 0
+            ; Transforms lower case to upper case - is added ascii -> zx81
+            defc __CLIB_ZX_LOWER_CASE_TRANSFORM = $26 - 'a'
+            defc __CLIB_ZX_CAPITAL_TRANSFORM = $26 - 'a'
+            ; Transforms upper case to inverse upper case is added ascii -> zx81
+            defc __CLIB_ZX_UPPER_CASE_TRANSFORM = $A6 - 'A'
+            defc __CLIB_ZX_INVERSE_TRANSFORM = $A6 - 'A'
+        ELIF ZX_CHAR_XLATE_MODE = 1
+            ; Transforms lower case to inverse upper case
+            defc __CLIB_ZX_LOWER_CASE_TRANSFORM = $A6 - 'a'
+            defc __CLIB_ZX_INVERSE_TRANSFORM = $A6 - 'a'
+            ; Transforms upper case to upper case
+            defc __CLIB_ZX_UPPER_CASE_TRANSFORM = $26 - 'A'
+            defc __CLIB_ZX_CAPITAL_TRANSFORM = $26 - 'A'
+        ELIF ZX_CHAR_XLATE_MODE = 2
+            ; Transforms lower case to upper case
+            defc __CLIB_ZX_LOWER_CASE_TRANSFORM = $26 - 'a'
+            defc __CLIB_ZX_INVERSE_TRANSFORM = $A6 - 'A'
+            ; Transforms upper case to upper case
+            defc __CLIB_ZX_UPPER_CASE_TRANSFORM = $26 - 'A'
+            defc __CLIB_ZX_CAPITAL_TRANSFORM = $26 - 'A'
+        ENDIF
+
         org     CRT_ORG_CODE
 
 
@@ -185,7 +223,7 @@ ENDIF
 	; the stack will be moved to make room
 	; for high-resolution graphics.
 	
-        ld      (start1+1),sp   ;Save entry stack
+        ld      (__restore_sp_onexit+1),sp   ;Save entry stack
 
 	INCLUDE	"crt/classic/crt_init_sp.asm"
 	INCLUDE	"crt/classic/crt_init_atexit.asm"
@@ -238,7 +276,7 @@ ENDIF
 ENDIF
 
         pop     bc		; return code (for BASIC)
-start1: ld      sp,0            ;Restore stack to entry value
+__restore_sp_onexit:ld      sp,0            ;Restore stack to entry value
         ret
 
 l_dcal: jp      (hl)            ;Used for function pointer calls

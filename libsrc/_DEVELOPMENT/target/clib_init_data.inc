@@ -22,7 +22,7 @@
       ; rom model + data section is compressed
       
       EXTERN __CODE_END_tail
-		EXTERN __DATA_head, __DATA_END_tail
+      EXTERN __DATA_head, __DATA_END_tail
       
       ld hl,__CODE_END_tail
       ld de,__DATA_head

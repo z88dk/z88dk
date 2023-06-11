@@ -7,7 +7,7 @@ include ../../../Make.config
 
 TARGET ?= test
 
-NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/sound/ay/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/sound/ay/z80/*.asm"
+NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/sound/ay/c/sccz80/wyz/*.asm" "$(NEWLIB_DIRECTORY)/sound/ay/z80/wyz/*.asm"
 NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy 
 
 space :=
@@ -23,7 +23,7 @@ obj/newlib-z80:
 	$(Q)$(ASSEMBLER) -d -O=obj/z80/x -I.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-r2k:  
-	$(Q)$(ASSEMBLER) -d -O=obj/r2k/x -I.. -mr2k -D__CLASSIC $(NEWLIBGLOBS)
+	$(Q)$(ASSEMBLER) -d -O=obj/r2k/x -I.. -mr2ka -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-z80n:  
 	$(Q)$(ASSEMBLER) -d -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBGLOBS)

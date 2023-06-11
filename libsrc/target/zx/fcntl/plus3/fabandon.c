@@ -32,8 +32,8 @@ static int fabandon1(int fd)
 	push	bc
 	ld	b,l
 	push	bc
-	ld	iy,DOS_ABANDON
 	push	ix
+	ld	ix,DOS_ABANDON
 	call	dodos
 	pop	ix
 	pop	de

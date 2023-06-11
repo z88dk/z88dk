@@ -9,6 +9,7 @@ PUBLIC strrchr_callee
 EXTERN asm_strrchr
 
 strrchr_callee:
+
 IF __CPU_GBZ80__
    pop de
    pop bc
@@ -24,7 +25,7 @@ ELSE
    ex (sp),hl
    jp asm_strrchr
 ENDIF
-   
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC

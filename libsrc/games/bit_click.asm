@@ -9,29 +9,19 @@
 
 IF !__CPU_GBZ80__
 
-    SECTION    code_clib
-    PUBLIC     bit_click
-    PUBLIC     _bit_click
-    INCLUDE  "games/games.inc"
+    SECTION code_clib
+    PUBLIC  bit_click
+    PUBLIC  _bit_click
+    INCLUDE "games/games.inc"
 
-    EXTERN     __snd_tick
+    EXTERN  __snd_tick
 
 .bit_click
 ._bit_click
-
-          ld   a,(__snd_tick)
-          xor  sndbit_mask
-
-   IF sndbit_port > 255
-      IF !__CPU_INTEL__	
-          ld   bc,sndbit_port
-          out  (c),a
-      ENDIF
-   ELSE
-          out  (sndbit_port),a
-   ENDIF
-
-          ld   (__snd_tick),a
-          ret
+    ld      a,(__snd_tick)
+    xor     SOUND_ONEBIT_mask
+    ld      (__snd_tick),a
+    ONEBITOUT
+    ret
 
 ENDIF

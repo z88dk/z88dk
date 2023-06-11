@@ -287,7 +287,7 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
             prototype = array_get_byindex(functype->parameters, proto_argnumber);
 
             if ( prototype->kind != KIND_ELLIPSES && type->kind != prototype->kind ) {
-                if ( vconst && (kind_is_floating(prototype->kind) || kind_is_integer(prototype->kind))) {                 
+                if ( vconst && (kind_is_decimal(prototype->kind) || kind_is_integer(prototype->kind))) {                 
                      LVALUE lval = {0};
                      clearstage(before,start);
                      start = NULL;

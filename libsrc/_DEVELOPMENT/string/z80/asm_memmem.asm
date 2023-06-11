@@ -15,7 +15,8 @@
 ; 
 ; ===============================================================
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+
 SECTION code_clib
 SECTION code_string
 
@@ -44,27 +45,26 @@ asm_memmem:
    ;
    ; uses  : af, bc, hl, ix
 
-   or a   
+   or a
    sbc hl,bc
-   jp c, error_zc              ; if big_len < little_len, not found
+   jp C,error_zc               ; if big_len < little_len, not found
    inc hl                      ; hl = num positions in big to check
-   
+
    ld a,b
    or c                        ; little_len == 0? ....
    dec bc                      ; bc = little_len - 1
 
    push ix                     ; save big
-   
+
    push bc
    pop ix                      ; ix = little_len - 1
-   
-   ld c,l
-   ld b,h                      ; bc = num positions to check
+
+   ld bc,hl                    ; bc = num positions to check
 
    pop hl                      ; hl = big
-   
-   ret z                       ; .... little_len == 0 means match
-   
+
+   ret Z                       ; .... little_len == 0 means match
+
 search_loop:
 
    ; hl = big
@@ -74,6 +74,7 @@ search_loop:
 
    ld a,(de)                   ; a = first little char
    cpir                        ; look for little char in big
+
    jp nz, error_zc             ; not found
 
    push hl
@@ -96,18 +97,18 @@ match_substring:
 
    inc de
    ld a,(de)
-   
+
    cpi
-   jr nz, no_match
-   
-   jp pe, match_substring
+   jr NZ,no_match
+
+   jp PE,match_substring
 
 found:
 
    pop de
    pop bc
    pop hl
-   
+
    dec hl
    ret
 
@@ -124,9 +125,10 @@ no_match:
    
    ld a,b
    or c
-   jr nz, search_loop
+   jr NZ,search_loop
 
 not_found:
 
    jp error_zc
+
 ENDIF

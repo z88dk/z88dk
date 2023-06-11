@@ -16,6 +16,7 @@
 	inc	hl
 	ld	(_var),hl
 	dec	hl
+.i_3
 	ret
 
 
@@ -97,7 +98,7 @@
 	ld	hl,(_var)
 	ld	a,h
 	or	l
-	jp	z,i_21	;
+	ret	z
 	call	_whilefunc
 	jp	i_20	;EOS
 .i_21
@@ -177,6 +178,7 @@
 	dec	hl
 	pop	bc
 	ret
+
 
 
 

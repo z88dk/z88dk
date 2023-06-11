@@ -11,13 +11,13 @@ EXTERN asm_strnchr
 strnchr:
 IF __CPU_GBZ80__ | __CPU_INTEL__
    ld hl,sp+2
-   ld c,(hl)
-   inc hl
-   ld b,(hl)
-   inc hl
    ld e,(hl)
    inc hl
    ld d,(hl)
+   inc hl
+   ld c,(hl)
+   inc hl
+   ld b,(hl)
    inc hl
    ld a,(hl+)
    ld h,(hl)
@@ -32,14 +32,14 @@ ELSE
    pop de
    pop bc
    pop hl
-   
+
    push hl
    push bc
    push de
    push af
    jp asm_strnchr
 ENDIF
-   
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC

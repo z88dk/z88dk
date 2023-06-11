@@ -1,0 +1,25 @@
+//-----------------------------------------------------------------------------
+// z80asm
+// Copyright (C) Paulo Custodio, 2011-2023
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+X(genmath)		// zcc -l, Classic z80 mode 48-bit format
+X(math48)		// zcc -lmath48, same format as genmath
+
+X(ieee16)		// zcc --math16, 16 bit ieee
+X(ieee32)		// zcc --math32, 32 bit ieee-754
+X(ieee64)		// 64 bit ieee-754
+
+X(z80)			// zcc -fp-mode=z80, Classic z80 mode with 48 bits
+X(zx81)			// ZX-81 40 bit format
+X(zx)			// ZX-Spectrum 40 bit format
+X(z88)			// zcc -math-z88, 40 bit format for Z88
+
+X(mbfs)			// zcc -fp-mode=mbf32, 32 bit Microsoft single precision
+X(mbf40)		// zcc -fp-mode=mbf40, 40 bit Microsoft
+X(mbf64)		// zcc -fp-mode=mbf64, 64 bit Microsoft double precision
+
+X(am9511)		// zcc -fp-mode=am9511, AM9511 math processor format
+
+#undef X

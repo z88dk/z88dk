@@ -1,5 +1,5 @@
 name: z88dk
-base: core18
+base: core20
 summary: Development kit for Z80 machiens
 adopt-info: part-z88dk
 
@@ -30,9 +30,11 @@ parts:
       - BUILD_SDCC: "1"
       - BUILD_SDCC_HTTP: "1"
     override-build: |
-      ./build.sh -i $SNAP 
-      make DESTDIR=$SNAPCRAFT_PART_INSTALL install
+      cpanm -n -L $SNAPCRAFT_PART_INSTALL Path::Tiny App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
+      ./build.sh -t -z -i $SNAP
+      make DESTDIR=$SNAPCRAFT_PART_INSTALL PREFIX= install
     build-packages:
+      - cpanminus
       - build-essential
       - dos2unix
       - libboost-all-dev
@@ -45,8 +47,26 @@ parts:
       - zlib1g-dev
       - m4
       - curl
+      - ragel
+      - re2c
+      - libmodern-perl-perl
+      - libtemplate-perl
+      - libtemplate-plugin-yaml-perl
+      - libyaml-perl 
+      - liblocal-lib-perl 
+      - libcapture-tiny-perl 
+      - libpath-tiny-perl 
+      - libtest-differences-perl 
+      - libtext-table-perl 
+      - libdata-hexdump-perl
+      - libregexp-common-perl 
+      - libclone-perl
+      - libfile-slurp-perl
+      - libyaml-tiny-perl
     stage-packages:
-      - libicu60
+      - libicu66
+      - perl-modules-5.30
+      - libperl5.30
       - libxml2
       - m4
 
@@ -97,6 +117,16 @@ apps:
     plugs: [home, removable-media]
   z88dk-font2pv1000:
     command: bin/z88dk-font2pv1000
+    plugs: [home, removable-media]
+  z88dk-asmpp:
+    environment:
+      PERL5LIB: "$SNAP/lib/perl5:$SNAP/usr/share/perl/5.30:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.30"
+    command: bin/z88dk-asmpp
+    plugs: [home, removable-media]
+  z88dk-asmstyle:
+    environment:
+      PERL5LIB: "$SNAP/lib/perl5:$SNAP/usr/share/perl/5.30:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.30"
+    command: bin/z88dk-asmstyle
     plugs: [home, removable-media]
 
 

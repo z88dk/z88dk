@@ -1,23 +1,31 @@
 	SECTION code_clib	
 	PUBLIC	fputc_cons_native
 	
+    EXTERN  l_tms9918_disable_interrupts
+    EXTERN  l_tms9918_enable_interrupts_jp
 	INCLUDE "target/sms/sms.hdr"
 
-	EXTERN	VRAMToHL
-        EXTERN  CONSOLE_YOFFSET
-        EXTERN  CONSOLE_XOFFSET
+    EXTERN  CONSOLE_YOFFSET
+    EXTERN  CONSOLE_XOFFSET
 	PUBLIC	fputc_vdp_offs
 	
 .fputc_cons_native
+	call	l_tms9918_disable_interrupts
+
 	ld	a, (fputc_vdp_offs)
 	ld	l, a
 	ld	a, (fputc_vdp_offs+1)
 	ld	h, a			; Loads char offset
 	ld	de, NameTableAddress
 	add	hl, de			; Calculates name table address
-	call	VRAMToHL
-	
-	ld      hl,2
+
+	ld		a, l
+    out     (__IO_VDP_COMMAND), a
+	ld		a, h
+    or      VDP_SET_VRAM
+    out     (__IO_VDP_COMMAND), a
+
+	ld      hl,4
 	add     hl,sp
 	ld	a,(hl)
 
@@ -44,19 +52,22 @@ ENDIF
 	ld	a, h
 	ld	(fputc_vdp_offs+1), a	; Saves char offset
 	
-	ret				; Nothing more to do
+    ; exit through l_tms9918_enable_interrupts_jp
+    jp      l_tms9918_enable_interrupts_jp
 
 .nocrlf
 	cp	12		; CLS ?
 	jr	nz,nocls
 
 	; TODO: Implement CLS
-        ld      hl,+(CONSOLE_YOFFSET * 64 + CONSOLE_XOFFSET * 2)
-        ld      (fputc_vdp_offs),hl
-        ret
+    ld      hl,+(CONSOLE_YOFFSET * 64 + CONSOLE_XOFFSET * 2)
+    ld      (fputc_vdp_offs),hl
+
+    ; exit through l_tms9918_enable_interrupts_jp
+    jp      l_tms9918_enable_interrupts_jp
 
 .nocls
-	out	($be), a	; Outputs character
+	out	(__IO_VDP_DATA), a	; Outputs character
 	
 	ld	a, (fputc_vdp_offs)
 	ld	l, a
@@ -72,7 +83,8 @@ ENDIF
 	cp	64 - (CONSOLE_XOFFSET * 2)
 	jr	z,linebreak
 
-	ret
+    ; exit through l_tms9918_enable_interrupts_jp
+    jp      l_tms9918_enable_interrupts_jp
 
 	SECTION	data_clib
 

@@ -141,8 +141,8 @@ extern void __LIB__ setpos_callee(int px, int py) __smallc __z88dk_callee;
 #define setpos(a,b)           setpos_callee(a,b)
 
 /* Get current X position of graphics cursor */
-extern int __LIB__ getx();
-extern int __LIB__ gety();
+extern int __LIB__ getx(void);
+extern int __LIB__ gety(void);
 
 /* Draw a box (minimum size: 3x3) */
 extern void __LIB__ drawb(int tlx, int tly, int width, int height) __smallc;
@@ -215,6 +215,21 @@ extern int y_4x6;
 /* Get MAX x and y coordinates */
 extern int __LIB__ getmaxx(void);
 extern int __LIB__ getmaxy(void);
+
+/* Set FATPIX mode.
+ *
+ * Some targets have rectangular pixels in hires mode (eg SAM Coupe), setting
+ * fatpix doubles the width of pixels to make them "square"
+ */
+extern void __LIB__ gfx_set_fatpix(int enable);
+
+/*
+ * Some graphics library need a signal to redraw the screen. Call this 
+ * function periodically.
+ *
+ * At present, this is only needed for the ReGIS driver
+ */
+extern void __LIB__ gfx_refresh(void);
 
 /* The "stencil" object is an evolution of a base concept introduced 
  * by Rafael de Oliveira Jannone in his gfx library: 

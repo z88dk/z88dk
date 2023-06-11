@@ -21,7 +21,7 @@
 #include <psg.h>
 #include <sound.h>
 
-void psg_play(unsigned char melody[])
+void psg_play(char melody[])
 {
 int sound;
 int duration=2;

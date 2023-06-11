@@ -440,7 +440,8 @@ Node *dodo()
     testresult = pair->i;
 
     if ( testresult == 0 ) { // False
-        // We don't need to do anything
+        // Post the exit label in case there were any breaks
+        postlabel(wq.exit);
     } else {
         gen_jp_label(top, 1);
         postlabel(wq.exit);
@@ -510,11 +511,14 @@ Node *dofor()
     suspendbuffer();
 
     if ( testresult != 0 ) {  /* So it's either true or non-constant */      
-        gen_jp_label(l_condition,1); /*         goto loop                  */
+        if (bufferlen(buf2) > 0 ) 
+            gen_jp_label(l_condition,1); /*         goto loop                  */
         postlabel(wq.loop); /* .loop                              */
         clearbuffer(buf3); /*         modification               */
-        postlabel(l_condition); /* .condition                         */
-        clearbuffer(buf2); /*         if (!condition) goto exit  */
+        if (bufferlen(buf2) > 0 )  {
+            postlabel(l_condition); /* .condition                         */
+            clearbuffer(buf2); /*         if (!condition) goto exit  */
+        }
         pair = statement(); /*         statement                  */
         body = pair->node;
         gen_jp_label(wq.loop,1); /*         goto loop                  */
@@ -633,7 +637,7 @@ Node *docase()
     }
     postlabel(swnext->label = getlabel());
     constexpr(&value,&valtype, 1);
-    if ( kind_is_floating(valtype)) 
+    if ( kind_is_decimal(valtype)) 
         warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
     swnext->value = value;
     needchar(':');

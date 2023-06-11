@@ -15,6 +15,8 @@ int main(int argc, char *argv[])
     res += test_strlcpy();
     res += test_strlcat();
     res += test_strrev();
+    res += test_strncat();
+    res += test_strchr();
 
     return res;
 }

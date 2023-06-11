@@ -23,7 +23,7 @@
 
 
 #undef  __Z88DK
-#define __Z88DK  2000
+#define __Z88DK  2200
 
 
 
@@ -55,8 +55,6 @@
 
 #define __Z80_NMOS  0x01
 #define __Z80_CMOS  0x02
-
-#define __CPU_CLOCK  4000000
 
 #define __CPU_INFO  0x00
 

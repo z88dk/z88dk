@@ -169,7 +169,7 @@ struct in_UDK {        /* user defined keys structure         */
 extern uint __LIB__  in_JoyKeyboard(struct in_UDK *u) __z88dk_fastcall;
 
 #ifdef SPECTRUM
-   #include <arch/zx/spectrum.h>
+   #include <arch/zx/zx_input.h>
 /*
    Adds: 1 in_JoyKempston, 2 in_JoySinclair1, 3 in_JoySinclair2,
          4 in_JoyFuller,   5 in_JoyTimex1,    6 in_JoyTimex2
@@ -304,7 +304,7 @@ extern void __LIB__  in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uin
 #ifdef __SPECTRUM__
    #define IN_MAX_X    255  /* largest x coord  */
    #define IN_MAX_Y    191  /* largest y coord  */
-   #include <spectrum.h>
+   #include <arch/zx/spectrum.h>
 /*
    Adds: 1 in_MouseKempInit, in_MouseKemp, in_MouseKempSetPos
          2 in_MouseAMXInit, in_MouseAMXInit2, in_MouseAMX, in_MouseAMXSetPos

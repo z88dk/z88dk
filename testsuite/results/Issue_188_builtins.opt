@@ -11,9 +11,7 @@
 ._strchr1
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	ex	de,hl
 	pop	hl
 .i_2
@@ -31,9 +29,7 @@
 
 
 ._strchr2
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	ld	e,97
 .i_4
 	ld	a,(hl)
@@ -50,9 +46,7 @@
 
 
 ._memset1
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	push	hl
 	ld	e,0
 	ld	b,13
@@ -68,9 +62,7 @@
 ._memset2
 	ld	hl,6	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	ex	de,hl
 	pop	hl
 	push	hl
@@ -87,9 +79,7 @@
 ._memset3
 	ld	hl,6	;const
 	call	l_g2intspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	push	hl
 	call	memset_callee
 	ret
@@ -97,9 +87,7 @@
 
 
 ._memset4
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	push	hl
 	ld	e,0
 	ld	b,0
@@ -113,11 +101,8 @@
 
 
 ._strcpy1
-	ld	hl,4	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
+	call	l_gint4sp	;
+	ex	de,hl
 	ld	hl,i_1+0
 	push	de
 	xor	a
@@ -132,14 +117,9 @@
 
 ._strcpy2
 	ld	hl,4	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
+	call	l_gintspsp	;
+	call	l_gint4sp	;
+	pop	de
 	push	de
 	xor	a
 .i_10
@@ -152,9 +132,7 @@
 
 
 ._memcpy1
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	push	hl
 	ex	de,hl
 	ld	hl,1000
@@ -167,14 +145,9 @@
 
 ._memcpy2
 	ld	hl,4	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
+	call	l_gintspsp	;
+	call	l_gint4sp	;
+	pop	de
 	push	de
 	ld	bc,10
 	ldir
@@ -186,12 +159,11 @@
 ._memcpy3
 	ld	hl,6	;const
 	call	l_g2intspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	push	hl
 	call	memcpy_callee
 	ret
+
 
 
 	SECTION	rodata_compiler

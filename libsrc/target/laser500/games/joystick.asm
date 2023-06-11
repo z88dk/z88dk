@@ -20,8 +20,9 @@
 .joystick
 ._joystick
 	;__FASTCALL__ : joystick no. in HL
+        ld      a,l
 	ld	hl,0
-	dec	a
+        dec     a
 	jp	nz,joystick_inkey
 
 ; 0 = #define MOVE_RIGHT 1

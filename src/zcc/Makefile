@@ -8,7 +8,7 @@ endif
 
 INSTALL ?= install
 
-INCLUDES += -I. -I../copt -I../common
+INCLUDES += -I. -I../copt -I../common -I../../ext/uthash/src
 
 CFLAGS += -DLOCAL_REGEXP -Wall -pedantic -g -MMD
 

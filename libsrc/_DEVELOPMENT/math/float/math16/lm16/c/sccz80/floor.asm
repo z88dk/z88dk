@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _floorf16
-EXTERN cm16_sdcc_floor
-defc _floorf16 = cm16_sdcc_floor
+defc _floorf16 = floorf16
 ENDIF
 

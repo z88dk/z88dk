@@ -14,7 +14,7 @@ strtok_r_callee:
    pop bc
    pop de
    ex (sp),hl
-   
+
    jp asm_strtok_r
 
 ; SDCC bridge for Classic

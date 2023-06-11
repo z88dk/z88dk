@@ -19,4 +19,15 @@ sp1_GetSprClr:
    push bc
    push af
    
-   jp asm_sp1_GetSprClr
+;   jp asm_sp1_GetSprClr
+   push ix
+   call asm_sp1_GetSprClr
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_GetSprClr
+defc _sp1_GetSprClr = sp1_GetSprClr
+ENDIF
+

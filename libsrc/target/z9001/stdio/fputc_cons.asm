@@ -1,31 +1,40 @@
 ;
-;	Console routines
-;	Created for Robotron KC85 but kept generic
-;	By Stefano Bodrato - Sept. 2016
+;       CPM Library
 ;
-;	$Id: fputc_cons.asm,v 1.1 2016-09-22 06:29:49 stefano Exp $
+;       Fputc_cons
+;
+;	Stefano Bodrato - Apr. 2000
+;
+;
+;	$Id: fputc_cons.asm,v 1.9 2016-05-15 20:15:45 dom Exp $
 ;
 
 	SECTION	code_clib
-	PUBLIC	fputc_cons_native
+	PUBLIC  fputc_cons_native
 
+;
+; Entry:        hl = points to char
+;
 .fputc_cons_native
-	ld	hl,2
-	add	hl,sp
+	ld      hl,2
+	add     hl,sp
+	ld	d,0
 	ld	a,(hl)
-	
-	ld  c,a
+	ld	e,a
 IF STANDARDESCAPECHARS
-	cp  10
+	cp	10	; LF ?
+	jr	nz,nocrlf
+	ld	de,13
+	ld	c,2
+	call	5
+	ld	de,10
 ELSE
-	cp  13
+        cp      13      ; CR ?
+        jr      nz,nocrlf
+        ld      c,2
+        call    5
+        ld      de,10
 ENDIF
-	jr  nz,nocr
-	call $f00c		; conout
-IF STANDARDESCAPECHARS
-	ld  c,13
-ELSE
-	ld  c,10
-ENDIF
-.nocr
-	jp  $f00c		; conout
+.nocrlf
+	ld      c,2
+	jp	5

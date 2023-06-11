@@ -6,7 +6,7 @@
 ;        $Id: bkrestore.asm $
 ;
 
-        SECTION smc_clib
+        SECTION smc_video_vdp
         
         PUBLIC  bkrestore
         PUBLIC  _bkrestore
@@ -17,12 +17,19 @@
         EXTERN  l_tms9918_enable_interrupts
         EXTERN  swapgfxbk
         EXTERN  __graphics_end
+        EXTERN  __tms9918_screen_mode
 
         INCLUDE "video/tms9918/vdp.inc"
 
 
 .bkrestore
 ._bkrestore
+       ld      a,(__tms9918_screen_mode)
+       cp      2
+       jr      z,dorender
+       cp      4
+       ret     nz
+dorender:
 
 ; __FASTCALL__ : sprite ptr in HL
 		push    ix                ;save callers        

@@ -38,12 +38,10 @@ l_small_mul_32_32x32:
     ;
     ; uses  : af, bc, de, hl, bc', de', hl'
 
-
-    xor a
-    or e
+    ld a,e
     or d
-
     exx
+
     or e
     or d
     jr Z,l0_small_mul_32_16x16  ; demote if both are uint16_t

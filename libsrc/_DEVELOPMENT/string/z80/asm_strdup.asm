@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; char *strdup(const char * s)
@@ -44,39 +44,45 @@ asm_strdup:
    call asm_strlen             ; hl = length
 
 asm0_strdup:
-
    inc hl                      ; include space for NUL
- 
+
    push hl
    call asm_malloc             ; malloc(hl bytes)
    pop bc                      ; bc = length
-   
+
    pop de                      ; de = char *s
-   ret c                       ; malloc error
-   
+   ret C                       ; malloc error
+
    push hl                     ; save char *str (dup)
 
-IF __CPU_GBZ80__
-loop:
-   ld a,(de)
-   ld (hl+),a
-   inc de
+   ex de,hl
+
+IF __CPU_INTEL || __CPU_GBZ80__
+
    dec bc
-   ld a,b
-   or c
-   jr nz,loop
-   ld (hl+),a	;write terminating zero
+   inc b
+   inc c
+
+loop:
+   ld a,(hl+)
+   ld (de+),a
+
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
 ELSE
 
-   ex de,hl
    ldir
-   
+
+ENDIF
+
    ; ensure terminating NUL written, strndup requires it
-   
+
    dec de
    xor a
    ld (de),a
-ENDIF
-   
+
    pop hl
    ret

@@ -17,8 +17,3 @@ generic_console_cls:
 	ldir
 	call	swapgfxbk1
 	ret
-
-        SECTION code_crt_init
-	ld	c,4
-	ld	e,0x1a		;Clears screen, sets up VRAM at 0
-        call    __bdos

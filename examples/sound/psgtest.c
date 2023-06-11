@@ -22,7 +22,7 @@ If the target system lacks the lib support for timers, then try with "-DNODELAY"
 #include <stdlib.h>
 #include <time.h>
 
-void psg_play(unsigned char melody[])
+void psgplay(unsigned char melody[])
 {
     int sound;
     int duration = 2;
@@ -129,15 +129,15 @@ void main()
     psg_volume(2, 10);
 
     // Fra Martino
-    psg_play("C4DECCDECEFG8E4FG8G2AGFE4CG2AGFE4CDG-CCDG-CC");
+    psgplay("C4DECCDECEFG8E4FG8G2AGFE4CG2AGFE4CDG-CCDG-CC");
 
     // ZX DEMO
-    psg_play("C8DEb4DC8");
-    psg_play("C8DEb4DC8");
-    psg_play("Eb8FGG");
-    psg_play("Eb8FGG");
-    psg_play("G8Ab4G8FEb4DC");
-    psg_play("G8Ab4G8FEb4DC");
-    psg_play("C8G-C");
-    psg_play("C8G-C");
+    psgplay("C8DEb4DC8");
+    psgplay("C8DEb4DC8");
+    psgplay("Eb8FGG");
+    psgplay("Eb8FGG");
+    psgplay("G8Ab4G8FEb4DC");
+    psgplay("G8Ab4G8FEb4DC");
+    psgplay("C8G-C");
+    psgplay("C8G-C");
 }

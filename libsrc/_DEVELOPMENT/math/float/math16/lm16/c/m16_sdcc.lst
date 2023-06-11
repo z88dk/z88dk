@@ -73,11 +73,15 @@ math/float/math16/lm16/c/sdcc/___hadd
 math/float/math16/lm16/c/sdcc/___hadd_callee
 math/float/math16/lm16/c/sdcc/___hdiv
 math/float/math16/lm16/c/sdcc/___hdiv_callee
+math/float/math16/lm16/c/sdcc/___heq
 math/float/math16/lm16/c/sdcc/___heq_callee
+math/float/math16/lm16/c/sdcc/___hgt
 math/float/math16/lm16/c/sdcc/___hgt_callee
+math/float/math16/lm16/c/sdcc/___hlt
 math/float/math16/lm16/c/sdcc/___hlt_callee
 math/float/math16/lm16/c/sdcc/___hmul
 math/float/math16/lm16/c/sdcc/___hmul_callee
+math/float/math16/lm16/c/sdcc/___hneq
 math/float/math16/lm16/c/sdcc/___hneq_callee
 math/float/math16/lm16/c/sdcc/___hsub
 math/float/math16/lm16/c/sdcc/___hsub_callee

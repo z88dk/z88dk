@@ -2,23 +2,31 @@
 ; Doesn't emulate the flags correctly
 
 
-      SECTION  code_crt0_sccz80
-      PUBLIC   __z80asm__lddr
+        SECTION code_l_sccz80
+        PUBLIC  __z80asm__lddr
 
 __z80asm__lddr:
-      push  af
+        push    af
+
+		; setup loop
+        dec     bc
+        inc     b
+        inc     c
 loop:
-IF __CPU_GBZ80__
-      ld    a, (hl-)
-ELSE  
-      ld    a, (hl)
-      dec   hl
-ENDIF 
-      ld    (de), a
-      dec   de
-      dec   bc
-      ld    a, b
-      or    c
-      jp    nz, loop
-      pop   af
-      ret   
+  IF    __CPU_GBZ80__
+        ld      a, (hl-)
+  ELSE
+        ld      a, (hl)
+        dec     hl
+  ENDIF
+        ld      (de), a
+        dec     de
+
+        ; iterate
+        dec     c
+        jp      nz, loop
+        dec     b
+        jp      nz, loop
+
+        pop     af
+        ret

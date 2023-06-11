@@ -63,8 +63,13 @@ ENDIF
    call l_jphl
    pop hl
    pop bc
-   
+
+IF __CPU_INTEL__
+   dec b
+   jp NZ,loop
+ELSE
    djnz loop
+ENDIF
 
 .end                         ; disrupt stack completely and exit with error value
 

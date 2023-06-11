@@ -1,6 +1,8 @@
 /*
- * FreeRTOS Kernel V10.4.3
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.5.1+
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -80,12 +82,12 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * QueueHandle_t xQueueCreate(
  *                            UBaseType_t uxQueueLength,
  *                            UBaseType_t uxItemSize
  *                        );
- * </pre>
+ * @endcode
  *
  * Creates a new queue instance, and returns a handle by which the new queue
  * can be referenced.
@@ -114,7 +116,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  * returned.
  *
  * Example usage:
- * <pre>
+ * @code{c}
  * struct AMessage
  * {
  *  char ucMessageID;
@@ -142,7 +144,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *
  *  // ... Rest of task code.
  * }
- * </pre>
+ * @endcode
  * \defgroup xQueueCreate xQueueCreate
  * \ingroup QueueManagement
  */
@@ -152,14 +154,14 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * QueueHandle_t xQueueCreateStatic(
  *                            UBaseType_t uxQueueLength,
  *                            UBaseType_t uxItemSize,
- *                            uint8_t *pucQueueStorageBuffer,
+ *                            uint8_t *pucQueueStorage,
  *                            StaticQueue_t *pxQueueBuffer
  *                        );
- * </pre>
+ * @endcode
  *
  * Creates a new queue instance, and returns a handle by which the new queue
  * can be referenced.
@@ -183,11 +185,11 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  * that will be copied for each posted item.  Each item on the queue must be
  * the same size.
  *
- * @param pucQueueStorageBuffer If uxItemSize is not zero then
- * pucQueueStorageBuffer must point to a uint8_t array that is at least large
+ * @param pucQueueStorage If uxItemSize is not zero then
+ * pucQueueStorage must point to a uint8_t array that is at least large
  * enough to hold the maximum number of items that can be in the queue at any
  * one time - which is ( uxQueueLength * uxItemsSize ) bytes.  If uxItemSize is
- * zero then pucQueueStorageBuffer can be NULL.
+ * zero then pucQueueStorage can be NULL.
  *
  * @param pxQueueBuffer Must point to a variable of type StaticQueue_t, which
  * will be used to hold the queue's data structure.
@@ -196,7 +198,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  * returned.  If pxQueueBuffer is NULL then NULL is returned.
  *
  * Example usage:
- * <pre>
+ * @code{c}
  * struct AMessage
  * {
  *  char ucMessageID;
@@ -215,7 +217,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *
  * void vATask( void *pvParameters )
  * {
- * QueueHandle_t xQueue1;
+ *  QueueHandle_t xQueue1;
  *
  *  // Create a queue capable of containing 10 uint32_t values.
  *  xQueue1 = xQueueCreate( QUEUE_LENGTH, // The number of items the queue can hold.
@@ -228,7 +230,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *
  *  // ... Rest of task code.
  * }
- * </pre>
+ * @endcode
  * \defgroup xQueueCreateStatic xQueueCreateStatic
  * \ingroup QueueManagement
  */
@@ -238,13 +240,42 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
+ * BaseType_t xQueueGetStaticBuffers( QueueHandle_t xQueue,
+ *                                    uint8_t ** ppucQueueStorage,
+ *                                    StaticQueue_t ** ppxStaticQueue );
+ * @endcode
+ *
+ * Retrieve pointers to a statically created queue's data structure buffer
+ * and storage area buffer. These are the same buffers that are supplied
+ * at the time of creation.
+ *
+ * @param xQueue The queue for which to retrieve the buffers.
+ *
+ * @param ppucQueueStorage Used to return a pointer to the queue's storage
+ * area buffer.
+ *
+ * @param ppxStaticQueue Used to return a pointer to the queue's data
+ * structure buffer.
+ *
+ * @return pdTRUE if buffers were retrieved, pdFALSE otherwise.
+ *
+ * \defgroup xQueueGetStaticBuffers xQueueGetStaticBuffers
+ * \ingroup QueueManagement
+ */
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+    #define xQueueGetStaticBuffers( xQueue, ppucQueueStorage, ppxStaticQueue )    xQueueGenericGetStaticBuffers( ( xQueue ), ( ppucQueueStorage ), ( ppxStaticQueue ) )
+#endif /* configSUPPORT_STATIC_ALLOCATION */
+
+/**
+ * queue. h
+ * @code{c}
  * BaseType_t xQueueSendToToFront(
  *                                 QueueHandle_t    xQueue,
  *                                 const void       *pvItemToQueue,
  *                                 TickType_t       xTicksToWait
  *                             );
- * </pre>
+ * @endcode
  *
  * Post an item to the front of a queue.  The item is queued by copy, not by
  * reference.  This function must not be called from an interrupt service
@@ -267,7 +298,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  * @return pdTRUE if the item was successfully posted, otherwise errQUEUE_FULL.
  *
  * Example usage:
- * <pre>
+ * @code{c}
  * struct AMessage
  * {
  *  char ucMessageID;
@@ -310,7 +341,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *
  *  // ... Rest of task code.
  * }
- * </pre>
+ * @endcode
  * \defgroup xQueueSend xQueueSend
  * \ingroup QueueManagement
  */
@@ -319,13 +350,13 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueueSendToBack(
  *                                 QueueHandle_t    xQueue,
  *                                 const void       *pvItemToQueue,
  *                                 TickType_t       xTicksToWait
  *                             );
- * </pre>
+ * @endcode
  *
  * This is a macro that calls xQueueGenericSend().
  *
@@ -350,7 +381,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  * @return pdTRUE if the item was successfully posted, otherwise errQUEUE_FULL.
  *
  * Example usage:
- * <pre>
+ * @code{c}
  * struct AMessage
  * {
  *  char ucMessageID;
@@ -393,7 +424,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *
  *  // ... Rest of task code.
  * }
- * </pre>
+ * @endcode
  * \defgroup xQueueSend xQueueSend
  * \ingroup QueueManagement
  */
@@ -402,13 +433,13 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueueSend(
  *                            QueueHandle_t xQueue,
  *                            const void * pvItemToQueue,
  *                            TickType_t xTicksToWait
  *                       );
- * </pre>
+ * @endcode
  *
  * This is a macro that calls xQueueGenericSend().  It is included for
  * backward compatibility with versions of FreeRTOS.org that did not
@@ -435,7 +466,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  * @return pdTRUE if the item was successfully posted, otherwise errQUEUE_FULL.
  *
  * Example usage:
- * <pre>
+ * @code{c}
  * struct AMessage
  * {
  *  char ucMessageID;
@@ -478,7 +509,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *
  *  // ... Rest of task code.
  * }
- * </pre>
+ * @endcode
  * \defgroup xQueueSend xQueueSend
  * \ingroup QueueManagement
  */
@@ -487,12 +518,12 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueueOverwrite(
  *                            QueueHandle_t xQueue,
  *                            const void * pvItemToQueue
  *                       );
- * </pre>
+ * @endcode
  *
  * Only for use with queues that have a length of one - so the queue is either
  * empty or full.
@@ -516,7 +547,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  * to the queue even when the queue is already full.
  *
  * Example usage:
- * <pre>
+ * @code{c}
  *
  * void vFunction( void *pvParameters )
  * {
@@ -562,7 +593,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *
  *  // ...
  * }
- * </pre>
+ * @endcode
  * \defgroup xQueueOverwrite xQueueOverwrite
  * \ingroup QueueManagement
  */
@@ -572,14 +603,14 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueueGenericSend(
  *                                  QueueHandle_t xQueue,
  *                                  const void * pvItemToQueue,
  *                                  TickType_t xTicksToWait
  *                                  BaseType_t xCopyPosition
  *                              );
- * </pre>
+ * @endcode
  *
  * It is preferred that the macros xQueueSend(), xQueueSendToFront() and
  * xQueueSendToBack() are used in place of calling this function directly.
@@ -608,7 +639,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  * @return pdTRUE if the item was successfully posted, otherwise errQUEUE_FULL.
  *
  * Example usage:
- * <pre>
+ * @code{c}
  * struct AMessage
  * {
  *  char ucMessageID;
@@ -651,7 +682,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *
  *  // ... Rest of task code.
  * }
- * </pre>
+ * @endcode
  * \defgroup xQueueSend xQueueSend
  * \ingroup QueueManagement
  */
@@ -667,13 +698,13 @@ extern BaseType_t xQueueGenericSend(QueueHandle_t xQueue,const void * const pvIt
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueuePeek(
  *                           QueueHandle_t xQueue,
  *                           void * const pvBuffer,
  *                           TickType_t xTicksToWait
  *                       );
- * </pre>
+ * @endcode
  *
  * Receive an item from a queue without removing the item from the queue.
  * The item is received by copy so a buffer of adequate size must be
@@ -704,7 +735,7 @@ extern BaseType_t xQueueGenericSend(QueueHandle_t xQueue,const void * const pvIt
  * otherwise pdFALSE.
  *
  * Example usage:
- * <pre>
+ * @code{c}
  * struct AMessage
  * {
  *  char ucMessageID;
@@ -754,7 +785,7 @@ extern BaseType_t xQueueGenericSend(QueueHandle_t xQueue,const void * const pvIt
  *
  *  // ... Rest of task code.
  * }
- * </pre>
+ * @endcode
  * \defgroup xQueuePeek xQueuePeek
  * \ingroup QueueManagement
  */
@@ -769,12 +800,12 @@ extern BaseType_t xQueuePeek(QueueHandle_t xQueue,void * const pvBuffer,TickType
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueuePeekFromISR(
  *                                  QueueHandle_t xQueue,
  *                                  void *pvBuffer,
  *                              );
- * </pre>
+ * @endcode
  *
  * A version of xQueuePeek() that can be called from an interrupt service
  * routine (ISR).
@@ -809,13 +840,13 @@ extern BaseType_t xQueuePeekFromISR(QueueHandle_t xQueue,void * const pvBuffer);
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueueReceive(
  *                               QueueHandle_t xQueue,
  *                               void *pvBuffer,
  *                               TickType_t xTicksToWait
  *                          );
- * </pre>
+ * @endcode
  *
  * Receive an item from a queue.  The item is received by copy so a buffer of
  * adequate size must be provided.  The number of bytes copied into the buffer
@@ -843,7 +874,7 @@ extern BaseType_t xQueuePeekFromISR(QueueHandle_t xQueue,void * const pvBuffer);
  * otherwise pdFALSE.
  *
  * Example usage:
- * <pre>
+ * @code{c}
  * struct AMessage
  * {
  *  char ucMessageID;
@@ -893,7 +924,7 @@ extern BaseType_t xQueuePeekFromISR(QueueHandle_t xQueue,void * const pvBuffer);
  *
  *  // ... Rest of task code.
  * }
- * </pre>
+ * @endcode
  * \defgroup xQueueReceive xQueueReceive
  * \ingroup QueueManagement
  */
@@ -908,9 +939,9 @@ extern BaseType_t xQueueReceive(QueueHandle_t xQueue,void * const pvBuffer,TickT
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * UBaseType_t uxQueueMessagesWaiting( const QueueHandle_t xQueue );
- * </pre>
+ * @endcode
  *
  * Return the number of messages stored in a queue.
  *
@@ -930,9 +961,9 @@ extern UBaseType_t uxQueueMessagesWaiting(const QueueHandle_t xQueue);
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * UBaseType_t uxQueueSpacesAvailable( const QueueHandle_t xQueue );
- * </pre>
+ * @endcode
  *
  * Return the number of free spaces available in a queue.  This is equal to the
  * number of items that can be sent to the queue before the queue becomes full
@@ -954,9 +985,9 @@ extern UBaseType_t uxQueueSpacesAvailable(const QueueHandle_t xQueue);
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * void vQueueDelete( QueueHandle_t xQueue );
- * </pre>
+ * @endcode
  *
  * Delete a queue - freeing all the memory allocated for storing of items
  * placed on the queue.
@@ -975,13 +1006,13 @@ extern void vQueueDelete(QueueHandle_t xQueue);
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueueSendToFrontFromISR(
  *                                       QueueHandle_t xQueue,
  *                                       const void *pvItemToQueue,
  *                                       BaseType_t *pxHigherPriorityTaskWoken
  *                                    );
- * </pre>
+ * @endcode
  *
  * This is a macro that calls xQueueGenericSendFromISR().
  *
@@ -1010,11 +1041,11 @@ extern void vQueueDelete(QueueHandle_t xQueue);
  *
  * Example usage for buffered IO (where the ISR can obtain more than one value
  * per call):
- * <pre>
+ * @code{c}
  * void vBufferISR( void )
  * {
  * char cIn;
- * BaseType_t xHigherPrioritTaskWoken;
+ * BaseType_t xHigherPriorityTaskWoken;
  *
  *  // We have not woken a task at the start of the ISR.
  *  xHigherPriorityTaskWoken = pdFALSE;
@@ -1036,7 +1067,7 @@ extern void vQueueDelete(QueueHandle_t xQueue);
  *      taskYIELD ();
  *  }
  * }
- * </pre>
+ * @endcode
  *
  * \defgroup xQueueSendFromISR xQueueSendFromISR
  * \ingroup QueueManagement
@@ -1047,13 +1078,13 @@ extern void vQueueDelete(QueueHandle_t xQueue);
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueueSendToBackFromISR(
  *                                       QueueHandle_t xQueue,
  *                                       const void *pvItemToQueue,
  *                                       BaseType_t *pxHigherPriorityTaskWoken
  *                                    );
- * </pre>
+ * @endcode
  *
  * This is a macro that calls xQueueGenericSendFromISR().
  *
@@ -1082,7 +1113,7 @@ extern void vQueueDelete(QueueHandle_t xQueue);
  *
  * Example usage for buffered IO (where the ISR can obtain more than one value
  * per call):
- * <pre>
+ * @code{c}
  * void vBufferISR( void )
  * {
  * char cIn;
@@ -1108,7 +1139,7 @@ extern void vQueueDelete(QueueHandle_t xQueue);
  *      taskYIELD ();
  *  }
  * }
- * </pre>
+ * @endcode
  *
  * \defgroup xQueueSendFromISR xQueueSendFromISR
  * \ingroup QueueManagement
@@ -1118,13 +1149,13 @@ extern void vQueueDelete(QueueHandle_t xQueue);
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueueOverwriteFromISR(
  *                            QueueHandle_t xQueue,
  *                            const void * pvItemToQueue,
  *                            BaseType_t *pxHigherPriorityTaskWoken
  *                       );
- * </pre>
+ * @endcode
  *
  * A version of xQueueOverwrite() that can be used in an interrupt service
  * routine (ISR).
@@ -1155,7 +1186,7 @@ extern void vQueueDelete(QueueHandle_t xQueue);
  * the queue is already full.
  *
  * Example usage:
- * <pre>
+ * @code{c}
  *
  * QueueHandle_t xQueue;
  *
@@ -1197,7 +1228,7 @@ extern void vQueueDelete(QueueHandle_t xQueue);
  *      portYIELD_FROM_ISR(); // or portEND_SWITCHING_ISR() depending on the port.
  *  }
  * }
- * </pre>
+ * @endcode
  * \defgroup xQueueOverwriteFromISR xQueueOverwriteFromISR
  * \ingroup QueueManagement
  */
@@ -1206,13 +1237,13 @@ extern void vQueueDelete(QueueHandle_t xQueue);
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueueSendFromISR(
  *                                   QueueHandle_t xQueue,
  *                                   const void *pvItemToQueue,
  *                                   BaseType_t *pxHigherPriorityTaskWoken
  *                              );
- * </pre>
+ * @endcode
  *
  * This is a macro that calls xQueueGenericSendFromISR().  It is included
  * for backward compatibility with versions of FreeRTOS.org that did not
@@ -1244,7 +1275,7 @@ extern void vQueueDelete(QueueHandle_t xQueue);
  *
  * Example usage for buffered IO (where the ISR can obtain more than one value
  * per call):
- * <pre>
+ * @code{c}
  * void vBufferISR( void )
  * {
  * char cIn;
@@ -1268,10 +1299,10 @@ extern void vQueueDelete(QueueHandle_t xQueue);
  *  if( xHigherPriorityTaskWoken )
  *  {
  *      // Actual macro used here is port specific.
- *      portYIELD_FROM_ISR();
+ *      portYIELD_FROM_ISR ();
  *  }
  * }
- * </pre>
+ * @endcode
  *
  * \defgroup xQueueSendFromISR xQueueSendFromISR
  * \ingroup QueueManagement
@@ -1281,14 +1312,14 @@ extern void vQueueDelete(QueueHandle_t xQueue);
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueueGenericSendFromISR(
  *                                         QueueHandle_t    xQueue,
  *                                         const    void    *pvItemToQueue,
  *                                         BaseType_t  *pxHigherPriorityTaskWoken,
  *                                         BaseType_t  xCopyPosition
  *                                     );
- * </pre>
+ * @endcode
  *
  * It is preferred that the macros xQueueSendFromISR(),
  * xQueueSendToFrontFromISR() and xQueueSendToBackFromISR() be used in place
@@ -1324,7 +1355,7 @@ extern void vQueueDelete(QueueHandle_t xQueue);
  *
  * Example usage for buffered IO (where the ISR can obtain more than one value
  * per call):
- * <pre>
+ * @code{c}
  * void vBufferISR( void )
  * {
  * char cIn;
@@ -1351,7 +1382,7 @@ extern void vQueueDelete(QueueHandle_t xQueue);
  *      portYIELD_FROM_ISR();
  *  }
  * }
- * </pre>
+ * @endcode
  *
  * \defgroup xQueueSendFromISR xQueueSendFromISR
  * \ingroup QueueManagement
@@ -1375,13 +1406,13 @@ extern BaseType_t xQueueGiveFromISR(QueueHandle_t xQueue,BaseType_t * const pxHi
 
 /**
  * queue. h
- * <pre>
+ * @code{c}
  * BaseType_t xQueueReceiveFromISR(
  *                                     QueueHandle_t    xQueue,
  *                                     void             *pvBuffer,
  *                                     BaseType_t       *pxTaskWoken
  *                                 );
- * </pre>
+ * @endcode
  *
  * Receive an item from a queue.  It is safe to use this function from within an
  * interrupt service routine.
@@ -1392,16 +1423,16 @@ extern BaseType_t xQueueGiveFromISR(QueueHandle_t xQueue,BaseType_t * const pxHi
  * @param pvBuffer Pointer to the buffer into which the received item will
  * be copied.
  *
- * @param pxTaskWoken A task may be blocked waiting for space to become
- * available on the queue.  If xQueueReceiveFromISR causes such a task to
- * unblock *pxTaskWoken will get set to pdTRUE, otherwise *pxTaskWoken will
+ * @param pxHigherPriorityTaskWoken A task may be blocked waiting for space to
+ * become available on the queue.  If xQueueReceiveFromISR causes such a task
+ * to unblock *pxTaskWoken will get set to pdTRUE, otherwise *pxTaskWoken will
  * remain unchanged.
  *
  * @return pdTRUE if an item was successfully received from the queue,
  * otherwise pdFALSE.
  *
  * Example usage:
- * <pre>
+ * @code{c}
  *
  * QueueHandle_t xQueue;
  *
@@ -1446,17 +1477,17 @@ extern BaseType_t xQueueGiveFromISR(QueueHandle_t xQueue,BaseType_t * const pxHi
  *      vOutputCharacter( cRxedChar );
  *
  *      // If removing the character from the queue woke the task that was
- *      // posting onto the queue cTaskWokenByReceive will have been set to
+ *      // posting onto the queue xTaskWokenByReceive will have been set to
  *      // pdTRUE.  No matter how many times this loop iterates only one
  *      // task will be woken.
  *  }
  *
- *  if( cTaskWokenByPost != ( char ) pdFALSE;
+ *  if( xTaskWokenByReceive != ( char ) pdFALSE;
  *  {
  *      taskYIELD ();
  *  }
  * }
- * </pre>
+ * @endcode
  * \defgroup xQueueReceiveFromISR xQueueReceiveFromISR
  * \ingroup QueueManagement
  */
@@ -1471,7 +1502,7 @@ extern BaseType_t xQueueReceiveFromISR(QueueHandle_t xQueue,void * const pvBuffe
 
 /*
  * Utilities to query queues that are safe to use from an ISR.  These utilities
- * should be used only from witin an ISR, or within a critical section.
+ * should be used only from within an ISR, or within a critical section.
  */
 /*
 BaseType_t xQueueIsQueueEmptyFromISR( const QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
@@ -1485,42 +1516,6 @@ extern BaseType_t xQueueIsQueueFullFromISR(const QueueHandle_t xQueue);
 
 
 extern UBaseType_t uxQueueMessagesWaitingFromISR(const QueueHandle_t xQueue);
-
-
-
-/*
- * The functions defined above are for passing data to and from tasks.  The
- * functions below are the equivalents for passing data to and from
- * co-routines.
- *
- * These functions are called from the co-routine macro implementation and
- * should not be called directly from application code.  Instead use the macro
- * wrappers defined within croutine.h.
- */
-/*
-BaseType_t xQueueCRSendFromISR( QueueHandle_t xQueue,
-                                const void * pvItemToQueue,
-                                BaseType_t xCoRoutinePreviouslyWoken );
-BaseType_t xQueueCRReceiveFromISR( QueueHandle_t xQueue,
-                                   void * pvBuffer,
-                                   BaseType_t * pxTaskWoken );
-BaseType_t xQueueCRSend( QueueHandle_t xQueue,
-                         const void * pvItemToQueue,
-                         TickType_t xTicksToWait );
-BaseType_t xQueueCRReceive( QueueHandle_t xQueue,
-                            void * pvBuffer,
-                            TickType_t xTicksToWait );
- */
-extern BaseType_t xQueueCRSendFromISR(QueueHandle_t xQueue,const void * pvItemToQueue,BaseType_t xCoRoutinePreviouslyWoken);
-
-
-extern BaseType_t xQueueCRReceiveFromISR(QueueHandle_t xQueue,void * pvBuffer,BaseType_t * pxTaskWoken);
-
-
-extern BaseType_t xQueueCRSend(QueueHandle_t xQueue,const void * pvItemToQueue,TickType_t xTicksToWait);
-
-
-extern BaseType_t xQueueCRReceive(QueueHandle_t xQueue,void * pvBuffer,TickType_t xTicksToWait);
 
 
 
@@ -1585,7 +1580,7 @@ extern BaseType_t xQueueGiveMutexRecursive(QueueHandle_t xMutex);
  * Reset a queue back to its original empty state.  The return value is now
  * obsolete and is always set to pdPASS.
  */
-#define xQueueReset( xQueue )    xQueueGenericReset( xQueue, pdFALSE )
+#define xQueueReset( xQueue )    xQueueGenericReset( ( xQueue ), pdFALSE )
 
 /*
  * The registry is provided as a means for kernel aware debuggers to
@@ -1597,14 +1592,18 @@ extern BaseType_t xQueueGiveMutexRecursive(QueueHandle_t xMutex);
  * configQUEUE_REGISTRY_SIZE defines the maximum number of handles the
  * registry can hold.  configQUEUE_REGISTRY_SIZE must be greater than 0
  * within FreeRTOSConfig.h for the registry to be available.  Its value
- * does not effect the number of queues, semaphores and mutexes that can be
+ * does not affect the number of queues, semaphores and mutexes that can be
  * created - just the number that the registry can hold.
+ *
+ * If vQueueAddToRegistry is called more than once with the same xQueue
+ * parameter, the registry will store the pcQueueName parameter from the
+ * most recent call to vQueueAddToRegistry.
  *
  * @param xQueue The handle of the queue being added to the registry.  This
  * is the handle returned by a call to xQueueCreate().  Semaphore and mutex
  * handles can also be passed in here.
  *
- * @param pcName The name to be associated with the handle.  This is the
+ * @param pcQueueName The name to be associated with the handle.  This is the
  * name that the kernel aware debugger will display.  The queue registry only
  * stores a pointer to the string - so the string must be persistent (global or
  * preferably in ROM/Flash), not on the stack.
@@ -1688,6 +1687,23 @@ extern BaseType_t xQueueGiveMutexRecursive(QueueHandle_t xMutex);
                                              const uint8_t ucQueueType ) PRIVILEGED_FUNCTION;
  */
     extern QueueHandle_t xQueueGenericCreateStatic(const UBaseType_t uxQueueLength,const UBaseType_t uxItemSize,uint8_t * pucQueueStorage,StaticQueue_t * pxStaticQueue,const uint8_t ucQueueType);
+
+
+#endif
+
+/*
+ * Generic version of the function used to retrieve the buffers of statically
+ * created queues. This is called by other functions and macros that retrieve
+ * the buffers of other statically created RTOS objects that use the queue
+ * structure as their base.
+ */
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+/*
+    BaseType_t xQueueGenericGetStaticBuffers( QueueHandle_t xQueue,
+                                              uint8_t ** ppucQueueStorage,
+                                              StaticQueue_t ** ppxStaticQueue ) PRIVILEGED_FUNCTION;
+ */
+    extern BaseType_t xQueueGenericGetStaticBuffers(QueueHandle_t xQueue,uint8_t ** ppucQueueStorage,StaticQueue_t ** ppxStaticQueue);
 
 
 #endif

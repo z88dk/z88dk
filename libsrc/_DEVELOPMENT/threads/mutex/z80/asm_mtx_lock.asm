@@ -16,7 +16,7 @@ PUBLIC asm_mtx_lock
 
 EXTERN asm_mtx_timedlock
 
-asm_mtx_lock:
+.asm_mtx_lock
 
    ; enter : hl = mtx_t *m
    ;

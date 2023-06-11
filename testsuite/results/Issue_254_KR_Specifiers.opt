@@ -7,6 +7,8 @@
 
 
 
+	SECTION	code_compiler
+
 
 	SECTION	bss_compiler
 	SECTION	code_compiler

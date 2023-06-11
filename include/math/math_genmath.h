@@ -1,5 +1,5 @@
-#ifndef __MATH_GENMATH_H__
-#define __MATH_GENMATH_H__
+#ifndef __MATH_GENMATH_H
+#define __MATH_GENMATH_H
 
 #include <sys/compiler.h>
 #include <sys/types.h>
@@ -88,10 +88,8 @@ extern double_t __LIB__ frexp(double_t x, int *pw2) __smallc;
 /* General */
 extern double_t __LIB__ fabs(double_t) __smallc;
 extern double_t __LIB__ fmod(double_t,double_t) __smallc;
-extern double_t __LIB__ amax(double_t,double_t) __smallc;
-extern double_t __LIB__ amin(double_t,double_t) __smallc;
-#define fmax(x,y) amax(x,y)
-#define fmin(x,y) amin(x,y)
+extern double_t __LIB__ fmax(double_t,double_t) __smallc;
+extern double_t __LIB__ fmin(double_t,double_t) __smallc;
 #define remainder(x,y) (x-(fabs(y)*round(x/fabs(y))))
 #define fdim(a,b) (a>b?a-b:b-a)
 
@@ -131,4 +129,4 @@ extern int __LIB__ fpclassify(double_t );
 #define fma(x,y,z) (x*y+z)
 
 
-#endif /* _MATH_GENMATH_H */
+#endif /* __MATH_GENMATH_H */

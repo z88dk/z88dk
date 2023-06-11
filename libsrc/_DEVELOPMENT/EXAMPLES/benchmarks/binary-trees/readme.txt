@@ -17,7 +17,7 @@ When compiling binary-trees, several defines are possible:
 
 /*
  * COMMAND LINE DEFINES
- * 
+ *
  * -DSTATIC
  * Use static variables instead of locals.
  *
@@ -75,36 +75,36 @@ RESULTS
 
 
 1.
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-2978 bytes less page zero
+Z88DK August 28, 2022
+zsdcc #13131 / classic c library
+3536 bytes less page zero
 
-cycle count  = 150508687
-time @ 4MHz  = 150508687 / 4*10^6 = 37.63 sec
+cycle count  = 150118736
+time @ 4MHz  = 150118736 / 4*10^6 = 37.52 sec
 
 2.
-Z88DK April 20, 2020
+Z88DK August 28, 2022
 sccz80 / classic c library
-2924 bytes less page zero
+3800 bytes less page zero
 
-cycle count  = 153408086
-time @ 4MHz  = 153408086 / 4*10^6 = 38.52 sec
+cycle count  = 145563150
+time @ 4MHz  = 145563150 / 4*10^6 = 36.39 sec
 
 3.
-SDCC 3.6.5 #9852 (MINGW64)
-8626 bytes less page zero
+SDCC 4.2.0 Linux
+7158 bytes less page zero
 
-cycle count  = 203788182
-time @ 4MHz  = 203788182 / 4*10^6 = 50.95 sec
+cycle count  = 188126191
+time @ 4MHz  = 188126191 / 4*10^6 = 47.03 sec
 
 Large size caused by float package implemented in C.
 
 4.
-HITECH C MSDOS V750
-4121 bytes exact
+HITECH C MSDOS V780pl2
+4247 bytes exact
 
-cycle count  = 243708728
-time @ 4MHz  = 243708728 / 4x10^6 = 60.93 seconds
+cycle count  = 240336355
+time @ 4MHz  = 240336355 / 4x10^6 = 60.09 seconds
 
 5.
 Z88DK April 20, 2020
@@ -140,11 +140,20 @@ time @ 4MHz  = 7358336547 / 4x10^6 = 30 min 40 sec
 IAR is likely implementing a heap similar to z88dk's new c library
 where an emphasis is placed on the speed of realloc().
 
-DQ.
-HITECH C CPM V309
-4165 bytes less cpm overhead
+8.
+Z88DK January 31, 2023
+sccz80 / classic c library / 8085 CPU
+3775 bytes less page zero
 
-Disqualified for incorrect results.
+cycle count  = 137783936
+time @ 4MHz  = 137783936 / 4*10^6 = 34.45 sec
+
+9.
+HITECH C CPM V309-15
+5,821 bytes exact
+
+cycle count  = 298416076
+time @ 4MHz  = 298416076 / 4x10^6 = 74.60 seconds
 
 
 BENCHMARKS GAME COMMENTS
@@ -183,7 +192,7 @@ We ask that contributed programs not only give the correct result, but also use 
 
 Each program should:
 
-    define a tree node class and methods, a tree node record and procedures, or an algebraic data type and functions, or…
+    define a tree node class and methods, a tree node record and procedures, or an algebraic data type and functions, orï¿½
 
     allocate a binary tree to 'stretch' memory, check it exists, and deallocate it
 
@@ -195,10 +204,10 @@ Each program should:
 
         walk the tree nodes, checksum the node items (and maybe deallocate the node)
 
-        deallocate the tree 
+        deallocate the tree
 
-    check that the long-lived binary tree still exists 
+    check that the long-lived binary tree still exists
 
 diff program output N = 10 with this 1KB output file to check your program output has the correct format, before you contribute your program.
 
-Use a larger command line argument (20) to check program performance. 
+Use a larger command line argument (20) to check program performance.

@@ -9,7 +9,7 @@
 ;	$Id: dithpat.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
-	SECTION rodata_clib
+	SECTION rodata_video_vdp
 	PUBLIC	_dithpat
 	
 

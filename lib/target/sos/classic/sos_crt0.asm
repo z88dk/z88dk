@@ -24,7 +24,7 @@ ENDIF
 
     IF !DEFINED_CRT_COMMANDLINE_REDIRECTION
         define  DEFINED_CRT_COMMANDLINE_REDIRECTION
-        defc    DEF__CRT_COMMANDLINE_REDIRECTION = 0
+        defc    TAR__CRT_COMMANDLINE_REDIRECTION = 0
     ENDIF
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -0x1f6a	;;Upper limit of the user area
@@ -34,7 +34,7 @@ ENDIF
     org     CRT_ORG_CODE
 
 start:
-    ld      (start1+1),sp	;Save entry stack
+    ld      (__restore_sp_onexit+1),sp	;Save entry stack
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     dec     sp
@@ -88,7 +88,7 @@ cleanup:
     push    hl
     call    crt0_exit
     pop     bc      ;Get exit() value into bc
-start1:
+__restore_sp_onexit:
     ld      sp,0		;Pick up entry sp
     jp      $1FFA	; HOT boot
 

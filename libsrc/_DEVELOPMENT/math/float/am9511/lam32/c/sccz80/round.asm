@@ -5,10 +5,10 @@
 
 	defc	round = cam32_sccz80_round
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _round
-EXTERN	cam32_sdcc_round
-defc _round = cam32_sdcc_round
+defc _round = cam32_sccz80_round
 ENDIF
 

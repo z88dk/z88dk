@@ -1,4 +1,8 @@
 
-		PUBLIC	OVERR
+SECTION code_fp_mbf32
 
-OVERR:	ret
+PUBLIC  OVERR
+
+EXTERN  ARET
+
+defc OVERR = ARET

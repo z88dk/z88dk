@@ -12,7 +12,9 @@
     PUBLIC  msxbios
 
     defc    CONSOLE_COLUMNS = 32
+IF !DEFINED_CONSOLE_ROWS
     defc    CONSOLE_ROWS = 24
+ENDIF
     defc    __CPU_CLOCK = 3580000
 
 IF (!DEFINED_startup || (startup=1))
@@ -27,6 +29,8 @@ IF startup = 3
     INCLUDE	"target/msx/classic/rom.asm"
 ENDIF
 
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms9918/mode_disable.asm"
 
     SECTION code_clib
 

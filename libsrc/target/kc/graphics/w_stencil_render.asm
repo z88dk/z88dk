@@ -1,5 +1,5 @@
 ;
-;       Graphics routines for the Robotron KC
+;       Graphics routines for the VEB MPM KC
 ;       Stefano - Sept 2016
 ;
 ;	Render the "stencil".

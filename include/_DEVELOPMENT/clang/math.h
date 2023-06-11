@@ -5,10 +5,12 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
+#include <stdint.h>
+
 // THE SELECTED FLOATING POINT PACKAGE MAY NOT SUPPORT ALL LISTED FUNCTIONS
 
-#ifndef _FLOAT_T_DEFINED
-#define _FLOAT_T_DEFINED
+#ifndef _FLOAT_T
+#define _FLOAT_T
 
    #ifdef __CLANG
    typedef float float_t;
@@ -24,8 +26,8 @@
    
 #endif
 
-#ifndef _DOUBLE_T_DEFINED
-#define _DOUBLE_T_DEFINED
+#ifndef _DOUBLE_T
+#define _DOUBLE_T
 
    #ifdef __CLANG
    typedef float double_t;
@@ -41,8 +43,8 @@
    
 #endif
 
-#ifndef _FLOAT16_T_DEFINED
-#define _FLOAT16_T_DEFINED
+#ifndef _FLOAT16_T
+#define _FLOAT16_T
 
    #ifndef __SCCZ80
    typedef short _Float16;      /* IEEE-754 half float type */  
@@ -123,29 +125,33 @@ typedef _Float16 half_t;
 #define MAXL10_F32              (+18.9638)
 #define MINL10_F32              (−19.5686)
 
-#define HUGE_VAL_F32           (0x7F800000)
-#define INFINITY_POS_F32       (0x7F800000)
-#define INFINITY_NEG_F32       (0xFF800000)
+#define HUGE_VAL_F32            ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32        ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32        ((unsigned long)0xFF800000)
+#define NAN_POS_F32             ((unsigned long)0x7FFFFFFF)
+#define NAN_NEG_F32             ((unsigned long)0xFFFFFFFF)
 
 #endif
 
 #ifdef __MATH_MATH32
 
-#define HUGE_POS_F32           (+3.4028234664E+38)
-#define TINY_POS_F32           (+1.1754943508E−38)
-#define HUGE_NEG_F32           (-1.7014118346E+38)
-#define TINY_NEG_F32           (-1.1754943508E-38)
+#define HUGE_POS_F32            (+3.4028234664E+38)
+#define TINY_POS_F32            (+1.1754943508E−38)
+#define HUGE_NEG_F32            (-1.7014118346E+38)
+#define TINY_NEG_F32            (-1.1754943508E-38)
 
-#define MAXL2_F32              (+127.999999914)
-#define MINL2_F32              (-126.0)
-#define MAXLOG_F32             (+88.722839052)
-#define MINLOG_F32             (−87.336544751)
-#define MAXL10_F32             (+38.230809449)
-#define MINL10_F32             (−37.929779454)
+#define MAXL2_F32               (+127.999999914)
+#define MINL2_F32               (-126.0)
+#define MAXLOG_F32              (+88.722839052)
+#define MINLOG_F32              (−87.336544751)
+#define MAXL10_F32              (+38.230809449)
+#define MINL10_F32              (−37.929779454)
 
-#define HUGE_VAL_F32           (0x7F800000)
-#define INFINITY_POS_F32       (0x7F800000)
-#define INFINITY_NEG_F32       (0xFF800000)
+#define HUGE_VAL_F32            ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32        ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32        ((unsigned long)0xFF800000)
+#define NAN_POS_F32             ((unsigned long)0x7FFFFFFF)
+#define NAN_NEG_F32             ((unsigned long)0xFFFFFFFF)
 
 #endif
 
@@ -163,9 +169,11 @@ typedef _Float16 half_t;
 #define MAXL10_F16              (+4.816)            /* 0x44D1 */
 #define MINL10_F16              (-4.215)            /* 0xC437 */
 
-#define HUGE_VAL_F16            (0x7C00)
-#define INFINITY_POS_F16        (0x7C00)
-#define INFINITY_NEG_F16        (0xFC00)
+#define HUGE_VAL_F16            ((unsigned int)0x7C00)
+#define INFINITY_POS_F16        ((unsigned int)0x7C00)
+#define INFINITY_NEG_F16        ((unsigned int)0xFC00)
+#define NAN_POS_F16             ((unsigned int)0x7FFF)
+#define NAN_NEG_F16             ((unsigned int)0xFFFF)
 
 #endif
 
@@ -178,9 +186,15 @@ extern double_t asin(double_t x);
 extern double_t atan(double_t x);
 
 
+#ifdef __MATH_AM9511
 extern double_t atan2(double_t y,double_t x);
 
 
+#else
+extern double_t atan2(double_t y,double_t x);
+
+
+#endif
 
 extern double_t cos(double_t x);
 
@@ -224,9 +238,6 @@ extern double_t expm1(double_t x);
 extern double_t frexp(double_t value,int *exp);
 
 
-extern int ilogb(double_t x);
-
-
 extern double_t ldexp(double_t x,int exp);
 
 
@@ -234,6 +245,10 @@ extern double_t scalbn(double_t x,int n);
 
 	
 extern double_t scalbln(double_t x,int n);
+
+
+
+extern int ilogb(double_t x);
 
 
 
@@ -259,8 +274,8 @@ extern double_t fabs(double_t x);
 extern double_t hypot(double_t x,double_t y);
 
 
-
 extern double_t pow(double_t x,double_t y);
+
 
 
 extern double_t sqrt(double_t x);
@@ -308,11 +323,21 @@ extern double_t trunc(double_t x);
 
 
 
+#ifdef __MATH_AM9511
 extern double_t modf(double_t value,double_t *iptr);
 
 
 extern double_t fmod(double_t x,double_t y);
 
+
+#else
+extern double_t modf(double_t value,double_t *iptr);
+
+
+extern double_t fmod(double_t x,double_t y);
+
+
+#endif
 
 extern double_t remainder(double_t x,double_t y);
 
@@ -336,7 +361,6 @@ extern double_t nexttoward(double_t x,double_t y);
 
 
 extern double_t fdim(double_t x,double_t y);
-
 
 
 extern double_t fmax(double_t x,double_t y);
@@ -371,6 +395,9 @@ extern int isunordered(double_t x,double_t y);
 
 #ifdef __MATH_MATH32
 
+extern double_t neg(double_t x);
+
+
 extern double_t sqr(double_t x);
 
 
@@ -404,6 +431,9 @@ extern double_t f32_fam9511(double_t x);
 
 
 extern double_t fam9511_f32(double_t x);
+
+
+extern double_t neg(double_t x);
 
 
 extern double_t sqr(double_t x);
@@ -515,7 +545,7 @@ extern half_t mul2f16(half_t x);
 extern half_t mul10f16(half_t x);
 
 
-extern half_t frexpf16(half_t x,int8_t *pw2);
+extern half_t frexpf16(half_t x,int16_t *pw2);
 
 
 extern half_t ldexpf16(half_t x,int16_t pw2);
@@ -529,6 +559,9 @@ extern half_t asinf16(half_t x);
 
 
 extern half_t atanf16(half_t x);
+
+
+extern half_t atan2f16(half_t y,half_t x);
 
 
 

@@ -33,7 +33,5 @@ asm_zx_saddrcup:
    ld h,a
    
    and $18
-   cp $18
-
-   ccf
+   add a,$e8
    ret

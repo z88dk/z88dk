@@ -5,14 +5,15 @@ include ../Make.config
 CFILES = $(wildcard *.c)
 ZSFILES = $(wildcard zsock/*.c) 
 AFILES = $(wildcard *.asm) $(wildcard conio/*.asm)
-AFILES_8080 = $(filter-out $(wildcard *scanf*.asm), $(wildcard *.asm)) $(wildcard conio/*.asm)
+AFILES_8080 = $(wildcard *.asm) $(wildcard conio/*.asm)
+AFILES_GBZ80 = $(filter-out $(wildcard *scanf*.asm), $(wildcard *.asm)) $(wildcard conio/*.asm)
 OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 CFILES_8080= 
 OFILES_8080 = $(CFILES:.c=.o) $(CFILES_8080:.c=.o)  $(AFILES_8080:.asm=.o)
-OFILES_GBZ80 = $(CFILES:.c=.o) $(CFILES_8080:.c=.o)  $(AFILES_8080:.asm=.o)
+OFILES_GBZ80 = $(CFILES:.c=.o) $(CFILES_8080:.c=.o)  $(AFILES_GBZ80:.asm=.o)
 
 
-all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/binary/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES)) $(addprefix obj/8080/,$(OFILES_8080)) $(addprefix obj/gbz80/,$(OFILES_GBZ80))
+all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/binary/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES)) $(addprefix obj/8080/,$(OFILES_8080)) $(addprefix obj/gbz80/,$(OFILES_GBZ80)) $(addprefix obj/ez80_z80/,$(OFILES))
 
 obj/net/%.o: %.asm
 	$(ZCC) +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
@@ -27,6 +28,11 @@ obj/binary/%.o: %.c
 	$(ZCC) +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
 
 
+obj/ez80_z80/%.o: %.asm
+	$(ZCC) +test -clib=ez80_z80 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
+
+obj/ez80_z80/%.o: %.c
+	$(ZCC) +test -clib=ez80_z80 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
 
 obj/8080/%.o: %.asm
 	$(ZCC) +cpm -clib=8080 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
@@ -65,6 +71,7 @@ dirs:
 	@mkdir -p obj/8080 obj/8080/8080 obj/8080/conio/
 	@mkdir -p obj/binary-8080 obj/binary-8080/8080 obj/binary-8080/conio 
 	@mkdir -p obj/gbz80  obj/gbz80/8080  obj/gbz80/conio
+	@mkdir -p obj/ez80_z80 obj/ez80_z80/8080  obj/ez80_z80/conio
 
 
 

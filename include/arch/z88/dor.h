@@ -22,6 +22,8 @@
  *	$Id: dor.h,v 1.2 2001-04-20 16:04:24 dom Exp $
  */
 
+#ifndef ARCH_Z88_DOR_H
+#define ARCH_Z88_DOR_H
 
 #define AT_Good         1
 #define AT_Bad          2
@@ -60,3 +62,4 @@
 
 #define TP_Def          0
 
+#endif

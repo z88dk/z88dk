@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; size_t strnlen(const char *s, size_t maxlen)
@@ -29,27 +29,47 @@ asm_strnlen:
    ;
    ; uses : af, bc, de, hl
 
-   ld e,l
-   ld d,h                      ; de = char *s
+   ld de,hl                    ; de = char *s
 
    ld a,b
    or c
-   jp z, error_znc
-   
-   xor a
-IF __CPU_GBZ80__
-   EXTERN __z80asm_cpir
-   call __z80asm_cpir
+   jp Z,error_znc
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+
+   dec bc
+   inc b
+   inc c
+
+loop:
+   ld a,(hl)
+   or a
+   jr Z,isend
+
+   inc (hl)
+
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
+   or a
+   jr NZ,notend                ; if end of s not reached, skip scf
+
 ELSE
+   xor a
    cpir                        ; find end of s, maxlen chars examined
+
+   jr NZ,notend                ; if end of s not reached, skip scf
 ENDIF
 
-   jr nz, notend               ; if end of s not reached, skip scf
+isend:
+
    scf                         ; end of s reached, need to sub 1 extra
 
 notend:
 
-IF __CPU_INTEL__ | __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld  a,l
    sub e
    ld  l,a

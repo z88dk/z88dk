@@ -11,7 +11,6 @@
  #include "utstring.h"
 
 
-
 #define MALLOC(x)   malloc(x)
 #define CALLOC(x,y) calloc(x,y)
 #define REALLOC(x,y) realloc(x,y)
@@ -42,7 +41,7 @@
 #if defined(__MSDOS__) && defined(__TURBOC__)
 #define NUMLOC          33
 #else
-#define NUMLOC		512
+#define NUMLOC          512
 #endif
 #define STARTLOC        loctab
 #define ENDLOC          (STARTLOC+NUMLOC)
@@ -77,12 +76,20 @@ typedef enum {
     KIND_CARRY,
     KIND_FLOAT16,
     KIND_LONGLONG,
+    KIND_ACCUM16,
+    KIND_ACCUM32,
 } Kind;
 
+#define kind_is_fixed(x)  ( (x) == KIND_ACCUM16 || (x) == KIND_ACCUM32)
 #define kind_is_floating(x)  ( (x) == KIND_DOUBLE || (x) == KIND_FLOAT16)
 #define kind_is_integer(k) ( k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT || k == KIND_LONG || k == KIND_LONGLONG )
 
-#define get_float_type(k) (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16
+#define kind_is_decimal(x)  ( kind_is_floating(x) || kind_is_fixed(x) )
+
+
+#define get_decimal_type(k,us) (k == KIND_ACCUM16 ? us ? type_uaccum16 : type_accum16 \
+            : k == KIND_ACCUM32 ? us ? type_uaccum32 : type_accum32 \
+            : (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16)
 
 typedef struct {
     size_t    size;
@@ -142,7 +149,8 @@ struct type_s {
 };
 
 extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double, *type_float16, *type_longlong, *type_ulonglong;
-
+extern Type *type_accum16, *type_accum32;
+extern Type *type_uaccum16, *type_uaccum32;
 
 enum ident_type {
         ID_VARIABLE = 1,
@@ -156,7 +164,6 @@ enum storage_type {
     STATIK,        /* Implemented in this file, export */
     STKLOC,        /* On the stack */
     EXTERNAL,      /* External to this file */
-    EXTERNP,       /* Extern @ */
     LSTATIC,       /* Static to this file */
     TYPDEF
 };
@@ -181,7 +188,8 @@ enum symbol_flags {
         SHORTCALL_HL = 0x8000,   /* Use ld HL,$addr style of shortcall */
         BANKED = 0x10000,      /* Call via the banked_call function */
         HL_CALL = 0x20000,    /* Call via ld hl, (module) call (addr) */
-        INTERRUPT = 0x40000   /* Function is used for interrupts */
+        INTERRUPT = 0x40000,   /* Function is used for interrupts */
+        ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
 };
 
 
@@ -247,7 +255,7 @@ typedef struct switchtab_s SW_TAB;
 
 struct switchtab_s {
         int label ;             /* label for start of case */
-        int64_t value ;             /* value associated with case */
+        int64_t value ;         /* value associated with case */
 } ;
 
 
@@ -359,20 +367,22 @@ struct gototab_s {
 
 #define CPU_Z80      1
 #define CPU_Z180     2
-#define CPU_R2K      4
+#define CPU_R2KA     4
 #define CPU_R3K      8
 #define CPU_Z80N     16
 #define CPU_8080     32
-#define CPU_8085     34
+#define CPU_8085     64
 #define CPU_GBZ80    128
+#define CPU_EZ80_Z80 256
 
-#define CPU_RABBIT (CPU_R2K|CPU_R3K)
+#define CPU_RABBIT (CPU_R2KA|CPU_R3K)
 
 #define IS_8080() (c_cpu == CPU_8080 )
 #define IS_8085() (c_cpu == CPU_8085 )
 #define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085)
 #define IS_GBZ80() (c_cpu == CPU_GBZ80)
 #define IS_Z80N() (c_cpu == CPU_Z80N)
+#define IS_EZ80() (c_cpu == CPU_EZ80_Z80)
 
 
 
@@ -395,15 +405,15 @@ typedef struct lvalue_s LVALUE;
 struct lvalue_s {
         SYMBOL *symbol ;                /* symbol table address, or 0 for constant */
         Type   *ltype;
-        Kind    indirect_kind;                  /* type of indirect object, 0 for static object */
-        Kind ptr_type ;                  /* type of pointer or array, 0 for other idents */
+        Kind indirect_kind;             /* type of indirect object, 0 for static object */
+        Kind ptr_type ;                 /* type of pointer or array, 0 for other idents */
         int is_const ;                  /* true if constant expression */
-        zdouble const_val ;                        /* value of constant expression (& other uses) */
-        void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
+        zdouble const_val ;             /* value of constant expression (& other uses) */
+        void (*binop)(LVALUE *lval) ;   /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
         Type *stage_add_ltype;          /* Type at stage_add being set */
-        Kind val_type ;                  /* type of value calculated */
-	    Kind oldval_kind;		/* What the valtype was */
+        Kind val_type ;                 /* type of value calculated */
+	    Kind oldval_kind;               /* What the valtype was */
         enum symbol_flags flags;        /* As per symbol */
         char oflags;                    /* Needed for deref of far str*/
         int type;                       /* type (from symbol table) */
@@ -580,5 +590,7 @@ struct nodepair {
 extern UT_string *debug_utstr;
 extern UT_string *debug2_utstr;
 extern int        scope_block;
+extern char       c_debug_entry_points;
+
 
 #endif

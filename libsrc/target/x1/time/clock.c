@@ -12,11 +12,11 @@
  *	stefano, 11/2013
  *	
  * --------
- * $Id: clock.c,v 1.2 2013-11-13 20:46:42 stefano Exp $
+ * $Id: clock.c $
  */
 
 #include <time.h>
-#include <x1.h>
+#include <arch/x1.h>
 
 
 /*

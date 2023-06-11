@@ -29,26 +29,24 @@ asm_ffsl:
 
    ld a,l
    or a
-   jp nz, asm0_ffs
-   
+   jp NZ,asm0_ffs
+
    ld a,h
    or a
-   jp nz, asm1_ffs
-   
+   jp NZ,asm1_ffs
+
    ld a,e
    or a
-   jr nz, bits_17_24
-   
+   jr NZ,bits_17_24
+
    ld a,d
    or a
-   ret z
+   ret Z
 
 bits_25_32:
-
    ld l,25
    jp asm2_ffs
 
 bits_17_24:
-
    ld l,17
    jp asm2_ffs

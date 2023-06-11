@@ -16,12 +16,16 @@
 _sscanf:
 	ld	hl,2
 	add	hl,sp		;points to buf
+IF !__CPU_INTEL__
 	push	ix		;save callers
+ENDIF
 	ld	c,(hl)		;buf
 	inc	hl
 	ld	b,(hl)
 	inc	hl		;&fmt
 	ex	de,hl		;de=&fmt
+        ld      hl,65535        ;infinite length
+        push    hl
 	ld	hl,1+2+128	;h=ungetc, l=_IOREAD|_IOSTRING|_IOUSE
 	push	hl		;
 	push	bc		;buf
@@ -44,7 +48,10 @@ _sscanf:
 	pop	bc
 	pop	bc
 	pop	bc
+	pop	bc
+IF !__CPU_INTEL__
 	pop	ix
+ENDIF
 	ret
 
 

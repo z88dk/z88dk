@@ -2,7 +2,7 @@
 
 #------------------------------------------------------------------------------
 # Beautify asm code
-# Copyright (C) Paulo Custodio, 2011-2019
+# Copyright (C) Paulo Custodio, 2011-2023
 # License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
@@ -20,11 +20,11 @@ my $OPCODE = 2*$TAB;
 my $ARGS = 4*$TAB;
 my $COMMENT = 10*$TAB;
 my $DEFVARS = 6*$TAB;
-my $LEVEL = 0;
+my $LEVEL = 1;
+my $DEFVARSLEVEL = 0;
 
 @ARGV or die "Usage: ",path($0)->basename," FILES...\n";
 for my $asm (@ARGV) {
-    $LEVEL = 0;
 	open(my $in, "<", $asm) or die "$asm: $!\n";
 	open(my $out, ">:raw", $asm.".new") or die "$asm.new: $!\n";
 	while (<$in>) {
@@ -65,7 +65,7 @@ sub parse_line {
             while (/\S/) {
                 if (s/^\s+//)                       { $ret{args} .= " "; }
                 elsif (s/^\s*(;.*)//)               { $ret{comment} = $1; }
-                elsif (s/^\s*(.)//)                 { $ret{args} .= $1; }
+                elsif (s/(\w+)//)                   { $ret{args} .= $1; }
                 else { die; }
 	    }
         }
@@ -79,8 +79,17 @@ sub parse_line {
                 else { die; }
 	    }
         }
+        # #define
+        elsif (s/^\s*(#DEFINE)\b//i) {
+            $ret{opcode} = $1;
+            $ret{args} = '';
+            while (/\S/) {
+                if (s/^\s*(\w+)//)                 { $ret{args} .= " " . $1; }
+                else { die; }
+	    }
+        }
         # opcode
-        elsif (s/^\s*(\w+)\s*//) {
+        elsif (s/^\s*(#?\w+)\s*//) {
             $ret{opcode} = $1;
             $ret{args} = '';
             while (/\S/) {
@@ -94,7 +103,7 @@ sub parse_line {
             }
         }
         elsif (s/^\s*(;.*)//)                       { $ret{comment} = $1; }
-        elsif (s/^\s*({|})//)                       { $ret{opcode} = $1; $ret{args} = ''; }
+	elsif (s/^\s*(\{|\})//)                       { $ret{opcode} = $1; $ret{args} = ''; }
         /\S/ and die "cannot parse: $_";
     }
     return \%ret;
@@ -115,15 +124,35 @@ sub format_line {
             $out = tab_to($out, $ARGS);
             $out .= $line->{args};
         }
+        elsif (($line->{opcode}//'') =~ /^#define$/i) {
+            $out = tab_to($out, $OPCODE);
+            $out .= $line->{opcode};
+            $out .= "  ";
+            $out = tab_to($out, $ARGS);
+            $line->{args} =~ s/^\s+|\s+$//g;
+            $out .= $line->{args};
+        }
         elsif (($line->{opcode}//'') =~ /^(if|ifdef|ifndef|else|elif|elifdef|efifndef|endif)$/i) {
             $line->{label} and die;
             $LEVEL-- if $line->{opcode} =~ /^el|^end/i;
             $out .= "  " x $LEVEL;
             $out .= $line->{opcode};
-            $out = tab($out);
+            # If there are no args, don't add a tab
+            if ("$line->{args}" ne "") {
+                $out = tab($out);
+            }
             $out .= $line->{args};
             $LEVEL++ if $line->{opcode} =~ /^el/i;
             $LEVEL++ if $line->{opcode} =~ /^if/i;
+        }
+        elsif (($line->{opcode}//'') =~ /^(\{|\})$/i) {
+            $DEFVARSLEVEL-- if $line->{opcode} =~ /^\}$/i;
+
+            $out = tab_to_newline($out, $OPCODE, $fh);
+            $out .= " " x $TAB x $DEFVARSLEVEL;
+            $out .= $line->{opcode};
+
+            $DEFVARSLEVEL++ if $line->{opcode} =~ /^\{$/i;
         }
         else {
             if ($line->{label}) {
@@ -131,8 +160,12 @@ sub format_line {
             }
             if ($line->{opcode}) {
                 $out = tab_to_newline($out, $OPCODE, $fh);
+                $out .= " " x $TAB x $DEFVARSLEVEL;
                 $out .= $line->{opcode};
-                $out = tab_to($out, $ARGS);
+                # If there are no args, don't add a tab
+                if ("$line->{args}" ne "") {
+                    $out = tab_to($out, $ARGS);
+                }
                 $out .= $line->{args};
             }
             if ($line->{macro_label}) {
@@ -143,7 +176,8 @@ sub format_line {
                 $out .= $line->{args};
             }
             if ($line->{defvars}) {
-                $out = tab_to($out, $OPCODE+1, $fh);
+                $out = tab_to($out, $OPCODE, $fh);
+                $out .= " " x $TAB x $DEFVARSLEVEL;
                 $out .= $line->{defvars};
                 $out = tab_to($out, $DEFVARS);
                 $out .= "ds.";

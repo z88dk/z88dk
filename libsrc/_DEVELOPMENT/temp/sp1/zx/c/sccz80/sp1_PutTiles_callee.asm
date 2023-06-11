@@ -24,4 +24,15 @@ sp1_PutTiles_callee:
    pop hl
    push af
 
-   jp asm_sp1_PutTiles
+;   jp asm_sp1_PutTiles
+   push ix
+   call asm_sp1_PutTiles
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PutTiles_callee
+defc _sp1_PutTiles_callee = sp1_PutTiles_callee
+ENDIF
+

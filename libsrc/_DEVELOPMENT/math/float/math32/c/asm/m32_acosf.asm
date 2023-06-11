@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.2.0 #13131 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -67,6 +67,10 @@
 	EXTERN __rrslonglong_callee
 	EXTERN __rrulonglong
 	EXTERN __rrulonglong_callee
+	EXTERN ___mulsint2slong
+	EXTERN ___mulsint2slong_callee
+	EXTERN ___muluint2ulong
+	EXTERN ___muluint2ulong_callee
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
@@ -257,6 +261,8 @@
 	GLOBAL _inv
 	GLOBAL _sqr_fastcall
 	GLOBAL _sqr
+	GLOBAL _neg_fastcall
+	GLOBAL _neg
 	GLOBAL _isunordered_callee
 	GLOBAL _isunordered
 	GLOBAL _islessgreater_callee
@@ -422,9 +428,34 @@ _m32_acosf:
 	add	ix,sp
 	push	af
 	push	af
-	ex	(sp), hl
+	push	af
+	push	af
+	ld	(ix-4),l
+	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
+	call	_fabs_fastcall
+	push	de
+	push	hl
+	ld	hl,0x3f80
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	call	___fslt_callee
+	ld	a, l
+	or	a, a
+	jr	Z,l_m32_acosf_00102
+	ld	a,0xff
+	ld	(ix-8),a
+	ld	(ix-7),a
+	ld	(ix-6),a
+	ld	(ix-5),a
+	pop	hl
+	push	hl
+	ld	e,(ix-6)
+	ld	d,(ix-5)
+	jr	l_m32_acosf_00103
+l_m32_acosf_00102:
 	ld	l,(ix-4)
 	ld	h,(ix-3)
 	ld	e,(ix-2)
@@ -438,18 +469,17 @@ _m32_acosf:
 	push	hl
 	call	___fssub_callee
 	call	_m32_sqrtf
-	ld	c, l
-	ld	l,(ix-2)
-	ld	b,h
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	push	de
+	ld	c,(ix-2)
+	ld	b,(ix-1)
 	push	bc
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	push	bc
+	push	de
+	push	hl
 	call	___fsdiv_callee
 	call	_m32_atanf
+l_m32_acosf_00103:
 	ld	sp, ix
 	pop	ix
 	ret

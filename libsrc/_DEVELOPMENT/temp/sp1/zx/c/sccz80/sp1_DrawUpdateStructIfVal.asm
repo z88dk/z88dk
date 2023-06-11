@@ -8,4 +8,16 @@ PUBLIC sp1_DrawUpdateStructIfVal
 
 EXTERN asm_sp1_DrawUpdateStructIfVal
 
-defc sp1_DrawUpdateStructIfVal = asm_sp1_DrawUpdateStructIfVal
+sp1_DrawUpdateStructIfVal:
+
+   push ix
+   call asm_sp1_DrawUpdateStructIfVal
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_DrawUpdateStructIfVal
+defc _sp1_DrawUpdateStructIfVal = sp1_DrawUpdateStructIfVal
+ENDIF
+

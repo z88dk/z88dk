@@ -17,9 +17,9 @@ l_fast_mulu_40_32x8:
    ;         carry reset
    ;
    ; uses  : af, bc, de, hl, de', hl' (ixh if loop unrolling disabled)
-   
+
    ; try to reduce the multiplication
-   
+
    inc d
    dec d
    jp z, l0_fast_mulu_32_24x8
@@ -29,12 +29,12 @@ l0_fast_mulu_40_32x8:
    ; two full size multiplicands
 
    push hl
-   
+
    ld l,e
    ld h,d
-   
+
    exx
-   
+
    pop de
 
    ld l,e
@@ -61,26 +61,26 @@ loop_00:
 
    add a,a
    jr c, loop12
-   
+
    add a,a
    jr c, loop13
-   
+
    add a,a
    jr c, loop14
 
    add a,a
    jr c, loop15
-   
+
    add a,a
    jr c, loop16
-   
+
    add a,a
    jr c, loop17
 
    add a,a
    ccf
-   jr nz, loop_exit
-   
+   jr nc, loop_exit
+
    xor a
    jp error_lznc
 
@@ -92,7 +92,7 @@ loop11:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop12
 
@@ -108,7 +108,7 @@ loop12:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop13
 
@@ -124,7 +124,7 @@ loop13:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop14
 
@@ -140,7 +140,7 @@ loop14:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop15
 
@@ -156,7 +156,7 @@ loop15:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop16
 
@@ -172,7 +172,7 @@ loop16:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop17
 
@@ -188,7 +188,7 @@ loop17:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop_exit
 
@@ -205,7 +205,7 @@ loop_exit:
    push hl
    exx
    pop de
-   
+
    ex de,hl
    ret
 
@@ -223,7 +223,7 @@ loop_00:
 
    add a,a
    jr c, loop
-   djnz loop_00   
+   djnz loop_00
 
    add a,a
    ccf
@@ -240,10 +240,10 @@ loop:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop_end
-   
+
    add hl,de
    exx
    adc hl,de
@@ -261,7 +261,7 @@ loop_exit:
    push hl
    exx
    pop de
-   
+
    ex de,hl
    ret
 

@@ -55,10 +55,10 @@ loop_00:
 
    sla h
    jr c, loop_11
-   
+
    sla h
    jr c, loop_12
-   
+
    sla h
    jr c, loop_13
 
@@ -67,10 +67,10 @@ loop_00:
 
    sla h
    jr c, loop_15
-   
+
    sla h
    jr c, loop_16
-   
+
    sla h
    jr c, loop_17
 
@@ -98,7 +98,7 @@ ENDIF
    ; general multiplication loop
 
 loop_11:
-   
+
    add hl,hl
    jr nc, loop_12
    add hl,de
@@ -157,9 +157,9 @@ loop_00:
 
    sla h
    jr c, loop_01
-   
+
    djnz loop_00
-   
+
    xor a
    ld l,a
    ret

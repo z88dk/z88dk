@@ -29,6 +29,49 @@ ENDIF
     defc    CONSOLE_COLUMNS = 40
     defc    CONSOLE_ROWS = 24
 
+
+    defc    KRT_PORT = 0xb8
+    defc    KRT_ENABLE = 0x08
+    defc    KRT_DISABLE = 0x00
+    defc    KRT_ROWS = 24
+    defc    KRT_COLUMNS = 40
+    defc    KRT_ADDRESS = $ec00
+    defc    KRT_BANK_SELECTOR = 0x08
+    defc    KRT_CLS_FILL = 0x00
+
+    PUBLIC KRT_ENABLE
+    PUBLIC KRT_DISABLE
+    PUBLIC KRT_PORT
+    PUBLIC KRT_ROWS
+    PUBLIC KRT_COLUMNS
+    PUBLIC KRT_ADDRESS
+    PUBLIC KRT_BANK_SELECTOR
+    PUBLIC KRT_CLS_FILL
+
+IF CLIB_DISABLE_MODE1 = 1
+    PUBLIC  __krt_vpeek
+    PUBLIC  __krt_printc
+    PUBLIC  __krt_plot
+    PUBLIC  __krt_res
+    PUBLIC  __krt_xor
+    PUBLIC  __krt_pointxy
+    PUBLIC  __krt_pixeladdress
+    PUBLIC  __krt_scrollup
+    defc    __krt_vpeek = vpeek_noop
+    defc    __krt_printc = noop
+    defc    __krt_plot = noop
+    defc    __krt_res = noop
+    defc    __krt_xor = noop
+    defc    __krt_pointxy = noop
+    defc    __krt_pixeladdress = noop
+    defc    __krt_scrollup = noop
+    PUBLIC  __CLIB_DISABLE_MODE1
+    defc    __CLIB_DISABLE_MODE1 = 1
+ELSE
+    PUBLIC  __CLIB_DISABLE_MODE1
+    defc    __CLIB_DISABLE_MODE1 = 0
+ENDIF
+
     defc    TAR__no_ansifont = 1
     defc    TAR__register_sp = CRT_ORG_CODE - 2
     defc    TAR__clib_exit_stack_size = 32
@@ -38,7 +81,7 @@ ENDIF
     org     CRT_ORG_CODE
 
 start:
-    ld      (start1+1),sp
+    ld      (__restore_sp_onexit+1),sp
 
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
@@ -49,6 +92,18 @@ start:
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
+    ; Copy variables from "text graphics mem" to "video graphics mem page 0"
+    ld      hl,$efc0
+    ld      b,64
+copy_loop:
+    ld      a,0
+    out     (KRT_PORT),a
+    ld      c,(hl)
+    ld      a,KRT_BANK_SELECTOR
+    out     (KRT_PORT),a
+    ld      (hl),c
+    inc     hl
+    djnz    copy_loop
 
     call    _main   ;Call user program
 
@@ -56,7 +111,7 @@ cleanup:
     push    hl
     call    crt0_exit
     pop     bc
-start1:
+__restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
     jp      $F000
 

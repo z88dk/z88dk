@@ -37,12 +37,21 @@
         defc __CLIB_ZX_CONIO32 = CLIB_ZX_CONIO32
 	defc CONSOLE_ROWS = 24
        
-	defc	CLIB_FGETC_CONS_DELAY = 150
+        IFNDEF CLIB_FGETC_CONS_DELAY
+	    defc    CLIB_FGETC_CONS_DELAY = 150
+        ENDIF
+        IFNDEF CLIB_KBHIT_DELAY
+	    defc    CLIB_KBHIT_DELAY = 100
+        ENDIF
         defc    CRT_KEY_DEL = 12
 
         PUBLIC CLIB_SAM_IS_BASIC
 
 	defc	__CPU_CLOCK = 6000000
+
+        IFNDEF CLIB_DEFAULT_SCREEN_MODE
+            defc       CLIB_DEFAULT_SCREEN_MODE = 4
+        ENDIF
 
 	INCLUDE	"target/sam/def/sam.def"
 

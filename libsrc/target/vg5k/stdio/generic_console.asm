@@ -1,25 +1,25 @@
 
 
-		SECTION		code_clib
+    SECTION code_clib
 
-		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
-		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_printc
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_attribute
-		PUBLIC		__vg5k_custom_font
+    PUBLIC  generic_console_cls
+    PUBLIC  generic_console_vpeek
+    PUBLIC  generic_console_scrollup
+    PUBLIC  generic_console_printc
+    PUBLIC  generic_console_set_ink
+    PUBLIC  generic_console_set_paper
+    PUBLIC  generic_console_set_attribute
+    PUBLIC  __vg5k_custom_font
 
-		EXTERN		__vg5k_attr
-		EXTERN		conio_map_colour
-		EXTERN		CONSOLE_COLUMNS
-		EXTERN		CONSOLE_ROWS
+    EXTERN  __vg5k_attr
+    EXTERN  conio_map_colour
+    EXTERN  CONSOLE_COLUMNS
+    EXTERN  CONSOLE_ROWS
 
-		defc		DISPLAY = 0x4000
+    defc    DISPLAY = 0x4000
 
 generic_console_set_attribute:
-	ret
+    ret
 
 generic_console_set_paper:
 	call	conio_map_colour
@@ -165,44 +165,44 @@ generic_console_printc_1:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
-        call    xypos
-	ld	d,(hl)
-	ld	a,d
-	res	7,a		;never high
-	inc	hl
-	bit	7,(hl)	
-	jr	z,vpeek_done	;not graphics
-	bit	7,d		;is it a udg
-	jr	z,not_vpeek_udg
-	sub	32		;UDG offset
+    call    xypos
+    ld      d,(hl)
+    ld      a,d
+    res     7,a		;never high
+    inc     hl
+    bit     7,(hl)	
+    jr      z,vpeek_done	;not graphics
+    bit     7,d		;is it a udg
+    jr      z,not_vpeek_udg
+    sub     32		;UDG offset
 not_vpeek_udg:
-	set	7,a
+    set     7,a
 vpeek_done:
-	and	a
-	ret
+    and     a
+    ret
 
 
 generic_console_scrollup:
-	push	de
-	push	bc
-	ld	hl, DISPLAY + 80
-	ld	de, DISPLAY
-	ld	bc, 80 * (CONSOLE_ROWS-1)
-	ldir
-	ex	de,hl
-	ld	a,(__vg5k_attr)
-	and	7
-	ld	b,CONSOLE_COLUMNS
+    push    de
+    push    bc
+    ld      hl, DISPLAY + 80
+    ld      de, DISPLAY
+    ld      bc, 80 * (CONSOLE_ROWS-1)
+    ldir
+    ex      de,hl
+    ld      a,(__vg5k_attr)
+    and     7
+    ld      b,CONSOLE_COLUMNS
 generic_console_scrollup_3:
-	ld	(hl),32
-	inc	hl
-	ld	(hl),a
-	inc	hl
-	djnz	generic_console_scrollup_3
-	call	refresh_screen
-	pop	bc
-	pop	de
-	ret
+    ld      (hl),32
+    inc     hl
+    ld      (hl),a
+    inc     hl
+    djnz    generic_console_scrollup_3
+    call    refresh_screen
+    pop     bc
+    pop     de
+    ret
 
 ; Refresh the whole VG5k screen - we can't rely on the interrupt
 refresh_screen:
@@ -249,26 +249,27 @@ same_line:
 __vg5k_custom_font:	defb	0
 
 
-	SECTION		code_crt_init
-	EXTERN	set_character8
-	EXTERN	CRT_FONT
+    SECTION code_crt_init
+    EXTERN  set_character
+    EXTERN  __CLIB_FONT_HEIGHT
+    EXTERN  CRT_FONT
 
-	ld	hl,CRT_FONT
-	ld	a,h
-	or	l
-	jr	z,no_set_font
-	ld	a,1
-	ld	(__vg5k_custom_font),a
-        ld      b,96
-        ld      c,32
+    ld      hl,CRT_FONT
+    ld      a,h
+    or      l
+    jr      z,no_set_font
+    ld      a,1
+    ld      (__vg5k_custom_font),a
+    ld      b,96
+    ld      c,32
 set_font:
-        push    bc
-        push    hl
-        call    set_character8
-        pop     hl
-	ld	bc,8
-	add	hl,bc
-        pop     bc
-        inc     c
-        djnz    set_font
+    push    bc
+    push    hl
+    call    set_character
+    pop     hl
+    ld      bc,__CLIB_FONT_HEIGHT
+    add     hl,bc
+    pop     bc
+    inc     c
+    djnz    set_font
 no_set_font:

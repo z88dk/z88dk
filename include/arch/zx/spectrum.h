@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.41 2016-06-11 19:53:08 dom Exp $
+ * $Id: spectrum.h$
  */
 
 #ifndef __SPECTRUM_H__
@@ -9,6 +9,7 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
+#include <arch/zx/zx_input.h>
 
 /////////////
 // CONSTANTS
@@ -220,6 +221,116 @@ extern void __LIB__    zx_setfloat_callee(char *variable, double_t value) __smal
 #define zx_setfloat(a,b)         zx_setfloat_callee(a,b)
 
 
+///////////////////////////////
+// INTERFACE FOR BASIC CALLS
+///////////////////////////////
+
+// BASIC error messages.  This will abruptly stop the program execution.
+#define REPORT_OK asm("rst\t8\ndefb\t255\n") // OK
+#define REPORT_1  asm("rst\t8\ndefb\t0\n")   // NEXT without FOR
+#define REPORT_2  asm("rst\t8\ndefb\t1\n")   // Variable not found
+#define REPORT_3  asm("rst\t8\ndefb\t2\n")   // Subscript wrong
+#define REPORT_4  asm("rst\t8\ndefb\t3\n")   // Out of memory
+#define REPORT_5  asm("rst\t8\ndefb\t4\n")   // Out of screen
+#define REPORT_6  asm("rst\t8\ndefb\t5\n")   // Number too big
+#define REPORT_7  asm("rst\t8\ndefb\t6\n")   // RETURN without GOSUB
+#define REPORT_8  asm("rst\t8\ndefb\t7\n")   // End of file
+#define REPORT_9  asm("rst\t8\ndefb\t8\n")   // STOP statement
+#define REPORT_A  asm("rst\t8\ndefb\t9\n")   // Invalid argument
+#define REPORT_B  asm("rst\t8\ndefb\t10\n")  // Integer out of range
+#define REPORT_C  asm("rst\t8\ndefb\t11\n")  // Nonsense in BASIC
+#define REPORT_D  asm("rst\t8\ndefb\t12\n")  // BREAK - CONT repeat
+#define REPORT_E  asm("rst\t8\ndefb\t13\n")  // Out of DATA
+#define REPORT_F  asm("rst\t8\ndefb\t14\n")  // Invalid file name
+#define REPORT_G  asm("rst\t8\ndefb\t15\n")  // No room for line
+#define REPORT_H  asm("rst\t8\ndefb\t16\n")  // STOP in INPUT
+#define REPORT_I  asm("rst\t8\ndefb\t17\n")  // FOR without NEXT
+#define REPORT_J  asm("rst\t8\ndefb\t18\n")  // Invalid I/O device
+#define REPORT_K  asm("rst\t8\ndefb\t19\n")  // Invalid colour
+#define REPORT_L  asm("rst\t8\ndefb\t20\n")  // BREAK into program
+#define REPORT_M  asm("rst\t8\ndefb\t21\n")  // RAMTOP no good
+#define REPORT_N  asm("rst\t8\ndefb\t22\n")  // Statement lost
+#define REPORT_O  asm("rst\t8\ndefb\t23\n")  // Invalid stream
+#define REPORT_P  asm("rst\t8\ndefb\t24\n")  // FN without DEF
+#define REPORT_Q  asm("rst\t8\ndefb\t25\n")  // Parameter error
+#define REPORT_R  asm("rst\t8\ndefb\t26\n")  // Tape loading error
+
+
+/*
+Macros to write new BASIC statement in C, in example:
+
+#include <stdio.h>
+#include <arch/zx/spectrum.h>
+
+main(unsigned int arg2, char *arg1)
+{
+	ARG_STR;
+	ARG_UINT;
+	ARG_END;
+	
+	printf("Arg1: %s, arg2: %u \n", arg1 ,arg2);
+
+	STMT_RET;
+}
+
+------------------
+10   LET a$="abc": LET a2=123
+20   PRINT USR 32768,a$,a2
+------------------
+
+*/
+
+// Capture arguments and push them on the stack
+// The macros will also fire a "Nonsense in BASIC" message when the argument type is wrong
+// Arguments must be declared in reverse order but captured sequentially
+
+
+#ifdef __TS2068__
+
+// int
+#define ARG_INT    asm("rst\t0x20\ncall\t0x1BE5\ncall\t0x3160\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\npush\tbc\n")
+
+// unsigned int
+#define ARG_UINT   asm("rst\t0x20\ncall\t0x1BE5\ncall\t0x3160\npush\tbc\n")
+
+// void *, struct, char *...
+#define ARG_PTR    asm("rst\t0x20\ncall\t0x1BEF\ncall\t0x2FAF\npush\tde\n")
+
+// C style strings (adds the string termination automatically)
+#define ARG_STR    asm("rst\t0x20\ncall\t0x1BEF\nld\tde,0x040F\nld\tbc,1\ncall\t0x2E70\ncall\t0x39B7\ncall\t0x2FAF\npush\tde\n")
+
+// End of argument list
+#define ARG_END    asm("push\tbc\n")
+
+// Terminate your custom statement and get back to the BASIC interpreter
+#define STMT_RET   asm("ld\tiy,0x5C3A\nld\tsp,(0x5C3D)\njp\t0x1AB9\n")
+
+
+#else
+
+
+// int
+#define ARG_INT    asm("rst\t0x20\ncall\t0x1C82\ncall\t0x2DA2\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\npush\tbc\n")
+
+// unsigned int
+#define ARG_UINT   asm("rst\t0x20\ncall\t0x1C82\ncall\t0x2DA2\npush\tbc\n")
+
+// void *, struct, char *...
+#define ARG_PTR    asm("rst\t0x20\ncall\t0x1C8C\ncall\t0x2BF1\npush\tde\n")
+
+// C style strings (adds the string termination automatically)
+#define ARG_STR    asm("rst\t0x20\ncall\t0x1C8C\nld\tde,0x03d1\nld\tbc,1\ncall\t0x2ab2\ncall\t0x359C\ncall\t0x2BF1\npush\tde\n")
+
+// End of argument list
+#define ARG_END    asm("push\tbc\n")
+
+// Terminate your custom statement and get back to the BASIC interpreter
+#define STMT_RET   asm("ld\tiy,0x5C3A\nld\tsp,(0x5C3D)\njp\t0x1b76\n")
+
+#endif
+
+
+
 //////////////
 // ZX PRINTER
 //////////////
@@ -267,50 +378,6 @@ extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned cha
 #endif
 
 
-/////////////////////////////////////////////////////////////////
-// INPUT DEVICES: KEYBOARD, JOYSTICK AND MICE (SEE ALSO INPUT.H)
-/////////////////////////////////////////////////////////////////
-
-// Joystick Functions
-// These are actually in_*(void)
-extern unsigned int  __LIB__ in_JoyFuller();
-extern unsigned int  __LIB__ in_JoyKempston();
-extern unsigned int  __LIB__ in_JoySinclair1();
-extern unsigned int  __LIB__ in_JoySinclair2();
-extern unsigned int  __LIB__ in_JoyTimex1();
-extern unsigned int  __LIB__ in_JoyTimex2();
-
-// AMX Mouse
-//
-// To use you must declare the following global variables
-// uint in_AMXcoordX, in_AMXcoordY, in_AMXdeltaX, in_AMXdeltaY;
-
-extern void __LIB__             in_MouseAMXInit(uchar xvector, uchar yvector) __smallc;
-extern void __LIB__             in_MouseAMX(uchar *buttons, uint *xcoord, uint *ycoord) __smallc;
-extern void __LIB__             in_MouseAMXSetPos(uint xcoord, uint ycoord) __smallc;
-
-extern void __LIB__   in_MouseAMXInit_callee(uchar xvector, uchar yvector) __smallc __z88dk_callee;
-extern void __LIB__   in_MouseAMX_callee(uchar *buttons, uint *xcoord, uint *ycoord) __smallc __z88dk_callee;
-extern void __LIB__   in_MouseAMXSetPos_callee(uint xcoord, uint ycoord) __smallc __z88dk_callee;
-
-#define in_MouseAMXInit(a,b)    in_MouseAMXInit_callee(a,b)
-#define in_MouseAMX(a,b,c)      in_MouseAMX_callee(a,b,c)
-#define in_MouseAMXSetPos(a,b)  in_MouseAMXSetPos_callee(a,b)
-
-// Kempston Mouse
-//
-// To use you must declare the following global variables
-// uchar in_KempcoordX, in_KempcoordY, in_KemprawX, in_KemprawY;
-
-extern void __LIB__             in_MouseKempInit(void);
-extern void __LIB__             in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord) __smallc;
-extern void __LIB__             in_MouseKempSetPos(uint xcoord, uint ycoord) __smallc;
-
-extern void __LIB__   in_MouseKemp_callee(uchar *buttons, uint *xcoord, uint *ycoord) __smallc __z88dk_callee;
-extern void __LIB__   in_MouseKempSetPos_callee(uint xcoord, uint ycoord) __smallc __z88dk_callee;
-
-#define in_MouseKemp(a,b,c)     in_MouseKemp_callee(a,b,c)
-#define in_MouseKempSetPos(a,b) in_MouseKempSetPos_callee(a,b)
 
 
 //////////////////////////
@@ -400,7 +467,7 @@ extern int __LIB__ zx_printf(char *fmt, ...);
 extern uchar __LIB__              *zx_cxy2saddr(uchar row, uchar col) __smallc;
 extern uchar __LIB__  *zx_cy2saddr(uchar row) __z88dk_fastcall;           // cx assumed 0
 
-extern uchar __LIB__              *zx_pxy2saddr(uchar xcoord, uchar ycoord, uchar *mask) __smallc;
+extern uchar __LIB__              *zx_pxy2saddr(uchar xcoord, uchar ycoord) __smallc;
 extern uchar __LIB__  *zx_py2saddr(uchar ycoord) __z88dk_fastcall;        // px assumed 0
 
 extern uint  __LIB__   zx_saddr2cx(void *pixeladdr) __z88dk_fastcall;
@@ -422,7 +489,7 @@ extern uchar __LIB__              *zx_saddrpright(void *pixeladdr, uchar *mask) 
 extern uchar __LIB__  *zx_saddrpup(void *pixeladdr) __z88dk_fastcall;
 
 extern uchar __LIB__    *zx_cxy2saddr_callee(uchar row, uchar col) __smallc __z88dk_callee;
-extern uchar __LIB__    *zx_pxy2saddr_callee(uchar xcoord, uchar ycoord, uchar *mask) __smallc __z88dk_callee;
+extern uchar __LIB__    *zx_pxy2saddr_callee(uchar xcoord, uchar ycoord) __smallc __z88dk_callee;
 extern uint  __LIB__     zx_saddr2px_callee(void *pixeladdr, uchar mask) __smallc __z88dk_callee;
 extern uchar __LIB__    *zx_saddrpleft_callee(void *pixeladdr, uchar *mask) __smallc __z88dk_callee;
 extern uchar __LIB__    *zx_saddrpright_callee(void *pixeladdr, uchar *mask) __smallc __z88dk_callee;
@@ -430,7 +497,7 @@ extern uchar __LIB__    *zx_saddrpright_callee(void *pixeladdr, uchar *mask) __s
 #define zx_cyx2saddr(a,b)          zx_cxy2saddr_callee(b,a)
 #define zx_cxy2saddr(a,b)          zx_cxy2saddr_callee(a,b)
 
-#define zx_pxy2saddr(a,b,c)        zx_pxy2saddr_callee(a,b,c)
+#define zx_pxy2saddr(a,b)          zx_pxy2saddr_callee(a,b)
 #define zx_saddr2px(a,b)           zx_saddr2px_callee(a,b)
 #define zx_saddrpleft(a,b)         zx_saddrpleft_callee(a,b)
 #define zx_saddrpright(a,b)        zx_saddrpright_callee(a,b)
@@ -470,9 +537,6 @@ extern uchar __LIB__    *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __small
 
 // Setup an im2 jump table at given address
 extern void __LIB__  zx_im2_init(void *address, uchar byte) __smallc;
-
-// Add a raster interrupt handler
-extern void __LIB__ add_raster_int(isr_t handler);
 
 
 /* This routine strips the drive specifier from the filename header.

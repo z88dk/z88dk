@@ -69,13 +69,15 @@
 	rr	l	; "fire1"
 	rla
 	rr	l
-	ld	e,l	; save the "right" bit
+	ld	e,l	; 8: save the "right" bit
 	rr	l
-	rr	l	; "up"
+        ld      d,l
+        rr      l
+	rr	l	; 7: "down"
 	rla
-	rr	l	; "down"
+	rr	d	; 6: "up"
 	rla
-	rl	h	; "left"
+	rl	h	; 5: "left"
 	rla
 	rr	e	; "right"
 	rla

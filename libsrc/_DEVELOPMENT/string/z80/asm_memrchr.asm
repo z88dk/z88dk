@@ -40,29 +40,26 @@ asm_memrchr:
 
    inc c
    dec c
-   jr z, test0
+   jr Z,test0
 
 asm0_memrchr:
 loop:
-
    add hl,bc
    dec hl                      ; hl = last byte of block
-IF __CPU_GBZ80__
-   EXTERN __z80asm_cpdr
-   call __z80asm_cpdr
-ELSE   
-   cpdr   
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   EXTERN __z80asm__cpdr
+   call __z80asm__cpdr
+ELSE
+   cpdr
 ENDIF
    inc hl
-   ret z                       ; char found
+   ret Z                       ; char found
 
 notfound:
-
    jp error_zc
    
 test0:
-
    inc b
    djnz loop
-   
+
    jr notfound

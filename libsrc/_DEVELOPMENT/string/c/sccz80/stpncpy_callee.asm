@@ -1,7 +1,6 @@
 
 ; char *stpncpy(char * restrict s1, const char * restrict s2, size_t n)
 
-IF !__CPU_GBZ80__
 SECTION code_clib
 SECTION code_string
 
@@ -11,12 +10,12 @@ EXTERN asm_stpncpy
 
 stpncpy_callee:
 
-   pop af
-   pop bc
    pop hl
+   pop bc
    pop de
-   push af
-   
+   ex (sp),hl
+   ex de,hl
+
    jp asm_stpncpy
 
 ; SDCC bridge for Classic
@@ -25,4 +24,3 @@ PUBLIC _stpncpy_callee
 defc _stpncpy_callee = stpncpy_callee
 ENDIF
 
-ENDIF

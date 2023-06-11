@@ -9,5 +9,7 @@
 @arch/zx/misc/misc_sdcc_iy.lst
 @arch/zx/nirvanam/nirvanam_sdcc_iy.lst
 @arch/zx/nirvanap/nirvanap_sdcc_iy.lst
+arch/zx/sysvar/system_variables
 @arch/zx/tape/tape_sdcc_iy.lst
 @arch/zx/ulaplus/ulaplus_sdcc.lst
+@arch/zx/arkos/arkos_sdcc_iy.lst

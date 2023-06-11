@@ -33,43 +33,44 @@ EXTERN asm_HeapAlloc
 
    push bc
    call l_mult               ; hl = hl*de = total size of request
-   ld c,l
-   ld b,h
+   ld bc,hl
    pop hl
    push bc
    call asm_HeapAlloc
    pop bc
-   ret nc                    ; ret if fail
-   
+   ret NC                    ; ret if fail
+
    ld a,b
    or c
-   jr z, out
+   jr Z,out
 
    ld (hl),0
    dec bc
    ld a,b
    or c
-   jr z, out
-      
+   jr Z,out
+
    push hl                   ; zero memory block
-   ld e,l
-   ld d,h
+   ld de,hl
    inc de
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
-ldir_loop:
-   ld a,(hl)
-   ld (de),a
-   inc hl
-   inc de
    dec bc
-   ld a,b
-   or c
-   jp nz,ldir_loop
+   inc b
+   inc c
+.ldir_loop
+   ld a,(hl+)
+   ld (de+),a
+   dec c
+   jr NZ,ldir_loop
+   dec b
+   jr NZ,ldir_loop
 ELSE
    ldir
 ENDIF
+
    pop hl
-   
+
 .out
 
    scf

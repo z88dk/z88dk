@@ -7,7 +7,7 @@
 
 #ifdef TOPIC4_1HELP1
 .in_com_hlp4_1
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_1HELP1)
 #ifdef TOPIC4_1HELP2
         HELPTEXT(TOPIC4_1HELP2)
@@ -29,7 +29,7 @@
 
 #ifdef TOPIC4_2HELP1
 .in_com_hlp4_2
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_2HELP1)
 #ifdef TOPIC4_2HELP2
         HELPTEXT(TOPIC4_2HELP2)
@@ -52,7 +52,7 @@
 
 #ifdef TOPIC4_3HELP1
 .in_com_hlp4_3
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_3HELP1)
 #ifdef TOPIC4_3HELP2
         HELPTEXT(TOPIC4_3HELP2)
@@ -77,7 +77,7 @@
 
 #ifdef TOPIC4_4HELP1
 .in_com_hlp4_4
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_4HELP1)
 #ifdef TOPIC4_4HELP2
         HELPTEXT(TOPIC4_4HELP2)
@@ -100,7 +100,7 @@
 
 #ifdef TOPIC4_5HELP1
 .in_com_hlp4_5
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_5HELP1)
 #ifdef TOPIC4_5HELP2
         HELPTEXT(TOPIC4_5HELP2)
@@ -123,7 +123,7 @@
 
 #ifdef TOPIC4_6HELP1
 .in_com_hlp4_6
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_6HELP1)
 #ifdef TOPIC4_6HELP2
         HELPTEXT(TOPIC4_6HELP2)
@@ -146,7 +146,7 @@
 
 #ifdef TOPIC4_7HELP1
 .in_com_hlp4_7
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_7HELP1)
 #ifdef TOPIC4_7HELP2
         HELPTEXT(TOPIC4_7HELP2)
@@ -169,7 +169,7 @@
 
 #ifdef TOPIC4_8HELP1
 .in_com_hlp4_8
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_8HELP1)
 #ifdef TOPIC4_8HELP2
         HELPTEXT(TOPIC4_8HELP2)
@@ -192,7 +192,7 @@
 
 #ifdef TOPIC4_9HELP1
 .in_com_hlp4_9
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_9HELP1)
 #ifdef TOPIC4_9HELP2
         HELPTEXT(TOPIC4_9HELP2)
@@ -215,7 +215,7 @@
 
 #ifdef TOPIC4_10HELP1
 .in_com_hlp4_10
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_10HELP1)
 #ifdef TOPIC4_10HELP2
         HELPTEXT(TOPIC4_10HELP2)
@@ -238,7 +238,7 @@
 
 #ifdef TOPIC4_11HELP1
 .in_com_hlp4_11
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_11HELP1)
 #ifdef TOPIC4_11HELP2
         HELPTEXT(TOPIC4_11HELP2)
@@ -261,7 +261,7 @@
 
 #ifdef TOPIC4_12HELP1
 .in_com_hlp4_12
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_12HELP1)
 #ifdef TOPIC4_12HELP2
         HELPTEXT(TOPIC4_12HELP2)
@@ -284,7 +284,7 @@
 
 #ifdef TOPIC4_13HELP1
 .in_com_hlp4_13
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_13HELP1)
 #ifdef TOPIC4_13HELP2
         HELPTEXT(TOPIC4_13HELP2)
@@ -307,7 +307,7 @@
 
 #ifdef TOPIC4_14HELP1
 .in_com_hlp4_14
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_14HELP1)
 #ifdef TOPIC4_14HELP2
         HELPTEXT(TOPIC4_14HELP2)
@@ -330,7 +330,7 @@
 
 #ifdef TOPIC4_15HELP1
 .in_com_hlp4_15
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_15HELP1)
 #ifdef TOPIC4_15HELP2
         HELPTEXT(TOPIC4_15HELP2)
@@ -353,7 +353,7 @@
 
 #ifdef TOPIC4_16HELP1
 .in_com_hlp4_16
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_16HELP1)
 #ifdef TOPIC4_16HELP2
         HELPTEXT(TOPIC4_16HELP2)
@@ -376,7 +376,7 @@
 
 #ifdef TOPIC4_17HELP1
 .in_com_hlp4_17
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_17HELP1)
 #ifdef TOPIC4_17HELP2
         HELPTEXT(TOPIC4_17HELP2)
@@ -399,7 +399,7 @@
 
 #ifdef TOPIC4_18HELP1
 .in_com_hlp4_18
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_18HELP1)
 #ifdef TOPIC4_18HELP2
         HELPTEXT(TOPIC4_18HELP2)
@@ -422,7 +422,7 @@
 
 #ifdef TOPIC4_19HELP1
 .in_com_hlp4_19
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_19HELP1)
 #ifdef TOPIC4_19HELP2
         HELPTEXT(TOPIC4_19HELP2)
@@ -445,7 +445,7 @@
 
 #ifdef TOPIC4_20HELP1
 .in_com_hlp4_20
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_20HELP1)
 #ifdef TOPIC4_20HELP2
         HELPTEXT(TOPIC4_20HELP2)
@@ -468,7 +468,7 @@
 
 #ifdef TOPIC4_21HELP1
 .in_com_hlp4_21
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_21HELP1)
 #ifdef TOPIC4_21HELP2
         HELPTEXT(TOPIC4_21HELP2)
@@ -491,7 +491,7 @@
 
 #ifdef TOPIC4_22HELP1
 .in_com_hlp4_22
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_22HELP1)
 #ifdef TOPIC4_22HELP2
         HELPTEXT(TOPIC4_22HELP2)
@@ -514,7 +514,7 @@
 
 #ifdef TOPIC4_23HELP1
 .in_com_hlp4_23
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_23HELP1)
 #ifdef TOPIC4_23HELP2
         HELPTEXT(TOPIC4_23HELP2)
@@ -537,7 +537,7 @@
 
 #ifdef TOPIC4_24HELP1
 .in_com_hlp4_24
-        defb    $7F
+        defb    0x7F
         HELPTEXT(TOPIC4_24HELP1)
 #ifdef TOPIC4_24HELP2
         HELPTEXT(TOPIC4_24HELP2)

@@ -1,0 +1,17 @@
+target/newbrain/cpmzcall
+target/newbrain/break_status
+target/newbrain/fputc_lcd
+target/newbrain/fputs_lcd
+target/newbrain/warm_reset
+target/newbrain/nb_open
+target/newbrain/nb_close
+target/newbrain/nb_clear
+target/newbrain/nb_getc
+target/newbrain/nb_gets
+target/newbrain/nb_getblock
+target/newbrain/nb_putc
+target/newbrain/nb_puts
+target/newbrain/nb_putblock
+target/newbrain/nb_putval
+target/newbrain/time/clock
+games/joystick

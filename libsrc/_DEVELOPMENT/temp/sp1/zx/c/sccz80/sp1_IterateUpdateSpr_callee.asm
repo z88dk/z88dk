@@ -11,8 +11,26 @@ EXTERN asm_sp1_IterateUpdateSpr
 
 sp1_IterateUpdateSpr_callee:
 
+   push ix      ; save IX to BC'
+   exx
+   pop bc
+   exx
+
    pop hl
    pop ix
    ex (sp),hl
 
-   jp asm_sp1_IterateUpdateSpr
+;   jp asm_sp1_IterateUpdateSpr
+   exx
+   push bc      ; save old IX
+   exx
+   call asm_sp1_IterateUpdateSpr
+   pop ix       ; restore it
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_IterateUpdateSpr_callee
+defc _sp1_IterateUpdateSpr_callee = sp1_IterateUpdateSpr_callee
+ENDIF
+

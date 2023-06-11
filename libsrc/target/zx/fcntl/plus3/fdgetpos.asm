@@ -29,8 +29,8 @@
 	push	hl
 	ld	b,c
 	push	de	;save store location
-	ld	iy,DOS_GET_POSITION
 	push	ix
+	ld	ix,DOS_GET_POSITION
 	call	dodos
 	pop	ix
 	pop	bc	;get store location back

@@ -20,3 +20,9 @@ aplib_depack:
    
    jp asm_aplib_depack
  
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _aplib_depack
+defc _aplib_depack = aplib_depack
+ENDIF
+

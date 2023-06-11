@@ -1,8 +1,15 @@
 
 /*
 	Coloured mandelbrot demo
+	
+	to build:  zcc +<target> <stdio options> -lm -create-app cmandel.c
+	or
+	to build using math32:  zcc +<target> <stdio options> --math32 -create-app cmandel.c
+	
+	Examples:
+	  zcc +zx -lm -lndos -create-app cmandel.c
+	  zcc +aquarius -lm -create-app cmandel.c
 
-	$Id: cmandel.c $
 */
 
 

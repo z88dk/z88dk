@@ -32,13 +32,9 @@
 
 ._func1c
 	ld	hl,2	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gintspsp	;
+	call	l_gint6sp	;
+	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -95,13 +91,9 @@
 
 ._func2c
 	ld	hl,2	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gintspsp	;
+	call	l_gint6sp	;
+	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -166,13 +158,9 @@
 
 ._func3c
 	ld	hl,2	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gintspsp	;
+	call	l_gint6sp	;
+	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -237,13 +225,9 @@
 
 ._func4c
 	ld	hl,2	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gintspsp	;
+	call	l_gint6sp	;
+	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -313,13 +297,9 @@
 
 ._func5c
 	ld	hl,2	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gintspsp	;
+	call	l_gint6sp	;
+	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -357,6 +337,7 @@
 	inc	hl
 	inc	hl
 	ret
+
 
 
 

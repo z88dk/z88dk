@@ -1,5 +1,5 @@
 ;
-;	Keyboard routines for the Robotron VEB KC85/2,3,4
+;	Keyboard routines for the VEB MPM KC85/2,3,4
 ;
 ;	By Stefano Bodrato - Oct. 2016
 ;
@@ -17,12 +17,9 @@
 
 .fgetc_cons
 ._fgetc_cons
-	push	iy
-	ld	iy,$1f0
-
-    call PV1
-    defb FNKBD
-	pop	iy
+.nokey  call    PV1
+        defb    FNKBDZ
+        jr      NC,nokey
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return

@@ -36,33 +36,30 @@ loop:
 
    push de
    push hl
-   
+
    ld a,(de)
    ld b,a
    ld c,(hl)
-   
+
    call __lc_char_cmp_bc       ; a = *s1 - *s2
    
    pop hl
    pop de
-   
-   jr nz, different
-   
+   jr NZ,different
+
    ld a,(de)
    inc de
    inc hl
-   
-   or a
-   jr nz, loop                 ; end of string?
+
+   or a                        ; end of string?
+   jr NZ,loop
    
 equal:                         ; both strings ended same time
-
    dec de
    ld l,a
    ld h,a
    ret
 
 different:
-
    ld h,a
    ret

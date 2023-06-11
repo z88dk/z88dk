@@ -30,22 +30,19 @@ asm_zx_pxy2aaddr:
    srl l
 
    ld a,h
-   rlca
-   rlca
-   ld h,a
-   
+
+IF __USE_SPECTRUM_128_SECOND_DFILE
+   ld h,$d8/4
+ELSE
+   ld h,$58/4
+ENDIF
+
+   rla
+   rl h
+   rla
+   rl h
+
    and $e0
    or l
    ld l,a
-   
-   ld a,h
-   and $03
-
-IF __USE_SPECTRUM_128_SECOND_DFILE
-   or $d8
-ELSE
-   or $58
-ENDIF
-
-   ld h,a   
    ret

@@ -23,8 +23,8 @@
 	pop	hl	;filename
 	push	hl
 	push	bc
-	ld	iy,DOS_DELETE
 	push	ix
+	ld	ix,DOS_DELETE
 	call	dodos
 	pop	ix
 	ld	hl,0

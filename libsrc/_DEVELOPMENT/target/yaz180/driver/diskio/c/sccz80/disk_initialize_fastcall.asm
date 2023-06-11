@@ -1,6 +1,6 @@
 SECTION code_driver
 
-PUBLIC _disk_initialize_fastcall
+PUBLIC disk_initialize_fastcall
 
 EXTERN asm_disk_initialize
 
@@ -11,4 +11,4 @@ EXTERN asm_disk_initialize
 
 ; initialize the ide drive
 
-defc _disk_initialize_fastcall = asm_disk_initialize
+defc disk_initialize_fastcall = asm_disk_initialize

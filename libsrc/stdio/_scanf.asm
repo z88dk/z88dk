@@ -19,7 +19,9 @@ _scanf:
 	pop	de	;fmt
 	push	de
 	push	bc
+IF !__CPU_INTEL__
 	push	ix	;save ix
+ENDIF
 	ld	bc,__sgoioblk	;stdin
 	push	bc
 	ld	bc,0	;flag
@@ -31,6 +33,8 @@ _scanf:
 	pop	bc	
 	pop	bc
 	pop	bc
+IF !__CPU_INTEL__
 	pop	ix	;restore ix
+ENDIF
 	ret
 

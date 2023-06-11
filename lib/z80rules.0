@@ -23,17 +23,6 @@
 	dec	hl
 	ld	(%1),hl
 
-	ld	hl,(%1)
-	ld	h,0
-	%2c	hl
-	ld	a,l
-	ld	(%1),a
-=
-	ld	hl,%1
-	%2c	(hl)
-	ld	l,(hl)
-	ld	h,0
-
 	call	l_pint
 	ld	a,h
 	or	l
@@ -134,58 +123,6 @@
 	inc	hl
 	push	hl
 
-	pop	hl
-	push	hl
-	ld	bc,%1
-	add	hl,bc
-	ld	(hl),%2
-	inc	hl
-	ld	(hl),%3
-	pop	hl
-	push	hl
-	ld	bc,%4
-	add	hl,bc
-=
-	pop	hl
-	push	hl
-	ld	bc,%1
-	add	hl,bc
-	ld	(hl),%2
-	inc	hl
-	ld	(hl),%3
-	ld	bc,%eval( %4 %1 - 1 -)
-	add	hl,bc
-
-	pop	hl
-	push	hl
-	ld	bc,%1
-	add	hl,bc
-	ld	(hl),%2
-	pop	hl
-	push	hl
-	ld	bc,%3
-	add	hl,bc
-=
-	pop	hl
-	push	hl
-	ld	bc,%1
-	add	hl,bc
-	ld	(hl),%2
-	ld	bc,%eval(%3 %1 -)
-	add	hl,bc
-
-%notcpu gbz80
-	ld	hl,%1	;const
-	push	hl
-	call	l_gint	;%3
-	%2c	hl
-	pop	de
-	call	l_pint
-=
-	ld	hl,(%1)
-	%2c	hl
-	ld	(%1),hl
-
 	call	l_eq
 	ld	de,0	;const
 	ex	de,hl
@@ -204,13 +141,7 @@
 	call	l_eq
 	jr	c,%1
 
-	call	l_pint
-	ld	de,%1	;const
-	ex	de,hl
-=
-	call	l_pint_ex
-	ld	hl,%1	;const
-
+%notcpu 8085
 	pop	de
 	call	l_pint
 =
@@ -224,6 +155,7 @@
 	call	l_gchar
 
 %notcpu 8080
+%notcpu 8085
 	ld	hl,%1	;const
 	call	l_gint
 	ld	h,0
@@ -361,6 +293,7 @@
 	ld	h,0
 
 %notcpu 8080
+%notcpu 8085
 	ld	hl,(%1)
 	ld	h,0
 	ex	de,hl
@@ -637,6 +570,7 @@
 	ld	(%1),hl
 	ld	hl,%3
 
+%notcpu gbz80
 	ld	hl,%1
 	ld	(hl),+(%2 %% 256)
 	inc	hl
@@ -647,6 +581,7 @@
 	ld	(%1),hl
 	ld	hl,%3
 
+%notcpu gbz80
 	ld	hl,%1
 	ld	(%2),hl
 	ld	hl,%1	;const
@@ -672,6 +607,15 @@
 =
 	call	l_gint7de	;
 
+%notcpu 8085
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gchar
+=
+	ld	hl,%1	;const
+	call	l_gcharsp	;
+
+%notcpu 8085
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint	;
@@ -679,6 +623,7 @@
 	ld	hl,%1	;const
 	call	l_gintsp	;
 
+%notcpu 8085
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_glong
@@ -698,13 +643,6 @@
 	ld	hl,%3
 =
 	ld	hl,%3
-
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_gchar
-=
-	ld	hl,%1	;const
-	call	l_gcharsp	;
 
 	ld	de,256	;const
 	ex	de,hl
@@ -787,3 +725,4 @@
 	add	hl,sp
 	ld	sp,hl
 	ld	hl,%1
+

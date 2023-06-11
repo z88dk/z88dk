@@ -17,8 +17,6 @@
     EXTERN  __printf_check_long_flag
     EXTERN  __printf_context
 
-    EXTERN  __math_block2
-
     defc    handlelong = 1
 
 
@@ -186,13 +184,13 @@ miniprintn_start_process:
 .divloop
 IF handlelong
   IF __CPU_INTEL__ | __CPU_GBZ80__
+    EXTERN  l_long_div_m
     push    de      ; number MSW
     push    hl      ; number LSW
     call    __printf_get_base
     ld      d,h
     ld      e,h
-    call    l_long_div_u
-    ld      a,(__math_block2)   ;We know that's where the modulus is kept
+    call    l_long_div_m    ;returns modulus LSB in a
     cp      255
     push    af
   ELSE

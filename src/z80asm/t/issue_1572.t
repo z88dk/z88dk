@@ -1,34 +1,33 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-# Z88DK Z80 Macro Assembler
-#
-# Copyright (C) Paulo Custodio, 2011-2020
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/z88dk/z88dk/
-#
+BEGIN { use lib 't'; require 'testlib.pl'; }
+
+use Modern::Perl;
+
 # Test https://github.com/z88dk/z88dk/issues/1572
 # z80asm: -reloc-info adds -O directory path twice
 
-use Modern::Perl;
-use Test::More;
-use Path::Tiny;
-require './t/testlib.pl';
+unlink_testfiles;
+path("${test}dir")->remove_tree;
+path("${test}dir")->mkpath;
 
-unlink_testfiles();
--d "test_dir" and path("test_dir")->remove_tree;
-path("test_dir")->mkpath;
-z80asm(<<END, "-Otest_dir -b -reloc-info -g -m -l test.asm", 0, "", "");
+spew("${test}.asm", <<END);
 		start:
 			nop
 			jp start
 END
-ok -f "test_dir/test.bin", "test_dir/test.bin created";
-ok -f "test_dir/test.lis", "test_dir/test.bin created";
-ok -f "test_dir/test.map", "test_dir/test.bin created";
-ok -f "test_dir/test.def", "test_dir/test.bin created";
-ok -f "test_dir/test.o", "test_dir/test.bin created";
-ok -f "test_dir/test.reloc", "test_dir/test.bin created";
 
-path("test_dir")->remove_tree;
-unlink_testfiles();
-done_testing();
+capture_ok("z88dk-z80asm -O${test}dir -b -reloc-info -g -m -l ${test}.asm", "");
+
+ok -f "${test}dir/${test}.bin", 	"${test}dir/${test}.bin created";
+ok -f "${test}dir/${test}.lis", 	"${test}dir/${test}.lis created";
+ok -f "${test}dir/${test}.map", 	"${test}dir/${test}.map created";
+ok -f "${test}dir/${test}.def", 	"${test}dir/${test}.def created";
+ok -f "${test}dir/${test}.o", 	 	"${test}dir/${test}.o created";
+ok -f "${test}dir/${test}.reloc", 	"${test}dir/${test}.reloc created";
+
+check_bin_file("${test}dir/${test}.bin", bytes(0,0xC3,0,0));
+
+path("${test}dir")->remove_tree if Test::More->builder->is_passing;
+unlink_testfiles;
+done_testing;

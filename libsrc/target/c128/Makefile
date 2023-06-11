@@ -3,7 +3,7 @@ include ../../Make.config
 TARGET = c128
 
 SUBDIRS = psg c128 graphics graphics_64k
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 CFILES = $(wildcard *.c)
 ASMFILES = $(wildcard *.asm)
@@ -24,8 +24,7 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I../..  $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -DFOR$(TARGET) -I../.. -Oobj/$(TARGET) $^
 
 obj/$(TARGET)/%.o: %.c
 	$(ZCC) +$(TARGET) -mz80 $(CFLAGS) -o $@  $^
@@ -39,5 +38,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o

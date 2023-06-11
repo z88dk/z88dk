@@ -228,6 +228,20 @@ void disc_print_writers(FILE *fp)
 }
 
 
+// If necessary, apply the skew table
+int skew_sector(disc_handle* h, int j, int track)
+{
+    int sect;
+
+    if ( h->spec.has_skew && track + (track * h->spec.sides) >= h->spec.skew_track_start ) {
+        for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+            if ( h->spec.skew_tab[sect] == j ) break;
+	    }
+    } else return (j);
+	
+	return (sect);
+}
+
 
 // Write a raw disk, no headers for tracks etc
 int disc_write_raw(disc_handle* h, const char* filename)
@@ -249,13 +263,7 @@ int disc_write_raw(disc_handle* h, const char* filename)
                 offs = track_length * ( 2* i + s);
             }
             for (j = 0; j < h->spec.sectors_per_track; j++) {
-                 int sect = j; // TODO: Skew
-                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-                     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-                        if ( h->spec.skew_tab[sect] == j ) break;
-                     }
-                 }
-                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+                 fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
     }
@@ -315,9 +323,9 @@ int disc_write_edsk(disc_handle* h, const char* filename)
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                 *ptr++ = i; // Track
                 *ptr++ = s; // Side
-                if ( 0 && h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-                    *ptr++ = h->spec.skew_tab[j] + h->spec.first_sector_offset; // Sector ID
-                } else if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+
+                // Implementing SKEW is not necessary (tested on MAME)
+                if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
                     *ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
                 } else {
                     *ptr++ = j + h->spec.first_sector_offset; // Sector ID
@@ -330,13 +338,7 @@ int disc_write_edsk(disc_handle* h, const char* filename)
             }
             fwrite(header, 256, 1, fp);
             for (j = 0; j < h->spec.sectors_per_track; j++) {
-                 int sect = j; // TODO: Skew
-                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-                     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-                        if ( h->spec.skew_tab[sect] == j ) break;
-                     }
-                 }
-                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+                 fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
     }
@@ -410,12 +412,6 @@ int disc_write_d88(disc_handle* h, const char* filename)
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                  uint8_t *ptr = header;
 
-                 int sect = j; // TODO: Skew
-                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-                     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-                        if ( h->spec.skew_tab[sect] == j ) break;
-                     }
-                 }
                  *ptr++ = i;                 //track
                  *ptr++ = s;                //head
                  *ptr++ = j+1;                //sector
@@ -433,7 +429,7 @@ int disc_write_d88(disc_handle* h, const char* filename)
                  *ptr++ = (h->spec.sector_size % 256);
                  *ptr++ = (h->spec.sector_size / 256);
                  fwrite(header, ptr - header, 1, fp);
-                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+                 fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
     }
@@ -472,14 +468,6 @@ int disc_write_anadisk(disc_handle* h, const char* filename)
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                 uint8_t header[8] = { 0 };
 
-
-                int sect = j; // TODO: Skew
-                if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-                    for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-                    if ( h->spec.skew_tab[sect] == j ) break;
-                    }
-                }
-
                 // Track header:
                 // physical cylinder
                 // physical head
@@ -492,13 +480,13 @@ int disc_write_anadisk(disc_handle* h, const char* filename)
                 header[1] = s;
                 header[2] = i;
                 header[3] = s;
-                header[4] = sect + h->spec.first_sector_offset;
+                header[4] = skew_sector(h, j, i) + h->spec.first_sector_offset;
                 header[5] = sector_size;
                 header[6] = h->spec.sector_size % 256;
                 header[7] = h->spec.sector_size / 256;
 
                 fwrite(header, 8, 1, fp);
-                fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+                fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
     }
@@ -541,16 +529,21 @@ int disc_write_imd(disc_handle* h, const char* filename)
         for (s = 0; s < h->spec.sides; s++) {
             ptr = buffer;
 
-            *ptr++ = 3; // Mode + transfer rate
+			if (h->spec.disk_mode)
+				*ptr++ = h->spec.disk_mode-1; // Mode + transfer rate
+			else 
+				*ptr++ = 3; // 500 kbps MFM
+			
             *ptr++ = i; // track
             *ptr++ = s; // head
             *ptr++ = h->spec.sectors_per_track; // Sectors per track
             *ptr++ = sector_size; // Size of sector
 
             // Write sector map
-            for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
-                *ptr++ = j  +  h->spec.first_sector_offset;
-            }
+				for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
+					*ptr++ = j  +  h->spec.first_sector_offset;
+				}
+
             // And write the header
             fwrite(buffer, ptr - buffer, 1, fp);
 
@@ -561,15 +554,8 @@ int disc_write_imd(disc_handle* h, const char* filename)
                 offs = track_length * ( 2* i + s);
             }
             for (j = 0; j < h->spec.sectors_per_track; j++) {
-                int sect = j;
-                if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-                    for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-                        if ( h->spec.skew_tab[sect] == j ) break;
-                    }
-                }
-
                 fputc(1, fp);   // Sector type 1  = has data
-                fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+                fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
     }
@@ -664,7 +650,7 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
             direntry[15] = 0x80;
             extents_to_write = extents_per_entry;
         } else {
-            direntry[15] = ((len % (extents_per_entry * h->spec.extent_size)) / 128) + 1;
+            direntry[15] = (((len % (extents_per_entry * h->spec.extent_size))+ 127) / 128);
             extents_to_write = (num_extents - (i * extents_per_entry));
         }
         for (j = 0; j < extents_per_entry; j++) {
@@ -679,6 +665,11 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
                 current_extent++;
             }
         }
+		
+		// Wipe the directory entry if empty (no extents)
+		if (!(direntry[16] | direntry[17]))
+	        memset(direntry, 0, sizeof(direntry));
+
         memcpy(h->image + directory_offset, direntry, 32);
         directory_offset += 32;
     }
@@ -730,14 +721,14 @@ static void fat_write_file(disc_handle* h, char *filename, void* data, size_t le
 // FATFs interface
 
 DSTATUS disk_status (
-	BYTE pdrv		/* Physical drive nmuber to identify the drive */
+	BYTE pdrv		/* Physical drive number to identify the drive */
 )
 {
     return RES_OK;
 }
 
 DSTATUS disk_initialize (
-	BYTE pdrv				/* Physical drive nmuber to identify the drive */
+	BYTE pdrv				/* Physical drive number to identify the drive */
 )
 {
     return RES_OK;
@@ -745,7 +736,7 @@ DSTATUS disk_initialize (
 
 
 DRESULT disk_read (
-	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
+	BYTE pdrv,		/* Physical drive number to identify the drive */
 	BYTE *buff,		/* Data buffer to store read data */
 	DWORD sector,	/* Start sector in LBA */
 	UINT count		/* Number of sectors to read */
@@ -758,7 +749,7 @@ DRESULT disk_read (
 
 
 DRESULT disk_write (
-	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
+	BYTE pdrv,			/* Physical drive number to identify the drive */
 	const BYTE *buff,	/* Data to be written */
 	DWORD sector,		/* Start sector in LBA */
 	UINT count			/* Number of sectors to write */
@@ -770,7 +761,7 @@ DRESULT disk_write (
 }
 
 DRESULT disk_ioctl (
-	BYTE pdrv,		/* Physical drive nmuber (0..) */
+	BYTE pdrv,		/* Physical drive number (0..) */
 	BYTE cmd,		/* Control code */
 	void *buff		/* Buffer to send/receive control data */
 )

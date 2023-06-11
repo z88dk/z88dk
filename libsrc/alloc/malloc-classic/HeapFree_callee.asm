@@ -31,7 +31,7 @@ PUBLIC asm_HeapFree
 
    ld a,h
    or l
-   ret z
+   ret Z
 
    inc de
    inc de
@@ -47,7 +47,7 @@ PUBLIC asm_HeapFree
    ld c,l
    ld b,h
    ex de,hl
-   
+
    ; hl = & lagger's next pointer
    ; bc = address following block to free
    ; stack = & block to free
@@ -57,7 +57,7 @@ PUBLIC asm_HeapFree
    ; hl = & lagger's next pointer
    ; bc = address following block to free
    ; stack = & block to free
-   
+
    ld a,(hl)
    inc hl
    push hl                   ; save & lagger->next + 1b
@@ -65,9 +65,11 @@ PUBLIC asm_HeapFree
    ld l,a                    ; hl = & next block
 
    or h                      ; if there is no next block...
-   jr z, placeatend
+   jr Z,placeatend
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_8085__
+   sub hl,bc
+ELIF __CPU_8080__ || __CPU_GBZ80
    ld a,l
    sub c
    ld l,a
@@ -77,8 +79,8 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
 ELSE
    sbc hl,bc                 ; next block - address following block to free
 ENDIF
-   jr z, mergeontop
-   jr nc, insertbefore
+   jr Z,mergeontop
+   jr NC,insertbefore
 IF __CPU_INTEL__ || __CPU_GBZ80__
    ld a,l
    adc c
@@ -86,35 +88,35 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    ld a,h
    adc b
    ld  h,a
-ELSE   
+ELSE
    adc hl,bc
 ENDIF
    inc hl                    ; hl = & next block->next
    pop de                    ; junk lagger
-   
+
    jp loop
 
 .insertbefore
 
    add hl,bc
-   
+
 .placeatend
 
    ld c,l
    ld b,h
    pop hl
-   
+
    ; bc = & next block
    ; hl = & lagger->next + 1b
    ; stack = & block to free
 
    jp checkformergebelow
-   
+
 .mergeontop
 
    ; bc = & next block
    ; stack = & block to free, & lagger->next + 1b
-   
+
    ld l,c
    ld h,b
    ld e,(hl)
@@ -126,7 +128,7 @@ ENDIF
    ld c,(hl)
    inc hl
    ld b,(hl)                 ; bc = & next block after merged blocks
-   
+
    pop hl
    ex (sp),hl                ; hl = & block to free, stack = & lagger->next + 1b
    ld a,(hl)                 ; add next block's size to merged block
@@ -138,13 +140,13 @@ ENDIF
    ld (hl),a
    dec hl
    ex (sp),hl
-   
+
 .checkformergebelow
 
    ; bc = & next block after free
    ; hl = & lagger->next + 1b
    ; stack = & block to free
-   
+
    dec hl
    ld e,l
    ld d,h                    ; de = & lagger->next
@@ -158,13 +160,13 @@ ENDIF
    ex de,hl
    ex (sp),hl
    ex de,hl
-   
+
    ; bc = & next block after free
    ; hl = byte past end of lagger block
    ; de = & block to free
    ; stack = & lagger->next
-   
-IF __CPU_INTEL__ || __CPU_GBZ80__
+
+IF __CPU_INTEL__ || __CPU_GBZ80
    ld a,l
    sub e
    ld l,a
@@ -175,14 +177,14 @@ ELSE
    sbc hl,de                 ; carry must be clear here
 ENDIF
    pop hl
-   jr z, mergebelow
-   
+   jr Z,mergebelow
+
 .nomergebelow
 
    ; bc = & next block after free
    ; de = & block to free
    ; hl = & lagger->next
-   
+
    ld (hl),e
    inc hl
    ld (hl),d
@@ -193,13 +195,13 @@ ENDIF
    inc hl
    ld (hl),b
    ret
-   
+
 .mergebelow
  
    ; bc = & next block after free
    ; de = & block to free
    ; hl = & lagger->next
-   
+
    ld (hl),c
    inc hl
    ld (hl),b                 ; write new next pointer for merged block

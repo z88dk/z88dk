@@ -65,7 +65,6 @@ IF FORpc88
     defc    WANT_swapgfxbk = 0
 ENDIF
 
-
 IF FORvz
     DEFINE gotgfx
     IF BLOCKgfx
@@ -114,6 +113,20 @@ IF FORbeehr512
     DEFINE gotgfx
     defc maxx    = 512
     defc maxy    = 256
+ENDIF
+
+IF FORgemini
+    DEFINE gotgfx
+    defc maxx    = 160
+    defc maxy    = 75
+    defc blankch    = 128
+ENDIF
+
+IF FORgeminihr
+    DEFINE gotgfx
+    defc maxx    = 256
+    defc maxy    = 256
+    defc blankch    = 128
 ENDIF
 
 IF FORzx80
@@ -182,8 +195,9 @@ ENDIF
 IF FORaceudg
     DEFINE gotgfx
     defc maxx    = 64
-    defc maxy    = 71
-    defc blankch    = 128
+    defc maxy    = 72
+    defc blankch    = 32
+    defc    WANT_swapgfxbk = 0
 ENDIF
 
 IF FORace
@@ -254,6 +268,18 @@ IF FOReinstein
     defc maxy    = 192
     defc fcolor    = 1
     defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORmbc200
+    DEFINE gotgfx
+    defc maxx    = 640
+    defc maxy    = 400
+ENDIF
+
+IF FORv1050
+    DEFINE gotgfx
+    defc maxx    = 640
+    defc maxy    = 300
 ENDIF
 
 IF FORmsx
@@ -358,10 +384,12 @@ IF FORz88
     defc    maxy     = 64
 ENDIF
 
-IF FORz9001krt
+IF FORz9001
     DEFINE gotgfx
     defc maxx    = 320
     defc maxy    = 192
+    defc    WANT_swapgfxbk = 0
+    defc blankch = 32
 ENDIF
 
 IF FORkc
@@ -392,19 +420,11 @@ ENDIF
 
 IF FORz1013
     DEFINE gotgfx
-    defc maxx    = 64
-    defc maxy    = 64
-    defc blankch    = 32
+    defc maxx    = 256
+    defc maxy    = 256
     defc    WANT_swapgfxbk = 0
 ENDIF
 
-IF FORz9001
-    DEFINE gotgfx
-    defc maxx    = 80
-    defc maxy    = 48
-    defc blankch    = 32
-    defc    WANT_swapgfxbk = 0
-ENDIF
 
 IF FORc128
     DEFINE gotgfx
@@ -456,6 +476,14 @@ IF FORtrs80
     defc maxy    = 48
     defc blankch    = 128
     defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORtrs80m2
+    DEFINE gotgfx
+    defc maxx    = 80
+    defc maxy    = 72
+    defc blankch    = 32
+    defc GFXTEXT3 = 1
 ENDIF
 
 IF FOReg2000
@@ -516,7 +544,7 @@ ENDIF
 IF FORvg5k
     DEFINE gotgfx
     defc maxx    = 80
-    defc maxy    = 72
+    defc maxy    = 75
     defc blankch    = 0
     defc    WANT_swapgfxbk = 0
 ENDIF
@@ -544,7 +572,7 @@ ENDIF
 
 IF FORalphatro
     DEFINE gotgfx
-    defc maxx    = 80
+    defc maxx    = 160
     defc maxy    = 72
     defc blankch    = 32
     defc    WANT_swapgfxbk = 0
@@ -757,17 +785,45 @@ IF FORgl6000
     defc    WANT_swapgfxbk = 0
 ENDIF
 
+IF FORsol20
+    DEFINE gotgfx
+    defc maxx    = 64
+    defc maxy    = 16
+    defc USEplotc = 1
+ENDIF
+
 ; GSX virtual window is (32768 x 32768)
 ; HiRez display should stay between 512..800 px.
 ; We keep an average value
 IF FORcpm
+  IF FORgsx
     DEFINE gotgfx
     defc maxx    = 1920        ; foo value hopefully larger than the max X resolution
     defc maxy    = 768        ; we keep unbalanced proportions, assuming non-square pixels
+  ENDIF
 ENDIF
 
 ; =============================================
 
+IF FORtek
+   DEFINE gotgfx
+   defc maxx = 1024
+   defc maxy = 768
+   defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORregis
+   DEFINE gotgfx
+   defc maxx = 768
+   defc maxy = 480
+ENDIF
+
+IF FORagon
+   DEFINE gotgfx
+   defc maxx = 1024
+   defc maxy = 768
+   defc    WANT_swapgfxbk = 0
+ENDIF
 
 ; Catch all to sort things out
 

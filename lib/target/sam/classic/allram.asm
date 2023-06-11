@@ -6,7 +6,6 @@
     defc    TAR__fputc_cons_generic = 1
     defc    CLIB_SAM_IS_BASIC = 0
     defc    CRT_MAX_HEAP_ADDRESS = 65535
-    defc    CLIB_KBHIT_NOSTORE = 1
 
     PUBLIC  THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES
     defc    THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES = 1
@@ -70,10 +69,7 @@ program:
         INCLUDE "crt/classic/crt_init_amalloc.asm"
     ENDIF
 
-    ; Switch to mode 4
-    in      a,(VMPR)
-    or      @01100000
-    out     (VMPR),a
+    INCLUDE "target/sam/classic/sam_switchmode.inc"
 
 IF !CRT_DISABLE_INT_TICK
     EXTERN   tick_count_isr
@@ -194,7 +190,9 @@ stacktop:
     ; As a result, we need to ensure that compiler support routines,
     ; screen routines are in low memory and can't be
     ; paged out
-    SECTION code_crt0_sccz80
+    SECTION code_l
+    SECTION code_l_sdcc
+    SECTION code_l_sccz80
     SECTION code_graphics
     SECTION code_driver
     SECTION data_graphics

@@ -14,7 +14,7 @@
 
 
 
-int __FASTCALL__ readbyte(int fd)
+int __FASTCALL__ readbyte(int fd) __naked
 {
 #asm
         INCLUDE "fileio.def"
@@ -23,11 +23,12 @@ int __FASTCALL__ readbyte(int fd)
         push    hl
 	pop     ix  
 	call_oz(os_gb)
+        pop     ix
 	ld      hl,-1	;EOF
 	ret     c
 	ld      l,a
 	ld      h,0
-        pop     ix
+        ret
 #endasm
 }
 

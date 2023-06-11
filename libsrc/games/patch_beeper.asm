@@ -29,9 +29,9 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 		  pop  ix
 		  push ix
 
-        IF sndbit_port >= 256
+        IF SOUND_ONEBIT_port >= 256
           exx
-          ld   bc,sndbit_port
+          ld   bc,SOUND_ONEBIT_port
           exx
         ENDIF
           ld   a,l
@@ -77,22 +77,17 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
           rlc  (ix+0)
 		  sbc  a,a	; 0 or FF
-		  and  sndbit_mask
+		  and  SOUND_ONEBIT_mask
 		  ld   c,a
           ld   a,(__snd_tick)
           xor  c
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+    ONEBITOUT
+
 
           ld   b,h
           ld   c,a
-          ;bit  sndbit_bit,a            ;if o/p go again!
+          ;bit  SOUND_ONEBIT_bit,a            ;if o/p go again!
           ;jr   nz,be_again
           ld   a,d
           or   e

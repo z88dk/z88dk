@@ -14,6 +14,7 @@
 
 	PUBLIC    swapgfxbk1
 	PUBLIC    _swapgfxbk1
+        EXTERN    __bdos
 
 
 
@@ -50,3 +51,8 @@ bankval:	defb	0
 	ld      de,__HIMEM_head
 	ld      bc,__HIMEM_END_tail - __HIMEM_head
 	ldir
+
+        ld      c,2
+        ld      e,0x1a          ;Clears screen, sets up VRAM at 0
+        call    __bdos
+

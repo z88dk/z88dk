@@ -11,7 +11,7 @@
 ._func
 	ld	hl,0	;const
 	push	hl
-	ld	hl,4	;const
+	ld	l,4
 	call	l_gintspsp	;
 	pop	bc
 	pop	hl
@@ -32,12 +32,12 @@
 	ld	sp,hl
 	ld	hl,0	;const
 	push	hl
-	ld	hl,2	;const
+	ld	l,2
 	add	hl,sp
+	pop	de
+	push	de
 	push	hl
-	dec	hl
-	dec	hl
-	call	l_gint	;
+	ex	de,hl
 	add	hl,hl
 	pop	de
 	add	hl,de
@@ -75,9 +75,7 @@
 	ld	hl,65516	;const
 	add	hl,sp
 	ld	sp,hl
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	exx
 	ld	hl,20	;const
 	add	hl,sp
@@ -139,6 +137,7 @@
 	ld	sp,hl
 	exx
 	ret
+
 
 
 

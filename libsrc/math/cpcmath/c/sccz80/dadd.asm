@@ -6,21 +6,20 @@
 ;	$Id: dadd.asm,v 1.4 2016-06-22 19:50:48 dom Exp $
 ;
 
-                SECTION         smc_fp
-		INCLUDE		"target/cpc/def/cpcfirm.def"
-		INCLUDE		"target/cpc/def/cpcfp.def"
+    SECTION smc_fp
+    INCLUDE "cpcmath.inc"
+    
+    PUBLIC  dadd
+    PUBLIC  daddc
 
-		PUBLIC		dadd
-		PUBLIC		daddc
+    EXTERN  fsetup
+    EXTERN  stkequ
+    EXTERN  fa
 
-		EXTERN		fsetup
-		EXTERN		stkequ
-		EXTERN		fa
-
-.dadd						; (fa+1)=(fa+1)+(sp+3)
-		call    fsetup
-        call    firmware
-.daddc  defw    CPCFP_FLO_ADD		; (hl)=(hl)+(de)
-		jp stkequ		
-
+; (fa+1)=(fa+1)+(sp+3))
+.dadd
+    call    fsetup
+.daddc
+    FPCALL(CPCFP_FLO_ADD)   ; (hl)=(hl)+(de)
+    jp      stkequ
 

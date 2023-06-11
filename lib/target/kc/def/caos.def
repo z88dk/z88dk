@@ -23,18 +23,22 @@ lstoff
     defc	ARG2      = 0xb784 ; argument 2
     defc	ARG3      = 0xb786 ; argument 3
     defc	ARG4      = 0xb788 ; argument 4
-	defc	ARG5      = 0xb78a ; argument 5
-	defc	ARG6      = 0xb78c ; argument 6
-	defc	ARG7      = 0xb78e ; argument 7
-	defc	ARG8      = 0xb790 ; argument 8
-	defc	ARG9      = 0xb792 ; argument 9
+    defc	ARG5      = 0xb78a ; argument 5
+    defc	ARG6      = 0xb78c ; argument 6
+    defc	ARG7      = 0xb78e ; argument 7
+    defc	ARG8      = 0xb790 ; argument 8
+    defc	ARG9      = 0xb792 ; argument 9
     defc	ARG10     = 0xb794 ; argument 10
+
+    defc	WINNR     = 0xb79b ; window number
+    defc	WINON     = 0xb79c ; window start
+    defc	WINLG     = 0xb79e ; window size
 
     defc	CURSO_COL = 0xb7a0 ; cursor position x
     defc	CURSO_ROW = 0xb7a1 ; cursor position y
     defc	STBT      = 0xb7a2 ; control byte for screen
     defc	COLOR     = 0xb7a3 ; color byte
-          
+
     defc	HOR       = 0xb7d3 ; horizontal graphic position
     defc	VERT      = 0xb7d5 ; vertical graphic position
     defc	FARB      = 0xb7d6 ; graphic color
@@ -61,7 +65,7 @@ lstoff
     defc	FNLARG    = 0x15
     defc	FNINTB    = 0x16
     defc	FNINLIN   = 0x17
-	defc	FNRHEX    = 0x18
+    defc	FNRHEX    = 0x18
     defc	FNERRM    = 0x19
     defc	FNHLHX    = 0x1a
     defc	FNHLDE    = 0x1b

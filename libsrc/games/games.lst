@@ -26,6 +26,18 @@ games/obj/${TARGET}/bit_noise_callee
 games/obj/${TARGET}/playzb4_big
 games/obj/${TARGET}/__bit_irqstatus
 games/obj/${TARGET}/__snd_tick
+games/obj/${TARGET}/bit_save_zx
+games/obj/${TARGET}/bit_save_block_zx
+games/obj/${TARGET}/bit_save_block_zx_callee
+games/obj/${TARGET}/bit_load_block_zx
+games/obj/${TARGET}/bit_load_block_zx_callee
+games/obj/${TARGET}/bit_save_msx
+games/obj/${TARGET}/bit_save_msx_callee
+games/obj/${TARGET}/bit_load_msx
+games/obj/${TARGET}/bit_load_vg5000
+games/obj/${TARGET}/bit_tapion
+games/obj/${TARGET}/bit_tapiof
+games/obj/${TARGET}/bit_tapin
 games/obj/${TARGET}/bit_open
 games/obj/${TARGET}/bit_open_di
 games/obj/${TARGET}/bit_close
@@ -34,3 +46,6 @@ games/obj/${TARGET}/joystick_type
 games/obj/${TARGET}/joystick_sc
 games/obj/${TARGET}/kjoystick
 games/obj/${TARGET}/joystick_inkey
+games/obj/${TARGET}/asm_bit_beepfx
+games/obj/${TARGET}/bit_beepfx
+games/obj/${TYPE}/**/*.o

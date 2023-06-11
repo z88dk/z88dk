@@ -1,7 +1,0 @@
-; TODO: add all ALTD combinations
-[rabbit]	altd			=>     76
-
-; TODO: add all IOE IOI combinations
-[rabbit]	ioe				=>     DB
-[rabbit]	ioi				=>     D3
-

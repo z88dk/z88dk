@@ -8,7 +8,7 @@
 
 #include "am9511_math.h"
 
-float am9511_fmod (float x, float y)
+float am9511_fmod (float x, float y) __stdc
 {
     long k;
     float d;

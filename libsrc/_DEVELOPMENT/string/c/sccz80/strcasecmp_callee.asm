@@ -14,6 +14,7 @@ strcasecmp_callee:
    pop hl
    pop de
    push bc
+
 IF __CLASSIC && __CPU_GBZ80__
    call asm_strcasecmp
    ld d,h

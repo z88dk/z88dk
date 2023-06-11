@@ -10,7 +10,6 @@ math/float/math32/c/sdcc/cm32_sdcc_cos
 math/float/math32/c/sdcc/cm32_sdcc_cosh
 math/float/math32/c/sdcc/cm32_sdcc_dload
 math/float/math32/c/sdcc/cm32_sdcc_exp
-math/float/math32/c/sdcc/cm32_sdcc_fam9511
 math/float/math32/c/sdcc/cm32_sdcc_fabs
 math/float/math32/c/sdcc/cm32_sdcc_floor
 math/float/math32/c/sdcc/cm32_sdcc_fpclassify
@@ -27,17 +26,19 @@ math/float/math32/c/sdcc/cm32_sdcc_fsadd_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsdiv
 math/float/math32/c/sdcc/cm32_sdcc_fsdiv_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsdiv2
+math/float/math32/c/sdcc/cm32_sdcc___fseq
 math/float/math32/c/sdcc/cm32_sdcc___fseq_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsfrexp
 math/float/math32/c/sdcc/cm32_sdcc_fsfrexp_callee
+math/float/math32/c/sdcc/cm32_sdcc___fsgt
 math/float/math32/c/sdcc/cm32_sdcc___fsgt_callee
 math/float/math32/c/sdcc/cm32_sdcc_fshypot
 math/float/math32/c/sdcc/cm32_sdcc_fshypot_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsinv
 math/float/math32/c/sdcc/cm32_sdcc_fsinvsqrt
-math/float/math32/c/sdcc/cm32_sdcc_fsload
 math/float/math32/c/sdcc/cm32_sdcc_fsldexp
 math/float/math32/c/sdcc/cm32_sdcc_fsldexp_callee
+math/float/math32/c/sdcc/cm32_sdcc___fslt
 math/float/math32/c/sdcc/cm32_sdcc___fslt_callee
 math/float/math32/c/sdcc/cm32_sdcc_fmin
 math/float/math32/c/sdcc/cm32_sdcc_fmin_callee
@@ -48,6 +49,7 @@ math/float/math32/c/sdcc/cm32_sdcc_fsmul_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsmul2
 math/float/math32/c/sdcc/cm32_sdcc_fsmul10u
 math/float/math32/c/sdcc/cm32_sdcc_fsneg
+math/float/math32/c/sdcc/cm32_sdcc___fsneq
 math/float/math32/c/sdcc/cm32_sdcc___fsneq_callee
 math/float/math32/c/sdcc/cm32_sdcc_fspoly
 math/float/math32/c/sdcc/cm32_sdcc_fspoly_callee

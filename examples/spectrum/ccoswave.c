@@ -3,11 +3,13 @@
 
 	build with:   zcc +zx -lndos -lm -create-app ccoswave.c
 
-    zcc +zx -lndos -lm ccoswave.c -o ccoswave48 -create-app
-    zcc +zx -lndos -O3 --math32 ccoswave.c -o ccoswave32 -create-app
-    zcc +zx -lndos -O3 --math16 ccoswave.c -o ccoswave16 -create-app
+	Build and link with alternative floating point libraries:
+	zcc +zx -lndos -O2 -lm ccoswave.c -o ccoswave -create-app
+	zcc +zx -lndos -O2 -lm48 ccoswave.c -o ccoswave48 -create-app
+	zcc +zx -lndos -O2 --math32 ccoswave.c -o ccoswave32 -create-app
+	zcc +zx -lndos -O2 --math16 ccoswave.c -o ccoswave16 -create-app
 
-	$id:$
+	stefano
 */
 
 #include <graphics.h>

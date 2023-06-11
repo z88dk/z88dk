@@ -105,7 +105,7 @@ ELSE
 	; -10 = length of buffer
 	;
 	; -80->-11 = buffer (69 bytes)
-  IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__
 	add	sp,-80
 	ld	hl,(ix+2)
 	ex	de,hl
@@ -114,10 +114,15 @@ ELSE
 	ld	hl,-80
 	add	hl,sp
 	ld	sp,hl
+   IF __CPU_EZ80__
+        ld      de,(ix+2)
+        ld      hl,(ix+4)
+   ELSE
 	ld	e,(ix+2)	;arg pointer
 	ld	d,(ix+3)
 	ld	l,(ix+4)	;format pointer
 	ld	h,(ix+5)
+   ENDIF
   ENDIF
 	xor	a
 	ld	(ix-1),a
@@ -175,7 +180,7 @@ ELSE
 ENDIF
 	and	a
 	jr	nz,cont
-IF __CPU_R2K__ | __CPU_R3K__ | __CPU_GBZ80__
+IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_GBZ80__
 	add	sp,78
 ELSE
 	ld	hl,78		;adjust the stack

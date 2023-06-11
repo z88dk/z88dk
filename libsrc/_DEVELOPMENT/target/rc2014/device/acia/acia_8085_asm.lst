@@ -1,0 +1,13 @@
+_DEVELOPMENT/target/rc2014/device/acia/8080/__acia_data_ctl
+_DEVELOPMENT/target/rc2014/device/acia/8080/__acia_data_Rx
+_DEVELOPMENT/target/rc2014/device/acia/8080/__acia_data_Tx
+_DEVELOPMENT/target/rc2014/device/acia/8080/__acia_need
+_DEVELOPMENT/target/rc2014/device/acia/8080/acia_flush_Rx
+_DEVELOPMENT/target/rc2014/device/acia/8080/acia_flush_Tx
+_DEVELOPMENT/target/rc2014/device/acia/8080/acia_getc
+_DEVELOPMENT/target/rc2014/device/acia/8080/acia_init
+_DEVELOPMENT/target/rc2014/device/acia/8080/acia_interrupt
+_DEVELOPMENT/target/rc2014/device/acia/8080/acia_peekc
+_DEVELOPMENT/target/rc2014/device/acia/8080/acia_pollc
+_DEVELOPMENT/target/rc2014/device/acia/8080/acia_putc
+_DEVELOPMENT/target/rc2014/device/acia/8080/acia_reset

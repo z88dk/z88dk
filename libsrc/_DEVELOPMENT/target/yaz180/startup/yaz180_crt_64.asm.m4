@@ -15,6 +15,7 @@ dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "config_yaz180_public.inc"
+include "config_yabios_def.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -107,7 +108,8 @@ EXTERN _main
 
 IF __crt_include_preamble
 
-   include "crt_preamble.asm"  ; user provided preamble
+   include "crt_preamble.asm"
+   SECTION CODE
 
 ENDIF
 

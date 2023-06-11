@@ -13,6 +13,11 @@ int main(int argc, char *argv[])
 #endif
     res += test_strtol();
     res += test_unbcd();
+#ifndef __8080__
+    res += test_qsort();
+    res += test_qsort_newlib();
+#endif
+    res += test_bsearch();
 
     return res;
 }

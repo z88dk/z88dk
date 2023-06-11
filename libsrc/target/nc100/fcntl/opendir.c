@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <nc.h>
+#include <arch/nc.h>
 #include <string.h>
 #include <dirent.h>
 

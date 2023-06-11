@@ -8,16 +8,18 @@
 ;	No sound on nascom (?).  We'll look for some trick..
 ;	What about making buzz the tape relais ?
 ;
-;	$Id: f_ansi_bel.asm,v 1.5 2016-04-04 18:31:22 dom Exp $
+;	$Id: f_ansi_bel.asm $
 ;
 
 	SECTION	code_clib
 	PUBLIC	ansi_BEL
+
 	EXTERN	montest
 
-	; This could put a symbol somewhere on the screen, as a side effect.
+
 
 .ansi_BEL
+
 	call	montest
 	jr	nz,nassys
 	
@@ -30,4 +32,3 @@
 	ld	a,7
 	defb	0f7h
 	ret
-

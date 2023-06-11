@@ -32,5 +32,6 @@ ENDIF
     SECTION bss_psg
     SECTION bss_sound_ay
     SECTION	bss_PSGlib
+    SECTION bss_video_vdp
     SECTION bss_splib2
     SECTION bss_user

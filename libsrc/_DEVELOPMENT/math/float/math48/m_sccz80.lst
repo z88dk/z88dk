@@ -85,6 +85,7 @@ math/float/math48/lm/c/sccz80/lp_pdoub
 math/float/math48/lm/c/sccz80/lrint
 math/float/math48/lm/c/sccz80/lround
 math/float/math48/lm/c/sccz80/minusfa
+math/float/math48/lm/c/sccz80/mlib2d
 math/float/math48/lm/c/sccz80/modf
 math/float/math48/lm/c/sccz80/modf_callee
 math/float/math48/lm/c/sccz80/nan

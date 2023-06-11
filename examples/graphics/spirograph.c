@@ -6,6 +6,10 @@
 		
 		For graphics only devices (no text), add "-pragma-redirect=fputc_cons=putc4x6"
 		On Sinclair computers the specific maths library can be used, but in full form only (TINY mode will fail).
+		
+		Examples:
+		  zcc +zx -lm -lndos -create-app spirograph.c
+		  zcc +zx --math32 -lndos -create-app spirograph.c
 	*/
 
 	#include <graphics.h>
@@ -54,7 +58,7 @@
 
 		incr=1.0/(float)360.0;
 
-		for (t=0.0; t<=pi()*2.0*loops; t=t+incr)
+		for (t=0.0; t<=M_PI*2.0*loops; t=t+incr)
 		{
 				if (t==0.0)
 					plot ( cx+(int) (x(t)*scale), cy-(y(t)*scale));

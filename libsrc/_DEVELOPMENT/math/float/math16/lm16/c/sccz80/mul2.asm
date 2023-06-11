@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _mul2f16
-EXTERN cm16_sdcc_mul2
-defc _mul2f16 = cm16_sdcc_mul2
+defc _mul2f16 = mul2f16
 ENDIF
 

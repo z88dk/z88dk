@@ -11,15 +11,15 @@
 
 typedef int           ptrdiff_t;
 
-#ifndef _SIZE_T_DEFINED
-#define _SIZE_T_DEFINED
+#ifndef _SIZE_T
+#define _SIZE_T
 typedef unsigned int  size_t;
 #endif
 
 typedef unsigned char max_align_t;
 
-#ifndef _WCHAR_T_DEFINED
-#define _WCHAR_T_DEFINED
+#ifndef _WCHAR_T
+#define _WCHAR_T
 typedef unsigned char wchar_t;
 #endif
 

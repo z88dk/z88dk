@@ -7,12 +7,19 @@
  * 
  *  Build examples
  *  zcc +zx -oclock -lndos -create-app -lm -llib3d -DDETAILED clock.c
+ * ZX81, high resolution mod
  *  zcc +zx81ansi -oclock -startup=3 -lgfx81hr192 -lndos -create-app -llib3d -DDETAILED clock.c
  *  zcc +zx81 -oclock -startup=2 -lgfx81 -lndos -create-app -llib3d clock.c
- *  zcc +ts2068 -create-app -lm -lgfx2068hr -lm -llib3d -DDETAILED -Dhires clock.c
+ * Timex Sinclair 2068, double resolution on X axis
+ *  zcc +ts2068 -pragma-define:CLIB_ZX_CONIO32=1 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -DDETAILED -create-app -llib3d -Dhires clock.c
+ * SANYO MBC-200, very high resolution
+ *  zcc +cpm -subtype=mbc200 -DDETAILED -DFULL_HRG -create-app -lndos -llib3d -lm clock.c
+ * Visual 1050, very high resolution, CP/M 3 supports time/date
+ *  zcc +cpm -subtype=v1050 -DDETAILED -DFULL_HRG -Dhires -create-app -lndos -llib3d -lm -DHAVE_TIME clock.c
+
  *  Add -DHAVE_TIME if the machine has a hardware clock that can be read
 
- $Id: clock.c,v 1.1 2012-11-07 15:10:06 stefano Exp $
+ $Id: clock.c$
 */
 
 #include <graphics.h>
@@ -122,17 +129,26 @@ void main()
 #endif
 #endif
 	for (i=0;i<60;i++) {
+#ifdef FULL_HRG
+		x=(long)icos(i*6)*sz/XDIV;
+		y=(long)isin(i*6)*sz/256;
+#else
 		x=icos(i*6)*sz/XDIV;
 		y=isin(i*6)*sz/256;
-		
+#endif
 		plot (cx+x,cy+y);
 	
 	}
 
 #ifdef DETAILED
 	for (i=0;i<12;i++) {
+#ifdef FULL_HRG
+		x=(long)isin(i*30)*(sz-8)/XDIV;
+		y=(long)icos(i*30)*(sz-8)/256;
+#else
 		x=isin(i*30)*(sz-8)/XDIV;
 		y=icos(i*30)*(sz-8)/256;
+#endif
 		putsprite(spr_or, cx+x-5, cy-y-3, roman_nums + i*16 + 7*(i>8));
 	}
 #endif
@@ -174,6 +190,16 @@ void main()
 			undraw(cx,cy,cx+x,cy+y);
 		}
 		
+#ifdef FULL_HRG
+		x=(long)icos(i*6)*long_sz/XDIV;
+		y=(long)isin(i*6)*long_sz/256;
+
+		x_min=(long)icos(j*6)*long_sz/XDIV;
+		y_min=(long)isin(j*6)*long_sz/256;
+
+		x_hr=(long)icos(k*6)*short_sz/XDIV;
+		y_hr=(long)isin(k*6)*short_sz/256;
+#else
 		x=icos(i*6)*long_sz/XDIV;
 		y=isin(i*6)*long_sz/256;
 
@@ -182,7 +208,7 @@ void main()
 
 		x_hr=icos(k*6)*short_sz/XDIV;
 		y_hr=isin(k*6)*short_sz/256;
-
+#endif
 		// sec
 		draw(cx,cy,cx+x,cy+y);
 

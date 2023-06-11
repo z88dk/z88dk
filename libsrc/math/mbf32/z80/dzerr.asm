@@ -1,4 +1,8 @@
 
-		PUBLIC	DZERR
+SECTION code_fp_mbf32
 
-DZERR:	ret
+PUBLIC  DZERR
+
+EXTERN  ARET
+
+defc DZERR = ARET

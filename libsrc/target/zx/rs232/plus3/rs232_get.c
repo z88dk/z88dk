@@ -15,7 +15,7 @@
 #include <rs232.h>
 
 
-uint8_t __FASTCALL__ rs232_get(uint8_t *char) 
+uint8_t __FASTCALL__ rs232_get(uint8_t *char)  __naked
 {	/* fastcall so implicit push */
 #asm
 

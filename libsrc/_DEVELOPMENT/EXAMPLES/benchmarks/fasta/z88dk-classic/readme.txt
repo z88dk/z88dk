@@ -10,7 +10,10 @@ To verify the correct result compile for the zx spectrum target
 and run in an emulator.
 
 classic/sccz80
-zcc +zx-vn -DSTATIC -DPRINTF -O2 fasta.c -o fasta -lm -lndos -pragma-define:USING_amalloc -create-app
+zcc +zx-vn -DSTATIC -DPRINTF -O2 fasta.c -o fasta --math-mbf32 -lndos -pragma-define:USING_amalloc -create-app
+
+classic/sccz80/8085
+zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 fasta.c -o fasta --math-mbf32_8085 -lndos -pragma-define:USING_amalloc -create-app
 
 classic/sccz80/math32
 zcc +cpm -vn -DSTATIC -DPRINTF -O2 fasta.c -o fasta --math32 -lndos -pragma-define:USING_amalloc -create-app
@@ -26,8 +29,11 @@ a binary ORGed at address 0 was produced.
 
 This simplifies the use of TICKS for timing.
 
-classic/sccz80
-zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 fasta.c -o fasta.bin -m -lm -lndos -pragma-define:USING_amalloc
+classic/sccz80/MBF32
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 fasta.c -o fasta.bin -m --math-mbf32 -lndos -pragma-define:USING_amalloc
+
+classic/sccz80/8085/MBF32
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 fasta.c -o fasta.bin -m --math-mbf32_8085 -lndos -pragma-define:USING_amalloc
 
 classic/sccz80/math32
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 fasta.c -o fasta.bin -m --math32 -lndos -pragma-define:USING_amalloc
@@ -40,7 +46,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks fasta.bin -start 0546 -end 05bc -counter 999999999999
+z88dk-ticks fasta.bin -x fasta.map -start TIMER_START -end TIMER_END -counter 999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -60,12 +66,20 @@ cycle count  = 248331410
 time @ 4MHz  = 248331410 / 4*10^6 = 62.08 sec
 
 
-Z88DK April 20, 2020
-classic/sccz80
-3291 bytes less page zero
+Z88DK December 12, 2022
+classic/sccz80/8085/MBF32
+4869 bytes less page zero
 
-cycle count  = 243021012
-time @ 4MHz  = 243021012 / 4*10^6 = 60.76 sec
+cycle count  = 206325540
+time @ 4MHz  = 206325540 / 4*10^6 = 51.58 sec
+
+
+Z88DK January 3, 2022
+classic/sccz80/MBF32
+4823 bytes less page zero
+
+cycle count  = 165102454
+time @ 4MHz  = 165102454 / 4*10^6 = 41.27 sec
 
 
 Z88DK April 20, 2020
@@ -74,4 +88,3 @@ classic/sccz80/math32
 
 cycle count  = 136057474
 time @ 4MHz  = 136057474 / 4*10^6 = 34.01 sec
-

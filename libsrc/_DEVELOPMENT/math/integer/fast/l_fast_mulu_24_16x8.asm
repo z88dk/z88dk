@@ -26,7 +26,7 @@ IF __CLIB_OPT_IMATH_FAST & $08
    ld a,e
    ld e,l
    ld d,h
-   
+
    ld c,0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -35,7 +35,7 @@ ELSE
 
    ld a,e
    ex de,hl
-   
+
    ld hl,0
    ld c,l
 
@@ -82,11 +82,11 @@ loop_00:
    add a,a
    ccf
    ret nc
-   
+
    xor a
    ld l,a
    ld h,a
-   
+
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -110,7 +110,7 @@ loop_11:
 
    add hl,hl
    rla
-   
+
    jr nc, loop_12
 
    add hl,de
@@ -120,7 +120,7 @@ loop_12:
 
    add hl,hl
    rla
-   
+
    jr nc, loop_13
 
    add hl,de
@@ -130,7 +130,7 @@ loop_13:
 
    add hl,hl
    rla
-   
+
    jr nc, loop_14
 
    add hl,de
@@ -140,7 +140,7 @@ loop_14:
 
    add hl,hl
    rla
-   
+
    jr nc, loop_15
 
    add hl,de
@@ -150,7 +150,7 @@ loop_15:
 
    add hl,hl
    rla
-   
+
    jr nc, loop_16
 
    add hl,de
@@ -160,7 +160,7 @@ loop_16:
 
    add hl,hl
    rla
-   
+
    jr nc, loop_17
 
    add hl,de
@@ -170,7 +170,7 @@ loop_17:
 
    add hl,hl
    rla
-   
+
    ret nc
 
    add hl,de
@@ -201,7 +201,7 @@ loop_00:
    xor a
    ld l,a
    ld h,a
-   
+
    ret
 
 ENDIF
@@ -211,7 +211,7 @@ loop_11:
 
    add hl,hl
    rla
-   
+
    jr nc, loop_01
 
    add hl,de
@@ -245,11 +245,11 @@ l1_fast_mulu_24_16x8:
    ;         carry reset
    ;
    ; uses  : af, c, de, hl
-   
+
    call l_fast_mulu_24_16x8
-   
+
    ld e,a
    ld d,c
-   
+
    xor a
    ret

@@ -48,6 +48,7 @@ ENDIF
 	ld	a,(SYSVAR_bank1)
 	ld	d,a		;Save the old bank value
 	ld	a,7
+        ld      (SYSVAR_bank1),a
 	out	($41),a
 IF NEEDplot
 	ld	a,e

@@ -6,7 +6,7 @@
 ; set up the frequency shifting parameters for synth_play
 ;
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
+IF !__CPU_GBZ80__
     SECTION    code_clib
 
     PUBLIC     synth_phase
@@ -24,25 +24,41 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
 synth_phase:
 _synth_phase:
-	ld	a,h
-	srl a
-	srl a
-	srl a
-	srl a
-	ld	(synth_phase_1),a
-	ld	a,h
-	and $0f
-	ld	(synth_phase_2),a
-	ld	a,l
-	srl a
-	srl a
-	srl a
-	srl a
-	ld	(synth_phase_3),a
-	ld	a,l
-	and $0f
-	ld	(synth_phase_4),a
-	ret
+    ld      a,h
+IF __CPU_INTEL__
+    rrca
+    rrca
+    rrca
+    rrca
+    and     15
+ELSE
+    srl     a
+    srl     a
+    srl     a
+    srl     a
+ENDIF
+    ld      (synth_phase_1),a
+    ld      a,h
+    and     $0f
+    ld      (synth_phase_2),a
+    ld      a,l
+IF __CPU_INTEL__
+    rrca
+    rrca
+    rrca
+    rrca
+    and     15
+ELSE
+    srl     a
+    srl     a
+    srl     a
+    srl     a
+ENDIF
+    ld      (synth_phase_3),a
+    ld      a,l
+    and     $0f
+    ld      (synth_phase_4),a
+    ret
 
 
 

@@ -46,13 +46,11 @@ RESULTS
 =======
 
 1.
-HITECH C CPM V309
-4056 bytes less cpm overhead
+HITECH C CPM V309-15
+5638 bytes exact
 
-cycle count  = 188751954
-time @ 4MHz  = 188751954 / 4*10^6 = 47.19 sec
-
-Very fast float library but only accurate for +-*/
+cycle count  = 189901647
+time @ 4MHz  = 189901647 / 4*10^6 = 47.4754 sec
 
 2.
 IAR Z80 V4.06A
@@ -82,24 +80,23 @@ time @ 4MHz  = 248331410 / 4*10^6 = 62.08 sec
 Internal 48-bit float implementation causes relative slowdown.
 
 5.
-SDCC 3.6.5 #9852 (MINGW64)
-6947 bytes less page zero
+SDCC 4.2.0 Linux
+5835 bytes less page zero
 
-cycle count  = 488970702
-time @ 4MHz  = 488970702 / 4*10^6 = 122.24 sec
+cycle count  = 373202979
+time @ 4MHz  = 373202979 / 4*10^6 = 93.30 sec
 
 Large size & slow speed largely due to float implementation in C.
-Bugged -DSTATIC prevents potentially faster version from compiling.
 
 6.
-Z88DK April 20, 2020
-sccz80 / classic c library
-3291 bytes less page zero
+Z88DK January 3, 2022
+sccz80 / classic c library / MBF32
+4823 bytes less page zero
 
-cycle count  = 243021012
-time @ 4MHz  = 243021012 / 4*10^6 = 60.76 sec
+cycle count  = 165102454
+time @ 4MHz  = 165102454 / 4*10^6 = 41.27 sec
 
-Internal 48-bit float implementation causes relative slowdown.
+Microsoft 32-bit float implementation.
 
 7.
 Z88DK April 20, 2020
@@ -119,6 +116,8 @@ sccz80 / new c library
 cycle count  = 204281085
 time @ 4MHz  = 204281085 / 4*10^6 = 51.07 sec
 
+Internal 48-bit float implementation causes relative slowdown.
+
 9.
 Z88DK April 20, 2020
 sccz80 / new c library / math32
@@ -129,12 +128,21 @@ time @ 4MHz  = 136057141 / 4*10^6 = 34.01 sec
 
 IEEE 32-bit float implementation.
 
-DQ.
-HITECH C MSDOS V750
+10.
+Z88DK December 12, 2022
+sccz80 / classic c library / 8085 / MBF32
+4869 bytes less page zero
+
+cycle count  = 206325540
+time @ 4MHz  = 206325540 / 4*10^6 = 51.58 sec
+
+Microsoft 32-bit float implementation.
+
+DISQ.
+HITECH C MSDOS V780pl2
 4121 bytes exact
 
 Disqualified due to incorrect results.
-HTC V750 does not have a functioning float library.
 
 
 BENCHMARKS GAME COMMENTS
@@ -143,7 +151,7 @@ BENCHMARKS GAME COMMENTS
 Variance
 --------
 
-Please don't optimize the cumulative-probabilities lookup (for example, by using a scaling factor) or naïve LCG arithmetic - those programs will not be accepted.
+Please don't optimize the cumulative-probabilities lookup (for example, by using a scaling factor) or naï¿½ve LCG arithmetic - those programs will not be accepted.
 
 How to implement
 ----------------
@@ -160,13 +168,13 @@ Each program should:
 
         match a random number against those cumulative probabilities to select each nucleotide (use linear search or binary search)
 
-        use this naïve linear congruential generator to calculate a random number each time a nucleotide needs to be selected (don't cache the random number sequence)
+        use this naï¿½ve linear congruential generator to calculate a random number each time a nucleotide needs to be selected (don't cache the random number sequence)
 
         IM = 139968
         IA = 3877
         IC = 29573
         Seed = 42
-         	
+
         Random (Max)
            Seed = (Seed * IA + IC) modulo IM
            = Max * Seed / IM

@@ -35,7 +35,5 @@ asm_zx_saddrpleft:
    ret nz
 
    inc l
-   ld e,$80
-   
-   scf 
+   rrc e ; set carry and restore $80 in e
    ret

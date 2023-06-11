@@ -55,8 +55,21 @@ typedef unsigned long long     uint_fast64_t;
 
 #endif
 
-#ifndef _INTPTR_T_DEFINED
-#define _INTPTR_T_DEFINED
+#ifdef __SCCZ80
+
+typedef long long              int64_t;
+typedef unsigned long long     uint64_t;
+
+typedef long long              int_least64_t;
+typedef unsigned long long     uint_least64_t;
+
+typedef long long              int_fast64_t;
+typedef unsigned long long     uint_fast64_t;
+
+#endif
+
+#ifndef _INTPTR_T
+#define _INTPTR_T
 typedef int                    intptr_t;
 #endif
 

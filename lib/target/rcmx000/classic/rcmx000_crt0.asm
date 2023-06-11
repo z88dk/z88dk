@@ -34,52 +34,46 @@
 ; Some general scope declarations
 ;-------
 
-        EXTERN    _main           ;main() is always external to crt0 code
+    EXTERN    _main           ;main() is always external to crt0 code
 
-	PUBLIC	__sendchar	;  Used by stdio
-	PUBLIC    __recvchar
-	
-        PUBLIC    cleanup         ;jp'd to by exit()
-        PUBLIC    l_dcal          ;jp(hl)
+    PUBLIC  __sendchar	;  Used by stdio
+    PUBLIC  __recvchar
 
-        defc    TAR__register_sp = -1
-        defc    TAR__clib_exit_stack_size = 0
+    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  l_dcal          ;jp(hl)
 
-        PUBLIC  __CPU_CLOCK
-        defc    __CPU_CLOCK = 6000000
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc    TAR__register_sp = -1
+    defc    TAR__clib_exit_stack_size = 0
+
+    PUBLIC  __CPU_CLOCK
+    defc    __CPU_CLOCK = 6000000
+    INCLUDE "crt/classic/crt_rules.inc"
 
 
-	org 0
+    org     0
 start:
-	; On this platform we are king of the road and may use
-	; any register for any purpose Wheee!!
-
-	include "target/rcmx000/classic/rcmx000_boot.asm"
-
-	call	crt0_init_bss
-
-        call    _main	;Call user program
+    ; On this platform we are king of the road and may use
+    ; any register for any purpose Wheee!!
+    ld      (__restore_sp_onexit),sp
+    include "target/rcmx000/classic/rcmx000_boot.asm"
+    call    crt0_init_bss
+    call    _main	;Call user program
         
 cleanup:
-	push	hl
+    push	hl
     call    crt0_exit
+    pop     bc
+__restore_sp_onexit:
+    ld      sp,0        ;Restore stack to some sane value
+
+    ; Puts us back into the monitor
+    call    8
+
+l_dcal:
+    jp      (hl)        ;Used for function pointer calls
 
 
-	pop	bc
-start1:	ld	sp,0		;Restore stack to some sane value
+    INCLUDE "crt/classic/crt_runtime_selection.asm"
 
-	; Puts us back into the monitor
-	call 8
-
-l_dcal:	jp	(hl)		;Used for function pointer calls
-
-
-	; Here is a great place to store temp variables and stuff!!
-acme:	defw 4711 			; useless arbitrarily choosen number
-
-
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-
-	INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.asm"
 

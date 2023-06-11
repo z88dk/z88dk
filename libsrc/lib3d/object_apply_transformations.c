@@ -6,7 +6,7 @@
 	Copyright (C) 2004  Rafael de Oliveira Jannone
 
 	Apply perspective transformations on object obj, centering the points around x and y
-	
+
 	$Id: object_apply_transformations.c,v 1.1 2009-04-10 12:47:42 stefano Exp $
 */
 

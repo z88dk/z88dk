@@ -90,57 +90,57 @@ RESULTS
 =======
 
 1.
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-7344 bytes less page zero
+Z88DK March 10, 2022
+classic/zsdcc #13131
+7882 bytes less page zero
 
-cycle count  = 248080263
-time @ 4MHz  = 248080263 / 4x10^6 = 62.0201 seconds
-dhrystones/s = 20000 / 62.0201 = 322.4763
-DMIPS        = 322.4763 / 1757 = 0.18354
+cycle count  = 251880052
+time @ 4MHz  = 251880052 / 4x10^6 = 62.97 seconds
+dhrystones/s = 20000 / 62.97 = 317.6115
+DMIPS        = 317.6115 / 1757 = 0.18077
 
 2.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library
-7163 bytes less page zero
+Z88DK March 10, 2022
+zsdcc #13131 / new c library
+7072 bytes less page zero
 
-cycle count  = 257100263
-time @ 4MHz  = 257100263 / 4x10^6 = 62.2751  seconds
-dhrystones/s = 20000 / 62.2107 = 311.1626
-DMIPS        = 311.1626 / 1757 = 0.1771
+cycle count  = 254720052
+time @ 4MHz  = 254720052 / 4x10^6 = 63.68 seconds
+dhrystones/s = 20000 / 63.68 = 314.0703
+DMIPS        = 314.0703 / 1757 = 0.1787
 
 3.
-HITECH C MSDOS V750
-7002 bytes exact
+HITECH C MSDOS V780pl2
+1895 bytes exact
 
-cycle count  = 288200126
-time @ 4MHz  = 288200126 / 4x10^6 = 72.0500 seconds
-dhrystones/s = 20000 / 72.0500 = 277.5849
-DMIPS        = 277.5849 / 1757 = 0.15799
+cycle count  = 280100135
+time @ 4MHz  = 280100135 / 4x10^6 = 70.0250 seconds
+dhrystones/s = 20000 / 70.0250 = 285.6121
+DMIPS        = 285.6121 / 1757 = 0.1625
 
 4.
-SDCC 3.6.5 #9842 (MINGW64)
-7013 bytes less page zero
+SDCC 4.2.0 Linux
+6825 bytes less page zero
 
-cycle count  = 292880320
-time @ 4MHz  = 292880320 / 4x10^6 = 73.22008  seconds
-dhrystones/s = 20000 / 73.2208 = 273.1464
-DMIPS        = 273.1464 / 1757 = 0.15546
+cycle count  = 225522684
+time @ 4MHz  = 225522684 / 4x10^6 = 56.3807 seconds
+dhrystones/s = 20000 / 56.3807 = 354.7315
+DMIPS        = 354.7315 / 1757 = 0.20189
 
 5.
 IAR Z80 V4.06A
 7371 bytes less small amount
 
 cycle count  = 306860580
-time @ 4MHz  = 306860580 / 4x10^6 = 76.7151  seconds
+time @ 4MHz  = 306860580 / 4x10^6 = 76.7151 seconds
 dhrystones/s = 20000 / 76.7151 = 260.7047
 DMIPS        = 260.7047 / 1757 = 0.14838
 
 6.
-HITECH C CPM V309
-7471 bytes less cpm overhead
+HITECH C CPM V309-15
+8988 bytes exact
 
-cycle count  = 354120220
-time @ 4MHz  = 354120220 / 4*10^6 = 88.53 sec
-dhrystones/s = 20000 / 88.53 = 225.9120
-DMIPS        = 225.9120 / 1757 = 0.12858
+cycle count  = 356235065
+time @ 4MHz  = 356235065 / 4*10^6 = 89.0588 sec
+dhrystones/s = 20000 / 89.0588 = 224.5708
+DMIPS        = 224.5708 / 1757 = 0.1278

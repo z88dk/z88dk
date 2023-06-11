@@ -1,4 +1,4 @@
-; KC Driver
+; VEB MPM KC Driver
 ;
 ; We need to be low in memory or we might get paged out
 ;
@@ -348,7 +348,7 @@ not_udg:
 	ld	l,a
 	call	print_half
 
-	; And now colour (again only KC82/2)
+	; And now colour (again only KC85/2)
 	pop	bc
 
 	call	cxypos
@@ -523,18 +523,17 @@ not_odd_lhs:
         ret
 
 	SECTION	code_crt_init
-
-	; Remove the cursor
-	ld	hl,0xffff
-	ld	(CURSO_COL),hl
-
+        ; initialize the kc_attr
+        ld      a,@01111000    ; white on black
+        ld      (kc_attr),a
+        ; check for <= 85/3 oder >= 85/4
 	ld	hl,$0001
 	call	PV1
 	defb	FNPADR
 	ld	l,0
 	ld	a,h
 	cp	$81
-	jr	nz,not_kc85_4
+	jr	nz,crt_init_not_kc85_4
 	inc	l
 	ld	a,(iy+1)
 	res	0,a	;display image 0
@@ -542,14 +541,27 @@ not_odd_lhs:
 	set	3,a	;disable hicolor
 	ld	(iy+1),a
 	out	($84),a
-not_kc85_4:
+crt_init_not_kc85_4:
 	ld	a,l
 	ld	(kc_type),a
 
 
+        SECTION code_crt_exit
+        ld      a,(kc_type)
+        and     a
+        jr      z,crt_exit_not_kc85_4
+        ; 85/4 needs to switch back to pixel memory  
+        ld      a,(iy+1)
+        res     1,a     ;access to pixel memory
+        ld      (iy+1),a
+        out     ($84),a
+crt_exit_not_kc85_4:
+        ld      a,$39   ; CAOS default color: white on blue
+        ld      (COLOR),a
+
 		SECTION bss_clib
 
-.kc_type	defb	0		;holds 1 for KC85/4
+.kc_type	defb	0		;holds 1 for >= KC85/4
 
 		SECTION	data_clib
 .kc_attr	defb @01111000

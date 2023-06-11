@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _atan
-EXTERN cam32_sdcc_atan
-defc _atan = cam32_sdcc_atan
+defc _atan = cam32_sccz80_atan
 ENDIF
 

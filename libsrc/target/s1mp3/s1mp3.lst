@@ -1,0 +1,4 @@
+@stdio/stdio.lst
+
+
+target/s1mp3/**/*.o

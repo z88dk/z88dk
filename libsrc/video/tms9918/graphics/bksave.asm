@@ -6,7 +6,7 @@
 ;        $Id: bksave.asm,v 1.7 2016-07-02 09:01:36 dom Exp $
 ;
 
-        SECTION smc_clib
+        SECTION smc_video_vdp
         
         PUBLIC  bksave
         PUBLIC  _bksave
@@ -15,12 +15,19 @@
         EXTERN  l_tms9918_enable_interrupts
         EXTERN  swapgfxbk
         EXTERN  __graphics_end
+        EXTERN  __tms9918_screen_mode
 
         INCLUDE "video/tms9918/vdp.inc"
 
         
 .bksave
 ._bksave
+       ld      a,(__tms9918_screen_mode)
+       cp      2
+       jr      z,dorender
+       cp      4
+       ret     nz
+dorender:
         push    ix        ;save callers
         call    swapgfxbk
         ld      hl,4

@@ -14,7 +14,7 @@ ide_read_byte:
     ld d, a                 ;copy address to D
     ld bc, __IO_PIO_IDE_CTL
     out (c), a              ;drive address onto control lines
-    or __IO_IDE_RD_LINE    
+    or __IO_PIO_IDE_RD_LINE    
     out (c), a              ;and assert read pin
     ld bc, __IO_PIO_IDE_LSB
     in e, (c)               ;read the lower byte

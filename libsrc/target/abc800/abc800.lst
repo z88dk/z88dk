@@ -1,0 +1,13 @@
+target/abc800/stdio/fgetc_cons
+target/abc800/stdio/fputc_cons
+target/abc800/stdio/getk
+@stdio/stdio.lst
+target/abc80/graphics/clsgraph
+target/abc80/graphics/pixel
+target/abc80/graphics/pointxy
+@gfx/narrow/gfx_narrow.lst
+games/obj/${TARGET}/joystick
+games/obj/${TARGET}/joystick_type
+target/abc800/abc800/abc_cursor
+target/abc800/abc800/abc_vdu
+

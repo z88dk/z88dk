@@ -28,6 +28,7 @@
 ; Coefficients for exp10f()
 ;-------------------------------------------------------------------------
 
+SECTION rodata_clib
 SECTION rodata_fp_math32
 
 PUBLIC _m32_coeff_exp10f

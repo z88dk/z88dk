@@ -68,9 +68,7 @@
 	push	hl
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	push	hl
 	ld	a,3
 	call	printf
@@ -140,9 +138,7 @@
 	push	hl
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	push	hl
 	ld	a,3
 	call	printf
@@ -155,6 +151,7 @@
 	pop	bc
 	pop	bc
 	ret
+
 
 
 	SECTION	rodata_compiler
@@ -206,6 +203,7 @@
 	GLOBAL	acosf16
 	GLOBAL	asinf16
 	GLOBAL	atanf16
+	GLOBAL	atan2f16
 	GLOBAL	cosf16
 	GLOBAL	sinf16
 	GLOBAL	tanf16
@@ -249,8 +247,8 @@
 	GLOBAL	frexp
 	GLOBAL	fabs
 	GLOBAL	fmod
-	GLOBAL	amax
-	GLOBAL	amin
+	GLOBAL	fmax
+	GLOBAL	fmin
 	GLOBAL	halfpi
 	GLOBAL	pi
 	GLOBAL	atof

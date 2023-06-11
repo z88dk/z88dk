@@ -1,6 +1,8 @@
-target/rc2014/driver/ram/c/sdcc/shadowread
-target/rc2014/driver/ram/c/sdcc/shadowread_callee
-target/rc2014/driver/ram/c/sdcc/shadowwrite
-target/rc2014/driver/ram/c/sdcc/shadowwrite_callee
+target/rc2014/driver/ram/c/sdcc/shadow_read
+target/rc2014/driver/ram/c/sdcc/shadow_read_callee
+target/rc2014/driver/ram/c/sdcc/shadow_write
+target/rc2014/driver/ram/c/sdcc/shadow_write_callee
+target/rc2014/driver/ram/c/sdcc/shadow_relocate
+target/rc2014/driver/ram/c/sdcc/shadow_relocate_fastcall
 
 @target/rc2014/driver/ram/ram_asm.lst

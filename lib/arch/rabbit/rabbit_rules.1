@@ -40,7 +40,7 @@
 	add	hl,sp
 	call	l_gint	;
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const
@@ -50,7 +50,7 @@
 	ld	h,(hl)
 	ld	l,a
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const
@@ -60,7 +60,7 @@
 	ld	b,(hl)
 	ld	hl,%2
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 	ld	c,l
 	ld	b,h
 	ld	hl,%2
@@ -84,9 +84,9 @@
 	ld	h,(hl)
 	ld	l,a
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 	inc	hl
-	ld	(sp + %1),hl
+	ld	(sp+%1),hl
 
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const
@@ -100,9 +100,9 @@
 	ld	h,(hl)
 	ld	l,a
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 	dec	hl
-	ld	(sp + %1),hl
+	ld	(sp+%1),hl
 
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const
@@ -112,13 +112,13 @@
 	call	l_pint
 =
 	ld	hl,%2
-	ld	(sp + %1),hl
+	ld	(sp+%1),hl
 
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
 	call	l_gintspsp	;
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 	push	hl
 
 %check 0 <= %1 <= 251
@@ -126,16 +126,16 @@
 	add	hl,sp
 	call	l_glong
 =
-	ld	hl,(sp + %1 + 2)
+	ld	hl,(sp+%eval(%1 2 +))
 	ex	de,hl
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 
 %check 0 <= %1 <= 253
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 
 %check 0 <= %1 <= 127
 	ld	hl,%1	;const
@@ -166,7 +166,7 @@
 	pop	bc
 	push	hl
 =
-	ld	(sp + 0),hl
+	ld	(sp+0),hl
 
 	srl	h
 	rr	l
@@ -228,13 +228,13 @@
 	pop	hl
 	push	hl
 =
-	ld	hl,(sp + 0)
+	ld	hl,(sp+0)
 
 	pop	bc
-	ld	hl,(sp + 0)
+	ld	hl,(sp+0)
 	push	bc
 =
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 
 ; bool clears the carry flag
 =

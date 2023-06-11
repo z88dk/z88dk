@@ -3,7 +3,7 @@ defc   __CONFIG_Z88DK_INC_ = 1
 
 ; Automatically Generated at Library Build Time
 
-defc __Z88DK = 1992
+defc __Z88DK = 2200
 defc __EMBEDDED_Z80 = 1
 
 defc __Z80 = 0x01
@@ -42,5 +42,8 @@ defc __CLIB_OPT_IMATH_SELECT_FAST_LSL = 0x04
 
 defc CHAR_CR = 13
 defc CHAR_LF = 10
+
+EXTERN  __IO_VDP_DATA
+
 ENDIF
 

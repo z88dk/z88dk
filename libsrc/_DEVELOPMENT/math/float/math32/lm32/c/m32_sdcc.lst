@@ -25,7 +25,6 @@ math/float/math32/lm32/c/sdcc/exp2
 math/float/math32/lm32/c/sdcc/exp2_fastcall
 math/float/math32/lm32/c/sdcc/exp10
 math/float/math32/lm32/c/sdcc/exp10_fastcall
-math/float/math32/lm32/c/sdcc/f32_fam9511
 math/float/math32/lm32/c/sdcc/fabs
 math/float/math32/lm32/c/sdcc/fabs_fastcall
 math/float/math32/lm32/c/sdcc/floor
@@ -54,11 +53,15 @@ math/float/math32/lm32/c/sdcc/___fsadd
 math/float/math32/lm32/c/sdcc/___fsadd_callee
 math/float/math32/lm32/c/sdcc/___fsdiv
 math/float/math32/lm32/c/sdcc/___fsdiv_callee
+math/float/math32/lm32/c/sdcc/___fseq
 math/float/math32/lm32/c/sdcc/___fseq_callee
+math/float/math32/lm32/c/sdcc/___fsgt
 math/float/math32/lm32/c/sdcc/___fsgt_callee
+math/float/math32/lm32/c/sdcc/___fslt
 math/float/math32/lm32/c/sdcc/___fslt_callee
 math/float/math32/lm32/c/sdcc/___fsmul
 math/float/math32/lm32/c/sdcc/___fsmul_callee
+math/float/math32/lm32/c/sdcc/___fsneq
 math/float/math32/lm32/c/sdcc/___fsneq_callee
 math/float/math32/lm32/c/sdcc/___fssub
 math/float/math32/lm32/c/sdcc/___fssub_callee
@@ -84,6 +87,8 @@ math/float/math32/lm32/c/sdcc/mul10u
 math/float/math32/lm32/c/sdcc/mul10u_fastcall
 math/float/math32/lm32/c/sdcc/mlib2d
 math/float/math32/lm32/c/sdcc/modf
+math/float/math32/lm32/c/sdcc/neg
+math/float/math32/lm32/c/sdcc/neg_fastcall
 math/float/math32/lm32/c/sdcc/poly
 math/float/math32/lm32/c/sdcc/poly_callee
 math/float/math32/lm32/c/sdcc/pow

@@ -19,20 +19,19 @@
 	defw	i_5
 	defw	3
 	defw	0
-	jp	i_3	;EOS
-.i_4
 	ld	hl,1	;const
 	push	hl
 	call	_dofunc
 	pop	bc
-	jp	i_3	;EOS
-.i_5
+	ret
+.i_6
 	ld	hl,1	;const
 	push	hl
 	call	_dofunc
 	pop	bc
 .i_3
 	ret
+
 
 
 

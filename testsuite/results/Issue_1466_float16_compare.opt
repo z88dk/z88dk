@@ -27,7 +27,7 @@
 	or	l
 	jp	z,i_2	;
 	call	_Yes
-	jp	i_3	;EOS
+	ret
 .i_2
 	call	_No
 .i_3
@@ -44,7 +44,7 @@
 	or	l
 	jp	z,i_4	;
 	call	_Yes
-	jp	i_5	;EOS
+	ret
 .i_4
 	call	_No
 .i_5
@@ -61,7 +61,7 @@
 	or	l
 	jp	z,i_6	;
 	call	_Yes
-	jp	i_7	;EOS
+	ret
 .i_6
 	call	_No
 .i_7
@@ -78,7 +78,7 @@
 	or	l
 	jp	z,i_8	;
 	call	_Yes
-	jp	i_9	;EOS
+	ret
 .i_8
 	call	_No
 .i_9
@@ -95,7 +95,7 @@
 	or	l
 	jp	z,i_10	;
 	call	_Yes
-	jp	i_11	;EOS
+	ret
 .i_10
 	call	_No
 .i_11
@@ -112,7 +112,7 @@
 	or	l
 	jp	z,i_12	;
 	call	_Yes
-	jp	i_13	;EOS
+	ret
 .i_12
 	call	_No
 .i_13
@@ -129,7 +129,7 @@
 	or	l
 	jp	z,i_14	;
 	call	_Yes
-	jp	i_15	;EOS
+	ret
 .i_14
 	call	_No
 .i_15
@@ -146,7 +146,7 @@
 	or	l
 	jp	z,i_16	;
 	call	_Yes
-	jp	i_17	;EOS
+	ret
 .i_16
 	call	_No
 .i_17
@@ -157,16 +157,14 @@
 ._eq_int
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	call	l_f16_sint2f
 	call	l_f16_eq
 	ld	a,h
 	or	l
 	jp	z,i_18	;
 	call	_Yes
-	jp	i_19	;EOS
+	ret
 .i_18
 	call	_No
 .i_19
@@ -186,7 +184,7 @@
 	or	l
 	jp	z,i_20	;
 	call	_Yes
-	jp	i_21	;EOS
+	ret
 .i_20
 	call	_No
 .i_21
@@ -208,7 +206,7 @@
 	or	l
 	jp	z,i_22	;
 	call	_Yes
-	jp	i_23	;EOS
+	ret
 .i_22
 	call	_No
 .i_23
@@ -219,15 +217,13 @@
 ._eq_float16
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	call	l_f16_eq
 	ld	a,h
 	or	l
 	jp	z,i_24	;
 	call	_Yes
-	jp	i_25	;EOS
+	ret
 .i_24
 	call	_No
 .i_25
@@ -238,9 +234,7 @@
 ._eq_int_r
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	ex	(sp),hl
 	call	l_f16_sint2f
 	call	l_f16_eq
@@ -248,7 +242,7 @@
 	or	l
 	jp	z,i_26	;
 	call	_Yes
-	jp	i_27	;EOS
+	ret
 .i_26
 	call	_No
 .i_27
@@ -272,7 +266,7 @@
 	or	l
 	jp	z,i_28	;
 	call	_Yes
-	jp	i_29	;EOS
+	ret
 .i_28
 	call	_No
 .i_29
@@ -293,7 +287,7 @@
 	or	l
 	jp	z,i_30	;
 	call	_Yes
-	jp	i_31	;EOS
+	ret
 .i_30
 	call	_No
 .i_31
@@ -304,15 +298,13 @@
 ._eq_float16_r
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	call	l_f16_eq
 	ld	a,h
 	or	l
 	jp	z,i_32	;
 	call	_Yes
-	jp	i_33	;EOS
+	ret
 .i_32
 	call	_No
 .i_33
@@ -329,7 +321,7 @@
 	or	l
 	jp	z,i_34	;
 	call	_Yes
-	jp	i_35	;EOS
+	ret
 .i_34
 	call	_No
 .i_35
@@ -346,7 +338,7 @@
 	or	l
 	jp	z,i_36	;
 	call	_Yes
-	jp	i_37	;EOS
+	ret
 .i_36
 	call	_No
 .i_37
@@ -363,7 +355,7 @@
 	or	l
 	jp	z,i_38	;
 	call	_Yes
-	jp	i_39	;EOS
+	ret
 .i_38
 	call	_No
 .i_39
@@ -380,7 +372,7 @@
 	or	l
 	jp	z,i_40	;
 	call	_Yes
-	jp	i_41	;EOS
+	ret
 .i_40
 	call	_No
 .i_41
@@ -399,7 +391,7 @@
 	or	l
 	jp	z,i_42	;
 	call	_Yes
-	jp	i_43	;EOS
+	ret
 .i_42
 	call	_No
 .i_43
@@ -418,7 +410,7 @@
 	or	l
 	jp	z,i_44	;
 	call	_Yes
-	jp	i_45	;EOS
+	ret
 .i_44
 	call	_No
 .i_45
@@ -437,7 +429,7 @@
 	or	l
 	jp	z,i_46	;
 	call	_Yes
-	jp	i_47	;EOS
+	ret
 .i_46
 	call	_No
 .i_47
@@ -456,7 +448,7 @@
 	or	l
 	jp	z,i_48	;
 	call	_Yes
-	jp	i_49	;EOS
+	ret
 .i_48
 	call	_No
 .i_49
@@ -467,16 +459,14 @@
 ._lt_int
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	call	l_f16_sint2f
 	call	l_f16_lt
 	ld	a,h
 	or	l
 	jp	z,i_50	;
 	call	_Yes
-	jp	i_51	;EOS
+	ret
 .i_50
 	call	_No
 .i_51
@@ -496,7 +486,7 @@
 	or	l
 	jp	z,i_52	;
 	call	_Yes
-	jp	i_53	;EOS
+	ret
 .i_52
 	call	_No
 .i_53
@@ -519,7 +509,7 @@
 	or	l
 	jp	z,i_54	;
 	call	_Yes
-	jp	i_55	;EOS
+	ret
 .i_54
 	call	_No
 .i_55
@@ -530,15 +520,13 @@
 ._lt_float16
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	call	l_f16_lt
 	ld	a,h
 	or	l
 	jp	z,i_56	;
 	call	_Yes
-	jp	i_57	;EOS
+	ret
 .i_56
 	call	_No
 .i_57
@@ -549,9 +537,7 @@
 ._lt_int_r
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	ex	(sp),hl
 	call	l_f16_sint2f
 	ex	(sp),hl
@@ -560,7 +546,7 @@
 	or	l
 	jp	z,i_58	;
 	call	_Yes
-	jp	i_59	;EOS
+	ret
 .i_58
 	call	_No
 .i_59
@@ -585,7 +571,7 @@
 	or	l
 	jp	z,i_60	;
 	call	_Yes
-	jp	i_61	;EOS
+	ret
 .i_60
 	call	_No
 .i_61
@@ -606,7 +592,7 @@
 	or	l
 	jp	z,i_62	;
 	call	_Yes
-	jp	i_63	;EOS
+	ret
 .i_62
 	call	_No
 .i_63
@@ -617,19 +603,18 @@
 ._lt_float16_r
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	call	l_f16_lt
 	ld	a,h
 	or	l
 	jp	z,i_64	;
 	call	_Yes
-	jp	i_65	;EOS
+	ret
 .i_64
 	call	_No
 .i_65
 	ret
+
 
 
 

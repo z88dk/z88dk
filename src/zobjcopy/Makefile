@@ -1,16 +1,9 @@
 #-----------------------------------------------------------------------------
 # zobjcopy - manipulate z80asm object files
-# Copyright (C) Paulo Custodio, 2011-2019
+# Copyright (C) Paulo Custodio, 2011-2022
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #-----------------------------------------------------------------------------
 PROJ		:= z88dk-zobjcopy
-
-# EXESUFFIX is passed when cross-compiling Win32 on Linux
-ifeq ($(OS),Windows_NT)
-  EXESUFFIX 		:= .exe
-else
-  EXESUFFIX 		?=
-endif
 
 include ../Make.common
 

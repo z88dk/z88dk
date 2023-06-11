@@ -4,15 +4,10 @@
 #include <string.h>
 
 #include "ticks.h"
-
-#if defined(_WIN32) || defined(WIN32)
-#ifndef strcasecmp
-#define strcasecmp(a,b) stricmp(a,b)
-#endif
-#endif
-
-
-
+#include "cpu.h"
+#include "debugger.h"
+#include "backend.h"
+#include "profiler.h"
 
 // fr = zero, ff&256 = carry, ff&128 = s/p
 
@@ -79,37 +74,39 @@
 
 #define INCW(a, b)              \
           st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : is8080() ? 5 : 6, \
-          ++b || a++
+          ++b || a++, \
+          fk = (a|b) == 0 ? 1 : 0
 
 #define DECW(a, b)              \
           st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : is8080() ? 5 : 6, \
-          b-- || a--
+          b-- || a--, \
+          fk = (a&b) == 0xff ? 1 : 0
 
 // TODO: Should affect alternate flags if altd
 #define INC(r)                  \
           st +=isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : 4, \
           ff= ff&256            \
-            | (fr= r= (fa= r)+(fb= 1))
+            | (fr= r= (fa= r)+(fb= 1)), fk = 0
 
 // TODO: Should affect alternate flags if altd
 #define DEC(r)                  \
           st +=isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : 4, \
           ff= ff&256            \
-            | (fr= r= (fa= r)+(fb= -1))
+            | (fr= r= (fa= r)+(fb= -1)), fk = 0
 
 // TODO: Should affect alternate flags if altd
 #define INCPI(a, b)             \
           st +=isez80() ? 5 : israbbit() ? 12 : 19, \
           fa= get_memory(t= (get_memory(pc++)^128)-128+(b|a<<8)), \
           ff= ff&256            \
-            | (fr= put_memory(t,fa+(fb=1)))
+            | (fr= put_memory(t,fa+(fb=1))), fk = 0
 
 // TODO: Should affect alternate flags if altd
 #define DECPI(a, b)             \
           st +=isez80() ? 5 : israbbit() ? 12 : 19, \
           fa= get_memory(t= (get_memory(pc++)^128)-128+(b|a<<8)), \
           ff= ff&256            \
-            | (fr= put_memory(t,fa+(fb=-1)))
+            | (fr= put_memory(t,fa+(fb=-1))), fk = 0
 
 #define ADDRRRR(a, b, c, d)     \
           st+= isez80() ? 1 :israbbit() ? 2 : is808x() ? 10 : isgbz80() ? 8 : 11,              \
@@ -183,30 +180,35 @@
           st+= n;               \
           if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= b)); \
           else fr= a= (ff= (fa= a)+(fb= b)); \
+          fk = 0; \
       } while (0)
 
 #define ADC(b, n)  do {         \
           st+= n;               \
           if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= b)+(ff_>>8&1)); \
           fr= a= (ff= (fa= a)+(fb= b)+(ff>>8&1)); \
+          fk = 0; \
         } while (0)
 
 #define SUB(b, n)  do {         \
           st+= n;               \
           if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= ~b)+1); \
           else fr= a= (ff= (fa= a)+(fb= ~b)+1); \
+          fk = 0; \
         } while (0)
 
 #define SBC(b, n) do {             \
           st+= n;               \
           if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= ~b)+(ff_>>8&1^1)); \
           else fr= a= (ff= (fa= a)+(fb= ~b)+(ff>>8&1^1)); \
+          fk = 0; \
         } while (0)
 
 #define AND(b, n) do {          \
           st+= n;               \
           if ( altd ) { fa_= ~(a_= ff_= fr_= a&b); fb_= 0;} \
           else { fa= ~(a= ff= fr= a&b);  fb= 0; } \
+          fk = 0; \
       } while (0)
 
 // TODO: Flags not right
@@ -218,6 +220,7 @@
             fa= ~(r1= ff= fr= r1&r2);    \
             fb= 0;                       \
           }                              \
+          fk = 0; \
         } while (0)
 
 
@@ -232,6 +235,7 @@
               | (ff= fr= a^= b);     \
             fb= 0;                   \
           }                          \
+          fk = 0; \
         } while (0)
 
 #define OR(b, n) do {                  \
@@ -245,13 +249,14 @@
               | (ff= fr= a|= b);       \
             fb= 0;                     \
           } \
+          fk = 0; \
         } while (0)
 
 // TODO: Flags not right
 #define OR2(r1, r2)             \
           fa= 256               \
             | (ff= fr= r1|= r2),  \
-          fb= 0
+          fb= 0, fk=0
 
 #define CP(b, n)                \
           st+= n,               \
@@ -528,6 +533,7 @@ unsigned short
       , fb_= 0
       , fr= 0
       , fr_= 0
+      , fk = 0
       ;
 long long
         st= 0
@@ -574,9 +580,10 @@ char   cmd_arguments[255];
 int    cmd_arguments_len = 0;
 
 int    ioport = -1;
-int    c_cpu = CPU_Z80;
 int    rom_size = 0;
 int    rc2014_mode = 0;
+int    c_autolabel = 0;
+int    break_required = 0;
 
 static const uint8_t mirror_table[] = {
     0x0, 0x8, 0x4, 0xC,  /*  0-3  */
@@ -635,14 +642,46 @@ void out(int port, int value){
 }
 
 int f(void){
-  return  ff & 168  // S, 5, 3: bits 7, 5, 3
-        | ff >> 8 & 1 // C bit 0, so value 256
-        | !fr << 6    // Z, bit 6
-        | fb >> 8 & 2 // N (subtract flag) bit 1, value 512
-        | (fr ^ fa ^ fb ^ fb >> 8) & 16 // H (half carry) bit 4
-        | (fa & -256 
-            ? 154020 >> ((fr ^ fr >> 4) & 15)
-            : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4; // P/V bit 2
+    if ( is8085() ) {
+        int pv = (fa & -256
+                ? 154020 >> ((fr ^ fr >> 4) & 15)
+                : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4;
+
+        // bit 0 = carry
+        // bit 1 = V
+        // bit 2 = parity
+        // bit 3 = 0
+        // bit 4 = half carry
+        // bit 5 = K
+        // bit 6 = zero
+        // bit 7 = S
+        return  ff & 128  // S bit 7
+            | ff >> 8 & 1 // C bit 0, so value 256
+            | !fr << 6    // Z, bit 6
+            | fk << 5     // K, bit 5
+            | (fr ^ fa ^ fb ^ fb >> 8) & 16 // H (half carry) bit 4
+            | pv            // bit 2 parity
+            | pv >> 1       // bit 1 v (cheat)
+            ;
+    } else {
+        // bit 0 = carry
+        // bit 1 = N (subtract flag)
+        // bit 2 = P/V
+        // bit 3 = copy of A
+        // bit 4 = H half carry
+        // bit 5 = copy of A
+        // bit 6 = Z
+        // bit 7 = S sign flag
+      return  ff & 168  // S, 5, 3: bits 7, 5, 3
+            | ff >> 8 & 1 // C bit 0, so value 256
+            | !fr << 6    // Z, bit 6
+            | fb >> 8 & 2 // N (subtract flag) bit 1, value 512
+            | (fr ^ fa ^ fb ^ fb >> 8) & 16 // H (half carry) bit 4
+            | (fa & -256
+                ? 154020 >> ((fr ^ fr >> 4) & 15)
+                : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4; // P/V bit 2
+                ;
+    }
 }
 
 int f_(void){
@@ -660,24 +699,25 @@ void setf(int a){
   fr= ~a & 64;
   ff= a|= a<<8;
   fa= 255 & (fb= a & -129 | (a&4)<<5);
+  fk= (a&0x20)>>5;  // 8085 flag
 }
 
-
+extern backend_t ticks_debugger_backend;
 
 int main (int argc, char **argv){
-  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0;
+  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0, symbol_addr = -1;
   char * output= NULL;
   char  *memory_model = "standard";
   FILE * fh;
 
   hook_init();
-  debugger_init();
+  set_backend(ticks_debugger_backend);
   apu_reset();
 
   tapbuf= (unsigned char *) malloc (0x20000);
   if( argc==1 )
-    printf("Ticks v0.14c beta, a silent Z80 emulator by Antonio Villena, 10 Jan 2013\n\n"),
-    printf("  ticks [-pc X] [-start X] [-end X] [-counter X] [-output <file>] <input_file>\n\n"),
+    printf("z88dk-ticks is derived from a silent Z80 emulator by Antonio Villena (v0.14c beta)\n\n"),
+    printf("  z88dk-ticks [-x <file>] [-pc X] [-start X] [-end X] [-counter X] [-output <file>] <input_file>\n\n"),
     printf("  <input_file>   File between 1 and 65536 bytes with Z80 machine code\n"),
     printf("  -tape <file>   emulates ZX tape in port $FE from a .WAV file\n"),
     printf("  -trace         outputs register values and disassembly while executing\n"),
@@ -686,8 +726,8 @@ int main (int argc, char **argv){
     printf("  -end X         X in hexadecimal is the PC condition to exit\n"),
     printf("  -counter X     X in decimal is another condition to exit\n"),
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n"),
-    printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
     printf("  -d             Enable debugger\n"),
+    printf("  -v             Verbose logging\n"),
     printf("  -l X           Load file to address\n"),
     printf("  -b <model>     Memory model (zxn/zx/z180)\n"),
     printf("  -m8080         Emulate an 8080\n"),
@@ -695,18 +735,20 @@ int main (int argc, char **argv){
     printf("  -mgbz80        Emulate a gbz80 (mostly)\n"),
     printf("  -mz80          Emulate a z80\n"),
     printf("  -mz180         Emulate a z180\n"),
-    printf("  -mr2k          Emulate a Rabbit 2000\n"),
+    printf("  -mr2ka         Emulate a Rabbit 2000\n"),
     printf("  -mr3k          Emulate a Rabbit 3000\n"),
     printf("  -mz80n         Emulate a Spectrum Next z80n\n"),
     printf("  -mez80         Emulate an ez80 (z80 mode)\n"),
-    printf("  -x <file>      Symbol file to read\n"),
     printf("  -ide0 <file>   Set file to be ide device 0\n"),
     printf("  -ide1 <file>   Set file to be ide device 1\n"),
     printf("  -iochar X      Set port X to be character input/output\n"),
     printf("  -output <file> dumps the RAM content to a 64K file\n"),
-    printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n\n"),
-    printf("  Default values for -pc, -start and -end are 0000 if ommited. When the program "),
-    printf("exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
+    printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n"),
+    printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
+    printf("  -x <file>      Symbol or map file to read\n"),
+    printf("                 Use before -pc,-start,-end to enable symbols\n\n"),
+    printf("  Default values for -pc, -start and -end are 0000 if omitted.\n"),
+    printf("  When the program exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
     exit(0);
   while (argc > 1){
     if( argv[1][0] == '-' && argv[2] )
@@ -719,13 +761,16 @@ int main (int argc, char **argv){
           memory_model = argv[1];
           break;
         case 'p':
-          pc= strtol(argv[1], NULL, 16);
+          symbol_addr= symbol_resolve(argv[1], NULL);
+          pc= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 's':
-          start= strtol(argv[1], NULL, 16);
+          symbol_addr= symbol_resolve(argv[1], NULL);
+          start= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 'e':
-          end= strtol(argv[1], NULL, 16);
+          symbol_addr= symbol_resolve(argv[1], NULL);
+          end= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 'r':
           rom_size= strtol(argv[1], NULL, 16);
@@ -750,6 +795,12 @@ int main (int argc, char **argv){
           break;
         case 'd':
           debugger_active = 1;
+          debugger_init();
+          argv--;
+          argc++;
+          break;
+        case 'v':
+          verbose = 1;
           argv--;
           argc++;
           break;
@@ -768,10 +819,10 @@ int main (int argc, char **argv){
           } else if ( strcmp(&argv[0][1],"mz80n") == 0 ) {
             c_cpu = CPU_Z80N;
             memory_model = "zxn";
-          } else if ( strcmp(&argv[0][1],"mr2k") == 0 ) {
-            c_cpu = CPU_R2K;
+          } else if ( strcmp(&argv[0][1],"mr2ka") == 0 ) {
+            c_cpu = CPU_R2KA;
           } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
-            c_cpu = CPU_R2K;
+            c_cpu = CPU_R3K;
           } else if ( strcmp(&argv[0][1],"mez80") == 0 ) {
             c_cpu = CPU_EZ80;
           } else if ( strcmp(&argv[0][1],"mgbz80") == 0 ) {
@@ -991,8 +1042,13 @@ int main (int argc, char **argv){
 
 
   do{
-    char buf[256];
-    if ( ih ) debugger();
+    if ( ih ) {
+        if (break_required) {
+            break_required = 0;
+            debugger_request_a_break();
+        }
+        debugger();
+    }
     if( pc==start )
       st= 0,
       stint= intr,
@@ -1411,6 +1467,7 @@ int main (int argc, char **argv){
           fb= fb      &128
             | (fa^fr) & 16;
         }
+        fk=0;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x17: // RLA,  (EZ80) ld de,(ix+d) (prefixed)
         if ( isez80() && ih == 0 ) {
@@ -1441,6 +1498,7 @@ int main (int argc, char **argv){
           fb= fb      & 128
             | (fa^fr) &  16;
         }
+        fk=0;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1f: // RRA / (EZ80) ld (ix+d),de (prefixed)
         if ( isez80() && ih == 0 ) {
@@ -1469,6 +1527,7 @@ int main (int argc, char **argv){
           fb= fb      &128
             | (fa^fr) & 16;
         }
+        fk=0;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x09: // ADD HL,BC // ADD IX,BC // ADD IY,BC
         if( ih ) {
@@ -3019,9 +3078,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xdd: // OP DD
         if ( is8085() ) { // (8085) JP NK,nnnn (JNK nnnn)
-          // K flag is bit 5 of flags (not emulated since we don't use it)
-          pc+=2;
-          st+=7;
+          JPC(fk);
         } else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xDD\n",pc-1);
           st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : 17;
@@ -3039,9 +3096,7 @@ int main (int argc, char **argv){
         break;
       case 0xfd: // OP FD
         if ( is8085() ) { // (8085) JP K,nnnn (JK nnnn)
-          // K flag is bit 5 of flags (not emulated since we don't use it)
-          pc+=2;
-          st+=7;
+          JPCI(fk);
         } else if ( is808x() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xFD\n",pc-1);
           st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : 17;
@@ -4639,6 +4694,7 @@ int main (int argc, char **argv){
     }
   } while ( pc != end && st < counter  );
   if ( alarmtime != 0 ) {
+     if ( rc2014_mode ) exit(l);
       /* We running as a test, we should never reach the end, so exit with error */
       exit(1);
   }
@@ -4646,6 +4702,10 @@ int main (int argc, char **argv){
     sttap= st+( tap= tapcycles() );
   if ( counter != -1 )
     printf("%llu\n", st);
+  warn_existing_temp_breakpoints();
+  if (profiler_enabled) {
+      profiler_stop();
+  }
   if( output ){
     fh= fopen(output, "wb+");
     if( !fh )

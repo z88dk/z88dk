@@ -24,6 +24,7 @@ asm_zx_saddrcright:
    ;
    ; uses  : af, hl
 
+   or a
    inc l
    ret nz
    
@@ -32,7 +33,5 @@ asm_zx_saddrcright:
    ld h,a
 
    and $18
-   cp $18
-
-   ccf
+   add a,$e8
    ret

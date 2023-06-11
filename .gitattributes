@@ -1,4 +1,3 @@
-*.pdf   binary
 *.asm   text eol=lf
 *.bmk   text eol=lf
 *.c     text eol=lf
@@ -11,16 +10,20 @@
 *.lst   text eol=lf
 *.md    text eol=lf
 *.opt   text eol=lf
+*.pdf   binary
 *.pl    text eol=lf
-*.py    text eol=lf
 *.pm    text eol=lf
+*.py    text eol=lf
+*.re    text eol=lf
 *.rl    text eol=lf
-*.t     text eol=lf
 *.sh    text eol=lf
+*.t     text eol=lf
 *.tt    text eol=lf
 *.txt   text eol=lf
+*.vcxproj text eol=crlf
+*.vcxproj.filters text eol=crlf
 *.yaml  text eol=lf
+*.yml   text eol=lf
 Makefile text eol=lf
 README* text eol=lf
 readme* text eol=lf
-*.vcxproj text eol=crlf

@@ -280,6 +280,10 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                 exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
             }
         }
+        if (zxt->usr_address == -1 )
+        {
+          zxt->usr_address = pos;
+        }
 
         if ((fpin = fopen_bin(zxc->binname, zxc->crtfile)) == NULL) {
             exit_log(1, "Can't open input file %s\n", zxc->binname);
@@ -350,7 +354,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
             writebyte_p(0xf9, fpout, &zxt->parity);       /* RANDOMIZE */
             writebyte_p(0xc0, fpout, &zxt->parity);       /* USR */
             writebyte_p(0xb0, fpout, &zxt->parity);       /* VAL */
-            sprintf(mybuf, "\"%i\"", (int)pos);      /* Location for USR */
+            sprintf(mybuf, "\"%i\"", zxt->usr_address);      /* Location for USR */
             writestring_p(mybuf, fpout, &zxt->parity);
             writebyte_p(0x0d, fpout, &zxt->parity);       /* ENTER (end of BASIC line) */
             writebyte_p(zxt->parity, fpout, &zxt->parity);
@@ -515,7 +519,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                     writebyte_p(0xf9, fpout, &zxt->parity);       /* RANDOMIZE */
                     writebyte_p(0xc0, fpout, &zxt->parity);       /* USR */
                     writebyte_p(0xb0, fpout, &zxt->parity);       /* VAL */
-                    sprintf(mybuf, "\"%i\"", (int)pos);           /* Location for USR */
+                    sprintf(mybuf, "\"%i\"", zxt->usr_address);           /* Location for USR */
                     writestring_p(mybuf, fpout, &zxt->parity);
                     writebyte_p(0x0d, fpout, &zxt->parity);       /* ENTER (end of BASIC line) */
                     writebyte_p(zxt->parity, fpout, &zxt->parity);
@@ -790,27 +794,32 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
     struct section_bin *sb;
     int section_num;
 
-    char outname[9];
-    char outnamex[13];
+    char *dirname;
+    char outname[FILENAME_MAX+1];
+    char blockname[8+1];
+    char outnamex[FILENAME_MAX+1];
 
     int c;
     int z_dtx_filename, z_alt_filename;
 
     // determine output filename
 
-    if (zxc->outfile == NULL)
-        sprintf(outname, "%.8s", zxc->binname);
-    else
-        sprintf(outname, "%.8s", zxc->outfile);
-
-    suffix_change(outname, "");
+    if (zxc->outfile == NULL) {
+        snprintf(blockname, sizeof(blockname), "%.8s", zbasename(zxc->binname));
+                dirname = zdirname(zxc->binname);
+    } else {    
+        snprintf(blockname, sizeof(blockname), "%.8s", zbasename(zxc->outfile));
+          dirname = zdirname(zxc->outfile);
+    }
+    suffix_change(blockname, "");
 
     // truncate output filename to eight characters
+    blockname[8] = 0;
+    for (c = 0; blockname[c]; ++c)
+        blockname[c] = toupper(blockname[c]);
 
-    outname[8] = 0;
-    for (c = 0; outname[c]; ++c)
-        outname[c] = toupper(outname[c]);
-
+    snprintf(outname,sizeof(outname),"%s/%s",dirname,blockname);
+    
     // generate the dot command from section CODE
 
     if (mb_find_section(memory, "CODE", &mb, &section_num) == 0)
@@ -843,8 +852,7 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
             remove(outname);
             exit_log(1, "Error: Section MAIN not found\n");
         }
-
-        sprintf(outnamex, "%s.X", outname);
+        snprintf(outnamex,sizeof(outnamex),"%s/%s.X",dirname,blockname);
 
         sb = &mb->secbin[section_num];
 
@@ -2196,6 +2204,10 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *m
             exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
         }
     }
+    if (zxt->usr_address == -1 )
+    {
+      zxt->usr_address = (int)origin;
+    }
 
     if ((fpin = fopen_bin(zxc->binname, zxc->crtfile)) == NULL) {
         exit_log(1,"Can't open input file %s\n", zxc->binname);
@@ -2250,7 +2262,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *m
     writebyte_b(0xf9, &ptr);	/* RANDOMIZE */
     writebyte_b(0xc0, &ptr);	/* USR */
     writebyte_b(0xb0, &ptr);	/* VAL */
-    snprintf(tbuf,sizeof(tbuf), "\"%i\"", (int)origin);           /* Location for USR */
+    snprintf(tbuf,sizeof(tbuf), "\"%i\"", zxt->usr_address);           /* Location for USR */
     writestring_b(tbuf, &ptr);
     writebyte_b(':', &ptr);
     writebyte_b(234, &ptr);      /* REM */

@@ -39,10 +39,10 @@ asm_strndup:
    ;           bc = min(strlen(s)+1, n+1)
    ;
    ; uses  : af, bc, de, hl
-   
+
    push hl                     ; save char *s
-   
+
    call asm_strlen             ; hl = strlen(s)
    call l_minu_bc_hl           ; hl = min(strlen, n)
-   
+
    jp asm0_strdup

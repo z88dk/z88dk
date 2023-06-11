@@ -3,17 +3,17 @@
 ; 8080  47    52
 ; 8085  48    51
 ; gbz80 36    44
-; r2k    4     4
+; r2ka   4     4
 ; z180  10    10
 ; z80   15    15
 ; z80n  15    15
 
-      SECTION  code_crt0_sccz80
-      PUBLIC   __z80asm__adc_hl_bc
+        SECTION code_l_sccz80
+        PUBLIC  __z80asm__adc_hl_bc
 
 __z80asm__adc_hl_bc:
-      jr    nc, carry0
-      inc   hl
+        jr      nc, carry0
+        inc     hl
 carry0:
-      add   hl, bc
-      ret   
+        add     hl, bc
+        ret

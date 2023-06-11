@@ -147,7 +147,11 @@ void write_defined(char *sname, int32_t value, int export)
     fprintf(fp,"\nIF !DEFINED_%s\n",sname);
     fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
 	if (export) fprintf(fp, "\tPUBLIC\t%s\n", sname);
-    fprintf(fp,"\tdefc %s = %0#x\n",sname,value);
+    if ( value < 0 ) {
+        fprintf(fp,"\tdefc %s = %d\n",sname,value);
+    } else {
+        fprintf(fp,"\tdefc %s = %0#x\n",sname,value);
+    }
     fprintf(fp,"\tIFNDEF %s\n\tENDIF\n",sname);
     fprintf(fp,"ENDIF\n\n");
     fclose(fp);
@@ -346,12 +350,18 @@ int main(int argc, char **argv)
         ptr = skip_ws(buf);
         if ( strncmp(ptr,"#pragma", 7) == 0 ) {
             int  ol = 1;
+
+            if ( ptr[7] == '-' )
+                ptr++;
             ptr = skip_ws(ptr + 7);
          
             if ( ( strncmp(ptr, "output",6) == 0 ) || ( strncmp(ptr, "define",6) == 0 ) || ( strncmp(ptr, "export",6) == 0 ) ) {
                 char *offs;
                 int   value = 0;
-				int   exp = strncmp(ptr, "export",6) == 0;
+                int   exp = strncmp(ptr, "export",6) == 0;
+
+                if (ispunct(ptr[6]))
+                    ptr++;
 
                 ptr = skip_ws(ptr+6);
                 
@@ -369,6 +379,9 @@ int main(int argc, char **argv)
             } else if ( strncmp(ptr, "redirect",8) == 0 ) {
                 char *offs;
                 char *value = "0";
+
+                if (ispunct(ptr[8]))
+                    ptr++;
                 ptr = skip_ws(ptr+8);
                 if ( (offs = strchr(ptr+1,'=') ) != NULL  ) {
                     value = offs + 1;
@@ -385,7 +398,7 @@ int main(int argc, char **argv)
                 write_defined("CLIB_OPT_SCANF_2", (int32_t)((value >> 32) & 0xffffffff), 0);
             } else if ( strncmp(ptr,"string",6) == 0 ) {
                 write_pragma_string(ptr + 6);
-            } else if ( strncmp(ptr, "data", 4) == 0 ) {
+            } else if ( strncmp(ptr, "data", 4) == 0 && isspace(*(ptr+4)) ) {
                 write_bytes(ptr + 4, 1);
             } else if ( strncmp(ptr, "byte", 4) == 0 ) {
                 write_bytes(ptr + 4, 0);

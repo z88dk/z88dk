@@ -9,11 +9,12 @@ PUBLIC strnchr_callee
 EXTERN asm_strnchr
 
 strnchr_callee:
-   pop af
+
+   pop hl
    pop de
    pop bc
-   pop hl
-   push af
+   ex (sp),hl
+
    jp asm_strnchr
 
 ; SDCC bridge for Classic

@@ -4,14 +4,14 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_small_divu_64_64x64
+PUBLIC l_fast_divu_64_64x64
 
 EXTERN l_setmem_hl, error_divide_by_zero_mc
 EXTERN l0_fast_divu_32_32x32
 
-l_small_divu_64_64x64:
+l_fast_divu_64_64x64:
 
-   ; unsigned 64-bit division
+   ; unsigned "fast" 64-bit division (copied from small)
    ;
    ; enter :      +------------------------
    ;              | +15 

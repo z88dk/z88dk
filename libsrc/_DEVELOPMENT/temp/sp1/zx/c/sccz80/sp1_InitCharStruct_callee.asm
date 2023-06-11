@@ -21,4 +21,15 @@ sp1_InitCharStruct_callee:
    pop de
    ex (sp),hl
 
-   jp asm_sp1_InitCharStruct
+;   jp asm_sp1_InitCharStruct
+   push ix
+   call asm_sp1_InitCharStruct
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_InitCharStruct_callee
+defc _sp1_InitCharStruct_callee = sp1_InitCharStruct_callee
+ENDIF
+

@@ -17,7 +17,7 @@ PUBLIC asm_mtx_trylock
 EXTERN __thrd_id, thrd_success, thrd_error, thrd_busy
 EXTERN asm_spinlock_acquire, error_einval_mc
 
-asm_mtx_trylock:
+.asm_mtx_trylock
 
    ; enter : hl = mtx_t *m
    ;
@@ -48,14 +48,14 @@ asm_mtx_trylock:
    dec hl
    
    or a
-   jp z, error_einval_mc       ; if mutex is invalid
+   jp Z, error_einval_mc       ; if mutex is invalid
    
    ld a,(__thrd_id)            ; thread id
    
    cp (hl)                     ; compare against current mutex owner
    inc hl                      ; hl = & mutex_type
 
-   jr z, mutex_owned           ; if thread owns mutex already
+   jr Z, mutex_owned           ; if thread owns mutex already
 
    inc hl
    inc hl                      ; hl = & m->spinlock
@@ -68,9 +68,9 @@ asm_mtx_trylock:
    
    ld a,(hl)
    or a
-   jr z, mutex_acquired        ; if mutex not currently owned
+   jr Z, mutex_acquired        ; if mutex not currently owned
 
-trylock_failed:
+.trylock_failed
 
    inc hl
    inc hl
@@ -82,7 +82,7 @@ trylock_failed:
    scf
    ret
 
-mutex_acquired:
+.mutex_acquired
 
    ld a,(__thrd_id)            ; thread id
    
@@ -98,15 +98,22 @@ mutex_acquired:
    
    jr trylock_success
 
-mutex_owned:
+.mutex_owned
 
    ; hl = & m->mutex_type
    ; carry reset
 
+IF __CPU_INTEL__
+   ld a,(hl)                  ; test recursive bit on type
+   rrca
+   rrca
+   jr NC, trylock_success
+ELSE
    bit 1,(hl)                  ; test recursive bit on type
-   jr z, trylock_success
+   jr Z, trylock_success
+ENDIF
 
-recursive:
+.recursive
 
    inc hl                      ; hl = & m->lock_count
    
@@ -121,7 +128,7 @@ recursive:
    scf
    ret
 
-trylock_success:
+.trylock_success
 
    ld hl,thrd_success
    ret

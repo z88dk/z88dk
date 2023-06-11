@@ -3,7 +3,7 @@
 ; QSORT - compiled, then hand-adjusted
 ; Stefano, 29/10/2010
 ;
-; $Id: qsort_callee.asm,v 1.4 2016-03-04 23:48:13 dom Exp $
+; $Id: qsort_callee.asm $
 ;
 ; Original code taken from the BDS C by Leor Zolman
 ;
@@ -24,6 +24,16 @@
 ;        }
 ;  }
 ;}
+
+
+
+IF __CPU_GBZ80__ || __CPU_INTEL__
+;---------------------------------------------
+
+
+ELSE
+;---------------------------------------------
+
 
 SECTION code_clib
 PUBLIC qsort_sdcc_callee
@@ -189,3 +199,6 @@ SECTION bss_clib
 ._base   defs  2
 ; ._ngap defs  2
 ._gap defs  2
+
+
+ENDIF

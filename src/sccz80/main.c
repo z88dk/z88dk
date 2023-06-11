@@ -3,7 +3,6 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.42 2016-09-01 04:08:32 aralbrec Exp $
  */
 
 #include "../config.h"
@@ -17,6 +16,7 @@ static char   *c_output_extension = "asm";
 static char   *c_output_file = NULL;
 static char    c_debug_adb_file = 0;
 static char    c_debug_adb_defc = 0;
+       char    c_debug_entry_points = 0;
 
 static int      gargc; /* global copies of command line args */
 static char   **gargv;
@@ -39,6 +39,7 @@ int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 int c_disable_builtins = 0;
 int c_cline_directive = 0;
 int c_cpu = CPU_Z80;
+int c_params_offset = 2;
 int c_old_diagnostic_fmt = 0;
 char *c_zcc_opt = "zcc_opt.def";
 
@@ -88,15 +89,17 @@ static option  sccz80_opts[] = {
     { 0, "", OPT_HEADER, "CPU Targetting:", NULL, NULL, 0 },
     { 0, "m8080", OPT_ASSIGN|OPT_INT, "Generate output for the i8080", &c_cpu, NULL, CPU_8080 },
     { 0, "m8085", OPT_ASSIGN|OPT_INT, "Generate output for the i8085", &c_cpu, NULL, CPU_8085 },
+    { 0, "mez80_z80", OPT_ASSIGN|OPT_INT, "Generate output for the ez80 in z80 mode", &c_cpu, NULL, CPU_EZ80_Z80 },
     { 0, "mz80", OPT_ASSIGN|OPT_INT, "Generate output for the z80", &c_cpu, NULL, CPU_Z80 },
     { 0, "mz80n", OPT_ASSIGN|OPT_INT, "Generate output for the z80n", &c_cpu, NULL, CPU_Z80N },
     { 0, "mz180", OPT_ASSIGN|OPT_INT, "Generate output for the z180", &c_cpu, NULL, CPU_Z180 },
-    { 0, "mr2k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000", &c_cpu, NULL, CPU_R2K },
+    { 0, "mr2ka", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000A", &c_cpu, NULL, CPU_R2KA },
     { 0, "mr3k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 3000", &c_cpu, NULL, CPU_R3K },
     { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the Gameboy Z80", &c_cpu, NULL, CPU_GBZ80 },
     { 0, "", OPT_HEADER, "Code generation options", NULL, NULL, 0 },
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, NULL, 0 },
     { 0, "disable-builtins", OPT_BOOL|OPT_DOUBLE_DASH, "Disable builtin functions",&c_disable_builtins, NULL, 0},
+    { 0, "params-offset", OPT_INT, "=<num> Base offset for the function parameters (default: 2)",&c_params_offset,NULL, 0},
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, NULL, 0 },
     { 0, "math-z88", OPT_ASSIGN|OPT_INT, "(deprecated) Make FP constants match z88", &c_maths_mode, NULL, MATHS_Z88 },
 
@@ -265,9 +268,8 @@ int main(int argc, char** argv)
 
     if ( c_debug_adb_file || c_debug_adb_defc ) {
         c_cline_directive = 1;
-        // Turn on the framepointer entry so we can get local variables
-        if ( !IS_808x() && !IS_GBZ80() && c_framepointer_is_ix == -1 ) {
-            c_framepointer_is_ix = 1;
+        if ( c_framepointer_is_ix == -1 ) {
+            c_debug_entry_points = 1;
         }
     }
 
@@ -275,6 +277,11 @@ int main(int argc, char** argv)
     if ( c_cpu == CPU_8080 ) {
         c_notaltreg = 1;
         WriteDefined("CPU_8080", 1);
+    }
+
+    if ( c_cpu == CPU_8085 ) {
+        c_notaltreg = 1;
+        WriteDefined("CPU_8085", 1);
     }
 
     if ( c_cpu == CPU_GBZ80 ) {
@@ -294,6 +301,8 @@ int main(int argc, char** argv)
 
 
 
+    outstr("; --- Start of Optimiser additions ---\n\n");
+    gen_switch_section(c_code_section);
     /* dump literal queues, with label */
     /* litq starts from 1, so literp has to be -1 */
     dumplits(0, YES, litptr - 1, litlab, litq + 1);
@@ -426,7 +435,7 @@ void info()
 {
     fputs(titlec, stderr);
     fputs(Version, stderr);
-    fputs("\n(C) 1980-2017 Cain, Van Zandt, Hendrix, Yorston, z88dk\n", stderr);
+    fputs("\n(C) 1980-2022 Cain, Van Zandt, Hendrix, Yorston, z88dk\n", stderr);
     fprintf(stderr, "Usage: %s [flags] [file]\n", gargv[0]);
 }
 
@@ -488,15 +497,14 @@ static void dumpfns()
             if (ptr->ctype->kind == KIND_PORT8 || ptr->ctype->kind == KIND_PORT16 ) {
                 outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->ctype->value);
             } else {
-                if ( storage == EXTERNP ) {
-                    outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("\t= %d\n", ptr->ctype->value);
-                } else if ( storage != LSTATIC && storage != TYPDEF ) {
+                if ( storage != LSTATIC && storage != TYPDEF ) {
                     GlobalPrefix();                    
                     outname(ptr->name, dopref(ptr)); nl();
-                    if ( storage != STATIK ) {
-                        debug_write_symbol(ptr);
-                    }
+                    debug_write_symbol(ptr);
                 }
+                if ( ptr->flags & ASSIGNED_ADDR ) {
+                    outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("\t= %d\n", ptr->ctype->value);
+                } 
             }
         }
     }
@@ -784,9 +792,16 @@ void openin()
             fprintf(stderr, "Can't open: %s\n", Filename);
             exit(1);
         } else {
+            unsigned char bombuf[4];
+            unsigned char utf8bom[] = { 0xef, 0xbb, 0xbf };
             if (c_verbose)
                 fprintf(stderr, "Compiling: %s\n", Filename);
             ncomp++;
+            fread(bombuf, sizeof(char), 3, input);
+            if ( memcmp(bombuf, utf8bom, 3) ) {
+                rewind(input);
+            }
+            
             newfile();
         }
     }
@@ -963,7 +978,7 @@ void atexit_deallocate()
     FREENULL(glbq);
     FREENULL(loctab);
     FREENULL(wqueue);
-    FREENULL(swnext);
+//    FREENULL(swnext);
     FREENULL(stage);
     FREENULL(gotoq);
 }

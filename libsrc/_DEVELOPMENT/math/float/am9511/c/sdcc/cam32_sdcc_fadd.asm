@@ -6,7 +6,7 @@ SECTION code_fp_am9511
 
 PUBLIC cam32_sdcc_fadd
 
-EXTERN cam32_sdcc_readr, asm_am9511_fadd
+EXTERN asm_sdcc_readr, asm_am9511_fadd
 
 .cam32_sdcc_fadd
 
@@ -18,7 +18,7 @@ EXTERN cam32_sdcc_readr, asm_am9511_fadd
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    call cam32_sdcc_readr
+    call asm_sdcc_readr
     jp asm_am9511_fadd      ; enter stack = sdcc_float right, sdcc_float left, ret
                             ;        DEHL = sdcc_float right
                             ; return DEHL = sdcc_float

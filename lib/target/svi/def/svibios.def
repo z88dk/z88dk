@@ -2,7 +2,7 @@ lstoff
 
 ; Spectravideo SVI functions definition
 ;
-; $Id: svibios.def,v 1.6 2016-06-06 15:40:54 stefano Exp $
+; $Id: svibios.def $
 ;
 
 
@@ -97,14 +97,14 @@ defc TOTEXT = $3768 ; Forcidly places the screen in text mode.
 ;; defc GTPAD  = $???? ; Check the current touch PAD status.
 ;; defc GTPDL  = $???? ; Return the value of the paddle.
 
-; Tape device routines
+; Tape device routines (MSX style names but the functions are slightly different)
 
-;; defc TAPION = $???? ; Reads the header block after turning the cassette motor on
-;; defc TAPIN  = $???? ; Read data from the tape
-;; defc TAPIOF = $???? ; Stops reading from the tape
-;; defc TAPOON = $???? ; Turns on the cassette motor and writes the header
-;; defc TAPOUT = $???? ; Writes data on the tape
-;; defc TAPOOF = $???? ; Stops writing on the tape
+   defc TAPION = $0069 ; Reads the header block after turning the cassette motor on
+   defc TAPIN  = $006C ; (CASIN), Read data from the tape
+   defc TAPIOF = $006F ; Stops reading from the tape
+   defc TAPOON = $0072 ; Turns on the cassette motor and writes the header
+   defc TAPOUT = $0075 ; (CASOUT), Writes data on the tape
+   defc TAPOOF = $0078 ; Stops writing on the tape
 ;; defc STMOTR = $???? ; Sets the cassette motor action
 
 ; Queue routines
@@ -146,7 +146,7 @@ defc RDVDP  = $3734 ; Reads VDP status register
 ;; defc PHYDIO = $???? ; Executes I/O for mass-storage media like diskettes
 ;; defc FORMAT = $???? ; Initialises mass-storage media like formatting of diskettes
 defc ISFLIO = $68C2 ; Tests if I/O to device is taking place
-defc OUTDLP = $6415 ; Printer output
+defc OUTDLP = $0081 ; Printer output
 defc GETVCP = $2D46 ; Returns pointer to play queue
 ;; defc GETVC2 = $???? ; Returns pointer to variable in queue number VOICEN (byte op #FB38)
 defc KILBUF = $0156 ; Clear keyboard buffer

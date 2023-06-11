@@ -58,6 +58,7 @@
 ../../_DEVELOPMENT/math/float/math48//c/sccz80/cm48_sccz80_logb.asm
 ../../_DEVELOPMENT/math/float/math48//c/sccz80/cm48_sccz80_lrint.asm
 ../../_DEVELOPMENT/math/float/math48//c/sccz80/cm48_sccz80_lround.asm
+../../_DEVELOPMENT/math/float/math48//c/sccz80/cm48_sccz80_m482d.asm
 ../../_DEVELOPMENT/math/float/math48//c/sccz80/cm48_sccz80_modf.asm
 ../../_DEVELOPMENT/math/float/math48//c/sccz80/cm48_sccz80_modf_callee.asm
 ../../_DEVELOPMENT/math/float/math48//c/sccz80/cm48_sccz80_nan.asm
@@ -369,6 +370,7 @@
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/lrint.asm
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/lround.asm
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/minusfa.asm
+../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/mlib2d.asm
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/modf.asm
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/modf_callee.asm
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/nan.asm

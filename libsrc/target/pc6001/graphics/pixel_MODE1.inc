@@ -34,7 +34,7 @@ IF NEEDunplot
 ENDIF
 IF NEEDxor
 	xor	c
-	ld	(hl),c
+	ld	(hl),a
 ENDIF
 IF NEEDpoint
 	and	c

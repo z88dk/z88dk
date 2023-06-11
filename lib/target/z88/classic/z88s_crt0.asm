@@ -47,7 +47,7 @@ start:
 	push	de	
 	ld	(saveix),ix
 	ld	(saveiy),iy
-	ld	(start1+1),sp	;Save starting stack
+	ld	(__restore_sp_onexit+1),sp	;Save starting stack
 	ld	hl,(shell_cmdlen)
 	ld	de,(shell_cmdaddr)
 	add	hl,de
@@ -135,7 +135,7 @@ cleanup:			;Jump back here from exit() if needed
 
         call    resterrhan	;Restore the original error handler
 	
-start1:	ld	sp,0		;Restore stack to entry value
+__restore_sp_onexit	ld	sp,0		;Restore stack to entry value
 	ld	ix,(saveix)	;Get back those registers
 	ld	iy,(saveiy)
 	pop	de

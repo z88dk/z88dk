@@ -27,18 +27,16 @@ asm_strlwr:
    push hl
 
 loop:
-
    ld a,(hl)
    or a
-   jr z, exit
+   jr Z,exit
 
    call asm_tolower
    ld (hl),a
-   
+
    inc hl
    jr loop
 
 exit:
-
    pop hl
    ret

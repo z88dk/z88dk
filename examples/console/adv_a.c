@@ -14,9 +14,10 @@
  *	 - casts removed in structures
  *	 - Few defines to make life easier
  *   - tape or disk save     (-DTAPE, -DDISK)
- *   - disk save in data block mode (-DDISKBLOCK)
  *   - lowercase text taken from the oz700 port in the 'ozdev' web site
+ *   - disk save in data block mode (-DDISKBLOCK)
  *   - opt graphics scenes   (-DPICS)
+ *   - low resolution graphics scenes   (-DPICS -DRASTER)
  *   - score made optional   (-DCOMPUTE_SCORE)
  *
  *	Found at: http://www.penelope.demon.co.uk/pod/
@@ -37,7 +38,14 @@
   * 7650 SAVE *"m";d;n$ CODE a,l : STOP
   * 7900 ERASE "m";d;n$ : STOP
   *
+  *
+  * TAPE support is, at the moment available for J.ACE, Spectrum, TS2068, Sharp MZ, MSX, Spectravideo SVI, S-OS, ZX80, ZX81
+  * e.g.
+  * zcc +msx -lmsxbios -DTAPE -create-app adv_a.c
+  *
   */
+
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,15 +53,45 @@
 #include <ctype.h>
 
 
+/* This hack forces the ZX Spectrum tape format using the generic sound library */
+/* Only a limited set of targets is supported for data input and no border flashing happens during LOAD/SAVE operations */
+
+#include <sound.h>
+#ifdef ZXTAPE
+#undef tape_load_block
+#undef tape_save_block
+#define tape_load_block bit_load_block_zx
+#define tape_save_block bit_save_block_zx
+#endif
+
+
+
 #ifdef PICS
 #include <graphics.h>
-#include <adv_a.h>
+#include <games.h>
+#include "adv_a.h"
+int mazepic;
 #endif
 
 #ifdef ACE
-#include <ace.h>
+#include <arch/ace.h>
 #endif
 
+#ifdef __AQUARIUS__
+#include <arch/aquarius.h>
+#endif
+
+#ifdef __MSX__
+#include <msx.h>
+#endif
+
+#ifdef __SVI__
+#include <msx.h>
+#endif
+
+#ifdef SORCERER
+#include <arch/sorcerer.h>
+#endif
 
 #ifndef getkey
 #include <conio.h>
@@ -1842,40 +1880,88 @@ void ShowRoom()
 	switch(CUR_RM)
 	{
 		case 0:
+#ifdef RASTER
+			//putsprite(spr_or, 70, 6, mountain);
+			putsprite(spr_or, 0, 20, mountain);
+#else
 			draw_profile(60, 60, 160, mountain);
-			draw_profile(63, 63, 152, mountain);
-			draw(135,73,175,71);
+			//draw_profile(63, 63, 152, mountain);
+			//draw(135,73,175,71);
 			draw_profile(80, 80, 240, tree2);
 			draw_profile(80, 120, 80, mountain);
 			draw_profile(60, 110, 200, tree2);
+#endif
+			mazepic = 0;			
 			break;
 		case 3:
+#ifdef RASTER
+			//putsprite(spr_or, 65, 28, forest);
+			putsprite(spr_or, 0, 5, forest);
+#else
 			for (nItem = 1; nItem < 5; ++nItem) {
 				draw_profile(nItem*10-rand()%100, 20+rand()%40, 170+nItem*20, tree2);
 				draw_profile(60-rand()%100, nItem+rand()%40, 170+nItem*20, tree1);
 			}
+#endif
 			break;
 		case 4:
+#ifdef RASTER
+			//putsprite(spr_or, 8, 28, lake);
+			putsprite(spr_or, 0, 5, lake);
+#else
 			draw_profile(50, 20, 160, lake);
+#endif
 			break;
 		case 5:
+#ifdef RASTER
+			//putsprite(spr_or, 83, 10, house);
+			putsprite(spr_or, 0, 20, house);
+#endif
 			//draw_profile(50, 20, 240, strange_house);
 			break;
 		case 6:
+#ifdef RASTER
+			//putsprite(spr_or, 85, 20, shed);
+			putsprite(spr_or, 0, 5, shed);
+#else
 			draw_profile(60, 3, 180, shed);
+#endif
 			break;
 		case 7:
 		case 8:
 		case 9:
 		case 10:
-			draw_profile(60, 60, 240, maze);
+			if (!mazepic++)
+#ifdef RASTER
+				//putsprite(spr_or, 40, 32, maze);
+				putsprite(spr_or, 0, 6, maze);
+#else
+				draw_profile(60, 60, 240, maze);
+#endif
 			break;
 		case 14:
+#ifdef RASTER
+			//putsprite(spr_or, 90, 2, keyboard);
+			putsprite(spr_or, 0, 20, keyboard);
+#else
 			draw_profile(20, 100, 200, keyboard);
+#endif
 			break;
 		case 19:
+#ifdef RASTER
+			//putsprite(spr_or, 90, 2, jail);
+			putsprite(spr_or, 0, 8, jail);
+#else
 			draw_profile(60, 20, 160, jail);
+#endif
 			break;
+
+#ifdef RASTER
+		case 20:
+			//putsprite(spr_or, 20, 28, spaceship);
+			putsprite(spr_or, 0, 10, spaceship);
+			break;
+#endif
 
 	}
 #endif
@@ -2590,7 +2676,6 @@ void SH_OK()
 
 
 
-
 void SH_QUIT()
 {
 
@@ -2604,9 +2689,14 @@ void SH_QUIT()
 #ifdef DISKBLOCK
 		PrintStr("\nPrepare disc or cartrige, then press a key\n");
 #else
+#ifndef __SHARPMZ__
 		PrintStr("\nStart tape, then press a key\n");
 #endif
+#endif
+
+#ifndef __SHARPMZ__
 		i_GetCh();
+#endif
 		
 #ifdef DISKBLOCK
 		rnd_erase("GVARS.SAV");
@@ -2976,7 +3066,12 @@ int main()
 {
 	int n;
 
+
 	printf("%cE",27);
+#ifdef PICS
+	clg();
+#endif
+
 	for (;;)		/* restart game loop */
 	{
 		/* initialize the game variables */
@@ -2987,6 +3082,7 @@ int main()
 		nScore = 0;
 #endif
 		
+
 		PrintInstr();
 
 		/* copy data from naItemStart to naItemLoc at start of game */

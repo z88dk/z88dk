@@ -58,6 +58,7 @@ typedef unsigned char * va_list;
 #define va_ptr(marker, type)    *((type *)(marker - sizeof(type)))
 
 #elif defined(__SCCZ80)
+#warning stdarg.h has many caveats when used in left-to-right mode.
 
 // SCCZ80
 // l->r parameter passing means compiler must tell us how many params are on the stack

@@ -65,9 +65,7 @@
 	dec	hl
 	dec	hl
 	ld	(_pint),hl
-	inc	hl
-	inc	hl
-	call	l_gint	;
+	call	l_gint2	;
 	ret
 
 
@@ -98,6 +96,7 @@
 	push	de
 	call	l_i64_copy
 	ret
+
 
 
 

@@ -29,9 +29,9 @@ asm_strrstrip:
    ;         carry reset if s is entirely whitespace
    ;
    ; uses  : af, bc, de
-   
+
    call asm__strrstrip         ; hl = ptr to ws char
    ld (hl),0                   ; terminate s early
-   
+
    ex de,hl
    ret

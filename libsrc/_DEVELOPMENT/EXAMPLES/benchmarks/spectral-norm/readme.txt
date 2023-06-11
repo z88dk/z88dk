@@ -46,15 +46,13 @@ RESULTS
 =======
 
 1.
-HITECH C CPM V309
-3778 bytes less cpm overhead
+HITECH C CPM V309-15
+2135 bytes exact
 
 error: 1 * 10^(-6)
 
-cycle count  = 6798318787
-time @ 4MHz  = 6798318787 / 4*10^6 = 28 min 20 sec
-
-Very fast float library but only accurate for */+-
+cycle count  = 6790499956
+time @ 4MHz  = 6790499956 / 4*10^6 = 28 min 18 sec
 
 2.
 Z88DK April 20, 2020
@@ -115,42 +113,64 @@ time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
 [Issue #124](https://github.com/z88dk/z88dk/issues/124) Normalization is slow.
 
 7.
-Z88DK April 30, 2021
-sccz80 / classic c library / math32
-5842 bytes less page zero
+Z88DK January 3, 2022
+zsdcc #12555 / classic c library / math32
+5910 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9702197187
-time @ 4MHz  = 9702197187 / 4*10^6 = 40 min 25 sec
+cycle count  = 9756176827
+time @ 4MHz  = 9756176827 / 4*10^6 = 40 min 39 sec
 
 8.
-Z88DK April 30, 2021
-zsdcc #12250 / new c library / math32
-5531 bytes less page zero
+Z88DK July 4, 2021
+zsdcc #12419 / new c library / math32
+5453 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 10531372867
-time @ 4MHz  = 10531372867 / 4*10^6 = 43 min 53 sec
+cycle count  = 9947615066
+time @ 4MHz  = 9947615066 / 4*10^6 = 41 min 27 sec
 
 9.
-SDCC 3.6.5 #9852 (MINGW64)
-7495 bytes less page zero
+SDCC 4.2.0 Linux
+6013 bytes less page zero
 
 error: 5 * 10^(-6)
 
-cycle count  = 20543308237
-time @ 4MHz  = 20543308237 / 4*10^6 = 85 min 36 sec
+cycle count  = 15739496039
+time @ 4MHz  = 15739496039 / 4*10^6 = 65 min 35 sec
 
 Slow speed & large size due to float implementation in C.
 
-DQ.
-HITECH C MSDOS V750
-? bytes exact
+10.
+Z88DK January 3, 2022
+sccz80 / classic c library / MBF32
+4703 bytes less page zero
 
-Disqualified due to incorrect results.
-HTC V750 does not have a functioning float library.
+error: 2 * 10^(-7)
+
+cycle count  = 6306469660
+time @ 4MHz  = 6306469660 / 4*10^6 = 26 min 16 sec
+
+11.
+Z88DK December 12, 2022
+sccz80 / classic c library / 8085 / MBF32
+4604 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 6237494435
+time @ 4MHz  = 6237494435 / 4*10^6 = 25 min 59 sec
+
+12.
+HITECH C MSDOS V780pl2
+3780 bytes exact
+
+error: 2 * 10^(-7)
+
+cycle count  = 6780314927
+time @ 4MHz  = 6780314927 / 4*10^6 = 28 min 15 sec
 
 
 BENCHMARKS GAME COMMENTS
@@ -170,4 +190,4 @@ Each program should:
 
     calculate the spectral norm of an infinite matrix A, with entries a11=1, a12=1/2, a21=1/3, a13=1/4, a22=1/5, a31=1/6, etc
 
-    implement 4 separate functions / procedures / methods like the C# program 
+    implement 4 separate functions / procedures / methods like the C# program

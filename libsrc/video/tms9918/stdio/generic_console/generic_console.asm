@@ -1,35 +1,40 @@
 
 
-	MODULE	tms9918_generic_console
-        SECTION code_clib
+    MODULE	tms9918_generic_console
+    SECTION code_video_vdp
 
-        EXTERN	__tms9918_cls
-        PUBLIC  __tms9918_scrollup
-        PUBLIC  __tms9918_printc
-        PUBLIC  __tms9918_set_ink
-        PUBLIC  __tms9918_set_paper
-        PUBLIC  __tms9918_set_attribute
-        EXTERN  __tms9918_attribute
-        EXTERN  __tms9918_text_xypos
-	EXTERN	__tms9918_pattern_name
+    EXTERN	__tms9918_cls
+    PUBLIC  __tms9918_scrollup
+    PUBLIC  __tms9918_printc
+    PUBLIC  __tms9918_set_ink
+    PUBLIC  __tms9918_set_paper
+    PUBLIC  __tms9918_set_attribute
+    EXTERN  __tms9918_2bpp_attr
+    EXTERN  __tms9918_8bpp_attr
 
-        EXTERN  generic_console_font32
-        EXTERN  generic_console_udg32
+    EXTERN  __tms9918_spec_funcs
+    EXTERN  __tms9918_spec_funcs_end
+    EXTERN  __tms9918_attribute
+    EXTERN  __tms9918_map_colour
+    EXTERN  __tms9918_scroll_func
+    EXTERN  __tms9918_printc_func
+    EXTERN  __tms9918_gencon_hook
 
-        EXTERN  __console_w
-        EXTERN  ansi_SCROLLUP
-        EXTERN  ansi_cls
-        EXTERN  __tms9918_map_colour
-        EXTERN  generic_console_flags
-        EXTERN  __tms9918_screen_mode
-        EXTERN  __tms9918_scroll_buffer
-        EXTERN  FILVRM
-        EXTERN  LDIRVM
-        EXTERN  LDIRMV
-	EXTERN	CONSOLE_XOFFSET
-	EXTERN	CONSOLE_YOFFSET
+    EXTERN  __vdp_mode0_term
+    EXTERN  __vdp_mode1_term
+    EXTERN  __vdp_mode0_80col_term
+    EXTERN  __vdp_mode2_term
+    EXTERN  __vdp_mode3_term
+    EXTERN  __vdp_mode4_term
+    EXTERN  __vdp_mode5_term
+    EXTERN  __vdp_mode6_term
+    EXTERN  __vdp_mode8_term
+    EXTERN  __vdp_mode1_2_term
+    
 
-        INCLUDE "video/tms9918/vdp.inc"
+    EXTERN  l_dcal
+
+    INCLUDE "video/tms9918/vdp.inc"
 
 
 ;
@@ -43,191 +48,148 @@
 ; an 80 column 6845 as a secondary display.
 ;
 IF VDP_EXPORT_DIRECT = 1
-        PUBLIC  generic_console_cls
-        PUBLIC  generic_console_scrollup
-        PUBLIC  generic_console_printc
-        PUBLIC  generic_console_set_ink
-        PUBLIC  generic_console_set_paper
-        PUBLIC  generic_console_set_attribute
+    PUBLIC  generic_console_cls
+    PUBLIC  generic_console_scrollup
+    PUBLIC  generic_console_printc
+    PUBLIC  generic_console_set_ink
+    PUBLIC  generic_console_set_paper
+    PUBLIC  generic_console_set_attribute
 
-        defc        generic_console_cls = __tms9918_cls
-        defc        generic_console_scrollup = __tms9918_scrollup
-        defc        generic_console_printc = __tms9918_printc
-        defc        generic_console_set_ink = __tms9918_set_ink
-        defc        generic_console_set_paper = __tms9918_set_paper
-        defc        generic_console_set_attribute = __tms9918_set_attribute
+    defc        generic_console_cls = __tms9918_cls
+    defc        generic_console_scrollup = __tms9918_scrollup
+    defc        generic_console_printc = __tms9918_printc
+    defc        generic_console_set_ink = __tms9918_set_ink
+    defc        generic_console_set_paper = __tms9918_set_paper
+    defc        generic_console_set_attribute = __tms9918_set_attribute
 ENDIF
 
 
 __tms9918_set_attribute:
-        ret
+    ret
 
 __tms9918_set_ink:
-        call    __tms9918_map_colour
-        rla
-        rla
-        rla
-        rla
-        and     @11110000
-        ld      b,0x0f
+IFDEF V9938
+    ld      (__tms9918_8bpp_attr+0),a
+ENDIF
+    call    __tms9918_map_colour
+IFDEF V9938
+    ld      c,a     ;Save it for a moment
+    rrca
+    rrca
+    and     @11000000
+    ld      (__tms9918_2bpp_attr+0),a
+    ld      a,c
+ENDIF
+    rla
+    rla
+    rla
+    rla
+    and     @11110000
+    ld      b,0x0f
 set_attr:
-        ld      c,a
-        ld      hl,__tms9918_attribute
-        ld      a,(hl)
-        and     b
-        or      c
-        ld      (hl),a
-        ret
+    ld      c,a
+    ld      hl,__tms9918_attribute
+    ld      a,(hl)
+    and     b
+    or      c
+    ld      (hl),a
+    ret
 
 __tms9918_set_paper:
-        call    __tms9918_map_colour
-        and     15
-        ld      b,0xf0
-        jr      set_attr
+IFDEF V9938
+    ld      (__tms9918_8bpp_attr+1),a
+ENDIF
+    call    __tms9918_map_colour
+    and     15
+IFDEF V9938
+    ld      c,a     ;Save it for a moment
+    rrca
+    rrca
+    and     @11000000
+    ld      (__tms9918_2bpp_attr+1),a
+    ld      a,c
+ENDIF
+    ld      b,0xf0
+    jr      set_attr
         
 
 
 __tms9918_scrollup:
-        push    de
-        push    bc
-        ld      a,(__tms9918_screen_mode)
-        ld      b,3
-        ld      hl,40
-        and     a
-        jr      z,scroll_text
-        ld      b,4
-        ld      hl,32
-        cp      1
-        jr      z,scroll_text
-        call    ansi_SCROLLUP
-scroll_rejoin:
-        pop     bc
-        pop     de
-        ret
-
-
-; Entry: bc = width
-scroll_text:
-        push    ix
-	ld	de,(__tms9918_pattern_name)
-	add	hl,de
-        push    hl      ;Save width for later
-scroll_text_1:
-        push    bc
-        push    hl      ;Source
-        push    de      ;Destination
-
-        ld      de,__tms9918_scroll_buffer
-        ld      bc,256
-        call    LDIRMV
-        pop     de
-        push    de
-        ld      hl,__tms9918_scroll_buffer
-        ld      bc,256
-        call    LDIRVM
-        pop     de      ;Destination
-        pop     hl
-        inc     d
-        inc     h
-        pop     bc
-        djnz    scroll_text_1
-        ; And blank characters out
-        ld      b,23
-        ld      c,0
-        call    __tms9918_text_xypos
-        pop     bc
-        ld      a,' '
-        call    FILVRM
-        pop     ix
-        jr      scroll_rejoin
-
-
-
+    push    de
+    push    bc
+    ld      hl,(__tms9918_scroll_func)
+    call    l_dcal
+    pop     bc
+    pop     de
+    ret
 
 ; c = x
 ; b = y
 ; a = d = character to print
 ; e = raw
 __tms9918_printc:
-        push    ix
-        ld      a,(__tms9918_screen_mode)
-        cp      2
-        jr      z,tms9918_printc_1
-        push    de                ;Save character
-        call    __tms9918_text_xypos
-        pop     de
-        ld      a,d
-        ld      bc,1
-        call    FILVRM
-        pop     ix
-        ret
-tms9918_printc_1:
-        ld      a,d
-        ld      de,(generic_console_font32)
-        dec     d
-        bit     7,a
-        jr      z,tms9918_printc_rejoin
-        ld      de,(generic_console_udg32)
-        res     7,a
-tms9918_printc_rejoin:
-        ld      l,a
-        ld      h,0
-        add     hl,hl
-        add     hl,hl
-        add     hl,hl
-        add     hl,de
-	push	bc	;Save coordinates
-	ld	a,(generic_console_flags)
-	ld	b,a	;Save flags
-	rlca
-	sbc	a
-	ld	c,a	;So c = 255/0 depending on inverse
-        ld      de,__tms9918_scroll_buffer
-	push	de	;Save buffer
-	ld	a,8
-copy_glyph:
-	ex	af,af
-	ld	a,(hl)
-	bit	4,b
-	jr	z,not_bold
-	rrca
-	or	(hl)
-not_bold:
-	xor	c	;Invert if necessary
-	ld	(de),a
-	inc	de
-	inc	hl
-	ex	af,af
-	dec	a
-	jr	nz,copy_glyph
-	bit	3,b
-	jr	z,not_underline
-	dec	de
-	dec	a
-	ld	(de),a
-not_underline:
-	pop	hl	;Get buffer back
-	pop	bc
-        ld      a,c
-	add	CONSOLE_XOFFSET
-        add     a
-        add     a
-        add     a
-        ld      e,a
-	ld	a,CONSOLE_YOFFSET
-	add	b
-        ld      d,a
-        push    de
-        ld      bc,8
-        call    LDIRVM
-        pop     hl
-	; Now set the attributes
-        ld      de,8192
-        add     hl,de        
-        ld      a,(__tms9918_attribute)
-        ld      bc,8
-        call    FILVRM
-        pop     ix
-        ret
+    push    ix
+    ld      hl,(__tms9918_printc_func)
+    call    l_dcal
+    pop     ix
+    ret
 
+; Entry: a = screenmode
+__tms9918_gencon_hook_func:
+    ld      e,a
+    ld      hl,mode_term_table - 2
+loop:
+    inc     hl
+    inc     hl
+    ld      a,(hl)
+    inc     hl
+    cp      255
+    ret     z
+    cp      e
+    jr      nz,loop
+    ld      a,(hl)
+    inc     hl
+    ld      h,(hl)
+    ld      l,a
+    ld      de,__tms9918_spec_funcs
+    ld      bc, +(__tms9918_spec_funcs_end - __tms9918_spec_funcs)
+    ldir
+    ret
+
+
+    SECTION rodata_video_vdp
+
+mode_term_table:
+    defb    0
+    defw    __vdp_mode0_term
+IFDEF V9938
+    defb    80
+    defw    __vdp_mode0_80col_term
+ENDIF
+    defb    1
+    defw    __vdp_mode1_term
+    defb    2
+    defw    __vdp_mode2_term
+    defb    3
+    defw    __vdp_mode3_term
+IFDEF V9938
+    defb    4
+    defw    __vdp_mode4_term
+    defb    5
+    defw    __vdp_mode5_term
+    defb    6
+    defw    __vdp_mode6_term
+    defb    8
+    defw    __vdp_mode8_term
+ENDIF
+    defb    81
+    defw    __vdp_mode1_2_term
+    defb    $ff
+
+
+    SECTION code_crt_init
+
+    ; Register a hook function so that we can get in on the mode changing too
+    ld      hl,__tms9918_gencon_hook_func
+    ld      (__tms9918_gencon_hook),hl
 

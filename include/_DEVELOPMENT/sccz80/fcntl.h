@@ -7,8 +7,8 @@
 
 typedef unsigned int  mode_t;
 
-#ifndef _OFF_T_DEFINED
-#define _OFF_T_DEFINED
+#ifndef _OFF_T
+#define _OFF_T
 typedef unsigned long off_t;
 #endif
 

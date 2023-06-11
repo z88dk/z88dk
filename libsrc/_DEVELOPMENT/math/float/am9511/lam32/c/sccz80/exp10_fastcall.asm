@@ -5,6 +5,7 @@
 
 	defc	exp10_fastcall = _am9511_exp10
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _exp10_fastcall

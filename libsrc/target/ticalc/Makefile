@@ -3,9 +3,9 @@ include ../../Make.config
 TARGET ?= ti82
 
 SUBDIRS = 
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
-ASMFILES = $(wildcard *.asm)
+ASMFILES = $(wildcard *.asm) $(wildcard */*.asm) $(wildcard */*/*.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
 
 all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
@@ -25,8 +25,7 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I../..  $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -DFOR$(TARGET) -DSTANDARDESCAPECHARS  -DPACKEDFONT -I../.. -Oobj/$(TARGET) $^
 
 dirs:
 	@mkdir -p obj/$(TARGET)
@@ -37,5 +36,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o

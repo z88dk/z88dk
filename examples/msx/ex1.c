@@ -40,13 +40,13 @@ void star_randomize(star_t* st) {
 void star_move(star_t* st) {
 	int x, y, z;
 	z = (st->z -= 2);
-	x = f2i(divfx(st->x, z)) + 128;
-	y = f2i(divfx(st->y, z)) + 96;
+	x = st->x / z + 128;
+	y = st->y / z + 96;
 	if (z < 1 || x < 0 || x >= MODE2_WIDTH || y < 0 || y >= MODE2_HEIGHT) {
 		star_randomize(st);
 		z = st->z;
-		x = f2i(divfx(st->x, z)) + 128;
-		y = f2i(divfx(st->y, z)) + 96;
+		x = st->x / z + 128;
+		y = st->y / z + 96;
 	}
 	st->last = st->addr;
 	st->addr = map_pixel(x, y);
@@ -61,13 +61,13 @@ void main() {
 
 //printf("%d\n",(i2f((rand() & 63)-32)));
 
-	set_color(15, 1, 1);
+	vdp_color(15, 1, 1);
 
 	// set video mode to screen 2
-	set_mode(mode_2);
+	vdp_set_mode(mode_2);
 
 	// set whole screen to color white/black
-	msx_vfill(MODE2_ATTR, 0xf1, MODE2_MAX);
+	vdp_vfill(MODE2_ATTR, 0xf1, MODE2_MAX);
 
 	// initialize stars
 	for (c=0; c < MAX_STARS; c++) {
@@ -78,19 +78,19 @@ void main() {
 	}
 
 	// animation loop
-	while (!get_trigger(0)) {
+	while (!getk()) {
 		// calculate star movement
 		for (st=stars, c=0; c < MAX_STARS; c++, st++)
 			star_move(st);
 
 		// erase previous stars
 		for (st=stars, c=0; c < MAX_STARS; c++, st++)
-			vpoke(st->last, 0);
+			vdp_vpoke(st->last, 0);
 
 		// show new stars
 		for (st=stars, c=0; c < MAX_STARS; c++, st++)
 			vmerge(st->addr, st->sub);
 	}
 
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 }

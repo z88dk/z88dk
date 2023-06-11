@@ -497,7 +497,7 @@ why this guide has focused so heavily on understanding the memory layout.
 
 If you find yourself uncertain as to how to proceed with a particular scenario,
 or are getting occasional or strange, sudden crashes, consider raising the
-issue on the Z88DK [ZX support forum](https://www.z88dk.org/forum/viewforum.php?id=2).
+issue on the Z88DK [ZX support forum](https://www.z88dk.org/forum/viewforum.php?f=2).
 
 ### Conclusion
 

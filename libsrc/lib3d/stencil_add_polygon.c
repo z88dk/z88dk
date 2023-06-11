@@ -4,10 +4,9 @@
 	* stencil version
 
 	stencil_add_polygon(cx, cy, corners, radius, startangle,stencil)
-	
+
 	Add a regular polygon of a given no. of corners and a corner at a given angle (0..360).
-	
-	
+
 	$Id: stencil_add_polygon.c,v 1.1 2013-05-15 06:45:47 stefano Exp $
 */
 

@@ -4,10 +4,14 @@
 		INCLUDE	"target/msx/def/msxdos2.def"
 		PUBLIC	remove
 		PUBLIC	_remove
+		PUBLIC	rmdir
+		PUBLIC	_rmdir
 
 		EXTERN	MSXDOS
 		EXTERN	msxdos_error
 
+.rmdir
+._rmdir
 .remove
 ._remove
 	ex	de,hl

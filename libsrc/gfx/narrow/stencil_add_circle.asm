@@ -50,7 +50,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
     ;call    swapgfxbk
     
-        ld    ix,stencil_add_pixel
+        ld    hl,stencil_add_pixel
         call    draw_circle
     ;jp    __graphics_end
     pop    ix

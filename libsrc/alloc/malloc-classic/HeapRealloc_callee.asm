@@ -45,7 +45,7 @@ EXTERN asm_HeapAlloc, asm_HeapFree
 
    ld a,h
    or l
-   jr nz, checksize
+   jr NZ,checksize
 
    ex de,hl                    ; ISO C wants a malloc to occur if realloc block == 0
    jp asm_HeapAlloc
@@ -54,12 +54,12 @@ EXTERN asm_HeapAlloc, asm_HeapFree
 
    ld a,b
    or a
-   jp nz, sizeok
+   jp NZ,sizeok
    ld a,c
    cp 2
-   jp nc, sizeok
+   jp NC,sizeok
    ld c,2
-   
+
 .sizeok
 
    push de
@@ -67,8 +67,8 @@ EXTERN asm_HeapAlloc, asm_HeapFree
    push bc
    ex de,hl
    call asm_HeapAlloc
-   jr c, success
-   
+   jr C,success
+
 .fail
 
    pop bc
@@ -80,7 +80,7 @@ EXTERN asm_HeapAlloc, asm_HeapFree
 
    ; hl = & new block (+2)
    ; stack = & heap, & old block (+2), new block size
-   
+
    pop bc                    ; bc = new block size
    pop de
    ex de,hl                  ; de = & new block (+2), hl = & old block (+2)
@@ -90,8 +90,10 @@ EXTERN asm_HeapAlloc, asm_HeapFree
    dec hl
    ld l,(hl)
    ld h,a                    ; hl = size of old block
-   
-IF __CPU_INTEL__ || __CPU_GBZ80__
+
+IF __CPU_8085__
+   sub hl,bc
+ELIF __CPU_8080__ || __CPU_GBZ80
    ld a,l
    sub c
    ld l,a
@@ -102,46 +104,48 @@ ELSE
    or a
    sbc hl,bc                 ; old size - new size
 ENDIF
-   jr nc, usenewsize
+
+   jr NC,usenewsize
    add hl,bc
-   ld c,l
-   ld b,h                    ; bc = old size
-   
+   ld bc,hl                  ; bc = old size
+
 .usenewsize
 
    ; bc = number of bytes to copy
    ; de = & new block (+2)
    ; stack = & heap, & old block (+2)
-   
+
    pop hl
    push hl
    push de
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
-ldir_loop:
-   ld a,(hl)
-   ld (de),a
-   inc hl
-   inc de
    dec bc
-   ld a,b
-   or c
-   jp nz,ldir_loop
+   inc b
+   inc c
+.ldir_loop
+   ld a,(hl+)
+   ld (de+),a
+   dec c
+   jr NZ,ldir_loop
+   dec b
+   jr NZ,ldir_loop
 ELSE
    ldir                      ; copy old data block to new data block
 ENDIF
-   
+
    ; stack = & heap, & old block (+2), & new block (+2)
-   
+
    pop hl
    pop de
    ex (sp),hl
    ex de,hl
-   
+
    ; de = & heap, hl = & old block (+2)
    ; stack = & new block
-   
+
    call asm_HeapFree  ; return old block to free list
-   
+
    pop hl
    scf
    ret

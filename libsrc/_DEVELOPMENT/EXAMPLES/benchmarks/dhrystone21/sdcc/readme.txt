@@ -44,36 +44,36 @@ sdcc -mz80 -DNOSTRUCTASSIGN -DTIMER --max-allocs-per-node200000 -c dhry_2.c
 sdcc -mz80 dhry_1.rel dhry_2.rel -o dhry.ihx
 hex2bin dhry.ihx
 
-TIMER_START = 0x278
-   0x06e (TIMER_START in dhry_1.sym) -
+TIMER_START = 0x26f
+   0x065 (TIMER_START in dhry_1.sym) -
    0x000 (_main in dhry_1.sym) +
    0x20a (_main in dhry.map)
 
-TIMER_STOP = 0x3f3
-   0x1e9 (TIMER_STOP in dhry_1.sym) -
+TIMER_STOP = 0x38a
+   0x180 (TIMER_STOP in dhry_1.sym) -
    0x000 (_main in dhry_1.sym) +
    0x20a (_main in dhry.map)
 
-SIZE = 7073 bytes
-   0x071c (_CODE in dhry.map) +
-   0x0003 (_HEADER0 in dhry.map) +
-   0x0002 (_HEADER1 in dhry.map) +
-   0x0002 (_HEADER2 in dhry.map) +
-   0x0002 (_HEADER3 in dhry.map) +
-   0x0002 (_HEADER4 in dhry.map) +
-   0x0002 (_HEADER5 in dhry.map) +
-   0x0002 (_HEADER6 in dhry.map) +
-   0x0002 (_HEADER7 in dhry.map) +
-   0x000c (_HEADER8 in dhry.map) +
-   0x0002 (_INITIALIZER in dhry.map) +
-   0x000f (_GSINIT in dhry.map) +
-   0x0001 (_GSFINAL in dhry.map) +
-   0x1454 (_DATA in dhry.map) +
-   0x0002 (_INITIALIZED in dhry.map)
+SIZE = 6825 bytes
+   1543 (_CODE in dhry.map) +
+   3    (_HEADER0 in dhry.map) +
+   3    (_HEADER1 in dhry.map) +
+   3    (_HEADER2 in dhry.map) +
+   3    (_HEADER3 in dhry.map) +
+   3    (_HEADER4 in dhry.map) +
+   3    (_HEADER5 in dhry.map) +
+   3    (_HEADER6 in dhry.map) +
+   3    (_HEADER7 in dhry.map) +
+   12   (_HEADER8 in dhry.map) +
+   2    (_INITIALIZER in dhry.map) +
+   37   (_GSINIT in dhry.map) +
+   1    (_GSFINAL in dhry.map) +
+   5204 (_DATA in dhry.map) +
+   2    (_INITIALIZED in dhry.map)
 
 The invocation of TICKS looked like this:
 
-ticks dhry.bin -start 0278 -end 03f3 -counter 999999999
+z88dk-ticks dhry.bin -start 026f -end 038a -counter 999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -85,10 +85,10 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-SDCC 3.6.5 #9842 (MINGW64)
-7013 bytes less page zero
+SDCC 4.2.0 Linux
+6825 bytes less page zero
 
-cycle count  = 292880320
-time @ 4MHz  = 292880320 / 4x10^6 = 73.22008  seconds
-dhrystones/s = 20000 / 73.2208 = 273.1464
-DMIPS        = 273.1464 / 1757 = 0.15546
+cycle count  = 225522684
+time @ 4MHz  = 225522684 / 4x10^6 = 56.3807 seconds
+dhrystones/s = 20000 / 56.3807 = 354.7315
+DMIPS        = 354.7315 / 1757 = 0.20189

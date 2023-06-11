@@ -12,6 +12,9 @@ and run in an emulator.
 classic/sccz80
 zcc +zx -vn -DSTATIC -DPRINTF -O2 n-body.c -o n-body -lm -lndos -create-app
 
+classic/sccz80/8085
+zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 n-body.c -o n-body --math-mbf32_8085 -lndos -create-app
+
 classic/sccz80/math32
 zcc +zx -vn -DSTATIC -DPRINTF -O2 n-body.c -o n-body --math32 -lndos -create-app
 
@@ -31,6 +34,12 @@ This simplifies the use of TICKS for timing.
 classic/sccz80
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin -lm -m -lndos
 
+classic/sccz80/MBF32
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math-mbf32 -m -lndos
+
+classic/sccz80/8085/MBF32
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math-mbf32_8085 -m -lndos
+
 classic/sccz80/math32
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math32 -m -lndos
 
@@ -42,7 +51,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks n-body.bin -start 0dc6 -end 0e25 -counter 999999999999
+z88dk-ticks n-body.bin -x n-body.map -start TIMER_START -end TIMER_END -counter 999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -65,23 +74,45 @@ cycle count  = 2253709929
 time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 
 
-Z88DK April 28, 2021
+Z88DK January 3, 2022
 sccz80 / classic
-4493 bytes less page zero
+4527 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-8)
 
-cycle count  = 3658052111
-time @ 4MHz  = 3658052111 / 4*10^6 = 15 min 14 sec
+cycle count  = 3659884553
+time @ 4MHz  = 3659884553 / 4*10^6 = 15 min 15 sec
 
 
-Z88DK April 30, 2021
-sccz80 / classic / math32
-6018 bytes less page zero
+Z88DK December 12, 2022
+sccz80 / classic / 8085 / MBF32
+4868 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 993265277
-time @ 4MHz  = 993265277 / 4*10^6 =  4 min 8 sec
+cycle count  = 1851095771
+time @ 4MHz  = 1851095771 / 4*10^6 =  7 min 43 sec
+
+
+Z88DK January 3, 2022
+sccz80 / classic / MBF32
+4989 bytes less page zero
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1848679330
+time @ 4MHz  = 1848679330 / 4*10^6 =  7 min 42 sec
+
+
+Z88DK January 3, 2022
+sccz80 / classic / math32
+6052 bytes less page zero
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 995097719
+time @ 4MHz  = 995097719 / 4*10^6 =  4 min 9 sec

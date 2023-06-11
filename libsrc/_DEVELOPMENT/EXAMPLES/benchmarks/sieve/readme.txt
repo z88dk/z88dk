@@ -75,11 +75,11 @@ cycle count  = 3665494
 time @ 4MHZ  = 3665494 / 4*10^6 = 0.9163 sec
 
 2.
-HITECH C MSDOS V750
-8243 bytes exact
+HITECH C MSDOS V780pl2
+8472 bytes exact
 
-cycle count  = 3672107
-time @ 4MHz  = 3672107 / 4x10^6 = 0.9180 sec
+cycle count  = 3885436
+time @ 4MHz  = 3885436 / 4x10^6 = 0.9713 seconds
 
 3.
 IAR Z80 V4.06A
@@ -89,26 +89,26 @@ cycle count  = 3714152
 time @ 4MHz  = 3714152 / 4*10^6 = 0.9285 sec
 
 4.
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-8558 bytes less page zero
+Z88DK January 5, 2022
+zsdcc #12555 / classic c library
+9177 bytes less page zero
 
-cycle count  = 4510806
-time @ 4MHZ  = 4510806 / 4*10^6 = 1.1277 sec
+cycle count  = 4110873
+time @ 4MHZ  = 4110873 / 4*10^6 = 1.0277 sec
 
 5.
-HITECH C CPM V309
-8725 bytes less cpm overhead
+HITECH C CPM V309-15
+10297 bytes exact
 
-cycle count  = 4547538
-time @ 4MHz  = 4547538 / 4*10^6 = 1.1369 sec
+cycle count  = 7916099
+time @ 4MHz  = 7916099 / 4*10^6 = 1.979 sec
 
 6.
-SDCC 3.6.5 #9842 (MINGW64)
-8263 bytes less page zero
+SDCC 4.2.0 Linux
+8278 bytes less page zero
 
-cycle count  = 4701570
-time @ 4MHz  = 4701570 / 4*10^6 = 1.1754 sec
+cycle count  = 4219481
+time @ 4MHz  = 4219481 / 4*10^6 = 1.0548 sec
 
 7.
 Z88DK April 20, 2020
@@ -119,9 +119,18 @@ cycle count  = 4957733
 time @ 4MHz  = 4957733 / 4*10^6 = 1.2394 sec
 
 7.
-Z88DK April 20, 2020
+Z88DK January 5, 2022
 sccz80 / classic c library
-8589 bytes less page zero
+9185 bytes less page zero
 
-cycle count  = 4957733
-time @ 4MHz  = 4957733 / 4*10^6 = 1.2394 sec
+cycle count  = 4769143
+time @ 4MHz  = 4769143 / 4*10^6 = 1.1923 sec
+
+8.
+Z88DK January 5, 2022
+sccz80 / classic c library / 8085
+9278 bytes less page zero
+
+cycle count  = 5129695
+time @ 4MHz  = 5129695 / 4*10^6 = 1.2824 sec
+

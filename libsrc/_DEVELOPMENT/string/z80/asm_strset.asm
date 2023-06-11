@@ -29,11 +29,10 @@ asm_strset:
    xor a
    
 loop:
-
    cp (hl)
-   jp z, l_ret - 1
-   
+   jp Z,l_ret - 1
+
    ld (hl),e
    inc hl
-   
+
    jr loop

@@ -5,8 +5,8 @@ include(__link__.m4)
 
 #include <stddef.h>
 
-#ifndef _SIZE_T_DEFINED
-#define _SIZE_T_DEFINED
+#ifndef _SIZE_T
+#define _SIZE_T
 typedef unsigned int  size_t;
 #endif
 

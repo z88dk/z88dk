@@ -36,8 +36,6 @@
 ;   = 24 bits significant + 1 bit shift + 7 bits rounding
 ;
 ;-------------------------------------------------------------------------
-; FIXME clocks
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

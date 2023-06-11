@@ -62,6 +62,8 @@ ENDIF
 	djnz zloop
 	dec a
 	jr nz,floop
+
+
 ;	ld (hl),$76
 
 ;IF FORzx81mt64
@@ -83,12 +85,13 @@ ENDIF
 ; Patch the shadow rom
 	ld	a,$7b			; the new ptr to D-FILE will be $407b
 	ld	($0075),a
-	;ld	($027a),a		; probably useless, we have our custom handler
+	;ld	($027a),a		; useless, we have our custom handler
+	                    ; (leave it untouched to make the "BASIC RE-SET" button work)
 	ld	(MTCH_P1+1),a	; patch our custom interrupt handler
 
 	; Force row-in-a-text-line-counter from 8 to 1
 	ld	a,$c1		; set 3,c (CB D9) -> set 0,c (CB C1)
-					;	incidentally $C1 = 193.. could bring to confusion
+					;	incidentally $C1 = 193.. but it is NOT a row counter constant !!
 	ld	($0040),a
 
 	pop af
@@ -96,7 +99,8 @@ ENDIF
 	ld	(MTCH_P2+2),a	; patch also our custom interrupt handler
 	
 IF FORzx81mt64
-	ld	a,85
+;	ld	a,85
+	ld	a,58			; Determined experimentally on the EO emulator !!
 	ld	(MTCH_P3+1),a	; patch also our custom interrupt handler
 ENDIF
 

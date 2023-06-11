@@ -16,16 +16,12 @@ PUBLIC cm32_sdcc_dload
     ;
     ; uses  : bc, de, hl, bc', de', hl'
 
-    ld c,(hl)
-    inc hl
-    ld b,(hl)
-    inc hl
-    ld e,(hl)
-    inc hl
+    ld c,(hl+)
+    ld b,(hl+)
+    ld e,(hl+)
     ld d,(hl)                   ; DEBC = sdcc_float
 
-    ld l,c
-    ld h,b
+    ld hl,bc
 
     exx
     ret                         ; DEHL' = sdcc_float

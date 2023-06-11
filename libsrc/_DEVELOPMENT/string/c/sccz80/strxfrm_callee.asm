@@ -10,12 +10,12 @@ EXTERN asm_strxfrm
 
 strxfrm_callee:
 
-   pop af
-   pop bc
    pop hl
+   pop bc
    pop de
-   push af
-   
+   ex (sp),hl
+   ex de,hl
+
    jp asm_strxfrm
 
 ; SDCC bridge for Classic

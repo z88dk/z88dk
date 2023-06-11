@@ -10,7 +10,7 @@ org __crt_org_code
 
 IF (__crt_org_vector_table = -0x80) || (__crt_org_vector_table = -0x100)
 
-section interrupt_vectors
+section code_crt_interrupt_vector_table
 section code_crt_start
 
 ENDIF
@@ -23,7 +23,7 @@ section code_crt_common
 
 IF (__crt_org_vector_table) && (__crt_org_vector_table != -0x80) && (__crt_org_vector_table != -0x100)
 
-section interrupt_vectors
+section code_crt_interrupt_vector_table
 
 ENDIF
 
@@ -305,7 +305,7 @@ SECTION MAIN_END
 
 IF (__crt_org_vector_table = 0)
 
-section interrupt_vectors
+section code_crt_interrupt_vector_table
 org 0
 
 ENDIF

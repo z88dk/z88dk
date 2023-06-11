@@ -4,7 +4,7 @@
 ; Alternate sound library by Stefano Bodrato
 ;
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
+IF !__CPU_GBZ80__  && !__CPU_INTEL__
           SECTION    code_clib
           PUBLIC     bit_fx3
           PUBLIC     _bit_fx3
@@ -19,9 +19,9 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 .bit_fx3
 ._bit_fx3
 
-        IF sndbit_port >= 256
+        IF SOUND_ONEBIT_port >= 256
           exx
-          ld   bc,sndbit_port
+          ld   bc,SOUND_ONEBIT_port
           exx
         ENDIF
 
@@ -53,21 +53,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld	b,255
 .expl
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
           ld      l,a
           pop     af
           xor     l
+    ONEBITOUT
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
 
           push    bc
 .dly      nop
@@ -75,7 +69,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           pop     bc
 
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
@@ -83,13 +77,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           pop     af
           xor     l
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+    ONEBITOUT
+
 
           push    bc
           push    af
@@ -112,21 +101,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld	b,100
 .blrp
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
           ld      l,a
           pop     af
           xor     l
+    ONEBITOUT
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
 
           push    bc
           push    af
@@ -138,15 +121,10 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           djnz    dlyb
           pop     bc
 
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+    ONEBITOUT
+
 
           push    bc
 .dlya     nop
@@ -166,19 +144,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld	hl,0
 .coff2
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           and     (hl)
           ld      b,a
           pop     af
           xor     b
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+    ONEBITOUT
+
 
           ld      b,(hl)
 .cdly          
@@ -197,7 +170,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld	b,255
 .blurp2
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
@@ -205,13 +178,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           pop     af
           xor     l
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+    ONEBITOUT
+
 
           push    af
           ld      a,(hl)
@@ -235,15 +203,10 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 .desc2    rl      l
           rl      h
           jr      nc,desc3
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+    ONEBITOUT
+
 
 .desc3
           ld      e,5
@@ -274,15 +237,10 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 .hdesc2   rl      l
           rl      h
           jr      nc,hdesc3
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+    ONEBITOUT
+
 
 .hdesc3
           djnz    hdesc2
@@ -310,15 +268,10 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 .asc2     rl      l
           rl      h
           jr      c,asc3
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+    ONEBITOUT
+
 
 .asc3
           djnz    asc2
@@ -342,19 +295,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           
 .fx71     push    hl
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           and     l
           ld      l,a
           pop     af
           xor     l
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+    ONEBITOUT
+
 
           pop     hl
           dec     hl

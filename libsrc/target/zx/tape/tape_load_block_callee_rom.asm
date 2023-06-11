@@ -18,7 +18,7 @@ EXTERN __SYSVAR_BORDCR
 	pop bc
 	ld a,c
 	pop de
-	pop ix
+	pop bc
 	push hl
 
 .asm_tape_load_block
@@ -27,6 +27,10 @@ EXTERN __SYSVAR_BORDCR
 ;         de = len
 ;          a = type
 
+
+	push ix
+	push bc
+	pop ix
 
         SCF
 
@@ -49,6 +53,9 @@ EXTERN __SYSVAR_BORDCR
         IN      A,($FE)
         RRA
         EI
+
+	pop ix
+
 		LD      HL,0
 		RET     NC
 		

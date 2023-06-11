@@ -55,11 +55,11 @@ RESULTS
 =======
 
 1.
-HITECH C MSDOS V750
-716 bytes exact
+HITECH C MSDOS V780pl2
+868 bytes exact
 
-cycle count  = 49858382
-time @ 4MHz  = 49858382 / 4x10^6 = 12.46 sec
+cycle count  = 51982515
+time @ 4MHz  = 51982515 / 4x10^6 = 12.99 seconds
 
 2.
 Z88DK April 20, 2020
@@ -70,11 +70,11 @@ cycle count  = 56090095
 time @ 4MHz  = 56090095 / 4*10^6 = 14.02 sec
 
 3.
-HITECH C CPM V309
-1218 bytes less cpm overhead
+HITECH C CPM V309-15
+2771 bytes exact
 
-cycle count  = 56667034
-time @ 4MHz  = 56667034 / 4*10^6 = 14.17 sec
+cycle count  = 56614856
+time @ 4MHz  = 56614856 / 4*10^6 = 14.1537 sec
 
 4.
 IAR Z80 V4.06A
@@ -92,11 +92,11 @@ cycle count  = 59756269
 time @ 4MHz  = 59756269 / 4*10^6 = 14.94 sec
 
 6.
-SDCC 3.6.5 #9852 (MINGW64)
-1196 bytes less page zero
+SDCC 4.2.0 Linux
+962 bytes less page zero
 
-cycle count  = 67174167
-time @ 4MHz  = 67174167 / 4*10^6 = 16.79 sec
+cycle count  = 57325388
+time @ 4MHz  = 57325388 / 4*10^6 = 14.33 sec
 
 7.
 Z88DK April 20, 2020
@@ -107,13 +107,20 @@ cycle count  = 77386481
 time @ 4MHz  = 77386481 / 4*10^6 = 19.35 sec
 
 8.
-Z88DK April 20, 2020
+Z88DK January 3, 2022
 sccz80 / classic c library
-1178 bytes less page zero
+1763 bytes less page zero
 
-cycle count  = 77386481
-time @ 4MHz  = 77386481 / 4*10^6 = 19.34 sec
+cycle count  = 75381296
+time @ 4MHz  = 75381296 / 4*10^6 = 18.84 sec
 
+9.
+Z88DK January 31, 2023
+sccz80 / classic c library / 8085 CPU
+1782 bytes less page zero
+
+cycle count  = 64389094
+time @ 4MHz  = 64389094 / 4*10^6 = 16.10 sec
 
 
 Background
@@ -141,10 +148,10 @@ Each program should:
 
         checksum = checksum + (if permutation_index is even then flips_count else -flips_count)
 
-        checksum = checksum + (toggle_sign_-1_1 * flips_count) 
+        checksum = checksum + (toggle_sign_-1_1 * flips_count)
 
-    Do this for all n! permutations, and record the maximum number of flips needed for any permutation. 
+    Do this for all n! permutations, and record the maximum number of flips needed for any permutation.
 
 diff program output N = 7 with this output file to check your program output has the correct format, before you contribute your program.
 
-Use a larger command line argument (12) to check program performance. 
+Use a larger command line argument (12) to check program performance.

@@ -24,6 +24,8 @@ math/float/math16/c/sccz80/cm16_sccz80_read_callee
 math/float/math16/c/sccz80/cm16_sccz80_sub
 math/float/math16/c/sccz80/cm16_sccz80_sub_callee
 math/float/math16/c/sccz80/cm16_sccz80_sqrt
+math/float/math16/c/sccz80/cm16_sccz80_atan2
+math/float/math16/c/sccz80/cm16_sccz80_atan2_callee
 
 math/float/math16/c/sccz80/cm16_sccz80_acos
 math/float/math16/c/sccz80/cm16_sccz80_asin

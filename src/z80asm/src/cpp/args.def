@@ -1,0 +1,69 @@
+//-----------------------------------------------------------------------------
+// z80asm
+// Copyright (C) Paulo Custodio, 2011-2023
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+#ifndef OPT_HEADER
+#define OPT_HEADER(opt_header)
+#endif
+
+#ifndef OPT
+#define OPT(opt_name, opt_param, opt_code, opt_help)
+#endif
+
+#define HELP_CONTINUE "\n                        "	// 24 spaces
+
+OPT_HEADER("Help Options:")
+OPT("-h", nullptr, exit_help(), "Show help options")
+OPT("-v", nullptr, m_verbose = true, "Be verbose")
+
+OPT_HEADER("Preprocessor Options:")
+OPT("-IXIY", nullptr, m_swap_ixiy = true, "Swap IX and IY registers")
+OPT("-I", "[=]DIR", push_include_path(opt_arg), "Add directory to include search path")
+OPT("-D", "[=]SYMBOL[=VALUE]", parse_define(opt_arg), "Define a static symbol in decimal or hex")
+OPT("-ucase", nullptr, m_ucase = true, "Convert identifiers to upper case")
+OPT("-float", "[=]FORMAT", set_float_format(opt_arg), "Set default float format")
+
+OPT_HEADER("Code Generation Options:")
+OPT("-m", "[=]CPU", set_cpu(opt_arg), "Assemble for the specified CPU, default z80")
+OPT("-opt-speed", nullptr, m_opt_speed = true, "Optimize for speed")
+OPT("-debug", nullptr, m_debug = m_map = true, "Add debug info to map file")
+
+OPT_HEADER("Libraries:")
+OPT("-L", "[=]DIR", push_library_path(opt_arg), "Add directory to library search path")
+OPT("-x", "[=]FILE[" EXT_LIB "]", m_lib_file = opt_arg, \
+	"Create a library file" EXT_LIB)
+OPT("-l", "[=]FILE[" EXT_LIB "]", library_file_append(opt_arg.c_str()), \
+	"Use library file" EXT_LIB)
+
+OPT_HEADER("Binary Output:")
+OPT("-O", "[=]DIR", m_output_dir = opt_arg, "Output directory")
+OPT("-o", "[=]FILE", m_bin_file = opt_arg, "Output binary file")
+OPT("-b", nullptr, m_make_bin = true, "Assemble and link/relocate to file" EXT_BIN)
+OPT("-split-bin", nullptr, m_split_bin = true, "Create one binary file per section")
+OPT("-d", nullptr, m_date_stamp = true, "Assemble only updated files")
+OPT("-R", nullptr, m_relocatable = true, "Create relocatable code")
+OPT("-reloc-info", nullptr, m_reloc_info = true, "Generate binary file relocation information")
+OPT("-r", "[=]ADDR", set_origin(opt_arg), "Relocate binary file to given address in decimal or hex")
+OPT("-f", "[=]BYTE", set_filler(opt_arg), "Default value to fill in DEFS in decimal or hex")
+
+OPT_HEADER("Output File Options:")
+OPT("-s", nullptr, m_symtable = true, "Create symbol table file" EXT_SYM)
+OPT("-l", nullptr, m_list_file = true, "Create listing file" EXT_LIS)
+OPT("-m", nullptr, m_map = true, "Create address map file" EXT_MAP)
+OPT("-g", nullptr, m_globaldef = true, "Create global definition file" EXT_DEF)
+
+OPT_HEADER("Appmake Options:")
+OPT("+zx81", nullptr, \
+	m_appmake = APPMAKE_ZX81; m_make_bin = true; set_origin_option(ZX81_ORIGIN), \
+	"Generate ZX81 " ZX81_APP_EXT " file, origin at " TOSTR(ZX81_ORIGIN))
+OPT("+zx", nullptr, \
+	m_appmake = APPMAKE_ZX; m_make_bin = true; set_origin_option(ZX_ORIGIN), \
+	"Generate ZX Spectrum " ZX_APP_EXT " file, origin defaults to" HELP_CONTINUE \
+	TOSTR(ZX_ORIGIN) " (in a REM), but can be set with -rORG >= 24000" HELP_CONTINUE \
+	"for above RAMTOP")
+
+#undef OPT_HEADER
+#undef OPT
+#undef HELP_CONTINUE

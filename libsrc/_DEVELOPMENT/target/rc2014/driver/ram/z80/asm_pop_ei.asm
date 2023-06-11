@@ -15,7 +15,7 @@
 
 INCLUDE "config_private.inc"
 
-SECTION smc_clib
+SECTION code_clib
 
 PUBLIC asm_pop_ei_jp
 
@@ -26,7 +26,7 @@ PUBLIC asm_pop_ei_jp
    ; uses  : af
 
    pop af                      ; af = ei_di_status
-   jp po, di_state
+   jp PO, di_state
 
 .ei_state
 

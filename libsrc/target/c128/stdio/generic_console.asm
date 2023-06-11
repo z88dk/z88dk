@@ -16,6 +16,7 @@
 		EXTERN		CONSOLE_ROWS
 		EXTERN		conio_map_colour
 		EXTERN		__c128_attr
+		EXTERN		__c128_paper
 
 		defc		DISPLAY = $2000
 		defc		COLOUR_MAP = $1000
@@ -32,6 +33,9 @@ generic_console_set_ink:
 
 	
 generic_console_set_paper:
+	call	conio_map_colour
+	and	15
+	ld	(__c128_paper),a
 	ret
 
 generic_console_cls:
@@ -46,6 +50,11 @@ generic_console_cls:
 	ld	a,(__c128_attr)
 	ld	(hl),a
 	ldir
+	ld	bc,$D021
+	ld	a,(__c128_paper)
+	out (c),a
+	ld	bc,$D020	; BORDER
+	out (c),a
 	ret
 
 ; c = x

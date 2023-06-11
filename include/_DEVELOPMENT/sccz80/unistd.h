@@ -25,23 +25,23 @@
 #define STDOUT_FILENO          1
 #define STDERR_FILENO          2
 
-#ifndef _SIZE_T_DEFINED
-#define _SIZE_T_DEFINED
+#ifndef _SIZE_T
+#define _SIZE_T
 typedef unsigned int           size_t;
 #endif
 
-#ifndef _SSIZE_T_DEFINED
-#define _SSIZE_T_DEFINED
+#ifndef _SSIZE_T
+#define _SSIZE_T
 typedef unsigned int           ssize_t;
 #endif
 
-#ifndef _OFF_T_DEFINED
-#define _OFF_T_DEFINED
+#ifndef _OFF_T
+#define _OFF_T
 typedef long                   off_t;
 #endif
 
-#ifndef _INTPTR_T_DEFINED
-#define _INTPTR_T_DEFINED
+#ifndef _INTPTR_T
+#define _INTPTR_T
 typedef int                    intptr_t;
 #endif
 

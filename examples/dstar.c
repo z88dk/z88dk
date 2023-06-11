@@ -72,7 +72,7 @@
  *      zcc +zx -Dspritesize=16 -DSOUND -create-app -zorg=24300 dstar.c
  *
  *      To get a TS2068 HRG version of the game:
- *      zcc +ts2068 -startup=2 -Dspritesize=21 -DSOUND -create-app dstar.c
+ *      zcc +ts2068 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=0x3e -Dspritesize=21 -DSOUND -create-app dstar.c
  *   
  *      To get a VZ200 version:
  *      zcc +vz -Dspritesize=7 -DSOUND -odztar.vz dstar.c
@@ -418,9 +418,9 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		if(*(locn+temp2)==BUBB)
 		{
 #ifdef xsize
-			putsprite(spr_xor,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
+			putsprite(spr_and,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
 #else
-			putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
+			putsprite(spr_and,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
 #endif
 
 			#ifdef SOUND
@@ -435,12 +435,12 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		*locn = 0;
 
  		/* remove old */
-		putsprite(spr_xor,x,y,sprites + (spritemem * temp));
+		putsprite(spr_and,x,y,sprites + (spritemem * temp));
 		/* put new */
 #ifdef xsize
-		putsprite(spr_xor,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * temp));
+		putsprite(spr_or,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * temp));
 #else
-		putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * temp));
+		putsprite(spr_or,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * temp));
 #endif
 		
 		#ifdef SOUND

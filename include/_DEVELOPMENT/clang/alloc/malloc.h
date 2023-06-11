@@ -89,7 +89,7 @@ extern int posix_memalign_unlocked(void **memptr,size_t alignment,size_t size);
 
 
 
-#ifndef _STDLIB_H
+#ifndef __STDLIB_H__
 
 extern void *aligned_alloc(size_t alignment,size_t size);
 

@@ -15,7 +15,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _negf16
-EXTERN cm16_sdcc_neg
-defc _negf16 = cm16_sdcc_neg
+defc _negf16 = negf16
 ENDIF
 

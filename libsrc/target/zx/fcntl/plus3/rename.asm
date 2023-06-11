@@ -25,8 +25,8 @@
 	push	hl
 	push	de
 	push	bc
-	ld	iy,DOS_RENAME
 	push	ix
+	ld	ix,DOS_RENAME
 	call	dodos
 	pop	ix
 	ld	hl,0

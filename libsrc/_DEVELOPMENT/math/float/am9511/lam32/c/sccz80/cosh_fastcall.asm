@@ -5,6 +5,7 @@
 
 	defc	cosh_fastcall = _am9511_cosh
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _cosh_fastcall

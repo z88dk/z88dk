@@ -34,7 +34,7 @@
 
 ; tvc specific stuff
         defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp          = 0x7f00
+        defc    TAR__register_sp          = -1
         defc    __CPU_CLOCK               = 3125000
         INCLUDE "crt/classic/crt_rules.inc"
 
@@ -56,7 +56,7 @@ start:
         push hl
         exx
         
-        ld      (start1+1),sp
+        ld      (__restore_sp_onexit+1),sp
         INCLUDE "crt/classic/crt_init_sp.asm"
 
         INCLUDE "crt/classic/crt_init_atexit.asm"
@@ -77,7 +77,7 @@ cleanup:
 
 
 
-start1:
+__restore_sp_onexit:
         ld      sp,0
         exx
         pop     hl

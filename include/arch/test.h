@@ -14,15 +14,22 @@
 #define REG_MMU6  0x56
 #define REG_MMU7  0x57
 
-#ifdef _SDCC
+// This function doesn't exist and is handled entirely by the preprocessor
+// and peep hole optimiser
+//
+// The optimiser has rules for sdcc and sccz80, so we have to make the call to
+// this resemble those used in newlib
+//
+// As a result, the sdcc variant needs to be __stdc so that the two parameters
+// are packed into a single word.
+#ifdef __SDCC
 extern void ZXN_WRITE_REG(unsigned char reg,unsigned char data) __preserves_regs(a,d,e,iyl,iyh);
-extern void ZXN_WRITE_REG_callee(unsigned char reg,unsigned char data) __preserves_regs(a,d,e,iyl,iyh) __z88dk_callee;
-#define ZXN_WRITE_REG(a,b) ZXN_WRITE_REG_callee(a,b)
+extern void ZXN_WRITE_REG_callee(unsigned char reg,unsigned char val) __z88dk_callee __preserves_regs(a,d,e,iyl,iyh);
 #else
 extern void __LIB__ ZXN_WRITE_REG(unsigned char reg,unsigned char data) __smallc;
-extern void __LIB__ ZXN_WRITE_REG_callee(unsigned char reg,unsigned char data) __smallc __z88dk_callee;
-#define ZXN_WRITE_REG(a,b) ZXN_WRITE_REG_callee(a,b)
+extern void __LIB__ ZXN_WRITE_REG_callee(unsigned char reg,unsigned char val) __smallc  __z88dk_callee;
 #endif
+#define ZXN_WRITE_REG(a,b) ZXN_WRITE_REG_callee(a,b)
 
 #ifndef __SDCC
 extern void __LIB__ ZXN_WRITE_MMU0(unsigned char page) __smallc __z88dk_fastcall;

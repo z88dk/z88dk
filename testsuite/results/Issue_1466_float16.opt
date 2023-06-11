@@ -11,9 +11,7 @@
 ._func1
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	call	l_f16_add
 	ret
 
@@ -152,9 +150,7 @@
 	ld	hl,4	;const
 	add	hl,sp
 	call	dldpsh
-	ld	hl,8	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint8sp	;
 	call	l_f48_f16tof
 	call	dmul
 	call	l_f48_ftof16
@@ -209,9 +205,7 @@
 ._func5e
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	call	l_f16_sint2f
 	call	l_f16_mul
 	ret
@@ -221,9 +215,7 @@
 ._func5f
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	ex	(sp),hl
 	call	l_f16_sint2f
 	call	l_f16_mul
@@ -235,9 +227,7 @@
 	ld	hl,4	;const
 	add	hl,sp
 	call	dldpsh
-	ld	hl,8	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint8sp	;
 	call	l_f48_f16tof
 	call	dadd
 	call	l_f48_ftof16
@@ -292,9 +282,7 @@
 ._func6e
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	call	l_f16_sint2f
 	call	l_f16_add
 	ret
@@ -304,9 +292,7 @@
 ._func6f
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	ex	(sp),hl
 	call	l_f16_sint2f
 	call	l_f16_add
@@ -330,9 +316,7 @@
 	ld	hl,4	;const
 	add	hl,sp
 	call	l_glong2sp
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	pop	de
 	ex	(sp),hl
 	ex	de,hl
@@ -358,9 +342,7 @@
 	ld	hl,4	;const
 	add	hl,sp
 	call	l_glong2sp
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	pop	de
 	ex	(sp),hl
 	ex	de,hl
@@ -379,6 +361,7 @@
 ._func8b
 	ld	hl,15360	;const
 	ret
+
 
 
 

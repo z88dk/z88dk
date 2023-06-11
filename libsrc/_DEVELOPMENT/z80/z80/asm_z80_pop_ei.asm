@@ -29,7 +29,7 @@ PUBLIC asm_cpu_pop_ei_jp
 asm_z80_pop_ei:
 asm_cpu_pop_ei:
 
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 
    defc asm0_z80_pop_ei = asm_cpu_pop_ei
    defc asm0_cpu_pop_ei = asm_cpu_pop_ei
@@ -62,17 +62,26 @@ asm_cpu_pop_ei_jp:
    ; uses  : af
 
    pop af                      ; af = ei_di_status
-   
+
+IF __CPU_8085__
+
+   and $08                     ; isolate IE bit
+   jp Z,di_state               ; or fall through to ei_state
+
+ELSE
+
    IF __Z80 & __Z80_NMOS
    
-      jr nc, di_state
+      jr NC, di_state
    
    ELSE
    
-      jp po, di_state
+      jp PO, di_state
 
    ENDIF
-   
+
+ENDIF
+
 ei_state:
 
    ei

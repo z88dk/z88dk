@@ -9,6 +9,9 @@ VERIFY CORRECT RESULT
 To verify correct result, compile for the zx spectrum target
 and run in an emulator.
 
+classic/sccz80/8085
+zcc +cpm -clib=8085 -vn -O2 -DSTATIC -DPRINTF pi.c -o pi -lndos -create-app
+
 sccz80/classic
 zcc +zx -vn -O2 -DSTATIC -DPRINTF pi.c -o pi -lndos -create-app
 
@@ -23,6 +26,9 @@ a binary ORGed at address 0 was produced.
 
 This simplifies the use of TICKS for timing.
 
+classic/sccz80/8085
+zcc +test -clib=8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
+
 sccz80/classic
 zcc +test -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
 
@@ -35,10 +41,8 @@ execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks pi.bin -start 00bb -end 01e9 -counter 9999999999
+z88dk-ticks pi.bin -x pi.map -start TIMER_START -end TIMER_STOP -counter 9999999999
 
-start   = TIMER_START in hex
-end     = TIMER_STOP in hex
 counter = High value to ensure completion
 
 If the result is close to the counter value, the program may have
@@ -50,17 +54,25 @@ RESULT
 PI.C
 
 
-Z88DK April 20, 2020
+Z88DK December 12, 2022
+sccz80 / classic c library / 8085 CPU
+7335 bytes less page zero
+
+cycle count  = 7824146079
+time @ 4MHz  = 7824146079 / 4*10^6 = 32 min 36 sec
+
+
+Z88DK April 4, 2022
 sccz80 / classic c library
-6508 bytes less page zero
+7154 bytes less page zero
 
-cycle count  = 4012440830
-time @ 4MHz  = 4012440830 / 4*10^6 = 16 min 43 sec
+cycle count  = 4028061102
+time @ 4MHz  = 4028061102 / 4*10^6 = 16 min 47 sec
 
 
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-6600 bytes less page zero
+Z88DK April 4, 2022
+zsdcc #13131 / classic c library
+7146 bytes less page zero
 
-cycle count  = 4169137078
-time @ 4MHz  = 4169137078 / 4*10^6 = 17 min 22 sec
+cycle count  = 4013954322
+time @ 4MHz  = 4013954322 / 4*10^6 = 16 min 43 sec

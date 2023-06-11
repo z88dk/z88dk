@@ -1,7 +1,5 @@
 target/ace/graphics/udg/clsgraph
-target/ace/graphics/udg/plotpixl
-target/ace/graphics/udg/respixl
-target/ace/graphics/udg/xorpixl
-target/ace/graphics/udg/pointxy
+target/ace/graphics/udg/textpixl6
 target/ace/graphics/udg/zx_hardcopy
-@gfx/text6/gfx_text6.lst
+gfx/text6/obj/${TARGET}/loadudg6
+@gfx/gencon/gfx_gencon6.lst

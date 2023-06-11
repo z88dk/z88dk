@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.2.0 #13131 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -67,6 +67,10 @@
 	EXTERN __rrslonglong_callee
 	EXTERN __rrulonglong
 	EXTERN __rrulonglong_callee
+	EXTERN ___mulsint2slong
+	EXTERN ___mulsint2slong_callee
+	EXTERN ___muluint2ulong
+	EXTERN ___muluint2ulong_callee
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
@@ -257,6 +261,8 @@
 	GLOBAL _inv
 	GLOBAL _sqr_fastcall
 	GLOBAL _sqr
+	GLOBAL _neg_fastcall
+	GLOBAL _neg
 	GLOBAL _isunordered_callee
 	GLOBAL _isunordered
 	GLOBAL _islessgreater_callee
@@ -423,24 +429,22 @@ _m32_atanhf:
 	push	af
 	push	af
 	push	hl
-	ld	c,l
-	ld	b,h
 	push	de
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
+	ld	bc,0x3f80
 	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
 	pop	de
-	pop	bc
+	pop	hl
 	push	de
-	push	bc
+	push	hl
 	ld	hl,0x3f80
 	push	hl
 	ld	hl,0x0000

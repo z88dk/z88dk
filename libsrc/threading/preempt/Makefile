@@ -4,6 +4,7 @@ include ../../Make.config
 
 
 CFILES = $(wildcard *.c)
+CFLAGS += -DASM_THREADING
 OBJECTS = $(CFILES:.c=.o)
 
 DESTDIR=$(OUTPUT_DIRECTORY)/

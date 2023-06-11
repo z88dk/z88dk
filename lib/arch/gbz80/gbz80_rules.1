@@ -4,7 +4,7 @@
 	ld	h,(hl)
 	ld	l,a
 
-%check 0 <= %1 <= 127
+%check -128 <= %1 <= 127
 	ld	hl,%1	;const
 	add	hl,sp
 =
@@ -45,8 +45,7 @@
 	ld	l,a
 	push	hl
 
-
-%check 0 <= %1 <= 127
+%check -128 <= %1 <= 127
 	ld	hl,%1	;const
 	add	hl,sp
 	ld	sp,hl
@@ -168,3 +167,107 @@
 	ld	e,l
 	ld	d,h
 	ld	hl,%2
+
+%title Cleanup a rules generated mess
+	call	l_glong
+	push	hl
+	ld	l,e
+	ld	h,d
+	pop	de
+	ld	hl,%1	;const
+	push	de
+	ex	de,hl
+	ld	hl,%2
+=
+	call	l_gint
+	push	hl
+	ld	de,%1	;const
+	ld	hl,%2
+
+%title Avoid stack usage
+	push	hl
+	ld	hl,sp+%1
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	de
+=
+	ld	d,h
+	ld	e,l
+	ld	hl,sp+%eval( %1 2 -)
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+
+%title Don't pop+transfer
+	pop	hl
+	push	hl
+	ld	d,h
+	ld	e,l
+	ld	hl,%1
+=
+	pop	de
+	push	de
+	ld	hl,%1
+
+%title Load directly into de
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	ld	d,h
+	ld	e,l
+	ld	hl,%1
+=
+	ld	a,(hl+)
+	ld	d,(hl)
+	ld	e,a
+	ld	hl,%1
+
+%title Load variable address directly into de
+	ld	hl,_%1
+	ld	d,h
+	ld	e,l
+	ld	hl,%2
+=
+	ld	de,_%1
+	ld	hl,%2
+
+%title Avoid using swap stacking
+	ld	de,%1
+	push	hl
+	ld	l,e
+	ld	h,d
+	pop	de
+=
+	ld	e,l
+	ld	d,h
+	ld	hl,%1
+
+%title Load 2nd tos directly 
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	e,l
+	ld	d,h
+	ld	hl,%1
+=
+	ld	hl,sp+2
+	ld	a,(hl+)
+	ld	d,(hl)
+	ld	e,a
+	ld	hl,%1
+
+%title Store directly to stack if EOS
+	ld	hl,%1
+	ld	d,h
+	ld	e,l
+	ld	hl,%2	;const
+	call	l_pint
+	jp	%3	;EOS
+=
+	ld	hl,%1
+	ld	(hl),%eval(%2 256 %%)
+	inc	hl
+	ld	(hl),%eval(%2 256 /)
+	jp	%3	;EOS

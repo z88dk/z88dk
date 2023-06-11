@@ -1,0 +1,4 @@
+target/nabu/stdio/fputc_cons.asm
+target/nabu/stdio/fgetc_cons.asm
+target/nabu/stdio/getk.asm
+@target/nabu/nabu_cpm.lst

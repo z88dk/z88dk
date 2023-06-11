@@ -14,9 +14,10 @@ else
   EXESUFFIX 		?=
 endif
 
-DESTDIR ?= /usr/local
+PREFIX ?= /usr/local
 
-prefix_share = $(DESTDIR)/share/z88dk
+prefix_share = $(PREFIX)/share/z88dk
+bin_dir = $(PREFIX)/bin
 git_rev ?= $(shell git rev-parse --short HEAD)
 git_count ?= $(shell git rev-list --count HEAD)
 version ?= $(shell date +%Y%m%d)
@@ -27,14 +28,14 @@ CC ?= gcc
 # Prefix for executables (eg z88dk-, hence z88dk-z80asm, z88dk-copt etc)
 CROSS ?= 0
 
+OCC := $(CC)
 ifneq (, $(shell which ccache))
-   OCC := $(CC)
    CC := ccache $(CC)
 endif
 
 Z88DK_PATH	= $(shell pwd)
 SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
-SDCC_VERSION    = 12250
+SDCC_VERSION    = 13131
 
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
@@ -46,8 +47,8 @@ endif
 
 export CC INSTALL CFLAGS CROSS
 
-BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(EXESUFFIX) \
-	bin/z88dk-ucpp$(EXESUFFIX) bin/sccz80$(EXESUFFIX) bin/z88dk-z80asm$(EXESUFFIX) \
+BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) \
+	bin/z88dk-ucpp$(EXESUFFIX) bin/z88dk-sccz80$(EXESUFFIX) bin/z88dk-z80asm$(EXESUFFIX) \
 	bin/zcc$(EXESUFFIX) bin/z88dk-zpragma$(EXESUFFIX) bin/z88dk-zx7$(EXESUFFIX) \
 	bin/z88dk-z80nm$(EXESUFFIX) bin/z88dk-zobjcopy$(EXESUFFIX)  \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
@@ -56,7 +57,7 @@ BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(
 	
 ALL = $(BINS) testsuite
 
-ALL_EXT = bin/zsdcc$(EXESUFFIX)
+ALL_EXT = bin/z88dk-zsdcc$(EXESUFFIX)
 
 .PHONY: all
 all: 	$(ALL) $(ALL_EXT)
@@ -64,11 +65,13 @@ all: 	$(ALL) $(ALL_EXT)
 src/config.h:
 	$(shell if [ "${git_count}" != "" ]; then \
 		echo '#define PREFIX "${prefix_share}"' > src/config.h; \
+		echo '#define BINDIR "${bin_dir}"' >> src/config.h; \
 		echo '#define UNIX 1' >> src/config.h; \
 		echo '#define Z88DK_VERSION "${git_count}-${git_rev}-${version}"' >> src/config.h; \
 	fi)
 	$(shell if [ ! -f src/config.h ]; then \
 		echo '#define PREFIX "${prefix_share}"' > src/config.h; \
+		echo '#define BINDIR "${bin_dir}"' >> src/config.h; \
 		echo '#define UNIX 1' >> src/config.h; \
 		echo '#define Z88DK_VERSION "unknown-unknown-${version}"' >> src/config.h; \
 		fi)
@@ -104,6 +107,8 @@ ifdef BUILD_SDCC
 		--disable-tlcs90-port --disable-xa51-port --disable-stm8-port \
 		--disable-pdk13-port --disable-pdk14-port \
 		--disable-pdk15-port --disable-pdk16-port \
+		--disable-mos6502-port --disable-mos65c02-port \
+		--disable-r2k-port \
 		--disable-ucsim --disable-device-lib --disable-packihx
 endif
 
@@ -114,10 +119,10 @@ ifdef BUILD_SDCC
 endif
 
 
-bin/zsdcc$(EXESUFFIX): $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)
+bin/z88dk-zsdcc$(EXESUFFIX): $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)
 ifdef BUILD_SDCC
-	cp $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/zsdcc$(EXESUFFIX)
-	cp $(SDCC_PATH)/bin/sdcpp$(EXESUFFIX) $(Z88DK_PATH)/bin/zsdcpp$(EXESUFFIX)
+	cp $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
+	cp $(SDCC_PATH)/bin/sdcpp$(EXESUFFIX) $(Z88DK_PATH)/bin/z88dk-zsdcpp$(EXESUFFIX)
 endif
 
 
@@ -130,10 +135,7 @@ bin/z88dk-copt$(EXESUFFIX): src/config.h
 bin/z88dk-ucpp$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/ucpp PREFIX=`pwd` install
 
-bin/z88dk-zcpp$(EXESUFFIX): src/config.h
-	$(MAKE) -C src/cpp PREFIX=`pwd` install
-
-bin/sccz80$(EXESUFFIX): src/config.h
+bin/z88dk-sccz80$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/sccz80 PREFIX=`pwd` install
 
 bin/z88dk-z80asm$(EXESUFFIX): src/config.h
@@ -174,35 +176,38 @@ bin/z88dk-lib$(EXESUFFIX): src/config.h
 
 
 libs: $(BINS)
-	cd libsrc ; $(MAKE)
-	cd libsrc ; $(MAKE) install
+	$(MAKE) -C libsrc
+	$(MAKE) -C libsrc  install
 
 install: install-clean
-	install -d $(DESTDIR) $(DESTDIR)/bin $(prefix_share)/lib $(prefix_share)/src
-	$(MAKE) -C src/appmake PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/copt PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/cpp PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/sccz80 PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/z80asm  PREFIX=$(DESTDIR) PREFIX_SHARE=$(prefix_share) install
-	$(MAKE) -C src/zcc PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/zx0 PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/zobjcopy PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/ticks PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/z88dk-lib PREFIX=$(DESTDIR) install
-	$(MAKE) -C support/graphics PREFIX=$(DESTDIR) install
-	$(MAKE) -C support/basck PREFIX=$(DESTDIR) install
-	$(MAKE) -C support/pv1000 PREFIX=$(DESTDIR) install
-	if [ -f bin/zsdcpp$(EXESUFFIX) ]; then cp bin/zsdcpp$(EXESUFFIX) $(DESTDIR)/bin/; fi
-	if [ -f bin/zsdcc$(EXESUFFIX) ]; then cp bin/zsdcc$(EXESUFFIX) $(DESTDIR)/bin/; fi
-	cp -r include $(prefix_share)/
-	cp -r lib $(prefix_share)/
-	cp -r libsrc $(prefix_share)/
-	cp -r src/m4 $(prefix_share)/src/
+	mkdir -p $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(prefix_share)/lib $(DESTDIR)$(prefix_share)/src
+	$(MAKE) -C src/appmake PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/copt PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/sccz80 PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/z80asm  PREFIX=$(DESTDIR)$(PREFIX) PREFIX_SHARE=$(DESTDIR)$(prefix_share) install
+	$(MAKE) -C src/zcc PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/zx0 PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/zobjcopy PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/ticks PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/z88dk-lib PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C support/graphics PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C support/basck PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C support/pv1000 PREFIX=$(DESTDIR)$(PREFIX) install
+	cp -r support/cmake $(DESTDIR)$(prefix_share)/
+	if [ -f bin/z88dk-zsdcpp$(EXESUFFIX) ]; then cp bin/z88dk-zsdcpp$(EXESUFFIX) $(DESTDIR)$(PREFIX)/bin/; fi
+	if [ -f bin/z88dk-zsdcc$(EXESUFFIX) ]; then cp bin/z88dk-zsdcc$(EXESUFFIX) $(DESTDIR)$(PREFIX)/bin/; fi
+	cp -r include $(DESTDIR)$(prefix_share)/
+	cp -r lib $(DESTDIR)$(prefix_share)/
+	cp -r libsrc $(DESTDIR)$(prefix_share)/
+	cp -r src/m4 $(DESTDIR)$(prefix_share)/src/
 
+install-clean:
+	$(MAKE) -C libsrc install-clean
+	$(RM) lib/z80asm*.lib
 
 	# BSD install syntax below
 	#find include -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{}  \;
@@ -214,27 +219,23 @@ install: install-clean
 
 
 # Needs to have a dependency on libs
-test: $(ALL) 
+test: $(ALL)
 	$(MAKE) -C test
 
 testsuite: $(BINS)
+ifeq ($(CROSS),0)
 	$(MAKE) -C testsuite
+endif
 
-install-clean:
-	$(MAKE) -C libsrc install-clean
-	$(RM) lib/z80asm*.lib
-
-clean: clean-bins
+clean: bins-clean
 	$(MAKE) -C libsrc clean
 	$(RM) lib/clibs/*.lib
 	$(RM) lib/z80asm*.lib
 
-
-clean-bins:
+bins-clean:
 	$(MAKE) -C src/appmake clean
 	$(MAKE) -C src/common clean
 	$(MAKE) -C src/copt clean
-	$(MAKE) -C src/cpp clean
 	$(MAKE) -C src/sccz80 clean
 	$(MAKE) -C src/ticks clean
 	$(MAKE) -C src/ucpp clean
@@ -246,6 +247,7 @@ clean-bins:
 	$(MAKE) -C src/zpragma clean
 	$(MAKE) -C src/zx7 clean
 	$(MAKE) -C src/zx0 clean
+	$(MAKE) -C examples clean
 	$(MAKE) -C support clean
 	$(MAKE) -C test clean
 	$(MAKE) -C testsuite clean
@@ -257,5 +259,14 @@ ifdef BUILD_SDCC_HTTP
 endif
 endif
 	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
+
+test-clean:
+	$(MAKE) -C test clean
+
+testsuite-clean:
+	$(MAKE) -C testsuite clean
+
+examples-clean:
+	$(MAKE) -C examples clean
 
 .PHONY: test testsuite

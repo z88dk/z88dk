@@ -1,6 +1,6 @@
 SECTION code_driver
 
-PUBLIC _disk_ioctl
+PUBLIC disk_ioctl
 
 EXTERN asm_disk_ioctl
 
@@ -19,17 +19,19 @@ EXTERN asm_disk_ioctl
     
 ; control the ide drive
 
-_disk_ioctl:
+disk_ioctl:
 
-    pop af
+    inc sp
+    inc sp
     pop hl
     pop de
     pop bc
     push bc
     push de
     push hl
-    push af
-    
-    ld b, e
+    dec sp
+    dec sp
+
+    ld b,e
 
     jp asm_disk_ioctl

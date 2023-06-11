@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.2.0 #13131 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -67,6 +67,10 @@
 	EXTERN __rrslonglong_callee
 	EXTERN __rrulonglong
 	EXTERN __rrulonglong_callee
+	EXTERN ___mulsint2slong
+	EXTERN ___mulsint2slong_callee
+	EXTERN ___muluint2ulong
+	EXTERN ___muluint2ulong_callee
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
@@ -257,6 +261,8 @@
 	GLOBAL _inv
 	GLOBAL _sqr_fastcall
 	GLOBAL _sqr
+	GLOBAL _neg_fastcall
+	GLOBAL _neg
 	GLOBAL _isunordered_callee
 	GLOBAL _isunordered
 	GLOBAL _islessgreater_callee
@@ -422,35 +428,21 @@ _m32_roundf:
 	add	ix,sp
 	ld	c, l
 	ld	b, h
-	ld	hl, -20
+	ld	hl, -18
 	add	hl, sp
 	ld	sp, hl
-	ld	hl,0
-	add	hl, sp
-	ld	(ix-2),l
-	ld	(ix-1),h
-	ld	(hl), c
-	inc	hl
-	ld	(hl), b
-	inc	hl
-	ld	(hl), e
-	inc	hl
-	ld	(hl), d
-	ld	hl,0
-	add	hl, sp
-	ld	(ix-16),l
-	ld	(ix-15),h
-	push	de
+	pop	hl
 	push	bc
-	ld	e,(ix-16)
-	ld	d,(ix-15)
-	ld	hl,0x0014
-	add	hl, sp
-	ex	de, hl
-	ld	bc,0x0004
-	ldir
-	pop	bc
-	pop	de
+	ld	(ix-16),e
+	ld	(ix-15),d
+	ld	a,(ix-18)
+	ld	(ix-4),a
+	ld	a,(ix-17)
+	ld	(ix-3),a
+	ld	a,(ix-16)
+	ld	(ix-2),a
+	ld	a,(ix-15)
+	ld	(ix-1),a
 	ld	a,(ix-4)
 	ld	(ix-14),a
 	ld	a,(ix-3)
@@ -551,9 +543,11 @@ l_m32_roundf_00146:
 	jp	l_m32_roundf_00114
 l_m32_roundf_00104:
 	ld	a,(ix-10)
-	inc	a
+	push	af
 	ld	bc,0x0000
 	ld	de,0x0040
+	pop	af
+	inc	a
 	jr	l_m32_roundf_00148
 l_m32_roundf_00147:
 	sra	d
@@ -614,26 +608,14 @@ l_m32_roundf_00109:
 	ld	h, b
 	jr	l_m32_roundf_00114
 l_m32_roundf_00113:
-	ld	l,(ix-16)
-	ld	h,(ix-15)
-	ld	(hl), c
-	inc	hl
-	ld	(hl), b
-	inc	hl
-	ld	(hl), e
-	inc	hl
-	ld	(hl), d
-	ld	hl,0
-	add	hl, sp
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	inc	hl
-	ld	c, (hl)
-	inc	hl
-	ld	h, (hl)
-	ld	l,c
-	ex	de,hl
+	pop	hl
+	push	bc
+	ld	(ix-16),e
+	ld	(ix-15),d
+	pop	hl
+	push	hl
+	ld	e,(ix-16)
+	ld	d,(ix-15)
 l_m32_roundf_00114:
 	ld	sp, ix
 	pop	ix

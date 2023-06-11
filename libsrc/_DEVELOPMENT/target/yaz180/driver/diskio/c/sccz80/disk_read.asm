@@ -1,6 +1,6 @@
 SECTION code_driver
 
-PUBLIC _disk_read
+PUBLIC disk_read
 
 EXTERN asm_disk_read
 
@@ -19,7 +19,7 @@ EXTERN asm_disk_read
 ; hl = the address pointer to the buffer to fill
 ;
 
-_disk_read:
+disk_read:
     inc sp      ; pop return address
 ;   inc sp
 

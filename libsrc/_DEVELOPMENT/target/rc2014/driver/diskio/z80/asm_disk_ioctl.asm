@@ -45,7 +45,7 @@ EXTERN ideBuffer
 ; b = BYTE cmd
 ; hl = void* buff (for the result)
 ;
-; no guarentee that buff will be large enough to hold the whole ioctl 512 byte
+; no guarantee that buff will be large enough to hold the whole ioctl 512 byte
 ; response. so use our own buffer, ideBuffer.
 ;
 ; exit
@@ -54,122 +54,120 @@ EXTERN ideBuffer
     
 ; control the ide drive
 
-asm_disk_ioctl:
-    push af
+.asm_disk_ioctl
     push de
 
-    xor a                   ; clear a
-    or c                    ; check that that it is drive 0
-    jr nz, dresult_error
+    xor a                       ; clear a
+    or c                        ; check that that it is drive 0
+    jr NZ,dresult_error
 
-    inc b                   ; use the command byte in b, to switch the action
+    inc b                       ; use the command byte in b, to switch the action
     djnz get_sector_count
 
-    call ide_cache_flush    ; cmd = 0
-    jr nc, dresult_error
+    call ide_cache_flush        ; cmd = 0
+
+    jr NC,dresult_error
     jr dresult_ok
 
-get_sector_count:
+.get_sector_count
     djnz get_sector_size
-    
-    push hl                 ; save the calling buffer origin
-    ld hl, ideBuffer        ; insert our own scratch buffer
-    call ide_drive_id       ; cmd = 1 get the drive id info.
 
-    pop de                  ; get calling buffer origin in de
-    ld bc, 4                ; put the number of bytes in bc
-    ld hl, ideBuffer+120    ; point to Word 60, 61
-    
-    jr nc, dresult_error
+    push hl                     ; save the calling buffer origin
+    ld hl, ideBuffer            ; insert our own scratch buffer
+    call ide_drive_id           ; cmd = 1 get the drive id info.
 
-    ldir                    ; if all good then copy 4 bytes
+    pop de                      ; get calling buffer origin in de
+    ld hl, ideBuffer+120        ; point to Word 60, 61
+    ld bc,4                     ; put the number of bytes in bc
+
+    jr NC,dresult_error
+
+    ldir                        ; if all good then copy 4 bytes
     jr dresult_ok
 
-get_sector_size:
+.get_sector_size
     djnz get_block_size
 
-    ld (hl), 0              ; cmd = 2
+    ld (hl),0                   ; cmd = 2
     inc hl
-    ld (hl), 2              ; set value at pointer to 0x0200 (512)
+    ld (hl),2                   ; set value at pointer to 0x0200 (512)
     jr dresult_ok
 
-get_block_size:
+.get_block_size
     djnz ata_get_rev
 
-    ld (hl), 1              ; cmd = 3
+    ld (hl),1                   ; cmd = 3
     inc hl
-    ld (hl), 0              ; set value at pointer to 0x0001 sectors
+    ld (hl),0                   ; set value at pointer to 0x0001 sectors
     jr dresult_ok
 
-dresult_error:
-    ld hl, 1                ; set DRESULT RES_ERROR
+.dresult_error
+    ld hl,1                     ; set DRESULT RES_ERROR
     pop de
-    pop af
-    or a
     ret
 
-dresult_ok:
-    ld hl, 0                ; set DRESULT RES_OK
+.dresult_ok
+    ld hl,0                     ; set DRESULT RES_OK
     pop de
-    pop af
     scf
     ret
 
-ata_get_rev:
-    ld a, b
-    sub 17                  ; jump gap to next ATA commands
-    ld b, a
-    jr nz, ata_get_model
+.ata_get_rev
+    ld a,b
+    sub 17                      ; jump gap to next ATA commands
+    jr C,dresult_par_error
 
-    push hl                 ; save the output buffer origin
-    ld hl, ideBuffer        ; insert our own scratch buffer
-    call ide_drive_id       ; cmd = 20 get the drive firmware revision.
+    ld b,a
+    jr NZ,ata_get_model
 
-    ld bc, 8                ; number of bytes (8) to move
-    pop de                  ; get calling buffer origin in de
-    ld hl, ideBuffer+46     ; prepare the firmware offset
-    
-    jr nc, dresult_error    
+    push hl                     ; save the output buffer origin
+    ld hl,ideBuffer             ; insert our own scratch buffer
+    call ide_drive_id           ; cmd = 20 get the drive firmware revision.
 
-    call copy_word          ; 8 bytes
+    pop de                      ; get calling buffer origin in de
+    ld hl,ideBuffer+46          ; prepare the firmware offset
+    ld bc,8                     ; number of bytes (8) to move
+
+    jr NC,dresult_error
+
+    call copy_word              ; 8 bytes
     jr dresult_ok
 
-ata_get_model:
+.ata_get_model
     djnz ata_get_sn
 
-    push hl                 ; save the output buffer origin
-    ld hl, ideBuffer        ; insert our own scratch buffer
-    call ide_drive_id       ; cmd = 21 get the drive model number.
+    push hl                     ; save the output buffer origin
+    ld hl,ideBuffer             ; insert our own scratch buffer
+    call ide_drive_id           ; cmd = 21 get the drive model number.
 
-    ld bc, 40               ; number of bytes (40) to move
-    pop de                  ; get calling buffer origin in de
-    ld hl, ideBuffer+54     ; prepare the model number offset
+    pop de                      ; get calling buffer origin in de
+    ld hl,ideBuffer+54          ; prepare the model number offset
+    ld bc,40                    ; number of bytes (40) to move
 
-    jr nc, dresult_error
+    jr NC,dresult_error
 
-    call copy_word          ; 40 bytes
+    call copy_word              ; 40 bytes
     jr dresult_ok
      
-ata_get_sn:
+.ata_get_sn
     djnz dresult_par_error
 
-    push hl                 ; save the output buffer origin
-    ld hl, ideBuffer        ; insert our own scratch buffer
-    call ide_drive_id       ; cmd = 22 get the serial number.
+    push hl                     ; save the output buffer origin
+    ld hl,ideBuffer             ; insert our own scratch buffer
+    call ide_drive_id           ; cmd = 22 get the serial number.
 
-    ld bc, 20               ; number of bytes (20) to move
-    pop de                  ; get calling buffer origin in de
-    ld hl, ideBuffer+20     ; prepare the serial number offset
+    pop de                      ; get calling buffer origin in de
+    ld hl,ideBuffer+20          ; prepare the serial number offset
+    ld bc,20                    ; number of bytes (20) to move
 
-    jr nc, dresult_error
+    jr NC,dresult_error
 
-    call copy_word          ; 20 bytes
+    call copy_word              ; 20 bytes
     jr dresult_ok
 
-dresult_par_error:
-    ld hl, 4                ; set DRESULT RES_PARERR
+.dresult_par_error
+    ld hl,4                     ; set DRESULT RES_PARERR
     pop de
-    pop af
     or a
     ret
 
@@ -187,3 +185,4 @@ copy_word:
     xor a
     ld (de), a          ; add a null on the end of the string
     ret
+

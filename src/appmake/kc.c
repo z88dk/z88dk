@@ -1,5 +1,5 @@
 /*
- *      Short program to create a Robotron KC85/2..KC85/4 type header
+ *      Short program to create a VEB MPM KC85/2..KC85/4 type header
  *
  *      
  *      $Id: kc.c,v 1.1 2016-10-03 06:14:49 stefano Exp $

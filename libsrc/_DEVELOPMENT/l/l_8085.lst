@@ -1,0 +1,2 @@
+@${NEWLIB_ROOT}l/sccz80/8085.lst
+@${NEWLIB_ROOT}l/util/8085.lst

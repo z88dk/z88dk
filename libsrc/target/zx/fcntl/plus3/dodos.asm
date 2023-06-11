@@ -14,13 +14,9 @@
 
         EXTERN  l_push_di
         EXTERN  l_pop_ei
-        EXTERN  l_jpiy
 
+jpix:   jp	(ix)
 dodos:
-        call    dodos2          ;dummy routine to restore iy afterwards
-        ld      iy,23610
-        ret
-dodos2:
         push    af
         push    bc
         call    l_push_di
@@ -31,7 +27,7 @@ dodos2:
         call    l_pop_ei
         pop     bc
         pop     af
-        call    l_jpiy
+        call    jpix
         push    af
         push    bc
         call    l_push_di

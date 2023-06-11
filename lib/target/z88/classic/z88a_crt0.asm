@@ -199,7 +199,7 @@ errhan2:
 IF DEFINED_applicationquit
     call    applicationquit
 ENDIF
-    xor     a		;Standard cleanup
+    ld      l,0
     jr      cleanup
 not_quit:
     xor     a

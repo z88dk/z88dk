@@ -8,7 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _tan
-EXTERN cm32_sdcc_tan
-defc _tan = cm32_sdcc_tan
+defc _tan = tan
 ENDIF
 

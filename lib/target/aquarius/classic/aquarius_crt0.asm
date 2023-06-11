@@ -9,47 +9,44 @@
 
 
 
-                MODULE  aquarius_crt0
-;--------
-; Include zcc_opt.def to find out some info
-;--------
+    MODULE  aquarius_crt0
 
-        defc    crt0 = 1
-        INCLUDE "zcc_opt.def"
 
-;--------
-; Some scope definitions
-;--------
-
-        EXTERN    _main           ;main() is always external to crt0 code
-
-        PUBLIC    cleanup         ;jp'd to by exit()
-        PUBLIC    l_dcal          ;jp(hl)
-
-	defc    TAR__no_ansifont = 1
-	defc	CONSOLE_ROWS = 24
-	defc	CONSOLE_COLUMNS = 40
-	defc __CPU_CLOCK = 4000000
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
 
 
-	IF startup = 1 
-		INCLUDE "target/aquarius/def/maths_mbf.def"
-		INCLUDE	"target/aquarius/classic/ram.asm"
-        ELSE
-		INCLUDE	"target/aquarius/classic/rom.asm"
-	ENDIF
+    EXTERN  _main           ;main() is always external to crt0 code
+
+    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  l_dcal          ;jp(hl)
+
+    defc    TAR__no_ansifont = 1
+    defc    CONSOLE_ROWS = 24
+    defc    CONSOLE_COLUMNS = 40
+    defc    __CPU_CLOCK = 4000000
 
 
-l_dcal:	jp	(hl)
+
+IF startup = 1 
+    INCLUDE "target/aquarius/def/maths_mbf.def"
+    INCLUDE	"target/aquarius/classic/ram.asm"
+ELSE
+    INCLUDE	"target/aquarius/classic/rom.asm"
+ENDIF
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+l_dcal: 
+    jp      (hl)
 
-	INCLUDE	"crt/classic/crt_section.asm"
 
-	SECTION code_crt_init
-	ld	hl,$3028
-	ld	(base_graphics),hl
+    INCLUDE "crt/classic/crt_runtime_selection.asm"
+
+    INCLUDE	"crt/classic/crt_section.asm"
+
+    SECTION code_crt_init
+    ld      hl,$3028
+    ld      (base_graphics),hl
 
 

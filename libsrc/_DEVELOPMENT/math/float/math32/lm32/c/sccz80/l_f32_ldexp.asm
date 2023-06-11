@@ -35,7 +35,6 @@
 
 .zero_legal
         ld e,d                      ; use 0
-        ld h,d
-        ld l,d
-        rr d                        ; restore the sign
+        ld hl,de
+        rr d                        ; restore the sign and exponent
         ret                         ; return IEEE signed ZERO in DEHL

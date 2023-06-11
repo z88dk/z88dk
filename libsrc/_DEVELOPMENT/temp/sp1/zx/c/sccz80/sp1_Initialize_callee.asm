@@ -19,4 +19,15 @@ sp1_Initialize_callee:
    ld a,e
    push bc
 
-   jp asm_sp1_Initialize
+;   jp asm_sp1_Initialize
+   push ix
+   call asm_sp1_Initialize
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_Initialize_callee
+defc _sp1_Initialize_callee = sp1_Initialize_callee
+ENDIF
+

@@ -1,0 +1,71 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+._offs_x
+	defb	80,0,0,0
+	SECTION	code_compiler
+	SECTION	data_compiler
+._offs_x2
+	defb	80,0,0,0
+	SECTION	code_compiler
+	SECTION	data_compiler
+._offs_xt
+	defw	80
+	SECTION	code_compiler
+	SECTION	data_compiler
+._offs_data
+	defw	80
+	SECTION	code_compiler
+	SECTION	data_compiler
+._size_x
+	defw	140
+	SECTION	code_compiler
+	SECTION	data_compiler
+._size_x_tn
+	defw	60
+	SECTION	code_compiler
+
+._func
+	ld	hl,80	;const
+	ld	de,0
+	push	de
+	push	hl
+	ld	hl,80	;const
+	ld	de,0
+	push	de
+	push	hl
+	ld	hl,80	;const
+	push	hl
+	push	hl
+	ld	hl,12	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+
+
+
+
+
+	SECTION	bss_compiler
+._data	defs	140
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_offs_x
+	GLOBAL	_offs_x2
+	GLOBAL	_offs_xt
+	GLOBAL	_offs_data
+	GLOBAL	_size_x
+	GLOBAL	_size_x_tn
+	GLOBAL	_func
+
+
+
+

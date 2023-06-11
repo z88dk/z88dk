@@ -66,13 +66,11 @@ RESULTS
 =======
 
 1.
-HITECH C CPM V309
-1872 bytes less cpm overhead
+HITECH C CPM V309-15
+3479 bytes exact
 
-cycle count  = 1852698998
-time @ 4MHz  = 1852698998 / 4*10^6 = 7 min 43 sec
-
-Very fast float library but only accurate for */+-
+cycle count  = 1870290979
+time @ 4MHz  = 1870290979 / 4*10^6 = 7 min 47 sec
 
 2.
 IAR Z80 V4.06A
@@ -140,13 +138,13 @@ time @ 4MHz  = 3596657568 / 4*10^6 = 14 min 59 sec
 48-bit float implementation causes relative slowdown.
 
 9.
-SDCC 3.6.5 #9852 (MINGW64)
-5218 bytes less page zero
+SDCC 4.2.0 Linux
+3962 bytes less page zero
 
-cycle count  = 10863431873
-time @ 4MHz  = 10863431873 / 4*10^6 = 45 min 16 sec
+cycle count  = 4991827956
+time @ 4MHz  = 4991827956 / 4*10^6 = 20 min 48 sec
 
-Large size & slow speed largely due to float implementation in C.
+Slow speed largely due to float implementation in C.
 
 10.
 Z88DK April 30, 2021
@@ -158,22 +156,29 @@ time @ 4MHz  = 1142045217 / 4*10^6 =  4 min 45 sec
 
 IEEE 32-bit float implementation.
 
-12.
-Z88DK June 13, 2020
-sccz80 / new c library / math16-fast
-1986 bytes less page zero
+11.
+Z88DK May 3, 2021
+sccz80 / new c library / math16
+2050 bytes less page zero
 
-cycle count  =  965171871
-time @ 4MHz  =  965171871 / 4*10^6 =  4 min 01 sec
+cycle count  =  915024561
+time @ 4MHz  =  915024561 / 4*10^6 =  3 min 48 sec
 
 IEEE 16-bit float implementation.
 
-DQ.
-HITECH C MSDOS V750
-1526 bytes exact
+12.
+Z88DK January 5, 2022
+sccz80 / classic c library / 8085 / MBF32
+3457 bytes less page zero
+
+cycle count  = 1806589346
+time @ 4MHz  = 1806589346 / 4*10^6 =  7 min 32 sec
+
+DISQ.
+HITECH C MSDOS V780pl2
+1679 bytes exact
 
 Disqualified due to incorrect results.
-HTCv750 does not have a functioning float library.
 
 
 BENCHMARKS GAME COMMENTS

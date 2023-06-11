@@ -4,7 +4,7 @@ TARGET ?= zxn
 
 SUBDIRS = 
 
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 ASMFILES = $(wildcard *.asm) $(wildcard ansi/*.asm)
 CFILES = $(wildcard *.c)
@@ -31,8 +31,7 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	$(Q)$(ASSEMBLER) -DFOR$(TARGET) $(AFLAGS) -I$(OUTPUT_DIRECTORY) -I$(Z88DK_LIB) -DSTANDARDESCAPECHARS  $^
-	@mv $(^:.asm=.o) $@
+	$(Q)$(ASSEMBLER) -DFOR$(TARGET) $(AFLAGS) -I$(OUTPUT_DIRECTORY) -I$(Z88DK_LIB) -DSTANDARDESCAPECHARS -Oobj/$(TARGET) $^
 
 obj/$(TARGET)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@ $^
@@ -46,5 +45,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all TARGET=$(TARGET)
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o

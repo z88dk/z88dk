@@ -1,5 +1,7 @@
 // zcc +zx main.c sound.asm -lndos -create-app
 // zcc +msx main.c sound.asm -subtype=rom -create-app
+// zcc +cpc main.c sound.asm -create-app
+// zcc +cpm -subtype=einstein main.c sound.asm -subtype=rom -create-app
 #include <stdio.h>
 #include <intrinsic.h>
 #include <interrupt.h>
@@ -9,11 +11,14 @@
 #ifdef __MSX__
 #include <msx.h>
 #endif
+#ifdef __GAL__
+#include <arch/gal.h>
+#endif
 #include <psg/vt2.h>
 #include <stdlib.h>
 
 
-#if __PC6001__ | __MULTI8__
+#if __PC6001__ | __MULTI8__  | __NABUPC__ | __EINSTEIN__
 #define NO_INTERRUPT 1
 #endif
 
@@ -64,9 +69,13 @@ void main()
           ay_vt2_start();
           break;
       }
+#ifdef __CPC__
+       msleep(40);
+#endif
+       
 #ifdef NO_INTERRUPT
        ay_vt2_play();
-       msleep(40);
+       msleep(10);
 #endif
    }
 }

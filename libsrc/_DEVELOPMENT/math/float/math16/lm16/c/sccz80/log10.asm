@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _log10f16
-EXTERN cm16_sdcc_log10
-defc _log10f16 = cm16_sdcc_log10
+defc _log10f16 = log10f16
 ENDIF
 

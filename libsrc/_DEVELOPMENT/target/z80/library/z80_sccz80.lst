@@ -10,8 +10,7 @@
 @font/fzx/fzx_sccz80.lst
 @im2/im2_sccz80.lst
 @inttypes/inttypes_sccz80.lst
-@l/l.lst
-@l/sccz80.lst
+@l/l_z80.lst
 @libgen/libgen_sccz80.lst
 @locale/locale.lst
 @math/math_integer.lst

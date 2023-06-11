@@ -9,7 +9,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2016-11-17 09:39:03 stefano Exp $
+;	$Id: f_ansi_char.asm $
 ;
 
         SECTION  code_clib
@@ -19,8 +19,16 @@
 	EXTERN	INVRS
 
 .ansi_CHAR
-	ld	hl,INVRS		;TODO: really?
-	or	(HL)
+;	ld	hl,INVRS		;TODO: really?
+;	or	(HL)
+	ld	hl,INVRS
+	ld  d,a
+	xor a
+	add (hl)
+	ld  a,d
+	jr  z,no_inverse
+	add 144-32
+.no_inverse
 	ld	d,a
 	ld	bc,(__console_x)
 	ld	e,1

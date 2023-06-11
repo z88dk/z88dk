@@ -17,6 +17,7 @@ strchr:
    push hl
    push bc
    push de
+
 IF __CLASSIC && __CPU_GBZ80__
    call asm_strchr
    ld d,h

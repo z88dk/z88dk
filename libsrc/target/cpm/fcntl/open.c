@@ -44,7 +44,7 @@ int open(char *name, int flags, mode_t mode)
             clearfcb(fc);
             if ( (flags & 0xff))  { /* If returned error and writer then create */
                 fd = creat(name,0);
-                swapuid(fd);
+                swapuid(uid);
                 if ( fd == -1 )
                     return -1;
                 fc = &_fcb[fd];

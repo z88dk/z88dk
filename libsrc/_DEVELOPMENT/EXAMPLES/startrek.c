@@ -27,22 +27,31 @@
  * - Instructions stored as text rather than loaded from disk.
  */
 
+// classic
+// zcc +cpm -clib=8085 -O2 startrek.c -o startrek --math-mbf32_8085 -create-app
+// zcc +rc2014 -SO2 -subtype=basic85 startrek.c -o startrek --math-mbf32_8085 -create-app
+// zcc +rc2014 -SO2 -subtype=basic85 startrek.c -o startrek --math-am9511_8085 -create-app
+
+// newlib
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
 // zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
 
-#pragma printf = "%s %d %f"
+#pragma printf = "%s %d %4.2f"
 
-#pragma output CLIB_MALLOC_HEAP_SIZE   = 0            // do not create malloc heap
-#pragma output CLIB_STDIO_HEAP_SIZE    = 0            // do not create stdio heap (cannot open files)
-#pragma output CLIB_EXIT_STACK_SIZE    = 0            // do not reserve space for registering atexit() functions
-#pragma output CRT_ENABLE_COMMANDLINE  = 3            // create command line
+#pragma output CLIB_MALLOC_HEAP_SIZE    = 0             // do not create malloc heap
+#pragma output CLIB_STDIO_HEAP_SIZE     = 0             // do not create stdio heap (cannot open files)
+#pragma output CLIB_EXIT_STACK_SIZE     = 0             // do not reserve space for registering atexit() functions
+#pragma output CRT_ENABLE_COMMANDLINE   = 3             // create command line
 
 #ifdef __SPECTRUM
+#pragma output CRT_ORG_CODE             = 30000         // move ORG to 30000
+#pragma output REGISTER_SP              = -1            // indicate crt should not modify stack location
+#pragma output CRT_ENABLE_EIDI          = 0x01          // disable interrupts at start
+#endif
 
-#pragma output CRT_ORG_CODE            = 30000        // move ORG to 30000
-#pragma output REGISTER_SP             = -1           // indicate crt should not modify stack location
-#pragma output CRT_ENABLE_EIDI         = 0x01         // disable interrupts at start
-
+#ifdef __RC2014
+#pragma output CRT_ORG_CODE                 = 0x8400    // move ORG to 0x8400 for -subtype=basic85
+                                                        // also all the instruction text is omitted
 #endif
 
 /*
@@ -940,7 +949,7 @@ long_range_scan(void)
         if (i > 0 && i <= 8 && j > 0 && j <= 8)
           {
             z[i][j] = g[i][j];
-            printf(" %3.3d :", z[i][j]);
+            printf(" %03d :", z[i][j]);
           }
         else
           printf(" *** :");
@@ -1368,7 +1377,7 @@ galactic_record(void)
       if (z[i][j] == 0)
         printf("***");
       else
-        printf("%3.3d", z[i][j]);
+        printf("%03d", z[i][j]);
     }
 
     printf("\n");
@@ -1999,6 +2008,15 @@ getline_l(char *s)
 
 **********/
 
+
+#ifdef __RC2014
+
+const unsigned char *instr[] = {
+"\nThere are no instructions. You are on your own!\n",
+0 };
+
+#else
+
 const unsigned char *instr[] = {
 "\n\n",
 "1. When you see _Command?_ printed, enter one of the legal",
@@ -2109,6 +2127,8 @@ const unsigned char *instr[] = {
 "   regions referred to in the game.",
 "\n",
 0 };
+
+#endif
 
 void
 showfile(char *filename)

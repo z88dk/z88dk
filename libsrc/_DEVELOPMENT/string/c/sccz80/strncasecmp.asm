@@ -43,7 +43,7 @@ ELSE
 
  IF __CLASSIC
   IF !__CPU_INTEL__ 
-   push ix   
+   push ix
   ENDIF
    call  asm_strncasecmp
   IF !__CPU_INTEL__ 

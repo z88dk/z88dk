@@ -8,7 +8,7 @@
 
 #ifdef WIN32
 #ifndef __MINGW__
-#include "dirent.h"
+#include "win32/dirent.h"
 #else
 #include <dirent.h>
 #endif

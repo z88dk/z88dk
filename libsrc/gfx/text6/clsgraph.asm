@@ -1,6 +1,6 @@
 ;
 ;       Generic pseudo graphics routines for text-only platforms
-;	Version for the 2x3 graphics symbols
+;       Version for the 2x3 or 1x3 graphics symbols
 ;
 ;       Written by Stefano Bodrato 19/12/2006
 ;
@@ -8,7 +8,7 @@
 ;       Clears graph screen.
 ;
 ;
-;	$Id: clsgraph.asm,v 1.5 2017-01-02 22:57:59 aralbrec Exp $
+;	$Id: clsgraph.asm $
 ;
 
 
@@ -16,7 +16,7 @@
 
 		        SECTION code_clib
 			PUBLIC	cleargraphics
-         PUBLIC   _cleargraphics
+			PUBLIC   _cleargraphics
 			EXTERN	base_graphics
 
 
@@ -24,7 +24,11 @@
 ._cleargraphics
 
 	ld	hl,(base_graphics)
+IF GFXTEXT3
+	ld	bc,maxx*maxy/3-1
+ELSE
 	ld	bc,maxx*maxy/6-1
+ENDIF
 .clean
 	ld	(hl),blankch
 	inc	hl

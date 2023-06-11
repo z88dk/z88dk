@@ -11,12 +11,9 @@
 ._func
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	hl,16
+	call	l_gint4sp	;
+	ld	de,16
+	ex	de,hl
 	and	a
 	sbc	hl,de
 	ld	de,65535
@@ -24,6 +21,7 @@
 	pop	de
 	call	l_and
 	ret
+
 
 
 

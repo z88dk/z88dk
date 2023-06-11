@@ -1,0 +1,16 @@
+stdio/inkey/fgetc_cons
+stdio/inkey/getk
+target/pasopia7/stdio/fputc_cons_native
+target/pasopia7/stdio/CRT_FONT
+target/pasopia7/stdio/generic_console
+target/pasopia7/stdio/conio_map_colour
+target/pasopia7/stdio/generic_console_ioctl
+
+@stdio/stdio.lst
+@input/input_keyboard.lst
+target/pasopia7/games/joystick
+@psg/sn76489/sn76489.lst
+@games/games.lst
+@gfx/gencon/gfx_gencon1.lst
+@video/mc6845/mc6845.lst
+

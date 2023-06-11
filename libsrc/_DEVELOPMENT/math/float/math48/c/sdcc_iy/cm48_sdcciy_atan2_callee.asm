@@ -17,7 +17,6 @@ cm48_sdcciy_atan2_callee:
 
 l0_cm48_sdcciy_atan2_callee:
 
-   exx
    call am48_atan2
 
    jp cm48_sdcciyp_m482d

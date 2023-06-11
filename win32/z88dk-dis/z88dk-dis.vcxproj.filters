@@ -27,24 +27,27 @@
     <ClCompile Include="..\..\src\ticks\debug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ticks\backend.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ticks\exp_engine.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\ticks\cmds.h">
+    <ClInclude Include="..\..\src\ticks\backend.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\ticks\ticks.h">
+    <ClInclude Include="..\..\src\ticks\debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ext\uthash\src\uthash.h">
+    <ClInclude Include="..\..\src\ticks\disassembler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ext\uthash\src\utlist.h">
+    <ClInclude Include="..\..\src\ticks\exp_engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\ticks\linenoise.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ticks\utf8.h">
+    <ClInclude Include="..\..\src\ticks\syms.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

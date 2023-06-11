@@ -19,7 +19,9 @@ scanf:
 	ld	h,0
         add     hl,hl
 	add	hl,sp		;&fmt
+IF !__CPU_INTEL__
 	push	ix		;save callers
+ENDIF
 
 	ld	bc,__sgoioblk	;stdin
 	push	bc		;fp
@@ -38,7 +40,9 @@ scanf:
 	pop	bc
 	pop	bc
 	pop	bc
+IF !__CPU_INTEL__
 	pop	ix
+ENDIF
 	ret
 
 

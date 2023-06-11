@@ -6,10 +6,10 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #ifdef WIN32
 #include        <io.h>
-#include        <sys/stat.h>
 #else
 #include        <unistd.h>
 #endif
@@ -79,7 +79,7 @@ static void cmd_openfile(void)
     l = h = 255; 
     if ( slot != -1 ) {
 #ifdef WIN32
-        int fd = open(filename, flags, _S_IREAD | _S_IWRITE);
+        int fd = open(filename, flags|O_BINARY, _S_IREAD | _S_IWRITE);
 #else
         int fd = open(filename, flags, S_IRWXU);
 #endif

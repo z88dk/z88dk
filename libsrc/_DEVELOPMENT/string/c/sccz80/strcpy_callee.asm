@@ -14,12 +14,13 @@ strcpy_callee:
    pop hl
    pop de
    push bc
+
 IF __CLASSIC &&  __CPU_GBZ80__
    call asm_strcpy
    ld d,h
    ld e,l
    ret
-ELSE   
+ELSE
    jp asm_strcpy
 ENDIF
 

@@ -70,16 +70,16 @@ these commands should produce something similar to the output given:
   <pages and pages of help and options snipped>
 ```
 ```
-  >zsdcc -v
+  >z88dk-zsdcc -v
   ZSDCC IS A MODIFICATION OF SDCC FOR Z88DK
-  Build: 3.6.6 #9921 (Linux) Jun  2 2017
+  Build: 4.2.0 #13131 (Linux) Jan  5 2023
 ```
 ```
   >z80asm
   Z80 Module Assembler 2.8.5, (c) InterLogic 1993-2009, Paulo Custodio 2011-2017
 ```
 ```
-  >appmake 
+  >z88dk-appmake 
   appmake [+target] [options]
   
   The z88dk application generator
@@ -248,9 +248,9 @@ which together make up the entire sdcc_iy library. Any of those files can supply
 code for a zsdcc compiled program. The important one for Spectrum programmers is
 zx.lib. That library file is full of optimised Z80 machine code routines which
 provide the sorts of features Spectrum programs need. If you're interested you
-can inspect the contents of the library with the z80nm command:
+can inspect the contents of the library with the z88dk-z80nm command:
 ```
->z80nm zx.lib | less
+>z88dk-z80nm zx.lib | less
 ```
 Do a search and you'll find the zx_border() function listed in there.
 

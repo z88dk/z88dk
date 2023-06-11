@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fp_am9511
 
 PUBLIC cam32_sccz80_ldexp_callee
@@ -10,14 +11,15 @@ EXTERN asm_am9511_ldexp_callee
 .cam32_sccz80_ldexp_callee
     ; Entry:
     ; Stack: float left, int right, ret
-    ; Reverse the stack
-    pop af                      ;my return
+    ; Reverse the stack, return on top
+
+    pop hl                      ;my return
     pop bc                      ;int
-    pop hl                      ;float
-    pop de
+    pop de                      ;float LSW
+    ex (sp),hl                  ;float MSW <-> my return
     push bc                     ;int
-    push de                     ;float
-    push hl
-    push af                     ;my return
-    jp asm_am9511_ldexp_callee
-    
+    push hl                     ;float MSW
+    push de                     ;float LSW
+    call asm_am9511_ldexp_callee
+    ret
+

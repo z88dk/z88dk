@@ -1,32 +1,34 @@
 
 
-	MODULE	generic_console
+    MODULE  generic_console
 
-	SECTION	code_clib
+    SECTION code_clib
 
-        PUBLIC  generic_console_cls
-        PUBLIC  generic_console_printc
-        PUBLIC  generic_console_scrollup
-        PUBLIC  generic_console_set_ink
-        PUBLIC  generic_console_set_paper
-        PUBLIC  generic_console_set_attribute
-	PUBLIC	generic_console_calc_screen_address
+    PUBLIC  generic_console_cls
+    PUBLIC  generic_console_printc
+    PUBLIC  generic_console_scrollup
+    PUBLIC  generic_console_set_ink
+    PUBLIC  generic_console_set_paper
+    PUBLIC  generic_console_set_attribute
+    PUBLIC	generic_console_calc_screen_address
 
-	PUBLIC	__cpc_mode
-	EXTERN	generic_console_font32
-	EXTERN	generic_console_udg32
+    EXTERN __cpc_mode
+    EXTERN __cpc_ink0
+    EXTERN __cpc_paper0
+    EXTERN __cpc_ink1
+    EXTERN __cpc_paper1
+    EXTERN  generic_console_font32
+    EXTERN  generic_console_udg32
 
-	EXTERN	generic_console_flags
-	EXTERN	CRT_FONT
-	EXTERN	conio_map_colour
+    EXTERN  generic_console_flags
+    EXTERN  CRT_FONT
 
-	defc	SCREEN = 0xc000
+    defc    SCREEN = 0xc000
 
 generic_console_set_attribute:
 	ret
 
 generic_console_set_ink:
-	call	conio_map_colour
 	ld	d,a
 	and	15		;Maximum
 	call	convert_to_mode0
@@ -39,7 +41,6 @@ generic_console_set_ink:
 	ret
 
 generic_console_set_paper:
-	call	conio_map_colour
 	ld	d,a
 	and	15		;Maximum
 	call	convert_to_mode0
@@ -57,11 +58,21 @@ generic_console_cls:
 	and	a
 	jr	nz,cls_mode1
 	ld	a,(__cpc_paper0)
+	ld	b,a
+	rrca
+	or	b
 	jr	docls
 cls_mode1:
 	cp	1
 	jr	nz,cls_mode2
 	ld	a,(__cpc_paper1)
+	ld	b,a
+	rrca
+	or	b
+	rrca
+	or	b
+	rrca
+	or	b
 	jr	docls
 cls_mode2:
 	xor	a
@@ -215,7 +226,7 @@ handle_mode2_noinverse:
 handle_mode0:
 	ld	b,8
 	; b7    b6    b5    b4    b3    b2    b1    b0
-	; p0-b0 p1-b0 p1-b2 p1-b2 p0-b1 p1-b1 p0-b3 p1-b3
+	; p0-b0 p1-b0 01-b2 p1-b2 p0-b1 p1-b1 p0-b3 p1-b3
 handle_mode0_0:
 	ld      a,(generic_console_flags)
 	rlca		;get bit 7 out
@@ -348,14 +359,3 @@ mode0_table:
 	defb	@10100010		; 13
 	defb	@00101010		; 14
 	defb	@10101010		; 14
-	
-	
-	SECTION	data_clib
-
-.__cpc_mode	defb	1
-; Mode 0 equivalents of ink/paper
-.__cpc_ink0	defb	@10001000
-.__cpc_paper0	defb	@00000000
-; And equivalents for mode 1
-.__cpc_ink1	defb	@10001000
-.__cpc_paper1	defb	@00000000

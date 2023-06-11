@@ -4,6 +4,5 @@
 
 .l_f32_zero
     ld hl,0
-    ld d,h
-    ld e,l
+    ld de,hl
     ret

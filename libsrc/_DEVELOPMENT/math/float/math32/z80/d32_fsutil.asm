@@ -10,12 +10,11 @@
 ;
 ;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC m32_fseexit
 PUBLIC m32_fsneg
 PUBLIC m32_fszero
-PUBLIC m32_fszero_hlde
 PUBLIC m32_fsmin
 PUBLIC m32_fsmax
 PUBLIC m32_fsnan
@@ -26,10 +25,6 @@ PUBLIC m32_fsnan
     xor 080h
     ld d,a
     ret
-
-; here to return a legal zero of sign h in hlde
-.m32_fszero_hlde
-    ex de,hl
 
 ; here to return a legal zero of sign d in dehl
 .m32_fszero

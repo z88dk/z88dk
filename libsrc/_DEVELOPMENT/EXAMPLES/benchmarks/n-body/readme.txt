@@ -88,27 +88,27 @@ cycle count  = 2331516019
 time @ 4MHz  = 2331516019 / 4*10^6 = 9 min 43 sec
 
 4.
-SDCC 3.6.5 #9852 (MINGW64)
-9233 bytes less page zero
+SDCC 4.2.0 Linux
+7141 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 5306393684
-time @ 4MHz  = 5306393684 / 4*10^6 = 22 min 07 sec
+cycle count  = 3163137393
+time @ 4MHz  = 3163137393 / 4*10^6 = 13 min 11 sec
 
 Slow speed & large size due to float implementation in C.
 
 5.
-Z88DK April 28, 2021
+Z88DK January 3, 2022
 sccz80 / classic
-4493 bytes less page zero
+4527 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-8)
 
-cycle count  = 3658052111
-time @ 4MHz  = 3658052111 / 4*10^6 = 15 min 14 sec
+cycle count  = 3659884553
+time @ 4MHz  = 3659884553 / 4*10^6 = 15 min 15 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -137,15 +137,15 @@ cycle count  = 2253709929
 time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 
 8.
-Z88DK April 30, 2021
+Z88DK January 3, 2022
 sccz80 / classic / math32
-6018 bytes less page zero
+6052 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 993265277
-time @ 4MHz  = 993265277 / 4*10^6 =  4 min 8 sec
+cycle count  = 995097719
+time @ 4MHz  = 995097719 / 4*10^6 =  4 min 9 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
 
@@ -163,30 +163,63 @@ time @ 4MHz  = 754266702 / 4*10^6 = 3 min 8 sec
 IEEE 32-bit float implementation, accurate to 7 significant digits.
 
 10.
-Z88DK June 28, 2020
+Z88DK May 3, 2021
 sccz80 / new / math16
-3222 bytes less page zero
+3309 bytes less page zero
 
 first number error : 5 * 10^(-4)
 second number error: 5 * 10^(-2)
 
-cycle count  = 384070543
-time @ 4MHz  = 384070543 / 4*10^6 = 1 min 36 sec
+cycle count  = 357718801
+time @ 4MHz  = 357718801 / 4*10^6 = 1 min 29 sec
 
 IEEE 16-bit float implementation, accurate to 3 significant digits.
 
-DQ.
-HITECH C CPM V309
-???? bytes less cpm overhead
+11.
+Z88DK January 3, 2022
+sccz80 / classic / MBF32
+4989 bytes less page zero
 
-Unable to compile.
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
 
-DQ.
-HITECH C MSDOS V750
-? bytes exact
+cycle count  = 1848679330
+time @ 4MHz  = 1848679330 / 4*10^6 =  7 min 42 sec
 
-Disqualified due to incorrect results.
-HTC v750 does not have a functioning float library.
+Microsoft 32-bit float implementation, accurate to 7 significant digits.
+
+12.
+Z88DK December 12, 2022
+sccz80 / classic / 8085 / MBF32
+4868 bytes less page zero
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1851095771
+time @ 4MHz  = 1851095771 / 4*10^6 =  7 min 43 sec
+
+Microsoft 32-bit float implementation, accurate to 7 significant digits.
+
+13.
+HITECH C MSDOS V780pl2
+3736 bytes exact
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1600543903
+time @ 4MHz  = 1600543903 / 4*10^6 = 6 min 40 sec
+
+14.
+HITECH C CPM V309-15
+5633 bytes exact
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1594771948
+time @ 4MHz  = 1594771948 / 4*10^6 = 6 min 38 sec
 
 
 BENCHMARKS GAME COMMENTS
@@ -208,4 +241,4 @@ We ask that contributed programs not only give the correct result, but also use 
 
 Each program should:
 
-    use the same simple symplectic-integrator - see the Java program. 
+    use the same simple symplectic-integrator - see the Java program.

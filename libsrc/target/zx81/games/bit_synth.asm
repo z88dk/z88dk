@@ -32,28 +32,28 @@
           and     a
           jr      z,FR1_blank
           ld      (FR_1+1),a
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
 .FR1_blank
           ld      (FR1_tick+1),a
           ld      a,(ix+4)
           and     a
           jr      z,FR2_blank
           ld      (FR_2+1),a
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
 .FR2_blank
           ld      (FR2_tick+1),a
           ld      a,(ix+2)
           and     a
           jr      z,FR3_blank
           ld      (FR_3+1),a
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
 .FR3_blank
           ld      (FR1_tick+1),a
           ld      a,(ix+0)
           and     a
           jr      z,FR4_blank
           ld      (FR_4+1),a
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
 .FR4_blank
           ld      (FR1_tick+1),a
 
@@ -70,7 +70,7 @@
           dec     h
           jr      nz,jump
 .FR1_tick
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -88,7 +88,7 @@
           dec     l
           jr      nz,jump2
 .FR2_tick
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -106,7 +106,7 @@
           dec     d
           jr      nz,jump3
 .FR3_tick
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -124,7 +124,7 @@
           dec     e
           jr      nz,loop2
 .FR4_tick
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a

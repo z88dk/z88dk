@@ -9,11 +9,18 @@
     EXTERN  __scanf_getchar
     EXTERN  scanf_loop
 
+    EXTERN  __scanf_get_width
+    EXTERN  __scanf_increment_conversions
+
 __scanf_handle_c:
     ld      b,1             ;width
+IF __CPU_INTEL__
+    call    __scanf_get_width
+ELSE
     bit     2,(ix-3)        ;is there a width specified?
     jr      z,c_fmt_get_buf
     ld      b,(ix-4)        ;width
+ENDIF
 c_fmt_get_buf:
     ; TODO: Handling of *, bit 3
     call    __scanf_nextarg ;de = destination
@@ -23,5 +30,9 @@ c_fmt_loop:
     ld      (de),a
     inc     de
     djnz    c_fmt_loop
+IF __CPU_INTEL__
+    call    __scanf_increment_conversions
+ELSE
     inc     (ix-1)          ;increment number of conversions done
+ENDIF
     jp      scanf_loop

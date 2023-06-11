@@ -29,25 +29,25 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
 .noise
 ._noise
-          ;push	ix
-          ld	bc,noise  ; point to myself to garble the bit patterns
-		  push  bc
-        IF sndbit_port >= 256
-          exx
-          ld   bc,sndbit_port
-          exx
-        ENDIF
+    ;push	ix
+    ld	bc,noise  ; point to myself to garble the bit patterns
+    push  bc
+IF SOUND_ONEBIT_port >= 256
+    exx
+    ld   bc,SOUND_ONEBIT_port
+    exx
+ENDIF
 ;          ld   a,l
 ;          srl  l
 ;          srl  l
 ;          cpl
 ;          and  3
 ;          ld   c,a
-          ld   b,0
-          ;ld   ix,beixp3
-          ;add  ix,bc
+    ld   b,0
+    ;ld   ix,beixp3
+    ;add  ix,bc
 
-          ld	a,(__snd_tick)
+    ld	a,(__snd_tick)
 
 .beixp3
           ;nop
@@ -67,7 +67,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 		  ;ld   a,r		; more randomness
 		  ;xor  (hl)
 		  ;xor  l
-          ;and  sndbit_mask
+          ;and  SOUND_ONEBIT_mask
 		  ;xor  b
           ;ex  (sp),hl
 		  
@@ -80,26 +80,21 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 		  ;ld  a,h
 		  ;xor l
 		  ld  a,l
-		  and  sndbit_mask
+		  and  SOUND_ONEBIT_mask
 		  ld  l,a		  
 		  pop af
 
 		  xor l
 
-        IF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+    ONEBITOUT
+
 
 		  pop de
 		  pop hl
 
           ld   b,h
           ld   c,a
-          bit  sndbit_bit,a            ;if o/p go again!
+          bit  SOUND_ONEBIT_bit,a            ;if o/p go again!
           jr   nz,noise_again
 		  
           ld   a,d

@@ -5,7 +5,6 @@
     defc    TAR__register_sp = 0xfd00
     defc    TAR__clib_exit_stack_size = 4
     defc    TAR__fputc_cons_generic = 1
-    defc    CLIB_KBHIT_NOSTORE = 1
 
     ; Where the screen is located
     defc    SCREEN_BASE = 0x0000
@@ -35,7 +34,8 @@ IF DEFINED_USING_amalloc
 ENDIF
 
     ; Now, page the screen into 0000-0x7fff
-    ; Switch to mode 4
+    INCLUDE "target/sam/classic/sam_switchmode.inc"
+
     in      a,(VMPR)
     ld      b,a
     or      @01100000

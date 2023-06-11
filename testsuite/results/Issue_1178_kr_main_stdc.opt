@@ -16,12 +16,8 @@
 	push	hl
 	call	_func
 	pop	bc
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
-	inc	hl
-	inc	hl
-	call	l_gint	;
+	call	l_gint4sp	;
+	call	l_gint2	;
 	push	hl
 	call	_func2
 	pop	bc
@@ -30,9 +26,7 @@
 
 
 ._func3
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	push	hl
 	call	_func
 	pop	bc
@@ -40,13 +34,12 @@
 	pop	hl
 	push	hl
 	push	bc
-	inc	hl
-	inc	hl
-	call	l_gint	;
+	call	l_gint2	;
 	push	hl
 	call	_func2
 	pop	bc
 	ret
+
 
 
 

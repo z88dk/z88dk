@@ -24,7 +24,7 @@ ELSE
    ex (sp),hl
    jp asm_strrstr
 ENDIF
-   
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC

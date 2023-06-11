@@ -13,7 +13,7 @@
 
 #include <fcntl.h>
 #include <stdio.h>
-#include <zxinterface1.h>
+#include <arch/zx/zxinterface1.h>
 
 
 long lseek(int handle, long posn, int whence)

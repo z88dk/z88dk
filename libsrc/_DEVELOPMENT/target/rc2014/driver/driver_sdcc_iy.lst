@@ -10,7 +10,7 @@
 @target/hbios/driver/terminal/rc_01_output_hbios0.lst
 @target/hbios/driver/terminal/rc_01_output_hbios1.lst
 @target/rc2014/driver/terminal/rc_01_output_basic.lst
-@target/rc2014/driver/ide/ide.lst
+@target/rc2014/driver/ide/ide_asm.lst
 @target/rc2014/driver/diskio/diskio_sdcc.lst
 @target/rc2014/driver/ram/ram_sdcc.lst
 @target/rc2014/driver/time/time_sdcc.lst

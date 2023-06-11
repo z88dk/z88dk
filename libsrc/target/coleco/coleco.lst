@@ -1,0 +1,14 @@
+@stdio/ansicore.lst
+target/coleco/stdio/CRT_FONT
+target/coleco/stdio/fgetc_cons
+target/coleco/stdio/getk
+@video/tms9918/video_tms9918_nmi.lst
+@stdio/stdio.lst
+
+@gfx/narrow/gfx_narrow.lst
+@psg/sn76489/sn76489.lst
+target/coleco/games/joystick
+target/coleco/games/coleco_joypad
+games/obj/coleco/joystick_type
+@games/games.lst
+

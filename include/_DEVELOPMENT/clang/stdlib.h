@@ -10,18 +10,18 @@
 
 // DATA STRUCTURES
 
-#ifndef _SIZE_T_DEFINED
-#define _SIZE_T_DEFINED
+#ifndef _SIZE_T
+#define _SIZE_T
 typedef unsigned int  size_t;
 #endif
 
-#ifndef _WCHAR_T_DEFINED
-#define _WCHAR_T_DEFINED
+#ifndef _WCHAR_T
+#define _WCHAR_T
 typedef unsigned char wchar_t;
 #endif
 
-#ifndef _FLOAT_T_DEFINED
-#define _FLOAT_T_DEFINED
+#ifndef _FLOAT_T
+#define _FLOAT_T
 
    #ifdef __CLANG
    
@@ -43,8 +43,8 @@ typedef unsigned char wchar_t;
    
 #endif
 
-#ifndef _DOUBLE_T_DEFINED
-#define _DOUBLE_T_DEFINED
+#ifndef _DOUBLE_T
+#define _DOUBLE_T
 
    #ifdef __CLANG
    
@@ -285,7 +285,7 @@ extern char *utoa(uint16_t num,char *buf,int radix);
 
 
 
-#ifndef _ALLOC_MALLOC_H
+#ifndef __ALLOC_MALLOC_H__
 
 extern void *aligned_alloc(size_t alignment,size_t size);
 
@@ -346,6 +346,31 @@ extern void _lldiv_(lldiv_t *ld,long long numer,long long denom);
 extern void _lldivu_(lldivu_t *ld,unsigned long long numer,unsigned long long denom);
 
 
+
+extern long long llabs(long long i);
+extern long long llabs_callee(long long i) __z88dk_callee;
+#define llabs(a) llabs_callee(a)
+   
+extern char *lltoa(long long num,char *buf,int radix);
+
+
+extern long long strtoll(char *nptr,char **endptr,int base);
+
+
+extern unsigned long long strtoull(char *nptr,char **endptr,int base);
+
+
+extern char *ulltoa(unsigned long long num,char *buf,int radix);
+
+
+
+#endif
+
+#ifdef __SCCZ80
+
+extern long long atoll(char *buf);
+extern long long atoll_callee(char *buf) __z88dk_callee;
+#define atoll(a) atoll_callee(a)
 
 extern long long llabs(long long i);
 extern long long llabs_callee(long long i) __z88dk_callee;

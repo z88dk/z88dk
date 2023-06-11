@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _tanf16
-EXTERN cm16_sdcc_tan
-defc _tanf16 = cm16_sdcc_tan
+defc _tanf16 = tanf16
 ENDIF
 

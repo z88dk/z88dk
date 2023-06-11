@@ -1,361 +1,291 @@
-#------------------------------------------------------------------------------
-# Z88DK Z80 Macro Assembler
-#
-# Plain Perl (no CPAN libraries) test library
-#
-# Copyright (C) Paulo Custodio, 2011-2019
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/z88dk/z88dk
-#------------------------------------------------------------------------------
+#!/usr/bin/env perl
+
 use Modern::Perl;
-use Config;
 use Test::More;
-use Cwd qw( cwd abs_path );
-use File::Basename;
-use File::Path 'remove_tree';
+use Config;
+use Capture::Tiny 'capture_merged';
+use Data::HexDump;
+use Path::Tiny;
+use Text::Diff;
 
-my @TEST_EXT = qw( asm bin c d dat def err inc lis lst map o P out sym tap );
+$ENV{PATH} = join($Config{path_sep}, 
+			".",
+			"../../bin",
+			$ENV{PATH});
 
-# run z80asm from .
-$ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
+my $OBJ_FILE_VERSION = "16";
 
-# add path to z80asm top directory
-_prepend_path(_root());
+use vars '$test', '$null';
+$test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
+$null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 
-#------------------------------------------------------------------------------
-# Portability
-#------------------------------------------------------------------------------
-
-# return the top directory of z80asm
-sub _root {
-	our $root;
-	$root or $root = abs_path(dirname(dirname(__FILE__)));
-	return $root
-}
-
-sub _prepend_path {
-	my($dir) = @_;
-	$ENV{PATH} = $dir . $Config{path_sep} . $ENV{PATH};
-}
+unlink_testfiles();
 
 #------------------------------------------------------------------------------
-# Build z88dk tools
-#------------------------------------------------------------------------------
-
-sub _build_tool {
-	my($tool) = @_;
-	our %have_built;
+sub check_bin_file {
+    my($got_file, $exp_bin) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    
+	my $got_bin = slurp($got_file);
+	my $got_hex = HexDump($got_bin);
 	
-	unless ($have_built{$tool}) {
-		note "Building $tool";
-		
-		my $dir = cwd();
-		chdir _root()."/../$tool" or die;
-		
-		my $tool_dir = abs_path(cwd());
-		
-		# cannot make -C because make does not understand \\ in filenames
-		run("make", 0, 'IGNORE', 'IGNORE');	
-		
-		chdir $dir or die;
-		
-		_prepend_path($tool_dir);
-		
-		$have_built{$tool}++;
-	}
-}
-
-sub build_appmake {	_build_tool('appmake'); }
-sub build_ticks	{	_build_tool('ticks');	}
-sub build_z80nm {	_build_tool('z80nm');	}
-
-#------------------------------------------------------------------------------
-# Run tools
-#------------------------------------------------------------------------------
-
-sub run {
-	my($cmd, $return, $out, $err) = @_;
-	$return //= 0;
-	$out //= '';
-	$err //= '';
+	my $exp_hex = HexDump($exp_bin);
 	
-	$cmd .= " >test.stdout 2>test.stderr";
-	
-	ok 1, $cmd;
-	ok !!$return == !!system($cmd), "exit value";
-	
-	my $gotout = slurp("test.stdout");
-	my $goterr = slurp("test.stderr");
-	
-	if ($out eq "IGNORE") {
-		note "test.stdout: ", $gotout;
-	}
-	else {
-		check_text($gotout, $out, "test.stdout");
-	}
-	
-	if ($err eq "IGNORE") {
-		note "test.stderr: ", $goterr;
-	}
-	else {
-		check_text($goterr, $err, "test.stderr");
-	}
-	
-	if (Test::More->builder->is_passing) {
-		unlink "test.stdout", "test.stderr";
-	}
-}
-
-sub z80asm {
-	my($source, $options, $return, $out, $err) = @_;
-	$options //= "-b";
-	
-	spew("test.asm", $source);
-	run("z80asm $options test.asm", $return, $out, $err);
-}
-
-sub appmake {
-	my($args) = @_;
-	
-	build_appmake();
-	run("z88dk-appmake $args", 0, 'IGNORE');
-}
-
-sub ticks {
-	my($source, $options) = @_;
-
-	build_ticks();
-	z80asm($source, $options." -b");
-	
-	my $cpu = ($options =~ /(?:-m=?)(\S+)/) ? $1 : "z80";
-	run("z88dk-ticks test.bin -m$cpu -output test.out", 
-		0, "IGNORE");
-
-	my $bin = slurp("test.out");
-	my $mem = substr($bin, 0, 0x10000); $mem =~ s/\0+$//;
-	my @mem = map {ord} split //, $mem;
-	my @regs = map {ord} split //, substr($bin, 0x10000);
-	my $ret = {
-		mem 	=> \@mem, 
-	};
-	$ret->{F} = shift @regs;	$ret->{F_S}  = ($ret->{F} & 0x80) ? 1 : 0;
-								$ret->{F_Z}  = ($ret->{F} & 0x40) ? 1 : 0;
-								$ret->{F_H}  = ($ret->{F} & 0x10) ? 1 : 0;
-								$ret->{F_PV} = ($ret->{F} & 0x04) ? 1 : 0;
-								$ret->{F_N}  = ($ret->{F} & 0x02) ? 1 : 0;
-								$ret->{F_C}  = ($ret->{F} & 0x01) ? 1 : 0;
-	$ret->{A} = shift @regs;
-	$ret->{C} = shift @regs;
-	$ret->{B} = shift @regs;	$ret->{BC} = ($ret->{B} << 8) | $ret->{C};
-	$ret->{L} = shift @regs;
-	$ret->{H} = shift @regs;	$ret->{HL} = ($ret->{H} << 8) | $ret->{L};
-	my $PCl = shift @regs;
-	my $PCh = shift @regs;		$ret->{PC} = ($PCh << 8) | $PCl;
-	my $SPl = shift @regs;
-	my $SPh = shift @regs;		$ret->{SP} = ($SPh << 8) | $SPl;
-	$ret->{I} = shift @regs;
-	$ret->{R} = shift @regs;
-	$ret->{E} = shift @regs;
-	$ret->{D} = shift @regs;	$ret->{DE} = ($ret->{D} << 8) | $ret->{E};
-	$ret->{C_} = shift @regs;
-	$ret->{B_} = shift @regs;	$ret->{BC_} = ($ret->{B_} << 8) | $ret->{C_};
-	$ret->{E_} = shift @regs;
-	$ret->{D_} = shift @regs;	$ret->{DE_} = ($ret->{D_} << 8) | $ret->{E_};
-	$ret->{L_} = shift @regs;
-	$ret->{H_} = shift @regs;	$ret->{HL_} = ($ret->{H_} << 8) | $ret->{L_};
-	$ret->{F_} = shift @regs;	$ret->{F__S}  = ($ret->{F_} & 0x80) ? 1 : 0;
-								$ret->{F__Z}  = ($ret->{F_} & 0x40) ? 1 : 0;
-								$ret->{F__H}  = ($ret->{F_} & 0x10) ? 1 : 0;
-								$ret->{F__PV} = ($ret->{F_} & 0x04) ? 1 : 0;
-								$ret->{F__N}  = ($ret->{F_} & 0x02) ? 1 : 0;
-								$ret->{F__C}  = ($ret->{F_} & 0x01) ? 1 : 0;
-	$ret->{A_} = shift @regs;
-	my $IYl = shift @regs;
-	my $IYh = shift @regs;		$ret->{IY} = ($IYh << 8) | $IYl;
-	my $IXl = shift @regs;
-	my $IXh = shift @regs;		$ret->{IX} = ($IXh << 8) | $IXl;
-	$ret->{IFF} = shift @regs;
-	$ret->{IM} = shift @regs;
-	my $MPl = shift @regs;
-	my $MPh = shift @regs;		$ret->{MP} = ($MPh << 8) | $MPl;
-	@regs == 8 or die;
-	
-	return $ret;
-}
-
-sub parity {
-	my($a) = @_;
-	my $bits = 0;
-	$bits++ if $a & 0x80;
-	$bits++ if $a & 0x40;
-	$bits++ if $a & 0x20;
-	$bits++ if $a & 0x10;
-	$bits++ if $a & 0x08;
-	$bits++ if $a & 0x04;
-	$bits++ if $a & 0x02;
-	$bits++ if $a & 0x01;
-	return ($bits & 1) == 0 ? 1 : 0;
-}
-
-sub z80nm {
-	my($file, $out) = @_;
-	
-	build_z80nm();
-	run("z88dk-z80nm -a $file", 0, $out);
+	my $diff = diff(\$exp_hex, \$got_hex, {STYLE => 'Context'});
+	is $diff, "", "bin file $got_file ok";
 }
 
 #------------------------------------------------------------------------------
-# Read and write files
+sub check_text_file {
+    my($got_file, $exp_text) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    
+	(my $got_text = slurp($got_file)) =~ s/\r\n/\n/g;
+	$exp_text =~ s/\r\n/\n/g;
+	
+	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Context'});
+	is $diff, "", "text file $got_file ok";
+}
+
 #------------------------------------------------------------------------------
+sub z80asm_ok {
+    my($options, $files, $exp_warn, @pairs_asm_bin) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    
+    # build $asm and $bin
+    my($asm, $bin) = ("","");
+    while (my($a, $b) = splice(@pairs_asm_bin, 0, 2)) {
+        $asm .= "$a\n";
+        $bin .= $b;
+    }
+    
+    # save asm file
+    my $asm_file = "${test}.asm";
+    my $bin_file = "${test}.bin";
+    spew($asm_file, $asm);
+    unlink($bin_file);
+    
+    # assemble
+    $options ||= "-b";
+    $files ||= $asm_file;
 
-sub slurp {
-	my($file) = @_;
-	ok -f $file, $file;
-	local $/;
-	open(my $fh, "<:raw", $file) or die "$file: $!";
-	return <$fh> // "";
+    run_ok("z88dk-z80asm $options $files 2> ${test}.stderr");
+    check_bin_file($bin_file, $bin);
+    check_text_file("${test}.stderr", $exp_warn) if $exp_warn;
 }
 
-sub spew {
-	my($file, @text) = @_;
-	open(my $fh, ">:raw", $file) or die "$file: $!";
-	print $fh @text;
+#------------------------------------------------------------------------------
+sub z80asm_nok {
+    my($options, $files, $asm, $exp_err) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    
+    # save asm file
+    my $asm_file = "${test}.asm";
+	spew($asm_file, $asm);
+    
+    # assemble
+    $options ||= "-b";
+    $files ||= $asm_file;
+
+    capture_nok("z88dk-z80asm $options $files", $exp_err);
 }
+
+#------------------------------------------------------------------------------
+sub capture_ok {
+    my($cmd, $exp_out) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    
+    run_ok($cmd." > ${test}.stdout");
+    check_text_file("${test}.stdout", $exp_out);
+}
+
+#------------------------------------------------------------------------------
+sub capture_nok {
+    my($cmd, $exp_err) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    run_nok($cmd." 2> ${test}.stderr");
+    check_text_file("${test}.stderr", $exp_err);
+}
+
+#------------------------------------------------------------------------------
+sub run_ok {
+    my($cmd) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+	
+	ok 1, "Running: $cmd";
+    ok 0==system($cmd), $cmd;
+}
+
+#------------------------------------------------------------------------------
+sub run_nok {
+    my($cmd) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+	
+	ok 1, "Running: $cmd";
+    ok 0!=system($cmd), $cmd;
+}
+
+#------------------------------------------------------------------------------
+sub bytes { return pack("C*", map {$_ & 0xff} @_); }
+sub words { return pack("v*", @_); }
+sub words_be { return pack("n*", @_); }
+sub pointers { return join('', map {pack("vC", $_ & 0xFFFF, ($_ >> 16) & 0xFF)} @_); }
+sub dwords { return pack("V*", @_); }
 
 sub unlink_testfiles {
-	if ($ENV{KEEP}) {
-		note "kept test files";
+	my(@additional) = @_;
+    unlink(<${test}*>, @additional) 
+        if Test::More->builder->is_passing;
+}
+
+# return object file binary representation
+sub objfile {
+	my(%args) = @_;
+
+	exists($args{ORG}) and die;
+
+	my $o = "Z80RMF".$OBJ_FILE_VERSION;
+
+	# store empty pointers; mark position for later
+	my $name_addr	 = length($o); $o .= pack("V", -1);
+	my $expr_addr	 = length($o); $o .= pack("V", -1);
+	my $symbols_addr = length($o); $o .= pack("V", -1);
+	my $lib_addr	 = length($o); $o .= pack("V", -1);
+	my $code_addr	 = length($o); $o .= pack("V", -1);
+
+	# store expressions
+	if ($args{EXPR}) {
+		store_ptr(\$o, $expr_addr);
+		for (@{$args{EXPR}}) {
+			@$_ == 8 or die;
+			my($type, $filename, $line_nr, $section, $asmptr, $ptr, $target_name, $text) = @$_;
+			$o .= $type . pack_lstring($filename) . pack("V", $line_nr) .
+			        pack_lstring($section) . pack("vv", $asmptr, $ptr) .
+					pack_lstring($target_name) . pack_lstring($text);
+		}
+		$o .= "\0";
+	}
+
+	# store symbols
+	if ($args{SYMBOLS}) {
+		store_ptr(\$o, $symbols_addr);
+		for (@{$args{SYMBOLS}}) {
+			@$_ == 7 or die;
+			my($scope, $type, $section, $value, $name, $def_filename, $line_nr) = @$_;
+			$o .= $scope . $type . pack_lstring($section) .
+					pack("V", $value) . pack_lstring($name) .
+					pack_lstring($def_filename) . pack("V", $line_nr);
+		}
+		$o .= "\0";
+	}
+
+	# store library
+	if ($args{LIBS}) {
+		store_ptr(\$o, $lib_addr);
+		for my $name (@{$args{LIBS}}) {
+			$o .= pack_lstring($name);
+		}
+	}
+
+	# store name
+	store_ptr(\$o, $name_addr);
+	$o .= pack_lstring($args{NAME});
+
+	# store code
+	if ( $args{CODE} ) {
+		ref($args{CODE}) eq 'ARRAY' or die;
+		store_ptr(\$o, $code_addr);
+		for (@{$args{CODE}}) {
+			@$_ == 4 or die;
+			my($section, $org, $align, $code) = @$_;
+			$o .= pack("V", length($code)) .
+			        pack_lstring($section) .
+					pack("VV", $org, $align) .
+					$code;
+		}
+		$o .= pack("V", -1);
+	}
+
+	return $o;
+}
+
+#------------------------------------------------------------------------------
+# store a pointer to the end of the binary object at the given address
+sub store_ptr {
+	my($robj, $addr) = @_;
+	my $ptr = length($$robj);
+	my $packed_ptr = pack("V", $ptr);
+	substr($$robj, $addr, length($packed_ptr)) = $packed_ptr;
+}
+
+#------------------------------------------------------------------------------
+sub pack_lstring {
+	my($string) = @_;
+	return pack("v", length($string)).$string;
+}
+
+#------------------------------------------------------------------------------
+# return library file binary representation
+sub libfile {
+	my(@o_files) = @_;
+	my $lib = "Z80LMF".$OBJ_FILE_VERSION;
+	for my $i (0 .. $#o_files) {
+		my $o_file = $o_files[$i];
+		my $next_ptr = ($i == $#o_files) ?
+						-1 : length($lib) + 4 + 4 + length($o_file);
+
+		$lib .= pack("V", $next_ptr);
+		$lib .= pack("V", length($o_file));
+		$lib .= $o_file;
+	}
+
+	return $lib;
+}
+
+#------------------------------------------------------------------------------
+# quote command line argument with "" on Windows, '' otherwise
+sub quote_os {
+	my($txt) = @_;
+	if ($^O eq 'MSWin32') {
+		return '"'.$txt.'"';
 	}
 	else {
-		if (Test::More->builder->is_passing) {
-			for (@TEST_EXT) {
-				for (<test*.$_>) {
-					if (-f $_) { ok unlink($_), "unlink $_"; }
-				}
-			}
-			for (<test_dir*>) {
-				if (-d $_) { ok remove_tree($_), "remove_tree $_"; }
-			}
-		}
+		return "'".$txt."'";
 	}
 }
 
 #------------------------------------------------------------------------------
-# Compare files
+# path()->spew fails sometimes on Windows (race condition?) with 
+# Error rename on 'test_t_ALIGN.asm37032647357911' -> 'test_t_ALIGN.asm': Permission denied
+# replace by a simpler spew without renames
+sub spew {
+	my($file, @data) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+	my $open_ok = open(my $fh, ">:raw", $file);
+	ok $open_ok, "write $file"; 
+	
+	if ($open_ok) {
+		print $fh join('', @data);
+	}
+}
+
 #------------------------------------------------------------------------------
+# and for simetry
+sub slurp {
+	my($file) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-sub trim {
-	local $_ = shift;
-	s/^[ \t\f\v\r]+//mg;
-	s/[ \t\f\v\r]+$//mg;
-	s/[ \t\f\r\r]+/ /g;
-	return $_;
-}
-
-sub hexdump {
-	my($str) = @_;
-	my $ret = '';
-	my $addr = 0;
-	my @bytes = map {ord} split //, $str;
-	while (@bytes) {
-		$ret .= sprintf("%04X:", $addr);
-		for (1..8) {
-			if (@bytes) {
-				$ret .= sprintf(" %02X", shift @bytes);
-			}
-			$addr++;
-		}
-		$ret .= "\n";
-	}
-	return $ret;
-}
-
-sub check_text_file {
-	my($file, $exp, $title) = @_;
-	$title //= $file." contents";
-	my $loc = " at file ".((caller)[1])." line ".((caller)[2]);
+	my $open_ok = open(my $fh, "<:raw", $file);
+	ok $open_ok, "read $file";
 	
-	ok -f $file, "$file exists".$loc;
-	if (-f $file) {
-		check_text(
-				slurp($file), 
-				$exp, 
-				$title.$loc);
+	if ($open_ok) {
+		read($fh, my $data, -s $file);
+		return $data;
 	}
-}
-
-sub check_bin_file {
-	my($file, $exp, $title) = @_;
-	$title //= $file." contents";
-	my $loc = " at file ".((caller)[1])." line ".((caller)[2]);
-	
-	ok -f $file, "$file exists".$loc;
-
-	if (-f $file) {
-		check_text(
-				hexdump(slurp($file)),
-				hexdump($exp),
-				$title.$loc);
-	}
-}
-
-sub check_text {
-	my($out, $exp, $title) = @_;
-
-	my $out_t = trim($out);
-	my $exp_t = trim($exp);
-	
-	ok $out_t eq $exp_t, $title;
-	if ($out_t ne $exp_t) {
-		my $line_nr = 0;
-		my @out = map {(++$line_nr).": ".$_} split(/\n/, $out);
-		my @out_t = map {trim($_)} @out;
-
-		$line_nr = 0;
-		my @exp = map {(++$line_nr).": ".$_} split(/\n/, $exp);
-		my @exp_t = map {trim($_)} @exp;
-		
-		while (@out || @exp) {
-			# remove same lines
-			while (@out && @exp && $out_t[0] eq $exp_t[0]) {
-				shift @out; shift @out_t;
-				shift @exp; shift @exp_t;
-			}
-			
-			# check for one input finished
-			if (@out && !@exp) {
-				diag scalar(@out)." lines differ";
-				diag "---";
-				diag "> ".$_ for @out;
-				diag ".";
-				@out = @out_t = ();
-			}
-			elsif (!@out && @exp) {
-				diag scalar(@exp)." lines differ";
-				diag "< ".$_ for @exp;
-				diag "---";
-				diag ".";
-				@exp = @exp_t = ();
-			}
-			else {
-				# count different lines and show them
-				my $count = 0;
-				while ($count < @out && $count < @exp && $out_t[$count] ne $exp_t[$count]) {
-					$count++;
-				}
-				diag "$count lines differ";
-				for (0..$count-1) {
-					diag "< ".$exp[$_];
-				}
-				diag "---";
-				for (0..$count-1) {
-					diag "> ".$out[$_];
-				}
-				diag ".";
-				splice(@out, 0, $count); splice(@out_t, 0, $count);
-				splice(@exp, 0, $count); splice(@exp_t, 0, $count);
-			}
-		}
+	else {
+		return "";
 	}
 }
 

@@ -5,6 +5,7 @@
 
 	defc	log2_fastcall = _am9511_log2
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _log2_fastcall

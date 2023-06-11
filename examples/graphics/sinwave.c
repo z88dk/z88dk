@@ -6,12 +6,14 @@
 	The picture size is automatically adapted to the target display size
 	
 	to build:  zcc +<target> <stdio options> -lm -create-app sinwave.c
+	or
+	to build using math32:  zcc +<target> <stdio options> --math32 -create-app sinwave.c
 	
 	Examples:
 	  zcc +zx -lm -lndos -create-app sinwave.c
 	  zcc +aquarius -lm -create-app sinwave.c
 	
-	$Id: sinwave.c,v 1.4 2011-04-01 06:50:45 stefano Exp $
+	stefano
 
 */
 
@@ -31,10 +33,10 @@ int z,buf;
 
 	for (x=-3.0; x<0; x=x+incr)
 	{
-		buf=255;
+		buf=getmaxy();
 		for (y=-3.0; y<3.0; y=y+0.2)
 		{
-			z = (int) (float)getmaxy() - (yenlarge * (y + 3.0) + ( yenlarge * sin (x*x + y*y) ));
+			z = (float)getmaxy() - (yenlarge * (y + 3.0) + ( yenlarge * sin (x*x + y*y) ));
 
 			if (buf>z)
 			{

@@ -5,6 +5,7 @@
 	EXTERN	__gfx_coords
 	EXTERN	pixeladdress_MODE6
 	EXTERN	l_cmp
+        EXTERN  __gfx_fatpix
 
 ; We enter here with: hl = x, de = y
         push    hl              ;save x
@@ -28,7 +29,16 @@
 	push	bc		;Save callers
 	call	pixeladdress_MODE6
         ld      b,a
-        ld      a,1
+        ex      af,af
+        ld      a,(__gfx_fatpix)
+        and     a
+        ld      c,@00000001
+        jr      z,not_fatpix_rotate
+        ld      c,@00000011
+        res     0,b
+not_fatpix_rotate:
+        ex      af,af
+        ld      a,c
         jr      z, continue	; pixel is at bit 0...
 .plot_position 
 	rlca

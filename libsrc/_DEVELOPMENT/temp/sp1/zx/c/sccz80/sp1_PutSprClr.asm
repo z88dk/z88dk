@@ -20,4 +20,15 @@ sp1_PutSprClr:
    push af
    ld b,c
    
-   jp asm_sp1_PutSprClr
+;   jp asm_sp1_PutSprClr
+   push ix
+   call asm_sp1_PutSprClr
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PutSprClr
+defc _sp1_PutSprClr = sp1_PutSprClr
+ENDIF
+

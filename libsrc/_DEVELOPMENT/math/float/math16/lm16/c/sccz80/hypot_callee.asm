@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _hypotf16_callee
-EXTERN cm16_sdcc_hypot_callee
-defc _hypotf16_callee = cm16_sdcc_hypot_callee
+defc _hypotf16_callee = hypotf16_callee
 ENDIF
 

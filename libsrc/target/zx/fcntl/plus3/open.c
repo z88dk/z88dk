@@ -86,7 +86,7 @@ int open(char *name, int flags, mode_t mode)
 	pop	hl
 	pop	bc
 	pop	de
-	ld	iy,DOS_OPEN
+	ld	ix,DOS_OPEN
 	call	dodos
 	ex	af,af		;save flags
 	ld	hl,20		;repair the stack after our storage

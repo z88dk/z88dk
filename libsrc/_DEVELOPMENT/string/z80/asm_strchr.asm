@@ -37,14 +37,13 @@ asm_strchr:
    ; uses  : af, hl
 
 loop:
-
    ld a,(hl)
    cp c
-   ret z
-   
+   ret Z
+
    inc hl
-   
-   or a
-   jr nz, loop
-   
+
+   or a                        ; end of string?
+   jr NZ,loop
+
    jp error_zc

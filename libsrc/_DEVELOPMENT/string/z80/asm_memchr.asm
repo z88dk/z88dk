@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; void *memchr(const void *s, int c, size_t n)
@@ -41,26 +41,40 @@ asm_memchr:
 
    inc c
    dec c
-   jr z, test0
+   jr Z,test0
 
 asm0_memchr:
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+
+   dec bc
+   inc b
+   inc c
+
 loop:
-IF __CPU_GBZ80__
-   EXTERN __z80asm__cpir
-   call __z80asm__cpir
+   cp (hl)
+   ret Z                       ; char found
+
+   inc hl
+
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
 ELSE
    cpir
-ENDIF
    dec hl
-   ret z                       ; char found
+   ret Z                       ; char found
+
+ENDIF
 
 notfound:
-
    jp error_zc
 
 test0:
-
    inc b
-   djnz loop
+   dec b
+   jr NZ,asm0_memchr
 
    jr notfound

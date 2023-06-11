@@ -309,8 +309,8 @@ extern unsigned char *zx_pxy2aaddr_callee(unsigned char x,unsigned char y) __pre
 #define zx_pxy2aaddr(a,b) zx_pxy2aaddr_callee(a,b)
 
 
-extern unsigned char *zx_pxy2saddr(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
-extern unsigned char *zx_pxy2saddr_callee(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_callee;
+extern unsigned char *zx_pxy2saddr(unsigned char x,unsigned char y) __preserves_regs(b,c,iyl,iyh);
+extern unsigned char *zx_pxy2saddr_callee(unsigned char x,unsigned char y) __preserves_regs(b,c,iyl,iyh) __z88dk_callee;
 #define zx_pxy2saddr(a,b) zx_pxy2saddr_callee(a,b)
 
 

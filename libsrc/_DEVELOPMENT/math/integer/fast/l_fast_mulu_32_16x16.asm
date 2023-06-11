@@ -18,7 +18,7 @@ l_fast_mulu_32_16x16:
    ;         carry reset
    ;
    ; uses  : af, bc, de, hl
-   
+
    ; try to reduce the multiplication
 
    inc d
@@ -46,9 +46,9 @@ ELSE
 
    push hl
    push de
-   
+
    call l_fast_mulu_24_16x8
-   
+
    pop bc
 
 ENDIF
@@ -61,40 +61,40 @@ IF __CLIB_OPT_IMATH_FAST & $04
 
    ld e,b                      ; e = D
    ld b,a                      ; b = MSB(HL * E)
-   
+
    call l_fast_mulu_24_16x8         ; ahl = HL * D
 
 ELSE
 
    ld e,b
    push af
-   
+
    call l_fast_mulu_24_16x8
-   
+
    pop bc
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
+
    ld c,b
    ld b,0                      ; bc = MSW(HL * E)
-   
+
    ld d,l
    ld e,b                      ; bc = LSW(HL * D << 8)
-   
+
    ld l,h
    ld h,a                      ; hl = MSW(HL * D << 8)
 
    add hl,bc
    ex de,hl                    ; de = MSW(result)
-   
+
    pop bc                      ; bc = LSW(HL * E)
    add hl,bc                   ; hl = LSW(result)
-   
+
    ret nc
-   
+
    inc de
-   
+
    or a
    ret
 
@@ -105,8 +105,8 @@ ENDIF
 ;   add hl,hl
 ;   rla
 ;   rl c
-;   
+;
 ;   jr nc, loop_13
-;   
+;
 ;   add hl,de
 ;   adc a,b

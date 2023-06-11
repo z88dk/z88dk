@@ -6,6 +6,7 @@
 	SECTION	code_graphics
 	PUBLIC	pixeladdress_MODE6
 	EXTERN	__zx_screenmode
+        EXTERN  __gfx_fatpix
 
 ; ******************************************************************
 ;
@@ -22,6 +23,11 @@
 ;  ......../ixiy same
 ;  afbcdehl/.... different
 pixeladdress_MODE6:
+    ld      a,(__gfx_fatpix)
+    and     a
+    jr      z,not_fatpix
+    add     hl,hl
+not_fatpix:
     ld      a,e
     ld      b,a
     and     a

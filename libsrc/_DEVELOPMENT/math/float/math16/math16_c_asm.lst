@@ -1,6 +1,7 @@
 math/float/math16/c/asm/acosf16
 math/float/math16/c/asm/asinf16
 math/float/math16/c/asm/atanf16
+math/float/math16/c/asm/atan2f16
 math/float/math16/c/asm/cosf16
 math/float/math16/c/asm/sinf16
 math/float/math16/c/asm/tanf16

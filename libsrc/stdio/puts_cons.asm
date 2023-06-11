@@ -11,8 +11,6 @@
 		SECTION	code_clib
 		PUBLIC	puts_cons
 		PUBLIC	_puts_cons
-		PUBLIC	cputs
-		PUBLIC	_cputs
 		EXTERN	fputc_cons
 
 
@@ -20,8 +18,6 @@
 
 .puts_cons
 ._puts_cons
-.cputs
-._cputs
 	pop	bc
 	pop	hl
 	push	hl

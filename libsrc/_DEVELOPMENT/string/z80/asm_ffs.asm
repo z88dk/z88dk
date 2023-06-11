@@ -25,31 +25,27 @@ asm_ffs:
    ;         carry set if set bit present
    ;
    ; uses  : af, hl
-   
+
    ld a,l
    or a
-   jr nz, bits_1_8
-   
+   jr NZ,bits_1_8
+
    ld a,h
    or a
-   ret z
+   ret Z
 
 asm1_ffs:
 bits_9_16:
-
    ld hl,9
 
 asm2_ffs:
 loop:
-
    rra
    ret c
-   
    inc l
    jr loop
 
 asm0_ffs:
 bits_1_8:
-
    ld hl,1
    jr loop

@@ -5,10 +5,10 @@
 
 	defc	acos = cam32_sccz80_acos
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _acos
-EXTERN cam32_sdcc_acos
-defc _acos = cam32_sdcc_acos
+defc _acos = cam32_sccz80_acos
 ENDIF
 

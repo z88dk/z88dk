@@ -1,36 +1,27 @@
-      
-        MODULE __tms9918_xorpixel 
-        SECTION code_clib
-        PUBLIC  __tms9918_xorpixel
 
-        EXTERN  __tms9918_pixeladdress
-        EXTERN  __gfx_coords
-        EXTERN  __tms9918_pix_return
+    MODULE  __tms9918_xorpixel
+    SECTION code_video_vdp
+    PUBLIC  __tms9918_xorpixel
 
-        INCLUDE "video/tms9918/vdp.inc"
-        INCLUDE "graphics/grafix.inc"
+    EXTERN  __tms9918_graphics_xor
+
+    INCLUDE "graphics/grafix.inc"
+    INCLUDE "video/tms9918/vdp.inc"
 
 IF VDP_EXPORT_GFX_DIRECT = 1
-        PUBLIC  xorpixel
-        defc    xorpixel = __tms9918_xorpixel
+    PUBLIC  xorpixel
+    defc    xorpixel = __tms9918_xorpixel
 ENDIF
 
-.__tms9918_xorpixel
-        ld      a,l
-        cp      192 
-        ret     nc                        ; y0        out of range
-                                
-        ld      (__gfx_coords),hl
 
-        push    bc
-        call    __tms9918_pixeladdress
-        ld      b,a
-        ld      a,1
-        jr      z, xor_pixel                ; pixel is at bit 0...
-.plot_position
-        rlca
-        djnz    plot_position
-.xor_pixel
-        ;ex     de,hl
-        xor     (hl)
-        jp      __tms9918_pix_return
+
+; ******************************************************************
+;
+; Xor plot pixel at (x,y) coordinate.
+;
+; in:  hl = (x,y) coordinate of pixel (h,l)
+
+.__tms9918_xorpixel
+    ex      de,hl
+    ld      hl,(__tms9918_graphics_xor)
+    jp      (hl)

@@ -1,0 +1,11 @@
+target/excali64/stdio/generic_console
+target/excali64/stdio/generic_console_ioctl
+target/excali64/stdio/conio_vars
+target/excali64/stdio/conio_map_colour
+target/excali64/stdio/CRT_FONT
+target/excali64/stdio/copy_font
+target/excali64/stdio/loadudg6
+
+@input/input_keyboard.lst
+@gfx/gencon/gfx_gencon6.lst
+@video/mc6845/mc6845.lst

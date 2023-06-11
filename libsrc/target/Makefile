@@ -1,19 +1,22 @@
 include ../Make.config
 
 
-SUBDIRS = c128 z88 x1 msx svi nc100 rex zx gb s1mp3 cpc sos ace pps tvc trs80 ticalc mtx oz enterprise cpm osca zx81 zxn zx-common ts2068 newbrain lm80c zx80
+SUBDIRS = ace c128 cpc cpm enterprise gb lm80c msx mtx nabu nc100 newbrain osca oz pps rex s1mp3 sos svi ticalc trs80 ts2068 tvc x1 z88 zx-common zx zx80 zx81 zxn
+
+CLEANDIRS = $(addsuffix -clean,$(SUBDIRS))
 
 
-     
 .PHONY: subdirs $(SUBDIRS) $(CLEANDIRS)
-     
+
 subdirs: $(SUBDIRS)
-     
+
 $(SUBDIRS):
 	$(MAKE) -C $@
 
 clean: $(CLEANDIRS)
-	$(RM) */*.o
+	$(RM) */*.o 
+	$(RM) */*/*.o 
+	$(RM) */*/*/*.o 
 
 $(CLEANDIRS): 
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean

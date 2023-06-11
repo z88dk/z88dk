@@ -38,7 +38,11 @@
 
 double eval_A(int i, int j)
 {
-	return 1.0/((i+j)*(i+j+1)/2+i+1);
+#ifdef __MATH_MATH32
+    return inv((i+j)*(i+j+1)/2+i+1);
+#else
+    return 1.0/((i+j)*(i+j+1)/2+i+1);
+#endif
 }
 
 void eval_A_times_u(const double u[], double Au[])
@@ -63,10 +67,10 @@ void eval_At_times_u(const double u[], double Au[])
 
 void eval_AtA_times_u(const double u[], double AtAu[])
 {
-	static double v[NUM];
-	
-	eval_A_times_u(u,v);
-	eval_At_times_u(v,AtAu);
+    static double v[NUM];
+
+    eval_A_times_u(u,v);
+    eval_At_times_u(v,AtAu);
 }
 
 int main(void)

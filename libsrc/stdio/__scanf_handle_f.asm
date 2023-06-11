@@ -1,6 +1,8 @@
 
     MODULE  __scanf_handle_f
     SECTION code_clib
+
+IF ! __CPU_INTEL__
     PUBLIC  __scanf_handle_f
 
     EXTERN  __scanf_common_start
@@ -9,11 +11,14 @@
     EXTERN  __scanf_getchar
     EXTERN  scanf_loop
 
+    EXTERN  __scanf_check_sign
+
     EXTERN  atof
     EXTERN  l_cmp
     EXTERN  asm_isdigit
     EXTERN  dstore
     EXTERN	CLIB_32BIT_FLOATS
+
 
 
 ; Floating point
@@ -27,13 +32,23 @@ __scanf_handle_f:
     add     hl,sp
     ex      de,hl       ;de = our buffer for the number
     ld      c,0	       ;[000000E.]
+IF __CPU_INTEL__
+    call    __scanf_check_sign
+ELSE
     bit     0,(ix-3)
+ENDIF
     jr      z,handle_f_fmt_check_width
     ld      a,'-'
     ld      (de),a	
     inc     de
 handle_f_fmt_check_width:
+IF __CPU_INTEL__
+    ld      b,0
+    call    ___scanf_get_width
+    ld      a,b
+ELSE
     ld      a,(ix-4)	;width
+ENDIF
     and     a
     jr      z,handle_f_fmt_check_width1
     cp      39		;maximum width
@@ -81,11 +96,15 @@ handle_f_fmt_finished_reading:
     ; TODO: Check there's something there
     ld      hl,2    ;we have the destination on the stack
     add     hl,sp
+IF !__CPU_INTEL__
     push    ix      ;save our framepointer - fp library will disturb it
+ENDIF
     push    hl
     call    atof
     pop     bc
+IF !__CPU_INTEL__
     pop     ix      ;get our framepointer back
+ENDIF
     ld      a,CLIB_32BIT_FLOATS
     and     a
     jr      z,store_48bit_float
@@ -104,9 +123,15 @@ store_48bit_float:
     pop     hl      ;destination
     call    dstore  ;and put it there
 store_rejoin:
+IF __CPU_INTEL__
+    call    __scanf_increment_conversions
+ELSE
     inc     (ix-1)  ;increase number of conversions
+ENDIF
     jp      scanf_loop
 handle_f_fmt_error:
     call    __scanf_ungetchar
     pop	    de  ;discard destinatino
     jp      scanf_exit
+
+ENDIF

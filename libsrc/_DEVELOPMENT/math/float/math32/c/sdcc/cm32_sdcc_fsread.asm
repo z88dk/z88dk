@@ -5,7 +5,7 @@ SECTION code_fp_math32
 PUBLIC cm32_sdcc_fsreadr
 PUBLIC cm32_sdcc_fsread1
 
-EXTERN cm32_sdcc_fsload
+EXTERN m32_fsload
 
 .cm32_sdcc_fsreadr
 
@@ -24,7 +24,7 @@ EXTERN cm32_sdcc_fsload
     ld hl,8                     ; stack sdcc_float right
     add hl,sp
 
-    jp cm32_sdcc_fsload         ; return DEHL = sdcc_float right
+    jp m32_fsload               ; return DEHL = sdcc_float right
 
 
 .cm32_sdcc_fsread1
@@ -44,4 +44,4 @@ EXTERN cm32_sdcc_fsload
     ld hl,4                     ; stack sdcc_float
     add hl,sp
 
-    jp cm32_sdcc_fsload         ; return DEHL = sdcc_float
+    jp m32_fsload               ; return DEHL = sdcc_float

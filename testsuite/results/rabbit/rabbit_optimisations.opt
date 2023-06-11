@@ -9,7 +9,7 @@
 	SECTION	code_compiler
 
 ._getviapointer
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	ld	hl,(hl+0)
 	ret
 
@@ -17,9 +17,9 @@
 
 ._mult
 	add	sp,-4
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	push	hl
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	pop	de
 	call	l_mult
 	add	sp,4
@@ -28,7 +28,7 @@
 
 
 ._negate
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	call	l_neg
 	ret
 
@@ -37,15 +37,15 @@
 ._or
 	ld	hl,(sp+4)
 	ex	de,hl
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	or	hl,de
 	push	hl
-	ld	hl,(sp + 6)
+	ld	hl,(sp+6)
 	ld	a,l
 	or	255
 	ld	l,a
-	ld	(sp + 0),hl
-	ld	hl,(sp + 6)
+	ld	(sp+0),hl
+	ld	hl,(sp+6)
 	ld	de,511
 	or	hl,de
 	add	sp,2
@@ -56,13 +56,13 @@
 ._and
 	ld	hl,(sp+4)
 	ex	de,hl
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	and	hl,de
 	push	hl
-	ld	hl,(sp + 6)
+	ld	hl,(sp+6)
 	ld	h,0
-	ld	(sp + 0),hl
-	ld	hl,(sp + 6)
+	ld	(sp+0),hl
+	ld	hl,(sp+6)
 	ld	de,511
 	and	hl,de
 	add	sp,2
@@ -71,7 +71,7 @@
 
 
 ._rshift
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	and	a
 	rr	hl
 	ret
@@ -79,16 +79,16 @@
 
 
 ._lshift
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	add	hl,hl
 	ret
 
 
 
 ._lshift_long
-	ld	hl,(sp + 2 + 2)
+	ld	hl,(sp+4)
 	ex	de,hl
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	add	hl,hl
 	rl	de
 	push	de
@@ -97,9 +97,9 @@
 	rr	hl
 	add	hl,sp
 	push	hl
-	ld	hl,(sp + 8 + 2)
+	ld	hl,(sp+10)
 	ex	de,hl
-	ld	hl,(sp + 8)
+	ld	hl,(sp+8)
 	add	hl,hl
 	rl	de
 	add	hl,hl
@@ -110,9 +110,9 @@
 	rr	hl
 	add	hl,sp
 	push	hl
-	ld	hl,(sp + 8 + 2)
+	ld	hl,(sp+10)
 	ex	de,hl
-	ld	hl,(sp + 8)
+	ld	hl,(sp+8)
 	ld	a,3
 	call	l_long_aslo
 	pop	bc
@@ -125,24 +125,24 @@
 
 
 ._addition
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	ld	bc,10
 	add	hl,bc
 	push	hl
 	call	_mult
-	ld	hl,(sp + 0)
+	ld	hl,(sp+0)
 	add	sp,2
 	ret
 
 
 
 ._subtract
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	ld	bc,-10
 	add	hl,bc
 	push	hl
 	call	_mult
-	ld	hl,(sp + 0)
+	ld	hl,(sp+0)
 	add	sp,2
 	ret
 
@@ -162,9 +162,9 @@
 
 
 ._longadd
-	ld	hl,(sp + 2 + 2)
+	ld	hl,(sp+4)
 	ex	de,hl
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 	ld	bc,10
 	add	hl,bc
 	jr	nc,ASMPC+3
@@ -176,13 +176,14 @@
 ._pushinstr
 	ld	hl,1	;const
 	push	hl
-	ld	hl,2	;const
+	ld	l,2
 	push	hl
 	ld	hl,3	;const
 	push	hl
 	call	_anotherfunc
 	add	sp,6
 	ret
+
 
 
 
