@@ -1907,7 +1907,7 @@ agon_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	$(call buildgeneric,agon,"wide")
 	$(MAKE) -C games TARGET=agon
-	TARGET=agon TYPE=z80 $(LIBLINKER) -mz80 -DFORagon -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/agon_clib @$(TARGET_DIRECTORY)/agon/agon.lst
+	TARGET=agon TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -DFORagon -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/agon_clib @$(TARGET_DIRECTORY)/agon/agon.lst
 
 dai_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
