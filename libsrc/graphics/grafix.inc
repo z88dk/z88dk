@@ -486,6 +486,13 @@ IF FORtrs80m2
     defc GFXTEXT3 = 1
 ENDIF
 
+IF FORtrs80m4
+    DEFINE gotgfx
+    defc maxx    = 160
+    defc maxy    = 72
+    defc blankch    = 128
+ENDIF
+
 IF FOReg2000
     DEFINE gotgfx
     defc maxx    = 160
