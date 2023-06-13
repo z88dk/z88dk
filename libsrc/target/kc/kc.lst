@@ -6,7 +6,7 @@ target/kc/stdio/generic_console_ioctl
 target/kc/stdio/generic_console_vpeek
 target/kc/stdio/conio_map_colour
 target/kc/stdio/CRT_FONT
-@stdio/stdio_ixiy.lst
+@stdio/stdio.lst
 
 games/joystick
 target/kc/graphics/clg

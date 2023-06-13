@@ -7,7 +7,7 @@ target/special/stdio/conio_map_colour
 target/special/stdio/fputc_cons_native
 target/special/stdio/fputc_cons_native
 target/special/stdio/fgetc_cons
-@stdio/stdio_8080.lst
+@stdio/stdio.lst
 stdio/inkey/getk
 stdio/inkey/fgetc_cons
 
