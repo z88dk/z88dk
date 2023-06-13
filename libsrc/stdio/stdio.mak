@@ -1,7 +1,11 @@
 
 
 
-STDIO_CFILES = $(notdir $(wildcard stdio/*.c))
+STDIO_CFILES = $(notdir $(wildcard stdio/*.c)) 
+
+STDIO_NET_CFILES = $(STDIO_CFILES) \
+		$(patsubst %,zsock/%,$(notdir $(wildcard stdio/zsock/*.c)))
+
 STDIO_AFILES = $(notdir $(wildcard stdio/*.asm)) \
 		$(patsubst %,conio/%,$(notdir $(wildcard stdio/conio/*.asm))) \
 		$(patsubst %,ansi/%,$(notdir $(wildcard stdio/ansi/*.asm))) \
@@ -18,6 +22,7 @@ STDIO_8080_OBJECTS = $(STDIO_CFILES:.c=.o) $(STDIO_8080_AFILES:.asm=.o)
 STDIO_GBZ80_OBJECTS = $(STDIO_CFILES:.c=.o) $(STDIO_GBZ80_AFILES:.asm=.o)
 
 STDIO_OBJS = $(addprefix stdio/obj/z80/, $(STDIO_OBJECTS)) \
+	$(addprefix stdio/obj/z80/, $(STDIO_NET_CFILES:.c=.o)) \
 	$(addprefix stdio/obj/ixiy/,$(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/z80-binary/,$(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/r2k/,$(STDIO_OBJECTS)) \
@@ -25,7 +30,8 @@ STDIO_OBJS = $(addprefix stdio/obj/z80/, $(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/8085/,$(STDIO_8080_OBJECTS)) \
 	$(addprefix stdio/obj/8080-binary/,$(STDIO_8080_OBJECTS)) \
 	$(addprefix stdio/obj/gbz80/,$(STDIO_GBZ80_OBJECTS)) \
-	$(addprefix stdio/obj/ez80_z80/,$(STDIO_OBJECTS))
+	$(addprefix stdio/obj/ez80_z80/,$(STDIO_OBJECTS)) \
+	$(addprefix stdio/obj/z80n/,$(STDIO_OBJECTS)) 
 
 OBJS += $(STDIO_OBJS)
 CLEAN += stdio-clean
