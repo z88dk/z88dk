@@ -40,7 +40,7 @@ stdio: $(STDIO_OBJS)
 
 .PHONY: stdio stdio-clean
 
-$(eval $(call buildbit,stdio,z80,test,-DSTDIO_BINARY))
+$(eval $(call buildbit,stdio,z80,test))
 $(eval $(call buildbit,stdio,z80-binary,cpm))
 $(eval $(call buildbit,stdio,ixiy,test,-Ca-IXIY,-mz80 -IXIY))
 $(eval $(call buildbit,stdio,8080,test,-DCPU_8080 -clib=8080,-m8080))
