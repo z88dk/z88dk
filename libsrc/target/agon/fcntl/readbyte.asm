@@ -6,13 +6,8 @@ INCLUDE "target/agon/def/mos_api.inc"
 
 readbyte:
 _readbyte:
-    pop     hl
-    pop     bc
-    push    bc
-    push    hl
-    push    ix
-    MOSCALL(mos_fgetc)
-    pop     ix
+    ld      c,l
+    MOSCALL(mos_fgetc)	;preserves ix
     ld      hl,-1
     ret     c
     ld      l,a
