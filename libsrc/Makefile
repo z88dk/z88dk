@@ -197,13 +197,13 @@ include regex/regex.mak
 include sdcard/sdcard.mak
 include setjmp/setjmp.mak
 include strings/strings.mak
+include stdio/stdio.mak
 include stdlib/stdlib.mak
 include time/time.mak
 
 
 # Targets depend on some common code + target specific (include stdio in here)
-# Depend on z80_crt0.lib as a proxy for stdio (temporary)
-TARGET_CLIB_OBJS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) z80_crt0.lib
+TARGET_CLIB_OBJS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS)
 
 # Arg1: target
 # Arg2: Graphics flavour
@@ -213,7 +213,6 @@ define buildgeneric
 endef
 
 define buildcrt
-	$(MAKE) -C stdio
 	$(MAKE) -C z80_crt0s
 	$(MAKE) -C math/fix16
 endef
@@ -2109,7 +2108,6 @@ install-clean: classic-clean new-install-clean
 classic-clean: $(CLEAN)
 	$(MAKE) -C fcntl clean
 	$(MAKE) -C math clean
-	$(MAKE) -C stdio clean
 	$(MAKE) -C z80_crt0s clean
 	$(MAKE) -C alloc/farz88 clean
 	$(MAKE) -C lib3d clean

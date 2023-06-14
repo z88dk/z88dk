@@ -14,7 +14,7 @@ target/vg5k/stdio/CRT_FONT
 target/vg5k/stdio/set_character
 target/vg5k/stdio/conio_map_colour
 target/vg5k/stdio/conio_vars
-@stdio/stdio_ixiy.lst
+@stdio/stdio.lst
 
 @font/font_8x10/font_8x10.lst
 @input/input_keyboard.lst

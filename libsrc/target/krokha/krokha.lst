@@ -4,6 +4,6 @@ target/krokha/games/joystick
 target/krokha/games/joystick
 @games/games.lst
 @gfx/gencon/gfx_gencon_portable.lst
-@stdio/stdio_8080.lst
+@stdio/stdio.lst
 
 
