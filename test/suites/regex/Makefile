@@ -7,7 +7,7 @@ OBJECTS := $(SOURCES:.c=.o)
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
-all:	test.bin test_rcm.bin test_8080.bin test_gbz80.bin test_8085.bin
+all:	test.bin test_rcm.bin test_8080.bin test_gbz80.bin test_8085.bin test_ez80_z80.bin
 
 
 
@@ -31,6 +31,10 @@ test_8085.bin: $(SOURCES)
 test_gbz80.bin: $(SOURCES)
 	$(compile_gbz80)
 	$(runtest_gbz80)
+
+test_ez80_z80.bin: $(SOURCES)
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
 
 clean:
 	rm -f *.bin *.map $(OBJECTS) zcc_opt.def *~

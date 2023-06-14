@@ -738,7 +738,7 @@ int main (int argc, char **argv){
     printf("  -mr2ka         Emulate a Rabbit 2000\n"),
     printf("  -mr3k          Emulate a Rabbit 3000\n"),
     printf("  -mz80n         Emulate a Spectrum Next z80n\n"),
-    printf("  -mez80         Emulate an ez80 (z80 mode)\n"),
+    printf("  -mez80_z80     Emulate an ez80 (z80 mode)\n"),
     printf("  -ide0 <file>   Set file to be ide device 0\n"),
     printf("  -ide1 <file>   Set file to be ide device 1\n"),
     printf("  -iochar X      Set port X to be character input/output\n"),
@@ -823,7 +823,7 @@ int main (int argc, char **argv){
             c_cpu = CPU_R2KA;
           } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
             c_cpu = CPU_R3K;
-          } else if ( strcmp(&argv[0][1],"mez80") == 0 ) {
+          } else if ( strcmp(&argv[0][1],"mez80_z80") == 0 ) {
             c_cpu = CPU_EZ80;
           } else if ( strcmp(&argv[0][1],"mgbz80") == 0 ) {
             c_cpu = CPU_GBZ80;            
