@@ -1,9 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 20991-4398ebbb5d-20230509
+;  Version: 21234-4d9c2f0cbb-20230615
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu May 18 15:08:34 2023
+;	Module compile time: Thu Jun 15 13:10:19 2023
 
 
 	C_LINE	0,"am9511_fmax.c"
@@ -221,24 +221,14 @@
 	call	l_glong2sp
 	ld	de,sp+6
 	ex	de,hl
-	call	l_glong2sp
-	ld	de,sp+4
-	ex	de,hl
-	call	l_glong2sp
-	ld	de,sp+4
-	ex	de,hl
 	call	l_glong
 	call	l_f32_gt
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	ld	de,sp+14
+	ld	de,sp+6
 	ex	de,hl
 	call	l_glong
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
 	pop	bc
 	pop	af
 	pop	af
@@ -249,13 +239,9 @@
 
 
 .i_2
-	ld	de,sp+10
+	ld	de,sp+2
 	ex	de,hl
 	call	l_glong
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
 	pop	bc
 	pop	af
 	pop	af
@@ -265,13 +251,13 @@
 	ret
 
 
-	C_LINE	21,"am9511_fmax.c::am9511_fmax_callee::0::1"
+	C_LINE	19,"am9511_fmax.c::am9511_fmax_callee::0::1"
 
 ; Function am9511_fmax flags 0x00000200 __smallc 
 ; double am9511_fmax(double x, double y)
 ; parameter 'double y' at sp+2 size(4)
 ; parameter 'double x' at sp+6 size(4)
-	C_LINE	22,"am9511_fmax.c::am9511_fmax::0::1"
+	C_LINE	20,"am9511_fmax.c::am9511_fmax::0::1"
 ._am9511_fmax
 	ld	de,sp+6
 	ex	de,hl
