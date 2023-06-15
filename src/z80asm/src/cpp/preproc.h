@@ -108,6 +108,7 @@ private:
 	void parse_line(const string& line);
 	void do_label();
 	bool ifs_active();
+	bool symbol_defined(const string& name);
 
 	bool check_opcode(Keyword keyword, void (Preproc::* do_action)());
 	bool check_hash_directive(Keyword keyword, void (Preproc::* do_action)());

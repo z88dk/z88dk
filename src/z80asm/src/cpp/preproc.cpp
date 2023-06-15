@@ -371,6 +371,26 @@ bool Preproc::ifs_active() {
 	return true;
 }
 
+bool Preproc::symbol_defined(const string& name) {
+	// expand macros in condition
+	string expanded_text = expand(name);
+	string expanded_name = expanded_text.empty() ? name : expanded_text;
+
+	// check macro
+	if (m_macros.find_all(expanded_name))
+		return true;
+
+	// check preprocessor macro
+	if (defines().find_all(expanded_name))
+		return true;
+
+	// check assembler symbol
+	if (check_ifdef_condition(expanded_name.c_str()))
+		return true;
+	else
+		return false;
+}
+
 bool Preproc::check_opcode(Keyword keyword, void(Preproc::* do_action)()) {
 	if (m_lexer.peek(0).is(TType::Label) && m_lexer.peek(1).is(keyword)) {
 		if (ifs_active())
@@ -570,11 +590,7 @@ void Preproc::do_ifdef_ifndef(bool invert) {
 		if (!m_lexer.peek().is(TType::Newline))
 			g_errors.error(ErrCode::Syntax);
 		else {
-			// expand macros in condition
-			string cond_text = expand(name);
-
-			// check condition
-			bool f = check_ifdef_condition(cond_text.c_str());
+			bool f = symbol_defined(name);
 			if (invert)
 				f = !f;
 			m_if_stack.emplace_back(Keyword::IF, m_files.back().location, f);
@@ -636,11 +652,7 @@ void Preproc::do_elifdef_elifndef(bool invert) {
 				if (!m_lexer.peek().is(TType::Newline))
 					g_errors.error(ErrCode::Syntax);
 				else {
-					// expand macros in condition
-					string cond_text = expand(name);
-
-					// check condition
-					bool f = check_ifdef_condition(cond_text.c_str());
+					bool f = symbol_defined(name);
 					if (invert)
 						f = !f;
 					if (m_if_stack.back().done_if)
