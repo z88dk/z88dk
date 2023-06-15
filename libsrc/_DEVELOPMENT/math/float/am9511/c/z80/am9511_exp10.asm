@@ -214,8 +214,9 @@
 	GLOBAL _sqr_fastcall
 	GLOBAL _div2_fastcall
 	GLOBAL _mul2_fastcall
-	GLOBAL _fmin
-	GLOBAL _fmax
+	GLOBAL _fmod
+	GLOBAL _fmin_callee
+	GLOBAL _fmax_callee
 	GLOBAL _floor_fastcall
 	GLOBAL _fabs_fastcall
 	GLOBAL _ceil_fastcall
@@ -264,6 +265,8 @@
 	GLOBAL _isgreater
 	GLOBAL _fma_callee
 	GLOBAL _fma
+	GLOBAL _fmin
+	GLOBAL _fmax
 	GLOBAL _fdim_callee
 	GLOBAL _fdim
 	GLOBAL _nexttoward_callee
@@ -278,7 +281,6 @@
 	GLOBAL _remquo
 	GLOBAL _remainder_callee
 	GLOBAL _remainder
-	GLOBAL _fmod
 	GLOBAL _modf
 	GLOBAL _trunc_fastcall
 	GLOBAL _trunc

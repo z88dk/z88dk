@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.2.0 #13081 (Linux)
+; Version 4.2.0 #13131 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -215,6 +215,7 @@
 	GLOBAL _sqr_fastcall
 	GLOBAL _div2_fastcall
 	GLOBAL _mul2_fastcall
+	GLOBAL _fmod
 	GLOBAL _fmin_callee
 	GLOBAL _fmax_callee
 	GLOBAL _floor_fastcall
@@ -282,7 +283,6 @@
 	GLOBAL _remquo
 	GLOBAL _remainder_callee
 	GLOBAL _remainder
-	GLOBAL _fmod
 	GLOBAL _modf
 	GLOBAL _trunc_fastcall
 	GLOBAL _trunc

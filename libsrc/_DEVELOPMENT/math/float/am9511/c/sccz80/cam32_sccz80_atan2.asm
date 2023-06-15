@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fp_am9511
 
 PUBLIC cam32_sccz80_atan2

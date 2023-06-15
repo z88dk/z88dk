@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jun 15 13:10:19 2023
+;	Module compile time: Thu Jun 15 13:54:56 2023
 
 
 	C_LINE	0,"am9511_fmax.c"
@@ -178,34 +178,35 @@
 	C_LINE	39,"/home/phillip/Z80/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"am9511_math.h"
 	C_LINE	37,"am9511_math.h"
-	C_LINE	96,"am9511_math.h"
 	C_LINE	97,"am9511_math.h"
 	C_LINE	98,"am9511_math.h"
 	C_LINE	99,"am9511_math.h"
 	C_LINE	100,"am9511_math.h"
 	C_LINE	101,"am9511_math.h"
-	C_LINE	103,"am9511_math.h"
-	C_LINE	106,"am9511_math.h"
+	C_LINE	102,"am9511_math.h"
+	C_LINE	104,"am9511_math.h"
 	C_LINE	107,"am9511_math.h"
 	C_LINE	108,"am9511_math.h"
 	C_LINE	109,"am9511_math.h"
 	C_LINE	110,"am9511_math.h"
 	C_LINE	111,"am9511_math.h"
-	C_LINE	114,"am9511_math.h"
+	C_LINE	112,"am9511_math.h"
 	C_LINE	115,"am9511_math.h"
 	C_LINE	116,"am9511_math.h"
-	C_LINE	118,"am9511_math.h"
+	C_LINE	117,"am9511_math.h"
 	C_LINE	119,"am9511_math.h"
 	C_LINE	120,"am9511_math.h"
-	C_LINE	123,"am9511_math.h"
+	C_LINE	121,"am9511_math.h"
 	C_LINE	124,"am9511_math.h"
 	C_LINE	125,"am9511_math.h"
 	C_LINE	126,"am9511_math.h"
 	C_LINE	127,"am9511_math.h"
-	C_LINE	130,"am9511_math.h"
-	C_LINE	131,"am9511_math.h"
+	C_LINE	128,"am9511_math.h"
+	C_LINE	129,"am9511_math.h"
 	C_LINE	132,"am9511_math.h"
 	C_LINE	133,"am9511_math.h"
+	C_LINE	134,"am9511_math.h"
+	C_LINE	135,"am9511_math.h"
 	C_LINE	9,"am9511_fmax.c"
 	C_LINE	12,"am9511_fmax.c"
 	SECTION	code_compiler
@@ -366,7 +367,7 @@
 	GLOBAL	frexp
 	GLOBAL	frexp_callee
 	GLOBAL	_fabs
-	GLOBAL	fmod
+	GLOBAL	_fmod
 	GLOBAL	hypot
 	GLOBAL	hypot_callee
 	GLOBAL	atof
