@@ -711,7 +711,7 @@ static disc_spec bic_spec = {
 
 // 8" floppy disk on Xerox 820 or Ferguson BigBoard
 static disc_spec bigboard_spec = {
-    .name = "Z80pack",
+    .name = "BigBoard",
     .disk_mode = FM500,
     .sectors_per_track = 26,
     .tracks = 77,
@@ -887,6 +887,26 @@ static disc_spec v1050_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 1,
 };
+
+
+// Heath H89/Zenith Z89 SSSD (H17 disk unit)
+// H77/Z-77 or H87/Z-87 drives with soft-sectored controller
+static disc_spec hz17_spec = {
+    .name = "HZenith17",
+    .disk_mode = FM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
 
 static disc_spec z80pack_spec = {
     .name = "Z80pack",
@@ -1110,6 +1130,7 @@ static struct formats {
     { "v1050",     "Visual 1050",           &v1050_spec, 0, NULL, 1 },
     { "vt180",     "DEC VT-180",            &vt180_spec, 0, NULL, 1 },
     { "x820",      "Xerox 820",             &x820_spec, 0, NULL, 1 },
+    { "hz89",      "Zenith Z89, Z17-SSSD",  &hz17_spec, 0, NULL, 1 },
     { "z80pack",   "z80pack 8\" format",    &z80pack_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
