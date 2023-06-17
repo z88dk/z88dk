@@ -170,12 +170,12 @@ sub add {
 		}
 	}
 	elsif ($asm =~ /%d/) {
-		my $asm1 = $asm =~ s/\+%d/+127/r;
-		my $bytes1 = $bytes =~ s/%d/7F/r;
+		my $asm1 = $asm =~ s/\+%d/+126/r;
+		my $bytes1 = $bytes =~ s/%d/7E/r =~ s/%D/7F/r;
 		add($cpu, $asm1, $bytes1);
 		
 		$asm1 = $asm =~ s/\+%d/-128/r;
-		$bytes1 = $bytes =~ s/%d/80/r;
+		$bytes1 = $bytes =~ s/%d/80/r =~ s/%D/81/r;
 		add($cpu, $asm1, $bytes1);
 	}
 	elsif ($asm =~ /%u/) {

@@ -65,6 +65,14 @@ sub parse_code {
 	my($cpu, $asm, @ops) = @_;
 	my @code;
 
+	my @bin;
+	for my $op (@ops) {
+		push @bin, @$op;
+	}
+	my $bin = "@bin";
+	
+	#say "$cpu\t$asm\t$bin";
+
 	# handle special case of jump to %t
 	if (grep {/%t/} @{$ops[0]}) {
 		my $op1 = $ops[0][0];
@@ -125,13 +133,31 @@ sub parse_code {
 				"DO_stmt(".sprintf("0x%02X", $ops[0][0]).");";
 			shift @ops;
 		}
-		for my $bin (@ops) {
-			push @code, parse_code_opcode($cpu, $asm, @$bin);
+		for my $op (@ops) {
+			push @code, parse_code_opcode($cpu, $asm, @$op);
 		}
-	}		
+	}
+	# handle ld dd,(ix+d) -> ld ddl,(ix+d) : ld ddh, (ix+d+1)
+	elsif ($bin =~ /%D/) {
+		push @code, "DO_STMT_LABEL();";
+		for my $i (0 .. $#ops) {
+			if (($ops[$i][2]//'') eq '%d' && ($ops[$i+1][2]//'') eq '%D') {
+				my $opcode0 = ($ops[$i+0][0] << 8) + $ops[$i+0][1];
+				my $opcode1 = ($ops[$i+1][0] << 8) + $ops[$i+1][1];
+				push @code, 
+					"DO_stmt_idx_idx1(".sprintf("0x%04X, 0x%04X", $opcode0, $opcode1).");";
+			}
+			elsif ($ops[$i][2]//'' eq '%D') {
+				# already handled
+			}
+			else {
+				push @code, parse_code_opcode($cpu, $asm, @{$ops[$i]});
+			}
+		}
+	}
 	else {
-		for my $bin (@ops) {
-			push @code, parse_code_opcode($cpu, $asm, @$bin);
+		for my $op (@ops) {
+			push @code, parse_code_opcode($cpu, $asm, @$op);
 		}
 	}
 	

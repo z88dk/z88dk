@@ -4452,54 +4452,54 @@
 |ld (ix), %n            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix), a             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix), b             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (ix), bc            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (ix), bc            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix), c             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix), d             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (ix), de            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (ix), de            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix), e             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix), h             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (ix), hl            |-    -    ez80 ez80_z80 -     r2ka r3k -    -   -   |
-|ld (ix), ix            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld (ix), iy            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (ix), hl            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld (ix), ix            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld (ix), iy            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix), l             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix+%d), %n         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix+%d), a          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix+%d), b          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (ix+%d), bc         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (ix+%d), bc         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix+%d), c          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix+%d), d          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (ix+%d), de         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (ix+%d), de         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix+%d), e          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix+%d), h          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (ix+%d), hl         |-    -    ez80 ez80_z80 -     r2ka r3k -    -   -   |
-|ld (ix+%d), ix         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld (ix+%d), iy         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (ix+%d), hl         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld (ix+%d), ix         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld (ix+%d), iy         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (ix+%d), l          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy), %n            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy), a             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy), b             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (iy), bc            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (iy), bc            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy), c             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy), d             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (iy), de            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (iy), de            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy), e             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy), h             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (iy), hl            |-    -    ez80 ez80_z80 -     r2ka r3k -    -   -   |
-|ld (iy), ix            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld (iy), iy            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (iy), hl            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld (iy), ix            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld (iy), iy            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy), l             |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy+%d), %n         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy+%d), a          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy+%d), b          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (iy+%d), bc         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (iy+%d), bc         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy+%d), c          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy+%d), d          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (iy+%d), de         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (iy+%d), de         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy+%d), e          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy+%d), h          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld (iy+%d), hl         |-    -    ez80 ez80_z80 -     r2ka r3k -    -   -   |
-|ld (iy+%d), ix         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld (iy+%d), iy         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld (iy+%d), hl         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld (iy+%d), ix         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld (iy+%d), iy         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (iy+%d), l          |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (sp), hl            |-    -    -    -        -     r2ka r3k -    -   -   |
 |ld (sp), ix            |-    -    -    -        -     r2ka r3k -    -   -   |
@@ -4618,10 +4618,10 @@
 |ld bc, (%m)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld bc, (hl)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld bc, (hl+)           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|ld bc, (ix)            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld bc, (ix+%d)         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld bc, (iy)            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld bc, (iy+%d)         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld bc, (ix)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld bc, (ix+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld bc, (iy)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld bc, (iy+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld bc, de              |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld bc, hl              |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld bc, ix              |-    -    ez80 ez80_z80 -     -    -   -    z80 z80n|
@@ -4716,10 +4716,10 @@
 |ld de, (%m)            |8080 8085 ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld de, (hl)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld de, (hl+)           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|ld de, (ix)            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld de, (ix+%d)         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld de, (iy)            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld de, (iy+%d)         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld de, (ix)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld de, (ix+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld de, (iy)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld de, (iy+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld de, bc              |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld de, hl              |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld de, hl+%u           |-    8085 -    -        -     -    -   -    -   -   |
@@ -4826,10 +4826,10 @@
 |ld hl, (hl)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld hl, (hl+%d)         |-    -    -    -        -     r2ka r3k -    -   -   |
 |ld hl, (hl+)           |8080 8085 ez80 ez80_z80 gbz80 -    -   z180 z80 z80n|
-|ld hl, (ix)            |-    -    ez80 ez80_z80 -     r2ka r3k -    -   -   |
-|ld hl, (ix+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k -    -   -   |
-|ld hl, (iy)            |-    -    ez80 ez80_z80 -     r2ka r3k -    -   -   |
-|ld hl, (iy+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k -    -   -   |
+|ld hl, (ix)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld hl, (ix+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld hl, (iy)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld hl, (iy+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld hl, (sp)            |-    -    -    -        -     r2ka r3k -    -   -   |
 |ld hl, (sp+%u)         |-    -    -    -        -     r2ka r3k -    -   -   |
 |ld hl, bc              |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
@@ -4847,10 +4847,10 @@
 |ld ix, (%m)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld ix, (hl)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld ix, (hl+)           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|ld ix, (ix)            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld ix, (ix+%d)         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld ix, (iy)            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld ix, (iy+%d)         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld ix, (ix)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld ix, (ix+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld ix, (iy)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld ix, (iy+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld ix, (sp)            |-    -    -    -        -     r2ka r3k -    -   -   |
 |ld ix, (sp+%u)         |-    -    -    -        -     r2ka r3k -    -   -   |
 |ld ix, bc              |-    -    ez80 ez80_z80 -     -    -   -    z80 z80n|
@@ -4877,10 +4877,10 @@
 |ld iy, (%m)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld iy, (hl)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld iy, (hl+)           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|ld iy, (ix)            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld iy, (ix+%d)         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld iy, (iy)            |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld iy, (iy+%d)         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld iy, (ix)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld iy, (ix+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld iy, (iy)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld iy, (iy+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld iy, (sp)            |-    -    -    -        -     r2ka r3k -    -   -   |
 |ld iy, (sp+%u)         |-    -    -    -        -     r2ka r3k -    -   -   |
 |ld iy, bc              |-    -    ez80 ez80_z80 -     -    -   -    z80 z80n|
@@ -20590,6 +20590,11 @@
 |ld (ix), b             |z80n    |DD 70 00                           |
 |ld (ix), bc            |ez80    |DD 0F 00                           |
 |ld (ix), bc            |ez80_z80|DD 0F 00                           |
+|ld (ix), bc            |r2ka    |DD 71 00 DD 70 01                  |
+|ld (ix), bc            |r3k     |DD 71 00 DD 70 01                  |
+|ld (ix), bc            |z180    |DD 71 00 DD 70 01                  |
+|ld (ix), bc            |z80     |DD 71 00 DD 70 01                  |
+|ld (ix), bc            |z80n    |DD 71 00 DD 70 01                  |
 |ld (ix), c             |ez80    |DD 71 00                           |
 |ld (ix), c             |ez80_z80|DD 71 00                           |
 |ld (ix), c             |r2ka    |DD 71 00                           |
@@ -20606,6 +20611,11 @@
 |ld (ix), d             |z80n    |DD 72 00                           |
 |ld (ix), de            |ez80    |DD 1F 00                           |
 |ld (ix), de            |ez80_z80|DD 1F 00                           |
+|ld (ix), de            |r2ka    |DD 73 00 DD 72 01                  |
+|ld (ix), de            |r3k     |DD 73 00 DD 72 01                  |
+|ld (ix), de            |z180    |DD 73 00 DD 72 01                  |
+|ld (ix), de            |z80     |DD 73 00 DD 72 01                  |
+|ld (ix), de            |z80n    |DD 73 00 DD 72 01                  |
 |ld (ix), e             |ez80    |DD 73 00                           |
 |ld (ix), e             |ez80_z80|DD 73 00                           |
 |ld (ix), e             |r2ka    |DD 73 00                           |
@@ -20624,10 +20634,23 @@
 |ld (ix), hl            |ez80_z80|DD 2F 00                           |
 |ld (ix), hl            |r2ka    |F4 00                              |
 |ld (ix), hl            |r3k     |F4 00                              |
+|ld (ix), hl            |z180    |DD 75 00 DD 74 01                  |
+|ld (ix), hl            |z80     |DD 75 00 DD 74 01                  |
+|ld (ix), hl            |z80n    |DD 75 00 DD 74 01                  |
 |ld (ix), ix            |ez80    |DD 3F 00                           |
 |ld (ix), ix            |ez80_z80|DD 3F 00                           |
+|ld (ix), ix            |r2ka    |DD E5 E3 DD 75 00 DD 74 01 E3 DD E1|
+|ld (ix), ix            |r3k     |DD E5 E3 DD 75 00 DD 74 01 E3 DD E1|
+|ld (ix), ix            |z180    |DD E5 E3 DD 75 00 DD 74 01 E3 DD E1|
+|ld (ix), ix            |z80     |DD E5 E3 DD 75 00 DD 74 01 E3 DD E1|
+|ld (ix), ix            |z80n    |DD E5 E3 DD 75 00 DD 74 01 E3 DD E1|
 |ld (ix), iy            |ez80    |DD 3E 00                           |
 |ld (ix), iy            |ez80_z80|DD 3E 00                           |
+|ld (ix), iy            |r2ka    |FD E5 E3 DD 75 00 DD 74 01 E3 FD E1|
+|ld (ix), iy            |r3k     |FD E5 E3 DD 75 00 DD 74 01 E3 FD E1|
+|ld (ix), iy            |z180    |FD E5 E3 DD 75 00 DD 74 01 E3 FD E1|
+|ld (ix), iy            |z80     |FD E5 E3 DD 75 00 DD 74 01 E3 FD E1|
+|ld (ix), iy            |z80n    |FD E5 E3 DD 75 00 DD 74 01 E3 FD E1|
 |ld (ix), l             |ez80    |DD 75 00                           |
 |ld (ix), l             |ez80_z80|DD 75 00                           |
 |ld (ix), l             |r2ka    |DD 75 00                           |
@@ -20658,6 +20681,11 @@
 |ld (ix+%d), b          |z80n    |DD 70 %d                           |
 |ld (ix+%d), bc         |ez80    |DD 0F %d                           |
 |ld (ix+%d), bc         |ez80_z80|DD 0F %d                           |
+|ld (ix+%d), bc         |r2ka    |DD 71 %d DD 70 %D                  |
+|ld (ix+%d), bc         |r3k     |DD 71 %d DD 70 %D                  |
+|ld (ix+%d), bc         |z180    |DD 71 %d DD 70 %D                  |
+|ld (ix+%d), bc         |z80     |DD 71 %d DD 70 %D                  |
+|ld (ix+%d), bc         |z80n    |DD 71 %d DD 70 %D                  |
 |ld (ix+%d), c          |ez80    |DD 71 %d                           |
 |ld (ix+%d), c          |ez80_z80|DD 71 %d                           |
 |ld (ix+%d), c          |r2ka    |DD 71 %d                           |
@@ -20674,6 +20702,11 @@
 |ld (ix+%d), d          |z80n    |DD 72 %d                           |
 |ld (ix+%d), de         |ez80    |DD 1F %d                           |
 |ld (ix+%d), de         |ez80_z80|DD 1F %d                           |
+|ld (ix+%d), de         |r2ka    |DD 73 %d DD 72 %D                  |
+|ld (ix+%d), de         |r3k     |DD 73 %d DD 72 %D                  |
+|ld (ix+%d), de         |z180    |DD 73 %d DD 72 %D                  |
+|ld (ix+%d), de         |z80     |DD 73 %d DD 72 %D                  |
+|ld (ix+%d), de         |z80n    |DD 73 %d DD 72 %D                  |
 |ld (ix+%d), e          |ez80    |DD 73 %d                           |
 |ld (ix+%d), e          |ez80_z80|DD 73 %d                           |
 |ld (ix+%d), e          |r2ka    |DD 73 %d                           |
@@ -20692,10 +20725,23 @@
 |ld (ix+%d), hl         |ez80_z80|DD 2F %d                           |
 |ld (ix+%d), hl         |r2ka    |F4 %d                              |
 |ld (ix+%d), hl         |r3k     |F4 %d                              |
+|ld (ix+%d), hl         |z180    |DD 75 %d DD 74 %D                  |
+|ld (ix+%d), hl         |z80     |DD 75 %d DD 74 %D                  |
+|ld (ix+%d), hl         |z80n    |DD 75 %d DD 74 %D                  |
 |ld (ix+%d), ix         |ez80    |DD 3F %d                           |
 |ld (ix+%d), ix         |ez80_z80|DD 3F %d                           |
+|ld (ix+%d), ix         |r2ka    |DD E5 E3 DD 75 %d DD 74 %D E3 DD E1|
+|ld (ix+%d), ix         |r3k     |DD E5 E3 DD 75 %d DD 74 %D E3 DD E1|
+|ld (ix+%d), ix         |z180    |DD E5 E3 DD 75 %d DD 74 %D E3 DD E1|
+|ld (ix+%d), ix         |z80     |DD E5 E3 DD 75 %d DD 74 %D E3 DD E1|
+|ld (ix+%d), ix         |z80n    |DD E5 E3 DD 75 %d DD 74 %D E3 DD E1|
 |ld (ix+%d), iy         |ez80    |DD 3E %d                           |
 |ld (ix+%d), iy         |ez80_z80|DD 3E %d                           |
+|ld (ix+%d), iy         |r2ka    |FD E5 E3 DD 75 %d DD 74 %D E3 FD E1|
+|ld (ix+%d), iy         |r3k     |FD E5 E3 DD 75 %d DD 74 %D E3 FD E1|
+|ld (ix+%d), iy         |z180    |FD E5 E3 DD 75 %d DD 74 %D E3 FD E1|
+|ld (ix+%d), iy         |z80     |FD E5 E3 DD 75 %d DD 74 %D E3 FD E1|
+|ld (ix+%d), iy         |z80n    |FD E5 E3 DD 75 %d DD 74 %D E3 FD E1|
 |ld (ix+%d), l          |ez80    |DD 75 %d                           |
 |ld (ix+%d), l          |ez80_z80|DD 75 %d                           |
 |ld (ix+%d), l          |r2ka    |DD 75 %d                           |
@@ -20726,6 +20772,11 @@
 |ld (iy), b             |z80n    |FD 70 00                           |
 |ld (iy), bc            |ez80    |FD 0F 00                           |
 |ld (iy), bc            |ez80_z80|FD 0F 00                           |
+|ld (iy), bc            |r2ka    |FD 71 00 FD 70 01                  |
+|ld (iy), bc            |r3k     |FD 71 00 FD 70 01                  |
+|ld (iy), bc            |z180    |FD 71 00 FD 70 01                  |
+|ld (iy), bc            |z80     |FD 71 00 FD 70 01                  |
+|ld (iy), bc            |z80n    |FD 71 00 FD 70 01                  |
 |ld (iy), c             |ez80    |FD 71 00                           |
 |ld (iy), c             |ez80_z80|FD 71 00                           |
 |ld (iy), c             |r2ka    |FD 71 00                           |
@@ -20742,6 +20793,11 @@
 |ld (iy), d             |z80n    |FD 72 00                           |
 |ld (iy), de            |ez80    |FD 1F 00                           |
 |ld (iy), de            |ez80_z80|FD 1F 00                           |
+|ld (iy), de            |r2ka    |FD 73 00 FD 72 01                  |
+|ld (iy), de            |r3k     |FD 73 00 FD 72 01                  |
+|ld (iy), de            |z180    |FD 73 00 FD 72 01                  |
+|ld (iy), de            |z80     |FD 73 00 FD 72 01                  |
+|ld (iy), de            |z80n    |FD 73 00 FD 72 01                  |
 |ld (iy), e             |ez80    |FD 73 00                           |
 |ld (iy), e             |ez80_z80|FD 73 00                           |
 |ld (iy), e             |r2ka    |FD 73 00                           |
@@ -20760,10 +20816,23 @@
 |ld (iy), hl            |ez80_z80|FD 2F 00                           |
 |ld (iy), hl            |r2ka    |FD F4 00                           |
 |ld (iy), hl            |r3k     |FD F4 00                           |
+|ld (iy), hl            |z180    |FD 75 00 FD 74 01                  |
+|ld (iy), hl            |z80     |FD 75 00 FD 74 01                  |
+|ld (iy), hl            |z80n    |FD 75 00 FD 74 01                  |
 |ld (iy), ix            |ez80    |FD 3E 00                           |
 |ld (iy), ix            |ez80_z80|FD 3E 00                           |
+|ld (iy), ix            |r2ka    |DD E5 E3 FD 75 00 FD 74 01 E3 DD E1|
+|ld (iy), ix            |r3k     |DD E5 E3 FD 75 00 FD 74 01 E3 DD E1|
+|ld (iy), ix            |z180    |DD E5 E3 FD 75 00 FD 74 01 E3 DD E1|
+|ld (iy), ix            |z80     |DD E5 E3 FD 75 00 FD 74 01 E3 DD E1|
+|ld (iy), ix            |z80n    |DD E5 E3 FD 75 00 FD 74 01 E3 DD E1|
 |ld (iy), iy            |ez80    |FD 3F 00                           |
 |ld (iy), iy            |ez80_z80|FD 3F 00                           |
+|ld (iy), iy            |r2ka    |FD E5 E3 FD 75 00 FD 74 01 E3 FD E1|
+|ld (iy), iy            |r3k     |FD E5 E3 FD 75 00 FD 74 01 E3 FD E1|
+|ld (iy), iy            |z180    |FD E5 E3 FD 75 00 FD 74 01 E3 FD E1|
+|ld (iy), iy            |z80     |FD E5 E3 FD 75 00 FD 74 01 E3 FD E1|
+|ld (iy), iy            |z80n    |FD E5 E3 FD 75 00 FD 74 01 E3 FD E1|
 |ld (iy), l             |ez80    |FD 75 00                           |
 |ld (iy), l             |ez80_z80|FD 75 00                           |
 |ld (iy), l             |r2ka    |FD 75 00                           |
@@ -20794,6 +20863,11 @@
 |ld (iy+%d), b          |z80n    |FD 70 %d                           |
 |ld (iy+%d), bc         |ez80    |FD 0F %d                           |
 |ld (iy+%d), bc         |ez80_z80|FD 0F %d                           |
+|ld (iy+%d), bc         |r2ka    |FD 71 %d FD 70 %D                  |
+|ld (iy+%d), bc         |r3k     |FD 71 %d FD 70 %D                  |
+|ld (iy+%d), bc         |z180    |FD 71 %d FD 70 %D                  |
+|ld (iy+%d), bc         |z80     |FD 71 %d FD 70 %D                  |
+|ld (iy+%d), bc         |z80n    |FD 71 %d FD 70 %D                  |
 |ld (iy+%d), c          |ez80    |FD 71 %d                           |
 |ld (iy+%d), c          |ez80_z80|FD 71 %d                           |
 |ld (iy+%d), c          |r2ka    |FD 71 %d                           |
@@ -20810,6 +20884,11 @@
 |ld (iy+%d), d          |z80n    |FD 72 %d                           |
 |ld (iy+%d), de         |ez80    |FD 1F %d                           |
 |ld (iy+%d), de         |ez80_z80|FD 1F %d                           |
+|ld (iy+%d), de         |r2ka    |FD 73 %d FD 72 %D                  |
+|ld (iy+%d), de         |r3k     |FD 73 %d FD 72 %D                  |
+|ld (iy+%d), de         |z180    |FD 73 %d FD 72 %D                  |
+|ld (iy+%d), de         |z80     |FD 73 %d FD 72 %D                  |
+|ld (iy+%d), de         |z80n    |FD 73 %d FD 72 %D                  |
 |ld (iy+%d), e          |ez80    |FD 73 %d                           |
 |ld (iy+%d), e          |ez80_z80|FD 73 %d                           |
 |ld (iy+%d), e          |r2ka    |FD 73 %d                           |
@@ -20828,10 +20907,23 @@
 |ld (iy+%d), hl         |ez80_z80|FD 2F %d                           |
 |ld (iy+%d), hl         |r2ka    |FD F4 %d                           |
 |ld (iy+%d), hl         |r3k     |FD F4 %d                           |
+|ld (iy+%d), hl         |z180    |FD 75 %d FD 74 %D                  |
+|ld (iy+%d), hl         |z80     |FD 75 %d FD 74 %D                  |
+|ld (iy+%d), hl         |z80n    |FD 75 %d FD 74 %D                  |
 |ld (iy+%d), ix         |ez80    |FD 3E %d                           |
 |ld (iy+%d), ix         |ez80_z80|FD 3E %d                           |
+|ld (iy+%d), ix         |r2ka    |DD E5 E3 FD 75 %d FD 74 %D E3 DD E1|
+|ld (iy+%d), ix         |r3k     |DD E5 E3 FD 75 %d FD 74 %D E3 DD E1|
+|ld (iy+%d), ix         |z180    |DD E5 E3 FD 75 %d FD 74 %D E3 DD E1|
+|ld (iy+%d), ix         |z80     |DD E5 E3 FD 75 %d FD 74 %D E3 DD E1|
+|ld (iy+%d), ix         |z80n    |DD E5 E3 FD 75 %d FD 74 %D E3 DD E1|
 |ld (iy+%d), iy         |ez80    |FD 3F %d                           |
 |ld (iy+%d), iy         |ez80_z80|FD 3F %d                           |
+|ld (iy+%d), iy         |r2ka    |FD E5 E3 FD 75 %d FD 74 %D E3 FD E1|
+|ld (iy+%d), iy         |r3k     |FD E5 E3 FD 75 %d FD 74 %D E3 FD E1|
+|ld (iy+%d), iy         |z180    |FD E5 E3 FD 75 %d FD 74 %D E3 FD E1|
+|ld (iy+%d), iy         |z80     |FD E5 E3 FD 75 %d FD 74 %D E3 FD E1|
+|ld (iy+%d), iy         |z80n    |FD E5 E3 FD 75 %d FD 74 %D E3 FD E1|
 |ld (iy+%d), l          |ez80    |FD 75 %d                           |
 |ld (iy+%d), l          |ez80_z80|FD 75 %d                           |
 |ld (iy+%d), l          |r2ka    |FD 75 %d                           |
@@ -21448,12 +21540,32 @@
 |ld bc, (hl+)           |z80n    |4E 23 46 23                        |
 |ld bc, (ix)            |ez80    |DD 07 00                           |
 |ld bc, (ix)            |ez80_z80|DD 07 00                           |
+|ld bc, (ix)            |r2ka    |DD 4E 00 DD 46 01                  |
+|ld bc, (ix)            |r3k     |DD 4E 00 DD 46 01                  |
+|ld bc, (ix)            |z180    |DD 4E 00 DD 46 01                  |
+|ld bc, (ix)            |z80     |DD 4E 00 DD 46 01                  |
+|ld bc, (ix)            |z80n    |DD 4E 00 DD 46 01                  |
 |ld bc, (ix+%d)         |ez80    |DD 07 %d                           |
 |ld bc, (ix+%d)         |ez80_z80|DD 07 %d                           |
+|ld bc, (ix+%d)         |r2ka    |DD 4E %d DD 46 %D                  |
+|ld bc, (ix+%d)         |r3k     |DD 4E %d DD 46 %D                  |
+|ld bc, (ix+%d)         |z180    |DD 4E %d DD 46 %D                  |
+|ld bc, (ix+%d)         |z80     |DD 4E %d DD 46 %D                  |
+|ld bc, (ix+%d)         |z80n    |DD 4E %d DD 46 %D                  |
 |ld bc, (iy)            |ez80    |FD 07 00                           |
 |ld bc, (iy)            |ez80_z80|FD 07 00                           |
+|ld bc, (iy)            |r2ka    |FD 4E 00 FD 46 01                  |
+|ld bc, (iy)            |r3k     |FD 4E 00 FD 46 01                  |
+|ld bc, (iy)            |z180    |FD 4E 00 FD 46 01                  |
+|ld bc, (iy)            |z80     |FD 4E 00 FD 46 01                  |
+|ld bc, (iy)            |z80n    |FD 4E 00 FD 46 01                  |
 |ld bc, (iy+%d)         |ez80    |FD 07 %d                           |
 |ld bc, (iy+%d)         |ez80_z80|FD 07 %d                           |
+|ld bc, (iy+%d)         |r2ka    |FD 4E %d FD 46 %D                  |
+|ld bc, (iy+%d)         |r3k     |FD 4E %d FD 46 %D                  |
+|ld bc, (iy+%d)         |z180    |FD 4E %d FD 46 %D                  |
+|ld bc, (iy+%d)         |z80     |FD 4E %d FD 46 %D                  |
+|ld bc, (iy+%d)         |z80n    |FD 4E %d FD 46 %D                  |
 |ld bc, de              |8080    |42 4B                              |
 |ld bc, de              |8085    |42 4B                              |
 |ld bc, de              |ez80    |42 4B                              |
@@ -21997,12 +22109,32 @@
 |ld de, (hl+)           |z80n    |5E 23 56 23                        |
 |ld de, (ix)            |ez80    |DD 17 00                           |
 |ld de, (ix)            |ez80_z80|DD 17 00                           |
+|ld de, (ix)            |r2ka    |DD 5E 00 DD 56 01                  |
+|ld de, (ix)            |r3k     |DD 5E 00 DD 56 01                  |
+|ld de, (ix)            |z180    |DD 5E 00 DD 56 01                  |
+|ld de, (ix)            |z80     |DD 5E 00 DD 56 01                  |
+|ld de, (ix)            |z80n    |DD 5E 00 DD 56 01                  |
 |ld de, (ix+%d)         |ez80    |DD 17 %d                           |
 |ld de, (ix+%d)         |ez80_z80|DD 17 %d                           |
+|ld de, (ix+%d)         |r2ka    |DD 5E %d DD 56 %D                  |
+|ld de, (ix+%d)         |r3k     |DD 5E %d DD 56 %D                  |
+|ld de, (ix+%d)         |z180    |DD 5E %d DD 56 %D                  |
+|ld de, (ix+%d)         |z80     |DD 5E %d DD 56 %D                  |
+|ld de, (ix+%d)         |z80n    |DD 5E %d DD 56 %D                  |
 |ld de, (iy)            |ez80    |FD 17 00                           |
 |ld de, (iy)            |ez80_z80|FD 17 00                           |
+|ld de, (iy)            |r2ka    |FD 5E 00 FD 56 01                  |
+|ld de, (iy)            |r3k     |FD 5E 00 FD 56 01                  |
+|ld de, (iy)            |z180    |FD 5E 00 FD 56 01                  |
+|ld de, (iy)            |z80     |FD 5E 00 FD 56 01                  |
+|ld de, (iy)            |z80n    |FD 5E 00 FD 56 01                  |
 |ld de, (iy+%d)         |ez80    |FD 17 %d                           |
 |ld de, (iy+%d)         |ez80_z80|FD 17 %d                           |
+|ld de, (iy+%d)         |r2ka    |FD 5E %d FD 56 %D                  |
+|ld de, (iy+%d)         |r3k     |FD 5E %d FD 56 %D                  |
+|ld de, (iy+%d)         |z180    |FD 5E %d FD 56 %D                  |
+|ld de, (iy+%d)         |z80     |FD 5E %d FD 56 %D                  |
+|ld de, (iy+%d)         |z80n    |FD 5E %d FD 56 %D                  |
 |ld de, bc              |8080    |50 59                              |
 |ld de, bc              |8085    |50 59                              |
 |ld de, bc              |ez80    |50 59                              |
@@ -22578,18 +22710,30 @@
 |ld hl, (ix)            |ez80_z80|DD 27 00                           |
 |ld hl, (ix)            |r2ka    |E4 00                              |
 |ld hl, (ix)            |r3k     |E4 00                              |
+|ld hl, (ix)            |z180    |DD 6E 00 DD 66 01                  |
+|ld hl, (ix)            |z80     |DD 6E 00 DD 66 01                  |
+|ld hl, (ix)            |z80n    |DD 6E 00 DD 66 01                  |
 |ld hl, (ix+%d)         |ez80    |DD 27 %d                           |
 |ld hl, (ix+%d)         |ez80_z80|DD 27 %d                           |
 |ld hl, (ix+%d)         |r2ka    |E4 %d                              |
 |ld hl, (ix+%d)         |r3k     |E4 %d                              |
+|ld hl, (ix+%d)         |z180    |DD 6E %d DD 66 %D                  |
+|ld hl, (ix+%d)         |z80     |DD 6E %d DD 66 %D                  |
+|ld hl, (ix+%d)         |z80n    |DD 6E %d DD 66 %D                  |
 |ld hl, (iy)            |ez80    |FD 27 00                           |
 |ld hl, (iy)            |ez80_z80|FD 27 00                           |
 |ld hl, (iy)            |r2ka    |FD E4 00                           |
 |ld hl, (iy)            |r3k     |FD E4 00                           |
+|ld hl, (iy)            |z180    |FD 6E 00 FD 66 01                  |
+|ld hl, (iy)            |z80     |FD 6E 00 FD 66 01                  |
+|ld hl, (iy)            |z80n    |FD 6E 00 FD 66 01                  |
 |ld hl, (iy+%d)         |ez80    |FD 27 %d                           |
 |ld hl, (iy+%d)         |ez80_z80|FD 27 %d                           |
 |ld hl, (iy+%d)         |r2ka    |FD E4 %d                           |
 |ld hl, (iy+%d)         |r3k     |FD E4 %d                           |
+|ld hl, (iy+%d)         |z180    |FD 6E %d FD 66 %D                  |
+|ld hl, (iy+%d)         |z80     |FD 6E %d FD 66 %D                  |
+|ld hl, (iy+%d)         |z80n    |FD 6E %d FD 66 %D                  |
 |ld hl, (sp)            |r2ka    |C4 00                              |
 |ld hl, (sp)            |r3k     |C4 00                              |
 |ld hl, (sp+%u)         |r2ka    |C4 %u                              |
@@ -22694,12 +22838,32 @@
 |ld ix, (hl+)           |z80n    |D5 DD E5 D1 5E 23 56 D1 23         |
 |ld ix, (ix)            |ez80    |DD 37 00                           |
 |ld ix, (ix)            |ez80_z80|DD 37 00                           |
+|ld ix, (ix)            |r2ka    |DD E5 E3 DD 6E 00 DD 66 01 E3 DD E1|
+|ld ix, (ix)            |r3k     |DD E5 E3 DD 6E 00 DD 66 01 E3 DD E1|
+|ld ix, (ix)            |z180    |DD E5 E3 DD 6E 00 DD 66 01 E3 DD E1|
+|ld ix, (ix)            |z80     |DD E5 E3 DD 6E 00 DD 66 01 E3 DD E1|
+|ld ix, (ix)            |z80n    |DD E5 E3 DD 6E 00 DD 66 01 E3 DD E1|
 |ld ix, (ix+%d)         |ez80    |DD 37 %d                           |
 |ld ix, (ix+%d)         |ez80_z80|DD 37 %d                           |
+|ld ix, (ix+%d)         |r2ka    |DD E5 E3 DD 6E %d DD 66 %D E3 DD E1|
+|ld ix, (ix+%d)         |r3k     |DD E5 E3 DD 6E %d DD 66 %D E3 DD E1|
+|ld ix, (ix+%d)         |z180    |DD E5 E3 DD 6E %d DD 66 %D E3 DD E1|
+|ld ix, (ix+%d)         |z80     |DD E5 E3 DD 6E %d DD 66 %D E3 DD E1|
+|ld ix, (ix+%d)         |z80n    |DD E5 E3 DD 6E %d DD 66 %D E3 DD E1|
 |ld ix, (iy)            |ez80    |FD 31 00                           |
 |ld ix, (iy)            |ez80_z80|FD 31 00                           |
+|ld ix, (iy)            |r2ka    |DD E5 E3 FD 6E 00 FD 66 01 E3 DD E1|
+|ld ix, (iy)            |r3k     |DD E5 E3 FD 6E 00 FD 66 01 E3 DD E1|
+|ld ix, (iy)            |z180    |DD E5 E3 FD 6E 00 FD 66 01 E3 DD E1|
+|ld ix, (iy)            |z80     |DD E5 E3 FD 6E 00 FD 66 01 E3 DD E1|
+|ld ix, (iy)            |z80n    |DD E5 E3 FD 6E 00 FD 66 01 E3 DD E1|
 |ld ix, (iy+%d)         |ez80    |FD 31 %d                           |
 |ld ix, (iy+%d)         |ez80_z80|FD 31 %d                           |
+|ld ix, (iy+%d)         |r2ka    |DD E5 E3 FD 6E %d FD 66 %D E3 DD E1|
+|ld ix, (iy+%d)         |r3k     |DD E5 E3 FD 6E %d FD 66 %D E3 DD E1|
+|ld ix, (iy+%d)         |z180    |DD E5 E3 FD 6E %d FD 66 %D E3 DD E1|
+|ld ix, (iy+%d)         |z80     |DD E5 E3 FD 6E %d FD 66 %D E3 DD E1|
+|ld ix, (iy+%d)         |z80n    |DD E5 E3 FD 6E %d FD 66 %D E3 DD E1|
 |ld ix, (sp)            |r2ka    |DD C4 00                           |
 |ld ix, (sp)            |r3k     |DD C4 00                           |
 |ld ix, (sp+%u)         |r2ka    |DD C4 %u                           |
@@ -22823,12 +22987,32 @@
 |ld iy, (hl+)           |z80n    |D5 FD E5 D1 5E 23 56 D1 23         |
 |ld iy, (ix)            |ez80    |DD 31 00                           |
 |ld iy, (ix)            |ez80_z80|DD 31 00                           |
+|ld iy, (ix)            |r2ka    |FD E5 E3 DD 6E 00 DD 66 01 E3 FD E1|
+|ld iy, (ix)            |r3k     |FD E5 E3 DD 6E 00 DD 66 01 E3 FD E1|
+|ld iy, (ix)            |z180    |FD E5 E3 DD 6E 00 DD 66 01 E3 FD E1|
+|ld iy, (ix)            |z80     |FD E5 E3 DD 6E 00 DD 66 01 E3 FD E1|
+|ld iy, (ix)            |z80n    |FD E5 E3 DD 6E 00 DD 66 01 E3 FD E1|
 |ld iy, (ix+%d)         |ez80    |DD 31 %d                           |
 |ld iy, (ix+%d)         |ez80_z80|DD 31 %d                           |
+|ld iy, (ix+%d)         |r2ka    |FD E5 E3 DD 6E %d DD 66 %D E3 FD E1|
+|ld iy, (ix+%d)         |r3k     |FD E5 E3 DD 6E %d DD 66 %D E3 FD E1|
+|ld iy, (ix+%d)         |z180    |FD E5 E3 DD 6E %d DD 66 %D E3 FD E1|
+|ld iy, (ix+%d)         |z80     |FD E5 E3 DD 6E %d DD 66 %D E3 FD E1|
+|ld iy, (ix+%d)         |z80n    |FD E5 E3 DD 6E %d DD 66 %D E3 FD E1|
 |ld iy, (iy)            |ez80    |FD 37 00                           |
 |ld iy, (iy)            |ez80_z80|FD 37 00                           |
+|ld iy, (iy)            |r2ka    |FD E5 E3 FD 6E 00 FD 66 01 E3 FD E1|
+|ld iy, (iy)            |r3k     |FD E5 E3 FD 6E 00 FD 66 01 E3 FD E1|
+|ld iy, (iy)            |z180    |FD E5 E3 FD 6E 00 FD 66 01 E3 FD E1|
+|ld iy, (iy)            |z80     |FD E5 E3 FD 6E 00 FD 66 01 E3 FD E1|
+|ld iy, (iy)            |z80n    |FD E5 E3 FD 6E 00 FD 66 01 E3 FD E1|
 |ld iy, (iy+%d)         |ez80    |FD 37 %d                           |
 |ld iy, (iy+%d)         |ez80_z80|FD 37 %d                           |
+|ld iy, (iy+%d)         |r2ka    |FD E5 E3 FD 6E %d FD 66 %D E3 FD E1|
+|ld iy, (iy+%d)         |r3k     |FD E5 E3 FD 6E %d FD 66 %D E3 FD E1|
+|ld iy, (iy+%d)         |z180    |FD E5 E3 FD 6E %d FD 66 %D E3 FD E1|
+|ld iy, (iy+%d)         |z80     |FD E5 E3 FD 6E %d FD 66 %D E3 FD E1|
+|ld iy, (iy+%d)         |z80n    |FD E5 E3 FD 6E %d FD 66 %D E3 FD E1|
 |ld iy, (sp)            |r2ka    |FD C4 00                           |
 |ld iy, (sp)            |r3k     |FD C4 00                           |
 |ld iy, (sp+%u)         |r2ka    |FD C4 %u                           |

@@ -32,16 +32,16 @@ Define rules for a ragel-based parser.
 				add_opcode_##suffix((opcode), expr); \
 			} while(0)
 
-#define DO_stmt_jr( opcode)	_DO_stmt_(jr,  opcode)
-#define DO_stmt_n(  opcode)	_DO_stmt_(n,   opcode)
-#define DO_stmt_h(  opcode)	_DO_stmt_(h,   opcode)
-#define DO_stmt_n_0(opcode)	_DO_stmt_(n_0, opcode)
-#define DO_stmt_s_0(opcode)	_DO_stmt_(s_0, opcode)
-#define DO_stmt_d(  opcode)	_DO_stmt_(d,   opcode)
-#define DO_stmt_nn( opcode)	_DO_stmt_(nn,  opcode)
-#define DO_stmt_nnn( opcode)_DO_stmt_(nnn, opcode)
-#define DO_stmt_NN( opcode)	_DO_stmt_(NN,  opcode)
-#define DO_stmt_idx(opcode)	_DO_stmt_(idx, opcode)
+#define DO_stmt_jr( opcode)		_DO_stmt_(jr,		opcode)
+#define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
+#define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
+#define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
+#define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
+#define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
+#define DO_stmt_nn( opcode)		_DO_stmt_(nn,		opcode)
+#define DO_stmt_nnn( opcode)	_DO_stmt_(nnn,		opcode)
+#define DO_stmt_NN( opcode)		_DO_stmt_(NN,		opcode)
+#define DO_stmt_idx(opcode)		_DO_stmt_(idx,		opcode)
 
 #define DO_stmt_idx_n(opcode) \
 			do { \
@@ -52,11 +52,19 @@ Define rules for a ragel-based parser.
 			} while(0)
 
 #define DO_stmt_n_n(opcode) \
-			{ 	Expr1 *n2_expr = pop_expr(ctx); \
+			do { \
+			 	Expr1 *n2_expr = pop_expr(ctx); \
 				Expr1 *n1_expr = pop_expr(ctx); \
 				DO_STMT_LABEL(); \
 				add_opcode_n_n((opcode), n1_expr, n2_expr); \
-			}
+			} while(0)
+
+#define DO_stmt_idx_idx1(opcode0, opcode1) \
+			do { \
+			 	Expr1 *idx_expr = pop_expr(ctx); \
+				DO_STMT_LABEL(); \
+				add_opcode_idx_idx1((opcode0), (opcode1), idx_expr); \
+			} while(0)
 
 /*-----------------------------------------------------------------------------
 *   State Machine

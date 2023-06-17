@@ -49,6 +49,9 @@ void add_opcode_NN(int opcode, struct Expr1 *expr);
 /* add opcode followed by IX/IY offset expression */
 void add_opcode_idx(int opcode, struct Expr1 *expr);
 
+/* add two (ix+d) and (ix+d+1) opcodes */
+void add_opcode_idx_idx1(int opcode0, int opcode1, struct Expr1* expr);
+
 /* add opcode followed by IX/IY offset expression and 8 bit expression */
 void add_opcode_idx_n(int opcode, struct Expr1 *idx_expr,
 										 struct Expr1 *n_expr );

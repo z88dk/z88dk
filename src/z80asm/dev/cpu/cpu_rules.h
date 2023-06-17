@@ -37944,11 +37944,19 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xDD0700);
 break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xDD4E00);
+DO_stmt(0xDD4601);
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_LD _TK_BC _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xDD4E, 0xDD46);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xDD07);
 break;
@@ -37960,11 +37968,19 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xFD0700);
 break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xFD4E00);
+DO_stmt(0xFD4601);
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_LD _TK_BC _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xFD4E, 0xFD46);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xFD07);
 break;
@@ -38723,11 +38739,19 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xDD1700);
 break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xDD5E00);
+DO_stmt(0xDD5601);
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_LD _TK_DE _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xDD5E, 0xDD56);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xDD17);
 break;
@@ -38739,11 +38763,19 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xFD1700);
 break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xFD5E00);
+DO_stmt(0xFD5601);
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_LD _TK_DE _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xFD5E, 0xFD56);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xFD17);
 break;
@@ -46024,6 +46056,10 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xDD2700);
 break;
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xDD6E00);
+DO_stmt(0xDD6601);
+break;
 case CPU_R2KA: case CPU_R3K: 
 DO_stmt(0xE400);
 break;
@@ -46032,6 +46068,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_HL _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xDD6E, 0xDD66);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xDD27);
 break;
@@ -46046,6 +46086,10 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xFD2700);
 break;
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xFD6E00);
+DO_stmt(0xFD6601);
+break;
 case CPU_R2KA: case CPU_R3K: 
 DO_stmt(0xFDE400);
 break;
@@ -46054,6 +46098,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_HL _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xFD6E, 0xFD66);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xFD27);
 break;
@@ -46992,6 +47040,10 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xDD0F00);
 break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xDD7100);
+DO_stmt(0xDD7001);
+break;
 default: error_illegal_ident(); }
 }
 
@@ -47015,6 +47067,10 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xDD1F00);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xDD7300);
+DO_stmt(0xDD7201);
 break;
 default: error_illegal_ident(); }
 }
@@ -47040,6 +47096,10 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xDD2F00);
 break;
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xDD7500);
+DO_stmt(0xDD7401);
+break;
 case CPU_R2KA: case CPU_R3K: 
 DO_stmt(0xF400);
 break;
@@ -47051,6 +47111,14 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xDD3F00);
 break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xDDE5);
+DO_stmt(0xE3);
+DO_stmt(0xDD7500);
+DO_stmt(0xDD7401);
+DO_stmt(0xE3);
+DO_stmt(0xDDE1);
+break;
 default: error_illegal_ident(); }
 }
 
@@ -47058,6 +47126,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xDD3E00);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xFDE5);
+DO_stmt(0xE3);
+DO_stmt(0xDD7500);
+DO_stmt(0xDD7401);
+DO_stmt(0xE3);
+DO_stmt(0xFDE1);
 break;
 default: error_illegal_ident(); }
 }
@@ -47097,6 +47173,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_BC _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xDD71, 0xDD70);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xDD0F);
 break;
@@ -47121,6 +47201,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_DE _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xDD73, 0xDD72);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xDD1F);
 break;
@@ -47145,6 +47229,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xDD75, 0xDD74);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xDD2F);
 break;
@@ -47156,6 +47244,14 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_IX _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt(0xDDE5);
+DO_stmt(0xE3);
+DO_stmt_idx_idx1(0xDD75, 0xDD74);
+DO_stmt(0xE3);
+DO_stmt(0xDDE1);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xDD3F);
 break;
@@ -47164,6 +47260,14 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_IY _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt(0xFDE5);
+DO_stmt(0xE3);
+DO_stmt_idx_idx1(0xDD75, 0xDD74);
+DO_stmt(0xE3);
+DO_stmt(0xFDE1);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xDD3E);
 break;
@@ -47208,6 +47312,10 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xFD0F00);
 break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xFD7100);
+DO_stmt(0xFD7001);
+break;
 default: error_illegal_ident(); }
 }
 
@@ -47231,6 +47339,10 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xFD1F00);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xFD7300);
+DO_stmt(0xFD7201);
 break;
 default: error_illegal_ident(); }
 }
@@ -47256,6 +47368,10 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xFD2F00);
 break;
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xFD7500);
+DO_stmt(0xFD7401);
+break;
 case CPU_R2KA: case CPU_R3K: 
 DO_stmt(0xFDF400);
 break;
@@ -47264,6 +47380,14 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IY _TK_RPAREN _TK_COMMA _TK_IX _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xDDE5);
+DO_stmt(0xE3);
+DO_stmt(0xFD7500);
+DO_stmt(0xFD7401);
+DO_stmt(0xE3);
+DO_stmt(0xDDE1);
+break;
 case CPU_EZ80: 
 DO_stmt(0xFD3E00);
 break;
@@ -47274,6 +47398,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xFD3F00);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xFDE5);
+DO_stmt(0xE3);
+DO_stmt(0xFD7500);
+DO_stmt(0xFD7401);
+DO_stmt(0xE3);
+DO_stmt(0xFDE1);
 break;
 default: error_illegal_ident(); }
 }
@@ -47313,6 +47445,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_BC _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xFD71, 0xFD70);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xFD0F);
 break;
@@ -47337,6 +47473,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_DE _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xFD73, 0xFD72);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xFD1F);
 break;
@@ -47361,6 +47501,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt_idx_idx1(0xFD75, 0xFD74);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xFD2F);
 break;
@@ -47372,6 +47516,14 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_IX _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt(0xDDE5);
+DO_stmt(0xE3);
+DO_stmt_idx_idx1(0xFD75, 0xFD74);
+DO_stmt(0xE3);
+DO_stmt(0xDDE1);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xFD3E);
 break;
@@ -47380,6 +47532,14 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_IY _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt(0xFDE5);
+DO_stmt(0xE3);
+DO_stmt_idx_idx1(0xFD75, 0xFD74);
+DO_stmt(0xE3);
+DO_stmt(0xFDE1);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xFD3F);
 break;
@@ -47524,11 +47684,27 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xDD3700);
 break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xDDE5);
+DO_stmt(0xE3);
+DO_stmt(0xDD6E00);
+DO_stmt(0xDD6601);
+DO_stmt(0xE3);
+DO_stmt(0xDDE1);
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_LD _TK_IX _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt(0xDDE5);
+DO_stmt(0xE3);
+DO_stmt_idx_idx1(0xDD6E, 0xDD66);
+DO_stmt(0xE3);
+DO_stmt(0xDDE1);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xDD37);
 break;
@@ -47537,6 +47713,14 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IX _TK_COMMA _TK_IND_IY _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xDDE5);
+DO_stmt(0xE3);
+DO_stmt(0xFD6E00);
+DO_stmt(0xFD6601);
+DO_stmt(0xE3);
+DO_stmt(0xDDE1);
+break;
 case CPU_EZ80: 
 DO_stmt(0xFD3100);
 break;
@@ -47545,6 +47729,14 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IX _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt(0xDDE5);
+DO_stmt(0xE3);
+DO_stmt_idx_idx1(0xFD6E, 0xFD66);
+DO_stmt(0xE3);
+DO_stmt(0xDDE1);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xFD31);
 break;
@@ -47804,11 +47996,27 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xDD3100);
 break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xFDE5);
+DO_stmt(0xE3);
+DO_stmt(0xDD6E00);
+DO_stmt(0xDD6601);
+DO_stmt(0xE3);
+DO_stmt(0xFDE1);
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_LD _TK_IY _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt(0xFDE5);
+DO_stmt(0xE3);
+DO_stmt_idx_idx1(0xDD6E, 0xDD66);
+DO_stmt(0xE3);
+DO_stmt(0xFDE1);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xDD31);
 break;
@@ -47820,11 +48028,27 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0xFD3700);
 break;
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0xFDE5);
+DO_stmt(0xE3);
+DO_stmt(0xFD6E00);
+DO_stmt(0xFD6601);
+DO_stmt(0xE3);
+DO_stmt(0xFDE1);
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_LD _TK_IY _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_STMT_LABEL();
+DO_stmt(0xFDE5);
+DO_stmt(0xE3);
+DO_stmt_idx_idx1(0xFD6E, 0xFD66);
+DO_stmt(0xE3);
+DO_stmt(0xFDE1);
+break;
 case CPU_EZ80: 
 DO_stmt_idx(0xFD37);
 break;

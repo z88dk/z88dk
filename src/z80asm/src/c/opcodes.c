@@ -150,6 +150,21 @@ void add_opcode_idx(int opcode, Expr1 *expr)
 	}
 }
 
+/* add two (ix+d) and (ix+d+1) opcodes */
+void add_opcode_idx_idx1(int opcode0, int opcode1, struct Expr1* expr0) {
+	// build expr1 = 1+(expr)
+	UT_string* expr1_text;
+	utstring_new(expr1_text);
+	utstring_printf(expr1_text, "1+(%s)", expr0->text->data);
+
+	add_opcode_idx(opcode0, expr0);
+	struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
+	if (expr1) 
+		add_opcode_idx(opcode1, expr1);
+
+	utstring_free(expr1_text);
+}
+
 /* add opcode followed by IX/IY offset expression and 8 bit expression */
 void add_opcode_idx_n(int opcode, struct Expr1 *idx_expr,
 								  struct Expr1 *n_expr )
