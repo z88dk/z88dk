@@ -30,7 +30,7 @@ ENDIF
 
 
     ; Default, don't change the stack pointer
-    defc    TAR__register_sp = -1
+    defc    TAR__register_sp = 0xffff
     defc    TAR__clib_exit_stack_size = 32
     ; Default, halt loop
     defc    TAR__crt_on_exit = 0x10001
@@ -112,6 +112,10 @@ ENDIF
     ld      (exitsp),sp
 
     ld      (__agon_mbase),a
+
+IF DEFINED_USING_amalloc
+    INCLUDE "crt/classic/crt_init_amalloc.asm"
+ENDIF
 
     ld      a,CLIB_DEFAULT_SCREEN_MODE
     call    asm_agon_setmode

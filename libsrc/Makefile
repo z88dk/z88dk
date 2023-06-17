@@ -79,6 +79,7 @@ TOCREATE += $(call check_target,multi8,multi8_clib.lib)
 TOCREATE += $(call check_target,myvision,myvision_clib.lib)
 TOCREATE += $(call check_target,mz,mz_clib.lib)
 TOCREATE += $(call check_target,mz2500,mz2500_clib.lib)
+TOCREATE += $(call check_target,nanos,nanos.lib)
 TOCREATE += $(call check_target,nabu,nabu_clib.lib nabu_cpm.lib nabu_int.lib)
 TOCREATE += $(call check_target,nascom,nascom_clib.lib)
 TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib zxfcntl)
@@ -1733,14 +1734,14 @@ gfxtrs80.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="text6 narrow"
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(TARGET_DIRECTORY)/trs80/gfxtrs80.lst
 
-gfxtrs80m2.lib:
+gfxtrs80m2.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building TRS 80 Model II GFX Libraries ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="text6 narrow" SUBTYPE=trs80m2
 	TARGET=trs80m2 TYPE=z80 $(LIBLINKER) -DFORtrs80m2 -x$(OUTPUT_DIRECTORY)/gfxtrs80m2 @$(TARGET_DIRECTORY)/trs80/gfxtrs80m2.lst
 
-gfxtrs80m4.lib:
+gfxtrs80m4.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building TRS 80 Model 4 GFX Libraries ---'
 	@echo ''
@@ -1777,7 +1778,7 @@ grafyx4.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=grafyx4
 	TARGET=grafyx4 TYPE=z80 $(LIBLINKER) -DFORgrafyx4 -x$(OUTPUT_DIRECTORY)/grafyx4 @$(TARGET_DIRECTORY)/trs80/grafyx.lst
 
-trsdos.lib:
+trsdos.lib: trs80_clib.lib
 	$(MAKE) -C target/trs80/fcntl
 
 # Canon X-07 lib - Stefano
@@ -2013,6 +2014,13 @@ gfxvdm.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=altair8800 SUBTYPE=vdm FLAVOUR="gencon portable"
 	TARGET=vdm TYPE=8080 $(LIBLINKER) -m8080 -DFORvdm -x$(OUTPUT_DIRECTORY)/gfxvdm @$(LISTFILE_DIRECTORY)/video/vdm/video_vdm.lst
 
+nanos.lib: $(TARGET_CLIB_OBJS)
+	@echo ''
+	@echo '--- Building Nanos Library ---'
+	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=nanos
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR="narrow gencon" SUBTYPE=nanos
+	TARGET=nanos TYPE=z80 $(LIBLINKER) -mz80 -DFORnanos -x$(OUTPUT_DIRECTORY)/nanos @$(LISTFILE_DIRECTORY)/target/nanos/nanos.lst
 
 # Preempt multitasking library - dom
 preempt.lib:
