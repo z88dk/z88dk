@@ -322,7 +322,6 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
             uint8_t p = (y & 0x06) >> 1;
             uint8_t q = y & 0x01;
 
-            
             switch ( x ) {
                 case 0:
                     switch ( z ) {
@@ -351,8 +350,11 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             else BUF_PRINTF("nop");
                             break;
                         case 1:
-                            if ( q == 0 ) BUF_PRINTF("%-10s%s,%s",handle_ez80_am(state, "ld"), handle_register16(state, p,state->index), handle_immed16(state, opbuf1, sizeof(opbuf1)));
-                            else BUF_PRINTF("%-10s%s,%s", "add", handle_hl(state->index), handle_register16(state, p, state->index));
+                           if ( q == 0 ) {
+                               if ( isez80() && y == 6 && state->index )
+                                   BUF_PRINTF("%-10s%s,%s",handle_ez80_am(state, "ld"), handle_hl(state->index == 1 ? 2 : 1), handle_register8(state, 6, opbuf1, sizeof(opbuf1)));
+                               else BUF_PRINTF("%-10s%s,%s",handle_ez80_am(state, "ld"), handle_register16(state, p,state->index), handle_immed16(state, opbuf1, sizeof(opbuf1)));
+                           } else BUF_PRINTF("%-10s%s,%s", "add", handle_hl(state->index), handle_register16(state, p, state->index));
                             break;
                         case 2:
                             if ( q == 0 ) {
@@ -382,17 +384,21 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             BUF_PRINTF("%-10s%s", "dec", handle_register8(state, y,opbuf1,sizeof(opbuf1)));
                             break;
                         case 6:
-                            handle_register8(state, y,opbuf1,sizeof(opbuf1));
-                            handle_immed8(state, opbuf2, sizeof(opbuf2));
-                            BUF_PRINTF("%-10s%s,%s", "ld", opbuf1, opbuf2);
+                            if ( isez80() && state->index != 0 ) {
+                               BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state, "ld"), handle_register8(state, 6, opbuf1, sizeof(opbuf1)), handle_hl(state->index == 1 ? 2 : 1));
+                            } else {
+                               handle_register8(state, y,opbuf1,sizeof(opbuf1));
+                               handle_immed8(state, opbuf2, sizeof(opbuf2));
+                               BUF_PRINTF("%-10s%s,%s", "ld", opbuf1, opbuf2);
+                            }
                             break;
                         case 7:
                             if ( israbbit() && y == 4 ) BUF_PRINTF("%-10ssp,%s", "add",handle_displacement(state, opbuf1, sizeof(opbuf1)));
                             else if ( isez80() && state->index != 0  ) {
                                 if ( q == 0 && y < 6 ) BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state, "ld"), handle_register16(state,p,0), handle_register8(state, 6, opbuf1, sizeof(opbuf1)));
                                 else if ( q == 1 && y < 6 ) BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state, "ld"),handle_register8(state, 6, opbuf1, sizeof(opbuf1)), handle_register16(state,p,0));
-                                else if ( y == 6 ) BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state, "ld"),handle_hl(state->index == 1 ? 2 : 1), handle_register8(state, 6, opbuf1, sizeof(opbuf1)));
-                                else if ( y == 7 ) BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state, "ld"), handle_register8(state, 6, opbuf1, sizeof(opbuf1)), handle_hl(state->index == 1 ? 2 : 1));
+                                else if ( y == 6 ) BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state, "ld"),handle_hl(state->index), handle_register8(state, 6, opbuf1, sizeof(opbuf1)));
+                                else if ( y == 7 ) BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state, "ld"), handle_register8(state, 6, opbuf1, sizeof(opbuf1)), handle_hl(state->index));
                             } else BUF_PRINTF("%-10s", assorted_mainpage_opcodes[y]);
                             break;
                     }
