@@ -118,7 +118,7 @@ src/c/tokens.h : make_tokens.pl Makefile
 # opcode tables generator
 dev: dev/cpu/opcodes.yaml \
 	 dev/cpu/opcodes.txt \
-	 dev/cpu/cpu_test_z80_ok.asm \
+	 dev/cpu/cpu_test_z80_adl0_ok.asm \
 	 dev/cpu/cpu_rules.h
 
 dev/cpu/opcodes.yaml: dev/cpu/make_opcodes.pl Makefile

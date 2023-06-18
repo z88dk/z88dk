@@ -271,11 +271,13 @@ for my $cpu (@CPUS) {
 								      [':'], [0x3A, '%m', '%m', '%m']);
 		add($cpu, "ld.il a, (%m)",	[0x5B], [0x3A, '%m', '%m', '%m']);
 		add($cpu, "ld.is a, (%m)",	[0x40], [0x3A, '%m', '%m']);
+		add($cpu, "ld.sis a, (%m)",	[0x40], [0x3A, '%m', '%m']);
 
 		add($cpu, "ld (%m), a",	['{ADL0}?'], [0x32, '%m', '%m'],
 								      [':'], [0x32, '%m', '%m', '%m']);
 		add($cpu, "ld.il (%m), a",	[0x5B], [0x32, '%m', '%m', '%m']);
 		add($cpu, "ld.is (%m), a",	[0x40], [0x32, '%m', '%m']);
+		add($cpu, "ld.sis (%m), a",	[0x40], [0x32, '%m', '%m']);
 	}
 	else {
 		add_x($cpu, "ld (%m), a", [0x32, '%m', '%m']);
@@ -1232,7 +1234,8 @@ for my $cpu (@CPUS) {
 				# (ix+d) -> r
 				if ($z80 && $r ne '(hl)') {
 					for my $x (qw( ix iy )) {
-						add($cpu, "$op ($x+%d), $r", [$V{$x}, 0xCB, '%d', 8*$V{$op}+$V{$r}]);
+						add($cpu, "$op ($x+%d), $r", 	[$V{$x}, 0xCB, '%d', 8*$V{$op}+$V{$r}]);
+						add($cpu, "ld $r, $op ($x+%d)", [$V{$x}, 0xCB, '%d', 8*$V{$op}+$V{$r}]);
 					}
 				}
 			}
@@ -1378,6 +1381,8 @@ for my $cpu (@CPUS) {
 				if ($z80 && $op ne 'bit' && $r ne '(hl)') {
 					for my $x (qw( ix iy )) {
 						add($cpu, "$op %c, ($x+%d), $r", 
+							[$V{$x}, 0xCB, '%d', (0x40*$V{$op}+$V{$r})."+8*%c(0..7)"]);
+						add($cpu, "ld $r, $op %c, ($x+%d)", 
 							[$V{$x}, 0xCB, '%d', (0x40*$V{$op}+$V{$r})."+8*%c(0..7)"]);
 					}
 				}
@@ -1580,8 +1585,13 @@ for my $cpu (@CPUS) {
 		add($cpu, "call %m",    ['{ADL0}?'], [call(), '%m', '%m'], [':'], [call(), '%m', '%m', '%m']);
 		add($cpu, "call.is %m", ['{ADL0}?'], [0x40], [call(), '%m', '%m'], 
 									  [':'], [0x49], [call(), '%m', '%m']);
+		add($cpu, "call.sis %m", ['{ADL0}'], [0x40], [call(), '%m', '%m']);
+		add($cpu, "call.lis %m", ['{ADL1}'], [0x49], [call(), '%m', '%m']);
+
 		add($cpu, "call.il %m", ['{ADL0}?'], [0x52], [call(), '%m', '%m', '%m'], 
 									  [':'], [0x5B], [call(), '%m', '%m', '%m']);
+		add($cpu, "call.sil %m", ['{ADL0}'], [0x52], [call(), '%m', '%m', '%m']);
+		add($cpu, "call.lil %m", ['{ADL1}'], [0x5B], [call(), '%m', '%m', '%m']);
 	}
 	else {
 		add($cpu, "call %m", [call(), '%m', '%m']);
@@ -1667,6 +1677,7 @@ for my $cpu (@CPUS) {
 		# Restart 8 (0040) if V flag is set
 		add($cpu, "rstv",		[0xCB]);
 		add($cpu, "ovrst8",		[0xCB]);
+		add($cpu, "rst v, %c",	[(0xCB-0x40).'+%c('.(0x40).'..'.(0x40).')']);
 
 		# Jump on flag X5/K is set
 		add($cpu, "jx5 %m",		[0xFD, '%m', '%m']);
@@ -1755,6 +1766,7 @@ for my $cpu (@CPUS) {
 		add($cpu, "in0 (%n)", 			[0xED, 0x00+8*$V{f}, '%n']) if $z180 || $ez80;
 		
 		for my $r (qw( b c d e h l f a )) {
+			next if $r eq 'f' && $ez80;
 			add($cpu, "in $r, (c)", 	[0xED, 0x40+8*$V{$r}]);
 			add($cpu, "in $r, (bc)", 	[0xED, 0x40+8*$V{$r}]);
 			add($cpu, "in0 $r, (%n)", 	[0xED, 0x00+8*$V{$r}, '%n']) if $z180 || $ez80;
@@ -1765,6 +1777,7 @@ for my $cpu (@CPUS) {
 		add($cpu, "out (bc), %c", 		[0xED, '0x41+%c(0..0)+6*8']);
 
 		for my $r (qw( b c d e h l f a )) {
+			next if $r eq 'f' && ($z180 || $ez80);
 			add($cpu, "out (c), $r", 	[0xED, 0x41+8*$V{$r}]);
 			add($cpu, "out (bc), $r", 	[0xED, 0x41+8*$V{$r}]);
 			add($cpu, "out0 (%n), $r", 	[0xED, 0x01+8*$V{$r}, '%n']) if $z180 || $ez80;
@@ -2023,7 +2036,8 @@ sub add_suf {
 	}
 	# ez80
 	elsif ($cpu eq 'ez80') {
-		if ($asm =~ /^ (?| (add|adc|inc|dec|ld|lea|pea|mlt|push|pop|sbc) \b (\s+ (?:bc|de|hl|sp|af|ix|iy)\b .*)
+		if ($asm =~ /^ (?| (add|adc|inc|dec|ld|lea|pea|mlt|push|pop|sbc) \b 
+						   (\s+ (?:bc|de|hl|sp|af|ix|iy)\b .*)
 						 | (add|adc|sub|sbc|and|xor|or|cp|cmp|
 						    bit|set|res|inc|dec|ex|jp|jmp|ld|ldi|ldd|
 							rlc|rrc|rl|rr|sla|sra|srl|tst|test) \b
@@ -2032,12 +2046,15 @@ sub add_suf {
 							ini|inir|ind|indr|
 						    ini2|ini2r|ind2|ind2r|
 							inim|inimr|indm|indmr|inirx|indrx|
-							otd2r|otdm|otdmr|otdr|otdrx|oti2r|otim|otimr|otir|otirx|outd|outd2|outi|outi2|
+							otd2r|otdm|otdmr|otdr|otdrx|oti2r|otim|otimr|
+							otir|otirx|outd|outd2|outi|outi2|
 							ldi|ldir|ldd|lddr|
 							rst) \b (.*)
 						) $/x) {
-			add($cpu, "$1.s$2", ['{ADL1}'], [0x52], @{clone(\@ops)});
-			add($cpu, "$1.l$2", ['{ADL0}'], [0x49], @{clone(\@ops)});
+			add($cpu, "$1.s$2", 	['{ADL1}'], [0x52], @{clone(\@ops)});
+			add($cpu, "$1.sil$2", 	['{ADL1}'], [0x52], @{clone(\@ops)});
+			add($cpu, "$1.l$2", 	['{ADL0}'], [0x49], @{clone(\@ops)});
+			add($cpu, "$1.lis$2", 	['{ADL0}'], [0x49], @{clone(\@ops)});
 		}
 	}
 }

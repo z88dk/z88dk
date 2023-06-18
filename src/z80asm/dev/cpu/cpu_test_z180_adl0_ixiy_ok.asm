@@ -1485,7 +1485,6 @@
  out (bc), c                    ; ED 49
  out (bc), d                    ; ED 51
  out (bc), e                    ; ED 59
- out (bc), f                    ; ED 71
  out (bc), h                    ; ED 61
  out (bc), l                    ; ED 69
  out (c), 0                     ; ED 71
@@ -1494,7 +1493,6 @@
  out (c), c                     ; ED 49
  out (c), d                     ; ED 51
  out (c), e                     ; ED 59
- out (c), f                     ; ED 71
  out (c), h                     ; ED 61
  out (c), l                     ; ED 69
  out -128                       ; D3 80
@@ -1505,7 +1503,6 @@
  out0 (-128), c                 ; ED 09 80
  out0 (-128), d                 ; ED 11 80
  out0 (-128), e                 ; ED 19 80
- out0 (-128), f                 ; ED 31 80
  out0 (-128), h                 ; ED 21 80
  out0 (-128), l                 ; ED 29 80
  out0 (127), a                  ; ED 39 7F
@@ -1513,7 +1510,6 @@
  out0 (127), c                  ; ED 09 7F
  out0 (127), d                  ; ED 11 7F
  out0 (127), e                  ; ED 19 7F
- out0 (127), f                  ; ED 31 7F
  out0 (127), h                  ; ED 21 7F
  out0 (127), l                  ; ED 29 7F
  out0 (255), a                  ; ED 39 FF
@@ -1521,7 +1517,6 @@
  out0 (255), c                  ; ED 09 FF
  out0 (255), d                  ; ED 11 FF
  out0 (255), e                  ; ED 19 FF
- out0 (255), f                  ; ED 31 FF
  out0 (255), h                  ; ED 21 FF
  out0 (255), l                  ; ED 29 FF
  outd                           ; ED AB

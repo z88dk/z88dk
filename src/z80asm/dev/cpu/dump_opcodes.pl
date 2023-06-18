@@ -105,7 +105,7 @@ sub expand_ez80 {
 sub find_range {
 	my($asm, $cpu, @ops) = @_;
 	
-	if ($asm =~ / rst (\.[ls])? \s+ %c /x) {
+	if ($asm =~ / rst (\.(s|sil|l|lis))? \s+ %c /x) {
 		return (0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38);
 	}
 	else {

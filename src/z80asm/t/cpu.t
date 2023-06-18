@@ -22,18 +22,16 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	my $ixiy = $base =~ s/_ixiy//;
 	$base =~ s/_adl\d//;
 	my($cpu) = $base =~ /cpu_test_(\w+)$/; $cpu =~ tr/_/-/;
+	(my $dis_cpu = $cpu) =~ s/ez80_z80/ez80/;
 	
-	# build command line
-	my $cmd = "z88dk-z80asm -m$cpu ".
-			($ixiy ? "-IXIY " : "").
-			" -m -l -b $file 2> $test.err";
-
 	# assembler output files
 	(my $file_bin = $file) =~ s/\.asm$/.bin/;
 	(my $file_o   = $file) =~ s/\.asm$/.o/;
 	(my $file_lis = $file) =~ s/\.asm$/.lis/;
 	(my $file_map = $file) =~ s/\.asm$/.map/;
 	unlink "$test.err", $file_bin, $file_o, $file_lis, $file_map;
+	
+	my $asm_cmd = "z88dk-z80asm -m$cpu ".($ixiy ? "-IXIY " : "")." -m -l -b $file 2> $test.err";
 	
 	if ($ok) {
 		# build binary image, check output of assembler
@@ -60,7 +58,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		my $length = $addr;		# only compare output up to $length
 		
 		# run assembler
-		run_ok($cmd);
+		run_ok($asm_cmd);
 
 		# read labels from map file and patch @bin
 		{
@@ -98,6 +96,18 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 			diag "expected ", unpack("H*", substr($bin, $addr, 10));
 			diag "got      ", unpack("H*", substr($out_bin, $addr, 10));
 		}
+		
+		if (!$ixiy && $cpu ne 'ez80') {
+			# run disassembler and assemble again; check binary
+			run_ok("z88dk-dis -m$dis_cpu $file_bin > $test.asm");
+			
+			# assemble
+			run_ok("z88dk-z80asm -m$cpu -b -l $test.asm 2> $test.err");
+			is slurp("$test.err"), "", "check errors";
+			
+			# compare
+			check_bin_file("$test.bin", slurp("$file_bin"));
+		}
 	}
 	else {
 		# check that all lines have error messages
@@ -110,7 +120,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		}
 		
 		# run assembler
-		run_nok($cmd);
+		run_nok($asm_cmd);
 		{
 			local(@ARGV) = "$test.err";
 			while (<>) {

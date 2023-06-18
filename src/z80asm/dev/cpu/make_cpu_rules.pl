@@ -117,7 +117,7 @@ sub parse_code {
 			"}";
 	}
 	# handle rst[.l] %c
-	elsif ($asm =~ /^rst((\.[ls])?) %c/) {
+	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
 		if ($1) {
 			push @code, 
 				"DO_STMT_LABEL();",
@@ -172,7 +172,7 @@ sub parse_code_opcode {
 			"DO_STMT_LABEL();",
 			"add_call_emul_func(\"$func\");";
 	}
-	elsif ($asm =~ /^rst((\.[ls])?) %c/) {
+	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
 		push @code, 
 			"DO_STMT_LABEL();",
 			"if (expr_error) { error_expected_const_expr(); } else {",

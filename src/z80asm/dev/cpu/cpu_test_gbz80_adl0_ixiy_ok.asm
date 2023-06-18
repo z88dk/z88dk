@@ -428,6 +428,10 @@
  jz 65535                       ; CA FF FF
  ld (-32768), a                 ; EA 00 80
  ld (-32768), sp                ; 08 00 80
+ ld (0xff00+0), a               ; E0 00
+ ld (0xff00+127), a             ; E0 7F
+ ld (0xff00+255), a             ; E0 FF
+ ld (0xff00+c), a               ; E2
  ld (32767), a                  ; EA FF 7F
  ld (32767), sp                 ; 08 FF 7F
  ld (65535), a                  ; EA FF FF
@@ -490,6 +494,10 @@
  ld (hli), h                    ; 74 23
  ld (hli), l                    ; 75 23
  ld a, (-32768)                 ; FA 00 80
+ ld a, (0xff00+0)               ; F0 00
+ ld a, (0xff00+127)             ; F0 7F
+ ld a, (0xff00+255)             ; F0 FF
+ ld a, (0xff00+c)               ; F2
  ld a, (32767)                  ; FA FF 7F
  ld a, (65535)                  ; FA FF FF
  ld a, (bc)                     ; 0A
@@ -665,14 +673,14 @@
  ldd h, (hl)                    ; 66 2B
  ldd l, (hl)                    ; 6E 2B
  lddr                           ; CD @__z80asm__lddr
- ldh (0), a                     ; E0 00
- ldh (127), a                   ; E0 7F
- ldh (255), a                   ; E0 FF
- ldh (c), a                     ; E2
- ldh a, (0)                     ; F0 00
- ldh a, (127)                   ; F0 7F
- ldh a, (255)                   ; F0 FF
- ldh a, (c)                     ; F2
+ ldh ( 0 ), a                   ; E0 00
+ ldh ( 127 ), a                 ; E0 7F
+ ldh ( 255 ), a                 ; E0 FF
+ ldh ( c ), a                   ; E2
+ ldh a, ( 0 )                   ; F0 00
+ ldh a, ( 127 )                 ; F0 7F
+ ldh a, ( 255 )                 ; F0 FF
+ ldh a, ( c )                   ; F2
  ldhl sp, -128                  ; F8 80
  ldhl sp, 127                   ; F8 7F
  ldi                            ; CD @__z80asm__ldi

@@ -243,7 +243,7 @@ bool Preproc::getline1(string& line) {
 bool Preproc::getline(string& line) {
 	g_is_preproc_active = true;
 	if (getline1(line)) {
-		// publish expaneded line
+		// publish expanded line
 		list_got_expanded_line(line.c_str());
 		set_error_expanded_line(line.c_str());
 		return true;
@@ -339,6 +339,8 @@ void Preproc::parse_line(const string& line) {
 	if (check_macro()) return;
 	if (check_reptx()) return;
 	if (check_hash()) return;
+	if (check_gbz80_opcodes()) return;
+	if (check_z80_ld_bit_opcodes()) return;
 
 	// last check - macro call
 	if (check_macro_call()) return;
@@ -526,6 +528,108 @@ bool Preproc::check_reptx() {
 	}
 	else if (m_lexer.peek(0).is(Keyword::ENDR)) {
 		g_errors.error(ErrCode::UnbalancedStruct);
+		return true;
+	}
+	else
+		return false;
+}
+
+bool Preproc::check_gbz80_opcodes() {
+	// ld ($ff00+xxx --> ldh (xxx
+	// ld ($ff00-xxx --> ldh (-xxx
+	// ld ($ff00)xxx --> ldh (0)xxx
+	if (m_lexer.peek(0).is(Keyword::LD) &&
+		m_lexer.peek(1).is(TType::LParen) &&
+		m_lexer.peek(2).is(TType::Integer) && m_lexer.peek(2).ivalue == 0xff00) {
+		switch (m_lexer.peek(3).ttype) {
+		case TType::Plus:
+			m_lexer.next(4);
+			m_output.push_back(string("ldh (") + m_lexer.text_ptr());
+			return true;
+		case TType::Minus:
+			m_lexer.next(3);
+			m_output.push_back(string("ldh (") + m_lexer.text_ptr());
+			return true;
+		case TType::RParen:
+			m_lexer.next(3);
+			m_output.push_back(string("ldh (0") + m_lexer.text_ptr());
+			return true;
+		default:
+			return false;
+		}
+	}
+	// ld ($ff00+xxx --> ldh (xxx
+	// ld ($ff00-xxx --> ldh (-xxx
+	// ld ($ff00)xxx --> ldh (0)xxx
+	if (m_lexer.peek(0).is(Keyword::LD) &&
+		m_lexer.peek(1).is(Keyword::A) &&
+		m_lexer.peek(2).is(TType::Comma) &&
+		m_lexer.peek(3).is(TType::LParen) &&
+		m_lexer.peek(4).is(TType::Integer) && m_lexer.peek(4).ivalue == 0xff00) {
+		switch (m_lexer.peek(5).ttype) {
+		case TType::Plus:
+			m_lexer.next(6);
+			m_output.push_back(string("ldh a,(") + m_lexer.text_ptr());
+			return true;
+		case TType::Minus:
+			m_lexer.next(5);
+			m_output.push_back(string("ldh a,(") + m_lexer.text_ptr());
+			return true;
+		case TType::RParen:
+			m_lexer.next(5);
+			m_output.push_back(string("ldh a,(0") + m_lexer.text_ptr());
+			return true;
+		default:
+			return false;
+		}
+	}
+	else
+		return false;
+}
+
+bool Preproc::check_z80_ld_bit_opcodes() {
+	// ld a, res 0, (ix+127) --> res 0, (ix+126), a
+	if (m_lexer.peek(0).is(Keyword::LD) &&
+		keyword_is_reg_8(m_lexer.peek(1).keyword) &&
+		m_lexer.peek(2).is(TType::Comma) &&
+		keyword_is_z80_ld_bit(m_lexer.peek(3).keyword) &&
+		m_lexer.peek(4).is(TType::Integer) &&
+		m_lexer.peek(5).is(TType::Comma) &&
+		m_lexer.peek(6).is(TType::LParen) &&
+		keyword_is_reg_ixy(m_lexer.peek(7).keyword)) {
+
+		string reg_8 = m_lexer.peek(1).svalue;
+		m_lexer.next(3);
+		string line = str_chomp(m_lexer.text_ptr()) + ", " + reg_8 + "\n";
+
+		// need to expand to swap IX/IY if -IXIY
+		m_lexer.set(line);
+		ExpandedText expanded = expand(m_lexer, defines());
+		if (expanded.got_error())
+			m_output.push_back(line);
+		else
+			m_output.push_back(expanded.text());
+		return true;
+	}
+	// ld a,rl (ix+127) --> rl (ix+127), a
+	else if (m_lexer.peek(0).is(Keyword::LD) &&
+		keyword_is_reg_8(m_lexer.peek(1).keyword) &&
+		m_lexer.peek(2).is(TType::Comma) &&
+		keyword_is_z80_ld_bit(m_lexer.peek(3).keyword) &&
+		m_lexer.peek(4).is(TType::LParen) &&
+		keyword_is_reg_ixy(m_lexer.peek(5).keyword)) {
+
+		string reg_8 = m_lexer.peek(1).svalue;
+		m_lexer.next(3);
+		string line = str_chomp(m_lexer.text_ptr()) + ", " + reg_8 + "\n";
+
+		// need to expand to swap IX/IY if -IXIY
+		m_lexer.set(line);
+		ExpandedText expanded = expand(m_lexer, defines());
+		if (expanded.got_error())
+			m_output.push_back(line);
+		else
+			m_output.push_back(expanded.text());
 		return true;
 	}
 	else

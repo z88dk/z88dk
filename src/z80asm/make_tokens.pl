@@ -49,7 +49,7 @@ my @tokens = (
 	'B1', 'C1', 'D1', 'E1', 'H1', 'L1', 'A1', 'F1', 'BC1', 'DE1', 'HL1', 'AF1',
 	
 	# EZ80 specific keywords
-	'ADL', 'S', 'IS', 'IL', 'SIS', 'LIL', 'MB',
+	'ADL', 'S', 'IS', 'IL', 'SIS', 'LIL', 'LIS', 'SIL', 'MB',
 	'LEA', 'PEA', 'RSMIX', 'STMIX',
 	'INI2', 'INI2R', 'IND2', 'IND2R', 'INIM', 'INIMR', 'INDM', 'INDMR', 'INIRX', 'INDRX',
 	'OTD2R', 'OTDRX', 'OTI2R', 'OTIRX', 'OUTD2', 'OUTI2',
