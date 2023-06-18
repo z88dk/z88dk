@@ -25,10 +25,7 @@ END
 			}
 			
 			if ($cpu =~ /ez80/) {
-				SKIP: {
-					skip "z88dk-dis gives incorrect disassembly for $cpu $idx $dd";
-					is $dis, "ld $dd,($idx+\$08):ld ($idx+\$08),$dd";
-				}
+				is $dis, "ld $dd,($idx+\$08):ld ($idx+\$08),$dd";
 			}
 			else {
 				my($ddh, $ddl) = split //, $dd;
@@ -36,20 +33,17 @@ END
 					is $dis, "ld $dd,($idx+\$08):ld ($idx+\$08),$dd";
 				}
 				elsif ($dd =~ /ix|iy/) {
-					SKIP: {
-						skip "z88dk-dis gives incorrect disassembly for $cpu $idx $dd" if $cpu =~ /^r/;
-						is $dis, "push $dd:".
-								 "ex (sp),hl:".
-								 "ld l,($idx+\$08):ld h,($idx+\$09):".
-								 "ex (sp),hl:".
-								 "pop $dd:".
-								 
-								 "push $dd:".
-								 "ex (sp),hl:".
-								 "ld ($idx+\$08),l:ld ($idx+\$09),h:".
-								 "ex (sp),hl:".
-								 "pop $dd";
-					}
+					is $dis, "push $dd:".
+							 "ex (sp),hl:".
+							 "ld l,($idx+\$08):ld h,($idx+\$09):".
+							 "ex (sp),hl:".
+							 "pop $dd:".
+							 
+							 "push $dd:".
+							 "ex (sp),hl:".
+							 "ld ($idx+\$08),l:ld ($idx+\$09),h:".
+							 "ex (sp),hl:".
+							 "pop $dd";
 				}
 				else {
 					is $dis, "ld $ddl,($idx+\$08):ld $ddh,($idx+\$09):".

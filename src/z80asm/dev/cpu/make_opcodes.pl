@@ -617,10 +617,10 @@ for my $cpu (@CPUS) {
 			
 			for my $x1 (qw( ix iy )) {
 				add($cpu, "ld $x1, ($x+%d)",[$V{$x1}, push_dd('hl')],
-											[ex_sp_hl()],
+											[$rabbit ? (0xED, 0x54) : (0xE3)],
 											[$V{$x}, ld_r_r('l', '(hl)'), '%d'],
 											[$V{$x}, ld_r_r('h', '(hl)'), '%D'],
-											[ex_sp_hl()],
+											[$rabbit ? (0xED, 0x54) : (0xE3)],
 											[$V{$x1}, pop_dd('hl')]);
 			}
 		}
@@ -654,10 +654,10 @@ for my $cpu (@CPUS) {
 			
 			for my $x1 (qw( ix iy )) {
 				add($cpu, "ld ($x+%d), $x1",[$V{$x1}, push_dd('hl')],
-											[ex_sp_hl()],
+											[$rabbit ? (0xED, 0x54) : (0xE3)],
 											[$V{$x}, ld_r_r('(hl)', 'l'), '%d'],
 											[$V{$x}, ld_r_r('(hl)', 'h'), '%D'],
-											[ex_sp_hl()],
+											[$rabbit ? (0xED, 0x54) : (0xE3)],
 											[$V{$x1}, pop_dd('hl')]);
 			}
 		}
@@ -1017,8 +1017,8 @@ for my $cpu (@CPUS) {
 	}
 	
 	if ($zilog || $intel) {
-		add_suf($cpu, "ex (sp), hl", 	[ex_sp_hl()]);
-		add($cpu, "xthl",				[ex_sp_hl()]);
+		add_suf($cpu, "ex (sp), hl", 	[0xE3]);
+		add($cpu, "xthl",				[0xE3]);
 	}
 	elsif ($rabbit) {
 		add($cpu, "ex (sp), hl", 		[0xED, 0x54]);
@@ -1033,7 +1033,7 @@ for my $cpu (@CPUS) {
 	
 	if (!$intel && !$gameboy) {
 		for my $x (qw( ix iy )) {
-			add_suf($cpu, "ex (sp), $x", [$V{$x}, ex_sp_hl()]);
+			add_suf($cpu, "ex (sp), $x", [$V{$x}, 0xE3]);
 		}
 	}
 	
@@ -1902,7 +1902,6 @@ sub ret		{					return 0xC9; }
 sub ret_f	{ my($_f) = @_;		return 0xC0+8*$V{$_f}; }
 sub rot_a	{ my($op) = @_;		return 0x07+8*$V{$op}; }
 sub sbc_hl_dd{my($dd) = @_; 	return (0xED, 0x42+16*$V{$dd}); }
-sub ex_sp_hl{					return 0xE3; }
 
 #------------------------------------------------------------------------------
 # add opcode
