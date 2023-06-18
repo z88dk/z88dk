@@ -13,8 +13,9 @@ for my $cpu (qw( ez80 ez80_z80 r2ka r3k z180 z80 z80n )) {
 	ld $dd, ($idx+8)
 	ld ($idx+8), $dd
 END
+			(my $dis_cpu = $cpu) =~ s/ez80_z80/ez80/;
 			capture_ok("z88dk-z80asm -m$cpu -b -l $test.asm", "");
-			run_ok("z88dk-dis -m$cpu $test.bin > $test.dis");
+			run_ok("z88dk-dis -m$dis_cpu $test.bin > $test.dis");
 			my $dis = slurp("$test.dis");
 			for ($dis) {
 				s/^\s+//gm;
