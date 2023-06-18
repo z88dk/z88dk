@@ -5671,6 +5671,10 @@
  ld (de-), e                    ; Error
  ld (de-), h                    ; Error
  ld (de-), l                    ; Error
+ ld (hl), ix                    ; Error
+ ld (hl), iy                    ; Error
+ ld (hl+), ix                   ; Error
+ ld (hl+), iy                   ; Error
  ld (hl+126), hl                ; Error
  ld (hl-128), hl                ; Error
  ld (ix), -128                  ; Error
@@ -6074,6 +6078,8 @@
  ld ix, (-32768)                ; Error
  ld ix, (32767)                 ; Error
  ld ix, (65535)                 ; Error
+ ld ix, (hl)                    ; Error
+ ld ix, (hl+)                   ; Error
  ld ix, (ix)                    ; Error
  ld ix, (ix+126)                ; Error
  ld ix, (ix-128)                ; Error
@@ -6083,6 +6089,9 @@
  ld ix, (sp)                    ; Error
  ld ix, (sp+0)                  ; Error
  ld ix, (sp+255)                ; Error
+ ld ix, -32768                  ; Error
+ ld ix, 32767                   ; Error
+ ld ix, 65535                   ; Error
  ld ix, bc                      ; Error
  ld ix, de                      ; Error
  ld ix, hl                      ; Error
@@ -6110,6 +6119,8 @@
  ld iy, (-32768)                ; Error
  ld iy, (32767)                 ; Error
  ld iy, (65535)                 ; Error
+ ld iy, (hl)                    ; Error
+ ld iy, (hl+)                   ; Error
  ld iy, (ix)                    ; Error
  ld iy, (ix+126)                ; Error
  ld iy, (ix-128)                ; Error
@@ -6119,6 +6130,9 @@
  ld iy, (sp)                    ; Error
  ld iy, (sp+0)                  ; Error
  ld iy, (sp+255)                ; Error
+ ld iy, -32768                  ; Error
+ ld iy, 32767                   ; Error
+ ld iy, 65535                   ; Error
  ld iy, bc                      ; Error
  ld iy, de                      ; Error
  ld iy, hl                      ; Error
@@ -6889,11 +6903,15 @@
  ldi (de), e                    ; Error
  ldi (de), h                    ; Error
  ldi (de), l                    ; Error
+ ldi (hl), ix                   ; Error
+ ldi (hl), iy                   ; Error
  ldi b, (de)                    ; Error
  ldi c, (de)                    ; Error
  ldi d, (de)                    ; Error
  ldi e, (de)                    ; Error
  ldi h, (de)                    ; Error
+ ldi ix, (hl)                   ; Error
+ ldi iy, (hl)                   ; Error
  ldi l, (de)                    ; Error
  ldi.l                          ; Error
  ldi.l (bc), a                  ; Error

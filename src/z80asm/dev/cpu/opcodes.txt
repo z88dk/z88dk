@@ -4410,8 +4410,8 @@
 |ld (hl), e             |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld (hl), h             |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld (hl), hl            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|ld (hl), ix            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|ld (hl), iy            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
+|ld (hl), ix            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld (hl), iy            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (hl), l             |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld (hl+%d), hl         |-    -    -    -        -     r2ka r3k -    -   -   |
 |ld (hl+), %n           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
@@ -4424,8 +4424,8 @@
 |ld (hl+), e            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld (hl+), h            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld (hl+), hl           |8080 8085 ez80 ez80_z80 gbz80 -    -   z180 z80 z80n|
-|ld (hl+), ix           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|ld (hl+), iy           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
+|ld (hl+), ix           |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld (hl+), iy           |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld (hl+), l            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld (hl-), %n           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ld (hl-), a            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
@@ -4843,10 +4843,10 @@
 |ld i, a                |-    -    ez80 ez80_z80 -     -    -   z180 z80 z80n|
 |ld i, hl               |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
 |ld iir, a              |-    -    -    -        -     r2ka r3k -    -   -   |
-|ld ix, %m              |-    -    ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
+|ld ix, %m              |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld ix, (%m)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld ix, (hl)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|ld ix, (hl+)           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
+|ld ix, (hl)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld ix, (hl+)           |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld ix, (ix)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld ix, (ix+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld ix, (iy)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
@@ -4873,10 +4873,10 @@
 |ld ixl, e              |-    -    ez80 ez80_z80 -     -    -   -    z80 z80n|
 |ld ixl, ixh            |-    -    ez80 ez80_z80 -     -    -   -    z80 z80n|
 |ld ixl, ixl            |-    -    ez80 ez80_z80 -     -    -   -    z80 z80n|
-|ld iy, %m              |-    -    ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
+|ld iy, %m              |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld iy, (%m)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
-|ld iy, (hl)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|ld iy, (hl+)           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
+|ld iy, (hl)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ld iy, (hl+)           |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld iy, (ix)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld iy, (ix+%d)         |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld iy, (iy)            |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
@@ -5514,8 +5514,8 @@
 |ldi (hl), e            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ldi (hl), h            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ldi (hl), hl           |8080 8085 ez80 ez80_z80 gbz80 -    -   z180 z80 z80n|
-|ldi (hl), ix           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|ldi (hl), iy           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
+|ldi (hl), ix           |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ldi (hl), iy           |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ldi (hl), l            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ldi a, (bc)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ldi a, (de)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
@@ -5533,8 +5533,8 @@
 |ldi h, (de)            |8080 8085 ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ldi h, (hl)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ldi hl, (hl)           |8080 8085 ez80 ez80_z80 gbz80 -    -   z180 z80 z80n|
-|ldi ix, (hl)           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|ldi iy, (hl)           |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
+|ldi ix, (hl)           |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
+|ldi iy, (hl)           |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ldi l, (de)            |8080 8085 ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ldi l, (hl)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ldi.l                  |-    -    -    ez80_z80 -     -    -   -    -   -   |
@@ -20187,21 +20187,15 @@
 |ld (hl), hl            |z180    |F5 7C 75 23 77 F1 2B               |
 |ld (hl), hl            |z80     |F5 7C 75 23 77 F1 2B               |
 |ld (hl), hl            |z80n    |F5 7C 75 23 77 F1 2B               |
-|ld (hl), ix            |8080    |D5 DD E5 D1 73 23 72 D1 2B         |
-|ld (hl), ix            |8085    |D5 DD E5 D1 73 23 72 D1 2B         |
 |ld (hl), ix            |ez80    |ED 3F                              |
 |ld (hl), ix            |ez80_z80|ED 3F                              |
-|ld (hl), ix            |gbz80   |D5 DD E5 D1 73 23 72 D1 2B         |
 |ld (hl), ix            |r2ka    |D5 DD E5 D1 73 23 72 D1 2B         |
 |ld (hl), ix            |r3k     |D5 DD E5 D1 73 23 72 D1 2B         |
 |ld (hl), ix            |z180    |D5 DD E5 D1 73 23 72 D1 2B         |
 |ld (hl), ix            |z80     |D5 DD E5 D1 73 23 72 D1 2B         |
 |ld (hl), ix            |z80n    |D5 DD E5 D1 73 23 72 D1 2B         |
-|ld (hl), iy            |8080    |D5 FD E5 D1 73 23 72 D1 2B         |
-|ld (hl), iy            |8085    |D5 FD E5 D1 73 23 72 D1 2B         |
 |ld (hl), iy            |ez80    |ED 3E                              |
 |ld (hl), iy            |ez80_z80|ED 3E                              |
-|ld (hl), iy            |gbz80   |D5 FD E5 D1 73 23 72 D1 2B         |
 |ld (hl), iy            |r2ka    |D5 FD E5 D1 73 23 72 D1 2B         |
 |ld (hl), iy            |r3k     |D5 FD E5 D1 73 23 72 D1 2B         |
 |ld (hl), iy            |z180    |D5 FD E5 D1 73 23 72 D1 2B         |
@@ -20317,21 +20311,15 @@
 |ld (hl+), hl           |z180    |F5 7C 75 23 77 F1 23               |
 |ld (hl+), hl           |z80     |F5 7C 75 23 77 F1 23               |
 |ld (hl+), hl           |z80n    |F5 7C 75 23 77 F1 23               |
-|ld (hl+), ix           |8080    |D5 DD E5 D1 73 23 72 D1 23         |
-|ld (hl+), ix           |8085    |D5 DD E5 D1 73 23 72 D1 23         |
 |ld (hl+), ix           |ez80    |ED 3F 23 23                        |
 |ld (hl+), ix           |ez80_z80|ED 3F 23 23                        |
-|ld (hl+), ix           |gbz80   |D5 DD E5 D1 73 23 72 D1 23         |
 |ld (hl+), ix           |r2ka    |D5 DD E5 D1 73 23 72 D1 23         |
 |ld (hl+), ix           |r3k     |D5 DD E5 D1 73 23 72 D1 23         |
 |ld (hl+), ix           |z180    |D5 DD E5 D1 73 23 72 D1 23         |
 |ld (hl+), ix           |z80     |D5 DD E5 D1 73 23 72 D1 23         |
 |ld (hl+), ix           |z80n    |D5 DD E5 D1 73 23 72 D1 23         |
-|ld (hl+), iy           |8080    |D5 FD E5 D1 73 23 72 D1 23         |
-|ld (hl+), iy           |8085    |D5 FD E5 D1 73 23 72 D1 23         |
 |ld (hl+), iy           |ez80    |ED 3E 23 23                        |
 |ld (hl+), iy           |ez80_z80|ED 3E 23 23                        |
-|ld (hl+), iy           |gbz80   |D5 FD E5 D1 73 23 72 D1 23         |
 |ld (hl+), iy           |r2ka    |D5 FD E5 D1 73 23 72 D1 23         |
 |ld (hl+), iy           |r3k     |D5 FD E5 D1 73 23 72 D1 23         |
 |ld (hl+), iy           |z180    |D5 FD E5 D1 73 23 72 D1 23         |
@@ -22803,7 +22791,6 @@
 |ld iir, a              |r3k     |ED 4F                              |
 |ld ix, %m              |ez80    |DD 21 %m %m %m                     |
 |ld ix, %m              |ez80_z80|                                   |
-|ld ix, %m              |gbz80   |DD 21 %m %m                        |
 |ld ix, %m              |r2ka    |DD 21 %m %m                        |
 |ld ix, %m              |r3k     |DD 21 %m %m                        |
 |ld ix, %m              |z180    |DD 21 %m %m                        |
@@ -22816,21 +22803,15 @@
 |ld ix, (%m)            |z180    |DD 2A %m %m                        |
 |ld ix, (%m)            |z80     |DD 2A %m %m                        |
 |ld ix, (%m)            |z80n    |DD 2A %m %m                        |
-|ld ix, (hl)            |8080    |D5 DD E5 D1 5E 23 56 D1 2B         |
-|ld ix, (hl)            |8085    |D5 DD E5 D1 5E 23 56 D1 2B         |
 |ld ix, (hl)            |ez80    |ED 37                              |
 |ld ix, (hl)            |ez80_z80|ED 37                              |
-|ld ix, (hl)            |gbz80   |D5 DD E5 D1 5E 23 56 D1 2B         |
 |ld ix, (hl)            |r2ka    |D5 DD E5 D1 5E 23 56 D1 2B         |
 |ld ix, (hl)            |r3k     |D5 DD E5 D1 5E 23 56 D1 2B         |
 |ld ix, (hl)            |z180    |D5 DD E5 D1 5E 23 56 D1 2B         |
 |ld ix, (hl)            |z80     |D5 DD E5 D1 5E 23 56 D1 2B         |
 |ld ix, (hl)            |z80n    |D5 DD E5 D1 5E 23 56 D1 2B         |
-|ld ix, (hl+)           |8080    |D5 DD E5 D1 5E 23 56 D1 23         |
-|ld ix, (hl+)           |8085    |D5 DD E5 D1 5E 23 56 D1 23         |
 |ld ix, (hl+)           |ez80    |ED 37 23 23                        |
 |ld ix, (hl+)           |ez80_z80|ED 37 23 23                        |
-|ld ix, (hl+)           |gbz80   |D5 DD E5 D1 5E 23 56 D1 23         |
 |ld ix, (hl+)           |r2ka    |D5 DD E5 D1 5E 23 56 D1 23         |
 |ld ix, (hl+)           |r3k     |D5 DD E5 D1 5E 23 56 D1 23         |
 |ld ix, (hl+)           |z180    |D5 DD E5 D1 5E 23 56 D1 23         |
@@ -22952,7 +22933,6 @@
 |ld ixl, ixl            |z80n    |DD 6D                              |
 |ld iy, %m              |ez80    |FD 21 %m %m %m                     |
 |ld iy, %m              |ez80_z80|                                   |
-|ld iy, %m              |gbz80   |FD 21 %m %m                        |
 |ld iy, %m              |r2ka    |FD 21 %m %m                        |
 |ld iy, %m              |r3k     |FD 21 %m %m                        |
 |ld iy, %m              |z180    |FD 21 %m %m                        |
@@ -22965,21 +22945,15 @@
 |ld iy, (%m)            |z180    |FD 2A %m %m                        |
 |ld iy, (%m)            |z80     |FD 2A %m %m                        |
 |ld iy, (%m)            |z80n    |FD 2A %m %m                        |
-|ld iy, (hl)            |8080    |D5 FD E5 D1 5E 23 56 D1 2B         |
-|ld iy, (hl)            |8085    |D5 FD E5 D1 5E 23 56 D1 2B         |
 |ld iy, (hl)            |ez80    |ED 31                              |
 |ld iy, (hl)            |ez80_z80|ED 31                              |
-|ld iy, (hl)            |gbz80   |D5 FD E5 D1 5E 23 56 D1 2B         |
 |ld iy, (hl)            |r2ka    |D5 FD E5 D1 5E 23 56 D1 2B         |
 |ld iy, (hl)            |r3k     |D5 FD E5 D1 5E 23 56 D1 2B         |
 |ld iy, (hl)            |z180    |D5 FD E5 D1 5E 23 56 D1 2B         |
 |ld iy, (hl)            |z80     |D5 FD E5 D1 5E 23 56 D1 2B         |
 |ld iy, (hl)            |z80n    |D5 FD E5 D1 5E 23 56 D1 2B         |
-|ld iy, (hl+)           |8080    |D5 FD E5 D1 5E 23 56 D1 23         |
-|ld iy, (hl+)           |8085    |D5 FD E5 D1 5E 23 56 D1 23         |
 |ld iy, (hl+)           |ez80    |ED 31 23 23                        |
 |ld iy, (hl+)           |ez80_z80|ED 31 23 23                        |
-|ld iy, (hl+)           |gbz80   |D5 FD E5 D1 5E 23 56 D1 23         |
 |ld iy, (hl+)           |r2ka    |D5 FD E5 D1 5E 23 56 D1 23         |
 |ld iy, (hl+)           |r3k     |D5 FD E5 D1 5E 23 56 D1 23         |
 |ld iy, (hl+)           |z180    |D5 FD E5 D1 5E 23 56 D1 23         |
@@ -24445,21 +24419,15 @@
 |ldi (hl), hl           |z180    |F5 7C 75 23 77 F1 23               |
 |ldi (hl), hl           |z80     |F5 7C 75 23 77 F1 23               |
 |ldi (hl), hl           |z80n    |F5 7C 75 23 77 F1 23               |
-|ldi (hl), ix           |8080    |D5 DD E5 D1 73 23 72 D1 23         |
-|ldi (hl), ix           |8085    |D5 DD E5 D1 73 23 72 D1 23         |
 |ldi (hl), ix           |ez80    |ED 3F 23 23                        |
 |ldi (hl), ix           |ez80_z80|ED 3F 23 23                        |
-|ldi (hl), ix           |gbz80   |D5 DD E5 D1 73 23 72 D1 23         |
 |ldi (hl), ix           |r2ka    |D5 DD E5 D1 73 23 72 D1 23         |
 |ldi (hl), ix           |r3k     |D5 DD E5 D1 73 23 72 D1 23         |
 |ldi (hl), ix           |z180    |D5 DD E5 D1 73 23 72 D1 23         |
 |ldi (hl), ix           |z80     |D5 DD E5 D1 73 23 72 D1 23         |
 |ldi (hl), ix           |z80n    |D5 DD E5 D1 73 23 72 D1 23         |
-|ldi (hl), iy           |8080    |D5 FD E5 D1 73 23 72 D1 23         |
-|ldi (hl), iy           |8085    |D5 FD E5 D1 73 23 72 D1 23         |
 |ldi (hl), iy           |ez80    |ED 3E 23 23                        |
 |ldi (hl), iy           |ez80_z80|ED 3E 23 23                        |
-|ldi (hl), iy           |gbz80   |D5 FD E5 D1 73 23 72 D1 23         |
 |ldi (hl), iy           |r2ka    |D5 FD E5 D1 73 23 72 D1 23         |
 |ldi (hl), iy           |r3k     |D5 FD E5 D1 73 23 72 D1 23         |
 |ldi (hl), iy           |z180    |D5 FD E5 D1 73 23 72 D1 23         |
@@ -24628,21 +24596,15 @@
 |ldi hl, (hl)           |z180    |F5 7E 23 66 6F F1                  |
 |ldi hl, (hl)           |z80     |F5 7E 23 66 6F F1                  |
 |ldi hl, (hl)           |z80n    |F5 7E 23 66 6F F1                  |
-|ldi ix, (hl)           |8080    |D5 DD E5 D1 5E 23 56 D1 23         |
-|ldi ix, (hl)           |8085    |D5 DD E5 D1 5E 23 56 D1 23         |
 |ldi ix, (hl)           |ez80    |ED 37 23 23                        |
 |ldi ix, (hl)           |ez80_z80|ED 37 23 23                        |
-|ldi ix, (hl)           |gbz80   |D5 DD E5 D1 5E 23 56 D1 23         |
 |ldi ix, (hl)           |r2ka    |D5 DD E5 D1 5E 23 56 D1 23         |
 |ldi ix, (hl)           |r3k     |D5 DD E5 D1 5E 23 56 D1 23         |
 |ldi ix, (hl)           |z180    |D5 DD E5 D1 5E 23 56 D1 23         |
 |ldi ix, (hl)           |z80     |D5 DD E5 D1 5E 23 56 D1 23         |
 |ldi ix, (hl)           |z80n    |D5 DD E5 D1 5E 23 56 D1 23         |
-|ldi iy, (hl)           |8080    |D5 FD E5 D1 5E 23 56 D1 23         |
-|ldi iy, (hl)           |8085    |D5 FD E5 D1 5E 23 56 D1 23         |
 |ldi iy, (hl)           |ez80    |ED 31 23 23                        |
 |ldi iy, (hl)           |ez80_z80|ED 31 23 23                        |
-|ldi iy, (hl)           |gbz80   |D5 FD E5 D1 5E 23 56 D1 23         |
 |ldi iy, (hl)           |r2ka    |D5 FD E5 D1 5E 23 56 D1 23         |
 |ldi iy, (hl)           |r3k     |D5 FD E5 D1 5E 23 56 D1 23         |
 |ldi iy, (hl)           |z180    |D5 FD E5 D1 5E 23 56 D1 23         |

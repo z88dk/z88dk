@@ -554,8 +554,6 @@
  ld (hl), e                     ; 73
  ld (hl), h                     ; 74
  ld (hl), hl                    ; F5 7C 75 23 77 F1 2B
- ld (hl), ix                    ; D5 DD E5 D1 73 23 72 D1 2B
- ld (hl), iy                    ; D5 FD E5 D1 73 23 72 D1 2B
  ld (hl), l                     ; 75
  ld (hl+), -128                 ; 36 80 23
  ld (hl+), 127                  ; 36 7F 23
@@ -569,8 +567,6 @@
  ld (hl+), e                    ; 73 23
  ld (hl+), h                    ; 74 23
  ld (hl+), hl                   ; F5 7C 75 23 77 F1 23
- ld (hl+), ix                   ; D5 DD E5 D1 73 23 72 D1 23
- ld (hl+), iy                   ; D5 FD E5 D1 73 23 72 D1 23
  ld (hl+), l                    ; 75 23
  ld (hl-), -128                 ; 36 80 2B
  ld (hl-), 127                  ; 36 7F 2B
@@ -743,10 +739,6 @@
  ld hl, sp                      ; 21 00 00 39
  ld hl, sp+127                  ; 21 7F 00 39
  ld hl, sp-128                  ; 21 80 FF 39
- ld ix, (hl)                    ; D5 DD E5 D1 5E 23 56 D1 2B
- ld ix, (hl+)                   ; D5 DD E5 D1 5E 23 56 D1 23
- ld iy, (hl)                    ; D5 FD E5 D1 5E 23 56 D1 2B
- ld iy, (hl+)                   ; D5 FD E5 D1 5E 23 56 D1 23
  ld l, (de)                     ; EB 5E EB
  ld l, (de+)                    ; EB 5E EB 13
  ld l, (de-)                    ; EB 5E EB 1B
@@ -838,8 +830,6 @@
  ldi (hl), e                    ; 73 23
  ldi (hl), h                    ; 74 23
  ldi (hl), hl                   ; F5 7C 75 23 77 F1 23
- ldi (hl), ix                   ; D5 DD E5 D1 73 23 72 D1 23
- ldi (hl), iy                   ; D5 FD E5 D1 73 23 72 D1 23
  ldi (hl), l                    ; 75 23
  ldi a, (bc)                    ; 0A 03
  ldi a, (de)                    ; 1A 13
@@ -857,8 +847,6 @@
  ldi h, (de)                    ; EB 56 EB 13
  ldi h, (hl)                    ; 66 23
  ldi hl, (hl)                   ; F5 7E 23 66 6F F1
- ldi ix, (hl)                   ; D5 DD E5 D1 5E 23 56 D1 23
- ldi iy, (hl)                   ; D5 FD E5 D1 5E 23 56 D1 23
  ldi l, (de)                    ; EB 5E EB 13
  ldi l, (hl)                    ; 6E 23
  ldir                           ; CD @__z80asm__ldir
