@@ -1141,7 +1141,7 @@ int main (int argc, char **argv){
             }
             break;
         }
-        st+= israbbit() ? 6 : isgbz80() ? 12 : isz180() ? 9 : 10;
+        st+= israbbit() ? 6 : isgbz80() ? 12 : isz180() ? 9 : isez80() ? 3 : 10;
         sp= get_memory(pc++);
         sp|= get_memory(pc++)<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
@@ -1188,7 +1188,7 @@ int main (int argc, char **argv){
           | a<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x2a: // LD HL,(nn) // LD IX,(nn) // LD IY,(nn)
-      if ( isgbz80() ) { // ld a,(hl+)
+        if ( isgbz80() ) { // ld a,(hl+)
           long long save = st;
           LDRP(h, l, a);
           INCW(h,l);
@@ -1198,9 +1198,9 @@ int main (int argc, char **argv){
           if ( altd ) LDRRPNN(h_, l_, 11);
           else LDRRPNN(h, l, isez80() ? 5 : israbbit() ? 11 : isz180() ? 15 : 16);
         } else if( iy )
-          LDRRPNN(yh, yl, isez80() ? 65: israbbit() ? 11 : isz180() ? 15 : 16);
+          LDRRPNN(yh, yl, isez80() ? 6: israbbit() ? 11 : isz180() ? 15 : 16);
         else
-          LDRRPNN(xh, xl, isez80() ? 5 : israbbit() ? 11 : isz180() ? 15 : 16);
+          LDRRPNN(xh, xl, isez80() ? 6 : israbbit() ? 11 : isz180() ? 15 : 16);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3a: // LD A,(nn)
         if ( isgbz80() ) { // ld a,(hl-)
