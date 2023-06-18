@@ -65569,8 +65569,15 @@ DO_stmt_n(0xEE);
 
 | label? _TK_XTHL _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_GBZ80: 
+DO_STMT_LABEL();
+add_call_emul_func("__z80asm__ex_sp_hl");
+break;
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0xE3);
+break;
+case CPU_R2KA: case CPU_R3K: 
+DO_stmt(0xED54);
 break;
 default: error_illegal_ident(); }
 }

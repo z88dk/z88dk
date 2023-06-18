@@ -10053,4 +10053,3 @@
  xor.s a, (iy)                  ; Error
  xor.s a, (iy+126)              ; Error
  xor.s a, (iy-128)              ; Error
- xthl                           ; Error

@@ -1024,9 +1024,11 @@ for my $cpu (@CPUS) {
 		add($cpu, "ex (sp), hl", 		[0xED, 0x54]);
 		add($cpu, "ex (sp), hl'", 		[$V{altd}], [0xED, 0x54]);
 		add($cpu, "altd ex (sp), hl", 	[$V{altd}], [0xED, 0x54]);
+		add($cpu, "xthl",				[0xED, 0x54]);
 	}
 	else {
 		add($cpu, "ex (sp), hl", 		[call(), '@__z80asm__ex_sp_hl', '']);
+		add($cpu, "xthl",				[call(), '@__z80asm__ex_sp_hl', '']);
 	}
 	
 	if (!$intel && !$gameboy) {

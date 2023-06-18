@@ -6859,3 +6859,4 @@
  xri -128                       ; EE 80
  xri 127                        ; EE 7F
  xri 255                        ; EE FF
+ xthl                           ; ED 54

@@ -7958,7 +7958,7 @@
 |xra l                  |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |xra m                  |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |xri %n                 |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
-|xthl                   |8080 8085 ez80 ez80_z80 -     -    -   z180 z80 z80n|
+|xthl                   |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |=======================|====================================================|
 
 
@@ -33139,6 +33139,9 @@
 |xthl                   |8085    |E3                                 |
 |xthl                   |ez80    |E3                                 |
 |xthl                   |ez80_z80|E3                                 |
+|xthl                   |gbz80   |CD @__z80asm__ex_sp_hl             |
+|xthl                   |r2ka    |ED 54                              |
+|xthl                   |r3k     |ED 54                              |
 |xthl                   |z180    |E3                                 |
 |xthl                   |z80     |E3                                 |
 |xthl                   |z80n    |E3                                 |
