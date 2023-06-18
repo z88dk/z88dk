@@ -33,6 +33,10 @@ typedef struct {
     state->instr_bytes[state->len++] = val; \
 } while (0)
 
+#define PEEK_BYTE(state,val) do { \
+    val = bk.get_memory(state->pc); \
+} while (0)
+
 #define BUF_PRINTF(fmt, ...) do { \
     offs += snprintf(buf + offs, buflen - offs, fmt, ## __VA_ARGS__); \
 } while(0)
@@ -333,7 +337,12 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                 else if (is8085() ) BUF_PRINTF("%-10shl,bc", "sub");
                                 else BUF_PRINTF("nop");
                             } else if ( y == 2 ) {
-                                if ( isgbz80() )  BUF_PRINTF("%-10s","stop");
+                                if ( isgbz80() ) {
+                                    uint8_t p; 
+                                    PEEK_BYTE(state, p); 
+                                    if ( p == 0 ) READ_BYTE(state, b);
+                                    BUF_PRINTF("%-10s","stop");
+                                } 
                                 else if ( is8080() ) BUF_PRINTF("nop");                            
                                 else if ( is8085() ) BUF_PRINTF("%-10shl","sra");                            
                                 else BUF_PRINTF("%-10s%s","djnz", handle_rel8(state, opbuf1, sizeof(opbuf1)));                  
@@ -405,7 +414,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                     break;
                 case 1: /* x = 1 */
                     if ( z == 6 && y == 6 ) {
-                        if ( israbbit() ) BUF_PRINTF("%-10s","altd");
+                        if ( israbbit() ) { BUF_PRINTF("altd "); continue; }
                         else BUF_PRINTF("%-10s","halt");
                     } else if ( israbbit() && z == 4 && y == 7 && state->index ) {
                         BUF_PRINTF("%-10shl,%s", "ld", handle_register16(state,2, state->index));
@@ -489,8 +498,9 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             if ( x == 0 ) {
                                 char *instr = handle_rot(state, y);
                                 if ( state->index && z != 6 && instr ) {
-                                    handle_register8(state, z, opbuf1, sizeof(opbuf1));
                                     handle_register8(state, 6, opbuf2, sizeof(opbuf2));
+                                    state->index = 0;
+                                    handle_register8(state, z, opbuf1, sizeof(opbuf1));
                                     if ( cancbundoc() ) BUF_PRINTF("%-10s%s,%s %s","ld", opbuf1, instr, opbuf2);
                                     else BUF_PRINTF("nop");
                                 } else if ( instr ) BUF_PRINTF("%-10s%s", z == 6 ? handle_ez80_am(state,instr) : instr, handle_register8(state, z, opbuf1, sizeof(opbuf1)));
@@ -503,26 +513,28 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                 else BUF_PRINTF("%-10s%d,%s", handle_ez80_am(state,"bit"), y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                             } else if ( x == 2 ) {
                                 if ( state->index && z != 6 ) {
-                                    handle_register8(state, z, opbuf1, sizeof(opbuf1));
                                     handle_register8(state, 6, opbuf2, sizeof(opbuf2));
+                                    state->index = 0;
+                                    handle_register8(state, z, opbuf1, sizeof(opbuf1));
                                     if ( cancbundoc() ) BUF_PRINTF("%-10s%s,%s %d,%s","ld", opbuf1, "res",y, opbuf2);
                                     else BUF_PRINTF("nop");
                                 } else BUF_PRINTF("%-10s%d,%s", handle_ez80_am(state,"res"), y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                             } else if ( x == 3 ) {
                                 if ( cancbundoc() && state->index && z != 6 ) {
-                                    handle_register8(state, z, opbuf1, sizeof(opbuf1));
                                     handle_register8(state, 6, opbuf2, sizeof(opbuf2));
+                                    state->index = 0;
+                                    handle_register8(state, z, opbuf1, sizeof(opbuf1));
                                     if ( cancbundoc() ) BUF_PRINTF("%-10s%s,%s %d,%s","ld", opbuf1, "set",y, opbuf2);
                                     else BUF_PRINTF("nop");
                                 } else BUF_PRINTF("%-10s%d,%s", handle_ez80_am(state,"set"), y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                             }
                             state->prefix = 0;
                         } else if ( y == 2 ) {
-                            if ( israbbit() ) BUF_PRINTF("%-10s", "ioi");  
+                            if ( israbbit() ) { BUF_PRINTF("ioi "); continue; }
                             else if ( !isgbz80() ) BUF_PRINTF("%-10s(%s),a","out", handle_immed8(state, opbuf1, sizeof(opbuf1)));
                             else BUF_PRINTF("nop");
                         } else if ( y == 3 ) {
-                            if ( israbbit() ) BUF_PRINTF("%-10s", "ioe");
+                            if ( israbbit() ) { BUF_PRINTF("ioe "); continue; }
                             else if ( !isgbz80() ) BUF_PRINTF("%-10sa,(%s)","in", handle_immed8(state, opbuf1, sizeof(opbuf1)));
                             else BUF_PRINTF("nop");
                         } else if ( y == 4 ) {
