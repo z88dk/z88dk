@@ -35,6 +35,7 @@ target/agon/fcntl/rename
 target/agon/fcntl/remove
 target/agon/fcntl/mkdir
 target/agon/fcntl/chdir
+target/agon/fcntl/fdtell
 target/agon/time/target_read_structtm
 @stdio/stdio.lst
 @gfx/wide/gfx_wide.lst
