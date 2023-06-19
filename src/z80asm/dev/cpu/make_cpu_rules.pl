@@ -86,15 +86,6 @@ sub parse_code {
 			"add_opcode_nn(0x".fmthex($op2).", target_expr);",		# call
 			"asm_LABEL_offset(end_label, 6);";
 	}
-	# handle special case of dec b;jr nz, %j
-	elsif (@ops==2 && $ops[0][0] =~ /^\d+$/ && 
-	       $ops[0][0] == 0x05 && $ops[1][1] eq '%j') {
-		my $opc = "0x".fmthex($ops[1][0]);
-		push @code, 
-			"DO_stmt(0x05);",
-			# compensate for extra byte
-			"add_opcode_jr_n($opc, pop_expr(ctx), 1);";	
-	}
 	# handle {ADL0}? xxx : xxx
 	elsif ($ops[0][0] eq '{ADL0}?') {
 		my(@adl0, @adl1);

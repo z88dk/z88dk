@@ -4139,8 +4139,7 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x76);
-DO_stmt_jr(0x10);
+DO_stmt_jr(0x7610);
 break;
 default: error_illegal_ident(); }
 }
@@ -4149,8 +4148,7 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x76);
-DO_stmt_jr(0x10);
+DO_stmt_jr(0x7610);
 break;
 default: error_illegal_ident(); }
 }
@@ -17985,19 +17983,17 @@ default: error_illegal_ident(); }
 
 | label? _TK_DJNZ _TK_B _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_8080: case CPU_8085: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x05);
-DO_stmt_nn(0xC2);
-break;
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x05);
-add_opcode_jr_n(0x20, pop_expr(ctx), 1);
+DO_stmt_jr(0x0520);
 break;
 case CPU_EZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_jr(0x10);
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0x05C2);
 break;
 default: error_illegal_ident(); }
 }
@@ -18006,27 +18002,24 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x76);
-DO_stmt_jr(0x10);
+DO_stmt_jr(0x7610);
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_DJNZ expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_8080: case CPU_8085: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x05);
-DO_stmt_nn(0xC2);
-break;
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x05);
-add_opcode_jr_n(0x20, pop_expr(ctx), 1);
+DO_stmt_jr(0x0520);
 break;
 case CPU_EZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_jr(0x10);
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0x05C2);
 break;
 default: error_illegal_ident(); }
 }

@@ -492,8 +492,8 @@
  altd dec h                     ; 76 25
  altd dec hl                    ; 76 2B
  altd dec l                     ; 76 2D
- altd djnz ASMPC                ; 76 10 FE
- altd djnz b, ASMPC             ; 76 10 FE
+ altd djnz ASMPC                ; 76 10 FD
+ altd djnz b, ASMPC             ; 76 10 FD
  altd ex (sp), hl               ; 76 ED 54
  altd ex de', hl                ; 76 E3
  altd ex de, hl                 ; 76 EB
@@ -2316,7 +2316,7 @@
  dec l'                         ; 76 2D
  dec sp                         ; 3B
  djnz ASMPC                     ; 10 FE
- djnz b', ASMPC                 ; 76 10 FE
+ djnz b', ASMPC                 ; 76 10 FD
  djnz b, ASMPC                  ; 10 FE
  dsub                           ; CD @__z80asm__sub_hl_bc
  ex (sp), hl                    ; ED 54

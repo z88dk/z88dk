@@ -329,8 +329,9 @@ static void read_cur_module_exprs(Expr1List* exprs, obj_file_t* obj) {
 
 		// patch location
 		const char* section_name = parse_wcount_str(obj);
-		int asmpc = parse_word(obj);
-		int code_pos = parse_word(obj);
+		int asmpc = parse_int(obj);
+		int code_pos = parse_int(obj);
+		int opcode_size = parse_int(obj);
 
 		const char* target_name = parse_wcount_str(obj);
 		const char* expr_text = parse_wcount_str(obj);
@@ -364,6 +365,7 @@ static void read_cur_module_exprs(Expr1List* exprs, obj_file_t* obj) {
 			expr->section = CURRENTSECTION;
 			expr->asmpc = asmpc;
 			expr->code_pos = code_pos;
+			expr->opcode_size = opcode_size;
 			expr->filename = spool_add(source_filename);
 			expr->line_num = line_num;
 			expr->listpos = -1;
@@ -605,7 +607,7 @@ static void patch_exprs(Expr1List* exprs)
 
 			case RANGE_JR_OFFSET:
 				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
-				value -= asmpc + 2;		/* get module PC at JR instruction */
+				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
 				if (value < -128 || value > 127)
 					error_int_range(value);
