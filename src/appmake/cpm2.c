@@ -784,6 +784,27 @@ static disc_spec lynx_spec = {
 };
 
 
+// DEC Rainbow 100
+// Some of the disk images are marked as MFM300
+static disc_spec rainbow_spec = {
+    .name = "Rainbow100",
+    .disk_mode = MFM250,	
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 }
+};
+
+
 static disc_spec rc700_spec = {
     .name = "RC-700",
     .sectors_per_track = 9,
@@ -1147,6 +1168,7 @@ static struct formats {
     { "pcw40",     "Amstrad PCW, 40T",      &pcw40_spec, 16, "\x00\x00\x28\x09\x02\x01\x03\x02\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "plus3",     "Spectrum +3 173k",      &plus3_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
+    { "rainbow",    "DEC Rainbow 100",      &rainbow_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
     { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
