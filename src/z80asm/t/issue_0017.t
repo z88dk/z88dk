@@ -1,9 +1,11 @@
 #!/usr/bin/env perl
 
+BEGIN { use lib 't'; require 'testlib.pl'; }
+
+use Modern::Perl;
+
 # Test https://github.com/z88dk/z88dk/issues/17
 # z80asm: bug with filenames interpreting escape sequences
-
-BEGIN { use lib 't'; require 'testlib.pl'; }
 
 my @slashes = ($^O eq 'MSWin32') ? ('/', '\\') : ('/');
 for my $slash (@slashes) {

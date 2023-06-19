@@ -4,8 +4,8 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-# z80asm: emulated indirect opcodes
 # https://github.com/z88dk/z88dk/issues/1865
+# z80asm: emulated indirect opcodes
 
 # ld de,(nn) / ld (nn),de
 

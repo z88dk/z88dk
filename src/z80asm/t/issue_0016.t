@@ -4,7 +4,9 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-# cannot specify name of generated object file
+# Test https://github.com/z88dk/z88dk/issues/16
+# z80asm: cannot specify name of generated object file
+
 spew("$test.asm", <<END);
 		public test_function
 test_function:  ret

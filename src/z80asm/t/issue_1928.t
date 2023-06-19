@@ -4,6 +4,9 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
+# https://github.com/z88dk/z88dk/issues/1928
+# z80asm: .lis file lists incorrect bytes for REPTC macro directive
+
 spew("$test.asm", <<END);
 REPTC var, 45
 defb var

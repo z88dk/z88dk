@@ -4,6 +4,9 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
+# Test https://github.com/z88dk/z88dk/issues/2309
+# z80asm: Request for emulated instructions
+
 for my $cpu (qw( ez80 ez80_z80 r2ka r3k z180 z80 z80n )) {
 	for my $idx (qw( ix iy )) {
 		for my $dd (qw( bc de hl ix iy )) {

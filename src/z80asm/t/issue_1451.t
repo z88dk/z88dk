@@ -4,6 +4,9 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
+# https://github.com/z88dk/z88dk/issues/1451
+# z80asm: Linking very slow on windows
+
 my $got_zsdcc = -f "../../bin/z88dk-zsdcc$Config{_exe}";
 if (!$got_zsdcc) {
     diag("z88dk-zsdcc not found, test skipped");

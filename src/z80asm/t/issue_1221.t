@@ -4,8 +4,8 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-# z80asm: support db, dw, ... as shortcuts to defb, defw, ...
 # https://github.com/z88dk/z88dk/issues/1221
+# z80asm: support db, dw, ... as shortcuts to defb, defw, ...
 
 z80asm_ok("", "", "",
           'byte     1'          => bytes(1),

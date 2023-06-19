@@ -4,6 +4,9 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
+# Test https://github.com/z88dk/z88dk/issues/2308
+# z80asm: Header guards not working as expected
+
 for my $define ("#define MEMMAPPER_DEFS_H_", 
 				"define MEMMAPPER_DEFS_H_",
 				"MEMMAPPER_DEFS_H_ equ 1",

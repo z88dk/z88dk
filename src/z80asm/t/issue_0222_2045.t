@@ -3,7 +3,6 @@
 BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
-
 use CPU::Z80::Assembler;
 
 # Test https://github.com/z88dk/z88dk/issues/222
