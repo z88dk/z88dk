@@ -924,6 +924,23 @@ static disc_spec magnolia_spec = {
     .first_sector_offset = 1,
 };
 
+// Heath H100/Zenith Z100 5" DSDD
+static disc_spec z100_spec = {
+    .name = "Z-100",
+    .disk_mode = MFM250,
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 256,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+};
 
 static disc_spec z80pack_spec = {
     .name = "Z80pack",
@@ -1148,6 +1165,7 @@ static struct formats {
     { "vt180",     "DEC VT-180",            &vt180_spec, 0, NULL, 1 },
     { "x820",      "Xerox 820",             &x820_spec, 0, NULL, 1 },
     { "hz89",      "Zenith Z89, Z17-SSSD",  &hz17_spec, 0, NULL, 1 },
+    { "hz100",     "Zenith Z100, DSDD",     &z100_spec, 0, NULL, 1 },
     { "magnolia",  "Zenith Z89, magnolia",  &magnolia_spec, 0, NULL, 1 },
     { "z80pack",   "z80pack 8\" format",    &z80pack_spec, 0, NULL, 1 },
     { NULL, NULL }
