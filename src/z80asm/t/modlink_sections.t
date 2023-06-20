@@ -97,7 +97,7 @@ capture_ok("z88dk-z80asm -b -l -m ${test}.o ${test}1.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF17
   Name: ${test}
   Section "": 0 bytes, ORG \$1234
   Section code: 28 bytes
@@ -116,16 +116,16 @@ Object  file ${test}.o at \$0000: Z80RMF16
     U         mes0
     U         mes0end
   Expressions:
-    E Cw \$0000 \$0001: mes1 (section code) (file ${test}.asm:6)
-    E Cw \$0003 \$0004: mes1end-mes1 (section code) (file ${test}.asm:7)
-    E Cw \$0006 \$0007: prmes (section code) (file ${test}.asm:13)
-    E Cw \$0009 \$000A: mes2 (section code) (file ${test}.asm:16)
-    E Cw \$000C \$000D: mes2end-mes2 (section code) (file ${test}.asm:17)
-    E Cw \$000F \$0010: prmes (section code) (file ${test}.asm:23)
-    E Cw \$0012 \$0013: mes0 (section code) (file ${test}.asm:25)
-    E Cw \$0015 \$0016: mes0end-mes0 (section code) (file ${test}.asm:26)
-    E Cw \$0018 \$0019: prmes (section code) (file ${test}.asm:27)
-Object  file ${test}1.o at \$0000: Z80RMF16
+    E Cw \$0000 \$0001 3 mes1 (section code) (file ${test}.asm:6)
+    E Cw \$0003 \$0004 3 mes1end-mes1 (section code) (file ${test}.asm:7)
+    E Cw \$0006 \$0007 3 prmes (section code) (file ${test}.asm:13)
+    E Cw \$0009 \$000A 3 mes2 (section code) (file ${test}.asm:16)
+    E Cw \$000C \$000D 3 mes2end-mes2 (section code) (file ${test}.asm:17)
+    E Cw \$000F \$0010 3 prmes (section code) (file ${test}.asm:23)
+    E Cw \$0012 \$0013 3 mes0 (section code) (file ${test}.asm:25)
+    E Cw \$0015 \$0016 3 mes0end-mes0 (section code) (file ${test}.asm:26)
+    E Cw \$0018 \$0019 3 prmes (section code) (file ${test}.asm:27)
+Object  file ${test}1.o at \$0000: Z80RMF17
   Name: ${test}1
   Section "": 0 bytes, ORG \$1234
   Section code: 9 bytes
@@ -203,19 +203,19 @@ capture_ok("z88dk-z80asm -b -l -m ${test}.o ${test}1.o ${test}2.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o ${test}2.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF17
   Name: ${test}
   Section code: 0 bytes
   Section data: 0 bytes
   Section bss: 1 bytes
     C \$0000: 03
-Object  file ${test}1.o at \$0000: Z80RMF16
+Object  file ${test}1.o at \$0000: Z80RMF17
   Name: ${test}1
   Section code: 0 bytes
   Section data: 1 bytes
     C \$0000: 02
   Section bss: 0 bytes
-Object  file ${test}2.o at \$0000: Z80RMF16
+Object  file ${test}2.o at \$0000: Z80RMF17
   Name: ${test}2
   Section code: 1 bytes
     C \$0000: 01

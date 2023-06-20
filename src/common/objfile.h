@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 #define MIN_VERSION				1
-#define MAX_VERSION				16
+#define MAX_VERSION				17
 #define CUR_VERSION				MAX_VERSION
 #define SIGNATURE_SIZE			8
 #define SIGNATURE_OBJ			"Z80RMF"
@@ -68,7 +68,8 @@ typedef struct expr_s
 	UT_string* text;
 	char	 type;
 	int		 asmpc;
-	int		 patch_ptr;
+	int		 code_pos;
+	int		 opcode_size;
 
 	struct section_s* section;		// weak
 

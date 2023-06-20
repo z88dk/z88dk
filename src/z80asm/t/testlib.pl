@@ -13,7 +13,7 @@ $ENV{PATH} = join($Config{path_sep},
 			"../../bin",
 			$ENV{PATH});
 
-my $OBJ_FILE_VERSION = "16";
+my $OBJ_FILE_VERSION = "17";
 
 use vars '$test', '$null';
 $test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
@@ -33,6 +33,8 @@ sub check_bin_file {
 	
 	my $diff = diff(\$exp_hex, \$got_hex, {STYLE => 'Context'});
 	is $diff, "", "bin file $got_file ok";
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -45,6 +47,8 @@ sub check_text_file {
 	
 	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Context'});
 	is $diff, "", "text file $got_file ok";
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -72,6 +76,8 @@ sub z80asm_ok {
     run_ok("z88dk-z80asm $options $files 2> ${test}.stderr");
     check_bin_file($bin_file, $bin);
     check_text_file("${test}.stderr", $exp_warn) if $exp_warn;
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -88,6 +94,8 @@ sub z80asm_nok {
     $files ||= $asm_file;
 
     capture_nok("z88dk-z80asm $options $files", $exp_err);
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -97,6 +105,8 @@ sub capture_ok {
     
     run_ok($cmd." > ${test}.stdout");
     check_text_file("${test}.stdout", $exp_out);
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -106,6 +116,8 @@ sub capture_nok {
 
     run_nok($cmd." 2> ${test}.stderr");
     check_text_file("${test}.stderr", $exp_err);
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -115,6 +127,8 @@ sub run_ok {
 	
 	ok 1, "Running: $cmd";
     ok 0==system($cmd), $cmd;
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -124,6 +138,8 @@ sub run_nok {
 	
 	ok 1, "Running: $cmd";
     ok 0!=system($cmd), $cmd;
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -158,10 +174,11 @@ sub objfile {
 	if ($args{EXPR}) {
 		store_ptr(\$o, $expr_addr);
 		for (@{$args{EXPR}}) {
-			@$_ == 8 or die;
-			my($type, $filename, $line_nr, $section, $asmptr, $ptr, $target_name, $text) = @$_;
+			@$_ == 9 or die;
+			my($type, $filename, $line_nr, $section, $asmptr, $ptr, $opcode_size, 
+			   $target_name, $text) = @$_;
 			$o .= $type . pack_lstring($filename) . pack("V", $line_nr) .
-			        pack_lstring($section) . pack("vv", $asmptr, $ptr) .
+			        pack_lstring($section) . pack("VVV", $asmptr, $ptr, $opcode_size) .
 					pack_lstring($target_name) . pack_lstring($text);
 		}
 		$o .= "\0";
@@ -269,6 +286,8 @@ sub spew {
 	if ($open_ok) {
 		print $fh join('', @data);
 	}
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -287,6 +306,8 @@ sub slurp {
 	else {
 		return "";
 	}
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 1;

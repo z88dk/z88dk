@@ -29,7 +29,7 @@ __size                          = \$0005 ; const, public, def, , ,
 END
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF16
+Object  file $test.o at \$0000: Z80RMF17
   Name: $test
   Section "": 5 bytes
     C \$0000: 01 05 00 00 00

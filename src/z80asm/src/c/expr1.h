@@ -128,6 +128,7 @@ struct Module1* module;			/* module where expression is patched (weak ref) */
 struct Section1* section;		/* section where expression is patched (weak ref) */
 int			asmpc;				/* ASMPC value during linking */
 int			code_pos;			/* Address to patch expression value */
+int			opcode_size;		/* opcode size to be able to compute jr offset */
 
 const char* filename;			/* file and line where expression defined, string in strpool */
 int			 line_num;			/* source line */

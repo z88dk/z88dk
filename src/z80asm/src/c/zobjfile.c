@@ -90,8 +90,9 @@ static long write_expr(FILE* fp)
 
 		xfwrite_wcount_cstr(expr->section->name, fp);	/* section name */
 
-		xfwrite_word(expr->asmpc, fp);					/* ASMPC */
-		xfwrite_word(expr->code_pos, fp);				/* patchptr */
+		xfwrite_dword(expr->asmpc, fp);					/* ASMPC */
+		xfwrite_dword(expr->code_pos, fp);				/* patchptr */
+		xfwrite_dword(expr->opcode_size, fp);			/* opcode size */
 		xfwrite_wcount_cstr(target_name, fp);			/* target symbol for expression */
 		xfwrite_wcount_cstr(Str_data(expr->text), fp);	/* expression */
 	}

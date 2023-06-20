@@ -132,6 +132,7 @@ for my $cpu (@CPUS) {
 
 sub add {
 	my($cpu, $asm, $bytes) = @_;
+	my @bytes = split ' ', $bytes;
 	
 	#say "$cpu\t$asm\t$bytes";
 	
@@ -266,7 +267,8 @@ sub add {
 	}
 	elsif ($asm =~ /%j/) {
 		my $asm1 = $asm =~ s/%j/ASMPC/r;
-		my $bytes1 = $bytes =~ s/%j/FE/r;
+		my $dist = @bytes==3 ? "FD" : "FE";
+		my $bytes1 = $bytes =~ s/%j/$dist/r;
 		add($cpu, $asm1, $bytes1);
 	}
 	elsif ($asm =~ /%c/) {

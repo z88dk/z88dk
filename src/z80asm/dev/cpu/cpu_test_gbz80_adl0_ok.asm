@@ -324,8 +324,8 @@
  dec l                          ; 2D
  dec sp                         ; 3B
  di                             ; F3
- djnz ASMPC                     ; 05 20 FE
- djnz b, ASMPC                  ; 05 20 FE
+ djnz ASMPC                     ; 05 20 FD
+ djnz b, ASMPC                  ; 05 20 FD
  dsub                           ; CD @__z80asm__sub_hl_bc
  ei                             ; FB
  ex (sp), hl                    ; CD @__z80asm__ex_sp_hl

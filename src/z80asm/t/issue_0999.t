@@ -24,7 +24,7 @@ END
 run_ok("zcc +zx -c -clib=new ${test}a.c ${test}b.c -o ${test}cons.o");
 
 capture_ok("z88dk-z80nm -a ${test}cons.o", <<END);
-Object  file ${test}cons.o at \$0000: Z80RMF16
+Object  file ${test}cons.o at \$0000: Z80RMF17
   Name: ${test}cons
   Section code_compiler: 8 bytes
     C \$0000: 21 64 00 C9 21 C8 00 C9

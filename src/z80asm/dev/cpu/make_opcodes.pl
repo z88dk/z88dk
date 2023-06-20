@@ -1493,23 +1493,22 @@ for my $cpu (@CPUS) {
 	}
 
 	# DJNZ
-	# TODO: check that address is correctly computed in DJNZ B', LABEL - 76 10 FE or 76 10 FD
 	if ($intel) {
 		# Emulate with "DEB B / JP NZ, nn" on 8080/8085
-		add($cpu, "djnz %j",	[dec_r('b')], [jp_f('_nz'), '%m', '%m']);
-		add($cpu, "djnz b, %j",	[dec_r('b')], [jp_f('_nz'), '%m', '%m']);
+		add($cpu, "djnz %j",	[dec_r('b'), jp_f('_nz'), '%m', '%m']);
+		add($cpu, "djnz b, %j",	[dec_r('b'), jp_f('_nz'), '%m', '%m']);
 	} 
 	elsif ($gameboy) {
 		# Emulate with "DEB B / JR NZ, nn" on GameBoy
-		add($cpu, "djnz %j",	[dec_r('b')], [jr_f('_nz'), '%j']);
-		add($cpu, "djnz b, %j",	[dec_r('b')], [jr_f('_nz'), '%j']);
+		add($cpu, "djnz %j",	[dec_r('b'), jr_f('_nz'), '%j']);
+		add($cpu, "djnz b, %j",	[dec_r('b'), jr_f('_nz'), '%j']);
 	} 
 	elsif ($rabbit) {
 		add($cpu, "djnz %j", 		[djnz(), '%j']);
 		add($cpu, "djnz b, %j", 	[djnz(), '%j']);
-		add($cpu, "djnz b', %j",	[$V{altd}], [djnz(), '%j']);
-		add($cpu, "altd djnz %j",	[$V{altd}], [djnz(), '%j']);
-		add($cpu, "altd djnz b, %j",[$V{altd}], [djnz(), '%j']);
+		add($cpu, "djnz b', %j",	[$V{altd}, djnz(), '%j']);
+		add($cpu, "altd djnz %j",	[$V{altd}, djnz(), '%j']);
+		add($cpu, "altd djnz b, %j",[$V{altd}, djnz(), '%j']);
 	}
 	else {
 		add($cpu, "djnz %j", 		[djnz(), '%j']);

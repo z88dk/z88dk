@@ -81,6 +81,9 @@ extern void reset_codearea( void );
 /* return size of current section */
 extern int get_section_size( Section1 *section );
 
+/* return size of current opcode */
+extern int get_cur_opcode_size(void);
+
 /* compute total size of all sections */
 extern int get_sections_size( void );
 
