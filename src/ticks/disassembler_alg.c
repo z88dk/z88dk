@@ -423,7 +423,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                     } else if ( israbbit() && z == 4 && y == 4 && state->index ) {
                         BUF_PRINTF("%-10s(%s),hl", "ldp", handle_register16(state,2, state->index)); 
                     } else if ( israbbit() && z == 5 && y == 4 && state->index ) {
-                        BUF_PRINTF("%-10s(%s),hl", "ldp", handle_addr16(state,opbuf1, sizeof(opbuf1)));
+                        BUF_PRINTF("%-10s(%s),%s", "ldp", handle_addr16(state,opbuf1, sizeof(opbuf1)), handle_register16(state,2, state->index));
                     } else if ( israbbit() && z == 4 && y == 5 && state->index ) {
                         BUF_PRINTF("%-10shl,(%s)", "ldp", handle_register16(state,2, state->index)); 
                     } else if ( israbbit() && z == 5 && y == 5 && state->index ) {
