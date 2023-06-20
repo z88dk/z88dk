@@ -17,7 +17,7 @@ all: dirs $(NEWLIB_TARGETS) $(OBJECTS) sp1-zx.lib
 
 sp1-zx.lib:
 	find obj -type f -name "*.o" > files.lst
-	z80asm -xsp1-zx @files.lst
+	z88dk-z80asm -xsp1-zx @files.lst
 	rm files.lst
 
 newlib-z80:
