@@ -717,7 +717,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     break;
                                 } else if ( x == 3 ) {
                                     if ( z == 0 && israbbit3k() ) {
-                                        char *r3k_instrs[] = { "uma", "umsa", "lsidr", "lsddr", "nop", "nop", "lsir", "lsdr"};
+                                        char *r3k_instrs[] = { "uma", "ums", "lsidr", "lsddr", "nop", "nop", "lsir", "lsdr"};
                                         BUF_PRINTF("%s",r3k_instrs[y]);
                                     } else if ( z == 1 && y != 6 && isr800() ) {
                                         BUF_PRINTF("%-10sa,%s","mulub", handle_register8(state, y, opbuf1, sizeof(opbuf1)));
