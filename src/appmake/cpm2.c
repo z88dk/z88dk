@@ -100,6 +100,25 @@ static disc_spec ampro_spec = {
 };
 
 
+// Apple II CP/M on Softcard
+static disc_spec apple2_spec = {
+    .name = "A2Softcard",
+    .sectors_per_track = 16,
+    .tracks = 35,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,6,12,3,9,15,14,5,11,2,8,7,13,4,10,1 }
+};
+
+
 static disc_spec attache_spec = {
     .name = "Attache",
     .disk_mode = MFM300,	
@@ -692,6 +711,25 @@ static disc_spec plus3_spec = {
 };
 
 
+// BBC Micro, Acorn Z80 2nd processor
+static disc_spec bbc_spec = {
+    .name = "BBC Micro",
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,2,4,1,3 }
+};
+
+
 static disc_spec bic_spec = {
     .name = "A1505/BIC",
     .sectors_per_track = 5,
@@ -1134,7 +1172,9 @@ static struct formats {
     { "alphatro",  "Alphatronic PC",        &alphatro_spec, 0, NULL, 1 },
     { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
     { "ampro",     "Ampro 48tpi",           &ampro_spec, 0, NULL, 1 },
+    { "apple2",    "Apple II Softcard",     &apple2_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
+    { "bbc",       "BBC Micro Z80CPU SSSD", &bbc_spec, 0, NULL, 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bigboard",  "X820/Bigboard, 8in",    &bigboard_spec, 0, NULL, 1 },
     { "bw12",      "Bondwell 12/14",        &bondwell12_spec, 0, NULL, 1 },
