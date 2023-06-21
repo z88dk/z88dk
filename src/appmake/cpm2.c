@@ -191,6 +191,26 @@ static disc_spec dmv_spec = {
 };
 
 
+// Eagle IIE-2 SSDD 96tpi
+static disc_spec eagle2_spec = {
+    .name = "Eagle II",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 192,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 1, 3 }
+};
+
+
 static disc_spec cpcsystem_spec = {
     .name = "CPCSystem",
     .sectors_per_track = 9,
@@ -1204,6 +1224,7 @@ static struct formats {
     { "corvette",  "Corvette", &corvette_spec, 32,         "\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8c\x01\x7f\x00\xc0\x00\x20\x00\x01\x00\x11", 1 },
     { "corvboot",  "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
+    { "eagle2",    "Eagle II",              &eagle2_spec, 0, NULL, 1 },
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
     { "fp1100",    "Casio FP1100",          &fp1100_spec, 0, NULL, 1 },
