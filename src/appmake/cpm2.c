@@ -1091,6 +1091,22 @@ static disc_spec corvette_spec = {
      .first_sector_offset = 1,
 };
 
+static disc_spec tim011_spec = {
+     .name = "Tim011",
+     .sectors_per_track = 5,
+     .tracks = 80,
+     .sides = 2,
+     .sector_size = 1024,
+     .gap3_length = 0x2a,   
+     .filler_byte = 0xe5,
+     .boottracks = 2,
+     .directory_entries = 256,
+     .alternate_sides = 1,
+     .extent_size = 2048,
+     .byte_size_extents = 0,  
+     .first_sector_offset = 1,
+};
+
 static disc_spec corvetteBOOT_spec = {
      .name = "Corvette-boot",
      .sectors_per_track = 5,
@@ -1257,6 +1273,7 @@ static struct formats {
     { "televideo", "Televideo TS80x/TPC1",  &televideo_spec, 0, NULL, 1 },
     { "tiki100ss", "Tiki 100 (200k)",       &tiki100_ss_spec, 0, NULL, 1 },
     { "tiki100ds", "Tiki 100 (400k)",       &tiki100_ds_spec, 0, NULL, 1 },
+    { "tim011",    "TIM011 (DSDD 3.5\")",   &tim011_spec, 0, NULL, 1 },
     { "omikron",   "TRS80 I Omikron",       &omikron_spec, 0, NULL, 1 },
     { "lifeboat",  "TRS80 II Lifeboat",     &lifeboat_spec, 0, NULL, 1 },
     { "fmgcpm",    "TRS80 II FMG CP/M",     &fmgcpm_spec, 0, NULL, 1 },
