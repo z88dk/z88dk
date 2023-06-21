@@ -261,6 +261,25 @@ static disc_spec microbee_spec = {
 };
 
 
+// PMC-101 MicroMate (Type "A")
+static disc_spec pmc101a_spec = {
+    .name = "PMC-101_A",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+};
+
+
 static disc_spec md2_spec = {
     .name = "Morrow_MD2",
     .disk_mode = MFM250,
@@ -1207,8 +1226,9 @@ static struct formats {
     { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "pcw40",     "Amstrad PCW, 40T",      &pcw40_spec, 16, "\x00\x00\x28\x09\x02\x01\x03\x02\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "plus3",     "Spectrum +3 173k",      &plus3_spec, 0, NULL, 1 },
+    { "pmc101a",   "PMC-101 MicroMate",     &pmc101a_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
-    { "rainbow",    "DEC Rainbow 100",      &rainbow_spec, 0, NULL, 1 },
+    { "rainbow",   "DEC Rainbow 100",       &rainbow_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
     { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
