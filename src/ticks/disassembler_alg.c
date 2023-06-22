@@ -470,7 +470,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         else {
                             // gbz80 codes
                             if ( y == 4 ) BUF_PRINTF("%-10s($ff00+%s),a","ld", handle_immed8(state, opbuf1, sizeof(opbuf2)));
-                            else if ( y == 5 ) BUF_PRINTF("%-10ssp,%s","add", handle_immed8(state, opbuf1, sizeof(opbuf2)));
+                            else if ( y == 5 ) BUF_PRINTF("%-10ssp,%s","add", handle_displacement(state, opbuf1, sizeof(opbuf2)));
                             else if ( y == 6 ) BUF_PRINTF("%-10sa,($ff00+%s)","ld", handle_immed8(state, opbuf1, sizeof(opbuf2)));
                             else if ( y == 7 ) BUF_PRINTF("%-10shl,sp+%s","ld", handle_immed8(state, opbuf1, sizeof(opbuf2)));
                         }
