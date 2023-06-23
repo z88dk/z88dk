@@ -31,24 +31,24 @@ IF __CLIB_OPT_IMATH <= 50
 l_mulu_40_32x8:
 
    exx
-   
+
    push bc
    push de
    push hl
-   
+
    exx
-   
+
    call l_small_mul_40_32x8
-   
+
    exx
-   
+
    pop hl
    pop de
    pop bc
-   
+
    exx
    ret
-   
+
 ENDIF
 
 IF __CLIB_OPT_IMATH > 50

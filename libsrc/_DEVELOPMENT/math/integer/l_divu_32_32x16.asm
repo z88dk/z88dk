@@ -23,12 +23,12 @@ l_divu_32_32x16:
 l0_divu_32_32x16:
 
    push bc
-   
+
    exx
-   
+
    pop hl
    ld de,0
-   
+
    jp nc, l0_small_divu_32_32x32
    jp l_small_divu_32_32x32
 
@@ -38,7 +38,7 @@ IF __CLIB_OPT_IMATH > 50
 
    EXTERN l_fast_divu_32_32x16, l0_fast_divu_32_32x16
    
-   defc  l_divu_32_32x16 =  l_fast_divu_32_32x16
+   defc l_divu_32_32x16 =  l_fast_divu_32_32x16
    defc l0_divu_32_32x16 = l0_fast_divu_32_32x16
 
 ENDIF

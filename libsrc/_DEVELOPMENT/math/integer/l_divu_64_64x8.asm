@@ -16,7 +16,7 @@ IF __CLIB_OPT_IMATH <= 50
 
    EXTERN l_small_divu_64_64x8, l0_small_divu_64_64x8
 
-   defc  l_divu_64_64x8 =  l_small_divu_64_64x8
+   defc l_divu_64_64x8 =  l_small_divu_64_64x8
    defc l0_divu_64_64x8 = l0_small_divu_64_64x8
 
 ENDIF
@@ -24,8 +24,8 @@ ENDIF
 IF __CLIB_OPT_IMATH > 50
 
    EXTERN l_fast_divu_64_64x8, l0_fast_divu_64_64x8
-   
-   defc  l_divu_64_64x8 =  l_fast_divu_64_64x8
+
+   defc l_divu_64_64x8 =  l_fast_divu_64_64x8
    defc l0_divu_64_64x8 = l0_fast_divu_64_64x8
 
 ENDIF

@@ -23,20 +23,20 @@ l_divu_32_32x8:
 l0_divu_32_32x8:
 
    ld a,c
-   
+
    exx
-   
+
    ld l,a
    ld de,0
    ld h,d
-   
+
    call nc, l0_small_divu_32_32x32
    call c, l_small_divu_32_32x32
-   
+
    exx
    ld a,l
    exx
-   
+
    ret
 
 ENDIF
@@ -44,8 +44,8 @@ ENDIF
 IF __CLIB_OPT_IMATH > 50
 
    EXTERN l_fast_divu_32_32x8, l0_fast_divu_32_32x8
-   
-   defc  l_divu_32_32x8 =  l_fast_divu_32_32x8
+
+   defc l_divu_32_32x8 =  l_fast_divu_32_32x8
    defc l0_divu_32_32x8 = l0_fast_divu_32_32x8
 
 ENDIF
