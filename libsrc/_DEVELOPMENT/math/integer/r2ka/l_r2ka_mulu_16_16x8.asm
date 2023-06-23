@@ -19,7 +19,7 @@ l_r2ka_mulu_16_16x8:
     ;
     ; uses  : bc, de, hl
 
-    ld bc,hl                    ; multiplier to bc
+    ld c,l                      ; multiplier to bc
     ld b,0                      ; extended 16 bit unsigned multiplier
 
     mul                         ; signed multiply of BC and DE,

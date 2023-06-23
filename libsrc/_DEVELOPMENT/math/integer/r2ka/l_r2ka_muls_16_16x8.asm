@@ -17,7 +17,7 @@ l_r2ka_muls_16_16x8:
     ;
     ; uses  : af, bc, de, hl
 
-    ld bc,hl                    ; multiplier to bc
+    ld c,l                      ; multiplier to c
 
     ld a,c                      ; c = LSB of multiplier
     rla                         ; sign to carry to extend
