@@ -1,0 +1,5 @@
+target/tim011/stdio/generic_console
+target/tim011/stdio/generic_console_vpeek
+target/tim011/stdio/generic_console_ioctl
+target/tim011/stdio/conio_vars
+target/tim011/stdio/CRT_FONT

@@ -128,6 +128,7 @@ TOCREATE += $(call check_target,ti83,ti83_clib.lib)
 TOCREATE += $(call check_target,ti83p,ti83p_clib.lib)
 TOCREATE += $(call check_target,ti85,ti85_clib.lib)
 TOCREATE += $(call check_target,ti86,ti86_clib.lib)
+TOCREATE += $(call check_target,tim011,tim011.lib)
 TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
 TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxtrs80m2.lib gfxtrs80m4.lib gfxeg2000.lib grafyx4_3.lib grafyx4.lib gfxhrg1.lib)
 TOCREATE += $(call check_target,ts2068, ts2068_clib.lib m2068.lib)
@@ -734,6 +735,14 @@ x1_cpm.lib: x1_clib.lib
 	$(MAKE) -C target/x1
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=x1
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(TARGET_DIRECTORY)/x1/x1_common.lst
+
+tim011.lib: cpm_clib.lib
+	@echo ''
+	@echo '--- Building Tim-011 Library ---'
+	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=tim011
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide gencon" SUBTYPE=tim011
+	TARGET=tim011 TYPE=z180 $(LIBLINKER) -mz180 -DFORtim011 -x$(OUTPUT_DIRECTORY)/tim011.lib @$(TARGET_DIRECTORY)/tim011/tim011.lst
 
 x820ii.lib: cpm_clib.lib
 	@echo ''
