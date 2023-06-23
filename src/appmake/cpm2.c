@@ -677,6 +677,22 @@ static disc_spec montezuma_spec = {
     .skew_tab = { 0, 2, 4, 6, 8, 10, 12, 14, 16, 1, 3, 5, 7, 9, 11, 13, 15, 17 }
 };
 
+static disc_spec trs80_cpm3_spec = {
+    .name = "TRS80M4CPM3",
+    .disk_mode = MFM250,
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
 
 static disc_spec svi40ss_spec = {
     .name = "SVI40SS",
@@ -1263,6 +1279,7 @@ static struct formats {
     { "ptcpm",     "TRS80 II PickelsTrout", &ptcpm_spec, 0, NULL, 1 },
     { "merchant",  "TRS80 III MemMerchant", &merchant_spec, 0, NULL, 1 },
     { "montezuma", "TRS80 4 Montezuma",     &montezuma_spec, 0, NULL, 1 },
+    { "m4cpm3",    "TRS80 4 CP/M Plus",     &trs80_cpm3_spec, 0, NULL, 1 },
     { "vector06c", "Vector 06c",            &vector06c_spec, 0, NULL, 1 },
     { "v1050",     "Visual 1050",           &v1050_spec, 0, NULL, 1 },
     { "vt180",     "DEC VT-180",            &vt180_spec, 0, NULL, 1 },
