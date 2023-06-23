@@ -141,7 +141,7 @@ sub add {
 		$asm =~ s/%j/%m/;
 	}
 	
-	if ($asm =~ /rst(\.[ls])? %c/) {
+	if ($asm =~ /rst(\.(s|sil|l|lis))? %c/) {
 		for my $c (0..8,0x10,0x18,0x20,0x28,0x30,0x38) {
 			my $asm1 = $asm =~ s/%c/$c/r;
 			$c *= 8 if $c < 8;
@@ -169,6 +169,14 @@ sub add {
 			(my $asm1 = $asm) =~ s/%c/$c/;
 			$all_opcodes{ALL}{$asm1} = 1;
 		}
+	}
+	elsif ($asm =~ /^ldh .*\(c\)/) {
+		add($cpu, $asm =~ s/\(c\)/( c )/r, $bytes);	# ( c ) to break recursion
+		add($cpu, $asm =~ s/ldh /ld /r =~ s/\(c\)/(0xff00+c)/r, $bytes);
+	}
+	elsif ($asm =~ /^ldh .*\(%h\)/) {
+		add($cpu, $asm =~ s/\(%h\)/( %h )/r, $bytes);	# ( %h ) to break recursion
+		add($cpu, $asm =~ s/ldh /ld /r =~ s/\(%h\)/(0xff00+%h)/r, $bytes);
 	}
 	elsif ($asm =~ /%d/) {
 		my $asm1 = $asm =~ s/\+%d/+126/r;

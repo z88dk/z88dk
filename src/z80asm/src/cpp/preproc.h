@@ -118,7 +118,9 @@ private:
 	bool check_macro();
 	bool check_macro_call();
 	bool check_reptx();
-
+	bool check_gbz80_opcodes();
+	bool check_z80_ld_bit_opcodes();
+	
 	void do_if();
 	void do_else();
 	void do_endif();

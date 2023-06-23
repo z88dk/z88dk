@@ -45,10 +45,33 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 
+enum KeywordFlags {
+	KW_REG_8 		= 1 << 1,
+	KW_REG_IXY		= 1 << 2,
+	KW_Z80_LD_BIT 	= 1 << 3,
+};
+
 static unordered_map<string, Keyword> keyword_table = {
-#	define X(id, text)		{ text, Keyword::id },
+#	define X(id, text, flags)		{ text, Keyword::id },
 #	include "keyword.def"
 };
+
+static int keyword_flags[] = {
+#	define X(id, text, flags)		flags,
+#	include "keyword.def"
+};
+
+bool keyword_is_reg_8(Keyword keyword) { 
+	return keyword_flags[static_cast<int>(keyword)] & KW_REG_8; 
+}
+
+bool keyword_is_reg_ixy(Keyword keyword) { 
+	return keyword_flags[static_cast<int>(keyword)] & KW_REG_IXY; 
+}
+
+bool keyword_is_z80_ld_bit(Keyword keyword) { 
+	return keyword_flags[static_cast<int>(keyword)] & KW_Z80_LD_BIT; 
+}
 
 static int a2i(const char* str, int base) {
 	return (int)strtol(str, NULL, base);

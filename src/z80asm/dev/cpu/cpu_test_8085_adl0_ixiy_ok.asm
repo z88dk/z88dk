@@ -1143,6 +1143,7 @@
  rst 6                          ; F7
  rst 7                          ; FF
  rst 8                          ; CF
+ rst v, 64                      ; CB
  rstv                           ; CB
  rv                             ; E8
  rz                             ; C8
