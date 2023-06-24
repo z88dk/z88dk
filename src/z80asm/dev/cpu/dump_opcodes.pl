@@ -78,7 +78,6 @@ sub expand_ez80 {
 				elsif ($ops[0][0] eq '{ADL0}?') {
 					shift @ops;
 					my(@adl0, @adl1);
-					shift @ops;
 					while ($ops[0][0] ne ':') {
 						push @adl0, shift @ops;
 					}

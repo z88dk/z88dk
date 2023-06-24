@@ -15320,7 +15320,7 @@
 |c_c %m                 |8080    |DC %m %m                                 |
 |c_c %m                 |8085    |DC %m %m                                 |
 |c_c %m                 |ez80    |DC %m %m %m                              |
-|c_c %m                 |ez80_z80|                                         |
+|c_c %m                 |ez80_z80|DC %m %m                                 |
 |c_c %m                 |gbz80   |DC %m %m                                 |
 |c_c %m                 |r2ka    |30 03 CD %m %m                           |
 |c_c %m                 |r3k     |30 03 CD %m %m                           |
@@ -15334,7 +15334,7 @@
 |c_m %m                 |8080    |FC %m %m                                 |
 |c_m %m                 |8085    |FC %m %m                                 |
 |c_m %m                 |ez80    |FC %m %m %m                              |
-|c_m %m                 |ez80_z80|                                         |
+|c_m %m                 |ez80_z80|FC %m %m                                 |
 |c_m %m                 |r2ka    |F2 %t %t CD %m %m                        |
 |c_m %m                 |r3k     |F2 %t %t CD %m %m                        |
 |c_m %m                 |z180    |FC %m %m                                 |
@@ -15343,7 +15343,7 @@
 |c_nc %m                |8080    |D4 %m %m                                 |
 |c_nc %m                |8085    |D4 %m %m                                 |
 |c_nc %m                |ez80    |D4 %m %m %m                              |
-|c_nc %m                |ez80_z80|                                         |
+|c_nc %m                |ez80_z80|D4 %m %m                                 |
 |c_nc %m                |gbz80   |D4 %m %m                                 |
 |c_nc %m                |r2ka    |38 03 CD %m %m                           |
 |c_nc %m                |r3k     |38 03 CD %m %m                           |
@@ -15353,7 +15353,7 @@
 |c_nv %m                |8080    |E4 %m %m                                 |
 |c_nv %m                |8085    |E4 %m %m                                 |
 |c_nv %m                |ez80    |E4 %m %m %m                              |
-|c_nv %m                |ez80_z80|                                         |
+|c_nv %m                |ez80_z80|E4 %m %m                                 |
 |c_nv %m                |r2ka    |EA %t %t CD %m %m                        |
 |c_nv %m                |r3k     |EA %t %t CD %m %m                        |
 |c_nv %m                |z180    |E4 %m %m                                 |
@@ -15362,7 +15362,7 @@
 |c_nz %m                |8080    |C4 %m %m                                 |
 |c_nz %m                |8085    |C4 %m %m                                 |
 |c_nz %m                |ez80    |C4 %m %m %m                              |
-|c_nz %m                |ez80_z80|                                         |
+|c_nz %m                |ez80_z80|C4 %m %m                                 |
 |c_nz %m                |gbz80   |C4 %m %m                                 |
 |c_nz %m                |r2ka    |28 03 CD %m %m                           |
 |c_nz %m                |r3k     |28 03 CD %m %m                           |
@@ -15372,7 +15372,7 @@
 |c_p %m                 |8080    |F4 %m %m                                 |
 |c_p %m                 |8085    |F4 %m %m                                 |
 |c_p %m                 |ez80    |F4 %m %m %m                              |
-|c_p %m                 |ez80_z80|                                         |
+|c_p %m                 |ez80_z80|F4 %m %m                                 |
 |c_p %m                 |r2ka    |FA %t %t CD %m %m                        |
 |c_p %m                 |r3k     |FA %t %t CD %m %m                        |
 |c_p %m                 |z180    |F4 %m %m                                 |
@@ -15381,7 +15381,7 @@
 |c_pe %m                |8080    |EC %m %m                                 |
 |c_pe %m                |8085    |EC %m %m                                 |
 |c_pe %m                |ez80    |EC %m %m %m                              |
-|c_pe %m                |ez80_z80|                                         |
+|c_pe %m                |ez80_z80|EC %m %m                                 |
 |c_pe %m                |r2ka    |E2 %t %t CD %m %m                        |
 |c_pe %m                |r3k     |E2 %t %t CD %m %m                        |
 |c_pe %m                |z180    |EC %m %m                                 |
@@ -15390,7 +15390,7 @@
 |c_po %m                |8080    |E4 %m %m                                 |
 |c_po %m                |8085    |E4 %m %m                                 |
 |c_po %m                |ez80    |E4 %m %m %m                              |
-|c_po %m                |ez80_z80|                                         |
+|c_po %m                |ez80_z80|E4 %m %m                                 |
 |c_po %m                |r2ka    |EA %t %t CD %m %m                        |
 |c_po %m                |r3k     |EA %t %t CD %m %m                        |
 |c_po %m                |z180    |E4 %m %m                                 |
@@ -15399,7 +15399,7 @@
 |c_v %m                 |8080    |EC %m %m                                 |
 |c_v %m                 |8085    |EC %m %m                                 |
 |c_v %m                 |ez80    |EC %m %m %m                              |
-|c_v %m                 |ez80_z80|                                         |
+|c_v %m                 |ez80_z80|EC %m %m                                 |
 |c_v %m                 |r2ka    |E2 %t %t CD %m %m                        |
 |c_v %m                 |r3k     |E2 %t %t CD %m %m                        |
 |c_v %m                 |z180    |EC %m %m                                 |
@@ -15408,7 +15408,7 @@
 |c_z %m                 |8080    |CC %m %m                                 |
 |c_z %m                 |8085    |CC %m %m                                 |
 |c_z %m                 |ez80    |CC %m %m %m                              |
-|c_z %m                 |ez80_z80|                                         |
+|c_z %m                 |ez80_z80|CC %m %m                                 |
 |c_z %m                 |gbz80   |CC %m %m                                 |
 |c_z %m                 |r2ka    |20 03 CD %m %m                           |
 |c_z %m                 |r3k     |20 03 CD %m %m                           |
@@ -15418,7 +15418,7 @@
 |call %m                |8080    |CD %m %m                                 |
 |call %m                |8085    |CD %m %m                                 |
 |call %m                |ez80    |CD %m %m %m                              |
-|call %m                |ez80_z80|                                         |
+|call %m                |ez80_z80|CD %m %m                                 |
 |call %m                |gbz80   |CD %m %m                                 |
 |call %m                |r2ka    |CD %m %m                                 |
 |call %m                |r3k     |CD %m %m                                 |
@@ -15428,7 +15428,7 @@
 |call c, %m             |8080    |DC %m %m                                 |
 |call c, %m             |8085    |DC %m %m                                 |
 |call c, %m             |ez80    |DC %m %m %m                              |
-|call c, %m             |ez80_z80|                                         |
+|call c, %m             |ez80_z80|DC %m %m                                 |
 |call c, %m             |gbz80   |DC %m %m                                 |
 |call c, %m             |r2ka    |30 03 CD %m %m                           |
 |call c, %m             |r3k     |30 03 CD %m %m                           |
@@ -15442,7 +15442,7 @@
 |call m, %m             |8080    |FC %m %m                                 |
 |call m, %m             |8085    |FC %m %m                                 |
 |call m, %m             |ez80    |FC %m %m %m                              |
-|call m, %m             |ez80_z80|                                         |
+|call m, %m             |ez80_z80|FC %m %m                                 |
 |call m, %m             |r2ka    |F2 %t %t CD %m %m                        |
 |call m, %m             |r3k     |F2 %t %t CD %m %m                        |
 |call m, %m             |z180    |FC %m %m                                 |
@@ -15451,7 +15451,7 @@
 |call nc, %m            |8080    |D4 %m %m                                 |
 |call nc, %m            |8085    |D4 %m %m                                 |
 |call nc, %m            |ez80    |D4 %m %m %m                              |
-|call nc, %m            |ez80_z80|                                         |
+|call nc, %m            |ez80_z80|D4 %m %m                                 |
 |call nc, %m            |gbz80   |D4 %m %m                                 |
 |call nc, %m            |r2ka    |38 03 CD %m %m                           |
 |call nc, %m            |r3k     |38 03 CD %m %m                           |
@@ -15461,7 +15461,7 @@
 |call nv, %m            |8080    |E4 %m %m                                 |
 |call nv, %m            |8085    |E4 %m %m                                 |
 |call nv, %m            |ez80    |E4 %m %m %m                              |
-|call nv, %m            |ez80_z80|                                         |
+|call nv, %m            |ez80_z80|E4 %m %m                                 |
 |call nv, %m            |r2ka    |EA %t %t CD %m %m                        |
 |call nv, %m            |r3k     |EA %t %t CD %m %m                        |
 |call nv, %m            |z180    |E4 %m %m                                 |
@@ -15470,7 +15470,7 @@
 |call nz, %m            |8080    |C4 %m %m                                 |
 |call nz, %m            |8085    |C4 %m %m                                 |
 |call nz, %m            |ez80    |C4 %m %m %m                              |
-|call nz, %m            |ez80_z80|                                         |
+|call nz, %m            |ez80_z80|C4 %m %m                                 |
 |call nz, %m            |gbz80   |C4 %m %m                                 |
 |call nz, %m            |r2ka    |28 03 CD %m %m                           |
 |call nz, %m            |r3k     |28 03 CD %m %m                           |
@@ -15480,7 +15480,7 @@
 |call p, %m             |8080    |F4 %m %m                                 |
 |call p, %m             |8085    |F4 %m %m                                 |
 |call p, %m             |ez80    |F4 %m %m %m                              |
-|call p, %m             |ez80_z80|                                         |
+|call p, %m             |ez80_z80|F4 %m %m                                 |
 |call p, %m             |r2ka    |FA %t %t CD %m %m                        |
 |call p, %m             |r3k     |FA %t %t CD %m %m                        |
 |call p, %m             |z180    |F4 %m %m                                 |
@@ -15489,7 +15489,7 @@
 |call pe, %m            |8080    |EC %m %m                                 |
 |call pe, %m            |8085    |EC %m %m                                 |
 |call pe, %m            |ez80    |EC %m %m %m                              |
-|call pe, %m            |ez80_z80|                                         |
+|call pe, %m            |ez80_z80|EC %m %m                                 |
 |call pe, %m            |r2ka    |E2 %t %t CD %m %m                        |
 |call pe, %m            |r3k     |E2 %t %t CD %m %m                        |
 |call pe, %m            |z180    |EC %m %m                                 |
@@ -15498,7 +15498,7 @@
 |call po, %m            |8080    |E4 %m %m                                 |
 |call po, %m            |8085    |E4 %m %m                                 |
 |call po, %m            |ez80    |E4 %m %m %m                              |
-|call po, %m            |ez80_z80|                                         |
+|call po, %m            |ez80_z80|E4 %m %m                                 |
 |call po, %m            |r2ka    |EA %t %t CD %m %m                        |
 |call po, %m            |r3k     |EA %t %t CD %m %m                        |
 |call po, %m            |z180    |E4 %m %m                                 |
@@ -15507,7 +15507,7 @@
 |call v, %m             |8080    |EC %m %m                                 |
 |call v, %m             |8085    |EC %m %m                                 |
 |call v, %m             |ez80    |EC %m %m %m                              |
-|call v, %m             |ez80_z80|                                         |
+|call v, %m             |ez80_z80|EC %m %m                                 |
 |call v, %m             |r2ka    |E2 %t %t CD %m %m                        |
 |call v, %m             |r3k     |E2 %t %t CD %m %m                        |
 |call v, %m             |z180    |EC %m %m                                 |
@@ -15516,7 +15516,7 @@
 |call z, %m             |8080    |CC %m %m                                 |
 |call z, %m             |8085    |CC %m %m                                 |
 |call z, %m             |ez80    |CC %m %m %m                              |
-|call z, %m             |ez80_z80|                                         |
+|call z, %m             |ez80_z80|CC %m %m                                 |
 |call z, %m             |gbz80   |CC %m %m                                 |
 |call z, %m             |r2ka    |20 03 CD %m %m                           |
 |call z, %m             |r3k     |20 03 CD %m %m                           |
@@ -15524,49 +15524,49 @@
 |call z, %m             |z80     |CC %m %m                                 |
 |call z, %m             |z80n    |CC %m %m                                 |
 |call.il %m             |ez80    |5B CD %m %m %m                           |
-|call.il %m             |ez80_z80|CD %m %m %m                              |
+|call.il %m             |ez80_z80|52 CD %m %m %m                           |
 |call.il c, %m          |ez80    |5B DC %m %m %m                           |
-|call.il c, %m          |ez80_z80|DC %m %m %m                              |
+|call.il c, %m          |ez80_z80|52 DC %m %m %m                           |
 |call.il m, %m          |ez80    |5B FC %m %m %m                           |
-|call.il m, %m          |ez80_z80|FC %m %m %m                              |
+|call.il m, %m          |ez80_z80|52 FC %m %m %m                           |
 |call.il nc, %m         |ez80    |5B D4 %m %m %m                           |
-|call.il nc, %m         |ez80_z80|D4 %m %m %m                              |
+|call.il nc, %m         |ez80_z80|52 D4 %m %m %m                           |
 |call.il nv, %m         |ez80    |5B E4 %m %m %m                           |
-|call.il nv, %m         |ez80_z80|E4 %m %m %m                              |
+|call.il nv, %m         |ez80_z80|52 E4 %m %m %m                           |
 |call.il nz, %m         |ez80    |5B C4 %m %m %m                           |
-|call.il nz, %m         |ez80_z80|C4 %m %m %m                              |
+|call.il nz, %m         |ez80_z80|52 C4 %m %m %m                           |
 |call.il p, %m          |ez80    |5B F4 %m %m %m                           |
-|call.il p, %m          |ez80_z80|F4 %m %m %m                              |
+|call.il p, %m          |ez80_z80|52 F4 %m %m %m                           |
 |call.il pe, %m         |ez80    |5B EC %m %m %m                           |
-|call.il pe, %m         |ez80_z80|EC %m %m %m                              |
+|call.il pe, %m         |ez80_z80|52 EC %m %m %m                           |
 |call.il po, %m         |ez80    |5B E4 %m %m %m                           |
-|call.il po, %m         |ez80_z80|E4 %m %m %m                              |
+|call.il po, %m         |ez80_z80|52 E4 %m %m %m                           |
 |call.il v, %m          |ez80    |5B EC %m %m %m                           |
-|call.il v, %m          |ez80_z80|EC %m %m %m                              |
+|call.il v, %m          |ez80_z80|52 EC %m %m %m                           |
 |call.il z, %m          |ez80    |5B CC %m %m %m                           |
-|call.il z, %m          |ez80_z80|CC %m %m %m                              |
+|call.il z, %m          |ez80_z80|52 CC %m %m %m                           |
 |call.is %m             |ez80    |49 CD %m %m                              |
-|call.is %m             |ez80_z80|CD %m %m                                 |
+|call.is %m             |ez80_z80|40 CD %m %m                              |
 |call.is c, %m          |ez80    |49 DC %m %m                              |
-|call.is c, %m          |ez80_z80|DC %m %m                                 |
+|call.is c, %m          |ez80_z80|40 DC %m %m                              |
 |call.is m, %m          |ez80    |49 FC %m %m                              |
-|call.is m, %m          |ez80_z80|FC %m %m                                 |
+|call.is m, %m          |ez80_z80|40 FC %m %m                              |
 |call.is nc, %m         |ez80    |49 D4 %m %m                              |
-|call.is nc, %m         |ez80_z80|D4 %m %m                                 |
+|call.is nc, %m         |ez80_z80|40 D4 %m %m                              |
 |call.is nv, %m         |ez80    |49 E4 %m %m                              |
-|call.is nv, %m         |ez80_z80|E4 %m %m                                 |
+|call.is nv, %m         |ez80_z80|40 E4 %m %m                              |
 |call.is nz, %m         |ez80    |49 C4 %m %m                              |
-|call.is nz, %m         |ez80_z80|C4 %m %m                                 |
+|call.is nz, %m         |ez80_z80|40 C4 %m %m                              |
 |call.is p, %m          |ez80    |49 F4 %m %m                              |
-|call.is p, %m          |ez80_z80|F4 %m %m                                 |
+|call.is p, %m          |ez80_z80|40 F4 %m %m                              |
 |call.is pe, %m         |ez80    |49 EC %m %m                              |
-|call.is pe, %m         |ez80_z80|EC %m %m                                 |
+|call.is pe, %m         |ez80_z80|40 EC %m %m                              |
 |call.is po, %m         |ez80    |49 E4 %m %m                              |
-|call.is po, %m         |ez80_z80|E4 %m %m                                 |
+|call.is po, %m         |ez80_z80|40 E4 %m %m                              |
 |call.is v, %m          |ez80    |49 EC %m %m                              |
-|call.is v, %m          |ez80_z80|EC %m %m                                 |
+|call.is v, %m          |ez80_z80|40 EC %m %m                              |
 |call.is z, %m          |ez80    |49 CC %m %m                              |
-|call.is z, %m          |ez80_z80|CC %m %m                                 |
+|call.is z, %m          |ez80_z80|40 CC %m %m                              |
 |call.lil %m            |ez80    |5B CD %m %m %m                           |
 |call.lis %m            |ez80    |49 CD %m %m                              |
 |call.sil %m            |ez80_z80|52 CD %m %m %m                           |
@@ -15574,7 +15574,7 @@
 |cc %m                  |8080    |DC %m %m                                 |
 |cc %m                  |8085    |DC %m %m                                 |
 |cc %m                  |ez80    |DC %m %m %m                              |
-|cc %m                  |ez80_z80|                                         |
+|cc %m                  |ez80_z80|DC %m %m                                 |
 |cc %m                  |gbz80   |DC %m %m                                 |
 |cc %m                  |r2ka    |30 03 CD %m %m                           |
 |cc %m                  |r3k     |30 03 CD %m %m                           |
@@ -15600,7 +15600,7 @@
 |cm %m                  |8080    |FC %m %m                                 |
 |cm %m                  |8085    |FC %m %m                                 |
 |cm %m                  |ez80    |FC %m %m %m                              |
-|cm %m                  |ez80_z80|                                         |
+|cm %m                  |ez80_z80|FC %m %m                                 |
 |cm %m                  |r2ka    |F2 %t %t CD %m %m                        |
 |cm %m                  |r3k     |F2 %t %t CD %m %m                        |
 |cm %m                  |z180    |FC %m %m                                 |
@@ -16003,7 +16003,7 @@
 |cnc %m                 |8080    |D4 %m %m                                 |
 |cnc %m                 |8085    |D4 %m %m                                 |
 |cnc %m                 |ez80    |D4 %m %m %m                              |
-|cnc %m                 |ez80_z80|                                         |
+|cnc %m                 |ez80_z80|D4 %m %m                                 |
 |cnc %m                 |gbz80   |D4 %m %m                                 |
 |cnc %m                 |r2ka    |38 03 CD %m %m                           |
 |cnc %m                 |r3k     |38 03 CD %m %m                           |
@@ -16013,7 +16013,7 @@
 |cnv %m                 |8080    |E4 %m %m                                 |
 |cnv %m                 |8085    |E4 %m %m                                 |
 |cnv %m                 |ez80    |E4 %m %m %m                              |
-|cnv %m                 |ez80_z80|                                         |
+|cnv %m                 |ez80_z80|E4 %m %m                                 |
 |cnv %m                 |r2ka    |EA %t %t CD %m %m                        |
 |cnv %m                 |r3k     |EA %t %t CD %m %m                        |
 |cnv %m                 |z180    |E4 %m %m                                 |
@@ -16022,7 +16022,7 @@
 |cnz %m                 |8080    |C4 %m %m                                 |
 |cnz %m                 |8085    |C4 %m %m                                 |
 |cnz %m                 |ez80    |C4 %m %m %m                              |
-|cnz %m                 |ez80_z80|                                         |
+|cnz %m                 |ez80_z80|C4 %m %m                                 |
 |cnz %m                 |gbz80   |C4 %m %m                                 |
 |cnz %m                 |r2ka    |28 03 CD %m %m                           |
 |cnz %m                 |r3k     |28 03 CD %m %m                           |
@@ -16424,7 +16424,7 @@
 |cpe %m                 |8080    |EC %m %m                                 |
 |cpe %m                 |8085    |EC %m %m                                 |
 |cpe %m                 |ez80    |EC %m %m %m                              |
-|cpe %m                 |ez80_z80|                                         |
+|cpe %m                 |ez80_z80|EC %m %m                                 |
 |cpe %m                 |r2ka    |E2 %t %t CD %m %m                        |
 |cpe %m                 |r3k     |E2 %t %t CD %m %m                        |
 |cpe %m                 |z180    |EC %m %m                                 |
@@ -16493,7 +16493,7 @@
 |cpo %m                 |8080    |E4 %m %m                                 |
 |cpo %m                 |8085    |E4 %m %m                                 |
 |cpo %m                 |ez80    |E4 %m %m %m                              |
-|cpo %m                 |ez80_z80|                                         |
+|cpo %m                 |ez80_z80|E4 %m %m                                 |
 |cpo %m                 |r2ka    |EA %t %t CD %m %m                        |
 |cpo %m                 |r3k     |EA %t %t CD %m %m                        |
 |cpo %m                 |z180    |E4 %m %m                                 |
@@ -16502,7 +16502,7 @@
 |cv %m                  |8080    |EC %m %m                                 |
 |cv %m                  |8085    |EC %m %m                                 |
 |cv %m                  |ez80    |EC %m %m %m                              |
-|cv %m                  |ez80_z80|                                         |
+|cv %m                  |ez80_z80|EC %m %m                                 |
 |cv %m                  |r2ka    |E2 %t %t CD %m %m                        |
 |cv %m                  |r3k     |E2 %t %t CD %m %m                        |
 |cv %m                  |z180    |EC %m %m                                 |
@@ -16511,7 +16511,7 @@
 |cz %m                  |8080    |CC %m %m                                 |
 |cz %m                  |8085    |CC %m %m                                 |
 |cz %m                  |ez80    |CC %m %m %m                              |
-|cz %m                  |ez80_z80|                                         |
+|cz %m                  |ez80_z80|CC %m %m                                 |
 |cz %m                  |gbz80   |CC %m %m                                 |
 |cz %m                  |r2ka    |20 03 CD %m %m                           |
 |cz %m                  |r3k     |20 03 CD %m %m                           |
@@ -21681,7 +21681,7 @@
 |jmp %m                 |8080    |C3 %m %m                                 |
 |jmp %m                 |8085    |C3 %m %m                                 |
 |jmp %m                 |ez80    |C3 %m %m %m                              |
-|jmp %m                 |ez80_z80|                                         |
+|jmp %m                 |ez80_z80|C3 %m %m                                 |
 |jmp %m                 |gbz80   |C3 %m %m                                 |
 |jmp %m                 |r2ka    |C3 %m %m                                 |
 |jmp %m                 |r3k     |C3 %m %m                                 |
@@ -21736,7 +21736,7 @@
 |jmp c, %m              |8080    |DA %m %m                                 |
 |jmp c, %m              |8085    |DA %m %m                                 |
 |jmp c, %m              |ez80    |DA %m %m %m                              |
-|jmp c, %m              |ez80_z80|                                         |
+|jmp c, %m              |ez80_z80|DA %m %m                                 |
 |jmp c, %m              |gbz80   |DA %m %m                                 |
 |jmp c, %m              |r2ka    |DA %m %m                                 |
 |jmp c, %m              |r3k     |DA %m %m                                 |
@@ -21751,7 +21751,7 @@
 |jmp m, %m              |8080    |FA %m %m                                 |
 |jmp m, %m              |8085    |FA %m %m                                 |
 |jmp m, %m              |ez80    |FA %m %m %m                              |
-|jmp m, %m              |ez80_z80|                                         |
+|jmp m, %m              |ez80_z80|FA %m %m                                 |
 |jmp m, %m              |r2ka    |FA %m %m                                 |
 |jmp m, %m              |r3k     |FA %m %m                                 |
 |jmp m, %m              |z180    |FA %m %m                                 |
@@ -21760,7 +21760,7 @@
 |jmp nc, %m             |8080    |D2 %m %m                                 |
 |jmp nc, %m             |8085    |D2 %m %m                                 |
 |jmp nc, %m             |ez80    |D2 %m %m %m                              |
-|jmp nc, %m             |ez80_z80|                                         |
+|jmp nc, %m             |ez80_z80|D2 %m %m                                 |
 |jmp nc, %m             |gbz80   |D2 %m %m                                 |
 |jmp nc, %m             |r2ka    |D2 %m %m                                 |
 |jmp nc, %m             |r3k     |D2 %m %m                                 |
@@ -21771,7 +21771,7 @@
 |jmp nv, %m             |8080    |E2 %m %m                                 |
 |jmp nv, %m             |8085    |E2 %m %m                                 |
 |jmp nv, %m             |ez80    |E2 %m %m %m                              |
-|jmp nv, %m             |ez80_z80|                                         |
+|jmp nv, %m             |ez80_z80|E2 %m %m                                 |
 |jmp nv, %m             |r2ka    |E2 %m %m                                 |
 |jmp nv, %m             |r3k     |E2 %m %m                                 |
 |jmp nv, %m             |z180    |E2 %m %m                                 |
@@ -21781,7 +21781,7 @@
 |jmp nz, %m             |8080    |C2 %m %m                                 |
 |jmp nz, %m             |8085    |C2 %m %m                                 |
 |jmp nz, %m             |ez80    |C2 %m %m %m                              |
-|jmp nz, %m             |ez80_z80|                                         |
+|jmp nz, %m             |ez80_z80|C2 %m %m                                 |
 |jmp nz, %m             |gbz80   |C2 %m %m                                 |
 |jmp nz, %m             |r2ka    |C2 %m %m                                 |
 |jmp nz, %m             |r3k     |C2 %m %m                                 |
@@ -21791,7 +21791,7 @@
 |jmp p, %m              |8080    |F2 %m %m                                 |
 |jmp p, %m              |8085    |F2 %m %m                                 |
 |jmp p, %m              |ez80    |F2 %m %m %m                              |
-|jmp p, %m              |ez80_z80|                                         |
+|jmp p, %m              |ez80_z80|F2 %m %m                                 |
 |jmp p, %m              |r2ka    |F2 %m %m                                 |
 |jmp p, %m              |r3k     |F2 %m %m                                 |
 |jmp p, %m              |z180    |F2 %m %m                                 |
@@ -21800,7 +21800,7 @@
 |jmp pe, %m             |8080    |EA %m %m                                 |
 |jmp pe, %m             |8085    |EA %m %m                                 |
 |jmp pe, %m             |ez80    |EA %m %m %m                              |
-|jmp pe, %m             |ez80_z80|                                         |
+|jmp pe, %m             |ez80_z80|EA %m %m                                 |
 |jmp pe, %m             |r2ka    |EA %m %m                                 |
 |jmp pe, %m             |r3k     |EA %m %m                                 |
 |jmp pe, %m             |z180    |EA %m %m                                 |
@@ -21809,7 +21809,7 @@
 |jmp po, %m             |8080    |E2 %m %m                                 |
 |jmp po, %m             |8085    |E2 %m %m                                 |
 |jmp po, %m             |ez80    |E2 %m %m %m                              |
-|jmp po, %m             |ez80_z80|                                         |
+|jmp po, %m             |ez80_z80|E2 %m %m                                 |
 |jmp po, %m             |r2ka    |E2 %m %m                                 |
 |jmp po, %m             |r3k     |E2 %m %m                                 |
 |jmp po, %m             |z180    |E2 %m %m                                 |
@@ -21818,7 +21818,7 @@
 |jmp v, %m              |8080    |EA %m %m                                 |
 |jmp v, %m              |8085    |EA %m %m                                 |
 |jmp v, %m              |ez80    |EA %m %m %m                              |
-|jmp v, %m              |ez80_z80|                                         |
+|jmp v, %m              |ez80_z80|EA %m %m                                 |
 |jmp v, %m              |r2ka    |EA %m %m                                 |
 |jmp v, %m              |r3k     |EA %m %m                                 |
 |jmp v, %m              |z180    |EA %m %m                                 |
@@ -21828,7 +21828,7 @@
 |jmp z, %m              |8080    |CA %m %m                                 |
 |jmp z, %m              |8085    |CA %m %m                                 |
 |jmp z, %m              |ez80    |CA %m %m %m                              |
-|jmp z, %m              |ez80_z80|                                         |
+|jmp z, %m              |ez80_z80|CA %m %m                                 |
 |jmp z, %m              |gbz80   |CA %m %m                                 |
 |jmp z, %m              |r2ka    |CA %m %m                                 |
 |jmp z, %m              |r3k     |CA %m %m                                 |
@@ -21925,7 +21925,7 @@
 |jp %m                  |8080    |C3 %m %m                                 |
 |jp %m                  |8085    |C3 %m %m                                 |
 |jp %m                  |ez80    |C3 %m %m %m                              |
-|jp %m                  |ez80_z80|                                         |
+|jp %m                  |ez80_z80|C3 %m %m                                 |
 |jp %m                  |gbz80   |C3 %m %m                                 |
 |jp %m                  |r2ka    |C3 %m %m                                 |
 |jp %m                  |r3k     |C3 %m %m                                 |
@@ -21980,7 +21980,7 @@
 |jp c, %m               |8080    |DA %m %m                                 |
 |jp c, %m               |8085    |DA %m %m                                 |
 |jp c, %m               |ez80    |DA %m %m %m                              |
-|jp c, %m               |ez80_z80|                                         |
+|jp c, %m               |ez80_z80|DA %m %m                                 |
 |jp c, %m               |gbz80   |DA %m %m                                 |
 |jp c, %m               |r2ka    |DA %m %m                                 |
 |jp c, %m               |r3k     |DA %m %m                                 |
@@ -21995,7 +21995,7 @@
 |jp m, %m               |8080    |FA %m %m                                 |
 |jp m, %m               |8085    |FA %m %m                                 |
 |jp m, %m               |ez80    |FA %m %m %m                              |
-|jp m, %m               |ez80_z80|                                         |
+|jp m, %m               |ez80_z80|FA %m %m                                 |
 |jp m, %m               |r2ka    |FA %m %m                                 |
 |jp m, %m               |r3k     |FA %m %m                                 |
 |jp m, %m               |z180    |FA %m %m                                 |
@@ -22004,7 +22004,7 @@
 |jp nc, %m              |8080    |D2 %m %m                                 |
 |jp nc, %m              |8085    |D2 %m %m                                 |
 |jp nc, %m              |ez80    |D2 %m %m %m                              |
-|jp nc, %m              |ez80_z80|                                         |
+|jp nc, %m              |ez80_z80|D2 %m %m                                 |
 |jp nc, %m              |gbz80   |D2 %m %m                                 |
 |jp nc, %m              |r2ka    |D2 %m %m                                 |
 |jp nc, %m              |r3k     |D2 %m %m                                 |
@@ -22015,7 +22015,7 @@
 |jp nv, %m              |8080    |E2 %m %m                                 |
 |jp nv, %m              |8085    |E2 %m %m                                 |
 |jp nv, %m              |ez80    |E2 %m %m %m                              |
-|jp nv, %m              |ez80_z80|                                         |
+|jp nv, %m              |ez80_z80|E2 %m %m                                 |
 |jp nv, %m              |r2ka    |E2 %m %m                                 |
 |jp nv, %m              |r3k     |E2 %m %m                                 |
 |jp nv, %m              |z180    |E2 %m %m                                 |
@@ -22025,7 +22025,7 @@
 |jp nz, %m              |8080    |C2 %m %m                                 |
 |jp nz, %m              |8085    |C2 %m %m                                 |
 |jp nz, %m              |ez80    |C2 %m %m %m                              |
-|jp nz, %m              |ez80_z80|                                         |
+|jp nz, %m              |ez80_z80|C2 %m %m                                 |
 |jp nz, %m              |gbz80   |C2 %m %m                                 |
 |jp nz, %m              |r2ka    |C2 %m %m                                 |
 |jp nz, %m              |r3k     |C2 %m %m                                 |
@@ -22035,7 +22035,7 @@
 |jp p, %m               |8080    |F2 %m %m                                 |
 |jp p, %m               |8085    |F2 %m %m                                 |
 |jp p, %m               |ez80    |F2 %m %m %m                              |
-|jp p, %m               |ez80_z80|                                         |
+|jp p, %m               |ez80_z80|F2 %m %m                                 |
 |jp p, %m               |r2ka    |F2 %m %m                                 |
 |jp p, %m               |r3k     |F2 %m %m                                 |
 |jp p, %m               |z180    |F2 %m %m                                 |
@@ -22044,7 +22044,7 @@
 |jp pe, %m              |8080    |EA %m %m                                 |
 |jp pe, %m              |8085    |EA %m %m                                 |
 |jp pe, %m              |ez80    |EA %m %m %m                              |
-|jp pe, %m              |ez80_z80|                                         |
+|jp pe, %m              |ez80_z80|EA %m %m                                 |
 |jp pe, %m              |r2ka    |EA %m %m                                 |
 |jp pe, %m              |r3k     |EA %m %m                                 |
 |jp pe, %m              |z180    |EA %m %m                                 |
@@ -22053,7 +22053,7 @@
 |jp po, %m              |8080    |E2 %m %m                                 |
 |jp po, %m              |8085    |E2 %m %m                                 |
 |jp po, %m              |ez80    |E2 %m %m %m                              |
-|jp po, %m              |ez80_z80|                                         |
+|jp po, %m              |ez80_z80|E2 %m %m                                 |
 |jp po, %m              |r2ka    |E2 %m %m                                 |
 |jp po, %m              |r3k     |E2 %m %m                                 |
 |jp po, %m              |z180    |E2 %m %m                                 |
@@ -22062,7 +22062,7 @@
 |jp v, %m               |8080    |EA %m %m                                 |
 |jp v, %m               |8085    |EA %m %m                                 |
 |jp v, %m               |ez80    |EA %m %m %m                              |
-|jp v, %m               |ez80_z80|                                         |
+|jp v, %m               |ez80_z80|EA %m %m                                 |
 |jp v, %m               |r2ka    |EA %m %m                                 |
 |jp v, %m               |r3k     |EA %m %m                                 |
 |jp v, %m               |z180    |EA %m %m                                 |
@@ -22072,7 +22072,7 @@
 |jp z, %m               |8080    |CA %m %m                                 |
 |jp z, %m               |8085    |CA %m %m                                 |
 |jp z, %m               |ez80    |CA %m %m %m                              |
-|jp z, %m               |ez80_z80|                                         |
+|jp z, %m               |ez80_z80|CA %m %m                                 |
 |jp z, %m               |gbz80   |CA %m %m                                 |
 |jp z, %m               |r2ka    |CA %m %m                                 |
 |jp z, %m               |r3k     |CA %m %m                                 |
@@ -22226,7 +22226,7 @@
 |ld (%m), a             |8080    |32 %m %m                                 |
 |ld (%m), a             |8085    |32 %m %m                                 |
 |ld (%m), a             |ez80    |32 %m %m %m                              |
-|ld (%m), a             |ez80_z80|                                         |
+|ld (%m), a             |ez80_z80|32 %m %m                                 |
 |ld (%m), a             |gbz80   |EA %m %m                                 |
 |ld (%m), a             |r2ka    |32 %m %m                                 |
 |ld (%m), a             |r3k     |32 %m %m                                 |
@@ -22234,7 +22234,7 @@
 |ld (%m), a             |z80     |32 %m %m                                 |
 |ld (%m), a             |z80n    |32 %m %m                                 |
 |ld (%m), bc            |ez80    |ED 43 %m %m %m                           |
-|ld (%m), bc            |ez80_z80|                                         |
+|ld (%m), bc            |ez80_z80|ED 43 %m %m                              |
 |ld (%m), bc            |r2ka    |ED 43 %m %m                              |
 |ld (%m), bc            |r3k     |ED 43 %m %m                              |
 |ld (%m), bc            |z180    |ED 43 %m %m                              |
@@ -22243,7 +22243,7 @@
 |ld (%m), de            |8080    |EB 22 %m %m EB                           |
 |ld (%m), de            |8085    |EB 22 %m %m EB                           |
 |ld (%m), de            |ez80    |ED 53 %m %m %m                           |
-|ld (%m), de            |ez80_z80|                                         |
+|ld (%m), de            |ez80_z80|ED 53 %m %m                              |
 |ld (%m), de            |r2ka    |ED 53 %m %m                              |
 |ld (%m), de            |r3k     |ED 53 %m %m                              |
 |ld (%m), de            |z180    |ED 53 %m %m                              |
@@ -22252,28 +22252,28 @@
 |ld (%m), hl            |8080    |22 %m %m                                 |
 |ld (%m), hl            |8085    |22 %m %m                                 |
 |ld (%m), hl            |ez80    |22 %m %m %m                              |
-|ld (%m), hl            |ez80_z80|                                         |
+|ld (%m), hl            |ez80_z80|22 %m %m                                 |
 |ld (%m), hl            |r2ka    |22 %m %m                                 |
 |ld (%m), hl            |r3k     |22 %m %m                                 |
 |ld (%m), hl            |z180    |22 %m %m                                 |
 |ld (%m), hl            |z80     |22 %m %m                                 |
 |ld (%m), hl            |z80n    |22 %m %m                                 |
 |ld (%m), ix            |ez80    |DD 22 %m %m %m                           |
-|ld (%m), ix            |ez80_z80|                                         |
+|ld (%m), ix            |ez80_z80|DD 22 %m %m                              |
 |ld (%m), ix            |r2ka    |DD 22 %m %m                              |
 |ld (%m), ix            |r3k     |DD 22 %m %m                              |
 |ld (%m), ix            |z180    |DD 22 %m %m                              |
 |ld (%m), ix            |z80     |DD 22 %m %m                              |
 |ld (%m), ix            |z80n    |DD 22 %m %m                              |
 |ld (%m), iy            |ez80    |FD 22 %m %m %m                           |
-|ld (%m), iy            |ez80_z80|                                         |
+|ld (%m), iy            |ez80_z80|FD 22 %m %m                              |
 |ld (%m), iy            |r2ka    |FD 22 %m %m                              |
 |ld (%m), iy            |r3k     |FD 22 %m %m                              |
 |ld (%m), iy            |z180    |FD 22 %m %m                              |
 |ld (%m), iy            |z80     |FD 22 %m %m                              |
 |ld (%m), iy            |z80n    |FD 22 %m %m                              |
 |ld (%m), sp            |ez80    |ED 73 %m %m %m                           |
-|ld (%m), sp            |ez80_z80|                                         |
+|ld (%m), sp            |ez80_z80|ED 73 %m %m                              |
 |ld (%m), sp            |gbz80   |08 %m %m                                 |
 |ld (%m), sp            |r2ka    |ED 73 %m %m                              |
 |ld (%m), sp            |r3k     |ED 73 %m %m                              |
@@ -23442,7 +23442,7 @@
 |ld a, (%m)             |8080    |3A %m %m                                 |
 |ld a, (%m)             |8085    |3A %m %m                                 |
 |ld a, (%m)             |ez80    |3A %m %m %m                              |
-|ld a, (%m)             |ez80_z80|                                         |
+|ld a, (%m)             |ez80_z80|3A %m %m                                 |
 |ld a, (%m)             |gbz80   |FA %m %m                                 |
 |ld a, (%m)             |r2ka    |3A %m %m                                 |
 |ld a, (%m)             |r3k     |3A %m %m                                 |
@@ -24352,7 +24352,7 @@
 |ld bc, %m              |8080    |01 %m %m                                 |
 |ld bc, %m              |8085    |01 %m %m                                 |
 |ld bc, %m              |ez80    |01 %m %m %m                              |
-|ld bc, %m              |ez80_z80|                                         |
+|ld bc, %m              |ez80_z80|01 %m %m                                 |
 |ld bc, %m              |gbz80   |01 %m %m                                 |
 |ld bc, %m              |r2ka    |01 %m %m                                 |
 |ld bc, %m              |r3k     |01 %m %m                                 |
@@ -24360,7 +24360,7 @@
 |ld bc, %m              |z80     |01 %m %m                                 |
 |ld bc, %m              |z80n    |01 %m %m                                 |
 |ld bc, (%m)            |ez80    |ED 4B %m %m %m                           |
-|ld bc, (%m)            |ez80_z80|                                         |
+|ld bc, (%m)            |ez80_z80|ED 4B %m %m                              |
 |ld bc, (%m)            |r2ka    |ED 4B %m %m                              |
 |ld bc, (%m)            |r3k     |ED 4B %m %m                              |
 |ld bc, (%m)            |z180    |ED 4B %m %m                              |
@@ -25335,7 +25335,7 @@
 |ld de, %m              |8080    |11 %m %m                                 |
 |ld de, %m              |8085    |11 %m %m                                 |
 |ld de, %m              |ez80    |11 %m %m %m                              |
-|ld de, %m              |ez80_z80|                                         |
+|ld de, %m              |ez80_z80|11 %m %m                                 |
 |ld de, %m              |gbz80   |11 %m %m                                 |
 |ld de, %m              |r2ka    |11 %m %m                                 |
 |ld de, %m              |r3k     |11 %m %m                                 |
@@ -25345,7 +25345,7 @@
 |ld de, (%m)            |8080    |EB 2A %m %m EB                           |
 |ld de, (%m)            |8085    |EB 2A %m %m EB                           |
 |ld de, (%m)            |ez80    |ED 5B %m %m %m                           |
-|ld de, (%m)            |ez80_z80|                                         |
+|ld de, (%m)            |ez80_z80|ED 5B %m %m                              |
 |ld de, (%m)            |r2ka    |ED 5B %m %m                              |
 |ld de, (%m)            |r3k     |ED 5B %m %m                              |
 |ld de, (%m)            |z180    |ED 5B %m %m                              |
@@ -26349,7 +26349,7 @@
 |ld hl, %m              |8080    |21 %m %m                                 |
 |ld hl, %m              |8085    |21 %m %m                                 |
 |ld hl, %m              |ez80    |21 %m %m %m                              |
-|ld hl, %m              |ez80_z80|                                         |
+|ld hl, %m              |ez80_z80|21 %m %m                                 |
 |ld hl, %m              |gbz80   |21 %m %m                                 |
 |ld hl, %m              |r2ka    |21 %m %m                                 |
 |ld hl, %m              |r3k     |21 %m %m                                 |
@@ -26359,7 +26359,7 @@
 |ld hl, (%m)            |8080    |2A %m %m                                 |
 |ld hl, (%m)            |8085    |2A %m %m                                 |
 |ld hl, (%m)            |ez80    |2A %m %m %m                              |
-|ld hl, (%m)            |ez80_z80|                                         |
+|ld hl, (%m)            |ez80_z80|2A %m %m                                 |
 |ld hl, (%m)            |r2ka    |2A %m %m                                 |
 |ld hl, (%m)            |r3k     |2A %m %m                                 |
 |ld hl, (%m)            |z180    |2A %m %m                                 |
@@ -26482,14 +26482,14 @@
 |ld iir, a              |r2ka    |ED 4F                                    |
 |ld iir, a              |r3k     |ED 4F                                    |
 |ld ix, %m              |ez80    |DD 21 %m %m %m                           |
-|ld ix, %m              |ez80_z80|                                         |
+|ld ix, %m              |ez80_z80|DD 21 %m %m                              |
 |ld ix, %m              |r2ka    |DD 21 %m %m                              |
 |ld ix, %m              |r3k     |DD 21 %m %m                              |
 |ld ix, %m              |z180    |DD 21 %m %m                              |
 |ld ix, %m              |z80     |DD 21 %m %m                              |
 |ld ix, %m              |z80n    |DD 21 %m %m                              |
 |ld ix, (%m)            |ez80    |DD 2A %m %m %m                           |
-|ld ix, (%m)            |ez80_z80|                                         |
+|ld ix, (%m)            |ez80_z80|DD 2A %m %m                              |
 |ld ix, (%m)            |r2ka    |DD 2A %m %m                              |
 |ld ix, (%m)            |r3k     |DD 2A %m %m                              |
 |ld ix, (%m)            |z180    |DD 2A %m %m                              |
@@ -26624,14 +26624,14 @@
 |ld ixl, ixl            |z80     |DD 6D                                    |
 |ld ixl, ixl            |z80n    |DD 6D                                    |
 |ld iy, %m              |ez80    |FD 21 %m %m %m                           |
-|ld iy, %m              |ez80_z80|                                         |
+|ld iy, %m              |ez80_z80|FD 21 %m %m                              |
 |ld iy, %m              |r2ka    |FD 21 %m %m                              |
 |ld iy, %m              |r3k     |FD 21 %m %m                              |
 |ld iy, %m              |z180    |FD 21 %m %m                              |
 |ld iy, %m              |z80     |FD 21 %m %m                              |
 |ld iy, %m              |z80n    |FD 21 %m %m                              |
 |ld iy, (%m)            |ez80    |FD 2A %m %m %m                           |
-|ld iy, (%m)            |ez80_z80|                                         |
+|ld iy, (%m)            |ez80_z80|FD 2A %m %m                              |
 |ld iy, (%m)            |r2ka    |FD 2A %m %m                              |
 |ld iy, (%m)            |r3k     |FD 2A %m %m                              |
 |ld iy, (%m)            |z180    |FD 2A %m %m                              |
@@ -27202,7 +27202,7 @@
 |ld sp, %m              |8080    |31 %m %m                                 |
 |ld sp, %m              |8085    |31 %m %m                                 |
 |ld sp, %m              |ez80    |31 %m %m %m                              |
-|ld sp, %m              |ez80_z80|                                         |
+|ld sp, %m              |ez80_z80|31 %m %m                                 |
 |ld sp, %m              |gbz80   |31 %m %m                                 |
 |ld sp, %m              |r2ka    |31 %m %m                                 |
 |ld sp, %m              |r3k     |31 %m %m                                 |
@@ -27210,7 +27210,7 @@
 |ld sp, %m              |z80     |31 %m %m                                 |
 |ld sp, %m              |z80n    |31 %m %m                                 |
 |ld sp, (%m)            |ez80    |ED 7B %m %m %m                           |
-|ld sp, (%m)            |ez80_z80|                                         |
+|ld sp, (%m)            |ez80_z80|ED 7B %m %m                              |
 |ld sp, (%m)            |r2ka    |ED 7B %m %m                              |
 |ld sp, (%m)            |r3k     |ED 7B %m %m                              |
 |ld sp, (%m)            |z180    |ED 7B %m %m                              |
@@ -32863,27 +32863,27 @@
 |ret z                  |z80     |C8                                       |
 |ret z                  |z80n    |C8                                       |
 |ret.l                  |ez80    |5B C9                                    |
-|ret.l                  |ez80_z80|C9                                       |
+|ret.l                  |ez80_z80|49 C9                                    |
 |ret.l c                |ez80    |5B D8                                    |
-|ret.l c                |ez80_z80|D8                                       |
+|ret.l c                |ez80_z80|49 D8                                    |
 |ret.l m                |ez80    |5B F8                                    |
-|ret.l m                |ez80_z80|F8                                       |
+|ret.l m                |ez80_z80|49 F8                                    |
 |ret.l nc               |ez80    |5B D0                                    |
-|ret.l nc               |ez80_z80|D0                                       |
+|ret.l nc               |ez80_z80|49 D0                                    |
 |ret.l nv               |ez80    |5B E0                                    |
-|ret.l nv               |ez80_z80|E0                                       |
+|ret.l nv               |ez80_z80|49 E0                                    |
 |ret.l nz               |ez80    |5B C0                                    |
-|ret.l nz               |ez80_z80|C0                                       |
+|ret.l nz               |ez80_z80|49 C0                                    |
 |ret.l p                |ez80    |5B F0                                    |
-|ret.l p                |ez80_z80|F0                                       |
+|ret.l p                |ez80_z80|49 F0                                    |
 |ret.l pe               |ez80    |5B E8                                    |
-|ret.l pe               |ez80_z80|E8                                       |
+|ret.l pe               |ez80_z80|49 E8                                    |
 |ret.l po               |ez80    |5B E0                                    |
-|ret.l po               |ez80_z80|E0                                       |
+|ret.l po               |ez80_z80|49 E0                                    |
 |ret.l v                |ez80    |5B E8                                    |
-|ret.l v                |ez80_z80|E8                                       |
+|ret.l v                |ez80_z80|49 E8                                    |
 |ret.l z                |ez80    |5B C8                                    |
-|ret.l z                |ez80_z80|C8                                       |
+|ret.l z                |ez80_z80|49 C8                                    |
 |reti                   |ez80    |ED 4D                                    |
 |reti                   |ez80_z80|ED 4D                                    |
 |reti                   |gbz80   |D9                                       |
@@ -32893,14 +32893,14 @@
 |reti                   |z80     |ED 4D                                    |
 |reti                   |z80n    |ED 4D                                    |
 |reti.l                 |ez80    |5B ED 4D                                 |
-|reti.l                 |ez80_z80|ED 4D                                    |
+|reti.l                 |ez80_z80|49 ED 4D                                 |
 |retn                   |ez80    |ED 45                                    |
 |retn                   |ez80_z80|ED 45                                    |
 |retn                   |z180    |ED 45                                    |
 |retn                   |z80     |ED 45                                    |
 |retn                   |z80n    |ED 45                                    |
 |retn.l                 |ez80    |5B ED 45                                 |
-|retn.l                 |ez80_z80|ED 45                                    |
+|retn.l                 |ez80_z80|49 ED 45                                 |
 |rim                    |8085    |20                                       |
 |rl (hl)                |ez80    |CB 16                                    |
 |rl (hl)                |ez80_z80|CB 16                                    |
