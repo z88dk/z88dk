@@ -34,9 +34,9 @@ IF (__CPU_R2KA__ || __CPU_R3K__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH
 
 l_mulu_16_8x8:
 
-   ld bc,hl
+   ld c,l
    ld b,0
-   ld d,0
+   ld d,b
    mul
    ld bc,hl
    ret
