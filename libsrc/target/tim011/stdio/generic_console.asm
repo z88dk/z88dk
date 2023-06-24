@@ -7,6 +7,9 @@
 ;
 ; There is a scroll register which affects the top row position
 ;
+; Display bits are reversed with the left hand pixel being bits 0-1 
+; in display.
+;
 
     SECTION code_clib
 
@@ -58,8 +61,7 @@ generic_console_cls:
     ld      de,+(512 / 4) * 256
     ; This will actually clear from left to right
     ld      bc,$8000
-    ld      a,(__tim011_paper)
-    ld      l,0
+    ld      l,0     ;May want to clear with bg colour?
 loop:
     out     (c),l
     inc     bc
@@ -169,14 +171,14 @@ printc_not_bold:
 
 
     ld      h,2
-printc_MODE3_2:
+printc_2:
     ld      de,(__tim011_ink)    ;e = ink, b = paper
     push    hl
     push    bc
     ld      l,a
     ld      b,4    ;4 iterations
     ld      h,0    ;final byte
-printc_MODE3_3:
+printc_3:
     rr      l
     ld      a,d
     jr      nc,is_paper
@@ -188,14 +190,14 @@ is_paper:
     srl     d
     srl     e
     srl     e
-    djnz    printc_MODE3_3
+    djnz    printc_3
     ld      a,l    ;Save the character for a moment
     pop     bc
     out     (c),h
     dec     b
     pop     hl
     dec     h
-    jr      nz,printc_MODE3_2
+    jr      nz,printc_2
     ; Move to next row of screen
     inc     b
     inc     b
@@ -229,7 +231,7 @@ generic_console_xypos:
     ld      a,32
     ld      (__console_h),a
     call    reset_scroll
-    ; Disable cursor
+    ; Disable cursor - this is on a 100ms tick
     ld      a,$c9
     ld      ($e806),a
 
