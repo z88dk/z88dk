@@ -51,7 +51,7 @@ l_small_mul_64_64x64:
    ld l,a
    ld h,a
    
-   call l0_mulu_64_32x32  ; dehl dehl' = B*D
+   call l0_mulu_64_32x32       ; bc'bc de'de = B*D
    
    exx
    
@@ -91,7 +91,7 @@ l_small_mul_64_64x64:
    
    ld hl,0
    
-   call l0_mulu_32_32x32  ; dehl = LS32(A*D)
+   call l0_mulu_32_32x32       ; dehl = LS32(A*D)
    
    push de
    push hl                     ; save LS32(A*D)
@@ -118,7 +118,7 @@ l_small_mul_64_64x64:
    ld l,a
    ld h,a
    
-   call l0_mulu_32_32x32  ; dehl = LS32(B*C)
+   call l0_mulu_32_32x32       ; dehl = LS32(B*C)
    
    pop bc
    add hl,bc

@@ -43,7 +43,7 @@ l_z180_mulu_64_64x64:
    ld d,(ix+1)
    ld e,(ix+0)
    
-   call l0_mulu_64_32x32  ; dehl dehl' = B*D
+   call l0_mulu_64_32x32       ; bc'bc de'de = B*D
    
    exx
    
@@ -79,7 +79,7 @@ l_z180_mulu_64_64x64:
    ld d,(ix+3)
    ld e,(ix+2)
    
-   call l0_mulu_32_32x32  ; dehl = LS32(A*D)
+   call l0_mulu_32_32x32       ; dehl = LS32(A*D)
    
    push de
    push hl                     ; save LS32(A*D)
@@ -98,7 +98,7 @@ l_z180_mulu_64_64x64:
    ld d,(ix+7)
    ld e,(ix+6)
    
-   call l0_mulu_32_32x32  ; dehl = LS32(B*C)
+   call l0_mulu_32_32x32       ; dehl = LS32(B*C)
    
    pop bc
    add hl,bc
