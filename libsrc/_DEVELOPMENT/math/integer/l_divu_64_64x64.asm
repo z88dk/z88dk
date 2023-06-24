@@ -61,7 +61,7 @@ ENDIF
 IF __CLIB_OPT_IMATH > 50
 
    EXTERN l_fast_divu_64_64x64
-   
+
    defc l_divu_64_64x64 = l_fast_divu_64_64x64
 
 ENDIF

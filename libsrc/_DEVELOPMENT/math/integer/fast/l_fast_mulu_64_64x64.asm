@@ -7,8 +7,8 @@ SECTION code_math
 
 PUBLIC l_fast_mulu_64_64x64
 
-EXTERN l0_fast_mulu_64_32x32
-EXTERN l_fast_mulu_32_32x32
+EXTERN l0_mulu_64_32x32
+EXTERN l_mulu_32_32x32
 
 l_fast_mulu_64_64x64:
 
@@ -52,7 +52,7 @@ l_fast_mulu_64_64x64:
    ld l,a
    ld h,a
 
-   call l0_fast_mulu_64_32x32  ; dehl dehl' = B*D
+   call l0_mulu_64_32x32       ; bc'bc de'de = B*D
 
    exx
 
@@ -87,7 +87,7 @@ l_fast_mulu_64_64x64:
    ld l,(ix+0)
 
    push ix
-   call l_fast_mulu_32_32x32   ; dehl = LS32(A*D)
+   call l_mulu_32_32x32        ; dehl = LS32(A*D)
    pop ix
 
    push de
@@ -106,7 +106,7 @@ l_fast_mulu_64_64x64:
    ld l,(ix+4)
 
    push ix
-   call l_fast_mulu_32_32x32   ; dehl = LS32(B*C)
+   call l_mulu_32_32x32        ; dehl = LS32(B*C)
    pop ix
 
    pop bc

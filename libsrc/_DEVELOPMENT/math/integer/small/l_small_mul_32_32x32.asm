@@ -5,7 +5,7 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN l_small_mul_32_16x16
+EXTERN l_mulu_32_16x16
 
 PUBLIC l_small_mul_32_32x32, l0_small_mul_32_32x32
 
@@ -24,7 +24,7 @@ l0_small_mul_32_16x16:
     push hl
     exx
     pop de
-    jp l_small_mul_32_16x16
+    jp l_mulu_32_16x16
 
 l_small_mul_32_32x32:
 

@@ -53,17 +53,35 @@ void test_mult_long()
      Assert( -val2 * -val1  ==  15, "-5 * -3");
 }
 
+void test_mult_int()
+{
+     int val1 = 3;
+     int val2 = 5;
+
+     Assert(  val1 *  val2  ==  15, " 3 *  5");
+     Assert(  val1 * -val2  == -15, " 3 * -5");
+     Assert( -val1 *  val2  == -15, "-3 *  5");
+     Assert( -val1 * -val2  ==  15, "-3 * -5");
+     Assert(  val2 *  val1  ==  15, " 5 *  3");
+     Assert(  val2 * -val1  == -15, " 5 * -3");
+     Assert( -val2 *  val1  == -15, "-5 *  3");
+     Assert( -val2 * -val1  ==  15, "-5 * -3");
+}
+
 int suite_mult()
 {
     suite_setup("Multiplication Tests");
+
+    suite_add_test(test_quickmult_long);
 
 #ifndef __8080__
   #ifndef __GBZ80__
     suite_add_test(test_longlong_mult);
   #endif
 #endif
-    suite_add_test(test_quickmult_long);
+
     suite_add_test(test_mult_long);
+    suite_add_test(test_mult_int);
 
     return suite_run();
 }

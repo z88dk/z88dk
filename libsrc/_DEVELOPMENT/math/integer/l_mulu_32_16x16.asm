@@ -23,6 +23,13 @@ IF __CPU_Z80N__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
 ELSE
 
+IF (__CPU_R2KA__ || __CPU_R3K__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+
+   EXTERN l_r2ka_mulu_32_16x16
+   defc l_mulu_32_16x16 = l_r2ka_mulu_32_16x16
+
+ELSE
+
 IF __CLIB_OPT_IMATH <= 50
 
    EXTERN l_small_mul_32_16x16
@@ -34,6 +41,8 @@ IF __CLIB_OPT_IMATH > 50
 
    EXTERN l_fast_mulu_32_16x16
    defc l_mulu_32_16x16 = l_fast_mulu_32_16x16
+
+ENDIF
 
 ENDIF
 
