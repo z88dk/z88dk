@@ -832,6 +832,13 @@ IF FORagon
    defc    WANT_swapgfxbk = 0
 ENDIF
 
+IF FORtim011
+   DEFINE gotgfx
+   defc maxx = 512
+   defc maxy = 256
+   defc    WANT_swapgfxbk = 0
+ENDIF
+
 ; Catch all to sort things out
 
 IF !gotgfx
