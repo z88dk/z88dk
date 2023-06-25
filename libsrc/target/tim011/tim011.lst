@@ -13,3 +13,4 @@ target/tim011/graphics/w_respixl
 target/tim011/graphics/w_xorpixl
 target/tim011/graphics/w_pointxy
 @gfx/wide/gfx_wide.lst
+@games/games.lst
