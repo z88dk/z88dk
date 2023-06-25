@@ -46,9 +46,11 @@ ENDIF
     or      e
     ld      e,a
     ex      af,af
+    ld      a,b
+    xor     3
     ld      a,e
     ld      e,@00001111
-    jr      z,rotate_done
+    jr      nz,rotate_done
     rrca
     rrca
     rrca
