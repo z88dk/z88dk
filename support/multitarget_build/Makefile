@@ -137,7 +137,8 @@ ZLDFLAGS_zx_rom = -lndos
 CPMSUBTYPES = aussie px pxansi px8 pxansi px4 px4ansi einstein einstein256 attache osborne1 kaypro83 \
 	kaypro84 mz2500 microbee qc10 nascom tiki100 svi dmv adam smc777 pasopia \
 	msx bic excali64 lynx x1 rc700 fp1100 zxplus3 vector06c bondwell bw2  \
-	cpc pcw40 pcw80 corvette nabu mbc200 mbc1100 mbc1160 mbc2000 x820 partner v1050
+	cpc pcw40 pcw80 corvette nabu mbc200 mbc1100 mbc1160 mbc2000 x820 partner v1050 \
+	tim011
 
 define setup_cpm_subtypes
 Z88DKTARGET_cpm_$(1) = cpm
