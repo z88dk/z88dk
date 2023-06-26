@@ -1,0 +1,30 @@
+	section	.text,%1
+=
+	SECTION	code_compiler
+
+	section	.rodata,%1
+=
+	SECTION rodata_compiler
+
+	section	.bss,%1
+=
+	SECTION bss_compiler
+
+	section	.data,%1
+=
+	SECTION data_compiler
+
+	rb	%1
+=
+	defs	%1
+
+	private	%1
+=
+
+	ident	%1
+=
+
+_%1:%2
+_%1$local:%3
+=
+_%1:%2
