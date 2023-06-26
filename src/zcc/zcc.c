@@ -302,8 +302,9 @@ static int             linker_output_separate_arg = 0;
 
 static enum iostyle    compiler_style = outimplied;
 
-#define CC_SCCZ80 0
-#define CC_SDCC   1
+#define CC_SCCZ80    0
+#define CC_SDCC      1
+#define CC_EZ80CLANG 2
 static char           *c_compiler_type = "sccz80";
 static int             compiler_type = CC_SCCZ80;
 
@@ -328,6 +329,7 @@ static char  *c_options = NULL;
 
 static char  *c_z80asm_exe = "z88dk-z80asm";
 
+static char  *c_ez80clang_exe = "ez80-clang";
 static char  *c_clang_exe = "zclang";
 static char  *c_llvm_exe = "zllvm-cbe";
 static char  *c_sdcc_exe = "z88dk-zsdcc";
@@ -354,6 +356,7 @@ static char  *c_coptrules_user = NULL;
 static char  *c_coptrules_sccz80 = NULL;
 static char  *c_coptrules_target = NULL;
 static char  *coptrules_cpu = NULL;
+static char  *c_ez80clang_opt = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
@@ -424,6 +427,7 @@ static arg_t  config[] = {
     { "COPTRULES9", 0, SetStringConfig, &c_coptrules9, NULL, "", "\"DESTDIR/lib/z80rules.9\"" },
     { "COPTRULESINLINE", 0, SetStringConfig, &c_coptrules_sccz80, NULL, "Optimisation file for inlining sccz80 ops", "\"DESTDIR/lib/z80rules.8\"" },
     { "COPTRULESTARGET", 0, SetStringConfig, &c_coptrules_target, NULL, "Optimisation file for target specific operations",NULL },
+    { "EZ80CLANGRULES", 0, SetStringConfig, &c_ez80clang_opt, NULL, "Rules for ez80 clang", "DESTDIR/lib/clang_rules.1"},
     { "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1\"" },
     { "SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2\"" },
     { "SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3\"" },
@@ -1361,15 +1365,14 @@ int main(int argc, char **argv)
             if (hassuffix(filelist[i], ".cbe.c"))
                 BuildOptions(&cpparg, clangcpparg);
             /* past clang+llvm related pre-processing */
-            if (compiler_type == CC_SDCC) {
+            if (compiler_type == CC_SDCC || compiler_type == CC_EZ80CLANG) {
                 char zpragma_args[1024];
                 snprintf(zpragma_args, sizeof(zpragma_args),"-zcc-opt=\"%s\"", zcc_opt_def);
                 if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
                     exit(1);
-            }
-            else {
+            } else {
                 char zpragma_args[1024];
                 snprintf(zpragma_args, sizeof(zpragma_args),"-sccz80 -zcc-opt=\"%s\"", zcc_opt_def);
 
@@ -1380,6 +1383,7 @@ int main(int argc, char **argv)
             }
         case CPPFILE:
             if (m4only || clangonly || llvmonly || preprocessonly) continue;
+        
             if (process(".i", ".opt", c_compiler, comparg, compiler_style, i, YES, NO))
                 exit(1);
         case OPTFILE:
@@ -1428,6 +1432,14 @@ int main(int argc, char **argv)
                     apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".s");
                 else
                     apply_copt_rules(i, num_rules, rules, ".op1", ".opt", ".asm");
+            } else if ( compiler_type == CC_EZ80CLANG) {
+                char  *rules[MAX_COPT_RULE_FILES];
+                int    num_rules = 0;
+
+                rules[num_rules++] = c_ez80clang_opt;
+
+                apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
+
             } else {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
@@ -1630,8 +1642,10 @@ int main(int argc, char **argv)
         if (nfiles > 1) outputfile = NULL;
         copy_output_files_to_destdir(".asm", 1);
         copy_output_files_to_destdir(".s", 1);
+        copy_output_files_to_destdir(".adb", 1);
         exit(0);
     }
+    copy_output_files_to_destdir(".adb", 1);
 
     {
         char *tempofile = outputfile;
@@ -2880,8 +2894,8 @@ static void configure_compiler()
     } else if (strcmp(c_compiler_type,"sccz80") == 0 ) {
         preprocarg = " -DSCCZ80 -DSMALL_C -D__SCCZ80";
         BuildOptions(&cpparg, preprocarg);
-                BuildOptions(&asmargs, "-D__SCCZ80");
-                BuildOptions(&linkargs, "-D__SCCZ80");
+        BuildOptions(&asmargs, "-D__SCCZ80");
+        BuildOptions(&linkargs, "-D__SCCZ80");
         /* Indicate to sccz80 what assembler we want */
         snprintf(buf, sizeof(buf), "-ext=opt %s -zcc-opt=\"%s\"", select_cpu(CPU_MAP_TOOL_SCCZ80),zcc_opt_def);
         add_option_to_compiler(buf);
@@ -2902,6 +2916,15 @@ static void configure_compiler()
         }
         c_compiler = c_sccz80_exe;
         compiler_style = outspecified_flag;
+    } else if (strcmp(c_compiler_type,"ez80clang") == 0 ) {
+        preprocarg = " -E -D__CLANG";
+        BuildOptions(&cpparg, preprocarg);
+        add_option_to_compiler("-cc1 -triple z80 -S -O3");
+        compiler_type = CC_EZ80CLANG;
+        c_compiler = c_ez80clang_exe;
+        c_cpp_exe = c_ez80clang_exe;
+        compiler_style = filter_outspecified_flag;
+        c_stylecpp = filter_out;
     } else {
         printf("Unknown compiler type: %s\n",c_compiler_type);
         exit(1);
@@ -3089,7 +3112,7 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
                         exit(1);
                     }
                 }
-            }
+            } 
 
             free(ptr);
         }

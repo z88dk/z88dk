@@ -18,13 +18,37 @@
 =
 	defs	%1
 
+;;
+;; Unnecessary directives
+;;
+
 	private	%1
 =
 
 	ident	%1
 =
 
+;;
+;; Change local static references
+;;
+
+%1, _.%3
+=
+%1, _%3
+
+;;
+;; function labels
+;;
+
 _%1:%2
 _%1$local:%3
 =
 _%1:%2
+
+;;
+;; Static labes
+;;
+
+_.%1:
+=
+_%1:
