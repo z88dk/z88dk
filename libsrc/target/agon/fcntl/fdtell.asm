@@ -18,5 +18,5 @@ _fdtell:
     push.l  hl
     pop.l   ix
     ld.l    hl,(ix+fil_fptr)
-    ld.l    de,(ix+fil_fptr+1)
+    ld.l    de,(ix+fil_fptr+2)
     ret
