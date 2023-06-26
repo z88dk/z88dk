@@ -26,8 +26,8 @@ l_r2ka_mulu_32_32x32:
 
     ; multiplication of two 32-bit numbers into a 32-bit product
     ;
-    ; enter : de hl = 32-bit multiplier
-    ;         de'hl'= 32-bit multiplicand
+    ; enter : de hl = 32-bit multiplicand = x
+    ;         de'hl'= 32-bit multiplier   = y
     ;
     ; exit  : dehl = 32-bit product
     ;         carry reset
@@ -48,6 +48,7 @@ l_r2ka_mulu_32_32x32:
     exx
 
     ld bc,hl
+    exx
 
 l0_r2ka_mulu_32_32x32:
 
@@ -89,11 +90,11 @@ l0_r2ka_mulu_32_32x32:
     exx
 
     mul                         ; hlbc = yl * xl
-    ld bc',bc
-    ex de',hl
+    ld bc',bc                   ; LSW( yl * xl)
+    ex de',hl                   ; MSW( yl * xl)
     exx
 
-    add hl,de                   ; hl = LSW(yh * xl + xh * yl) + (yl * xl)
+    add hl,de                   ; hl = LSW(yh * xl + xh * yl) + MSW(yl * xl)
 
     ex de,hl
     ld hl,bc                    ; result to dehl

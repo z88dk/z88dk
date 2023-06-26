@@ -30,7 +30,7 @@ l_fast_mulu_32_32x32:
    ; error reported on overflow
    ;
    ; enter : dehl = 32-bit multiplicand
-   ;         dehl'= 32-bit multiplicand
+   ;         dehl'= 32-bit multiplier
    ;
    ; exit  : success
    ;
