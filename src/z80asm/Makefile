@@ -89,27 +89,32 @@ clean::
 
 #------------------------------------------------------------------------------
 # developer generated source files, and test libs
+# only run with RUN_RAGEL=1 to fix #2332 Build fails on cygwin
 #------------------------------------------------------------------------------
 .PHONY: dev
 dev:
 	perl asmstyle.pl dev/z80asm_lib/*.asm
-	$(MAKE) all
+	$(MAKE) RUN_RAGEL=1 all
 
 # ragel parser generator
 dev: src/c/scan_rules.h
 
 src/c/scan_rules.h: src/c/scan_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile 
+ifeq ($(RUN_RAGEL),1)
 	perl parse_ragel.pl src/c/scan_rules.rl
 	dos2unix src/c/scan_rules.h > /dev/null
+endif
 	
 dev: src/c/parse_rules.h
 
 src/c/parse_rules.h: src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile \
 				dev/cpu/cpu_rules.h
+ifeq ($(RUN_RAGEL),1)
 	perl parse_ragel.pl src/c/parse_rules.rl
 	dos2unix src/c/parse_rules.h > /dev/null
+endif
 
 src/c/tokens.h : make_tokens.pl Makefile
 	perl make_tokens.pl > src/c/tokens.h
@@ -171,23 +176,17 @@ clean::
 	$(RM) -rf Debug Release x1 x2 x3
 	$(RM) $(OBJS) $(TEST_SRC_LIB:.c=.o)
 
-#all:
-#	perl dev/cpu2/cpu.pl
-
 test: $(PROJ)$(EXESUFFIX) z80asm_lib
+	perl -S prove --state=slow,save -j9 t/*.t
+
+testdev: $(PROJ)$(EXESUFFIX)
 	$(MAKE) dev
 	$(MAKE) z80asm_lib
-	$(MAKE) prove_perl
-
-testdev: test
 	$(MAKE) -C dev/z80asm_lib test
-	perl dev/cpu2/cpu.pl -s test
+	$(MAKE) test
 
 testlib:
 	$(MAKE) -C lib test
-
-prove_perl: $(PROJ)$(EXESUFFIX)
-	perl -S prove --state=slow,save -j9 t/*.t
 
 clean::
 	$(RM) zcc_opt.def zcc_proj.lst
