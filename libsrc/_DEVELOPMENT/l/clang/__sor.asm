@@ -1,16 +1,16 @@
 
 SECTION code_l_clang
 
-PUBLIC __sand
+PUBLIC __sor
 
 ; Unused: ?
-__sand:
+__sor:
     push af
     ld a,h
-    and b
+    or b
     ld h,a
     ld a,l
-    and c
+    or c
     ld l,a
     pop af
     ret 

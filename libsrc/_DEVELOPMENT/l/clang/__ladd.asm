@@ -1,5 +1,5 @@
 
-SECTION code_crt_clang
+SECTION code_l_clang
 
 PUBLIC __ladd
 EXTERN l_neg_hl

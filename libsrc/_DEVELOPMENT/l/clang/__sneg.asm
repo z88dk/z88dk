@@ -1,17 +1,13 @@
 
 SECTION code_l_clang
 
-PUBLIC __snot
+PUBLIC __sneg
+EXTERN l_neg_hl
 
 ; Seems to be inlined
 
-__snot:
+__sneg:
     push af	;TODO Necessary?
-    ld a,h
-    cpl
-    ld h,a
-    ld a,l
-    cpl
-    ld l,a
+    call l_neg_hl
     pop af
     ret

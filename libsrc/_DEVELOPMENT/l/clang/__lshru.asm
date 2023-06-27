@@ -2,11 +2,11 @@
 SECTION code_l_clang
 
 
-PUBLIC __lshl
+PUBLIC __lshru
 
 
-; iybc << a
-__lshl:
+; iybc >> a
+__lshru:
    push af
    push iy
    ex (sp),hl
@@ -22,11 +22,12 @@ impl:
 
    cp 32
    ret nc
+
 shift_loop:
-   sla c
-   rl  b
-   rl  l
-   rl  h
+   srl h
+   rr l
+   rr b
+   rr c
    dec a
    jr  nz,shift_loop
    ret

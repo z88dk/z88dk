@@ -1,48 +1,24 @@
 
-SECTION code_crt_clang
+SECTION code_l_clang
 
 PUBLIC __lnot
 EXTERN l_neg_hl
 
-; negate dehl
+; ~dehl
 __lnot:
     push af	;TODO Necessary?
-    call l_neg_dehl
+    ld a,l
+    cpl
+    ld l,a
+    ld a,h
+    cpl
+    ld h,a
+    ld a,e
+    cpl
+    ld e,a
+    ld a,d
+    cpl
+    ld d,a
 
     pop af
     ret
-
-l_neg_dehl:
-
-   ; negate dehl
-   ;
-   ; enter : dehl = long
-   ;
-   ; exit  : dehl = -long
-   ;
-   ; uses  : af, de, hl, carry unaffected
-
-   ld a,l
-   cpl
-   ld l,a
-
-   ld a,h
-   cpl
-   ld h,a
-
-   ld a,e
-   cpl
-   ld e,a
-
-   ld a,d
-   cpl
-   ld d,a
-
-   inc l
-   ret nz
-
-   inc h
-   ret nz
-
-   inc de
-   ret
