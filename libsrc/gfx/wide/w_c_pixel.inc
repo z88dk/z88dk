@@ -11,7 +11,7 @@
 ; Entry h = x
 ;       l = y
 ;
-IF maxx / 4 < 256 && maxy / 4 < 256
+IF maxx / 4 <= 256 && maxy / 4 <= 256
 
 IF maxx / 4 <> 256
 	ld	a,h
