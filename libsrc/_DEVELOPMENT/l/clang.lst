@@ -29,3 +29,5 @@ ${NEWLIB_ROOT}l/clang/__land.asm
 ${NEWLIB_ROOT}l/clang/__bshl.asm
 ${NEWLIB_ROOT}l/clang/__lxor.asm
 ${NEWLIB_ROOT}l/clang/__bshrs.asm
+${NEWLIB_ROOT}l/clang/__indcall
+${NEWLIB_ROOT}l/clang/__indcallhl

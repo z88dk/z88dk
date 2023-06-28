@@ -14,9 +14,25 @@
 =
 	SECTION data_compiler
 
+	section	.data.%2,%1
+=
+	SECTION data_compiler
+
+	db	"%1
+=
+	defm	"%1
+
 	rb	%1
 =
 	defs	%1
+
+	db	%1 dup %2
+=
+	defs	%1,%2
+
+	dw	%1
+=
+	defw	%1
 
 ;;
 ;; Unnecessary directives
@@ -32,9 +48,13 @@
 ;; Change local static references
 ;;
 
-%1, _.%3
+%1_%2.%3
 =
-%1, _%3
+%1_%2_%3
+
+%1_%2.%3.%4
+=
+%1_%2_%3_%4
 
 ;;
 ;; function labels
@@ -46,9 +66,27 @@ _%1$local:%3
 _%1:%2
 
 ;;
-;; Static labes
+;; Static labels
 ;;
 
-_.%1:
+_%2.%1:
 =
-_%1:
+_%2_%1:
+
+_%3.%2.%1:
+=
+_$3_%2_%1:
+
+;;
+;; Store + load of local temporary
+;;
+
+	ld	(ix - %1), l
+	ld	(ix - %2), h
+	ld	l, (ix - %1)
+	ld	h, (ix - %2)
+=
+	ld	(ix - %1), l
+	ld	(ix - %2), h
+
+
