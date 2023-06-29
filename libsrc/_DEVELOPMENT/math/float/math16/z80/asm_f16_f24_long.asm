@@ -41,8 +41,7 @@ PUBLIC asm_u32_f24
 .lloop
     srl d                       ;fill with 0
     rr e
-    rr h
-    rr l
+    rr hl
     inc a
     cp $7e + 32
     jr NZ,lloop

@@ -134,8 +134,7 @@ ENDIF
     bit 7,d                     ; need to shift result left if msb!=1
     jr NZ,fm2
     add hl,hl
-    rl e
-    rl d
+    rl de
     jr fm3
 
 .fm2

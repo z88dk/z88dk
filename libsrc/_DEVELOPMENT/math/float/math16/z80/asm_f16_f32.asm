@@ -63,8 +63,8 @@ PUBLIC asm_f32_f16
     ld l,0
     sla e                       ; remove implicit bit
     rla                         ; sign in carry
-    rr d                        ; sign and exponent in d
-    rr e                        ; exponent and mantissa in e (hl)
+    rr de                       ; sign and exponent in d
+                                ; exponent and mantissa in e (hl)
     ret
 
 ; convert f24 to f16
@@ -116,17 +116,14 @@ PUBLIC asm_f32_f16
     ld h,l                      ; mantissa padded to ehl
     ld l,0
     rra                         ; shift & position exponent
-    rr h
-    rr l
+    rr hl
     rra
-    rr h
-    rr l
+    rr hl
     and 01Fh                    ; separate exponent
     jp Z,asm_f24_zero           ; zero if number was zero
     add a,127-15                ; convert bias to 8 bits
     ld d,a
     scf                         ; set implicit bit
-    rr h                        ; align mantissa to hl
-    rr l
+    rr hl                       ; align mantissa to hl
     ret
 

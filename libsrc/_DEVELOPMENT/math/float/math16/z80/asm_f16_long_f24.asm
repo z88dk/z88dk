@@ -71,20 +71,16 @@ PUBLIC asm_f24_u32
 
 .S16R                           ; must shift right to make de = 0 and mantissa in hl
     srl e
-    rr h
-    rr l
+    rr hl
     inc c                       ; increment exponent following each shift
     srl e
-    rr h
-    rr l
+    rr hl
     inc c
     srl e
-    rr h
-    rr l
+    rr hl
     inc c
     srl e
-    rr h
-    rr l                        ; 4 for sure
+    rr hl                       ; 4 for sure
     inc c                       ; exponent for no more shifts
     ld a,e
     or a
@@ -92,32 +88,28 @@ PUBLIC asm_f24_u32
 
 .S12R                           ; here shift right 1-4 more
     srl e
-    rr h
-    rr l
+    rr hl
     inc c
     ld a,e
     or a
     jr Z,packup
 
     srl e
-    rr h
-    rr l
+    rr hl
     inc c
     ld a,e
     or a
     jr Z,packup
 
     srl e
-    rr h
-    rr l
+    rr hl
     inc c
     ld a,e
     or a
     jr Z,packup
 
     srl e
-    rr h
-    rr l
+    rr hl
     inc c
 .packup                         ; pack up the floating point mantissa in hl, exponent in d, sign in e[7]
     ld e,b                      ; sign in e[7], get sign (if unsigned input, it was forced 0)

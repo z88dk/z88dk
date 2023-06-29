@@ -39,19 +39,16 @@ PUBLIC asm_f24_normalize
     jp normdone                 ; from normalize
 
 .S4L1
-    rr h                        ; reverse overshift
-    rr l
+    rr hl                       ; reverse overshift
     ret	                        ; no shift required, return DEHL immediately
 
 .S4L2
-    rr h
-    rr l
+    rr hl
     ld a,-1
     jp normdone
 
 .S4L3
-    rr h
-    rr l
+    rr hl
     ld a,-2
     jp normdone
 
@@ -79,14 +76,12 @@ PUBLIC asm_f24_normalize
     jp normdone
 
 .S8L1                           ; total of 4 shifts
-    rr h
-    rr l                        ; correct overshift
+    rr hl                       ; correct overshift
     ld a,-4
     jp normdone
 
 .S8L2                           ; total of 5 shifts
-    rr h
-    rr l
+    rr hl
     ld a,-5                     ; this is the very worst case
 ;   jp normdone                 ; drop through to .normdone
                                 
