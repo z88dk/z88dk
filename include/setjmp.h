@@ -28,6 +28,6 @@ typedef struct {
 #define longjmp(env, val)   l_longjmp(&(env), val)
 
 extern int __LIB__ l_setjmp(jmp_buf *env);
-FUNC2(void,,l_longjmp,jmp_buf *,env,int, val);
+FUNC2(void,,l_longjmp,jmp_buf *,env,int, val)
 
 #endif /* _SETJMP_H */

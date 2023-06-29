@@ -5,14 +5,13 @@ SECTION code_l_clang
 PUBLIC __lshl
 
 
-; iybc << a
+; dehl = iybc << a
 __lshl:
    push af
    push iy
-   ex (sp),hl
+   pop  de
+   ld   hl,bc
    call impl
-   ex (sp),hl
-   pop iy
    pop af
    ret
 
@@ -23,10 +22,10 @@ impl:
    cp 32
    ret nc
 shift_loop:
-   sla c
-   rl  b
-   rl  l
+   sla d
+   rl  e
    rl  h
+   rl  l
    dec a
    jr  nz,shift_loop
    ret

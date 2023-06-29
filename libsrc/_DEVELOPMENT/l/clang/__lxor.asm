@@ -5,7 +5,7 @@ IF __CPU_Z80__
 PUBLIC __lxor
 
 
-; xor dehl with iybc
+; defhl = dehl ^ iybc
 __lxor:
     push af
     ld a,d

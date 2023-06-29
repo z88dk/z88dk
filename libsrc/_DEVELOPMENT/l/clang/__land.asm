@@ -5,7 +5,7 @@ IF __CPU_Z80__
 PUBLIC __land
 
 
-; and dehl with iybc
+; dehl = dehl & iybc
 __land:
     push af
     ld a,d

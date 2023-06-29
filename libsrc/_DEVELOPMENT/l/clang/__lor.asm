@@ -5,7 +5,7 @@ IF __CPU_Z80__
 PUBLIC __lor
 
 
-; or dehl with iybc
+; dehl = dehl | iybc
 __lor:
     push af
     ld a,d

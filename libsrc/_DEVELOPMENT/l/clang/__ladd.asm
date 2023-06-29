@@ -5,7 +5,7 @@ IF __CPU_Z80__
 PUBLIC __ladd
 EXTERN l_neg_hl
 
-; dehl + iybc
+; dehl = dehl + iybc
 __ladd:
     push af	;TODO Necessary?
     add  hl,bc
