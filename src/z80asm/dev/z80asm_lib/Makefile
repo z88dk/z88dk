@@ -44,4 +44,4 @@ clean::
 
 test: all
 	cp $(Z80ASM_EXE) $(PROJ)
-	perl -S prove t/*.t
+	perl -S prove --state=slow,save -j9 t/*.t

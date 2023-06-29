@@ -7,11 +7,10 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
-use strict;
-use warnings;
-use v5.10;
-use Test::More;
-require '../../t/testlib.pl';
+
+BEGIN { use lib '../../t'; require 'testlib.pl'; }
+
+use Modern::Perl;
 
 # CPUs not supported by ticks: z80n z180 r3k
 my @CPUS = (qw( z80 8080 gbz80 r2ka ));
