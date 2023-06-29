@@ -29,8 +29,7 @@ loop_0:
     ;  a = iterations
 
     add hl,hl
-    rl e
-    rl d
+    rl de
 
     jp NC,loop_1
     add hl,bc

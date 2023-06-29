@@ -104,8 +104,7 @@ IF (__CLIB_OPT_IMATH_FAST & $80) = 0
 
 mulu_32_16x16:
 
-   ld c,e
-   ld b,d
+   ld bc,de
    ld e,0
 
    IF __CLIB_OPT_IMATH_FAST & $04

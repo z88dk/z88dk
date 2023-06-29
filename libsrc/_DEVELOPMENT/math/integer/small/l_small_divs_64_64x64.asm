@@ -168,7 +168,6 @@ pos_inf:
 exit:
 
    ex de,hl
-   ld e,c
-   ld d,b
+   ld de,bc
    
    ret

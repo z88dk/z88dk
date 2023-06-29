@@ -124,12 +124,11 @@ loop_0:
    ; rotate remainder left, dividend bit in
 
    adc hl,hl
-   rl e
-   rl d
+   rl de
    exx
+
    adc hl,hl
-   rl e
-   rl d
+   rl de
    exx
    
    ; remainder > divisor ?
@@ -273,7 +272,6 @@ divide_by_zero:
    call l_setmem_hl - 16
    
    ex de,hl
-   ld e,c
-   ld d,b
+   ld de,bc
    
    ret

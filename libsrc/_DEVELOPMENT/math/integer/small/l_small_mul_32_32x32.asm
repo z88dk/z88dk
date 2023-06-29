@@ -49,8 +49,7 @@ l_small_mul_32_32x32:
     xor a
     push hl
     exx
-    ld c,l
-    ld b,h
+    ld bc,hl
     pop hl
     push de
     ex de,hl
@@ -89,8 +88,7 @@ loop_1:
     sla e
     rl d
     exx
-    rl e
-    rl d
+    rl de
 
     djnz loop_0
 
