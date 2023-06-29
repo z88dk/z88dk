@@ -91,6 +91,7 @@ string/c/sccz80/strrchr_callee
 string/c/sccz80/strrcspn
 string/c/sccz80/strrcspn_callee
 string/c/sccz80/strrev
+string/c/sccz80/strrev_fastcall
 string/c/sccz80/strrspn
 string/c/sccz80/strrspn_callee
 string/c/sccz80/strrstr
