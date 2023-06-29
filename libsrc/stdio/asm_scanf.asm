@@ -32,7 +32,7 @@
     EXTERN  asm_toupper
     EXTERN  l_long_mult
     EXTERN  l_long_neg
-    EXTERN  atoi
+    EXTERN  asm_atoi
     EXTERN  atof
     EXTERN  fa
     EXTERN  l_cmp
@@ -189,7 +189,7 @@ width:
     ld      a,(hl)
     call    asm_isdigit
     jr      c,formatchar
-    call    atoi        ;exits hl=number, de = non numeric in fmt
+    call    asm_atoi        ;exits hl=number, de = non numeric in fmt
     ex      de,hl
 IF __CPU_INTEL__
     call    __scanf_set_width
