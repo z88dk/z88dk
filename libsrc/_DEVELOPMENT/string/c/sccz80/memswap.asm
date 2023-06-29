@@ -50,3 +50,10 @@ PUBLIC _memswap
 defc _memswap = memswap
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memswap
+defc ___memswap = memswap
+ENDIF
+

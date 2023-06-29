@@ -1,6 +1,7 @@
 
 SECTION code_l_clang
 
+IF __CPU_Z80__
 PUBLIC __land
 
 
@@ -21,3 +22,4 @@ __land:
     ld l,a
     pop af
     ret 
+ENDIF

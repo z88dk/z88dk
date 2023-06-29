@@ -1,6 +1,8 @@
 
 SECTION code_l_clang
 
+IF __CPU_Z80__
+
 PUBLIC __lsub
 
 EXTERN l_neg_dehl
@@ -19,3 +21,4 @@ __lsub:
     ld d,a
     pop  af
     ret
+ENDIF

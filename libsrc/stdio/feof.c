@@ -18,8 +18,18 @@ static void wrapper() __naked
 {
 #asm
 	GLOBAL	_feof
+	GLOBAL	__feof
+	GLOBAL	_feof_fastcall
 feof:
 _feof:
+__feof:
+    pop     de
+    pop     hl
+    push    hl
+    push    de
+
+feof_fastcall:
+_feof_fastcall:
 	inc	hl
 	inc	hl	;flags
 	ld	a,(hl)

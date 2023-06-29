@@ -45,3 +45,10 @@ PUBLIC _bcopy
 defc _bcopy = bcopy
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___bcopy
+defc ___bcopy = bcopy
+ENDIF
+

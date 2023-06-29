@@ -24,3 +24,10 @@ PUBLIC _glob_dos
 defc _glob_dos = glob_dos
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___glob_dos
+defc ___glob_dos = glob_dos
+ENDIF
+

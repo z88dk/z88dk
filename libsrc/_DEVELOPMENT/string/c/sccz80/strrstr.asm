@@ -30,3 +30,10 @@ IF __CLASSIC
 PUBLIC _strrstr
 defc _strrstr = strrstr
 ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strrstr
+defc ___strrstr = strrstr
+ENDIF
+

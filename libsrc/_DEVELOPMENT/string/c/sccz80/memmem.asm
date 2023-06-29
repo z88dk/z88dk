@@ -48,4 +48,13 @@ PUBLIC _memmem
 defc _memmem = memmem
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memmem
+defc ___memmem = memmem
 ENDIF
+
+ENDIF
+
+

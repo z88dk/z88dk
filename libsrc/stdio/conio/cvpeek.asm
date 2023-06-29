@@ -6,8 +6,10 @@
 	SECTION	code_clib
 	PUBLIC	cvpeek
 	PUBLIC	_cvpeek
+	PUBLIC	___cvpeek
 	PUBLIC	cvpeekr
 	PUBLIC	_cvpeekr
+	PUBLIC	___cvpeekr
 
 	EXTERN	__console_w
 	EXTERN	__console_h
@@ -20,11 +22,13 @@
 
 cvpeekr:
 _cvpeekr:
+___cvpeekr:
     ld      a,1
     jr      do_peek
 
 cvpeek:
 _cvpeek:
+___cvpeek:
     xor     a		;Not in raw mode
 
 

@@ -30,3 +30,10 @@ PUBLIC _strcoll_callee
 defc _strcoll_callee = strcoll_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strcoll_callee
+defc ___strcoll_callee = strcoll_callee
+ENDIF
+

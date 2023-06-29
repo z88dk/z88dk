@@ -1,6 +1,7 @@
 
 SECTION code_l_clang
 
+IF __CPU_Z80__
 PUBLIC __lxor
 
 
@@ -21,3 +22,5 @@ __lxor:
     ld l,a
     pop af
     ret 
+
+ENDIF

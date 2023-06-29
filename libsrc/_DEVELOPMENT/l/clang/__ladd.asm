@@ -1,6 +1,7 @@
 
 SECTION code_l_clang
 
+IF __CPU_Z80__
 PUBLIC __ladd
 EXTERN l_neg_hl
 
@@ -16,3 +17,4 @@ __ladd:
     ld d,a
     pop  af
     ret
+ENDIF

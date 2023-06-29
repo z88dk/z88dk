@@ -33,3 +33,10 @@ PUBLIC _strrspn_callee
 defc _strrspn_callee = strrspn_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strrspn_callee
+defc ___strrspn_callee = strrspn_callee
+ENDIF
+

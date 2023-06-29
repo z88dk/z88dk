@@ -1937,6 +1937,13 @@ static void declfunc(Type *functype, enum storage_type storage)
         prefix();
         outname(currfn->name, YES);
         col();
+        // And now the clang version
+        nl();
+        GlobalPrefix(); outstr("__"); outname(currfn->name, YES); ;nl();
+        prefix();
+        outstr("__");
+        outname(currfn->name, YES);
+        col();
     }
     nl();
     reset_namespace();

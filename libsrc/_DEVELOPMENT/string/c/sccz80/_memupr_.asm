@@ -26,3 +26,10 @@ PUBLIC __memupr_
 defc __memupr_ = _memupr_
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ____memupr_
+defc ____memupr_ = _memupr_
+ENDIF
+

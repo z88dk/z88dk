@@ -26,3 +26,10 @@ PUBLIC _stpcpy
 defc _stpcpy = stpcpy
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___stpcpy
+defc ___stpcpy = stpcpy
+ENDIF
+

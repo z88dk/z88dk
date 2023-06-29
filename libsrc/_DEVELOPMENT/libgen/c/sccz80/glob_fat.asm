@@ -24,3 +24,10 @@ PUBLIC _glob_fat
 defc _glob_fat = glob_fat
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___glob_fat
+defc ___glob_fat = glob_fat
+ENDIF
+

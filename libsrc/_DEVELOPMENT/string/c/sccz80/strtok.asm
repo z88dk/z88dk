@@ -32,3 +32,10 @@ PUBLIC _strtok
 defc _strtok = strtok
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strtok
+defc ___strtok = strtok
+ENDIF
+

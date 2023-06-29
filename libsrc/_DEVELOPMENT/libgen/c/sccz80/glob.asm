@@ -24,3 +24,10 @@ PUBLIC _glob
 defc _glob = glob
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___glob
+defc ___glob = glob
+ENDIF
+

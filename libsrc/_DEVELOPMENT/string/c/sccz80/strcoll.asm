@@ -32,3 +32,10 @@ PUBLIC _strcoll
 defc _strcoll = strcoll
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strcoll
+defc ___strcoll = strcoll
+ENDIF
+

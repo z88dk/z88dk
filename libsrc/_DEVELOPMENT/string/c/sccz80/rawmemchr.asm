@@ -27,3 +27,10 @@ PUBLIC _rawmemchr
 defc _rawmemchr = rawmemchr
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___rawmemchr
+defc ___rawmemchr = rawmemchr
+ENDIF
+

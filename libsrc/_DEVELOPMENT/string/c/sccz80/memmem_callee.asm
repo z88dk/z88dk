@@ -42,4 +42,13 @@ PUBLIC _memmem_callee
 defc _memmem_callee = memmem_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memmem_callee
+defc ___memmem_callee = memmem_callee
 ENDIF
+
+ENDIF
+
+

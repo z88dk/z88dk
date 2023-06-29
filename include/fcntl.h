@@ -33,24 +33,30 @@
 
 typedef int mode_t;
 
+FUNC3(int,,open,const char *,name, int, flags, mode_t, mode)
+FUNC2(int,,creat,const char *,name,mode_t, mode)
 
-extern int __LIB__ open(const char *name, int flags, mode_t mode) __smallc;
-extern int __LIB__ creat(const char *name, mode_t mode) __smallc;
 extern int __LIB__ close(int fd);
-extern ssize_t __LIB__ read(int fd, void *ptr, size_t len) __smallc;
-extern ssize_t __LIB__ write(int fd, const void *ptr, size_t len) __smallc;
-extern long __LIB__ __SAVEFRAME__ lseek(int fd,long posn, int whence) __smallc;
 
-extern int __LIB__ readbyte(int fd) __z88dk_fastcall;
-extern int __LIB__ writebyte(int fd, int c) __smallc;
+FUNC3(ssize_t,,read,int,fd,void *,ptr,size_t,len)
+FUNC3(ssize_t,,write,int,fd,void *,ptr,size_t,len)
+
+#ifndef __STDC_ABI_ONLY
+extern long __LIB__ __SAVEFRAME__ lseek(int fd,long posn, int whence) __smallc;
+#else
+FUNC3(long,,lseek,int,fd,long,posn,int,whence)
+#endif
+
+extern int __LIB__ readbyte(int fd) __z88dk_fastcall;  // TODO: Clang
+FUNC2(int,,writebyte,int,fd,int,c)
 
 
 /* mkdir is defined in sys/stat.h */
 /* extern int __LIB__ mkdir(char *, int mode); */
 
 
-extern char __LIB__ *getcwd(char *buf, size_t maxlen) __smallc;
-extern int __LIB__ chdir(const char *dir) __smallc;
+FUNC2(char,*,getcwd,char *,buf,size_t,newlen);
+extern int __LIB__ chdir(const char *dir);
 extern char __LIB__ *getwd(char *buf);
 
 /* Following two only implemented for Sprinter ATM (20.11.2002) + esxdos */
@@ -95,9 +101,15 @@ struct RND_FILE {
 
 
 /* The following three functions are target specific */
-extern int  __LIB__ rnd_loadblock(char *name, void *loadstart, size_t len) __smallc;
-extern int  __LIB__ rnd_saveblock(char *name, void *loadstart, size_t len) __smallc;
-extern int  __LIB__  rnd_erase(char *name) __z88dk_fastcall;
+FUNC3(int,,rnd_loadblock,char *,name,void *,loadstart,size_t,len)
+FUNC3(int,,rnd_saveblock,char *,name,void *,loadstart,size_t,len)
+
+extern int  __LIB__  rnd_erase(char *name);
+#ifndef __STDC_ABI_ONLY
+extern int  __LIB__  rnd_erase_fastcall(char *name) __z88dk_fastcall;
+#define rnd_erase(x) rnd_erase_fastcall(x)
+
+#endif
 
 /* ********************************************************* */
 
