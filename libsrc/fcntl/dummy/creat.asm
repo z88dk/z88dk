@@ -10,6 +10,7 @@
 		PUBLIC	___creat
 
 .creat
+._creat
 .___creat
 	ld	hl,-1	;error
 	ret

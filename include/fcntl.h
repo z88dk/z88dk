@@ -55,7 +55,7 @@ FUNC2(int,,writebyte,int,fd,int,c)
 /* extern int __LIB__ mkdir(char *, int mode); */
 
 
-FUNC2(char,*,getcwd,char *,buf,size_t,newlen);
+FUNC2(char,*,getcwd,char *,buf,size_t,newlen)
 extern int __LIB__ chdir(const char *dir);
 extern char __LIB__ *getwd(char *buf);
 

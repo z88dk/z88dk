@@ -10,5 +10,6 @@
 		PUBLIC	___write
 
 .write
+._write
 .___write
 	ret

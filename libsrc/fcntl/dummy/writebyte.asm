@@ -10,5 +10,6 @@
 		PUBLIC	___writebyte
 
 .writebyte
+._writebyte
 .___writebyte
 	ret

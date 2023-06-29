@@ -427,6 +427,7 @@ extern void __LIB__    *memopd_callee(void *, void *, uint, uint) __smallc __z88
 
 #ifdef FARDATA
 
+#undef strlen
 #define strlen(s) strlen_far(s)
 extern int __LIB__ strlen_far(far char *);
 
@@ -446,9 +447,11 @@ extern far char __LIB__ *strncat_far(far char *, far char *, int) __smallc;
 #define strncpy(s1,s2) strncpy_far(s1,s2,n)
 extern far char __LIB__ *strncpy_far(far char *, far char *, int) __smallc;
 
+#undef strlwr
 #define strlwr(s) strlwr_far(s)
 extern far char __LIB__ *strlwr_far(far char *);
 
+#undef strupr
 #define strupr(s) strupr_far(s)
 extern far char __LIB__ *strupr_far(far char *);
 
@@ -460,6 +463,7 @@ extern far char __LIB__ *strchr_far(far unsigned char *, unsigned char) __smallc
 #define strrchr(s,c) strrchr_far(s1,c)
 extern far char __LIB__ *strrchr_far(far unsigned char *, unsigned char) __smallc;
 
+#undef strdup
 #define strdup(s) strdup_far(s)
 extern far char __LIB__ *strdup_far(far char *);
 
