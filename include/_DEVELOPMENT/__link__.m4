@@ -93,7 +93,7 @@ dnl
 `ifelse(eval($# == 6),1,dnl
 dnl
 extern `$3' ifdef(`m4_SCCZ80_NOLIB',,__LIB__) `$4'``$5''`'(`$6') __smallc ;
-extern `$3' `$4'`$5'_fastcall`'(`$6') __z88dk_fastcall;
+extern `$3' ifdef(`m4_SCCZ80_NOLIB',,__LIB__) `$4'`$5'_fastcall`'(`$6') __z88dk_fastcall;
 `#define' `$5'`'(a) `$5'_fastcall`'(a)
 
 ,dnl

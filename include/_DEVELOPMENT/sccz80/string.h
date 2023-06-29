@@ -73,7 +73,7 @@ extern char __LIB__ *_memupr__callee(void *p,size_t n) __smallc __z88dk_callee;
 
 
 extern char __LIB__ *_strrstrip_(char *s) __smallc ;
-extern char *_strrstrip__fastcall(char *s) __z88dk_fastcall;
+extern char __LIB__ *_strrstrip__fastcall(char *s) __z88dk_fastcall;
 #define _strrstrip_(a) _strrstrip__fastcall(a)
 
 
@@ -184,12 +184,12 @@ extern size_t __LIB__ strcspn_callee(const char *s,const char *nspn) __smallc __
 
 
 extern char __LIB__ *strdup(const char *s) __smallc ;
-extern char *strdup_fastcall(const char *s) __z88dk_fastcall;
+extern char __LIB__ *strdup_fastcall(const char *s) __z88dk_fastcall;
 #define strdup(a) strdup_fastcall(a)
 
 
 extern char __LIB__ *strerror(int errnum) __smallc ;
-extern char *strerror_fastcall(int errnum) __z88dk_fastcall;
+extern char __LIB__ *strerror_fastcall(int errnum) __z88dk_fastcall;
 #define strerror(a) strerror_fastcall(a)
 
 
@@ -209,12 +209,12 @@ extern size_t __LIB__ strlcpy_callee(char *dst,const char *src,size_t n) __small
 
 
 extern size_t __LIB__ strlen(const char *s) __smallc ;
-extern size_t strlen_fastcall(const char *s) __z88dk_fastcall;
+extern size_t __LIB__ strlen_fastcall(const char *s) __z88dk_fastcall;
 #define strlen(a) strlen_fastcall(a)
 
 
 extern char __LIB__ *strlwr(char *s) __smallc ;
-extern char *strlwr_fastcall(char *s) __z88dk_fastcall;
+extern char __LIB__ *strlwr_fastcall(char *s) __z88dk_fastcall;
 #define strlwr(a) strlwr_fastcall(a)
 
 
@@ -273,7 +273,9 @@ extern size_t __LIB__ strrcspn_callee(const char *s,const char *set) __smallc __
 #define strrcspn(a,b) strrcspn_callee(a,b)
 
 
-extern char __LIB__ *strrev(char *s) __smallc __z88dk_fastcall;
+extern char __LIB__ *strrev(char *s) __smallc ;
+extern char __LIB__ *strrev_fastcall(char *s) __z88dk_fastcall;
+#define strrev(a) strrev_fastcall(a)
 
 
 extern size_t __LIB__ strrspn(const char *s,const char *set) __smallc;
@@ -287,7 +289,7 @@ extern char __LIB__ *strrstr_callee(const char *s,const char *subs) __smallc __z
 
 
 extern char __LIB__ *strrstrip(char *s) __smallc ;
-extern char *strrstrip_fastcall(char *s) __z88dk_fastcall;
+extern char __LIB__ *strrstrip_fastcall(char *s) __z88dk_fastcall;
 #define strrstrip(a) strrstrip_fastcall(a)
 
 
@@ -320,7 +322,7 @@ extern char __LIB__ *strtok_r_callee(char *s,const char *delim,char **last_s) __
 
 
 extern char __LIB__ *strupr(char *s) __smallc ;
-extern char *strupr_fastcall(char *s) __z88dk_fastcall;
+extern char __LIB__ *strupr_fastcall(char *s) __z88dk_fastcall;
 #define strupr(a) strupr_fastcall(a)
 
 
