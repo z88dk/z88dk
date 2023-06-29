@@ -22,10 +22,10 @@ impl:
    cp 32
    ret nc
 shift_loop:
-   sla d
-   rl  e
+   sla l
    rl  h
-   rl  l
+   rl  e
+   rl  d
    dec a
    jr  nz,shift_loop
    ret
