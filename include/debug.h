@@ -14,7 +14,7 @@
 
 /* Disassembles a line; returns the address for the next line 
    if MYSELF, disassembles the current program location */
-FUNC2(unsigned int,disz80,unsigned int,address, unsigned int,lines)
+FUNC2(unsigned int,,disz80,unsigned int,address, unsigned int,lines)
 
 /* Dump on screen: if MYSELF address is given, displays #count stack words 
    and returns the current SP value (dump excluded), otherwise dumps memory 
