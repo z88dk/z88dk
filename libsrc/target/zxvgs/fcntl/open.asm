@@ -16,9 +16,11 @@
 	SECTION code_clib
 	PUBLIC	open
 	PUBLIC	_open
+	PUBLIC	___open
 
 .open
 ._open
+.___open
 	push	ix		;save caller
 	LD	IX,2
 	ADD	IX,SP

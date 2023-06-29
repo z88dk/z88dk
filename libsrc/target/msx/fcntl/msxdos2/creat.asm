@@ -4,6 +4,7 @@
 
 		PUBLIC	creat
 		PUBLIC	_creat
+		PUBLIC	___creat
 
 		INCLUDE	"target/msx/def/msxdos2.def"
 		EXTERN	MSXDOS
@@ -11,6 +12,7 @@
 
 .creat
 ._creat
+.___creat
 	push	ix
 	ld	ix,2
 	add	ix,sp

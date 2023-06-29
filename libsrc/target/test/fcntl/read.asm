@@ -8,10 +8,12 @@
 
 		PUBLIC	read
 		PUBLIC	_read
+		PUBLIC	___read
 ; (fd, buf,len)
 ;  bc,  de, hl
 .read
 ._read
+.___read
 	ld	hl,2
 	add	hl,sp
 	ld	c,(hl)

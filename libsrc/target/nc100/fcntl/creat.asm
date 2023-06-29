@@ -5,9 +5,11 @@
 		SECTION code_clib
 		PUBLIC creat
 		PUBLIC _creat
+		PUBLIC ___creat
 
 .creat		
 ._creat		
+.___creat		
 		pop de
 		pop bc		; don't care
 		pop hl

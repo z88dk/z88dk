@@ -389,7 +389,7 @@ extern char __LIB__ *strtok_r_callee(char *s,const char *delim,char **last_s) __
 extern char __LIB__  *strupr(char *s);
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__  *strupr_fastcall(char *s) __z88dk_fastcall;
-#define strlwr(x) strupr_fastcall(x)
+#define strupr(x) strupr_fastcall(x)
 #endif
 
 

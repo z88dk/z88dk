@@ -12,9 +12,11 @@
 	SECTION code_clib
 	PUBLIC	lseek
 	PUBLIC	_lseek
+	PUBLIC	___lseek
 
 .lseek
 ._lseek
+.___lseek
 	push	ix		;save caller
 	LD	IX,4
 	ADD	IX,SP

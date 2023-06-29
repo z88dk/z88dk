@@ -21,9 +21,11 @@
         SECTION code_clib
 	PUBLIC	write
 	PUBLIC	_write
+	PUBLIC	___write
 
 	EXTERN	nb_putblock
 	
 .write
 ._write
+.___write
 	jp	nb_putblock

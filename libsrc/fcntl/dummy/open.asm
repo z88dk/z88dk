@@ -7,8 +7,10 @@
 
 		PUBLIC	open
 		PUBLIC	_open
+		PUBLIC	___open
 
 .open
 ._open
+.___open
 	ld	hl,-1	;error
 	ret

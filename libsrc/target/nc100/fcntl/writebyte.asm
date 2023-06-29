@@ -1,8 +1,10 @@
 		SECTION code_clib	
 		PUBLIC writebyte
 		PUBLIC _writebyte
+		PUBLIC ___writebyte
 
 ._writebyte
+.___writebyte
 .writebyte	pop bc
 		pop de
 		ld hl, 0

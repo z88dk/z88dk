@@ -101,6 +101,7 @@
 	GLOBAL	rnd_loadblock
 	GLOBAL	rnd_saveblock
 	GLOBAL	rnd_erase
+	GLOBAL	rnd_erase_fastcall
 	GLOBAL	__FOPEN_MAX
 	GLOBAL	__sgoioblk
 	GLOBAL	__sgoioblk_end
@@ -117,13 +118,15 @@
 	GLOBAL	closeall
 	GLOBAL	fgets
 	GLOBAL	fputs
-	GLOBAL	fputc
 	GLOBAL	fputs_callee
+	GLOBAL	fputc
 	GLOBAL	fputc_callee
 	GLOBAL	fgetc
 	GLOBAL	ungetc
 	GLOBAL	feof
+	GLOBAL	feof_fastcall
 	GLOBAL	ferror
+	GLOBAL	ferror_fastcall
 	GLOBAL	puts
 	GLOBAL	ftell
 	GLOBAL	fgetpos
