@@ -22,6 +22,9 @@
 #define strcasecmp stricmp
 #endif
 
+static char* subst(char* pat, char** vars);
+static char* install(char* str);
+static struct lnode* opt(struct lnode* r);
 int rpn_eval(const char* expr, char** vars);
 
 #define HSIZE 107
@@ -90,7 +93,7 @@ void connect(struct lnode* p1, struct lnode* p2)
 }
 
 /* install - install str in string table */
-char* install(char* str)
+static char* install(char* str)
 {
     register struct hnode* p;
     register char *p1, *p2, *s;
@@ -138,7 +141,7 @@ void insert(char* s, struct lnode* p)
 /* getlst - link lines from fp in between p1 and p2 */
 void getlst(FILE* fp, char* quit, struct lnode* p1, struct lnode* p2)
 {
-    char *install(), lin[MAXLINE];
+    char lin[MAXLINE];
 
     connect(p1, p2);
     while (fgets(lin, MAXLINE, fp) != NULL && strcmp(lin, quit)) {
@@ -150,7 +153,7 @@ void getlst(FILE* fp, char* quit, struct lnode* p1, struct lnode* p2)
 /* skip blank lines and comments at the start */
 void getlst_1(FILE* fp, char* quit, struct lnode* p1, struct lnode* p2)
 {
-    char *install(), lin[MAXLINE];
+    char lin[MAXLINE];
     int firstline = 1;
 
     connect(p1, p2);
@@ -392,6 +395,31 @@ char* subst_imp(char* pat, char** vars)
             sprintf(expr, "%d", r);
             for ( s = expr; i <MAXLINE && *s; i++ )
                 lin[i] = *s++;
+        } else if (pat[0] == '%' && strncmp(pat,"%defb(", 6) == 0 ) {
+            int  var,quotes = 0,needcomma = 0;
+            pat += 6;
+            while (*pat != ')') {
+                if (*pat++ == '%' ) {
+                   var=atoi(pat++);
+                }
+            }
+            pat++;
+            if (vars[var] == 0) {
+                sprintf(errormsg, "error: variable %c is not set in \"%s\"",
+                    var+'0', start);
+                error(errormsg);
+            }
+            for (s = vars[var]; i < MAXLINE && *s; s++ ) {
+                if (isprint(*s) ) {
+                   i += snprintf(lin+i,MAXLINE-i,"%s%s%c",needcomma ? "," : "", quotes == 0 ? "\"" : "", *s);
+                   needcomma = 0; quotes = 1;
+                } else {
+                   i += snprintf(lin+i,MAXLINE-i,"%s%s$%02x",quotes ? "\"," : "", needcomma ? "," : "", (unsigned char)*s);
+                   needcomma = 1; quotes = 0;
+                }
+	    }
+            if ( quotes ) i += snprintf(lin+i,MAXLINE-i,"\"");
+          
         } else if (pat[0] == '%' && isdigit(pat[1])) {
             if (vars[pat[1] - '0'] == 0) {
                 sprintf(errormsg, "error: variable %c is not set in \"%s\"",
@@ -409,7 +437,7 @@ char* subst_imp(char* pat, char** vars)
 }
 
 /* subst - return install(result of substituting vars into pat) */
-char* subst(char* pat, char** vars)
+static char* subst(char* pat, char** vars)
 {
     return install(subst_imp(pat, vars));
 }
@@ -418,7 +446,6 @@ char* subst(char* pat, char** vars)
 struct lnode* rep(
     struct lnode* p1, struct lnode* p2, struct lnode* new, char** vars)
 {
-    char *exec(), *subst();
     int i;
     struct lnode *p, *psav;
 
@@ -487,7 +514,7 @@ struct lnode* copylist(
 }
 
 /* opt - replace instructions ending at r if possible */
-struct lnode* opt(struct lnode* r)
+static struct lnode* opt(struct lnode* r)
 {
     char  titlebuf[128];
     char* vars[10];
@@ -657,7 +684,7 @@ int main(int argc, char** argv)
     FILE* inp;
 #endif
     int i, pass;
-    struct lnode head, *p, *opt(), tail;
+    struct lnode head, *p, tail;
 
     for (i = 1; i < argc; i++)
         if (strcasecmp(argv[i], "-D") == 0)
@@ -715,14 +742,14 @@ void push(int l)
     ;
 }
 
-int pop()
+int pop(void)
 {
     if (sp > 0)
         return stack[--sp];
     return 0;
 }
 
-int top()
+int top(void)
 {
     if (sp > 0)
         return stack[sp - 1];
