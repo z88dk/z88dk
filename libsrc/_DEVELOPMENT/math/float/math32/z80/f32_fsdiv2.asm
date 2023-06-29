@@ -29,8 +29,7 @@ PUBLIC _m32_div2f
     dec d                       ; divide by 2
     jr Z,zero_underflow         ; capture underflow zero
 
-    rr d                        ; return sign and exponent
-    rr e
+    rr de                       ; return sign and exponent
     ret                         ; return IEEE DEHL
 
 .zero_legal

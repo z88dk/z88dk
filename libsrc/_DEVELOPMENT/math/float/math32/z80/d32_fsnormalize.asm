@@ -62,22 +62,19 @@ PUBLIC m32_fsnormalize
 
 .S24H1
     rr l
-    rr d
-    rr e                        ; reverse overshift
+    rr de                       ; reverse overshift
     ld a,c                      ; zero adjust
     jr 	normdone0
 
 .S24H2
     rr l
-    rr d
-    rr e
+    rr de
     ld a,-1
     jr normdone
 
 .S24H3
     rr l
-    rr d
-    rr e
+    rr de
     ld a,-2
     jr normdone
 
@@ -128,15 +125,13 @@ PUBLIC m32_fsnormalize
 
 .S24Lover1                      ; total of 4 shifts
     rr l
-    rr d
-    rr e                        ; correct overshift
+    rr de                       ; correct overshift
     ld a,-4
     jr normdone
 
 .S24Lover2                      ; total of 5 shifts
     rr l
-    rr d
-    rr e
+    rr de
     ld a,-5                     ; this is the very worst case
                                 ; drop through to .normdone
 

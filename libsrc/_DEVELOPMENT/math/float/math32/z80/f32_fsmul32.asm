@@ -127,8 +127,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     bit 7,d                     ; need to shift result left if msb!=1
     jr NZ,fm0
     add hl,hl    
-    rl e
-    rl d
+    rl de
     ret                         ; return BC DEHL
 
 .fm0

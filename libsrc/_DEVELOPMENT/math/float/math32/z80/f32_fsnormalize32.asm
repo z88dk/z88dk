@@ -43,67 +43,52 @@ PUBLIC m32_fsnormalize32
 
 .S32H                           ; shift 32 bits 0 to 3 left
     add hl,hl
-    rl e
-    rl d
+    rl de
     jr C,S32H1
     add hl,hl
-    rl e
-    rl d
+    rl de
     jr C,S32H2
     add hl,hl
-    rl e
-    rl d
+    rl de
     jr C,S32H3
     ld a,-3                     ; count
     jr normdone                 ; from normalize
 
 .S32H1
-    rr d                        ; reverse overshift
-    rr e
-    rr h
-    rr l
+    rr de                       ; reverse overshift
+    rr hl
     ret	                        ; no shift required, return BC DEHL
 
 .S32H2
-    rr d
-    rr e
-    rr h
-    rr l
+    rr de
+    rr hl
     ld a,-1
     jr normdone
 
 .S32H3
-    rr d
-    rr e
-    rr h
-    rr l
+    rr de
+    rr hl
     ld a,-2
     jr normdone
 
 .S32L                           ; shift 32 bits 4-7 left
     add hl,hl
-    rl e
-    rl d
+    rl de
     add hl,hl
-    rl e
-    rl d
+    rl de
     add hl,hl
-    rl e
-    rl d
+    rl de
     ld a,0f0h
     and a,d
     jp Z,S32L4more               ; if still no bits in high nibble, total of 7 shifts
     add hl,hl
-    rl e
-    rl d
+    rl de
 ; 0, 1 or 2 shifts possible here
     add hl,hl
-    rl e
-    rl d
+    rl de
     jr C,S32Lover1
     add hl,hl
-    rl e
-    rl d
+    rl de
     jr C,S32Lover2
 ; 6 shift case
     ld a,-6
@@ -111,33 +96,25 @@ PUBLIC m32_fsnormalize32
 
 .S32L4more
     add hl,hl
-    rl e
-    rl d
+    rl de
     add hl,hl
-    rl e
-    rl d
+    rl de
     add hl,hl
-    rl e
-    rl d
+    rl de
     add hl,hl
-    rl e
-    rl d
+    rl de
     ld a,-7
     jr normdone
 
 .S32Lover1                      ; total of 4 shifts
-    rr d
-    rr e
-    rr h
-    rr l                        ; correct overshift
+    rr de
+    rr hl                       ; correct overshift
     ld a,-4
     jr normdone
 
 .S32Lover2                      ; total of 5 shifts
-    rr d
-    rr e
-    rr h
-    rr l
+    rr de
+    rr hl
     ld a,-5                     ; this is the very worst case
                                 ; drop through to .normdone
 
@@ -176,26 +153,21 @@ PUBLIC m32_fsnormalize32
     add hl,hl                   ; the shift
     jr C,S16Lover2
 ; total of 6, case 7 already handled
-    ld d,h
-    ld e,l
+    ex de,hl
     ld hl,0                     ; zero
     ld a,-22
     jr normdone
 
 .S16Lover1                      ; total of 4
-    rr h
-    rr l
-    ld d,h
-    ld e,l
+    rr hl
+    ex de,hl
     ld hl,0                     ; zero
     ld a,-20
     jr normdone
 
 .S16Lover2                      ; total of 5
-    rr h
-    rr l
-    ld d,h
-    ld e,l
+    rr hl
+    ex de,hl
     ld hl,0                     ; zero
     ld a,-21
     jr normdone
@@ -205,8 +177,7 @@ PUBLIC m32_fsnormalize32
     add hl,hl
     add hl,hl
     add hl,hl
-    ld d,h
-    ld e,l
+    ex de,hl
     ld hl,0                     ; zero
     ld a,-23
     jr normdone
@@ -292,8 +263,7 @@ PUBLIC m32_fsnormalize32
 
 .S24H1                          ; overshift
     rr e
-    rr h
-    rr l
+    rr hl
     ld d,e
     ld e,h
     ld h,l
@@ -327,35 +297,28 @@ PUBLIC m32_fsnormalize32
     add hl,hl
     jr C,S16H3
 ; 3 good shifts, number in a shifted left 3 ok
-    ld d,h
-    ld e,l
+    ex de,hl
     ld hl,0                     ; zero
     ld a,-19
     jp normdone
 
 .S16H1
-    rr h
-    rr l                        ; correct overshift
-    ld d,h
-    ld e,l
+    rr hl                       ; correct overshift
+    ex de,hl
     ld hl,0                     ; zero
     ld a,-16                    ; zero shifts
     jp normdone
 
 .S16H2
-    rr h
-    rr l                        ; correct overshift
-    ld d,h
-    ld e,l
+    rr hl                       ; correct overshift
+    ex de,hl
     ld hl,0                     ; zero
     ld a,-17                    ; one shift
     jp normdone
 
 .S16H3
-    rr h
-    rr l                        ; correct overshift
-    ld d,h
-    ld e,l
+    rr hl                       ; correct overshift
+    ex de,hl
     ld hl,0                     ; zero   
     ld a,-18
     jp normdone                ; worst case S16H

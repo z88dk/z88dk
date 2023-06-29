@@ -91,8 +91,7 @@ PUBLIC _m32_ldexpf
     ld d,a                      ; exponent returned
 
     sla e                       ; restore sign to C
-    rr d
-    rr e
+    rr de
 
     and a                       ; check for zero exponent
     ret NZ                      ; return IEEE DEHL
