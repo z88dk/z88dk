@@ -15,6 +15,9 @@
 SECTION code_clib
 PUBLIC exit
 PUBLIC _exit
+PUBLIC ___exit
+PUBLIC exit_fastcall
+PUBLIC _exit_fastcall
 
 EXTERN cleanup, exitsp, exitcount
 
@@ -29,6 +32,14 @@ PUBLIC asm_exit
 
 .exit
 ._exit
+.___exit
+   pop de
+   pop hl
+   push hl
+   push de
+
+.exit_fastcall
+._exit_fastcall
 .asm_exit
 
    push hl                   ; save exit value

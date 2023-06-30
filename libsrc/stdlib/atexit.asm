@@ -14,15 +14,28 @@
 SECTION code_clib
 PUBLIC atexit
 PUBLIC _atexit
+PUBLIC ___atexit
+PUBLIC atexit_fastcall
+PUBLIC _atexit_fastcall
+
 EXTERN __clib_exit_stack_size
 EXTERN exitsp, exitcount
+
+
+.atexit
+._atexit
+.___atexit
+   pop de
+   pop hl
+   push hl
+   push de
 
 ; enter : hl = atexit function
 ; exit  : hl !=0 and no carry if can't register
 ;         hl  =0 and carry set if successful
 
-.atexit
-._atexit
+.atexit_fastcall
+._atexit_fastcall
 
    ex de,hl                  ; de = function to register
 

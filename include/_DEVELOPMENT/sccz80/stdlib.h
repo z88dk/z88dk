@@ -212,7 +212,9 @@ extern uint16_t __LIB__ _strtou__callee(char *nptr,char **endptr,int base) __sma
 extern void __LIB__ abort(void) __smallc;
 
 
-extern int __LIB__ abs(int j) __smallc __z88dk_fastcall;
+extern int __LIB__ abs(int j) __smallc ;
+extern int __LIB__ abs_fastcall(int j) __z88dk_fastcall;
+#define abs(a) abs_fastcall(a)
 
 
 extern int __LIB__ at_quick_exit(void *func) __smallc __z88dk_fastcall;
@@ -224,10 +226,14 @@ extern int __LIB__ atexit(void *func) __smallc __z88dk_fastcall;
 extern double_t __LIB__ atof(char *nptr) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ atoi(char *buf) __smallc __z88dk_fastcall;
+extern int __LIB__ atoi(char *buf) __smallc ;
+extern int __LIB__ atoi_fastcall(char *buf) __z88dk_fastcall;
+#define atoi(a) atoi_fastcall(a)
 
 
-extern long __LIB__ atol(char *buf) __smallc __z88dk_fastcall;
+extern long __LIB__ atol(char *buf) __smallc ;
+extern long __LIB__ atol_fastcall(char *buf) __z88dk_fastcall;
+#define atol(a) atol_fastcall(a)
 
 
 extern void __LIB__ *bsearch(void *key,void *base,size_t nmemb,size_t size,void *compar) __smallc;
@@ -283,7 +289,9 @@ extern char __LIB__ *itoa_callee(int num,char *buf,int radix) __smallc __z88dk_c
 #define itoa(a,b,c) itoa_callee(a,b,c)
 
 
-extern long __LIB__ labs(long j) __smallc __z88dk_fastcall;
+extern long __LIB__ labs(long j) __smallc ;
+extern long __LIB__ labs_fastcall(long j) __z88dk_fastcall;
+#define labs(a) labs_fastcall(a)
 
 
 extern char __LIB__ *ltoa(long num,char *buf,int radix) __smallc;
@@ -302,7 +310,9 @@ extern void __LIB__ quick_exit(int status) __smallc __z88dk_fastcall;
 extern int __LIB__ rand(void) __smallc;
 
 
-extern void __LIB__ srand(uint16_t seed) __smallc __z88dk_fastcall;
+extern void __LIB__ srand(uint16_t seed) __smallc ;
+extern void __LIB__ srand_fastcall(uint16_t seed) __z88dk_fastcall;
+#define srand(a) srand_fastcall(a)
 
 
 extern double_t __LIB__ strtod(char *nptr,char **endptr) __smallc;

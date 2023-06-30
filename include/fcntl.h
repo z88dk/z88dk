@@ -33,29 +33,29 @@
 
 typedef int mode_t;
 
-__ZFUNC3(int,,open,const char *,name, int, flags, mode_t, mode)
-__ZFUNC2(int,,creat,const char *,name,mode_t, mode)
+__ZPROTO3(int,,open,const char *,name, int, flags, mode_t, mode)
+__ZPROTO2(int,,creat,const char *,name,mode_t, mode)
 
 extern int __LIB__ close(int fd);
 
-__ZFUNC3(ssize_t,,read,int,fd,void *,ptr,size_t,len)
-__ZFUNC3(ssize_t,,write,int,fd,void *,ptr,size_t,len)
+__ZPROTO3(ssize_t,,read,int,fd,void *,ptr,size_t,len)
+__ZPROTO3(ssize_t,,write,int,fd,void *,ptr,size_t,len)
 
 #ifndef __STDC_ABI_ONLY
 extern long __LIB__ __SAVEFRAME__ lseek(int fd,long posn, int whence) __smallc;
 #else
-__ZFUNC3(long,,lseek,int,fd,long,posn,int,whence)
+__ZPROTO3(long,,lseek,int,fd,long,posn,int,whence)
 #endif
 
 extern int __LIB__ readbyte(int fd) __z88dk_fastcall;  // TODO: Clang
-__ZFUNC2(int,,writebyte,int,fd,int,c)
+__ZPROTO2(int,,writebyte,int,fd,int,c)
 
 
 /* mkdir is defined in sys/stat.h */
 /* extern int __LIB__ mkdir(char *, int mode); */
 
 
-__ZFUNC2(char,*,getcwd,char *,buf,size_t,newlen)
+__ZPROTO2(char,*,getcwd,char *,buf,size_t,newlen)
 extern int __LIB__ chdir(const char *dir);
 extern char __LIB__ *getwd(char *buf);
 
@@ -101,8 +101,8 @@ struct RND_FILE {
 
 
 /* The following three functions are target specific */
-__ZFUNC3(int,,rnd_loadblock,char *,name,void *,loadstart,size_t,len)
-__ZFUNC3(int,,rnd_saveblock,char *,name,void *,loadstart,size_t,len)
+__ZPROTO3(int,,rnd_loadblock,char *,name,void *,loadstart,size_t,len)
+__ZPROTO3(int,,rnd_saveblock,char *,name,void *,loadstart,size_t,len)
 
 extern int  __LIB__  rnd_erase(char *name);
 #ifndef __STDC_ABI_ONLY

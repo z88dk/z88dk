@@ -1,5 +1,6 @@
 stdlib/c/sccz80/abort
 stdlib/c/sccz80/abs
+stdlib/c/sccz80/abs_fastcall
 stdlib/c/sccz80/atexit
 stdlib/c/sccz80/atof
 stdlib/c/sccz80/atoi
@@ -29,6 +30,7 @@ stdlib/c/sccz80/ftoh_callee
 stdlib/c/sccz80/itoa
 stdlib/c/sccz80/itoa_callee
 stdlib/c/sccz80/labs
+stdlib/c/sccz80/labs_fastcall
 stdlib/c/sccz80/llabs
 stdlib/c/sccz80/llabs_callee
 stdlib/c/sccz80/ltoa
@@ -40,6 +42,7 @@ stdlib/c/sccz80/qsort_callee
 stdlib/c/sccz80/quick_exit
 stdlib/c/sccz80/rand
 stdlib/c/sccz80/srand
+stdlib/c/sccz80/srand_fastcall
 stdlib/c/sccz80/strtod
 stdlib/c/sccz80/strtod_callee
 stdlib/c/sccz80/strtof

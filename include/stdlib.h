@@ -24,40 +24,49 @@
 
 // double atof(char *s);                    /* check math library for availability */
 
-extern int  __LIB__   atoi(const char *s) __z88dk_fastcall;
-extern long __LIB__   atol(const char *s) __z88dk_fastcall;
+extern int  __LIB__   atoi(const char *s);
+#ifndef __STDC_ABI_ONLY
+extern int  __LIB__   atoi_fastcall(const char *s) __z88dk_fastcall;
+#define atoi(x) atoi_fastcall(x)
+#endif
 
-__ZFUNC3(char,*,itoa,int,num,char *,buf,int,radix)
+extern long __LIB__   atol(const char *s);
+#ifndef __STDC_ABI_ONLY
+extern long __LIB__   atol_fastcall(const char *s) __z88dk_fastcall;
+#define atol(x) atol_fastcall(x)
+#endif
+
+__ZPROTO3(char,*,itoa,int,num,char *,buf,int,radix)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *itoa_callee(int num,char *buf,int radix) __smallc __z88dk_callee;
 #define itoa(a,b,c) itoa_callee(a,b,c)
 #endif
 
-__ZFUNC3(char,*,ltoa,long,num,char *,buf,int,radix)
+__ZPROTO3(char,*,ltoa,long,num,char *,buf,int,radix)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *ltoa_callee(long num,char *buf,int radix) __smallc __z88dk_callee;
 #define ltoa(a,b,c) ltoa_callee(a,b,c)
 #endif
 
-__ZFUNC3(long,,strtol,char *,nptr,char **,endptr,int,base)
+__ZPROTO3(long,,strtol,char *,nptr,char **,endptr,int,base)
 #ifndef __STDC_ABI_ONLY
 extern long __LIB__ strtol_callee(char *nptr,char **endptr,int base) __smallc __z88dk_callee;
 #define strtol(a,b,c) strtol_callee(a,b,c)
 #endif
 
-__ZFUNC3(uint32_t,,strtoul,char *,nptr,char **,endptr,int,base)
+__ZPROTO3(uint32_t,,strtoul,char *,nptr,char **,endptr,int,base)
 #ifndef __STDC_ABI_ONLY
 extern uint32_t __LIB__ strtoul_callee(char *nptr,char **endptr,int base) __smallc __z88dk_callee;
 #define strtoul(a,b,c) strtoul_callee(a,b,c)
 #endif
 
-__ZFUNC3(char,*,ultoa,uint32_t,num,char *,buf,int,radix)
+__ZPROTO3(char,*,ultoa,uint32_t,num,char *,buf,int,radix)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *ultoa_callee(uint32_t num,char *buf,int radix) __smallc __z88dk_callee;
 #define ultoa(a,b,c) ultoa_callee(a,b,c)
 #endif
 
-__ZFUNC3(char,*,utoa,uint16_t,num,char *,buf,int,radix)
+__ZPROTO3(char,*,utoa,uint16_t,num,char *,buf,int,radix)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *utoa_callee(uint16_t num,char *buf,int radix) __smallc __z88dk_callee;
 #define utoa(a,b,c) utoa_callee(a,b,c)
@@ -108,7 +117,11 @@ extern char *ulltoa_callee(unsigned long long num,char *buf,int radix) __z88dk_c
 #define RAND_MAX    32767
 
 extern int  __LIB__              rand(void);
-extern void __LIB__  srand(unsigned int seed) __z88dk_fastcall;
+extern void __LIB__  srand(unsigned int seed);
+#ifndef __STDC_ABI_ONLY
+extern void __LIB__  srand_fastcall(unsigned int seed) __z88dk_fastcall;
+#define srand(x) srand_fastcall(x)
+#endif
 
 // Not sure why Rex has it's own rand() routine using different seed?
 
@@ -135,20 +148,27 @@ extern void __LIB__  srand(unsigned int seed) __z88dk_fastcall;
 #define EXIT_FAILURE   1
 #define EXIT_SUCCESS   0
 
-extern void __LIB__  exit(int status) __z88dk_fastcall;
-extern int  __LIB__  atexit(void *fcn) __z88dk_fastcall;
+extern void __LIB__  exit(int status);
+extern int  __LIB__  atexit(void *(func)(void));
+
+#ifndef __STDC_ABI_ONLY
+extern void __LIB__  exit_fastcall(int status) __z88dk_fastcall;
+extern int  __LIB__  atexit_fastcall(void *(func)(void)) __z88dk_fastcall;
+#define exit(x) exit_fastcall(x)
+#define atexit(x) atexit_fastcall(x)
+#endif
 
 // int system(char *s);                     /* might be implemented in target's library but doubtful */
 
 // Environment variables, may be present in fcntl library
 extern char __LIB__ *getenv(const char *name); 
-__ZFUNC3(char,*,getenv_r,const char *,name,char *,buf,size_t,len)
-__ZFUNC3(int,,setenv,const char *,name,const char *,value,int,overflow)
+__ZPROTO3(char,*,getenv_r,const char *,name,char *,buf,size_t,len)
+__ZPROTO3(int,,setenv,const char *,name,const char *,value,int,overflow)
 extern int __LIB__ unsetenv(const char *name);
 
 
 
-__ZFUNC3(int,,getopt,int,argc,char **,argv,const char *,optstring)
+__ZPROTO3(int,,getopt,int,argc,char **,argv,const char *,optstring)
 
 
 extern   char *optarg;                      /* getopt(3) external variables */
@@ -268,8 +288,18 @@ extern void __LIB__ _ldivu__callee(ldivu_t *ld,unsigned long numer,unsigned long
 //// Misc Number Functions
 //////////////////////////
 
-extern int  __LIB__  abs(int n) __z88dk_fastcall;
-extern long __LIB__  labs(long n) __z88dk_fastcall;
+extern int  __LIB__  abs(int n);
+#ifndef __STDC_ABI_ONLY
+extern int  __LIB__  abs_fastcall(int n) __z88dk_fastcall;
+#define abs(x) abs_fastcall(x)
+#endif
+
+extern long __LIB__  labs(long n);
+#ifndef __STDC_ABI_ONLY
+extern long  __LIB__  labs_fastcall(long n) __z88dk_fastcall;
+#define labs(x) labs_fastcall(x)
+#endif
+
 
 extern uint __LIB__  isqrt(uint n);
 #ifndef __STDC_ABI_ONLY
@@ -296,7 +326,7 @@ extern unsigned int  __LIB__  inp_fastcall(unsigned int port) __z88dk_fastcall;
 #define inp(p) inp_fastcall(p)
 #endif
 
-__ZFUNC2(void,,outp,unsigned int,port,unsigned int,byte)
+__ZPROTO2(void,,outp,unsigned int,port,unsigned int,byte)
 #ifndef __STDC_ABI_ONLY
 extern void  __LIB__  outp_callee(unsigned int port, unsigned int byte) __smallc __z88dk_callee;
 #define outp(a,b) outp_callee(a,b)
@@ -315,8 +345,8 @@ extern void __LIB__  *swapendian(void *addr) __z88dk_fastcall;
 
 // The macros can be used to inline code if the parameters resolve to constants
 
-__ZFUNC2(void,,bpoke,void *,addr,unsigned char,byte)
-__ZFUNC2(void,,wpoke,void *,addr,unsigned int,byte)
+__ZPROTO2(void,,bpoke,void *,addr,unsigned char,byte)
+__ZPROTO2(void,,wpoke,void *,addr,unsigned int,byte)
 
 
 extern unsigned char __LIB__    bpeek(const void *addr);
@@ -380,7 +410,7 @@ extern unsigned long __LIB__   extract_bits_callee(unsigned char *data, unsigned
 #endif
 
 // Compare a file name in "8.3" format to a wildcard expression
-__ZFUNC2(int,,wcmatch,char,*wildname,char *,filename)
+__ZPROTO2(int,,wcmatch,char,*wildname,char *,filename)
 
 // Convert a BCD encoded value to unsigned int
 extern unsigned int __LIB__ unbcd(unsigned int value);
