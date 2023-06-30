@@ -22,7 +22,7 @@
 #include <sys/compiler.h>
 
 #ifndef NDEBUG
-FUNC3(void,,l_assert,int,line,const char *,file, const char *,msg)
+__ZFUNC3(void,,l_assert,int,line,const char *,file, const char *,msg)
 #define assert(exp)     if((exp==0)) {l_assert(__LINE__, __FILE__, #exp );}
 #else
 #define assert(exp)

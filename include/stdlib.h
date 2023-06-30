@@ -27,37 +27,37 @@
 extern int  __LIB__   atoi(const char *s) __z88dk_fastcall;
 extern long __LIB__   atol(const char *s) __z88dk_fastcall;
 
-FUNC3(char,*,itoa,int,num,char *,buf,int,radix)
+__ZFUNC3(char,*,itoa,int,num,char *,buf,int,radix)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *itoa_callee(int num,char *buf,int radix) __smallc __z88dk_callee;
 #define itoa(a,b,c) itoa_callee(a,b,c)
 #endif
 
-FUNC3(char,*,ltoa,long,num,char *,buf,int,radix)
+__ZFUNC3(char,*,ltoa,long,num,char *,buf,int,radix)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *ltoa_callee(long num,char *buf,int radix) __smallc __z88dk_callee;
 #define ltoa(a,b,c) ltoa_callee(a,b,c)
 #endif
 
-FUNC3(long,,strtol,char *,nptr,char **,endptr,int,base)
+__ZFUNC3(long,,strtol,char *,nptr,char **,endptr,int,base)
 #ifndef __STDC_ABI_ONLY
 extern long __LIB__ strtol_callee(char *nptr,char **endptr,int base) __smallc __z88dk_callee;
 #define strtol(a,b,c) strtol_callee(a,b,c)
 #endif
 
-FUNC3(uint32_t,,strtoul,char *,nptr,char **,endptr,int,base)
+__ZFUNC3(uint32_t,,strtoul,char *,nptr,char **,endptr,int,base)
 #ifndef __STDC_ABI_ONLY
 extern uint32_t __LIB__ strtoul_callee(char *nptr,char **endptr,int base) __smallc __z88dk_callee;
 #define strtoul(a,b,c) strtoul_callee(a,b,c)
 #endif
 
-FUNC3(char,*,ultoa,uint32_t,num,char *,buf,int,radix)
+__ZFUNC3(char,*,ultoa,uint32_t,num,char *,buf,int,radix)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *ultoa_callee(uint32_t num,char *buf,int radix) __smallc __z88dk_callee;
 #define ultoa(a,b,c) ultoa_callee(a,b,c)
 #endif
 
-FUNC3(char,*,utoa,uint16_t,num,char *,buf,int,radix)
+__ZFUNC3(char,*,utoa,uint16_t,num,char *,buf,int,radix)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *utoa_callee(uint16_t num,char *buf,int radix) __smallc __z88dk_callee;
 #define utoa(a,b,c) utoa_callee(a,b,c)
@@ -142,13 +142,13 @@ extern int  __LIB__  atexit(void *fcn) __z88dk_fastcall;
 
 // Environment variables, may be present in fcntl library
 extern char __LIB__ *getenv(const char *name); 
-FUNC3(char,*,getenv_r,const char *,name,char *,buf,size_t,len)
-FUNC3(int,,setenv,const char *,name,const char *,value,int,overflow)
+__ZFUNC3(char,*,getenv_r,const char *,name,char *,buf,size_t,len)
+__ZFUNC3(int,,setenv,const char *,name,const char *,value,int,overflow)
 extern int __LIB__ unsetenv(const char *name);
 
 
 
-FUNC3(int,,getopt,int,argc,char **,argv,const char *,optstring)
+__ZFUNC3(int,,getopt,int,argc,char **,argv,const char *,optstring)
 
 
 extern   char *optarg;                      /* getopt(3) external variables */
@@ -296,7 +296,7 @@ extern unsigned int  __LIB__  inp_fastcall(unsigned int port) __z88dk_fastcall;
 #define inp(p) inp_fastcall(p)
 #endif
 
-FUNC2(void,,outp,unsigned int,port,unsigned int,byte)
+__ZFUNC2(void,,outp,unsigned int,port,unsigned int,byte)
 #ifndef __STDC_ABI_ONLY
 extern void  __LIB__  outp_callee(unsigned int port, unsigned int byte) __smallc __z88dk_callee;
 #define outp(a,b) outp_callee(a,b)
@@ -315,8 +315,8 @@ extern void __LIB__  *swapendian(void *addr) __z88dk_fastcall;
 
 // The macros can be used to inline code if the parameters resolve to constants
 
-FUNC2(void,,bpoke,void *,addr,unsigned char,byte)
-FUNC2(void,,wpoke,void *,addr,unsigned int,byte)
+__ZFUNC2(void,,bpoke,void *,addr,unsigned char,byte)
+__ZFUNC2(void,,wpoke,void *,addr,unsigned int,byte)
 
 
 extern unsigned char __LIB__    bpeek(const void *addr);
@@ -380,7 +380,7 @@ extern unsigned long __LIB__   extract_bits_callee(unsigned char *data, unsigned
 #endif
 
 // Compare a file name in "8.3" format to a wildcard expression
-FUNC2(int,,wcmatch,char,*wildname,char *,filename)
+__ZFUNC2(int,,wcmatch,char,*wildname,char *,filename)
 
 // Convert a BCD encoded value to unsigned int
 extern unsigned int __LIB__ unbcd(unsigned int value);

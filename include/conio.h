@@ -68,13 +68,13 @@ extern void __LIB__        textbackground(int c) __z88dk_fastcall;
 
 extern int     __LIB__     wherex (void);
 extern int     __LIB__     wherey (void);
-FUNC2(void,,gotoxy,unsigned int,x,unsigned int,y);
+__ZFUNC2(void,,gotoxy,unsigned int,x,unsigned int,y);
 #ifndef __STDC_ABI_ONLY
 extern void    __LIB__     gotoxy_callee(unsigned int x, unsigned int y) __smallc __z88dk_callee;
 #define gotoxy(a,b) gotoxy_callee(a,b)
 #endif
 
-FUNC2(void,,screensize,unsigned int *,x,unsigned int *,y);
+__ZFUNC2(void,,screensize,unsigned int *,x,unsigned int *,y);
 #ifndef __STDC_ABI_ONLY
 extern void    __LIB__     screensize_callee(unsigned int *x, unsigned int *y) __smallc __z88dk_callee;
 #define screensize(a,b) screensize_callee(a,b)
@@ -111,11 +111,11 @@ extern int __LIB__ kbhit(void);
 extern int __LIB__ getch(void);
 
 // Get the character that is on screen at the specified location
-FUNC2(int,,cvpeek,int,x,int,y);
+__ZFUNC2(int,,cvpeek,int,x,int,y);
 
 // Get the character that is on screen at the specified location (no charset
 // translations will be made)
-FUNC2(int,,cvpeekr,int,x,int,y);
+__ZFUNC2(int,,cvpeekr,int,x,int,y);
 
 // Set the border colour, may not be implemented on all ports
 extern int __LIB__ bordercolor(int c) __z88dk_fastcall;

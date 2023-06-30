@@ -179,12 +179,12 @@ extern int __LIB__ fileno(FILE *stream) __smallc __z88dk_fastcall;
 
 /* Our new and improved functions!! */
 
-FUNC2(FILE,*,fopen,const char *,name, const char *,mode)
-FUNC3(FILE,*,freopen,const char *,name, const char *,mode,FILE *,fp)
-FUNC2(FILE,*,fdopen,const int, fileds,const char *,mode)
+__ZFUNC2(FILE,*,fopen,const char *,name, const char *,mode)
+__ZFUNC3(FILE,*,freopen,const char *,name, const char *,mode,FILE *,fp)
+__ZFUNC2(FILE,*,fdopen,const int, fileds,const char *,mode)
 
-FUNC4(FILE,*,_freopen1,const char *,name, int, fd, const char *,mode, FILE *,fp)
-FUNC3(FILE,*,fmemopen,void *,buf, size_t, size, const char *,mode)
+__ZFUNC4(FILE,*,_freopen1,const char *,name, int, fd, const char *,mode, FILE *,fp)
+__ZFUNC3(FILE,*,fmemopen,void *,buf, size_t, size, const char *,mode)
 
 // Leaving this one, it's complicated
 #ifndef __STDC_ABI_ONLY
@@ -203,9 +203,9 @@ extern void __LIB__ closeall(void);
 /* --------------------------------------------------------------*/
 /* Optimized stdio uses the 'CALLEE' convention here and there   */
 
-FUNC3(char,*,fgets,char *,s,int,l,FILE *,fp)
+__ZFUNC3(char,*,fgets,char *,s,int,l,FILE *,fp)
 
-FUNC2(int,,fputs,const char *,s,FILE *,fp)
+__ZFUNC2(int,,fputs,const char *,s,FILE *,fp)
 #ifndef __STDC_ABI_ONLY
 extern int __LIB__  fputs_callee(const char *s,  FILE *fp) __smallc __z88dk_callee;
 #define fputs(a,b)   fputs_callee(a,b)
@@ -228,7 +228,7 @@ extern int putchar(int);
 extern int __LIB__ fgetc(FILE *fp);
 #define getc(f) fgetc(f)
 
-FUNC2(int,,ungetc,int,c,FILE *,fp)
+__ZFUNC2(int,,ungetc,int,c,FILE *,fp)
 
 extern int __LIB__ feof(FILE *fp);
 #ifndef __STDC_ABI_ONLY
@@ -253,21 +253,21 @@ extern int __LIB__ puts(const char *);
 
 /* Routines for file positioning */
 extern fpos_t __LIB__ ftell(FILE *fp);
-FUNC2(int,,fgetpos,FILE *,fp,fpos_t, *pos)
+__ZFUNC2(int,,fgetpos,FILE *,fp,fpos_t, *pos)
 
 
 #ifndef __STDC_ABI_ONLY
 extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __smallc;
 #else
-FUNC3(int,,fseek,FILE *,fp,fpos_t,offset,int,whence)
+__ZFUNC3(int,,fseek,FILE *,fp,fpos_t,offset,int,whence)
 #endif
 #define fsetpos(fp,pos) fseek(fp,pos,SEEK_SET)
 #define rewind(fp) fseek(fp,0L,SEEK_SET)
 
 
 /* Block read/writing */
-FUNC4(int,,fread,void *,ptr,size_t,size,size_t,num,FILE *,fp)
-FUNC4(int,,fwrite,void *,ptr,size_t,size,size_t,num,FILE *,fp)
+__ZFUNC4(int,,fread,void *,ptr,size_t,size,size_t,num,FILE *,fp)
+__ZFUNC4(int,,fwrite,void *,ptr,size_t,size,size_t,num,FILE *,fp)
 
 
 extern char __LIB__ *gets(char *s);
@@ -323,7 +323,7 @@ extern int __LIB__ fgetc_cons_inkey(void);
 extern int __LIB__ fputc_cons(char c);
 
 /* Read a string using the default keyboard driver */
-FUNC2(char,*,fgets_cons,char *,s,size_t,n)
+__ZFUNC2(char,*,fgets_cons,char *,s,size_t,n)
 
 extern int __LIB__ puts_cons(char *s);
 
@@ -331,9 +331,9 @@ extern int __LIB__ puts_cons(char *s);
 extern void __LIB__ fabandon(FILE *);
 /* Get file position for file handle fd */
 extern long __LIB__ fdtell(int fd);
-FUNC2(int,,fdgetpos,int,fd,fpos_t *,pos)
+__ZFUNC2(int,,fdgetpos,int,fd,fpos_t *,pos)
 /* Rename a file */
-FUNC2(int,,rename,const char *,s,const char *,d)
+__ZFUNC2(int,,rename,const char *,s,const char *,d)
 /* Remove a file */
 extern int __LIB__ remove(const char *name);
 

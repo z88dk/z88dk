@@ -26,19 +26,19 @@ extern char __LIB__ *dirname_fastcall(char *path) __z88dk_fastcall;
 #define dirname(x) dirname_fastcall(x)
 #endif
 
-FUNC2(unsigned char,*,glob,const char *,s,const char *,pattern)
+__ZFUNC2(unsigned char,*,glob,const char *,s,const char *,pattern)
 #ifndef __STDC_ABI_ONLY
 extern unsigned char __LIB__ glob_callee(const char *s,const char *pattern) __smallc __z88dk_callee;
 #define glob(a,b) glob_callee(a,b)
 #endif
 
-FUNC2(unsigned char,*,glob_dos,const char *,s,const char *,pattern)
+__ZFUNC2(unsigned char,*,glob_dos,const char *,s,const char *,pattern)
 #ifndef __STDC_ABI_ONLY
 extern unsigned char __LIB__ glob_dos_callee(const char *s,const char *pattern) __smallc __z88dk_callee;
 #define glob_dos(a,b) glob_dos_callee(a,b)
 #endif
 
-FUNC2(unsigned char,*,glob_fat,const char *,s,const char *,pattern)
+__ZFUNC2(unsigned char,*,glob_fat,const char *,s,const char *,pattern)
 #ifndef __STDC_ABI_ONLY
 extern unsigned char __LIB__ glob_fat_callee(const char *s,const char *pattern) __smallc __z88dk_callee;
 #define glob_fat(a,b) glob_fat_callee(a,b)

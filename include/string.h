@@ -4,69 +4,69 @@
 #include <sys/compiler.h>
 #include <sys/types.h>
 
-FUNC3(int,,bcmp,const void *,b1,const void *,b2,size_t,len)
+__ZFUNC3(int,,bcmp,const void *,b1,const void *,b2,size_t,len)
 #ifndef __STDC_ABI_ONLY
 extern int __LIB__ bcmp_callee(const void *b1,const void *b2,size_t len) __smallc __z88dk_callee;
 #define bcmp(a,b,c) bcmp_callee(a,b,c)
 #endif
 
-FUNC3(void,,bcopy,const void *,src,void *,dst,size_t,len)
+__ZFUNC3(void,,bcopy,const void *,src,void *,dst,size_t,len)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ bcopy_callee(const void *src,void *dst,size_t len) __smallc __z88dk_callee; 
 #define bcopy(a,b,c) bcopy_callee(a,b,c)
 #endif
 
-FUNC2(void,,bzero,void *,mem,size_t,n)
+__ZFUNC2(void,,bzero,void *,mem,size_t,n)
 #ifndef __STDC_ABI_ONLY
 extern void __LIB__ bzero_callee(void *mem,size_t n) __smallc __z88dk_callee;
 #define bzero(a,b) bzero_callee(a,b)
 #endif
 
-FUNC2(char,*,index,const char *,s,int,c)
+__ZFUNC2(char,*,index,const char *,s,int,c)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *index_callee(const char *s,int c) __smallc __z88dk_callee;
 #define index(a,b) index_callee(a,b)
 #endif
 
 
-FUNC2(char,*,rindex,const char *,s,int,c)
+__ZFUNC2(char,*,rindex,const char *,s,int,c)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *rindex_callee(const char *s,int c) __smallc __z88dk_callee;
 #define rindex(a,b) rindex_callee(a,b)
 #endif
 
-FUNC2(char,*,strset, char *,s,int,c)
+__ZFUNC2(char,*,strset, char *,s,int,c)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *strset_callee(char *s,int c) __smallc __z88dk_callee;
 #define strset(a,b) strset_callee(a,b)
 #endif
 
-FUNC3(char,*,strnset, char *,s,int,c,size_t,n)
+__ZFUNC3(char,*,strnset, char *,s,int,c,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strnset_callee(char *s,int c,size_t n) __smallc __z88dk_callee;
 #define strnset(a,b,c) strnset_callee(a,b,c)
 #endif
 
-FUNC2(void,*,rawmemchr,const void *,mem,int,c)
+__ZFUNC2(void,*,rawmemchr,const void *,mem,int,c)
 #ifndef __STDC_ABI_ONLY
 extern void __LIB__ *rawmemchr_callee(const void *mem,int c) __smallc __z88dk_callee;
 #define rawmemchr(a,b) rawmemchr_callee(a,b)
 #endif
 
 
-FUNC2(char,*,_memlwr_,void *,p,size_t,n)
+__ZFUNC2(char,*,_memlwr_,void *,p,size_t,n)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *_memlwr__callee(void *p,size_t n) __smallc __z88dk_callee;
 #define _memlwr_(a,b) _memlwr__callee(a,b)
 #endif
 
-FUNC3(char,*,_memstrcpy_,void *,p,const char *,s,size_t,n)
+__ZFUNC3(char,*,_memstrcpy_,void *,p,const char *,s,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *_memstrcpy__callee(void *p,const char *s,size_t n) __smallc __z88dk_callee;
 #define _memstrcpy_(a,b,c) _memstrcpy__callee(a,b,c)
 #endif
 
-FUNC2(char,*,_memupr_,void *,p,size_t,n)
+__ZFUNC2(char,*,_memupr_,void *,p,size_t,n)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *_memupr__callee(void *p,size_t n) __smallc __z88dk_callee;
 #define _memupr_(a,b) _memupr__callee(a,b)
@@ -162,49 +162,49 @@ extern char __LIB__ *stpncpy_callee(char *dst,const char *src,size_t n) __smallc
 #define stpncpy(a,b,c) stpncpy_callee(a,b,c)
 #endif
 
-FUNC2(int,,strcasecmp,const char *,s1,const char *,s2)
+__ZFUNC2(int,,strcasecmp,const char *,s1,const char *,s2)
 #ifndef __STDC_ABI_ONLY
 extern int __LIB__ strcasecmp_callee(const char *s1,const char *s2) __smallc __z88dk_callee;
 #define strcasecmp(a,b) strcasecmp_callee(a,b)
 #endif
 
-FUNC2(char,*,strcat,char *,dest,const char *,src)
+__ZFUNC2(char,*,strcat,char *,dest,const char *,src)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *strcat_callee(char *dst,const char *src) __smallc __z88dk_callee;
 #define strcat(a,b) strcat_callee(a,b)
 #endif
 
-FUNC2(char,*,strchr,const char *,s,int,c)
+__ZFUNC2(char,*,strchr,const char *,s,int,c)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *strchr_callee(const char *s,int c) __smallc __z88dk_callee;
 #define strchr(a,b) strchr_callee(a,b)
 #endif
 
-FUNC2(char,*,strchrnul,const char *,s,int,c)
+__ZFUNC2(char,*,strchrnul,const char *,s,int,c)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *strchrnul_callee(const char *s,int c) __smallc __z88dk_callee;
 #define strchrnul(a,b) strchrnul_callee(a,b)
 #endif
 
-FUNC2(int,,strcmp,const char *,s1,const char *,s2)
+__ZFUNC2(int,,strcmp,const char *,s1,const char *,s2)
 #ifndef __STDC_ABI_ONLY
 extern int __LIB__ strcmp_callee(const char *s1,const char *s2) __smallc __z88dk_callee;
 #define strcmp(a,b) strcmp_callee(a,b)
 #endif
 
-FUNC2(int,,strcoll,const char *,s1,const char *,s2)
+__ZFUNC2(int,,strcoll,const char *,s1,const char *,s2)
 #ifndef __STDC_ABI_ONLY
 extern int __LIB__ strcoll_callee(const char *s1,const char *s2) __smallc __z88dk_callee;
 #define strcoll(a,b) strcoll_callee(a,b)
 #endif
 
-FUNC2(char,*,strcpy,char *,dst,const char *,src)
+__ZFUNC2(char,*,strcpy,char *,dst,const char *,src)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *strcpy_callee(char *dst,const char *src) __smallc __z88dk_callee;
 #define strcpy(a,b) strcpy_callee(a,b)
 #endif
 
-FUNC2(size_t,,strcspn,const char *,s,const char *,nspn)
+__ZFUNC2(size_t,,strcspn,const char *,s,const char *,nspn)
 #ifndef __STDC_ABI_ONLY
 extern size_t __LIB__ strcspn_callee(const char *s,const char *nspn) __smallc __z88dk_callee;
 #define strcspn(a,b) strcspn_callee(a,b)
@@ -225,19 +225,19 @@ extern char __LIB__  *strerror_fastcall(char *s)  __z88dk_fastcall;
 #endif
 
 
-FUNC2(int,,stricmp,const char *,s1,const char *,s2)
+__ZFUNC2(int,,stricmp,const char *,s1,const char *,s2)
 #ifndef __STDC_ABI_ONLY
 extern int __LIB__ stricmp_callee(const char *s1,const char *s2) __smallc __z88dk_callee;
 #define stricmp(a,b) stricmp_callee(a,b)
 #endif
 
-FUNC3(size_t,,strlcat,char *,dest,const char *,src,size_t,n)
+__ZFUNC3(size_t,,strlcat,char *,dest,const char *,src,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern size_t __LIB__ strlcat_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strlcat(a,b,c) strlcat_callee(a,b,c)
 #endif
 
-FUNC3(size_t,,strlcpy,char *,dest,const char *,src,size_t,n)
+__ZFUNC3(size_t,,strlcpy,char *,dest,const char *,src,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern size_t __LIB__ strlcpy_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strlcpy(a,b,c) strlcpy_callee(a,b,c)
@@ -258,68 +258,68 @@ extern char __LIB__  *strlwr_fastcall(char *s) __z88dk_fastcall;
 #define strlwr(x) strlwr_fastcall(x)
 #endif
 
-FUNC3(int,,strncasecmp,const char *,s1,const char *,s2,size_t,n)
+__ZFUNC3(int,,strncasecmp,const char *,s1,const char *,s2,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern int __LIB__ strncasecmp_callee(const char *s1,const char *s2,size_t n) __smallc __z88dk_callee;
 #define strncasecmp(a,b,c) strncasecmp_callee(a,b,c)
 #endif
 
-FUNC3(int,,strncat,char *,dst,const char *,src,size_t,n)
+__ZFUNC3(int,,strncat,char *,dst,const char *,src,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strncat_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strncat(a,b,c) strncat_callee(a,b,c)
 #endif
 
-FUNC3(char,*,strnchar,const char *,s,size_t,n,int,c)
+__ZFUNC3(char,*,strnchar,const char *,s,size_t,n,int,c)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strnchr_callee(const char *s,size_t n,int c) __smallc __z88dk_callee;
 #define strnchr(a,b,c) strnchr_callee(a,b,c)
 #endif
 
 
-FUNC3(int,,strncmp,const char *,s1, const char *,s2, size_t, n)
+__ZFUNC3(int,,strncmp,const char *,s1, const char *,s2, size_t, n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern int __LIB__ strncmp_callee(const char *s1,const char *s2,size_t n) __smallc __z88dk_callee;
 #define strncmp(a,b,c) strncmp_callee(a,b,c)
 #endif
 
-FUNC3(char,*,strncpy,char *,dest, const char *,src, size_t,n)
+__ZFUNC3(char,*,strncpy,char *,dest, const char *,src, size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strncpy_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strncpy(a,b,c) strncpy_callee(a,b,c)
 #endif
 
-FUNC2(char,*,strndup,const char *,s,size_t,n)
+__ZFUNC2(char,*,strndup,const char *,s,size_t,n)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *strndup_callee(const char *s,size_t n) __smallc __z88dk_callee;
 #define strndup(a,b) strndup_callee(a,b)
 #endif
 
-FUNC3(int,,strnicmp,const char *,s1,const char *,s2,size_t,n)
+__ZFUNC3(int,,strnicmp,const char *,s1,const char *,s2,size_t,n)
 #ifndef __STDC_ABI_ONLY
 extern int __LIB__ strnicmp_callee(const char *s1,const char *s2,size_t n) __smallc __z88dk_callee;
 #define strnicmp(a,b,c) strnicmp_callee(a,b,c)
 #endif
 
-FUNC2(size_t,,strnlen,const char *,s,size_t,max_len)
+__ZFUNC2(size_t,,strnlen,const char *,s,size_t,max_len)
 #ifndef __STDC_ABI_ONLY
 extern size_t __LIB__ strnlen_callee(const char *s,size_t max_len) __smallc __z88dk_callee;
 #define strnlen(a,b) strnlen_callee(a,b)
 #endif
 
-FUNC2(char,*,strpkbrk,const char *,s,const char *,set)
+__ZFUNC2(char,*,strpkbrk,const char *,s,const char *,set)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *strpbrk_callee(const char *s,const char *set) __smallc __z88dk_callee;
 #define strpbrk(a,b) strpbrk_callee(a,b)
 #endif
 
-FUNC2(char,*,strrchr,const char *,s,int,c)
+__ZFUNC2(char,*,strrchr,const char *,s,int,c)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *strrchr_callee(const char *s,int c) __smallc __z88dk_callee;
 #define strrchr(a,b) strrchr_callee(a,b)
 #endif
 
-FUNC2(size_t,,strrcspn,const char *,s,const char *,set)
+__ZFUNC2(size_t,,strrcspn,const char *,s,const char *,set)
 extern size_t __LIB__ strrcspn(const char *s,const char *set) __smallc;
 #ifndef __STDC_ABI_ONLY
 extern size_t __LIB__ strrcspn_callee(const char *s,const char *set) __smallc __z88dk_callee;
@@ -334,7 +334,7 @@ extern char __LIB__  *strrev_fastcall(char *s) __z88dk_fastcall;
 #endif
 
 
-FUNC2(size_t,,strrspn,const char *,s,const char *,set)
+__ZFUNC2(size_t,,strrspn,const char *,s,const char *,set)
 extern size_t __LIB__ strrspn(const char *s,const char *set) __smallc;
 #ifndef __STDC_ABI_ONLY
 extern size_t __LIB__ strrspn_callee(const char *s,const char *set) __smallc __z88dk_callee;
@@ -348,19 +348,19 @@ extern char __LIB__  *strrstrip_fastcall(char *s)  __z88dk_fastcall;
 #define strrstrip(x) strrstrip_fastcall(x)
 #endif
 
-FUNC2(char,*,strsep,char **,s,const char *,delim)
+__ZFUNC2(char,*,strsep,char **,s,const char *,delim)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *strsep_callee(char **s,const char *delim) __smallc __z88dk_callee;
 #define strsep(a,b) strsep_callee(a,b)
 #endif
 
-FUNC2(size_t,,strspn,const char *,s,const char *,pfx)
+__ZFUNC2(size_t,,strspn,const char *,s,const char *,pfx)
 #ifndef __STDC_ABI_ONLY
 extern size_t __LIB__ strspn_callee(const char *s,const char *pfx) __smallc __z88dk_callee;
 #define strspn(a,b) strspn_callee(a,b)
 #endif
 
-FUNC2(char,*,strstr,const char *,s,const char *,subs)
+__ZFUNC2(char,*,strstr,const char *,s,const char *,subs)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *strstr_callee(const char *s,const char *subs) __smallc __z88dk_callee;
 #define strstr(a,b) strstr_callee(a,b)
@@ -374,13 +374,13 @@ extern char __LIB__  *strstrip_fastcall(char *s)  __z88dk_fastcall;
 #define strstrip(x) strstrip_fastcall(x)
 #endif
 
-FUNC2(char,*,strtok,char *,s,const char *,delim)
+__ZFUNC2(char,*,strtok,char *,s,const char *,delim)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *strtok_callee(char *s,const char *delim) __smallc __z88dk_callee;
 #define strtok(a,b) strtok_callee(a,b)
 #endif
 
-FUNC3(char,*,strtok_r,char *,s,const char *,delim,char **,last_s)
+__ZFUNC3(char,*,strtok_r,char *,s,const char *,delim,char **,last_s)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strtok_r_callee(char *s,const char *delim,char **last_s) __smallc __z88dk_callee;
 #define strtok_r(a,b,c) strtok_r_callee(a,b,c)
@@ -393,13 +393,13 @@ extern char __LIB__  *strupr_fastcall(char *s) __z88dk_fastcall;
 #endif
 
 
-FUNC3(size_t,,strxfrm,char *,dst,const char *,src,size_t,n)
+__ZFUNC3(size_t,,strxfrm,char *,dst,const char *,src,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern size_t __LIB__ strxfrm_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strxfrm(a,b,c) strxfrm_callee(a,b,c)
 #endif
 
-FUNC2(char,*,strrstr,const char *,haystack,const char *,needle)
+__ZFUNC2(char,*,strrstr,const char *,haystack,const char *,needle)
 extern char __LIB__    *strrstr(const char *haystack, const char *needle) __smallc;
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__    *strrstr_callee(const char *haystack, const char *needle) __smallc __z88dk_callee;
