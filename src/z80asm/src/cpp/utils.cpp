@@ -94,13 +94,13 @@ string str_expand_escapes(const string& in) {
 		default:
 			if (c >= 0x20 && c < 0x7f)
 				out.push_back(c);
-			else if (c < 8)
+			else if (c >= 0 && c < 8)
 				out += "\\" + to_string(c);			// \o
 			else {
 				std::ostringstream ss;
 				ss << "\\x"
 					<< std::setfill('0') << std::setw(2)
-					<< std::hex << c << std::dec;
+					<< std::hex << static_cast<unsigned int>(c & 0xff) << std::dec;
 				out += ss.str();
 			}
 		}
