@@ -11,16 +11,18 @@
 ;
 
 
-			INCLUDE	"graphics/grafix.inc"
+    INCLUDE	"graphics/grafix.inc"
 
-		        SECTION code_clib
-			PUBLIC	cleargraphics
-         PUBLIC   _cleargraphics
-			EXTERN	base_graphics
+    SECTION code_clib
+    PUBLIC	cleargraphics
+    PUBLIC  _cleargraphics
+    PUBLIC  ___cleargraphics
+    EXTERN	base_graphics
 
 
 .cleargraphics
 ._cleargraphics
+.___cleargraphics
 
 	ld	hl,(base_graphics)
 	ld	d,h

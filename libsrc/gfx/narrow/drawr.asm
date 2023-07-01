@@ -6,12 +6,14 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  drawr
     PUBLIC  _drawr
+    PUBLIC  ___drawr
     
     EXTERN  asm_drawr
 
 
 .drawr
 ._drawr
+.___drawr
     pop     af    ; ret addr
     pop     de    ; y
     pop     hl    ; x

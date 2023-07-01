@@ -4,10 +4,12 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  fillb
     PUBLIC  _fillb
+    PUBLIC  ___fillb
     EXTERN  asm_fillb
     
 .fillb
 ._fillb
+.___fillb
     pop     af
     pop     de
     pop     hl

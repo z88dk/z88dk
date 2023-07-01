@@ -5,11 +5,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  fillb
     PUBLIC  _fillb
+    PUBLIC  ___fillb
     
     EXTERN  asm_fillb
 
 .fillb
 ._fillb
+.___fillb
     push    ix
     ld      ix,2
     add     ix,sp

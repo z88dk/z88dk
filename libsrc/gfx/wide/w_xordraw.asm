@@ -4,10 +4,12 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  xordraw
     PUBLIC  _xordraw
+    PUBLIC  ___xordraw
     EXTERN  asm_xordraw
 
 .xordraw
 ._xordraw
+.___xordraw
     pop     af
     pop     de     ;y2
     pop     hl     ;x2

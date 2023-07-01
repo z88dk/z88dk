@@ -5,16 +5,18 @@
     
     PUBLIC  plot
     PUBLIC  _plot
+    PUBLIC  ___plot
     
     EXTERN  asm_plot
 
 .plot
 ._plot
-    pop     af
+.___plot
+    pop     bc
     pop     de    ; y
     pop     hl    ; x
     push    hl
     push    de
-    push    af
+    push    bc
     jp      asm_plot
    

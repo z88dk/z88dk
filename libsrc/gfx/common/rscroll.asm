@@ -5,12 +5,14 @@ IF !__CPU_GBZ80__ & !__CPU_INTEL__
     SECTION code_graphics
     PUBLIC  rscroll
     PUBLIC  _rscroll
+    PUBLIC  ___rscroll
 
     EXTERN  scroll_right
 
 
 .rscroll
 ._rscroll
+.___rscroll
     push    ix
     ld      ix,2
     add     ix,sp

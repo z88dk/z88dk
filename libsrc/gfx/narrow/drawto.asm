@@ -5,11 +5,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  drawto
     PUBLIC  _drawto
+    PUBLIC  ___drawto
     
     EXTERN  asm_drawto
 
 .drawto
 ._drawto
+.___drawto
     pop     af    ; ret addr
     pop     de    ; y2
     pop     hl

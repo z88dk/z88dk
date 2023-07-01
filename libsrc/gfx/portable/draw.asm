@@ -4,6 +4,7 @@
 
 	PUBLIC	draw
 	PUBLIC	_draw
+	PUBLIC	___draw
 
 	EXTERN commondraw
 	EXTERN plot
@@ -12,5 +13,6 @@
 ;Note ints are actually uint8_t
 draw:
 _draw:
+___draw:
 	ld	hl,plot
 	jp	commondraw

@@ -1,13 +1,15 @@
 
     SECTION code_clib
     PUBLIC  getmaxy
-    PUBLIC  _getmaxy
 
     EXTERN  __console_h
 
+    PUBLIC  _getmaxy
+    PUBLIC  ___getmaxy
+    defc    _getmaxy = getmaxy
+    defc    ___getmaxy = getmaxy
 
 getmaxy:
-_getmaxy:
     ld      a,(__console_h)
     ld      l,a
     add     a

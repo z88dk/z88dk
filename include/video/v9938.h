@@ -3,6 +3,8 @@
 #ifndef __VIDEO_V9938_H__
 #define __VIDEO_V9938_H__
 
+#include <sys/compiler.h>
+
 // We want all the good stuff from tms99x8.h
 #include <video/tms99x8.h>
 
@@ -101,7 +103,7 @@ typedef struct {
 
 
 // Following this you'll
-extern void __LIB__ vdp_cmd_execute(vdp_cmd_t *cmd, vdp_cmd_operation oper, vdp_cmd_logic logic);
+__ZPROTO3(void,,vdp_cmd_execute,vdp_cmd_t *,cmd,vdp_cmd_operation,oper,vdp_cmd_logic,logic)
 
 
 

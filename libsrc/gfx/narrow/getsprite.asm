@@ -16,6 +16,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION   smc_clib
     PUBLIC    getsprite
     PUBLIC    _getsprite
+    PUBLIC    ___getsprite
     PUBLIC    getsprite_sub
     EXTERN    pixeladdress
     EXTERN    swapgfxbk
@@ -31,6 +32,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .getsprite
 ._getsprite
+.___getsprite
 
     push    ix
 

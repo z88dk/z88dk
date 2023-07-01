@@ -3,6 +3,7 @@
 
 	PUBLIC	plot
 	PUBLIC	_plot
+	PUBLIC	___plot
 	PUBLIC	plot_callee
 	PUBLIC	_plot_callee
 	PUBLIC	asm_plot
@@ -12,6 +13,7 @@
 ; int plot(int x, int y) __smallc;
 plot:
 _plot:
+___plot:
 	ld	hl,sp+2
 	ld	e,(hl)		;y
 	ld	hl,sp+4

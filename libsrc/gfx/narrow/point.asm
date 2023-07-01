@@ -5,11 +5,13 @@
     
     PUBLIC  point
     PUBLIC  _point
+    PUBLIC  ___point
     
     EXTERN  asm_point
     
 .point
 ._point
+.___point
 
     pop     bc    ; ret addr
     pop     hl    ; y

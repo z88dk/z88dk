@@ -11,12 +11,14 @@ IF !__CPU_INTEL__
     
     PUBLIC    bksave
     PUBLIC    _bksave
+    PUBLIC    ___bksave
     
     EXTERN    w_pixeladdress
 
 
 .bksave
 ._bksave
+.___bksave
     push    ix
        ld     hl,4   
        add    hl,sp

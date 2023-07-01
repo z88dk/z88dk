@@ -7,11 +7,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  undrawr
     PUBLIC  _undrawr
+    PUBLIC  ___undrawr
 
     EXTERN  asm_undrawr
 
 .undrawr
 ._undrawr
+.___undrawr
     pop     af    ; ret addr
     pop     de    ; y
     pop     hl    ; x

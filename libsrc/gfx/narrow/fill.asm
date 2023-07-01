@@ -15,6 +15,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION    code_graphics
     PUBLIC    fill
     PUBLIC    _fill
+    PUBLIC    ___fill
 
     EXTERN    do_fill
     EXTERN    swapgfxbk
@@ -23,6 +24,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .fill
 ._fill
+.___fill
     push    ix
     ld    ix,2
     add    ix,sp

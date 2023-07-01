@@ -3,6 +3,7 @@
 
 	PUBLIC	point
 	PUBLIC	_point
+	PUBLIC	___point
 	PUBLIC	point_callee
 	PUBLIC	_point_callee
 	PUBLIC	asm_point
@@ -12,6 +13,7 @@
 ; int point(int x, int y) __smallc;
 point:
 _point:
+___point:
 	ld	hl,sp+2
 	ld	e,(hl)		;y
 	ld	hl,sp+4

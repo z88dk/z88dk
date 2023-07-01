@@ -11,6 +11,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC    bkrestore
     PUBLIC    _bkrestore
+    PUBLIC    ___bkrestore
     
     EXTERN    plotpixel
     EXTERN    respixel
@@ -19,6 +20,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .bkrestore
 ._bkrestore
+.___bkrestore
 
     ; __FASTCALL__ !!   HL = sprite address
     

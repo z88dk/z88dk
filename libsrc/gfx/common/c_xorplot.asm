@@ -9,6 +9,7 @@
     SECTION	  code_graphics
     PUBLIC    c_xorplot
     PUBLIC    _c_xorplot
+    PUBLIC    ___c_xorplot
     EXTERN    swapgfxbk
     EXTERN    __graphics_end
 
@@ -17,6 +18,7 @@
 
 .c_xorplot
 ._c_xorplot
+.___c_xorplot
 IF __CPU_INTEL__ | __CPU_GBZ80__
     pop    bc
     pop    hl

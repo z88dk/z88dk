@@ -11,12 +11,14 @@ IF !__CPU_INTEL__
     
     PUBLIC    bkrestore
     PUBLIC    _bkrestore
+    PUBLIC    ___bkrestore
     
     EXTERN    w_pixeladdress
 
 
 .bkrestore
 ._bkrestore
+.___bkrestore
     push    ix
 ; __FASTCALL__ : sprite ptr in HL
     

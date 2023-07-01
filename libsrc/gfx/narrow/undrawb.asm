@@ -9,12 +9,14 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  undrawb
     PUBLIC  _undrawb
+    PUBLIC  ___undrawb
 
     EXTERN  asm_undrawb
 
 
 .undrawb
 ._undrawb
+.___undrawb
     push    ix
     ld      ix,2
     add     ix,sp

@@ -1,13 +1,15 @@
 
     SECTION code_clib
     PUBLIC  getmaxx
-    PUBLIC  _getmaxx
 
     EXTERN	__console_w
 
+    PUBLIC  _getmaxx
+    PUBLIC  ___getmaxx
+    defc    _getmaxx = getmaxx
+    defc    ___getmaxx = getmaxx
 
 getmaxx:
-_getmaxx:
 IF __CPU_GBZ80__
     ld      hl,__console_w
     ld      l,(hl)

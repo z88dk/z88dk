@@ -4,12 +4,14 @@
 
     PUBLIC  setpos
     PUBLIC  _setpos
+    PUBLIC  ___setpos
     
     EXTERN  asm_setpos
 
 
 .setpos
 ._setpos
+.___setpos
     pop     bc    ; ret addr
     pop     hl
     pop     de

@@ -20,12 +20,14 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  multipoint
     PUBLIC  _multipoint
+    PUBLIC  ___multipoint
 
     EXTERN  asm_multipoint
 
 
 .multipoint
 ._multipoint
+.___multipoint
     pop     af    ; ret addr
     pop     hl    ; y
     pop     de    ; x

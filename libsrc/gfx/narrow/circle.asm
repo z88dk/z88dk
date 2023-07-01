@@ -6,12 +6,14 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC    circle
     PUBLIC    _circle
+    PUBLIC    ___circle
 
     EXTERN    asm_circle
 
 
 .circle
 ._circle
+.___circle
     push    ix
     ld      ix,2
     add     ix,sp
