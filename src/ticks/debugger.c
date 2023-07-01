@@ -175,7 +175,7 @@ static command commands[] = {
     { "set",       cmd_set,         "<hl/h/l/...> <value>", "Set registers" },
     { "out",       cmd_out,         "<address> <value>",    "Send to IO bus"},
     { "trace",     cmd_trace,       "<on/off>",             "Disassemble every instruction"},
-    { "define",    cmd_define,   "define {hook_stop|...}",        "Specify a command block:\n\t\t\t\t\thook-stop: commands to execute when trace occurs"},
+    { "define",    cmd_define,   "define {hook-stop|...}",        "Specify a command block:\n\t\t\t\t\thook-stop: commands to execute when trace occurs"},
     { "hotspot",   cmd_hotspot,     "<on/off>",             "Track address counts and write to hotspots file"},
     { "profiler",  cmd_profiler,    "[-f fun][-i iter]",    "start/stop profiling (-f function limit, -i iteration limit)"},
     { "list",      cmd_list,        "[<address>]",          "List the source code at location given or pc"},
@@ -421,7 +421,7 @@ static void debugger_print_prompt(char *prompt, size_t prompt_size, char *buf, s
 			snprintf(prompt, prompt_size, "\n" FNT_BCK "    $%04x    (%s)>" FNT_RST " ", bk.pc(), buf);
 		}
 	} else {
-		// Original output for non-active tty 
+		// Original output for non-active tty
         snprintf(prompt, prompt_size, " %04x (%s)>", bk.pc(), buf);
 	}
 }
