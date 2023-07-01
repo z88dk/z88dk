@@ -36,4 +36,10 @@ IF __CLASSIC
 PUBLIC  _ay_wyz_start_effect
 defc _ay_wyz_start_effect = ay_wyz_start_effect
 ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC  ___ay_wyz_start_effect
+defc ___ay_wyz_start_effect = ay_wyz_start_effect
+ENDIF
 ENDIF

@@ -1,6 +1,8 @@
 #ifndef __MATH_MATH16_H
 #define __MATH_MATH16_H
 
+#ifndef __CLANG
+
 #include <sys/compiler.h>
 #include <sys/types.h>
 #include <limits.h>
@@ -170,6 +172,8 @@ extern half_t __LIB__ invsqrtf16(half_t a) __z88dk_fastcall;
 /* General */
 extern half_t __LIB__ fabsf16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ negf16(half_t x) __z88dk_fastcall;
+
+#endif
 
 #endif
 
