@@ -13,9 +13,9 @@ STDLIB_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRE
 STDLIB_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/stdlib/z80/*.asm $(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm
 
 STDLIB_8080_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/abs.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/labs.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atoi.asm" \
+        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/abs*.asm" \
+        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/labs*.asm" \
+        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atoi*.asm" \
         "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol.asm" \
         "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/itoa*.asm" \
         "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtol.asm" \
@@ -28,16 +28,17 @@ STDLIB_8080_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm" \
         $(NEWLIB_DIRECTORY)/stdlib/z80/__stdlib_seed.asm
 
 STDLIB_8080_NEWLIBGLOBS_ex := $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm) \
-        $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/abs.asm \
-        $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/labs.asm \
-        $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atoi.asm \
+        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/abs*.asm) \
+        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/labs*.asm) \
+        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atoi*.asm) \
         $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol.asm \
+        $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol_fastcall.asm \
         $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/itoa*.asm) \
         $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtol.asm \
         $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtol_callee.asm \
         $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtoul.asm \
         $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtoul_callee.asm \
-        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/z80/*rand*.asm") \
+        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/z80/*rand*.asm) \
         $(wildcard $(NEWLIB_DIRECTORY)/stdlib/z80/*abs*.asm) \
         $(wildcard $(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm) \
         $(NEWLIB_DIRECTORY)/stdlib/z80/__stdlib_seed.asm
