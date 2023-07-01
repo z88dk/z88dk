@@ -149,11 +149,11 @@ extern void __LIB__  srand_fastcall(unsigned int seed) __z88dk_fastcall;
 #define EXIT_SUCCESS   0
 
 extern void __LIB__  exit(int status);
-extern int  __LIB__  atexit(void *(func)(void));
+extern int  __LIB__  atexit(void (*func)(void));
 
 #ifndef __STDC_ABI_ONLY
 extern void __LIB__  exit_fastcall(int status) __z88dk_fastcall;
-extern int  __LIB__  atexit_fastcall(void *(func)(void)) __z88dk_fastcall;
+extern int  __LIB__  atexit_fastcall(void (*func)(void)) __z88dk_fastcall;
 #define exit(x) exit_fastcall(x)
 #define atexit(x) atexit_fastcall(x)
 #endif
