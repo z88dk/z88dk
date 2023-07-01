@@ -19,11 +19,13 @@
     SECTION	  code_clib
     PUBLIC    getcwd
     PUBLIC    _getcwd
+    PUBLIC    ___getcwd
     EXTERN    readbyte        ;standard.EXTERN
     PUBLIC asm_getcwd
 
 .getcwd
 ._getcwd
+.___getcwd
 
         pop hl
         pop bc

@@ -1,6 +1,7 @@
 SECTION   code_clib
 PUBLIC    rename
 PUBLIC    _rename
+PUBLIC    ___rename
 
 EXTERN  __agon_hl24
 EXTERN  __agon_de24
@@ -14,6 +15,7 @@ INCLUDE "target/agon/def/mos_api.inc"
 
 .rename
 ._rename
+.___rename
     push	ix
     ld      ix,4
     add     hl,sp

@@ -29,3 +29,10 @@ PUBLIC _glob_dos_callee
 defc _glob_dos_callee = glob_dos_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC __glob_dos_callee
+defc __glob_dos_callee = glob_dos_callee
+ENDIF
+

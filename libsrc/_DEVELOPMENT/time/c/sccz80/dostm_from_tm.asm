@@ -24,3 +24,10 @@ PUBLIC _dostm_from_tm
 defc _dostm_from_tm = dostm_from_tm
 ENDIF
 
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___dostm_from_tm
+defc ___dostm_from_tm = dostm_from_tm
+ENDIF
+
+

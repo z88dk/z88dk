@@ -7,6 +7,7 @@
                 SECTION   code_clib
                 PUBLIC    rename
                 PUBLIC    _rename
+                PUBLIC    ___rename
 
 ;int rename(char *s1,char *s2)
 ;on stack:
@@ -15,6 +16,7 @@
 
 .rename
 ._rename
+.___rename
         pop     bc
         pop     de      ;dest filename
         pop     hl      ;orig filename

@@ -17,6 +17,7 @@ clean: $(CLEANDIRS)
 	$(RM) */*.o 
 	$(RM) */*/*.o 
 	$(RM) */*/*/*.o 
+	$(RM) */*/*/*/*.o 
 
 $(CLEANDIRS): 
 	$(MAKE) -C $(@:%-clean=%) clean

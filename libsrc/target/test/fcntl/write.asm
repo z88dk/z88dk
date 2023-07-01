@@ -7,11 +7,13 @@
 
 		PUBLIC	write
 		PUBLIC	_write
+		PUBLIC	___write
 
 		INCLUDE	"target/test/def/test_cmds.def"
 
 .write
 ._write
+.___write
         ld      hl,2
         add     hl,sp
         ld      c,(hl)

@@ -4,6 +4,7 @@
 
 	PUBLIC	getcwd
 	PUBLIC	_getcwd
+	PUBLIC	___getcwd
 
 	EXTERN	MSXDOS
 	EXTERN	msxdos_error
@@ -11,6 +12,7 @@
 ; (char *,size_t len)
 getcwd:
 _getcwd:
+___getcwd:
 	push	ix
 	ld	ix,0
 	add	ix,sp

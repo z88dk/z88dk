@@ -4,9 +4,18 @@
 SECTION code_clib
 PUBLIC inp
 PUBLIC _inp
+PUBLIC inp_fastcall
+PUBLIC _inp_fastcall
 
-.inp
-._inp
+inp:
+_inp:
+    pop     de
+    pop     hl
+    push    hl
+    push    de
+
+.inp_fastcall
+._inp_fastcall
 
 IF __CPU_R2KA__|__CPU_R3K__
 

@@ -32,3 +32,10 @@ PUBLIC _strnlen
 defc _strnlen = strnlen
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strnlen
+defc ___strnlen = strnlen
+ENDIF
+

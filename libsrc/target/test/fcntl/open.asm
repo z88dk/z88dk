@@ -8,10 +8,12 @@
 
                 PUBLIC  open
                 PUBLIC  _open
+                PUBLIC  ___open
 
 ; char *name, int flags, mode_t mode)
 .open
 ._open
+.___open
         ld      hl,2
         add     hl,sp
         ld      c,(hl)

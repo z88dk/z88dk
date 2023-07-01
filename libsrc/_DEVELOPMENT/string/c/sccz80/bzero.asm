@@ -27,3 +27,10 @@ PUBLIC _bzero
 defc _bzero = bzero
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___bzero
+defc ___bzero = bzero
+ENDIF
+

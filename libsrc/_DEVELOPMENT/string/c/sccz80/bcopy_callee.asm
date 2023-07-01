@@ -24,3 +24,10 @@ PUBLIC _bcopy_callee
 defc _bcopy_callee = bcopy_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___bcopy_callee
+defc ___bcopy_callee = bcopy_callee
+ENDIF
+

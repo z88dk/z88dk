@@ -7,9 +7,11 @@
 	SECTION code_clib
 	PUBLIC	rename
 	PUBLIC	_rename
+	PUBLIC	___rename
 
 .rename
 ._rename
+.___rename
 	POP	BC
 	POP	HL	;new filename
 	POP	DE	;old

@@ -38,8 +38,12 @@ ELSE
 	call	malloc		
 	pop	bc
 	push	hl		;Keep for later
+IF __CPU_EZ80__
+	ld	de,(ix+8)	;cookie
+ELSE
 	ld	e,(ix+8)	;cookie
 	ld	d,(ix+9)
+ENDIF
 	ld	(hl),e		;fp_desc
 	inc	hl
 	ld	(hl),d
@@ -53,33 +57,53 @@ ELSE
 	inc	hl
 	ld	(hl),d
 	inc	hl
+IF __CPU_EZ80__
+	ld	de,(ix + 6)	;readfn
+ELSE
 	ld	e,(ix + 6)	;readfn
 	ld	d,(ix + 7)
+ENDIF
 	call	noop_becomes_dummy
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
 	inc	hl
+IF __CPU_EZ80__
+	ld	de,(ix + 4)	;writefn
+ELSE
 	ld	e,(ix + 4)	;writefn
 	ld	d,(ix + 5)
+ENDIF
 	call	noop_becomes_dummy
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
 	inc	hl
+IF __CPU_EZ80__
+	ld	de,(ix + 2)	;seekfn
+ELSE
 	ld	e,(ix + 2)	;seekfn
 	ld	d,(ix + 3)
+ENDIF
 	call	noop_becomes_dummy
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
 	inc	hl
+IF __CPU_EZ80__
+	ld	de,(ix + 0)	;closefn
+ELSE
 	ld	e,(ix + 0)	;closefn
 	ld	d,(ix + 1)
+ENDIF
 	call	noop_becomes_dummy
+IF __CPU_EZ80__
+	ld	(hl),de
+ELSE
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
+ENDIF
 	pop	hl		;get fp back
 	pop	ix		;restore callers
 	ret
@@ -168,13 +192,21 @@ handle_putc:
 ; de = buf,
 ; bc = length
 handle_read:
+IF __CPU_EZ80__ | __CPU_R2KA__ | __CPU_R3K__
+	ld	hl,(ix+fp_desc)
+ELSE
 	ld	l,(ix+fp_desc)
 	ld	h,(ix+fp_desc+1)
+ENDIF
 	push	hl
 	push	de
 	push	bc
+IF __CPU_EZ80__ | __CPU_R2KA__ | __CPU_R3K__
+	ld	hl,(ix + fp_extra + 2 + fu_readfn)
+ELSE
 	ld	l,(ix + fp_extra + 2 + fu_readfn)
 	ld	h,(ix + fp_extra + 2 + fu_readfn + 1)
+ENDIF
 exec_3args:
 	call	l_jphl
 	pop	bc
@@ -186,18 +218,30 @@ exec_3args:
 ; de = buf,
 ; bc = length	
 handle_write:
+IF __CPU_EZ80__ | __CPU_R2KA__ | __CPU_R3K__
+	ld	hl,(ix+fp_desc)
+ELSE
 	ld	l,(ix+fp_desc)
 	ld	h,(ix+fp_desc+1)
+ENDIF
 	push	hl
 	push	de
 	push	bc
+IF __CPU_EZ80__ | __CPU_R2KA__ | __CPU_R3K__
+	ld	hl,(ix + fp_extra + 2 + fu_writefn)
+ELSE
 	ld	l,(ix + fp_extra + 2 + fu_writefn)
 	ld	h,(ix + fp_extra + 2 + fu_writefn + 1)
+ENDIF
 	jr	exec_3args
 
 handle_close:
+IF __CPU_EZ80__ | __CPU_R2KA__ | __CPU_R3K__
+	ld	hl,(ix + fp_extra + 2 + fu_closefn)
+ELSE
 	ld	l,(ix + fp_extra + 2 + fu_closefn)
 	ld	h,(ix + fp_extra + 2 + fu_closefn + 1)
+ENDIF
 	ld	c,(ix + fp_desc)
 	ld	b,(ix + fp_desc + 1)
 	push	bc
@@ -215,8 +259,12 @@ handle_close:
 ; alt-a = whence
 ; Exit: dehl = current position or -1
 handle_seek:
+IF __CPU_EZ80__ | __CPU_R2KA__ | __CPU_R3K__
+	ld	hl,(ix+fp_desc)
+ELSE
 	ld	l,(ix+fp_desc)
 	ld	h,(ix+fp_desc+1)
+ENDIF
 	push	hl		;void *
 	push	bc		;posn
 	push	de
@@ -224,8 +272,12 @@ handle_seek:
 	ld	c,a
 	ld	b,0
 	push	bc		;whence
+IF __CPU_EZ80__ | __CPU_R2KA__ | __CPU_R3K__
+	ld	hl,(ix + fp_extra + 2 + fu_seekfn)
+ELSE
 	ld	l,(ix + fp_extra + 2 + fu_seekfn)
 	ld	h,(ix + fp_extra + 2 + fu_seekfn + 1)
+ENDIF
 	call	l_jphl
 	pop	bc
 	pop	bc

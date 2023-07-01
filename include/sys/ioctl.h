@@ -4,7 +4,7 @@
 #include <sys/compiler.h>
 #include <stdint.h>
 
-extern int __LIB__ console_ioctl(uint16_t cmd, void *arg) __smallc;
+__ZPROTO2(int,,console_ioctl,uint16_t,cmd,void *,arg)
 
 #define IOCTL_GENCON_RAW_MODE	  1  /* Set raw terminal mode (int *) */
 #define IOCTL_GENCON_CONSOLE_SIZE 2  /* Get console size (int *) = (d<<8|w)  */

@@ -7,10 +7,12 @@
 
 	PUBLIC	lseek
 	PUBLIC	_lseek
+	PUBLIC	___lseek
 
 ; fd, where, whence
 .lseek
 ._lseek
+.___lseek
         push    ix              ;save callers
         ld      ix,2
         add     ix,sp

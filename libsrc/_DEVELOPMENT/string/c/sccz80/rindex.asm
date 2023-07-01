@@ -17,3 +17,10 @@ PUBLIC _rindex
 defc _rindex = rindex
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___rindex
+defc ___rindex = rindex
+ENDIF
+

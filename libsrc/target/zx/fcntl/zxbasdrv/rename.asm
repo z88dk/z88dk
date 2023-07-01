@@ -13,6 +13,7 @@
 	SECTION code_clib
 	PUBLIC	rename
 	PUBLIC	_rename
+	PUBLIC	___rename
 
 	EXTERN	zx_setstr
 	EXTERN	zx_goto
@@ -20,6 +21,7 @@
 
 .rename
 ._rename
+.___rename
 	pop	bc
 	pop	de
 	pop	hl

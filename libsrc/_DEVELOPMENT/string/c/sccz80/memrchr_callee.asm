@@ -26,3 +26,10 @@ PUBLIC _memrchr_callee
 defc _memrchr_callee = memrchr_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memrchr_callee
+defc ___memrchr_callee = memrchr_callee
+ENDIF
+

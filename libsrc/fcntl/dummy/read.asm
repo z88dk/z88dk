@@ -7,7 +7,9 @@
 
 		PUBLIC	read
 		PUBLIC	_read
+		PUBLIC	___read
 
 .read
 ._read
+.___read
 	ret

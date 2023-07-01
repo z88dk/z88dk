@@ -9,6 +9,7 @@
     SECTION code_l		;Keep these in "low" memory
     SECTION code_l_sdcc
     SECTION code_l_sccz80
+    SECTION code_l_clang
     SECTION code_z80
     SECTION rodata_driver       ;Keep it in low memoey
     SECTION code_compiler

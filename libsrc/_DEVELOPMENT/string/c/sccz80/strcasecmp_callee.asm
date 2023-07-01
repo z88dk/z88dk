@@ -30,3 +30,10 @@ PUBLIC _strcasecmp_callee
 defc _strcasecmp_callee = strcasecmp_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strcasecmp_callee
+defc ___strcasecmp_callee = strcasecmp_callee
+ENDIF
+

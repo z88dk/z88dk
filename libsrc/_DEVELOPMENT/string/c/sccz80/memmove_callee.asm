@@ -24,3 +24,10 @@ PUBLIC _memmove_callee
 defc _memmove_callee = memmove_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memmove_callee
+defc ___memmove_callee = memmove_callee
+ENDIF
+

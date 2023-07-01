@@ -54,3 +54,10 @@ PUBLIC _memcpy
 defc _memcpy = memcpy
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memcpy
+defc ___memcpy = memcpy
+ENDIF
+

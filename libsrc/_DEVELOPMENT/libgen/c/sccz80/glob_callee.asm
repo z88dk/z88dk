@@ -29,3 +29,10 @@ PUBLIC _glob_callee
 defc _glob_callee = glob_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC __glob_callee
+defc __glob_callee = glob_callee
+ENDIF
+

@@ -32,3 +32,10 @@ PUBLIC _strcmp
 defc _strcmp = strcmp
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strcmp
+defc ___strcmp = strcmp
+ENDIF
+

@@ -32,3 +32,10 @@ PUBLIC _strndup
 defc _strndup = strndup
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strndup
+defc ___strndup = strndup
+ENDIF
+

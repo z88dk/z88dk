@@ -10,6 +10,7 @@ SECTION code_clib
 
 PUBLIC lseek
 PUBLIC _lseek
+PUBLIC ___lseek
 
 EXTERN l_long_add
 
@@ -17,6 +18,7 @@ INCLUDE "target/agon/def/mos_api.inc"
 
 lseek:
 _lseek:
+___lseek:
     push    ix
     ld      ix,4
     add     ix,sp

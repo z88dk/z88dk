@@ -26,3 +26,4 @@
 @threads/threads_sdcc_ix.lst
 @time/time_sdcc.lst
 @z80/z80_sdcc.lst
+@l/clang.lst

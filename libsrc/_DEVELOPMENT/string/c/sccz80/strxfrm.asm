@@ -51,3 +51,10 @@ PUBLIC _strxfrm
 defc _strxfrm = strxfrm
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strxfrm
+defc ___strxfrm = strxfrm
+ENDIF
+

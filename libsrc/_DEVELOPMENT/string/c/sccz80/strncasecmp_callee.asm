@@ -24,3 +24,10 @@ PUBLIC _strncasecmp_callee
 defc _strncasecmp_callee = strncasecmp_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strncasecmp_callee
+defc ___strncasecmp_callee = strncasecmp_callee
+ENDIF
+

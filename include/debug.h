@@ -14,12 +14,12 @@
 
 /* Disassembles a line; returns the address for the next line 
    if MYSELF, disassembles the current program location */
-extern unsigned int __LIB__ disz80(unsigned int address, unsigned int lines) __smallc;
+__ZPROTO2(unsigned int,,disz80,unsigned int,address, unsigned int,lines)
 
 /* Dump on screen: if MYSELF address is given, displays #count stack words 
    and returns the current SP value (dump excluded), otherwise dumps memory 
    bytes and returns the address reached */
-extern unsigned int __LIB__ dump(unsigned int address,unsigned int count) __smallc;
+__ZPROTO2(unsigned int,,dump,unsigned int,address,unsigned int,count)
 
 /* TRUE if Z80 supports undocumented instructions.
    Otherwise, FALSE (or, in worst cases.. crash !) */

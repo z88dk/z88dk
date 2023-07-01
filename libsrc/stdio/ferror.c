@@ -18,8 +18,17 @@ int wrapper2(FILE *fp) __naked
 {
 #asm
 PUBLIC _ferror
+PUBLIC __ferror
+PUBLIC _ferror_fastcall
 ferror:
 _ferror:
+__ferror:
+    pop de
+    pop hl
+    push hl
+    push de
+ferror_fastcall:
+_ferror_fastcall:
 	inc	hl
 	inc	hl	;flags
 	ld	a,(hl)

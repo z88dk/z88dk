@@ -54,3 +54,10 @@ PUBLIC _memcmp
 defc _memcmp = memcmp
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memcmp
+defc ___memcmp = memcmp
+ENDIF
+

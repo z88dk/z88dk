@@ -32,3 +32,10 @@ PUBLIC _strchrnul
 defc _strchrnul = strchrnul
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strchrnul
+defc ___strchrnul = strchrnul
+ENDIF
+

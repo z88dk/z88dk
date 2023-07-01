@@ -5,6 +5,7 @@ INCLUDE "target/msx/def/msxdos2.def"
 
 PUBLIC  setenv
 PUBLIC  _setenv
+PUBLIC  ___setenv
 
 
 EXTERN  MSXDOS
@@ -12,6 +13,7 @@ EXTERN  msxdos_error
 
 setenv:
 _setenv:
+___setenv:
    pop af  ;ret
    pop bc  ;overwrite flag
    pop de ; value

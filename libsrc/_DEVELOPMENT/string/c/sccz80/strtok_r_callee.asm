@@ -23,3 +23,10 @@ PUBLIC _strtok_r_callee
 defc _strtok_r_callee = strtok_r_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strtok_r_callee
+defc ___strtok_r_callee = strtok_r_callee
+ENDIF
+

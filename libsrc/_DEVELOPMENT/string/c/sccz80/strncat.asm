@@ -51,3 +51,10 @@ PUBLIC _strncat
 defc _strncat = strncat
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strncat
+defc ___strncat = strncat
+ENDIF
+
