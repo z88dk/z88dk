@@ -175,7 +175,7 @@ static command commands[] = {
     { "set",       cmd_set,         "<hl/h/l/...> <value>", "Set registers" },
     { "out",       cmd_out,         "<address> <value>",    "Send to IO bus"},
     { "trace",     cmd_trace,       "<on/off>",             "Disassemble every instruction"},
-    { "define",    cmd_define,   "define {hook-stop|...}",        "Specify a command block:\n\t\t\t\t\thook-stop: commands to execute when trace occurs"},
+    { "define",    cmd_define,   "define {hook-stop|...}",        "Specify a command block:\n          \t                    \t    hook-stop: commands to execute when trace occurs"},
     { "hotspot",   cmd_hotspot,     "<on/off>",             "Track address counts and write to hotspots file"},
     { "profiler",  cmd_profiler,    "[-f fun][-i iter]",    "start/stop profiling (-f function limit, -i iteration limit)"},
     { "list",      cmd_list,        "[<address>]",          "List the source code at location given or pc"},
