@@ -81,12 +81,52 @@ _$3_%2_%1:
 ;; Store + load of local temporary
 ;;
 
-	ld	(ix - %1), l
-	ld	(ix - %2), h
-	ld	l, (ix - %1)
-	ld	h, (ix - %2)
+	ld	(i%3 - %1), l
+	ld	(i%3 - %2), h
+	ld	l, (i%3 - %1)
+	ld	h, (i%3 - %2)
 =
-	ld	(ix - %1), l
-	ld	(ix - %2), h
+	ld	(i%3 - %1), l
+	ld	(i%3 - %2), h
 
+%eval 1 = %1 %2 -
+	ld	l, (i%3 - %1)
+	ld	h, (i%3 - %2)
+=
+	ld	hl, (i%3 - %1)
+
+%eval 1 = %1 %2 -
+	ld	(i%3 - %1), l
+	ld	(i%3 - %2), h
+=
+	ld	(i%3 - %1), hl
+
+%eval 1 = %1 %2 -
+	ld	c, (i%3 - %1)
+	ld	b, (i%3 - %2)
+=
+	ld	bc, (i%3 - %1)
+
+%eval 1 = %1 %2 -
+	ld	(i%3 - %1), c
+	ld	(i%3 - %2), b
+=
+	ld	(i%3 - %1), bc
+
+%eval 1 = %1 %2 -
+	ld	e, (i%3 - %1)
+	ld	d, (i%3 - %2)
+=
+	ld	de, (i%3 - %1)
+
+%eval 1 = %1 %2 -
+	ld	(i%3 - %1), e
+	ld	(i%3 - %2), d
+=
+	ld	(i%3 - %1), de
+
+	ld	l, (i%1)
+	ld	h, (i%1 + 1)
+=
+	ld	hl, (i%1 + 0)
 
