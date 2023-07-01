@@ -71,8 +71,8 @@ __ZPROTO2(void,*,sbrk,void *,addr,unsigned int,size)
 __ZPROTO2(void,*,calloc,unsigned int,nobj,unsigned int,size)
 extern void __LIB__              free(void *addr);
 extern void __LIB__              *malloc(unsigned int size);
-__ZPROTO2(void,*,realloc,void *,p,unsigned int,size);
-__ZPROTO2(void,,mallinfo, unsigned int *,total,unsigned int *,largest);
+__ZPROTO2(void,*,realloc,void *,p,unsigned int,size)
+__ZPROTO2(void,,mallinfo, unsigned int *,total,unsigned int *,largest)
 
 
 #ifndef __STDC_ABI_ONLY
