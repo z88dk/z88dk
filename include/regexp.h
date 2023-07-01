@@ -28,7 +28,7 @@ extern void __LIB__ __SAVEFRAME__ regerror(const char *);
 extern int __LIB__ __SAVEFRAME__ regexec(regexp *__prog, char *__string) __smallc;
 extern void __LIB__ __SAVEFRAME__ regsub(regexp *__prog, char *__source, char *__dest) __smallc;
 #else
-__ZPROTO2(int,,regexec,regexp *,__prog, char *,__string);
+__ZPROTO2(int,,regexec,regexp *,__prog, char *,__string)
 __ZPROTO3(void,,regsub,regexp *,__prog, char *,__source, char *,__dest)
 #endif
 
