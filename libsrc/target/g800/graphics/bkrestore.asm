@@ -6,16 +6,26 @@
 
 	SECTION smc_clib
 	
-	PUBLIC    bkrestore
-	PUBLIC    _bkrestore
 	
 	EXTERN sety
 	EXTERN setx
 	EXTERN getpat
 
+    PUBLIC    bkrestore
+    PUBLIC    _bkrestore
+    PUBLIC    bkrestore_fastcall
+    PUBLIC    _bkrestore_fastcall
 
 .bkrestore
 ._bkrestore
+    pop de
+    pop hl
+    push hl
+    push de
+
+.bkrestore_fastcall
+._bkrestore_fastcall
+
 	push	ix
 ; __FASTCALL__ : sprite ptr in HL
 	

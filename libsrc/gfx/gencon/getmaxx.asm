@@ -5,9 +5,7 @@
     EXTERN  __console_w
 
     PUBLIC  _getmaxx
-    PUBLIC  ___getmaxx
     defc    _getmaxx = getmaxx
-    defc    ___getmaxx = getmaxx
 
 getmaxx:
     ld      a,(__console_w)

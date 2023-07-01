@@ -9,16 +9,25 @@
 IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION   code_clib
     
-    PUBLIC    bkrestore
-    PUBLIC    _bkrestore
-    PUBLIC    ___bkrestore
     
     EXTERN    putsprite
     EXTERN    asm_clga
 
+    PUBLIC    bkrestore
+    PUBLIC    _bkrestore
+    PUBLIC    bkrestore_fastcall
+    PUBLIC    _bkrestore_fastcall
+
 .bkrestore
 ._bkrestore
-.___bkrestore
+    pop de
+    pop hl
+    push hl
+    push de
+
+.bkrestore_fastcall
+._bkrestore_fastcall
+
 
     ; __FASTCALL__ !!   HL = sprite address
 

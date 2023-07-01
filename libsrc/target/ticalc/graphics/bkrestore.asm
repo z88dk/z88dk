@@ -7,15 +7,26 @@
 ; $Id: bkrestore.asm,v 1.9 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
-	PUBLIC    bkrestore
-   PUBLIC    _bkrestore
+    SECTION code_graphics
 	EXTERN	cpygraph
 	EXTERN	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
 
+    PUBLIC    bkrestore
+    PUBLIC    _bkrestore
+    PUBLIC    bkrestore_fastcall
+    PUBLIC    _bkrestore_fastcall
+
 .bkrestore
 ._bkrestore
+    pop de
+    pop hl
+    push hl
+    push de
+
+.bkrestore_fastcall
+._bkrestore_fastcall
 
 ; __FASTCALL__ : sprite ptr in HL
 	

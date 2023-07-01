@@ -3,11 +3,9 @@
     PUBLIC  getmaxx
 
     EXTERN	__console_w
-
+    
     PUBLIC  _getmaxx
-    PUBLIC  ___getmaxx
     defc    _getmaxx = getmaxx
-    defc    ___getmaxx = getmaxx
 
 getmaxx:
 IF __CPU_GBZ80__

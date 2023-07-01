@@ -8,11 +8,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  uncircle
     PUBLIC  _uncircle
+    PUBLIC  ___uncircle
     EXTERN  asm_uncircle
 
 
 .uncircle
 ._uncircle
+.___uncircle
     push    ix
     ld      ix,2
     add     ix,sp

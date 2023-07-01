@@ -16,6 +16,7 @@
         SECTION code_clib
 	PUBLIC	msx_locate
 	PUBLIC	_msx_locate
+	PUBLIC	___msx_locate
 	
 	EXTERN	msxbios
 
@@ -28,6 +29,7 @@ ENDIF
 
 msx_locate:
 _msx_locate:
+___msx_locate:
 	
 	pop	bc
 	pop	hl

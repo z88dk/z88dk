@@ -67,7 +67,7 @@ extern void __LIB__  msx_screen(int mode) __z88dk_fastcall;
 extern void __LIB__ msx_text(void);
 
 // Move the screen cursor to a given position
-extern void __LIB__ msx_locate(unsigned int x, unsigned int y) __smallc;
+__ZPROTO2(void,,msx_locate,unsigned int,x,unsigned int,y)
 
 
 // Joystick related stuff - only for +svi, +msx using BIOS
@@ -112,20 +112,25 @@ struct msxcodehdr {
 };
 
 // Standard BSAVE tape format
-extern int  __LIB__  tape_save(char *name, size_t loadstart, void *start, size_t exec, size_t len) __smallc;
-extern int  __LIB__  tape_save_callee(char *name, size_t loadstart, void *start, size_t exec, size_t len) __smallc __z88dk_callee;
+__ZPROTO5(int,,tape_save,char *,name,size_t,loadstart,void *,start,size_t,exec,size_t,len)
 
+#ifndef __STDC_ABI_ONLY
+extern int  __LIB__  tape_save_callee(char *name, size_t loadstart, void *start, size_t exec, size_t len) __smallc __z88dk_callee;
 #define tape_save(a,b,c,d,e) tape_save_callee(a,b,c,d,e)
+#endif
 
 // Custom data blocks transfer (no filename, just a short byte for "type" discrimination
-extern int  __LIB__  tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
-extern int  __LIB__  tape_load_block(void *addr, size_t len, unsigned char type) __smallc;
+__ZPROTO3(int,,tape_save_block,void *,addr,size_t,len,unsigned char,type)
+__ZPROTO3(int,,tape_load_block,void *,addr,size_t,len,unsigned char,type)
+
 
 // save_header is equivalent to save_block with a longer leading tone
-extern int  __LIB__  msxtape_save_header(void *addr, size_t len) __smallc;
-extern int  __LIB__  msxtape_save_block(void *addr, size_t len) __smallc;
-extern int  __LIB__  msxtape_load_block(void *addr, size_t len) __smallc;
+__ZPROTO2(int,,msxtape_save_header,void *,addr,size_t,len)
+__ZPROTO2(int,,msxtape_save_block,void *,addr,size_t,len)
+__ZPROTO2(int,,msxtape_load_block,void *,addr,size_t,len)
 
+
+#ifndef __STDC_ABI_ONLY
 extern int  __LIB__  msxtape_save_header_callee(void *addr, size_t len) __smallc __z88dk_callee;
 extern int  __LIB__  msxtape_save_block_callee(void *addr, size_t len) __smallc __z88dk_callee;
 extern int  __LIB__  msxtape_load_block_callee(void *addr, size_t len) __smallc __z88dk_callee;
@@ -133,6 +138,7 @@ extern int  __LIB__  msxtape_load_block_callee(void *addr, size_t len) __smallc 
 #define msxtape_save_header(a,b) msxtape_save_header_callee(a,b)
 #define msxtape_save_block(a,b) msxtape_save_block_callee(a,b)
 #define msxtape_load_block(a,b) msxtape_load_block_callee(a,b)
+#endif
 
 
 // Low level tape control

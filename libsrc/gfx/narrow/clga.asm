@@ -6,11 +6,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  clga
     PUBLIC  _clga
+    PUBLIC  ___clga
     
     EXTERN  asm_clga
 
 .clga
 ._clga
+.___clga
     push    ix
     ld      ix,2
     add     ix,sp
