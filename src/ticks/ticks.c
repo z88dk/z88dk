@@ -1408,7 +1408,7 @@ int main (int argc, char **argv){
             if ( iy == 0 ) {  // ld (ix+d),iy
                 put_memory(t+(xl|xh<<8),yl);
                 put_memory(t+(xl|xh<<8) + 1,yh);
-            } else {  // ld (iy+d),iy
+            } else {  // ld (iy+d),ix
                 put_memory(t+(yl|yh<<8),xl);
                 put_memory(t+(yl|yh<<8) + 1,xh);
             }

@@ -33,7 +33,7 @@ char flgstk[100];
 
 /* Set up the stack references... */
 
-void initstack()
+void initstack(void)
 {
     stkcount = 0;
     laststk = 0;

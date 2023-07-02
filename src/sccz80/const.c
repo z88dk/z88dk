@@ -454,7 +454,7 @@ void stowlit(int value, int size)
 }
 
 /* Return current literal char & bump lptr */
-unsigned char litchar()
+unsigned char litchar(void)
 {
     int i, oct;
 

@@ -20,7 +20,7 @@ void addwhile(WHILE_TAB* ptr)
     ++wqptr;
 }
 
-void delwhile()
+void delwhile(void)
 {
     if (wqptr > wqueue)
         --wqptr;

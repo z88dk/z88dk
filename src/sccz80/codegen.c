@@ -256,7 +256,7 @@ void outname(const char* sname, char pref)
 }
 
 
-void reset_namespace()
+void reset_namespace(void)
 {
     current_nspace = NULL;
 }
@@ -5326,7 +5326,7 @@ void gen_emit_line(int line)
 
 /* Prefix for assembler */
 
-void prefix()
+void prefix(void)
 {
     outbyte('.');
 }
@@ -5338,7 +5338,7 @@ void printlabel(int label)
 }
 
 /* Print a label suffix */
-void col()
+void col(void)
 {
     //outstr(":");
 }
@@ -5435,7 +5435,7 @@ void gen_pop_frame(void)
 }
 
 
-void gen_builtin_strcpy()
+void gen_builtin_strcpy(void)
 {
     int label;
     // hl holds src on entry, on stack= dest

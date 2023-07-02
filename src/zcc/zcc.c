@@ -180,9 +180,9 @@ static void            parse_configfile_line(char *config_line);
 static void            KillEOL(char *line);
 static int             add_variant_args(char *wanted, int num_choices, char **choices);
 
-static void            configure_assembler();
-static void            configure_compiler();
-static void            configure_misc_options();
+static void            configure_assembler(void);
+static void            configure_compiler(void);
+static void            configure_misc_options(void);
 static void            configure_maths_library(char **libstring);
 
 static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext);
@@ -198,8 +198,8 @@ static void            find_zcc_config_fileFile(const char *program, char *arg, 
 static void            parse_option(char *option);
 static void            add_zccopt(char *fmt, ...);
 static char           *replace_str(const char *str, const char *old, const char *new);
-static void            setup_default_configuration();
-static void            print_specs();
+static void            setup_default_configuration(void);
+static void            print_specs(void);
 static int             isquote(unsigned char c);
 static char           *qstrtok(char *s, const char *delim);
 static char           *strip_inner_quotes(char *p);
@@ -695,12 +695,12 @@ static char *changesuffix(char *name, char *suffix)
     return (r);
 }
 
-static int explicit_file_type_defined()
+static int explicit_file_type_defined(void)
 {
     return explicit_file_type_c;
 }
 
-static char* get_explicit_file_type()
+static char* get_explicit_file_type(void)
 {
     if (explicit_file_type_c) {
         return ".c";
@@ -2771,7 +2771,7 @@ void parse_configfile_line(char *arg)
     return;
 }
 
-static void configure_misc_options()
+static void configure_misc_options(void)
 {
     char     buf[256];
 
@@ -2829,7 +2829,7 @@ static void configure_maths_library(char **libstring)
     }
 }
 
-static void configure_assembler()
+static void configure_assembler(void)
 {
     char            buf[FILENAME_MAX+1];
     char           *assembler = NULL;
@@ -2863,7 +2863,7 @@ static void configure_assembler()
 
 
 
-static void configure_compiler()
+static void configure_compiler(void)
 {
     char *preprocarg;
     char  buf[256];
@@ -3333,7 +3333,7 @@ char *replace_str(const char *str, const char *old, const char *new)
     return ret;
 }
 
-static void setup_default_configuration()
+static void setup_default_configuration(void)
 {
     char    buf[1024];
     arg_t  *pargs = config;
@@ -3347,7 +3347,7 @@ static void setup_default_configuration()
     }
 }
 
-static void print_specs()
+static void print_specs(void)
 {
     arg_t  *pargs = config;
     int     i;

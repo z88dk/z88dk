@@ -328,7 +328,7 @@ int main(int argc, char** argv)
 /*
  *      Abort compilation
  */
-void ccabort()
+void ccabort(void)
 {
     if (inpt2 != NULL)
         endinclude();
@@ -346,7 +346,7 @@ void ccabort()
  * defines, includes, and function
  * definitions are legal...
  */
-void parse()
+void parse(void)
 {
     while (eof == 0) { /* do until no more input */
         if (amatch("extern")) {
@@ -380,7 +380,7 @@ void parse()
 /*
  *      Report errors for user
  */
-void errsummary()
+void errsummary(void)
 {
     /* see if anything left hanging... */
     if (ncmp) {
@@ -422,7 +422,7 @@ char *nextarg(int n, char* s, int size)
  * make a few preliminary entries in the symbol table
  */
 
-void setup_sym()
+void setup_sym(void)
 {
     defmac("Z80");
     defmac("SMALL_C");
@@ -431,7 +431,7 @@ void setup_sym()
     addglb("__asm__", asm_function("__asm__"), 0, KIND_LONG, 0, LSTATIC);
 }
 
-void info()
+void info(void)
 {
     fputs(titlec, stderr);
     fputs(Version, stderr);
@@ -475,7 +475,7 @@ static void dumpsymdebug(void)
  ***********************************************************************
  */
 
-static void dumpfns()
+static void dumpfns(void)
 {
     int type, storage;
     SYMBOL* ptr;
@@ -590,7 +590,7 @@ void WriteDefined(char* sname, int value)
 
 /*
  */
-void dumpvars()
+void dumpvars(void)
 {
     int ident, type, storage;
     SYMBOL* ptr;
@@ -736,7 +736,7 @@ int dumpzero(int size, int count)
 /*
  *      Get output filename
  */
-void openout()
+void openout(void)
 {
     char filen2[FILENAME_LEN + 1];
     char extension[FILENAME_LEN+1];
@@ -775,7 +775,7 @@ void openout()
 /*
  *      Get (next) input file
  */
-void openin()
+void openin(void)
 {
     input = NULL; /* none to start with */
     while (input == NULL) { /* any above 1 allowed */
@@ -811,7 +811,7 @@ void openin()
 /*
  *      Reset line count, etc.
  */
-void newfile()
+void newfile(void)
 {
     lineno = /* no lines read */
         infunc = 0; /* therefore not in fn. */
@@ -821,7 +821,7 @@ void newfile()
 /*
  *      Open an include file
  */
-void doinclude()
+void doinclude(void)
 {
     char name[FILENAME_LEN + 1], *cp;
 
@@ -862,7 +862,7 @@ void doinclude()
 /*
  *      Close an include file
  */
-void endinclude()
+void endinclude(void)
 {
     if (c_verbose) {
         toconsole();
@@ -879,7 +879,7 @@ void endinclude()
 /*
  *      Close the output file
  */
-void closeout()
+void closeout(void)
 {
     tofile(); /* if diverted, return to file */
     if (output) {
@@ -970,7 +970,7 @@ void DispVersion(char* arg)
  *      This routine called via atexit to clean up memory
  */
 
-void atexit_deallocate()
+void atexit_deallocate(void)
 {
     FREENULL(litq);
     FREENULL(dubq);

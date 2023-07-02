@@ -979,7 +979,7 @@ Type *parse_decl(char name[], Type *base_type)
 
 /** \brief Parse an expression as used for a cast or a sizeof operation
  */
-Type *parse_expr_type()
+Type *parse_expr_type(void)
 {
     Type *type = dodeclare2(NULL, MODE_CAST);
 
@@ -1383,7 +1383,7 @@ Type *asm_function(const char *name)
 }
 
 
-void declare_func_kr()
+void declare_func_kr(void)
 {
     char   sname[NAMESIZE];
     Type  *func;
