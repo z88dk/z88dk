@@ -5268,8 +5268,8 @@
  ld (hl), e                     ; 73
  ld (hl), h                     ; 74
  ld (hl), hl                    ; DD F4 00
- ld (hl), ix                    ; D5 FD E5 D1 73 23 72 D1 2B
- ld (hl), iy                    ; D5 DD E5 D1 73 23 72 D1 2B
+ ld (hl), ix                    ; D5 FD E5 D1 73 23 72 2B D1
+ ld (hl), iy                    ; D5 DD E5 D1 73 23 72 2B D1
  ld (hl), l                     ; 75
  ld (hl+), -128                 ; 36 80 23
  ld (hl+), 127                  ; 36 7F 23
@@ -5282,8 +5282,8 @@
  ld (hl+), de                   ; 73 23 72 23
  ld (hl+), e                    ; 73 23
  ld (hl+), h                    ; 74 23
- ld (hl+), ix                   ; D5 FD E5 D1 73 23 72 D1 23
- ld (hl+), iy                   ; D5 DD E5 D1 73 23 72 D1 23
+ ld (hl+), ix                   ; D5 FD E5 D1 73 23 72 23 D1
+ ld (hl+), iy                   ; D5 DD E5 D1 73 23 72 23 D1
  ld (hl+), l                    ; 75 23
  ld (hl+126), hl                ; DD F4 7E
  ld (hl-), -128                 ; 36 80 2B
@@ -5819,8 +5819,8 @@
  ld ix, (0x123456)              ; FD 2A 56 34
  ld ix, (32767)                 ; FD 2A FF 7F
  ld ix, (65535)                 ; FD 2A FF FF
- ld ix, (hl)                    ; D5 FD E5 D1 5E 23 56 D1 2B
- ld ix, (hl+)                   ; D5 FD E5 D1 5E 23 56 D1 23
+ ld ix, (hl)                    ; D5 5E 23 56 2B D5 FD E1 D1
+ ld ix, (hl+)                   ; D5 5E 23 56 23 D5 FD E1 D1
  ld ix, (ix)                    ; FD E5 ED 54 FD 6E 00 FD 66 01 ED 54 FD E1
  ld ix, (ix+126)                ; FD E5 ED 54 FD 6E 7E FD 66 7F ED 54 FD E1
  ld ix, (ix-128)                ; FD E5 ED 54 FD 6E 80 FD 66 81 ED 54 FD E1
@@ -5839,8 +5839,8 @@
  ld iy, (0x123456)              ; DD 2A 56 34
  ld iy, (32767)                 ; DD 2A FF 7F
  ld iy, (65535)                 ; DD 2A FF FF
- ld iy, (hl)                    ; D5 DD E5 D1 5E 23 56 D1 2B
- ld iy, (hl+)                   ; D5 DD E5 D1 5E 23 56 D1 23
+ ld iy, (hl)                    ; D5 5E 23 56 2B D5 DD E1 D1
+ ld iy, (hl+)                   ; D5 5E 23 56 23 D5 DD E1 D1
  ld iy, (ix)                    ; DD E5 ED 54 FD 6E 00 FD 66 01 ED 54 DD E1
  ld iy, (ix+126)                ; DD E5 ED 54 FD 6E 7E FD 66 7F ED 54 DD E1
  ld iy, (ix-128)                ; DD E5 ED 54 FD 6E 80 FD 66 81 ED 54 DD E1
@@ -5981,8 +5981,8 @@
  ldi (hl), de                   ; 73 23 72 23
  ldi (hl), e                    ; 73 23
  ldi (hl), h                    ; 74 23
- ldi (hl), ix                   ; D5 FD E5 D1 73 23 72 D1 23
- ldi (hl), iy                   ; D5 DD E5 D1 73 23 72 D1 23
+ ldi (hl), ix                   ; D5 FD E5 D1 73 23 72 23 D1
+ ldi (hl), iy                   ; D5 DD E5 D1 73 23 72 23 D1
  ldi (hl), l                    ; 75 23
  ldi a, (bc)                    ; 0A 03
  ldi a, (de)                    ; 1A 13
@@ -5999,8 +5999,8 @@
  ldi e, (hl)                    ; 5E 23
  ldi h, (de)                    ; EB 56 EB 13
  ldi h, (hl)                    ; 66 23
- ldi ix, (hl)                   ; D5 FD E5 D1 5E 23 56 D1 23
- ldi iy, (hl)                   ; D5 DD E5 D1 5E 23 56 D1 23
+ ldi ix, (hl)                   ; D5 5E 23 56 23 D5 FD E1 D1
+ ldi iy, (hl)                   ; D5 5E 23 56 23 D5 DD E1 D1
  ldi l, (de)                    ; EB 5E EB 13
  ldi l, (hl)                    ; 6E 23
  ldir                           ; ED B0

@@ -475,55 +475,23 @@ for my $cpu (@CPUS) {
 
 	}
 	elsif ($zilog || $rabbit) {
-		add($cpu, "ld (hl), ix",  	[push_dd('de')], 
-									[$V{ix}, push_dd('hl')], 
-									[pop_dd('de')], 
-									[ld_r_r('(hl)', 'e')], 
-									[inc_dd('hl')], 
-									[ld_r_r('(hl)', 'd')], 
-									[pop_dd('de')], 
-									[dec_dd('hl')]);
-		add($cpu, "ld (hl+), ix", 	[push_dd('de')], 
-									[$V{ix}, push_dd('hl')], 	
-									[pop_dd('de')], 
-									[ld_r_r('(hl)', 'e')], 
-									[inc_dd('hl')], 
-									[ld_r_r('(hl)', 'd')], 
-									[pop_dd('de')], 
-									[inc_dd('hl')]);
-		add($cpu, "ldi (hl), ix", 	[push_dd('de')], 
-									[$V{ix}, push_dd('hl')], 
-									[pop_dd('de')], 
-									[ld_r_r('(hl)', 'e')], 
-									[inc_dd('hl')], 	
-									[ld_r_r('(hl)', 'd')], 
-									[pop_dd('de')], 
-									[inc_dd('hl')]);
-
-		add($cpu, "ld (hl), iy",  	[push_dd('de')], 
-									[$V{iy}, push_dd('hl')], 
-									[pop_dd('de')], 
-									[ld_r_r('(hl)', 'e')], 
-									[inc_dd('hl')], 
-									[ld_r_r('(hl)', 'd')], 
-									[pop_dd('de')], 
-									[dec_dd('hl')]);
-		add($cpu, "ld (hl+), iy", 	[push_dd('de')], 
-									[$V{iy}, push_dd('hl')], 
-									[pop_dd('de')], 
-									[ld_r_r('(hl)', 'e')], 
-									[inc_dd('hl')], 
-									[ld_r_r('(hl)', 'd')], 
-									[pop_dd('de')], 
-									[inc_dd('hl')]);
-		add($cpu, "ldi (hl), iy", 	[push_dd('de')], 
-									[$V{iy}, push_dd('hl')], 
-									[pop_dd('de')], 
-									[ld_r_r('(hl)', 'e')], 
-									[inc_dd('hl')], 
-									[ld_r_r('(hl)', 'd')], 
-									[pop_dd('de')], 
-									[inc_dd('hl')]);
+		for my $x (qw( ix iy )) {
+			add($cpu, "ld (hl), $x",  	[push_dd('de')], 
+										[$V{$x}, push_dd('hl')], [pop_dd('de')], 
+										[ld_r_r('(hl)', 'e')], [inc_dd('hl')], 
+										[ld_r_r('(hl)', 'd')], [dec_dd('hl')], 
+										[pop_dd('de')]);
+			add($cpu, "ld (hl+), $x", 	[push_dd('de')], 
+										[$V{$x}, push_dd('hl')], [pop_dd('de')], 
+										[ld_r_r('(hl)', 'e')], [inc_dd('hl')], 
+										[ld_r_r('(hl)', 'd')], [inc_dd('hl')], 
+										[pop_dd('de')]);
+			add($cpu, "ldi (hl), $x", 	[push_dd('de')], 
+										[$V{$x}, push_dd('hl')], [pop_dd('de')], 
+										[ld_r_r('(hl)', 'e')], [inc_dd('hl')], 
+										[ld_r_r('(hl)', 'd')], [inc_dd('hl')], 
+										[pop_dd('de')]);
+		}
 	}
 	
 	# ld bc/de/hl, (hl)
@@ -577,25 +545,23 @@ for my $cpu (@CPUS) {
 
 	}
 	elsif ($zilog || $rabbit) {
-		add($cpu, "ld ix, (hl)",  [push_dd('de')], [$V{ix}, push_dd('hl')], [pop_dd('de')], 	
-								  [ld_r_r('e', '(hl)')], [inc_dd('hl')], [ld_r_r('d', '(hl)')], 	
-								  [pop_dd('de')], [dec_dd('hl')]);
-		add($cpu, "ld ix, (hl+)", [push_dd('de')], [$V{ix}, push_dd('hl')], [pop_dd('de')], 	
-								  [ld_r_r('e', '(hl)')], [inc_dd('hl')], [ld_r_r('d', '(hl)')],  	
-								  [pop_dd('de')], [inc_dd('hl')]);
-		add($cpu, "ldi ix, (hl)", [push_dd('de')], [$V{ix}, push_dd('hl')], [pop_dd('de')],  	
-								  [ld_r_r('e', '(hl)')], [inc_dd('hl')], [ld_r_r('d', '(hl)')],  	
-								  [pop_dd('de')], [inc_dd('hl')]);
-		
-		add($cpu, "ld iy, (hl)",  [push_dd('de')], [$V{iy}, push_dd('hl')], [pop_dd('de')],  	
-								  [ld_r_r('e', '(hl)')], [inc_dd('hl')], [ld_r_r('d', '(hl)')],  	
-								  [pop_dd('de')], [dec_dd('hl')]);
-		add($cpu, "ld iy, (hl+)", [push_dd('de')], [$V{iy}, push_dd('hl')], [pop_dd('de')],  	
-								  [ld_r_r('e', '(hl)')], [inc_dd('hl')], [ld_r_r('d', '(hl)')],  	
-								  [pop_dd('de')], [inc_dd('hl')]);
-		add($cpu, "ldi iy, (hl)", [push_dd('de')], [$V{iy}, push_dd('hl')], [pop_dd('de')],  	
-								  [ld_r_r('e', '(hl)')], [inc_dd('hl')], [ld_r_r('d', '(hl)')],  	
-								  [pop_dd('de')], [inc_dd('hl')]);
+		for my $x (qw( ix iy )) {
+			add($cpu, "ld $x, (hl)",  	[push_dd('de')], 
+										[ld_r_r('e', '(hl)')], [inc_dd('hl')], 
+										[ld_r_r('d', '(hl)')], [dec_dd('hl')],
+										[push_dd('de')], [$V{$x}, pop_dd('hl')],
+										[pop_dd('de')]);
+			add($cpu, "ld $x, (hl+)", 	[push_dd('de')], 
+										[ld_r_r('e', '(hl)')], [inc_dd('hl')], 
+										[ld_r_r('d', '(hl)')], [inc_dd('hl')],
+										[push_dd('de')], [$V{$x}, pop_dd('hl')],
+										[pop_dd('de')]);
+			add($cpu, "ldi $x, (hl)", 	[push_dd('de')], 
+										[ld_r_r('e', '(hl)')], [inc_dd('hl')], 
+										[ld_r_r('d', '(hl)')], [inc_dd('hl')],
+										[push_dd('de')], [$V{$x}, pop_dd('hl')],
+										[pop_dd('de')]);
+		}
 	}
 	
 	# ld bc/de/hl/ix/iy, (ix/iy+d)
