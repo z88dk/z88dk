@@ -74,7 +74,7 @@ src/c/parse.o: src/c/parse.c
 .PHONY: z80asm_lib
 all: z80asm_lib
 
-z80asm_lib:
+z80asm_lib: $(PROJ)$(EXESUFFIX)
 ifeq ($(CROSS),0)
 	$(MAKE) -C dev/z80asm_lib
 	cp dev/z80asm_lib/$(PROJ)-*.lib .

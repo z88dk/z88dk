@@ -20,10 +20,11 @@ define MAKE_LIB
 all: $(PROJ)-$(strip $(1)).lib
 
 $(PROJ)-$(strip $(1)).lib: $(PROJ)_lib.lst $(SRC) Makefile ../../src/c/zobjfile.h
-	$(Z80ASM_EXE) -l -x$(PROJ)-$(strip $(1)).lib $(2) @$(PROJ)_lib.lst
+	$(Z80ASM_EXE) -l -O$(1) -x$(PROJ)-$(strip $(1)).lib $(2) @$(PROJ)_lib.lst
 
 clean::
 	$(RM) $(PROJ)-$(strip $(1)).lib
+	$(RM) -r  $(1)
 
 install::
 	$(INSTALL) $(PROJ)-$(strip $(1)).lib $(PREFIX)/lib/$(PROJ)-$(strip $(1)).lib
