@@ -27,6 +27,7 @@
 #define NS_TO_US(ns)    ((ns)/1000)
 
 static uint8_t verbose = 0;
+static char* script_file = NULL;
 int c_autolabel = 0;
 uint8_t temporary_break = 0;
 static uint8_t has_clock_register = 0;
@@ -343,6 +344,11 @@ uint16_t get_ff()
 uint8_t is_verbose()
 {
     return verbose;
+}
+
+char* script_filename()
+{
+    return script_file;
 }
 
 uint16_t get_pc()
@@ -1200,7 +1206,8 @@ static backend_t gdb_backend = {
     .debug = stdout_log,
     .execution_stopped = gdb_execution_stopped,
     .ctrl_c = ctrl_c,
-    .time = gdb_profiler_time
+    .time = gdb_profiler_time,
+	.script_filename = script_filename
 };
 
 static void process_scheduled_actions()
@@ -1272,6 +1279,11 @@ int main(int argc, char **argv) {
             read_symbol_file(debug_symbols);
             if (bk.is_verbose()) {
                 bk.debug("OK\n");
+            }
+        } else if (strcmp(argv[i], "--script") == 0) {
+            script_file = argv[++i];
+            if (bk.is_verbose()) {
+                bk.debug("Will load script file...");
             }
         } else if (strcmp(argv[i], "-v") == 0) {
             verbose = 1;

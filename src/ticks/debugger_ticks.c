@@ -9,6 +9,7 @@
 #include "breakpoints.h"
 
 uint8_t verbose = 0;
+char* script_file = NULL;
 
 long long get_st()
 {
@@ -38,6 +39,10 @@ uint8_t get_ticks_memory(uint16_t at)
 uint8_t is_verbose()
 {
     return verbose;
+}
+
+char* script_filename() {
+	return script_file;
 }
 
 void get_regs(struct debugger_regs_t* regs)
@@ -230,6 +235,7 @@ backend_t ticks_debugger_backend = {
     .enable_breakpoint = &do_nothing,
     .breakpoints_check = &breakpoints_check,
     .is_verbose = is_verbose,
+	.script_filename = script_filename,
     .remote_connect = NULL,
     .is_remote_connected = NULL,
     .console = stdout_log,
