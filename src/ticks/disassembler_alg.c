@@ -590,7 +590,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     if ( isz180() || isez80() ) {
                                         if ( z == 4 ) BUF_PRINTF("%-10s%s","tst",handle_register8(state,y, opbuf1, sizeof(opbuf1)));
                                         else if ( z == 0 ) BUF_PRINTF("%-10s%s,(%s)","in0",y == 6 ? "f" : handle_register8(state,y, opbuf1, sizeof(opbuf1)), handle_immed8(state, opbuf2, sizeof(opbuf2)));
-                                        else if ( z == 1 ) BUF_PRINTF("%-10s(%s),%s","out0",handle_immed8(state, opbuf2, sizeof(opbuf2)),handle_register8(state,y, opbuf1, sizeof(opbuf1)));
+                                        else if ( z == 1 && y != 6) BUF_PRINTF("%-10s(%s),%s","out0",handle_immed8(state, opbuf2, sizeof(opbuf2)),handle_register8(state,y, opbuf1, sizeof(opbuf1)));
+                                        else if ( z == 1 && isez80() ) BUF_PRINTF("%-10siy,(hl)","ld");
                                         else if ( (z == 2 || z == 3) && isez80() ) BUF_PRINTF("%-10s%s,%s%s", handle_ez80_am(state,"lea"), y == 6 ? handle_hl(z-1) : handle_register16(state, p, 0), handle_hl(z-1), handle_displacement(state, opbuf1, sizeof(opbuf1)));
                                         else if ( z == 7 && isez80() ) {
                                             if ( q == 1 ) BUF_PRINTF("%-10s(hl),%s", handle_ez80_am(state,"ld"), p == 3 ? handle_hl(1) : handle_register16(state, p, 0));
