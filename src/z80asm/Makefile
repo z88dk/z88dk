@@ -103,7 +103,7 @@ src/c/scan_rules.h: src/c/scan_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile 
 ifeq ($(RUN_RAGEL),1)
 	perl parse_ragel.pl src/c/scan_rules.rl
-	dos2unix src/c/scan_rules.h > /dev/null
+	dos2unix src/c/scan_rules.h 2> /dev/null
 endif
 	
 dev: src/c/parse_rules.h
@@ -113,37 +113,37 @@ src/c/parse_rules.h: src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				dev/cpu/cpu_rules.h
 ifeq ($(RUN_RAGEL),1)
 	perl parse_ragel.pl src/c/parse_rules.rl
-	dos2unix src/c/parse_rules.h > /dev/null
+	dos2unix src/c/parse_rules.h 2> /dev/null
 endif
 
 src/c/tokens.h : make_tokens.pl Makefile
 	perl make_tokens.pl > src/c/tokens.h
-	dos2unix src/c/tokens.h > /dev/null
+	dos2unix src/c/tokens.h 2> /dev/null
 
 # opcode tables generator
 dev: dev/cpu/opcodes.yaml \
 	 dev/cpu/opcodes.txt \
-	 dev/cpu/cpu_test_z80_adl0_ok.asm \
+	 dev/cpu/cpu_test_z80_ok.asm \
 	 dev/cpu/cpu_rules.h
 
 dev/cpu/opcodes.yaml: dev/cpu/make_opcodes.pl Makefile
-	cd dev/cpu && perl make_opcodes.pl && dos2unix opcodes.yaml > /dev/null
+	cd dev/cpu && perl make_opcodes.pl && dos2unix opcodes.yaml 2> /dev/null
 
 dev/cpu/opcodes.txt: dev/cpu/opcodes.yaml dev/cpu/dump_opcodes.pl Makefile
-	cd dev/cpu && perl dump_opcodes.pl && dos2unix opcodes.txt > /dev/null
+	cd dev/cpu && perl dump_opcodes.pl && dos2unix opcodes.txt 2> /dev/null
 
 dev/cpu/cpu_test_z80_ok.asm: dev/cpu/opcodes.yaml dev/cpu/make_cpu_test.pl Makefile
-	cd dev/cpu && perl make_cpu_test.pl && dos2unix cpu_test_*.asm > /dev/null
+	cd dev/cpu && perl make_cpu_test.pl && dos2unix cpu_test_*.asm 2> /dev/null
 
 dev/cpu/cpu_rules.h: dev/cpu/opcodes.yaml dev/cpu/make_cpu_rules.pl Makefile
-	cd dev/cpu && perl make_cpu_rules.pl && dos2unix cpu_rules.h > /dev/null
+	cd dev/cpu && perl make_cpu_rules.pl && dos2unix cpu_rules.h 2> /dev/null
 
 # reloc routine
 dev: src/c/reloc_code.c
 
 src/c/reloc_code.c: dev/reloc_code.asm dev/make_reloc_code.pl Makefile
-	cd dev && perl make_reloc_code.pl && dos2unix reloc_code.[ch] && \
-		mv -f reloc_code.[ch] ../src/c/ > /dev/null
+	cd dev && perl make_reloc_code.pl && dos2unix reloc_code.[ch] 2> /dev/null && \
+		mv -f reloc_code.[ch] ../src/c/ 
 
 # re2c
 define MAKE_RE2C
@@ -151,7 +151,7 @@ dev: $(1).o
 
 $(1).cpp: $(1).re Makefile
 	$(RE2C) -o $(1).cpp $(1).re
-	dos2unix $(1).cpp > /dev/null
+	dos2unix $(1).cpp 2> /dev/null
 endef
 
 $(eval $(call MAKE_RE2C,src/cpp/lex))

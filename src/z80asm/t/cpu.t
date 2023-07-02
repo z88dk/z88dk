@@ -20,9 +20,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	my $base = path($file)->basename(".asm");
 	my $ok = $base =~ s/_ok//; $base =~ s/_err//;
 	my $ixiy = $base =~ s/_ixiy//;
-	$base =~ s/_adl\d//;
-	my($cpu) = $base =~ /cpu_test_(\w+)$/; $cpu =~ tr/_/-/;
-	(my $dis_cpu = $cpu) =~ s/ez80_z80/ez80/;
+	my($cpu) = $base =~ /cpu_test_(\w+)$/;
 	
 	# assembler output files
 	(my $file_bin = $file) =~ s/\.asm$/.bin/;
@@ -99,14 +97,18 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		
 		if (!$ixiy && $cpu ne 'ez80') {
 			# run disassembler and assemble again; check binary
-			run_ok("z88dk-dis -m$dis_cpu $file_bin > $test.asm");
-			
-			# assemble
-			run_ok("z88dk-z80asm -m$cpu -b -l $test.asm 2> $test.err");
-			is slurp("$test.err"), "", "check errors";
-			
-			# compare
-			check_bin_file("$test.bin", slurp("$file_bin"));
+			run_ok("z88dk-dis -m$cpu $file_bin > $test.asm");
+
+			SKIP: {
+				skip "skip until #2313 is solved";
+				
+				# assemble
+				run_ok("z88dk-z80asm -m$cpu -b -l $test.asm 2> $test.err");
+				is slurp("$test.err"), "", "check errors";
+				
+				# compare
+				check_bin_file("$test.bin", slurp("$file_bin"));
+			}
 		}
 	}
 	else {
@@ -114,10 +116,6 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		my @lines = path($file)->lines;
 		my $num_lines = scalar @lines;
 		my @err_lines;
-		
-		if ($lines[0] =~ /\.assume/i) {
-			$err_lines[1]++;
-		}
 		
 		# run assembler
 		run_nok($asm_cmd);

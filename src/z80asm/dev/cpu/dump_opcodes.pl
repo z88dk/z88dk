@@ -10,7 +10,7 @@ my %opcodes = %{$yaml->[0]};
 
 my $sep = \"|";
 
-%opcodes = expand_ez80(expand_consts(%opcodes));
+%opcodes = expand_consts(%opcodes);
 my $opcode_table = make_opcode_table(%opcodes);
 my $hex_table = make_hex_table(%opcodes);
 
@@ -58,49 +58,6 @@ sub expand_consts {
 	return %opcodes_out;
 }	
 
-sub expand_ez80 {
-	my(%opcodes_in) = @_;
-	my %opcodes_out;
-
-	for my $asm (sort keys %opcodes_in) {
-		for my $cpu (sort keys %{$opcodes_in{$asm}}) {
-			my @ops = @{clone($opcodes_in{$asm}{$cpu})};
-
-			if ($cpu =~ /ez80/) {
-				if ($ops[0][0] eq '{ADL0}') {
-					shift @ops;
-					$opcodes_out{$asm}{ez80_z80} = clone(\@ops);
-				}
-				elsif ($ops[0][0] eq '{ADL1}') {
-					shift @ops;
-					$opcodes_out{$asm}{ez80} = clone(\@ops);
-				}
-				elsif ($ops[0][0] eq '{ADL0}?') {
-					shift @ops;
-					my(@adl0, @adl1);
-					while ($ops[0][0] ne ':') {
-						push @adl0, shift @ops;
-					}
-					shift @ops;
-					@adl1 = @ops;
-					
-					$opcodes_out{$asm}{ez80_z80} = clone(\@adl0);
-					$opcodes_out{$asm}{ez80} = clone(\@adl1);
-				}
-				else {
-					$opcodes_out{$asm}{ez80_z80} = clone(\@ops);
-					$opcodes_out{$asm}{ez80} = clone(\@ops);
-				}
-			}
-			else {
-				$opcodes_out{$asm}{$cpu} = clone(\@ops);
-			}
-		}
-	}
-			
-	return %opcodes_out;
-}
-				
 sub find_range {
 	my($asm, $cpu, @ops) = @_;
 	

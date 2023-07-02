@@ -45,15 +45,16 @@ extern "C" {
 
 
 // CPU types
-#define CPU_Z80     (1 << 0)
-#define CPU_Z80N	(1 << 1)
-#define CPU_Z180    (1 << 2)
-#define CPU_EZ80	(1 << 3)
-#define CPU_R2KA	(1 << 4)
-#define CPU_R3K		(1 << 5)
-#define CPU_8080	(1 << 6)
-#define CPU_8085	(1 << 7)
-#define CPU_GBZ80	(1 << 8)
+#define CPU_Z80			(1 << 0)
+#define CPU_Z80N		(1 << 1)
+#define CPU_Z180		(1 << 2)
+#define CPU_EZ80		(1 << 3)
+#define CPU_EZ80_Z80	(1 << 4)
+#define CPU_R2KA		(1 << 5)
+#define CPU_R3K			(1 << 6)
+#define CPU_8080		(1 << 7)
+#define CPU_8085		(1 << 8)
+#define CPU_GBZ80		(1 << 9)
 
 #define CPU_Z80_NAME		"z80"
 #define CPU_Z80N_NAME		"z80n"
@@ -68,7 +69,7 @@ extern "C" {
 #define ARCH_TI83_NAME		"ti83"
 #define ARCH_TI83PLUS_NAME	"ti83plus"
 
-#define CPU_ZILOG	(CPU_Z80 | CPU_Z80N | CPU_Z180 | CPU_EZ80)
+#define CPU_ZILOG	(CPU_Z80 | CPU_Z80N | CPU_Z180 | CPU_EZ80 | CPU_EZ80_Z80)
 #define CPU_RABBIT	(CPU_R2KA | CPU_R3K)
 #define CPU_ALL		(CPU_ZILOG | CPU_RABBIT)
 #define CPU_NOT_Z80	(CPU_ALL & ~(CPU_Z80 | CPU_Z80N))
@@ -152,8 +153,6 @@ int option_cpu();
 const char* option_cpu_name();
 bool option_ti83();
 bool option_ti83plus();
-bool option_ez80_adl();
-void set_ez80_adl_option(bool f);
 bool option_speed();
 bool option_debug();
 const char* search_libraries(const char* filename);

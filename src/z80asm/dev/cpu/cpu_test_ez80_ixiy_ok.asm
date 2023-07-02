@@ -1,4 +1,3 @@
- .assume adl=1
  aci -128                       ; CE 80
  aci 127                        ; CE 7F
  aci 255                        ; CE FF
@@ -135,18 +134,21 @@
  add a, l                       ; 85
  add b                          ; 80
  add bc, -32768                 ; E5 21 00 80 09 44 4D E1
+ add bc, 0x123456               ; E5 21 56 34 09 44 4D E1
  add bc, 32767                  ; E5 21 FF 7F 09 44 4D E1
  add bc, 65535                  ; E5 21 FF FF 09 44 4D E1
  add bc, a                      ; CD @__z80asm__add_bc_a
  add c                          ; 81
  add d                          ; 82
  add de, -32768                 ; E5 21 00 80 19 54 5D E1
+ add de, 0x123456               ; E5 21 56 34 19 54 5D E1
  add de, 32767                  ; E5 21 FF 7F 19 54 5D E1
  add de, 65535                  ; E5 21 FF FF 19 54 5D E1
  add de, a                      ; CD @__z80asm__add_de_a
  add e                          ; 83
  add h                          ; 84
  add hl, -32768                 ; D5 11 00 80 19 D1
+ add hl, 0x123456               ; D5 11 56 34 19 D1
  add hl, 32767                  ; D5 11 FF 7F 19 D1
  add hl, 65535                  ; D5 11 FF FF 19 D1
  add hl, a                      ; CD @__z80asm__add_hl_a
@@ -549,78 +551,275 @@
  bit.sil 7, (iy)                ; 52 DD CB 00 7E
  bit.sil 7, (iy+126)            ; 52 DD CB 7E 7E
  bit.sil 7, (iy-128)            ; 52 DD CB 80 7E
+ c_c -32768                     ; DC 00 80 FF
  c_c 0x123456                   ; DC 56 34 12
+ c_c 32767                      ; DC FF 7F 00
+ c_c 65535                      ; DC FF FF 00
+ c_m -32768                     ; FC 00 80 FF
  c_m 0x123456                   ; FC 56 34 12
+ c_m 32767                      ; FC FF 7F 00
+ c_m 65535                      ; FC FF FF 00
+ c_nc -32768                    ; D4 00 80 FF
  c_nc 0x123456                  ; D4 56 34 12
+ c_nc 32767                     ; D4 FF 7F 00
+ c_nc 65535                     ; D4 FF FF 00
+ c_nv -32768                    ; E4 00 80 FF
  c_nv 0x123456                  ; E4 56 34 12
+ c_nv 32767                     ; E4 FF 7F 00
+ c_nv 65535                     ; E4 FF FF 00
+ c_nz -32768                    ; C4 00 80 FF
  c_nz 0x123456                  ; C4 56 34 12
+ c_nz 32767                     ; C4 FF 7F 00
+ c_nz 65535                     ; C4 FF FF 00
+ c_p -32768                     ; F4 00 80 FF
  c_p 0x123456                   ; F4 56 34 12
+ c_p 32767                      ; F4 FF 7F 00
+ c_p 65535                      ; F4 FF FF 00
+ c_pe -32768                    ; EC 00 80 FF
  c_pe 0x123456                  ; EC 56 34 12
+ c_pe 32767                     ; EC FF 7F 00
+ c_pe 65535                     ; EC FF FF 00
+ c_po -32768                    ; E4 00 80 FF
  c_po 0x123456                  ; E4 56 34 12
+ c_po 32767                     ; E4 FF 7F 00
+ c_po 65535                     ; E4 FF FF 00
+ c_v -32768                     ; EC 00 80 FF
  c_v 0x123456                   ; EC 56 34 12
+ c_v 32767                      ; EC FF 7F 00
+ c_v 65535                      ; EC FF FF 00
+ c_z -32768                     ; CC 00 80 FF
  c_z 0x123456                   ; CC 56 34 12
+ c_z 32767                      ; CC FF 7F 00
+ c_z 65535                      ; CC FF FF 00
+ call -32768                    ; CD 00 80 FF
  call 0x123456                  ; CD 56 34 12
+ call 32767                     ; CD FF 7F 00
+ call 65535                     ; CD FF FF 00
+ call c, -32768                 ; DC 00 80 FF
  call c, 0x123456               ; DC 56 34 12
+ call c, 32767                  ; DC FF 7F 00
+ call c, 65535                  ; DC FF FF 00
+ call m, -32768                 ; FC 00 80 FF
  call m, 0x123456               ; FC 56 34 12
+ call m, 32767                  ; FC FF 7F 00
+ call m, 65535                  ; FC FF FF 00
+ call nc, -32768                ; D4 00 80 FF
  call nc, 0x123456              ; D4 56 34 12
+ call nc, 32767                 ; D4 FF 7F 00
+ call nc, 65535                 ; D4 FF FF 00
+ call nv, -32768                ; E4 00 80 FF
  call nv, 0x123456              ; E4 56 34 12
+ call nv, 32767                 ; E4 FF 7F 00
+ call nv, 65535                 ; E4 FF FF 00
+ call nz, -32768                ; C4 00 80 FF
  call nz, 0x123456              ; C4 56 34 12
+ call nz, 32767                 ; C4 FF 7F 00
+ call nz, 65535                 ; C4 FF FF 00
+ call p, -32768                 ; F4 00 80 FF
  call p, 0x123456               ; F4 56 34 12
+ call p, 32767                  ; F4 FF 7F 00
+ call p, 65535                  ; F4 FF FF 00
+ call pe, -32768                ; EC 00 80 FF
  call pe, 0x123456              ; EC 56 34 12
+ call pe, 32767                 ; EC FF 7F 00
+ call pe, 65535                 ; EC FF FF 00
+ call po, -32768                ; E4 00 80 FF
  call po, 0x123456              ; E4 56 34 12
+ call po, 32767                 ; E4 FF 7F 00
+ call po, 65535                 ; E4 FF FF 00
+ call v, -32768                 ; EC 00 80 FF
  call v, 0x123456               ; EC 56 34 12
+ call v, 32767                  ; EC FF 7F 00
+ call v, 65535                  ; EC FF FF 00
+ call z, -32768                 ; CC 00 80 FF
  call z, 0x123456               ; CC 56 34 12
+ call z, 32767                  ; CC FF 7F 00
+ call z, 65535                  ; CC FF FF 00
+ call.il -32768                 ; 5B CD 00 80 FF
  call.il 0x123456               ; 5B CD 56 34 12
+ call.il 32767                  ; 5B CD FF 7F 00
+ call.il 65535                  ; 5B CD FF FF 00
+ call.il c, -32768              ; 5B DC 00 80 FF
  call.il c, 0x123456            ; 5B DC 56 34 12
+ call.il c, 32767               ; 5B DC FF 7F 00
+ call.il c, 65535               ; 5B DC FF FF 00
+ call.il m, -32768              ; 5B FC 00 80 FF
  call.il m, 0x123456            ; 5B FC 56 34 12
+ call.il m, 32767               ; 5B FC FF 7F 00
+ call.il m, 65535               ; 5B FC FF FF 00
+ call.il nc, -32768             ; 5B D4 00 80 FF
  call.il nc, 0x123456           ; 5B D4 56 34 12
+ call.il nc, 32767              ; 5B D4 FF 7F 00
+ call.il nc, 65535              ; 5B D4 FF FF 00
+ call.il nv, -32768             ; 5B E4 00 80 FF
  call.il nv, 0x123456           ; 5B E4 56 34 12
+ call.il nv, 32767              ; 5B E4 FF 7F 00
+ call.il nv, 65535              ; 5B E4 FF FF 00
+ call.il nz, -32768             ; 5B C4 00 80 FF
  call.il nz, 0x123456           ; 5B C4 56 34 12
+ call.il nz, 32767              ; 5B C4 FF 7F 00
+ call.il nz, 65535              ; 5B C4 FF FF 00
+ call.il p, -32768              ; 5B F4 00 80 FF
  call.il p, 0x123456            ; 5B F4 56 34 12
+ call.il p, 32767               ; 5B F4 FF 7F 00
+ call.il p, 65535               ; 5B F4 FF FF 00
+ call.il pe, -32768             ; 5B EC 00 80 FF
  call.il pe, 0x123456           ; 5B EC 56 34 12
+ call.il pe, 32767              ; 5B EC FF 7F 00
+ call.il pe, 65535              ; 5B EC FF FF 00
+ call.il po, -32768             ; 5B E4 00 80 FF
  call.il po, 0x123456           ; 5B E4 56 34 12
+ call.il po, 32767              ; 5B E4 FF 7F 00
+ call.il po, 65535              ; 5B E4 FF FF 00
+ call.il v, -32768              ; 5B EC 00 80 FF
  call.il v, 0x123456            ; 5B EC 56 34 12
+ call.il v, 32767               ; 5B EC FF 7F 00
+ call.il v, 65535               ; 5B EC FF FF 00
+ call.il z, -32768              ; 5B CC 00 80 FF
  call.il z, 0x123456            ; 5B CC 56 34 12
+ call.il z, 32767               ; 5B CC FF 7F 00
+ call.il z, 65535               ; 5B CC FF FF 00
  call.is -32768                 ; 49 CD 00 80
+ call.is 0x123456               ; 49 CD 56 34
  call.is 32767                  ; 49 CD FF 7F
  call.is 65535                  ; 49 CD FF FF
  call.is c, -32768              ; 49 DC 00 80
+ call.is c, 0x123456            ; 49 DC 56 34
  call.is c, 32767               ; 49 DC FF 7F
  call.is c, 65535               ; 49 DC FF FF
  call.is m, -32768              ; 49 FC 00 80
+ call.is m, 0x123456            ; 49 FC 56 34
  call.is m, 32767               ; 49 FC FF 7F
  call.is m, 65535               ; 49 FC FF FF
  call.is nc, -32768             ; 49 D4 00 80
+ call.is nc, 0x123456           ; 49 D4 56 34
  call.is nc, 32767              ; 49 D4 FF 7F
  call.is nc, 65535              ; 49 D4 FF FF
  call.is nv, -32768             ; 49 E4 00 80
+ call.is nv, 0x123456           ; 49 E4 56 34
  call.is nv, 32767              ; 49 E4 FF 7F
  call.is nv, 65535              ; 49 E4 FF FF
  call.is nz, -32768             ; 49 C4 00 80
+ call.is nz, 0x123456           ; 49 C4 56 34
  call.is nz, 32767              ; 49 C4 FF 7F
  call.is nz, 65535              ; 49 C4 FF FF
  call.is p, -32768              ; 49 F4 00 80
+ call.is p, 0x123456            ; 49 F4 56 34
  call.is p, 32767               ; 49 F4 FF 7F
  call.is p, 65535               ; 49 F4 FF FF
  call.is pe, -32768             ; 49 EC 00 80
+ call.is pe, 0x123456           ; 49 EC 56 34
  call.is pe, 32767              ; 49 EC FF 7F
  call.is pe, 65535              ; 49 EC FF FF
  call.is po, -32768             ; 49 E4 00 80
+ call.is po, 0x123456           ; 49 E4 56 34
  call.is po, 32767              ; 49 E4 FF 7F
  call.is po, 65535              ; 49 E4 FF FF
  call.is v, -32768              ; 49 EC 00 80
+ call.is v, 0x123456            ; 49 EC 56 34
  call.is v, 32767               ; 49 EC FF 7F
  call.is v, 65535               ; 49 EC FF FF
  call.is z, -32768              ; 49 CC 00 80
+ call.is z, 0x123456            ; 49 CC 56 34
  call.is z, 32767               ; 49 CC FF 7F
  call.is z, 65535               ; 49 CC FF FF
+ call.lil -32768                ; 5B CD 00 80 FF
  call.lil 0x123456              ; 5B CD 56 34 12
+ call.lil 32767                 ; 5B CD FF 7F 00
+ call.lil 65535                 ; 5B CD FF FF 00
+ call.lil c, -32768             ; 5B DC 00 80 FF
+ call.lil c, 0x123456           ; 5B DC 56 34 12
+ call.lil c, 32767              ; 5B DC FF 7F 00
+ call.lil c, 65535              ; 5B DC FF FF 00
+ call.lil m, -32768             ; 5B FC 00 80 FF
+ call.lil m, 0x123456           ; 5B FC 56 34 12
+ call.lil m, 32767              ; 5B FC FF 7F 00
+ call.lil m, 65535              ; 5B FC FF FF 00
+ call.lil nc, -32768            ; 5B D4 00 80 FF
+ call.lil nc, 0x123456          ; 5B D4 56 34 12
+ call.lil nc, 32767             ; 5B D4 FF 7F 00
+ call.lil nc, 65535             ; 5B D4 FF FF 00
+ call.lil nv, -32768            ; 5B E4 00 80 FF
+ call.lil nv, 0x123456          ; 5B E4 56 34 12
+ call.lil nv, 32767             ; 5B E4 FF 7F 00
+ call.lil nv, 65535             ; 5B E4 FF FF 00
+ call.lil nz, -32768            ; 5B C4 00 80 FF
+ call.lil nz, 0x123456          ; 5B C4 56 34 12
+ call.lil nz, 32767             ; 5B C4 FF 7F 00
+ call.lil nz, 65535             ; 5B C4 FF FF 00
+ call.lil p, -32768             ; 5B F4 00 80 FF
+ call.lil p, 0x123456           ; 5B F4 56 34 12
+ call.lil p, 32767              ; 5B F4 FF 7F 00
+ call.lil p, 65535              ; 5B F4 FF FF 00
+ call.lil pe, -32768            ; 5B EC 00 80 FF
+ call.lil pe, 0x123456          ; 5B EC 56 34 12
+ call.lil pe, 32767             ; 5B EC FF 7F 00
+ call.lil pe, 65535             ; 5B EC FF FF 00
+ call.lil po, -32768            ; 5B E4 00 80 FF
+ call.lil po, 0x123456          ; 5B E4 56 34 12
+ call.lil po, 32767             ; 5B E4 FF 7F 00
+ call.lil po, 65535             ; 5B E4 FF FF 00
+ call.lil v, -32768             ; 5B EC 00 80 FF
+ call.lil v, 0x123456           ; 5B EC 56 34 12
+ call.lil v, 32767              ; 5B EC FF 7F 00
+ call.lil v, 65535              ; 5B EC FF FF 00
+ call.lil z, -32768             ; 5B CC 00 80 FF
+ call.lil z, 0x123456           ; 5B CC 56 34 12
+ call.lil z, 32767              ; 5B CC FF 7F 00
+ call.lil z, 65535              ; 5B CC FF FF 00
  call.lis -32768                ; 49 CD 00 80
+ call.lis 0x123456              ; 49 CD 56 34
  call.lis 32767                 ; 49 CD FF 7F
  call.lis 65535                 ; 49 CD FF FF
+ call.lis c, -32768             ; 49 DC 00 80
+ call.lis c, 0x123456           ; 49 DC 56 34
+ call.lis c, 32767              ; 49 DC FF 7F
+ call.lis c, 65535              ; 49 DC FF FF
+ call.lis m, -32768             ; 49 FC 00 80
+ call.lis m, 0x123456           ; 49 FC 56 34
+ call.lis m, 32767              ; 49 FC FF 7F
+ call.lis m, 65535              ; 49 FC FF FF
+ call.lis nc, -32768            ; 49 D4 00 80
+ call.lis nc, 0x123456          ; 49 D4 56 34
+ call.lis nc, 32767             ; 49 D4 FF 7F
+ call.lis nc, 65535             ; 49 D4 FF FF
+ call.lis nv, -32768            ; 49 E4 00 80
+ call.lis nv, 0x123456          ; 49 E4 56 34
+ call.lis nv, 32767             ; 49 E4 FF 7F
+ call.lis nv, 65535             ; 49 E4 FF FF
+ call.lis nz, -32768            ; 49 C4 00 80
+ call.lis nz, 0x123456          ; 49 C4 56 34
+ call.lis nz, 32767             ; 49 C4 FF 7F
+ call.lis nz, 65535             ; 49 C4 FF FF
+ call.lis p, -32768             ; 49 F4 00 80
+ call.lis p, 0x123456           ; 49 F4 56 34
+ call.lis p, 32767              ; 49 F4 FF 7F
+ call.lis p, 65535              ; 49 F4 FF FF
+ call.lis pe, -32768            ; 49 EC 00 80
+ call.lis pe, 0x123456          ; 49 EC 56 34
+ call.lis pe, 32767             ; 49 EC FF 7F
+ call.lis pe, 65535             ; 49 EC FF FF
+ call.lis po, -32768            ; 49 E4 00 80
+ call.lis po, 0x123456          ; 49 E4 56 34
+ call.lis po, 32767             ; 49 E4 FF 7F
+ call.lis po, 65535             ; 49 E4 FF FF
+ call.lis v, -32768             ; 49 EC 00 80
+ call.lis v, 0x123456           ; 49 EC 56 34
+ call.lis v, 32767              ; 49 EC FF 7F
+ call.lis v, 65535              ; 49 EC FF FF
+ call.lis z, -32768             ; 49 CC 00 80
+ call.lis z, 0x123456           ; 49 CC 56 34
+ call.lis z, 32767              ; 49 CC FF 7F
+ call.lis z, 65535              ; 49 CC FF FF
+ cc -32768                      ; DC 00 80 FF
  cc 0x123456                    ; DC 56 34 12
+ cc 32767                       ; DC FF 7F 00
+ cc 65535                       ; DC FF FF 00
  ccf                            ; 3F
+ cm -32768                      ; FC 00 80 FF
  cm 0x123456                    ; FC 56 34 12
+ cm 32767                       ; FC FF 7F 00
+ cm 65535                       ; FC FF FF 00
  cma                            ; 2F
  cmc                            ; 3F
  cmp (hl)                       ; BE
@@ -706,9 +905,18 @@
  cmp.sil a, (iy)                ; 52 DD BE 00
  cmp.sil a, (iy+126)            ; 52 DD BE 7E
  cmp.sil a, (iy-128)            ; 52 DD BE 80
+ cnc -32768                     ; D4 00 80 FF
  cnc 0x123456                   ; D4 56 34 12
+ cnc 32767                      ; D4 FF 7F 00
+ cnc 65535                      ; D4 FF FF 00
+ cnv -32768                     ; E4 00 80 FF
  cnv 0x123456                   ; E4 56 34 12
+ cnv 32767                      ; E4 FF 7F 00
+ cnv 65535                      ; E4 FF FF 00
+ cnz -32768                     ; C4 00 80 FF
  cnz 0x123456                   ; C4 56 34 12
+ cnz 32767                      ; C4 FF 7F 00
+ cnz 65535                      ; C4 FF FF 00
  cp (hl)                        ; BE
  cp (hl+)                       ; BE 23
  cp (hl-)                       ; BE 2B
@@ -797,7 +1005,10 @@
  cpdr                           ; ED B9
  cpdr.s                         ; 52 ED B9
  cpdr.sil                       ; 52 ED B9
+ cpe -32768                     ; EC 00 80 FF
  cpe 0x123456                   ; EC 56 34 12
+ cpe 32767                      ; EC FF 7F 00
+ cpe 65535                      ; EC FF FF 00
  cpi                            ; ED A1
  cpi -128                       ; FE 80
  cpi 127                        ; FE 7F
@@ -809,9 +1020,18 @@
  cpir.sil                       ; 52 ED B1
  cpl                            ; 2F
  cpl a                          ; 2F
+ cpo -32768                     ; E4 00 80 FF
  cpo 0x123456                   ; E4 56 34 12
+ cpo 32767                      ; E4 FF 7F 00
+ cpo 65535                      ; E4 FF FF 00
+ cv -32768                      ; EC 00 80 FF
  cv 0x123456                    ; EC 56 34 12
+ cv 32767                       ; EC FF 7F 00
+ cv 65535                       ; EC FF FF 00
+ cz -32768                      ; CC 00 80 FF
  cz 0x123456                    ; CC 56 34 12
+ cz 32767                       ; CC FF 7F 00
+ cz 65535                       ; CC FF FF 00
  daa                            ; 27
  dad b                          ; 09
  dad bc                         ; 09
@@ -936,9 +1156,6 @@
  in h, (c)                      ; ED 60
  in l, (bc)                     ; ED 68
  in l, (c)                      ; ED 68
- in0 (-128)                     ; ED 30 80
- in0 (127)                      ; ED 30 7F
- in0 (255)                      ; ED 30 FF
  in0 a, (-128)                  ; ED 38 80
  in0 a, (127)                   ; ED 38 7F
  in0 a, (255)                   ; ED 38 FF
@@ -1074,39 +1291,51 @@
  inx hl                         ; 23
  inx sp                         ; 33
  j_c -32768                     ; DA 00 80
+ j_c 0x123456                   ; DA 56 34
  j_c 32767                      ; DA FF 7F
  j_c 65535                      ; DA FF FF
  j_m -32768                     ; FA 00 80
+ j_m 0x123456                   ; FA 56 34
  j_m 32767                      ; FA FF 7F
  j_m 65535                      ; FA FF FF
  j_nc -32768                    ; D2 00 80
+ j_nc 0x123456                  ; D2 56 34
  j_nc 32767                     ; D2 FF 7F
  j_nc 65535                     ; D2 FF FF
  j_nv -32768                    ; E2 00 80
+ j_nv 0x123456                  ; E2 56 34
  j_nv 32767                     ; E2 FF 7F
  j_nv 65535                     ; E2 FF FF
  j_nz -32768                    ; C2 00 80
+ j_nz 0x123456                  ; C2 56 34
  j_nz 32767                     ; C2 FF 7F
  j_nz 65535                     ; C2 FF FF
  j_p -32768                     ; F2 00 80
+ j_p 0x123456                   ; F2 56 34
  j_p 32767                      ; F2 FF 7F
  j_p 65535                      ; F2 FF FF
  j_pe -32768                    ; EA 00 80
+ j_pe 0x123456                  ; EA 56 34
  j_pe 32767                     ; EA FF 7F
  j_pe 65535                     ; EA FF FF
  j_po -32768                    ; E2 00 80
+ j_po 0x123456                  ; E2 56 34
  j_po 32767                     ; E2 FF 7F
  j_po 65535                     ; E2 FF FF
  j_v -32768                     ; EA 00 80
+ j_v 0x123456                   ; EA 56 34
  j_v 32767                      ; EA FF 7F
  j_v 65535                      ; EA FF FF
  j_z -32768                     ; CA 00 80
+ j_z 0x123456                   ; CA 56 34
  j_z 32767                      ; CA FF 7F
  j_z 65535                      ; CA FF FF
  jc -32768                      ; DA 00 80
+ jc 0x123456                    ; DA 56 34
  jc 32767                       ; DA FF 7F
  jc 65535                       ; DA FF FF
  jm -32768                      ; FA 00 80
+ jm 0x123456                    ; FA 56 34
  jm 32767                       ; FA FF 7F
  jm 65535                       ; FA FF FF
  jmp (bc)                       ; C5 C9
@@ -1114,28 +1343,94 @@
  jmp (hl)                       ; E9
  jmp (ix)                       ; FD E9
  jmp (iy)                       ; DD E9
+ jmp -32768                     ; C3 00 80 FF
  jmp 0x123456                   ; C3 56 34 12
+ jmp 32767                      ; C3 FF 7F 00
+ jmp 65535                      ; C3 FF FF 00
+ jmp c, -32768                  ; DA 00 80 FF
  jmp c, 0x123456                ; DA 56 34 12
+ jmp c, 32767                   ; DA FF 7F 00
+ jmp c, 65535                   ; DA FF FF 00
+ jmp m, -32768                  ; FA 00 80 FF
  jmp m, 0x123456                ; FA 56 34 12
+ jmp m, 32767                   ; FA FF 7F 00
+ jmp m, 65535                   ; FA FF FF 00
+ jmp nc, -32768                 ; D2 00 80 FF
  jmp nc, 0x123456               ; D2 56 34 12
+ jmp nc, 32767                  ; D2 FF 7F 00
+ jmp nc, 65535                  ; D2 FF FF 00
+ jmp nv, -32768                 ; E2 00 80 FF
  jmp nv, 0x123456               ; E2 56 34 12
+ jmp nv, 32767                  ; E2 FF 7F 00
+ jmp nv, 65535                  ; E2 FF FF 00
+ jmp nz, -32768                 ; C2 00 80 FF
  jmp nz, 0x123456               ; C2 56 34 12
+ jmp nz, 32767                  ; C2 FF 7F 00
+ jmp nz, 65535                  ; C2 FF FF 00
+ jmp p, -32768                  ; F2 00 80 FF
  jmp p, 0x123456                ; F2 56 34 12
+ jmp p, 32767                   ; F2 FF 7F 00
+ jmp p, 65535                   ; F2 FF FF 00
+ jmp pe, -32768                 ; EA 00 80 FF
  jmp pe, 0x123456               ; EA 56 34 12
+ jmp pe, 32767                  ; EA FF 7F 00
+ jmp pe, 65535                  ; EA FF FF 00
+ jmp po, -32768                 ; E2 00 80 FF
  jmp po, 0x123456               ; E2 56 34 12
+ jmp po, 32767                  ; E2 FF 7F 00
+ jmp po, 65535                  ; E2 FF FF 00
+ jmp v, -32768                  ; EA 00 80 FF
  jmp v, 0x123456                ; EA 56 34 12
+ jmp v, 32767                   ; EA FF 7F 00
+ jmp v, 65535                   ; EA FF FF 00
+ jmp z, -32768                  ; CA 00 80 FF
  jmp z, 0x123456                ; CA 56 34 12
+ jmp z, 32767                   ; CA FF 7F 00
+ jmp z, 65535                   ; CA FF FF 00
+ jmp.lil -32768                 ; 5B C3 00 80 FF
  jmp.lil 0x123456               ; 5B C3 56 34 12
+ jmp.lil 32767                  ; 5B C3 FF 7F 00
+ jmp.lil 65535                  ; 5B C3 FF FF 00
+ jmp.lil c, -32768              ; 5B DA 00 80 FF
  jmp.lil c, 0x123456            ; 5B DA 56 34 12
+ jmp.lil c, 32767               ; 5B DA FF 7F 00
+ jmp.lil c, 65535               ; 5B DA FF FF 00
+ jmp.lil m, -32768              ; 5B FA 00 80 FF
  jmp.lil m, 0x123456            ; 5B FA 56 34 12
+ jmp.lil m, 32767               ; 5B FA FF 7F 00
+ jmp.lil m, 65535               ; 5B FA FF FF 00
+ jmp.lil nc, -32768             ; 5B D2 00 80 FF
  jmp.lil nc, 0x123456           ; 5B D2 56 34 12
+ jmp.lil nc, 32767              ; 5B D2 FF 7F 00
+ jmp.lil nc, 65535              ; 5B D2 FF FF 00
+ jmp.lil nv, -32768             ; 5B E2 00 80 FF
  jmp.lil nv, 0x123456           ; 5B E2 56 34 12
+ jmp.lil nv, 32767              ; 5B E2 FF 7F 00
+ jmp.lil nv, 65535              ; 5B E2 FF FF 00
+ jmp.lil nz, -32768             ; 5B C2 00 80 FF
  jmp.lil nz, 0x123456           ; 5B C2 56 34 12
+ jmp.lil nz, 32767              ; 5B C2 FF 7F 00
+ jmp.lil nz, 65535              ; 5B C2 FF FF 00
+ jmp.lil p, -32768              ; 5B F2 00 80 FF
  jmp.lil p, 0x123456            ; 5B F2 56 34 12
+ jmp.lil p, 32767               ; 5B F2 FF 7F 00
+ jmp.lil p, 65535               ; 5B F2 FF FF 00
+ jmp.lil pe, -32768             ; 5B EA 00 80 FF
  jmp.lil pe, 0x123456           ; 5B EA 56 34 12
+ jmp.lil pe, 32767              ; 5B EA FF 7F 00
+ jmp.lil pe, 65535              ; 5B EA FF FF 00
+ jmp.lil po, -32768             ; 5B E2 00 80 FF
  jmp.lil po, 0x123456           ; 5B E2 56 34 12
+ jmp.lil po, 32767              ; 5B E2 FF 7F 00
+ jmp.lil po, 65535              ; 5B E2 FF FF 00
+ jmp.lil v, -32768              ; 5B EA 00 80 FF
  jmp.lil v, 0x123456            ; 5B EA 56 34 12
+ jmp.lil v, 32767               ; 5B EA FF 7F 00
+ jmp.lil v, 65535               ; 5B EA FF FF 00
+ jmp.lil z, -32768              ; 5B CA 00 80 FF
  jmp.lil z, 0x123456            ; 5B CA 56 34 12
+ jmp.lil z, 32767               ; 5B CA FF 7F 00
+ jmp.lil z, 65535               ; 5B CA FF FF 00
  jmp.s (hl)                     ; 52 E9
  jmp.s (ix)                     ; 52 FD E9
  jmp.s (iy)                     ; 52 DD E9
@@ -1143,45 +1438,59 @@
  jmp.sil (ix)                   ; 52 FD E9
  jmp.sil (iy)                   ; 52 DD E9
  jmp.sis -32768                 ; 40 C3 00 80
+ jmp.sis 0x123456               ; 40 C3 56 34
  jmp.sis 32767                  ; 40 C3 FF 7F
  jmp.sis 65535                  ; 40 C3 FF FF
  jmp.sis c, -32768              ; 40 DA 00 80
+ jmp.sis c, 0x123456            ; 40 DA 56 34
  jmp.sis c, 32767               ; 40 DA FF 7F
  jmp.sis c, 65535               ; 40 DA FF FF
  jmp.sis m, -32768              ; 40 FA 00 80
+ jmp.sis m, 0x123456            ; 40 FA 56 34
  jmp.sis m, 32767               ; 40 FA FF 7F
  jmp.sis m, 65535               ; 40 FA FF FF
  jmp.sis nc, -32768             ; 40 D2 00 80
+ jmp.sis nc, 0x123456           ; 40 D2 56 34
  jmp.sis nc, 32767              ; 40 D2 FF 7F
  jmp.sis nc, 65535              ; 40 D2 FF FF
  jmp.sis nv, -32768             ; 40 E2 00 80
+ jmp.sis nv, 0x123456           ; 40 E2 56 34
  jmp.sis nv, 32767              ; 40 E2 FF 7F
  jmp.sis nv, 65535              ; 40 E2 FF FF
  jmp.sis nz, -32768             ; 40 C2 00 80
+ jmp.sis nz, 0x123456           ; 40 C2 56 34
  jmp.sis nz, 32767              ; 40 C2 FF 7F
  jmp.sis nz, 65535              ; 40 C2 FF FF
  jmp.sis p, -32768              ; 40 F2 00 80
+ jmp.sis p, 0x123456            ; 40 F2 56 34
  jmp.sis p, 32767               ; 40 F2 FF 7F
  jmp.sis p, 65535               ; 40 F2 FF FF
  jmp.sis pe, -32768             ; 40 EA 00 80
+ jmp.sis pe, 0x123456           ; 40 EA 56 34
  jmp.sis pe, 32767              ; 40 EA FF 7F
  jmp.sis pe, 65535              ; 40 EA FF FF
  jmp.sis po, -32768             ; 40 E2 00 80
+ jmp.sis po, 0x123456           ; 40 E2 56 34
  jmp.sis po, 32767              ; 40 E2 FF 7F
  jmp.sis po, 65535              ; 40 E2 FF FF
  jmp.sis v, -32768              ; 40 EA 00 80
+ jmp.sis v, 0x123456            ; 40 EA 56 34
  jmp.sis v, 32767               ; 40 EA FF 7F
  jmp.sis v, 65535               ; 40 EA FF FF
  jmp.sis z, -32768              ; 40 CA 00 80
+ jmp.sis z, 0x123456            ; 40 CA 56 34
  jmp.sis z, 32767               ; 40 CA FF 7F
  jmp.sis z, 65535               ; 40 CA FF FF
  jnc -32768                     ; D2 00 80
+ jnc 0x123456                   ; D2 56 34
  jnc 32767                      ; D2 FF 7F
  jnc 65535                      ; D2 FF FF
  jnv -32768                     ; E2 00 80
+ jnv 0x123456                   ; E2 56 34
  jnv 32767                      ; E2 FF 7F
  jnv 65535                      ; E2 FF FF
  jnz -32768                     ; C2 00 80
+ jnz 0x123456                   ; C2 56 34
  jnz 32767                      ; C2 FF 7F
  jnz 65535                      ; C2 FF FF
  jp (bc)                        ; C5 C9
@@ -1189,28 +1498,94 @@
  jp (hl)                        ; E9
  jp (ix)                        ; FD E9
  jp (iy)                        ; DD E9
+ jp -32768                      ; C3 00 80 FF
  jp 0x123456                    ; C3 56 34 12
+ jp 32767                       ; C3 FF 7F 00
+ jp 65535                       ; C3 FF FF 00
+ jp c, -32768                   ; DA 00 80 FF
  jp c, 0x123456                 ; DA 56 34 12
+ jp c, 32767                    ; DA FF 7F 00
+ jp c, 65535                    ; DA FF FF 00
+ jp m, -32768                   ; FA 00 80 FF
  jp m, 0x123456                 ; FA 56 34 12
+ jp m, 32767                    ; FA FF 7F 00
+ jp m, 65535                    ; FA FF FF 00
+ jp nc, -32768                  ; D2 00 80 FF
  jp nc, 0x123456                ; D2 56 34 12
+ jp nc, 32767                   ; D2 FF 7F 00
+ jp nc, 65535                   ; D2 FF FF 00
+ jp nv, -32768                  ; E2 00 80 FF
  jp nv, 0x123456                ; E2 56 34 12
+ jp nv, 32767                   ; E2 FF 7F 00
+ jp nv, 65535                   ; E2 FF FF 00
+ jp nz, -32768                  ; C2 00 80 FF
  jp nz, 0x123456                ; C2 56 34 12
+ jp nz, 32767                   ; C2 FF 7F 00
+ jp nz, 65535                   ; C2 FF FF 00
+ jp p, -32768                   ; F2 00 80 FF
  jp p, 0x123456                 ; F2 56 34 12
+ jp p, 32767                    ; F2 FF 7F 00
+ jp p, 65535                    ; F2 FF FF 00
+ jp pe, -32768                  ; EA 00 80 FF
  jp pe, 0x123456                ; EA 56 34 12
+ jp pe, 32767                   ; EA FF 7F 00
+ jp pe, 65535                   ; EA FF FF 00
+ jp po, -32768                  ; E2 00 80 FF
  jp po, 0x123456                ; E2 56 34 12
+ jp po, 32767                   ; E2 FF 7F 00
+ jp po, 65535                   ; E2 FF FF 00
+ jp v, -32768                   ; EA 00 80 FF
  jp v, 0x123456                 ; EA 56 34 12
+ jp v, 32767                    ; EA FF 7F 00
+ jp v, 65535                    ; EA FF FF 00
+ jp z, -32768                   ; CA 00 80 FF
  jp z, 0x123456                 ; CA 56 34 12
+ jp z, 32767                    ; CA FF 7F 00
+ jp z, 65535                    ; CA FF FF 00
+ jp.lil -32768                  ; 5B C3 00 80 FF
  jp.lil 0x123456                ; 5B C3 56 34 12
+ jp.lil 32767                   ; 5B C3 FF 7F 00
+ jp.lil 65535                   ; 5B C3 FF FF 00
+ jp.lil c, -32768               ; 5B DA 00 80 FF
  jp.lil c, 0x123456             ; 5B DA 56 34 12
+ jp.lil c, 32767                ; 5B DA FF 7F 00
+ jp.lil c, 65535                ; 5B DA FF FF 00
+ jp.lil m, -32768               ; 5B FA 00 80 FF
  jp.lil m, 0x123456             ; 5B FA 56 34 12
+ jp.lil m, 32767                ; 5B FA FF 7F 00
+ jp.lil m, 65535                ; 5B FA FF FF 00
+ jp.lil nc, -32768              ; 5B D2 00 80 FF
  jp.lil nc, 0x123456            ; 5B D2 56 34 12
+ jp.lil nc, 32767               ; 5B D2 FF 7F 00
+ jp.lil nc, 65535               ; 5B D2 FF FF 00
+ jp.lil nv, -32768              ; 5B E2 00 80 FF
  jp.lil nv, 0x123456            ; 5B E2 56 34 12
+ jp.lil nv, 32767               ; 5B E2 FF 7F 00
+ jp.lil nv, 65535               ; 5B E2 FF FF 00
+ jp.lil nz, -32768              ; 5B C2 00 80 FF
  jp.lil nz, 0x123456            ; 5B C2 56 34 12
+ jp.lil nz, 32767               ; 5B C2 FF 7F 00
+ jp.lil nz, 65535               ; 5B C2 FF FF 00
+ jp.lil p, -32768               ; 5B F2 00 80 FF
  jp.lil p, 0x123456             ; 5B F2 56 34 12
+ jp.lil p, 32767                ; 5B F2 FF 7F 00
+ jp.lil p, 65535                ; 5B F2 FF FF 00
+ jp.lil pe, -32768              ; 5B EA 00 80 FF
  jp.lil pe, 0x123456            ; 5B EA 56 34 12
+ jp.lil pe, 32767               ; 5B EA FF 7F 00
+ jp.lil pe, 65535               ; 5B EA FF FF 00
+ jp.lil po, -32768              ; 5B E2 00 80 FF
  jp.lil po, 0x123456            ; 5B E2 56 34 12
+ jp.lil po, 32767               ; 5B E2 FF 7F 00
+ jp.lil po, 65535               ; 5B E2 FF FF 00
+ jp.lil v, -32768               ; 5B EA 00 80 FF
  jp.lil v, 0x123456             ; 5B EA 56 34 12
+ jp.lil v, 32767                ; 5B EA FF 7F 00
+ jp.lil v, 65535                ; 5B EA FF FF 00
+ jp.lil z, -32768               ; 5B CA 00 80 FF
  jp.lil z, 0x123456             ; 5B CA 56 34 12
+ jp.lil z, 32767                ; 5B CA FF 7F 00
+ jp.lil z, 65535                ; 5B CA FF FF 00
  jp.s (hl)                      ; 52 E9
  jp.s (ix)                      ; 52 FD E9
  jp.s (iy)                      ; 52 DD E9
@@ -1218,42 +1593,55 @@
  jp.sil (ix)                    ; 52 FD E9
  jp.sil (iy)                    ; 52 DD E9
  jp.sis -32768                  ; 40 C3 00 80
+ jp.sis 0x123456                ; 40 C3 56 34
  jp.sis 32767                   ; 40 C3 FF 7F
  jp.sis 65535                   ; 40 C3 FF FF
  jp.sis c, -32768               ; 40 DA 00 80
+ jp.sis c, 0x123456             ; 40 DA 56 34
  jp.sis c, 32767                ; 40 DA FF 7F
  jp.sis c, 65535                ; 40 DA FF FF
  jp.sis m, -32768               ; 40 FA 00 80
+ jp.sis m, 0x123456             ; 40 FA 56 34
  jp.sis m, 32767                ; 40 FA FF 7F
  jp.sis m, 65535                ; 40 FA FF FF
  jp.sis nc, -32768              ; 40 D2 00 80
+ jp.sis nc, 0x123456            ; 40 D2 56 34
  jp.sis nc, 32767               ; 40 D2 FF 7F
  jp.sis nc, 65535               ; 40 D2 FF FF
  jp.sis nv, -32768              ; 40 E2 00 80
+ jp.sis nv, 0x123456            ; 40 E2 56 34
  jp.sis nv, 32767               ; 40 E2 FF 7F
  jp.sis nv, 65535               ; 40 E2 FF FF
  jp.sis nz, -32768              ; 40 C2 00 80
+ jp.sis nz, 0x123456            ; 40 C2 56 34
  jp.sis nz, 32767               ; 40 C2 FF 7F
  jp.sis nz, 65535               ; 40 C2 FF FF
  jp.sis p, -32768               ; 40 F2 00 80
+ jp.sis p, 0x123456             ; 40 F2 56 34
  jp.sis p, 32767                ; 40 F2 FF 7F
  jp.sis p, 65535                ; 40 F2 FF FF
  jp.sis pe, -32768              ; 40 EA 00 80
+ jp.sis pe, 0x123456            ; 40 EA 56 34
  jp.sis pe, 32767               ; 40 EA FF 7F
  jp.sis pe, 65535               ; 40 EA FF FF
  jp.sis po, -32768              ; 40 E2 00 80
+ jp.sis po, 0x123456            ; 40 E2 56 34
  jp.sis po, 32767               ; 40 E2 FF 7F
  jp.sis po, 65535               ; 40 E2 FF FF
  jp.sis v, -32768               ; 40 EA 00 80
+ jp.sis v, 0x123456             ; 40 EA 56 34
  jp.sis v, 32767                ; 40 EA FF 7F
  jp.sis v, 65535                ; 40 EA FF FF
  jp.sis z, -32768               ; 40 CA 00 80
+ jp.sis z, 0x123456             ; 40 CA 56 34
  jp.sis z, 32767                ; 40 CA FF 7F
  jp.sis z, 65535                ; 40 CA FF FF
  jpe -32768                     ; EA 00 80
+ jpe 0x123456                   ; EA 56 34
  jpe 32767                      ; EA FF 7F
  jpe 65535                      ; EA FF FF
  jpo -32768                     ; E2 00 80
+ jpo 0x123456                   ; E2 56 34
  jpo 32767                      ; E2 FF 7F
  jpo 65535                      ; E2 FF FF
  jr ASMPC                       ; 18 FE
@@ -1262,11 +1650,20 @@
  jr nz, ASMPC                   ; 20 FE
  jr z, ASMPC                    ; 28 FE
  jv -32768                      ; EA 00 80
+ jv 0x123456                    ; EA 56 34
  jv 32767                       ; EA FF 7F
  jv 65535                       ; EA FF FF
  jz -32768                      ; CA 00 80
+ jz 0x123456                    ; CA 56 34
  jz 32767                       ; CA FF 7F
  jz 65535                       ; CA FF FF
+ ld (-32768), a                 ; 32 00 80 FF
+ ld (-32768), bc                ; ED 43 00 80 FF
+ ld (-32768), de                ; ED 53 00 80 FF
+ ld (-32768), hl                ; 22 00 80 FF
+ ld (-32768), ix                ; FD 22 00 80 FF
+ ld (-32768), iy                ; DD 22 00 80 FF
+ ld (-32768), sp                ; ED 73 00 80 FF
  ld (0x123456), a               ; 32 56 34 12
  ld (0x123456), bc              ; ED 43 56 34 12
  ld (0x123456), de              ; ED 53 56 34 12
@@ -1274,6 +1671,20 @@
  ld (0x123456), ix              ; FD 22 56 34 12
  ld (0x123456), iy              ; DD 22 56 34 12
  ld (0x123456), sp              ; ED 73 56 34 12
+ ld (32767), a                  ; 32 FF 7F 00
+ ld (32767), bc                 ; ED 43 FF 7F 00
+ ld (32767), de                 ; ED 53 FF 7F 00
+ ld (32767), hl                 ; 22 FF 7F 00
+ ld (32767), ix                 ; FD 22 FF 7F 00
+ ld (32767), iy                 ; DD 22 FF 7F 00
+ ld (32767), sp                 ; ED 73 FF 7F 00
+ ld (65535), a                  ; 32 FF FF 00
+ ld (65535), bc                 ; ED 43 FF FF 00
+ ld (65535), de                 ; ED 53 FF FF 00
+ ld (65535), hl                 ; 22 FF FF 00
+ ld (65535), ix                 ; FD 22 FF FF 00
+ ld (65535), iy                 ; DD 22 FF FF 00
+ ld (65535), sp                 ; ED 73 FF FF 00
  ld (bc), a                     ; 02
  ld (bc+), a                    ; 02 03
  ld (bc-), a                    ; 02 0B
@@ -1451,7 +1862,10 @@
  ld (iy-128), ix                ; DD 3E 80
  ld (iy-128), iy                ; DD 3F 80
  ld (iy-128), l                 ; DD 75 80
+ ld a, (-32768)                 ; 3A 00 80 FF
  ld a, (0x123456)               ; 3A 56 34 12
+ ld a, (32767)                  ; 3A FF 7F 00
+ ld a, (65535)                  ; 3A FF FF 00
  ld a, (bc)                     ; 0A
  ld a, (bc+)                    ; 0A 03
  ld a, (bc-)                    ; 0A 0B
@@ -1513,7 +1927,10 @@
  ld b, iyh                      ; DD 44
  ld b, iyl                      ; DD 45
  ld b, l                        ; 45
+ ld bc, (-32768)                ; ED 4B 00 80 FF
  ld bc, (0x123456)              ; ED 4B 56 34 12
+ ld bc, (32767)                 ; ED 4B FF 7F 00
+ ld bc, (65535)                 ; ED 4B FF FF 00
  ld bc, (hl)                    ; ED 07
  ld bc, (hl+)                   ; ED 07 23 23
  ld bc, (ix)                    ; FD 07 00
@@ -1522,7 +1939,10 @@
  ld bc, (iy)                    ; DD 07 00
  ld bc, (iy+126)                ; DD 07 7E
  ld bc, (iy-128)                ; DD 07 80
+ ld bc, -32768                  ; 01 00 80 FF
  ld bc, 0x123456                ; 01 56 34 12
+ ld bc, 32767                   ; 01 FF 7F 00
+ ld bc, 65535                   ; 01 FF FF 00
  ld bc, de                      ; 42 4B
  ld bc, hl                      ; 44 4D
  ld bc, ix                      ; FD 44 FD 4D
@@ -1581,7 +2001,10 @@
  ld d, iyh                      ; DD 54
  ld d, iyl                      ; DD 55
  ld d, l                        ; 55
+ ld de, (-32768)                ; ED 5B 00 80 FF
  ld de, (0x123456)              ; ED 5B 56 34 12
+ ld de, (32767)                 ; ED 5B FF 7F 00
+ ld de, (65535)                 ; ED 5B FF FF 00
  ld de, (hl)                    ; ED 17
  ld de, (hl+)                   ; ED 17 23 23
  ld de, (ix)                    ; FD 17 00
@@ -1590,7 +2013,10 @@
  ld de, (iy)                    ; DD 17 00
  ld de, (iy+126)                ; DD 17 7E
  ld de, (iy-128)                ; DD 17 80
+ ld de, -32768                  ; 11 00 80 FF
  ld de, 0x123456                ; 11 56 34 12
+ ld de, 32767                   ; 11 FF 7F 00
+ ld de, 65535                   ; 11 FF FF 00
  ld de, bc                      ; 50 59
  ld de, hl                      ; 54 5D
  ld de, ix                      ; FD 54 FD 5D
@@ -1649,7 +2075,10 @@
  ld h, e                        ; 63
  ld h, h                        ; 64
  ld h, l                        ; 65
+ ld hl, (-32768)                ; 2A 00 80 FF
  ld hl, (0x123456)              ; 2A 56 34 12
+ ld hl, (32767)                 ; 2A FF 7F 00
+ ld hl, (65535)                 ; 2A FF FF 00
  ld hl, (hl)                    ; ED 27
  ld hl, (hl+)                   ; ED 27 23 23
  ld hl, (ix)                    ; FD 27 00
@@ -1658,7 +2087,10 @@
  ld hl, (iy)                    ; DD 27 00
  ld hl, (iy+126)                ; DD 27 7E
  ld hl, (iy-128)                ; DD 27 80
+ ld hl, -32768                  ; 21 00 80 FF
  ld hl, 0x123456                ; 21 56 34 12
+ ld hl, 32767                   ; 21 FF 7F 00
+ ld hl, 65535                   ; 21 FF FF 00
  ld hl, bc                      ; 60 69
  ld hl, de                      ; 62 6B
  ld hl, i                       ; ED D7
@@ -1669,7 +2101,10 @@
  ld hl, sp-128                  ; 21 80 FF 39
  ld i, a                        ; ED 47
  ld i, hl                       ; ED C7
+ ld ix, (-32768)                ; FD 2A 00 80 FF
  ld ix, (0x123456)              ; FD 2A 56 34 12
+ ld ix, (32767)                 ; FD 2A FF 7F 00
+ ld ix, (65535)                 ; FD 2A FF FF 00
  ld ix, (hl)                    ; ED 31
  ld ix, (hl+)                   ; ED 31 23 23
  ld ix, (ix)                    ; FD 37 00
@@ -1678,7 +2113,10 @@
  ld ix, (iy)                    ; DD 31 00
  ld ix, (iy+126)                ; DD 31 7E
  ld ix, (iy-128)                ; DD 31 80
+ ld ix, -32768                  ; FD 21 00 80 FF
  ld ix, 0x123456                ; FD 21 56 34 12
+ ld ix, 32767                   ; FD 21 FF 7F 00
+ ld ix, 65535                   ; FD 21 FF FF 00
  ld ix, bc                      ; FD 60 FD 69
  ld ix, de                      ; FD 62 FD 6B
  ld ix, hl                      ; E5 FD E1
@@ -1703,7 +2141,10 @@
  ld ixl, e                      ; FD 6B
  ld ixl, ixh                    ; FD 6C
  ld ixl, ixl                    ; FD 6D
+ ld iy, (-32768)                ; DD 2A 00 80 FF
  ld iy, (0x123456)              ; DD 2A 56 34 12
+ ld iy, (32767)                 ; DD 2A FF 7F 00
+ ld iy, (65535)                 ; DD 2A FF FF 00
  ld iy, (hl)                    ; ED 37
  ld iy, (hl+)                   ; ED 37 23 23
  ld iy, (ix)                    ; FD 31 00
@@ -1712,7 +2153,10 @@
  ld iy, (iy)                    ; DD 37 00
  ld iy, (iy+126)                ; DD 37 7E
  ld iy, (iy-128)                ; DD 37 80
+ ld iy, -32768                  ; DD 21 00 80 FF
  ld iy, 0x123456                ; DD 21 56 34 12
+ ld iy, 32767                   ; DD 21 FF 7F 00
+ ld iy, 65535                   ; DD 21 FF FF 00
  ld iy, bc                      ; DD 60 DD 69
  ld iy, de                      ; DD 62 DD 6B
  ld iy, hl                      ; E5 DD E1
@@ -1763,17 +2207,31 @@
  ld l, l                        ; 6D
  ld mb, a                       ; ED 6D
  ld r, a                        ; ED 4F
+ ld sp, (-32768)                ; ED 7B 00 80 FF
  ld sp, (0x123456)              ; ED 7B 56 34 12
+ ld sp, (32767)                 ; ED 7B FF 7F 00
+ ld sp, (65535)                 ; ED 7B FF FF 00
+ ld sp, -32768                  ; 31 00 80 FF
  ld sp, 0x123456                ; 31 56 34 12
+ ld sp, 32767                   ; 31 FF 7F 00
+ ld sp, 65535                   ; 31 FF FF 00
  ld sp, hl                      ; F9
  ld sp, ix                      ; FD F9
  ld sp, iy                      ; DD F9
+ ld.il (-32768), a              ; 5B 32 00 80 FF
  ld.il (0x123456), a            ; 5B 32 56 34 12
+ ld.il (32767), a               ; 5B 32 FF 7F 00
+ ld.il (65535), a               ; 5B 32 FF FF 00
+ ld.il a, (-32768)              ; 5B 3A 00 80 FF
  ld.il a, (0x123456)            ; 5B 3A 56 34 12
+ ld.il a, (32767)               ; 5B 3A FF 7F 00
+ ld.il a, (65535)               ; 5B 3A FF FF 00
  ld.is (-32768), a              ; 40 32 00 80
+ ld.is (0x123456), a            ; 40 32 56 34
  ld.is (32767), a               ; 40 32 FF 7F
  ld.is (65535), a               ; 40 32 FF FF
  ld.is a, (-32768)              ; 40 3A 00 80
+ ld.is a, (0x123456)            ; 40 3A 56 34
  ld.is a, (32767)               ; 40 3A FF 7F
  ld.is a, (65535)               ; 40 3A FF FF
  ld.s (bc), a                   ; 52 02
@@ -2335,6 +2793,13 @@
  ld.sis (-32768), ix            ; 40 FD 22 00 80
  ld.sis (-32768), iy            ; 40 DD 22 00 80
  ld.sis (-32768), sp            ; 40 ED 73 00 80
+ ld.sis (0x123456), a           ; 40 32 56 34
+ ld.sis (0x123456), bc          ; 40 ED 43 56 34
+ ld.sis (0x123456), de          ; 40 ED 53 56 34
+ ld.sis (0x123456), hl          ; 40 22 56 34
+ ld.sis (0x123456), ix          ; 40 FD 22 56 34
+ ld.sis (0x123456), iy          ; 40 DD 22 56 34
+ ld.sis (0x123456), sp          ; 40 ED 73 56 34
  ld.sis (32767), a              ; 40 32 FF 7F
  ld.sis (32767), bc             ; 40 ED 43 FF 7F
  ld.sis (32767), de             ; 40 ED 53 FF 7F
@@ -2350,42 +2815,55 @@
  ld.sis (65535), iy             ; 40 DD 22 FF FF
  ld.sis (65535), sp             ; 40 ED 73 FF FF
  ld.sis a, (-32768)             ; 40 3A 00 80
+ ld.sis a, (0x123456)           ; 40 3A 56 34
  ld.sis a, (32767)              ; 40 3A FF 7F
  ld.sis a, (65535)              ; 40 3A FF FF
  ld.sis bc, (-32768)            ; 40 ED 4B 00 80
+ ld.sis bc, (0x123456)          ; 40 ED 4B 56 34
  ld.sis bc, (32767)             ; 40 ED 4B FF 7F
  ld.sis bc, (65535)             ; 40 ED 4B FF FF
  ld.sis bc, -32768              ; 40 01 00 80
+ ld.sis bc, 0x123456            ; 40 01 56 34
  ld.sis bc, 32767               ; 40 01 FF 7F
  ld.sis bc, 65535               ; 40 01 FF FF
  ld.sis de, (-32768)            ; 40 ED 5B 00 80
+ ld.sis de, (0x123456)          ; 40 ED 5B 56 34
  ld.sis de, (32767)             ; 40 ED 5B FF 7F
  ld.sis de, (65535)             ; 40 ED 5B FF FF
  ld.sis de, -32768              ; 40 11 00 80
+ ld.sis de, 0x123456            ; 40 11 56 34
  ld.sis de, 32767               ; 40 11 FF 7F
  ld.sis de, 65535               ; 40 11 FF FF
  ld.sis hl, (-32768)            ; 40 2A 00 80
+ ld.sis hl, (0x123456)          ; 40 2A 56 34
  ld.sis hl, (32767)             ; 40 2A FF 7F
  ld.sis hl, (65535)             ; 40 2A FF FF
  ld.sis hl, -32768              ; 40 21 00 80
+ ld.sis hl, 0x123456            ; 40 21 56 34
  ld.sis hl, 32767               ; 40 21 FF 7F
  ld.sis hl, 65535               ; 40 21 FF FF
  ld.sis ix, (-32768)            ; 40 FD 2A 00 80
+ ld.sis ix, (0x123456)          ; 40 FD 2A 56 34
  ld.sis ix, (32767)             ; 40 FD 2A FF 7F
  ld.sis ix, (65535)             ; 40 FD 2A FF FF
  ld.sis ix, -32768              ; 40 FD 21 00 80
+ ld.sis ix, 0x123456            ; 40 FD 21 56 34
  ld.sis ix, 32767               ; 40 FD 21 FF 7F
  ld.sis ix, 65535               ; 40 FD 21 FF FF
  ld.sis iy, (-32768)            ; 40 DD 2A 00 80
+ ld.sis iy, (0x123456)          ; 40 DD 2A 56 34
  ld.sis iy, (32767)             ; 40 DD 2A FF 7F
  ld.sis iy, (65535)             ; 40 DD 2A FF FF
  ld.sis iy, -32768              ; 40 DD 21 00 80
+ ld.sis iy, 0x123456            ; 40 DD 21 56 34
  ld.sis iy, 32767               ; 40 DD 21 FF 7F
  ld.sis iy, 65535               ; 40 DD 21 FF FF
  ld.sis sp, (-32768)            ; 40 ED 7B 00 80
+ ld.sis sp, (0x123456)          ; 40 ED 7B 56 34
  ld.sis sp, (32767)             ; 40 ED 7B FF 7F
  ld.sis sp, (65535)             ; 40 ED 7B FF FF
  ld.sis sp, -32768              ; 40 31 00 80
+ ld.sis sp, 0x123456            ; 40 31 56 34
  ld.sis sp, 32767               ; 40 31 FF 7F
  ld.sis sp, 65535               ; 40 31 FF FF
  ldax b                         ; 0A
@@ -2681,27 +3159,35 @@
  lea.sil iy, iy+126             ; 52 ED 32 7E
  lea.sil iy, iy-128             ; 52 ED 32 80
  lhld -32768                    ; 2A 00 80
+ lhld 0x123456                  ; 2A 56 34
  lhld 32767                     ; 2A FF 7F
  lhld 65535                     ; 2A FF FF
  lxi b, -32768                  ; 01 00 80
+ lxi b, 0x123456                ; 01 56 34
  lxi b, 32767                   ; 01 FF 7F
  lxi b, 65535                   ; 01 FF FF
  lxi bc, -32768                 ; 01 00 80
+ lxi bc, 0x123456               ; 01 56 34
  lxi bc, 32767                  ; 01 FF 7F
  lxi bc, 65535                  ; 01 FF FF
  lxi d, -32768                  ; 11 00 80
+ lxi d, 0x123456                ; 11 56 34
  lxi d, 32767                   ; 11 FF 7F
  lxi d, 65535                   ; 11 FF FF
  lxi de, -32768                 ; 11 00 80
+ lxi de, 0x123456               ; 11 56 34
  lxi de, 32767                  ; 11 FF 7F
  lxi de, 65535                  ; 11 FF FF
  lxi h, -32768                  ; 21 00 80
+ lxi h, 0x123456                ; 21 56 34
  lxi h, 32767                   ; 21 FF 7F
  lxi h, 65535                   ; 21 FF FF
  lxi hl, -32768                 ; 21 00 80
+ lxi hl, 0x123456               ; 21 56 34
  lxi hl, 32767                  ; 21 FF 7F
  lxi hl, 65535                  ; 21 FF FF
  lxi sp, -32768                 ; 31 00 80
+ lxi sp, 0x123456               ; 31 56 34
  lxi sp, 32767                  ; 31 FF 7F
  lxi sp, 65535                  ; 31 FF FF
  mlt bc                         ; ED 4C
@@ -3815,6 +4301,7 @@
  set.sil 7, (iy+126)            ; 52 DD CB 7E FE
  set.sil 7, (iy-128)            ; 52 DD CB 80 FE
  shld -32768                    ; 22 00 80
+ shld 0x123456                  ; 22 56 34
  shld 32767                     ; 22 FF 7F
  shld 65535                     ; 22 FF FF
  sla (hl)                       ; CB 26

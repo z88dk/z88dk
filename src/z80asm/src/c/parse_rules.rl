@@ -582,21 +582,6 @@ Define rules for a ragel-based parser.
 			add_copper_unit_nop();
 		}
 
-		/*---------------------------------------------------------------------
-		*   ez80
-		*--------------------------------------------------------------------*/
-
-		| _TK_ASSUME _TK_ADL _TK_EQUAL const_expr _TK_NEWLINE @{
-			if (option_cpu() != CPU_EZ80)
-				error_illegal_ident();
-			else if (expr_error)
-				error_expected_const_expr();
-			else if (expr_value != 0 && expr_value != 1)
-				error_int_range(expr_value);
-			else
-				set_ez80_adl_option(expr_value);
-		}
-
 		;
 
 }%%

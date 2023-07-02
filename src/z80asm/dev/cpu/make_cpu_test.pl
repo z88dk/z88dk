@@ -14,119 +14,68 @@ my @CPUS = sort keys %{$opcodes{"nop"}};
 # dump cpu_ok and cpu_ixiy_ok
 for my $ixiy ("", "_ixiy") {
 	for my $cpu (@CPUS) {
-		for my $ez80_adl (0 .. ($cpu eq 'ez80' ? 1 : 0)) {
-			@test = ();
-			
-			if ($cpu eq 'ez80') {
-				push @test, " .assume adl=$ez80_adl";
+		@test = ();
+		
+		for my $asm (sort keys %opcodes) {
+			my $asm_ixiy = $asm;
+			if ($ixiy) {
+				$asm_ixiy =~ s/\b(ix|iy)/$1 eq 'ix' ? 'iy' : 'ix'/eg;
 			}
 			
-			for my $asm (sort keys %opcodes) {
-				my $asm_ixiy = $asm;
-				if ($ixiy) {
-					$asm_ixiy =~ s/\b(ix|iy)/$1 eq 'ix' ? 'iy' : 'ix'/eg;
+			if (exists $opcodes{$asm_ixiy}{$cpu}) {
+				my @ops = @{$opcodes{$asm_ixiy}{$cpu}};
+				my @bytes;
+				for my $op (@ops) {
+					for my $byte (@$op) {
+						next unless defined $byte;
+						if ($byte =~ /^\d+$/) {
+							push @bytes, sprintf("%02X", $byte);
+						}
+						else {
+							push @bytes, $byte;
+						}
+					}
 				}
 				
-				if (exists $opcodes{$asm_ixiy}{$cpu}) {
-					my @ops = @{$opcodes{$asm_ixiy}{$cpu}};
-					my $do_code = 1;
-					
-					# handle {ADL0}? xxx : xxx
-					if ($ops[0][0] eq '{ADL0}?') {
-						my(@adl0, @adl1);
-						shift @ops;
-						while (@ops && $ops[0][0] ne ':') {
-							push @adl0, shift @ops;
-						}
-						shift @ops;
-						@adl1 = @ops;
-						
-						@ops = $ez80_adl ? @adl1 : @adl0;
-					}
-					# handle {ADLn}
-					elsif ($ops[0][0] =~ /\{ADL(\d)\}/) {
-						my $this_adl = $1;
-						shift @ops;
-						if (!!$this_adl != !!$ez80_adl) {
-							$do_code = 0;
-						}
-					}
-					
-					if ($do_code) {
-						my @bytes;
-						for my $op (@ops) {
-							for my $byte (@$op) {
-								next unless defined $byte;
-								if ($byte =~ /^\d+$/) {
-									push @bytes, sprintf("%02X", $byte);
-								}
-								else {
-									push @bytes, $byte;
-								}
-							}
-						}
-						
-						(my $bytes = join(' ', @bytes)) =~ s/\s+$//;
-						add($cpu, $asm, $bytes);
-					}
-				}
+				(my $bytes = join(' ', @bytes)) =~ s/\s+$//;
+				add($cpu, $asm, $bytes);
 			}
-			
-			open(my $fh, ">", "cpu_test_${cpu}_adl${ez80_adl}${ixiy}_ok.asm") or die $!;
-			say $fh join("\n", compute_labels(sort @test));
 		}
+		
+		open(my $fh, ">", "cpu_test_${cpu}${ixiy}_ok.asm") or die $!;
+		say $fh join("\n", compute_labels(sort @test));
 	}
 }
 
 # dump cpu_error
 for my $cpu (@CPUS) {
-	for my $ez80_adl (0 .. ($cpu eq 'ez80' ? 1 : 0)) {
-		@test = ();
-		
-		if ($cpu eq 'ez80') {
-			push @test, " .assume adl=$ez80_adl";
-			for my $asm (sort keys %opcodes) {
-				if (exists $opcodes{$asm}{$cpu}) {
-					my @ops = @{$opcodes{$asm}{$cpu}};
-					if ($ops[0][0] =~ /^\{ADL(\d)\}$/) {
-						my $this_adl = $1;
-						if ($this_adl != $ez80_adl) {
-							push @test, sprintf(" %-31s; Error", $asm)
-						}
-					}
+	@test = ();
+	
+	for my $asm (sort keys %{$all_opcodes{ALL}}) {
+		#say "$cpu\t$asm";
+
+		if (!exists $all_opcodes{$cpu}{$asm}) {
+			my $skip = 0;
+
+			# special case: 'djnz ASMPC' is translated to 'djnz NN' in 8080/8085
+			if ($asm =~ /^(jr|djnz)/) {
+				if ($cpu =~ /^80/) {
+					$skip = 1 if $asm =~ /ASMPC/;	# DIS
+				}
+				else {
+					$skip = 1 if $asm =~ /\d+/;		# nn
 				}
 			}
-		}
-		
-		for my $asm (keys %{$all_opcodes{ALL}}) {
-			if (!exists $all_opcodes{$cpu}{$asm}) {
-				my $skip = 0;
 
-				# special case: 'djnz ASMPC' is translated to 'djnz NN' in 8080/8085
-				if ($asm =~ /^(jr|djnz)/) {
-					if ($cpu =~ /^80/) {
-						$skip = 1 if $asm =~ /ASMPC/;	# DIS
-					}
-					else {
-						$skip = 1 if $asm =~ /\d+/;		# nn
-					}
-				}
-
-				# special case: ld hl, sp+%u vs ld hl, sp+%s
-				$skip = 1 if $asm =~ /ld hl, sp[+-]/;
-				
-				# special case: 24-bit addresses only in ez80
-				if ($cpu ne 'ez80' && $asm !~ /^\w+\.(s|l|is|il)/) {
-					$skip = 1 if $asm =~ /0x123456/; # not call.il
-				}
-				
-				push @test, sprintf(" %-31s; Error", $asm) unless $skip;
-			}
+			# special case: ld hl, sp+%u vs ld hl, sp+%s
+			$skip = 1 if $asm =~ /ld hl, sp[+-]/;
+			
+			push @test, sprintf(" %-31s; Error", $asm) unless $skip;
 		}
-		
-		open(my $fh, ">", "cpu_test_${cpu}_adl${ez80_adl}_err.asm") or die $!;
-		say $fh join("\n", sort @test);
 	}
+	
+	open(my $fh, ">", "cpu_test_${cpu}_err.asm") or die $!;
+	say $fh join("\n", sort @test);
 }
 
 
@@ -234,27 +183,29 @@ sub add {
 		$bytes1 = $bytes =~ s/%h/FF/gr;
 		add($cpu, $asm1, $bytes1);
 	}
-	elsif ($bytes =~ /%m %m %m/) {
+	elsif ($asm =~ /%m/) {
 		my $asm1 = $asm =~ s/%m/0x123456/r;
 		my $bytes1 = $bytes =~ s/%m/56/r;
 		$bytes1 = $bytes1 =~ s/%m/34/r;
 		$bytes1 = $bytes1 =~ s/%m/12/r;
 		add($cpu, $asm1, $bytes1);
-	}
-	elsif ($asm =~ /%m/) {
-		my $asm1 = $asm =~ s/%m/-32768/r;
-		my $bytes1 = $bytes =~ s/%m/00/r;
+
+		$asm1 = $asm =~ s/%m/-32768/r;
+		$bytes1 = $bytes =~ s/%m/00/r;
 		$bytes1 = $bytes1 =~ s/%m/80/r;
+		$bytes1 = $bytes1 =~ s/%m/FF/r;
 		add($cpu, $asm1, $bytes1);
 		
 		$asm1 = $asm =~ s/%m/32767/r;
 		$bytes1 = $bytes =~ s/%m/FF/r;
 		$bytes1 = $bytes1 =~ s/%m/7F/r;
+		$bytes1 = $bytes1 =~ s/%m/00/r;
 		add($cpu, $asm1, $bytes1);
 		
 		$asm1 = $asm =~ s/%m/65535/r;
 		$bytes1 = $bytes =~ s/%m/FF/r;
 		$bytes1 = $bytes1 =~ s/%m/FF/r;
+		$bytes1 = $bytes1 =~ s/%m/00/r;
 		add($cpu, $asm1, $bytes1);
 	}
 	elsif ($asm =~ /%M/) {
@@ -310,7 +261,6 @@ sub compute_labels {
 	my(@test) = @_;
 	my $asmpc = 0;
 	for (@test) {
-		next if /\.assume/i;
 		my($asm, $bytes) = split(/;/, $_, 2);
 		my $num_bytes = scalar(split(' ', $bytes));
 		$num_bytes++ if $bytes =~ /\@/;

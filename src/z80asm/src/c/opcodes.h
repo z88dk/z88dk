@@ -20,7 +20,6 @@ void add_opcode(int opcode);
 
 /* add opcode followed by jump relative offset expression */
 void add_opcode_jr(int opcode, struct Expr1 *expr);
-void add_opcode_jr_n(int opcode, struct Expr1* expr, int asmpc_offset);
 
 /* add opcode followed by 8-bit unsigned expression */
 void add_opcode_n(int opcode, struct Expr1 *expr);
@@ -76,7 +75,7 @@ void add_copper_unit_stop();
 void add_copper_unit_nop();
 
 /* assert we are on a Z80 */
-#define _Z80_ONLY(x)		(!(option_cpu() & (CPU_Z80|CPU_Z80N|CPU_EZ80)) ? \
+#define _Z80_ONLY(x)		(!(option_cpu() & (CPU_Z80|CPU_Z80N|CPU_EZ80|CPU_EZ80_Z80)) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 #define _EXCEPT_Z80(x)		((option_cpu() & (CPU_Z80|CPU_Z80N)) ? \

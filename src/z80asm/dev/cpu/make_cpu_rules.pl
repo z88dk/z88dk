@@ -86,36 +86,6 @@ sub parse_code {
 			"add_opcode_nn(0x".fmthex($op2).", target_expr);",		# call
 			"asm_LABEL_offset(end_label, 6);";
 	}
-	# handle {ADL0}? xxx : xxx
-	elsif ($ops[0][0] eq '{ADL0}?') {
-		my(@adl0, @adl1);
-		shift @ops;
-		while (@ops && $ops[0][0] ne ':') {
-			push @adl0, shift @ops;
-		}
-		shift @ops;
-		@adl1 = @ops;
-		
-		push @code, 
-			"if (option_ez80_adl() == false) {",
-			parse_code($cpu, $asm, @adl0),
-			"}",
-			"else {",
-			parse_code($cpu, $asm, @adl1),
-			"}";
-	}
-	# handle {ADLn}
-	elsif ($ops[0][0] =~ /\{ADL(\d)\}/) {
-		my $value = $1 ? "true" : "false";
-		shift @ops;
-		push @code,
-			"if (option_ez80_adl() != $value) {",
-			"    error_illegal_ident(); ",
-			"}",
-			"else {",
-			parse_code($cpu, $asm, @ops),
-			"}";
-	}
 	# handle rst[.l] %c
 	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
 		if ($1) {

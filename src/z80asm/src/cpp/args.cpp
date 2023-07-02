@@ -660,12 +660,10 @@ void Args::set_cpu(const string& name) {
 	else if (name == CPU_EZ80_NAME) {
 		m_cpu = CPU_EZ80;
 		m_cpu_name = CPU_EZ80_NAME;
-		set_ez80_adl_option(true);
 	}
 	else if (name == CPU_EZ80_Z80_NAME) {
-		m_cpu = CPU_EZ80;
+		m_cpu = CPU_EZ80_Z80;
 		m_cpu_name = CPU_EZ80_Z80_NAME;
-		set_ez80_adl_option(false);
 	}
 	else if (name == CPU_R2KA_NAME) {
 		m_cpu = CPU_R2KA;
@@ -848,10 +846,12 @@ void Args::define_assembly_defines() {
 		break;
 	case CPU_EZ80:
 		define_static_def_sym("__CPU_EZ80__", 1);
-		if (option_ez80_adl()) 
-			define_static_def_sym("__CPU_EZ80_ADL__", 1);
-		else
-			define_static_def_sym("__CPU_EZ80_Z80__", 1);
+		define_static_def_sym("__CPU_EZ80_ADL__", 1);
+		define_static_def_sym("__CPU_ZILOG__", 1);
+		break;
+	case CPU_EZ80_Z80:
+		define_static_def_sym("__CPU_EZ80__", 1);
+		define_static_def_sym("__CPU_EZ80_Z80__", 1);
 		define_static_def_sym("__CPU_ZILOG__", 1);
 		break;
 	case CPU_R2KA:
@@ -930,14 +930,6 @@ bool option_ti83() {
 
 bool option_ti83plus() {
 	return g_args.ti83plus();
-}
-
-bool option_ez80_adl() {
-	return g_args.ez80_adl();
-}
-
-void set_ez80_adl_option(bool f) {
-	g_args.set_ez80_adl(f);
 }
 
 bool option_speed() {

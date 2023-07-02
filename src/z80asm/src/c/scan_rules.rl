@@ -89,7 +89,8 @@ ragel, to expand token definition from token_def.h.
 #define TOKEN_EZ80_1(opcode, string)	 \
 	string <CAT> i										<NL> \
 	{													<NL> \
-		<TAB>		if (option_cpu() == CPU_EZ80) {		<NL> \
+		<TAB>		if (option_cpu() == CPU_EZ80 ||		<NL> \
+					    option_cpu() == CPU_EZ80_Z80) {	<NL> \
 		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
 		<TAB>		}									<NL> \
 		<TAB>		else {								<NL> \

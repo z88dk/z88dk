@@ -412,11 +412,7 @@ void Lexer::set(const string& text) {
 
 			'.' ws* @p1 ident @p2 {
 							  string str = ident_change_case(string(p1, p2));
-							  Keyword keyword = lu_keyword(str);
-							  if (keyword == Keyword::ASSUME) {
-							      m_tokens.emplace_back(TType::Ident, str, keyword);
-							  }
-							  else if (first_token) {
+							  if (first_token) {
 								  m_tokens.emplace_back(TType::Label, str);
 							  }
 							  else {

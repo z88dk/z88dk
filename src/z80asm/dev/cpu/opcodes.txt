@@ -2128,9 +2128,49 @@
 |call.is v, %m          |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
 |call.is z, %m          |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
 |call.lil %m            |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lil c, %m         |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lil m, %m         |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lil nc, %m        |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lil nv, %m        |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lil nz, %m        |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lil p, %m         |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lil pe, %m        |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lil po, %m        |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lil v, %m         |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lil z, %m         |-    -    ez80 -        -     -    -   -    -   -   |
 |call.lis %m            |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lis c, %m         |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lis m, %m         |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lis nc, %m        |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lis nv, %m        |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lis nz, %m        |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lis p, %m         |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lis pe, %m        |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lis po, %m        |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lis v, %m         |-    -    ez80 -        -     -    -   -    -   -   |
+|call.lis z, %m         |-    -    ez80 -        -     -    -   -    -   -   |
 |call.sil %m            |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sil c, %m         |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sil m, %m         |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sil nc, %m        |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sil nv, %m        |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sil nz, %m        |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sil p, %m         |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sil pe, %m        |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sil po, %m        |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sil v, %m         |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sil z, %m         |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |call.sis %m            |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sis c, %m         |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sis m, %m         |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sis nc, %m        |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sis nv, %m        |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sis nz, %m        |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sis p, %m         |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sis pe, %m        |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sis po, %m        |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sis v, %m         |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|call.sis z, %m         |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |cc %m                  |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ccf                    |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |ccf'                   |-    -    -    -        -     r2ka r3k -    -   -   |
@@ -2523,7 +2563,7 @@
 |in h, (c)              |-    -    ez80 ez80_z80 -     -    -   z180 z80 z80n|
 |in l, (bc)             |-    -    ez80 ez80_z80 -     -    -   z180 z80 z80n|
 |in l, (c)              |-    -    ez80 ez80_z80 -     -    -   z180 z80 z80n|
-|in0 (%n)               |-    -    ez80 ez80_z80 -     -    -   z180 -   -   |
+|in0 (%n)               |-    -    -    -        -     -    -   z180 -   -   |
 |in0 a, (%n)            |-    -    ez80 ez80_z80 -     -    -   z180 -   -   |
 |in0 b, (%n)            |-    -    ez80 ez80_z80 -     -    -   z180 -   -   |
 |in0 c, (%n)            |-    -    ez80 ez80_z80 -     -    -   z180 -   -   |
@@ -15568,9 +15608,49 @@
 |call.is z, %m          |ez80    |49 CC %m %m                              |
 |call.is z, %m          |ez80_z80|40 CC %m %m                              |
 |call.lil %m            |ez80    |5B CD %m %m %m                           |
+|call.lil c, %m         |ez80    |5B DC %m %m %m                           |
+|call.lil m, %m         |ez80    |5B FC %m %m %m                           |
+|call.lil nc, %m        |ez80    |5B D4 %m %m %m                           |
+|call.lil nv, %m        |ez80    |5B E4 %m %m %m                           |
+|call.lil nz, %m        |ez80    |5B C4 %m %m %m                           |
+|call.lil p, %m         |ez80    |5B F4 %m %m %m                           |
+|call.lil pe, %m        |ez80    |5B EC %m %m %m                           |
+|call.lil po, %m        |ez80    |5B E4 %m %m %m                           |
+|call.lil v, %m         |ez80    |5B EC %m %m %m                           |
+|call.lil z, %m         |ez80    |5B CC %m %m %m                           |
 |call.lis %m            |ez80    |49 CD %m %m                              |
+|call.lis c, %m         |ez80    |49 DC %m %m                              |
+|call.lis m, %m         |ez80    |49 FC %m %m                              |
+|call.lis nc, %m        |ez80    |49 D4 %m %m                              |
+|call.lis nv, %m        |ez80    |49 E4 %m %m                              |
+|call.lis nz, %m        |ez80    |49 C4 %m %m                              |
+|call.lis p, %m         |ez80    |49 F4 %m %m                              |
+|call.lis pe, %m        |ez80    |49 EC %m %m                              |
+|call.lis po, %m        |ez80    |49 E4 %m %m                              |
+|call.lis v, %m         |ez80    |49 EC %m %m                              |
+|call.lis z, %m         |ez80    |49 CC %m %m                              |
 |call.sil %m            |ez80_z80|52 CD %m %m %m                           |
+|call.sil c, %m         |ez80_z80|52 DC %m %m %m                           |
+|call.sil m, %m         |ez80_z80|52 FC %m %m %m                           |
+|call.sil nc, %m        |ez80_z80|52 D4 %m %m %m                           |
+|call.sil nv, %m        |ez80_z80|52 E4 %m %m %m                           |
+|call.sil nz, %m        |ez80_z80|52 C4 %m %m %m                           |
+|call.sil p, %m         |ez80_z80|52 F4 %m %m %m                           |
+|call.sil pe, %m        |ez80_z80|52 EC %m %m %m                           |
+|call.sil po, %m        |ez80_z80|52 E4 %m %m %m                           |
+|call.sil v, %m         |ez80_z80|52 EC %m %m %m                           |
+|call.sil z, %m         |ez80_z80|52 CC %m %m %m                           |
 |call.sis %m            |ez80_z80|40 CD %m %m                              |
+|call.sis c, %m         |ez80_z80|40 DC %m %m                              |
+|call.sis m, %m         |ez80_z80|40 FC %m %m                              |
+|call.sis nc, %m        |ez80_z80|40 D4 %m %m                              |
+|call.sis nv, %m        |ez80_z80|40 E4 %m %m                              |
+|call.sis nz, %m        |ez80_z80|40 C4 %m %m                              |
+|call.sis p, %m         |ez80_z80|40 F4 %m %m                              |
+|call.sis pe, %m        |ez80_z80|40 EC %m %m                              |
+|call.sis po, %m        |ez80_z80|40 E4 %m %m                              |
+|call.sis v, %m         |ez80_z80|40 EC %m %m                              |
+|call.sis z, %m         |ez80_z80|40 CC %m %m                              |
 |cc %m                  |8080    |DC %m %m                                 |
 |cc %m                  |8085    |DC %m %m                                 |
 |cc %m                  |ez80    |DC %m %m %m                              |
@@ -17273,8 +17353,6 @@
 |in l, (c)              |z180    |ED 68                                    |
 |in l, (c)              |z80     |ED 68                                    |
 |in l, (c)              |z80n    |ED 68                                    |
-|in0 (%n)               |ez80    |ED 30 %n                                 |
-|in0 (%n)               |ez80_z80|ED 30 %n                                 |
 |in0 (%n)               |z180    |ED 30 %n                                 |
 |in0 a, (%n)            |ez80    |ED 38 %n                                 |
 |in0 a, (%n)            |ez80_z80|ED 38 %n                                 |
