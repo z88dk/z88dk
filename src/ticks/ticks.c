@@ -1145,6 +1145,7 @@ int main (int argc, char **argv){
                 xl = get_memory(t+(yl|yh<<8));
                 xh = get_memory(t+(yl|yh<<8) + 1);
             }
+            ih=1;altd=0;ioi=0;ioe=0;break;
             break;
         }
         st+= israbbit() ? 6 : isgbz80() ? 12 : isz180() ? 9 : isez80() ? 3 : 10;
@@ -1411,6 +1412,7 @@ int main (int argc, char **argv){
                 put_memory(t+(yl|yh<<8),xl);
                 put_memory(t+(yl|yh<<8) + 1,xh);
             }
+            ih=1;altd=0;ioi=0;ioe=0;break;
             break;
         }
         if ( altd ) LDRIM(a_);
@@ -1427,6 +1429,7 @@ int main (int argc, char **argv){
                 c = get_memory(t+(yl|yh<<8));
                 b = get_memory(t+(yl|yh<<8) + 1);
             }
+            ih=1;altd=0;ioi=0;ioe=0;break;
             break;
         }
 	      st+= isez80() ? 1 :  israbbit() ? 2 : isz180() ? 3 : 4;
@@ -1455,6 +1458,7 @@ int main (int argc, char **argv){
                 put_memory(t+(yl|yh<<8),c);
                 put_memory(t+(yl|yh<<8) + 1,b);
             }
+            ih=1;altd=0;ioi=0;ioe=0;break;
             break;
         }
         st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
@@ -1486,6 +1490,7 @@ int main (int argc, char **argv){
                 e = get_memory(t+(yl|yh<<8));
                 d = get_memory(t+(yl|yh<<8) + 1);
             }
+            ih=1;altd=0;ioi=0;ioe=0;break;
             break;
         }
         st+= isez80() ? 1 :  israbbit() ? 2 : isz180() ? 3 : 4;
@@ -1517,6 +1522,7 @@ int main (int argc, char **argv){
                 put_memory(t+(yl|yh<<8),e);
                 put_memory(t+(yl|yh<<8) + 1,d);
             }
+            ih=1;altd=0;ioi=0;ioe=0;break;
             break;
         }
         st+= isez80() ? 1 : israbbit() ? 2 :isz180() ? 3 : 4;
@@ -1719,6 +1725,7 @@ int main (int argc, char **argv){
                 l = get_memory(t+(yl|yh<<8));
                 h = get_memory(t+(yl|yh<<8) + 1);
             }
+            ih=1;altd=0;ioi=0;ioe=0;break;
             break;
         }
         if ( israbbit()) {
@@ -1758,6 +1765,7 @@ int main (int argc, char **argv){
                 put_memory(t+(yl|yh<<8),l);
                 put_memory(t+(yl|yh<<8) + 1,h);
             }
+            ih=1;altd=0;ioi=0;ioe=0;break;
             break;
         }
         st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
@@ -1790,6 +1798,7 @@ int main (int argc, char **argv){
                 yh = get_memory(t+(yl|yh<<8) + 1);
                 yl = tl;
             }
+            ih=1;altd=0;ioi=0;ioe=0;break;
             break;
         }
         st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
@@ -1818,6 +1827,7 @@ int main (int argc, char **argv){
                 put_memory(t+(yl|yh<<8),yl);
                 put_memory(t+(yl|yh<<8) + 1,yh);
             }
+            ih=1;altd=0;ioi=0;ioe=0;break;
             break;
         }
         st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
