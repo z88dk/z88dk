@@ -150,6 +150,7 @@ void push_includes(const char* dir);
 void pop_includes();
 const char* search_includes(const char* filename);
 int option_cpu();
+void set_cpu_option(int cpu);
 const char* option_cpu_name();
 bool option_ti83();
 bool option_ti83plus();
@@ -212,6 +213,9 @@ void sfile_set_c_source(bool f);
 // symbol table
 struct Symbol1;
 struct Symbol1* define_static_def_sym(const char* name, long value);
+void undefine_static_def_sym(const char* name);
+struct Symbol1* define_local_def_sym(const char* name, long value);
+void undefine_local_def_sym(const char* name);
 
 // code area
 int get_PC();

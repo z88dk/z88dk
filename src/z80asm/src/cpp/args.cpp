@@ -17,6 +17,7 @@
 #include <cassert>
 #include <cstring>
 #include <climits>
+#include <map>
 using namespace std;
 
 Args g_args;
@@ -89,6 +90,12 @@ void Args::parse_args(const vector<string>& args) {
 
 	if (args.empty())
 		exit_copyright();
+
+    // check for -v to activate verbosity before other options are parsed
+    for (auto& arg : args) {
+        if (arg == "-v")
+            m_verbose = true;
+    }
 
 	pre_parsing_actions();
 	if (g_errors.count() > 0)
@@ -294,12 +301,12 @@ void Args::parse_define(const string& opt_arg) {
 		g_errors.error(ErrCode::IllegalIdent, ident);
 	else {
 		if (equal_pos == string::npos) {
-			define_static_def_sym(ident.c_str(), 1);
+            define_static_symbol(ident.c_str(), 1);
 		}
 		else {
 			int value = 0;
 			if (parse_opt_int(value, opt_arg.substr(equal_pos + 1))) 
-				define_static_def_sym(ident.c_str(), value);
+				define_static_symbol(ident.c_str(), value);
 			else
 				g_errors.error(ErrCode::InvalidDefineOption, opt_arg);
 		}
@@ -644,76 +651,134 @@ string Args::search_path(vector<string>& path, const string& file) {
 	return file_path.generic_string();
 }
 
+void Args::set_cpu(int cpu) {
+    undefine_static_symbol("__CPU_Z80__");
+    undefine_static_symbol("__CPU_Z80N__");
+    undefine_static_symbol("__CPU_Z180__");
+    undefine_static_symbol("__CPU_EZ80__");
+    undefine_static_symbol("__CPU_EZ80_Z80__");
+    undefine_static_symbol("__CPU_EZ80_ADL__");
+    undefine_static_symbol("__CPU_ZILOG__");
+
+    undefine_static_symbol("__CPU_R2KA__");
+    undefine_static_symbol("__CPU_R3K__");
+    undefine_static_symbol("__CPU_RABBIT__");
+
+    undefine_static_symbol("__CPU_8080__");
+    undefine_static_symbol("__CPU_8085__");
+    undefine_static_symbol("__CPU_INTEL__");
+
+    undefine_static_symbol("__CPU_GBZ80__");
+
+    switch (cpu) {
+    case CPU_Z80:
+        m_cpu = CPU_Z80;
+        m_cpu_name = CPU_Z80_NAME;
+        define_static_symbol("__CPU_Z80__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_Z80N:
+        m_cpu = CPU_Z80N;
+        m_cpu_name = CPU_Z80N_NAME;
+        define_static_symbol("__CPU_Z80N__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_Z180:
+        m_cpu = CPU_Z180;
+        m_cpu_name = CPU_Z180_NAME;
+        define_static_symbol("__CPU_Z180__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_EZ80:
+        m_cpu = CPU_EZ80;
+        m_cpu_name = CPU_EZ80_NAME;
+        define_static_symbol("__CPU_EZ80__");
+        define_static_symbol("__CPU_EZ80_ADL__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_EZ80_Z80:
+        m_cpu = CPU_EZ80_Z80;
+        m_cpu_name = CPU_EZ80_Z80_NAME;
+        define_static_symbol("__CPU_EZ80__");
+        define_static_symbol("__CPU_EZ80_Z80__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_R2KA:
+        m_cpu = CPU_R2KA;
+        m_cpu_name = CPU_R2KA_NAME;
+        define_static_symbol("__CPU_R2KA__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
+    case CPU_R3K:
+        m_cpu = CPU_R3K;
+        m_cpu_name = CPU_R3K_NAME;
+        define_static_symbol("__CPU_R3K__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
+    case CPU_8080:
+        m_cpu = CPU_8080;
+        m_cpu_name = CPU_8080_NAME;
+        define_static_symbol("__CPU_8080__");
+        define_static_symbol("__CPU_INTEL__");
+        break;
+    case CPU_8085:
+        m_cpu = CPU_8085;
+        m_cpu_name = CPU_8085_NAME;
+        define_static_symbol("__CPU_8085__");
+        define_static_symbol("__CPU_INTEL__");
+        break;
+    case CPU_GBZ80:
+        m_cpu = CPU_GBZ80;
+        m_cpu_name = CPU_GBZ80_NAME;
+        define_static_symbol("__CPU_GBZ80__");
+        break;
+    default:
+        assert(0);
+    }
+}
+
 void Args::set_cpu(const string& name) {
-	if (name == CPU_Z80_NAME) {
-		m_cpu = CPU_Z80;
-		m_cpu_name = CPU_Z80_NAME;
-	}
-	else if (name == CPU_Z80N_NAME) {
-		m_cpu = CPU_Z80N;
-		m_cpu_name = CPU_Z80N_NAME;
-	}
-	else if (name == CPU_Z180_NAME) {
-		m_cpu = CPU_Z180;
-		m_cpu_name = CPU_Z180_NAME;
-	}
-	else if (name == CPU_EZ80_NAME) {
-		m_cpu = CPU_EZ80;
-		m_cpu_name = CPU_EZ80_NAME;
-	}
-	else if (name == CPU_EZ80_Z80_NAME) {
-		m_cpu = CPU_EZ80_Z80;
-		m_cpu_name = CPU_EZ80_Z80_NAME;
-	}
-	else if (name == CPU_R2KA_NAME) {
-		m_cpu = CPU_R2KA;
-		m_cpu_name = CPU_R2KA_NAME;
-	}
-	else if (name == CPU_R3K_NAME) {
-		m_cpu = CPU_R3K;
-		m_cpu_name = CPU_R3K_NAME;
-	}
-	else if (name == CPU_8080_NAME) {
-		m_cpu = CPU_8080;
-		m_cpu_name = CPU_8080_NAME;
-	}
-	else if (name == CPU_8085_NAME) {
-		m_cpu = CPU_8085;
-		m_cpu_name = CPU_8085_NAME;
-	}
-	else if (name == CPU_GBZ80_NAME) {
-		m_cpu = CPU_GBZ80;
-		m_cpu_name = CPU_GBZ80_NAME;
-	}
-	else if (name == ARCH_TI83_NAME) {
-		m_cpu = CPU_Z80;
-		m_cpu_name = CPU_Z80_NAME;
-		m_ti83 = true;
-		m_ti83plus = false;
-	}
-	else if (name == ARCH_TI83PLUS_NAME) {
-		m_cpu = CPU_Z80;
-		m_cpu_name = CPU_Z80_NAME;
-		m_ti83 = false;
-		m_ti83plus = true;
-	}
-	else {
-		string error = name + "; expected: ";
-		error += CPU_Z80_NAME		",";
-		error += CPU_Z80N_NAME		",";
-		error += CPU_Z180_NAME		",";
-		error += CPU_EZ80_NAME		",";
-		error += CPU_EZ80_Z80_NAME	",";
-		error += CPU_R2KA_NAME		",";
-		error += CPU_R3K_NAME		",";
-		error += CPU_8080_NAME		",";
-		error += CPU_8085_NAME		",";
-		error += CPU_GBZ80_NAME		",";
-		error += ARCH_TI83_NAME		",";
-		error += ARCH_TI83PLUS_NAME	",";
-		error.pop_back(); // remove last comma
-		g_errors.error(ErrCode::InvalidCpu, error);
-	}
+    static std::map<string, int> cpu_map = {
+        {CPU_Z80_NAME, CPU_Z80},
+        {CPU_Z80N_NAME, CPU_Z80N},
+        {CPU_Z180_NAME, CPU_Z180},
+        {CPU_EZ80_NAME, CPU_EZ80},
+        {CPU_EZ80_Z80_NAME, CPU_EZ80_Z80},
+        {CPU_R2KA_NAME, CPU_R2KA},
+        {CPU_R3K_NAME, CPU_R3K},
+        {CPU_8080_NAME, CPU_8080},
+        {CPU_8085_NAME, CPU_8085},
+        {CPU_GBZ80_NAME, CPU_GBZ80},
+    };
+
+    m_got_cpu_option = true;
+
+    if (name == ARCH_TI83_NAME) {
+        set_cpu(CPU_Z80);
+        m_ti83 = true;
+        m_ti83plus = false;
+    }
+    else if (name == ARCH_TI83PLUS_NAME) {
+        set_cpu(CPU_Z80);
+        m_ti83 = false;
+        m_ti83plus = true;
+    }
+    else {
+        auto it = cpu_map.find(name);
+        if (it != cpu_map.end()) {
+            set_cpu(it->second);
+        }
+        else {
+            string error = name + "; expected: ";
+            for (auto& it : cpu_map) {
+                error += it.first + ",";
+            }
+            error += string(ARCH_TI83_NAME) + ",";
+            error += string(ARCH_TI83PLUS_NAME) + ",";
+            error.pop_back(); // remove last comma
+            g_errors.error(ErrCode::InvalidCpu, error);
+        }
+    }
 }
 
 void Args::set_filler(const string& opt_arg) {
@@ -739,8 +804,8 @@ void Args::post_parsing_actions() {
 	if (!m_output_dir.empty())
 		fs::create_directories(fs::path(m_output_dir));
 
-	include_z80asm_lib();
 	define_assembly_defines();
+	include_z80asm_lib();
 }
 
 // parse environment variable options
@@ -831,65 +896,39 @@ bool Args::check_library(const fs::path& file_path) {
 }
 
 void Args::define_assembly_defines() {
-	switch (m_cpu) {
-	case CPU_Z80:
-		define_static_def_sym("__CPU_Z80__", 1);
-		define_static_def_sym("__CPU_ZILOG__", 1);
-		break;
-	case CPU_Z80N:
-		define_static_def_sym("__CPU_Z80N__", 1);
-		define_static_def_sym("__CPU_ZILOG__", 1);
-		break;
-	case CPU_Z180:
-		define_static_def_sym("__CPU_Z180__", 1);
-		define_static_def_sym("__CPU_ZILOG__", 1);
-		break;
-	case CPU_EZ80:
-		define_static_def_sym("__CPU_EZ80__", 1);
-		define_static_def_sym("__CPU_EZ80_ADL__", 1);
-		define_static_def_sym("__CPU_ZILOG__", 1);
-		break;
-	case CPU_EZ80_Z80:
-		define_static_def_sym("__CPU_EZ80__", 1);
-		define_static_def_sym("__CPU_EZ80_Z80__", 1);
-		define_static_def_sym("__CPU_ZILOG__", 1);
-		break;
-	case CPU_R2KA:
-		define_static_def_sym("__CPU_R2KA__", 1);
-		define_static_def_sym("__CPU_RABBIT__", 1);
-		break;
-	case CPU_R3K:
-		define_static_def_sym("__CPU_R3K__", 1);
-		define_static_def_sym("__CPU_RABBIT__", 1);
-		break;
-	case CPU_8080:
-		define_static_def_sym("__CPU_8080__", 1);
-		define_static_def_sym("__CPU_INTEL__", 1);
-		break;
-	case CPU_8085:
-		define_static_def_sym("__CPU_8085__", 1);
-		define_static_def_sym("__CPU_INTEL__", 1);
-		break;
-	case CPU_GBZ80:
-		define_static_def_sym("__CPU_GBZ80__", 1);
-		break;
-	default:
-		assert(0);
-	}
+    if (!m_got_cpu_option)
+        set_cpu(CPU_Z80);
 
-	if (m_swap_ixiy) {
-		define_static_def_sym("__SWAP_IX_IY__", 1);
-	}
+    if (m_swap_ixiy) {
+        define_static_symbol("__SWAP_IX_IY__");
+    }
+    else {
+        undefine_static_symbol("__SWAP_IX_IY__");
+    }
 
 	if (m_ti83) {
-		define_static_def_sym("__CPU_TI83__", 1);
+		define_static_symbol("__CPU_TI83__");
+        undefine_static_symbol("__CPU_TI83PLUS__");
 	}
 	else if (m_ti83plus) {
-		define_static_def_sym("__CPU_TI83PLUS__", 1);
+        undefine_static_symbol("__CPU_TI83__");
+        define_static_symbol("__CPU_TI83PLUS__");
 	}
 
 	// __FLOAT__xxx__
-	define_static_def_sym(get_float_format_define(), 1);
+	define_static_symbol(get_float_format_define());
+}
+
+void Args::define_static_symbol(const string& name, int value) {
+    undefine_static_def_sym(name.c_str());
+    define_static_def_sym(name.c_str(), value);
+    undefine_local_def_sym(name.c_str());
+    define_local_def_sym(name.c_str(), value);
+}
+
+void Args::undefine_static_symbol(const string& name) {
+    undefine_static_def_sym(name.c_str());
+    undefine_local_def_sym(name.c_str());
 }
 
 //-----------------------------------------------------------------------------
@@ -918,6 +957,10 @@ const char* search_includes(const char* filename) {
 
 int option_cpu() {
 	return g_args.cpu();
+}
+
+void set_cpu_option(int cpu) {
+    g_args.set_cpu(cpu);
 }
 
 const char* option_cpu_name() {

@@ -55,7 +55,7 @@ my @tokens = (
 	'OTD2R', 'OTDRX', 'OTI2R', 'OTIRX', 'OUTD2', 'OUTI2',
 
 	# Assembly directives
-	'ALIGN', 'ASSERT', 
+	'ALIGN', 'ASSERT', 'ASSUME', 
 	'BYTE', 'C_LINE', 'DB', 'DC', 'DDB', 'DEFB', 'DEFC', 
 	'DEFDB', 'DEFGROUP', 'DEFINE', 'DEFM', 'DEFP', 'DEFQ', 'DEFS', 'DEFVARS', 
 	'DEFW', 'DEPHASE', 'DM', 'DP', 'DQ', 'DS', 'DW', 'DWORD', 'EQU', 'EXTERN', 

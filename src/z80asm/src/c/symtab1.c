@@ -168,6 +168,10 @@ Symbol1 *define_static_def_sym(const char *name, long value )
 	return sym;
 }
 
+void undefine_static_def_sym(const char* name) {
+    Symbol1Hash_remove(static_symtab, name);
+}
+
 /*-----------------------------------------------------------------------------
 *   define a global static symbol (e.g. ASMSIZE, ASMTAIL)
 *----------------------------------------------------------------------------*/
@@ -181,13 +185,21 @@ Symbol1 *define_global_def_sym(const char *name, long value )
 }
 
 /*-----------------------------------------------------------------------------
-*   define a local DEF symbol (e.g. DEFINE)
+*   define/undefine a local DEF symbol (e.g. DEFINE)
 *----------------------------------------------------------------------------*/
 Symbol1 *define_local_def_sym(const char *name, long value )
 {
-	return _define_sym(name, value, TYPE_CONSTANT, SCOPE_LOCAL,
-						CURRENTMODULE, CURRENTSECTION, 
-						& CURRENTMODULE->local_symtab );
+    if (CURRENTMODULE)
+        return _define_sym(name, value, TYPE_CONSTANT, SCOPE_LOCAL,
+            CURRENTMODULE, CURRENTSECTION,
+            &CURRENTMODULE->local_symtab);
+    else
+        return NULL;
+}
+
+void undefine_local_def_sym(const char* name) {
+    if (CURRENTMODULE)
+        Symbol1Hash_remove(CURRENTMODULE->local_symtab, name);
 }
 
 /*-----------------------------------------------------------------------------

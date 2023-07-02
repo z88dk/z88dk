@@ -6,11 +6,11 @@ use Modern::Perl;
 
 # test error
 z80asm_nok("-mcc", "", "", <<END);
-error: invalid cpu: cc; expected: z80,z80n,z180,ez80,ez80_z80,r2ka,r3k,8080,8085,gbz80,ti83,ti83plus
+error: invalid cpu: cc; expected: 8080,8085,ez80,ez80_z80,gbz80,r2ka,r3k,z180,z80,z80n,ti83,ti83plus
 END
 
 z80asm_nok("-m=cc", "", "", <<END);
-error: invalid cpu: cc; expected: z80,z80n,z180,ez80,ez80_z80,r2ka,r3k,8080,8085,gbz80,ti83,ti83plus
+error: invalid cpu: cc; expected: 8080,8085,ez80,ez80_z80,gbz80,r2ka,r3k,z180,z80,z80n,ti83,ti83plus
 END
 
 # Test cpu opcode files created by ../dev/cpu/cpu.pl
@@ -100,7 +100,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 			run_ok("z88dk-dis -m$cpu $file_bin > $test.asm");
 
 			SKIP: {
-				skip "skip until #2313 is solved";
+				skip "skip until #2340 is solved";
 				
 				# assemble
 				run_ok("z88dk-z80asm -m$cpu -b -l $test.asm 2> $test.err");

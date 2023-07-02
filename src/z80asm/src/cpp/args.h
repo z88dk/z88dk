@@ -23,6 +23,7 @@ public:
 	bool ucase() const { return m_ucase; }
 	int cpu() const { return m_cpu; }
 	const string& cpu_name() const { return m_cpu_name; }
+    void set_cpu(int cpu);
 	bool ti83() const { return m_ti83; }
 	bool ti83plus() const { return m_ti83plus; }
 	bool opt_speed() const { return m_opt_speed; }
@@ -71,7 +72,8 @@ private:
 	bool			m_swap_ixiy{ false };		// -IXIY option
 	bool			m_ucase{ false };			// -ucase option
 	int				m_cpu{ CPU_Z80 };			// -m option
-	string			m_cpu_name{ CPU_Z80_NAME };	
+	string			m_cpu_name{ CPU_Z80_NAME };
+    bool            m_got_cpu_option{ false };  // got -m option
 	bool			m_ti83{ false };			// -mti83 option
 	bool			m_ti83plus{ false };		// -mti83plus option
 	bool			m_opt_speed{ false };		// -opt-speed option
@@ -131,6 +133,8 @@ private:
 	static string expand_env_vars(string text);
 	static void set_float_format(const string& format);
 	static void set_origin(const string& opt_arg);
+    static void define_static_symbol(const string& name, int value = 1);
+    static void undefine_static_symbol(const string& name);
 
 	// filenames
 	string prepend_output_dir(const string& filename);
