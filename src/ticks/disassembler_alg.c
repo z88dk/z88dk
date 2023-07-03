@@ -370,7 +370,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                if ( isez80() && y == 6 && state->index )
                                    BUF_PRINTF("%-10s%s,%s",handle_ez80_am(state, "ld"), handle_hl(state->index == 1 ? 2 : 1), handle_register8(state, 6, opbuf1, sizeof(opbuf1)));
                                else BUF_PRINTF("%-10s%s,%s",handle_ez80_am(state, "ld"), handle_register16(state, p,state->index), handle_immed16(state, opbuf1, sizeof(opbuf1)));
-                           } else BUF_PRINTF("%-10s%s,%s", "add", handle_hl(state->index), handle_register16(state, p, state->index));
+                           } else BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state,"add"), handle_hl(state->index), handle_register16(state, p, state->index));
                             break;
                         case 2:
                             if ( q == 0 ) {
@@ -394,10 +394,10 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             else BUF_PRINTF("%-10s%s", handle_ez80_am(state,"dec"), handle_register16(state, p, state->index));
                             break;
                         case 4:
-                            BUF_PRINTF("%-10s%s", "inc", handle_register8(state, y, opbuf1, sizeof(opbuf1)));
+                            BUF_PRINTF("%-10s%s", y == 6 ? handle_ez80_am(state,"inc") : "inc",  handle_register8(state, y, opbuf1, sizeof(opbuf1)));
                             break;
                         case 5:
-                            BUF_PRINTF("%-10s%s", "dec", handle_register8(state, y,opbuf1,sizeof(opbuf1)));
+                            BUF_PRINTF("%-10s%s", y == 6 ? handle_ez80_am(state,"dec") : "dec", handle_register8(state, y,opbuf1,sizeof(opbuf1)));
                             break;
                         case 6:
                             if ( isez80() && state->index != 0 ) {
