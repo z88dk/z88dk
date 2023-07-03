@@ -17,5 +17,5 @@ z180_outp:
    push bc
    push hl
    push af
-   
-   jp asm_z180_outp
+   out (c),l
+   ret

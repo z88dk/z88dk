@@ -17,5 +17,5 @@ _z80_outp:
    push hl
    push bc
    push af
-   
-   jp asm_z80_outp
+   out (c),l
+   ret

@@ -12,10 +12,8 @@ _z180_outp:
 
    pop af
    pop bc
+   dec sp
    pop hl
-   
-   push hl
-   push bc
    push af
-   
-   jp asm_z180_outp
+   out (c),h
+   ret
