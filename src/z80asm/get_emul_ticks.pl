@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # assemble instruction given in command line (separated by ':'), get ticks in all CPUs
 # for carry clear and carry set

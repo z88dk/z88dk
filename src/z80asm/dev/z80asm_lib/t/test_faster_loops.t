@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # test standard loop vs faster loop 
 # see https://github.com/z88dk/z88dk/issues/1911

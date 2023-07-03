@@ -282,7 +282,7 @@ static char *handle_ez80_am(dcontext *state, char *opcode)
     static char buf[128];
     static char *modes[] = { "", ".sis", ".lis", ".sil", ".lil" };
 
-    snprintf(buf,sizeof(buf),"%s%s", opcode, modes[state->am]);
+    snprintf(buf,sizeof(buf),"%s%s", opcode, isez80() ? modes[state->am] : "");
 
     return buf;
 }
@@ -584,14 +584,14 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                 uint8_t z = b & 0x07;
                                 uint8_t p = (y & 0x06) >> 1;
                                 uint8_t q = y & 0x01;
-         //                       printf("x=%d y=%d z=%dp=%d q=%d\n",x,y,z,p,q);
+                               //printf("x=%d y=%d z=%dp=%d q=%d\n",x,y,z,p,q);
                                 state->index = 0;
                                 if ( x == 0 ) {
                                     if ( isz180() || isez80() ) {
-                                        if ( z == 4 ) BUF_PRINTF("%-10s%s","tst",handle_register8(state,y, opbuf1, sizeof(opbuf1)));
+                                        if ( z == 4 ) BUF_PRINTF("%-10s%s",y == 6 && isez80() ? handle_ez80_am(state,"tst") : "tst",handle_register8(state,y, opbuf1, sizeof(opbuf1)));
                                         else if ( z == 0 ) BUF_PRINTF("%-10s%s,(%s)","in0",y == 6 ? "f" : handle_register8(state,y, opbuf1, sizeof(opbuf1)), handle_immed8(state, opbuf2, sizeof(opbuf2)));
                                         else if ( z == 1 && y != 6) BUF_PRINTF("%-10s(%s),%s","out0",handle_immed8(state, opbuf2, sizeof(opbuf2)),handle_register8(state,y, opbuf1, sizeof(opbuf1)));
-                                        else if ( z == 1 && isez80() ) BUF_PRINTF("%-10siy,(hl)","ld");
+                                        else if ( z == 1 && isez80() ) BUF_PRINTF("%-10siy,(hl)",handle_ez80_am(state,"ld"));
                                         else if ( (z == 2 || z == 3) && isez80() ) BUF_PRINTF("%-10s%s,%s%s", handle_ez80_am(state,"lea"), y == 6 ? handle_hl(z-1) : handle_register16(state, p, 0), handle_hl(z-1), handle_displacement(state, opbuf1, sizeof(opbuf1)));
                                         else if ( z == 7 && isez80() ) {
                                             if ( q == 1 ) BUF_PRINTF("%-10s(hl),%s", handle_ez80_am(state,"ld"), p == 3 ? handle_hl(1) : handle_register16(state, p, 0));
