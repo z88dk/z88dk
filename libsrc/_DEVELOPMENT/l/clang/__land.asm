@@ -1,7 +1,7 @@
 
 SECTION code_l_clang
 
-IF __CPU_Z80__
+IF __CPU_Z80__ | __CPU_EZ80__
 PUBLIC __land
 
 

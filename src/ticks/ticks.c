@@ -39,9 +39,9 @@
           r= get_memory(((get_memory(pc++)^128)-128+(b|a<<8))&65535)
 
 #define LEA(r1, r2, s1, s2, t) do { \
-    uint16_t offs = ((get_memory(pc++)^128)-128+(s1|s2<<8))&65535; \
-    r2 = get_memory(offs); \
-    r1 = get_memory(offs+1); \
+    uint16_t offs = ((get_memory(pc++)^128)-128+((s1 << 8)|s2))&65535; \
+    r2 = offs & 0xff; \
+    r1 = offs >> 8; \
     st += t; \
 } while (0)
 
@@ -4414,9 +4414,9 @@ int main (int argc, char **argv){
                      st+= 8;
                      fr= a= (ff= (fb= ~a)+1);
                      fa= 0; break;
-          case 0x55:    // (EZ80) LEA IX,IX+d
+          case 0x55:    // (EZ80) LEA IY,IX+d
             if ( isez80() ) {
-                LEA(xh, xl, xh, xl, 3);
+                LEA(yh, yl, xh, xl, 3);
                 break;
             }
             // Fall through for z80 case
