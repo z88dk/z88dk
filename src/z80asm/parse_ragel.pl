@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # Z88-DK Z80ASM - Z80 Assembler
 #
