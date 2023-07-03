@@ -89,9 +89,6 @@ sub replace_const {
 			if ($byte =~ s/ %c ( \( \d+ \.\. \d+ \) )? /$c/xg) {
 				$byte = eval($byte); die "$byte: $@" if $@;
 			}
-			if ($byte =~ /^\d+$/) {
-				$byte = sprintf("%02X", $byte);
-			}
 		}
 	}
 	
