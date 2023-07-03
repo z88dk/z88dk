@@ -246,8 +246,8 @@ static char *handle_block_instruction(dcontext *state, uint8_t z, uint8_t y)
     static char *table[4][5] = { 
         { "ldi", "cpi", "ini", "outi", "outi2"},
         { "ldd", "cpd", "ind", "outd", "outd2", },
-        { "ldir", "cpir", "inir", "otir", "otir2"},
-        { "lddr", "cpdr", "indr", "otdr", "otdr2"}
+        { "ldir", "cpir", "inir", "otir", "oti2r"},
+        { "lddr", "cpdr", "indr", "otdr", "otd2r"}
     };
 
     if ( israbbit() && z != 0 ) return "nop";
