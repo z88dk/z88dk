@@ -6078,10 +6078,10 @@
 |ld sp, ix              |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld sp, iy              |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
 |ld xpc, a              |-    -    -    -        -     r2ka r3k -    -   -   |
-|ld.il (%m), a          |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld.il a, (%m)          |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld.is (%m), a          |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
-|ld.is a, (%m)          |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ld.il (%m), a          |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ld.il a, (%m)          |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ld.is (%m), a          |-    -    ez80 -        -     -    -   -    -   -   |
+|ld.is a, (%m)          |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.l (bc), a           |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.l (bc+), a          |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.l (bc-), a          |-    -    -    ez80_z80 -     -    -   -    -   -   |
@@ -6308,6 +6308,7 @@
 |ld.lil iy, (%m)        |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.lil sp, %m          |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.lil sp, (%m)        |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ld.lis (%m), a         |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.lis (bc), a         |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.lis (bc+), a        |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.lis (bc-), a        |-    -    -    ez80_z80 -     -    -   -    -   -   |
@@ -6414,6 +6415,7 @@
 |ld.lis (iy+%d), ix     |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.lis (iy+%d), iy     |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.lis (iy+%d), l      |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ld.lis a, (%m)         |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.lis a, (bc)         |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.lis a, (bc+)        |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.lis a, (bc-)        |-    -    -    ez80_z80 -     -    -   -    -   -   |
@@ -6724,6 +6726,7 @@
 |ld.s sp, hl            |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.s sp, ix            |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.s sp, iy            |-    -    ez80 -        -     -    -   -    -   -   |
+|ld.sil (%m), a         |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.sil (bc), a         |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sil (bc+), a        |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sil (bc-), a        |-    -    ez80 -        -     -    -   -    -   -   |
@@ -6830,6 +6833,7 @@
 |ld.sil (iy+%d), ix     |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sil (iy+%d), iy     |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sil (iy+%d), l      |-    -    ez80 -        -     -    -   -    -   -   |
+|ld.sil a, (%m)         |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |ld.sil a, (bc)         |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sil a, (bc+)        |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sil a, (bc-)        |-    -    ez80 -        -     -    -   -    -   -   |
@@ -6932,14 +6936,12 @@
 |ld.sil sp, hl          |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sil sp, ix          |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sil sp, iy          |-    -    ez80 -        -     -    -   -    -   -   |
-|ld.sis (%m), a         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
 |ld.sis (%m), bc        |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sis (%m), de        |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sis (%m), hl        |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sis (%m), ix        |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sis (%m), iy        |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sis (%m), sp        |-    -    ez80 -        -     -    -   -    -   -   |
-|ld.sis a, (%m)         |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
 |ld.sis bc, %m          |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sis bc, (%m)        |-    -    ez80 -        -     -    -   -    -   -   |
 |ld.sis de, %m          |-    -    ez80 -        -     -    -   -    -   -   |
@@ -8412,10 +8414,36 @@
 |ret.l po               |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
 |ret.l v                |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
 |ret.l z                |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|ret.lil                |-    -    ez80 -        -     -    -   -    -   -   |
+|ret.lil c              |-    -    ez80 -        -     -    -   -    -   -   |
+|ret.lil m              |-    -    ez80 -        -     -    -   -    -   -   |
+|ret.lil nc             |-    -    ez80 -        -     -    -   -    -   -   |
+|ret.lil nv             |-    -    ez80 -        -     -    -   -    -   -   |
+|ret.lil nz             |-    -    ez80 -        -     -    -   -    -   -   |
+|ret.lil p              |-    -    ez80 -        -     -    -   -    -   -   |
+|ret.lil pe             |-    -    ez80 -        -     -    -   -    -   -   |
+|ret.lil po             |-    -    ez80 -        -     -    -   -    -   -   |
+|ret.lil v              |-    -    ez80 -        -     -    -   -    -   -   |
+|ret.lil z              |-    -    ez80 -        -     -    -   -    -   -   |
+|ret.lis                |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ret.lis c              |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ret.lis m              |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ret.lis nc             |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ret.lis nv             |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ret.lis nz             |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ret.lis p              |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ret.lis pe             |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ret.lis po             |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ret.lis v              |-    -    -    ez80_z80 -     -    -   -    -   -   |
+|ret.lis z              |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |reti                   |-    -    ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |reti.l                 |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|reti.lil               |-    -    ez80 -        -     -    -   -    -   -   |
+|reti.lis               |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |retn                   |-    -    ez80 ez80_z80 -     -    -   z180 z80 z80n|
 |retn.l                 |-    -    ez80 ez80_z80 -     -    -   -    -   -   |
+|retn.lil               |-    -    ez80 -        -     -    -   -    -   -   |
+|retn.lis               |-    -    -    ez80_z80 -     -    -   -    -   -   |
 |rim                    |-    8085 -    -        -     -    -   -    -   -   |
 |rl (hl)                |-    -    ez80 ez80_z80 gbz80 r2ka r3k z180 z80 z80n|
 |rl (ix)                |-    -    ez80 ez80_z80 -     r2ka r3k z180 z80 z80n|
@@ -27320,14 +27348,10 @@
 |ld sp, iy              |z80n    |FD F9                                    |
 |ld xpc, a              |r2ka    |ED 67                                    |
 |ld xpc, a              |r3k     |ED 67                                    |
-|ld.il (%m), a          |ez80    |5B 32 %m %m %m                           |
-|ld.il (%m), a          |ez80_z80|5B 32 %m %m %m                           |
-|ld.il a, (%m)          |ez80    |5B 3A %m %m %m                           |
-|ld.il a, (%m)          |ez80_z80|5B 3A %m %m %m                           |
-|ld.is (%m), a          |ez80    |40 32 %m %m                              |
-|ld.is (%m), a          |ez80_z80|40 32 %m %m                              |
-|ld.is a, (%m)          |ez80    |40 3A %m %m                              |
-|ld.is a, (%m)          |ez80_z80|40 3A %m %m                              |
+|ld.il (%m), a          |ez80_z80|52 32 %m %m %m                           |
+|ld.il a, (%m)          |ez80_z80|52 3A %m %m %m                           |
+|ld.is (%m), a          |ez80    |49 32 %m %m                              |
+|ld.is a, (%m)          |ez80    |49 3A %m %m                              |
 |ld.l (bc), a           |ez80_z80|49 02                                    |
 |ld.l (bc+), a          |ez80_z80|49 02 03                                 |
 |ld.l (bc-), a          |ez80_z80|49 02 0B                                 |
@@ -27554,6 +27578,7 @@
 |ld.lil iy, (%m)        |ez80_z80|5B FD 2A %m %m %m                        |
 |ld.lil sp, %m          |ez80_z80|5B 31 %m %m %m                           |
 |ld.lil sp, (%m)        |ez80_z80|5B ED 7B %m %m %m                        |
+|ld.lis (%m), a         |ez80    |49 32 %m %m                              |
 |ld.lis (bc), a         |ez80_z80|49 02                                    |
 |ld.lis (bc+), a        |ez80_z80|49 02 03                                 |
 |ld.lis (bc-), a        |ez80_z80|49 02 0B                                 |
@@ -27660,6 +27685,7 @@
 |ld.lis (iy+%d), ix     |ez80_z80|49 FD 3E %d                              |
 |ld.lis (iy+%d), iy     |ez80_z80|49 FD 3F %d                              |
 |ld.lis (iy+%d), l      |ez80_z80|49 FD 75 %d                              |
+|ld.lis a, (%m)         |ez80    |49 3A %m %m                              |
 |ld.lis a, (bc)         |ez80_z80|49 0A                                    |
 |ld.lis a, (bc+)        |ez80_z80|49 0A 03                                 |
 |ld.lis a, (bc-)        |ez80_z80|49 0A 0B                                 |
@@ -27970,6 +27996,7 @@
 |ld.s sp, hl            |ez80    |52 F9                                    |
 |ld.s sp, ix            |ez80    |52 DD F9                                 |
 |ld.s sp, iy            |ez80    |52 FD F9                                 |
+|ld.sil (%m), a         |ez80_z80|52 32 %m %m %m                           |
 |ld.sil (bc), a         |ez80    |52 02                                    |
 |ld.sil (bc+), a        |ez80    |52 02 03                                 |
 |ld.sil (bc-), a        |ez80    |52 02 0B                                 |
@@ -28076,6 +28103,7 @@
 |ld.sil (iy+%d), ix     |ez80    |52 FD 3E %d                              |
 |ld.sil (iy+%d), iy     |ez80    |52 FD 3F %d                              |
 |ld.sil (iy+%d), l      |ez80    |52 FD 75 %d                              |
+|ld.sil a, (%m)         |ez80_z80|52 3A %m %m %m                           |
 |ld.sil a, (bc)         |ez80    |52 0A                                    |
 |ld.sil a, (bc+)        |ez80    |52 0A 03                                 |
 |ld.sil a, (bc-)        |ez80    |52 0A 0B                                 |
@@ -28178,16 +28206,12 @@
 |ld.sil sp, hl          |ez80    |52 F9                                    |
 |ld.sil sp, ix          |ez80    |52 DD F9                                 |
 |ld.sil sp, iy          |ez80    |52 FD F9                                 |
-|ld.sis (%m), a         |ez80    |40 32 %m %m                              |
-|ld.sis (%m), a         |ez80_z80|40 32 %m %m                              |
 |ld.sis (%m), bc        |ez80    |40 ED 43 %m %m                           |
 |ld.sis (%m), de        |ez80    |40 ED 53 %m %m                           |
 |ld.sis (%m), hl        |ez80    |40 22 %m %m                              |
 |ld.sis (%m), ix        |ez80    |40 DD 22 %m %m                           |
 |ld.sis (%m), iy        |ez80    |40 FD 22 %m %m                           |
 |ld.sis (%m), sp        |ez80    |40 ED 73 %m %m                           |
-|ld.sis a, (%m)         |ez80    |40 3A %m %m                              |
-|ld.sis a, (%m)         |ez80_z80|40 3A %m %m                              |
 |ld.sis bc, %m          |ez80    |40 01 %m %m                              |
 |ld.sis bc, (%m)        |ez80    |40 ED 4B %m %m                           |
 |ld.sis de, %m          |ez80    |40 11 %m %m                              |
@@ -32962,6 +32986,28 @@
 |ret.l v                |ez80_z80|49 E8                                    |
 |ret.l z                |ez80    |5B C8                                    |
 |ret.l z                |ez80_z80|49 C8                                    |
+|ret.lil                |ez80    |5B C9                                    |
+|ret.lil c              |ez80    |5B D8                                    |
+|ret.lil m              |ez80    |5B F8                                    |
+|ret.lil nc             |ez80    |5B D0                                    |
+|ret.lil nv             |ez80    |5B E0                                    |
+|ret.lil nz             |ez80    |5B C0                                    |
+|ret.lil p              |ez80    |5B F0                                    |
+|ret.lil pe             |ez80    |5B E8                                    |
+|ret.lil po             |ez80    |5B E0                                    |
+|ret.lil v              |ez80    |5B E8                                    |
+|ret.lil z              |ez80    |5B C8                                    |
+|ret.lis                |ez80_z80|49 C9                                    |
+|ret.lis c              |ez80_z80|49 D8                                    |
+|ret.lis m              |ez80_z80|49 F8                                    |
+|ret.lis nc             |ez80_z80|49 D0                                    |
+|ret.lis nv             |ez80_z80|49 E0                                    |
+|ret.lis nz             |ez80_z80|49 C0                                    |
+|ret.lis p              |ez80_z80|49 F0                                    |
+|ret.lis pe             |ez80_z80|49 E8                                    |
+|ret.lis po             |ez80_z80|49 E0                                    |
+|ret.lis v              |ez80_z80|49 E8                                    |
+|ret.lis z              |ez80_z80|49 C8                                    |
 |reti                   |ez80    |ED 4D                                    |
 |reti                   |ez80_z80|ED 4D                                    |
 |reti                   |gbz80   |D9                                       |
@@ -32972,6 +33018,8 @@
 |reti                   |z80n    |ED 4D                                    |
 |reti.l                 |ez80    |5B ED 4D                                 |
 |reti.l                 |ez80_z80|49 ED 4D                                 |
+|reti.lil               |ez80    |5B ED 4D                                 |
+|reti.lis               |ez80_z80|49 ED 4D                                 |
 |retn                   |ez80    |ED 45                                    |
 |retn                   |ez80_z80|ED 45                                    |
 |retn                   |z180    |ED 45                                    |
@@ -32979,6 +33027,8 @@
 |retn                   |z80n    |ED 45                                    |
 |retn.l                 |ez80    |5B ED 45                                 |
 |retn.l                 |ez80_z80|49 ED 45                                 |
+|retn.lil               |ez80    |5B ED 45                                 |
+|retn.lis               |ez80_z80|49 ED 45                                 |
 |rim                    |8085    |20                                       |
 |rl (hl)                |ez80    |CB 16                                    |
 |rl (hl)                |ez80_z80|CB 16                                    |

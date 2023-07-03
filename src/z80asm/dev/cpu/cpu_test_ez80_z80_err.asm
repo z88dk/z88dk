@@ -6840,6 +6840,22 @@
  ld l, srl (iy+126)             ; Error
  ld l, srl (iy-128)             ; Error
  ld xpc, a                      ; Error
+ ld.is (-32768), a              ; Error
+ ld.is (0x123456), a            ; Error
+ ld.is (32767), a               ; Error
+ ld.is (65535), a               ; Error
+ ld.is a, (-32768)              ; Error
+ ld.is a, (0x123456)            ; Error
+ ld.is a, (32767)               ; Error
+ ld.is a, (65535)               ; Error
+ ld.lis (-32768), a             ; Error
+ ld.lis (0x123456), a           ; Error
+ ld.lis (32767), a              ; Error
+ ld.lis (65535), a              ; Error
+ ld.lis a, (-32768)             ; Error
+ ld.lis a, (0x123456)           ; Error
+ ld.lis a, (32767)              ; Error
+ ld.lis a, (65535)              ; Error
  ld.s (bc), a                   ; Error
  ld.s (bc+), a                  ; Error
  ld.s (bc-), a                  ; Error
@@ -8637,6 +8653,19 @@
  res.sil 8, (iy-128)            ; Error
  ret lo                         ; Error
  ret lz                         ; Error
+ ret.lil                        ; Error
+ ret.lil c                      ; Error
+ ret.lil m                      ; Error
+ ret.lil nc                     ; Error
+ ret.lil nv                     ; Error
+ ret.lil nz                     ; Error
+ ret.lil p                      ; Error
+ ret.lil pe                     ; Error
+ ret.lil po                     ; Error
+ ret.lil v                      ; Error
+ ret.lil z                      ; Error
+ reti.lil                       ; Error
+ retn.lil                       ; Error
  rim                            ; Error
  rl (ix), a                     ; Error
  rl (ix), b                     ; Error

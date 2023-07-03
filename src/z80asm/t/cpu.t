@@ -99,16 +99,12 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 			# run disassembler and assemble again; check binary
 			run_ok("z88dk-dis -m$cpu $file_bin > $test.asm");
 
-			SKIP: {
-				skip "skip until #2340 is solved";
-				
-				# assemble
-				run_ok("z88dk-z80asm -m$cpu -b -l $test.asm 2> $test.err");
-				is slurp("$test.err"), "", "check errors";
-				
-				# compare
-				check_bin_file("$test.bin", slurp("$file_bin"));
-			}
+			# assemble
+			run_ok("z88dk-z80asm -m$cpu -b -l $test.asm 2> $test.err");
+			is slurp("$test.err"), "", "check errors";
+			
+			# compare
+			check_bin_file("$test.bin", slurp("$file_bin"));
 		}
 	}
 	else {

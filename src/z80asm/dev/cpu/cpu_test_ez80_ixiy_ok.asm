@@ -2218,22 +2218,22 @@
  ld sp, hl                      ; F9
  ld sp, ix                      ; FD F9
  ld sp, iy                      ; DD F9
- ld.il (-32768), a              ; 5B 32 00 80 FF
- ld.il (0x123456), a            ; 5B 32 56 34 12
- ld.il (32767), a               ; 5B 32 FF 7F 00
- ld.il (65535), a               ; 5B 32 FF FF 00
- ld.il a, (-32768)              ; 5B 3A 00 80 FF
- ld.il a, (0x123456)            ; 5B 3A 56 34 12
- ld.il a, (32767)               ; 5B 3A FF 7F 00
- ld.il a, (65535)               ; 5B 3A FF FF 00
- ld.is (-32768), a              ; 40 32 00 80
- ld.is (0x123456), a            ; 40 32 56 34
- ld.is (32767), a               ; 40 32 FF 7F
- ld.is (65535), a               ; 40 32 FF FF
- ld.is a, (-32768)              ; 40 3A 00 80
- ld.is a, (0x123456)            ; 40 3A 56 34
- ld.is a, (32767)               ; 40 3A FF 7F
- ld.is a, (65535)               ; 40 3A FF FF
+ ld.is (-32768), a              ; 49 32 00 80
+ ld.is (0x123456), a            ; 49 32 56 34
+ ld.is (32767), a               ; 49 32 FF 7F
+ ld.is (65535), a               ; 49 32 FF FF
+ ld.is a, (-32768)              ; 49 3A 00 80
+ ld.is a, (0x123456)            ; 49 3A 56 34
+ ld.is a, (32767)               ; 49 3A FF 7F
+ ld.is a, (65535)               ; 49 3A FF FF
+ ld.lis (-32768), a             ; 49 32 00 80
+ ld.lis (0x123456), a           ; 49 32 56 34
+ ld.lis (32767), a              ; 49 32 FF 7F
+ ld.lis (65535), a              ; 49 32 FF FF
+ ld.lis a, (-32768)             ; 49 3A 00 80
+ ld.lis a, (0x123456)           ; 49 3A 56 34
+ ld.lis a, (32767)              ; 49 3A FF 7F
+ ld.lis a, (65535)              ; 49 3A FF FF
  ld.s (bc), a                   ; 52 02
  ld.s (bc+), a                  ; 52 02 03
  ld.s (bc-), a                  ; 52 02 0B
@@ -2786,38 +2786,30 @@
  ld.sil sp, hl                  ; 52 F9
  ld.sil sp, ix                  ; 52 FD F9
  ld.sil sp, iy                  ; 52 DD F9
- ld.sis (-32768), a             ; 40 32 00 80
  ld.sis (-32768), bc            ; 40 ED 43 00 80
  ld.sis (-32768), de            ; 40 ED 53 00 80
  ld.sis (-32768), hl            ; 40 22 00 80
  ld.sis (-32768), ix            ; 40 FD 22 00 80
  ld.sis (-32768), iy            ; 40 DD 22 00 80
  ld.sis (-32768), sp            ; 40 ED 73 00 80
- ld.sis (0x123456), a           ; 40 32 56 34
  ld.sis (0x123456), bc          ; 40 ED 43 56 34
  ld.sis (0x123456), de          ; 40 ED 53 56 34
  ld.sis (0x123456), hl          ; 40 22 56 34
  ld.sis (0x123456), ix          ; 40 FD 22 56 34
  ld.sis (0x123456), iy          ; 40 DD 22 56 34
  ld.sis (0x123456), sp          ; 40 ED 73 56 34
- ld.sis (32767), a              ; 40 32 FF 7F
  ld.sis (32767), bc             ; 40 ED 43 FF 7F
  ld.sis (32767), de             ; 40 ED 53 FF 7F
  ld.sis (32767), hl             ; 40 22 FF 7F
  ld.sis (32767), ix             ; 40 FD 22 FF 7F
  ld.sis (32767), iy             ; 40 DD 22 FF 7F
  ld.sis (32767), sp             ; 40 ED 73 FF 7F
- ld.sis (65535), a              ; 40 32 FF FF
  ld.sis (65535), bc             ; 40 ED 43 FF FF
  ld.sis (65535), de             ; 40 ED 53 FF FF
  ld.sis (65535), hl             ; 40 22 FF FF
  ld.sis (65535), ix             ; 40 FD 22 FF FF
  ld.sis (65535), iy             ; 40 DD 22 FF FF
  ld.sis (65535), sp             ; 40 ED 73 FF FF
- ld.sis a, (-32768)             ; 40 3A 00 80
- ld.sis a, (0x123456)           ; 40 3A 56 34
- ld.sis a, (32767)              ; 40 3A FF 7F
- ld.sis a, (65535)              ; 40 3A FF FF
  ld.sis bc, (-32768)            ; 40 ED 4B 00 80
  ld.sis bc, (0x123456)          ; 40 ED 4B 56 34
  ld.sis bc, (32767)             ; 40 ED 4B FF 7F
@@ -3783,10 +3775,23 @@
  ret.l po                       ; 5B E0
  ret.l v                        ; 5B E8
  ret.l z                        ; 5B C8
+ ret.lil                        ; 5B C9
+ ret.lil c                      ; 5B D8
+ ret.lil m                      ; 5B F8
+ ret.lil nc                     ; 5B D0
+ ret.lil nv                     ; 5B E0
+ ret.lil nz                     ; 5B C0
+ ret.lil p                      ; 5B F0
+ ret.lil pe                     ; 5B E8
+ ret.lil po                     ; 5B E0
+ ret.lil v                      ; 5B E8
+ ret.lil z                      ; 5B C8
  reti                           ; ED 4D
  reti.l                         ; 5B ED 4D
+ reti.lil                       ; 5B ED 4D
  retn                           ; ED 45
  retn.l                         ; 5B ED 45
+ retn.lil                       ; 5B ED 45
  rl (hl)                        ; CB 16
  rl (ix)                        ; FD CB 00 16
  rl (ix+126)                    ; FD CB 7E 16
