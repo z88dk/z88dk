@@ -400,12 +400,12 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             BUF_PRINTF("%-10s%s", y == 6 ? handle_ez80_am(state,"dec") : "dec", handle_register8(state, y,opbuf1,sizeof(opbuf1)));
                             break;
                         case 6:
-                            if ( isez80() && state->index != 0 ) {
+                            if ( isez80() && state->index != 0 && y == 7 ) {
                                BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state, "ld"), handle_register8(state, 6, opbuf1, sizeof(opbuf1)), handle_hl(state->index == 1 ? 2 : 1));
                             } else {
                                handle_register8(state, y,opbuf1,sizeof(opbuf1));
                                handle_immed8(state, opbuf2, sizeof(opbuf2));
-                               BUF_PRINTF("%-10s%s,%s", "ld", opbuf1, opbuf2);
+                               BUF_PRINTF("%-10s%s,%s", y == 6 ? handle_ez80_am(state, "ld") : "ld", opbuf1, opbuf2);
                             }
                             break;
                         case 7:
