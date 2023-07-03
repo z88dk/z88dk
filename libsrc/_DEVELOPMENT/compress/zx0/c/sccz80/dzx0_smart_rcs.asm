@@ -19,3 +19,16 @@ dzx0_smart_rcs:
    push af
    
    jp asm_dzx0_smart_rcs
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx0_smart_rcs
+defc _dzx0_smart_rcs = dzx0_smart_rcs
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___dzx0_smart_rcs
+defc ___dzx0_smart_rcs = dzx0_smart_rcs
+ENDIF
+

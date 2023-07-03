@@ -19,3 +19,16 @@ dzx0_agile_rcs:
    push af
    
    jp asm_dzx0_agile_rcs
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx0_agile_rcs
+defc _dzx0_agile_rcs = dzx0_agile_rcs
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___dzx0_agile_rcs
+defc ___dzx0_agile_rcs = dzx0_agile_rcs
+ENDIF
+
