@@ -95,7 +95,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 			diag "got      ", unpack("H*", substr($out_bin, $addr, 10));
 		}
 		
-		if (!$ixiy && $cpu ne 'ez80') {
+		if (!$ixiy) {
 			# run disassembler and assemble again; check binary
 			run_ok("z88dk-dis -m$cpu $file_bin > $test.asm");
 
