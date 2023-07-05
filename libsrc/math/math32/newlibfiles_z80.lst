@@ -389,3 +389,13 @@
 ../../_DEVELOPMENT/math/float/math32/z80/h32_coeff_expf.asm
 ../../_DEVELOPMENT/math/float/math32/z80/h32_coeff_logf.asm
 ../../_DEVELOPMENT/math/float/math32/z80/h32_coeff_sinf.asm
+
+../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__ltof.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__fneg.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__fmul.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__fcmp.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__ftol.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__fdiv.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__ultof.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__fadd.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__fsub.asm
