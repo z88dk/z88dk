@@ -22,3 +22,11 @@ ELSE
 ENDIF
    
    jp asm_dzx0_agile_rcs
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx1_agile_rcs_callee
+defc _dzx1_agile_rcs_callee = dzx1_agile_rcs_callee
+ENDIF
+
+

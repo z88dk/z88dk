@@ -22,3 +22,11 @@ ELSE
 ENDIF
 
    jp asm_dzx1_mega_back
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx1_mega_back_callee
+defc _dzx1_mega_back_callee = dzx1_mega_back_callee
+ENDIF
+
+
