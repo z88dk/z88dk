@@ -3,6 +3,7 @@
 IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
 	PUBLIC	psg_envelope
 	PUBLIC	_psg_envelope
+	PUBLIC	___psg_envelope
 
 ; 
 	
@@ -18,6 +19,7 @@ IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
 
 .psg_envelope
 ._psg_envelope
+.___psg_envelope
 
 	ld	hl, 2
 	add	hl, sp
