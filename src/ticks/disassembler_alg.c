@@ -48,7 +48,7 @@ typedef struct {
    } \
 } while (0)
 
-#define WORDIS24(state) ( (state->adl) || (state->am) >= 3 )
+#define WORDIS24(state) ( (state->adl && state->am == 0 ) || (state->am) >= 3 )
 
 static char *handle_rot(dcontext *state,  uint8_t z)
 {
