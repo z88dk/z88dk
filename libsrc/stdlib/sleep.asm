@@ -5,7 +5,7 @@
 	PUBLIC	_sleep_fastcall
 	PUBLIC	sleep_fastcall
 
-	EXTERN	msleep
+	EXTERN	msleep_fastcall
 
 sleep:
 _sleep:
@@ -20,7 +20,7 @@ _sleep_fastcall:
     ret     z
     push    hl
     ld      hl,1000
-    call    msleep
+    call    msleep_fastcall
     pop     hl
     dec     hl
-    jr      sleep
+    jr      sleep_fastcall
