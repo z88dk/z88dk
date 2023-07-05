@@ -4,11 +4,11 @@
 SECTION code_clib
 SECTION code_compress_zx7
 
-PUBLIC _dzx7_agile_rcs_callee
+PUBLIC dzx7_agile_rcs_callee
 
 EXTERN asm_dzx7_agile_rcs
 
-_dzx7_agile_rcs_callee:
+dzx7_agile_rcs_callee:
 
 IF __CPU_GBZ80__
    pop bc
