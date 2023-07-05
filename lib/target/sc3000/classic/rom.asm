@@ -8,7 +8,9 @@
 IF      !DEFINED_CRT_ORG_CODE
     defc    CRT_ORG_CODE  = 0x0000
 ENDIF
-    defc    TAR__register_sp = $c800
+    ; This sp value is good for both SC-3000 and SG-1000, to run on the SC-3000
+    ; only use:  -pragma-define:REGISTER_SP=0xc7f0
+    defc    TAR__register_sp = $c400
 IF !DEFINED_CRT_ORG_BSS
     defc    CRT_ORG_BSS = $c000
     defc DEFINED_CRT_ORG_BSS = 1
