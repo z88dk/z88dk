@@ -11,7 +11,7 @@ Define ragel-based parser.
 
 #pragma once
 
-#include "scan.h"
+#include "scan1.h"
 #include "types.h"
 #include "utarray.h"
 

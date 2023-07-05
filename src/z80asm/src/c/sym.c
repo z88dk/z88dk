@@ -11,7 +11,7 @@ One symbol from the assembly code - label or constant.
 
 #include "expr1.h"
 #include "if.h"
-#include "scan.h"
+#include "scan1.h"
 #include "str.h"
 #include "strutil.h"
 #include "sym.h"

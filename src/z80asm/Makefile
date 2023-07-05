@@ -154,7 +154,7 @@ $(1).cpp: $(1).re Makefile
 	dos2unix $(1).cpp 2> /dev/null
 endef
 
-$(eval $(call MAKE_RE2C,src/cpp/lex))
+$(eval $(call MAKE_RE2C,src/cpp/scan))
 
 #------------------------------------------------------------------------------
 # install

@@ -201,8 +201,7 @@ bool check_ifdef_condition(const char* name);
 bool sfile_open(const char* filename, bool search_include_path);
 void sfile_hold_input();
 void sfile_unhold_input();
-char* sfile_getline();			// NOTE: user must free returned pointer
-char* sfile_get_source_line();	// NOTE: user must free returned pointer
+char* sfile_getline();	// NOTE: user must free returned pointer
 const char* sfile_filename();
 int sfile_line_num();
 bool sfile_is_c_source();
@@ -216,6 +215,7 @@ struct Symbol1* define_static_def_sym(const char* name, long value);
 void undefine_static_def_sym(const char* name);
 struct Symbol1* define_local_def_sym(const char* name, long value);
 void undefine_local_def_sym(const char* name);
+struct Symbol1* find_local_symbol(const char* name);
 
 // code area
 int get_PC();

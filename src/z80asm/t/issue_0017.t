@@ -17,10 +17,11 @@ for my $slash (@slashes) {
 	spew("$test.asm", <<END);
 		include "$test.dir${slash}test.inc"
 		binary  "$test.dir${slash}test1.bin"
+		incbin  "$test.dir${slash}test1.bin"
 		defb 3
 END
 	run_ok("z88dk-z80asm -b $test.asm");
-	check_bin_file("$test.bin", bytes(1, 2, 3));
+	check_bin_file("$test.bin", bytes(1, 2, 2, 3));
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		line 1, "$test.dir${slash}test.inc"

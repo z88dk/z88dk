@@ -5,11 +5,16 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#ifndef X
+#define X(id, text, flags)
+#endif
+
 X(None, "", 0)
 
 // preprocessor
 X(ASMPC, "asmpc", 0)
 X(BINARY, "binary", 0)
+X(C_LINE, "c_line", 0)
 X(DEFC, "defc", 0)
 X(DEFINE, "define", 0)
 X(DEFL, "defl", 0)
@@ -27,6 +32,7 @@ X(IFDEF, "ifdef", 0)
 X(IFNDEF, "ifndef", 0)
 X(INCBIN, "incbin", 0)
 X(INCLUDE, "include", 0)
+X(LINE, "line", 0)
 X(LOCAL, "local", 0)
 X(MACRO, "macro", 0)
 X(REPT, "rept", 0)
@@ -106,8 +112,8 @@ X(AF, "af", 0)
 X(AF1, "af'", 0)
 X(IP, "ip", 0)
 X(SP, "sp", 0)
-X(IX, "ix", KW_REG_IXY)
-X(IY, "iy", KW_REG_IXY)
+X(IX, "ix", KW_REG_IX_IY)
+X(IY, "iy", KW_REG_IX_IY)
 
 // flags
 X(NZ, "nz", 0)
@@ -441,5 +447,15 @@ X(GLOBAL, "global", 0)
 X(ORG, "org", 0)
 X(PUBLIC, "public", 0)
 X(SECTION, "section", 0)
+X(DEFS, "defs", 0)
+X(DEFB, "defb", 0)
+X(DEFW, "defw", 0)
+X(DEFP, "defp", 0)
+X(DEFQ, "defq", 0)
+X(DS, "ds", 0)
+X(DB, "db", 0)
+X(DW, "dw", 0)
+X(DP, "dp", 0)
+X(DQ, "dq", 0)
 
 #undef X

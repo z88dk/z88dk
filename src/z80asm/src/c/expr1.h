@@ -15,7 +15,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "array.h"
 #include "class.h"
 #include "classlist.h"
-#include "scan.h"
+#include "scan1.h"
 #include "sym.h"
 #include "utarray.h"
 

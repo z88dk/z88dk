@@ -181,35 +181,6 @@ void asm_LSTOFF(void)
 /*-----------------------------------------------------------------------------
 *   directives with number argument
 *----------------------------------------------------------------------------*/
-void asm_LINE(int line_num, const char* filename) {
-	sfile_set_filename(filename);
-	sfile_set_line_num(line_num, 1);
-	sfile_set_c_source(false);
-
-	set_error_location(filename, line_num);
-}
-
-void asm_C_LINE(int line_num, const char* filename) {
-	sfile_set_filename(filename);
-	sfile_set_line_num(line_num, 0);		// do not increment line numbers
-	sfile_set_c_source(true);
-
-	set_error_location(filename, line_num);
-
-	if (option_debug()) {
-		STR_DEFINE(name, STR_SIZE);
-
-		char fname_encoded[FILENAME_MAX * 2];
-		url_encode(filename, fname_encoded);
-
-		Str_sprintf(name, "__C_LINE_%ld_%s", line_num, fname_encoded);
-		if (!find_local_symbol(Str_data(name)))
-			asm_LABEL(Str_data(name));
-
-		STR_DELETE(name);
-	}
-}
-
 void asm_ORG(int address)
 {
 	set_origin_directive(address);

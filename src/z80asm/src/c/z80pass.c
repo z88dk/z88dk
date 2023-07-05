@@ -12,7 +12,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "if.h"
 #include "limits.h"
 #include "modlink.h"
-#include "scan.h"
+#include "scan1.h"
 #include "symtab1.h"
 #include "types.h"
 #include "zobjfile.h"

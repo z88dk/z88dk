@@ -7,7 +7,7 @@
 #pragma once
 
 #include "if.h"
-#include "lex.h"
+#include "scan.h"
 #include <cstdint>
 #include <vector>
 using namespace std;
@@ -15,14 +15,14 @@ using namespace std;
 // expression parser
 class FloatExpr {
 public:
-	FloatExpr(Lexer& lexer);
+	FloatExpr(ScannedLine& line);
 
 	bool parse();
 	bool eval_error() const { return m_eval_error; }
 	double value() const { return m_value; }
 
 private:
-	Lexer& m_lexer;
+    ScannedLine& m_line;
 	double m_value{ 0.0 };
 	bool   m_parse_error{ false };	// expression could not be parsed
 	bool   m_eval_error{ false };	// expression could not be evaluated

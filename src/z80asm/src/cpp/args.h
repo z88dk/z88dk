@@ -21,6 +21,7 @@ public:
 	bool verbose() const { return m_verbose; }
 	bool swap_ixiy() const { return m_swap_ixiy; }
 	bool ucase() const { return m_ucase; }
+    bool raw_strings() const { return m_raw_strings; }
 	int cpu() const { return m_cpu; }
 	const string& cpu_name() const { return m_cpu_name; }
     void set_cpu(int cpu);
@@ -71,6 +72,7 @@ private:
 	bool			m_verbose{ false };			// -v option
 	bool			m_swap_ixiy{ false };		// -IXIY option
 	bool			m_ucase{ false };			// -ucase option
+    bool            m_raw_strings{ false };     // -raw-strings option
 	int				m_cpu{ CPU_Z80 };			// -m option
 	string			m_cpu_name{ CPU_Z80_NAME };
     bool            m_got_cpu_option{ false };  // got -m option

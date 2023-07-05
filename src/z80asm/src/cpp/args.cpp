@@ -8,7 +8,7 @@
 #include "args.h"
 #include "errors.h"
 #include "float.h"
-#include "lex.h"
+#include "scan.h"
 #include "preproc.h"
 #include "utils.h"
 #include "../config.h"
@@ -132,7 +132,7 @@ string Args::prepend_output_dir(const string& filename) {
 		// with strings instead.
 		// is it a win32 absolute path?
 		string file;
-		if (isalpha(filename[0]) && filename[1] == ':') {	// C:
+		if (is_alpha(filename[0]) && filename[1] == ':') {	// C:
 			file += m_output_dir + "/";
 			file += string(1, filename[0]) + "/";
 			file += string(filename.substr(2));
@@ -264,11 +264,11 @@ bool Args::parse_opt_int(int& value, const string& opt_arg) {
 		p++;
 		radix = 16;
 	}
-	else if (opt_arg.length() > 2 && opt_arg[0] == '0' && tolower(opt_arg[1]) == 'x') {
+	else if (opt_arg.length() > 2 && opt_arg[0] == '0' && to_lower(opt_arg[1]) == 'x') {
 		p += 2;
 		radix = 16;
 	}
-	else if (isdigit(opt_arg[0]) && tolower(opt_arg[opt_arg.length() - 1]) == 'h') {
+	else if (is_digit(opt_arg[0]) && to_lower(opt_arg[opt_arg.length() - 1]) == 'h') {
 		suffix = opt_arg[opt_arg.length() - 1];
 		radix = 16;
 	}
@@ -297,7 +297,7 @@ void Args::parse_define(const string& opt_arg) {
 	else
 		ident = opt_arg.substr(0, equal_pos);
 
-	if (!isident(ident))
+	if (!is_ident(ident))
 		g_errors.error(ErrCode::IllegalIdent, ident);
 	else {
 		if (equal_pos == string::npos) {
@@ -435,9 +435,9 @@ void Args::expand_list_glob(const string& pattern) {
 			g_args.push_include_path(file.parent_path().generic_string());
 			{
 				if (g_preproc.open(file.generic_string(), false)) {
-					string line;
+					ScannedLine line;
 					while (g_preproc.get_unpreproc_line(line)) {
-						parse_args_in_text(line);
+						parse_args_in_text(line.text());
 					}
 				}
 			}
@@ -446,7 +446,6 @@ void Args::expand_list_glob(const string& pattern) {
 		}
 	}
 }
-
 
 // search for the first file in path, with the given extension,
 // with .asm extension and with .o extension
@@ -569,11 +568,11 @@ static string next_arg(const char*& p) {
 	string ret;
 
 	// skip blanks
-	while (isspace(*p))
+	while (is_space(*p))
 		p++;
 
 	// collect delimited string
-	while (*p != '\0' && !isspace(*p)) {
+	while (*p != '\0' && !is_space(*p)) {
 		char delim = '\0';
 		if (*p == '"' || *p == '\'')	// quoted substring
 			delim = *p;
@@ -733,7 +732,7 @@ void Args::set_cpu(int cpu) {
         define_static_symbol("__CPU_GBZ80__");
         break;
     default:
-        assert(0);
+        Assert(0);
     }
 }
 

@@ -44,12 +44,9 @@ END
 check_bin_file("${test}.bin", bytes(0,0,0));
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
-     1                          	nop
-        0000  00                      + nop
-     2                          	nop
-        0001  00                      + nop
-     3                          	nop
-        0002  00                      + nop
+     1  0000  00                	nop
+     2  0001  00                	nop
+     3  0002  00                	nop
      4                          
 END
 
