@@ -9,7 +9,12 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _modf
-EXTERN	_m32_modff
-defc _modf = _m32_modff
+defc _modf = modf
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___modf
+defc ___modf = modf
 ENDIF
 

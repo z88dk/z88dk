@@ -1,14 +1,24 @@
+SECTION   code_fp_math32
+PUBLIC    inv
+EXTERN    _m32_invf
 
-    SECTION code_fp_math32
+IFNDEF __CLASSIC
+defc   inv = _m32_invf
+ELSE
 
-    PUBLIC inv
-    EXTERN m32_fsinv_fastcall
+; Classic has a non-fastcall implementation
 
-    defc inv = m32_fsinv_fastcall
+inv:
+    pop bc
+    pop hl
+    pop de
+    push de
+    push hl
+    push bc
+    jp _m32_invf
 
 ; SDCC bridge for Classic
-IF __CLASSIC
 PUBLIC _inv
-defc _inv = m32_fsinv_fastcall
-ENDIF
+defc _inv = inv
 
+ENDIF

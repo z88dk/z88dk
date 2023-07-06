@@ -1,13 +1,24 @@
+SECTION   code_fp_math32
+PUBLIC    tanh
+EXTERN    _m32_tanhf
 
-	SECTION	code_fp_math32
-	PUBLIC	tanh
-	EXTERN	_m32_tanhf
+IFNDEF __CLASSIC
+defc   tanh = _m32_tanhf
+ELSE
 
-	defc	tanh = _m32_tanhf
+; Classic has a non-fastcall implementation
+
+tanh:
+    pop bc
+    pop hl
+    pop de
+    push de
+    push hl
+    push bc
+    jp _m32_tanhf
 
 ; SDCC bridge for Classic
-IF __CLASSIC
 PUBLIC _tanh
-defc _tanh = _m32_tanhf
-ENDIF
+defc _tanh = tanh
 
+ENDIF

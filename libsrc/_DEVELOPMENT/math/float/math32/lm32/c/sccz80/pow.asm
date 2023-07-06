@@ -9,7 +9,13 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _pow
-EXTERN	_m32_powf
-defc _pow = _m32_powf
+defc _pow = pow
 ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___pow
+defc ___pow = pow
+ENDIF
+
 

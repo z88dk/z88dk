@@ -3,10 +3,14 @@
 SECTION code_fp_math32
 
 PUBLIC __fadd
-EXTERN m32_fsadd_callee
+EXTERN m32_fsadd
 
-;dehl = dehl + iybc
+;dehl = iybc + dehl
+;We have to preserve iybc
 __fadd:
     push iy
     push bc
-    jp m32_fsadd_callee
+    call m32_fsadd
+    pop bc
+    pop iy
+    ret

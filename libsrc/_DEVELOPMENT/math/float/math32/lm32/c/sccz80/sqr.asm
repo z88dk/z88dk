@@ -1,14 +1,24 @@
+SECTION   code_fp_math32
+PUBLIC    sqr
+EXTERN    _m32_sqrf
 
-    SECTION code_fp_math32
+IFNDEF __CLASSIC
+defc   sqr = _m32_sqrf
+ELSE
 
-    PUBLIC sqr
-    EXTERN m32_fssqr_fastcall
+; Classic has a non-fastcall implementation
 
-    defc sqr = m32_fssqr_fastcall
+sqr:
+    pop bc
+    pop hl
+    pop de
+    push de
+    push hl
+    push bc
+    jp _m32_sqrf
 
 ; SDCC bridge for Classic
-IF __CLASSIC
 PUBLIC _sqr
-defc _sqr = m32_fssqr_fastcall
-ENDIF
+defc _sqr = sqr
 
+ENDIF
