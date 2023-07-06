@@ -129,6 +129,8 @@
 
 ../_DEVELOPMENT/l/clang/__setflag
 ../_DEVELOPMENT/l/clang/__lneg
+../_DEVELOPMENT/l/clang/__ldivs
+../_DEVELOPMENT/l/clang/__ldivu
 ../_DEVELOPMENT/l/clang/__lor
 ../_DEVELOPMENT/l/clang/__sand
 ../_DEVELOPMENT/l/clang/__smulu
