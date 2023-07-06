@@ -253,7 +253,7 @@ extern int __LIB__ puts(const char *);
 
 /* Routines for file positioning */
 extern fpos_t __LIB__ ftell(FILE *fp);
-__ZPROTO2(int,,fgetpos,FILE *,fp,fpos_t, *pos)
+__ZPROTO2(int,,fgetpos,FILE *,fp,fpos_t *, pos)
 
 
 #ifndef __STDC_ABI_ONLY

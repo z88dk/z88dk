@@ -1296,7 +1296,7 @@ int main(int argc, char **argv)
         if (i == nfiles) i = 0;                            /* HACK 2 OF 2 */
         if (verbose) printf("\nPROCESSING %s\n", original_filenames[i]);
     SWITCH_REPEAT:
-        switch (get_filetype_by_suffix(filelist[i]))
+        switch ( (ft = get_filetype_by_suffix(filelist[i])))
         {
         case M4FILE:
             // Strip off the .m4 suffix and find the underlying extension
@@ -1355,6 +1355,7 @@ int main(int argc, char **argv)
             original_filenames[i] = ptr;
             filelist[i] = muststrdup(ptr);
         case CFILE:
+        case CXXFILE:
             if (m4only) continue;
             /* special treatment for clang+llvm */
             if ((strcmp(c_compiler_type, "clang") == 0) && !hassuffix(filelist[i], ".cbe.c")) {
@@ -1369,7 +1370,7 @@ int main(int argc, char **argv)
             if (compiler_type == CC_SDCC || compiler_type == CC_EZ80CLANG) {
                 char zpragma_args[1024];
                 snprintf(zpragma_args, sizeof(zpragma_args),"-zcc-opt=\"%s\"", zcc_opt_def);
-                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
+                if (process(ft == CXXFILE ? ".cpp" : ".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
                     exit(1);
@@ -1383,10 +1384,26 @@ int main(int argc, char **argv)
                     exit(1);
             }
         case CPPFILE:
-            if (m4only || clangonly || llvmonly || preprocessonly) continue;
-        
-            if (process(".i", ".opt", c_compiler, comparg, compiler_style, i, YES, NO))
-                exit(1);
+            {
+                char *compiler_arg = NULL;
+
+                if (m4only || clangonly || llvmonly || preprocessonly) continue;
+
+                if ( get_filetype_by_suffix(original_filenames[i]) == CXXFILE ) {
+                    if ( compiler_type != CC_EZ80CLANG) {
+                        fprintf(stderr, "Only -compiler=ez80clang supports c++\n");
+                        exit(1);
+                    }
+                    // Nobble compiler args so we compile c++
+                    compiler_arg = replace_str(comparg, "-cc1", "-cc1 -x c++");
+                } else {
+                    compiler_arg = strdup(comparg);
+                }
+            
+                if (process(".i", ".opt", c_compiler, compiler_arg, compiler_style, i, YES, NO))
+                    exit(1);
+                free(compiler_arg);
+            }
         case OPTFILE:
             if (m4only || clangonly || llvmonly || preprocessonly) continue;
             if (compiler_type == CC_SDCC) {
@@ -2111,6 +2128,8 @@ int get_filetype_by_suffix(char *name)
     }
     if (strcmp(ext, ".c") == 0)
         return CFILE;
+    if (strcmp(ext, ".cpp") == 0)
+        return CXXFILE;
     if (strcmp(ext, ".i") == 0)
         return CPPFILE;
     if (strcmp(ext, ".opt") == 0)
