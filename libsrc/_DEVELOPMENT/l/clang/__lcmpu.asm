@@ -3,9 +3,12 @@
 SECTION code_l_clang
 
 PUBLIC __lcmpu
+; This is wrong
+PUBLIC __lcmps
 
 
 __lcmpu:
+__lcmps:
     or a
     sbc hl,bc
     add hl,bc

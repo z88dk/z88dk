@@ -21,10 +21,13 @@
 	assume	adl = 1
 =
 
-
 	db	"%1"%2
 =
 	defb	%defb(%1)%2
+
+	dd	%1
+=
+	defq	%1
 
 	rb	%1
 =
@@ -37,6 +40,18 @@
 	dw	%1
 =
 	defw	%1
+
+;;
+;; Generation of a builtin memcpy
+;;
+
+%1_memcpy
+=
+%1___memcpy_stdc
+
+%1_memmove
+=
+%1___memmove_stdc
 
 ;;
 ;; Unnecessary directives

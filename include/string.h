@@ -78,28 +78,27 @@ extern int __LIB__  ffs(int i) __smallc __z88dk_callee __z88dk_fastcall;
 extern int __LIB__  ffsl(long i) __smallc __z88dk_callee __z88dk_fastcall;
 #endif
 
-extern void __LIB__ *memccpy(void *dst,const void *src,int c,size_t n) __smallc;
+__ZPROTO4(void,*,memccpy,void *,dst,const void *,src,int,c,size_t,n)
 #ifndef __STDC_ABI_ONLY
 extern void __LIB__ *memccpy_callee(void *dst,const void *src,int c,size_t n) __smallc __z88dk_callee;
 #define memccpy(a,b,c,d) memccpy_callee(a,b,c,d)
 #endif
 
-
-extern void __LIB__ *memchr(const void *s,int c,size_t n) __smallc;
+__ZPROTO3(void,*,memchr,const void *,s,int,c,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memchr_callee(const void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memchr(a,b,c) memchr_callee(a,b,c)
 #endif
 
 
-extern int __LIB__ memcmp(const void *s1,const void *s2,size_t n) __smallc;
+__ZPROTO3(int,,memcmp,const void *,s1,const void *,s2,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern int __LIB__ memcmp_callee(const void *s1,const void *s2,size_t n) __smallc __z88dk_callee;
 #define memcmp(a,b,c) memcmp_callee(a,b,c)
 #endif
 
 
-extern void __LIB__ *memcpy(void *dst,const void *src,size_t n) __smallc;
+__ZPROTO3(void,*,memcpy,void *,dst,const void *,src,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memcpy_callee(void *dst,const void *src,size_t n) __smallc __z88dk_callee;
 #define memcpy(a,b,c) memcpy_callee(a,b,c)
@@ -113,21 +112,20 @@ extern void __LIB__ *memmem_callee(const void *haystack,size_t haystack_len,cons
 #endif
 #endif
 
-extern void __LIB__ *memmove(void *dst,const void *src,size_t n) __smallc;
+__ZPROTO3(void,*,memmove,void *,dst,const void *,src,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memmove_callee(void *dst,const void *src,size_t n) __smallc __z88dk_callee;
 #define memmove(a,b,c) memmove_callee(a,b,c)
 #endif
 
 
-extern void __LIB__ *memrchr(const void *s,int c,size_t n) __smallc;
+__ZPROTO3(void,*,memrchr,const void *,s,int,c,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memrchr_callee(const void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memrchr(a,b,c) memrchr_callee(a,b,c)
 #endif
 
-
-extern void __LIB__ *memset(void *s,int c,size_t n) __smallc;
+__ZPROTO3(void,*,memset,void *,s,int,c,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memset_callee(void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memset(a,b,c) memset_callee(a,b,c)
@@ -137,26 +135,26 @@ extern void __LIB__ *memset_callee(void *s,int c,size_t n) __smallc __z88dk_call
  * area being cleared can't be read (eg VRAM in certain machines).
  * for INTEL / GBZ80 it is faster than memset().
  */
-extern void __LIB__ *memset_wr(volatile void *s,int c,size_t n) __smallc;
+__ZPROTO3(void,*,memset_wr,volatile void *,s,int,c,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memset_wr_callee(volatile void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memset_wr(a,b,c) memset_wr_callee(a,b,c)
 #endif
 
-extern void __LIB__ *memswap(void *s1,void *s2,size_t n) __smallc;
+__ZPROTO3(void,*,memswap,void *,s,void *,s2,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memswap_callee(void *s1,void *s2,size_t n) __smallc __z88dk_callee;
 #define memswap(a,b,c) memswap_callee(a,b,c)
 #endif
 
-extern char __LIB__ *stpcpy(char *dst,const char *src) __smallc;
+__ZPROTO2(char,*,stpcpy,char *,dst,const char *,src)
 #ifndef __STDC_ABI_ONLY
 extern char __LIB__ *stpcpy_callee(char *dst,const char *src) __smallc __z88dk_callee;
 #define stpcpy(a,b) stpcpy_callee(a,b)
 #endif
 
 
-extern char __LIB__ *stpncpy(char *dst,const char *src,size_t n) __smallc;
+__ZPROTO3(char,*,stpncpy,char *,dst,const char *,src,size_t,n)
 #if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *stpncpy_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define stpncpy(a,b,c) stpncpy_callee(a,b,c)
