@@ -84,6 +84,13 @@ IF FORg800
     defc maxy    = 47    ; (a different "getmaxy" is provided for G800 and smaller ones)
 ENDIF
 
+IF FORh19
+    DEFINE gotgfx
+    defc maxx    = 80
+    defc maxy    = 72
+    defc    WANT_swapgfxbk = 0
+ENDIF
+
 IF FORabc80
     DEFINE gotgfx
     defc maxx    = 78
