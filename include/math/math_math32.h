@@ -201,7 +201,11 @@ extern double_t __LIB__ frexp_callee(double_t value,int *exp) __smallc __z88dk_c
 #endif
 
 /* General */
-extern double_t __LIB__ fabs(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ fabs(double_t x);
+#ifndef __STDC_ABI_ONLY
+extern double_t __LIB__ fabs_fastcall(double_t x) __z88dk_fastcall;
+#define fabs(x) fabs_fastcall(x)
+#endif
 
 __ZPROTO2(double_t,,fmod,double_t,x,double_t,y)
 #ifndef __STDC_ABI_ONLY
