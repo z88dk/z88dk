@@ -3,13 +3,13 @@
 SECTION code_fp_math32
 
 PUBLIC __fdiv
-EXTERN m32_fsdiv_callee
+EXTERN m32_fsdiv
 
-;dehl = dehl / iybc
+;dehl = iybc / dehl
 __fdiv:
-    push de
-    push hl
     push iy
-    pop  de
-    ld hl,bc
-    jp m32_fsdiv_callee
+    push bc
+    call m32_fsdiv
+    pop bc
+    pop iy
+    ret

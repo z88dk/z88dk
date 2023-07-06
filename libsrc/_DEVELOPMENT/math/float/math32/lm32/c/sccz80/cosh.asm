@@ -1,14 +1,24 @@
+SECTION   code_fp_math32
+PUBLIC    cosh
+EXTERN    _m32_coshf
 
-	SECTION	code_fp_math32
-	PUBLIC	cosh
-	EXTERN	_m32_coshf
+IFNDEF __CLASSIC
+defc   cosh = _m32_coshf
+ELSE
 
-	defc	cosh = _m32_coshf
+; Classic has a non-fastcall implementation
 
+cosh:
+    pop bc
+    pop hl
+    pop de
+    push de
+    push hl
+    push bc
+    jp _m32_coshf
 
 ; SDCC bridge for Classic
-IF __CLASSIC
 PUBLIC _cosh
-defc _cosh = _m32_coshf
-ENDIF
+defc _cosh = cosh
 
+ENDIF

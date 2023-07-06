@@ -1,13 +1,24 @@
+SECTION   code_fp_math32
+PUBLIC    div2
+EXTERN    _m32_div2f
 
-	SECTION	code_fp_math32
-	PUBLIC	div2
-	EXTERN	m32_fsdiv2_fastcall
+IFNDEF __CLASSIC
+defc   div2 = _m32_div2f
+ELSE
 
-	defc	div2 = m32_fsdiv2_fastcall
+; Classic has a non-fastcall implementation
+
+div2:
+    pop bc
+    pop hl
+    pop de
+    push de
+    push hl
+    push bc
+    jp _m32_div2f
 
 ; SDCC bridge for Classic
-IF __CLASSIC
 PUBLIC _div2
-defc _div2 = m32_fsdiv2_fastcall
-ENDIF
+defc _div2 = div2
 
+ENDIF

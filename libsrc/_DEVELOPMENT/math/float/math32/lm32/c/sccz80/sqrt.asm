@@ -1,14 +1,29 @@
+SECTION   code_fp_math32
+PUBLIC    sqrt
+EXTERN    _m32_sqrtf
 
-    SECTION code_fp_math32
+IFNDEF __CLASSIC
+defc   sqrt = _m32_sqrtf
+ELSE
 
-    PUBLIC sqrt
-    EXTERN m32_fssqrt_fastcall
+; Classic has a non-fastcall implementation
 
-    defc sqrt = m32_fssqrt_fastcall
+sqrt:
+    pop bc
+    pop hl
+    pop de
+    push de
+    push hl
+    push bc
+    jp _m32_sqrtf
 
 ; SDCC bridge for Classic
-IF __CLASSIC
 PUBLIC _sqrt
-defc _sqrt = m32_fssqrt_fastcall
-ENDIF
+defc _sqrt = sqrt
 
+
+; Clang bridge for Classic
+PUBLIC _sqrtf
+defc _sqrtf = sqrt
+
+ENDIF

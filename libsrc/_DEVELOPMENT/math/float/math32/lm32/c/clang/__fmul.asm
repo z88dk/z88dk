@@ -3,10 +3,13 @@
 SECTION code_fp_math32
 
 PUBLIC __fmul
-EXTERN m32_fsmul_callee
+EXTERN m32_fsmul
 
-;dehl = dehl * iybc
+;dehl = iybc * dehl
 __fmul:
     push iy
     push bc
-    jp m32_fsmul_callee
+    call m32_fsmul
+    pop bc
+    pop iy
+    ret
