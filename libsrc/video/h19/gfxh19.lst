@@ -1,0 +1,10 @@
+video/h19/graphics/textpixl3
+video/h19/graphics/clsgraph
+video/h19/graphics/plotpixl
+video/h19/graphics/respixl
+video/h19/graphics/xorpixl
+video/h19/graphics/pointxy
+video/h19/graphics/h19_backbuffer
+video/h19/graphics/h19_sendchar
+gfx/narrow/obj/${TARGET}/getsprite2
+@gfx/narrow/gfx_narrow.lst
