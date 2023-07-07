@@ -1748,6 +1748,7 @@ gfxtrs80m2.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building TRS 80 Model II GFX Libraries ---'
 	@echo ''
 	@$(RM) -f video/mc6845/*.o
+	$(MAKE) -C video/mc6845 TARGET=trs80m2
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="text6 narrow" SUBTYPE=trs80m2
 	TARGET=trs80m2 TYPE=z80 $(LIBLINKER) -DFORtrs80m2 -x$(OUTPUT_DIRECTORY)/gfxtrs80m2 @$(TARGET_DIRECTORY)/trs80/gfxtrs80m2.lst
 
