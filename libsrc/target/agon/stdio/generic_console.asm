@@ -14,6 +14,8 @@
     EXTERN  __agon_fgcol
     EXTERN  __agon_putc
 
+    EXTERN  conio_map_colour
+
     INCLUDE "ioctl.def"
     INCLUDE "target/agon/def/mos_api.inc"
     PUBLIC  CLIB_GENCON_CAPS
@@ -24,11 +26,13 @@ generic_console_set_attribute:
     ret
 
 generic_console_set_ink:
+    call    conio_map_colour
     and     63
     ld      (__agon_fgcol),a
     jr      set_colour
 
 generic_console_set_paper:
+    call    conio_map_colour
     and     63
     ld      (__agon_bgcol),a
     or      $80
