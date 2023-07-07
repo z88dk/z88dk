@@ -1747,6 +1747,7 @@ gfxtrs80m2.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building TRS 80 Model II GFX Libraries ---'
 	@echo ''
+	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="text6 narrow" SUBTYPE=trs80m2
 	TARGET=trs80m2 TYPE=z80 $(LIBLINKER) -DFORtrs80m2 -x$(OUTPUT_DIRECTORY)/gfxtrs80m2 @$(TARGET_DIRECTORY)/trs80/gfxtrs80m2.lst
 
@@ -2009,7 +2010,7 @@ gfxregis.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C video/regis TARGET=test 
 	TARGET=regis TYPE=z80 $(LIBLINKER) -mz80 -DFORregis -x$(OUTPUT_DIRECTORY)/gfxregis @$(LISTFILE_DIRECTORY)/video/regis/video_regis.lst
 
-gfxh19.lib:
+gfxh19.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Heath/Zenith H19 graphics Library ---'
 	@echo ''
