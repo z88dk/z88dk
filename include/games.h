@@ -372,9 +372,17 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __TRS80__
 #ifdef DEFINE_JOYSTICK_TYPE
+#ifdef __TRS80II__
+	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05"};
+#else
 	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
+#endif
+#ifdef __TRS80II__
+	#define GAME_DEVICES 2
+#else
 	#define GAME_DEVICES 4
+#endif
 #endif
 
 #ifdef __SV8000_

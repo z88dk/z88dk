@@ -85,6 +85,11 @@
 ;--------------------------------------------------
 	SECTION		code_crt_init
 	EXTERN		base_graphics
+	EXTERN		asm_set_cursor_state
+
 	ld	hl,$f800
 	ld	(base_graphics),hl
+
+	ld	l,0x20		;disable cursor
+	call	asm_set_cursor_state
 
