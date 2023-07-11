@@ -641,6 +641,23 @@ static disc_spec ptcpm_spec = {
     .first_sector_offset = 1,
 };
 
+// TRS80 Holmes VID-80 DDSS
+static disc_spec holmes_spec = {
+    .name = "TRS80Holmes",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+};
+
 // TRS80 Memory Merchant Shuffleboard DDSS
 static disc_spec merchant_spec = {
     .name = "MemMerchant",
@@ -696,6 +713,7 @@ static disc_spec montezuma_spec = {
     .skew_tab = { 0, 2, 4, 6, 8, 10, 12, 14, 16, 1, 3, 5, 7, 9, 11, 13, 15, 17 }
 };
 
+// TRS80 Model 4 CP/M Plus
 static disc_spec trs80_cpm3_spec = {
     .name = "TRS80M4CPM3",
     .disk_mode = MFM250,
@@ -712,6 +730,24 @@ static disc_spec trs80_cpm3_spec = {
     .first_sector_offset = 1,
 };
 
+// LNW-80 (TRS80 clone)
+static disc_spec lnw80_spec = {
+    .name = "LNW 80",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,5,10,15,2,7,12,17,4,9,14,1,6,11,16,3,8,13 }
+};
 
 static disc_spec svi40ss_spec = {
     .name = "SVI40SS",
@@ -876,6 +912,25 @@ static disc_spec gemini_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 0,
     .alternate_sides = 1,
+};
+
+
+// HP 120/125, DSDD
+static disc_spec hp125_spec = {
+    .name = "HP125",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 35,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
 };
 
 
@@ -1280,8 +1335,10 @@ static struct formats {
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
     { "fp1100",    "Casio FP1100",          &fp1100_spec, 0, NULL, 1 },
     { "gemini",    "GeminiGalaxy",          &gemini_spec, 0, NULL, 1 },
+    { "hp125",     "HP 125/120",            &hp125_spec, 0, NULL, 1 },
     { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
+    { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
     { "morrow2",   "Morrow MD 2 (SS)",      &md2_spec, 0, NULL, 1 },
@@ -1313,6 +1370,7 @@ static struct formats {
     { "lifeboat",  "TRS80 II Lifeboat",     &lifeboat_spec, 0, NULL, 1 },
     { "fmgcpm",    "TRS80 II FMG CP/M",     &fmgcpm_spec, 0, NULL, 1 },
     { "ptcpm",     "TRS80 II PickelsTrout", &ptcpm_spec, 0, NULL, 1 },
+    { "holmes",    "TRS80 Holmes VID-80",   &holmes_spec, 0, NULL, 1 },
     { "merchant",  "TRS80 III MemMerchant", &merchant_spec, 0, NULL, 1 },
     { "compactor", "TRS80 III Hurricane C", &hurricane_spec, 0, NULL, 1 },
     { "montezuma", "TRS80 4 Montezuma",     &montezuma_spec, 0, NULL, 1 },
