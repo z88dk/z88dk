@@ -915,6 +915,25 @@ static disc_spec gemini_spec = {
 };
 
 
+// HP 120/125, DSDD
+static disc_spec hp125_spec = {
+    .name = "HP125",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 35,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+};
+
+
 static disc_spec lynx_spec = {
     .name = "CampLynx",
     .disk_mode = FM500,           // possibly wrong information gathered online, IMD format is UNTESTED
@@ -1316,6 +1335,7 @@ static struct formats {
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
     { "fp1100",    "Casio FP1100",          &fp1100_spec, 0, NULL, 1 },
     { "gemini",    "GeminiGalaxy",          &gemini_spec, 0, NULL, 1 },
+    { "hp125",     "HP 125/120",            &hp125_spec, 0, NULL, 1 },
     { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
