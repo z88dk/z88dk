@@ -4,7 +4,8 @@
 ; Exit:  a = colour to use on screen
 ; Used:  hl,bc,f
 ;
-; Only maps colours in mode 2
+; These colours work in both 16 and 64 colour modes
+; Thanks to RobertK for mapping them
 ;
 ; Palettes are defined here: https://gist.github.com/astralaster/33a7c4ca85380925b306b2df37afbd19
 ;
@@ -27,7 +28,6 @@ conio_map_colour:
         ld      a,(hl)
         ret
 
-
 SECTION rodata_clib
 
 table:
@@ -37,13 +37,13 @@ table:
         defb    14      ;CYAN -> (#00 ff ff)
         defb    9       ;RED -> (#ff 00 00)
         defb    13      ;MAGENTA -> (#ff 00 ff)
-        defb    43      ;BROWN -> (#aa 55 55)
-        defb    15      ;LIGHTGRAY -> (#ff ff ff)
-        defb    15      ;DARKGRAY -> (#ff ff ff)
-        defb    47      ;LIGHTBLUE -> (#aa aa ff)
+        defb    3       ;BROWN -> (#aa aa 00)
+        defb    7       ;LIGHTGRAY -> (#aa aa aa)
+        defb    8       ;DARKGRAY -> (#55 55 55)
+        defb    4       ;LIGHTBLUE -> (#00 00 aa)
         defb    2       ;LIGHTGREEN -> (#00 aa 00) 
-        defb    51      ;LIGHTCYAN -> (#aa ff ff)
+        defb    6       ;LIGHTCYAN -> (#00 aa aa)
         defb    1       ;LIGHTRED -> (#aa 00 00)
-        defb    57      ;LIGHTMAGENTA -> (#ff 55 ff)
+        defb    5       ;LIGHTMAGENTA -> (#aa 00 aa)
         defb    11      ;YELLOW -> (#ff ff 00)
         defb    15      ;WHITE -> (#ff ff ff)

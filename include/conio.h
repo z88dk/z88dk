@@ -60,6 +60,7 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 // VT52, but may drag in more code than intended.
 
 extern void __LIB__        textcolor(int c) __z88dk_fastcall;
+extern void __LIB__        textcolour(int c) __z88dk_fastcall;
 extern void __LIB__        textbackground(int c) __z88dk_fastcall;
 #define clrscr()           fputc_cons(12)
 #endif
@@ -119,6 +120,7 @@ __ZPROTO2(int,,cvpeekr,int,x,int,y)
 
 // Set the border colour, may not be implemented on all ports
 extern int __LIB__ bordercolor(int c) __z88dk_fastcall;
+extern int __LIB__ bordercolour(int c) __z88dk_fastcall;
 
 // Missing functions, not implemented
 //extern int  __LIB__ movetext (int _left, int _top, int _right, int _bottom, int _destleft, int _desttop);
