@@ -641,6 +641,23 @@ static disc_spec ptcpm_spec = {
     .first_sector_offset = 1,
 };
 
+// TRS80 Holmes VID-80 DDSS
+static disc_spec holmes_spec = {
+    .name = "TRS80Holmes",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+};
+
 // TRS80 Memory Merchant Shuffleboard DDSS
 static disc_spec merchant_spec = {
     .name = "MemMerchant",
@@ -1333,6 +1350,7 @@ static struct formats {
     { "lifeboat",  "TRS80 II Lifeboat",     &lifeboat_spec, 0, NULL, 1 },
     { "fmgcpm",    "TRS80 II FMG CP/M",     &fmgcpm_spec, 0, NULL, 1 },
     { "ptcpm",     "TRS80 II PickelsTrout", &ptcpm_spec, 0, NULL, 1 },
+    { "holmes",    "TRS80 Holmes VID-80",   &holmes_spec, 0, NULL, 1 },
     { "merchant",  "TRS80 III MemMerchant", &merchant_spec, 0, NULL, 1 },
     { "compactor", "TRS80 III Hurricane C", &hurricane_spec, 0, NULL, 1 },
     { "montezuma", "TRS80 4 Montezuma",     &montezuma_spec, 0, NULL, 1 },
