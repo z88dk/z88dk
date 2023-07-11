@@ -26,7 +26,7 @@
 IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
     IF CLIB_DEFAULT_SCREEN_MODE = 0
         defc    CONSOLE_COLUMNS = 80
-        defc    CONSOLE_ROWS = 25
+        defc    CONSOLE_ROWS = 24
     ELIF CLIB_DEFAULT_SCREEN_MODE = 1
         defc    CONSOLE_COLUMNS = 40
         defc    CONSOLE_ROWS = 25
@@ -39,7 +39,7 @@ ELSE
         defc    DEFINED_CLIB_DEFAULT_SCREEN_MODE = 1
         defc    CLIB_DEFAULT_SCREEN_MODE = 0
         defc    CONSOLE_COLUMNS = 80
-        defc    CONSOLE_ROWS = 25
+        defc    CONSOLE_ROWS = 24
     ELSE
     ; When loading from BASIC we startup in 64x16 screenmode
         IFNDEF CONSOLE_COLUMNS
