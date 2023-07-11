@@ -8,17 +8,16 @@
 #include "utils.h"
 #include <regex>
 #include <set>
+#include <algorithm>
 
 string str_tolower(string str) {
-	for (auto& c : str)
-		c = tolower(c);
+    std::transform(str.begin(), str.end(), str.begin(), [](int c) {return c >= 0 ? tolower(c) : c; });
 	return str;
 }
 
 string str_toupper(string str) {
-	for (auto& c : str)
-		c = toupper(c);
-	return str;
+    std::transform(str.begin(), str.end(), str.begin(), [](int c) {return c >= 0 ? toupper(c) : c; });
+    return str;
 }
 
 static int char_digit(char c) {
