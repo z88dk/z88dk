@@ -696,6 +696,7 @@ static disc_spec montezuma_spec = {
     .skew_tab = { 0, 2, 4, 6, 8, 10, 12, 14, 16, 1, 3, 5, 7, 9, 11, 13, 15, 17 }
 };
 
+// TRS80 Model 4 CP/M Plus
 static disc_spec trs80_cpm3_spec = {
     .name = "TRS80M4CPM3",
     .disk_mode = MFM250,
@@ -712,6 +713,24 @@ static disc_spec trs80_cpm3_spec = {
     .first_sector_offset = 1,
 };
 
+// LNW-80 (TRS80 clone)
+static disc_spec lnw80_spec = {
+    .name = "LNW 80",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,5,10,15,2,7,12,17,4,9,14,1,6,11,16,3,8,13 }
+};
 
 static disc_spec svi40ss_spec = {
     .name = "SVI40SS",
@@ -1282,6 +1301,7 @@ static struct formats {
     { "gemini",    "GeminiGalaxy",          &gemini_spec, 0, NULL, 1 },
     { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
+    { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
     { "morrow2",   "Morrow MD 2 (SS)",      &md2_spec, 0, NULL, 1 },
