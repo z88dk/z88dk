@@ -49,6 +49,8 @@ ELSE
     ENDIF
 ENDIF
 
+    INCLUDE "target/bee/classic/bee_premium.inc"
+
 IF      !DEFINED_CRT_ORG_CODE
     defc    CRT_ORG_CODE  = $900  ; clean binary block
 ENDIF

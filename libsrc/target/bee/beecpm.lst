@@ -7,7 +7,7 @@ target/bee/stdio/ansi/f_ansi_dline
 target/bee/stdio/ansi/f_ansi_scrollup
 target/bee/stdio/generic_console
 target/bee/stdio/generic_console_ioctl
-target/bee/stdio/conio_map_colour
+target/bee/stdio/generic_console_attrs
 target/bee/stdio/conio_vars
 target/bee/stdio/CRT_FONT
 target/shared/copy_font
