@@ -15,18 +15,24 @@
     defc    crt0 = 1
     INCLUDE "zcc_opt.def"
 
-
+    INCLUDE "target/aquarius/def/aqplus.def"
 
     EXTERN  _main           ;main() is always external to crt0 code
 
     PUBLIC  cleanup         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
+    PUBLIC  CLIB_VIDEO_PAGE_PORT    ;Video paging port for aq+
+
     defc    TAR__no_ansifont = 1
     defc    CONSOLE_ROWS = 24
     defc    CONSOLE_COLUMNS = 40
     defc    __CPU_CLOCK = 4000000
 
+    PUBLIC  CLIB_AQUARIUS_PLUS
+IFNDEF CLIB_AQUARIUS_PLUS
+    defc    CLIB_AQUARIUS_PLUS = 0
+ENDIF
 
 
 IF startup = 1 

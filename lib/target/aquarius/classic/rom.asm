@@ -9,6 +9,9 @@
     defc	RAM_Start = 0x3900
     INCLUDE	"crt/classic/crt_rules.inc"
 
+    ; Page video into 0x8000 - 0xc000
+    defc    CLIB_VIDEO_PAGE_PORT = PORT_BANK2
+
 
     org     CRT_ORG_CODE
 
@@ -38,7 +41,6 @@ cleanup:
 
 endloop:
     jr      endloop
-
 
     defc	__crt_org_bss = RAM_Start
     ; If we were given a model then use it

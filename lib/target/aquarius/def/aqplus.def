@@ -1,0 +1,21 @@
+; Aquarius+ port definitions
+;
+; Ports are writable + readable
+
+
+
+
+defc PORT_VCTRL         = $e0
+
+defc PORT_VPALSEL       = $ea
+defc PORT_VPALDATA      = $eb
+
+defc PORT_BANK0         = $f0
+defc PORT_BANK1         = $f1
+defc PORT_BANK2         = $f2
+defc PORT_BANK3         = $f3
+
+
+
+
+

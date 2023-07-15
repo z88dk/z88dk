@@ -12,6 +12,9 @@ IF      !DEFINED_CRT_ORG_CODE
 ENDIF
 
 
+    ; Page video into 0xc000 -> 0xffff
+    defc    CLIB_VIDEO_PAGE_PORT = PORT_BANK3
+
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1
     INCLUDE "crt/classic/crt_rules.inc"
