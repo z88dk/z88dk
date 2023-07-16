@@ -49,4 +49,14 @@ target/aquarius/tape/tape_load_block_callee
 @psg/ay/psg.lst
 @psg/ay/vt2/psg_vt2.lst
 @psg/ay/wyz/psg_wyz.lst
-
+target/aquarius/fcntl/chdir
+target/aquarius/fcntl/close
+target/aquarius/fcntl/esp
+target/aquarius/fcntl/mkdir
+target/aquarius/fcntl/open
+target/aquarius/fcntl/read
+target/aquarius/fcntl/readbyte
+target/aquarius/fcntl/remove
+target/aquarius/fcntl/rename
+target/aquarius/fcntl/write
+target/aquarius/fcntl/writebyte
