@@ -17,8 +17,9 @@
 
     EXTERN      __aquarius_mode
 
-
-
+    INCLUDE     "ioctl.def"
+    PUBLIC  CLIB_GENCON_CAPS
+    defc    CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR 
 
 
 

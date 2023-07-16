@@ -32,6 +32,19 @@
     PUBLIC  CLIB_AQUARIUS_PLUS
 IFNDEF CLIB_AQUARIUS_PLUS
     defc    CLIB_AQUARIUS_PLUS = 0
+
+    ; Forcibly disable bitmap routines
+    EXTERN  l_ret
+    PUBLIC  cls_BITMAP
+    PUBLIC  printc_BITMAP
+    PUBLIC  scrollup_BITMAP
+    PUBLIC  vpeek_BITMAP
+    PUBLIC  generic_console_ioctl
+    defc    cls_BITMAP = l_ret
+    defc    printc_BITMAP = l_ret
+    defc    scrollup_BITMAP = l_ret
+    defc    vpeek_BITMAP = l_ret
+    defc    generic_console_ioctl = l_ret
 ENDIF
 
 

@@ -6,7 +6,7 @@
 ALIAS   --conio-selector -pragma-redirect:fputc_cons=fputc_cons_selector 
 ALIAS   --generic-console -pragma-redirect:fputc_cons=fputc_cons_generic -D__HAVE_GENCON -pragma-define:__HAVE_GENCON=1
 ALIAS   --hardware-keyboard -pragma-redirect:fgetc_cons=fgetc_cons_inkey -pragma-redirect:getk=getk_inkey 
-
+ALIAS   --vt100  -pragma-need=ansiterminal -D__CONIO_VT100 
 
 #
 # Math library aliases (classic)
