@@ -518,6 +518,24 @@ static disc_spec nascom_spec = {
 };
 
 
+// NEC PC-6001/6601
+static disc_spec pc6001_spec = {
+    .name = "NEC PC6001",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x23,
+    .filler_byte = 0xFF,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
 // NEC PC-8001, SSDD
 static disc_spec pc8001_spec = {
     .name = "NEC PC8001",
@@ -1389,6 +1407,7 @@ static struct formats {
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
+    { "pc6001",    "NEC PC6001/6601",       &pc6001_spec, 0, NULL, 1 },
     { "pc8001",    "NEC PC8001",            &pc8001_spec, 0, NULL, 1 },
     { "pc88",      "NEC PC8001/8801,FM7/8", &pc88_spec, 0, NULL, 1 },
     { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
