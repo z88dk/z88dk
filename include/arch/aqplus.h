@@ -2,6 +2,7 @@
 #ifndef __AQPLUS_H
 #define __AQPLUS_H
 
+#include <stdint.h>
 #include <arch/aquarius.h>
 
 // Stat buffer returned by ESP32
