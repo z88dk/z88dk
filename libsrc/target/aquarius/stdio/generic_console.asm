@@ -51,7 +51,6 @@ generic_console_printc:
 
 
 generic_console_scrollup:
-jp scrollup_TEXT
     ld      hl,__aquarius_mode
     bit     0,(hl)
     jp      nz,scrollup_TEXT

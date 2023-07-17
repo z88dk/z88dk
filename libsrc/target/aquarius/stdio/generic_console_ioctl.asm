@@ -21,6 +21,8 @@
     EXTERN  CLIB_AQUARIUS_PLUS
     EXTERN  CLIB_VIDEO_PAGE_PORT
 
+    EXTERN  __console_h
+
 
     ; For AQ+ we have different values
     defc    CLIB_GENCON_CAPS_TEXT = CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR 
@@ -91,10 +93,14 @@ ck_mode:
     ld      (__aquarius_mode),a
     out     (PORT_VCTRL),a
     ld      c,CLIB_GENCON_CAPS_TEXT
+    ld      b,24
     bit     1,a
-    jr      z,set_caps
+    jr      nz,set_caps
     ld      c,CLIB_GENCON_CAPS_BITMAP
+    ld      b,25
 set_caps:
+    ld      a,b
+    ld      (__console_h),a
     ld      a,c
     ld      (generic_console_caps),a
     call    generic_console_cls

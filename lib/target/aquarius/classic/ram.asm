@@ -61,7 +61,7 @@ banked_call:
     ld      d,(hl)
     inc     hl
     ld      a,(hl)          ; ...and page
-    add     35
+    add     34
     inc     hl
     inc     hl              ; Yes this should be here
     push    hl              ; Push the real return address
@@ -87,7 +87,7 @@ banked_call:
     EXTERN  __esp_read_byte
     EXTERN  asm_strlen
     
-; Load banks 35 -> 63 (we call them 1 ->28 )
+; Load banks 34 -> 63 (we call them 1 ->29 )
 loadbanks:
     ; Save current binding
     in      a,(PORT_BANK3)
@@ -95,9 +95,9 @@ loadbanks:
     ld      a,1
 loadloop:
     push    af
-    add     35              ;We use banks 0 - 28 for compatibility with other targets
+    add     34              ;We use banks 1 - 29 for compatibility with other targets
     out     (PORT_BANK3),a
-    sub     35
+    sub     34
     call    setext
     ld      a,ESPCMD_OPEN
     call    __esp_send_cmd
