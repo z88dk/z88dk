@@ -383,7 +383,7 @@ extern int __LIB__ __SAVEFRAME__     sleep_fastcall (int secs) __z88dk_fastcall;
 #define sleep(x) sleep_fastcall(x)
 #endif
 
-extern void __LIB__ msleep(unsigned int milliseconds) __z88dk_fastcall;
+extern void __LIB__ msleep(unsigned int milliseconds);
 #ifndef __STDC_ABI_ONLY
 extern int __LIB__  msleep_fastcall (unsigned int milliseconds) __z88dk_fastcall;
 #define msleep(x) msleep_fastcall(x)

@@ -9,7 +9,7 @@
 		PUBLIC	getk_inkey
 		PUBLIC	_getk_inkey
 
-		EXTERN	msleep
+		EXTERN asm_z80_delay_ms
                 EXTERN in_GetKey
 		EXTERN	__CLIB_FGETC_CONS_DELAY
 
@@ -21,7 +21,7 @@ _getk_inkey:
 .fgetc_cons_inkey
 ._fgetc_cons_inkey
 	ld	hl,__CLIB_FGETC_CONS_DELAY
-	call	msleep
+	call	asm_z80_delay_ms
 loop:
 	call	in_GetKey
 	jr	c,loop
