@@ -34,6 +34,16 @@
 #define SCORE_ROW 22
 #endif
 
+#ifdef __AQUARIUSPLUS__
+#define USE_COLOUR 1
+#define USE_BIGSPRITES 1
+#define ARENA_W 20
+#define ARENA_H 10
+#define X_OFFSET 0
+#define Y_OFFSET 0
+#define SCORE_ROW 22
+#endif
+
 #ifdef __SAM__
 #define USE_COLOUR 1
 #define USE_BIGSPRITES 1
@@ -56,7 +66,7 @@
 #endif
 
 #ifndef TEXT_COLOUR
-#define TEXT_COLOUR 0
+#define TEXT_COLOUR WHITE
 #endif
 
 
@@ -491,7 +501,7 @@ static void print_sprite(int y, int x, uint8_t spr)
 
 #ifdef USE_COLOUR
     udg_num = spr & 128 ? 132 : 128;
-    textcolor(spr & 3);
+    textcolor((spr & 3) + 1);
 #else
     // We have no colour, use different UDGs
     udg_num = (spr & 3) * 4;
