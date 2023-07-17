@@ -52,6 +52,9 @@ target/aquarius/tape/tape_load_block_callee
 target/aquarius/fcntl/chdir
 target/aquarius/fcntl/close
 target/aquarius/fcntl/esp
+target/aquarius/fcntl/fdgetpos
+target/aquarius/fcntl/fdtell
+target/aquarius/fcntl/lseek
 target/aquarius/fcntl/mkdir
 target/aquarius/fcntl/open
 target/aquarius/fcntl/read
