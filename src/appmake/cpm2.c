@@ -518,6 +518,61 @@ static disc_spec nascom_spec = {
 };
 
 
+// NEC PC-6001/6601
+static disc_spec pc6001_spec = {
+    .name = "NEC PC6001",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x23,
+    .filler_byte = 0xFF,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
+// NEC PC-8001, SSDD
+static disc_spec pc8001_spec = {
+    .name = "NEC PC8001",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x23,
+    .filler_byte = 0xE5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1
+};
+
+
+// NEC PC-8801, DSDD
+static disc_spec pc88_spec = {
+    .name = "NEC PC8801",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x4E,
+    .filler_byte = 0xFF,
+    .boottracks = 4,
+    .alternate_sides = 1,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
 static disc_spec qc10_spec = {
     .name = "QC10",
     .sectors_per_track = 10,
@@ -1352,10 +1407,12 @@ static struct formats {
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
+    { "pc6001",    "NEC PC6001/6601",       &pc6001_spec, 0, NULL, 1 },
+    { "pc8001",    "NEC PC8001",            &pc8001_spec, 0, NULL, 1 },
+    { "pc88",      "NEC PC8001/8801,FM7/8", &pc88_spec, 0, NULL, 1 },
     { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "pcw40",     "Amstrad PCW, 40T",      &pcw40_spec, 16, "\x00\x00\x28\x09\x02\x01\x03\x02\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "plus3",     "Spectrum +3 173k",      &plus3_spec, 0, NULL, 1 },
-    { "pmc101a",   "PMC-101 MicroMate",     &pmc101a_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
     { "rainbow",   "DEC Rainbow 100",       &rainbow_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
