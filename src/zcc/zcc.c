@@ -151,6 +151,7 @@ static void            PragmaExport(option *arg, char *);
 static void            PragmaRedirect(option *arg, char *);
 static void            PragmaNeed(option *arg, char *);
 static void            PragmaBytes(option *arg, char *);
+static void            PragmaString(option *arg, char *);
 static void            PragmaInclude(option *arg, char *);
 static void            AddArray(arg_t *arg, char *);
 static void            conf_opt_code_speed(option *arg, char *);
@@ -489,7 +490,8 @@ static option options[] = {
     { 0, "pragma-output", OPT_FUNCTION,  "Define the option in zcc_opt.def (same as above)" , NULL, PragmaDefine, 0},
     { 0, "pragma-export", OPT_FUNCTION,  "Define the option in zcc_opt.def and export as public" , NULL, PragmaExport, 0},
     { 0, "pragma-need", OPT_FUNCTION,  "NEED the option in zcc_opt.def" , NULL, PragmaNeed, 0},
-    { 0, "pragma-bytes", OPT_FUNCTION,  "Dump a string of bytes zcc_opt.def" , NULL, PragmaBytes, 0},
+    { 0, "pragma-bytes", OPT_FUNCTION,  "Dump a sequence of bytes zcc_opt.def" , NULL, PragmaBytes, 0},
+    { 0, "pragma-string", OPT_FUNCTION,  "Dump a string zcc_opt.def" , NULL, PragmaString, 0},
     { 0, "pragma-include", OPT_FUNCTION,  "Process include file containing pragmas" , NULL, PragmaInclude, 0},
 
     { 0, "", OPT_HEADER, "Lifecycle options:", NULL, NULL, 0 },
@@ -3073,8 +3075,26 @@ void PragmaBytes(option *arg, char *val)
     }
 
     add_zccopt("\nIF NEED_%s\n", ptr);
-    add_zccopt("\tDEFINED\tDEFINED_NEED_%s\n", ptr);
+    add_zccopt("\tDEFINE\tDEFINED_NEED_%s\n", ptr);
     add_zccopt("\tdefb\t%s\n", value);
+    add_zccopt("ENDIF\n\n");
+}
+
+void PragmaString(option *arg, char *val)
+{
+    char *ptr = val;
+    char *value;
+
+    if ((value = strchr(ptr, '=')) != NULL) {
+        *value++ = 0;
+    }
+    else {
+        return;
+    }
+
+    add_zccopt("\nIF NEED_%s\n", ptr);
+    add_zccopt("\tDEFINE\tDEFINED_NEED_%s\n", ptr);
+    add_zccopt("\tdefm\t\"%s\"\n", value);
     add_zccopt("ENDIF\n\n");
 }
 

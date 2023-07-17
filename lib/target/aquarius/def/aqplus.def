@@ -1,0 +1,60 @@
+; Aquarius+ port definitions
+;
+; Ports are writable + readable
+
+
+
+
+defc PORT_VCTRL         = $e0
+
+defc PORT_VPALSEL       = $ea
+defc PORT_VPALDATA      = $eb
+
+
+defc PORT_BANK0         = $f0
+defc PORT_BANK1         = $f1
+defc PORT_BANK2         = $f2
+defc PORT_BANK3         = $f3
+
+defc PORT_ESPCTRL       = $f4
+defc PORT_ESPDATA       = $f5
+
+
+
+defc ESPCMD_RESET    = 0x01 ; Reset ESP
+defc ESPCMD_OPEN     = 0x10 ; Open / create file
+defc ESPCMD_CLOSE    = 0x11 ; Close open file
+defc ESPCMD_READ     = 0x12 ; Read from file
+defc ESPCMD_WRITE    = 0x13 ; Write to file
+defc ESPCMD_SEEK     = 0x14 ; Move read/write pointer
+defc ESPCMD_TELL     = 0x15 ; Get current read/write
+defc ESPCMD_OPENDIR  = 0x16 ; Open directory
+defc ESPCMD_CLOSEDIR = 0x17 ; Close open directory
+defc ESPCMD_READDIR  = 0x18 ; Read from directory
+defc ESPCMD_DELETE   = 0x19 ; Remove file or directory
+defc ESPCMD_RENAME   = 0x1A ; Rename / move file or directory
+defc ESPCMD_MKDIR    = 0x1B ; Create directory
+defc ESPCMD_CHDIR    = 0x1C ; Change directory
+defc ESPCMD_STAT     = 0x1D ; Get file status
+defc ESPCMD_GETCWD   = 0x1E ; Get current working directory
+defc ESPCMD_CLOSEALL = 0x1F ; Close any open file/directory descriptor
+
+defc ERR_NOT_FOUND     = -1 ; File / directory not found
+defc ERR_TOO_MANY_OPEN = -2 ; Too many open files / directories
+defc ERR_PARAM         = -3 ; Invalid parameter
+defc ERR_EOF           = -4 ; End of file / directory
+defc ERR_EXISTS        = -5 ; File already exists
+defc ERR_OTHER         = -6 ; Other error
+defc ERR_NO_DISK       = -7 ; No disk
+defc ERR_NOT_EMPTY     = -8 ; Not empty
+
+
+defc OPENF_RDONLY  = 0x00 ; Open for reading only
+defc OPENF_WRONLY  = 0x01 ; Open for writing only
+defc OPENF_RDWR    = 0x02 ; Open for reading and writing
+defc OPENF_ACCMODE = 0x03 ; Mask for above modes
+
+defc OPENF_APPEND  = 0x04 ; Append mode
+defc OPENF_CREATE  = 0x08 ; Create if non-existant
+defc OPENF_TRUNC   = 0x10 ; Truncate to zero length
+defc OPENF_EXCL    = 0x20 ; Error if already exists
