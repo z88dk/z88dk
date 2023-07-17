@@ -1390,7 +1390,7 @@ static struct formats {
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
     { "pc8001",    "NEC PC8001",            &pc8001_spec, 0, NULL, 1 },
-    { "pc88",      "NEC PC8801",            &pc88_spec, 0, NULL, 1 },
+    { "pc88",      "NEC PC8001/8801,FM7/8", &pc88_spec, 0, NULL, 1 },
     { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "pcw40",     "Amstrad PCW, 40T",      &pcw40_spec, 16, "\x00\x00\x28\x09\x02\x01\x03\x02\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "plus3",     "Spectrum +3 173k",      &plus3_spec, 0, NULL, 1 },
