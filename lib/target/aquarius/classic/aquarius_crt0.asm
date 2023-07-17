@@ -48,11 +48,11 @@ IFNDEF CLIB_AQUARIUS_PLUS
 ENDIF
 
 
-IF startup = 1 
+IF startup = 2
+    INCLUDE	"target/aquarius/classic/rom.asm"
+ELSE
     INCLUDE "target/aquarius/def/maths_mbf.def"
     INCLUDE	"target/aquarius/classic/ram.asm"
-ELSE
-    INCLUDE	"target/aquarius/classic/rom.asm"
 ENDIF
 
 
@@ -68,4 +68,8 @@ l_dcal:
     ld      hl,$3028
     ld      (base_graphics),hl
 
+IF startup = 3
+    INCLUDE	"target/aquarius/classic/banks.asm"
+ENDIF
+    
 
