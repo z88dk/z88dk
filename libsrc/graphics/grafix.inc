@@ -418,6 +418,12 @@ IF FORaquarius
     defc blankch    = 160
 ENDIF
 
+IF FORaqplus
+    DEFINE gotgfx
+    defc maxx    = 320
+    defc maxy    = 299
+ENDIF
+
 IF FORaq48
     DEFINE gotgfx
     defc maxx    = 80
