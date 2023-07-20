@@ -518,6 +518,27 @@ static disc_spec nascom_spec = {
 };
 
 
+// Toshiba T100/PASOPIA
+static disc_spec pasopia_spec = {
+    .name = "PASOPIA",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 35,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x23,
+    .filler_byte = 0xE5,
+    .boottracks = 6,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15 }
+};
+
+
 // NEC PC-6001/6601
 static disc_spec pc6001_spec = {
     .name = "NEC PC6001",
@@ -1407,6 +1428,7 @@ static struct formats {
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
+    { "pasopia",   "Toshiba Pasopia/T100",  &pasopia_spec, 0, NULL, 1 },
     { "pc6001",    "NEC PC6001/6601",       &pc6001_spec, 0, NULL, 1 },
     { "pc8001",    "NEC PC8001",            &pc8001_spec, 0, NULL, 1 },
     { "pc88",      "NEC PC8001/8801,FM7/8", &pc88_spec, 0, NULL, 1 },
