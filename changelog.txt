@@ -7,6 +7,7 @@ z88dk v2.3 - xx.xx.202x
 Detailed but incomplete changelist:
 
 - [classic] +agon: New target
+- [classic] +aquarius: New target Aquarius Plus (-clib=aqplus)
 - [classic] +cpc: Interrupt support
 - [classic] +cpc: Graphics support for all 3 official modes
 - [classic] +cpm: Support for Xerox 820 and sound on 820ii
@@ -28,6 +29,7 @@ Detailed but incomplete changelist:
 - [classic] Arkos Tracker available for +cpc, +msx, +zx, +zxn
 - [classic] TMS99x8 library enhancements
 - [classic] A fixed point Q8.8 maths library is available
+- [classic] Support for using clang as a compiler
 - [newlib] Arkos Tracker available for +zx, +zxn
 - [sccz80] 8080, 8085, gbz80 opt-code-speed: add32, sub32, longcompare
 - [sccz80] Extended quikmult cases
