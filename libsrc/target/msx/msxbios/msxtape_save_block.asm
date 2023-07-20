@@ -3,11 +3,13 @@
 
 PUBLIC msxtape_save_block
 PUBLIC _msxtape_save_block
+PUBLIC ___msxtape_save_block
 
 EXTERN asm_msxtape_save_block
 
 .msxtape_save_block
 ._msxtape_save_block
+.___msxtape_save_block
 
 ;--------------------
 ;   in   BC=byte size

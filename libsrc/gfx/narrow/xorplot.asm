@@ -5,12 +5,14 @@
     
     PUBLIC  xorplot
     PUBLIC  _xorplot
+    PUBLIC  ___xorplot
     
     EXTERN  asm_xorplot
 
     
 .xorplot
 ._xorplot
+.___xorplot
     pop     bc    ; ret addr
     pop     hl    ; y
     pop     de    ; x

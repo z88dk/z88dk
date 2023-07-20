@@ -215,6 +215,7 @@
 	GLOBAL _sqr_fastcall
 	GLOBAL _div2_fastcall
 	GLOBAL _mul2_fastcall
+	GLOBAL _fmod
 	GLOBAL _fmin_callee
 	GLOBAL _fmax_callee
 	GLOBAL _floor_fastcall
@@ -282,7 +283,6 @@
 	GLOBAL _remquo
 	GLOBAL _remainder_callee
 	GLOBAL _remainder
-	GLOBAL _fmod
 	GLOBAL _modf
 	GLOBAL _trunc_fastcall
 	GLOBAL _trunc
@@ -397,45 +397,33 @@ _am9511_fmax_callee:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	push	af
-	push	af
-	ld	hl,0
-	add	hl, sp
-	ex	de, hl
-	ld	hl,8
-	add	hl, sp
-	ld	bc,4
-	ldir
-	ld	c,(ix+8)
-	ld	b,(ix+9)
-	ld	e,(ix+10)
-	ld	d,(ix+11)
-	push	bc
-	push	de
-	ld	l,(ix-2)
-	ld	h,(ix-1)
+	ld	l,(ix+6)
+	ld	h,(ix+7)
 	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
+	ld	l,(ix+4)
+	ld	h,(ix+5)
 	push	hl
-	push	de
-	push	bc
+	ld	l,(ix+10)
+	ld	h,(ix+11)
+	push	hl
+	ld	l,(ix+8)
+	ld	h,(ix+9)
+	push	hl
 	call	___fslt_callee
 	ld	a, l
-	pop	de
-	pop	bc
 	or	a, a
 	jr	Z,l_am9511_fmax_callee_00102
-	pop	hl
-	push	hl
-	ld	e,(ix-2)
-	ld	d,(ix-1)
+	ld	l,(ix+4)
+	ld	h,(ix+5)
+	ld	e,(ix+6)
+	ld	d,(ix+7)
 	jr	l_am9511_fmax_callee_00103
 l_am9511_fmax_callee_00102:
-	ld	l, c
-	ld	h, b
+	ld	l,(ix+8)
+	ld	h,(ix+9)
+	ld	e,(ix+10)
+	ld	d,(ix+11)
 l_am9511_fmax_callee_00103:
-	ld	sp, ix
 	pop	ix
 	pop	bc
 	pop	af

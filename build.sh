@@ -47,6 +47,21 @@ case `uname -s` in                      # Insert default values for MAKE and INS
     MAKE="gmake"
     INSTALL="install"
     export INSTALL
+    if [ -z "$CC" ]; then                   # Insert default value for CC if CC is empty
+      CC="cc"
+      export CC
+    fi
+    ;;
+  Darwin)
+    if ! command -v gmake &> /dev/null
+    then
+        MAKE="make"
+        echo "Using gmake is recommended on MacOS"
+    else
+        MAKE="gmake"
+    fi
+    INSTALL="install"
+    export INSTALL
     ;;
   *)
     MAKE="make"
@@ -150,7 +165,6 @@ if [ -z "$CC" ]; then                   # Insert default value for CC if CC is e
   CC="gcc"
   export CC
 fi
-
 
 if [ -z "$CFLAGS" ]; then               # Insert default value for CFLAGS if CFLAGS is empty
   CFLAGS="-g -O2"

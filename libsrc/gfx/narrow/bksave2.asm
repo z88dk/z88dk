@@ -17,6 +17,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .bksave
 ._bksave
+.___bksave
     
     push    ix
     ld    hl,4   

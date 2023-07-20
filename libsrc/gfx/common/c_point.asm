@@ -5,6 +5,7 @@
     SECTION	  code_graphics
     PUBLIC    c_point
     PUBLIC    _c_point
+    PUBLIC    ___c_point
 
     EXTERN    c_pointxy
     EXTERN    swapgfxbk
@@ -14,6 +15,7 @@
 
 .c_point
 ._c_point
+.___c_point
 IF __CPU_INTEL__ | __CPU_GBZ80__
     pop    bc
     pop    hl

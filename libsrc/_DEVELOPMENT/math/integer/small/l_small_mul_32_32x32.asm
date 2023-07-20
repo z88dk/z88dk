@@ -5,7 +5,7 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN l_small_mul_32_16x16
+EXTERN l_mulu_32_16x16
 
 PUBLIC l_small_mul_32_32x32, l0_small_mul_32_32x32
 
@@ -24,14 +24,14 @@ l0_small_mul_32_16x16:
     push hl
     exx
     pop de
-    jp l_small_mul_32_16x16
+    jp l_mulu_32_16x16
 
 l_small_mul_32_32x32:
 
     ; multiplication of two 32-bit numbers into a 32-bit product
     ;
     ; enter : dehl = 32-bit multiplicand (more leading zeroes = better performance)
-    ;         dehl'= 32-bit multiplicand
+    ;         dehl'= 32-bit multiplier
     ;
     ; exit  : dehl = 32-bit product
     ;         carry reset
@@ -49,8 +49,7 @@ l_small_mul_32_32x32:
     xor a
     push hl
     exx
-    ld c,l
-    ld b,h
+    ld bc,hl
     pop hl
     push de
     ex de,hl
@@ -89,8 +88,7 @@ loop_1:
     sla e
     rl d
     exx
-    rl e
-    rl d
+    rl de
 
     djnz loop_0
 

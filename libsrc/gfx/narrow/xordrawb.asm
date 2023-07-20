@@ -5,11 +5,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  xordrawb
     PUBLIC  _xordrawb
+    PUBLIC  ___xordrawb
 
     EXTERN  asm_xordrawb
 
 .xordrawb
 ._xordrawb
+.___xordrawb
     push    ix
     ld      ix,2
     add     ix,sp

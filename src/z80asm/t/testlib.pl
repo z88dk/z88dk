@@ -13,7 +13,7 @@ $ENV{PATH} = join($Config{path_sep},
 			"../../bin",
 			$ENV{PATH});
 
-my $OBJ_FILE_VERSION = "16";
+my $OBJ_FILE_VERSION = "17";
 
 use vars '$test', '$null';
 $test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
@@ -33,6 +33,8 @@ sub check_bin_file {
 	
 	my $diff = diff(\$exp_hex, \$got_hex, {STYLE => 'Context'});
 	is $diff, "", "bin file $got_file ok";
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -45,6 +47,8 @@ sub check_text_file {
 	
 	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Context'});
 	is $diff, "", "text file $got_file ok";
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -72,6 +76,8 @@ sub z80asm_ok {
     run_ok("z88dk-z80asm $options $files 2> ${test}.stderr");
     check_bin_file($bin_file, $bin);
     check_text_file("${test}.stderr", $exp_warn) if $exp_warn;
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -88,6 +94,88 @@ sub z80asm_nok {
     $files ||= $asm_file;
 
     capture_nok("z88dk-z80asm $options $files", $exp_err);
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+}
+
+#------------------------------------------------------------------------------
+sub ticks {
+	my($source, $options) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+	spew("$test.asm", $source);
+	run_ok("z88dk-z80asm $options -b -l $test.asm");
+	
+	my $cpu = ($options =~ /(?:-m=?)(\S+)/) ? $1 : "z80";
+	$cpu = 'ez80_z80' if $cpu eq 'ez80';
+	run_ok("z88dk-ticks $test.bin -m$cpu -output $test.out");
+
+	my $bin = slurp("$test.out");
+	my $mem = substr($bin, 0, 0x10000); $mem =~ s/\0+$//;
+	my @mem = map {ord} split //, $mem;
+	my @regs = map {ord} split //, substr($bin, 0x10000);
+	my $ret = {
+		mem 	=> \@mem, 
+	};
+	$ret->{F} = shift @regs;	$ret->{F_S}  = ($ret->{F} & 0x80) ? 1 : 0;
+								$ret->{F_Z}  = ($ret->{F} & 0x40) ? 1 : 0;
+								$ret->{F_H}  = ($ret->{F} & 0x10) ? 1 : 0;
+								$ret->{F_PV} = ($ret->{F} & 0x04) ? 1 : 0;
+								$ret->{F_N}  = ($ret->{F} & 0x02) ? 1 : 0;
+								$ret->{F_C}  = ($ret->{F} & 0x01) ? 1 : 0;
+	$ret->{A} = shift @regs;
+	$ret->{C} = shift @regs;
+	$ret->{B} = shift @regs;	$ret->{BC} = ($ret->{B} << 8) | $ret->{C};
+	$ret->{L} = shift @regs;
+	$ret->{H} = shift @regs;	$ret->{HL} = ($ret->{H} << 8) | $ret->{L};
+	my $PCl = shift @regs;
+	my $PCh = shift @regs;		$ret->{PC} = ($PCh << 8) | $PCl;
+	my $SPl = shift @regs;
+	my $SPh = shift @regs;		$ret->{SP} = ($SPh << 8) | $SPl;
+	$ret->{I} = shift @regs;
+	$ret->{R} = shift @regs;
+	$ret->{E} = shift @regs;
+	$ret->{D} = shift @regs;	$ret->{DE} = ($ret->{D} << 8) | $ret->{E};
+	$ret->{C_} = shift @regs;
+	$ret->{B_} = shift @regs;	$ret->{BC_} = ($ret->{B_} << 8) | $ret->{C_};
+	$ret->{E_} = shift @regs;
+	$ret->{D_} = shift @regs;	$ret->{DE_} = ($ret->{D_} << 8) | $ret->{E_};
+	$ret->{L_} = shift @regs;
+	$ret->{H_} = shift @regs;	$ret->{HL_} = ($ret->{H_} << 8) | $ret->{L_};
+	$ret->{F_} = shift @regs;	$ret->{F__S}  = ($ret->{F_} & 0x80) ? 1 : 0;
+								$ret->{F__Z}  = ($ret->{F_} & 0x40) ? 1 : 0;
+								$ret->{F__H}  = ($ret->{F_} & 0x10) ? 1 : 0;
+								$ret->{F__PV} = ($ret->{F_} & 0x04) ? 1 : 0;
+								$ret->{F__N}  = ($ret->{F_} & 0x02) ? 1 : 0;
+								$ret->{F__C}  = ($ret->{F_} & 0x01) ? 1 : 0;
+	$ret->{A_} = shift @regs;
+	my $IYl = shift @regs;
+	my $IYh = shift @regs;		$ret->{IY} = ($IYh << 8) | $IYl;
+	my $IXl = shift @regs;
+	my $IXh = shift @regs;		$ret->{IX} = ($IXh << 8) | $IXl;
+	$ret->{IFF} = shift @regs;
+	$ret->{IM} = shift @regs;
+	my $MPl = shift @regs;
+	my $MPh = shift @regs;		$ret->{MP} = ($MPh << 8) | $MPl;
+	@regs == 8 or die;
+		
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+
+	return $ret;
+}
+
+sub parity {
+	my($a) = @_;
+	my $bits = 0;
+	$bits++ if $a & 0x80;
+	$bits++ if $a & 0x40;
+	$bits++ if $a & 0x20;
+	$bits++ if $a & 0x10;
+	$bits++ if $a & 0x08;
+	$bits++ if $a & 0x04;
+	$bits++ if $a & 0x02;
+	$bits++ if $a & 0x01;
+	return ($bits & 1) == 0 ? 1 : 0;
 }
 
 #------------------------------------------------------------------------------
@@ -97,6 +185,8 @@ sub capture_ok {
     
     run_ok($cmd." > ${test}.stdout");
     check_text_file("${test}.stdout", $exp_out);
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -106,6 +196,8 @@ sub capture_nok {
 
     run_nok($cmd." 2> ${test}.stderr");
     check_text_file("${test}.stderr", $exp_err);
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -115,6 +207,8 @@ sub run_ok {
 	
 	ok 1, "Running: $cmd";
     ok 0==system($cmd), $cmd;
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -124,6 +218,8 @@ sub run_nok {
 	
 	ok 1, "Running: $cmd";
     ok 0!=system($cmd), $cmd;
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -158,10 +254,11 @@ sub objfile {
 	if ($args{EXPR}) {
 		store_ptr(\$o, $expr_addr);
 		for (@{$args{EXPR}}) {
-			@$_ == 8 or die;
-			my($type, $filename, $line_nr, $section, $asmptr, $ptr, $target_name, $text) = @$_;
+			@$_ == 9 or die;
+			my($type, $filename, $line_nr, $section, $asmptr, $ptr, $opcode_size, 
+			   $target_name, $text) = @$_;
 			$o .= $type . pack_lstring($filename) . pack("V", $line_nr) .
-			        pack_lstring($section) . pack("vv", $asmptr, $ptr) .
+			        pack_lstring($section) . pack("VVV", $asmptr, $ptr, $opcode_size) .
 					pack_lstring($target_name) . pack_lstring($text);
 		}
 		$o .= "\0";
@@ -269,6 +366,8 @@ sub spew {
 	if ($open_ok) {
 		print $fh join('', @data);
 	}
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 #------------------------------------------------------------------------------
@@ -287,6 +386,8 @@ sub slurp {
 	else {
 		return "";
 	}
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 }
 
 1;

@@ -31,3 +31,10 @@ PUBLIC _bzero_callee
 defc _bzero_callee = bzero_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___bzero_callee
+defc ___bzero_callee = bzero_callee
+ENDIF
+

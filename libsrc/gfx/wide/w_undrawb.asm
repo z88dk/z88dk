@@ -4,10 +4,12 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  undrawb
     PUBLIC  _undrawb
+    PUBLIC  ___undrawb
     EXTERN  asm_undrawb
 
 .undrawb
 ._undrawb
+.___undrawb
     pop     af
     
     pop     de

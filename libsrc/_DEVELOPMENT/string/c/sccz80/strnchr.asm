@@ -47,3 +47,10 @@ PUBLIC _strnchr
 defc _strnchr = strnchr
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strnchr
+defc ___strnchr = strnchr
+ENDIF
+

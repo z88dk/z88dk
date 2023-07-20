@@ -29,7 +29,7 @@ using namespace std;
 			  'b\''   | 'c\''   | 'd\''   | 'e\''    | 'h\''   | 'l\''    | 'a\'' |
 			  'af\''  | 'bc\''  | 'de\''  | 'hl\''   |
 			  'ccf\'' | 'scf\'' | 'rra\'' | 'rrca\'' | 'rla\'' | 'rlca\'' |
-			  'ds.b'  | 'ds.w'  | 'ds.p'  | 'ds.q';
+			  'ds.b'  | 'ds.w'  | 'ds.p'  | 'ds.q' ;
 	bin		= [0-1];
 	oct		= [0-7];
 	dec		= [0-9];
@@ -45,10 +45,33 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 
+enum KeywordFlags {
+	KW_REG_8 		= 1 << 1,
+	KW_REG_IXY		= 1 << 2,
+	KW_Z80_LD_BIT 	= 1 << 3,
+};
+
 static unordered_map<string, Keyword> keyword_table = {
-#	define X(id, text)		{ text, Keyword::id },
+#	define X(id, text, flags)		{ text, Keyword::id },
 #	include "keyword.def"
 };
+
+static int keyword_flags[] = {
+#	define X(id, text, flags)		flags,
+#	include "keyword.def"
+};
+
+bool keyword_is_reg_8(Keyword keyword) { 
+	return keyword_flags[static_cast<int>(keyword)] & KW_REG_8; 
+}
+
+bool keyword_is_reg_ixy(Keyword keyword) { 
+	return keyword_flags[static_cast<int>(keyword)] & KW_REG_IXY; 
+}
+
+bool keyword_is_z80_ld_bit(Keyword keyword) { 
+	return keyword_flags[static_cast<int>(keyword)] & KW_Z80_LD_BIT; 
+}
 
 static int a2i(const char* str, int base) {
 	return (int)strtol(str, NULL, base);
@@ -388,8 +411,12 @@ void Lexer::set(const string& text) {
 							  continue; }
 
 			'.' ws* @p1 ident @p2 {
-							  if (first_token) {
-								  string str = ident_change_case(string(p1, p2));
+							  string str = ident_change_case(string(p1, p2));
+							  Keyword keyword = lu_keyword(str);
+							  if (keyword == Keyword::ASSUME) {
+							      m_tokens.emplace_back(TType::Ident, str, keyword);
+							  }
+							  else if (first_token) {
 								  m_tokens.emplace_back(TType::Label, str);
 							  }
 							  else {
@@ -410,7 +437,7 @@ void Lexer::set(const string& text) {
 								  if (keyword == Keyword::ASMPC)
 									  m_tokens.emplace_back(TType::ASMPC);
 								  else
-								  m_tokens.emplace_back(TType::Ident, str, keyword);
+								      m_tokens.emplace_back(TType::Ident, str, keyword);
 							  }
 							  m_tokens.back().col = col;
 							  continue; }

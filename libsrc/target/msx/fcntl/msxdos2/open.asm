@@ -14,6 +14,7 @@
 
 		PUBLIC	open
 		PUBLIC	_open
+		PUBLIC	___open
 
 		EXTERN	MSXDOS
 		EXTERN	msxdos_error
@@ -21,6 +22,7 @@
 ; char *name, int flags, mode_t mode)
 .open
 ._open
+.___open
 	push	ix
 	ld	ix,2
 	add	ix,sp

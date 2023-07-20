@@ -5,12 +5,14 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  plot
     PUBLIC  _plot
+    PUBLIC  ___plot
     
     EXTERN  asm_plot
 
     
 .plot
 ._plot
+.___plot
     pop     af    ; ret addr
     pop     hl    ; y
     pop     de    ; x

@@ -2,53 +2,22 @@
 ;
 
 
-		SECTION		code_clib
+    SECTION		code_clib
 
-		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
-		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_printc
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_attribute
-		PUBLIC		generic_console_xypos
+    PUBLIC		generic_console_cls
+    PUBLIC		generic_console_vpeek
+    PUBLIC		generic_console_scrollup
+    PUBLIC		generic_console_printc
+    PUBLIC		generic_console_xypos
 
-		EXTERN		generic_console_generic_console_xypos
-		EXTERN		conio_map_colour
-		EXTERN		__console_w
-		EXTERN		__console_h
-		EXTERN		__bee_custom_font
-		EXTERN		__bee_attr
+    EXTERN		generic_console_generic_console_xypos
+    EXTERN		conio_map_colour
+    EXTERN		__console_w
+    EXTERN		__console_h
+    EXTERN		__bee_custom_font
+    EXTERN		__bee_attr
 
-		defc		DISPLAY = 0xf000
-
-generic_console_set_attribute:
-	ret
-
-
-generic_console_set_paper:
-	call	conio_map_colour
-	rlca
-	rlca
-	rlca
-	rlca
-	and	@11110000
-	ld	c,a
-	ld	b,15
-set_attr:
-	ld	hl,__bee_attr
-	ld	a,(hl)
-	and	b
-	or	c
-	ld	(hl),a
-	ret
-	
-generic_console_set_ink:
-	call	conio_map_colour
-	and	15
-	ld	c,a
-	ld	b,240
-	jr	set_attr
+    defc		DISPLAY = 0xf000
 
 generic_console_cls:
 	ld	hl, DISPLAY
@@ -95,14 +64,14 @@ generic_console_printc:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
-	ld	a,e
-        call    generic_console_xypos
-        ld      d,(hl)
-	rra
-	call	nc,vpeek_unmap
-	ld	a,d
-        and     a
-        ret
+    ld	a,e
+    call    generic_console_xypos
+    ld      d,(hl)
+    rra
+    call	nc,vpeek_unmap
+    ld	a,d
+    and     a
+    ret
 
 ; Unmap characters:
 ; Need to handle 

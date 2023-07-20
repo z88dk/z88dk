@@ -31,3 +31,10 @@ IF __CLASSIC
 PUBLIC _strrstr_callee
 defc _strrstr_callee = strrstr_callee
 ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strrstr_callee
+defc ___strrstr_callee = strrstr_callee
+ENDIF
+

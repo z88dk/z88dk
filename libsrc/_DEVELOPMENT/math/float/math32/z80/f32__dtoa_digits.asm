@@ -47,12 +47,10 @@ PUBLIC m32__dtoa_digits
     push hl
     sla l
     rl h
-    rl e
-    rl d
+    rl de
     sla l
     rl h
-    rl e
-    rl d
+    rl de
     ex de,hl
     ex (sp),hl
     add hl,de
@@ -63,8 +61,7 @@ PUBLIC m32__dtoa_digits
     pop hl
     sla l
     rl h
-    rl e
-    rl d
+    rl de
 
     exx
     dec c                       ; significant digits --

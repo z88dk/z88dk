@@ -25,11 +25,11 @@ END
 capture_ok("z88dk-z80asm -x${test}plat1.lib ${test}plat1.asm ${test}gen.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<END);
-Library file ${test}plat1.lib at \$0000: Z80LMF16
-Object  file ${test}plat1.lib at \$0010: Z80RMF16
+Library file ${test}plat1.lib at \$0000: Z80LMF17
+Object  file ${test}plat1.lib at \$0010: Z80RMF17
   Name: ${test}plat1
 
-Object  file ${test}plat1.lib at \$0054: Z80RMF16
+Object  file ${test}plat1.lib at \$0054: Z80RMF17
   Name: ${test}gen
   Section "": 3 bytes
     C \$0000: 3E 01 C9
@@ -52,11 +52,11 @@ END
 capture_ok("z88dk-z80asm -x${test}plat2.lib ${test}plat2.asm ${test}gen.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<END);
-Library file ${test}plat1.lib at \$0000: Z80LMF16
-Object  file ${test}plat1.lib at \$0010: Z80RMF16
+Library file ${test}plat1.lib at \$0000: Z80LMF17
+Object  file ${test}plat1.lib at \$0010: Z80RMF17
   Name: ${test}plat1
 
-Object  file ${test}plat1.lib at \$0054: Z80RMF16
+Object  file ${test}plat1.lib at \$0054: Z80RMF17
   Name: ${test}gen
   Section "": 3 bytes
     C \$0000: 3E 01 C9

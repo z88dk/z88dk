@@ -206,7 +206,7 @@ expr_t* expr_new()
 
 	self->text = utstr_new();
 	self->type = '\0';
-	self->asmpc = self->patch_ptr = 0;
+	self->asmpc = self->code_pos = self->opcode_size = 0;
 	self->section = NULL;
 	self->target_name = utstr_new();
 
@@ -530,15 +530,31 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
 			expr->section = obj->sections;			// the first section
 
 		if (obj->version >= 3) {
-			expr->asmpc = xfread_word(fp);
+			if (obj->version >= 17)
+				expr->asmpc = xfread_dword(fp);
+			else
+				expr->asmpc = xfread_word(fp);
 
 			if (show_expr)
 				printf(" $%04X", expr->asmpc);
 		}
 
-		expr->patch_ptr = xfread_word(fp);
+		if (obj->version >= 17)
+			expr->code_pos = xfread_dword(fp);
+		else
+			expr->code_pos = xfread_word(fp);
+
 		if (show_expr)
-			printf(" $%04X: ", expr->patch_ptr);
+			printf(" $%04X", expr->code_pos);
+
+		if (obj->version >= 17) {
+			expr->opcode_size = xfread_dword(fp);
+
+			if (show_expr)
+				printf(" %d", expr->opcode_size);
+		}
+
+		printf(" ");
 
 		if (obj->version >= 6) {
 			if (obj->version >= 16)
@@ -665,8 +681,9 @@ static long objfile_write_exprs1(objfile_t* obj, FILE* fp, UT_string* last_filen
 			xfwrite_dword(expr->line_num, fp);				// source line number
 			xfwrite_wcount_str(expr->section->name, fp);	// section name
 
-			xfwrite_word(expr->asmpc, fp);					// ASMPC
-			xfwrite_word(expr->patch_ptr, fp);				// patchptr
+			xfwrite_dword(expr->asmpc, fp);					// ASMPC
+			xfwrite_dword(expr->code_pos, fp);				// code position
+			xfwrite_dword(expr->opcode_size, fp);			// opcode size
 			xfwrite_wcount_str(expr->target_name, fp);		// target symbol for expression
 			xfwrite_wcount_str(expr->text, fp);				// expression
 		}
@@ -1019,7 +1036,7 @@ static bool delete_merged_section(objfile_t* obj, section_t** p_merged_section,
 		DL_FOREACH_SAFE(section->exprs, expr, tmp_expr) {
 			// compute changed patch address
 			expr->asmpc += merged_base;
-			expr->patch_ptr += merged_base;
+			expr->code_pos += merged_base;
 
 			// move to merged_section
 			expr->section = merged_section;

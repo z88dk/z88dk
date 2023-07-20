@@ -1,0 +1,4 @@
+target/trs80/graphics/m2_swapgfxbk
+target/trs80/graphics/m2_textpixl3
+@gfx/text6/gfx_text6.lst
+@video/mc6845/mc6845.lst

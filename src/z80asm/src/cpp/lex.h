@@ -40,9 +40,13 @@ enum class TType {
 };
 
 enum class Keyword {
-#	define X(id, text)		id,
+#	define X(id, text, flags)		id,
 #	include "keyword.def"
 };
+
+bool keyword_is_reg_8(Keyword keyword);
+bool keyword_is_reg_ixy(Keyword keyword);
+bool keyword_is_z80_ld_bit(Keyword keyword);
 
 struct Token {
 	TType   ttype{ TType::End };

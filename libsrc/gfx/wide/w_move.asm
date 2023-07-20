@@ -9,6 +9,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC    move
     PUBLIC    _move
+    PUBLIC    ___move
     EXTERN    swapgfxbk
     EXTERN    __graphics_end
 
@@ -20,6 +21,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
 .move
 ._move
+.___move
     push    ix
     ld      ix,2
     add     ix,sp

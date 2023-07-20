@@ -4,6 +4,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  xorborder
     PUBLIC  _xorborder
+    PUBLIC  ___xorborder
     
     EXTERN  asm_xorborder
     
@@ -25,6 +26,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .xorborder
 ._xorborder
+.___xorborder
     push    ix
     ld      ix,2
     add     ix,sp

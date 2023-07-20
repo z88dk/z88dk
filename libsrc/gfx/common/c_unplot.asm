@@ -5,6 +5,7 @@
     SECTION code_graphics
      PUBLIC    c_unplot
      PUBLIC    _c_unplot
+     PUBLIC    ___c_unplot
      EXTERN    swapgfxbk
      EXTERN    __graphics_end
 
@@ -15,6 +16,7 @@
 
 .c_unplot
 ._c_unplot
+.___c_unplot
 IF __CPU_INTEL__ | __CPU_GBZ80__
     pop    bc
     pop    hl

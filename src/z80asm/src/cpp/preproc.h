@@ -108,6 +108,7 @@ private:
 	void parse_line(const string& line);
 	void do_label();
 	bool ifs_active();
+	bool symbol_defined(const string& name);
 
 	bool check_opcode(Keyword keyword, void (Preproc::* do_action)());
 	bool check_hash_directive(Keyword keyword, void (Preproc::* do_action)());
@@ -117,7 +118,9 @@ private:
 	bool check_macro();
 	bool check_macro_call();
 	bool check_reptx();
-
+	bool check_gbz80_opcodes();
+	bool check_z80_ld_bit_opcodes();
+	
 	void do_if();
 	void do_else();
 	void do_endif();

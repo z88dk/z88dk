@@ -50,3 +50,10 @@ PUBLIC _memset_wr
 defc _memset_wr = memset_wr
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memset_wr
+defc ___memset_wr = memset_wr
+ENDIF
+

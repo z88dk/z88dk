@@ -66,11 +66,11 @@ CTSET1:
 TAB1:
     DB      46H,28H,34H,56H ;40X24
     DB      1EH,02H,18H,1BH
-    DB      0,09H,49H,09H
-    DB      0,0,0,0,0,0
+    DB      0,09H,20H,09H
+    DB      0,0,0,0
 
 TAB2:
     DB      7EH,50H,5FH,5CH ;80X24
     DB      1EH,04H,18H,1BH
-    DB      0,09H,49H,09H
-    DB      0,0,0,0,0,0
+    DB      0,09H,20H,09H
+    DB      0,0,0,0

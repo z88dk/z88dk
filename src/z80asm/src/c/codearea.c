@@ -277,6 +277,7 @@ static int section_module_size(  Section1 *section, int module_id )
 
 int get_cur_module_start( void ) { return section_module_start( g_cur_section, g_cur_module ); }
 int get_cur_module_size(  void ) { return section_module_size(  g_cur_section, g_cur_module ); }
+int get_cur_opcode_size(void) { init_module(); return g_cur_section->opcode_size; }
 
 /*-----------------------------------------------------------------------------
 *   allocate the addr of each of the sections, concatenating the sections in

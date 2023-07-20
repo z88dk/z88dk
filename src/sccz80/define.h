@@ -368,8 +368,9 @@ struct gototab_s {
 #define CPU_R3K      8
 #define CPU_Z80N     16
 #define CPU_8080     32
-#define CPU_8085     34
+#define CPU_8085     64
 #define CPU_GBZ80    128
+#define CPU_EZ80_Z80 256
 
 #define CPU_RABBIT (CPU_R2KA|CPU_R3K)
 
@@ -378,6 +379,7 @@ struct gototab_s {
 #define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085)
 #define IS_GBZ80() (c_cpu == CPU_GBZ80)
 #define IS_Z80N() (c_cpu == CPU_Z80N)
+#define IS_EZ80() (c_cpu == CPU_EZ80_Z80)
 
 
 

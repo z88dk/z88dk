@@ -34,3 +34,19 @@
 	ld	e,1
 	call	generic_console_printc
 	ret
+
+	SECTION code_crt_init
+
+	EXTERN ansicolumns
+        EXTERN asm_bee_set_screenmode
+
+        ; If we're compiled with -clib=ansi40 then set screenmode to 1
+        ; else set to 0 (80column mode)
+        ld      c,0
+	ld	a,ansicolumns
+        cp      40
+        jr      nz,skip40
+        ld      c,2
+skip40:
+        ld      a,c
+        call    asm_bee_set_screenmode

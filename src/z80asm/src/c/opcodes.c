@@ -46,13 +46,6 @@ void add_opcode(int opcode)
 /* add opcode followed by jump relative offset expression */
 void add_opcode_jr(int opcode, Expr1 *expr)
 {
-	add_opcode_jr_n(opcode, expr, 0);
-}
-
-void add_opcode_jr_n(int opcode, struct Expr1* expr, int asmpc_offset)
-{
-	expr->asmpc += asmpc_offset;		// expr is assumed to be at asmpc+1; add offset if this is not true
-
 	if (option_speed()) {
 		switch (opcode) {
 		case Z80_JR:
@@ -121,6 +114,12 @@ void add_opcode_nn(int opcode, Expr1 *expr)
 	Pass2infoExpr(RANGE_WORD, expr);
 }
 
+/* add opcode followed by 24-bit expression */
+void add_opcode_nnn(int opcode, struct Expr1 *expr) {
+	add_opcode(opcode);
+	Pass2infoExpr(RANGE_PTR24, expr);
+}
+
 /* add opcode followed by big-endian 16-bit expression */
 void add_opcode_NN(int opcode, struct Expr1 *expr)
 {
@@ -142,6 +141,21 @@ void add_opcode_idx(int opcode, Expr1 *expr)
 		add_opcode(opcode);
 		Pass2infoExpr(RANGE_BYTE_SIGNED, expr);
 	}
+}
+
+/* add two (ix+d) and (ix+d+1) opcodes */
+void add_opcode_idx_idx1(int opcode0, int opcode1, struct Expr1* expr0) {
+	// build expr1 = 1+(expr)
+	UT_string* expr1_text;
+	utstring_new(expr1_text);
+	utstring_printf(expr1_text, "1+(%s)", expr0->text->data);
+
+	add_opcode_idx(opcode0, expr0);
+	struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
+	if (expr1) 
+		add_opcode_idx(opcode1, expr1);
+
+	utstring_free(expr1_text);
 }
 
 /* add opcode followed by IX/IY offset expression and 8 bit expression */

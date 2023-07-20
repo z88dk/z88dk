@@ -53,3 +53,10 @@ PUBLIC _memmove
 defc _memmove = memmove
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memmove
+defc ___memmove = memmove
+ENDIF
+

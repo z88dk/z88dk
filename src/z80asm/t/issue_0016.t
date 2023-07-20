@@ -4,7 +4,9 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-# cannot specify name of generated object file
+# Test https://github.com/z88dk/z88dk/issues/16
+# z80asm: cannot specify name of generated object file
+
 spew("$test.asm", <<END);
 		public test_function
 test_function:  ret
@@ -17,7 +19,7 @@ run_ok("z88dk-z80asm $test.asm");
 ok -f "$test.o", "$test.o exists";
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF16
+Object  file $test.o at \$0000: Z80RMF17
   Name: $test
   Section "": 2 bytes
     C \$0000: C9 C9
@@ -34,7 +36,7 @@ ok ! -f "$test.o", "no $test.o";
 ok -f "$test.dir/zcc0000.o", "$test.dir/zcc0000.o exists";
 
 capture_ok("z88dk-z80nm -a $test.dir/zcc0000.o", <<END);
-Object  file $test.dir/zcc0000.o at \$0000: Z80RMF16
+Object  file $test.dir/zcc0000.o at \$0000: Z80RMF17
   Name: zcc0000
   Section "": 2 bytes
     C \$0000: C9 C9

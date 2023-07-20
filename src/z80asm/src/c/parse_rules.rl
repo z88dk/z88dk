@@ -32,15 +32,16 @@ Define rules for a ragel-based parser.
 				add_opcode_##suffix((opcode), expr); \
 			} while(0)
 
-#define DO_stmt_jr( opcode)	_DO_stmt_(jr,  opcode)
-#define DO_stmt_n(  opcode)	_DO_stmt_(n,   opcode)
-#define DO_stmt_h(  opcode)	_DO_stmt_(h,   opcode)
-#define DO_stmt_n_0(opcode)	_DO_stmt_(n_0, opcode)
-#define DO_stmt_s_0(opcode)	_DO_stmt_(s_0, opcode)
-#define DO_stmt_d(  opcode)	_DO_stmt_(d,   opcode)
-#define DO_stmt_nn( opcode)	_DO_stmt_(nn,  opcode)
-#define DO_stmt_NN( opcode)	_DO_stmt_(NN,  opcode)
-#define DO_stmt_idx(opcode)	_DO_stmt_(idx, opcode)
+#define DO_stmt_jr( opcode)		_DO_stmt_(jr,		opcode)
+#define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
+#define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
+#define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
+#define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
+#define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
+#define DO_stmt_nn( opcode)		_DO_stmt_(nn,		opcode)
+#define DO_stmt_nnn( opcode)	_DO_stmt_(nnn,		opcode)
+#define DO_stmt_NN( opcode)		_DO_stmt_(NN,		opcode)
+#define DO_stmt_idx(opcode)		_DO_stmt_(idx,		opcode)
 
 #define DO_stmt_idx_n(opcode) \
 			do { \
@@ -51,11 +52,19 @@ Define rules for a ragel-based parser.
 			} while(0)
 
 #define DO_stmt_n_n(opcode) \
-			{ 	Expr1 *n2_expr = pop_expr(ctx); \
+			do { \
+			 	Expr1 *n2_expr = pop_expr(ctx); \
 				Expr1 *n1_expr = pop_expr(ctx); \
 				DO_STMT_LABEL(); \
 				add_opcode_n_n((opcode), n1_expr, n2_expr); \
-			}
+			} while(0)
+
+#define DO_stmt_idx_idx1(opcode0, opcode1) \
+			do { \
+			 	Expr1 *idx_expr = pop_expr(ctx); \
+				DO_STMT_LABEL(); \
+				add_opcode_idx_idx1((opcode0), (opcode1), idx_expr); \
+			} while(0)
 
 /*-----------------------------------------------------------------------------
 *   State Machine
@@ -571,6 +580,24 @@ Define rules for a ragel-based parser.
 		| label? _TK_CU_NOP _TK_NEWLINE @{
 			DO_STMT_LABEL();
 			add_copper_unit_nop();
+		}
+
+		/*---------------------------------------------------------------------
+		*   ez80
+		*--------------------------------------------------------------------*/
+
+		| _TK_ASSUME _TK_ADL _TK_EQUAL const_expr _TK_NEWLINE @{
+			if (option_cpu() != CPU_EZ80 && option_cpu() != CPU_EZ80_Z80)
+				error_illegal_ident();
+			else if (expr_error)
+				error_expected_const_expr();
+            else {
+                switch (expr_value) {
+                case 0: set_cpu_option(CPU_EZ80_Z80); break;
+                case 1: set_cpu_option(CPU_EZ80); break;
+                default: error_int_range(expr_value);
+                }
+            }
 		}
 
 		;

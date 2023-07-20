@@ -3,6 +3,7 @@
 
 		PUBLIC	write
 		PUBLIC	_write
+		PUBLIC	___write
                 EXTERN  MSXDOS
                 EXTERN  msxdos_error
 
@@ -10,6 +11,7 @@
 ; (fd, buf,len)
 .write
 ._write
+.___write
 	pop	af	;ret
 	pop	hl	;len
 	pop	de	;buf

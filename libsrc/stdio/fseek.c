@@ -72,12 +72,7 @@ call_trampoline:
 	ld	a,c		;a = whence
 	ld	c,l		;lower 16 bit of posn
 	ld	b,h
-IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(ix+fp_extra)
-ELSE
-	ld	l,(ix+fp_extra)
-	ld	h,(ix+fp_extra+1)
-ENDIF
 	ex	af,af
 	ld	a,__STDIO_MSG_SEEK
 	call	l_jphl

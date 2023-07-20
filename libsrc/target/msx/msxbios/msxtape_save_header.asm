@@ -3,11 +3,13 @@
 
 PUBLIC msxtape_save_header
 PUBLIC _msxtape_save_header
+PUBLIC ___msxtape_save_header
 
 EXTERN asm_msxtape_save_header
 
 .msxtape_save_header
 ._msxtape_save_header
+.___msxtape_save_header
 
 ;--------------------
 ;   in   BC=byte size

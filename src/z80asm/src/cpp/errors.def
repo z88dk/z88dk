@@ -8,6 +8,7 @@
 X(Ok, "ok")
 
 // files
+X(FileNotFound, "file not found")
 X(FileOpen, "file open")
 X(IncludeRecursion, "include recursion")
 X(NotLibFile, "not a library file")

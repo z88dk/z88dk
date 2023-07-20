@@ -17,6 +17,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC    stencil_render
     PUBLIC    _stencil_render
+    PUBLIC    ___stencil_render
     EXTERN    dither_pattern
     ;EXTERN    l_graphics_cmp
 
@@ -36,6 +37,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .stencil_render
 ._stencil_render
+.___stencil_render
     push    ix
     ld    ix,4
     add    ix,sp

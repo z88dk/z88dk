@@ -48,7 +48,7 @@ ok unlink("$dir/f1.o"),   "remove $dir/f1.o";
 
 unlink_testfiles;
 capture_nok("z88dk-z80asm -b -o${test}.bin ".quote_os("\@$dir/lib.lst"), <<END);
-$dir/lib.lst:1: error: file open: $dir/f1.asm
+$dir/lib.lst:1: error: file not found: $dir/f1.asm
   ^---- $dir/f1.asm
 END
 

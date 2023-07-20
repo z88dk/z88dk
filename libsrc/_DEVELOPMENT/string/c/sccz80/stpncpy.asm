@@ -46,3 +46,10 @@ PUBLIC _stpncpy
 defc _stpncpy = stpncpy
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___stpncpy
+defc ___stpncpy = stpncpy
+ENDIF
+

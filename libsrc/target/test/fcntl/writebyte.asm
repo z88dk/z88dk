@@ -8,9 +8,11 @@
 		INCLUDE	"target/test/def/test_cmds.def"
 		PUBLIC	writebyte
 		PUBLIC	_writebyte
+		PUBLIC	___writebyte
 
 .writebyte
 ._writebyte
+.___writebyte
 	pop	de
 	pop	hl
 	pop	bc

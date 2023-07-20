@@ -38,7 +38,7 @@ END
 capture_ok("z88dk-z80asm -l ${test}.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF17
   Name: ${test}
   Section rodata_driver: 257 bytes
     C \$0000: 55 C3 08 D8 C3 07 D8 AA C9 C9 00 00 00 00 00 00
@@ -69,7 +69,7 @@ Object  file ${test}.o at \$0000: Z80RMF16
     L C \$D807 CLEARBUF (section rodata_driver) (file ${test}.asm:16)
     L C \$D806 TESTING2 (section rodata_driver) (file ${test}.asm:14)
   Expressions:
-    E =  \$0001 \$0001: ENTRY := _cpm_bdos_head (section rodata_driver) (file ${test}.asm:5)
+    E =  \$0001 \$0001 0 ENTRY := _cpm_bdos_head (section rodata_driver) (file ${test}.asm:5)
 END
 
 unlink_testfiles;

@@ -6,11 +6,13 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
     PUBLIC  xorborder
     PUBLIC  _xorborder
+    PUBLIC  ___xorborder
 
     EXTERN  asm_xorborder
     
 .xorborder
 ._xorborder
+.___xorborder
     pop     af
     pop     de
     pop     hl

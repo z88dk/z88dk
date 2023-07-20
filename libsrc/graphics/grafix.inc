@@ -84,6 +84,13 @@ IF FORg800
     defc maxy    = 47    ; (a different "getmaxy" is provided for G800 and smaller ones)
 ENDIF
 
+IF FORh19
+    DEFINE gotgfx
+    defc maxx    = 80
+    defc maxy    = 72
+    defc    WANT_swapgfxbk = 0
+ENDIF
+
 IF FORabc80
     DEFINE gotgfx
     defc maxx    = 78
@@ -411,6 +418,12 @@ IF FORaquarius
     defc blankch    = 160
 ENDIF
 
+IF FORaqplus
+    DEFINE gotgfx
+    defc maxx    = 320
+    defc maxy    = 299
+ENDIF
+
 IF FORaq48
     DEFINE gotgfx
     defc maxx    = 80
@@ -476,6 +489,21 @@ IF FORtrs80
     defc maxy    = 48
     defc blankch    = 128
     defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORtrs80m2
+    DEFINE gotgfx
+    defc maxx    = 80
+    defc maxy    = 72
+    defc blankch    = 32
+    defc GFXTEXT3 = 1
+ENDIF
+
+IF FORtrs80m4
+    DEFINE gotgfx
+    defc maxx    = 160
+    defc maxy    = 72
+    defc blankch    = 128
 ENDIF
 
 IF FOReg2000
@@ -564,7 +592,7 @@ ENDIF
 
 IF FORalphatro
     DEFINE gotgfx
-    defc maxx    = 80
+    defc maxx    = 160
     defc maxy    = 72
     defc blankch    = 32
     defc    WANT_swapgfxbk = 0
@@ -801,12 +829,27 @@ IF FORtek
    DEFINE gotgfx
    defc maxx = 1024
    defc maxy = 768
+   defc    WANT_swapgfxbk = 0
 ENDIF
 
 IF FORregis
    DEFINE gotgfx
    defc maxx = 768
    defc maxy = 480
+ENDIF
+
+IF FORagon
+   DEFINE gotgfx
+   defc maxx = 1024
+   defc maxy = 768
+   defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORtim011
+   DEFINE gotgfx
+   defc maxx = 512
+   defc maxy = 256
+   defc    WANT_swapgfxbk = 0
 ENDIF
 
 ; Catch all to sort things out

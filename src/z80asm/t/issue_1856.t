@@ -4,8 +4,8 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-# z80asm: Can't generate labels with > 255 characters
 # https://github.com/z88dk/z88dk/issues/1856
+# z80asm: Can't generate labels with > 255 characters
 
 for my $len (255, 256, 1023, 1024, 8192) {
 #for my $len (255) {

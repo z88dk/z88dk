@@ -8,13 +8,23 @@
 
 IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION smc_clib
-    
+
+    EXTERN    pixeladdress
+
     PUBLIC    bkrestore
     PUBLIC    _bkrestore
-    EXTERN    pixeladdress
+    PUBLIC    bkrestore_fastcall
+    PUBLIC    _bkrestore_fastcall
 
 .bkrestore
 ._bkrestore
+    pop de
+    pop hl
+    push hl
+    push de
+
+.bkrestore_fastcall
+._bkrestore_fastcall
     push    ix
 ; __FASTCALL__ : sprite ptr in HL
     

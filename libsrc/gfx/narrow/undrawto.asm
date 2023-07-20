@@ -5,6 +5,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  undrawto
     PUBLIC  _undrawto
+    PUBLIC  ___undrawto
 
     EXTERN  asm_undrawto
 
@@ -12,6 +13,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .undrawto
 ._undrawto
+.___undrawto
     pop     af    ; ret addr
     pop     de    ; y2
     pop     hl

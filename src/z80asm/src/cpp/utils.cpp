@@ -8,17 +8,16 @@
 #include "utils.h"
 #include <regex>
 #include <set>
+#include <algorithm>
 
 string str_tolower(string str) {
-	for (auto& c : str)
-		c = tolower(c);
+    std::transform(str.begin(), str.end(), str.begin(), [](int c) {return c >= 0 ? tolower(c) : c; });
 	return str;
 }
 
 string str_toupper(string str) {
-	for (auto& c : str)
-		c = toupper(c);
-	return str;
+    std::transform(str.begin(), str.end(), str.begin(), [](int c) {return c >= 0 ? toupper(c) : c; });
+    return str;
 }
 
 static int char_digit(char c) {
@@ -94,13 +93,13 @@ string str_expand_escapes(const string& in) {
 		default:
 			if (c >= 0x20 && c < 0x7f)
 				out.push_back(c);
-			else if (c < 8)
+			else if (c >= 0 && c < 8)
 				out += "\\" + to_string(c);			// \o
 			else {
 				std::ostringstream ss;
 				ss << "\\x"
 					<< std::setfill('0') << std::setw(2)
-					<< std::hex << c << std::dec;
+					<< std::hex << static_cast<unsigned int>(c & 0xff) << std::dec;
 				out += ss.str();
 			}
 		}

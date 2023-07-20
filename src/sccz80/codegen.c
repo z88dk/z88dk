@@ -256,7 +256,7 @@ void outname(const char* sname, char pref)
 }
 
 
-void reset_namespace()
+void reset_namespace(void)
 {
     current_nspace = NULL;
 }
@@ -2650,7 +2650,7 @@ void mult(LVALUE* lval)
         break;
     case KIND_CHAR:
         if ( lval->ltype->isunsigned ) {
-            if (c_cpu == CPU_Z180 ) {
+            if (c_cpu == CPU_Z180 || IS_EZ80() ) {
                 ot("ld\th,e\n");
                 ot("mlt\thl\n");
                 break;
@@ -5326,7 +5326,7 @@ void gen_emit_line(int line)
 
 /* Prefix for assembler */
 
-void prefix()
+void prefix(void)
 {
     outbyte('.');
 }
@@ -5338,7 +5338,7 @@ void printlabel(int label)
 }
 
 /* Print a label suffix */
-void col()
+void col(void)
 {
     //outstr(":");
 }
@@ -5435,7 +5435,7 @@ void gen_pop_frame(void)
 }
 
 
-void gen_builtin_strcpy()
+void gen_builtin_strcpy(void)
 {
     int label;
     // hl holds src on entry, on stack= dest
@@ -5616,7 +5616,7 @@ void gen_intrinsic_in(SYMBOL *sym)
         return;
     }
     if (sym->type == KIND_PORT8 ) {
-        if ( c_cpu == CPU_Z180 ) {
+        if ( c_cpu == CPU_Z180 || IS_EZ80() ) {
             outstr("\tin0\tl,("); outname(sym->name, 1); outstr(")"); nl();
         } else {
             outstr("\tin\ta,("); outname(sym->name, 1); outstr(")"); nl();
@@ -5647,7 +5647,7 @@ void gen_intrinsic_out(SYMBOL *sym)
         return;
     }
     if (sym->type == KIND_PORT8 ) {
-        if ( c_cpu == CPU_Z180 ) {
+        if ( c_cpu == CPU_Z180 || IS_EZ80() ) {
             outstr("\tout0\t("); outname(sym->name, 1); outstr("),l"); nl();
         } else {
             ol("ld\ta,l");

@@ -14,8 +14,8 @@ z80_outp_callee:
    pop hl
    pop bc
    push af
-   
-   jp asm_z80_outp
+   out (c),l
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

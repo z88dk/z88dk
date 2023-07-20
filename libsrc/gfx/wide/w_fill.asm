@@ -15,6 +15,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
     PUBLIC    fill
     PUBLIC    _fill
+    PUBLIC    ___fill
 
     EXTERN    l_graphics_cmp
 
@@ -42,6 +43,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
 .fill
 ._fill
+.___fill
     pop bc
     pop de  ; y
     pop hl  ; x

@@ -37,8 +37,7 @@ PUBLIC asm_f16_mul10
     ld a,3                      ; exponent increase
     jr NC,no_carry
 
-    rr h                        ; shift if a carry
-    rr l
+    rr hl                       ; shift if a carry
     inc a                       ; and increment exponent
 
 .no_carry

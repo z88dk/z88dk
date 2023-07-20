@@ -6,12 +6,14 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     
     PUBLIC  xorcircle
     PUBLIC  _xorcircle
+    PUBLIC  ___xorcircle
 
     EXTERN  asm_xorcircle
 
 
 .xorcircle
 ._xorcircle
+.___xorcircle
     push    ix
     ld      ix,2
     add     ix,sp

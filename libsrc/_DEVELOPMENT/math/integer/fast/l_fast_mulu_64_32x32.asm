@@ -22,8 +22,7 @@ l_fast_mulu_64_32x32:
    ; uses  : af, bc, de, hl, bc', de', hl'
 
    xor a
-   ld c,l
-   ld b,h
+   ld bc,hl
    ld l,a
    ld h,a
    push de
@@ -58,11 +57,9 @@ loop_0:
 loop_1:
 
    exx
-   rr h
-   rr l
+   rr hl
    exx
-   rr h
-   rr l
+   rr hl
 
 start:
 
@@ -81,8 +78,7 @@ start:
    exx
    ex (sp),hl
    ld h,a
-   ld e,c
-   ld d,b
+   ld de,bc
    exx
    pop de
 

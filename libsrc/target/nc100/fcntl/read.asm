@@ -5,8 +5,10 @@
 		SECTION code_clib
 		PUBLIC read
 		PUBLIC _read
+		PUBLIC ___read
 .read
 ._read
+.___read
 		pop af
 		pop de
 		pop hl

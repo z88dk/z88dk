@@ -19,3 +19,16 @@ dzx0_turbo:
    push af
    
    jp asm_dzx0_turbo
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx0_turbo
+defc _dzx0_turbo = dzx0_turbo
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___dzx0_turbo
+defc ___dzx0_turbo = dzx0_turbo
+ENDIF
+

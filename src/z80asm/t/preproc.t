@@ -219,7 +219,7 @@ SKIP: {
     z80asm_nok("", "", <<'END_ASM', <<END_ERR);
         include "a\run\new\folder"
 END_ASM
-$test.asm:1: error: file open: a/run/new/folder
+$test.asm:1: error: file not found: a/run/new/folder
   ^---- include "a\\run\\new\\folder"
 END_ERR
 }

@@ -6,24 +6,34 @@
 ;        $Id: bkrestore.asm $
 ;
 
-        SECTION smc_video_vdp
-        
-        PUBLIC  bkrestore
-        PUBLIC  _bkrestore
-		
-        EXTERN  bkpixeladdress
+    SECTION smc_video_vdp
+    
+    
+    EXTERN  bkpixeladdress
 
-        EXTERN  l_tms9918_disable_interrupts
-        EXTERN  l_tms9918_enable_interrupts
-        EXTERN  swapgfxbk
-        EXTERN  __graphics_end
-        EXTERN  __tms9918_screen_mode
+    EXTERN  l_tms9918_disable_interrupts
+    EXTERN  l_tms9918_enable_interrupts
+    EXTERN  swapgfxbk
+    EXTERN  __graphics_end
+    EXTERN  __tms9918_screen_mode
 
-        INCLUDE "video/tms9918/vdp.inc"
+    INCLUDE "video/tms9918/vdp.inc"
 
+    PUBLIC    bkrestore
+    PUBLIC    _bkrestore
+    PUBLIC    bkrestore_fastcall
+    PUBLIC    _bkrestore_fastcall
 
 .bkrestore
 ._bkrestore
+    pop de
+    pop hl
+    push hl
+    push de
+
+.bkrestore_fastcall
+._bkrestore_fastcall
+
        ld      a,(__tms9918_screen_mode)
        cp      2
        jr      z,dorender

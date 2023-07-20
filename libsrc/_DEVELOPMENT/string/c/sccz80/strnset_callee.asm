@@ -23,3 +23,10 @@ PUBLIC _strnset_callee
 defc _strnset_callee = strnset_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strnset_callee
+defc ___strnset_callee = strnset_callee
+ENDIF
+

@@ -75,7 +75,7 @@ void Z80pass2(int start_errors)
 			{
 			case RANGE_JR_OFFSET:
 				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
-				value -= asmpc + 2;		/* get module PC at JR instruction */
+				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
 				if (value >= -128 && value <= 127)
 				{
@@ -198,6 +198,7 @@ bool Pass2infoExpr(range_t range, Expr1* expr)
 	{
 		expr->range = range;
 		expr->code_pos = get_cur_module_size();			/* update expression location */
+		expr->opcode_size = get_cur_opcode_size() + range_size(range);
 
 		if (list_is_on())
 			expr->listpos = expr->code_pos;

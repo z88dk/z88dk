@@ -16,3 +16,10 @@ PUBLIC _strnicmp
 defc _strnicmp = strnicmp
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strnicmp
+defc ___strnicmp = strnicmp
+ENDIF
+

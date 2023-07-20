@@ -5,6 +5,7 @@ IF !__CPU_GBZ80__ & !__CPU_INTEL__
     SECTION code_graphics
     PUBLIC  lscroll
     PUBLIC  _lscroll
+    PUBLIC  ___lscroll
 
     EXTERN  scroll_left
 
@@ -12,6 +13,7 @@ IF !__CPU_GBZ80__ & !__CPU_INTEL__
 
 .lscroll
 ._lscroll
+.___lscroll
     push    ix
     ld      ix,2
     add     ix,sp

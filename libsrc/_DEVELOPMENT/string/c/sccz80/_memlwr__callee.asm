@@ -29,3 +29,10 @@ PUBLIC __memlwr__callee
 defc __memlwr__callee = _memlwr__callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ____memlwr__callee
+defc ____memlwr__callee = _memlwr__callee
+ENDIF
+

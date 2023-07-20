@@ -19,3 +19,16 @@ dzx1_standard:
    push af
    
    jp asm_dzx1_standard
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx1_standard
+defc _dzx1_standard = dzx1_standard
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___dzx1_standard
+defc ___dzx1_standard = dzx1_standard
+ENDIF
+

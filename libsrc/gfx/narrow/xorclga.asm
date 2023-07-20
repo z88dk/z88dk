@@ -6,11 +6,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  xorclga
     PUBLIC  _xorclga
+    PUBLIC  ___xorclga
     
     EXTERN  asm_xorclga
     
 .xorclga
 ._xorclga
+.___xorclga
     push    ix
     ld      ix,2
     add     ix,sp

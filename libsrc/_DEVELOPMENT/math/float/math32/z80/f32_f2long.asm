@@ -34,8 +34,7 @@ m32_f2ulong:
 loop:
     srl d                       ;fill with 0
     rr e
-    rr h
-    rr l
+    rr hl
     inc a
     cp $7e + 32
     jr NZ,loop

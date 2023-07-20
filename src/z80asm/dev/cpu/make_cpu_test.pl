@@ -36,6 +36,7 @@ for my $ixiy ("", "_ixiy") {
 						}
 					}
 				}
+				
 				(my $bytes = join(' ', @bytes)) =~ s/\s+$//;
 				add($cpu, $asm, $bytes);
 			}
@@ -50,7 +51,9 @@ for my $ixiy ("", "_ixiy") {
 for my $cpu (@CPUS) {
 	@test = ();
 	
-	for my $asm (keys %{$all_opcodes{ALL}}) {
+	for my $asm (sort keys %{$all_opcodes{ALL}}) {
+		#say "$cpu\t$asm";
+
 		if (!exists $all_opcodes{$cpu}{$asm}) {
 			my $skip = 0;
 
@@ -64,9 +67,9 @@ for my $cpu (@CPUS) {
 				}
 			}
 
-            # special case: ld hl, sp+%u vs ld hl, sp+%s
-            $skip=1 if $asm =~ /ld hl, sp[+-]/;
-            			
+			# special case: ld hl, sp+%u vs ld hl, sp+%s
+			$skip = 1 if $asm =~ /ld hl, sp[+-]/;
+			
 			push @test, sprintf(" %-31s; Error", $asm) unless $skip;
 		}
 	}
@@ -78,18 +81,29 @@ for my $cpu (@CPUS) {
 
 sub add {
 	my($cpu, $asm, $bytes) = @_;
+	my @bytes = split ' ', $bytes;
+	
+	#say "$cpu\t$asm\t$bytes";
 	
 	# special case for intel: jr and djnz %j is converted to %m
 	if ($cpu =~ /^80/ && $asm =~ /^(jr|djnz)/) {
 		$asm =~ s/%j/%m/;
 	}
 	
-	if ($asm =~ /rst %c/) {
+	if ($asm =~ /rst(\.(s|sil|l|lis))? %c/) {
 		for my $c (0..8,0x10,0x18,0x20,0x28,0x30,0x38) {
 			my $asm1 = $asm =~ s/%c/$c/r;
 			$c *= 8 if $c < 8;
-			my $bytes1 = $bytes =~ s/%c/$c/r;
-			$bytes1 = sprintf("%02X", eval($bytes1));
+			my @bytes1;
+			for (split(' ', $bytes)) {
+				if (s/%c/$c/) {
+					push @bytes1, sprintf("%02X", eval($_)); 
+				}
+				else {
+					push @bytes1, $_;
+				}
+			}
+			my $bytes1 = join(' ', @bytes1);
 			
 			# rabit lacks these restarts
 			if ($cpu =~ /^r/ && ($c==0 || $c==8 || $c==0x30)) {	
@@ -105,13 +119,21 @@ sub add {
 			$all_opcodes{ALL}{$asm1} = 1;
 		}
 	}
+	elsif ($asm =~ /^ldh .*\(c\)/) {
+		add($cpu, $asm =~ s/\(c\)/( c )/r, $bytes);	# ( c ) to break recursion
+		add($cpu, $asm =~ s/ldh /ld /r =~ s/\(c\)/(0xff00+c)/r, $bytes);
+	}
+	elsif ($asm =~ /^ldh .*\(%h\)/) {
+		add($cpu, $asm =~ s/\(%h\)/( %h )/r, $bytes);	# ( %h ) to break recursion
+		add($cpu, $asm =~ s/ldh /ld /r =~ s/\(%h\)/(0xff00+%h)/r, $bytes);
+	}
 	elsif ($asm =~ /%d/) {
-		my $asm1 = $asm =~ s/\+%d/+127/r;
-		my $bytes1 = $bytes =~ s/%d/7F/r;
+		my $asm1 = $asm =~ s/\+%d/+126/r;
+		my $bytes1 = $bytes =~ s/%d/7E/r =~ s/%D/7F/r;
 		add($cpu, $asm1, $bytes1);
 		
 		$asm1 = $asm =~ s/\+%d/-128/r;
-		$bytes1 = $bytes =~ s/%d/80/r;
+		$bytes1 = $bytes =~ s/%d/80/r =~ s/%D/81/r;
 		add($cpu, $asm1, $bytes1);
 	}
 	elsif ($asm =~ /%u/) {
@@ -162,19 +184,28 @@ sub add {
 		add($cpu, $asm1, $bytes1);
 	}
 	elsif ($asm =~ /%m/) {
-		my $asm1 = $asm =~ s/%m/-32768/r;
-		my $bytes1 = $bytes =~ s/%m/00/r;
+		my $asm1 = $asm =~ s/%m/0x123456/r;
+		my $bytes1 = $bytes =~ s/%m/56/r;
+		$bytes1 = $bytes1 =~ s/%m/34/r;
+		$bytes1 = $bytes1 =~ s/%m/12/r;
+		add($cpu, $asm1, $bytes1);
+
+		$asm1 = $asm =~ s/%m/-32768/r;
+		$bytes1 = $bytes =~ s/%m/00/r;
 		$bytes1 = $bytes1 =~ s/%m/80/r;
+		$bytes1 = $bytes1 =~ s/%m/FF/r;
 		add($cpu, $asm1, $bytes1);
 		
 		$asm1 = $asm =~ s/%m/32767/r;
 		$bytes1 = $bytes =~ s/%m/FF/r;
 		$bytes1 = $bytes1 =~ s/%m/7F/r;
+		$bytes1 = $bytes1 =~ s/%m/00/r;
 		add($cpu, $asm1, $bytes1);
 		
 		$asm1 = $asm =~ s/%m/65535/r;
 		$bytes1 = $bytes =~ s/%m/FF/r;
 		$bytes1 = $bytes1 =~ s/%m/FF/r;
+		$bytes1 = $bytes1 =~ s/%m/00/r;
 		add($cpu, $asm1, $bytes1);
 	}
 	elsif ($asm =~ /%M/) {
@@ -195,7 +226,8 @@ sub add {
 	}
 	elsif ($asm =~ /%j/) {
 		my $asm1 = $asm =~ s/%j/ASMPC/r;
-		my $bytes1 = $bytes =~ s/%j/FE/r;
+		my $dist = @bytes==3 ? "FD" : "FE";
+		my $bytes1 = $bytes =~ s/%j/$dist/r;
 		add($cpu, $asm1, $bytes1);
 	}
 	elsif ($asm =~ /%c/) {

@@ -74,7 +74,7 @@ src/c/parse.o: src/c/parse.c
 .PHONY: z80asm_lib
 all: z80asm_lib
 
-z80asm_lib:
+z80asm_lib: $(PROJ)$(EXESUFFIX)
 ifeq ($(CROSS),0)
 	$(MAKE) -C dev/z80asm_lib
 	cp dev/z80asm_lib/$(PROJ)-*.lib .
@@ -89,31 +89,36 @@ clean::
 
 #------------------------------------------------------------------------------
 # developer generated source files, and test libs
+# only run with RUN_RAGEL=1 to fix #2332 Build fails on cygwin
 #------------------------------------------------------------------------------
 .PHONY: dev
 dev:
 	perl asmstyle.pl dev/z80asm_lib/*.asm
-	$(MAKE) all
+	$(MAKE) RUN_RAGEL=1 all
 
 # ragel parser generator
 dev: src/c/scan_rules.h
 
 src/c/scan_rules.h: src/c/scan_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile 
+ifeq ($(RUN_RAGEL),1)
 	perl parse_ragel.pl src/c/scan_rules.rl
-	dos2unix -q src/c/scan_rules.h
+	dos2unix src/c/scan_rules.h 2> /dev/null
+endif
 	
 dev: src/c/parse_rules.h
 
 src/c/parse_rules.h: src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile \
 				dev/cpu/cpu_rules.h
+ifeq ($(RUN_RAGEL),1)
 	perl parse_ragel.pl src/c/parse_rules.rl
-	dos2unix -q src/c/parse_rules.h
+	dos2unix src/c/parse_rules.h 2> /dev/null
+endif
 
 src/c/tokens.h : make_tokens.pl Makefile
 	perl make_tokens.pl > src/c/tokens.h
-	dos2unix -q src/c/tokens.h
+	dos2unix src/c/tokens.h 2> /dev/null
 
 # opcode tables generator
 dev: dev/cpu/opcodes.yaml \
@@ -122,23 +127,23 @@ dev: dev/cpu/opcodes.yaml \
 	 dev/cpu/cpu_rules.h
 
 dev/cpu/opcodes.yaml: dev/cpu/make_opcodes.pl Makefile
-	cd dev/cpu && perl make_opcodes.pl && dos2unix -q opcodes.yaml
+	cd dev/cpu && perl make_opcodes.pl && dos2unix opcodes.yaml 2> /dev/null
 
 dev/cpu/opcodes.txt: dev/cpu/opcodes.yaml dev/cpu/dump_opcodes.pl Makefile
-	cd dev/cpu && perl dump_opcodes.pl && dos2unix -q opcodes.txt
+	cd dev/cpu && perl dump_opcodes.pl && dos2unix opcodes.txt 2> /dev/null
 
 dev/cpu/cpu_test_z80_ok.asm: dev/cpu/opcodes.yaml dev/cpu/make_cpu_test.pl Makefile
-	cd dev/cpu && perl make_cpu_test.pl && dos2unix -q cpu_test_*.asm
+	cd dev/cpu && perl make_cpu_test.pl && dos2unix cpu_test_*.asm 2> /dev/null
 
 dev/cpu/cpu_rules.h: dev/cpu/opcodes.yaml dev/cpu/make_cpu_rules.pl Makefile
-	cd dev/cpu && perl make_cpu_rules.pl && dos2unix -q cpu_rules.h
+	cd dev/cpu && perl make_cpu_rules.pl && dos2unix cpu_rules.h 2> /dev/null
 
 # reloc routine
 dev: src/c/reloc_code.c
 
 src/c/reloc_code.c: dev/reloc_code.asm dev/make_reloc_code.pl Makefile
-	cd dev && perl make_reloc_code.pl && dos2unix -q reloc_code.[ch] && \
-		mv -f reloc_code.[ch] ../src/c/
+	cd dev && perl make_reloc_code.pl && dos2unix reloc_code.[ch] 2> /dev/null && \
+		mv -f reloc_code.[ch] ../src/c/ 
 
 # re2c
 define MAKE_RE2C
@@ -146,7 +151,7 @@ dev: $(1).o
 
 $(1).cpp: $(1).re Makefile
 	$(RE2C) -o $(1).cpp $(1).re
-	dos2unix -q $(1).cpp
+	dos2unix $(1).cpp 2> /dev/null
 endef
 
 $(eval $(call MAKE_RE2C,src/cpp/lex))
@@ -171,23 +176,17 @@ clean::
 	$(RM) -rf Debug Release x1 x2 x3
 	$(RM) $(OBJS) $(TEST_SRC_LIB:.c=.o)
 
-#all:
-#	perl dev/cpu2/cpu.pl
-
 test: $(PROJ)$(EXESUFFIX) z80asm_lib
+	perl -S prove --state=slow,save -j9 t/*.t
+
+testdev: $(PROJ)$(EXESUFFIX)
 	$(MAKE) dev
 	$(MAKE) z80asm_lib
-	$(MAKE) prove_perl
-
-testdev: test
 	$(MAKE) -C dev/z80asm_lib test
-	perl dev/cpu2/cpu.pl -s test
+	$(MAKE) test
 
 testlib:
 	$(MAKE) -C lib test
-
-prove_perl: $(PROJ)$(EXESUFFIX)
-	perl -S prove --state=slow,save -j9 t/*.t
 
 clean::
 	$(RM) zcc_opt.def zcc_proj.lst

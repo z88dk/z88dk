@@ -1,13 +1,29 @@
+SECTION   code_fp_math32
+PUBLIC    fabs
+EXTERN    _m32_fabsf
 
-	SECTION	code_fp_math32
-	PUBLIC	fabs
-	EXTERN	m32_fabs_fastcall
+IFNDEF __CLASSIC
+defc   fabs = _m32_fabsf
+ELSE
 
-	defc	fabs = m32_fabs_fastcall
+; Classic has a non-fastcall implementation
+
+fabs:
+    pop bc
+    pop hl
+    pop de
+    push de
+    push hl
+    push bc
+    jp _m32_fabsf
 
 ; SDCC bridge for Classic
-IF __CLASSIC
 PUBLIC _fabs
-defc _fabs = m32_fabs_fastcall
-ENDIF
+defc _fabs = fabs
 
+
+; Clang bridge for Classic
+PUBLIC _fabsf
+defc _fabsf = fabs
+
+ENDIF

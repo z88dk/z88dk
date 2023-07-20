@@ -14,10 +14,12 @@ IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
     SECTION code_clib
     PUBLIC	set_psg
     PUBLIC	_set_psg
+    PUBLIC	___set_psg
     EXTERN  asm_set_psg	
 
 set_psg:
 _set_psg:
+___set_psg:
 
 	pop	bc
 	pop	de

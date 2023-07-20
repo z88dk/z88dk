@@ -17,6 +17,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC    putsprite
     PUBLIC    _putsprite
+    PUBLIC    ___putsprite
 
     EXTERN    plot
     EXTERN    unplot
@@ -27,6 +28,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .putsprite
 ._putsprite
+.___putsprite
 
        ld     hl,2   
        add    hl,sp

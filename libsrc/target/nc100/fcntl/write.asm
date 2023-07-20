@@ -5,8 +5,10 @@
 		SECTION code_clib
 		PUBLIC write
 		PUBLIC _write
+		PUBLIC ___write
 
 ._write
+.___write
 .write		pop af
 		pop de
 		pop hl

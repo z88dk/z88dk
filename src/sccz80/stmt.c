@@ -51,7 +51,7 @@ static int incritical = 0;  /* Are we in a __critical block */
  * this routine performs that statement
  * and returns a number telling which one
  */
-int statement()
+int statement(void)
 {
     int st;
     int locstatic; /* have we had the static keyword */
@@ -211,7 +211,7 @@ int statement()
  *
  * called whenever syntax requires a semicolon
  */
-void ns()
+void ns(void)
 {
     if (cmatch(';') == 0)
         errorfmt("Expected ';'",1);
@@ -222,7 +222,7 @@ void ns()
  *
  * allow any number of statements to fall between "{}"
  */
-void compound()
+void compound(void)
 {
     SYMBOL* savloc;
 
@@ -253,7 +253,7 @@ void compound()
  *    to combine C and asm compactly and efficiently requires
  *     this sort of extension (much like return_c/_nc
  */
-void doiferror()
+void doiferror(void)
 {
     int flab1, flab2;
     flab1 = getlabel(); /* Get label for false branch */
@@ -278,7 +278,7 @@ void doiferror()
 /*
  *              "if" statement
  */
-void doif()
+void doif(void)
 {
     int flab1, flab2;
     int testtype;
@@ -333,7 +333,7 @@ void doif()
 /*
  * perform expression (including commas)
  */
-Type *doexpr()
+Type *doexpr(void)
 {
     char *before, *start;
     zdouble val;
@@ -353,7 +353,7 @@ Type *doexpr()
 /*
  *      "while" statement
  */
-void dowhile()
+void dowhile(void)
 {
     WHILE_TAB wq; /* allocate local queue */
     t_buffer  *buf;
@@ -381,7 +381,7 @@ void dowhile()
 /*
  * "do - while" statement
  */
-void dodo()
+void dodo(void)
 {
     WHILE_TAB wq;
     int top;
@@ -407,7 +407,7 @@ void dodo()
 /*
  * "for" statement (zrin)
  */
-void dofor()
+void dofor(void)
 {
     WHILE_TAB wq;
     int l_condition;
@@ -475,7 +475,7 @@ void dofor()
 /*
  * "switch" statement
  */
-void doswitch()
+void doswitch(void)
 {
     WHILE_TAB wq;
     int endlab, swact, swdef;
@@ -525,7 +525,7 @@ void doswitch()
 /*
  * "case" statement
  */
-void docase()
+void docase(void)
 {
     double value;
     Kind   valtype;
@@ -544,7 +544,7 @@ void docase()
     ++swnext;
 }
 
-void dodefault()
+void dodefault(void)
 {
     if (swactive) {
         if (swdefault)
@@ -598,7 +598,7 @@ void doreturn(char type)
 /*
  *      "break" statement
  */
-void dobreak()
+void dobreak(void)
 {
     WHILE_TAB* ptr;
 
@@ -612,7 +612,7 @@ void dobreak()
 /*
  *      "continue" statement
  */
-void docont()
+void docont(void)
 {
     WHILE_TAB* ptr;
 
@@ -696,7 +696,7 @@ void doasmfunc(char wantbr)
  *      passed intact through parser
  */
 
-void doasm()
+void doasm(void)
 {
     cmode = 0; /* mark mode as "asm" */
 
@@ -730,7 +730,7 @@ static void set_section(char **dest_section)
 }
 
 /* #pragma statement */
-void dopragma()
+void dopragma(void)
 {
     blanks();
     if (amatch("proto"))
@@ -768,7 +768,7 @@ void dopragma()
     }
 }
 
-static void dostaticassert() 
+static void dostaticassert(void) 
 {
     Kind   valtype;
     double val;

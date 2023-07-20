@@ -22,3 +22,11 @@ ELSE
 ENDIF
 
    jp asm_dzx0_smart_rcs_back
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx0_smart_rcs_back_callee
+defc _dzx0_smart_rcs_back_callee = dzx0_smart_rcs_back_callee
+ENDIF
+
+

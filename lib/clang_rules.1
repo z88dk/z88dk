@@ -1,0 +1,320 @@
+	section	.text,%1
+=
+	SECTION	code_compiler
+
+	section	.rodata,%1
+=
+	SECTION rodata_compiler
+
+	section	.bss,%1
+=
+	SECTION bss_compiler
+
+	section	.data,%1
+=
+	SECTION data_compiler
+
+	section	.data.%2,%1
+=
+	SECTION data_compiler
+
+	assume	adl = 1
+=
+
+	db	"%1"%2
+=
+	defb	%defb(%1)%2
+
+	dd	%1
+=
+	defq	%1
+
+	rb	%1
+=
+	defs	%1
+
+	db	%1 dup %2
+=
+	defs	%1,%2
+
+	dw	%1
+=
+	defw	%1
+
+;;
+;; Generation of a builtin memcpy
+;;
+
+%1_memcpy
+=
+%1___memcpy_stdc
+
+%1_memmove
+=
+%1___memmove_stdc
+
+;;
+;; Unnecessary directives
+;;
+
+	private	%1
+=
+
+	ident	%1
+=
+
+
+;;
+;; Change local static references
+;;
+
+%1_%2.%3
+=
+%1_%2_%3
+
+%1_%2.%3.%4
+=
+%1_%2_%3_%4
+
+;;
+;; function labels
+;;
+
+_%1:%2
+_%1$local:%3
+=
+_%1:%2
+
+;;
+;; Static labels
+;;
+
+_%2.%1:
+=
+_%2_%1:
+
+_%3.%2.%1:
+=
+_$3_%2_%1:
+
+;;
+;; Store + load of local temporary
+;;
+
+	ld	(i%3 - %1), l
+	ld	(i%3 - %2), h
+	ld	l, (i%3 - %1)
+	ld	h, (i%3 - %2)
+=
+	ld	(i%3 - %1), l
+	ld	(i%3 - %2), h
+
+%eval 1 = %1 %2 -
+	ld	l, (i%3 - %1)
+	ld	h, (i%3 - %2)
+=
+	ld	hl, (i%3 - %1)
+
+%eval 1 = %2 %1 -
+	ld	l, (i%3 + %1)
+	ld	h, (i%3 + %2)
+=
+	ld	hl, (i%3 + %1)
+
+%eval 1 = %1 %2 -
+	ld	(i%3 - %1), l
+	ld	(i%3 - %2), h
+=
+	ld	(i%3 - %1), hl
+
+%eval 1 = %2 %1 -
+	ld	(i%3 + %1), l
+	ld	(i%3 + %2), h
+=
+	ld	(i%3 + %1), hl
+
+%eval 1 = %1 %2 -
+	ld	c, (i%3 - %1)
+	ld	b, (i%3 - %2)
+=
+	ld	bc, (i%3 - %1)
+
+%eval 1 = %1 %2 -
+	ld	(i%3 - %1), c
+	ld	(i%3 - %2), b
+=
+	ld	(i%3 - %1), bc
+
+%eval 1 = %2 %1 -
+	ld	(i%3 + %1), c
+	ld	(i%3 + %2), b
+=
+	ld	(i%3 + %1), bc
+
+%eval 1 = %2 %1 -
+	ld	c, (i%3 + %1)
+	ld	b, (i%3 + %2)
+=
+	ld	bc, (i%3 + %1)
+
+%eval 1 = %1 %2 -
+	ld	e, (i%3 - %1)
+	ld	d, (i%3 - %2)
+=
+	ld	de, (i%3 - %1)
+
+%eval 1 = %2 %1 -
+	ld	e, (i%3 + %1)
+	ld	d, (i%3 + %2)
+=
+	ld	de, (i%3 + %1)
+
+%eval 1 = %1 %2 -
+	ld	(i%3 - %1), e
+	ld	(i%3 - %2), d
+=
+	ld	(i%3 - %1), de
+
+%eval 1 = %2 %1 -
+	ld	(i%3 + %1), e
+	ld	(i%3 + %2), d
+=
+	ld	(i%3 + %1), de
+
+%title Cleanup loading iy 
+%notcpu ez80
+	push	hl
+	ld	hl, (i%4 %3 %1)
+	ex	(sp), hl
+	pop	iy
+	ld	hl, (%2)
+=
+	ld	hl, (i%4 %3 %1)
+	push	hl
+	pop	iy
+	ld	hl, (%2)
+
+%cpu ez80
+	push	hl
+	ld	hl, (i%4 %3 %1)
+	ex	(sp), hl
+	pop	iy
+=
+	ld	iy, (i%4 %3 %1)
+
+%title Load of iy copying hl constant
+%check -65535 <= %1 <= 65535
+	ld	hl, %1
+	ex	de, hl
+	ld	iyl, e
+	ld	iyh, d
+	ex	de, hl
+=
+	ld	hl, %1
+	ld	iy, %1
+
+%title Inline 32 bit constant addition
+%check -65535 <= %3 <= 65535
+%check -65535 <= %4 <= 65535
+	ld	hl, %1
+	ld	de, %2
+	ld	bc, %3
+	ld	iy, %4
+	call	__ladd
+=
+	ld	hl, %1
+	ld	de, %2
+	ld	bc, %3
+	add	hl, bc
+	ex	de, hl
+	ld	bc, %4
+	adc	hl, bc
+	ex	de, hl
+
+%title Declare displacement
+	ld	(i%"x|y"1), %2
+=
+	ld	(i%1 + 0), %2
+
+%title Declare displacement
+	ld	%2, (i%"x|y"1)
+=
+	ld	%2, (i%1 + 0)
+
+
+%title Remove duplicate push/pop
+	push	af
+	ld	a, ixl
+	ld	iyl, a
+	pop	af
+	push	af
+	ld	a, ixh
+	ld	iyh, a
+	pop	af
+=
+	push	af
+	ld	a, ixl
+	ld	iyl, a
+	ld	a, ixh
+	ld	iyh, a
+	pop	af
+
+%check -128 <= %1 <= 126
+%cpu ez80
+	ld	ix, 0
+	add	ix, sp
+	ld	hl, %1
+	add	hl, sp
+	ld	sp, hl
+=
+	ld	ix, 0
+	add	ix, sp
+	lea	hl, ix %1
+	ld	sp, hl
+
+%cpu ez80
+	push	iy
+	ex	(sp), hl
+	ld	(i%1 %2 %3), hl
+	pop	hl
+=
+	ld	(i%1 %2 %3), iy
+
+%cpu ez80
+	ld	e, (hl)
+	inc	hl
+	ld	d, (hl)
+	dec	hl
+=
+	ld	de, (hl)
+
+%cpu ez80
+	ex	de, hl
+	lea	de, %1
+	ex	de, hl
+=
+	lea	hl, %1
+
+%cpu ez80
+	ld	e, i%1l
+	ld	d, i%"x|y"1h
+=
+	lea	de, i%1 + 0
+
+%cpu ez80
+	push	de
+	ld	e, (hl)
+	inc	hl
+	ld	d, (hl)
+	ex	de, hl
+	pop	de
+=
+	ld	hl, (hl)
+
+%cpu ez80
+	ld	a, ixl
+	ld	iyl, a	;
+	ld	a, ixh
+	ld	iyh, a
+=
+	lea	iy, ix + 0

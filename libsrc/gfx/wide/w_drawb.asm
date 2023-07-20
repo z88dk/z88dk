@@ -3,11 +3,13 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  drawb
     PUBLIC  _drawb
+    PUBLIC  ___drawb
     EXTERN  asm_drawb
 
     
 .drawb
 ._drawb
+.___drawb
 
     pop     af
     

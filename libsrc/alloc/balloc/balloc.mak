@@ -9,7 +9,11 @@ BALLOC_NEWLIB_TARGETS := alloc/balloc/obj/newlib-z80-alloc-balloc alloc/balloc/o
 
 BALLOC_OBJECTS = $(BALLOC_CFILES:.c=.o) $(BALLOC_AFILES:.asm=.o)
 
-BALLOC_OBJS = $(addprefix alloc/balloc/obj/z80/, $(BALLOC_OBJECTS)) $(addprefix alloc/balloc/obj/r2k/,$(BALLOC_OBJECTS)) $(addprefix alloc/balloc/obj/ixiy/,$(BALLOC_OBJECTS))  $(addprefix alloc/balloc/obj/z80n/,$(BALLOC_OBJECTS))
+BALLOC_OBJS = $(addprefix alloc/balloc/obj/z80/, $(BALLOC_OBJECTS)) \
+	$(addprefix alloc/balloc/obj/r2k/,$(BALLOC_OBJECTS)) \
+	$(addprefix alloc/balloc/obj/ixiy/,$(BALLOC_OBJECTS)) \
+	$(addprefix alloc/balloc/obj/z80n/,$(BALLOC_OBJECTS)) \
+	$(addprefix alloc/balloc/obj/ez80_z80/,$(BALLOC_OBJECTS))
 
 
 OBJS += $(BALLOC_OBJS) $(BALLOC_NEWLIB_TARGETS)
@@ -25,6 +29,7 @@ $(eval $(call buildbit,alloc/balloc,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,alloc/balloc,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,alloc/balloc,r2k,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,alloc/balloc,z80n,test,-clib=z80n,-mz80n))
+$(eval $(call buildbit,alloc/balloc,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 
 
 alloc/balloc/obj/newlib-z80-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)

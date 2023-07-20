@@ -4,7 +4,7 @@ SECTION code_math
 
 PUBLIC l_small_divs_32_32x32, l0_small_divs_32_32x32
 
-EXTERN l_neg_dehl, l0_small_divu_32_32x32, error_divide_by_zero_mc
+EXTERN l_neg_dehl, l0_divu_32_32x32, error_divide_by_zero_mc
 
    ; alternate entry to swap dividend / divisor
    
@@ -62,7 +62,7 @@ l0_small_divs_32_32x32:
 
    ; perform unsigned division
 
-   call l0_small_divu_32_32x32
+   call l0_divu_32_32x32
 
    ; dehl = unsigned quotient
    ; dehl'= unsigned remainder

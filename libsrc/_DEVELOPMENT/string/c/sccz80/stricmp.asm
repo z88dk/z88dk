@@ -16,3 +16,10 @@ PUBLIC _stricmp
 defc _stricmp = stricmp
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___stricmp
+defc ___stricmp = stricmp
+ENDIF
+

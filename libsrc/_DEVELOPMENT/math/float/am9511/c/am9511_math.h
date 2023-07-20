@@ -79,8 +79,9 @@ float am9511_exp10 (float x) __z88dk_fastcall;
 float ceil (float x) __z88dk_fastcall;
 float fabs (float x) __z88dk_fastcall;
 float floor (float x) __z88dk_fastcall;
-float fmax(float x,float y);
-float fmin(float x,float y);
+float fmax (float x,float y);
+float fmin (float x,float y);
+float fmod (float x, float y);
 
 /* Intrinsic functions */
 float mul2 (float a) __z88dk_fastcall;
@@ -123,8 +124,9 @@ float am9511_exp10 (float x) __z88dk_fastcall;
 float ceil (float x) __z88dk_fastcall;
 float fabs (float x) __z88dk_fastcall;
 float floor (float x) __z88dk_fastcall;
-float fmax(float x,float y) __stdc;
-float fmin(float x,float y) __stdc;
+float fmax (float x,float y) __stdc;
+float fmin (float x,float y) __stdc;
+float fmod (float x, float y) __stdc;
 
 /* Intrinsic functions */
 float mul2 (float a) __z88dk_fastcall;

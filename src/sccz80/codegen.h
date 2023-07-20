@@ -53,7 +53,7 @@ extern int zcriticaloffset(void);
 extern void zconvert_to_decimal(Kind from, Kind to, unsigned char isunsigned, unsigned char tounsigned);
 extern void zconvert_from_decimal(Kind from, Kind to, unsigned char isunsigned);
 extern int push_function_argument_fnptr(Kind expr, Type *type, Type *functype, int push_sdccchar, int is_last_argument);
-extern void reset_namespace();
+extern void reset_namespace(void);
 extern void zwiden_stack_to_long(LVALUE *lval);
 extern void zwiden_stack_to_llong(LVALUE *lval);
 extern void zconvert_stacked_to_decimal(Kind stacked_kind, Kind float_kind, unsigned char isunsigned,  unsigned char float_sign, int operator_is_commutative);

@@ -13,11 +13,12 @@ z80asm_ok("", "", "", <<END,
 		f10 = 10,  						
 		f11,  							
 		f20 = 20, f21					
-		rl					; opcode can be used as constant
+		rl	; opcode can be used as constant
+		ld
 	} 									
-	defb f0,f1,f2,f3,f10,f11,f20,f21,rl	
+	defb f0,f1,f2,f3,f10,f11,f20,f21,rl,ld	
 END
-	bytes(0,1,2,3,10,11,20,21,22));
+	bytes(0,1,2,3,10,11,20,21,22,23));
 
 # defgroup with end-comma
 z80asm_ok("", "", "", <<END,

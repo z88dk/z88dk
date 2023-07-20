@@ -8,12 +8,14 @@
 
 PUBLIC tape_save
 PUBLIC _tape_save
+PUBLIC ___tape_save
 
 EXTERN asm_tape_save
 
 
 .tape_save
 ._tape_save
+.___tape_save
 
 
   POP AF	; ret_addr

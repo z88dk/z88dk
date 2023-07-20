@@ -15,12 +15,14 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC    drawb
     PUBLIC    _drawb
+    PUBLIC    ___drawb
 
     EXTERN    asm_drawb
 
 
 .drawb
 ._drawb
+.___drawb
     push    ix
     ld    ix,2
     add    ix,sp

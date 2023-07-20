@@ -290,7 +290,7 @@ void asm_DEFINE(const char* name)
 
 void asm_UNDEFINE(const char* name)
 {
-	Symbol1Hash_remove(CURRENTMODULE->local_symtab, name);
+    undefine_local_def_sym(name);
 }
 
 /*-----------------------------------------------------------------------------

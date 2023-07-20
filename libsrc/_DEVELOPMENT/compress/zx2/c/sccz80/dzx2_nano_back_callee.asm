@@ -22,3 +22,11 @@ ELSE
 ENDIF
 
    jp asm_dzx2_nano_back
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx2_nano_back_callee
+defc _dzx2_nano_back_callee = dzx2_nano_back_callee
+ENDIF
+
+

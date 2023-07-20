@@ -94,21 +94,43 @@
 	ld	(hl),de
 
 	ex	de,hl
+	jp	%1	;EOS
+=
+	jp	%1	;EOS
+
+	ex	de,hl
+	ld	hl,(_%1)
+	ex	de,hl
+	ld	(hl),de
+=
+	ld	de,(_%1)
+	ld	(hl),de
+
+	ex	de,hl
 	ex	de,hl
 =
 
+
+%title  Cleanup after ez80 optimisation
+	inc	hl
+	ld	hl,%1	;const
+=
+	ld	hl,%1	;const
+
+%title Optimise stack increment
+	inc	(hl)
+	ld	a,(hl)
+	inc	hl
+	jr	nz,ASMPC+3
+	inc	(hl)
+	ld	h,(hl)
+	ld	l,a
+	dec	hl
+	pop	de
+=
 	ld	de,(hl)
-=
-	defb	0xed, 0x17	;ld de,(hl)
-
-	ld	hl,(hl)
-=
-	defb	0xed, 0x27	;ld hl,(hl)
-
+	inc	de
 	ld	(hl),de
-=
-	defb	0xed, 0x1f	;ld (hl),de
-
-	ld	bc,(hl)
-=
-	defb	0xed, 0x07	;ld bc,(hl)
+	dec	de
+	ex	de,hl
+	pop	de

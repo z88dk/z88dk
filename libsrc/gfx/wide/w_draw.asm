@@ -4,10 +4,12 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  draw
     PUBLIC  _draw
+    PUBLIC  ___draw
     EXTERN  asm_draw
     
 .draw
 ._draw
+.___draw
     pop     af
     pop     de    ;y2
     pop     hl    ;x2

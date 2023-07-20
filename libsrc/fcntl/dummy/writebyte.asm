@@ -7,7 +7,9 @@
 
 		PUBLIC	writebyte
 		PUBLIC	_writebyte
+		PUBLIC	___writebyte
 
 .writebyte
 ._writebyte
+.___writebyte
 	ret

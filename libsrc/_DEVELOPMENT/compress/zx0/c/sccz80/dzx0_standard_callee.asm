@@ -22,3 +22,11 @@ ELSE
 ENDIF
    
    jp asm_dzx0_standard
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx0_standard_callee
+defc _dzx0_standard_callee = dzx0_standard_callee
+ENDIF
+
+

@@ -28,8 +28,8 @@ l_z180_mulu_32_32x32:
 
     ; multiplication of two 32-bit numbers into a 32-bit product
     ;
-    ; enter : dehl = 32-bit multiplicand
-    ;         dehl'= 32-bit multiplicand
+    ; enter : de hl = 32-bit multiplicand = x
+    ;         de'hl'= 32-bit multiplier   = y
     ;
     ; exit  : dehl = 32-bit product
     ;         carry reset
@@ -47,12 +47,13 @@ l_z180_mulu_32_32x32:
 
     push hl
     exx
-    ld c,l
-    ld b,h
+    
+    ld bc,hl
     pop hl
     push de
     ex de,hl
     exx
+
     pop bc
 
 l0_z180_mulu_32_32x32:
@@ -70,9 +71,11 @@ l0_z180_mulu_32_32x32:
     ; save material for the byte p3 = x3*y0 + x2*y1 + x1*y2 + x0*y3 + p2 carry
     push de                     ; x3 x2
     exx
+
     push bc                     ; y1 y0
     push de                     ; x1 x0
     exx
+
     push bc                     ; y3 y2
 
     ; save material for the byte p2 = x2*y0 + x0*y2 + x1*y1 + p1 carry

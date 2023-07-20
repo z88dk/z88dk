@@ -11,3 +11,8 @@ PUBLIC _fmax
 defc _fmax = fmax
 ENDIF
 
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___fmax
+defc ___fmax = fmax
+ENDIF

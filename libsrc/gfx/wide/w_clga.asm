@@ -6,9 +6,11 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  clga
     PUBLIC  _clga
+    PUBLIC  ___clga
     EXTERN  asm_clga
 .clga
 ._clga
+.___clga
 
     pop     af
     pop     de

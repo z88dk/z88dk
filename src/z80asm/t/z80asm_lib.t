@@ -49,10 +49,10 @@ END
 unlink("${test}.bin");
 
 capture_ok("z88dk-z80asm -b -v ${test}.asm", <<END);
-Reading library 'z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
+Reading library 'z88dk-z80asm-z80-.lib'
 Assembling '${test}.asm' to '${test}.o'
 Reading '${test}.asm' = '${test}.asm'
 Writing object file '${test}.o'
@@ -78,11 +78,11 @@ $ENV{ZCCCFG} = "root/lib/config";
 copy('../z88dk-z80asm-z80-.lib', $ENV{ZCCCFG}.'/../z88dk-z80asm-z80-.lib');
 
 capture_ok("z88dk-z80asm -b -v ../${test}.asm", <<END);
-Library 'z88dk-z80asm-z80-.lib' not found
-Reading library 'root/lib/z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
+Library 'z88dk-z80asm-z80-.lib' not found
+Reading library 'root/lib/z88dk-z80asm-z80-.lib'
 Assembling '../${test}.asm' to '../${test}.o'
 Reading '../${test}.asm' = '../${test}.asm'
 Writing object file '../${test}.o'
@@ -102,11 +102,11 @@ delete $ENV{ZCCCFG};
 unlink("../${test}.bin");
 
 capture_ok("z88dk-z80asm -b -v -Lroot/lib ../${test}.asm", <<END);
-Library 'z88dk-z80asm-z80-.lib' not found
-Reading library 'root/lib/z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
+Library 'z88dk-z80asm-z80-.lib' not found
+Reading library 'root/lib/z88dk-z80asm-z80-.lib'
 Assembling '../${test}.asm' to '../${test}.o'
 Reading '../${test}.asm' = '../${test}.asm'
 Writing object file '../${test}.o'
@@ -126,11 +126,11 @@ unlink("../${test}.bin");
 run_nok("z88dk-z80asm -b -v ../${test}.asm > ../${test}.out 2> ../${test}.err");
 
 check_text_file("../${test}.out", <<END);
-Library 'z88dk-z80asm-z80-.lib' not found
-Library '$default_lib_path/z88dk-z80asm-z80-.lib' not found
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
+Library 'z88dk-z80asm-z80-.lib' not found
+Library '$default_lib_path/z88dk-z80asm-z80-.lib' not found
 Assembling '../${test}.asm' to '../${test}.o'
 Reading '../${test}.asm' = '../${test}.asm'
 Writing object file '../${test}.o'
@@ -194,12 +194,12 @@ sub exp_output {
 				 ($cpu =~ /^r/i)  ? "RABBIT" :
 				 ($cpu =~ /^80/i) ? "INTEL" : "";
 
-	my $out = 	"Reading library '$library'\n";
-	$out .=		"Predefined constant: __CPU_${CPU}__ = 1\n";
+	my $out = 	"Predefined constant: __CPU_${CPU}__ = 1\n";
 	$out .= 	"Predefined constant: __CPU_${family}__ = 1\n" if $family;
 	$out .= 	"Predefined constant: __SWAP_IX_IY__ = 1\n" if $ixiy;
 	$out .= <<END;
 Predefined constant: __FLOAT_GENMATH__ = 1
+Reading library '$library'
 Assembling '${test}.asm' to '${test}.o'
 Reading '${test}.asm' = '${test}.asm'
 Writing object file '${test}.o'

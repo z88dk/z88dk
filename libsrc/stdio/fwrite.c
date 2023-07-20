@@ -48,20 +48,16 @@ ELSE
   ELSE
 	ld	ix,0
 	add	ix,sp
-	ld	l,(ix+6)	;nmemb
-	ld	h,(ix+7)
-	ld	e,(ix+8)	;size
-	ld	d,(ix+9)
+        ld      hl,(ix+6)	;nmemb
+        ld      de,(ix+8)	;size
 	call	l_mult		;hl = nmemb * size
 	ld	a,h
 	or	l
 	jp	z,fwrite_exit
 	ld	c,l
 	ld	b,h
-	ld	e,(ix+10)	;ptr
-	ld	d,(ix+11)
-	ld	l,(ix+4)	;fp
-	ld	h,(ix+5)
+        ld      de,(ix+10) 	;ptr
+        ld      hl,(ix+4)	;fp
 	push	hl	
 	pop	ix		;ix = fp
   ENDIF
@@ -86,8 +82,7 @@ fwrite_done:
   ELSE
 	ld	ix,0
 	add	ix,sp
-	ld	l,(ix+8)	;size
-	ld	h,(ix+9)
+        ld      hl,(ix+8)	;size
   ENDIF
 	call	l_div_u		;hl = de/hl = bytes_written/size
 fwrite_exit:
@@ -103,21 +98,11 @@ _fwrite1:
         bit	5,(ix+fp_flags)		;_IOEXTRA
         jr      z,fwrite_direct
         ; Calling via the extra hook
-  IF __CPU_R2KA__ | __CPU_R3K__
         ld      hl,(ix+fp_extra)
-  ELSE
-        ld      l,(ix+fp_extra)
-        ld      h,(ix+fp_extra+1)
-  ENDIF
         ld      a,__STDIO_MSG_WRITE
         jp      l_jphl
 fwrite_direct:
-  IF __CPU_R2KA__ | __CPU_R3K__
         ld      hl,(ix+fp_desc)
-  ELSE
-        ld      l,(ix+fp_desc)
-        ld      h,(ix+fp_desc+1)
-  ENDIF
         push    hl
         push    de
         push    bc

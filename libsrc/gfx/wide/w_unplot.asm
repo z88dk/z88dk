@@ -6,17 +6,19 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     
     PUBLIC  unplot
     PUBLIC  _unplot
+    PUBLIC  ___unplot
     
     EXTERN  asm_unplot
 
 .unplot
 ._unplot
-    pop     af
+.___unplot
+    pop     bc
     pop     de    ; y
     pop     hl    ; x
     push    hl
     push    de
-    push    af
+    push    bc
     jp      asm_unplot
    
 ENDIF

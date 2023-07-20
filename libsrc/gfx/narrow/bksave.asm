@@ -10,11 +10,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION smc_clib
     PUBLIC    bksave
     PUBLIC    _bksave
+    PUBLIC    ___bksave
     EXTERN    pixeladdress
 
 
 .bksave
 ._bksave
+.___bksave
     push    ix
       ld    hl,4   
       add    hl,sp

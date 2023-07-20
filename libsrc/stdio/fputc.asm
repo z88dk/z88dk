@@ -4,10 +4,12 @@ MODULE fputc
 SECTION code_clib
 PUBLIC fputc
 PUBLIC _fputc
+PUBLIC ___fputc
 EXTERN asm_fputc_callee
 
 .fputc
 ._fputc
+.___fputc
     pop     de      ;return address
     pop     hl      ;fp
     pop     bc      ;c

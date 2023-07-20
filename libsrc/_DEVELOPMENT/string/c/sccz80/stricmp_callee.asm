@@ -16,3 +16,10 @@ PUBLIC _stricmp_callee
 defc _stricmp_callee = stricmp_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___stricmp_callee
+defc ___stricmp_callee = stricmp_callee
+ENDIF
+

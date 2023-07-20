@@ -4,7 +4,7 @@
 static void write_cdb_type(UT_string *output, Type *type,int comma);
 
 
-void debug_write_module()
+void debug_write_module(void)
 {
     utstring_printf(debug_utstr,"M:%.*s\n",(int)strlen(Filename)-2,Filename+1);
 }

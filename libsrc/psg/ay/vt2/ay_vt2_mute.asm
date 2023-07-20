@@ -1,13 +1,19 @@
 
-	SECTION	code_psg
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
-	PUBLIC	ay_vt2_mute
-	PUBLIC	_ay_vt2_mute
-	EXTERN	asm_VT_MUTE
+    SECTION code_psg
+
+    PUBLIC  ay_vt2_mute
+    PUBLIC  _ay_vt2_mute
+    EXTERN  asm_VT_MUTE
 
 
 ay_vt2_mute:
 _ay_vt2_mute:
-	call	asm_VT_MUTE
-	ret
+    push    ix
+    call    asm_VT_MUTE
+    pop     ix
+    ret
+
+ENDIF
 

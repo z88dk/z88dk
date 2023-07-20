@@ -10,6 +10,7 @@
 	SECTION code_clib
 	PUBLIC	open
 	PUBLIC	_open
+	PUBLIC	___open
 	
 	EXTERN	zxhandl
 	
@@ -22,6 +23,7 @@
 
 .open
 ._open
+.___open
 	ld	hl,2
 	add	hl,sp
 

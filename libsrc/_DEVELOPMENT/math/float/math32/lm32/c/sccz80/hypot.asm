@@ -5,10 +5,14 @@
 
 	defc	hypot = cm32_sccz80_fshypot
 
-
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _hypot
 defc _hypot = hypot
 ENDIF
 
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___hypot
+defc ___hypot = hypot
+ENDIF

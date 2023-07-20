@@ -6,9 +6,9 @@
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 
+BEGIN { use lib '../../t'; require 'testlib.pl'; }
+
 use Modern::Perl;
-use Test::More;
-require '../../t/testlib.pl';
 
 my @CPUS = (qw( z80 gbz80 ));
 

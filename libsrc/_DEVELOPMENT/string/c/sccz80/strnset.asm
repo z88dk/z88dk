@@ -46,3 +46,10 @@ PUBLIC _strnset
 defc _strnset = strnset
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strnset
+defc ___strnset = strnset
+ENDIF
+

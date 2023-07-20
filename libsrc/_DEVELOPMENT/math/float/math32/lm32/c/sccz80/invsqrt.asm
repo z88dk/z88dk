@@ -1,14 +1,24 @@
+SECTION   code_fp_math32
+PUBLIC    invsqrt
+EXTERN    _m32_invsqrtf
 
-    SECTION code_fp_math32
+IFNDEF __CLASSIC
+defc   invsqrt = _m32_invsqrtf
+ELSE
 
-    PUBLIC invsqrt
-    EXTERN m32_fsinvsqrt_fastcall
+; Classic has a non-fastcall implementation
 
-    defc invsqrt = m32_fsinvsqrt_fastcall
+invsqrt:
+    pop bc
+    pop hl
+    pop de
+    push de
+    push hl
+    push bc
+    jp _m32_invsqrtf
 
 ; SDCC bridge for Classic
-IF __CLASSIC
 PUBLIC _invsqrt
-defc _invsqrt = m32_fsinvsqrt_fastcall
-ENDIF
+defc _invsqrt = invsqrt
 
+ENDIF

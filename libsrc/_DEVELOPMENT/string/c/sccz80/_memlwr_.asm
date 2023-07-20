@@ -26,3 +26,10 @@ PUBLIC __memlwr_
 defc __memlwr_ = _memlwr_
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ____memlwr_
+defc ____memlwr_ = _memlwr_
+ENDIF
+

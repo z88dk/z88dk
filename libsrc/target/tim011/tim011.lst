@@ -1,0 +1,16 @@
+target/tim011/stdio/generic_console
+target/tim011/stdio/generic_console_vpeek
+target/tim011/stdio/generic_console_ioctl
+target/tim011/stdio/conio_vars
+target/tim011/stdio/CRT_FONT
+target/tim011/graphics/clsgraph
+target/tim011/graphics/getmaxx
+target/tim011/graphics/getmaxy
+target/tim011/graphics/getmaxy
+target/tim011/graphics/w_pixladdr
+target/tim011/graphics/w_plotpixl
+target/tim011/graphics/w_respixl
+target/tim011/graphics/w_xorpixl
+target/tim011/graphics/w_pointxy
+@gfx/wide/gfx_wide.lst
+@games/games.lst

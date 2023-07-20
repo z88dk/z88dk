@@ -15,10 +15,10 @@ z80asm_ok("", "", "", <<END,
 		df3 ds.p 2						;; ; df3 = 0x84 + 2*2 = 0x88
 		df4 ds.q 2						;; ; df4 = 0x88 + 2*3 = 0x8E
 		df5 							;; ; df5 = 0x8E + 2*4 = 0x96
-		rr								;; ; opcode can be used as constant
+		rl								;; ; opcode can be used as constant
 										;;
 	}									;;
-	defb df1, df2, df3, df4, df5, rr	;; defb 80h, 84h, 88h, 8Eh, 96h, 96h
+	defb df1, df2, df3, df4, df5, rl	;; defb 80h, 84h, 88h, 8Eh, 96h, 96h
 	
 	defvars 0 {							;;
 		df6 ds.b 1						;; ; df6 = 0

@@ -17,7 +17,7 @@ END
 unlink "${test}2.lst";
 
 capture_nok("z88dk-z80asm -b -o${test}.bin ".quote_os("\@${test}1.lst"), <<END);
-${test}1.lst:2: error: file open: ${test}2.lst
+${test}1.lst:2: error: file not found: ${test}2.lst
   ^---- \@${test}2.lst
 END
 

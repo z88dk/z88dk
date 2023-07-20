@@ -8,7 +8,7 @@ use Modern::Perl;
 # error_expression
 my $obj = objfile(NAME => "test",
 				  CODE => [["", -1, 1, "\0\0"]],
-				  EXPR => [["C", "test.asm",1, "", 0, 0, "", "*+VAL"]]);
+				  EXPR => [["C", "test.asm",1, "", 0, 0, 0, "", "*+VAL"]]);
 spew("$test.o", $obj);
 capture_nok("z88dk-z80asm -b -d $test.o", <<END);
 test.asm:1: error: syntax error in expression
@@ -342,7 +342,7 @@ $obj = objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] );
 substr($obj,6,2) = "99";		# change version
 spew("$test.o", $obj);
 capture_nok("z88dk-z80asm -b $test.o", <<END);
-error: invalid object file version: file=$test.o, found=99, expected=16
+error: invalid object file version: file=$test.o, found=99, expected=17
 END
 
 #------------------------------------------------------------------------------
@@ -353,7 +353,7 @@ substr($lib,6,2) = "99";		# change version
 spew("$test.lib", $lib);
 spew("$test.asm", "nop");
 capture_nok("z88dk-z80asm -b -l$test.lib $test.asm", <<END);
-error: invalid library file version: file=$test.lib, found=99, expected=16
+error: invalid library file version: file=$test.lib, found=99, expected=17
 END
 
 #------------------------------------------------------------------------------

@@ -34,16 +34,17 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 
 
 #define CFILE     1
-#define CPPFILE   2
-#define OPTFILE   3
-#define SFILE     4
-#define ASMFILE   5
-#define OBJFILE   6
-#define OBJFILE2  7
-#define M4FILE    8
-#define HDRFILE   9
-#define INCFILE   10
-#define LLFILE    11
+#define CXXFILE   2
+#define CPPFILE   3
+#define OPTFILE   4
+#define SFILE     5
+#define ASMFILE   6
+#define OBJFILE   7
+#define OBJFILE2  8
+#define M4FILE    9
+#define HDRFILE   10
+#define INCFILE   11
+#define LLFILE    12
 
 #define NO      0
 #define YES     1

@@ -8,11 +8,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  xordrawr
     PUBLIC  _xordrawr
+    PUBLIC  ___xordrawr
     
     EXTERN  asm_xordrawr
 
 .xordrawr
 ._xordrawr
+.___xordrawr
     pop     af    ; ret addr
     pop     de    ; y
     pop     hl    ; x

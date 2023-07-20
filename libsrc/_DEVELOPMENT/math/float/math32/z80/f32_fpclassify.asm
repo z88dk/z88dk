@@ -17,8 +17,7 @@ m32_fpclassify:
     sla e
     rl d
     ld a,d
-    rr d
-    rr e
+    rr de
 
     ; Zero  -     sign  = whatever
     ;         exponent  = all 0s

@@ -70,6 +70,5 @@ PUBLIC _m32_frexpf
     ld  (bc),a
 
     rl e                        ; get sign back
-    rr d
-    rr e
+    rr de
     ret                         ; return IEEE DEHL fraction

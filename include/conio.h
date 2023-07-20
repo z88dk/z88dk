@@ -60,6 +60,7 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 // VT52, but may drag in more code than intended.
 
 extern void __LIB__        textcolor(int c) __z88dk_fastcall;
+extern void __LIB__        textcolour(int c) __z88dk_fastcall;
 extern void __LIB__        textbackground(int c) __z88dk_fastcall;
 #define clrscr()           fputc_cons(12)
 #endif
@@ -68,14 +69,17 @@ extern void __LIB__        textbackground(int c) __z88dk_fastcall;
 
 extern int     __LIB__     wherex (void);
 extern int     __LIB__     wherey (void);
-extern void    __LIB__     gotoxy(unsigned int x, unsigned int y) __smallc;
+__ZPROTO2(void,,gotoxy,unsigned int,x,unsigned int,y)
+#ifndef __STDC_ABI_ONLY
 extern void    __LIB__     gotoxy_callee(unsigned int x, unsigned int y) __smallc __z88dk_callee;
-
-extern void    __LIB__     screensize(unsigned int *x, unsigned int *y) __smallc;
-extern void    __LIB__     screensize_callee(unsigned int *x, unsigned int *y) __smallc __z88dk_callee;
-
 #define gotoxy(a,b) gotoxy_callee(a,b)
+#endif
+
+__ZPROTO2(void,,screensize,unsigned int *,x,unsigned int *,y)
+#ifndef __STDC_ABI_ONLY
+extern void    __LIB__     screensize_callee(unsigned int *x, unsigned int *y) __smallc __z88dk_callee;
 #define screensize(a,b) screensize_callee(a,b)
+#endif
 
 
 /* The leading underscores are for compatibility with the 
@@ -108,15 +112,15 @@ extern int __LIB__ kbhit(void);
 extern int __LIB__ getch(void);
 
 // Get the character that is on screen at the specified location
-extern int __LIB__ cvpeek(int x, int y) __smallc;
-
+__ZPROTO2(int,,cvpeek,int,x,int,y)
 
 // Get the character that is on screen at the specified location (no charset
 // translations will be made)
-extern int __LIB__ cvpeekr(int x, int y) __smallc;
+__ZPROTO2(int,,cvpeekr,int,x,int,y)
 
 // Set the border colour, may not be implemented on all ports
 extern int __LIB__ bordercolor(int c) __z88dk_fastcall;
+extern int __LIB__ bordercolour(int c) __z88dk_fastcall;
 
 // Missing functions, not implemented
 //extern int  __LIB__ movetext (int _left, int _top, int _right, int _bottom, int _destleft, int _desttop);

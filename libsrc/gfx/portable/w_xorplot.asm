@@ -3,6 +3,7 @@
 
 	PUBLIC	xorplot
 	PUBLIC	_xorplot
+	PUBLIC	___xorplot
 	PUBLIC	xorplot_callee
 	PUBLIC	_xorplot_callee
 	PUBLIC	asm_xorplot
@@ -12,6 +13,7 @@
 ; int xorplot(int x, int y) __smallc;
 xorplot:
 _xorplot:
+___xorplot:
 	ld	hl,sp+2
 	ld	e,(hl)		;y
 	inc	hl

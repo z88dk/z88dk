@@ -7,7 +7,7 @@ OBJECTS := $(SOURCES:.c=.o)
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
-all:	test.bin test_rcm.bin test_8080.bin test_8085.bin test_gbz80.bin test_rc2014_CODE.bin
+all:	test.bin test_r2ka.bin test_8080.bin test_8085.bin test_gbz80.bin test_rc2014_CODE.bin
 
 
 
@@ -15,9 +15,9 @@ test.bin: $(SOURCES)
 	$(compile)
 	$(runtest)
 
-test_rcm.bin: $(SOURCES)
-	$(compile_rcm)
-	$(runtest_rcm)
+test_r2ka.bin: $(SOURCES)
+	$(compile_r2ka)
+	$(runtest_r2ka)
 
 test_8080.bin: $(SOURCES)
 	$(compile_8080)

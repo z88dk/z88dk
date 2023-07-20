@@ -197,11 +197,14 @@
 
 
 // Play a sound by PSG
-extern void __LIB__ set_psg(unsigned int reg, unsigned int val) __smallc;
+__ZPROTO2(void,,set_psg,unsigned int,reg,unsigned int,val)
+#ifndef __STDC_ABI_ONLY
 extern void __LIB__    set_psg_callee(unsigned int reg, unsigned int val) __smallc __z88dk_callee;
 #define set_psg(a,b)     set_psg_callee(a,b)
+#endif
 
 // Read the PSG register
+// TODO: Clang
 extern int __LIB__  get_psg(int regno) __z88dk_fastcall;
 
 // Init the PSG (reset sound etc..)
@@ -212,19 +215,19 @@ extern void __LIB__ psg_init(void);
 #define sound(reg, value) set_psg(reg, value)
 
 // Set a given tone for the channel (0-2)
-extern void __LIB__ psg_tone(unsigned int channel, int period) __smallc;
+__ZPROTO2(void,,psg_tone,unsigned int,channel,int,period)
 
 // Set the global noise period
 extern void __LIB__ psg_noise(unsigned int period);
 
 // Set channel's volume
-extern void __LIB__ psg_volume(unsigned int channel, unsigned int volume) __smallc;
+__ZPROTO2(void,,psg_volume,unsigned int,channel,unsigned int,volume)
 
 // Set the volume envelope of number \a waveform, with the given period, on a group of channels (ORed bits)
-extern void __LIB__ psg_envelope(unsigned int waveform, int period, unsigned int channels) __smallc;
+__ZPROTO3(void,,psg_envelope,unsigned int,waveform,int,period,unsigned int,channels)
 
 // Set noise or tone generation on a group of channels (ORed bits)
-extern void __LIB__ psg_channels(unsigned int tone_channels, unsigned int noise_channels) __smallc;
+__ZPROTO2(void,,psg_channels,unsigned int,tone_channels,unsigned int,noise_channels)
 
 // Get the group of channels currently generating tone (ORed bits)
 extern unsigned char __LIB__ psg_tone_channels(void);

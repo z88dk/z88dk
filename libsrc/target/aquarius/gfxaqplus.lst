@@ -1,0 +1,15 @@
+target/aquarius/graphicsp/__aquarius_set_attribute
+target/aquarius/graphics/textpixl
+target/aquarius/graphicsp/clg
+target/aquarius/graphicsp/getmaxx
+target/aquarius/graphicsp/getmaxy
+target/aquarius/graphicsp/w_pixladdr
+target/aquarius/graphicsp/w_plotpixl
+target/aquarius/graphicsp/w_plotpixl_BITMAP
+target/aquarius/graphicsp/w_pointxy
+target/aquarius/graphicsp/w_pointxy_BITMAP
+target/aquarius/graphicsp/w_respixl
+target/aquarius/graphicsp/w_respixl_BITMAP
+target/aquarius/graphicsp/w_xorpixl
+target/aquarius/graphicsp/w_xorpixl_BITMAP
+@gfx/wide/gfx_wide.lst

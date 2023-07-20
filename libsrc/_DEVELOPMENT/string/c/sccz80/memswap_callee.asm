@@ -23,3 +23,10 @@ PUBLIC _memswap_callee
 defc _memswap_callee = memswap_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memswap_callee
+defc ___memswap_callee = memswap_callee
+ENDIF
+

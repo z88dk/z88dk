@@ -11,9 +11,9 @@ EXTERN asm_z80_inp
 _z80_inp:
 
    pop af
-   pop hl
+   pop bc
    
-   push hl
+   push bc
    push af
-   
-   jp asm_z80_inp
+   in  l,(c)
+   ret

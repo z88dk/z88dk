@@ -5,13 +5,18 @@
 ;	$Id: sc3000_crt0.asm,v 1.18 2016-07-13 22:12:25 dom Exp $
 ;
 
-    defc    ROM_Start  = $0000
-    defc    RAM_Start  = $C000
-    defc    RAM_Length = $0800
-    defc    Stack_Top  = $c400
+IF      !DEFINED_CRT_ORG_CODE
+    defc    CRT_ORG_CODE  = 0x0000
+ENDIF
+    ; This sp value is good for both SC-3000 and SG-1000, to run on the SC-3000
+    ; only use:  -pragma-define:REGISTER_SP=0xc7f0
+    defc    TAR__register_sp = $c400
+IF !DEFINED_CRT_ORG_BSS
+    defc    CRT_ORG_BSS = $c000
+    defc DEFINED_CRT_ORG_BSS = 1
+ENDIF   
 
-    defc    CRT_ORG_CODE  = ROM_Start
-    defc    TAR__register_sp = Stack_Top
+
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__fgetc_cons_inkey = 1
     defc	__CPU_CLOCK = 3580000
@@ -34,9 +39,7 @@
 
     org     CRT_ORG_CODE
 
-if (ASMPC<>$0000)
-    defs    CODE_ALIGNMENT_ERROR
-endif
+if (ASMPC = $0000)
     di
     jp      program
 
@@ -54,6 +57,7 @@ int_VBL:
     pop     af
     ei
     reti
+ENDIF
 
 
 
@@ -82,12 +86,10 @@ cleanup:
     push    hl
     call    crt0_exit
 
-
-endloop:
-    jr      endloop
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
-    defc    __crt_org_bss = RAM_Start
+    defc    __crt_org_bss = CRT_ORG_BSS
     ; If we were given a model then use it
     IF DEFINED_CRT_MODEL
         defc __crt_model = CRT_MODEL

@@ -33,3 +33,10 @@ PUBLIC _strnlen_callee
 defc _strnlen_callee = strnlen_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strnlen_callee
+defc ___strnlen_callee = strnlen_callee
+ENDIF
+

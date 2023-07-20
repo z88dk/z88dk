@@ -14,6 +14,7 @@
         SECTION   code_clib
         PUBLIC    rename
         PUBLIC    _rename
+        PUBLIC    ___rename
         EXTERN	strlen
         EXTERN	cpc_rsx
         EXTERN	bios_msg
@@ -22,6 +23,7 @@
 
 .rename
 ._rename
+.___rename
 
         pop     bc
         pop     de

@@ -4,6 +4,7 @@
 
 	PUBLIC	xordrawr
 	PUBLIC	_xordrawr
+	PUBLIC	___xordrawr
 
 	EXTERN	xorplot
 	EXTERN	commondrawr
@@ -12,5 +13,6 @@
 ;Note ints are actually uint8_t
 xordrawr:
 _xordrawr:
+___xordrawr:
 	ld	hl,xorplot
 	jp	commondrawr

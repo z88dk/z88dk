@@ -155,7 +155,7 @@ capture_ok("z88dk-z80asm -s -o${test}.o ".
 		   "${test}1.asm ${test}2.asm ${test}3.asm ${test}4.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF17
   Name: ${test}
   Section code: 37 bytes
     C \$0000: CD 00 00 21 00 00 CD 00 00 CD 00 00 C9 7E A7 C8
@@ -181,18 +181,18 @@ Object  file ${test}.o at \$0000: Z80RMF16
     U         lib_start
     U         lib_end
   Expressions:
-    E Cw \$0000 \$0001: lib_start (section code) (file ${test}1.asm:5)
-    E Cw \$0003 \$0004: ${test}1_mess (section code) (file ${test}1.asm:6)
-    E Cw \$0006 \$0007: print (section code) (file ${test}1.asm:7)
-    E Cw \$0009 \$000A: lib_end (section code) (file ${test}1.asm:8)
-    E =  \$0006 \$0006: main1 := main (section data) (file ${test}1.asm:14)
-    E Cw \$001B \$001C: ${test}2__delay_1 (section code) (file ${test}2.asm:20)
-    E Cw \$0015 \$0016: ${test}2_printa1 (section code) (file ${test}2.asm:14)
-    E Cw \$0012 \$0013: ${test}2__delay (section code) (file ${test}2.asm:13)
-    E =  \$0000 \$0000: ${test}2_printa1 := printa (section "") (file ${test}2.asm:4)
-    E =  \$0000 \$0000: print := print1 (section "") (file ${test}2.asm:3)
-    E Cw \$000D \$000D: \$ (section data) (file ${test}3.asm:12)
-    E Cw \$0020 \$0021: printa (section code) (file ${test}3.asm:6)
+    E Cw \$0000 \$0001 3 lib_start (section code) (file ${test}1.asm:5)
+    E Cw \$0003 \$0004 3 ${test}1_mess (section code) (file ${test}1.asm:6)
+    E Cw \$0006 \$0007 3 print (section code) (file ${test}1.asm:7)
+    E Cw \$0009 \$000A 3 lib_end (section code) (file ${test}1.asm:8)
+    E =  \$0006 \$0006 0 main1 := main (section data) (file ${test}1.asm:14)
+    E Cw \$001B \$001C 3 ${test}2__delay_1 (section code) (file ${test}2.asm:20)
+    E Cw \$0015 \$0016 3 ${test}2_printa1 (section code) (file ${test}2.asm:14)
+    E Cw \$0012 \$0013 3 ${test}2__delay (section code) (file ${test}2.asm:13)
+    E =  \$0000 \$0000 0 ${test}2_printa1 := printa (section "") (file ${test}2.asm:4)
+    E =  \$0000 \$0000 0 print := print1 (section "") (file ${test}2.asm:3)
+    E Cw \$000D \$000D 2 \$ (section data) (file ${test}3.asm:12)
+    E Cw \$0020 \$0021 3 printa (section code) (file ${test}3.asm:6)
 END
 
 check_text_file("${test}.sym", <<'END');

@@ -4,9 +4,11 @@
 
 	PUBLIC	lseek
 	PUBLIC	_lseek
+	PUBLIC	___lseek
 
 .lseek
 ._lseek
+.___lseek
 	ld	hl,1	;non zero is error
 	ld	d,h
 	ld	e,l

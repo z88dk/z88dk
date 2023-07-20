@@ -7,7 +7,9 @@
 
 		PUBLIC	write
 		PUBLIC	_write
+		PUBLIC	___write
 
 .write
 ._write
+.___write
 	ret

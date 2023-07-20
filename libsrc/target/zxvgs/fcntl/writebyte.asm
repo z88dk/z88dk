@@ -10,9 +10,11 @@
 	SECTION code_clib
 	PUBLIC	writebyte
 	PUBLIC	_writebyte
+	PUBLIC	___writebyte
 
 .writebyte
 ._writebyte
+.___writebyte
 	push	ix		;save caller
 	LD	HL,4
 	ADD	HL,SP		;pointer to byte

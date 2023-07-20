@@ -13,6 +13,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
        SECTION   smc_clib
        PUBLIC    putsprite
        PUBLIC    _putsprite
+       PUBLIC    ___putsprite
        EXTERN    w_pixeladdress
 
        EXTERN    swapgfxbk
@@ -27,6 +28,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .putsprite
 ._putsprite
+.___putsprite
        
     push ix
     

@@ -262,6 +262,10 @@ IF __NABUPC__
     INCLUDE "target/nabu/classic/nabu_hccabuf.asm"
 ENDIF
 
+IF __BEE__
+    INCLUDE "target/bee/classic/bee_premium.inc"
+ENDIF
+
     SECTION code_crt_init
     ld      c,25
     call    5

@@ -3,8 +3,10 @@
 IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
 	PUBLIC	set_sound_volume
 	PUBLIC	_set_sound_volume
+	PUBLIC	___set_sound_volume
 	PUBLIC	psg_volume
 	PUBLIC	_psg_volume
+	PUBLIC	___psg_volume
 	
 ;	$Id: psg_volume.asm $
 
@@ -18,8 +20,10 @@ IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
 
 .set_sound_volume
 ._set_sound_volume
+.___set_sound_volume
 .psg_volume
 ._psg_volume
+.___psg_volume
 
 	ld	hl, 2
 	add	hl, sp

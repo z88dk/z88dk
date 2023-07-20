@@ -13,12 +13,24 @@
 SECTION code_clib
 PUBLIC strdup
 PUBLIC _strdup
+PUBLIC ___strdup
+PUBLIC strdup_fastcall
+PUBLIC _strdup_fastcall
+
 
 EXTERN asm_HeapAlloc
 EXTERN _heap
 
 .strdup
 ._strdup
+.___strdup
+    pop bc
+    pop hl
+    push hl
+    push bc
+
+.strdup_fastcall
+._strdup_fastcall
 
    push hl
    ld bc,0

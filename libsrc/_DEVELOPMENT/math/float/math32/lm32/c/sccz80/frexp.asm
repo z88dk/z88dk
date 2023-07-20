@@ -9,7 +9,11 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _frexp
-EXTERN cm32_sdcc_frexp
-defc _frexp = cm32_sdcc_frexp
+defc _frexp = frexp
 ENDIF
 
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___frexp
+defc ___frexp = frexp
+ENDIF

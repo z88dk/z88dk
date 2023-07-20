@@ -4,7 +4,7 @@ target/pmd85/stdio/conio_map_colour
 target/pmd85/stdio/generic_console
 target/pmd85/stdio/generic_console_vpeek
 target/pmd85/stdio/generic_console_ioctl
-@stdio/stdio_8080.lst
+@stdio/stdio.lst
 stdio/inkey/getk
 stdio/inkey/fgetc_cons
 

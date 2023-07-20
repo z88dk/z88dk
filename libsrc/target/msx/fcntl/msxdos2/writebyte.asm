@@ -3,6 +3,7 @@
 		INCLUDE	"target/msx/def/msxdos2.def"
 		PUBLIC	writebyte
 		PUBLIC	_writebyte
+		PUBLIC	___writebyte
 
 		EXTERN	MSXDOS
 		EXTERN	msxdos_error
@@ -11,6 +12,7 @@
 ;(int fd, int b)
 .writebyte
 ._writebyte
+.___writebyte
 	push	ix
 	ld	ix,4
 	add	ix,sp

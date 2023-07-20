@@ -19,6 +19,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
     PUBLIC    putsprite
     PUBLIC    _putsprite
+    PUBLIC    ___putsprite
 
     EXTERN    swapgfxbk
     EXTERN    __graphics_end
@@ -33,6 +34,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .putsprite
 ._putsprite
+.___putsprite
 IF NEED_swapgfxbk = 1
     call    swapgfxbk
 ENDIF

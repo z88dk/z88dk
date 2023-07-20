@@ -6,11 +6,13 @@
     
     PUBLIC  point
     PUBLIC  _point
+    PUBLIC  ___point
     
     EXTERN  asm_point
 
 .point
 ._point
+.___point
     pop     bc
     pop     de    ; y
     pop     hl    ; x

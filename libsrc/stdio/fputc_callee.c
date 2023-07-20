@@ -88,20 +88,10 @@ asm_fputc_callee:
 	dec	de
 	ld	(ix+fp_extra),e
 	ld	(ix+fp_extra+1),d
-IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(ix+fp_desc)
-ELSE
-	ld	l,(ix+fp_desc)
-	ld	h,(ix+fp_desc+1)
-ENDIF
 	ld	(hl),c
 	inc	hl
-IF __CPU_R2KA__ | __CPU_R3K__
 	ld	(ix+fp_desc),hl
-ELSE
-	ld	(ix+fp_desc),l
-	ld	(ix+fp_desc+1),h
-ENDIF
 	ld	l,c	;load char to return
 	ld	h,0
 	ret
@@ -109,12 +99,7 @@ ENDIF
 	ld	a,(ix+fp_flags)
 	and	_IOEXTRA
 	jr	z,no_net
-IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(ix+fp_extra)
-ELSE
-	ld	l,(ix+fp_extra)
-	ld	h,(ix+fp_extra+1)
-ENDIF
         ld      a,__STDIO_MSG_PUTC
 	push	bc		;save byte writte
         call	l_jphl
@@ -132,12 +117,7 @@ ENDIF
 	ret
 .no_cons
 ; Output to file
-IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(ix+fp_desc)
-ELSE
-	ld	l,(ix+fp_desc)
-	ld	h,(ix+fp_desc+1)
-ENDIF
 	push	hl	;fd
 #ifdef __STDIO_BINARY
 #ifdef __STDIO_CRLF

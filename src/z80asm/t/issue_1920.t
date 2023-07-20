@@ -4,6 +4,9 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
+# https://github.com/z88dk/z88dk/issues/1920
+# z80asm: Is #define with conditionals supported?
+
 z80asm_ok("", "", "", <<'END', bytes(0x3e, 2, 0x3e, 1));
         #define ONEBITOUT(x)  \
         IF x                \ \

@@ -54,12 +54,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_GBZ80__
 	push	ix	;Save callers ix
 	push	hl
 	pop	ix	;ix = fp
-IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(ix+fp_extra)
-ELSE
-	ld	l,(ix+fp_extra)
-	ld	h,(ix+fp_extra+1)
-ENDIF
 	ld	a,__STDIO_MSG_CLOSE
 	call	l_jphl
 	pop	ix	;restore callers ix

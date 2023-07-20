@@ -3,6 +3,8 @@
 #ifndef __SYS_COMPILER_H__
 #define __SYS_COMPILER_H__
 
+#include <sys/proto.h>
+
 #if defined(__CLION_IDE__) | defined(__INTELLISENSE__)
 
 #define __LIB__
@@ -36,7 +38,8 @@
 #define __z88dk_sdccdecl
 
 // Make intellisense run easier..
-#ifdef __clang__
+#if __clang__ | __CLANG
+#define __STDC_ABI_ONLY
 #define __smallc
 #define __z88dk_callee
 #define __z88dk_fastcall

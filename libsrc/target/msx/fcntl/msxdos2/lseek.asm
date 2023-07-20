@@ -6,6 +6,7 @@
 
 	PUBLIC	lseek
 	PUBLIC	_lseek
+	PUBLIC	___lseek
 
 	EXTERN	MSXDOS
 	EXTERN	msxdos_error
@@ -13,6 +14,7 @@
 ; fd, where, whence
 .lseek
 ._lseek
+.___lseek
         push    ix              ;save callers
         ld      ix,2
         add     ix,sp

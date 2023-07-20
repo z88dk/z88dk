@@ -45,18 +45,22 @@ extern "C" {
 
 
 // CPU types
-#define CPU_Z80     (1 << 0)
-#define CPU_Z80N	(1 << 1)
-#define CPU_Z180    (1 << 2)
-#define CPU_R2KA	(1 << 3)
-#define CPU_R3K		(1 << 4)
-#define CPU_8080	(1 << 5)
-#define CPU_8085	(1 << 6)
-#define CPU_GBZ80	(1 << 7)
+#define CPU_Z80			(1 << 0)
+#define CPU_Z80N		(1 << 1)
+#define CPU_Z180		(1 << 2)
+#define CPU_EZ80		(1 << 3)
+#define CPU_EZ80_Z80	(1 << 4)
+#define CPU_R2KA		(1 << 5)
+#define CPU_R3K			(1 << 6)
+#define CPU_8080		(1 << 7)
+#define CPU_8085		(1 << 8)
+#define CPU_GBZ80		(1 << 9)
 
 #define CPU_Z80_NAME		"z80"
 #define CPU_Z80N_NAME		"z80n"
 #define CPU_Z180_NAME		"z180"
+#define CPU_EZ80_NAME		"ez80"
+#define CPU_EZ80_Z80_NAME	"ez80_z80"
 #define CPU_R2KA_NAME		"r2ka"
 #define CPU_R3K_NAME		"r3k"
 #define CPU_8080_NAME		"8080"
@@ -65,7 +69,7 @@ extern "C" {
 #define ARCH_TI83_NAME		"ti83"
 #define ARCH_TI83PLUS_NAME	"ti83plus"
 
-#define CPU_ZILOG	(CPU_Z80 | CPU_Z80N | CPU_Z180)
+#define CPU_ZILOG	(CPU_Z80 | CPU_Z80N | CPU_Z180 | CPU_EZ80 | CPU_EZ80_Z80)
 #define CPU_RABBIT	(CPU_R2KA | CPU_R3K)
 #define CPU_ALL		(CPU_ZILOG | CPU_RABBIT)
 #define CPU_NOT_Z80	(CPU_ALL & ~(CPU_Z80 | CPU_Z80N))
@@ -98,6 +102,7 @@ void error_division_by_zero();
 void error_duplicate_definition(const char* name);
 void error_duplicate_definition_module(const char* modulename, const char* name);
 void error_expr_recursion();
+void error_file_not_found(const char* filename);
 void error_file_open(const char* filename);
 void error_file_rename(const char* filename);
 void error_illegal_ident();
@@ -145,6 +150,7 @@ void push_includes(const char* dir);
 void pop_includes();
 const char* search_includes(const char* filename);
 int option_cpu();
+void set_cpu_option(int cpu);
 const char* option_cpu_name();
 bool option_ti83();
 bool option_ti83plus();
@@ -207,6 +213,9 @@ void sfile_set_c_source(bool f);
 // symbol table
 struct Symbol1;
 struct Symbol1* define_static_def_sym(const char* name, long value);
+void undefine_static_def_sym(const char* name);
+struct Symbol1* define_local_def_sym(const char* name, long value);
+void undefine_local_def_sym(const char* name);
 
 // code area
 int get_PC();

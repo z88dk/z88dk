@@ -46,3 +46,10 @@ PUBLIC __memstrcpy_
 defc __memstrcpy_ = _memstrcpy_
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ____memstrcpy_
+defc ____memstrcpy_ = _memstrcpy_
+ENDIF
+

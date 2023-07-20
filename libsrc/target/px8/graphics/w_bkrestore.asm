@@ -7,14 +7,26 @@
 ;
 
 	SECTION	 code_graphics
-	PUBLIC    bkrestore
-	PUBLIC    _bkrestore
+
 	
 	EXTERN    subcpu_call
 	;EXTERN    __graphics_end
 
+    PUBLIC    bkrestore
+    PUBLIC    _bkrestore
+    PUBLIC    bkrestore_fastcall
+    PUBLIC    _bkrestore_fastcall
+
 .bkrestore
 ._bkrestore
+    pop de
+    pop hl
+    push hl
+    push de
+
+.bkrestore_fastcall
+._bkrestore_fastcall
+
 ; __FASTCALL__ : sprite ptr in HL
 	inc hl
 	inc hl

@@ -19,16 +19,23 @@
  */
 
 /* save the sprite background in another sprite (the 'background' struct and its size is target dependent) */
-extern void __LIB__ bksave(int x, int y, void *background) __smallc;
-extern void __LIB__  bkrestore(void *background) __z88dk_fastcall;
+__ZPROTO3(void,,bksave,int,x,int,y,void *,background)
+
+extern void __LIB__  bkrestore(void *background);
+#ifndef __STDC_ABI_ONLY
+extern void __LIB__  bkrestore_fastcall(void *background) __z88dk_fastcall;
+#define bkrestore(x) bkrestore_fastcall(x)
+#endif
 
 /* pick up a sprite directly from the screen  (not yet working with coordinates > 255) */
-extern void __LIB__ getsprite(int x, int y, void *sprite) __smallc;
+__ZPROTO3(void,,getsprite,int,x,int,y,void *,sprite)
 
 /* draw a sprite of variable size */
-extern void __LIB__ putsprite(int ortype, int x, int y, void *sprite) __smallc;
+__ZPROTO4(void,,putsprite,int,ortype,int,x,int,y,void *,sprite)
+#ifndef __STDC_ABI_ONLY
 extern void __LIB__ putsprite_callee(int ortype, int x, int y, void *sprite) __smallc __z88dk_callee;
 #define putsprite(a,b,c,d)           putsprite_callee(a,b,c,d)
+#endif
 
 #define spr_and  166+47*256 // CPL - AND (HL)
 #define spr_or   182 // OR (HL)
@@ -365,9 +372,17 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __TRS80__
 #ifdef DEFINE_JOYSTICK_TYPE
+#ifdef __TRS80II__
+	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05"};
+#else
 	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
+#endif
+#ifdef __TRS80II__
+	#define GAME_DEVICES 2
+#else
 	#define GAME_DEVICES 4
+#endif
 #endif
 
 #ifdef __SV8000_

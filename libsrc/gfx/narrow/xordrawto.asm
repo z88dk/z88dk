@@ -6,12 +6,14 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     PUBLIC  xordrawto
     PUBLIC  _xordrawto
+    PUBLIC  ___xordrawto
     
     EXTERN  asm_xordrawto
 
 
 .xordrawto
 ._xordrawto
+.___xordrawto
     pop     af    ; ret addr
     pop     de    ; y2
     pop     hl

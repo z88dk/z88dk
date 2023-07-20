@@ -3,6 +3,7 @@
 
 	PUBLIC	unplot
 	PUBLIC	_unplot
+	PUBLIC	___unplot
 	PUBLIC	unplot_callee
 	PUBLIC	_unplot_callee
 	PUBLIC	asm_unplot
@@ -12,6 +13,7 @@
 ; int unplot(int x, int y) __smallc;
 unplot:
 _unplot:
+___unplot:
 	ld	hl,sp+2
 	ld	e,(hl)		;y
 	ld	hl,sp+4

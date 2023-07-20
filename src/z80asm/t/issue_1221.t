@@ -4,8 +4,8 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-# z80asm: support db, dw, ... as shortcuts to defb, defw, ...
 # https://github.com/z88dk/z88dk/issues/1221
+# z80asm: support db, dw, ... as shortcuts to defb, defw, ...
 
 z80asm_ok("", "", "",
           'byte     1'          => bytes(1),
@@ -38,7 +38,7 @@ z80asm_ok("", "", "",
           'dc       c2 = 5'     => "");
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF17
   Name: ${test}
   Section "": 50 bytes
     C \$0000: 01 02 03 04 05 68 65 6C 6C 6F 77 6F 72 6C 64 34

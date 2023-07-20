@@ -179,14 +179,21 @@ bool Preproc::open(const string& filename_, bool search_include_path) {
 	}
 
 	// open file
-	ifstream ifs(found_filename, ios::binary);
-	if (!ifs.is_open()) {
-		g_errors.error(ErrCode::FileOpen, found_filename);
+	if (!fs::is_regular_file(fs::path(found_filename))) {
+		g_errors.error(ErrCode::FileNotFound, found_filename);
 		return false;
 	}
 	else {
-		m_files.emplace_back(found_filename, ifs);
-		return true;
+		ifstream ifs(found_filename, ios::binary);
+		if (!ifs.is_open()) {
+			g_errors.error(ErrCode::FileOpen, found_filename);
+			perror(found_filename.c_str());
+			return false;
+		}
+		else {
+			m_files.emplace_back(found_filename, ifs);
+			return true;
+		}
 	}
 }
 
@@ -236,7 +243,7 @@ bool Preproc::getline1(string& line) {
 bool Preproc::getline(string& line) {
 	g_is_preproc_active = true;
 	if (getline1(line)) {
-		// publish expaneded line
+		// publish expanded line
 		list_got_expanded_line(line.c_str());
 		set_error_expanded_line(line.c_str());
 		return true;
@@ -332,6 +339,8 @@ void Preproc::parse_line(const string& line) {
 	if (check_macro()) return;
 	if (check_reptx()) return;
 	if (check_hash()) return;
+	if (check_gbz80_opcodes()) return;
+	if (check_z80_ld_bit_opcodes()) return;
 
 	// last check - macro call
 	if (check_macro_call()) return;
@@ -362,6 +371,26 @@ bool Preproc::ifs_active() {
 			return false;
 	}
 	return true;
+}
+
+bool Preproc::symbol_defined(const string& name) {
+	// expand macros in condition
+	string expanded_text = expand(name);
+	string expanded_name = expanded_text.empty() ? name : expanded_text;
+
+	// check macro
+	if (m_macros.find_all(expanded_name))
+		return true;
+
+	// check preprocessor macro
+	if (defines().find_all(expanded_name))
+		return true;
+
+	// check assembler symbol
+	if (check_ifdef_condition(expanded_name.c_str()))
+		return true;
+	else
+		return false;
 }
 
 bool Preproc::check_opcode(Keyword keyword, void(Preproc::* do_action)()) {
@@ -505,6 +534,108 @@ bool Preproc::check_reptx() {
 		return false;
 }
 
+bool Preproc::check_gbz80_opcodes() {
+	// ld ($ff00+xxx --> ldh (xxx
+	// ld ($ff00-xxx --> ldh (-xxx
+	// ld ($ff00)xxx --> ldh (0)xxx
+	if (m_lexer.peek(0).is(Keyword::LD) &&
+		m_lexer.peek(1).is(TType::LParen) &&
+		m_lexer.peek(2).is(TType::Integer) && m_lexer.peek(2).ivalue == 0xff00) {
+		switch (m_lexer.peek(3).ttype) {
+		case TType::Plus:
+			m_lexer.next(4);
+			m_output.push_back(string("ldh (") + m_lexer.text_ptr());
+			return true;
+		case TType::Minus:
+			m_lexer.next(3);
+			m_output.push_back(string("ldh (") + m_lexer.text_ptr());
+			return true;
+		case TType::RParen:
+			m_lexer.next(3);
+			m_output.push_back(string("ldh (0") + m_lexer.text_ptr());
+			return true;
+		default:
+			return false;
+		}
+	}
+	// ld ($ff00+xxx --> ldh (xxx
+	// ld ($ff00-xxx --> ldh (-xxx
+	// ld ($ff00)xxx --> ldh (0)xxx
+	if (m_lexer.peek(0).is(Keyword::LD) &&
+		m_lexer.peek(1).is(Keyword::A) &&
+		m_lexer.peek(2).is(TType::Comma) &&
+		m_lexer.peek(3).is(TType::LParen) &&
+		m_lexer.peek(4).is(TType::Integer) && m_lexer.peek(4).ivalue == 0xff00) {
+		switch (m_lexer.peek(5).ttype) {
+		case TType::Plus:
+			m_lexer.next(6);
+			m_output.push_back(string("ldh a,(") + m_lexer.text_ptr());
+			return true;
+		case TType::Minus:
+			m_lexer.next(5);
+			m_output.push_back(string("ldh a,(") + m_lexer.text_ptr());
+			return true;
+		case TType::RParen:
+			m_lexer.next(5);
+			m_output.push_back(string("ldh a,(0") + m_lexer.text_ptr());
+			return true;
+		default:
+			return false;
+		}
+	}
+	else
+		return false;
+}
+
+bool Preproc::check_z80_ld_bit_opcodes() {
+	// ld a, res 0, (ix+127) --> res 0, (ix+126), a
+	if (m_lexer.peek(0).is(Keyword::LD) &&
+		keyword_is_reg_8(m_lexer.peek(1).keyword) &&
+		m_lexer.peek(2).is(TType::Comma) &&
+		keyword_is_z80_ld_bit(m_lexer.peek(3).keyword) &&
+		m_lexer.peek(4).is(TType::Integer) &&
+		m_lexer.peek(5).is(TType::Comma) &&
+		m_lexer.peek(6).is(TType::LParen) &&
+		keyword_is_reg_ixy(m_lexer.peek(7).keyword)) {
+
+		string reg_8 = m_lexer.peek(1).svalue;
+		m_lexer.next(3);
+		string line = str_chomp(m_lexer.text_ptr()) + ", " + reg_8 + "\n";
+
+		// need to expand to swap IX/IY if -IXIY
+		m_lexer.set(line);
+		ExpandedText expanded = expand(m_lexer, defines());
+		if (expanded.got_error())
+			m_output.push_back(line);
+		else
+			m_output.push_back(expanded.text());
+		return true;
+	}
+	// ld a,rl (ix+127) --> rl (ix+127), a
+	else if (m_lexer.peek(0).is(Keyword::LD) &&
+		keyword_is_reg_8(m_lexer.peek(1).keyword) &&
+		m_lexer.peek(2).is(TType::Comma) &&
+		keyword_is_z80_ld_bit(m_lexer.peek(3).keyword) &&
+		m_lexer.peek(4).is(TType::LParen) &&
+		keyword_is_reg_ixy(m_lexer.peek(5).keyword)) {
+
+		string reg_8 = m_lexer.peek(1).svalue;
+		m_lexer.next(3);
+		string line = str_chomp(m_lexer.text_ptr()) + ", " + reg_8 + "\n";
+
+		// need to expand to swap IX/IY if -IXIY
+		m_lexer.set(line);
+		ExpandedText expanded = expand(m_lexer, defines());
+		if (expanded.got_error())
+			m_output.push_back(line);
+		else
+			m_output.push_back(expanded.text());
+		return true;
+	}
+	else
+		return false;
+}
+
 void Preproc::do_if() {
 	// expand macros in condition
 	string cond_text = expand(m_lexer.text_ptr());
@@ -563,11 +694,7 @@ void Preproc::do_ifdef_ifndef(bool invert) {
 		if (!m_lexer.peek().is(TType::Newline))
 			g_errors.error(ErrCode::Syntax);
 		else {
-			// expand macros in condition
-			string cond_text = expand(name);
-
-			// check condition
-			bool f = check_ifdef_condition(cond_text.c_str());
+			bool f = symbol_defined(name);
 			if (invert)
 				f = !f;
 			m_if_stack.emplace_back(Keyword::IF, m_files.back().location, f);
@@ -629,11 +756,7 @@ void Preproc::do_elifdef_elifndef(bool invert) {
 				if (!m_lexer.peek().is(TType::Newline))
 					g_errors.error(ErrCode::Syntax);
 				else {
-					// expand macros in condition
-					string cond_text = expand(name);
-
-					// check condition
-					bool f = check_ifdef_condition(cond_text.c_str());
+					bool f = symbol_defined(name);
 					if (invert)
 						f = !f;
 					if (m_if_stack.back().done_if)
@@ -682,26 +805,31 @@ void Preproc::do_binary() {
 			string found_filename = search_includes(filename.c_str());
 
 			// open file
-			ifstream ifs(found_filename, ios::binary);
-			if (!ifs.is_open())
-				g_errors.error(ErrCode::FileOpen, found_filename);
+			if (!fs::is_regular_file(fs::path(found_filename))) {
+				g_errors.error(ErrCode::FileNotFound, found_filename);
+			}
 			else {
-				// output DEFB lines
-				const int line_len = 16;
-				unsigned char bytes[line_len];
+				ifstream ifs(found_filename, ios::binary);
+				if (!ifs.is_open())
+					g_errors.error(ErrCode::FileOpen, found_filename);
+				else {
+					// output DEFB lines
+					const int line_len = 16;
+					unsigned char bytes[line_len];
 
-				while (!ifs.eof()) {
-					ifs.read(reinterpret_cast<char*>(bytes), line_len);
-					size_t num_read = static_cast<size_t>(ifs.gcount());
-					if (num_read > 0) {
-						string line = "defb ";
-						string separator = "";
-						for (size_t i = 0; i < num_read; i++) {
-							line += separator + std::to_string(bytes[i]);
-							separator = ",";
+					while (!ifs.eof()) {
+						ifs.read(reinterpret_cast<char*>(bytes), line_len);
+						size_t num_read = static_cast<size_t>(ifs.gcount());
+						if (num_read > 0) {
+							string line = "defb ";
+							string separator = "";
+							for (size_t i = 0; i < num_read; i++) {
+								line += separator + std::to_string(bytes[i]);
+								separator = ",";
+							}
+							line += "\n";
+							m_output.push_back(line);
 						}
-						line += "\n";
-						m_output.push_back(line);
 					}
 				}
 			}

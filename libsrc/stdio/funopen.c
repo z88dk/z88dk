@@ -38,8 +38,7 @@ ELSE
 	call	malloc		
 	pop	bc
 	push	hl		;Keep for later
-	ld	e,(ix+8)	;cookie
-	ld	d,(ix+9)
+	ld	de,(ix+8)	;cookie
 	ld	(hl),e		;fp_desc
 	inc	hl
 	ld	(hl),d
@@ -53,33 +52,33 @@ ELSE
 	inc	hl
 	ld	(hl),d
 	inc	hl
-	ld	e,(ix + 6)	;readfn
-	ld	d,(ix + 7)
+	ld	de,(ix + 6)	;readfn
 	call	noop_becomes_dummy
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
 	inc	hl
-	ld	e,(ix + 4)	;writefn
-	ld	d,(ix + 5)
+	ld	de,(ix + 4)	;writefn
 	call	noop_becomes_dummy
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
 	inc	hl
-	ld	e,(ix + 2)	;seekfn
-	ld	d,(ix + 3)
+	ld	de,(ix + 2)	;seekfn
 	call	noop_becomes_dummy
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
 	inc	hl
-	ld	e,(ix + 0)	;closefn
-	ld	d,(ix + 1)
+	ld	de,(ix + 0)	;closefn
 	call	noop_becomes_dummy
+IF __CPU_EZ80__
+	ld	(hl),de
+ELSE
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
+ENDIF
 	pop	hl		;get fp back
 	pop	ix		;restore callers
 	ret
@@ -168,13 +167,11 @@ handle_putc:
 ; de = buf,
 ; bc = length
 handle_read:
-	ld	l,(ix+fp_desc)
-	ld	h,(ix+fp_desc+1)
+	ld	hl,(ix+fp_desc)
 	push	hl
 	push	de
 	push	bc
-	ld	l,(ix + fp_extra + 2 + fu_readfn)
-	ld	h,(ix + fp_extra + 2 + fu_readfn + 1)
+	ld	hl,(ix + fp_extra + 2 + fu_readfn)
 exec_3args:
 	call	l_jphl
 	pop	bc
@@ -186,20 +183,16 @@ exec_3args:
 ; de = buf,
 ; bc = length	
 handle_write:
-	ld	l,(ix+fp_desc)
-	ld	h,(ix+fp_desc+1)
+	ld	hl,(ix+fp_desc)
 	push	hl
 	push	de
 	push	bc
-	ld	l,(ix + fp_extra + 2 + fu_writefn)
-	ld	h,(ix + fp_extra + 2 + fu_writefn + 1)
+	ld	hl,(ix + fp_extra + 2 + fu_writefn)
 	jr	exec_3args
 
 handle_close:
-	ld	l,(ix + fp_extra + 2 + fu_closefn)
-	ld	h,(ix + fp_extra + 2 + fu_closefn + 1)
-	ld	c,(ix + fp_desc)
-	ld	b,(ix + fp_desc + 1)
+	ld	hl,(ix + fp_extra + 2 + fu_closefn)
+	ld	bc,(ix + fp_desc)
 	push	bc
 	call	l_jphl		; call users close function
 	pop	bc
@@ -215,8 +208,7 @@ handle_close:
 ; alt-a = whence
 ; Exit: dehl = current position or -1
 handle_seek:
-	ld	l,(ix+fp_desc)
-	ld	h,(ix+fp_desc+1)
+	ld	hl,(ix+fp_desc)
 	push	hl		;void *
 	push	bc		;posn
 	push	de
@@ -224,8 +216,7 @@ handle_seek:
 	ld	c,a
 	ld	b,0
 	push	bc		;whence
-	ld	l,(ix + fp_extra + 2 + fu_seekfn)
-	ld	h,(ix + fp_extra + 2 + fu_seekfn + 1)
+	ld	hl,(ix + fp_extra + 2 + fu_seekfn)
 	call	l_jphl
 	pop	bc
 	pop	bc

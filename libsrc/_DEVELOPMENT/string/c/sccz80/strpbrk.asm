@@ -32,3 +32,10 @@ PUBLIC _strpbrk
 defc _strpbrk = strpbrk
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strpbrk
+defc ___strpbrk = strpbrk
+ENDIF
+

@@ -1,13 +1,29 @@
+SECTION   code_fp_math32
+PUBLIC    log
+EXTERN    _m32_logf
 
-	SECTION	code_fp_math32
-	PUBLIC	log
-	EXTERN	_m32_logf
+IFNDEF __CLASSIC
+defc   log = _m32_logf
+ELSE
 
-	defc	log = _m32_logf
+; Classic has a non-fastcall implementation
+
+log:
+    pop bc
+    pop hl
+    pop de
+    push de
+    push hl
+    push bc
+    jp _m32_logf
 
 ; SDCC bridge for Classic
-IF __CLASSIC
 PUBLIC _log
-defc _log = _m32_logf
-ENDIF
+defc _log = log
 
+
+; Clang bridge for Classic
+PUBLIC _logf
+defc _logf = log
+
+ENDIF

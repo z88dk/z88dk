@@ -64,8 +64,8 @@ void playmusic(void) {
 void setup_int() {
 #ifndef NO_INTERRUPT
 #if __SPECTRUM__
-   zx_im2_init(0xd300, 0xd4);
-   add_raster_int(0x38);
+   zx_im2_init((void *)0xd300, 0xd4);
+   add_raster_int((isr_t)0x38);
 #endif
 #ifndef NO_INTERRUPT_INIT
    im1_init();
@@ -75,7 +75,7 @@ void setup_int() {
 }
 
 
-void main()
+int main()
 {
    printf("%cWYZ Tracker example\n",12);
 
@@ -123,5 +123,6 @@ void main()
        msleep(40);
 #endif
    }
+   return 0;
 }
 

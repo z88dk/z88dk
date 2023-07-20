@@ -53,10 +53,10 @@ ENDIF
     defc    TAR__fputc_cons_generic = 1
     defc	TAR__register_sp = -1
     defc    TAR__clib_exit_stack_size = 32
-    IF !DEFINED_CRT_COMMANDLINE_REDIRECTION
-        define  DEFINED_CRT_COMMANDLINE_REDIRECTION
-        defc    CRT_COMMANDLINE_REDIRECTION = 0
-    ENDIF
+;    IF !DEFINED_CRT_COMMANDLINE_REDIRECTION
+;        define  DEFINED_CRT_COMMANDLINE_REDIRECTION
+;        defc    CRT_COMMANDLINE_REDIRECTION = 0
+;    ENDIF
     INCLUDE	"crt/classic/crt_rules.inc"
 
     INCLUDE	"target/trs80/def/maths_mbf.def"

@@ -199,8 +199,7 @@ PUBLIC asm_f24_add_f24
     adc a,a                     ; see if overflow from hl
     ret Z                       ; return if no overflow
     rra                         ; put carried bit back
-    rr h
-    rr l
+    rr hl
     jr NC,doadd0
     set 0,l
 .doadd0

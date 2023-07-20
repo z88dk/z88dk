@@ -6,11 +6,13 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     
     PUBLIC  xorplot
     PUBLIC  _xorplot
+    PUBLIC  ___xorplot
     
     EXTERN  asm_xorplot
 
 .xorplot
 ._xorplot
+.___xorplot
     pop     af
     pop     de    ; y
     pop     hl    ; x

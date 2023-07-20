@@ -77,8 +77,7 @@ PUBLIC m32__dtoa_base10
     sla e                       ; move mantissa to capture exponent
     rl d
     ld a,d                      ; get exponent in A
-    rr d
-    rr e
+    rr de
 
     cp $7e+1                    ; remaining fraction part < 1 ?
     jr NC,aligned_digit         ; if no
@@ -112,8 +111,7 @@ PUBLIC m32__dtoa_base10
 .digit_loop
     srl d                       ; shift mantissa bits right
     rr e
-    rr h
-    rr l
+    rr hl
     dec a
     jr NZ,digit_loop
 

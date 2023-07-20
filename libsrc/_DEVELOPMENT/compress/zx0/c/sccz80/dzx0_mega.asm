@@ -19,3 +19,16 @@ dzx0_mega:
    push af
    
    jp asm_dzx0_mega
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx0_mega
+defc _dzx0_mega = dzx0_mega
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___dzx0_mega
+defc ___dzx0_mega = dzx0_mega
+ENDIF
+

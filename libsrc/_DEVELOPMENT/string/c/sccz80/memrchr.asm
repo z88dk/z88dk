@@ -50,3 +50,10 @@ PUBLIC _memrchr
 defc _memrchr = memrchr
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memrchr
+defc ___memrchr = memrchr
+ENDIF
+

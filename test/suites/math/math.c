@@ -238,8 +238,9 @@ static void run_fmin(FLOAT x, FLOAT y, FLOAT e)
 void test_fmin()
 {
     run_fmin(3.0, 2.0, 2.0);
-    run_fmin(3.0,-1.0, -1.0);
-    run_fmin(-3.0,1.0, -3.0);
+    run_fmin(3.0, -1.0, -1.0);
+    run_fmin(-3.0, 1.0, -3.0);
+    run_fmin(-3.0, -1.0, -3.0);
 }
 
 static void run_fmax(FLOAT x, FLOAT y, FLOAT e)
@@ -254,9 +255,9 @@ static void run_fmax(FLOAT x, FLOAT y, FLOAT e)
 void test_fmax()
 {
     run_fmax(3.0, 2.0, 3.0);
-    run_fmax(3.0,-1.0, 3.0);
-    run_fmax(-3.0,1.0, 1.0);
-
+    run_fmax(3.0, -1.0, 3.0);
+    run_fmax(-3.0, 1.0, 1.0);
+    run_fmax(-3.0, -1.0, -1.0);
 }
 
 #endif

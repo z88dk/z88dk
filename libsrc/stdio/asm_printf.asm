@@ -114,10 +114,8 @@ ELSE
 	ld	hl,-80
 	add	hl,sp
 	ld	sp,hl
-	ld	e,(ix+2)	;arg pointer
-	ld	d,(ix+3)
-	ld	l,(ix+4)	;format pointer
-	ld	h,(ix+5)
+        ld      de,(ix+2)	;arg pointer
+        ld      hl,(ix+4)	;format pointer
   ENDIF
 	xor	a
 	ld	(ix-1),a

@@ -3,11 +3,13 @@
 SECTION code_clib
 PUBLIC sbrk
 PUBLIC _sbrk
+PUBLIC ___sbrk
 
 EXTERN asm_sbrk
 
 .sbrk
 ._sbrk
+.___sbrk
 
    pop de
    pop bc
