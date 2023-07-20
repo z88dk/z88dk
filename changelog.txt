@@ -33,7 +33,7 @@ Detailed but incomplete changelist:
 - [sccz80] Extended quikmult cases
 - [sccz80] Initialisation improvements
 - [zsdcc] The preprocessor has been switched over to ucpp which is C99 compatible
-- [zsdcc] Upgraded to SDCC 4.3.0 r13xxx
+- [zsdcc] Upgraded to SDCC 4.3.0 r14210
 - [z80asm] Allow jr across sections
 - [z80asm] Convert address difference to constant
 - [z80asm] Support #ifdef/#endif etc in assembler
