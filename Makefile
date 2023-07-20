@@ -9,9 +9,9 @@
 
 # EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
-  EXESUFFIX 		:= .exe
+  EXESUFFIX 	:= .exe
 else
-  EXESUFFIX 		?=
+  EXESUFFIX 	?=
 endif
 
 PREFIX ?= /usr/local
@@ -35,11 +35,11 @@ endif
 
 Z88DK_PATH	= $(shell pwd)
 SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
-SDCC_VERSION    = 13131
+SDCC_VERSION	= 14210
 
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
-SDCC_DEPS = zsdcc_r$(SDCC_VERSION)_src.tar.gz
+SDCC_DEPS	= zsdcc_r$(SDCC_VERSION)_src.tar.gz
 endif
 endif
 
@@ -54,7 +54,7 @@ BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
 	bin/z88dk-lib$(EXESUFFIX) bin/z88dk-zx0$(EXESUFFIX)
-	
+
 ALL = $(BINS) testsuite
 
 ALL_EXT = bin/z88dk-zsdcc$(EXESUFFIX)
@@ -84,7 +84,7 @@ ifdef BUILD_SDCC_HTTP
 	tar xzf $^
 	touch $@
 else
-	svn checkout -r $(SDCC_VERSION) https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH) 
+	svn checkout -r $(SDCC_VERSION) https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
 	patch -d $(SDCC_PATH) -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 endif
 endif
@@ -96,7 +96,6 @@ zsdcc_r$(SDCC_VERSION)_src.tar.gz:
 zsdcc-tarball: $(SDCC_PATH)/configure
 	@mkdir -p dist
 	tar --exclude=.svn -cvzf dist/zsdcc_r$(SDCC_VERSION)_src.tar.gz src/sdcc-build
-	
 
 $(SDCC_PATH)/Makefile: $(SDCC_PATH)/configure
 ifdef BUILD_SDCC
@@ -109,20 +108,23 @@ ifdef BUILD_SDCC
 		--disable-pdk15-port --disable-pdk16-port \
 		--disable-mos6502-port --disable-mos65c02-port \
 		--disable-r2k-port \
-		--disable-ucsim --disable-device-lib --disable-packihx
+		--disable-non-free --disable-device-lib \
+		--disable-ucsim --disable-packihx \
+		--disable-sdcpp --disable-sdcdb --disable-sdbinutil \
+		--prefix=`pwd`/sdcc-install
 endif
 
 
 $(SDCC_PATH)/bin/sdcc$(EXESUFFIX): $(SDCC_PATH)/Makefile
 ifdef BUILD_SDCC
-	$(MAKE) -C $(SDCC_PATH)
+	$(MAKE) -C $(SDCC_PATH) all
+	$(MAKE) -C $(SDCC_PATH) install
 endif
 
 
 bin/z88dk-zsdcc$(EXESUFFIX): $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)
 ifdef BUILD_SDCC
-	cp $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
-	cp $(SDCC_PATH)/bin/sdcpp$(EXESUFFIX) $(Z88DK_PATH)/bin/z88dk-zsdcpp$(EXESUFFIX)
+	cp $(SDCC_PATH)/sdcc-install/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
 endif
 
 
