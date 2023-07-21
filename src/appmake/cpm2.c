@@ -1087,6 +1087,7 @@ static disc_spec alphatro_spec = {
 
 static disc_spec sharpx1_spec = {
     .name = "Sharp-X1",
+    .disk_mode = MFM250,
     .sectors_per_track = 16,
     .tracks = 40,
     .sides = 2,
