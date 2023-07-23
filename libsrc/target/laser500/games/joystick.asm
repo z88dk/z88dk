@@ -48,7 +48,7 @@ got_it:
 	set	4,l
 not_fire1:
 	in	a,($27)
-	bit	5,a
+	bit	4,a
 	ret	nz
 	set	5,l
 	ret
