@@ -118,7 +118,7 @@ endif
 $(SDCC_PATH)/bin/sdcc$(EXESUFFIX): $(SDCC_PATH)/Makefile
 ifdef BUILD_SDCC
 	$(MAKE) -C $(SDCC_PATH) all
-	$(MAKE) -C $(SDCC_PATH) install
+	$(MAKE) DESTDIR= -C $(SDCC_PATH) install
 endif
 
 
