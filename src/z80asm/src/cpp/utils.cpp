@@ -93,7 +93,7 @@ string str_expand_escapes(const string& in) {
 		default:
 			if (c >= 0x20 && c < 0x7f)
 				out.push_back(c);
-			else if (c >= 0 && c < 8)
+			else if ((c & 0xff) < 8)
 				out += "\\" + to_string(c);			// \o
 			else {
 				std::ostringstream ss;
