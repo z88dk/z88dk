@@ -110,21 +110,19 @@ ifdef BUILD_SDCC
 		--disable-r2k-port \
 		--disable-non-free --disable-device-lib \
 		--disable-ucsim --disable-packihx \
-		--disable-sdcpp --disable-sdcdb --disable-sdbinutil \
-		--prefix=`pwd`/sdcc-install
+		--disable-sdcpp --disable-sdcdb --disable-sdbinutil
 endif
 
 
 $(SDCC_PATH)/bin/sdcc$(EXESUFFIX): $(SDCC_PATH)/Makefile
 ifdef BUILD_SDCC
 	$(MAKE) -C $(SDCC_PATH) all
-	$(MAKE) DESTDIR= -C $(SDCC_PATH) install
 endif
 
 
 bin/z88dk-zsdcc$(EXESUFFIX): $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)
 ifdef BUILD_SDCC
-	cp $(SDCC_PATH)/sdcc-install/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
+	cp $(SDCC_PATH)/src/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
 endif
 
 
