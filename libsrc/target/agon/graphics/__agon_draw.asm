@@ -18,22 +18,35 @@ __agon_draw:
     pop     af
     call    __agon_putc
 
+    ; Plot the origin pixel
     ld      a,25
     call    __agon_putc
     ld      a,$41
     call    __agon_putc
-    defb    $dd, $27, 6	; ld hl,(ix+6) (x1)
+    ld      hl,(ix+6)
     call    __agon_putword
-    defb    $dd, $27, 4	; ld hl,(ix+4) (y1)
+    ld      hl,(ix+4)
     call    __agon_putword
+
+    ; Now move the cursor
+    ld      a,25
+    call    __agon_putc
+    ld      a,4
+    call    __agon_putc
+    ld      hl,(ix+6)
+    call    __agon_putword
+    ld      hl,(ix+4)
+    call    __agon_putword
+
+    ; And now draw the line
     ld      a,25
     call    __agon_putc
     ld      a,5
     call    __agon_putc
-    defb    $dd, $27, 2	; ld hl,(ix+2) (y2)
+    ld      hl,(ix+2)
     ld      (__gfx_coords),hl
     call    __agon_putword
-    defb    $dd, $27, 0	; ld hl,(ix+0) (y2)
+    ld      hl,(ix+0)
     ld      (__gfx_coords+2),hl
     call    __agon_putword
     ret

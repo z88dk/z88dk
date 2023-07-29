@@ -18,6 +18,7 @@ __agon_drawr:
     pop     af
     call    __agon_putc
 
+    ;Plot pixel
     ld      a,25
     call    __agon_putc
     ld      a,$41
@@ -26,16 +27,27 @@ __agon_drawr:
     call    __agon_putword
     ld      hl,(__gfx_coords+2)
     call    __agon_putword
+
+    ; Move to 
+    ld      a,25
+    call    __agon_putc
+    ld      a,4
+    call    __agon_putc
+    ld      hl,(__gfx_coords)
+    call    __agon_putword
+    ld      hl,(__gfx_coords+2)
+    call    __agon_putword
+
     ld      a,25
     call    __agon_putc
     ld      a,5
     call    __agon_putc
-    defb    $dd, $17, 2	; ld de,(ix+2) (y2)
+    ld      de,(ix+2)	;x2
     ld      hl,(__gfx_coords)
     add     hl,de
     ld      (__gfx_coords),hl
     call    __agon_putword
-    defb    $dd, $17, 0	; ld de,(ix+0) (y2)
+    ld      de,(ix+0)	;y2
     ld      hl,(__gfx_coords+2)
     add     hl,de
     ld      (__gfx_coords+2),hl
