@@ -83,8 +83,9 @@ capture_ok("z88dk-z80asm -b -l -m ${test}.o ${test}1.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 28 bytes, ORG \$1234
     C \$0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 06 00
     C \$0010: 11 00 00 21 00 00 11 00 00 01 00 00
@@ -106,8 +107,9 @@ Object  file ${test}.o at \$0000: Z80RMF17
     E Cw \$0013 \$0014 3 __head (section "") (file ${test}.asm:14)
     E Cw \$0016 \$0017 3 __tail (section "") (file ${test}.asm:15)
     E Cw \$0019 \$001A 3 __size (section "") (file ${test}.asm:16)
-Object  file ${test}1.o at \$0000: Z80RMF17
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 28 bytes, ORG \$1234
     C \$0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C \$0010: 11 03 00 21 00 00 11 00 00 01 00 00
@@ -176,8 +178,9 @@ capture_ok("z88dk-z80asm -b ${test}.o ${test}1.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 4 bytes, ORG \$1000
     C \$0000: CD 00 00 C9
   Symbols:
@@ -186,8 +189,9 @@ Object  file ${test}.o at \$0000: Z80RMF17
     U         func2
   Expressions:
     E Cw \$0000 \$0001 3 func2 (section "") (file ${test}.asm:3)
-Object  file ${test}1.o at \$0000: Z80RMF17
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 4 bytes, ORG \$1000
     C \$0000: CD 00 00 C9
   Symbols:
@@ -235,8 +239,9 @@ capture_ok("z88dk-z80asm -b ${test}.o ${test}1.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 4 bytes, ORG \$1000
     C \$0000: CD 00 00 C9
   Symbols:
@@ -245,8 +250,9 @@ Object  file ${test}.o at \$0000: Z80RMF17
     U         func2
   Expressions:
     E Cw \$0000 \$0001 3 func2 (section "") (file ${test}.asm:1)
-Object  file ${test}1.o at \$0000: Z80RMF17
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 4 bytes, ORG \$1000
     C \$0000: CD 00 00 C9
   Symbols:

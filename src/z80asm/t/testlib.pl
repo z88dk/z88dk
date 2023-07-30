@@ -13,7 +13,7 @@ $ENV{PATH} = join($Config{path_sep},
 			"../../bin",
 			$ENV{PATH});
 
-my $OBJ_FILE_VERSION = "17";
+my $OBJ_FILE_VERSION = "18";
 
 use vars '$test', '$null';
 $test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
@@ -250,6 +250,9 @@ sub objfile {
 	my $lib_addr	 = length($o); $o .= pack("V", -1);
 	my $code_addr	 = length($o); $o .= pack("V", -1);
 
+	# store CPU and -IXIY
+	$o .= pack("VV", 1, 0);
+	
 	# store expressions
 	if ($args{EXPR}) {
 		store_ptr(\$o, $expr_addr);

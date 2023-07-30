@@ -38,8 +38,9 @@ END
 capture_ok("z88dk-z80asm -l ${test}.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section rodata_driver: 257 bytes
     C \$0000: 55 C3 08 D8 C3 07 D8 AA C9 C9 00 00 00 00 00 00
     C \$0010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00

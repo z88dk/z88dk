@@ -10,8 +10,9 @@ z80asm_ok("", "", "", <<END, bytes(0xc9));
 END
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF17
+Object  file $test.o at \$0000: Z80RMF18
   Name: $test
+  CPU:  z80 
   Section "": 1 bytes
     C \$0000: C9
   Symbols:
@@ -26,8 +27,9 @@ z80asm_ok("", "", "", <<END, bytes(0xc9));
 END
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF17
+Object  file $test.o at \$0000: Z80RMF18
   Name: lib
+  CPU:  z80 
   Section "": 1 bytes
     C \$0000: C9
   Symbols:
@@ -43,8 +45,9 @@ z80asm_ok("", "", "", <<END, bytes(0xc9));
 END
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF17
+Object  file $test.o at \$0000: Z80RMF18
   Name: lib2
+  CPU:  z80 
   Section "": 1 bytes
     C \$0000: C9
   Symbols:

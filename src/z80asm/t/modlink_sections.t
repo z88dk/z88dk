@@ -97,8 +97,9 @@ capture_ok("z88dk-z80asm -b -l -m ${test}.o ${test}1.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 0 bytes, ORG \$1234
   Section code: 28 bytes
     C \$0000: 21 00 00 01 00 00 CD 00 00 21 00 00 01 00 00 CD
@@ -125,8 +126,9 @@ Object  file ${test}.o at \$0000: Z80RMF17
     E Cw \$0012 \$0013 3 mes0 (section code) (file ${test}.asm:25)
     E Cw \$0015 \$0016 3 mes0end-mes0 (section code) (file ${test}.asm:26)
     E Cw \$0018 \$0019 3 prmes (section code) (file ${test}.asm:27)
-Object  file ${test}1.o at \$0000: Z80RMF17
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 0 bytes, ORG \$1234
   Section code: 9 bytes
     C \$0000: 78 B1 C8 7E 23 D7 0B 18 F7
@@ -203,20 +205,23 @@ capture_ok("z88dk-z80asm -b -l -m ${test}.o ${test}1.o ${test}2.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o ${test}2.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section code: 0 bytes
   Section data: 0 bytes
   Section bss: 1 bytes
     C \$0000: 03
-Object  file ${test}1.o at \$0000: Z80RMF17
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section code: 0 bytes
   Section data: 1 bytes
     C \$0000: 02
   Section bss: 0 bytes
-Object  file ${test}2.o at \$0000: Z80RMF17
+Object  file ${test}2.o at \$0000: Z80RMF18
   Name: ${test}2
+  CPU:  z80 
   Section code: 1 bytes
     C \$0000: 01
   Section data: 0 bytes

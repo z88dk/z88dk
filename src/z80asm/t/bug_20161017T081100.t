@@ -22,8 +22,9 @@ END
 capture_ok("z88dk-z80asm ${test}1.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}1.o", <<END);
-Object  file ${test}1.o at \$0000: Z80RMF17
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section LOADER: 3 bytes
     C \$0000: 21 00 00
   Externs:
@@ -37,8 +38,9 @@ END
 capture_ok("z88dk-z80asm -o${test}1.o ${test}1.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}1.o", <<END);
-Object  file ${test}1.o at \$0000: Z80RMF17
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section LOADER: 3 bytes
     C \$0000: 21 00 00
   Externs:

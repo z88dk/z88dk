@@ -155,8 +155,9 @@ capture_ok("z88dk-z80asm -s -o${test}.o ".
 		   "${test}1.asm ${test}2.asm ${test}3.asm ${test}4.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section code: 37 bytes
     C \$0000: CD 00 00 21 00 00 CD 00 00 CD 00 00 C9 7E A7 C8
     C \$0010: D7 23 CD 00 00 C3 00 00 06 00 05 C2 00 00 C9 E5

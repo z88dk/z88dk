@@ -19,8 +19,9 @@ run_ok("z88dk-z80asm $test.asm");
 ok -f "$test.o", "$test.o exists";
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF17
+Object  file $test.o at \$0000: Z80RMF18
   Name: $test
+  CPU:  z80 
   Section "": 2 bytes
     C \$0000: C9 C9
   Symbols:
@@ -36,8 +37,9 @@ ok ! -f "$test.o", "no $test.o";
 ok -f "$test.dir/zcc0000.o", "$test.dir/zcc0000.o exists";
 
 capture_ok("z88dk-z80nm -a $test.dir/zcc0000.o", <<END);
-Object  file $test.dir/zcc0000.o at \$0000: Z80RMF17
+Object  file $test.dir/zcc0000.o at \$0000: Z80RMF18
   Name: zcc0000
+  CPU:  z80 
   Section "": 2 bytes
     C \$0000: C9 C9
   Symbols:

@@ -51,8 +51,9 @@ DEFC asm_BIFROST2_stop               = $C9B2
 END
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 1 bytes, ORG \$FDE8
     C \$0000: C9
   Symbols:

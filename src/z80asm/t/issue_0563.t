@@ -22,8 +22,9 @@ END
 capture_ok("z88dk-z80asm -o${test}x.o ${test}1.asm ${test}2.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}x.o", <<END);
-Object  file ${test}x.o at \$0000: Z80RMF17
+Object  file ${test}x.o at \$0000: Z80RMF18
   Name: ${test}x
+  CPU:  z80 
   Section "": 1 bytes
     C \$0000: C9
   Symbols:

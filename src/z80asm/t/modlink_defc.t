@@ -30,8 +30,9 @@ capture_ok("z88dk-z80asm -b ${test}.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 8 bytes, ORG \$0100
     C \$0000: 00 00 00 00 00 00 00 00
   Symbols:
@@ -111,8 +112,9 @@ capture_ok("z88dk-z80asm -b ${test}.o ${test}1.o ${test}2.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o ${test}2.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 0 bytes, ORG \$1000
   Section code: 9 bytes
     C \$0000: CD 00 00 CD 00 00 C3 00 00
@@ -125,8 +127,9 @@ Object  file ${test}.o at \$0000: Z80RMF17
     E Cw \$0000 \$0001 3 func1_alias (section code) (file ${test}.asm:7)
     E Cw \$0003 \$0004 3 func2_alias (section code) (file ${test}.asm:8)
     E Cw \$0006 \$0007 3 computed_end (section code) (file ${test}.asm:9)
-Object  file ${test}1.o at \$0000: Z80RMF17
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 0 bytes, ORG \$1000
   Section code: 1 bytes
     C \$0000: C8
@@ -135,8 +138,9 @@ Object  file ${test}1.o at \$0000: Z80RMF17
   Symbols:
     G A \$0000 func1 (section lib) (file ${test}1.asm:7)
     G A \$0000 func2 (section code) (file ${test}1.asm:10)
-Object  file ${test}2.o at \$0000: Z80RMF17
+Object  file ${test}2.o at \$0000: Z80RMF18
   Name: ${test}2
+  CPU:  z80 
   Section "": 0 bytes, ORG \$1000
   Section code: 0 bytes
   Section lib: 0 bytes
@@ -202,8 +206,9 @@ capture_ok("z88dk-z80asm -b ${test}.o ${test}1.o ${test}2.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o ${test}2.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 0 bytes, ORG \$1000
   Symbols:
     G = \$0000 asm_b_vector_at (section "") (file ${test}.asm:4)
@@ -211,14 +216,16 @@ Object  file ${test}.o at \$0000: Z80RMF17
     U         asm_b_array_at
   Expressions:
     E =  \$0000 \$0000 0 asm_b_vector_at := asm_b_array_at (section "") (file ${test}.asm:4)
-Object  file ${test}1.o at \$0000: Z80RMF17
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 1 bytes, ORG \$1000
     C \$0000: C9
   Symbols:
     G A \$0000 asm_b_array_at (section "") (file ${test}1.asm:3)
-Object  file ${test}2.o at \$0000: Z80RMF17
+Object  file ${test}2.o at \$0000: Z80RMF18
   Name: ${test}2
+  CPU:  z80 
   Section "": 7 bytes, ORG \$1000
     C \$0000: CD 00 00 CD 00 00 C9
   Symbols:

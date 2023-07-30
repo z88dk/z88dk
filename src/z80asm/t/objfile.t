@@ -17,8 +17,9 @@ capture_ok("z88dk-z80asm ${test}.asm", "");
 check_bin_file("${test}.o", objfile(NAME => $test));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
 END
 
 
@@ -32,8 +33,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 									CODE => [["", -1, 1, bytes(0)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 1 bytes
     C \$0000: 00
 END
@@ -49,8 +51,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 									CODE => [["", -1, 1, bytes(0) x 0x10000]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 65536 bytes
     C \$0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     C \$0010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -4161,8 +4164,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 									CODE => [["", 0, 1, bytes(0)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 1 bytes, ORG \$0000
     C \$0000: 00
 END
@@ -4178,8 +4182,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 									CODE => [["", 0xFFFF, 1, bytes(0)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 1 bytes, ORG \$FFFF
     C \$0000: 00
 END
@@ -4216,8 +4221,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 												  0x21,0x7F,0x00,0x39)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 42 bytes
     C \$0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00 EB 21 80 00
     C \$0010: 39 EB EB 21 00 00 39 EB EB 21 7F 00 39 EB 21 80
@@ -4267,8 +4273,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 						  0x21,0x7F,0x00,0x39)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 42 bytes
     C \$0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00 EB 21 80 00
     C \$0010: 39 EB EB 21 00 00 39 EB EB 21 7F 00 39 EB 21 80
@@ -4323,8 +4330,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 						  0x21,0x7F,0x00,0x39)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 42 bytes
     C \$0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00 EB 21 80 00
     C \$0010: 39 EB EB 21 00 00 39 EB EB 21 7F 00 39 EB 21 80
@@ -4376,8 +4384,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 						  0x00,0x00,0x00,0x00)]]));	# addr  14
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 18 bytes, ORG \$0003
     C \$0000: 3E 00 DD 46 00 01 00 00 11 00 00 01 00 00 00 00
     C \$0010: 00 00
@@ -4423,8 +4432,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 							  0xCD,0x00,0x00)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF17
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 7 bytes
     C \$0000: 00 CD 00 00 CD 00 00
   Symbols:
@@ -4460,16 +4470,18 @@ my $obj2 = slurp("${test}2.o");
 check_bin_file("${test}.lib", libfile($obj1, $obj2));
 
 capture_ok("z88dk-z80nm -a ${test}.lib", <<END);
-Library file ${test}.lib at \$0000: Z80LMF17
-Object  file ${test}.lib at \$0010: Z80RMF17
+Library file ${test}.lib at \$0000: Z80LMF18
+Object  file ${test}.lib at \$0010: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 1 bytes
     C \$0000: C9
   Symbols:
     G A \$0000 mult (section "") (file ${test}1.asm:2)
 
-Object  file ${test}.lib at \$0080: Z80RMF17
+Object  file ${test}.lib at \$0088: Z80RMF18
   Name: ${test}2
+  CPU:  z80 
   Section "": 1 bytes
     C \$0000: C9
   Symbols:

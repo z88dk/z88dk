@@ -23,8 +23,9 @@ __size                          = \$0004 ; const, public, def, , ,
 END
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF17
+Object  file $test.o at \$0000: Z80RMF18
   Name: $test
+  CPU:  z80 
   Section "": 4 bytes
     C \$0000: C9 CD 00 00
   Symbols:
@@ -48,8 +49,9 @@ __size                          = \$0004 ; const, public, def, , ,
 END
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF17
+Object  file $test.o at \$0000: Z80RMF18
   Name: $test
+  CPU:  z80 
   Section "": 4 bytes
     C \$0000: C9 CD 00 00
   Symbols:

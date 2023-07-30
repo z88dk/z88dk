@@ -17,8 +17,9 @@ z80asm_ok("", "$test.asm $test.1.asm", "", <<END, words(1000));
 END
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF17
+Object  file $test.o at \$0000: Z80RMF18
   Name: $test
+  CPU:  z80 
   Section "": 2 bytes
     C \$0000: 00 00
   Externs:

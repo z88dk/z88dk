@@ -25,12 +25,14 @@ END
 capture_ok("z88dk-z80asm -x${test}plat1.lib ${test}plat1.asm ${test}gen.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<END);
-Library file ${test}plat1.lib at \$0000: Z80LMF17
-Object  file ${test}plat1.lib at \$0010: Z80RMF17
+Library file ${test}plat1.lib at \$0000: Z80LMF18
+Object  file ${test}plat1.lib at \$0010: Z80RMF18
   Name: ${test}plat1
+  CPU:  z80 
 
-Object  file ${test}plat1.lib at \$0054: Z80RMF17
+Object  file ${test}plat1.lib at \$005C: Z80RMF18
   Name: ${test}gen
+  CPU:  z80 
   Section "": 3 bytes
     C \$0000: 3E 01 C9
   Symbols:
@@ -52,12 +54,14 @@ END
 capture_ok("z88dk-z80asm -x${test}plat2.lib ${test}plat2.asm ${test}gen.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<END);
-Library file ${test}plat1.lib at \$0000: Z80LMF17
-Object  file ${test}plat1.lib at \$0010: Z80RMF17
+Library file ${test}plat1.lib at \$0000: Z80LMF18
+Object  file ${test}plat1.lib at \$0010: Z80RMF18
   Name: ${test}plat1
+  CPU:  z80 
 
-Object  file ${test}plat1.lib at \$0054: Z80RMF17
+Object  file ${test}plat1.lib at \$005C: Z80RMF18
   Name: ${test}gen
+  CPU:  z80 
   Section "": 3 bytes
     C \$0000: 3E 01 C9
   Symbols:
