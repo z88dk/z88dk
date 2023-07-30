@@ -8,6 +8,7 @@
 
 #include "if.h"
 #include "utils.h"
+#include "z80asm_cpu.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -15,6 +16,7 @@ using namespace std;
 // command line arguments and files
 struct Args {
 public:
+    Args();
 	void parse_args(const vector<string>& args);
 
 	// options
@@ -73,8 +75,8 @@ private:
 	bool			m_swap_ixiy{ false };		// -IXIY option
 	bool			m_ucase{ false };			// -ucase option
     bool            m_raw_strings{ false };     // -raw-strings option
-	int				m_cpu{ CPU_Z80 };			// -m option
-	string			m_cpu_name{ CPU_Z80_NAME };
+	int				m_cpu{ 0 };			        // -m option
+	string			m_cpu_name;
     bool            m_got_cpu_option{ false };  // got -m option
 	bool			m_ti83{ false };			// -mti83 option
 	bool			m_ti83plus{ false };		// -mti83plus option

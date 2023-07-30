@@ -1,9 +1,13 @@
 //-----------------------------------------------------------------------------
 // String Utilities - based on UT_string
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "utarray.h"
 #include "utstring.h"
@@ -45,3 +49,7 @@ extern void argv_set(argv_t *argv, size_t idx, const char *str);
 //-----------------------------------------------------------------------------
 extern const char *spool_add(const char *str);
 extern const char *spool_add_n(const char *str, size_t n);
+
+#ifdef __cplusplus
+}
+#endif

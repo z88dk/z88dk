@@ -26,6 +26,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "z80asm.h"
 #include "zobjfile.h"
 #include "zutils.h"
+#include "z80asm_cpu.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdio.h>
@@ -39,7 +40,7 @@ typedef struct obj_file_t {
 	int				size;				// size of library file
 	byte_t*			data;				// contents of library file, loaded before linking
 	int				i;					// point to next position to parse
-	Module1*			module;				// weak pointer to main module information, if object file
+	Module1*		module;				// weak pointer to main module information, if object file
 } obj_file_t;
 
 
@@ -748,6 +749,20 @@ static bool pending_syms(StrHash* extern_syms) {
 		return true;
 }
 
+// check if library module is for same CPU
+static bool module_same_cpu(obj_file_t* obj) {
+    obj->i = 8 + 5 * 4;
+    int cpu_id = parse_int(obj);
+    if (!cpu_compatible(option_cpu(), cpu_id))
+        return false;
+
+    int swap_ixiy = parse_int(obj);
+    if (option_swap_ixiy() != !!swap_ixiy)
+        return false;
+
+    return true;
+}
+
 // search one module for unresolved symbols and link if needed
 static bool linked_module(obj_file_t* obj, StrHash* extern_syms) {
 	bool linked = false;
@@ -803,7 +818,8 @@ static bool linked_libraries(StrHash* extern_syms) {
 			obj.data = lib->data + lib->i;
 			obj.size = module_size;
 			obj.i = 0;
-			if (linked_module(&obj, extern_syms))
+			if (module_same_cpu(&obj) &&
+                linked_module(&obj, extern_syms))
 				linked = true;
 		}
 	}
@@ -1356,6 +1372,6 @@ void checkrun_appmake(void) {
 		run_appmake("+zx81", ZX81_APP_EXT, ZX81_ORIGIN_MIN, ZX81_ORIGIN_MAX);
 		break;
 	default:
-		assert(0);
+		xassert(0);
 	}
 }

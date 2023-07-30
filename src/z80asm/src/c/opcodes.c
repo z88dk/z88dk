@@ -13,6 +13,7 @@ Define CPU opcodes
 #include "codearea.h"
 #include "directives.h"
 #include "expr1.h"
+#include "z80asm_cpu.h"
 #include "opcodes.h"
 #include "parse.h"
 #include "symtab1.h"
@@ -64,7 +65,7 @@ void add_opcode_jr(int opcode, Expr1 *expr)
 			Pass2infoExpr(RANGE_JR_OFFSET, expr);
 			break;
 		default:
-			assert(0);
+			xassert(0);
 		}
 	}
 	else {

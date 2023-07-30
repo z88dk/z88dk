@@ -1,0 +1,22 @@
+//-----------------------------------------------------------------------------
+// z80asm cpu's
+// Copyright (C) Paulo Custodio, 2011-2023
+// License: http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+#ifndef X
+#define X(id, value, name)
+#endif
+
+X(CPU_Z80, 1 << 0, "z80")
+X(CPU_Z80N, 1 << 1, "z80n")
+X(CPU_Z180, 1 << 2, "z180")
+X(CPU_EZ80, 1 << 3, "ez80")
+X(CPU_EZ80_Z80, 1 << 4, "ez80_z80")
+X(CPU_R2KA, 1 << 5, "r2ka")
+X(CPU_R3K, 1 << 6, "r3k")
+X(CPU_8080, 1 << 7, "8080")
+X(CPU_8085, 1 << 8, "8085")
+X(CPU_GBZ80, 1 << 9, "gbz80")
+
+#undef X

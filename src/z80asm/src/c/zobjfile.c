@@ -20,6 +20,7 @@ Handle object file contruction, reading and writing
 #include "utstring.h"
 #include "zobjfile.h"
 #include "zutils.h"
+#include "z80asm_cpu.h"
 
 /*-----------------------------------------------------------------------------
 *   Object header
@@ -248,7 +249,11 @@ void write_obj_file(const char* source_filename)
 	for (i = 0; i < 5; i++)
 		xfwrite_dword(-1, fp);
 
-	/* write sections, return pointers */
+    /* write CPU and -IXIY */
+    xfwrite_dword(option_cpu(), fp);
+    xfwrite_dword(option_swap_ixiy(), fp);
+
+    /* write sections, return pointers */
 	expr_ptr = write_expr(fp);
 	symbols_ptr = write_symbols(fp);
 	externsym_ptr = write_externsym(fp);
@@ -274,8 +279,6 @@ void write_obj_file(const char* source_filename)
 
 	utstring_free(temp_filename);
 }
-
-
 
 /*-----------------------------------------------------------------------------
 *   Check the object file header
@@ -354,6 +357,10 @@ OFile* OFile_read_header(FILE* file, size_t start_ptr)
 	self->externsym_ptr = xfread_dword(file);
 	self->code_ptr = xfread_dword(file);
 
+    /* read CPU and IXIY */
+    self->cpu_id = xfread_dword(file);
+    self->swap_ixiy = xfread_dword(file);
+
 	/* read module name */
 	fseek(file, start_ptr + self->modname_ptr, SEEK_SET);
 	xfread_wcount_str(modname, file);
@@ -372,6 +379,15 @@ OFile* OFile_read_header(FILE* file, size_t start_ptr)
 *----------------------------------------------------------------------------*/
 static OFile* _OFile_open_read(const char* filename, bool test_mode)
 {
+    if (test_mode) {
+        if (!check_object_file_no_errors(filename))
+            return NULL;
+    }
+    else {
+        if (!check_object_file(filename))
+            return NULL;
+    }
+
 	OFile* self;
 	FILE* file;
 
@@ -517,70 +533,112 @@ bool objmodule_loaded(const char* obj_filename)
 bool check_object_file(const char* obj_filename)
 {
 	return check_obj_lib_file(
+        false,
 		obj_filename,
 		Z80objhdr,
+        error_file_not_found,
+        error_file_open,
 		error_not_obj_file,
-		error_obj_file_version);
+		error_obj_file_version,
+        error_cpu_incompatible,
+        error_ixiy_incompatible);
 }
 
 static void no_error_file(const char* filename) {}
 static void no_error_version(const char* filename, int version, int expected) {}
+static void no_error_cpu_incompatible(const char* filename, int cpu_id) {}
+static void no_error_ixiy_incompatible(const char* filename, bool swap_ixiy) {}
 
 bool check_object_file_no_errors(const char* obj_filename) {
 	return check_obj_lib_file(
+        false,
 		obj_filename,
 		Z80objhdr,
+        no_error_file,
 		no_error_file,
-		no_error_version);
+		no_error_file,
+		no_error_version,
+        no_error_cpu_incompatible,
+        no_error_ixiy_incompatible);
 }
 
-bool check_obj_lib_file(const char* filename,
-	char* signature,
-	void(*error_file)(const char*),
-	void(*error_version)(const char*, int, int))
+bool check_obj_lib_file(
+    bool is_lib,
+    const char* filename,
+    const char* signature,
+    void(*do_error_file_not_found)(const char*),
+    void(*do_error_file_open)(const char*),
+    void(*do_error_file_type)(const char*),
+    void(*do_error_version)(const char*, int, int),
+    void(*do_error_cpu_incompatible)(const char*, int),
+    void(*do_error_ixiy_incompatible)(const char*, bool))
 {
-	FILE* fp = NULL;
+    FILE* fp = NULL;
 
-	// file exists?
-	if (!file_exists(filename)) {
-		error_file_not_found(filename);
-		goto error;
-	}
+    // file exists?
+    if (!file_exists(filename)) {
+        do_error_file_not_found(filename);
+        goto error;
+    }
 
-	// can read file?
-	fp = fopen(filename, "rb");
-	if (fp == NULL) {
-		error_file_open(filename);
-		goto error;
-	}
+    // can read file?
+    fp = fopen(filename, "rb");
+    if (fp == NULL) {
+        do_error_file_open(filename);
+        goto error;
+    }
 
-	// can read header?
-	char header[Z80objhdr_size + 1];
-	if (Z80objhdr_size != fread(header, 1, Z80objhdr_size, fp)) {
-		error_file(filename);
-		goto error;
-	}
+    // can read header?
+    char header[Z80objhdr_size + 1];
+    if (Z80objhdr_size != fread(header, 1, Z80objhdr_size, fp)) {
+        do_error_file_type(filename);
+        goto error;
+    }
 
-	// header has correct prefix?
-	if (strncmp(header, signature, Z80objhdr_version_pos) != 0) {
-		error_file(filename);
-		goto error;
-	}
+    // header has correct prefix?
+    if (strncmp(header, signature, Z80objhdr_version_pos) != 0) {
+        do_error_file_type(filename);
+        goto error;
+    }
 
-	// has right version?
-	header[Z80objhdr_size] = '\0';
-	int version, expected;
-	sscanf(OBJ_VERSION, "%d", &expected);
-	if (1 != sscanf(header + Z80objhdr_version_pos, "%d", &version)) {
-		error_file(filename);
-		goto error;
-	}
-	if (version != expected) {
-		error_version(filename, version, expected);
-		goto error;
-	}
+    // has right version?
+    header[Z80objhdr_size] = '\0';
+    int version, expected;
+    sscanf(OBJ_VERSION, "%d", &expected);
+    if (1 != sscanf(header + Z80objhdr_version_pos, "%d", &version)) {
+        do_error_file_type(filename);
+        goto error;
+    }
+    if (version != expected) {
+        do_error_version(filename, version, expected);
+        goto error;
+    }
 
-	// ok
+    if (is_lib)
+        return true;
+
+    // only for object files
+    
+    // skip file pointers
+    for (int i = 0; i < 5; i++) {
+        xfread_dword(fp);
+    }
+
+    // has right CPU?
+    int cpu_id = xfread_dword(fp);
+    if (!cpu_compatible(option_cpu(), cpu_id)) {
+        do_error_cpu_incompatible(filename, cpu_id);
+        goto error;
+    }
+
+    // has right -XIIY?
+    int swap_ixiy = xfread_dword(fp);
+    if (option_swap_ixiy() != !!swap_ixiy) {
+        do_error_ixiy_incompatible(filename, !!swap_ixiy);
+        goto error;
+    }
+
+    // ok
 	fclose(fp);
 	return true;
 

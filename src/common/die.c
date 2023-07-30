@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // die - check results and die on error
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "die.h"
@@ -13,7 +13,7 @@
 //-----------------------------------------------------------------------------
 // die
 //-----------------------------------------------------------------------------
-void die(char *msg, ...)
+void die(const char *msg, ...)
 {
     va_list argptr;
     

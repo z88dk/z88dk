@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // zobjfile - manipulate z80asm object files
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -10,6 +10,7 @@
 #include "utlist.h"
 #include "utstring.h"
 #include "zutils.h"
+#include "z80asm_cpu.h"
 #include <ctype.h>
 
 #include <sys/types.h>	// needed before regex.h
@@ -279,7 +280,8 @@ objfile_t* objfile_new()
 	self->signature = utstr_new();
 	self->modname = utstr_new();
 
-	self->version = self->global_org = -1;
+	self->version = self->global_org = self->cpu_id = -1;
+    self->swap_ixiy = false;
 	self->externs = argv_new();
 
 	section_t* section = section_new();			// section "" must exist
@@ -613,6 +615,12 @@ void objfile_read(objfile_t* obj, FILE* fp)
 	long fpos_externs = xfread_dword(fp);
 	long fpos_sections = xfread_dword(fp);
 
+    // CPU
+    if (obj->version >= 18) {
+        obj->cpu_id = xfread_dword(fp);
+        obj->swap_ixiy = xfread_dword(fp);
+    }
+
 	// module name
 	xfseek(fp, fpos0 + fpos_modname, SEEK_SET);
 	if (obj->version >= 16)
@@ -624,10 +632,14 @@ void objfile_read(objfile_t* obj, FILE* fp)
 		printf("  Name: %s\n", utstr_body(obj->modname));
 
 	// global ORG
-	if (opt_obj_list && obj->global_org >= 0)
-		printf("  Org:  $%04X\n", obj->global_org);
+    if (opt_obj_list && obj->global_org >= 0)
+        printf("  Org:  $%04X\n", obj->global_org);
 
-	// sections
+    // cpu
+    if (opt_obj_list && obj->cpu_id >= 0)
+        printf("  CPU:  %s %s\n", cpu_name(obj->cpu_id), obj->swap_ixiy ? "(-IXIY)" : "");
+
+    // sections
 	if (fpos_sections >= 0)
 		objfile_read_sections(obj, fp, fpos0 + fpos_sections);
 
@@ -800,6 +812,12 @@ void objfile_write(objfile_t* obj, FILE* fp)
 	long header_ptr = ftell(fp);
 	for (int i = 0; i < 5; i++)
 		xfwrite_dword(-1, fp);
+
+    // write CPU
+    if (obj->version >= 18) {
+        xfwrite_dword(obj->cpu_id, fp);
+        xfwrite_dword(obj->swap_ixiy, fp);
+    }
 
 	// write blocks, return pointers
 	long expr_ptr = objfile_write_exprs(obj, fp);

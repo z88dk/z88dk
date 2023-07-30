@@ -1,9 +1,13 @@
 //-----------------------------------------------------------------------------
 // zobjfile - manipulate z80asm object files
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "die.h"
 #include "strutil.h"
@@ -14,7 +18,7 @@
 #include <stdio.h>
 
 #define MIN_VERSION				1
-#define MAX_VERSION				17
+#define MAX_VERSION				18
 #define CUR_VERSION				MAX_VERSION
 #define SIGNATURE_SIZE			8
 #define SIGNATURE_OBJ			"Z80RMF"
@@ -109,13 +113,15 @@ extern void section_free(section_t* self);
 //-----------------------------------------------------------------------------
 typedef struct objfile_s
 {
-	UT_string* filename;
-	UT_string* signature;
-	UT_string* modname;
-	int			 version;
-	int			 global_org;
-	argv_t* externs;
-	section_t* sections;
+	UT_string*  filename;
+	UT_string*  signature;
+	UT_string*  modname;
+	int			version;
+	int			global_org;
+    int         cpu_id;
+    bool        swap_ixiy;
+	argv_t*     externs;
+	section_t*  sections;
 
 	struct objfile_s* next, * prev;
 } objfile_t;
@@ -150,3 +156,7 @@ extern void file_make_symbols_local(file_t* file, const char* regexp);
 extern void file_make_symbols_global(file_t* file, const char* regexp);
 extern void file_set_section_org(file_t* file, const char* name, int value);
 extern void file_set_section_align(file_t* file, const char* name, int value);
+
+#ifdef __cplusplus
+}
+#endif

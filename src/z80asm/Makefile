@@ -18,12 +18,11 @@ OPT 		= -O3
 #OPT		= -g -Wextra 
 
 COMMON_FLAGS = -MMD -Wall $(OPT) \
-			-I. -Isrc
+			-I. -Isrc -I../common
 
 LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 			-Isrc/c \
 			-It \
-			-I../common \
 			-I../../ext/optparse \
 			-I../../ext/regex \
 			-I../../ext/uthash/src \
@@ -38,7 +37,7 @@ LDFLAGS 	+= $(shell perl build_ldflags.pl $(CXX) $(CROSS))
 # Object files
 #------------------------------------------------------------------------------
 C_SRCS		:= $(filter-out src/c/test.c, $(wildcard src/c/*.c ../common/*.c ../../ext/regex/reg*.c))
-CXX_SRCS	:= $(wildcard src/cpp/*.cpp)	
+CXX_SRCS	:= $(wildcard src/cpp/*.cpp ../common/*.cpp)	
 OBJS 		:= $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o) $(UNIXem_OBJS)
 DEPENDS		:= $(C_SRCS:.c=.d) $(CXX_SRCS:.cpp=.d)
 #TEST_SRC_MAIN	:= $(wildcard t/test_*.cpp)

@@ -8,6 +8,7 @@
 #include "float.h"
 #include "if.h"
 #include "utils.h"
+#include "z80asm_cpu.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -357,4 +358,25 @@ void error_cmd_failed(const char* cmd) {
 
 void error_assert_failed() {
 	g_errors.error(ErrCode::AssertFailed);
+}
+
+void error_cpu_incompatible(const char* filename, int got_cpu_id) {
+    ostringstream error;
+    error << "file " << filename << " compiled for " << cpu_name(got_cpu_id)
+        << ", incompatible with " << cpu_name(option_cpu());
+    g_errors.error(ErrCode::CPUIncompatible, error.str());
+}
+
+static const char* ixiy_to_string(bool f) {
+    if (f)
+        return "IX=IY";
+    else
+        return "IX=IX";
+}
+
+void error_ixiy_incompatible(const char* filename, bool swap_ixiy) {
+    ostringstream error;
+    error << "file " << filename << " compiled for " << ixiy_to_string(swap_ixiy)
+        << ", incompatible with " << ixiy_to_string(option_swap_ixiy());
+    g_errors.error(ErrCode::IXIYIncompatible, error.str());
 }

@@ -19,7 +19,7 @@ Handle object file contruction, reading and writing
 #include <stdio.h>
 #include <stdlib.h>
 
-#define OBJ_VERSION	"17"
+#define OBJ_VERSION	"18"
 
 /*-----------------------------------------------------------------------------
 *   Write current module to object file - object file name is computed
@@ -46,6 +46,8 @@ long	 expr_ptr;			/* offset if file to Expression Declaration */
 long	 symbols_ptr;		/* offset if file to Name Definition */
 long	 externsym_ptr;		/* offset if file to External Name Declaration */
 long	 code_ptr;			/* offset if file to Machine Code Block */
+int      cpu_id;            /* cpu */
+bool     swap_ixiy;         /* -IXIY */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
@@ -88,7 +90,13 @@ extern bool check_object_file(const char* obj_filename);
 extern bool check_object_file_no_errors(const char* obj_filename);
 
 // worker
-extern bool check_obj_lib_file(const char* filename,
-	char* signature,
-	void(*error_file)(const char*),
-	void(*error_version)(const char*, int, int));
+extern bool check_obj_lib_file(
+    bool is_lib,
+    const char* filename,
+	const char* signature,
+    void(*do_error_file_not_found)(const char*),
+    void(*do_error_file_open)(const char*),
+	void(*do_error_file_type)(const char*),
+	void(*do_error_version)(const char*, int, int),
+    void(*do_error_cpu_incompatible)(const char*, int),
+    void(*do_error_ixiy_incompatible)(const char*, bool));

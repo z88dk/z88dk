@@ -79,7 +79,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 #------------------------------------------------------------------------------
 # call zobjcopy
 #------------------------------------------------------------------------------
-ok run("zobjcopy", <<'...');
+ok run("z88dk-zobjcopy", <<'...');
 Usage: zobjcopy input [options] [output]
   -v|--verbose                          ; show what is going on
   -l|--list                             ; dump contents of file
@@ -98,28 +98,28 @@ Usage: zobjcopy input [options] [output]
 
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 
-ok run("zobjcopy --wrong-option", 					"", "error: invalid option -- 'wrong-option'\n", 		1);
-ok run("zobjcopy -v",	 							"", "error: no input file\n", 							1);
-ok run("zobjcopy -s",	 							"", "error: option requires an argument -- 's'\n",		1);
-ok run("zobjcopy --section aaa",					"", "error: no '=' in --section argument 'aaa'\n",		1);
-ok run("zobjcopy --section ?=aaa test.o test2.o",	"", "error: could not compile regex '?'\n",				1);
-ok run("zobjcopy --add-prefix aaa",					"", "error: no ',' in --add-prefix argument 'aaa'\n",	1);
-ok run("zobjcopy --add-prefix ?,aaa test.o test2.o","", "error: could not compile regex '?'\n",				1);
-ok run("zobjcopy --symbol aaa",						"", "error: no '=' in --symbol argument 'aaa'\n",		1);
-ok run("zobjcopy --local",							"", "error: option requires an argument -- 'local'\n",	1);
-ok run("zobjcopy --global",							"", "error: option requires an argument -- 'global'\n",	1);
-ok run("zobjcopy --filler",							"", "error: option requires an argument -- 'filler'\n",	1);
-ok run("zobjcopy --org",							"", "error: option requires an argument -- 'org'\n",	1);
-ok run("zobjcopy --org aaa",						"", "error: no ',' in --org argument 'aaa'\n",			1);
-ok run("zobjcopy --align",							"", "error: option requires an argument -- 'align'\n",	1);
-ok run("zobjcopy --align aaa",						"", "error: no ',' in --align argument 'aaa'\n",		1);
-ok run("zobjcopy test1.o test2.o test3.o",			"", "error: too many arguments\n",						1);
-ok run("zobjcopy -l test1.o test2.o",				"", "error: too many arguments\n",						1);
-ok run("zobjcopy test.o",							"", "error: no output file\n",							1);
+ok run("z88dk-zobjcopy --wrong-option", 					"", "error: invalid option -- 'wrong-option'\n", 		1);
+ok run("z88dk-zobjcopy -v",	 							"", "error: no input file\n", 							1);
+ok run("z88dk-zobjcopy -s",	 							"", "error: option requires an argument -- 's'\n",		1);
+ok run("z88dk-zobjcopy --section aaa",					"", "error: no '=' in --section argument 'aaa'\n",		1);
+ok run("z88dk-zobjcopy --section ?=aaa test.o test2.o",	"", "error: could not compile regex '?'\n",				1);
+ok run("z88dk-zobjcopy --add-prefix aaa",					"", "error: no ',' in --add-prefix argument 'aaa'\n",	1);
+ok run("z88dk-zobjcopy --add-prefix ?,aaa test.o test2.o","", "error: could not compile regex '?'\n",				1);
+ok run("z88dk-zobjcopy --symbol aaa",						"", "error: no '=' in --symbol argument 'aaa'\n",		1);
+ok run("z88dk-zobjcopy --local",							"", "error: option requires an argument -- 'local'\n",	1);
+ok run("z88dk-zobjcopy --global",							"", "error: option requires an argument -- 'global'\n",	1);
+ok run("z88dk-zobjcopy --filler",							"", "error: option requires an argument -- 'filler'\n",	1);
+ok run("z88dk-zobjcopy --org",							"", "error: option requires an argument -- 'org'\n",	1);
+ok run("z88dk-zobjcopy --org aaa",						"", "error: no ',' in --org argument 'aaa'\n",			1);
+ok run("z88dk-zobjcopy --align",							"", "error: option requires an argument -- 'align'\n",	1);
+ok run("z88dk-zobjcopy --align aaa",						"", "error: no ',' in --align argument 'aaa'\n",		1);
+ok run("z88dk-zobjcopy test1.o test2.o test3.o",			"", "error: too many arguments\n",						1);
+ok run("z88dk-zobjcopy -l test1.o test2.o",				"", "error: too many arguments\n",						1);
+ok run("z88dk-zobjcopy test.o",							"", "error: no output file\n",							1);
 
 path("test.o")->spew_raw($objfile[1]);	
 	
-ok run("zobjcopy -v test.o test2.o", <<"...");
+ok run("z88dk-zobjcopy -v test.o test2.o", <<"...");
 Reading file 'test.o': object version 1
 Writing file 'test2.o': object version $OBJ_FILE_VERSION
 ...
@@ -138,7 +138,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 
 	ok check_z80nm("test.o", 		sprintf("t/bmk_obj_%02d.txt", $version));
 	ok check_zobjcopy("test.o", 	sprintf("t/bmk_obj_%02d.txt", $version));
-	ok run("zobjcopy test.o test2.o");
+	ok run("z88dk-zobjcopy test.o test2.o");
 	ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_converted.txt", $version));
 	unlink "test.o", "test2.o";
 	
@@ -147,7 +147,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 	
 	ok check_z80nm("test.lib", 		sprintf("t/bmk_lib_%02d.txt", $version));
 	ok check_zobjcopy("test.lib", 	sprintf("t/bmk_lib_%02d.txt", $version));
-	ok run("zobjcopy test.lib test2.lib");
+	ok run("z88dk-zobjcopy test.lib test2.lib");
 	ok check_zobjcopy("test2.lib", 	sprintf("t/bmk_lib_%02d_converted.txt", $version));
 	unlink "test.lib", "test2.lib";
 }
@@ -158,7 +158,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose -s text=text --section data=data test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose -s text=text --section data=data test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match 'text' to 'text'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -183,7 +183,7 @@ unlink "test.o", "test2.o";
 path("test.lib")->spew_raw($libfile[$OBJ_FILE_VERSION]);
 unlink "test2.lib";
 
-ok run("zobjcopy test.lib --verbose -s text=text --section data=data test2.lib", <<"...");
+ok run("z88dk-zobjcopy test.lib --verbose -s text=text --section data=data test2.lib", <<"...");
 Reading file 'test.lib': library version $OBJ_FILE_VERSION
 File 'test.lib': rename sections that match 'text' to 'text'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -221,7 +221,7 @@ unlink "test.lib", "test2.lib";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy -v test.o -s .=ram test2.o", <<"...");
+ok run("z88dk-zobjcopy -v test.o -s .=ram test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '.' to 'ram'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -239,7 +239,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy -v test.o -s ^text=rom_text -s ^data=ram_data test2.o", <<"...");
+ok run("z88dk-zobjcopy -v test.o -s ^text=rom_text -s ^data=ram_data test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '^text' to 'rom_text'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -264,7 +264,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy -v test.o -s ^data=base test2.o", <<"...");
+ok run("z88dk-zobjcopy -v test.o -s ^data=base test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '^data' to 'base'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -282,7 +282,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy -v test.o -s ^data=base -s ^text=base test2.o", <<"...");
+ok run("z88dk-zobjcopy -v test.o -s ^data=base -s ^text=base test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '^data' to 'base'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -306,7 +306,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --filler 0x55 -s text=text test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose --filler 0x55 -s text=text test2.o", <<"...");
 Filler byte: \$55
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match 'text' to 'text'
@@ -325,7 +325,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose -F 127 -s text=text test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose -F 127 -s text=text test2.o", <<"...");
 Filler byte: \$7F
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match 'text' to 'text'
@@ -344,7 +344,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose -s .=text --org text,0x8000 --align text,64 test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose -s .=text --org text,0x8000 --align text,64 test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '.' to 'text'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -370,7 +370,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose -s .=text -O text,0x8000 -A text,64 test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose -s .=text -O text,0x8000 -A text,64 test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '.' to 'text'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -399,7 +399,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --add-prefix .,lib_ test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose --add-prefix .,lib_ test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': add prefix 'lib_' to symbols that match '.'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -415,7 +415,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose -p m,lib_ test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose -p m,lib_ test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': add prefix 'lib_' to symbols that match 'm'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -434,7 +434,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --symbol ext1=ff_lib_ext1 -y ext=xxx -y msg1=MSG1 test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose --symbol ext1=ff_lib_ext1 -y ext=xxx -y msg1=MSG1 test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename symbol 'ext1' to 'ff_lib_ext1'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -471,7 +471,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --local \"^_\" -L msg test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose --local \"^_\" -L msg test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': make symbols that match '^_' local
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -495,7 +495,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --global start -G s test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose --global start -G s test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': make symbols that match 'start' global
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -535,7 +535,7 @@ path("test.asm")->spew(<<'...');
 	section text	; so that obj file has one section but no ''
 ...
 ok run("z80asm test.asm");
-ok run("zobjcopy -l test.o", <<"...");
+ok run("z88dk-zobjcopy -l test.o", <<"...");
 Object  file test.o at \$0000: Z80RMF$OBJ_FILE_VERSION
   Name: test
   Section text: 0 bytes
@@ -543,8 +543,8 @@ Object  file test.o at \$0000: Z80RMF$OBJ_FILE_VERSION
     G C \$0002 aa (section "") (file test.asm:2)
 ...
 
-ok run("zobjcopy test.o test2.o");
-ok run("zobjcopy -l test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o test2.o");
+ok run("z88dk-zobjcopy -l test2.o", <<"...");
 Object  file test2.o at \$0000: Z80RMF$OBJ_FILE_VERSION
   Name: test
   Section "": 0 bytes
@@ -750,13 +750,13 @@ sub check_zobjcopy_nm {
 sub check_zobjcopy {
 	my($file, $bmk, $options) = @_;
 	$options //= "";
-	return check_zobjcopy_nm("zobjcopy -l $options", $file, $bmk);
+	return check_zobjcopy_nm("z88dk-zobjcopy -l $options", $file, $bmk);
 
 }
 
 sub check_z80nm {
 	my($file, $bmk, $options) = @_;
 	$options //= "-a";
-	return check_zobjcopy_nm("z80nm $options", $file, $bmk);
+	return check_zobjcopy_nm("z80nm-zobjcopy $options", $file, $bmk);
 
 }

@@ -11,6 +11,7 @@
 #include "scan.h"
 #include "preproc.h"
 #include "utils.h"
+#include "z80asm_cpu.h"
 #include "../config.h"
 #include <iostream>
 #include <iomanip>
@@ -81,6 +82,11 @@ void Args::exit_help() {
 #include "args.def"
 
 	exit(0);
+}
+
+//-----------------------------------------------------------------------------
+Args::Args()
+    : m_cpu(CPU_Z80), m_cpu_name(::cpu_name(m_cpu)) {
 }
 
 //-----------------------------------------------------------------------------
@@ -672,63 +678,63 @@ void Args::set_cpu(int cpu) {
     switch (cpu) {
     case CPU_Z80:
         m_cpu = CPU_Z80;
-        m_cpu_name = CPU_Z80_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_Z80__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_Z80N:
         m_cpu = CPU_Z80N;
-        m_cpu_name = CPU_Z80N_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_Z80N__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_Z180:
         m_cpu = CPU_Z180;
-        m_cpu_name = CPU_Z180_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_Z180__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_EZ80:
         m_cpu = CPU_EZ80;
-        m_cpu_name = CPU_EZ80_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_EZ80__");
         define_static_symbol("__CPU_EZ80_ADL__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_EZ80_Z80:
         m_cpu = CPU_EZ80_Z80;
-        m_cpu_name = CPU_EZ80_Z80_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_EZ80__");
         define_static_symbol("__CPU_EZ80_Z80__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_R2KA:
         m_cpu = CPU_R2KA;
-        m_cpu_name = CPU_R2KA_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_R2KA__");
         define_static_symbol("__CPU_RABBIT__");
         break;
     case CPU_R3K:
         m_cpu = CPU_R3K;
-        m_cpu_name = CPU_R3K_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_R3K__");
         define_static_symbol("__CPU_RABBIT__");
         break;
     case CPU_8080:
         m_cpu = CPU_8080;
-        m_cpu_name = CPU_8080_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_8080__");
         define_static_symbol("__CPU_INTEL__");
         break;
     case CPU_8085:
         m_cpu = CPU_8085;
-        m_cpu_name = CPU_8085_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_8085__");
         define_static_symbol("__CPU_INTEL__");
         break;
     case CPU_GBZ80:
         m_cpu = CPU_GBZ80;
-        m_cpu_name = CPU_GBZ80_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_GBZ80__");
         break;
     default:
@@ -737,19 +743,6 @@ void Args::set_cpu(int cpu) {
 }
 
 void Args::set_cpu(const string& name) {
-    static std::map<string, int> cpu_map = {
-        {CPU_Z80_NAME, CPU_Z80},
-        {CPU_Z80N_NAME, CPU_Z80N},
-        {CPU_Z180_NAME, CPU_Z180},
-        {CPU_EZ80_NAME, CPU_EZ80},
-        {CPU_EZ80_Z80_NAME, CPU_EZ80_Z80},
-        {CPU_R2KA_NAME, CPU_R2KA},
-        {CPU_R3K_NAME, CPU_R3K},
-        {CPU_8080_NAME, CPU_8080},
-        {CPU_8085_NAME, CPU_8085},
-        {CPU_GBZ80_NAME, CPU_GBZ80},
-    };
-
     m_got_cpu_option = true;
 
     if (name == ARCH_TI83_NAME) {
@@ -763,15 +756,11 @@ void Args::set_cpu(const string& name) {
         m_ti83plus = true;
     }
     else {
-        auto it = cpu_map.find(name);
-        if (it != cpu_map.end()) {
-            set_cpu(it->second);
-        }
+        int id = cpu_id(name.c_str());
+        if (id >= 0)
+            set_cpu(id);
         else {
-            string error = name + "; expected: ";
-            for (auto& it : cpu_map) {
-                error += it.first + ",";
-            }
+            string error = name + "; expected: " + cpu_list() + ",";
             error += string(ARCH_TI83_NAME) + ",";
             error += string(ARCH_TI83PLUS_NAME) + ",";
             error.pop_back(); // remove last comma

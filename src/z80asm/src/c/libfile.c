@@ -85,8 +85,13 @@ void make_library(const char *lib_filename)
 bool check_library_file(const char *src_filename)
 {
 	return check_obj_lib_file(
+        true,
 		get_lib_filename(src_filename),
 		Z80libhdr,
+        error_file_not_found,
+        error_file_open,
 		error_not_lib_file,
-		error_lib_file_version);
+		error_lib_file_version,
+        error_cpu_incompatible,
+        error_ixiy_incompatible);
 }

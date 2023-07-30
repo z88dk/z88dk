@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // zobjcopy - manipulate z80asm object files
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "zobjcopy.h"
@@ -54,7 +54,7 @@ static struct optparse_long longopts[] = {
 { "filler",		OPT_FILLER,			OPTPARSE_REQUIRED },
 { "org",		OPT_ORG,			OPTPARSE_REQUIRED },
 { "align",		OPT_ALIGN,			OPTPARSE_REQUIRED },
-{ 0,0,0 }
+{ 0,0,OPTPARSE_NONE }
 };
 
 //-----------------------------------------------------------------------------

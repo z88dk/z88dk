@@ -21,6 +21,7 @@ Assembly directives.
 #include "types.h"
 #include "utstring.h"
 #include "z80asm.h"
+#include "z80asm_cpu.h"
 
 static void check_org_align();
 

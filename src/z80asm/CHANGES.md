@@ -3,13 +3,15 @@ Z88DK Z80 Module Assembler Change Log
 
 2023
 ----
-2023-03-16 Fix #2066: Use boost::filesystem as fallback to std::filesystem from C++17
+2023-03-16 Fix #2066: use boost::filesystem as fallback to std::filesystem from C++17
 2023-03-19 Fix nightly build failure - z80asm cannot find std::filesystem dll entry point
-2023-04-17 Fix #2227: Support #ifdef/#endif etc in assembler
+2023-04-17 Fix #2227: support #ifdef/#endif etc in assembler
 2023-05-13 Fix #2254: move the object file into place once it's been generated
 2023-05-13 Fix #2251: accept ':' as statement separator
 2023-05-18 Fix #2260: output dir prepended twice
-2023-06--9 Fix #2279: add support to ez80, both z80 memory mode and ADL memory mode
+2023-06-09 Fix #2279: add support to ez80, both z80 memory mode and ADL memory mode
+2023-07-05 Fix #2338, #2333: add -raw-strings option
+2023-07-30 Fix #2320: do not link with object files built for a different cpu
 
 2022
 ----
