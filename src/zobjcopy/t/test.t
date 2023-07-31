@@ -11,7 +11,7 @@ use Test::More;
 use Capture::Tiny 'capture';
 use Config;
 
-my $OBJ_FILE_VERSION = "12";
+my $OBJ_FILE_VERSION = "18";
 
 $ENV{PATH} = join($Config{path_sep}, 
 				".",
@@ -35,17 +35,21 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 		VERSION => $version,
 		NAME => "file1",
 		EXPRS => [
-			# type, filename, line_nr, section, asmptr, ptr, target_name, text
-			[ 'U', "file1.asm", 123, "text_1", 0, 1, "", "start1 % 256" ],
-			[ 'S', "file1.asm", 132, "text_2", 0, 1, "", "start2 % 127" ],
-			[ 'C', "file1.asm", 231, "data_1", 0, 1, "", "msg1" ],
-			[ 'L', "file1.asm", 321, "data_2", 0, 1, "", "msg2" ],
-			[ 'C', "file1.asm", 231, "data_1", 0, 1, "", "ext1" ],
-			[ 'L', "file1.asm", 321, "data_2", 0, 1, "", "ext2" ],
-			[ 'C', "file1.asm", 231, "data_1", 0, 1, "", "msg2-msg1" ],
-			[ '=', "file1.asm", 321, "text_1", 0, 0, "_start", "start1" ],
-			[ 'B', "file1.asm", 231, "text_1", 0, 1, "", "start1" ],
-			[ 'J', "file1.asm", 456, "text_1", 0, 1, "", "start1" ],
+			# type, filename, line_nr, section, asmptr, ptr, opcode_size, target_name, text
+			[ 'U', "file1.asm", 123, "text_1", 0, 1, 2, "", "start1 % 256" ],
+			[ 'S', "file1.asm", 132, "text_2", 0, 1, 2, "", "start2 % 127" ],
+			[ 'u', "file1.asm", 123, "text_1", 0, 1, 2, "", "256" ],
+			[ 's', "file1.asm", 132, "text_2", 0, 1, 2, "", "256" ],
+			[ 'C', "file1.asm", 231, "data_1", 0, 1, 2, "", "msg1" ],
+			[ 'L', "file1.asm", 321, "data_2", 0, 1, 2, "", "msg2" ],
+			[ 'C', "file1.asm", 231, "data_1", 0, 1, 2, "", "ext1" ],
+			[ 'L', "file1.asm", 321, "data_2", 0, 1, 2, "", "ext2" ],
+			[ 'C', "file1.asm", 231, "data_1", 0, 1, 2, "", "msg2-msg1" ],
+			[ '=', "file1.asm", 321, "text_1", 0, 0, 2, "_start", "start1" ],
+			[ 'B', "file1.asm", 231, "text_1", 0, 1, 2, "", "start1" ],
+			[ 'J', "file1.asm", 456, "text_1", 0, 1, 2, "", "start1" ],
+			[ 'P', "file1.asm", 456, "text_1", 0, 1, 2, "", "start1" ],
+			[ 'H', "file1.asm", 456, "text_1", 0, 1, 2, "", "0xff01" ],
 		],
 		NAMES => [
 			# scope, type, section, value, name, def_filename, line_nr
@@ -538,6 +542,7 @@ ok run("z80asm test.asm");
 ok run("z88dk-zobjcopy -l test.o", <<"...");
 Object  file test.o at \$0000: Z80RMF$OBJ_FILE_VERSION
   Name: test
+  CPU:  z80 
   Section text: 0 bytes
   Symbols:
     G C \$0002 aa (section "") (file test.asm:2)
@@ -547,6 +552,7 @@ ok run("z88dk-zobjcopy test.o test2.o");
 ok run("z88dk-zobjcopy -l test2.o", <<"...");
 Object  file test2.o at \$0000: Z80RMF$OBJ_FILE_VERSION
   Name: test
+  CPU:  z80 
   Section "": 0 bytes
   Section text: 0 bytes
   Symbols:
@@ -576,7 +582,7 @@ sub objfile {
 	else {
 		$o .= pack("v", $org);
 	}
-	
+
 	# store empty pointers; mark position for later
 	my $name_addr	 = length($o); $o .= pack("V", -1);
 	my $expr_addr	 = length($o); $o .= pack("V", -1);
@@ -584,22 +590,59 @@ sub objfile {
 	my $extern_addr	 = length($o); $o .= pack("V", -1);
 	my $code_addr	 = length($o); $o .= pack("V", -1);
 
+	if ($args{VERSION} >= 18) {
+		$o .= pack("V", $args{CPU} // 1);
+		$o .= pack("V", $args{IXIY} // 0);
+	}
+	
 	# store expressions
 	if ($args{EXPRS}) {
 		store_ptr(\$o, $expr_addr);
 		for (@{$args{EXPRS}}) {
-			@$_ == 8 or die;
-			my($type, $filename, $line_nr, $section, $asmpc, $patch_ptr, $target_name, $text) = @$_;
+			@$_ == 9 or die;
+			my($type, $filename, $line_nr, $section, $asmpc, $patch_ptr, $opcode_size, 
+			   $target_name, $text) = @$_;
 			next if $type eq '=' && $args{VERSION} < 6;
 			next if $type eq 'B' && $args{VERSION} < 11;
 			next if $type eq 'J' && $args{VERSION} < 12;
+			next if $type eq 'u' && $args{VERSION} < 13;
+			next if $type eq 's' && $args{VERSION} < 13;
+			next if $type eq 'P' && $args{VERSION} < 14;
+			next if $type eq 'H' && $args{VERSION} < 15;
 			
 			$o .= $type;
 			$o .= pack_lstring($filename) . pack("V", $line_nr) if $args{VERSION} >= 4;
-			$o .= pack_string($section)							if $args{VERSION} >= 5;
-			$o .= pack("v", $asmpc)								if $args{VERSION} >= 3;
-			$o .= pack("v", $patch_ptr);
-			$o .= pack_string($target_name)						if $args{VERSION} >= 6;
+			if ($args{VERSION} >= 5) {
+				if ($args{VERSION} < 16) {
+					$o .= pack_string($section);
+				}
+				else {
+					$o .= pack_lstring($section);
+				}
+			}
+			if ($args{VERSION} >= 3) {
+				if ($args{VERSION} < 17) {
+					$o .= pack("v", $asmpc);
+				}
+				else {
+					$o .= pack("V", $asmpc);
+				}
+			}
+			if ($args{VERSION} < 17) {
+				$o .= pack("v", $patch_ptr);
+			}
+			else {
+				$o .= pack("V", $patch_ptr);
+			}
+			$o .= pack("V", $opcode_size) if $args{VERSION} >= 17;
+			if ($args{VERSION} >= 6) {
+				if ($args{VERSION} < 16) {
+					$o .= pack_string($target_name);
+				}
+				else {
+					$o .= pack_lstring($target_name);
+				}
+			}
 			if ($args{VERSION} >= 4) {
 				$o .= pack_lstring($text);
 			}
@@ -619,9 +662,29 @@ sub objfile {
 			next if $type eq '=' && $args{VERSION} < 7;
 
 			$o .= $scope . $type;
-			$o .= pack_string($section)								if $args{VERSION} >= 5;
-			$o .= pack("V", $value) . pack_string($name);
-			$o .= pack_string($def_filename) . pack("V", $line_nr)	if $args{VERSION} >= 9;
+			if ($args{VERSION} >= 5) {
+				if ($args{VERSION} < 16) {
+					$o .= pack_string($section);
+				}
+				else {
+					$o .= pack_lstring($section);
+				}
+			}
+			$o .= pack("V", $value);
+			if ($args{VERSION} < 16) {
+				$o .= pack_string($name);
+			}
+			else {
+				$o .= pack_lstring($name);
+			}
+			if ($args{VERSION} >= 9) {
+				if ($args{VERSION} < 16) {
+					$o .= pack_string($def_filename) . pack("V", $line_nr);
+				}
+				else {
+					$o .= pack_lstring($def_filename) . pack("V", $line_nr);
+				}
+			}
 		}
 		$o .= pack("C", 0) if $args{VERSION} >= 5;
 	}
@@ -630,13 +693,23 @@ sub objfile {
 	if ($args{EXTERNS}) {
 		store_ptr(\$o, $extern_addr);
 		for my $name (@{$args{EXTERNS}}) {
-			$o .= pack_string($name);
+			if ($args{VERSION} < 16) {
+				$o .= pack_string($name);
+			}
+			else {
+				$o .= pack_lstring($name);
+			}
 		}
 	}
 
 	# store name
 	store_ptr(\$o, $name_addr);
-	$o .= pack_string($args{NAME});
+	if ($args{VERSION} < 16) {
+		$o .= pack_string($args{NAME});
+	}
+	else {
+		$o .= pack_lstring($args{NAME});
+	}
 
 	# store code
 	if ( $args{CODES} ) {
@@ -647,7 +720,13 @@ sub objfile {
 			my($section, $org, $align, $code) = @$_;
 			
 			if ($args{VERSION} >= 5) {
-				$o .= pack("V", length($code)) . pack_string($section);
+				$o .= pack("V", length($code));
+				if ($args{VERSION} < 16) {
+					$o .= pack_string($section);
+				}
+				else {
+					$o .= pack_lstring($section);
+				}
 				$o .= pack("V", $org)		if $args{VERSION} >= 8;
 				$o .= pack("V", $align)		if $args{VERSION} >= 10;
 				$o .= $code;				
@@ -714,6 +793,7 @@ sub pack_lstring {
 #------------------------------------------------------------------------------
 sub run {
 	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	$exp_out //= "";
 	$exp_err //= "";
 	$exp_exit //= 0;	
@@ -722,6 +802,9 @@ sub run {
 	
 	ok 1, $cmd;
 	my($out, $err, $exit, @dummy) = capture {system $cmd};
+	for ($exp_out, $exp_err, $out, $err) {
+		s/\r\n/\n/g;
+	}
 	is $out, $exp_out, $cmd;
 	is $err, $exp_err, $cmd;
 	is !!$exit, !!$exp_exit, $cmd;
@@ -732,23 +815,23 @@ sub run {
 #------------------------------------------------------------------------------
 sub check_zobjcopy_nm {
 	my($cmd, $file, $bmk) = @_;
-	
-	my $ok = Test::More->builder->is_passing;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
 	(my $out = $bmk) =~ s/$/.out/;
 	
 	is 0, system("$cmd $file > $out"), "$cmd $file > $out";
 	my $diff = system("diff -w $out $bmk");
-	is 0, $diff;
-	
-	system("winmergeu $out $bmk") if $diff;
+	is 0, $diff, "diff -w $out $bmk";
 	unlink $out unless $diff;
 	
-	return $ok && Test::More->builder->is_passing;
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	
+	return Test::More->builder->is_passing;
 }
 
 sub check_zobjcopy {
 	my($file, $bmk, $options) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	$options //= "";
 	return check_zobjcopy_nm("z88dk-zobjcopy -l $options", $file, $bmk);
 
@@ -756,7 +839,7 @@ sub check_zobjcopy {
 
 sub check_z80nm {
 	my($file, $bmk, $options) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	$options //= "-a";
-	return check_zobjcopy_nm("z80nm-zobjcopy $options", $file, $bmk);
-
+	return check_zobjcopy_nm("z88dk-z80nm $options", $file, $bmk);
 }

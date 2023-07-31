@@ -207,7 +207,8 @@ expr_t* expr_new()
 
 	self->text = utstr_new();
 	self->type = '\0';
-	self->asmpc = self->code_pos = self->opcode_size = 0;
+    self->asmpc = self->code_pos = 0;
+    self->opcode_size = 2;      // default for normal JR
 	self->section = NULL;
 	self->target_name = utstr_new();
 
@@ -280,7 +281,8 @@ objfile_t* objfile_new()
 	self->signature = utstr_new();
 	self->modname = utstr_new();
 
-	self->version = self->global_org = self->cpu_id = -1;
+    self->version = self->global_org = -1;
+    self->cpu_id = CPU_Z80;
     self->swap_ixiy = false;
 	self->externs = argv_new();
 
@@ -556,7 +558,8 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
 				printf(" %d", expr->opcode_size);
 		}
 
-		printf(" ");
+        if (show_expr)
+            printf(" ");
 
 		if (obj->version >= 6) {
 			if (obj->version >= 16)
@@ -636,7 +639,7 @@ void objfile_read(objfile_t* obj, FILE* fp)
         printf("  Org:  $%04X\n", obj->global_org);
 
     // cpu
-    if (opt_obj_list && obj->cpu_id >= 0)
+    if (opt_obj_list && obj->version >= 18)
         printf("  CPU:  %s %s\n", cpu_name(obj->cpu_id), obj->swap_ixiy ? "(-IXIY)" : "");
 
     // sections
@@ -814,10 +817,8 @@ void objfile_write(objfile_t* obj, FILE* fp)
 		xfwrite_dword(-1, fp);
 
     // write CPU
-    if (obj->version >= 18) {
-        xfwrite_dword(obj->cpu_id, fp);
-        xfwrite_dword(obj->swap_ixiy, fp);
-    }
+    xfwrite_dword(obj->cpu_id, fp);
+    xfwrite_dword(obj->swap_ixiy, fp);
 
 	// write blocks, return pointers
 	long expr_ptr = objfile_write_exprs(obj, fp);
