@@ -72,7 +72,7 @@ Predefined constant: ten = \$000a
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
-Reading library 'z88dk-z80asm-z80-.lib'
+Reading library 'z88dk-z80asm.lib'
 Assembling 'test_t_option_define.asm' to 'test_t_option_define.o'
 Reading 'test_t_option_define.asm' = 'test_t_option_define.asm'
 Writing object file 'test_t_option_define.o'

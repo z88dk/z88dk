@@ -871,15 +871,10 @@ string Args::search_z80asm_lib() {
 	return "";
 }
 
-// build z80asm_lib filename: z88dk-z80asm-<cpu>-<ixiy|''>.lib
+// build z80asm_lib filename: z88dk-z80asm.lib
 string Args::z80asm_lib_filename() {
 	string filename;
 	filename = Z80ASM_LIB_BASE;
-	filename += "-";
-	filename += m_cpu_name;
-	filename += "-";
-	if (m_swap_ixiy)
-		filename += "ixiy";
 	filename += EXT_LIB;
 	return filename;
 }

@@ -11,37 +11,22 @@ PROJ		:= z88dk-z80asm
 
 INSTALL 	?= install
 Z80ASM_EXE	?= ../../$(PROJ)
-SRC		:= $(filter-out test.asm,$(wildcard *.asm))
+SRC			:= $(filter-out test.asm,$(wildcard *.asm))
 
-#------------------------------------------------------------------------------
-# Macro for each library build
-#------------------------------------------------------------------------------
-define MAKE_LIB
-all: $(PROJ)-$(strip $(1)).lib
+all:		$(PROJ).lib
 
-$(PROJ)-$(strip $(1)).lib: $(PROJ)_lib.lst $(SRC) Makefile ../../src/c/zobjfile.h
-	$(Z80ASM_EXE) -l -O$(1) -x$(PROJ)-$(strip $(1)).lib $(2) @$(PROJ)_lib.lst
+$(PROJ).lib: $(SRC) $(PROJ)_lib.lst Makefile
+	$(Z80ASM_EXE) -l -m* -x$(PROJ).lib @$(PROJ)_lib.lst
 
-clean::
-	$(RM) $(PROJ)-$(strip $(1)).lib
-	$(RM) -r  $(1)
-
-install::
-	$(INSTALL) $(PROJ)-$(strip $(1)).lib $(PREFIX)/lib/$(PROJ)-$(strip $(1)).lib
-endef
-
-#------------------------------------------------------------------------------
-# Call for all variants
-#------------------------------------------------------------------------------
-$(foreach cpu,8080 8085 gbz80 r2ka r3k z180 z80 z80n ez80 ez80_z80,$(eval $(call MAKE_LIB,$(cpu)-,-m$(cpu))))
-$(foreach cpu,8080 8085 gbz80 r2ka r3k z180 z80 z80n ez80 ez80_z80,$(eval $(call MAKE_LIB,$(cpu)-ixiy,-m$(cpu) -IXIY)))
-
-$(PROJ)_lib.lst: $(SRC)
+$(PROJ)_lib.lst: $(SRC) Makefile
 	$(RM) $(PROJ)_lib.lst
 	$(foreach file, $(sort $(SRC)), echo $(file) >> $(PROJ)_lib.lst; )
 
 clean::
-	$(RM) $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin $(PROJ)
+	$(RM) $(PROJ).lib $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin $(PROJ) *.bak
+
+install::
+	$(INSTALL) $(PROJ).lib $(PREFIX)/lib/$(PROJ).lib
 
 test: all
 	cp $(Z80ASM_EXE) $(PROJ)

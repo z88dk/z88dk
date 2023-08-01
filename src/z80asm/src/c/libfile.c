@@ -69,11 +69,16 @@ void make_library(const char *lib_filename)
 	if ( lib_filename == NULL )
 		return;					/* ERROR */
 
-	if (option_verbose())
+    // #2254 - write temp file
+    UT_string* temp_filename;
+    utstring_new(temp_filename);
+    utstring_printf(temp_filename, "%s~", lib_filename);
+
+    if (option_verbose())
 		printf("Creating library '%s'\n", path_canon(lib_filename));
 
 	/* write library header */
-	lib_file = xfopen( lib_filename, "wb" );	
+    lib_file = xfopen(utstring_body(temp_filename), "wb");
 	xfwrite_cstr(Z80libhdr, lib_file);
 
     if (option_lib_for_all_cpus()) {
@@ -114,7 +119,15 @@ void make_library(const char *lib_filename)
     xfwrite_dword(0, lib_file);         // size = 0  - deleted
 
 	/* close and write lib file */
-	xfclose( lib_file );
+    xfclose(lib_file);
+
+    // #2254 - rename temp file
+    remove(lib_filename);
+    int rv = rename(utstring_body(temp_filename), lib_filename);
+    if (rv != 0)
+        error_file_rename(utstring_body(temp_filename));
+
+    utstring_free(temp_filename);
 }
 
 bool check_library_file(const char *src_filename)

@@ -76,15 +76,15 @@ all: z80asm_lib
 z80asm_lib: $(PROJ)$(EXESUFFIX)
 ifeq ($(CROSS),0)
 	$(MAKE) -C dev/z80asm_lib
-	cp dev/z80asm_lib/$(PROJ)-*.lib .
+	cp dev/z80asm_lib/$(PROJ).lib .
   ifdef ZCCCFG
-	cp dev/z80asm_lib/$(PROJ)-*.lib $(ZCCCFG)/../
+	cp dev/z80asm_lib/$(PROJ).lib $(ZCCCFG)/../
   endif
 endif
 
 clean::
 	$(MAKE) -C dev/z80asm_lib clean
-	$(RM) $(PROJ)-*.lib
+	$(RM) $(PROJ).lib
 
 #------------------------------------------------------------------------------
 # developer generated source files, and test libs

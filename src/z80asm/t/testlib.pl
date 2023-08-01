@@ -332,13 +332,14 @@ sub libfile {
 	my $lib = "Z80LMF".$OBJ_FILE_VERSION;
 	for my $i (0 .. $#o_files) {
 		my $o_file = $o_files[$i];
-		my $next_ptr = ($i == $#o_files) ?
-						-1 : length($lib) + 4 + 4 + length($o_file);
+		my $next_ptr = length($lib) + 4 + 4 + length($o_file);
 
 		$lib .= pack("V", $next_ptr);
 		$lib .= pack("V", length($o_file));
 		$lib .= $o_file;
 	}
+	$lib .= pack("V", -1);	# next
+	$lib .= pack("V", 0);	# length = deleted
 
 	return $lib;
 }
