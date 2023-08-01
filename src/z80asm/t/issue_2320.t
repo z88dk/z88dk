@@ -129,8 +129,24 @@ END
 # make multi-cpu library
 
 spew("$test.1.asm", <<END);
-			public the_answer
-	the_answer = 42
+	public the_answer
+the_answer = 42
+	ifdef __CPU_8080__		: defm "8080"		: endif
+	ifdef __CPU_8085__		: defm "8085"		: endif
+	ifdef __CPU_EZ80_ADL__	: defm "ez80"		: endif
+	ifdef __CPU_EZ80_Z80__	: defm "ez80_z80"	: endif
+	ifdef __CPU_GBZ80__		: defm "gbz80"		: endif
+	ifdef __CPU_R2KA__		: defm "r2ka"		: endif
+	ifdef __CPU_R3K__		: defm "r3k"		: endif
+	ifdef __CPU_Z180__		: defm "z180"		: endif
+	ifdef __CPU_Z80__		: defm "z80"		: endif
+	ifdef __CPU_Z80N__		: defm "z80n" 		: endif
+	ifdef __SWAP_IX_IY__	: defm "-IXIY"		: endif
+END
+
+spew("$test.asm", <<END);
+	extern the_answer
+	defb the_answer
 END
 
 unlink("$test.1.lib");
@@ -140,122 +156,192 @@ capture_ok("z88dk-z80nm -a $test.1.lib", <<END);
 Library file $test.1.lib at \$0000: Z80LMF18
 Object  file $test.1.lib at \$0010: Z80RMF18
   Name: $test.1
-  CPU:  z80 
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$0083: Z80RMF18
-  Name: $test.1
-  CPU:  z80 (-IXIY)
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$00F6: Z80RMF18
-  Name: $test.1
-  CPU:  z80n 
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$0169: Z80RMF18
-  Name: $test.1
-  CPU:  z80n (-IXIY)
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$01DC: Z80RMF18
-  Name: $test.1
-  CPU:  z180 
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$024F: Z80RMF18
-  Name: $test.1
-  CPU:  z180 (-IXIY)
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$02C2: Z80RMF18
-  Name: $test.1
-  CPU:  ez80 
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$0335: Z80RMF18
-  Name: $test.1
-  CPU:  ez80 (-IXIY)
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$03A8: Z80RMF18
-  Name: $test.1
-  CPU:  ez80_z80 
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$041B: Z80RMF18
-  Name: $test.1
-  CPU:  ez80_z80 (-IXIY)
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$048E: Z80RMF18
-  Name: $test.1
-  CPU:  r2ka 
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$0501: Z80RMF18
-  Name: $test.1
-  CPU:  r2ka (-IXIY)
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$0574: Z80RMF18
-  Name: $test.1
-  CPU:  r3k 
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$05E7: Z80RMF18
-  Name: $test.1
-  CPU:  r3k (-IXIY)
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$065A: Z80RMF18
-  Name: $test.1
-  CPU:  8080 
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$06CD: Z80RMF18
-  Name: $test.1
-  CPU:  8080 (-IXIY)
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$0740: Z80RMF18
-  Name: $test.1
-  CPU:  8085 
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$07B3: Z80RMF18
-  Name: $test.1
-  CPU:  8085 (-IXIY)
-  Symbols:
-    G C \$002A the_answer (section "") (file $test.1.asm:2)
-
-Object  file $test.1.lib at \$0826: Z80RMF18
-  Name: $test.1
   CPU:  gbz80 
+  Section "": 5 bytes
+    C \$0000: 67 62 7A 38 30
   Symbols:
+    L C \$0001 __CPU_GBZ80__ (section "") (file $test.1.asm)
     G C \$002A the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0899: Z80RMF18
+Object  file $test.1.lib at \$00CE: Z80RMF18
   Name: $test.1
   CPU:  gbz80 (-IXIY)
+  Section "": 10 bytes
+    C \$0000: 67 62 7A 38 30 2D 49 58 49 59
   Symbols:
+    L C \$0001 __CPU_GBZ80__ (section "") (file $test.1.asm)
+    L C \$0001 __SWAP_IX_IY__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$01C6: Z80RMF18
+  Name: $test.1
+  CPU:  ez80 
+  Section "": 4 bytes
+    C \$0000: 65 7A 38 30
+  Symbols:
+    L C \$0001 __CPU_EZ80_ADL__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0286: Z80RMF18
+  Name: $test.1
+  CPU:  ez80 (-IXIY)
+  Section "": 9 bytes
+    C \$0000: 65 7A 38 30 2D 49 58 49 59
+  Symbols:
+    L C \$0001 __CPU_EZ80_ADL__ (section "") (file $test.1.asm)
+    L C \$0001 __SWAP_IX_IY__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0380: Z80RMF18
+  Name: $test.1
+  CPU:  r3k 
+  Section "": 3 bytes
+    C \$0000: 72 33 6B
+  Symbols:
+    L C \$0001 __CPU_R3K__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$043A: Z80RMF18
+  Name: $test.1
+  CPU:  r3k (-IXIY)
+  Section "": 8 bytes
+    C \$0000: 72 33 6B 2D 49 58 49 59
+  Symbols:
+    L C \$0001 __CPU_R3K__ (section "") (file $test.1.asm)
+    L C \$0001 __SWAP_IX_IY__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$052E: Z80RMF18
+  Name: $test.1
+  CPU:  r2ka 
+  Section "": 4 bytes
+    C \$0000: 72 32 6B 61
+  Symbols:
+    L C \$0001 __CPU_R2KA__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$05EA: Z80RMF18
+  Name: $test.1
+  CPU:  r2ka (-IXIY)
+  Section "": 9 bytes
+    C \$0000: 72 32 6B 61 2D 49 58 49 59
+  Symbols:
+    L C \$0001 __CPU_R2KA__ (section "") (file $test.1.asm)
+    L C \$0001 __SWAP_IX_IY__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$06E0: Z80RMF18
+  Name: $test.1
+  CPU:  z80n 
+  Section "": 4 bytes
+    C \$0000: 7A 38 30 6E
+  Symbols:
+    L C \$0001 __CPU_Z80N__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$079C: Z80RMF18
+  Name: $test.1
+  CPU:  z80n (-IXIY)
+  Section "": 9 bytes
+    C \$0000: 7A 38 30 6E 2D 49 58 49 59
+  Symbols:
+    L C \$0001 __CPU_Z80N__ (section "") (file $test.1.asm)
+    L C \$0001 __SWAP_IX_IY__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0892: Z80RMF18
+  Name: $test.1
+  CPU:  z80 
+  Section "": 3 bytes
+    C \$0000: 7A 38 30
+  Symbols:
+    L C \$0001 __CPU_Z80__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$094C: Z80RMF18
+  Name: $test.1
+  CPU:  z80 (-IXIY)
+  Section "": 8 bytes
+    C \$0000: 7A 38 30 2D 49 58 49 59
+  Symbols:
+    L C \$0001 __CPU_Z80__ (section "") (file $test.1.asm)
+    L C \$0001 __SWAP_IX_IY__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0A40: Z80RMF18
+  Name: $test.1
+  CPU:  ez80_z80 
+  Section "": 8 bytes
+    C \$0000: 65 7A 38 30 5F 7A 38 30
+  Symbols:
+    L C \$0001 __CPU_EZ80_Z80__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0B04: Z80RMF18
+  Name: $test.1
+  CPU:  ez80_z80 (-IXIY)
+  Section "": 13 bytes
+    C \$0000: 65 7A 38 30 5F 7A 38 30 2D 49 58 49 59
+  Symbols:
+    L C \$0001 __CPU_EZ80_Z80__ (section "") (file $test.1.asm)
+    L C \$0001 __SWAP_IX_IY__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0C02: Z80RMF18
+  Name: $test.1
+  CPU:  z180 
+  Section "": 4 bytes
+    C \$0000: 7A 31 38 30
+  Symbols:
+    L C \$0001 __CPU_Z180__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0CBE: Z80RMF18
+  Name: $test.1
+  CPU:  z180 (-IXIY)
+  Section "": 9 bytes
+    C \$0000: 7A 31 38 30 2D 49 58 49 59
+  Symbols:
+    L C \$0001 __CPU_Z180__ (section "") (file $test.1.asm)
+    L C \$0001 __SWAP_IX_IY__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0DB4: Z80RMF18
+  Name: $test.1
+  CPU:  8085 
+  Section "": 4 bytes
+    C \$0000: 38 30 38 35
+  Symbols:
+    L C \$0001 __CPU_8085__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0E70: Z80RMF18
+  Name: $test.1
+  CPU:  8085 (-IXIY)
+  Section "": 9 bytes
+    C \$0000: 38 30 38 35 2D 49 58 49 59
+  Symbols:
+    L C \$0001 __CPU_8085__ (section "") (file $test.1.asm)
+    L C \$0001 __SWAP_IX_IY__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0F66: Z80RMF18
+  Name: $test.1
+  CPU:  8080 
+  Section "": 4 bytes
+    C \$0000: 38 30 38 30
+  Symbols:
+    L C \$0001 __CPU_8080__ (section "") (file $test.1.asm)
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$1022: Z80RMF18
+  Name: $test.1
+  CPU:  8080 (-IXIY)
+  Section "": 9 bytes
+    C \$0000: 38 30 38 30 2D 49 58 49 59
+  Symbols:
+    L C \$0001 __CPU_8080__ (section "") (file $test.1.asm)
+    L C \$0001 __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A the_answer (section "") (file $test.1.asm:2)
 
 END
@@ -266,7 +352,7 @@ for my $ixiy ("", "-IXIY") {
 		capture_ok("z88dk-z80asm -b -m$code_cpu $ixiy ".
 						   "-l$test.1.lib $test.asm", "");
 		ok -f "$test.bin", "$test.bin created";
-		check_bin_file("$test.bin", bytes(42));
+		check_bin_file("$test.bin", bytes(42).$code_cpu.$ixiy);
 	}
 }
 

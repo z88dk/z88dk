@@ -27,7 +27,8 @@ enum {
 const char* cpu_name(int cpu_id);
 int cpu_id(const char* name);       // -1 if not found
 const char* cpu_list();             // static comma-separated list of names
-const int* cpu_ids();               // static list terminated by -1 of all CPUs
+const int* cpu_ids();               // static list terminated by -1 of all CPUs in the order more
+                                    // specific to more generic
 
 bool cpu_compatible(int code_cpu_id, int lib_cpu_id);
 

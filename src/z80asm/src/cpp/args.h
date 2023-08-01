@@ -22,7 +22,7 @@ public:
 	// options
 	bool verbose() const { return m_verbose; }
 	bool swap_ixiy() const { return m_swap_ixiy; }
-    void set_swap_ixiy(bool f) { m_swap_ixiy = f; }
+    void set_swap_ixiy(bool f);
 	bool ucase() const { return m_ucase; }
     bool raw_strings() const { return m_raw_strings; }
 	int cpu() const { return m_cpu; }

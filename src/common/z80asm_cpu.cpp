@@ -5,10 +5,12 @@
 //-----------------------------------------------------------------------------
 
 #include "z80asm_cpu.h"
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <map>
 #include <string>
+#include <vector>
 using namespace std;
 
 // Assert for internal errors, similar to assert but not removed in release builds
@@ -43,14 +45,19 @@ int cpu_id(const char* name) {
 }
 
 const char* cpu_list() {
+    static vector<string> cpus_list = {
+#define X(id, value, name)      name,
+#include "z80asm_cpu.def"
+    };
     static string cpus;
 
     if (cpus.empty()) {
-#define X(id, value, name)      cpus += string(name) + ",";
-#include "z80asm_cpu.def"
+        std::sort(cpus_list.begin(), cpus_list.end());
+        for (auto& i : cpus_list)
+            cpus += i + ",";
 
-    if (!cpus.empty())
-        cpus.pop_back();
+        if (!cpus.empty())
+            cpus.pop_back();    // remove last comma
     }
 
     return cpus.c_str();        // must be static

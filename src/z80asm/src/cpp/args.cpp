@@ -125,6 +125,14 @@ void Args::parse_args(const vector<string>& args) {
 	post_parsing_actions();
 }
 
+void Args::set_swap_ixiy(bool f) {
+    m_swap_ixiy = f;
+    if (m_swap_ixiy) 
+        define_static_symbol("__SWAP_IX_IY__");
+    else 
+        undefine_static_symbol("__SWAP_IX_IY__");
+}
+
 string Args::prepend_output_dir(const string& filename) {
 	if (m_output_dir.empty())
 		return filename;
@@ -891,12 +899,7 @@ void Args::define_assembly_defines() {
     if (!m_got_cpu_option)
         set_cpu(CPU_Z80);
 
-    if (m_swap_ixiy) {
-        define_static_symbol("__SWAP_IX_IY__");
-    }
-    else {
-        undefine_static_symbol("__SWAP_IX_IY__");
-    }
+    set_swap_ixiy(m_swap_ixiy);
 
 	if (m_ti83) {
 		define_static_symbol("__CPU_TI83__");
