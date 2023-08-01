@@ -117,6 +117,7 @@ void error_ixiy_incompatible(const char* filename, bool swap_ixiy);
 // options
 bool option_verbose();
 bool option_swap_ixiy();
+void set_swap_ixiy_option(bool f);
 void push_includes(const char* dir);
 void pop_includes();
 const char* search_includes(const char* filename);
@@ -129,6 +130,7 @@ bool option_speed();
 bool option_debug();
 const char* search_libraries(const char* filename);
 const char* option_lib_file();
+bool option_lib_for_all_cpus();
 void library_file_append(const char* filename);
 const char* option_bin_file();
 bool option_make_bin();

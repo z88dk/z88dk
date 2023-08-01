@@ -22,6 +22,7 @@ public:
 	// options
 	bool verbose() const { return m_verbose; }
 	bool swap_ixiy() const { return m_swap_ixiy; }
+    void set_swap_ixiy(bool f) { m_swap_ixiy = f; }
 	bool ucase() const { return m_ucase; }
     bool raw_strings() const { return m_raw_strings; }
 	int cpu() const { return m_cpu; }
@@ -32,6 +33,7 @@ public:
 	bool opt_speed() const { return m_opt_speed; }
 	bool debug() const { return m_debug; }
 	const string& lib_file() const { return m_lib_file; }
+    bool lib_for_all_cpus() const { return m_lib_for_all_cpus; }
 	const string& output_dir() const { return m_output_dir; }
 	bool split_bin() const { return m_split_bin; }
 	bool date_stamp() const { return m_date_stamp; }
@@ -83,6 +85,7 @@ private:
 	bool			m_opt_speed{ false };		// -opt-speed option
 	bool			m_debug{ false };			// -debug option
 	string			m_lib_file;					// -x option
+    bool            m_lib_for_all_cpus{ false };// build multi-target library
 	string			m_output_dir;				// -O option
 	string			m_bin_file;					// -o option
 	bool			m_make_bin{ false };		// -b option

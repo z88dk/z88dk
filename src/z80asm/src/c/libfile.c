@@ -11,6 +11,8 @@
 #include "modlink.h"
 #include "utlist.h"
 #include "zobjfile.h"
+#include "z80asm.h"
+#include "z80asm_cpu.h"
 
 char Z80libhdr[] = "Z80LMF" OBJ_VERSION;
 
@@ -31,12 +33,37 @@ static const char *search_libfile(const char *filename )
 /*-----------------------------------------------------------------------------
 *	make library from source files; convert each source to object file name 
 *----------------------------------------------------------------------------*/
+static bool add_object_modules(FILE* lib_file) {
+    ByteArray* obj_file_data;
+    const char* obj_filename;
+    size_t	 fptr, obj_size;
+
+    for (size_t i = 0; i < option_files_size(); i++)
+    {
+        fptr = ftell(lib_file);
+
+        /* read object file */
+        obj_filename = get_o_filename(option_file(i));
+        obj_file_data = read_obj_file_data(obj_filename);
+        if (obj_file_data == NULL)
+            return false;
+
+        /* write file pointer of next file, or -1 if last */
+        obj_size = ByteArray_size(obj_file_data);
+        xfwrite_dword(fptr + 4 + 4 + obj_size, lib_file);
+
+        /* write module size */
+        xfwrite_dword(obj_size, lib_file);
+
+        /* write module */
+        xfwrite_bytes((char*)ByteArray_item(obj_file_data, 0), obj_size, lib_file);
+    }
+    return true;
+}
+
 void make_library(const char *lib_filename)
 {
-	ByteArray *obj_file_data;
 	FILE	*lib_file;
-	const char *obj_filename;
-	size_t	 fptr, obj_size;
 
 	lib_filename = search_libfile(lib_filename);
 	if ( lib_filename == NULL )
@@ -49,34 +76,42 @@ void make_library(const char *lib_filename)
 	lib_file = xfopen( lib_filename, "wb" );	
 	xfwrite_cstr(Z80libhdr, lib_file);
 
-	/* write each object file */
-	for (size_t i = 0; i < option_files_size(); i++)
-	{
-		fptr = ftell( lib_file );
+    if (option_lib_for_all_cpus()) {
+        /* assemble for each cpu-ixiy combination and append to library */
+        for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
+            set_cpu_option(*cpu);
+            for (int ixiy = 0; ixiy < 2; ixiy++) {
+                set_swap_ixiy_option(ixiy == 1);
 
-		/* read object file */
-		obj_filename = get_o_filename(option_file(i));
-		obj_file_data = read_obj_file_data( obj_filename );
-		if ( obj_file_data == NULL )
-		{
-			xfclose(lib_file);			/* error */
-			remove(lib_filename);
-			return;
-		}
+                for (size_t i = 0; i < option_files_size(); i++)
+                    assemble_file(option_file(i));
 
-		/* write file pointer of next file, or -1 if last */
-		obj_size = ByteArray_size( obj_file_data );
-		if (i + 1 == option_files_size())
-			xfwrite_dword(-1, lib_file);
-        else
-            xfwrite_dword(fptr + 4 + 4 + obj_size,  lib_file); 
+                if (get_num_errors()) {
+                    xfclose(lib_file);			/* error */
+                    remove(lib_filename);
+                    return;
+                }
 
-		/* write module size */
-        xfwrite_dword(obj_size, lib_file);
+                if (!add_object_modules(lib_file)) {
+                    xfclose(lib_file);			/* error */
+                    remove(lib_filename);
+                    return;
+                }
+            }
+        }
+    }
+    else {
+        /* already assembled in main(), write each object file */
+        if (!add_object_modules(lib_file)) {
+            xfclose(lib_file);			/* error */
+            remove(lib_filename);
+            return;
+        }
+    }
 
-		/* write module */
-		xfwrite_bytes((char *)ByteArray_item(obj_file_data, 0), obj_size, lib_file);
-	}
+    // write end marker
+    xfwrite_dword(-1, lib_file);        // next = -1 - last module
+    xfwrite_dword(0, lib_file);         // size = 0  - deleted
 
 	/* close and write lib file */
 	xfclose( lib_file );

@@ -126,6 +126,151 @@ END
 }
 
 
+# make multi-cpu library
+
+spew("$test.1.asm", <<END);
+			public the_answer
+	the_answer = 42
+END
+
+unlink("$test.1.lib");
+capture_ok("z88dk-z80asm -m\"*\" -x$test.1.lib $test.1.asm", "");
+ok -f "$test.1.lib", "$test.1.lib created";
+capture_ok("z88dk-z80nm -a $test.1.lib", <<END);
+Library file $test.1.lib at \$0000: Z80LMF18
+Object  file $test.1.lib at \$0010: Z80RMF18
+  Name: $test.1
+  CPU:  z80 
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0083: Z80RMF18
+  Name: $test.1
+  CPU:  z80 (-IXIY)
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$00F6: Z80RMF18
+  Name: $test.1
+  CPU:  z80n 
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0169: Z80RMF18
+  Name: $test.1
+  CPU:  z80n (-IXIY)
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$01DC: Z80RMF18
+  Name: $test.1
+  CPU:  z180 
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$024F: Z80RMF18
+  Name: $test.1
+  CPU:  z180 (-IXIY)
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$02C2: Z80RMF18
+  Name: $test.1
+  CPU:  ez80 
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0335: Z80RMF18
+  Name: $test.1
+  CPU:  ez80 (-IXIY)
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$03A8: Z80RMF18
+  Name: $test.1
+  CPU:  ez80_z80 
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$041B: Z80RMF18
+  Name: $test.1
+  CPU:  ez80_z80 (-IXIY)
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$048E: Z80RMF18
+  Name: $test.1
+  CPU:  r2ka 
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0501: Z80RMF18
+  Name: $test.1
+  CPU:  r2ka (-IXIY)
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0574: Z80RMF18
+  Name: $test.1
+  CPU:  r3k 
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$05E7: Z80RMF18
+  Name: $test.1
+  CPU:  r3k (-IXIY)
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$065A: Z80RMF18
+  Name: $test.1
+  CPU:  8080 
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$06CD: Z80RMF18
+  Name: $test.1
+  CPU:  8080 (-IXIY)
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0740: Z80RMF18
+  Name: $test.1
+  CPU:  8085 
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$07B3: Z80RMF18
+  Name: $test.1
+  CPU:  8085 (-IXIY)
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0826: Z80RMF18
+  Name: $test.1
+  CPU:  gbz80 
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0899: Z80RMF18
+  Name: $test.1
+  CPU:  gbz80 (-IXIY)
+  Symbols:
+    G C \$002A the_answer (section "") (file $test.1.asm:2)
+
+END
+
+for my $ixiy ("", "-IXIY") {
+	for my $code_cpu (@CPUS) {
+		unlink("$test.bin");
+		capture_ok("z88dk-z80asm -b -m$code_cpu $ixiy ".
+						   "-l$test.1.lib $test.asm", "");
+		ok -f "$test.bin", "$test.bin created";
+		check_bin_file("$test.bin", bytes(42));
+	}
+}
+
+
 unlink_testfiles;
 done_testing;
 

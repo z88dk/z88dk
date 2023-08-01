@@ -745,7 +745,11 @@ void Args::set_cpu(int cpu) {
 void Args::set_cpu(const string& name) {
     m_got_cpu_option = true;
 
-    if (name == ARCH_TI83_NAME) {
+    if (name == "*") {
+        set_cpu(CPU_Z80);
+        m_lib_for_all_cpus = true;
+    }
+    else if (name == ARCH_TI83_NAME) {
         set_cpu(CPU_Z80);
         m_ti83 = true;
         m_ti83plus = false;
@@ -930,6 +934,10 @@ bool option_swap_ixiy() {
 	return g_args.swap_ixiy();
 }
 
+void set_swap_ixiy_option(bool f) {
+    g_args.set_swap_ixiy(f);
+}
+
 void push_includes(const char* dir) {
 	g_args.push_include_path(dir);
 }
@@ -982,6 +990,10 @@ const char* option_lib_file() {
 		return nullptr;
 	else
 		return spool_add(filename.c_str());
+}
+
+bool option_lib_for_all_cpus() {
+    return !g_args.lib_file().empty() && g_args.lib_for_all_cpus();
 }
 
 const char* option_bin_file() {

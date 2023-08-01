@@ -132,8 +132,10 @@ static void do_assemble(const char *src_filename )
  ***************************************************************************************************/
 int z80asm_main() {
 	if (!get_num_errors()) {
-		for (size_t i = 0; i < option_files_size(); i++)
-			assemble_file(option_file(i));
+        if (!option_lib_for_all_cpus()) {
+            for (size_t i = 0; i < option_files_size(); i++)
+                assemble_file(option_file(i));
+        }
 	}
 
 	/* Create output file */

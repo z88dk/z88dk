@@ -905,16 +905,19 @@ static void file_read_library(file_t* file, FILE* fp, UT_string* signature, int 
 		next = xfread_dword(fp);
 		length = xfread_dword(fp);
 
-		file_type_e type = read_signature(fp, utstr_body(file->filename), obj_signature, &obj_version);
-		if (type != is_object)
-			die("File %s: contains non-object file\n", utstr_body(file->filename));
+        if (next == -1 && length == 0)
+            break;                          // end marker
 
 		if (length == 0) {
 			if (opt_obj_list)
 				printf("  Deleted...\n");
 		}
 		else {
-			file_read_object(file, fp, obj_signature, obj_version);
+            file_type_e type = read_signature(fp, utstr_body(file->filename), obj_signature, &obj_version);
+            if (type != is_object)
+                die("File %s: contains non-object file\n", utstr_body(file->filename));
+
+            file_read_object(file, fp, obj_signature, obj_version);
 		}
 
 		if (opt_obj_list)

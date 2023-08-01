@@ -56,6 +56,16 @@ const char* cpu_list() {
     return cpus.c_str();        // must be static
 }
 
+const int* cpu_ids() {
+    static int cpu_ids[] = {
+#define X(id, value, name)      id,
+#include "z80asm_cpu.def"
+        - 1
+    };
+
+    return &cpu_ids[0];
+}
+
 bool cpu_compatible(int code_cpu_id, int lib_cpu_id) {
     if (code_cpu_id == lib_cpu_id)
         return true;
