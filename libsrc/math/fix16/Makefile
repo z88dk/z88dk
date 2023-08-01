@@ -26,7 +26,7 @@ obj/z80n/%.o: %.asm
 	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80n -D__CLASSIC -Oobj/z80n  $^
 
 obj/ixiy/%.o: %.c
-	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
+	$(ZCC) +test -mz80 -Ca-IXIY $(CFLAGS) -o $@  $^
 
 obj/ixiy/%.o: %.asm
 	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -IXIY -mz80 -D__CLASSIC -Oobj/ixiy  $^

@@ -16,7 +16,7 @@ TOCREATE =
 # $2 = libs
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
-CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxh19.lib gfxvio.lib
+CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxh19.lib gfxvio.lib
 GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2k_crt0.lib ez80_z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib lib3d.lib fastmath.lib preempt.lib sp1-all
 GENLIBS += 8080_opt.lib 8085_opt.lib z180_opt.lib 
 GENLIBS += gfxtek.lib gfxregis.lib
@@ -709,8 +709,8 @@ bondwell2.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Bondwell 2 Library ---'
 	@echo ''
-	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=bondwell2 TARGET_CFLAGS="-Ca-IXIY -Cl-IXIY"
-	$(MAKE) -C games TARGET=cpm SUBTYPE=bondwell2
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=bondwell2 TARGET_CFLAGS="-subtype=bondwell2"
+	$(MAKE) -C games TARGET=cpm SUBTYPE=bondwell2 TARGET_CFLAGS="-subtype=bondwell2"
 	$(MAKE) -C video/msm6255 TARGET=cpm SUBTYPE=bondwell2
 	TARGET=bondwell2 TYPE=ixiy $(LIBLINKER) -IXIY -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(TARGET_DIRECTORY)/bondwell2/bw2.lst
 
@@ -740,8 +740,8 @@ tim011.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Tim-011 Library ---'
 	@echo ''
-	$(MAKE) -C games TARGET=cpm SUBTYPE=tim011
-	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide gencon" SUBTYPE=tim011
+	$(MAKE) -C games TARGET=cpm SUBTYPE=tim011 TARGET_CFLAGS="-subtype=tim011"
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide gencon" SUBTYPE=tim011 TARGET_CFLAGS="-subtype=tim011"
 	TARGET=tim011 TYPE=z180 $(LIBLINKER) -mz180 -DFORtim011 -x$(OUTPUT_DIRECTORY)/tim011.lib @$(TARGET_DIRECTORY)/tim011/tim011.lst
 
 x820ii.lib: cpm_clib.lib
@@ -770,6 +770,19 @@ cpm8080_clib.lib: $(TARGET_CLIB_OBJS) cpm_clib.lib
 	@echo '--- Building CP/M Library (8080)---'
 	@echo ''
 	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(TARGET_DIRECTORY)/cpm/cpm_8080.lst
+
+cpmixiy_clib.lib: $(TARGET_CLIB_OBJS) cpm_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Library (IXIY)---'
+	@echo ''
+	TARGET=cpm TYPE=ixiy DEVICE=nodevice $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmixiy_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst
+
+cpmz180_clib.lib: $(TARGET_CLIB_OBJS) cpm_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Library (z180)---'
+	@echo ''
+	TARGET=cpm TYPE=z180 DEVICE=nodevice $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmz180_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst
+
 
 cpmdevice.lib: cpm_clib.lib
 	@echo ''
@@ -1195,7 +1208,7 @@ ixiy_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building +z80 (ixiy) Library ---'
 	@echo ''
 	$(call buildgeneric,z80)
-	TARGET=z80 TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/ixiy_clib @$(TARGET_DIRECTORY)/z80/z80.lst
+	TARGET=z80 TYPE=ixiy $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/ixiy_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Barebone z80/8080 clib
 8080_clib.lib: $(TARGET_CLIB_OBJS)
@@ -1262,7 +1275,7 @@ primo_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	$(call buildgeneric,primo)
 	$(MAKE) -C games TARGET=primo
-	TARGET=primo TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORprimo -x$(OUTPUT_DIRECTORY)/primo_clib @$(TARGET_DIRECTORY)/primo/primo.lst
+	TARGET=primo TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -IXIY -DFORprimo -x$(OUTPUT_DIRECTORY)/primo_clib @$(TARGET_DIRECTORY)/primo/primo.lst
 
 
 
@@ -1717,21 +1730,21 @@ testrcm_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building Test System Library (Rabbit) ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=r2k $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
+	TARGET=test TYPE=r2k $(LIBLINKER) -mr2ka -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
 
 test8080_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Test System Library (8080) ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=8080 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test8080_clib @$(TARGET_DIRECTORY)/test/test8080.lst
+	TARGET=test TYPE=8080 $(LIBLINKER) -m8080 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test8080_clib @$(TARGET_DIRECTORY)/test/test8080.lst
 
 testgbz80_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Test System Library (gbz80) ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=gbz80 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testgbz80_clib @$(TARGET_DIRECTORY)/test/testgbz80.lst
+	TARGET=test TYPE=gbz80 $(LIBLINKER) -mgbz80 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testgbz80_clib @$(TARGET_DIRECTORY)/test/testgbz80.lst
 
 
 # TRS 80 - stefano

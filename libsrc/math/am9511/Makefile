@@ -24,7 +24,7 @@ $(OUTPUT_DIRECTORY)/am9511_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 
 $(OUTPUT_DIRECTORY)/am9511_8085.lib: $(addprefix obj/8085/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/8085/x/x -I.. -m8085 -D__CLASSIC @newlibfiles_8085.lst
-	TYPE=8085 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/am9511_8085 @am9511.lst
+	TYPE=8085 $(LIBLINKER) -m8085 -x$(OUTPUT_DIRECTORY)/am9511_8085 @am9511.lst
 
 dirs:
 	@mkdir -p obj/z80/c obj/ixiy/c  obj/8085/c

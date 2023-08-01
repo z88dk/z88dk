@@ -6,7 +6,7 @@ TARGET = cpm
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
 
-all: dirs $(addprefix obj/8080/,$(OBJECTS)) $(addprefix obj/z80/,$(OBJECTS))
+all: dirs $(addprefix obj/8080/,$(OBJECTS)) $(addprefix obj/z80/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS)) $(addprefix obj/z180/,$(OBJECTS))
 
 
 clean: 

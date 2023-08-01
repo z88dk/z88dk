@@ -1,7 +1,13 @@
 FONT4x8_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/font/font_4x8/*.asm"
 FONT4x8_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/font/font_4x8/*.asm
 
-FONT4x8_NEWLIB_TARGETS := font/font_4x8/obj/newlib-z80-font_4x8 
+FONT4x8_NEWLIB_TARGETS := font/font_4x8/obj/newlib-z80-font_4x8 \
+	font/font_4x8/obj/newlib-r2k-font_4x8 \
+	font/font_4x8/obj/newlib-z80n-font_4x8 \
+	font/font_4x8/obj/newlib-ixiy-font_4x8 \
+	font/font_4x8/obj/newlib-8080-font_4x8 \
+	font/font_4x8/obj/newlib-gbz80-font_4x8 \
+	font/font_4x8/obj/newlib-ez80_z80-font_4x8
 
 OBJS += $(FONT4x8_NEWLIB_TARGETS)
 CLEAN += font_4x8-clean
@@ -40,6 +46,10 @@ font/font_4x8/obj/newlib-gbz80-font_4x8: $(FONT4x8_NEWLIBGLOBS_ex)
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=font/font_4x8/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(FONT4x8_NEWLIBGLOBS)
 
+font/font_4x8/obj/newlib-ez80_z80-font_4x8: $(FONT4x8_NEWLIBGLOBS_ex)
+	@mkdir -p font/font_4x8/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=font/font_4x8/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(FONT4x8_NEWLIBGLOBS)
 
 font_4x8-clean:
 	$(RM) -fr font/font_4x8/obj

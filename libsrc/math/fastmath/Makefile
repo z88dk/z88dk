@@ -50,19 +50,19 @@ $(OUTPUT_DIRECTORY)/fastmath.lib: fastmath.lst
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath.lib @fastmath.lst
 
 $(OUTPUT_DIRECTORY)/fastmath_r2ka.lib: fastmath.lst
-	TYPE=r2ka $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_r2ka.lib @fastmath.lst
+	TYPE=r2ka $(LIBLINKER) -mr2ka -x$(OUTPUT_DIRECTORY)/fastmath_r2ka.lib @fastmath.lst
 
 $(OUTPUT_DIRECTORY)/fastmath_z80n.lib: fastmath.lst
-	TYPE=z80n $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_z80n.lib @fastmath.lst
+	TYPE=z80n $(LIBLINKER) -mz80n -x$(OUTPUT_DIRECTORY)/fastmath_z80n.lib @fastmath.lst
 
 $(OUTPUT_DIRECTORY)/fastmath_z180.lib: fastmath.lst
-	TYPE=z180 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_z180.lib @fastmath.lst
+	TYPE=z180 $(LIBLINKER) -mz180 -x$(OUTPUT_DIRECTORY)/fastmath_z180.lib @fastmath.lst
 
 $(OUTPUT_DIRECTORY)/fastmath_ez80_z80.lib: fastmath.lst
-	TYPE=ez80_z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_ez80_z80.lib @fastmath.lst
+	TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -x$(OUTPUT_DIRECTORY)/fastmath_ez80_z80.lib @fastmath.lst
 
 $(OUTPUT_DIRECTORY)/fastmath_ixiy.lib: fastmath.lst
-	TYPE=ixiy $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_ixiy.lib @fastmath.lst
+	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/fastmath_ixiy.lib @fastmath.lst
 
 dirs:
 	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k obj/z180 obj/ez80_z80
