@@ -90,11 +90,12 @@ clean::
 #------------------------------------------------------------------------------
 # developer generated source files, and test libs
 # only run with RUN_RAGEL=1 to fix #2332 Build fails on cygwin
+# only run with RUN_RE2C=1 to fix #2369 wrong re2c output on Snapcraft
 #------------------------------------------------------------------------------
 .PHONY: dev
 dev:
 	perl asmstyle.pl dev/z80asm_lib/*.asm
-	$(MAKE) RUN_RAGEL=1 all
+	$(MAKE) RUN_RAGEL=1 RUN_RE2C=1 all
 
 # ragel parser generator
 dev: src/c/scan_rules.h
@@ -150,8 +151,10 @@ define MAKE_RE2C
 dev: $(1).o
 
 $(1).cpp: $(1).re Makefile
+ifeq ($(RUN_RE2C),1)
 	$(RE2C) -o $(1).cpp $(1).re
 	dos2unix $(1).cpp 2> /dev/null
+endif
 endef
 
 $(eval $(call MAKE_RE2C,src/cpp/scan))
