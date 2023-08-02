@@ -930,6 +930,7 @@ static void decompose_float(double raw, struct fp_decomposed *fs)
     double norm;
     double x = fabs(raw);
     double exp = log(x) / log(2);
+    double ipart;
     int i;
     int mant_bytes = c_fp_mantissa_bytes;
     int exp_bias = c_fp_exponent_bias;
@@ -949,8 +950,7 @@ static void decompose_float(double raw, struct fp_decomposed *fs)
         memset(fs->mantissa, 0, MAX_MANTISSA_SIZE + 1);
         return;
     }
-
-    if (floor(exp) == ceil(exp)) {
+    if ( modf(exp, &ipart) == 0.0 ) {
         exp = ceil(exp) + 1;
     } else {
         exp = ceil(exp);
