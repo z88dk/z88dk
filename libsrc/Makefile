@@ -122,7 +122,7 @@ TOCREATE += $(call check_target,special,special_clib.lib)
 TOCREATE += $(call check_target,super80,super80_clib.lib super80_vduem_clib.lib)
 TOCREATE += $(call check_target,sv8000,sv8000_clib.lib)
 TOCREATE += $(call check_target,svi,svi_clib.lib)
-TOCREATE += $(call check_target,test,test_clib.lib test8080_clib.lib testrcm_clib.lib testgbz80_clib.lib)
+TOCREATE += $(call check_target,test,test_clib.lib testz180_clib.lib testez80_z80_clib.lib test8080_clib.lib testrcm_clib.lib testgbz80_clib.lib)
 TOCREATE += $(call check_target,ti82,ti82_clib.lib)
 TOCREATE += $(call check_target,ti83,ti83_clib.lib)
 TOCREATE += $(call check_target,ti83p,ti83p_clib.lib)
@@ -1723,23 +1723,37 @@ test_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building Test System Library ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=z80 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test_clib @$(TARGET_DIRECTORY)/test/test.lst
+	TARGET=test TYPE=z80 $(LIBLINKER) -mz80 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test_clib @$(TARGET_DIRECTORY)/test/test.lst
 
-testrcm_clib.lib: $(TARGET_CLIB_OBJS)
+testz180_clib.lib: $(TARGET_CLIB_OBJS) test_clib.lib
+	@echo ''
+	@echo '--- Building Test System Library (z180) ---'
+	@echo ''
+	$(call buildgeneric,test)
+	TARGET=test TYPE=z180 $(LIBLINKER) -mz180 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testz180_clib @$(TARGET_DIRECTORY)/test/test.lst
+
+testez80_z80_clib.lib: $(TARGET_CLIB_OBJS) testz180_clib.lib
+	@echo ''
+	@echo '--- Building Test System Library (ez80_z80) ---'
+	@echo ''
+	$(call buildgeneric,test)
+	TARGET=test TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testez80_z80_clib @$(TARGET_DIRECTORY)/test/test.lst
+
+testrcm_clib.lib: $(TARGET_CLIB_OBJS) testez80_z80_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (Rabbit) ---'
 	@echo ''
 	$(call buildgeneric,test)
 	TARGET=test TYPE=r2k $(LIBLINKER) -mr2ka -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
 
-test8080_clib.lib: $(TARGET_CLIB_OBJS)
+test8080_clib.lib: $(TARGET_CLIB_OBJS) testrcm_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (8080) ---'
 	@echo ''
 	$(call buildgeneric,test)
 	TARGET=test TYPE=8080 $(LIBLINKER) -m8080 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test8080_clib @$(TARGET_DIRECTORY)/test/test8080.lst
 
-testgbz80_clib.lib: $(TARGET_CLIB_OBJS)
+testgbz80_clib.lib: $(TARGET_CLIB_OBJS) test8080_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (gbz80) ---'
 	@echo ''

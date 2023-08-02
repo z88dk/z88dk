@@ -27,11 +27,11 @@ test_sprintf.bin: sprintf.c $(SOURCES)
 	$(runtest)
 
 test_sprintf_8080.bin: sprintf.c $(SOURCES)
-	$(call compile_8080,-lm)
+	$(call compile_8080)
 	$(runtest_8080)
 
 test_sprintf_gbz80.bin: sprintf.c $(SOURCES)
-	$(call compile_gbz80,-lm)
+	$(call compile_gbz80)
 	$(runtest_gbz80)
 
 test_sprintf_ez80_z80.bin: sprintf.c $(SOURCES)
@@ -39,7 +39,7 @@ test_sprintf_ez80_z80.bin: sprintf.c $(SOURCES)
 	$(runtest_ez80_z80)
 
 test_sprintf_r2ka.bin: sprintf.c $(SOURCES)
-	$(call compile_r2ka,-lm)
+	$(call compile_r2ka)
 	$(runtest_r2ka)
 
 test_sprintf_sdcc.bin: sprintf.c $(SOURCES)

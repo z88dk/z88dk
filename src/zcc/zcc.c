@@ -377,7 +377,7 @@ static char  *c_asmopts = NULL;
 static char  *c_altmathlib = NULL;
 static char  *c_altmathflags = NULL;        /* "-math-z88 -D__NATIVE_MATH__"; */
 static char  *c_startuplib = "z80_crt0";
-static char  *c_genmathlib = "genmath";
+static char  *c_genmathlib = "genmath@{ZCC_LIBCPU}";
 static int    c_stylecpp = outspecified;
 
 static char  *c_extension = NULL;
