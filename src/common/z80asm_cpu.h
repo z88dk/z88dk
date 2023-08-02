@@ -19,11 +19,6 @@ enum {
 #define ARCH_TI83_NAME		"ti83"
 #define ARCH_TI83PLUS_NAME	"ti83plus"
 
-#define CPU_ZILOG	(CPU_Z80 | CPU_Z80N | CPU_Z180 | CPU_EZ80 | CPU_EZ80_Z80)
-#define CPU_RABBIT	(CPU_R2KA | CPU_R3K)
-#define CPU_ALL		(CPU_ZILOG | CPU_RABBIT)
-#define CPU_NOT_Z80	(CPU_ALL & ~(CPU_Z80 | CPU_Z80N))
-
 const char* cpu_name(int cpu_id);
 int cpu_id(const char* name);       // -1 if not found
 const char* cpu_list();             // static comma-separated list of names

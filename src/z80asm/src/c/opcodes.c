@@ -20,6 +20,14 @@ Define CPU opcodes
 #include "z80asm.h"
 #include <assert.h>
 
+enum { FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO_LZ, FLAG_PE_LO, FLAG_P, FLAG_M };
+#define Z80_DJNZ			0x10
+#define Z80_JR				0x18
+#define Z80_JP				0xC3
+#define Z80_JR_FLAG(flag)	(0x20 + ((flag) << 3))
+#define Z80_JP_FLAG(flag)	(0xC2 + ((flag) << 3))
+#define Z80_CALL			0xCD
+
 /* add 1 to 4 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xCB00 */
 void add_opcode(int opcode)
@@ -184,17 +192,33 @@ void add_call_emul_func(char * emul_func)
 	add_opcode_nn(0xCD, emul_expr);
 }
 
+void add_rst_opcode(int arg) {
+    if (arg > 0 && arg < 8)
+        arg *= 8;
+    switch (arg) {
+    case 0x00: case 0x08: case 0x30:
+        if (option_cpu() == CPU_R2KA || option_cpu() == CPU_R3K)
+            add_opcode(0xCD0000 + (arg << 8));
+        else
+            add_opcode(0xC7 + arg);
+        break;
+    case 0x10: case 0x18: case 0x20: case 0x28: case 0x38:
+        add_opcode(0xC7 + arg); break;
+    default: error_int_range(arg);
+    }
+}
+
 /* add Z88's opcodes */
 void add_Z88_CALL_OZ(int argument)
 {
 	if (argument > 0 && argument <= 255)
 	{
-		append_byte(Z80_RST(0x20));
+        add_rst_opcode(0x20);
 		append_byte(argument);
 	}
 	else if (argument > 255)
 	{
-		append_byte(Z80_RST(0x20));
+        add_rst_opcode(0x20);
 		append_word(argument);
 	}
 	else
@@ -205,7 +229,7 @@ void add_Z88_CALL_PKG(int argument)
 {
 	if (argument >= 0)
 	{
-		append_byte(Z80_RST(0x08));
+        add_rst_opcode(0x08);
 		append_word(argument);
 	}
 	else
@@ -216,7 +240,7 @@ void add_Z88_FPP(int argument)
 {
 	if (argument > 0 && argument < 255)
 	{
-		append_byte(Z80_RST(0x18));
+        add_rst_opcode(0x18);
 		append_byte(argument);
 	}
 	else
@@ -226,18 +250,13 @@ void add_Z88_FPP(int argument)
 void add_Z88_INVOKE(int argument)
 {
 	if (option_ti83() || option_ti83plus()) {
-		int opcode;
-
 		if (option_ti83plus())
-			opcode = Z80_RST(0x28);		/* Ti83Plus: RST 28H instruction */
+            add_rst_opcode(0x28);		/* Ti83Plus: RST 28H instruction */
 		else
-			opcode = Z80_CALL;			/* Ti83: CALL */
+			append_byte(Z80_CALL);		/* Ti83: CALL */
 
 		if (argument >= 0)
-		{
-			append_byte(opcode);
 			append_word(argument);
-		}
 		else
 			error_int_range(argument);
 	}

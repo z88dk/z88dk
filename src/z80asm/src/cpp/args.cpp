@@ -666,6 +666,7 @@ string Args::search_path(vector<string>& path, const string& file) {
 
 void Args::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_Z80__");
+    undefine_static_symbol("__CPU_Z80_STRICT__");
     undefine_static_symbol("__CPU_Z80N__");
     undefine_static_symbol("__CPU_Z180__");
     undefine_static_symbol("__CPU_EZ80__");
@@ -688,6 +689,12 @@ void Args::set_cpu(int cpu) {
         m_cpu = CPU_Z80;
         m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_Z80__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_Z80_STRICT:
+        m_cpu = CPU_Z80_STRICT;
+        m_cpu_name = ::cpu_name(m_cpu);
+        define_static_symbol("__CPU_Z80_STRICT__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_Z80N:
@@ -758,12 +765,12 @@ void Args::set_cpu(const string& name) {
         m_lib_for_all_cpus = true;
     }
     else if (name == ARCH_TI83_NAME) {
-        set_cpu(CPU_Z80);
+        set_cpu(CPU_Z80_STRICT);
         m_ti83 = true;
         m_ti83plus = false;
     }
     else if (name == ARCH_TI83PLUS_NAME) {
-        set_cpu(CPU_Z80);
+        set_cpu(CPU_Z80_STRICT);
         m_ti83 = false;
         m_ti83plus = true;
     }

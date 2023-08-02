@@ -93,13 +93,13 @@ void make_library(const char *lib_filename)
 
                 if (get_num_errors()) {
                     xfclose(lib_file);			/* error */
-                    remove(lib_filename);
+                    remove(utstring_body(temp_filename));
                     return;
                 }
 
                 if (!add_object_modules(lib_file)) {
                     xfclose(lib_file);			/* error */
-                    remove(lib_filename);
+                    remove(utstring_body(temp_filename));
                     return;
                 }
             }
@@ -109,7 +109,7 @@ void make_library(const char *lib_filename)
         /* already assembled in main(), write each object file */
         if (!add_object_modules(lib_file)) {
             xfclose(lib_file);			/* error */
-            remove(lib_filename);
+            remove(utstring_body(temp_filename));
             return;
         }
     }

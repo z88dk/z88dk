@@ -145,19 +145,8 @@ sub parse_code_opcode {
 	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
 		push @code, 
 			"DO_STMT_LABEL();",
-			"if (expr_error) { error_expected_const_expr(); } else {",
-			"if (expr_value > 0 && expr_value < 8) expr_value *= 8;",
-			"switch (expr_value) {",
-			"case 0x00: case 0x08: case 0x30:",
-			"  if (option_cpu() & CPU_RABBIT)",
-			"    DO_stmt(0xCD0000 + (expr_value << 8));",
-			"  else",
-			"    DO_stmt(0xC7 + expr_value);",
-			"  break;",
-			"case 0x10: case 0x18: case 0x20: case 0x28: case 0x38:",
-			"  DO_stmt(0xC7 + expr_value); break;",
-			"default: error_int_range(expr_value);",
-			"}}";
+			"if (expr_error) { error_expected_const_expr(); }".
+			"else { add_rst_opcode(expr_value); }";
 	}
 	elsif ($asm =~ /^mmu %c, %n/) {
 		push @code, 
