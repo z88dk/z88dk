@@ -25,6 +25,7 @@ STDIO_OBJS = $(addprefix stdio/obj/z80/, $(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/z80/, $(STDIO_NET_CFILES:.c=.o)) \
 	$(addprefix stdio/obj/ixiy/,$(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/z80-binary/,$(STDIO_OBJECTS)) \
+	$(addprefix stdio/obj/z180/,$(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/z180-binary/,$(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/ixiy-binary/,$(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/r2k/,$(STDIO_OBJECTS)) \

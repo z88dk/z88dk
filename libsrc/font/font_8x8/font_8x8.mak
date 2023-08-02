@@ -7,6 +7,7 @@ FONT8x8_NEWLIB_TARGETS := font/font_8x8/obj/newlib-z80-font_8x8 \
 	font/font_8x8/obj/newlib-ixiy-font_8x8 \
 	font/font_8x8/obj/newlib-8080-font_8x8 \
 	font/font_8x8/obj/newlib-gbz80-font_8x8 \
+	font/font_8x8/obj/newlib-z180-font_8x8 \
 	font/font_8x8/obj/newlib-ez80_z80-font_8x8
 
 OBJS += $(FONT8x8_NEWLIB_TARGETS)
@@ -45,6 +46,11 @@ font/font_8x8/obj/newlib-gbz80-font_8x8: $(FONT8x8_NEWLIBGLOBS_ex)
 	@mkdir -p font/font_8x8/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=font/font_8x8/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(FONT8x8_NEWLIBGLOBS)
+
+font/font_8x8/obj/newlib-z180-font_8x8: $(FONT8x8_NEWLIBGLOBS_ex)
+	@mkdir -p font/font_8x8/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=font/font_8x8/obj/z180/x -I.. -mz180 -D__CLASSIC $(FONT8x8_NEWLIBGLOBS)
 
 font/font_8x8/obj/newlib-ez80_z80-font_8x8: $(FONT8x8_NEWLIBGLOBS_ex)
 	@mkdir -p font/font_8x8/obj

@@ -9,6 +9,7 @@ QUEUE_OBJS = $(addprefix adt/queue/obj/z80/, $(QUEUE_OBJECTS)) \
 	$(addprefix adt/queue/obj/r2k/,$(QUEUE_OBJECTS)) \
 	$(addprefix adt/queue/obj/ixiy/,$(QUEUE_OBJECTS)) \
 	$(addprefix adt/queue/obj/z80n/,$(QUEUE_OBJECTS)) \
+	$(addprefix adt/queue/obj/z180/,$(QUEUE_OBJECTS)) \
 	$(addprefix adt/queue/obj/ez80_z80/,$(QUEUE_OBJECTS)) 
 
 
@@ -23,6 +24,7 @@ $(eval $(call buildbit,adt/queue,z80,test))
 $(eval $(call buildbit,adt/queue,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,adt/queue,r2k,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,adt/queue,z80n,test,-clib=z80n,-mz80n))
+$(eval $(call buildbit,adt/queue,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,adt/queue,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 
 

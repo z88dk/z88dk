@@ -3,6 +3,7 @@ LIBGEN_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/libgen/c/sccz80/*.asm $(NEWLIB_DIRE
 
 LIBGEN_NEWLIB_TARGETS := libgen/obj/newlib-z80-libgen libgen/obj/newlib-z80n-libgen libgen/obj/newlib-r2k-libgen \
 		 libgen/obj/newlib-ixiy-libgen libgen/obj/newlib-8080-libgen libgen/obj/newlib-gbz80-libgen \
+		libgen/obj/newlib-z180-libgen \
 		libgen/obj/newlib-ez80_z80-libgen		
 
 OBJS += $(LIBGEN_NEWLIB_TARGETS)
@@ -41,6 +42,11 @@ libgen/obj/newlib-gbz80-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
 	@mkdir -p libgen/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=libgen/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(LIBGEN_NEWLIBGLOBS)
+
+libgen/obj/newlib-z180-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
+	@mkdir -p libgen/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=libgen/obj/z180/x -I.. -mz180 -D__CLASSIC $(LIBGEN_NEWLIBGLOBS)
 
 libgen/obj/newlib-ez80_z80-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
 	@mkdir -p libgen/obj

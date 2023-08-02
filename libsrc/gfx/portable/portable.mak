@@ -7,6 +7,7 @@ GFXPORTABLE_OBJECTS = $(GFXPORTABLE_CFILES:.c=.o) $(GFXPORTABLE_AFILES:.asm=.o)
 
 GFXPORTABLE_OBJS = $(addprefix gfx/portable/obj/ixiy/,$(GFXPORTABLE_OBJECTS)) \
 	$(addprefix gfx/portable/obj/8080/,$(GFXPORTABLE_OBJECTS)) \
+	$(addprefix gfx/portable/obj/z180/,$(GFXPORTABLE_OBJECTS)) \
 	$(addprefix gfx/portable/obj/gbz80/,$(GFXPORTABLE_OBJECTS))
 
 
