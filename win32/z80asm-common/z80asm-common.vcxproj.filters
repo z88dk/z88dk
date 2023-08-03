@@ -68,7 +68,7 @@
     <ClCompile Include="..\..\src\common\option.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\z80asm_cpu.cpp">
+    <ClCompile Include="..\..\src\common\z80asm_cpu.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

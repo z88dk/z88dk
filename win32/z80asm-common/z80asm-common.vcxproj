@@ -45,7 +45,7 @@
     <ClCompile Include="..\..\src\common\option.c" />
     <ClCompile Include="..\..\src\common\optparse.c" />
     <ClCompile Include="..\..\src\common\strutil.c" />
-    <ClCompile Include="..\..\src\common\z80asm_cpu.cpp" />
+    <ClCompile Include="..\..\src\common\z80asm_cpu.c" />
     <ClCompile Include="..\..\src\common\zutils.c" />
   </ItemGroup>
   <ItemGroup>

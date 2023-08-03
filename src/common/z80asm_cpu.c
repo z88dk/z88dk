@@ -5,69 +5,80 @@
 //-----------------------------------------------------------------------------
 
 #include "z80asm_cpu.h"
-#include <algorithm>
-#include <cassert>
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-using namespace std;
+#include "die.h"
+#include "uthash.h"
 
-// Assert for internal errors, similar to assert but not removed in release builds
-#define Assert(f)    do { \
-                        if (!(f)) { \
-                            cerr << "z88dk-z80asm panic at " << __FILE__ << ":" << __LINE__ << endl; \
-                            exit(EXIT_FAILURE); \
-                        } \
-                    } while(0)
+typedef struct {
+    const char* str;
+    int id;
+    UT_hash_handle hh;
+} map_string_int_t;
 
+// hash table to lookup CPUs
+static map_string_int_t map_cpu_ids[] = {
+#define X(id, value, name)      {name, id},
+#include "z80asm_cpu.def"
+    {NULL, 0}
+};
+
+static map_string_int_t* map_cpu_ids_hash = NULL;
+
+static UT_string* cpus_list = NULL;
+
+static int by_str(const map_string_int_t* a, const map_string_int_t* b) {
+    return strcmp(a->str, b->str);
+}
+
+static void init() {
+    static inited = false;
+    if (!inited) {
+        for (map_string_int_t* p = map_cpu_ids; p->str != NULL; p++) {
+            const char* str = p->str;
+            HASH_ADD_STR(map_cpu_ids_hash, str, p);
+        }
+        HASH_SORT(map_cpu_ids_hash, by_str);
+
+        utstring_new(cpus_list);
+        const char* sep = "";
+        for (map_string_int_t* p = map_cpu_ids_hash; p != NULL; p = (map_string_int_t*)(p->hh.next)) {
+            utstring_printf(cpus_list, "%s%s", sep, p->str);
+            sep = ",";
+        }
+        inited = true;
+    }
+}
 
 const char* cpu_name(int cpu_id) {
     switch (cpu_id) {
 #define X(id, value, name)      case id: return name;
 #include "z80asm_cpu.def"
-    default: Assert(0);
+    default: xassert(0);
     }
     return "";  // not reached
 }
 
 int cpu_id(const char* name) {
-    static std::map<string, int> cpu_map = {
-#define X(id, value, name)      {name, id},
-#include "z80asm_cpu.def"
-    };
+    init();
 
-    auto it = cpu_map.find(name);
-    if (it != cpu_map.end())
-        return it->second;
+    map_string_int_t* found;
+    HASH_FIND_STR(map_cpu_ids_hash, name, found);
+    if (found)
+        return found->id;
     else
         return -1;
 }
 
 const char* cpu_list() {
-    static vector<string> cpus_list = {
-#define X(id, value, name)      name,
-#include "z80asm_cpu.def"
-    };
-    static string cpus;
+    init();
 
-    if (cpus.empty()) {
-        std::sort(cpus_list.begin(), cpus_list.end());
-        for (auto& i : cpus_list)
-            cpus += i + ",";
-
-        if (!cpus.empty())
-            cpus.pop_back();    // remove last comma
-    }
-
-    return cpus.c_str();        // must be static
+    return utstring_body(cpus_list);
 }
 
 const int* cpu_ids() {
     static int cpu_ids[] = {
 #define X(id, value, name)      id,
 #include "z80asm_cpu.def"
-        - 1
+        -1
     };
 
     return &cpu_ids[0];
@@ -122,7 +133,7 @@ bool cpu_compatible(int code_cpu_id, int lib_cpu_id) {
         case CPU_GBZ80:
             return false;
         default:
-            Assert(0);
+            xassert(0);
         }
     }
 }

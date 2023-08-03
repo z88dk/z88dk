@@ -20,13 +20,14 @@ CXXFLAGS 	+= -std=gnu++17 $(COMMON_FLAGS)
 
 INSTALL 	?= install
 
-CXXSRCS		:= $(wildcard *.cpp ../common/*.cpp)
+CXXSRCS		:= $(wildcard *.cpp)
 CSRCS		:= ../common/zutils.c \
 			../common/die.c \
 			../common/objfile.c \
 			../common/fileutil.c \
 			../common/strutil.c \
 			../common/optparse.c \
+			../common/z80asm_cpu.c \
 			$(wildcard ../../ext/regex/reg*.c)
 
 OBJS	:= $(CXXSRCS:.cpp=.o) $(CSRCS:.c=.o) \

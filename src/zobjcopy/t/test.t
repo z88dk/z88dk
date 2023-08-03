@@ -805,9 +805,9 @@ sub run {
 	for ($exp_out, $exp_err, $out, $err) {
 		s/\r\n/\n/g;
 	}
-	is $out, $exp_out, $cmd;
-	is $err, $exp_err, $cmd;
-	is !!$exit, !!$exp_exit, $cmd;
+	is $out, $exp_out, "$cmd: stdout";
+	is $err, $exp_err, "$cmd: stderr";
+	is !!$exit, !!$exp_exit, "$cmd: exit";
 	
 	return $ok && Test::More->builder->is_passing;
 }
@@ -823,6 +823,10 @@ sub check_zobjcopy_nm {
 	my $diff = system("diff -w $out $bmk");
 	is 0, $diff, "diff -w $out $bmk";
 	unlink $out unless $diff;
+	
+	if ($diff && $ENV{DEBUG}) {
+		system("'/c/Program Files/WinMerge/WinMergeU.exe' $out $bmk");
+	}
 	
 	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 	
