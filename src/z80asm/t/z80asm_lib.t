@@ -56,7 +56,6 @@ Reading library 'z88dk-z80asm.lib'
 Assembling '${test}.asm' to '${test}.o'
 Reading '${test}.asm' = '${test}.asm'
 Writing object file '${test}.o'
-Module '${test}' size: 4 bytes
 
 Linking library module 'rld'
 Code size: 38 bytes (\$0000 to \$0025)
@@ -86,7 +85,6 @@ Reading library 'root/lib/z88dk-z80asm.lib'
 Assembling '../${test}.asm' to '../${test}.o'
 Reading '../${test}.asm' = '../${test}.asm'
 Writing object file '../${test}.o'
-Module '${test}' size: 4 bytes
 
 Linking library module 'rld'
 Code size: 38 bytes (\$0000 to \$0025)
@@ -110,7 +108,6 @@ Reading library 'root/lib/z88dk-z80asm.lib'
 Assembling '../${test}.asm' to '../${test}.o'
 Reading '../${test}.asm' = '../${test}.asm'
 Writing object file '../${test}.o'
-Module '${test}' size: 4 bytes
 
 Linking library module 'rld'
 Code size: 38 bytes (\$0000 to \$0025)
@@ -134,7 +131,6 @@ Library '$default_lib_path/z88dk-z80asm.lib' not found
 Assembling '../${test}.asm' to '../${test}.o'
 Reading '../${test}.asm' = '../${test}.asm'
 Writing object file '../${test}.o'
-Module '${test}' size: 4 bytes
 
 Code size: 4 bytes (\$0000 to \$0003)
 END
@@ -199,7 +195,6 @@ Reading library 'z88dk-z80asm.lib'
 Assembling '${test}.asm' to '${test}.o'
 Reading '${test}.asm' = '${test}.asm'
 Writing object file '${test}.o'
-Module '${test}' size: 4 bytes
 
 Linking library module 'rld'
 END

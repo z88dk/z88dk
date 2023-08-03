@@ -11,8 +11,6 @@
 #include "strutil.h"
 #include "utstring.h"
 
-extern char Z80libhdr[];
-
 /* make library from source files; convert each source to object file name */
 extern void make_library(const char *lib_filename);
 

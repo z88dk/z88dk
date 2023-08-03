@@ -51,7 +51,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 			[ 'P', "file1.asm", 456, "text_1", 0, 1, 2, "", "start1" ],
 			[ 'H', "file1.asm", 456, "text_1", 0, 1, 2, "", "0xff01" ],
 		],
-		NAMES => [
+		SYMBOLS => [
 			# scope, type, section, value, name, def_filename, line_nr
 			[ 'L', 'A', "text_1", 2, "start1", "file1.asm", 123 ],
 			[ 'L', 'A', "text_2", 2, "start2", "file1.asm", 123 ],
@@ -64,7 +64,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 			# name, ...
 			"ext1", "ext2"
 		],
-		CODES => [
+		CODE => [
 			# section, org, align, code
 			[ "text_1",      0,  1, pack("C*", 1..63) ],
 			[ "text_2",     -1, 16, pack("C*", 1..64) ],
@@ -76,7 +76,8 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 	
 	$libfile[$version] = libfile(
 			VERSION => $version,
-			OBJS => [$objfile[$version], $objfile[$version]]
+			OBJS => [$objfile[$version], $objfile[$version]],
+			PUBLIC => ["data_1", "data_2", "text_1"]
 	);
 }
 
@@ -480,14 +481,14 @@ Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': make symbols that match '^_' local
 Block 'Z80RMF$OBJ_FILE_VERSION'
   skip symbol main
-  change scope of symbol _start -> L
+  change scope of symbol _start -> local
   skip symbol msg1
   skip symbol msg2
 File 'test.o': make symbols that match 'msg' local
 Block 'Z80RMF$OBJ_FILE_VERSION'
   skip symbol main
-  change scope of symbol msg1 -> L
-  change scope of symbol msg2 -> L
+  change scope of symbol msg1 -> local
+  change scope of symbol msg2 -> local
 Writing file 'test2.o': object version $OBJ_FILE_VERSION
 ...
 ok check_zobjcopy("test2.o", sprintf("t/bmk_obj_%02d_local1.txt", $OBJ_FILE_VERSION));
@@ -503,8 +504,8 @@ ok run("z88dk-zobjcopy test.o --verbose --global start -G s test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': make symbols that match 'start' global
 Block 'Z80RMF$OBJ_FILE_VERSION'
-  change scope of symbol start1 -> G
-  change scope of symbol start2 -> G
+  change scope of symbol start1 -> global
+  change scope of symbol start2 -> global
 File 'test.o': make symbols that match 's' global
 Block 'Z80RMF$OBJ_FILE_VERSION'
 Writing file 'test2.o': object version $OBJ_FILE_VERSION
@@ -537,15 +538,20 @@ path("test.asm")->spew(<<'...');
 	public aa
 	defc aa=2		; in section ''
 	section text	; so that obj file has one section but no ''
+	defb aa
 ...
-ok run("z80asm test.asm");
+ok run("z88dk-z80asm test.asm");
 ok run("z88dk-zobjcopy -l test.o", <<"...");
 Object  file test.o at \$0000: Z80RMF$OBJ_FILE_VERSION
   Name: test
   CPU:  z80 
-  Section text: 0 bytes
+  Section "": 0 bytes
+  Section text: 1 bytes
+    C \$0000: 00
   Symbols:
-    G C \$0002 aa (section "") (file test.asm:2)
+    G C \$0002: aa (section "") (file test.asm:2)
+  Expressions:
+    E U \$0000 \$0000 1: aa (section text) (file test.asm:4)
 ...
 
 ok run("z88dk-zobjcopy test.o test2.o");
@@ -554,25 +560,95 @@ Object  file test2.o at \$0000: Z80RMF$OBJ_FILE_VERSION
   Name: test
   CPU:  z80 
   Section "": 0 bytes
-  Section text: 0 bytes
+  Section text: 1 bytes
+    C \$0000: 00
   Symbols:
-    G C \$0002 aa (section "") (file test.asm:2)
+    G C \$0002: aa (section "") (file test.asm:2)
+  Expressions:
+    E U \$0000 \$0000 1: aa (section text) (file test.asm:4)
 ...
 
-unlink "test.asm", "test.o", "test2.o";
+unlink "test.asm", "test.o", "test2.o" if Test::More->builder->is_passing;
 
 done_testing;
+
+#------------------------------------------------------------------------------
+# string table
+{
+	package ST;
+	use Object::Tiny::RW qw( hash list );
+	
+	sub new {
+		my($class) = shift;
+		return bless {
+			hash => {"" => 0},
+			list => [""] }, $class;
+	}
+	
+	sub add {
+		my($self, $str) = @_;
+		return $self->hash->{$str} if exists $self->hash->{$str};
+		my $id = $self->count;
+		$self->hash->{$str} = $id;
+		push @{$self->list}, $str;
+		return $id;
+	}
+	
+	sub lookup {
+		my($self, $id) = @_;
+		return $self->list->[$id];
+	}
+	
+	sub count {
+		my($self) = @_;
+		return scalar @{$self->list};
+	}
+	
+	sub store {
+		my($self) = @_;
+		
+		# build list of strings and indexes
+		my $strings = "";
+		my @index;
+		for my $id (0 .. $self->count - 1) {
+			push @index, length($strings);
+			$strings .= $self->lookup($id) . pack("C", 0);
+		}
+		my $aligned = (length($strings)+3) & ~3;
+		$strings .= pack("C*", (0) x ($aligned - length($strings)));
+		
+		# write sizes
+		my $o = pack("VV", $self->count, length($strings));
+		
+		# write indexes
+		$o .= pack("V*", @index);
+		
+		# write strings
+		$o .= $strings;
+		
+		return $o;
+	}
+}	
 
 #------------------------------------------------------------------------------
 # return object file binary representation
 sub objfile {
 	my(%args) = @_;
-
+	
+	my $st = ST->new;				# string table
+	
 	exists($args{ORG}) and die;
 	
 	my $o = "Z80RMF".sprintf("%02d",($args{VERSION} || $OBJ_FILE_VERSION));
 	
-	my $org = $args{CODES}[0][1] // -1;
+	# CPU version
+	if ($args{VERSION} >= 18) {
+		$o .= pack("V", $args{CPU} // 1);
+		$o .= pack("V", $args{IXIY} // 0);
+	}
+
+	# global ORG (for old versions)
+	my $org = $args{CODE}[0][1] // -1;
 	if ($args{VERSION} >= 8) {
 		# no global ORG
 	}
@@ -589,12 +665,8 @@ sub objfile {
 	my $symbols_addr = length($o); $o .= pack("V", -1);
 	my $extern_addr	 = length($o); $o .= pack("V", -1);
 	my $code_addr	 = length($o); $o .= pack("V", -1);
+	my $st_addr		 = length($o); $o .= pack("V", -1) if $args{VERSION} >= 18;
 
-	if ($args{VERSION} >= 18) {
-		$o .= pack("V", $args{CPU} // 1);
-		$o .= pack("V", $args{IXIY} // 0);
-	}
-	
 	# store expressions
 	if ($args{EXPRS}) {
 		store_ptr(\$o, $expr_addr);
@@ -610,16 +682,40 @@ sub objfile {
 			next if $type eq 'P' && $args{VERSION} < 14;
 			next if $type eq 'H' && $args{VERSION} < 15;
 			
-			$o .= $type;
-			$o .= pack_lstring($filename) . pack("V", $line_nr) if $args{VERSION} >= 4;
-			if ($args{VERSION} >= 5) {
-				if ($args{VERSION} < 16) {
-					$o .= pack_string($section);
+			my %TYPES = ( 	"J"=>1, "U"=>2, "S"=>3, 
+							"W"=>4, "C"=>4, # was C until v17, after is W
+							"B"=>5, "L"=>6, "u"=>7, "s"=>8, 
+							"P"=>9, "H"=>10, "="=>11 );
+			die "invalid type $type" unless exists $TYPES{$type};
+			if ($args{VERSION} >= 18) {
+				$o .= pack("V", $TYPES{$type});
+			}
+			else {
+				$o .= $type;
+			}
+			
+			if ($args{VERSION} >= 4) {
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($filename));
 				}
 				else {
+					$o .= pack_lstring($filename);
+				}
+				$o .= pack("V", $line_nr);
+			}
+			
+			if ($args{VERSION} >= 5) {
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($section));
+				}
+				elsif ($args{VERSION} >= 16) {
 					$o .= pack_lstring($section);
 				}
+				else {
+					$o .= pack_string($section);
+				}
 			}
+			
 			if ($args{VERSION} >= 3) {
 				if ($args{VERSION} < 17) {
 					$o .= pack("v", $asmpc);
@@ -628,108 +724,177 @@ sub objfile {
 					$o .= pack("V", $asmpc);
 				}
 			}
+			
 			if ($args{VERSION} < 17) {
 				$o .= pack("v", $patch_ptr);
 			}
 			else {
 				$o .= pack("V", $patch_ptr);
 			}
+			
 			$o .= pack("V", $opcode_size) if $args{VERSION} >= 17;
+			
 			if ($args{VERSION} >= 6) {
-				if ($args{VERSION} < 16) {
-					$o .= pack_string($target_name);
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($target_name));
 				}
-				else {
+				elsif ($args{VERSION} >= 16) {
 					$o .= pack_lstring($target_name);
 				}
+				else {
+					$o .= pack_string($target_name);
+				}
 			}
-			if ($args{VERSION} >= 4) {
+			
+			if ($args{VERSION} >= 18) {
+				$o .= pack("V", $st->add($text));
+			}
+			elsif ($args{VERSION} >= 4) {
 				$o .= pack_lstring($text);
 			}
 			else {
 				$o .= pack_string($text) . pack("C", 0);
 			}
 		}
-		$o .= pack("C", 0) if $args{VERSION} >= 4;
+		
+		if ($args{VERSION} >= 18) {
+			$o .= pack("V", 0);
+		}
+		elsif ($args{VERSION} >= 4) {
+			$o .= pack("C", 0)
+		}
 	}
 
 	# store symbols
-	if ($args{NAMES}) {
+	if ($args{SYMBOLS}) {
 		store_ptr(\$o, $symbols_addr);
-		for (@{$args{NAMES}}) {
+		for (@{$args{SYMBOLS}}) {
 			@$_ == 7 or die;
 			my($scope, $type, $section, $value, $name, $def_filename, $line_nr) = @$_;
 			next if $type eq '=' && $args{VERSION} < 7;
 
-			$o .= $scope . $type;
-			if ($args{VERSION} >= 5) {
-				if ($args{VERSION} < 16) {
-					$o .= pack_string($section);
-				}
-				else {
-					$o .= pack_lstring($section);
-				}
-			}
-			$o .= pack("V", $value);
-			if ($args{VERSION} < 16) {
-				$o .= pack_string($name);
+			my %SCOPES = ("L"=>1, "G"=>2);
+			die "invalid scope $scope" unless exists $SCOPES{$scope};
+
+			my %TYPES = ("C"=>1, "A"=>2, "="=>3);
+			die "invalid scope $type" unless exists $TYPES{$type};
+
+			if ($args{VERSION} >= 18) {
+				$o .= pack("V", $SCOPES{$scope});
+				$o .= pack("V", $TYPES{$type});
 			}
 			else {
-				$o .= pack_lstring($name);
+				$o .= $scope;
+				$o .= $type;
 			}
-			if ($args{VERSION} >= 9) {
-				if ($args{VERSION} < 16) {
-					$o .= pack_string($def_filename) . pack("V", $line_nr);
+
+			if ($args{VERSION} >= 5) {
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($section));
+				}
+				elsif ($args{VERSION} >= 16) {
+					$o .= pack_lstring($section);
 				}
 				else {
+					$o .= pack_string($section);
+				}
+			}
+			
+			$o .= pack("V", $value);
+			
+			if ($args{VERSION} >= 18) {
+				$o .= pack("V", $st->add($name));
+			}
+			elsif ($args{VERSION} >= 16) {
+				$o .= pack_lstring($name);
+			}
+			else {
+				$o .= pack_string($name);
+			}
+			
+			if ($args{VERSION} >= 9) {
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($def_filename)) . pack("V", $line_nr);
+				}
+				elsif ($args{VERSION} >= 16) {
 					$o .= pack_lstring($def_filename) . pack("V", $line_nr);
+				}
+				else {
+					$o .= pack_string($def_filename) . pack("V", $line_nr);
 				}
 			}
 		}
-		$o .= pack("C", 0) if $args{VERSION} >= 5;
+		
+		if ($args{VERSION} >= 18) {
+			$o .= pack("V", 0);
+		} 
+		elsif ($args{VERSION} >= 5) {
+			$o .= pack("C", 0);
+		}
 	}
 
 	# store externals
 	if ($args{EXTERNS}) {
 		store_ptr(\$o, $extern_addr);
 		for my $name (@{$args{EXTERNS}}) {
-			if ($args{VERSION} < 16) {
-				$o .= pack_string($name);
+			if ($args{VERSION} >= 18) {
+				$o .= pack("V", $st->add($name));
 			}
-			else {
+			elsif ($args{VERSION} >= 16) {
 				$o .= pack_lstring($name);
 			}
+			else {
+				$o .= pack_string($name);
+			}
+		}
+		if ($args{VERSION} >= 18) {
+			$o .= pack("V", $st->add(""));		# end marker
 		}
 	}
 
 	# store name
 	store_ptr(\$o, $name_addr);
-	if ($args{VERSION} < 16) {
-		$o .= pack_string($args{NAME});
+	if ($args{VERSION} >= 18) {
+		$o .= pack("V", $st->add($args{NAME}));
+	}
+	elsif ($args{VERSION} >= 16) {
+		$o .= pack_lstring($args{NAME});
 	}
 	else {
-		$o .= pack_lstring($args{NAME});
+		$o .= pack_string($args{NAME});
 	}
 
 	# store code
-	if ( $args{CODES} ) {
-		ref($args{CODES}) eq 'ARRAY' or die;
+	if ( $args{CODE} ) {
+		ref($args{CODE}) eq 'ARRAY' or die;
 		store_ptr(\$o, $code_addr);
-		for (@{$args{CODES}}) {
+		for (@{$args{CODE}}) {
 			@$_ == 4 or die;
 			my($section, $org, $align, $code) = @$_;
 			
 			if ($args{VERSION} >= 5) {
 				$o .= pack("V", length($code));
-				if ($args{VERSION} < 16) {
-					$o .= pack_string($section);
+				
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($section));
 				}
-				else {
+				elsif ($args{VERSION} >= 16) {
 					$o .= pack_lstring($section);
 				}
+				else {
+					$o .= pack_string($section);
+				}
+				
 				$o .= pack("V", $org)		if $args{VERSION} >= 8;
 				$o .= pack("V", $align)		if $args{VERSION} >= 10;
+				
 				$o .= $code;				
+
+				if ($args{VERSION} >= 18) {		# align to dword size
+					my $aligned_size = (length($code) + 3) & ~3;
+					my $extra_bytes = $aligned_size - length($code);
+					$o .= pack("C*", (0) x $extra_bytes);
+				}				
 			}
 			else {
 				$o .= pack("v", length($code) & 0xFFFF) . $code;
@@ -738,7 +903,13 @@ sub objfile {
 		}
 		$o .= pack("V", -1) if $args{VERSION} >= 5;
 	}
-
+	
+	# store string table
+	if ($args{VERSION} >= 18) {
+		store_ptr(\$o, $st_addr);
+		$o .= $st->store;
+	}
+	
 	return $o;
 }
 
@@ -748,6 +919,10 @@ sub libfile {
 	my(%args) = @_;
 
 	my $o = "Z80LMF".sprintf("%02d",($args{VERSION} || $OBJ_FILE_VERSION));
+	
+	# string table pointer
+	my $st_addr		 = length($o); $o .= pack("V", -1) if $args{VERSION} >= 18;
+
 	my $next_pos;
 	my @objs = @{$args{OBJS}};
 	for (0 .. $#objs) {
@@ -763,9 +938,23 @@ sub libfile {
 		$next_pos = length($o); $o .= pack("V", -1);
 		$o .= pack("V", length($obj));
 		$o .= $obj;
-		store_ptr(\$o, $next_pos) if $_ != $#objs;
+		store_ptr(\$o, $next_pos);
 	}
+	
+	# store end marker
+	$o .= pack("VV", -1, 0);
 
+	# store string table
+	if ($args{VERSION} >= 18) {
+		my $st = ST->new();
+		for (@{$args{PUBLIC}}) {
+			$st->add($_);
+		}
+		
+		store_ptr(\$o, $st_addr);
+		$o .= $st->store;
+	}
+		
 	return $o;
 }
 
@@ -824,7 +1013,7 @@ sub check_zobjcopy_nm {
 	is 0, $diff, "diff -w $out $bmk";
 	unlink $out unless $diff;
 	
-	if ($diff && $ENV{DEBUG}) {
+	if ($diff != 0 && $ENV{DEBUG}) {
 		system("'/c/Program Files/WinMerge/WinMergeU.exe' $out $bmk");
 	}
 	

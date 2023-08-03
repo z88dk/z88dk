@@ -18,12 +18,12 @@ Object  file test.o at $0000: Z80RMF18
   Section data_2: 10 bytes
     C $0000: 0B 0C 0D 0E 0F 10 11 12 13 14
   Symbols:
-    L A $0002 start1 (section text_1) (file file1.asm:123)
-    L A $0002 start2 (section text_2) (file file1.asm:123)
-    G A $0002 msg1 (section data_1) (file file1.asm:123)
-    G A $0002 msg2 (section data_2) (file file1.asm:123)
-    G C $0000 main (section text_1) (file file1.asm:231)
-    G = $0000 _start (section text_1) (file file1.asm:231)
+    L A $0002: start1 (section text_1) (file file1.asm:123)
+    L A $0002: start2 (section text_2) (file file1.asm:123)
+    G A $0002: msg1 (section data_1) (file file1.asm:123)
+    G A $0002: msg2 (section data_2) (file file1.asm:123)
+    G C $0000: main (section text_1) (file file1.asm:231)
+    G = $0000: _start (section text_1) (file file1.asm:231)
   Externs:
     U         ext1
     U         ext2

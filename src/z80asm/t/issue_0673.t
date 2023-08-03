@@ -19,6 +19,7 @@ capture_ok("z88dk-z80nm -a ${test}.o", <<END);
 Object  file ${test}.o at \$0000: Z80RMF18
   Name: a
   CPU:  z80 
+  Section "": 0 bytes
   Section a: 1 bytes
     C \$0000: 01
   Section b: 1 bytes

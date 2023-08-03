@@ -10,11 +10,10 @@
 #include "libfile.h"
 #include "modlink.h"
 #include "utlist.h"
+#include "objfile.h"
 #include "zobjfile.h"
 #include "z80asm.h"
 #include "z80asm_cpu.h"
-
-char Z80libhdr[] = "Z80LMF" OBJ_VERSION;
 
 /*-----------------------------------------------------------------------------
 *	define a library file name from the command line
@@ -33,41 +32,60 @@ static const char *search_libfile(const char *filename )
 /*-----------------------------------------------------------------------------
 *	make library from source files; convert each source to object file name 
 *----------------------------------------------------------------------------*/
-static bool add_object_modules(FILE* lib_file) {
-    ByteArray* obj_file_data;
-    const char* obj_filename;
-    size_t	 fptr, obj_size;
+static bool add_object_modules(FILE* lib_fp, string_table_t* st) {
+    char* obj_file_data = NULL;
 
-    for (size_t i = 0; i < option_files_size(); i++)
-    {
-        fptr = ftell(lib_file);
+    for (size_t i = 0; i < option_files_size(); i++) {
+        size_t fptr = ftell(lib_fp);
 
-        /* read object file */
-        obj_filename = get_o_filename(option_file(i));
-        obj_file_data = read_obj_file_data(obj_filename);
-        if (obj_file_data == NULL)
+        // read object file blob
+        const char* obj_filename = get_o_filename(option_file(i));
+
+        int obj_size = file_size(obj_filename);
+        if (obj_size < 0) {
+            error_file_open(obj_filename);
+            xfree(obj_file_data);
             return false;
+        }
 
-        /* write file pointer of next file, or -1 if last */
-        obj_size = ByteArray_size(obj_file_data);
-        xfwrite_dword(fptr + 4 + 4 + obj_size, lib_file);
+        FILE* obj_fp = fopen(obj_filename, "rb");
+        if (!obj_fp) {
+            error_file_open(obj_filename);
+            xfree(obj_file_data);
+            return false;
+        }
 
-        /* write module size */
-        xfwrite_dword(obj_size, lib_file);
+        obj_file_data = xrealloc(obj_file_data, obj_size);
+        xfread_bytes(obj_file_data, obj_size, obj_fp);
 
-        /* write module */
-        xfwrite_bytes((char*)ByteArray_item(obj_file_data, 0), obj_size, lib_file);
+        fclose(obj_fp);
+
+        // write file pointer of next file
+        xfwrite_dword(fptr + 2 * sizeof(int32_t) + obj_size, lib_fp);
+
+        // write module size
+        xfwrite_dword(obj_size, lib_fp);
+
+        // write object blob
+        xfwrite_bytes(obj_file_data, obj_size, lib_fp);
+
+        // lookup defined symbols in object file
+        file_t* file = file_new();
+        file_read(file, obj_filename);
+        objfile_get_defined_symbols(file->objs, st);
+        file_free(file);
     }
+
+    xfree(obj_file_data);
     return true;
 }
 
-void make_library(const char *lib_filename)
-{
-	FILE	*lib_file;
-
+void make_library(const char *lib_filename) {
 	lib_filename = search_libfile(lib_filename);
 	if ( lib_filename == NULL )
-		return;					/* ERROR */
+		return;					            // ERROR
+
+    string_table_t* st = st_new();          // list of all defined symbols
 
     // #2254 - write temp file
     UT_string* temp_filename;
@@ -77,61 +95,73 @@ void make_library(const char *lib_filename)
     if (option_verbose())
 		printf("Creating library '%s'\n", path_canon(lib_filename));
 
-	/* write library header */
-    lib_file = xfopen(utstring_body(temp_filename), "wb");
-	xfwrite_cstr(Z80libhdr, lib_file);
+	// write library header
+    FILE* fp = xfopen(utstring_body(temp_filename), "wb");
+	xfwrite_cstr(libfile_header(), fp);
+
+    long st_ptr = ftell(fp);
+    xfwrite_dword(-1, fp);              // placeholder for string table address
 
     if (option_lib_for_all_cpus()) {
-        /* assemble for each cpu-ixiy combination and append to library */
+        // libraries have no_swap and swap object files
+        // libraries built with -IXIY-soft have only soft-swap object files
+        swap_ixiy_t current_swap_ixiy = option_swap_ixiy();
+        swap_ixiy_t first_ixiy, last_ixiy;
+        if (current_swap_ixiy == IXIY_SOFT_SWAP) {
+            first_ixiy = last_ixiy = IXIY_SOFT_SWAP;
+        }
+        else {
+            first_ixiy = IXIY_NO_SWAP;
+            last_ixiy = IXIY_SWAP;
+        }
+
+        // assemble for each cpu-ixiy combination and append to library
         for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
             set_cpu_option(*cpu);
 
-            // libraries have no_swap and swap object files
-            // libraries built with -IXIY-soft have only soft-swap object files
-            swap_ixiy_t current_swap_ixiy = option_swap_ixiy();
-            swap_ixiy_t first_ixiy, last_ixiy;
-            if (current_swap_ixiy == IXIY_SOFT_SWAP) {
-                first_ixiy = last_ixiy = IXIY_SOFT_SWAP;
-            }
-            else {
-                first_ixiy = IXIY_NO_SWAP;
-                last_ixiy = IXIY_SWAP;
-            }
             for (swap_ixiy_t ixiy = first_ixiy; ixiy <= last_ixiy; ixiy++) {
                 set_swap_ixiy_option(ixiy);
 
-                for (size_t i = 0; i < option_files_size(); i++)
+                for (size_t i = 0; i < option_files_size(); i++) {
                     assemble_file(option_file(i));
 
-                if (get_num_errors()) {
-                    xfclose(lib_file);			/* error */
-                    remove(utstring_body(temp_filename));
-                    return;
+                    if (get_num_errors()) {
+                        xfclose(fp);			/* error */
+                        remove(utstring_body(temp_filename));
+                        goto cleanup_and_return;
+                    }
                 }
 
-                if (!add_object_modules(lib_file)) {
-                    xfclose(lib_file);			/* error */
+                if (!add_object_modules(fp, st)) {
+                    xfclose(fp);			/* error */
                     remove(utstring_body(temp_filename));
-                    return;
+                    goto cleanup_and_return;
                 }
             }
         }
     }
     else {
         /* already assembled in main(), write each object file */
-        if (!add_object_modules(lib_file)) {
-            xfclose(lib_file);			/* error */
+        if (!add_object_modules(fp, st)) {
+            xfclose(fp);			/* error */
             remove(utstring_body(temp_filename));
-            return;
+            goto cleanup_and_return;
         }
     }
 
     // write end marker
-    xfwrite_dword(-1, lib_file);        // next = -1 - last module
-    xfwrite_dword(0, lib_file);         // size = 0  - deleted
+    xfwrite_dword(-1, fp);        // next = -1 - last module
+    xfwrite_dword(0, fp);         // size = 0  - deleted
+
+    // write string table
+    long st_pos = write_string_table(st, fp);
+    long fpos = ftell(fp);
+    fseek(fp, st_ptr, SEEK_SET);
+    xfwrite_dword(st_pos, fp);
+    fseek(fp, fpos, SEEK_SET);
 
 	/* close and write lib file */
-    xfclose(lib_file);
+    xfclose(fp);
 
     // #2254 - rename temp file
     remove(lib_filename);
@@ -139,6 +169,8 @@ void make_library(const char *lib_filename)
     if (rv != 0)
         error_file_rename(utstring_body(temp_filename));
 
+cleanup_and_return:
+    st_free(st);
     utstring_free(temp_filename);
 }
 
@@ -147,7 +179,7 @@ bool check_library_file(const char *src_filename)
 	return check_obj_lib_file(
         true,
 		get_lib_filename(src_filename),
-		Z80libhdr,
+        libfile_header(),
         error_file_not_found,
         error_file_open,
 		error_not_lib_file,

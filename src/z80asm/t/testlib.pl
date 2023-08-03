@@ -223,6 +223,64 @@ sub run_nok {
 }
 
 #------------------------------------------------------------------------------
+# string table
+{
+	package ST;
+	use Object::Tiny::RW qw( hash list );
+	
+	sub new {
+		my($class) = shift;
+		return bless {
+			hash => {"" => 0},
+			list => [""] }, $class;
+	}
+	
+	sub add {
+		my($self, $str) = @_;
+		return $self->hash->{$str} if exists $self->hash->{$str};
+		my $id = $self->count;
+		$self->hash->{$str} = $id;
+		push @{$self->list}, $str;
+		return $id;
+	}
+	
+	sub lookup {
+		my($self, $id) = @_;
+		return $self->list->[$id];
+	}
+	
+	sub count {
+		my($self) = @_;
+		return scalar @{$self->list};
+	}
+	
+	sub store {
+		my($self) = @_;
+		
+		# build list of strings and indexes
+		my $strings = "";
+		my @index;
+		for my $id (0 .. $self->count - 1) {
+			push @index, length($strings);
+			$strings .= $self->lookup($id) . pack("C", 0);
+		}
+		my $aligned = (length($strings)+3) & ~3;
+		$strings .= pack("C*", (0) x ($aligned - length($strings)));
+		
+		# write sizes
+		my $o = pack("VV", $self->count, length($strings));
+		
+		# write indexes
+		$o .= pack("V*", @index);
+		
+		# write strings
+		$o .= $strings;
+		
+		return $o;
+	}
+}	
+
+#------------------------------------------------------------------------------
 sub bytes { return pack("C*", map {$_ & 0xff} @_); }
 sub words { return pack("v*", @_); }
 sub words_be { return pack("n*", @_); }
@@ -239,32 +297,45 @@ sub unlink_testfiles {
 sub objfile {
 	my(%args) = @_;
 
+	my $st = ST->new;				# string table
+
 	exists($args{ORG}) and die;
 
 	my $o = "Z80RMF".$OBJ_FILE_VERSION;
 
+	# store CPU and -IXIY
+	$o .= pack("VV", 1, 0);
+	
 	# store empty pointers; mark position for later
 	my $name_addr	 = length($o); $o .= pack("V", -1);
 	my $expr_addr	 = length($o); $o .= pack("V", -1);
 	my $symbols_addr = length($o); $o .= pack("V", -1);
 	my $lib_addr	 = length($o); $o .= pack("V", -1);
 	my $code_addr	 = length($o); $o .= pack("V", -1);
-
-	# store CPU and -IXIY
-	$o .= pack("VV", 1, 0);
+	my $st_addr		 = length($o); $o .= pack("V", -1);
 	
 	# store expressions
-	if ($args{EXPR}) {
+	if ($args{EXPRS}) {
 		store_ptr(\$o, $expr_addr);
-		for (@{$args{EXPR}}) {
+		for (@{$args{EXPRS}}) {
 			@$_ == 9 or die;
 			my($type, $filename, $line_nr, $section, $asmptr, $ptr, $opcode_size, 
 			   $target_name, $text) = @$_;
-			$o .= $type . pack_lstring($filename) . pack("V", $line_nr) .
-			        pack_lstring($section) . pack("VVV", $asmptr, $ptr, $opcode_size) .
-					pack_lstring($target_name) . pack_lstring($text);
+
+			my %TYPES = ( 	"J"=>1, "U"=>2, "S"=>3, 
+							"W"=>4, "C"=>4, # was C until v17, after is W
+							"B"=>5, "L"=>6, "u"=>7, "s"=>8, 
+							"P"=>9, "H"=>10, "="=>11 );
+			die "invalid type $type" unless exists $TYPES{$type};
+
+			$o .= pack("V", $TYPES{$type});
+			$o .= pack("V", $st->add($filename)) . pack("V", $line_nr);
+			$o .= pack("V", $st->add($section));
+			$o .= pack("VVV", $asmptr, $ptr, $opcode_size);
+			$o .= pack("V", $st->add($target_name));
+			$o .= pack("V", $st->add($text));
 		}
-		$o .= "\0";
+		$o .= pack("V", 0);
 	}
 
 	# store symbols
@@ -273,24 +344,35 @@ sub objfile {
 		for (@{$args{SYMBOLS}}) {
 			@$_ == 7 or die;
 			my($scope, $type, $section, $value, $name, $def_filename, $line_nr) = @$_;
-			$o .= $scope . $type . pack_lstring($section) .
-					pack("V", $value) . pack_lstring($name) .
-					pack_lstring($def_filename) . pack("V", $line_nr);
+			
+			my %SCOPES = ("L"=>1, "G"=>2);
+			die "invalid scope $scope" unless exists $SCOPES{$scope};
+
+			my %TYPES = ("C"=>1, "A"=>2, "="=>3);
+			die "invalid scope $type" unless exists $TYPES{$type};
+
+			$o .= pack("V", $SCOPES{$scope});
+			$o .= pack("V", $TYPES{$type});
+			$o .= pack("V", $st->add($section));
+			$o .= pack("V", $value);
+			$o .= pack("V", $st->add($name));
+			$o .= pack("V", $st->add($def_filename)) . pack("V", $line_nr);
 		}
-		$o .= "\0";
+		$o .= pack("V", 0);
 	}
 
 	# store library
-	if ($args{LIBS}) {
+	if ($args{EXTERNS}) {
 		store_ptr(\$o, $lib_addr);
-		for my $name (@{$args{LIBS}}) {
-			$o .= pack_lstring($name);
+		for my $name (@{$args{EXTERNS}}) {
+			$o .= pack("V", $st->add($name));
 		}
+		$o .= pack("V", $st->add(""));		# end marker
 	}
 
 	# store name
 	store_ptr(\$o, $name_addr);
-	$o .= pack_lstring($args{NAME});
+	$o .= pack("V", $st->add($args{NAME}));
 
 	# store code
 	if ( $args{CODE} ) {
@@ -299,14 +381,22 @@ sub objfile {
 		for (@{$args{CODE}}) {
 			@$_ == 4 or die;
 			my($section, $org, $align, $code) = @$_;
-			$o .= pack("V", length($code)) .
-			        pack_lstring($section) .
-					pack("VV", $org, $align) .
-					$code;
+			$o .= pack("V", length($code));
+			$o .= pack("V", $st->add($section));
+			$o .= pack("VV", $org, $align);
+			$o .= $code;
+			
+			my $aligned_size = (length($code) + 3) & ~3;
+			my $extra_bytes = $aligned_size - length($code);
+			$o .= pack("C*", (0) x $extra_bytes);
 		}
 		$o .= pack("V", -1);
 	}
 
+	# store string table
+	store_ptr(\$o, $st_addr);
+	$o .= $st->store;
+	
 	return $o;
 }
 
@@ -328,20 +418,35 @@ sub pack_lstring {
 #------------------------------------------------------------------------------
 # return library file binary representation
 sub libfile {
-	my(@o_files) = @_;
-	my $lib = "Z80LMF".$OBJ_FILE_VERSION;
-	for my $i (0 .. $#o_files) {
-		my $o_file = $o_files[$i];
-		my $next_ptr = length($lib) + 4 + 4 + length($o_file);
+	my($o_files, $public) = @_;
 
-		$lib .= pack("V", $next_ptr);
-		$lib .= pack("V", length($o_file));
-		$lib .= $o_file;
+	my $o = "Z80LMF".$OBJ_FILE_VERSION;
+	
+	# string table pointer
+	my $st_addr	= length($o); 
+	$o .= pack("V", -1);
+
+	for my $i (0 .. $#$o_files) {
+		my $o_file = $o_files->[$i];
+		my $next_ptr = length($o) + 4 + 4 + length($o_file);
+
+		$o .= pack("V", $next_ptr);
+		$o .= pack("V", length($o_file));
+		$o .= $o_file;
 	}
-	$lib .= pack("V", -1);	# next
-	$lib .= pack("V", 0);	# length = deleted
+	$o .= pack("V", -1);	# next
+	$o .= pack("V", 0);	# length = deleted
 
-	return $lib;
+	# store string table
+	my $st = ST->new();
+	for (@$public) {
+		$st->add($_);
+	}
+
+	store_ptr(\$o, $st_addr);
+	$o .= $st->store;
+
+	return $o;
 }
 
 #------------------------------------------------------------------------------

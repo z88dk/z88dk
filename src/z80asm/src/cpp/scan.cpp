@@ -936,7 +936,7 @@ yy74:
                               }
 
                               // check for -IXIY
-                              if (g_args.swap_ixiy()) {
+                              if (g_args.swap_ixiy() != IXIY_NO_SWAP) {
                                 switch (keyword) {
                                 case Keyword::IX: case Keyword::IXH: case Keyword::IXL:
                                 case Keyword::IY: case Keyword::IYH: case Keyword::IYL:

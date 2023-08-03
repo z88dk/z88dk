@@ -35,8 +35,8 @@ Object  file $test.o at \$0000: Z80RMF18
   Section "": 5 bytes
     C \$0000: 01 05 00 00 00
   Symbols:
-    L A \$0000 foo (section "") (file $test.asm:1)
-    L A \$0005 bar (section "") (file $test.asm:5)
+    L A \$0000: foo (section "") (file $test.asm:1)
+    L A \$0005: bar (section "") (file $test.asm:5)
 END
 
 check_bin_file("$test.reloc", bytes());

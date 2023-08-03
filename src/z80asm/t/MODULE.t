@@ -16,7 +16,7 @@ Object  file $test.o at \$0000: Z80RMF18
   Section "": 1 bytes
     C \$0000: C9
   Symbols:
-    L A \$0000 main (section "") (file $test.asm:1)
+    L A \$0000: main (section "") (file $test.asm:1)
 END
 
 
@@ -33,7 +33,7 @@ Object  file $test.o at \$0000: Z80RMF18
   Section "": 1 bytes
     C \$0000: C9
   Symbols:
-    L A \$0000 main (section "") (file $test.asm:2)
+    L A \$0000: main (section "") (file $test.asm:2)
 END
 
 
@@ -51,7 +51,7 @@ Object  file $test.o at \$0000: Z80RMF18
   Section "": 1 bytes
     C \$0000: C9
   Symbols:
-    L A \$0000 main (section "") (file $test.asm:3)
+    L A \$0000: main (section "") (file $test.asm:3)
 END
 
 

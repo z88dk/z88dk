@@ -28,10 +28,10 @@ Object  file ${test}x.o at \$0000: Z80RMF18
   Section "": 1 bytes
     C \$0000: C9
   Symbols:
-    G = \$0000 main1 (section "") (file ${test}1.asm:4)
-    G A \$0000 main (section "") (file ${test}2.asm:2)
+    G = \$0000: main1 (section "") (file ${test}1.asm:4)
+    G A \$0000: main (section "") (file ${test}2.asm:2)
   Expressions:
-    E =  \$0000 \$0000 0 main1 := main (section "") (file ${test}1.asm:4)
+    E = \$0000 \$0000 0: main1 := main (section "") (file ${test}1.asm:4)
 END
 
 spew("${test}.asm", <<'END');

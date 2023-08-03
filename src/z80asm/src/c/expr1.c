@@ -335,21 +335,20 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 *----------------------------------------------------------------------------*/
 
 /* return size in bytes of value of given range */
-int range_size(range_t range)
-{
-	switch (range)
-	{
+int range_size(range_t range) {
+	switch (range) {
 	case RANGE_JR_OFFSET:		        return 1;
 	case RANGE_BYTE_UNSIGNED:	        return 1;
 	case RANGE_BYTE_SIGNED:		        return 1;
-	case RANGE_HIGH_OFFSET:				return 1;
 	case RANGE_WORD:			        return 2;
 	case RANGE_WORD_BE:			        return 2;
 	case RANGE_DWORD:			        return 4;
 	case RANGE_BYTE_TO_WORD_UNSIGNED:   return 2;
 	case RANGE_BYTE_TO_WORD_SIGNED:     return 2;
 	case RANGE_PTR24:					return 3;
-	default: xassert(0);
+	case RANGE_HIGH_OFFSET:				return 1;
+    case RANGE_ASSIGNMENT:              return 2;
+    default: xassert(0);
 	}
 
 	xassert(0);

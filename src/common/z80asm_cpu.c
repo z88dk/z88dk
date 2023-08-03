@@ -30,7 +30,7 @@ static int by_str(const map_string_int_t* a, const map_string_int_t* b) {
 }
 
 static void init() {
-    static inited = false;
+    static bool inited = false;
     if (!inited) {
         for (map_string_int_t* p = map_cpu_ids; p->str != NULL; p++) {
             const char* str = p->str;
@@ -134,6 +134,7 @@ bool cpu_compatible(int code_cpu_id, int lib_cpu_id) {
             return false;
         default:
             xassert(0);
+            return false;
         }
     }
 }

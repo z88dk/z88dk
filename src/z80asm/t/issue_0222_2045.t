@@ -140,7 +140,6 @@ Reading library '../z88dk-z80asm.lib'
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
-Module 'test' size: 7 bytes
 
 Code size: 7 bytes ($5CD0 to $5CD6)
 Creating file 'test.map'
@@ -415,7 +414,6 @@ Reading library '../z88dk-z80asm.lib'
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
-Module 'test' size: 7 bytes
 
 Code size: 7 bytes ($4082 to $4088)
 Creating file 'test.map'

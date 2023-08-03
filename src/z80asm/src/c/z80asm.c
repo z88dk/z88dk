@@ -71,7 +71,7 @@ void assemble_file( const char *filename ) {
 	module->filename = spool_add(src_filename);
 
 	if (got_obj) {
-		object_file_append(obj_filename, CURRENTMODULE, true, false);
+		object_file_check_append(obj_filename, CURRENTMODULE, true, false);
 	}
 	else {
 		// append the directoy of the file being assembled to the include path 

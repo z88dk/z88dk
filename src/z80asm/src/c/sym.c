@@ -21,23 +21,6 @@ One symbol from the assembly code - label or constant.
 #include "zobjfile.h"
 
 /*-----------------------------------------------------------------------------
-*   Constant tables
-*----------------------------------------------------------------------------*/
-char *sym_type_str[] = {
-	"undef",
-	"const",
-	"addr",
-	"comput",
-};
-
-char *sym_scope_str[] = {
-	"local",
-	"public",
-	"extern",
-	"global",
-};
-
-/*-----------------------------------------------------------------------------
 *   Symbol1
 *----------------------------------------------------------------------------*/
 DEF_CLASS( Symbol1 )
@@ -57,8 +40,8 @@ Symbol1 *Symbol_create(const char *name, long value, sym_type_t type, sym_scope_
 
 	self->name = spool_add(name);			/* name in strpool, not freed */
 	self->value = value;
-	self->type = type;
 	self->scope = scope;
+	self->type = type;
 	self->module = module;
 	self->section = section;
 	self->filename = get_error_filename();

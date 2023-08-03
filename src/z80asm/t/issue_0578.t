@@ -25,8 +25,8 @@ Object  file ${test}.o at \$0000: Z80RMF18
   Section "": 2 bytes
     C \$0000: 00 01
   Symbols:
-    L A \$0000 lbl1 (section "") (file ${test}.asm:1)
-    L A \$0001 lbl2 (section "") (file ${test}.asm:2)
+    L A \$0000: lbl1 (section "") (file ${test}.asm:1)
+    L A \$0001: lbl2 (section "") (file ${test}.asm:2)
 END
 
 unlink_testfiles;

@@ -15,6 +15,8 @@ extern "C" {
 #include "utarray.h"
 #include "utstring.h"
 #include "z80asm_cpu.h"
+#include "uthash.h"
+#include "utarray.h"
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -22,6 +24,7 @@ extern "C" {
 #define MAX_VERSION				18
 #define CUR_VERSION				MAX_VERSION
 #define SIGNATURE_SIZE			8
+#define SIGNATURE_BASE_SIZE		6
 #define SIGNATURE_OBJ			"Z80RMF"
 #define SIGNATURE_LIB			"Z80LMF"
 #define SIGNATURE_VERS			"%02d"
@@ -34,6 +37,9 @@ extern bool opt_obj_hide_local;
 extern bool opt_obj_hide_expr;
 extern bool opt_obj_hide_code;
 
+extern const char* objfile_header();
+extern const char* libfile_header();
+
 struct section_s;
 
 //-----------------------------------------------------------------------------
@@ -45,13 +51,58 @@ typedef enum file_type
 } file_type_e;
 
 //-----------------------------------------------------------------------------
+// string table
+//-----------------------------------------------------------------------------
+typedef struct string_item_s {
+    char* str;              // actual string in alloc space
+    int id;                 // index into string table in file
+    UT_hash_handle hh;
+} string_item_t;
+
+typedef struct string_table_s {
+    UT_array* strs_list;        // each item is a weak pointer to a string_item_t
+    string_item_t* strs_hash;   // holds the strings
+} string_table_t;
+
+string_table_t* st_new(void);
+void st_free(string_table_t* st);
+void st_clear(string_table_t* st);
+int st_add_string(string_table_t* st, const char* str); // return ID of existing string, or adds new
+bool st_find(string_table_t* st, const char* str);      // check if string exists
+const char* st_lookup(string_table_t* st, int id);      // return string of given ID
+int st_count(string_table_t* st);                       // number of strings in table
+long write_string_table(string_table_t* st, FILE* fp);  // write string table, return address of start
+
+//-----------------------------------------------------------------------------
 // a defined symbol
 //-----------------------------------------------------------------------------
+
+// Scope of symbol, Initially defined as LOCAL
+typedef enum {
+    SCOPE_NONE,     // 0
+    SCOPE_LOCAL,    // 1 "L"
+    SCOPE_PUBLIC,   // 2 "G"            - defined and exported
+    SCOPE_EXTERN,   // 3                - not defined and imported
+    SCOPE_GLOBAL,   // 4 "G" if defined - PUBLIC if defined, EXTERN if not defined
+} sym_scope_t;
+
+extern const char* sym_scope_str[];
+
+// Type of symbol - Expressions have the type of the greatest symbol used
+typedef enum {
+    TYPE_UNKNOWN,   // 0     - symbol not defined
+    TYPE_CONSTANT,	// 1 "C" - can be computed
+    TYPE_ADDRESS,	// 2 "A" - depends on ASMPC, can be computed after address allocation
+    TYPE_COMPUTED,	// 3 "=" - depends on the result of an expression that has this symbol as target
+} sym_type_t;
+
+extern char* sym_type_str[];
+
 typedef struct symbol_s
 {
-	UT_string* name;
-	char	 scope;
-	char	 type;
+	UT_string*  name;
+    sym_scope_t scope;
+    sym_type_t  type;
 	int		 value;
 
 	struct section_s* section;		// weak
@@ -68,10 +119,26 @@ extern void symbol_free(symbol_t* self);
 //-----------------------------------------------------------------------------
 // an expression
 //-----------------------------------------------------------------------------
-typedef struct expr_s
-{
+
+// Expression range
+typedef enum {
+    RANGE_UNKNONW,                  // 0  
+    RANGE_JR_OFFSET,                // 1  "J"
+    RANGE_BYTE_UNSIGNED,            // 2  "U"
+    RANGE_BYTE_SIGNED,              // 3  "S"
+    RANGE_WORD,						// 4  "W"  // 16-bit value little-endian
+    RANGE_WORD_BE,					// 5  "B"  // 16-bit value big-endian
+    RANGE_DWORD,                    // 6  "L"  // 32-bit signed
+    RANGE_BYTE_TO_WORD_UNSIGNED,    // 7  "u"  // unsigned byte extended to 16 bits
+    RANGE_BYTE_TO_WORD_SIGNED,      // 8  "s"  // signed byte sign-extended to 16 bits
+    RANGE_PTR24,					// 9  "P"  // 24-bit pointer
+    RANGE_HIGH_OFFSET,				// 10 "H"  // byte offset to 0xFF00
+    RANGE_ASSIGNMENT,               // 11 "="  // DEFC expression assigning a symbol
+} range_t;
+
+typedef struct expr_s {
 	UT_string* text;
-	char	 type;
+    range_t	 range;
 	int		 asmpc;
 	int		 code_pos;
 	int		 opcode_size;
@@ -92,11 +159,15 @@ extern void expr_free(expr_t* self);
 //-----------------------------------------------------------------------------
 // one section
 //-----------------------------------------------------------------------------
+
+#define ORG_NOT_DEFINED     -1
+#define ORG_SECTION_SPLIT   -2
+
 typedef struct section_s
 {
 	UT_string* name;
 	UT_array* data;
-	int			 org;
+	int			 org;       // ORG_NOT_DEFINED: not defined; ORG_SECTION_SPLIT: section split
 	int			 align;
 
 	symbol_t* symbols;
@@ -123,6 +194,7 @@ typedef struct objfile_s
     swap_ixiy_t swap_ixiy;
 	argv_t*     externs;
 	section_t*  sections;
+    string_table_t* st;
 
 	struct objfile_s* next, * prev;
 } objfile_t;
@@ -131,6 +203,7 @@ extern objfile_t* objfile_new();
 extern void objfile_free(objfile_t* obj);
 extern void objfile_read(objfile_t* obj, FILE* fp);
 extern void objfile_write(objfile_t* obj, FILE* fp);
+void objfile_get_defined_symbols(objfile_t* obj, string_table_t* st);
 
 //-----------------------------------------------------------------------------
 // one file - either object or library
@@ -141,9 +214,8 @@ typedef struct file_s
 	UT_string* signature;
 	file_type_e  type;
 	int			 version;
-
 	objfile_t* objs;					// either one or multiple object files
-
+    string_table_t* st;                 // symbols defined in this library
 } file_t;
 
 extern file_t* file_new();

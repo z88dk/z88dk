@@ -25,13 +25,14 @@ capture_ok("z88dk-z80nm -a ${test}1.o", <<END);
 Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
   CPU:  z80 
+  Section "": 0 bytes
   Section LOADER: 3 bytes
     C \$0000: 21 00 00
   Externs:
     U         __LOADER_head
     U         __LOADER_tail
   Expressions:
-    E Cw \$0000 \$0001 3 __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
+    E W \$0000 \$0001 3: __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
 END
 
 
@@ -41,13 +42,14 @@ capture_ok("z88dk-z80nm -a ${test}1.o", <<END);
 Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
   CPU:  z80 
+  Section "": 0 bytes
   Section LOADER: 3 bytes
     C \$0000: 21 00 00
   Externs:
     U         __LOADER_head
     U         __LOADER_tail
   Expressions:
-    E Cw \$0000 \$0001 3 __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
+    E W \$0000 \$0001 3: __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
 END
 
 

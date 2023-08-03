@@ -14,22 +14,22 @@ Object  file test2.o at $0000: Z80RMF12
     C $0090: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
     C $00A0: 11 12 13 14
   Symbols:
-    L A $0002 start1 (section text) (file file1.asm:123)
-    G C $0000 main (section text) (file file1.asm:231)
-    G = $0000 _start (section text) (file file1.asm:231)
-    L A $0042 start2 (section text) (file file1.asm:123)
-    G A $0092 msg1 (section text) (file file1.asm:123)
-    G A $009C msg2 (section text) (file file1.asm:123)
+    L A $0002: start1 (section text) (file file1.asm:123)
+    G C $0000: main (section text) (file file1.asm:231)
+    G = $0000: _start (section text) (file file1.asm:231)
+    L A $0042: start2 (section text) (file file1.asm:123)
+    G A $0092: msg1 (section text) (file file1.asm:123)
+    G A $009C: msg2 (section text) (file file1.asm:123)
   Externs:
     U         ext1
     U         ext2
   Expressions:
-    E Ub $0000 $0001 start1 % 256 (section text) (file file1.asm:123)
-    E =  $0000 $0000 _start := start1 (section text) (file file1.asm:321)
-    E BW $0000 $0001 start1 (section text) (file file1.asm:231)
-    E Sb $0040 $0041 start2 % 127 (section text) (file file1.asm:132)
-    E Cw $0090 $0091 msg1 (section text) (file file1.asm:231)
-    E Cw $0090 $0091 ext1 (section text) (file file1.asm:231)
-    E Cw $0090 $0091 msg2-msg1 (section text) (file file1.asm:231)
-    E Ll $009A $009B msg2 (section text) (file file1.asm:321)
-    E Ll $009A $009B ext2 (section text) (file file1.asm:321)
+    E U $0000 $0001: start1 % 256 (section text) (file file1.asm:123)
+    E = $0000 $0000: _start := start1 (section text) (file file1.asm:321)
+    E B $0000 $0001: start1 (section text) (file file1.asm:231)
+    E S $0040 $0041: start2 % 127 (section text) (file file1.asm:132)
+    E W $0090 $0091: msg1 (section text) (file file1.asm:231)
+    E W $0090 $0091: ext1 (section text) (file file1.asm:231)
+    E W $0090 $0091: msg2-msg1 (section text) (file file1.asm:231)
+    E L $009A $009B: msg2 (section text) (file file1.asm:321)
+    E L $009A $009B: ext2 (section text) (file file1.asm:321)

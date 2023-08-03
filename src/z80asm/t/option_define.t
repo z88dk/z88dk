@@ -76,7 +76,6 @@ Reading library 'z88dk-z80asm.lib'
 Assembling 'test_t_option_define.asm' to 'test_t_option_define.o'
 Reading 'test_t_option_define.asm' = 'test_t_option_define.asm'
 Writing object file 'test_t_option_define.o'
-Module 'test_t_option_define' size: 1 bytes
 
 END
 

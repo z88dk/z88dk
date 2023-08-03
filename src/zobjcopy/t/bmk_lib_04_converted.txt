@@ -1,5 +1,5 @@
 Library file test2.lib at $0000: Z80LMF18
-Object  file test2.lib at $0010: Z80RMF18
+Object  file test2.lib at $0014: Z80RMF18
   Name: file1
   CPU:  z80 
   Section "": 63 bytes
@@ -8,24 +8,24 @@ Object  file test2.lib at $0010: Z80RMF18
     C $0020: 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30
     C $0030: 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F
   Symbols:
-    L A $0002 start1 (section "") (file "")
-    L A $0002 start2 (section "") (file "")
-    G A $0002 msg1 (section "") (file "")
-    G A $0002 msg2 (section "") (file "")
-    G C $0000 main (section "") (file "")
+    L A $0002: start1 (section "") (file "")
+    L A $0002: start2 (section "") (file "")
+    G A $0002: msg1 (section "") (file "")
+    G A $0002: msg2 (section "") (file "")
+    G C $0000: main (section "") (file "")
   Externs:
     U         ext1
     U         ext2
   Expressions:
-    E Ub $0000 $0001 2 start1 % 256 (section "") (file file1.asm:123)
-    E Sb $0000 $0001 2 start2 % 127 (section "") (file file1.asm:132)
-    E Cw $0000 $0001 2 msg1 (section "") (file file1.asm:231)
-    E Ll $0000 $0001 2 msg2 (section "") (file file1.asm:321)
-    E Cw $0000 $0001 2 ext1 (section "") (file file1.asm:231)
-    E Ll $0000 $0001 2 ext2 (section "") (file file1.asm:321)
-    E Cw $0000 $0001 2 msg2-msg1 (section "") (file file1.asm:231)
+    E U $0000 $0001 2: start1 % 256 (section "") (file file1.asm:123)
+    E S $0000 $0001 2: start2 % 127 (section "") (file file1.asm:132)
+    E W $0000 $0001 2: msg1 (section "") (file file1.asm:231)
+    E L $0000 $0001 2: msg2 (section "") (file file1.asm:321)
+    E W $0000 $0001 2: ext1 (section "") (file file1.asm:231)
+    E L $0000 $0001 2: ext2 (section "") (file file1.asm:321)
+    E W $0000 $0001 2: msg2-msg1 (section "") (file file1.asm:231)
 
-Object  file test2.lib at $01F3: Z80RMF18
+Object  file test2.lib at $02D0: Z80RMF18
   Name: file1
   CPU:  z80 
   Section "": 63 bytes
@@ -34,20 +34,20 @@ Object  file test2.lib at $01F3: Z80RMF18
     C $0020: 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30
     C $0030: 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F
   Symbols:
-    L A $0002 start1 (section "") (file "")
-    L A $0002 start2 (section "") (file "")
-    G A $0002 msg1 (section "") (file "")
-    G A $0002 msg2 (section "") (file "")
-    G C $0000 main (section "") (file "")
+    L A $0002: start1 (section "") (file "")
+    L A $0002: start2 (section "") (file "")
+    G A $0002: msg1 (section "") (file "")
+    G A $0002: msg2 (section "") (file "")
+    G C $0000: main (section "") (file "")
   Externs:
     U         ext1
     U         ext2
   Expressions:
-    E Ub $0000 $0001 2 start1 % 256 (section "") (file file1.asm:123)
-    E Sb $0000 $0001 2 start2 % 127 (section "") (file file1.asm:132)
-    E Cw $0000 $0001 2 msg1 (section "") (file file1.asm:231)
-    E Ll $0000 $0001 2 msg2 (section "") (file file1.asm:321)
-    E Cw $0000 $0001 2 ext1 (section "") (file file1.asm:231)
-    E Ll $0000 $0001 2 ext2 (section "") (file file1.asm:321)
-    E Cw $0000 $0001 2 msg2-msg1 (section "") (file file1.asm:231)
+    E U $0000 $0001 2: start1 % 256 (section "") (file file1.asm:123)
+    E S $0000 $0001 2: start2 % 127 (section "") (file file1.asm:132)
+    E W $0000 $0001 2: msg1 (section "") (file file1.asm:231)
+    E L $0000 $0001 2: msg2 (section "") (file file1.asm:321)
+    E W $0000 $0001 2: ext1 (section "") (file file1.asm:231)
+    E L $0000 $0001 2: ext2 (section "") (file file1.asm:321)
+    E W $0000 $0001 2: msg2-msg1 (section "") (file file1.asm:231)
 

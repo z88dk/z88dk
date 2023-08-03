@@ -57,9 +57,9 @@ Object  file ${test}.o at \$0000: Z80RMF18
   Section "": 1 bytes, ORG \$FDE8
     C \$0000: C9
   Symbols:
-    G A \$0000 program (section "") (file ${test}.asm:18)
-    G C \$C9A9 asm_BIFROST2_start (section "") (file ${test}.asm:8)
-    G C \$C9B2 asm_BIFROST2_stop (section "") (file ${test}.asm:9)
+    G A \$0000: program (section "") (file ${test}.asm:18)
+    G C \$C9A9: asm_BIFROST2_start (section "") (file ${test}.asm:8)
+    G C \$C9B2: asm_BIFROST2_stop (section "") (file ${test}.asm:9)
 END
 
 

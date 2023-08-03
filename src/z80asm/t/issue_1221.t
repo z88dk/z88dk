@@ -47,8 +47,8 @@ Object  file ${test}.o at \$0000: Z80RMF18
     C \$0020: 34 12 78 56 34 12 78 56 34 12 78 56 34 12 55 55
     C \$0030: AA AA
   Symbols:
-    L C \$0004 c1 (section "") (file ${test}.asm:20)
-    L C \$0005 c2 (section "") (file ${test}.asm:21)
+    L C \$0004: c1 (section "") (file ${test}.asm:20)
+    L C \$0005: c2 (section "") (file ${test}.asm:21)
 END
 
 unlink_testfiles;

@@ -103,6 +103,7 @@ void add_opcode_n_0(int opcode, struct Expr1* expr)
     Pass2infoExpr(RANGE_BYTE_TO_WORD_UNSIGNED, expr);
 }
 
+/* add opcode followed by 8-bit signed expression and a 0x00/0xFF byte */
 void add_opcode_s_0(int opcode, struct Expr1* expr)
 {
     add_opcode(opcode);
