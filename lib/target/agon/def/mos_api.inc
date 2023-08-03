@@ -171,6 +171,11 @@ MACRO MOSCALL func
     rst  $08
 ENDM
 
+MACRO AGONPUTC
+    defb    $49         ;LIS
+    rst     $10
+ENDM
+
 ;
 ; FatFS structures
 ; These mirror the structures contained in src_fatfs/ff.h in the MOS project

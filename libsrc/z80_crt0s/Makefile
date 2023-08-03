@@ -12,7 +12,7 @@ all: obj/z80 obj/ixiy obj/8080 obj/8085 obj/r2k obj/gbz80 obj/z180 obj/ez80_z80 
 
 obj/z80:
 	mkdir -p obj/z80/z80
-	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/z80/z80 -I..  @crt0_z80.lst
+	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/z80/z80 -I.. -mz80_strict @crt0_z80.lst
 
 obj/z80n:
 	mkdir -p obj/z80/z80
