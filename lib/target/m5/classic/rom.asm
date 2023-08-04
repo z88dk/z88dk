@@ -10,6 +10,8 @@
 
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x7fff
+    ; Default, halt loop
+    defc    TAR__crt_on_exit = 0x10001
     INCLUDE "crt/classic/crt_rules.inc"
 
 
@@ -52,16 +54,10 @@ ENDIF
 
     call    _main           ; Call user program
 cleanup:
-    push    hl              ; return code
-
     call    crt0_exit
-
-
-
 cleanup_exit:
-
-    pop     bc              ; return code (still not sure it is teh right one !)
-    ret
+    ; How does the program end?
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 
