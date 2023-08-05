@@ -547,7 +547,7 @@ bool check_object_file(const char* obj_filename)
 static void no_error_file(const char* filename) {}
 static void no_error_version(const char* filename, int version, int expected) {}
 static void no_error_cpu_incompatible(const char* filename, int cpu_id) {}
-static void no_error_ixiy_incompatible(const char* filename, bool swap_ixiy) {}
+static void no_error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy) {}
 
 bool check_object_file_no_errors(const char* obj_filename) {
 	return check_obj_lib_file(
@@ -571,7 +571,7 @@ bool check_obj_lib_file(
     void(*do_error_file_type)(const char*),
     void(*do_error_version)(const char*, int, int),
     void(*do_error_cpu_incompatible)(const char*, int),
-    void(*do_error_ixiy_incompatible)(const char*, bool))
+    void(*do_error_ixiy_incompatible)(const char*, swap_ixiy_t))
 {
     FILE* fp = NULL;
 
@@ -632,9 +632,9 @@ bool check_obj_lib_file(
     }
 
     // has right -XIIY?
-    int swap_ixiy = xfread_dword(fp);
-    if (option_swap_ixiy() != !!swap_ixiy) {
-        do_error_ixiy_incompatible(filename, !!swap_ixiy);
+    swap_ixiy_t swap_ixiy = xfread_dword(fp);
+    if (!ixiy_compatible(option_swap_ixiy(), swap_ixiy)) {
+        do_error_ixiy_incompatible(filename, swap_ixiy);
         goto error;
     }
 

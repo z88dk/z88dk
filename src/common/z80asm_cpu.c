@@ -137,3 +137,17 @@ bool cpu_compatible(int code_cpu_id, int lib_cpu_id) {
         }
     }
 }
+
+// linking with no-swap accepts object files assembled with soft-swap
+bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixiy) {
+    if (code_swap_ixiy == IXIY_NO_SWAP && lib_swap_ixiy == IXIY_SOFT_SWAP)
+        return true;
+    else if (code_swap_ixiy == IXIY_SOFT_SWAP && lib_swap_ixiy == IXIY_NO_SWAP)
+        return true;
+    else if (code_swap_ixiy != lib_swap_ixiy)
+        return false;
+    else
+        return true;
+
+    return false;
+}

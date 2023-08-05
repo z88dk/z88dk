@@ -125,12 +125,21 @@ void Args::parse_args(const vector<string>& args) {
 	post_parsing_actions();
 }
 
-void Args::set_swap_ixiy(bool f) {
-    m_swap_ixiy = f;
-    if (m_swap_ixiy) 
+void Args::set_swap_ixiy(swap_ixiy_t swap_ixiy) {
+    m_swap_ixiy = swap_ixiy;
+
+    undefine_static_symbol("__SWAP_IX_IY__");
+
+    switch (m_swap_ixiy) {
+    case IXIY_NO_SWAP:
+        break;
+    case IXIY_SWAP:
+    case IXIY_SOFT_SWAP:
         define_static_symbol("__SWAP_IX_IY__");
-    else 
-        undefine_static_symbol("__SWAP_IX_IY__");
+        break;
+    default:
+        Assert(0);
+    }
 }
 
 string Args::prepend_output_dir(const string& filename) {
@@ -935,12 +944,12 @@ bool option_verbose() {
 	return g_args.verbose();
 }
 
-bool option_swap_ixiy() {
+swap_ixiy_t option_swap_ixiy() {
 	return g_args.swap_ixiy();
 }
 
-void set_swap_ixiy_option(bool f) {
-    g_args.set_swap_ixiy(f);
+void set_swap_ixiy_option(swap_ixiy_t swap_ixiy) {
+    g_args.set_swap_ixiy(swap_ixiy);
 }
 
 void push_includes(const char* dir) {

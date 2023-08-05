@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "args.h"
 #include "errors.h"
 #include "float.h"
 #include "if.h"
@@ -367,16 +368,18 @@ void error_cpu_incompatible(const char* filename, int got_cpu_id) {
     g_errors.error(ErrCode::CPUIncompatible, error.str());
 }
 
-static const char* ixiy_to_string(bool f) {
-    if (f)
-        return "IX=IY";
-    else
-        return "IX=IX";
+static const char* ixiy_to_string(swap_ixiy_t swap_ixiy) {
+    switch (swap_ixiy) {
+    case IXIY_NO_SWAP: return "(no option)"; 
+    case IXIY_SWAP: return "-IXIY";
+    case IXIY_SOFT_SWAP: return "-IXIY-soft";
+    default: Assert(0); return "";
+    }
 }
 
-void error_ixiy_incompatible(const char* filename, bool swap_ixiy) {
+void error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy) {
     ostringstream error;
-    error << "file " << filename << " compiled for " << ixiy_to_string(swap_ixiy)
-        << ", incompatible with " << ixiy_to_string(option_swap_ixiy());
+    error << "file " << filename << " compiled with " << ixiy_to_string(swap_ixiy)
+        << ", incompatible with " << ixiy_to_string(g_args.swap_ixiy());
     g_errors.error(ErrCode::IXIYIncompatible, error.str());
 }

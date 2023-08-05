@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "z80asm_cpu.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -112,12 +113,12 @@ void warn_dma_ready_signal_unsupported();
 void error_cmd_failed(const char* cmd);
 void error_assert_failed();
 void error_cpu_incompatible(const char* filename, int got_cpu_id);
-void error_ixiy_incompatible(const char* filename, bool swap_ixiy);
+void error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy);
 
 // options
 bool option_verbose();
-bool option_swap_ixiy();
-void set_swap_ixiy_option(bool f);
+swap_ixiy_t option_swap_ixiy();
+void set_swap_ixiy_option(swap_ixiy_t swap_ixiy);
 void push_includes(const char* dir);
 void pop_includes();
 const char* search_includes(const char* filename);

@@ -11,7 +11,8 @@ Z88DK Z80 Module Assembler Change Log
 2023-05-18 Fix #2260: output dir prepended twice
 2023-06-09 Fix #2279: add support to ez80, both z80 memory mode and ADL memory mode
 2023-07-05 Fix #2338, #2333: add -raw-strings option
-2023-07-30 Fix #2320: do not link with object files built for a different cpu
+2023-08-05 Fix #2320: do not link with object files built for a different cpu
+2023-08-05 Fix #2320: add -IXIY-soft that swap index registers but saves object file as not-swapped
 
 2022
 ----

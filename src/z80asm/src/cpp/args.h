@@ -21,8 +21,8 @@ public:
 
 	// options
 	bool verbose() const { return m_verbose; }
-	bool swap_ixiy() const { return m_swap_ixiy; }
-    void set_swap_ixiy(bool f);
+	swap_ixiy_t swap_ixiy() const { return m_swap_ixiy; }
+    void set_swap_ixiy(swap_ixiy_t swap_ixiy);
 	bool ucase() const { return m_ucase; }
     bool raw_strings() const { return m_raw_strings; }
 	int cpu() const { return m_cpu; }
@@ -74,7 +74,7 @@ public:
 private:
 	// options
 	bool			m_verbose{ false };			// -v option
-	bool			m_swap_ixiy{ false };		// -IXIY option
+    swap_ixiy_t     m_swap_ixiy{ IXIY_NO_SWAP };// -IXIY, -IXIY-soft options
 	bool			m_ucase{ false };			// -ucase option
     bool            m_raw_strings{ false };     // -raw-strings option
 	int				m_cpu{ 0 };			        // -m option

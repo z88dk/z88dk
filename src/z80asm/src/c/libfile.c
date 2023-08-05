@@ -85,8 +85,20 @@ void make_library(const char *lib_filename)
         /* assemble for each cpu-ixiy combination and append to library */
         for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
             set_cpu_option(*cpu);
-            for (int ixiy = 0; ixiy < 2; ixiy++) {
-                set_swap_ixiy_option(ixiy == 1);
+
+            // libraries have no_swap and swap object files
+            // libraries built with -IXIY-soft have only soft-swap object files
+            swap_ixiy_t current_swap_ixiy = option_swap_ixiy();
+            swap_ixiy_t first_ixiy, last_ixiy;
+            if (current_swap_ixiy == IXIY_SOFT_SWAP) {
+                first_ixiy = last_ixiy = IXIY_SOFT_SWAP;
+            }
+            else {
+                first_ixiy = IXIY_NO_SWAP;
+                last_ixiy = IXIY_SWAP;
+            }
+            for (swap_ixiy_t ixiy = first_ixiy; ixiy <= last_ixiy; ixiy++) {
+                set_swap_ixiy_option(ixiy);
 
                 for (size_t i = 0; i < option_files_size(); i++)
                     assemble_file(option_file(i));

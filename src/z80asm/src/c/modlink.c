@@ -756,8 +756,8 @@ static bool module_same_cpu(obj_file_t* obj) {
     if (!cpu_compatible(option_cpu(), cpu_id))
         return false;
 
-    int swap_ixiy = parse_int(obj);
-    if (option_swap_ixiy() != !!swap_ixiy)
+    swap_ixiy_t swap_ixiy = parse_int(obj);
+    if (!ixiy_compatible(option_swap_ixiy(), swap_ixiy))
         return false;
 
     return true;

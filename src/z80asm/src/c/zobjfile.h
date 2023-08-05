@@ -16,6 +16,7 @@ Handle object file contruction, reading and writing
 #include "if.h"
 #include "module1.h"
 #include "types.h"
+#include "objfile.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -47,7 +48,7 @@ long	 symbols_ptr;		/* offset if file to Name Definition */
 long	 externsym_ptr;		/* offset if file to External Name Declaration */
 long	 code_ptr;			/* offset if file to Machine Code Block */
 int      cpu_id;            /* cpu */
-bool     swap_ixiy;         /* -IXIY */
+swap_ixiy_t swap_ixiy;      /* -IXIY, -IXIY-soft */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
@@ -99,4 +100,4 @@ extern bool check_obj_lib_file(
 	void(*do_error_file_type)(const char*),
 	void(*do_error_version)(const char*, int, int),
     void(*do_error_cpu_incompatible)(const char*, int),
-    void(*do_error_ixiy_incompatible)(const char*, bool));
+    void(*do_error_ixiy_incompatible)(const char*, swap_ixiy_t));

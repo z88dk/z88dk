@@ -283,7 +283,7 @@ objfile_t* objfile_new()
 
     self->version = self->global_org = -1;
     self->cpu_id = CPU_Z80;
-    self->swap_ixiy = false;
+    self->swap_ixiy = IXIY_NO_SWAP;
 	self->externs = argv_new();
 
 	section_t* section = section_new();			// section "" must exist
@@ -639,8 +639,16 @@ void objfile_read(objfile_t* obj, FILE* fp)
         printf("  Org:  $%04X\n", obj->global_org);
 
     // cpu
-    if (opt_obj_list && obj->version >= 18)
-        printf("  CPU:  %s %s\n", cpu_name(obj->cpu_id), obj->swap_ixiy ? "(-IXIY)" : "");
+    if (opt_obj_list && obj->version >= 18) {
+        printf("  CPU:  %s ", cpu_name(obj->cpu_id));
+        switch (obj->swap_ixiy) {
+        case IXIY_NO_SWAP: break;
+        case IXIY_SWAP: printf("(-IXIY)"); break;
+        case IXIY_SOFT_SWAP: printf("(-IXIY-soft)"); break;
+        default: xassert(0);
+        }
+        printf("\n");
+    }
 
     // sections
 	if (fpos_sections >= 0)

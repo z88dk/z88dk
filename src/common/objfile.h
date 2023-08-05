@@ -14,6 +14,7 @@ extern "C" {
 #include "types.h"
 #include "utarray.h"
 #include "utstring.h"
+#include "z80asm_cpu.h"
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -119,7 +120,7 @@ typedef struct objfile_s
 	int			version;
 	int			global_org;
     int         cpu_id;
-    bool        swap_ixiy;
+    swap_ixiy_t swap_ixiy;
 	argv_t*     externs;
 	section_t*  sections;
 

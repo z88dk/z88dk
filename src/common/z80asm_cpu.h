@@ -11,6 +11,7 @@ extern "C" {
 
 #include "stdbool.h"
 
+// CPUs
 enum {
 #define X(id, value, name)      id = value,
 #include "z80asm_cpu.def"
@@ -26,6 +27,17 @@ const int* cpu_ids();               // static list terminated by -1 of all CPUs 
                                     // specific to more generic
 
 bool cpu_compatible(int code_cpu_id, int lib_cpu_id);
+
+// IXIY
+typedef enum {
+    IXIY_NO_SWAP,           // no swap
+    IXIY_SWAP,              // swap IX and IY
+    IXIY_SOFT_SWAP,         // swap IX and IY, but save object file with no swap
+} swap_ixiy_t;
+
+
+bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixiy);
+
 
 #ifdef __cplusplus
 }
