@@ -74,6 +74,7 @@ install: $(PROJ)$(EXESUFFIX)
 #------------------------------------------------------------------------------
 # rebuild the three tools needed for the tests
 rebuild:
+	$(MAKE) -C ../common
 	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm.lib
 	$(MAKE) -C ../z80asm dev
 	cp ../z80asm/z88dk-z80asm$(EXESUFFIX) ../../bin/
@@ -81,3 +82,8 @@ rebuild:
 	cp ../z80nm/z88dk-z80nm$(EXESUFFIX) ../../bin/
 	$(MAKE) all
 	cp $(PROJ)$(EXESUFFIX) ../../bin/
+
+retest: rebuild
+	$(MAKE) -C ../common test
+	$(MAKE) -C ../z80asm testdev
+	$(MAKE) test

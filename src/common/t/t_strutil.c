@@ -43,17 +43,15 @@ void t_strutil_cstr_strip(void)
 
 void t_strutil_cstr_strip_compress_escapes(void)
 {
-	UT_string *s = utstr_new();
+    UT_string* s;
+    utstring_new(s);
 	char cs[100];
 
 #define T(in, out_len, out_str) \
 			strcpy(cs, in); \
 			TEST_ASSERT_EQUAL(out_len, str_compress_escapes(cs)); \
 			TEST_ASSERT_EQUAL(0, memcmp(cs, out_str, out_len)); \
-			utstr_set(s, in); \
-			utstr_compress_escapes(s); \
-			TEST_ASSERT_EQUAL(out_len, utstr_len(s)); \
-			TEST_ASSERT_EQUAL(0, memcmp(utstr_body(s), out_str, out_len))
+            utstring_clear(s)
 
 	// trailing backslash ignored 
 	T("\\", 0, "");
@@ -100,7 +98,7 @@ void t_strutil_cstr_strip_compress_escapes(void)
 		4,
 		"\xFF" "0" "\xFF" "0");
 
-	utstr_free(s);
+	utstring_free(s);
 #undef T
 }
 
@@ -129,42 +127,6 @@ void t_strutil_cstr_case_ncmp(void)
 	TEST_ASSERT(strncasecmp("abx", "a", 2) > 0);
 	TEST_ASSERT(strncasecmp("a", "aby", 2) < 0);
 	TEST_ASSERT(strncasecmp("abx", "aby", 2) == 0);
-}
-
-void t_strutil_str_toupper(void)
-{
-	UT_string *s = utstr_new();
-	utstr_set(s, "abc1"); utstr_toupper(s); TEST_ASSERT_EQUAL_STRING("ABC1", utstr_body(s));
-	utstr_set(s, "Abc1"); utstr_toupper(s); TEST_ASSERT_EQUAL_STRING("ABC1", utstr_body(s));
-	utstr_set(s, "ABC1"); utstr_toupper(s); TEST_ASSERT_EQUAL_STRING("ABC1", utstr_body(s));
-	utstr_free(s);
-}
-
-void t_strutil_str_tolower(void)
-{
-	UT_string *s = utstr_new();
-	utstr_set(s, "abc1"); utstr_tolower(s); TEST_ASSERT_EQUAL_STRING("abc1", utstr_body(s));
-	utstr_set(s, "Abc1"); utstr_tolower(s); TEST_ASSERT_EQUAL_STRING("abc1", utstr_body(s));
-	utstr_set(s, "ABC1"); utstr_tolower(s); TEST_ASSERT_EQUAL_STRING("abc1", utstr_body(s));
-	utstr_free(s);
-}
-
-void t_strutil_str_chomp(void)
-{
-	UT_string *s = utstr_new();
-	utstr_set(s, ""); utstr_chomp(s); TEST_ASSERT_EQUAL_STRING("", utstr_body(s));
-	utstr_set(s, "\r\n \t\f \r\n \t\f\v"); utstr_chomp(s); TEST_ASSERT_EQUAL_STRING("", utstr_body(s));
-	utstr_set(s, "\r\n \t\fx\r\n \t\f\v"); utstr_chomp(s); TEST_ASSERT_EQUAL_STRING("\r\n \t\fx", utstr_body(s));
-	utstr_free(s);
-}
-
-void t_strutil_str_strip(void)
-{
-	UT_string *s = utstr_new();
-	utstr_set(s, ""); utstr_strip(s); TEST_ASSERT_EQUAL_STRING("", utstr_body(s));
-	utstr_set(s, "\r\n \t\f \r\n \t\f\v"); utstr_strip(s); TEST_ASSERT_EQUAL_STRING("", utstr_body(s));
-	utstr_set(s, "\r\n \t\fx\r\n \t\f\v"); utstr_strip(s); TEST_ASSERT_EQUAL_STRING("x", utstr_body(s));
-	utstr_free(s);
 }
 
 void t_strutil_argv_new(void)
