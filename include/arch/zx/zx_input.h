@@ -61,12 +61,12 @@
 
 // Joystick Functions
 // These are actually in_*(void)
-extern unsigned int  __LIB__ in_JoyFuller();
-extern unsigned int  __LIB__ in_JoyKempston();
-extern unsigned int  __LIB__ in_JoySinclair1();
-extern unsigned int  __LIB__ in_JoySinclair2();
-extern unsigned int  __LIB__ in_JoyTimex1();
-extern unsigned int  __LIB__ in_JoyTimex2();
+extern unsigned int  __LIB__ in_JoyFuller(void);
+extern unsigned int  __LIB__ in_JoyKempston(void);
+extern unsigned int  __LIB__ in_JoySinclair1(void);
+extern unsigned int  __LIB__ in_JoySinclair2(void);
+extern unsigned int  __LIB__ in_JoyTimex1(void);
+extern unsigned int  __LIB__ in_JoyTimex2(void);
 
 // AMX Mouse
 //

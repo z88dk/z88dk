@@ -336,7 +336,7 @@ main(unsigned int arg2, char *arg1)
 //////////////
 
 extern void __LIB__  zx_lprintc(int chr);
-extern void __LIB__  zx_hardcopy();
+extern void __LIB__  zx_hardcopy(void);
 // Print out a 256 bytes buffer (8 rows)
 extern void __LIB__  zx_print_buf(char *buf) __z88dk_fastcall;
 // Print out a single graphics row (a 32 bytes buffer is required)

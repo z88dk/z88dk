@@ -38,6 +38,8 @@ target/agon/fcntl/mkdir
 target/agon/fcntl/chdir
 target/agon/fcntl/fdtell
 target/agon/time/target_read_structtm
+target/agon/agon/agon_set_palette
+target/agon/agon/agon_set_cursor_state
 @stdio/stdio.lst
 @gfx/wide/gfx_wide.lst
 @games/games.lst
