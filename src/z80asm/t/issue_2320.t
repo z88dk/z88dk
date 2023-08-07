@@ -10,6 +10,33 @@ use Modern::Perl;
 my @CPUS = qw( z80 z80_strict z80n z180 ez80 ez80_z80 r2ka r3k 8080 8085 gbz80 );
 
 
+# test use-after-delete modlink - fails on Linux
+
+spew("$test.1.asm", <<END);
+			public the_answer
+	the_answer = 42
+END
+
+unlink("$test.1.o", "$test.1.lib");
+capture_ok("z88dk-z80asm -x$test.1.lib $test.1.asm", "");
+unlink("$test.1.o", "$test.1.asm");
+
+spew("$test.asm", <<END);
+	extern the_answer
+	defb the_answer
+END
+
+unlink("$test.o", "$test.bin");
+capture_ok("z88dk-z80asm -b -m -l$test.1.lib $test.asm", "");
+check_bin_file("$test.bin", bytes(42));
+check_text_file("$test.map", <<END);
+the_answer                      = \$002A ; const, public, , $test.1, , $test.1.asm:2
+__head                          = \$0000 ; const, public, def, , ,
+__tail                          = \$0001 ; const, public, def, , ,
+__size                          = \$0001 ; const, public, def, , ,
+END
+
+
 # link object files
 
 for my $lib_ixiy ("", "-IXIY", "-IXIY-soft") {

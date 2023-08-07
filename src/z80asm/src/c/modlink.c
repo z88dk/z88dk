@@ -71,6 +71,7 @@ static void init(void) {
 	static bool inited = false;
 	if (!inited) {
 		atexit(dtor);
+        inited = true;
 	}
 }
 
@@ -258,7 +259,7 @@ static void object_file_reserve_space(obj_file_t* obj, Module1* module) {
         return;
 
     xassert(goto_modname(obj));
-    const char* modname = parse_st_str(obj);
+    const char* modname = spool_add(parse_st_str(obj));     // st from obj from lib will be deleted, save modname
     CURRENTMODULE->modname = modname;
 
     if (goto_code(obj)) {
