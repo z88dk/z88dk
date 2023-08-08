@@ -574,7 +574,7 @@ static void path_find_glob_1(argv_t *files, const char *pattern)
         utstring_clear(pad);
         utstring_printf(pad, "%.*s", (int)(wc - pattern + 1), pattern);
         if (child)
-            utstring_printf(pad, "%.*s", child - (wc + 2), wc + 2);      // and up to child
+            utstring_printf(pad, "%.*s", (int)(child - (wc + 2)), wc + 2);      // and up to child
 		else
             utstring_printf(pad, "%s", wc + 2);
 		

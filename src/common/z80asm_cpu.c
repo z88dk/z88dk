@@ -149,6 +149,4 @@ bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixiy) {
         return false;
     else
         return true;
-
-    return false;
 }

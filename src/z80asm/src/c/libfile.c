@@ -30,7 +30,8 @@ static const char *search_libfile(const char *filename )
 }
 
 /*-----------------------------------------------------------------------------
-*	make library from source files; convert each source to object file name 
+*	make library from source files; convert each source to object file name
+*   add only object files for the same CPU-IXIY combination
 *----------------------------------------------------------------------------*/
 static bool add_object_modules(FILE* lib_fp, string_table_t* st) {
     char* obj_file_data = NULL;
@@ -55,24 +56,30 @@ static bool add_object_modules(FILE* lib_fp, string_table_t* st) {
             return false;
         }
 
-        obj_file_data = xrealloc(obj_file_data, obj_size);
-        xfread_bytes(obj_file_data, obj_size, obj_fp);
-
-        fclose(obj_fp);
-
-        // write file pointer of next file
-        xfwrite_dword(fptr + 2 * sizeof(int32_t) + obj_size, lib_fp);
-
-        // write module size
-        xfwrite_dword(obj_size, lib_fp);
-
-        // write object blob
-        xfwrite_bytes(obj_file_data, obj_size, lib_fp);
-
-        // lookup defined symbols in object file
+        // check if object file is for same CPU-IXIY as defined currently
         file_t* file = file_new();
         file_read(file, obj_filename);
-        objfile_get_defined_symbols(file->objs, st);
+        if (file->objs->cpu_id == option_cpu() && file->objs->swap_ixiy == option_swap_ixiy()) {
+            if (option_verbose())
+                printf("Adding %s to library\n", obj_filename);
+
+            obj_file_data = xrealloc(obj_file_data, obj_size);
+            xfread_bytes(obj_file_data, obj_size, obj_fp);
+
+            // write file pointer of next file
+            xfwrite_dword(fptr + 2 * sizeof(int32_t) + obj_size, lib_fp);
+
+            // write module size
+            xfwrite_dword(obj_size, lib_fp);
+
+            // write object blob
+            xfwrite_bytes(obj_file_data, obj_size, lib_fp);
+
+            // lookup defined symbols in object file
+            objfile_get_defined_symbols(file->objs, st);
+        }
+
+        fclose(obj_fp);
         file_free(file);
     }
 
@@ -115,7 +122,7 @@ void make_library(const char *lib_filename) {
             last_ixiy = IXIY_SWAP;
         }
 
-        // assemble for each cpu-ixiy combination and append to library
+        // assemble or include object for each cpu-ixiy combination and append to library
         for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
             set_cpu_option(*cpu);
 
@@ -123,7 +130,10 @@ void make_library(const char *lib_filename) {
                 set_swap_ixiy_option(ixiy);
 
                 for (size_t i = 0; i < option_files_size(); i++) {
-                    assemble_file(option_file(i));
+                    const char* filename = option_file(i);
+                    bool got_asm = strcmp(filename + strlen(filename) - strlen(EXT_ASM), EXT_ASM) == 0;
+                    if (got_asm)
+                        assemble_file(option_file(i));
 
                     if (get_num_errors()) {
                         xfclose(fp);			/* error */

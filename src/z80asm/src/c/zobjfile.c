@@ -267,7 +267,10 @@ bool check_obj_lib_file(
         goto error;
     }
 
+    // libraries may contain multiple cpu-ixiy combinations
     if (is_lib)
+        return true;
+    if (option_lib_for_all_cpus())
         return true;
 
     // only for object files

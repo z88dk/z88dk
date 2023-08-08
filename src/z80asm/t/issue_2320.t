@@ -10,8 +10,229 @@ use Modern::Perl;
 my @CPUS = qw( z80 z80_strict z80n z180 ez80 ez80_z80 r2ka r3k 8080 8085 gbz80 );
 
 
+# allow multi-CPU object files during library creation
+
+for my $has_asm (0 .. 1) {
+
+	unlink_testfiles;
+	my @objs;
+	for my $cpu (@CPUS) {
+		for my $ixiy ("", "-IXIY") {
+			my $ixiy_text = $ixiy eq "" ? "" : "($ixiy)";
+			my $base = "$test.$cpu$ixiy";
+			spew("$base.asm", "nop");
+			unlink("$base.o");
+			capture_ok("z88dk-z80asm -m$cpu $ixiy $base.asm", "");
+			ok -f "$base.o", "$base.o created";
+			unlink("$base.asm") unless $has_asm;
+			push @objs, "$base.o";
+		}
+	}
+
+	capture_ok("z88dk-z80asm -v -m* -x$test.1.lib @objs", <<END);
+Predefined constant: __CPU_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Predefined constant: __FLOAT_GENMATH__ = 1
+Reading library 'z88dk-z80asm.lib'
+Creating library '$test.1.lib'
+Predefined constant: __CPU_Z80N__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Adding $test.z80n.o to library
+Predefined constant: __SWAP_IX_IY__ = 1
+Adding $test.z80n-IXIY.o to library
+Predefined constant: __CPU_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Adding $test.z80.o to library
+Predefined constant: __SWAP_IX_IY__ = 1
+Adding $test.z80-IXIY.o to library
+Predefined constant: __CPU_EZ80__ = 1
+Predefined constant: __CPU_EZ80_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Adding $test.ez80_z80.o to library
+Predefined constant: __SWAP_IX_IY__ = 1
+Adding $test.ez80_z80-IXIY.o to library
+Predefined constant: __CPU_Z180__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Adding $test.z180.o to library
+Predefined constant: __SWAP_IX_IY__ = 1
+Adding $test.z180-IXIY.o to library
+Predefined constant: __CPU_Z80_STRICT__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Adding $test.z80_strict.o to library
+Predefined constant: __SWAP_IX_IY__ = 1
+Adding $test.z80_strict-IXIY.o to library
+Predefined constant: __CPU_8085__ = 1
+Predefined constant: __CPU_INTEL__ = 1
+Adding $test.8085.o to library
+Predefined constant: __SWAP_IX_IY__ = 1
+Adding $test.8085-IXIY.o to library
+Predefined constant: __CPU_R3K__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
+Adding $test.r3k.o to library
+Predefined constant: __SWAP_IX_IY__ = 1
+Adding $test.r3k-IXIY.o to library
+Predefined constant: __CPU_GBZ80__ = 1
+Adding $test.gbz80.o to library
+Predefined constant: __SWAP_IX_IY__ = 1
+Adding $test.gbz80-IXIY.o to library
+Predefined constant: __CPU_EZ80__ = 1
+Predefined constant: __CPU_EZ80_ADL__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Adding $test.ez80.o to library
+Predefined constant: __SWAP_IX_IY__ = 1
+Adding $test.ez80-IXIY.o to library
+Predefined constant: __CPU_R2KA__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
+Adding $test.r2ka.o to library
+Predefined constant: __SWAP_IX_IY__ = 1
+Adding $test.r2ka-IXIY.o to library
+Predefined constant: __CPU_8080__ = 1
+Predefined constant: __CPU_INTEL__ = 1
+Adding $test.8080.o to library
+Predefined constant: __SWAP_IX_IY__ = 1
+Adding $test.8080-IXIY.o to library
+END
+
+	capture_ok("z88dk-z80nm -a $test.1.lib", <<END);
+Library file $test.1.lib at \$0000: Z80LMF18
+Object  file $test.1.lib at \$0014: Z80RMF18
+  Name: $test.z80n
+  CPU:  z80n 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0088: Z80RMF18
+  Name: $test.z80n-IXIY
+  CPU:  z80n (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0104: Z80RMF18
+  Name: $test.z80
+  CPU:  z80 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0178: Z80RMF18
+  Name: $test.z80-IXIY
+  CPU:  z80 (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$01F0: Z80RMF18
+  Name: $test.ez80_z80
+  CPU:  ez80_z80 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0268: Z80RMF18
+  Name: $test.ez80_z80-IXIY
+  CPU:  ez80_z80 (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$02E8: Z80RMF18
+  Name: $test.z180
+  CPU:  z180 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$035C: Z80RMF18
+  Name: $test.z180-IXIY
+  CPU:  z180 (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$03D8: Z80RMF18
+  Name: $test.z80_strict
+  CPU:  z80_strict 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0454: Z80RMF18
+  Name: $test.z80_strict-IXIY
+  CPU:  z80_strict (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$04D4: Z80RMF18
+  Name: $test.8085
+  CPU:  8085 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0548: Z80RMF18
+  Name: $test.8085-IXIY
+  CPU:  8085 (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$05C4: Z80RMF18
+  Name: $test.r3k
+  CPU:  r3k 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0638: Z80RMF18
+  Name: $test.r3k-IXIY
+  CPU:  r3k (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$06B0: Z80RMF18
+  Name: $test.gbz80
+  CPU:  gbz80 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0728: Z80RMF18
+  Name: $test.gbz80-IXIY
+  CPU:  gbz80 (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$07A4: Z80RMF18
+  Name: $test.ez80
+  CPU:  ez80 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0818: Z80RMF18
+  Name: $test.ez80-IXIY
+  CPU:  ez80 (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0894: Z80RMF18
+  Name: $test.r2ka
+  CPU:  r2ka 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0908: Z80RMF18
+  Name: $test.r2ka-IXIY
+  CPU:  r2ka (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$0984: Z80RMF18
+  Name: $test.8080
+  CPU:  8080 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$09F8: Z80RMF18
+  Name: $test.8080-IXIY
+  CPU:  8080 (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+END
+}
+
 # test use-after-delete modlink - fails on Linux
 
+unlink_testfiles;
 spew("$test.1.asm", <<END);
 			public the_answer
 	the_answer = 42
@@ -39,6 +260,7 @@ END
 
 # link object files
 
+unlink_testfiles;
 for my $lib_ixiy ("", "-IXIY", "-IXIY-soft") {
 	my $lib_ixiy_cpu = $lib_ixiy ? "($lib_ixiy)" : "";
 	my %IXIY_ERROR = (""=>"(no option)", "-IXIY"=>"-IXIY", "-IXIY-soft"=>"-IXIY-soft");
@@ -129,6 +351,7 @@ END
 # make multi-cpu library
 
 
+unlink_testfiles;
 spew("$test.asm", <<END);
 		extern the_answer
 		defb the_answer
@@ -389,6 +612,7 @@ END
 
 # make -XIIY-soft library
 
+unlink_testfiles;
 unlink("$test.1.lib");
 capture_ok("z88dk-z80asm -IXIY-soft -m\"*\" -x$test.1.lib $test.1.asm", "");
 ok -f "$test.1.lib", "$test.1.lib created";
@@ -529,6 +753,8 @@ END
 
 
 # check actual swapping
+
+unlink_testfiles;
 for my $code_ixiy ("", "-IXIY", "-IXIY-soft") {
 	spew("$test.asm", <<END);
 			ld ix, 0
