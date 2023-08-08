@@ -5,8 +5,8 @@ target/pmd85/stdio/generic_console
 target/pmd85/stdio/generic_console_vpeek
 target/pmd85/stdio/generic_console_ioctl
 @stdio/stdio.lst
-stdio/inkey/getk
-stdio/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
 
 @input/input_keyboard.lst
 

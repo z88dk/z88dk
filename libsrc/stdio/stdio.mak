@@ -9,13 +9,17 @@ STDIO_NET_CFILES = $(STDIO_CFILES) \
 STDIO_AFILES = $(notdir $(wildcard stdio/*.asm)) \
 		$(patsubst %,conio/%,$(notdir $(wildcard stdio/conio/*.asm))) \
 		$(patsubst %,ansi/%,$(notdir $(wildcard stdio/ansi/*.asm))) \
+		$(patsubst %,inkey/%,$(notdir $(wildcard stdio/inkey/*.asm))) \
 		$(patsubst %,ansi/generic/%,$(notdir $(wildcard stdio/ansi/generic/*.asm))) \
 		$(patsubst %,ansi/gencon/%,$(notdir $(wildcard stdio/ansi/gencon/*.asm)))
 
 STDIO_8080_AFILES = $(notdir $(wildcard stdio/*.asm))  \
-		$(patsubst %,conio/%,$(notdir $(wildcard stdio/conio/*.asm)))
+		$(patsubst %,conio/%,$(notdir $(wildcard stdio/conio/*.asm))) \
+		$(patsubst %,inkey/%,$(notdir $(wildcard stdio/inkey/*.asm)))
+
 STDIO_GBZ80_AFILES = $(notdir $(filter-out $(wildcard stdio/*scanf*.asm),$(wildcard stdio/*.asm))) \
-		$(patsubst %,conio/%,$(notdir $(wildcard stdio/conio/*.asm)))
+		$(patsubst %,conio/%,$(notdir $(wildcard stdio/conio/*.asm))) \
+		$(patsubst %,inkey/%,$(notdir $(wildcard stdio/inkey/*.asm)))
 
 STDIO_OBJECTS = $(STDIO_CFILES:.c=.o) $(STDIO_AFILES:.asm=.o)
 STDIO_8080_OBJECTS = $(STDIO_CFILES:.c=.o) $(STDIO_8080_AFILES:.asm=.o)

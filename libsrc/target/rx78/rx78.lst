@@ -1,5 +1,5 @@
-stdio/inkey/fgetc_cons
-stdio/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
 target/rx78/stdio/generic_console
 target/rx78/stdio/generic_console_ioctl
 target/rx78/stdio/generic_console_vpeek

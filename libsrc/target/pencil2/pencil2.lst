@@ -1,6 +1,6 @@
 @stdio/ansicore.lst
-stdio/inkey/fgetc_cons
-stdio/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
 target/pencil2/stdio/CRT_FONT
 
 @video/tms9918/video_tms9918_nmi.lst

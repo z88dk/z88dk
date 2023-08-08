@@ -1,6 +1,6 @@
 @stdio/stdio.lst
-stdio/inkey/fgetc_cons
-stdio/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
 target/gl6000/stdio/CRT_FONT
 target/gl6000/stdio/generic_console
 target/gl6000/stdio/generic_console_ioctl
