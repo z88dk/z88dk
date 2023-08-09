@@ -9,6 +9,59 @@ use Modern::Perl;
 
 my @CPUS = qw( z80 z80_strict z80n z180 ez80 ez80_z80 r2ka r3k 8080 8085 gbz80 );
 
+# building library for diferent cpus not showing error message
+
+unlink_testfiles;
+spew("$test.a.asm", <<END);
+SECTION code2
+
+a:
+        ld      hl,16384
+END
+
+spew("$test.b.asm", <<END);
+MODULE b
+SECTION code
+
+
+b:
+        ld      hl,32768
+END
+
+capture_ok("z88dk-z80asm -mz80 $test.a.asm", "");
+capture_ok("z88dk-z80asm -mz80_strict $test.b.asm", "");
+capture_ok("z88dk-z80asm -v -x$test.lib -mz80 $test.*.o", <<END);
+Predefined constant: __CPU_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Predefined constant: __FLOAT_GENMATH__ = 1
+Reading library 'z88dk-z80asm.lib'
+Creating library 'test_t_issue_2320.lib'
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
+END
+
+capture_ok("z88dk-z80nm -a $test.lib", <<END);
+Library file $test.lib at \$0000: Z80LMF18
+Object  file $test.lib at \$0014: Z80RMF18
+  Name: $test.a
+  CPU:  z80 
+  Section "": 0 bytes
+  Section code2: 3 bytes
+    C \$0000: 21 00 40
+  Symbols:
+    L A \$0000: a (section code2) (file $test.a.asm:3)
+
+Object  file $test.lib at \$00E4: Z80RMF18
+  Name: b
+  CPU:  z80_strict 
+  Section "": 0 bytes
+  Section code: 3 bytes
+    C \$0000: 21 00 80
+  Symbols:
+    L A \$0000: b (section code) (file $test.b.asm:5)
+
+END
+
 
 # allow multi-CPU object files during library creation
 
@@ -37,60 +90,522 @@ Reading library 'z88dk-z80asm.lib'
 Creating library '$test.1.lib'
 Predefined constant: __CPU_Z80N__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
 Adding $test.z80n.o to library
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
 Adding $test.z80n-IXIY.o to library
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Adding $test.z80.o to library
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
 Adding $test.z80-IXIY.o to library
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __CPU_EZ80__ = 1
 Predefined constant: __CPU_EZ80_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Adding $test.ez80_z80.o to library
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Adding $test.ez80_z80-IXIY.o to library
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __CPU_Z180__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
 Adding $test.z180.o to library
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
 Adding $test.z180-IXIY.o to library
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __CPU_Z80_STRICT__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
 Adding $test.z80_strict.o to library
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
 Adding $test.z80_strict-IXIY.o to library
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __CPU_8085__ = 1
 Predefined constant: __CPU_INTEL__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
 Adding $test.8085.o to library
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
 Adding $test.8085-IXIY.o to library
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __CPU_R3K__ = 1
 Predefined constant: __CPU_RABBIT__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Adding $test.r3k.o to library
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
 Adding $test.r3k-IXIY.o to library
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __CPU_GBZ80__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
 Adding $test.gbz80.o to library
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
 Adding $test.gbz80-IXIY.o to library
 Predefined constant: __CPU_EZ80__ = 1
 Predefined constant: __CPU_EZ80_ADL__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
 Adding $test.ez80.o to library
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
 Adding $test.ez80-IXIY.o to library
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __CPU_R2KA__ = 1
 Predefined constant: __CPU_RABBIT__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
 Adding $test.r2ka.o to library
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
 Adding $test.r2ka-IXIY.o to library
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __CPU_8080__ = 1
 Predefined constant: __CPU_INTEL__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
 Adding $test.8080.o to library
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
 Adding $test.8080-IXIY.o to library
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
 END
 
 	capture_ok("z88dk-z80nm -a $test.1.lib", <<END);

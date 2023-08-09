@@ -57,9 +57,18 @@ static bool add_object_modules(FILE* lib_fp, string_table_t* st) {
         }
 
         // check if object file is for same CPU-IXIY as defined currently
+        // include if same cpu-ixiy and -m*; without -m* include always
         file_t* file = file_new();
         file_read(file, obj_filename);
-        if (file->objs->cpu_id == option_cpu() && file->objs->swap_ixiy == option_swap_ixiy()) {
+
+        bool include = true;
+        if (option_lib_for_all_cpus()) {
+            if (file->objs->cpu_id == option_cpu() && file->objs->swap_ixiy == option_swap_ixiy())
+                include = true;
+            else
+                include = false;
+        }
+        if (include) {
             if (option_verbose())
                 printf("Adding %s to library\n", obj_filename);
 
@@ -77,6 +86,10 @@ static bool add_object_modules(FILE* lib_fp, string_table_t* st) {
 
             // lookup defined symbols in object file
             objfile_get_defined_symbols(file->objs, st);
+        }
+        else {
+            if (option_verbose())
+                printf("Skipping %s - different CPU-IXIY combination\n", obj_filename);
         }
 
         fclose(obj_fp);
