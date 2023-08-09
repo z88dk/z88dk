@@ -7,7 +7,7 @@ use Modern::Perl;
 # Test https://github.com/z88dk/z88dk/issues/2320
 # z80asm: do not link with object files built for a different cpu
 
-my @CPUS = qw( z80 z80_strict z80n z180 ez80 ez80_z80 r2ka r3k 8080 8085 gbz80 );
+my @CPUS = qw( z80 z80_strict z80n z180 ez80 ez80_z80 r800 r2ka r3k 8080 8085 gbz80 );
 
 # building library for diferent cpus not showing error message
 
@@ -35,9 +35,9 @@ Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
-Creating library 'test_t_issue_2320.lib'
-Adding test_t_issue_2320.a.o to library
-Adding test_t_issue_2320.b.o to library
+Creating library '$test.lib'
+Adding $test.a.o to library
+Adding $test.b.o to library
 END
 
 capture_ok("z88dk-z80nm -a $test.lib", <<END);
@@ -160,6 +160,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -183,6 +185,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -207,6 +211,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -230,6 +236,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -255,6 +263,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Adding $test.ez80_z80.o to library
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -278,6 +288,58 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Adding $test.ez80_z80-IXIY.o to library
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
+Predefined constant: __CPU_R800__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Adding $test.r800.o to library
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
+Skipping $test.r2ka.o - different CPU-IXIY combination
+Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
+Skipping $test.r3k.o - different CPU-IXIY combination
+Skipping $test.r3k-IXIY.o - different CPU-IXIY combination
+Skipping $test.8080.o - different CPU-IXIY combination
+Skipping $test.8080-IXIY.o - different CPU-IXIY combination
+Skipping $test.8085.o - different CPU-IXIY combination
+Skipping $test.8085-IXIY.o - different CPU-IXIY combination
+Skipping $test.gbz80.o - different CPU-IXIY combination
+Skipping $test.gbz80-IXIY.o - different CPU-IXIY combination
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.z80.o - different CPU-IXIY combination
+Skipping $test.z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80_strict.o - different CPU-IXIY combination
+Skipping $test.z80_strict-IXIY.o - different CPU-IXIY combination
+Skipping $test.z80n.o - different CPU-IXIY combination
+Skipping $test.z80n-IXIY.o - different CPU-IXIY combination
+Skipping $test.z180.o - different CPU-IXIY combination
+Skipping $test.z180-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80.o - different CPU-IXIY combination
+Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
+Skipping $test.ez80_z80.o - different CPU-IXIY combination
+Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Adding $test.r800-IXIY.o to library
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -302,6 +364,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -325,6 +389,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -349,6 +415,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -372,6 +440,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -396,6 +466,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -419,6 +491,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -443,6 +517,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Adding $test.r3k.o to library
@@ -466,6 +542,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -489,6 +567,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -512,6 +592,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -537,6 +619,8 @@ Adding $test.ez80.o to library
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -560,6 +644,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Adding $test.ez80-IXIY.o to library
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -584,6 +670,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Adding $test.r2ka.o to library
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -607,6 +695,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Adding $test.r2ka-IXIY.o to library
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -631,6 +721,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -654,6 +746,8 @@ Skipping $test.ez80.o - different CPU-IXIY combination
 Skipping $test.ez80-IXIY.o - different CPU-IXIY combination
 Skipping $test.ez80_z80.o - different CPU-IXIY combination
 Skipping $test.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping $test.r800.o - different CPU-IXIY combination
+Skipping $test.r800-IXIY.o - different CPU-IXIY combination
 Skipping $test.r2ka.o - different CPU-IXIY combination
 Skipping $test.r2ka-IXIY.o - different CPU-IXIY combination
 Skipping $test.r3k.o - different CPU-IXIY combination
@@ -705,96 +799,108 @@ Object  file $test.1.lib at \$0268: Z80RMF18
     C \$0000: 00
 
 Object  file $test.1.lib at \$02E8: Z80RMF18
+  Name: $test.r800
+  CPU:  r800 
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$035C: Z80RMF18
+  Name: $test.r800-IXIY
+  CPU:  r800 (-IXIY)
+  Section "": 1 bytes
+    C \$0000: 00
+
+Object  file $test.1.lib at \$03D8: Z80RMF18
   Name: $test.z180
   CPU:  z180 
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$035C: Z80RMF18
+Object  file $test.1.lib at \$044C: Z80RMF18
   Name: $test.z180-IXIY
   CPU:  z180 (-IXIY)
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$03D8: Z80RMF18
+Object  file $test.1.lib at \$04C8: Z80RMF18
   Name: $test.z80_strict
   CPU:  z80_strict 
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$0454: Z80RMF18
+Object  file $test.1.lib at \$0544: Z80RMF18
   Name: $test.z80_strict-IXIY
   CPU:  z80_strict (-IXIY)
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$04D4: Z80RMF18
+Object  file $test.1.lib at \$05C4: Z80RMF18
   Name: $test.8085
   CPU:  8085 
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$0548: Z80RMF18
+Object  file $test.1.lib at \$0638: Z80RMF18
   Name: $test.8085-IXIY
   CPU:  8085 (-IXIY)
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$05C4: Z80RMF18
+Object  file $test.1.lib at \$06B4: Z80RMF18
   Name: $test.r3k
   CPU:  r3k 
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$0638: Z80RMF18
+Object  file $test.1.lib at \$0728: Z80RMF18
   Name: $test.r3k-IXIY
   CPU:  r3k (-IXIY)
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$06B0: Z80RMF18
+Object  file $test.1.lib at \$07A0: Z80RMF18
   Name: $test.gbz80
   CPU:  gbz80 
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$0728: Z80RMF18
+Object  file $test.1.lib at \$0818: Z80RMF18
   Name: $test.gbz80-IXIY
   CPU:  gbz80 (-IXIY)
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$07A4: Z80RMF18
+Object  file $test.1.lib at \$0894: Z80RMF18
   Name: $test.ez80
   CPU:  ez80 
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$0818: Z80RMF18
+Object  file $test.1.lib at \$0908: Z80RMF18
   Name: $test.ez80-IXIY
   CPU:  ez80 (-IXIY)
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$0894: Z80RMF18
+Object  file $test.1.lib at \$0984: Z80RMF18
   Name: $test.r2ka
   CPU:  r2ka 
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$0908: Z80RMF18
+Object  file $test.1.lib at \$09F8: Z80RMF18
   Name: $test.r2ka-IXIY
   CPU:  r2ka (-IXIY)
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$0984: Z80RMF18
+Object  file $test.1.lib at \$0A74: Z80RMF18
   Name: $test.8080
   CPU:  8080 
   Section "": 1 bytes
     C \$0000: 00
 
-Object  file $test.1.lib at \$09F8: Z80RMF18
+Object  file $test.1.lib at \$0AE8: Z80RMF18
   Name: $test.8080-IXIY
   CPU:  8080 (-IXIY)
   Section "": 1 bytes
@@ -938,6 +1044,7 @@ the_answer = 42
 	ifdef __CPU_EZ80_ADL__	: defm "ez80"		: endif
 	ifdef __CPU_EZ80_Z80__	: defm "ez80_z80"	: endif
 	ifdef __CPU_GBZ80__		: defm "gbz80"		: endif
+	ifdef __CPU_R800__		: defm "r800"		: endif
 	ifdef __CPU_R2KA__		: defm "r2ka"		: endif
 	ifdef __CPU_R3K__		: defm "r3k"		: endif
 	ifdef __CPU_Z180__		: defm "z180"		: endif
@@ -1018,6 +1125,25 @@ Object  file $test.1.lib at \$0518: Z80RMF18
 
 Object  file $test.1.lib at \$0640: Z80RMF18
   Name: $test.1
+  CPU:  r800 
+  Section "": 4 bytes
+    C \$0000: 72 38 30 30
+  Symbols:
+    L C \$0001: __CPU_R800__ (section "") (file $test.1.asm)
+    G C \$002A: the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$072C: Z80RMF18
+  Name: $test.1
+  CPU:  r800 (-IXIY)
+  Section "": 9 bytes
+    C \$0000: 72 38 30 30 2D 49 58 49 59
+  Symbols:
+    L C \$0001: __CPU_R800__ (section "") (file $test.1.asm)
+    L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
+    G C \$002A: the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$084C: Z80RMF18
+  Name: $test.1
   CPU:  z180 
   Section "": 4 bytes
     C \$0000: 7A 31 38 30
@@ -1025,7 +1151,7 @@ Object  file $test.1.lib at \$0640: Z80RMF18
     L C \$0001: __CPU_Z180__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$072C: Z80RMF18
+Object  file $test.1.lib at \$0938: Z80RMF18
   Name: $test.1
   CPU:  z180 (-IXIY)
   Section "": 9 bytes
@@ -1035,7 +1161,7 @@ Object  file $test.1.lib at \$072C: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$084C: Z80RMF18
+Object  file $test.1.lib at \$0A58: Z80RMF18
   Name: $test.1
   CPU:  z80_strict 
   Section "": 10 bytes
@@ -1044,7 +1170,7 @@ Object  file $test.1.lib at \$084C: Z80RMF18
     L C \$0001: __CPU_Z80_STRICT__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0944: Z80RMF18
+Object  file $test.1.lib at \$0B50: Z80RMF18
   Name: $test.1
   CPU:  z80_strict (-IXIY)
   Section "": 15 bytes
@@ -1054,7 +1180,7 @@ Object  file $test.1.lib at \$0944: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0A70: Z80RMF18
+Object  file $test.1.lib at \$0C7C: Z80RMF18
   Name: $test.1
   CPU:  8085 
   Section "": 4 bytes
@@ -1063,7 +1189,7 @@ Object  file $test.1.lib at \$0A70: Z80RMF18
     L C \$0001: __CPU_8085__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0B5C: Z80RMF18
+Object  file $test.1.lib at \$0D68: Z80RMF18
   Name: $test.1
   CPU:  8085 (-IXIY)
   Section "": 9 bytes
@@ -1073,7 +1199,7 @@ Object  file $test.1.lib at \$0B5C: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0C7C: Z80RMF18
+Object  file $test.1.lib at \$0E88: Z80RMF18
   Name: $test.1
   CPU:  r3k 
   Section "": 3 bytes
@@ -1082,7 +1208,7 @@ Object  file $test.1.lib at \$0C7C: Z80RMF18
     L C \$0001: __CPU_R3K__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0D64: Z80RMF18
+Object  file $test.1.lib at \$0F70: Z80RMF18
   Name: $test.1
   CPU:  r3k (-IXIY)
   Section "": 8 bytes
@@ -1092,7 +1218,7 @@ Object  file $test.1.lib at \$0D64: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0E80: Z80RMF18
+Object  file $test.1.lib at \$108C: Z80RMF18
   Name: $test.1
   CPU:  gbz80 
   Section "": 5 bytes
@@ -1101,7 +1227,7 @@ Object  file $test.1.lib at \$0E80: Z80RMF18
     L C \$0001: __CPU_GBZ80__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0F70: Z80RMF18
+Object  file $test.1.lib at \$117C: Z80RMF18
   Name: $test.1
   CPU:  gbz80 (-IXIY)
   Section "": 10 bytes
@@ -1111,7 +1237,7 @@ Object  file $test.1.lib at \$0F70: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$1094: Z80RMF18
+Object  file $test.1.lib at \$12A0: Z80RMF18
   Name: $test.1
   CPU:  ez80 
   Section "": 4 bytes
@@ -1120,7 +1246,7 @@ Object  file $test.1.lib at \$1094: Z80RMF18
     L C \$0001: __CPU_EZ80_ADL__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$1184: Z80RMF18
+Object  file $test.1.lib at \$1390: Z80RMF18
   Name: $test.1
   CPU:  ez80 (-IXIY)
   Section "": 9 bytes
@@ -1130,7 +1256,7 @@ Object  file $test.1.lib at \$1184: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$12A8: Z80RMF18
+Object  file $test.1.lib at \$14B4: Z80RMF18
   Name: $test.1
   CPU:  r2ka 
   Section "": 4 bytes
@@ -1139,7 +1265,7 @@ Object  file $test.1.lib at \$12A8: Z80RMF18
     L C \$0001: __CPU_R2KA__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$1394: Z80RMF18
+Object  file $test.1.lib at \$15A0: Z80RMF18
   Name: $test.1
   CPU:  r2ka (-IXIY)
   Section "": 9 bytes
@@ -1149,7 +1275,7 @@ Object  file $test.1.lib at \$1394: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$14B4: Z80RMF18
+Object  file $test.1.lib at \$16C0: Z80RMF18
   Name: $test.1
   CPU:  8080 
   Section "": 4 bytes
@@ -1158,7 +1284,7 @@ Object  file $test.1.lib at \$14B4: Z80RMF18
     L C \$0001: __CPU_8080__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$15A0: Z80RMF18
+Object  file $test.1.lib at \$17AC: Z80RMF18
   Name: $test.1
   CPU:  8080 (-IXIY)
   Section "": 9 bytes
@@ -1223,6 +1349,16 @@ Object  file $test.1.lib at \$0250: Z80RMF18
 
 Object  file $test.1.lib at \$0378: Z80RMF18
   Name: $test.1
+  CPU:  r800 (-IXIY-soft)
+  Section "": 9 bytes
+    C \$0000: 72 38 30 30 2D 49 58 49 59
+  Symbols:
+    L C \$0001: __CPU_R800__ (section "") (file $test.1.asm)
+    L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
+    G C \$002A: the_answer (section "") (file $test.1.asm:2)
+
+Object  file $test.1.lib at \$0498: Z80RMF18
+  Name: $test.1
   CPU:  z180 (-IXIY-soft)
   Section "": 9 bytes
     C \$0000: 7A 31 38 30 2D 49 58 49 59
@@ -1231,7 +1367,7 @@ Object  file $test.1.lib at \$0378: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0498: Z80RMF18
+Object  file $test.1.lib at \$05B8: Z80RMF18
   Name: $test.1
   CPU:  z80_strict (-IXIY-soft)
   Section "": 15 bytes
@@ -1241,7 +1377,7 @@ Object  file $test.1.lib at \$0498: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$05C4: Z80RMF18
+Object  file $test.1.lib at \$06E4: Z80RMF18
   Name: $test.1
   CPU:  8085 (-IXIY-soft)
   Section "": 9 bytes
@@ -1251,7 +1387,7 @@ Object  file $test.1.lib at \$05C4: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$06E4: Z80RMF18
+Object  file $test.1.lib at \$0804: Z80RMF18
   Name: $test.1
   CPU:  r3k (-IXIY-soft)
   Section "": 8 bytes
@@ -1261,7 +1397,7 @@ Object  file $test.1.lib at \$06E4: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0800: Z80RMF18
+Object  file $test.1.lib at \$0920: Z80RMF18
   Name: $test.1
   CPU:  gbz80 (-IXIY-soft)
   Section "": 10 bytes
@@ -1271,7 +1407,7 @@ Object  file $test.1.lib at \$0800: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0924: Z80RMF18
+Object  file $test.1.lib at \$0A44: Z80RMF18
   Name: $test.1
   CPU:  ez80 (-IXIY-soft)
   Section "": 9 bytes
@@ -1281,7 +1417,7 @@ Object  file $test.1.lib at \$0924: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0A48: Z80RMF18
+Object  file $test.1.lib at \$0B68: Z80RMF18
   Name: $test.1
   CPU:  r2ka (-IXIY-soft)
   Section "": 9 bytes
@@ -1291,7 +1427,7 @@ Object  file $test.1.lib at \$0A48: Z80RMF18
     L C \$0001: __SWAP_IX_IY__ (section "") (file $test.1.asm)
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
 
-Object  file $test.1.lib at \$0B68: Z80RMF18
+Object  file $test.1.lib at \$0C88: Z80RMF18
   Name: $test.1
   CPU:  8080 (-IXIY-soft)
   Section "": 9 bytes
@@ -1364,6 +1500,9 @@ sub cpu_compatible {
 		return 0;
 	}
 	elsif ($code_cpu eq "ez80_z80" && ($lib_cpu eq "8080" || $lib_cpu eq "z180" || $lib_cpu eq "z80_strict")) {
+		return 1;
+	}
+	elsif ($code_cpu eq "r800" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
 		return 1;
 	}
 	elsif ($code_cpu eq "r2ka") {

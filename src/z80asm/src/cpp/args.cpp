@@ -683,6 +683,8 @@ void Args::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_EZ80_ADL__");
     undefine_static_symbol("__CPU_ZILOG__");
 
+    undefine_static_symbol("__CPU_R800__");
+
     undefine_static_symbol("__CPU_R2KA__");
     undefine_static_symbol("__CPU_R3K__");
     undefine_static_symbol("__CPU_RABBIT__");
@@ -731,6 +733,11 @@ void Args::set_cpu(int cpu) {
         define_static_symbol("__CPU_EZ80__");
         define_static_symbol("__CPU_EZ80_Z80__");
         define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_R800:
+        m_cpu = CPU_R800;
+        m_cpu_name = ::cpu_name(m_cpu);
+        define_static_symbol("__CPU_R800__");
         break;
     case CPU_R2KA:
         m_cpu = CPU_R2KA;

@@ -439,6 +439,8 @@ X(XPC, "xpc", 0)
 X(XRA, "xra", 0)
 X(XRI, "xri", 0)
 X(XTHL, "xthl", 0)
+X(MULUB, "mulub", 0)
+X(MULUW, "muluw", 0)
 
 // directives
 X(EQU, "equ", 0)

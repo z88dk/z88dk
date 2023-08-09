@@ -8284,6 +8284,17 @@
  mmu 8, 255                     ; Error
  mmu 8, a                       ; Error
  mul                            ; Error
+ mulub a, a                     ; Error
+ mulub a, b                     ; Error
+ mulub a, c                     ; Error
+ mulub a, d                     ; Error
+ mulub a, e                     ; Error
+ mulub a, h                     ; Error
+ mulub a, l                     ; Error
+ muluw hl, bc                   ; Error
+ muluw hl, de                   ; Error
+ muluw hl, hl                   ; Error
+ muluw hl, sp                   ; Error
  neg a'                         ; Error
  or a', (hl)                    ; Error
  or a', (hl+)                   ; Error

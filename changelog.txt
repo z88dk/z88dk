@@ -44,9 +44,10 @@ Detailed but incomplete changelist:
 - [z80asm] add support of -raw-strings
 - [z80asm] add support of z80_strict that only accepts the documented opcodes
 - [z80asm] do not link with object files built for a different cpu
-- [z80asm] add -IXIY-soft that swap index registers but saves object file as not-swapped
+- [z80asm] add -IXIY-soft that swaps index registers but saves object file as not-swapped
 - [z80asm] add symbol table to libraries to speed-up linking
 - [z80asm] allow the creation of fat libraries with the same code for all CPUs (-m*)
+- [z80asm] add support of r800
 - [zcc] +config at any place, support for -xc
 - [make] add cmake support
 

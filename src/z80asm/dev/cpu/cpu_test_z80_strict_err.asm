@@ -9583,6 +9583,17 @@
  mul                            ; Error
  mul d, e                       ; Error
  mul de                         ; Error
+ mulub a, a                     ; Error
+ mulub a, b                     ; Error
+ mulub a, c                     ; Error
+ mulub a, d                     ; Error
+ mulub a, e                     ; Error
+ mulub a, h                     ; Error
+ mulub a, l                     ; Error
+ muluw hl, bc                   ; Error
+ muluw hl, de                   ; Error
+ muluw hl, hl                   ; Error
+ muluw hl, sp                   ; Error
  neg a'                         ; Error
  nextreg -128, -128             ; Error
  nextreg -128, a                ; Error

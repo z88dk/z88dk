@@ -11,11 +11,12 @@ Z88DK Z80 Module Assembler Change Log
 2023-05-18 Fix #2260: output dir prepended twice
 2023-06-09 Fix #2279: add support to ez80, both z80 memory mode and ADL memory mode
 2023-07-05 Fix #2338, #2333: add -raw-strings option
-2023-08-07 Fix #2320: do not link with object files built for a different cpu
-2023-08-07 Fix #2320: add -IXIY-soft that swap index registers but saves object file as not-swapped
-2023-08-07 Fix #2320: add symbol table to libraries to speed-up linking
-2023-08-07 Fix #2373: create cpu z80_strict with just the documented opcodes
-2023-08-07 Fix #2373: allow the creation of fat libraries with the same code for all CPUs (-m*)
+2023-08-09 Fix #2320: do not link with object files built for a different cpu
+2023-08-09 Fix #2320: add -IXIY-soft that swaps index registers but saves object file as not-swapped
+2023-08-09 Fix #2320: add symbol table to libraries to speed-up linking
+2023-08-09 Fix #2373: create cpu z80_strict with just the documented opcodes
+2023-08-09 Fix #2373: allow the creation of fat libraries with the same code for all CPUs (-m*)
+2023-08-09 Fix #2377: add support of r800
 
 2022
 ----
