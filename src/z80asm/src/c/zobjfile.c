@@ -232,46 +232,50 @@ bool check_obj_lib_file(
     // file exists?
     if (!file_exists(filename)) {
         do_error_file_not_found(filename);
-        goto error;
+        return false;
     }
 
     // can read file?
     fp = fopen(filename, "rb");
     if (fp == NULL) {
         do_error_file_open(filename);
-        goto error;
+        return false;
     }
 
     // can read header?
     char header[SIGNATURE_SIZE + 1];
     if (SIGNATURE_SIZE != fread(header, 1, SIGNATURE_SIZE, fp)) {
         do_error_file_type(filename);
-        goto error;
+        fclose(fp);
+        return false;
     }
     header[SIGNATURE_SIZE] = '\0';
 
     // header has correct prefix?
     if (strncmp(header, signature, SIGNATURE_BASE_SIZE) != 0) {
         do_error_file_type(filename);
-        goto error;
+        fclose(fp);
+        return false;
     }
 
     // has right version?
     int version;
     if (1 != sscanf(header + SIGNATURE_BASE_SIZE, "%d", &version)) {
         do_error_file_type(filename);
-        goto error;
+        fclose(fp);
+        return false;
     }
     if (version != CUR_VERSION) {
         do_error_version(filename, version, CUR_VERSION);
-        goto error;
+        fclose(fp);
+        return false;
     }
 
     // libraries may contain multiple cpu-ixiy combinations
-    if (is_lib)
+    if (is_lib || option_lib_for_all_cpus()) {
+        fclose(fp);
         return true;
-    if (option_lib_for_all_cpus())
-        return true;
+    }
 
     // only for object files
     
@@ -279,22 +283,19 @@ bool check_obj_lib_file(
     int cpu_id = xfread_dword(fp);
     if (!cpu_compatible(option_cpu(), cpu_id)) {
         do_error_cpu_incompatible(filename, cpu_id);
-        goto error;
+        fclose(fp);
+        return false;
     }
 
     // has right -XIIY?
     swap_ixiy_t swap_ixiy = xfread_dword(fp);
     if (!ixiy_compatible(option_swap_ixiy(), swap_ixiy)) {
         do_error_ixiy_incompatible(filename, swap_ixiy);
-        goto error;
+        fclose(fp);
+        return false;
     }
 
     // ok
 	fclose(fp);
 	return true;
-
-error:
-	if (fp)
-		fclose(fp);
-	return false;
 }
