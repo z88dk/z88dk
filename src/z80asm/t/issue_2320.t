@@ -1127,7 +1127,6 @@ END
 
 # make -XIIY-soft library
 
-unlink_testfiles;
 unlink("$test.1.lib");
 capture_ok("z88dk-z80asm -IXIY-soft -m\"*\" -x$test.1.lib $test.1.asm", "");
 ok -f "$test.1.lib", "$test.1.lib created";
