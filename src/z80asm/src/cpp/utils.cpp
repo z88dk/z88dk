@@ -180,12 +180,17 @@ static void expand_wildcards(set<fs::path>& result,
 	const vector<string>& elems, size_t cur_elem) {
 	// build prefix and suffix
 	fs::path prefix;
-	for (size_t i = 0; i < cur_elem; i++)
-		prefix /= fs::path(elems[i]);
+    for (size_t i = 0; i < cur_elem; i++) {
+        prefix /= fs::path(elems[i]);
+    }
+    if (prefix.empty()) {
+        prefix = ".";
+    }
 
 	fs::path suffix;
-	for (size_t i = cur_elem + 1; i < elems.size(); i++)
+    for (size_t i = cur_elem + 1; i < elems.size(); i++) {
 		suffix /= elems[i];
+    }
 
 	// expand current element
 	if (elems[cur_elem] == "**") {
