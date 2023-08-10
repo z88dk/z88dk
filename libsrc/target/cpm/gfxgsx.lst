@@ -28,9 +28,9 @@ graphics/retrofit/obj/${TYPE}/xordrawb_callee
 target/cpm/graphics/obj/${TYPE}/xorborder
 graphics/retrofit/obj/${TYPE}/xorborder_callee
 target/cpm/graphics/obj/${TYPE}/xordrawr
-graphics/retrofit/obj/${TYPE}/obj/${TYPE}/xordrawr_callee
-target/cpm/graphics/xordrawto
-graphics/retrofit/obj/${TYPE}/obj/${TYPE}/xordrawto_callee
+graphics/retrofit/obj/${TYPE}/xordrawr_callee
+target/cpm/graphics/obj/${TYPE}/xordrawto
+graphics/retrofit/obj/${TYPE}/xordrawto_callee
 target/cpm/graphics/obj/${TYPE}/setxy
 target/cpm/graphics/obj/${TYPE}/plot
 graphics/retrofit/obj/${TYPE}/plot_callee

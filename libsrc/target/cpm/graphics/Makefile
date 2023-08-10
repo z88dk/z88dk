@@ -3,8 +3,9 @@ include ../../../Make.config
 TARGET = cpm
 
 
+CFILES = $(wildcard *.c)
 ASMFILES = $(wildcard *.asm)
-OBJECTS = $(ASMFILES:.asm=.o)
+OBJECTS = $(ASMFILES:.asm=.o) $(CFILES:.c=.o)
 
 all: dirs $(addprefix obj/8080/,$(OBJECTS)) $(addprefix obj/z80/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS)) $(addprefix obj/z180/,$(OBJECTS))
 
