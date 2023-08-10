@@ -12,15 +12,22 @@ for my $opts ('', '-d') {
 	for my $ext ('', '.asm', '.o') {
 		unlink_testfiles;
 		spew("${test}.asm", "nop");
-		capture_ok("z88dk-z80asm ${test}${ext}", "");
-		ok -f "${test}.o", "${test}.o exists";
+		if ($ext eq '.o') {
+			capture_nok("z88dk-z80asm ${test}${ext}", <<END);
+error: file not found: test_t_issue_2052.o
+END
+		}
+		else {
+			capture_ok("z88dk-z80asm ${test}${ext}", "");
+			ok -f "${test}.o", "${test}.o exists";
 		
-		spew("${test}.o", "rubbish");	# make .o invalid
-		sleep(1);
-		spew("${test}.asm", "nop");		# touch .asm
-		
-		capture_ok("z88dk-z80asm -b ${opts} ${test}${ext}", "");
-		check_bin_file("${test}.bin", bytes(0));
+			spew("${test}.o", "rubbish");	# make .o invalid
+			sleep(1);
+			spew("${test}.asm", "nop");		# touch .asm
+			
+			capture_ok("z88dk-z80asm -b ${opts} ${test}${ext}", "");
+			check_bin_file("${test}.bin", bytes(0));
+		}
 	}
 }
 

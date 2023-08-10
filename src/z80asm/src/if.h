@@ -114,6 +114,7 @@ void error_cmd_failed(const char* cmd);
 void error_assert_failed();
 void error_cpu_incompatible(const char* filename, int got_cpu_id);
 void error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy);
+void error_date_and_mstar_incompatible();
 
 // options
 bool option_verbose();

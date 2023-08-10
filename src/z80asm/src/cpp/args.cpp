@@ -474,117 +474,129 @@ void Args::expand_list_glob(const string& pattern) {
 // with .asm extension and with .o extension
 // if not found, output error and return original file
 string Args::search_source(const string& filename) {
-	string out_filename;
+    string out_filename;
 
-	// check plain filename
-	if (check_source(filename, out_filename))
-		return out_filename;
+    // check plain filename
+    if (check_source(filename, out_filename))
+        return out_filename;
 
-	// check plain file in include path
-	string found_file = search_include_path(filename);
-	if (check_source(found_file, out_filename))
-		return out_filename;
+    // check plain file in include path
+    string found_file = search_include_path(filename);
+    if (found_file != filename && check_source(found_file, out_filename))
+        return out_filename;
 
-	// check filename with .asm extension
-	string asm_file = asm_filename(filename);
-	if (check_source(asm_file, out_filename))
-		return out_filename;
+    // check filename with .asm extension
+    string asm_file = filename + EXT_ASM;
+    if (check_source(asm_file, out_filename))
+        return out_filename;
 
-	// check filename with .asm extension in include path
-	found_file = search_include_path(asm_file);
-	if (check_source(found_file, out_filename))
-		return out_filename;
+    // check filename with .asm extension in include path
+    found_file = search_include_path(asm_file);
+    if (found_file != asm_file && check_source(found_file, out_filename))
+        return out_filename;
 
-	// check filename with .o extension
-	string o_file = o_filename(filename);
-	if (check_source(o_file, out_filename))
-		return out_filename;
+    // check filename with .o extension
+    string o_file = filename + EXT_O;
+    if (check_source(o_file, out_filename))
+        return out_filename;
 
-	// check filename with .o extension in include path
-	found_file = search_include_path(o_file);
-	if (check_source(found_file, out_filename))
-		return out_filename;
+    // check filename with .o extension in include path
+    found_file = search_include_path(o_file);
+    if (found_file != o_file && check_source(found_file, out_filename))
+        return out_filename;
 
-	// not found, avoid cascade of errors
-	if (g_errors.count() == 0)
-		g_errors.error(ErrCode::FileNotFound, filename);
+    // check object file in the output directory
+    o_file = o_filename(filename);
+    if (check_source(o_file, out_filename))
+        return out_filename;
 
-	return fs::path(filename).generic_string();
+    // check filename with .o extension in include path
+    found_file = search_include_path(o_file);
+    if (found_file != o_file && check_source(found_file, out_filename))
+        return out_filename;
+
+    // not found, avoid cascade of errors
+    if (g_errors.count() == 0)
+        g_errors.error(ErrCode::FileNotFound, filename);
+
+    return fs::path(filename).generic_string();
 }
 
 bool Args::check_source(const string& filename, string& out_filename) {
-	out_filename.clear();
+    out_filename.clear();
 
-	// avoid cascade of errors
-	if (g_errors.count() > 0) {
-		out_filename = fs::path(filename).generic_string();
-		return true;
-	}
+    // avoid cascade of errors
+    if (g_errors.count() > 0) {
+        out_filename = fs::path(filename).generic_string();
+        return true;
+    }
 
-	fs::path file_path{ filename };
-	fs::path src_file, obj_file;
-	bool got_obj;
+    fs::path file_path{ filename };
+    fs::path src_file, obj_file;
+    bool got_obj = false;
 
-	if (!file_path.has_extension()) {
-		if (fs::is_regular_file(file_path))
-			src_file = filename;
-		else
-			src_file = asm_filename(filename);
-		obj_file = o_filename(filename);
-		got_obj = false;
-	}
-	else if (file_path.extension().generic_string() == EXT_O) {
-		src_file = asm_filename(filename);
-		obj_file = file_path;
-		got_obj = true;
-	}
-	else {
-		src_file = file_path;
-		obj_file = o_filename(filename);
-		got_obj = false;
-	}
+    if (file_path.extension().generic_string() == EXT_O) {
+        got_obj = true;
+        obj_file = file_path;
+        src_file = asm_filename(filename);
+    }
+    else if (file_path.extension().generic_string() == EXT_ASM) {
+        got_obj = false;
+        src_file = file_path;
+        obj_file = o_filename(filename);
+    }
+    else if (fs::is_regular_file(file_path)) {      // ASM with different extentension
+        got_obj = false;
+        src_file = file_path;
+        obj_file = o_filename(filename);
+    }
+    else {
+        return false;
+    }
 
-	bool src_ok = fs::is_regular_file(src_file);
-	bool obj_ok = fs::is_regular_file(obj_file) &&
-		check_object_file_no_errors(obj_file.generic_string().c_str());
+    bool src_ok = fs::is_regular_file(src_file);
+    bool obj_ok = fs::is_regular_file(obj_file);
 
-	// if both .o and .asm exist and .o is valid, return .asm
-	// or .o if -d and .o is newer
-	// NOTE: -d must come before the file to have effect
-	if (src_ok && obj_ok) {
-		if (!m_date_stamp) {
-			// no -d
-			if (got_obj)
-				out_filename = obj_file.generic_string();
-			else
-				out_filename = src_file.generic_string();
-			return true;
-		}
-		else if (fs::last_write_time(obj_file) >= fs::last_write_time(src_file)) {
-			// -d and .o is up-to-date
-			out_filename = obj_file.generic_string();
-			return true;
-		}
-		else {
-			// -d and .o is old
-			out_filename = src_file.generic_string();
-			return true;
-		}
-	}
-	else if (src_ok) {
-		out_filename = src_file.generic_string();
-		return true;
-	}
-	else if (obj_ok) {
-		out_filename = obj_file.generic_string();
-		return true;
-	}
-	else {
-		// output object file errors, if any
-		if (fs::is_regular_file(obj_file))
-			check_object_file(obj_file.generic_string().c_str());
-		return false;
-	}
+    // if both .o and .asm exist, return .asm or .o if -d and .o is newer
+    // NOTE: -d must come before the file to have effect
+    if (src_ok && obj_ok) {
+        if (!m_date_stamp) {
+            // no -d
+            if (got_obj) {
+                out_filename = obj_file.generic_string();
+                if (!m_lib_for_all_cpus)
+                    check_object_file(obj_file.generic_string().c_str());
+            }
+            else
+                out_filename = src_file.generic_string();
+            return true;
+        }
+        else if (fs::last_write_time(obj_file) >= fs::last_write_time(src_file)) {
+            // -d and .o is up-to-date
+            out_filename = obj_file.generic_string();
+            if (!m_lib_for_all_cpus)
+                check_object_file(obj_file.generic_string().c_str());
+            return true;
+        }
+        else {
+            // -d and .o is old
+            out_filename = src_file.generic_string();
+            return true;
+        }
+    }
+    else if (!got_obj && src_ok) {
+        out_filename = src_file.generic_string();
+        return true;
+    }
+    else if (got_obj && obj_ok) {
+        out_filename = obj_file.generic_string();
+        if (!m_lib_for_all_cpus)
+            check_object_file(obj_file.generic_string().c_str());
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 static string next_arg(const char*& p) {
@@ -819,13 +831,20 @@ void Args::pre_parsing_actions() {
 void Args::post_parsing_actions() {
 	set_consol_obj_options();
 
+    // check if -d and -m* were given
+    if (m_date_stamp && m_lib_for_all_cpus) {
+        g_errors.error(ErrCode::DateAndMstarIncompatible);
+    }
+
 	// check if we have any file to process
-	if (m_files.empty())
+    if (m_files.empty()) {
 		g_errors.error(ErrCode::NoSrcFile);
+    }
 
 	// make output directory if needed
-	if (!m_output_dir.empty())
+    if (!m_output_dir.empty()) {
 		fs::create_directories(fs::path(m_output_dir));
+    }
 
 	define_assembly_defines();
 	include_z80asm_lib();

@@ -383,3 +383,7 @@ void error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy) {
         << ", incompatible with " << ixiy_to_string(g_args.swap_ixiy());
     g_errors.error(ErrCode::IXIYIncompatible, error.str());
 }
+
+void error_date_and_mstar_incompatible() {
+    g_errors.error(ErrCode::DateAndMstarIncompatible);
+}

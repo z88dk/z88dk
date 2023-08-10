@@ -26,6 +26,7 @@ X(InvalidDefineOption, "invalid define (-Dvar=value) option")
 X(InvalidFillerOption, "invalid filler (-f) option")
 X(CmdFailed, "command failed")
 X(InvalidCpu, "invalid cpu")
+X(DateAndMstarIncompatible, "cannot build libraries with -m* and -d")
 
 // lexer
 X(InvalidChar, "invalid character")

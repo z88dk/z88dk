@@ -160,6 +160,9 @@ void make_library(const char *lib_filename) {
                     remove(utstring_body(temp_filename));
                     goto cleanup_and_return;
                 }
+
+                if (option_verbose())
+                    printf("\n");
             }
         }
     }
