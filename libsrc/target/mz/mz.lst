@@ -8,7 +8,7 @@ target/mz/stdio/ansi/f_ansi_attr
 target/mz/stdio/ansi/f_ansi_bel
 target/mz/stdio/ansi/f_ansi_char
 target/mz/stdio/ansi/f_ansi_cls
-stdio/ansi/generic/f_ansi_dline
+stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/mz/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
 @psg/sn76489/sn76489.lst

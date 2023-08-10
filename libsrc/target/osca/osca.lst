@@ -6,7 +6,7 @@ target/osca/stdio/ansi/f_ansi_attr
 target/osca/stdio/ansi/f_ansi_bel
 target/osca/stdio/ansi/f_ansi_char
 target/osca/stdio/ansi//f_ansi_cls
-stdio/ansi/generic/f_ansi_dline
+stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/osca/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
 gfx/wide/obj/osca/w_dcircle_square.asm

@@ -36,7 +36,7 @@ target/nc100/heapfree
 target/nc100/heaplock
 target/nc100/heapmaxfree
 target/nc100/heaprealloc
-target/nc100/kmcharreturn.sm
+target/nc100/kmcharreturn
 target/nc100/kmgetyellow
 target/nc100/kmreadchar
 target/nc100/kmreadkbd

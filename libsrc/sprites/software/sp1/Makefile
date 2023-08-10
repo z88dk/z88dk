@@ -6,8 +6,8 @@ sp1-all:
 	@echo
 	@echo --- SP1 Software Sprite Engine ---
 	# newlib and sccz80 + classic libraries
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1-ts2068 @ts2068hr.lst
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1-zx81hr -IXIY @zx81hr.lst
+	$(LIBLINKER2) -x$(OUTPUT_DIRECTORY)/sp1-ts2068 @ts2068hr.lst
+	$(LIBLINKER2) -x$(OUTPUT_DIRECTORY)/sp1-zx81hr -IXIY @zx81hr.lst
 	# sdcc + classic library
 	$(MAKE) -C zx all
 	cp zx/sp1-zx.lib $(OUTPUT_DIRECTORY)

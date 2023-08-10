@@ -38,4 +38,4 @@ target/zx/input/in_WaitForNoKey
 target/zx/input/INMouseAMX
 target/zx/input/INMouseKemp
 target/zx/input/INMouseSim
-input/fgetc_cons_inkey
+input/obj/${TYPE}/fgetc_cons_inkey

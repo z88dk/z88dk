@@ -6,7 +6,7 @@ target/x1/input/in_Pause
 target/x1/input/in_Wait
 target/x1/input/in_WaitForKey
 target/x1/input/in_WaitForNoKey
-input/fgetc_cons_inkey
+input/obj/${TYPE}/fgetc_cons_inkey
 target/x1/stdio/generic_console_cls
 target/x1/stdio/generic_console_ioctl
 target/x1/stdio/generic_console_printc

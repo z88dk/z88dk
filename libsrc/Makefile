@@ -186,6 +186,7 @@ include font/font_4x8/font_4x8.mak
 include font/font_8x8/font_8x8.mak
 include font/font_8x10/font_8x10.mak
 include font/fzx/fzx.mak
+include graphics/retrofit/retrofit.mak
 include gfx/portable/portable.mak
 include gfx/x11/x11.mak
 include input/input.mak
@@ -1200,7 +1201,7 @@ z80_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building +z80 Library ---'
 	@echo ''
 	$(call buildgeneric,z80)
-	TARGET=z80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/z80_clib @$(TARGET_DIRECTORY)/z80/z80.lst
+	TARGET=z80 TYPE=z80 $(LIBLINKER2) -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/z80_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Barebone z80 (ixiy swapped)clib
 ixiy_clib.lib: $(TARGET_CLIB_OBJS)
@@ -1208,7 +1209,7 @@ ixiy_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building +z80 (ixiy) Library ---'
 	@echo ''
 	$(call buildgeneric,z80)
-	TARGET=z80 TYPE=ixiy $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/ixiy_clib @$(TARGET_DIRECTORY)/z80/z80.lst
+	TARGET=z80 TYPE=ixiy $(LIBLINKER2) -IXIY -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/ixiy_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Barebone z80/8080 clib
 8080_clib.lib: $(TARGET_CLIB_OBJS)
@@ -1216,7 +1217,7 @@ ixiy_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building +z80 (8080) Library ---'
 	@echo ''
 	$(call buildgeneric,z80)
-	TARGET=z80 TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8080_clib @$(TARGET_DIRECTORY)/z80/808x.lst
+	TARGET=z80 TYPE=8080 $(LIBLINKER2) -m8080 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8080_clib @$(TARGET_DIRECTORY)/z80/808x.lst
 
 # Barebone z80/8085 clib
 8085_clib.lib: $(TARGET_CLIB_OBJS)
@@ -1224,7 +1225,7 @@ ixiy_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building +z80 (8085) Library ---'
 	@echo ''
 	$(call buildgeneric,z80)
-	TARGET=z80 TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8085_clib @$(TARGET_DIRECTORY)/z80/808x.lst
+	TARGET=z80 TYPE=8085 $(LIBLINKER2) -m8085 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8085_clib @$(TARGET_DIRECTORY)/z80/808x.lst
 
 # Barebone z80/r2k clib
 r2ka_clib.lib: $(TARGET_CLIB_OBJS)
@@ -1232,7 +1233,7 @@ r2ka_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building +z80 (r2ka) Library ---'
 	@echo ''
 	$(call buildgeneric,z80)
-	TARGET=z80 TYPE=r2k $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/r2ka_clib @$(TARGET_DIRECTORY)/z80/z80.lst
+	TARGET=z80 TYPE=r2k $(LIBLINKER2) -mr2ka -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/r2ka_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
 kc_clib.lib: $(TARGET_CLIB_OBJS)
@@ -1723,42 +1724,42 @@ test_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building Test System Library ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=z80 $(LIBLINKER) -mz80 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test_clib @$(TARGET_DIRECTORY)/test/test.lst
+	TARGET=test TYPE=z80 $(LIBLINKER2) -mz80 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test_clib @$(TARGET_DIRECTORY)/test/test.lst
 
 testz180_clib.lib: $(TARGET_CLIB_OBJS) test_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (z180) ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=z180 $(LIBLINKER) -mz180 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testz180_clib @$(TARGET_DIRECTORY)/test/test.lst
+	TARGET=test TYPE=z180 $(LIBLINKER2) -mz180 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testz180_clib @$(TARGET_DIRECTORY)/test/test.lst
 
 testez80_z80_clib.lib: $(TARGET_CLIB_OBJS) testz180_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (ez80_z80) ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testez80_z80_clib @$(TARGET_DIRECTORY)/test/test.lst
+	TARGET=test TYPE=ez80_z80 $(LIBLINKER2) -mez80_z80 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testez80_z80_clib @$(TARGET_DIRECTORY)/test/test.lst
 
 testrcm_clib.lib: $(TARGET_CLIB_OBJS) testez80_z80_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (Rabbit) ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=r2k $(LIBLINKER) -mr2ka -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
+	TARGET=test TYPE=r2k $(LIBLINKER2) -mr2ka -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
 
 test8080_clib.lib: $(TARGET_CLIB_OBJS) testrcm_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (8080) ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=8080 $(LIBLINKER) -m8080 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test8080_clib @$(TARGET_DIRECTORY)/test/test8080.lst
+	TARGET=test TYPE=8080 $(LIBLINKER2) -m8080 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test8080_clib @$(TARGET_DIRECTORY)/test/test8080.lst
 
 testgbz80_clib.lib: $(TARGET_CLIB_OBJS) test8080_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (gbz80) ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=gbz80 $(LIBLINKER) -mgbz80 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testgbz80_clib @$(TARGET_DIRECTORY)/test/testgbz80.lst
+	TARGET=test TYPE=gbz80 $(LIBLINKER2) -mgbz80 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testgbz80_clib @$(TARGET_DIRECTORY)/test/testgbz80.lst
 
 
 # TRS 80 - stefano
