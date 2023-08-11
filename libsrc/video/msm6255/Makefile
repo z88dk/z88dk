@@ -23,10 +23,10 @@ OBJECTS = $(CFILES:.c=.o) $(ASMFILES:.asm=.o)
 all: dirs $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)) $(SUBDIRS)
 
 obj/$(OBJSUBDIR)/%.o: %.c
-	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
+	$(ZCC) +$(TARGET) $(CFLAGS) -Ca$(ASMFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
-	$(Q)$(ASSEMBLER) $(ASMFLAGS) -I../.. -Oobj/$(OBJSUBDIR) $^
+	$(ZCC) +$(TARGET) $(CFLAGS) -Ca$(ASMFLAGS) -o $@  $^
 
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR)

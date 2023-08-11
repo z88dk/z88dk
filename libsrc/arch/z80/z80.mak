@@ -17,6 +17,7 @@ ARCHZ80_NEWLIB_TARGETS := arch/z80/obj/newlib-z80-arch-z80 arch/z80/obj/newlib-z
 ARCHZ80_OBJECTS = $(ARCHZ80_CFILES:.c=.o) $(ARCHZ80_AFILES:.asm=.o)
 
 ARCHZ80_OBJS = $(addprefix arch/z80/obj/z80/, $(ARCHZ80_OBJECTS)) $(addprefix arch/z80/obj/ixiy/,$(ARCHZ80_OBJECTS))  $(addprefix arch/z80/obj/z80n/,$(ARCHZ80_OBJECTS))  $(addprefix arch/z80/obj/r2k/, $(ARCHZ80_R2K_OBJECTS)) \
+	$(addprefix arch/z80/obj/z180/, $(ARCHZ80_OBJECTS)) \
 	$(addprefix arch/z80/obj/ez80_z80/, $(ARCHZ80_OBJECTS))
 
 
@@ -31,6 +32,7 @@ $(eval $(call buildbit,arch/z80,z80,test))
 $(eval $(call buildbit,arch/z80,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,arch/z80,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,arch/z80,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,arch/z80,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,arch/z80,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 
 

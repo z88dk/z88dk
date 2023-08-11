@@ -26,7 +26,7 @@ endif
 
 OBJECTS = $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
 
-NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy obj/newlib-8080 obj/newlib-gbz80 obj/newlib-ez80_z80 obj/newlib-z180
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy obj/newlib-8080 obj/newlib-gbz80 obj/newlib-ez80_z80 obj/newlib-z180 obj/newlib-8085
 
 .PHONY: dirs  $(NEWLIB_TARGETS)
 
@@ -65,6 +65,9 @@ obj/newlib-ez80_z80:
 
 obj/newlib-z180:
 	@$(ASSEMBLER) -d -O=obj/z180/x -I.. -mz180 -D__CLASSIC $(NEWLIBGLOBS)
+
+obj/newlib-8085:
+	@$(ASSEMBLER) -d -O=obj/8085/x -I.. -m8085 -D__CLASSIC $(NEWLIBGLOBS)
 
 
 dirs:

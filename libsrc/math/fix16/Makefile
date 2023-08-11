@@ -11,6 +11,7 @@ CFLAGS +=
 
 all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/, $(OBJECTS)) \
 	$(addprefix obj/ixiy/, $(OBJECTS)) $(addprefix obj/z80n/, $(OBJECTS)) \
+	$(addprefix obj/z180/, $(OBJECTS)) \
 	$(addprefix obj/ez80_z80/, $(OBJECTS))
 
 obj/z80/%.o: %.c
@@ -26,10 +27,16 @@ obj/z80n/%.o: %.asm
 	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80n -D__CLASSIC -Oobj/z80n  $^
 
 obj/ixiy/%.o: %.c
-	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
+	$(ZCC) +test -mz80 -Ca-IXIY $(CFLAGS) -o $@  $^
 
 obj/ixiy/%.o: %.asm
 	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -IXIY -mz80 -D__CLASSIC -Oobj/ixiy  $^
+
+obj/z180/%.o: %.c
+	$(ZCC) +test -clib=z180 $(CFLAGS) -o $@  $^
+
+obj/z180/%.o: %.asm
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz180 -D__CLASSIC -Oobj/z180 $^
 
 obj/r2k/%.o: %.c
 	$(ZCC) +test -clib=rabbit $(CFLAGS) -o $@  $^
@@ -50,6 +57,7 @@ dirs:
 	@mkdir -p obj/r2k/c/sccz80  obj/r2k/z80 obj/r2k/cimpl
 	@mkdir -p obj/ixiy/c/sccz80  obj/ixiy/z80 obj/ixiy/cimpl
 	@mkdir -p obj/ez80_z80/c/sccz80  obj/ez80_z80/z80 obj/ez80_z80/cimpl
+	@mkdir -p obj/z180/c/sccz80  obj/z180/z80 obj/z180/cimpl
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt

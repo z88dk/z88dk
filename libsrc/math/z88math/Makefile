@@ -23,16 +23,16 @@ $(OUTPUT_DIRECTORY)/bbc_math.lib: $(addprefix obj/z80/, $(OBJECTS))
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/bbc_math @z88math.lst
 
 $(OUTPUT_DIRECTORY)/bbc_math_z80n.lib: $(addprefix obj/z80n/, $(OBJECTS))
-	TYPE=z80n $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/bbc_math_z80n @z88math.lst
+	TYPE=z80n $(LIBLINKER) -mz80n -x$(OUTPUT_DIRECTORY)/bbc_math_z80n @z88math.lst
 
 $(OUTPUT_DIRECTORY)/bbc_math_ez80_z80.lib: $(addprefix obj/ez80_z80/, $(OBJECTS))
-	TYPE=ez80_z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/bbc_math_ez80_z80 @z88math.lst
+	TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -x$(OUTPUT_DIRECTORY)/bbc_math_ez80_z80 @z88math.lst
 
 $(OUTPUT_DIRECTORY)/bbc_math_z180.lib: $(addprefix obj/z180/, $(OBJECTS))
-	TYPE=z180 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/bbc_math_z180 @z88math.lst
+	TYPE=z180 $(LIBLINKER) -mz180 -x$(OUTPUT_DIRECTORY)/bbc_math_z180 @z88math.lst
 
 $(OUTPUT_DIRECTORY)/bbc_math_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
-	TYPE=z80 $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/bbc_math_ixiy @z88math.lst
+	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/bbc_math_ixiy @z88math.lst
 
 obj/z88/%.o: %.c
 	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^

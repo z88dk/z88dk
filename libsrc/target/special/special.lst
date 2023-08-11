@@ -8,8 +8,8 @@ target/special/stdio/fputc_cons_native
 target/special/stdio/fputc_cons_native
 target/special/stdio/fgetc_cons
 @stdio/stdio.lst
-stdio/inkey/getk
-stdio/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
 
 
 target/special/graphics/clg

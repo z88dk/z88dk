@@ -11,6 +11,7 @@
 #include "scan.h"
 #include "preproc.h"
 #include "utils.h"
+#include "z80asm_cpu.h"
 #include "../config.h"
 #include <iostream>
 #include <iomanip>
@@ -84,6 +85,11 @@ void Args::exit_help() {
 }
 
 //-----------------------------------------------------------------------------
+Args::Args()
+    : m_cpu(CPU_Z80), m_cpu_name(::cpu_name(m_cpu)) {
+}
+
+//-----------------------------------------------------------------------------
 // parsing
 //-----------------------------------------------------------------------------
 void Args::parse_args(const vector<string>& args) {
@@ -117,6 +123,23 @@ void Args::parse_args(const vector<string>& args) {
 	}
 
 	post_parsing_actions();
+}
+
+void Args::set_swap_ixiy(swap_ixiy_t swap_ixiy) {
+    m_swap_ixiy = swap_ixiy;
+
+    undefine_static_symbol("__SWAP_IX_IY__");
+
+    switch (m_swap_ixiy) {
+    case IXIY_NO_SWAP:
+        break;
+    case IXIY_SWAP:
+    case IXIY_SOFT_SWAP:
+        define_static_symbol("__SWAP_IX_IY__");
+        break;
+    default:
+        Assert(0);
+    }
 }
 
 string Args::prepend_output_dir(const string& filename) {
@@ -451,117 +474,129 @@ void Args::expand_list_glob(const string& pattern) {
 // with .asm extension and with .o extension
 // if not found, output error and return original file
 string Args::search_source(const string& filename) {
-	string out_filename;
+    string out_filename;
 
-	// check plain filename
-	if (check_source(filename, out_filename))
-		return out_filename;
+    // check plain filename
+    if (check_source(filename, out_filename))
+        return out_filename;
 
-	// check plain file in include path
-	string found_file = search_include_path(filename);
-	if (check_source(found_file, out_filename))
-		return out_filename;
+    // check plain file in include path
+    string found_file = search_include_path(filename);
+    if (found_file != filename && check_source(found_file, out_filename))
+        return out_filename;
 
-	// check filename with .asm extension
-	string asm_file = asm_filename(filename);
-	if (check_source(asm_file, out_filename))
-		return out_filename;
+    // check filename with .asm extension
+    string asm_file = filename + EXT_ASM;
+    if (check_source(asm_file, out_filename))
+        return out_filename;
 
-	// check filename with .asm extension in include path
-	found_file = search_include_path(asm_file);
-	if (check_source(found_file, out_filename))
-		return out_filename;
+    // check filename with .asm extension in include path
+    found_file = search_include_path(asm_file);
+    if (found_file != asm_file && check_source(found_file, out_filename))
+        return out_filename;
 
-	// check filename with .o extension
-	string o_file = o_filename(filename);
-	if (check_source(o_file, out_filename))
-		return out_filename;
+    // check filename with .o extension
+    string o_file = filename + EXT_O;
+    if (check_source(o_file, out_filename))
+        return out_filename;
 
-	// check filename with .o extension in include path
-	found_file = search_include_path(o_file);
-	if (check_source(found_file, out_filename))
-		return out_filename;
+    // check filename with .o extension in include path
+    found_file = search_include_path(o_file);
+    if (found_file != o_file && check_source(found_file, out_filename))
+        return out_filename;
 
-	// not found, avoid cascade of errors
-	if (g_errors.count() == 0)
-		g_errors.error(ErrCode::FileNotFound, filename);
+    // check object file in the output directory
+    o_file = o_filename(filename);
+    if (check_source(o_file, out_filename))
+        return out_filename;
 
-	return fs::path(filename).generic_string();
+    // check filename with .o extension in include path
+    found_file = search_include_path(o_file);
+    if (found_file != o_file && check_source(found_file, out_filename))
+        return out_filename;
+
+    // not found, avoid cascade of errors
+    if (g_errors.count() == 0)
+        g_errors.error(ErrCode::FileNotFound, filename);
+
+    return fs::path(filename).generic_string();
 }
 
 bool Args::check_source(const string& filename, string& out_filename) {
-	out_filename.clear();
+    out_filename.clear();
 
-	// avoid cascade of errors
-	if (g_errors.count() > 0) {
-		out_filename = fs::path(filename).generic_string();
-		return true;
-	}
+    // avoid cascade of errors
+    if (g_errors.count() > 0) {
+        out_filename = fs::path(filename).generic_string();
+        return true;
+    }
 
-	fs::path file_path{ filename };
-	fs::path src_file, obj_file;
-	bool got_obj;
+    fs::path file_path{ filename };
+    fs::path src_file, obj_file;
+    bool got_obj = false;
 
-	if (!file_path.has_extension()) {
-		if (fs::is_regular_file(file_path))
-			src_file = filename;
-		else
-			src_file = asm_filename(filename);
-		obj_file = o_filename(filename);
-		got_obj = false;
-	}
-	else if (file_path.extension().generic_string() == EXT_O) {
-		src_file = asm_filename(filename);
-		obj_file = file_path;
-		got_obj = true;
-	}
-	else {
-		src_file = file_path;
-		obj_file = o_filename(filename);
-		got_obj = false;
-	}
+    if (file_path.extension().generic_string() == EXT_O) {
+        got_obj = true;
+        obj_file = file_path;
+        src_file = asm_filename(filename);
+    }
+    else if (file_path.extension().generic_string() == EXT_ASM) {
+        got_obj = false;
+        src_file = file_path;
+        obj_file = o_filename(filename);
+    }
+    else if (fs::is_regular_file(file_path)) {      // ASM with different extentension
+        got_obj = false;
+        src_file = file_path;
+        obj_file = o_filename(filename);
+    }
+    else {
+        return false;
+    }
 
-	bool src_ok = fs::is_regular_file(src_file);
-	bool obj_ok = fs::is_regular_file(obj_file) &&
-		check_object_file_no_errors(obj_file.generic_string().c_str());
+    bool src_ok = fs::is_regular_file(src_file);
+    bool obj_ok = fs::is_regular_file(obj_file);
 
-	// if both .o and .asm exist and .o is valid, return .asm
-	// or .o if -d and .o is newer
-	// NOTE: -d must come before the file to have effect
-	if (src_ok && obj_ok) {
-		if (!m_date_stamp) {
-			// no -d
-			if (got_obj)
-				out_filename = obj_file.generic_string();
-			else
-				out_filename = src_file.generic_string();
-			return true;
-		}
-		else if (fs::last_write_time(obj_file) >= fs::last_write_time(src_file)) {
-			// -d and .o is up-to-date
-			out_filename = obj_file.generic_string();
-			return true;
-		}
-		else {
-			// -d and .o is old
-			out_filename = src_file.generic_string();
-			return true;
-		}
-	}
-	else if (src_ok) {
-		out_filename = src_file.generic_string();
-		return true;
-	}
-	else if (obj_ok) {
-		out_filename = obj_file.generic_string();
-		return true;
-	}
-	else {
-		// output object file errors, if any
-		if (fs::is_regular_file(obj_file))
-			check_object_file(obj_file.generic_string().c_str());
-		return false;
-	}
+    // if both .o and .asm exist, return .asm or .o if -d and .o is newer
+    // NOTE: -d must come before the file to have effect
+    if (src_ok && obj_ok) {
+        if (!m_date_stamp) {
+            // no -d
+            if (got_obj) {
+                out_filename = obj_file.generic_string();
+                if (!m_lib_for_all_cpus)
+                    check_object_file(obj_file.generic_string().c_str());
+            }
+            else
+                out_filename = src_file.generic_string();
+            return true;
+        }
+        else if (fs::last_write_time(obj_file) >= fs::last_write_time(src_file)) {
+            // -d and .o is up-to-date
+            out_filename = obj_file.generic_string();
+            if (!m_lib_for_all_cpus)
+                check_object_file(obj_file.generic_string().c_str());
+            return true;
+        }
+        else {
+            // -d and .o is old
+            out_filename = src_file.generic_string();
+            return true;
+        }
+    }
+    else if (!got_obj && src_ok) {
+        out_filename = src_file.generic_string();
+        return true;
+    }
+    else if (got_obj && obj_ok) {
+        out_filename = obj_file.generic_string();
+        if (!m_lib_for_all_cpus)
+            check_object_file(obj_file.generic_string().c_str());
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 static string next_arg(const char*& p) {
@@ -652,12 +687,15 @@ string Args::search_path(vector<string>& path, const string& file) {
 
 void Args::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_Z80__");
+    undefine_static_symbol("__CPU_Z80_STRICT__");
     undefine_static_symbol("__CPU_Z80N__");
     undefine_static_symbol("__CPU_Z180__");
     undefine_static_symbol("__CPU_EZ80__");
     undefine_static_symbol("__CPU_EZ80_Z80__");
     undefine_static_symbol("__CPU_EZ80_ADL__");
     undefine_static_symbol("__CPU_ZILOG__");
+
+    undefine_static_symbol("__CPU_R800__");
 
     undefine_static_symbol("__CPU_R2KA__");
     undefine_static_symbol("__CPU_R3K__");
@@ -672,63 +710,74 @@ void Args::set_cpu(int cpu) {
     switch (cpu) {
     case CPU_Z80:
         m_cpu = CPU_Z80;
-        m_cpu_name = CPU_Z80_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_Z80__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_Z80_STRICT:
+        m_cpu = CPU_Z80_STRICT;
+        m_cpu_name = ::cpu_name(m_cpu);
+        define_static_symbol("__CPU_Z80_STRICT__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_Z80N:
         m_cpu = CPU_Z80N;
-        m_cpu_name = CPU_Z80N_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_Z80N__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_Z180:
         m_cpu = CPU_Z180;
-        m_cpu_name = CPU_Z180_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_Z180__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_EZ80:
         m_cpu = CPU_EZ80;
-        m_cpu_name = CPU_EZ80_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_EZ80__");
         define_static_symbol("__CPU_EZ80_ADL__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_EZ80_Z80:
         m_cpu = CPU_EZ80_Z80;
-        m_cpu_name = CPU_EZ80_Z80_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_EZ80__");
         define_static_symbol("__CPU_EZ80_Z80__");
         define_static_symbol("__CPU_ZILOG__");
         break;
+    case CPU_R800:
+        m_cpu = CPU_R800;
+        m_cpu_name = ::cpu_name(m_cpu);
+        define_static_symbol("__CPU_R800__");
+        break;
     case CPU_R2KA:
         m_cpu = CPU_R2KA;
-        m_cpu_name = CPU_R2KA_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_R2KA__");
         define_static_symbol("__CPU_RABBIT__");
         break;
     case CPU_R3K:
         m_cpu = CPU_R3K;
-        m_cpu_name = CPU_R3K_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_R3K__");
         define_static_symbol("__CPU_RABBIT__");
         break;
     case CPU_8080:
         m_cpu = CPU_8080;
-        m_cpu_name = CPU_8080_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_8080__");
         define_static_symbol("__CPU_INTEL__");
         break;
     case CPU_8085:
         m_cpu = CPU_8085;
-        m_cpu_name = CPU_8085_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_8085__");
         define_static_symbol("__CPU_INTEL__");
         break;
     case CPU_GBZ80:
         m_cpu = CPU_GBZ80;
-        m_cpu_name = CPU_GBZ80_NAME;
+        m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_GBZ80__");
         break;
     default:
@@ -737,41 +786,28 @@ void Args::set_cpu(int cpu) {
 }
 
 void Args::set_cpu(const string& name) {
-    static std::map<string, int> cpu_map = {
-        {CPU_Z80_NAME, CPU_Z80},
-        {CPU_Z80N_NAME, CPU_Z80N},
-        {CPU_Z180_NAME, CPU_Z180},
-        {CPU_EZ80_NAME, CPU_EZ80},
-        {CPU_EZ80_Z80_NAME, CPU_EZ80_Z80},
-        {CPU_R2KA_NAME, CPU_R2KA},
-        {CPU_R3K_NAME, CPU_R3K},
-        {CPU_8080_NAME, CPU_8080},
-        {CPU_8085_NAME, CPU_8085},
-        {CPU_GBZ80_NAME, CPU_GBZ80},
-    };
-
     m_got_cpu_option = true;
 
-    if (name == ARCH_TI83_NAME) {
+    if (name == "*") {
         set_cpu(CPU_Z80);
+        m_lib_for_all_cpus = true;
+    }
+    else if (name == ARCH_TI83_NAME) {
+        set_cpu(CPU_Z80_STRICT);
         m_ti83 = true;
         m_ti83plus = false;
     }
     else if (name == ARCH_TI83PLUS_NAME) {
-        set_cpu(CPU_Z80);
+        set_cpu(CPU_Z80_STRICT);
         m_ti83 = false;
         m_ti83plus = true;
     }
     else {
-        auto it = cpu_map.find(name);
-        if (it != cpu_map.end()) {
-            set_cpu(it->second);
-        }
+        int id = cpu_id(name.c_str());
+        if (id >= 0)
+            set_cpu(id);
         else {
-            string error = name + "; expected: ";
-            for (auto& it : cpu_map) {
-                error += it.first + ",";
-            }
+            string error = name + "; expected: " + cpu_list() + ",";
             error += string(ARCH_TI83_NAME) + ",";
             error += string(ARCH_TI83PLUS_NAME) + ",";
             error.pop_back(); // remove last comma
@@ -795,13 +831,20 @@ void Args::pre_parsing_actions() {
 void Args::post_parsing_actions() {
 	set_consol_obj_options();
 
+    // check if -d and -m* were given
+    if (m_date_stamp && m_lib_for_all_cpus) {
+        g_errors.error(ErrCode::DateAndMstarIncompatible);
+    }
+
 	// check if we have any file to process
-	if (m_files.empty())
+    if (m_files.empty()) {
 		g_errors.error(ErrCode::NoSrcFile);
+    }
 
 	// make output directory if needed
-	if (!m_output_dir.empty())
+    if (!m_output_dir.empty()) {
 		fs::create_directories(fs::path(m_output_dir));
+    }
 
 	define_assembly_defines();
 	include_z80asm_lib();
@@ -870,15 +913,10 @@ string Args::search_z80asm_lib() {
 	return "";
 }
 
-// build z80asm_lib filename: z88dk-z80asm-<cpu>-<ixiy|''>.lib
+// build z80asm_lib filename: z88dk-z80asm.lib
 string Args::z80asm_lib_filename() {
 	string filename;
 	filename = Z80ASM_LIB_BASE;
-	filename += "-";
-	filename += m_cpu_name;
-	filename += "-";
-	if (m_swap_ixiy)
-		filename += "ixiy";
 	filename += EXT_LIB;
 	return filename;
 }
@@ -898,12 +936,7 @@ void Args::define_assembly_defines() {
     if (!m_got_cpu_option)
         set_cpu(CPU_Z80);
 
-    if (m_swap_ixiy) {
-        define_static_symbol("__SWAP_IX_IY__");
-    }
-    else {
-        undefine_static_symbol("__SWAP_IX_IY__");
-    }
+    set_swap_ixiy(m_swap_ixiy);
 
 	if (m_ti83) {
 		define_static_symbol("__CPU_TI83__");
@@ -937,8 +970,12 @@ bool option_verbose() {
 	return g_args.verbose();
 }
 
-bool option_swap_ixiy() {
+swap_ixiy_t option_swap_ixiy() {
 	return g_args.swap_ixiy();
+}
+
+void set_swap_ixiy_option(swap_ixiy_t swap_ixiy) {
+    g_args.set_swap_ixiy(swap_ixiy);
 }
 
 void push_includes(const char* dir) {
@@ -993,6 +1030,10 @@ const char* option_lib_file() {
 		return nullptr;
 	else
 		return spool_add(filename.c_str());
+}
+
+bool option_lib_for_all_cpus() {
+    return !g_args.lib_file().empty() && g_args.lib_for_all_cpus();
 }
 
 const char* option_bin_file() {

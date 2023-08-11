@@ -15,6 +15,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "array.h"
 #include "class.h"
 #include "classlist.h"
+#include "objfile.h"
 #include "scan1.h"
 #include "sym.h"
 #include "utarray.h"
@@ -80,22 +81,6 @@ typedef struct ExprOp				/* hold one operation or operand */
 } ExprOp;
 
 ARRAY(ExprOp);					/* hold list of Expr1 operations/operands */
-
-/*-----------------------------------------------------------------------------
-*	Expression range
-*----------------------------------------------------------------------------*/
-typedef enum {
-	RANGE_JR_OFFSET = 1,
-	RANGE_BYTE_UNSIGNED,
-	RANGE_BYTE_SIGNED,
-	RANGE_WORD,						// 16-bit value little-endian
-	RANGE_WORD_BE,					// 16-bit value big-endian
-	RANGE_DWORD,
-	RANGE_BYTE_TO_WORD_UNSIGNED,    // unsigned byte extended to 16 bits
-	RANGE_BYTE_TO_WORD_SIGNED,      // signed byte sign-extended to 16 bits
-	RANGE_PTR24,					// 24-bit pointer
-	RANGE_HIGH_OFFSET,				// byte offset to 0xFF00 
-} range_t;
 
 /* return size in bytes of value of given range */
 extern int range_size(range_t range);

@@ -51,25 +51,27 @@ my %INV_FLAG = qw(	_nz	_z	_z 	_nz
 					_lz _lo _lo	_lz
 					_p 	_m	_m	_p );
 
-my @CPUS = qw( z80 z80n z180 ez80 ez80_z80 r2ka r3k 8080 8085 gbz80 );
+my @CPUS = qw( z80 z80_strict z80n z180 ez80 ez80_z80 r800 r2ka r3k 8080 8085 gbz80 );
 
 #------------------------------------------------------------------------------
 # for each CPU
 #------------------------------------------------------------------------------
 for my $cpu (@CPUS) {
-	my $rabbit	= ($cpu =~ /^r/);
-	my $r3k		= ($cpu =~ /^r3k/);
-	my $z80 	= ($cpu =~ /^z80/);
-	my $z80n	= ($cpu =~ /^z80n/);
-	my $z180 	= ($cpu =~ /^z180/);
-	my $ez80_x 	= ($cpu =~ /^ez80/);
-	my $ez80_z80= ($cpu =~ /^ez80_z80/);
-	my $ez80_adl= ($cpu =~ /^ez80$/);
-	my $zilog	= ($cpu =~ /^z|^ez/);
-	my $i8080	= ($cpu =~ /^8080/);
-	my $i8085	= ($cpu =~ /^8085/);
-	my $intel 	= ($cpu =~ /^80/);
-	my $gameboy	= ($cpu =~ /^gbz80/);
+	my $rabbit		= ($cpu =~ /^r2ka|^r3k/);
+	my $r3k			= ($cpu =~ /^r3k/);
+	my $z80 		= ($cpu =~ /^z80$/);
+	my $z80_strict	= ($cpu =~ /^z80$/);
+	my $r800		= ($cpu =~ /^r800/);
+	my $z80n		= ($cpu =~ /^z80n/);
+	my $z180 		= ($cpu =~ /^z180/);
+	my $ez80_x 		= ($cpu =~ /^ez80/);
+	my $ez80_z80	= ($cpu =~ /^ez80_z80/);
+	my $ez80_adl	= ($cpu =~ /^ez80$/);
+	my $zilog		= ($cpu =~ /^z|^ez|^r800/);
+	my $i8080		= ($cpu =~ /^8080/);
+	my $i8085		= ($cpu =~ /^8085/);
+	my $intel 		= ($cpu =~ /^80/);
+	my $gameboy		= ($cpu =~ /^gbz80/);
 
 	#--------------------------------------------------------------------------
 	# 8-bit load
@@ -762,7 +764,7 @@ for my $cpu (@CPUS) {
 	# LD dd, dd
 	add($cpu, "ld bc, de", [ld_r_r('b', 'd')], [ld_r_r('c', 'e')]);
 	add($cpu, "ld bc, hl", [ld_r_r('b', 'h')], [ld_r_r('c', 'l')]);
-	if ($z80 || $ez80_x) {
+	if ($z80 || $z80n || $ez80_x || $r800) {
 		add($cpu, "ld bc, ix", [$V{ix}, ld_r_r('b', 'h')], [$V{ix}, ld_r_r('c', 'l')]);
 		add($cpu, "ld bc, iy", [$V{iy}, ld_r_r('b', 'h')], [$V{iy}, ld_r_r('c', 'l')]);
 	}
@@ -780,7 +782,7 @@ for my $cpu (@CPUS) {
     # add($cpu, "ld de, hl",	0x28, 0);       						# 10 T
     add($cpu, "ld de, hl", 	[ld_r_r('d', 'h')], [ld_r_r('e', 'l')]);	#  8 T
 
-	if ($z80 || $ez80_x) {
+	if ($z80 || $z80n || $ez80_x || $r800) {
 		add($cpu, "ld de, ix", [$V{ix}, ld_r_r('d', 'h')], [$V{ix}, ld_r_r('e', 'l')]);
 		add($cpu, "ld de, iy", [$V{iy}, ld_r_r('d', 'h')], [$V{iy}, ld_r_r('e', 'l')]);
 	}
@@ -788,7 +790,7 @@ for my $cpu (@CPUS) {
 	add($cpu, "ld hl, bc", [ld_r_r('h', 'b')], [ld_r_r('l', 'c')]);
 	add($cpu, "ld hl, de", [ld_r_r('h', 'd')], [ld_r_r('l', 'e')]);
 
-	if ($z80 || $ez80_x) {
+	if ($z80 || $z80n || $ez80_x || $r800) {
 		add($cpu, "ld ix, bc", [$V{ix}, ld_r_r('h', 'b')], [$V{ix}, ld_r_r('l', 'c')]);
 		add($cpu, "ld ix, de", [$V{ix}, ld_r_r('h', 'd')], [$V{ix}, ld_r_r('l', 'e')]);
 
@@ -1190,13 +1192,26 @@ for my $cpu (@CPUS) {
 	elsif ($rabbit) {
 		add($cpu, "mul", [0xF7]);
 	}
+	elsif ($r800) {
+		add($cpu, "mulub a, a",		[0xED, 0xF9]);
+		add($cpu, "mulub a, b",		[0xED, 0xC1]);
+		add($cpu, "mulub a, c",		[0xED, 0xC9]);
+		add($cpu, "mulub a, d",		[0xED, 0xD1]);
+		add($cpu, "mulub a, e",		[0xED, 0xD9]);
+		add($cpu, "mulub a, h",		[0xED, 0xE1]);
+		add($cpu, "mulub a, l",		[0xED, 0xE9]);
+		add($cpu, "muluw hl, bc",	[0xED, 0xC3]);
+		add($cpu, "muluw hl, de",	[0xED, 0xD3]);
+		add($cpu, "muluw hl, hl",	[0xED, 0xE3]);
+		add($cpu, "muluw hl, sp",	[0xED, 0xF3]);
+	}
 	else {}
 	
 	if ($r3k) {
 		add($cpu, "uma", [0xED, 0xC0]);
 		add($cpu, "ums", [0xED, 0xC8]);
 	}
-		
+
 	#--------------------------------------------------------------------------
 	# 8-bit rotate and shift group
 	#--------------------------------------------------------------------------
@@ -1212,14 +1227,14 @@ for my $cpu (@CPUS) {
 	if (!$intel) {
 		for (qw( rlc rrc rl rr sla sra sll sls sli srl )) {
 			my $op = (/sll|sls|sli/ && $gameboy) ? 'swap' : $_;
-			next if $op =~ /sll|sls|sli/ && !$z80;
+			next if $op =~ /sll|sls|sli/ && !($z80 || $z80n);
 
 			for my $r (qw( b c d e h l (hl) a )) {
 				add_x($cpu, "$op $r", [0xCB, 8*$V{$op}+$V{$r}]) 
 					unless $opcodes{"$op $r"}{$cpu};
 				
 				# (ix+d) -> r
-				if ($z80 && $r ne '(hl)') {
+				if (($z80 || $z80n) && $r ne '(hl)') {
 					for my $x (qw( ix iy )) {
 						add($cpu, "$op ($x+%d), $r", 	[$V{$x}, 0xCB, '%d', 8*$V{$op}+$V{$r}]);
 						add($cpu, "ld $r, $op ($x+%d)", [$V{$x}, 0xCB, '%d', 8*$V{$op}+$V{$r}]);
@@ -1365,7 +1380,7 @@ for my $cpu (@CPUS) {
 					[0xCB, (0x40*$V{$op}+$V{$r})."+8*%c(0..7)"]);
 
 				# (ix+d) -> r
-				if ($z80 && $op ne 'bit' && $r ne '(hl)') {
+				if (($z80 || $z80n) && $op ne 'bit' && $r ne '(hl)') {
 					for my $x (qw( ix iy )) {
 						add($cpu, "$op %c, ($x+%d), $r", 
 							[$V{$x}, 0xCB, '%d', (0x40*$V{$op}+$V{$r})."+8*%c(0..7)"]);
@@ -1980,7 +1995,7 @@ sub add_x {
 	my @rest = @{clone([@ops[1..$#ops]])};
 	
 	# ixh
-	if ($cpu =~ /^z80|^ez80/ && $asm =~ /\b[hl]\b/ && 
+	if ($cpu =~ /^z80n?|^ez80|^r800/ && $cpu !~ /z80_strict/ && $asm =~ /\b[hl]\b/ && 
 		$asm !~ /\(hl|bit|res|set|rlc|rrc|rl|rr|sla|sra|sll|sls|srl|sli/) {
 		for my $x (qw( ix iy )) {
 			my $asm1 = $asm =~ s/\b([hl])\b/$x$1/gr;
@@ -1991,7 +2006,7 @@ sub add_x {
 	}
 	
 	# (ix+d)
-	if ($cpu =~ /^z|^r|^ez80/ && $asm =~ /\(hl\)/ && $asm !~ /ldi|ldd/) {
+	if ($cpu =~ /^z|^r2ka|^r3k|^ez80|^r800/ && $asm =~ /\(hl\)/ && $asm !~ /ldi|ldd/) {
 		for my $x (qw( ix iy )) {
 			my $asm1 = $asm =~ s/\(hl\)/($x+%d)/gr;
 			if ($asm ne $asm1) {
@@ -2008,7 +2023,7 @@ sub add_suf {
 	add($cpu, $asm, @{clone(\@ops)});
 	
 	# rabbit
-	if ($cpu =~ /^r/) {
+	if ($cpu =~ /^r2ka|^r3k/) {
 		# expand ioi ioe
 		my $has_io;
 		if (($asm =~ /\((ix|iy|hl|bc|de|%m)/ && $asm !~ /^(ldp|jp|jmp)/) ||

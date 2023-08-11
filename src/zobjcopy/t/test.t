@@ -11,7 +11,7 @@ use Test::More;
 use Capture::Tiny 'capture';
 use Config;
 
-my $OBJ_FILE_VERSION = "12";
+my $OBJ_FILE_VERSION = "18";
 
 $ENV{PATH} = join($Config{path_sep}, 
 				".",
@@ -35,19 +35,23 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 		VERSION => $version,
 		NAME => "file1",
 		EXPRS => [
-			# type, filename, line_nr, section, asmptr, ptr, target_name, text
-			[ 'U', "file1.asm", 123, "text_1", 0, 1, "", "start1 % 256" ],
-			[ 'S', "file1.asm", 132, "text_2", 0, 1, "", "start2 % 127" ],
-			[ 'C', "file1.asm", 231, "data_1", 0, 1, "", "msg1" ],
-			[ 'L', "file1.asm", 321, "data_2", 0, 1, "", "msg2" ],
-			[ 'C', "file1.asm", 231, "data_1", 0, 1, "", "ext1" ],
-			[ 'L', "file1.asm", 321, "data_2", 0, 1, "", "ext2" ],
-			[ 'C', "file1.asm", 231, "data_1", 0, 1, "", "msg2-msg1" ],
-			[ '=', "file1.asm", 321, "text_1", 0, 0, "_start", "start1" ],
-			[ 'B', "file1.asm", 231, "text_1", 0, 1, "", "start1" ],
-			[ 'J', "file1.asm", 456, "text_1", 0, 1, "", "start1" ],
+			# type, filename, line_nr, section, asmptr, ptr, opcode_size, target_name, text
+			[ 'U', "file1.asm", 123, "text_1", 0, 1, 2, "", "start1 % 256" ],
+			[ 'S', "file1.asm", 132, "text_2", 0, 1, 2, "", "start2 % 127" ],
+			[ 'u', "file1.asm", 123, "text_1", 0, 1, 2, "", "256" ],
+			[ 's', "file1.asm", 132, "text_2", 0, 1, 2, "", "256" ],
+			[ 'C', "file1.asm", 231, "data_1", 0, 1, 2, "", "msg1" ],
+			[ 'L', "file1.asm", 321, "data_2", 0, 1, 2, "", "msg2" ],
+			[ 'C', "file1.asm", 231, "data_1", 0, 1, 2, "", "ext1" ],
+			[ 'L', "file1.asm", 321, "data_2", 0, 1, 2, "", "ext2" ],
+			[ 'C', "file1.asm", 231, "data_1", 0, 1, 2, "", "msg2-msg1" ],
+			[ '=', "file1.asm", 321, "text_1", 0, 0, 2, "_start", "start1" ],
+			[ 'B', "file1.asm", 231, "text_1", 0, 1, 2, "", "start1" ],
+			[ 'J', "file1.asm", 456, "text_1", 0, 1, 2, "", "start1" ],
+			[ 'P', "file1.asm", 456, "text_1", 0, 1, 2, "", "start1" ],
+			[ 'H', "file1.asm", 456, "text_1", 0, 1, 2, "", "0xff01" ],
 		],
-		NAMES => [
+		SYMBOLS => [
 			# scope, type, section, value, name, def_filename, line_nr
 			[ 'L', 'A', "text_1", 2, "start1", "file1.asm", 123 ],
 			[ 'L', 'A', "text_2", 2, "start2", "file1.asm", 123 ],
@@ -60,7 +64,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 			# name, ...
 			"ext1", "ext2"
 		],
-		CODES => [
+		CODE => [
 			# section, org, align, code
 			[ "text_1",      0,  1, pack("C*", 1..63) ],
 			[ "text_2",     -1, 16, pack("C*", 1..64) ],
@@ -72,14 +76,15 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 	
 	$libfile[$version] = libfile(
 			VERSION => $version,
-			OBJS => [$objfile[$version], $objfile[$version]]
+			OBJS => [$objfile[$version], $objfile[$version]],
+			PUBLIC => ["data_1", "data_2", "text_1"]
 	);
 }
 
 #------------------------------------------------------------------------------
 # call zobjcopy
 #------------------------------------------------------------------------------
-ok run("zobjcopy", <<'...');
+ok run("z88dk-zobjcopy", <<'...');
 Usage: zobjcopy input [options] [output]
   -v|--verbose                          ; show what is going on
   -l|--list                             ; dump contents of file
@@ -98,28 +103,28 @@ Usage: zobjcopy input [options] [output]
 
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 
-ok run("zobjcopy --wrong-option", 					"", "error: invalid option -- 'wrong-option'\n", 		1);
-ok run("zobjcopy -v",	 							"", "error: no input file\n", 							1);
-ok run("zobjcopy -s",	 							"", "error: option requires an argument -- 's'\n",		1);
-ok run("zobjcopy --section aaa",					"", "error: no '=' in --section argument 'aaa'\n",		1);
-ok run("zobjcopy --section ?=aaa test.o test2.o",	"", "error: could not compile regex '?'\n",				1);
-ok run("zobjcopy --add-prefix aaa",					"", "error: no ',' in --add-prefix argument 'aaa'\n",	1);
-ok run("zobjcopy --add-prefix ?,aaa test.o test2.o","", "error: could not compile regex '?'\n",				1);
-ok run("zobjcopy --symbol aaa",						"", "error: no '=' in --symbol argument 'aaa'\n",		1);
-ok run("zobjcopy --local",							"", "error: option requires an argument -- 'local'\n",	1);
-ok run("zobjcopy --global",							"", "error: option requires an argument -- 'global'\n",	1);
-ok run("zobjcopy --filler",							"", "error: option requires an argument -- 'filler'\n",	1);
-ok run("zobjcopy --org",							"", "error: option requires an argument -- 'org'\n",	1);
-ok run("zobjcopy --org aaa",						"", "error: no ',' in --org argument 'aaa'\n",			1);
-ok run("zobjcopy --align",							"", "error: option requires an argument -- 'align'\n",	1);
-ok run("zobjcopy --align aaa",						"", "error: no ',' in --align argument 'aaa'\n",		1);
-ok run("zobjcopy test1.o test2.o test3.o",			"", "error: too many arguments\n",						1);
-ok run("zobjcopy -l test1.o test2.o",				"", "error: too many arguments\n",						1);
-ok run("zobjcopy test.o",							"", "error: no output file\n",							1);
+ok run("z88dk-zobjcopy --wrong-option", 					"", "error: invalid option -- 'wrong-option'\n", 		1);
+ok run("z88dk-zobjcopy -v",	 							"", "error: no input file\n", 							1);
+ok run("z88dk-zobjcopy -s",	 							"", "error: option requires an argument -- 's'\n",		1);
+ok run("z88dk-zobjcopy --section aaa",					"", "error: no '=' in --section argument 'aaa'\n",		1);
+ok run("z88dk-zobjcopy --section ?=aaa test.o test2.o",	"", "error: could not compile regex '?'\n",				1);
+ok run("z88dk-zobjcopy --add-prefix aaa",					"", "error: no ',' in --add-prefix argument 'aaa'\n",	1);
+ok run("z88dk-zobjcopy --add-prefix ?,aaa test.o test2.o","", "error: could not compile regex '?'\n",				1);
+ok run("z88dk-zobjcopy --symbol aaa",						"", "error: no '=' in --symbol argument 'aaa'\n",		1);
+ok run("z88dk-zobjcopy --local",							"", "error: option requires an argument -- 'local'\n",	1);
+ok run("z88dk-zobjcopy --global",							"", "error: option requires an argument -- 'global'\n",	1);
+ok run("z88dk-zobjcopy --filler",							"", "error: option requires an argument -- 'filler'\n",	1);
+ok run("z88dk-zobjcopy --org",							"", "error: option requires an argument -- 'org'\n",	1);
+ok run("z88dk-zobjcopy --org aaa",						"", "error: no ',' in --org argument 'aaa'\n",			1);
+ok run("z88dk-zobjcopy --align",							"", "error: option requires an argument -- 'align'\n",	1);
+ok run("z88dk-zobjcopy --align aaa",						"", "error: no ',' in --align argument 'aaa'\n",		1);
+ok run("z88dk-zobjcopy test1.o test2.o test3.o",			"", "error: too many arguments\n",						1);
+ok run("z88dk-zobjcopy -l test1.o test2.o",				"", "error: too many arguments\n",						1);
+ok run("z88dk-zobjcopy test.o",							"", "error: no output file\n",							1);
 
 path("test.o")->spew_raw($objfile[1]);	
 	
-ok run("zobjcopy -v test.o test2.o", <<"...");
+ok run("z88dk-zobjcopy -v test.o test2.o", <<"...");
 Reading file 'test.o': object version 1
 Writing file 'test2.o': object version $OBJ_FILE_VERSION
 ...
@@ -138,7 +143,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 
 	ok check_z80nm("test.o", 		sprintf("t/bmk_obj_%02d.txt", $version));
 	ok check_zobjcopy("test.o", 	sprintf("t/bmk_obj_%02d.txt", $version));
-	ok run("zobjcopy test.o test2.o");
+	ok run("z88dk-zobjcopy test.o test2.o");
 	ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_converted.txt", $version));
 	unlink "test.o", "test2.o";
 	
@@ -147,7 +152,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 	
 	ok check_z80nm("test.lib", 		sprintf("t/bmk_lib_%02d.txt", $version));
 	ok check_zobjcopy("test.lib", 	sprintf("t/bmk_lib_%02d.txt", $version));
-	ok run("zobjcopy test.lib test2.lib");
+	ok run("z88dk-zobjcopy test.lib test2.lib");
 	ok check_zobjcopy("test2.lib", 	sprintf("t/bmk_lib_%02d_converted.txt", $version));
 	unlink "test.lib", "test2.lib";
 }
@@ -158,7 +163,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose -s text=text --section data=data test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose -s text=text --section data=data test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match 'text' to 'text'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -183,7 +188,7 @@ unlink "test.o", "test2.o";
 path("test.lib")->spew_raw($libfile[$OBJ_FILE_VERSION]);
 unlink "test2.lib";
 
-ok run("zobjcopy test.lib --verbose -s text=text --section data=data test2.lib", <<"...");
+ok run("z88dk-zobjcopy test.lib --verbose -s text=text --section data=data test2.lib", <<"...");
 Reading file 'test.lib': library version $OBJ_FILE_VERSION
 File 'test.lib': rename sections that match 'text' to 'text'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -221,7 +226,7 @@ unlink "test.lib", "test2.lib";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy -v test.o -s .=ram test2.o", <<"...");
+ok run("z88dk-zobjcopy -v test.o -s .=ram test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '.' to 'ram'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -239,7 +244,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy -v test.o -s ^text=rom_text -s ^data=ram_data test2.o", <<"...");
+ok run("z88dk-zobjcopy -v test.o -s ^text=rom_text -s ^data=ram_data test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '^text' to 'rom_text'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -264,7 +269,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy -v test.o -s ^data=base test2.o", <<"...");
+ok run("z88dk-zobjcopy -v test.o -s ^data=base test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '^data' to 'base'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -282,7 +287,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy -v test.o -s ^data=base -s ^text=base test2.o", <<"...");
+ok run("z88dk-zobjcopy -v test.o -s ^data=base -s ^text=base test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '^data' to 'base'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -306,7 +311,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --filler 0x55 -s text=text test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose --filler 0x55 -s text=text test2.o", <<"...");
 Filler byte: \$55
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match 'text' to 'text'
@@ -325,7 +330,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose -F 127 -s text=text test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose -F 127 -s text=text test2.o", <<"...");
 Filler byte: \$7F
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match 'text' to 'text'
@@ -344,7 +349,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose -s .=text --org text,0x8000 --align text,64 test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose -s .=text --org text,0x8000 --align text,64 test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '.' to 'text'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -370,7 +375,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose -s .=text -O text,0x8000 -A text,64 test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose -s .=text -O text,0x8000 -A text,64 test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename sections that match '.' to 'text'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -399,7 +404,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --add-prefix .,lib_ test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose --add-prefix .,lib_ test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': add prefix 'lib_' to symbols that match '.'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -415,7 +420,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose -p m,lib_ test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose -p m,lib_ test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': add prefix 'lib_' to symbols that match 'm'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -434,7 +439,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --symbol ext1=ff_lib_ext1 -y ext=xxx -y msg1=MSG1 test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose --symbol ext1=ff_lib_ext1 -y ext=xxx -y msg1=MSG1 test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': rename symbol 'ext1' to 'ff_lib_ext1'
 Block 'Z80RMF$OBJ_FILE_VERSION'
@@ -471,19 +476,19 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --local \"^_\" -L msg test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose --local \"^_\" -L msg test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': make symbols that match '^_' local
 Block 'Z80RMF$OBJ_FILE_VERSION'
   skip symbol main
-  change scope of symbol _start -> L
+  change scope of symbol _start -> local
   skip symbol msg1
   skip symbol msg2
 File 'test.o': make symbols that match 'msg' local
 Block 'Z80RMF$OBJ_FILE_VERSION'
   skip symbol main
-  change scope of symbol msg1 -> L
-  change scope of symbol msg2 -> L
+  change scope of symbol msg1 -> local
+  change scope of symbol msg2 -> local
 Writing file 'test2.o': object version $OBJ_FILE_VERSION
 ...
 ok check_zobjcopy("test2.o", sprintf("t/bmk_obj_%02d_local1.txt", $OBJ_FILE_VERSION));
@@ -495,12 +500,12 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --global start -G s test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o --verbose --global start -G s test2.o", <<"...");
 Reading file 'test.o': object version $OBJ_FILE_VERSION
 File 'test.o': make symbols that match 'start' global
 Block 'Z80RMF$OBJ_FILE_VERSION'
-  change scope of symbol start1 -> G
-  change scope of symbol start2 -> G
+  change scope of symbol start1 -> global
+  change scope of symbol start2 -> global
 File 'test.o': make symbols that match 's' global
 Block 'Z80RMF$OBJ_FILE_VERSION'
 Writing file 'test2.o': object version $OBJ_FILE_VERSION
@@ -533,40 +538,117 @@ path("test.asm")->spew(<<'...');
 	public aa
 	defc aa=2		; in section ''
 	section text	; so that obj file has one section but no ''
+	defb aa
 ...
-ok run("z80asm test.asm");
-ok run("zobjcopy -l test.o", <<"...");
+ok run("z88dk-z80asm test.asm");
+ok run("z88dk-zobjcopy -l test.o", <<"...");
 Object  file test.o at \$0000: Z80RMF$OBJ_FILE_VERSION
   Name: test
-  Section text: 0 bytes
+  CPU:  z80 
+  Section "": 0 bytes
+  Section text: 1 bytes
+    C \$0000: 00
   Symbols:
-    G C \$0002 aa (section "") (file test.asm:2)
+    G C \$0002: aa (section "") (file test.asm:2)
+  Expressions:
+    E U \$0000 \$0000 1: aa (section text) (file test.asm:4)
 ...
 
-ok run("zobjcopy test.o test2.o");
-ok run("zobjcopy -l test2.o", <<"...");
+ok run("z88dk-zobjcopy test.o test2.o");
+ok run("z88dk-zobjcopy -l test2.o", <<"...");
 Object  file test2.o at \$0000: Z80RMF$OBJ_FILE_VERSION
   Name: test
+  CPU:  z80 
   Section "": 0 bytes
-  Section text: 0 bytes
+  Section text: 1 bytes
+    C \$0000: 00
   Symbols:
-    G C \$0002 aa (section "") (file test.asm:2)
+    G C \$0002: aa (section "") (file test.asm:2)
+  Expressions:
+    E U \$0000 \$0000 1: aa (section text) (file test.asm:4)
 ...
 
-unlink "test.asm", "test.o", "test2.o";
+unlink "test.asm", "test.o", "test2.o" if Test::More->builder->is_passing;
 
 done_testing;
+
+#------------------------------------------------------------------------------
+# string table
+{
+	package ST;
+	use Object::Tiny::RW qw( hash list );
+	
+	sub new {
+		my($class) = shift;
+		return bless {
+			hash => {"" => 0},
+			list => [""] }, $class;
+	}
+	
+	sub add {
+		my($self, $str) = @_;
+		return $self->hash->{$str} if exists $self->hash->{$str};
+		my $id = $self->count;
+		$self->hash->{$str} = $id;
+		push @{$self->list}, $str;
+		return $id;
+	}
+	
+	sub lookup {
+		my($self, $id) = @_;
+		return $self->list->[$id];
+	}
+	
+	sub count {
+		my($self) = @_;
+		return scalar @{$self->list};
+	}
+	
+	sub store {
+		my($self) = @_;
+		
+		# build list of strings and indexes
+		my $strings = "";
+		my @index;
+		for my $id (0 .. $self->count - 1) {
+			push @index, length($strings);
+			$strings .= $self->lookup($id) . pack("C", 0);
+		}
+		my $aligned = (length($strings)+3) & ~3;
+		$strings .= pack("C*", (0) x ($aligned - length($strings)));
+		
+		# write sizes
+		my $o = pack("VV", $self->count, length($strings));
+		
+		# write indexes
+		$o .= pack("V*", @index);
+		
+		# write strings
+		$o .= $strings;
+		
+		return $o;
+	}
+}	
 
 #------------------------------------------------------------------------------
 # return object file binary representation
 sub objfile {
 	my(%args) = @_;
-
+	
+	my $st = ST->new;				# string table
+	
 	exists($args{ORG}) and die;
 	
 	my $o = "Z80RMF".sprintf("%02d",($args{VERSION} || $OBJ_FILE_VERSION));
 	
-	my $org = $args{CODES}[0][1] // -1;
+	# CPU version
+	if ($args{VERSION} >= 18) {
+		$o .= pack("V", $args{CPU} // 1);
+		$o .= pack("V", $args{IXIY} // 0);
+	}
+
+	# global ORG (for old versions)
+	my $org = $args{CODE}[0][1] // -1;
 	if ($args{VERSION} >= 8) {
 		# no global ORG
 	}
@@ -576,81 +658,243 @@ sub objfile {
 	else {
 		$o .= pack("v", $org);
 	}
-	
+
 	# store empty pointers; mark position for later
 	my $name_addr	 = length($o); $o .= pack("V", -1);
 	my $expr_addr	 = length($o); $o .= pack("V", -1);
 	my $symbols_addr = length($o); $o .= pack("V", -1);
 	my $extern_addr	 = length($o); $o .= pack("V", -1);
 	my $code_addr	 = length($o); $o .= pack("V", -1);
+	my $st_addr		 = length($o); $o .= pack("V", -1) if $args{VERSION} >= 18;
 
 	# store expressions
 	if ($args{EXPRS}) {
 		store_ptr(\$o, $expr_addr);
 		for (@{$args{EXPRS}}) {
-			@$_ == 8 or die;
-			my($type, $filename, $line_nr, $section, $asmpc, $patch_ptr, $target_name, $text) = @$_;
+			@$_ == 9 or die;
+			my($type, $filename, $line_nr, $section, $asmpc, $patch_ptr, $opcode_size, 
+			   $target_name, $text) = @$_;
 			next if $type eq '=' && $args{VERSION} < 6;
 			next if $type eq 'B' && $args{VERSION} < 11;
 			next if $type eq 'J' && $args{VERSION} < 12;
+			next if $type eq 'u' && $args{VERSION} < 13;
+			next if $type eq 's' && $args{VERSION} < 13;
+			next if $type eq 'P' && $args{VERSION} < 14;
+			next if $type eq 'H' && $args{VERSION} < 15;
 			
-			$o .= $type;
-			$o .= pack_lstring($filename) . pack("V", $line_nr) if $args{VERSION} >= 4;
-			$o .= pack_string($section)							if $args{VERSION} >= 5;
-			$o .= pack("v", $asmpc)								if $args{VERSION} >= 3;
-			$o .= pack("v", $patch_ptr);
-			$o .= pack_string($target_name)						if $args{VERSION} >= 6;
+			my %TYPES = ( 	"J"=>1, "U"=>2, "S"=>3, 
+							"W"=>4, "C"=>4, # was C until v17, after is W
+							"B"=>5, "L"=>6, "u"=>7, "s"=>8, 
+							"P"=>9, "H"=>10, "="=>11 );
+			die "invalid type $type" unless exists $TYPES{$type};
+			if ($args{VERSION} >= 18) {
+				$o .= pack("V", $TYPES{$type});
+			}
+			else {
+				$o .= $type;
+			}
+			
 			if ($args{VERSION} >= 4) {
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($filename));
+				}
+				else {
+					$o .= pack_lstring($filename);
+				}
+				$o .= pack("V", $line_nr);
+			}
+			
+			if ($args{VERSION} >= 5) {
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($section));
+				}
+				elsif ($args{VERSION} >= 16) {
+					$o .= pack_lstring($section);
+				}
+				else {
+					$o .= pack_string($section);
+				}
+			}
+			
+			if ($args{VERSION} >= 3) {
+				if ($args{VERSION} < 17) {
+					$o .= pack("v", $asmpc);
+				}
+				else {
+					$o .= pack("V", $asmpc);
+				}
+			}
+			
+			if ($args{VERSION} < 17) {
+				$o .= pack("v", $patch_ptr);
+			}
+			else {
+				$o .= pack("V", $patch_ptr);
+			}
+			
+			$o .= pack("V", $opcode_size) if $args{VERSION} >= 17;
+			
+			if ($args{VERSION} >= 6) {
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($target_name));
+				}
+				elsif ($args{VERSION} >= 16) {
+					$o .= pack_lstring($target_name);
+				}
+				else {
+					$o .= pack_string($target_name);
+				}
+			}
+			
+			if ($args{VERSION} >= 18) {
+				$o .= pack("V", $st->add($text));
+			}
+			elsif ($args{VERSION} >= 4) {
 				$o .= pack_lstring($text);
 			}
 			else {
 				$o .= pack_string($text) . pack("C", 0);
 			}
 		}
-		$o .= pack("C", 0) if $args{VERSION} >= 4;
+		
+		if ($args{VERSION} >= 18) {
+			$o .= pack("V", 0);
+		}
+		elsif ($args{VERSION} >= 4) {
+			$o .= pack("C", 0)
+		}
 	}
 
 	# store symbols
-	if ($args{NAMES}) {
+	if ($args{SYMBOLS}) {
 		store_ptr(\$o, $symbols_addr);
-		for (@{$args{NAMES}}) {
+		for (@{$args{SYMBOLS}}) {
 			@$_ == 7 or die;
 			my($scope, $type, $section, $value, $name, $def_filename, $line_nr) = @$_;
 			next if $type eq '=' && $args{VERSION} < 7;
 
-			$o .= $scope . $type;
-			$o .= pack_string($section)								if $args{VERSION} >= 5;
-			$o .= pack("V", $value) . pack_string($name);
-			$o .= pack_string($def_filename) . pack("V", $line_nr)	if $args{VERSION} >= 9;
+			my %SCOPES = ("L"=>1, "G"=>2);
+			die "invalid scope $scope" unless exists $SCOPES{$scope};
+
+			my %TYPES = ("C"=>1, "A"=>2, "="=>3);
+			die "invalid scope $type" unless exists $TYPES{$type};
+
+			if ($args{VERSION} >= 18) {
+				$o .= pack("V", $SCOPES{$scope});
+				$o .= pack("V", $TYPES{$type});
+			}
+			else {
+				$o .= $scope;
+				$o .= $type;
+			}
+
+			if ($args{VERSION} >= 5) {
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($section));
+				}
+				elsif ($args{VERSION} >= 16) {
+					$o .= pack_lstring($section);
+				}
+				else {
+					$o .= pack_string($section);
+				}
+			}
+			
+			$o .= pack("V", $value);
+			
+			if ($args{VERSION} >= 18) {
+				$o .= pack("V", $st->add($name));
+			}
+			elsif ($args{VERSION} >= 16) {
+				$o .= pack_lstring($name);
+			}
+			else {
+				$o .= pack_string($name);
+			}
+			
+			if ($args{VERSION} >= 9) {
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($def_filename)) . pack("V", $line_nr);
+				}
+				elsif ($args{VERSION} >= 16) {
+					$o .= pack_lstring($def_filename) . pack("V", $line_nr);
+				}
+				else {
+					$o .= pack_string($def_filename) . pack("V", $line_nr);
+				}
+			}
 		}
-		$o .= pack("C", 0) if $args{VERSION} >= 5;
+		
+		if ($args{VERSION} >= 18) {
+			$o .= pack("V", 0);
+		} 
+		elsif ($args{VERSION} >= 5) {
+			$o .= pack("C", 0);
+		}
 	}
 
 	# store externals
 	if ($args{EXTERNS}) {
 		store_ptr(\$o, $extern_addr);
 		for my $name (@{$args{EXTERNS}}) {
-			$o .= pack_string($name);
+			if ($args{VERSION} >= 18) {
+				$o .= pack("V", $st->add($name));
+			}
+			elsif ($args{VERSION} >= 16) {
+				$o .= pack_lstring($name);
+			}
+			else {
+				$o .= pack_string($name);
+			}
+		}
+		if ($args{VERSION} >= 18) {
+			$o .= pack("V", $st->add(""));		# end marker
 		}
 	}
 
 	# store name
 	store_ptr(\$o, $name_addr);
-	$o .= pack_string($args{NAME});
+	if ($args{VERSION} >= 18) {
+		$o .= pack("V", $st->add($args{NAME}));
+	}
+	elsif ($args{VERSION} >= 16) {
+		$o .= pack_lstring($args{NAME});
+	}
+	else {
+		$o .= pack_string($args{NAME});
+	}
 
 	# store code
-	if ( $args{CODES} ) {
-		ref($args{CODES}) eq 'ARRAY' or die;
+	if ( $args{CODE} ) {
+		ref($args{CODE}) eq 'ARRAY' or die;
 		store_ptr(\$o, $code_addr);
-		for (@{$args{CODES}}) {
+		for (@{$args{CODE}}) {
 			@$_ == 4 or die;
 			my($section, $org, $align, $code) = @$_;
 			
 			if ($args{VERSION} >= 5) {
-				$o .= pack("V", length($code)) . pack_string($section);
+				$o .= pack("V", length($code));
+				
+				if ($args{VERSION} >= 18) {
+					$o .= pack("V", $st->add($section));
+				}
+				elsif ($args{VERSION} >= 16) {
+					$o .= pack_lstring($section);
+				}
+				else {
+					$o .= pack_string($section);
+				}
+				
 				$o .= pack("V", $org)		if $args{VERSION} >= 8;
 				$o .= pack("V", $align)		if $args{VERSION} >= 10;
+				
 				$o .= $code;				
+
+				if ($args{VERSION} >= 18) {		# align to dword size
+					my $aligned_size = (length($code) + 3) & ~3;
+					my $extra_bytes = $aligned_size - length($code);
+					$o .= pack("C*", (0) x $extra_bytes);
+				}				
 			}
 			else {
 				$o .= pack("v", length($code) & 0xFFFF) . $code;
@@ -659,7 +903,13 @@ sub objfile {
 		}
 		$o .= pack("V", -1) if $args{VERSION} >= 5;
 	}
-
+	
+	# store string table
+	if ($args{VERSION} >= 18) {
+		store_ptr(\$o, $st_addr);
+		$o .= $st->store;
+	}
+	
 	return $o;
 }
 
@@ -669,6 +919,10 @@ sub libfile {
 	my(%args) = @_;
 
 	my $o = "Z80LMF".sprintf("%02d",($args{VERSION} || $OBJ_FILE_VERSION));
+	
+	# string table pointer
+	my $st_addr		 = length($o); $o .= pack("V", -1) if $args{VERSION} >= 18;
+
 	my $next_pos;
 	my @objs = @{$args{OBJS}};
 	for (0 .. $#objs) {
@@ -684,9 +938,23 @@ sub libfile {
 		$next_pos = length($o); $o .= pack("V", -1);
 		$o .= pack("V", length($obj));
 		$o .= $obj;
-		store_ptr(\$o, $next_pos) if $_ != $#objs;
+		store_ptr(\$o, $next_pos);
 	}
+	
+	# store end marker
+	$o .= pack("VV", -1, 0);
 
+	# store string table
+	if ($args{VERSION} >= 18) {
+		my $st = ST->new();
+		for (@{$args{PUBLIC}}) {
+			$st->add($_);
+		}
+		
+		store_ptr(\$o, $st_addr);
+		$o .= $st->store;
+	}
+		
 	return $o;
 }
 
@@ -714,6 +982,7 @@ sub pack_lstring {
 #------------------------------------------------------------------------------
 sub run {
 	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	$exp_out //= "";
 	$exp_err //= "";
 	$exp_exit //= 0;	
@@ -722,9 +991,12 @@ sub run {
 	
 	ok 1, $cmd;
 	my($out, $err, $exit, @dummy) = capture {system $cmd};
-	is $out, $exp_out, $cmd;
-	is $err, $exp_err, $cmd;
-	is !!$exit, !!$exp_exit, $cmd;
+	for ($exp_out, $exp_err, $out, $err) {
+		s/\r\n/\n/g;
+	}
+	is $out, $exp_out, "$cmd: stdout";
+	is $err, $exp_err, "$cmd: stderr";
+	is !!$exit, !!$exp_exit, "$cmd: exit";
 	
 	return $ok && Test::More->builder->is_passing;
 }
@@ -732,31 +1004,35 @@ sub run {
 #------------------------------------------------------------------------------
 sub check_zobjcopy_nm {
 	my($cmd, $file, $bmk) = @_;
-	
-	my $ok = Test::More->builder->is_passing;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
 	(my $out = $bmk) =~ s/$/.out/;
 	
 	is 0, system("$cmd $file > $out"), "$cmd $file > $out";
 	my $diff = system("diff -w $out $bmk");
-	is 0, $diff;
-	
-	system("winmergeu $out $bmk") if $diff;
+	is 0, $diff, "diff -w $out $bmk";
 	unlink $out unless $diff;
 	
-	return $ok && Test::More->builder->is_passing;
+	if ($diff != 0 && $ENV{DEBUG}) {
+		system("'/c/Program Files/WinMerge/WinMergeU.exe' $out $bmk");
+	}
+	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	
+	return Test::More->builder->is_passing;
 }
 
 sub check_zobjcopy {
 	my($file, $bmk, $options) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	$options //= "";
-	return check_zobjcopy_nm("zobjcopy -l $options", $file, $bmk);
+	return check_zobjcopy_nm("z88dk-zobjcopy -l $options", $file, $bmk);
 
 }
 
 sub check_z80nm {
 	my($file, $bmk, $options) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	$options //= "-a";
-	return check_zobjcopy_nm("z80nm $options", $file, $bmk);
-
+	return check_zobjcopy_nm("z88dk-z80nm $options", $file, $bmk);
 }

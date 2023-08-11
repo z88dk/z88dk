@@ -5,8 +5,8 @@ target/primo/stdio/CRT_FONT
 target/primo/stdio/conio_vars
 target/primo/stdio/fputc_cons_native
 @stdio/stdio.lst
-stdio/inkey/getk
-stdio/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
 @input/input_keyboard.lst
 
 target/primo/graphics/pixladdr

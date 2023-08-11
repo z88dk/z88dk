@@ -143,13 +143,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\zutils.c" />
-    <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c" />
+    <ClCompile Include="..\..\src\zobjcopy\zobjcopy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\common\zutils.h" />
     <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\getopt\getopt.vcxproj">
+      <Project>{0e6deebd-2979-4ab0-ab8a-5a51f6579aaf}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">
       <Project>{7d0213a3-87fa-4f56-a5d6-cc23682acad8}</Project>
     </ProjectReference>

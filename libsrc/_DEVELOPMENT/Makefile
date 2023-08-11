@@ -94,7 +94,7 @@ lib/sdcc_ix/$(1).lib: target/$(1)/obj/config_private.inc
 	$(Z80ASM) $(cpu) -d -Otarget/$(1)/obj/sdcc_ix -Itarget/$(1)/obj -xlib/sdcc_ix/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/$(1)/library/$(1)_sdcc_ix.lst
 
 lib/sdcc_iy/$(1).lib: target/$(1)/obj/config_private.inc
-	$(Z80ASM) $(cpu) -d -Otarget/$(1)/obj/sdcc_iy -Itarget/$(1)/obj -IXIY -xlib/sdcc_iy/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IY @target/$(1)/library/$(1)_sdcc_iy.lst
+	$(Z80ASM) $(cpu) -d -Otarget/$(1)/obj/sdcc_iy -Itarget/$(1)/obj -IXIY-soft -xlib/sdcc_iy/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IY @target/$(1)/library/$(1)_sdcc_iy.lst
 endef
 
 define make_clean

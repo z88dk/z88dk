@@ -1,5 +1,5 @@
-stdio/inkey/fgetc_cons
-stdio/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
 target/m5/stdio/fgetc_cons_rom
 target/m5/stdio/getk_rom
 target/m5/stdio/fputc_cons_rom

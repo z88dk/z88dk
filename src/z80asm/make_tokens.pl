@@ -111,6 +111,9 @@ my @tokens = (
 	'R_LO', 'R_LZ', 'R_P', 'R_M', 'PCHL', 'XTHL', 'SPHL', 'HLT', 'RIM', 'SIM', 
 	'DSUB', 'ARHL', 'RRHL', 'RDEL', 'RLDE', 'LDHI', 'LDSI', 'RSTV', 'OVRST8', 
 	'SHLX', 'SHLDE', 'LHLX', 'LHLDE',
+	
+	# R800 specific opcodes
+	'MULUB', 'MULUW',
 );
 
 # output tokens.h

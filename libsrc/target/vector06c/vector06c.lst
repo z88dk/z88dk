@@ -10,8 +10,8 @@ target/vector06c/games/keys_joystick
 target/vector06c/load_palette
 target/vector06c/asm_load_palette
 @stdio/stdio.lst
-stdio/inkey/getk
-stdio/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
 @input/input_keyboard.lst
 
 

@@ -5,6 +5,7 @@ ADT_NEWLIB_TARGETS := adt-newlib/obj/newlib-z80-adt-newlib \
 	adt-newlib/obj/newlib-z80n-adt-newlib \
 	adt-newlib/obj/newlib-r2k-adt-newlib \
 	adt-newlib/obj/newlib-ixiy-adt-newlib \
+	adt-newlib/obj/newlib-z180-adt-newlib \
 	adt-newlib/obj/newlib-ez80_z80-adt-newlib 
 
 OBJS += $(ADT_NEWLIB_TARGETS)
@@ -43,6 +44,11 @@ adt-newlib/obj/newlib-gbz80-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
 	@mkdir -p adt-newlib/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(ADT_NEWLIBGLOBS)
+
+adt-newlib/obj/newlib-z180-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
+	@mkdir -p adt-newlib/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/z180/x -I.. -mz180 -D__CLASSIC $(ADT_NEWLIBGLOBS)
 
 adt-newlib/obj/newlib-ez80_z80-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
 	@mkdir -p adt-newlib/obj

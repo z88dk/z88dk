@@ -6,7 +6,8 @@ ZX1_8080_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/compress/zx1//c/sccz80/*.asm $(NE
 
 ZX1_NEWLIB_TARGETS := compress/zx1/obj/newlib-z80-compress-zx1 compress/zx1/obj/newlib-z80n-compress-zx1 \
 		compress/zx1/obj/newlib-ixiy-compress-zx1 compress/zx1/obj/newlib-8080-compress-zx1 \
-		compress/zx1/obj/newlib-r2k-compress-zx1 compress/zx1/obj/newlib-ez80_z80-compress-zx1
+		compress/zx1/obj/newlib-r2k-compress-zx1 compress/zx1/obj/newlib-ez80_z80-compress-zx1 \
+		compress/zx1/obj/newlib-z180-compress-zx1
 
 OBJS += $(ZX1_NEWLIB_TARGETS)
 CLEAN += compress-zx1-clean
@@ -44,6 +45,11 @@ compress/zx1/obj/newlib-gbz80-compress-zx1: $(ZX1_NEWLIBGLOBS_ex)
 	@mkdir -p compress/zx1/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=compress/zx1/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(ZX1_NEWLIBGLOBS)
+
+compress/zx1/obj/newlib-z180-compress-zx1: $(ZX1_NEWLIBGLOBS_ex)
+	@mkdir -p compress/zx1/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=compress/zx1/obj/z180/x -I.. -mz180 -D__CLASSIC $(ZX1_NEWLIBGLOBS)
 
 compress/zx1/obj/newlib-ez80_z80-compress-zx1: $(ZX1_NEWLIBGLOBS_ex)
 	@mkdir -p compress/zx1/obj

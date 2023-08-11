@@ -106,7 +106,7 @@ sub add {
 			my $bytes1 = join(' ', @bytes1);
 			
 			# rabit lacks these restarts
-			if ($cpu =~ /^r/ && ($c==0 || $c==8 || $c==0x30)) {	
+			if ($cpu =~ /^r2ka|^r3k/ && ($c==0 || $c==8 || $c==0x30)) {	
 				$bytes1 = sprintf("CD %02X 00", $c);
 			}
 			

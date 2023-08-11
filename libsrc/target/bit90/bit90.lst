@@ -2,5 +2,5 @@
 target/bit90/games/joystick
 target/bit90/games/keys_joystick
 games/obj/bit90/joystick_type
-stdio/inkey/fgetc_cons
-stdio/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk

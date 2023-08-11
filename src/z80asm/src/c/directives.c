@@ -21,6 +21,7 @@ Assembly directives.
 #include "types.h"
 #include "utstring.h"
 #include "z80asm.h"
+#include "z80asm_cpu.h"
 
 static void check_org_align();
 
@@ -32,7 +33,7 @@ static void url_encode(const char *s, char *enc)
     const char *hex = "0123456789abcdef";
 
     int pos = 0;
-    for (int i = 0, t = strlen(s); i < t; i++)
+    for (int i = 0, t = (int)strlen(s); i < t; i++)
     {
         if (('a' <= s[i] && s[i] <= 'z')
         || ('A' <= s[i] && s[i] <= 'Z')
@@ -281,7 +282,7 @@ void asm_DEFC(const char* name, Expr1* expr)
 		}
 		else {
 			/* store in object file to be computed at link time */
-			expr->range = RANGE_WORD;
+			expr->range = RANGE_ASSIGNMENT;
 			expr->target_name = spool_add(name);
 
 			Expr1List_push(&CURRENTMODULE->exprs, expr);

@@ -10,7 +10,7 @@ target/g800/stdio/ansi/f_ansi_bel
 target/g800/stdio/ansi/f_ansi_char_850
 target/g800/stdio/ansi/_font_3x5_850
 target/g800/stdio/ansi/f_ansi_cls_850
-stdio/ansi/generic/f_ansi_dline
+stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/g800/stdio/ansi/f_ansi_scrollup_850
 @stdio/stdio.lst
 target/g800/games/bit_open

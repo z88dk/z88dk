@@ -1,6 +1,6 @@
 target/laser500/im1_init
-stdio/inkey/fgetc_cons
-stdio/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
 target/laser500/stdio/generic_console
 target/laser500/stdio/generic_console_ioctl
 target/laser500/stdio/generic_console_vpeek

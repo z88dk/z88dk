@@ -479,6 +479,8 @@
 #define _TK_SHLDE       476
 #define _TK_LHLX        477
 #define _TK_LHLDE       478
+#define _TK_MULUB       479
+#define _TK_MULUW       480
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t {
@@ -961,5 +963,7 @@ typedef enum tokid_t {
     TK_SHLDE            = 476,
     TK_LHLX             = 477,
     TK_LHLDE            = 478,
+    TK_MULUB            = 479,
+    TK_MULUW            = 480,
 } tokid_t;
 #endif

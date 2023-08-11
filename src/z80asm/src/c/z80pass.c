@@ -185,7 +185,7 @@ void Z80pass2(int start_errors)
 
 	// add to the list of objects to link
 	if (start_errors == get_num_errors())
-		object_file_append(get_o_filename(CURRENTMODULE->filename), CURRENTMODULE, false, false);
+        object_file_append(get_o_filename(CURRENTMODULE->filename), CURRENTMODULE);
 
 	if (start_errors == get_num_errors() && option_symtable())
 		write_sym_file(CURRENTMODULE);

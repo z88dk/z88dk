@@ -4,10 +4,12 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "args.h"
 #include "errors.h"
 #include "float.h"
 #include "if.h"
 #include "utils.h"
+#include "z80asm_cpu.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -357,4 +359,31 @@ void error_cmd_failed(const char* cmd) {
 
 void error_assert_failed() {
 	g_errors.error(ErrCode::AssertFailed);
+}
+
+void error_cpu_incompatible(const char* filename, int got_cpu_id) {
+    ostringstream error;
+    error << "file " << filename << " compiled for " << cpu_name(got_cpu_id)
+        << ", incompatible with " << cpu_name(option_cpu());
+    g_errors.error(ErrCode::CPUIncompatible, error.str());
+}
+
+static const char* ixiy_to_string(swap_ixiy_t swap_ixiy) {
+    switch (swap_ixiy) {
+    case IXIY_NO_SWAP: return "(no option)"; 
+    case IXIY_SWAP: return "-IXIY";
+    case IXIY_SOFT_SWAP: return "-IXIY-soft";
+    default: Assert(0); return "";
+    }
+}
+
+void error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy) {
+    ostringstream error;
+    error << "file " << filename << " compiled with " << ixiy_to_string(swap_ixiy)
+        << ", incompatible with " << ixiy_to_string(g_args.swap_ixiy());
+    g_errors.error(ErrCode::IXIYIncompatible, error.str());
+}
+
+void error_date_and_mstar_incompatible() {
+    g_errors.error(ErrCode::DateAndMstarIncompatible);
 }

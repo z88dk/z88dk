@@ -1,29 +1,20 @@
-#
-# Make CP/M GSX graphics lib (only the C code portions)
-#
-# $Id: Makefile $
-#
-
 include ../../../Make.config
 
-EPFILES = \
-	clg.c      clga.c      xorclga.c   setxy.c     move.c\
-	plot.c     unplot.c    xorplot.c   xorborder.c \
-	draw.c     drawb.c     drawr.c     drawto.c \
-	undraw.c   undrawb.c   undrawr.c   undrawto.c \
-	xordraw.c  xordrawb.c  xordrawr.c  xordrawto.c \
-	putc_gsx.c stencil_render.c
-	
-	
+TARGET = cpm
 
-EPOBJECTS = $(EPFILES:.c=.o)
 
-AFILES  = $(EPFILES:.c=.asm)
+CFILES = $(wildcard *.c)
+ASMFILES = $(wildcard *.asm)
+OBJECTS = $(ASMFILES:.asm=.o) $(CFILES:.c=.o)
 
-all:    $(EPOBJECTS)
+all: dirs $(addprefix obj/8080/,$(OBJECTS)) $(addprefix obj/z80/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS)) $(addprefix obj/z180/,$(OBJECTS))
 
-.c.o:
-	$(ZCC) +test $(CFLAGS) $*.c
 
-clean:
-	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
+
+clean: 
+	$(RM) -r obj
+	$(RM) zcc_opt.def *.err *.o
+
+dirs:
+	@mkdir -p obj/8080 obj/z80
+

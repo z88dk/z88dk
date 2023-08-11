@@ -40,7 +40,7 @@ sub expand_consts {
 				my @range = find_range($asm, $cpu, @ops);
 				for my $c (@range) {
 					my($asm1, @ops1) = replace_const($c, $asm, @ops);
-					if ($asm =~ /^rst/ && $cpu =~ /^r/ && 
+					if ($asm =~ /^rst/ && $cpu =~ /^r2ka|^r3k/ && 
 					    ($c == 0 || $c == 8 || $c == 0x30)) {
 						$opcodes_out{$asm1}{$cpu} = [[0xCD, $c, 0]];
 					}

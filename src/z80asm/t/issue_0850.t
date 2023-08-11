@@ -19,10 +19,6 @@ spew("${test}.asm", "");
 capture_ok("z88dk-z80asm -x${test}.lib ${test}.asm", "");
 ok -f "${test}.lib", "${test}.lib created";
 
-# invalid lib, only header
-my $bytes = slurp("${test}.lib");
-spew("${test}.lib", substr($bytes, 0, 8));		
-
 # link with empty lib
 spew("${test}.asm", <<END);
 	extern main

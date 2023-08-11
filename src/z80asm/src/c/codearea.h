@@ -163,13 +163,6 @@ extern byte_t *append_reserve( int num_bytes );
 extern void patch_from_memory(byte_t* data, int addr, long num_bytes);
 
 /*-----------------------------------------------------------------------------
-*   read/write current module to an open file
-*----------------------------------------------------------------------------*/
-
-/* write object code of the current module, return true if wrote any data */
-extern bool fwrite_module_code(FILE *file, int* p_code_size);
-
-/*-----------------------------------------------------------------------------
 *   write whole code area to an open file
 *----------------------------------------------------------------------------*/
 extern void fwrite_codearea(CodeareaFile* binfile, CodeareaFile* relocfile);

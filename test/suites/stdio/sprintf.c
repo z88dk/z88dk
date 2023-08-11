@@ -4,11 +4,13 @@
 #include <string.h>
 #include "test.h"
 
-#ifndef __GBZ80__
-#pragma output CLIB_OPT_PRINTF=0x7fffffff
-#else
+
+#if __RCMX000__ | __GBZ80__ | __8080__
 #pragma output CLIB_OPT_PRINTF=0x40ffffff
+#else
+#pragma output CLIB_OPT_PRINTF=0x7fffffff
 #endif
+
 
 struct sprintf_test {
     char *pattern;
@@ -125,6 +127,8 @@ void test_sprintf_long_positive()
        ++test;
     }
 }
+#if __RCMX000__ | __GBZ80__ | __8080__
+#else
 struct sprintf_test double_tests[] = {
     { "%f", "1.234500" },
     { "% f", "1.234500" }, // This is wrong, should have leading space
@@ -148,6 +152,7 @@ void test_sprintf_double()
        ++test;
     }
 }
+#endif
 
 void test_sprintf_precision_parameter()
 {
@@ -177,12 +182,9 @@ int test_scanf()
     suite_add_test(test_sprintf_int);
     suite_add_test(test_sprintf_int_negative);
     suite_add_test(test_sprintf_long_positive);
-#ifndef __RCMX000__
-#ifndef __8080__
-#ifndef __GBZ80__
+#if __RCMX000__ | __GBZ80__ | __8080__
+#else
     suite_add_test(test_sprintf_double);
-#endif
-#endif
 #endif
     suite_add_test(test_sprintf_precision_parameter);
     suite_add_test(test_sprintf_n);

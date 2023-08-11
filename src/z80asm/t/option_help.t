@@ -38,6 +38,7 @@ Help Options:
 
 Preprocessor Options:
   -IXIY                 Swap IX and IY registers
+  -IXIY-soft            Swap IX and IY registers but write object as unswapped
   -I[=]DIR              Add directory to include search path
   -D[=]SYMBOL[=VALUE]   Define a static symbol in decimal or hex
   -ucase                Convert identifiers to upper case

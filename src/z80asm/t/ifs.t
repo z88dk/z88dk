@@ -430,11 +430,13 @@ END_ERR
 
 spew("$test.asm", <<'END_ASM');
 		if __CPU_Z80__				: defb  1  : endif
+		if __CPU_Z80_STRICT__		: defb 33  : endif
 		if __CPU_Z80N__				: defb  2  : endif
 		if __CPU_Z180__				: defb  3  : endif
-		if __CPU_EZ80__				: defb  15 : endif
-		if __CPU_EZ80_ADL__			: defb  16 : endif
-		if __CPU_EZ80_Z80__			: defb  17 : endif
+		if __CPU_EZ80__				: defb 15  : endif
+		if __CPU_EZ80_ADL__			: defb 16  : endif
+		if __CPU_EZ80_Z80__			: defb 17  : endif
+		if __CPU_R800__				: defb 34  : endif
 		if __CPU_R2KA__				: defb  4  : endif
 		if __CPU_R3K__				: defb  5  : endif
 		if __CPU_8080__				: defb  6  : endif
@@ -474,6 +476,12 @@ check_bin_file("$test.bin", bytes(1, 9, 20));
 capture_ok("z88dk-z80asm -b -mz80 -IXIY $test.asm", "");
 check_bin_file("$test.bin", bytes(1, 9, 12, 20));
 
+capture_ok("z88dk-z80asm -b -mz80_strict $test.asm", "");
+check_bin_file("$test.bin", bytes(33, 9, 20));
+
+capture_ok("z88dk-z80asm -b -mz80_strict -IXIY $test.asm", "");
+check_bin_file("$test.bin", bytes(33, 9, 12, 20));
+
 capture_ok("z88dk-z80asm -b -mz80n $test.asm", "");
 check_bin_file("$test.bin", bytes(2, 9, 20));
 
@@ -497,6 +505,12 @@ check_bin_file("$test.bin", bytes(15, 17, 9, 20));
 
 capture_ok("z88dk-z80asm -b -mez80_z80 -IXIY $test.asm", "");
 check_bin_file("$test.bin", bytes(15, 17, 9, 12, 20));
+
+capture_ok("z88dk-z80asm -b -mr800 $test.asm", "");
+check_bin_file("$test.bin", bytes(34, 20));
+
+capture_ok("z88dk-z80asm -b -mr800 -IXIY $test.asm", "");
+check_bin_file("$test.bin", bytes(34, 12, 20));
 
 capture_ok("z88dk-z80asm -b -mr2ka $test.asm", "");
 check_bin_file("$test.bin", bytes(4, 10, 20));
@@ -529,16 +543,16 @@ capture_ok("z88dk-z80asm -b -mgbz80 -IXIY $test.asm", "");
 check_bin_file("$test.bin", bytes(8, 12, 20));
 
 capture_ok("z88dk-z80asm -b -mti83 $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 13, 20));
+check_bin_file("$test.bin", bytes(33, 9, 13, 20));
 
 capture_ok("z88dk-z80asm -b -mti83 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 12, 13, 20));
+check_bin_file("$test.bin", bytes(33, 9, 12, 13, 20));
 
 capture_ok("z88dk-z80asm -b -mti83plus $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 14, 20));
+check_bin_file("$test.bin", bytes(33, 9, 14, 20));
 
 capture_ok("z88dk-z80asm -b -mti83plus -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 12, 14, 20));
+check_bin_file("$test.bin", bytes(33, 9, 12, 14, 20));
 
 capture_ok("z88dk-z80asm -b -float=genmath $test.asm", "");
 check_bin_file("$test.bin", bytes(1, 9, 20));

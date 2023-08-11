@@ -18,12 +18,11 @@ OPT 		= -O3
 #OPT		= -g -Wextra 
 
 COMMON_FLAGS = -MMD -Wall $(OPT) \
-			-I. -Isrc
+			-I. -Isrc -I../common
 
 LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 			-Isrc/c \
 			-It \
-			-I../common \
 			-I../../ext/optparse \
 			-I../../ext/regex \
 			-I../../ext/uthash/src \
@@ -77,15 +76,15 @@ all: z80asm_lib
 z80asm_lib: $(PROJ)$(EXESUFFIX)
 ifeq ($(CROSS),0)
 	$(MAKE) -C dev/z80asm_lib
-	cp dev/z80asm_lib/$(PROJ)-*.lib .
+	cp dev/z80asm_lib/$(PROJ).lib .
   ifdef ZCCCFG
-	cp dev/z80asm_lib/$(PROJ)-*.lib $(ZCCCFG)/../
+	cp dev/z80asm_lib/$(PROJ).lib $(ZCCCFG)/../
   endif
 endif
 
 clean::
 	$(MAKE) -C dev/z80asm_lib clean
-	$(RM) $(PROJ)-*.lib
+	$(RM) $(PROJ).lib
 
 #------------------------------------------------------------------------------
 # developer generated source files, and test libs
@@ -217,3 +216,20 @@ clean::
 	$(RM) $(DEPENDS)
 
 -include $(DEPENDS)
+
+#------------------------------------------------------------------------------
+# rebuild the three tools needed for the tests
+rebuild:
+	$(MAKE) -C ../common
+	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm.lib
+	$(MAKE) -C ../z80asm dev
+	cp ../z80asm/z88dk-z80asm$(EXESUFFIX) ../../bin/
+	$(MAKE) -C ../z80nm
+	cp ../z80nm/z88dk-z80nm$(EXESUFFIX) ../../bin/
+	$(MAKE) -C ../zobjcopy all
+	cp $(PROJ)$(EXESUFFIX) ../../bin/
+
+retest: rebuild
+	$(MAKE) -C ../common test
+	$(MAKE) -C ../z80asm testdev
+	$(MAKE) -C ../zobjcopy test

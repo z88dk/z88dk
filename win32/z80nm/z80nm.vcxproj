@@ -172,7 +172,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\zutils.c" />
-    <ClCompile Include="..\..\src\z80nm\ar.c" />
+    <ClCompile Include="..\..\src\z80nm\ar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\getopt\getopt.vcxproj">

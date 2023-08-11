@@ -32,6 +32,6 @@ target/px8/stdio/ansi/f_ansi_attr
 target/px8/stdio/ansi/f_ansi_bel
 target/px8/stdio/ansi/f_ansi_char
 target/px8/stdio/ansi/f_ansi_cls
-stdio/ansi/generic/f_ansi_dline
+stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/px8/stdio/ansi/f_ansi_scrollup
 target/px8/stdio/ansi/_font_8x6_px

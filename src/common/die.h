@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // die - check results and die on error
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #pragma once
@@ -22,7 +22,7 @@
 #include <dirent.h>
 
 // error message and exit program
-extern void die(char *msg, ...);
+extern void die(const char *msg, ...);
 
 // assertion that is not removed in a release compile
 #define xassert(f)			do { \
