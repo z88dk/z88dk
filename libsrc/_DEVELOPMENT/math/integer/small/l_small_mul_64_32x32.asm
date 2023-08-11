@@ -43,7 +43,7 @@ l0_small_mul_64_32x32:
 
    ld a,b
    ld b,33
-   
+
    jr start
 
 loop_0:
@@ -65,12 +65,11 @@ loop_1:
 start:
 
    exx
-   rr b
-   rr c
+   rr bc
    exx
    rra
    rr c
-   
+
    djnz loop_0
 
    ; result = hl' hl bc' ac
@@ -82,5 +81,5 @@ start:
    ld de,bc
    exx
    pop de
-   
+
    ret

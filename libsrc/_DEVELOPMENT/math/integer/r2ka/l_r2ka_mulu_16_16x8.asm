@@ -25,7 +25,7 @@ l_r2ka_mulu_16_16x8:
     mul                         ; signed multiply of BC and DE,
                                 ; result in HL:BC
 
-    ld hl,bc                    ; signed result to hl
+    ld hl,bc                    ; result to hl
 
     or a
     ret
