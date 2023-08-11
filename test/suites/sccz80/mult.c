@@ -93,6 +93,9 @@ void test_mult_long()
 {
      long val1 = 3;
      long val2 = 5;
+     long val3 = 10923;
+     long val4 = 715827883;
+     long val5 = 32769;
 
      Assert(  val1 *  val2  ==  15, " 3 *  5");
      Assert(  val1 * -val2  == -15, " 3 * -5");
@@ -102,6 +105,29 @@ void test_mult_long()
      Assert(  val2 * -val1  == -15, " 5 * -3");
      Assert( -val2 *  val1  == -15, "-5 *  3");
      Assert( -val2 * -val1  ==  15, "-5 * -3");
+
+     Assert(  val1 *  val3  ==  32769, " 3 *  10923");
+     Assert(  val1 * -val3  == -32769, " 3 * -10923");
+     Assert( -val1 *  val3  == -32769, "-3 *  10923");
+     Assert( -val1 * -val3  ==  32769, "-3 * -10923");
+     Assert(  val3 *  val1  ==  32769, " 10923 *  3");
+     Assert(  val3 * -val1  == -32769, " 10923 * -3");
+     Assert( -val3 *  val1  == -32769, "-10923 *  3");
+     Assert( -val3 * -val1  ==  32769, "-10923 * -3");
+
+     Assert(  val1 *  val4  ==  2147483649, " 3 *  715827883");
+     Assert(  val1 * -val4  == -2147483649, " 3 * -715827883");
+     Assert( -val1 *  val4  == -2147483649, "-3 *  715827883");
+     Assert( -val1 * -val4  ==  2147483649, "-3 * -715827883");
+     Assert(  val4 *  val1  ==  2147483649, " 715827883 *  3");
+     Assert(  val4 * -val1  == -2147483649, " 715827883 * -3");
+     Assert( -val4 *  val1  == -2147483649, "-715827883 *  3");
+     Assert( -val4 * -val1  ==  2147483649, "-715827883 * -3");
+
+     Assert(  val5 *  val5  ==  1073807361, " 32769 *  32769");
+     Assert(  val5 * -val5  == -1073807361, " 32769 * -32769");
+     Assert( -val5 *  val5  == -1073807361, "-32769 *  32769");
+     Assert( -val5 * -val5  ==  1073807361, "-32769 * -32769");
 }
 
 void test_mult_unsigned_long()
@@ -110,17 +136,18 @@ void test_mult_unsigned_long()
      unsigned long val2 = 5;
      unsigned long val3 = 0x2AAB;
      unsigned long val4 = 0x2AAAAAAB;
+     unsigned long val5 = 0x8001;
 
      Assert( val1 * val2  ==  15, "3 * 5");
      Assert( val2 * val1  ==  15, "5 * 3");
 
      Assert( val1 * val3  ==  0x8001, "3 * 0x2AAB");
      Assert( val3 * val1  ==  0x8001, "0x2AAB * 3");
+
      Assert( val1 * val4  ==  0x80000001, "3 * 0x2AAAAAAB");
      Assert( val4 * val1  ==  0x80000001, "0x2AAAAAAB * 3");
 
-     Assert( val1 * val3 * 3 ==  0x18003, "3 * 0x2AAB * 3");
-     Assert( val3 * val1 * 3 ==  0x18003, "0x2AAB * 3 * 3");
+     Assert( val5 * val5  ==  0x40010001, "0x8001 * 0x8001");
 }
 
 void test_mult_int()
