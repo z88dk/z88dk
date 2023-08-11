@@ -59,7 +59,7 @@ static char *handle_rot(dcontext *state,  uint8_t z)
         if ( cansll() ) {
             instr = "sll";
         } else if ( isr800() ) {
-            instr = "test";
+            instr = "sla";
         } else if ( isgbz80() ) {
             instr = "swap";
         }

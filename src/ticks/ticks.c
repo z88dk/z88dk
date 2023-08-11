@@ -739,6 +739,7 @@ int main (int argc, char **argv){
     printf("  -mr3k          Emulate a Rabbit 3000\n"),
     printf("  -mz80n         Emulate a Spectrum Next z80n\n"),
     printf("  -mez80_z80     Emulate an ez80 (z80 mode)\n"),
+    printf("  -mr800         Emulate a r800 (ticks may not be accurate)\n"),
     printf("  -ide0 <file>   Set file to be ide device 0\n"),
     printf("  -ide1 <file>   Set file to be ide device 1\n"),
     printf("  -iochar X      Set port X to be character input/output\n"),
@@ -833,6 +834,8 @@ int main (int argc, char **argv){
             c_cpu = CPU_EZ80;
           } else if ( strcmp(&argv[0][1],"mgbz80") == 0 ) {
             c_cpu = CPU_GBZ80;
+          } else if ( strcmp(&argv[0][1],"mr800") == 0 ) {
+            c_cpu = CPU_R800;
           } else {
             printf("Unknown CPU: %s\n",&argv[0][1]);
           }
@@ -4004,6 +4007,106 @@ int main (int argc, char **argv){
                   st += 8; break;
               }
               break;
+          case 0xf9:   // (R800) MULUB A,A
+            if ( isr800() ) {
+              uint16_t v = a * a;  
+              h = (v >> 8) & 0xff;
+              l = v & 0xff;
+              st += 14;
+            } else st += 8; 
+            break;
+          case 0xc1:   // (R800) MULUB A,B
+            if ( isr800() ) {
+              uint16_t v = a * b;  
+              h = (v >> 8) & 0xff;
+              l = v & 0xff;
+              st += 14;
+            } else st += 8; 
+            break;
+          case 0xc9:   // (R800) MULUB A,C
+            if ( isr800() ) {
+              uint16_t v = a * c;  
+              h = (v >> 8) & 0xff;
+              l = v & 0xff;
+              st += 14;
+            } else st += 8; 
+            break;
+          case 0xd1:   // (R800) MULUB A,D
+            if ( isr800() ) {
+              uint16_t v = a * d;  
+              h = (v >> 8) & 0xff;
+              l = v & 0xff;
+              st += 14;
+            } else st += 8; 
+            break;
+          case 0xd9:   // (R800) MULUB A,E
+            if ( isr800() ) {
+              uint16_t v = a * e;  
+              h = (v >> 8) & 0xff;
+              l = v & 0xff;
+              st += 14;
+            } else st += 8; 
+            break;
+          case 0xe1:   // (R800) MULUB A,H
+            if ( isr800() ) {
+              uint16_t v = a * h;  
+              h = (v >> 8) & 0xff;
+              l = v & 0xff;
+              st += 14;
+            } else st += 8; 
+            break;
+          case 0xe9:   // (R800) MULUB A,L
+            if ( isr800() ) {
+              uint16_t v = a * l;  
+              h = (v >> 8) & 0xff;
+              l = v & 0xff;
+              st += 14;
+            } else st += 8; 
+            break;
+          case 0xc3:  // (R800) MULUW HL,BC
+            if ( isr800() ) {
+              // DE:HL = HL • BC
+              uint32_t result = (( h * 256 ) + l) * (( b * 256 ) + c);
+              d = (result >> 24) & 0xff;
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 36;
+            } else st += 8; 
+            break;
+          case 0xd3:  // (R800) MULUW HL,DE
+            if ( isr800() ) {
+              // DE:HL = HL • DE
+              uint32_t result = (( h * 256 ) + l) * (( d * 256 ) + e);
+              d = (result >> 24) & 0xff;
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 36;
+            } else st += 8; 
+            break;
+          case 0xe3:  // (R800) MULUW HL,HL
+            if ( isr800() ) {
+              // DE:HL = HL • HL
+              uint32_t result = (( h * 256 ) + l) * (( h * 256 ) + l);
+              d = (result >> 24) & 0xff;
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 36;
+            } else st += 8; 
+            break;
+          case 0xf3:  // (R800) MULUW HL,SP
+            if ( isr800() ) {
+              // DE:HL = HL • SP
+              uint32_t result = (( h * 256 ) + l) * (sp & 0xffff);
+              d = (result >> 24) & 0xff;
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 36;
+            } else st += 8; 
+            break;
           case 0x00: case 0x01:       // NOP
           case 0x05: case 0x06:
           case 0x08: case 0x09: case 0x0a: case 0x0b:
@@ -4027,21 +4130,21 @@ int main (int argc, char **argv){
           case 0xad: case 0xae: case 0xaf:
           case 0xb6:
           case 0xbd: case 0xbe: case 0xbf:
-          case 0xc0: case 0xc1: case 0xc2: case 0xc3:
+          case 0xc0: case 0xc2: 
           case 0xc4: case 0xc5: case 0xc6: case 0xc7:
-          case 0xc8: case 0xc9: case 0xca: case 0xcb:
+          case 0xc8: case 0xca: case 0xcb:
           case 0xcc: case 0xcd: case 0xce: case 0xcf:
-          case 0xd0: case 0xd1: case 0xd2: case 0xd3:
+          case 0xd0: case 0xd2: 
           case 0xd4: case 0xd5: case 0xd6: case 0xd7:
-          case 0xd8: case 0xd9: case 0xda: case 0xdb:
+          case 0xd8: case 0xda: case 0xdb:
           case 0xdc: case 0xdd: case 0xde: case 0xdf:
-          case 0xe0: case 0xe1: case 0xe2: case 0xe3:
+          case 0xe0: case 0xe2: 
           case 0xe4: case 0xe5: case 0xe6: case 0xe7:
-          case 0xe8: case 0xe9: case 0xea: case 0xeb:
+          case 0xe8: case 0xea: case 0xeb:
           case 0xec: case 0xed: case 0xee: case 0xef:
-          case 0xf0: case 0xf1: case 0xf2: case 0xf3:
+          case 0xf0: case 0xf1: case 0xf2: 
           case 0xf4: case 0xf5: case 0xf6: case 0xf7:
-          case 0xf8: case 0xf9: case 0xfa: case 0xfb:
+          case 0xf8: case 0xfa: case 0xfb:
           case 0xfc: case 0xfd: case 0xff:
             st+= 8; break;
           case 0x26:                                         // (ZXN) mirror de
