@@ -2926,8 +2926,8 @@ int main (int argc, char **argv){
       case 0xf7: // RST 0x30, (RCM) mul
         if ( israbbit()) {
           // HL:BC = BC • DE
-          int32_t result = (( d * 256 ) + e) * (( b * 256 ) + c);
-          h = (result >> 24);
+          int32_t result = (( (int32_t)(int8_t)d * 256 ) + e) * (( (int32_t)(int8_t)b * 256 ) + c);
+          h = (result >> 24) & 0xff;
           l = (result >> 16) & 0xff;
           b  = (result >> 8 ) & 0xff;
           c = result & 0xff;
