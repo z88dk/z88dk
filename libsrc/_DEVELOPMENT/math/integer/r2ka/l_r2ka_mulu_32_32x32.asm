@@ -17,7 +17,7 @@ l0_r2ka_mulu_32_16x16:
     ; exit  : dehl = 32-bit product
     ;         carry reset
     ;
-    ; uses  : af, bc, de, hl, bc', de', hl'
+    ; uses  : af, bc, de, hl, hl'
 
     ex de,hl'
     jp l_mulu_32_16x16
@@ -78,26 +78,29 @@ l0_r2ka_mulu_32_32x32:
     ;
     ; multiply the MSWs and add, then multiply and add LSW
 
+                                ; signed multiply of BC and DE,
+                                ; result in HL:BC
     mul                         ; yh * xl
     exx
 
     mul                         ; xh * yl
-    ld hl',bc
+    ld hl',bc                   ; LSW( xh * yl )
     exx
 
-    add hl,bc                   ; hl = partial result LSW(yh * xl + xh * yl)
-    ld bc',de
+    ld hl',de                   ; xl
+
+    add hl,bc                   ; hl = partial result LSW( yh * xl + xh * yl )
+    ex de,hl                    ; de = partial result
     exx
 
-    mul                         ; hlbc = yl * xl
-    ld bc',bc                   ; LSW( yl * xl)
-    ex de',hl                   ; MSW( yl * xl)
+    call l_mulu_32_16x16        ; yl * xl = de*hl => dehl ; uses bc, hl'
+    ld hl',de                   ; MSW( yl * xl )
     exx
 
-    add hl,de                   ; hl = LSW(yh * xl + xh * yl) + MSW(yl * xl)
+    add hl,de                   ; hl = LSW( yh * xl + xh * yl ) + MSW( yl * xl )
+    exx
 
-    ex de,hl
-    ld hl,bc                    ; result to dehl
+    ex de,hl'                   ; result to dehl
 
     or a                        ; carry reset
     ret                         ; exit  : dehl = 32-bit product
