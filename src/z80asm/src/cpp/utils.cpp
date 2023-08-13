@@ -260,8 +260,19 @@ static void expand_glob_1(set<fs::path>& result, const string& pattern) {
 
 // use set in recursion to eliminate duplicates
 void expand_glob(vector<fs::path>& result, const string& pattern) {
-	set<fs::path> files;
-	expand_glob_1(files, pattern);
-	for (auto& file : files) 
-		result.push_back(file.generic_string());
+    set<fs::path> files;
+    expand_glob_1(files, pattern);
+
+    // #2380 - remove ./ prefix if it was added during glob search
+    bool pattern_has_dot_slash = (pattern.substr(0, 2) == "./");
+    for (auto& file : files) {
+        string file_str = file.generic_string();
+
+        if (!pattern_has_dot_slash && file_str.substr(0, 2) == "./") {
+            // ./ was added during glob search
+            file_str.erase(file_str.begin(), file_str.begin() + 2);
+        }
+
+        result.push_back(file_str);
+    }
 }
