@@ -1,5 +1,9 @@
 #!/usr/bin/env perl
 
+#------------------------------------------------------------------------------
+# Build parser rules for parsing the opcodes
+#------------------------------------------------------------------------------
+
 use Modern::Perl;
 use YAML::Tiny;
 
@@ -288,7 +292,9 @@ sub merge_cpu {
 			}
 			$ret .= "\n$code\nbreak;\n"
 		}
-		$ret .= "default: error_illegal_ident(); }\n";
+		$ret .= "default: ".
+				"error_illegal_ident(); ".
+				"}\n";
 	}
 	
 	return $ret;

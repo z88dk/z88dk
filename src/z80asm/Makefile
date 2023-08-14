@@ -121,22 +121,12 @@ src/c/tokens.h : make_tokens.pl Makefile
 	dos2unix src/c/tokens.h 2> /dev/null
 
 # opcode tables generator
-dev: dev/cpu/opcodes.yaml \
-	 dev/cpu/opcodes.txt \
-	 dev/cpu/cpu_test_z80_ok.asm \
-	 dev/cpu/cpu_rules.h
+dev: src/c/cpu_rules.h
+src/c/cpu_rules.h: \
+			$(wildcard dev/cpu/*.pl dev/cpu/*.y dev/cpu/Makefile) Makefile
+	$(MAKE) -C dev/cpu
+	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
 
-dev/cpu/opcodes.yaml: dev/cpu/make_opcodes.pl Makefile
-	cd dev/cpu && perl make_opcodes.pl && dos2unix opcodes.yaml 2> /dev/null
-
-dev/cpu/opcodes.txt: dev/cpu/opcodes.yaml dev/cpu/dump_opcodes.pl Makefile
-	cd dev/cpu && perl dump_opcodes.pl && dos2unix opcodes.txt 2> /dev/null
-
-dev/cpu/cpu_test_z80_ok.asm: dev/cpu/opcodes.yaml dev/cpu/make_cpu_test.pl Makefile
-	cd dev/cpu && perl make_cpu_test.pl && dos2unix cpu_test_*.asm 2> /dev/null
-
-dev/cpu/cpu_rules.h: dev/cpu/opcodes.yaml dev/cpu/make_cpu_rules.pl Makefile
-	cd dev/cpu && perl make_cpu_rules.pl && dos2unix cpu_rules.h 2> /dev/null
 
 # reloc routine
 dev: src/c/reloc_code.c
