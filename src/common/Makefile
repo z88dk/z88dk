@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------
 # Test common utils
-# Copyright (C) Paulo Custodio, 2011-2022
+# Copyright (C) Paulo Custodio, 2011-2023
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #-----------------------------------------------------------------------------
 

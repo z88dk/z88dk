@@ -11,7 +11,7 @@ use Modern::Perl;
 path("${test}dir")->mkpath;
 
 capture_nok("z88dk-z80asm -b -I${test}dir f_not_found.asm", <<END);
-error: file open: f_not_found.asm
+error: file not found: f_not_found.asm
 END
 
 path("${test}dir")->remove_tree if Test::More->builder->is_passing;

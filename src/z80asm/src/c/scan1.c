@@ -2,7 +2,7 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2023
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -14,7 +14,8 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #include "if.h"
 #include "init.h"
 #include "list.h"
-#include "scan.h"
+#include "z80asm_cpu.h"
+#include "scan1.h"
 #include "str.h"
 #include "utarray.h"
 #include "zutils.h"
@@ -307,7 +308,7 @@ static bool fill_buffer( void )
 		else 
 		{
 			/* get next line from input source file */
-			char* line = sfile_get_source_line();
+			char* line = sfile_getline();
 			if ( line == NULL )
 				return false;
 

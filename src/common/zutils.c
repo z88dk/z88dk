@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm restart
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: http://www.perlfoundation.org/artistic_license_2_0
 // Repository: https://github.com/z88dk/z88dk
 //-----------------------------------------------------------------------------
@@ -98,94 +98,4 @@ size_t str_compress_escapes(char* str) {
 	*q = '\0';
 
 	return q - str;
-}
-
-
-// UT_string
-
-UT_string* utstr_new(void) {
-	UT_string* str;
-	utstring_new(str);
-	return str;
-}
-
-UT_string* utstr_new_init(const char* src) {
-	UT_string* str = utstr_new();
-	utstr_append(str, src);
-	return str;
-}
-
-bool utstr_fgets(UT_string* str, FILE* fp) {
-	int c1, c2;
-	utstr_clear(str);
-	utstr_reserve(str, BUFSIZ);
-
-	while ((c1 = getc(fp)) != EOF && c1 != '\n' && c1 != '\r')
-		utstr_append_fmt(str, "%c", c1);
-	if (c1 == EOF) {
-		if (utstr_len(str) > 0)
-			utstr_append(str, "\n");		// add missing newline
-	}
-	else {
-		utstr_append(str, "\n");			// add end of line
-		if (c1 == '\r' && (c2 = getc(fp)) != EOF && c2 != '\n')
-			ungetc(c2, fp);					// push back to input
-	}
-	return utstr_len(str) > 0 ? true : false;
-}
-
-// utstring_reserve(x) allocates 100+x and does not take space for '\0' into account
-// rewrite
-void utstr_reserve(UT_string* str, size_t amt) {
-	size_t new_size = str->i + amt + 1;		// space for null char
-	if (new_size > str->n) {
-		str->d = xrealloc(str->d, new_size);
-		str->n = new_size;
-	}
-	str->d[str->n - 1] = '\0';
-}
-
-void utstr_set(UT_string* dst, const char* src) {
-	utstr_set_n(dst, src, strlen(src));
-}
-
-void utstr_set_n(UT_string* dst, const char* src, size_t n) {
-	utstr_clear(dst);
-	utstr_append_n(dst, src, n);
-}
-
-void utstr_set_fmt(UT_string* str, const char* fmt, ...) {
-	utstr_clear(str);
-	va_list ap;
-	va_start(ap, fmt);
-	utstring_printf_va(str, fmt, ap);
-	va_end(ap);
-}
-
-void utstr_set_str(UT_string* str, UT_string* src) {
-	utstr_clear(str);
-	utstr_append_str(str, src);
-}
-
-void utstr_toupper(UT_string* str) {
-	strtoupper(utstr_body(str));
-}
-
-void utstr_tolower(UT_string* str) {
-	strtolower(utstr_body(str));
-}
-
-void utstr_chomp(UT_string* str) {
-	strchomp(utstr_body(str));
-	utstr_sync_len(str);
-}
-
-void utstr_strip(UT_string* str) {
-	strstrip(utstr_body(str));
-	utstr_sync_len(str);
-}
-
-void utstr_compress_escapes(UT_string* str) {
-	size_t len= str_compress_escapes(utstr_body(str));
-	utstr_len(str) = len;
 }

@@ -25,16 +25,19 @@ END
 capture_ok("z88dk-z80asm -x${test}plat1.lib ${test}plat1.asm ${test}gen.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<END);
-Library file ${test}plat1.lib at \$0000: Z80LMF16
-Object  file ${test}plat1.lib at \$0010: Z80RMF16
+Library file ${test}plat1.lib at \$0000: Z80LMF18
+Object  file ${test}plat1.lib at \$0014: Z80RMF18
   Name: ${test}plat1
+  CPU:  z80 
+  Section "": 0 bytes
 
-Object  file ${test}plat1.lib at \$0054: Z80RMF16
+Object  file ${test}plat1.lib at \$008C: Z80RMF18
   Name: ${test}gen
+  CPU:  z80 
   Section "": 3 bytes
     C \$0000: 3E 01 C9
   Symbols:
-    G A \$0000 putpixel (section "") (file ${test}gen.asm:3)
+    G A \$0000: putpixel (section "") (file ${test}gen.asm:3)
 
 END
 
@@ -52,16 +55,19 @@ END
 capture_ok("z88dk-z80asm -x${test}plat2.lib ${test}plat2.asm ${test}gen.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<END);
-Library file ${test}plat1.lib at \$0000: Z80LMF16
-Object  file ${test}plat1.lib at \$0010: Z80RMF16
+Library file ${test}plat1.lib at \$0000: Z80LMF18
+Object  file ${test}plat1.lib at \$0014: Z80RMF18
   Name: ${test}plat1
+  CPU:  z80 
+  Section "": 0 bytes
 
-Object  file ${test}plat1.lib at \$0054: Z80RMF16
+Object  file ${test}plat1.lib at \$008C: Z80RMF18
   Name: ${test}gen
+  CPU:  z80 
   Section "": 3 bytes
     C \$0000: 3E 01 C9
   Symbols:
-    G A \$0000 putpixel (section "") (file ${test}gen.asm:3)
+    G A \$0000: putpixel (section "") (file ${test}gen.asm:3)
 
 END
 

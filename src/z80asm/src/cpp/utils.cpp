@@ -1,30 +1,41 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // utils
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
 #include "utils.h"
 #include <regex>
 #include <set>
+#include <algorithm>
+
+bool is_ident(const string& ident) {
+    if (ident.empty())
+        return false;
+    else if (!is_ident_start(ident[0]))
+        return false;
+    else {
+        for (auto c : ident) {
+            if (!is_ident(c))
+                return false;
+        }
+        return true;
+    }
+}
+
+int char_digit(char c) {
+    return is_digit(c) ? c - '0' : is_xdigit(c) ? 10 + to_upper(c) - 'A' : -1;
+}
 
 string str_tolower(string str) {
-	for (auto& c : str)
-		c = tolower(c);
-	return str;
+    std::transform(str.begin(), str.end(), str.begin(), [](char c) {return to_lower(c); });
+    return str;
 }
 
 string str_toupper(string str) {
-	for (auto& c : str)
-		c = toupper(c);
-	return str;
-}
-
-static int char_digit(char c) {
-	if (isdigit(c)) return c - '0';
-	if (isxdigit(c)) return 10 + toupper(c) - 'A';
-	return -1;
+    std::transform(str.begin(), str.end(), str.begin(), [](char c) {return to_upper(c); });
+    return str;
 }
 
 // convert "\xnn" et all to characters
@@ -84,23 +95,25 @@ string str_expand_escapes(const string& in) {
 	string out;
 	for (auto c : in) {
 		switch (c) {
-		case '\a':	out += "\\a"; break;
-		case '\b':	out += "\\b"; break;
-		case '\f':	out += "\\f"; break;
-		case '\n':	out += "\\n"; break;
-		case '\r':	out += "\\r"; break;
-		case '\t':	out += "\\t"; break;
-		case '\v':	out += "\\v"; break;
-		default:
+		case '\a': out += "\\a"; break;
+		case '\b': out += "\\b"; break;
+		case '\f': out += "\\f"; break;
+		case '\n': out += "\\n"; break;
+		case '\r': out += "\\r"; break;
+		case '\t': out += "\\t"; break;
+		case '\v': out += "\\v"; break;
+        case '\\': out += "\\\\"; break;
+        case '"': out += "\\\""; break;
+        default:
 			if (c >= 0x20 && c < 0x7f)
 				out.push_back(c);
-			else if (c < 8)
+			else if ((c & 0xff) < 8)
 				out += "\\" + to_string(c);			// \o
 			else {
 				std::ostringstream ss;
 				ss << "\\x"
 					<< std::setfill('0') << std::setw(2)
-					<< std::hex << c << std::dec;
+					<< std::hex << static_cast<unsigned int>(c & 0xff) << std::dec;
 				out += ss.str();
 			}
 		}
@@ -117,35 +130,35 @@ bool str_ends_with(const string& str, const string& ending) {
 }
 
 string str_chomp(const string& str_) {
-	string str = str_;
-	while (!str.empty() && isspace(str.back()))
-		str.pop_back();
-	return str;
+    string str = str_;
+    while (!str.empty() && is_space(str.back()))
+        str.pop_back();
+    return str;
 }
 
 string str_strip(const string& str) {
-	const char* p = str.c_str();
-	while (*p && isspace(*p))
-		p++;
-	return str_chomp(p);
+    const char* p = str.c_str();
+    while (*p && is_space(*p))
+        p++;
+    return str_chomp(p);
 }
 
 string str_remove_all_blanks(const string& str) {
-	string out;
-	for (auto c : str)
-		if (!isspace(c))
-			out.push_back(c);
-	return out;
+    string out;
+    for (auto c : str)
+        if (!is_space(c))
+            out.push_back(c);
+    return out;
 }
 
 string str_remove_extra_blanks(const string& str) {
 	string out;
 	for (const char* p = str.c_str(); *p != '\0'; p++) {
-		if (!isspace(*p))
+        if (!is_space(*p))
 			out.push_back(*p);
 		else {
 			out.push_back(' ');
-			while (p[1] && isspace(p[1]))
+			while (is_space(p[1]))
 				p++;
 		}
 	}
@@ -161,57 +174,23 @@ string str_replace_all(string text, const string& find, const string& replace) {
 	return text;
 }
 
-// https://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
-istream& safe_getline(istream& is, string& t) {
-	t.clear();
-
-	// The characters in the stream are read one-by-one using a streambuf.
-	// That is faster than reading them one-by-one using the istream.
-	// Code that uses streambuf this way must be guarded by a sentry object.
-	// The sentry object performs various tasks,
-	// such as thread synchronization and updating the stream state.
-	istream::sentry se(is, true);
-	streambuf* sb = is.rdbuf();
-	for (;;) {
-		int c = sb->sbumpc();
-
-		switch (c) {
-		case '\n':
-			return is;
-
-		case '\r':
-			if (sb->sgetc() == '\n')
-				sb->sbumpc();
-			return is;
-
-#if _MSC_VER >= 1910
-		case streambuf::traits_type::eof():
-#else
-		case EOF:
-#endif
-			// Also handle the case when the last line has no line ending
-			if (t.empty())
-				is.setstate(ios::eofbit);
-			return is;
-
-		default:
-			t += (char)c;
-		}
-	}
-}
-
 static void expand_glob_1(set<fs::path>& result, const string& pattern);
 
 static void expand_wildcards(set<fs::path>& result,
 	const vector<string>& elems, size_t cur_elem) {
 	// build prefix and suffix
 	fs::path prefix;
-	for (size_t i = 0; i < cur_elem; i++)
-		prefix /= fs::path(elems[i]);
+    for (size_t i = 0; i < cur_elem; i++) {
+        prefix /= fs::path(elems[i]);
+    }
+    if (prefix.empty()) {
+        prefix = ".";
+    }
 
 	fs::path suffix;
-	for (size_t i = cur_elem + 1; i < elems.size(); i++)
+    for (size_t i = cur_elem + 1; i < elems.size(); i++) {
 		suffix /= elems[i];
+    }
 
 	// expand current element
 	if (elems[cur_elem] == "**") {
@@ -259,7 +238,7 @@ static void expand_glob_1(set<fs::path>& result, const string& pattern) {
 	// split path in directory/file elements
 	fs::path full_path{ pattern };
 	vector<string> elems;
-	for (auto& elem : full_path) {
+	for (auto elem : full_path) {
 		elems.push_back(elem.generic_string());
 	}
 
@@ -281,8 +260,19 @@ static void expand_glob_1(set<fs::path>& result, const string& pattern) {
 
 // use set in recursion to eliminate duplicates
 void expand_glob(vector<fs::path>& result, const string& pattern) {
-	set<fs::path> files;
-	expand_glob_1(files, pattern);
-	for (auto& file : files) 
-		result.push_back(file.generic_string());
+    set<fs::path> files;
+    expand_glob_1(files, pattern);
+
+    // #2380 - remove ./ prefix if it was added during glob search
+    bool pattern_has_dot_slash = (pattern.substr(0, 2) == "./");
+    for (auto& file : files) {
+        string file_str = file.generic_string();
+
+        if (!pattern_has_dot_slash && file_str.substr(0, 2) == "./") {
+            // ./ was added during glob search
+            file_str.erase(file_str.begin(), file_str.begin() + 2);
+        }
+
+        result.push_back(file_str);
+    }
 }

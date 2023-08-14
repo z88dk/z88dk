@@ -4,8 +4,8 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-# z80asm: deletion of empty binary files except first not always working #2043 
 # https://github.com/z88dk/z88dk/issues/2043
+# z80asm: deletion of empty binary files except first not always working #2043 
 
 #------------------------------------------------------------------------------
 # empty default section and empty code section

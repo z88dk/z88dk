@@ -1,8 +1,8 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2022
+# Copyright (C) Paulo Custodio, 2011-2023
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #
 # Preprocessor that translates z80asm source code for CP/M's Z80MR, generates .i file with

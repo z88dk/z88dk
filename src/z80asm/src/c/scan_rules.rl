@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Macro Assembler
 
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2023
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -44,7 +44,7 @@ ragel, to expand token definition from token_def.h.
 #define TOKEN_RABBIT1(opcode, string)	 \
 	string <CAT> i										<NL> \
 	{													<NL> \
-		<TAB>		if ((option_cpu() & CPU_R2KA) || (option_cpu() & CPU_R3K)) {	<NL> \
+		<TAB>		if ((option_cpu() == CPU_R2KA) || (option_cpu() == CPU_R3K)) {	<NL> \
 		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
 		<TAB>		}									<NL> \
 		<TAB>		else {								<NL> \
@@ -59,7 +59,7 @@ ragel, to expand token definition from token_def.h.
 #define TOKEN_ZXN1(opcode, string)	 \
 	string <CAT> i										<NL> \
 	{													<NL> \
-		<TAB>		if (option_cpu() & CPU_Z80N) {			<NL> \
+		<TAB>		if (option_cpu() == CPU_Z80N) {			<NL> \
 		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
 		<TAB>		}									<NL> \
 		<TAB>		else {								<NL> \
@@ -85,6 +85,22 @@ ragel, to expand token definition from token_def.h.
 
 #define TOKEN_8085(opcode)	 \
 	TOKEN_8085_1(opcode, #opcode)
+
+#define TOKEN_EZ80_1(opcode, string)	 \
+	string <CAT> i										<NL> \
+	{													<NL> \
+		<TAB>		if (option_cpu() == CPU_EZ80 ||		<NL> \
+					    option_cpu() == CPU_EZ80_Z80) {	<NL> \
+		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
+		<TAB>		}									<NL> \
+		<TAB>		else {								<NL> \
+		<TAB><TAB>		sym.tok        = TK_NAME;		<NL> \
+		<TAB>		}									<NL> \
+		<TAB>		fbreak; 							<NL> \
+	};													<NL>
+
+#define TOKEN_EZ80(opcode)	 \
+	TOKEN_EZ80_1(opcode, #opcode)
 
 %%{
 machine lexer;

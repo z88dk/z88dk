@@ -18,18 +18,29 @@ spew("${test}.xxx", "ret");
 capture_ok("z88dk-z80asm -b ${test}.xxx", "");
 check_bin_file("${test}.bin", bytes(0xC9));
 
+# no extension
+
+unlink_testfiles;
+spew("${test}.asm", "ret");
+capture_ok("z88dk-z80asm -b ${test}", "");
+check_bin_file("${test}.bin", bytes(0xC9));
+
+unlink("${test}.bin", "${test}.asm");
+capture_ok("z88dk-z80asm -b ${test}", "");
+check_bin_file("${test}.bin", bytes(0xC9));
+
 # o extension
 
-for my $file ("${test}", "${test}.o") {
-	unlink_testfiles;
-	spew("${test}.asm", "ret");
-	capture_ok("z88dk-z80asm -b $file", "");
-	check_bin_file("${test}.bin", bytes(0xC9));
-	
-	unlink("${test}.bin", "${test}.asm");
-	capture_ok("z88dk-z80asm -b $file", "");
-	check_bin_file("${test}.bin", bytes(0xC9));
-}
+unlink_testfiles;
+spew("${test}.asm", "ret");
+capture_nok("z88dk-z80asm -b ${test}.o", <<END);
+error: file not found: test_t_option_files.o
+END
+
+unlink("${test}.bin", "${test}.asm");
+capture_nok("z88dk-z80asm -b ${test}.o", <<END);
+error: file not found: test_t_option_files.o
+END
 
 # -- option separator
 unlink_testfiles;

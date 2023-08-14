@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "lex.h"
+#include "scan.h"
 #include "preproc.h"
 using namespace std;
 
@@ -20,7 +20,7 @@ public:
 private:
 	enum class State { Assembly };
 	Preproc		m_preproc;
-	Lexer		m_lexer;
+	ScannedLine		m_line;
 	State		m_state{ State::Assembly };
 
 	bool parse();

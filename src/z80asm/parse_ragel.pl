@@ -1,9 +1,9 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # Z88-DK Z80ASM - Z80 Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2022
+# Copyright (C) Paulo Custodio, 2011-2023
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #
@@ -33,7 +33,9 @@ copy("$FILE.rl1", "$FILE.c") or die "read $FILE.rl failed: $!\n";
 push @TEMP, "$FILE.c";
 
 # preprocess to .c -> .rl2
-my $cmd = "gcc -E $FILE.c";
+my $cc = $ENV{CC};
+$cc = 'gcc' if !defined($cc);
+my $cmd = "$cc -E $FILE.c";
 open(my $in, "$cmd |") or die "Input from '$cmd' failed: $!\n";
 open(my $out, ">", "$FILE.rl2") or die "Output to $FILE.rl2 failed: $!\n";
 push @TEMP, "$FILE.rl2";

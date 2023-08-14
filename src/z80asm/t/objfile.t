@@ -14,11 +14,14 @@ spew("${test}.asm", "");
 
 capture_ok("z88dk-z80asm ${test}.asm", "");
 
-check_bin_file("${test}.o", objfile(NAME => $test));
+check_bin_file("${test}.o", objfile(NAME => $test,
+									CODE => [["", -1, 1, ""]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
+  Section "": 0 bytes
 END
 
 
@@ -32,8 +35,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 									CODE => [["", -1, 1, bytes(0)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 1 bytes
     C \$0000: 00
 END
@@ -49,8 +53,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 									CODE => [["", -1, 1, bytes(0) x 0x10000]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 65536 bytes
     C \$0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     C \$0010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -4161,8 +4166,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 									CODE => [["", 0, 1, bytes(0)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 1 bytes, ORG \$0000
     C \$0000: 00
 END
@@ -4178,8 +4184,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 									CODE => [["", 0xFFFF, 1, bytes(0)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 1 bytes, ORG \$FFFF
     C \$0000: 00
 END
@@ -4216,8 +4223,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 												  0x21,0x7F,0x00,0x39)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 42 bytes
     C \$0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00 EB 21 80 00
     C \$0010: 39 EB EB 21 00 00 39 EB EB 21 7F 00 39 EB 21 80
@@ -4267,17 +4275,18 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 						  0x21,0x7F,0x00,0x39)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 42 bytes
     C \$0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00 EB 21 80 00
     C \$0010: 39 EB EB 21 00 00 39 EB EB 21 7F 00 39 EB 21 80
     C \$0020: FF 39 21 00 00 39 21 7F 00 39
   Symbols:
-    L C \$0003 value8 (section "") (file ${test}.asm:1)
-    L C \$0003 value16 (section "") (file ${test}.asm:2)
-    L C \$007F value127 (section "") (file ${test}.asm:3)
-    L C \$0080 value128 (section "") (file ${test}.asm:4)
+    L C \$0003: value8 (section "") (file ${test}.asm:1)
+    L C \$0003: value16 (section "") (file ${test}.asm:2)
+    L C \$007F: value127 (section "") (file ${test}.asm:3)
+    L C \$0080: value128 (section "") (file ${test}.asm:4)
 END
 
 
@@ -4323,17 +4332,18 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 						  0x21,0x7F,0x00,0x39)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 42 bytes
     C \$0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00 EB 21 80 00
     C \$0010: 39 EB EB 21 00 00 39 EB EB 21 7F 00 39 EB 21 80
     C \$0020: FF 39 21 00 00 39 21 7F 00 39
   Symbols:
-    L C \$0003 value8 (section "") (file ${test}.asm:12)
-    L C \$0003 value16 (section "") (file ${test}.asm:13)
-    L C \$0080 value128 (section "") (file ${test}.asm:15)
-    L C \$007F value127 (section "") (file ${test}.asm:14)
+    L C \$0003: value8 (section "") (file ${test}.asm:12)
+    L C \$0003: value16 (section "") (file ${test}.asm:13)
+    L C \$0080: value128 (section "") (file ${test}.asm:15)
+    L C \$007F: value127 (section "") (file ${test}.asm:14)
 END
 
 
@@ -4357,13 +4367,13 @@ END
 capture_ok("z88dk-z80asm ${test}.asm", "");
 
 check_bin_file("${test}.o", objfile(NAME => $test,
-		       EXPR => [
-				["U", "${test}.asm",2,  "", 0,  1, "", "label*4"],
-				["S", "",3,             "", 2,  4, "", "label*5"],
-				["C", "${test}.inc",1,  "", 5,  6, "", "label*2"],
-				["C", "${test}.asm",5,  "", 8,  9, "", "label2*4"],
-				["C", "${test}.inc",1,  "",11, 12, "", "label*2"],
-				["L", "${test}.asm",7,  "",14, 14, "", "label2*6"]],
+		       EXPRS => [
+				["U", "${test}.asm",2,  "", 0,  1, 2, "", "label*4"],
+				["S", "${test}.asm",3,  "", 2,  4, 3, "", "label*5"],
+				["C", "${test}.inc",1,  "", 5,  6, 3, "", "label*2"],
+				["C", "${test}.asm",5,  "", 8,  9, 3, "", "label2*4"],
+				["C", "${test}.inc",1,  "",11, 12, 3, "", "label*2"],
+				["L", "${test}.asm",7,  "",14, 14, 4, "", "label2*6"]],
 		       SYMBOLS => [
 					["L", "A", "", 0, "label", "${test}.asm", 2],
 					["L", "A", "", 8, "label2", "${test}.asm", 5]],
@@ -4376,21 +4386,22 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 						  0x00,0x00,0x00,0x00)]]));	# addr  14
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 18 bytes, ORG \$0003
     C \$0000: 3E 00 DD 46 00 01 00 00 11 00 00 01 00 00 00 00
     C \$0010: 00 00
   Symbols:
-    L A \$0000 label (section "") (file ${test}.asm:2)
-    L A \$0008 label2 (section "") (file ${test}.asm:5)
+    L A \$0000: label (section "") (file ${test}.asm:2)
+    L A \$0008: label2 (section "") (file ${test}.asm:5)
   Expressions:
-    E Ub \$0000 \$0001: label*4 (section "") (file ${test}.asm:2)
-    E Sb \$0002 \$0004: label*5 (section "") (file ${test}.asm:3)
-    E Cw \$0005 \$0006: label*2 (section "") (file ${test}.inc:1)
-    E Cw \$0008 \$0009: label2*4 (section "") (file ${test}.asm:5)
-    E Cw \$000B \$000C: label*2 (section "") (file ${test}.inc:1)
-    E Ll \$000E \$000E: label2*6 (section "") (file ${test}.asm:7)
+    E U \$0000 \$0001 2: label*4 (section "") (file ${test}.asm:2)
+    E S \$0002 \$0004 3: label*5 (section "") (file ${test}.asm:3)
+    E W \$0005 \$0006 3: label*2 (section "") (file ${test}.inc:1)
+    E W \$0008 \$0009 3: label2*4 (section "") (file ${test}.asm:5)
+    E W \$000B \$000C 3: label*2 (section "") (file ${test}.inc:1)
+    E L \$000E \$000E 4: label2*6 (section "") (file ${test}.asm:7)
 END
 
 
@@ -4410,32 +4421,33 @@ END
 capture_ok("z88dk-z80asm ${test}.asm", "");
 
 check_bin_file("${test}.o", objfile(NAME => $test,
-		       EXPR => [
-				["C", "${test}.asm",6, "", 1, 2, "", "extobj"],
-				["C", "",7,            "", 4, 5, "", "extlib"]],
+		       EXPRS => [
+				["C", "${test}.asm",6, "", 1, 2, 3, "", "extobj"],
+				["C", "${test}.asm",7, "", 4, 5, 3, "", "extlib"]],
 		       SYMBOLS => [
 					["L", "A", "", 0, "local", "${test}.asm", 5],
 				    ["G", "A", "", 1, "global", "${test}.asm", 6]],
-		       LIBS => ["extobj","extlib"],
+		       EXTERNS => ["extobj","extlib"],
 		       CODE => [["", -1, 1,
 						bytes(0x00,
 							  0xCD,0x00,0x00,
 							  0xCD,0x00,0x00)]]));
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 7 bytes
     C \$0000: 00 CD 00 00 CD 00 00
   Symbols:
-    L A \$0000 local (section "") (file ${test}.asm:5)
-    G A \$0001 global (section "") (file ${test}.asm:6)
+    L A \$0000: local (section "") (file ${test}.asm:5)
+    G A \$0001: global (section "") (file ${test}.asm:6)
   Externs:
     U         extobj
     U         extlib
   Expressions:
-    E Cw \$0001 \$0002: extobj (section "") (file ${test}.asm:6)
-    E Cw \$0004 \$0005: extlib (section "") (file ${test}.asm:7)
+    E W \$0001 \$0002 3: extobj (section "") (file ${test}.asm:6)
+    E W \$0004 \$0005 3: extlib (section "") (file ${test}.asm:7)
 END
 
 
@@ -4457,23 +4469,25 @@ capture_ok("z88dk-z80asm -x${test}.lib ${test}1.asm ${test}2.asm", "");
 my $obj1 = slurp("${test}1.o");
 my $obj2 = slurp("${test}2.o");
 
-check_bin_file("${test}.lib", libfile($obj1, $obj2));
+check_bin_file("${test}.lib", libfile([$obj1, $obj2], ["mult", "div"]));
 
 capture_ok("z88dk-z80nm -a ${test}.lib", <<END);
-Library file ${test}.lib at \$0000: Z80LMF16
-Object  file ${test}.lib at \$0010: Z80RMF16
+Library file ${test}.lib at \$0000: Z80LMF18
+Object  file ${test}.lib at \$0014: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 1 bytes
     C \$0000: C9
   Symbols:
-    G A \$0000 mult (section "") (file ${test}1.asm:2)
+    G A \$0000: mult (section "") (file ${test}1.asm:2)
 
-Object  file ${test}.lib at \$0080: Z80RMF16
+Object  file ${test}.lib at \$00C4: Z80RMF18
   Name: ${test}2
+  CPU:  z80 
   Section "": 1 bytes
     C \$0000: C9
   Symbols:
-    G A \$0000 div (section "") (file ${test}2.asm:2)
+    G A \$0000: div (section "") (file ${test}2.asm:2)
 
 END
 
@@ -4485,13 +4499,15 @@ spew("${test}.asm", "");
 
 capture_ok("z88dk-z80asm ${test}.asm", "");
 
-check_bin_file("${test}.o", objfile(NAME => $test));
+check_bin_file("${test}.o", objfile(NAME => $test, 
+                                    CODE => [["", -1, 1, ""]]));
 
 spew("${test}1.asm", "PUBLIC main \n main:");
 
 capture_ok("z88dk-z80asm ${test}1.asm", "");
 
 check_bin_file("${test}1.o", objfile(NAME => "${test}1",
+				CODE => [["", -1, 1, ""]],
 				SYMBOLS => [["G", "A", "", 0, "main", "${test}1.asm", 2]]));
 
 spew("${test}2.asm", "EXTERN main \n jp main");
@@ -4499,8 +4515,8 @@ spew("${test}2.asm", "EXTERN main \n jp main");
 capture_ok("z88dk-z80asm ${test}2.asm", "");
 
 check_bin_file("${test}2.o", objfile(NAME => "${test}2",
-				EXPR => [["C", "${test}2.asm",2, "", 0, 1, "", "main"]],
-				LIBS => ["main"],
+				EXPRS => [["C", "${test}2.asm",2, "", 0, 1, 3, "", "main"]],
+				EXTERNS => ["main"],
 				CODE => [["", -1, 1, bytes(0xC3,0,0)]]));
 
 capture_ok("z88dk-z80asm -b ${test}.o ${test}1.o ${test}2.o", "");

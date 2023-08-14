@@ -2,7 +2,7 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2023
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -16,9 +16,10 @@ Define ragel-based parser.
 #include "expr1.h"
 #include "if.h"
 #include "module1.h"
+#include "z80asm_cpu.h"
 #include "opcodes.h"
 #include "parse.h"
-#include "scan.h"
+#include "scan1.h"
 #include "str.h"
 #include "strutil.h"
 #include "sym.h"
@@ -173,6 +174,52 @@ static void pop_eval_expr(ParseCtx *ctx, int *pvalue, bool *perror)
 	*pvalue = Expr_eval(expr, true);
 	*perror = (expr->result.not_evaluable);
 	OBJ_DELETE(expr);
+}
+
+/*-----------------------------------------------------------------------------
+*   check if whole expression is in parens
+*----------------------------------------------------------------------------*/
+static bool check_expr_in_parens(Sym* start, Sym* end) {
+	if (start->tok != TK_LPAREN && start->tok != TK_LSQUARE)
+		return false;
+
+	UT_string* stack;
+	utstring_new(stack);
+
+	size_t len;
+	bool extra_text = false;
+	for (Sym* p = start; !extra_text && p != end; p++) {
+		switch (p->tok) {
+		case TK_LPAREN:
+			utstring_printf(stack, "%c", TK_RPAREN);
+			break;
+		case TK_LSQUARE:
+			utstring_printf(stack, "%c", TK_RSQUARE);
+			break;
+		case TK_RPAREN:
+		case TK_RSQUARE:
+			len = utstring_len(stack);
+			if (len == 0)			/* syntax error */
+				extra_text = true;
+			else {
+				len--;
+				if (utstring_body(stack)[len] != p->tok)			/* syntax error */
+					extra_text = true;
+				else {
+					utstring_len(stack) = len;
+					if (len == 0 && p + 1 != end)
+						extra_text = true;
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	utstring_free(stack);
+
+	return !extra_text;
 }
 
 /*-----------------------------------------------------------------------------

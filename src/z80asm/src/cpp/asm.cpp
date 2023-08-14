@@ -8,6 +8,7 @@
 #include "asm.h"
 #include "errors.h"
 #include "if.h"
+#include "utils.h"
 using namespace std;
 
 bool Asm::assemble(const string& filename) {
@@ -19,9 +20,8 @@ bool Asm::assemble(const string& filename) {
 bool Asm::parse() {
 	int initial_error_count = g_errors.count();
 
-	string line;
+	ScannedLine line;
 	while (m_preproc.getline(line)) {
-		m_lexer.set(line);
 		parse_line();
 	}
 
@@ -45,26 +45,26 @@ void Asm::parse_line_assembly() {
 		asm_LABEL(label.c_str());
 	*/
 
-	while (!m_lexer.at_end()) {
-		if (m_lexer.peek().ttype == TType::Backslash)
-			m_lexer.next();
+	while (!m_line.at_end()) {
+		if (m_line.peek().type() == TType::Backslash)
+			m_line.next();
 		else
 			asm_parser_assembly();
 	}
 }
 
 string Asm::check_label() {
-	if (m_lexer.peek(0).ttype == TType::Dot &&
-		m_lexer.peek(1).ttype == TType::Ident &&
-		m_lexer.peek(2).keyword != Keyword::EQU) {
-		m_lexer.next(2);
-		return m_lexer.peek(-1).svalue;
+	if (m_line.peek(0).type() == TType::Dot &&
+		m_line.peek(1).type() == TType::Ident &&
+		m_line.peek(2).keyword() != Keyword::EQU) {
+		m_line.next(2);
+		return m_line.peek(-1).svalue();
 	}
-	else if (m_lexer.peek(0).ttype == TType::Ident &&
-		m_lexer.peek(1).ttype == TType::Colon &&
-		m_lexer.peek(2).keyword != Keyword::EQU) {
-		m_lexer.next(2);
-		return m_lexer.peek(-2).svalue;
+	else if (m_line.peek(0).type() == TType::Ident &&
+		m_line.peek(1).type() == TType::Colon &&
+		m_line.peek(2).keyword() != Keyword::EQU) {
+		m_line.next(2);
+		return m_line.peek(-2).svalue();
 	}
 	else
 		return string();

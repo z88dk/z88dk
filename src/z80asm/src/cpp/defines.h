@@ -1,12 +1,13 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // macro symbols
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
 #pragma once
 
+#include "scan.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -15,21 +16,21 @@ using namespace std;
 
 class Macro {
 public:
-	Macro(const string& name, const string& body = "");
+    Macro(const string& name, const ScannedLine& body = ScannedLine());
 
 	const string& name() const { return m_name; }
 	const vector<string>& args() const { return m_args; }
-	const string& body() const { return m_body; }
+	const ScannedLine& body() const { return m_body; }
 	bool is_expanding() const { return m_is_expanding; }
 	void set_expanding(bool f) { m_is_expanding = f; }
 
 	void push_arg(const string& arg);
-	void push_body(const string& text);
+    void push_body(const ScannedLine& other) { m_body.append(other); }
 
 private:
 	string			m_name;
 	vector<string>	m_args;
-	string			m_body;
+    ScannedLine		m_body;
 	bool			m_is_expanding{ false };
 };
 

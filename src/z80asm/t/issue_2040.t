@@ -4,6 +4,9 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
+# https://github.com/z88dk/z88dk/issues/2040
+# z80asm: allow options and filenames in @ files
+
 #------------------------------------------------------------------------------
 # allow filenames with spaces
 unlink_testfiles;

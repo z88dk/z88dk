@@ -10,7 +10,7 @@ ok $version, "version $version";
 
 capture_ok("z88dk-z80asm -h", <<"END");
 Z80 Macro Assembler $version
-(c) InterLogic 1993-2009, Paulo Custodio 2011-2022
+(c) InterLogic 1993-2009, Paulo Custodio 2011-2023
 
 Usage:
   z80asm [options] { \@<modulefile> | <filename> }
@@ -38,10 +38,13 @@ Help Options:
 
 Preprocessor Options:
   -IXIY                 Swap IX and IY registers
+  -IXIY-soft            Swap IX and IY registers but write object as unswapped
   -I[=]DIR              Add directory to include search path
   -D[=]SYMBOL[=VALUE]   Define a static symbol in decimal or hex
   -ucase                Convert identifiers to upper case
   -float[=]FORMAT       Set default float format
+  -raw-strings          Double-quoted strings may include any character
+                        except double quotes
 
 Code Generation Options:
   -m[=]CPU              Assemble for the specified CPU, default z80

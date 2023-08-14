@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2023
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 */
@@ -12,7 +12,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "if.h"
 #include "limits.h"
 #include "modlink.h"
-#include "scan.h"
+#include "scan1.h"
 #include "symtab1.h"
 #include "types.h"
 #include "zobjfile.h"
@@ -75,7 +75,7 @@ void Z80pass2(int start_errors)
 			{
 			case RANGE_JR_OFFSET:
 				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
-				value -= asmpc + 2;		/* get module PC at JR instruction */
+				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
 				if (value >= -128 && value <= 127)
 				{
@@ -185,7 +185,7 @@ void Z80pass2(int start_errors)
 
 	// add to the list of objects to link
 	if (start_errors == get_num_errors())
-		object_file_append(get_o_filename(CURRENTMODULE->filename), CURRENTMODULE, false, false);
+        object_file_append(get_o_filename(CURRENTMODULE->filename), CURRENTMODULE);
 
 	if (start_errors == get_num_errors() && option_symtable())
 		write_sym_file(CURRENTMODULE);
@@ -198,6 +198,7 @@ bool Pass2infoExpr(range_t range, Expr1* expr)
 	{
 		expr->range = range;
 		expr->code_pos = get_cur_module_size();			/* update expression location */
+		expr->opcode_size = get_cur_opcode_size() + range_size(range);
 
 		if (list_is_on())
 			expr->listpos = expr->code_pos;

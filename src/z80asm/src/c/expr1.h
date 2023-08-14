@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2023
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -15,7 +15,8 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "array.h"
 #include "class.h"
 #include "classlist.h"
-#include "scan.h"
+#include "objfile.h"
+#include "scan1.h"
 #include "sym.h"
 #include "utarray.h"
 
@@ -32,7 +33,7 @@ extern UT_icd ut_exprs_icd;
 *----------------------------------------------------------------------------*/
 typedef enum
 {
-	ASMPC_OP, NUMBER_OP, SYMBOL_OP, CONST_EXPR_OP,
+	ASMPC_OP, NUMBER_OP, SYMBOL_OP,
 	UNARY_OP, BINARY_OP, TERNARY_OP,
 } op_type_t;
 
@@ -74,30 +75,12 @@ typedef struct ExprOp				/* hold one operation or operand */
 		/* SYMBOL_OP */
 		Symbol1* symbol;				/* symbol in symbol table */
 
-		/* CONST_EXPR_OP - no data */
-
 		/* UNARY_OP, BINARY_OP, TERNARY_OP */
 		Operator* op;				/* static struct, retrieved by Operator_get() */
 	} d;
 } ExprOp;
 
 ARRAY(ExprOp);					/* hold list of Expr1 operations/operands */
-
-/*-----------------------------------------------------------------------------
-*	Expression range
-*----------------------------------------------------------------------------*/
-typedef enum {
-	RANGE_JR_OFFSET = 1,
-	RANGE_BYTE_UNSIGNED,
-	RANGE_BYTE_SIGNED,
-	RANGE_WORD,						// 16-bit value little-endian
-	RANGE_WORD_BE,					// 16-bit value big-endian
-	RANGE_DWORD,
-	RANGE_BYTE_TO_WORD_UNSIGNED,    // unsigned byte extended to 16 bits
-	RANGE_BYTE_TO_WORD_SIGNED,      // signed byte sign-extended to 16 bits
-	RANGE_PTR24,					// 24-bit pointer
-	RANGE_HIGH_OFFSET,				// byte offset to 0xFF00 
-} range_t;
 
 /* return size in bytes of value of given range */
 extern int range_size(range_t range);
@@ -130,6 +113,7 @@ struct Module1* module;			/* module where expression is patched (weak ref) */
 struct Section1* section;		/* section where expression is patched (weak ref) */
 int			asmpc;				/* ASMPC value during linking */
 int			code_pos;			/* Address to patch expression value */
+int			opcode_size;		/* opcode size to be able to compute jr offset */
 
 const char* filename;			/* file and line where expression defined, string in strpool */
 int			 line_num;			/* source line */
@@ -160,6 +144,9 @@ extern bool Expr_without_addresses(Expr1* self);
 
 /* check if expression depends on itself */
 extern bool Expr_is_recusive(Expr1* self, const char* name);
+
+/* check if expression is difference of two addresses in the same section, convert it to a constant */
+bool Expr_is_addr_diff(Expr1* expr);
 
 /*-----------------------------------------------------------------------------
 *	Stack for calculator

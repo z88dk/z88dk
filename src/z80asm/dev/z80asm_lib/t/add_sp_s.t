@@ -1,17 +1,16 @@
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
-# Copyright (C) Paulo Custodio, 2011-2022
+# Copyright (C) Paulo Custodio, 2011-2023
 # License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 
-use Modern::Perl;
-use Test::More;
-use Path::Tiny;
-require '../../t/testlib.pl';
+BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
-my @CPUS = (qw( 8080 gbz80 r2ka z80 ));
+use Modern::Perl;
+
+my @CPUS = (qw( gbz80 r2ka r3k ));
 
 my $test_nr;
 
@@ -23,7 +22,7 @@ for my $cpu (@CPUS) {
 			
 			my $r = ticks(<<END, "-m$cpu");
 						ld		sp, $base
-						add.a 	sp, $add
+						add 	sp, $add
 						
 						ld		hl, 0
 						add 	hl, sp

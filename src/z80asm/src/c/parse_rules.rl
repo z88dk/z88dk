@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Macro Assembler
 
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2023
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -32,15 +32,16 @@ Define rules for a ragel-based parser.
 				add_opcode_##suffix((opcode), expr); \
 			} while(0)
 
-#define DO_stmt_jr( opcode)	_DO_stmt_(jr,  opcode)
-#define DO_stmt_n(  opcode)	_DO_stmt_(n,   opcode)
-#define DO_stmt_h(  opcode)	_DO_stmt_(h,   opcode)
-#define DO_stmt_n_0(opcode)	_DO_stmt_(n_0, opcode)
-#define DO_stmt_s_0(opcode)	_DO_stmt_(s_0, opcode)
-#define DO_stmt_d(  opcode)	_DO_stmt_(d,   opcode)
-#define DO_stmt_nn( opcode)	_DO_stmt_(nn,  opcode)
-#define DO_stmt_NN( opcode)	_DO_stmt_(NN,  opcode)
-#define DO_stmt_idx(opcode)	_DO_stmt_(idx, opcode)
+#define DO_stmt_jr( opcode)		_DO_stmt_(jr,		opcode)
+#define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
+#define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
+#define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
+#define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
+#define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
+#define DO_stmt_nn( opcode)		_DO_stmt_(nn,		opcode)
+#define DO_stmt_nnn( opcode)	_DO_stmt_(nnn,		opcode)
+#define DO_stmt_NN( opcode)		_DO_stmt_(NN,		opcode)
+#define DO_stmt_idx(opcode)		_DO_stmt_(idx,		opcode)
 
 #define DO_stmt_idx_n(opcode) \
 			do { \
@@ -51,11 +52,19 @@ Define rules for a ragel-based parser.
 			} while(0)
 
 #define DO_stmt_n_n(opcode) \
-			{ 	Expr1 *n2_expr = pop_expr(ctx); \
+			do { \
+			 	Expr1 *n2_expr = pop_expr(ctx); \
 				Expr1 *n1_expr = pop_expr(ctx); \
 				DO_STMT_LABEL(); \
 				add_opcode_n_n((opcode), n1_expr, n2_expr); \
-			}
+			} while(0)
+
+#define DO_stmt_idx_idx1(opcode0, opcode1) \
+			do { \
+			 	Expr1 *idx_expr = pop_expr(ctx); \
+				DO_STMT_LABEL(); \
+				add_opcode_idx_idx1((opcode0), (opcode1), idx_expr); \
+			} while(0)
 
 /*-----------------------------------------------------------------------------
 *   State Machine
@@ -111,38 +120,18 @@ Define rules for a ragel-based parser.
 
 	action expr_start_action {
 		ctx->expr_start = ctx->p;
-		expr_in_parens =
-			(ctx->expr_start->tok == TK_LPAREN) ? true : false;
 		expr_open_parens = 0;
 	}
 
 	/* expression */
 	expr 	= expr1
 			  >expr_start_action
-			  %{ push_expr(ctx); };
+			  %{ expr_in_parens = check_expr_in_parens(ctx->expr_start, ctx->p);
+			     push_expr(ctx); };
 
 	const_expr =
 			  expr %{ pop_eval_expr(ctx, &expr_value, &expr_error); };
 
-	/*---------------------------------------------------------------------
-	*   C_LINE
-	*--------------------------------------------------------------------*/
-	asm_C_LINE =
-		  _TK_C_LINE const_expr _TK_NEWLINE @{
-			if (expr_error)
-				error_expected_const_expr();
-			else
-				asm_C_LINE(expr_value, get_error_filename());
-		}
-
-		| _TK_C_LINE const_expr _TK_COMMA string _TK_NEWLINE @{
-			if (expr_error)
-				error_expected_const_expr();
-			else
-				asm_C_LINE(expr_value, Str_data(name));
-		}
-		;
-	
 	/*---------------------------------------------------------------------
 	*   DEFGROUP
 	*--------------------------------------------------------------------*/
@@ -161,7 +150,7 @@ Define rules for a ragel-based parser.
 		  %{ asm_DEFGROUP_define_const(Str_data(name)); }
 		;
 
-	defgroup_var = defgroup_var_value | defgroup_var_next | asm_C_LINE;
+	defgroup_var = defgroup_var_value | defgroup_var_next;
 
 	defgroup_vars = defgroup_var (_TK_COMMA defgroup_var)* _TK_COMMA? ;
 
@@ -229,7 +218,6 @@ Define rules for a ragel-based parser.
 												ctx->current_sm = SM_MAIN;
 											}
 #endfor  <S>
-		| 	asm_C_LINE
 		;
 
 	asm_DEFVARS =
@@ -474,7 +462,6 @@ Define rules for a ragel-based parser.
 		| asm_DEFGROUP
 		| asm_DEFVARS
 		| asm_DMA
-		| asm_C_LINE
 		/*---------------------------------------------------------------------
 		*   Directives
 		*--------------------------------------------------------------------*/
@@ -513,20 +500,6 @@ Define rules for a ragel-based parser.
 				error_expected_const_expr();
 			else
 				asm_ORG(expr_value);
-		}
-
-		| _TK_LINE const_expr _TK_NEWLINE @{
-			if (expr_error)
-				error_expected_const_expr();
-			else
-				asm_LINE(expr_value, get_error_filename());
-		}
-
-		| _TK_LINE const_expr _TK_COMMA string _TK_NEWLINE @{
-			if (expr_error)
-				error_expected_const_expr();
-			else
-				asm_LINE(expr_value, Str_data(name));
 		}
 
 		| _TK_PHASE const_expr _TK_NEWLINE @{
@@ -572,6 +545,24 @@ Define rules for a ragel-based parser.
 		| label? _TK_CU_NOP _TK_NEWLINE @{
 			DO_STMT_LABEL();
 			add_copper_unit_nop();
+		}
+
+		/*---------------------------------------------------------------------
+		*   ez80
+		*--------------------------------------------------------------------*/
+
+		| _TK_ASSUME _TK_ADL _TK_EQUAL const_expr _TK_NEWLINE @{
+			if (option_cpu() != CPU_EZ80 && option_cpu() != CPU_EZ80_Z80)
+				error_illegal_ident();
+			else if (expr_error)
+				error_expected_const_expr();
+            else {
+                switch (expr_value) {
+                case 0: set_cpu_option(CPU_EZ80_Z80); break;
+                case 1: set_cpu_option(CPU_EZ80); break;
+                default: error_int_range(expr_value);
+                }
+            }
 		}
 
 		;

@@ -102,13 +102,13 @@ sub dump_state {
 		}
 		if ($have_keywords) {
 			say $fh "\t// check keywords";
-			say $fh "\tswitch (m_lexer.peek().keyword) {";
+			say $fh "\tswitch (m_line.peek().keyword()) {";
 			for my $token (sort keys %{$tree->{next}}) {
 				if ($token =~ /^Keyword::/) {
 					my $target = (exists $tree->{next}{$token}{action}) ? 
 									"action_".$tree->{next}{$token}{action} :
 									"state_".$tree->{next}{$token}{state};
-					say $fh "\tcase $token: m_lexer.next(); goto $target;";
+					say $fh "\tcase $token: m_line.next(); goto $target;";
 				}
 			}
 			say $fh "\tdefault:;";
@@ -125,18 +125,17 @@ sub dump_state {
 		}
 		if ($have_tokens) {
 			say $fh "\t// check tokens";
-			say $fh "\tswitch (m_lexer.peek().ttype) {";
+			say $fh "\tswitch (m_line.peek().type()) {";
 			for my $token (sort keys %{$tree->{next}}) {
 				if ($token =~ /^TType::/) {
 					my $target = (exists $tree->{next}{$token}{action}) ? 
 									"action_".$tree->{next}{$token}{action} :
 									"state_".$tree->{next}{$token}{state};
 					if ($token =~ /^TType::End/) {
-						say $fh "\tcase TType::End: goto $target;";
-						say $fh "\tcase TType::Backslash: m_lexer.next(); goto $target;";
+						say $fh "\tcase TType::Newline: m_line.next(); goto $target;";
 					}
 					else {
-						say $fh "\tcase $token: m_lexer.next(); goto $target;";
+						say $fh "\tcase $token: m_line.next(); goto $target;";
 					}
 				}
 			}

@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2023
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -21,6 +21,7 @@ Assembly directives.
 #include "types.h"
 #include "utstring.h"
 #include "z80asm.h"
+#include "z80asm_cpu.h"
 
 static void check_org_align();
 
@@ -32,7 +33,7 @@ static void url_encode(const char *s, char *enc)
     const char *hex = "0123456789abcdef";
 
     int pos = 0;
-    for (int i = 0, t = strlen(s); i < t; i++)
+    for (int i = 0, t = (int)strlen(s); i < t; i++)
     {
         if (('a' <= s[i] && s[i] <= 'z')
         || ('A' <= s[i] && s[i] <= 'Z')
@@ -51,7 +52,8 @@ static void url_encode(const char *s, char *enc)
 /*-----------------------------------------------------------------------------
 *   LABEL: define a label at the current location
 *----------------------------------------------------------------------------*/
-static void define_label_offset(const char* name, int offset) {
+void asm_LABEL_offset(const char* name, int offset)
+{
 	Symbol1* sym;
 
 	if (get_phased_PC() >= 0)
@@ -62,31 +64,29 @@ static void define_label_offset(const char* name, int offset) {
 	sym->is_touched = true;
 }
 
-void asm_LABEL_offset(const char* name, int offset) {
-	define_label_offset(name, offset);
-
-	if (option_debug() && !sfile_is_c_source()) {
-		STR_DEFINE(name, STR_SIZE);
-
-		char fname_encoded[FILENAME_MAX * 2];
-		url_encode(sfile_filename(), fname_encoded);
-
-		Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line_num(), fname_encoded);
-		if (!find_local_symbol(Str_data(name)))
-			define_label_offset(Str_data(name), 0);
-
-		STR_DELETE(name);
-	}
-}
-
-void asm_LABEL(const char* name) {
+void asm_LABEL(const char* name)
+{
 	asm_LABEL_offset(name, 0);
 }
 
-void asm_cond_LABEL(Str* label) {
+void asm_cond_LABEL(Str* label)
+{
 	if (Str_len(label)) {
 		asm_LABEL(Str_data(label));
 		Str_len(label) = 0;
+
+		if (option_debug() && !sfile_is_c_source()) {
+			STR_DEFINE(name, STR_SIZE);
+
+			char fname_encoded[FILENAME_MAX * 2];
+			url_encode(sfile_filename(), fname_encoded);
+
+			Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line_num(), fname_encoded);
+			if (!find_local_symbol(Str_data(name)))
+				asm_LABEL(Str_data(name));
+
+			STR_DELETE(name);
+		}
 	}
 }
 
@@ -182,35 +182,6 @@ void asm_LSTOFF(void)
 /*-----------------------------------------------------------------------------
 *   directives with number argument
 *----------------------------------------------------------------------------*/
-void asm_LINE(int line_num, const char* filename) {
-	sfile_set_filename(filename);
-	sfile_set_line_num(line_num, 1);
-	sfile_set_c_source(false);
-
-	set_error_location(filename, line_num);
-}
-
-void asm_C_LINE(int line_num, const char* filename) {
-	sfile_set_filename(filename);
-	sfile_set_line_num(line_num, 0);		// do not increment line numbers
-	sfile_set_c_source(true);
-
-	set_error_location(filename, line_num);
-
-	if (option_debug()) {
-		STR_DEFINE(name, STR_SIZE);
-
-		char fname_encoded[FILENAME_MAX * 2];
-		url_encode(filename, fname_encoded);
-
-		Str_sprintf(name, "__C_LINE_%ld_%s", line_num, fname_encoded);
-		if (!find_local_symbol(Str_data(name)))
-			asm_LABEL(Str_data(name));
-
-		STR_DELETE(name);
-	}
-}
-
 void asm_ORG(int address)
 {
 	set_origin_directive(address);
@@ -291,7 +262,7 @@ void asm_DEFINE(const char* name)
 
 void asm_UNDEFINE(const char* name)
 {
-	Symbol1Hash_remove(CURRENTMODULE->local_symtab, name);
+    undefine_local_def_sym(name);
 }
 
 /*-----------------------------------------------------------------------------
@@ -299,9 +270,10 @@ void asm_UNDEFINE(const char* name)
 *----------------------------------------------------------------------------*/
 void asm_DEFC(const char* name, Expr1* expr)
 {
-	int value;
+	int value = Expr_eval(expr, false);		/* DEFC constant expression */
 
-	value = Expr_eval(expr, false);		/* DEFC constant expression */
+	/* if expression is difference of two addresses in the same
+	   section, convert it to a constant */
 	if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
 	{
 		/* check if expression depends on itself */
@@ -310,7 +282,7 @@ void asm_DEFC(const char* name, Expr1* expr)
 		}
 		else {
 			/* store in object file to be computed at link time */
-			expr->range = RANGE_WORD;
+			expr->range = RANGE_ASSIGNMENT;
 			expr->target_name = spool_add(name);
 
 			Expr1List_push(&CURRENTMODULE->exprs, expr);

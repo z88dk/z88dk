@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Macro Assembler
 
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2023
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -81,6 +81,9 @@ extern void reset_codearea( void );
 /* return size of current section */
 extern int get_section_size( Section1 *section );
 
+/* return size of current opcode */
+extern int get_cur_opcode_size(void);
+
 /* compute total size of all sections */
 extern int get_sections_size( void );
 
@@ -158,13 +161,6 @@ extern void append_defs(int num_bytes, byte_t fill);
 extern byte_t *append_reserve( int num_bytes );	
 
 extern void patch_from_memory(byte_t* data, int addr, long num_bytes);
-
-/*-----------------------------------------------------------------------------
-*   read/write current module to an open file
-*----------------------------------------------------------------------------*/
-
-/* write object code of the current module, return true if wrote any data */
-extern bool fwrite_module_code(FILE *file, int* p_code_size);
 
 /*-----------------------------------------------------------------------------
 *   write whole code area to an open file

@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // macro symbols
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -11,20 +11,15 @@
 #include <algorithm>
 using namespace std;
 
-Macro::Macro(const string& name, const string& body)
-	: m_name(name), m_body(body) {}
+Macro::Macro(const string& name, const ScannedLine& body)
+    : m_name(name), m_body(body) {
+}
 
 void Macro::push_arg(const string& arg) {
 	if (find(m_args.begin(), m_args.end(), arg) != m_args.end())
 		g_errors.error(ErrCode::DuplicateDefinition, arg);
 	else
 		m_args.push_back(arg);
-}
-
-void Macro::push_body(const string& text) {
-	if (!m_body.empty())
-		m_body.push_back(' ');
-	m_body += text;
 }
 
 //-----------------------------------------------------------------------------

@@ -8,8 +8,10 @@ use Modern::Perl;
 z80asm_ok("", "", "", "", "");
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
+  Section "": 0 bytes
 END
 
 # empty section

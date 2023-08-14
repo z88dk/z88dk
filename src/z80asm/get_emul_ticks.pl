@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # assemble instruction given in command line (separated by ':'), get ticks in all CPUs
 # for carry clear and carry set
@@ -13,7 +13,7 @@ $ENV{PATH} = join($Config{path_sep}, ".", "../ticks", $ENV{PATH});
 
 my $asm = "@ARGV\n"; $asm =~ s/\s*:\s*/\n/g;
 my $tb = Text::Table->new(";", "CPU", "Min T", "Max T");
-for my $cpu (qw( 8080 8085 gbz80 r2ka z180 z80 z80n )) {
+for my $cpu (qw( 8080 8085 gbz80 r2ka z180 z80 z80n ez80 )) {
 	my @T;
 	for my $carry (0..1) {
 		path("test.asm")->spew(

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -8,12 +8,14 @@
 X(Ok, "ok")
 
 // files
+X(FileNotFound, "file not found")
 X(FileOpen, "file open")
 X(IncludeRecursion, "include recursion")
 X(NotLibFile, "not a library file")
 X(NotObjFile, "not an object file")
 X(ObjFileVersion, "invalid object file version")
 X(LibFileVersion, "invalid library file version")
+X(FileRename, "file rename")
 
 // options
 X(NoSrcFile, "source file expected")
@@ -24,6 +26,7 @@ X(InvalidDefineOption, "invalid define (-Dvar=value) option")
 X(InvalidFillerOption, "invalid filler (-f) option")
 X(CmdFailed, "command failed")
 X(InvalidCpu, "invalid cpu")
+X(DateAndMstarIncompatible, "cannot build libraries with -m* and -d")
 
 // lexer
 X(InvalidChar, "invalid character")
@@ -87,5 +90,8 @@ X(OrgRedefined, "ORG redefined")
 X(SegmentOverflow, "segment overflow")
 X(OrgNotAligned, "ORG not aligned")
 X(InvalidOrg, "invalid ORG")
+X(CPUIncompatible, "CPU incompatible")
+X(CPUInvalid, "CPU invalid")
+X(IXIYIncompatible, "-IXIY incompatible")
 
 #undef X
