@@ -6,13 +6,23 @@
 #------------------------------------------------------------------------------
 
 org EXPR $
-	while (!m_lexer.at_end()) m_lexer.next();
+	/*set_origin(expr);*/
+	while (!m_line.at_end()) m_line.next();
 
-LABEL equ EXPR $
-	while (!m_lexer.at_end()) m_lexer.next();
+. IDENT equ EXPR $
+	/*add_equ();*/
+	while (!m_line.at_end()) m_line.next();
+
+IDENT : equ EXPR $
+	/*add_equ();*/
+	while (!m_line.at_end()) m_line.next();
+
+IDENT equ EXPR $
+	/*add_equ();*/
+	while (!m_line.at_end()) m_line.next();
 
 section
-	while (!m_lexer.at_end()) m_lexer.next();
+	while (!m_line.at_end()) m_line.next();
 
 #------------------------------------------------------------------------------
 # symbol declaration
@@ -38,3 +48,12 @@ xdef
 
 xlib
 	parse_symbol_declare(Symbol::Scope::Public);
+
+extern
+	return parse_symbol_declare(Symbol::Scope::Extern);
+
+xref
+	return parse_symbol_declare(Symbol::Scope::Extern);
+
+lib
+	return parse_symbol_declare(Symbol::Scope::Extern);

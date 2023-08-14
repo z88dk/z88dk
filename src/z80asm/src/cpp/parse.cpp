@@ -14,16 +14,14 @@ using namespace std;
 
 void Parser::clear() {
 	m_state = State::Main;
-	m_lexer.clear();
+	m_line.clear();
 	m_exprs.clear();
 }
 
 bool Parser::parse() {
 	int start_errors = g_errors.count();
 
-	string line;
-	while (g_preproc.getline(line)) {
-		m_lexer.set(line);
+	while (g_preproc.getline(m_line)) {
 		parse_line();
 	}
 
@@ -41,15 +39,16 @@ void Parser::parse_line() {
 void Parser::parse_line_main() {
 	int start_errors = g_errors.count();
 
-	while (!m_lexer.at_end() && start_errors == g_errors.count()) {
+	while (!m_line.at_end() && start_errors == g_errors.count()) {
 		string label = check_label();
 		if (!label.empty())
 			g_asm.cur_section()->add_label(label);
 
-		switch (m_lexer.peek().ttype) {
+		switch (m_line.peek().type()) {
 		case TType::End:
+            break;
 		case TType::Newline:
-			m_lexer.next();
+			m_line.next();
 			break;
 		default:
 			parse_main1();
@@ -58,41 +57,46 @@ void Parser::parse_line_main() {
 }
 
 string Parser::check_label() {
-	TType t0 = m_lexer.peek(0).ttype;
-	Keyword kw1 = m_lexer.peek(1).keyword;
-
-	if (t0 == TType::Label && kw1 != Keyword::EQU) {
-		m_lexer.next();
-		return m_lexer.peek(-1).svalue;
-	}
-	else
-		return string();
+    if (m_line.peek(0).type() == TType::Dot &&
+        m_line.peek(1).type() == TType::Ident &&
+        m_line.peek(2).keyword() != Keyword::EQU) {
+        m_line.next(2);
+        return m_line.peek(-1).svalue();
+    }
+    else if (m_line.peek(0).type() == TType::Ident &&
+        m_line.peek(1).type() == TType::Colon &&
+        m_line.peek(2).keyword() != Keyword::EQU) {
+        m_line.next(2);
+        return m_line.peek(-2).svalue();
+    }
+    else
+        return string();
 }
 
 void Parser::parse_symbol_declare(Symbol::Scope scope) {
 	while (true) {
 		// get identifier
-		Token& token = m_lexer.peek();
-		if (token.ttype != TType::Ident) {
-			g_errors.error(ErrCode::IdentExpected);
+		Token& token = m_line.peek();
+		if (token.type() != TType::Ident) {
+			g_errors.error(ErrCode::IdentExpected, m_line.peek_text());
 			return;
 		}
-
-		g_symbols.declare(token.svalue, scope);
+		g_symbols.declare(token.svalue(), scope);
 
 		// get comma or end
-		m_lexer.next();
-		token = m_lexer.peek();
-		switch (token.ttype) {
+		m_line.next();
+		token = m_line.peek();
+		switch (token.type()) {
 		case TType::Comma:
-			m_lexer.next();
+			m_line.next();
 			continue;
 		case TType::End:
+            return;
 		case TType::Newline:
-			m_lexer.next();
+			m_line.next();
 			return;
 		default:
-			g_errors.error(ErrCode::EolExpected);
+			g_errors.error(ErrCode::EolExpected, m_line.peek_text());
 			return;
 		}
 	}
@@ -110,8 +114,8 @@ void Parser::add_emul_call_flag(unsigned bytes_jump, unsigned bytes_call) {
 
 	// create label and expression
 	string temp_label_name = g_asm.cur_section()->autolabel();
-	Lexer lexer{ temp_label_name };			// prepare to parse expression with temp label
-	auto temp_label_expr = make_shared<Expr>(lexer);
+	ScannedLine line{ temp_label_name };			// prepare to parse expression with temp label
+	auto temp_label_expr = make_shared<Expr>(line);
 	Assert(temp_label_expr->parse());		// parse temp label
 
 	// jp !flag, temp
@@ -131,8 +135,8 @@ void Parser::add_call_function(const string& function_name) {
 	g_symbols.declare(function_name, Symbol::Scope::Extern);
 
 	// create expression with function name
-	Lexer lexer{ function_name };			// prepare to parse expression with function name
-	auto function_expr = make_shared<Expr>(lexer);
+	ScannedLine line{ function_name };			// prepare to parse expression with function name
+	auto function_expr = make_shared<Expr>(line);
 	Assert(function_expr->parse());			// parse function name
 
 	// add call instruction
@@ -177,10 +181,10 @@ void Parser::add_restart() {
 
 	switch (addr) {
 	case 0x00: case 0x08: case 0x30:
-		if (g_args.cpu() & CPU_RABBIT)
-			add_opcode((Z80_CALL << 16) | (addr << 8));
-		else
-			add_opcode(Z80_RST(addr));
+        if (g_args.cpu() == CPU_R2KA || g_args.cpu() == CPU_R3K)
+            add_opcode((Z80_CALL << 16) | (addr << 8));
+        else
+            add_opcode(Z80_RST(addr));
 		break;
 	case 0x10: case 0x18: case 0x20: case 0x28: case 0x38:
 		add_opcode(Z80_RST(addr));
@@ -228,6 +232,12 @@ void Parser::add_opcode_nn(unsigned bytes) {
 	Assert(m_exprs.size() == 1);
 
 	g_asm.cur_section()->add_opcode_nn(bytes, m_exprs[0], PatchExpr::Type::Word);
+}
+
+void Parser::add_opcode_nnn(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	g_asm.cur_section()->add_opcode_nnn(bytes, m_exprs[0], PatchExpr::Type::Ptr24);
 }
 
 void Parser::add_opcode_NN(unsigned bytes) {

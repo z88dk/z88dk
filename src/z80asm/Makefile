@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2022
+# Copyright (C) Paulo Custodio, 2011-2023
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 BARE_PROJ	:= z80asm
@@ -18,12 +18,11 @@ OPT 		= -O3
 #OPT		= -g -Wextra 
 
 COMMON_FLAGS = -MMD -Wall $(OPT) \
-			-I. -Isrc
+			-I. -Isrc -I../common
 
 LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 			-Isrc/c \
 			-It \
-			-I../common \
 			-I../../ext/optparse \
 			-I../../ext/regex \
 			-I../../ext/uthash/src \
@@ -31,12 +30,8 @@ LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS) -Wextra -Werror -pedantic-errors \
 			-Isrc/cpp
 
-# so that we can use C++17 features on older systems
-ifeq ($(CROSS),1)
-  ifeq ($(EXESUFFIX),.exe)
-LDFLAGS 	+= -static-libstdc++ -static-libgcc
-  endif
-endif
+# link boost::filesystem if needed
+LDFLAGS 	+= $(shell perl build_ldflags.pl $(CXX) $(CROSS))
 
 #------------------------------------------------------------------------------
 # Object files
@@ -71,7 +66,7 @@ $(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
 # parser is too big to optimize with -O3
 src/c/parse1.o: src/c/parse1.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
-	
+
 # parser is too big to optimize with -O3
 src/cpp/parse_main1.o: src/cpp/parse_main1.cpp
 	$(CXX) $(CXX_FLAGS) -O0 -c -o $@ $<
@@ -82,25 +77,29 @@ src/cpp/parse_main1.o: src/cpp/parse_main1.cpp
 .PHONY: z80asm_lib
 all: z80asm_lib
 
-z80asm_lib:
+z80asm_lib: $(PROJ)$(EXESUFFIX)
 ifeq ($(CROSS),0)
 	$(MAKE) -C dev/z80asm_lib
-	cp dev/z80asm_lib/$(PROJ)-*.lib .
+	cp dev/z80asm_lib/$(PROJ).lib .
   ifdef ZCCCFG
-	cp dev/z80asm_lib/$(PROJ)-*.lib $(ZCCCFG)/../
+	cp dev/z80asm_lib/$(PROJ).lib $(ZCCCFG)/../
   endif
 endif
 
 clean::
 	$(MAKE) -C dev/z80asm_lib clean
-	$(RM) $(PROJ)-*.lib
+	$(RM) $(PROJ).lib
 
 #------------------------------------------------------------------------------
 # developer generated source files, and test libs
+# only run with DEVELOPER=1 to fix #2332 (Build fails on cygwin), 
+# #2369 (wrong re2c output on Snapcraft), build failure of
+# .github/workflows/build-mingw-on-ubuntu.yml
 #------------------------------------------------------------------------------
 .PHONY: dev
 dev:
 	perl asmstyle.pl dev/z80asm_lib/*.asm
+	$(MAKE) DEVELOPER=1 all
 	$(MAKE) all
 
 # ragel parser generator
@@ -108,49 +107,65 @@ dev: src/c/scan_rules.h
 
 src/c/scan_rules.h: src/c/scan_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile 
+ifeq ($(DEVELOPER),1)
 	perl parse_ragel.pl src/c/scan_rules.rl
-	dos2unix -q src/c/scan_rules.h
+	dos2unix src/c/scan_rules.h 2> /dev/null
+endif
 	
 dev: src/c/parse_rules.h
 
 src/c/parse_rules.h: src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile \
 				dev/cpu/cpu_rules.h
+ifeq ($(DEVELOPER),1)
 	perl parse_ragel.pl src/c/parse_rules.rl
-	dos2unix -q src/c/parse_rules.h
+	dos2unix src/c/parse_rules.h 2> /dev/null
+endif
 
 src/c/tokens.h : make_tokens.pl Makefile
+ifeq ($(DEVELOPER),1)
 	perl make_tokens.pl > src/c/tokens.h
-	dos2unix -q src/c/tokens.h
+	dos2unix src/c/tokens.h 2> /dev/null
+endif
 
 # opcode tables generator
-dev: src/cpp/parse_main1.cpp
-src/cpp/parse_main1.cpp: \
+dev: src/c/cpu_rules.h
+
+dev: src/cpp/parse_main1.cpp 
+
+src/cpp/parse_main1.cpp src/c/cpu_rules.h: \
 		$(wildcard dev/cpu/*.pl dev/cpu/*.y) \
 		dev/cpu/Makefile \
+		Makefile \
 		src/cpp/keyword.def \
-		src/cpp/lex.h
+		src/cpp/scan.def
+ifeq ($(DEVELOPER),1)
 	$(MAKE) -C dev/cpu
 	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
 	cp dev/cpu/parse_main1.cpp src/cpp/parse_main1.cpp
-	
+endif
+
 # reloc routine
 dev: src/c/reloc_code.c
 
 src/c/reloc_code.c: dev/reloc_code.asm dev/make_reloc_code.pl Makefile
-	cd dev && perl make_reloc_code.pl && dos2unix -q reloc_code.[ch] && \
-		mv -f reloc_code.[ch] ../src/c/
+ifeq ($(DEVELOPER),1)
+	cd dev && perl make_reloc_code.pl && dos2unix reloc_code.[ch] 2> /dev/null && \
+		mv -f reloc_code.[ch] ../src/c/ 
+endif
 
 # re2c
 define MAKE_RE2C
 dev: $(1).o
 
 $(1).cpp: $(1).re Makefile
+ifeq ($(DEVELOPER),1)
 	$(RE2C) -o $(1).cpp $(1).re
-	dos2unix -q $(1).cpp
+	dos2unix $(1).cpp 2> /dev/null
+endif
 endef
 
-$(eval $(call MAKE_RE2C,src/cpp/lex))
+$(eval $(call MAKE_RE2C,src/cpp/scan))
 
 #------------------------------------------------------------------------------
 # install
@@ -172,23 +187,17 @@ clean::
 	$(RM) -rf Debug Release x1 x2 x3
 	$(RM) $(OBJS) $(TEST_SRC_LIB:.c=.o)
 
-#all:
-#	perl dev/cpu2/cpu.pl
-
 test: $(PROJ)$(EXESUFFIX) z80asm_lib
+	perl -S prove --state=slow,save -j9 t/*.t
+
+testdev: $(PROJ)$(EXESUFFIX)
 	$(MAKE) dev
 	$(MAKE) z80asm_lib
-	$(MAKE) prove_perl
-
-testdev: test
 	$(MAKE) -C dev/z80asm_lib test
-	perl dev/cpu2/cpu.pl -s test
+	$(MAKE) test
 
 testlib:
 	$(MAKE) -C lib test
-
-prove_perl: $(PROJ)$(EXESUFFIX)
-	perl -S prove --state=slow,save -j9 t/*.t
 
 clean::
 	$(RM) zcc_opt.def zcc_proj.lst
@@ -216,3 +225,24 @@ clean::
 	$(RM) $(DEPENDS)
 
 -include $(DEPENDS)
+
+#------------------------------------------------------------------------------
+# rebuild the three tools needed for the tests
+rebuild:
+	$(MAKE) -C ../common
+	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm.lib
+	$(MAKE) -C ../z80asm dev
+	cp ../z80asm/z88dk-z80asm$(EXESUFFIX) ../../bin/
+	$(MAKE) -C ../z80nm
+	cp ../z80nm/z88dk-z80nm$(EXESUFFIX) ../../bin/
+	$(MAKE) -C ../ticks all
+	cp ../ticks/z88dk-dis$(EXESUFFIX) ../../bin/
+	cp ../ticks/z88dk-ticks$(EXESUFFIX) ../../bin/
+	cp ../ticks/z88dk-gdb$(EXESUFFIX) ../../bin/
+	$(MAKE) -C ../zobjcopy all
+	cp $(PROJ)$(EXESUFFIX) ../../bin/
+
+retest: rebuild
+	$(MAKE) -C ../common test
+	$(MAKE) -C ../z80asm testdev
+	$(MAKE) -C ../zobjcopy test

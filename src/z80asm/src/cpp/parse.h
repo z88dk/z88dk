@@ -8,7 +8,7 @@
 #pragma once
 
 #include "expr.h"
-#include "lex.h"
+#include "scan.h"
 #include "symtab.h"
 #include "utils.h"
 #include <deque>
@@ -25,7 +25,7 @@ public:
 private:
 	enum class State { Main };
 
-	Lexer	m_lexer;						// line being parsed
+	ScannedLine m_line;						// line being parsed
 	State	m_state{ State::Main };			// parser state
 	deque<shared_ptr<Expr>> m_exprs;		// parsed expressions
 
@@ -48,6 +48,7 @@ private:
 	void add_opcode_n_0(unsigned bytes);
 	void add_opcode_s_0(unsigned bytes);
 	void add_opcode_nn(unsigned bytes);
+	void add_opcode_nnn(unsigned bytes);
 	void add_opcode_NN(unsigned bytes);
 	void add_opcode_idx(unsigned bytes);
 	void add_opcode_idx_n(unsigned bytes);

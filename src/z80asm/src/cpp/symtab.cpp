@@ -20,6 +20,12 @@ using namespace std;
 
 Symbols g_symbols;
 
+extern "C" {
+    struct Symbol1;
+    struct Symbol1* define_static_def_sym(const char* name, long value);
+    void undefine_static_def_sym(const char* name);
+}
+
 //-----------------------------------------------------------------------------
 
 Symbol::Symbol(const string& name, int value,
@@ -27,7 +33,7 @@ Symbol::Symbol(const string& name, int value,
 	shared_ptr<Module> module, shared_ptr<Section> section)
 	: m_name(name), m_value(value)
 	, m_type(type), m_scope(scope)
-	, m_module(module),m_section(section)
+	, m_module(module), m_section(section)
 	, m_location(g_preproc.location()) {
 }
 
@@ -138,12 +144,27 @@ shared_ptr<Symbol> Symbols::get_used(const string& name) {
 
 // define a static symbol(from - D command line)
 shared_ptr<Symbol> Symbols::add_define(const string& name, int value) {
-	auto symbol = create_or_update(m_defines, name, value,
-		Symbol::Type::Constant, Symbol::Scope::Local,
-		nullptr, nullptr);
-	return symbol;
+	auto old = m_defines.find(name);
+	if (old != nullptr && old->value() == value) {
+		// redefined with the same value, ignore
+		return old;
+	}
+	else {
+		auto symbol = create_or_update(m_defines, name, value,
+			Symbol::Type::Constant, Symbol::Scope::Local,
+			nullptr, nullptr);
+		if (g_args.verbose())
+			cout << "Predefined constant: "
+			<< name << " = " << int_to_hex(value, 4) << endl;
+		return symbol;
+	}
 }
 
+// undefine a static symbol (for pre-defined constants)
+void Symbols::erase_define(const string& name) {
+	m_defines.erase(name);
+}
+	
 // define a global define (head, tail, ...)
 shared_ptr<Symbol> Symbols::add_global_def(const string& name, int value) {
 	auto symbol = create_or_update(m_globals, name, value,
@@ -345,6 +366,16 @@ void Symbols::declare_extern(const string& name) {
 	}
 }
 
+shared_ptr<Symbol> Symtab::use(const string& name) {
+	shared_ptr<Symbol> symbol = find(name);
+	if (!symbol) {
+		symbol = make_shared<Symbol>(name);
+		insert(symbol);
+	}
+	symbol->set_touched(true);
+	return symbol;
+}
+
 //-----------------------------------------------------------------------------
 // C interface
 //-----------------------------------------------------------------------------
@@ -360,8 +391,25 @@ void symtab_insert_static(const char* name, int value) {
 }
 
 void symtab_insert_global_def(const char* name, int value) {
-	auto symbol = g_symbols.add_global_def(name, value);
-	if (symbol) {
-		define_global_def_sym(name, value);
-	}
+    auto old = g_symbols.defines().find(name);
+    if (old != nullptr && old->value() == value) {
+        // ok, -D symbol redefined with same value
+    }
+    else {
+		auto symbol = make_shared<Symbol>(name, value);
+		if (g_symbols.defines().insert(symbol)) {
+			if (g_args.verbose())
+				cout << "Predefined constant: "
+				<< name << " = " << int_to_hex(value, 4) << endl;
+			define_static_def_sym(name, value);
+		}
+		else {
+			g_errors.error(ErrCode::DuplicateDefinition, name);
+		}	
+    }
+}
+
+void symtab_erase_global_def(const char* name) {
+    g_symbols.defines().erase(name);
+    undefine_static_def_sym(name);
 }

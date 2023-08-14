@@ -106,6 +106,7 @@ public:
     Token& peek(int offset = 0);			// 0: current; 1: next; -1: previous
     void next(int n = 1);
     vector<Token> peek_tokens(int offset = 0);
+    string peek_text(int offset = 0);
 
 private:
     string  m_text;                         // read text

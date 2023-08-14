@@ -8,14 +8,14 @@
 #pragma once
 
 #include "errors.h"
-#include "lex.h"
+#include "scan.h"
 #include <memory>
 #include <string>
 #include <vector>
 using namespace std;
 
 class Asm;
-class Lexer;
+class ScannedLine;
 class Symbol;
 class Symtab;
 
@@ -52,12 +52,11 @@ private:
 
 class Expr {
 public:
-	Expr(Lexer& lexer);
-	void clear();
+	Expr(ScannedLine& line);
 
 	int value() const { return m_value; }
 	ErrCode result() const { return m_result; }
-	const string& text() const { return m_text; }
+	string text() const { return Token::to_string(m_tokens); }
 	bool is_const() const { return m_is_const; }
 	const Location& location() const { return m_location; }
 
@@ -70,11 +69,11 @@ public:
 	bool in_parens();
 
 private:
-	Lexer&				m_lexer;			// point at expression to parse
+	ScannedLine&		m_line;				// point at expression to parse
 	shared_ptr<ExprNode> m_root;			// root node of expression
 	int					m_value{ 0 };		// value computed during eval
 	ErrCode				m_result{ ErrCode::Ok };// result computed during eval
-	string				m_text;				// expression text
+    vector<Token>       m_tokens;			// expression tokens
 	int					m_asmpc{ 0 };		// ASMPC value
 	bool				m_silent{ false };	// silence errors
 	bool				m_is_const{ true };	// is a contant expression
@@ -83,9 +82,9 @@ private:
 
 	void error(ErrCode err, const string& text);
 
-	TType ttype() const { return m_lexer.peek().ttype; }
-	const Token& token() const { return m_lexer.peek(); }
-	void next() { m_lexer.next(); }
+	TType ttype() const { return m_line.peek().type(); }
+	const Token& token() const { return m_line.peek(); }
+	void next() { m_line.next(); }
 
 	shared_ptr<ExprNode> parse_expr();
 	shared_ptr<ExprNode> parse_ternary_condition();
@@ -111,7 +110,7 @@ public:
 	enum class Type {
 		UByte, SByte,					// unsigned and signed bytes
 		Word, BEWord,					// word and big-endian word (2 bytes)
-		Ptr24,							// poiter (3 bytes)
+		Ptr24,							// pointer (3 bytes)
 		Dword,							// double word (4 bytes)
 		JrOffset,						// jump relative offset
 		UByte2Word,						// unsigned byte extended to 16 bits

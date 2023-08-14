@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
+
 	// continue with the legacy code
 	return z80asm_main();
 }

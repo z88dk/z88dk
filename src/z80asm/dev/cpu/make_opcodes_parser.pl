@@ -72,15 +72,57 @@ sub parse_code {
 	my($cpu, $asm, @ops) = @_;
 	my @code;
 
+	my @bin;
+	for my $op (@ops) {
+		push @bin, @$op;
+	}
+	my $bin = "@bin";
+	
+	#say "$cpu\t$asm\t$bin";
+
 	# handle special case of jump to %t
 	if (grep {/%t/} @{$ops[0]}) {
 		my $op1 = $ops[0][0];
 		my $op2 = $ops[1][0];
 		push @code, "add_emul_call_flag(0x".fmthex($op1).", 0x".fmthex($op2).");";
 	}
+	# handle rst[.l] %c
+	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
+		if ($1) {
+			push @code, "\n#if 0\n";
+			push @code, 
+				"DO_STMT_LABEL();",
+				"DO_stmt(".sprintf("0x%02X", $ops[0][0]).");";
+			push @code, "\n#endif\n";
+			shift @ops;
+		}
+		for my $op (@ops) {
+			push @code, parse_code_opcode($cpu, $asm, @$op);
+		}
+	}
+	# handle ld dd,(ix+d) -> ld ddl,(ix+d) : ld ddh, (ix+d+1)
+	elsif ($bin =~ /%D/) {
+		push @code, "\n#if 0\n";
+		push @code, "DO_STMT_LABEL();";
+		for my $i (0 .. $#ops) {
+			if (($ops[$i][2]//'') eq '%d' && ($ops[$i+1][2]//'') eq '%D') {
+				my $opcode0 = ($ops[$i+0][0] << 8) + $ops[$i+0][1];
+				my $opcode1 = ($ops[$i+1][0] << 8) + $ops[$i+1][1];
+				push @code, 
+					"DO_stmt_idx_idx1(".sprintf("0x%04X, 0x%04X", $opcode0, $opcode1).");";
+			}
+			elsif ($ops[$i][2]//'' eq '%D') {
+				# already handled
+			}
+			else {
+				push @code, parse_code_opcode($cpu, $asm, @{$ops[$i]});
+			}
+		}
+		push @code, "\n#endif\n";
+	}
 	else {
-		for my $bin (@ops) {
-			push @code, parse_code_opcode($cpu, $asm, @$bin);
+		for my $op (@ops) {
+			push @code, parse_code_opcode($cpu, $asm, @$op);
 		}
 	}
 	
@@ -103,6 +145,58 @@ sub parse_code_opcode {
 	elsif ($asm =~ /^mmu %c, a/) {
 		return "add_z80n_mmu_a();";
 	}
+	
+	my @bin0 = @bin;
+	my @code;
+
+	#say "$cpu\t$asm\t@bin";
+	
+	# check for argument type
+	my($stmt, $extra_arg) = ("", "");
+	$bin = join(' ', @bin);
+	
+	if ($bin =~ s/ \@(\w+)//) {
+		my $func = $1;
+		push @code, "\n#if 0\n";
+		push @code, 
+			"DO_STMT_LABEL();",
+			"add_call_emul_func(\"$func\");";
+		push @code, "\n#endif\n";
+		my $code = join("\n", @code);
+		return $code;
+	}
+	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
+		push @code, "\n#if 0\n";
+		push @code, 
+			"DO_STMT_LABEL();",
+			"if (expr_error) { error_expected_const_expr(); }".
+			"else { add_rst_opcode(expr_value); }";
+		push @code, "\n#endif\n";
+		my $code = join("\n", @code);
+		return $code;
+	}
+	elsif ($asm =~ /^mmu %c, %n/) {
+		push @code, "\n#if 0\n";
+		push @code, 
+			"DO_STMT_LABEL();",
+			"if (expr_error) { error_expected_const_expr(); } else {",
+			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
+			"DO_stmt_n(0xED9150 + expr_value);}";
+		push @code, "\n#endif\n";
+		my $code = join("\n", @code);
+		return $code;
+	}
+	elsif ($asm =~ /^mmu %c, a/) {
+		push @code, "\n#if 0\n";
+		push @code, 
+			"DO_STMT_LABEL();",
+			"if (expr_error) { error_expected_const_expr(); } else {",
+			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
+			"DO_stmt(0xED9250 + expr_value);}";
+		push @code, "\n#endif\n";
+		my $code = join("\n", @code);
+		return $code;
+	}
 	elsif ($bin =~ s/ %d %n$//) {
 		return "add_opcode_idx_n(".build_bytes($bin).");";
 	}
@@ -120,6 +214,9 @@ sub parse_code_opcode {
 	}
 	elsif ($bin =~ s/ %h$//) {
 		return "add_opcode_h(".build_bytes($bin).");";
+	}
+	elsif ($bin =~ s/ %m %m %m$//) {
+		return "add_opcode_nnn(".build_bytes($bin).");";
 	}
 	elsif ($bin =~ s/ %m %m$//) {
 		return "add_opcode_nn(".build_bytes($bin).");";
@@ -229,8 +326,8 @@ sub merge_cpu {
 			$ret .= "\n$code\nbreak;\n"
 		}
 		$ret .= "default: ".
-				"g_errors.error(ErrCode::IllegalIdent); ".
-				"}\n";
+				"g_errors.error(ErrCode::IllegalIdent, m_line.peek_text()); ".
+                "}\n";
 	}
 	
 	return $ret;
@@ -239,7 +336,7 @@ sub merge_cpu {
 sub merge_parens {
 	my($cpu, $t) = @_;
 	my $ret = '';
-
+	
 	if ($t->{no_expr}) {
 		die if $t->{expr_no_parens} || $t->{expr_in_parens};
 		return parse_code($cpu, @{$t->{no_expr}});
@@ -259,36 +356,15 @@ sub merge_parens {
 				parse_code($cpu, @{$t->{expr_no_parens}});
 	}
 	elsif ($t->{expr_no_parens} && $t->{expr_in_parens}) {
-		my($common, $in_parens, $no_parens) = 
-			extract_common(parse_code($cpu, @{$t->{expr_in_parens}}),
-						   parse_code($cpu, @{$t->{expr_no_parens}}));
-		return $common.
-				"if (expr_in_parens()) { ".
-				$in_parens.
+		return 	"if (expr_in_parens()) { ".
+				parse_code($cpu, @{$t->{expr_in_parens}}).
 				" } else { ".
-				$no_parens.
+				parse_code($cpu, @{$t->{expr_no_parens}}).
 				" }";
 	}
 	else {
 		die;
 	}
-}
-
-sub extract_common {
-	my($a, $b) = @_;
-	my $common = '';
-	
-	while ($a =~ /(.*?[;}])/s && 
-			substr($a, 0, length($1)) eq
-			substr($b, 0, length($1)) ) {
-		$common .= $1;
-		
-		$a = substr($a, length($&));
-		$b = substr($b, length($&));
-	}
-	$common .= "\n" if $common;
-	
-	return ($common, $a, $b);
 }
 
 sub fmthex {

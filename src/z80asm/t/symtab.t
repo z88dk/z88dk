@@ -9,15 +9,6 @@ use Modern::Perl;
 #------------------------------------------------------------------------------
 
 unlink_testfiles;
-z80asm_nok("-b -DVAR", "", <<ASM, <<ERR);
-	define VAR
-ASM
-${test}.asm:1: error: duplicate definition: VAR
-  ^---- define VAR
-ERR
-
-
-unlink_testfiles;
 z80asm_ok("-b -DVAR", "", "", <<ASM, bytes(1));
 	defb VAR
 ASM
@@ -137,8 +128,8 @@ ASM
 
 
 unlink_testfiles;
-z80asm_nok("", "", <<ASM, <<ERR);
-	defc VAR=1
+z80asm_nok("", "", <<'ASM', <<ERR);
+	defc VAR=1+$ ; cannot be constant
 	define VAR
 ASM
 ${test}.asm:2: error: duplicate definition: VAR

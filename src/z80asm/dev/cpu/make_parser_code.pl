@@ -24,7 +24,7 @@ my %keywords;
 my $nr_keywords = scalar(keys %keywords);
 
 # read tokens from source
-my %tokens = read_tokens("../../src/cpp/lex.h");
+my %tokens = read_tokens("../../src/cpp/scan.def");
 my $nr_tokens = scalar(keys %tokens);
 
 # convert parser data into trie tree
@@ -53,11 +53,13 @@ for my $asm (sort keys %parser) {
 		push @current, $token =~ s/^\w+:://r;
 		if (!$t->{next}{$token}) {
 			if ($i == $#asm) {
-				$t->{next}{$token} = {action=>$action_nr, next=>{}, current=>"@current"};
+				$t->{next}{$token} = {action=>$action_nr, next=>{},
+									  current=>"@current"};
 			}
 			else {
 				my $state = scalar(@states);
-				$t->{next}{$token} = {state=>$state, next=>{}, current=>"@current"};
+				$t->{next}{$token} = {state=>$state, next=>{}, 
+									  current=>"@current"};
 				push @states, $t->{next}{$token};
 			}
 		}
@@ -109,7 +111,7 @@ END
 
 # dump state-expressions table
 print $fh <<END;
-static const struct { int16_t expr_type, next; } state_expr[$nr_states] = {
+static const struct { int16_t expr_type, next; } state_expr_tt[$nr_states] = {
 END
 for my $state (@states) {
 	dump_state_expr($fh, $state);
@@ -124,48 +126,49 @@ void Parser::$function() {
 	int state = 0;
 	int next, expr_type;
 	shared_ptr<Expr> expr;
+	size_t expr_pos;
 
 	while (true) {
 		Assert(state >= 0 && state < $nr_states);
 
 		// check keyword
-		int keyword_nr = static_cast<int>(m_lexer.peek().keyword);
+		int keyword_nr = static_cast<int>(m_line.peek().keyword());
 		Assert(keyword_nr >= 0 && keyword_nr < $nr_keywords);
 		next = state_keyword_tt[state][keyword_nr];
 		if (next < 0) {
-			m_lexer.next();
+			m_line.next();
 			${function}_action(-next);
 			return;
 		}
 		else if (next > 0) {
-			m_lexer.next();
+			m_line.next();
 			state = next;
 			continue;
 		}
 
 		// check token
-		int token_nr = static_cast<int>(m_lexer.peek().ttype);
+		int token_nr = static_cast<int>(m_line.peek().type());
 		Assert(token_nr >= 0 && token_nr < $nr_tokens);
 		next = state_token_tt[state][token_nr];
 		if (next < 0) {
-			m_lexer.next();
+			m_line.next();
 			${function}_action(-next);
 			return;
 		}
 		else if (next > 0) {
-			m_lexer.next();
+			m_line.next();
 			state = next;
 			continue;
 		}
 
 		// check expression
-		expr_type = state_expr[state].expr_type;
-		next = state_expr[state].next;
+		expr_type = state_expr_tt[state].expr_type;
+		next = state_expr_tt[state].next;
 		switch (expr_type) {
 		case 0:		// no expression
 			break;
 		case 1:		// expression
-			expr = make_shared<Expr>(m_lexer); 
+			expr = make_shared<Expr>(m_line); 
 			if (expr->parse()) {
 				m_exprs.push_back(expr);
 				if (next < 0) {
@@ -179,7 +182,8 @@ void Parser::$function() {
 			}
 			break;
 		case 2:		// const expression
-			expr = make_shared<Expr>(m_lexer); 
+			expr = make_shared<Expr>(m_line); 
+			expr_pos = m_line.pos();
 			if (expr->parse()) {
 				if (expr->eval_silent(0) && expr->is_const()) {
 					m_exprs.push_back(expr);
@@ -193,7 +197,10 @@ void Parser::$function() {
 					}
 				}
 				else {
-					g_errors.error(ErrCode::ConstExprExpected);
+					size_t save_pos = m_line.pos();
+					m_line.set_pos(expr_pos);
+					g_errors.error(ErrCode::ConstExprExpected, m_line.peek_text());
+					m_line.set_pos(save_pos);
 					return;
 				}
 			}
@@ -204,7 +211,7 @@ void Parser::$function() {
 		}
 
 		// no valid transition from this state
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrCode::Syntax, m_line.peek_text());
 		return;
 	}
 }
@@ -245,17 +252,25 @@ sub dump_state_keyword {
 	if ($tree->{next}) {
 		for my $token (keys %{$tree->{next}}) {
 			if ($token =~ /^Keyword::/) {
+				defined $keywords{$token} or die "Keyword $token not found\n";
+				my $id = $keywords{$token};
+				$id < $nr_keywords or die "Keyword $token index $id >= $nr_keywords\n";
 				if (exists $tree->{next}{$token}{action}) {
-					$row[$keywords{$token}] = - $tree->{next}{$token}{action};
+					$row[$id] = - $tree->{next}{$token}{action};
 				}
 				else {
-					$row[$keywords{$token}] = $tree->{next}{$token}{state};
+					$row[$id] = $tree->{next}{$token}{state};
 				}
 			}
 		}
 	}
 
-	say $fh "\t{", join(",", @row), "},";
+	# remove end zeros
+	while (@row > 1 && $row[-1] == 0) {
+		pop @row;
+	}
+
+	say $fh "{", join(",", @row), "},";
 }
 
 # dump one state-token transition row:
@@ -273,18 +288,26 @@ sub dump_state_token {
 				else {
 					$next = $tree->{next}{$token}{state};
 				}
+				defined $tokens{$token} or die "Token $token not found\n";
+				my $id = $tokens{$token};
+				$id < $nr_tokens or die "Keyword $token index $id >= $nr_tokens\n";
 				if ($token =~ /^TType::End/) {
 					$row[$tokens{'TType::End'}] = $next;
 					$row[$tokens{'TType::Newline'}] = $next;
 				}
 				else {
-					$row[$tokens{$token}] = $next;
+					$row[$id] = $next;
 				}
 			}
 		}
 	}
 
-	say $fh "\t{", join(",", @row), "},";
+	# remove end zeros
+	while (@row > 1 && $row[-1] == 0) {
+		pop @row;
+	}
+
+	say $fh "{", join(",", @row), "},";
 }
 
 # dump type of expression at each state
@@ -314,7 +337,7 @@ sub dump_state_expr {
 		}
 	}
 
-	say $fh "\t{", join(",", $type, $next), "},";
+	say $fh "{", join(",", $type, $next), "},";
 }
 
 # read %keywords
@@ -340,14 +363,11 @@ sub read_tokens {
 	my %tokens;
 
 	open(my $fh, "<", $file) or die "open $file: $!";
-	local $/;
-	my $text = <$fh>;
-	$text =~ /\b enum \s+ class \s+ TType \s+ \{ 
-		         ([^}]+) \} /x or die "TType not found in $file";
-	my $list = $1;
-	$list =~ s/\s+//g;
-	for my $token (split /,/, $list) {
-		$tokens{"TType::$token"} = $token_id++;
+	while (<$fh>) {
+		if (/^ \s* X\( \s* (\w+) \s* , /x) {
+			my $token = "TType::$1";
+			$tokens{$token} = $token_id++;
+		}
 	}
 	return %tokens;
 }

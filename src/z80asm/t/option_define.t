@@ -80,5 +80,44 @@ Writing object file 'test_t_option_define.o'
 
 END
 
+# duplicate definition
+z80asm_ok("-b -Dabc -Dabc", "", "", "defb abc", bytes(1));
+z80asm_ok("-b -Dabc=3 -Dabc=3", "", "", "defb abc", bytes(3));
+
+z80asm_nok("-b -Dabc=1 -Dabc=2", "", "", <<END);
+error: duplicate definition: abc
+END
+
+z80asm_ok("-b", "", "", <<END, bytes(1));
+	define abc
+	define abc
+	defb abc
+END
+
+z80asm_ok("-b -Dabc", "", "", <<END, bytes(1));
+	define abc
+	define abc
+	defb abc
+END
+
+z80asm_nok("-b", "", <<ASM, <<ERR);
+	define abc
+	defc abc=1
+ASM
+$test.asm:2: error: duplicate definition: abc
+  ^---- defc abc=1
+ERR
+
+z80asm_nok("-b", "", <<ASM, <<ERR);
+	section a1
+	define abc
+	section a2
+	define abc
+	defb abc
+ASM
+$test.asm:4: error: duplicate definition: abc
+  ^---- define abc
+ERR
+
 unlink_testfiles;
 done_testing;

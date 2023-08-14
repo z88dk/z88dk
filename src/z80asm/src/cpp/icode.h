@@ -7,10 +7,11 @@
 
 #pragma once
 
-#include "cpu.h"
+#include "z80asm_cpu.h"
 #include "errors.h"
 #include "expr.h"
 #include "symtab.h"
+#include "errors.h"
 #include <cinttypes>
 #include <list>
 #include <memory>
@@ -83,6 +84,7 @@ public:
 	void add_opcode(unsigned bytes);
 	void add_opcode_n(unsigned bytes, shared_ptr<Expr> n, PatchExpr::Type type);
 	void add_opcode_nn(unsigned bytes, shared_ptr<Expr> nn, PatchExpr::Type type);
+	void add_opcode_nnn(unsigned bytes, shared_ptr<Expr> nnn, PatchExpr::Type type);
 	void add_opcode_idx(unsigned bytes, shared_ptr<Expr> dis);
 	void add_opcode_idx_n(unsigned bytes, shared_ptr<Expr> dis, shared_ptr<Expr> n);
 	void add_opcode_n_n(unsigned bytes, shared_ptr<Expr> n1, shared_ptr<Expr> n2);

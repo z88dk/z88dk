@@ -90,7 +90,7 @@ string int_to_hex(T i, int width)
 		ss << i;
 	else
 		ss << "$"
-		<< std::setfill('0') << std::setw(width)
+			<< std::setfill('0') << std::setw(width)
 		<< std::hex << i << std::dec;
 	return ss.str();
 }

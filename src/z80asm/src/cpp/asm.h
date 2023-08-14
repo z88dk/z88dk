@@ -7,12 +7,16 @@
 
 #pragma once
 
-#include "icode.h"
-#include "lex.h"
-#include "parse.h"
+#include <memory>
 #include <string>
+#include "icode.h"
+#include "scan.h"
+#include "symtab.h"
+#include "parse.h"
+#include "preproc.h"
 using namespace std;
 
+class ScannedLine;
 class Object;
 class Module;
 class Group;

@@ -226,6 +226,11 @@ vector<Token> ScannedLine::peek_tokens(int offset) {
     return out;
 }
 
+string ScannedLine::peek_text(int offset) {
+    vector<Token> out = peek_tokens(offset);
+    return Token::to_string(out);
+}
+
 //-----------------------------------------------------------------------------
 
 FileScanner::FileScanner() {

@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 
 #include "expr.h"
-#include "lex.h"
+#include "scan.h"
 #include "preproc.h"
 #include "symtab.h"
 #include "utils.h"
@@ -50,20 +50,8 @@ shared_ptr<ExprNode> ExprNode::arg(size_t i) {
 	return m_args[i];
 }
 
-Expr::Expr(Lexer& lexer)
-	: m_lexer(lexer) {
-	clear();
-}
-
-void Expr::clear() {
-	m_root = nullptr;
-	m_value = 0;
-	m_result = ErrCode::Ok;
-	m_text.clear();
-	m_asmpc = 0;
-	m_silent = false;
-	m_is_const = true;
-	m_location = g_preproc.location();
+Expr::Expr(ScannedLine& line)
+	: m_line(line), m_location(g_preproc.location()) {
 }
 
 class ExprException : public exception {
@@ -85,14 +73,15 @@ void Expr::error(ErrCode err, const string& text) {
 }
 
 bool Expr::parse() {
-	clear();
-	const char* expr_start = m_lexer.text_ptr();
-	const char* expr_end = expr_start + strlen(expr_start);
+    vector<Token> tokens = m_line.peek_tokens();   // tokens from rest of line
+    size_t start_pos = m_line.pos();
 
 	m_root = parse_expr();
 
-	expr_end = m_lexer.text_ptr();
-	m_text = string(expr_start, expr_end);
+    size_t end_pos = m_line.pos();
+    size_t size = end_pos - start_pos;              // number of tokens in expression
+    m_tokens.clear();
+    std::copy(tokens.begin(), tokens.begin() + size, std::back_inserter(m_tokens));
 
 	return m_result == ErrCode::Ok ? true : false;
 }
@@ -107,7 +96,7 @@ bool Expr::parse_at_end() {
 	case TType::Newline:
 		return true;
 	default:
-		error(ErrCode::SyntaxExpr, m_lexer.text_ptr());
+		error(ErrCode::SyntaxExpr, m_line.peek_text());
 		return false;
 	}
 }
@@ -151,7 +140,7 @@ shared_ptr<ExprNode> Expr::parse_ternary_condition() {
 				node, t, f);
 		}
 		else {
-			throw ExprException(ErrCode::ColonExpected, m_lexer.text_ptr());
+			throw ExprException(ErrCode::ColonExpected, m_line.peek_text());
 		}
 	}
 	return node;
@@ -366,14 +355,14 @@ shared_ptr<ExprNode> Expr::parse_unary() {
 		node = parse_expr();
 		if (ttype() != TType::RParen)
 			throw ExprException(ErrCode::UnbalancedParens,
-				m_lexer.text_ptr());
+				m_line.peek_text());
 		next();
 		return make_shared<ExprNode>(ExprNode::Type::Parens, node);
 	case TType::LSquare:
 		next();
 		node = parse_expr();
 		throw ExprException(ErrCode::UnbalancedParens,
-			m_lexer.text_ptr());
+			m_line.peek_text());
 		next();
 		return make_shared<ExprNode>(ExprNode::Type::Parens, node);
 	default:
@@ -387,7 +376,7 @@ shared_ptr<ExprNode> Expr::parse_primary() {
 
 	switch (ttype()) {
 	case TType::Ident:
-		symbol = g_symbols.get_used(token().svalue);
+		symbol = g_symbols.get_used(token().svalue());
 		node = make_shared<ExprNode>(symbol);
 		next();
 		return node;
@@ -396,12 +385,12 @@ shared_ptr<ExprNode> Expr::parse_primary() {
 		next();
 		return node;
 	case TType::Integer:
-		node = make_shared<ExprNode>(token().ivalue);
+		node = make_shared<ExprNode>(token().ivalue());
 		next();
 		return node;
 	default:
 		throw ExprException(ErrCode::IntOrIdentExpected,
-			m_lexer.token_text());
+			m_line.peek_text());
 	}
 }
 
@@ -477,12 +466,12 @@ int Expr::eval_node(shared_ptr<ExprNode> node) {
 	case ExprNode::Type::Mult: return a * b;
 	case ExprNode::Type::Div:
 		if (b == 0)
-			throw(ExprException(ErrCode::DivisionByZero, m_text));
+			throw(ExprException(ErrCode::DivisionByZero, text()));
 		return a / b;
 
 	case ExprNode::Type::Mod:
 		if (b == 0)
-			throw(ExprException(ErrCode::DivisionByZero, m_text));
+			throw(ExprException(ErrCode::DivisionByZero, text()));
 		return a % b;
 
 	case ExprNode::Type::Power: return ipow(a, b);
@@ -510,7 +499,7 @@ int Expr::eval_symbol(shared_ptr<Symbol> symbol) {
 
 	case Symbol::Type::Computed:
 		if (m_evaluating)
-			throw(ExprException(ErrCode::RecursiveExpression, m_text));
+			throw(ExprException(ErrCode::RecursiveExpression, text()));
 		else {
 			// recurse to eval symbol expression
 			m_evaluating = true;

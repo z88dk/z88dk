@@ -1,15 +1,15 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // interface between C and C++ components
-// Copyright (C) Paulo Custodio, 2011-2022
+// Copyright (C) Paulo Custodio, 2011-2023
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
 #pragma once
 
+#include "z80asm_cpu.h"
 #include <stdbool.h>
 #include <stddef.h>
-#include "cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,6 +17,15 @@ extern "C" {
 
 #define TOSTR(x)	_TOSTR(x)
 #define _TOSTR(x)	#x
+
+// program name
+#define Z80ASM_PROG	    "z88dk-z80asm"
+
+// environment variable
+#define Z80ASM_ENVVAR	"Z80ASM"
+
+// library base name
+#define Z80ASM_LIB_BASE	Z80ASM_PROG
 
 // default file name extensions
 #define EXT_ASM     ".asm"    
@@ -72,7 +81,9 @@ void error_division_by_zero();
 void error_duplicate_definition(const char* name);
 void error_duplicate_definition_module(const char* modulename, const char* name);
 void error_expr_recursion();
+void error_file_not_found(const char* filename);
 void error_file_open(const char* filename);
+void error_file_rename(const char* filename);
 void error_illegal_ident();
 void error_int_range(int value);
 void error_invalid_char_const();
@@ -110,14 +121,20 @@ void warn_dma_half_cycle_timing();
 void warn_dma_ready_signal_unsupported();
 void error_cmd_failed(const char* cmd);
 void error_assert_failed();
+void error_cpu_incompatible(const char* filename, int got_cpu_id);
+void error_cpu_invalid(const char* filename, int cpu_id);
+void error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy);
+void error_date_and_mstar_incompatible();
 
 // options
 bool option_verbose();
-bool option_swap_ixiy();
+swap_ixiy_t option_swap_ixiy();
+void set_swap_ixiy_option(swap_ixiy_t swap_ixiy);
 void push_includes(const char* dir);
 void pop_includes();
 const char* search_includes(const char* filename);
 int option_cpu();
+void set_cpu_option(int cpu);
 const char* option_cpu_name();
 bool option_ti83();
 bool option_ti83plus();
@@ -125,6 +142,7 @@ bool option_speed();
 bool option_debug();
 const char* search_libraries(const char* filename);
 const char* option_lib_file();
+bool option_lib_for_all_cpus();
 void library_file_append(const char* filename);
 const char* option_bin_file();
 bool option_make_bin();
@@ -162,9 +180,15 @@ const char* get_reloc_filename(const char* filename);
 // symbol table
 struct Symbol1;
 struct Symbol1* define_static_def_sym(const char* name, long value);
+struct Symbol1* define_local_def_sym(const char* name, long value);
 struct Symbol1* define_global_def_sym(const char* name, long value);
-void symtab_insert_static(const char* name, int value);
 void symtab_insert_global_def(const char* name, int value);
+void symtab_insert_static(const char* name, int value);
+void undefine_local_def_sym(const char* name);
+struct Symbol1* find_local_symbol(const char* name);
+
+void symtab_insert_global_def(const char* name, int value);
+void symtab_erase_global_def(const char* name);
 
 // expressions
 void parse_const_expr_eval(const char* expr_text, int* result, bool* error);
@@ -175,8 +199,7 @@ bool check_ifdef_condition(const char* name);
 bool sfile_open(const char* filename, bool search_include_path);
 void sfile_hold_input();
 void sfile_unhold_input();
-char* sfile_getline();			// NOTE: user must free returned pointer
-char* sfile_get_source_line();	// NOTE: user must free returned pointer
+char* sfile_getline();	// NOTE: user must free returned pointer
 const char* sfile_filename();
 int sfile_line_num();
 bool sfile_is_c_source();

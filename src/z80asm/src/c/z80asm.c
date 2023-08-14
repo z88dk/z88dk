@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2023
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 */
@@ -16,7 +16,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "modlink.h"
 #include "module1.h"
 #include "parse1.h"
-#include "scan.h"
+#include "scan1.h"
 #include "strutil.h"
 #include "symtab1.h"
 #include "types.h"
@@ -71,7 +71,7 @@ void assemble_file( const char *filename ) {
 	module->filename = spool_add(src_filename);
 
 	if (got_obj) {
-		object_file_append(obj_filename, CURRENTMODULE, true, false);
+		object_file_check_append(obj_filename, CURRENTMODULE, true, false);
 	}
 	else {
 		// append the directoy of the file being assembled to the include path 
@@ -132,8 +132,10 @@ static void do_assemble(const char *src_filename )
  ***************************************************************************************************/
 int z80asm_main() {
 	if (!get_num_errors()) {		/* if no errors in command line parsing */
-		for (size_t i = 0; i < option_files_size(); i++)
-			assemble_file(option_file(i));
+        if (!option_lib_for_all_cpus()) {
+            for (size_t i = 0; i < option_files_size(); i++)
+                assemble_file(option_file(i));
+        }
 	}
 
 	/* Create output file */

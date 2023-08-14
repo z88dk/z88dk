@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 
 #include "args.h"
-#include "cpu.h"
+#include "z80asm_cpu.h"
 #include "icode.h"
 #include "preproc.h"
 #include "symtab.h"
@@ -75,8 +75,8 @@ void Section::add_label(const string& name) {
 	// add debug label
 	if (g_args.debug() && g_preproc.is_c_source()) {
 		ostringstream ss;
-		ss << "__ASM_LINE_" << g_preproc.location().line_num
-			<< "_" << url_encode(g_preproc.location().filename);
+		ss << "__ASM_LINE_" << g_preproc.location().line_num()
+			<< "_" << url_encode(g_preproc.location().filename());
 		string debug_name = ss.str();
 		if (!g_symbols.find_local(debug_name))
 			add_label_(debug_name);
@@ -145,6 +145,19 @@ void Section::add_opcode_nn(unsigned bytes, shared_ptr<Expr> nn, PatchExpr::Type
 
 	// add patch
 	auto patch = make_shared<PatchExpr>(nn, type, instr->size());
+	instr->bytes().push_back(0);
+	instr->bytes().push_back(0);
+	instr->patches().push_back(patch);
+}
+
+void Section::add_opcode_nnn(unsigned bytes, shared_ptr<Expr> nnn, PatchExpr::Type type) {
+	// add bytes
+	add_opcode(bytes);
+	shared_ptr<Icode> instr = m_icode.back();
+
+	// add patch
+	auto patch = make_shared<PatchExpr>(nnn, type, instr->size());
+	instr->bytes().push_back(0);
 	instr->bytes().push_back(0);
 	instr->bytes().push_back(0);
 	instr->patches().push_back(patch);

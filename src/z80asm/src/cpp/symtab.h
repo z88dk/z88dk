@@ -102,6 +102,8 @@ public:
 
 	shared_ptr<Symbol> find(const string& name);
 
+    shared_ptr<Symbol> use(const string& name);
+
 private:
 	map<string, shared_ptr<Symbol>>	m_table;	// symbols table
 };
@@ -117,6 +119,7 @@ public:
 	shared_ptr<Symbol> find_global(const string& name);
 
 	shared_ptr<Symbol> add_define(const string& name, int value);		// -D
+	void erase_define(const string& name);
 	shared_ptr<Symbol> add_global_def(const string& name, int value);	// head, tail
 	shared_ptr<Symbol> add_local_def(const string& name, int value);	// DEFINE
 
