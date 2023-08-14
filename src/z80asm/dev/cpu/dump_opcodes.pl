@@ -1,5 +1,9 @@
 #!/usr/bin/env perl
 
+#------------------------------------------------------------------------------
+# Build text table representation of opcodes.yaml
+#------------------------------------------------------------------------------
+
 use Modern::Perl;
 use YAML::Tiny;
 use Text::Table;

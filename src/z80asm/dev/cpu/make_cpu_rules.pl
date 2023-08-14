@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #------------------------------------------------------------------------------
-# Build parser rules for parsing the opcodes
+# Build ragel source code to parse opcodes
 #------------------------------------------------------------------------------
 
 use Modern::Perl;
