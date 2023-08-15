@@ -6,7 +6,7 @@ LINKEDLIST_AFILES = $(notdir $(wildcard adt/linkedlist/*.asm))
 LINKEDLIST_OBJECTS = $(LINKEDLIST_CFILES:.c=.o) $(LINKEDLIST_AFILES:.asm=.o)
 
 LINKEDLIST_OBJS = $(addprefix adt/linkedlist/obj/z80/, $(LINKEDLIST_OBJECTS)) \
-	$(addprefix adt/linkedlist/obj/r2k/,$(LINKEDLIST_OBJECTS)) \
+	$(addprefix adt/linkedlist/obj/r2ka/,$(LINKEDLIST_OBJECTS)) \
 	$(addprefix adt/linkedlist/obj/ixiy/,$(LINKEDLIST_OBJECTS)) \
 	$(addprefix adt/linkedlist/obj/z80n/,$(LINKEDLIST_OBJECTS)) \
 	$(addprefix adt/linkedlist/obj/z180/,$(LINKEDLIST_OBJECTS)) \
@@ -22,7 +22,7 @@ adt-linkedlist: $(LINKEDLIST_OBJS) $(LINKEDLIST_NEWLIB_TARGETS)
 
 $(eval $(call buildbit,adt/linkedlist,z80,test))
 $(eval $(call buildbit,adt/linkedlist,ixiy,test,-Ca-IXIY,-IXIY))
-$(eval $(call buildbit,adt/linkedlist,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,adt/linkedlist,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,adt/linkedlist,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,adt/linkedlist,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,adt/linkedlist,ez80_z80,test,-clib=ez80_z80,-mez80_z80))

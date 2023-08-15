@@ -8,7 +8,7 @@ NEWLIB_ROOT=../_DEVELOPMENT/
 
 #all: dirs $(OUTPUT_DIRECTORY)/z80_crt0.lib $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib $(OUTPUT_DIRECTORY)/z80iy_crt0.lib $(OUTPUT_DIRECTORY)/z180_crt0.lib $(OUTPUT_DIRECTORY)/ez80_crt0.lib $(OUTPUT_DIRECTORY)/8080_crt0.lib $(OUTPUT_DIRECTORY)/gbz80_crt0.lib $(OUTPUT_DIRECTORY)/z80n_crt0.lib $(OUTPUT_DIRECTORY)/8085_crt0.lib
 
-all: obj/z80 obj/ixiy obj/8080 obj/8085 obj/r2k obj/gbz80 obj/z180 obj/ez80_z80 obj/z180 obj/z80n 
+all: obj/z80 obj/ixiy obj/8080 obj/8085 obj/r2ka obj/gbz80 obj/z180 obj/ez80_z80 obj/z180 obj/z80n 
 
 obj/z80:
 	mkdir -p obj/z80/z80
@@ -38,9 +38,9 @@ obj/ez80_z80:
 	mkdir -p obj/ez80/ez80
 	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/ez80_z80/ez80 -I..  -mez80_z80 -DEZ80 @crt0_ez80.lst
 
-obj/r2k:
-	mkdir -p obj/r2k/r2k
-	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/r2k/r2k -I.. -mr2ka  @crt0_rcm.lst
+obj/r2ka:
+	mkdir -p obj/r2ka/r2ka
+	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/r2ka/r2ka -I.. -mr2ka  @crt0_rcm.lst
 
 # this one uses iy in place of ix
 obj/ixiy:

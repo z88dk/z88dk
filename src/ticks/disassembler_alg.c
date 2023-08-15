@@ -260,21 +260,21 @@ static char *handle_ed_assorted_instructions(dcontext *state, uint8_t y)
 {
     static char *table[] =      { "ld        i,a",   "ld        r,a",   "ld        a,i",   "ld        a,r",   "rrd",             "rld",    "ld        i,i",  "ld        r,r"};
     static char *z180_table[] = { "ld        i,a",   "ld        r,a",   "ld        a,i",   "ld        a,r",   "rrd",             "rld",    "nop",             "nop"};
-    static char *r2k_table[] =  { "ld        eir,a", "ld        iir,a", "ld        a,eir", "ld        a,iir", "ld        xpc,a", "nop",    "ld        a,xpc", "nop"};
+    static char *r2ka_table[] =  { "ld        eir,a", "ld        iir,a", "ld        a,eir", "ld        a,iir", "ld        xpc,a", "nop",    "ld        a,xpc", "nop"};
     static char *r3k_table[] =  { "ld        eir,a", "ld        iir,a", "ld        a,eir", "ld        a,iir", "ld        xpc,a", "setusr", "ld        a,xpc", "rdmode"};
     
-    return c_cpu & CPU_R2KA ? r2k_table[y] : c_cpu & CPU_R3K ? r3k_table[y] : c_cpu & (CPU_Z180|CPU_EZ80) ? z180_table[y] : table[y];
+    return c_cpu & CPU_R2KA ? r2ka_table[y] : c_cpu & CPU_R3K ? r3k_table[y] : c_cpu & (CPU_Z180|CPU_EZ80) ? z180_table[y] : table[y];
 }
 
 static char *handle_im_instructions(dcontext *state, uint8_t y)
 {
     char *table[] =      { "im        0", "im        0/1", "im        1", "im        2", "im        0",  "im        0/1", "im        1",  "im        2"};
     char *z180_table[] = { "im        0", "nop       ",    "im        1", "im        2", "nop       ",   "nop       ",    "slp       ",   "nop       "};
-    char *r2k_table[] =  { "ipset     0", "ipset     2",   "ipset     1", "ipset     3", "nop       ",   "nop       ",    "push      ip", "pop       ip"};
+    char *r2ka_table[] =  { "ipset     0", "ipset     2",   "ipset     1", "ipset     3", "nop       ",   "nop       ",    "push      ip", "pop       ip"};
     char *r3k_table[] =  { "ipset     0", "ipset     2",   "ipset     1", "ipset     3", "push      su", "pop       su",  "push      ip", "pop       ip"};
     char *ez80table[] =  { "im        0", "nop       ",    "im        1", "im        2", "im        0",  "ld        a,mb","slp       ",   "rsmix     "};
     
-    return c_cpu & CPU_R2KA ? r2k_table[y] : c_cpu & CPU_R3K ? r3k_table[y] : c_cpu & CPU_Z180 ? z180_table[y] : isez80() ? ez80table[y] : table[y];
+    return c_cpu & CPU_R2KA ? r2ka_table[y] : c_cpu & CPU_R3K ? r3k_table[y] : c_cpu & CPU_Z180 ? z180_table[y] : isez80() ? ez80table[y] : table[y];
 }   
 
 static char *handle_ez80_am(dcontext *state, char *opcode)

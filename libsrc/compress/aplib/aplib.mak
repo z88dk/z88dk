@@ -21,10 +21,10 @@ compress/aplib/obj/newlib-z80-compress-aplib: $(APLIB_NEWLIBGLOBS_ex)
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=compress/aplib/obj/z80/x -I.. -Icompress/aplib -mz80 -D__CLASSIC $(APLIB_NEWLIBGLOBS)
 
-compress/aplib/obj/newlib-r2k-compress-aplib: $(APLIB_NEWLIBGLOBS_ex)
+compress/aplib/obj/newlib-r2ka-compress-aplib: $(APLIB_NEWLIBGLOBS_ex)
 	@mkdir -p compress/aplib/obj
 	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=compress/aplib/obj/r2k/x -I.. -Icompress/aplib -mr2ka -D__CLASSIC $(APLIB_NEWLIBGLOBS)
+	$(Q)$(ASSEMBLER) -d -O=compress/aplib/obj/r2ka/x -I.. -Icompress/aplib -mr2ka -D__CLASSIC $(APLIB_NEWLIBGLOBS)
 
 compress/aplib/obj/newlib-z80n-compress-aplib: $(APLIB_NEWLIBGLOBS_ex)
 	@mkdir -p compress/aplib/obj

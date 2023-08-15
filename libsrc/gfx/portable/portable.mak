@@ -21,7 +21,7 @@ gfx-portable: $(GFXPORTABLE_OBJS) $(GFXPORTABLE_NEWLIB_TARGETS)
 
 $(eval $(call buildbit,gfx/portable,z80,test))
 $(eval $(call buildbit,gfx/portable,ixiy,test,-Ca-IXIY,-IXIY))
-$(eval $(call buildbit,gfx/portable,r2k,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,gfx/portable,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,gfx/portable,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,gfx/portable,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,gfx/portable,8085,test,-clib=8085,-m8085))

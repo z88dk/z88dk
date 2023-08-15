@@ -17,7 +17,7 @@ TOCREATE =
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
 CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxh19.lib gfxvio.lib
-GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2k_crt0.lib ez80_z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib lib3d.lib fastmath.lib preempt.lib sp1-all
+GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2ka_crt0.lib ez80_z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib lib3d.lib fastmath.lib preempt.lib sp1-all
 GENLIBS += 8080_opt.lib 8085_opt.lib  
 GENLIBS += gfxtek.lib gfxregis.lib
 
@@ -1227,13 +1227,13 @@ ixiy_clib.lib: $(TARGET_CLIB_OBJS)
 	$(call buildgeneric,z80)
 	TARGET=z80 TYPE=8085 $(LIBLINKER2) -m8085 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8085_clib @$(TARGET_DIRECTORY)/z80/808x.lst
 
-# Barebone z80/r2k clib
+# Barebone z80/r2ka clib
 r2ka_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building +z80 (r2ka) Library ---'
 	@echo ''
 	$(call buildgeneric,z80)
-	TARGET=z80 TYPE=r2k $(LIBLINKER2) -mr2ka -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/r2ka_clib @$(TARGET_DIRECTORY)/z80/z80.lst
+	TARGET=z80 TYPE=r2ka $(LIBLINKER2) -mr2ka -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/r2ka_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
 kc_clib.lib: $(TARGET_CLIB_OBJS)
@@ -1647,7 +1647,7 @@ rcmx000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building RCM2/3000 Library ---'
 	@echo ''
 	$(call buildgeneric,rcmx000)
-	TARGET=rcmx000 TYPE=r2k $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(TARGET_DIRECTORY)/rcmx000/rcmx000.lst
+	TARGET=rcmx000 TYPE=r2ka $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(TARGET_DIRECTORY)/rcmx000/rcmx000.lst
 
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib: $(TARGET_CLIB_OBJS)
@@ -1745,7 +1745,7 @@ testrcm_clib.lib: $(TARGET_CLIB_OBJS) testez80_z80_clib.lib
 	@echo '--- Building Test System Library (Rabbit) ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=r2k $(LIBLINKER2) -mr2ka -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
+	TARGET=test TYPE=r2ka $(LIBLINKER2) -mr2ka -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
 
 test8080_clib.lib: $(TARGET_CLIB_OBJS) testrcm_clib.lib
 	@echo ''
@@ -2154,12 +2154,12 @@ gbz80_crt0.lib: $(DIRS) $(OBJS) z80n_crt0.lib
 	$(call buildcrt)
 	TYPE=gbz80 $(LIBLINKER) -mgbz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gbz80_crt0 @$(LISTFILE_DIRECTORY)/gbz80.lst
 
-r2k_crt0.lib: $(DIRS) $(OBJS) gbz80_crt0.lib
+r2ka_crt0.lib: $(DIRS) $(OBJS) gbz80_crt0.lib
 	@echo ''
-	@echo '--- Building r2k crt Library ---'
+	@echo '--- Building r2ka crt Library ---'
 	@echo ''
 	$(call buildcrt)
-	TYPE=r2k $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/r2k_crt0 @$(LISTFILE_DIRECTORY)/rabbit.lst
+	TYPE=r2ka $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/r2ka_crt0 @$(LISTFILE_DIRECTORY)/rabbit.lst
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs

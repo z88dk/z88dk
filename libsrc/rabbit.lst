@@ -22,6 +22,6 @@ stdio/obj/${TYPE}/ansi/ansifont_f8
 @debug/debug.lst
 @rect/rect.lst
 @algorithm/alg.lst
-arch/z80/obj/r2k/AsmCall
+arch/z80/obj/r2ka/AsmCall
 @math/fix16/fix16.lst
 @z80_crt0s/crt0.lst

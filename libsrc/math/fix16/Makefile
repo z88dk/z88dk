@@ -9,7 +9,7 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += 
 
-all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/, $(OBJECTS)) \
+all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2ka/, $(OBJECTS)) \
 	$(addprefix obj/ixiy/, $(OBJECTS)) $(addprefix obj/z80n/, $(OBJECTS)) \
 	$(addprefix obj/z180/, $(OBJECTS)) \
 	$(addprefix obj/ez80_z80/, $(OBJECTS))
@@ -38,11 +38,11 @@ obj/z180/%.o: %.c
 obj/z180/%.o: %.asm
 	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz180 -D__CLASSIC -Oobj/z180 $^
 
-obj/r2k/%.o: %.c
+obj/r2ka/%.o: %.c
 	$(ZCC) +test -clib=rabbit $(CFLAGS) -o $@  $^
 
-obj/r2k/%.o: %.asm
-	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mr2ka -D__CLASSIC -Oobj/r2k  $^
+obj/r2ka/%.o: %.asm
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mr2ka -D__CLASSIC -Oobj/r2ka  $^
 
 obj/ez80_z80/%.o: %.c
 	$(ZCC) +test -clib=ez80_z80 $(CFLAGS) -o $@  $^
@@ -54,7 +54,7 @@ obj/ez80_z80/%.o: %.asm
 dirs:
 	@mkdir -p obj/z80/c/sccz80  obj/z80/z80 obj/z80/cimpl
 	@mkdir -p obj/z80n/c/sccz80  obj/z80n/z80 obj/z80n/cimpl
-	@mkdir -p obj/r2k/c/sccz80  obj/r2k/z80 obj/r2k/cimpl
+	@mkdir -p obj/r2ka/c/sccz80  obj/r2ka/z80 obj/r2ka/cimpl
 	@mkdir -p obj/ixiy/c/sccz80  obj/ixiy/z80 obj/ixiy/cimpl
 	@mkdir -p obj/ez80_z80/c/sccz80  obj/ez80_z80/z80 obj/ez80_z80/cimpl
 	@mkdir -p obj/z180/c/sccz80  obj/z180/z80 obj/z180/cimpl

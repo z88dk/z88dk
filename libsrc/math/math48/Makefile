@@ -41,7 +41,7 @@ $(OUTPUT_DIRECTORY)/math48_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	TYPE=ixiy $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math48_ixiy -IXIY @math48.lst
 
 dirs:
-	@mkdir -p obj/z80 obj/ixiy obj/r2k obj/z80/cimpl obj/z80n/cimpl obj/z180/cimpl obj/ez80_z80/cimpl
+	@mkdir -p obj/z80 obj/ixiy obj/r2ka obj/z80/cimpl obj/z80n/cimpl obj/z180/cimpl obj/ez80_z80/cimpl
 
 .PHONY: dirs
 

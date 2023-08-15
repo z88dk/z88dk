@@ -1,7 +1,7 @@
 LIBGEN_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/libgen/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/libgen/z80/*.asm"
 LIBGEN_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/libgen/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/libgen/z80/*.asm
 
-LIBGEN_NEWLIB_TARGETS := libgen/obj/newlib-z80-libgen libgen/obj/newlib-z80n-libgen libgen/obj/newlib-r2k-libgen \
+LIBGEN_NEWLIB_TARGETS := libgen/obj/newlib-z80-libgen libgen/obj/newlib-z80n-libgen libgen/obj/newlib-r2ka-libgen \
 		 libgen/obj/newlib-ixiy-libgen libgen/obj/newlib-8080-libgen libgen/obj/newlib-gbz80-libgen \
 		libgen/obj/newlib-z180-libgen \
 		libgen/obj/newlib-ez80_z80-libgen		
@@ -18,10 +18,10 @@ libgen/obj/newlib-z80-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=libgen/obj/z80/x -I.. -mz80 -D__CLASSIC $(LIBGEN_NEWLIBGLOBS)
 
-libgen/obj/newlib-r2k-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
+libgen/obj/newlib-r2ka-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
 	@mkdir -p libgen/obj
 	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=libgen/obj/r2k/x -I.. -mr2ka -D__CLASSIC $(LIBGEN_NEWLIBGLOBS)
+	$(Q)$(ASSEMBLER) -d -O=libgen/obj/r2ka/x -I.. -mr2ka -D__CLASSIC $(LIBGEN_NEWLIBGLOBS)
 
 libgen/obj/newlib-z80n-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
 	@mkdir -p libgen/obj

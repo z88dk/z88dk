@@ -26,7 +26,7 @@ endif
 
 OBJECTS = $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
 
-NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy obj/newlib-8080 obj/newlib-gbz80 obj/newlib-ez80_z80 obj/newlib-z180 obj/newlib-8085
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2ka obj/newlib-ixiy obj/newlib-8080 obj/newlib-gbz80 obj/newlib-ez80_z80 obj/newlib-z180 obj/newlib-8085
 
 .PHONY: dirs  $(NEWLIB_TARGETS)
 
@@ -45,8 +45,8 @@ obj/zxn/%.o: %.c
 obj/newlib-z80:
 	@$(ASSEMBLER) -d -O=obj/z80/x -I.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/newlib-r2k:
-	@$(ASSEMBLER) -d -O=obj/r2k/x -I.. -mr2ka -D__CLASSIC $(NEWLIBGLOBS)
+obj/newlib-r2ka:
+	@$(ASSEMBLER) -d -O=obj/r2ka/x -I.. -mr2ka -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-z80n:
 	@$(ASSEMBLER) -d -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBGLOBS)
@@ -71,7 +71,7 @@ obj/newlib-8085:
 
 
 dirs:
-	@mkdir -p obj/$(OBJSUBDIR) obj/z80 obj/z80n obj/ixiy obj/r2k obj/8080 obj/gbz80 obj/ez80_z80 obj/z180
+	@mkdir -p obj/$(OBJSUBDIR) obj/z80 obj/z80n obj/ixiy obj/r2ka obj/8080 obj/gbz80 obj/ez80_z80 obj/z180
 
 clean:
 	$(RM) -fr obj
