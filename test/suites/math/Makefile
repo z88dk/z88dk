@@ -9,8 +9,9 @@ FIXOBJECTS := $(FIXSOURCES:.c=.o)
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED 
 
 
-all: test_genmath.bin test_math48.bin test_math32.bin test_math16.bin test_daimath32.bin \
-	test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin test_cpcmath.bin \
+all: test_genmath.bin test_math16.bin test_daimath32.bin \
+	test_math32.bin test_math32_z180.bin test_math32_z80n.bin test_math32_r2ka.bin\
+	test_math48.bin test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin test_cpcmath.bin \
 	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_gbz80.bin \
 	test_9511.bin test_9511_8085.bin test_bbcmath.bin test_fixmath.bin
 
@@ -62,6 +63,18 @@ test_math48.bin: $(FPSOURCES)
 test_math32.bin: $(FPSOURCES)
 	$(call compile, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32)
 	$(runtest)
+
+test_math32_z180.bin: $(FPSOURCES)
+	$(call compile_z180, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_z180)
+	$(runtest_z180)
+
+test_math32_z80n.bin: $(FPSOURCES)
+	$(call compile_z80n, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_z80n)
+	$(runtest_z80n)
+
+test_math32_r2ka.bin: $(FPSOURCES)
+	$(call compile_r2ka, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_r2ka)
+	$(runtest_r2ka)
 
 test_math48_rc2014_CODE.bin: $(FPSOURCES)
 	$(call compile_rc2014, -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"", -lm)
