@@ -9,6 +9,35 @@ use Modern::Perl;
 
 my @CPUS = qw( z80 z80_strict z80n z180 ez80 ez80_z80 r800 r2ka r3k 8080 8085 gbz80 );
 
+# test invalid CPU
+
+unlink_testfiles;
+spew("$test.asm", "nop");
+sleep(1);
+
+spew("$test.o", objfile(CPU=>-1));
+
+capture_ok("z88dk-z80nm -a $test.o", <<'END');
+Object  file test_t_issue_2320.o at $0000: Z80RMF18
+  Name: test
+  CPU:  (invalid -1) 
+END
+
+capture_nok("z88dk-z80asm -b $test.o", <<'END');
+error: CPU invalid: file test_t_issue_2320.o, cpu_id = -1
+END
+
+capture_nok("z88dk-z80asm -d -b $test.o", <<'END');
+error: CPU invalid: file test_t_issue_2320.o, cpu_id = -1
+END
+
+sleep(1);
+spew("$test.asm", "nop");
+
+capture_ok("z88dk-z80asm -d -b $test.o", "");
+check_bin_file("$test.bin", bytes(0));
+
+
 # -M* and -d are incompatible
 
 unlink_testfiles;
@@ -100,6 +129,8 @@ Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
+Append object file test_t_issue_2320.a.o...
+Append object file test_t_issue_2320.b.o...
 Creating library 'test_t_issue_2320.lib'
 Adding test_t_issue_2320.a.o to library
 Adding test_t_issue_2320.b.o to library

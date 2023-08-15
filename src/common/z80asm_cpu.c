@@ -52,9 +52,9 @@ const char* cpu_name(int cpu_id) {
     switch (cpu_id) {
 #define X(id, value, name)      case id: return name;
 #include "z80asm_cpu.def"
-    default: xassert(0);
+    default:;
     }
-    return "";  // not reached
+    return NULL;
 }
 
 int cpu_id(const char* name) {
