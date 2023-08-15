@@ -26,11 +26,9 @@ PUBLIC m32__dtoa_base10
     ; e = n * log(2) = n * 0.301.. = n * 0.01001101...(base 2) = INT((n*77 + 5)/256)
 
     exx
-    sla e                       ; move mantissa to capture exponent
-    rl d
+    rl de                       ; move mantissa to capture exponent
     ld a,d                      ; get exponent in A
-    rr d
-    rr e
+    rr de
 
     exx
     ; A = n (binary exponent)
@@ -74,8 +72,7 @@ PUBLIC m32__dtoa_base10
 
     ; DEHL = b
 
-    sla e                       ; move mantissa to capture exponent
-    rl d
+    rl de                       ; move mantissa to capture exponent
     ld a,d                      ; get exponent in A
     rr de
 
@@ -94,8 +91,8 @@ PUBLIC m32__dtoa_base10
     ; there is one decimal digit in four bits of EHL
     ; align these bits so they are the first four in register D
 
-    sla e                       ; move mantissa to capture exponent
-    rl d                        ; get exponent in D
+    rl de                       ; move mantissa to capture exponent
+                                ; get exponent in D
     scf                         ; restore mantissa bit
     rr e
 

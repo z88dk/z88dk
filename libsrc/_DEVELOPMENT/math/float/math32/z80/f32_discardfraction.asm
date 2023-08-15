@@ -8,13 +8,11 @@ PUBLIC m32_discardfraction
 ; Exit:  dehl = 32 bit float without fractional part
 
 .m32_discardfraction
-    sla e                       ; get the exponent
-    rl d
+    rl de                       ; get the exponent
     jr Z,zero_legal             ; return IEEE signed zero
 
     ld a,d                      ; Exponent
-    rr d                        ; Keep sign and exponent safe
-    rr e
+    rr de                       ; Keep sign and exponent safe
     sub $7f                     ; Exponent value of 127 is 1.xx
     jr C,return_zero
 
@@ -31,8 +29,7 @@ PUBLIC m32_discardfraction
 .shift_right                    ; shift mantissa mask right
     scf
     rr e
-    rr h
-    rr l
+    rr hl
     dec a
     jr NZ,shift_right
 

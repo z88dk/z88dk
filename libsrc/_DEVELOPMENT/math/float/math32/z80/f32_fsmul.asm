@@ -69,12 +69,9 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     ld hl,002h                  ; get second operand off of the stack
     add hl,sp
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
-    ld c,(hl)
-    inc hl
+    ld e,(hl+)
+    ld d,(hl+)
+    ld c,(hl+)
     ld h,(hl)
     ld l,c                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
     jr fmrejoin
