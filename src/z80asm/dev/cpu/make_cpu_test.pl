@@ -7,7 +7,10 @@
 use Modern::Perl;
 use YAML::Tiny;
 
-my $yaml = YAML::Tiny->read("opcodes.yaml");
+@ARGV==2 or die "Usage: $0 input_file.yaml output_basename\n";
+my($input_file, $output_basename) = @ARGV;
+
+my $yaml = YAML::Tiny->read($input_file);
 my %opcodes = %{$yaml->[0]};
 
 my @test;
@@ -46,7 +49,7 @@ for my $ixiy ("", "_ixiy") {
 			}
 		}
 		
-		open(my $fh, ">", "cpu_test_${cpu}${ixiy}_ok.asm") or die $!;
+		open(my $fh, ">", "${output_basename}_${cpu}${ixiy}_ok.asm") or die $!;
 		say $fh join("\n", compute_labels(sort @test));
 	}
 }
@@ -78,7 +81,7 @@ for my $cpu (@CPUS) {
 		}
 	}
 	
-	open(my $fh, ">", "cpu_test_${cpu}_err.asm") or die $!;
+	open(my $fh, ">", "${output_basename}_${cpu}_err.asm") or die $!;
 	say $fh join("\n", sort @test);
 }
 
