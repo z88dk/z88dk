@@ -18,6 +18,15 @@ extern "C" {
 #define TOSTR(x)	_TOSTR(x)
 #define _TOSTR(x)	#x
 
+// program name
+#define Z80ASM_PROG	    "z88dk-z80asm"
+
+// environment variable
+#define Z80ASM_ENVVAR	"Z80ASM"
+
+// library base name
+#define Z80ASM_LIB_BASE	Z80ASM_PROG
+
 // default file name extensions
 #define EXT_ASM     ".asm"    
 #define EXT_LIS		".lis"    

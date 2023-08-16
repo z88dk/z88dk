@@ -132,6 +132,7 @@ unlink(qw( test.asm test.o test.map test.bin test.tap ));
 spew("test.asm", $asm);
 
 capture_ok("z88dk-z80asm +zx -v -m -L.. test.asm", <<'END');
+% z88dk-z80asm +zx -v -m -L.. test.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
@@ -406,6 +407,7 @@ unlink(qw( test.asm test.o test.map test.bin test.P ));
 spew("test.asm", $asm);
 
 capture_ok("z88dk-z80asm +zx81 -m -v -L.. test.asm 2> ${test}.err", <<'END');
+% z88dk-z80asm +zx81 -m -v -L.. test.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1

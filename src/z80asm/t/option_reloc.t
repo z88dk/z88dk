@@ -25,6 +25,7 @@ unlink_testfiles;
 spew("${test}.asm", $asm);
 
 capture_ok("z88dk-z80asm -b -v -R ${test}.asm", <<END);
+% z88dk-z80asm -b -v -R ${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
@@ -50,6 +51,7 @@ unlink_testfiles;
 spew("${test}.asm", $asm);
 
 capture_ok("z88dk-z80asm -b -v -R ${test}.asm", <<END);
+% z88dk-z80asm -b -v -R ${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1

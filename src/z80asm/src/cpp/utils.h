@@ -28,7 +28,7 @@ using namespace std;
 // Assert for internal errors, similar to assert but not removed in release builds
 #define Assert(f)    do { \
                         if (!(f)) { \
-                            cerr << "z88dk-z80asm panic at " << __FILE__ << ":" << __LINE__ << endl; \
+                            cerr << Z80ASM_PROG << " panic at " << __FILE__ << ":" << __LINE__ << endl; \
                             exit(EXIT_FAILURE); \
                         } \
                     } while(0)

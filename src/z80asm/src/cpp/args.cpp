@@ -23,12 +23,6 @@ using namespace std;
 
 Args g_args;
 
-// environment variable
-#define Z80ASM_ENVVAR	"Z80ASM"
-
-// library base name
-#define Z80ASM_LIB_BASE	"z88dk-z80asm"
-
 //-----------------------------------------------------------------------------
 // version
 //-----------------------------------------------------------------------------
@@ -93,30 +87,41 @@ Args::Args()
 // parsing
 //-----------------------------------------------------------------------------
 void Args::parse_args(const vector<string>& args) {
-
 	if (args.empty())
 		exit_copyright();
 
+    // set m_verbose, if defined in env var
+    parse_env_vars();
+
     // check for -v to activate verbosity before other options are parsed
     for (auto& arg : args) {
-        if (arg == "-v")
+        if (unquote(expand_env_vars(arg)) == "-v")
             m_verbose = true;
     }
 
-	pre_parsing_actions();
+    // show command line
+    if (m_verbose) {
+        cout << "% " << Z80ASM_PROG;
+        for (auto& arg : args) {
+            cout << " " << arg;
+        }
+        cout << endl;
+    }
+
 	if (g_errors.count() > 0)
 		return;
 
 	bool got_dash_dash = false;
 	for (auto& arg : args) {
-		if (arg.empty())
+        string arg1 = unquote(expand_env_vars(arg));
+		if (arg1.empty())
 			continue;
-		else if (arg == "--")
+		else if (arg1 == "--")
 			got_dash_dash = true;
-		else if (!got_dash_dash && (arg[0] == '-' || arg[0] == '+'))
-			parse_option(arg);
+		else if (!got_dash_dash && (arg1[0] == '-' || arg1[0] == '+'))
+			parse_option(arg1);
 		else
-			parse_file(arg);
+			parse_file(arg1);
 
 		if (g_errors.count() > 0)
 			return;
@@ -244,8 +249,7 @@ string Args::reloc_filename(const string& bin_filename) {
 	return replace_ext(bin_filename, EXT_RELOC);
 }
 
-void Args::parse_option(const string& arg_) {
-	string arg = unquote(expand_env_vars(arg_));
+void Args::parse_option(const string& arg) {
 	string opt_arg;
 
 #define OPT(opt_name, opt_param, opt_code, opt_help)					\
@@ -407,11 +411,10 @@ bool Args::collect_opt_arg(const string& opt_name, const string& arg,
 	}
 }
 
-void Args::parse_file(const string& arg_) {
-	if (arg_.empty())
+void Args::parse_file(const string& arg) {
+	if (arg.empty())
 		return;
 
-	string arg = unquote(expand_env_vars(arg_));
 	if (arg[0] == '@')
 		expand_list_glob(arg.substr(1));
 	else
@@ -460,7 +463,7 @@ void Args::expand_list_glob(const string& pattern) {
 				if (g_preproc.open(file.generic_string(), false)) {
 					ScannedLine line;
 					while (g_preproc.get_unpreproc_line(line)) {
-						parse_args_in_text(line.text());
+						parse_args_in_text(expand_env_vars(line.text()));
 					}
 				}
 			}
@@ -824,10 +827,6 @@ void Args::set_filler(const string& opt_arg) {
 		m_filler = value;
 }
 
-void Args::pre_parsing_actions() {
-	parse_env_vars();
-}
-
 void Args::post_parsing_actions() {
 	set_consol_obj_options();
 
@@ -853,8 +852,13 @@ void Args::post_parsing_actions() {
 // parse environment variable options
 void Args::parse_env_vars() {
 	const char* options = getenv(Z80ASM_ENVVAR);
-	if (options)
+    if (options) {
+        if (string(options).find("-v") != string::npos) {
+            m_verbose = true;
+            cout << Z80ASM_ENVVAR << "=" << options << endl;
+        }
 		parse_args_in_text(options);
+    }
 }
 
 // make consolidated object

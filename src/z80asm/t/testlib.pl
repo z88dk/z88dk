@@ -454,10 +454,20 @@ sub libfile {
 sub quote_os {
 	my($txt) = @_;
 	if ($^O eq 'MSWin32') {
-		return '"'.$txt.'"';
+		return '"\''.$txt.'\'"';
 	}
 	else {
+		return "'\"".$txt."\"'";
+	}
+}
+
+sub os_quoted {
+	my($txt) = @_;
+	if ($^O eq 'MSWin32') {
 		return "'".$txt."'";
+	}
+	else {
+		return '"'.$txt.'"';
 	}
 }
 

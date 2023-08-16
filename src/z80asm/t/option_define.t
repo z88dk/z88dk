@@ -63,6 +63,7 @@ z80asm_ok("-b ".quote_os("-D_value\${TEST_ENV}23"), "", "",
 spew("${test}.asm", "nop");
 capture_ok("z88dk-z80asm -v ".
 		   "-Dmten=-+-+-10 -Dmnine=-9 -Dzero=0 -Done -Dnine=+9 -Dten=10 ${test}.asm", <<END);
+% z88dk-z80asm -v -Dmten=-+-+-10 -Dmnine=-9 -Dzero=0 -Done -Dnine=+9 -Dten=10 ${test}.asm
 Predefined constant: mten = -\$000a
 Predefined constant: mnine = -9
 Predefined constant: zero = 0

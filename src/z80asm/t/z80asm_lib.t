@@ -49,6 +49,7 @@ END
 unlink("${test}.bin");
 
 capture_ok("z88dk-z80asm -b -v ${test}.asm", <<END);
+% z88dk-z80asm -b -v ${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
@@ -77,6 +78,7 @@ $ENV{ZCCCFG} = "root/lib/config";
 copy('../z88dk-z80asm.lib', $ENV{ZCCCFG}.'/../z88dk-z80asm.lib');
 
 capture_ok("z88dk-z80asm -b -v ../${test}.asm", <<END);
+% z88dk-z80asm -b -v ../${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
@@ -100,6 +102,7 @@ delete $ENV{ZCCCFG};
 unlink("../${test}.bin");
 
 capture_ok("z88dk-z80asm -b -v -Lroot/lib ../${test}.asm", <<END);
+% z88dk-z80asm -b -v -Lroot/lib ../${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
@@ -123,6 +126,7 @@ unlink("../${test}.bin");
 run_nok("z88dk-z80asm -b -v ../${test}.asm > ../${test}.out 2> ../${test}.err");
 
 check_text_file("../${test}.out", <<END);
+% z88dk-z80asm -b -v ../${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
@@ -164,7 +168,7 @@ for my $cpu ("", qw(z80 z80n z180 gbz80 8080 8085 r2ka r3k)) {
 		}
 		
 		unlink("${test}.bin");
-		capture_ok($cmd, exp_output($real_cpu, $ixiy));
+		capture_ok($cmd, exp_output($cmd, $real_cpu, $ixiy));
 		check_bin_file("${test}.bin", bytes(@bytes));
 		
 		die unless Test::More->builder->is_passing;
@@ -179,14 +183,15 @@ done_testing;
 
 
 sub exp_output {
-	my($cpu, $ixiy) = @_;
+	my($cmd, $cpu, $ixiy) = @_;
 	
 	my $CPU = uc($cpu);
 	my $family = ($cpu =~ /^z/i)  ? "ZILOG" :
 				 ($cpu =~ /^r/i)  ? "RABBIT" :
 				 ($cpu =~ /^80/i) ? "INTEL" : "";
-
-	my $out = 	"Predefined constant: __CPU_${CPU}__ = 1\n";
+	
+	my $out = 	"% $cmd\n";
+	$out .=		"Predefined constant: __CPU_${CPU}__ = 1\n";
 	$out .= 	"Predefined constant: __CPU_${family}__ = 1\n" if $family;
 	$out .= 	"Predefined constant: __SWAP_IX_IY__ = 1\n" if $ixiy;
 	$out .= <<END;
