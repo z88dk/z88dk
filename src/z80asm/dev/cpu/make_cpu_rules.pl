@@ -7,7 +7,10 @@
 use Modern::Perl;
 use YAML::Tiny;
 
-my $yaml = YAML::Tiny->read("opcodes.yaml");
+@ARGV==2 or die "Usage $0 input_file.yaml output_file.h\n";
+my($input_file, $output_file) = @ARGV;
+
+my $yaml = YAML::Tiny->read($input_file);
 my %opcodes = %{$yaml->[0]};
 
 my %parser;
@@ -30,7 +33,7 @@ for my $asm (sort keys %opcodes) {
 	}
 }
 
-open(my $rules, ">", "cpu_rules.h") or die $!;
+open(my $rules, ">", $output_file) or die $!;
 
 for my $tokens (sort keys %parser) {
 	#say $tokens;

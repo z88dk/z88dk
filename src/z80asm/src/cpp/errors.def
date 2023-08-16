@@ -91,6 +91,7 @@ X(SegmentOverflow, "segment overflow")
 X(OrgNotAligned, "ORG not aligned")
 X(InvalidOrg, "invalid ORG")
 X(CPUIncompatible, "CPU incompatible")
+X(CPUInvalid, "CPU invalid")
 X(IXIYIncompatible, "-IXIY incompatible")
 
 #undef X

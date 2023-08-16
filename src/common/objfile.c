@@ -942,7 +942,12 @@ void objfile_read(objfile_t* obj, FILE* fp)
 
     // cpu
     if (opt_obj_list && obj->version >= 18) {
-        printf("  CPU:  %s ", cpu_name(obj->cpu_id));
+        const char* cpu_str = cpu_name(obj->cpu_id);
+        if (cpu_str)
+            printf("  CPU:  %s ", cpu_str);
+        else
+            printf("  CPU:  (invalid %d) ", obj->cpu_id);
+
         switch (obj->swap_ixiy) {
         case IXIY_NO_SWAP: break;
         case IXIY_SWAP: printf("(-IXIY)"); break;

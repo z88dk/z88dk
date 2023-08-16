@@ -304,7 +304,7 @@ sub objfile {
 	my $o = "Z80RMF".$OBJ_FILE_VERSION;
 
 	# store CPU and -IXIY
-	$o .= pack("VV", 1, 0);
+	$o .= pack("VV", $args{CPU}//1, $args{SWAP_IXIY}//0);
 	
 	# store empty pointers; mark position for later
 	my $name_addr	 = length($o); $o .= pack("V", -1);
@@ -372,7 +372,7 @@ sub objfile {
 
 	# store name
 	store_ptr(\$o, $name_addr);
-	$o .= pack("V", $st->add($args{NAME}));
+	$o .= pack("V", $st->add($args{NAME}//"test"));
 
 	# store code
 	if ( $args{CODE} ) {

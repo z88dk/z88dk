@@ -9,7 +9,10 @@ use YAML::Tiny;
 use Text::Table;
 use Clone 'clone';
 
-my $yaml = YAML::Tiny->read("opcodes.yaml");
+@ARGV==2 or die "Usage: $0 input_file.yaml output_file.txt\n";
+my($input_file, $output_file) = @ARGV;
+
+my $yaml = YAML::Tiny->read($input_file);
 my %opcodes = %{$yaml->[0]};
 
 my $sep = \"|";
@@ -18,7 +21,7 @@ my $sep = \"|";
 my $opcode_table = make_opcode_table(%opcodes);
 my $hex_table = make_hex_table(%opcodes);
 
-open(my $fh, ">", "opcodes.txt") or die $!;
+open(my $fh, ">", $output_file) or die $!;
 print $fh $opcode_table->rule('=');
 print $fh $opcode_table->title;
 print $fh $opcode_table->rule('=');

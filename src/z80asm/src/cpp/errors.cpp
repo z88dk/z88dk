@@ -363,9 +363,20 @@ void error_assert_failed() {
 
 void error_cpu_incompatible(const char* filename, int got_cpu_id) {
     ostringstream error;
-    error << "file " << filename << " compiled for " << cpu_name(got_cpu_id)
-        << ", incompatible with " << cpu_name(option_cpu());
-    g_errors.error(ErrCode::CPUIncompatible, error.str());
+    const char* cpu_str = cpu_name(got_cpu_id);
+    if (cpu_str == NULL)
+        error_cpu_invalid(filename, got_cpu_id);
+    else {
+        error << "file " << filename << " compiled for " << cpu_str
+            << ", incompatible with " << cpu_name(option_cpu());
+        g_errors.error(ErrCode::CPUIncompatible, error.str());
+    }
+}
+
+void error_cpu_invalid(const char* filename, int got_cpu_id) {
+    ostringstream error;
+    error << "file " << filename << ", cpu_id = " << got_cpu_id;
+    g_errors.error(ErrCode::CPUInvalid, error.str());
 }
 
 static const char* ixiy_to_string(swap_ixiy_t swap_ixiy) {
