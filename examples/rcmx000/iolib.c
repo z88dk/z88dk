@@ -62,8 +62,7 @@ static void ioi_inb_impl()
   push af;
 
   ld hl,(_ioi_addr);
-  defb 0d3h ; ioi ;
-  ld a,(hl);
+  ioi ld a,(hl);
   ld (_ioi_data),a;
 
   pop af ;
@@ -87,9 +86,8 @@ static void ioi_outb_impl()
   ld hl,(_ioi_addr);
   ld a,(_ioi_data);
 
-  defb 0d3h; ioi ;
-  ld (hl),a ;
-  
+  ioi ld (hl),a ;
+
   pop af ;
   pop hl ;
 #endasm

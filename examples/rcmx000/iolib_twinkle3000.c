@@ -1,29 +1,28 @@
 /*
-	Z88DK - Rabbit Control Module examples
-	Led blinking for the Rabbit 3000
-	
-	Same, but using the IOLIB
-	
+    Z88DK - Rabbit Control Module examples
+    Led blinking for the Rabbit 3000
+
+    Same, but using the IOLIB
 */
-	
+
 #include "iolib.h"
-	
+
+
 void setup_io()
 {
-  iolib_outb(IOLIB_PGDCR, 0);    /* High and low as opposed to open drain */
-  iolib_outb(IOLIB_PGDDR, 0xff); /* Direction Out port */
+    iolib_outb(IOLIB_PGDCR, 0);    /* High and low as opposed to open drain */
+    iolib_outb(IOLIB_PGDDR, 0xff); /* Direction Out port */
 }
-
 
 void leds_on()
 {
-  iolib_outb(IOLIB_PGDR, 0);
-}	
-	
-	
+    iolib_outb(IOLIB_PGDR, 0);
+}
+
+
 void leds_off()
 {
-  iolib_outb(IOLIB_PGDR, 0xff);
+    iolib_outb(IOLIB_PGDR, 0xff);
 }
 
 static int wait_rtc(int port_rtc0r)
@@ -38,19 +37,16 @@ static int wait_rtc(int port_rtc0r)
 
 wait:
 
-    defb 0d3h ; ioi ;
-    ld (bc),a		; Any write triggers transfer ;
-    defb 0d3h ; ioi ;
-    ld a,(bc)		; RTC byte 0 ;
+    ioi ld (bc),a       ; Any write triggers transfer ;
+    ioi ld a,(bc)       ; RTC byte 0 ;
     ld l,a ;
     inc bc ;
-    defb 0d3h ; ioi ;
-    ld a,(bc)           ; RTC byte 1 ;
+    ioi ld a,(bc)       ; RTC byte 1 ;
     ld h,a ;
     dec bc ;
-    
+
     ld de,7fffh ;
-    defb 0dch ; and hl,de ;
+    and hl,de ;
     jr nz, wait ;
 
     pop hl ;
@@ -61,7 +57,7 @@ wait:
 
 #include <stdio.h>
 
-int main()
+int main(void)
 {
     int i;
 
@@ -71,17 +67,17 @@ int main()
 
     while(1)
     {
-	leds_on();
+        leds_on();
 
-	printf("LED ON....\n");
-	
-	wait_rtc(port_rtc0r);
-	
-	leds_off();
+        printf("LED ON....\n");
 
-	printf("LED OFF...\n");
+        wait_rtc(port_rtc0r);
 
-	wait_rtc(port_rtc0r);
+        leds_off();
+
+        printf("LED OFF...\n");
+
+        wait_rtc(port_rtc0r);
     }
-
+    return 0;
 }
