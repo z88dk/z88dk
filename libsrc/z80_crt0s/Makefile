@@ -40,7 +40,7 @@ obj/ez80_z80:
 
 obj/r2ka:
 	mkdir -p obj/r2ka/r2ka
-	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/r2ka/r2ka -I.. -mr2ka  @crt0_rcm.lst
+	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/r2ka/r2ka -I.. -mr2ka  @crt0_r2ka.lst
 
 # this one uses iy in place of ix
 obj/ixiy:
