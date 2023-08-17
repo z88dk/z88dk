@@ -51,8 +51,7 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     rl d
     jr Z,m32_sqrt_zero          ; sqrt 0
     jp C,m32_fsconst_nnan       ; negative number
-    rr d
-    rr e
+    rr de
     call m32_fsinvsqrt_fastcall
     jp m32_fsmul
 
@@ -230,7 +229,7 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
 .fd0
     sla e
     xor a                       ; set sign in C positive
-    rr b
-    rr e
-    ld d,b
+    ld d,b                      ; put exponent in D
+    rr de                       ; put sign and 7 exp bits into place
+                                ; put last exp bit into place
     ret                         ; return IEEE DEHL

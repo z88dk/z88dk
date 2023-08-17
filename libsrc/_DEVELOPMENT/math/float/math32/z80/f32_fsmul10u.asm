@@ -21,7 +21,7 @@ PUBLIC _m32_mul10uf
     sla e                       ; get exponent into d
     rl d
     jr Z,zero_legal             ; return IEEE zero
-    
+
     scf                         ; set hidden bit
     rr e                        ; return mantissa to ehl
 

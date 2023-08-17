@@ -78,8 +78,7 @@ PUBLIC  m32_compare, m32_compare_callee
     cpl
     ld d,a
 .positive_right
-    rr d
-    rr e
+    rr de
 
     res 0,l             ;remove least significant bit
 
@@ -102,8 +101,7 @@ PUBLIC  m32_compare, m32_compare_callee
     cpl
     ld d,a
 .positive_left
-    rr d
-    rr e
+    rr de
 
     res 0,l             ;remove least significant bit
 

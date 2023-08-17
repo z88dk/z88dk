@@ -84,8 +84,7 @@ PUBLIC _m32_invf
     push de                     ; - D' msw on stack for D[1] calculation
     push hl                     ; - D' lsw on stack for D[1] calculation
 
-    sla e
-    rl d                        ; get D' full exponent into d
+    rl de                       ; get D' full exponent into d
     res 7,c                     ; set D' positive
     scf
     rr e                        ; put implicit bit for mantissa in ehl
@@ -187,14 +186,13 @@ PUBLIC _m32_invf
     or a                        ; round using feilipu method
     jr Z,fd0
     inc l
-    jr NZ,fd0	
-    inc h	
-    jr NZ,fd0	
-    inc e	
-    jr NZ,fd0	
-    rr e	
-    rr h	
-    rr l	
+    jr NZ,fd0
+    inc h
+    jr NZ,fd0
+    inc e
+    jr NZ,fd0
+    rr e
+    rr hl
     inc b
 
 .fd0

@@ -163,9 +163,9 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 .fm4
     sla e                       ; adjust mantissa for exponent
     sla c                       ; put sign into C
-    rr b                        ; put sign and 7 exp bits into place
-    rr e                        ; put last exp bit into place
-    ld d,b                      ; put sign and exponent in D
+    ld d,b                      ; put exponent in D
+    rr de                       ; put sign and 7 exp bits into place
+                                ; put last exp bit into place
     ret                         ; return IEEE DEHL
 
 .mulovl
