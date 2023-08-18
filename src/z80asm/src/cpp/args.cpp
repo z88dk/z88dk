@@ -21,6 +21,11 @@
 #include <map>
 using namespace std;
 
+extern "C" {
+    extern Symbol1* define_static_def_sym(const char* name, long value);
+    extern void undefine_static_def_sym(const char* name);
+}
+
 Args g_args;
 
 //-----------------------------------------------------------------------------
@@ -956,9 +961,7 @@ void Args::define_assembly_defines() {
 }
 
 void Args::define_static_symbol(const string& name, int value) {
-    undefine_static_def_sym(name.c_str());
     define_static_def_sym(name.c_str(), value);
-    undefine_local_def_sym(name.c_str());
     define_local_def_sym(name.c_str(), value);
 }
 

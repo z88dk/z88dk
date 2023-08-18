@@ -105,6 +105,12 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
 		sym->filename = get_error_filename();
 		sym->line_num = get_error_line_num();
     }
+    else if (type == TYPE_CONSTANT && scope == SCOPE_LOCAL &&
+        sym->value == value && sym->type == type && sym->scope == scope &&
+        sym->module == module && sym->section == section)
+    {
+        /* constant redefined with the same value and in the same module/section */
+    }
     else											/* already defined */
     {
         if (strncmp(name, "__CDBINFO__",11) == 0)
@@ -356,7 +362,7 @@ Symbol1* define_symbol(const char* name, long value, sym_type_t type)
 	}
 	else if (sym->is_defined)				/* global symbol already defined */
 	{
-		if (strncmp(name, "__CDBINFO__", 11))
+		if (strncmp(name, "__CDBINFO__", 11) != 0)
 			error_duplicate_definition(name);
 	}
 	else
