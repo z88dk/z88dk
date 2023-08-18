@@ -15,9 +15,10 @@ $ENV{PATH} = join($Config{path_sep},
 
 my $OBJ_FILE_VERSION = "18";
 
-use vars '$test', '$null';
+use vars '$test', '$null', '@CPUS';
 $test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
 $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
+@CPUS = qw( z80 z80_strict z80n z180 ez80 ez80_z80 r800 r2ka r3k 8080 8085 gbz80 );
 
 unlink_testfiles();
 
@@ -507,6 +508,70 @@ sub slurp {
 	}
 	
 	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+}
+
+#------------------------------------------------------------------------------
+sub cpu_compatible {
+	my($code_cpu, $lib_cpu) = @_;
+	if ($code_cpu eq $lib_cpu) {
+		return 1;
+	}
+	elsif ($code_cpu eq "z80_strict" && $lib_cpu eq "8080") {
+		return 1;
+	}
+	elsif ($code_cpu eq "z80" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
+		return 1;
+	}
+	elsif ($code_cpu eq "z80n" && ($lib_cpu eq "8080" || $lib_cpu eq "z80" || $lib_cpu eq "z80_strict")) {
+		return 1;
+	}
+	elsif ($code_cpu eq "z180" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
+		return 1;
+	}
+	elsif ($code_cpu eq "ez80") {
+		return 0;
+	}
+	elsif ($code_cpu eq "ez80_z80" && ($lib_cpu eq "8080" || $lib_cpu eq "z180" || $lib_cpu eq "z80_strict")) {
+		return 1;
+	}
+	elsif ($code_cpu eq "r800" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
+		return 1;
+	}
+	elsif ($code_cpu eq "r2ka") {
+		return 0;
+	}
+	elsif ($code_cpu eq "r3k" && $lib_cpu eq "r2ka") {
+		return 1;
+	}
+	elsif ($code_cpu eq "8080") {
+		return 0;
+	}
+	elsif ($code_cpu eq "8085" && $lib_cpu eq "8080") {
+		return 1;
+	}
+	elsif ($code_cpu eq "gbz80") {
+		return 0;
+	}
+	else {
+		return 0;
+	}
+}
+
+#------------------------------------------------------------------------------
+sub ixiy_compatible {
+	my($code_ixiy, $lib_ixiy) = @_;
+	if ($code_ixiy eq $lib_ixiy) {
+		return 1;
+	}
+	elsif ($code_ixiy eq "" && $lib_ixiy eq "-IXIY-soft") {
+		return 1;
+	}
+	elsif ($code_ixiy eq "-IXIY-soft" && $lib_ixiy eq "") {
+		return 1;
+	}
+	else {
+		return 0;
+	}
 }
 
 1;
