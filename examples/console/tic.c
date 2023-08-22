@@ -56,6 +56,67 @@ void printboard()
 						draw((j * 80) + 60 + p, (i * 60) + 10, (j * 80) + 20 + p, (i * 60) + 50);
 					}
 					break;
+
+
+		case '1':
+			draw((j * 80) + 6, (i * 60) + 6, (j * 80) + 6, (i * 60) + 17);
+			break;
+		case '2':
+			draw((j * 80) + 6, (i * 60) + 6, (j * 80) + 11, (i * 60) + 6);
+			drawr(0,5);
+			drawr(-5,0);
+			drawr(0,5);
+			drawr(5,0);
+			break;
+		case '3':
+			draw((j * 80) + 6, (i * 60) + 6, (j * 80) + 11, (i * 60) + 6);
+			drawr(0,5);
+			drawr(-5,0);
+			drawr(5,0);
+			drawr(0,5);
+			drawr(-5,0);
+			break;
+		case '4':
+			draw((j * 80) + 6, (i * 60) + 6, (j * 80) + 6, (i * 60) + 11);
+			drawr(5,0);
+			drawr(0,-5);
+			drawr(0,10);
+			break;
+		case '5':
+			draw((j * 80) + 11, (i * 60) + 6,(j * 80) + 6, (i * 60) + 6);
+			drawr(0,5);
+			drawr(5,0);
+			drawr(0,5);
+			drawr(-5,0);
+			break;
+		case '6':
+			draw((j * 80) + 11, (i * 60) + 6,(j * 80) + 6, (i * 60) + 6);
+			drawr(0,10);
+			drawr(5,0);
+			drawr(0,-5);
+			drawr(-5,0);
+			break;
+		case '7':
+			draw((j * 80) + 6, (i * 60) + 6, (j * 80) + 11, (i * 60) + 6);
+			drawr(0,10);
+			break;
+		case '8':
+			draw((j * 80) + 11, (i * 60) + 6,(j * 80) + 6, (i * 60) + 6);
+			drawr(0,5);
+			drawr(5,0);
+			drawr(0,-5);
+			drawr(0,10);
+			drawr(-5,0);
+			drawr(0,-5);
+			break;
+		case '9':
+			draw((j * 80) + 11, (i * 60) + 6,(j * 80) + 6, (i * 60) + 6);
+			drawr(0,5);
+			drawr(5,0);
+			drawr(0,-5);
+			drawr(0,10);
+			drawr(-5,0);
+			break;
 			}
 		}
 	}
