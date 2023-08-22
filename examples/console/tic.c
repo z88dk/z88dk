@@ -4,6 +4,11 @@
 
 #include <stdio.h>
 
+#ifdef GRAPHICS
+#include <graphics.h>
+	int i,j,n,p;
+#endif
+
 char x;
 
 char board[] = {
@@ -25,6 +30,37 @@ char threes[] = {
 
 void printboard()
 {
+#ifdef GRAPHICS
+	
+	n=0;
+	// Game board
+	for (i = 0; i < 4; i++) {
+        for (p = -3; p < 4; p++)
+            draw(0, (i * 60), 240, (i * 60));
+        for (p = 0; p < 4; p++)
+            draw((p * 80), 0, (p * 80), 180);
+	}
+
+	// Pieces
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 3; j++) 
+			switch (board[n++]) {
+				case 'O':
+					circle((j * 80) + 40, (i * 60) + 30, 20, 1);
+					circle((j * 80) + 40, (i * 60) + 30, 15, 1);
+					fill((j * 80) + 25, (i * 60)+20);
+					break;
+				case 'X':
+					for (p=-3; p<4; p++) {
+						draw((j * 80) + 20 + p, (i * 60) + 10, (j * 80) + 60 + p, (i * 60) + 50);
+						draw((j * 80) + 60 + p, (i * 60) + 10, (j * 80) + 20 + p, (i * 60) + 50);
+					}
+					break;
+			}
+		}
+	}
+
+#else
 
     printf("\n     *     *");
     printf("\n  %c  *  %c  *  %c", board[0], board[1], board[2]);
@@ -48,6 +84,8 @@ void printboard()
 	printf("\n          *          *          ");
 	printf("\n\n");
 */
+
+#endif
 }
 
 int domove(char player, char opponent)
@@ -153,6 +191,9 @@ int main()
 {
 
     //for (x=0 ; x!=9; x++) board[x] = x;
+#ifdef GRAPHICS
+    clg();
+#endif
 
     printboard();
 
