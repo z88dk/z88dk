@@ -88,20 +88,22 @@ clean::
 
 #------------------------------------------------------------------------------
 # developer generated source files, and test libs
-# only run with RUN_RAGEL=1 to fix #2332 Build fails on cygwin
-# only run with RUN_RE2C=1 to fix #2369 wrong re2c output on Snapcraft
+# only run with DEVELOPER=1 to fix #2332 (Build fails on cygwin), 
+# #2369 (wrong re2c output on Snapcraft), build failure of
+# .github/workflows/build-mingw-on-ubuntu.yml
 #------------------------------------------------------------------------------
 .PHONY: dev
 dev:
 	perl asmstyle.pl dev/z80asm_lib/*.asm
-	$(MAKE) RUN_RAGEL=1 RUN_RE2C=1 all
+	$(MAKE) DEVELOPER=1 all
+	$(MAKE) all
 
 # ragel parser generator
 dev: src/c/scan_rules.h
 
 src/c/scan_rules.h: src/c/scan_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile 
-ifeq ($(RUN_RAGEL),1)
+ifeq ($(DEVELOPER),1)
 	perl parse_ragel.pl src/c/scan_rules.rl
 	dos2unix src/c/scan_rules.h 2> /dev/null
 endif
@@ -111,36 +113,42 @@ dev: src/c/parse_rules.h
 src/c/parse_rules.h: src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile \
 				dev/cpu/cpu_rules.h
-ifeq ($(RUN_RAGEL),1)
+ifeq ($(DEVELOPER),1)
 	perl parse_ragel.pl src/c/parse_rules.rl
 	dos2unix src/c/parse_rules.h 2> /dev/null
 endif
 
 src/c/tokens.h : make_tokens.pl Makefile
+ifeq ($(DEVELOPER),1)
 	perl make_tokens.pl > src/c/tokens.h
 	dos2unix src/c/tokens.h 2> /dev/null
+endif
 
 # opcode tables generator
 dev: src/c/cpu_rules.h
+
 src/c/cpu_rules.h: \
 			$(wildcard dev/cpu/*.pl dev/cpu/*.y dev/cpu/Makefile) Makefile
+ifeq ($(DEVELOPER),1)
 	$(MAKE) -C dev/cpu
 	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
-
+endif
 
 # reloc routine
 dev: src/c/reloc_code.c
 
 src/c/reloc_code.c: dev/reloc_code.asm dev/make_reloc_code.pl Makefile
+ifeq ($(DEVELOPER),1)
 	cd dev && perl make_reloc_code.pl && dos2unix reloc_code.[ch] 2> /dev/null && \
 		mv -f reloc_code.[ch] ../src/c/ 
+endif
 
 # re2c
 define MAKE_RE2C
 dev: $(1).o
 
 $(1).cpp: $(1).re Makefile
-ifeq ($(RUN_RE2C),1)
+ifeq ($(DEVELOPER),1)
 	$(RE2C) -o $(1).cpp $(1).re
 	dos2unix $(1).cpp 2> /dev/null
 endif
