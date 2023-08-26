@@ -701,7 +701,7 @@ l_read(void)
       ch = gchar();
     return -1;
   }
-#ifdef ZX81
+#if defined(ZX81)||defined(ZX80)
   else if (ch == '\"'){        /* quote macro */
 #else
   else if (ch == '\''){        /* quote macro */
@@ -715,7 +715,13 @@ l_read(void)
 
   } else if (ch != '('){         /* t, nil, symbol, or integer */
     token[0] = ch;
+
+#if defined(ZX80)||defined(LAMBDA)
+	// Workaround for some library bug
+    for (i = 0; ; i++){
+#else
     for (i = 1; ; i++){
+#endif
       ch = gchar();
       if (isspace(ch) || iscntrl(ch) || (ch < 0) 
           || (ch == ';') || (ch == '(') || (ch == ')')){
