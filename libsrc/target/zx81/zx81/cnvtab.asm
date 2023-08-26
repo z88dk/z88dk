@@ -256,5 +256,27 @@ ENDIF
 	defb	'{'
 	defb	153
 	defb	'}'
+
+; Workaround to deal with the asymmetric character encoding
+; between display and keyboard
+	defb	$DE
+	defb	'*'
+	defb	$D9
+	defb	')'
+	defb	$DA
+	defb	'('
+	defb	$D7
+	defb	';'
+	defb	$DF
+	defb	'/'
+	defb	$E3
+	defb	'='
+	defb	$DC
+	defb	'-'
+	defb	$DD
+	defb	'+'
+	defb	1
+	defb	'"'
+
 	defw	0
 ENDIF
