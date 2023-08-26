@@ -15,7 +15,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "libfile.h"
 #include "modlink.h"
 #include "module1.h"
-#include "parse.h"
+#include "parse1.h"
 #include "scan1.h"
 #include "strutil.h"
 #include "symtab1.h"
@@ -131,7 +131,7 @@ static void do_assemble(const char *src_filename )
  * Main entry of Z80asm
  ***************************************************************************************************/
 int z80asm_main() {
-	if (!get_num_errors()) {
+	if (!get_num_errors()) {		/* if no errors in command line parsing */
         if (!option_lib_for_all_cpus()) {
             for (size_t i = 0; i < option_files_size(); i++)
                 assemble_file(option_file(i));

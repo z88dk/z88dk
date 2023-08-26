@@ -64,7 +64,7 @@ $(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
 	$(CXX) $(CXX_FLAGS) -c -o $@ $<
 
 # parser is too big to optimize with -O3
-src/c/parse.o: src/c/parse.c
+src/c/parse1.o: src/c/parse1.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
 
 #------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ clean::
 # .github/workflows/build-mingw-on-ubuntu.yml
 #------------------------------------------------------------------------------
 .PHONY: dev
-dev:
+dev: 
 	perl asmstyle.pl dev/z80asm_lib/*.asm
 	$(MAKE) DEVELOPER=1 all
 	$(MAKE) all
@@ -145,9 +145,9 @@ endif
 
 # re2c
 define MAKE_RE2C
-dev: $(1).o
+dev: $(1).cpp
 
-$(1).cpp: $(1).re Makefile
+$(1).cpp: $(1).re $(1).def Makefile
 ifeq ($(DEVELOPER),1)
 	$(RE2C) -o $(1).cpp $(1).re
 	dos2unix $(1).cpp 2> /dev/null

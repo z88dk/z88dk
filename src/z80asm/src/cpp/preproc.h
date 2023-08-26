@@ -67,6 +67,7 @@ public:
 	bool get_unpreproc_line(ScannedLine& line);
 	const Location& location() const;
 	bool is_c_source() const;
+    void set_location(Location location);
 	void set_filename(const string& filename);
 	void set_line_num(int line_num, int line_inc = 1);
 	void set_c_source(bool f);

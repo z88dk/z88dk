@@ -111,7 +111,7 @@
     <ClInclude Include="..\..\src\z80asm\src\c\opcodes.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\c\parse.h">
+    <ClInclude Include="..\..\src\z80asm\src\c\parse1.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\parse_rules.h">
@@ -200,7 +200,7 @@
     <ClCompile Include="..\..\src\z80asm\src\c\opcodes.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\c\parse.c">
+    <ClCompile Include="..\..\src\z80asm\src\c\parse1.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\c\scan1.c">

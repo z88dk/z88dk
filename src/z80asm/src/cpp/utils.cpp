@@ -8,6 +8,7 @@
 #include "utils.h"
 #include <regex>
 #include <set>
+#include <cstdint>
 #include <algorithm>
 
 bool is_ident(const string& ident) {
@@ -275,4 +276,35 @@ void expand_glob(vector<fs::path>& result, const string& pattern) {
 
         result.push_back(file_str);
     }
+}
+
+int ipow(int base, int exp) {
+	int result = 1;
+	for (;;) {
+		if (exp & 1)
+			result *= base;
+		exp >>= 1;
+		if (!exp)
+			break;
+		base *= base;
+	}
+	return result;
+}
+
+void swrite_int16(int n, ostream& os) {
+	os.put((n >> 0) & 0xff);
+	os.put((n >> 8) & 0xff);
+}
+
+void swrite_int32(int n, ostream& os) {
+	os.put((n >> 0) & 0xff);
+	os.put((n >> 8) & 0xff);
+	os.put((n >> 16) & 0xff);
+	os.put((n >> 24) & 0xff);
+}
+
+void swrite_string(const string& s, ostream& os) {
+	Assert(s.size() <= INT16_MAX);
+	swrite_int16(static_cast<int>(s.size()), os);
+	os.write(s.c_str(), s.size());
 }

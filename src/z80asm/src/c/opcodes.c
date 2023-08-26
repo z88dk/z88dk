@@ -15,18 +15,10 @@ Define CPU opcodes
 #include "expr1.h"
 #include "z80asm_cpu.h"
 #include "opcodes.h"
-#include "parse.h"
+#include "parse1.h"
 #include "symtab1.h"
 #include "z80asm.h"
 #include <assert.h>
-
-enum { FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO_LZ, FLAG_PE_LO, FLAG_P, FLAG_M };
-#define Z80_DJNZ			0x10
-#define Z80_JR				0x18
-#define Z80_JP				0xC3
-#define Z80_JR_FLAG(flag)	(0x20 + ((flag) << 3))
-#define Z80_JP_FLAG(flag)	(0xC2 + ((flag) << 3))
-#define Z80_CALL			0xCD
 
 /* add 1 to 4 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xCB00 */

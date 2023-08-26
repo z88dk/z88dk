@@ -100,17 +100,18 @@ public:
 
     void rewind() { m_pos = 0; }
     bool at_end() const { return m_pos >= m_tokens.size(); }
-    size_t pos() const { return m_pos; }
-    void set_pos(size_t pos) { m_pos = pos; }
+    unsigned pos() const { return m_pos; }
+    void set_pos(unsigned pos) { m_pos = pos; }
 
     Token& peek(int offset = 0);			// 0: current; 1: next; -1: previous
     void next(int n = 1);
     vector<Token> peek_tokens(int offset = 0);
+    string peek_text(int offset = 0);
 
 private:
     string  m_text;                         // read text
     vector<Token> m_tokens;                 // scanned tokens
-    size_t m_pos{ 0 };                      // current token
+    unsigned m_pos{ 0 };                    // current token
 };
 
 // file scanner

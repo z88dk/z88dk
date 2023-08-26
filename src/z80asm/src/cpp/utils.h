@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "if.h"
 #include <iostream>
 #include <iomanip> 
 #include <sstream>
@@ -76,6 +77,9 @@ string str_replace_all(string text, const string& find, const string& replace);
 // globs a pattern including *, ? and ** and returns all matching files and directories
 void expand_glob(vector<fs::path>& result, const string& pattern);
 
+// integer power function
+int ipow(int base, int exp);
+
 // convert int to hex
 // https://stackoverflow.com/questions/5100718/integer-to-hex-string-in-c
 template<typename T>
@@ -105,3 +109,11 @@ string vector_to_csv(vector<T> items) {
 		out.pop_back();		// remove end comma
 	return out;
 }
+
+// read/write binary data from/to streams
+void swrite_int16(int n, ostream& os);
+void swrite_int32(int n, ostream& os);
+void swrite_string(const string& s, ostream& os);
+
+int sread_int32(istream& is);
+string sread_string(istream& is);

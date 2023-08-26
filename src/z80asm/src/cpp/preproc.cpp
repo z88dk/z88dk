@@ -41,12 +41,12 @@ PreprocLevel::PreprocLevel(Macros* parent)
 void PreprocLevel::split_lines(ScannedLine& line) {
     ScannedLine this_line;
 
-    for (size_t line_start = 0; line_start < line.tokens().size(); ) {
+    for (unsigned line_start = 0; line_start < line.tokens().size(); ) {
         bool is_hash_line = false;      // line started with '#'
         int conditional = 0;            // count pairs of '?' ':'
         bool got_eol = false;
 
-        size_t i;
+        unsigned i;
         for (i = line_start; !got_eol && i < line.tokens().size(); i++) {
             Token token = line.tokens()[i];
             switch (token.type()) {
@@ -242,6 +242,11 @@ bool Preproc::is_c_source() const {
 		return false;
 	else
 		return m_files.back().location().is_c_source();
+}
+
+void Preproc::set_location(Location location) {
+    if (!m_files.empty())
+        m_files.back().location() = location;
 }
 
 void Preproc::set_filename(const string& filename) {
@@ -846,11 +851,11 @@ void Preproc::do_binary() {
 
 					while (!ifs.eof()) {
 						ifs.read(reinterpret_cast<char*>(bytes), line_len);
-						size_t num_read = static_cast<size_t>(ifs.gcount());
+						unsigned num_read = static_cast<unsigned>(ifs.gcount());
 						if (num_read > 0) {
                             ScannedLine out;
                             out.append({ Token{TType::Ident, false, "defb"} });
-                            for (size_t i = 0; i < num_read; i++) {
+                            for (unsigned i = 0; i < num_read; i++) {
                                 if (i != 0)
                                     out.append({ Token{TType::Comma, false} });
                                 out.append({ Token{TType::Integer, false, bytes[i]} });
@@ -989,7 +994,7 @@ void Preproc::do_macro_call(shared_ptr<Macro> macro) {
 	m_levels.emplace_back(&defines());
 
 	// create macros in the new level for each argument
-    for (size_t i = 0; i < macro->args().size(); i++) {
+    for (unsigned i = 0; i < macro->args().size(); i++) {
         string arg = macro->args()[i];
         ScannedLine param = i < params.size() ? params[i] : ScannedLine();
 		shared_ptr<Macro> param_macro = make_shared<Macro>(arg, param);
@@ -1166,7 +1171,7 @@ void Preproc::do_float() {
 				vector<uint8_t> bytes = g_float_format.float_to_bytes(value);
                 ScannedLine line;
                 line.append({ Token{TType::Ident, false, "defb"} });
-                for (size_t i = 0; i < bytes.size(); i++) {
+                for (unsigned i = 0; i < bytes.size(); i++) {
                     if (i != 0)
                         line.append({ Token{TType::Comma, false} });
                     line.append({ Token{TType::Integer, false, bytes[i]}});
@@ -1309,7 +1314,7 @@ ExpandedLine Preproc::expand(ScannedLine& line, Macros& defines) {
 }
 
 void Preproc::expand_ident(ExpandedLine& out, const Token& ident, ScannedLine& line, Macros& defines) {
-	size_t pos = line.pos();
+	unsigned pos = line.pos();
     ExpandedLine expanded = expand_define_call(ident, line, defines);
 	if (expanded.got_error()) {
 		line.set_pos(pos);
@@ -1347,7 +1352,7 @@ ExpandedLine Preproc::expand_define_call(const Token& ident, ScannedLine& line, 
 
 	// create macros for each argument
 	Macros sub_defines{ defines };				// create scope for arguments
-	for (size_t i = 0; i < macro->args().size(); i++) {
+	for (unsigned i = 0; i < macro->args().size(); i++) {
 		string arg = macro->args()[i];
         ScannedLine param = i < params.size() ? params[i] : ScannedLine();
 		shared_ptr<Macro> param_macro = make_shared<Macro>(arg, param);

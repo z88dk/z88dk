@@ -18,7 +18,7 @@ Define ragel-based parser.
 #include "module1.h"
 #include "z80asm_cpu.h"
 #include "opcodes.h"
-#include "parse.h"
+#include "parse1.h"
 #include "scan1.h"
 #include "str.h"
 #include "strutil.h"

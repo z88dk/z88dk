@@ -17,6 +17,7 @@ Handle object file contruction, reading and writing
 #include "module1.h"
 #include "objfile.h"
 #include "types.h"
+#include "if.h"
 #include "objfile.h"
 #include <stdio.h>
 #include <stdlib.h>

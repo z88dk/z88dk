@@ -177,6 +177,14 @@ const char* get_sym_filename(const char* filename);
 const char* get_map_filename(const char* filename);
 const char* get_reloc_filename(const char* filename);
 
+// symbol table
+struct Symbol1;
+struct Symbol1* define_static_def_sym(const char* name, long value);
+void undefine_static_def_sym(const char* name);
+struct Symbol1* define_local_def_sym(const char* name, long value);
+void undefine_local_def_sym(const char* name);
+struct Symbol1* find_local_symbol(const char* name);
+
 // expressions
 void parse_const_expr_eval(const char* expr_text, int* result, bool* error);
 void parse_expr_eval_if_condition(const char *expr_text, bool* condition, bool* error);
@@ -193,14 +201,6 @@ bool sfile_is_c_source();
 void sfile_set_filename(const char* filename);
 void sfile_set_line_num(int line_num, int line_inc);
 void sfile_set_c_source(bool f);
-
-// symbol table
-struct Symbol1;
-struct Symbol1* define_static_def_sym(const char* name, long value);
-void undefine_static_def_sym(const char* name);
-struct Symbol1* define_local_def_sym(const char* name, long value);
-void undefine_local_def_sym(const char* name);
-struct Symbol1* find_local_symbol(const char* name);
 
 // code area
 int get_PC();

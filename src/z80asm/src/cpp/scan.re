@@ -222,7 +222,7 @@ void ScannedLine::clear() {
 
 Token& ScannedLine::peek(int offset) {
     static Token end{ TType::End, false };
-    size_t index = m_pos + offset;
+    unsigned index = m_pos + offset;
     if (index >= m_tokens.size())
         return end;
     else
@@ -232,15 +232,20 @@ Token& ScannedLine::peek(int offset) {
 void ScannedLine::next(int n) {
     m_pos += n;
     if (m_pos > m_tokens.size())
-        m_pos = m_tokens.size();
+        m_pos = static_cast<unsigned>(m_tokens.size());
 }
 
 vector<Token> ScannedLine::peek_tokens(int offset) {
     vector<Token> out;
-    size_t index = m_pos + offset;
-    for (size_t i = index; i < m_tokens.size(); i++)
+    unsigned index = m_pos + offset;
+    for (unsigned i = index; i < m_tokens.size(); i++)
         out.push_back(m_tokens[i]);
     return out;
+}
+
+string ScannedLine::peek_text(int offset) {
+    vector<Token> out = peek_tokens(offset);
+    return Token::to_string(out);
 }
 
 //-----------------------------------------------------------------------------
@@ -364,8 +369,8 @@ main_loop:
             '&&'			{ PUSH_TOKEN1(TType::LogAnd); continue; }
             '('				{ PUSH_TOKEN1(TType::LParen); continue; }
             ')'				{ PUSH_TOKEN1(TType::RParen); continue; }
-            '*'				{ PUSH_TOKEN1(TType::Mul); continue; }
-            '**'			{ PUSH_TOKEN1(TType::Pow); continue; }
+            '*'				{ PUSH_TOKEN1(TType::Mult); continue; }
+            '**'			{ PUSH_TOKEN1(TType::Power); continue; }
             '+'				{ PUSH_TOKEN1(TType::Plus); continue; }
             ','				{ PUSH_TOKEN1(TType::Comma); continue; }
             '-'				{ PUSH_TOKEN1(TType::Minus); continue; }
@@ -550,11 +555,11 @@ bool FileScanner::fill() {
         return false;
     else {
         // save indexes
-        size_t line_start_index = line_start - m_buffer.c_str();
-        size_t line_end_index = line_end - m_buffer.c_str();
-        size_t p_index = p - m_buffer.c_str();
-        size_t p0_index = p0 - m_buffer.c_str();
-        size_t marker_index = marker - m_buffer.c_str();
+        unsigned line_start_index = line_start - m_buffer.c_str();
+        unsigned line_end_index = line_end - m_buffer.c_str();
+        unsigned p_index = p - m_buffer.c_str();
+        unsigned p0_index = p0 - m_buffer.c_str();
+        unsigned marker_index = marker - m_buffer.c_str();
 
         // remove all before line_start
         m_buffer.erase(m_buffer.begin(), m_buffer.begin() + line_start_index);
@@ -566,7 +571,7 @@ bool FileScanner::fill() {
         line_start_index = 0;
 
         // read from file
-        size_t cur_size = m_buffer.size();
+        unsigned cur_size = m_buffer.size();
         m_buffer.resize(cur_size + FILL_SIZE + YYMAXFILL);      // reserve extra YYMAXFILL for re2c
         m_ifs.read(&m_buffer[cur_size], FILL_SIZE);
         m_buffer.resize(cur_size + m_ifs.gcount());
