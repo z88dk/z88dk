@@ -9,6 +9,7 @@
 #include "errors.h"
 #include "float.h"
 #include "scan.h"
+#include "symtab.h"
 #include "preproc.h"
 #include "utils.h"
 #include "z80asm_cpu.h"
@@ -175,6 +176,7 @@ string Args::prepend_output_dir(const string& filename) {
 			file += filename;
 		}
 		fs::path path{ file };
+
 		return path.generic_string();
 	}
 }
@@ -333,12 +335,12 @@ void Args::parse_define(const string& opt_arg) {
 		g_errors.error(ErrCode::IllegalIdent, ident);
 	else {
 		if (equal_pos == string::npos) {
-            define_static_symbol(ident.c_str(), 1);
+			define_static_symbol(ident, 1);
 		}
 		else {
 			int value = 0;
 			if (parse_opt_int(value, opt_arg.substr(equal_pos + 1))) 
-				define_static_symbol(ident.c_str(), value);
+				define_static_symbol(ident, value);
 			else
 				g_errors.error(ErrCode::InvalidDefineOption, opt_arg);
 		}
@@ -985,11 +987,13 @@ void Args::define_assembly_defines() {
 }
 
 void Args::define_static_symbol(const string& name, int value) {
-    define_static_def_sym(name.c_str(), value);
+	g_symbols.add_define(name, value);
+	define_static_def_sym(name.c_str(), value);
     define_local_def_sym(name.c_str(), value);
 }
 
 void Args::undefine_static_symbol(const string& name) {
+    g_symbols.erase_define(name);
     undefine_static_def_sym(name.c_str());
     undefine_local_def_sym(name.c_str());
 }

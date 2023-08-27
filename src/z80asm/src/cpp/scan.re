@@ -7,6 +7,7 @@
 
 #include "args.h"
 #include "if.h"
+#include "preproc.h"
 #include "scan.h"
 #include "utils.h"
 #include <unordered_map>
@@ -87,12 +88,12 @@ bool keyword_is_reg_8(Keyword keyword) {
     return keyword_flags[static_cast<int>(keyword)] & KW_REG_8;
 }
 
-bool keyword_is_reg_ix_iy(Keyword keyword) {
-    return keyword_flags[static_cast<int>(keyword)] & KW_REG_IX_IY;
-}
-
 bool keyword_is_z80_ld_bit(Keyword keyword) {
     return keyword_flags[static_cast<int>(keyword)] & KW_Z80_LD_BIT;
+}
+
+bool keyword_is_reg(Keyword keyword) {
+    return keyword_flags[static_cast<int>(keyword)] & KW_REG;
 }
 
 //-----------------------------------------------------------------------------
@@ -126,7 +127,10 @@ string Token::to_string() const {
     case TType::String:
         return string_bytes(m_svalue);
     default:
-        return tokens[static_cast<int>(m_type)];
+        if (g_args.swap_ixiy() != IXIY_NO_SWAP)
+            return str_swap_x_y(tokens[static_cast<int>(m_type)]);
+        else
+            return tokens[static_cast<int>(m_type)];
     }
 }
 
@@ -555,11 +559,11 @@ bool FileScanner::fill() {
         return false;
     else {
         // save indexes
-        unsigned line_start_index = line_start - m_buffer.c_str();
-        unsigned line_end_index = line_end - m_buffer.c_str();
-        unsigned p_index = p - m_buffer.c_str();
-        unsigned p0_index = p0 - m_buffer.c_str();
-        unsigned marker_index = marker - m_buffer.c_str();
+        unsigned line_start_index = static_cast<unsigned>(line_start - m_buffer.c_str());
+        unsigned line_end_index = static_cast<unsigned>(line_end - m_buffer.c_str());
+        unsigned p_index = static_cast<unsigned>(p - m_buffer.c_str());
+        unsigned p0_index = static_cast<unsigned>(p0 - m_buffer.c_str());
+        unsigned marker_index = static_cast<unsigned>(marker - m_buffer.c_str());
 
         // remove all before line_start
         m_buffer.erase(m_buffer.begin(), m_buffer.begin() + line_start_index);
@@ -571,7 +575,7 @@ bool FileScanner::fill() {
         line_start_index = 0;
 
         // read from file
-        unsigned cur_size = m_buffer.size();
+        unsigned cur_size = static_cast<unsigned>(m_buffer.size());
         m_buffer.resize(cur_size + FILL_SIZE + YYMAXFILL);      // reserve extra YYMAXFILL for re2c
         m_ifs.read(&m_buffer[cur_size], FILL_SIZE);
         m_buffer.resize(cur_size + m_ifs.gcount());
@@ -608,4 +612,15 @@ void FileScanner::scan_error(ErrCode code, const string& arg) {
     if (!m_got_error)
         g_errors.error(code, arg);
     m_got_error = true;
+}
+
+//-----------------------------------------------------------------------------
+
+TextScanner::TextScanner(const string& text, ScannedLine& out_line) {
+    out_line.clear();
+    FileScanner fs;
+    fs.scan_text(g_preproc.location(), text);
+    ScannedLine line;
+    while (fs.get_token_line(line))
+        out_line.append(line);
 }

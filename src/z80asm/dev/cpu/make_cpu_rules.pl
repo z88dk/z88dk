@@ -7,7 +7,7 @@
 use Modern::Perl;
 use YAML::Tiny;
 
-@ARGV==2 or die "Usage $0 input_file.yaml output_file.h\n";
+@ARGV==2 or die "Usage: $0 input_file.yaml output_file.h\n";
 my($input_file, $output_file) = @ARGV;
 
 my $aux_func_name = $output_file =~ s/\..*/_action_/r;

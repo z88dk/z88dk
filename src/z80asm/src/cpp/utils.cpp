@@ -308,3 +308,81 @@ void swrite_string(const string& s, ostream& os) {
 	swrite_int16(static_cast<int>(s.size()), os);
 	os.write(s.c_str(), s.size());
 }
+
+//-----------------------------------------------------------------------------
+// string table
+//-----------------------------------------------------------------------------
+
+StringTable::StringTable() {
+    clear();
+}
+
+void StringTable::clear() {
+    m_list.clear();
+    m_hash.clear();
+    int id = add_string("");
+    Assert(id == 0);
+}
+
+int StringTable::add_string(const string& str) {
+    auto it = m_hash.find(str);
+    if (it == m_hash.end()) {
+        int id = static_cast<int>(m_list.size());
+        m_list.push_back(str);
+        m_hash[str] = id;
+        return id;
+    }
+    else
+        return it->second;
+}
+
+const string& StringTable::lookup(int id) {
+    Assert(id >= 0 && id < static_cast<int>(count()));
+    return m_list[id];
+}
+
+bool StringTable::find(const string& str) {
+    auto it = m_hash.find(str);
+    if (it == m_hash.end())
+        return false;
+    else
+        return true;
+}
+
+streampos StringTable::write(ofstream& os) {
+    // alignment data
+    static const char align[sizeof(int32_t)] = { 0 };
+
+    streampos start_fpos = os.tellp();
+
+    // write size of table and placeholder for size of strings
+    swrite_int32(count(), os);
+    streampos strings_size_fpos = os.tellp();
+    swrite_int32(0, os);
+
+    // write index of each string into array of strings concatenated separated by '\0'
+    unsigned str_table = 0;
+    for (unsigned id = 0; id < count(); id++) {
+        unsigned pos = str_table;               // position of this string in table
+        str_table += static_cast<unsigned>(m_list[id].size()) + 1;     // next position
+
+        swrite_int32(pos, os);                  // index into strings
+    }
+
+    // write all strings together
+    for (unsigned id = 0; id < count(); id++) {
+        os.write(m_list[id].c_str(), m_list[id].size() + 1);    // write string including '\0'
+    }
+
+    // align to int32 size
+    unsigned aligned_str_table = ((str_table + (sizeof(int32_t) - 1)) & ~(sizeof(int32_t) - 1));
+    int extra_bytes = aligned_str_table - str_table;
+    os.write(align, extra_bytes);
+
+    streampos end_fpos = os.tellp();
+    os.seekp(strings_size_fpos);
+    swrite_int32(aligned_str_table, os);
+    os.seekp(end_fpos);
+
+    return start_fpos;
+}

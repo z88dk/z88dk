@@ -206,89 +206,6 @@ Define rules for a ragel-based parser.
 		;
 
 	/*---------------------------------------------------------------------
-	*   DEFS
-	*--------------------------------------------------------------------*/
-	asm_DEFS =
-		  label? (_TK_DEFS | _TK_DS) const_expr _TK_NEWLINE
-		  @{ DO_STMT_LABEL();
-		     if (ctx->expr_error)
-				error_expected_const_expr();
-			 else
-				asm_DEFS(ctx->expr_value, option_filler()); }
-		| label? (_TK_DEFS | _TK_DS)
-				const_expr _TK_COMMA
-				@{ if (ctx->expr_error)
-					  error_expected_const_expr();
-			       value1 = ctx->expr_error ? 0 : ctx->expr_value;
-				   ctx->expr_error = false;
-				}
-				const_expr _TK_NEWLINE
-		  @{ DO_STMT_LABEL();
-		     if (ctx->expr_error)
-				error_expected_const_expr();
-			 else
-				asm_DEFS(value1, ctx->expr_value); }
-		| label? (_TK_DEFS | _TK_DS)
-				const_expr _TK_COMMA
-				@{ if (ctx->expr_error)
-					  error_expected_const_expr();
-			       value1 = ctx->expr_error ? 0 : ctx->expr_value;
-				   ctx->expr_error = false;
-				}
-				string _TK_NEWLINE
-		  @{ DO_STMT_LABEL();
-			 Str_len(name) = str_compress_escapes(Str_data(name));
-			 asm_DEFS_str(value1, Str_data(name), Str_len(name)); }
-		;
-
-	/*---------------------------------------------------------------------
-	*   BYTE / DEFB / DEFM / DB / DM
-	*--------------------------------------------------------------------*/
-	asm_DEFB_iter =
-			asm_DEFB_next:
-			(
-				string (_TK_COMMA | _TK_NEWLINE)
-				@{	DO_STMT_LABEL();
-					Str_len(name) = str_compress_escapes(Str_data(name));
-					asm_DEFB_str(Str_data(name), Str_len(name));
-					if ( ctx->p->tok == TK_COMMA )
-						fgoto asm_DEFB_next;
-				}
-			|	expr (_TK_COMMA | _TK_NEWLINE)
-				@{	DO_STMT_LABEL();
-					asm_DEFB_expr(pop_expr(ctx));
-					if ( ctx->p->tok == TK_COMMA )
-						fgoto asm_DEFB_next;
-				}
-			);
-	asm_DEFB = 	label?
-				(_TK_BYTE | _TK_DEFB | _TK_DEFM | _TK_DB | _TK_DM)
-				asm_DEFB_iter;
-
-	/*---------------------------------------------------------------------
-	*   DEFW / DEFQ / DEFDB
-	*--------------------------------------------------------------------*/
-#foreach <OP> in DEFW, DW, WORD, DEFQ, DQ, DWORD, DEFDB, DDB, DEFP, PTR, DP
-	asm_<OP>_iter =
-			asm_<OP>_next:
-				expr (_TK_COMMA | _TK_NEWLINE)
-				@{	DO_STMT_LABEL();
-					asm_<OP>(pop_expr(ctx));
-					if ( ctx->p->tok == TK_COMMA )
-						fgoto asm_<OP>_next;
-				}
-			;
-	asm_<OP> = 	label? _TK_<OP>	asm_<OP>_iter;
-#endfor  <OP>
-
-	directives_DEFx =
-		asm_DEFS | asm_DEFB |
-		asm_DEFW | asm_DW | asm_WORD |
-		asm_DEFQ | asm_DQ | asm_DWORD |
-		asm_DEFDB | asm_DDB |
-		asm_DEFP | asm_PTR | asm_DP;
-
-	/*---------------------------------------------------------------------
 	*   directives without arguments
 	*--------------------------------------------------------------------*/
 #foreach <OP> in LSTON, LSTOFF
@@ -402,7 +319,6 @@ Define rules for a ragel-based parser.
 		| _TK_NEWLINE
 		| directives_no_args
 		| directives_name | directives_names | directives_assign
-		| directives_DEFx
 		| asm_Z88DK
 		| asm_DEFGROUP
 		| asm_DEFVARS

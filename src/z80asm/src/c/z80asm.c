@@ -129,14 +129,7 @@ static void do_assemble(const char *src_filename )
 /***************************************************************************************************
  * Main entry of Z80asm
  ***************************************************************************************************/
-int z80asm_main() {
-	if (!get_num_errors()) {		/* if no errors in command line parsing */
-        if (!option_lib_for_all_cpus()) {
-            for (size_t i = 0; i < option_files_size(); i++)
-                assemble_file(option_file(i));
-        }
-	}
-
+int z80asm_linker() {
 	/* Create output file */
 	if (!get_num_errors()) {
 		if (option_lib_file()) {

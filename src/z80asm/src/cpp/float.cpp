@@ -484,16 +484,16 @@ double FloatExpr::parse_primary() {
 		return a;
 	case TType::Ident:
         switch (m_line->peek().keyword()) {
-		case Keyword::SIN: m_line->next(); return parse_func(sin);
-		case Keyword::COS: m_line->next(); return parse_func(cos);
-		case Keyword::TAN: m_line->next(); return parse_func(tan);
-		case Keyword::ASIN: m_line->next(); return parse_func(asin);
-		case Keyword::ACOS: m_line->next(); return parse_func(acos);
-		case Keyword::ATAN: m_line->next(); return parse_func(atan);
-		case Keyword::ATAN2: m_line->next(); return parse_func2(atan2);
-		case Keyword::SINH: m_line->next(); return parse_func(sinh);
-		case Keyword::COSH: m_line->next(); return parse_func(cosh);
-		case Keyword::TANH: m_line->next(); return parse_func(tanh);
+        case Keyword::SIN: m_line->next(); return parse_func(sin);
+        case Keyword::COS: m_line->next(); return parse_func(cos);
+        case Keyword::TAN: m_line->next(); return parse_func(tan);
+        case Keyword::ASIN: m_line->next(); return parse_func(asin);
+        case Keyword::ACOS: m_line->next(); return parse_func(acos);
+        case Keyword::ATAN: m_line->next(); return parse_func(atan);
+        case Keyword::ATAN2: m_line->next(); return parse_func2(atan2);
+        case Keyword::SINH: m_line->next(); return parse_func(sinh);
+        case Keyword::COSH: m_line->next(); return parse_func(cosh);
+        case Keyword::TANH: m_line->next(); return parse_func(tanh);
         case Keyword::ASINH: m_line->next(); return parse_func(asinh);
         case Keyword::ACOSH: m_line->next(); return parse_func(acosh);
         case Keyword::ATANH: m_line->next(); return parse_func(atanh);

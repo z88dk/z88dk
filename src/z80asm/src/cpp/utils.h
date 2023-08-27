@@ -8,10 +8,12 @@
 #pragma once
 
 #include "if.h"
+#include <fstream>
 #include <iostream>
 #include <iomanip> 
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include <cctype>
 using namespace std;
@@ -117,3 +119,22 @@ void swrite_string(const string& s, ostream& os);
 
 int sread_int32(istream& is);
 string sread_string(istream& is);
+
+//-----------------------------------------------------------------------------
+// string table
+//-----------------------------------------------------------------------------
+class StringTable {
+public:
+    StringTable();
+    void clear();
+
+    int add_string(const string& str);
+    const string& lookup(int id);
+    bool find(const string& str);
+    unsigned count() const { return static_cast<unsigned>(m_list.size()); }
+    streampos write(ofstream& os);
+
+private:
+    vector<string> m_list;
+    unordered_map<string, int> m_hash;
+};

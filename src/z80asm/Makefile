@@ -70,6 +70,13 @@ $(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
 src/c/parse1.o: src/c/parse1.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) $(PARSE1_CFLAGS) -O0 -c -o $@ $<
 
+# parser is too big to optimize with -O3
+src/cpp/parse_main.o: src/cpp/parse_main.cpp
+	$(CXX) $(CXX_FLAGS) -O0 -c -o $@ $<
+
+src/cpp/parse_main_action.o: src/cpp/parse_main_action.cpp
+	$(CXX) $(CXX_FLAGS) -O0 -c -o $@ $<
+
 #------------------------------------------------------------------------------
 # libraries
 #------------------------------------------------------------------------------
@@ -119,7 +126,7 @@ src/c/parse1.o: src/c/parse_rules.h
 
 src/c/parse_rules.h: src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile \
-				src/c/cpu_rules.h
+				dev/cpu/cpu_rules.h
 ifeq ($(DEVELOPER),1)
 	perl parse_ragel.pl src/c/parse_rules.rl
 	dos2unix src/c/parse_rules.h 2> /dev/null
@@ -132,13 +139,30 @@ ifeq ($(DEVELOPER),1)
 endif
 
 # opcode tables generator
-dev: src/c/cpu_rules.h src/c/cpu_rules_action.c src/c/cpu_rules_action.h
+dev: \
+	src/cpp/parse_main.cpp \
+	src/cpp/parse_main_tables.h \
+	src/cpp/parse_main_action.h \
+	src/cpp/parse_main_action.cpp \
+	src/c/cpu_rules.h \
+	src/c/cpu_rules_action.c \
+	src/c/cpu_rules_action.h
 
-src/c/cpu_rules.h src/c/cpu_rules_action.c src/c/cpu_rules_action.h: \
+src/cpp/parse_main.cpp \
+src/cpp/parse_main_tables.h \
+src/cpp/parse_main_action.h \
+src/cpp/parse_main_action.cpp \
+src/c/cpu_rules.h \
+src/c/cpu_rules_action.c \
+src/c/cpu_rules_action.h: \
 			$(wildcard dev/cpu/*.pl dev/cpu/*.y) dev/cpu/Makefile Makefile
 ifeq ($(DEVELOPER),1)
 	$(MAKE) -C dev/cpu
 	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
+	cp dev/cpu/parse_main.cpp src/cpp/parse_main.cpp
+	cp dev/cpu/parse_main_tables.h src/cpp/parse_main_tables.h
+	cp dev/cpu/parse_main_action.h src/cpp/parse_main_action.h
+	cp dev/cpu/parse_main_action.cpp src/cpp/parse_main_action.cpp
 	cp dev/cpu/cpu_rules_action.c src/c/cpu_rules_action.c
 	cp dev/cpu/cpu_rules_action.h src/c/cpu_rules_action.h
 endif
