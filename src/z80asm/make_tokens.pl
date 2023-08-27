@@ -192,7 +192,7 @@ my @tokens = (
 	'BCDE', 'DEHL', 'JKHL', 'PW', 'PX', 'PY', 'PZ',
 	
 	# alternate registers
-	'B1', 'C1', 'D1', 'E1', 'H1', 'L1', 'A1', 'F1', 'BC1', 'DE1', 'JK1', 'HL1', 'AF1',
+	'B1', 'C1', 'D1', 'E1', 'H1', 'L1', 'A1', 'BC1', 'DE1', 'JK1', 'HL1', 'AF1',
 	'BCDE1', 'JKHL1', 'PW1', 'PX1', 'PY1', 'PZ1',
 
 	# EZ80 specific keywords

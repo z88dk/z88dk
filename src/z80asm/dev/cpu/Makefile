@@ -20,3 +20,29 @@ cpu_test_z80_ok.asm: opcodes.yaml make_cpu_test.pl Makefile
 all: cpu_rules.h
 cpu_rules.h: opcodes.yaml make_cpu_rules.pl Makefile
 	perl make_cpu_rules.pl opcodes.yaml cpu_rules.h && dos2unix cpu_rules.h 2> /dev/null
+
+all: parser1.yaml
+parser1.yaml: opcodes.yaml make_opcodes_parser.pl Makefile
+	perl make_opcodes_parser.pl opcodes.yaml parser1.yaml && dos2unix parser1.yaml 2> /dev/null
+
+all: parser2.yaml
+parser2.yaml: directives.y make_directives_parser.pl Makefile
+	perl make_directives_parser.pl directives.y parser2.yaml && dos2unix parser2.yaml 2> /dev/null
+
+all: parser.yaml
+parser.yaml: parser1.yaml parser2.yaml merge_parsers.pl Makefile
+	perl merge_parsers.pl parser1.yaml parser2.yaml parser.yaml && dos2unix parser.yaml 2> /dev/null
+
+all: parse_main.cpp \
+	 parse_main_tables.h \
+	 parse_main_action.h \
+	 parse_main_action.cpp
+	
+parse_main.cpp \
+parse_main_tables.h \
+parse_main_action.h \
+parse_main_action.cpp: parser.yaml make_parser_code.pl \
+		../../src/cpp/keyword.def \
+		../../src/cpp/scan.def \
+		Makefile
+	perl make_parser_code.pl parser.yaml parse_main.cpp && dos2unix parse_main.cpp 2> /dev/null
