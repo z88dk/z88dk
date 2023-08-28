@@ -1,10 +1,10 @@
 ;
 ;	ZX81 Stdio
 ;
-;	ASCII-ZX81 conversion Table
+;	ASCII-ZX81 (Lambda 8300, or ZX80) conversion Table
 ;	used by fgetc_cons and fputc_cons
 ;
-;	Stefano Bodrato - Apr. 2000
+;	Stefano Bodrato - Apr. 2000 -> Aug 2023
 ;
 ;
 ;	$Id: cnvtab.asm,v 1.10+ (now on GIT) $
@@ -277,6 +277,11 @@ ENDIF
 	defb	'+'
 	defb	1
 	defb	'"'
+	defb	$E4
+	defb	'>'
+	defb	$E5
+	defb	'<'
+
 
 	defw	0
 ENDIF
