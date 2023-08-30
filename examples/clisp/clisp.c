@@ -539,10 +539,14 @@ char gchar() {
 }
 
 void ugchar(char ch) {
+#ifndef FILES
+	ungetc(ch,stdin);
+#else
 if (c!=0 && c!=EOF)
     ungetc(ch,fpin);
 else
     ungetc(ch,stdin);
+#endif
 }
 
 #endif
@@ -719,13 +723,13 @@ l_read(void)
   } else if (ch != '('){         /* t, nil, symbol, or integer */
     token[0] = ch;
 
-#if defined(ZX80)||defined(LAMBDA)
-	// Workaround for some library bug
+#ifdef Z80
     for (i = 0; ; i++){
 #else
     for (i = 1; ; i++){
 #endif
       ch = gchar();
+
       if (isspace(ch) || iscntrl(ch) || (ch < 0) 
           || (ch == ';') || (ch == '(') || (ch == ')')){
         ugchar(ch);
