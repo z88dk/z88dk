@@ -122,7 +122,7 @@ extern void symbol_free(symbol_t* self);
 
 // Expression range
 typedef enum {
-    RANGE_UNKNONW,                  // 0  
+    RANGE_UNKNOWN,                  // 0  
     RANGE_JR_OFFSET,                // 1  "J"
     RANGE_BYTE_UNSIGNED,            // 2  "U"
     RANGE_BYTE_SIGNED,              // 3  "S"

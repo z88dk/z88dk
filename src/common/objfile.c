@@ -325,7 +325,7 @@ expr_t* expr_new() {
 	expr_t* self = xnew(expr_t);
 
     utstring_new(self->text);
-    self->range = RANGE_UNKNONW;
+    self->range = RANGE_UNKNOWN;
     self->asmpc = self->code_pos = 0;
     self->opcode_size = 2;      // default for normal JR
 	self->section = NULL;
@@ -710,10 +710,10 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
 
 	xfseek(fp, fpos_start, SEEK_SET);
     while (ftell(fp) < fpos_end) {
-        range_t range = RANGE_UNKNONW;
+        range_t range = RANGE_UNKNOWN;
         if (obj->version >= 18) {
             range = xfread_dword(fp);
-            if (range == RANGE_UNKNONW)             // end marker
+            if (range == RANGE_UNKNOWN)             // end marker
                 break;
         }
         else {
@@ -1022,7 +1022,7 @@ static long objfile_write_exprs(objfile_t* obj, FILE* fp)
 	}
 
 	if (has_exprs) {
-        xfwrite_dword(RANGE_UNKNONW, fp);	    		    // store end-terminator
+        xfwrite_dword(RANGE_UNKNOWN, fp);	    		    // store end-terminator
 		return fpos0;
 	}
 	else

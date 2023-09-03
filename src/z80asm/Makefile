@@ -93,13 +93,15 @@ clean::
 # .github/workflows/build-mingw-on-ubuntu.yml
 #------------------------------------------------------------------------------
 .PHONY: dev
-dev: 
+dev:
 	perl asmstyle.pl dev/z80asm_lib/*.asm
 	$(MAKE) DEVELOPER=1 all
 	$(MAKE) all
 
 # ragel parser generator
 dev: src/c/scan_rules.h
+
+src/c/scan1.o: src/c/scan_rules.h
 
 src/c/scan_rules.h: src/c/scan_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile 
@@ -109,6 +111,8 @@ ifeq ($(DEVELOPER),1)
 endif
 	
 dev: src/c/parse_rules.h
+
+src/c/parse1.o: src/c/parse_rules.h
 
 src/c/parse_rules.h: src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile \
@@ -172,7 +176,10 @@ endif
 # clean
 #------------------------------------------------------------------------------
 clean::
-	$(RM) *.core *.o  *.out *.orig *.exe *.tmp *.bak *.log *~
+	find . -type f '(' -name '*.core' -o -name '*.o' -o -name '*.d' \
+					-o -name '*.out' -o -name '*.orig' -o -name '*.exe' \
+					-o -name '*.tmp' -o -name '*.bak' -o -name '*.log' \
+					-o -name '*~' ')' -exec $(RM) {} '+'
 	$(RM) -rf Debug Release x1 x2 x3
 	$(RM) $(OBJS) $(TEST_SRC_LIB:.c=.o)
 
@@ -224,6 +231,10 @@ rebuild:
 	cp ../z80asm/z88dk-z80asm$(EXESUFFIX) ../../bin/
 	$(MAKE) -C ../z80nm
 	cp ../z80nm/z88dk-z80nm$(EXESUFFIX) ../../bin/
+	$(MAKE) -C ../ticks all
+	cp ../ticks/z88dk-dis$(EXESUFFIX) ../../bin/
+	cp ../ticks/z88dk-ticks$(EXESUFFIX) ../../bin/
+	cp ../ticks/z88dk-gdb$(EXESUFFIX) ../../bin/
 	$(MAKE) -C ../zobjcopy all
 	cp $(PROJ)$(EXESUFFIX) ../../bin/
 

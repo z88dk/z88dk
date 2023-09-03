@@ -377,7 +377,7 @@ static void set_expr_env(Expr1* expr, bool module_relative_addr)
 static void read_cur_module_exprs(Expr1List* exprs, obj_file_t* obj) {
 	while (true) {
         range_t range = parse_int(obj);
-		if (range == RANGE_UNKNONW)         // end marker
+		if (range == RANGE_UNKNOWN)         // end marker
 			break;			
 
 		// source file name and line number
