@@ -32,12 +32,10 @@ Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
-Assembling 'test_t_issue_2320_07.a.asm' to 'test_t_issue_2320_07.a.o'
-Reading 'test_t_issue_2320_07.a.asm' = 'test_t_issue_2320_07.a.asm'
+Assembling 'test_t_issue_2320_07.a.asm'
 Writing object file 'test_t_issue_2320_07.a.o'
 
-Assembling 'test_t_issue_2320_07.b.asm' to 'test_t_issue_2320_07.b.o'
-Reading 'test_t_issue_2320_07.b.asm' = 'test_t_issue_2320_07.b.asm'
+Assembling 'test_t_issue_2320_07.b.asm'
 Writing object file 'test_t_issue_2320_07.b.o'
 
 Creating library 'test_t_issue_2320_07.lib'

@@ -417,10 +417,6 @@ void parse_file(const char* filename)
 	ParseCtx* ctx = ParseCtx_new();
 	{
 		if (sfile_open(filename, true)) {
-			if (option_verbose())
-				printf("Reading '%s' = '%s'\n",
-					path_canon(filename), path_canon(sfile_filename()));	/* display name of file */
-
 			sym.tok = TK_NIL;
 			while (sym.tok != TK_END)
 				parseline(ctx);				/* before parsing it */

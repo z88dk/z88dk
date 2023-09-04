@@ -96,7 +96,6 @@ void assemble_file( const char *filename ) {
 static void do_assemble(const char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
-	const char *obj_filename = get_o_filename(src_filename);
 
 	/* initialize local symtab with copy of static one (-D defines) */
 	copy_static_syms();
@@ -105,7 +104,7 @@ static void do_assemble(const char *src_filename )
 	set_PC(0);
 
 	if (option_verbose())
-		printf("Assembling '%s' to '%s'\n", path_canon(src_filename), path_canon(obj_filename));
+		printf("Assembling '%s'\n", path_canon(src_filename));
 
 	list_open(get_lis_filename(src_filename));
 	parse_file(src_filename);

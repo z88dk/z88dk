@@ -32,12 +32,10 @@ Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
-Assembling '$test.a.as' to '$test.a.o'
-Reading '$test.a.as' = '$test.a.as'
+Assembling '$test.a.as'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.as' to '$test.b.o'
-Reading '$test.b.as' = '$test.b.as'
+Assembling '$test.b.as'
 Writing object file '$test.b.o'
 
 Creating library '$test.lib'

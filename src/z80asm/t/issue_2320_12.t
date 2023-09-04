@@ -35,24 +35,20 @@ Reading library 'z88dk-z80asm.lib'
 Creating library '$test.lib'
 Predefined constant: __CPU_Z80N__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
@@ -60,24 +56,20 @@ Adding $test.b.o to library
 
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
@@ -86,48 +78,40 @@ Adding $test.b.o to library
 Predefined constant: __CPU_EZ80__ = 1
 Predefined constant: __CPU_EZ80_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __CPU_R800__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
@@ -135,24 +119,20 @@ Adding $test.b.o to library
 
 Predefined constant: __CPU_Z180__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
@@ -160,24 +140,20 @@ Adding $test.b.o to library
 
 Predefined constant: __CPU_Z80_STRICT__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
@@ -185,24 +161,20 @@ Adding $test.b.o to library
 
 Predefined constant: __CPU_8085__ = 1
 Predefined constant: __CPU_INTEL__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
@@ -210,48 +182,40 @@ Adding $test.b.o to library
 
 Predefined constant: __CPU_R3K__ = 1
 Predefined constant: __CPU_RABBIT__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __CPU_GBZ80__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
@@ -260,24 +224,20 @@ Adding $test.b.o to library
 Predefined constant: __CPU_EZ80__ = 1
 Predefined constant: __CPU_EZ80_ADL__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
@@ -285,24 +245,20 @@ Adding $test.b.o to library
 
 Predefined constant: __CPU_R2KA__ = 1
 Predefined constant: __CPU_RABBIT__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
@@ -310,24 +266,20 @@ Adding $test.b.o to library
 
 Predefined constant: __CPU_8080__ = 1
 Predefined constant: __CPU_INTEL__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library
 Adding $test.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm' to '$test.a.o'
-Reading '$test.a.asm' = '$test.a.asm'
+Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
-Assembling '$test.b.asm' to '$test.b.o'
-Reading '$test.b.asm' = '$test.b.asm'
+Assembling '$test.b.asm'
 Writing object file '$test.b.o'
 
 Adding $test.a.o to library

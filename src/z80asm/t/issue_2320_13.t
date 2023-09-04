@@ -35,24 +35,20 @@ Reading library 'z88dk-z80asm.lib'
 Creating library 'test_t_issue_2320_13.lib'
 Predefined constant: __CPU_Z80N__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
@@ -60,24 +56,20 @@ Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
@@ -86,48 +78,40 @@ Adding test_t_issue_2320_13.b.o to library
 Predefined constant: __CPU_EZ80__ = 1
 Predefined constant: __CPU_EZ80_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __CPU_R800__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
@@ -135,24 +119,20 @@ Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __CPU_Z180__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
@@ -160,24 +140,20 @@ Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __CPU_Z80_STRICT__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
@@ -185,24 +161,20 @@ Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __CPU_8085__ = 1
 Predefined constant: __CPU_INTEL__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
@@ -210,48 +182,40 @@ Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __CPU_R3K__ = 1
 Predefined constant: __CPU_RABBIT__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __CPU_GBZ80__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
@@ -260,24 +224,20 @@ Adding test_t_issue_2320_13.b.o to library
 Predefined constant: __CPU_EZ80__ = 1
 Predefined constant: __CPU_EZ80_ADL__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
@@ -285,24 +245,20 @@ Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __CPU_R2KA__ = 1
 Predefined constant: __CPU_RABBIT__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
@@ -310,24 +266,20 @@ Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __CPU_8080__ = 1
 Predefined constant: __CPU_INTEL__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling 'test_t_issue_2320_13.a.asm' to 'test_t_issue_2320_13.a.o'
-Reading 'test_t_issue_2320_13.a.asm' = 'test_t_issue_2320_13.a.asm'
+Assembling 'test_t_issue_2320_13.a.asm'
 Writing object file 'test_t_issue_2320_13.a.o'
 
-Assembling 'test_t_issue_2320_13.b.asm' to 'test_t_issue_2320_13.b.o'
-Reading 'test_t_issue_2320_13.b.asm' = 'test_t_issue_2320_13.b.asm'
+Assembling 'test_t_issue_2320_13.b.asm'
 Writing object file 'test_t_issue_2320_13.b.o'
 
 Adding test_t_issue_2320_13.a.o to library

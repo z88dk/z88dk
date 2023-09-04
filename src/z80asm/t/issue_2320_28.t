@@ -22,6 +22,5 @@ END
 	check_bin_file("$test.bin", bytes($PREFIX{$code_ixiy}, 0x21, 0, 0));
 }
 
-
 unlink_testfiles;
 done_testing;

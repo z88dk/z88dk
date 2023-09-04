@@ -15,14 +15,12 @@ using namespace std;
 // expression parser
 class FloatExpr {
 public:
-	FloatExpr(ScannedLine& line);
-
-	bool parse();
+	bool parse(ScannedLine& line);
 	bool eval_error() const { return m_eval_error; }
 	double value() const { return m_value; }
 
 private:
-    ScannedLine& m_line;
+    ScannedLine* m_line{ nullptr };
 	double m_value{ 0.0 };
 	bool   m_parse_error{ false };	// expression could not be parsed
 	bool   m_eval_error{ false };	// expression could not be evaluated

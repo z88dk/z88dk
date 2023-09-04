@@ -305,7 +305,7 @@ bool object_file_check_append(const char* filename, Module1* module, bool reserv
 	}
 
     if (option_verbose())
-        printf("Append object file %s...\n", filename);
+        printf("Appending object file '%s'\n", filename);
 
     obj_file_t* obj = obj_files_append(&g_objects, filename, module);
 

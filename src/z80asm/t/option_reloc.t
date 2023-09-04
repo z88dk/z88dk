@@ -30,8 +30,7 @@ Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
-Assembling '${test}.asm' to '${test}.o'
-Reading '${test}.asm' = '${test}.asm'
+Assembling '${test}.asm'
 Writing object file '${test}.o'
 
 Code size: 3 bytes (\$0000 to \$0002)
@@ -56,8 +55,7 @@ Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
-Assembling '${test}.asm' to '${test}.o'
-Reading '${test}.asm' = '${test}.asm'
+Assembling '${test}.asm'
 Writing object file '${test}.o'
 
 Code size: 3 bytes (\$0000 to \$0002)

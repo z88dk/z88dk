@@ -99,9 +99,11 @@ void Errors::pop_location() {
 		clear();
 }
 
-void Errors::show_error(const string& prefix, ErrCode code, const string& arg) {
+void Errors::show_error(const string& prefix, ErrCode code, const string& arg_) {
 	Assert(!m_locations.empty());
 	Location& location = m_locations.back();
+
+    string arg = str_chomp(arg_);
 
 	// error message
 	if (!location.filename().empty()) {

@@ -32,8 +32,8 @@ Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
-Append object file $test.a.o...
-Append object file $test.b.o...
+Appending object file '$test.a.o'
+Appending object file '$test.b.o'
 Creating library '$test.lib'
 Adding $test.a.o to library
 Adding $test.b.o to library

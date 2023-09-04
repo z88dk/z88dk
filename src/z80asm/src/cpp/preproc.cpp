@@ -1157,8 +1157,8 @@ void Preproc::do_float() {
 	else {
 		while (true) {
 			// parse expression
-			FloatExpr expr{ sublexer };
-			if (!expr.parse()) {
+            FloatExpr expr;
+			if (!expr.parse(sublexer)) {
 				g_errors.error(ErrCode::Syntax, expanded.to_string());
 				return;
 			}

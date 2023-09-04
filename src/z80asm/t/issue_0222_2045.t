@@ -138,8 +138,7 @@ Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Library 'z88dk-z80asm.lib' not found
 Reading library '../z88dk-z80asm.lib'
-Assembling 'test.asm' to 'test.o'
-Reading 'test.asm' = 'test.asm'
+Assembling 'test.asm'
 Writing object file 'test.o'
 
 Code size: 7 bytes ($5CD0 to $5CD6)
@@ -413,8 +412,7 @@ Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Library 'z88dk-z80asm.lib' not found
 Reading library '../z88dk-z80asm.lib'
-Assembling 'test.asm' to 'test.o'
-Reading 'test.asm' = 'test.asm'
+Assembling 'test.asm'
 Writing object file 'test.o'
 
 Code size: 7 bytes ($4082 to $4088)
