@@ -2893,6 +2893,7 @@ static void configure_compiler(void)
     char  buf[256];
 
     compiler_type = CC_SCCZ80;
+    BuildOptions(&cpparg, "-D__Z88DK");
 
     /* compiler= */
     if ((strcmp(c_compiler_type, "clang") == 0) || (strcmp(c_compiler_type, "sdcc") == 0)) {
