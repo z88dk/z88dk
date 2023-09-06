@@ -1652,7 +1652,7 @@ void file_rename_symbol(file_t* file, const char* old_name, const char* new_name
 
 						obj_rename_symbol(obj, old_name, new_name);
                         utstring_clear(symbol->name);
-                        utstring_printf(symbol->name, new_name);
+                        utstring_printf(symbol->name, "%s", new_name);
 					}
 					else {		// no match
 						if (opt_obj_verbose)
