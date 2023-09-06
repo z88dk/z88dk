@@ -190,14 +190,6 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">
-      <Project>{7d0213a3-87fa-4f56-a5d6-cc23682acad8}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\z80asm-common\z80asm-common.vcxproj">
-      <Project>{00bce225-fe40-4c33-b15e-c8fb6ada74eb}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\src\cpp\args.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\errors.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\defines.h" />
@@ -284,6 +276,11 @@
     <None Include="..\..\src\z80asm\src\cpp\scan.re" />
     <None Include="..\..\src\z80asm\src\c\parse_rules.rl" />
     <None Include="..\..\src\z80asm\src\c\scan_rules.rl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\common.vcxproj">
+      <Project>{d7bc7a18-5bc5-4543-9f93-87a055319826}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
