@@ -35,7 +35,7 @@
 ; bit 18 = $ 40000 = enable %li
 ; bit 19 = $ 80000 = enable %lp
 ; bit 20 = $100000 = enable %lB
-; * bit 21 = $200000 = enable %[
+; bit 21 = $200000 = enable %[
 ; * bit 22 = $  400000 = enable %a
 ; * bit 23 = $  800000 = enable %A
 ; bit 24 = $ 1000000 = enable %e
@@ -73,6 +73,7 @@ IF NEED_scanf
 	EXTERN	__scanf_handle_c
 	EXTERN	__scanf_handle_n
 	EXTERN	__scanf_handle_i
+	EXTERN	__scanf_handle_bkt
 	EXTERN	__scanf_noop
 
 __scanf_format_table:
@@ -143,6 +144,10 @@ ENDIF
 IF CLIB_OPT_SCANF & $10000000
 	defb	'g'
 	defw	__scanf_handle_f
+ENDIF
+IF CLIB_OPT_SCANF & $200000
+	defb	'['
+	defw	__scanf_handle_bkt
 ENDIF
 
 	defb	0	;end marker

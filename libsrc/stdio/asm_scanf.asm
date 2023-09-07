@@ -59,7 +59,7 @@ ELSE
 ENDIF
 
     ; -1, -2 = conversions done
-        ; -3 = flags [000a*WL0]
+        ; -3 = flags [^00a*WL0]
     ; -4 = width
     ; -5, -6 = bytes read from stream
     ; -50->-10 = fp number buffer
