@@ -28,9 +28,30 @@
 enum colors { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY, DARKGRAY,
               LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE };
 
+// CONIO_NATIVE_VT100 and CONIO_NATIVE_VT52 provide basic
+// functionality when run on terminals of that type
+#ifdef CONIO_NATIVE_VT100
+// Color translation table
+static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
+#define	textattr(a)		cprintf("\x1b[%dm",a)
+#define	clrscr()		cprintf("\x1b[2J")
+#define	gotoxy(x,y)		cprintf("\x1b[%d;%df",y,x)
+#define textcolor(a)	        cprintf("\x1b[%um",PCDOS_COLORS[a]+30)
+#define textbackground(a)	cprintf("\x1b[%um",PCDOS_COLORS[a]+40)
+#define textattr(a)	        cprintf("\x1b[%um\033[%um",PCDOS_COLORS[a&0xF]+30,PCDOS_COLORS[a>>4]+40)
+#define highvideo()	        cprintf("\x1b[1m")
+#define lowvideo()	        cprintf("\x1b[2m")
+#define normvideo()	        cprintf("\x1b[m")
+#define clreol()                cprintf("\x1b[K")
 
-#ifdef __CONIO_VT100
+#elif CONIO_NATIVE_VT52
+#define	gotoxy(x,y)		cprintf("\x1bY%c%c",y+32,x+32)
+#define	clrscr()		cprintf("\x1bH\x1bE");
+#define textcolor(a)            cprintf("\x1bb%c",a+32);
+#define textbackground(a)       cprintf("\x1bc%c",a+32);
+
+#elif __CONIO_VT100
 // Much faster shortcut passing the colors in vt-ansi mode (equivalent to a "set text rendition" ESC sequence)
 extern void   __LIB__      vtrendition(unsigned int attribute) __z88dk_fastcall;
 
