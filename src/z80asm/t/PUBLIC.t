@@ -4,20 +4,20 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-for my $extern (qw( extern xref lib )) {
-	ok 1, "Test with $extern";
+for my $public (qw( public xdef xlib )) {
+	ok 1, "Test with $public";
 
 	z80asm_nok("", "", <<END, <<END);
-		$extern
+		$public
 END
 $test.asm:1: error: syntax error
-  ^---- $extern
+  ^---- $public
 END
 
 spew("$test.asm", <<END);
-		public p1,p2
-		public p3
-		public p4
+		$public p1,p2
+		$public p3
+		$public p4
 
 	p1:	defb ASMPC			;; 00
 	p2:	defb ASMPC			;; 01
@@ -26,9 +26,9 @@ spew("$test.asm", <<END);
 END
 
 spew("$test.1.asm", <<END);
-		$extern p1,p2
-		$extern p3
-		$extern p4
+		extern p1,p2
+		extern p3
+		extern p4
 
 		defb p1,p2,p3,p4	;; 00 01 02 03
 END
