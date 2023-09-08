@@ -1934,9 +1934,9 @@ int main (int argc, char **argv){
         if( ih )
           LDRR(d, h,  d_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         else if( iy && canixh() )
-          LDRR(d, yh, d,isez80() ? 1 : 4);
+          LDRR(d, yh, d,isez80() ? 1 : isr800() ? 1 : 4);
         else if ( canixh() )
-          LDRR(d, xh, d,isez80() ? 1 : 4);
+          LDRR(d, xh, d,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x55: // LD D,L // LD D,IXl // LD D,IYl
         if( ih )
@@ -2203,14 +2203,14 @@ int main (int argc, char **argv){
               yl = l; yh = h;      // LD IY,HL
               st += 4;
           } else {
-              LDRR(a, yl, a,isez80() ? 1 : 4);
+              LDRR(a, yl, a,isez80() ? 1 : isr800() ? 1 : 4);
           }
         } else {
           if ( israbbit() ) {
               xl = l; xh = h;     // LD IX,HL
               st += 4;
           } else {
-              LDRR(a, xl, a,isez80() ? 1 : 4);
+              LDRR(a, xl, a,isez80() ? 1 : isr800() ? 1 : 4);
           }
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
