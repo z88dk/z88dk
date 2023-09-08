@@ -130,6 +130,13 @@ msxbios:
 l_dcal: 
     jp      (hl)            ;Used for function pointer calls
 
+    ; Point the font to the ROM if not overriden
+IFNDEF DEFINED_CRT_FONT
+    PUBLIC CRT_FONT
+    defc CRT_FONT = 5539
+ENDIF
+
+
     INCLUDE "crt/classic/crt_runtime_selection.asm" 
     
     defc        __crt_org_bss = CRT_ORG_BSS

@@ -1,6 +1,7 @@
 
-		SECTION		rodata_clib
+    SECTION rodata_clib
 
-		PUBLIC		CRT_FONT
+    PUBLIC  CRT_FONT
+    EXTERN  _font_8x8_coleco_adam_system
 
-		defc		CRT_FONT = 5539
+    defc CRT_FONT = _font_8x8_coleco_adam_system
