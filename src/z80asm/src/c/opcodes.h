@@ -61,6 +61,9 @@ void add_opcode_idx_n(int opcode, struct Expr1 *idx_expr,
 void add_opcode_n_n(int opcode, struct Expr1 *n1_expr,
 									   struct Expr1 *n2_expr );
 
+/* add defb opcode with 8-bit data */
+void add_opcode_defb(struct Expr1* expr);
+
 /* call emulation function by name */
 void add_call_emul_func(char *emul_func);
 

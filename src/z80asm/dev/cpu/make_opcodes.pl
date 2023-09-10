@@ -679,36 +679,68 @@ for my $cpu (@CPUS) {
 		}
 	}
 	
+	# LD (NN), hl
+	if ($ez80_z80) {
+		for my $opcode ("ld (%m), hl", "shld %m") {
+			add($cpu, $opcode,	[0x22, '%m', '%m']);
+		}	
+		add($cpu, "ld.lil (%m), hl", [0x5B], [0x22, '%m', '%m', '%m']);
+	}
+	elsif ($ez80_adl) {
+		add($cpu, "ld (%m), hl", 	[0x22, '%m', '%m', '%m']);
+		add($cpu, "ld.sis (%m), hl", [0x40], [0x22, '%m', '%m']);
+	}
+	elsif ($gameboy) {
+		for my $opcode ("ld (%m), hl", "shld %m") {
+			add($cpu, $opcode, 	[push_dd('de')],			# save DE
+								[push_dd('hl')],			# save HL
+								[ld_r_r('d','h')],
+								[ld_r_r('e','l')],			# DE=word to store
+								[0x21, '%m', '%m'],			# HL=address to store
+								[ld_r_r('(hl)','e')],
+								[inc_dd('hl')],
+								[ld_r_r('(hl)','d')],
+								[pop_dd('hl')],				# restore HL
+								[pop_dd('de')]);			# restore DE
+		}						
+	}
+	else {
+		add_x($cpu, "ld (%m), hl", 	[0x22, '%m', '%m']);
+		add($cpu, "shld %m",		[0x22, '%m', '%m']);
+	}
+
+	# LD hl, (NN)
+	if ($ez80_z80) {
+		for my $opcode ("ld hl, (%m)", "lhld %m") {
+			add($cpu, $opcode,	[0x2A, '%m', '%m']);
+		}	
+		add($cpu, "ld.lil hl, (%m)", [0x5B], [0x2A, '%m', '%m', '%m']);
+	}
+	elsif ($ez80_adl) {
+		add($cpu, "ld hl, (%m)", [0x2A, '%m', '%m', '%m']);
+		add($cpu, "ld.sis hl, (%m)", [0x40], [0x2A, '%m', '%m']);
+	}
+	elsif ($gameboy) {
+		for my $opcode ("ld hl, (%m)", "lhld %m") {
+			add($cpu, $opcode,	[push_dd('de')],			# save DE
+								[0x21, '%m', '%m'],			# HL=address to fetch
+								[ld_r_r('e','(hl)')],
+								[inc_dd('hl')],
+								[ld_r_r('d','(hl)')],		# DE=word fetched
+								[ld_r_r('h','d')],
+								[ld_r_r('l','e')],			# HL=word fetched
+								[pop_dd('de')]);			# restore DE
+		}						
+	}
+	else {
+		add_x($cpu, "ld hl, (%m)", 	[0x2A, '%m', '%m']);
+		add($cpu, "lhld %m",		[0x2A, '%m', '%m']);
+	}
+
 	# LD dd, (NN) / LD (NN), dd
 	if (!$gameboy) {
 		for my $r (qw( bc de hl sp )) {
 			if ($r eq 'hl') {
-				if ($ez80_z80) {
-					add($cpu, "ld (%m), $r", [0x22, '%m', '%m']);
-					add($cpu, "ld.lil (%m), $r", [0x5B], [0x22, '%m', '%m', '%m']);
-				}
-				elsif ($ez80_adl) {
-					add($cpu, "ld (%m), $r", [0x22, '%m', '%m', '%m']);
-					add($cpu, "ld.sis (%m), $r", [0x40], [0x22, '%m', '%m']);
-				}
-				else {
-					add_x($cpu, "ld (%m), $r", 	[0x22, '%m', '%m']);
-				}
-				add($cpu, "shld %m",		[0x22, '%m', '%m']);
-
-				if ($ez80_z80) {
-					add($cpu, "ld $r, (%m)", [0x2A, '%m', '%m']);
-					add($cpu, "ld.lil $r, (%m)", [0x5B], [0x2A, '%m', '%m', '%m']);
-				}
-				elsif ($ez80_adl) {
-					add($cpu, "ld $r, (%m)", [0x2A, '%m', '%m', '%m']);
-					add($cpu, "ld.sis $r, (%m)", [0x40], [0x2A, '%m', '%m']);
-				}
-				else {
-					add_x($cpu, "ld $r, (%m)", 	[0x2A, '%m', '%m']);
-				}
-				add($cpu, "lhld %m",		[0x2A, '%m', '%m']);
-				
 				if (!$intel) {
 					for my $x (qw( ix iy )) {
 						if ($ez80_z80) {
@@ -1094,6 +1126,9 @@ for my $cpu (@CPUS) {
 	elsif ($gameboy) {
 		add($cpu, "add sp, %s", [0xE8, '%s']);
 	}
+	else {
+		add($cpu, "add sp, %s", [call(), '@__z80asm__add_sp_s'], ['%s']);
+	}
 
 	# ADC
 	for my $dd (qw( bc de hl sp )) {
@@ -1137,6 +1172,17 @@ for my $cpu (@CPUS) {
 			}
 		}
 	}
+	else {
+		add($cpu, "and hl, de",		[push_dd('af')],
+									[ld_r_r('a','h')],
+									[alu_r('and','d')],
+									[ld_r_r('h','a')],
+									[ld_r_r('a','l')],
+									[alu_r('and','e')],
+									[ld_r_r('l','a')],
+									[pop_dd('af')]);
+	}
+									
 
 	# INC/DEC
 	for my $dd (qw( bc de hl sp )) {

@@ -10,29 +10,31 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my @CPUS = (qw( 8080 8085 gbz80 z80 r2ka ));
-
 my $test_nr;
 
 for my $cpu (@CPUS) {
-	for my $reg (qw( BC DE HL )) {
-		for my $carry (0, 1) {
-			for my $init (0, 0x1111, 0x2222, 0x8888) {
-                $test_nr++;
-                note "Test $test_nr: cpu:$cpu reg:$reg carry:$carry init:$init";
-                my $init_carry = $carry ? "scf" : "and a";
-                my $r = ticks(<<END, "-m$cpu");
-                        ld		$reg, $init
-                        $init_carry 
-                        rl      $reg
-                        jr	 	0		; need to keep SP
+	SKIP: {
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
+		
+		for my $reg (qw( BC DE HL )) {
+			for my $carry (0, 1) {
+				for my $init (0, 0x1111, 0x2222, 0x8888) {
+					$test_nr++;
+					note "Test $test_nr: cpu:$cpu reg:$reg carry:$carry init:$init";
+					my $init_carry = $carry ? "scf" : "and a";
+					my $r = ticks(<<END, "-m$cpu");
+							ld		$reg, $init
+							$init_carry 
+							rl      $reg
+							jr	 	0		; need to keep SP
 END
-                my $res = (($init << 1) & 0xFFFF)|$carry;
-                
-                is $r->{F_C}, ($init & 0x8000) ? 1 : 0, "carry";
-                is $r->{$reg}, $res, "result";
-                        
-                (Test::More->builder->is_passing) or die;
+					my $res = (($init << 1) & 0xFFFF)|$carry;
+					
+					is $r->{F_C}, ($init & 0x8000) ? 1 : 0, "carry";
+					is $r->{$reg}, $res, "result";
+							
+					(Test::More->builder->is_passing) or die;
+				}
 			}
 		}
 	}

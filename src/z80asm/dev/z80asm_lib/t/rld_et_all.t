@@ -12,56 +12,64 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-# CPUs not supported by ticks: z80n z180 r3k
-my @CPUS = (qw( z80 8080 gbz80 r2ka ));
 my $test_nr;
 
 # RLD / RRD
 for my $cpu (@CPUS) {
-	for my $carry (0, 1) {
-		for my $op (qw( rld rrd )) {
-			for my $a (0x12, 0xF2, 0x01) {
-				for my $data (0x34, 0x01) {
-					my $bc = 0x8765;
-					my $de = 0x4321;
-					$test_nr++;
-					note "Test $test_nr: cpu:$cpu, carry:$carry, a:$a, data:$data, op:$op";
-					my $carry_set = $carry ? "scf" : "and a";
-					my $r = ticks(<<END, "-m$cpu");
-						defc data = 0x100
-								$carry_set
-								ld bc, $bc
-								ld de, $de
+	SKIP: {
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
+		
+		for my $carry (0, 1) {
+			for my $op (qw( rld rrd )) {
+				for my $a (0x12, 0xF2, 0x01) {
+					for my $data (0x34, 0x01) {
+						my $bc = 0x8765;
+						my $de = 0x4321;
+						$test_nr++;
+						note "Test $test_nr: cpu:$cpu, carry:$carry, a:$a, data:$data, op:$op";
+						my $carry_set = $carry ? "scf" : "and a";
+						my $r = ticks(<<END, "-m$cpu");
+							defc data = 0x100
+									$carry_set
+									ld bc, $bc
+									ld de, $de
 
-								ld hl, data
-								ld (hl), $data
-								ld a, $a
-								
-								$op
-								
-								rst 0
+									ld hl, data
+									ld (hl), $data
+									ld a, $a
+									
+									$op
+									
+									rst 0
 END
-					my $exp_a = ($a & 0xF0) | 
-								($op eq 'rld' ? ($data >> 4) & 0x0F 
-											  : $data & 0x0F);
-					my $exp_data = $op eq 'rld' ? 
-						(($data << 4) & 0xF0) | ($a & 0x0F) : 
-						(($data >> 4) & 0x0F) | (($a << 4) & 0xF0);
+						my $exp_a = ($a & 0xF0) | 
+									($op eq 'rld' ? ($data >> 4) & 0x0F 
+												  : $data & 0x0F);
+						my $exp_data = $op eq 'rld' ? 
+							(($data << 4) & 0xF0) | ($a & 0x0F) : 
+							(($data >> 4) & 0x0F) | (($a << 4) & 0xF0);
 
-					is $r->{A}, $exp_a, 						"A";
-					is $r->{mem}[0x100], $exp_data,				"(HL)";
-					
-					is $r->{F_S}, ($exp_a & 0x80	? 1 : 0), 	"S";
-					is $r->{F_Z}, ($exp_a == 0 		? 1 : 0), 	"Z";
-					is $r->{F_H}, 0,						 	"Hf";
-					is $r->{F_PV}, parity($exp_a),			 	"PV";
-					is $r->{F_N}, 0,						  	"N";
-					is $r->{F_C}, $carry,					  	"C";
-					is $r->{BC}, $bc,							"BC";
-					is $r->{DE}, $de,							"DE";
-					is $r->{HL}, 0x100,							"HL";
+						is $r->{A}, $exp_a, 						"A";
+						is $r->{mem}[0x100], $exp_data,				"(HL)";
 						
-					(Test::More->builder->is_passing) or die;
+						is $r->{F_S}, ($exp_a & 0x80	? 1 : 0), 	"S";
+						is $r->{F_Z}, ($exp_a == 0 		? 1 : 0), 	"Z";
+						is $r->{F_H}, 0,						 	"Hf";
+						is $r->{F_PV}, parity($exp_a),			 	"PV";
+						
+						SKIP: {
+							skip "$cpu N flag not emulated correctly?" if $cpu =~ /8085/;
+							
+							is $r->{F_N}, 0,						  	"N";
+						}
+						
+						is $r->{F_C}, $carry,					  	"C";
+						is $r->{BC}, $bc,							"BC";
+						is $r->{DE}, $de,							"DE";
+						is $r->{HL}, 0x100,							"HL";
+							
+						(Test::More->builder->is_passing) or die;
+					}
 				}
 			}
 		}

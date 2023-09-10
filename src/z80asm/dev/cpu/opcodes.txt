@@ -212,7 +212,7 @@
 |add iyl                |-    -    ez80 ez80_z80 -     -    -   r800 -    z80 -          z80n|
 |add l                  |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
 |add m                  |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
-|add sp, %s             |-    -    -    -        gbz80 r2ka r3k -    -    -   -          -   |
+|add sp, %s             |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
 |add.l (hl)             |-    -    -    ez80_z80 -     -    -   -    -    -   -          -   |
 |add.l (hl+)            |-    -    -    ez80_z80 -     -    -   -    -    -   -          -   |
 |add.l (hl-)            |-    -    -    ez80_z80 -     -    -   -    -    -   -          -   |
@@ -1749,7 +1749,7 @@
 |and e                  |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
 |and h                  |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
 |and hl', de            |-    -    -    -        -     r2ka r3k -    -    -   -          -   |
-|and hl, de             |-    -    -    -        -     r2ka r3k -    -    -   -          -   |
+|and hl, de             |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
 |and ix, de             |-    -    -    -        -     r2ka r3k -    -    -   -          -   |
 |and ixh                |-    -    ez80 ez80_z80 -     -    -   r800 -    z80 -          z80n|
 |and ixl                |-    -    ez80 ez80_z80 -     -    -   r800 -    z80 -          z80n|
@@ -4769,7 +4769,7 @@
 |ld (%m), a             |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
 |ld (%m), bc            |-    -    ez80 ez80_z80 -     r2ka r3k r800 z180 z80 z80_strict z80n|
 |ld (%m), de            |8080 8085 ez80 ez80_z80 -     r2ka r3k r800 z180 z80 z80_strict z80n|
-|ld (%m), hl            |8080 8085 ez80 ez80_z80 -     r2ka r3k r800 z180 z80 z80_strict z80n|
+|ld (%m), hl            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
 |ld (%m), ix            |-    -    ez80 ez80_z80 -     r2ka r3k r800 z180 z80 z80_strict z80n|
 |ld (%m), iy            |-    -    ez80 ez80_z80 -     r2ka r3k r800 z180 z80 z80_strict z80n|
 |ld (%m), sp            |-    -    ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
@@ -5847,7 +5847,7 @@
 |ld hl', ix             |-    -    -    -        -     r2ka r3k -    -    -   -          -   |
 |ld hl', iy             |-    -    -    -        -     r2ka r3k -    -    -   -          -   |
 |ld hl, %m              |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
-|ld hl, (%m)            |8080 8085 ez80 ez80_z80 -     r2ka r3k r800 z180 z80 z80_strict z80n|
+|ld hl, (%m)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
 |ld hl, (de)            |-    8085 -    -        -     -    -   -    -    -   -          -   |
 |ld hl, (hl)            |8080 8085 ez80 ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
 |ld hl, (hl+%d)         |-    -    -    -        -     r2ka r3k -    -    -   -          -   |
@@ -7373,7 +7373,7 @@
 |lea.sil iy, ix+%d      |-    -    ez80 -        -     -    -   -    -    -   -          -   |
 |lea.sil iy, iy         |-    -    ez80 -        -     -    -   -    -    -   -          -   |
 |lea.sil iy, iy+%d      |-    -    ez80 -        -     -    -   -    -    -   -          -   |
-|lhld %m                |8080 8085 ez80 ez80_z80 -     r2ka r3k r800 z180 z80 z80_strict z80n|
+|lhld %m                |8080 8085 -    ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
 |lhlde                  |-    8085 -    -        -     -    -   -    -    -   -          -   |
 |lhlx                   |-    8085 -    -        -     -    -   -    -    -   -          -   |
 |lirx                   |-    -    -    -        -     -    -   -    -    -   -          z80n|
@@ -9485,7 +9485,7 @@
 |set.sil 7, (iy+%d)     |-    -    ez80 -        -     -    -   -    -    -   -          -   |
 |setae                  |-    -    -    -        -     -    -   -    -    -   -          z80n|
 |setusr                 |-    -    -    -        -     -    r3k -    -    -   -          -   |
-|shld %m                |8080 8085 ez80 ez80_z80 -     r2ka r3k r800 z180 z80 z80_strict z80n|
+|shld %m                |8080 8085 -    ez80_z80 gbz80 r2ka r3k r800 z180 z80 z80_strict z80n|
 |shlde                  |-    8085 -    -        -     -    -   -    -    -   -          -   |
 |shlx                   |-    8085 -    -        -     -    -   -    -    -   -          -   |
 |sim                    |-    8085 -    -        -     -    -   -    -    -   -          -   |
@@ -11308,9 +11308,18 @@
 |add m                  |z80       |86                                       |
 |add m                  |z80_strict|86                                       |
 |add m                  |z80n      |86                                       |
+|add sp, %s             |8080      |CD @__z80asm__add_sp_s %s                |
+|add sp, %s             |8085      |CD @__z80asm__add_sp_s %s                |
+|add sp, %s             |ez80      |CD @__z80asm__add_sp_s %s                |
+|add sp, %s             |ez80_z80  |CD @__z80asm__add_sp_s %s                |
 |add sp, %s             |gbz80     |E8 %s                                    |
 |add sp, %s             |r2ka      |27 %s                                    |
 |add sp, %s             |r3k       |27 %s                                    |
+|add sp, %s             |r800      |CD @__z80asm__add_sp_s %s                |
+|add sp, %s             |z180      |CD @__z80asm__add_sp_s %s                |
+|add sp, %s             |z80       |CD @__z80asm__add_sp_s %s                |
+|add sp, %s             |z80_strict|CD @__z80asm__add_sp_s %s                |
+|add sp, %s             |z80n      |CD @__z80asm__add_sp_s %s                |
 |add.l (hl)             |ez80_z80  |49 86                                    |
 |add.l (hl+)            |ez80_z80  |49 86 23                                 |
 |add.l (hl-)            |ez80_z80  |49 86 2B                                 |
@@ -14645,8 +14654,18 @@
 |and h                  |z80n      |A4                                       |
 |and hl', de            |r2ka      |76 DC                                    |
 |and hl', de            |r3k       |76 DC                                    |
+|and hl, de             |8080      |F5 7C A2 67 7D A3 6F F1                  |
+|and hl, de             |8085      |F5 7C A2 67 7D A3 6F F1                  |
+|and hl, de             |ez80      |F5 7C A2 67 7D A3 6F F1                  |
+|and hl, de             |ez80_z80  |F5 7C A2 67 7D A3 6F F1                  |
+|and hl, de             |gbz80     |F5 7C A2 67 7D A3 6F F1                  |
 |and hl, de             |r2ka      |DC                                       |
 |and hl, de             |r3k       |DC                                       |
+|and hl, de             |r800      |F5 7C A2 67 7D A3 6F F1                  |
+|and hl, de             |z180      |F5 7C A2 67 7D A3 6F F1                  |
+|and hl, de             |z80       |F5 7C A2 67 7D A3 6F F1                  |
+|and hl, de             |z80_strict|F5 7C A2 67 7D A3 6F F1                  |
+|and hl, de             |z80n      |F5 7C A2 67 7D A3 6F F1                  |
 |and ix, de             |r2ka      |DD DC                                    |
 |and ix, de             |r3k       |DD DC                                    |
 |and ixh                |ez80      |DD A4                                    |
@@ -23420,6 +23439,7 @@
 |ld (%m), hl            |8085      |22 %m %m                                 |
 |ld (%m), hl            |ez80      |22 %m %m %m                              |
 |ld (%m), hl            |ez80_z80  |22 %m %m                                 |
+|ld (%m), hl            |gbz80     |D5 E5 54 5D 21 %m %m 73 23 72 E1 D1      |
 |ld (%m), hl            |r2ka      |22 %m %m                                 |
 |ld (%m), hl            |r3k       |22 %m %m                                 |
 |ld (%m), hl            |r800      |22 %m %m                                 |
@@ -28111,6 +28131,7 @@
 |ld hl, (%m)            |8085      |2A %m %m                                 |
 |ld hl, (%m)            |ez80      |2A %m %m %m                              |
 |ld hl, (%m)            |ez80_z80  |2A %m %m                                 |
+|ld hl, (%m)            |gbz80     |D5 21 %m %m 5E 23 56 62 6B D1            |
 |ld hl, (%m)            |r2ka      |2A %m %m                                 |
 |ld hl, (%m)            |r3k       |2A %m %m                                 |
 |ld hl, (%m)            |r800      |2A %m %m                                 |
@@ -31341,8 +31362,8 @@
 |lea.sil iy, iy+%d      |ez80      |52 ED 33 %d                              |
 |lhld %m                |8080      |2A %m %m                                 |
 |lhld %m                |8085      |2A %m %m                                 |
-|lhld %m                |ez80      |2A %m %m                                 |
 |lhld %m                |ez80_z80  |2A %m %m                                 |
+|lhld %m                |gbz80     |D5 21 %m %m 5E 23 56 62 6B D1            |
 |lhld %m                |r2ka      |2A %m %m                                 |
 |lhld %m                |r3k       |2A %m %m                                 |
 |lhld %m                |r800      |2A %m %m                                 |
@@ -39168,8 +39189,8 @@
 |setusr                 |r3k       |ED 6F                                    |
 |shld %m                |8080      |22 %m %m                                 |
 |shld %m                |8085      |22 %m %m                                 |
-|shld %m                |ez80      |22 %m %m                                 |
 |shld %m                |ez80_z80  |22 %m %m                                 |
+|shld %m                |gbz80     |D5 E5 54 5D 21 %m %m 73 23 72 E1 D1      |
 |shld %m                |r2ka      |22 %m %m                                 |
 |shld %m                |r3k       |22 %m %m                                 |
 |shld %m                |r800      |22 %m %m                                 |

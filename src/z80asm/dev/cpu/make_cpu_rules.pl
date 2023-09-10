@@ -227,6 +227,9 @@ sub parse_code_opcode {
 	elsif ($bin =~ s/ %d//) {
 		$stmt = "DO_stmt_idx";
 	}
+	elsif ($bin =~ s/^%s//) {
+		push @code, "DO_stmt_defb();";
+	}
 	else {
 		$stmt = "DO_stmt";
 	}

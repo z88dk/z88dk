@@ -10,27 +10,29 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my @CPUS = (qw( r2ka r3k ));
-
 my $test_nr;
 
 for my $cpu (@CPUS) {
-	for my $reg (qw( de )) {
-		for my $a (0, 0xAAAA) {
-			for my $b (0x5555, 0xFFFF) {
-				$test_nr++;
-				note "Test $test_nr: cpu:$cpu reg:$reg a:$a b:$b";
+	SKIP: {
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
+		
+		for my $reg (qw( de )) {
+			for my $a (0, 0xAAAA) {
+				for my $b (0x5555, 0xFFFF) {
+					$test_nr++;
+					note "Test $test_nr: cpu:$cpu reg:$reg a:$a b:$b";
 
-				my $r = ticks(<<END, "-m$cpu");
-							ld		hl, $a
-							ld		$reg, $b
-							and		hl, $reg
-							rst 	0
+					my $r = ticks(<<END, "-m$cpu");
+								ld		hl, $a
+								ld		$reg, $b
+								and		hl, $reg
+								rst 	0
 END
-				my $x = $a & $b;
-				is $r->{HL}, $x,			"result";
-						
-				(Test::More->builder->is_passing) or die; 
+					my $x = $a & $b;
+					is $r->{HL}, $x,			"result";
+							
+					(Test::More->builder->is_passing) or die; 
+				}
 			}
 		}
 	}

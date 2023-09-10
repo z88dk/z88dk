@@ -170,6 +170,8 @@
  add iyl                        ; DD 85
  add l                          ; 85
  add m                          ; 86
+ add sp, -128                   ; CD @__z80asm__add_sp_s 80
+ add sp, 127                    ; CD @__z80asm__add_sp_s 7F
  add.s (hl)                     ; 52 86
  add.s (hl+)                    ; 52 86 23
  add.s (hl-)                    ; 52 86 2B
@@ -282,6 +284,7 @@
  and d                          ; A2
  and e                          ; A3
  and h                          ; A4
+ and hl, de                     ; F5 7C A2 67 7D A3 6F F1
  and ixh                        ; FD A4
  and ixl                        ; FD A5
  and iyh                        ; DD A4
@@ -3150,10 +3153,6 @@
  lea.sil iy, iy                 ; 52 ED 32 00
  lea.sil iy, iy+126             ; 52 ED 32 7E
  lea.sil iy, iy-128             ; 52 ED 32 80
- lhld -32768                    ; 2A 00 80
- lhld 0x123456                  ; 2A 56 34
- lhld 32767                     ; 2A FF 7F
- lhld 65535                     ; 2A FF FF
  lxi b, -32768                  ; 01 00 80
  lxi b, 0x123456                ; 01 56 34
  lxi b, 32767                   ; 01 FF 7F
@@ -4305,10 +4304,6 @@
  set.sil 7, (iy)                ; 52 DD CB 00 FE
  set.sil 7, (iy+126)            ; 52 DD CB 7E FE
  set.sil 7, (iy-128)            ; 52 DD CB 80 FE
- shld -32768                    ; 22 00 80
- shld 0x123456                  ; 22 56 34
- shld 32767                     ; 22 FF 7F
- shld 65535                     ; 22 FF FF
  sla (hl)                       ; CB 26
  sla (ix)                       ; FD CB 00 26
  sla (ix+126)                   ; FD CB 7E 26

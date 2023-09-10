@@ -116,7 +116,7 @@ src/c/parse1.o: src/c/parse_rules.h
 
 src/c/parse_rules.h: src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile \
-				dev/cpu/cpu_rules.h
+				src/c/cpu_rules.h
 ifeq ($(DEVELOPER),1)
 	perl parse_ragel.pl src/c/parse_rules.rl
 	dos2unix src/c/parse_rules.h 2> /dev/null
@@ -132,7 +132,7 @@ endif
 dev: src/c/cpu_rules.h
 
 src/c/cpu_rules.h: \
-			$(wildcard dev/cpu/*.pl dev/cpu/*.y dev/cpu/Makefile) Makefile
+			$(wildcard dev/cpu/*.pl dev/cpu/*.y) dev/cpu/Makefile Makefile
 ifeq ($(DEVELOPER),1)
 	$(MAKE) -C dev/cpu
 	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
@@ -225,8 +225,9 @@ clean::
 #------------------------------------------------------------------------------
 # rebuild the three tools needed for the tests
 rebuild:
-	$(MAKE) -C ../common
 	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm.lib
+	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm_lib.lst
+	$(MAKE) -C ../common
 	$(MAKE) -C ../z80asm dev
 	cp ../z80asm/z88dk-z80asm$(EXESUFFIX) ../../bin/
 	$(MAKE) -C ../z80nm

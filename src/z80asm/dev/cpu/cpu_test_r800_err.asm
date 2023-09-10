@@ -132,8 +132,6 @@
  add hl', de                    ; Error
  add hl', hl                    ; Error
  add hl', sp                    ; Error
- add sp, -128                   ; Error
- add sp, 127                    ; Error
  add.l (hl)                     ; Error
  add.l (hl+)                    ; Error
  add.l (hl-)                    ; Error
@@ -2093,7 +2091,6 @@
  and a', h                      ; Error
  and a', l                      ; Error
  and hl', de                    ; Error
- and hl, de                     ; Error
  and ix, de                     ; Error
  and iy, de                     ; Error
  and.l (hl)                     ; Error

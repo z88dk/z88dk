@@ -88,8 +88,6 @@
  add hl', de                    ; Error
  add hl', hl                    ; Error
  add hl', sp                    ; Error
- add sp, -128                   ; Error
- add sp, 127                    ; Error
  add.l (hl)                     ; Error
  add.l (hl+)                    ; Error
  add.l (hl-)                    ; Error
@@ -1989,7 +1987,6 @@
  and a', h                      ; Error
  and a', l                      ; Error
  and hl', de                    ; Error
- and hl, de                     ; Error
  and ix, de                     ; Error
  and iy, de                     ; Error
  and.l (hl)                     ; Error
@@ -7711,6 +7708,10 @@
  lea.lis iy, iy                 ; Error
  lea.lis iy, iy+126             ; Error
  lea.lis iy, iy-128             ; Error
+ lhld -32768                    ; Error
+ lhld 0x123456                  ; Error
+ lhld 32767                     ; Error
+ lhld 65535                     ; Error
  lhlde                          ; Error
  lhlx                           ; Error
  lirx                           ; Error
@@ -9986,6 +9987,10 @@
  set.sil 8, (iy-128)            ; Error
  setae                          ; Error
  setusr                         ; Error
+ shld -32768                    ; Error
+ shld 0x123456                  ; Error
+ shld 32767                     ; Error
+ shld 65535                     ; Error
  shlde                          ; Error
  shlx                           ; Error
  sim                            ; Error

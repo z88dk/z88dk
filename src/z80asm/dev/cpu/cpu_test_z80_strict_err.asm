@@ -148,8 +148,6 @@
  add ixl                        ; Error
  add iyh                        ; Error
  add iyl                        ; Error
- add sp, -128                   ; Error
- add sp, 127                    ; Error
  add.l (hl)                     ; Error
  add.l (hl+)                    ; Error
  add.l (hl-)                    ; Error
@@ -2113,7 +2111,6 @@
  and a, iyh                     ; Error
  and a, iyl                     ; Error
  and hl', de                    ; Error
- and hl, de                     ; Error
  and ix, de                     ; Error
  and ixh                        ; Error
  and ixl                        ; Error

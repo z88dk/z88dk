@@ -2155,7 +2155,6 @@
  and a, iyh                     ; Error
  and a, iyl                     ; Error
  and hl', de                    ; Error
- and hl, de                     ; Error
  and ix, de                     ; Error
  and ixh                        ; Error
  and ixl                        ; Error
@@ -6529,22 +6528,18 @@
  jx5 65535                      ; Error
  ld (-32768), bc                ; Error
  ld (-32768), de                ; Error
- ld (-32768), hl                ; Error
  ld (-32768), ix                ; Error
  ld (-32768), iy                ; Error
  ld (0x123456), bc              ; Error
  ld (0x123456), de              ; Error
- ld (0x123456), hl              ; Error
  ld (0x123456), ix              ; Error
  ld (0x123456), iy              ; Error
  ld (32767), bc                 ; Error
  ld (32767), de                 ; Error
- ld (32767), hl                 ; Error
  ld (32767), ix                 ; Error
  ld (32767), iy                 ; Error
  ld (65535), bc                 ; Error
  ld (65535), de                 ; Error
- ld (65535), hl                 ; Error
  ld (65535), ix                 ; Error
  ld (65535), iy                 ; Error
  ld (de), -128                  ; Error
@@ -8047,10 +8042,6 @@
  ld hl', de                     ; Error
  ld hl', ix                     ; Error
  ld hl', iy                     ; Error
- ld hl, (-32768)                ; Error
- ld hl, (0x123456)              ; Error
- ld hl, (32767)                 ; Error
- ld hl, (65535)                 ; Error
  ld hl, (de)                    ; Error
  ld hl, (hl+126)                ; Error
  ld hl, (hl-128)                ; Error
@@ -10107,10 +10098,6 @@
  lea.sil iy, iy                 ; Error
  lea.sil iy, iy+126             ; Error
  lea.sil iy, iy-128             ; Error
- lhld -32768                    ; Error
- lhld 0x123456                  ; Error
- lhld 32767                     ; Error
- lhld 65535                     ; Error
  lhlde                          ; Error
  lhlx                           ; Error
  lirx                           ; Error
@@ -13115,10 +13102,6 @@
  set.sil 8, (iy-128)            ; Error
  setae                          ; Error
  setusr                         ; Error
- shld -32768                    ; Error
- shld 0x123456                  ; Error
- shld 32767                     ; Error
- shld 65535                     ; Error
  shlde                          ; Error
  shlx                           ; Error
  sim                            ; Error

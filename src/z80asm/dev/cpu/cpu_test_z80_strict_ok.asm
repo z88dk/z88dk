@@ -110,6 +110,8 @@
  add iy, sp                     ; FD 39
  add l                          ; 85
  add m                          ; 86
+ add sp, -128                   ; CD @__z80asm__add_sp_s 80
+ add sp, 127                    ; CD @__z80asm__add_sp_s 7F
  adi -128                       ; C6 80
  adi 127                        ; C6 7F
  adi 255                        ; C6 FF
@@ -158,6 +160,7 @@
  and d                          ; A2
  and e                          ; A3
  and h                          ; A4
+ and hl, de                     ; F5 7C A2 67 7D A3 6F F1
  and l                          ; A5
  ani -128                       ; E6 80
  ani 127                        ; E6 7F

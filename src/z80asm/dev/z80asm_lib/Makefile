@@ -11,7 +11,7 @@ PROJ		:= z88dk-z80asm
 
 INSTALL 	?= install
 Z80ASM_EXE	?= ../../$(PROJ)
-SRC			:= $(filter-out test.asm,$(wildcard *.asm))
+SRC			:= $(wildcard *.asm)
 
 all:		$(PROJ).lib
 

@@ -10,40 +10,37 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my @CPUS = (qw( z80 gbz80 ));
-
 my $test_nr;
 
 for my $cpu (@CPUS) {
+	SKIP: {
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
 
-	$test_nr++;
-	note "Test $test_nr: cpu:$cpu";
+		$test_nr++;
+		note "Test $test_nr: cpu:$cpu";
 
-	my $r = ticks(<<END, "-m$cpu");
-				jr start
-		data:	defw 0, 0
-		start:	ld hl, 0x1234
-				push hl
-				ld hl, 0x5678
-				ex (sp), hl
-				
-				ld a, l				; gbz80 does not have ld (NN),hl
-				ld (data), a
-				ld a,h
-				ld (data+1), a
-				
-				pop hl
-				ld a, l
-				ld (data+2), a
-				ld a,h
-				ld (data+3), a
-				rst 0
+		my $r = ticks(<<END, "-m$cpu");
+					jp start
+			data:	defw 0, 0
+			start:	ld hl, 0x1234
+					push hl
+					ld hl, 0x5678
+					ex (sp), hl
+					
+					ld (data), hl
+					
+					pop hl
+					ld (data+2), hl
+
+					rst 0
 END
-	is $r->{mem}[2], 0x34;
-	is $r->{mem}[3], 0x12;
-	is $r->{mem}[4], 0x78;
-	is $r->{mem}[5], 0x56;
+		is $r->{mem}[3], 0x34;
+		is $r->{mem}[4], 0x12;
+		is $r->{mem}[5], 0x78;
+		is $r->{mem}[6], 0x56;
 	
+		(Test::More->builder->is_passing) or die;
+	}
 }
 
 unlink_testfiles();

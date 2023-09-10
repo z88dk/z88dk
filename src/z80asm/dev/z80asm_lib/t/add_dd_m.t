@@ -10,34 +10,36 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my @CPUS = (qw( z80 z80n ));
-
 my $test_nr;
 
 for my $cpu (@CPUS) {
-	for my $reg (qw( bc de hl )) {
-		for my $base (0, 255, 65534) {
-			for my $add (1, 2) {
-				$test_nr++;
-				note "Test $test_nr: cpu:$cpu reg:$reg base:$base add:$add";
-				
-				my $r = ticks(<<END, "-m$cpu");
-						ld		$reg, $base
-						add 	$reg, $add
-						
-						push 	$reg
-						pop		hl
-						rst 	0
+	SKIP: {
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
+		
+		for my $reg (qw( bc de hl )) {
+			for my $base (0, 255, 65534) {
+				for my $add (1, 2) {
+					$test_nr++;
+					note "Test $test_nr: cpu:$cpu reg:$reg base:$base add:$add";
+					
+					my $r = ticks(<<END, "-m$cpu");
+							ld		$reg, $base
+							add 	$reg, $add
+							
+							push 	$reg
+							pop		hl
+							rst 	0
 END
-				my $sum = $base + $add;
-				
-				# z80n does not update carry
-				if ($cpu ne 'z80n') {
-					is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
+					my $sum = $base + $add;
+					
+					# z80n does not update carry
+					if ($cpu ne 'z80n') {
+						is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
+					}
+					is $r->{HL}, $sum & 65535,			"result";
+							
+					(Test::More->builder->is_passing) or die;
 				}
-				is $r->{HL}, $sum & 65535,			"result";
-						
-				(Test::More->builder->is_passing) or die;
 			}
 		}
 	}

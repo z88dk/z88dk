@@ -170,6 +170,8 @@
  add iyl                        ; FD 85
  add l                          ; 85
  add m                          ; 86
+ add sp, -128                   ; CD @__z80asm__add_sp_s 80
+ add sp, 127                    ; CD @__z80asm__add_sp_s 7F
  add.l (hl)                     ; 49 86
  add.l (hl+)                    ; 49 86 23
  add.l (hl-)                    ; 49 86 2B
@@ -282,6 +284,7 @@
  and d                          ; A2
  and e                          ; A3
  and h                          ; A4
+ and hl, de                     ; F5 7C A2 67 7D A3 6F F1
  and ixh                        ; DD A4
  and ixl                        ; DD A5
  and iyh                        ; FD A4

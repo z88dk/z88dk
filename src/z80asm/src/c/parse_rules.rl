@@ -66,6 +66,13 @@ Define rules for a ragel-based parser.
 				add_opcode_idx_idx1((opcode0), (opcode1), idx_expr); \
 			} while(0)
 
+#define DO_stmt_defb() \
+			do { \
+			 	Expr1 *expr = pop_expr(ctx); \
+				DO_STMT_LABEL(); \
+				add_opcode_defb(expr); \
+			} while(0)
+
 /*-----------------------------------------------------------------------------
 *   State Machine
 *----------------------------------------------------------------------------*/

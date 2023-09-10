@@ -10,30 +10,32 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my @CPUS = (qw( gbz80 r2ka r3k ));
-
 my $test_nr;
 
 for my $cpu (@CPUS) {
-	for my $base (0x1000) {
-		for my $add (-2, 0, 2) {
-			$test_nr++;
-			note "Test $test_nr: cpu:$cpu base:$base add:$add";
-			
-			my $r = ticks(<<END, "-m$cpu");
-						ld		sp, $base
-						add 	sp, $add
-						
-						ld		hl, 0
-						add 	hl, sp
-						rst 	0
+	SKIP: {
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
+		
+		for my $base (0x1000) {
+			for my $add (-2, 0, 2) {
+				$test_nr++;
+				note "Test $test_nr: cpu:$cpu base:$base add:$add";
+				
+				my $r = ticks(<<END, "-m$cpu");
+							ld		sp, $base
+							add 	sp, $add
+							
+							ld		hl, 0
+							add 	hl, sp
+							rst 	0
 END
-			my $sum = $base + $add;
-			
-			is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
-			is $r->{HL}, $sum & 65535,			"result";
-					
-			(Test::More->builder->is_passing) or die;
+				my $sum = $base + $add;
+				
+				is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
+				is $r->{HL}, $sum & 65535,			"result";
+						
+				(Test::More->builder->is_passing) or die;
+			}
 		}
 	}
 }
