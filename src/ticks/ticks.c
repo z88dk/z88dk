@@ -752,7 +752,7 @@ int main (int argc, char **argv){
     printf("                 Use before -pc,-start,-end to enable symbols\n\n"),
     printf("  Default values for -pc, -start and -end are 0000 if omitted.\n"),
     printf("  When the program exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
-    exit(0);
+    exit(EXIT_SUCCESS);
   while (argc > 1){
     if( argv[1][0] == '-' && argv[2] )
       switch (argc--, argv++[1][1]){
@@ -840,7 +840,8 @@ int main (int argc, char **argv){
           } else if ( strcmp(&argv[0][1],"mr800") == 0 ) {
             c_cpu = CPU_R800;
           } else {
-            printf("Unknown CPU: %s\n",&argv[0][1]);
+            fprintf(stderr, "\nUnknown CPU: %s\n",&argv[0][1]);
+            exit(EXIT_FAILURE);
           }
           argv--;
           argc++;
@@ -852,29 +853,29 @@ int main (int argc, char **argv){
           if (strcmp(&argv[0][1], "tape") == 0) {
             ft= fopen(argv[1], "rb");
             if( !ft )
-              printf("\nTape file not found: %s\n", argv[1]),
-              exit(-1);
+              fprintf(stderr, "\nTape file not found: %s\n", argv[1]),
+              exit(EXIT_FAILURE);
             if (0x20000 != fread(tapbuf, 1, 0x20000, ft)) { fclose(ft); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
             memcpy(&wavlen, tapbuf+4, 4);
             wavlen+= 8;
             if( *(int*) tapbuf != 0x46464952 )
-              printf("\nInvalid WAV header\n"),
-              exit(-1);
+              fprintf(stderr, "\nInvalid WAV header\n"),
+              exit(EXIT_FAILURE);
             if( *(int*)(tapbuf+16) != 16 )
-              printf("\nInvalid subchunk size\n"),
-              exit(-1);
+              fprintf(stderr, "\nInvalid subchunk size\n"),
+              exit(EXIT_FAILURE);
             if( *(int*)(tapbuf+20) != 0x10001 )
-              printf("\nInvalid number of channels or compression (only Mono and PCM allowed)\n"),
-              exit(-1);
+              fprintf(stderr, "\nInvalid number of channels or compression (only Mono and PCM allowed)\n"),
+              exit(EXIT_FAILURE);
             if( *(int*)(tapbuf+24) != 44100 )
-              printf("\nInvalid sample rate (only 44100Hz allowed)\n"),
-              exit(-1);
+              fprintf(stderr, "\nInvalid sample rate (only 44100Hz allowed)\n"),
+              exit(EXIT_FAILURE);
             if( *(int*)(tapbuf+32) != 0x80001 )
-              printf("\nInvalid align or bits per sample (only 8-bits samples allowed)\n"),
-              exit(-1);
+              fprintf(stderr, "\nInvalid align or bits per sample (only 8-bits samples allowed)\n"),
+              exit(EXIT_FAILURE);
             if( *(int*)(tapbuf+40)+44 != wavlen )
-              printf("\nInvalid header size\n"),
-              exit(-1);
+              fprintf(stderr, "\nInvalid header size\n"),
+              exit(EXIT_FAILURE);
             wavpos= 44;
           }
           else if (strcmp(&argv[0][1], "trace") == 0) {
@@ -884,8 +885,8 @@ int main (int argc, char **argv){
             argc++;
           }
           else {
-            printf("\nWrong Argument: %s\n", argv[0]);
-            exit(-1);
+            fprintf(stderr, "\nWrong Argument: %s\n", argv[0]);
+            exit(EXIT_FAILURE);
           }
           break;
 		case '-':
@@ -904,22 +905,22 @@ int main (int argc, char **argv){
           }
           break;
         default:
-          printf("\nWrong Argument: %s\n", argv[0]);
-          exit(-1);
+          fprintf(stderr, "\nWrong Argument: %s\n", argv[0]);
+          exit(EXIT_FAILURE);
       }
     else{
       memory_init(memory_model);
 
       fh= fopen(argv[1], "rb");
       if( !fh )
-        printf("\nFile not found: %s\n", argv[1]),
-        exit(-1);
+        fprintf(stderr, "\nFile not found: %s\n", argv[1]),
+        exit(EXIT_FAILURE);
       fseek(fh, 0, SEEK_END);
       size= ftell(fh);
       rewind(fh);
       if( size>65536 && size!=65574 )
-        printf("\nIncorrect length: %d\n", size),
-        exit(-1);
+        fprintf(stderr, "\nIncorrect length: %d\n", size),
+        exit(EXIT_FAILURE);
       else if( strstr(argv[1], "rc2014") != NULL ) {
         *get_memory_addr(0x08) = 0xED;
         *get_memory_addr(0x09) = 0xFE;
@@ -942,8 +943,8 @@ int main (int argc, char **argv){
       } else if( !strcasecmp(strchr(argv[1], '.'), ".sna" ) && size==49179 ){
         FILE *fk= fopen("48.rom", "rb");
         if( !fk )
-          printf("\nZX Spectrum ROM file not found: 48.rom\n"),
-          exit(-1);
+          fprintf(stderr, "\nZX Spectrum ROM file not found: 48.rom\n"),
+          exit(EXIT_FAILURE);
         if (16384 != fread(get_memory_addr(0), 1, 16384, fk)) { fclose(fk); exit_log(1, "Could not read required data from <48.rom>\n"); }
         fclose(fk);
         if (1 != fread(&i,  1, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
@@ -1048,8 +1049,10 @@ int main (int argc, char **argv){
   else
     sttap= tap= tapcycles();
   fclose(fh);
-  if( !size )
-    printf("File not specified or zero length\n");
+  if (!size) {
+    fprintf(stderr, "\nFile not specified or zero length\n");
+    exit(EXIT_FAILURE);
+  }
   stint= intr;
 
 
@@ -4831,8 +4834,8 @@ int main (int argc, char **argv){
   if( output ){
     fh= fopen(output, "wb+");
     if( !fh )
-      printf("\nCannot create or write in file: %s\n", output),
-      exit(-1);
+      fprintf(stderr, "\nCannot create or write in file: %s\n", output),
+      exit(EXIT_FAILURE);
     if( !strcasecmp(strchr(output, '.'), ".sna" ) )
       put_memory(--sp,pc>>8),
       put_memory(--sp,pc),
