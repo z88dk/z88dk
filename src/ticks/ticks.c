@@ -734,6 +734,7 @@ int main (int argc, char **argv){
     printf("  -m8085         Emulate an 8085 (mostly)\n"),
     printf("  -mgbz80        Emulate a gbz80 (mostly)\n"),
     printf("  -mz80          Emulate a z80\n"),
+    printf("  -mz80_strict   Emulate a z80\n"),
     printf("  -mz180         Emulate a z180\n"),
     printf("  -mr2ka         Emulate a Rabbit 2000\n"),
     printf("  -mr3k          Emulate a Rabbit 3000\n"),
@@ -816,6 +817,8 @@ int main (int argc, char **argv){
           break;
         case 'm':
           if ( strcmp(&argv[0][1],"mz80") == 0 ) {
+            c_cpu = CPU_Z80;
+          } else if ( strcmp(&argv[0][1],"mz80_strict") == 0 ) {
             c_cpu = CPU_Z80;
           } else if ( strcmp(&argv[0][1],"m8080") == 0 ) {
             c_cpu = CPU_8080;
