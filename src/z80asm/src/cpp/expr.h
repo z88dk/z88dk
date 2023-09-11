@@ -68,6 +68,7 @@ public:
 		Parens,
 	};
 
+    ExprNode() {}
     virtual ~ExprNode() {}
 	virtual Type type() const = 0;
 	virtual ExprResult value() = 0;

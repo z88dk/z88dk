@@ -7,21 +7,21 @@ use Modern::Perl;
 z80asm_nok("", "", <<END, <<END);
 		global
 END
-$test.asm:1: error: identifier expected
+$test.asm:1: error: syntax error
   ^---- global
 END
 
 	z80asm_nok("", "", <<END, <<END);
 		global aa,
 END
-$test.asm:1: error: identifier expected
+$test.asm:1: error: syntax error
   ^---- global aa,
 END
 
 	z80asm_nok("", "", <<END, <<END);
 		global aa.
 END
-$test.asm:1: error: end of line expected: .
+$test.asm:1: error: syntax error
   ^---- global aa.
 END
 

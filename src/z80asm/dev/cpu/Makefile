@@ -33,11 +33,13 @@ all: parser.yaml
 parser.yaml: parser1.yaml parser2.yaml merge_parsers.pl Makefile
 	perl merge_parsers.pl parser1.yaml parser2.yaml parser.yaml && dos2unix parser.yaml 2> /dev/null
 
-all: parse_main.cpp \
+all: parse_main.h \
+	 parse_main.cpp \
 	 parse_main_tables.h \
 	 parse_main_action.h \
 	 parse_main_action.cpp
 	
+parse_main.h \
 parse_main.cpp \
 parse_main_tables.h \
 parse_main_action.h \

@@ -53,7 +53,4 @@ X(RSquare, "]")
 X(LBrace, "{")
 X(RBrace, "}")
 
-// Parser state
-X(MainParser, "")
-
 #undef X

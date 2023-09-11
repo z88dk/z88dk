@@ -140,6 +140,7 @@ endif
 
 # opcode tables generator
 dev: \
+	src/cpp/parse_main.h \
 	src/cpp/parse_main.cpp \
 	src/cpp/parse_main_tables.h \
 	src/cpp/parse_main_action.h \
@@ -148,6 +149,7 @@ dev: \
 	src/c/cpu_rules_action.c \
 	src/c/cpu_rules_action.h
 
+src/cpp/parse_main.h \
 src/cpp/parse_main.cpp \
 src/cpp/parse_main_tables.h \
 src/cpp/parse_main_action.h \
@@ -158,13 +160,14 @@ src/c/cpu_rules_action.h: \
 			$(wildcard dev/cpu/*.pl dev/cpu/*.y) dev/cpu/Makefile Makefile
 ifeq ($(DEVELOPER),1)
 	$(MAKE) -C dev/cpu
-	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
-	cp dev/cpu/parse_main.cpp src/cpp/parse_main.cpp
-	cp dev/cpu/parse_main_tables.h src/cpp/parse_main_tables.h
-	cp dev/cpu/parse_main_action.h src/cpp/parse_main_action.h
+	cp dev/cpu/cpu_rules.h           src/c/cpu_rules.h
+	cp dev/cpu/parse_main.h          src/cpp/parse_main.h
+	cp dev/cpu/parse_main.cpp        src/cpp/parse_main.cpp
+	cp dev/cpu/parse_main_tables.h   src/cpp/parse_main_tables.h
+	cp dev/cpu/parse_main_action.h   src/cpp/parse_main_action.h
 	cp dev/cpu/parse_main_action.cpp src/cpp/parse_main_action.cpp
-	cp dev/cpu/cpu_rules_action.c src/c/cpu_rules_action.c
-	cp dev/cpu/cpu_rules_action.h src/c/cpu_rules_action.h
+	cp dev/cpu/cpu_rules_action.c    src/c/cpu_rules_action.c
+	cp dev/cpu/cpu_rules_action.h    src/c/cpu_rules_action.h
 endif
 
 # reloc routine

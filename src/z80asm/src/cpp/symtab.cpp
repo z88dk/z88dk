@@ -361,16 +361,6 @@ shared_ptr<Symbol> Symbols::add(shared_ptr<Symbol> new_symbol) {
 		return add_global_symbol(new_symbol);
 }
 
-void Symbols::declare(const string& name, Symbol::Scope scope) {
-	switch (scope) {
-	case Symbol::Scope::Global: declare_global(name); return;
-	case Symbol::Scope::Public: declare_public(name); return;
-	case Symbol::Scope::Extern: declare_extern(name); return;
-	case Symbol::Scope::Local: xassert(0); return;
-	default: xassert(0); return;
-	}
-}
-
 void Symbols::check_undefined_symbols() {
 	m_globals.check_undefined_symbols();
 }

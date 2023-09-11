@@ -200,6 +200,7 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\lstfile.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\ofile.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\parse.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpp\parse_main.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\parse_main_action.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\parse_main_tables.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\preproc.h" />

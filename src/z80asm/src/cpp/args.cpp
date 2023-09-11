@@ -271,9 +271,9 @@ void Args::parse_option(const string& arg) {
 	string opt_arg;
 
     if (arg == "-vv")
-        m_debug_verbose = true;
+        m_debug_verbose = m_verbose = true;
     else {
-#define OPT(opt_name, opt_param, opt_code, opt_help)					\
+#define OPT(opt_name, opt_param, opt_code, opt_help)					    \
 	    if (opt_param == nullptr && string(opt_name) == arg) {				\
 		    opt_code;														\
 		    return;															\

@@ -134,8 +134,10 @@ public:
 	shared_ptr<Symbol> add_global_def(const string& name, int value);	// head, tail
 	shared_ptr<Symbol> add_local_def(const string& name, int value);	// DEFINE
 	shared_ptr<Symbol> add(shared_ptr<Symbol> new_symbol);
-	void declare(const string& name, Symbol::Scope scope);
-	void check_undefined_symbols();
+    void declare_global(const string& name);
+    void declare_public(const string& name);
+    void declare_extern(const string& name);
+    void check_undefined_symbols();
 
     friend ostream& operator<<(ostream& os, const Symbols& symbols);
 
@@ -147,9 +149,6 @@ private:
 	shared_ptr<Symbol> add_local_symbol(shared_ptr<Symbol> new_symbol);
 	shared_ptr<Symbol> add_global_symbol(shared_ptr<Symbol> new_symbol);
 
-	void declare_global(const string& name);
-	void declare_public(const string& name);
-	void declare_extern(const string& name);
 };
 
 extern Symbols g_symbols;

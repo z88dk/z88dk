@@ -9,30 +9,67 @@
 # EQU / DEFC
 #------------------------------------------------------------------------------
 
-. IDENT [equ|=]
-	parse_equ(m_line.peek(start_stmt_index() + 1).svalue());
+. IDENT [equ|=] EXPR $
+	string name = m_line.peek(start_stmt_index() + 1).svalue();
+	do_equ(name, m_exprs.back());
 
-IDENT : [equ|=]
-	parse_equ(m_line.peek(start_stmt_index()).svalue());
+IDENT : [equ|=] EXPR $
+	string name = m_line.peek(start_stmt_index() + 0).svalue();
+	do_equ(name, m_exprs.back());
 
-IDENT [equ|=]
-	parse_equ(m_line.peek(start_stmt_index()).svalue());
+[START_STATE_EQU] IDENT [equ|=] EXPR [$|,]
+	string name = m_line.peek(start_stmt_index() + 0).svalue();
+	do_equ(name, m_exprs.back());
+	
+	// repeat if comma
+	if (m_line.peek(-1).is(TType::Comma)) {
+		m_start_stmt = m_line.pos();
+		parse_main(START_STATE_EQU);
+	}
 
-[defc|dc] 
-	parse_defc();
+[defc|dc] [START_STATE_DEFC] IDENT = EXPR [$|,]
+	string name = m_line.peek(start_stmt_index() + 1).svalue();
+	do_equ(name, m_exprs.back());
+	
+	// repeat if comma
+	if (m_line.peek(-1).is(TType::Comma)) {
+		m_start_stmt = m_line.pos() - 1;
+		parse_main(START_STATE_DEFC);
+	}
 
 #------------------------------------------------------------------------------
 # symbol declaration
 #------------------------------------------------------------------------------
 
-global
-	parse_symbol_declare(Symbol::Scope::Global);
+global [START_STATE_GLOBAL] IDENT [$|,]
+	string name = m_line.peek(start_stmt_index() + 1).svalue();
+	g_symbols.declare_global(name);
 
-[extern|xref|lib]
-	parse_symbol_declare(Symbol::Scope::Extern);
+	// repeat if comma
+	if (m_line.peek(-1).is(TType::Comma)) {
+		m_start_stmt = m_line.pos() - 1;
+		parse_main(START_STATE_GLOBAL);
+	}
 
-[public|xdef|xlib]
-	parse_symbol_declare(Symbol::Scope::Public);
+[extern|xref|lib] [START_STATE_EXTERN] IDENT [$|,]
+	string name = m_line.peek(start_stmt_index() + 1).svalue();
+	g_symbols.declare_extern(name);
+
+	// repeat if comma
+	if (m_line.peek(-1).is(TType::Comma)) {
+		m_start_stmt = m_line.pos() - 1;
+		parse_main(START_STATE_EXTERN);
+	}
+
+[public|xdef|xlib] [START_STATE_PUBLIC] IDENT [$|,]
+	string name = m_line.peek(start_stmt_index() + 1).svalue();
+	g_symbols.declare_public(name);
+
+	// repeat if comma
+	if (m_line.peek(-1).is(TType::Comma)) {
+		m_start_stmt = m_line.pos() - 1;
+		parse_main(START_STATE_PUBLIC);
+	}
 
 #------------------------------------------------------------------------------
 # data definitions

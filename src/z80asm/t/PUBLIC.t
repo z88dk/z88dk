@@ -10,21 +10,21 @@ for my $public (qw( public xdef xlib )) {
 	z80asm_nok("", "", <<END, <<END);
 		$public
 END
-$test.asm:1: error: identifier expected
+$test.asm:1: error: syntax error
   ^---- $public
 END
 
 	z80asm_nok("", "", <<END, <<END);
 		$public aa,
 END
-$test.asm:1: error: identifier expected
+$test.asm:1: error: syntax error
   ^---- $public aa,
 END
 
 	z80asm_nok("", "", <<END, <<END);
 		$public aa.
 END
-$test.asm:1: error: end of line expected: .
+$test.asm:1: error: syntax error
   ^---- $public aa.
 END
 

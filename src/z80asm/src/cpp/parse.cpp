@@ -22,11 +22,12 @@ void Parser::clear() {
 }
 
 void Parser::parse() {
+    m_start_state = START_STATE_MAIN;
 	while (g_preproc.getline(m_line)) {
         if (g_args.debug_verbose())
             cout << g_preproc.location().filename() << ":" << g_preproc.location().line_num()
             << ": " << m_line.text();
-		parse_line();
+		parse_line(m_start_state);
         if (g_args.debug_verbose())
             cout << g_asm << g_symbols;
 	}
@@ -42,19 +43,19 @@ void Parser::error(ErrCode code, const string& arg) {
         m_line.next();
 }
 
-void Parser::parse_line() {
+void Parser::parse_line(int start_state) {
 	m_exprs.clear();
     m_const_exprs.clear();
 	switch (m_state) {
 	case State::Main:
         g_asm.add_asmpc_instr();
-        parse_line_main();
+        parse_line_main(start_state);
         return;
 	default: xassert(0); return;
 	}
 }
 
-void Parser::parse_line_main() {
+void Parser::parse_line_main(int start_state) {
 	int start_errors = g_errors.count();
 
 	while (!m_line.at_end() && start_errors == g_errors.count()) {
@@ -68,7 +69,7 @@ void Parser::parse_line_main() {
             if (parse_label())
                 continue;
             m_start_stmt = m_line.pos();
-			parse_main();
+			parse_main(start_state);
 		}
     }
 }
@@ -103,31 +104,6 @@ bool Parser::parse_label() {
     }
     else
         return false;
-}
-
-void Parser::parse_symbol_declare(Symbol::Scope scope) {
-	while (true) {
-		// get identifier
-		Token& token = m_line.peek();
-		if (token.type() != TType::Ident) {
-			error(ErrCode::IdentExpected);
-			return;
-		}
-
-		g_symbols.declare(token.svalue(), scope);
-
-		// get comma or end
-		m_line.next();
-		token = m_line.peek();
-		switch (token.type()) {
-		case TType::Comma:
-			m_line.next();
-			continue;
-        default:
-            check_eol();
-            return;
-		}
-	}
 }
 
 template <typename TPatch>
@@ -193,59 +169,6 @@ void Parser::parse_int24_data() {
 
 void Parser::parse_int32_data() {
     parse_data<DWordPatch>(m_line);
-}
-
-void Parser::parse_defc() {
-    while (true) {
-        // collect name
-        Token& token = m_line.peek();
-        if (!token.is(TType::Ident)) {
-            error(ErrCode::IdentExpected);
-            break;
-        }
-        string name = m_line.peek().svalue();
-        m_line.next();
-
-        // collect =
-        token = m_line.peek();
-        if (!token.is(TType::Eq)) {
-            error(ErrCode::EqExpected);
-            break;
-        }
-        m_line.next();
-
-        // collect expression
-        auto expr = make_shared<Expr>();
-        if (!expr->parse(m_line)) {
-            break;
-        }
-
-        // create symbol
-        do_equ(name, expr);
-
-        // check for another
-        token = m_line.peek();
-        switch (token.type()) {
-        case TType::Comma:
-            m_line.next();
-            continue;
-        default:
-            check_eol();
-            return;
-        }
-    }
-}
-
-void Parser::parse_equ(const string& name) {
-    // collect expression
-    auto expr = make_shared<Expr>();
-    if (expr->parse(m_line)) {
-
-        // create symbol
-        do_equ(name, expr);
-
-        check_eol();
-    }
 }
 
 void Parser::do_defs_n() {
@@ -465,7 +388,7 @@ void Parser::add_emul_call_flag(unsigned bytes_jump, unsigned bytes_call) {
 
 void Parser::add_call_function(const string& function_name) {
 	// declare function as extern
-	g_symbols.declare(function_name, Symbol::Scope::Extern);
+	g_symbols.declare_extern(function_name);
 
 	// create expression with function name
     auto function_expr = Expr::make_expr(function_name);

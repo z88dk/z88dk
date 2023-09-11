@@ -3,7 +3,6 @@
 #include "asm.h"
 #include "icode.h"
 #include "parse.h"
-#include "xassert.h"
 
 // ACI expr End | ADC A Comma expr End | ADC expr End
 void Parser::parse_main_action_1() {
@@ -22157,9 +22156,15 @@ void Parser::parse_main_action_1716() {
 	error_illegal_ident(); }
 }
 
-// DC | DEFC
+// DC START_STATE_DEFC Ident Eq expr Comma | DC START_STATE_DEFC Ident Eq expr End | DEFC START_STATE_DEFC Ident Eq expr Comma | DEFC START_STATE_DEFC Ident Eq expr End
 void Parser::parse_main_action_1717() {
-	parse_defc();
+	string name = m_line.peek(start_stmt_index() + 1).svalue();
+	do_equ(name, m_exprs.back());
+	// repeat if comma
+	if (m_line.peek(-1).is(TType::Comma)) {
+		m_start_stmt = m_line.pos() - 1;
+		parse_main(START_STATE_DEFC);
+	}
 }
 
 // DCR A End | DEC A End
@@ -23505,9 +23510,15 @@ void Parser::parse_main_action_1850() {
 	error_illegal_ident(); }
 }
 
-// EXTERN | LIB | XREF
+// EXTERN START_STATE_EXTERN Ident Comma | EXTERN START_STATE_EXTERN Ident End | LIB START_STATE_EXTERN Ident Comma | LIB START_STATE_EXTERN Ident End | XREF START_STATE_EXTERN Ident Comma | XREF START_STATE_EXTERN Ident End
 void Parser::parse_main_action_1851() {
-	parse_symbol_declare(Symbol::Scope::Extern);
+	string name = m_line.peek(start_stmt_index() + 1).svalue();
+	g_symbols.declare_extern(name);
+	// repeat if comma
+	if (m_line.peek(-1).is(TType::Comma)) {
+		m_start_stmt = m_line.pos() - 1;
+		parse_main(START_STATE_EXTERN);
+	}
 }
 
 // EXX End
@@ -23610,9 +23621,15 @@ void Parser::parse_main_action_1861() {
 	error_illegal_ident(); }
 }
 
-// GLOBAL
+// GLOBAL START_STATE_GLOBAL Ident Comma | GLOBAL START_STATE_GLOBAL Ident End
 void Parser::parse_main_action_1862() {
-	parse_symbol_declare(Symbol::Scope::Global);
+	string name = m_line.peek(start_stmt_index() + 1).svalue();
+	g_symbols.declare_global(name);
+	// repeat if comma
+	if (m_line.peek(-1).is(TType::Comma)) {
+		m_start_stmt = m_line.pos() - 1;
+		parse_main(START_STATE_GLOBAL);
+	}
 }
 
 // HALT End | HLT End
@@ -71394,9 +71411,15 @@ void Parser::parse_main_action_5992() {
 	error_illegal_ident(); }
 }
 
-// PUBLIC | XDEF | XLIB
+// PUBLIC START_STATE_PUBLIC Ident Comma | PUBLIC START_STATE_PUBLIC Ident End | XDEF START_STATE_PUBLIC Ident Comma | XDEF START_STATE_PUBLIC Ident End | XLIB START_STATE_PUBLIC Ident Comma | XLIB START_STATE_PUBLIC Ident End
 void Parser::parse_main_action_5993() {
-	parse_symbol_declare(Symbol::Scope::Public);
+	string name = m_line.peek(start_stmt_index() + 1).svalue();
+	g_symbols.declare_public(name);
+	// repeat if comma
+	if (m_line.peek(-1).is(TType::Comma)) {
+		m_start_stmt = m_line.pos() - 1;
+		parse_main(START_STATE_PUBLIC);
+	}
 }
 
 // PUSH AF End | PUSH PSW End
@@ -80022,8 +80045,19 @@ void Parser::parse_main_action_6671() {
 	error_illegal_ident(); }
 }
 
-// STMIX End
+// START_STATE_EQU Ident EQU expr Comma | START_STATE_EQU Ident EQU expr End | START_STATE_EQU Ident Eq expr Comma | START_STATE_EQU Ident Eq expr End
 void Parser::parse_main_action_6672() {
+	string name = m_line.peek(start_stmt_index() + 0).svalue();
+	do_equ(name, m_exprs.back());
+	// repeat if comma
+	if (m_line.peek(-1).is(TType::Comma)) {
+		m_start_stmt = m_line.pos();
+		parse_main(START_STATE_EQU);
+	}
+}
+
+// STMIX End
+void Parser::parse_main_action_6673() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: 
 	add_opcode(0xED7D);
@@ -80033,7 +80067,7 @@ void Parser::parse_main_action_6672() {
 }
 
 // STOP End
-void Parser::parse_main_action_6673() {
+void Parser::parse_main_action_6674() {
 	switch (g_args.cpu()) {
 	case CPU_GBZ80: 
 	add_opcode(0x1000);
@@ -80043,7 +80077,7 @@ void Parser::parse_main_action_6673() {
 }
 
 // SUB A Comma A End | SUB A End
-void Parser::parse_main_action_6674() {
+void Parser::parse_main_action_6675() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7F97);
@@ -80056,7 +80090,7 @@ void Parser::parse_main_action_6674() {
 }
 
 // SUB A Comma B End | SUB B End
-void Parser::parse_main_action_6675() {
+void Parser::parse_main_action_6676() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7F90);
@@ -80069,7 +80103,7 @@ void Parser::parse_main_action_6675() {
 }
 
 // SUB A Comma C End | SUB C End
-void Parser::parse_main_action_6676() {
+void Parser::parse_main_action_6677() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7F91);
@@ -80082,7 +80116,7 @@ void Parser::parse_main_action_6676() {
 }
 
 // SUB A Comma D End | SUB D End
-void Parser::parse_main_action_6677() {
+void Parser::parse_main_action_6678() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7F92);
@@ -80095,7 +80129,7 @@ void Parser::parse_main_action_6677() {
 }
 
 // SUB A Comma E End | SUB E End
-void Parser::parse_main_action_6678() {
+void Parser::parse_main_action_6679() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7F93);
@@ -80108,7 +80142,7 @@ void Parser::parse_main_action_6678() {
 }
 
 // SUB A Comma H End | SUB H End
-void Parser::parse_main_action_6679() {
+void Parser::parse_main_action_6680() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7F94);
@@ -80121,7 +80155,7 @@ void Parser::parse_main_action_6679() {
 }
 
 // SUB A Comma IXH End | SUB IXH End
-void Parser::parse_main_action_6680() {
+void Parser::parse_main_action_6681() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xDD94);
@@ -80131,7 +80165,7 @@ void Parser::parse_main_action_6680() {
 }
 
 // SUB A Comma IXL End | SUB IXL End
-void Parser::parse_main_action_6681() {
+void Parser::parse_main_action_6682() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xDD95);
@@ -80141,7 +80175,7 @@ void Parser::parse_main_action_6681() {
 }
 
 // SUB A Comma IYH End | SUB IYH End
-void Parser::parse_main_action_6682() {
+void Parser::parse_main_action_6683() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xFD94);
@@ -80151,7 +80185,7 @@ void Parser::parse_main_action_6682() {
 }
 
 // SUB A Comma IYL End | SUB IYL End
-void Parser::parse_main_action_6683() {
+void Parser::parse_main_action_6684() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xFD95);
@@ -80161,7 +80195,7 @@ void Parser::parse_main_action_6683() {
 }
 
 // SUB A Comma L End | SUB L End
-void Parser::parse_main_action_6684() {
+void Parser::parse_main_action_6685() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7F95);
@@ -80174,7 +80208,7 @@ void Parser::parse_main_action_6684() {
 }
 
 // SUB A Comma LParen AHL RParen End | SUB LParen AHL RParen End
-void Parser::parse_main_action_6685() {
+void Parser::parse_main_action_6686() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x52);
@@ -80185,7 +80219,7 @@ void Parser::parse_main_action_6685() {
 }
 
 // SUB A Comma LParen AIX RParen End | SUB LParen AIX RParen End
-void Parser::parse_main_action_6686() {
+void Parser::parse_main_action_6687() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x52);
@@ -80196,7 +80230,7 @@ void Parser::parse_main_action_6686() {
 }
 
 // SUB A Comma LParen AIX expr RParen End | SUB LParen AIX expr RParen End
-void Parser::parse_main_action_6687() {
+void Parser::parse_main_action_6688() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x52);
@@ -80207,7 +80241,7 @@ void Parser::parse_main_action_6687() {
 }
 
 // SUB A Comma LParen AIY RParen End | SUB LParen AIY RParen End
-void Parser::parse_main_action_6688() {
+void Parser::parse_main_action_6689() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x52);
@@ -80218,7 +80252,7 @@ void Parser::parse_main_action_6688() {
 }
 
 // SUB A Comma LParen AIY expr RParen End | SUB LParen AIY expr RParen End
-void Parser::parse_main_action_6689() {
+void Parser::parse_main_action_6690() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x52);
@@ -80229,7 +80263,7 @@ void Parser::parse_main_action_6689() {
 }
 
 // SUB A Comma LParen HL Minus RParen End | SUB LParen HL Minus RParen End
-void Parser::parse_main_action_6690() {
+void Parser::parse_main_action_6691() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7F96);
@@ -80244,7 +80278,7 @@ void Parser::parse_main_action_6690() {
 }
 
 // SUB A Comma LParen HL Plus RParen End | SUB LParen HL Plus RParen End
-void Parser::parse_main_action_6691() {
+void Parser::parse_main_action_6692() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7F96);
@@ -80259,7 +80293,7 @@ void Parser::parse_main_action_6691() {
 }
 
 // SUB A Comma LParen HL RParen End | SUB M End | SUB LParen HL RParen End
-void Parser::parse_main_action_6692() {
+void Parser::parse_main_action_6693() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7F96);
@@ -80272,7 +80306,7 @@ void Parser::parse_main_action_6692() {
 }
 
 // SUB A Comma LParen IX RParen End | SUB LParen IX RParen End
-void Parser::parse_main_action_6693() {
+void Parser::parse_main_action_6694() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	add_opcode(0xDD9600);
@@ -80282,7 +80316,7 @@ void Parser::parse_main_action_6693() {
 }
 
 // SUB A Comma LParen IX expr RParen End | SUB LParen IX expr RParen End
-void Parser::parse_main_action_6694() {
+void Parser::parse_main_action_6695() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	add_opcode_idx(0xDD96);
@@ -80292,7 +80326,7 @@ void Parser::parse_main_action_6694() {
 }
 
 // SUB A Comma LParen IY RParen End | SUB LParen IY RParen End
-void Parser::parse_main_action_6695() {
+void Parser::parse_main_action_6696() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	add_opcode(0xFD9600);
@@ -80302,7 +80336,7 @@ void Parser::parse_main_action_6695() {
 }
 
 // SUB A Comma LParen IY expr RParen End | SUB LParen IY expr RParen End
-void Parser::parse_main_action_6696() {
+void Parser::parse_main_action_6697() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	add_opcode_idx(0xFD96);
@@ -80312,7 +80346,7 @@ void Parser::parse_main_action_6696() {
 }
 
 // SUB A Comma LParen PHL RParen End | SUB LParen PHL RParen End
-void Parser::parse_main_action_6697() {
+void Parser::parse_main_action_6698() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x5B);
@@ -80323,7 +80357,7 @@ void Parser::parse_main_action_6697() {
 }
 
 // SUB A Comma LParen PIX RParen End | SUB LParen PIX RParen End
-void Parser::parse_main_action_6698() {
+void Parser::parse_main_action_6699() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x5B);
@@ -80334,7 +80368,7 @@ void Parser::parse_main_action_6698() {
 }
 
 // SUB A Comma LParen PIX expr RParen End | SUB LParen PIX expr RParen End
-void Parser::parse_main_action_6699() {
+void Parser::parse_main_action_6700() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x5B);
@@ -80345,7 +80379,7 @@ void Parser::parse_main_action_6699() {
 }
 
 // SUB A Comma LParen PIY RParen End | SUB LParen PIY RParen End
-void Parser::parse_main_action_6700() {
+void Parser::parse_main_action_6701() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x5B);
@@ -80356,7 +80390,7 @@ void Parser::parse_main_action_6700() {
 }
 
 // SUB A Comma LParen PIY expr RParen End | SUB LParen PIY expr RParen End
-void Parser::parse_main_action_6701() {
+void Parser::parse_main_action_6702() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x5B);
@@ -80367,7 +80401,7 @@ void Parser::parse_main_action_6701() {
 }
 
 // SUB A Comma LParen XHL RParen End | SUB LParen XHL RParen End
-void Parser::parse_main_action_6702() {
+void Parser::parse_main_action_6703() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x40);
@@ -80378,7 +80412,7 @@ void Parser::parse_main_action_6702() {
 }
 
 // SUB A Comma LParen XIX RParen End | SUB LParen XIX RParen End
-void Parser::parse_main_action_6703() {
+void Parser::parse_main_action_6704() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x40);
@@ -80389,7 +80423,7 @@ void Parser::parse_main_action_6703() {
 }
 
 // SUB A Comma LParen XIX expr RParen End | SUB LParen XIX expr RParen End
-void Parser::parse_main_action_6704() {
+void Parser::parse_main_action_6705() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x40);
@@ -80400,7 +80434,7 @@ void Parser::parse_main_action_6704() {
 }
 
 // SUB A Comma LParen XIY RParen End | SUB LParen XIY RParen End
-void Parser::parse_main_action_6705() {
+void Parser::parse_main_action_6706() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x40);
@@ -80411,7 +80445,7 @@ void Parser::parse_main_action_6705() {
 }
 
 // SUB A Comma LParen XIY expr RParen End | SUB LParen XIY expr RParen End
-void Parser::parse_main_action_6706() {
+void Parser::parse_main_action_6707() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x40);
@@ -80422,7 +80456,7 @@ void Parser::parse_main_action_6706() {
 }
 
 // SUB A Comma LParen YHL RParen End | SUB LParen YHL RParen End
-void Parser::parse_main_action_6707() {
+void Parser::parse_main_action_6708() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x49);
@@ -80433,7 +80467,7 @@ void Parser::parse_main_action_6707() {
 }
 
 // SUB A Comma LParen YIX RParen End | SUB LParen YIX RParen End
-void Parser::parse_main_action_6708() {
+void Parser::parse_main_action_6709() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x49);
@@ -80444,7 +80478,7 @@ void Parser::parse_main_action_6708() {
 }
 
 // SUB A Comma LParen YIX expr RParen End | SUB LParen YIX expr RParen End
-void Parser::parse_main_action_6709() {
+void Parser::parse_main_action_6710() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x49);
@@ -80455,7 +80489,7 @@ void Parser::parse_main_action_6709() {
 }
 
 // SUB A Comma LParen YIY RParen End | SUB LParen YIY RParen End
-void Parser::parse_main_action_6710() {
+void Parser::parse_main_action_6711() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x49);
@@ -80466,7 +80500,7 @@ void Parser::parse_main_action_6710() {
 }
 
 // SUB A Comma LParen YIY expr RParen End | SUB LParen YIY expr RParen End
-void Parser::parse_main_action_6711() {
+void Parser::parse_main_action_6712() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x49);
@@ -80477,7 +80511,7 @@ void Parser::parse_main_action_6711() {
 }
 
 // SUB A Comma LParen ZHL RParen End | SUB LParen ZHL RParen End
-void Parser::parse_main_action_6712() {
+void Parser::parse_main_action_6713() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x7F);
@@ -80488,7 +80522,7 @@ void Parser::parse_main_action_6712() {
 }
 
 // SUB A Comma LParen ZIX RParen End | SUB LParen ZIX RParen End
-void Parser::parse_main_action_6713() {
+void Parser::parse_main_action_6714() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x7F);
@@ -80499,7 +80533,7 @@ void Parser::parse_main_action_6713() {
 }
 
 // SUB A Comma LParen ZIX expr RParen End | SUB LParen ZIX expr RParen End
-void Parser::parse_main_action_6714() {
+void Parser::parse_main_action_6715() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x7F);
@@ -80510,7 +80544,7 @@ void Parser::parse_main_action_6714() {
 }
 
 // SUB A Comma LParen ZIY RParen End | SUB LParen ZIY RParen End
-void Parser::parse_main_action_6715() {
+void Parser::parse_main_action_6716() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x7F);
@@ -80521,7 +80555,7 @@ void Parser::parse_main_action_6715() {
 }
 
 // SUB A Comma LParen ZIY expr RParen End | SUB LParen ZIY expr RParen End
-void Parser::parse_main_action_6716() {
+void Parser::parse_main_action_6717() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x7F);
@@ -80532,13 +80566,13 @@ void Parser::parse_main_action_6716() {
 }
 
 // SUB A Comma expr End | SUB expr End | SUI expr End
-void Parser::parse_main_action_6717() {
+void Parser::parse_main_action_6718() {
 	warn_if_expr_in_parens();
 	add_opcode_n(0xD6);
 }
 
 // SUB HL Comma DE End
-void Parser::parse_main_action_6718() {
+void Parser::parse_main_action_6719() {
 	switch (g_args.cpu()) {
 	case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	add_call_function("__z80asm__sub_hl_de");
@@ -80551,12 +80585,12 @@ void Parser::parse_main_action_6718() {
 }
 
 // SUB HL Comma HL End
-void Parser::parse_main_action_6719() {
+void Parser::parse_main_action_6720() {
 	add_call_function("__z80asm__sub_hl_hl");
 }
 
 // SUB HL Comma JK End
-void Parser::parse_main_action_6720() {
+void Parser::parse_main_action_6721() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x45);
@@ -80566,12 +80600,12 @@ void Parser::parse_main_action_6720() {
 }
 
 // SUB HL Comma SP End
-void Parser::parse_main_action_6721() {
+void Parser::parse_main_action_6722() {
 	add_call_function("__z80asm__sub_hl_sp");
 }
 
 // SUB JKHL Comma BCDE End
-void Parser::parse_main_action_6722() {
+void Parser::parse_main_action_6723() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0xEDD6);
@@ -80581,7 +80615,7 @@ void Parser::parse_main_action_6722() {
 }
 
 // SUB Dot L A Comma LParen HL Minus RParen End | SUB Dot L LParen HL Minus RParen End | SUB Dot LIS A Comma LParen HL Minus RParen End | SUB Dot LIS LParen HL Minus RParen End
-void Parser::parse_main_action_6723() {
+void Parser::parse_main_action_6724() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -80593,7 +80627,7 @@ void Parser::parse_main_action_6723() {
 }
 
 // SUB Dot L A Comma LParen HL Plus RParen End | SUB Dot L LParen HL Plus RParen End | SUB Dot LIS A Comma LParen HL Plus RParen End | SUB Dot LIS LParen HL Plus RParen End
-void Parser::parse_main_action_6724() {
+void Parser::parse_main_action_6725() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -80605,7 +80639,7 @@ void Parser::parse_main_action_6724() {
 }
 
 // SUB Dot L A Comma LParen HL RParen End | SUB Dot L LParen HL RParen End | SUB Dot LIS A Comma LParen HL RParen End | SUB Dot LIS LParen HL RParen End
-void Parser::parse_main_action_6725() {
+void Parser::parse_main_action_6726() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -80616,7 +80650,7 @@ void Parser::parse_main_action_6725() {
 }
 
 // SUB Dot L A Comma LParen IX RParen End | SUB Dot L LParen IX RParen End | SUB Dot LIS A Comma LParen IX RParen End | SUB Dot LIS LParen IX RParen End
-void Parser::parse_main_action_6726() {
+void Parser::parse_main_action_6727() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -80627,7 +80661,7 @@ void Parser::parse_main_action_6726() {
 }
 
 // SUB Dot L A Comma LParen IX expr RParen End | SUB Dot L LParen IX expr RParen End | SUB Dot LIS A Comma LParen IX expr RParen End | SUB Dot LIS LParen IX expr RParen End
-void Parser::parse_main_action_6727() {
+void Parser::parse_main_action_6728() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -80638,7 +80672,7 @@ void Parser::parse_main_action_6727() {
 }
 
 // SUB Dot L A Comma LParen IY RParen End | SUB Dot L LParen IY RParen End | SUB Dot LIS A Comma LParen IY RParen End | SUB Dot LIS LParen IY RParen End
-void Parser::parse_main_action_6728() {
+void Parser::parse_main_action_6729() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -80649,7 +80683,7 @@ void Parser::parse_main_action_6728() {
 }
 
 // SUB Dot L A Comma LParen IY expr RParen End | SUB Dot L LParen IY expr RParen End | SUB Dot LIS A Comma LParen IY expr RParen End | SUB Dot LIS LParen IY expr RParen End
-void Parser::parse_main_action_6729() {
+void Parser::parse_main_action_6730() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -80660,7 +80694,7 @@ void Parser::parse_main_action_6729() {
 }
 
 // SUB Dot S A Comma LParen HL Minus RParen End | SUB Dot S LParen HL Minus RParen End | SUB Dot SIL A Comma LParen HL Minus RParen End | SUB Dot SIL LParen HL Minus RParen End
-void Parser::parse_main_action_6730() {
+void Parser::parse_main_action_6731() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -80672,7 +80706,7 @@ void Parser::parse_main_action_6730() {
 }
 
 // SUB Dot S A Comma LParen HL Plus RParen End | SUB Dot S LParen HL Plus RParen End | SUB Dot SIL A Comma LParen HL Plus RParen End | SUB Dot SIL LParen HL Plus RParen End
-void Parser::parse_main_action_6731() {
+void Parser::parse_main_action_6732() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -80684,7 +80718,7 @@ void Parser::parse_main_action_6731() {
 }
 
 // SUB Dot S A Comma LParen HL RParen End | SUB Dot S LParen HL RParen End | SUB Dot SIL A Comma LParen HL RParen End | SUB Dot SIL LParen HL RParen End
-void Parser::parse_main_action_6732() {
+void Parser::parse_main_action_6733() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -80695,7 +80729,7 @@ void Parser::parse_main_action_6732() {
 }
 
 // SUB Dot S A Comma LParen IX RParen End | SUB Dot S LParen IX RParen End | SUB Dot SIL A Comma LParen IX RParen End | SUB Dot SIL LParen IX RParen End
-void Parser::parse_main_action_6733() {
+void Parser::parse_main_action_6734() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -80706,7 +80740,7 @@ void Parser::parse_main_action_6733() {
 }
 
 // SUB Dot S A Comma LParen IX expr RParen End | SUB Dot S LParen IX expr RParen End | SUB Dot SIL A Comma LParen IX expr RParen End | SUB Dot SIL LParen IX expr RParen End
-void Parser::parse_main_action_6734() {
+void Parser::parse_main_action_6735() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -80717,7 +80751,7 @@ void Parser::parse_main_action_6734() {
 }
 
 // SUB Dot S A Comma LParen IY RParen End | SUB Dot S LParen IY RParen End | SUB Dot SIL A Comma LParen IY RParen End | SUB Dot SIL LParen IY RParen End
-void Parser::parse_main_action_6735() {
+void Parser::parse_main_action_6736() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -80728,7 +80762,7 @@ void Parser::parse_main_action_6735() {
 }
 
 // SUB Dot S A Comma LParen IY expr RParen End | SUB Dot S LParen IY expr RParen End | SUB Dot SIL A Comma LParen IY expr RParen End | SUB Dot SIL LParen IY expr RParen End
-void Parser::parse_main_action_6736() {
+void Parser::parse_main_action_6737() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -80739,7 +80773,7 @@ void Parser::parse_main_action_6736() {
 }
 
 // SURES End
-void Parser::parse_main_action_6737() {
+void Parser::parse_main_action_6738() {
 	switch (g_args.cpu()) {
 	case CPU_R3K: 
 	add_opcode(0xED7D);
@@ -80749,7 +80783,7 @@ void Parser::parse_main_action_6737() {
 }
 
 // SWAP A End
-void Parser::parse_main_action_6738() {
+void Parser::parse_main_action_6739() {
 	switch (g_args.cpu()) {
 	case CPU_GBZ80: 
 	add_opcode(0xCB37);
@@ -80762,7 +80796,7 @@ void Parser::parse_main_action_6738() {
 }
 
 // SWAP B End
-void Parser::parse_main_action_6739() {
+void Parser::parse_main_action_6740() {
 	switch (g_args.cpu()) {
 	case CPU_GBZ80: 
 	add_opcode(0xCB30);
@@ -80772,7 +80806,7 @@ void Parser::parse_main_action_6739() {
 }
 
 // SWAP C End
-void Parser::parse_main_action_6740() {
+void Parser::parse_main_action_6741() {
 	switch (g_args.cpu()) {
 	case CPU_GBZ80: 
 	add_opcode(0xCB31);
@@ -80782,7 +80816,7 @@ void Parser::parse_main_action_6740() {
 }
 
 // SWAP D End
-void Parser::parse_main_action_6741() {
+void Parser::parse_main_action_6742() {
 	switch (g_args.cpu()) {
 	case CPU_GBZ80: 
 	add_opcode(0xCB32);
@@ -80792,7 +80826,7 @@ void Parser::parse_main_action_6741() {
 }
 
 // SWAP E End
-void Parser::parse_main_action_6742() {
+void Parser::parse_main_action_6743() {
 	switch (g_args.cpu()) {
 	case CPU_GBZ80: 
 	add_opcode(0xCB33);
@@ -80802,7 +80836,7 @@ void Parser::parse_main_action_6742() {
 }
 
 // SWAP H End
-void Parser::parse_main_action_6743() {
+void Parser::parse_main_action_6744() {
 	switch (g_args.cpu()) {
 	case CPU_GBZ80: 
 	add_opcode(0xCB34);
@@ -80812,7 +80846,7 @@ void Parser::parse_main_action_6743() {
 }
 
 // SWAP L End
-void Parser::parse_main_action_6744() {
+void Parser::parse_main_action_6745() {
 	switch (g_args.cpu()) {
 	case CPU_GBZ80: 
 	add_opcode(0xCB35);
@@ -80822,7 +80856,7 @@ void Parser::parse_main_action_6744() {
 }
 
 // SWAP End | SWAPNIB End
-void Parser::parse_main_action_6745() {
+void Parser::parse_main_action_6746() {
 	switch (g_args.cpu()) {
 	case CPU_Z80N: 
 	add_opcode(0xED23);
@@ -80832,7 +80866,7 @@ void Parser::parse_main_action_6745() {
 }
 
 // SWAP LParen HL RParen End
-void Parser::parse_main_action_6746() {
+void Parser::parse_main_action_6747() {
 	switch (g_args.cpu()) {
 	case CPU_GBZ80: 
 	add_opcode(0xCB36);
@@ -80842,7 +80876,7 @@ void Parser::parse_main_action_6746() {
 }
 
 // SYSCALL End
-void Parser::parse_main_action_6747() {
+void Parser::parse_main_action_6748() {
 	switch (g_args.cpu()) {
 	case CPU_R3K: 
 	add_opcode(0xED75);
@@ -80852,7 +80886,7 @@ void Parser::parse_main_action_6747() {
 }
 
 // TEST A Comma A End | TEST A End | TST A Comma A End | TST A End
-void Parser::parse_main_action_6748() {
+void Parser::parse_main_action_6749() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: 
 	add_opcode(0xED3C);
@@ -80862,7 +80896,7 @@ void Parser::parse_main_action_6748() {
 }
 
 // TEST A Comma B End | TEST B End | TST A Comma B End | TST B End
-void Parser::parse_main_action_6749() {
+void Parser::parse_main_action_6750() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: 
 	add_opcode(0xED04);
@@ -80872,7 +80906,7 @@ void Parser::parse_main_action_6749() {
 }
 
 // TEST A Comma C End | TEST C End | TST A Comma C End | TST C End
-void Parser::parse_main_action_6750() {
+void Parser::parse_main_action_6751() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: 
 	add_opcode(0xED0C);
@@ -80882,7 +80916,7 @@ void Parser::parse_main_action_6750() {
 }
 
 // TEST A Comma D End | TEST D End | TST A Comma D End | TST D End
-void Parser::parse_main_action_6751() {
+void Parser::parse_main_action_6752() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: 
 	add_opcode(0xED14);
@@ -80892,7 +80926,7 @@ void Parser::parse_main_action_6751() {
 }
 
 // TEST A Comma E End | TEST E End | TST A Comma E End | TST E End
-void Parser::parse_main_action_6752() {
+void Parser::parse_main_action_6753() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: 
 	add_opcode(0xED1C);
@@ -80902,7 +80936,7 @@ void Parser::parse_main_action_6752() {
 }
 
 // TEST A Comma H End | TEST H End | TST A Comma H End | TST H End
-void Parser::parse_main_action_6753() {
+void Parser::parse_main_action_6754() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: 
 	add_opcode(0xED24);
@@ -80912,7 +80946,7 @@ void Parser::parse_main_action_6753() {
 }
 
 // TEST A Comma L End | TEST L End | TST A Comma L End | TST L End
-void Parser::parse_main_action_6754() {
+void Parser::parse_main_action_6755() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: 
 	add_opcode(0xED2C);
@@ -80922,7 +80956,7 @@ void Parser::parse_main_action_6754() {
 }
 
 // TEST A Comma LParen HL RParen End | TEST LParen HL RParen End | TST A Comma LParen HL RParen End | TST LParen HL RParen End
-void Parser::parse_main_action_6755() {
+void Parser::parse_main_action_6756() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: 
 	add_opcode(0xED34);
@@ -80932,7 +80966,7 @@ void Parser::parse_main_action_6755() {
 }
 
 // TEST A Comma expr End | TEST expr End | TST A Comma expr End | TST expr End
-void Parser::parse_main_action_6756() {
+void Parser::parse_main_action_6757() {
 	switch (g_args.cpu()) {
 	case CPU_Z80N: 
 	warn_if_expr_in_parens();
@@ -80947,7 +80981,7 @@ void Parser::parse_main_action_6756() {
 }
 
 // TEST BC End
-void Parser::parse_main_action_6757() {
+void Parser::parse_main_action_6758() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0xED4C);
@@ -80957,7 +80991,7 @@ void Parser::parse_main_action_6757() {
 }
 
 // TEST BCDE End
-void Parser::parse_main_action_6758() {
+void Parser::parse_main_action_6759() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0xDD5C);
@@ -80967,7 +81001,7 @@ void Parser::parse_main_action_6758() {
 }
 
 // TEST HL End
-void Parser::parse_main_action_6759() {
+void Parser::parse_main_action_6760() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x4C);
@@ -80977,7 +81011,7 @@ void Parser::parse_main_action_6759() {
 }
 
 // TEST IX End
-void Parser::parse_main_action_6760() {
+void Parser::parse_main_action_6761() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0xDD4C);
@@ -80987,7 +81021,7 @@ void Parser::parse_main_action_6760() {
 }
 
 // TEST IY End
-void Parser::parse_main_action_6761() {
+void Parser::parse_main_action_6762() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0xFD4C);
@@ -80997,7 +81031,7 @@ void Parser::parse_main_action_6761() {
 }
 
 // TEST JKHL End
-void Parser::parse_main_action_6762() {
+void Parser::parse_main_action_6763() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0xFD5C);
@@ -81007,7 +81041,7 @@ void Parser::parse_main_action_6762() {
 }
 
 // TEST Dot L A Comma LParen HL RParen End | TEST Dot L LParen HL RParen End | TEST Dot LIS A Comma LParen HL RParen End | TEST Dot LIS LParen HL RParen End | TST Dot L A Comma LParen HL RParen End | TST Dot L LParen HL RParen End | TST Dot LIS A Comma LParen HL RParen End | TST Dot LIS LParen HL RParen End
-void Parser::parse_main_action_6763() {
+void Parser::parse_main_action_6764() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -81018,7 +81052,7 @@ void Parser::parse_main_action_6763() {
 }
 
 // TEST Dot S A Comma LParen HL RParen End | TEST Dot S LParen HL RParen End | TEST Dot SIL A Comma LParen HL RParen End | TEST Dot SIL LParen HL RParen End | TST Dot S A Comma LParen HL RParen End | TST Dot S LParen HL RParen End | TST Dot SIL A Comma LParen HL RParen End | TST Dot SIL LParen HL RParen End
-void Parser::parse_main_action_6764() {
+void Parser::parse_main_action_6765() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -81029,7 +81063,7 @@ void Parser::parse_main_action_6764() {
 }
 
 // TRA End
-void Parser::parse_main_action_6765() {
+void Parser::parse_main_action_6766() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: case CPU_KC160_Z80: 
 	add_opcode(0xED54);
@@ -81039,7 +81073,7 @@ void Parser::parse_main_action_6765() {
 }
 
 // TSTIO expr End
-void Parser::parse_main_action_6766() {
+void Parser::parse_main_action_6767() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: 
 	warn_if_expr_in_parens();
@@ -81050,7 +81084,7 @@ void Parser::parse_main_action_6766() {
 }
 
 // UMA End
-void Parser::parse_main_action_6767() {
+void Parser::parse_main_action_6768() {
 	switch (g_args.cpu()) {
 	case CPU_R3K: 
 	add_opcode(0xEDC0);
@@ -81060,7 +81094,7 @@ void Parser::parse_main_action_6767() {
 }
 
 // UMS End
-void Parser::parse_main_action_6768() {
+void Parser::parse_main_action_6769() {
 	switch (g_args.cpu()) {
 	case CPU_R3K: 
 	add_opcode(0xEDC8);
@@ -81070,7 +81104,7 @@ void Parser::parse_main_action_6768() {
 }
 
 // XOR A Comma A End | XOR A End | XRA A End
-void Parser::parse_main_action_6769() {
+void Parser::parse_main_action_6770() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7FAF);
@@ -81083,7 +81117,7 @@ void Parser::parse_main_action_6769() {
 }
 
 // XOR A Comma B End | XOR B End | XRA B End
-void Parser::parse_main_action_6770() {
+void Parser::parse_main_action_6771() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7FA8);
@@ -81096,7 +81130,7 @@ void Parser::parse_main_action_6770() {
 }
 
 // XOR A Comma C End | XOR C End | XRA C End
-void Parser::parse_main_action_6771() {
+void Parser::parse_main_action_6772() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7FA9);
@@ -81109,7 +81143,7 @@ void Parser::parse_main_action_6771() {
 }
 
 // XOR A Comma D End | XOR D End | XRA D End
-void Parser::parse_main_action_6772() {
+void Parser::parse_main_action_6773() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7FAA);
@@ -81122,7 +81156,7 @@ void Parser::parse_main_action_6772() {
 }
 
 // XOR A Comma E End | XOR E End | XRA E End
-void Parser::parse_main_action_6773() {
+void Parser::parse_main_action_6774() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7FAB);
@@ -81135,7 +81169,7 @@ void Parser::parse_main_action_6773() {
 }
 
 // XOR A Comma H End | XOR H End | XRA H End
-void Parser::parse_main_action_6774() {
+void Parser::parse_main_action_6775() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7FAC);
@@ -81148,7 +81182,7 @@ void Parser::parse_main_action_6774() {
 }
 
 // XOR A Comma IXH End | XOR IXH End
-void Parser::parse_main_action_6775() {
+void Parser::parse_main_action_6776() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xDDAC);
@@ -81158,7 +81192,7 @@ void Parser::parse_main_action_6775() {
 }
 
 // XOR A Comma IXL End | XOR IXL End
-void Parser::parse_main_action_6776() {
+void Parser::parse_main_action_6777() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xDDAD);
@@ -81168,7 +81202,7 @@ void Parser::parse_main_action_6776() {
 }
 
 // XOR A Comma IYH End | XOR IYH End
-void Parser::parse_main_action_6777() {
+void Parser::parse_main_action_6778() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xFDAC);
@@ -81178,7 +81212,7 @@ void Parser::parse_main_action_6777() {
 }
 
 // XOR A Comma IYL End | XOR IYL End
-void Parser::parse_main_action_6778() {
+void Parser::parse_main_action_6779() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xFDAD);
@@ -81188,7 +81222,7 @@ void Parser::parse_main_action_6778() {
 }
 
 // XOR A Comma L End | XOR L End | XRA L End
-void Parser::parse_main_action_6779() {
+void Parser::parse_main_action_6780() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7FAD);
@@ -81201,7 +81235,7 @@ void Parser::parse_main_action_6779() {
 }
 
 // XOR A Comma LParen AHL RParen End | XOR LParen AHL RParen End
-void Parser::parse_main_action_6780() {
+void Parser::parse_main_action_6781() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x52);
@@ -81212,7 +81246,7 @@ void Parser::parse_main_action_6780() {
 }
 
 // XOR A Comma LParen AIX RParen End | XOR LParen AIX RParen End
-void Parser::parse_main_action_6781() {
+void Parser::parse_main_action_6782() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x52);
@@ -81223,7 +81257,7 @@ void Parser::parse_main_action_6781() {
 }
 
 // XOR A Comma LParen AIX expr RParen End | XOR LParen AIX expr RParen End
-void Parser::parse_main_action_6782() {
+void Parser::parse_main_action_6783() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x52);
@@ -81234,7 +81268,7 @@ void Parser::parse_main_action_6782() {
 }
 
 // XOR A Comma LParen AIY RParen End | XOR LParen AIY RParen End
-void Parser::parse_main_action_6783() {
+void Parser::parse_main_action_6784() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x52);
@@ -81245,7 +81279,7 @@ void Parser::parse_main_action_6783() {
 }
 
 // XOR A Comma LParen AIY expr RParen End | XOR LParen AIY expr RParen End
-void Parser::parse_main_action_6784() {
+void Parser::parse_main_action_6785() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x52);
@@ -81256,7 +81290,7 @@ void Parser::parse_main_action_6784() {
 }
 
 // XOR A Comma LParen HL Minus RParen End | XOR LParen HL Minus RParen End
-void Parser::parse_main_action_6785() {
+void Parser::parse_main_action_6786() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7FAE);
@@ -81271,7 +81305,7 @@ void Parser::parse_main_action_6785() {
 }
 
 // XOR A Comma LParen HL Plus RParen End | XOR LParen HL Plus RParen End
-void Parser::parse_main_action_6786() {
+void Parser::parse_main_action_6787() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7FAE);
@@ -81286,7 +81320,7 @@ void Parser::parse_main_action_6786() {
 }
 
 // XOR A Comma LParen HL RParen End | XOR LParen HL RParen End | XRA M End
-void Parser::parse_main_action_6787() {
+void Parser::parse_main_action_6788() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x7FAE);
@@ -81299,7 +81333,7 @@ void Parser::parse_main_action_6787() {
 }
 
 // XOR A Comma LParen IX RParen End | XOR LParen IX RParen End
-void Parser::parse_main_action_6788() {
+void Parser::parse_main_action_6789() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	add_opcode(0xDDAE00);
@@ -81309,7 +81343,7 @@ void Parser::parse_main_action_6788() {
 }
 
 // XOR A Comma LParen IX expr RParen End | XOR LParen IX expr RParen End
-void Parser::parse_main_action_6789() {
+void Parser::parse_main_action_6790() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	add_opcode_idx(0xDDAE);
@@ -81319,7 +81353,7 @@ void Parser::parse_main_action_6789() {
 }
 
 // XOR A Comma LParen IY RParen End | XOR LParen IY RParen End
-void Parser::parse_main_action_6790() {
+void Parser::parse_main_action_6791() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	add_opcode(0xFDAE00);
@@ -81329,7 +81363,7 @@ void Parser::parse_main_action_6790() {
 }
 
 // XOR A Comma LParen IY expr RParen End | XOR LParen IY expr RParen End
-void Parser::parse_main_action_6791() {
+void Parser::parse_main_action_6792() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	add_opcode_idx(0xFDAE);
@@ -81339,7 +81373,7 @@ void Parser::parse_main_action_6791() {
 }
 
 // XOR A Comma LParen PHL RParen End | XOR LParen PHL RParen End
-void Parser::parse_main_action_6792() {
+void Parser::parse_main_action_6793() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x5B);
@@ -81350,7 +81384,7 @@ void Parser::parse_main_action_6792() {
 }
 
 // XOR A Comma LParen PIX RParen End | XOR LParen PIX RParen End
-void Parser::parse_main_action_6793() {
+void Parser::parse_main_action_6794() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x5B);
@@ -81361,7 +81395,7 @@ void Parser::parse_main_action_6793() {
 }
 
 // XOR A Comma LParen PIX expr RParen End | XOR LParen PIX expr RParen End
-void Parser::parse_main_action_6794() {
+void Parser::parse_main_action_6795() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x5B);
@@ -81372,7 +81406,7 @@ void Parser::parse_main_action_6794() {
 }
 
 // XOR A Comma LParen PIY RParen End | XOR LParen PIY RParen End
-void Parser::parse_main_action_6795() {
+void Parser::parse_main_action_6796() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x5B);
@@ -81383,7 +81417,7 @@ void Parser::parse_main_action_6795() {
 }
 
 // XOR A Comma LParen PIY expr RParen End | XOR LParen PIY expr RParen End
-void Parser::parse_main_action_6796() {
+void Parser::parse_main_action_6797() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x5B);
@@ -81394,7 +81428,7 @@ void Parser::parse_main_action_6796() {
 }
 
 // XOR A Comma LParen XHL RParen End | XOR LParen XHL RParen End
-void Parser::parse_main_action_6797() {
+void Parser::parse_main_action_6798() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x40);
@@ -81405,7 +81439,7 @@ void Parser::parse_main_action_6797() {
 }
 
 // XOR A Comma LParen XIX RParen End | XOR LParen XIX RParen End
-void Parser::parse_main_action_6798() {
+void Parser::parse_main_action_6799() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x40);
@@ -81416,7 +81450,7 @@ void Parser::parse_main_action_6798() {
 }
 
 // XOR A Comma LParen XIX expr RParen End | XOR LParen XIX expr RParen End
-void Parser::parse_main_action_6799() {
+void Parser::parse_main_action_6800() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x40);
@@ -81427,7 +81461,7 @@ void Parser::parse_main_action_6799() {
 }
 
 // XOR A Comma LParen XIY RParen End | XOR LParen XIY RParen End
-void Parser::parse_main_action_6800() {
+void Parser::parse_main_action_6801() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x40);
@@ -81438,7 +81472,7 @@ void Parser::parse_main_action_6800() {
 }
 
 // XOR A Comma LParen XIY expr RParen End | XOR LParen XIY expr RParen End
-void Parser::parse_main_action_6801() {
+void Parser::parse_main_action_6802() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x40);
@@ -81449,7 +81483,7 @@ void Parser::parse_main_action_6801() {
 }
 
 // XOR A Comma LParen YHL RParen End | XOR LParen YHL RParen End
-void Parser::parse_main_action_6802() {
+void Parser::parse_main_action_6803() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x49);
@@ -81460,7 +81494,7 @@ void Parser::parse_main_action_6802() {
 }
 
 // XOR A Comma LParen YIX RParen End | XOR LParen YIX RParen End
-void Parser::parse_main_action_6803() {
+void Parser::parse_main_action_6804() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x49);
@@ -81471,7 +81505,7 @@ void Parser::parse_main_action_6803() {
 }
 
 // XOR A Comma LParen YIX expr RParen End | XOR LParen YIX expr RParen End
-void Parser::parse_main_action_6804() {
+void Parser::parse_main_action_6805() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x49);
@@ -81482,7 +81516,7 @@ void Parser::parse_main_action_6804() {
 }
 
 // XOR A Comma LParen YIY RParen End | XOR LParen YIY RParen End
-void Parser::parse_main_action_6805() {
+void Parser::parse_main_action_6806() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x49);
@@ -81493,7 +81527,7 @@ void Parser::parse_main_action_6805() {
 }
 
 // XOR A Comma LParen YIY expr RParen End | XOR LParen YIY expr RParen End
-void Parser::parse_main_action_6806() {
+void Parser::parse_main_action_6807() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x49);
@@ -81504,7 +81538,7 @@ void Parser::parse_main_action_6806() {
 }
 
 // XOR A Comma LParen ZHL RParen End | XOR LParen ZHL RParen End
-void Parser::parse_main_action_6807() {
+void Parser::parse_main_action_6808() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x7F);
@@ -81515,7 +81549,7 @@ void Parser::parse_main_action_6807() {
 }
 
 // XOR A Comma LParen ZIX RParen End | XOR LParen ZIX RParen End
-void Parser::parse_main_action_6808() {
+void Parser::parse_main_action_6809() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x7F);
@@ -81526,7 +81560,7 @@ void Parser::parse_main_action_6808() {
 }
 
 // XOR A Comma LParen ZIX expr RParen End | XOR LParen ZIX expr RParen End
-void Parser::parse_main_action_6809() {
+void Parser::parse_main_action_6810() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x7F);
@@ -81537,7 +81571,7 @@ void Parser::parse_main_action_6809() {
 }
 
 // XOR A Comma LParen ZIY RParen End | XOR LParen ZIY RParen End
-void Parser::parse_main_action_6810() {
+void Parser::parse_main_action_6811() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x7F);
@@ -81548,7 +81582,7 @@ void Parser::parse_main_action_6810() {
 }
 
 // XOR A Comma LParen ZIY expr RParen End | XOR LParen ZIY expr RParen End
-void Parser::parse_main_action_6811() {
+void Parser::parse_main_action_6812() {
 	switch (g_args.cpu()) {
 	case CPU_KC160: 
 	add_opcode(0x7F);
@@ -81559,13 +81593,13 @@ void Parser::parse_main_action_6811() {
 }
 
 // XOR A Comma expr End | XOR expr End | XRI expr End
-void Parser::parse_main_action_6812() {
+void Parser::parse_main_action_6813() {
 	warn_if_expr_in_parens();
 	add_opcode_n(0xEE);
 }
 
 // XOR HL Comma BC End
-void Parser::parse_main_action_6813() {
+void Parser::parse_main_action_6814() {
 	switch (g_args.cpu()) {
 	case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	add_opcode(0xF5);
@@ -81592,7 +81626,7 @@ void Parser::parse_main_action_6813() {
 }
 
 // XOR HL Comma DE End
-void Parser::parse_main_action_6814() {
+void Parser::parse_main_action_6815() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0x54);
@@ -81612,7 +81646,7 @@ void Parser::parse_main_action_6814() {
 }
 
 // XOR IX Comma BC End
-void Parser::parse_main_action_6815() {
+void Parser::parse_main_action_6816() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xF5);
@@ -81629,7 +81663,7 @@ void Parser::parse_main_action_6815() {
 }
 
 // XOR IX Comma DE End
-void Parser::parse_main_action_6816() {
+void Parser::parse_main_action_6817() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xF5);
@@ -81646,7 +81680,7 @@ void Parser::parse_main_action_6816() {
 }
 
 // XOR IY Comma BC End
-void Parser::parse_main_action_6817() {
+void Parser::parse_main_action_6818() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xF5);
@@ -81663,7 +81697,7 @@ void Parser::parse_main_action_6817() {
 }
 
 // XOR IY Comma DE End
-void Parser::parse_main_action_6818() {
+void Parser::parse_main_action_6819() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80: case CPU_Z80N: 
 	add_opcode(0xF5);
@@ -81680,7 +81714,7 @@ void Parser::parse_main_action_6818() {
 }
 
 // XOR JKHL Comma BCDE End
-void Parser::parse_main_action_6819() {
+void Parser::parse_main_action_6820() {
 	switch (g_args.cpu()) {
 	case CPU_R4K: case CPU_R5K: 
 	add_opcode(0xEDEE);
@@ -81690,7 +81724,7 @@ void Parser::parse_main_action_6819() {
 }
 
 // XOR Dot L A Comma LParen HL Minus RParen End | XOR Dot L LParen HL Minus RParen End | XOR Dot LIS A Comma LParen HL Minus RParen End | XOR Dot LIS LParen HL Minus RParen End
-void Parser::parse_main_action_6820() {
+void Parser::parse_main_action_6821() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -81702,7 +81736,7 @@ void Parser::parse_main_action_6820() {
 }
 
 // XOR Dot L A Comma LParen HL Plus RParen End | XOR Dot L LParen HL Plus RParen End | XOR Dot LIS A Comma LParen HL Plus RParen End | XOR Dot LIS LParen HL Plus RParen End
-void Parser::parse_main_action_6821() {
+void Parser::parse_main_action_6822() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -81714,7 +81748,7 @@ void Parser::parse_main_action_6821() {
 }
 
 // XOR Dot L A Comma LParen HL RParen End | XOR Dot L LParen HL RParen End | XOR Dot LIS A Comma LParen HL RParen End | XOR Dot LIS LParen HL RParen End
-void Parser::parse_main_action_6822() {
+void Parser::parse_main_action_6823() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -81725,7 +81759,7 @@ void Parser::parse_main_action_6822() {
 }
 
 // XOR Dot L A Comma LParen IX RParen End | XOR Dot L LParen IX RParen End | XOR Dot LIS A Comma LParen IX RParen End | XOR Dot LIS LParen IX RParen End
-void Parser::parse_main_action_6823() {
+void Parser::parse_main_action_6824() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -81736,7 +81770,7 @@ void Parser::parse_main_action_6823() {
 }
 
 // XOR Dot L A Comma LParen IX expr RParen End | XOR Dot L LParen IX expr RParen End | XOR Dot LIS A Comma LParen IX expr RParen End | XOR Dot LIS LParen IX expr RParen End
-void Parser::parse_main_action_6824() {
+void Parser::parse_main_action_6825() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -81747,7 +81781,7 @@ void Parser::parse_main_action_6824() {
 }
 
 // XOR Dot L A Comma LParen IY RParen End | XOR Dot L LParen IY RParen End | XOR Dot LIS A Comma LParen IY RParen End | XOR Dot LIS LParen IY RParen End
-void Parser::parse_main_action_6825() {
+void Parser::parse_main_action_6826() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -81758,7 +81792,7 @@ void Parser::parse_main_action_6825() {
 }
 
 // XOR Dot L A Comma LParen IY expr RParen End | XOR Dot L LParen IY expr RParen End | XOR Dot LIS A Comma LParen IY expr RParen End | XOR Dot LIS LParen IY expr RParen End
-void Parser::parse_main_action_6826() {
+void Parser::parse_main_action_6827() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80_Z80: 
 	add_opcode(0x49);
@@ -81769,7 +81803,7 @@ void Parser::parse_main_action_6826() {
 }
 
 // XOR Dot S A Comma LParen HL Minus RParen End | XOR Dot S LParen HL Minus RParen End | XOR Dot SIL A Comma LParen HL Minus RParen End | XOR Dot SIL LParen HL Minus RParen End
-void Parser::parse_main_action_6827() {
+void Parser::parse_main_action_6828() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -81781,7 +81815,7 @@ void Parser::parse_main_action_6827() {
 }
 
 // XOR Dot S A Comma LParen HL Plus RParen End | XOR Dot S LParen HL Plus RParen End | XOR Dot SIL A Comma LParen HL Plus RParen End | XOR Dot SIL LParen HL Plus RParen End
-void Parser::parse_main_action_6828() {
+void Parser::parse_main_action_6829() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -81793,7 +81827,7 @@ void Parser::parse_main_action_6828() {
 }
 
 // XOR Dot S A Comma LParen HL RParen End | XOR Dot S LParen HL RParen End | XOR Dot SIL A Comma LParen HL RParen End | XOR Dot SIL LParen HL RParen End
-void Parser::parse_main_action_6829() {
+void Parser::parse_main_action_6830() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -81804,7 +81838,7 @@ void Parser::parse_main_action_6829() {
 }
 
 // XOR Dot S A Comma LParen IX RParen End | XOR Dot S LParen IX RParen End | XOR Dot SIL A Comma LParen IX RParen End | XOR Dot SIL LParen IX RParen End
-void Parser::parse_main_action_6830() {
+void Parser::parse_main_action_6831() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -81815,7 +81849,7 @@ void Parser::parse_main_action_6830() {
 }
 
 // XOR Dot S A Comma LParen IX expr RParen End | XOR Dot S LParen IX expr RParen End | XOR Dot SIL A Comma LParen IX expr RParen End | XOR Dot SIL LParen IX expr RParen End
-void Parser::parse_main_action_6831() {
+void Parser::parse_main_action_6832() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -81826,7 +81860,7 @@ void Parser::parse_main_action_6831() {
 }
 
 // XOR Dot S A Comma LParen IY RParen End | XOR Dot S LParen IY RParen End | XOR Dot SIL A Comma LParen IY RParen End | XOR Dot SIL LParen IY RParen End
-void Parser::parse_main_action_6832() {
+void Parser::parse_main_action_6833() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -81837,7 +81871,7 @@ void Parser::parse_main_action_6832() {
 }
 
 // XOR Dot S A Comma LParen IY expr RParen End | XOR Dot S LParen IY expr RParen End | XOR Dot SIL A Comma LParen IY expr RParen End | XOR Dot SIL LParen IY expr RParen End
-void Parser::parse_main_action_6833() {
+void Parser::parse_main_action_6834() {
 	switch (g_args.cpu()) {
 	case CPU_EZ80: 
 	add_opcode(0x52);
@@ -81847,13 +81881,15 @@ void Parser::parse_main_action_6833() {
 	error_illegal_ident(); }
 }
 
-// Dot Ident EQU | Dot Ident Eq
-void Parser::parse_main_action_6834() {
-	parse_equ(m_line.peek(start_stmt_index() + 1).svalue());
+// Dot Ident EQU expr End | Dot Ident Eq expr End
+void Parser::parse_main_action_6835() {
+	string name = m_line.peek(start_stmt_index() + 1).svalue();
+	do_equ(name, m_exprs.back());
 }
 
-// Ident EQU | Ident Colon EQU | Ident Colon Eq | Ident Eq
-void Parser::parse_main_action_6835() {
-	parse_equ(m_line.peek(start_stmt_index()).svalue());
+// Ident Colon EQU expr End | Ident Colon Eq expr End
+void Parser::parse_main_action_6836() {
+	string name = m_line.peek(start_stmt_index() + 0).svalue();
+	do_equ(name, m_exprs.back());
 }
 
