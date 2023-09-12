@@ -15220,11 +15220,6 @@ default: error_illegal_ident(); }
 
 | label? _TK_CALL _TK_C _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x3003);
-DO_stmt_nn(0xCD);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xDC);
@@ -15233,10 +15228,168 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xDC);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x30, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_CALL _TK_DOT _TK_IL _TK_C _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x52);
+DO_stmt_nnn(0xDC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xDC);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_IL _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x52);
+DO_stmt_nnn(0xCC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xCC);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_IL _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x52);
+DO_stmt_nnn(0xD4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_IL _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x52);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x5B);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_IL _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-5", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x52);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-5", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x5B);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_IL _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -15277,6 +15430,21 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x5B);
 DO_stmt_nnn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_IL _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x52);
+DO_stmt_nnn(0xC4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xC4);
 break;
 default: error_illegal_ident(); }
 }
@@ -15416,6 +15584,149 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_CALL _TK_DOT _TK_IS _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xCC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x49);
+DO_stmt_nn(0xCC);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_IS _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xD4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x49);
+DO_stmt_nn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_IS _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x40);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x49);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_IS _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-5", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x40);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-5", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x49);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_IS _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xDC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x49);
+DO_stmt_nn(0xDC);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_CALL _TK_DOT _TK_IS _TK_M _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
@@ -15442,6 +15753,21 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x49);
 DO_stmt_nn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_IS _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xC4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x49);
+DO_stmt_nn(0xC4);
 break;
 default: error_illegal_ident(); }
 }
@@ -15576,6 +15902,90 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_CALL _TK_DOT _TK_LIL _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xCC);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_LIL _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_LIL _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x5B);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_LIL _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-5", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x5B);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_LIL _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xDC);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_CALL _TK_DOT _TK_LIL _TK_M _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: 
@@ -15592,6 +16002,16 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x5B);
 DO_stmt_nnn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_LIL _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xC4);
 break;
 default: error_illegal_ident(); }
 }
@@ -15686,6 +16106,90 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_CALL _TK_DOT _TK_LIS _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x49);
+DO_stmt_nn(0xCC);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_LIS _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x49);
+DO_stmt_nn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_LIS _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x49);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_LIS _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-5", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x49);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_LIS _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x49);
+DO_stmt_nn(0xDC);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_CALL _TK_DOT _TK_LIS _TK_M _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: 
@@ -15702,6 +16206,16 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x49);
 DO_stmt_nn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_LIS _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x49);
+DO_stmt_nn(0xC4);
 break;
 default: error_illegal_ident(); }
 }
@@ -15796,6 +16310,90 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_CALL _TK_DOT _TK_SIL _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x52);
+DO_stmt_nnn(0xCC);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_SIL _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x52);
+DO_stmt_nnn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_SIL _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x52);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_SIL _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-5", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x52);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_SIL _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x52);
+DO_stmt_nnn(0xDC);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_CALL _TK_DOT _TK_SIL _TK_M _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
@@ -15812,6 +16410,16 @@ case CPU_EZ80_Z80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x52);
 DO_stmt_nnn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_SIL _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x52);
+DO_stmt_nnn(0xC4);
 break;
 default: error_illegal_ident(); }
 }
@@ -15906,6 +16514,90 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_CALL _TK_DOT _TK_SIS _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xCC);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_SIS _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_SIS _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x40);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_SIS _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-5", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x40);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_SIS _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xDC);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_CALL _TK_DOT _TK_SIS _TK_M _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
@@ -15922,6 +16614,16 @@ case CPU_EZ80_Z80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x40);
 DO_stmt_nn(0xD4);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_DOT _TK_SIS _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xC4);
 break;
 default: error_illegal_ident(); }
 }
@@ -16006,66 +16708,36 @@ break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_CALL _TK_LO _TK_COMMA expr _TK_NEWLINE @{
+| label? _TK_CALL _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xE2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_CALL _TK_LZ _TK_COMMA expr _TK_NEWLINE @{
-switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xEA, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_CALL _TK_M _TK_COMMA expr _TK_NEWLINE @{
-switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xF2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
-case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFC);
+DO_stmt_nn(0xCC);
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xFC);
+DO_stmt_nnn(0xCC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x20, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_CALL _TK_NC _TK_COMMA expr _TK_NEWLINE @{
+| label? _TK_CALL _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x3803);
-DO_stmt_nn(0xCD);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xD4);
@@ -16074,39 +16746,286 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xD4);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x38, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_CALL _TK_NV _TK_COMMA expr _TK_NEWLINE @{
+| label? _TK_CALL _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
+case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
+{
 DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xEA, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
-case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE4);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE4);
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_nn(0xDA, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_CALL _TK_NZ _TK_COMMA expr _TK_NEWLINE @{
+| label? _TK_CALL _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-3", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-3", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_nn(0xD2, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-4", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_LO _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x2803);
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xE2, end_label_expr1);
+utstring_free(end_label1);
 DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xDC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x30, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_LZ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xEA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_M _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xFC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xFC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xF2, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_NC _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xD4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xD4);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x38, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xC4);
@@ -16115,67 +17034,26 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xC4);
 break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_CALL _TK_P _TK_COMMA expr _TK_NEWLINE @{
-switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
+{
 DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xFA, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
-case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xF4);
-break;
-case CPU_EZ80: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xF4);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_CALL _TK_PE _TK_COMMA expr _TK_NEWLINE @{
+| label? _TK_CALL _TK_NV _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xE2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
-case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEC);
-break;
-case CPU_EZ80: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEC);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_CALL _TK_PO _TK_COMMA expr _TK_NEWLINE @{
-switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xEA, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xE4);
@@ -16184,21 +17062,82 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xE4);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xEA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_CALL _TK_V _TK_COMMA expr _TK_NEWLINE @{
+| label? _TK_CALL _TK_NZ _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xC4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xC4);
+break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
+{
 DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xE2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_P _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xF4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xF4);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xFA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_PE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEC);
@@ -16207,16 +17146,82 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xEC);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xE2, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_PO _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xE4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xE4);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xEA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CALL _TK_V _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xEC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xEC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xE2, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_CALL _TK_Z _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x2003);
-DO_stmt_nn(0xCD);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xCC);
@@ -16224,6 +17229,21 @@ break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xCC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x20, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16243,11 +17263,6 @@ default: error_illegal_ident(); }
 
 | label? _TK_CC expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x3003);
-DO_stmt_nn(0xCD);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xDC);
@@ -16255,6 +17270,21 @@ break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xDC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x30, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16272,17 +17302,242 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_CEQ expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xCC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xCC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x20, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CGEU expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xD4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xD4);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x38, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CGTU expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_nn(0xDA, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CLEU expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-3", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-3", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_nn(0xD2, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-4", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_CLO expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
+{
 DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xE2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xE2, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CLTU expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xDC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x30, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16291,29 +17546,24 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
+{
 DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xEA, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xEA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_CM expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xF2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xFC);
@@ -16321,6 +17571,21 @@ break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xFC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xF2, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -17081,11 +18346,6 @@ DO_stmt_n(0xFE);
 
 | label? _TK_CNC expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x3803);
-DO_stmt_nn(0xCD);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xD4);
@@ -17094,21 +18354,54 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xD4);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x38, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CNE expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xC4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xC4);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_CNV expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xEA, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xE4);
@@ -17117,16 +18410,26 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xE4);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xEA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_CNZ expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x2803);
-DO_stmt_nn(0xCD);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xC4);
@@ -17134,6 +18437,21 @@ break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xC4);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -17978,16 +19296,6 @@ default: error_illegal_ident(); }
 
 | label? _TK_CPE expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xE2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEC);
@@ -17995,6 +19303,21 @@ break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xEC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xE2, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -18119,16 +19442,6 @@ DO_stmt(0x2F);
 
 | label? _TK_CPO expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xEA, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xE4);
@@ -18137,21 +19450,26 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xE4);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xEA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_CV expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xE2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEC);
@@ -18160,16 +19478,26 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xEC);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xE2, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_CZ expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x2003);
-DO_stmt_nn(0xCD);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xCC);
@@ -18178,16 +19506,26 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xCC);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x20, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_C_C expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x3003);
-DO_stmt_nn(0xCD);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xDC);
@@ -18196,69 +19534,54 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xDC);
 break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_C_LO expr _TK_NEWLINE @{
-switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
+{
 DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xE2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x30, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_C_LZ expr _TK_NEWLINE @{
+| label? _TK_C_EQ expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xEA, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_C_M expr _TK_NEWLINE @{
-switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xF2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
-case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFC);
+DO_stmt_nn(0xCC);
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xFC);
+DO_stmt_nnn(0xCC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x20, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_C_NC expr _TK_NEWLINE @{
+| label? _TK_C_GEU expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x3803);
-DO_stmt_nn(0xCD);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xD4);
@@ -18267,39 +19590,286 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xD4);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x38, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_C_NV expr _TK_NEWLINE @{
+| label? _TK_C_GTU expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
+case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
+{
 DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xEA, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
-case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE4);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE4);
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_nn(0xDA, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_C_NZ expr _TK_NEWLINE @{
+| label? _TK_C_LEU expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-3", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-3", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_nn(0xD2, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-4", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x30, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_C_LO expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x2803);
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xE2, end_label_expr1);
+utstring_free(end_label1);
 DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_C_LTU expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xDC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x30, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_C_LZ expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xEA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_C_M expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xFC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xFC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xF2, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_C_NC expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xD4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xD4);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x38, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_C_NE expr _TK_NEWLINE @{
+switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xC4);
@@ -18308,67 +19878,26 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xC4);
 break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_C_P expr _TK_NEWLINE @{
-switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
+{
 DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xFA, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
-case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xF4);
-break;
-case CPU_EZ80: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xF4);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_C_PE expr _TK_NEWLINE @{
+| label? _TK_C_NV expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xE2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
-case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEC);
-break;
-case CPU_EZ80: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEC);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_C_PO expr _TK_NEWLINE @{
-switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
-const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xEA, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xE4);
@@ -18377,21 +19906,82 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xE4);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xEA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_C_V expr _TK_NEWLINE @{
+| label? _TK_C_NZ expr _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xC4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xC4);
+break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
+{
 DO_STMT_LABEL();
-Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr1 *end_label_expr = parse_expr(end_label);
-add_opcode_nn(0xE2, end_label_expr);
-add_opcode_nn(0xCD, target_expr);
-asm_LABEL_offset(end_label, 6);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_C_P expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xF4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xF4);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xFA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_C_PE expr _TK_NEWLINE @{
+switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEC);
@@ -18400,16 +19990,82 @@ case CPU_EZ80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xEC);
 break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xE2, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_C_PO expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xE4);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xE4);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xEA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_C_V expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xEC);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xEC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xE2, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_C_Z expr _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt(0x2003);
-DO_stmt_nn(0xCD);
-break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xCC);
@@ -18417,6 +20073,21 @@ break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xCC);
+break;
+case CPU_R2KA: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x20, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -37124,6 +38795,32 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xDA);
 }
 
+| label? _TK_JEQ expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xCA);
+}
+
+| label? _TK_JGEU expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xD2);
+}
+
+| label? _TK_JGTU expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xD2);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+}
+
 | label? _TK_JK expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_8085: 
@@ -37133,6 +38830,27 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_JLEU expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+UT_string* expr_text1;
+utstring_new(expr_text1);
+utstring_printf(expr_text1, "%s", expr->text->data);
+Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
+add_opcode_nn(0xCA, expr1);
+utstring_free(expr_text1);
+UT_string* expr_text2;
+utstring_new(expr_text2);
+utstring_printf(expr_text2, "%s", expr->text->data);
+Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
+add_opcode_nn(0xDA, expr2);
+utstring_free(expr_text2);
+OBJ_DELETE(expr);
+}
+}
+
 | label? _TK_JLO expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
@@ -37140,6 +38858,11 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEA);
 break;
 default: error_illegal_ident(); }
+}
+
+| label? _TK_JLTU expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDA);
 }
 
 | label? _TK_JLZ expr _TK_NEWLINE @{
@@ -37210,6 +38933,85 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_JMP _TK_DOT _TK_LIL _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xCA);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_DOT _TK_LIL _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_DOT _TK_LIL _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+DO_stmt(0x5B);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nnn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt(0x5B);
+DO_stmt_nnn(0xD2);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_DOT _TK_LIL _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+UT_string* expr_text1;
+utstring_new(expr_text1);
+utstring_printf(expr_text1, "%s", expr->text->data);
+Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
+add_opcode_nnn(0xCA, expr1);
+utstring_free(expr_text1);
+DO_stmt(0x5B);
+UT_string* expr_text2;
+utstring_new(expr_text2);
+utstring_printf(expr_text2, "%s", expr->text->data);
+Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
+add_opcode_nnn(0xDA, expr2);
+utstring_free(expr_text2);
+OBJ_DELETE(expr);
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_DOT _TK_LIL _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xDA);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_JMP _TK_DOT _TK_LIL _TK_M _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
@@ -37226,6 +39028,16 @@ case CPU_EZ80: case CPU_EZ80_Z80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x5B);
 DO_stmt_nnn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_DOT _TK_LIL _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xC2);
 break;
 default: error_illegal_ident(); }
 }
@@ -37401,6 +39213,85 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_JMP _TK_DOT _TK_SIS _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xCA);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_DOT _TK_SIS _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_DOT _TK_SIS _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+DO_stmt(0x40);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt(0x40);
+DO_stmt_nn(0xD2);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_DOT _TK_SIS _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+UT_string* expr_text1;
+utstring_new(expr_text1);
+utstring_printf(expr_text1, "%s", expr->text->data);
+Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
+add_opcode_nn(0xCA, expr1);
+utstring_free(expr_text1);
+DO_stmt(0x40);
+UT_string* expr_text2;
+utstring_new(expr_text2);
+utstring_printf(expr_text2, "%s", expr->text->data);
+Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
+add_opcode_nn(0xDA, expr2);
+utstring_free(expr_text2);
+OBJ_DELETE(expr);
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_DOT _TK_SIS _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xDA);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_JMP _TK_DOT _TK_SIS _TK_M _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
@@ -37417,6 +39308,16 @@ case CPU_EZ80: case CPU_EZ80_Z80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x40);
 DO_stmt_nn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_DOT _TK_SIS _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xC2);
 break;
 default: error_illegal_ident(); }
 }
@@ -37501,6 +39402,67 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_JMP _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xCA);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xCA);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xD2);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xD2);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nnn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nnn(0xD2);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_JMP _TK_IND_BC _TK_RPAREN _TK_NEWLINE @{
 DO_stmt(0xC5);
 DO_stmt(0xC9);
@@ -37548,11 +39510,69 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_JMP _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+UT_string* expr_text1;
+utstring_new(expr_text1);
+utstring_printf(expr_text1, "%s", expr->text->data);
+Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
+add_opcode_nn(0xCA, expr1);
+utstring_free(expr_text1);
+UT_string* expr_text2;
+utstring_new(expr_text2);
+utstring_printf(expr_text2, "%s", expr->text->data);
+Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
+add_opcode_nn(0xDA, expr2);
+utstring_free(expr_text2);
+OBJ_DELETE(expr);
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+UT_string* expr_text1;
+utstring_new(expr_text1);
+utstring_printf(expr_text1, "%s", expr->text->data);
+Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
+add_opcode_nnn(0xCA, expr1);
+utstring_free(expr_text1);
+UT_string* expr_text2;
+utstring_new(expr_text2);
+utstring_printf(expr_text2, "%s", expr->text->data);
+Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
+add_opcode_nnn(0xDA, expr2);
+utstring_free(expr_text2);
+OBJ_DELETE(expr);
+}
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_JMP _TK_LO _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEA);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDA);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xDA);
 break;
 default: error_illegal_ident(); }
 }
@@ -37588,6 +39608,19 @@ break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JMP _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xC2);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xC2);
 break;
 default: error_illegal_ident(); }
 }
@@ -37728,6 +39761,11 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xD2);
 }
 
+| label? _TK_JNE expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xC2);
+}
+
 | label? _TK_JNK expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_8085: 
@@ -37810,6 +39848,85 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_JP _TK_DOT _TK_LIL _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xCA);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_DOT _TK_LIL _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_DOT _TK_LIL _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+DO_stmt(0x5B);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nnn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt(0x5B);
+DO_stmt_nnn(0xD2);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_DOT _TK_LIL _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+UT_string* expr_text1;
+utstring_new(expr_text1);
+utstring_printf(expr_text1, "%s", expr->text->data);
+Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
+add_opcode_nnn(0xCA, expr1);
+utstring_free(expr_text1);
+DO_stmt(0x5B);
+UT_string* expr_text2;
+utstring_new(expr_text2);
+utstring_printf(expr_text2, "%s", expr->text->data);
+Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
+add_opcode_nnn(0xDA, expr2);
+utstring_free(expr_text2);
+OBJ_DELETE(expr);
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_DOT _TK_LIL _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xDA);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_JP _TK_DOT _TK_LIL _TK_M _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
@@ -37826,6 +39943,16 @@ case CPU_EZ80: case CPU_EZ80_Z80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x5B);
 DO_stmt_nnn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_DOT _TK_LIL _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x5B);
+DO_stmt_nnn(0xC2);
 break;
 default: error_illegal_ident(); }
 }
@@ -38001,6 +40128,85 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_JP _TK_DOT _TK_SIS _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xCA);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_DOT _TK_SIS _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_DOT _TK_SIS _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+DO_stmt(0x40);
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt(0x40);
+DO_stmt_nn(0xD2);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_DOT _TK_SIS _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+UT_string* expr_text1;
+utstring_new(expr_text1);
+utstring_printf(expr_text1, "%s", expr->text->data);
+Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
+add_opcode_nn(0xCA, expr1);
+utstring_free(expr_text1);
+DO_stmt(0x40);
+UT_string* expr_text2;
+utstring_new(expr_text2);
+utstring_printf(expr_text2, "%s", expr->text->data);
+Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
+add_opcode_nn(0xDA, expr2);
+utstring_free(expr_text2);
+OBJ_DELETE(expr);
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_DOT _TK_SIS _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xDA);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_JP _TK_DOT _TK_SIS _TK_M _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
@@ -38017,6 +40223,16 @@ case CPU_EZ80: case CPU_EZ80_Z80:
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x40);
 DO_stmt_nn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_DOT _TK_SIS _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x40);
+DO_stmt_nn(0xC2);
 break;
 default: error_illegal_ident(); }
 }
@@ -38101,6 +40317,67 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_JP _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xCA);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xCA);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xD2);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xD2);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nnn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nnn(0xD2);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_JP _TK_IND_BC _TK_RPAREN _TK_NEWLINE @{
 DO_stmt(0xC5);
 DO_stmt(0xC9);
@@ -38148,11 +40425,69 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_JP _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+UT_string* expr_text1;
+utstring_new(expr_text1);
+utstring_printf(expr_text1, "%s", expr->text->data);
+Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
+add_opcode_nn(0xCA, expr1);
+utstring_free(expr_text1);
+UT_string* expr_text2;
+utstring_new(expr_text2);
+utstring_printf(expr_text2, "%s", expr->text->data);
+Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
+add_opcode_nn(0xDA, expr2);
+utstring_free(expr_text2);
+OBJ_DELETE(expr);
+}
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+UT_string* expr_text1;
+utstring_new(expr_text1);
+utstring_printf(expr_text1, "%s", expr->text->data);
+Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
+add_opcode_nnn(0xCA, expr1);
+utstring_free(expr_text1);
+UT_string* expr_text2;
+utstring_new(expr_text2);
+utstring_printf(expr_text2, "%s", expr->text->data);
+Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
+add_opcode_nnn(0xDA, expr2);
+utstring_free(expr_text2);
+OBJ_DELETE(expr);
+}
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_JP _TK_LO _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEA);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDA);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xDA);
 break;
 default: error_illegal_ident(); }
 }
@@ -38188,6 +40523,19 @@ break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nnn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xC2);
+break;
+case CPU_EZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nnn(0xC2);
 break;
 default: error_illegal_ident(); }
 }
@@ -38354,6 +40702,109 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_JR _TK_EQ _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_jr(0x28);
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xCA);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JR _TK_GEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_jr(0x30);
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JR _TK_GTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_jr(0x30);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xD2);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JR _TK_LEU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_jr_jr(0x28, 0x38);
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+UT_string* expr_text1;
+utstring_new(expr_text1);
+utstring_printf(expr_text1, "%s", expr->text->data);
+Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
+add_opcode_nn(0xCA, expr1);
+utstring_free(expr_text1);
+UT_string* expr_text2;
+utstring_new(expr_text2);
+utstring_printf(expr_text2, "%s", expr->text->data);
+Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
+add_opcode_nn(0xDA, expr2);
+utstring_free(expr_text2);
+OBJ_DELETE(expr);
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JR _TK_LTU _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_jr(0x38);
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDA);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_JR _TK_NC _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
@@ -38363,6 +40814,19 @@ break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xD2);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_JR _TK_NE _TK_COMMA expr _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_jr(0x20);
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xC2);
 break;
 default: error_illegal_ident(); }
 }
@@ -38434,6 +40898,53 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xDA);
 }
 
+| label? _TK_J_EQ expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xCA);
+}
+
+| label? _TK_J_GEU expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xD2);
+}
+
+| label? _TK_J_GTU expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+DO_stmt_nn(0xD2);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+}
+
+| label? _TK_J_LEU expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+UT_string* expr_text1;
+utstring_new(expr_text1);
+utstring_printf(expr_text1, "%s", expr->text->data);
+Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
+add_opcode_nn(0xCA, expr1);
+utstring_free(expr_text1);
+UT_string* expr_text2;
+utstring_new(expr_text2);
+utstring_printf(expr_text2, "%s", expr->text->data);
+Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
+add_opcode_nn(0xDA, expr2);
+utstring_free(expr_text2);
+OBJ_DELETE(expr);
+}
+}
+
 | label? _TK_J_LO expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
@@ -38441,6 +40952,11 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEA);
 break;
 default: error_illegal_ident(); }
+}
+
+| label? _TK_J_LTU expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDA);
 }
 
 | label? _TK_J_LZ expr _TK_NEWLINE @{
@@ -38464,6 +40980,11 @@ default: error_illegal_ident(); }
 | label? _TK_J_NC expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xD2);
+}
+
+| label? _TK_J_NE expr _TK_NEWLINE @{
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xC2);
 }
 
 | label? _TK_J_NV expr _TK_NEWLINE @{
@@ -40239,12 +42760,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_BC _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xDD4E, 0xDD46);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xDD07);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xDD4E, 0xDD46);
 break;
 default: error_illegal_ident(); }
 }
@@ -40263,12 +42783,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_BC _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xFD4E, 0xFD46);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xFD07);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xFD4E, 0xFD46);
 break;
 default: error_illegal_ident(); }
 }
@@ -41888,12 +44407,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_DE _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xDD5E, 0xDD56);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xDD17);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xDD5E, 0xDD56);
 break;
 default: error_illegal_ident(); }
 }
@@ -41912,12 +44430,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_DE _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xFD5E, 0xFD56);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xFD17);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xFD5E, 0xFD56);
 break;
 default: error_illegal_ident(); }
 }
@@ -51772,15 +54289,14 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_HL _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xDD6E, 0xDD66);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xDD27);
 break;
 case CPU_R2KA: case CPU_R3K: 
 DO_stmt_idx(0xE4);
+break;
+case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xDD6E, 0xDD66);
 break;
 default: error_illegal_ident(); }
 }
@@ -51802,15 +54318,14 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_HL _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xFD6E, 0xFD66);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xFD27);
 break;
 case CPU_R2KA: case CPU_R3K: 
 DO_stmt_idx(0xFDE4);
+break;
+case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xFD6E, 0xFD66);
 break;
 default: error_illegal_ident(); }
 }
@@ -52889,12 +55404,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_BC _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xDD71, 0xDD70);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xDD0F);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xDD71, 0xDD70);
 break;
 default: error_illegal_ident(); }
 }
@@ -52917,12 +55431,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_DE _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xDD73, 0xDD72);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xDD1F);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xDD73, 0xDD72);
 break;
 default: error_illegal_ident(); }
 }
@@ -52945,15 +55458,14 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xDD75, 0xDD74);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xDD2F);
 break;
 case CPU_R2KA: case CPU_R3K: 
 DO_stmt_idx(0xF4);
+break;
+case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xDD75, 0xDD74);
 break;
 default: error_illegal_ident(); }
 }
@@ -52961,7 +55473,6 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_IX _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
 DO_stmt(0xDDE5);
 DO_stmt(0xE3);
 DO_stmt_idx_idx1(0xDD75, 0xDD74);
@@ -52969,7 +55480,6 @@ DO_stmt(0xE3);
 DO_stmt(0xDDE1);
 break;
 case CPU_R2KA: case CPU_R3K: 
-DO_STMT_LABEL();
 DO_stmt(0xDDE5);
 DO_stmt(0xED54);
 DO_stmt_idx_idx1(0xDD75, 0xDD74);
@@ -52985,7 +55495,6 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_IY _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
 DO_stmt(0xFDE5);
 DO_stmt(0xE3);
 DO_stmt_idx_idx1(0xDD75, 0xDD74);
@@ -52993,7 +55502,6 @@ DO_stmt(0xE3);
 DO_stmt(0xFDE1);
 break;
 case CPU_R2KA: case CPU_R3K: 
-DO_STMT_LABEL();
 DO_stmt(0xFDE5);
 DO_stmt(0xED54);
 DO_stmt_idx_idx1(0xDD75, 0xDD74);
@@ -53193,12 +55701,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_BC _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xFD71, 0xFD70);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xFD0F);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xFD71, 0xFD70);
 break;
 default: error_illegal_ident(); }
 }
@@ -53221,12 +55728,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_DE _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xFD73, 0xFD72);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xFD1F);
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xFD73, 0xFD72);
 break;
 default: error_illegal_ident(); }
 }
@@ -53249,15 +55755,14 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
 switch (option_cpu()) {
-case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
-DO_stmt_idx_idx1(0xFD75, 0xFD74);
-break;
 case CPU_EZ80: case CPU_EZ80_Z80: 
 DO_stmt_idx(0xFD2F);
 break;
 case CPU_R2KA: case CPU_R3K: 
 DO_stmt_idx(0xFDF4);
+break;
+case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt_idx_idx1(0xFD75, 0xFD74);
 break;
 default: error_illegal_ident(); }
 }
@@ -53265,7 +55770,6 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_IX _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
 DO_stmt(0xDDE5);
 DO_stmt(0xE3);
 DO_stmt_idx_idx1(0xFD75, 0xFD74);
@@ -53273,7 +55777,6 @@ DO_stmt(0xE3);
 DO_stmt(0xDDE1);
 break;
 case CPU_R2KA: case CPU_R3K: 
-DO_STMT_LABEL();
 DO_stmt(0xDDE5);
 DO_stmt(0xED54);
 DO_stmt_idx_idx1(0xFD75, 0xFD74);
@@ -53289,7 +55792,6 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_IY _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
 DO_stmt(0xFDE5);
 DO_stmt(0xE3);
 DO_stmt_idx_idx1(0xFD75, 0xFD74);
@@ -53297,7 +55799,6 @@ DO_stmt(0xE3);
 DO_stmt(0xFDE1);
 break;
 case CPU_R2KA: case CPU_R3K: 
-DO_STMT_LABEL();
 DO_stmt(0xFDE5);
 DO_stmt(0xED54);
 DO_stmt_idx_idx1(0xFD75, 0xFD74);
@@ -53470,7 +55971,6 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_IX _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
 DO_stmt(0xDDE5);
 DO_stmt(0xE3);
 DO_stmt_idx_idx1(0xDD6E, 0xDD66);
@@ -53478,7 +55978,6 @@ DO_stmt(0xE3);
 DO_stmt(0xDDE1);
 break;
 case CPU_R2KA: case CPU_R3K: 
-DO_STMT_LABEL();
 DO_stmt(0xDDE5);
 DO_stmt(0xED54);
 DO_stmt_idx_idx1(0xDD6E, 0xDD66);
@@ -53518,7 +56017,6 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_IX _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
 DO_stmt(0xDDE5);
 DO_stmt(0xE3);
 DO_stmt_idx_idx1(0xFD6E, 0xFD66);
@@ -53526,7 +56024,6 @@ DO_stmt(0xE3);
 DO_stmt(0xDDE1);
 break;
 case CPU_R2KA: case CPU_R3K: 
-DO_STMT_LABEL();
 DO_stmt(0xDDE5);
 DO_stmt(0xED54);
 DO_stmt_idx_idx1(0xFD6E, 0xFD66);
@@ -53800,7 +56297,6 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_IY _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
 DO_stmt(0xFDE5);
 DO_stmt(0xE3);
 DO_stmt_idx_idx1(0xDD6E, 0xDD66);
@@ -53808,7 +56304,6 @@ DO_stmt(0xE3);
 DO_stmt(0xFDE1);
 break;
 case CPU_R2KA: case CPU_R3K: 
-DO_STMT_LABEL();
 DO_stmt(0xFDE5);
 DO_stmt(0xED54);
 DO_stmt_idx_idx1(0xDD6E, 0xDD66);
@@ -53848,7 +56343,6 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_IY _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-DO_STMT_LABEL();
 DO_stmt(0xFDE5);
 DO_stmt(0xE3);
 DO_stmt_idx_idx1(0xFD6E, 0xFD66);
@@ -53856,7 +56350,6 @@ DO_stmt(0xE3);
 DO_stmt(0xFDE1);
 break;
 case CPU_R2KA: case CPU_R3K: 
-DO_STMT_LABEL();
 DO_stmt(0xFDE5);
 DO_stmt(0xED54);
 DO_stmt_idx_idx1(0xFD6E, 0xFD66);
@@ -59126,7 +61619,6 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
 if (expr_error) { error_expected_const_expr(); } else {
 if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);
 DO_stmt(0xED9250 + expr_value);}
@@ -59138,7 +61630,6 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
 if (expr_error) { error_expected_const_expr(); } else {
 if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);
 DO_stmt_n(0xED9150 + expr_value);}
@@ -62455,6 +64946,10 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_REQ _TK_NEWLINE @{
+DO_stmt(0xC8);
+}
+
 | label? _TK_RES _TK_DOT _TK_L const_expr _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
@@ -63437,6 +65932,109 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_RET _TK_DOT _TK_L _TK_EQ _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+DO_stmt(0x49);
+DO_stmt(0xC8);
+break;
+case CPU_EZ80: 
+DO_stmt(0x5B);
+DO_stmt(0xC8);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_L _TK_GEU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+DO_stmt(0x49);
+DO_stmt(0xD0);
+break;
+case CPU_EZ80: 
+DO_stmt(0x5B);
+DO_stmt(0xD0);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_L _TK_GTU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x49);
+DO_stmt(0xC9);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_EZ80: 
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x5B);
+DO_stmt(0xC9);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_L _TK_LEU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+DO_stmt(0x49);
+DO_stmt(0xC8);
+DO_stmt(0x49);
+DO_stmt(0xD8);
+break;
+case CPU_EZ80: 
+DO_stmt(0x5B);
+DO_stmt(0xC8);
+DO_stmt(0x5B);
+DO_stmt(0xD8);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_L _TK_LTU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+DO_stmt(0x49);
+DO_stmt(0xD8);
+break;
+case CPU_EZ80: 
+DO_stmt(0x5B);
+DO_stmt(0xD8);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_RET _TK_DOT _TK_L _TK_M _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
@@ -63459,6 +66057,19 @@ break;
 case CPU_EZ80: 
 DO_stmt(0x5B);
 DO_stmt(0xD0);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_L _TK_NE _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+DO_stmt(0x49);
+DO_stmt(0xC0);
+break;
+case CPU_EZ80: 
+DO_stmt(0x5B);
+DO_stmt(0xC0);
 break;
 default: error_illegal_ident(); }
 }
@@ -63576,6 +66187,70 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_RET _TK_DOT _TK_LIL _TK_EQ _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+DO_stmt(0x5B);
+DO_stmt(0xC8);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_LIL _TK_GEU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+DO_stmt(0x5B);
+DO_stmt(0xD0);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_LIL _TK_GTU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x5B);
+DO_stmt(0xC9);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_LIL _TK_LEU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+DO_stmt(0x5B);
+DO_stmt(0xC8);
+DO_stmt(0x5B);
+DO_stmt(0xD8);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_LIL _TK_LTU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+DO_stmt(0x5B);
+DO_stmt(0xD8);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_RET _TK_DOT _TK_LIL _TK_M _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: 
@@ -63590,6 +66265,15 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 DO_stmt(0x5B);
 DO_stmt(0xD0);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_LIL _TK_NE _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: 
+DO_stmt(0x5B);
+DO_stmt(0xC0);
 break;
 default: error_illegal_ident(); }
 }
@@ -63675,6 +66359,70 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_RET _TK_DOT _TK_LIS _TK_EQ _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+DO_stmt(0x49);
+DO_stmt(0xC8);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_LIS _TK_GEU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+DO_stmt(0x49);
+DO_stmt(0xD0);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_LIS _TK_GTU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0x49);
+DO_stmt(0xC9);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_LIS _TK_LEU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+DO_stmt(0x49);
+DO_stmt(0xC8);
+DO_stmt(0x49);
+DO_stmt(0xD8);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_LIS _TK_LTU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+DO_stmt(0x49);
+DO_stmt(0xD8);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_RET _TK_DOT _TK_LIS _TK_M _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
@@ -63689,6 +66437,15 @@ switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 DO_stmt(0x49);
 DO_stmt(0xD0);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_DOT _TK_LIS _TK_NE _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80_Z80: 
+DO_stmt(0x49);
+DO_stmt(0xC0);
 break;
 default: error_illegal_ident(); }
 }
@@ -63765,12 +66522,74 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_RET _TK_EQ _TK_NEWLINE @{
+DO_stmt(0xC8);
+}
+
+| label? _TK_RET _TK_GEU _TK_NEWLINE @{
+DO_stmt(0xD0);
+}
+
+| label? _TK_RET _TK_GTU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0xC9);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_nn(0xDA, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0xC9);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_LEU _TK_NEWLINE @{
+DO_stmt(0xC8);
+DO_stmt(0xD8);
+}
+
 | label? _TK_RET _TK_LO _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 DO_stmt(0xE8);
 break;
 default: error_illegal_ident(); }
+}
+
+| label? _TK_RET _TK_LTU _TK_NEWLINE @{
+DO_stmt(0xD8);
 }
 
 | label? _TK_RET _TK_LZ _TK_NEWLINE @{
@@ -63791,6 +66610,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_RET _TK_NC _TK_NEWLINE @{
 DO_stmt(0xD0);
+}
+
+| label? _TK_RET _TK_NE _TK_NEWLINE @{
+DO_stmt(0xC0);
 }
 
 | label? _TK_RET _TK_NEWLINE @{
@@ -63922,6 +66745,55 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 DO_stmt(0xED45);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_RGEU _TK_NEWLINE @{
+DO_stmt(0xD0);
+}
+
+| label? _TK_RGTU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0xC9);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_nn(0xDA, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0xC9);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -65175,12 +68047,21 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_RLEU _TK_NEWLINE @{
+DO_stmt(0xC8);
+DO_stmt(0xD8);
+}
+
 | label? _TK_RLO _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 DO_stmt(0xE8);
 break;
 default: error_illegal_ident(); }
+}
+
+| label? _TK_RLTU _TK_NEWLINE @{
+DO_stmt(0xD8);
 }
 
 | label? _TK_RLZ _TK_NEWLINE @{
@@ -65201,6 +68082,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_RNC _TK_NEWLINE @{
 DO_stmt(0xD0);
+}
+
+| label? _TK_RNE _TK_NEWLINE @{
+DO_stmt(0xC0);
 }
 
 | label? _TK_RNV _TK_NEWLINE @{
@@ -66514,7 +69399,6 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
 DO_stmt(0x49);
 DO_STMT_LABEL();
 if (expr_error) { error_expected_const_expr(); }else { add_rst_opcode(expr_value); }
@@ -66526,7 +69410,6 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
 DO_stmt(0x49);
 DO_STMT_LABEL();
 if (expr_error) { error_expected_const_expr(); }else { add_rst_opcode(expr_value); }
@@ -66538,7 +69421,6 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
 DO_stmt(0x52);
 DO_STMT_LABEL();
 if (expr_error) { error_expected_const_expr(); }else { add_rst_opcode(expr_value); }
@@ -66550,7 +69432,6 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_STMT_LABEL();
 DO_stmt(0x52);
 DO_STMT_LABEL();
 if (expr_error) { error_expected_const_expr(); }else { add_rst_opcode(expr_value); }
@@ -66602,12 +69483,74 @@ DO_stmt(0xC8);
 DO_stmt(0xD8);
 }
 
+| label? _TK_R_EQ _TK_NEWLINE @{
+DO_stmt(0xC8);
+}
+
+| label? _TK_R_GEU _TK_NEWLINE @{
+DO_stmt(0xD0);
+}
+
+| label? _TK_R_GTU _TK_NEWLINE @{
+switch (option_cpu()) {
+case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_jr(0x28, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_jr(0x38, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0xC9);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+UT_string* end_label1;
+utstring_new(end_label1);
+utstring_printf(end_label1, "%s-0", end_label);
+Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
+add_opcode_nn(0xCA, end_label_expr1);
+utstring_free(end_label1);
+UT_string* end_label2;
+utstring_new(end_label2);
+utstring_printf(end_label2, "%s-0", end_label);
+Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
+add_opcode_nn(0xDA, end_label_expr2);
+utstring_free(end_label2);
+DO_stmt(0xC9);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_R_LEU _TK_NEWLINE @{
+DO_stmt(0xC8);
+DO_stmt(0xD8);
+}
+
 | label? _TK_R_LO _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 DO_stmt(0xE8);
 break;
 default: error_illegal_ident(); }
+}
+
+| label? _TK_R_LTU _TK_NEWLINE @{
+DO_stmt(0xD8);
 }
 
 | label? _TK_R_LZ _TK_NEWLINE @{
@@ -66628,6 +69571,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_R_NC _TK_NEWLINE @{
 DO_stmt(0xD0);
+}
+
+| label? _TK_R_NE _TK_NEWLINE @{
+DO_stmt(0xC0);
 }
 
 | label? _TK_R_NV _TK_NEWLINE @{

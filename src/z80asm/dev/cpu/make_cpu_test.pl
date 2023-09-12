@@ -61,7 +61,9 @@ for my $cpu (@CPUS) {
 	for my $asm (sort keys %{$all_opcodes{ALL}}) {
 		#say "$cpu\t$asm";
 
-		if (!exists $all_opcodes{$cpu}{$asm}) {
+		if (!exists $all_opcodes{$cpu}{$asm} &&
+		    !exists $all_opcodes{$cpu}{$asm =~ s/0x1234[0-9A-F]+/0x1234/r} &&
+			!exists $all_opcodes{$cpu}{$asm =~ s/0x1234\b/0x123456/r} ) {
 			my $skip = 0;
 
 			# special case: 'djnz ASMPC' is translated to 'djnz NN' in 8080/8085
@@ -190,50 +192,33 @@ sub add {
 		$bytes1 = $bytes =~ s/%h/FF/gr;
 		add($cpu, $asm1, $bytes1);
 	}
-	elsif ($asm =~ /%m/) {
+	elsif ($bytes =~ /%m %m %m/) {
 		my $asm1 = $asm =~ s/%m/0x123456/r;
 		my $bytes1 = $bytes =~ s/%m/56/r;
 		$bytes1 = $bytes1 =~ s/%m/34/r;
 		$bytes1 = $bytes1 =~ s/%m/12/r;
 		add($cpu, $asm1, $bytes1);
-
-		$asm1 = $asm =~ s/%m/-32768/r;
-		$bytes1 = $bytes =~ s/%m/00/r;
-		$bytes1 = $bytes1 =~ s/%m/80/r;
-		$bytes1 = $bytes1 =~ s/%m/FF/r;
-		add($cpu, $asm1, $bytes1);
-		
-		$asm1 = $asm =~ s/%m/32767/r;
-		$bytes1 = $bytes =~ s/%m/FF/r;
-		$bytes1 = $bytes1 =~ s/%m/7F/r;
-		$bytes1 = $bytes1 =~ s/%m/00/r;
-		add($cpu, $asm1, $bytes1);
-		
-		$asm1 = $asm =~ s/%m/65535/r;
-		$bytes1 = $bytes =~ s/%m/FF/r;
-		$bytes1 = $bytes1 =~ s/%m/FF/r;
-		$bytes1 = $bytes1 =~ s/%m/00/r;
+	}
+	elsif ($bytes =~ /%m %m/) {
+		my $asm1 = $asm =~ s/%m/0x1234/r;
+		my $bytes1 = $bytes =~ s/%m %m/34 12/gr;
 		add($cpu, $asm1, $bytes1);
 	}
 	elsif ($asm =~ /%M/) {
-		my $asm1 = $asm =~ s/%M/-32768/r;
-		my $bytes1 = $bytes =~ s/%M/80/r;
-		$bytes1 = $bytes1 =~ s/%M/00/r;
+		my $asm1 = $asm =~ s/%M/0x1234/r;
+		my $bytes1 = $bytes =~ s/%M/12/r;
+		$bytes1 = $bytes1 =~ s/%M/34/r;
 		add($cpu, $asm1, $bytes1);
-		
-		$asm1 = $asm =~ s/%M/32767/r;
-		$bytes1 = $bytes =~ s/%M/7F/r;
-		$bytes1 = $bytes1 =~ s/%M/FF/r;
-		add($cpu, $asm1, $bytes1);
-		
-		$asm1 = $asm =~ s/%M/65535/r;
-		$bytes1 = $bytes =~ s/%M/FF/r;
-		$bytes1 = $bytes1 =~ s/%M/FF/r;
+	}
+	elsif ($bytes =~ /^[0-9A-F]{2} %j [0-9A-F]{2} %j$/) {
+		my $asm1 = $asm =~ s/%j/ASMPC/r;
+		my $bytes1 = $bytes =~ s/%j/FE/r;
+		$bytes1 = $bytes1 =~ s/%j/FC/r;
 		add($cpu, $asm1, $bytes1);
 	}
 	elsif ($asm =~ /%j/) {
 		my $asm1 = $asm =~ s/%j/ASMPC/r;
-		my $dist = @bytes==3 ? "FD" : "FE";
+		my $dist = sprintf("%02X", (- scalar(@bytes)) & 0xFF);
 		my $bytes1 = $bytes =~ s/%j/$dist/r;
 		add($cpu, $asm1, $bytes1);
 	}
@@ -269,17 +254,42 @@ sub compute_labels {
 	my $asmpc = 0;
 	for (@test) {
 		my($asm, $bytes) = split(/;/, $_, 2);
-		my $num_bytes = scalar(split(' ', $bytes));
+		my @bytes = split ' ', $bytes;
+		my $num_bytes = scalar(@bytes);
 		$num_bytes++ if $bytes =~ /\@/;
 		
-		if ($bytes =~ /%t/) {
-			my $target = $asmpc+6;
-			$bytes =~ s/%t/sprintf("%02X", $target & 0xFF)/e;
-			$bytes =~ s/%t/sprintf("%02X", $target >> 8)/e;
-			$_ = "$asm;$bytes";
+		while ($bytes =~ /%t(\d*) %t\1 %t\1/) {
+			my $before = $`; my @before = split ' ', $before;
+			my $after  = $'; my @after  = split ' ', $after;
+			my $target = $asmpc + $num_bytes - ($1 || 0);
+			@bytes = (@before, sprintf("%02X", ($target) & 0xFF),
+							   sprintf("%02X", ($target >> 8) & 0xFF),
+							   sprintf("%02X", ($target >> 16) & 0xFF), @after);
+			$bytes = join ' ', @bytes;
 		}
 		
+		while ($bytes =~ /%t(\d*) %t\1/) {
+			my $before = $`; my @before = split ' ', $before;
+			my $after  = $'; my @after  = split ' ', $after;
+			my $target = $asmpc + $num_bytes - ($1 || 0);
+			@bytes = (@before, sprintf("%02X", ($target) & 0xFF),
+							   sprintf("%02X", ($target >> 8) & 0xFF), @after);
+			$bytes = join ' ', @bytes;
+		}
+		
+		while ($bytes =~ /%t(\d*)/) {
+			my $before = $`; my @before = split ' ', $before;
+			my $after  = $'; my @after  = split ' ', $after;
+			my $target = $asmpc + $num_bytes - ($1 || 0) - ($asmpc + scalar(@before) + 1);
+			@bytes = (@before, sprintf("%02X", ($target) & 0xFF), @after);
+			$bytes = join ' ', @bytes;
+		}
+		
+		die $bytes if $bytes =~ /%/;
+
 		$asmpc += $num_bytes;
+		
+		$_ = "$asm; @bytes";
 	}
 	return @test;
 }

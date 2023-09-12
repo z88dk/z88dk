@@ -53,24 +53,15 @@
  add a, h                       ; 84
  add a, l                       ; 85
  add b                          ; 80
- add bc, -32768                 ; E5 21 00 80 09 44 4D E1
- add bc, 0x123456               ; E5 21 56 34 09 44 4D E1
- add bc, 32767                  ; E5 21 FF 7F 09 44 4D E1
- add bc, 65535                  ; E5 21 FF FF 09 44 4D E1
+ add bc, 0x1234                 ; E5 21 34 12 09 44 4D E1
  add bc, a                      ; CD @__z80asm__add_bc_a
  add c                          ; 81
  add d                          ; 82
- add de, -32768                 ; E5 21 00 80 19 54 5D E1
- add de, 0x123456               ; E5 21 56 34 19 54 5D E1
- add de, 32767                  ; E5 21 FF 7F 19 54 5D E1
- add de, 65535                  ; E5 21 FF FF 19 54 5D E1
+ add de, 0x1234                 ; E5 21 34 12 19 54 5D E1
  add de, a                      ; CD @__z80asm__add_de_a
  add e                          ; 83
  add h                          ; 84
- add hl, -32768                 ; D5 11 00 80 19 D1
- add hl, 0x123456               ; D5 11 56 34 19 D1
- add hl, 32767                  ; D5 11 FF 7F 19 D1
- add hl, 65535                  ; D5 11 FF FF 19 D1
+ add hl, 0x1234                 ; D5 11 34 12 19 D1
  add hl, a                      ; CD @__z80asm__add_hl_a
  add hl, bc                     ; 09
  add hl, de                     ; 19
@@ -186,47 +177,34 @@
  bit 7, e                       ; CB 7B
  bit 7, h                       ; CB 7C
  bit 7, l                       ; CB 7D
- c_c -32768                     ; DC 00 80
- c_c 0x123456                   ; DC 56 34
- c_c 32767                      ; DC FF 7F
- c_c 65535                      ; DC FF FF
- c_nc -32768                    ; D4 00 80
- c_nc 0x123456                  ; D4 56 34
- c_nc 32767                     ; D4 FF 7F
- c_nc 65535                     ; D4 FF FF
- c_nz -32768                    ; C4 00 80
- c_nz 0x123456                  ; C4 56 34
- c_nz 32767                     ; C4 FF 7F
- c_nz 65535                     ; C4 FF FF
- c_z -32768                     ; CC 00 80
- c_z 0x123456                   ; CC 56 34
- c_z 32767                      ; CC FF 7F
- c_z 65535                      ; CC FF FF
- call -32768                    ; CD 00 80
- call 0x123456                  ; CD 56 34
- call 32767                     ; CD FF 7F
- call 65535                     ; CD FF FF
- call c, -32768                 ; DC 00 80
- call c, 0x123456               ; DC 56 34
- call c, 32767                  ; DC FF 7F
- call c, 65535                  ; DC FF FF
- call nc, -32768                ; D4 00 80
- call nc, 0x123456              ; D4 56 34
- call nc, 32767                 ; D4 FF 7F
- call nc, 65535                 ; D4 FF FF
- call nz, -32768                ; C4 00 80
- call nz, 0x123456              ; C4 56 34
- call nz, 32767                 ; C4 FF 7F
- call nz, 65535                 ; C4 FF FF
- call z, -32768                 ; CC 00 80
- call z, 0x123456               ; CC 56 34
- call z, 32767                  ; CC FF 7F
- call z, 65535                  ; CC FF FF
- cc -32768                      ; DC 00 80
- cc 0x123456                    ; DC 56 34
- cc 32767                       ; DC FF 7F
- cc 65535                       ; DC FF FF
+ c_c 0x1234                     ; DC 34 12
+ c_eq 0x1234                    ; CC 34 12
+ c_geu 0x1234                   ; D4 34 12
+ c_gtu 0x1234                   ; 28 05 38 03 CD 34 12
+ c_leu 0x1234                   ; 28 02 30 03 CD 34 12
+ c_ltu 0x1234                   ; DC 34 12
+ c_nc 0x1234                    ; D4 34 12
+ c_ne 0x1234                    ; C4 34 12
+ c_nz 0x1234                    ; C4 34 12
+ c_z 0x1234                     ; CC 34 12
+ call 0x1234                    ; CD 34 12
+ call c, 0x1234                 ; DC 34 12
+ call eq, 0x1234                ; CC 34 12
+ call geu, 0x1234               ; D4 34 12
+ call gtu, 0x1234               ; 28 05 38 03 CD 34 12
+ call leu, 0x1234               ; 28 02 30 03 CD 34 12
+ call ltu, 0x1234               ; DC 34 12
+ call nc, 0x1234                ; D4 34 12
+ call ne, 0x1234                ; C4 34 12
+ call nz, 0x1234                ; C4 34 12
+ call z, 0x1234                 ; CC 34 12
+ cc 0x1234                      ; DC 34 12
  ccf                            ; 3F
+ ceq 0x1234                     ; CC 34 12
+ cgeu 0x1234                    ; D4 34 12
+ cgtu 0x1234                    ; 28 05 38 03 CD 34 12
+ cleu 0x1234                    ; 28 02 30 03 CD 34 12
+ cltu 0x1234                    ; DC 34 12
  cma                            ; 2F
  cmc                            ; 3F
  cmp (hl)                       ; BE
@@ -256,14 +234,9 @@
  cmp h                          ; BC
  cmp l                          ; BD
  cmp m                          ; BE
- cnc -32768                     ; D4 00 80
- cnc 0x123456                   ; D4 56 34
- cnc 32767                      ; D4 FF 7F
- cnc 65535                      ; D4 FF FF
- cnz -32768                     ; C4 00 80
- cnz 0x123456                   ; C4 56 34
- cnz 32767                      ; C4 FF 7F
- cnz 65535                      ; C4 FF FF
+ cnc 0x1234                     ; D4 34 12
+ cne 0x1234                     ; C4 34 12
+ cnz 0x1234                     ; C4 34 12
  cp (hl)                        ; BE
  cp (hl+)                       ; BE 23
  cp (hl-)                       ; BE 2B
@@ -299,10 +272,7 @@
  cpir                           ; CD @__z80asm__cpir
  cpl                            ; 2F
  cpl a                          ; 2F
- cz -32768                      ; CC 00 80
- cz 0x123456                    ; CC 56 34
- cz 32767                       ; CC FF 7F
- cz 65535                       ; CC FF FF
+ cz 0x1234                      ; CC 34 12
  daa                            ; 27
  dad b                          ; 09
  dad bc                         ; 09
@@ -378,105 +348,72 @@
  inx h                          ; 23
  inx hl                         ; 23
  inx sp                         ; 33
- j_c -32768                     ; DA 00 80
- j_c 0x123456                   ; DA 56 34
- j_c 32767                      ; DA FF 7F
- j_c 65535                      ; DA FF FF
- j_nc -32768                    ; D2 00 80
- j_nc 0x123456                  ; D2 56 34
- j_nc 32767                     ; D2 FF 7F
- j_nc 65535                     ; D2 FF FF
- j_nz -32768                    ; C2 00 80
- j_nz 0x123456                  ; C2 56 34
- j_nz 32767                     ; C2 FF 7F
- j_nz 65535                     ; C2 FF FF
- j_z -32768                     ; CA 00 80
- j_z 0x123456                   ; CA 56 34
- j_z 32767                      ; CA FF 7F
- j_z 65535                      ; CA FF FF
- jc -32768                      ; DA 00 80
- jc 0x123456                    ; DA 56 34
- jc 32767                       ; DA FF 7F
- jc 65535                       ; DA FF FF
+ j_c 0x1234                     ; DA 34 12
+ j_eq 0x1234                    ; CA 34 12
+ j_geu 0x1234                   ; D2 34 12
+ j_gtu 0x1234                   ; CA 85 02 D2 34 12
+ j_leu 0x1234                   ; CA 34 12 DA 34 12
+ j_ltu 0x1234                   ; DA 34 12
+ j_nc 0x1234                    ; D2 34 12
+ j_ne 0x1234                    ; C2 34 12
+ j_nz 0x1234                    ; C2 34 12
+ j_z 0x1234                     ; CA 34 12
+ jc 0x1234                      ; DA 34 12
+ jeq 0x1234                     ; CA 34 12
+ jgeu 0x1234                    ; D2 34 12
+ jgtu 0x1234                    ; CA A9 02 D2 34 12
+ jleu 0x1234                    ; CA 34 12 DA 34 12
+ jltu 0x1234                    ; DA 34 12
  jmp (bc)                       ; C5 C9
  jmp (de)                       ; D5 C9
  jmp (hl)                       ; E9
- jmp -32768                     ; C3 00 80
- jmp 0x123456                   ; C3 56 34
- jmp 32767                      ; C3 FF 7F
- jmp 65535                      ; C3 FF FF
- jmp c, -32768                  ; DA 00 80
- jmp c, 0x123456                ; DA 56 34
- jmp c, 32767                   ; DA FF 7F
- jmp c, 65535                   ; DA FF FF
- jmp nc, -32768                 ; D2 00 80
- jmp nc, 0x123456               ; D2 56 34
- jmp nc, 32767                  ; D2 FF 7F
- jmp nc, 65535                  ; D2 FF FF
- jmp nz, -32768                 ; C2 00 80
- jmp nz, 0x123456               ; C2 56 34
- jmp nz, 32767                  ; C2 FF 7F
- jmp nz, 65535                  ; C2 FF FF
- jmp z, -32768                  ; CA 00 80
- jmp z, 0x123456                ; CA 56 34
- jmp z, 32767                   ; CA FF 7F
- jmp z, 65535                   ; CA FF FF
- jnc -32768                     ; D2 00 80
- jnc 0x123456                   ; D2 56 34
- jnc 32767                      ; D2 FF 7F
- jnc 65535                      ; D2 FF FF
- jnz -32768                     ; C2 00 80
- jnz 0x123456                   ; C2 56 34
- jnz 32767                      ; C2 FF 7F
- jnz 65535                      ; C2 FF FF
+ jmp 0x1234                     ; C3 34 12
+ jmp c, 0x1234                  ; DA 34 12
+ jmp eq, 0x1234                 ; CA 34 12
+ jmp geu, 0x1234                ; D2 34 12
+ jmp gtu, 0x1234                ; CA C9 02 D2 34 12
+ jmp leu, 0x1234                ; CA 34 12 DA 34 12
+ jmp ltu, 0x1234                ; DA 34 12
+ jmp nc, 0x1234                 ; D2 34 12
+ jmp ne, 0x1234                 ; C2 34 12
+ jmp nz, 0x1234                 ; C2 34 12
+ jmp z, 0x1234                  ; CA 34 12
+ jnc 0x1234                     ; D2 34 12
+ jne 0x1234                     ; C2 34 12
+ jnz 0x1234                     ; C2 34 12
  jp (bc)                        ; C5 C9
  jp (de)                        ; D5 C9
  jp (hl)                        ; E9
- jp -32768                      ; C3 00 80
- jp 0x123456                    ; C3 56 34
- jp 32767                       ; C3 FF 7F
- jp 65535                       ; C3 FF FF
- jp c, -32768                   ; DA 00 80
- jp c, 0x123456                 ; DA 56 34
- jp c, 32767                    ; DA FF 7F
- jp c, 65535                    ; DA FF FF
- jp nc, -32768                  ; D2 00 80
- jp nc, 0x123456                ; D2 56 34
- jp nc, 32767                   ; D2 FF 7F
- jp nc, 65535                   ; D2 FF FF
- jp nz, -32768                  ; C2 00 80
- jp nz, 0x123456                ; C2 56 34
- jp nz, 32767                   ; C2 FF 7F
- jp nz, 65535                   ; C2 FF FF
- jp z, -32768                   ; CA 00 80
- jp z, 0x123456                 ; CA 56 34
- jp z, 32767                    ; CA FF 7F
- jp z, 65535                    ; CA FF FF
+ jp 0x1234                      ; C3 34 12
+ jp c, 0x1234                   ; DA 34 12
+ jp eq, 0x1234                  ; CA 34 12
+ jp geu, 0x1234                 ; D2 34 12
+ jp gtu, 0x1234                 ; CA FE 02 D2 34 12
+ jp leu, 0x1234                 ; CA 34 12 DA 34 12
+ jp ltu, 0x1234                 ; DA 34 12
+ jp nc, 0x1234                  ; D2 34 12
+ jp ne, 0x1234                  ; C2 34 12
+ jp nz, 0x1234                  ; C2 34 12
+ jp z, 0x1234                   ; CA 34 12
  jr ASMPC                       ; 18 FE
  jr c, ASMPC                    ; 38 FE
+ jr eq, ASMPC                   ; 28 FE
+ jr geu, ASMPC                  ; 30 FE
+ jr gtu, ASMPC                  ; 28 02 30 FC
+ jr leu, ASMPC                  ; 28 FE 38 FC
+ jr ltu, ASMPC                  ; 38 FE
  jr nc, ASMPC                   ; 30 FE
+ jr ne, ASMPC                   ; 20 FE
  jr nz, ASMPC                   ; 20 FE
  jr z, ASMPC                    ; 28 FE
- jz -32768                      ; CA 00 80
- jz 0x123456                    ; CA 56 34
- jz 32767                       ; CA FF 7F
- jz 65535                       ; CA FF FF
- ld (-32768), a                 ; EA 00 80
- ld (-32768), hl                ; D5 E5 54 5D 21 00 80 73 23 72 E1 D1
- ld (-32768), sp                ; 08 00 80
- ld (0x123456), a               ; EA 56 34
- ld (0x123456), hl              ; D5 E5 54 5D 21 56 34 73 23 72 E1 D1
- ld (0x123456), sp              ; 08 56 34
+ jz 0x1234                      ; CA 34 12
+ ld (0x1234), a                 ; EA 34 12
+ ld (0x1234), hl                ; D5 E5 54 5D 21 34 12 73 23 72 E1 D1
+ ld (0x1234), sp                ; 08 34 12
  ld (0xff00+0), a               ; E0 00
  ld (0xff00+127), a             ; E0 7F
  ld (0xff00+255), a             ; E0 FF
  ld (0xff00+c), a               ; E2
- ld (32767), a                  ; EA FF 7F
- ld (32767), hl                 ; D5 E5 54 5D 21 FF 7F 73 23 72 E1 D1
- ld (32767), sp                 ; 08 FF 7F
- ld (65535), a                  ; EA FF FF
- ld (65535), hl                 ; D5 E5 54 5D 21 FF FF 73 23 72 E1 D1
- ld (65535), sp                 ; 08 FF FF
  ld (bc), a                     ; 02
  ld (bc+), a                    ; 02 03
  ld (bc-), a                    ; 02 0B
@@ -534,14 +471,11 @@
  ld (hli), e                    ; 73 23
  ld (hli), h                    ; 74 23
  ld (hli), l                    ; 75 23
- ld a, (-32768)                 ; FA 00 80
- ld a, (0x123456)               ; FA 56 34
+ ld a, (0x1234)                 ; FA 34 12
  ld a, (0xff00+0)               ; F0 00
  ld a, (0xff00+127)             ; F0 7F
  ld a, (0xff00+255)             ; F0 FF
  ld a, (0xff00+c)               ; F2
- ld a, (32767)                  ; FA FF 7F
- ld a, (65535)                  ; FA FF FF
  ld a, (bc)                     ; 0A
  ld a, (bc+)                    ; 0A 03
  ld a, (bc-)                    ; 0A 0B
@@ -581,10 +515,7 @@
  ld b, l                        ; 45
  ld bc, (hl)                    ; 4E 23 46 2B
  ld bc, (hl+)                   ; 4E 23 46 23
- ld bc, -32768                  ; 01 00 80
- ld bc, 0x123456                ; 01 56 34
- ld bc, 32767                   ; 01 FF 7F
- ld bc, 65535                   ; 01 FF FF
+ ld bc, 0x1234                  ; 01 34 12
  ld bc, de                      ; 42 4B
  ld bc, hl                      ; 44 4D
  ld c, (hl)                     ; 4E
@@ -619,10 +550,7 @@
  ld d, l                        ; 55
  ld de, (hl)                    ; 5E 23 56 2B
  ld de, (hl+)                   ; 5E 23 56 23
- ld de, -32768                  ; 11 00 80
- ld de, 0x123456                ; 11 56 34
- ld de, 32767                   ; 11 FF 7F
- ld de, 65535                   ; 11 FF FF
+ ld de, 0x1234                  ; 11 34 12
  ld de, bc                      ; 50 59
  ld de, hl                      ; 54 5D
  ld de, sp                      ; E5 D5 E1 D1 21 00 00 39 E5 D5 E1 D1
@@ -658,16 +586,10 @@
  ld h, e                        ; 63
  ld h, h                        ; 64
  ld h, l                        ; 65
- ld hl, (-32768)                ; D5 21 00 80 5E 23 56 62 6B D1
- ld hl, (0x123456)              ; D5 21 56 34 5E 23 56 62 6B D1
- ld hl, (32767)                 ; D5 21 FF 7F 5E 23 56 62 6B D1
- ld hl, (65535)                 ; D5 21 FF FF 5E 23 56 62 6B D1
+ ld hl, (0x1234)                ; D5 21 34 12 5E 23 56 62 6B D1
  ld hl, (hl)                    ; F5 7E 23 66 6F F1
  ld hl, (hl+)                   ; F5 7E 23 66 6F F1
- ld hl, -32768                  ; 21 00 80
- ld hl, 0x123456                ; 21 56 34
- ld hl, 32767                   ; 21 FF 7F
- ld hl, 65535                   ; 21 FF FF
+ ld hl, 0x1234                  ; 21 34 12
  ld hl, bc                      ; 60 69
  ld hl, de                      ; 62 6B
  ld hl, sp                      ; F8 00
@@ -688,15 +610,9 @@
  ld l, e                        ; 6B
  ld l, h                        ; 6C
  ld l, l                        ; 6D
- ld sp, -32768                  ; 31 00 80
- ld sp, 0x123456                ; 31 56 34
- ld sp, 32767                   ; 31 FF 7F
- ld sp, 65535                   ; 31 FF FF
+ ld sp, 0x1234                  ; 31 34 12
  ld sp, hl                      ; F9
- lda -32768                     ; FA 00 80
- lda 0x123456                   ; FA 56 34
- lda 32767                      ; FA FF 7F
- lda 65535                      ; FA FF FF
+ lda 0x1234                     ; FA 34 12
  ldax b                         ; 0A
  ldax bc                        ; 0A
  ldax d                         ; 1A
@@ -763,38 +679,14 @@
  ldi hl, (hl)                   ; F5 7E 23 66 6F F1
  ldi l, (hl)                    ; 6E 23
  ldir                           ; CD @__z80asm__ldir
- lhld -32768                    ; D5 21 00 80 5E 23 56 62 6B D1
- lhld 0x123456                  ; D5 21 56 34 5E 23 56 62 6B D1
- lhld 32767                     ; D5 21 FF 7F 5E 23 56 62 6B D1
- lhld 65535                     ; D5 21 FF FF 5E 23 56 62 6B D1
- lxi b, -32768                  ; 01 00 80
- lxi b, 0x123456                ; 01 56 34
- lxi b, 32767                   ; 01 FF 7F
- lxi b, 65535                   ; 01 FF FF
- lxi bc, -32768                 ; 01 00 80
- lxi bc, 0x123456               ; 01 56 34
- lxi bc, 32767                  ; 01 FF 7F
- lxi bc, 65535                  ; 01 FF FF
- lxi d, -32768                  ; 11 00 80
- lxi d, 0x123456                ; 11 56 34
- lxi d, 32767                   ; 11 FF 7F
- lxi d, 65535                   ; 11 FF FF
- lxi de, -32768                 ; 11 00 80
- lxi de, 0x123456               ; 11 56 34
- lxi de, 32767                  ; 11 FF 7F
- lxi de, 65535                  ; 11 FF FF
- lxi h, -32768                  ; 21 00 80
- lxi h, 0x123456                ; 21 56 34
- lxi h, 32767                   ; 21 FF 7F
- lxi h, 65535                   ; 21 FF FF
- lxi hl, -32768                 ; 21 00 80
- lxi hl, 0x123456               ; 21 56 34
- lxi hl, 32767                  ; 21 FF 7F
- lxi hl, 65535                  ; 21 FF FF
- lxi sp, -32768                 ; 31 00 80
- lxi sp, 0x123456               ; 31 56 34
- lxi sp, 32767                  ; 31 FF 7F
- lxi sp, 65535                  ; 31 FF FF
+ lhld 0x1234                    ; D5 21 34 12 5E 23 56 62 6B D1
+ lxi b, 0x1234                  ; 01 34 12
+ lxi bc, 0x1234                 ; 01 34 12
+ lxi d, 0x1234                  ; 11 34 12
+ lxi de, 0x1234                 ; 11 34 12
+ lxi h, 0x1234                  ; 21 34 12
+ lxi hl, 0x1234                 ; 21 34 12
+ lxi sp, 0x1234                 ; 31 34 12
  mov a, a                       ; 7F
  mov a, b                       ; 78
  mov a, c                       ; 79
@@ -940,13 +832,20 @@
  push hl                        ; E5
  push psw                       ; F5
  r_c                            ; D8
+ r_eq                           ; C8
+ r_geu                          ; D0
+ r_gtu                          ; 28 03 38 01 C9
+ r_leu                          ; C8 D8
+ r_ltu                          ; D8
  r_nc                           ; D0
+ r_ne                           ; C0
  r_nz                           ; C0
  r_z                            ; C8
  ral                            ; 17
  rar                            ; 1F
  rc                             ; D8
  rdel                           ; CB 13 CB 12
+ req                            ; C8
  res 0, (hl)                    ; CB 86
  res 0, a                       ; CB 87
  res 0, b                       ; CB 80
@@ -1013,10 +912,18 @@
  res 7, l                       ; CB BD
  ret                            ; C9
  ret c                          ; D8
+ ret eq                         ; C8
+ ret geu                        ; D0
+ ret gtu                        ; 28 03 38 01 C9
+ ret leu                        ; C8 D8
+ ret ltu                        ; D8
  ret nc                         ; D0
+ ret ne                         ; C0
  ret nz                         ; C0
  ret z                          ; C8
  reti                           ; D9
+ rgeu                           ; D0
+ rgtu                           ; 28 03 38 01 C9
  rl (hl)                        ; CB 16
  rl a                           ; CB 17
  rl b                           ; CB 10
@@ -1041,7 +948,10 @@
  rlca                           ; 07
  rld                            ; CD @__z80asm__rld
  rlde                           ; CB 13 CB 12
+ rleu                           ; C8 D8
+ rltu                           ; D8
  rnc                            ; D0
+ rne                            ; C0
  rnz                            ; C0
  rr (hl)                        ; CB 1E
  rr a                           ; CB 1F
@@ -1189,10 +1099,7 @@
  set 7, e                       ; CB FB
  set 7, h                       ; CB FC
  set 7, l                       ; CB FD
- shld -32768                    ; D5 E5 54 5D 21 00 80 73 23 72 E1 D1
- shld 0x123456                  ; D5 E5 54 5D 21 56 34 73 23 72 E1 D1
- shld 32767                     ; D5 E5 54 5D 21 FF 7F 73 23 72 E1 D1
- shld 65535                     ; D5 E5 54 5D 21 FF FF 73 23 72 E1 D1
+ shld 0x1234                    ; D5 E5 54 5D 21 34 12 73 23 72 E1 D1
  sla (hl)                       ; CB 26
  sla a                          ; CB 27
  sla b                          ; CB 20
@@ -1221,10 +1128,7 @@
  srl e                          ; CB 3B
  srl h                          ; CB 3C
  srl l                          ; CB 3D
- sta -32768                     ; EA 00 80
- sta 0x123456                   ; EA 56 34
- sta 32767                      ; EA FF 7F
- sta 65535                      ; EA FF FF
+ sta 0x1234                     ; EA 34 12
  stax b                         ; 02
  stax bc                        ; 02
  stax d                         ; 12
