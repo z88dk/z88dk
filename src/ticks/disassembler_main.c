@@ -37,6 +37,7 @@ static void usage(char *program)
     printf("  -mz80n         Disassemble z80n code\n");
     printf("  -mr2ka         Disassemble Rabbit 2000A code\n");
     printf("  -mr3k          Disassemble Rabbit 3000 code\n");
+    printf("  -mr4k          Disassemble Rabbit 4000 code\n");
     printf("  -mr800         Disassemble R800 code\n");
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
     printf("  -m8080         Disassemble 8080 code (with z80 mnenomics)\n");
@@ -109,6 +110,8 @@ int main(int argc, char **argv)
                     c_cpu = CPU_R2KA;
                 } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
                     c_cpu = CPU_R3K;
+                } else if ( strcmp(&argv[0][1],"mr4k") == 0 ) {
+                    c_cpu = CPU_R4K;
                 } else if ( strcmp(&argv[0][1],"mr800") == 0 ) {
                     c_cpu = CPU_R800;
                 } else if ( strcmp(&argv[0][1],"mgbz80") == 0 ) {
