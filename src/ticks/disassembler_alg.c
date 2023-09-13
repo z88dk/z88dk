@@ -216,7 +216,7 @@ static char *handle_immed32(dcontext *state, char *buf, size_t buflen)
     READ_BYTE(state, mlsb);
     READ_BYTE(state, mmsb);
 
-    BUF_PRINTF("$%02x%02x%02x%02x", mlsb, mmsb, msb, lsb);
+    BUF_PRINTF("$%02x%02x%02x%02x", mmsb, mlsb, msb, lsb);
     
     return buf;
 }
@@ -738,7 +738,27 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                //printf("x=%d y=%d z=%dp=%d q=%d\n",x,y,z,p,q);
                                 state->index = 0;
                                 if ( x == 0 ) {
-                                    if ( isz180() || isez80() ) {
+                                    if ( israbbit4k() ) {
+                                        // $ed 00 -> $ed 3f
+                                        if ( q == 0 && z == 0 && y == 0 ) BUF_PRINTF("%-10s%s","cbm", handle_immed8(state, opbuf1, sizeof(opbuf1)));
+                                        else if ( q == 0 && z == 2 && y == 0 ) BUF_PRINTF("%-10sa","sbox");
+                                        else if ( q == 0 && z == 2 && y == 2 ) BUF_PRINTF("%-10sa","ibox");
+                                        else if ( q == 0 && z == 1 ) BUF_PRINTF("%-10s%s,(htr+hl)",r4k_ps_table[p]);
+                                        else if ( q == 0 && z == 3 ) BUF_PRINTF("%-10s%s,(sp+%s)","ldl", r4k_ps_table[p],handle_immed8(state, opbuf1, sizeof(opbuf1)));
+                                        else if ( q == 0 && z == 4 ) BUF_PRINTF("%-10s%s,(sp+%s)","ld", r4k_ps_table[p],handle_immed8(state, opbuf1, sizeof(opbuf1)));
+                                        else if ( q == 0 && z == 5 ) BUF_PRINTF("%-10s(sp+%s),%s","ld", handle_immed8(state, opbuf1, sizeof(opbuf1)), r4k_ps_table[p]);
+                                        else if ( q == 0 && z == 6 ) BUF_PRINTF("%-10shl,(%s+bc)","ld", r4k_ps_table[p]);
+                                        else if ( q == 0 && z == 7 ) BUF_PRINTF("%-10s(%s+bc),hl","ld", r4k_ps_table[p]);
+                                        else if ( q == 1 && z == 0 ) BUF_PRINTF("%-10s%s,(%s)", "ldf", r4k_ps_table[p], handle_addr24(state, opbuf1,sizeof(opbuf1))) ;
+                                        else if ( q == 1 && z == 1 ) BUF_PRINTF("%-10s(%s),%s", "ldf", handle_addr24(state, opbuf1,sizeof(opbuf1)), r4k_ps_table[p]);
+                                        else if ( q == 1 && z == 2 ) BUF_PRINTF("%-10s%s,(%s)", "ldf", r4k_16b_table[p], handle_addr24(state, opbuf1,sizeof(opbuf1))) ;
+                                        else if ( q == 1 && z == 3 ) BUF_PRINTF("%-10s(%s),%s", "ldf", handle_addr24(state, opbuf1,sizeof(opbuf1)), r4k_16b_table[p]);
+                                        else if ( q == 1 && z == 4 ) BUF_PRINTF("%-10s%s,%s", "ld", r4k_ps_table[p], handle_immed32(state, opbuf1,sizeof(opbuf1)));
+                                        else if ( q == 1 && z == 5 ) BUF_PRINTF("%-10s%s,%s", "ldl", r4k_ps_table[p], handle_immed16(state, opbuf1,sizeof(opbuf1)));
+                                        else if ( q == 1 && z == 6 ) BUF_PRINTF("%-10s%s", "convc", r4k_ps_table[p]);
+                                        else if ( q == 1 && z == 7 ) BUF_PRINTF("%-10s%s", "convd", r4k_ps_table[p]);
+                                        else BUF_PRINTF("nop");
+                                    } else if ( isz180() || isez80() ) {
                                         if ( z == 4 ) BUF_PRINTF("%-10s%s",y == 6 && isez80() ? handle_ez80_am(state,"tst") : "tst",handle_register8(state,y, opbuf1, sizeof(opbuf1)));
                                         else if ( z == 0 ) BUF_PRINTF("%-10s%s,(%s)","in0",y == 6 ? "f" : handle_register8(state,y, opbuf1, sizeof(opbuf1)), handle_immed8(state, opbuf2, sizeof(opbuf2)));
                                         else if ( z == 1 && y != 6) BUF_PRINTF("%-10s(%s),%s","out0",handle_immed8(state, opbuf2, sizeof(opbuf2)),handle_register8(state,y, opbuf1, sizeof(opbuf1)));
