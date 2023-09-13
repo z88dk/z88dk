@@ -131,6 +131,32 @@ static char *handle_addr16(dcontext *state, char *buf, size_t buflen)
     return buf;
 }
 
+static char *handle_addr24(dcontext *state, char *buf, size_t buflen)
+{
+    size_t   offs = 0;
+    const char    *label;
+    uint8_t  lsb;
+    uint8_t  msb;
+    uint8_t  mmsb;
+    
+    READ_BYTE(state, lsb);
+    READ_BYTE(state, msb);
+    READ_BYTE(state, mmsb);
+
+    if ( (label = find_symbol(lsb + msb * 256 + mmsb * 65536, SYM_ADDRESS)) != NULL ) {
+        BUF_PRINTF("%s",label);
+    } else {
+        char temp[10];
+
+        if ( c_autolabel ) {
+            snprintf(temp,sizeof(temp),"L%02x%02x%02x",mmsb,msb,lsb);
+            symbol_add_autolabel(lsb + msb * 256 + mmsb * 65536,temp);
+        }
+        BUF_PRINTF("$%02x%02x%02x", mmsb, msb, lsb);
+    }
+    return buf;
+}
+
 static char *handle_immed8(dcontext *state, char *buf, size_t buflen)
 {
     size_t offs = 0;
@@ -511,7 +537,40 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                     }
                     break;
                 case 2: /* x = 2 */
-                    BUF_PRINTF("%-10s%s", z == 6 ? handle_ez80_am(state,alu_table[y]) : alu_table[y], handle_register8(state, z, opbuf1, sizeof(opbuf1)));
+                    if ( israbbit4k()) {
+                        //printf("x=%d y=%d z=%d p=%d q=%d\n",x,y,z,p,q);
+                        if ( q == 0 && z == 5 ) BUF_PRINTF("%-10shl,(%s+%s)", "ld", r4k_ps_table[p], handle_immed8(state, opbuf1, sizeof(opbuf1))); // TODO: Signed
+                        if ( q == 0 && z == 6 ) BUF_PRINTF("%-10s(%s+%s),hl", "ld", r4k_ps_table[p], handle_immed8(state, opbuf1, sizeof(opbuf1))); // TODO: Signed
+                        else if ( q == 1 && z == 3 ) BUF_PRINTF("%-10sa,(%s+hl)", "ld", r4k_ps_table[p]);
+                        else if ( q == 1 && z == 4 ) BUF_PRINTF("%-10s(%s+hl),a", "ld", r4k_ps_table[p]);
+                        else if ( q == 1 && z == 5 ) BUF_PRINTF("%-10sa,(%s+%s)", "ld", r4k_ps_table[p],  handle_immed8(state, opbuf1, sizeof(opbuf1))); // TODO: Signed
+                        else if ( q == 1 && z == 6 ) BUF_PRINTF("%-10s(%s+%s),a", "ld", r4k_ps_table[p],  handle_immed8(state, opbuf1, sizeof(opbuf1))); // TODO: Signed
+                        else if ( y > 3 && z == 0 ) BUF_PRINTF("%-10s%s,%s", "jr", r4k_cc_table[y-4], handle_rel8(state,opbuf1,sizeof(opbuf1)));
+                        else if ( y > 3 && z == 2 ) BUF_PRINTF("%-10s%s,%s", "jp", r4k_cc_table[y-4], handle_addr16(state,opbuf1,sizeof(opbuf1)));
+                        else if ( y == 0 && q == 0 && z == 1 ) BUF_PRINTF("%-10shl,bc","ld");
+                        else if ( y == 0 && q == 0 && z == 2 ) BUF_PRINTF("%-10s(%s),hl","ldf", handle_addr24(state,opbuf1,sizeof(opbuf1)));
+                        else if ( y == 2 && q == 0 && z == 1 ) BUF_PRINTF("%-10sbc,hl","ld");
+                        else if ( y == 2 && q == 0 && z == 2 ) BUF_PRINTF("%-10shl,(%s)","ldf", handle_addr24(state,opbuf1,sizeof(opbuf1)));
+                        else if ( y == 4 && q == 0 && z == 1 ) BUF_PRINTF("%-10shl,de","ld");
+                        else if ( y == 6 && q == 0 && z == 1 ) BUF_PRINTF("%-10sde,hl","ld");
+                        else if ( y == 2 && q == 0 && z == 7 ) BUF_PRINTF("%-10sxpc,hl","ld");
+                        else if ( y == 4 && q == 0 && z == 7 ) BUF_PRINTF("%-10s","mulu");
+                        else if ( y == 6 && q == 0 && z == 7 ) BUF_PRINTF("%-10sa","or");
+                        else if ( y == 1 && q == 1 && z == 1 ) BUF_PRINTF("%-10s(%s),jk","ld", handle_addr16(state,opbuf1,sizeof(opbuf1)));
+                        else if ( y == 1 && q == 1 && z == 2 ) BUF_PRINTF("%-10s(%s),a","ldf", handle_addr24(state,opbuf1,sizeof(opbuf1)));
+                        else if ( y == 3 && q == 1 && z == 1 ) BUF_PRINTF("%-10sjk,(%s)","ld", handle_addr16(state,opbuf1,sizeof(opbuf1)));
+                        else if ( y == 3 && q == 1 && z == 2 ) BUF_PRINTF("%-10sa,(%s)","ldf", handle_addr24(state,opbuf1,sizeof(opbuf1)));
+                        else if ( y == 3 && q == 1 && z == 7 ) BUF_PRINTF("%-10shl,xpc","ld");
+                        else if ( y == 5 && q == 1 && z == 1 ) BUF_PRINTF("%-10sjk,%s","ld", handle_immed16(state,opbuf1,sizeof(opbuf1)));
+                        else if ( y == 5 && q == 1 && z == 7 ) BUF_PRINTF("%-10sa","xor");
+                        else if ( y == 7 && q == 1 && z == 1 ) BUF_PRINTF("%-10sjk,hl","ex");
+                        else if ( y == 7 && q == 1 && z == 7 ) BUF_PRINTF("%-10shl","clr");
+                        else if ( y == 0 && q == 0 && (z == 3 || z == 4) ) BUF_PRINTF("%-10s(%s),%s", "ld", handle_addr16(state,opbuf1,sizeof(opbuf1)), r4k_32b_table[z-3]);
+                        else if ( y == 2 && q == 0 && (z == 3 || z == 4) ) BUF_PRINTF("%-10s%s,(%s)", "ld", r4k_32b_table[z-3], handle_addr16(state,opbuf1,sizeof(opbuf1)));
+                        else if ( y == 4 && q == 0 && (z == 3 || z == 4) ) BUF_PRINTF("%-10s%s,%s", "ld", r4k_32b_table[z-3],handle_immed8(state, opbuf1, sizeof(opbuf1))); // TODO: Signed
+                        else if ( y == 6 && q == 0 && z == 3 ) BUF_PRINTF("%-10sbc,hl", "ex");
+                        else if ( y == 6 && q == 0 && z == 4 ) BUF_PRINTF("%-10sjkhl,bcde", "ex");
+                    } else BUF_PRINTF("%-10s%s", z == 6 ? handle_ez80_am(state,alu_table[y]) : alu_table[y], handle_register8(state, z, opbuf1, sizeof(opbuf1)));
                     break;
                 case 3: /* x = 3 */
                     if ( z == 0 ) {
