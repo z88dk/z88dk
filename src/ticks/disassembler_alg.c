@@ -888,6 +888,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     }
                                 } else if ( x == 2 ) {
                                     // LDISR = 98 = 10 011 000
+                                    //printf("x=%d y=%d z=%d p=%d q=%d\n",x,y,z,p,q);
                                     if ( isez80() && y < 4 && z >=2 && z <= 4 ) {
                                         static char *instrs[4][3] = {
                                             { "inim", "otim", "ini2" },
@@ -909,7 +910,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                         BUF_PRINTF("%-10s%s", "setsysp", handle_immed16(state,opbuf1,sizeof(opbuf1)));
                                     } else if ( q == 0 && p >= 2 && z == 5 && israbbit4k() ) {
                                         BUF_PRINTF("%-10s%s", p == 2 ? "push" : "setusrp", handle_immed16(state,opbuf1,sizeof(opbuf1)));
-                                    } else if ( (israbbit3k()||israbbit4k()) && z == 0 ) {
+                                    } else if ( (israbbit3k()||israbbit4k()) && z == 0 && (y == 2 || y == 3)) {
                                         if ( y == 2 ) BUF_PRINTF("ldisr");
                                         else if ( y == 3 ) BUF_PRINTF("lddsr");
                                     } else if ( ((isez80() && z <= 4) || z <= 3) && y >= 4 ) {
