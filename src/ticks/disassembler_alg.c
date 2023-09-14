@@ -383,7 +383,11 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
             switch ( x ) {
                 case 0:
                     //printf("Index %d x=%d y=%d z=%d p=%d q=%d\n",state->index, x,y,z,p,q);
-                    if ( state->index && israbbit4k() && q == 1 && z == 4 ) {
+                    if ( state->index && israbbit4k() && q == 1 && z == 2 && p < 2 ) {
+                        BUF_PRINTF("%-10s%s,(%s)", p == 0 ? "ldf" : "ld", r4k_32b_table[state->index-1], p == 0 ? handle_addr24(state, opbuf1, sizeof(opbuf1)) : "hl");
+                    } else if ( state->index && israbbit4k() && q == 1 && z == 3 && p < 2 ) {
+                        BUF_PRINTF("%-10s(%s),%s", p == 0 ? "ldf" : "ld", p == 0 ? handle_addr24(state, opbuf1, sizeof(opbuf1)) : "hl", r4k_32b_table[state->index-1]);
+                    } else if ( state->index && israbbit4k() && q == 1 && z == 4 ) {
                         BUF_PRINTF("%-10s%s,(%s+hl)","ld", r4k_32b_table[state->index-1], r4k_ps_table[p]);
                     } else if ( state->index && israbbit4k() && q == 1 && z == 5 ) {
                         BUF_PRINTF("%-10s(%s+hl),%s","ld", r4k_ps_table[p], r4k_32b_table[state->index-1]);
@@ -391,8 +395,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         BUF_PRINTF("%-10s%s,(%s%s)","ld", r4k_32b_table[state->index-1], r4k_ps_table[p], handle_displacement(state, opbuf1,sizeof(opbuf1)));
                     } else if ( state->index && israbbit4k() && q == 1 && z == 7 ) {
                         BUF_PRINTF("%-10s(%s%s),%s","ld", r4k_ps_table[p], handle_displacement(state, opbuf1,sizeof(opbuf1)), r4k_32b_table[state->index-1]);
-                    } else
-                    switch ( z ) {
+                    } else switch ( z ) {
                         case 0:
                             if ( y == 0 ) BUF_PRINTF("nop");
                             else if ( y == 1 ) {
@@ -569,7 +572,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         } else if ( x == 2 ) {
                             BUF_PRINTF("%-10s%s", z == 6 ? handle_ez80_am(state,alu_table[y]) : alu_table[y], handle_register8(state, z, opbuf1, sizeof(opbuf1)));
                         } else {
-                            BUF_PRINTF("%-10s%", "nop");
+                            BUF_PRINTF("%-10s", "nop");
                         }
                     } else {
                         if ( isez80() ) {
@@ -754,7 +757,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                         if ( q == 0 && z == 0 && y == 0 ) BUF_PRINTF("%-10s%s","cbm", handle_immed8(state, opbuf1, sizeof(opbuf1)));
                                         else if ( q == 0 && z == 2 && y == 0 ) BUF_PRINTF("%-10sa","sbox");
                                         else if ( q == 0 && z == 2 && y == 2 ) BUF_PRINTF("%-10sa","ibox");
-                                        else if ( q == 0 && z == 1 ) BUF_PRINTF("%-10s%s,(htr+hl)",r4k_ps_table[p]);
+                                        else if ( q == 0 && z == 1 ) BUF_PRINTF("%-10s%s,(htr+hl)","ld",r4k_ps_table[p]);
                                         else if ( q == 0 && z == 3 ) BUF_PRINTF("%-10s%s,(sp+%s)","ldl", r4k_ps_table[p],handle_immed8(state, opbuf1, sizeof(opbuf1)));
                                         else if ( q == 0 && z == 4 ) BUF_PRINTF("%-10s%s,(sp+%s)","ld", r4k_ps_table[p],handle_immed8(state, opbuf1, sizeof(opbuf1)));
                                         else if ( q == 0 && z == 5 ) BUF_PRINTF("%-10s(sp+%s),%s","ld", handle_immed8(state, opbuf1, sizeof(opbuf1)), r4k_ps_table[p]);
