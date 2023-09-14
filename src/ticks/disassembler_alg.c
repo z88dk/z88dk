@@ -480,7 +480,19 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                     }
                     break;
                 case 1: /* x = 1 */
-                    if ( z == 6 && y == 6 ) {
+                    if ( state->index && israbbit4k() && q == 1 && z == 0 ) {
+                        BUF_PRINTF("%-10s1,%s", handle_rot(state, p), r4k_32b_table[state->index-1]);
+                    } else if ( state->index && israbbit4k() && q == 1 && z == 1 ) {
+                        BUF_PRINTF("%-10s2,%s", handle_rot(state, p), r4k_32b_table[state->index-1]);
+                    } else if ( state->index && israbbit4k() && q == 1 && z == 3 ) {
+                        BUF_PRINTF("%-10s4,%s", handle_rot(state, p), r4k_32b_table[state->index-1]);
+                    } else if ( state->index && israbbit4k() && q == 1 && z == 7 ) {
+                        BUF_PRINTF("%-10s8,%s", handle_rot(state, p), r4k_32b_table[state->index-1]);
+                    } else if ( state->index && israbbit4k() && q == 1 && z == 4 && p < 2 ) {
+                        BUF_PRINTF("%-10s%s","test", p == 0 ? handle_hl(state->index) : r4k_32b_table[state->index-1]);
+                    } else if ( state->index && israbbit4k() && q == 1 && p == 0 && z == 5 ) {
+                        BUF_PRINTF("%-10s%s","neg", r4k_32b_table[state->index-1]);
+                    } else if ( z == 6 && y == 6 ) {
                         if ( israbbit() ) { BUF_PRINTF("altd "); state->prefix=0x76; continue; }
                         else BUF_PRINTF("%-10s","halt");
                     } else if ( israbbit4k() && y < 6 && state->index == 0 && z < 6) {
