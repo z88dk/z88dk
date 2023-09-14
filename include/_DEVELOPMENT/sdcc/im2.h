@@ -50,11 +50,9 @@ extern int im2_remove_generic_callback_callee(uint8_t vector,void *callback) __p
 
 #endif
 
-#ifdef __SCCZ80
-
-#define IM2_DEFINE_ISR(name)  void name(void) \
+#define IM2_DEFINE_ISR(name)  void name(void) __naked \
 { \
-asm("\tEXTERN\tasm_im2_push_registers\n" \
+__asm__("\tEXTERN\tasm_im2_push_registers\n" \
 "\tEXTERN\tasm_im2_pop_registers\n" \
 "\n" \
 "\tcall\tasm_im2_push_registers\n" \
@@ -67,9 +65,9 @@ asm("\tEXTERN\tasm_im2_push_registers\n" \
 } \
 void _im2_isr_##name(void)
 
-#define IM2_DEFINE_ISR_8080(name)  void name(void) \
+#define IM2_DEFINE_ISR_8080(name)  void name(void) __naked \
 { \
-asm("\tEXTERN\tasm_im2_push_registers_8080\n" \
+__asm__("\tEXTERN\tasm_im2_push_registers_8080\n" \
 "\tEXTERN\tasm_im2_pop_registers_8080\n" \
 "\n" \
 "\tcall\tasm_im2_push_registers_8080\n" \
@@ -84,9 +82,9 @@ void _im2_isr_8080_##name(void)
 
 #if __SPECTRUM || __ZXNEXT
 
-#define IM2_DEFINE_ISR_WITH_BASIC(name)  void name(void) \
+#define IM2_DEFINE_ISR_WITH_BASIC(name)  void name(void) __naked \
 { \
-asm("\tEXTERN\tasm_im2_push_registers\n" \
+__asm__("\tEXTERN\tasm_im2_push_registers\n" \
 "\tEXTERN\tasm_im2_pop_registers\n" \
 "\n" \
 "\tcall\tasm_im2_push_registers\n" \
@@ -102,52 +100,6 @@ asm("\tEXTERN\tasm_im2_push_registers\n" \
 } \
 void _im2_isr_##name(void)
 
-#endif
-
-#endif
-
-#ifdef __SDCC
-
-#define IM2_DEFINE_ISR(name)  void name(void) __naked \
-{ \
-	__asm \
-	EXTERN	asm_im2_push_registers \
-   EXTERN	asm_im2_pop_registers \
-	\
-	call	asm_im2_push_registers \
-	call   __im2_isr_##name \
-	call   asm_im2_pop_registers \
-	\
-	ei \
-	reti \
-	__endasm; \
-} \
-void _im2_isr_##name(void)
-
-#define IM2_DEFINE_ISR_8080(name)  void name(void) __critical __interrupt(0)
-
-#if __SPECTRUM || __ZXNEXT
-
-#define IM2_DEFINE_ISR_WITH_BASIC(name)  void name(void) __naked \
-{ \
-	__asm \
-	EXTERN	asm_im2_push_registers \
-	EXTERN	asm_im2_pop_registers \
-	\
-	call	asm_im2_push_registers \
-	call   __im2_isr_##name \
-	call   asm_im2_pop_registers \
-	\
-	push iy \
-	ld iy,0x5c3a \
-	call 0x0038 \
-	pop iy \
-	ret \
-	__endasm; \
-} \
-void _im2_isr_##name(void)
-
-#endif
 
 #endif
 
