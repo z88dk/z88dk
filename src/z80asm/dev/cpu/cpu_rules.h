@@ -38255,8 +38255,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nn(0xCA, Expr_clone(expr));
-add_opcode_nn(0xDA, Expr_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr));
+add_opcode_nn(0xDA, Expr1_clone(expr));
 OBJ_DELETE(expr);
 }
 }
@@ -38388,9 +38388,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-add_opcode_nnn(0xCA, Expr_clone(expr));
+add_opcode_nnn(0xCA, Expr1_clone(expr));
 DO_stmt(0x5B);
-add_opcode_nnn(0xDA, Expr_clone(expr));
+add_opcode_nnn(0xDA, Expr1_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -38653,9 +38653,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-add_opcode_nn(0xCA, Expr_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr));
 DO_stmt(0x40);
-add_opcode_nn(0xDA, Expr_clone(expr));
+add_opcode_nn(0xDA, Expr1_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -38887,8 +38887,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nn(0xCA, Expr_clone(expr));
-add_opcode_nn(0xDA, Expr_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr));
+add_opcode_nn(0xDA, Expr1_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -38897,8 +38897,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nnn(0xCA, Expr_clone(expr));
-add_opcode_nnn(0xDA, Expr_clone(expr));
+add_opcode_nnn(0xCA, Expr1_clone(expr));
+add_opcode_nnn(0xDA, Expr1_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -39243,9 +39243,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-add_opcode_nnn(0xCA, Expr_clone(expr));
+add_opcode_nnn(0xCA, Expr1_clone(expr));
 DO_stmt(0x5B);
-add_opcode_nnn(0xDA, Expr_clone(expr));
+add_opcode_nnn(0xDA, Expr1_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -39508,9 +39508,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-add_opcode_nn(0xCA, Expr_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr));
 DO_stmt(0x40);
-add_opcode_nn(0xDA, Expr_clone(expr));
+add_opcode_nn(0xDA, Expr1_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -39742,8 +39742,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nn(0xCA, Expr_clone(expr));
-add_opcode_nn(0xDA, Expr_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr));
+add_opcode_nn(0xDA, Expr1_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -39752,8 +39752,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nnn(0xCA, Expr_clone(expr));
-add_opcode_nnn(0xDA, Expr_clone(expr));
+add_opcode_nnn(0xCA, Expr1_clone(expr));
+add_opcode_nnn(0xDA, Expr1_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -40054,8 +40054,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nn(0xCA, Expr_clone(expr));
-add_opcode_nn(0xDA, Expr_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr));
+add_opcode_nn(0xDA, Expr1_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -40194,8 +40194,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nn(0xCA, Expr_clone(expr));
-add_opcode_nn(0xDA, Expr_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr));
+add_opcode_nn(0xDA, Expr1_clone(expr));
 OBJ_DELETE(expr);
 }
 }

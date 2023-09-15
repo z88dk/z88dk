@@ -991,9 +991,3 @@ bool Expr_is_addr_diff(Expr1* self) {
 
 	return ret;
 }
-
-Expr1* Expr_clone(Expr1* expr) {
-    Expr1* copy = OBJ_NEW(Expr1);
-    Expr1_copy(copy, expr);
-    return copy;
-}

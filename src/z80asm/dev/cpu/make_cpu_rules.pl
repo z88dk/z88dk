@@ -144,11 +144,11 @@ sub parse_code {
 				
 				if ($count_m==2) {
 					push @code,
-						"add_opcode_nn(0x".fmthex($opcode).", Expr_clone(expr));";
+						"add_opcode_nn(0x".fmthex($opcode).", Expr1_clone(expr));";
 				}
 				elsif ($count_m==3) {	
 					push @code,
-						"add_opcode_nnn(0x".fmthex($opcode).", Expr_clone(expr));";
+						"add_opcode_nnn(0x".fmthex($opcode).", Expr1_clone(expr));";
 				}
 				else {	
 					die $count_m;
