@@ -550,7 +550,7 @@ static void print_line_info(struct lexer_state *ls, unsigned long flags)
 	if (flags & GCC_LINE_NUM) {
 		sprintf(b, "# %ld \"%s\"\n", ls->line, fn);
 	} else {
-		sprintf(b, "#line %ld \"%s\"\n", ls->line, fn);
+		sprintf(b, "\n#line %ld \"%s\"\n", ls->line, fn);
 	}
 	for (d = b; *d; d ++) put_char(ls, (unsigned char)(*d));
 	freemem(b);
