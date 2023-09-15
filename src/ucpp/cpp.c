@@ -550,8 +550,9 @@ static void print_line_info(struct lexer_state *ls, unsigned long flags)
 	if (flags & GCC_LINE_NUM) {
 		sprintf(b, "# %ld \"%s\"\n", ls->line, fn);
 	} else {
-		sprintf(b, "\n#line %ld \"%s\"\n", ls->line, fn);
+		sprintf(b, "#line %ld \"%s\"\n", ls->line, fn);
 	}
+        put_char(ls, '\n');
 	for (d = b; *d; d ++) put_char(ls, (unsigned char)(*d));
 	freemem(b);
 }
@@ -582,7 +583,7 @@ int enter_file(struct lexer_state *ls, unsigned long flags)
 		return 1;
 	}
 	print_line_info(ls, flags);
-	ls->oline --;	/* emitted #line troubled oline */
+	ls->oline -=2;	/* emitted #line troubled oline */
 	return 0;
 }
 
