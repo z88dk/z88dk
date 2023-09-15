@@ -35,7 +35,7 @@ ELSE
 
 	ld	hl, +(fp_extra + 2) + ( fu_closefn + 2)
 	push	hl
-	call	malloc		
+	call	malloc
 	pop	bc
 	push	hl		;Keep for later
 	ld	de,(ix+8)	;cookie
