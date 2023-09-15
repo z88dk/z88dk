@@ -86,7 +86,6 @@ sub parse_code {
 			"{",
 			"DO_STMT_LABEL();",
 			"const char *end_label = autolabel();";
-		my $count_expr = 0;
 		for my $op (@ops) {
 			my $count_t = scalar(grep {/%t/} @$op);
 			if ($count_t) {
@@ -105,34 +104,16 @@ sub parse_code {
 				}
 				
 				if ($count_t==1) {
-					$count_expr++;
 					push @code,
-						"UT_string* end_label$count_expr;",
-						"utstring_new(end_label$count_expr);",
-						"utstring_printf(end_label$count_expr, \"%s-$target_offset\", end_label);",
-						"Expr1 *end_label_expr$count_expr = parse_expr(utstring_body(end_label$count_expr));",
-						"add_opcode_jr(0x".fmthex($opcode).", end_label_expr$count_expr);",	# jump over
-						"utstring_free(end_label$count_expr);";
+						"add_opcode_jr_end(0x".fmthex($opcode).", end_label, $target_offset);";
 				}
 				elsif ($count_t==2) {
-					$count_expr++;
 					push @code,
-						"UT_string* end_label$count_expr;",
-						"utstring_new(end_label$count_expr);",
-						"utstring_printf(end_label$count_expr, \"%s-$target_offset\", end_label);",
-						"Expr1 *end_label_expr$count_expr = parse_expr(utstring_body(end_label$count_expr));",
-						"add_opcode_nn(0x".fmthex($opcode).", end_label_expr$count_expr);",	# jump over
-						"utstring_free(end_label$count_expr);";
+						"add_opcode_nn_end(0x".fmthex($opcode).", end_label, $target_offset);";
 				}
 				elsif ($count_t==3) {	
-					$count_expr++;
 					push @code,
-						"UT_string* end_label$count_expr;",
-						"utstring_new(end_label$count_expr);",
-						"utstring_printf(end_label$count_expr, \"%s-$target_offset\", end_label);",
-						"Expr1 *end_label_expr$count_expr = parse_expr(utstring_body(end_label$count_expr));",
-						"add_opcode_nnn(0x".fmthex($opcode).", end_label_expr$count_expr);",	# jump over
-						"utstring_free(end_label$count_expr);";
+						"add_opcode_nnn_end(0x".fmthex($opcode).", end_label, $target_offset);";
 				}
 				else {	
 					die $count_t;
@@ -152,7 +133,6 @@ sub parse_code {
 			"{",
 			"DO_STMT_LABEL();",
 			"Expr1 *expr = pop_expr(ctx);";
-		my $count_expr = 0;
 		for my $op (@ops) {
 			my $count_m = scalar(grep {/%m/} @$op);
 			if ($count_m) {
@@ -163,24 +143,12 @@ sub parse_code {
 				}
 				
 				if ($count_m==2) {
-					$count_expr++;
 					push @code,
-						"UT_string* expr_text$count_expr;",
-						"utstring_new(expr_text$count_expr);",
-						"utstring_printf(expr_text$count_expr, \"%s\", expr->text->data);",
-						"Expr1 *expr$count_expr = parse_expr(utstring_body(expr_text$count_expr));",
-						"add_opcode_nn(0x".fmthex($opcode).", expr$count_expr);",
-						"utstring_free(expr_text$count_expr);";
+						"add_opcode_nn(0x".fmthex($opcode).", Expr_clone(expr));";
 				}
 				elsif ($count_m==3) {	
-					$count_expr++;
 					push @code,
-						"UT_string* expr_text$count_expr;",
-						"utstring_new(expr_text$count_expr);",
-						"utstring_printf(expr_text$count_expr, \"%s\", expr->text->data);",
-						"Expr1 *expr$count_expr = parse_expr(utstring_body(expr_text$count_expr));",
-						"add_opcode_nnn(0x".fmthex($opcode).", expr$count_expr);",
-						"utstring_free(expr_text$count_expr);";
+						"add_opcode_nnn(0x".fmthex($opcode).", Expr_clone(expr));";
 				}
 				else {	
 					die $count_m;

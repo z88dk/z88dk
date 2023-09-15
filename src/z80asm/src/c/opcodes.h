@@ -76,6 +76,11 @@ void add_call_emul_func(char *emul_func);
 /* add RST opcode */
 void add_rst_opcode(int arg);
 
+/* add jump to text label - offset */
+void add_opcode_jr_end(int opcode, const char* end_label, int offset);
+void add_opcode_nn_end(int opcode, const char* end_label, int offset);
+void add_opcode_nnn_end(int opcode, const char* end_label, int offset);
+
 /* add Z88's opcodes */
 void add_Z88_CALL_OZ(int argument);
 void add_Z88_CALL_PKG(int argument);

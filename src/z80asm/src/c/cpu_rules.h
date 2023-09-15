@@ -15233,12 +15233,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x30, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -15298,18 +15293,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x52);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -15320,18 +15305,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x5B);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -15347,18 +15322,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-5", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 5);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt(0x52);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -15369,18 +15334,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-5", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 5);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt(0x5B);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -15621,18 +15576,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x40);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -15643,18 +15588,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x49);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -15670,18 +15605,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-5", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 5);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt(0x40);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -15692,18 +15617,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-5", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 5);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt(0x49);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -15929,18 +15844,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x5B);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -15956,18 +15861,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-5", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 5);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt(0x5B);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -16133,18 +16028,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x49);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -16160,18 +16045,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-5", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 5);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt(0x49);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -16337,18 +16212,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x52);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -16364,18 +16229,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-5", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 5);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt(0x52);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -16541,18 +16396,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x40);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -16568,18 +16413,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-5", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 5);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt(0x40);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -16723,12 +16558,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x20, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x20, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -16751,12 +16581,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x38, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -16771,18 +16596,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -16792,18 +16607,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -16813,18 +16618,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_nn(0xDA, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_nn_end(0xCA, end_label, 0);
+add_opcode_nn_end(0xDA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -16839,39 +16634,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-3", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
-DO_stmt_nn(0xCD);
-asm_LABEL_offset(end_label, get_cur_opcode_size());
-}
-break;
-case CPU_8080: case CPU_8085: 
-if (expr_in_parens) warn_expr_in_parens();
-{
-DO_STMT_LABEL();
-const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-3", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_nn(0xD2, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 3);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -16881,19 +16645,20 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-4", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 4);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+add_opcode_nn_end(0xCA, end_label, 3);
+add_opcode_nn_end(0xD2, end_label, 0);
+DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
 break;
@@ -16907,12 +16672,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xE2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xE2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -16935,12 +16695,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x30, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -16955,12 +16710,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xEA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xEA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -16983,12 +16733,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xF2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xF2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17011,12 +16756,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x38, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17039,12 +16779,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x28, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17067,12 +16802,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xEA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xEA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17095,12 +16825,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x28, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17123,12 +16848,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xFA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xFA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17151,12 +16871,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xE2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xE2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17179,12 +16894,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xEA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xEA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17207,12 +16917,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xE2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xE2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17235,12 +16940,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x20, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x20, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17276,12 +16976,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x30, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17317,12 +17012,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x20, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x20, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17345,12 +17035,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x38, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17365,18 +17050,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17386,18 +17061,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17407,18 +17072,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_nn(0xDA, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_nn_end(0xCA, end_label, 0);
+add_opcode_nn_end(0xDA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17433,39 +17088,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-3", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
-DO_stmt_nn(0xCD);
-asm_LABEL_offset(end_label, get_cur_opcode_size());
-}
-break;
-case CPU_8080: case CPU_8085: 
-if (expr_in_parens) warn_expr_in_parens();
-{
-DO_STMT_LABEL();
-const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-3", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_nn(0xD2, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 3);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17475,19 +17099,20 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-4", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 4);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+add_opcode_nn_end(0xCA, end_label, 3);
+add_opcode_nn_end(0xD2, end_label, 0);
+DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
 break;
@@ -17501,12 +17126,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xE2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xE2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17529,12 +17149,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x30, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17549,12 +17164,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xEA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xEA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -17577,12 +17187,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xF2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xF2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -18359,12 +17964,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x38, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -18387,12 +17987,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x28, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -18415,12 +18010,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xEA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xEA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -18443,12 +18033,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x28, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19309,12 +18894,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xE2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xE2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19455,12 +19035,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xEA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xEA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19483,12 +19058,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xE2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xE2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19511,12 +19081,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x20, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x20, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19539,12 +19104,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x30, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19567,12 +19127,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x20, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x20, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19595,12 +19150,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x38, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19615,18 +19165,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19636,18 +19176,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nnn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19657,18 +19187,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_nn(0xDA, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_nn_end(0xCA, end_label, 0);
+add_opcode_nn_end(0xDA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19683,39 +19203,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-3", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
-DO_stmt_nn(0xCD);
-asm_LABEL_offset(end_label, get_cur_opcode_size());
-}
-break;
-case CPU_8080: case CPU_8085: 
-if (expr_in_parens) warn_expr_in_parens();
-{
-DO_STMT_LABEL();
-const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-3", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_nn(0xD2, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 3);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19725,19 +19214,20 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-4", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x30, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 4);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nnn(0xCD);
+asm_LABEL_offset(end_label, get_cur_opcode_size());
+}
+break;
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+const char *end_label = autolabel();
+add_opcode_nn_end(0xCA, end_label, 3);
+add_opcode_nn_end(0xD2, end_label, 0);
+DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
 break;
@@ -19751,12 +19241,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xE2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xE2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19779,12 +19264,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x30, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x30, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19799,12 +19279,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xEA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xEA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19827,12 +19302,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xF2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xF2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19855,12 +19325,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x38, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19883,12 +19348,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x28, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19911,12 +19371,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xEA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xEA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19939,12 +19394,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x28, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19967,12 +19417,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xFA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xFA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -19995,12 +19440,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xE2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xE2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -20023,12 +19463,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xEA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xEA, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -20051,12 +19486,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xE2, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xE2, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -20079,12 +19509,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x20, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x20, end_label, 0);
 DO_stmt_nn(0xCD);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -38810,12 +38235,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xCA, end_label, 0);
 DO_stmt_nn(0xD2);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -38835,18 +38255,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-UT_string* expr_text1;
-utstring_new(expr_text1);
-utstring_printf(expr_text1, "%s", expr->text->data);
-Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
-add_opcode_nn(0xCA, expr1);
-utstring_free(expr_text1);
-UT_string* expr_text2;
-utstring_new(expr_text2);
-utstring_printf(expr_text2, "%s", expr->text->data);
-Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
-add_opcode_nn(0xDA, expr2);
-utstring_free(expr_text2);
+add_opcode_nn(0xCA, Expr_clone(expr));
+add_opcode_nn(0xDA, Expr_clone(expr));
 OBJ_DELETE(expr);
 }
 }
@@ -38961,12 +38371,7 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 const char *end_label = autolabel();
 DO_stmt(0x5B);
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nnn(0xCA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nnn_end(0xCA, end_label, 0);
 DO_stmt(0x5B);
 DO_stmt_nnn(0xD2);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -38983,19 +38388,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-UT_string* expr_text1;
-utstring_new(expr_text1);
-utstring_printf(expr_text1, "%s", expr->text->data);
-Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
-add_opcode_nnn(0xCA, expr1);
-utstring_free(expr_text1);
+add_opcode_nnn(0xCA, Expr_clone(expr));
 DO_stmt(0x5B);
-UT_string* expr_text2;
-utstring_new(expr_text2);
-utstring_printf(expr_text2, "%s", expr->text->data);
-Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
-add_opcode_nnn(0xDA, expr2);
-utstring_free(expr_text2);
+add_opcode_nnn(0xDA, Expr_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -39241,12 +38636,7 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 const char *end_label = autolabel();
 DO_stmt(0x40);
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xCA, end_label, 0);
 DO_stmt(0x40);
 DO_stmt_nn(0xD2);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -39263,19 +38653,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-UT_string* expr_text1;
-utstring_new(expr_text1);
-utstring_printf(expr_text1, "%s", expr->text->data);
-Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
-add_opcode_nn(0xCA, expr1);
-utstring_free(expr_text1);
+add_opcode_nn(0xCA, Expr_clone(expr));
 DO_stmt(0x40);
-UT_string* expr_text2;
-utstring_new(expr_text2);
-utstring_printf(expr_text2, "%s", expr->text->data);
-Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
-add_opcode_nn(0xDA, expr2);
-utstring_free(expr_text2);
+add_opcode_nn(0xDA, Expr_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -39435,12 +38815,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xCA, end_label, 0);
 DO_stmt_nn(0xD2);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -39450,12 +38825,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nnn(0xCA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nnn_end(0xCA, end_label, 0);
 DO_stmt_nnn(0xD2);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -39517,18 +38887,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-UT_string* expr_text1;
-utstring_new(expr_text1);
-utstring_printf(expr_text1, "%s", expr->text->data);
-Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
-add_opcode_nn(0xCA, expr1);
-utstring_free(expr_text1);
-UT_string* expr_text2;
-utstring_new(expr_text2);
-utstring_printf(expr_text2, "%s", expr->text->data);
-Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
-add_opcode_nn(0xDA, expr2);
-utstring_free(expr_text2);
+add_opcode_nn(0xCA, Expr_clone(expr));
+add_opcode_nn(0xDA, Expr_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -39537,18 +38897,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-UT_string* expr_text1;
-utstring_new(expr_text1);
-utstring_printf(expr_text1, "%s", expr->text->data);
-Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
-add_opcode_nnn(0xCA, expr1);
-utstring_free(expr_text1);
-UT_string* expr_text2;
-utstring_new(expr_text2);
-utstring_printf(expr_text2, "%s", expr->text->data);
-Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
-add_opcode_nnn(0xDA, expr2);
-utstring_free(expr_text2);
+add_opcode_nnn(0xCA, Expr_clone(expr));
+add_opcode_nnn(0xDA, Expr_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -39876,12 +39226,7 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 const char *end_label = autolabel();
 DO_stmt(0x5B);
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nnn(0xCA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nnn_end(0xCA, end_label, 0);
 DO_stmt(0x5B);
 DO_stmt_nnn(0xD2);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -39898,19 +39243,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-UT_string* expr_text1;
-utstring_new(expr_text1);
-utstring_printf(expr_text1, "%s", expr->text->data);
-Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
-add_opcode_nnn(0xCA, expr1);
-utstring_free(expr_text1);
+add_opcode_nnn(0xCA, Expr_clone(expr));
 DO_stmt(0x5B);
-UT_string* expr_text2;
-utstring_new(expr_text2);
-utstring_printf(expr_text2, "%s", expr->text->data);
-Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
-add_opcode_nnn(0xDA, expr2);
-utstring_free(expr_text2);
+add_opcode_nnn(0xDA, Expr_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -40156,12 +39491,7 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 const char *end_label = autolabel();
 DO_stmt(0x40);
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xCA, end_label, 0);
 DO_stmt(0x40);
 DO_stmt_nn(0xD2);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -40178,19 +39508,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-UT_string* expr_text1;
-utstring_new(expr_text1);
-utstring_printf(expr_text1, "%s", expr->text->data);
-Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
-add_opcode_nn(0xCA, expr1);
-utstring_free(expr_text1);
+add_opcode_nn(0xCA, Expr_clone(expr));
 DO_stmt(0x40);
-UT_string* expr_text2;
-utstring_new(expr_text2);
-utstring_printf(expr_text2, "%s", expr->text->data);
-Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
-add_opcode_nn(0xDA, expr2);
-utstring_free(expr_text2);
+add_opcode_nn(0xDA, Expr_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -40350,12 +39670,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xCA, end_label, 0);
 DO_stmt_nn(0xD2);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -40365,12 +39680,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nnn(0xCA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nnn_end(0xCA, end_label, 0);
 DO_stmt_nnn(0xD2);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -40432,18 +39742,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-UT_string* expr_text1;
-utstring_new(expr_text1);
-utstring_printf(expr_text1, "%s", expr->text->data);
-Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
-add_opcode_nn(0xCA, expr1);
-utstring_free(expr_text1);
-UT_string* expr_text2;
-utstring_new(expr_text2);
-utstring_printf(expr_text2, "%s", expr->text->data);
-Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
-add_opcode_nn(0xDA, expr2);
-utstring_free(expr_text2);
+add_opcode_nn(0xCA, Expr_clone(expr));
+add_opcode_nn(0xDA, Expr_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -40452,18 +39752,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-UT_string* expr_text1;
-utstring_new(expr_text1);
-utstring_printf(expr_text1, "%s", expr->text->data);
-Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
-add_opcode_nnn(0xCA, expr1);
-utstring_free(expr_text1);
-UT_string* expr_text2;
-utstring_new(expr_text2);
-utstring_printf(expr_text2, "%s", expr->text->data);
-Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
-add_opcode_nnn(0xDA, expr2);
-utstring_free(expr_text2);
+add_opcode_nnn(0xCA, Expr_clone(expr));
+add_opcode_nnn(0xDA, Expr_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -40735,12 +40025,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_jr_end(0x28, end_label, 0);
 DO_stmt_jr(0x30);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -40750,12 +40035,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xCA, end_label, 0);
 DO_stmt_nn(0xD2);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -40774,18 +40054,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-UT_string* expr_text1;
-utstring_new(expr_text1);
-utstring_printf(expr_text1, "%s", expr->text->data);
-Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
-add_opcode_nn(0xCA, expr1);
-utstring_free(expr_text1);
-UT_string* expr_text2;
-utstring_new(expr_text2);
-utstring_printf(expr_text2, "%s", expr->text->data);
-Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
-add_opcode_nn(0xDA, expr2);
-utstring_free(expr_text2);
+add_opcode_nn(0xCA, Expr_clone(expr));
+add_opcode_nn(0xDA, Expr_clone(expr));
 OBJ_DELETE(expr);
 }
 break;
@@ -40913,12 +40183,7 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
+add_opcode_nn_end(0xCA, end_label, 0);
 DO_stmt_nn(0xD2);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -40929,18 +40194,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-UT_string* expr_text1;
-utstring_new(expr_text1);
-utstring_printf(expr_text1, "%s", expr->text->data);
-Expr1 *expr1 = parse_expr(utstring_body(expr_text1));
-add_opcode_nn(0xCA, expr1);
-utstring_free(expr_text1);
-UT_string* expr_text2;
-utstring_new(expr_text2);
-utstring_printf(expr_text2, "%s", expr->text->data);
-Expr1 *expr2 = parse_expr(utstring_body(expr_text2));
-add_opcode_nn(0xDA, expr2);
-utstring_free(expr_text2);
+add_opcode_nn(0xCA, Expr_clone(expr));
+add_opcode_nn(0xDA, Expr_clone(expr));
 OBJ_DELETE(expr);
 }
 }
@@ -65964,18 +65219,8 @@ case CPU_EZ80_Z80:
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x49);
 DO_stmt(0xC9);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -65985,18 +65230,8 @@ case CPU_EZ80:
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x5B);
 DO_stmt(0xC9);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -66211,18 +65446,8 @@ case CPU_EZ80:
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x5B);
 DO_stmt(0xC9);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -66383,18 +65608,8 @@ case CPU_EZ80_Z80:
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0x49);
 DO_stmt(0xC9);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
@@ -66536,18 +65751,8 @@ case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: c
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0xC9);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -66556,18 +65761,8 @@ case CPU_8080: case CPU_8085:
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_nn(0xDA, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_nn_end(0xCA, end_label, 0);
+add_opcode_nn_end(0xDA, end_label, 0);
 DO_stmt(0xC9);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -66759,18 +65954,8 @@ case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: c
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0xC9);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -66779,18 +65964,8 @@ case CPU_8080: case CPU_8085:
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_nn(0xDA, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_nn_end(0xCA, end_label, 0);
+add_opcode_nn_end(0xDA, end_label, 0);
 DO_stmt(0xC9);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -69497,18 +68672,8 @@ case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: c
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_jr(0x28, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_jr(0x38, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_jr_end(0x28, end_label, 0);
+add_opcode_jr_end(0x38, end_label, 0);
 DO_stmt(0xC9);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
@@ -69517,18 +68682,8 @@ case CPU_8080: case CPU_8085:
 {
 DO_STMT_LABEL();
 const char *end_label = autolabel();
-UT_string* end_label1;
-utstring_new(end_label1);
-utstring_printf(end_label1, "%s-0", end_label);
-Expr1 *end_label_expr1 = parse_expr(utstring_body(end_label1));
-add_opcode_nn(0xCA, end_label_expr1);
-utstring_free(end_label1);
-UT_string* end_label2;
-utstring_new(end_label2);
-utstring_printf(end_label2, "%s-0", end_label);
-Expr1 *end_label_expr2 = parse_expr(utstring_body(end_label2));
-add_opcode_nn(0xDA, end_label_expr2);
-utstring_free(end_label2);
+add_opcode_nn_end(0xCA, end_label, 0);
+add_opcode_nn_end(0xDA, end_label, 0);
 DO_stmt(0xC9);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }

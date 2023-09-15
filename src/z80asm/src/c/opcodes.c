@@ -240,6 +240,37 @@ void add_rst_opcode(int arg) {
     }
 }
 
+/* add jump relative to text label - offset */
+void add_opcode_jr_end(int opcode, const char* end_label, int offset)
+{
+	UT_string* target;
+	utstring_new(target);
+	utstring_printf(target, "%s-%d", end_label, offset);
+	Expr1 *target_expr = parse_expr(utstring_body(target));
+	add_opcode_jr(opcode, target_expr);			//jump over
+	utstring_free(target);
+}
+
+void add_opcode_nn_end(int opcode, const char* end_label, int offset)
+{
+	UT_string* target;
+	utstring_new(target);
+	utstring_printf(target, "%s-%d", end_label, offset);
+	Expr1 *target_expr = parse_expr(utstring_body(target));
+	add_opcode_nn(opcode, target_expr);			//jump over
+	utstring_free(target);
+}
+
+void add_opcode_nnn_end(int opcode, const char* end_label, int offset)
+{
+	UT_string* target;
+	utstring_new(target);
+	utstring_printf(target, "%s-%d", end_label, offset);
+	Expr1 *target_expr = parse_expr(utstring_body(target));
+	add_opcode_nnn(opcode, target_expr);			//jump over
+	utstring_free(target);
+}
+
 /* add Z88's opcodes */
 void add_Z88_CALL_OZ(int argument)
 {
@@ -350,3 +381,4 @@ void add_copper_unit_nop()
 	else
 		append_word_be(0x0000);
 }
+	
