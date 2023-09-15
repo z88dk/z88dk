@@ -17,6 +17,7 @@ Z88DK Z80 Module Assembler Change Log
 2023-08-09 Fix #2373: create cpu z80_strict with just the documented opcodes
 2023-08-09 Fix #2373: allow the creation of fat libraries with the same code for all CPUs (-m*)
 2023-08-09 Fix #2377: add support of r800
+2023-09-15 Add EQ, NE, LTU, LEU, GTU, GEU condition codes
 
 2022
 ----

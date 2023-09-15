@@ -107,9 +107,13 @@ sub ticks {
 	spew("$test.asm", $source);
 	run_ok("z88dk-z80asm $options -b -l $test.asm");
 	
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+
 	my $cpu = ($options =~ /(?:-m=?)(\S+)/) ? $1 : "z80";
 	$cpu = 'ez80_z80' if $cpu eq 'ez80';
 	run_ok("z88dk-ticks $test.bin -m$cpu -output $test.out");
+
+	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
 
 	my $bin = slurp("$test.out");
 	my $mem = substr($bin, 0, 0x10000); $mem =~ s/\0+$//;

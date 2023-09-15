@@ -49,6 +49,7 @@ Detailed but incomplete changelist:
 - [z80asm] add symbol table to libraries to speed-up linking
 - [z80asm] allow the creation of fat libraries with the same code for all CPUs (-m*)
 - [z80asm] add support of r800
+- [z80asm] add EQ, NE, LTU, LEU, GTU, GEU condition codes
 - [zcc] +config at any place, support for -xc
 - [make] add cmake support
 

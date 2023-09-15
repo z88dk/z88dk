@@ -74,6 +74,23 @@ void add_opcode_jr(int opcode, Expr1 *expr)
 	}
 }
 
+/* add opcodes followed by jump relative offset expression to the same address*/
+void add_opcode_jr_jr(int opcode0, int opcode1, struct Expr1* expr0)
+{
+    // build expr1 = expr0
+    UT_string* expr1_text;
+    utstring_new(expr1_text);
+    utstring_printf(expr1_text, "%s", expr0->text->data);
+
+    add_opcode_jr(opcode0, expr0);
+
+    struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
+    if (expr1)
+        add_opcode_jr(opcode1, expr1);
+
+    utstring_free(expr1_text);
+}
+
 /* add opcode followed by 8-bit unsigned expression */
 void add_opcode_n(int opcode, Expr1* expr)
 {
@@ -114,6 +131,23 @@ void add_opcode_nn(int opcode, Expr1 *expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_WORD, expr);
+}
+
+/* add opcodes followed by the same 16-bit expression */
+void add_opcode_nn_nn(int opcode0, int opcode1, struct Expr1* expr0)
+{
+    // build expr1 = expr0
+    UT_string* expr1_text;
+    utstring_new(expr1_text);
+    utstring_printf(expr1_text, "%s", expr0->text->data);
+
+    add_opcode_nn(opcode0, expr0);
+
+    struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
+    if (expr1)
+        add_opcode_nn(opcode1, expr1);
+
+    utstring_free(expr1_text);
 }
 
 /* add opcode followed by 24-bit expression */
@@ -204,6 +238,37 @@ void add_rst_opcode(int arg) {
         add_opcode(0xC7 + arg); break;
     default: error_int_range(arg);
     }
+}
+
+/* add jump relative to text label - offset */
+void add_opcode_jr_end(int opcode, const char* end_label, int offset)
+{
+	UT_string* target;
+	utstring_new(target);
+	utstring_printf(target, "%s-%d", end_label, offset);
+	Expr1 *target_expr = parse_expr(utstring_body(target));
+	add_opcode_jr(opcode, target_expr);			//jump over
+	utstring_free(target);
+}
+
+void add_opcode_nn_end(int opcode, const char* end_label, int offset)
+{
+	UT_string* target;
+	utstring_new(target);
+	utstring_printf(target, "%s-%d", end_label, offset);
+	Expr1 *target_expr = parse_expr(utstring_body(target));
+	add_opcode_nn(opcode, target_expr);			//jump over
+	utstring_free(target);
+}
+
+void add_opcode_nnn_end(int opcode, const char* end_label, int offset)
+{
+	UT_string* target;
+	utstring_new(target);
+	utstring_printf(target, "%s-%d", end_label, offset);
+	Expr1 *target_expr = parse_expr(utstring_body(target));
+	add_opcode_nnn(opcode, target_expr);			//jump over
+	utstring_free(target);
 }
 
 /* add Z88's opcodes */
@@ -316,3 +381,4 @@ void add_copper_unit_nop()
 	else
 		append_word_be(0x0000);
 }
+	

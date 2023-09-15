@@ -19,8 +19,7 @@ $(PROJ).lib: $(SRC) $(PROJ)_lib.lst Makefile
 	$(Z80ASM_EXE) -l -m* -x$(PROJ).lib @$(PROJ)_lib.lst
 
 $(PROJ)_lib.lst: $(SRC) Makefile
-	$(RM) $(PROJ)_lib.lst
-	$(foreach file, $(sort $(SRC)), echo $(file) >> $(PROJ)_lib.lst; )
+	perl -E 'say $$_ for grep {!/^test/} sort @ARGV' $(SRC) > $(PROJ)_lib.lst
 
 clean::
 	$(RM) $(PROJ).lib $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin $(PROJ) *.bak

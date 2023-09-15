@@ -81,23 +81,91 @@ sub parse_code {
 	#say "$cpu\t$asm\t$bin";
 
 	# handle special case of jump to %t
-	if (grep {/%t/} @{$ops[0]}) {
-		my $op1 = $ops[0][0];
-		my $op2 = $ops[1][0];
+	if ($bin =~ /%t/) {
 		push @code,
+			"{",
 			"DO_STMT_LABEL();",
-			"Expr1 *target_expr = pop_expr(ctx);",
-			"const char *end_label = autolabel();",
-			"Expr1 *end_label_expr = parse_expr(end_label);",
-			"add_opcode_nn(0x".fmthex($op1).", end_label_expr);",	# jump over
-			"add_opcode_nn(0x".fmthex($op2).", target_expr);",		# call
-			"asm_LABEL_offset(end_label, 6);";
+			"const char *end_label = autolabel();";
+		for my $op (@ops) {
+			my $count_t = scalar(grep {/%t/} @$op);
+			if ($count_t) {
+				my $opcode = 0;
+				my $target_offset = 0;
+				for my $i (0 .. $#$op) {
+					if ($op->[$i] =~ /%t(\d*)/) {
+						if ($1) {
+							$target_offset = $1;
+						}
+						last;
+					}
+					else {
+						$opcode = ($opcode << 8) | ($op->[$i] & 0xFF);
+					}
+				}
+				
+				if ($count_t==1) {
+					push @code,
+						"add_opcode_jr_end(0x".fmthex($opcode).", end_label, $target_offset);";
+				}
+				elsif ($count_t==2) {
+					push @code,
+						"add_opcode_nn_end(0x".fmthex($opcode).", end_label, $target_offset);";
+				}
+				elsif ($count_t==3) {	
+					push @code,
+						"add_opcode_nnn_end(0x".fmthex($opcode).", end_label, $target_offset);";
+				}
+				else {	
+					die $count_t;
+				}				
+			}
+			else {
+				push @code, parse_code_opcode($cpu, $asm, @$op);
+			}
+		}
+		push @code, 
+			"asm_LABEL_offset(end_label, get_cur_opcode_size());",
+			"}";
+	}
+	# handle multiple uses of the same expression
+	elsif ($bin =~ /%m %m[0-9A-F ]+%m %m/) {
+		push @code,
+			"{",
+			"DO_STMT_LABEL();",
+			"Expr1 *expr = pop_expr(ctx);";
+		for my $op (@ops) {
+			my $count_m = scalar(grep {/%m/} @$op);
+			if ($count_m) {
+				my $opcode = 0;
+				for my $i (0 .. $#$op) {
+					last if $op->[$i] =~ /%m/;
+					$opcode = ($opcode << 8) | ($op->[$i] & 0xFF);
+				}
+				
+				if ($count_m==2) {
+					push @code,
+						"add_opcode_nn(0x".fmthex($opcode).", Expr1_clone(expr));";
+				}
+				elsif ($count_m==3) {	
+					push @code,
+						"add_opcode_nnn(0x".fmthex($opcode).", Expr1_clone(expr));";
+				}
+				else {	
+					die $count_m;
+				}				
+			}
+			else {
+				push @code, parse_code_opcode($cpu, $asm, @$op);
+			}
+		}
+		push @code, 
+			"OBJ_DELETE(expr);",
+			"}";
 	}
 	# handle rst[.l] %c
 	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
 		if ($1) {
 			push @code, 
-				"DO_STMT_LABEL();",
 				"DO_stmt(".sprintf("0x%02X", $ops[0][0]).");";
 			shift @ops;
 		}
@@ -107,7 +175,6 @@ sub parse_code {
 	}
 	# handle ld dd,(ix+d) -> ld ddl,(ix+d) : ld ddh, (ix+d+1)
 	elsif ($bin =~ /%D/) {
-		push @code, "DO_STMT_LABEL();";
 		for my $i (0 .. $#ops) {
 			if (($ops[$i][2]//'') eq '%d' && ($ops[$i+1][2]//'') eq '%D') {
 				my $opcode0 = ($ops[$i+0][0] << 8) + $ops[$i+0][1];
@@ -123,6 +190,18 @@ sub parse_code {
 			}
 		}
 	}
+	elsif ($bin =~ /^\d+ %m %m \d+ %m %m$/) {
+		my $opcode0 = $ops[0][0];
+		my $opcode1 = $ops[1][0];
+		push @code, 
+			"DO_stmt_nn_nn(".sprintf("0x%02X, 0x%02X", $opcode0, $opcode1).");";
+	}		
+	elsif ($bin =~ /^\d+ %j \d+ %j$/) {
+		my $opcode0 = $ops[0][0];
+		my $opcode1 = $ops[1][0];
+		push @code, 
+			"DO_stmt_jr_jr(".sprintf("0x%02X, 0x%02X", $opcode0, $opcode1).");";
+	}		
 	else {
 		for my $op (@ops) {
 			push @code, parse_code_opcode($cpu, $asm, @$op);
@@ -157,14 +236,12 @@ sub parse_code_opcode {
 	}
 	elsif ($asm =~ /^mmu %c, %n/) {
 		push @code, 
-			"DO_STMT_LABEL();",
 			"if (expr_error) { error_expected_const_expr(); } else {",
 			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
 			"DO_stmt_n(0xED9150 + expr_value);}";
 	}
 	elsif ($asm =~ /^mmu %c, a/) {
 		push @code, 
-			"DO_STMT_LABEL();",
 			"if (expr_error) { error_expected_const_expr(); } else {",
 			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
 			"DO_stmt(0xED9250 + expr_value);}";
@@ -237,6 +314,7 @@ sub parse_code_opcode {
 	# build statement - need to leave expressions for C compiler
 	if ($stmt) {
 		@bin = split(' ', $bin);	# $bin has %x removed
+		#say "@bin";
 		my @expr;
 		for (@bin) {
 			if (/[+*?<>]/) {

@@ -37,6 +37,8 @@ my @tokens = (
 	# Flags, C register
 	'NZ', 'Z', 'NC', 'C', 'PO', 'PE', 'P', 'M', 
 	'LZ', 'LO', 'NV', 'V', 'NK', 'K', 'NX5', 'X5',
+	'NE', 'EQ', 
+	'LTU', 'LEU', 'GTU', 'GEU', 
 
 	# 8-bit registers
 	'B', 'D', 'E', 'H', 'L', 'A', 'F', 'I', 'R', 
@@ -111,7 +113,13 @@ my @tokens = (
 	'R_LO', 'R_LZ', 'R_P', 'R_M', 'PCHL', 'XTHL', 'SPHL', 'HLT', 'RIM', 'SIM', 
 	'DSUB', 'ARHL', 'RRHL', 'RDEL', 'RLDE', 'LDHI', 'LDSI', 'RSTV', 'OVRST8', 
 	'SHLX', 'SHLDE', 'LHLX', 'LHLDE',
-	
+	'CEQ', 'C_EQ', 'CNE', 'C_NE',  
+	'JEQ', 'J_EQ', 'JNE', 'J_NE',  
+	'REQ', 'R_EQ', 'RNE', 'R_NE',  
+	'C_LTU', 'CLTU', 'C_LEU', 'CLEU', 'C_GTU', 'CGTU', 'C_GEU', 'CGEU',
+	'J_LTU', 'JLTU', 'J_LEU', 'JLEU', 'J_GTU', 'JGTU', 'J_GEU', 'JGEU',
+	'R_LTU', 'RLTU', 'R_LEU', 'RLEU', 'R_GTU', 'RGTU', 'R_GEU', 'RGEU',
+		
 	# R800 specific opcodes
 	'MULUB', 'MULUW',
 );
