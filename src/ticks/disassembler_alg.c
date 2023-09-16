@@ -347,7 +347,7 @@ static char *handle_ed_assorted_instructions(dcontext *state, uint8_t y)
     static char *r2ka_table[] =  { "ld        eir,a", "ld        iir,a", "ld        a,eir", "ld        a,iir", "ld        xpc,a", "nop",    "ld        a,xpc", "nop"};
     static char *r3k_table[] =  { "ld        eir,a", "ld        iir,a", "ld        a,eir", "ld        a,iir", "ld        xpc,a", "setusr", "ld        a,xpc", "rdmode"};
     
-    return c_cpu & CPU_R2KA ? r2ka_table[y] : c_cpu & CPU_R3K ? r3k_table[y] : c_cpu & (CPU_Z180|CPU_EZ80) ? z180_table[y] : table[y];
+    return c_cpu & CPU_R2KA ? r2ka_table[y] : c_cpu & (CPU_R3K|CPU_R4K) ? r3k_table[y] : c_cpu & (CPU_Z180|CPU_EZ80) ? z180_table[y] : table[y];
 }
 
 static char *handle_im_instructions(dcontext *state, uint8_t y)
@@ -358,7 +358,7 @@ static char *handle_im_instructions(dcontext *state, uint8_t y)
     char *r3k_table[] =  { "ipset     0", "ipset     2",   "ipset     1", "ipset     3", "push      su", "pop       su",  "push      ip", "pop       ip"};
     char *ez80table[] =  { "im        0", "nop       ",    "im        1", "im        2", "im        0",  "ld        a,mb","slp       ",   "rsmix     "};
     
-    return c_cpu & CPU_R2KA ? r2ka_table[y] : c_cpu & CPU_R3K ? r3k_table[y] : c_cpu & CPU_Z180 ? z180_table[y] : isez80() ? ez80table[y] : table[y];
+    return c_cpu & CPU_R2KA ? r2ka_table[y] : c_cpu & (CPU_R3K|CPU_R4K) ? r3k_table[y] : c_cpu & CPU_Z180 ? z180_table[y] : isez80() ? ez80table[y] : table[y];
 }   
 
 static char *handle_ez80_am(dcontext *state, char *opcode)
@@ -930,11 +930,12 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                         case 5:
                                             if ( israbbit() && y == 0 ) BUF_PRINTF("lret");
                                             if ( y == 1 ) { BUF_PRINTF("%-10s", handle_ez80_am(state, "reti"));; dolf=1; }
+                                            else if ( israbbit4k() && y == 2 ) BUF_PRINTF("fsyscall");
                                             else if ( israbbit() && y == 3 ) BUF_PRINTF("ipres");
                                             else if ( israbbit() && y == 4 ) BUF_PRINTF("%-10s(%s),hl","ldp", handle_addr16(state, opbuf1, sizeof(opbuf1)));
                                             else if ( israbbit() && y == 5 ) BUF_PRINTF("%-10shl,(%s)","ldp", handle_addr16(state, opbuf1, sizeof(opbuf1)));
-                                            else if ( israbbit() && y == 6 ) BUF_PRINTF("%-10s", c_cpu == CPU_R3K ? "syscall" : "nop");
-                                            else if ( israbbit() && y == 7 ) BUF_PRINTF("%-10s", c_cpu == CPU_R3K ? "sures" : "nop");
+                                            else if ( israbbit() && y == 6 ) BUF_PRINTF("%-10s", c_cpu & (CPU_R3K|CPU_R4K) ? "syscall" : "nop");
+                                            else if ( israbbit() && y == 7 ) BUF_PRINTF("%-10s", c_cpu & (CPU_R3K|CPU_R4K) ? "sures" : "nop");
                                             else if ( (isz180() || isez80()) && y == 0 ) { BUF_PRINTF("%10s", handle_ez80_am(state,"retn")); dolf=1; }
                                             else if ( isez80() && y == 2 ) BUF_PRINTF("%-10siy,ix%s",handle_ez80_am(state,"lea"),handle_displacement(state, opbuf1, sizeof(opbuf1)));                                        
                                             else if ( isez80() && y == 4 ) BUF_PRINTF("%-10six%s",handle_ez80_am(state,"pea"),handle_displacement(state, opbuf1, sizeof(opbuf1)));                                        
