@@ -827,6 +827,7 @@ int heirb(LVALUE* lval)
                 }
                 lval->flags = flags;
                 zadd_const(lval, member_type->offset);
+	        lval->offset = member_type->offset;
                 lval->symbol = NULL;
                 lval->ltype = member_type;
                 lval->indirect_kind = lval->val_type = member_type->kind;
