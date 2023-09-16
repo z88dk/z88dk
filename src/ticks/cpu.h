@@ -14,14 +14,16 @@ extern int c_adl_mode;
 #define CPU_8080     128
 #define CPU_8085     256
 #define CPU_EZ80     512
+#define CPU_R4K      1024
 
 #define is8080() ( (c_cpu & CPU_8080) )
 #define is8085() ( (c_cpu & CPU_8085) )
 #define is808x() ( (c_cpu & (CPU_8080|CPU_8085)) )
 #define isgbz80() ( (c_cpu & CPU_GBZ80) == CPU_GBZ80 )
 #define isr800() ( (c_cpu & CPU_R800) == CPU_R800 )
-#define israbbit() ( c_cpu & (CPU_R2KA|CPU_R3K))
+#define israbbit() ( c_cpu & (CPU_R2KA|CPU_R3K|CPU_R4K))
 #define israbbit3k() ( c_cpu & (CPU_R3K))
+#define israbbit4k() ( c_cpu & (CPU_R4K))
 #define isz180() ( c_cpu & (CPU_Z180))
 #define isez80() ( c_cpu & (CPU_EZ80))
 #define canaltreg() ( ( c_cpu & (CPU_8080|CPU_8085|CPU_GBZ80)) == 0 )
