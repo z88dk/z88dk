@@ -87,10 +87,10 @@ static char *handle_rel8(dcontext *state, char *buf, size_t buflen)
         char temp[10];
 
         if ( c_autolabel ) {
-            snprintf(temp,sizeof(temp),"L%04x",state->pc + displacement);
+            snprintf(temp,sizeof(temp),"L%04x",(unsigned short)(state->pc + displacement));
             symbol_add_autolabel(state->pc + displacement,temp);
-        }
-        if ( state->adl ) {
+            BUF_PRINTF("%s",temp);
+        } else if ( state->adl ) {
             BUF_PRINTF("$%06x", (state->pc + displacement));
         } else {
             BUF_PRINTF("$%04x", (unsigned short)(state->pc + displacement));
@@ -120,10 +120,10 @@ static char *handle_rel16(dcontext *state, char *buf, size_t buflen)
         char temp[10];
 
         if ( c_autolabel ) {
-            snprintf(temp,sizeof(temp),"L%04x",state->pc + displacement);
+            snprintf(temp,sizeof(temp),"L%04x",(unsigned short)(state->pc + displacement));
             symbol_add_autolabel(state->pc + displacement,temp);
-        }
-        if ( state->adl ) {
+            BUF_PRINTF("%s",temp);
+        } else if ( state->adl ) {
             BUF_PRINTF("$%06x", (state->pc + displacement));
         } else {
             BUF_PRINTF("$%04x", (unsigned short)(state->pc + displacement));
@@ -140,7 +140,7 @@ static char *handle_addr16(dcontext *state, char *buf, size_t buflen)
     const char    *label;
     uint8_t  lsb;
     uint8_t  msb;
-    uint8_t  mmsb;
+    uint8_t  mmsb = 0;
     
     READ_BYTE(state, lsb);
     READ_BYTE(state, msb);
@@ -148,16 +148,19 @@ static char *handle_addr16(dcontext *state, char *buf, size_t buflen)
         READ_BYTE(state, mmsb);
     }
 
-    if ( (label = find_symbol(lsb + msb * 256, SYM_ADDRESS)) != NULL ) {
+    if ( (label = find_symbol(lsb + msb * 256 + mmsb * 65536, SYM_ADDRESS)) != NULL ) {
         BUF_PRINTF("%s",label);
     } else {
         char temp[10];
 
         if ( c_autolabel ) {
-            snprintf(temp,sizeof(temp),"L%02x%02x",msb,lsb);
-            symbol_add_autolabel(lsb + msb * 256,temp);
-        }
-        if ( WORDIS24(state) ) {
+            if ( WORDIS24(state) ) 
+                snprintf(temp,sizeof(temp),"L%02x%02x%02x",mmsb,msb,lsb);
+            else
+                snprintf(temp,sizeof(temp),"L%02x%02x",msb,lsb);
+            symbol_add_autolabel(lsb + msb * 256 + mmsb * 65536,temp);
+            BUF_PRINTF("%s",temp);
+        } else if ( WORDIS24(state) ) {
             BUF_PRINTF("$%02x%02x%02x", mmsb, msb, lsb);
         } else {
             BUF_PRINTF("$%02x%02x", msb, lsb);
@@ -186,8 +189,8 @@ static char *handle_addr24(dcontext *state, char *buf, size_t buflen)
         if ( c_autolabel ) {
             snprintf(temp,sizeof(temp),"L%02x%02x%02x",mmsb,msb,lsb);
             symbol_add_autolabel(lsb + msb * 256 + mmsb * 65536,temp);
-        }
-        BUF_PRINTF("$%02x%02x%02x", mmsb, msb, lsb);
+            BUF_PRINTF("%s",temp);
+        } else BUF_PRINTF("$%02x%02x%02x", mmsb, msb, lsb);
     }
     return buf;
 }
