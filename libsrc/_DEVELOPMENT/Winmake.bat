@@ -98,7 +98,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sdcc_iy.lib
 
-      z88dk-z80asm !cpu! -IXIY -x%%t_sdcc_iy -I!z88dklib! -D__SDCC -D__SDCC_IY @target/%%t/library/%%t_sdcc_iy.lst
+      z88dk-z80asm !cpu! -IXIY-soft -x%%t_sdcc_iy -I!z88dklib! -D__SDCC -D__SDCC_IY @target/%%t/library/%%t_sdcc_iy.lst
       move /Y %%t_sdcc_iy.lib lib/sdcc_iy/%%t.lib
 
       del /S *.o > nul 2>&1
