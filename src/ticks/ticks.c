@@ -702,6 +702,15 @@ void setf(int a){
   fk= (a&0x20)>>5;  // 8085 flag
 }
 
+// get each of the flags as bools, pass f() or f_() as argument
+#define F_C(f)		(((f) & 1) == 1)
+#define F_V(f)		(is8085() ? (((f) & 2) == 2) : (((f) & 4) == 4))
+#define F_Z(f)		(((f) & 0x40) == 0x40)
+#define F_S(f)		(((f) & 0x80) == 0x80)
+#define F_GT(f)		((F_Z(f) | (F_S(f) ^ F_V(f))) == 0)
+#define F_LT(f)		((F_S(f) ^ F_V(f)) == 1)
+#define F_GTU(f)	(((F_C(f) == 0) & (F_Z(f)) == 0) == 1)
+
 extern backend_t ticks_debugger_backend;
 
 int main (int argc, char **argv){
@@ -2408,8 +2417,16 @@ int main (int argc, char **argv){
           fr= a= (ff= (ff&256)/-256);
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xa0: // AND B
-        AND(b, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xa0:
+        if ( israbbit4k() ) {       // (R4K) jr gt, s8
+          st += 5;
+          if (F_GT(f()))
+            pc += (get_memory(pc) ^ 128) - 127;
+          else
+            pc++;
+        } else {                    // AND B
+          AND(b, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa1: // AND C
         AND(c, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
@@ -2454,8 +2471,16 @@ int main (int argc, char **argv){
           fb= 0;
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xa8: // XOR B
-        XOR(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xa8:
+        if ( israbbit4k() ) {       // (R4K) jr gtu, s8
+          st += 5;
+          if (F_GTU(f()))
+            pc += (get_memory(pc) ^ 128) - 127;
+          else
+            pc++;
+        } else {                    // XOR B
+          XOR(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa9: // XOR C
         XOR(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
@@ -2495,8 +2520,16 @@ int main (int argc, char **argv){
         a= ff= fr= fb= 0;
         fa= 256;
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xb0: // OR B
-        OR(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xb0:
+        if ( israbbit4k() ) {       // (R4K) jr lt, s8
+          st += 5;
+          if (F_LT(f()))
+            pc += (get_memory(pc) ^ 128) - 127;
+          else
+            pc++;
+        } else {                    // OR B
+          OR(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb1: // OR C
         OR(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
@@ -2543,8 +2576,16 @@ int main (int argc, char **argv){
           fb= 0;
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xb8: // CP B
-        CP(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xb8:
+        if ( israbbit4k() ) {       // (R4K) jr v, s8
+          st += 5;
+          if (F_V(f()))
+            pc += (get_memory(pc) ^ 128) - 127;
+          else
+            pc++;
+        } else {                    // CP B
+          CP(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb9: // CP C
         CP(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
