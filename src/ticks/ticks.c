@@ -3943,20 +3943,20 @@ int main (int argc, char **argv){
               st += 8;
             }
             break;
-          case 0x3e:    // (EZ80) ld (hl),ix
-            if ( isez80() ) {
-              st += 4;
-              put_memory((l|h<<8),xl);
-              put_memory((l|h<<8) + 1,xh);
-            } else {
-              st += 8;
-            }
-            break;
-          case 0x3f:    // (EZ80) ld (hl),iy
+          case 0x3e:    // (EZ80) ld (hl),iy
             if ( isez80() ) {
               st += 4;
               put_memory((l|h<<8),yl);
               put_memory((l|h<<8) + 1,yh);
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x3f:    // (EZ80) ld (hl),ix
+            if ( isez80() ) {
+              st += 4;
+              put_memory((l|h<<8),xl);
+              put_memory((l|h<<8) + 1,xh);
             } else {
               st += 8;
             }
@@ -4186,8 +4186,12 @@ int main (int argc, char **argv){
               st += 8;
             }
             break;
-          case 0x31:                                         // (ZXN) add hl,a
-            if ( c_cpu == CPU_Z80N ) {
+          case 0x31:
+            if ( isez80() ) {                               // (EZ80) ld iy,(hl)
+              st += 4;
+              yl = get_memory((l|h<<8));
+              yh = get_memory((l|h<<8) + 1);
+            } else if ( c_cpu == CPU_Z80N ) {               // (ZXN) add hl,a
               int16_t result = (( h * 256 ) + l) + a;
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
