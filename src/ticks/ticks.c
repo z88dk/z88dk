@@ -4159,7 +4159,7 @@ int main (int argc, char **argv){
           case 0xdc: case 0xdd: case 0xde: case 0xdf:
           case 0xe0: case 0xe2: 
           case 0xe4: case 0xe5: case 0xe6: case 0xe7:
-          case 0xe8: case 0xea: case 0xeb:
+          case 0xe8: case 0xeb:
           case 0xec: case 0xed: case 0xee: case 0xef:
           case 0xf0: case 0xf1: case 0xf2: 
           case 0xf4: case 0xf5: case 0xf6: case 0xf7:
@@ -4831,6 +4831,16 @@ int main (int argc, char **argv){
                      fb=  (4928640>>((fb^fb>>4)&15)^b)&128
                         | u>>4
                         | (t&128)<<2; break;
+          case 0xea:
+            if ( israbbit4k() ) {       // (R4K) call (hl)
+              st += 12;
+              put_memory(--sp, pc >> 8);
+              put_memory(--sp, pc);
+              mp = pc = (h<<8)|l;
+            } else {
+              st += 8;
+            }
+            break;
         }
         ih=1;altd=0;ioi=0;ioe=0;//break;
     }
