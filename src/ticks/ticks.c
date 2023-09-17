@@ -738,6 +738,8 @@ int main (int argc, char **argv){
     printf("  -mz180         Emulate a z180\n"),
     printf("  -mr2ka         Emulate a Rabbit 2000\n"),
     printf("  -mr3k          Emulate a Rabbit 3000\n"),
+    printf("  -mr4k          Emulate a Rabbit 4000\n"),
+    printf("  -mr5k          Emulate a Rabbit 5000\n"),
     printf("  -mz80n         Emulate a Spectrum Next z80n\n"),
     printf("  -mez80_z80     Emulate an ez80 (z80 mode)\n"),
     printf("  -mr800         Emulate a r800 (ticks may not be accurate)\n"),
@@ -833,6 +835,10 @@ int main (int argc, char **argv){
             c_cpu = CPU_R2KA;
           } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
             c_cpu = CPU_R3K;
+          } else if ( strcmp(&argv[0][1],"mr4k") == 0 ) {
+            c_cpu = CPU_R4K;
+          } else if ( strcmp(&argv[0][1],"mr5k") == 0 ) {
+            c_cpu = CPU_R4K;
           } else if ( strcmp(&argv[0][1],"mez80_z80") == 0 ) {
             c_cpu = CPU_EZ80;
           } else if ( strcmp(&argv[0][1],"mgbz80") == 0 ) {
@@ -2578,7 +2584,14 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbf: // CP A
         st+=isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
-        if ( altd ) {
+        if ( israbbit4k() ) { // CLR HL
+          if ( altd ) {
+            h_ = l_ = 0;
+          } else {
+            h = l = 0;
+          }
+        }
+        else if ( altd ) {
           fr_= 0;
           fb_= ~(fa_= a);
           ff_= a&40;
