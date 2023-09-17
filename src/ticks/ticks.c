@@ -510,6 +510,10 @@
       st += ticks;             \
     } while (0)
 
+#define RABBIT4k_UNDEFINED() do { \
+    fprintf(stderr, "Invalid R4K opcode at %04x", pc-1); \
+} while(0)
+
 FILE * ft;
 unsigned char * tapbuf;
 
@@ -1105,20 +1109,426 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
         break;
       case 0x40: // LD B,B
-        if ( altd ) { b_ = b; st += 2; break; }
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if ( altd ) { b_ = b; st += 2; ih=1;altd=0;ioi=0;ioe=0;break; }
       case 0x49: // LD C,C
-        if ( altd ) { c_ = c; st += 2; break; }
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if ( altd ) { c_ = c; st += 2; ih=1;altd=0;ioi=0;ioe=0;break; }
       case 0x52: // LD D,D
-        if ( altd ) { d_ = d; st += 2; break; }
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if ( altd ) { d_ = d; st += 2; ih=1;altd=0;ioi=0;ioe=0;break; }
       case 0x5b: // LD E,E
-        if ( altd ) { e_ = e; st += 2; break; }
+        if ( altd ) { e_ = e; st += 2; ih=1;altd=0;ioi=0;ioe=0;break; }
       case 0x64: // LD H,H
-        if ( altd ) { h_ = h; st += 2; break; }
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if ( altd ) { h_ = h; st += 2; ih=1;altd=0;ioi=0;ioe=0;break; }
       case 0x6d: // LD L,L
-        if ( altd ) { l_ = l; st += 2; break; }
+        if ( israbbit4k() ) {
+            uint8_t v = get_memory(pc++);
+
+            fprintf(stderr,"Unsupported R4K opcode %02x %02x\n",0x6d, v);
+            // 6d page for r4k
+            ih=1;altd=0;ioi=0;ioe=0;break; 
+        } else if ( altd ) { l_ = l; st += 2; ih=1;altd=0;ioi=0;ioe=0;break; }
       case 0x7f: // LD A,A
-        if ( altd ) { a_ = a; st += 2; break; }
-        st+= israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4;
+        if ( israbbit4k() ) {
+            if (ih) {
+              // 7f page - 8 bit operations moved out from main page
+              r++;
+              switch( get_memory(pc++) ){
+                case 0x40: // LD B,B
+                    if ( altd ) { b_ = b; st += 4; ih=1;altd=0;ioi=0;ioe=0;break; }
+                case 0x49: // LD C,C
+                    if ( altd ) { c_ = c; st += 4; ih=1;altd=0;ioi=0;ioe=0;break; }
+                case 0x52: // LD D,D
+                    if ( altd ) { d_ = d; st += 4; ih=1;altd=0;ioi=0;ioe=0;break; }
+                case 0x5b: // LD E,E
+                    if ( altd ) { e_ = e; st += 4; ih=1;altd=0;ioi=0;ioe=0;break; }
+                case 0x64: // LD H,H
+                    if ( altd ) { h_ = h; st += 4; ih=1;altd=0;ioi=0;ioe=0;break; }
+                case 0x6d: // LD L,L
+                    if ( altd ) { l_ = l; st += 4; ih=1;altd=0;ioi=0;ioe=0;break; }
+                case 0x7f: // LD A,A
+                    if ( altd ) { a_ = a; st += 4; ih=1;altd=0;ioi=0;ioe=0;break; }
+                    st += 4;
+                    ih=1;altd=0;ioi=0;ioe=0;
+                    break;
+                case 0x41: // LD B,C
+                    LDRR(b, c, b_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x42: // LD B,D
+                    LDRR(b, d, b_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x43: // LD B,E
+                    LDRR(b, e, e_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x44: // LD B,H 
+                    LDRR(b, h, h_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x45: // LD B,L 
+                    LDRR(b, l, b_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x47: // LD B,A
+                    LDRR(b, a, b_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x48: // LD C,B
+                    LDRR(c, b, c_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x4a: // LD C,D
+                    LDRR(c, d, c_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x4b: // LD C,E
+                    LDRR(c, e,c_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x4c: // LD C,H 
+                    LDRR(c, h, c_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x4d: // LD C,L 
+                    LDRR(c, l, c_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x4f: // LD C,A
+                    LDRR(c, a, c_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                    break;
+                case 0x50: // LD D,B
+                    LDRR(d, b, d_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x51: // LD D,C
+                    LDRR(d, c,  d_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x53: // LD D,E
+                    LDRR(d, e,  d_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x54: // LD D,H 
+                    LDRR(d, h,  d_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x55: // LD D,L 
+                    LDRR(d, l,  d_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x57: // LD D,A
+                    LDRR(d, a,  d_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                    break;
+                case 0x58: // LD E,B
+                    LDRR(e, b, e_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x59: // LD E,C
+                    LDRR(e, c, e_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x5a: // LD E,D
+                    LDRR(e, d, e_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x5c: // LD E,H
+                    LDRR(e, h, e_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x5d: // LD E,L
+                    LDRR(e, l, e_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x5f: // LD E,A
+                    LDRR(e, a, e_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x60: // LD H,B
+                    LDRR(h, b, h_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x61: // LD H,C
+                    LDRR(h, c, h_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x62: // LD H,D 
+                    LDRR(h, d,  h_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x63: // LD H,E
+                    LDRR(h, e,  h_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x65: // LD H,L
+                    LDRR(h, l, h_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x67: // LD H,A
+                    LDRR(h, a, h_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x68: // LD L,B 
+                    LDRR(l, b, l_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x69: // LD L,C 
+                    LDRR(l, c, l_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x6a: // LD L,D
+                    LDRR(l, d, l_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x6b: // LD L,E 
+                    LDRR(l, e, l_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x6c: // LD L,H 
+                    LDRR(l, h, l_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x6f: // LD L,A 
+                    LDRR(l, a, l_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x78: // LD A,B
+                    LDRR(a, b, a_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x79: // LD A,C
+                    LDRR(a, c, a_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x7a: // LD A,D
+                    LDRR(a, d, a_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x7b: // LD A,E
+                    LDRR(a, e, a_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x7c: // LD A,H
+                    LDRR(a,h,a_, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x7d: // LD A,L 
+                    LDRR(a, l, a_,4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x80: // ADD A,B
+                    ADD(b, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x81: // ADD A,C
+                    ADD(c, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x82: // ADD A,D
+                    ADD(d, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x83: // ADD A,E
+                    ADD(e, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x84: // ADD A,H
+                    ADD(h, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x85: // ADD A,L
+                    ADD(l, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x86: // ADD A,(HL)
+                    ADD(get_memory(l|h<<8), 7);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x87: // ADD A,A
+                    st+= 4;
+                    if ( altd ) fr_= a_= (ff_= 2*(fa_= fb_= a));
+                    else fr= a= (ff= 2*(fa= fb= a));
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x88: // ADC A,B
+                    ADC(b, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x89: // ADC A,C
+                    ADC(c, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x8a: // ADC A,D
+                    ADC(d, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x8b: // ADC A,E
+                    ADC(e, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x8c: // ADC A,H
+                    ADC(h, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x8d: // ADC A,L
+                    ADC(l, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x8e: // ADC A,(HL)
+                    ADC(get_memory(l|h<<8), 7);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x8f: // ADC A,A
+                    st+=4;
+                    if ( altd ) fr_= a_= (ff_= 2*(fa_= fb_= a)+(ff_>>8&1));
+                    else fr= a= (ff= 2*(fa= fb= a)+(ff>>8&1));
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x90: // SUB B
+                    SUB(b, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x91: // SUB C
+                    SUB(c, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x92: // SUB D
+                    SUB(d, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x93: // SUB E
+                    SUB(e, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x94: // SUB H
+                    SUB(h, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x95: // SUB L // SUB IXl // SUB IYl
+                    SUB(l, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x96: // SUB (HL) // SUB (IX+d) // SUB (IY+d)
+                    SUB(get_memory(l|h<<8), 7);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x97: // SUB A
+                    st+=4;
+                    if ( altd ) {
+                        fb_= ~(fa_= a);
+                        fr_= a_= ff_= 0;
+                    } else {
+                        fb= ~(fa= a);
+                        fr= a= ff= 0;
+                    }
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x98: // SBC A,B
+                    SBC(b, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x99: // SBC A,C
+                    SBC(c,  4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x9a: // SBC A,D
+                    SBC(d,  4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x9b: // SBC A,E
+                    SBC(e, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x9c: // SBC A,H
+                    SBC(h, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x9d: // SBC A,L
+                    SBC(l, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x9e: // SBC A,(HL)
+                    SBC(get_memory(l|h<<8), 7);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0x9f: // SBC A,A
+                    st+=  4;
+                    if ( altd ) {
+                        fb_= ~(fa_= a);
+                        fr_= a_= (ff_= (ff_&256)/-256);
+                    } else {
+                        fb= ~(fa= a);
+                        fr= a= (ff= (ff&256)/-256);
+                    }
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xa0: // AND B
+                    AND(b, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xa1: // AND C
+                    AND(c, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xa2: // AND D
+                    AND(d, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xa3: // AND E
+                    AND(e,  4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xa4: // AND H
+                    AND(h, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xa5: // AND L 
+                    AND(l,  4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xa6: // AND (HL) // AND (IX+d) // AND (IY+d)
+                    AND(get_memory(l|h<<8), 7);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xa7: // AND A
+                    st+= 4;
+                    if ( altd ) {
+                        fa_= ~(ff_= fr_= a_);
+                        fb_= 0;
+                    } else {
+                        fa= ~(ff= fr= a);
+                        fb= 0;
+                    }
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xa8: // XOR B
+                    XOR(b, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xa9: // XOR C
+                    XOR(c, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xaa: // XOR D
+                    XOR(d, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xab: // XOR E
+                    XOR(e, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xac: // XOR H
+                    XOR(h, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xad: // XOR L 
+                    XOR(l, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xae: // XOR (HL)
+                    XOR(get_memory(l|h<<8), 7);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xaf: // XOR A
+                    st+= 4;
+                    if (altd) { a_= ff_= fr_= fb_= 0; fa_=256; }
+                    else { a= ff= fr= fb= 0; fa=256; }
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xb0: // OR B
+                    OR(b, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xb1: // OR C
+                    OR(c, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xb2: // OR D
+                    OR(d, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xb3: // OR E
+                    OR(e, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xb4: // OR H
+                    OR(h, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xb5: // OR L
+                    OR(l, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xb6: // OR (HL) // OR (IX+d) // OR (IY+d)
+                    OR(get_memory(l|h<<8),7);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xb7: // OR A
+                    st+= 4;
+                    if ( altd ) {
+                        fa_= 256
+                            | (ff_= fr_= a);
+                        fb_= 0;
+                    } else {
+                        fa= 256
+                            | (ff= fr= a);
+                        fb= 0;
+                    }
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xb8: // CP B
+                    CP(b, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xb9: // CP C
+                    CP(c, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xba: // CP D
+                    CP(d, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xbb: // CP E
+                    CP(e, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xbc: // CP H
+                    CP(h, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xbd: // CP L 
+                    CP(l, 4);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xbe: // CP (HL) 
+                    w= get_memory(l|h<<8),
+                    CP(w, 7);
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                case 0xbf: // CP A
+                    st+= 4;
+                    if ( altd ) {
+                        fr_= 0;
+                        fb_= ~(fa_= a);
+                        ff_= a&40;
+                    } else {
+                        fr= 0;
+                        fb= ~(fa= a);
+                        ff= a&40;
+                    }
+                    ih=1;altd=0;ioi=0;ioe=0;break;
+                default:
+                    t += 4;
+                    ih=1;altd=0;ioi=0;ioe=0;
+                    break;
+              }
+            }
+        } else {
+          if ( altd ) { a_ = a; st += 2; break; }
+          st+= israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4;
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x76: // HALT
         if ( israbbit()) {
@@ -1861,16 +2271,19 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x41: // LD B,C
-        LDRR(b, c, b_, isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else LDRR(b, c, b_, isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x42: // LD B,D
         LDRR(b, d, b_, isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x43: // LD B,E
-        LDRR(b, e, e_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else LDRR(b, e, e_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x44: // LD B,H // LD B,IXh // LD B,IYh
-        if( ih ) {
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if( ih ) {
           LDRR(b, h, h_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         } else if( iy && canixh() )
           LDRR(b, yh, b,isez80() ? 1 : isr800() ? 1 : 4);
@@ -1901,10 +2314,12 @@ int main (int argc, char **argv){
         LDRR(c, b, c_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4a: // LD C,D
-        LDRR(c, d, c_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else LDRR(c, d, c_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4b: // LD C,E
-        LDRR(c, e,c_, israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else LDRR(c, e,c_, israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4c: // LD C,H // LD C,IXh // LD C,IYh
         if( ih )
@@ -1923,9 +2338,10 @@ int main (int argc, char **argv){
           LDRR(c, xl, c,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4e: // LD C,(HL) // LD C,(IX+d) // LD C,(IY+d)
-        if( ih )
-          LDRP(h, l, c);
-        else if( iy )
+        if( ih ) {
+          if ( altd ) LDRP(h, l, c_);
+          else LDRP(h, l, c);
+        } else if( iy )
           LDRPI(yh, yl, c);
         else
           LDRPI(xh, xl, c);
@@ -1940,7 +2356,8 @@ int main (int argc, char **argv){
         LDRR(d, c,  d_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x53: // LD D,E
-        LDRR(d, e,  d_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else LDRR(d, e,  d_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x54: // LD D,H // LD D,IXh // LD D,IYh
         if( ih )
@@ -1970,16 +2387,20 @@ int main (int argc, char **argv){
         LDRR(d, a,  d_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x58: // LD E,B
-        LDRR(e, b, e_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else LDRR(e, b, e_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x59: // LD E,C
-        LDRR(e, c, e_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else LDRR(e, c, e_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x5a: // LD E,D
-        LDRR(e, d, e_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else LDRR(e, d, e_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x5c: // LD E,H // LD E,IXh // LD E,IYh
-        if( ih )
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if( ih )
           LDRR(e, h, e_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           LDRR(e, yh, e,isez80() ? 1 : isr800() ? 1 : 4);
@@ -1987,7 +2408,8 @@ int main (int argc, char **argv){
           LDRR(e, xh, e,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x5d: // LD E,L // LD E,IXl // LD E,IYl
-        if( ih )
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if( ih )
           LDRR(e, l, e_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           LDRR(e, yl, e,isez80() ? 1 : isr800() ? 1 : 4);
@@ -2062,7 +2484,8 @@ int main (int argc, char **argv){
           LDRR(xh, a, xh,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x68: // LD L,B // LD IXl,B // LD IYl,B
-        if( ih )
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if( ih )
           LDRR(l, b, l_,isez80() ? 1 : israbbit() ? 2 :is8080() ? 5 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           LDRR(yl, b, yl,isez80() ? 1 : isr800() ? 1 : 4);
@@ -2070,7 +2493,8 @@ int main (int argc, char **argv){
           LDRR(xl, b, xl,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x69: // LD L,C // LD IXl,C // LD IYl,C
-        if( ih )
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if( ih )
           LDRR(l, c, l_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           LDRR(yl, c, yl,isez80() ? 1 : isr800() ? 1 : 4);
@@ -2078,7 +2502,8 @@ int main (int argc, char **argv){
           LDRR(xl, c, xl,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x6a: // LD L,D // LD IXl,D // LD IYl,D
-        if( ih )
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if( ih )
           LDRR(l, d, l_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           LDRR(yl, d, yl,isez80() ? 1 : isr800() ? 1 : 4);
@@ -2086,7 +2511,8 @@ int main (int argc, char **argv){
           LDRR(xl, d, xl,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x6b: // LD L,E // LD IXl,E // LD IYl,E
-        if( ih )
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if( ih )
           LDRR(l, e, l_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 :isr800() ? 1 :  4);
         else if( iy && canixh() )
           LDRR(yl, e, yl,isez80() ? 1 : isr800() ? 1 : 4);
@@ -2094,7 +2520,8 @@ int main (int argc, char **argv){
           LDRR(xl, e, xl,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x6c: // LD L,H // LD IXl,IXh // LD IYl,IYh
-        if( ih )
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else if( ih )
           LDRR(l, h, l_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           LDRR(yl, yh, yl,isez80() ? 1 : isr800() ? 1 : 4);
@@ -2235,10 +2662,12 @@ int main (int argc, char **argv){
           LDRPI(xh, xl, a);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x80: // ADD A,B
-        ADD(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else ADD(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x81: // ADD A,C
-        ADD(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0x81: // ADD A,C // LD HL,BC (R4K)
+        if (israbbit4k()) { h = b; l = c; st+=2; }
+        else ADD(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x82: // ADD A,D
         ADD(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
@@ -2317,10 +2746,12 @@ int main (int argc, char **argv){
         else fr= a= (ff= 2*(fa= fb= a)+(ff>>8&1));
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x90: // SUB B
-        SUB(b,isez80() ? 1 :israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
+        if ( israbbit4k()) RABBIT4k_UNDEFINED();
+        else SUB(b,isez80() ? 1 :israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x91: // SUB C
-        SUB(c,isez80() ? 1 :israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
+      case 0x91: // SUB C // LD BC,HL (R4K)
+        if (israbbit4k()) { b = h; c = l; st+=2; }
+        else SUB(c,isez80() ? 1 :israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x92: // SUB D
         SUB(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
@@ -2411,8 +2842,9 @@ int main (int argc, char **argv){
       case 0xa0: // AND B
         AND(b, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xa1: // AND C
-        AND(c, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xa1: // AND C // LD HL,DE (R4K)
+        if (israbbit4k()) { h = d; l = e; st+=2; }
+        else AND(c, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa2: // AND D
         AND(d, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
@@ -2492,14 +2924,15 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xaf: // XOR A
         st+=isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
-        a= ff= fr= fb= 0;
-        fa= 256;
+        if (altd) { a_= ff_= fr_= fb_= 0; fa_=256; }
+        else { a= ff= fr= fb= 0; fa=256; }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb0: // OR B
         OR(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xb1: // OR C
-        OR(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xb1: // OR C // LD DE,HL (R4K)
+        if (israbbit4k()) { d = h; e = l; st+=2; }
+        else OR(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb2: // OR D
         OR(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
