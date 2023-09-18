@@ -3320,7 +3320,7 @@ int main (int argc, char **argv){
           put_memory(t|= get_memory(pc++)<<8,a);
           mp= t+1 & 255
              | a<<8;
-        } else JPCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
+        } else { JPCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128%); }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf2: // JP P
 		if (isgbz80()) { // LD A, (C), A
