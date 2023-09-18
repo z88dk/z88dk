@@ -820,7 +820,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     if ( israbbit4k() ) {
                                         // $ed 00 -> $ed 3f
                                         if ( q == 0 && z == 0 && y == 0 ) BUF_PRINTF("%-10s%s","cbm", handle_immed8(state, opbuf1, sizeof(opbuf1)));
-                                        else if ( q == 0 && z == 0 && y == 2 ) BUF_PRINTF("%-10s%s","dwjnz", handle_rel16(state, opbuf1, sizeof(opbuf1)));
+                                        else if ( q == 0 && z == 0 && y == 2 ) BUF_PRINTF("%-10s%s","dwjnz", handle_rel8(state, opbuf1, sizeof(opbuf1)));
                                         else if ( q == 0 && z == 2 && y == 0 ) BUF_PRINTF("%-10sa","sbox");
                                         else if ( q == 0 && z == 2 && y == 2 ) BUF_PRINTF("%-10sa","ibox");
                                         else if ( q == 0 && z == 1 ) BUF_PRINTF("%-10s%s,(htr+hl)","ld",r4k_ps_table[p]);
