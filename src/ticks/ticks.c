@@ -1455,14 +1455,27 @@ int main (int argc, char **argv){
                 case 0xa6: // AND (HL) // AND (IX+d) // AND (IY+d)
                     AND(get_memory(l|h<<8), 7);
                     ih=1;altd=0;ioi=0;ioe=0;break;
-                case 0xa7: // AND A
-                    st+= 4;
-                    if ( altd ) {
-                        fa_= ~(ff_= fr_= a_);
-                        fb_= 0;
+                case 0xa7: // AND A / MULU (R4k)
+                    if ( israbbit4k()) {
+                        if (ih) {
+                            // HL:BC = BC • DE
+                            uint32_t result = (( d * 256 ) + e) * (( b * 256 ) + c);
+                            h = (result >> 24) & 0xff;
+                            l = (result >> 16) & 0xff;
+                            b  = (result >> 8 ) & 0xff;
+                            c = result & 0xff;
+                            st += 10;
+                        }
+                        st += 2;
                     } else {
-                        fa= ~(ff= fr= a);
-                        fb= 0;
+                        st+= 4;
+                        if ( altd ) {
+                            fa_= ~(ff_= fr_= a_);
+                            fb_= 0;
+                        } else {
+                            fa= ~(ff= fr= a);
+                            fb= 0;
+                        }
                     }
                     ih=1;altd=0;ioi=0;ioe=0;break;
                 case 0xa8: // XOR B
