@@ -17,6 +17,18 @@
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x7400
     defc        CRT_KEY_DEL = 127
+
+    ;; RAM trimming
+IF !DEFINED_CLIB_FOPEN_MAX
+    defc    DEFINED_CLIB_FOPEN_MAX = 1
+    defc    CLIB_FOPEN_MAX = 3
+ENDIF
+    defc    DEFINED_basegraphics = 1
+IF !DEFINED_CLIB_DEFAULT_SCREEN_MODE
+    defc    CLIB_DEFAULT_SCREEN_MODE = 2
+ENDIF
+
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     org     CRT_ORG_CODE
@@ -87,8 +99,10 @@ program:
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      (exitsp),sp
-    ld      hl,2
+IF CLIB_DEFAULT_SCREEN_MODE != -1
+    ld      hl,CLIB_DEFAULT_SCREEN_MODE
     call    vdp_set_mode
+ENDIF
     im      1
     ei
 ; Optional definition for auto MALLOC init
