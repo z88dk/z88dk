@@ -583,6 +583,8 @@ unsigned char
       , e= 0
       , h= 0
       , l= 0
+      , j=0
+      , k=0
       , a_= 0
       , b_= 0
       , c_= 0
@@ -590,6 +592,8 @@ unsigned char
       , e_= 0
       , h_= 0
       , l_= 0
+      , j_=0
+      , k_=0
       , xl= 0
       , xh= 0
       , yl= 0
@@ -1650,9 +1654,9 @@ int main (int argc, char **argv){
           INCW(h,l);
           st = save + 8;
           break;
-        } else if( ih )
+        } else if (ih) {
           LDPNNRR(h, l,isez80() ? 5 : israbbit() ? 13 : 16);
-        else if( iy )
+        } else if( iy )
           LDPNNRR(yh, yl,isez80() ? 5 : israbbit() ? 13 : 16);
         else
           LDPNNRR(xh, xl, isez80() ? 5 :israbbit() ? 13 : 16);
@@ -2560,8 +2564,13 @@ int main (int argc, char **argv){
         else if ( canixh() )
           LDRR(xh, e, xh,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x65: // LD H,L // LD IXh,IXl // LD IYh,IYl
-        if( ih )
+      case 0x65: // LD H,L // LD IXh,IXl // LD IYh,IYl / ADD HL,JK (R4K)
+        if (israbbit4k()) {
+            if( ih ) {
+                if ( altd ) ADDRRRR_ALTD(h, l, j, k, h_, l_);
+                else ADDRRRR(h, l, j, k);
+            }
+        } else if( ih )
           LDRR(h, l, h_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           LDRR(yh, yl, yh,isez80() ? 1 : isr800() ? 1 : 4);
@@ -2811,8 +2820,12 @@ int main (int argc, char **argv){
       case 0x88: // ADC A,B
         ADC(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x89: // ADC A,C
-        ADC(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0x89: // ADC A,C / LD (mn),JK (R4k)
+        if (israbbit4k()) {
+             if (ih) {
+                LDPNNRR(j, k, 13);
+             } 
+        } else { ADC(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4); }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x8a: // ADC A,D
         ADC(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
@@ -2903,8 +2916,13 @@ int main (int argc, char **argv){
       case 0x98: // SBC A,B
         SBC(b, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x99: // SBC A,C
-        SBC(c, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0x99: // SBC A,C / LD JK,(nm) (R4k)
+        if (israbbit4k()) {
+            if(ih) {
+                if ( altd ) LDRRPNN(j_, k_, 11);
+                else LDRRPNN(j, k, 11);
+            }
+        } else { SBC(c, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4); }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9a: // SBC A,D
         SBC(d, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
@@ -2964,8 +2982,14 @@ int main (int argc, char **argv){
             st+=2;
         } else AND(c, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xa2: // AND D
-        AND(d, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xa2: // AND D / JP GT,mn (R4k)
+        if (israbbit4k()) {
+            if (ih) {
+                long long sst = st;
+                JPCI(F_GT(f()));
+                st = sst + 7;
+            }
+        } else { AND(d, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4); }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa3: // AND E
         AND(e, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
@@ -3015,11 +3039,22 @@ int main (int argc, char **argv){
           XOR(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xa9: // XOR C
-        XOR(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xa9: // XOR C / LD JK,nm (R4K)
+        if (israbbit4k()) {
+            if (ih) {
+                if ( altd ) LDRRIM(h_,l_);
+                else LDRRIM(h, l);
+            }
+        } else { XOR(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4); }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xaa: // XOR D
-        XOR(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xaa: // XOR D / JP GTU,mn (R4k)
+        if (israbbit4k()) {
+            if (ih) {
+                long long sst = st;
+                JPCI(F_GTU(f()));
+                st = sst + 7;
+            }
+        } else { XOR(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4); }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xab: // XOR E
         XOR(e,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
@@ -3071,8 +3106,14 @@ int main (int argc, char **argv){
             st+=2;
         } else OR(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xb2: // OR D
-        OR(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xb2: // OR D / JP LT,mn (R4K)
+        if (israbbit4k()) {
+            if (ih) {
+                long long sst = st;
+                JPCI(F_LT(f()));
+                st = sst + 7;
+            }
+        } else { OR(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4); }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb3: // OR E / EX BC,HL (R4k)
         if ( israbbit4k() ) {
@@ -3141,11 +3182,36 @@ int main (int argc, char **argv){
           CP(b,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xb9: // CP C
-        CP(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xb9: // CP C / EX JK,HL (R4k)
+        if (israbbit4k()) {
+            if (ih) {
+                if (altd) {
+                    t = j;
+                    j = h_;
+                    h_ = t;
+                    t = k;
+                    k = l_;
+                    l_ = t;
+                } else {
+                    t = j;
+                    j = h;
+                    h = t;
+                    t = k;
+                    k = l;
+                    l = t;
+                }
+            }
+            st+=2;
+        } else { CP(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4); }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xba: // CP D
-        CP(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xba: // CP D /  JP V,mn (R4k)
+        if (israbbit4k()) {
+            if (ih) {
+                long long sst = st;
+                JPCI(F_V(f()));
+                st = sst + 7;
+            }
+        } else { CP(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4); }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbb: // CP E
         CP(e,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
@@ -5129,12 +5195,32 @@ int main (int argc, char **argv){
               st += 2;
               break;
             } else if ( isez80() ) {
-                LEA(xh, xl, yh, yl, 3);
+              LEA(xh, xl, yh, yl, 3);
+              break;
+            }
+            // Fall through for z80 case
+          case 0x7c:   // (R4k) EX JK',HL
+            if (israbbit4k() ) {
+                if (altd) {
+                    t = j_;
+                    j_ = h_;
+                    h_ = t;
+                    t = k_;
+                    k_ = l_;
+                    l_ = t;
+                } else {
+                    t = j_;
+                    j_ = h;
+                    h = t;
+                    t = k_;
+                    k_ = l;
+                    l = t;
+                }
                 break;
             }
             // Fall through for z80 case
           case 0x44:       // NEG
-          case 0x74: case 0x7c:
+          case 0x74: 
                      st+= 8;
                      fr= a= (ff= (fb= ~a)+1);
                      fa= 0; break;
