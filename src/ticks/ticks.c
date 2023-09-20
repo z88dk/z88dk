@@ -271,21 +271,23 @@
           mp= get_memory(sp++), \
           pc= mp|= get_memory(sp++)<<8
 
-#define RETC(c)                 \
+#define RETC(c) do {            \
           if(c)                 \
             st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ? 8 : isr800() ? 1 :  5;             \
           else                  \
             st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 8 : isz180() ? 10 : isr800() ? 3 : 11,            \
             mp= get_memory(sp++),      \
-            pc= mp|= get_memory(sp++)<<8
+            pc= mp|= get_memory(sp++)<<8; \
+        } while (0) 
 
-#define RETCI(c)                \
+#define RETCI(c) do {           \
           if(c)                 \
             st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 8 : isz180() ? 10 : isr800() ? 3 :  11,            \
             mp= get_memory(sp++),      \
             pc= mp|= get_memory(sp++)<<8; \
           else                  \
-            st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ? 8 : isr800() ? 1 :  5
+            st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ? 8 : isr800() ? 1 :  5; \
+        } while (0)
 
 #define PUSH(a, b)              \
           st+= isez80() ? 3 :israbbit() ? 10 : is8085() ? 12 : isgbz80() ? 16 : isr800() ? 4 : 11,              \
@@ -297,23 +299,25 @@
           b= get_memory(sp++),  \
           a= get_memory(sp++)
 
-#define JPC(c)                  \
+#define JPC(c) do {             \
           st+= isez80() ? 3 : israbbit() ? 7 : isz180() ? 6 : is8085() ? 7 : isgbz80() ? 12 : isr800() ? 3 :  10;              \
           if(c)                 \
             pc+= 2;             \
           else                  \
             st += isez80() ? 1 : isz180() ? 3 : is8085() ? 3 : isr800() ? 2 : 0,  \
-            pc= get_memory(pc) | get_memory(pc+1)<<8
+            pc= get_memory(pc) | get_memory(pc+1)<<8; \
+        } while (0)
 
-#define JPCI(c)                 \
+#define JPCI(c) do {            \
           st+= isez80() ? 3 : israbbit() ? 7 : isz180() ? 6 : is8085() ? 7 : isgbz80() ? 12 : isr800() ? 3 : 10;              \
           if(c)                 \
             st += isez80() ? 1 : isz180() ? 3 : is8085() ? 3 : isr800() ? 2 : 0,  \
             pc= get_memory(pc) | get_memory(pc+1)<<8; \
           else                  \
-            pc+= 2
+            pc+= 2;             \
+        } while(0)
 
-#define CALLC(c)                \
+#define CALLC(c)  do  {         \
           if(c)                 \
             st+= isez80() ? 3 : isz180() ? 6 : is8085() ? 9 : is8080() ? 11 : isgbz80() ? 12 : isr800() ? 3 : 10,            \
             pc+= 2;             \
@@ -322,9 +326,10 @@
             t= pc+2,            \
             mp= pc= get_memory(pc) | get_memory(pc+1)<<8, \
             put_memory(--sp,t>>8),    \
-            put_memory(--sp,t)
+            put_memory(--sp,t); \
+        } while (0)
 
-#define CALLCI(c)               \
+#define CALLCI(c) do {          \
           if(c)                 \
             st+= isez80() ? 6 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 12 : isr800() ? 5 : 17,            \
             t= pc+2,            \
@@ -333,7 +338,8 @@
             put_memory(--sp,t);    \
           else                  \
             st+= isez80() ? 3 : isz180() ? 6 : is8085() ? 9 : is8080() ? 11 : isgbz80() ? 12 : isr800() ? 3 : 10,            \
-            pc+= 2
+            pc+= 2;              \
+        } while (0)
 
 #define RST(n)                  \
           st+= isez80() ? 5 :israbbit() ? 8 : is8085() ? 12 : isgbz80() ? 32 : 11,              \
@@ -351,7 +357,7 @@
           a= t,                 \
           mp= b | a<<8
 
-#define RLC(r,r_)               \
+#define RLC(r,r_) do  {         \
           st+= isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8;               \
           if (altd) {           \
             ff_= r_*257>>7,     \
@@ -363,9 +369,10 @@
             fa= 256             \
               | (fr= r= ff),    \
             fb= 0;              \
-          }
+          }                     \
+        } while (0)
 
-#define RRC(r,r_)                    \
+#define RRC(r,r_) do {               \
           st+= isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8;               \
           if ( altd ) {              \
             ff_=  r_ >> 1            \
@@ -379,25 +386,27 @@
             fa= 256                  \
                 | (fr= r= ff),       \
             fb= 0;                   \
-          }
+          }                          \
+        } while (0)
 
-#define RL(r,r_)                   \
+#define RL(r,r_)  do {            \
           st+= isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8;               \
-          if ( altd ) {         \
+          if ( altd ) {           \
             ff_= r_ << 1          \
-                | ff_  >> 8 & 1, \
-            fa_= 256             \
-                | (fr_= r_= ff_),  \
-            fb_= 0;              \
-          } else {              \
-            ff= r << 1          \
-                | ff  >> 8 & 1, \
-            fa= 256             \
-                | (fr= r= ff),  \
-            fb= 0;              \
-          }
+                | ff_  >> 8 & 1,  \
+            fa_= 256              \
+                | (fr_= r_= ff_), \
+            fb_= 0;               \
+          } else {                \
+            ff= r << 1            \
+                | ff  >> 8 & 1,   \
+            fa= 256               \
+                | (fr= r= ff),    \
+            fb= 0;                \
+          }                       \
+        } while (0)
 
-#define RR(r,r_)                \
+#define RR(r,r_) do {           \
           st+=isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8;               \
           if ( altd ) {         \
             ff_= (r_*513 | ff_&256)>>1, \
@@ -409,40 +418,66 @@
             fa= 256             \
                 | (fr= r= ff),  \
             fb= 0;              \
-          }
+          }                     \
+        } while (0)
 
-#define SLA(r)                  \
-          st+=isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8,               \
-          ff= r<<1,             \
-          fa= 256               \
-            | (fr= r= ff),      \
-          fb= 0
+#define SLA(r,r_) do {          \
+          st+=isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8;   \
+          if (altd) {           \
+            ff_= r_<<1,           \
+            fa_= 256             \
+                | (fr_= r_= ff_),  \
+            fb_= 0;              \
+          } else {              \
+            ff= r<<1,           \
+            fa= 256             \
+                | (fr= r= ff),  \
+            fb= 0;              \
+          }                     \
+        } while (0) 
 
-#define SRA(r)                  \
-          st+=isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8,               \
-          ff= (r*513+128^128)>>1, \
-          fa= 256               \
-            | (fr= r= ff),      \
-          fb= 0
+#define SRA(r,r_) do {          \
+          st+=isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8; \
+          if (altd) {           \
+            ff_= (r_*513+128^128)>>1, \
+            fa_= 256            \
+                | (fr_= r_= ff_),  \
+            fb_= 0;             \
+          } else {              \
+            ff= (r*513+128^128)>>1, \
+            fa= 256             \
+                | (fr= r= ff),  \
+            fb= 0;              \
+          }                     \
+        } while (0)
 
-#define SLL(r)                  \
+#define SLL(r) do {             \
           if ( cansll() )       \
             st+= 8,             \
             ff= r<<1 | 1,       \
             fa= 256             \
               | (fr= r= ff),    \
-            fb= 0
+            fb= 0;              \
+        } while (0)
 
 #define SWAP(r)                 \
           r = (( r & 0xf0) >> 4) | (( r & 0x0f) << 4);  \
           st += 8
 
-#define SRL(r)                  \
-          st+=isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8,               \
-          ff= r*513 >> 1,       \
-          fa= 256               \
-            | (fr= r= ff),      \
-          fb= 0
+#define SRL(r,r_) do {          \
+          st+=isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8; \
+          if (altd) {           \
+            ff_= r_*513 >> 1,   \
+            fa_= 256            \
+                | (fr_= r_= ff_),  \
+            fb_= 0;             \
+          } else {              \
+            ff= r*513 >> 1,     \
+            fa= 256             \
+                | (fr= r= ff),  \
+            fb= 0;              \
+          }                     \
+        } while (0)
 
 #define BIT(n, r)               \
           st += isez80() ? 2 : israbbit() ? 4 : isz180() ? 6 : isr800() ? 2 : 8, \
@@ -2178,7 +2213,7 @@ int main (int argc, char **argv){
           st+=4;
           break;
         } else if ( is8085() ) {   // (8085) SRA HL (ARHL)
-          SRA(h);
+          SRA(h,h);
           RR(l,l);
           st += (-16 + 7);
           break;
@@ -3656,8 +3691,7 @@ int main (int argc, char **argv){
           long long savest = st;
           RL(e,e_);
           RL(d,d_);
-          st = savest;
-          st += 2;
+          st = savest + 2;
         } else {
           st+= isez80() ? 1 : isz180() ? 3 : isr800() ? 2 : 4;
           iff= 0;
@@ -3669,8 +3703,7 @@ int main (int argc, char **argv){
           long long savest = st;
           RR(d,d_);
           RR(e,e_);
-          st = savest;
-          st += 2;
+          st = savest + 2;
         } else {
           st+= isez80() ? 1 : isz180() ? 3 : isr800() ? 2 : 4;
           iff= 1;
@@ -3878,30 +3911,30 @@ int main (int argc, char **argv){
                         RR(u,u);
                         put_memory(t, u); break;
             case 0x1f:  RR(a,a_); break;                        // RR A
-            case 0x20:  SLA(b); break;                       // SLA B
-            case 0x21:  SLA(c); break;                       // SLA C
-            case 0x22:  SLA(d); break;                       // SLA D
-            case 0x23:  SLA(e); break;                       // SLA E
-            case 0x24:  SLA(h); break;                       // SLA H
-            case 0x25:  SLA(l); break;                       // SLA L
+            case 0x20:  SLA(b,b_); break;                       // SLA B
+            case 0x21:  SLA(c,c_); break;                       // SLA C
+            case 0x22:  SLA(d,d_); break;                       // SLA D
+            case 0x23:  SLA(e,e_); break;                       // SLA E
+            case 0x24:  SLA(h,h_); break;                       // SLA H
+            case 0x25:  SLA(l,l_); break;                       // SLA L
             case 0x26:  st+= israbbit() ? 6 : isgbz80() ? 8 : isz180() ? 6 : 7;             // SLA (HL)
                         t= l|h<<8;
                         u=get_memory(t);
-                        SLA(u);
+                        SLA(u,u);
                         put_memory(t, u); break;
-            case 0x27:  SLA(a); break;                       // SLA A
-            case 0x28:  SRA(b); break;                       // SRA B
-            case 0x29:  SRA(c); break;                       // SRA C
-            case 0x2a:  SRA(d); break;                       // SRA D
-            case 0x2b:  SRA(e); break;                       // SRA E
-            case 0x2c:  SRA(h); break;                       // SRA H
-            case 0x2d:  SRA(l); break;                       // SRA L
+            case 0x27:  SLA(a,a_); break;                       // SLA A
+            case 0x28:  SRA(b,b_); break;                       // SRA B
+            case 0x29:  SRA(c,c_); break;                       // SRA C
+            case 0x2a:  SRA(d,d_); break;                       // SRA D
+            case 0x2b:  SRA(e,e_); break;                       // SRA E
+            case 0x2c:  SRA(h,h_); break;                       // SRA H
+            case 0x2d:  SRA(l,l_); break;                       // SRA L
             case 0x2e:  st+= israbbit() ? 6 : isgbz80() ? 8 : isz180() ? 6 : 7;             // SRA (HL)
                         t= l|h<<8;
                         u=get_memory(t);
-                        SRA(u);
+                        SRA(u,u);
                         put_memory(t, u); break;
-            case 0x2f:  SRA(a); break;                       // SRA A
+            case 0x2f:  SRA(a,a_); break;                       // SRA A
             case 0x30:  if (isgbz80()) { SWAP(b); } else { SLL(b); } break;                       // SLL B,  SWAP B (gbz80)
             case 0x31:  if (isgbz80()) { SWAP(c); } else { SLL(c); } break;                       // SLL C,  SWAP C (gbz80)
             case 0x32:  if (isgbz80()) { SWAP(d); } else { SLL(d); } break;                       // SLL D,  SWAP D (gbz80)
@@ -3924,18 +3957,18 @@ int main (int argc, char **argv){
                         }
                         break;
             case 0x37:  if (isgbz80()) { SWAP(a); } else { SLL(a); } break;                       // SLL A,  SWAP A (gbz80)
-            case 0x38:  SRL(b); break;                       // SRL B
-            case 0x39:  SRL(c); break;                       // SRL C
-            case 0x3a:  SRL(d); break;                       // SRL D
-            case 0x3b:  SRL(e); break;                       // SRL E
-            case 0x3c:  SRL(h); break;                       // SRL H
-            case 0x3d:  SRL(l); break;                       // SRL L
+            case 0x38:  SRL(b,b_); break;                       // SRL B
+            case 0x39:  SRL(c,c_); break;                       // SRL C
+            case 0x3a:  SRL(d,d_); break;                       // SRL D
+            case 0x3b:  SRL(e,e_); break;                       // SRL E
+            case 0x3c:  SRL(h,h_); break;                       // SRL H
+            case 0x3d:  SRL(l,l_); break;                       // SRL L
             case 0x3e:  st+= israbbit() ? 6 : isgbz80() ? 8 : isz180() ? 6 : 7;             // SRL (HL)
                         t= l|h<<8;
                         u=get_memory(t);
-                        SRL(u);
+                        SRL(u,u);
                         put_memory(t, u); break;
-            case 0x3f:  SRL(a); break;                       // SRL A
+            case 0x3f:  SRL(a,a_); break;                       // SRL A
             case 0x40:  BIT(1, b); break;                    // BIT 0,B
             case 0x41:  BIT(1, c); break;                    // BIT 0,C
             case 0x42:  BIT(1, d); break;                    // BIT 0,D
@@ -4168,22 +4201,22 @@ int main (int argc, char **argv){
             case 0x1d: RR(t,t); put_memory(mp, l=t); break;          // LD L,RR (IX+d) // LD L,RR (IY+d)
             case 0x1e: RR(t,t); put_memory(mp, t); break;             // RR (IX+d) // RR (IY+d)
             case 0x1f: RR(t,t); put_memory(mp, a=t); break;          // LD A,RR (IX+d) // LD A,RR (IY+d)
-            case 0x20: SLA(t); put_memory(mp, b=t); break;         // LD B,SLA (IX+d) // LD B,SLA (IY+d)
-            case 0x21: SLA(t); put_memory(mp, c=t); break;         // LD C,SLA (IX+d) // LD C,SLA (IY+d)
-            case 0x22: SLA(t); put_memory(mp, d=t); break;         // LD D,SLA (IX+d) // LD D,SLA (IY+d)
-            case 0x23: SLA(t); put_memory(mp, e=t); break;         // LD E,SLA (IX+d) // LD E,SLA (IY+d)
-            case 0x24: SLA(t); put_memory(mp, h=t); break;         // LD H,SLA (IX+d) // LD H,SLA (IY+d)
-            case 0x25: SLA(t); put_memory(mp, l=t); break;         // LD L,SLA (IX+d) // LD L,SLA (IY+d)
-            case 0x26: SLA(t); put_memory(mp, t); break;            // SLA (IX+d) // SLA (IY+d)
-            case 0x27: SLA(t); put_memory(mp, a=t); break;         // LD A,SLA (IX+d) // LD A,SLA (IY+d)
-            case 0x28: SRA(t); put_memory(mp, b=t); break;         // LD B,SRA (IX+d) // LD B,SRA (IY+d)
-            case 0x29: SRA(t); put_memory(mp, c=t); break;         // LD C,SRA (IX+d) // LD C,SRA (IY+d)
-            case 0x2a: SRA(t); put_memory(mp, d=t); break;         // LD D,SRA (IX+d) // LD D,SRA (IY+d)
-            case 0x2b: SRA(t); put_memory(mp, e=t); break;         // LD E,SRA (IX+d) // LD E,SRA (IY+d)
-            case 0x2c: SRA(t); put_memory(mp, h=t); break;         // LD H,SRA (IX+d) // LD H,SRA (IY+d)
-            case 0x2d: SRA(t); put_memory(mp, l=t); break;         // LD L,SRA (IX+d) // LD L,SRA (IY+d)
-            case 0x2e: SRA(t); put_memory(mp, t); break;            // SRA (IX+d) // SRA (IY+d)
-            case 0x2f: SRA(t); put_memory(mp, a=t); break;         // LD A,SRA (IX+d) // LD A,SRA (IY+d)
+            case 0x20: SLA(t,t); put_memory(mp, b=t); break;         // LD B,SLA (IX+d) // LD B,SLA (IY+d)
+            case 0x21: SLA(t,t); put_memory(mp, c=t); break;         // LD C,SLA (IX+d) // LD C,SLA (IY+d)
+            case 0x22: SLA(t,t); put_memory(mp, d=t); break;         // LD D,SLA (IX+d) // LD D,SLA (IY+d)
+            case 0x23: SLA(t,t); put_memory(mp, e=t); break;         // LD E,SLA (IX+d) // LD E,SLA (IY+d)
+            case 0x24: SLA(t,t); put_memory(mp, h=t); break;         // LD H,SLA (IX+d) // LD H,SLA (IY+d)
+            case 0x25: SLA(t,t); put_memory(mp, l=t); break;         // LD L,SLA (IX+d) // LD L,SLA (IY+d)
+            case 0x26: SLA(t,t); put_memory(mp, t); break;            // SLA (IX+d) // SLA (IY+d)
+            case 0x27: SLA(t,t); put_memory(mp, a=t); break;         // LD A,SLA (IX+d) // LD A,SLA (IY+d)
+            case 0x28: SRA(t,t); put_memory(mp, b=t); break;         // LD B,SRA (IX+d) // LD B,SRA (IY+d)
+            case 0x29: SRA(t,t); put_memory(mp, c=t); break;         // LD C,SRA (IX+d) // LD C,SRA (IY+d)
+            case 0x2a: SRA(t,t); put_memory(mp, d=t); break;         // LD D,SRA (IX+d) // LD D,SRA (IY+d)
+            case 0x2b: SRA(t,t); put_memory(mp, e=t); break;         // LD E,SRA (IX+d) // LD E,SRA (IY+d)
+            case 0x2c: SRA(t,t); put_memory(mp, h=t); break;         // LD H,SRA (IX+d) // LD H,SRA (IY+d)
+            case 0x2d: SRA(t,t); put_memory(mp, l=t); break;         // LD L,SRA (IX+d) // LD L,SRA (IY+d)
+            case 0x2e: SRA(t,t); put_memory(mp, t); break;            // SRA (IX+d) // SRA (IY+d)
+            case 0x2f: SRA(t,t); put_memory(mp, a=t); break;         // LD A,SRA (IX+d) // LD A,SRA (IY+d)
             case 0x30: SLL(t); put_memory(mp, b=t); break;         // LD B,SLL (IX+d) // LD B,SLL (IY+d)
             case 0x31: SLL(t); put_memory(mp, c=t); break;         // LD C,SLL (IX+d) // LD C,SLL (IY+d)
             case 0x32: SLL(t); put_memory(mp, d=t); break;         // LD D,SLL (IX+d) // LD D,SLL (IY+d)
@@ -4192,14 +4225,14 @@ int main (int argc, char **argv){
             case 0x35: SLL(t); put_memory(mp, l=t); break;         // LD L,SLL (IX+d) // LD L,SLL (IY+d)
             case 0x36: SLL(t); put_memory(mp, t); break;            // SLL (IX+d) // SLL (IY+d)
             case 0x37: SLL(t); put_memory(mp, a=t); break;         // LD A,SLL (IX+d) // LD A,SLL (IY+d)
-            case 0x38: SRL(t); put_memory(mp, b=t); break;         // LD B,SRL (IX+d) // LD B,SRL (IY+d)
-            case 0x39: SRL(t); put_memory(mp, c=t); break;         // LD C,SRL (IX+d) // LD C,SRL (IY+d)
-            case 0x3a: SRL(t); put_memory(mp, d=t); break;         // LD D,SRL (IX+d) // LD D,SRL (IY+d)
-            case 0x3b: SRL(t); put_memory(mp, e=t); break;         // LD E,SRL (IX+d) // LD E,SRL (IY+d)
-            case 0x3c: SRL(t); put_memory(mp, h=t); break;         // LD H,SRL (IX+d) // LD H,SRL (IY+d)
-            case 0x3d: SRL(t); put_memory(mp, l=t); break;         // LD L,SRL (IX+d) // LD L,SRL (IY+d)
-            case 0x3e: SRL(t); put_memory(mp, t); break;            // SRL (IX+d) // SRL (IY+d)
-            case 0x3f: SRL(t); put_memory(mp, a=t); break;         // LD A,SRL (IX+d) // LD A,SRL (IY+d)
+            case 0x38: SRL(t,t); put_memory(mp, b=t); break;         // LD B,SRL (IX+d) // LD B,SRL (IY+d)
+            case 0x39: SRL(t,t); put_memory(mp, c=t); break;         // LD C,SRL (IX+d) // LD C,SRL (IY+d)
+            case 0x3a: SRL(t,t); put_memory(mp, d=t); break;         // LD D,SRL (IX+d) // LD D,SRL (IY+d)
+            case 0x3b: SRL(t,t); put_memory(mp, e=t); break;         // LD E,SRL (IX+d) // LD E,SRL (IY+d)
+            case 0x3c: SRL(t,t); put_memory(mp, h=t); break;         // LD H,SRL (IX+d) // LD H,SRL (IY+d)
+            case 0x3d: SRL(t,t); put_memory(mp, l=t); break;         // LD L,SRL (IX+d) // LD L,SRL (IY+d)
+            case 0x3e: SRL(t,t); put_memory(mp, t); break;            // SRL (IX+d) // SRL (IY+d)
+            case 0x3f: SRL(t,t); put_memory(mp, a=t); break;         // LD A,SRL (IX+d) // LD A,SRL (IY+d)
             case 0x40: case 0x41: case 0x42: case 0x43:      // BIT 0,(IX+d) // BIT 0,(IY+d)
             case 0x44: case 0x45: case 0x46: case 0x47:
                        BITI(1); break;
@@ -4500,7 +4533,7 @@ int main (int argc, char **argv){
                 unsigned short old_ff = ff, old_fa = fa, old_fb = fb, old_fr = fr;
                 int count;
                 for ( count = 0 ; count < (b & 0x1f); count++ ) {
-                    SLA(e);
+                    SLA(e,e);
                     RL(d,d);
                 }
                 st = old_st + 8;
@@ -4515,7 +4548,7 @@ int main (int argc, char **argv){
                 unsigned short old_ff = ff, old_fa = fa, old_fb = fb, old_fr = fr;
                 int count;
                 for ( count = 0 ; count < (b & 0x1f); count++ ) {
-                    SRA(d);
+                    SRA(d,d);
                     RR(e,e);
                 }
                 st = old_st + 8;
@@ -4530,7 +4563,7 @@ int main (int argc, char **argv){
                 unsigned short old_ff = ff, old_fa = fa, old_fb = fb, old_fr = fr;
                 int count;
                 for ( count = 0 ; count < (b & 0x1f); count++ ) {
-                    SRL(d);
+                    SRL(d,d);
                     RR(e,e);
                 }
                 st = old_st + 8;
