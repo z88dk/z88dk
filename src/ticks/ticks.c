@@ -557,16 +557,17 @@
           l= v,                 \
           fr= h|l<<8
 
-#define ADCHLRR(a, b)           \
-          st += isez80() ? 2 :israbbit() ? 4 : isz180() ? 10 : isr800() ? 2 : 15, \
-          v= l+b+(h+a<<8)+(ff>>8&1),\
-          mp= l+1+(h<<8),       \
-          ff= v>>8,             \
-          fa= h,                \
-          fb= a,                \
-          h= ff,                \
-          l= v,                 \
-          fr= h|l<<8
+#define ADCHLRR(a, b) do {      \
+          st += isez80() ? 2 :israbbit() ? 4 : isz180() ? 10 : isr800() ? 2 : 15; \
+          v= l+b+((h+a)<<8)+(ff>>8&1);\
+          mp= l+1+(h<<8);       \
+          ff= v>>8;             \
+          fa= h;                \
+          fb= a;                \
+          h= ff;                \
+          l= v;                 \
+          fr= h|l<<8;           \
+        } while (0)
 
 #define TEST(v, ticks) do {  \
       uint8_t olda = a;        \
@@ -782,7 +783,7 @@ void setf(int a){
 #define F_S(f)		(((f) & 0x80) == 0x80)
 #define F_GT(f)		((F_Z(f) | (F_S(f) ^ F_V(f))) == 0)
 #define F_LT(f)		((F_S(f) ^ F_V(f)) == 1)
-#define F_GTU(f)	(((F_C(f) == 0) & (F_Z(f)) == 0) == 1)
+#define F_GTU(f)	(((F_C(f) == 0) && (F_Z(f)) == 0))
 
 extern backend_t ticks_debugger_backend;
 
