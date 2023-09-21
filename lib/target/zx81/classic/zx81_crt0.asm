@@ -9,6 +9,8 @@
 ;       Values for "startup" from 3 to 6 activate the WRX HRG modes
 ;       Values between 13 and 17 activate the ARX HRG modes
 ;		LAMBDA 8300/POWER 3000 modes: startup=101 and startup=102
+;		LAMBDA 8300 monochrome ROM: startup=201 and startup=202
+;		LAMBDA 8300 CAC-3 and NF300 ROM: startup=301 and startup=302
 ;
 ;       OPTIMIZATIONS:
 ;
@@ -25,7 +27,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.59 2016-07-15 21:03:25 dom Exp $
+;       $Id: zx81_crt0.asm $
 ;
 ; - - - - - - -
 
@@ -160,16 +162,25 @@ IF (!DEFINED_startup | (startup=1))
         ;out ($fd),a  ; nmi off        
 ENDIF
 
-
+; LAMBDA 8300
 IF (startup>100)
 	IF (startup=101)
 		; FAST mode, safest way to use the special registers
 		call	$D5E
 	ENDIF
-	IF (startup=102)
+	IF (startup=201)
+		; FAST mode in monochrome ROM
+		call	$36C
+	ENDIF
+	IF (startup=301)
+		; FAST mode on CAC-3 and NF300
+		call	$E06
+	ENDIF
+	IF ((startup=102) | (startup=202) | (startup=302))
       call    altint_on
 	ENDIF
 ELSE
+
 IF (startup>=2)
  IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
         ld	a,1
@@ -248,11 +259,17 @@ cleanup:
         call    restore81
 
 IF (startup>100)
-    IF (startup=101)
 	; LAMBDA specific exit resume code (if any)
+    IF (startup=101)
 	call	 $12A5	; SLOW
     ENDIF
-    IF (startup=102)
+    IF (startup=201)
+	call	 $281	; SLOW (Monochrome ROM)
+    ENDIF
+    IF (startup=301)
+	call	 $13BE	; SLOW (CAC-3 amd NF300)
+    ENDIF
+    IF ((startup=102) | (startup=202) | (startup=302))
         call    altint_off
     ENDIF
 ELSE
@@ -317,8 +334,7 @@ ENDIF
 
 IF (startup>100)
 	; LAMBDA modes
-	
-     IF (startup=102)
+     IF ((startup=102) | (startup=202) | (startup=302))
         INCLUDE "target/lambda/classic/lambda_altint.asm"
      ENDIF
 ELSE
@@ -371,6 +387,47 @@ _zx_fast:
 _zx_slow:
 	ret
 ENDIF
+
+IF (startup>100)
+
+    ; LAMBDA JP tables
+	
+	PUBLIC __lambda_keyboard
+	PUBLIC __lambda_decode
+	PUBLIC __lambda_cls
+
+; Color Lambda ROM
+IF ((startup=101) | (startup=102))
+__lambda_keyboard:
+    jp $D74
+__lambda_decode:
+    jp $1877
+__lambda_cls:
+    jp $1C7D
+ENDIF
+
+; Monochrome Lambda ROM (earlier?)
+IF ((startup=201) | (startup=202))
+__lambda_keyboard:
+    jp $33D
+__lambda_decode:
+    jp $95E
+__lambda_cls:
+    jp $BD0
+ENDIF
+
+; CAC-3 and NF300
+IF ((startup=301) | (startup=302))
+__lambda_keyboard:
+    jp $E1C
+__lambda_decode:
+    jp $1A40
+__lambda_cls:
+    jp $1602
+ENDIF
+
+ENDIF
+
 
 ;-----------
 ; Now some variables

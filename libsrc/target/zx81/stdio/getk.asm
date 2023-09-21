@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - 8/5/2000
 ;
 ;
-;	$Id: getk.asm,v 1.7 2016-06-12 17:32:01 dom Exp $
+;	$Id: getk.asm $
 ;
 
         SECTION code_clib
@@ -21,7 +21,8 @@
 	call	restore81
 	
 IF FORlambda
-	call	3444
+	EXTERN  __lambda_keyboard
+	call	__lambda_keyboard
 ELSE
 	call	699
 ENDIF
@@ -30,8 +31,10 @@ ENDIF
         LD      C,L             ;
         LD      D,C             ;
         INC     D  
+
 IF FORlambda
-	call	nz,6263
+	EXTERN  __lambda_decode
+	call	nz,__lambda_decode
 ELSE
 	call	nz,1981	;exits with e = key
 ENDIF
@@ -41,6 +44,7 @@ ENDIF
 	ld	l,a
 	ld	h,0
 	ret
+
 nokey:
 	ld	hl,0
 	ret

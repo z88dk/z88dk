@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.8 2016-06-12 17:32:01 dom Exp $
+;	$Id: fgetc_cons.asm $
 ;
 
         SECTION code_clib
@@ -21,7 +21,8 @@
 	call	restore81
 .fgcloop
 IF FORlambda
-	call	3444
+	EXTERN  __lambda_keyboard
+	call	__lambda_keyboard
 ELSE
 	call	699
 ENDIF
@@ -30,7 +31,7 @@ ENDIF
 	jr	nc,fgcloop
 .wloop
 IF FORlambda
-	call	3444
+	call	__lambda_keyboard
 ELSE
 	call	699
 ENDIF
@@ -40,7 +41,8 @@ ENDIF
 	ld	b,h
 	ld	c,l
 IF FORlambda
-	call	6263
+	EXTERN  __lambda_decode
+	call	__lambda_decode
 ELSE
 	call	1981
 ENDIF
