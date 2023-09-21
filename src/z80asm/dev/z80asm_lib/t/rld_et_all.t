@@ -17,7 +17,7 @@ my $test_nr;
 # RLD / RRD
 for my $cpu (@CPUS) {
 	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
 		
 		for my $carry (0, 1) {
 			for my $op (qw( rld rrd )) {

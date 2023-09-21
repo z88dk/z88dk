@@ -127,10 +127,25 @@ void add_opcode_d(int opcode, Expr1 *expr)
 }
 
 /* add opcode followed by 16-bit expression */
-void add_opcode_nn(int opcode, Expr1 *expr)
-{
-	add_opcode(opcode);
-	Pass2infoExpr(RANGE_WORD, expr);
+void add_opcode_nn(int opcode, Expr1 *expr, int target_offset) {
+	if (target_offset != 0) {
+		// build expr1 = expr+target_offset
+		UT_string* expr1_text;
+		utstring_new(expr1_text);
+		utstring_printf(expr1_text, "+(%s)+%d", expr->text->data, target_offset);
+
+		struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
+		xassert(expr1);
+		
+		add_opcode(opcode);
+		Pass2infoExpr(RANGE_WORD, expr1);
+
+		utstring_free(expr1_text);
+	}
+	else {
+		add_opcode(opcode);
+		Pass2infoExpr(RANGE_WORD, expr);
+	}
 }
 
 /* add opcodes followed by the same 16-bit expression */
@@ -141,19 +156,35 @@ void add_opcode_nn_nn(int opcode0, int opcode1, struct Expr1* expr0)
     utstring_new(expr1_text);
     utstring_printf(expr1_text, "%s", expr0->text->data);
 
-    add_opcode_nn(opcode0, expr0);
+    add_opcode_nn(opcode0, expr0, 0);
 
     struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
     if (expr1)
-        add_opcode_nn(opcode1, expr1);
+        add_opcode_nn(opcode1, expr1, 0);
 
     utstring_free(expr1_text);
 }
 
 /* add opcode followed by 24-bit expression */
-void add_opcode_nnn(int opcode, struct Expr1 *expr) {
-	add_opcode(opcode);
-	Pass2infoExpr(RANGE_PTR24, expr);
+void add_opcode_nnn(int opcode, struct Expr1 *expr, int target_offset) {
+	if (target_offset != 0) {
+		// build expr1 = expr+target_offset
+		UT_string* expr1_text;
+		utstring_new(expr1_text);
+		utstring_printf(expr1_text, "+(%s)+%d", expr->text->data, target_offset);
+
+		struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
+		xassert(expr1);
+		
+		add_opcode(opcode);
+		Pass2infoExpr(RANGE_WORD, expr1);
+
+		utstring_free(expr1_text);
+	}
+	else {
+		add_opcode(opcode);
+		Pass2infoExpr(RANGE_PTR24, expr);
+	}
 }
 
 /* add opcode followed by big-endian 16-bit expression */
@@ -221,7 +252,7 @@ void add_call_emul_func(char * emul_func)
 { 
 	declare_extern_symbol(emul_func);
 	Expr1 *emul_expr = parse_expr(emul_func);
-	add_opcode_nn(0xCD, emul_expr);
+	add_opcode_nn(0xCD, emul_expr, 0);
 }
 
 void add_rst_opcode(int arg) {
@@ -257,7 +288,7 @@ void add_opcode_nn_end(int opcode, const char* end_label, int offset)
 	utstring_new(target);
 	utstring_printf(target, "%s-%d", end_label, offset);
 	Expr1 *target_expr = parse_expr(utstring_body(target));
-	add_opcode_nn(opcode, target_expr);			//jump over
+	add_opcode_nn(opcode, target_expr, 0);			//jump over
 	utstring_free(target);
 }
 
@@ -267,7 +298,7 @@ void add_opcode_nnn_end(int opcode, const char* end_label, int offset)
 	utstring_new(target);
 	utstring_printf(target, "%s-%d", end_label, offset);
 	Expr1 *target_expr = parse_expr(utstring_body(target));
-	add_opcode_nnn(opcode, target_expr);			//jump over
+	add_opcode_nnn(opcode, target_expr, 0);			//jump over
 	utstring_free(target);
 }
 

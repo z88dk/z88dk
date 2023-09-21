@@ -5880,14 +5880,10 @@
  jp.sis po, 0x1234              ; Error
  jp.sis v, 0x1234               ; Error
  jp.sis z, 0x1234               ; Error
- ld (0x1234), bc                ; Error
  ld (0x1234), ix                ; Error
  ld (0x1234), iy                ; Error
- ld (0x1234), sp                ; Error
- ld (0x123456), bc              ; Error
  ld (0x123456), ix              ; Error
  ld (0x123456), iy              ; Error
- ld (0x123456), sp              ; Error
  ld (0xff00+0), a               ; Error
  ld (0xff00+127), a             ; Error
  ld (0xff00+255), a             ; Error

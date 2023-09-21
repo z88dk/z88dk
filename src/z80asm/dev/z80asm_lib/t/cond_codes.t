@@ -12,7 +12,7 @@ use Modern::Perl;
 
 for my $cpu (@CPUS) {
 	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
 
 		for my $opts ("-m$cpu", "-m$cpu -opt-speed") {
 			test_cond($opts, "nz",  sub {my($a,$b)=@_; return ($a&0xff)!=($b&0xff) ? 1 : 0;});
@@ -35,7 +35,6 @@ done_testing();
 sub test_cond {
 	my($opts, $flag, $func) = @_;
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
-	diag "$opts, $flag";
 
 	for my $b (0, 128) {
 		for my $a ($b-1, $b, $b+1) {

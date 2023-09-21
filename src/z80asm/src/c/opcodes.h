@@ -42,13 +42,13 @@ void add_opcode_s_0(int opcode, struct Expr1* expr);
 void add_opcode_d(int opcode, struct Expr1 *expr);
 
 /* add opcode followed by 16-bit expression */
-void add_opcode_nn(int opcode, struct Expr1 *expr);
+void add_opcode_nn(int opcode, struct Expr1 *expr, int target_offset);
 
 /* add opcodes followed by the same 16-bit expression */
 void add_opcode_nn_nn(int opcode0, int opcode1, struct Expr1 *expr0);
 
 /* add opcode followed by 24-bit expression */
-void add_opcode_nnn(int opcode, struct Expr1 *expr);
+void add_opcode_nnn(int opcode, struct Expr1 *expr, int target_offset);
 
 /* add opcode followed by big-endian 16-bit expression */
 void add_opcode_NN(int opcode, struct Expr1 *expr);

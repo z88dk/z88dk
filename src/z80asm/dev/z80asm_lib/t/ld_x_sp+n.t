@@ -15,8 +15,8 @@ my $test_nr;
 # ld de, sp+%n
 for my $cpu (@CPUS) {
 	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
-		
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+
 		for my $base (0x1000) {
 			for my $add (0, 127, 255) {
 				$test_nr++;
@@ -42,7 +42,7 @@ END
 # ld hl, sp+%s
 for my $cpu (@CPUS) {
 	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
 		
 		for my $base (0x1000) {
 			for my $add (-128, 0, 127) {

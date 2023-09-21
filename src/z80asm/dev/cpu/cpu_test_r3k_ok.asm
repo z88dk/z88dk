@@ -5238,6 +5238,8 @@
  ld de, 0x1234                  ; 11 34 12
  ld de, bc                      ; 50 59
  ld de, hl                      ; 54 5D
+ ld de, hl+0                    ; E5 11 00 00 19 EB E1
+ ld de, hl+255                  ; E5 11 FF 00 19 EB E1
  ld de, sp                      ; EB 21 00 00 39 EB
  ld de, sp+0                    ; EB 21 00 00 39 EB
  ld de, sp+255                  ; EB 21 FF 00 39 EB

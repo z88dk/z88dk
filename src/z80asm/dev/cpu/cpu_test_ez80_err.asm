@@ -5868,8 +5868,6 @@
  ld de', 0x1234                 ; Error
  ld de', bc                     ; Error
  ld de', de                     ; Error
- ld de, hl+0                    ; Error
- ld de, hl+255                  ; Error
  ld e', (hl)                    ; Error
  ld e', (hl+)                   ; Error
  ld e', (hl-)                   ; Error

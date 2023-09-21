@@ -1388,16 +1388,26 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xE5);
-DO_stmt_nn(0x21);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
 DO_stmt(0x09);
 DO_stmt(0x44);
 DO_stmt(0x4D);
 DO_stmt(0xE1);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xED36);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xED36, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -1426,16 +1436,26 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xE5);
-DO_stmt_nn(0x21);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
 DO_stmt(0x19);
 DO_stmt(0x54);
 DO_stmt(0x5D);
 DO_stmt(0xE1);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xED35);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xED35, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -2432,14 +2452,24 @@ DO_stmt(0x39);
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD5);
-DO_stmt_nn(0x11);
+add_opcode_nn(0x11, Expr1_clone(expr), 0);
 DO_stmt(0x19);
 DO_stmt(0xD1);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xED34);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xED34, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -5815,9 +5845,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x76);
 DO_stmt(0xDB);
-DO_stmt_nn(0x3A);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -5920,9 +5955,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x76);
 DO_stmt(0xDB);
-DO_stmt_nn(0xED4B);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -6119,9 +6159,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x76);
 DO_stmt(0xDB);
-DO_stmt_nn(0xED5B);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -6378,9 +6423,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x76);
 DO_stmt(0xDB);
-DO_stmt_nn(0x2A);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -8511,9 +8561,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x76);
 DO_stmt(0xD3);
-DO_stmt_nn(0x3A);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -8616,9 +8671,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x76);
 DO_stmt(0xD3);
-DO_stmt_nn(0xED4B);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -8815,9 +8875,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x76);
 DO_stmt(0xD3);
-DO_stmt_nn(0xED5B);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -9074,9 +9139,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x76);
 DO_stmt(0xD3);
-DO_stmt_nn(0x2A);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -10337,8 +10407,13 @@ default: error_illegal_ident(); }
 | label? _TK_ALTD _TK_LD _TK_A _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) { DO_stmt(0x76);
-DO_stmt_nn(0x3A); } else { DO_stmt(0x76);
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { DO_stmt(0x76);
 DO_stmt_n(0x3E); }
 break;
 default: error_illegal_ident(); }
@@ -10521,9 +10596,19 @@ default: error_illegal_ident(); }
 | label? _TK_ALTD _TK_LD _TK_BC _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) { DO_stmt(0x76);
-DO_stmt_nn(0xED4B); } else { DO_stmt(0x76);
-DO_stmt_nn(0x01); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0x01, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -10863,9 +10948,19 @@ default: error_illegal_ident(); }
 | label? _TK_ALTD _TK_LD _TK_DE _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) { DO_stmt(0x76);
-DO_stmt_nn(0xED5B); } else { DO_stmt(0x76);
-DO_stmt_nn(0x11); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0x11, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -11295,9 +11390,19 @@ default: error_illegal_ident(); }
 | label? _TK_ALTD _TK_LD _TK_HL _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) { DO_stmt(0x76);
-DO_stmt_nn(0x2A); } else { DO_stmt(0x76);
-DO_stmt_nn(0x21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -15222,11 +15327,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -15245,13 +15360,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xDC);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xDC);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15260,13 +15385,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xCC);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xCC);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15275,13 +15410,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xD4);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xD4);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15348,13 +15493,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xDC);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xDC);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15363,13 +15518,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xFC);
+add_opcode_nnn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xFC);
+add_opcode_nnn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15378,13 +15543,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xD4);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xD4);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15393,13 +15568,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xC4);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xC4);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15408,13 +15593,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xE4);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xE4);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15423,13 +15618,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xC4);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xC4);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15438,13 +15643,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xF4);
+add_opcode_nnn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xF4);
+add_opcode_nnn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15453,13 +15668,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xEC);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xEC);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15468,13 +15693,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xE4);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xE4);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15483,13 +15718,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xEC);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xEC);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15498,13 +15743,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xCC);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xCC);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15513,13 +15768,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xCD);
+add_opcode_nnn(0xCD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xCD);
+add_opcode_nnn(0xCD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15528,13 +15793,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xDC);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xDC);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15543,13 +15818,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xCC);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xCC);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15558,13 +15843,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xD4);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xD4);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15631,13 +15926,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xDC);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xDC);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15646,13 +15951,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xFC);
+add_opcode_nn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xFC);
+add_opcode_nn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15661,13 +15976,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xD4);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xD4);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15676,13 +16001,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xC4);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xC4);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15691,13 +16026,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xE4);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xE4);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15706,13 +16051,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xC4);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xC4);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15721,13 +16076,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xF4);
+add_opcode_nn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xF4);
+add_opcode_nn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15736,13 +16101,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xEC);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xEC);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15751,13 +16126,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xE4);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xE4);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15766,13 +16151,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xEC);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xEC);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15781,13 +16176,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xCC);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xCC);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15796,13 +16201,23 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xCD);
+add_opcode_nn(0xCD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xCD);
+add_opcode_nn(0xCD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15811,8 +16226,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xDC);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15821,8 +16241,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xCC);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15831,8 +16256,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xD4);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15875,8 +16305,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xDC);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15885,8 +16320,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xFC);
+add_opcode_nnn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15895,8 +16335,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xD4);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15905,8 +16350,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xC4);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15915,8 +16365,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xE4);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15925,8 +16380,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xC4);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15935,8 +16395,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xF4);
+add_opcode_nnn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15945,8 +16410,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xEC);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15955,8 +16425,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xE4);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15965,8 +16440,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xEC);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15975,8 +16455,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xCC);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15985,8 +16470,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xCD);
+add_opcode_nnn(0xCD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -15995,8 +16485,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xDC);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16005,8 +16500,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xCC);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16015,8 +16515,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xD4);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16059,8 +16564,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xDC);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16069,8 +16579,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xFC);
+add_opcode_nn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16079,8 +16594,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xD4);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16089,8 +16609,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xC4);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16099,8 +16624,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xE4);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16109,8 +16639,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xC4);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16119,8 +16654,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xF4);
+add_opcode_nn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16129,8 +16669,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xEC);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16139,8 +16684,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xE4);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16149,8 +16699,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xEC);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16159,8 +16714,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xCC);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16169,8 +16729,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0xCD);
+add_opcode_nn(0xCD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16179,8 +16744,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xDC);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16189,8 +16759,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xCC);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16199,8 +16774,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xD4);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16243,8 +16823,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xDC);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16253,8 +16838,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xFC);
+add_opcode_nnn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16263,8 +16853,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xD4);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16273,8 +16868,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xC4);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16283,8 +16883,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xE4);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16293,8 +16898,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xC4);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16303,8 +16913,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xF4);
+add_opcode_nnn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16313,8 +16928,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xEC);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16323,8 +16943,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xE4);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16333,8 +16958,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xEC);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16343,8 +16973,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xCC);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16353,8 +16988,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0xCD);
+add_opcode_nnn(0xCD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16363,8 +17003,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xDC);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16373,8 +17018,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xCC);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16383,8 +17033,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xD4);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16427,8 +17082,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xDC);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16437,8 +17097,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xFC);
+add_opcode_nn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16447,8 +17112,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xD4);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16457,8 +17127,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xC4);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16467,8 +17142,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xE4);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16477,8 +17157,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xC4);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16487,8 +17172,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xF4);
+add_opcode_nn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16497,8 +17187,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xEC);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16507,8 +17202,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xE4);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16517,8 +17217,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xEC);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16527,8 +17232,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xCC);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16537,8 +17247,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xCD);
+add_opcode_nn(0xCD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16547,11 +17262,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16570,11 +17295,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16684,11 +17419,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16722,11 +17467,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xFC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16745,11 +17500,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16768,11 +17533,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16791,11 +17566,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16814,11 +17599,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16837,11 +17632,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xF4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xF4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16860,11 +17665,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16883,11 +17698,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16906,11 +17731,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16929,11 +17764,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -16952,11 +17797,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xCD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xCD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -16965,11 +17820,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -17001,11 +17866,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -17024,11 +17899,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -17138,11 +18023,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -17176,11 +18071,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xFC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -17953,11 +18858,21 @@ DO_stmt_n(0xFE);
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -17976,11 +18891,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -17999,11 +18924,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -18022,11 +18957,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -18883,11 +19828,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19024,11 +19979,21 @@ DO_stmt(0x2F);
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19047,11 +20012,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19070,11 +20045,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19093,11 +20078,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19116,11 +20111,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19139,11 +20144,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19253,11 +20268,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xDC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19291,11 +20316,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xFC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xFC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19314,11 +20349,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xD4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xD4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19337,11 +20382,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19360,11 +20415,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19383,11 +20448,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19406,11 +20481,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xF4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xF4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xF4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19429,11 +20514,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19452,11 +20547,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE4);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xE4, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19475,11 +20580,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xEC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -19498,11 +20613,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xCC);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xCC, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -20341,7 +21466,12 @@ DO_stmt_jr(0x10);
 break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x05C2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x5C2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -20367,7 +21497,12 @@ DO_stmt_jr(0x10);
 break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x05C2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x5C2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -23775,9 +24910,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
 DO_stmt(0x76);
-DO_stmt_nn(0x3A);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -23880,9 +25020,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
 DO_stmt(0x76);
-DO_stmt_nn(0xED4B);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -24079,9 +25224,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
 DO_stmt(0x76);
-DO_stmt_nn(0xED5B);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -24338,9 +25488,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
 DO_stmt(0x76);
-DO_stmt_nn(0x2A);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -26179,8 +27334,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0x3A);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -26347,9 +27507,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
 DO_stmt(0x76);
-DO_stmt_nn(0x3A);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -26537,8 +27702,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0xED4B);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -26547,9 +27717,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
 DO_stmt(0x76);
-DO_stmt_nn(0xED4B);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -26916,8 +28091,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0xED5B);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -26926,9 +28106,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
 DO_stmt(0x76);
-DO_stmt_nn(0xED5B);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -27349,8 +28534,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0x2A);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -27419,9 +28609,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
 DO_stmt(0x76);
-DO_stmt_nn(0x2A);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -28209,8 +29404,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0xDD2A);
+add_opcode_nn(0xDD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -28219,8 +29419,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0xFD2A);
+add_opcode_nn(0xFD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -28408,8 +29613,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0xED7B);
+add_opcode_nn(0xED7B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -28418,8 +29628,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0x32);
+add_opcode_nn(0x32, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -28428,8 +29643,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0xED43);
+add_opcode_nn(0xED43, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -28438,8 +29658,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0xED53);
+add_opcode_nn(0xED53, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -28448,8 +29673,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0x22);
+add_opcode_nn(0x22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -28458,8 +29688,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0xDD22);
+add_opcode_nn(0xDD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -28468,8 +29703,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0xFD22);
+add_opcode_nn(0xFD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -28478,8 +29718,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xDB);
-DO_stmt_nn(0xED73);
+add_opcode_nn(0xED73, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -31739,9 +32984,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
 DO_stmt(0x76);
-DO_stmt_nn(0x3A);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -31844,9 +33094,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
 DO_stmt(0x76);
-DO_stmt_nn(0xED4B);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -32043,9 +33298,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
 DO_stmt(0x76);
-DO_stmt_nn(0xED5B);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -32302,9 +33562,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
 DO_stmt(0x76);
-DO_stmt_nn(0x2A);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -34143,8 +35408,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0x3A);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -34311,9 +35581,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
 DO_stmt(0x76);
-DO_stmt_nn(0x3A);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -34501,8 +35776,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0xED4B);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -34511,9 +35791,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
 DO_stmt(0x76);
-DO_stmt_nn(0xED4B);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -34880,8 +36165,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0xED5B);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -34890,9 +36180,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
 DO_stmt(0x76);
-DO_stmt_nn(0xED5B);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -35313,8 +36608,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0x2A);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -35383,9 +36683,14 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
 DO_stmt(0x76);
-DO_stmt_nn(0x2A);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -36173,8 +37478,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0xDD2A);
+add_opcode_nn(0xDD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -36183,8 +37493,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0xFD2A);
+add_opcode_nn(0xFD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -36372,8 +37687,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0xED7B);
+add_opcode_nn(0xED7B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -36382,8 +37702,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0x32);
+add_opcode_nn(0x32, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -36392,8 +37717,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0xED43);
+add_opcode_nn(0xED43, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -36402,8 +37732,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0xED53);
+add_opcode_nn(0xED53, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -36412,8 +37747,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0x22);
+add_opcode_nn(0x22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -36422,8 +37762,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0xDD22);
+add_opcode_nn(0xDD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -36432,8 +37777,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0xFD22);
+add_opcode_nn(0xFD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -36442,8 +37792,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD3);
-DO_stmt_nn(0xED73);
+add_opcode_nn(0xED73, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38217,17 +39572,32 @@ default: error_illegal_ident(); }
 
 | label? _TK_JC expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_JEQ expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_JGEU expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_JGTU expr _TK_NEWLINE @{
@@ -38245,7 +39615,12 @@ asm_LABEL_offset(end_label, get_cur_opcode_size());
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38255,8 +39630,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nn(0xCA, Expr1_clone(expr));
-add_opcode_nn(0xDA, Expr1_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 }
@@ -38265,21 +39640,36 @@ OBJ_DELETE(expr);
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_JLTU expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_JLZ expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38288,7 +39678,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38297,11 +39692,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38337,8 +39742,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xDA);
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38347,8 +39757,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xCA);
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38357,8 +39772,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xD2);
+add_opcode_nnn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38388,9 +39808,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-add_opcode_nnn(0xCA, Expr1_clone(expr));
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
 DO_stmt(0x5B);
-add_opcode_nnn(0xDA, Expr1_clone(expr));
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -38401,8 +39821,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xDA);
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38411,8 +39836,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xFA);
+add_opcode_nnn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38421,8 +39851,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xD2);
+add_opcode_nnn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38431,8 +39866,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xC2);
+add_opcode_nnn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38441,8 +39881,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xE2);
+add_opcode_nnn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38451,8 +39896,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xC2);
+add_opcode_nnn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38461,8 +39911,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xF2);
+add_opcode_nnn(0xF2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38471,8 +39926,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xEA);
+add_opcode_nnn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38481,8 +39941,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xE2);
+add_opcode_nnn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38491,8 +39956,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xEA);
+add_opcode_nnn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38501,8 +39971,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xCA);
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38511,8 +39986,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xC3);
+add_opcode_nnn(0xC3, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38602,8 +40082,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xDA);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38612,8 +40097,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xCA);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38622,8 +40112,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xD2);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38653,9 +40148,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-add_opcode_nn(0xCA, Expr1_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
 DO_stmt(0x40);
-add_opcode_nn(0xDA, Expr1_clone(expr));
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -38666,8 +40161,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xDA);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38676,8 +40176,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xFA);
+add_opcode_nn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38686,8 +40191,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xD2);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38696,8 +40206,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xC2);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38706,8 +40221,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xE2);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38716,8 +40236,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xC2);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38726,8 +40251,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xF2);
+add_opcode_nn(0xF2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38736,8 +40266,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xEA);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38746,8 +40281,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xE2);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38756,8 +40296,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xEA);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38766,8 +40311,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xCA);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38776,8 +40326,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xC3);
+add_opcode_nn(0xC3, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38786,11 +40341,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38799,11 +40364,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38875,7 +40450,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38887,8 +40467,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nn(0xCA, Expr1_clone(expr));
-add_opcode_nn(0xDA, Expr1_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -38897,8 +40477,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nnn(0xCA, Expr1_clone(expr));
-add_opcode_nnn(0xDA, Expr1_clone(expr));
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -38909,7 +40489,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38918,11 +40503,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38931,7 +40526,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38940,11 +40540,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xFA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38953,11 +40563,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38966,11 +40586,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38979,7 +40609,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -38988,11 +40623,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39001,7 +40646,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39010,11 +40660,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39023,11 +40683,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xF2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xF2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xF2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xF2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39036,11 +40706,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39049,11 +40729,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39062,11 +40752,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39075,7 +40775,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39084,11 +40789,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39097,30 +40812,55 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC3);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC3, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC3);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC3, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_JNC expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_JNE expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_JNK expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39129,7 +40869,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39138,25 +40883,45 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_JNZ expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_JP _TK_C _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39192,8 +40957,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xDA);
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39202,8 +40972,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xCA);
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39212,8 +40987,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xD2);
+add_opcode_nnn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39243,9 +41023,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-add_opcode_nnn(0xCA, Expr1_clone(expr));
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
 DO_stmt(0x5B);
-add_opcode_nnn(0xDA, Expr1_clone(expr));
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -39256,8 +41036,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xDA);
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39266,8 +41051,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xFA);
+add_opcode_nnn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39276,8 +41066,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xD2);
+add_opcode_nnn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39286,8 +41081,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xC2);
+add_opcode_nnn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39296,8 +41096,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xE2);
+add_opcode_nnn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39306,8 +41111,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xC2);
+add_opcode_nnn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39316,8 +41126,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xF2);
+add_opcode_nnn(0xF2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39326,8 +41141,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xEA);
+add_opcode_nnn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39336,8 +41156,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xE2);
+add_opcode_nnn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39346,8 +41171,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xEA);
+add_opcode_nnn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39356,8 +41186,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xCA);
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39366,8 +41201,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xC3);
+add_opcode_nnn(0xC3, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39457,8 +41297,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xDA);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39467,8 +41312,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xCA);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39477,8 +41327,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xD2);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39508,9 +41363,9 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-add_opcode_nn(0xCA, Expr1_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
 DO_stmt(0x40);
-add_opcode_nn(0xDA, Expr1_clone(expr));
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -39521,8 +41376,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xDA);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39531,8 +41391,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xFA);
+add_opcode_nn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39541,8 +41406,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xD2);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39551,8 +41421,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xC2);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39561,8 +41436,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xE2);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39571,8 +41451,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xC2);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39581,8 +41466,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xF2);
+add_opcode_nn(0xF2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39591,8 +41481,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xEA);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39601,8 +41496,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xE2);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39611,8 +41511,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xEA);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39621,8 +41526,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xCA);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39631,8 +41541,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: case CPU_EZ80_Z80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xC3);
+add_opcode_nn(0xC3, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39641,11 +41556,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39654,11 +41579,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39730,7 +41665,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39742,8 +41682,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nn(0xCA, Expr1_clone(expr));
-add_opcode_nn(0xDA, Expr1_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -39752,8 +41692,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nnn(0xCA, Expr1_clone(expr));
-add_opcode_nnn(0xDA, Expr1_clone(expr));
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -39764,7 +41704,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39773,11 +41718,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39786,7 +41741,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39795,11 +41755,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xFA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39808,11 +41778,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39821,11 +41801,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39834,7 +41824,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39843,11 +41838,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39856,7 +41861,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39865,11 +41875,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39878,11 +41898,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xF2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xF2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xF2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xF2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39891,11 +41921,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39904,11 +41944,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39917,11 +41967,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39930,7 +41990,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39939,11 +42004,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39952,11 +42027,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC3);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC3, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nnn(0xC3);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xC3, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39965,7 +42050,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39974,7 +42064,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -39987,7 +42082,12 @@ DO_stmt_jr(0x38);
 break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40000,7 +42100,12 @@ DO_stmt_jr(0x28);
 break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40013,7 +42118,12 @@ DO_stmt_jr(0x30);
 break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40054,8 +42164,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nn(0xCA, Expr1_clone(expr));
-add_opcode_nn(0xDA, Expr1_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -40070,7 +42180,12 @@ DO_stmt_jr(0x38);
 break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40083,7 +42198,12 @@ DO_stmt_jr(0x30);
 break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40096,7 +42216,12 @@ DO_stmt_jr(0x20);
 break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40109,7 +42234,12 @@ DO_stmt_jr(0x20);
 break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40122,7 +42252,12 @@ DO_stmt_jr(0x28);
 break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40135,7 +42270,12 @@ DO_stmt_jr(0x18);
 break;
 case CPU_8080: case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC3);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC3, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40144,7 +42284,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40153,29 +42298,54 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8085: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFD);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFD, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_JZ expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_J_C expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_J_EQ expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_J_GEU expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_J_GTU expr _TK_NEWLINE @{
@@ -40194,8 +42364,8 @@ if (expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
-add_opcode_nn(0xCA, Expr1_clone(expr));
-add_opcode_nn(0xDA, Expr1_clone(expr));
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 }
@@ -40204,21 +42374,36 @@ OBJ_DELETE(expr);
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_J_LTU expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xDA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_J_LZ expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40227,40 +42412,70 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_J_NC expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xD2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xD2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_J_NE expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_J_NV expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_J_NZ expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xC2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xC2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_J_P expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xF2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xF2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40269,7 +42484,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40278,7 +42498,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xE2);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xE2, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -40287,14 +42512,24 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_J_Z expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xCA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xCA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_LD _TK_A _TK_COMMA _TK_A _TK_NEWLINE @{
@@ -40960,13 +43195,28 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_A _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) { DO_stmt_nn(0x3A); } else { DO_stmt_n(0x3E); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { DO_stmt_n(0x3E); }
 break;
 case CPU_GBZ80: 
-if (expr_in_parens) { DO_stmt_nn(0xFA); } else { DO_stmt_n(0x3E); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { DO_stmt_n(0x3E); }
 break;
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt_nnn(0x3A); } else { DO_stmt_n(0x3E); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { DO_stmt_n(0x3E); }
 break;
 default: error_illegal_ident(); }
 }
@@ -41207,8 +43457,13 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_A1 _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) { DO_stmt(0x76);
-DO_stmt_nn(0x3A); } else { DO_stmt(0x76);
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { DO_stmt(0x76);
 DO_stmt_n(0x3E); }
 break;
 default: error_illegal_ident(); }
@@ -42069,13 +44324,38 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x01);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x01, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) { DO_stmt_nn(0xED4B); } else { DO_stmt_nn(0x01); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x01, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt_nnn(0xED4B); } else { DO_stmt_nnn(0x01); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0x01, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -42099,9 +44379,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_BC1 _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) { DO_stmt(0x76);
-DO_stmt_nn(0xED4B); } else { DO_stmt(0x76);
-DO_stmt_nn(0x01); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0x01, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -43612,6 +45902,23 @@ DO_stmt(0x5D);
 
 | label? _TK_LD _TK_DE _TK_COMMA _TK_HL expr _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_GBZ80: 
+DO_stmt(0xE5);
+DO_stmt_n_0(0x11);
+DO_stmt(0x19);
+DO_stmt(0xE5);
+DO_stmt(0xD5);
+DO_stmt(0xE1);
+DO_stmt(0xD1);
+DO_stmt(0xE1);
+break;
+case CPU_8080: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
+DO_stmt(0xE5);
+DO_stmt_n_0(0x11);
+DO_stmt(0x19);
+DO_stmt(0xEB);
+DO_stmt(0xE1);
+break;
 case CPU_8085: 
 DO_stmt_n(0x28);
 break;
@@ -43768,18 +46075,53 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x11);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x11, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_8080: case CPU_8085: 
-if (expr_in_parens) { DO_stmt(0xEB);
-DO_stmt_nn(0x2A);
-DO_stmt(0xEB); } else { DO_stmt_nn(0x11); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0xEB);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+DO_stmt(0xEB);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x11, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) { DO_stmt_nn(0xED5B); } else { DO_stmt_nn(0x11); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x11, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt_nnn(0xED5B); } else { DO_stmt_nnn(0x11); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0x11, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -43803,9 +46145,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DE1 _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) { DO_stmt(0x76);
-DO_stmt_nn(0xED5B); } else { DO_stmt(0x76);
-DO_stmt_nn(0x11); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0x11, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -43814,8 +46166,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0x3A);
+add_opcode_nnn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -43824,8 +46181,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0x32);
+add_opcode_nnn(0x32, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -43834,8 +46196,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0x3A);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -43844,8 +46211,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0x32);
+add_opcode_nn(0x32, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -45818,9 +48190,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_LIL _TK_BC _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
-if (expr_in_parens) { DO_stmt(0x5B);
-DO_stmt_nnn(0xED4B); } else { DO_stmt(0x5B);
-DO_stmt_nnn(0x01); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0x01, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -45828,9 +48210,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_LIL _TK_DE _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
-if (expr_in_parens) { DO_stmt(0x5B);
-DO_stmt_nnn(0xED5B); } else { DO_stmt(0x5B);
-DO_stmt_nnn(0x11); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0x11, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -45838,9 +48230,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_LIL _TK_HL _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
-if (expr_in_parens) { DO_stmt(0x5B);
-DO_stmt_nnn(0x2A); } else { DO_stmt(0x5B);
-DO_stmt_nnn(0x21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0x21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -45848,9 +48250,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_LIL _TK_IX _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
-if (expr_in_parens) { DO_stmt(0x5B);
-DO_stmt_nnn(0xDD2A); } else { DO_stmt(0x5B);
-DO_stmt_nnn(0xDD21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0xDD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0xDD21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -45858,9 +48270,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_LIL _TK_IY _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
-if (expr_in_parens) { DO_stmt(0x5B);
-DO_stmt_nnn(0xFD2A); } else { DO_stmt(0x5B);
-DO_stmt_nnn(0xFD21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0xFD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0xFD21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -45868,9 +48290,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_LIL _TK_SP _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
-if (expr_in_parens) { DO_stmt(0x5B);
-DO_stmt_nnn(0xED7B); } else { DO_stmt(0x5B);
-DO_stmt_nnn(0x31); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0xED7B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x5B);
+add_opcode_nnn(0x31, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -45879,8 +48311,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xED43);
+add_opcode_nnn(0xED43, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -45889,8 +48326,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xED53);
+add_opcode_nnn(0xED53, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -45899,8 +48341,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0x22);
+add_opcode_nnn(0x22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -45909,8 +48356,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xDD22);
+add_opcode_nnn(0xDD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -45919,8 +48371,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xFD22);
+add_opcode_nnn(0xFD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -45929,8 +48386,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5B);
-DO_stmt_nnn(0xED73);
+add_opcode_nnn(0xED73, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -46082,8 +48544,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0x3A);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -47914,8 +50381,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x49);
-DO_stmt_nn(0x32);
+add_opcode_nn(0x32, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -50032,8 +52504,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0x3A);
+add_opcode_nnn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -51864,8 +54341,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x52);
-DO_stmt_nnn(0x32);
+add_opcode_nnn(0x32, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -51873,9 +54355,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_SIS _TK_BC _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt(0x40);
-DO_stmt_nn(0xED4B); } else { DO_stmt(0x40);
-DO_stmt_nn(0x01); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0xED4B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0x01, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -51883,9 +54375,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_SIS _TK_DE _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt(0x40);
-DO_stmt_nn(0xED5B); } else { DO_stmt(0x40);
-DO_stmt_nn(0x11); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0xED5B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0x11, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -51893,9 +54395,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_SIS _TK_HL _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt(0x40);
-DO_stmt_nn(0x2A); } else { DO_stmt(0x40);
-DO_stmt_nn(0x21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -51903,9 +54415,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_SIS _TK_IX _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt(0x40);
-DO_stmt_nn(0xDD2A); } else { DO_stmt(0x40);
-DO_stmt_nn(0xDD21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0xDD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0xDD21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -51913,9 +54435,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_SIS _TK_IY _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt(0x40);
-DO_stmt_nn(0xFD2A); } else { DO_stmt(0x40);
-DO_stmt_nn(0xFD21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0xFD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0xFD21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -51923,9 +54455,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_DOT _TK_SIS _TK_SP _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt(0x40);
-DO_stmt_nn(0xED7B); } else { DO_stmt(0x40);
-DO_stmt_nn(0x31); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0xED7B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x40);
+add_opcode_nn(0x31, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -51934,8 +54476,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xED43);
+add_opcode_nn(0xED43, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -51944,8 +54491,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xED53);
+add_opcode_nn(0xED53, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -51954,8 +54506,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0x22);
+add_opcode_nn(0x22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -51964,8 +54521,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xDD22);
+add_opcode_nn(0xDD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -51974,8 +54536,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xFD22);
+add_opcode_nn(0xFD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -51984,8 +54551,13 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40);
-DO_stmt_nn(0xED73);
+add_opcode_nn(0xED73, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -53664,20 +56236,50 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_HL _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_GBZ80: 
-if (expr_in_parens) { DO_stmt(0xD5);
-DO_stmt_nn(0x21);
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0xD5);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
 DO_stmt(0x5E);
 DO_stmt(0x23);
 DO_stmt(0x56);
 DO_stmt(0x62);
 DO_stmt(0x6B);
-DO_stmt(0xD1); } else { DO_stmt_nn(0x21); }
+DO_stmt(0xD1);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) { DO_stmt_nn(0x2A); } else { DO_stmt_nn(0x21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt_nnn(0x2A); } else { DO_stmt_nnn(0x21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0x21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -53791,9 +56393,19 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_HL1 _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
-if (expr_in_parens) { DO_stmt(0x76);
-DO_stmt_nn(0x2A); } else { DO_stmt(0x76);
-DO_stmt_nn(0x21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0x76);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -55319,10 +57931,30 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_IX _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) { DO_stmt_nn(0xDD2A); } else { DO_stmt_nn(0xDD21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDD21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt_nnn(0xDD2A); } else { DO_stmt_nnn(0xDD21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDD21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -55645,10 +58277,30 @@ default: error_illegal_ident(); }
 | label? _TK_LD _TK_IY _TK_COMMA expr _TK_NEWLINE @{
 switch (option_cpu()) {
 case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) { DO_stmt_nn(0xFD2A); } else { DO_stmt_nn(0xFD21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFD21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt_nnn(0xFD2A); } else { DO_stmt_nnn(0xFD21); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xFD2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xFD21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -56534,13 +59186,38 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x31);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x31, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
-if (expr_in_parens) { DO_stmt_nn(0xED7B); } else { DO_stmt_nn(0x31); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xED7B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x31, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 case CPU_EZ80: 
-if (expr_in_parens) { DO_stmt_nnn(0xED7B); } else { DO_stmt_nnn(0x31); }
+if (expr_in_parens) { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xED7B, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} } else { {
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0x31, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+} }
 break;
 default: error_illegal_ident(); }
 }
@@ -56557,28 +59234,81 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0x32);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x32, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_GBZ80: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
-DO_stmt_nnn(0x32);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0x32, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_LD expr _TK_COMMA _TK_BC _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_8080: case CPU_8085: 
+if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0xF5);
+DO_stmt(0x79);
+add_opcode_nn(0x32, Expr1_clone(expr), 0);
+DO_stmt(0x78);
+add_opcode_nn(0x32, Expr1_clone(expr), 1);
+DO_stmt(0xF1);
+OBJ_DELETE(expr);
+}
+break;
+case CPU_GBZ80: 
+if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0xF5);
+DO_stmt(0x79);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+DO_stmt(0x78);
+add_opcode_nn(0xEA, Expr1_clone(expr), 1);
+DO_stmt(0xF1);
+OBJ_DELETE(expr);
+}
+break;
 case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xED43);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xED43, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
-DO_stmt_nnn(0xED43);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xED43, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -56587,17 +59317,46 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xEB);
-DO_stmt_nn(0x22);
+add_opcode_nn(0x22, Expr1_clone(expr), 0);
 DO_stmt(0xEB);
+OBJ_DELETE(expr);
+}
+break;
+case CPU_GBZ80: 
+if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0xF5);
+DO_stmt(0x7B);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+DO_stmt(0x7A);
+add_opcode_nn(0xEA, Expr1_clone(expr), 1);
+DO_stmt(0xF1);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xED53);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xED53, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
-DO_stmt_nnn(0xED53);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xED53, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -56606,24 +59365,39 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_GBZ80: 
 if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD5);
 DO_stmt(0xE5);
 DO_stmt(0x54);
 DO_stmt(0x5D);
-DO_stmt_nn(0x21);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
 DO_stmt(0x73);
 DO_stmt(0x23);
 DO_stmt(0x72);
 DO_stmt(0xE1);
 DO_stmt(0xD1);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0x22);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
-DO_stmt_nnn(0x22);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0x22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -56632,11 +59406,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xDD22);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
-DO_stmt_nnn(0xDD22);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xDD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -56645,28 +59429,66 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xFD22);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
-DO_stmt_nnn(0xFD22);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xFD22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
 
 | label? _TK_LD expr _TK_COMMA _TK_SP _TK_NEWLINE @{
 switch (option_cpu()) {
+case CPU_8080: case CPU_8085: 
+if (!expr_in_parens) return false;
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0xE5);
+DO_stmt(0x210200);
+DO_stmt(0x39);
+add_opcode_nn(0x22, Expr1_clone(expr), 0);
+DO_stmt(0xE1);
+OBJ_DELETE(expr);
+}
+break;
 case CPU_GBZ80: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0x08);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x08, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xED73);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xED73, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_EZ80: 
 if (!expr_in_parens) return false;
-DO_stmt_nnn(0xED73);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nnn(0xED73, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -56675,11 +59497,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x3A);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xFA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -59677,7 +62509,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xED6D);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xED6D, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -59710,7 +62547,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xDD6D);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDD6D, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -59719,7 +62561,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xFD6D);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFD6D, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -59728,7 +62575,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xED65);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xED65, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -59737,7 +62589,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xDD65);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xDD65, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -59746,7 +62603,12 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (!expr_in_parens) return false;
-DO_stmt_nn(0xFD65);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xFD65, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -60668,18 +63530,28 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD5);
-DO_stmt_nn(0x21);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
 DO_stmt(0x5E);
 DO_stmt(0x23);
 DO_stmt(0x56);
 DO_stmt(0x62);
 DO_stmt(0x6B);
 DO_stmt(0xD1);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x2A);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x2A, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -60750,37 +63622,72 @@ default: error_illegal_ident(); }
 
 | label? _TK_LXI _TK_B _TK_COMMA expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x01);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x01, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_LXI _TK_BC _TK_COMMA expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x01);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x01, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_LXI _TK_D _TK_COMMA expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x11);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x11, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_LXI _TK_DE _TK_COMMA expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x11);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x11, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_LXI _TK_H _TK_COMMA expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x21);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_LXI _TK_HL _TK_COMMA expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x21);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_LXI _TK_SP _TK_COMMA expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x31);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x31, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 }
 
 | label? _TK_MIRR _TK_A _TK_NEWLINE @{
@@ -70923,20 +73830,30 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD5);
 DO_stmt(0xE5);
 DO_stmt(0x54);
 DO_stmt(0x5D);
-DO_stmt_nn(0x21);
+add_opcode_nn(0x21, Expr1_clone(expr), 0);
 DO_stmt(0x73);
 DO_stmt(0x23);
 DO_stmt(0x72);
 DO_stmt(0xE1);
 DO_stmt(0xD1);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x22);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x22, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }
@@ -73672,11 +76589,21 @@ default: error_illegal_ident(); }
 switch (option_cpu()) {
 case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x32);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0x32, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xEA);
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+add_opcode_nn(0xEA, Expr1_clone(expr), 0);
+OBJ_DELETE(expr);
+}
 break;
 default: error_illegal_ident(); }
 }

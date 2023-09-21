@@ -18,9 +18,9 @@ my $test_nr;
 # CPIR / CPDR with BC = 1
 for my $cpu (@CPUS) {
 	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
 		skip "$cpu P/V flag not correct in ticks?" if $cpu =~ /^8080$|^8085$/;
-	
+		
 		for my $carry (0, 1) {
 			for my $data (1, 2, 3) {
 				my $a = 2;
@@ -66,7 +66,7 @@ END
 # CPIR / CPDR with BC > 1
 for my $cpu (@CPUS) {
 	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
 		skip "$cpu P/V flag not correct in ticks?" if $cpu =~ /^8080$|^8085$/;
 
 		for my $carry (0, 1) {

@@ -774,33 +774,77 @@ for my $cpu (@CPUS) {
 					if ($r eq 'de') {
 						# gbz80 lacks the ld hl,(**) and ld (**),hl
 						add($cpu, "ld $r, (%m)", [ex_de_hl()], [0x2A, '%m', '%m'], [ex_de_hl()]);
-						add($cpu, "ld (%m), $r", [ex_de_hl()], [0x22, '%m', '%m'], [ex_de_hl()]);
 					}
 				}
 				else {
 					if ($ez80_z80) {
-						add($cpu, "ld $r, (%m)", [0xED, 0x4B + $V{$r}*16, '%m', '%m']);
-						add($cpu, "ld.lil $r, (%m)", [0x5B], [0xED, 0x4B + $V{$r}*16, '%m', '%m', '%m']);
+						add($cpu, "ld $r, (%m)", [0xED, 0x4B+$V{$r}*16, '%m', '%m']);
+						add($cpu, "ld.lil $r, (%m)", [0x5B], [0xED, 0x4B+$V{$r}*16, '%m', '%m', '%m']);
 
-						add($cpu, "ld (%m), $r", [0xED, 0x43 + $V{$r}*16, '%m', '%m']);
-						add($cpu, "ld.lil (%m), $r", [0x5B], [0xED, 0x43 + $V{$r}*16, '%m', '%m', '%m']);
+						add($cpu, "ld (%m), $r", [0xED, 0x43+$V{$r}*16, '%m', '%m']);
+						add($cpu, "ld.lil (%m), $r", [0x5B], [0xED, 0x43+$V{$r}*16, '%m', '%m', '%m']);
 					}
 					elsif ($ez80_adl) {
-						add($cpu, "ld $r, (%m)", [0xED, 0x4B + $V{$r}*16, '%m', '%m', '%m']);
-						add($cpu, "ld.sis $r, (%m)", [0x40], [0xED, 0x4B + $V{$r}*16, '%m', '%m']);
+						add($cpu, "ld $r, (%m)", [0xED, 0x4B+$V{$r}*16, '%m', '%m', '%m']);
+						add($cpu, "ld.sis $r, (%m)", [0x40], [0xED, 0x4B+$V{$r}*16, '%m', '%m']);
 
-						add($cpu, "ld (%m), $r", [0xED, 0x43 + $V{$r}*16, '%m', '%m', '%m']);
-						add($cpu, "ld.sis (%m), $r", [0x40], [0xED, 0x43 + $V{$r}*16, '%m', '%m']);
+						add($cpu, "ld (%m), $r", [0xED, 0x43+$V{$r}*16, '%m', '%m', '%m']);
+						add($cpu, "ld.sis (%m), $r", [0x40], [0xED, 0x43+$V{$r}*16, '%m', '%m']);
 					}
 					else {
-						add_x($cpu, "ld $r, (%m)", [0xED, 0x4B + $V{$r}*16, '%m', '%m']);
-						add_x($cpu, "ld (%m), $r", [0xED, 0x43 + $V{$r}*16, '%m', '%m']);
+						add_x($cpu, "ld $r, (%m)", [0xED, 0x4B+$V{$r}*16, '%m', '%m']);
+						add_x($cpu, "ld (%m), $r", [0xED, 0x43+$V{$r}*16, '%m', '%m']);
 					}
 				}
 			}
 		}
 	}
 
+	# ld (%m), bc
+	if ($intel) {
+		add($cpu, "ld (%m), bc",	[push_dd('af')],
+									[ld_r_r('a','c')],
+									[0x32, '%m', '%m'],		# ld (%m), a
+									[ld_r_r('a','b')],
+									[0x32, '%m1', '%m1'],	# ld (%m+1), a
+									[pop_dd('af')]);
+	}
+	elsif ($gameboy) {
+		add($cpu, "ld (%m), bc",	[push_dd('af')],
+									[ld_r_r('a','c')],
+									[0xEA, '%m', '%m'],		# ld (%m), a
+									[ld_r_r('a','b')],
+									[0xEA, '%m1', '%m1'],	# ld (%m+1), a
+									[pop_dd('af')]);
+	}
+
+	# ld (%m), de
+	if ($intel) {
+		add($cpu, "ld (%m), de", 	[ex_de_hl()], 
+									[0x22, '%m', '%m'],		# ld (%m), hl
+									[ex_de_hl()]);
+	}
+	elsif ($gameboy) {
+		add($cpu, "ld (%m), de",	[push_dd('af')],
+									[ld_r_r('a','e')],
+									[0xEA, '%m', '%m'],		# ld (%m), a
+									[ld_r_r('a','d')],
+									[0xEA, '%m1', '%m1'],	# ld (%m+1), a
+									[pop_dd('af')]);
+	}
+
+	# ld (%m), sp
+	if ($intel) {
+		add($cpu, "ld (%m), sp", 	[push_dd('hl')],
+									[ld_dd_m('hl'), 2, 0],	# compensate for push hl
+									[add_hl_dd('sp')],		# hl=sp
+									[0x22, '%m', '%m'],		# ld (%m), hl
+									[pop_dd('hl')]);
+	}
+	elsif ($gameboy) {
+		add($cpu, "ld (%m), sp", 	[0x08, '%m', '%m']);
+	}
+	
 	# LD dd, dd
 	add($cpu, "ld bc, de", [ld_r_r('b', 'd')], [ld_r_r('c', 'e')]);
 	add($cpu, "ld bc, hl", [ld_r_r('b', 'h')], [ld_r_r('c', 'l')]);
@@ -816,6 +860,21 @@ for my $cpu (@CPUS) {
 		add($cpu, "ldhi %n",		[0x28, '%n']);
 		add($cpu, "adi hl, %n",		[0x28, '%n']);
 		add($cpu, "ld de, hl+%u",	[0x28, '%u']);
+	}
+	elsif ($gameboy) {
+		add($cpu, "ld de, hl+%u",	[push_dd('hl')],
+									[ld_dd_m('de'), '%u', 0],
+									[add_hl_dd('de')],
+									[push_dd('hl')], [push_dd('de')],
+									[pop_dd('hl')], [pop_dd('de')],
+									[pop_dd('hl')]);
+	}
+	else {
+		add($cpu, "ld de, hl+%u",	[push_dd('hl')],
+									[ld_dd_m('de'), '%u', 0],
+									[add_hl_dd('de')],
+									[ex_de_hl()],
+									[pop_dd('hl')]);
 	}
     
     # this 8085 instruction is slower, thanks @feilipu
@@ -872,10 +931,6 @@ for my $cpu (@CPUS) {
 									[add_hl_dd('sp')]);    		# add hl, sp
     }
     
-	if ($gameboy) {
-		add($cpu, "ld (%m), sp", [0x08, '%m', '%m']);
-	}
-
 	for my $r (qw( bc de hl af )) {
 		my $r1 = ($r eq 'af') ? 'psw' : substr($r,0,1);		# B, D, H, PSW
 

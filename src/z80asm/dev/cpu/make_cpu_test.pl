@@ -199,6 +199,11 @@ sub add {
 		$bytes1 = $bytes1 =~ s/%m/12/r;
 		add($cpu, $asm1, $bytes1);
 	}
+	elsif ($bytes =~ /%m1 %m1/) {
+		my $asm1 = $asm =~ s/%m/0x1234/r;
+		my $bytes1 = $bytes =~ s/%m1 %m1/35 12/gr;
+		add($cpu, $asm1, $bytes1);
+	}
 	elsif ($bytes =~ /%m %m/) {
 		my $asm1 = $asm =~ s/%m/0x1234/r;
 		my $bytes1 = $bytes =~ s/%m %m/34 12/gr;

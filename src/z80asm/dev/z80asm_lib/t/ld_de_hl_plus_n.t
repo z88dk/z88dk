@@ -10,27 +10,28 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my $test_nr;
-
 for my $cpu (@CPUS) {
 	SKIP: {
 		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-
-		$test_nr++;
-		note "Test $test_nr: cpu:$cpu";
-
-		my $r = ticks(<<END, "-m$cpu");
-					ld 	a, 0
-					ld 	b, 42
-			loop:	inc a
-					djnz loop
+		
+		for my $hl (32767, 65535) {
+			for my $u (127, 255) {
+				my $t = ticks(<<END, "-m$cpu");
+					; $cpu $hl $u
+					ld hl, $hl
+					ld de, -1
+					ld de, hl+$u
 					rst 0
 END
-		is $r->{A}, 42;
+				is $t->{DE}, ($hl + $u) & 0xFFFF, "result";
+				is $t->{HL}, $hl, "result";
 				
-		(Test::More->builder->is_passing) or die;
+				(Test::More->builder->is_passing) or die;
+			}
+		}
 	}
 }
 
 unlink_testfiles();
 done_testing();
+

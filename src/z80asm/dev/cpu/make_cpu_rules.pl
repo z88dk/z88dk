@@ -128,7 +128,7 @@ sub parse_code {
 			"}";
 	}
 	# handle multiple uses of the same expression
-	elsif ($bin =~ /%m %m[0-9A-F ]+%m %m/) {
+	elsif ($bin =~ /%m/) {
 		push @code,
 			"{",
 			"DO_STMT_LABEL();",
@@ -137,18 +137,26 @@ sub parse_code {
 			my $count_m = scalar(grep {/%m/} @$op);
 			if ($count_m) {
 				my $opcode = 0;
+				my $target_offset = 0;
 				for my $i (0 .. $#$op) {
-					last if $op->[$i] =~ /%m/;
-					$opcode = ($opcode << 8) | ($op->[$i] & 0xFF);
+					if ($op->[$i] =~ /%m(\d*)/) {
+						if ($1) {
+							$target_offset = $1;
+						}
+						last;
+					}
+					else {
+						$opcode = ($opcode << 8) | ($op->[$i] & 0xFF);
+					}
 				}
 				
 				if ($count_m==2) {
 					push @code,
-						"add_opcode_nn(0x".fmthex($opcode).", Expr1_clone(expr));";
+						"add_opcode_nn(0x".fmthex($opcode).", Expr1_clone(expr), $target_offset);";
 				}
 				elsif ($count_m==3) {	
 					push @code,
-						"add_opcode_nnn(0x".fmthex($opcode).", Expr1_clone(expr));";
+						"add_opcode_nnn(0x".fmthex($opcode).", Expr1_clone(expr), $target_offset);";
 				}
 				else {	
 					die $count_m;
@@ -190,12 +198,6 @@ sub parse_code {
 			}
 		}
 	}
-	elsif ($bin =~ /^\d+ %m %m \d+ %m %m$/) {
-		my $opcode0 = $ops[0][0];
-		my $opcode1 = $ops[1][0];
-		push @code, 
-			"DO_stmt_nn_nn(".sprintf("0x%02X, 0x%02X", $opcode0, $opcode1).");";
-	}		
 	elsif ($bin =~ /^\d+ %j \d+ %j$/) {
 		my $opcode0 = $ops[0][0];
 		my $opcode1 = $ops[1][0];

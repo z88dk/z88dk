@@ -38,8 +38,22 @@ Define rules for a ragel-based parser.
 #define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
 #define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
 #define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
-#define DO_stmt_nn( opcode)		_DO_stmt_(nn,		opcode)
-#define DO_stmt_nnn( opcode)	_DO_stmt_(nnn,		opcode)
+
+#define DO_stmt_nn( opcode) \
+			do { \
+			 	Expr1 *expr = pop_expr(ctx); \
+				DO_STMT_LABEL(); \
+				add_opcode_nn((opcode), expr, 0); \
+			} while(0)
+
+#define DO_stmt_nnn( opcode) \
+			do { \
+			 	Expr1 *expr = pop_expr(ctx); \
+				DO_STMT_LABEL(); \
+				add_opcode_nnn((opcode), expr, 0); \
+			} while(0)
+
+
 #define DO_stmt_NN( opcode)		_DO_stmt_(NN,		opcode)
 #define DO_stmt_idx(opcode)		_DO_stmt_(idx,		opcode)
 

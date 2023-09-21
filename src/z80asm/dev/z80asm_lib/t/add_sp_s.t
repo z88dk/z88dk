@@ -14,8 +14,8 @@ my $test_nr;
 
 for my $cpu (@CPUS) {
 	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
-		
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+
 		for my $base (0x1000) {
 			for my $add (-2, 0, 2) {
 				$test_nr++;

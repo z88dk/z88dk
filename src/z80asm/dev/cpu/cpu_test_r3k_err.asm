@@ -2226,8 +2226,6 @@
  ld d, srl (iy)                 ; Error
  ld d, srl (iy+126)             ; Error
  ld d, srl (iy-128)             ; Error
- ld de, hl+0                    ; Error
- ld de, hl+255                  ; Error
  ld de, ix                      ; Error
  ld de, iy                      ; Error
  ld e, ixh                      ; Error

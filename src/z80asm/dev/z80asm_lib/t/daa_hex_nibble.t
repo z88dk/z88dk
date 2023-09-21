@@ -17,7 +17,7 @@ my $test_nr;
 # test l_hex_nibble from the z88dk library (uses DAA)
 for my $cpu (@CPUS) {
 	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$|^r4k$|^r5k$/;
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
 		skip "$cpu flags not correct in ticks?" if $cpu =~ /^8080$|^8085$/;
 
 		for my $a (0..15) {

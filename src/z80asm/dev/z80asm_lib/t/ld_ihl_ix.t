@@ -7,7 +7,7 @@ use Modern::Perl;
 # ld (hl), ixy
 for my $cpu (@CPUS) {
 	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /ez80|r4k|r5k/;
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
 		skip "$cpu does not have index registers" if $cpu =~ /8080|8085|gbz80/;
 		
 		for my $x (qw( ix iy )) {
@@ -38,7 +38,7 @@ END
 # ld ixy, (hl)
 for my $cpu (@CPUS) {
 	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /ez80|r4k|r5k/;
+		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
 		skip "$cpu does not have index registers" if $cpu =~ /8080|8085|gbz80/;
 		
 		for my $x (qw( ix iy )) {

@@ -408,6 +408,8 @@
  jr z, ASMPC                    ; 28 FE
  jz 0x1234                      ; CA 34 12
  ld (0x1234), a                 ; EA 34 12
+ ld (0x1234), bc                ; F5 79 EA 34 12 78 EA 35 12 F1
+ ld (0x1234), de                ; F5 7B EA 34 12 7A EA 35 12 F1
  ld (0x1234), hl                ; D5 E5 54 5D 21 34 12 73 23 72 E1 D1
  ld (0x1234), sp                ; 08 34 12
  ld (0xff00+0), a               ; E0 00
@@ -553,6 +555,8 @@
  ld de, 0x1234                  ; 11 34 12
  ld de, bc                      ; 50 59
  ld de, hl                      ; 54 5D
+ ld de, hl+0                    ; E5 11 00 00 19 E5 D5 E1 D1 E1
+ ld de, hl+255                  ; E5 11 FF 00 19 E5 D5 E1 D1 E1
  ld de, sp                      ; E5 D5 E1 D1 21 00 00 39 E5 D5 E1 D1
  ld de, sp+0                    ; E5 D5 E1 D1 21 00 00 39 E5 D5 E1 D1
  ld de, sp+255                  ; E5 D5 E1 D1 21 FF 00 39 E5 D5 E1 D1

@@ -228,6 +228,7 @@ rebuild:
 	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm.lib
 	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm_lib.lst
 	touch ../z80asm/Makefile ../z80asm/dev/z80asm_lib/Makefile ../z80asm/dev/cpu/Makefile
+	touch ../z80asm/src/c/*.rl
 	$(MAKE) -C ../common
 	$(MAKE) -C ../z80asm dev
 	cp ../z80asm/z88dk-z80asm$(EXESUFFIX) ../../bin/
