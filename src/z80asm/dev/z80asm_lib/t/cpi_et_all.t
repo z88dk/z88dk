@@ -19,7 +19,6 @@ my $test_nr;
 for my $cpu (@CPUS) {
 	SKIP: {
 		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-		skip "$cpu P/V flag not correct in ticks?" if $cpu =~ /^8080$|^8085$/;
 		
 		for my $carry (0, 1) {
 			for my $data (1, 2, 3) {
@@ -48,8 +47,14 @@ END
 						is $r->{F_S}, ($a <  $data 		? 1 : 0), "S";
 						is $r->{F_Z}, ($a == $data 		? 1 : 0), "Z";
 						is $r->{F_H}, ($a <  $data 		? 1 : 0), "Hf";
-						is $r->{F_PV}, ($r->{BC} == 0 	? 0 : 1), "PV";
-						is $r->{F_N}, 1,						  "N";
+						is $r->{F_PV},($r->{BC} == 0 	? 0 : 1), "PV";
+						
+						SKIP: {
+							skip "8085 has no N flag" if $cpu =~ /8085/;
+							
+							is $r->{F_N}, 1,					  "N";
+						}
+						
 						is $r->{F_C}, $carry,					  "C";					
 						is $r->{HL}, $op =~ /cpi/ ? 0x101 : 0x0FF,"HL";
 						is $r->{BC}, $bc - 1,					  "BC";
