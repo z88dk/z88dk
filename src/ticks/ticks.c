@@ -566,6 +566,28 @@
           l= v,                 \
           fr= h|l<<8
 
+#define SUBHLRR(a, b) do {      \
+          if (altd) {           \
+            mp= l_+1+(h_<<8);   \
+            v= l_-b+((h_-a)<<8),\
+            ff_= v>>8,          \
+            fa_= h,             \
+            fb_= ~a,            \
+            h= ff_,             \
+            l= v,               \
+            fr_= h_|l_<<8;          \
+          } else {              \
+            mp= l+1+(h<<8);     \
+            v= l-b+((h-a)<<8),  \
+            ff= v>>8,           \
+            fa= h,              \
+            fb= ~a,             \
+            h= ff,              \
+            l= v,               \
+            fr= h|l<<8;         \
+          }                     \
+        } while(0)
+
 #define ADCHLRR(a, b) do {      \
           st += isez80() ? 2 :israbbit() ? 4 : isz180() ? 10 : isr800() ? 2 : 15; \
           v= l+b+((h+a)<<8)+(ff>>8&1);\
@@ -2183,11 +2205,8 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x08: // EX AF,AF'
         if ( is8085() ) {  // (8085) SUB HL,BC (DSUB)
-          long long savest = st;
-          ff&=~256;  // Clear carry
-          SBCHLRR(b,c);
-		  st = savest;
-		  st += 10;
+          SUBHLRR(b,c);
+          st += 10;
           break;
         } else if ( is8080()) {
           printf("%04x: ILLEGAL 8080 opcode EX AF,AF\n",pc-1);
@@ -2398,13 +2417,17 @@ int main (int argc, char **argv){
         else if ( canixh() )
           LDRR(b, xh, b,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x45: // LD B,L // LD B,IXl // LD B,IYl
-        if( ih ) {
+      case 0x45: // LD B,L // LD B,IXl // LD B,IYl / (R4K) SUB HL,JK
+        if (israbbit4k()) {
+          SUBHLRR(j,k);
+          st += 2;
+        } else if( ih ) {
           LDRR(b, l, b_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
-        } else if( iy && canixh() )
+        } else if( iy && canixh() ) {
           LDRR(b, yl, b,isez80() ? 1 : isr800() ? 1 : 4);
-        else if ( canixh() )
+        } else if ( canixh() ) {
           LDRR(b, xl, b,isez80() ? 1 : isr800() ? 1 : 4);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x46: // LD B,(HL) // LD B,(IX+d) // LD B,(IY+d)
         if( ih ) {
@@ -2489,8 +2512,11 @@ int main (int argc, char **argv){
         else if ( canixh() )
           LDRR(d, xh, d,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x55: // LD D,L // LD D,IXl // LD D,IYl
-        if( ih )
+      case 0x55: // LD D,L // LD D,IXl // LD D,IYl / (R4K) SUB HL, DE
+        if (israbbit4k()) {
+          SUBHLRR(d,e);
+          st += 2;
+        } else if( ih )
           LDRR(d, l,  d_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           LDRR(d, yl, d,isez80() ? 1 : isr800() ? 1 : 4);
@@ -4680,8 +4706,7 @@ int main (int argc, char **argv){
                   put_memory(e | d << 8, t = get_memory(l | h << 8));
                   ++l || h++;
                   st += 16;
-              }
-              else {
+              } else {
                   st += 8; break;
               }
               break;
@@ -4711,9 +4736,8 @@ int main (int argc, char **argv){
                   put_memory(e | d << 8, t = get_memory(l | h << 8));
                   l++; d++;
                   st += 14;
-              }
-              else {
-                  st += 8; break;
+              } else {
+                  st += 8;
               }
               break;
           case 0xb7:
@@ -4724,9 +4748,8 @@ int main (int argc, char **argv){
                   c-- || b--;
                   st += 16;
                   if ((b | c) != 0) { pc -= 2; st += 5; }
-              }
-              else {
-                  st += 8; break;
+              } else {
+                  st += 8;
               }
               break;
           case 0xf9:   // (R800) MULUB A,A
@@ -4735,7 +4758,9 @@ int main (int argc, char **argv){
               h = (v >> 8) & 0xff;
               l = v & 0xff;
               st += 14;
-            } else st += 8; 
+            } else { 
+              st += 8; 
+            }
             break;
           case 0xc1:   // (R800) MULUB A,B
             if ( isr800() ) {

@@ -651,7 +651,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 if (dbltest(lval2, lval)) {
                     UT_string  *str;
                     utstring_new(str);
-                    utstring_printf(str,"Converting integer type to pointer witout cast. From ");
+                    utstring_printf(str,"Converting integer type to pointer without cast. From ");
                     type_describe(lval->ltype, str);
                     utstring_printf(str, " to ");
                     type_describe(lval2->ltype, str);
