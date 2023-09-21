@@ -26,6 +26,7 @@ extern int c_adl_mode;
 #define israbbit4k() ( c_cpu & (CPU_R4K))
 #define isz180() ( c_cpu & (CPU_Z180))
 #define isez80() ( c_cpu & (CPU_EZ80))
+#define isz80n() ( c_cpu & CPU_Z80N )
 #define canaltreg() ( ( c_cpu & (CPU_8080|CPU_8085|CPU_GBZ80)) == 0 )
 #define canindex() ( ( c_cpu & (CPU_8080|CPU_8085|CPU_GBZ80)) == 0 )
 #define canixh() ( c_cpu & (CPU_Z80|CPU_Z80N|CPU_R800|CPU_EZ80))
