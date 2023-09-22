@@ -16,7 +16,7 @@
  *    zcc +zx81 -create-app -DDKTRONICS dstar.c
  *
  * 	LAMBDA 8300 / POWER 3000
- *    zcc +lambda -create-app (-subtype=???) -DTEXT dstar.c
+ *    zcc +lambda -create-app -DTEXT dstar.c
  *
  * 	Standard Sinclair mode
  *    zcc +zx81 -create-app -DTEXT dstar.c
@@ -142,15 +142,13 @@ void main()
 	/* (we're working in text mode, with redefinded font) */
 	display=d_file+1;
 
-// This can't work with the Lambda ROM subtypes
-// let's get zx_border() first, then we will fix it
-
-//#ifdef LAMBDA
+#ifdef LAMBDA
+	zx_border(5);
 //	#asm
 //	ld   a,5	; Cyan border
 //	call 06E7h
 //	#endasm
-//#endif
+#endif
 
 #ifdef CHROMA81
 	display_attr=d_file+1+32768;
