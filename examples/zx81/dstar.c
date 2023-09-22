@@ -142,12 +142,15 @@ void main()
 	/* (we're working in text mode, with redefinded font) */
 	display=d_file+1;
 
-#ifdef LAMBDA
-	#asm
-	ld   a,5	; Cyan border
-	call 06E7h
-	#endasm
-#endif
+// This can't work with the Lambda ROM subtypes
+// let's get zx_border() first, then we will fix it
+
+//#ifdef LAMBDA
+//	#asm
+//	ld   a,5	; Cyan border
+//	call 06E7h
+//	#endasm
+//#endif
 
 #ifdef CHROMA81
 	display_attr=d_file+1+32768;
