@@ -16,7 +16,7 @@
  *    zcc +zx81 -create-app -DDKTRONICS dstar.c
  *
  * 	LAMBDA 8300 / POWER 3000
- *    zcc +lambda -create-app -DTEXT dstar.c
+ *    zcc +lambda -create-app (-subtype=???) -DTEXT dstar.c
  *
  * 	Standard Sinclair mode
  *    zcc +zx81 -create-app -DTEXT dstar.c
