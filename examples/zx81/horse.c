@@ -12,6 +12,7 @@
  * and add your PRINT instruction just after line 1 (REM..).
  * Save before testing it !
  *
+ * It works on a LAMBDA 8300, use 'subtypes' for different ROM versions (cac3, lambdamono)
  */
 
 #include <stdio.h>
@@ -167,8 +168,19 @@ void copy_frame(char *spr) {
 	pop de
 	push de        ; picture: current frame data
 	push bc
-	
+#endasm
+
+#ifdef LAMBDA
+#asm
+	ld hl,16510
+#endasm
+#else
+#asm
 	ld hl,(16396)  ; D_FILE, starts with 0x76 (EOL), so we add 1
+#endasm
+#endif
+
+#asm
 	ld bc,33*4+1   ; move the picture away from the top
 	add hl,bc
 	ex de,hl
