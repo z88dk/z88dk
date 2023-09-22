@@ -18,7 +18,6 @@ my $test_nr;
 for my $cpu (@CPUS) {
 	SKIP: {
 		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-		skip "$cpu flags not correct in ticks?" if $cpu =~ /^8080$|^8085$/;
 
 		for my $a (0..15) {
 			$test_nr++;

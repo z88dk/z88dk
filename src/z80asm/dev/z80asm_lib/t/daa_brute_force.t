@@ -17,7 +17,6 @@ my $test_nr;
 for my $cpu (@CPUS) {
 	SKIP: {
 		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-		skip "$cpu flags not correct in ticks?" if $cpu =~ /^8080$|^8085$/;
 
 		my @asm = "ld hl, 0";			# overwrite code with output data
 		my @in;
@@ -159,7 +158,12 @@ for my $cpu (@CPUS) {
 			is $got_sign, $got_a & 0x80 	? 1 : 0, 	"S";
 			is $got_zero, $got_a == 0 		? 1 : 0, 	"Z";
 			is $got_parity, parity($got_a),		 		"PV";
-			is $got_nflag, $nflag,				 		"N";
+
+			SKIP: {
+				skip "8085 has no N flag" if $cpu =~ /8085/;
+				
+				is $got_nflag, $nflag,				 	"N";
+			}
 			
 			(Test::More->builder->is_passing) or die;
 		}

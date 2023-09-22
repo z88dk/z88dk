@@ -58,7 +58,7 @@ END
 						is $r->{F_PV}, parity($exp_a),			 	"PV";
 						
 						SKIP: {
-							skip "$cpu N flag not emulated correctly?" if $cpu =~ /8085/;
+							skip "8085 has no N flag" if $cpu =~ /8085/;
 							
 							is $r->{F_N}, 0,						  	"N";
 						}
