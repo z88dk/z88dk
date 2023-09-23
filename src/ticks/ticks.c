@@ -4580,11 +4580,32 @@ static void handle_ed_page(void)
             st += 4;
         } else st += 8;
         break;
+    case 0x10:  // (R4K) DWJNZ d
+        if ( israbbit4k() ) { // DJWNZ d
+            uint8_t zero = 0;
+            if ( altd ) {
+                c_-- || (b_ > 0 && b_--);
+                zero = (c_ | b_) == 0;
+            } else {
+                c-- || (b > 0 && b--);
+                zero = (c | b) == 0;
+            }
+            if ( zero ) {
+                mp= pc+= (get_memory(pc)^128)-127;
+            } else {
+                pc++;
+            }
+            st += 7;
+        } else {
+            st+= 8;
+        }
+        ih=1;altd=0;ioi=0;ioe=0;
+        break;
     case 0x00: case 0x01:       // NOP
     case 0x05: case 0x06:
     case 0x08: case 0x09: case 0x0a: case 0x0b:
     case 0x0d: case 0x0e:
-    case 0x10: case 0x11:
+    case 0x11:
     case 0x15: case 0x16:
     case 0x18: case 0x19: case 0x1a: case 0x1b:
     case 0x1d: case 0x1e:
