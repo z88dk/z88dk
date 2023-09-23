@@ -205,6 +205,23 @@ main()
 	int x, y, a ,b;
 	int speed, flg;
 
+// Set up the color attributes, in case we have the hardware for it
+#ifdef LAMBDA
+#asm
+	ld hl,$207D
+	ld bc,33*4+1   ; move the picture away from the top
+	add hl,bc
+	ld (hl),6
+	ld d,h
+	ld e,l
+	inc de
+	ld bc,416      ; picture: single frame size
+	ldir
+#endasm
+#endif
+
+
+
 	//display=d_file+1;
 	// Approx. way to collapse the display file,
 	// possible way for direct video memory access from C
