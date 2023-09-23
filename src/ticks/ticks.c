@@ -1873,8 +1873,12 @@ int main (int argc, char **argv){
             break;
         }
         if ( israbbit() ) { // ADD SP,d
+          int v;
           st += 4;
-          sp += (get_memory(pc++)^128)-128; // TODO: Carry
+          v = sp + (get_memory(pc++)^128)-128;
+          sp = v & 0xffff;
+          if ( v > 0xffff || v < 0 ) ff |= 256;
+          else ff &= ~256;
         } else {
           st+= isez80() ? 1 : isr800() ? 1 : 4;
           t= (fr^fa^fb^fb>>8) & 16;  // H flag
@@ -2972,11 +2976,15 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe8: // RET PE
         if ( isgbz80()) {  // add sp,d
+          int v;
           st += 16;
-          sp += (get_memory(pc++)^128)-128;
-          break;
+          v = sp + (get_memory(pc++)^128)-128;
+          sp = v & 0xffff;
+          if ( v > 0xffff || v < 0 ) ff |= 256;
+          else ff &= ~256;
+        } else {
+            RETCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
         }
-        RETCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf0: // RET P
   	    if ( isgbz80()) { // LDH A, (n) - I/O
