@@ -978,7 +978,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                         BUF_PRINTF("%-10s%s,%s,%s","lljp", r4k_cc_table[y-4], opbuf2, opbuf1);
                                     } else if ( z == 3 && y > 3 && israbbit4k() ) {
                                         BUF_PRINTF("%-10s%s,%s","jre", r4k_cc_table[y-4], handle_rel16(state,opbuf1,sizeof(opbuf1)));
-                                    } else if ( y > 3 & z == 4 && israbbit4k() ) {
+                                    } else if ( y > 3 && z == 4 && israbbit4k() ) {
                                         BUF_PRINTF("%-10s%s,hl","flag", r4k_cc_table[y-4]);
                                     } else if ( q == 0 && y == 6 && z == 1  &&  israbbit4k() ) {
                                         BUF_PRINTF("%-10s%s", "setsysp", handle_immed16(state,opbuf1,sizeof(opbuf1)));
