@@ -91,7 +91,6 @@ void read_symbol_file(char *filename)
 {
     FILE *fp = fopen(filename,"r");
     UT_string* temp;
-    int length;
 
     if ( fp != NULL ) {
         while ( fgets(read_symbol_buf, sizeof(read_symbol_buf), fp) != NULL ) {
