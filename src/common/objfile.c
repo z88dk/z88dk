@@ -732,6 +732,7 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
             case 'P': range = RANGE_PTR24; break;
             case 'H': range = RANGE_HIGH_OFFSET; break;
             case '=': range = RANGE_ASSIGNMENT; break;
+            case 'j': range = RANGE_JRE_OFFSET; break;
             default:
                 printf("\nError expression range %d\n", old_range);
                 exit(EXIT_FAILURE);
@@ -753,6 +754,7 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
             case RANGE_PTR24:                   printf("P"); break;
             case RANGE_HIGH_OFFSET:             printf("H"); break;
             case RANGE_ASSIGNMENT:              printf("="); break;
+            case RANGE_JRE_OFFSET:              printf("j"); break;
             default:
                 printf("\nError expression range %d\n", range);
                 exit(EXIT_FAILURE);

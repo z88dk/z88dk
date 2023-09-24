@@ -27,6 +27,11 @@ extern "C" {
 #define FLAG_NV     FLAG_PO
 #define FLAG_V      FLAG_PE
 
+#define FLAG_R4K_GT     0x10
+#define FLAG_R4K_GTU    0x11
+#define FLAG_R4K_LT     0x12
+#define FLAG_R4K_V      0x13
+
 #define NOT_FLAG(flag)    ((flag) ^ 1)
 
 // 8-bit registers
@@ -45,6 +50,10 @@ extern "C" {
 #define Z80_JR      0x18
 #define Z80_JP      0xC3
 #define Z80_CALL    0xCD
+#define R4K_DWJNZ   0xED10
+
+#define R4K_JR_FLAG(flag)   (0xA0 + (((flag) & 0x03) << 3))
+#define R4K_JP_FLAG(flag)   (0xA2 + (((flag) & 0x03) << 3))
 
 #define Z80_JR_FLAG(flag)   (0x20 + ((flag) << 3))
 #define Z80_JP_FLAG(flag)   (0xC2 + ((flag) << 3))
@@ -53,6 +62,8 @@ extern "C" {
 
 #define Z80_DEC(reg)        (0x05 + ((reg) << 3))
 #define Z80_INC(reg)        (0x04 + ((reg) << 3))
+
+#define RABBIT_ALTD         0x76
 
 // Z80Next
 #define Z80N_MMU_N(c)       (0xED9150 + (c))

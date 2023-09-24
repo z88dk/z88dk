@@ -115,7 +115,7 @@ sub add {
 			my $bytes1 = join(' ', @bytes1);
 			
 			# rabit lacks these restarts
-			if ($cpu =~ /^r2ka|^r3k/ && ($c==0 || $c==8 || $c==0x30)) {	
+			if ($cpu =~ /^r2ka|^r3k|^r4k|^r5k/ && ($c==0 || $c==8 || $c==0x30)) {	
 				$bytes1 = sprintf("CD %02X 00", $c);
 			}
 			
@@ -192,6 +192,14 @@ sub add {
 		$bytes1 = $bytes =~ s/%h/FF/gr;
 		add($cpu, $asm1, $bytes1);
 	}
+	elsif ($bytes =~ /%m %m %m %m/) {
+		my $asm1 = $asm =~ s/%m/0x12345678/r;
+		my $bytes1 = $bytes =~ s/%m/78/r;
+		$bytes1 = $bytes1 =~ s/%m/56/r;
+		$bytes1 = $bytes1 =~ s/%m/34/r;
+		$bytes1 = $bytes1 =~ s/%m/12/r;
+		add($cpu, $asm1, $bytes1);
+	}
 	elsif ($bytes =~ /%m %m %m/) {
 		my $asm1 = $asm =~ s/%m/0x123456/r;
 		my $bytes1 = $bytes =~ s/%m/56/r;
@@ -225,6 +233,12 @@ sub add {
 		my $asm1 = $asm =~ s/%j/ASMPC/r;
 		my $dist = sprintf("%02X", (- scalar(@bytes)) & 0xFF);
 		my $bytes1 = $bytes =~ s/%j/$dist/r;
+		add($cpu, $asm1, $bytes1);
+	}
+	elsif ($asm =~ /%J/) {
+		my $asm1 = $asm =~ s/%J/ASMPC/r;
+		my $dist = sprintf("%04X", (- scalar(@bytes)) & 0xFFFF);
+		my $bytes1 = $bytes =~ s/%J %J/substr($dist,2,2)." ".substr($dist,0,2)/er;
 		add($cpu, $asm1, $bytes1);
 	}
 	elsif ($asm =~ /%c/) {

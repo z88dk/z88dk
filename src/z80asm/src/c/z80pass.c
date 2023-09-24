@@ -58,10 +58,10 @@ void Z80pass2(int start_errors)
 		{
 			do_patch = false;
 		}
-		else if (expr->range == RANGE_JR_OFFSET)
-		{
-			do_patch = true;
-		}
+        else if (expr->range == RANGE_JR_OFFSET || expr->range == RANGE_JRE_OFFSET)
+        {
+            do_patch = true;
+        }
 		else if (expr->type >= TYPE_ADDRESS ||
 			expr->target_name)
 		{
@@ -77,16 +77,21 @@ void Z80pass2(int start_errors)
 				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
 				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
-				if (value >= -128 && value <= 127)
-				{
-					patch_byte(expr->code_pos, (byte_t)value);
-					/* opcode is stored, now store relative jump */
-				}
-				else
-				{
-					error_int_range(value);
-				}
-				break;
+                if (value < -128 || value > 127)
+                    error_int_range(value);
+                else
+                    patch_byte(expr->code_pos, (byte_t)value);
+                break;
+
+			case RANGE_JRE_OFFSET:
+				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
+				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
+
+                if (value < -0x8000 || value > 0x7FFF)
+                    error_int_range(value);
+                else
+                    patch_word(expr->code_pos, value);
+                break;
 
 			case RANGE_BYTE_UNSIGNED:
 				if (value < -128 || value > 255)

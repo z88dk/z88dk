@@ -128,6 +128,13 @@ bool cpu_compatible(int code_cpu_id, int lib_cpu_id) {
             case CPU_R2KA: return true;
             default: return false;
             }
+        case CPU_R4K:
+            return false;
+        case CPU_R5K:
+            switch (lib_cpu_id) {
+            case CPU_R4K: return true;
+            default: return false;
+            }
         case CPU_8080:
             return false;
         case CPU_8085:

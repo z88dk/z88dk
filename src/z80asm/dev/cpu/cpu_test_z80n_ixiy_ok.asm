@@ -171,9 +171,14 @@
  and d                          ; A2
  and e                          ; A3
  and h                          ; A4
+ and hl, bc                     ; F5 7C A0 67 7D A1 6F F1
  and hl, de                     ; F5 7C A2 67 7D A3 6F F1
+ and ix, bc                     ; F5 FD 7C A0 FD 67 FD 7D A1 FD 6F F1
+ and ix, de                     ; F5 FD 7C A2 FD 67 FD 7D A3 FD 6F F1
  and ixh                        ; FD A4
  and ixl                        ; FD A5
+ and iy, bc                     ; F5 DD 7C A0 DD 67 DD 7D A1 DD 6F F1
+ and iy, de                     ; F5 DD 7C A2 DD 67 DD 7D A3 DD 6F F1
  and iyh                        ; DD A4
  and iyl                        ; DD A5
  and l                          ; A5
@@ -293,6 +298,9 @@
  bit 7, e                       ; CB 7B
  bit 7, h                       ; CB 7C
  bit 7, l                       ; CB 7D
+ bool hl                        ; F5 7C B5 28 03 21 01 00 F1
+ bool ix                        ; F5 FD 7C FD B5 28 04 FD 21 01 00 F1
+ bool iy                        ; F5 DD 7C DD B5 28 04 DD 21 01 00 F1
  brlc de, b                     ; ED 2C
  bsla de, b                     ; ED 28
  bsra de, b                     ; ED 29
@@ -314,6 +322,9 @@
  c_po 0x1234                    ; E4 34 12
  c_v 0x1234                     ; EC 34 12
  c_z 0x1234                     ; CC 34 12
+ call (hl)                      ; CD @__z80asm__call_hl
+ call (ix)                      ; CD @__z80asm__call_iy
+ call (iy)                      ; CD @__z80asm__call_ix
  call 0x1234                    ; CD 34 12
  call c, 0x1234                 ; DC 34 12
  call eq, 0x1234                ; CC 34 12
@@ -337,6 +348,29 @@
  cgeu 0x1234                    ; D4 34 12
  cgtu 0x1234                    ; 28 05 38 03 CD 34 12
  cleu 0x1234                    ; 28 02 30 03 CD 34 12
+ clr (hl)                       ; 36 00
+ clr (ix)                       ; FD 36 00 00
+ clr (ix+126)                   ; FD 36 7E 00
+ clr (ix-128)                   ; FD 36 80 00
+ clr (iy)                       ; DD 36 00 00
+ clr (iy+126)                   ; DD 36 7E 00
+ clr (iy-128)                   ; DD 36 80 00
+ clr a                          ; 3E 00
+ clr b                          ; 06 00
+ clr bc                         ; 01 00 00
+ clr c                          ; 0E 00
+ clr d                          ; 16 00
+ clr de                         ; 11 00 00
+ clr e                          ; 1E 00
+ clr h                          ; 26 00
+ clr hl                         ; 21 00 00
+ clr ix                         ; FD 21 00 00
+ clr ixh                        ; FD 26 00
+ clr ixl                        ; FD 2E 00
+ clr iy                         ; DD 21 00 00
+ clr iyh                        ; DD 26 00
+ clr iyl                        ; DD 2E 00
+ clr l                          ; 2E 00
  cltu 0x1234                    ; DC 34 12
  cm 0x1234                      ; FC 34 12
  cma                            ; 2F
@@ -508,9 +542,13 @@
  ex (sp), hl                    ; E3
  ex (sp), ix                    ; FD E3
  ex (sp), iy                    ; DD E3
+ ex af', af                     ; 08
  ex af, af                      ; 08
  ex af, af'                     ; 08
+ ex bc, hl                      ; E5 C5 E1 C1
  ex de, hl                      ; EB
+ ex hl, bc                      ; E5 C5 E1 C1
+ ex hl, de                      ; EB
  exx                            ; D9
  halt                           ; 76
  hlt                            ; 76
@@ -589,7 +627,7 @@
  j_c 0x1234                     ; DA 34 12
  j_eq 0x1234                    ; CA 34 12
  j_geu 0x1234                   ; D2 34 12
- j_gtu 0x1234                   ; CA FF 04 D2 34 12
+ j_gtu 0x1234                   ; CA B0 05 D2 34 12
  j_leu 0x1234                   ; CA 34 12 DA 34 12
  j_ltu 0x1234                   ; DA 34 12
  j_m 0x1234                     ; FA 34 12
@@ -605,7 +643,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 35 05 D2 34 12
+ jgtu 0x1234                    ; CA E6 05 D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jm 0x1234                      ; FA 34 12
@@ -619,7 +657,7 @@
  jmp c, 0x1234                  ; DA 34 12
  jmp eq, 0x1234                 ; CA 34 12
  jmp geu, 0x1234                ; D2 34 12
- jmp gtu, 0x1234                ; CA 5E 05 D2 34 12
+ jmp gtu, 0x1234                ; CA 0F 06 D2 34 12
  jmp leu, 0x1234                ; CA 34 12 DA 34 12
  jmp ltu, 0x1234                ; DA 34 12
  jmp m, 0x1234                  ; FA 34 12
@@ -646,7 +684,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA AE 05 D2 34 12
+ jp gtu, 0x1234                 ; CA 5F 06 D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp m, 0x1234                   ; FA 34 12
@@ -2589,8 +2627,14 @@
  or d                           ; B2
  or e                           ; B3
  or h                           ; B4
+ or hl, bc                      ; F5 7C B0 67 7D B1 6F F1
+ or hl, de                      ; F5 7C B2 67 7D B3 6F F1
+ or ix, bc                      ; F5 FD 7C B0 FD 67 FD 7D B1 FD 6F F1
+ or ix, de                      ; F5 FD 7C B2 FD 67 FD 7D B3 FD 6F F1
  or ixh                         ; FD B4
  or ixl                         ; FD B5
+ or iy, bc                      ; F5 DD 7C B0 DD 67 DD 7D B1 DD 6F F1
+ or iy, de                      ; F5 DD 7C B2 DD 67 DD 7D B3 DD 6F F1
  or iyh                         ; DD B4
  or iyl                         ; DD B5
  or l                           ; B5
@@ -4388,8 +4432,14 @@
  xor d                          ; AA
  xor e                          ; AB
  xor h                          ; AC
+ xor hl, bc                     ; F5 7C A8 67 7D A9 6F F1
+ xor hl, de                     ; F5 7C AA 67 7D AB 6F F1
+ xor ix, bc                     ; F5 FD 7C A8 FD 67 FD 7D A9 FD 6F F1
+ xor ix, de                     ; F5 FD 7C AA FD 67 FD 7D AB FD 6F F1
  xor ixh                        ; FD AC
  xor ixl                        ; FD AD
+ xor iy, bc                     ; F5 DD 7C A8 DD 67 DD 7D A9 DD 6F F1
+ xor iy, de                     ; F5 DD 7C AA DD 67 DD 7D AB DD 6F F1
  xor iyh                        ; DD AC
  xor iyl                        ; DD AD
  xor l                          ; AD

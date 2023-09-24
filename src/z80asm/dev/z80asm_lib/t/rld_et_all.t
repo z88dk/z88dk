@@ -36,7 +36,6 @@ for my $carry (0, 1) {
 				
 				$ticks->add(<<END, 
 							jp start
-							defs 14*2*3*2*2	; reserve space for data
 					data:	defb -1
 					start:
 							$init_carry

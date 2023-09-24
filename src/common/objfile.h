@@ -134,6 +134,7 @@ typedef enum {
     RANGE_PTR24,					// 9  "P"  // 24-bit pointer
     RANGE_HIGH_OFFSET,				// 10 "H"  // byte offset to 0xFF00
     RANGE_ASSIGNMENT,               // 11 "="  // DEFC expression assigning a symbol
+    RANGE_JRE_OFFSET,               // 12 "j"  // 16-bit relative offset for JRE
 } range_t;
 
 typedef struct expr_s {

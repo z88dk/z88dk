@@ -16,7 +16,6 @@ for my $lib_ixiy ("", "-IXIY", "-IXIY-soft") {
 	my %IXIY_ERROR = (""=>"(no option)", "-IXIY"=>"-IXIY", "-IXIY-soft"=>"-IXIY-soft");
 		
 	for my $lib_cpu (@CPUS) {
-		
 		spew("$test.1.asm", <<'END');
 				public the_answer
 		the_answer = 42
@@ -57,6 +56,7 @@ END
 
 		for my $code_ixiy ("", "-IXIY", "-IXIY-soft") {
 			for my $code_cpu (@CPUS) {
+				
 				if (!cpu_compatible($code_cpu, $lib_cpu)) {
 					capture_nok("z88dk-z80asm -b -m$code_cpu $code_ixiy ".
 						    "$test.asm $test.1.o", <<END);

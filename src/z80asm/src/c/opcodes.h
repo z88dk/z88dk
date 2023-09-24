@@ -23,6 +23,9 @@ void add_opcode(int opcode);
 /* add opcode followed by jump relative offset expression */
 void add_opcode_jr(int opcode, struct Expr1 *expr);
 
+/* add opcode followed by jump relative offset expression */
+void add_opcode_jre(int opcode, struct Expr1 *expr);
+
 /* add opcodes followed by jump relative offset expression to the same address*/
 void add_opcode_jr_jr(int opcode0, int opcode1, struct Expr1 *expr0);
 
@@ -49,6 +52,9 @@ void add_opcode_nn_nn(int opcode0, int opcode1, struct Expr1 *expr0);
 
 /* add opcode followed by 24-bit expression */
 void add_opcode_nnn(int opcode, struct Expr1 *expr, int target_offset);
+
+/* add opcode followed by 32-bit expression */
+void add_opcode_nnnn(int opcode, struct Expr1 *expr);
 
 /* add opcode followed by big-endian 16-bit expression */
 void add_opcode_NN(int opcode, struct Expr1 *expr);

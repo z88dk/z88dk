@@ -17,7 +17,6 @@ my $ticks = Ticks->new;
 # LDI
 $ticks->add(<<END,
 						jr start
-						defs 3*2*4		; reserve space for results
 				src:	defb 1,2,3,4
 				dst:	defb 0,0,0,0
 				start:	ld hl, src
@@ -88,7 +87,6 @@ END
 # LDDR
 $ticks->add(<<END,
 						jr start
-						defs 6			; save space for output data
 				src:	defb 1,2,3,4
 				dst:	defb 0,0,0,0
 				start:	ld hl, src+3

@@ -77,6 +77,9 @@ sub find_range {
 				if ($byte =~ / %c \( (\d+) \.\. (\d+) \) /x) {
 					return ($1 .. $2);
 				}
+				elsif ($byte =~ / %c \( ( \d+ (, \d+)* ) \) /x) {
+					return (eval $1);
+				}
 			}
 		}
 	}
@@ -93,7 +96,7 @@ sub replace_const {
 	@ops = @{clone(\@ops)};
 	for my $op (@ops) {
 		for my $byte (@$op) {
-			if ($byte =~ s/ %c ( \( \d+ \.\. \d+ \) )? /$c/xg) {
+			if ($byte =~ s/ %c ( \( .*? \) )? /$c/xg) {
 				$byte = eval($byte); die "$byte: $@" if $@;
 			}
 		}

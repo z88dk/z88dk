@@ -54,7 +54,8 @@ ragel, to expand token definition from token_def.h.
 #define TOKEN_RABBIT1(opcode, string)	 \
 	string <CAT> i										<NL> \
 	{													<NL> \
-		<TAB>		if ((option_cpu() == CPU_R2KA) || (option_cpu() == CPU_R3K)) {	<NL> \
+		<TAB>		if ((option_cpu() == CPU_R2KA) || (option_cpu() == CPU_R3K) || \
+                        (option_cpu() == CPU_R4K) || (option_cpu() == CPU_R5K)) {	<NL> \
 		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
 		<TAB>		}									<NL> \
 		<TAB>		else {								<NL> \

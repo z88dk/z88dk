@@ -41,937 +41,1054 @@
 #define _TK_RCURLY      38
 #define _TK_BIN_NOT     39
 #define _TK_IND_C       40
-#define _TK_IND_BC      41
-#define _TK_IND_DE      42
-#define _TK_IND_HL      43
-#define _TK_IND_SP      44
-#define _TK_IND_IX      45
-#define _TK_IND_IY      46
-#define _TK_IND_HLI     47
-#define _TK_IND_HLD     48
-#define _TK_ASMPC       49
-#define _TK_CALL_NZ     50
-#define _TK_CALL_Z      51
-#define _TK_CALL_NC     52
-#define _TK_CALL_C      53
-#define _TK_CALL_PO     54
-#define _TK_CALL_PE     55
-#define _TK_CALL_P      56
-#define _TK_CALL_M      57
-#define _TK_CALL_LZ     58
-#define _TK_CALL_LO     59
-#define _TK_CALL_NV     60
-#define _TK_CALL_V      61
-#define _TK_CALL_NK     62
-#define _TK_CALL_K      63
-#define _TK_CALL_NX5    64
-#define _TK_CALL_X5     65
-#define _TK_CALL_NE     66
-#define _TK_CALL_EQ     67
-#define _TK_CALL_LTU    68
-#define _TK_CALL_LEU    69
-#define _TK_CALL_GTU    70
-#define _TK_CALL_GEU    71
-#define _TK_CALL_LT     72
-#define _TK_CALL_LE     73
-#define _TK_CALL_GT     74
-#define _TK_CALL_GE     75
-#define _TK_CALL_SIS_NZ 76
-#define _TK_CALL_SIS_Z  77
-#define _TK_CALL_SIS_NC 78
-#define _TK_CALL_SIS_C  79
-#define _TK_CALL_SIS_PO 80
-#define _TK_CALL_SIS_PE 81
-#define _TK_CALL_SIS_P  82
-#define _TK_CALL_SIS_M  83
-#define _TK_CALL_SIS_LZ 84
-#define _TK_CALL_SIS_LO 85
-#define _TK_CALL_SIS_NV 86
-#define _TK_CALL_SIS_V  87
-#define _TK_CALL_SIS_NK 88
-#define _TK_CALL_SIS_K  89
-#define _TK_CALL_SIS_NX5 90
-#define _TK_CALL_SIS_X5 91
-#define _TK_CALL_SIS_NE 92
-#define _TK_CALL_SIS_EQ 93
-#define _TK_CALL_SIS_LTU 94
-#define _TK_CALL_SIS_LEU 95
-#define _TK_CALL_SIS_GTU 96
-#define _TK_CALL_SIS_GEU 97
-#define _TK_CALL_SIS_LT 98
-#define _TK_CALL_SIS_LE 99
-#define _TK_CALL_SIS_GT 100
-#define _TK_CALL_SIS_GE 101
-#define _TK_CALL_SIL_NZ 102
-#define _TK_CALL_SIL_Z  103
-#define _TK_CALL_SIL_NC 104
-#define _TK_CALL_SIL_C  105
-#define _TK_CALL_SIL_PO 106
-#define _TK_CALL_SIL_PE 107
-#define _TK_CALL_SIL_P  108
-#define _TK_CALL_SIL_M  109
-#define _TK_CALL_SIL_LZ 110
-#define _TK_CALL_SIL_LO 111
-#define _TK_CALL_SIL_NV 112
-#define _TK_CALL_SIL_V  113
-#define _TK_CALL_SIL_NK 114
-#define _TK_CALL_SIL_K  115
-#define _TK_CALL_SIL_NX5 116
-#define _TK_CALL_SIL_X5 117
-#define _TK_CALL_SIL_NE 118
-#define _TK_CALL_SIL_EQ 119
-#define _TK_CALL_SIL_LTU 120
-#define _TK_CALL_SIL_LEU 121
-#define _TK_CALL_SIL_GTU 122
-#define _TK_CALL_SIL_GEU 123
-#define _TK_CALL_SIL_LT 124
-#define _TK_CALL_SIL_LE 125
-#define _TK_CALL_SIL_GT 126
-#define _TK_CALL_SIL_GE 127
-#define _TK_CALL_LIS_NZ 128
-#define _TK_CALL_LIS_Z  129
-#define _TK_CALL_LIS_NC 130
-#define _TK_CALL_LIS_C  131
-#define _TK_CALL_LIS_PO 132
-#define _TK_CALL_LIS_PE 133
-#define _TK_CALL_LIS_P  134
-#define _TK_CALL_LIS_M  135
-#define _TK_CALL_LIS_LZ 136
-#define _TK_CALL_LIS_LO 137
-#define _TK_CALL_LIS_NV 138
-#define _TK_CALL_LIS_V  139
-#define _TK_CALL_LIS_NK 140
-#define _TK_CALL_LIS_K  141
-#define _TK_CALL_LIS_NX5 142
-#define _TK_CALL_LIS_X5 143
-#define _TK_CALL_LIS_NE 144
-#define _TK_CALL_LIS_EQ 145
-#define _TK_CALL_LIS_LTU 146
-#define _TK_CALL_LIS_LEU 147
-#define _TK_CALL_LIS_GTU 148
-#define _TK_CALL_LIS_GEU 149
-#define _TK_CALL_LIS_LT 150
-#define _TK_CALL_LIS_LE 151
-#define _TK_CALL_LIS_GT 152
-#define _TK_CALL_LIS_GE 153
-#define _TK_CALL_LIL_NZ 154
-#define _TK_CALL_LIL_Z  155
-#define _TK_CALL_LIL_NC 156
-#define _TK_CALL_LIL_C  157
-#define _TK_CALL_LIL_PO 158
-#define _TK_CALL_LIL_PE 159
-#define _TK_CALL_LIL_P  160
-#define _TK_CALL_LIL_M  161
-#define _TK_CALL_LIL_LZ 162
-#define _TK_CALL_LIL_LO 163
-#define _TK_CALL_LIL_NV 164
-#define _TK_CALL_LIL_V  165
-#define _TK_CALL_LIL_NK 166
-#define _TK_CALL_LIL_K  167
-#define _TK_CALL_LIL_NX5 168
-#define _TK_CALL_LIL_X5 169
-#define _TK_CALL_LIL_NE 170
-#define _TK_CALL_LIL_EQ 171
-#define _TK_CALL_LIL_LTU 172
-#define _TK_CALL_LIL_LEU 173
-#define _TK_CALL_LIL_GTU 174
-#define _TK_CALL_LIL_GEU 175
-#define _TK_CALL_LIL_LT 176
-#define _TK_CALL_LIL_LE 177
-#define _TK_CALL_LIL_GT 178
-#define _TK_CALL_LIL_GE 179
-#define _TK_CALL_IS_NZ  180
-#define _TK_CALL_IS_Z   181
-#define _TK_CALL_IS_NC  182
-#define _TK_CALL_IS_C   183
-#define _TK_CALL_IS_PO  184
-#define _TK_CALL_IS_PE  185
-#define _TK_CALL_IS_P   186
-#define _TK_CALL_IS_M   187
-#define _TK_CALL_IS_LZ  188
-#define _TK_CALL_IS_LO  189
-#define _TK_CALL_IS_NV  190
-#define _TK_CALL_IS_V   191
-#define _TK_CALL_IS_NK  192
-#define _TK_CALL_IS_K   193
-#define _TK_CALL_IS_NX5 194
-#define _TK_CALL_IS_X5  195
-#define _TK_CALL_IS_NE  196
-#define _TK_CALL_IS_EQ  197
-#define _TK_CALL_IS_LTU 198
-#define _TK_CALL_IS_LEU 199
-#define _TK_CALL_IS_GTU 200
-#define _TK_CALL_IS_GEU 201
-#define _TK_CALL_IS_LT  202
-#define _TK_CALL_IS_LE  203
-#define _TK_CALL_IS_GT  204
-#define _TK_CALL_IS_GE  205
-#define _TK_CALL_IL_NZ  206
-#define _TK_CALL_IL_Z   207
-#define _TK_CALL_IL_NC  208
-#define _TK_CALL_IL_C   209
-#define _TK_CALL_IL_PO  210
-#define _TK_CALL_IL_PE  211
-#define _TK_CALL_IL_P   212
-#define _TK_CALL_IL_M   213
-#define _TK_CALL_IL_LZ  214
-#define _TK_CALL_IL_LO  215
-#define _TK_CALL_IL_NV  216
-#define _TK_CALL_IL_V   217
-#define _TK_CALL_IL_NK  218
-#define _TK_CALL_IL_K   219
-#define _TK_CALL_IL_NX5 220
-#define _TK_CALL_IL_X5  221
-#define _TK_CALL_IL_NE  222
-#define _TK_CALL_IL_EQ  223
-#define _TK_CALL_IL_LTU 224
-#define _TK_CALL_IL_LEU 225
-#define _TK_CALL_IL_GTU 226
-#define _TK_CALL_IL_GEU 227
-#define _TK_CALL_IL_LT  228
-#define _TK_CALL_IL_LE  229
-#define _TK_CALL_IL_GT  230
-#define _TK_CALL_IL_GE  231
-#define _TK_JR_NZ       232
-#define _TK_JR_Z        233
-#define _TK_JR_NC       234
-#define _TK_JR_C        235
-#define _TK_JR_PO       236
-#define _TK_JR_PE       237
-#define _TK_JR_P        238
-#define _TK_JR_M        239
-#define _TK_JR_LZ       240
-#define _TK_JR_LO       241
-#define _TK_JR_NV       242
-#define _TK_JR_V        243
-#define _TK_JR_NK       244
-#define _TK_JR_K        245
-#define _TK_JR_NX5      246
-#define _TK_JR_X5       247
-#define _TK_JR_NE       248
-#define _TK_JR_EQ       249
-#define _TK_JR_LTU      250
-#define _TK_JR_LEU      251
-#define _TK_JR_GTU      252
-#define _TK_JR_GEU      253
-#define _TK_JR_LT       254
-#define _TK_JR_LE       255
-#define _TK_JR_GT       256
-#define _TK_JR_GE       257
-#define _TK_JP_NZ       258
-#define _TK_JP_Z        259
-#define _TK_JP_NC       260
-#define _TK_JP_C        261
-#define _TK_JP_PO       262
-#define _TK_JP_PE       263
-#define _TK_JP_P        264
-#define _TK_JP_M        265
-#define _TK_JP_LZ       266
-#define _TK_JP_LO       267
-#define _TK_JP_NV       268
-#define _TK_JP_V        269
-#define _TK_JP_NK       270
-#define _TK_JP_K        271
-#define _TK_JP_NX5      272
-#define _TK_JP_X5       273
-#define _TK_JP_NE       274
-#define _TK_JP_EQ       275
-#define _TK_JP_LTU      276
-#define _TK_JP_LEU      277
-#define _TK_JP_GTU      278
-#define _TK_JP_GEU      279
-#define _TK_JP_LT       280
-#define _TK_JP_LE       281
-#define _TK_JP_GT       282
-#define _TK_JP_GE       283
-#define _TK_JP_SIS_NZ   284
-#define _TK_JP_SIS_Z    285
-#define _TK_JP_SIS_NC   286
-#define _TK_JP_SIS_C    287
-#define _TK_JP_SIS_PO   288
-#define _TK_JP_SIS_PE   289
-#define _TK_JP_SIS_P    290
-#define _TK_JP_SIS_M    291
-#define _TK_JP_SIS_LZ   292
-#define _TK_JP_SIS_LO   293
-#define _TK_JP_SIS_NV   294
-#define _TK_JP_SIS_V    295
-#define _TK_JP_SIS_NK   296
-#define _TK_JP_SIS_K    297
-#define _TK_JP_SIS_NX5  298
-#define _TK_JP_SIS_X5   299
-#define _TK_JP_SIS_NE   300
-#define _TK_JP_SIS_EQ   301
-#define _TK_JP_SIS_LTU  302
-#define _TK_JP_SIS_LEU  303
-#define _TK_JP_SIS_GTU  304
-#define _TK_JP_SIS_GEU  305
-#define _TK_JP_SIS_LT   306
-#define _TK_JP_SIS_LE   307
-#define _TK_JP_SIS_GT   308
-#define _TK_JP_SIS_GE   309
-#define _TK_JP_LIL_NZ   310
-#define _TK_JP_LIL_Z    311
-#define _TK_JP_LIL_NC   312
-#define _TK_JP_LIL_C    313
-#define _TK_JP_LIL_PO   314
-#define _TK_JP_LIL_PE   315
-#define _TK_JP_LIL_P    316
-#define _TK_JP_LIL_M    317
-#define _TK_JP_LIL_LZ   318
-#define _TK_JP_LIL_LO   319
-#define _TK_JP_LIL_NV   320
-#define _TK_JP_LIL_V    321
-#define _TK_JP_LIL_NK   322
-#define _TK_JP_LIL_K    323
-#define _TK_JP_LIL_NX5  324
-#define _TK_JP_LIL_X5   325
-#define _TK_JP_LIL_NE   326
-#define _TK_JP_LIL_EQ   327
-#define _TK_JP_LIL_LTU  328
-#define _TK_JP_LIL_LEU  329
-#define _TK_JP_LIL_GTU  330
-#define _TK_JP_LIL_GEU  331
-#define _TK_JP_LIL_LT   332
-#define _TK_JP_LIL_LE   333
-#define _TK_JP_LIL_GT   334
-#define _TK_JP_LIL_GE   335
-#define _TK_JMP_NZ      336
-#define _TK_JMP_Z       337
-#define _TK_JMP_NC      338
-#define _TK_JMP_C       339
-#define _TK_JMP_PO      340
-#define _TK_JMP_PE      341
-#define _TK_JMP_P       342
-#define _TK_JMP_M       343
-#define _TK_JMP_LZ      344
-#define _TK_JMP_LO      345
-#define _TK_JMP_NV      346
-#define _TK_JMP_V       347
-#define _TK_JMP_NK      348
-#define _TK_JMP_K       349
-#define _TK_JMP_NX5     350
-#define _TK_JMP_X5      351
-#define _TK_JMP_NE      352
-#define _TK_JMP_EQ      353
-#define _TK_JMP_LTU     354
-#define _TK_JMP_LEU     355
-#define _TK_JMP_GTU     356
-#define _TK_JMP_GEU     357
-#define _TK_JMP_LT      358
-#define _TK_JMP_LE      359
-#define _TK_JMP_GT      360
-#define _TK_JMP_GE      361
-#define _TK_JMP_SIS_NZ  362
-#define _TK_JMP_SIS_Z   363
-#define _TK_JMP_SIS_NC  364
-#define _TK_JMP_SIS_C   365
-#define _TK_JMP_SIS_PO  366
-#define _TK_JMP_SIS_PE  367
-#define _TK_JMP_SIS_P   368
-#define _TK_JMP_SIS_M   369
-#define _TK_JMP_SIS_LZ  370
-#define _TK_JMP_SIS_LO  371
-#define _TK_JMP_SIS_NV  372
-#define _TK_JMP_SIS_V   373
-#define _TK_JMP_SIS_NK  374
-#define _TK_JMP_SIS_K   375
-#define _TK_JMP_SIS_NX5 376
-#define _TK_JMP_SIS_X5  377
-#define _TK_JMP_SIS_NE  378
-#define _TK_JMP_SIS_EQ  379
-#define _TK_JMP_SIS_LTU 380
-#define _TK_JMP_SIS_LEU 381
-#define _TK_JMP_SIS_GTU 382
-#define _TK_JMP_SIS_GEU 383
-#define _TK_JMP_SIS_LT  384
-#define _TK_JMP_SIS_LE  385
-#define _TK_JMP_SIS_GT  386
-#define _TK_JMP_SIS_GE  387
-#define _TK_JMP_LIL_NZ  388
-#define _TK_JMP_LIL_Z   389
-#define _TK_JMP_LIL_NC  390
-#define _TK_JMP_LIL_C   391
-#define _TK_JMP_LIL_PO  392
-#define _TK_JMP_LIL_PE  393
-#define _TK_JMP_LIL_P   394
-#define _TK_JMP_LIL_M   395
-#define _TK_JMP_LIL_LZ  396
-#define _TK_JMP_LIL_LO  397
-#define _TK_JMP_LIL_NV  398
-#define _TK_JMP_LIL_V   399
-#define _TK_JMP_LIL_NK  400
-#define _TK_JMP_LIL_K   401
-#define _TK_JMP_LIL_NX5 402
-#define _TK_JMP_LIL_X5  403
-#define _TK_JMP_LIL_NE  404
-#define _TK_JMP_LIL_EQ  405
-#define _TK_JMP_LIL_LTU 406
-#define _TK_JMP_LIL_LEU 407
-#define _TK_JMP_LIL_GTU 408
-#define _TK_JMP_LIL_GEU 409
-#define _TK_JMP_LIL_LT  410
-#define _TK_JMP_LIL_LE  411
-#define _TK_JMP_LIL_GT  412
-#define _TK_JMP_LIL_GE  413
-#define _TK_RET_NZ      414
-#define _TK_RET_Z       415
-#define _TK_RET_NC      416
-#define _TK_RET_C       417
-#define _TK_RET_PO      418
-#define _TK_RET_PE      419
-#define _TK_RET_P       420
-#define _TK_RET_M       421
-#define _TK_RET_LZ      422
-#define _TK_RET_LO      423
-#define _TK_RET_NV      424
-#define _TK_RET_V       425
-#define _TK_RET_NK      426
-#define _TK_RET_K       427
-#define _TK_RET_NX5     428
-#define _TK_RET_X5      429
-#define _TK_RET_NE      430
-#define _TK_RET_EQ      431
-#define _TK_RET_LTU     432
-#define _TK_RET_LEU     433
-#define _TK_RET_GTU     434
-#define _TK_RET_GEU     435
-#define _TK_RET_LT      436
-#define _TK_RET_LE      437
-#define _TK_RET_GT      438
-#define _TK_RET_GE      439
-#define _TK_RET_L_NZ    440
-#define _TK_RET_L_Z     441
-#define _TK_RET_L_NC    442
-#define _TK_RET_L_C     443
-#define _TK_RET_L_PO    444
-#define _TK_RET_L_PE    445
-#define _TK_RET_L_P     446
-#define _TK_RET_L_M     447
-#define _TK_RET_L_LZ    448
-#define _TK_RET_L_LO    449
-#define _TK_RET_L_NV    450
-#define _TK_RET_L_V     451
-#define _TK_RET_L_NK    452
-#define _TK_RET_L_K     453
-#define _TK_RET_L_NX5   454
-#define _TK_RET_L_X5    455
-#define _TK_RET_L_NE    456
-#define _TK_RET_L_EQ    457
-#define _TK_RET_L_LTU   458
-#define _TK_RET_L_LEU   459
-#define _TK_RET_L_GTU   460
-#define _TK_RET_L_GEU   461
-#define _TK_RET_L_LT    462
-#define _TK_RET_L_LE    463
-#define _TK_RET_L_GT    464
-#define _TK_RET_L_GE    465
-#define _TK_RET_LIS_NZ  466
-#define _TK_RET_LIS_Z   467
-#define _TK_RET_LIS_NC  468
-#define _TK_RET_LIS_C   469
-#define _TK_RET_LIS_PO  470
-#define _TK_RET_LIS_PE  471
-#define _TK_RET_LIS_P   472
-#define _TK_RET_LIS_M   473
-#define _TK_RET_LIS_LZ  474
-#define _TK_RET_LIS_LO  475
-#define _TK_RET_LIS_NV  476
-#define _TK_RET_LIS_V   477
-#define _TK_RET_LIS_NK  478
-#define _TK_RET_LIS_K   479
-#define _TK_RET_LIS_NX5 480
-#define _TK_RET_LIS_X5  481
-#define _TK_RET_LIS_NE  482
-#define _TK_RET_LIS_EQ  483
-#define _TK_RET_LIS_LTU 484
-#define _TK_RET_LIS_LEU 485
-#define _TK_RET_LIS_GTU 486
-#define _TK_RET_LIS_GEU 487
-#define _TK_RET_LIS_LT  488
-#define _TK_RET_LIS_LE  489
-#define _TK_RET_LIS_GT  490
-#define _TK_RET_LIS_GE  491
-#define _TK_RET_LIL_NZ  492
-#define _TK_RET_LIL_Z   493
-#define _TK_RET_LIL_NC  494
-#define _TK_RET_LIL_C   495
-#define _TK_RET_LIL_PO  496
-#define _TK_RET_LIL_PE  497
-#define _TK_RET_LIL_P   498
-#define _TK_RET_LIL_M   499
-#define _TK_RET_LIL_LZ  500
-#define _TK_RET_LIL_LO  501
-#define _TK_RET_LIL_NV  502
-#define _TK_RET_LIL_V   503
-#define _TK_RET_LIL_NK  504
-#define _TK_RET_LIL_K   505
-#define _TK_RET_LIL_NX5 506
-#define _TK_RET_LIL_X5  507
-#define _TK_RET_LIL_NE  508
-#define _TK_RET_LIL_EQ  509
-#define _TK_RET_LIL_LTU 510
-#define _TK_RET_LIL_LEU 511
-#define _TK_RET_LIL_GTU 512
-#define _TK_RET_LIL_GEU 513
-#define _TK_RET_LIL_LT  514
-#define _TK_RET_LIL_LE  515
-#define _TK_RET_LIL_GT  516
-#define _TK_RET_LIL_GE  517
-#define _TK_RST_V       518
-#define _TK_B           519
-#define _TK_C           520
-#define _TK_D           521
-#define _TK_E           522
-#define _TK_H           523
-#define _TK_L           524
-#define _TK_A           525
-#define _TK_F           526
-#define _TK_I           527
-#define _TK_R           528
-#define _TK_M           529
-#define _TK_IIR         530
-#define _TK_EIR         531
-#define _TK_XPC         532
-#define _TK_IXH         533
-#define _TK_IYH         534
-#define _TK_IXL         535
-#define _TK_IYL         536
-#define _TK_X           537
-#define _TK_BC          538
-#define _TK_DE          539
-#define _TK_HL          540
-#define _TK_IX          541
-#define _TK_IY          542
-#define _TK_AF          543
-#define _TK_SP          544
-#define _TK_PSW         545
-#define _TK_B1          546
-#define _TK_C1          547
-#define _TK_D1          548
-#define _TK_E1          549
-#define _TK_H1          550
-#define _TK_L1          551
-#define _TK_A1          552
-#define _TK_F1          553
-#define _TK_BC1         554
-#define _TK_DE1         555
-#define _TK_HL1         556
-#define _TK_AF1         557
-#define _TK_ADL         558
-#define _TK_S           559
-#define _TK_IS          560
-#define _TK_IL          561
-#define _TK_SIS         562
-#define _TK_LIL         563
-#define _TK_LIS         564
-#define _TK_SIL         565
-#define _TK_MB          566
-#define _TK_LEA         567
-#define _TK_PEA         568
-#define _TK_RSMIX       569
-#define _TK_STMIX       570
-#define _TK_INI2        571
-#define _TK_INI2R       572
-#define _TK_IND2        573
-#define _TK_IND2R       574
-#define _TK_INIM        575
-#define _TK_INIMR       576
-#define _TK_INDM        577
-#define _TK_INDMR       578
-#define _TK_INIRX       579
-#define _TK_INDRX       580
-#define _TK_OTD2R       581
-#define _TK_OTDRX       582
-#define _TK_OTI2R       583
-#define _TK_OTIRX       584
-#define _TK_OUTD2       585
-#define _TK_OUTI2       586
-#define _TK_ALIGN       587
-#define _TK_ASSERT      588
-#define _TK_ASSUME      589
-#define _TK_BYTE        590
-#define _TK_C_LINE      591
-#define _TK_DB          592
-#define _TK_DC          593
-#define _TK_DDB         594
-#define _TK_DEFB        595
-#define _TK_DEFC        596
-#define _TK_DEFDB       597
-#define _TK_DEFGROUP    598
-#define _TK_DEFINE      599
-#define _TK_DEFM        600
-#define _TK_DEFP        601
-#define _TK_DEFQ        602
-#define _TK_DEFS        603
-#define _TK_DEFVARS     604
-#define _TK_DEFW        605
-#define _TK_DEPHASE     606
-#define _TK_DM          607
-#define _TK_DP          608
-#define _TK_DQ          609
-#define _TK_DS          610
-#define _TK_DW          611
-#define _TK_DWORD       612
-#define _TK_EQU         613
-#define _TK_EXTERN      614
-#define _TK_GLOBAL      615
-#define _TK_LIB         616
-#define _TK_LINE        617
-#define _TK_LSTOFF      618
-#define _TK_LSTON       619
-#define _TK_MODULE      620
-#define _TK_ORG         621
-#define _TK_PHASE       622
-#define _TK_PTR         623
-#define _TK_PUBLIC      624
-#define _TK_SECTION     625
-#define _TK_UNDEFINE    626
-#define _TK_WORD        627
-#define _TK_XDEF        628
-#define _TK_XLIB        629
-#define _TK_XREF        630
-#define _TK_DS_B        631
-#define _TK_DS_W        632
-#define _TK_DS_P        633
-#define _TK_DS_Q        634
-#define _TK_ADC         635
-#define _TK_ADD         636
-#define _TK_AND         637
-#define _TK_BIT         638
-#define _TK_CALL        639
-#define _TK_CCF         640
-#define _TK_CCF1        641
-#define _TK_CP          642
-#define _TK_CPD         643
-#define _TK_CPDR        644
-#define _TK_CPI         645
-#define _TK_CPIR        646
-#define _TK_CPL         647
-#define _TK_DAA         648
-#define _TK_DEC         649
-#define _TK_DI          650
-#define _TK_DJNZ        651
-#define _TK_EI          652
-#define _TK_EX          653
-#define _TK_EXX         654
-#define _TK_HALT        655
-#define _TK_IM          656
-#define _TK_IN          657
-#define _TK_INC         658
-#define _TK_IND         659
-#define _TK_INDR        660
-#define _TK_INI         661
-#define _TK_INIR        662
-#define _TK_JP          663
-#define _TK_JR          664
-#define _TK_LD          665
-#define _TK_LDH         666
-#define _TK_LDHL        667
-#define _TK_LDD         668
-#define _TK_LDDR        669
-#define _TK_LDI         670
-#define _TK_LDIR        671
-#define _TK_NEG         672
-#define _TK_NOP         673
-#define _TK_OR          674
-#define _TK_OTDR        675
-#define _TK_OTIR        676
-#define _TK_OUT         677
-#define _TK_OUTD        678
-#define _TK_OUTI        679
-#define _TK_POP         680
-#define _TK_PUSH        681
-#define _TK_RES         682
-#define _TK_RET         683
-#define _TK_RETI        684
-#define _TK_RETN        685
-#define _TK_RL          686
-#define _TK_RLA         687
-#define _TK_RLA1        688
-#define _TK_RLC         689
-#define _TK_RLCA        690
-#define _TK_RLCA1       691
-#define _TK_RLD         692
-#define _TK_RR          693
-#define _TK_RRA         694
-#define _TK_RRA1        695
-#define _TK_RRC         696
-#define _TK_RRCA        697
-#define _TK_RRCA1       698
-#define _TK_RRD         699
-#define _TK_RST         700
-#define _TK_SBC         701
-#define _TK_SCF         702
-#define _TK_SCF1        703
-#define _TK_SET         704
-#define _TK_SLA         705
-#define _TK_SLL         706
-#define _TK_SLS         707
-#define _TK_SLI         708
-#define _TK_SRA         709
-#define _TK_SRL         710
-#define _TK_STOP        711
-#define _TK_SUB         712
-#define _TK_XOR         713
-#define _TK_SWAPNIB     714
-#define _TK_SWAP        715
-#define _TK_OUTINB      716
-#define _TK_LDIX        717
-#define _TK_LDIRX       718
-#define _TK_LDDX        719
-#define _TK_LDDRX       720
-#define _TK_LDIRSCALE   721
-#define _TK_LDPIRX      722
-#define _TK_LDWS        723
-#define _TK_FILL        724
-#define _TK_FILLDE      725
-#define _TK_MIRROR      726
-#define _TK_NEXTREG     727
-#define _TK_PIXELDN     728
-#define _TK_PIXELAD     729
-#define _TK_SETAE       730
-#define _TK_TEST        731
-#define _TK_MMU         732
-#define _TK_MMU0        733
-#define _TK_MMU1        734
-#define _TK_MMU2        735
-#define _TK_MMU3        736
-#define _TK_MMU4        737
-#define _TK_MMU5        738
-#define _TK_MMU6        739
-#define _TK_MMU7        740
-#define _TK_CU_WAIT     741
-#define _TK_CU_MOVE     742
-#define _TK_CU_STOP     743
-#define _TK_CU_NOP      744
-#define _TK_DMA_WR0     745
-#define _TK_DMA_WR1     746
-#define _TK_DMA_WR2     747
-#define _TK_DMA_WR3     748
-#define _TK_DMA_WR4     749
-#define _TK_DMA_WR5     750
-#define _TK_DMA_WR6     751
-#define _TK_DMA_CMD     752
-#define _TK_BSLA        753
-#define _TK_BSRA        754
-#define _TK_BSRL        755
-#define _TK_BSRF        756
-#define _TK_BRLC        757
-#define _TK_LDRX        758
-#define _TK_LIRX        759
-#define _TK_LPRX        760
-#define _TK_MIRR        761
-#define _TK_NREG        762
-#define _TK_OTIB        763
-#define _TK_PXAD        764
-#define _TK_PXDN        765
-#define _TK_STAE        766
-#define _TK_SLP         767
-#define _TK_MLT         768
-#define _TK_IN0         769
-#define _TK_OUT0        770
-#define _TK_OTIM        771
-#define _TK_OTIMR       772
-#define _TK_OTDM        773
-#define _TK_OTDMR       774
-#define _TK_TST         775
-#define _TK_TSTIO       776
-#define _TK_ALTD        777
-#define _TK_BOOL        778
-#define _TK_IOE         779
-#define _TK_IOI         780
-#define _TK_IPRES       781
-#define _TK_IPSET       782
-#define _TK_IDET        783
-#define _TK_LDDSR       784
-#define _TK_LDISR       785
-#define _TK_LDP         786
-#define _TK_LSDR        787
-#define _TK_LSIR        788
-#define _TK_LSDDR       789
-#define _TK_LSIDR       790
-#define _TK_MUL         791
-#define _TK_IP          792
-#define _TK_SU          793
-#define _TK_RDMODE      794
-#define _TK_SETUSR      795
-#define _TK_SURES       796
-#define _TK_SYSCALL     797
-#define _TK_UMA         798
-#define _TK_UMS         799
-#define _TK_CALL_OZ     800
-#define _TK_CALL_PKG    801
-#define _TK_FPP         802
-#define _TK_INVOKE      803
-#define _TK_MOV         804
-#define _TK_MVI         805
-#define _TK_LXI         806
-#define _TK_LDA         807
-#define _TK_STA         808
-#define _TK_LHLD        809
-#define _TK_SHLD        810
-#define _TK_LDAX        811
-#define _TK_STAX        812
-#define _TK_XCHG        813
-#define _TK_ADI         814
-#define _TK_ACI         815
-#define _TK_SUI         816
-#define _TK_SBB         817
-#define _TK_SBI         818
-#define _TK_INR         819
-#define _TK_DCR         820
-#define _TK_INX         821
-#define _TK_DCX         822
-#define _TK_DAD         823
-#define _TK_ANA         824
-#define _TK_ANI         825
-#define _TK_ORA         826
-#define _TK_ORI         827
-#define _TK_XRA         828
-#define _TK_XRI         829
-#define _TK_CMP         830
-#define _TK_RAL         831
-#define _TK_RAR         832
-#define _TK_CMA         833
-#define _TK_CMC         834
-#define _TK_STC         835
-#define _TK_JMP         836
-#define _TK_JNC         837
-#define _TK_JC          838
-#define _TK_JNZ         839
-#define _TK_JZ          840
-#define _TK_JPO         841
-#define _TK_JPE         842
-#define _TK_JNV         843
-#define _TK_JV          844
-#define _TK_JLO         845
-#define _TK_JLZ         846
-#define _TK_JM          847
-#define _TK_JK          848
-#define _TK_JX5         849
-#define _TK_JNK         850
-#define _TK_JNX5        851
-#define _TK_J_NC        852
-#define _TK_J_C         853
-#define _TK_J_NZ        854
-#define _TK_J_Z         855
-#define _TK_J_PO        856
-#define _TK_J_PE        857
-#define _TK_J_NV        858
-#define _TK_J_V         859
-#define _TK_J_LO        860
-#define _TK_J_LZ        861
-#define _TK_J_P         862
-#define _TK_J_M         863
-#define _TK_J_K         864
-#define _TK_J_X5        865
-#define _TK_J_NK        866
-#define _TK_J_NX5       867
-#define _TK_CNC         868
-#define _TK_CC          869
-#define _TK_CNZ         870
-#define _TK_CZ          871
-#define _TK_CPO         872
-#define _TK_CPE         873
-#define _TK_CNV         874
-#define _TK_CV          875
-#define _TK_CLO         876
-#define _TK_CLZ         877
-#define _TK_CM          878
-#define _TK_C_NC        879
-#define _TK_C_C         880
-#define _TK_C_NZ        881
-#define _TK_C_Z         882
-#define _TK_C_PO        883
-#define _TK_C_PE        884
-#define _TK_C_NV        885
-#define _TK_C_V         886
-#define _TK_C_LO        887
-#define _TK_C_LZ        888
-#define _TK_C_P         889
-#define _TK_C_M         890
-#define _TK_RNC         891
-#define _TK_RC          892
-#define _TK_RNZ         893
-#define _TK_RZ          894
-#define _TK_RPO         895
-#define _TK_RPE         896
-#define _TK_RNV         897
-#define _TK_RV          898
-#define _TK_RLO         899
-#define _TK_RLZ         900
-#define _TK_RP          901
-#define _TK_RM          902
-#define _TK_R_NC        903
-#define _TK_R_C         904
-#define _TK_R_NZ        905
-#define _TK_R_Z         906
-#define _TK_R_PO        907
-#define _TK_R_PE        908
-#define _TK_R_NV        909
-#define _TK_R_V         910
-#define _TK_R_LO        911
-#define _TK_R_LZ        912
-#define _TK_R_P         913
-#define _TK_R_M         914
-#define _TK_PCHL        915
-#define _TK_XTHL        916
-#define _TK_SPHL        917
-#define _TK_HLT         918
-#define _TK_RIM         919
-#define _TK_SIM         920
-#define _TK_DSUB        921
-#define _TK_ARHL        922
-#define _TK_RRHL        923
-#define _TK_RDEL        924
-#define _TK_RLDE        925
-#define _TK_LDHI        926
-#define _TK_LDSI        927
-#define _TK_RSTV        928
-#define _TK_OVRST8      929
-#define _TK_SHLX        930
-#define _TK_SHLDE       931
-#define _TK_LHLX        932
-#define _TK_LHLDE       933
-#define _TK_CEQ         934
-#define _TK_C_EQ        935
-#define _TK_CNE         936
-#define _TK_C_NE        937
-#define _TK_JEQ         938
-#define _TK_J_EQ        939
-#define _TK_JNE         940
-#define _TK_J_NE        941
-#define _TK_REQ         942
-#define _TK_R_EQ        943
-#define _TK_RNE         944
-#define _TK_R_NE        945
-#define _TK_C_LTU       946
-#define _TK_CLTU        947
-#define _TK_C_LEU       948
-#define _TK_CLEU        949
-#define _TK_C_GTU       950
-#define _TK_CGTU        951
-#define _TK_C_GEU       952
-#define _TK_CGEU        953
-#define _TK_J_LTU       954
-#define _TK_JLTU        955
-#define _TK_J_LEU       956
-#define _TK_JLEU        957
-#define _TK_J_GTU       958
-#define _TK_JGTU        959
-#define _TK_J_GEU       960
-#define _TK_JGEU        961
-#define _TK_R_LTU       962
-#define _TK_RLTU        963
-#define _TK_R_LEU       964
-#define _TK_RLEU        965
-#define _TK_R_GTU       966
-#define _TK_RGTU        967
-#define _TK_R_GEU       968
-#define _TK_RGEU        969
-#define _TK_MULUB       970
-#define _TK_MULUW       971
+#define _TK_IND_HTR     41
+#define _TK_IND_BC      42
+#define _TK_IND_DE      43
+#define _TK_IND_HL      44
+#define _TK_IND_SP      45
+#define _TK_IND_IX      46
+#define _TK_IND_IY      47
+#define _TK_IND_HLI     48
+#define _TK_IND_HLD     49
+#define _TK_IND_PW      50
+#define _TK_IND_PX      51
+#define _TK_IND_PY      52
+#define _TK_IND_PZ      53
+#define _TK_ASMPC       54
+#define _TK_CALL_NZ     55
+#define _TK_CALL_Z      56
+#define _TK_CALL_NC     57
+#define _TK_CALL_C      58
+#define _TK_CALL_PO     59
+#define _TK_CALL_PE     60
+#define _TK_CALL_P      61
+#define _TK_CALL_M      62
+#define _TK_CALL_LZ     63
+#define _TK_CALL_LO     64
+#define _TK_CALL_NV     65
+#define _TK_CALL_V      66
+#define _TK_CALL_NK     67
+#define _TK_CALL_K      68
+#define _TK_CALL_NX5    69
+#define _TK_CALL_X5     70
+#define _TK_CALL_NE     71
+#define _TK_CALL_EQ     72
+#define _TK_CALL_LTU    73
+#define _TK_CALL_LEU    74
+#define _TK_CALL_GTU    75
+#define _TK_CALL_GEU    76
+#define _TK_CALL_LT     77
+#define _TK_CALL_LE     78
+#define _TK_CALL_GT     79
+#define _TK_CALL_GE     80
+#define _TK_CALL_SIS_NZ 81
+#define _TK_CALL_SIS_Z  82
+#define _TK_CALL_SIS_NC 83
+#define _TK_CALL_SIS_C  84
+#define _TK_CALL_SIS_PO 85
+#define _TK_CALL_SIS_PE 86
+#define _TK_CALL_SIS_P  87
+#define _TK_CALL_SIS_M  88
+#define _TK_CALL_SIS_LZ 89
+#define _TK_CALL_SIS_LO 90
+#define _TK_CALL_SIS_NV 91
+#define _TK_CALL_SIS_V  92
+#define _TK_CALL_SIS_NK 93
+#define _TK_CALL_SIS_K  94
+#define _TK_CALL_SIS_NX5 95
+#define _TK_CALL_SIS_X5 96
+#define _TK_CALL_SIS_NE 97
+#define _TK_CALL_SIS_EQ 98
+#define _TK_CALL_SIS_LTU 99
+#define _TK_CALL_SIS_LEU 100
+#define _TK_CALL_SIS_GTU 101
+#define _TK_CALL_SIS_GEU 102
+#define _TK_CALL_SIS_LT 103
+#define _TK_CALL_SIS_LE 104
+#define _TK_CALL_SIS_GT 105
+#define _TK_CALL_SIS_GE 106
+#define _TK_CALL_SIL_NZ 107
+#define _TK_CALL_SIL_Z  108
+#define _TK_CALL_SIL_NC 109
+#define _TK_CALL_SIL_C  110
+#define _TK_CALL_SIL_PO 111
+#define _TK_CALL_SIL_PE 112
+#define _TK_CALL_SIL_P  113
+#define _TK_CALL_SIL_M  114
+#define _TK_CALL_SIL_LZ 115
+#define _TK_CALL_SIL_LO 116
+#define _TK_CALL_SIL_NV 117
+#define _TK_CALL_SIL_V  118
+#define _TK_CALL_SIL_NK 119
+#define _TK_CALL_SIL_K  120
+#define _TK_CALL_SIL_NX5 121
+#define _TK_CALL_SIL_X5 122
+#define _TK_CALL_SIL_NE 123
+#define _TK_CALL_SIL_EQ 124
+#define _TK_CALL_SIL_LTU 125
+#define _TK_CALL_SIL_LEU 126
+#define _TK_CALL_SIL_GTU 127
+#define _TK_CALL_SIL_GEU 128
+#define _TK_CALL_SIL_LT 129
+#define _TK_CALL_SIL_LE 130
+#define _TK_CALL_SIL_GT 131
+#define _TK_CALL_SIL_GE 132
+#define _TK_CALL_LIS_NZ 133
+#define _TK_CALL_LIS_Z  134
+#define _TK_CALL_LIS_NC 135
+#define _TK_CALL_LIS_C  136
+#define _TK_CALL_LIS_PO 137
+#define _TK_CALL_LIS_PE 138
+#define _TK_CALL_LIS_P  139
+#define _TK_CALL_LIS_M  140
+#define _TK_CALL_LIS_LZ 141
+#define _TK_CALL_LIS_LO 142
+#define _TK_CALL_LIS_NV 143
+#define _TK_CALL_LIS_V  144
+#define _TK_CALL_LIS_NK 145
+#define _TK_CALL_LIS_K  146
+#define _TK_CALL_LIS_NX5 147
+#define _TK_CALL_LIS_X5 148
+#define _TK_CALL_LIS_NE 149
+#define _TK_CALL_LIS_EQ 150
+#define _TK_CALL_LIS_LTU 151
+#define _TK_CALL_LIS_LEU 152
+#define _TK_CALL_LIS_GTU 153
+#define _TK_CALL_LIS_GEU 154
+#define _TK_CALL_LIS_LT 155
+#define _TK_CALL_LIS_LE 156
+#define _TK_CALL_LIS_GT 157
+#define _TK_CALL_LIS_GE 158
+#define _TK_CALL_LIL_NZ 159
+#define _TK_CALL_LIL_Z  160
+#define _TK_CALL_LIL_NC 161
+#define _TK_CALL_LIL_C  162
+#define _TK_CALL_LIL_PO 163
+#define _TK_CALL_LIL_PE 164
+#define _TK_CALL_LIL_P  165
+#define _TK_CALL_LIL_M  166
+#define _TK_CALL_LIL_LZ 167
+#define _TK_CALL_LIL_LO 168
+#define _TK_CALL_LIL_NV 169
+#define _TK_CALL_LIL_V  170
+#define _TK_CALL_LIL_NK 171
+#define _TK_CALL_LIL_K  172
+#define _TK_CALL_LIL_NX5 173
+#define _TK_CALL_LIL_X5 174
+#define _TK_CALL_LIL_NE 175
+#define _TK_CALL_LIL_EQ 176
+#define _TK_CALL_LIL_LTU 177
+#define _TK_CALL_LIL_LEU 178
+#define _TK_CALL_LIL_GTU 179
+#define _TK_CALL_LIL_GEU 180
+#define _TK_CALL_LIL_LT 181
+#define _TK_CALL_LIL_LE 182
+#define _TK_CALL_LIL_GT 183
+#define _TK_CALL_LIL_GE 184
+#define _TK_CALL_IS_NZ  185
+#define _TK_CALL_IS_Z   186
+#define _TK_CALL_IS_NC  187
+#define _TK_CALL_IS_C   188
+#define _TK_CALL_IS_PO  189
+#define _TK_CALL_IS_PE  190
+#define _TK_CALL_IS_P   191
+#define _TK_CALL_IS_M   192
+#define _TK_CALL_IS_LZ  193
+#define _TK_CALL_IS_LO  194
+#define _TK_CALL_IS_NV  195
+#define _TK_CALL_IS_V   196
+#define _TK_CALL_IS_NK  197
+#define _TK_CALL_IS_K   198
+#define _TK_CALL_IS_NX5 199
+#define _TK_CALL_IS_X5  200
+#define _TK_CALL_IS_NE  201
+#define _TK_CALL_IS_EQ  202
+#define _TK_CALL_IS_LTU 203
+#define _TK_CALL_IS_LEU 204
+#define _TK_CALL_IS_GTU 205
+#define _TK_CALL_IS_GEU 206
+#define _TK_CALL_IS_LT  207
+#define _TK_CALL_IS_LE  208
+#define _TK_CALL_IS_GT  209
+#define _TK_CALL_IS_GE  210
+#define _TK_CALL_IL_NZ  211
+#define _TK_CALL_IL_Z   212
+#define _TK_CALL_IL_NC  213
+#define _TK_CALL_IL_C   214
+#define _TK_CALL_IL_PO  215
+#define _TK_CALL_IL_PE  216
+#define _TK_CALL_IL_P   217
+#define _TK_CALL_IL_M   218
+#define _TK_CALL_IL_LZ  219
+#define _TK_CALL_IL_LO  220
+#define _TK_CALL_IL_NV  221
+#define _TK_CALL_IL_V   222
+#define _TK_CALL_IL_NK  223
+#define _TK_CALL_IL_K   224
+#define _TK_CALL_IL_NX5 225
+#define _TK_CALL_IL_X5  226
+#define _TK_CALL_IL_NE  227
+#define _TK_CALL_IL_EQ  228
+#define _TK_CALL_IL_LTU 229
+#define _TK_CALL_IL_LEU 230
+#define _TK_CALL_IL_GTU 231
+#define _TK_CALL_IL_GEU 232
+#define _TK_CALL_IL_LT  233
+#define _TK_CALL_IL_LE  234
+#define _TK_CALL_IL_GT  235
+#define _TK_CALL_IL_GE  236
+#define _TK_JR_NZ       237
+#define _TK_JR_Z        238
+#define _TK_JR_NC       239
+#define _TK_JR_C        240
+#define _TK_JR_PO       241
+#define _TK_JR_PE       242
+#define _TK_JR_P        243
+#define _TK_JR_M        244
+#define _TK_JR_LZ       245
+#define _TK_JR_LO       246
+#define _TK_JR_NV       247
+#define _TK_JR_V        248
+#define _TK_JR_NK       249
+#define _TK_JR_K        250
+#define _TK_JR_NX5      251
+#define _TK_JR_X5       252
+#define _TK_JR_NE       253
+#define _TK_JR_EQ       254
+#define _TK_JR_LTU      255
+#define _TK_JR_LEU      256
+#define _TK_JR_GTU      257
+#define _TK_JR_GEU      258
+#define _TK_JR_LT       259
+#define _TK_JR_LE       260
+#define _TK_JR_GT       261
+#define _TK_JR_GE       262
+#define _TK_JRE_NZ      263
+#define _TK_JRE_Z       264
+#define _TK_JRE_NC      265
+#define _TK_JRE_C       266
+#define _TK_JRE_PO      267
+#define _TK_JRE_PE      268
+#define _TK_JRE_P       269
+#define _TK_JRE_M       270
+#define _TK_JRE_LZ      271
+#define _TK_JRE_LO      272
+#define _TK_JRE_NV      273
+#define _TK_JRE_V       274
+#define _TK_JRE_NK      275
+#define _TK_JRE_K       276
+#define _TK_JRE_NX5     277
+#define _TK_JRE_X5      278
+#define _TK_JRE_NE      279
+#define _TK_JRE_EQ      280
+#define _TK_JRE_LTU     281
+#define _TK_JRE_LEU     282
+#define _TK_JRE_GTU     283
+#define _TK_JRE_GEU     284
+#define _TK_JRE_LT      285
+#define _TK_JRE_LE      286
+#define _TK_JRE_GT      287
+#define _TK_JRE_GE      288
+#define _TK_JP_NZ       289
+#define _TK_JP_Z        290
+#define _TK_JP_NC       291
+#define _TK_JP_C        292
+#define _TK_JP_PO       293
+#define _TK_JP_PE       294
+#define _TK_JP_P        295
+#define _TK_JP_M        296
+#define _TK_JP_LZ       297
+#define _TK_JP_LO       298
+#define _TK_JP_NV       299
+#define _TK_JP_V        300
+#define _TK_JP_NK       301
+#define _TK_JP_K        302
+#define _TK_JP_NX5      303
+#define _TK_JP_X5       304
+#define _TK_JP_NE       305
+#define _TK_JP_EQ       306
+#define _TK_JP_LTU      307
+#define _TK_JP_LEU      308
+#define _TK_JP_GTU      309
+#define _TK_JP_GEU      310
+#define _TK_JP_LT       311
+#define _TK_JP_LE       312
+#define _TK_JP_GT       313
+#define _TK_JP_GE       314
+#define _TK_JP_SIS_NZ   315
+#define _TK_JP_SIS_Z    316
+#define _TK_JP_SIS_NC   317
+#define _TK_JP_SIS_C    318
+#define _TK_JP_SIS_PO   319
+#define _TK_JP_SIS_PE   320
+#define _TK_JP_SIS_P    321
+#define _TK_JP_SIS_M    322
+#define _TK_JP_SIS_LZ   323
+#define _TK_JP_SIS_LO   324
+#define _TK_JP_SIS_NV   325
+#define _TK_JP_SIS_V    326
+#define _TK_JP_SIS_NK   327
+#define _TK_JP_SIS_K    328
+#define _TK_JP_SIS_NX5  329
+#define _TK_JP_SIS_X5   330
+#define _TK_JP_SIS_NE   331
+#define _TK_JP_SIS_EQ   332
+#define _TK_JP_SIS_LTU  333
+#define _TK_JP_SIS_LEU  334
+#define _TK_JP_SIS_GTU  335
+#define _TK_JP_SIS_GEU  336
+#define _TK_JP_SIS_LT   337
+#define _TK_JP_SIS_LE   338
+#define _TK_JP_SIS_GT   339
+#define _TK_JP_SIS_GE   340
+#define _TK_JP_LIL_NZ   341
+#define _TK_JP_LIL_Z    342
+#define _TK_JP_LIL_NC   343
+#define _TK_JP_LIL_C    344
+#define _TK_JP_LIL_PO   345
+#define _TK_JP_LIL_PE   346
+#define _TK_JP_LIL_P    347
+#define _TK_JP_LIL_M    348
+#define _TK_JP_LIL_LZ   349
+#define _TK_JP_LIL_LO   350
+#define _TK_JP_LIL_NV   351
+#define _TK_JP_LIL_V    352
+#define _TK_JP_LIL_NK   353
+#define _TK_JP_LIL_K    354
+#define _TK_JP_LIL_NX5  355
+#define _TK_JP_LIL_X5   356
+#define _TK_JP_LIL_NE   357
+#define _TK_JP_LIL_EQ   358
+#define _TK_JP_LIL_LTU  359
+#define _TK_JP_LIL_LEU  360
+#define _TK_JP_LIL_GTU  361
+#define _TK_JP_LIL_GEU  362
+#define _TK_JP_LIL_LT   363
+#define _TK_JP_LIL_LE   364
+#define _TK_JP_LIL_GT   365
+#define _TK_JP_LIL_GE   366
+#define _TK_JMP_NZ      367
+#define _TK_JMP_Z       368
+#define _TK_JMP_NC      369
+#define _TK_JMP_C       370
+#define _TK_JMP_PO      371
+#define _TK_JMP_PE      372
+#define _TK_JMP_P       373
+#define _TK_JMP_M       374
+#define _TK_JMP_LZ      375
+#define _TK_JMP_LO      376
+#define _TK_JMP_NV      377
+#define _TK_JMP_V       378
+#define _TK_JMP_NK      379
+#define _TK_JMP_K       380
+#define _TK_JMP_NX5     381
+#define _TK_JMP_X5      382
+#define _TK_JMP_NE      383
+#define _TK_JMP_EQ      384
+#define _TK_JMP_LTU     385
+#define _TK_JMP_LEU     386
+#define _TK_JMP_GTU     387
+#define _TK_JMP_GEU     388
+#define _TK_JMP_LT      389
+#define _TK_JMP_LE      390
+#define _TK_JMP_GT      391
+#define _TK_JMP_GE      392
+#define _TK_JMP_SIS_NZ  393
+#define _TK_JMP_SIS_Z   394
+#define _TK_JMP_SIS_NC  395
+#define _TK_JMP_SIS_C   396
+#define _TK_JMP_SIS_PO  397
+#define _TK_JMP_SIS_PE  398
+#define _TK_JMP_SIS_P   399
+#define _TK_JMP_SIS_M   400
+#define _TK_JMP_SIS_LZ  401
+#define _TK_JMP_SIS_LO  402
+#define _TK_JMP_SIS_NV  403
+#define _TK_JMP_SIS_V   404
+#define _TK_JMP_SIS_NK  405
+#define _TK_JMP_SIS_K   406
+#define _TK_JMP_SIS_NX5 407
+#define _TK_JMP_SIS_X5  408
+#define _TK_JMP_SIS_NE  409
+#define _TK_JMP_SIS_EQ  410
+#define _TK_JMP_SIS_LTU 411
+#define _TK_JMP_SIS_LEU 412
+#define _TK_JMP_SIS_GTU 413
+#define _TK_JMP_SIS_GEU 414
+#define _TK_JMP_SIS_LT  415
+#define _TK_JMP_SIS_LE  416
+#define _TK_JMP_SIS_GT  417
+#define _TK_JMP_SIS_GE  418
+#define _TK_JMP_LIL_NZ  419
+#define _TK_JMP_LIL_Z   420
+#define _TK_JMP_LIL_NC  421
+#define _TK_JMP_LIL_C   422
+#define _TK_JMP_LIL_PO  423
+#define _TK_JMP_LIL_PE  424
+#define _TK_JMP_LIL_P   425
+#define _TK_JMP_LIL_M   426
+#define _TK_JMP_LIL_LZ  427
+#define _TK_JMP_LIL_LO  428
+#define _TK_JMP_LIL_NV  429
+#define _TK_JMP_LIL_V   430
+#define _TK_JMP_LIL_NK  431
+#define _TK_JMP_LIL_K   432
+#define _TK_JMP_LIL_NX5 433
+#define _TK_JMP_LIL_X5  434
+#define _TK_JMP_LIL_NE  435
+#define _TK_JMP_LIL_EQ  436
+#define _TK_JMP_LIL_LTU 437
+#define _TK_JMP_LIL_LEU 438
+#define _TK_JMP_LIL_GTU 439
+#define _TK_JMP_LIL_GEU 440
+#define _TK_JMP_LIL_LT  441
+#define _TK_JMP_LIL_LE  442
+#define _TK_JMP_LIL_GT  443
+#define _TK_JMP_LIL_GE  444
+#define _TK_RET_NZ      445
+#define _TK_RET_Z       446
+#define _TK_RET_NC      447
+#define _TK_RET_C       448
+#define _TK_RET_PO      449
+#define _TK_RET_PE      450
+#define _TK_RET_P       451
+#define _TK_RET_M       452
+#define _TK_RET_LZ      453
+#define _TK_RET_LO      454
+#define _TK_RET_NV      455
+#define _TK_RET_V       456
+#define _TK_RET_NK      457
+#define _TK_RET_K       458
+#define _TK_RET_NX5     459
+#define _TK_RET_X5      460
+#define _TK_RET_NE      461
+#define _TK_RET_EQ      462
+#define _TK_RET_LTU     463
+#define _TK_RET_LEU     464
+#define _TK_RET_GTU     465
+#define _TK_RET_GEU     466
+#define _TK_RET_LT      467
+#define _TK_RET_LE      468
+#define _TK_RET_GT      469
+#define _TK_RET_GE      470
+#define _TK_RET_L_NZ    471
+#define _TK_RET_L_Z     472
+#define _TK_RET_L_NC    473
+#define _TK_RET_L_C     474
+#define _TK_RET_L_PO    475
+#define _TK_RET_L_PE    476
+#define _TK_RET_L_P     477
+#define _TK_RET_L_M     478
+#define _TK_RET_L_LZ    479
+#define _TK_RET_L_LO    480
+#define _TK_RET_L_NV    481
+#define _TK_RET_L_V     482
+#define _TK_RET_L_NK    483
+#define _TK_RET_L_K     484
+#define _TK_RET_L_NX5   485
+#define _TK_RET_L_X5    486
+#define _TK_RET_L_NE    487
+#define _TK_RET_L_EQ    488
+#define _TK_RET_L_LTU   489
+#define _TK_RET_L_LEU   490
+#define _TK_RET_L_GTU   491
+#define _TK_RET_L_GEU   492
+#define _TK_RET_L_LT    493
+#define _TK_RET_L_LE    494
+#define _TK_RET_L_GT    495
+#define _TK_RET_L_GE    496
+#define _TK_RET_LIS_NZ  497
+#define _TK_RET_LIS_Z   498
+#define _TK_RET_LIS_NC  499
+#define _TK_RET_LIS_C   500
+#define _TK_RET_LIS_PO  501
+#define _TK_RET_LIS_PE  502
+#define _TK_RET_LIS_P   503
+#define _TK_RET_LIS_M   504
+#define _TK_RET_LIS_LZ  505
+#define _TK_RET_LIS_LO  506
+#define _TK_RET_LIS_NV  507
+#define _TK_RET_LIS_V   508
+#define _TK_RET_LIS_NK  509
+#define _TK_RET_LIS_K   510
+#define _TK_RET_LIS_NX5 511
+#define _TK_RET_LIS_X5  512
+#define _TK_RET_LIS_NE  513
+#define _TK_RET_LIS_EQ  514
+#define _TK_RET_LIS_LTU 515
+#define _TK_RET_LIS_LEU 516
+#define _TK_RET_LIS_GTU 517
+#define _TK_RET_LIS_GEU 518
+#define _TK_RET_LIS_LT  519
+#define _TK_RET_LIS_LE  520
+#define _TK_RET_LIS_GT  521
+#define _TK_RET_LIS_GE  522
+#define _TK_RET_LIL_NZ  523
+#define _TK_RET_LIL_Z   524
+#define _TK_RET_LIL_NC  525
+#define _TK_RET_LIL_C   526
+#define _TK_RET_LIL_PO  527
+#define _TK_RET_LIL_PE  528
+#define _TK_RET_LIL_P   529
+#define _TK_RET_LIL_M   530
+#define _TK_RET_LIL_LZ  531
+#define _TK_RET_LIL_LO  532
+#define _TK_RET_LIL_NV  533
+#define _TK_RET_LIL_V   534
+#define _TK_RET_LIL_NK  535
+#define _TK_RET_LIL_K   536
+#define _TK_RET_LIL_NX5 537
+#define _TK_RET_LIL_X5  538
+#define _TK_RET_LIL_NE  539
+#define _TK_RET_LIL_EQ  540
+#define _TK_RET_LIL_LTU 541
+#define _TK_RET_LIL_LEU 542
+#define _TK_RET_LIL_GTU 543
+#define _TK_RET_LIL_GEU 544
+#define _TK_RET_LIL_LT  545
+#define _TK_RET_LIL_LE  546
+#define _TK_RET_LIL_GT  547
+#define _TK_RET_LIL_GE  548
+#define _TK_RST_V       549
+#define _TK_FLAG_NZ     550
+#define _TK_FLAG_Z      551
+#define _TK_FLAG_NC     552
+#define _TK_FLAG_C      553
+#define _TK_FLAG_PO     554
+#define _TK_FLAG_PE     555
+#define _TK_FLAG_P      556
+#define _TK_FLAG_M      557
+#define _TK_FLAG_LZ     558
+#define _TK_FLAG_LO     559
+#define _TK_FLAG_NV     560
+#define _TK_FLAG_V      561
+#define _TK_FLAG_X5     562
+#define _TK_FLAG_NX5    563
+#define _TK_FLAG_K      564
+#define _TK_FLAG_NK     565
+#define _TK_FLAG_NE     566
+#define _TK_FLAG_EQ     567
+#define _TK_FLAG_LTU    568
+#define _TK_FLAG_LEU    569
+#define _TK_FLAG_GTU    570
+#define _TK_FLAG_GEU    571
+#define _TK_FLAG_LT     572
+#define _TK_FLAG_LE     573
+#define _TK_FLAG_GT     574
+#define _TK_FLAG_GE     575
+#define _TK_B           576
+#define _TK_C           577
+#define _TK_D           578
+#define _TK_E           579
+#define _TK_H           580
+#define _TK_L           581
+#define _TK_A           582
+#define _TK_F           583
+#define _TK_I           584
+#define _TK_R           585
+#define _TK_M           586
+#define _TK_IIR         587
+#define _TK_EIR         588
+#define _TK_XPC         589
+#define _TK_IXH         590
+#define _TK_IYH         591
+#define _TK_IXL         592
+#define _TK_IYL         593
+#define _TK_HTR         594
+#define _TK_LXPC        595
+#define _TK_BC          596
+#define _TK_DE          597
+#define _TK_HL          598
+#define _TK_JK          599
+#define _TK_IX          600
+#define _TK_IY          601
+#define _TK_AF          602
+#define _TK_SP          603
+#define _TK_PSW         604
+#define _TK_BCDE        605
+#define _TK_JKHL        606
+#define _TK_PW          607
+#define _TK_PX          608
+#define _TK_PY          609
+#define _TK_PZ          610
+#define _TK_B1          611
+#define _TK_C1          612
+#define _TK_D1          613
+#define _TK_E1          614
+#define _TK_H1          615
+#define _TK_L1          616
+#define _TK_A1          617
+#define _TK_F1          618
+#define _TK_BC1         619
+#define _TK_DE1         620
+#define _TK_JK1         621
+#define _TK_HL1         622
+#define _TK_AF1         623
+#define _TK_BCDE1       624
+#define _TK_JKHL1       625
+#define _TK_PW1         626
+#define _TK_PX1         627
+#define _TK_PY1         628
+#define _TK_PZ1         629
+#define _TK_ADL         630
+#define _TK_S           631
+#define _TK_IS          632
+#define _TK_IL          633
+#define _TK_SIS         634
+#define _TK_LIL         635
+#define _TK_LIS         636
+#define _TK_SIL         637
+#define _TK_MB          638
+#define _TK_LEA         639
+#define _TK_PEA         640
+#define _TK_RSMIX       641
+#define _TK_STMIX       642
+#define _TK_INI2        643
+#define _TK_INI2R       644
+#define _TK_IND2        645
+#define _TK_IND2R       646
+#define _TK_INIM        647
+#define _TK_INIMR       648
+#define _TK_INDM        649
+#define _TK_INDMR       650
+#define _TK_INIRX       651
+#define _TK_INDRX       652
+#define _TK_OTD2R       653
+#define _TK_OTDRX       654
+#define _TK_OTI2R       655
+#define _TK_OTIRX       656
+#define _TK_OUTD2       657
+#define _TK_OUTI2       658
+#define _TK_ALIGN       659
+#define _TK_ASSERT      660
+#define _TK_ASSUME      661
+#define _TK_BYTE        662
+#define _TK_C_LINE      663
+#define _TK_DB          664
+#define _TK_DC          665
+#define _TK_DDB         666
+#define _TK_DEFB        667
+#define _TK_DEFC        668
+#define _TK_DEFDB       669
+#define _TK_DEFGROUP    670
+#define _TK_DEFINE      671
+#define _TK_DEFM        672
+#define _TK_DEFP        673
+#define _TK_DEFQ        674
+#define _TK_DEFS        675
+#define _TK_DEFVARS     676
+#define _TK_DEFW        677
+#define _TK_DEPHASE     678
+#define _TK_DM          679
+#define _TK_DP          680
+#define _TK_DQ          681
+#define _TK_DS          682
+#define _TK_DW          683
+#define _TK_DWORD       684
+#define _TK_EQU         685
+#define _TK_EXTERN      686
+#define _TK_GLOBAL      687
+#define _TK_LIB         688
+#define _TK_LINE        689
+#define _TK_LSTOFF      690
+#define _TK_LSTON       691
+#define _TK_MODULE      692
+#define _TK_ORG         693
+#define _TK_PHASE       694
+#define _TK_PTR         695
+#define _TK_PUBLIC      696
+#define _TK_SECTION     697
+#define _TK_UNDEFINE    698
+#define _TK_WORD        699
+#define _TK_XDEF        700
+#define _TK_XLIB        701
+#define _TK_XREF        702
+#define _TK_DS_B        703
+#define _TK_DS_W        704
+#define _TK_DS_P        705
+#define _TK_DS_Q        706
+#define _TK_ADC         707
+#define _TK_ADD         708
+#define _TK_AND         709
+#define _TK_BIT         710
+#define _TK_CALL        711
+#define _TK_CCF         712
+#define _TK_CCF1        713
+#define _TK_CP          714
+#define _TK_CPD         715
+#define _TK_CPDR        716
+#define _TK_CPI         717
+#define _TK_CPIR        718
+#define _TK_CPL         719
+#define _TK_DAA         720
+#define _TK_DEC         721
+#define _TK_DI          722
+#define _TK_DJNZ        723
+#define _TK_EI          724
+#define _TK_EX          725
+#define _TK_EXX         726
+#define _TK_HALT        727
+#define _TK_IM          728
+#define _TK_IN          729
+#define _TK_INC         730
+#define _TK_IND         731
+#define _TK_INDR        732
+#define _TK_INI         733
+#define _TK_INIR        734
+#define _TK_JP          735
+#define _TK_JR          736
+#define _TK_LD          737
+#define _TK_LDH         738
+#define _TK_LDHL        739
+#define _TK_LDD         740
+#define _TK_LDDR        741
+#define _TK_LDI         742
+#define _TK_LDIR        743
+#define _TK_NEG         744
+#define _TK_NOP         745
+#define _TK_OR          746
+#define _TK_OTDR        747
+#define _TK_OTIR        748
+#define _TK_OUT         749
+#define _TK_OUTD        750
+#define _TK_OUTI        751
+#define _TK_POP         752
+#define _TK_PUSH        753
+#define _TK_RES         754
+#define _TK_RET         755
+#define _TK_RETI        756
+#define _TK_RETN        757
+#define _TK_RL          758
+#define _TK_RLA         759
+#define _TK_RLA1        760
+#define _TK_RLC         761
+#define _TK_RLCA        762
+#define _TK_RLCA1       763
+#define _TK_RLD         764
+#define _TK_RR          765
+#define _TK_RRA         766
+#define _TK_RRA1        767
+#define _TK_RRC         768
+#define _TK_RRCA        769
+#define _TK_RRCA1       770
+#define _TK_RRD         771
+#define _TK_RST         772
+#define _TK_SBC         773
+#define _TK_SCF         774
+#define _TK_SCF1        775
+#define _TK_SET         776
+#define _TK_SLA         777
+#define _TK_SLL         778
+#define _TK_SLS         779
+#define _TK_SLI         780
+#define _TK_SRA         781
+#define _TK_SRL         782
+#define _TK_STOP        783
+#define _TK_SUB         784
+#define _TK_XOR         785
+#define _TK_SWAPNIB     786
+#define _TK_SWAP        787
+#define _TK_OUTINB      788
+#define _TK_LDIX        789
+#define _TK_LDIRX       790
+#define _TK_LDDX        791
+#define _TK_LDDRX       792
+#define _TK_LDIRSCALE   793
+#define _TK_LDPIRX      794
+#define _TK_LDWS        795
+#define _TK_FILL        796
+#define _TK_FILLDE      797
+#define _TK_MIRROR      798
+#define _TK_NEXTREG     799
+#define _TK_PIXELDN     800
+#define _TK_PIXELAD     801
+#define _TK_SETAE       802
+#define _TK_TEST        803
+#define _TK_MMU         804
+#define _TK_MMU0        805
+#define _TK_MMU1        806
+#define _TK_MMU2        807
+#define _TK_MMU3        808
+#define _TK_MMU4        809
+#define _TK_MMU5        810
+#define _TK_MMU6        811
+#define _TK_MMU7        812
+#define _TK_CU_WAIT     813
+#define _TK_CU_MOVE     814
+#define _TK_CU_STOP     815
+#define _TK_CU_NOP      816
+#define _TK_DMA_WR0     817
+#define _TK_DMA_WR1     818
+#define _TK_DMA_WR2     819
+#define _TK_DMA_WR3     820
+#define _TK_DMA_WR4     821
+#define _TK_DMA_WR5     822
+#define _TK_DMA_WR6     823
+#define _TK_DMA_CMD     824
+#define _TK_BSLA        825
+#define _TK_BSRA        826
+#define _TK_BSRL        827
+#define _TK_BSRF        828
+#define _TK_BRLC        829
+#define _TK_LDRX        830
+#define _TK_LIRX        831
+#define _TK_LPRX        832
+#define _TK_MIRR        833
+#define _TK_NREG        834
+#define _TK_OTIB        835
+#define _TK_PXAD        836
+#define _TK_PXDN        837
+#define _TK_STAE        838
+#define _TK_SLP         839
+#define _TK_MLT         840
+#define _TK_IN0         841
+#define _TK_OUT0        842
+#define _TK_OTIM        843
+#define _TK_OTIMR       844
+#define _TK_OTDM        845
+#define _TK_OTDMR       846
+#define _TK_TST         847
+#define _TK_TSTIO       848
+#define _TK_ALTD        849
+#define _TK_BOOL        850
+#define _TK_IOE         851
+#define _TK_IOI         852
+#define _TK_IPRES       853
+#define _TK_IPSET       854
+#define _TK_IDET        855
+#define _TK_LDDSR       856
+#define _TK_LDISR       857
+#define _TK_LDP         858
+#define _TK_LSDR        859
+#define _TK_LSIR        860
+#define _TK_LSDDR       861
+#define _TK_LSIDR       862
+#define _TK_MUL         863
+#define _TK_IP          864
+#define _TK_SU          865
+#define _TK_RDMODE      866
+#define _TK_SETUSR      867
+#define _TK_SURES       868
+#define _TK_SYSCALL     869
+#define _TK_UMA         870
+#define _TK_UMS         871
+#define _TK_CBM         872
+#define _TK_CLR         873
+#define _TK_CONVC       874
+#define _TK_CONVD       875
+#define _TK_COPY        876
+#define _TK_COPYR       877
+#define _TK_DWJNZ       878
+#define _TK_EXP         879
+#define _TK_FLAG        880
+#define _TK_FSYSCALL    881
+#define _TK_IBOX        882
+#define _TK_JRE         883
+#define _TK_LDF         884
+#define _TK_LDL         885
+#define _TK_MULU        886
+#define _TK_RLB         887
+#define _TK_RRB         888
+#define _TK_SBOX        889
+#define _TK_SETSYSP     890
+#define _TK_SETUSRP     891
+#define _TK_SYSRET      892
+#define _TK_SRET        893
+#define _TK_CALL_OZ     894
+#define _TK_CALL_PKG    895
+#define _TK_FPP         896
+#define _TK_INVOKE      897
+#define _TK_MOV         898
+#define _TK_MVI         899
+#define _TK_LXI         900
+#define _TK_LDA         901
+#define _TK_STA         902
+#define _TK_LHLD        903
+#define _TK_SHLD        904
+#define _TK_LDAX        905
+#define _TK_STAX        906
+#define _TK_XCHG        907
+#define _TK_ADI         908
+#define _TK_ACI         909
+#define _TK_SUI         910
+#define _TK_SBB         911
+#define _TK_SBI         912
+#define _TK_INR         913
+#define _TK_DCR         914
+#define _TK_INX         915
+#define _TK_DCX         916
+#define _TK_DAD         917
+#define _TK_ANA         918
+#define _TK_ANI         919
+#define _TK_ORA         920
+#define _TK_ORI         921
+#define _TK_XRA         922
+#define _TK_XRI         923
+#define _TK_CMP         924
+#define _TK_RAL         925
+#define _TK_RAR         926
+#define _TK_CMA         927
+#define _TK_CMC         928
+#define _TK_STC         929
+#define _TK_JMP         930
+#define _TK_JNC         931
+#define _TK_JC          932
+#define _TK_JNZ         933
+#define _TK_JZ          934
+#define _TK_JPO         935
+#define _TK_JPE         936
+#define _TK_JNV         937
+#define _TK_JV          938
+#define _TK_JLO         939
+#define _TK_JLZ         940
+#define _TK_JM          941
+#define _TK_JX5         942
+#define _TK_JNK         943
+#define _TK_JNX5        944
+#define _TK_J_NC        945
+#define _TK_J_C         946
+#define _TK_J_NZ        947
+#define _TK_J_Z         948
+#define _TK_J_PO        949
+#define _TK_J_PE        950
+#define _TK_J_NV        951
+#define _TK_J_V         952
+#define _TK_J_LO        953
+#define _TK_J_LZ        954
+#define _TK_J_P         955
+#define _TK_J_M         956
+#define _TK_J_K         957
+#define _TK_J_X5        958
+#define _TK_J_NK        959
+#define _TK_J_NX5       960
+#define _TK_CNC         961
+#define _TK_CC          962
+#define _TK_CNZ         963
+#define _TK_CZ          964
+#define _TK_CPO         965
+#define _TK_CPE         966
+#define _TK_CNV         967
+#define _TK_CV          968
+#define _TK_CLO         969
+#define _TK_CLZ         970
+#define _TK_CM          971
+#define _TK_C_NC        972
+#define _TK_C_C         973
+#define _TK_C_NZ        974
+#define _TK_C_Z         975
+#define _TK_C_PO        976
+#define _TK_C_PE        977
+#define _TK_C_NV        978
+#define _TK_C_V         979
+#define _TK_C_LO        980
+#define _TK_C_LZ        981
+#define _TK_C_P         982
+#define _TK_C_M         983
+#define _TK_RNC         984
+#define _TK_RC          985
+#define _TK_RNZ         986
+#define _TK_RZ          987
+#define _TK_RPO         988
+#define _TK_RPE         989
+#define _TK_RNV         990
+#define _TK_RV          991
+#define _TK_RLO         992
+#define _TK_RLZ         993
+#define _TK_RP          994
+#define _TK_RM          995
+#define _TK_R_NC        996
+#define _TK_R_C         997
+#define _TK_R_NZ        998
+#define _TK_R_Z         999
+#define _TK_R_PO        1000
+#define _TK_R_PE        1001
+#define _TK_R_NV        1002
+#define _TK_R_V         1003
+#define _TK_R_LO        1004
+#define _TK_R_LZ        1005
+#define _TK_R_P         1006
+#define _TK_R_M         1007
+#define _TK_PCHL        1008
+#define _TK_XTHL        1009
+#define _TK_SPHL        1010
+#define _TK_HLT         1011
+#define _TK_RIM         1012
+#define _TK_SIM         1013
+#define _TK_DSUB        1014
+#define _TK_ARHL        1015
+#define _TK_RRHL        1016
+#define _TK_RDEL        1017
+#define _TK_RLDE        1018
+#define _TK_LDHI        1019
+#define _TK_LDSI        1020
+#define _TK_RSTV        1021
+#define _TK_OVRST8      1022
+#define _TK_SHLX        1023
+#define _TK_SHLDE       1024
+#define _TK_LHLX        1025
+#define _TK_LHLDE       1026
+#define _TK_CEQ         1027
+#define _TK_C_EQ        1028
+#define _TK_CNE         1029
+#define _TK_C_NE        1030
+#define _TK_JEQ         1031
+#define _TK_J_EQ        1032
+#define _TK_JNE         1033
+#define _TK_J_NE        1034
+#define _TK_REQ         1035
+#define _TK_R_EQ        1036
+#define _TK_RNE         1037
+#define _TK_R_NE        1038
+#define _TK_C_LTU       1039
+#define _TK_CLTU        1040
+#define _TK_C_LEU       1041
+#define _TK_CLEU        1042
+#define _TK_C_GTU       1043
+#define _TK_CGTU        1044
+#define _TK_C_GEU       1045
+#define _TK_CGEU        1046
+#define _TK_J_LTU       1047
+#define _TK_JLTU        1048
+#define _TK_J_LEU       1049
+#define _TK_JLEU        1050
+#define _TK_J_GTU       1051
+#define _TK_JGTU        1052
+#define _TK_J_GEU       1053
+#define _TK_JGEU        1054
+#define _TK_R_LTU       1055
+#define _TK_RLTU        1056
+#define _TK_R_LEU       1057
+#define _TK_RLEU        1058
+#define _TK_R_GTU       1059
+#define _TK_RGTU        1060
+#define _TK_R_GEU       1061
+#define _TK_RGEU        1062
+#define _TK_C_LT        1063
+#define _TK_CLT         1064
+#define _TK_C_LE        1065
+#define _TK_CLE         1066
+#define _TK_C_GT        1067
+#define _TK_CGT         1068
+#define _TK_C_GE        1069
+#define _TK_CGE         1070
+#define _TK_J_LT        1071
+#define _TK_JLT         1072
+#define _TK_J_LE        1073
+#define _TK_JLE         1074
+#define _TK_J_GT        1075
+#define _TK_JGT         1076
+#define _TK_J_GE        1077
+#define _TK_JGE         1078
+#define _TK_R_LT        1079
+#define _TK_RLT         1080
+#define _TK_R_LE        1081
+#define _TK_RLE         1082
+#define _TK_R_GT        1083
+#define _TK_RGT         1084
+#define _TK_R_GE        1085
+#define _TK_RGE         1086
+#define _TK_MULUB       1087
+#define _TK_MULUW       1088
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t {
@@ -1016,936 +1133,1053 @@ typedef enum tokid_t {
     TK_RCURLY           = 38,
     TK_BIN_NOT          = 39,
     TK_IND_C            = 40,
-    TK_IND_BC           = 41,
-    TK_IND_DE           = 42,
-    TK_IND_HL           = 43,
-    TK_IND_SP           = 44,
-    TK_IND_IX           = 45,
-    TK_IND_IY           = 46,
-    TK_IND_HLI          = 47,
-    TK_IND_HLD          = 48,
-    TK_ASMPC            = 49,
-    TK_CALL_NZ          = 50,
-    TK_CALL_Z           = 51,
-    TK_CALL_NC          = 52,
-    TK_CALL_C           = 53,
-    TK_CALL_PO          = 54,
-    TK_CALL_PE          = 55,
-    TK_CALL_P           = 56,
-    TK_CALL_M           = 57,
-    TK_CALL_LZ          = 58,
-    TK_CALL_LO          = 59,
-    TK_CALL_NV          = 60,
-    TK_CALL_V           = 61,
-    TK_CALL_NK          = 62,
-    TK_CALL_K           = 63,
-    TK_CALL_NX5         = 64,
-    TK_CALL_X5          = 65,
-    TK_CALL_NE          = 66,
-    TK_CALL_EQ          = 67,
-    TK_CALL_LTU         = 68,
-    TK_CALL_LEU         = 69,
-    TK_CALL_GTU         = 70,
-    TK_CALL_GEU         = 71,
-    TK_CALL_LT          = 72,
-    TK_CALL_LE          = 73,
-    TK_CALL_GT          = 74,
-    TK_CALL_GE          = 75,
-    TK_CALL_SIS_NZ      = 76,
-    TK_CALL_SIS_Z       = 77,
-    TK_CALL_SIS_NC      = 78,
-    TK_CALL_SIS_C       = 79,
-    TK_CALL_SIS_PO      = 80,
-    TK_CALL_SIS_PE      = 81,
-    TK_CALL_SIS_P       = 82,
-    TK_CALL_SIS_M       = 83,
-    TK_CALL_SIS_LZ      = 84,
-    TK_CALL_SIS_LO      = 85,
-    TK_CALL_SIS_NV      = 86,
-    TK_CALL_SIS_V       = 87,
-    TK_CALL_SIS_NK      = 88,
-    TK_CALL_SIS_K       = 89,
-    TK_CALL_SIS_NX5     = 90,
-    TK_CALL_SIS_X5      = 91,
-    TK_CALL_SIS_NE      = 92,
-    TK_CALL_SIS_EQ      = 93,
-    TK_CALL_SIS_LTU     = 94,
-    TK_CALL_SIS_LEU     = 95,
-    TK_CALL_SIS_GTU     = 96,
-    TK_CALL_SIS_GEU     = 97,
-    TK_CALL_SIS_LT      = 98,
-    TK_CALL_SIS_LE      = 99,
-    TK_CALL_SIS_GT      = 100,
-    TK_CALL_SIS_GE      = 101,
-    TK_CALL_SIL_NZ      = 102,
-    TK_CALL_SIL_Z       = 103,
-    TK_CALL_SIL_NC      = 104,
-    TK_CALL_SIL_C       = 105,
-    TK_CALL_SIL_PO      = 106,
-    TK_CALL_SIL_PE      = 107,
-    TK_CALL_SIL_P       = 108,
-    TK_CALL_SIL_M       = 109,
-    TK_CALL_SIL_LZ      = 110,
-    TK_CALL_SIL_LO      = 111,
-    TK_CALL_SIL_NV      = 112,
-    TK_CALL_SIL_V       = 113,
-    TK_CALL_SIL_NK      = 114,
-    TK_CALL_SIL_K       = 115,
-    TK_CALL_SIL_NX5     = 116,
-    TK_CALL_SIL_X5      = 117,
-    TK_CALL_SIL_NE      = 118,
-    TK_CALL_SIL_EQ      = 119,
-    TK_CALL_SIL_LTU     = 120,
-    TK_CALL_SIL_LEU     = 121,
-    TK_CALL_SIL_GTU     = 122,
-    TK_CALL_SIL_GEU     = 123,
-    TK_CALL_SIL_LT      = 124,
-    TK_CALL_SIL_LE      = 125,
-    TK_CALL_SIL_GT      = 126,
-    TK_CALL_SIL_GE      = 127,
-    TK_CALL_LIS_NZ      = 128,
-    TK_CALL_LIS_Z       = 129,
-    TK_CALL_LIS_NC      = 130,
-    TK_CALL_LIS_C       = 131,
-    TK_CALL_LIS_PO      = 132,
-    TK_CALL_LIS_PE      = 133,
-    TK_CALL_LIS_P       = 134,
-    TK_CALL_LIS_M       = 135,
-    TK_CALL_LIS_LZ      = 136,
-    TK_CALL_LIS_LO      = 137,
-    TK_CALL_LIS_NV      = 138,
-    TK_CALL_LIS_V       = 139,
-    TK_CALL_LIS_NK      = 140,
-    TK_CALL_LIS_K       = 141,
-    TK_CALL_LIS_NX5     = 142,
-    TK_CALL_LIS_X5      = 143,
-    TK_CALL_LIS_NE      = 144,
-    TK_CALL_LIS_EQ      = 145,
-    TK_CALL_LIS_LTU     = 146,
-    TK_CALL_LIS_LEU     = 147,
-    TK_CALL_LIS_GTU     = 148,
-    TK_CALL_LIS_GEU     = 149,
-    TK_CALL_LIS_LT      = 150,
-    TK_CALL_LIS_LE      = 151,
-    TK_CALL_LIS_GT      = 152,
-    TK_CALL_LIS_GE      = 153,
-    TK_CALL_LIL_NZ      = 154,
-    TK_CALL_LIL_Z       = 155,
-    TK_CALL_LIL_NC      = 156,
-    TK_CALL_LIL_C       = 157,
-    TK_CALL_LIL_PO      = 158,
-    TK_CALL_LIL_PE      = 159,
-    TK_CALL_LIL_P       = 160,
-    TK_CALL_LIL_M       = 161,
-    TK_CALL_LIL_LZ      = 162,
-    TK_CALL_LIL_LO      = 163,
-    TK_CALL_LIL_NV      = 164,
-    TK_CALL_LIL_V       = 165,
-    TK_CALL_LIL_NK      = 166,
-    TK_CALL_LIL_K       = 167,
-    TK_CALL_LIL_NX5     = 168,
-    TK_CALL_LIL_X5      = 169,
-    TK_CALL_LIL_NE      = 170,
-    TK_CALL_LIL_EQ      = 171,
-    TK_CALL_LIL_LTU     = 172,
-    TK_CALL_LIL_LEU     = 173,
-    TK_CALL_LIL_GTU     = 174,
-    TK_CALL_LIL_GEU     = 175,
-    TK_CALL_LIL_LT      = 176,
-    TK_CALL_LIL_LE      = 177,
-    TK_CALL_LIL_GT      = 178,
-    TK_CALL_LIL_GE      = 179,
-    TK_CALL_IS_NZ       = 180,
-    TK_CALL_IS_Z        = 181,
-    TK_CALL_IS_NC       = 182,
-    TK_CALL_IS_C        = 183,
-    TK_CALL_IS_PO       = 184,
-    TK_CALL_IS_PE       = 185,
-    TK_CALL_IS_P        = 186,
-    TK_CALL_IS_M        = 187,
-    TK_CALL_IS_LZ       = 188,
-    TK_CALL_IS_LO       = 189,
-    TK_CALL_IS_NV       = 190,
-    TK_CALL_IS_V        = 191,
-    TK_CALL_IS_NK       = 192,
-    TK_CALL_IS_K        = 193,
-    TK_CALL_IS_NX5      = 194,
-    TK_CALL_IS_X5       = 195,
-    TK_CALL_IS_NE       = 196,
-    TK_CALL_IS_EQ       = 197,
-    TK_CALL_IS_LTU      = 198,
-    TK_CALL_IS_LEU      = 199,
-    TK_CALL_IS_GTU      = 200,
-    TK_CALL_IS_GEU      = 201,
-    TK_CALL_IS_LT       = 202,
-    TK_CALL_IS_LE       = 203,
-    TK_CALL_IS_GT       = 204,
-    TK_CALL_IS_GE       = 205,
-    TK_CALL_IL_NZ       = 206,
-    TK_CALL_IL_Z        = 207,
-    TK_CALL_IL_NC       = 208,
-    TK_CALL_IL_C        = 209,
-    TK_CALL_IL_PO       = 210,
-    TK_CALL_IL_PE       = 211,
-    TK_CALL_IL_P        = 212,
-    TK_CALL_IL_M        = 213,
-    TK_CALL_IL_LZ       = 214,
-    TK_CALL_IL_LO       = 215,
-    TK_CALL_IL_NV       = 216,
-    TK_CALL_IL_V        = 217,
-    TK_CALL_IL_NK       = 218,
-    TK_CALL_IL_K        = 219,
-    TK_CALL_IL_NX5      = 220,
-    TK_CALL_IL_X5       = 221,
-    TK_CALL_IL_NE       = 222,
-    TK_CALL_IL_EQ       = 223,
-    TK_CALL_IL_LTU      = 224,
-    TK_CALL_IL_LEU      = 225,
-    TK_CALL_IL_GTU      = 226,
-    TK_CALL_IL_GEU      = 227,
-    TK_CALL_IL_LT       = 228,
-    TK_CALL_IL_LE       = 229,
-    TK_CALL_IL_GT       = 230,
-    TK_CALL_IL_GE       = 231,
-    TK_JR_NZ            = 232,
-    TK_JR_Z             = 233,
-    TK_JR_NC            = 234,
-    TK_JR_C             = 235,
-    TK_JR_PO            = 236,
-    TK_JR_PE            = 237,
-    TK_JR_P             = 238,
-    TK_JR_M             = 239,
-    TK_JR_LZ            = 240,
-    TK_JR_LO            = 241,
-    TK_JR_NV            = 242,
-    TK_JR_V             = 243,
-    TK_JR_NK            = 244,
-    TK_JR_K             = 245,
-    TK_JR_NX5           = 246,
-    TK_JR_X5            = 247,
-    TK_JR_NE            = 248,
-    TK_JR_EQ            = 249,
-    TK_JR_LTU           = 250,
-    TK_JR_LEU           = 251,
-    TK_JR_GTU           = 252,
-    TK_JR_GEU           = 253,
-    TK_JR_LT            = 254,
-    TK_JR_LE            = 255,
-    TK_JR_GT            = 256,
-    TK_JR_GE            = 257,
-    TK_JP_NZ            = 258,
-    TK_JP_Z             = 259,
-    TK_JP_NC            = 260,
-    TK_JP_C             = 261,
-    TK_JP_PO            = 262,
-    TK_JP_PE            = 263,
-    TK_JP_P             = 264,
-    TK_JP_M             = 265,
-    TK_JP_LZ            = 266,
-    TK_JP_LO            = 267,
-    TK_JP_NV            = 268,
-    TK_JP_V             = 269,
-    TK_JP_NK            = 270,
-    TK_JP_K             = 271,
-    TK_JP_NX5           = 272,
-    TK_JP_X5            = 273,
-    TK_JP_NE            = 274,
-    TK_JP_EQ            = 275,
-    TK_JP_LTU           = 276,
-    TK_JP_LEU           = 277,
-    TK_JP_GTU           = 278,
-    TK_JP_GEU           = 279,
-    TK_JP_LT            = 280,
-    TK_JP_LE            = 281,
-    TK_JP_GT            = 282,
-    TK_JP_GE            = 283,
-    TK_JP_SIS_NZ        = 284,
-    TK_JP_SIS_Z         = 285,
-    TK_JP_SIS_NC        = 286,
-    TK_JP_SIS_C         = 287,
-    TK_JP_SIS_PO        = 288,
-    TK_JP_SIS_PE        = 289,
-    TK_JP_SIS_P         = 290,
-    TK_JP_SIS_M         = 291,
-    TK_JP_SIS_LZ        = 292,
-    TK_JP_SIS_LO        = 293,
-    TK_JP_SIS_NV        = 294,
-    TK_JP_SIS_V         = 295,
-    TK_JP_SIS_NK        = 296,
-    TK_JP_SIS_K         = 297,
-    TK_JP_SIS_NX5       = 298,
-    TK_JP_SIS_X5        = 299,
-    TK_JP_SIS_NE        = 300,
-    TK_JP_SIS_EQ        = 301,
-    TK_JP_SIS_LTU       = 302,
-    TK_JP_SIS_LEU       = 303,
-    TK_JP_SIS_GTU       = 304,
-    TK_JP_SIS_GEU       = 305,
-    TK_JP_SIS_LT        = 306,
-    TK_JP_SIS_LE        = 307,
-    TK_JP_SIS_GT        = 308,
-    TK_JP_SIS_GE        = 309,
-    TK_JP_LIL_NZ        = 310,
-    TK_JP_LIL_Z         = 311,
-    TK_JP_LIL_NC        = 312,
-    TK_JP_LIL_C         = 313,
-    TK_JP_LIL_PO        = 314,
-    TK_JP_LIL_PE        = 315,
-    TK_JP_LIL_P         = 316,
-    TK_JP_LIL_M         = 317,
-    TK_JP_LIL_LZ        = 318,
-    TK_JP_LIL_LO        = 319,
-    TK_JP_LIL_NV        = 320,
-    TK_JP_LIL_V         = 321,
-    TK_JP_LIL_NK        = 322,
-    TK_JP_LIL_K         = 323,
-    TK_JP_LIL_NX5       = 324,
-    TK_JP_LIL_X5        = 325,
-    TK_JP_LIL_NE        = 326,
-    TK_JP_LIL_EQ        = 327,
-    TK_JP_LIL_LTU       = 328,
-    TK_JP_LIL_LEU       = 329,
-    TK_JP_LIL_GTU       = 330,
-    TK_JP_LIL_GEU       = 331,
-    TK_JP_LIL_LT        = 332,
-    TK_JP_LIL_LE        = 333,
-    TK_JP_LIL_GT        = 334,
-    TK_JP_LIL_GE        = 335,
-    TK_JMP_NZ           = 336,
-    TK_JMP_Z            = 337,
-    TK_JMP_NC           = 338,
-    TK_JMP_C            = 339,
-    TK_JMP_PO           = 340,
-    TK_JMP_PE           = 341,
-    TK_JMP_P            = 342,
-    TK_JMP_M            = 343,
-    TK_JMP_LZ           = 344,
-    TK_JMP_LO           = 345,
-    TK_JMP_NV           = 346,
-    TK_JMP_V            = 347,
-    TK_JMP_NK           = 348,
-    TK_JMP_K            = 349,
-    TK_JMP_NX5          = 350,
-    TK_JMP_X5           = 351,
-    TK_JMP_NE           = 352,
-    TK_JMP_EQ           = 353,
-    TK_JMP_LTU          = 354,
-    TK_JMP_LEU          = 355,
-    TK_JMP_GTU          = 356,
-    TK_JMP_GEU          = 357,
-    TK_JMP_LT           = 358,
-    TK_JMP_LE           = 359,
-    TK_JMP_GT           = 360,
-    TK_JMP_GE           = 361,
-    TK_JMP_SIS_NZ       = 362,
-    TK_JMP_SIS_Z        = 363,
-    TK_JMP_SIS_NC       = 364,
-    TK_JMP_SIS_C        = 365,
-    TK_JMP_SIS_PO       = 366,
-    TK_JMP_SIS_PE       = 367,
-    TK_JMP_SIS_P        = 368,
-    TK_JMP_SIS_M        = 369,
-    TK_JMP_SIS_LZ       = 370,
-    TK_JMP_SIS_LO       = 371,
-    TK_JMP_SIS_NV       = 372,
-    TK_JMP_SIS_V        = 373,
-    TK_JMP_SIS_NK       = 374,
-    TK_JMP_SIS_K        = 375,
-    TK_JMP_SIS_NX5      = 376,
-    TK_JMP_SIS_X5       = 377,
-    TK_JMP_SIS_NE       = 378,
-    TK_JMP_SIS_EQ       = 379,
-    TK_JMP_SIS_LTU      = 380,
-    TK_JMP_SIS_LEU      = 381,
-    TK_JMP_SIS_GTU      = 382,
-    TK_JMP_SIS_GEU      = 383,
-    TK_JMP_SIS_LT       = 384,
-    TK_JMP_SIS_LE       = 385,
-    TK_JMP_SIS_GT       = 386,
-    TK_JMP_SIS_GE       = 387,
-    TK_JMP_LIL_NZ       = 388,
-    TK_JMP_LIL_Z        = 389,
-    TK_JMP_LIL_NC       = 390,
-    TK_JMP_LIL_C        = 391,
-    TK_JMP_LIL_PO       = 392,
-    TK_JMP_LIL_PE       = 393,
-    TK_JMP_LIL_P        = 394,
-    TK_JMP_LIL_M        = 395,
-    TK_JMP_LIL_LZ       = 396,
-    TK_JMP_LIL_LO       = 397,
-    TK_JMP_LIL_NV       = 398,
-    TK_JMP_LIL_V        = 399,
-    TK_JMP_LIL_NK       = 400,
-    TK_JMP_LIL_K        = 401,
-    TK_JMP_LIL_NX5      = 402,
-    TK_JMP_LIL_X5       = 403,
-    TK_JMP_LIL_NE       = 404,
-    TK_JMP_LIL_EQ       = 405,
-    TK_JMP_LIL_LTU      = 406,
-    TK_JMP_LIL_LEU      = 407,
-    TK_JMP_LIL_GTU      = 408,
-    TK_JMP_LIL_GEU      = 409,
-    TK_JMP_LIL_LT       = 410,
-    TK_JMP_LIL_LE       = 411,
-    TK_JMP_LIL_GT       = 412,
-    TK_JMP_LIL_GE       = 413,
-    TK_RET_NZ           = 414,
-    TK_RET_Z            = 415,
-    TK_RET_NC           = 416,
-    TK_RET_C            = 417,
-    TK_RET_PO           = 418,
-    TK_RET_PE           = 419,
-    TK_RET_P            = 420,
-    TK_RET_M            = 421,
-    TK_RET_LZ           = 422,
-    TK_RET_LO           = 423,
-    TK_RET_NV           = 424,
-    TK_RET_V            = 425,
-    TK_RET_NK           = 426,
-    TK_RET_K            = 427,
-    TK_RET_NX5          = 428,
-    TK_RET_X5           = 429,
-    TK_RET_NE           = 430,
-    TK_RET_EQ           = 431,
-    TK_RET_LTU          = 432,
-    TK_RET_LEU          = 433,
-    TK_RET_GTU          = 434,
-    TK_RET_GEU          = 435,
-    TK_RET_LT           = 436,
-    TK_RET_LE           = 437,
-    TK_RET_GT           = 438,
-    TK_RET_GE           = 439,
-    TK_RET_L_NZ         = 440,
-    TK_RET_L_Z          = 441,
-    TK_RET_L_NC         = 442,
-    TK_RET_L_C          = 443,
-    TK_RET_L_PO         = 444,
-    TK_RET_L_PE         = 445,
-    TK_RET_L_P          = 446,
-    TK_RET_L_M          = 447,
-    TK_RET_L_LZ         = 448,
-    TK_RET_L_LO         = 449,
-    TK_RET_L_NV         = 450,
-    TK_RET_L_V          = 451,
-    TK_RET_L_NK         = 452,
-    TK_RET_L_K          = 453,
-    TK_RET_L_NX5        = 454,
-    TK_RET_L_X5         = 455,
-    TK_RET_L_NE         = 456,
-    TK_RET_L_EQ         = 457,
-    TK_RET_L_LTU        = 458,
-    TK_RET_L_LEU        = 459,
-    TK_RET_L_GTU        = 460,
-    TK_RET_L_GEU        = 461,
-    TK_RET_L_LT         = 462,
-    TK_RET_L_LE         = 463,
-    TK_RET_L_GT         = 464,
-    TK_RET_L_GE         = 465,
-    TK_RET_LIS_NZ       = 466,
-    TK_RET_LIS_Z        = 467,
-    TK_RET_LIS_NC       = 468,
-    TK_RET_LIS_C        = 469,
-    TK_RET_LIS_PO       = 470,
-    TK_RET_LIS_PE       = 471,
-    TK_RET_LIS_P        = 472,
-    TK_RET_LIS_M        = 473,
-    TK_RET_LIS_LZ       = 474,
-    TK_RET_LIS_LO       = 475,
-    TK_RET_LIS_NV       = 476,
-    TK_RET_LIS_V        = 477,
-    TK_RET_LIS_NK       = 478,
-    TK_RET_LIS_K        = 479,
-    TK_RET_LIS_NX5      = 480,
-    TK_RET_LIS_X5       = 481,
-    TK_RET_LIS_NE       = 482,
-    TK_RET_LIS_EQ       = 483,
-    TK_RET_LIS_LTU      = 484,
-    TK_RET_LIS_LEU      = 485,
-    TK_RET_LIS_GTU      = 486,
-    TK_RET_LIS_GEU      = 487,
-    TK_RET_LIS_LT       = 488,
-    TK_RET_LIS_LE       = 489,
-    TK_RET_LIS_GT       = 490,
-    TK_RET_LIS_GE       = 491,
-    TK_RET_LIL_NZ       = 492,
-    TK_RET_LIL_Z        = 493,
-    TK_RET_LIL_NC       = 494,
-    TK_RET_LIL_C        = 495,
-    TK_RET_LIL_PO       = 496,
-    TK_RET_LIL_PE       = 497,
-    TK_RET_LIL_P        = 498,
-    TK_RET_LIL_M        = 499,
-    TK_RET_LIL_LZ       = 500,
-    TK_RET_LIL_LO       = 501,
-    TK_RET_LIL_NV       = 502,
-    TK_RET_LIL_V        = 503,
-    TK_RET_LIL_NK       = 504,
-    TK_RET_LIL_K        = 505,
-    TK_RET_LIL_NX5      = 506,
-    TK_RET_LIL_X5       = 507,
-    TK_RET_LIL_NE       = 508,
-    TK_RET_LIL_EQ       = 509,
-    TK_RET_LIL_LTU      = 510,
-    TK_RET_LIL_LEU      = 511,
-    TK_RET_LIL_GTU      = 512,
-    TK_RET_LIL_GEU      = 513,
-    TK_RET_LIL_LT       = 514,
-    TK_RET_LIL_LE       = 515,
-    TK_RET_LIL_GT       = 516,
-    TK_RET_LIL_GE       = 517,
-    TK_RST_V            = 518,
-    TK_B                = 519,
-    TK_C                = 520,
-    TK_D                = 521,
-    TK_E                = 522,
-    TK_H                = 523,
-    TK_L                = 524,
-    TK_A                = 525,
-    TK_F                = 526,
-    TK_I                = 527,
-    TK_R                = 528,
-    TK_M                = 529,
-    TK_IIR              = 530,
-    TK_EIR              = 531,
-    TK_XPC              = 532,
-    TK_IXH              = 533,
-    TK_IYH              = 534,
-    TK_IXL              = 535,
-    TK_IYL              = 536,
-    TK_X                = 537,
-    TK_BC               = 538,
-    TK_DE               = 539,
-    TK_HL               = 540,
-    TK_IX               = 541,
-    TK_IY               = 542,
-    TK_AF               = 543,
-    TK_SP               = 544,
-    TK_PSW              = 545,
-    TK_B1               = 546,
-    TK_C1               = 547,
-    TK_D1               = 548,
-    TK_E1               = 549,
-    TK_H1               = 550,
-    TK_L1               = 551,
-    TK_A1               = 552,
-    TK_F1               = 553,
-    TK_BC1              = 554,
-    TK_DE1              = 555,
-    TK_HL1              = 556,
-    TK_AF1              = 557,
-    TK_ADL              = 558,
-    TK_S                = 559,
-    TK_IS               = 560,
-    TK_IL               = 561,
-    TK_SIS              = 562,
-    TK_LIL              = 563,
-    TK_LIS              = 564,
-    TK_SIL              = 565,
-    TK_MB               = 566,
-    TK_LEA              = 567,
-    TK_PEA              = 568,
-    TK_RSMIX            = 569,
-    TK_STMIX            = 570,
-    TK_INI2             = 571,
-    TK_INI2R            = 572,
-    TK_IND2             = 573,
-    TK_IND2R            = 574,
-    TK_INIM             = 575,
-    TK_INIMR            = 576,
-    TK_INDM             = 577,
-    TK_INDMR            = 578,
-    TK_INIRX            = 579,
-    TK_INDRX            = 580,
-    TK_OTD2R            = 581,
-    TK_OTDRX            = 582,
-    TK_OTI2R            = 583,
-    TK_OTIRX            = 584,
-    TK_OUTD2            = 585,
-    TK_OUTI2            = 586,
-    TK_ALIGN            = 587,
-    TK_ASSERT           = 588,
-    TK_ASSUME           = 589,
-    TK_BYTE             = 590,
-    TK_C_LINE           = 591,
-    TK_DB               = 592,
-    TK_DC               = 593,
-    TK_DDB              = 594,
-    TK_DEFB             = 595,
-    TK_DEFC             = 596,
-    TK_DEFDB            = 597,
-    TK_DEFGROUP         = 598,
-    TK_DEFINE           = 599,
-    TK_DEFM             = 600,
-    TK_DEFP             = 601,
-    TK_DEFQ             = 602,
-    TK_DEFS             = 603,
-    TK_DEFVARS          = 604,
-    TK_DEFW             = 605,
-    TK_DEPHASE          = 606,
-    TK_DM               = 607,
-    TK_DP               = 608,
-    TK_DQ               = 609,
-    TK_DS               = 610,
-    TK_DW               = 611,
-    TK_DWORD            = 612,
-    TK_EQU              = 613,
-    TK_EXTERN           = 614,
-    TK_GLOBAL           = 615,
-    TK_LIB              = 616,
-    TK_LINE             = 617,
-    TK_LSTOFF           = 618,
-    TK_LSTON            = 619,
-    TK_MODULE           = 620,
-    TK_ORG              = 621,
-    TK_PHASE            = 622,
-    TK_PTR              = 623,
-    TK_PUBLIC           = 624,
-    TK_SECTION          = 625,
-    TK_UNDEFINE         = 626,
-    TK_WORD             = 627,
-    TK_XDEF             = 628,
-    TK_XLIB             = 629,
-    TK_XREF             = 630,
-    TK_DS_B             = 631,
-    TK_DS_W             = 632,
-    TK_DS_P             = 633,
-    TK_DS_Q             = 634,
-    TK_ADC              = 635,
-    TK_ADD              = 636,
-    TK_AND              = 637,
-    TK_BIT              = 638,
-    TK_CALL             = 639,
-    TK_CCF              = 640,
-    TK_CCF1             = 641,
-    TK_CP               = 642,
-    TK_CPD              = 643,
-    TK_CPDR             = 644,
-    TK_CPI              = 645,
-    TK_CPIR             = 646,
-    TK_CPL              = 647,
-    TK_DAA              = 648,
-    TK_DEC              = 649,
-    TK_DI               = 650,
-    TK_DJNZ             = 651,
-    TK_EI               = 652,
-    TK_EX               = 653,
-    TK_EXX              = 654,
-    TK_HALT             = 655,
-    TK_IM               = 656,
-    TK_IN               = 657,
-    TK_INC              = 658,
-    TK_IND              = 659,
-    TK_INDR             = 660,
-    TK_INI              = 661,
-    TK_INIR             = 662,
-    TK_JP               = 663,
-    TK_JR               = 664,
-    TK_LD               = 665,
-    TK_LDH              = 666,
-    TK_LDHL             = 667,
-    TK_LDD              = 668,
-    TK_LDDR             = 669,
-    TK_LDI              = 670,
-    TK_LDIR             = 671,
-    TK_NEG              = 672,
-    TK_NOP              = 673,
-    TK_OR               = 674,
-    TK_OTDR             = 675,
-    TK_OTIR             = 676,
-    TK_OUT              = 677,
-    TK_OUTD             = 678,
-    TK_OUTI             = 679,
-    TK_POP              = 680,
-    TK_PUSH             = 681,
-    TK_RES              = 682,
-    TK_RET              = 683,
-    TK_RETI             = 684,
-    TK_RETN             = 685,
-    TK_RL               = 686,
-    TK_RLA              = 687,
-    TK_RLA1             = 688,
-    TK_RLC              = 689,
-    TK_RLCA             = 690,
-    TK_RLCA1            = 691,
-    TK_RLD              = 692,
-    TK_RR               = 693,
-    TK_RRA              = 694,
-    TK_RRA1             = 695,
-    TK_RRC              = 696,
-    TK_RRCA             = 697,
-    TK_RRCA1            = 698,
-    TK_RRD              = 699,
-    TK_RST              = 700,
-    TK_SBC              = 701,
-    TK_SCF              = 702,
-    TK_SCF1             = 703,
-    TK_SET              = 704,
-    TK_SLA              = 705,
-    TK_SLL              = 706,
-    TK_SLS              = 707,
-    TK_SLI              = 708,
-    TK_SRA              = 709,
-    TK_SRL              = 710,
-    TK_STOP             = 711,
-    TK_SUB              = 712,
-    TK_XOR              = 713,
-    TK_SWAPNIB          = 714,
-    TK_SWAP             = 715,
-    TK_OUTINB           = 716,
-    TK_LDIX             = 717,
-    TK_LDIRX            = 718,
-    TK_LDDX             = 719,
-    TK_LDDRX            = 720,
-    TK_LDIRSCALE        = 721,
-    TK_LDPIRX           = 722,
-    TK_LDWS             = 723,
-    TK_FILL             = 724,
-    TK_FILLDE           = 725,
-    TK_MIRROR           = 726,
-    TK_NEXTREG          = 727,
-    TK_PIXELDN          = 728,
-    TK_PIXELAD          = 729,
-    TK_SETAE            = 730,
-    TK_TEST             = 731,
-    TK_MMU              = 732,
-    TK_MMU0             = 733,
-    TK_MMU1             = 734,
-    TK_MMU2             = 735,
-    TK_MMU3             = 736,
-    TK_MMU4             = 737,
-    TK_MMU5             = 738,
-    TK_MMU6             = 739,
-    TK_MMU7             = 740,
-    TK_CU_WAIT          = 741,
-    TK_CU_MOVE          = 742,
-    TK_CU_STOP          = 743,
-    TK_CU_NOP           = 744,
-    TK_DMA_WR0          = 745,
-    TK_DMA_WR1          = 746,
-    TK_DMA_WR2          = 747,
-    TK_DMA_WR3          = 748,
-    TK_DMA_WR4          = 749,
-    TK_DMA_WR5          = 750,
-    TK_DMA_WR6          = 751,
-    TK_DMA_CMD          = 752,
-    TK_BSLA             = 753,
-    TK_BSRA             = 754,
-    TK_BSRL             = 755,
-    TK_BSRF             = 756,
-    TK_BRLC             = 757,
-    TK_LDRX             = 758,
-    TK_LIRX             = 759,
-    TK_LPRX             = 760,
-    TK_MIRR             = 761,
-    TK_NREG             = 762,
-    TK_OTIB             = 763,
-    TK_PXAD             = 764,
-    TK_PXDN             = 765,
-    TK_STAE             = 766,
-    TK_SLP              = 767,
-    TK_MLT              = 768,
-    TK_IN0              = 769,
-    TK_OUT0             = 770,
-    TK_OTIM             = 771,
-    TK_OTIMR            = 772,
-    TK_OTDM             = 773,
-    TK_OTDMR            = 774,
-    TK_TST              = 775,
-    TK_TSTIO            = 776,
-    TK_ALTD             = 777,
-    TK_BOOL             = 778,
-    TK_IOE              = 779,
-    TK_IOI              = 780,
-    TK_IPRES            = 781,
-    TK_IPSET            = 782,
-    TK_IDET             = 783,
-    TK_LDDSR            = 784,
-    TK_LDISR            = 785,
-    TK_LDP              = 786,
-    TK_LSDR             = 787,
-    TK_LSIR             = 788,
-    TK_LSDDR            = 789,
-    TK_LSIDR            = 790,
-    TK_MUL              = 791,
-    TK_IP               = 792,
-    TK_SU               = 793,
-    TK_RDMODE           = 794,
-    TK_SETUSR           = 795,
-    TK_SURES            = 796,
-    TK_SYSCALL          = 797,
-    TK_UMA              = 798,
-    TK_UMS              = 799,
-    TK_CALL_OZ          = 800,
-    TK_CALL_PKG         = 801,
-    TK_FPP              = 802,
-    TK_INVOKE           = 803,
-    TK_MOV              = 804,
-    TK_MVI              = 805,
-    TK_LXI              = 806,
-    TK_LDA              = 807,
-    TK_STA              = 808,
-    TK_LHLD             = 809,
-    TK_SHLD             = 810,
-    TK_LDAX             = 811,
-    TK_STAX             = 812,
-    TK_XCHG             = 813,
-    TK_ADI              = 814,
-    TK_ACI              = 815,
-    TK_SUI              = 816,
-    TK_SBB              = 817,
-    TK_SBI              = 818,
-    TK_INR              = 819,
-    TK_DCR              = 820,
-    TK_INX              = 821,
-    TK_DCX              = 822,
-    TK_DAD              = 823,
-    TK_ANA              = 824,
-    TK_ANI              = 825,
-    TK_ORA              = 826,
-    TK_ORI              = 827,
-    TK_XRA              = 828,
-    TK_XRI              = 829,
-    TK_CMP              = 830,
-    TK_RAL              = 831,
-    TK_RAR              = 832,
-    TK_CMA              = 833,
-    TK_CMC              = 834,
-    TK_STC              = 835,
-    TK_JMP              = 836,
-    TK_JNC              = 837,
-    TK_JC               = 838,
-    TK_JNZ              = 839,
-    TK_JZ               = 840,
-    TK_JPO              = 841,
-    TK_JPE              = 842,
-    TK_JNV              = 843,
-    TK_JV               = 844,
-    TK_JLO              = 845,
-    TK_JLZ              = 846,
-    TK_JM               = 847,
-    TK_JK               = 848,
-    TK_JX5              = 849,
-    TK_JNK              = 850,
-    TK_JNX5             = 851,
-    TK_J_NC             = 852,
-    TK_J_C              = 853,
-    TK_J_NZ             = 854,
-    TK_J_Z              = 855,
-    TK_J_PO             = 856,
-    TK_J_PE             = 857,
-    TK_J_NV             = 858,
-    TK_J_V              = 859,
-    TK_J_LO             = 860,
-    TK_J_LZ             = 861,
-    TK_J_P              = 862,
-    TK_J_M              = 863,
-    TK_J_K              = 864,
-    TK_J_X5             = 865,
-    TK_J_NK             = 866,
-    TK_J_NX5            = 867,
-    TK_CNC              = 868,
-    TK_CC               = 869,
-    TK_CNZ              = 870,
-    TK_CZ               = 871,
-    TK_CPO              = 872,
-    TK_CPE              = 873,
-    TK_CNV              = 874,
-    TK_CV               = 875,
-    TK_CLO              = 876,
-    TK_CLZ              = 877,
-    TK_CM               = 878,
-    TK_C_NC             = 879,
-    TK_C_C              = 880,
-    TK_C_NZ             = 881,
-    TK_C_Z              = 882,
-    TK_C_PO             = 883,
-    TK_C_PE             = 884,
-    TK_C_NV             = 885,
-    TK_C_V              = 886,
-    TK_C_LO             = 887,
-    TK_C_LZ             = 888,
-    TK_C_P              = 889,
-    TK_C_M              = 890,
-    TK_RNC              = 891,
-    TK_RC               = 892,
-    TK_RNZ              = 893,
-    TK_RZ               = 894,
-    TK_RPO              = 895,
-    TK_RPE              = 896,
-    TK_RNV              = 897,
-    TK_RV               = 898,
-    TK_RLO              = 899,
-    TK_RLZ              = 900,
-    TK_RP               = 901,
-    TK_RM               = 902,
-    TK_R_NC             = 903,
-    TK_R_C              = 904,
-    TK_R_NZ             = 905,
-    TK_R_Z              = 906,
-    TK_R_PO             = 907,
-    TK_R_PE             = 908,
-    TK_R_NV             = 909,
-    TK_R_V              = 910,
-    TK_R_LO             = 911,
-    TK_R_LZ             = 912,
-    TK_R_P              = 913,
-    TK_R_M              = 914,
-    TK_PCHL             = 915,
-    TK_XTHL             = 916,
-    TK_SPHL             = 917,
-    TK_HLT              = 918,
-    TK_RIM              = 919,
-    TK_SIM              = 920,
-    TK_DSUB             = 921,
-    TK_ARHL             = 922,
-    TK_RRHL             = 923,
-    TK_RDEL             = 924,
-    TK_RLDE             = 925,
-    TK_LDHI             = 926,
-    TK_LDSI             = 927,
-    TK_RSTV             = 928,
-    TK_OVRST8           = 929,
-    TK_SHLX             = 930,
-    TK_SHLDE            = 931,
-    TK_LHLX             = 932,
-    TK_LHLDE            = 933,
-    TK_CEQ              = 934,
-    TK_C_EQ             = 935,
-    TK_CNE              = 936,
-    TK_C_NE             = 937,
-    TK_JEQ              = 938,
-    TK_J_EQ             = 939,
-    TK_JNE              = 940,
-    TK_J_NE             = 941,
-    TK_REQ              = 942,
-    TK_R_EQ             = 943,
-    TK_RNE              = 944,
-    TK_R_NE             = 945,
-    TK_C_LTU            = 946,
-    TK_CLTU             = 947,
-    TK_C_LEU            = 948,
-    TK_CLEU             = 949,
-    TK_C_GTU            = 950,
-    TK_CGTU             = 951,
-    TK_C_GEU            = 952,
-    TK_CGEU             = 953,
-    TK_J_LTU            = 954,
-    TK_JLTU             = 955,
-    TK_J_LEU            = 956,
-    TK_JLEU             = 957,
-    TK_J_GTU            = 958,
-    TK_JGTU             = 959,
-    TK_J_GEU            = 960,
-    TK_JGEU             = 961,
-    TK_R_LTU            = 962,
-    TK_RLTU             = 963,
-    TK_R_LEU            = 964,
-    TK_RLEU             = 965,
-    TK_R_GTU            = 966,
-    TK_RGTU             = 967,
-    TK_R_GEU            = 968,
-    TK_RGEU             = 969,
-    TK_MULUB            = 970,
-    TK_MULUW            = 971,
+    TK_IND_HTR          = 41,
+    TK_IND_BC           = 42,
+    TK_IND_DE           = 43,
+    TK_IND_HL           = 44,
+    TK_IND_SP           = 45,
+    TK_IND_IX           = 46,
+    TK_IND_IY           = 47,
+    TK_IND_HLI          = 48,
+    TK_IND_HLD          = 49,
+    TK_IND_PW           = 50,
+    TK_IND_PX           = 51,
+    TK_IND_PY           = 52,
+    TK_IND_PZ           = 53,
+    TK_ASMPC            = 54,
+    TK_CALL_NZ          = 55,
+    TK_CALL_Z           = 56,
+    TK_CALL_NC          = 57,
+    TK_CALL_C           = 58,
+    TK_CALL_PO          = 59,
+    TK_CALL_PE          = 60,
+    TK_CALL_P           = 61,
+    TK_CALL_M           = 62,
+    TK_CALL_LZ          = 63,
+    TK_CALL_LO          = 64,
+    TK_CALL_NV          = 65,
+    TK_CALL_V           = 66,
+    TK_CALL_NK          = 67,
+    TK_CALL_K           = 68,
+    TK_CALL_NX5         = 69,
+    TK_CALL_X5          = 70,
+    TK_CALL_NE          = 71,
+    TK_CALL_EQ          = 72,
+    TK_CALL_LTU         = 73,
+    TK_CALL_LEU         = 74,
+    TK_CALL_GTU         = 75,
+    TK_CALL_GEU         = 76,
+    TK_CALL_LT          = 77,
+    TK_CALL_LE          = 78,
+    TK_CALL_GT          = 79,
+    TK_CALL_GE          = 80,
+    TK_CALL_SIS_NZ      = 81,
+    TK_CALL_SIS_Z       = 82,
+    TK_CALL_SIS_NC      = 83,
+    TK_CALL_SIS_C       = 84,
+    TK_CALL_SIS_PO      = 85,
+    TK_CALL_SIS_PE      = 86,
+    TK_CALL_SIS_P       = 87,
+    TK_CALL_SIS_M       = 88,
+    TK_CALL_SIS_LZ      = 89,
+    TK_CALL_SIS_LO      = 90,
+    TK_CALL_SIS_NV      = 91,
+    TK_CALL_SIS_V       = 92,
+    TK_CALL_SIS_NK      = 93,
+    TK_CALL_SIS_K       = 94,
+    TK_CALL_SIS_NX5     = 95,
+    TK_CALL_SIS_X5      = 96,
+    TK_CALL_SIS_NE      = 97,
+    TK_CALL_SIS_EQ      = 98,
+    TK_CALL_SIS_LTU     = 99,
+    TK_CALL_SIS_LEU     = 100,
+    TK_CALL_SIS_GTU     = 101,
+    TK_CALL_SIS_GEU     = 102,
+    TK_CALL_SIS_LT      = 103,
+    TK_CALL_SIS_LE      = 104,
+    TK_CALL_SIS_GT      = 105,
+    TK_CALL_SIS_GE      = 106,
+    TK_CALL_SIL_NZ      = 107,
+    TK_CALL_SIL_Z       = 108,
+    TK_CALL_SIL_NC      = 109,
+    TK_CALL_SIL_C       = 110,
+    TK_CALL_SIL_PO      = 111,
+    TK_CALL_SIL_PE      = 112,
+    TK_CALL_SIL_P       = 113,
+    TK_CALL_SIL_M       = 114,
+    TK_CALL_SIL_LZ      = 115,
+    TK_CALL_SIL_LO      = 116,
+    TK_CALL_SIL_NV      = 117,
+    TK_CALL_SIL_V       = 118,
+    TK_CALL_SIL_NK      = 119,
+    TK_CALL_SIL_K       = 120,
+    TK_CALL_SIL_NX5     = 121,
+    TK_CALL_SIL_X5      = 122,
+    TK_CALL_SIL_NE      = 123,
+    TK_CALL_SIL_EQ      = 124,
+    TK_CALL_SIL_LTU     = 125,
+    TK_CALL_SIL_LEU     = 126,
+    TK_CALL_SIL_GTU     = 127,
+    TK_CALL_SIL_GEU     = 128,
+    TK_CALL_SIL_LT      = 129,
+    TK_CALL_SIL_LE      = 130,
+    TK_CALL_SIL_GT      = 131,
+    TK_CALL_SIL_GE      = 132,
+    TK_CALL_LIS_NZ      = 133,
+    TK_CALL_LIS_Z       = 134,
+    TK_CALL_LIS_NC      = 135,
+    TK_CALL_LIS_C       = 136,
+    TK_CALL_LIS_PO      = 137,
+    TK_CALL_LIS_PE      = 138,
+    TK_CALL_LIS_P       = 139,
+    TK_CALL_LIS_M       = 140,
+    TK_CALL_LIS_LZ      = 141,
+    TK_CALL_LIS_LO      = 142,
+    TK_CALL_LIS_NV      = 143,
+    TK_CALL_LIS_V       = 144,
+    TK_CALL_LIS_NK      = 145,
+    TK_CALL_LIS_K       = 146,
+    TK_CALL_LIS_NX5     = 147,
+    TK_CALL_LIS_X5      = 148,
+    TK_CALL_LIS_NE      = 149,
+    TK_CALL_LIS_EQ      = 150,
+    TK_CALL_LIS_LTU     = 151,
+    TK_CALL_LIS_LEU     = 152,
+    TK_CALL_LIS_GTU     = 153,
+    TK_CALL_LIS_GEU     = 154,
+    TK_CALL_LIS_LT      = 155,
+    TK_CALL_LIS_LE      = 156,
+    TK_CALL_LIS_GT      = 157,
+    TK_CALL_LIS_GE      = 158,
+    TK_CALL_LIL_NZ      = 159,
+    TK_CALL_LIL_Z       = 160,
+    TK_CALL_LIL_NC      = 161,
+    TK_CALL_LIL_C       = 162,
+    TK_CALL_LIL_PO      = 163,
+    TK_CALL_LIL_PE      = 164,
+    TK_CALL_LIL_P       = 165,
+    TK_CALL_LIL_M       = 166,
+    TK_CALL_LIL_LZ      = 167,
+    TK_CALL_LIL_LO      = 168,
+    TK_CALL_LIL_NV      = 169,
+    TK_CALL_LIL_V       = 170,
+    TK_CALL_LIL_NK      = 171,
+    TK_CALL_LIL_K       = 172,
+    TK_CALL_LIL_NX5     = 173,
+    TK_CALL_LIL_X5      = 174,
+    TK_CALL_LIL_NE      = 175,
+    TK_CALL_LIL_EQ      = 176,
+    TK_CALL_LIL_LTU     = 177,
+    TK_CALL_LIL_LEU     = 178,
+    TK_CALL_LIL_GTU     = 179,
+    TK_CALL_LIL_GEU     = 180,
+    TK_CALL_LIL_LT      = 181,
+    TK_CALL_LIL_LE      = 182,
+    TK_CALL_LIL_GT      = 183,
+    TK_CALL_LIL_GE      = 184,
+    TK_CALL_IS_NZ       = 185,
+    TK_CALL_IS_Z        = 186,
+    TK_CALL_IS_NC       = 187,
+    TK_CALL_IS_C        = 188,
+    TK_CALL_IS_PO       = 189,
+    TK_CALL_IS_PE       = 190,
+    TK_CALL_IS_P        = 191,
+    TK_CALL_IS_M        = 192,
+    TK_CALL_IS_LZ       = 193,
+    TK_CALL_IS_LO       = 194,
+    TK_CALL_IS_NV       = 195,
+    TK_CALL_IS_V        = 196,
+    TK_CALL_IS_NK       = 197,
+    TK_CALL_IS_K        = 198,
+    TK_CALL_IS_NX5      = 199,
+    TK_CALL_IS_X5       = 200,
+    TK_CALL_IS_NE       = 201,
+    TK_CALL_IS_EQ       = 202,
+    TK_CALL_IS_LTU      = 203,
+    TK_CALL_IS_LEU      = 204,
+    TK_CALL_IS_GTU      = 205,
+    TK_CALL_IS_GEU      = 206,
+    TK_CALL_IS_LT       = 207,
+    TK_CALL_IS_LE       = 208,
+    TK_CALL_IS_GT       = 209,
+    TK_CALL_IS_GE       = 210,
+    TK_CALL_IL_NZ       = 211,
+    TK_CALL_IL_Z        = 212,
+    TK_CALL_IL_NC       = 213,
+    TK_CALL_IL_C        = 214,
+    TK_CALL_IL_PO       = 215,
+    TK_CALL_IL_PE       = 216,
+    TK_CALL_IL_P        = 217,
+    TK_CALL_IL_M        = 218,
+    TK_CALL_IL_LZ       = 219,
+    TK_CALL_IL_LO       = 220,
+    TK_CALL_IL_NV       = 221,
+    TK_CALL_IL_V        = 222,
+    TK_CALL_IL_NK       = 223,
+    TK_CALL_IL_K        = 224,
+    TK_CALL_IL_NX5      = 225,
+    TK_CALL_IL_X5       = 226,
+    TK_CALL_IL_NE       = 227,
+    TK_CALL_IL_EQ       = 228,
+    TK_CALL_IL_LTU      = 229,
+    TK_CALL_IL_LEU      = 230,
+    TK_CALL_IL_GTU      = 231,
+    TK_CALL_IL_GEU      = 232,
+    TK_CALL_IL_LT       = 233,
+    TK_CALL_IL_LE       = 234,
+    TK_CALL_IL_GT       = 235,
+    TK_CALL_IL_GE       = 236,
+    TK_JR_NZ            = 237,
+    TK_JR_Z             = 238,
+    TK_JR_NC            = 239,
+    TK_JR_C             = 240,
+    TK_JR_PO            = 241,
+    TK_JR_PE            = 242,
+    TK_JR_P             = 243,
+    TK_JR_M             = 244,
+    TK_JR_LZ            = 245,
+    TK_JR_LO            = 246,
+    TK_JR_NV            = 247,
+    TK_JR_V             = 248,
+    TK_JR_NK            = 249,
+    TK_JR_K             = 250,
+    TK_JR_NX5           = 251,
+    TK_JR_X5            = 252,
+    TK_JR_NE            = 253,
+    TK_JR_EQ            = 254,
+    TK_JR_LTU           = 255,
+    TK_JR_LEU           = 256,
+    TK_JR_GTU           = 257,
+    TK_JR_GEU           = 258,
+    TK_JR_LT            = 259,
+    TK_JR_LE            = 260,
+    TK_JR_GT            = 261,
+    TK_JR_GE            = 262,
+    TK_JRE_NZ           = 263,
+    TK_JRE_Z            = 264,
+    TK_JRE_NC           = 265,
+    TK_JRE_C            = 266,
+    TK_JRE_PO           = 267,
+    TK_JRE_PE           = 268,
+    TK_JRE_P            = 269,
+    TK_JRE_M            = 270,
+    TK_JRE_LZ           = 271,
+    TK_JRE_LO           = 272,
+    TK_JRE_NV           = 273,
+    TK_JRE_V            = 274,
+    TK_JRE_NK           = 275,
+    TK_JRE_K            = 276,
+    TK_JRE_NX5          = 277,
+    TK_JRE_X5           = 278,
+    TK_JRE_NE           = 279,
+    TK_JRE_EQ           = 280,
+    TK_JRE_LTU          = 281,
+    TK_JRE_LEU          = 282,
+    TK_JRE_GTU          = 283,
+    TK_JRE_GEU          = 284,
+    TK_JRE_LT           = 285,
+    TK_JRE_LE           = 286,
+    TK_JRE_GT           = 287,
+    TK_JRE_GE           = 288,
+    TK_JP_NZ            = 289,
+    TK_JP_Z             = 290,
+    TK_JP_NC            = 291,
+    TK_JP_C             = 292,
+    TK_JP_PO            = 293,
+    TK_JP_PE            = 294,
+    TK_JP_P             = 295,
+    TK_JP_M             = 296,
+    TK_JP_LZ            = 297,
+    TK_JP_LO            = 298,
+    TK_JP_NV            = 299,
+    TK_JP_V             = 300,
+    TK_JP_NK            = 301,
+    TK_JP_K             = 302,
+    TK_JP_NX5           = 303,
+    TK_JP_X5            = 304,
+    TK_JP_NE            = 305,
+    TK_JP_EQ            = 306,
+    TK_JP_LTU           = 307,
+    TK_JP_LEU           = 308,
+    TK_JP_GTU           = 309,
+    TK_JP_GEU           = 310,
+    TK_JP_LT            = 311,
+    TK_JP_LE            = 312,
+    TK_JP_GT            = 313,
+    TK_JP_GE            = 314,
+    TK_JP_SIS_NZ        = 315,
+    TK_JP_SIS_Z         = 316,
+    TK_JP_SIS_NC        = 317,
+    TK_JP_SIS_C         = 318,
+    TK_JP_SIS_PO        = 319,
+    TK_JP_SIS_PE        = 320,
+    TK_JP_SIS_P         = 321,
+    TK_JP_SIS_M         = 322,
+    TK_JP_SIS_LZ        = 323,
+    TK_JP_SIS_LO        = 324,
+    TK_JP_SIS_NV        = 325,
+    TK_JP_SIS_V         = 326,
+    TK_JP_SIS_NK        = 327,
+    TK_JP_SIS_K         = 328,
+    TK_JP_SIS_NX5       = 329,
+    TK_JP_SIS_X5        = 330,
+    TK_JP_SIS_NE        = 331,
+    TK_JP_SIS_EQ        = 332,
+    TK_JP_SIS_LTU       = 333,
+    TK_JP_SIS_LEU       = 334,
+    TK_JP_SIS_GTU       = 335,
+    TK_JP_SIS_GEU       = 336,
+    TK_JP_SIS_LT        = 337,
+    TK_JP_SIS_LE        = 338,
+    TK_JP_SIS_GT        = 339,
+    TK_JP_SIS_GE        = 340,
+    TK_JP_LIL_NZ        = 341,
+    TK_JP_LIL_Z         = 342,
+    TK_JP_LIL_NC        = 343,
+    TK_JP_LIL_C         = 344,
+    TK_JP_LIL_PO        = 345,
+    TK_JP_LIL_PE        = 346,
+    TK_JP_LIL_P         = 347,
+    TK_JP_LIL_M         = 348,
+    TK_JP_LIL_LZ        = 349,
+    TK_JP_LIL_LO        = 350,
+    TK_JP_LIL_NV        = 351,
+    TK_JP_LIL_V         = 352,
+    TK_JP_LIL_NK        = 353,
+    TK_JP_LIL_K         = 354,
+    TK_JP_LIL_NX5       = 355,
+    TK_JP_LIL_X5        = 356,
+    TK_JP_LIL_NE        = 357,
+    TK_JP_LIL_EQ        = 358,
+    TK_JP_LIL_LTU       = 359,
+    TK_JP_LIL_LEU       = 360,
+    TK_JP_LIL_GTU       = 361,
+    TK_JP_LIL_GEU       = 362,
+    TK_JP_LIL_LT        = 363,
+    TK_JP_LIL_LE        = 364,
+    TK_JP_LIL_GT        = 365,
+    TK_JP_LIL_GE        = 366,
+    TK_JMP_NZ           = 367,
+    TK_JMP_Z            = 368,
+    TK_JMP_NC           = 369,
+    TK_JMP_C            = 370,
+    TK_JMP_PO           = 371,
+    TK_JMP_PE           = 372,
+    TK_JMP_P            = 373,
+    TK_JMP_M            = 374,
+    TK_JMP_LZ           = 375,
+    TK_JMP_LO           = 376,
+    TK_JMP_NV           = 377,
+    TK_JMP_V            = 378,
+    TK_JMP_NK           = 379,
+    TK_JMP_K            = 380,
+    TK_JMP_NX5          = 381,
+    TK_JMP_X5           = 382,
+    TK_JMP_NE           = 383,
+    TK_JMP_EQ           = 384,
+    TK_JMP_LTU          = 385,
+    TK_JMP_LEU          = 386,
+    TK_JMP_GTU          = 387,
+    TK_JMP_GEU          = 388,
+    TK_JMP_LT           = 389,
+    TK_JMP_LE           = 390,
+    TK_JMP_GT           = 391,
+    TK_JMP_GE           = 392,
+    TK_JMP_SIS_NZ       = 393,
+    TK_JMP_SIS_Z        = 394,
+    TK_JMP_SIS_NC       = 395,
+    TK_JMP_SIS_C        = 396,
+    TK_JMP_SIS_PO       = 397,
+    TK_JMP_SIS_PE       = 398,
+    TK_JMP_SIS_P        = 399,
+    TK_JMP_SIS_M        = 400,
+    TK_JMP_SIS_LZ       = 401,
+    TK_JMP_SIS_LO       = 402,
+    TK_JMP_SIS_NV       = 403,
+    TK_JMP_SIS_V        = 404,
+    TK_JMP_SIS_NK       = 405,
+    TK_JMP_SIS_K        = 406,
+    TK_JMP_SIS_NX5      = 407,
+    TK_JMP_SIS_X5       = 408,
+    TK_JMP_SIS_NE       = 409,
+    TK_JMP_SIS_EQ       = 410,
+    TK_JMP_SIS_LTU      = 411,
+    TK_JMP_SIS_LEU      = 412,
+    TK_JMP_SIS_GTU      = 413,
+    TK_JMP_SIS_GEU      = 414,
+    TK_JMP_SIS_LT       = 415,
+    TK_JMP_SIS_LE       = 416,
+    TK_JMP_SIS_GT       = 417,
+    TK_JMP_SIS_GE       = 418,
+    TK_JMP_LIL_NZ       = 419,
+    TK_JMP_LIL_Z        = 420,
+    TK_JMP_LIL_NC       = 421,
+    TK_JMP_LIL_C        = 422,
+    TK_JMP_LIL_PO       = 423,
+    TK_JMP_LIL_PE       = 424,
+    TK_JMP_LIL_P        = 425,
+    TK_JMP_LIL_M        = 426,
+    TK_JMP_LIL_LZ       = 427,
+    TK_JMP_LIL_LO       = 428,
+    TK_JMP_LIL_NV       = 429,
+    TK_JMP_LIL_V        = 430,
+    TK_JMP_LIL_NK       = 431,
+    TK_JMP_LIL_K        = 432,
+    TK_JMP_LIL_NX5      = 433,
+    TK_JMP_LIL_X5       = 434,
+    TK_JMP_LIL_NE       = 435,
+    TK_JMP_LIL_EQ       = 436,
+    TK_JMP_LIL_LTU      = 437,
+    TK_JMP_LIL_LEU      = 438,
+    TK_JMP_LIL_GTU      = 439,
+    TK_JMP_LIL_GEU      = 440,
+    TK_JMP_LIL_LT       = 441,
+    TK_JMP_LIL_LE       = 442,
+    TK_JMP_LIL_GT       = 443,
+    TK_JMP_LIL_GE       = 444,
+    TK_RET_NZ           = 445,
+    TK_RET_Z            = 446,
+    TK_RET_NC           = 447,
+    TK_RET_C            = 448,
+    TK_RET_PO           = 449,
+    TK_RET_PE           = 450,
+    TK_RET_P            = 451,
+    TK_RET_M            = 452,
+    TK_RET_LZ           = 453,
+    TK_RET_LO           = 454,
+    TK_RET_NV           = 455,
+    TK_RET_V            = 456,
+    TK_RET_NK           = 457,
+    TK_RET_K            = 458,
+    TK_RET_NX5          = 459,
+    TK_RET_X5           = 460,
+    TK_RET_NE           = 461,
+    TK_RET_EQ           = 462,
+    TK_RET_LTU          = 463,
+    TK_RET_LEU          = 464,
+    TK_RET_GTU          = 465,
+    TK_RET_GEU          = 466,
+    TK_RET_LT           = 467,
+    TK_RET_LE           = 468,
+    TK_RET_GT           = 469,
+    TK_RET_GE           = 470,
+    TK_RET_L_NZ         = 471,
+    TK_RET_L_Z          = 472,
+    TK_RET_L_NC         = 473,
+    TK_RET_L_C          = 474,
+    TK_RET_L_PO         = 475,
+    TK_RET_L_PE         = 476,
+    TK_RET_L_P          = 477,
+    TK_RET_L_M          = 478,
+    TK_RET_L_LZ         = 479,
+    TK_RET_L_LO         = 480,
+    TK_RET_L_NV         = 481,
+    TK_RET_L_V          = 482,
+    TK_RET_L_NK         = 483,
+    TK_RET_L_K          = 484,
+    TK_RET_L_NX5        = 485,
+    TK_RET_L_X5         = 486,
+    TK_RET_L_NE         = 487,
+    TK_RET_L_EQ         = 488,
+    TK_RET_L_LTU        = 489,
+    TK_RET_L_LEU        = 490,
+    TK_RET_L_GTU        = 491,
+    TK_RET_L_GEU        = 492,
+    TK_RET_L_LT         = 493,
+    TK_RET_L_LE         = 494,
+    TK_RET_L_GT         = 495,
+    TK_RET_L_GE         = 496,
+    TK_RET_LIS_NZ       = 497,
+    TK_RET_LIS_Z        = 498,
+    TK_RET_LIS_NC       = 499,
+    TK_RET_LIS_C        = 500,
+    TK_RET_LIS_PO       = 501,
+    TK_RET_LIS_PE       = 502,
+    TK_RET_LIS_P        = 503,
+    TK_RET_LIS_M        = 504,
+    TK_RET_LIS_LZ       = 505,
+    TK_RET_LIS_LO       = 506,
+    TK_RET_LIS_NV       = 507,
+    TK_RET_LIS_V        = 508,
+    TK_RET_LIS_NK       = 509,
+    TK_RET_LIS_K        = 510,
+    TK_RET_LIS_NX5      = 511,
+    TK_RET_LIS_X5       = 512,
+    TK_RET_LIS_NE       = 513,
+    TK_RET_LIS_EQ       = 514,
+    TK_RET_LIS_LTU      = 515,
+    TK_RET_LIS_LEU      = 516,
+    TK_RET_LIS_GTU      = 517,
+    TK_RET_LIS_GEU      = 518,
+    TK_RET_LIS_LT       = 519,
+    TK_RET_LIS_LE       = 520,
+    TK_RET_LIS_GT       = 521,
+    TK_RET_LIS_GE       = 522,
+    TK_RET_LIL_NZ       = 523,
+    TK_RET_LIL_Z        = 524,
+    TK_RET_LIL_NC       = 525,
+    TK_RET_LIL_C        = 526,
+    TK_RET_LIL_PO       = 527,
+    TK_RET_LIL_PE       = 528,
+    TK_RET_LIL_P        = 529,
+    TK_RET_LIL_M        = 530,
+    TK_RET_LIL_LZ       = 531,
+    TK_RET_LIL_LO       = 532,
+    TK_RET_LIL_NV       = 533,
+    TK_RET_LIL_V        = 534,
+    TK_RET_LIL_NK       = 535,
+    TK_RET_LIL_K        = 536,
+    TK_RET_LIL_NX5      = 537,
+    TK_RET_LIL_X5       = 538,
+    TK_RET_LIL_NE       = 539,
+    TK_RET_LIL_EQ       = 540,
+    TK_RET_LIL_LTU      = 541,
+    TK_RET_LIL_LEU      = 542,
+    TK_RET_LIL_GTU      = 543,
+    TK_RET_LIL_GEU      = 544,
+    TK_RET_LIL_LT       = 545,
+    TK_RET_LIL_LE       = 546,
+    TK_RET_LIL_GT       = 547,
+    TK_RET_LIL_GE       = 548,
+    TK_RST_V            = 549,
+    TK_FLAG_NZ          = 550,
+    TK_FLAG_Z           = 551,
+    TK_FLAG_NC          = 552,
+    TK_FLAG_C           = 553,
+    TK_FLAG_PO          = 554,
+    TK_FLAG_PE          = 555,
+    TK_FLAG_P           = 556,
+    TK_FLAG_M           = 557,
+    TK_FLAG_LZ          = 558,
+    TK_FLAG_LO          = 559,
+    TK_FLAG_NV          = 560,
+    TK_FLAG_V           = 561,
+    TK_FLAG_X5          = 562,
+    TK_FLAG_NX5         = 563,
+    TK_FLAG_K           = 564,
+    TK_FLAG_NK          = 565,
+    TK_FLAG_NE          = 566,
+    TK_FLAG_EQ          = 567,
+    TK_FLAG_LTU         = 568,
+    TK_FLAG_LEU         = 569,
+    TK_FLAG_GTU         = 570,
+    TK_FLAG_GEU         = 571,
+    TK_FLAG_LT          = 572,
+    TK_FLAG_LE          = 573,
+    TK_FLAG_GT          = 574,
+    TK_FLAG_GE          = 575,
+    TK_B                = 576,
+    TK_C                = 577,
+    TK_D                = 578,
+    TK_E                = 579,
+    TK_H                = 580,
+    TK_L                = 581,
+    TK_A                = 582,
+    TK_F                = 583,
+    TK_I                = 584,
+    TK_R                = 585,
+    TK_M                = 586,
+    TK_IIR              = 587,
+    TK_EIR              = 588,
+    TK_XPC              = 589,
+    TK_IXH              = 590,
+    TK_IYH              = 591,
+    TK_IXL              = 592,
+    TK_IYL              = 593,
+    TK_HTR              = 594,
+    TK_LXPC             = 595,
+    TK_BC               = 596,
+    TK_DE               = 597,
+    TK_HL               = 598,
+    TK_JK               = 599,
+    TK_IX               = 600,
+    TK_IY               = 601,
+    TK_AF               = 602,
+    TK_SP               = 603,
+    TK_PSW              = 604,
+    TK_BCDE             = 605,
+    TK_JKHL             = 606,
+    TK_PW               = 607,
+    TK_PX               = 608,
+    TK_PY               = 609,
+    TK_PZ               = 610,
+    TK_B1               = 611,
+    TK_C1               = 612,
+    TK_D1               = 613,
+    TK_E1               = 614,
+    TK_H1               = 615,
+    TK_L1               = 616,
+    TK_A1               = 617,
+    TK_F1               = 618,
+    TK_BC1              = 619,
+    TK_DE1              = 620,
+    TK_JK1              = 621,
+    TK_HL1              = 622,
+    TK_AF1              = 623,
+    TK_BCDE1            = 624,
+    TK_JKHL1            = 625,
+    TK_PW1              = 626,
+    TK_PX1              = 627,
+    TK_PY1              = 628,
+    TK_PZ1              = 629,
+    TK_ADL              = 630,
+    TK_S                = 631,
+    TK_IS               = 632,
+    TK_IL               = 633,
+    TK_SIS              = 634,
+    TK_LIL              = 635,
+    TK_LIS              = 636,
+    TK_SIL              = 637,
+    TK_MB               = 638,
+    TK_LEA              = 639,
+    TK_PEA              = 640,
+    TK_RSMIX            = 641,
+    TK_STMIX            = 642,
+    TK_INI2             = 643,
+    TK_INI2R            = 644,
+    TK_IND2             = 645,
+    TK_IND2R            = 646,
+    TK_INIM             = 647,
+    TK_INIMR            = 648,
+    TK_INDM             = 649,
+    TK_INDMR            = 650,
+    TK_INIRX            = 651,
+    TK_INDRX            = 652,
+    TK_OTD2R            = 653,
+    TK_OTDRX            = 654,
+    TK_OTI2R            = 655,
+    TK_OTIRX            = 656,
+    TK_OUTD2            = 657,
+    TK_OUTI2            = 658,
+    TK_ALIGN            = 659,
+    TK_ASSERT           = 660,
+    TK_ASSUME           = 661,
+    TK_BYTE             = 662,
+    TK_C_LINE           = 663,
+    TK_DB               = 664,
+    TK_DC               = 665,
+    TK_DDB              = 666,
+    TK_DEFB             = 667,
+    TK_DEFC             = 668,
+    TK_DEFDB            = 669,
+    TK_DEFGROUP         = 670,
+    TK_DEFINE           = 671,
+    TK_DEFM             = 672,
+    TK_DEFP             = 673,
+    TK_DEFQ             = 674,
+    TK_DEFS             = 675,
+    TK_DEFVARS          = 676,
+    TK_DEFW             = 677,
+    TK_DEPHASE          = 678,
+    TK_DM               = 679,
+    TK_DP               = 680,
+    TK_DQ               = 681,
+    TK_DS               = 682,
+    TK_DW               = 683,
+    TK_DWORD            = 684,
+    TK_EQU              = 685,
+    TK_EXTERN           = 686,
+    TK_GLOBAL           = 687,
+    TK_LIB              = 688,
+    TK_LINE             = 689,
+    TK_LSTOFF           = 690,
+    TK_LSTON            = 691,
+    TK_MODULE           = 692,
+    TK_ORG              = 693,
+    TK_PHASE            = 694,
+    TK_PTR              = 695,
+    TK_PUBLIC           = 696,
+    TK_SECTION          = 697,
+    TK_UNDEFINE         = 698,
+    TK_WORD             = 699,
+    TK_XDEF             = 700,
+    TK_XLIB             = 701,
+    TK_XREF             = 702,
+    TK_DS_B             = 703,
+    TK_DS_W             = 704,
+    TK_DS_P             = 705,
+    TK_DS_Q             = 706,
+    TK_ADC              = 707,
+    TK_ADD              = 708,
+    TK_AND              = 709,
+    TK_BIT              = 710,
+    TK_CALL             = 711,
+    TK_CCF              = 712,
+    TK_CCF1             = 713,
+    TK_CP               = 714,
+    TK_CPD              = 715,
+    TK_CPDR             = 716,
+    TK_CPI              = 717,
+    TK_CPIR             = 718,
+    TK_CPL              = 719,
+    TK_DAA              = 720,
+    TK_DEC              = 721,
+    TK_DI               = 722,
+    TK_DJNZ             = 723,
+    TK_EI               = 724,
+    TK_EX               = 725,
+    TK_EXX              = 726,
+    TK_HALT             = 727,
+    TK_IM               = 728,
+    TK_IN               = 729,
+    TK_INC              = 730,
+    TK_IND              = 731,
+    TK_INDR             = 732,
+    TK_INI              = 733,
+    TK_INIR             = 734,
+    TK_JP               = 735,
+    TK_JR               = 736,
+    TK_LD               = 737,
+    TK_LDH              = 738,
+    TK_LDHL             = 739,
+    TK_LDD              = 740,
+    TK_LDDR             = 741,
+    TK_LDI              = 742,
+    TK_LDIR             = 743,
+    TK_NEG              = 744,
+    TK_NOP              = 745,
+    TK_OR               = 746,
+    TK_OTDR             = 747,
+    TK_OTIR             = 748,
+    TK_OUT              = 749,
+    TK_OUTD             = 750,
+    TK_OUTI             = 751,
+    TK_POP              = 752,
+    TK_PUSH             = 753,
+    TK_RES              = 754,
+    TK_RET              = 755,
+    TK_RETI             = 756,
+    TK_RETN             = 757,
+    TK_RL               = 758,
+    TK_RLA              = 759,
+    TK_RLA1             = 760,
+    TK_RLC              = 761,
+    TK_RLCA             = 762,
+    TK_RLCA1            = 763,
+    TK_RLD              = 764,
+    TK_RR               = 765,
+    TK_RRA              = 766,
+    TK_RRA1             = 767,
+    TK_RRC              = 768,
+    TK_RRCA             = 769,
+    TK_RRCA1            = 770,
+    TK_RRD              = 771,
+    TK_RST              = 772,
+    TK_SBC              = 773,
+    TK_SCF              = 774,
+    TK_SCF1             = 775,
+    TK_SET              = 776,
+    TK_SLA              = 777,
+    TK_SLL              = 778,
+    TK_SLS              = 779,
+    TK_SLI              = 780,
+    TK_SRA              = 781,
+    TK_SRL              = 782,
+    TK_STOP             = 783,
+    TK_SUB              = 784,
+    TK_XOR              = 785,
+    TK_SWAPNIB          = 786,
+    TK_SWAP             = 787,
+    TK_OUTINB           = 788,
+    TK_LDIX             = 789,
+    TK_LDIRX            = 790,
+    TK_LDDX             = 791,
+    TK_LDDRX            = 792,
+    TK_LDIRSCALE        = 793,
+    TK_LDPIRX           = 794,
+    TK_LDWS             = 795,
+    TK_FILL             = 796,
+    TK_FILLDE           = 797,
+    TK_MIRROR           = 798,
+    TK_NEXTREG          = 799,
+    TK_PIXELDN          = 800,
+    TK_PIXELAD          = 801,
+    TK_SETAE            = 802,
+    TK_TEST             = 803,
+    TK_MMU              = 804,
+    TK_MMU0             = 805,
+    TK_MMU1             = 806,
+    TK_MMU2             = 807,
+    TK_MMU3             = 808,
+    TK_MMU4             = 809,
+    TK_MMU5             = 810,
+    TK_MMU6             = 811,
+    TK_MMU7             = 812,
+    TK_CU_WAIT          = 813,
+    TK_CU_MOVE          = 814,
+    TK_CU_STOP          = 815,
+    TK_CU_NOP           = 816,
+    TK_DMA_WR0          = 817,
+    TK_DMA_WR1          = 818,
+    TK_DMA_WR2          = 819,
+    TK_DMA_WR3          = 820,
+    TK_DMA_WR4          = 821,
+    TK_DMA_WR5          = 822,
+    TK_DMA_WR6          = 823,
+    TK_DMA_CMD          = 824,
+    TK_BSLA             = 825,
+    TK_BSRA             = 826,
+    TK_BSRL             = 827,
+    TK_BSRF             = 828,
+    TK_BRLC             = 829,
+    TK_LDRX             = 830,
+    TK_LIRX             = 831,
+    TK_LPRX             = 832,
+    TK_MIRR             = 833,
+    TK_NREG             = 834,
+    TK_OTIB             = 835,
+    TK_PXAD             = 836,
+    TK_PXDN             = 837,
+    TK_STAE             = 838,
+    TK_SLP              = 839,
+    TK_MLT              = 840,
+    TK_IN0              = 841,
+    TK_OUT0             = 842,
+    TK_OTIM             = 843,
+    TK_OTIMR            = 844,
+    TK_OTDM             = 845,
+    TK_OTDMR            = 846,
+    TK_TST              = 847,
+    TK_TSTIO            = 848,
+    TK_ALTD             = 849,
+    TK_BOOL             = 850,
+    TK_IOE              = 851,
+    TK_IOI              = 852,
+    TK_IPRES            = 853,
+    TK_IPSET            = 854,
+    TK_IDET             = 855,
+    TK_LDDSR            = 856,
+    TK_LDISR            = 857,
+    TK_LDP              = 858,
+    TK_LSDR             = 859,
+    TK_LSIR             = 860,
+    TK_LSDDR            = 861,
+    TK_LSIDR            = 862,
+    TK_MUL              = 863,
+    TK_IP               = 864,
+    TK_SU               = 865,
+    TK_RDMODE           = 866,
+    TK_SETUSR           = 867,
+    TK_SURES            = 868,
+    TK_SYSCALL          = 869,
+    TK_UMA              = 870,
+    TK_UMS              = 871,
+    TK_CBM              = 872,
+    TK_CLR              = 873,
+    TK_CONVC            = 874,
+    TK_CONVD            = 875,
+    TK_COPY             = 876,
+    TK_COPYR            = 877,
+    TK_DWJNZ            = 878,
+    TK_EXP              = 879,
+    TK_FLAG             = 880,
+    TK_FSYSCALL         = 881,
+    TK_IBOX             = 882,
+    TK_JRE              = 883,
+    TK_LDF              = 884,
+    TK_LDL              = 885,
+    TK_MULU             = 886,
+    TK_RLB              = 887,
+    TK_RRB              = 888,
+    TK_SBOX             = 889,
+    TK_SETSYSP          = 890,
+    TK_SETUSRP          = 891,
+    TK_SYSRET           = 892,
+    TK_SRET             = 893,
+    TK_CALL_OZ          = 894,
+    TK_CALL_PKG         = 895,
+    TK_FPP              = 896,
+    TK_INVOKE           = 897,
+    TK_MOV              = 898,
+    TK_MVI              = 899,
+    TK_LXI              = 900,
+    TK_LDA              = 901,
+    TK_STA              = 902,
+    TK_LHLD             = 903,
+    TK_SHLD             = 904,
+    TK_LDAX             = 905,
+    TK_STAX             = 906,
+    TK_XCHG             = 907,
+    TK_ADI              = 908,
+    TK_ACI              = 909,
+    TK_SUI              = 910,
+    TK_SBB              = 911,
+    TK_SBI              = 912,
+    TK_INR              = 913,
+    TK_DCR              = 914,
+    TK_INX              = 915,
+    TK_DCX              = 916,
+    TK_DAD              = 917,
+    TK_ANA              = 918,
+    TK_ANI              = 919,
+    TK_ORA              = 920,
+    TK_ORI              = 921,
+    TK_XRA              = 922,
+    TK_XRI              = 923,
+    TK_CMP              = 924,
+    TK_RAL              = 925,
+    TK_RAR              = 926,
+    TK_CMA              = 927,
+    TK_CMC              = 928,
+    TK_STC              = 929,
+    TK_JMP              = 930,
+    TK_JNC              = 931,
+    TK_JC               = 932,
+    TK_JNZ              = 933,
+    TK_JZ               = 934,
+    TK_JPO              = 935,
+    TK_JPE              = 936,
+    TK_JNV              = 937,
+    TK_JV               = 938,
+    TK_JLO              = 939,
+    TK_JLZ              = 940,
+    TK_JM               = 941,
+    TK_JX5              = 942,
+    TK_JNK              = 943,
+    TK_JNX5             = 944,
+    TK_J_NC             = 945,
+    TK_J_C              = 946,
+    TK_J_NZ             = 947,
+    TK_J_Z              = 948,
+    TK_J_PO             = 949,
+    TK_J_PE             = 950,
+    TK_J_NV             = 951,
+    TK_J_V              = 952,
+    TK_J_LO             = 953,
+    TK_J_LZ             = 954,
+    TK_J_P              = 955,
+    TK_J_M              = 956,
+    TK_J_K              = 957,
+    TK_J_X5             = 958,
+    TK_J_NK             = 959,
+    TK_J_NX5            = 960,
+    TK_CNC              = 961,
+    TK_CC               = 962,
+    TK_CNZ              = 963,
+    TK_CZ               = 964,
+    TK_CPO              = 965,
+    TK_CPE              = 966,
+    TK_CNV              = 967,
+    TK_CV               = 968,
+    TK_CLO              = 969,
+    TK_CLZ              = 970,
+    TK_CM               = 971,
+    TK_C_NC             = 972,
+    TK_C_C              = 973,
+    TK_C_NZ             = 974,
+    TK_C_Z              = 975,
+    TK_C_PO             = 976,
+    TK_C_PE             = 977,
+    TK_C_NV             = 978,
+    TK_C_V              = 979,
+    TK_C_LO             = 980,
+    TK_C_LZ             = 981,
+    TK_C_P              = 982,
+    TK_C_M              = 983,
+    TK_RNC              = 984,
+    TK_RC               = 985,
+    TK_RNZ              = 986,
+    TK_RZ               = 987,
+    TK_RPO              = 988,
+    TK_RPE              = 989,
+    TK_RNV              = 990,
+    TK_RV               = 991,
+    TK_RLO              = 992,
+    TK_RLZ              = 993,
+    TK_RP               = 994,
+    TK_RM               = 995,
+    TK_R_NC             = 996,
+    TK_R_C              = 997,
+    TK_R_NZ             = 998,
+    TK_R_Z              = 999,
+    TK_R_PO             = 1000,
+    TK_R_PE             = 1001,
+    TK_R_NV             = 1002,
+    TK_R_V              = 1003,
+    TK_R_LO             = 1004,
+    TK_R_LZ             = 1005,
+    TK_R_P              = 1006,
+    TK_R_M              = 1007,
+    TK_PCHL             = 1008,
+    TK_XTHL             = 1009,
+    TK_SPHL             = 1010,
+    TK_HLT              = 1011,
+    TK_RIM              = 1012,
+    TK_SIM              = 1013,
+    TK_DSUB             = 1014,
+    TK_ARHL             = 1015,
+    TK_RRHL             = 1016,
+    TK_RDEL             = 1017,
+    TK_RLDE             = 1018,
+    TK_LDHI             = 1019,
+    TK_LDSI             = 1020,
+    TK_RSTV             = 1021,
+    TK_OVRST8           = 1022,
+    TK_SHLX             = 1023,
+    TK_SHLDE            = 1024,
+    TK_LHLX             = 1025,
+    TK_LHLDE            = 1026,
+    TK_CEQ              = 1027,
+    TK_C_EQ             = 1028,
+    TK_CNE              = 1029,
+    TK_C_NE             = 1030,
+    TK_JEQ              = 1031,
+    TK_J_EQ             = 1032,
+    TK_JNE              = 1033,
+    TK_J_NE             = 1034,
+    TK_REQ              = 1035,
+    TK_R_EQ             = 1036,
+    TK_RNE              = 1037,
+    TK_R_NE             = 1038,
+    TK_C_LTU            = 1039,
+    TK_CLTU             = 1040,
+    TK_C_LEU            = 1041,
+    TK_CLEU             = 1042,
+    TK_C_GTU            = 1043,
+    TK_CGTU             = 1044,
+    TK_C_GEU            = 1045,
+    TK_CGEU             = 1046,
+    TK_J_LTU            = 1047,
+    TK_JLTU             = 1048,
+    TK_J_LEU            = 1049,
+    TK_JLEU             = 1050,
+    TK_J_GTU            = 1051,
+    TK_JGTU             = 1052,
+    TK_J_GEU            = 1053,
+    TK_JGEU             = 1054,
+    TK_R_LTU            = 1055,
+    TK_RLTU             = 1056,
+    TK_R_LEU            = 1057,
+    TK_RLEU             = 1058,
+    TK_R_GTU            = 1059,
+    TK_RGTU             = 1060,
+    TK_R_GEU            = 1061,
+    TK_RGEU             = 1062,
+    TK_C_LT             = 1063,
+    TK_CLT              = 1064,
+    TK_C_LE             = 1065,
+    TK_CLE              = 1066,
+    TK_C_GT             = 1067,
+    TK_CGT              = 1068,
+    TK_C_GE             = 1069,
+    TK_CGE              = 1070,
+    TK_J_LT             = 1071,
+    TK_JLT              = 1072,
+    TK_J_LE             = 1073,
+    TK_JLE              = 1074,
+    TK_J_GT             = 1075,
+    TK_JGT              = 1076,
+    TK_J_GE             = 1077,
+    TK_JGE              = 1078,
+    TK_R_LT             = 1079,
+    TK_RLT              = 1080,
+    TK_R_LE             = 1081,
+    TK_RLE              = 1082,
+    TK_R_GT             = 1083,
+    TK_RGT              = 1084,
+    TK_R_GE             = 1085,
+    TK_RGE              = 1086,
+    TK_MULUB            = 1087,
+    TK_MULUW            = 1088,
 } tokid_t;
 #endif

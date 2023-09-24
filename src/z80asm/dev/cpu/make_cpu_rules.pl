@@ -47,7 +47,7 @@ exit 0;
 
 sub parser_tokens {
 	local($_) = @_;
-	my $jump = qr/\b(?:call|jp|jmp|jr|ret|rst)\b/i;
+	my $instr = qr/\b(?:call|jp|jmp|jr|jre|ret|rst|flag)\b/i;
 	my $am = qr/\b(?:l|il|is|lil|lis|sil|sis)\b/i;
 	my $flag = qr/\b(?:nz|z|nc|c|po|pe|p|m|lz|lo|nv|v|x5|nx5|k|nk|ne|eq|ltu|leu|gtu|geu|lt|le|gt|ge)\b/i;
 	
@@ -56,14 +56,14 @@ sub parser_tokens {
 	while (!/\G \z 				/gcx) {
 		if (/\G \s+ 			/gcx) {}
 		elsif (/\G \( (\w+)		/gcx) { push @tokens, "_TK_IND_".uc($1); }
-		elsif (/\G ($jump) \s+ ($flag) \b
+		elsif (/\G ($instr) \s+ ($flag) \b
 								/gcx) { push @tokens, "_TK_".uc($1)."_".uc($2); }
-		elsif (/\G ($jump) \s* \. \s* ($am) \s+ ($flag) \b
+		elsif (/\G ($instr) \s* \. \s* ($am) \s+ ($flag) \b
 								/gcx) { push @tokens, "_TK_".uc($1)."_".uc($2)."_".uc($3); }
 		elsif (/\G , 			/gcx) { push @tokens, "_TK_COMMA"; }
 		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
 		elsif (/\G \( %[nmh] \)	/gcx) { push @tokens, "expr"; }
-		elsif (/\G    %[snmMj]	/gcx) { push @tokens, "expr"; }
+		elsif (/\G    %[snmMjJ]	/gcx) { push @tokens, "expr"; }
 		elsif (/\G \+ %[dsu]	/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[c]		/gcx) { push @tokens, "const_expr"; }
 		elsif (/\G    (\w+)	'	/gcx) { push @tokens, "_TK_".uc($1)."1"; }
@@ -166,8 +166,42 @@ sub parse_code {
 					push @code,
 						"add_opcode_nnn(0x".fmthex($opcode).", Expr1_clone(expr), $target_offset);";
 				}
+				elsif ($count_m==4) {	
+					push @code,
+						"add_opcode_nnnn(0x".fmthex($opcode).", Expr1_clone(expr));";
+				}
 				else {	
 					die $count_m;
+				}				
+			}
+			else {
+				push @code, parse_code_opcode($cpu, $asm, @$op);
+			}
+		}
+		push @code, 
+			"OBJ_DELETE(expr);",
+			"}";
+	}
+	elsif ($bin =~ /%j [0-9A-F ]+%j/) {
+		push @code,
+			"{",
+			"DO_STMT_LABEL();",
+			"Expr1 *expr = pop_expr(ctx);";
+		for my $op (@ops) {
+			my $count_j = scalar(grep {/%j/} @$op);
+			if ($count_j) {
+				my $opcode = 0;
+				for my $i (0 .. $#$op) {
+					last if $op->[$i] =~ /%j/;
+					$opcode = ($opcode << 8) | ($op->[$i] & 0xFF);
+				}
+				
+				if ($count_j==1) {
+					push @code,
+						"add_opcode_jr(0x".fmthex($opcode).", Expr1_clone(expr));";
+				}
+				else {	
+					die $count_j;
 				}				
 			}
 			else {
@@ -276,6 +310,9 @@ sub parse_code_opcode {
 	elsif ($bin =~ s/ %h$//) {
 		$stmt = "DO_stmt_h";
 	}
+	elsif ($bin =~ s/ %m %m %m %m$//) {
+		$stmt = "DO_stmt_nnnn";
+	}
 	elsif ($bin =~ s/ %m %m %m$//) {
 		$stmt = "DO_stmt_nnn";
 	}
@@ -293,6 +330,9 @@ sub parse_code_opcode {
 	}
 	elsif ($bin =~ s/ %j$//) {
 		$stmt = "DO_stmt_jr";
+	}
+	elsif ($bin =~ s/ %J %J$//) {
+		$stmt = "DO_stmt_jre";
 	}
 	elsif ($bin =~ s/%c\((.*?)\)/expr_value/) {
 		my @values = eval($1); die "$cpu, $asm, @bin, $1" if $@;

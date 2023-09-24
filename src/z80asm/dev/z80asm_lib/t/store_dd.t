@@ -22,7 +22,6 @@ for my $dd (qw( BC DE HL SP )) {
 	
 	$ticks->add(<<END,
 					jp start
-					defs 256 ; save space for output
 			var:	defw 0
 			start:
 					ld $dd, 0x1234

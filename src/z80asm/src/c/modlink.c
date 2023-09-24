@@ -652,13 +652,23 @@ static void patch_exprs(Expr1List* exprs)
 				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
 				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
-				if (value < -128 || value > 127)
-					error_int_range(value);
-
-				patch_byte(expr->code_pos, (byte_t)value);
+                if (value < -128 || value > 127)
+                    error_int_range(value);
+                else
+                    patch_byte(expr->code_pos, (byte_t)value);
 				break;
 
-			default: xassert(0);
+            case RANGE_JRE_OFFSET:
+                asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
+                value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
+
+                if (value < -0x8000 || value > 0x7FFF)
+                    error_int_range(value);
+                else
+                    patch_word(expr->code_pos, value);
+                break;
+
+            default: xassert(0);
 			}
 
 		}

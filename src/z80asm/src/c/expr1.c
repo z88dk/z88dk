@@ -348,6 +348,7 @@ int range_size(range_t range) {
 	case RANGE_PTR24:					return 3;
 	case RANGE_HIGH_OFFSET:				return 1;
     case RANGE_ASSIGNMENT:              return 2;
+    case RANGE_JRE_OFFSET:		        return 2;
     default: xassert(0);
 	}
 

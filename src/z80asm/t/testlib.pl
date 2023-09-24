@@ -18,7 +18,7 @@ my $OBJ_FILE_VERSION = "18";
 use vars '$test', '$null', '@CPUS';
 $test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
 $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
-@CPUS = qw( z80 z80_strict z80n z180 ez80 ez80_z80 r800 r2ka r3k 8080 8085 gbz80 );
+@CPUS = qw( z80 z80_strict z80n z180 ez80 ez80_z80 r800 r2ka r3k r4k r5k 8080 8085 gbz80 );
 
 unlink_testfiles();
 
@@ -546,6 +546,12 @@ sub cpu_compatible {
 	elsif ($code_cpu eq "r3k" && $lib_cpu eq "r2ka") {
 		return 1;
 	}
+	elsif ($code_cpu eq "r4k") {
+		return 0;
+	}
+	elsif ($code_cpu eq "r5k" && $lib_cpu eq "r4k") {
+		return 1;
+	}
 	elsif ($code_cpu eq "8080") {
 		return 0;
 	}
@@ -821,9 +827,22 @@ END
 		my($self, @opts) = @_;
 		local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-		push @{$self->asm}, "jp 0\n";
-		push @opts, "" if @opts==0;
+		my $save_bytes = $self->res_addr;
 		
+		unshift @{$self->asm}, <<END;
+			IF __CPU_R4K__ || __CPU_R5K__
+				;; Enable R4K instruction mode on the R4K
+				ld      a,0xC0
+				ioi ld  (0x0420),a      ;EDMR register (p299 in R4000UM.pdf)
+			ENDIF			
+				jp 		start
+				defs 	$save_bytes		;save bytes for results
+			start:
+END
+		push @{$self->asm}, <<END;
+				jp 0
+END
+		push @opts, "" if @opts==0;
 		for my $cpu (@::CPUS) {
 			SKIP: {
 				skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;

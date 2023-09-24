@@ -27,6 +27,8 @@ the_answer = 42
 	ifdef __CPU_R800__		: defm "r800"		: endif
 	ifdef __CPU_R2KA__		: defm "r2ka"		: endif
 	ifdef __CPU_R3K__		: defm "r3k"		: endif
+	ifdef __CPU_R4K__		: defm "r4k"		: endif
+	ifdef __CPU_R5K__		: defm "r5k"		: endif
 	ifdef __CPU_Z180__		: defm "z180"		: endif
 	ifdef __CPU_Z80__		: defm "z80"		: endif
 	ifdef __CPU_Z80_STRICT__: defm "z80_strict"	: endif
@@ -112,6 +114,26 @@ Object  file test_t_issue_2320_27.1.lib at $0710: Z80RMF18
 
 Object  file test_t_issue_2320_27.1.lib at $0838: Z80RMF18
   Name: test_t_issue_2320_27.1
+  CPU:  r5k (-IXIY-soft)
+  Section "": 8 bytes
+    C $0000: 72 35 6B 2D 49 58 49 59
+  Symbols:
+    L C $0001: __CPU_R5K__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
+
+Object  file test_t_issue_2320_27.1.lib at $095C: Z80RMF18
+  Name: test_t_issue_2320_27.1
+  CPU:  r4k (-IXIY-soft)
+  Section "": 8 bytes
+    C $0000: 72 34 6B 2D 49 58 49 59
+  Symbols:
+    L C $0001: __CPU_R4K__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
+
+Object  file test_t_issue_2320_27.1.lib at $0A80: Z80RMF18
+  Name: test_t_issue_2320_27.1
   CPU:  r3k (-IXIY-soft)
   Section "": 8 bytes
     C $0000: 72 33 6B 2D 49 58 49 59
@@ -120,27 +142,7 @@ Object  file test_t_issue_2320_27.1.lib at $0838: Z80RMF18
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 
-Object  file test_t_issue_2320_27.1.lib at $095C: Z80RMF18
-  Name: test_t_issue_2320_27.1
-  CPU:  gbz80 (-IXIY-soft)
-  Section "": 10 bytes
-    C $0000: 67 62 7A 38 30 2D 49 58 49 59
-  Symbols:
-    L C $0001: __CPU_GBZ80__ (section "") (file test_t_issue_2320_27.1.asm)
-    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
-    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
-
-Object  file test_t_issue_2320_27.1.lib at $0A84: Z80RMF18
-  Name: test_t_issue_2320_27.1
-  CPU:  ez80 (-IXIY-soft)
-  Section "": 9 bytes
-    C $0000: 65 7A 38 30 2D 49 58 49 59
-  Symbols:
-    L C $0001: __CPU_EZ80_ADL__ (section "") (file test_t_issue_2320_27.1.asm)
-    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
-    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
-
-Object  file test_t_issue_2320_27.1.lib at $0BB0: Z80RMF18
+Object  file test_t_issue_2320_27.1.lib at $0BA4: Z80RMF18
   Name: test_t_issue_2320_27.1
   CPU:  r2ka (-IXIY-soft)
   Section "": 9 bytes
@@ -150,7 +152,27 @@ Object  file test_t_issue_2320_27.1.lib at $0BB0: Z80RMF18
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 
-Object  file test_t_issue_2320_27.1.lib at $0CD8: Z80RMF18
+Object  file test_t_issue_2320_27.1.lib at $0CCC: Z80RMF18
+  Name: test_t_issue_2320_27.1
+  CPU:  gbz80 (-IXIY-soft)
+  Section "": 10 bytes
+    C $0000: 67 62 7A 38 30 2D 49 58 49 59
+  Symbols:
+    L C $0001: __CPU_GBZ80__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
+
+Object  file test_t_issue_2320_27.1.lib at $0DF4: Z80RMF18
+  Name: test_t_issue_2320_27.1
+  CPU:  ez80 (-IXIY-soft)
+  Section "": 9 bytes
+    C $0000: 65 7A 38 30 2D 49 58 49 59
+  Symbols:
+    L C $0001: __CPU_EZ80_ADL__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
+
+Object  file test_t_issue_2320_27.1.lib at $0F20: Z80RMF18
   Name: test_t_issue_2320_27.1
   CPU:  8080 (-IXIY-soft)
   Section "": 9 bytes

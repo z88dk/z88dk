@@ -48,30 +48,46 @@ void add_opcode(int opcode)
 void add_opcode_jr(int opcode, Expr1 *expr)
 {
 	if (option_speed()) {
-		switch (opcode) {
-		case Z80_JR:
-			add_opcode(Z80_JP);
-			Pass2infoExpr(RANGE_WORD, expr);
-			break;
-		case Z80_JR_FLAG(FLAG_NZ):
-		case Z80_JR_FLAG(FLAG_Z):
-		case Z80_JR_FLAG(FLAG_NC):
-		case Z80_JR_FLAG(FLAG_C):
-			add_opcode(opcode - Z80_JR_FLAG(0) + Z80_JP_FLAG(0));
-			Pass2infoExpr(RANGE_WORD, expr);
-			break;
-		case Z80_DJNZ:		// "dec b; jp nz" is always slower
-			add_opcode(opcode);
-			Pass2infoExpr(RANGE_JR_OFFSET, expr);
-			break;
-		default:
-			xassert(0);
-		}
+        switch (opcode) {
+        case Z80_JR:
+            add_opcode(Z80_JP);
+            Pass2infoExpr(RANGE_WORD, expr);
+            break;
+        case Z80_JR_FLAG(FLAG_NZ):
+        case Z80_JR_FLAG(FLAG_Z):
+        case Z80_JR_FLAG(FLAG_NC):
+        case Z80_JR_FLAG(FLAG_C):
+            add_opcode(opcode - Z80_JR_FLAG(0) + Z80_JP_FLAG(0));
+            Pass2infoExpr(RANGE_WORD, expr);
+            break;
+        case Z80_DJNZ:		// "dec b; jp nz" is always slower
+        case R4K_DWJNZ:		// "dec b; jp nz" is always slower
+        case (Z80_DEC(REG_B) << 8) | Z80_JR_FLAG(FLAG_NZ):
+        case (RABBIT_ALTD << 8) | Z80_DJNZ:
+        case (RABBIT_ALTD << 16) | R4K_DWJNZ:
+            add_opcode(opcode);
+            Pass2infoExpr(RANGE_JR_OFFSET, expr);
+            break;
+        case R4K_JR_FLAG(FLAG_R4K_GT):            // jr cx is faster than jp cx
+        case R4K_JR_FLAG(FLAG_R4K_GTU):
+        case R4K_JR_FLAG(FLAG_R4K_LT):
+        case R4K_JR_FLAG(FLAG_R4K_V):
+            add_opcode(opcode);
+            Pass2infoExpr(RANGE_JR_OFFSET, expr);
+            break;
+        default:
+            xassert(0);
+        }
 	}
 	else {
 		add_opcode(opcode);
 		Pass2infoExpr(RANGE_JR_OFFSET, expr);
 	}
+}
+
+void add_opcode_jre(int opcode, struct Expr1* expr) {
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_JRE_OFFSET, expr);
 }
 
 /* add opcodes followed by jump relative offset expression to the same address*/
@@ -187,6 +203,12 @@ void add_opcode_nnn(int opcode, struct Expr1 *expr, int target_offset) {
 	}
 }
 
+/* add opcode followed by 32-bit expression */
+void add_opcode_nnnn(int opcode, struct Expr1 *expr) {
+	add_opcode(opcode);
+	Pass2infoExpr(RANGE_DWORD, expr);
+}
+
 /* add opcode followed by big-endian 16-bit expression */
 void add_opcode_NN(int opcode, struct Expr1 *expr)
 {
@@ -263,7 +285,8 @@ void add_rst_opcode(int arg) {
         arg *= 8;
     switch (arg) {
     case 0x00: case 0x08: case 0x30:
-        if (option_cpu() == CPU_R2KA || option_cpu() == CPU_R3K)
+        if (option_cpu() == CPU_R2KA || option_cpu() == CPU_R3K ||
+            option_cpu() == CPU_R4K || option_cpu() == CPU_R5K)
             add_opcode(0xCD0000 + (arg << 8));
         else
             add_opcode(0xC7 + arg);

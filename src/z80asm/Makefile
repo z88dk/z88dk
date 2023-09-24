@@ -184,6 +184,7 @@ clean::
 	$(RM) $(OBJS) $(TEST_SRC_LIB:.c=.o)
 
 test: $(PROJ)$(EXESUFFIX) z80asm_lib
+	$(MAKE) -C dev/z80asm_lib test
 	perl -S prove --state=slow,save -j9 t/*.t
 
 testdev: $(PROJ)$(EXESUFFIX)

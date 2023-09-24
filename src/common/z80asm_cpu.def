@@ -22,11 +22,16 @@ X(CPU_Z180, 3, "z180")
 
 X(CPU_Z80_STRICT, 2, "z80_strict")
 X(CPU_8085, 11, "8085")
+
+X(CPU_R5K, 14, "r5k")
+X(CPU_R4K, 13, "r4k")
+
 X(CPU_R3K, 8, "r3k")
+X(CPU_R2KA, 7, "r2ka")
 
 X(CPU_GBZ80, 9, "gbz80")
 X(CPU_EZ80, 5, "ez80")
-X(CPU_R2KA, 7, "r2ka")
+
 X(CPU_8080, 10, "8080")
 
 #undef X

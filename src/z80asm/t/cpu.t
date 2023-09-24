@@ -6,11 +6,11 @@ use Modern::Perl;
 
 # test error
 z80asm_nok("-mcc", "", "", <<END);
-error: invalid cpu: cc; expected: 8080,8085,ez80,ez80_z80,gbz80,r2ka,r3k,r800,z180,z80,z80_strict,z80n,ti83,ti83plus
+error: invalid cpu: cc; expected: 8080,8085,ez80,ez80_z80,gbz80,r2ka,r3k,r4k,r5k,r800,z180,z80,z80_strict,z80n,ti83,ti83plus
 END
 
 z80asm_nok("-m=cc", "", "", <<END);
-error: invalid cpu: cc; expected: 8080,8085,ez80,ez80_z80,gbz80,r2ka,r3k,r800,z180,z80,z80_strict,z80n,ti83,ti83plus
+error: invalid cpu: cc; expected: 8080,8085,ez80,ez80_z80,gbz80,r2ka,r3k,r4k,r5k,r800,z180,z80,z80_strict,z80n,ti83,ti83plus
 END
 
 # Test cpu opcode files created by ../dev/cpu/cpu.pl

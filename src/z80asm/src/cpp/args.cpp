@@ -707,6 +707,8 @@ void Args::set_cpu(int cpu) {
 
     undefine_static_symbol("__CPU_R2KA__");
     undefine_static_symbol("__CPU_R3K__");
+    undefine_static_symbol("__CPU_R4K__");
+    undefine_static_symbol("__CPU_R5K__");
     undefine_static_symbol("__CPU_RABBIT__");
 
     undefine_static_symbol("__CPU_8080__");
@@ -769,6 +771,18 @@ void Args::set_cpu(int cpu) {
         m_cpu = CPU_R3K;
         m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_R3K__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
+    case CPU_R4K:
+        m_cpu = CPU_R4K;
+        m_cpu_name = ::cpu_name(m_cpu);
+        define_static_symbol("__CPU_R4K__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
+    case CPU_R5K:
+        m_cpu = CPU_R5K;
+        m_cpu_name = ::cpu_name(m_cpu);
+        define_static_symbol("__CPU_R5K__");
         define_static_symbol("__CPU_RABBIT__");
         break;
     case CPU_8080:

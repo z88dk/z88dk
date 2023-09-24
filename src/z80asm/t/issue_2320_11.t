@@ -96,10 +96,37 @@ Predefined constant: __SWAP_IX_IY__ = 1
 Skipping $test.a.o - different CPU-IXIY combination
 Skipping $test.b.o - different CPU-IXIY combination
 
+Predefined constant: __CPU_R5K__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
+
+Predefined constant: __CPU_R4K__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
+
 Predefined constant: __CPU_R3K__ = 1
 Predefined constant: __CPU_RABBIT__ = 1
 Skipping $test.a.o - different CPU-IXIY combination
 Adding $test.b.o to library
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
+
+Predefined constant: __CPU_R2KA__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
 
 Predefined constant: __SWAP_IX_IY__ = 1
 Skipping $test.a.o - different CPU-IXIY combination
@@ -116,15 +143,6 @@ Skipping $test.b.o - different CPU-IXIY combination
 Predefined constant: __CPU_EZ80__ = 1
 Predefined constant: __CPU_EZ80_ADL__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __CPU_R2KA__ = 1
-Predefined constant: __CPU_RABBIT__ = 1
 Skipping $test.a.o - different CPU-IXIY combination
 Skipping $test.b.o - different CPU-IXIY combination
 

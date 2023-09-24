@@ -26,10 +26,11 @@ my @tokens = (
 	'BIN_XOR', 'POWER', 'LCURLY', 'BIN_OR', 'LOG_OR', 'RCURLY', 'BIN_NOT',
 	
 	# Indirect 8-bit register
-	'IND_C',
+	'IND_C', 'IND_HTR',
 	
 	# Indirect 16-bit register
 	'IND_BC', 'IND_DE', 'IND_HL', 'IND_SP', 'IND_IX', 'IND_IY', 'IND_HLI', 'IND_HLD',
+	'IND_PW', 'IND_PX', 'IND_PY', 'IND_PZ', 
 	
 	# Assembly keywords
 	'ASMPC', 
@@ -82,6 +83,12 @@ my @tokens = (
 	'JR_NE', 'JR_EQ', 
 	'JR_LTU', 'JR_LEU', 'JR_GTU', 'JR_GEU', 
 	'JR_LT',  'JR_LE',  'JR_GT',  'JR_GE', 
+
+	'JRE_NZ', 'JRE_Z', 'JRE_NC', 'JRE_C', 'JRE_PO', 'JRE_PE', 'JRE_P', 'JRE_M', 
+	'JRE_LZ', 'JRE_LO', 'JRE_NV', 'JRE_V', 'JRE_NK', 'JRE_K', 'JRE_NX5', 'JRE_X5',
+	'JRE_NE', 'JRE_EQ', 
+	'JRE_LTU', 'JRE_LEU', 'JRE_GTU', 'JRE_GEU', 
+	'JRE_LT',  'JRE_LE',  'JRE_GT',  'JRE_GE', 
 
 	'JP_NZ', 'JP_Z', 'JP_NC', 'JP_C', 'JP_PO', 'JP_PE', 'JP_P', 'JP_M', 
 	'JP_LZ', 'JP_LO', 'JP_NV', 'JP_V', 'JP_NK', 'JP_K', 'JP_NX5', 'JP_X5',
@@ -145,16 +152,26 @@ my @tokens = (
 
 	'RST_V',
 
+	'FLAG_NZ', 'FLAG_Z', 'FLAG_NC', 'FLAG_C', 'FLAG_PO', 'FLAG_PE', 'FLAG_P', 'FLAG_M',
+	'FLAG_LZ', 'FLAG_LO', 'FLAG_NV', 'FLAG_V', 'FLAG_X5', 'FLAG_NX5', 'FLAG_K', 'FLAG_NK',
+	'FLAG_NE', 'FLAG_EQ',
+	'FLAG_LTU', 'FLAG_LEU', 'FLAG_GTU', 'FLAG_GEU',
+	'FLAG_LT', 'FLAG_LE', 'FLAG_GT', 'FLAG_GE',
+
 	# 8-bit registers
 	'B', 'C', 'D', 'E', 'H', 'L', 'A', 'F', 'I', 'R', 'M',
-	'IIR', 'EIR', 'XPC', 'IXH', 'IYH', 'IXL', 'IYL', 'X',
+	'IIR', 'EIR', 'XPC', 'IXH', 'IYH', 'IXL', 'IYL', 'HTR', 'LXPC',
 
 	# 16-bit registers
-	'BC', 'DE', 'HL', 'IX', 'IY', 'AF', 'SP', 'PSW',
+	'BC', 'DE', 'HL', 'JK', 'IX', 'IY', 'AF', 'SP', 'PSW',
 
-	# alternate registers
-	'B1', 'C1', 'D1', 'E1', 'H1', 'L1', 'A1', 'F1', 'BC1', 'DE1', 'HL1', 'AF1',
+	# 32-bit registers
+	'BCDE', 'JKHL', 'PW', 'PX', 'PY', 'PZ',
 	
+	# alternate registers
+	'B1', 'C1', 'D1', 'E1', 'H1', 'L1', 'A1', 'F1', 'BC1', 'DE1', 'JK1', 'HL1', 'AF1',
+	'BCDE1', 'JKHL1', 'PW1', 'PX1', 'PY1', 'PZ1',
+
 	# EZ80 specific keywords
 	'ADL', 'S', 'IS', 'IL', 'SIS', 'LIL', 'LIS', 'SIL', 'MB',
 	'LEA', 'PEA', 'RSMIX', 'STMIX',
@@ -196,10 +213,12 @@ my @tokens = (
 
 	# EZ80 specific opcodes
 	
-	# Rabbit 2000/3000 specific opcodes
+	# Rabbit specific opcodes
 	'ALTD', 'BOOL', 'IOE', 'IOI', 'IPRES', 'IPSET', 'IDET', 'LDDSR', 'LDISR', 
 	'LDP', 'LSDR', 'LSIR', 'LSDDR', 'LSIDR', 'MUL', 'IP', 'SU', 'RDMODE', 
-	'SETUSR', 'SURES', 'SYSCALL', 'UMA', 'UMS',
+	'SETUSR', 'SURES', 'SYSCALL', 'UMA', 'UMS', 'CBM', 'CLR', 'CONVC', 'CONVD',
+	'COPY', 'COPYR', 'DWJNZ', 'EXP', 'FLAG', 'FSYSCALL', 'IBOX', 'JRE', 'LDF',
+	'LDL', 'MULU', 'RLB', 'RRB', 'SBOX', 'SETSYSP', 'SETUSRP', 'SYSRET', 'SRET',
 
 	# Z88DK specific opcodes
 	'CALL_OZ', 'CALL_PKG', 'FPP', 'INVOKE',
@@ -209,7 +228,7 @@ my @tokens = (
 	'ADI', 'ACI', 'SUI', 'SBB', 'SBI', 'INR', 'DCR', 'INX', 'DCX', 'DAD', 'ANA',
 	'ANI', 'ORA', 'ORI', 'XRA', 'XRI', 'CMP', 'RAL', 'RAR', 'CMA', 'CMC', 'STC',
 	'JMP', 'JNC', 'JC', 'JNZ', 'JZ', 'JPO', 'JPE', 'JNV', 'JV', 'JLO', 'JLZ', 
-	'JM', 'JK', 'JX5', 'JNK', 'JNX5', 'J_NC', 'J_C', 'J_NZ', 'J_Z', 'J_PO', 'J_PE',
+	'JM', 'JX5', 'JNK', 'JNX5', 'J_NC', 'J_C', 'J_NZ', 'J_Z', 'J_PO', 'J_PE',
 	'J_NV', 'J_V', 'J_LO', 'J_LZ', 'J_P', 'J_M', 'J_K', 'J_X5', 'J_NK', 'J_NX5',
 	'CNC', 'CC', 'CNZ', 'CZ', 'CPO', 'CPE', 'CNV', 'CV', 'CLO', 'CLZ', 'CM', 
 	'C_NC', 'C_C', 'C_NZ', 'C_Z', 'C_PO', 'C_PE', 'C_NV', 'C_V', 'C_LO', 'C_LZ',
@@ -224,6 +243,9 @@ my @tokens = (
 	'C_LTU', 'CLTU', 'C_LEU', 'CLEU', 'C_GTU', 'CGTU', 'C_GEU', 'CGEU',
 	'J_LTU', 'JLTU', 'J_LEU', 'JLEU', 'J_GTU', 'JGTU', 'J_GEU', 'JGEU',
 	'R_LTU', 'RLTU', 'R_LEU', 'RLEU', 'R_GTU', 'RGTU', 'R_GEU', 'RGEU',
+	'C_LT',  'CLT',  'C_LE',  'CLE',  'C_GT',  'CGT',  'C_GE',  'CGE', 
+	'J_LT',  'JLT',  'J_LE',  'JLE',  'J_GT',  'JGT',  'J_GE',  'JGE', 
+	'R_LT',  'RLT',  'R_LE',  'RLE',  'R_GT',  'RGT',  'R_GE',  'RGE', 
 		
 	# R800 specific opcodes
 	'MULUB', 'MULUW',
