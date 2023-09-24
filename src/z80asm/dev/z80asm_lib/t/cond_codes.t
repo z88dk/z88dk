@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -10,30 +12,26 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-for my $cpu (@CPUS) {
-	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+my $ticks = Ticks->new;
 
-		for my $opts ("-m$cpu", "-m$cpu -opt-speed") {
-			test_cond($opts, "nz",  sub {my($a,$b)=@_; return ($a&0xff)!=($b&0xff) ? 1 : 0;});
-			test_cond($opts, "z",   sub {my($a,$b)=@_; return ($a&0xff)==($b&0xff) ? 1 : 0;});
-			test_cond($opts, "nc",  sub {my($a,$b)=@_; return ($a&0xff)>=($b&0xff) ? 1 : 0;});
-			test_cond($opts, "c",   sub {my($a,$b)=@_; return ($a&0xff)< ($b&0xff) ? 1 : 0;});
-			test_cond($opts, "ne",  sub {my($a,$b)=@_; return ($a&0xff)!=($b&0xff) ? 1 : 0;});
-			test_cond($opts, "eq",  sub {my($a,$b)=@_; return ($a&0xff)==($b&0xff) ? 1 : 0;});
-			test_cond($opts, "geu", sub {my($a,$b)=@_; return ($a&0xff)>=($b&0xff) ? 1 : 0;});
-			test_cond($opts, "ltu", sub {my($a,$b)=@_; return ($a&0xff)< ($b&0xff) ? 1 : 0;});
-			test_cond($opts, "gtu", sub {my($a,$b)=@_; return ($a&0xff)> ($b&0xff) ? 1 : 0;});
-			test_cond($opts, "leu", sub {my($a,$b)=@_; return ($a&0xff)<=($b&0xff) ? 1 : 0;});
-		}
-	}
-}
+test_cond($ticks, "nz",  sub {my($a,$b)=@_; return ($a&0xff)!=($b&0xff) ? 1 : 0;});
+test_cond($ticks, "z",   sub {my($a,$b)=@_; return ($a&0xff)==($b&0xff) ? 1 : 0;});
+test_cond($ticks, "nc",  sub {my($a,$b)=@_; return ($a&0xff)>=($b&0xff) ? 1 : 0;});
+test_cond($ticks, "c",   sub {my($a,$b)=@_; return ($a&0xff)< ($b&0xff) ? 1 : 0;});
+test_cond($ticks, "ne",  sub {my($a,$b)=@_; return ($a&0xff)!=($b&0xff) ? 1 : 0;});
+test_cond($ticks, "eq",  sub {my($a,$b)=@_; return ($a&0xff)==($b&0xff) ? 1 : 0;});
+test_cond($ticks, "geu", sub {my($a,$b)=@_; return ($a&0xff)>=($b&0xff) ? 1 : 0;});
+test_cond($ticks, "ltu", sub {my($a,$b)=@_; return ($a&0xff)< ($b&0xff) ? 1 : 0;});
+test_cond($ticks, "gtu", sub {my($a,$b)=@_; return ($a&0xff)> ($b&0xff) ? 1 : 0;});
+test_cond($ticks, "leu", sub {my($a,$b)=@_; return ($a&0xff)<=($b&0xff) ? 1 : 0;});
+
+$ticks->run("", "-opt-speed");
 
 unlink_testfiles();
 done_testing();
 
 sub test_cond {
-	my($opts, $flag, $func) = @_;
+	my($ticks, $flag, $func) = @_;
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	for my $b (0, 128) {
@@ -41,7 +39,7 @@ sub test_cond {
 
 			# test jump
 			for my $jump ("jr $flag,", "jp $flag,", "j$flag", "j_$flag") {
-				my $r = ticks(<<END, "$opts");
+				$ticks->add(<<END, L=>$func->($a, $b));
 							ld l, -1
 							
 							ld a, $a
@@ -49,54 +47,47 @@ sub test_cond {
 							$jump r1
 							
 				r0:			ld l, 0
-							rst 0
+							jr r2
 							
 				r1:			ld l, 1
-							rst 0
+				r2:
 END
-				is $r->{L}, $func->($a, $b), "jump result";
-				
-				(Test::More->builder->is_passing) or die;
 			}
 			
 			# test call
 			for my $call ("call $flag,", "c$flag", "c_$flag") {
-				my $r = ticks(<<END, "$opts");
+				$ticks->add(<<END, L=>$func->($a, $b));
 							ld l, 0
 							
 							ld a, $a
 							cp $b
 
 							$call r1
-							rst 0
+							jr r2
 							
 				r1:			ld l, 1
 							ret
+				r2:
 END
-				is $r->{L}, $func->($a, $b), "call result";
-				
-				(Test::More->builder->is_passing) or die;
 			}
 			
 			# test ret
 			for my $ret ("ret $flag", "r$flag", "r_$flag") {
-				my $r = ticks(<<END, "$opts");
+				$ticks->add(<<END, L=>$func->($a, $b));
 							ld l, 0
 							
 							ld a, $a
 							cp $b
 
 							call r1
-							rst 0
+							jr r2
 							
 				r1:			ld l, 1
 							$ret
 							ld l, 0
 							ret
+				r2:
 END
-				is $r->{L}, $func->($a, $b), "ret result";
-				
-				(Test::More->builder->is_passing) or die;
 			}		
 		}
 	}

@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -10,35 +12,30 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my $test_nr;
+my $ticks = Ticks->new;
 
-for my $cpu (@CPUS) {
-	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-
-		for my $base (0x1000) {
-			for my $add (-2, 0, 2) {
-				$test_nr++;
-				note "Test $test_nr: cpu:$cpu base:$base add:$add";
-				
-				my $r = ticks(<<END, "-m$cpu");
-							ld		sp, $base
-							add 	sp, $add
-							
-							ld		hl, 0
-							add 	hl, sp
-							rst 	0
+for my $base (0x1000, 0x4000) {
+	for my $add (-127, 0, 127) {
+		my $sum = $base + ($add & 0xFFFF);
+		
+		$ticks->add(<<END, 
+					ld		sp, $base
+					add 	sp, $add
 END
-				my $sum = $base + $add;
-				
-				is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
-				is $r->{HL}, $sum & 65535,			"result";
-						
-				(Test::More->builder->is_passing) or die;
-			}
-		}
+			F_C	=> sub { my($t) = @_;
+						 if ($t->{cpu} =~ /^r.k|^gbz80/) {
+							 diag "TODO ".$t->{cpu}.": carry on add sp, d";
+							 return 0;
+						 }
+						 else {
+							 return $sum > 0xFFFF ? 1 : 0;
+						 }
+			},
+			SP	=> $sum & 0xFFFF);
 	}
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

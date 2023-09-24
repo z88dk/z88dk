@@ -13,14 +13,8 @@ __z80asm__lddr:
         inc     b
         inc     c
 loop:
-  IF    __CPU_GBZ80__
         ld      a, (hl-)
-  ELSE
-        ld      a, (hl)
-        dec     hl
-  ENDIF
-        ld      (de), a
-        dec     de
+        ld      (de-), a
 
         ; iterate
         dec     c

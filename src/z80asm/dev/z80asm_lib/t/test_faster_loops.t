@@ -1,7 +1,13 @@
 #!/usr/bin/env perl
 
+#------------------------------------------------------------------------------
+# z80asm assembler
 # test standard loop vs faster loop 
 # see https://github.com/z88dk/z88dk/issues/1911
+# Copyright (C) Paulo Custodio, 2011-2023
+# License: http://www.perlfoundation.org/artistic_license_2_0
+# Repository: https://github.com/z88dk/z88dk
+#------------------------------------------------------------------------------
 
 BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
@@ -53,8 +59,7 @@ path("$test-old.asm")->spew(<<'END');
 		ld 		bc, 32*192
 loop:
         ld      a, (hl+)
-        ld      (de), a
-        inc     de
+        ld      (de+), a
 		
 		dec		bc
 		ld		a, b
@@ -74,8 +79,7 @@ path("$test-new.asm")->spew(<<'END');
 		inc 	c 
 loop:
         ld      a, (hl+)
-        ld      (de), a
-        inc     de
+        ld      (de+), a
 		
         ; iterate
 		dec 	c       

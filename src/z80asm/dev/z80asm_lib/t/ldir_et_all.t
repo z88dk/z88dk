@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -10,94 +12,106 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my $test_nr;
+my $ticks = Ticks->new;
 
-for my $cpu (@CPUS) {
-	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-		
-		$test_nr++;
-		note "Test $test_nr: cpu:$cpu";
-
-		for my $op ("ldi", "ldir") {
-			my $r = ticks(<<END, "-m$cpu");
-						jp start
+# LDI
+$ticks->add(<<END,
+						jr start
+						defs 3*2*4		; reserve space for results
 				src:	defb 1,2,3,4
 				dst:	defb 0,0,0,0
 				start:	ld hl, src
 						ld de, dst
 						ld bc, 4
-						$op
-						rst 0
+						ldi
 END
-			my $src = 3; my $dst = $src+4;
-			is $r->{mem}[$src+0], 1;
-			is $r->{mem}[$src+1], 2;
-			is $r->{mem}[$src+2], 3;
-			is $r->{mem}[$src+3], 4;
-			
-			if ($op eq "ldi") {
-				is $r->{mem}[$dst+0], 1;
-				is $r->{mem}[$dst+1], 0;
-				is $r->{mem}[$dst+2], 0;
-				is $r->{mem}[$dst+3], 0;
-				is $r->{HL}, $src+1;
-				is $r->{DE}, $dst+1;
-				is $r->{BC}, 3;
-			}
-			else {
-				is $r->{mem}[$dst+0], 1;
-				is $r->{mem}[$dst+1], 2;
-				is $r->{mem}[$dst+2], 3;
-				is $r->{mem}[$dst+3], 4;
-				is $r->{HL}, $src+4;
-				is $r->{DE}, $dst+4;
-				is $r->{BC}, 0;
-			}
+				HL => sub { my($t) = @_;
+							local $Test::Builder::Level = $Test::Builder::Level + 1;
+							is $t->{mem}[$t->{labels}{L1_dst}+0], 1, "L1_dst+0=1";
+							is $t->{mem}[$t->{labels}{L1_dst}+1], 0, "L1_dst+1=0";
+							is $t->{mem}[$t->{labels}{L1_dst}+2], 0, "L1_dst+2=0";
+							is $t->{mem}[$t->{labels}{L1_dst}+3], 0, "L1_dst+3=0";
+							return $t->{labels}{L1_src}+1; 
+				},
+				DE => sub { my($t) = @_;
+							return $t->{labels}{L1_dst}+1; 
+				},
+				BC => 3);
 
-			(Test::More->builder->is_passing) or die; 
-		}
-			
-		for my $op ("ldd", "lddr") {
-			my $r = ticks(<<END, "-m$cpu");
-						jp start
+
+# LDIR
+$ticks->add(<<END,
+						jr start
+				src:	defb 1,2,3,4
+				dst:	defb 0,0,0,0
+				start:	ld hl, src
+						ld de, dst
+						ld bc, 4
+						ldir
+END
+				HL => sub { my($t) = @_;
+							local $Test::Builder::Level = $Test::Builder::Level + 1;
+							is $t->{mem}[$t->{labels}{L2_dst}+0], 1, "L2_dst+0=1";
+							is $t->{mem}[$t->{labels}{L2_dst}+1], 2, "L2_dst+1=2";
+							is $t->{mem}[$t->{labels}{L2_dst}+2], 3, "L2_dst+2=3";
+							is $t->{mem}[$t->{labels}{L2_dst}+3], 4, "L2_dst+3=4";
+							return $t->{labels}{L2_src}+4; 
+				},
+				DE => sub { my($t) = @_;
+							return $t->{labels}{L2_dst}+4; 
+				},
+				BC => 0);
+
+# LDD
+$ticks->add(<<END,
+						jr start
 				src:	defb 1,2,3,4
 				dst:	defb 0,0,0,0
 				start:	ld hl, src+3
 						ld de, dst+3
 						ld bc, 4
-						$op
-						rst 0
+						ldd
 END
-			my $src = 3; my $dst = $src+4;
-			is $r->{mem}[$src+0], 1;
-			is $r->{mem}[$src+1], 2;
-			is $r->{mem}[$src+2], 3;
-			is $r->{mem}[$src+3], 4;
-			
-			if ($op eq "ldd") {
-				is $r->{mem}[$dst+0], 0;
-				is $r->{mem}[$dst+1], 0;
-				is $r->{mem}[$dst+2], 0;
-				is $r->{mem}[$dst+3], 4;
-				is $r->{HL}, $src+2;
-				is $r->{DE}, $dst+2;
-				is $r->{BC}, 3;
-			}
-			else {
-				is $r->{mem}[$dst+0], 1;
-				is $r->{mem}[$dst+1], 2;
-				is $r->{mem}[$dst+2], 3;
-				is $r->{mem}[$dst+3], 4;
-				is $r->{HL}, $src-1;
-				is $r->{DE}, $dst-1;
-				is $r->{BC}, 0;
-			}
-			
-			(Test::More->builder->is_passing) or die; 
-		}
-	}	
-}
+				HL => sub { my($t) = @_;
+							local $Test::Builder::Level = $Test::Builder::Level + 1;
+							is $t->{mem}[$t->{labels}{L3_dst}+0], 0, "L3_dst+0=0";
+							is $t->{mem}[$t->{labels}{L3_dst}+1], 0, "L3_dst+1=0";
+							is $t->{mem}[$t->{labels}{L3_dst}+2], 0, "L3_dst+2=0";
+							is $t->{mem}[$t->{labels}{L3_dst}+3], 4, "L3_dst+3=4";
+							return $t->{labels}{L3_src}+2; 
+				},
+				DE => sub { my($t) = @_;
+							return $t->{labels}{L3_dst}+2; 
+				},
+				BC => 3);
+
+# LDDR
+$ticks->add(<<END,
+						jr start
+						defs 6			; save space for output data
+				src:	defb 1,2,3,4
+				dst:	defb 0,0,0,0
+				start:	ld hl, src+3
+						ld de, dst+3
+						ld bc, 4
+						lddr
+END
+				HL => sub { my($t) = @_;
+							local $Test::Builder::Level = $Test::Builder::Level + 1;
+							is $t->{mem}[$t->{labels}{L4_dst}+0], 1, "L3_dst+0=0";
+							is $t->{mem}[$t->{labels}{L4_dst}+1], 2, "L3_dst+1=0";
+							is $t->{mem}[$t->{labels}{L4_dst}+2], 3, "L3_dst+2=0";
+							is $t->{mem}[$t->{labels}{L4_dst}+3], 4, "L3_dst+3=4";
+							return $t->{labels}{L4_src}-1; 
+				},
+				DE => sub { my($t) = @_;
+							return $t->{labels}{L4_dst}-1; 
+				},
+				BC => 0);
+
+
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

@@ -17,14 +17,7 @@ __z80asm__sub_hl_sp:
         push    de
         ex      de, hl                  ; subtrahed to de
 
-  IF    __CPU_GBZ80__
         ld      hl, sp+6                ; minuend to hl, compensate for return address, DE and BC in stack
-  ELSE
-        push    af
-        ld      hl, 8                   ; minuend to hl, compensate for return address, DE, BC and AF in stack
-        add     hl, sp
-        pop     af
-  ENDIF
         ld      a, e
         sub     a, l
         ld      e, a

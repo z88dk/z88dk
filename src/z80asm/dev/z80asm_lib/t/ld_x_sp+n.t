@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -10,68 +12,47 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my $test_nr;
+my $ticks = Ticks->new;
 
 # ld de, sp+%n
-for my $cpu (@CPUS) {
-	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-
-		for my $base (0x1000) {
-			for my $add (0, 127, 255) {
-				$test_nr++;
-				note "Test $test_nr: cpu:$cpu reg:de base:$base add:$add";
-				my $add_text = $add == 0 ? "" :
-										   "+$add";
-				
-				my $r = ticks(<<END, "-m$cpu");
-						ld		sp, $base
-						ld      de, sp $add_text
-						rst     0
+for my $base (0x1000) {
+	for my $add (0, 127, 255) {
+		my $add_text = $add == 0 ? "" :
+								   "+$add";
+		my $sum = $base + $add;
+		
+		$ticks->add(<<END, DE=>$sum);
+				ld		sp, $base
+				ld      de, sp $add_text
 END
-				my $sum = $base + $add;
-				
-				is $r->{DE}, $sum, "result";
-						
-				(Test::More->builder->is_passing) or die;
-			}
-        }
-    }
+	}
 }
 
 # ld hl, sp+%s
-for my $cpu (@CPUS) {
-	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+for my $base (0x1000) {
+	for my $add (-128, 0, 127) {
+		my $add_text = $add <  0 ? $add :
+					   $add == 0 ? "" :
+								   "+$add";
 		
-		for my $base (0x1000) {
-			for my $add (-128, 0, 127) {
-				$test_nr++;
-				note "Test $test_nr: cpu:$cpu reg:hl base:$base add:$add";
-				my $add_text = $add <  0 ? $add :
-							   $add == 0 ? "" :
-										   "+$add";
-				
-				my $r = ticks(<<END, "-m$cpu");
-						ld		sp, $base
-						ld      hl, sp $add_text
-						rst     0
+		$ticks->add(<<END, 
+				ld		sp, $base
+				ld      hl, sp $add_text
 END
-				my $sum;
-				if ($cpu eq '8085') {
-					$sum = $base + ($add & 0xff);		# unsigned
-				}
-				else {
-					$sum = $base + $add;				# signed
-				}
-				
-				is $r->{HL}, $sum, "result";
-						
-				(Test::More->builder->is_passing) or die;
-			}
-        }
-    }
+			HL => sub { my($t) = @_;
+						my $sum;
+						if ($t->{cpu} eq '8085') {
+							$sum = $base + ($add & 0xff);		# unsigned
+						}
+						else {
+							$sum = $base + $add;				# signed
+						}
+						return $sum;
+			});
+	}
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

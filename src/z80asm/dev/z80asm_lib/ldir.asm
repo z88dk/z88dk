@@ -13,14 +13,8 @@ __z80asm__ldir:
         inc     b
         inc     c
 loop:
-  IF    __CPU_GBZ80__
         ld      a, (hl+)
-  ELSE
-        ld      a, (hl)
-        inc     hl
-  ENDIF
-        ld      (de), a
-        inc     de
+        ld      (de+), a
 
         ; iterate
         dec     c

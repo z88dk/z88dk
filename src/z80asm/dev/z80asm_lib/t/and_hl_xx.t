@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -10,33 +12,23 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my $test_nr;
+my $ticks = Ticks->new;
 
-for my $cpu (@CPUS) {
-	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-		
-		for my $reg (qw( de )) {
-			for my $a (0, 0xAAAA) {
-				for my $b (0x5555, 0xFFFF) {
-					$test_nr++;
-					note "Test $test_nr: cpu:$cpu reg:$reg a:$a b:$b";
+for my $reg (qw( de )) {
+	for my $a (0, 0xAAAA) {
+		for my $b (0x5555, 0xFFFF) {
+			note "reg:$reg a:$a b:$b";
 
-					my $r = ticks(<<END, "-m$cpu");
-								ld		hl, $a
-								ld		$reg, $b
-								and		hl, $reg
-								rst 	0
+			$ticks->add(<<END, HL=>$a & $b);
+						ld		hl, $a
+						ld		$reg, $b
+						and		hl, $reg
 END
-					my $x = $a & $b;
-					is $r->{HL}, $x,			"result";
-							
-					(Test::More->builder->is_passing) or die; 
-				}
-			}
 		}
 	}
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

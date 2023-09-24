@@ -1856,8 +1856,6 @@
  ld b, srl (iy)                 ; Error
  ld b, srl (iy+126)             ; Error
  ld b, srl (iy-128)             ; Error
- ld bc, ix                      ; Error
- ld bc, iy                      ; Error
  ld c, ixh                      ; Error
  ld c, ixl                      ; Error
  ld c, iyh                      ; Error
@@ -2226,8 +2224,6 @@
  ld d, srl (iy)                 ; Error
  ld d, srl (iy+126)             ; Error
  ld d, srl (iy-128)             ; Error
- ld de, ix                      ; Error
- ld de, iy                      ; Error
  ld e, ixh                      ; Error
  ld e, ixl                      ; Error
  ld e, iyh                      ; Error
@@ -2597,9 +2593,6 @@
  ld hl, i                       ; Error
  ld i, a                        ; Error
  ld i, hl                       ; Error
- ld ix, bc                      ; Error
- ld ix, de                      ; Error
- ld ix, iy                      ; Error
  ld ixh, -128                   ; Error
  ld ixh, 127                    ; Error
  ld ixh, 255                    ; Error
@@ -2620,9 +2613,6 @@
  ld ixl, e                      ; Error
  ld ixl, ixh                    ; Error
  ld ixl, ixl                    ; Error
- ld iy, bc                      ; Error
- ld iy, de                      ; Error
- ld iy, ix                      ; Error
  ld iyh, -128                   ; Error
  ld iyh, 127                    ; Error
  ld iyh, 255                    ; Error

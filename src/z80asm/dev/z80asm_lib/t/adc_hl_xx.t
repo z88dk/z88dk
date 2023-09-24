@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -10,41 +12,30 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my $test_nr;
+my $ticks = Ticks->new;
 
-for my $cpu (@CPUS) {
-	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-		
-		for my $reg (qw( bc de hl sp )) {
-			for my $carry (0, 1) {
-				for my $base (0, 32768, 32769) {
-					for my $add (255, 256, 32767) {
-						$test_nr++;
-						note "Test $test_nr: cpu:$cpu reg:$reg carry:$carry base:$base add:$add";
+for my $reg (qw( bc de hl sp )) {
+	for my $carry (0, 1) {
+		for my $base (0, 32768, 32769) {
+			for my $add (255, 256, 32767) {
+				note "reg:$reg carry:$carry base:$base add:$add";
 
-						my $init_carry = $carry ? "scf" : "and a";
-						my $base1 = ($reg eq 'hl') ? $add : $base;
-						
-						my $r = ticks(<<END, "-m$cpu");
-								ld		hl, $base1
-								ld		$reg, $add
-								$init_carry 
-								adc 	hl, $reg
-								jr	 	0		; need to keep SP
+				my $init_carry = $carry ? "scf" : "and a";
+				my $base1 = ($reg eq 'hl') ? $add : $base;
+				my $sum = $base1 + $add + $carry;
+				
+				$ticks->add(<<END, F_C=>($sum > 65535 ? 1 : 0), HL=>$sum);
+						ld		hl, $base1
+						ld		$reg, $add
+						$init_carry 
+						adc 	hl, $reg
 END
-						my $sum = $base1 + $add + $carry;
-						
-						is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
-						is $r->{HL}, $sum & 65535,			"result";
-								
-						(Test::More->builder->is_passing) or die;
-					}
-				}
 			}
 		}
 	}
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

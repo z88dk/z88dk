@@ -6092,8 +6092,6 @@
  ld bc', 0x1234                 ; Error
  ld bc', bc                     ; Error
  ld bc', de                     ; Error
- ld bc, ix                      ; Error
- ld bc, iy                      ; Error
  ld c', (hl)                    ; Error
  ld c', (hl+)                   ; Error
  ld c', (hl-)                   ; Error
@@ -6508,8 +6506,6 @@
  ld de', 0x1234                 ; Error
  ld de', bc                     ; Error
  ld de', de                     ; Error
- ld de, ix                      ; Error
- ld de, iy                      ; Error
  ld e', (hl)                    ; Error
  ld e', (hl+)                   ; Error
  ld e', (hl-)                   ; Error
@@ -6942,17 +6938,11 @@
  ld hl, (sp+0)                  ; Error
  ld hl, (sp+255)                ; Error
  ld hl, i                       ; Error
- ld hl, ix                      ; Error
- ld hl, iy                      ; Error
  ld i, hl                       ; Error
  ld iir, a                      ; Error
  ld ix, (sp)                    ; Error
  ld ix, (sp+0)                  ; Error
  ld ix, (sp+255)                ; Error
- ld ix, bc                      ; Error
- ld ix, de                      ; Error
- ld ix, hl                      ; Error
- ld ix, iy                      ; Error
  ld ixh, -128                   ; Error
  ld ixh, 127                    ; Error
  ld ixh, 255                    ; Error
@@ -6976,10 +6966,6 @@
  ld iy, (sp)                    ; Error
  ld iy, (sp+0)                  ; Error
  ld iy, (sp+255)                ; Error
- ld iy, bc                      ; Error
- ld iy, de                      ; Error
- ld iy, hl                      ; Error
- ld iy, ix                      ; Error
  ld iyh, -128                   ; Error
  ld iyh, 127                    ; Error
  ld iyh, 255                    ; Error

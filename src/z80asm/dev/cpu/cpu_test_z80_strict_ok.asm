@@ -869,6 +869,8 @@
  ld bc, 0x1234                  ; 01 34 12
  ld bc, de                      ; 42 4B
  ld bc, hl                      ; 44 4D
+ ld bc, ix                      ; DD E5 C1
+ ld bc, iy                      ; FD E5 C1
  ld c, (de)                     ; EB 4E EB
  ld c, (de+)                    ; EB 4E EB 13
  ld c, (de-)                    ; EB 4E EB 1B
@@ -931,6 +933,8 @@
  ld de, hl                      ; 54 5D
  ld de, hl+0                    ; E5 11 00 00 19 EB E1
  ld de, hl+255                  ; E5 11 FF 00 19 EB E1
+ ld de, ix                      ; DD E5 D1
+ ld de, iy                      ; FD E5 D1
  ld de, sp                      ; EB 21 00 00 39 EB
  ld de, sp+0                    ; EB 21 00 00 39 EB
  ld de, sp+255                  ; EB 21 FF 00 39 EB
@@ -994,6 +998,8 @@
  ld hl, 0x1234                  ; 21 34 12
  ld hl, bc                      ; 60 69
  ld hl, de                      ; 62 6B
+ ld hl, ix                      ; DD E5 E1
+ ld hl, iy                      ; FD E5 E1
  ld hl, sp                      ; 21 00 00 39
  ld hl, sp+127                  ; 21 7F 00 39
  ld hl, sp-128                  ; 21 80 FF 39
@@ -1008,6 +1014,10 @@
  ld ix, (iy+126)                ; DD E5 E3 FD 6E 7E FD 66 7F E3 DD E1
  ld ix, (iy-128)                ; DD E5 E3 FD 6E 80 FD 66 81 E3 DD E1
  ld ix, 0x1234                  ; DD 21 34 12
+ ld ix, bc                      ; C5 DD E1
+ ld ix, de                      ; D5 DD E1
+ ld ix, hl                      ; E5 DD E1
+ ld ix, iy                      ; FD E5 DD E1
  ld iy, (0x1234)                ; FD 2A 34 12
  ld iy, (hl)                    ; D5 5E 23 56 2B D5 FD E1 D1
  ld iy, (hl+)                   ; D5 5E 23 56 23 D5 FD E1 D1
@@ -1018,6 +1028,10 @@
  ld iy, (iy+126)                ; FD E5 E3 FD 6E 7E FD 66 7F E3 FD E1
  ld iy, (iy-128)                ; FD E5 E3 FD 6E 80 FD 66 81 E3 FD E1
  ld iy, 0x1234                  ; FD 21 34 12
+ ld iy, bc                      ; C5 FD E1
+ ld iy, de                      ; D5 FD E1
+ ld iy, hl                      ; E5 FD E1
+ ld iy, ix                      ; DD E5 FD E1
  ld l, (de)                     ; EB 5E EB
  ld l, (de+)                    ; EB 5E EB 13
  ld l, (de-)                    ; EB 5E EB 1B

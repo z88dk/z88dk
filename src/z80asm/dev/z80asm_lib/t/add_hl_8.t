@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -10,40 +12,27 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my $test_nr;
+my $ticks = Ticks->new;
 
-for my $cpu (@CPUS) {
-	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-		
-		for my $reg (qw( bc de hl )) {
-			for my $base (0, 255, 65534) {
-				for my $add (1, 2) {
-					$test_nr++;
-					note "Test $test_nr: cpu:$cpu reg:$reg base:$base add:$add";
+for my $reg (qw( BC DE HL )) {
+	for my $base (0, 255, 65534) {
+		for my $add (1, 2) {
+			note "reg:$reg base:$base add:$add";
+
+			my $sum = $base + $add;
+			
+			# z80n does not update carry, neither does emulation
+			$ticks->add(<<END, $reg=>$sum);
+					ld		$reg, $base
+					ld		a, $add
 					
-					my $r = ticks(<<END, "-m$cpu");
-							ld		$reg, $base
-							ld		a, $add
-							
-							add 	$reg, a
-							
-							push 	$reg
-							pop		hl
-							rst 	0
+					add 	$reg, a
 END
-					my $sum = $base + $add;
-					
-					# z80n does not update carry, neither does emulation
-					#is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
-					is $r->{HL}, $sum & 65535,			"result";
-							
-					(Test::More->builder->is_passing) or die;
-				}
-			}
 		}
 	}
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

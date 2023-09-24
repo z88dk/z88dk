@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -10,25 +12,31 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-for my $cpu (@CPUS) {
-	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-		
-		for my $dd (qw( bc de hl sp )) {
-			my $var = 0x100;
-			my $t = ticks(<<END, "-m$cpu");
-					; $cpu $dd
+my $ticks = Ticks->new;
+
+my $test_nr = 0;
+
+for my $dd (qw( BC DE HL SP )) {
+	$test_nr++;
+	my $var_label = "L${test_nr}_var";
+	
+	$ticks->add(<<END,
+					jp start
+					defs 256 ; save space for output
+			var:	defw 0
+			start:
 					ld $dd, 0x1234
-					ld ($var), $dd
-					jp 0
+					ld (var), $dd
 END
-			is $t->{mem}[$var+0], 0x34;
-			is $t->{mem}[$var+1], 0x12;
-			 
-			(Test::More->builder->is_passing) or die;
-		}
-	}
+		$dd => sub { my($t) = @_;
+					local $Test::Builder::Level = $Test::Builder::Level + 1;
+					my $var_addr = $t->{labels}{$var_label};
+					my $var_value = $t->{mem}[$var_addr] + ($t->{mem}[$var_addr+1] << 8);
+					is $var_value, 0x1234, "var";
+					return 0x1234; });
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

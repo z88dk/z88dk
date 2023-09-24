@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -10,35 +12,26 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-my $test_nr;
+my $ticks = Ticks->new;
 
-for my $cpu (@CPUS) {
-	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
-		
-		for my $reg (qw( BC DE HL )) {
-			for my $carry (0, 1) {
-				for my $init (0, 0x1111, 0x2222, 0x8888) {
-					$test_nr++;
-					note "Test $test_nr: cpu:$cpu reg:$reg carry:$carry init:$init";
-					my $init_carry = $carry ? "scf" : "and a";
-					my $r = ticks(<<END, "-m$cpu");
-							ld		$reg, $init
-							$init_carry 
-							sra     $reg
-							jr	 	0		; need to keep SP
+for my $reg (qw( BC DE HL )) {
+	for my $carry (0, 1) {
+		for my $init (0, 0x1111, 0x2222, 0x8888) {
+			my $init_carry = $carry ? "scf" : "and a";
+			my $res = ($init & 0x8000)|($init >> 1);
+
+			$ticks->add(<<END,
+					$init_carry 
+					ld		$reg, $init
+					sra     $reg
 END
-					my $res = ($init & 0x8000)|($init >> 1);
-					
-					is $r->{F_C}, ($init & 1) ? 1 : 0, "carry";
-					is $r->{$reg}, $res, "result";
-							
-					(Test::More->builder->is_passing) or die;
-				}
-			}
+				F_C  => ($init & 1) ? 1 : 0,
+				$reg => $res);
 		}
 	}
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

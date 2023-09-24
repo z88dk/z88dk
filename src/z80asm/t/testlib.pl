@@ -35,7 +35,7 @@ sub check_bin_file {
 	my $diff = diff(\$exp_hex, \$got_hex, {STYLE => 'Context'});
 	is $diff, "", "bin file $got_file ok";
 	
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ sub check_text_file {
 	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Context'});
 	is $diff, "", "text file $got_file ok";
 	
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ sub z80asm_ok {
     check_bin_file($bin_file, $bin);
     check_text_file("${test}.stderr", $exp_warn) if $exp_warn;
 	
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ sub z80asm_nok {
 
     capture_nok("z88dk-z80asm $options $files", $exp_err);
 	
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
@@ -105,15 +105,14 @@ sub ticks {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	spew("$test.asm", $source);
-	run_ok("z88dk-z80asm $options -b -l $test.asm");
+	run_ok("z88dk-z80asm $options -b -l -m $test.asm");
 	
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 
 	my $cpu = ($options =~ /(?:-m=?)(\S+)/) ? $1 : "z80";
-	$cpu = 'ez80_z80' if $cpu eq 'ez80';
-	run_ok("z88dk-ticks $test.bin -m$cpu -output $test.out");
+	run_ok("z88dk-ticks -m$cpu $test.bin -output $test.out");
 
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 
 	my $bin = slurp("$test.out");
 	my $mem = substr($bin, 0, 0x10000); $mem =~ s/\0+$//;
@@ -164,7 +163,7 @@ sub ticks {
 	my $MPh = shift @regs;		$ret->{MP} = ($MPh << 8) | $MPl;
 	@regs == 8 or die;
 		
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 
 	return $ret;
 }
@@ -191,7 +190,7 @@ sub capture_ok {
     run_ok($cmd." > ${test}.stdout");
     check_text_file("${test}.stdout", $exp_out);
 	
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
@@ -202,7 +201,7 @@ sub capture_nok {
     run_nok($cmd." 2> ${test}.stderr");
     check_text_file("${test}.stderr", $exp_err);
 	
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
@@ -213,7 +212,7 @@ sub run_ok {
 	ok 1, "Running: $cmd";
     ok 0==system($cmd), $cmd;
 	
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
@@ -224,7 +223,7 @@ sub run_nok {
 	ok 1, "Running: $cmd";
     ok 0!=system($cmd), $cmd;
 	
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
@@ -295,7 +294,7 @@ sub dwords { return pack("V*", @_); }
 sub unlink_testfiles {
 	my(@additional) = @_;
     unlink(<${test}*>, @additional) 
-        if Test::More->builder->is_passing;
+        if !$ENV{DEBUG} && Test::More->builder->is_passing;
 }
 
 # return object file binary representation
@@ -491,7 +490,7 @@ sub spew {
 		print $fh join('', @data);
 	}
 	
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
@@ -511,7 +510,7 @@ sub slurp {
 		return "";
 	}
 	
-	die if $ENV{DEBUG} && !Test::More->builder->is_passing;
+	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
@@ -575,6 +574,282 @@ sub ixiy_compatible {
 	}
 	else {
 		return 0;
+	}
+}
+
+#------------------------------------------------------------------------------
+# Ticks: prepare tests and run all in one go
+{
+	package Ticks;
+	use Object::Tiny::RW qw( test_nr res_addr asm tests );
+	use Test::More;
+	
+	sub new {
+		my($class) = @_;
+		return bless {test_nr=>0, 
+					  res_addr=>0,
+					  asm=>[], 
+					  tests=>[]}, $class;
+	}
+	
+	sub add {
+		my($self, $asm, %checks) = @_;
+		
+		my $test_nr = ++$self->{test_nr};
+		
+		# localize all labels
+		my %labels;
+		while ($asm =~ /^ \s* (?| \. \s* ([a-z_]\w*) | ([a-z_]\w*) \s* : ) /mixg) {
+			$labels{$1}++;
+		}
+		for my $label (keys %labels) {
+			$asm =~ s/ \b $label \b /L${test_nr}_${label}/ixg;
+		}
+		
+		# add reset code
+		my $reset_code = "xor a\n";
+		for my $reg (qw( bc de hl )) {
+			$reset_code .= "ld $reg, 0\n";
+		}
+		$reset_code .= "IF !__CPU_INTEL__ && !__CPU_GBZ80__\n";
+		$reset_code .= "exx\n";
+		for my $reg (qw( bc de hl )) {
+			$reset_code .= "ld $reg, 0\n";
+		}
+		$reset_code .= "exx\n";
+		$reset_code .= "ENDIF\n";
+		$reset_code .= "IF !__CPU_INTEL__ && !__CPU_GBZ80__\nld ix, 0\nld iy, 0\nENDIF\n";
+		
+		# add test code
+		my $test_code = "";
+		for my $k (sort keys %checks) {
+			my $v = $checks{$k};
+			
+			if    ($k =~ /^F_S/) { $test_code .= $self->test_flag_code($test_nr, $k, 0x80, $v); }
+			elsif ($k =~ /^F_Z/) { $test_code .= $self->test_flag_code($test_nr, $k, 0x40, $v); }
+			elsif ($k =~ /^F_H/) { $test_code .= $self->test_flag_code($test_nr, $k, 0x10, $v); }
+			elsif ($k =~ /^F_PV/){ $test_code .= $self->test_flag_code($test_nr, $k, 0x04, $v); }
+			elsif ($k =~ /^F_N/) { $test_code .= $self->test_flag_code($test_nr, $k, 0x02, $v); }
+			elsif ($k =~ /^F_C/) { $test_code .= $self->test_flag_code($test_nr, $k, 0x01, $v); }
+			elsif ($k =~ /^(BC|DE|HL|SP|IX|IY)$/) {
+				$test_code .= $self->test_dd_code($test_nr, $k, $v);
+			}
+			elsif ($k =~ /^(BC|DE|HL)_$/) {
+				$test_code .= $self->test_dd1_code($test_nr, $k, $v);
+			}
+			elsif ($k =~ /^(B|C|D|E|H|L|A)$/) {
+				$test_code .= $self->test_r_code($test_nr, $k, $v);
+			}
+			elsif ($k =~ /^(B|C|D|E|H|L|A)_$/) {
+				$test_code .= $self->test_r1_code($test_nr, $k, $v);
+			}
+			else {
+				die "cannot parse $k";
+			}
+		}
+		
+		push @{$self->asm}, $reset_code, $asm, $test_code;
+		
+	}
+	
+	sub _alloc_addr {
+		my($self, $n) = @_;
+		
+		my $res_addr = $self->{res_addr};
+		$self->{res_addr} += $n;
+		return $res_addr;
+	}
+	
+	sub _tick_plain_regs {
+		my($self, $reg) = @_;
+		
+		my $reg_tick  = $reg =~ s/_/'/r;
+		my $reg_plain = $reg =~ s/_//r;
+		return ($reg_tick, $reg_plain);
+	}
+	
+	sub _eval_value {
+		my($self, $value, @args) = @_;
+		
+		if (ref($value) eq 'CODE') {
+			$value = $value->(@args);
+		}
+		return $value;
+	}
+	
+	sub _check_value {
+		my($self, $test_nr, $t, $reg, $res_addr, $size, $mask, $value) = @_;
+		local $Test::Builder::Level = $Test::Builder::Level + 1;
+		
+		my $got;
+		if ($size == 1) {
+			$got = $t->{mem}[$res_addr] & ($mask ? $mask : 0xFF);
+			if ($mask) {
+				$got = $got ? 1 : 0;
+			}
+		}
+		elsif ($size == 2) {
+			$got = ($t->{mem}[$res_addr] + ($t->{mem}[$res_addr+1] << 8))
+					& ($mask ? $mask : 0xFFFF);
+		}
+		else {
+			die;
+		}
+		
+		$value = $self->_eval_value($value, $t);
+		if ($size == 1) {
+			$value &= 0xFF;
+		}
+		elsif ($size == 2) {
+			$value &= 0xFFFF;
+		}
+		else {
+			die;
+		}
+		
+		is $got, $value, "Test $test_nr addr=$res_addr $reg=$value";
+	}
+			
+	sub test_flag_code {
+		my($self, $test_nr, $flag, $mask, $value) = @_;
+		
+		my $res_addr = $self->_alloc_addr(1);
+		push @{$self->tests}, sub {
+			my($t) = @_;
+			local $Test::Builder::Level = $Test::Builder::Level + 1;
+			SKIP: {
+				skip "8085 does not have the N flag" if $t->{cpu} eq '8085' && $flag eq 'F_N';
+				$self->_check_value($test_nr, $t, $flag, $res_addr, 1, $mask, $value);
+			}
+		};
+		return <<END;
+							push af
+							ex (sp), hl
+							ld ($res_addr), hl
+							ex (sp), hl
+							pop af
+END
+	}
+	
+	sub test_dd_code {
+		my($self, $test_nr, $dd, $value) = @_;
+		
+		my $res_addr = $self->_alloc_addr(2);
+		push @{$self->tests}, sub {
+			my($t) = @_;
+			local $Test::Builder::Level = $Test::Builder::Level + 1;
+			$self->_check_value($test_nr, $t, $dd, $res_addr, 2, 0, $value);
+		};
+
+		my $cond = ($dd =~ /IX|IY/i) ? "!__CPU_INTEL__ && !__CPU_GBZ80__" : "1";
+		return <<END;
+						IF $cond
+							ld ($res_addr), $dd
+						ELSE
+							push hl
+							ld hl, 0
+							ld ($res_addr), hl
+							pop hl
+						ENDIF
+END
+	}
+	
+	sub test_dd1_code {
+		my($self, $test_nr, $dd, $value) = @_;
+
+		my($dd_tick, $dd_plain) = $self->_tick_plain_regs($dd);
+		my $res_addr = $self->_alloc_addr(2);
+		push @{$self->tests}, sub {
+			my($t) = @_;
+			local $Test::Builder::Level = $Test::Builder::Level + 1;
+			$self->_check_value($test_nr, $t, $dd_tick, $res_addr, 2, 0, $value);
+		};
+		return <<END;
+							exx
+							ld ($res_addr), $dd_plain
+							exx
+END
+	}
+	
+	sub test_r_code {
+		my($self, $test_nr, $r, $value) = @_;
+		
+		my $res_addr = $self->_alloc_addr(1);
+		push @{$self->tests}, sub {
+			my($t) = @_;
+			local $Test::Builder::Level = $Test::Builder::Level + 1;
+			$self->_check_value($test_nr, $t, $r, $res_addr, 1, 0, $value);
+		};
+		return <<END;
+							push af
+							ld a, $r
+							ld ($res_addr), a
+							pop af
+END
+	}
+	
+	sub test_r1_code {
+		my($self, $test_nr, $r, $value) = @_;
+		
+		my($r_tick, $r_plain) = $self->_tick_plain_regs($r);
+		my $res_addr = $self->_alloc_addr(1);
+		push @{$self->tests}, sub {
+			my($t) = @_;
+			local $Test::Builder::Level = $Test::Builder::Level + 1;
+			$self->_check_value($test_nr, $t, $r_tick, $res_addr, 1, 0, $value);
+		};
+		if ($r =~ /A_/) {
+			return <<END;
+							ex af, af'
+							ld ($res_addr), a
+							ex af, af'
+END
+		}
+		else {
+			return <<END;
+							push af
+							exx
+							ld a, $r_plain
+							ld ($res_addr), a
+							exx
+							pop af
+END
+		}
+	}
+	
+	sub run {
+		my($self, @opts) = @_;
+		local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+		push @{$self->asm}, "jp 0\n";
+		push @opts, "" if @opts==0;
+		
+		for my $cpu (@::CPUS) {
+			SKIP: {
+				skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+				
+				for my $opts (@opts) {
+					# run ticks
+					my $t = ::ticks(join("\n", "; $cpu $opts\n", @{$self->asm}), "-m$cpu $opts");
+					
+					# collect labels
+					open(my $f, "<", "$::test.map") or die "open $::test.map: $!";
+					while (<$f>) {
+						if (/^(\w+)\s*=\s*\$([0-9a-f]+)/i) {
+							$t->{labels}{$1} = hex($2);
+						}
+					}
+					$t->{cpu} = $cpu;
+					
+					# check results
+					for (@{$self->tests}) {
+						$_->($t);
+
+						(Test::More->builder->is_passing) or die;
+					}
+				}
+			}
+		}
 	}
 }
 
