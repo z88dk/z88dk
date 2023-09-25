@@ -4599,9 +4599,9 @@ static void handle_ed_page(void)
                 zero = (c | b) == 0;
             }
             if ( zero ) {
-                mp= pc+= (get_memory(pc)^128)-127;
-            } else {
                 pc++;
+            } else {
+                mp = pc += (get_memory(pc) ^ 128) - 127;
             }
             st += 7;
         } else {
