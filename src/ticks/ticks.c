@@ -1875,7 +1875,7 @@ int main (int argc, char **argv){
         if ( israbbit() ) { // ADD SP,d
           uint32_t v;
           st += 4;
-          v = sp + (((get_memory(pc++)^128)-128) & 0xffff);
+          v = sp + (get_memory(pc++)^128)-128;
           sp = v & 0xffff;
           if ( v >> 16 ) ff |= 256;
           else ff &= ~256;
@@ -2978,7 +2978,7 @@ int main (int argc, char **argv){
         if ( isgbz80()) {  // add sp,d
           uint32_t v;
           st += 4;
-          v = sp + (((get_memory(pc++) ^ 128) - 128) & 0xffff);
+          v = sp + (get_memory(pc++)^128)-128;
           sp = v & 0xffff;
           if ( v >> 16 ) ff |= 256;
           else ff &= ~256;
