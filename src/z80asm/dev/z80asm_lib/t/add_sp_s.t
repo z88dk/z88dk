@@ -14,15 +14,18 @@ use Modern::Perl;
 
 my $ticks = Ticks->new;
 
-for my $base (0x1000, 0x4000) {
-	for my $add (-127, 0, 127) {
-		my $sum = $base + ($add & 0xFFFF);
+for my $base (0, 0x1000, 0x4000, 0xFFFF) {
+	for my $add (-127, 0, 127, ) {
+		my $sum = $base + $add;
 		
 		$ticks->add(<<END, 
+					jp start
+					defs 256 ; save space for output
+			start:
 					ld		sp, $base
 					add 	sp, $add
 END
-			F_C	=> $sum > 0xFFFF ? 1 : 0,
+			F_C	=> ($sum > 0xFFFF || $sum < 0) ? 1 : 0,
 			SP	=> $sum & 0xFFFF);
 	}
 }
