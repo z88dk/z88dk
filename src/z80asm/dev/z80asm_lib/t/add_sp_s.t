@@ -22,15 +22,7 @@ for my $base (0x1000, 0x4000) {
 					ld		sp, $base
 					add 	sp, $add
 END
-			F_C	=> sub { my($t) = @_;
-						 if ($t->{cpu} =~ /^r.k|^gbz80/) {
-							 diag "TODO ".$t->{cpu}.": carry on add sp, d";
-							 return 0;
-						 }
-						 else {
-							 return $sum > 0xFFFF ? 1 : 0;
-						 }
-			},
+			F_C	=> $sum > 0xFFFF ? 1 : 0,
 			SP	=> $sum & 0xFFFF);
 	}
 }
