@@ -50,7 +50,7 @@ for my $ixiy ("", "_ixiy") {
 		}
 		
 		open(my $fh, ">", "${output_basename}_${cpu}${ixiy}_ok.asm") or die $!;
-		say $fh join("\n", compute_labels(sort @test));
+		say $fh join("\n", compute_labels($cpu, sort @test));
 	}
 }
 
@@ -255,13 +255,20 @@ sub add {
 }
 
 sub compute_labels {
-	my(@test) = @_;
+	my($cpu, @test) = @_;
 	my $asmpc = 0;
 	for (@test) {
 		my($asm, $bytes) = split(/;/, $_, 2);
 		my @bytes = split ' ', $bytes;
 		my $num_bytes = scalar(@bytes);
-		$num_bytes++ if $bytes =~ /\@/;
+		if ($bytes =~ /\@/) {
+			if ($cpu eq 'ez80') {
+				$num_bytes += 2;
+			}
+			else {
+				$num_bytes += 1;
+			}
+		}
 		
 		while ($bytes =~ /%t(\d*) %t\1 %t\1/) {
 			my $before = $`; my @before = split ' ', $before;

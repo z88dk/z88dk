@@ -252,7 +252,10 @@ void add_call_emul_func(char * emul_func)
 { 
 	declare_extern_symbol(emul_func);
 	Expr1 *emul_expr = parse_expr(emul_func);
-	add_opcode_nn(0xCD, emul_expr, 0);
+    if (option_cpu() == CPU_EZ80)
+        add_opcode_nnn(0xCD, emul_expr, 0);
+    else
+        add_opcode_nn(0xCD, emul_expr, 0);
 }
 
 void add_rst_opcode(int arg) {
@@ -412,4 +415,3 @@ void add_copper_unit_nop()
 	else
 		append_word_be(0x0000);
 }
-	

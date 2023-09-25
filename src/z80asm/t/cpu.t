@@ -46,6 +46,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 						push @patch, [$addr, $1];
 						$bin[$addr++] = 0;
 						$bin[$addr++] = 0;
+						$bin[$addr++] = 0 if $cpu eq 'ez80';
 					}
 					else {
 						$bin[$addr++] = hex($_);							
@@ -77,6 +78,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 				defined(my $value = $labels{$name}) or die "$name not found";
 				$bin[$addr++] = $value & 0xFF;
 				$bin[$addr++] = ($value >> 8) & 0xFF;
+				$bin[$addr++] = ($value >> 16) & 0xFF if $cpu eq 'ez80';
 			}
 		}
 		my $bin = join('', map {chr} @bin);
