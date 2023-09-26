@@ -105,6 +105,7 @@ extern void        out(int port, int value);
 extern uint8_t    *get_memory_addr(int pc);
 
 extern uint8_t     get_memory(uint16_t pc);
+extern uint8_t     get_memory_inst(uint16_t pc); // Get memory for an instruction (so no ioi/ioe handling)
 extern uint8_t     put_memory(uint16_t pc, uint8_t b);
 
 // acia

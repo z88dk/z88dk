@@ -34,6 +34,8 @@ static unsigned char  zx_pages[4] = { 0x11, 0x05, 0x02, 0x00 };
 static unsigned char *zx_banks[8];
 static unsigned char *zx_rom[2];
 
+static int            inst_mode = 1;       // We're reading an instruction
+
 static memory_func   get_mem_addr;
 static void        (*handle_out)(int port, int value);
 
@@ -60,6 +62,16 @@ uint8_t get_memory(uint16_t pc)
 {
   bk.debugger_read_memory(pc);
   return  *get_memory_addr(pc);
+}
+
+uint8_t get_memory_inst(uint16_t pc)
+{
+  uint8_t v;
+  bk.debugger_read_memory(pc);
+  inst_mode = 1;
+  v =  *get_memory_addr(pc);
+  inst_mode = 0;
+  return v;
 }
 
 uint8_t put_memory(uint16_t pc, uint8_t b)
@@ -297,9 +309,9 @@ static uint8_t *ioe_mem;
 static uint8_t *rabbit_get_memory_addr(int pc)
 {
     pc &= 0xffff;
-    if (ioi) {
+    if (ioi && !inst_mode) {
       return &ioi_mem[pc & 65535];
-    } else if (ioe) {
+    } else if (ioe && !inst_mode) {
       return &ioe_mem[pc & 65535];
     }
     return &mem[pc & 65535];
