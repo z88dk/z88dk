@@ -276,7 +276,7 @@ static char *handle_register8(dcontext *state, uint8_t y, char *buf, size_t bufl
     size_t offs = 0;
     int index = state->index;
 
-    /* Turn of ixl/h handling for Rabbit and Z180 */
+    /* Turn off ixl/h handling for Rabbit and Z180 */
     if ( !canixh() && y != 6 ) {
         index = 0;
     }
@@ -500,8 +500,11 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         case 6:
                             if ( isez80() && state->index != 0 && y == 7 ) {
                                BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state, "ld"), handle_register8(state, 6, opbuf1, sizeof(opbuf1)), handle_hl(state->index == 1 ? 2 : 1));
+                            }
+                            else if (israbbit4k() && state->index != 0 && y == 0) {
+                               BUF_PRINTF("%-10sa,(%s+a)", "ld", handle_hl(state->index));
                             } else {
-                               handle_register8(state, y,opbuf1,sizeof(opbuf1));
+                               handle_register8(state,y,opbuf1,sizeof(opbuf1));
                                handle_immed8(state, opbuf2, sizeof(opbuf2));
                                BUF_PRINTF("%-10s%s,%s", y == 6 ? handle_ez80_am(state, "ld") : "ld", opbuf1, opbuf2);
                             }
@@ -916,6 +919,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                                 else if ( y == 2 ) BUF_PRINTF("%-10s(sp),hl","ex");
                                                 else if ( y == 4 ) BUF_PRINTF("%-10s(hl),hl","ldp");
                                                 else if ( y == 5 ) BUF_PRINTF("%-10shl,(hl)","ldp");
+                                                else if ( y == 6 && israbbit4k() ) BUF_PRINTF("%-10sbc',hl","ex");
                                                 else if ( y == 7 && israbbit4k() ) BUF_PRINTF("%-10sjk',hl","ex");
                                                 else BUF_PRINTF("nop");
                                             } else if ( isz180() || isez80() ) {
