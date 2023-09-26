@@ -8,7 +8,7 @@
 ;	int __FASTCALL__ zx_getint(char *variable);
 ;
 ;
-;	$Id: zx_getint.asm,v 1.5 2016-06-26 20:32:08 dom Exp $
+;	$Id: zx_getint.asm $
 ;	
 
 SECTION code_clib
@@ -40,7 +40,13 @@ _zx_getint:
 	inc	hl
 	ld	b,(hl)
 	
+IF FORlambda
+	EXTERN  __lambda_stk_store
+	call    __lambda_stk_store
+ELSE
 	call	ZXFP_STK_STORE
+ENDIF
+
 	call	ZXFP_FP_TO_BC
 	
 	ld	h,b

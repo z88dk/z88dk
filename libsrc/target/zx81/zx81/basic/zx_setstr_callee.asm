@@ -7,7 +7,7 @@
 ;	int __CALLEE__ zx_setstr_callee(char variable, char *value);
 ;
 ;
-;	$Id: zx_setstr_callee.asm,v 1.5 2016-06-26 20:32:09 dom Exp $
+;	$Id: zx_setstr_callee.asm $
 ;
 
 SECTION code_clib
@@ -30,6 +30,7 @@ _zx_setstr_callee:
 .asm_zx_setstr
 	
 	ld	a,e
+
 	and	31
 	add	69
 
@@ -53,8 +54,10 @@ morevar:
 	jr	nz,nextvar
 
 IF FORlambda
-	call	$1A13			; get next variable start
-	call	$0177			; reclaim space (delete)
+	EXTERN  __lambda_next_one
+	call    __lambda_next_one
+	EXTERN  __lambda_reclaim_space
+	call	__lambda_reclaim_space
 ELSE	
 	call	$09F2			; get next variable start
 	call	$0A60			; reclaim space (delete)
@@ -83,7 +86,8 @@ lenloop:
 	inc	bc
 	inc	bc
 IF FORlambda
-	call	$1CB5
+	EXTERN  __lambda_make_room
+	call    __lambda_make_room
 ELSE
 	call	$099E			; MAKE-ROOM
 ENDIF
@@ -118,8 +122,9 @@ ENDIF
 nextvar:
 
 IF FORlambda
-	call	$1A13			; get next variable start
-ELSE	
+	EXTERN  __lambda_next_one
+	call    __lambda_next_one
+ELSE
 	call	$09F2			;get next variable start
 ENDIF
 	ex	de,hl

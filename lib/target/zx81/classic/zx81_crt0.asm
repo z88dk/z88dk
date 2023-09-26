@@ -395,35 +395,81 @@ IF (startup>100)
 	PUBLIC __lambda_keyboard
 	PUBLIC __lambda_decode
 	PUBLIC __lambda_cls
+	PUBLIC __lambda_next_one
+	PUBLIC __lambda_make_room
+	PUBLIC __lambda_stk_store
+	PUBLIC __lambda_stk_fetch
+	PUBLIC __lambda_stack_bc
+	PUBLIC __lambda_fp_to_bc
+	PUBLIC __lambda_reclaim_space
+	PUBLIC __lambda_line_addr
+	PUBLIC __lambda_line_run
+	PUBLIC __lambda_class_6
+	PUBLIC __lambda_find_int
+	PUBLIC __lambda_scanning
+	PUBLIC __lambda_strs_add
 
 ; Color Lambda ROM
 IF ((startup=101) | (startup=102))
-__lambda_keyboard:
-    jp $D74
-__lambda_decode:
-    jp $1877
-__lambda_cls:
-    jp $1C7D
+    defc __lambda_keyboard       =  $0D74
+    defc __lambda_decode         =  $1877
+    defc __lambda_cls            =  $1C7D
+    defc __lambda_next_one       =  $1A13
+    defc __lambda_clear_one      =  $0174
+    defc __lambda_make_room      =  $1CB5
+    defc __lambda_stk_store      =  $13BC
+    defc __lambda_stk_fetch      =  $0020
+    defc __lambda_stack_bc       =  $077E
+    defc __lambda_fp_to_bc       =  $0555
+    defc __lambda_reclaim_space  =  $0177
+    defc __lambda_line_addr      =  $0B36
+    defc __lambda_line_run       =  $0088
+    defc __lambda_class_6        =  $0A11
+    defc __lambda_find_int       =  $1509
+    defc __lambda_scanning       =  $0806
+    defc __lambda_strs_add       =  $189B
 ENDIF
 
-; Monochrome Lambda ROM (earlier?)
+; Monochrome Lambda ROM (earlier version)
 IF ((startup=201) | (startup=202))
-__lambda_keyboard:
-    jp $33D
-__lambda_decode:
-    jp $95E
-__lambda_cls:
-    jp $BD0
+    defc __lambda_keyboard       =  $033D
+    defc __lambda_decode         =  $095E
+    defc __lambda_cls            =  $0BD0
+    defc __lambda_next_one       =  $0B84
+    defc __lambda_clear_one      =  $0612
+    defc __lambda_make_room      =  $0B30
+    defc __lambda_stk_store      =  $14B8
+    defc __lambda_stk_fetch      =  $15ED
+    defc __lambda_stack_bc       =  $1718
+    defc __lambda_fp_to_bc       =  $1782
+    defc __lambda_reclaim_space  =  $0BF5
+    defc __lambda_line_addr      =  $0B36
+    defc __lambda_line_run       =  $0E45
+    defc __lambda_class_6        =  $0F0F
+    defc __lambda_find_int       =  $1088
+    defc __lambda_scanning       =  $114A
+    defc __lambda_strs_add       =  $1D57
 ENDIF
 
 ; CAC-3 and NF300
 IF ((startup=301) | (startup=302))
-__lambda_keyboard:
-    jp $E1C
-__lambda_decode:
-    jp $1A40
-__lambda_cls:
-    jp $1602
+    defc __lambda_keyboard       =  $0E1C
+    defc __lambda_decode         =  $1A40
+    defc __lambda_cls            =  $1602
+    defc __lambda_next_one       =  $1BE0
+    defc __lambda_clear_one      =  $01CF
+    defc __lambda_make_room      =  $1E39
+    defc __lambda_stk_store      =  $14D5
+    defc __lambda_stk_fetch      =  $0020
+    defc __lambda_stack_bc       =  $0821
+    defc __lambda_fp_to_bc       =  $05DE
+    defc __lambda_reclaim_space  =  $01D2
+    defc __lambda_line_addr      =  $0BDA
+    defc __lambda_line_run       =  $00A6
+    defc __lambda_class_6        =  $0AB2
+    defc __lambda_find_int       =  $167C
+    defc __lambda_scanning       =  $08AB
+    defc __lambda_strs_add       =  $1A68
 ENDIF
 
 ENDIF

@@ -7,7 +7,7 @@
 ;	float zx_getfloat(char *variable);
 ;
 ;
-;	$Id: zx_getfloat.asm,v 1.4 2016-06-26 20:32:08 dom Exp $
+;	$Id: zx_getfloat.asm $
 ;
 
 SECTION code_clib
@@ -41,10 +41,17 @@ _zx_getfloat:
 	inc	hl
 	ld	b,(hl)
 
+IF FORlambda
+	EXTERN  __lambda_stk_store
+	call    __lambda_stk_store
+	ld de,(401Ch)		; STKEND
+	ld hl,-5
+	add hl,de
+ELSE
 	call	ZXFP_STK_STORE
-
-	rst	ZXFP_BEGIN_CALC
-	defb	ZXFP_END_CALC		; Now HL points to the float on the FP stack
+	rst     ZXFP_BEGIN_CALC
+	defb    ZXFP_END_CALC		; Now HL points to the float on the FP stack
+ENDIF
 
 	ld	(ZXFP_STK_PTR),hl	; update the FP stack pointer (equalise)
 	

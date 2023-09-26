@@ -8,7 +8,7 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.6 2016-06-26 20:32:08 dom Exp $
+;	$Id: zx_locatenum.asm $
 ;
 
         SECTION code_clib
@@ -56,7 +56,8 @@ vp:	ld	a,(hl)
 	
 v1:	push	bc
 IF FORlambda
-	call	$1A13
+	EXTERN  __lambda_next_one
+	call    __lambda_next_one
 ELSE
 	call	$09F2			; find next variable
 ENDIF
