@@ -412,8 +412,8 @@ main(unsigned int arg2, char *arg1)
 
 #ifdef __LAMBDA__
 
-// int
-#define ARG_INT    asm("rst\t0x08\nEXTERN\t__lambda_class_6\ncall\t__lambda_class_6\nEXTERN\t__lambda_find_int\ncall\t__lambda_find_int\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
+// int   (0x28,7 = JR Z,7)
+#define ARG_INT    asm("rst\t0x08\nEXTERN\t__lambda_class_6\ncall\t__lambda_class_6\nEXTERN\t__lambda_find_int\ncall\t__lambda_find_int\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\npush\tbc\n")
 
 // unsigned int
 #define ARG_UINT   asm("rst\t0x08\nEXTERN\t__lambda_class_6\ncall\t__lambda_class_6\nEXTERN\t__lambda_find_int\ncall\t__lambda_find_int\npush\tbc\n")
@@ -432,8 +432,8 @@ main(unsigned int arg2, char *arg1)
 
 #else
 
-// int
-#define ARG_INT    asm("rst\t0x20\ncall\t0x0D92\ncall\t0x158A\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
+// int   (0x28,7 = JR Z,7)
+#define ARG_INT    asm("rst\t0x20\ncall\t0x0D92\ncall\t0x158A\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\npush\tbc\n")
 
 // unsigned int
 #define ARG_UINT   asm("rst\t0x20\ncall\t0x0D92\ncall\t0x158A\npush\tbc\n")
