@@ -30,6 +30,7 @@
 extern unsigned char a,b,c,d,e,h,l,j,k;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_,j_,k_;
 extern unsigned char xh, xl, yh, yl;
+extern unsigned char ioi, ioe;
 extern unsigned short ff, pc, sp;
 extern long long st;
 
@@ -90,6 +91,12 @@ extern void      hook_console_init(hook_command *cmds);
 extern void memory_init(char *model);
 extern void memory_handle_paging(int port, int value);
 extern void memory_reset_paging();
+extern int       rabbit_get_ioi_reg(int reg);
+
+// Rabbit registers
+#define RABBIT_EDMR  0x0420    // If 0xc0 then R4K mode, otherwise in R2K
+
+
 
 
 extern void        out(int port, int value);
@@ -115,6 +122,7 @@ extern void apu_write_command(uint8_t cmd);
 
 extern int hook_console_out(int port, int value);
 extern int hook_console_in(int port);
+
 
 #ifndef WIN32
 extern int kbhit();

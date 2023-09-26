@@ -9,6 +9,10 @@
 #include "backend.h"
 #include "profiler.h"
 
+// Rabbit4k can work in both r3k and r2k modes
+#undef israbbit4k
+#define israbbit4k() ( (c_cpu & CPU_R4K) && rabbit_get_ioi_reg(RABBIT_EDMR) == 0xc0)
+
 // fr = zero, ff&256 = carry, ff&128 = s/p
 
 // TODO: Setting P flag
@@ -611,6 +615,11 @@
     fprintf(stderr, "Invalid R4K opcode at %04x", pc-1); \
 } while(0)
 
+
+#define RABBIT_UNDEFINED(addr,inst) do { \
+    fprintf(stderr, "Invalid Rabbit opcode at %04x opcode=%x %s", pc-1,addr,inst); \
+} while(0)
+
 FILE * ft;
 unsigned char * tapbuf;
 
@@ -1033,6 +1042,8 @@ int main (int argc, char **argv){
           exit(EXIT_FAILURE);
       }
     else{
+      if ( israbbit() )
+        memory_model = "rabbit";
       memory_init(memory_model);
 
       fh= fopen(argv[1], "rb");
@@ -5053,8 +5064,15 @@ static void handle_ed_page(void)
         put_memory(mp++,t); 
         break;
     case 0xa0: // LDI
-        st+= israbbit() ? 10 : isz180() ? 12 : isr800() ? 4 : 16; 
-        put_memory(e | d<<8, t= get_memory(l | h<<8));
+        st+= israbbit() ? 10 : isz180() ? 12 : isr800() ? 4 : 16;
+        // Only dest is affected by ioi/ioe on a rabbit
+        {
+            uint8_t s_ioi = ioi, s_ioe = ioe;
+            ioi = ioe = 0;
+            t =  get_memory(l | h<<8);
+            ioi = s_ioi; ioe = s_ioe;
+            put_memory(e | d<<8, t);
+        }
         ++l || h++;
         ++e || d++;
         c-- || b--;
@@ -5069,7 +5087,14 @@ static void handle_ed_page(void)
         break;
     case 0xa8: // LDD
         st+= israbbit() ? 10 : isz180() ? 12 :  isr800() ? 4 : 16;
-        put_memory(e | d<<8, t= get_memory(l | h<<8));
+        // On a rabbit only destination is affected by ioi/ioe
+        {
+            uint8_t s_ioi = ioi, s_ioe = ioe;
+            ioi = ioe = 0;
+            t = get_memory(l | h<<8);
+            ioi = s_ioi; ioe = s_ioe;
+            put_memory(e | d<<8, t);
+        }
         l-- || h--;
         e-- || d--;
         c-- || b--;
@@ -5083,7 +5108,14 @@ static void handle_ed_page(void)
         fb= fa; 
         break;
     case 0xb0: st+= israbbit() ? 7 : isz180() ? 12 :  isr800() ? 4 : 16;                                // LDIR
-        put_memory(e | d<<8, t= get_memory(l | h<<8));
+        // On a rabbit only destination is affected by ioi/ioe
+        {
+            uint8_t s_ioi = ioi, s_ioe = ioe;
+            ioi = ioe = 0;
+            t = get_memory(l | h<<8);
+            ioi = s_ioi; ioe = s_ioe;
+            put_memory(e | d<<8, t);
+        }
         ++l || h++;
         ++e || d++;
         c-- || b--;
@@ -5097,9 +5129,17 @@ static void handle_ed_page(void)
                 st+= israbbit() ? 6 : isz180() ? 2 : 5,
                 mp= --pc,
                 --pc);
+        if (ioe|ioi) --pc;  // Pick up the IO prefix again
         fb= fa; break;
     case 0xb8: st+= israbbit() ? 7 : isz180() ? 12 :  isr800() ? 4 : 16;                                // LDDR
-        put_memory(e | d<<8, t= get_memory(l | h<<8));
+        // On a rabbit only destination is affected by ioi/ioe
+        {
+            uint8_t s_ioi = ioi, s_ioe = ioe;
+            ioi = ioe = 0;
+            t = get_memory(l | h<<8);
+            ioi = s_ioi; ioe = s_ioe;
+            put_memory(e | d<<8, t);
+        }
         l-- || h--;
         e-- || d--;
         c-- || b--;
@@ -5113,73 +5153,102 @@ static void handle_ed_page(void)
                 st+= israbbit() ? 6 : isz180() ? 2 : 5,
                 mp= --pc,
                 --pc);
+        if (ioe|ioi) --pc;  // Pick up the IO prefix again
         fb= fa; break;
-    case 0xa1: st+=  isr800() ? 4 : 16;                                // CPI
-        w= a-(t= get_memory(l|h<<8));
-        ++l || h++;
-        c-- || b--;
-        ++mp;
-        fr=  w & 127
-        | w>>7;
-        fb= ~(t|128);
-        fa= a&127;
-        b|c && ( fa|= 128,
-                fb|= 128);
-        ff=  ff  & -256
-        | w   &  -41;
-    (w^t^a) & 16 && w--;
-    ff|= w<<4 & 32
-        | w    &  8; break;
-    case 0xa9: st+=  isr800() ? 4 : 16;                                // CPD
-        w= a-(t= get_memory(l|h<<8));
-        l-- || h--;
-        c-- || b--;
-        --mp;
-        fr=  w & 127
-        | w>>7;
-        fb= ~(t|128);
-        fa= a&127;
-        b|c && ( fa|= 128,
-                fb|= 128);
-        ff=  ff  & -256
-        | w   &  -41;
-    (w^t^a) & 16 && w--;
-    ff|= w<<4 & 32
-        | w    &  8; break;
-    case 0xb1: st+=  isr800() ? 4 : 16;                                // CPIR
-        w= a-(t= get_memory(l|h<<8));
-        ++l || h++;
-        c-- || b--;
-        ++mp;
-        fr=  w & 127
-        | w>>7;
-        fb= ~(t|128);
-        fa= a&127;
-        b|c && ( fa|= 128,
-                fb|= 128,
-                w && (st+= 5, mp=--pc, --pc));
-        ff=  ff  & -256
-        | w   &  -41;
-    (w^t^a) & 16 && w--;
-    ff|= w<<4 & 32
-        | w    &  8; break;
-    case 0xb9: st+=  isr800() ? 4 : 16;                                // CPDR
-        w= a-(t= get_memory(l|h<<8));
-        l-- || h--;
-        c-- || b--;
-        --mp;
-        fr=  w & 127
-        | w>>7;
-        fb= ~(t|128);
-        fa= a&127;
-        b|c && ( fa|= 128,
-                fb|= 128,
-                w && (st+= 5, mp=--pc, --pc));
-        ff=  ff  & -256
-        | w   &  -41;
-    (w^t^a) & 16 && w--;
-    ff|= w<<4 & 32
-        | w    &  8; break;
+    case 0xa1:    // CPI
+        if ( israbbit() ) {
+            RABBIT_UNDEFINED(0xeda1, "cpi");
+            st += 4;
+        } else {
+            st+=  isr800() ? 4 : 16;
+            w= a-(t= get_memory(l|h<<8));
+            ++l || h++;
+            c-- || b--;
+            ++mp;
+            fr=  w & 127
+            | w>>7;
+            fb= ~(t|128);
+            fa= a&127;
+            b|c && ( fa|= 128,
+                    fb|= 128);
+            ff=  ff  & -256
+            | w   &  -41;
+        (w^t^a) & 16 && w--;
+        ff|= w<<4 & 32
+            | w    &  8; 
+        }
+        break;
+    case 0xa9:  // cpd
+        if ( israbbit() ) {
+            RABBIT_UNDEFINED(0xeda9, "cpd");
+            st += 4;
+        } else {
+            st+=  isr800() ? 4 : 16;
+            w= a-(t= get_memory(l|h<<8));
+            l-- || h--;
+            c-- || b--;
+            --mp;
+            fr=  w & 127
+            | w>>7;
+            fb= ~(t|128);
+            fa= a&127;
+            b|c && ( fa|= 128,
+                    fb|= 128);
+            ff=  ff  & -256
+            | w   &  -41;
+        (w^t^a) & 16 && w--;
+        ff|= w<<4 & 32
+            | w    &  8; 
+        }
+        break;
+    case 0xb1: // CPIR
+        if ( israbbit() ) { // TODO: SETSYS (r4k)
+            RABBIT_UNDEFINED(0xedb1, "cpir");
+            st += 4;
+        } else {
+            st+=  isr800() ? 4 : 16; 
+            w= a-(t= get_memory(l|h<<8));
+            ++l || h++;
+            c-- || b--;
+            ++mp;
+            fr=  w & 127
+            | w>>7;
+            fb= ~(t|128);
+            fa= a&127;
+            b|c && ( fa|= 128,
+                    fb|= 128,
+                    w && (st+= 5, mp=--pc, --pc));
+            ff=  ff  & -256
+            | w   &  -41;
+        (w^t^a) & 16 && w--;
+        ff|= w<<4 & 32
+            | w    &  8; 
+        }
+        break;
+    case 0xb9: // CPDR
+        if ( israbbit() ) {
+            RABBIT_UNDEFINED(0xedb9, "cpdr");
+            st += 4;
+        } else {
+            st+=  isr800() ? 4 : 16;
+            w= a-(t= get_memory(l|h<<8));
+            l-- || h--;
+            c-- || b--;
+            --mp;
+            fr=  w & 127
+            | w>>7;
+            fb= ~(t|128);
+            fa= a&127;
+            b|c && ( fa|= 128,
+                    fb|= 128,
+                    w && (st+= 5, mp=--pc, --pc));
+            ff=  ff  & -256
+            | w   &  -41;
+        (w^t^a) & 16 && w--;
+        ff|= w<<4 & 32
+            | w    &  8; 
+        }
+        break;
     case 0xa2: st+=  isr800() ? 4 : 16;                                // INI
         put_memory(l | h<<8,t= in(mp= c | b<<8));
         ++l || h++;

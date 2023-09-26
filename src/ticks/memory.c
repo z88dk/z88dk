@@ -23,6 +23,8 @@ static void     zx_handle_out(int port, int value);
 static void     z180_init(void);
 static uint8_t *z180_get_memory_addr(int pc);
 static void     z180_handle_out(int port, int value);
+static void     rabbit_init(void);
+static uint8_t *rabbit_get_memory_addr(int pc);
 
 static unsigned char *mem;
 static unsigned char  zxnext_mmu[8] = {0xff};
@@ -46,6 +48,8 @@ void memory_init(char *model) {
         standard_init();
     } else if ( strcmp(model, "z180") == 0 ) {
         z180_init();
+    } else if ( strcmp(model, "rabbit") == 0 ) {
+        rabbit_init();
     } else {
         fprintf(stderr, "Unknown memory model %s\n",model);
         exit(1);
@@ -283,3 +287,41 @@ static void zx_handle_out(int port, int value)
   }
   return;
 }
+
+
+
+// Rabbit - need to handle ioi/ioe
+static uint8_t *ioi_mem;
+static uint8_t *ioe_mem;
+
+static uint8_t *rabbit_get_memory_addr(int pc)
+{
+    pc &= 0xffff;
+    if (ioi) {
+      return &ioi_mem[pc & 65535];
+    } else if (ioe) {
+      return &ioe_mem[pc & 65535];
+    }
+    return &mem[pc & 65535];
+}
+
+static void rabbit_init(void) 
+{
+    mem = calloc(65536, 1);
+    get_mem_addr = rabbit_get_memory_addr;
+
+    ioi_mem = calloc(65536,1);
+    ioe_mem = calloc(65536,1);
+
+    // Initialse some registers here
+}
+
+// Get the value of an internal register
+int rabbit_get_ioi_reg(int reg)
+{
+    reg &= 0xffff;
+
+    return ioi_mem[reg];
+}
+
+
