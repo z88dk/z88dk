@@ -1365,3 +1365,8 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+
+int israbbit4k(void)
+{
+    return 0;
+}
