@@ -31,7 +31,7 @@
 extern unsigned char a,b,c,d,e,h,l,j,k;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_,j_,k_;
 extern unsigned char xh, xl, yh, yl;
-extern unsigned char ioi, ioe;
+extern unsigned char ioi, ioe, altd;
 extern unsigned short ff, pc, sp;
 extern long long st;
 
@@ -109,6 +109,8 @@ extern uint8_t     get_memory(uint32_t pc, memtype type);
 #define get_memory_inst(x) get_memory(x, MEM_TYPE_INST)
 #define get_memory_data(x) get_memory(x, MEM_TYPE_DATA)
 extern uint8_t     put_memory(uint16_t pc, uint8_t b);
+
+#define put_memory_physical(pc,b) *get_memory_addr(pc, MEM_TYPE_PHYSICAL) = b
 
 // acia
 extern int acia_out(int port, int value);

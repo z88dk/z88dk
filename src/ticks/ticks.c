@@ -857,6 +857,7 @@ extern backend_t ticks_debugger_backend;
 
 int main (int argc, char **argv){
   int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0, symbol_addr = -1;
+  uint8_t opc;
   char * output= NULL;
   char  *memory_model = "standard";
   FILE * fh;
@@ -1252,7 +1253,7 @@ int main (int argc, char **argv){
     if( tap && st>sttap )
       sttap= st+( tap= tapcycles() );
     r++;
-    switch( get_memory_inst(pc++) ){
+    switch( (opc = get_memory_inst(pc++)) ){
       case 0x00: // NOP
         st+= israbbit() ? 2 : isz180() ? 3 : 4;
         ih=1;altd=0;ioi=0;ioe=0;break;
@@ -3687,10 +3688,11 @@ int main (int argc, char **argv){
 
 static void handle_r4k_7f_page(void)
 {
+    uint8_t opc;
     if (ih) {
         // 7f page - 8 bit operations moved out from main page
         r++;
-        switch( get_memory_inst(pc++) ){
+        switch( (opc = get_memory_inst(pc++)) ){
         case 0x40: // LD B,B
             if ( altd ) { b_ = b; st += 4; ih=1;altd=0;ioi=0;ioe=0;break; }
         case 0x49: // LD C,C
@@ -4084,8 +4086,9 @@ static void handle_r4k_7f_page(void)
 
 static void handle_ed_page(void)
 {
+    uint8_t opc;
     r++;
-    switch( get_memory_inst(pc++) ){
+    switch( (opc = get_memory_inst(pc++)) ){
     case 0x02:    // (EZ80) LEA BC,IX+d
         if ( isez80() ) { // LEA BC,IX+d
             LEA(b, c, xh, xl, 3);
@@ -5397,9 +5400,10 @@ static void handle_ed_page(void)
 
 static void handle_cb_page(void)
 {
+    uint8_t opc;
     r++;
     if( ih )
-        switch( get_memory_inst(pc++) ){
+        switch( (opc = get_memory_inst(pc++)) ){
         case 0x00:  RLC(b,b_); break;                       // RLC B
         case 0x01:  RLC(c,c_); break;                       // RLC C
         case 0x02:  RLC(d,d_); break;                       // RLC D
