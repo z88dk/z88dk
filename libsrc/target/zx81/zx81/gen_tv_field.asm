@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: gen_tv_field.asm,v 1.4 2016-06-26 20:36:33 dom Exp $
+;	$Id: gen_tv_field.asm $
 ;
 ;----------------------------------------------------------------
 ;
@@ -40,17 +40,24 @@ DFILE_PTRA:
                                         ;           the initial HALT representing the top border,
                                         ;           but with bit 15 of the address set.
 
+IF FORlambda
+        LD      HL,16509		; LAMBDA 8300 and clones..  not tested at all !
+ELSE
         LD      HL,($400C)      ;; point HL to D-FILE the first HALT
+ENDIF
                                 ;; instruction.
         SET     7,H             ;; now point to the DFILE echo in the 
                                 ;; top 32K of address space.
 
 DFILE_PTRB:
-        ;LD   C,24			;
-        LD   C,48			; 7         There are 48 scan lines (UK) above the ZX80
+        ;LD   C,24
+        LD   C,48                       ; 7         There are 48 scan lines (UK) above the ZX80
                                         ;           main display area, or 24 for USA models.
-                                  
+IF FORzx80
         CALL $01B0                      ; 17+n      Produce the top border and main area.
+ELSE
+        CALL __display_5
+ENDIF
 
 ; Generate the bottom border.
 
@@ -60,12 +67,27 @@ DFILE_PTRB:
         INC  B                          ; 4         Increment the row count, i.e. B holds $01.
         DEC  HL                         ; 6         Decrement the screen address, i.e. point to
                                         ;           the last HALT.
-        LD   C,$2F			; 7         the blank line counter, i.e. 47 or 23
+        LD   C,$2F                      ; 7         the blank line counter, i.e. 47 or 23
                                         ;           scan lines below the ZX80 main display area.
+IF FORzx80
         CALL $01B0                      ; 17+n      Produce the bottom border.
+ELSE
+        CALL __display_5
+ENDIF
 
 ; Start the vertical sync pulse.
 
         IN   A,($FE)                    ; 11        Turn on the vertical sync generator. It be
                                         ;           will be turned off approximately 23 scan
         RET                             ; 10        lines from now.
+
+
+IF FORzx80
+        ;
+ELSE
+__display_5:
+        LD      R,A             ;
+        LD      A,$DD           ;
+        EI                      ; enable interrupts
+        JP      (HL)            ;
+ENDIF
