@@ -28,8 +28,14 @@
 
 ;; COPY
 L0869:  LD      D,24           ; prepare to copy twenty four text lines.
+
+IF FORlambda
+        LD      HL,16510		; LAMBDA 8300 and clones..  not tested at all !
+ELSE
         LD      HL,($400C)      ; set HL to start of display file from D_FILE.
         INC     HL              ; 
+ENDIF
+
 
 ;; COPY*D
 L0876:  ;CALL    $02E7           ; routine SET-FAST
