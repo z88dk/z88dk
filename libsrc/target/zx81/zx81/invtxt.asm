@@ -19,7 +19,11 @@
 
 invtxt:
 _invtxt:
+IF FORlambda
+                ld	hl,16509
+ELSE
                 LD HL,(400CH)        ; DFILE ADDR
+ENDIF
                 LD C,16H             ; LINES=22
 LOOP2:          LD B,20H             ; CHARS=32
 LOOP1:          INC HL               ; INC DFILE
