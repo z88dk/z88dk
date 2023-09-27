@@ -671,14 +671,14 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         else if ( y == 2 && q == 0 && z == 2 ) BUF_PRINTF("%-10shl,(%s)","ldf", handle_addr24(state,opbuf1,sizeof(opbuf1)));
                         else if ( y == 4 && q == 0 && z == 1 ) BUF_PRINTF("%-10shl,de","ld");
                         else if ( y == 6 && q == 0 && z == 1 ) BUF_PRINTF("%-10sde,hl","ld");
-                        else if ( y == 2 && q == 0 && z == 7 ) BUF_PRINTF("%-10sxpc,hl","ld");
+                        else if ( y == 2 && q == 0 && z == 7 ) BUF_PRINTF("%-10slxpc,hl","ld");
                         else if ( y == 4 && q == 0 && z == 7 ) BUF_PRINTF("%-10s","mulu");
                         else if ( y == 6 && q == 0 && z == 7 ) BUF_PRINTF("%-10sa","or");
                         else if ( y == 1 && q == 1 && z == 1 ) BUF_PRINTF("%-10s(%s),jk","ld", handle_addr16(state,opbuf1,sizeof(opbuf1)));
                         else if ( y == 1 && q == 1 && z == 2 ) BUF_PRINTF("%-10s(%s),a","ldf", handle_addr24(state,opbuf1,sizeof(opbuf1)));
                         else if ( y == 3 && q == 1 && z == 1 ) BUF_PRINTF("%-10sjk,(%s)","ld", handle_addr16(state,opbuf1,sizeof(opbuf1)));
                         else if ( y == 3 && q == 1 && z == 2 ) BUF_PRINTF("%-10sa,(%s)","ldf", handle_addr24(state,opbuf1,sizeof(opbuf1)));
-                        else if ( y == 3 && q == 1 && z == 7 ) BUF_PRINTF("%-10shl,xpc","ld");
+                        else if ( y == 3 && q == 1 && z == 7 ) BUF_PRINTF("%-10shl,lxpc","ld");
                         else if ( y == 5 && q == 1 && z == 1 ) BUF_PRINTF("%-10sjk,%s","ld", handle_immed16(state,opbuf1,sizeof(opbuf1)));
                         else if ( y == 5 && q == 1 && z == 7 ) BUF_PRINTF("%-10sa","xor");
                         else if ( y == 7 && q == 1 && z == 1 ) BUF_PRINTF("%-10sjk,hl","ex");
