@@ -187,7 +187,7 @@ static void disassemble_loop(int start, int end)
 }
 
 
-uint8_t get_memory(uint16_t pc)
+uint8_t get_memory(uint32_t pc, memtype type)
 {
     return mem[pc % BUFF_SIZE] ^ inverted;
 }

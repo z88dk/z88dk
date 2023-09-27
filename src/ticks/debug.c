@@ -1026,7 +1026,7 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
             char ch;
             switch (resolve_by) {
                 case RESOLVE_BY_POINTER: {
-                    ch = bk.get_memory((uint16_t)data);
+                    ch = bk.get_memory(data, MEM_TYPE_DATA);
                     into->memory_location = data;
                     break;
                 }
@@ -1050,7 +1050,7 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
                 int16_t v;
                 switch (resolve_by) {
                     case RESOLVE_BY_POINTER: {
-                        v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                        v = (bk.get_memory(data + 1, MEM_TYPE_DATA) << 8) + bk.get_memory(data, MEM_TYPE_DATA);
                         into->memory_location = data;
                         break;
                     }
@@ -1066,7 +1066,7 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
                 uint16_t v;
                 switch (resolve_by) {
                     case RESOLVE_BY_POINTER: {
-                        v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                        v = (bk.get_memory(data + 1, MEM_TYPE_DATA) << 8) + bk.get_memory(data, MEM_TYPE_DATA);
                         into->memory_location = data;
                         break;
                     }
@@ -1085,7 +1085,7 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
                 int32_t v;
                 switch (resolve_by) {
                     case RESOLVE_BY_POINTER: {
-                        v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
+                        v = (bk.get_memory(data + 3, MEM_TYPE_DATA) << 24) + (bk.get_memory(data + 2, MEM_TYPE_DATA) << 16) + (bk.get_memory(data + 1, MEM_TYPE_DATA) << 8) + bk.get_memory(data, MEM_TYPE_DATA);
                         into->memory_location = data;
                         break;
                     }
@@ -1101,7 +1101,7 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
                 uint32_t v;
                 switch (resolve_by) {
                     case RESOLVE_BY_POINTER: {
-                        v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
+                        v = (bk.get_memory(data + 3, MEM_TYPE_DATA) << 24) + (bk.get_memory(data + 2, MEM_TYPE_DATA) << 16) + (bk.get_memory(data + 1, MEM_TYPE_DATA) << 8) + bk.get_memory(data, MEM_TYPE_DATA);
                         into->memory_location = data;
                         break;
                     }
@@ -1131,7 +1131,7 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
             uint16_t v;
             switch (resolve_by) {
                 case RESOLVE_BY_POINTER: {
-                    v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                    v = (bk.get_memory(data + 1, MEM_TYPE_DATA) << 8) + bk.get_memory(data, MEM_TYPE_DATA);
                     into->memory_location = data;
                     break;
                 }
@@ -1285,7 +1285,7 @@ static uint16_t get_current_framepointer(struct debugger_regs_t *regs, size_t* i
     if ( where != -1 ) {
         // call l_debug_push_frame
         *invalidate_stack_offset = 3;
-        uint16_t ret = bk.get_memory(where) + (bk.get_memory(where+1)*256);
+        uint16_t ret = bk.get_memory(where, MEM_TYPE_DATA) + (bk.get_memory(where+1, MEM_TYPE_DATA)*256);
         return ret;
     }
 
@@ -1300,7 +1300,7 @@ static uint8_t recover_from_frame_pointer(symbol* sym, uint16_t frame_pointer,
 {
     // we have no idea where we are but, but somebody called us, and it's return address
     // should be right before frame pointer
-    uint16_t caller = wrap_reg(bk.get_memory(frame_pointer - 1), bk.get_memory(frame_pointer - 2));
+    uint16_t caller = wrap_reg(bk.get_memory(frame_pointer - 1, MEM_TYPE_DATA), bk.get_memory(frame_pointer - 2, MEM_TYPE_DATA));
     uint16_t offset;
     sym = symbol_find_lower(caller, SYM_ADDRESS, &offset);
     if (sym != NULL && sym->file != NULL) {
@@ -1371,7 +1371,7 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
                 // we might save the situation here
                 debug_frame_pointer* unknown_entry = malloc(sizeof(debug_frame_pointer));
 
-                uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
+                uint16_t caller = wrap_reg(bk.get_memory(stack + 1, MEM_TYPE_STACK), bk.get_memory(stack, MEM_TYPE_STACK));
 
                 uint16_t unknown_offset;
                 symbol* s = symbol_find_lower(at, SYM_ADDRESS, &unknown_offset);
@@ -1461,7 +1461,7 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
             debug_frame_pointer* unknown_entry = malloc(sizeof(debug_frame_pointer));
             new_frame->next = unknown_entry;
 
-            uint16_t caller = wrap_reg(bk.get_memory(new_frame_pointer + 3), bk.get_memory(new_frame_pointer + 2));
+            uint16_t caller = wrap_reg(bk.get_memory(new_frame_pointer + 3, MEM_TYPE_STACK), bk.get_memory(new_frame_pointer + 2, MEM_TYPE_STACK));
             uint16_t unknown_offset;
             symbol* s = symbol_find_lower(caller, SYM_ADDRESS, &unknown_offset);
 
@@ -1488,7 +1488,7 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
                 stack += fn->address_space.b;
             }
             // we're exactly at beginning of the function
-            uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
+            uint16_t caller = wrap_reg(bk.get_memory(stack + 1, MEM_TYPE_STACK), bk.get_memory(stack, MEM_TYPE_STACK));
             at = caller;
             // unwind ret
             stack += 2;
@@ -1497,7 +1497,7 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
                 stack += fn->address_space.b;
             }
             // we've pushed old ix but haven't inited old one
-            uint16_t caller = wrap_reg(bk.get_memory(stack + 3), bk.get_memory(stack + 2));
+            uint16_t caller = wrap_reg(bk.get_memory(stack + 3, MEM_TYPE_STACK), bk.get_memory(stack + 2, MEM_TYPE_STACK));
             at = caller;
             // unwind ret and ix
             stack += 4;
@@ -1508,10 +1508,10 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
                 stack += fn->address_space.b;
             }
             // last thing pushed is frame pointer of the caller (its fp)
-            frame_pointer = wrap_reg(bk.get_memory(frame_pointer + 1), bk.get_memory(frame_pointer));
+            frame_pointer = wrap_reg(bk.get_memory(frame_pointer + 1,MEM_TYPE_STACK), bk.get_memory(frame_pointer, MEM_TYPE_STACK));
             // then goes ret
             stack += 2;
-            uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
+            uint16_t caller = wrap_reg(bk.get_memory(stack + 1, MEM_TYPE_STACK), bk.get_memory(stack, MEM_TYPE_STACK));
             at = caller;
         }
 

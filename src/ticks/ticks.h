@@ -7,6 +7,7 @@
 #include "cmds.h"
 #include "syms.h"
 #include "cpu.h"
+#include "memory.h"
 #include <sys/types.h>
 #include <inttypes.h>
 
@@ -102,10 +103,11 @@ extern int       rabbit_get_ioi_reg(int reg);
 extern void        out(int port, int value);
 
 
-extern uint8_t    *get_memory_addr(int pc);
+extern uint8_t    *get_memory_addr(uint32_t pc, memtype type);
 
-extern uint8_t     get_memory(uint16_t pc);
-extern uint8_t     get_memory_inst(uint16_t pc); // Get memory for an instruction (so no ioi/ioe handling)
+extern uint8_t     get_memory(uint32_t pc, memtype type);
+#define get_memory_inst(x) get_memory(x, MEM_TYPE_INST)
+#define get_memory_data(x) get_memory(x, MEM_TYPE_DATA)
 extern uint8_t     put_memory(uint16_t pc, uint8_t b);
 
 // acia
