@@ -30,8 +30,12 @@ generic_console_set_attribute:
 	ret
 
 generic_console_cls:
+IF FORlambda
+	ld	hl,16510
+ELSE
 	ld	hl,(D_FILE)
 	inc	hl
+ENDIF
 	ld	c,CONSOLE_ROWS
 generic_console_cls_1:
 	ld	b,CONSOLE_COLUMNS
@@ -77,8 +81,12 @@ generic_console_vpeek:
         ret
 
 xypos:
+IF FORlambda
+	ld	hl,16510
+ELSE
 	ld	hl,(D_FILE)
 	inc	hl
+ENDIF
 	ld	de,CONSOLE_COLUMNS+1
 	and	a
 	sbc	hl,de
@@ -94,8 +102,12 @@ generic_console_printc_3:
 generic_console_scrollup:
 	push	de
 	push	bc
+IF FORlambda
+	ld	hl,16510
+ELSE
 	ld	hl,(D_FILE)
 	inc	hl
+ENDIF
 	ld	d,h
 	ld	e,l
 	ld	bc,CONSOLE_COLUMNS + 1
