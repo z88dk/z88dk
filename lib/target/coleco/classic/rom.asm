@@ -34,10 +34,26 @@ ENDIF
     org     CRT_ORG_CODE
 
     defb    0x55, 0xaa        ;Title screen + 12 second delay, swap to not skip it
+IF CRT_COLECO_SPRITE_NAME_SIZE > 0
+   defw     _os7_sprite_order_table
+ELSE
     defw    0                ;Sprite name table for BIOS
+ENDIF
+IF CRT_COLECO_SPRITE_ORDER_SIZE > 0
+   defw     _os7_sprite_order_table
+ELSE
     defw    0                ;Sprite order table for BIOS
+ENDIF
+IF CRT_COLECO_BIOS_BUFFER_SIZE > 0
+   defw     _os7_bios_buffer
+ELSE
     defw    0                ;Buffer for BIOS
+ENDIF
+IF CRT_COLECO_BIOS_CONTROLLER_SIZE > 0
+   defw     _os7_bios_controller
+ELSE
     defw    0                ;Controller map for bios
+ENDIF
     defw    program                ;Where to start execution from
 IF ((__crt_enable_rst & $0202) = $0002)
     EXTERN  _z80_rst_08h
@@ -161,3 +177,26 @@ ENDIF
     ENDIF
     INCLUDE        "crt/classic/crt_section.asm"
 
+
+    SECTION bss_crt
+
+IF CRT_COLECO_SPRITE_NAME_SIZE > 0
+    PUBLIC  _os7_sprite_name_table
+_os7_sprite_order_table:
+    defs    CRT_COLECO_SPRITE_NAME_SIZE
+ENDIF
+IF CRT_COLECO_SPRITE_ORDER_SIZE > 0
+   PUBLIC _os7_sprite_order_table
+_os7_sprite_order_table:
+   defs     CRT_COLECO_SPRITE_ORDER_SIZE
+ENDIF
+IF CRT_COLECO_BIOS_BUFFER_SIZE > 0
+   PUBLIC _os7_bios_buffer
+_os7_bios_buffer:
+   defs    CRT_COLECO_BIOS_BUFFER_SIZE
+ENDIF
+IF CRT_COLECO_BIOS_CONTROLLER_SIZE > 0
+   PUBLIC  _os7_bios_controller
+_os7_bios_controller:
+   defs    CRT_COLECO_BIOS_CONTROLLER_SIZE
+ENDIF
