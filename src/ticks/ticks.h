@@ -129,6 +129,20 @@ extern int hook_console_out(int port, int value);
 extern int hook_console_in(int port);
 
 
+// r4k
+extern void r4k_handle_6d_page(void);
+extern void r4k_ld_ipdd_hl(uint8_t opcode);
+extern void r4k_ld_hl_ipsd(uint8_t opcode);
+extern void r4k_ld_a_ipshl(uint8_t opcode);
+extern void r4k_ld_ipdhl_a(uint8_t opcode);
+extern void r4k_ld_a_ipsd(uint8_t opcode);
+extern void r4k_ld_ipdd_a(uint8_t opcode);
+extern void r4k_ldl_pd_mn(uint8_t opcode);
+extern void r4k_ld_pd_klmn(uint8_t opcode);
+extern void r4k_ldl_pd_ispn(uint8_t opcode);
+extern void r4k_ld_pd_ispn(uint8_t opcode);
+
+
 #ifndef WIN32
 extern int kbhit();
 extern int getch();
