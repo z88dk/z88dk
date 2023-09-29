@@ -141,7 +141,16 @@ extern void r4k_ldl_pd_mn(uint8_t opcode);
 extern void r4k_ld_pd_klmn(uint8_t opcode);
 extern void r4k_ldl_pd_ispn(uint8_t opcode);
 extern void r4k_ld_pd_ispn(uint8_t opcode);
+extern void r4k_ld_ispn_ps(uint8_t opcode);
+extern void r4k_ld_hl_ipsbc(uint8_t opcode);
+extern void r4k_ld_ipdbc_hl(uint8_t opcode);
 
+extern void r4k_ld_pd_bcde(uint8_t opcode);
+extern void r4k_ld_pd_jkhl(uint8_t opcode);
+extern void r4k_ldl_pd_rr(uint8_t opcode, uint8_t lsb, uint8_t msb);
+extern void r4k_ld_a_ixya(uint8_t opcode, uint8_t lsb, uint8_t msb);
+extern void r4k_ld_bcde_ps(uint8_t opcode);
+extern void r4k_ld_jkhl_ps(uint8_t opcode);
 
 #ifndef WIN32
 extern int kbhit();
