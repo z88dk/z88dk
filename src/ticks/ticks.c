@@ -9,6 +9,7 @@
 #include "backend.h"
 #include "profiler.h"
 
+
 // fr = zero, ff&256 = carry, ff&128 = s/p
 
 // TODO: Setting P flag
@@ -20,26 +21,30 @@
           }                              \
         } while (0)
 
-#define LDRIM(r)                \
+#define LDRIM(r) do { \
           st += isez80() ? 2 : israbbit() ? 4 : isz180() ? 6 : isgbz80() ? 8 : isr800() ? 2 :  7, \
-          r= get_memory(pc++)
+          r= get_memory_inst(pc++); \
+        } while (0)
 
-#define LDRRIM(a, b)            \
+#define LDRRIM(a, b) do {           \
           st += isez80() ? 3 : israbbit() ? 6 : isz180() ? 9 : isgbz80() ? 12 : isr800() ? 3 : 10, \
-          b= get_memory(pc++),         \
-          a= get_memory(pc++)
-
-#define LDRP(a, b, r)           \
+          b= get_memory_inst(pc++), \
+          a= get_memory_inst(pc++); \
+        } while (0)
+ 
+#define LDRP(a, b, r) do {         \
           st += isez80() ? 2 : israbbit() ? (&a == &h) ? 5 : 6 : isgbz80() ? 8 : isz180() ? 6 : isr800() ? 2 : 7, \
-          r= get_memory(mp= b|a<<8),   \
-          ++mp
+          r= get_memory_data(mp= b|a<<8),   \
+          ++mp; \
+        } while (0)
 
-#define LDRPI(a, b, r)          \
+#define LDRPI(a, b, r) do {         \
           st += isez80() ? 3 : israbbit() ? 7 : isz180() ? 11 : isr800() ? 5 : 15, \
-          r= get_memory(((get_memory(pc++)^128)-128+(b|a<<8))&65535)
+          r= get_memory_data(((get_memory_inst(pc++)^128)-128+(b|a<<8))&65535); \
+        } while (0)
 
 #define LEA(r1, r2, s1, s2, t) do { \
-    uint16_t offs = ((get_memory(pc++)^128)-128+((s1 << 8)|s2))&65535; \
+    uint16_t offs = ((get_memory_inst(pc++)^128)-128+((s1 << 8)|s2))&65535; \
     r2 = offs & 0xff; \
     r1 = offs >> 8; \
     st += t; \
@@ -52,7 +57,7 @@
 
 #define LDPRI(a, b, r)          \
           st += isez80() ? 3 : israbbit() ? 8 : isz180() ? 12 : isr800() ? 5 : 15, \
-          put_memory(((get_memory(pc++)^128)-128+(b|a<<8))&65535,r)
+          put_memory(((get_memory_inst(pc++)^128)-128+(b|a<<8))&65535,r)
 
 // ld r,r'
 #define LDRR(dr, sr, dr_, n) do {          \
@@ -63,14 +68,14 @@
 
 #define LDPNNRR(a, b, n)        \
           st+= n,               \
-          t= get_memory(pc++),         \
-          put_memory(t|= get_memory(pc++)<<8, b), \
+          t= get_memory_inst(pc++),         \
+          put_memory(t|= get_memory_inst(pc++)<<8, b), \
           put_memory(mp= t+1,a)
 
 #define LDPIN(a, b)             \
           st+= isez80() ? 4 : israbbit() ? 9 : isz180() ? 12 : isr800() ? 5 : 15,              \
-          t= get_memory(pc++),         \
-          put_memory(((t^128)-128+(b|a<<8))&65535, get_memory(pc++))
+          t= get_memory_inst(pc++),         \
+          put_memory(((t^128)-128+(b|a<<8))&65535, get_memory_inst(pc++))
 
 #define INCW(a, b)              \
           st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : is8080() ? 5 : isr800() ? 2 : 6, \
@@ -97,14 +102,14 @@
 // TODO: Should affect alternate flags if altd
 #define INCPI(a, b)             \
           st +=isez80() ? 5 : israbbit() ? 12 : isr800() ? 7 : 19, \
-          fa= get_memory(t= (get_memory(pc++)^128)-128+(b|a<<8)), \
+          fa= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
           ff= ff&256            \
             | (fr= put_memory(t,fa+(fb=1))), fk = 0
 
 // TODO: Should affect alternate flags if altd
 #define DECPI(a, b)             \
           st +=isez80() ? 5 : israbbit() ? 12 : isr800() ? 7 : 19, \
-          fa= get_memory(t= (get_memory(pc++)^128)-128+(b|a<<8)), \
+          fa= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
           ff= ff&256            \
             | (fr= put_memory(t,fa+(fb=-1))), fk = 0
 
@@ -135,7 +140,7 @@
 #define JRCI(c)                 \
           if(c)                 \
             st+= isez80() ? 3 : isgbz80() ? 8 : isz180() ? 8 : isr800() ? 3 : 12,            \
-            pc+= (get_memory(pc)^128)-127; \
+            pc+= (get_memory_inst(pc)^128)-127; \
           else                  \
             st+= isez80() ? 2 : isgbz80() ? 8 : isz180() ? 6 : isr800() ? 2 : 7,             \
             pc++
@@ -146,13 +151,14 @@
             pc++;               \
           else                  \
             st+= isez80() ? 3 : isgbz80() ? 8 : isz180() ? 8 : isr800() ? 3 : 12,            \
-            pc+= (get_memory(pc)^128)-127
+            pc+= (get_memory_inst(pc)^128)-127
 
+// ld rr,(nn)
 #define LDRRPNN(a, b, n)        \
           st+= n,               \
-          t= get_memory(pc++),         \
-          b= get_memory(t|= get_memory(pc++)<<8), \
-          a= get_memory(mp= t+1)
+          t= get_memory_inst(pc++),         \
+          b= get_memory_data(t|= get_memory_inst(pc++)<<8), \
+          a= get_memory_data(mp= t+1)
 
 #define ADDISP(a, b)            \
           st+= isez80() ? 1 : is808x() ? 10 : isgbz80() ? 8 : isr800() ? 1 :  11,              \
@@ -275,74 +281,86 @@
           }                     \
         } while (0)
 
-#define RET(n)                  \
+#define RET(n) do {             \
+          ioi=ioe=0;            \
           st+= (n),             \
-          mp= get_memory(sp++), \
-          pc= mp|= get_memory(sp++)<<8
+          mp= get_memory_data(sp++), \
+          pc= mp|= get_memory_data(sp++)<<8; \
+        } while (0)
 
 #define RETC(c) do {            \
+          ioi=ioe=0;            \
           if(c)                 \
             st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ? 8 : isr800() ? 1 :  5;             \
           else                  \
             st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 8 : isz180() ? 10 : isr800() ? 3 : 11,            \
-            mp= get_memory(sp++),      \
-            pc= mp|= get_memory(sp++)<<8; \
+            mp= get_memory_data(sp++),      \
+            pc= mp|= get_memory_data(sp++)<<8; \
         } while (0) 
 
 #define RETCI(c) do {           \
+          ioi=ioe=0;            \
           if(c)                 \
             st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 8 : isz180() ? 10 : isr800() ? 3 :  11,            \
-            mp= get_memory(sp++),      \
-            pc= mp|= get_memory(sp++)<<8; \
+            mp= get_memory_data(sp++),      \
+            pc= mp|= get_memory_data(sp++)<<8; \
           else                  \
             st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ? 8 : isr800() ? 1 :  5; \
         } while (0)
 
-#define PUSH(a, b)              \
+#define PUSH(a, b) do {         \
+          ioi=ioe=0;            \
           st+= isez80() ? 3 :israbbit() ? 10 : is8085() ? 12 : isgbz80() ? 16 : isr800() ? 4 : 11,              \
           put_memory(--sp,a),   \
-          put_memory(--sp,b)
+          put_memory(--sp,b);   \
+        } while (0)
 
-#define POP(a, b)               \
+#define POP(a, b) do {          \
+          ioi=ioe=0;            \
           st+= isez80() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 12 : isr800() ? 3 : 10,              \
-          b= get_memory(sp++),  \
-          a= get_memory(sp++)
+          b= get_memory_data(sp++),  \
+          a= get_memory_data(sp++);  \
+        } while (0)
 
 #define JPC(c) do {             \
+          ioi=ioe=0;            \
           st+= isez80() ? 3 : israbbit() ? 7 : isz180() ? 6 : is8085() ? 7 : isgbz80() ? 12 : isr800() ? 3 :  10;              \
           if(c)                 \
             pc+= 2;             \
           else                  \
             st += isez80() ? 1 : isz180() ? 3 : is8085() ? 3 : isr800() ? 2 : 0,  \
-            pc= get_memory(pc) | get_memory(pc+1)<<8; \
+            pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8; \
         } while (0)
 
 #define JPCI(c) do {            \
+          ioi=ioe=0;            \
           st+= isez80() ? 3 : israbbit() ? 7 : isz180() ? 6 : is8085() ? 7 : isgbz80() ? 12 : isr800() ? 3 : 10;              \
           if(c)                 \
             st += isez80() ? 1 : isz180() ? 3 : is8085() ? 3 : isr800() ? 2 : 0,  \
-            pc= get_memory(pc) | get_memory(pc+1)<<8; \
+            pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8; \
           else                  \
             pc+= 2;             \
         } while(0)
 
 #define CALLC(c)  do  {         \
+          ioi=ioe=0;            \
           if(c)                 \
             st+= isez80() ? 3 : isz180() ? 6 : is8085() ? 9 : is8080() ? 11 : isgbz80() ? 12 : isr800() ? 3 : 10,            \
             pc+= 2;             \
           else                  \
             st+= isez80() ? 6 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 12 : isr800() ? 5 : 17,            \
             t= pc+2,            \
-            mp= pc= get_memory(pc) | get_memory(pc+1)<<8, \
+            mp= pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8, \
             put_memory(--sp,t>>8),    \
             put_memory(--sp,t); \
         } while (0)
 
 #define CALLCI(c) do {          \
+          ioi=ioe=0;            \
           if(c)                 \
             st+= isez80() ? 6 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 12 : isr800() ? 5 : 17,            \
             t= pc+2,            \
-            mp= pc= get_memory(pc) | get_memory(pc+1)<<8, \
+            mp= pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8, \
             put_memory(--sp,t>>8),    \
             put_memory(--sp,t);    \
           else                  \
@@ -350,21 +368,25 @@
             pc+= 2;              \
         } while (0)
 
-#define RST(n)                  \
+#define RST(n) do {                   \
+          ioi=ioe=0;                  \
           st+= isez80() ? 5 :israbbit() ? 8 : is8085() ? 12 : isgbz80() ? 32 : 11,              \
           put_memory(--sp,pc>>8),     \
           put_memory(--sp,pc),        \
-          mp= pc= n
+          mp= pc= n;                  \
+        } while (0)
 
-#define EXSPI(a, b)             \
+#define EXSPI(a, b) do {        \
+          ioi=ioe=0;            \
           st+= isez80() ? 5 : israbbit() ? 13 : isz180() ? 16 : is8080() ? 18 : is8085() ? 16 : isr800() ? 4 : 19, \
-          t= get_memory(sp),    \
+          t= get_memory_data(sp),    \
           put_memory(sp++,b),   \
           b= t,                 \
-          t= get_memory(sp),    \
+          t= get_memory_data(sp),    \
           put_memory(sp--,a),   \
           a= t,                 \
-          mp= b | a<<8
+          mp= b | a<<8;         \
+        } while (0)
 
 #define RLC(r,r_) do  {         \
           st+= isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8;               \
@@ -498,7 +520,7 @@
 
 #define BITHL(n)                \
           st += isez80() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 16 : isr800() ? 3 : 12, \
-          t = get_memory(l | h<<8),     \
+          t = get_memory_data(l | h<<8),     \
           ff= ff    & -256      \
             | mp>>8 &   40      \
             | -41   & (t&= n),  \
@@ -530,7 +552,7 @@
 #define RESHL(n)                \
           st += isez80() ? 3 : israbbit() ? 10 : isz180() ? 13 : isgbz80() ? 16 : isr800() ? 5 : 15, \
           t = l|h<<8, \
-          put_memory(t, get_memory(t) & n)
+          put_memory(t, get_memory_data(t) & n)
 
 #define SET(n, r)               \
           st += isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8, \
@@ -539,7 +561,7 @@
 #define SETHL(n)                \
           st += isez80() ? 3 : israbbit() ? 10 : isz180() ? 13 : isgbz80() ? 16 :  isr800() ? 5 : 15, \
           t = l|h<<8, \
-          put_memory(t, get_memory(t) | n)
+          put_memory(t, get_memory_data(t) | n)
 
 #define INR(r)                  \
           st+= isr800() ? 3 : 12,              \
@@ -609,6 +631,11 @@
 
 #define RABBIT4k_UNDEFINED() do { \
     fprintf(stderr, "Invalid R4K opcode at %04x", pc-1); \
+} while(0)
+
+
+#define RABBIT_UNDEFINED(addr,inst) do { \
+    fprintf(stderr, "Invalid Rabbit opcode at %04x opcode=%x %s", pc-1,addr,inst); \
 } while(0)
 
 FILE * ft;
@@ -750,6 +777,12 @@ void out(int port, int value){
   memory_handle_paging(port, value);
 }
 
+int israbbit4k(void)
+{
+    return ((c_cpu & CPU_R4K) && rabbit_get_ioi_reg(RABBIT_EDMR) == 0xc0);
+
+}
+
 int f(void){
     if ( is8085() ) {
         int pv = (fa & -256
@@ -824,6 +857,7 @@ extern backend_t ticks_debugger_backend;
 
 int main (int argc, char **argv){
   int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0, symbol_addr = -1;
+  uint8_t opc;
   char * output= NULL;
   char  *memory_model = "standard";
   FILE * fh;
@@ -1022,10 +1056,10 @@ int main (int argc, char **argv){
           }
           if ( pc == 256 ) {
             put_memory(0x80,cmd_arguments_len % 256);
-            memcpy(get_memory_addr(0x81), cmd_arguments, cmd_arguments_len % 256);
+            memcpy(get_memory_addr(0x81,MEM_TYPE_DATA), cmd_arguments, cmd_arguments_len % 256);
           } else {
             put_memory(65280,cmd_arguments_len % 256);
-            memcpy(get_memory_addr(65281), cmd_arguments, cmd_arguments_len % 256);
+            memcpy(get_memory_addr(65281, MEM_TYPE_DATA), cmd_arguments, cmd_arguments_len % 256);
           }
           break;
         default:
@@ -1033,6 +1067,8 @@ int main (int argc, char **argv){
           exit(EXIT_FAILURE);
       }
     else{
+      if ( israbbit() )
+        memory_model = "rabbit";
       memory_init(memory_model);
 
       fh= fopen(argv[1], "rb");
@@ -1046,30 +1082,30 @@ int main (int argc, char **argv){
         fprintf(stderr, "\nIncorrect length: %d\n", size),
         exit(EXIT_FAILURE);
       else if( strstr(argv[1], "rc2014") != NULL ) {
-        *get_memory_addr(0x08) = 0xED;
-        *get_memory_addr(0x09) = 0xFE;
-        *get_memory_addr(0x0a) = 0xC9;
-        *get_memory_addr(0x10) = 0xED;
-        *get_memory_addr(0x11) = 0xFE;
-        *get_memory_addr(0x12) = 0xC9;
-        *get_memory_addr(0x18) = 0xED;
-        *get_memory_addr(0x19) = 0xFE;
-        *get_memory_addr(0x1a) = 0xC9;
+        *get_memory_addr(0x08, MEM_TYPE_INST) = 0xED;
+        *get_memory_addr(0x09, MEM_TYPE_INST) = 0xFE;
+        *get_memory_addr(0x0a, MEM_TYPE_INST) = 0xC9;
+        *get_memory_addr(0x10, MEM_TYPE_INST) = 0xED;
+        *get_memory_addr(0x11, MEM_TYPE_INST) = 0xFE;
+        *get_memory_addr(0x12, MEM_TYPE_INST) = 0xC9;
+        *get_memory_addr(0x18, MEM_TYPE_INST) = 0xED;
+        *get_memory_addr(0x19, MEM_TYPE_INST) = 0xFE;
+        *get_memory_addr(0x1a, MEM_TYPE_INST) = 0xC9;
         rc2014_mode = 1;
-        if (1 != fread(get_memory_addr(pc), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
+        if (1 != fread(get_memory_addr(pc, MEM_TYPE_INST), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
       } else if( !strcasecmp(strchr(argv[1], '.'), ".com" ) ){
-        *get_memory_addr(5) = 0xED;
-        *get_memory_addr(6) = 0xFE;
-        *get_memory_addr(7) = 0xC9;
+        *get_memory_addr(5, MEM_TYPE_INST) = 0xED;
+        *get_memory_addr(6, MEM_TYPE_INST) = 0xFE;
+        *get_memory_addr(7, MEM_TYPE_INST) = 0xC9;
         pc = 256;
         // CP/M emulator
-        if (1 != fread(get_memory_addr(256), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
+        if (1 != fread(get_memory_addr(256, MEM_TYPE_INST), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
       } else if( !strcasecmp(strchr(argv[1], '.'), ".sna" ) && size==49179 ){
         FILE *fk= fopen("48.rom", "rb");
         if( !fk )
           fprintf(stderr, "\nZX Spectrum ROM file not found: 48.rom\n"),
           exit(EXIT_FAILURE);
-        if (16384 != fread(get_memory_addr(0), 1, 16384, fk)) { fclose(fk); exit_log(1, "Could not read required data from <48.rom>\n"); }
+        if (16384 != fread(get_memory_addr(0, MEM_TYPE_INST), 1, 16384, fk)) { fclose(fk); exit_log(1, "Could not read required data from <48.rom>\n"); }
         fclose(fk);
         if (1 != fread(&i,  1, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
         if (1 != fread(&l_, 1, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
@@ -1105,11 +1141,11 @@ int main (int argc, char **argv){
         if (1 != fread(&sp, 1, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
         if (1 != fread(&im, 1, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
         if (1 != fread(&w,  1, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
-        if (0xc000 != fread(get_memory_addr(0x4000), 1, 0xc000, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
+        if (0xc000 != fread(get_memory_addr(0x4000, MEM_TYPE_INST), 1, 0xc000, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
         RET(0);
       }
       else if( size==65574 ) {
-        if (65536 != fread(get_memory_addr(0), 1, 65536, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
+        if (65536 != fread(get_memory_addr(0, MEM_TYPE_INST), 1, 65536, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
 
         if (1 != fread(&w, 1, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
         u= w;
@@ -1150,7 +1186,7 @@ int main (int argc, char **argv){
       else {
         int l;
         for ( l = 0; l < size; l++ ) {
-          *get_memory_addr(load_address+l) = fgetc(fh);
+          *get_memory_addr(load_address+l, MEM_TYPE_INST) = fgetc(fh);
         }
       }
     }
@@ -1208,8 +1244,8 @@ int main (int argc, char **argv){
             st+= 12;
             break;
           default:
-            pc= get_memory(t= 255 | i << 8);
-            pc|= get_memory(++t) << 8;
+            pc= get_memory_data(t= 255 | i << 8);
+            pc|= get_memory_data(++t) << 8;
             st+= 19;
         }
       }
@@ -1217,7 +1253,7 @@ int main (int argc, char **argv){
     if( tap && st>sttap )
       sttap= st+( tap= tapcycles() );
     r++;
-    switch( get_memory(pc++) ){
+    switch( (opc = get_memory_inst(pc++)) ){
       case 0x00: // NOP
         st+= israbbit() ? 2 : isz180() ? 3 : 4;
         ih=1;altd=0;ioi=0;ioe=0;break;
@@ -1238,10 +1274,7 @@ int main (int argc, char **argv){
         else if ( altd ) { h_ = h; st += 2; ih=1;altd=0;ioi=0;ioe=0;break; }
       case 0x6d: // LD L,L
         if ( israbbit4k() ) { // 0x6d page
-            uint8_t v = get_memory(pc++);
-
-            fprintf(stderr,"Unsupported R4K opcode %02x %02x\n",0x6d, v);
-            // 6d page for r4k
+            r4k_handle_6d_page();
             ih=1;altd=0;ioi=0;ioe=0;break; 
         } else if ( altd ) { l_ = l; st += 2; ih=1;altd=0;ioi=0;ioe=0;break; }
       case 0x7f: // LD A,A
@@ -1283,21 +1316,21 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x31: // LD SP,nn / (EZ80) ld iy,(ix+d)
         if ( isez80() && ih == 0 ) {
-            t = (get_memory(pc++)^128)-128;
+            t = (get_memory_inst(pc++)^128)-128;
             st += 5;
             if ( iy == 0 ) {  // ld iy,(ix+d)
-                yl = get_memory(t+(xl|xh<<8));
-                yh = get_memory(t+(xl|xh<<8) + 1);
+                yl = get_memory_data(t+(xl|xh<<8));
+                yh = get_memory_data(t+(xl|xh<<8) + 1);
             } else {  // ld ix,(iy+d)
-                xl = get_memory(t+(yl|yh<<8));
-                xh = get_memory(t+(yl|yh<<8) + 1);
+                xl = get_memory_data(t+(yl|yh<<8));
+                xh = get_memory_data(t+(yl|yh<<8) + 1);
             }
             ih=1;altd=0;ioi=0;ioe=0;break;
             break;
         }
         st+= israbbit() ? 6 : isgbz80() ? 12 : isz180() ? 9 : isez80() ? 3 : isr800() ? 3 : 10;
-        sp= get_memory(pc++);
-        sp|= get_memory(pc++)<<8;
+        sp= get_memory_inst(pc++);
+        sp|= get_memory_inst(pc++)<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x02: // LD (BC),A
         LDPR(b, c, a);
@@ -1336,8 +1369,8 @@ int main (int argc, char **argv){
           break;
         }
         st+= isez80() ? 4 : israbbit() ? 10 : isr800() ? 4 : 13;
-        t= get_memory(pc++);
-        put_memory(t|= get_memory(pc++)<<8,a);
+        t= get_memory_inst(pc++);
+        put_memory(t|= get_memory_inst(pc++)<<8,a);
         mp= t+1 & 255
           | a<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
@@ -1365,9 +1398,9 @@ int main (int argc, char **argv){
           break;
         }
         st+= isez80() ? 4 : israbbit() ? 9 : isz180() ? 12 : isr800() ? 4 : 13;
-        mp= get_memory(pc++);
-        if ( altd ) a_ = get_memory(mp|= get_memory(pc++)<<8);
-        else a= get_memory(mp|= get_memory(pc++)<<8);
+        mp= get_memory_inst(pc++);
+        if ( altd ) a_ = get_memory_data(mp|= get_memory_inst(pc++)<<8);
+        else a= get_memory_data(mp|= get_memory_inst(pc++)<<8);
         ++mp;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x03: // INC BC
@@ -1451,7 +1484,7 @@ int main (int argc, char **argv){
       case 0x34: // INC (HL) // INC (IX+d) // INC (IY+d)
         if( ih )
           st+=isez80() ? 4 : israbbit() ? 8 : is808x() ? 10 : isgbz80() ? 12 : isr800() ? 4 : 11,
-          fa= get_memory(t= l | h<<8),
+          fa= get_memory_data(t= l | h<<8),
           ff= ff&256
             | (fr= put_memory(t,fa+(fb=+1)));
         else if( iy )
@@ -1493,7 +1526,7 @@ int main (int argc, char **argv){
       case 0x35: // DEC (HL) // DEC (IX+d) // DEC (IY+d)
         if( ih )
           st+=isez80() ? 4 : israbbit() ? 8 : is808x() ? 10 : isgbz80() ? 12 : isr800() ? 4 : 11,
-          fa= get_memory(t= l | h<<8),
+          fa= get_memory_data(t= l | h<<8),
           ff= ff&256
             | (fr= put_memory(t,fa+(fb=-1)));
         else if( iy )
@@ -1505,8 +1538,10 @@ int main (int argc, char **argv){
         if ( altd ) DEC(a_);
         else DEC(a);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x06: // LD B,n
-        if ( altd ) LDRIM(b_);
+      case 0x06: // LD B,n // (R4K) LD A,(IXY+A)
+        if ( israbbit4k() && iy) r4k_ld_a_ixya(opc, yl, yh);
+        else if ( israbbit4k() && ih==0) r4k_ld_a_ixya(opc, xl, xh);
+        else if ( altd ) LDRIM(b_);
         else LDRIM(b);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x0e: // LD C,n
@@ -1542,7 +1577,7 @@ int main (int argc, char **argv){
       case 0x36: // LD (HL),n // LD (IX+d),n // LD (IY+d),n
         if( ih )
           st+= israbbit() ? 7 : isgbz80() ? 12 : isz180() ? 9 : isr800() ? 3 : 10,
-          put_memory(l|h<<8,get_memory(pc++));
+          put_memory(l|h<<8,get_memory_inst(pc++));
         else if( iy )
           LDPIN(yh, yl);
         else
@@ -1550,7 +1585,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3e: // LD A,n / (EZ80) ld (ix+d),iy (prefixed)
         if ( isez80() && ih == 0 ) {
-            t = (get_memory(pc++)^128)-128;
+            t = (get_memory_inst(pc++)^128)-128;
             st += 4;
             if ( iy == 0 ) {  // ld (ix+d),iy
                 put_memory(t+(xl|xh<<8),yl);
@@ -1567,14 +1602,14 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x07: // RLCA / (EZ80) ld bc,(ix+d) (prefixed)
         if ( isez80() && ih == 0 ) {
-            t = (get_memory(pc++)^128)-128;
+            t = (get_memory_inst(pc++)^128)-128;
             st += 4;
             if ( iy == 0 ) {  // ld bc,(ix+d)
-                c = get_memory(t+(xl|xh<<8));
-                b = get_memory(t+(xl|xh<<8) + 1);
+                c = get_memory_data(t+(xl|xh<<8));
+                b = get_memory_data(t+(xl|xh<<8) + 1);
             } else {  // ld bc,(iy+d)
-                c = get_memory(t+(yl|yh<<8));
-                b = get_memory(t+(yl|yh<<8) + 1);
+                c = get_memory_data(t+(yl|yh<<8));
+                b = get_memory_data(t+(yl|yh<<8) + 1);
             }
             ih=1;altd=0;ioi=0;ioe=0;break;
             break;
@@ -1596,7 +1631,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x0f: // RRCA / (EZ80) ld (ix+d),bc (prefixed)
         if ( isez80() && ih == 0 ) {
-            t = (get_memory(pc++)^128)-128;
+            t = (get_memory_inst(pc++)^128)-128;
             st += 4;
             if ( iy == 0 ) {  // ld (ix+d),bc
                 put_memory(t+(xl|xh<<8),c);
@@ -1628,14 +1663,14 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x17: // RLA,  (EZ80) ld de,(ix+d) (prefixed)
         if ( isez80() && ih == 0 ) {
-            t = (get_memory(pc++)^128)-128;
+            t = (get_memory_inst(pc++)^128)-128;
             st += 4;
             if ( iy == 0 ) {  // ld de,(ix+d)
-                e = get_memory(t+(xl|xh<<8));
-                d = get_memory(t+(xl|xh<<8) + 1);
+                e = get_memory_data(t+(xl|xh<<8));
+                d = get_memory_data(t+(xl|xh<<8) + 1);
             } else {  // ld de,(iy+d)
-                e = get_memory(t+(yl|yh<<8));
-                d = get_memory(t+(yl|yh<<8) + 1);
+                e = get_memory_data(t+(yl|yh<<8));
+                d = get_memory_data(t+(yl|yh<<8) + 1);
             }
             ih=1;altd=0;ioi=0;ioe=0;break;
             break;
@@ -1660,7 +1695,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1f: // RRA / (EZ80) ld (ix+d),de (prefixed)
         if ( isez80() && ih == 0 ) {
-            t = (get_memory(pc++)^128)-128;
+            t = (get_memory_inst(pc++)^128)-128;
             st += 4;
             if ( iy == 0 ) {  // ld (ix+d),de
                 put_memory(t+(xl|xh<<8),e);
@@ -1749,7 +1784,7 @@ int main (int argc, char **argv){
           break;
         }
         st+= isez80() ? 3 : isgbz80() ? 8 : isz180() ? 8 : isr800() ? 3 : 12;
-        mp= pc+= (get_memory(pc)^128)-127;
+        mp= pc+= (get_memory_inst(pc)^128)-127;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x20: // JR NZ,s8
         if ( is8085() ) { // (8085) RIM
@@ -1765,7 +1800,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x28: // JR Z,s8
         if ( is8085() ) {  // (8085) ld de,hl+nn (LDHI)
-          uint16_t val =(l | h<<8) + get_memory(pc++);
+          uint16_t val =(l | h<<8) + get_memory_inst(pc++);
           d = val / 256;
           e = val % 256;
           st += 10;
@@ -1790,7 +1825,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x38: // JR C,s8
         if ( is8085() ) { // (8085) LD DE,SP+nn (LDSI)
-          uint16_t val = sp + get_memory(pc++);
+          uint16_t val = sp + get_memory_inst(pc++);
           d = val / 256;
           e = val % 256;
           st += 10;
@@ -1812,8 +1847,8 @@ int main (int argc, char **argv){
           st+= 4;
           break;
         } else if ( isgbz80() ) {  // ld (nn),sp
-          mp= get_memory(pc++);
-          put_memory(mp|= get_memory(pc++)<<8, sp);
+          mp= get_memory_inst(pc++);
+          put_memory(mp|= get_memory_inst(pc++)<<8, sp);
           put_memory(++mp,sp>>8);
           st += 20;
           break;
@@ -1846,28 +1881,28 @@ int main (int argc, char **argv){
           st += (-16 + 7);
           break;
         } else if ( isgbz80() ) {  // STOP
-		  t = get_memory(pc++);    // collect and ignore 00 byte
+		  t = get_memory_inst(pc++);    // collect and ignore 00 byte
           st += 4;
 		  end = pc; // stop simulation
 		  break;
         }
         if( ( altd && --b_) || ( altd == 0 && --b) )
           st+= isez80() ? 4 :israbbit() ? 5 : isr800() ? 3 : 13,
-          mp= pc+= (get_memory(pc)^128)-127;
+          mp= pc+= (get_memory_inst(pc)^128)-127;
         else
           st+= isez80() ? 2 : israbbit() ? 5 : isr800() ? 2 : 8,
           pc++;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x27: // DAA / (RCM) add sp,d / (EZ80) ld hl,(ix+d) (prefixed)
         if ( isez80() && ih == 0 ) {
-            t = (get_memory(pc++)^128)-128;
+            t = (get_memory_inst(pc++)^128)-128;
             st += 5;
             if ( iy == 0 ) {  // ld hl,(ix+d)
-                l = get_memory(t+(xl|xh<<8));
-                h = get_memory(t+(xl|xh<<8) + 1);
+                l = get_memory_data(t+(xl|xh<<8));
+                h = get_memory_data(t+(xl|xh<<8) + 1);
             } else {  // ld hl,(iy+d)
-                l = get_memory(t+(yl|yh<<8));
-                h = get_memory(t+(yl|yh<<8) + 1);
+                l = get_memory_data(t+(yl|yh<<8));
+                h = get_memory_data(t+(yl|yh<<8) + 1);
             }
             ih=1;altd=0;ioi=0;ioe=0;break;
             break;
@@ -1875,7 +1910,7 @@ int main (int argc, char **argv){
         if ( israbbit() ) { // ADD SP,d
           uint32_t v;
           st += 4;
-          v = sp + (get_memory(pc++)^128)-128;
+          v = sp + (get_memory_inst(pc++)^128)-128;
           sp = v & 0xffff;
           if ( v >> 16 ) ff |= 256;
           else ff &= ~256;
@@ -1904,7 +1939,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x2f: // CPL / (EZ80) ld (ix+d),hl
         if ( isez80() && ih == 0 ) {
-            t = (get_memory(pc++)^128)-128;
+            t = (get_memory_inst(pc++)^128)-128;
             st += 5;
             if ( iy == 0 ) {  // ld (ix+d),hl
                 put_memory(t+(xl|xh<<8),l);
@@ -1933,17 +1968,17 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x37: // SCF/ (EZ80) ld ix,(ix+d) (prefixed)
         if ( isez80() && ih == 0) {
-            t = (get_memory(pc++)^128)-128;
+            t = (get_memory_inst(pc++)^128)-128;
             st += 5;
             if ( iy == 0 ) {  // ld ix,(ix+d)
                 unsigned char tl;
-                tl = get_memory(t+(xl|xh<<8));
-                xh = get_memory(t+(xl|xh<<8) + 1);
+                tl = get_memory_data(t+(xl|xh<<8));
+                xh = get_memory_data(t+(xl|xh<<8) + 1);
                 xl = tl;
             } else {  // ld iy,(iy+d)
                 unsigned char tl;
-                tl = get_memory(t+(yl|yh<<8));
-                yh = get_memory(t+(yl|yh<<8) + 1);
+                tl = get_memory_data(t+(yl|yh<<8));
+                yh = get_memory_data(t+(yl|yh<<8) + 1);
                 yl = tl;
             }
             ih=1;altd=0;ioi=0;ioe=0;break;
@@ -1966,7 +2001,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3f: // CCF / (EZ80) ld (ix+d),ix
         if ( isez80() && ih == 0 ) {
-            t = (get_memory(pc++)^128)-128;
+            t = (get_memory_inst(pc++)^128)-128;
             st += 5;
             if ( iy == 0 ) {  // ld (ix+d),ix
                 put_memory(t+(xl|xh<<8),xl);
@@ -2470,21 +2505,23 @@ int main (int argc, char **argv){
         else if ( canixh() )
           ADD(xh,isez80() ? 1 : isr800() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x85: // ADD A,L // ADD A,IXl // ADD A,IYl
-        if( ih )
+      case 0x85: // ADD A,L // ADD A,IXl // ADD A,IYl // (R4K) LD HL,(PW+d)
+        if (israbbit4k()) r4k_ld_hl_ipsd(opc);
+        else if( ih )
           ADD(l,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 :  4);
         else if( iy && canixh() )
           ADD(yl,isez80() ? 1 : isr800() ? 2 : 4);
         else if ( canixh() )
           ADD(xl,isez80() ? 1 : isr800() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x86: // ADD A,(HL) // ADD A,(IX+d) // ADD A,(IY+d)
-        if( ih )
-          ADD(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
+      case 0x86: // ADD A,(HL) // ADD A,(IX+d) // ADD A,(IY+d) // (R4k) LD (PX+d),HL
+        if (israbbit4k()) r4k_ld_ipdd_hl(opc);
+        else if( ih )
+          ADD(get_memory_data(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
         else if( iy )
-          ADD(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : isr800() ? 5 : 15);
+          ADD(get_memory_data(((get_memory_inst(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : isr800() ? 5 : 15);
         else
-          ADD(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : isr800() ? 5 : 15);
+          ADD(get_memory_data(((get_memory_inst(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : isr800() ? 5 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x87: // ADD A,A
         st+= isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
@@ -2504,37 +2541,56 @@ int main (int argc, char **argv){
       case 0x8a: // ADC A,D
         ADC(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x8b: // ADC A,E
-        ADC(e,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0x8b: // ADC A,E // (R4K) LD A,(PW+HL)
+        if (israbbit4k()) r4k_ld_a_ipshl(opc);
+        else {
+            ADC(e,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x8c: // ADC A,H // ADC A,IXh // ADC A,IYh
-        if( ih )
+      case 0x8c: // ADC A,H // ADC A,IXh // ADC A,IYh  // (R4K) LD (PW+HL),A, LDL PW,IX, LDL PW,IY
+        if (israbbit4k()) {
+            if (ih) r4k_ld_ipdhl_a(opc);
+            else if (iy) r4k_ldl_pd_rr(opc, yl, yh);
+            else r4k_ldl_pd_rr(opc, xl, xh);
+        } else if( ih )
           ADC(h,isez80() ? 1 :israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           ADC(yh,isez80() ? 1 : isr800() ? 2 : 4);
         else if ( canixh() )
           ADC(xh,isez80() ? 1 : isr800() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x8d: // ADC A,L // ADC A,IXl // ADC A,IYl
-        if( ih )
+      case 0x8d: // ADC A,L // ADC A,IXl // ADC A,IYl // (R4K) LD A,(PW+d), LD PW,BCDE, LD PW, JKHL
+        if (israbbit4k()) {
+            if (ih)
+                r4k_ld_a_ipsd(opc);
+            else if (iy)
+                r4k_ld_pd_jkhl(opc);
+            else 
+                r4k_ld_pd_bcde(opc);
+        } else if( ih )
           ADC(l,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           ADC(yl,isez80() ? 1 : isr800() ? 2 : 4);
         else if ( canixh() )
           ADC(xl,isez80() ? 1 : isr800() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x8e: // ADC A,(HL) // ADC A,(IX+d) // ADC A,(IY+d)
-        if( ih )
-          ADC(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
+      case 0x8e: // ADC A,(HL) // ADC A,(IX+d) // ADC A,(IY+d) // (R4K) LD (PW+d),A
+        if (israbbit4k()) r4k_ld_ipdd_a(opc);
+        else if( ih )
+          ADC(get_memory_data(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
         else if( iy )
-          ADC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : isr800() ? 5 : 15);
+          ADC(get_memory_data(((get_memory_inst(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : isr800() ? 5 : 15);
         else
-          ADC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : isr800() ? 5 : 15);
+          ADC(get_memory_data(((get_memory_inst(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : isr800() ? 5 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x8f: // ADC A,A
-        st+=isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
-        if ( altd ) fr_= a_= (ff_= 2*(fa_= fb_= a)+(ff_>>8&1));
-        else fr= a= (ff= 2*(fa= fb= a)+(ff>>8&1));
+      case 0x8f: // ADC A,A // (R4K) LDL PW,DE, LDL PW,HL
+        if (israbbit4k() && iy) r4k_ldl_pd_rr(opc, l, h);
+        else if ( israbbit4k() && ih==0) r4k_ldl_pd_rr(opc, e, d);
+        else { 
+            st+=isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
+            if ( altd ) fr_= a_= (ff_= 2*(fa_= fb_= a)+(ff_>>8&1));
+            else fr= a= (ff= 2*(fa= fb= a)+(ff>>8&1));
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x90: // SUB B
         if ( israbbit4k() ) RABBIT4k_UNDEFINED();
@@ -2561,21 +2617,23 @@ int main (int argc, char **argv){
         else if ( canixh() )
           SUB(xh,isez80() ? 1 : isr800() ? 2 : isr800() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x95: // SUB L // SUB IXl // SUB IYl
-        if( ih )
+      case 0x95: // SUB L // SUB IXl // SUB IYl / (R4K) LD HL,(PX+d)
+        if (israbbit4k()) r4k_ld_hl_ipsd(opc);
+        else if( ih )
           SUB(l,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           SUB(yl,isez80() ? 1 : isr800() ? 2 : isr800() ? 2 : 4);
         else if ( canixh() )
           SUB(xl,isez80() ? 1 : isr800() ? 2 : isr800() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x96: // SUB (HL) // SUB (IX+d) // SUB (IY+d)
-        if( ih )
-          SUB(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : isr800() ? 2 : 7);
+      case 0x96: // SUB (HL) // SUB (IX+d) // SUB (IY+d) // (R4k) LD (PX+d),HL
+        if (israbbit4k()) r4k_ld_ipdd_hl(opc);
+        else if( ih )
+          SUB(get_memory_data(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : isr800() ? 2 : 7);
         else if( iy )
-          SUB(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : isr800() ? 5 : isr800() ? 5 : 15);
+          SUB(get_memory_data(((get_memory_inst(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : isr800() ? 5 : isr800() ? 5 : 15);
         else
-          SUB(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : isr800() ? 5 : isr800() ? 5 : 15);
+          SUB(get_memory_data(((get_memory_inst(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : isr800() ? 5 : isr800() ? 5 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x97: // SUB A
         st+=isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
@@ -2601,48 +2659,67 @@ int main (int argc, char **argv){
       case 0x9a: // SBC A,D
         SBC(d, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x9b: // SBC A,E
-        SBC(e, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0x9b: // SBC A,E // (R4K) LD A,(PX+HL)
+        if (israbbit4k()) r4k_ld_a_ipshl(opc);
+        else {
+            SBC(e, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x9c: // SBC A,H // SBC A,IXh // SBC A,IYh
-        if( ih )
+      case 0x9c: // SBC A,H // SBC A,IXh // SBC A,IYh // (R4K) LD (PX+HL),A, LDL PW,IX, LDL PW,IY
+        if (israbbit4k()) {
+            if (ih) r4k_ld_ipdhl_a(opc);
+            else if (iy) r4k_ldl_pd_rr(opc, yl, yh);
+            else r4k_ldl_pd_rr(opc, xl, xh);
+        } else if( ih )
           SBC(h,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           SBC(yh,isez80() ? 1 : isr800() ? 2 : 4);
         else if ( canixh() )
           SBC(xh,isez80() ? 1 : isr800() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x9d: // SBC A,L // SBC A,IXl // SBC A,IYl
-        if( ih )
+      case 0x9d: // SBC A,L // SBC A,IXl // SBC A,IYl // (R4K) LD A,(PX+d),  LD PX,BCDE, LD PX, JKHL
+        if (israbbit4k()) {
+            if (ih)
+                r4k_ld_a_ipsd(opc);
+            else if (iy)
+                r4k_ld_pd_jkhl(opc);
+            else 
+                r4k_ld_pd_bcde(opc);
+        } else if( ih )
           SBC(l,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           SBC(yl,isez80() ? 1 : isr800() ? 2 : 4);
         else if ( canixh() )
           SBC(xl,isez80() ? 1 : isr800() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x9e: // SBC A,(HL) // SBC A,(IX+d) // SBC A,(IY+d)
-        if( ih )
-          SBC(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
+      case 0x9e: // SBC A,(HL) // SBC A,(IX+d) // SBC A,(IY+d) // (R4K) LD (PX+d),A
+        if (israbbit4k()) r4k_ld_ipdd_a(opc);
+        else if( ih )
+          SBC(get_memory_data(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
         else if( iy )
-          SBC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), isez80() ? 3 : isr800() ? 5 : 15);
+          SBC(get_memory_data(((get_memory_inst(pc++)^128)-128+(yl|yh<<8))&65535), isez80() ? 3 : isr800() ? 5 : 15);
         else
-          SBC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), isez80() ? 3 : isr800() ? 5 : 15);
+          SBC(get_memory_data(((get_memory_inst(pc++)^128)-128+(xl|xh<<8))&65535), isez80() ? 3 : isr800() ? 5 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x9f: // SBC A,A
-        st+= isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
-        if ( altd ) {
-          fb_= ~(fa_= a);
-          fr_= a_= (ff_= (ff_&256)/-256);
-        } else {
-          fb= ~(fa= a);
-          fr= a= (ff= (ff&256)/-256);
+      case 0x9f: // SBC A,A // (R4K) LDL PX,DE, LDL PX,HL
+        if (israbbit4k() && iy) r4k_ldl_pd_rr(opc, l, h);
+        else if ( israbbit4k() && ih==0) r4k_ldl_pd_rr(opc, e, d);
+        else {
+            st+= isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
+            if ( altd ) {
+            fb_= ~(fa_= a);
+            fr_= a_= (ff_= (ff_&256)/-256);
+            } else {
+            fb= ~(fa= a);
+            fr= a= (ff= (ff&256)/-256);
+            }
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa0:
         if ( israbbit4k() ) { // JR GT,s8
           st += 5;
           if (F_GT(f()))
-            pc += (get_memory(pc) ^ 128) - 127;
+            pc += (get_memory_inst(pc) ^ 128) - 127;
           else
             pc++;
         } else {                    // AND B
@@ -2676,21 +2753,23 @@ int main (int argc, char **argv){
         else if ( canixh() )
           AND(xh, isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xa5: // AND L // AND IXl // AND IYl
-        if( ih )
+      case 0xa5: // AND L // AND IXl // AND IYl / (R4K) LD HL,(PY+d)
+        if (israbbit4k()) r4k_ld_hl_ipsd(opc);
+        else if( ih )
           AND(l, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           AND(yl, isez80() ? 1 : isr800() ? 1 : 4);
         else if ( canixh() )
           AND(xl, isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xa6: // AND (HL) // AND (IX+d) // AND (IY+d)
-        if( ih )
-          AND(get_memory(l|h<<8), isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
+      case 0xa6: // AND (HL) // AND (IX+d) // AND (IY+d) // (R4K) LD (PY+d),HL
+        if (israbbit4k()) r4k_ld_ipdd_hl(opc);
+        else if( ih )
+          AND(get_memory_data(l|h<<8), isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
         else if( iy )
-          AND(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), isez80() ? 3 : isr800() ? 4 : 15);
+          AND(get_memory_data(((get_memory_inst(pc++)^128)-128+(yl|yh<<8))&65535), isez80() ? 3 : isr800() ? 4 : 15);
         else
-          AND(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), isez80() ? 3 : isr800() ? 4 : 15);
+          AND(get_memory_data(((get_memory_inst(pc++)^128)-128+(xl|xh<<8))&65535), isez80() ? 3 : isr800() ? 4 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa7: // AND A / (R4K) MULU
         if ( israbbit4k() ) { // MULU
@@ -2719,7 +2798,7 @@ int main (int argc, char **argv){
         if ( israbbit4k() ) {  // JR GTU,s8
           st += 5;
           if (F_GTU(f()))
-            pc += (get_memory(pc) ^ 128) - 127;
+            pc += (get_memory_inst(pc) ^ 128) - 127;
           else
             pc++;
         } else {                    // XOR B
@@ -2743,43 +2822,62 @@ int main (int argc, char **argv){
             }
         } else { XOR(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4); }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xab: // XOR E
-        XOR(e,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xab: // XOR E // (R4K) LD A,(PY+HL)
+        if (israbbit4k()) r4k_ld_a_ipshl(opc);
+        else {
+            XOR(e,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xac: // XOR H // XOR IXh // XOR IYh
-        if( ih )
+      case 0xac: // XOR H // XOR IXh // XOR IYh // (R4K) LD (PY+HL),A, LDL PY,IX, LDL PY,IY
+        if (israbbit4k()) {
+            if (ih) r4k_ld_ipdhl_a(opc);
+            else if (iy) r4k_ldl_pd_rr(opc, yl, yh);
+            else r4k_ldl_pd_rr(opc, xl, xh);
+        } else if( ih )
           XOR(h,isez80() ? 1 : isr800() ? 1 : 4);
         else if( iy )
           XOR(yh,isez80() ? 1 : isr800() ? 1 : 4);
         else
           XOR(xh,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xad: // XOR L // XOR IXl // XOR IYl
-        if( ih )
+      case 0xad: // XOR L // XOR IXl // XOR IYl // (R4K) LD A,(PY+d),  LD PY,BCDE, LD PY, JKHL
+        if (israbbit4k()) {
+            if (ih)
+                r4k_ld_a_ipsd(opc);
+            else if (iy)
+                r4k_ld_pd_jkhl(opc);
+            else 
+                r4k_ld_pd_bcde(opc);
+        } else if( ih )
           XOR(l,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           XOR(yl,isez80() ? 1 : isr800() ? 1 : 4);
         else if ( canixh() )
           XOR(xl,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xae: // XOR (HL) // XOR (IX+d) // XOR (IY+d)
-        if( ih )
-          XOR(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
+      case 0xae: // XOR (HL) // XOR (IX+d) // XOR (IY+d) // (R4K) LD (PY+d),A
+        if (israbbit4k()) r4k_ld_ipdd_a(opc);
+        else if( ih )
+          XOR(get_memory_data(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
         else if( iy )
-          XOR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : isr800() ? 4 : 15);
+          XOR(get_memory_data(((get_memory_inst(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : isr800() ? 4 : 15);
         else
-          XOR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : isr800() ? 4 : 15);
+          XOR(get_memory_data(((get_memory_inst(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : isr800() ? 4 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xaf: // XOR A
-        st+=isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
-        if (altd) { a_= ff_= fr_= fb_= 0; fa_=256; }
-        else { a= ff= fr= fb= 0; fa=256; }
+      case 0xaf: // XOR A // (R4K) LDL PY,DE, LDL PY,HL
+        if (israbbit4k() && iy) r4k_ldl_pd_rr(opc, l, h);
+        else if ( israbbit4k() && ih==0) r4k_ldl_pd_rr(opc, e, d);
+        else {
+            st+=isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
+            if (altd) { a_= ff_= fr_= fb_= 0; fa_=256; }
+            else { a= ff= fr= fb= 0; fa=256; }
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb0:
         if ( israbbit4k() ) {  // JR LT, s8
           st += 5;
           if (F_LT(f()))
-            pc += (get_memory(pc) ^ 128) - 127;
+            pc += (get_memory_inst(pc) ^ 128) - 127;
           else
             pc++;
         } else {                    // OR B
@@ -2830,21 +2928,23 @@ int main (int argc, char **argv){
         else if ( canixh() )
           OR(xh,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xb5: // OR L // OR IXl // OR IYl
-        if( ih )
+      case 0xb5: // OR L // OR IXl // OR IYl / (R4K) LD HL,(PZ+d)
+        if (israbbit4k()) r4k_ld_hl_ipsd(opc);
+        else if( ih )
           OR(l,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           OR(yl,isez80() ? 1 : isr800() ? 1 : 4);
         else if ( canixh() )
           OR(xl,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xb6: // OR (HL) // OR (IX+d) // OR (IY+d)
-        if( ih )
-          OR(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
+      case 0xb6: // OR (HL) // OR (IX+d) // OR (IY+d) // (R4K) LD (PZ+d),HL
+        if (israbbit4k()) r4k_ld_ipdd_hl(opc);
+        else if( ih )
+          OR(get_memory_data(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
         else if( iy )
-          OR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : isr800() ? 4 : 15);
+          OR(get_memory_data(((get_memory_inst(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : isr800() ? 4 : 15);
         else
-          OR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : isr800() ? 4 : 15);
+          OR(get_memory_data(((get_memory_inst(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : isr800() ? 4 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb7: // OR A
         st+=isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
@@ -2862,7 +2962,7 @@ int main (int argc, char **argv){
         if ( israbbit4k() ) {  // JR V,s8
           st += 5;
           if (F_V(f()))
-            pc += (get_memory(pc) ^ 128) - 127;
+            pc += (get_memory_inst(pc) ^ 128) - 127;
           else
             pc++;
         } else {                    // CP B
@@ -2900,54 +3000,71 @@ int main (int argc, char **argv){
             }
         } else { CP(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4); }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xbb: // CP E
-        CP(e,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xbb: // CP E // (R4K) LD A,(PZ+HL)
+        if (israbbit4k()) r4k_ld_a_ipshl(opc);
+        else {
+            CP(e,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xbc: // CP H // CP IXh // CP IYh
-        if( ih )
+      case 0xbc: // CP H // CP IXh // CP IYh // (R4K) LD (PZ+HL),A, LDL PZ,IX, LDL PZ,IY
+        if (israbbit4k()) {
+            if (ih) r4k_ld_ipdhl_a(opc);
+            else if (iy) r4k_ldl_pd_rr(opc, yl, yh);
+            else r4k_ldl_pd_rr(opc, xl, xh);
+        } else if( ih )
           CP(h,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           CP(yh,isez80() ? 1 : isr800() ? 1 : 4);
         else if ( canixh() )
           CP(xh,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xbd: // CP L // CP IXl // CP IYl
-        if( ih )
+      case 0xbd: // CP L // CP IXl // CP IYl // (R4K) LD A,(PZ+d),  LD PZ,BCDE, LD PZ, JKHL
+        if (israbbit4k()) {
+            if (ih)
+                r4k_ld_a_ipsd(opc);
+            else if (iy)
+                r4k_ld_pd_jkhl(opc);
+            else 
+                r4k_ld_pd_bcde(opc);
+        } else if( ih )
           CP(l,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           CP(yl,isez80() ? 1 : isr800() ? 1 : 4);
         else if (canixh())
           CP(xl,isez80() ? 1 :isr800() ? 1 :  4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xbe: // CP (HL) // CP (IX+d) // CP (IY+d)
-        if( ih ) {
-          w= get_memory(l|h<<8);
+      case 0xbe: // CP (HL) // CP (IX+d) // CP (IY+d) // (R4K) LD (PZ+d),A
+        if (israbbit4k()) r4k_ld_ipdd_a(opc);
+        else if( ih ) {
+          w= get_memory_data(l|h<<8);
           CP(w,isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : isr800() ? 2 : 7);
         } else if( iy ) {
-          w= get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535);
+          w= get_memory_data(((get_memory_inst(pc++)^128)-128+(yl|yh<<8))&65535);
           CP(w,isez80() ? 3 : isr800() ? 4 : 15);
         } else {
-          w= get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535);
+          w= get_memory_data(((get_memory_inst(pc++)^128)-128+(xl|xh<<8))&65535);
           CP(w,isez80() ? 3 : isr800() ? 4 : 15);
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xbf: // CP A
-        st+=isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
-        if ( israbbit4k() ) { // CLR HL
-          if ( altd ) {
-            h_ = l_ = 0;
-          } else {
-            h = l = 0;
-          }
-        }
-        else if ( altd ) {
-          fr_= 0;
-          fb_= ~(fa_= a);
-          ff_= a&40;
+      case 0xbf: // CP A // (R4K) CLR HL, LDL PZ,DE, LDL PZ,HL
+        if (israbbit4k()) {
+            if (ih ) {
+                if ( altd ) h_ = l_ = 0;
+                else h = l = 0;
+                st += 2;
+            } else if (iy) r4k_ldl_pd_rr(opc, l, h);
+            else r4k_ldl_pd_rr(opc, e, d);
         } else {
-          fr= 0;
-          fb= ~(fa= a);
-          ff= a&40;
+            st+=isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4;
+            if ( altd ) {
+            fr_= 0;
+            fb_= ~(fa_= a);
+            ff_= a&40;
+            } else {
+            fr= 0;
+            fb= ~(fa= a);
+            ff= a&40;
+            }
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc9: // RET
@@ -2967,7 +3084,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe0: // RET PO
 		if ( isgbz80()) { // LDH (n),A - I/O
-		  t = get_memory(pc++);
+		  t = get_memory_inst(pc++);
 		  put_memory(0xFF00 + t, a);
 		  st+= 12;
 		} else {
@@ -2978,7 +3095,7 @@ int main (int argc, char **argv){
         if ( isgbz80()) {  // add sp,d
           uint32_t v;
           st += 4;
-          v = sp + (get_memory(pc++)^128)-128;
+          v = sp + (get_memory_inst(pc++)^128)-128;
           sp = v & 0xffff;
           if ( v >> 16 ) ff |= 256;
           else ff &= ~256;
@@ -2988,8 +3105,8 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf0: // RET P
   	    if ( isgbz80()) { // LDH A, (n) - I/O
-		  t = get_memory(pc++);
-		  a = get_memory(0xFF00 + t);
+		  t = get_memory_inst(pc++);
+		  a = get_memory_data(0xFF00 + t);
 		  st+= 12;
 		} else {
           RETC(ff&128);
@@ -2998,7 +3115,7 @@ int main (int argc, char **argv){
       case 0xf8: // RET M
         if ( isgbz80() ) {  // ld hl,sp+d
           st += 12;
-          t = (sp + (get_memory(pc++)^128)-128) & 0xffff;
+          t = (sp + (get_memory_inst(pc++)^128)-128) & 0xffff;
           h = t / 256;
           l = t % 256;
         } else RETCI(ff&128);
@@ -3019,8 +3136,8 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf1: // POP AF
         st+= isez80() ? 3 : isgbz80() ? 12 : israbbit() ? 7 : isz180() ? 9 : 10;
-        setf(get_memory(sp++));
-        a= get_memory(sp++);
+        setf(get_memory_data(sp++));
+        a= get_memory_data(sp++);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc5: // PUSH BC
         PUSH(b, c);
@@ -3041,7 +3158,8 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc3: // JP nn
         st+= isez80() ? 4 : israbbit() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 12 : isr800() ? 3 : 10;
-        mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
+        ioi=ioe=0;
+        mp= pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc2: // JP NZ
         JPCI(fr);
@@ -3072,15 +3190,15 @@ int main (int argc, char **argv){
             else mp = pc = (xh<<8)|xl;
         } else if ( isgbz80() ) {  // ld (nn),a
           st+= 16;
-          t= get_memory(pc++);
-          put_memory(t|= get_memory(pc++)<<8,a);
+          t= get_memory_inst(pc++);
+          put_memory(t|= get_memory_inst(pc++)<<8,a);
           mp= t+1 & 255
              | a<<8;
         } else { JPCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128); }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf2: // JP P
 		if ( isgbz80()) { // LD A, (C), A
-		  a= get_memory(0xFF00+c);
+		  a= get_memory_data(0xFF00+c);
 		  st+= 8;
 		} else {
           JPC(ff&128);
@@ -3089,34 +3207,40 @@ int main (int argc, char **argv){
       case 0xfa: // JP M
         if ( isgbz80()) {  // ld a,(nn)
           st+= 16;
-          mp= get_memory(pc++);
-          if ( altd ) a_ = get_memory(mp|= get_memory(pc++)<<8);
-          else a= get_memory(mp|= get_memory(pc++)<<8);
+          mp= get_memory_inst(pc++);
+          a= get_memory_data(mp|= get_memory_inst(pc++)<<8);
           ++mp;
           ih=1;altd=0;ioi=0;ioe=0;break;
         }
         JPCI(ff&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xcd: // CALL nn
-        st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 12 : isr800() ? 5 : 17;
-        t= pc+2;
-        mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
-        put_memory(--sp,t>>8);
-        put_memory(--sp,t);
+      case 0xcd: // CALL nn // (R4K) LD BCDE,PW, LD JKHL,PW
+        if ( israbbit4k() && iy ) r4k_ld_jkhl_ps(opc);
+        else if ( israbbit4k() && ih== 0) r4k_ld_bcde_ps(opc);
+        else {
+            st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 12 : isr800() ? 5 : 17;
+            t= pc+2;
+            ioi=ioe=0;
+            mp= pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8;
+            put_memory(--sp,t>>8);
+            put_memory(--sp,t);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc4: // CALL NZ / (RCM) LD HL,(SP+N)
         if ( israbbit() ) { // LD HL,(SP+n)
-          int     offset = sp + get_memory(pc++);
+          int     offset;
+          ioi=ioe=0;
+          offset = sp + get_memory_inst(pc++);
           st += 9;
           if ( ih ) {
-            l = get_memory(offset++);
-            h = get_memory(offset);
+            l = get_memory_data(offset++);
+            h = get_memory_data(offset);
           } else if ( iy ) {
-            yl = get_memory(offset++);
-            yh = get_memory(offset);
+            yl = get_memory_data(offset++);
+            yh = get_memory_data(offset);
           } else {
-            xl = get_memory(offset++);
-            xh = get_memory(offset);
+            xl = get_memory_data(offset++);
+            xh = get_memory_data(offset);
           }
         } else {
           CALLCI(fr);
@@ -3138,8 +3262,11 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd4: // CALL NC / (RCM) LD (SP+N),HL
         if ( israbbit() ) { // LD (SP+n),HL
-          int     offset = sp + get_memory(pc++);
+          int     offset;
+
+          ioi=ioe=0;
           st += 9;
+          offset = sp + get_memory_inst(pc++);
 
           if ( ih ) {
             put_memory(offset++,l);
@@ -3175,17 +3302,17 @@ int main (int argc, char **argv){
       case 0xe4: // CALL PO / (RCM) LD HL,(IX+D)
         if ( israbbit() ) { // LD HL,(IXY+d) LD HL,(HL+d)
           uint8_t lt, ht;
-          t = (get_memory(pc++)^128)-128;
+          t = (get_memory_inst(pc++)^128)-128;
           st += 11;
           if ( ih ) {    // ld hl,(ix+d)
-            lt = get_memory(t+(xl|xh<<8));
-            ht = get_memory(t+(xl|xh<<8) + 1);
+            lt = get_memory_data(t+(xl|xh<<8));
+            ht = get_memory_data(t+(xl|xh<<8) + 1);
           } else if ( iy ) { // ld hl,(iy+d)
-            lt = get_memory(t+(yl|yh<<8));
-            ht = get_memory(t+(yl|yh<<8) + 1);
+            lt = get_memory_data(t+(yl|yh<<8));
+            ht = get_memory_data(t+(yl|yh<<8) + 1);
           } else { // ld hl,(hl+d)
-            lt = get_memory(t+(l|h<<8));
-            ht = get_memory(t+(l|h<<8) + 1);
+            lt = get_memory_data(t+(l|h<<8));
+            ht = get_memory_data(t+(l|h<<8) + 1);
           }
           if ( altd ) { h_ = ht; l_ = lt; }
           else { h = ht; l = lt; }
@@ -3216,7 +3343,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf4: // CALL P or (RCM) LD (IX+D),HL
         if ( israbbit() ) { // LD (IXY+d),HL LD (HL+d),HL
-          t = (get_memory(pc++)^128)-128;
+          t = (get_memory_inst(pc++)^128)-128;
           st += 11;
           if ( ih ) {    // ld (ix+d),hl
             put_memory(t+(xl|xh<<8),l);
@@ -3257,28 +3384,28 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;
         break;
       case 0xc6: // ADD A,n
-        ADD(get_memory(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+        ADD(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xce: // ADC A,n
-        ADC(get_memory(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+        ADC(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd6: // SUB n
-        SUB(get_memory(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+        SUB(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xde: // SBC A,n
-        SBC(get_memory(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+        SBC(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe6: // AND n
-        AND(get_memory(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+        AND(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xee: // XOR A,n
-        XOR(get_memory(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+        XOR(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf6: // OR n
-        OR(get_memory(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+        OR(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xfe: // CP A,n
-        w= get_memory(pc++);
+        w= get_memory_inst(pc++);
         CP(w, isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc7: // RST 0x00  (RCM) LJP
@@ -3322,7 +3449,7 @@ int main (int argc, char **argv){
           st+=2;
         } else {
           st+= is808x() ? 10 : isr800() ? 3 : 11;
-          out(mp= get_memory(pc++) | a<<8, a);
+          out(mp= get_memory_inst(pc++) | a<<8, a);
           mp= mp&65280
             | ++mp;
           ih=1;altd=0;ioi=0;ioe=0;
@@ -3336,7 +3463,7 @@ int main (int argc, char **argv){
           st+=2;
         } else {
           st+= is808x() ? 10 : isr800() ? 3 : 11;
-          a= in(mp= get_memory(pc++) | a<<8);
+          a= in(mp= get_memory_inst(pc++) | a<<8);
           ++mp;
           ih=1;altd=0;ioi=0;ioe=0;
         }
@@ -3464,38 +3591,42 @@ int main (int argc, char **argv){
         else
           sp= xl | xh<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xdd: // OP DD
+      case 0xdd: // OP DD // (8085) JP NK,nnnn //  (R4K) LD BCDE, PX, LD JKHL,PX
         if ( is8085() ) { // (8085) JP NK,nnnn (JNK nnnn)
           JPC(fk);
         } else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xDD\n",pc-1);
           st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : 17;
           t= pc+2;
-          mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
+          mp= pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8;
           put_memory(--sp,t>>8);
           put_memory(--sp,t);
           ih=1;altd=0;ioi=0;ioe=0;
         } else if ( isgbz80() ) {
           printf("%04x: ILLEGAL GBZ80 prefix 0xDD\n",pc-1);
-        } else {
+        } else if ( israbbit4k() && iy) r4k_ld_jkhl_ps(opc);
+        else if ( israbbit4k() && ih==0) r4k_ld_bcde_ps(opc);
+        else {
           st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : isr800() ? 1 : 4;
           ih= iy= 0;
         }
         break;
-      case 0xfd: // OP FD
+      case 0xfd: // OP FD // (8085) JP K,nnnn // (R4K) LD BCDE,PZ, LD JKHL,PZ
         if ( is8085() ) { // (8085) JP K,nnnn (JK nnnn)
           JPCI(fk);
         } else if ( is808x() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xFD\n",pc-1);
           st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : 17;
           t= pc+2;
-          mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
+          mp= pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8;
           put_memory(--sp,t>>8);
           put_memory(--sp,t);
           ih=1;altd=0;ioi=0;ioe=0;
         } else if ( isgbz80() ) {
           printf("%04x: ILLEGAL GBZ80 prefix 0xFD\n",pc-1);
-        } else {
+        } else if ( israbbit4k() && iy) r4k_ld_jkhl_ps(opc);
+        else if ( israbbit4k() && ih==0) r4k_ld_bcde_ps(opc);
+        else {
           st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : isr800() ? 1 : 4;
           ih= 0;
           iy= 1;
@@ -3508,31 +3639,32 @@ int main (int argc, char **argv){
 		} else if ( is808x() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xCB\n",pc-1);
           st+= isez80() ? 4 : israbbit() ? 3 : israbbit() ? 7 : isz180() ? 9 : 10;
-          mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
+          mp= pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8;
         } else {
             handle_cb_page();
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xed: // OP ED
+      case 0xed: // OP ED // (8085) LD HL,(DE) // (R4K) LD BCDE,PY, LD JKHL, PY
         if ( is8085() ) { // (8085) LD HL,(DE) (LHLDE)
-           if ( get_memory(pc) != 0xfe) {
-               l = get_memory( (e|d<<8));
-               h = get_memory( (e|d<<8) + 1);
+           if ( get_memory_inst(pc) != 0xfe) {
+               l = get_memory_data( (e|d<<8));
+               h = get_memory_data( (e|d<<8) + 1);
                st+=10;
 	           break;
            }
         } else if ( is8080() ) {
-          if ( get_memory(pc) != 0xfe) {
+          if ( get_memory_inst(pc) != 0xfe) {
             printf("%04x: ILLEGAL 8080 prefix 0xED\n",pc-1);
             break;
           }
         } else if ( isgbz80() ) {
-          if ( get_memory(pc) != 0xfe) {
+          if ( get_memory_inst(pc) != 0xfe) {
               printf("%04x: ILLEGAL GBZ80 prefix 0xED\n",pc-1);
               break;
           }
-        }
-        handle_ed_page();
+        } else if ( israbbit4k() && iy) r4k_ld_jkhl_ps(opc);
+        else if ( israbbit4k() && ih==0) r4k_ld_bcde_ps(opc);
+        else handle_ed_page();
         ih=1;altd=0;ioi=0;ioe=0;//break;
     }
   } while ( pc != end && st < counter  );
@@ -3591,11 +3723,11 @@ int main (int argc, char **argv){
       fwrite(&sp, 2, 1, fh),
       fwrite(&im, 1, 1, fh),
       fwrite(&w, 1, 1, fh),
-      fwrite(get_memory_addr(0x4000), 1, 0xc000, fh);
+      fwrite(get_memory_addr(0x4000, MEM_TYPE_INST), 1, 0xc000, fh);
     else if ( !strcasecmp(strchr(output, '.'), ".scr" ) )
-      fwrite(get_memory_addr(0x4000), 1, 0x1b00, fh);
+      fwrite(get_memory_addr(0x4000, MEM_TYPE_INST), 1, 0x1b00, fh);
     else{
-      fwrite(get_memory_addr(0), 1, 65536, fh);
+      fwrite(get_memory_addr(0, MEM_TYPE_INST), 1, 65536, fh);
       w= f();
       fwrite(&w, 1, 1, fh);    // 10000 F
       fwrite(&a, 1, 1, fh);    // 10001 A
@@ -3646,10 +3778,11 @@ int main (int argc, char **argv){
 
 static void handle_r4k_7f_page(void)
 {
+    uint8_t opc;
     if (ih) {
         // 7f page - 8 bit operations moved out from main page
         r++;
-        switch( get_memory(pc++) ){
+        switch( (opc = get_memory_inst(pc++)) ){
         case 0x40: // LD B,B
             if ( altd ) { b_ = b; st += 4; ih=1;altd=0;ioi=0;ioe=0;break; }
         case 0x49: // LD C,C
@@ -3814,7 +3947,7 @@ static void handle_r4k_7f_page(void)
             ADD(l, 4);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0x86: // ADD A,(HL)
-            ADD(get_memory(l|h<<8), 7);
+            ADD(get_memory_data(l|h<<8), 7);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0x87: // ADD A,A
             st+= 4;
@@ -3840,7 +3973,7 @@ static void handle_r4k_7f_page(void)
             ADC(l, 4);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0x8e: // ADC A,(HL)
-            ADC(get_memory(l|h<<8), 7);
+            ADC(get_memory_data(l|h<<8), 7);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0x8f: // ADC A,A
             st+=4;
@@ -3866,7 +3999,7 @@ static void handle_r4k_7f_page(void)
             SUB(l, 4);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0x96: // SUB (HL)
-            SUB(get_memory(l|h<<8), 7);
+            SUB(get_memory_data(l|h<<8), 7);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0x97: // SUB A
             st+=4;
@@ -3897,7 +4030,7 @@ static void handle_r4k_7f_page(void)
             SBC(l, 4);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0x9e: // SBC A,(HL)
-            SBC(get_memory(l|h<<8), 7);
+            SBC(get_memory_data(l|h<<8), 7);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0x9f: // SBC A,A
             st+=  4;
@@ -3928,7 +4061,7 @@ static void handle_r4k_7f_page(void)
             AND(l,  4);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0xa6: // AND (HL) // AND (IX+d) // AND (IY+d)
-            AND(get_memory(l|h<<8), 7);
+            AND(get_memory_data(l|h<<8), 7);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0xa7: // AND A
             st+= 4;
@@ -3959,7 +4092,7 @@ static void handle_r4k_7f_page(void)
             XOR(l, 4);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0xae: // XOR (HL)
-            XOR(get_memory(l|h<<8), 7);
+            XOR(get_memory_data(l|h<<8), 7);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0xaf: // XOR A
             st+= 4;
@@ -3985,7 +4118,7 @@ static void handle_r4k_7f_page(void)
             OR(l, 4);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0xb6: // OR (HL) // OR (IX+d) // OR (IY+d)
-            OR(get_memory(l|h<<8),7);
+            OR(get_memory_data(l|h<<8),7);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0xb7: // OR A
             st+= 4;
@@ -4018,7 +4151,7 @@ static void handle_r4k_7f_page(void)
             CP(l, 4);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0xbe: // CP (HL) 
-            w= get_memory(l|h<<8);
+            w= get_memory_data(l|h<<8);
             CP(w, 7);
             ih=1;altd=0;ioi=0;ioe=0;break;
         case 0xbf: // CP A
@@ -4043,8 +4176,9 @@ static void handle_r4k_7f_page(void)
 
 static void handle_ed_page(void)
 {
+    uint8_t opc;
     r++;
-    switch( get_memory(pc++) ){
+    switch( (opc = get_memory_inst(pc++)) ){
     case 0x02:    // (EZ80) LEA BC,IX+d
         if ( isez80() ) { // LEA BC,IX+d
             LEA(b, c, xh, xl, 3);
@@ -4052,31 +4186,39 @@ static void handle_ed_page(void)
             st += 8;
         }
         break;
-    case 0x03:    // (EZ80) LEA BC,IY+d
-        if ( isez80() ) { // LEA BC,IY+d
+    case 0x03:    // (EZ80) LEA BC,IY+d // (R4K) LDL PW,(SP+n)
+        if ( israbbit4k() ) {
+            r4k_ldl_pd_ispn(opc);
+        } else if ( isez80() ) { // LEA BC,IY+d
             LEA(b, c, yh, yl, 3);
         } else {
             st += 8;
         }
         break;
-    case 0x04:    // (Z180) TST A,B
-        if ( canz180() ) { 
+    case 0x04:    // (Z180) TST A,B // (R4K) LD PW,(SP+n)
+        if ( israbbit4k() ) {
+            r4k_ld_pd_ispn(opc);
+        } else if ( canz180() ) { 
             TEST(b, isez80() ? 2 : 7);
         } else {
             st += 8;
         }
         break;
-    case 0x07:    // (EZ80) ld bc,(hl)
-        if ( isez80() ) { // LD BC,(HL)
+    case 0x07:    // (EZ80) ld bc,(hl) // (R4K) LD (PW+BC),HL
+        if ( israbbit4k() ) {
+            r4k_ld_ipdbc_hl(opc);
+        } else if ( isez80() ) { // LD BC,(HL)
             st += 4;
-            c = get_memory((l|h<<8));
-            b = get_memory((l|h<<8) + 1);
+            c = get_memory_data((l|h<<8));
+            b = get_memory_data((l|h<<8) + 1);
         } else {
             st += 8;
         }
         break;
-    case 0x0c:    // (Z180) TST A,C
-        if ( canz180() ) {
+    case 0x0c:    // (Z180) TST A,C // R4K LD PW,klmn
+        if ( israbbit4k() ) {
+            r4k_ld_pd_klmn(opc);
+        } else if ( canz180() ) {
             TEST(c, isez80() ? 2 : 7);
         } else {
             st += 8;
@@ -4098,31 +4240,39 @@ static void handle_ed_page(void)
             st += 8;
         }
         break;
-    case 0x13:    // (EZ80) LEA DE,IY+d
-        if ( isez80() ) { // LEA DE,IY+d
+    case 0x13:    // (EZ80) LEA DE,IY+d // (R4K) LDL PX,(SP+n)
+        if ( israbbit4k() ) {
+            r4k_ldl_pd_ispn(opc);
+        } else if ( isez80() ) { // LEA DE,IY+d
             LEA(d, e, yh, yl, 3);
         } else {
             st += 8;
         }
         break;
-    case 0x14:    // (Z180) TST A,D
-        if ( canz180() ) {
+    case 0x14:    // (Z180) TST A,D // (R4K) LD PX,(SP+n)
+        if ( israbbit4k() ) {
+            r4k_ld_pd_ispn(opc);
+        } else if ( canz180() ) {
             TEST(d, isez80() ? 2 : 7);
         } else {
             st += 8;
         }
         break;
-    case 0x17:    // (EZ80) ld de,(hl)
-        if ( isez80() ) { // LD DE,(HL)
+    case 0x17:    // (EZ80) ld de,(hl) // (R4K) LD (PX+BC),HL
+        if ( israbbit4k() ) {
+            r4k_ld_ipdbc_hl(opc);
+        } else  if ( isez80() ) { // LD DE,(HL)
             st += 4;
-            e = get_memory((l|h<<8));
-            d = get_memory((l|h<<8) + 1);
+            e = get_memory_data((l|h<<8));
+            d = get_memory_data((l|h<<8) + 1);
         } else {
             st += 8;
         }
         break;
-    case 0x1c:    // (Z180) TST A,E
-        if ( canz180() ) {
+    case 0x1c:    // (Z180) TST A,E // R4K LD PX,klmn
+        if ( israbbit4k() ) {
+            r4k_ld_pd_klmn(opc);
+        } else if ( canz180() ) {
             TEST(e, isez80() ? 2 : 7);
         } else {
             st += 8;
@@ -4144,8 +4294,10 @@ static void handle_ed_page(void)
             st += 8;
         }
         break;
-    case 0x23:    // (EZ80) LEA HL,IY+d, (ZXN) swapnib
-        if ( isez80() ) { // LEA HL,IY+d
+    case 0x23:    // (EZ80) LEA HL,IY+d, (ZXN) swapnib // (R4K) LDL PY,(SP+n)
+        if ( israbbit4k() ) {
+            r4k_ldl_pd_ispn(opc);
+        } else if ( isez80() ) { // LEA HL,IY+d
             LEA(h, l, yh, yl, 3);
         } else if ( isz80n() ) { // SWAPNIB
             SWAP(a);
@@ -4153,8 +4305,10 @@ static void handle_ed_page(void)
             st += 8;
         }
         break;
-    case 0x24:    // (Z180) TST A,D
-        if ( canz180() ) {
+    case 0x24:    // (Z180) TST A,D // (R4K) LD PY,(SP+n)
+        if ( israbbit4k() ) {
+            r4k_ld_pd_ispn(opc);
+        } else if ( canz180() ) {
             TEST(h, isez80() ? 2 : 7);
         } else if ( isz80n() ) {   // (ZXN) mirror a
             a = mirror_table[a & 0x0f] << 4 | mirror_table[(a & 0xf0) >> 4];
@@ -4224,8 +4378,10 @@ static void handle_ed_page(void)
             st += 8;
         }
         break;
-    case 0x2c:    // (Z180) TST A,E (ZXN) brlc de,b
-        if ( canz180() ) {
+    case 0x2c:    // (Z180) TST A,E (ZXN) brlc de,b // R4K LD PY,klmn
+        if ( israbbit4k() ) {
+            r4k_ld_pd_klmn(opc);
+        } else if ( canz180() ) {
             TEST(l, isez80() ? 2 : 7);
         } else if ( isz80n() ) { // BRLC DE,B
             long long old_st = st;
@@ -4264,8 +4420,10 @@ static void handle_ed_page(void)
             st += 8;
         }
         break;
-    case 0x33:    // (EZ80) LEA IY,IY+d, (ZXN) add bc,a
-        if ( isez80() ) { // LEA IY,IY+d
+    case 0x33:    // (EZ80) LEA IY,IY+d, (ZXN) add bc,a // (R4K) LDL PZ,(SP+n)
+        if ( israbbit4k() ) {
+            r4k_ldl_pd_ispn(opc);
+        } else if ( isez80() ) { // LEA IY,IY+d
             LEA(yh, yl, yh, yl, 3);
         } else if ( isz80n() ) { // ADD BC,A
             int16_t result = (( b * 256 ) + c) + a;
@@ -4296,7 +4454,7 @@ static void handle_ed_page(void)
         break;
     case 0x64:    // (Z180) TST A,n
         if ( canz180() ) {
-            uint8_t v = get_memory(pc++);
+            uint8_t v = get_memory_inst(pc++);
             TEST(v, isez80() ? 3 : 9);
         } else {    // Z80 (Undocumented NEG)
             st+= 8;
@@ -4306,8 +4464,8 @@ static void handle_ed_page(void)
         break;
     case 0x90:
             if ( isz80n()) {  // OUTINB : out(BC,HL*); HL++
-                out(c | b << 8, t = get_memory(l | h << 8));
-                put_memory(e | d << 8, t = get_memory(l | h << 8));
+                out(c | b << 8, t = get_memory_data(l | h << 8));
+                put_memory(e | d << 8, t = get_memory_data(l | h << 8));
                 ++l || h++;
                 st += 16;
             } else {
@@ -4316,8 +4474,8 @@ static void handle_ed_page(void)
             break;
     case 0x91:
         if ( isz80n() ) {
-            uint8_t v = get_memory(pc++);
-            uint8_t r = get_memory(pc++);
+            uint8_t v = get_memory_inst(pc++);
+            uint8_t r = get_memory_inst(pc++);
             out(0x243b, v);
             out(0x253b, r);
             st += 20;
@@ -4327,7 +4485,7 @@ static void handle_ed_page(void)
         break;
     case 0x92:
         if ( isz80n() ) {
-            uint8_t v = get_memory(pc++);
+            uint8_t v = get_memory_inst(pc++);
             out(0x243b, v);
             out(0x253b, a);
             st += 17;
@@ -4337,7 +4495,7 @@ static void handle_ed_page(void)
         break;
     case 0xa5:
             if ( isz80n()) {  // LDWS : DE*:=HL*; INC L; INC D;
-                put_memory(e | d << 8, t = get_memory(l | h << 8));
+                put_memory(e | d << 8, t = get_memory_data(l | h << 8));
                 l++; d++;
                 st += 14;
             } else {
@@ -4346,7 +4504,7 @@ static void handle_ed_page(void)
             break;
     case 0xb7:
             if ( isz80n()) {  // LDPIRX : do{t:=(HL&$FFF8+E&7)*; {if t!=A DE*:=t;} DE++; BC--}while(BC>0)
-                t = get_memory(((l | h << 8) & 0xfff8) + (e & 0x07));
+                t = get_memory_data(((l | h << 8) & 0xfff8) + (e & 0x07));
                 if (t != a) put_memory(e | d << 8, t);
                 ++e || d++;
                 c-- || b--;
@@ -4465,9 +4623,9 @@ static void handle_ed_page(void)
             st += 4;
         } else if ( isz80n()) { // LDIX
             st += 16;
-            t = get_memory(l | h<<8);
+            t = get_memory_data(l | h<<8);
             if ( t != a ) {
-            put_memory(e | d<<8, t= get_memory(l | h<<8));
+            put_memory(e | d<<8, t= get_memory_data(l | h<<8));
             }
             ++l || h++;
             ++e || d++;
@@ -4488,10 +4646,10 @@ static void handle_ed_page(void)
             if (F_GTU(f())) l = 1;
             st += 4;
         } if ( isz80n()) { // lddx
-            t = get_memory(l | h<<8);
+            t = get_memory_data(l | h<<8);
             st += 16;
             if ( t != a ) {
-                put_memory(e | d<<8, t= get_memory(l | h<<8));
+                put_memory(e | d<<8, t= get_memory_data(l | h<<8));
             }
             l-- || h--;
             e-- || d--;
@@ -4512,10 +4670,10 @@ static void handle_ed_page(void)
             if (F_LT(f())) l = 1;
             st += 4;
         } else if ( isz80n() ) { // LDIRX
-            t = get_memory(l | h<<8);
+            t = get_memory_data(l | h<<8);
             st += 16;
             if ( t != a ) {
-                put_memory(e | d<<8, t= get_memory(l | h<<8));
+                put_memory(e | d<<8, t= get_memory_data(l | h<<8));
             }
             ++l || h++;
             ++e || d++;
@@ -4539,10 +4697,10 @@ static void handle_ed_page(void)
             if (F_V(f())) l = 1;
             st += 4;
         } else if ( isz80n()) { // LDDRX
-            t = get_memory(l | h<<8);
+            t = get_memory_data(l | h<<8);
             st += 16;
             if ( t != a ) {
-                put_memory(e | d<<8, t= get_memory(l | h<<8));
+                put_memory(e | d<<8, t= get_memory_data(l | h<<8));
             }
             l-- || h--;
             e-- || d--;
@@ -4601,7 +4759,7 @@ static void handle_ed_page(void)
             if ( zero ) {
                 pc++;
             } else {
-                mp = pc += (get_memory(pc) ^ 128) - 127;
+                mp = pc += (get_memory_inst(pc) ^ 128) - 127;
             }
             st += 7;
         } else {
@@ -4609,16 +4767,43 @@ static void handle_ed_page(void)
         }
         ih=1;altd=0;ioi=0;ioe=0;
         break;
+    case 0x0d:   // (R4K) LDL PW,mn
+    case 0x1d:   // (R4K) LDL PX,mn
+    case 0x2d:   // (R4K) LDL PY,mn
+        if ( israbbit4k() ) {
+            r4k_ldl_pd_mn(opc);
+        } else {
+            st += 8;
+        }
+        break;
+    case 0x05:  // (R4K) LD (SP+n),PW
+    case 0x15:  // (R4K) LD (SP+n),PX
+    case 0x25:  // (R4K) LD (SP+n),PY
+        if ( israbbit4k() ) {
+            r4k_ld_ispn_ps(opc);
+        } else {
+            st += israbbit() ? 4 : 8;
+        }
+        break;
+
+    case 0x06: // (R4K) LD HL,(PW+BC)
+    case 0x16: // (R4K) LD HL,(PX+BC)
+        if ( israbbit4k() ) {
+            r4k_ld_hl_ipsbc(opc);
+        } else {
+            st += israbbit() ? 4 : 8;
+        }
+        break;
+
+
     case 0x00: case 0x01:       // NOP
-    case 0x05: case 0x06:
     case 0x08: case 0x09: case 0x0a: case 0x0b:
-    case 0x0d: case 0x0e:
+    case 0x0e:
     case 0x11:
-    case 0x15: case 0x16:
     case 0x18: case 0x19: case 0x1a: case 0x1b:
-    case 0x1d: case 0x1e:
+    case 0x1e:
     case 0x20: case 0x21:
-    case 0x2d: case 0x2e:
+    case 0x2e:
     case 0x77: case 0x7f:
     case 0x80: case 0x81: case 0x82: case 0x83:
     case 0x84: case 0x85: case 0x86: case 0x87:
@@ -4649,8 +4834,10 @@ static void handle_ed_page(void)
     case 0xf8: case 0xfa: case 0xfb:
     case 0xfc: case 0xff:
         st+= 8; break;
-    case 0x26:                                         // (ZXN) mirror de
-        if ( !isz80n()) { st += 8; break; }
+    case 0x26:                                         // (ZXN) mirror de // (R4K) LD HL,(PY+BC)
+        if ( israbbit4k() ) {
+            r4k_ld_hl_ipsbc(opc);
+        } else if ( !isz80n()) { st += 8; break; }
 #if 0
         t = (mirror_table[e & 0x0f] << 4) | mirror_table[(e & 0xf0) >> 4];
         e = d;
@@ -4672,8 +4859,8 @@ static void handle_ed_page(void)
     case 0x31:
         if ( isez80() ) {  // LD IY,(HL)
             st += 4;
-            yl = get_memory((l|h<<8));
-            yh = get_memory((l|h<<8) + 1);
+            yl = get_memory_data((l|h<<8));
+            yh = get_memory_data((l|h<<8) + 1);
         } else if ( isz80n() ) {               // (ZXN) add hl,a
             int16_t result = (( h * 256 ) + l) + a;
             h  = (result >> 8 ) & 0xff;
@@ -4683,25 +4870,29 @@ static void handle_ed_page(void)
             st += 8;
         }
         break;
-    case 0x34:                                         // (ZXN) add hl,$xxxx
-        if ( isz80n() ) { // ADD HL,mn
-            uint8_t lsb = get_memory(pc++);
-            uint8_t msb = get_memory(pc++);
+    case 0x34:                                         // (ZXN) add hl,$xxxx // (R4K) LD PZ,(SP+n)
+        if ( israbbit4k() ) {
+            r4k_ld_pd_ispn(opc);
+        } else if ( isz80n() ) { // ADD HL,mn
+            uint8_t lsb = get_memory_inst(pc++);
+            uint8_t msb = get_memory_inst(pc++);
             int16_t result = (( h * 256 ) + l) + ( lsb + msb * 256);
             h  = (result >> 8 ) & 0xff;
             l = result & 0xff;
             st += 16;
         } else if ( canz180() ) {			// (Z180/EZ80) TST A,(HL)
-            uint8_t v = get_memory(l | h << 8);
+            uint8_t v = get_memory_data(l | h << 8);
             TEST(v, isez80() ? 3 : 10);
         } else {
             st += 8;
         }
         break;
-    case 0x35:                                         // (ZXN) add de,$xxxx
-        if ( isz80n() ) { // ADD DE,mn
-            uint8_t lsb = get_memory(pc++);
-            uint8_t msb = get_memory(pc++);
+    case 0x35:                                         // (ZXN) add de,$xxxx // (R4K) LD (SP+n),PZ
+        if ( israbbit4k() ) {
+            r4k_ld_ispn_ps(opc);
+        } else if ( isz80n() ) { // ADD DE,mn
+            uint8_t lsb = get_memory_inst(pc++);
+            uint8_t msb = get_memory_inst(pc++);
             int16_t result = (( d * 256 ) + e) + ( lsb + msb * 256);
             d  = (result >> 8 ) & 0xff;
             e = result & 0xff;
@@ -4710,14 +4901,16 @@ static void handle_ed_page(void)
             st += 8;
         }
         break;
-    case 0x36:                                         // (ZXN) add bc,$xxxx/ (EZ80) ld iy,(hl)
-        if ( isez80() ) { // LD IY,(HL)
+    case 0x36:                                         // (ZXN) add bc,$xxxx/ (EZ80) ld iy,(hl) // (R4K) LD HL,(PZ+BC)
+        if ( israbbit4k() ) {
+            r4k_ld_hl_ipsbc(opc);
+        } else if ( isez80() ) { // LD IY,(HL)
             st += 4;
-            yl = get_memory((l|h<<8));
-            yh = get_memory((l|h<<8) + 1);
+            yl = get_memory_data((l|h<<8));
+            yh = get_memory_data((l|h<<8) + 1);
         } else if ( isz80n() ) { // ADD BC,mn
-            uint8_t lsb = get_memory(pc++);
-            uint8_t msb = get_memory(pc++);
+            uint8_t lsb = get_memory_inst(pc++);
+            uint8_t msb = get_memory_inst(pc++);
             int16_t result = (( b * 256 ) + c) + ( lsb + msb * 256);
             b = (result >> 8 ) & 0xff;
             c = result & 0xff;
@@ -4726,14 +4919,13 @@ static void handle_ed_page(void)
             st += 8;
         }
         break;
-    case 0x25:
-        st += 8;
-        break;
-    case 0x37:                                         // (ZXN) inc dehl / (EZ80) ld ix,(hl)
-        if ( isez80() ) { // LD IX,(HL)
+    case 0x37:                                         // (ZXN) inc dehl / (EZ80) ld ix,(hl) // (R4K) LD (PZ+BC),HL
+        if ( israbbit4k() ) {
+            r4k_ld_ipdbc_hl(opc);
+        } else if ( isez80() ) { // LD IX,(HL)
             st += 4;
-            xl = get_memory((l|h<<8));
-            xh = get_memory((l|h<<8) + 1);
+            xl = get_memory_data((l|h<<8));
+            xh = get_memory_data((l|h<<8) + 1);
         } else {
             st += 8;
         }
@@ -4750,20 +4942,26 @@ static void handle_ed_page(void)
     case 0x3B:                                         // (ZXN) add dehl,$XXXX
         st += 8;
         break;
-    case 0x3C:                                         // (ZXN) sub dehl,a
-        if ( canz180()) {                                // (Z180) TST A,A
+    case 0x3C:                                         // (ZXN) sub dehl,a // R4K LD PW,klmn
+        if ( israbbit4k() ) {
+            r4k_ld_pd_klmn(opc);
+        } else if ( canz180()) {                                // (Z180) TST A,A
             TEST(a, isez80() ? 2 : 7);
         } else {
             st += 8;
         }
         break;
-    case 0x3D:                                         // (ZXN) sub dehl,bc
-        st += 8;
+    case 0x3D:                                         // (ZXN) sub dehl,bc // (R4K) LD PZ,mn
+        if ( israbbit4k() ) {
+            r4k_ldl_pd_mn(opc);
+        } else {
+            st += 8;
+        }
         break;
     case 0x8a:                                         // (ZXN) push $xxxx
         if ( isz80n() ) { // PUSH mn
-            uint8_t lsb = get_memory(pc++);
-            uint8_t msb = get_memory(pc++);
+            uint8_t lsb = get_memory_inst(pc++);
+            uint8_t msb = get_memory_inst(pc++);
             long long old_st = st;
             PUSH(msb,lsb);
             st = old_st + 23;
@@ -4774,15 +4972,17 @@ static void handle_ed_page(void)
     case 0x8b:                                         // (ZXN) popx
         st += 8;
         break;
-    case 0x27:                                         // (ZXN) tst $xx (EZ80) ld hl,(hl)
-        if ( isez80() ) { // LD HL,(HL)
+    case 0x27:                                         // (ZXN) tst $xx (EZ80) ld hl,(hl) // (R4K) LD (PY+BC),HL
+        if ( israbbit4k() ) {
+            r4k_ld_ipdbc_hl(opc);
+        } else if ( isez80() ) { // LD HL,(HL)
             unsigned char tl;
             st += 4;
-            tl = get_memory((l|h<<8));
-            h = get_memory((l|h<<8) + 1);
+            tl = get_memory_data((l|h<<8));
+            h = get_memory_data((l|h<<8) + 1);
             l = tl;
         } else if ( isz80n() ) { // TST n
-            uint8_t v = get_memory(pc++);
+            uint8_t v = get_memory_inst(pc++);
             TEST(v, 7);
             st += 11;
         } else {
@@ -4795,14 +4995,15 @@ static void handle_ed_page(void)
     case 0xfe:   // (R4K) LD HL,(SP+HL) 
         if ( israbbit4k() ) { // LD HL,(SP+HL)
             int     offset = sp;
+            ioi=ioe=0;
             if ( altd ) {
                 offset += (h_ *256) + l_;
-                l_ = get_memory(offset++);
-                h_ = get_memory(offset);
+                l_ = get_memory_data(offset++);
+                h_ = get_memory_data(offset);
             } else {
                 offset += (h *256) + l;
-                l_ = get_memory(offset++);
-                h_ = get_memory(offset);
+                l_ = get_memory_data(offset++);
+                h_ = get_memory_data(offset);
             }
             st += 4;
         } else PatchZ80();
@@ -4899,16 +5100,16 @@ static void handle_ed_page(void)
     case 0x53: LDPNNRR(d, e, isez80() ? 6 : israbbit() ? 15 : isz180() ? 19 : isr800() ? 6 : 20); break;               // LD (NN),DE
     case 0x63: LDPNNRR(h, l, isez80() ? 6 : israbbit() ? 15 : isz180() ? 19 : isr800() ? 6 : 20); break;               // LD (NN),HL
     case 0x73: st+= isez80() ? 6 : israbbit() ? 15 : isz180() ? 19 : 20;                                // LD (NN),SP
-                mp= get_memory(pc++);
-                put_memory(mp|= get_memory(pc++)<<8, sp);
+                mp= get_memory_inst(pc++);
+                put_memory(mp|= get_memory_inst(pc++)<<8, sp);
                 put_memory(++mp,sp>>8); break;
     case 0x4b: LDRRPNN(b, c, isez80() ? 6 : israbbit() ? 13 : isz180() ? 18 : isr800() ? 6 : 20); break;               // LD BC,(NN)
     case 0x5b: LDRRPNN(d, e, isez80() ? 6 : israbbit() ? 13 : isz180() ? 18 : isr800() ? 6 : 20); break;               // LD DE,(NN)
     case 0x6b: LDRRPNN(h, l, isez80() ? 6 : israbbit() ? 13 : isz180() ? 18 : isr800() ? 6 : 20); break;               // LD HL,(NN)
     case 0x7b: st+= isez80() ? 6 : israbbit() ? 13 : isz180() ? 18 : isr800() ? 6 : 20;                                // LD SP,(NN)
-                t= get_memory(pc++);
-                sp= get_memory(t|= get_memory(pc++)<<8);
-                sp|= get_memory(mp= t+1) << 8; break;
+                t= get_memory_inst(pc++);
+                sp= get_memory_data(t|= get_memory_inst(pc++)<<8);
+                sp|= get_memory_data(mp= t+1) << 8; break;
     case 0x4c:                                         // (Z180) MLT BC
         if ( canz180() ) {
             uint16_t v = b * c;
@@ -4988,7 +5189,7 @@ static void handle_ed_page(void)
         // Fall through for z80 case
     case 0x65:    // (EZ80) PEA ix+d
         if ( isez80() ) { // PEA IX+d
-            uint16_t tv = ((get_memory(pc++)^128)-128+(xl|xh<<8))&65535;
+            uint16_t tv = ((get_memory_inst(pc++)^128)-128+(xl|xh<<8))&65535;
             st += 5;
             put_memory(--sp, tv / 256);
             put_memory(--sp, tv % 256);
@@ -5001,7 +5202,7 @@ static void handle_ed_page(void)
         break;
     case 0x66:    // (EZ80) PEA iy+d
         if ( isez80() ) { // PEA IY+d
-            uint16_t tv = ((get_memory(pc++)^128)-128+(yl|yh<<8))&65535;
+            uint16_t tv = ((get_memory_inst(pc++)^128)-128+(yl|yh<<8))&65535;
             st += 5;
             put_memory(--sp, tv / 256);
             put_memory(--sp, tv % 256);
@@ -5030,7 +5231,7 @@ static void handle_ed_page(void)
         fa= fb= iff<<7 & 128; break;
     case 0x67:  // RRD
         st+= isr800() ? 5 : 18;
-        t= get_memory(mp= l|h<<8)
+        t= get_memory_data(mp= l|h<<8)
         | a<<8;
         a= (a &240)
         | (t & 15);
@@ -5042,7 +5243,7 @@ static void handle_ed_page(void)
         break;
     case 0x6f: // RLD
         st+= isr800() ? 5 : 18;
-        t= get_memory(mp= l|h<<8)<<4
+        t= get_memory_data(mp= l|h<<8)<<4
         | (a&15);
         a= (a &240)
         | t>>8;
@@ -5053,8 +5254,15 @@ static void handle_ed_page(void)
         put_memory(mp++,t); 
         break;
     case 0xa0: // LDI
-        st+= israbbit() ? 10 : isz180() ? 12 : isr800() ? 4 : 16; 
-        put_memory(e | d<<8, t= get_memory(l | h<<8));
+        st+= israbbit() ? 10 : isz180() ? 12 : isr800() ? 4 : 16;
+        // Only dest is affected by ioi/ioe on a rabbit
+        {
+            uint8_t s_ioi = ioi, s_ioe = ioe;
+            ioi = ioe = 0;
+            t =  get_memory_data(l | h<<8);
+            ioi = s_ioi; ioe = s_ioe;
+            put_memory(e | d<<8, t);
+        }
         ++l || h++;
         ++e || d++;
         c-- || b--;
@@ -5069,7 +5277,14 @@ static void handle_ed_page(void)
         break;
     case 0xa8: // LDD
         st+= israbbit() ? 10 : isz180() ? 12 :  isr800() ? 4 : 16;
-        put_memory(e | d<<8, t= get_memory(l | h<<8));
+        // On a rabbit only destination is affected by ioi/ioe
+        {
+            uint8_t s_ioi = ioi, s_ioe = ioe;
+            ioi = ioe = 0;
+            t = get_memory_data(l | h<<8);
+            ioi = s_ioi; ioe = s_ioe;
+            put_memory(e | d<<8, t);
+        }
         l-- || h--;
         e-- || d--;
         c-- || b--;
@@ -5083,7 +5298,14 @@ static void handle_ed_page(void)
         fb= fa; 
         break;
     case 0xb0: st+= israbbit() ? 7 : isz180() ? 12 :  isr800() ? 4 : 16;                                // LDIR
-        put_memory(e | d<<8, t= get_memory(l | h<<8));
+        // On a rabbit only destination is affected by ioi/ioe
+        {
+            uint8_t s_ioi = ioi, s_ioe = ioe;
+            ioi = ioe = 0;
+            t = get_memory_data(l | h<<8);
+            ioi = s_ioi; ioe = s_ioe;
+            put_memory(e | d<<8, t);
+        }
         ++l || h++;
         ++e || d++;
         c-- || b--;
@@ -5097,9 +5319,17 @@ static void handle_ed_page(void)
                 st+= israbbit() ? 6 : isz180() ? 2 : 5,
                 mp= --pc,
                 --pc);
+        if (ioe|ioi) --pc;  // Pick up the IO prefix again
         fb= fa; break;
     case 0xb8: st+= israbbit() ? 7 : isz180() ? 12 :  isr800() ? 4 : 16;                                // LDDR
-        put_memory(e | d<<8, t= get_memory(l | h<<8));
+        // On a rabbit only destination is affected by ioi/ioe
+        {
+            uint8_t s_ioi = ioi, s_ioe = ioe;
+            ioi = ioe = 0;
+            t = get_memory_data(l | h<<8);
+            ioi = s_ioi; ioe = s_ioe;
+            put_memory(e | d<<8, t);
+        }
         l-- || h--;
         e-- || d--;
         c-- || b--;
@@ -5113,73 +5343,102 @@ static void handle_ed_page(void)
                 st+= israbbit() ? 6 : isz180() ? 2 : 5,
                 mp= --pc,
                 --pc);
+        if (ioe|ioi) --pc;  // Pick up the IO prefix again
         fb= fa; break;
-    case 0xa1: st+=  isr800() ? 4 : 16;                                // CPI
-        w= a-(t= get_memory(l|h<<8));
-        ++l || h++;
-        c-- || b--;
-        ++mp;
-        fr=  w & 127
-        | w>>7;
-        fb= ~(t|128);
-        fa= a&127;
-        b|c && ( fa|= 128,
-                fb|= 128);
-        ff=  ff  & -256
-        | w   &  -41;
-    (w^t^a) & 16 && w--;
-    ff|= w<<4 & 32
-        | w    &  8; break;
-    case 0xa9: st+=  isr800() ? 4 : 16;                                // CPD
-        w= a-(t= get_memory(l|h<<8));
-        l-- || h--;
-        c-- || b--;
-        --mp;
-        fr=  w & 127
-        | w>>7;
-        fb= ~(t|128);
-        fa= a&127;
-        b|c && ( fa|= 128,
-                fb|= 128);
-        ff=  ff  & -256
-        | w   &  -41;
-    (w^t^a) & 16 && w--;
-    ff|= w<<4 & 32
-        | w    &  8; break;
-    case 0xb1: st+=  isr800() ? 4 : 16;                                // CPIR
-        w= a-(t= get_memory(l|h<<8));
-        ++l || h++;
-        c-- || b--;
-        ++mp;
-        fr=  w & 127
-        | w>>7;
-        fb= ~(t|128);
-        fa= a&127;
-        b|c && ( fa|= 128,
-                fb|= 128,
-                w && (st+= 5, mp=--pc, --pc));
-        ff=  ff  & -256
-        | w   &  -41;
-    (w^t^a) & 16 && w--;
-    ff|= w<<4 & 32
-        | w    &  8; break;
-    case 0xb9: st+=  isr800() ? 4 : 16;                                // CPDR
-        w= a-(t= get_memory(l|h<<8));
-        l-- || h--;
-        c-- || b--;
-        --mp;
-        fr=  w & 127
-        | w>>7;
-        fb= ~(t|128);
-        fa= a&127;
-        b|c && ( fa|= 128,
-                fb|= 128,
-                w && (st+= 5, mp=--pc, --pc));
-        ff=  ff  & -256
-        | w   &  -41;
-    (w^t^a) & 16 && w--;
-    ff|= w<<4 & 32
-        | w    &  8; break;
+    case 0xa1:    // CPI
+        if ( israbbit() ) {
+            RABBIT_UNDEFINED(0xeda1, "cpi");
+            st += 4;
+        } else {
+            st+=  isr800() ? 4 : 16;
+            w= a-(t= get_memory_data(l|h<<8));
+            ++l || h++;
+            c-- || b--;
+            ++mp;
+            fr=  w & 127
+            | w>>7;
+            fb= ~(t|128);
+            fa= a&127;
+            b|c && ( fa|= 128,
+                    fb|= 128);
+            ff=  ff  & -256
+            | w   &  -41;
+        (w^t^a) & 16 && w--;
+        ff|= w<<4 & 32
+            | w    &  8; 
+        }
+        break;
+    case 0xa9:  // cpd
+        if ( israbbit() ) {
+            RABBIT_UNDEFINED(0xeda9, "cpd");
+            st += 4;
+        } else {
+            st+=  isr800() ? 4 : 16;
+            w= a-(t= get_memory_data(l|h<<8));
+            l-- || h--;
+            c-- || b--;
+            --mp;
+            fr=  w & 127
+            | w>>7;
+            fb= ~(t|128);
+            fa= a&127;
+            b|c && ( fa|= 128,
+                    fb|= 128);
+            ff=  ff  & -256
+            | w   &  -41;
+        (w^t^a) & 16 && w--;
+        ff|= w<<4 & 32
+            | w    &  8; 
+        }
+        break;
+    case 0xb1: // CPIR
+        if ( israbbit() ) { // TODO: SETSYS (r4k)
+            RABBIT_UNDEFINED(0xedb1, "cpir");
+            st += 4;
+        } else {
+            st+=  isr800() ? 4 : 16; 
+            w= a-(t= get_memory_data(l|h<<8));
+            ++l || h++;
+            c-- || b--;
+            ++mp;
+            fr=  w & 127
+            | w>>7;
+            fb= ~(t|128);
+            fa= a&127;
+            b|c && ( fa|= 128,
+                    fb|= 128,
+                    w && (st+= 5, mp=--pc, --pc));
+            ff=  ff  & -256
+            | w   &  -41;
+        (w^t^a) & 16 && w--;
+        ff|= w<<4 & 32
+            | w    &  8; 
+        }
+        break;
+    case 0xb9: // CPDR
+        if ( israbbit() ) {
+            RABBIT_UNDEFINED(0xedb9, "cpdr");
+            st += 4;
+        } else {
+            st+=  isr800() ? 4 : 16;
+            w= a-(t= get_memory_data(l|h<<8));
+            l-- || h--;
+            c-- || b--;
+            --mp;
+            fr=  w & 127
+            | w>>7;
+            fb= ~(t|128);
+            fa= a&127;
+            b|c && ( fa|= 128,
+                    fb|= 128,
+                    w && (st+= 5, mp=--pc, --pc));
+            ff=  ff  & -256
+            | w   &  -41;
+        (w^t^a) & 16 && w--;
+        ff|= w<<4 & 32
+            | w    &  8; 
+        }
+        break;
     case 0xa2: st+=  isr800() ? 4 : 16;                                // INI
         put_memory(l | h<<8,t= in(mp= c | b<<8));
         ++l || h++;
@@ -5231,7 +5490,7 @@ static void handle_ed_page(void)
     case 0xa3: st+=  isr800() ? 4 : 16;                                // OUTI
         --b;
         out( mp= c | b<<8,
-            t = get_memory(l | h<<8));
+            t = get_memory_data(l | h<<8));
         ++mp;
         ++l || h++;
         u= t+l;
@@ -5244,7 +5503,7 @@ static void handle_ed_page(void)
     case 0xab: st+=  isr800() ? 4 : 16;                                // OUTD
         --b;
         out( mp= c | b<<8,
-            t = get_memory(l | h<<8));
+            t = get_memory_data(l | h<<8));
         --mp;
         l-- || h--;
         u= t+l;
@@ -5257,7 +5516,7 @@ static void handle_ed_page(void)
     case 0xb3: st+=  isr800() ? 4 : 16;                                // OTIR
         --b;
         out( mp= c | b<<8,
-            t = get_memory(l | h<<8));
+            t = get_memory_data(l | h<<8));
         ++mp;
         ++l || h++;
         u= t+l;
@@ -5271,7 +5530,7 @@ static void handle_ed_page(void)
     case 0xbb: st+=  isr800() ? 4 : 16;                                // OTDR
         --b;
         out( mp= c | b<<8,
-            t = get_memory(l | h<<8));
+            t = get_memory_data(l | h<<8));
         --mp;
         l-- || h--;
         u= t+l;
@@ -5297,9 +5556,10 @@ static void handle_ed_page(void)
 
 static void handle_cb_page(void)
 {
+    uint8_t opc;
     r++;
     if( ih )
-        switch( get_memory(pc++) ){
+        switch( (opc = get_memory_inst(pc++)) ){
         case 0x00:  RLC(b,b_); break;                       // RLC B
         case 0x01:  RLC(c,c_); break;                       // RLC C
         case 0x02:  RLC(d,d_); break;                       // RLC D
@@ -5308,7 +5568,7 @@ static void handle_cb_page(void)
         case 0x05:  RLC(l,l_); break;                       // RLC L
         case 0x06:  st+= israbbit() ? 6 : isgbz80() ? 8 : isz180() ? 6 : 7;             // RLC (HL)
                     t= l|h<<8;
-                    u=get_memory(t);
+                    u=get_memory_data(t);
                     RLC(u,u);
                     put_memory(t, u); break;
         case 0x07:  RLC(a,a); break;                       // RLC A
@@ -5320,7 +5580,7 @@ static void handle_cb_page(void)
         case 0x0d:  RRC(l,l_); break;                       // RRC L
         case 0x0e:  st+= israbbit() ? 6 : isgbz80() ? 8 : isz180() ? 6 : 7;             // RRC (HL)
                     t= l|h<<8;
-                    u=get_memory(t);
+                    u=get_memory_data(t);
                     RRC(u,u);
                     put_memory(t, u); break;
         case 0x0f:  RRC(a,a_); break;                       // RRC A
@@ -5332,7 +5592,7 @@ static void handle_cb_page(void)
         case 0x15:  RL(l,l_); break;                        // RL L
         case 0x16:  st+= israbbit() ? 6 : isgbz80() ? 8 : isz180() ? 6 : 7;             // RL (HL)
                     t= l|h<<8;
-                    u=get_memory(t);
+                    u=get_memory_data(t);
                     RL(u,u);
                     put_memory(t, u); break;
         case 0x17:  RL(a,a_); break;                        // RL A
@@ -5344,8 +5604,8 @@ static void handle_cb_page(void)
         case 0x1d:  RR(l,l_); break;                        // RR L
         case 0x1e:  st+= israbbit() ? 6 : isgbz80() ? 8 : isz180() ? 6 : 7;             // RR (HL)
                     t= l|h<<8;
-                    u=get_memory(t);
-                    u=get_memory(t);
+                    u=get_memory_data(t);
+                    u=get_memory_data(t);
                     RR(u,u);
                     put_memory(t, u); break;
         case 0x1f:  RR(a,a_); break;                        // RR A
@@ -5357,7 +5617,7 @@ static void handle_cb_page(void)
         case 0x25:  SLA(l,l_); break;                       // SLA L
         case 0x26:  st+= israbbit() ? 6 : isgbz80() ? 8 : isz180() ? 6 : 7;             // SLA (HL)
                     t= l|h<<8;
-                    u=get_memory(t);
+                    u=get_memory_data(t);
                     SLA(u,u);
                     put_memory(t, u); break;
         case 0x27:  SLA(a,a_); break;                       // SLA A
@@ -5369,7 +5629,7 @@ static void handle_cb_page(void)
         case 0x2d:  SRA(l,l_); break;                       // SRA L
         case 0x2e:  st+= israbbit() ? 6 : isgbz80() ? 8 : isz180() ? 6 : 7;             // SRA (HL)
                     t= l|h<<8;
-                    u=get_memory(t);
+                    u=get_memory_data(t);
                     SRA(u,u);
                     put_memory(t, u); break;
         case 0x2f:  SRA(a,a_); break;                       // SRA A
@@ -5383,13 +5643,13 @@ static void handle_cb_page(void)
                     if ( isgbz80() ) { // SWAP (HL)
                         st += 8;
                         t= l|h<<8;
-                        u=get_memory(t);
+                        u=get_memory_data(t);
                         SWAP(u);
                         put_memory(t, u);
                     } else if (cansll() ) {
                         st+= 7;
                         t= l|h<<8;
-                        u=get_memory(t);
+                        u=get_memory_data(t);
                         SLL(u);
                         put_memory(t, u);
                     }
@@ -5403,7 +5663,7 @@ static void handle_cb_page(void)
         case 0x3d:  SRL(l,l_); break;                       // SRL L
         case 0x3e:  st+= israbbit() ? 6 : isgbz80() ? 8 : isz180() ? 6 : 7;             // SRL (HL)
                     t= l|h<<8;
-                    u=get_memory(t);
+                    u=get_memory_data(t);
                     SRL(u,u);
                     put_memory(t, u); break;
         case 0x3f:  SRL(a,a_); break;                       // SRL A
@@ -5603,10 +5863,10 @@ static void handle_cb_page(void)
     else{
         st+= isz180() ? 9 : 11;
         if( iy )
-        t= get_memory(mp= ((get_memory(pc++)^128)-128+(yl|yh<<8)));
+            t= get_memory_data(mp= ((get_memory_inst(pc++)^128)-128+(yl|yh<<8)));
         else
-        t= get_memory(mp= ((get_memory(pc++)^128)-128+(xl|xh<<8)));
-        switch( get_memory(pc++) ){
+            t= get_memory_data(mp= ((get_memory_inst(pc++)^128)-128+(xl|xh<<8)));
+        switch( get_memory_inst(pc++) ){
         case 0x00: RLC(t,t); put_memory(mp, b=t); break;         // LD B,RLC (IX+d) // LD B,RLC (IY+d)
         case 0x01: RLC(t,t); put_memory(mp, c=t); break;         // LD C,RLC (IX+d) // LD C,RLC (IY+d)
         case 0x02: RLC(t,t); put_memory(mp, d=t); break;         // LD D,RLC (IX+d) // LD D,RLC (IY+d)

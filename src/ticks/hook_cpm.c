@@ -44,7 +44,7 @@ void hook_cpm(void)
         {
             int addr = d << 8 | e;
             int tp;
-            while ( ( tp = *get_memory_addr(addr)) ) {
+            while ( ( tp = *get_memory_addr(addr, MEM_TYPE_INST)) ) {
                 if ( tp == '$' ) 
                     break;
                 fputc(tp, stdout);
