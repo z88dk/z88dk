@@ -8,8 +8,9 @@
     EXTERN    nmi_vectors
     EXTERN    asm_interrupt_handler
 
-
+IF !DEFINED_CRT_ORG_BSS
     defc    CRT_ORG_BSS = 0x7000        
+ENDIF
     defc    CRT_ORG_CODE = 0x8000
 
     defc    TAR__fputc_cons_generic = 1
