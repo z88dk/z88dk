@@ -361,10 +361,8 @@ uint16_t get_sp()
     return fetch_registers()->sp;
 }
 
-uint8_t get_memory(uint32_t at, memtype type)
+uint8_t get_memory(uint16_t at)
 {
-    at &= 0xffff;
-
     if (at >= mem_requested_at && (int)at < (int)(mem_requested_at + mem_requested_amount))
     {
         return mem_fetch[at - mem_requested_at];
@@ -621,7 +619,7 @@ void debugger_next(uint8_t add_bp)
     int len;
     const unsigned short pc = bk.pc();
 
-    uint8_t opcode = bk.get_memory(pc, MEM_TYPE_INST);
+    uint8_t opcode = bk.get_memory(pc);
 
     len = disassemble2(pc, buf, sizeof(buf), 0);
 
@@ -1365,10 +1363,5 @@ int main(int argc, char **argv) {
         }
     }
 
-    return 0;
-}
-
-int israbbit4k(void)
-{
     return 0;
 }

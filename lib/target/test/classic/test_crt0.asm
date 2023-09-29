@@ -57,11 +57,6 @@ IF CRT_ORG_CODE = 0x0000
 ENDIF
 
 program:
-IF __CPU_R4K__ || __CPU_R4K__
-    ;; Enable R4K instruction mode on the R4K
-    ld      a,$c0
-    ioi ld  ($0420),a       ;EDMR register (p299 in R4000UM.pdf)
-ENDIF
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss

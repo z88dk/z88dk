@@ -31,9 +31,9 @@ uint16_t get_sp()
     return sp;
 }
 
-uint8_t get_ticks_memory(uint32_t at, memtype type)
+uint8_t get_ticks_memory(uint16_t at)
 {
-    return get_memory(at, type);
+    return get_memory(at);
 }
 
 uint8_t is_verbose()
@@ -151,7 +151,7 @@ void next(uint8_t add_bp)
     int len;
     const unsigned short pc = bk.pc();
 
-    uint8_t opcode = bk.get_memory(pc, MEM_TYPE_INST);
+    uint8_t opcode = bk.get_memory(pc);
 
     len = disassemble2(pc, buf, sizeof(buf), 0);
 

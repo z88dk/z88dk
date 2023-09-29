@@ -2,12 +2,11 @@
 #define BACKEND_H
 
 #include "breakpoints.h"
-#include "memory.h"
 #include <inttypes.h>
 
 struct debugger_regs_t;
 
-typedef uint8_t (*get_get_memory_cb)(uint32_t at, memtype type);
+typedef uint8_t (*get_get_memory_cb)(uint16_t at);
 typedef uint16_t (*get_uint16_cb)();
 typedef long long (*get_longlong_cb)();
 typedef char* (*get_charp_cb)();

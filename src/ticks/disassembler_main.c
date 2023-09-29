@@ -190,12 +190,7 @@ static void disassemble_loop(int start, int end)
 }
 
 
-uint8_t get_memory(uint32_t pc, memtype type)
+uint8_t get_memory(uint16_t pc)
 {
     return mem[pc % BUFF_SIZE] ^ inverted;
-}
-
-int israbbit4k(void)
-{
-    return c_cpu & CPU_R4K;
 }

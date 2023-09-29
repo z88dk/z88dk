@@ -644,14 +644,14 @@ void debugger()
                     bk.console("Hit breakpoint %d: @%04x (%s)\n",i,bk.pc(),resolve_to_label(bk.pc()));
                     dodebug=1;
                     break;
-                } else if ( elem->type == BREAK_CHECK8 && bk.get_memory(elem->lcheck_arg, MEM_TYPE_DATA) == elem->lvalue ) {
+                } else if ( elem->type == BREAK_CHECK8 && bk.get_memory(elem->lcheck_arg) == elem->lvalue ) {
                     bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
                     elem->enabled = 0;
                     dodebug=1;
                     break;
                 } else if ( elem->type == BREAK_CHECK16 &&
-                            bk.get_memory(elem->lcheck_arg, MEM_TYPE_DATA) == elem->lvalue  &&
-                            bk.get_memory(elem->hcheck_arg, MEM_TYPE_DATA) == elem->hvalue  ) {
+                            bk.get_memory(elem->lcheck_arg) == elem->lvalue  &&
+                            bk.get_memory(elem->hcheck_arg) == elem->hvalue  ) {
                     bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
                     elem->enabled = 0;
                     dodebug=1;
@@ -1336,14 +1336,14 @@ static int cmd_stack(int argc, char **argv)
     bk.console("Values: ");
     uint16_t stack_summary = stack;
     for (int i = 0; i < stack_size; i++) {
-        uint16_t value_at = (bk.get_memory(stack_summary + 1, MEM_TYPE_STACK) << 8) + bk.get_memory(stack_summary, MEM_TYPE_STACK);
+        uint16_t value_at = (bk.get_memory((uint16_t)stack_summary + 1) << 8) + bk.get_memory((uint16_t)stack_summary);
         bk.console("%04x ", value_at);
         stack_summary += 2;
     }
 
     bk.console("\nDetail:\n");
     for (int i = 0; i < stack_size; i++) {
-        uint16_t value_at = (bk.get_memory(stack + 1, MEM_TYPE_STACK) << 8) + bk.get_memory(stack, MEM_TYPE_STACK);
+        uint16_t value_at = (bk.get_memory((uint16_t)stack + 1) << 8) + bk.get_memory((uint16_t)stack);
         bk.console("  $%04x (offset %d): %04x\n", stack, i * 2, value_at);
 
         uint16_t offset;
@@ -1501,7 +1501,7 @@ static int cmd_registers(int argc, char **argv)
 
             bk.f_() | regs.a_ << 8, regs.c_ | regs.b_ << 8, regs.e_ | regs.d_ << 8, regs.l_ | regs.h_ << 8, regs.yl | regs.yh << 8,
 
-            pc, bk.get_memory(pc, MEM_TYPE_INST), sp, (bk.get_memory(sp+1, MEM_TYPE_DATA) << 8 | bk.get_memory(sp, MEM_TYPE_DATA))
+            pc, bk.get_memory(pc), sp, (bk.get_memory(sp+1) << 8 | bk.get_memory(sp))
             );
 
         if (regs.clockh || regs.clockl)
@@ -1514,8 +1514,8 @@ static int cmd_registers(int argc, char **argv)
         bk.console("pc=%04X, [pc]=%02X,    bc=%04X,  de=%04X,  hl=%04X,  af=%04X, ix=%04X, iy=%04X\n"
                "sp=%04X, [sp]=%04X, bc'=%04X, de'=%04X, hl'=%04X, af'=%04X\n"
                "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d\n",
-               pc, bk.get_memory(pc, MEM_TYPE_INST), regs.c | regs.b << 8, regs.e | regs.d << 8, regs.l | regs.h << 8, bk.f() | regs.a << 8, regs.xl | regs.xh << 8, regs.yl | regs.yh << 8,
-               sp, (bk.get_memory(sp+1, MEM_TYPE_DATA) << 8 | bk.get_memory(sp, MEM_TYPE_DATA)), regs.c_ | regs.b_ << 8, regs.e_ | regs.d_ << 8, regs.l_ | regs.h_ << 8, bk.f_() | regs.a_ << 8,
+               pc, bk.get_memory(pc), regs.c | regs.b << 8, regs.e | regs.d << 8, regs.l | regs.h << 8, bk.f() | regs.a << 8, regs.xl | regs.xh << 8, regs.yl | regs.yh << 8,
+               sp, (bk.get_memory(sp+1) << 8 | bk.get_memory(sp)), regs.c_ | regs.b_ << 8, regs.e_ | regs.d_ << 8, regs.l_ | regs.h_ << 8, bk.f_() | regs.a_ << 8,
                (bk.f() & 0x80) ? 1 : 0, (bk.f() & 0x40) ? 1 : 0, (bk.f() & 0x10) ? 1 : 0, (bk.f() & 0x04) ? 1 : 0, (bk.f() & 0x02) ? 1 : 0, (bk.f() & 0x01) ? 1 : 0);
 
         if (regs.clockh || regs.clockl)
@@ -1790,7 +1790,7 @@ static int cmd_examine(int argc, char **argv)
     addr %= 0x10000;                                          // First address with overflow correction
 
     for ( i = 0; i < len; i++ ) {
-        uint8_t b = bk.get_memory(addr, MEM_TYPE_DATA);
+        uint8_t b = bk.get_memory(addr);
         abuf[i % 16] = isprint(b) ? ((char) b) : '.';         // Prepare end of dump in ASCII format
 
         if ( i % 16 == 0 ) {                                  // Handle line prefix
