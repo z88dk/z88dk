@@ -311,6 +311,9 @@ static void read_token(ParseCtx *ctx)
 	STR_DELETE(buffer);
 }
 
+/*-----------------------------------------------------------------------------
+*   Free saved tokens
+*----------------------------------------------------------------------------*/
 static void free_tokens(ParseCtx *ctx)
 {
 	utarray_clear(ctx->tokens);

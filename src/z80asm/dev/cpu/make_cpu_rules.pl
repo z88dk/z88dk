@@ -47,11 +47,19 @@ exit 0;
 
 sub parser_tokens {
 	local($_) = @_;
+	my $jump = qr/\b(?:call|jp|jmp|jr|ret|rst)\b/i;
+	my $am = qr/\b(?:l|il|is|lil|lis|sil|sis)\b/i;
+	my $flag = qr/\b(?:nz|z|nc|c|po|pe|p|m|lz|lo|nv|v|x5|nx5|k|nk|ne|eq|ltu|leu|gtu|geu|lt|le|gt|ge)\b/i;
+	
 	my @tokens = ();
 	
 	while (!/\G \z 				/gcx) {
 		if (/\G \s+ 			/gcx) {}
 		elsif (/\G \( (\w+)		/gcx) { push @tokens, "_TK_IND_".uc($1); }
+		elsif (/\G ($jump) \s+ ($flag) \b
+								/gcx) { push @tokens, "_TK_".uc($1)."_".uc($2); }
+		elsif (/\G ($jump) \s* \. \s* ($am) \s+ ($flag) \b
+								/gcx) { push @tokens, "_TK_".uc($1)."_".uc($2)."_".uc($3); }
 		elsif (/\G , 			/gcx) { push @tokens, "_TK_COMMA"; }
 		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
 		elsif (/\G \( %[nmh] \)	/gcx) { push @tokens, "expr"; }

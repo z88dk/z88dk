@@ -17,6 +17,16 @@ ragel, to expand token definition from token_def.h.
 		<TAB>	fbreak; 					<NL> \
 	};										<NL>
 
+#define TOKEN_OPCODE_RE(name, string, regexp, set_value)	 \
+	regexp									<NL> \
+	{										<NL> \
+		<TAB>	sym.tok        = name;		<NL> \
+		<TAB>	sym.tok_opcode = name;		<NL> \
+		<TAB>	set_value;					<NL> \
+		<TAB>	expect_opcode  = false;		<NL> \
+		<TAB>	fbreak; 					<NL> \
+	};										<NL>
+
 #define TOKEN(name, string, set_value)	\
 		TOKEN_RE(name, string, string <CAT> i, set_value)
 
@@ -111,7 +121,8 @@ variable eof eof_;
 action at_bol 		{ at_bol }	
 
 /* horizontal white space */
-hspace = (" " | "\t")*;
+hspace0 = (" " | "\t")*;
+hspace1 = (" " | "\t")+;
 
 /* Alpha numeric characters or underscore. */
 alnum_u = alnum | '_';
@@ -123,13 +134,13 @@ alpha_u = alpha | '_';
 name = alpha_u alnum_u*;
 
 /* Label */
-label = "." hspace name | name hspace ":";
+label = "." hspace0 name | name hspace0 ":";
 
 /* binary digit */
 bdigit = [01];
 
 /* index register suffix */
-index_reg_suffix = hspace ( "+" | "-" | ")" );
+index_reg_suffix = hspace0 ( "+" | "-" | ")" );
 
 /* STATE MACHINE */
 main := |*

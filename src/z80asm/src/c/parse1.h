@@ -33,7 +33,7 @@ typedef struct ParseCtx
 	int cs;							/* current state */
 
 	UT_array *tokens;				/* array of tokens in the current statement */
-	Sym *p, *pe, *eof_, *expr_start;	/* point into array */
+    Sym *p, *pe, *eof_, *expr_start;	/* point into array */
 
 	UT_array *token_strings;		/* strings saved from the current statement */
 	UT_array *exprs;				/* array of expressions computed during parse */
