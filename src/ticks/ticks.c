@@ -3646,22 +3646,25 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xed: // OP ED // (8085) LD HL,(DE) // (R4K) LD BCDE,PY, LD JKHL, PY
         if ( is8085() ) { // (8085) LD HL,(DE) (LHLDE)
-           if ( get_memory_inst(pc) != 0xfe) {
-               l = get_memory_data( (e|d<<8));
-               h = get_memory_data( (e|d<<8) + 1);
-               st+=10;
-	           break;
-           }
+          if ( get_memory_inst(pc) != 0xfe) {
+              l = get_memory_data( (e|d<<8));
+              h = get_memory_data( (e|d<<8) + 1);
+              st+=10;
+	      break;
+          }
+          handle_ed_page();
         } else if ( is8080() ) {
           if ( get_memory_inst(pc) != 0xfe) {
             printf("%04x: ILLEGAL 8080 prefix 0xED\n",pc-1);
             break;
           }
+          handle_ed_page();
         } else if ( isgbz80() ) {
           if ( get_memory_inst(pc) != 0xfe) {
               printf("%04x: ILLEGAL GBZ80 prefix 0xED\n",pc-1);
               break;
           }
+          handle_ed_page();
         } else if ( israbbit4k() && iy) r4k_ld_jkhl_ps(opc);
         else if ( israbbit4k() && ih==0) r4k_ld_bcde_ps(opc);
         else handle_ed_page();
