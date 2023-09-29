@@ -7,6 +7,7 @@
 #include "cmds.h"
 #include "syms.h"
 #include "cpu.h"
+#include "memory.h"
 #include <sys/types.h>
 #include <inttypes.h>
 
@@ -30,6 +31,7 @@
 extern unsigned char a,b,c,d,e,h,l,j,k;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_,j_,k_;
 extern unsigned char xh, xl, yh, yl;
+extern unsigned char ioi, ioe, altd;
 extern unsigned short ff, pc, sp;
 extern long long st;
 
@@ -90,15 +92,25 @@ extern void      hook_console_init(hook_command *cmds);
 extern void memory_init(char *model);
 extern void memory_handle_paging(int port, int value);
 extern void memory_reset_paging();
+extern int       rabbit_get_ioi_reg(int reg);
+
+// Rabbit registers
+#define RABBIT_EDMR  0x0420    // If 0xc0 then R4K mode, otherwise in R2K
+
+
 
 
 extern void        out(int port, int value);
 
 
-extern uint8_t    *get_memory_addr(int pc);
+extern uint8_t    *get_memory_addr(uint32_t pc, memtype type);
 
-extern uint8_t     get_memory(uint16_t pc);
+extern uint8_t     get_memory(uint32_t pc, memtype type);
+#define get_memory_inst(x) get_memory(x, MEM_TYPE_INST)
+#define get_memory_data(x) get_memory(x, MEM_TYPE_DATA)
 extern uint8_t     put_memory(uint16_t pc, uint8_t b);
+
+#define put_memory_physical(pc,b) *get_memory_addr(pc, MEM_TYPE_PHYSICAL) = b
 
 // acia
 extern int acia_out(int port, int value);
@@ -115,6 +127,30 @@ extern void apu_write_command(uint8_t cmd);
 
 extern int hook_console_out(int port, int value);
 extern int hook_console_in(int port);
+
+
+// r4k
+extern void r4k_handle_6d_page(void);
+extern void r4k_ld_ipdd_hl(uint8_t opcode);
+extern void r4k_ld_hl_ipsd(uint8_t opcode);
+extern void r4k_ld_a_ipshl(uint8_t opcode);
+extern void r4k_ld_ipdhl_a(uint8_t opcode);
+extern void r4k_ld_a_ipsd(uint8_t opcode);
+extern void r4k_ld_ipdd_a(uint8_t opcode);
+extern void r4k_ldl_pd_mn(uint8_t opcode);
+extern void r4k_ld_pd_klmn(uint8_t opcode);
+extern void r4k_ldl_pd_ispn(uint8_t opcode);
+extern void r4k_ld_pd_ispn(uint8_t opcode);
+extern void r4k_ld_ispn_ps(uint8_t opcode);
+extern void r4k_ld_hl_ipsbc(uint8_t opcode);
+extern void r4k_ld_ipdbc_hl(uint8_t opcode);
+
+extern void r4k_ld_pd_bcde(uint8_t opcode);
+extern void r4k_ld_pd_jkhl(uint8_t opcode);
+extern void r4k_ldl_pd_rr(uint8_t opcode, uint8_t lsb, uint8_t msb);
+extern void r4k_ld_a_ixya(uint8_t opcode, uint8_t lsb, uint8_t msb);
+extern void r4k_ld_bcde_ps(uint8_t opcode);
+extern void r4k_ld_jkhl_ps(uint8_t opcode);
 
 #ifndef WIN32
 extern int kbhit();

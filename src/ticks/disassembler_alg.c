@@ -35,12 +35,12 @@ typedef struct {
 
 
 #define READ_BYTE(state,val) do { \
-    val = bk.get_memory(state->pc++); \
+    val = bk.get_memory(state->pc++, MEM_TYPE_INST); \
     state->instr_bytes[state->len++] = val; \
 } while (0)
 
 #define PEEK_BYTE(state,val) do { \
-    val = bk.get_memory(state->pc); \
+    val = bk.get_memory(state->pc, MEM_TYPE_INST); \
 } while (0)
 
 #define BUF_PRINTF(fmt, ...) do { \
