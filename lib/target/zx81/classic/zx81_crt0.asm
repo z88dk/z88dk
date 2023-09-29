@@ -408,6 +408,7 @@ IF (startup>100)
 	PUBLIC __lambda_find_int
 	PUBLIC __lambda_scanning
 	PUBLIC __lambda_strs_add
+	PUBLIC __lambda_syncvideo	; entry for fgetc_cons_fast
 
 ; Color Lambda ROM
 IF ((startup=101) | (startup=102))
@@ -428,6 +429,7 @@ IF ((startup=101) | (startup=102))
     defc __lambda_find_int       =  $1509
     defc __lambda_scanning       =  $0806
     defc __lambda_strs_add       =  $189B
+    defc __lambda_syncvideo      =  $131B
 ENDIF
 
 ; Monochrome Lambda ROM (earlier version)
@@ -449,6 +451,7 @@ IF ((startup=201) | (startup=202))
     defc __lambda_find_int       =  $1088
     defc __lambda_scanning       =  $114A
     defc __lambda_strs_add       =  $1D57
+    defc __lambda_syncvideo      =  $02F8
 ENDIF
 
 ; CAC-3 and NF300
@@ -470,6 +473,7 @@ IF ((startup=301) | (startup=302))
     defc __lambda_find_int       =  $167C
     defc __lambda_scanning       =  $08AB
     defc __lambda_strs_add       =  $1A68
+    defc __lambda_syncvideo      =  $1434
 ENDIF
 
 ENDIF
