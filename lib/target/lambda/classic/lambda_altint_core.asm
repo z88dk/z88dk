@@ -10,7 +10,7 @@
 ;  MEMOTECH HRG won't work on the Lambda, it requires a specific D-FILE vector,
 ;  but the LAMBDA drivers points directly to the video memory.
 ; PUBLIC	MTCH_P1
-; PUBLIC	MTCH_P2
+PUBLIC	MTCH_P2
 
 ; I'm restoring this entry point to allow a 50hz hack, setting (MTCH_P3+1)=16 should do the trick
 PUBLIC	MTCH_P3
@@ -134,7 +134,7 @@ L026A:  DJNZ    L026A           ; to LOOP-B
 
 ;; R-IX-1  --  on the LAMBDA this is at position $1323
 L0281:
-; MTCH_P2:
+MTCH_P2:
 ; G007_P2:    ; the ROW couter patch for the G007 should be adjusted because..
 IF (startup=202)
         LD      BC,$1901        ; Monochrome ROM
