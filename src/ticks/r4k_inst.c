@@ -664,7 +664,123 @@ void r4k_ld_a_ixya(uint8_t opcode, uint8_t lsb, uint8_t msb)
     st += 8;
 }
 
+// push ps
+void r4k_push_ps(uint8_t opcode)
+{
+    uint8_t  reg = (opcode >> 4) & 0x03;
+    uint32_t ps = read_ps(reg);
 
+    put_memory(--sp,(ps >> 24) & 0xff);
+    put_memory(--sp,(ps >> 16) & 0xff);
+    put_memory(--sp,(ps >> 8 ) & 0xff);
+    put_memory(--sp,(ps >> 0 ) & 0xff);
+    st += 18;
+}
+
+// pop pd
+void r4k_pop_pd(uint8_t opcode)
+{
+    uint8_t  reg = (opcode >> 4) & 0x03;
+    uint32_t *pd = write_pd(reg);
+
+    *pd = (get_memory(sp + 0, MEM_TYPE_STACK) << 0) |
+          (get_memory(sp + 1, MEM_TYPE_STACK) << 8) |
+          (get_memory(sp + 2, MEM_TYPE_STACK) << 16) |
+          (get_memory(sp + 3, MEM_TYPE_STACK) << 24);
+    sp += 4;
+    st += 13;
+}
+
+// ldf a,(lmn)
+void r4k_ldf_a_ilmn(uint8_t opcode)
+{
+    uint32_t addr;
+
+    addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
+    pc += 3;
+
+    if ( altd ) a_ = get_memory(addr, MEM_TYPE_PHYSICAL);
+    else a = get_memory(addr, MEM_TYPE_PHYSICAL);
+
+    st+=11;
+}
+
+// ldf (lmn),a
+void r4k_ldf_ilmn_a(uint8_t opcode)
+{
+    uint32_t addr;
+
+    addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
+    pc += 3;
+
+    put_memory_physical(addr, a);
+    
+    st+=12;
+}
+
+
+// ldf pd,(lmn)
+void r4k_ldf_pd_ilmn(uint8_t opcode)
+{
+    uint8_t  reg = (opcode >> 4) & 0x03;
+    uint32_t *pd = write_pd(reg);
+    uint32_t addr;
+
+    addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
+    pc += 3;
+
+    *pd = (get_memory(addr + 0, MEM_TYPE_PHYSICAL) << 0 ) |
+          (get_memory(addr + 1, MEM_TYPE_PHYSICAL) << 8 ) |
+          (get_memory(addr + 2, MEM_TYPE_PHYSICAL) << 16 ) |
+          (get_memory(addr + 3, MEM_TYPE_PHYSICAL) << 24);
+    
+    st+=19;
+}
+
+// ldf (lmn),ps
+void r4k_ldf_ilmn_ps(uint8_t opcode)
+{
+    uint32_t addr;
+    uint8_t  reg = (opcode >> 4) & 0x03;
+    uint32_t ps = read_ps(reg);
+
+    addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
+    pc += 3;
+
+    put_memory_physical(addr + 0, (ps >> 0 ) & 0xff);
+    put_memory_physical(addr + 1, (ps >> 8 ) & 0xff);
+    put_memory_physical(addr + 2, (ps >> 16) & 0xff);
+    put_memory_physical(addr + 3, (ps >> 24) & 0xff);
+    
+    st+=23;
+}
+
+
+void r4k_dwjnz(uint8_t opcode)
+{
+    uint8_t zero = 0;
+    if ( altd ) {
+        c_-- || (b_ > 0 && b_--);
+        zero = (c_ | b_) == 0;
+    } else {
+        c-- || (b > 0 && b--);
+        zero = (c | b) == 0;
+    }
+    if ( zero ) {
+        pc++;
+    } else {
+        mp = pc += (get_memory_inst(pc) ^ 128) - 127;
+    }
+    st += 7;
+}
 
 void r4k_handle_6d_page(void)
 {

@@ -32,7 +32,7 @@ extern unsigned char a,b,c,d,e,h,l,j,k;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_,j_,k_;
 extern unsigned char xh, xl, yh, yl;
 extern unsigned char ioi, ioe, altd;
-extern unsigned short ff, pc, sp;
+extern unsigned short ff, pc, sp, mp;
 extern long long st;
 
 
@@ -151,6 +151,14 @@ extern void r4k_ldl_pd_rr(uint8_t opcode, uint8_t lsb, uint8_t msb);
 extern void r4k_ld_a_ixya(uint8_t opcode, uint8_t lsb, uint8_t msb);
 extern void r4k_ld_bcde_ps(uint8_t opcode);
 extern void r4k_ld_jkhl_ps(uint8_t opcode);
+extern void r4k_push_ps(uint8_t opcode);
+extern void r4k_pop_pd(uint8_t opcode);
+extern void r4k_ldf_a_ilmn(uint8_t opcode);
+extern void r4k_ldf_ilmn_a(uint8_t opcode);
+extern void r4k_ldf_pd_ilmn(uint8_t opcode);
+extern void r4k_ldf_ilmn_ps(uint8_t opcode);
+extern void r4k_dwjnz(uint8_t opcode);
+
 
 #ifndef WIN32
 extern int kbhit();
