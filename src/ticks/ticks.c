@@ -1864,34 +1864,28 @@ int main (int argc, char **argv){
         if ( is8085() ) {  // (8085) SUB HL,BC (DSUB)
           SUBHLRR(b,c);
           st += 10;
-          break;
         } else if ( is8080()) {
           printf("%04x: ILLEGAL 8080 opcode EX AF,AF\n",pc-1);
           st+= 4;
-          break;
-        } else if ( isgbz80() ) {  // ld (nn),sp
-          mp= get_memory_inst(pc++);
-          put_memory(mp|= get_memory_inst(pc++)<<8, sp);
-          put_memory(++mp,sp>>8);
-          st += 20;
-          break;
+        } else if ( isgbz80() ) { gbz80_ld_inm_sp();
+        } else {
+            st+= israbbit() ? 2 : isez80() ? 1 : isr800() ? 1 : 4;
+            t  =  a_;
+            a_ =  a;
+            a  =  t;
+            t  =  ff_;
+            ff_=  ff;
+            ff =  t;
+            t  =  fr_;
+            fr_=  fr;
+            fr =  t;
+            t  =  fa_;
+            fa_=  fa;
+            fa =  t;
+            t  =  fb_;
+            fb_=  fb;
+            fb =  t;
         }
-        st+= israbbit() ? 2 : isez80() ? 1 : isr800() ? 1 : 4;
-        t  =  a_;
-        a_ =  a;
-        a  =  t;
-        t  =  ff_;
-        ff_=  ff;
-        ff =  t;
-        t  =  fr_;
-        fr_=  fr;
-        fr =  t;
-        t  =  fa_;
-        fa_=  fa;
-        fa =  t;
-        t  =  fb_;
-        fb_=  fb;
-        fb =  t;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x10: // DJNZ
         if ( is8080() ) {
@@ -3081,16 +3075,8 @@ int main (int argc, char **argv){
 		}
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe8: // RET PE
-        if ( isgbz80()) {  // add sp,d
-          uint32_t v;
-          st += 4;
-          v = sp + (get_memory_inst(pc++)^128)-128;
-          sp = v & 0xffff;
-          if ( v >> 16 ) ff |= 256;
-          else ff &= ~256;
-        } else {
-            RETCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
-        }
+        if ( isgbz80()) gbz80_add_sp_d();
+        else RETCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf0: // RET P
   	    if ( isgbz80()) { // LDH A, (n) - I/O
@@ -3102,12 +3088,8 @@ int main (int argc, char **argv){
 		}
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf8: // RET M
-        if ( isgbz80() ) {  // ld hl,sp+d
-          st += 12;
-          t = (sp + (get_memory_inst(pc++)^128)-128) & 0xffff;
-          h = t / 256;
-          l = t % 256;
-        } else RETCI(ff&128);
+        if ( isgbz80() ) gbz80_ld_hl_spn();
+        else RETCI(ff&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc1: // POP BC
         POP(b, c);
@@ -3181,16 +3163,11 @@ int main (int argc, char **argv){
             put_memory(--sp, pc);
             if (iy) mp = pc = (yh<<8)|yl;
             else mp = pc = (xh<<8)|xl;
-        } else if ( isgbz80() ) {  // ld (nn),a
-          st+= 16;
-          t= get_memory_inst(pc++);
-          put_memory(t|= get_memory_inst(pc++)<<8,a);
-          mp= t+1 & 255
-             | a<<8;
-        } else { JPCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128); }
+        } else if ( isgbz80() ) gbz80_ld_inm_a();  // ld (nn),a
+        else JPCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf2: // JP P
-		if ( isgbz80()) { // LD A, (C), A
+		if ( isgbz80()) { // LD A, (C)
 		  a= get_memory_data(0xFF00+c);
 		  st+= 8;
 		} else {
@@ -3198,14 +3175,8 @@ int main (int argc, char **argv){
         }
 		ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xfa: // JP M
-        if ( isgbz80()) {  // ld a,(nn)
-          st+= 16;
-          mp= get_memory_inst(pc++);
-          a= get_memory_data(mp|= get_memory_inst(pc++)<<8);
-          ++mp;
-          ih=1;altd=0;ioi=0;ioe=0;break;
-        }
-        JPCI(ff&128);
+        if ( isgbz80()) gbz80_ld_a_inm();  // ld a,(nn)
+        else JPCI(ff&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xcd: // CALL nn // (R4K) LD BCDE,PW, LD JKHL,PW
         if ( israbbit4k() && ih == 0 ) r4k_ld_r32_ps(opc, iy);
@@ -3517,34 +3488,31 @@ int main (int argc, char **argv){
           put_memory((e | d<<8),l);
           put_memory((e | d<<8) + 1,h);
           st+=10;
-          break;
         } else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 instruction EXX\n",pc-1);
-          RET(isez80() ? 5 : israbbit() ?  8 : isz180() ? 9 : 10);
-          ih=1;altd=0;ioi=0;ioe=0;
-          break;
         } else if ( isgbz80() ) {  // RETI
-          RET(isgbz80() ? 8 : 16); break;
+          RET(8);
+        } else {
+            st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : isr800() ? 1 : 4;
+            t = b;
+            b = b_;
+            b_= t;
+            t = c;
+            c = c_;
+            c_= t;
+            t = d;
+            d = d_;
+            d_= t;
+            t = e;
+            e = e_;
+            e_= t;
+            t = h;
+            h = h_;
+            h_= t;
+            t = l;
+            l = l_;
+            l_= t;
         }
-        st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : isr800() ? 1 : 4;
-        t = b;
-        b = b_;
-        b_= t;
-        t = c;
-        c = c_;
-        c_= t;
-        t = d;
-        d = d_;
-        d_= t;
-        t = e;
-        e = e_;
-        e_= t;
-        t = h;
-        h = h_;
-        h_= t;
-        t = l;
-        l = l_;
-        l_= t;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe3: // EX (SP),HL // EX (SP),IX // EX (SP),IY or (RCM) EX DE',HL
         if ( isgbz80() ) {
@@ -3598,12 +3566,6 @@ int main (int argc, char **argv){
           JPC(fk);
         } else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xDD\n",pc-1);
-          st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : 17;
-          t= pc+2;
-          mp= pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8;
-          put_memory(--sp,t>>8);
-          put_memory(--sp,t);
-          ih=1;altd=0;ioi=0;ioe=0;
         } else if ( isgbz80() ) {
           printf("%04x: ILLEGAL GBZ80 prefix 0xDD\n",pc-1);
         } else if ( israbbit4k() && ih == 0 ) r4k_ld_r32_ps(opc, iy);
@@ -3617,12 +3579,6 @@ int main (int argc, char **argv){
           JPCI(fk);
         } else if ( is808x() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xFD\n",pc-1);
-          st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : 17;
-          t= pc+2;
-          mp= pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8;
-          put_memory(--sp,t>>8);
-          put_memory(--sp,t);
-          ih=1;altd=0;ioi=0;ioe=0;
         } else if ( isgbz80() ) {
           printf("%04x: ILLEGAL GBZ80 prefix 0xFD\n",pc-1);
         } else if ( israbbit4k() && ih == 0 ) r4k_ld_r32_ps(opc, iy);
@@ -3638,8 +3594,6 @@ int main (int argc, char **argv){
 		  st += 6;
 		} else if ( is808x() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xCB\n",pc-1);
-          st+= isez80() ? 4 : israbbit() ? 3 : israbbit() ? 7 : isz180() ? 9 : 10;
-          mp= pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8;
         } else {
             handle_cb_page();
         }

@@ -180,6 +180,7 @@
     <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
     <ClCompile Include="..\..\src\ticks\expressions.tab.c" />
     <ClCompile Include="..\..\src\ticks\exp_engine.c" />
+    <ClCompile Include="..\..\src\ticks\gbz80_inst.c" />
     <ClCompile Include="..\..\src\ticks\hook.c" />
     <ClCompile Include="..\..\src\ticks\hook_console.c" />
     <ClCompile Include="..\..\src\ticks\hook_cpm.c" />
