@@ -512,13 +512,22 @@
           }                     \
         } while (0)
 
-#define BIT(n, r)               \
-          st += isez80() ? 2 : israbbit() ? 4 : isz180() ? 6 : isr800() ? 2 : 8, \
-          ff= ff  & -256        \
-            | r   &   40        \
-            | (fr= r & n),      \
-          fa= ~fr,              \
-          fb= 0
+#define BIT(n, r) do {          \
+          st += isez80() ? 2 : israbbit() ? 4 : isz180() ? 6 : isr800() ? 2 : 8; \
+          if (altd) {           \
+            ff_= ff_  & -256    \
+                | r   &   40    \
+                | (fr_= r & n), \
+            fa_= ~fr_,          \
+            fb_= 0;             \
+          } else {              \
+            ff= ff  & -256      \
+                | r   &   40    \
+                | (fr= r & n),  \
+            fa= ~fr,            \
+            fb= 0;              \
+          }                     \
+        } while (0)
 
 #define BITHL(n)                \
           st += isez80() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 16 : isr800() ? 3 : 12, \
@@ -1340,8 +1349,9 @@ int main (int argc, char **argv){
       case 0x12: // LD (DE),A
         LDPR(d, e, a);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x0a: // LD A,(BC)
-        if ( altd ) LDRP(b, c, a_);
+      case 0x0a: // LD A,(BC) // (R4K) LDF BCDE,(lmn) LDF JKHL,(lmn)
+        if (israbbit4k() && ih==0) r4k_ldf_r32_ilmn(opc, iy);
+        else if ( altd ) LDRP(b, c, a_);
         else LDRP(b, c, a);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1a: // LD A,(DE) // (R4K) LD BCDE,(HL), LD JKHL,(HL)
@@ -1428,8 +1438,9 @@ int main (int argc, char **argv){
         st+= isez80() ? 1 : isgbz80() ? 8 : is8080() ? 5 : isr800() ? 1 : 6;
         sp++;
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x0b: // DEC BC
-        if ( altd ) DECW(b_,c_);
+      case 0x0b: // DEC BC / (R4K) LDF (lmn),BCDE LDF (lmn),JKHL
+        if (israbbit4k() && ih==0) r4k_ldf_ilmn_r32(opc, iy);
+        else if ( altd ) DECW(b_,c_);
         else DECW(b, c);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1b: // DEC DE // (R4k) LD (HL),BCDE, LD (HL),JKHL
@@ -3403,45 +3414,54 @@ int main (int argc, char **argv){
       case 0xc6: // ADD A,n
         ADD(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xce: // ADC A,n
-        ADC(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+      case 0xce: // ADC A,n // (R4K) LD BCDE,(ix+d), LD JKHL,(ix+d)
+        if (israbbit4k() && ih==0) r4k_ld_r32_ixyd(opc, xl, xh, iy);
+        else ADC(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd6: // SUB n
         SUB(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xde: // SBC A,n
-        SBC(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+      case 0xde: // SBC A,n // (R4K) LD BCDE,(iy+d), LD JKHL,(iy+d)
+        if (israbbit4k() && ih==0) r4k_ld_r32_ixyd(opc, yl, yh, iy);
+        else SBC(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe6: // AND n
         AND(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xee: // XOR A,n
-        XOR(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+      case 0xee: // XOR A,n // (R4K) LD BCDE,(SP+n) LD JKHL,(SP+n)
+        if (israbbit4k() && ih==0) r4k_ld_r32_ispn(opc, iy);
+        else XOR(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf6: // OR n
         OR(get_memory_inst(pc++), isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xfe: // CP A,n
-        w= get_memory_inst(pc++);
-        CP(w, isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+      case 0xfe: // CP A,n // LD BCDE,(SP+HL), LD JKHL,(SP+HL)
+        if (israbbit4k() && ih==0) r4k_ld_r32_isphl(opc, iy);
+        else { 
+            w= get_memory_inst(pc++);
+            CP(w, isez80() ? 2 : israbbit() ? 4 : isgbz80() ? 8 : isr800() ? 2 : 7);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc7: // RST 0x00  (RCM) LJP
         RST(0);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xcf: // RST 0x08 (RCM) LCALL
-        RST(8);
+        if (israbbit4k() && ih==0) r4k_ld_ixyd_r32(opc, xl, xh, iy);
+        else RST(8);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd7: // RST 0x10
         RST(0x10);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xdf: // RST 0x18
-        RST(0x18);
+        if (israbbit4k() && ih==0) r4k_ld_ixyd_r32(opc, xl, xh, iy);
+        else RST(0x18);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe7: // RST 0x20
         RST(0x20);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xef: // RST 0x28
-        RST(0x28);
+      case 0xef: // RST 0x28 // (R4K) LD (SP+n),BCDE LD (SP+n),JKHL
+        if (israbbit4k() && ih==0) r4k_ld_ispn_r32(opc, iy);
+        else RST(0x28);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf7: // RST 0x30, (RCM) mul
         if ( israbbit() ) { // MUL
@@ -3456,8 +3476,9 @@ int main (int argc, char **argv){
           RST(0x30);
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xff: // RST 0x38
-        RST(0x38);
+      case 0xff: // RST 0x38 // LD (SP+HL),BCDE , LD (SP+HL),JKHL
+        if (israbbit4k() && ih==0) r4k_ld_isphl_r32(opc, iy);
+        else RST(0x38);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd3: // OUT (n),A
         if ( isgbz80()) {
@@ -4512,8 +4533,9 @@ static void handle_ed_page(void)
             st+= 8; break;
         }
         break;
-    case 0xa5:
-            if ( isz80n()) {  // LDWS : DE*:=HL*; INC L; INC D;
+    case 0xa5: // (R4K) PUSH nm
+            if (israbbit4k()) r4k_push_mn(opc);
+            else if ( isz80n()) {  // LDWS : DE*:=HL*; INC L; INC D;
                 put_memory(e | d << 8, t = get_memory_data(l | h << 8));
                 l++; d++;
                 st += 14;
@@ -4522,17 +4544,17 @@ static void handle_ed_page(void)
             }
             break;
     case 0xb7:
-            if ( isz80n()) {  // LDPIRX : do{t:=(HL&$FFF8+E&7)*; {if t!=A DE*:=t;} DE++; BC--}while(BC>0)
-                t = get_memory_data(((l | h << 8) & 0xfff8) + (e & 0x07));
-                if (t != a) put_memory(e | d << 8, t);
-                ++e || d++;
-                c-- || b--;
-                st += 16;
-                if ((b | c) != 0) { pc -= 2; st += 5; }
-            } else {
-                st += 8;
-            }
-            break;
+        if ( isz80n()) {  // LDPIRX : do{t:=(HL&$FFF8+E&7)*; {if t!=A DE*:=t;} DE++; BC--}while(BC>0)
+            t = get_memory_data(((l | h << 8) & 0xfff8) + (e & 0x07));
+            if (t != a) put_memory(e | d << 8, t);
+            ++e || d++;
+            c-- || b--;
+            st += 16;
+            if ((b | c) != 0) { pc -= 2; st += 5; }
+        } else {
+            st += 8;
+        }
+        break;
     case 0xf9:   // (R800) MULUB A,A
         if ( isr800() ) { // MULUB A,A
             uint16_t v = a * a;  
@@ -4647,7 +4669,7 @@ static void handle_ed_page(void)
             st += 16;
             t = get_memory_data(l | h<<8);
             if ( t != a ) {
-            put_memory(e | d<<8, t= get_memory_data(l | h<<8));
+                put_memory(e | d<<8, t= get_memory_data(l | h<<8));
             }
             ++l || h++;
             ++e || d++;
@@ -5603,7 +5625,7 @@ static void handle_cb_page(void)
                     u=get_memory_data(t);
                     RLC(u,u);
                     put_memory(t, u); break;
-        case 0x07:  RLC(a,a); break;                       // RLC A
+        case 0x07:  RLC(a,a_); break;                       // RLC A
         case 0x08:  RRC(b,b_); break;                       // RRC B
         case 0x09:  RRC(c,c_); break;                       // RRC C
         case 0x0a:  RRC(d,d_); break;                       // RRC D
@@ -5672,20 +5694,20 @@ static void handle_cb_page(void)
         case 0x34:  if ( isgbz80()) { SWAP(h); } else { SLL(h); } break;                       // SLL H,  SWAP H (gbz80)
         case 0x35:  if ( isgbz80()) { SWAP(l); } else { SLL(l); } break;                       // SLL L,  SWAP L (gbz80)
         case 0x36:                                       // SLL (HL),  SWAP (hl) (gbz80)
-                    if ( isgbz80() ) { // SWAP (HL)
-                        st += 8;
-                        t= l|h<<8;
-                        u=get_memory_data(t);
-                        SWAP(u);
-                        put_memory(t, u);
-                    } else if (cansll() ) {
-                        st+= 7;
-                        t= l|h<<8;
-                        u=get_memory_data(t);
-                        SLL(u);
-                        put_memory(t, u);
-                    }
-                    break;
+            if ( isgbz80() ) { // SWAP (HL)
+                st += 8;
+                t= l|h<<8;
+                u=get_memory_data(t);
+                SWAP(u);
+                put_memory(t, u);
+            } else if (cansll() ) {
+                st+= 7;
+                t= l|h<<8;
+                u=get_memory_data(t);
+                SLL(u);
+                put_memory(t, u);
+            }
+            break;
         case 0x37:  if ( isgbz80()) { SWAP(a); } else { SLL(a); } break;                       // SLL A,  SWAP A (gbz80)
         case 0x38:  SRL(b,b_); break;                       // SRL B
         case 0x39:  SRL(c,c_); break;                       // SRL C

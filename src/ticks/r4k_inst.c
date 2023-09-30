@@ -43,6 +43,41 @@ static uint32_t *write_pd(uint8_t reg)
     return r;
 }
 
+
+
+static uint8_t **get_r32_ptr(uint8_t iyprefix)
+{
+    static uint8_t  *reg32[4];
+    if (iyprefix) {
+        if (altd) {
+            reg32[0] = &l_;
+            reg32[1] = &h_;
+            reg32[2] = &j_;
+            reg32[3] = &k_;
+        } else {
+            reg32[0] = &l;
+            reg32[1] = &h;
+            reg32[2] = &j;
+            reg32[3] = &k;
+        }
+    } else {
+        if (altd) {
+            reg32[0] = &e_;
+            reg32[1] = &d_;
+            reg32[2] = &c_;
+            reg32[3] = &b_;
+        } else {
+            reg32[0] = &e;
+            reg32[1] = &d;
+            reg32[2] = &c;
+            reg32[3] = &b;
+        }
+    }
+    return reg32;
+}
+
+
+
 static uint32_t ps16se(uint32_t ps, uint16_t offs)
 {
     int islogical = ( ps & 0xffff0000 ) == 0xffff0000;
@@ -579,37 +614,32 @@ void r4k_ld_ipdhl_r32(uint8_t opcode, uint8_t iyprefix)
     uint8_t reg = (opcode >> 4) & 0x03;
     uint32_t pd = read_ps(reg);
     uint32_t addr = ps16se(pd,h<<8|l);
+    uint8_t **reg32;
 
-    if (iyprefix) {
-        put_memory_physical(addr,l);
-        put_memory_physical(ps8se(addr,1),h);
-        put_memory_physical(ps8se(addr,2),k);
-        put_memory_physical(ps8se(addr,3),j);
-    } else {
-        put_memory_physical(addr,e);
-        put_memory_physical(ps8se(addr,1),d);
-        put_memory_physical(ps8se(addr,2),c);
-        put_memory_physical(ps8se(addr,3),b);
-    }
+    altd = 0;
+    reg32 = get_r32_ptr(iyprefix);
+
+    put_memory_physical(ps8se(addr,0),*reg32[0]);
+    put_memory_physical(ps8se(addr,1),*reg32[1]);
+    put_memory_physical(ps8se(addr,2),*reg32[2]);
+    put_memory_physical(ps8se(addr,3),*reg32[3]);
+
     st += 18;
 }
 
 void r4k_ld_ihl_r32(uint8_t opcode, uint8_t iyprefix)
 {
     uint16_t addr = h<<8|l;
+    uint8_t **reg32;
 
-    if (iyprefix) {
-        put_memory(addr+0, l);
-        put_memory(addr+1, h);
-        put_memory(addr+2, k);
-        put_memory(addr+3, j);
-    } else {
-        put_memory(addr+0, e);
-        put_memory(addr+1, d);
-        put_memory(addr+2, c);
-        put_memory(addr+3, b);
-    }
+    altd = 0;
+    reg32 = get_r32_ptr(iyprefix);
 
+    put_memory(addr+0, *reg32[0]);
+    put_memory(addr+1, *reg32[1]);
+    put_memory(addr+2, *reg32[2]);
+    put_memory(addr+3, *reg32[3]);
+    
     st += 18;
 }
 
@@ -619,32 +649,13 @@ void r4k_ld_r32_ps(uint8_t opcode, uint8_t iyprefix)
 {
     uint8_t  sreg = (opcode >> 4) & 0x03;
     uint32_t s = read_ps(sreg);
+    uint8_t **reg32 = get_r32_ptr(iyprefix);;
 
-    if (iyprefix) {
-        if (altd) {
-            j_ = ( s >> 24 ) & 0xff;
-            k_ = ( s >> 16 ) & 0xff;
-            h_ = ( s >> 8  ) & 0xff;
-            l_ = ( s >> 0  ) & 0xff;
-        } else {
-            j = ( s >> 24 ) & 0xff;
-            k = ( s >> 16 ) & 0xff;
-            h = ( s >> 8  ) & 0xff;
-            l = ( s >> 0  ) & 0xff;
-        }
-    } else {
-        if (altd) {
-            b_ = ( s >> 24 ) & 0xff;
-            c_ = ( s >> 16 ) & 0xff;
-            d_ = ( s >> 8  ) & 0xff;
-            e_ = ( s >> 0  ) & 0xff;
-        } else {
-            b = ( s >> 24 ) & 0xff;
-            c = ( s >> 16 ) & 0xff;
-            d = ( s >> 8  ) & 0xff;
-            e = ( s >> 0  ) & 0xff;
-        }
-    }
+    *reg32[0] = ( s >> 24 ) & 0xff;
+    *reg32[1] = ( s >> 16 ) & 0xff;
+    *reg32[2] = ( s >> 8  ) & 0xff;
+    *reg32[3] = ( s >> 0  ) & 0xff;
+
     st += 4;
 }
 
@@ -653,32 +664,13 @@ void r4k_ld_r32_ps(uint8_t opcode, uint8_t iyprefix)
 void r4k_ld_r32_ihl(uint8_t opcode, uint8_t iyprefix)
 {
     uint32_t addr = h<<8|l;
+    uint8_t **reg32 = get_r32_ptr(iyprefix);;
 
-    if (iyprefix) {
-        if (altd) {
-            l_ = get_memory(addr + 0, MEM_TYPE_DATA);
-            h_ = get_memory(addr + 1, MEM_TYPE_DATA);
-            k_ = get_memory(addr + 2, MEM_TYPE_DATA);
-            j_ = get_memory(addr + 3, MEM_TYPE_DATA);
-        } else {
-            l = get_memory(addr + 0, MEM_TYPE_DATA);
-            h = get_memory(addr + 1, MEM_TYPE_DATA);
-            k = get_memory(addr + 2, MEM_TYPE_DATA);
-            j = get_memory(addr + 3, MEM_TYPE_DATA);
-        }
-    } else {
-        if (altd) {
-            e_ = get_memory(addr + 0, MEM_TYPE_DATA);
-            d_ = get_memory(addr + 1, MEM_TYPE_DATA);
-            c_ = get_memory(addr + 2, MEM_TYPE_DATA);
-            b_ = get_memory(addr + 3, MEM_TYPE_DATA);
-        } else {
-            e = get_memory(addr + 0, MEM_TYPE_DATA);
-            d = get_memory(addr + 1, MEM_TYPE_DATA);
-            c = get_memory(addr + 2, MEM_TYPE_DATA);
-            b = get_memory(addr + 3, MEM_TYPE_DATA);
-        }
-    }
+    *reg32[0] = get_memory(addr + 0, MEM_TYPE_DATA);
+    *reg32[1] = get_memory(addr + 1, MEM_TYPE_DATA);
+    *reg32[2] = get_memory(addr + 2, MEM_TYPE_DATA);
+    *reg32[3] = get_memory(addr + 3, MEM_TYPE_DATA);
+    
     st += 14;
 }
 
@@ -688,32 +680,13 @@ void r4k_ld_r32_ipshl(uint8_t opcode,uint8_t iyprefix)
     uint8_t reg = (opcode >> 4) & 0x03;
     uint32_t ps = read_ps(reg);
     uint32_t addr = ps16se(ps,(int16_t)(h<<8|l));
+    uint8_t **reg32 = get_r32_ptr(iyprefix);;
 
-    if (iyprefix) {
-        if (altd) {
-            l_ = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
-            h_ = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
-            k_ = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
-            j_ = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
-        } else {
-            l = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
-            h = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
-            k = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
-            j = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
-        }
-    } else {
-        if (altd) {
-            e_ = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
-            d_ = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
-            c_ = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
-            b_ = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
-        } else {
-            e = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
-            d = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
-            c = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
-            b = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
-        }
-    }
+    *reg32[0]= get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
+    *reg32[1]= get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+    *reg32[2]= get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
+    *reg32[3]= get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
+    
     st += 15;
 }
 
@@ -723,50 +696,153 @@ void r4k_ld_r32_ipsd(uint8_t opcode, uint8_t iyprefix)
     uint8_t reg = (opcode >> 4) & 0x03;
     uint32_t ps = read_ps(reg);
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
-    
-    if (iyprefix) {
-        if (altd) {
-            l_ = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
-            h_ = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
-            k_ = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
-            j_ = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
-        } else {
-            l = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
-            h = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
-            k = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
-            j = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
-        }
-    } else {
-        if (altd) {
-            e_ = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
-            d_ = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
-            c_ = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
-            b_ = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
-        } else {
-            e = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
-            d = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
-            c = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
-            b = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
-        }
-    }
+    uint8_t **reg32 = get_r32_ptr(iyprefix);;
+
+    *reg32[0] = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
+    *reg32[1] = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+    *reg32[2] = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
+    *reg32[3] = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
+
     st += 15;
 }
 
-
-// ld (pd+d),bcde
-void r4k_ld_ipdd_bcde(uint8_t opcode)
+// ld bcde,(ixy+d), ld jkhl,(ixy+d)
+void r4k_ld_r32_ixyd(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t iyprefix)
 {
-    uint8_t reg = (opcode >> 4) & 0x03;
-    uint32_t pd = read_ps(reg);
-    uint32_t addr = ps8se(pd,get_memory_inst(pc++));
+    uint16_t  addr = (msb << 8|lsb) + (get_memory_inst(pc++)^128)-128;
+    uint8_t **reg32 = get_r32_ptr(iyprefix);;
 
-    put_memory_physical(ps8se(addr,0),c);
-    put_memory_physical(ps8se(addr,1),b);
-    put_memory_physical(ps8se(addr,2),e);
-    put_memory_physical(ps8se(addr,3),d);
-
-    st += 18;
+    *reg32[0] = get_memory(addr + 0, MEM_TYPE_DATA);
+    *reg32[1] = get_memory(addr + 1, MEM_TYPE_DATA);
+    *reg32[2] = get_memory(addr + 2, MEM_TYPE_DATA);
+    *reg32[3] = get_memory(addr + 3, MEM_TYPE_DATA);
+    
+    st += 15;
 }
+
+// ldf bcde,(lmn) ldf jkhl,(lmn)
+void r4k_ldf_r32_ilmn(uint8_t opcode, uint8_t iyprefix)
+{
+    uint32_t addr;
+    uint8_t **reg32 = get_r32_ptr(iyprefix);
+
+    addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
+    pc += 3;
+
+    *reg32[0] = get_memory(ps16se(addr,0), MEM_TYPE_PHYSICAL);
+    *reg32[1] = get_memory(ps16se(addr,1), MEM_TYPE_PHYSICAL);
+    *reg32[2] = get_memory(ps16se(addr,2), MEM_TYPE_PHYSICAL);
+    *reg32[3] = get_memory(ps16se(addr,3), MEM_TYPE_PHYSICAL);
+
+    st+=19;
+}
+
+// ldf (lmn),bcde ldf (lmn),jkhl
+void r4k_ldf_ilmn_r32(uint8_t opcode, uint8_t iyprefix)
+{
+    uint32_t addr;
+    uint32_t v;
+    uint8_t **reg32;
+    
+    altd = 0;
+    reg32 = get_r32_ptr(iyprefix);
+    
+    addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
+    pc += 3;
+
+    put_memory_physical(ps16se(addr, 0), *reg32[0]);
+    put_memory_physical(ps16se(addr, 1), *reg32[1]);
+    put_memory_physical(ps16se(addr, 2), *reg32[2]);
+    put_memory_physical(ps16se(addr, 3), *reg32[3]);
+    
+    st += 23;
+}
+
+
+// ld bcde,(sp+n) ld jkhl,(sp+n)
+void r4k_ld_r32_ispn(uint8_t opcode, uint8_t iyprefix)
+{
+    uint16_t  s = (sp + get_memory_inst(pc++));
+    uint8_t **reg32 = get_r32_ptr(iyprefix);
+
+    *reg32[0] = get_memory(s+0, MEM_TYPE_STACK);
+    *reg32[1] = get_memory(s+1, MEM_TYPE_STACK);
+    *reg32[2] = get_memory(s+2, MEM_TYPE_STACK);
+    *reg32[3] = get_memory(s+3, MEM_TYPE_STACK);
+
+    st+=15;
+}
+
+// ld (sp+n),bcde ld (sp+n),jkhl
+void r4k_ld_ispn_r32(uint8_t opcode, uint8_t iyprefix)
+{
+    uint16_t  s = (sp + get_memory_inst(pc++));
+    uint8_t **reg32 = get_r32_ptr(iyprefix);
+
+    put_memory(sp + 0, *reg32[0]);
+    put_memory(sp + 1, *reg32[1]);
+    put_memory(sp + 2, *reg32[2]);
+    put_memory(sp + 3, *reg32[3]);
+
+    st+=19;
+}
+
+// ld bcde,(sp+hl) ld jkhl,(sp+hl)
+void r4k_ld_r32_isphl(uint8_t opcode, uint8_t iyprefix)
+{
+    uint16_t  s = sp + (h<<8|l);
+    uint8_t **reg32 = get_r32_ptr(iyprefix);
+
+    *reg32[0] = get_memory(s+0, MEM_TYPE_STACK);
+    *reg32[1] = get_memory(s+1, MEM_TYPE_STACK);
+    *reg32[2] = get_memory(s+2, MEM_TYPE_STACK);
+    *reg32[3] = get_memory(s+3, MEM_TYPE_STACK);
+
+    st+=14;
+}
+
+// ld (sp+hl),bcde ld (sp+hl),jkhl
+void r4k_ld_isphl_r32(uint8_t opcode, uint8_t iyprefix)
+{
+    uint16_t  s = sp + (h<<8|l);
+    uint8_t **reg32 = get_r32_ptr(iyprefix);
+
+    put_memory(sp + 0, *reg32[0]);
+    put_memory(sp + 1, *reg32[1]);
+    put_memory(sp + 2, *reg32[2]);
+    put_memory(sp + 3, *reg32[3]);
+
+    st+=18;
+}
+
+
+
+
+
+// ld (ixy+d),bcde, ld (ixy+d),jkhl
+void r4k_ld_ixyd_r32(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t iyprefix)
+{
+    uint16_t  addr = (msb << 8|lsb) + (get_memory_inst(pc++)^128)-128;
+    uint8_t  **reg32;
+
+    altd = 0;
+    reg32 = get_r32_ptr(iyprefix);
+
+    put_memory(addr + 0, *reg32[0]);
+    put_memory(addr + 1, *reg32[1]);
+    put_memory(addr + 2, *reg32[2]);
+    put_memory(addr + 3, *reg32[3]);
+
+    st += 19;
+}
+
+
+
+
 
 
 // ld (pd+d),jkhl, ld (pd+d),bcde
@@ -775,18 +851,14 @@ void r4k_ld_ipdd_r32(uint8_t opcode, uint8_t iyprefix)
     uint8_t reg = (opcode >> 4) & 0x03;
     uint32_t pd = read_ps(reg);
     uint32_t addr = ps8se(pd,get_memory_inst(pc++));
+    uint8_t **reg32;
 
-    if (iyprefix) {
-        put_memory_physical(ps8se(addr,0),l);
-        put_memory_physical(ps8se(addr,1),h);
-        put_memory_physical(ps8se(addr,2),k);
-        put_memory_physical(ps8se(addr,3),j);
-    } else {
-        put_memory_physical(ps8se(addr,0),c);
-        put_memory_physical(ps8se(addr,1),b);
-        put_memory_physical(ps8se(addr,2),e);
-        put_memory_physical(ps8se(addr,3),d);
-    }
+    altd = 0;
+    reg32 = get_r32_ptr(iyprefix);
+    put_memory_physical(ps8se(addr,0),*reg32[0]);
+    put_memory_physical(ps8se(addr,1),*reg32[1]);
+    put_memory_physical(ps8se(addr,2),*reg32[2]);
+    put_memory_physical(ps8se(addr,3),*reg32[3]);
 
     st += 18;
 }
@@ -886,32 +958,13 @@ void r4k_pop_r32(uint8_t opcode, uint8_t iyprefix)
 {
     uint8_t  reg = (opcode >> 4) & 0x03;
     uint32_t *pd = write_pd(reg);
+    uint8_t **reg32 = get_r32_ptr(iyprefix);
 
-    if (iyprefix) {
-        if ( altd ) {
-            l_ = get_memory(sp + 0, MEM_TYPE_STACK);
-            h_ = get_memory(sp + 1, MEM_TYPE_STACK);
-            k_ = get_memory(sp + 2, MEM_TYPE_STACK);
-            j_ = get_memory(sp + 3, MEM_TYPE_STACK);
-        } else {
-            l = get_memory(sp + 0, MEM_TYPE_STACK);
-            h = get_memory(sp + 1, MEM_TYPE_STACK);
-            k = get_memory(sp + 2, MEM_TYPE_STACK);
-            j = get_memory(sp + 3, MEM_TYPE_STACK);
-        }
-    } else {
-        if ( altd ) {
-            e_ = get_memory(sp + 0, MEM_TYPE_STACK);
-            d_ = get_memory(sp + 1, MEM_TYPE_STACK);
-            c_ = get_memory(sp + 2, MEM_TYPE_STACK);
-            b_ = get_memory(sp + 3, MEM_TYPE_STACK);
-        } else {
-            e = get_memory(sp + 0, MEM_TYPE_STACK);
-            d = get_memory(sp + 1, MEM_TYPE_STACK);
-            c = get_memory(sp + 2, MEM_TYPE_STACK);
-            b = get_memory(sp + 3, MEM_TYPE_STACK);
-        }
-    }
+    *reg32[0] = get_memory(sp + 0, MEM_TYPE_STACK);
+    *reg32[1] = get_memory(sp + 1, MEM_TYPE_STACK);
+    *reg32[2] = get_memory(sp + 2, MEM_TYPE_STACK);
+    *reg32[3] = get_memory(sp + 3, MEM_TYPE_STACK);
+
     sp += 4;
     st += 13;
 }
@@ -1006,6 +1059,19 @@ void r4k_dwjnz(uint8_t opcode)
         mp = pc += (get_memory_inst(pc) ^ 128) - 127;
     }
     st += 7;
+}
+
+
+void r4k_push_mn(uint8_t opcode)
+{
+    uint8_t v, v2;
+
+    v = get_memory_inst(pc++);
+    v2 = get_memory_inst(pc++);
+    put_memory(--sp, v2);      
+    put_memory(--sp, v);      
+
+    st += 15;
 }
 
 void r4k_handle_6d_page(void)
