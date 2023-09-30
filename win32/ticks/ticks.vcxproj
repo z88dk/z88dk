@@ -195,6 +195,7 @@
     <ClCompile Include="..\..\src\ticks\syms.c" />
     <ClCompile Include="..\..\src\ticks\ticks.c" />
     <ClCompile Include="..\..\src\ticks\utf8.c" />
+    <ClCompile Include="..\..\src\ticks\z80n_inst.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ext\uthash\src\uthash.h" />
@@ -208,6 +209,7 @@
     <ClInclude Include="..\..\src\ticks\expressions.tab.h" />
     <ClInclude Include="..\..\src\ticks\exp_engine.h" />
     <ClInclude Include="..\..\src\ticks\linenoise.h" />
+    <ClInclude Include="..\..\src\ticks\memory.h" />
     <ClInclude Include="..\..\src\ticks\profiler.h" />
     <ClInclude Include="..\..\src\ticks\srcfile.h" />
     <ClInclude Include="..\..\src\ticks\syms.h" />

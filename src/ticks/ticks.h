@@ -32,7 +32,8 @@ extern unsigned char a,b,c,d,e,h,l,j,k;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_,j_,k_;
 extern unsigned char xh, xl, yh, yl;
 extern unsigned char ioi, ioe, altd;
-extern unsigned short ff, pc, sp, mp;
+
+extern unsigned short ff, fr, fa, fb,  pc, sp, mp;
 extern long long st;
 
 
@@ -180,7 +181,31 @@ extern void r4k_ld_imn_r32(uint8_t opcode, uint8_t isjkhl);
 extern void r4k_ld_r32_imn(uint8_t opcode, uint8_t isjkhl);
 extern void r4k_ex_jkhl_bcde(uint8_t opcode);
 extern void r4k_ld_r32_d(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_hl_isphl(uint8_t opcode);
+extern void r4k_ex_jk_hl(uint8_t opcode);
+extern void r4k_ex_jk1_hl(uint8_t opcode);
+extern void r4k_ex_bc_hl(uint8_t opcode);
+extern void r4k_mulu(uint8_t opcode);
 
+// z80n
+extern void z80n_mirror(void);
+extern void z80n_outinb(void);
+extern void z80n_nextreg_8_8(void);
+extern void z80n_nextreg_8_a(void);
+extern void z80n_ldws(void);
+extern void z80n_ldpirx(void);
+extern void z80n_ldix(void);
+extern void z80n_lddx(void);
+extern void z80n_ldirx(void);
+extern void z80n_lddrx(void);
+extern void z80n_mul_d_e(void);
+extern void z80n_add_hl_a(void);
+extern void z80n_add_hl_mn(void);
+extern void z80n_add_de_mn(void);
+extern void z80n_add_bc_mn(void);
+extern void z80n_push_mn(void);
+extern void z80n_add_de_a(void);
+extern void z80n_add_bc_a(void);
 
 #ifndef WIN32
 extern int kbhit();

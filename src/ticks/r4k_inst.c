@@ -1142,6 +1142,97 @@ void r4k_ex_jkhl_bcde(uint8_t opcode)
     st += 2;
 }
 
+// ld hl,(sp+hl)
+void r4k_ld_hl_isphl(uint8_t opcode)
+{
+    int     offset = sp;
+    ioi=ioe=0;
+    if ( altd ) {
+        offset += (h_ *256) + l_;
+        l_ = get_memory_data(offset++);
+        h_ = get_memory_data(offset);
+    } else {
+        offset += (h *256) + l;
+        l_ = get_memory_data(offset++);
+        h_ = get_memory_data(offset);
+    }
+    st += 4;
+}
+
+void r4k_ex_jk1_hl(uint8_t opcode)
+{
+    uint8_t t;
+    if (altd) {
+        t = j_;
+        j_ = h_;
+        h_ = t;
+        t = k_;
+        k_ = l_;
+        l_ = t;
+    } else {
+        t = j_;
+        j_ = h;
+        h = t;
+        t = k_;
+        k_ = l;
+        l = t;
+    }
+    st += 4;
+}
+
+void r4k_ex_jk_hl(uint8_t opcode)
+{
+    uint8_t t;
+    if (altd) {
+        t = j;
+        j = h_;
+        h_ = t;
+        t = k;
+        k = l_;
+        l_ = t;
+    } else {
+        t = j;
+        j = h;
+        h = t;
+        t = k;
+        k = l;
+        l = t;
+    }
+    st += 2;
+}
+
+void r4k_ex_bc_hl(uint8_t opcode)
+{
+    uint8_t t;
+    if ( altd ) { // EX BC,HL'
+        t = b;
+        b = h_;
+        h_ = t;
+        t = c;
+        c = l_;
+        l_ = t;
+    } else {
+        t = b;
+        b = h;
+        h = t;
+        t = c;
+        c = l;
+        l = t;
+    }
+    st += 2;
+}
+
+void r4k_mulu(uint8_t opcode)
+{
+    // HL:BC = BC • DE
+    uint32_t result = (( d * 256 ) + e) * (( b * 256 ) + c);
+    h = (result >> 24) & 0xff;
+    l = (result >> 16) & 0xff;
+    b  = (result >> 8 ) & 0xff;
+    c = result & 0xff;
+    st += 10;
+}
+
 void r4k_handle_6d_page(void)
 {
     uint8_t opc;
