@@ -573,6 +573,46 @@ void r4k_ld_pd_r32(uint8_t opcode, uint8_t iyprefix)
 }
 
 
+// ld (pd+hl),bcde, ld (pd+hl),jkhl
+void r4k_ld_ipdhl_r32(uint8_t opcode, uint8_t iyprefix)
+{
+    uint8_t reg = (opcode >> 4) & 0x03;
+    uint32_t pd = read_ps(reg);
+    uint32_t addr = ps16se(pd,h<<8|l);
+
+    if (iyprefix) {
+        put_memory_physical(addr,l);
+        put_memory_physical(ps8se(addr,1),h);
+        put_memory_physical(ps8se(addr,2),k);
+        put_memory_physical(ps8se(addr,3),j);
+    } else {
+        put_memory_physical(addr,e);
+        put_memory_physical(ps8se(addr,1),d);
+        put_memory_physical(ps8se(addr,2),c);
+        put_memory_physical(ps8se(addr,3),b);
+    }
+    st += 18;
+}
+
+void r4k_ld_ihl_r32(uint8_t opcode, uint8_t iyprefix)
+{
+    uint16_t addr = h<<8|l;
+
+    if (iyprefix) {
+        put_memory(addr+0, l);
+        put_memory(addr+1, h);
+        put_memory(addr+2, k);
+        put_memory(addr+3, j);
+    } else {
+        put_memory(addr+0, e);
+        put_memory(addr+1, d);
+        put_memory(addr+2, c);
+        put_memory(addr+3, b);
+    }
+
+    st += 18;
+}
+
 
 // ld bcde,ps / ld jkhl,ps
 void r4k_ld_r32_ps(uint8_t opcode, uint8_t iyprefix)
@@ -822,6 +862,60 @@ void r4k_pop_pd(uint8_t opcode)
     sp += 4;
     st += 13;
 }
+
+
+// push bcde, push jkhl
+void r4k_push_r32(uint8_t opcode, uint8_t iyprefix)
+{
+    if ( iyprefix ) {
+        put_memory(--sp,b);
+        put_memory(--sp,c);
+        put_memory(--sp,d);
+        put_memory(--sp,e);
+    } else {
+        put_memory(--sp,j);
+        put_memory(--sp,k);
+        put_memory(--sp,h);
+        put_memory(--sp,l);
+    }
+    st += 18;
+}
+
+// pop bcde, pop jkhl
+void r4k_pop_r32(uint8_t opcode, uint8_t iyprefix)
+{
+    uint8_t  reg = (opcode >> 4) & 0x03;
+    uint32_t *pd = write_pd(reg);
+
+    if (iyprefix) {
+        if ( altd ) {
+            l_ = get_memory(sp + 0, MEM_TYPE_STACK);
+            h_ = get_memory(sp + 1, MEM_TYPE_STACK);
+            k_ = get_memory(sp + 2, MEM_TYPE_STACK);
+            j_ = get_memory(sp + 3, MEM_TYPE_STACK);
+        } else {
+            l = get_memory(sp + 0, MEM_TYPE_STACK);
+            h = get_memory(sp + 1, MEM_TYPE_STACK);
+            k = get_memory(sp + 2, MEM_TYPE_STACK);
+            j = get_memory(sp + 3, MEM_TYPE_STACK);
+        }
+    } else {
+        if ( altd ) {
+            e_ = get_memory(sp + 0, MEM_TYPE_STACK);
+            d_ = get_memory(sp + 1, MEM_TYPE_STACK);
+            c_ = get_memory(sp + 2, MEM_TYPE_STACK);
+            b_ = get_memory(sp + 3, MEM_TYPE_STACK);
+        } else {
+            e = get_memory(sp + 0, MEM_TYPE_STACK);
+            d = get_memory(sp + 1, MEM_TYPE_STACK);
+            c = get_memory(sp + 2, MEM_TYPE_STACK);
+            b = get_memory(sp + 3, MEM_TYPE_STACK);
+        }
+    }
+    sp += 4;
+    st += 13;
+}
+
 
 // ldf a,(lmn)
 void r4k_ldf_a_ilmn(uint8_t opcode)

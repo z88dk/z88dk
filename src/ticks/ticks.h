@@ -162,7 +162,10 @@ extern void r4k_ld_r32_ihl(uint8_t opcode, uint8_t iyprefix);
 extern void r4k_ld_r32_ipshl(uint8_t opcode, uint8_t iyprefix);
 extern void r4k_ld_r32_ipsd(uint8_t opcode, uint8_t iyprefix);
 extern void r4k_ld_ipdd_r32(uint8_t opcode, uint8_t iyprefix);
-
+extern void r4k_push_r32(uint8_t opcode, uint8_t iyprefix);
+extern void r4k_pop_r32(uint8_t opcode, uint8_t iyprefix);
+extern void r4k_ld_ipdhl_r32(uint8_t opcode, uint8_t iyprefix);
+extern void r4k_ld_ihl_r32(uint8_t opcode, uint8_t iyprefix);
 
 #ifndef WIN32
 extern int kbhit();

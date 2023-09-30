@@ -1432,8 +1432,9 @@ int main (int argc, char **argv){
         if ( altd ) DECW(b_,c_);
         else DECW(b, c);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x1b: // DEC DE
-        if ( altd ) DECW(d_,e_);
+      case 0x1b: // DEC DE // (R4k) LD (HL),BCDE, LD (HL),JKHL
+        if (israbbit4k() && ih==0) r4k_ld_ihl_r32(opc, iy);
+        else if ( altd ) DECW(d_,e_);
         else DECW(d, e);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x2b: // DEC HL // DEC IX // DEC IY
@@ -1505,14 +1506,16 @@ int main (int argc, char **argv){
       case 0x05: // DEC B
         DEC(b);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x0d: // DEC C
-        DEC(c);
+      case 0x0d: // DEC C // (R4K) LD (PW+HL), BCDE, LD (PW+HL),JKHL
+        if ( israbbit4k() && ih==0) r4k_ld_ipdhl_r32(opc, iy);
+        else DEC(c);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x15: // DEC D
         DEC(d);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x1d: // DEC E
-        DEC(e);
+      case 0x1d: // DEC E // (R4K) LD (PX+HL), BCDE, LD (PX+HL),JKHL
+        if ( israbbit4k() && ih==0) r4k_ld_ipdhl_r32(opc, iy);
+        else DEC(e);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x25: // DEC H // DEC IXh // DEC IYh
         if( ih )
@@ -1522,8 +1525,9 @@ int main (int argc, char **argv){
         else
           DEC(xh);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x2d: // DEC L // DEC IXl // DEC IYl
-        if( ih )
+      case 0x2d: // DEC L // DEC IXl // DEC IYl // (R4K) LD (PY+HL), BCDE, LD (PY+HL),JKHL
+        if ( israbbit4k() && ih==0) r4k_ld_ipdhl_r32(opc, iy);
+        else if( ih )
           DEC(l);
         else if( iy )
           DEC(yl);
@@ -1541,8 +1545,9 @@ int main (int argc, char **argv){
         else
           DECPI(xh, xl);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x3d: // DEC A
-        if ( altd ) DEC(a_);
+      case 0x3d: // DEC A // (R4K) LD (PZ+HL), BCDE, LD (PZ+HL),JKHL
+        if ( israbbit4k() && ih==0) r4k_ld_ipdhl_r32(opc, iy);
+        else if ( altd ) DEC(a_);
         else DEC(a);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x06: // LD B,n // (R4K) LD A,(IXY+A)
@@ -3143,10 +3148,13 @@ int main (int argc, char **argv){
         else
           POP(xh, xl);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xf1: // POP AF
-        st+= isez80() ? 3 : isgbz80() ? 12 : israbbit() ? 7 : isz180() ? 9 : 10;
-        setf(get_memory_data(sp++));
-        a= get_memory_data(sp++);
+      case 0xf1: // POP AF // (R4K)
+        if (israbbit4k() && ih==0) r4k_pop_r32(opc, iy);
+        else {
+            st+= isez80() ? 3 : isgbz80() ? 12 : israbbit() ? 7 : isz180() ? 9 : 10;
+            setf(get_memory_data(sp++));
+            a= get_memory_data(sp++);
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc5: // PUSH BC
         PUSH(b, c);
@@ -3163,7 +3171,8 @@ int main (int argc, char **argv){
           PUSH(xh, xl);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf5: // PUSH AF
-        PUSH(a, f());
+        if (israbbit4k() && ih==0) r4k_push_r32(opc, iy);
+        else PUSH(a, f());
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc3: // JP nn
         st+= isez80() ? 4 : israbbit() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 12 : isr800() ? 3 : 10;
