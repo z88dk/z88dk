@@ -322,56 +322,14 @@ static void r4k_ld_ipdhl_rr(uint8_t opcode)
 }
 
 
-// ld pd,ps+ix
-static void r4k_ld_pd_psix(uint8_t opcode)
+// ld pd,ps+rr rr=iy,ix,de,hl
+static void r4k_ld_pd_psrr(uint8_t opcode, uint8_t lsb, uint8_t msb)
 {
     uint8_t dreg = (opcode >> 6) & 0x03;
     uint8_t reg = (opcode >> 4) & 0x03;
     uint32_t *pd = write_pd(dreg);
     uint32_t ps = read_ps(reg);
-    uint32_t addr = ps16se(ps,xh<<8|xl);
-
-    *pd = addr;
-
-    st += 4;
-}
-
-// ld pd,ps+iy
-static void r4k_ld_pd_psiy(uint8_t opcode)
-{
-    uint8_t dreg = (opcode >> 6) & 0x03;
-    uint8_t reg = (opcode >> 4) & 0x03;
-    uint32_t *pd = write_pd(dreg);
-    uint32_t ps = read_ps(reg);
-    uint32_t addr = ps16se(ps,yh<<8|yl);
-
-    *pd = addr;
-
-    st += 4;
-}
-
-// ld pd,ps+de
-static void r4k_ld_pd_psde(uint8_t opcode)
-{
-    uint8_t dreg = (opcode >> 6) & 0x03;
-    uint8_t reg = (opcode >> 4) & 0x03;
-    uint32_t *pd = write_pd(dreg);
-    uint32_t ps = read_ps(reg);
-    uint32_t addr = ps16se(ps,d<<8|e);
-
-    *pd = addr;
-
-    st += 4;
-}
-
-// ld pd,ps+hl
-static void r4k_ld_pd_pshl(uint8_t opcode)
-{
-    uint8_t dreg = (opcode >> 6) & 0x03;
-    uint8_t reg = (opcode >> 4) & 0x03;
-    uint32_t *pd = write_pd(dreg);
-    uint32_t ps = read_ps(reg);
-    uint32_t addr = ps16se(ps,h<<8|l);
+    uint32_t addr = ps16se(ps,msb<<8|lsb);
 
     *pd = addr;
 
@@ -900,6 +858,19 @@ void r4k_ld_ipdd_r32(uint8_t opcode, uint8_t isjkhl)
     st += 18;
 }
 
+void r4k_ld_r32_d(uint8_t opcode, uint8_t isjkhl)
+{
+    uint32_t v = (int8_t)get_memory_inst(pc++);
+    uint8_t **reg32 = get_r32_ptr(isjkhl);
+
+    *reg32[0] = ( v >> 0 ) & 0xff;
+    *reg32[1] = ( v >> 8 ) & 0xff;
+    *reg32[2] = ( v >> 16) & 0xff;
+    *reg32[3] = ( v >> 24) & 0xff;
+
+    st += 4;
+}
+
 
 // ld hl,(ps+bc)
 void r4k_ld_hl_ipsbc(uint8_t opcode)
@@ -1189,13 +1160,13 @@ void r4k_handle_6d_page(void)
         r4k_ld_ipdhl_rr(opc);
         break;
     case 0x04:
-        r4k_ld_pd_psix(opc);
+        r4k_ld_pd_psrr(opc, xl, xh);
         break;
     case 0x05:
-        r4k_ld_pd_psiy(opc);
+        r4k_ld_pd_psrr(opc, yl, yh);
         break;
     case 0x06:
-        r4k_ld_pd_psde(opc);
+        r4k_ld_pd_psrr(opc, e, d);
         break;
     case 0x07:
         r4k_ld_pd_ps(opc);
@@ -1216,7 +1187,7 @@ void r4k_handle_6d_page(void)
         r4k_ld_pd_psd(opc);
         break;
     case 0x0e:
-        r4k_ld_pd_pshl(opc);
+        r4k_ld_pd_psrr(opc, l, h);
         break;
     }
 }

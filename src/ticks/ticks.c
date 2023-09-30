@@ -2777,11 +2777,13 @@ int main (int argc, char **argv){
             }
         } else { AND(d, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4); }
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xa3: // AND E
-        AND(e, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0xa3: // AND E // (R4K) LD BCDE,d
+        if (israbbit4k()) r4k_ld_r32_d(opc,0);
+        else AND(e, isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xa4: // AND H // AND IXh // AND IYh
-        if( ih )
+      case 0xa4: // AND H // AND IXh // AND IYh // (R4K) LD JKHL,d
+        if (israbbit4k()) r4k_ld_r32_d(opc,1);
+        else if( ih )
           AND(h,  isez80() ? 1 :israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           AND(yh, isez80() ? 1 : isr800() ? 1 : 4);

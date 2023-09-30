@@ -179,6 +179,8 @@ extern void r4k_ld_isphl_r32(uint8_t opcode, uint8_t isjkhl);
 extern void r4k_ld_imn_r32(uint8_t opcode, uint8_t isjkhl);
 extern void r4k_ld_r32_imn(uint8_t opcode, uint8_t isjkhl);
 extern void r4k_ex_jkhl_bcde(uint8_t opcode);
+extern void r4k_ld_r32_d(uint8_t opcode, uint8_t isjkhl);
+
 
 #ifndef WIN32
 extern int kbhit();
