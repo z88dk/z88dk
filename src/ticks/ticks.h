@@ -145,7 +145,7 @@ extern void r4k_ld_ispn_ps(uint8_t opcode);
 extern void r4k_ld_hl_ipsbc(uint8_t opcode);
 extern void r4k_ld_ipdbc_hl(uint8_t opcode);
 
-extern void r4k_ld_pd_r32(uint8_t opcode, uint8_t iyprefix);
+extern void r4k_ld_pd_r32(uint8_t opcode, uint8_t isjkhl);
 extern void r4k_ldl_pd_rr(uint8_t opcode, uint8_t lsb, uint8_t msb);
 extern void r4k_ld_a_ixya(uint8_t opcode, uint8_t lsb, uint8_t msb);
 extern void r4k_push_ps(uint8_t opcode);
@@ -156,25 +156,29 @@ extern void r4k_ldf_pd_ilmn(uint8_t opcode);
 extern void r4k_ldf_ilmn_ps(uint8_t opcode);
 extern void r4k_dwjnz(uint8_t opcode);
 extern void r4k_push_mn(uint8_t opcode);
+extern void r4k_ldf_hl_ilmn(uint8_t opcode);
+extern void r4k_ldf_ilmn_hl(uint8_t opcode);
 
-
-extern void r4k_ld_r32_ps(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ld_r32_ihl(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ld_r32_ipshl(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ld_r32_ipsd(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ld_ipdd_r32(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_push_r32(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_pop_r32(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ld_ipdhl_r32(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ld_ihl_r32(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ld_r32_ixyd(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t iyprefix);
-extern void r4k_ld_ixyd_r32(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t iyprefix);
-extern void r4k_ldf_r32_ilmn(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ldf_ilmn_r32(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ld_r32_ispn(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ld_ispn_r32(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ld_r32_isphl(uint8_t opcode, uint8_t iyprefix);
-extern void r4k_ld_isphl_r32(uint8_t opcode, uint8_t iyprefix);
+extern void r4k_ld_r32_ps(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_r32_ihl(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_r32_ipshl(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_r32_ipsd(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_ipdd_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_push_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_pop_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_ipdhl_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_ihl_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_r32_ixyd(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t isjkhl);
+extern void r4k_ld_ixyd_r32(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t isjkhl);
+extern void r4k_ldf_r32_ilmn(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ldf_ilmn_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_r32_ispn(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_ispn_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_r32_isphl(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_isphl_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_imn_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ld_r32_imn(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_ex_jkhl_bcde(uint8_t opcode);
 
 #ifndef WIN32
 extern int kbhit();

@@ -45,10 +45,10 @@ static uint32_t *write_pd(uint8_t reg)
 
 
 
-static uint8_t **get_r32_ptr(uint8_t iyprefix)
+static uint8_t **get_r32_ptr(uint8_t isjkhl)
 {
     static uint8_t  *reg32[4];
-    if (iyprefix) {
+    if (isjkhl) {
         if (altd) {
             reg32[0] = &l_;
             reg32[1] = &h_;
@@ -595,12 +595,12 @@ void r4k_ldl_pd_rr(uint8_t opcode, uint8_t lsb, uint8_t msb)
     st+=2;
 }
 // ld pd,jkhl / ld pd,bcde
-void r4k_ld_pd_r32(uint8_t opcode, uint8_t iyprefix)
+void r4k_ld_pd_r32(uint8_t opcode, uint8_t isjkhl)
 {
     uint8_t dreg = (opcode >> 4) & 0x03;
     uint32_t *pd = write_pd(dreg);
 
-    if (iyprefix)
+    if (isjkhl)
         *pd = ( j << 24 ) | (k << 16 ) | (h << 8) | (l << 0);
     else
         *pd = ( b << 24 ) | (c << 16 ) | (d << 8) | (e << 0);
@@ -609,7 +609,7 @@ void r4k_ld_pd_r32(uint8_t opcode, uint8_t iyprefix)
 
 
 // ld (pd+hl),bcde, ld (pd+hl),jkhl
-void r4k_ld_ipdhl_r32(uint8_t opcode, uint8_t iyprefix)
+void r4k_ld_ipdhl_r32(uint8_t opcode, uint8_t isjkhl)
 {
     uint8_t reg = (opcode >> 4) & 0x03;
     uint32_t pd = read_ps(reg);
@@ -617,7 +617,7 @@ void r4k_ld_ipdhl_r32(uint8_t opcode, uint8_t iyprefix)
     uint8_t **reg32;
 
     altd = 0;
-    reg32 = get_r32_ptr(iyprefix);
+    reg32 = get_r32_ptr(isjkhl);
 
     put_memory_physical(ps8se(addr,0),*reg32[0]);
     put_memory_physical(ps8se(addr,1),*reg32[1]);
@@ -627,13 +627,13 @@ void r4k_ld_ipdhl_r32(uint8_t opcode, uint8_t iyprefix)
     st += 18;
 }
 
-void r4k_ld_ihl_r32(uint8_t opcode, uint8_t iyprefix)
+void r4k_ld_ihl_r32(uint8_t opcode, uint8_t isjkhl)
 {
     uint16_t addr = h<<8|l;
     uint8_t **reg32;
 
     altd = 0;
-    reg32 = get_r32_ptr(iyprefix);
+    reg32 = get_r32_ptr(isjkhl);
 
     put_memory(addr+0, *reg32[0]);
     put_memory(addr+1, *reg32[1]);
@@ -645,11 +645,11 @@ void r4k_ld_ihl_r32(uint8_t opcode, uint8_t iyprefix)
 
 
 // ld bcde,ps / ld jkhl,ps
-void r4k_ld_r32_ps(uint8_t opcode, uint8_t iyprefix)
+void r4k_ld_r32_ps(uint8_t opcode, uint8_t isjkhl)
 {
     uint8_t  sreg = (opcode >> 4) & 0x03;
     uint32_t s = read_ps(sreg);
-    uint8_t **reg32 = get_r32_ptr(iyprefix);;
+    uint8_t **reg32 = get_r32_ptr(isjkhl);;
 
     *reg32[0] = ( s >> 24 ) & 0xff;
     *reg32[1] = ( s >> 16 ) & 0xff;
@@ -661,10 +661,10 @@ void r4k_ld_r32_ps(uint8_t opcode, uint8_t iyprefix)
 
 
 // ld bcde,(hl) ld jkhl,(hl)
-void r4k_ld_r32_ihl(uint8_t opcode, uint8_t iyprefix)
+void r4k_ld_r32_ihl(uint8_t opcode, uint8_t isjkhl)
 {
     uint32_t addr = h<<8|l;
-    uint8_t **reg32 = get_r32_ptr(iyprefix);;
+    uint8_t **reg32 = get_r32_ptr(isjkhl);;
 
     *reg32[0] = get_memory(addr + 0, MEM_TYPE_DATA);
     *reg32[1] = get_memory(addr + 1, MEM_TYPE_DATA);
@@ -674,13 +674,50 @@ void r4k_ld_r32_ihl(uint8_t opcode, uint8_t iyprefix)
     st += 14;
 }
 
+
+// ld (mn),bcde ld (mn),jkhl
+void r4k_ld_imn_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    uint16_t addr = get_memory_inst(pc) | (get_memory_inst(pc+1) << 8);
+    uint8_t **reg32;
+
+    pc += 2;
+    altd = 0;
+    reg32 = get_r32_ptr(isjkhl);
+
+    put_memory(addr+0, *reg32[0]);
+    put_memory(addr+1, *reg32[1]);
+    put_memory(addr+2, *reg32[2]);
+    put_memory(addr+3, *reg32[3]);
+    
+    st += 19;
+}
+
+// ld bcde,(mn) ld jkhl,(mn)
+void r4k_ld_r32_imn(uint8_t opcode, uint8_t isjkhl)
+{
+    uint16_t addr = get_memory_inst(pc) | (get_memory_inst(pc+1) << 8);
+    uint8_t **reg32;
+
+    pc += 2;
+    reg32 = get_r32_ptr(isjkhl);
+
+    *reg32[0] = get_memory(addr + 0, MEM_TYPE_DATA);
+    *reg32[1] = get_memory(addr + 1, MEM_TYPE_DATA);
+    *reg32[2] = get_memory(addr + 2, MEM_TYPE_DATA);
+    *reg32[3] = get_memory(addr + 3, MEM_TYPE_DATA);
+
+    st += 15;
+}
+
+
 // ld bcde,(ps+hl), ld jkhl,(ps+hl)
-void r4k_ld_r32_ipshl(uint8_t opcode,uint8_t iyprefix)
+void r4k_ld_r32_ipshl(uint8_t opcode,uint8_t isjkhl)
 {
     uint8_t reg = (opcode >> 4) & 0x03;
     uint32_t ps = read_ps(reg);
     uint32_t addr = ps16se(ps,(int16_t)(h<<8|l));
-    uint8_t **reg32 = get_r32_ptr(iyprefix);;
+    uint8_t **reg32 = get_r32_ptr(isjkhl);;
 
     *reg32[0]= get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
     *reg32[1]= get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
@@ -691,12 +728,12 @@ void r4k_ld_r32_ipshl(uint8_t opcode,uint8_t iyprefix)
 }
 
 // ld bcde,(ps+hl), ld jkhl,(ps+hl)
-void r4k_ld_r32_ipsd(uint8_t opcode, uint8_t iyprefix)
+void r4k_ld_r32_ipsd(uint8_t opcode, uint8_t isjkhl)
 {
     uint8_t reg = (opcode >> 4) & 0x03;
     uint32_t ps = read_ps(reg);
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
-    uint8_t **reg32 = get_r32_ptr(iyprefix);;
+    uint8_t **reg32 = get_r32_ptr(isjkhl);;
 
     *reg32[0] = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
     *reg32[1] = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
@@ -707,10 +744,10 @@ void r4k_ld_r32_ipsd(uint8_t opcode, uint8_t iyprefix)
 }
 
 // ld bcde,(ixy+d), ld jkhl,(ixy+d)
-void r4k_ld_r32_ixyd(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t iyprefix)
+void r4k_ld_r32_ixyd(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t isjkhl)
 {
     uint16_t  addr = (msb << 8|lsb) + (get_memory_inst(pc++)^128)-128;
-    uint8_t **reg32 = get_r32_ptr(iyprefix);;
+    uint8_t **reg32 = get_r32_ptr(isjkhl);;
 
     *reg32[0] = get_memory(addr + 0, MEM_TYPE_DATA);
     *reg32[1] = get_memory(addr + 1, MEM_TYPE_DATA);
@@ -721,10 +758,10 @@ void r4k_ld_r32_ixyd(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t iyprefix)
 }
 
 // ldf bcde,(lmn) ldf jkhl,(lmn)
-void r4k_ldf_r32_ilmn(uint8_t opcode, uint8_t iyprefix)
+void r4k_ldf_r32_ilmn(uint8_t opcode, uint8_t isjkhl)
 {
     uint32_t addr;
-    uint8_t **reg32 = get_r32_ptr(iyprefix);
+    uint8_t **reg32 = get_r32_ptr(isjkhl);
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
            (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
@@ -740,14 +777,14 @@ void r4k_ldf_r32_ilmn(uint8_t opcode, uint8_t iyprefix)
 }
 
 // ldf (lmn),bcde ldf (lmn),jkhl
-void r4k_ldf_ilmn_r32(uint8_t opcode, uint8_t iyprefix)
+void r4k_ldf_ilmn_r32(uint8_t opcode, uint8_t isjkhl)
 {
     uint32_t addr;
     uint32_t v;
     uint8_t **reg32;
     
     altd = 0;
-    reg32 = get_r32_ptr(iyprefix);
+    reg32 = get_r32_ptr(isjkhl);
     
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
            (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
@@ -764,10 +801,10 @@ void r4k_ldf_ilmn_r32(uint8_t opcode, uint8_t iyprefix)
 
 
 // ld bcde,(sp+n) ld jkhl,(sp+n)
-void r4k_ld_r32_ispn(uint8_t opcode, uint8_t iyprefix)
+void r4k_ld_r32_ispn(uint8_t opcode, uint8_t isjkhl)
 {
     uint16_t  s = (sp + get_memory_inst(pc++));
-    uint8_t **reg32 = get_r32_ptr(iyprefix);
+    uint8_t **reg32 = get_r32_ptr(isjkhl);
 
     *reg32[0] = get_memory(s+0, MEM_TYPE_STACK);
     *reg32[1] = get_memory(s+1, MEM_TYPE_STACK);
@@ -778,10 +815,10 @@ void r4k_ld_r32_ispn(uint8_t opcode, uint8_t iyprefix)
 }
 
 // ld (sp+n),bcde ld (sp+n),jkhl
-void r4k_ld_ispn_r32(uint8_t opcode, uint8_t iyprefix)
+void r4k_ld_ispn_r32(uint8_t opcode, uint8_t isjkhl)
 {
     uint16_t  s = (sp + get_memory_inst(pc++));
-    uint8_t **reg32 = get_r32_ptr(iyprefix);
+    uint8_t **reg32 = get_r32_ptr(isjkhl);
 
     put_memory(sp + 0, *reg32[0]);
     put_memory(sp + 1, *reg32[1]);
@@ -792,10 +829,10 @@ void r4k_ld_ispn_r32(uint8_t opcode, uint8_t iyprefix)
 }
 
 // ld bcde,(sp+hl) ld jkhl,(sp+hl)
-void r4k_ld_r32_isphl(uint8_t opcode, uint8_t iyprefix)
+void r4k_ld_r32_isphl(uint8_t opcode, uint8_t isjkhl)
 {
     uint16_t  s = sp + (h<<8|l);
-    uint8_t **reg32 = get_r32_ptr(iyprefix);
+    uint8_t **reg32 = get_r32_ptr(isjkhl);
 
     *reg32[0] = get_memory(s+0, MEM_TYPE_STACK);
     *reg32[1] = get_memory(s+1, MEM_TYPE_STACK);
@@ -806,10 +843,10 @@ void r4k_ld_r32_isphl(uint8_t opcode, uint8_t iyprefix)
 }
 
 // ld (sp+hl),bcde ld (sp+hl),jkhl
-void r4k_ld_isphl_r32(uint8_t opcode, uint8_t iyprefix)
+void r4k_ld_isphl_r32(uint8_t opcode, uint8_t isjkhl)
 {
     uint16_t  s = sp + (h<<8|l);
-    uint8_t **reg32 = get_r32_ptr(iyprefix);
+    uint8_t **reg32 = get_r32_ptr(isjkhl);
 
     put_memory(sp + 0, *reg32[0]);
     put_memory(sp + 1, *reg32[1]);
@@ -824,13 +861,13 @@ void r4k_ld_isphl_r32(uint8_t opcode, uint8_t iyprefix)
 
 
 // ld (ixy+d),bcde, ld (ixy+d),jkhl
-void r4k_ld_ixyd_r32(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t iyprefix)
+void r4k_ld_ixyd_r32(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t isjkhl)
 {
     uint16_t  addr = (msb << 8|lsb) + (get_memory_inst(pc++)^128)-128;
     uint8_t  **reg32;
 
     altd = 0;
-    reg32 = get_r32_ptr(iyprefix);
+    reg32 = get_r32_ptr(isjkhl);
 
     put_memory(addr + 0, *reg32[0]);
     put_memory(addr + 1, *reg32[1]);
@@ -846,7 +883,7 @@ void r4k_ld_ixyd_r32(uint8_t opcode, uint8_t lsb, uint8_t msb, uint8_t iyprefix)
 
 
 // ld (pd+d),jkhl, ld (pd+d),bcde
-void r4k_ld_ipdd_r32(uint8_t opcode, uint8_t iyprefix)
+void r4k_ld_ipdd_r32(uint8_t opcode, uint8_t isjkhl)
 {
     uint8_t reg = (opcode >> 4) & 0x03;
     uint32_t pd = read_ps(reg);
@@ -854,7 +891,7 @@ void r4k_ld_ipdd_r32(uint8_t opcode, uint8_t iyprefix)
     uint8_t **reg32;
 
     altd = 0;
-    reg32 = get_r32_ptr(iyprefix);
+    reg32 = get_r32_ptr(isjkhl);
     put_memory_physical(ps8se(addr,0),*reg32[0]);
     put_memory_physical(ps8se(addr,1),*reg32[1]);
     put_memory_physical(ps8se(addr,2),*reg32[2]);
@@ -937,9 +974,9 @@ void r4k_pop_pd(uint8_t opcode)
 
 
 // push bcde, push jkhl
-void r4k_push_r32(uint8_t opcode, uint8_t iyprefix)
+void r4k_push_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    if ( iyprefix ) {
+    if ( isjkhl ) {
         put_memory(--sp,b);
         put_memory(--sp,c);
         put_memory(--sp,d);
@@ -954,11 +991,11 @@ void r4k_push_r32(uint8_t opcode, uint8_t iyprefix)
 }
 
 // pop bcde, pop jkhl
-void r4k_pop_r32(uint8_t opcode, uint8_t iyprefix)
+void r4k_pop_r32(uint8_t opcode, uint8_t isjkhl)
 {
     uint8_t  reg = (opcode >> 4) & 0x03;
     uint32_t *pd = write_pd(reg);
-    uint8_t **reg32 = get_r32_ptr(iyprefix);
+    uint8_t **reg32 = get_r32_ptr(isjkhl);
 
     *reg32[0] = get_memory(sp + 0, MEM_TYPE_STACK);
     *reg32[1] = get_memory(sp + 1, MEM_TYPE_STACK);
@@ -1000,6 +1037,45 @@ void r4k_ldf_ilmn_a(uint8_t opcode)
     
     st+=12;
 }
+
+
+// ldf hl,(lmn)
+void r4k_ldf_hl_ilmn(uint8_t opcode)
+{
+    uint32_t addr;
+
+    addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
+    pc += 3;
+
+    if ( altd ) {
+        l_ = get_memory(addr, MEM_TYPE_PHYSICAL);
+        h_ = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+    } else {
+        l = get_memory(addr, MEM_TYPE_PHYSICAL);
+        h = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+    }
+
+    st+=13;
+}
+
+// ldf (lmn),a
+void r4k_ldf_ilmn_hl(uint8_t opcode)
+{
+    uint32_t addr;
+
+    addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
+    pc += 3;
+
+    put_memory_physical(addr, l);
+    put_memory_physical(addr, h);
+    
+    st+=15;
+}
+
 
 
 // ldf pd,(lmn)
@@ -1072,6 +1148,27 @@ void r4k_push_mn(uint8_t opcode)
     put_memory(--sp, v);      
 
     st += 15;
+}
+
+void r4k_ex_jkhl_bcde(uint8_t opcode)
+{
+    uint8_t t;
+
+    t = e;
+    e = l;
+    l = t;
+    t = d;
+    e = h;
+    h = t;
+
+    t = c;
+    c = k;
+    k = t;
+    t = b;
+    b = j;
+    j = t;
+
+    st += 2;
 }
 
 void r4k_handle_6d_page(void)

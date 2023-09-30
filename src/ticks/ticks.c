@@ -1349,7 +1349,7 @@ int main (int argc, char **argv){
       case 0x12: // LD (DE),A
         LDPR(d, e, a);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x0a: // LD A,(BC) // (R4K) LDF BCDE,(lmn) LDF JKHL,(lmn)
+      case 0x0a: // LD A,(BC) // (R4K) LDF BCDE,(lmn) LDF JKH L,(lmn)
         if (israbbit4k() && ih==0) r4k_ldf_r32_ilmn(opc, iy);
         else if ( altd ) LDRP(b, c, a_);
         else LDRP(b, c, a);
@@ -2522,14 +2522,17 @@ int main (int argc, char **argv){
             st+=2; 
         } else ADD(c,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x82: // ADD A,D
-        ADD(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0x82: // ADD A,D // (R4k) LDF (lmn),HL
+        if (israbbit4k()) r4k_ldf_ilmn_hl(opc);
+        else ADD(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x83: // ADD A,E
-        ADD(e,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
+      case 0x83: // ADD A,E // (R4K) LD (mn),BCDE
+        if (israbbit4k()) r4k_ld_imn_r32(opc, 0);
+        else ADD(e,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x84: // ADD A,H // ADD A,IXh // ADD A,IYh
-        if( ih )
+      case 0x84: // ADD A,H // ADD A,IXh // ADD A,IYh // (R4K) LD (mn),JKHL
+        if (israbbit4k()) r4k_ld_imn_r32(opc, 1);
+        else if( ih )
           ADD(h,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           ADD(yh,isez80() ? 1 : isr800() ? 2 : 4);
@@ -2633,14 +2636,17 @@ int main (int argc, char **argv){
             st+=2; 
         } else SUB(c,isez80() ? 1 :israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x92: // SUB D
-        SUB(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
+      case 0x92: // SUB D // (R4K) LDF HL,(lmn)
+        if (israbbit4k()) r4k_ldf_hl_ilmn(opc);
+        else SUB(d,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x93: // SUB E
-        SUB(e,isez80() ? 1 :israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
+      case 0x93: // SUB E // (R4K) LD BCDE,(mn)
+        if (israbbit4k()) r4k_ld_r32_imn(opc, 0);
+        else SUB(e,isez80() ? 1 :israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x94: // SUB H // SUB IXh // SUB IYh
-        if( ih )
+      case 0x94: // SUB H // SUB IXh // SUB IYh // (R4K) LD BCDE,(mn)
+        if (israbbit4k()) r4k_ld_r32_imn(opc, 1);
+        else if( ih )
           SUB(h,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           SUB(yh,isez80() ? 1 : isr800() ? 2 : isr800() ? 2 : 4);
@@ -2947,8 +2953,9 @@ int main (int argc, char **argv){
             st += 2;
         } else OR(e,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0xb4: // OR H // OR IXh // OR IYh
-        if( ih )
+      case 0xb4: // OR H // OR IXh // OR IYh // (R4K) EX JKHL,BCDE
+        if (israbbit4k()) r4k_ex_jkhl_bcde(opc);
+        else if( ih )
           OR(h,isez80() ? 1 : israbbit() ? 2 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           OR(yh,isez80() ? 1 : isr800() ? 1 : 4);
