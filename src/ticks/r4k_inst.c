@@ -143,11 +143,7 @@ void r4k_ld_ipdhl_a(uint8_t opcode)
     uint32_t ps = read_ps(reg);
     uint32_t addr = ps16se(ps,(int16_t)(h<<8|l));
 
-    if (altd) {
-        put_memory_physical(addr,a_);
-    } else {
-        put_memory_physical(addr,a);
-    }
+    put_memory_physical(addr,a);
 
     st += 6;
 }
@@ -428,6 +424,7 @@ static void r4k_ld_pd_ipsbc(uint8_t opcode)
 }
 
 
+// ld (pd+d),rr
 static void r4k_ld_ipdrr(uint8_t opcode, uint8_t lsb, uint8_t msb)
 {
     uint8_t dreg = (opcode >> 6) & 0x03;
@@ -476,7 +473,7 @@ static void r4k_ld_pd_psd(uint8_t opcode)
     st += 6;
 }
 
-
+// ld pd,(sp+n)
 void r4k_ld_pd_ispn(uint8_t opcode)
 {
     uint8_t dreg = (opcode >> 4) & 0x03;
@@ -492,7 +489,7 @@ void r4k_ld_pd_ispn(uint8_t opcode)
 }
 
 
-
+// ld (sp+n),ps
 void r4k_ld_ispn_ps(uint8_t opcode)
 {
     uint8_t  sreg = (opcode >> 4) & 0x03;
@@ -507,6 +504,7 @@ void r4k_ld_ispn_ps(uint8_t opcode)
     st += 19;
 }
 
+// ld pd,klmn
 void r4k_ld_pd_klmn(uint8_t opcode)
 {
     uint8_t dreg = (opcode >> 4) & 0x03;
@@ -521,6 +519,7 @@ void r4k_ld_pd_klmn(uint8_t opcode)
     st += 12;
 }
 
+// ldl pd,mn
 void r4k_ldl_pd_mn(uint8_t opcode)
 {
     uint8_t dreg = (opcode >> 4) & 0x03;
@@ -534,7 +533,7 @@ void r4k_ldl_pd_mn(uint8_t opcode)
     st += 8;
 }
 
-
+// ldl pd,(sp+n)
 void r4k_ldl_pd_ispn(uint8_t opcode)
 {
     uint8_t dreg = (opcode >> 4) & 0x03;
@@ -560,65 +559,198 @@ void r4k_ldl_pd_rr(uint8_t opcode, uint8_t lsb, uint8_t msb)
 
     st+=2;
 }
-
-
-
-void r4k_ld_pd_bcde(uint8_t opcode)
+// ld pd,jkhl / ld pd,bcde
+void r4k_ld_pd_r32(uint8_t opcode, uint8_t iyprefix)
 {
     uint8_t dreg = (opcode >> 4) & 0x03;
     uint32_t *pd = write_pd(dreg);
 
-    *pd = ( b << 24 ) | (c << 16 ) | (d << 8) | (e << 0);
+    if (iyprefix)
+        *pd = ( j << 24 ) | (k << 16 ) | (h << 8) | (l << 0);
+    else
+        *pd = ( b << 24 ) | (c << 16 ) | (d << 8) | (e << 0);
     st += 4;
 }
 
-void r4k_ld_pd_jkhl(uint8_t opcode)
-{
-    uint8_t dreg = (opcode >> 4) & 0x03;
-    uint32_t *pd = write_pd(dreg);
 
-    *pd = ( j << 24 ) | (k << 16 ) | (h << 8) | (l << 0);
-    st += 4;
-}
 
-void r4k_ld_bcde_ps(uint8_t opcode)
+// ld bcde,ps / ld jkhl,ps
+void r4k_ld_r32_ps(uint8_t opcode, uint8_t iyprefix)
 {
     uint8_t  sreg = (opcode >> 4) & 0x03;
     uint32_t s = read_ps(sreg);
 
-    if (altd) {
-        b_ = ( s >> 24 ) & 0xff;
-        c_ = ( s >> 16 ) & 0xff;
-        d_ = ( s >> 8  ) & 0xff;
-        e_ = ( s >> 0  ) & 0xff;
+    if (iyprefix) {
+        if (altd) {
+            j_ = ( s >> 24 ) & 0xff;
+            k_ = ( s >> 16 ) & 0xff;
+            h_ = ( s >> 8  ) & 0xff;
+            l_ = ( s >> 0  ) & 0xff;
+        } else {
+            j = ( s >> 24 ) & 0xff;
+            k = ( s >> 16 ) & 0xff;
+            h = ( s >> 8  ) & 0xff;
+            l = ( s >> 0  ) & 0xff;
+        }
     } else {
-        b = ( s >> 24 ) & 0xff;
-        c = ( s >> 16 ) & 0xff;
-        d = ( s >> 8  ) & 0xff;
-        e = ( s >> 0  ) & 0xff;
+        if (altd) {
+            b_ = ( s >> 24 ) & 0xff;
+            c_ = ( s >> 16 ) & 0xff;
+            d_ = ( s >> 8  ) & 0xff;
+            e_ = ( s >> 0  ) & 0xff;
+        } else {
+            b = ( s >> 24 ) & 0xff;
+            c = ( s >> 16 ) & 0xff;
+            d = ( s >> 8  ) & 0xff;
+            e = ( s >> 0  ) & 0xff;
+        }
     }
     st += 4;
 }
 
 
-void r4k_ld_jkhl_ps(uint8_t opcode)
+// ld bcde,(hl) ld jkhl,(hl)
+void r4k_ld_r32_ihl(uint8_t opcode, uint8_t iyprefix)
 {
-    uint8_t  sreg = (opcode >> 4) & 0x03;
-    uint32_t s = read_ps(sreg);
+    uint32_t addr = h<<8|l;
 
-    if (altd) {
-        j_ = ( s >> 24 ) & 0xff;
-        k_ = ( s >> 16 ) & 0xff;
-        h_ = ( s >> 8  ) & 0xff;
-        l_ = ( s >> 0  ) & 0xff;
+    if (iyprefix) {
+        if (altd) {
+            l_ = get_memory(addr + 0, MEM_TYPE_DATA);
+            h_ = get_memory(addr + 1, MEM_TYPE_DATA);
+            k_ = get_memory(addr + 2, MEM_TYPE_DATA);
+            j_ = get_memory(addr + 3, MEM_TYPE_DATA);
+        } else {
+            l = get_memory(addr + 0, MEM_TYPE_DATA);
+            h = get_memory(addr + 1, MEM_TYPE_DATA);
+            k = get_memory(addr + 2, MEM_TYPE_DATA);
+            j = get_memory(addr + 3, MEM_TYPE_DATA);
+        }
     } else {
-        j = ( s >> 24 ) & 0xff;
-        k = ( s >> 16 ) & 0xff;
-        h = ( s >> 8  ) & 0xff;
-        l = ( s >> 0  ) & 0xff;
+        if (altd) {
+            e_ = get_memory(addr + 0, MEM_TYPE_DATA);
+            d_ = get_memory(addr + 1, MEM_TYPE_DATA);
+            c_ = get_memory(addr + 2, MEM_TYPE_DATA);
+            b_ = get_memory(addr + 3, MEM_TYPE_DATA);
+        } else {
+            e = get_memory(addr + 0, MEM_TYPE_DATA);
+            d = get_memory(addr + 1, MEM_TYPE_DATA);
+            c = get_memory(addr + 2, MEM_TYPE_DATA);
+            b = get_memory(addr + 3, MEM_TYPE_DATA);
+        }
     }
-    st += 4;
+    st += 14;
 }
+
+// ld bcde,(ps+hl), ld jkhl,(ps+hl)
+void r4k_ld_r32_ipshl(uint8_t opcode,uint8_t iyprefix)
+{
+    uint8_t reg = (opcode >> 4) & 0x03;
+    uint32_t ps = read_ps(reg);
+    uint32_t addr = ps16se(ps,(int16_t)(h<<8|l));
+
+    if (iyprefix) {
+        if (altd) {
+            l_ = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
+            h_ = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+            k_ = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
+            j_ = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
+        } else {
+            l = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
+            h = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+            k = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
+            j = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
+        }
+    } else {
+        if (altd) {
+            e_ = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
+            d_ = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+            c_ = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
+            b_ = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
+        } else {
+            e = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
+            d = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+            c = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
+            b = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
+        }
+    }
+    st += 15;
+}
+
+// ld bcde,(ps+hl), ld jkhl,(ps+hl)
+void r4k_ld_r32_ipsd(uint8_t opcode, uint8_t iyprefix)
+{
+    uint8_t reg = (opcode >> 4) & 0x03;
+    uint32_t ps = read_ps(reg);
+    uint32_t addr = ps8se(ps,get_memory_inst(pc++));
+    
+    if (iyprefix) {
+        if (altd) {
+            l_ = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
+            h_ = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+            k_ = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
+            j_ = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
+        } else {
+            l = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
+            h = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+            k = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
+            j = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
+        }
+    } else {
+        if (altd) {
+            e_ = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
+            d_ = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+            c_ = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
+            b_ = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
+        } else {
+            e = get_memory(ps8se(addr,0), MEM_TYPE_PHYSICAL);
+            d = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+            c = get_memory(ps8se(addr,2), MEM_TYPE_PHYSICAL);
+            b = get_memory(ps8se(addr,3), MEM_TYPE_PHYSICAL);
+        }
+    }
+    st += 15;
+}
+
+
+// ld (pd+d),bcde
+void r4k_ld_ipdd_bcde(uint8_t opcode)
+{
+    uint8_t reg = (opcode >> 4) & 0x03;
+    uint32_t pd = read_ps(reg);
+    uint32_t addr = ps8se(pd,get_memory_inst(pc++));
+
+    put_memory_physical(ps8se(addr,0),c);
+    put_memory_physical(ps8se(addr,1),b);
+    put_memory_physical(ps8se(addr,2),e);
+    put_memory_physical(ps8se(addr,3),d);
+
+    st += 18;
+}
+
+
+// ld (pd+d),jkhl, ld (pd+d),bcde
+void r4k_ld_ipdd_r32(uint8_t opcode, uint8_t iyprefix)
+{
+    uint8_t reg = (opcode >> 4) & 0x03;
+    uint32_t pd = read_ps(reg);
+    uint32_t addr = ps8se(pd,get_memory_inst(pc++));
+
+    if (iyprefix) {
+        put_memory_physical(ps8se(addr,0),l);
+        put_memory_physical(ps8se(addr,1),h);
+        put_memory_physical(ps8se(addr,2),k);
+        put_memory_physical(ps8se(addr,3),j);
+    } else {
+        put_memory_physical(ps8se(addr,0),c);
+        put_memory_physical(ps8se(addr,1),b);
+        put_memory_physical(ps8se(addr,2),e);
+        put_memory_physical(ps8se(addr,3),d);
+    }
+
+    st += 18;
+}
+
 
 // ld hl,(ps+bc)
 void r4k_ld_hl_ipsbc(uint8_t opcode)
