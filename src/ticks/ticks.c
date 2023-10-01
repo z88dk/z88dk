@@ -1562,8 +1562,8 @@ int main (int argc, char **argv){
         else DEC(a);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x06: // LD B,n // (R4K) LD A,(IXY+A)
-        if ( israbbit4k() && iy) r4k_ld_a_ixya(opc, yl, yh);
-        else if ( israbbit4k() && ih==0) r4k_ld_a_ixya(opc, xl, xh);
+        if ( israbbit4k() && ih==0 && iy==1) r4k_ld_a_ixya(opc, yl, yh);
+        else if ( israbbit4k() && ih==0 && iy==0) r4k_ld_a_ixya(opc, xl, xh);
         else if ( altd ) LDRIM(b_);
         else LDRIM(b);
         ih=1;altd=0;ioi=0;ioe=0;break;
