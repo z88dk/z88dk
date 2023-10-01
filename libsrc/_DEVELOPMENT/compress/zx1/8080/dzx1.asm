@@ -21,7 +21,10 @@
 
 
 
+; We enter here with hl=source, de=dest
 dzx1_standard:
+                ld bc,de
+                ex de,hl
 IF BACKWARD
 		lxi h,1
 ELSE
