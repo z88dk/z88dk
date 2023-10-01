@@ -28,6 +28,8 @@
 
 #endif
 
+#define SUSPECT_IMPL(m)
+
 extern unsigned char a,b,c,d,e,h,l,j,k;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_,j_,k_;
 extern unsigned char xh, xl, yh, yl;
@@ -229,6 +231,9 @@ extern void r4k_cbm(uint8_t opcode);
 extern void r4k_sbox_a(uint8_t opcode);
 extern void r4k_ibox_a(uint8_t opcode);
 extern void r4k_ld_pd_ihtrhl(uint8_t opcode);
+extern void r4k_xor_hl_de(uint8_t opcode);
+extern void r4k_flag_cc_hl(uint8_t opcode, uint8_t set);
+
 
 // rxk
 extern void rxk_ld_hl_ispn(uint8_t opcode, uint8_t ih, uint8_t iy);
@@ -253,7 +258,12 @@ extern void rxk_ldp_irr_hl(uint8_t opcode, uint8_t prefix);
 extern void rxk_lret(uint8_t opcode);
 extern void rxk_lcall(uint8_t opcode);
 extern void rxk_ljp(uint8_t opcode);
-
+extern void rxk_ipset(uint8_t opcode);
+extern void rxk_ipres(uint8_t opcode);
+extern void rxk_ld_eir_a(uint8_t opcode);
+extern void rxk_ld_iir_a(uint8_t opcode);
+extern void rxk_ld_a_eir(uint8_t opcode);
+extern void rxk_ld_a_iir(uint8_t opcode);
 
 extern void r3k_push_su(uint8_t opcode);
 extern void r3k_pop_su(uint8_t opcode);
@@ -326,6 +336,15 @@ extern void zilog_outd(uint8_t opcode);
 extern void zilog_otir(uint8_t opcode);
 extern void zilog_otdr(uint8_t opcode);
 
+// i8085
+extern void i8085_rim(uint8_t opcode);
+extern void i8085_sim(uint8_t opcode);
+extern void i8085_rstv(uint8_t opcode);
+extern void i8085_ld_de_hln(uint8_t opcode);
+extern void i8085_ld_de_spn(uint8_t opcode);
+extern void i8085_ld_hl_ide(uint8_t opcode);
+extern void i8085_ld_ide_hl(uint8_t opcode);
+extern void i8085_sub_hl_bc(uint8_t opcode);
 
 #ifndef WIN32
 extern int kbhit();

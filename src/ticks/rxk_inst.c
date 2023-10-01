@@ -83,6 +83,7 @@ void rxk_ld_ispn_hl(uint8_t opcode, uint8_t ih, uint8_t iy)
 
 void rxk_bool(uint8_t opcode, uint8_t ih, uint8_t iy)
 {
+    SUSPECT_IMPL("Need to set P flag");
     if ( ih ) {
         BOOL(h,l, h_, l_, altd);
     } else if ( iy ) {
@@ -95,6 +96,7 @@ void rxk_bool(uint8_t opcode, uint8_t ih, uint8_t iy)
 
 void rxk_and_hlxy_de(uint8_t opcode, uint8_t ih, uint8_t iy)
 {
+    SUSPECT_IMPL("Incorrect flags");
     if ( ih ) {
         AND2(h,d,h_);
         AND2(l,e,e_);
@@ -110,6 +112,7 @@ void rxk_and_hlxy_de(uint8_t opcode, uint8_t ih, uint8_t iy)
 
 void rxk_or_hlxy_de(uint8_t opcode, uint8_t ih, uint8_t iy)
 {
+    SUSPECT_IMPL("Incorrect flags");
     if ( ih ) {
         OR2(h,d,h_);
         OR2(l,e,e_);
@@ -325,6 +328,42 @@ void rxk_ljp(uint8_t opcode)
 {
     UNIMPLEMENTED(opcode, "ljp x,mn");
     st += 10;
+}
+
+void rxk_ipres(uint8_t opcode)
+{
+    UNIMPLEMENTED(opcode, "ipres");
+    st += 4;
+}
+
+void rxk_ipset(uint8_t opcode)
+{
+    UNIMPLEMENTED(opcode, "ipset");
+    st += 4;
+}
+
+void rxk_ld_eir_a(uint8_t opcode)
+{
+    UNIMPLEMENTED(opcode, "ld eir,a");
+    st += 4;
+}
+
+void rxk_ld_iir_a(uint8_t opcode)
+{
+    UNIMPLEMENTED(opcode, "ld iir,a");
+    st += 4;
+}
+
+void rxk_ld_a_eir(uint8_t opcode)
+{
+    UNIMPLEMENTED(opcode, "ld a,eir");
+    st += 4;
+}
+
+void rxk_ld_a_iir(uint8_t opcode)
+{
+    UNIMPLEMENTED(opcode, "ld a,iir");
+    st += 4;
 }
 
 

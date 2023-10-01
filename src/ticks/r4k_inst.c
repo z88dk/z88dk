@@ -1295,9 +1295,21 @@ void r4k_callxy(uint8_t opcode, uint8_t iy)
     else mp = pc = (xh<<8)|xl;
 }
 
+void r4k_flag_cc_hl(uint8_t opcode, uint8_t set)
+{
+    h = l = 0;
+    if (set) l = 1;
+    st += 4;
+}
+
 void r4k_neg_hl(uint8_t opcode)
 {
      UNIMPLEMENTED(opcode, "neg hl");
+}
+
+void r4k_xor_hl_de(uint8_t opcode)
+{
+     UNIMPLEMENTED(opcode, "xor hl,de");
 }
 
 void r4k_test_hlxy(uint8_t opcode, uint8_t prefix)
@@ -1479,6 +1491,7 @@ void r4k_alu_jkhl_bcde(uint8_t opcode)
 
 void r4k_ld_pd_ihtrhl(uint8_t opcode)
 {
+    altd=0;
     UNIMPLEMENTED( 0xed00|opcode, "ld pd,(htr+hl)");
     st += 14;
 }
@@ -1496,7 +1509,7 @@ void r4k_copyr(uint8_t opcode)
 
 void r4k_ld_hl_lxpc(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "ld hl,xpc");
+    UNIMPLEMENTED(opcode, "ld hl,lxpc");
     st += 2;
 }
 
