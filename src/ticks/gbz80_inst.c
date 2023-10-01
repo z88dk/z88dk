@@ -23,7 +23,7 @@ void gbz80_add_sp_d(void)
     else ff &= ~256;
 }
 
-void gbz80_ld_hl_spn(void)
+void gbz80_ld_hl_spd(void)
 {
     uint16_t t;
     st += 12;
@@ -34,7 +34,7 @@ void gbz80_ld_hl_spn(void)
 
 void gbz80_ld_inm_a(void)
 {
-    uint8_t t;
+    uint16_t t;
 
     st+= 16;
     t= get_memory_inst(pc++);

@@ -210,7 +210,7 @@ extern void z80n_add_bc_a(void);
 // gbz80
 extern void gbz80_ld_inm_sp(void);
 extern void gbz80_add_sp_d(void);
-extern void gbz80_ld_hl_spn(void);
+extern void gbz80_ld_hl_spd(void);
 extern void gbz80_ld_inm_a(void);
 extern void gbz80_ld_a_inm(void);
 

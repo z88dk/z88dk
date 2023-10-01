@@ -3088,7 +3088,7 @@ int main (int argc, char **argv){
 		}
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf8: // RET M
-        if ( isgbz80() ) gbz80_ld_hl_spn();
+        if ( isgbz80() ) gbz80_ld_hl_spd();
         else RETCI(ff&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc1: // POP BC
