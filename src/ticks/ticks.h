@@ -214,6 +214,17 @@ extern void gbz80_ld_hl_spd(void);
 extern void gbz80_ld_inm_a(void);
 extern void gbz80_ld_a_inm(void);
 
+// r800
+extern void r800_mulub(uint8_t opcode);
+extern void r800_muluw(uint8_t opcode);
+
+// z180
+extern void z180_mlt(uint8_t opcode);
+extern void z180_otim(uint8_t opcode);
+extern void z180_otimr(uint8_t opcode);
+extern void z180_otdm(uint8_t opcode);
+extern void z180_otdmr(uint8_t opcode);
+
 #ifndef WIN32
 extern int kbhit();
 extern int getch();

@@ -4423,110 +4423,54 @@ static void handle_ed_page(void)
         if ( isz80n()) z80n_ldpirx();
         else st += 8;
         break;
-    case 0xf9:   // (R800) MULUB A,A
-        if ( isr800() ) { // MULUB A,A
-            uint16_t v = a * a;  
-            h = (v >> 8) & 0xff;
-            l = v & 0xff;
-            st += 14;
-        } else { 
-            st += 8; 
-        }
-        break;
+
     case 0xc1:   // (R800) MULUB A,B // (R4K) POP PW
         if ( israbbit4k()) r4k_pop_pd(opc);
-        else if ( isr800() ) { // MULB A,B
-            uint16_t v = a * b;  
-            h = (v >> 8) & 0xff;
-            l = v & 0xff;
-            st += 14;
-        } else st += 8; 
+        else if ( isr800() ) r800_mulub(opc); // MULUB A,B
+        else st += 8; 
         break;
     case 0xc9:   // (R800) MULUB A,C
-        if ( isr800() ) { // MULB A,C
-            uint16_t v = a * c;  
-            h = (v >> 8) & 0xff;
-            l = v & 0xff;
-            st += 14;
-        } else st += 8; 
+        if ( isr800() ) r800_mulub(opc); // MULUB A,C
+        else st += 8; 
         break;
     case 0xd1:   // (R800) MULUB A,D // (R4K) POP PX
         if ( israbbit4k()) r4k_pop_pd(opc);
-        else if ( isr800() ) { // MULUB A,D
-            uint16_t v = a * d;  
-            h = (v >> 8) & 0xff;
-            l = v & 0xff;
-            st += 14;
-        } else st += 8; 
+        else if ( isr800() ) r800_mulub(opc); // MULUB A,D
+        else st += 8; 
         break;
     case 0xd9:   // (R800) MULUB A,E
-        if ( isr800() ) { // MULB A,E
-            uint16_t v = a * e;  
-            h = (v >> 8) & 0xff;
-            l = v & 0xff;
-            st += 14;
-        } else st += 8; 
+        if ( isr800() ) r800_mulub(opc); // MULUB A,E
+        else st += 8; 
         break;
     case 0xe1:   // (R800) MULUB A,H // (R4K) POP PY
         if ( israbbit4k()) r4k_pop_pd(opc);
-        else if ( isr800() ) { // MULUB A,H
-            uint16_t v = a * h;  
-            h = (v >> 8) & 0xff;
-            l = v & 0xff;
-            st += 14;
-        } else st += 8; 
+        else if ( isr800() ) r800_mulub(opc); // MULUB A,H
+        else st += 8; 
         break;
     case 0xe9:   // (R800) MULUB A,L
-        if ( isr800() ) { // MULB A,L
-            uint16_t v = a * l;  
-            h = (v >> 8) & 0xff;
-            l = v & 0xff;
-            st += 14;
-        } else st += 8; 
+        if ( isr800() ) r800_mulub(opc); // MULUB A,L
+        else st += 8; 
         break;
+    case 0xf9:   // (R800) MULUB A,A
+        if ( isr800() ) r800_mulub(opc); // MULUB A,A
+        else st += 8; 
+        break;
+
     case 0xc3:  // (R800) MULUW HL,BC
-        if ( isr800() ) { // MULW HL,BC
-            // DE:HL = HL • BC
-            uint32_t result = (( h * 256 ) + l) * (( b * 256 ) + c);
-            d = (result >> 24) & 0xff;
-            e = (result >> 16) & 0xff;
-            h  = (result >> 8 ) & 0xff;
-            l = result & 0xff;
-            st += 36;
-        } else st += 8; 
+        if ( isr800() ) r800_muluw(opc); // MULW HL,BC
+        else st += 8; 
         break;
     case 0xd3:  // (R800) MULUW HL,DE
-        if ( isr800() ) { // MULW HL,DE
-            // DE:HL = HL • DE
-            uint32_t result = (( h * 256 ) + l) * (( d * 256 ) + e);
-            d = (result >> 24) & 0xff;
-            e = (result >> 16) & 0xff;
-            h  = (result >> 8 ) & 0xff;
-            l = result & 0xff;
-            st += 36;
-        } else st += 8; 
+        if ( isr800() ) r800_muluw(opc); // MULW HL,DE
+        else st += 8; 
         break;
     case 0xe3:  // (R800) MULUW HL,HL
-        if ( isr800() ) { // MULW HL,HL
-            // DE:HL = HL • HL
-            uint32_t result = (( h * 256 ) + l) * (( h * 256 ) + l);
-            d = (result >> 24) & 0xff;
-            e = (result >> 16) & 0xff;
-            h  = (result >> 8 ) & 0xff;
-            l = result & 0xff;
-            st += 36;
-        } else st += 8; 
+        if ( isr800() ) r800_muluw(opc); // MULW HL,HL
+        else st += 8; 
         break;
     case 0xf3:  // (R800) MULUW HL,SP
-        if ( isr800() ) { // MULW HL,SP
-            // DE:HL = HL • SP
-            uint32_t result = (( h * 256 ) + l) * (sp & 0xffff);
-            d = (result >> 24) & 0xff;
-            e = (result >> 16) & 0xff;
-            h  = (result >> 8 ) & 0xff;
-            l = result & 0xff;
-            st += 36;
-        } else st += 8; 
+        if ( isr800() ) r800_muluw(opc); // MULW HL,SP
+        else st += 8; 
         break;
     case 0xa4:   // (ZXN) LDIX / (R4K) FLAG GT,HL
         if ( israbbit4k() ) { // FLAG GT,HL
@@ -4637,6 +4581,24 @@ static void handle_ed_page(void)
         else israbbit() ? 4 : 8;
         break;
 
+    case 0x83:
+        if ( canz180()) z180_otim(opc);
+        else israbbit() ? 4 : 8;
+        break;
+    case 0x8b:                                         // (ZXN) popx
+        if ( canz180()) z180_otimr(opc);
+        else israbbit() ? 4 : 8;
+        st += 8;
+        break;
+    case 0x93:
+        if ( canz180()) z180_otimr(opc);
+        else israbbit() ? 4 : 8;
+        break;
+    case 0x9b:
+        if ( canz180()) z180_otdmr(opc);
+        else israbbit() ? 4 : 8;
+        break;
+
     case 0x00: case 0x01:       // NOP
     case 0x0a: case 0x0b:
     case 0x0e:
@@ -4646,13 +4608,12 @@ static void handle_ed_page(void)
     case 0x20: case 0x21:
     case 0x2e:
     case 0x77: case 0x7f:
-    case 0x80: case 0x81: case 0x82: case 0x83:
+    case 0x80: case 0x81: case 0x82:
     case 0x84: case 0x85: case 0x86: case 0x87:
     case 0x88: case 0x89:
     case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-    case 0x93:
     case 0x94: case 0x95: case 0x96: case 0x97:
-    case 0x98: case 0x99: case 0x9a: case 0x9b:
+    case 0x98: case 0x99: case 0x9a:
     case 0x9c: case 0x9d: case 0x9e: case 0x9f:
     case 0xa6: case 0xa7:
     case 0xad: case 0xae: case 0xaf:
@@ -4756,9 +4717,6 @@ static void handle_ed_page(void)
     case 0x8a:                                         // (ZXN) push $xxxx
         if ( isz80n() ) z80n_push_mn();
         else st += 8;
-        break;
-    case 0x8b:                                         // (ZXN) popx
-        st += 8;
         break;
     case 0x27:                                         // (ZXN) tst $xx (EZ80) ld hl,(hl) // (R4K) LD (PY+BC),HL
         if ( israbbit4k() ) r4k_ld_ipdbc_hl(opc);
@@ -4888,36 +4846,24 @@ static void handle_ed_page(void)
                 sp= get_memory_data(t|= get_memory_inst(pc++)<<8);
                 sp|= get_memory_data(mp= t+1) << 8; break;
     case 0x4c:                                         // (Z180) MLT BC
-        if ( canz180() ) {
-            uint16_t v = b * c;
-            b = v >> 8;
-            c = v;
-            st += isez80() ? 6 : 17;
-        } else {  // (Z80) Undocumented NEG
+        if ( canz180() ) z180_mlt(opc);
+        else {  // (Z80) Undocumented NEG
             st+= 8;
             fr= a= (ff= (fb= ~a)+1);
             fa= 0;
         }
         break;
     case 0x5c:                                         // (Z180) MLT DE
-        if ( canz180() ) {
-            uint16_t v = d * e;
-            d = v >> 8;
-            e = v;
-            st += isez80() ? 6 : 17;
-        } else {  // (Z80) Undocumented NEG
+        if ( canz180() ) z180_mlt(opc);
+         else {  // (Z80) Undocumented NEG
             st+= 8;
             fr= a= (ff= (fb= ~a)+1);
             fa= 0;
         }
         break;
     case 0x6c:                                         // (Z180) MLT HL
-        if ( canz180() ) {
-            uint16_t v = h * l;
-            h = v >> 8;
-            l = v;
-            st += isez80() ? 6 : 17;
-        } else {  // (Z80) Undocumented NEG
+        if ( canz180() ) z180_mlt(opc);
+        else {  // (Z80) Undocumented NEG
             st+= 8;
             fr= a= (ff= (fb= ~a)+1);
             fa= 0;
@@ -4935,6 +4881,7 @@ static void handle_ed_page(void)
         // Fall through for z80 case
     case 0x7c:   // (R4k) EX JK',HL
         if ( israbbit4k() ) { r4k_ex_jk1_hl(opc); break; }
+        else if ( canz180() ) z180_mlt(opc);   // (Z180) MLT SP
         // Fall through for z80 case
     case 0x44:       // NEG
     case 0x74: 
