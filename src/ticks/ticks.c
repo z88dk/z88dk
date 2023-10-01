@@ -493,9 +493,10 @@
             fb= 0;              \
         } while (0)
 
-#define SWAP(r)                 \
+#define SWAP(r) do {            \
           r = (( r & 0xf0) >> 4) | (( r & 0x0f) << 4);  \
-          st += 8
+          st += 8;              \
+        } while (0)
 
 #define SRL(r,r_) do {          \
           st+=isez80() ? 2 : israbbit() ? 4 : isz180() ? 7 : isr800() ? 2 : 8; \
@@ -3988,25 +3989,17 @@ static void handle_ed_page(void)
     switch( (opc = get_memory_inst(pc++)) ){
     case 0x02:    // (EZ80) LEA BC,IX+d // (R4K) SBOX A
         if ( israbbit4k()) r4k_sbox_a(opc);
-        else if ( isez80() ) { // LEA BC,IX+d
-            LEA(b, c, xh, xl, 3);
-        } else {
-            st += 8;
-        }
+        else if ( isez80() ) LEA(b, c, xh, xl, 3); // LEA BC,IX+d
+        else st += 8;
         break;
     case 0x03:    // (EZ80) LEA BC,IY+d // (R4K) LDL PW,(SP+n)
-        if ( israbbit4k() ) {
-            r4k_ldl_pd_ispn(opc);
-        } else if ( isez80() ) { // LEA BC,IY+d
-            LEA(b, c, yh, yl, 3);
-        } else {
-            st += 8;
-        }
+        if ( israbbit4k() ) r4k_ldl_pd_ispn(opc);
+        else if ( isez80() ) LEA(b, c, yh, yl, 3); // LEA BC,IY+d
+        else st += 8;
         break;
     case 0x04:    // (Z180) TST A,B // (R4K) LD PW,(SP+n)
-        if ( israbbit4k() ) {
-            r4k_ld_pd_ispn(opc);
-        } else if ( canz180() ) TEST(b, isez80() ? 2 : 7);
+        if ( israbbit4k() ) r4k_ld_pd_ispn(opc);
+        else if ( canz180() ) TEST(b, isez80() ? 2 : 7);
         else st += 8;
         break;
     case 0x07:    // (EZ80) ld bc,(hl) // (R4K) LD (PW+BC),HL
@@ -4036,20 +4029,13 @@ static void handle_ed_page(void)
         break;
     case 0x12:    // (EZ80) LEA DE,IX+d // (R4K) IBOX A
         if (israbbit4k()) r4k_ibox_a(opc);
-        else if ( isez80() ) { // LEA DE,IX+d
-            LEA(d, e, xh, xl, 3);
-        } else {
-            st += 8;
-        }
+        else if ( isez80() ) LEA(d, e, xh, xl, 3); // LEA DE,IX+d
+        else st += 8;
         break;
     case 0x13:    // (EZ80) LEA DE,IY+d // (R4K) LDL PX,(SP+n)
-        if ( israbbit4k() ) {
-            r4k_ldl_pd_ispn(opc);
-        } else if ( isez80() ) { // LEA DE,IY+d
-            LEA(d, e, yh, yl, 3);
-        } else {
-            st += 8;
-        }
+        if ( israbbit4k() ) r4k_ldl_pd_ispn(opc);
+        else if ( isez80() ) LEA(d, e, yh, yl, 3); // LEA DE,IY+d
+        else st += 8;
         break;
     case 0x14:    // (Z180) TST A,D // (R4K) LD PX,(SP+n)
         if ( israbbit4k() ) r4k_ld_pd_ispn(opc);
@@ -4080,22 +4066,14 @@ static void handle_ed_page(void)
         }
         break;
     case 0x22:    // (EZ80) LEA HL,IX+d
-        if ( isez80() ) { // LEA HL,IX+d
-            LEA(h, l, xh, xl, 3);
-        } else {
-            st += 8;
-        }
+        if ( isez80() ) LEA(h, l, xh, xl, 3); // LEA HL,IX+d
+        else st += 8;
         break;
     case 0x23:    // (EZ80) LEA HL,IY+d, (ZXN) swapnib // (R4K) LDL PY,(SP+n)
-        if ( israbbit4k() ) {
-            r4k_ldl_pd_ispn(opc);
-        } else if ( isez80() ) { // LEA HL,IY+d
-            LEA(h, l, yh, yl, 3);
-        } else if ( isz80n() ) { // SWAPNIB
-            SWAP(a);
-        } else {
-            st += 8;
-        }
+        if ( israbbit4k() ) r4k_ldl_pd_ispn(opc);
+        else if ( isez80() ) LEA(h, l, yh, yl, 3); // LEA HL,IY+d
+        else if ( isz80n() ) SWAP(a); // SWAPNIB
+        else st += 8;
         break;
     case 0x24:    // (Z180) TST A,D // (Z80N) MIRROR // (R4K) LD PY,(SP+n)
         if ( israbbit4k() ) r4k_ld_pd_ispn(opc);
@@ -4199,17 +4177,14 @@ static void handle_ed_page(void)
         }
         break;
     case 0x32:    // (EZ80) LEA IX,IX+d, (ZXN) add de,a
-        if ( isez80() ) { // LEA IX,IX+d
-            LEA(xh, xl, xh, xl, 3);
-        } else if ( isz80n() ) z80n_add_de_a();
+        if ( isez80() ) LEA(xh, xl, xh, xl, 3); // LEA IX,IX+d
+        else if ( isz80n() ) z80n_add_de_a();
         else st += 8;
         break;
     case 0x33:    // (EZ80) LEA IY,IY+d, (ZXN) add bc,a // (R4K) LDL PZ,(SP+n)
-        if ( israbbit4k() ) {
-            r4k_ldl_pd_ispn(opc);
-        } else if ( isez80() ) { // LEA IY,IY+d
-            LEA(yh, yl, yh, yl, 3);
-        } else if ( isz80n() ) z80n_add_bc_a();
+        if ( israbbit4k() ) r4k_ldl_pd_ispn(opc);
+        else if ( isez80() ) LEA(yh, yl, yh, yl, 3); // LEA IY,IY+d
+        else if ( isz80n() ) z80n_add_bc_a();
         else st += 8;
         break;
     case 0x3e:    // (EZ80) ld (hl),iy // (R4k) CONVC PZ
@@ -4313,64 +4288,40 @@ static void handle_ed_page(void)
         else st += 8; 
         break;
     case 0xa4:   // (ZXN) LDIX / (R4K) FLAG GT,HL
-        if ( israbbit4k() ) { // FLAG GT,HL
-            h = l = 0;
-            if (F_GT(f())) l = 1;
-            st += 4;
-        } else if ( isz80n()) z80n_ldix();
-         else st += 8;
+        if ( israbbit4k() ) r4k_flag_cc_hl(opc,F_GT(f()));  // FLAG GT,HL
+        else if ( isz80n()) z80n_ldix();
+        else st += 8;
         break;
     case 0xac:   // (ZXN) LDDX / (R4K) FLAG GTU,HL
-        if ( israbbit4k() ) { // FLAG GTU,HL
-            h = l = 0;
-            if (F_GTU(f())) l = 1;
-            st += 4;
-        } else if ( isz80n()) z80n_lddx();
+        if ( israbbit4k() ) r4k_flag_cc_hl(opc,F_GTU(f()));  // FLAG GTU,HL
+        else if ( isz80n()) z80n_lddx();
         else st += 8;
         break;
     case 0xb4:   // (ZXN) LDIRX / (R4K) FLAG LT,HL
-        if ( israbbit4k() ) { // FLAG LT,HL
-            h = l = 0;
-            if (F_LT(f())) l = 1;
-            st += 4;
-        } else if ( isz80n() ) z80n_ldirx();
-         else st += 8;
+        if ( israbbit4k() ) r4k_flag_cc_hl(opc,F_LT(f()));  // FLAG LT,HL
+        else if ( isz80n() ) z80n_ldirx();
+        else st += 8;
         break;
     case 0xbc:   // (ZXN) LDDRX / (R4K) FLAG V,HL
-        if ( israbbit4k() ) { // FLAG V,HL
-            h = l = 0;
-            if (F_V(f())) l = 1;
-            st += 4;
-        } else if ( isz80n()) z80n_ldirx();
+        if ( israbbit4k() ) r4k_flag_cc_hl(opc,F_V(f()));  // FLAG V,HL
+        else if ( isz80n()) z80n_lddrx();
         else st += 8;
         break;
     case 0xc4:   // (R4K) FLAG NZ,HL
-        if ( israbbit4k() ) { // FLAG NZ,HL
-            h = l = 0;
-            if (fr) l = 1;
-            st += 4;
-        } else st += 8;
+        if ( israbbit4k() ) r4k_flag_cc_hl(opc, fr); // FLAG NZ,HL
+        else st += 8;
         break;
     case 0xcc:   // (R4K) FLAG Z,HL
-        if ( israbbit4k() ) { // FLAG Z,HL
-            h = l = 0;
-            if (!fr) l = 1;
-            st += 4;
-        } else st += 8;
+        if ( israbbit4k() ) r4k_flag_cc_hl(opc, !fr); // FLAG Z,HL
+        else st += 8;
         break;
     case 0xd4:   // (R4K) FLAG NC,HL
-        if ( israbbit4k() ) { // FLAG NC,HL
-            h = l = 0;
-            if (ff&256) l = 1;
-            st += 4;
-        } else st += 8;
+        if ( israbbit4k() ) r4k_flag_cc_hl(opc, !(ff&256)); // FLAG NC,HL
+        else st += 8;
         break;
     case 0xdc:   // (R4K) FLAG C,HL
-        if ( israbbit4k() ) { // FLAG C,HL
-            h = l = 0;
-            if ((ff&256) == 0) l = 1;
-            st += 4;
-        } else st += 8;
+        if ( israbbit4k() ) r4k_flag_cc_hl(opc, (ff&256)); // FLAG C,HL
+        else st += 8;
         break;
     case 0x10:  // (R4K) DWJNZ d // (Z180) IN0 d,(n)
         if ( israbbit4k() ) r4k_dwjnz(opc);

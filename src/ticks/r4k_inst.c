@@ -1295,6 +1295,13 @@ void r4k_callxy(uint8_t opcode, uint8_t iy)
     else mp = pc = (xh<<8)|xl;
 }
 
+void r4k_flag_cc_hl(uint8_t opcode, uint8_t set)
+{
+    h = l = 0;
+    if (set) l = 1;
+    st += 4;
+}
+
 void r4k_neg_hl(uint8_t opcode)
 {
      UNIMPLEMENTED(opcode, "neg hl");
