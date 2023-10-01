@@ -221,6 +221,14 @@ extern void r4k_setusrp_mn(uint8_t opcode);
 extern void r4k_fsyscall(uint8_t opcode);
 extern void r4k_syscall(uint8_t opcode);
 extern void r4k_sysret(uint8_t opcode);
+extern void r4k_llret(uint8_t opcode);
+extern void r4k_lljp(uint8_t opcode, uint8_t dojump);
+extern void r4k_llcall(uint8_t opcode);
+extern void r4k_llcall_jkhl(uint8_t opcode);
+extern void r4k_cbm(uint8_t opcode);
+extern void r4k_sbox_a(uint8_t opcode);
+extern void r4k_ibox_a(uint8_t opcode);
+extern void r4k_ld_pd_ihtrhl(uint8_t opcode);
 
 // rxk
 extern void rxk_ld_hl_ispn(uint8_t opcode, uint8_t ih, uint8_t iy);
@@ -238,6 +246,14 @@ extern void rxk_ld_xpc_a(uint8_t opcode);
 extern void rxk_ld_a_xpc(uint8_t opcode);
 extern void rxk_push_ip(uint8_t opcode);
 extern void rxk_pop_ip(uint8_t opcode);
+extern void rxk_ldp_hl_irr(uint8_t opcode, uint8_t prefix);
+extern void rxk_ldp_rr_inm(uint8_t opcode, uint8_t prefix);
+extern void rxk_ldp_inm_rr(uint8_t opcode, uint8_t prefix);
+extern void rxk_ldp_irr_hl(uint8_t opcode, uint8_t prefix);
+extern void rxk_lret(uint8_t opcode);
+extern void rxk_lcall(uint8_t opcode);
+extern void rxk_ljp(uint8_t opcode);
+
 
 extern void r3k_push_su(uint8_t opcode);
 extern void r3k_pop_su(uint8_t opcode);

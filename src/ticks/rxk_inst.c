@@ -243,6 +243,90 @@ void rxk_pop_ip(uint8_t opcode)
 
 
 
+void rxk_ldp_hl_irr(uint8_t opcode, uint8_t prefix)
+{
+    switch (prefix) {
+    case 0xed:
+        UNIMPLEMENTED(0xed00|opcode, "ldp hl,(hl)");
+        break;
+    case 0xdd:
+        UNIMPLEMENTED(0xed00|opcode, "ldp hl,(ix)");
+        break;
+    case 0xfd:
+        UNIMPLEMENTED(0xfd00|opcode, "ldp hl,(iy)");
+        break;
+    }
+    st += 10;
+}
+
+void rxk_ldp_rr_inm(uint8_t opcode, uint8_t prefix)
+{
+    switch (prefix) {
+    case 0xed:
+        UNIMPLEMENTED(0xed00|opcode, "ldp hl,(nm)");
+        break;
+    case 0xdd:
+        UNIMPLEMENTED(0xed00|opcode, "ldp ix,(nm)");
+        break;
+    case 0xfd:
+        UNIMPLEMENTED(0xfd00|opcode, "ldp iy,(nm)");
+        break;
+    }
+    st += 13;
+}
+
+void rxk_ldp_inm_rr(uint8_t opcode, uint8_t prefix)
+{
+    switch (prefix) {
+    case 0xed:
+        UNIMPLEMENTED(0xed00|opcode, "ldp (nm),hl");
+        break;
+    case 0xdd:
+        UNIMPLEMENTED(0xed00|opcode, "ldp (nm),ix");
+        break;
+    case 0xfd:
+        UNIMPLEMENTED(0xfd00|opcode, "ldp (nm),iy");
+        break;
+    }
+    st += 15;
+}
+
+
+
+void rxk_ldp_irr_hl(uint8_t opcode, uint8_t prefix)
+{
+    switch (prefix) {
+    case 0xed:
+        UNIMPLEMENTED(0xed00|opcode, "ldp (hl),hl");
+        break;
+    case 0xdd:
+        UNIMPLEMENTED(0xed00|opcode, "ldp (ix),hl");
+        break;
+    case 0xfd:
+        UNIMPLEMENTED(0xfd00|opcode, "ldp (iy),hl");
+        break;
+    }
+    st += 12;
+}
+
+void rxk_lret(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "lret");
+    st += 13;
+}
+
+void rxk_lcall(uint8_t opcode)
+{
+    UNIMPLEMENTED(opcode, "lcall x,mn");
+    st += 19;
+}
+
+void rxk_ljp(uint8_t opcode)
+{
+    UNIMPLEMENTED(opcode, "ljp x,mn");
+    st += 10;
+}
+
 
 void r3k_push_su(uint8_t opcode)
 {

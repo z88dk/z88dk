@@ -1387,6 +1387,47 @@ void r4k_jre(uint8_t opcode, uint8_t dojump)
     }
 }
 
+
+void r4k_lljp(uint8_t opcode, uint8_t dojump)
+{
+    if (opcode == 0x87) {
+        UNIMPLEMENTED( opcode, "lljp lxpc,mn");
+    } else {
+        UNIMPLEMENTED( 0xed00 | opcode, "lljp cc/cx,lxpc,mn");
+    }
+    st += 14;
+}
+
+void r4k_llcall(uint8_t opcode)
+{
+    UNIMPLEMENTED( opcode, "llcall lxpc,mn");
+    st += 24;
+}
+
+void r4k_llcall_jkhl(uint8_t opcode)
+{
+    UNIMPLEMENTED( opcode, "llcall (jkhl)");
+    st += 19;
+}
+
+void r4k_cbm(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "cbm n");
+    st += 15;
+}
+
+void r4k_sbox_a(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "sbox a");
+    st += 4;
+}
+
+void r4k_ibox_a(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "sbox a");
+    st += 4;
+}
+
 void r4k_convc(uint8_t opcode)
 {
     UNIMPLEMENTED( 0xed00|opcode, "convc pp");
@@ -1436,6 +1477,12 @@ void r4k_alu_jkhl_bcde(uint8_t opcode)
 }
 
 
+void r4k_ld_pd_ihtrhl(uint8_t opcode)
+{
+    UNIMPLEMENTED( 0xed00|opcode, "ld pd,(htr+hl)");
+    st += 14;
+}
+
 
 void r4k_copy(uint8_t opcode)
 {
@@ -1481,6 +1528,12 @@ void r4k_sysret(uint8_t opcode)
 {
     UNIMPLEMENTED(0xed00|opcode, "sysret");
     st += 10;
+}
+
+void r4k_llret(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "llret");
+    st += 14;
 }
 
 
