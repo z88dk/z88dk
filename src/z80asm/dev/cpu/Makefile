@@ -20,4 +20,3 @@ cpu_test_z80_ok.asm: opcodes.yaml make_cpu_test.pl Makefile
 all: cpu_rules.h
 cpu_rules.h: opcodes.yaml make_cpu_rules.pl Makefile
 	perl make_cpu_rules.pl opcodes.yaml cpu_rules.h && dos2unix cpu_rules.h 2> /dev/null
-

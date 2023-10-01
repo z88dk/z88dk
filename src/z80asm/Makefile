@@ -129,13 +129,15 @@ ifeq ($(DEVELOPER),1)
 endif
 
 # opcode tables generator
-dev: src/c/cpu_rules.h
+dev: src/c/cpu_rules.h src/c/cpu_rules_action.c src/c/cpu_rules_action.h
 
-src/c/cpu_rules.h: \
+src/c/cpu_rules.h src/c/cpu_rules_action.c src/c/cpu_rules_action.h: \
 			$(wildcard dev/cpu/*.pl dev/cpu/*.y) dev/cpu/Makefile Makefile
 ifeq ($(DEVELOPER),1)
 	$(MAKE) -C dev/cpu
 	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
+	cp dev/cpu/cpu_rules_action.c src/c/cpu_rules_action.c
+	cp dev/cpu/cpu_rules_action.h src/c/cpu_rules_action.h
 endif
 
 # reloc routine
@@ -190,7 +192,6 @@ test: $(PROJ)$(EXESUFFIX) z80asm_lib
 testdev: $(PROJ)$(EXESUFFIX)
 	$(MAKE) dev
 	$(MAKE) z80asm_lib
-	$(MAKE) -C dev/z80asm_lib test
 	$(MAKE) test
 
 testlib:

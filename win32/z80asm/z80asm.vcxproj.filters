@@ -156,6 +156,12 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\scan.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\cpu_rules.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\cpu_rules_action.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\src\c\alloc.c">
@@ -256,6 +262,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\cpp\scan.cpp">
       <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\cpu_rules_action.c">
+      <Filter>Source Files\c</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

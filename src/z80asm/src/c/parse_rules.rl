@@ -12,98 +12,6 @@ Define rules for a ragel-based parser.
 #include "tokens.h"
 
 /*-----------------------------------------------------------------------------
-*   Helper macros
-*----------------------------------------------------------------------------*/
-
-/* macros for actions - labels */
-#define DO_STMT_LABEL() asm_cond_LABEL(stmt_label)
-
-/* macros for actions - statements */
-#define DO_stmt(opcode) \
-			do { \
-				DO_STMT_LABEL(); \
-				add_opcode(opcode); \
-			} while(0)
-
-#define _DO_stmt_(suffix, opcode) \
-			do { \
-			 	Expr1 *expr = pop_expr(ctx); \
-				DO_STMT_LABEL(); \
-				add_opcode_##suffix((opcode), expr); \
-			} while(0)
-
-#define DO_stmt_jr( opcode)		_DO_stmt_(jr,		opcode)
-#define DO_stmt_jre( opcode)	_DO_stmt_(jre,		opcode)
-#define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
-#define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
-#define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
-#define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
-#define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
-
-#define DO_stmt_nn( opcode) \
-			do { \
-			 	Expr1 *expr = pop_expr(ctx); \
-				DO_STMT_LABEL(); \
-				add_opcode_nn((opcode), expr, 0); \
-			} while(0)
-
-#define DO_stmt_nnn( opcode) \
-			do { \
-			 	Expr1 *expr = pop_expr(ctx); \
-				DO_STMT_LABEL(); \
-				add_opcode_nnn((opcode), expr, 0); \
-			} while(0)
-
-
-#define DO_stmt_nnnn( opcode)	_DO_stmt_(nnnn,		opcode)
-#define DO_stmt_NN( opcode)		_DO_stmt_(NN,		opcode)
-#define DO_stmt_idx(opcode)		_DO_stmt_(idx,		opcode)
-
-#define DO_stmt_idx_n(opcode) \
-			do { \
-			 	Expr1 *n_expr   = pop_expr(ctx); \
-				Expr1 *idx_expr = pop_expr(ctx); \
-				DO_STMT_LABEL(); \
-				add_opcode_idx_n((opcode), idx_expr, n_expr); \
-			} while(0)
-
-#define DO_stmt_n_n(opcode) \
-			do { \
-			 	Expr1 *n2_expr = pop_expr(ctx); \
-				Expr1 *n1_expr = pop_expr(ctx); \
-				DO_STMT_LABEL(); \
-				add_opcode_n_n((opcode), n1_expr, n2_expr); \
-			} while(0)
-
-#define DO_stmt_idx_idx1(opcode0, opcode1) \
-			do { \
-			 	Expr1 *idx_expr = pop_expr(ctx); \
-				DO_STMT_LABEL(); \
-				add_opcode_idx_idx1((opcode0), (opcode1), idx_expr); \
-			} while(0)
-
-#define DO_stmt_nn_nn(opcode0, opcode1) \
-			do { \
-			 	Expr1 *expr = pop_expr(ctx); \
-				DO_STMT_LABEL(); \
-				add_opcode_nn_nn((opcode0), (opcode1), expr); \
-			} while(0)
-
-#define DO_stmt_jr_jr(opcode0, opcode1) \
-			do { \
-			 	Expr1 *expr = pop_expr(ctx); \
-				DO_STMT_LABEL(); \
-				add_opcode_jr_jr((opcode0), (opcode1), expr); \
-			} while(0)
-
-#define DO_stmt_defb() \
-			do { \
-			 	Expr1 *expr = pop_expr(ctx); \
-				DO_STMT_LABEL(); \
-				add_opcode_defb(expr); \
-			} while(0)
-
-/*-----------------------------------------------------------------------------
 *   State Machine
 *----------------------------------------------------------------------------*/
 
@@ -163,21 +71,21 @@ Define rules for a ragel-based parser.
 	/* expression */
 	expr 	= expr1
 			  >expr_start_action
-			  %{ expr_in_parens = check_expr_in_parens(ctx->expr_start, ctx->p);
+			  %{ ctx->expr_in_parens = check_expr_in_parens(ctx->expr_start, ctx->p);
 			     push_expr(ctx); };
 
 	const_expr =
-			  expr %{ pop_eval_expr(ctx, &expr_value, &expr_error); };
+			  expr %{ pop_eval_expr(ctx, &ctx->expr_value, &ctx->expr_error); };
 
 	/*---------------------------------------------------------------------
 	*   DEFGROUP
 	*--------------------------------------------------------------------*/
 	defgroup_var_value =
 		  name _TK_EQUAL const_expr
-		  %{ if (expr_error)
+		  %{ if (ctx->expr_error)
 				error_expected_const_expr();
 			else {
-				asm_DEFGROUP_start(expr_value);
+				asm_DEFGROUP_start(ctx->expr_value);
 				asm_DEFGROUP_define_const(Str_data(name));
 			}
 		  };
@@ -236,22 +144,22 @@ Define rules for a ragel-based parser.
 												ctx->current_sm = SM_MAIN; }
 #foreach <S> in B, W, P, Q
 		|	name _TK_DS_<S> const_expr _TK_NEWLINE
-											@{ 	if (expr_error)
+											@{ 	if (ctx->expr_error)
 													error_expected_const_expr();
 												else
 													asm_DEFVARS_define_const( Str_data(name),
 																			  DEFVARS_SIZE_<S>,
-																			  expr_value );
+																			  ctx->expr_value );
 											}
 #endfor  <S>
 #foreach <S> in B, W, P, Q
 		|	name _TK_DS_<S> const_expr _TK_RCURLY _TK_NEWLINE
-											@{ 	if (expr_error)
+											@{ 	if (ctx->expr_error)
 													error_expected_const_expr();
 												else
 													asm_DEFVARS_define_const( Str_data(name),
 																			  DEFVARS_SIZE_<S>,
-																			  expr_value );
+																			  ctx->expr_value );
 												ctx->current_sm = SM_MAIN;
 											}
 #endfor  <S>
@@ -259,24 +167,24 @@ Define rules for a ragel-based parser.
 
 	asm_DEFVARS =
 		  _TK_DEFVARS const_expr _TK_NEWLINE
-											@{ 	if (expr_error)
+											@{ 	if (ctx->expr_error)
 													error_expected_const_expr();
 												else
-													asm_DEFVARS_start(expr_value);
+													asm_DEFVARS_start(ctx->expr_value);
 												ctx->current_sm = SM_DEFVARS_OPEN;
 											}
 		| _TK_DEFVARS const_expr _TK_LCURLY _TK_NEWLINE
-											@{ 	if (expr_error)
+											@{ 	if (ctx->expr_error)
 													error_expected_const_expr();
 												else
-													asm_DEFVARS_start(expr_value);
+													asm_DEFVARS_start(ctx->expr_value);
 												ctx->current_sm = SM_DEFVARS_LINE;
 											}
 		| _TK_DEFVARS const_expr _TK_LCURLY
-											@{ 	if (expr_error)
+											@{ 	if (ctx->expr_error)
 													error_expected_const_expr();
 												else
-													asm_DEFVARS_start(expr_value);
+													asm_DEFVARS_start(ctx->expr_value);
 												ctx->current_sm = SM_DEFVARS_LINE;
 											}
 		  defvars_define
@@ -303,29 +211,29 @@ Define rules for a ragel-based parser.
 	asm_DEFS =
 		  label? (_TK_DEFS | _TK_DS) const_expr _TK_NEWLINE
 		  @{ DO_STMT_LABEL();
-		     if (expr_error)
+		     if (ctx->expr_error)
 				error_expected_const_expr();
 			 else
-				asm_DEFS(expr_value, option_filler()); }
+				asm_DEFS(ctx->expr_value, option_filler()); }
 		| label? (_TK_DEFS | _TK_DS)
 				const_expr _TK_COMMA
-				@{ if (expr_error)
+				@{ if (ctx->expr_error)
 					  error_expected_const_expr();
-			       value1 = expr_error ? 0 : expr_value;
-				   expr_error = false;
+			       value1 = ctx->expr_error ? 0 : ctx->expr_value;
+				   ctx->expr_error = false;
 				}
 				const_expr _TK_NEWLINE
 		  @{ DO_STMT_LABEL();
-		     if (expr_error)
+		     if (ctx->expr_error)
 				error_expected_const_expr();
 			 else
-				asm_DEFS(value1, expr_value); }
+				asm_DEFS(value1, ctx->expr_value); }
 		| label? (_TK_DEFS | _TK_DS)
 				const_expr _TK_COMMA
-				@{ if (expr_error)
+				@{ if (ctx->expr_error)
 					  error_expected_const_expr();
-			       value1 = expr_error ? 0 : expr_value;
-				   expr_error = false;
+			       value1 = ctx->expr_error ? 0 : ctx->expr_value;
+				   ctx->expr_error = false;
 				}
 				string _TK_NEWLINE
 		  @{ DO_STMT_LABEL();
@@ -446,10 +354,10 @@ Define rules for a ragel-based parser.
 #foreach <OP> in CALL_OZ, CALL_PKG, FPP, INVOKE
 	asm_<OP> = label? _TK_<OP> const_expr _TK_NEWLINE
 			@{	DO_STMT_LABEL();
-			    if (expr_error)
+			    if (ctx->expr_error)
 				    error_expected_const_expr();
 			    else
-					add_Z88_<OP>(expr_value);
+					add_Z88_<OP>(ctx->expr_value);
 			};
 #endfor  <OP>
 	asm_Z88DK = asm_CALL_OZ | asm_CALL_PKG | asm_FPP | asm_INVOKE;
@@ -504,46 +412,46 @@ Define rules for a ragel-based parser.
 		*--------------------------------------------------------------------*/
 		| label? _TK_ASSERT const_expr _TK_NEWLINE @{
 			DO_STMT_LABEL();
-			if (expr_error)
+			if (ctx->expr_error)
 				error_expected_const_expr();
-			else if (expr_value == 0)
+			else if (ctx->expr_value == 0)
 				error_assert_failed();
 			else 
 				; 
 		}
 		| label? _TK_ALIGN const_expr _TK_NEWLINE @{
 		    DO_STMT_LABEL();
-			if (expr_error)
+			if (ctx->expr_error)
 				error_expected_const_expr();
 			else
-				asm_ALIGN(expr_value, option_filler());
+				asm_ALIGN(ctx->expr_value, option_filler());
 		}
 		| label? _TK_ALIGN const_expr _TK_COMMA
-				@{ if (expr_error)
+				@{ if (ctx->expr_error)
 					   error_expected_const_expr();
-				   value1 = expr_error ? 0 : expr_value;
-				   expr_error = false;
+				   value1 = ctx->expr_error ? 0 : ctx->expr_value;
+				   ctx->expr_error = false;
 				}
 				const_expr _TK_NEWLINE @{
 			DO_STMT_LABEL();
-		    if (expr_error)
+		    if (ctx->expr_error)
 				error_expected_const_expr();
 			else
-				asm_ALIGN(value1, expr_value);
+				asm_ALIGN(value1, ctx->expr_value);
 		}
 
 		| _TK_ORG const_expr _TK_NEWLINE @{
-			if (expr_error)
+			if (ctx->expr_error)
 				error_expected_const_expr();
 			else
-				asm_ORG(expr_value);
+				asm_ORG(ctx->expr_value);
 		}
 
 		| _TK_PHASE const_expr _TK_NEWLINE @{
-			if (expr_error)
+			if (ctx->expr_error)
 				error_expected_const_expr();
 			else
-				asm_PHASE(expr_value);
+				asm_PHASE(ctx->expr_value);
 		}
 
 		| _TK_DEPHASE _TK_NEWLINE @{
@@ -591,13 +499,13 @@ Define rules for a ragel-based parser.
 		| _TK_ASSUME _TK_ADL _TK_EQUAL const_expr _TK_NEWLINE @{
 			if (option_cpu() != CPU_EZ80 && option_cpu() != CPU_EZ80_Z80)
 				error_illegal_ident();
-			else if (expr_error)
+			else if (ctx->expr_error)
 				error_expected_const_expr();
             else {
-                switch (expr_value) {
+                switch (ctx->expr_value) {
                 case 0: set_cpu_option(CPU_EZ80_Z80); break;
                 case 1: set_cpu_option(CPU_EZ80); break;
-                default: error_int_range(expr_value);
+                default: error_int_range(ctx->expr_value);
                 }
             }
 		}
@@ -646,9 +554,9 @@ static bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 {
 	int  value1 = 0;
 	int  start_num_errors = get_num_errors();
-	int  expr_value = 0;			/* last computed expression value */
-	bool expr_error = false;		/* last computed expression error */
-	bool expr_in_parens = false;	/* true if expression has enclosing parens */
+	ctx->expr_value = 0;			/* last computed expression value */
+	ctx->expr_error = false;		/* last computed expression error */
+	ctx->expr_in_parens = false;	/* true if expression has enclosing parens */
 	int  expr_open_parens = 0;		/* number of open parens */
 
 	%%write init nocs;

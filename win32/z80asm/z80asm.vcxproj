@@ -205,6 +205,8 @@
     <ClInclude Include="..\..\src\z80asm\src\c\classlist.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\codearea.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\common.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\cpu_rules.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\cpu_rules_action.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\dbg.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\directives.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\expr1.h" />
@@ -247,6 +249,7 @@
     <ClCompile Include="..\..\src\z80asm\src\c\class.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\codearea.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\common.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\cpu_rules_action.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\dbg.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\directives.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\expr1.c" />

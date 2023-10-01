@@ -11,6 +11,7 @@ Define ragel-based parser.
 
 #include "class.h"
 #include "codearea.h"
+#include "cpu_rules_action.h"
 #include "die.h"
 #include "directives.h"
 #include "expr1.h"
@@ -93,7 +94,7 @@ struct Expr1 *parse_expr(const char *expr_text)
 }
 
 /* push current expression */
-static void push_expr(ParseCtx *ctx)
+void push_expr(ParseCtx *ctx)
 {
 	STR_DEFINE(expr_text, STR_SIZE);
 	Expr1 *expr;
@@ -141,7 +142,7 @@ static void push_expr(ParseCtx *ctx)
 /*-----------------------------------------------------------------------------
 *   Pop and return expression
 *----------------------------------------------------------------------------*/
-static Expr1 *pop_expr(ParseCtx *ctx)
+Expr1 *pop_expr(ParseCtx *ctx)
 {
 	Expr1 *expr;
 
@@ -156,7 +157,7 @@ static Expr1 *pop_expr(ParseCtx *ctx)
 /*-----------------------------------------------------------------------------
 *   Pop and compute expression, issue error on failure
 *----------------------------------------------------------------------------*/
-static void pop_eval_expr(ParseCtx *ctx, int *pvalue, bool *perror)
+void pop_eval_expr(ParseCtx *ctx, int *pvalue, bool *perror)
 {
 	Expr1 *expr;
 

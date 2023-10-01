@@ -10,6 +10,11 @@ use YAML::Tiny;
 @ARGV==2 or die "Usage $0 input_file.yaml output_file.h\n";
 my($input_file, $output_file) = @ARGV;
 
+my $aux_func_name = $output_file =~ s/\..*/_action_/r;
+my $output_aux_file_header = $output_file =~ s/\.\w+$/_action.h/r;
+my $output_aux_file_source = $output_file =~ s/\.\w+$/_action.c/r;
+
+
 my $yaml = YAML::Tiny->read($input_file);
 my %opcodes = %{$yaml->[0]};
 
@@ -33,14 +38,135 @@ for my $asm (sort keys %opcodes) {
 	}
 }
 
-open(my $rules, ">", $output_file) or die $!;
+open(my $rules, ">", $output_file) or die "$output_file: $!";
+open(my $aux_h, ">", $output_aux_file_header) or die "$output_aux_file_header: $!";
+open(my $aux_c, ">", $output_aux_file_source) or die "$output_aux_file_source: $!";
 
+say $aux_h <<END;
+#pragma once
+#include "codearea.h"
+#include "directives.h"
+#include "expr1.h"
+#include "if.h"
+#include "opcodes.h"
+#include "parse1.h"
+#include "str.h"
+
+/*-----------------------------------------------------------------------------
+*   Helper macros
+*----------------------------------------------------------------------------*/
+
+/* macros for actions - labels */
+#define DO_STMT_LABEL() asm_cond_LABEL(stmt_label)
+
+/* macros for actions - statements */
+#define DO_stmt(opcode) \\
+			do { \\
+				DO_STMT_LABEL(); \\
+				add_opcode(opcode); \\
+			} while(0)
+
+#define _DO_stmt_(suffix, opcode) \\
+			do { \\
+			 	Expr1 *expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_##suffix((opcode), expr); \\
+			} while(0)
+
+#define DO_stmt_jr( opcode)		_DO_stmt_(jr,		opcode)
+#define DO_stmt_jre( opcode)	_DO_stmt_(jre,		opcode)
+#define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
+#define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
+#define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
+#define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
+#define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
+
+#define DO_stmt_nn( opcode) \\
+			do { \\
+			 	Expr1 *expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_nn((opcode), expr, 0); \\
+			} while(0)
+
+#define DO_stmt_nnn( opcode) \\
+			do { \\
+			 	Expr1 *expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_nnn((opcode), expr, 0); \\
+			} while(0)
+
+
+#define DO_stmt_nnnn( opcode)	_DO_stmt_(nnnn,		opcode)
+#define DO_stmt_NN( opcode)		_DO_stmt_(NN,		opcode)
+#define DO_stmt_idx(opcode)		_DO_stmt_(idx,		opcode)
+
+#define DO_stmt_idx_n(opcode) \\
+			do { \\
+			 	Expr1 *n_expr   = pop_expr(ctx); \\
+				Expr1 *idx_expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_idx_n((opcode), idx_expr, n_expr); \\
+			} while(0)
+
+#define DO_stmt_n_n(opcode) \\
+			do { \\
+			 	Expr1 *n2_expr = pop_expr(ctx); \\
+				Expr1 *n1_expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_n_n((opcode), n1_expr, n2_expr); \\
+			} while(0)
+
+#define DO_stmt_idx_idx1(opcode0, opcode1) \\
+			do { \\
+			 	Expr1 *idx_expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_idx_idx1((opcode0), (opcode1), idx_expr); \\
+			} while(0)
+
+#define DO_stmt_nn_nn(opcode0, opcode1) \\
+			do { \\
+			 	Expr1 *expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_nn_nn((opcode0), (opcode1), expr); \\
+			} while(0)
+
+#define DO_stmt_jr_jr(opcode0, opcode1) \\
+			do { \\
+			 	Expr1 *expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_jr_jr((opcode0), (opcode1), expr); \\
+			} while(0)
+
+#define DO_stmt_defb() \\
+			do { \\
+			 	Expr1 *expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_defb(expr); \\
+			} while(0)
+
+
+END
+
+say $aux_c <<END;
+#include "$output_aux_file_header"
+END
+
+my $action_nr = 0;
 for my $tokens (sort keys %parser) {
+	$action_nr++;
 	#say $tokens;
 	
-	print $rules $tokens, ' @{', "\n";
-	print $rules merge_cpu($parser{$tokens});
-	print $rules '}', "\n\n";
+	say $rules $tokens, ' @{ ',
+				"if (!${aux_func_name}${action_nr}(ctx, name, stmt_label)) return false; }";
+	
+	say $aux_h "bool ${aux_func_name}${action_nr}",
+						"(ParseCtx *ctx, Str *name, Str *stmt_label);";
+	
+	say $aux_c "bool ${aux_func_name}${action_nr}",
+						"(ParseCtx *ctx, Str *name, Str *stmt_label) {";
+	say $aux_c merge_cpu($parser{$tokens});
+	say $aux_c "return true;";
+	say $aux_c "}\n";
 }
 
 exit 0;
@@ -275,20 +401,20 @@ sub parse_code_opcode {
 	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
 		push @code, 
 			"DO_STMT_LABEL();",
-			"if (expr_error) { error_expected_const_expr(); }".
-			"else { add_rst_opcode(expr_value); }";
+			"if (ctx->expr_error) { error_expected_const_expr(); }".
+			"else { add_rst_opcode(ctx->expr_value); }";
 	}
 	elsif ($asm =~ /^mmu %c, %n/) {
 		push @code, 
-			"if (expr_error) { error_expected_const_expr(); } else {",
-			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
-			"DO_stmt_n(0xED9150 + expr_value);}";
+			"if (ctx->expr_error) { error_expected_const_expr(); } else {",
+			"if (ctx->expr_value < 0 || ctx->expr_value > 7) error_int_range(ctx->expr_value);",
+			"DO_stmt_n(0xED9150 + ctx->expr_value);}";
 	}
 	elsif ($asm =~ /^mmu %c, a/) {
 		push @code, 
-			"if (expr_error) { error_expected_const_expr(); } else {",
-			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
-			"DO_stmt(0xED9250 + expr_value);}";
+			"if (ctx->expr_error) { error_expected_const_expr(); } else {",
+			"if (ctx->expr_value < 0 || ctx->expr_value > 7) error_int_range(ctx->expr_value);",
+			"DO_stmt(0xED9250 + ctx->expr_value);}";
 		my $code = join("\n", @code);
 		return $code;
 	}
@@ -334,14 +460,14 @@ sub parse_code_opcode {
 	elsif ($bin =~ s/ %J %J$//) {
 		$stmt = "DO_stmt_jre";
 	}
-	elsif ($bin =~ s/%c\((.*?)\)/expr_value/) {
+	elsif ($bin =~ s/%c\((.*?)\)/ctx->expr_value/) {
 		my @values = eval($1); die "$cpu, $asm, @bin, $1" if $@;
-		$bin =~ s/%c/expr_value/g;		# replace all other %c in bin
+		$bin =~ s/%c/ctx->expr_value/g;		# replace all other %c in bin
 		push @code,
-			"if (expr_error) { error_expected_const_expr(); } else {",
-			"switch (expr_value) {",
+			"if (ctx->expr_error) { error_expected_const_expr(); } else {",
+			"switch (ctx->expr_value) {",
 			join(" ", map {"case $_:"} @values)." break;",
-			"default: error_int_range(expr_value);",
+			"default: error_int_range(ctx->expr_value);",
 			"}}";
 			
 		if ($bin =~ s/ %d// || $bin =~ s/%d //) {
@@ -446,17 +572,17 @@ sub merge_parens {
 		die;
 	}
 	elsif (!$t->{expr_no_parens} && $t->{expr_in_parens}) {
-		return "if (!expr_in_parens) return false;\n".
+		return "if (!ctx->expr_in_parens) return false;\n".
 				parse_code($cpu, @{$t->{expr_in_parens}});			
 	}
 	elsif ($t->{expr_no_parens} && !$t->{expr_in_parens}) {
-		return "if (expr_in_parens) warn_expr_in_parens();\n".
+		return "if (ctx->expr_in_parens) warn_expr_in_parens();\n".
 				parse_code($cpu, @{$t->{expr_no_parens}});
 	}
 	elsif ($t->{expr_no_parens} && $t->{expr_in_parens}) {
 		my $in_parens = parse_code($cpu, @{$t->{expr_in_parens}});
 		my $no_parens = parse_code($cpu, @{$t->{expr_no_parens}});
-		return "if (expr_in_parens) { $in_parens } else { $no_parens }";
+		return "if (ctx->expr_in_parens) { $in_parens } else { $no_parens }";
 	}
 	else {
 		die;
