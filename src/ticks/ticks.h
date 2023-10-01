@@ -326,6 +326,15 @@ extern void zilog_outd(uint8_t opcode);
 extern void zilog_otir(uint8_t opcode);
 extern void zilog_otdr(uint8_t opcode);
 
+// i8085
+extern void i8085_rim(uint8_t opcode);
+extern void i8085_sim(uint8_t opcode);
+extern void i8085_rstv(uint8_t opcode);
+extern void i8085_ld_de_hln(uint8_t opcode);
+extern void i8085_ld_de_spn(uint8_t opcode);
+extern void i8085_ld_hl_ide(uint8_t opcode);
+extern void i8085_ld_ide_hl(uint8_t opcode);
+extern void i8085_sub_hl_bc(uint8_t opcode);
 
 #ifndef WIN32
 extern int kbhit();

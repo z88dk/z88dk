@@ -1813,50 +1813,37 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x20: // JR NZ,s8
-        if ( is8085() ) { // (8085) RIM
-          st+=4;
-          break;
-        } else if ( is808x() ) {
+        if ( is8085() ) i8085_rim(opc); // (8085) RIM
+        else if ( is808x() ) {
           printf("%04x: ILLEGAL 8080 opcode JR NZ\n",pc-1);
           st+=4;
           break;
         } else JRCI(fr);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x28: // JR Z,s8
-        if ( is8085() ) {  // (8085) ld de,hl+nn (LDHI)
-          uint16_t val =(l | h<<8) + get_memory_inst(pc++);
-          d = val / 256;
-          e = val % 256;
-          st += 10;
-        } else if ( is8080() ) {
+        if ( is8085() ) i8085_ld_de_hln(opc);  // (8085) ld de,hl+nn (LDHI)
+        else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 opcode JR Z\n",pc-1);
           st+=4;
         } else JRC(fr);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x30: // JR NC,s8
-        if ( is8085() ) { // (8085) SIM
-          st+=4;
-        } else if ( is8080() ) {
+        if ( is8085() ) i8085_sim(opc); // (8085) SIM
+        else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 opcode JR NC\n",pc-1);
           st+=4;
         } else JRC(ff&256);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x38: // JR C,s8
-        if ( is8085() ) { // (8085) LD DE,SP+nn (LDSI)
-          uint16_t val = sp + get_memory_inst(pc++);
-          d = val / 256;
-          e = val % 256;
-          st += 10;
-        } else if ( is8080() ) {
+        if ( is8085() ) i8085_ld_de_spn(opc);  // (8085) LD DE,SP+nn (LDSI)
+        else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 opcode JR C\n",pc-1);
           st+=4;
         } else JRCI(ff&256);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x08: // EX AF,AF'
-        if ( is8085() ) {  // (8085) SUB HL,BC (DSUB)
-          SUBHLRR(b,c);
-          st += 10;
-        } else if ( is8080()) {
+        if ( is8085() ) i8085_sub_hl_bc(opc);  // (8085) SUB HL,BC (DSUB)
+        else if ( is8080()) {
           printf("%04x: ILLEGAL 8080 opcode EX AF,AF\n",pc-1);
           st+= 4;
         } else if ( isgbz80() ) { gbz80_ld_inm_sp();
@@ -3348,11 +3335,8 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd9: // EXX
-        if ( is8085() ) {  // (8085) ld (de),hl (SHLX)
-          put_memory((e | d<<8),l);
-          put_memory((e | d<<8) + 1,h);
-          st+=10;
-        } else if ( is8080() ) {
+        if ( is8085() ) i8085_ld_ide_hl(opc);  // (8085) ld (de),hl (SHLX)
+        else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 instruction EXX\n",pc-1);
         } else if ( isgbz80() ) {  // RETI
           RET(8);
@@ -3453,10 +3437,8 @@ int main (int argc, char **argv){
         }
         break;
       case 0xcb: // OP CB
-		if ( is8085() ) {		// (8085) RSTV, OVRST8
-		  // V flag is bit 1 of flags (not emulated since we don't use it)
-		  st += 6;
-		} else if ( is808x() ) {
+		if ( is8085() ) i8085_rstv(opc); 		// (8085) RSTV, OVRST8
+		else if ( is808x() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xCB\n",pc-1);
         } else {
             handle_cb_page();
@@ -3464,25 +3446,14 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xed: // OP ED // (8085) LD HL,(DE) // (R4K) LD BCDE,PY, LD JKHL, PY
         if ( is8085() ) { // (8085) LD HL,(DE) (LHLDE)
-          if ( get_memory_inst(pc) != 0xfe) {
-              l = get_memory_data( (e|d<<8));
-              h = get_memory_data( (e|d<<8) + 1);
-              st+=10;
-	          break;
-          }
-          handle_ed_page();
+          if ( get_memory_inst(pc) != 0xfe) i8085_ld_hl_ide(opc);
+          else handle_ed_page();
         } else if ( is8080() ) {
-          if ( get_memory_inst(pc) != 0xfe) {
-            printf("%04x: ILLEGAL 8080 prefix 0xED\n",pc-1);
-            break;
-          }
-          handle_ed_page();
+          if ( get_memory_inst(pc) == 0xfe) handle_ed_page();
+          else printf("%04x: ILLEGAL 8080 prefix 0xED\n",pc-1);
         } else if ( isgbz80() ) {
-          if ( get_memory_inst(pc) != 0xfe) {
-              printf("%04x: ILLEGAL GBZ80 prefix 0xED\n",pc-1);
-              break;
-          }
-          handle_ed_page();
+          if ( get_memory_inst(pc) == 0xfe) handle_ed_page();
+          else printf("%04x: ILLEGAL GBZ80 prefix 0xED\n",pc-1);
         } else if ( israbbit4k() && ih == 0 ) r4k_ld_r32_ps(opc, iy);
         else handle_ed_page();
         ih=1;altd=0;ioi=0;ioe=0;//break;
