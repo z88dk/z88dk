@@ -4132,8 +4132,9 @@ static void handle_ed_page(void)
             st += 8;
         }
         break;
-    case 0x29:    // (ZXN) bsra de,b // (R4K) LDF (lmn),PY
+    case 0x29:    // (ZXN) bsra de,b // (R4K) LDF (lmn),PY // (Z180) OUT0 (n),l
         if ( israbbit4k() ) r4k_ldf_ilmn_ps(opc);
+        else if (canz180()) z180_out0(opc);
         else if ( isz80n() ) { // BSRA DE,B
             long long old_st = st;
             unsigned short old_ff = ff, old_fa = fa, old_fb = fb, old_fr = fr;
@@ -4384,8 +4385,9 @@ static void handle_ed_page(void)
             st += 4;
         } else st += 8;
         break;
-    case 0x10:  // (R4K) DWJNZ d
+    case 0x10:  // (R4K) DWJNZ d // (Z180) IN0 d,(n)
         if ( israbbit4k() ) r4k_dwjnz(opc);
+        else if (canz180()) z180_in0(opc);
         else st += israbbit() ? 4 : 8;
         break;
     case 0x0d:   // (R4K) LDL PW,mn
@@ -4420,15 +4422,17 @@ static void handle_ed_page(void)
         else st += israbbit() ? 4 : 8;
         break;
 
-    case 0x08:  // (R4K) LDF PW,(lmn)
-    case 0x18:  // (R4K) LDF PX,(lmn)
+    case 0x08:  // (R4K) LDF PW,(lmn) // (Z180) in0 c,(n)
+    case 0x18:  // (R4K) LDF PX,(lmn) // (Z180) in0 e,(n)
         if ( israbbit4k()) r4k_ldf_pd_ilmn(opc);
+        else if (canz180()) z180_in0(opc);
         else st += israbbit() ? 4 : 8;
         break;
 
-    case 0x09: // (R4K) LDF (lmn),PW
-    case 0x19: // (R4K) LDF (lmn),PX
+    case 0x09: // (R4K) LDF (lmn),PW // (Z180) OUT0 (n),c
+    case 0x19: // (R4K) LDF (lmn),PX // (Z170) OUT0 (n),e
         if ( israbbit4k() ) r4k_ldf_ilmn_ps(opc);
+        else if (canz180()) z180_out0(opc);
         else st += israbbit() ? 4 : 8;
         break;
 
@@ -4557,20 +4561,26 @@ static void handle_ed_page(void)
         else st += israbbit() ? 4 : 8;
         break;
 
-    case 0x00: // (R4K) CBM n
+    case 0x00: // (R4K) CBM n // (Z180) IN0 B,(n)
         if (israbbit4k()) r4k_cbm(opc);
+        else if (canz180()) z180_in0(opc);
         else st += israbbit() ? 4 : 8;
         break;
 
-    case 0x01: // (R4K) LD PW,(HTR+HL)
-    case 0x11: // (R4K) LD PX,(HTR+HL)
-    case 0x21: // (R4K) LD PY,(HTR+HL)
+    case 0x01: // (R4K) LD PW,(HTR+HL) // (Z180) OUT0 (n),b
+    case 0x11: // (R4K) LD PX,(HTR+HL) // (Z180) OUT0 (n),d
+    case 0x21: // (R4K) LD PY,(HTR+HL) // (Z180) OUT0 (n),h
         if (israbbit4k()) r4k_ld_pd_ihtrhl(opc);
+        else if (canz180()) z180_out0(opc);
         else st += israbbit() ? 4 : 8;
         break;
 
 
-    case 0x20: 
+    case 0x20:  // (Z180) IN0, H,(n)
+        if (canz180()) z180_in0(opc);
+        else st += israbbit() ? 4 : 8;
+        break;
+
     case 0x81: case 0x82:
     case 0x84: case 0x85: case 0x86: case 0x87:
     case 0x89:
@@ -4650,12 +4660,14 @@ static void handle_ed_page(void)
             xh = get_memory_data((l|h<<8) + 1);
         } else st += israbbit() ? 4 : 8;
         break;
-    case 0x38:                                         // (ZXN) dec dehl // (R4K) LDF PZ,(lmn)
+    case 0x38:                                         // (ZXN) dec dehl // (R4K) LDF PZ,(lmn) // (Z180) IN0 A,(n)
         if ( israbbit4k()) r4k_ldf_pd_ilmn(opc);
+        else if ( canz180()) z180_in0(opc);  // IN0 A,(n)
         else st += 8;
         break;
-    case 0x39:                                         // (ZXN) add dehl,a // (R4K) LDF (lmn),PZ
+    case 0x39:                                         // (ZXN) add dehl,a // (R4K) LDF (lmn),PZ // (Z180) OUT0 (n),A
         if ( israbbit4k() ) r4k_ldf_ilmn_ps(opc);
+        else if (canz180()) z180_out0(opc);
         else st += 8;
         break;
 

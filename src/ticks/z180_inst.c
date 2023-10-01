@@ -57,3 +57,14 @@ void z180_otdmr(uint8_t opcode)
 {
     UNIMPLEMENTED(0xed00|opcode, "otdmr");
 }
+
+
+void z180_in0(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "in0");
+}
+
+void z180_out0(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "out0");
+}

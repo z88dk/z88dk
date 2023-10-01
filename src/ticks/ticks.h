@@ -306,6 +306,8 @@ extern void z180_otim(uint8_t opcode);
 extern void z180_otimr(uint8_t opcode);
 extern void z180_otdm(uint8_t opcode);
 extern void z180_otdmr(uint8_t opcode);
+extern void z180_in0(uint8_t opcode);
+extern void z180_out0(uint8_t opcode);
 
 // zilog
 extern void zilog_daa(uint8_t opcode);
