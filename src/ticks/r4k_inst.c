@@ -102,7 +102,7 @@ static uint32_t ps8se(uint32_t ps, uint8_t offs)
     return ps;
 }
 
-static uint8_t *get_6d_dest_msb(int reg)
+static uint8_t *get_rr_msb_ptr(int reg)
 {
     uint8_t *r, *r_;
 
@@ -124,7 +124,7 @@ static uint8_t *get_6d_dest_msb(int reg)
     return r;
 }
 
-static uint8_t *get_6d_dest_lsb(int reg)
+static uint8_t *get_rr_lsb_ptr(int reg)
 {
     uint8_t *r, *r_;
 
@@ -261,8 +261,8 @@ static void r4k_ld_rr_ipsd(uint8_t opcode)
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
     uint8_t *dm, *dl;
 
-    dm = get_6d_dest_msb(dreg);
-    dl = get_6d_dest_lsb(dreg);
+    dm = get_rr_msb_ptr(dreg);
+    dl = get_rr_lsb_ptr(dreg);
     
     *dl = get_memory(addr, MEM_TYPE_PHYSICAL);
     *dm = get_memory(ps8se(addr, 1), MEM_TYPE_PHYSICAL);
@@ -280,8 +280,8 @@ static void r4k_ld_ipdd_rr(uint8_t opcode)
 
     altd = 0;
 
-    dm = get_6d_dest_msb(dreg);
-    dl = get_6d_dest_lsb(dreg);
+    dm = get_rr_msb_ptr(dreg);
+    dl = get_rr_lsb_ptr(dreg);
 
     put_memory_physical(addr,*dl);
     put_memory_physical(ps8se(addr,1),*dm);
@@ -299,8 +299,8 @@ static void r4k_ld_rr_ipshl(uint8_t opcode)
     uint32_t addr = ps16se(ps,h<<8|l);
     uint8_t *dm, *dl;
 
-    dm = get_6d_dest_msb(dreg);
-    dl = get_6d_dest_lsb(dreg);
+    dm = get_rr_msb_ptr(dreg);
+    dl = get_rr_lsb_ptr(dreg);
     
     *dl = get_memory(addr, MEM_TYPE_PHYSICAL);
     *dm = get_memory(ps8se(addr, 1), MEM_TYPE_PHYSICAL);
@@ -318,8 +318,8 @@ static void r4k_ld_ipdhl_rr(uint8_t opcode)
 
     altd = 0;
 
-    dm = get_6d_dest_msb(dreg);
-    dl = get_6d_dest_lsb(dreg);
+    dm = get_rr_msb_ptr(dreg);
+    dl = get_rr_lsb_ptr(dreg);
 
     put_memory_physical(addr,*dl);
     put_memory_physical(ps8se(addr,1),*dm);
@@ -1037,7 +1037,8 @@ void r4k_ldf_hl_ilmn(uint8_t opcode)
     st+=13;
 }
 
-// ldf (lmn),a
+
+// ldf (lmn),hl
 void r4k_ldf_ilmn_hl(uint8_t opcode)
 {
     uint32_t addr;
@@ -1052,6 +1053,52 @@ void r4k_ldf_ilmn_hl(uint8_t opcode)
     
     st+=15;
 }
+
+
+// ldf rr,(lmn) rr=bc,de,ix,iy
+void r4k_ldf_rr_ilmn(uint8_t opcode)
+{
+    uint8_t dreg = (opcode >> 4) & 0x03;
+    uint32_t addr;
+    uint8_t *dm, *dl;
+
+    dm = get_rr_msb_ptr(dreg);
+    dl = get_rr_lsb_ptr(dreg);
+
+    addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
+    pc += 3;
+
+    *dl = get_memory(addr, MEM_TYPE_PHYSICAL);
+    *dm = get_memory(ps8se(addr,1), MEM_TYPE_PHYSICAL);
+    st+=15;
+}
+
+// ldf (lmn),rr, rr=bc,de,ix,iy
+void r4k_ldf_ilmn_rr(uint8_t opcode)
+{
+    uint8_t dreg = (opcode >> 4) & 0x03;
+    uint32_t addr;
+    uint8_t *dm, *dl;
+
+    altd = 0;
+    dm = get_rr_msb_ptr(dreg);
+    dl = get_rr_lsb_ptr(dreg);
+
+
+    addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
+           (get_memory(pc + 2, MEM_TYPE_INST) << 16 );
+    pc += 3;
+
+    put_memory_physical(addr, *dl);
+    put_memory_physical(addr, *dm);
+    
+    st+=17;
+}
+
+
 
 
 
@@ -1250,84 +1297,191 @@ void r4k_callxy(uint8_t opcode, uint8_t iy)
 
 void r4k_neg_hl(uint8_t opcode)
 {
-     UNIMPLEMENTED(opcode, "NEG hl");
+     UNIMPLEMENTED(opcode, "neg hl");
+}
+
+void r4k_test_hlxy(uint8_t opcode, uint8_t prefix)
+{
+    switch (prefix) {
+    case 0x00:
+        UNIMPLEMENTED(opcode, "test hl");
+        break;
+    case 0xdd:
+        UNIMPLEMENTED(0xdd00|opcode, "test ix");
+        break;
+    case 0xfd:
+        UNIMPLEMENTED(0xfd00|opcode, "test iy");
+        break;
+    }
 }
 
 void r4k_test_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    if (isjkhl) UNIMPLEMENTED( 0xfd00 | opcode, "TEST jkhl");
-    else UNIMPLEMENTED( 0xdd00 | opcode, "TEST bcde");
+    if (isjkhl) UNIMPLEMENTED( 0xfd00 | opcode, "test jkhl");
+    else UNIMPLEMENTED( 0xdd00 | opcode, "test bcde");
 }
 
 void r4k_neg_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    if (isjkhl) UNIMPLEMENTED( 0xfd00 | opcode, "NEG jkhl");
-    else UNIMPLEMENTED( 0xdd00 | opcode, "NEG bcde");
+    if (isjkhl) UNIMPLEMENTED( 0xfd00 | opcode, "neg jkhl");
+    else UNIMPLEMENTED( 0xdd00 | opcode, "neg bcde");
 }
 
 void r4k_rlb_a_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RLB A,r32");
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rlb a,r32");
 }
 
 void r4k_rrb_a_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RRB A,r32");
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rrb a,r32");
 }
 
 
 void r4k_rlc_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RLC n,r32");
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rlc n,r32");
 }
 
 void r4k_rrc_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RRC n,r32");
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rrc n,r32");
 }
 
 void r4k_rl_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RL n,r32");
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rl n,r32");
 }
 
 void r4k_rr_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RR n,r32");
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rr n,r32");
 }
 
 void r4k_sla_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "SLA n,r32");
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "sla n,r32");
 }
 
 void r4k_sra_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "SRA n,r32");
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "sra n,r32");
 }
 
 void r4k_sll_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "SLL n,r32");
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "sll n,r32");
 }
 
 void r4k_srl_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "SRL n,r32");
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "srl n,r32");
 }
 
 void r4k_jre(uint8_t opcode, uint8_t dojump)
 {
     if (opcode == 0x98) {
-        UNIMPLEMENTED( opcode, "JRE dddd");
+        UNIMPLEMENTED( opcode, "jre dddd");
     } else {
-        UNIMPLEMENTED( 0xed00 | opcode, "JRE cc/cx,r32");
+        UNIMPLEMENTED( 0xed00 | opcode, "jre cc/cx,dddd");
     }
+}
+
+void r4k_convc(uint8_t opcode)
+{
+    UNIMPLEMENTED( 0xed00|opcode, "convc pp");
+}
+
+void r4k_convd(uint8_t opcode)
+{
+    UNIMPLEMENTED( 0xed00|opcode, "convd pp");
+}
+
+void r4k_ld_a_htr(uint8_t opcode)
+{
+    UNIMPLEMENTED( 0xed00|opcode, "ld a,htr");
+}
+
+void r4k_ld_htr_a(uint8_t opcode)
+{
+    UNIMPLEMENTED( 0xed00|opcode, "ld htr,a");
+}
+
+void r4k_cp_hl_d(uint8_t opcode)
+{
+    UNIMPLEMENTED( 0xed00|opcode, "cp hl,d");
+    st += 4;
+}
+void r4k_cp_hl_de(uint8_t opcode)
+{
+    UNIMPLEMENTED( 0xed00|opcode, "cp hl,de");
+    st += 4;
+}
+void r4k_cp_jkhl_bcde(uint8_t opcode)
+{
+    UNIMPLEMENTED( 0xed00|opcode, "cp jkhl,bcde");
+    st += 4;
+}
+
+void r4k_alu_jkhl_bcde(uint8_t opcode)
+{
+    int op = (opcode >> 3) & 0x07;
+    char *types[] = { "add", "!!", "sub", "!!", "and", "xor", "or", "!!" };
+    char  buf[100];
+
+    snprintf(buf, sizeof(buf),"%s jkhl,bcde", types[op]);
+
+    UNIMPLEMENTED( 0xed00|opcode, buf);
+    st += 4;
 }
 
 
 
+void r4k_copy(uint8_t opcode)
+{
+    UNIMPLEMENTED( 0xed00|opcode, "copy");
+}
 
+void r4k_copyr(uint8_t opcode)
+{
+    UNIMPLEMENTED( 0xed00|opcode, "copyr");
+}
+
+void r4k_ld_hl_lxpc(uint8_t opcode)
+{
+    UNIMPLEMENTED(opcode, "ld hl,xpc");
+    st += 2;
+}
+
+void r4k_ld_lxpc_hl(uint8_t opcode)
+{
+    UNIMPLEMENTED(opcode, "ld lxpc,hl");
+    st += 2;
+}
+
+void r4k_setusrp_mn(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "setusrp mn");
+    st += 15;
+}
+
+void r4k_fsyscall(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "fsyscall/scall");
+    st += 15;
+}
+
+void r4k_syscall(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "syscall");
+    st += 10;
+}
+
+void r4k_sysret(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "sysret");
+    st += 10;
+}
 
 
 void r4k_handle_6d_page(void)

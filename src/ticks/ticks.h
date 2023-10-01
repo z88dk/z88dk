@@ -202,6 +202,25 @@ extern void r4k_jre(uint8_t opcode, uint8_t dojump);
 extern void r4k_test_r32(uint8_t opcode, uint8_t isjkhl);
 extern void r4k_neg_r32(uint8_t opcode, uint8_t isjkhl);
 extern void r4k_neg_hl(uint8_t opcode);
+extern void r4k_test_hlxy(uint8_t opcode, uint8_t prefix);
+extern void r4k_ldf_rr_ilmn(uint8_t opcode);
+extern void r4k_ldf_ilmn_rr(uint8_t opcode);
+extern void r4k_convc(uint8_t opcode);
+extern void r4k_convd(uint8_t opcode);
+extern void r4k_ld_a_htr(uint8_t opcode);
+extern void r4k_ld_htr_a(uint8_t opcode);
+extern void r4k_cp_hl_d(uint8_t opcode);
+extern void r4k_cp_hl_de(uint8_t opcode);
+extern void r4k_cp_jkhl_bcde(uint8_t opcode);
+extern void r4k_copy(uint8_t opcode);
+extern void r4k_copyr(uint8_t opcode);
+extern void r4k_ld_hl_lxpc(uint8_t opcode);
+extern void r4k_ld_lxpc_hl(uint8_t opcode);
+extern void r4k_alu_jkhl_bcde(uint8_t opcode);
+extern void r4k_setusrp_mn(uint8_t opcode);
+extern void r4k_fsyscall(uint8_t opcode);
+extern void r4k_syscall(uint8_t opcode);
+extern void r4k_sysret(uint8_t opcode);
 
 // rxk
 extern void rxk_ld_hl_ispn(uint8_t opcode, uint8_t ih, uint8_t iy);
@@ -219,9 +238,20 @@ extern void rxk_ld_xpc_a(uint8_t opcode);
 extern void rxk_ld_a_xpc(uint8_t opcode);
 extern void rxk_push_ip(uint8_t opcode);
 extern void rxk_pop_ip(uint8_t opcode);
+
 extern void r3k_push_su(uint8_t opcode);
 extern void r3k_pop_su(uint8_t opcode);
-
+extern void r3k_ldisr(uint8_t opcode);
+extern void r3k_lddsr(uint8_t opcode);
+extern void r3k_uma(uint8_t opcode);
+extern void r3k_ums(uint8_t opcode);
+extern void r3k_lsidr(uint8_t opcode);
+extern void r3k_lsddr(uint8_t opcode);
+extern void r3k_lsir(uint8_t opcode);
+extern void r3k_lsdr(uint8_t opcode);
+extern void r3k_setusr(uint8_t opcode);
+extern void r3k_rdmode(uint8_t opcode);
+extern void r3k_sures(uint8_t opcode);
 
 // z80n
 extern void z80n_mirror(void);

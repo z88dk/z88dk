@@ -39,7 +39,7 @@
     } while (0)
 
 #define UNIMPLEMENTED(o, t) do {  \
-        fprintf(stderr, "Unimplemented opcode ed,%02x/%s",o,t); \
+        fprintf(stderr, "Unimplemented opcode %04x/%s",o,t); \
     } while (0)
 
 
@@ -218,35 +218,100 @@ void rxk_mul(uint8_t opcode)
 
 void rxk_ld_xpc_a(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "ld xpc,a");
+    UNIMPLEMENTED(0xed00|opcode, "ld xpc,a");
+    st += 4;
 }
 
 void rxk_ld_a_xpc(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "ld a,xpc");
+    UNIMPLEMENTED(0xed00|opcode, "ld a,xpc");
+    st += 4;
 }
 
 
 void rxk_push_ip(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "push ip");
+    UNIMPLEMENTED(0xed00|opcode, "push ip");
     st += 9;
 }
 
 void rxk_pop_ip(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "pop ip");
+    UNIMPLEMENTED(0xed00|opcode, "pop ip");
     st += 7;
 }
 
+
+
+
 void r3k_push_su(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "push su");
+    UNIMPLEMENTED(0xed00|opcode, "push su");
     st += 9;
 }
 
 void r3k_pop_su(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "pop su");
+    UNIMPLEMENTED(0xed00|opcode, "pop su");
     st += 9;
+}
+
+void r3k_ldisr(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "ldisr");
+}
+
+void r3k_lddsr(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "lddsr");
+}
+
+void r3k_uma(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "uma");
+}
+
+void r3k_ums(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "ums");
+}
+
+void r3k_lsidr(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "lsidr");
+}
+
+
+void r3k_lsddr(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "lsddr");
+}
+
+
+void r3k_lsir(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "lsir");
+}
+
+void r3k_lsdr(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "lsdr");
+}
+
+void r3k_setusr(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "setusr");
+    st += 4;
+}
+
+void r3k_rdmode(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "rdmode");
+    st += 4;
+}
+
+void r3k_sures(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "sures");
+    st += 4;
 }
