@@ -1484,6 +1484,7 @@ void r4k_alu_jkhl_bcde(uint8_t opcode)
 
 void r4k_ld_pd_ihtrhl(uint8_t opcode)
 {
+    altd=0;
     UNIMPLEMENTED( 0xed00|opcode, "ld pd,(htr+hl)");
     st += 14;
 }
@@ -1501,7 +1502,7 @@ void r4k_copyr(uint8_t opcode)
 
 void r4k_ld_hl_lxpc(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "ld hl,xpc");
+    UNIMPLEMENTED(opcode, "ld hl,lxpc");
     st += 2;
 }
 

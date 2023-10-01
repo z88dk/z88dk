@@ -28,6 +28,8 @@
 
 #endif
 
+#define SUSPECT_IMPL(m)
+
 extern unsigned char a,b,c,d,e,h,l,j,k;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_,j_,k_;
 extern unsigned char xh, xl, yh, yl;
@@ -254,7 +256,12 @@ extern void rxk_ldp_irr_hl(uint8_t opcode, uint8_t prefix);
 extern void rxk_lret(uint8_t opcode);
 extern void rxk_lcall(uint8_t opcode);
 extern void rxk_ljp(uint8_t opcode);
-
+extern void rxk_ipset(uint8_t opcode);
+extern void rxk_ipres(uint8_t opcode);
+extern void rxk_ld_eir_a(uint8_t opcode);
+extern void rxk_ld_iir_a(uint8_t opcode);
+extern void rxk_ld_a_eir(uint8_t opcode);
+extern void rxk_ld_a_iir(uint8_t opcode);
 
 extern void r3k_push_su(uint8_t opcode);
 extern void r3k_pop_su(uint8_t opcode);
