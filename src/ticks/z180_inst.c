@@ -5,7 +5,7 @@
 
 
 #define UNIMPLEMENTED(o, t) do {  \
-        fprintf(stderr, "Unimplemeneted opcode %02x/%s",o,t); \
+        fprintf(stderr, "Unimplemented opcode %04x/%s",o,t); \
     } while (0)
 
 void z180_mlt(uint8_t opcode)
@@ -30,7 +30,7 @@ void z180_mlt(uint8_t opcode)
         l = v;
         break;
     case 0x03:      // MLT SP
-        UNIMPLEMENTED(opcode, "MLT SP");
+        UNIMPLEMENTED(0xed00|opcode, "MLT SP");
         break;
     }
     st += isez80() ? 6 : 17;
@@ -40,20 +40,20 @@ void z180_mlt(uint8_t opcode)
 
 void z180_otim(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "otim");
+    UNIMPLEMENTED(0xed00|opcode, "otim");
 }
 
 void z180_otdm(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "otdm");
+    UNIMPLEMENTED(0xed00|opcode, "otdm");
 }
 
 void z180_otimr(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "otimr");
+    UNIMPLEMENTED(0xed00|opcode, "otimr");
 }
 
 void z180_otdmr(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "otdmr");
+    UNIMPLEMENTED(0xed00|opcode, "otdmr");
 }

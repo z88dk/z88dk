@@ -33,7 +33,8 @@ extern unsigned char a_,b_,c_,d_,e_,h_,l_,j_,k_;
 extern unsigned char xh, xl, yh, yl;
 extern unsigned char ioi, ioe, altd;
 
-extern unsigned short ff, fr, fa, fb,  pc, sp, mp;
+extern unsigned short ff, fr, fa, fb, fk, pc, sp, mp;
+extern unsigned short ff_, fr_, fa_, fb_;
 extern long long st;
 
 
@@ -102,7 +103,7 @@ extern int       rabbit_get_ioi_reg(int reg);
 
 
 extern void        out(int port, int value);
-
+extern int         in(int port);
 
 extern uint8_t    *get_memory_addr(uint32_t pc, memtype type);
 
@@ -186,6 +187,41 @@ extern void r4k_ex_jk_hl(uint8_t opcode);
 extern void r4k_ex_jk1_hl(uint8_t opcode);
 extern void r4k_ex_bc_hl(uint8_t opcode);
 extern void r4k_mulu(uint8_t opcode);
+extern void r4k_callxy(uint8_t opcode, uint8_t iy);
+extern void r4k_rlc_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_rrc_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_rl_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_rr_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_sla_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_sra_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_sll_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_srl_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_rlb_a_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_rrb_a_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_jre(uint8_t opcode, uint8_t dojump);
+extern void r4k_test_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_neg_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r4k_neg_hl(uint8_t opcode);
+
+// rxk
+extern void rxk_ld_hl_ispn(uint8_t opcode, uint8_t ih, uint8_t iy);
+extern void rxk_ld_ispn_hl(uint8_t opcode, uint8_t ih, uint8_t iy);
+extern void rxk_bool(uint8_t opcode, uint8_t ih, uint8_t iy);
+extern void rxk_and_hlxy_de(uint8_t opcode, uint8_t ih, uint8_t iy);
+extern void rxk_or_hlxy_de(uint8_t opcode, uint8_t ih, uint8_t iy);
+extern void rxk_ld_hl_ihlxyd(uint8_t opcode, uint8_t prefix);
+extern void rxk_ld_ihlxyd_hl(uint8_t opcode, uint8_t prefix);
+extern void rxk_ld_hl_xy(uint8_t opcode, uint8_t prefix);
+extern void rxk_ld_xy_hl(uint8_t opcode, uint8_t prefix);
+extern void rxk_add_sp_d(uint8_t opcode);
+extern void rxk_mul(uint8_t opcode);
+extern void rxk_ld_xpc_a(uint8_t opcode);
+extern void rxk_ld_a_xpc(uint8_t opcode);
+extern void rxk_push_ip(uint8_t opcode);
+extern void rxk_pop_ip(uint8_t opcode);
+extern void r3k_push_su(uint8_t opcode);
+extern void r3k_pop_su(uint8_t opcode);
+
 
 // z80n
 extern void z80n_mirror(void);
@@ -224,6 +260,24 @@ extern void z180_otim(uint8_t opcode);
 extern void z180_otimr(uint8_t opcode);
 extern void z180_otdm(uint8_t opcode);
 extern void z180_otdmr(uint8_t opcode);
+
+// zilog
+extern void zilog_daa(uint8_t opcode);
+extern void zilog_rld(uint8_t opcode);
+extern void zilog_rrd(uint8_t opcode);
+extern void zilog_cpi(uint8_t opcode);
+extern void zilog_cpd(uint8_t opcode);
+extern void zilog_cpir(uint8_t opcode);
+extern void zilog_cpdr(uint8_t opcode);
+extern void zilog_ini(uint8_t opcode);
+extern void zilog_ind(uint8_t opcode);
+extern void zilog_inir(uint8_t opcode);
+extern void zilog_indr(uint8_t opcode);
+extern void zilog_outi(uint8_t opcode);
+extern void zilog_outd(uint8_t opcode);
+extern void zilog_otir(uint8_t opcode);
+extern void zilog_otdr(uint8_t opcode);
+
 
 #ifndef WIN32
 extern int kbhit();

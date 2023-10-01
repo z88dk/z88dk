@@ -2,9 +2,15 @@
 // These mostly involve the px registers
 
 #include "ticks.h"
+#include <stdio.h>
 
 uint32_t pw,px,py,pz;
 uint32_t pw_,px_,py_,pz_;
+
+
+#define UNIMPLEMENTED(o, t) do {  \
+        fprintf(stderr, "Unimplemented opcode %04x/%s",o,t); \
+    } while (0)
 
 
 static uint32_t read_ps(uint8_t reg)
@@ -1232,6 +1238,97 @@ void r4k_mulu(uint8_t opcode)
     c = result & 0xff;
     st += 10;
 }
+
+void r4k_callxy(uint8_t opcode, uint8_t iy)
+{
+    st += 8;
+    put_memory(--sp, pc >> 8);
+    put_memory(--sp, pc);
+    if (iy) mp = pc = (yh<<8)|yl;
+    else mp = pc = (xh<<8)|xl;
+}
+
+void r4k_neg_hl(uint8_t opcode)
+{
+     UNIMPLEMENTED(opcode, "NEG hl");
+}
+
+void r4k_test_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    if (isjkhl) UNIMPLEMENTED( 0xfd00 | opcode, "TEST jkhl");
+    else UNIMPLEMENTED( 0xdd00 | opcode, "TEST bcde");
+}
+
+void r4k_neg_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    if (isjkhl) UNIMPLEMENTED( 0xfd00 | opcode, "NEG jkhl");
+    else UNIMPLEMENTED( 0xdd00 | opcode, "NEG bcde");
+}
+
+void r4k_rlb_a_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RLB A,r32");
+}
+
+void r4k_rrb_a_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RRB A,r32");
+}
+
+
+void r4k_rlc_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RLC n,r32");
+}
+
+void r4k_rrc_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RRC n,r32");
+}
+
+void r4k_rl_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RL n,r32");
+}
+
+void r4k_rr_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "RR n,r32");
+}
+
+void r4k_sla_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "SLA n,r32");
+}
+
+void r4k_sra_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "SRA n,r32");
+}
+
+void r4k_sll_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "SLL n,r32");
+}
+
+void r4k_srl_r32(uint8_t opcode, uint8_t isjkhl)
+{
+    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "SRL n,r32");
+}
+
+void r4k_jre(uint8_t opcode, uint8_t dojump)
+{
+    if (opcode == 0x98) {
+        UNIMPLEMENTED( opcode, "JRE dddd");
+    } else {
+        UNIMPLEMENTED( 0xed00 | opcode, "JRE cc/cx,r32");
+    }
+}
+
+
+
+
+
 
 void r4k_handle_6d_page(void)
 {

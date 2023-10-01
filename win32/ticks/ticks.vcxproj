@@ -191,6 +191,7 @@
     <ClCompile Include="..\..\src\ticks\linenoise.c" />
     <ClCompile Include="..\..\src\ticks\memory.c" />
     <ClCompile Include="..\..\src\ticks\profiler.c" />
+    <ClCompile Include="..\..\src\ticks\rxk_inst.c" />
     <ClCompile Include="..\..\src\ticks\r4k_inst.c" />
     <ClCompile Include="..\..\src\ticks\r800_inst.c" />
     <ClCompile Include="..\..\src\ticks\srcfile.c" />
@@ -199,6 +200,7 @@
     <ClCompile Include="..\..\src\ticks\utf8.c" />
     <ClCompile Include="..\..\src\ticks\z180_inst.c" />
     <ClCompile Include="..\..\src\ticks\z80n_inst.c" />
+    <ClCompile Include="..\..\src\ticks\zilog_inst.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ext\uthash\src\uthash.h" />
