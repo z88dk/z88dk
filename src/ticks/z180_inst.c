@@ -61,15 +61,15 @@ void z180_otdmr(uint8_t opcode)
 
 void z180_in0(uint8_t opcode)
 {
-    uint_t p = get_memory_inst(pc++);
-    
+    uint8_t p = get_memory_inst(pc++);
+
     UNIMPLEMENTED(0xed00|opcode, "in0");
     st += 12;
 }
 
 void z180_out0(uint8_t opcode)
 {
-    uint_t p = get_memory_inst(pc++);
+    uint8_t p = get_memory_inst(pc++);
     UNIMPLEMENTED(0xed00|opcode, "out0");
     st += 13;
 }
