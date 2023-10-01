@@ -229,6 +229,7 @@ extern void r4k_cbm(uint8_t opcode);
 extern void r4k_sbox_a(uint8_t opcode);
 extern void r4k_ibox_a(uint8_t opcode);
 extern void r4k_ld_pd_ihtrhl(uint8_t opcode);
+extern void r4k_xor_hl_de(uint8_t opcode);
 
 // rxk
 extern void rxk_ld_hl_ispn(uint8_t opcode, uint8_t ih, uint8_t iy);

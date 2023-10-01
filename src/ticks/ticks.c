@@ -2116,8 +2116,9 @@ int main (int argc, char **argv){
         if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else LDRR(d, e,  d_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
-      case 0x54: // LD D,H // LD D,IXh // LD D,IYh
-        if( ih )
+      case 0x54: // LD D,H // LD D,IXh // LD D,IYh // (R4K) XOR HL,DE
+        if (israbbit4k()) r4k_xor_hl_de(opc);
+        else if( ih )
           LDRR(d, h,  d_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         else if( iy && canixh() )
           LDRR(d, yh, d,isez80() ? 1 : isr800() ? 1 : 4);

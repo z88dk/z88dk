@@ -1300,6 +1300,11 @@ void r4k_neg_hl(uint8_t opcode)
      UNIMPLEMENTED(opcode, "neg hl");
 }
 
+void r4k_xor_hl_de(uint8_t opcode)
+{
+     UNIMPLEMENTED(opcode, "xor hl,de");
+}
+
 void r4k_test_hlxy(uint8_t opcode, uint8_t prefix)
 {
     switch (prefix) {
