@@ -80,7 +80,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	; Call the seek function via the trampoline
 	dec	hl
 	dec	hl
-  IF __CPU_R2KA__ | __CPU_R3K__
+  IF __CPU_RABBIT__
 	ld	ix,hl
   ELSE
 	push	hl

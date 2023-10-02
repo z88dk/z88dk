@@ -34,7 +34,7 @@ _fputc_callee:
 
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
     push    ix
-  IF __CPU_R2KA__ | __CPU_R3K__
+  IF __CPU_RABBIT__
     ld      ix,hl
   ELSE
     push    hl

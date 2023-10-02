@@ -7,6 +7,7 @@ ASTAR_OBJECTS = $(ASTAR_CFILES:.c=.o) $(ASTAR_AFILES:.asm=.o)
 
 ASTAR_OBJS = $(addprefix algorithm/AStarSearch/obj/z80/, $(ASTAR_OBJECTS)) \
 	$(addprefix algorithm/AStarSearch/obj/r2ka/,$(ASTAR_OBJECTS)) \
+	$(addprefix algorithm/AStarSearch/obj/r4k/,$(ASTAR_OBJECTS)) \
 	$(addprefix algorithm/AStarSearch/obj/ixiy/,$(ASTAR_OBJECTS)) \
 	$(addprefix algorithm/AStarSearch/obj/z80n/,$(ASTAR_OBJECTS)) \
 	$(addprefix algorithm/AStarSearch/obj/z180/,$(ASTAR_OBJECTS)) \
@@ -23,6 +24,7 @@ algorithm-astar: $(ASTAR_OBJS) $(ASTAR_NEWLIB_TARGETS)
 $(eval $(call buildbit,algorithm/AStarSearch,z80,test))
 $(eval $(call buildbit,algorithm/AStarSearch,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,algorithm/AStarSearch,r2ka,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,algorithm/AStarSearch,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,algorithm/AStarSearch,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,algorithm/AStarSearch,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,algorithm/AStarSearch,ez80_z80,test,-clib=ez80_z80,-mez80_z80))

@@ -30,7 +30,7 @@ l_mulu_16_8x8:
 
 ELSE
 
-IF (__CPU_R2KA__ || __CPU_R3K__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+IF ( __CPU_RABBIT__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
 l_mulu_16_8x8:
 

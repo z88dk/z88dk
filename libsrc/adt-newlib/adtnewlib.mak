@@ -4,6 +4,7 @@ ADT_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/adt/*/c/sccz80/*.asm $(NEWLIB_DIRECTOR
 ADT_NEWLIB_TARGETS := adt-newlib/obj/newlib-z80-adt-newlib \
 	adt-newlib/obj/newlib-z80n-adt-newlib \
 	adt-newlib/obj/newlib-r2ka-adt-newlib \
+	adt-newlib/obj/newlib-r4k-adt-newlib \
 	adt-newlib/obj/newlib-ixiy-adt-newlib \
 	adt-newlib/obj/newlib-z180-adt-newlib \
 	adt-newlib/obj/newlib-ez80_z80-adt-newlib 
@@ -24,6 +25,11 @@ adt-newlib/obj/newlib-r2ka-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
 	@mkdir -p adt-newlib/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/r2ka/x -I.. -mr2ka -D__CLASSIC $(ADT_NEWLIBGLOBS)
+
+adt-newlib/obj/newlib-r4k-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
+	@mkdir -p adt-newlib/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/r4k/x -I.. -mr4k -D__CLASSIC $(ADT_NEWLIBGLOBS)
 
 adt-newlib/obj/newlib-z80n-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
 	@mkdir -p adt-newlib/obj

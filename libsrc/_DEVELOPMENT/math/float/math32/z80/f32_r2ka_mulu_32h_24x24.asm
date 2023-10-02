@@ -7,7 +7,7 @@
 ;
 ;------------------------------------------------------------------------------
 
-IF __CPU_R2KA__ | __CPU_R3K__
+IF  __CPU_RABBIT__
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -182,7 +182,11 @@ ELSE
 
    inc e
    dec e
+IF __CPU_R4K__ | __CPU_R5K__
+   jp NZ, _16b_16b
+ELSE
    jr NZ, _16b_16b
+ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

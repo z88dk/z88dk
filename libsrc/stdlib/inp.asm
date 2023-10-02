@@ -17,7 +17,7 @@ _inp:
 .inp_fastcall
 ._inp_fastcall
 
-IF __CPU_R2KA__|__CPU_R3K__
+IF  __CPU_RABBIT__
 
    defb 0d3h ; ioi
    ld a,(hl)

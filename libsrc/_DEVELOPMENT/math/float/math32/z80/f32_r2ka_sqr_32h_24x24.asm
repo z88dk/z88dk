@@ -7,7 +7,7 @@
 ;
 ;------------------------------------------------------------------------------
 
-IF __CPU_R2KA__ | __CPU_R3K__
+IF  __CPU_RABBIT__
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -40,7 +40,11 @@ PUBLIC m32_sqr_32h_24x24
     ld d,l
     ld l,0
 
+IF __CPU_R4K__ | __CPU_R5K__
+    defb $ed, $51   ;BODGE
+ELSE
     ld de',de                   ; replicate multiplicand
+ENDIF
     ex de,hl
     ld hl',de
     ex de,hl

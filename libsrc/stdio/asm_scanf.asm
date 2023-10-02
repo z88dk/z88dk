@@ -50,7 +50,7 @@ ELSE
     add     ix,sp        ; Now the frame pointer
                 ; ix+2, ix+3 = arg pointer
 ENDIF
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_RABBIT__
     add     sp,-50
 ELSE
     ld      hl,-50        ; make some space on the stack
@@ -152,7 +152,7 @@ ELSE
     ld      d,0
 ENDIF
 scanf_exit2:
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_RABBIT__
     add     sp,50
 ELSE
     ld      hl,50

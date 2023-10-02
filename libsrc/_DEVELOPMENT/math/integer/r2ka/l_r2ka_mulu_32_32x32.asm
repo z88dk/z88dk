@@ -77,7 +77,11 @@ l0_r2ka_mulu_32_32x32:
     ld bc,de                    ; xh
     exx
 
+IF __CPU_R4K__ | __CPU_R5K__
+    defb $ed, $59		;BODGE
+ELSE
     ld de',bc                   ; yl
+ENDIF
     ld bc,hl                    ; yh
 
     ; enter : bc'de = 32-bit multiplier   = x

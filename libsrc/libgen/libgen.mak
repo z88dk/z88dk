@@ -3,6 +3,7 @@ LIBGEN_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/libgen/c/sccz80/*.asm $(NEWLIB_DIRE
 
 LIBGEN_NEWLIB_TARGETS := libgen/obj/newlib-z80-libgen libgen/obj/newlib-z80n-libgen libgen/obj/newlib-r2ka-libgen \
 		 libgen/obj/newlib-ixiy-libgen libgen/obj/newlib-8080-libgen libgen/obj/newlib-gbz80-libgen \
+		libgen/obj/newlib-r4k-libgen \
 		libgen/obj/newlib-z180-libgen \
 		libgen/obj/newlib-ez80_z80-libgen		
 
@@ -22,6 +23,11 @@ libgen/obj/newlib-r2ka-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
 	@mkdir -p libgen/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=libgen/obj/r2ka/x -I.. -mr2ka -D__CLASSIC $(LIBGEN_NEWLIBGLOBS)
+
+libgen/obj/newlib-r4k-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
+	@mkdir -p libgen/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=libgen/obj/r4k/x -I.. -mr4k -D__CLASSIC $(LIBGEN_NEWLIBGLOBS)
 
 libgen/obj/newlib-z80n-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
 	@mkdir -p libgen/obj

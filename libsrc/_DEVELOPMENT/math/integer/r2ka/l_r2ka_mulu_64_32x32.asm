@@ -94,7 +94,11 @@ l0_r2ka_mulu_64_32x32:
     push af                     ;'pp1 carry
 
     ex de',hl                   ;'pp1 <> xh
+IF __CPU_R4K__ | __CPU_R5K__
+    defb $ed, $59		;BODGE
+ELSE
     ld de',bc                   ;'yh
+ENDIF
     push hl                     ;'xh
     exx
 
@@ -114,7 +118,11 @@ l0_r2ka_mulu_64_32x32:
     exx
 
     ex de,hl'                   ; ?? >> (xl*yh)h
+IF __CPU_R4K__ | __CPU_R5K__
+    defb $ed, $41		;BODGE
+ELSE
     ld bc',de                   ; (xl*yh)h
+ENDIF
     ld de,bc                    ; xh
     call l_mulu_32_16x16        ; yh * xh = de*hl => dehl ; uses bc, hl'
 
@@ -129,7 +137,11 @@ l0_r2ka_mulu_64_32x32:
     add hl,bc                   ;'pp2 = pp2 + (xl*yh)h
     adc a,0                     ;'pp2 carry
     ex de,hl                    ;'pp2
+IF __CPU_R4K__ | __CPU_R5K__
+    defb $ed, $41		;BODGE
+ELSE
     ld bc',de                   ;'pp2
+ENDIF
     pop de                      ;'p1
     pop hl                      ;'p0
     exx

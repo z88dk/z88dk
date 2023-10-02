@@ -150,7 +150,7 @@ not_text_fp:
   ENDIF
 ELSE
 
-  IF __CPU_R2KA__ | __CPU_R3K__
+  IF __CPU_RABBIT__
     ld      hl,(sp + 2)
     push    ix		;save callers ix
     ld      ix,hl
@@ -224,7 +224,7 @@ ELSE
     pop     hl
     jr      fgetc_end	; always succeeds - never EOF when EOF has not been defined.
 .no_stdin
-  IF __CPU_R2KA__ | __CPU_R3K__
+  IF __CPU_RABBIT__
     ld      hl,(ix+fp_desc)
   ELSE
     ld      l,(ix+fp_desc)

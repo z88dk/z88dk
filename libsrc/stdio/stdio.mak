@@ -33,6 +33,7 @@ STDIO_OBJS = $(addprefix stdio/obj/z80/, $(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/z180-binary/,$(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/ixiy-binary/,$(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/r2ka/,$(STDIO_OBJECTS)) \
+	$(addprefix stdio/obj/r4k/,$(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/8080/,$(STDIO_8080_OBJECTS)) \
 	$(addprefix stdio/obj/8085/,$(STDIO_8080_OBJECTS)) \
 	$(addprefix stdio/obj/8080-binary/,$(STDIO_8080_OBJECTS)) \
@@ -56,6 +57,7 @@ $(eval $(call buildbit,stdio,8085,test,-DCPU_8080 -clib=8085,-m8085))
 $(eval $(call buildbit,stdio,8080-binary,cpm,-DCPU_8080 -clib=8080,-m8080))
 $(eval $(call buildbit,stdio,gbz80,test,-DCPU_GBZ80 -clib=gbz80,-mgbz80))
 $(eval $(call buildbit,stdio,r2ka,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,stdio,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,stdio,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,stdio,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,stdio,z180-binary,cpm,-clib=z180,-mz180))

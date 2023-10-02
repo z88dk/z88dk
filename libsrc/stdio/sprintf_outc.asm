@@ -49,7 +49,7 @@ sprintf_outc:
 	pop	de	;charcter
 	push	bc
 	push	ix	;save ix
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_RABBIT__
 	ld	ix,hl
 ELSE
 	push	hl	;get fp into ix

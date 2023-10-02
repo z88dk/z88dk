@@ -132,7 +132,11 @@ handle_character_no_scroll:
 	inc	c
 	ld	a,(__console_w)
 	cp	c
+IF __CPU_R4K__ | __CPU_R5K__
+	jp	nz,store_coords
+ELSE
 	jr	nz,store_coords
+ENDIF
 	ld	c,0
 	inc	b
 	jr	store_coords

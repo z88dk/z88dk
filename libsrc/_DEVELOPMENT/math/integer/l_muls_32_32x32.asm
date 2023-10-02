@@ -23,7 +23,7 @@ IF __CPU_Z80N__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
 ELSE
 
-IF (__CPU_R2KA__ || __CPU_R3K__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+IF ( __CPU_RABBIT__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
    EXTERN l_r2ka_muls_32_32x32
    defc l_muls_32_32x32 = l_r2ka_muls_32_32x32

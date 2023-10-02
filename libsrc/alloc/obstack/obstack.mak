@@ -6,11 +6,13 @@ OBSTACK_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/alloc/obstack/c/sccz80/*.asm" "$(NEW
 OBSTACK_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/alloc/obstack/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/alloc/obstack/z80/*.asm
 
 
-OBSTACK_NEWLIB_TARGETS := alloc/obstack/obj/newlib-z80-alloc-obstack alloc/obstack/obj/newlib-z80n-alloc-obstack alloc/obstack/obj/newlib-r2ka-alloc-obstack alloc/obstack/obj/newlib-ixiy-alloc-obstack  alloc/obstack/obj/newlib-8080-alloc-obstack alloc/obstack/obj/newlib-ez80_z80-alloc-obstack alloc/obstack/obj/newlib-z180-alloc-obstack
+OBSTACK_NEWLIB_TARGETS := alloc/obstack/obj/newlib-z80-alloc-obstack alloc/obstack/obj/newlib-z80n-alloc-obstack alloc/obstack/obj/newlib-r2ka-alloc-obstack alloc/obstack/obj/newlib-ixiy-alloc-obstack  alloc/obstack/obj/newlib-8080-alloc-obstack alloc/obstack/obj/newlib-ez80_z80-alloc-obstack alloc/obstack/obj/newlib-z180-alloc-obstack \
+	alloc/obstack/obj/newlib-r4k-alloc-obstack
 
 OBSTACK_OBJECTS = $(OBSTACK_CFILES:.c=.o) $(OBSTACK_AFILES:.asm=.o)
 
 OBSTACK_OBJS = $(addprefix alloc/obstack/obj/z80/, $(OBSTACK_OBJECTS)) $(addprefix alloc/obstack/obj/r2ka/,$(OBSTACK_OBJECTS)) $(addprefix alloc/obstack/obj/ixiy/,$(OBSTACK_OBJECTS))  $(addprefix alloc/obstack/obj/z80n/,$(OBSTACK_OBJECTS)) \
+	$(addprefix alloc/obstack/obj/r4k/,$(OBSTACK_OBJECTS)) \
 	$(addprefix alloc/obstack/obj/8080/,$(OBSTACK_OBJECTS)) \
 	$(addprefix alloc/obstack/obj/z180/,$(OBSTACK_OBJECTS)) \
 	$(addprefix alloc/obstack/obj/ez80_z80/,$(OBSTACK_OBJECTS))
@@ -28,6 +30,7 @@ $(eval $(call buildbit,alloc/obstack,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,alloc/obstack,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,alloc/obstack,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,alloc/obstack,r2ka,test,-clib=rabbit,-mr2ka))
+$(eval $(call buildbit,alloc/obstack,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,alloc/obstack,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,alloc/obstack,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,alloc/obstack,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
@@ -42,6 +45,11 @@ alloc/obstack/obj/newlib-r2ka-alloc-obstack: $(OBSTACK_NEWLIBGLOBS_ex)
 	@mkdir -p alloc/obstack/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=alloc/obstack/obj/r2ka/x -I.. -mr2ka -D__CLASSIC $(OBSTACK_NEWLIBGLOBS)
+
+alloc/obstack/obj/newlib-r4k-alloc-obstack: $(OBSTACK_NEWLIBGLOBS_ex)
+	@mkdir -p alloc/obstack/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=alloc/obstack/obj/r4k/x -I.. -mr4k -D__CLASSIC $(OBSTACK_NEWLIBGLOBS)
 
 alloc/obstack/obj/newlib-z80n-alloc-obstack: $(OBSTACK_NEWLIBGLOBS_ex)
 	@mkdir -p alloc/obstack/obj

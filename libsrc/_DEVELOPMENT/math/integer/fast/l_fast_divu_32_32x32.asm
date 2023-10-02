@@ -256,7 +256,11 @@ loop_z6:
    
    inc h
    dec h
+IF __CPU_R4K__ | __CPU_R5K__
+   jp nz, loop_60
+ELSE
    jr nz, loop_60
+ENDIF
 
    scf
    jp loop_7
