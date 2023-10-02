@@ -2,9 +2,10 @@
 ;
 ;       ZX Maths Routines
 ;
-;       10/12/02 - Stefano Bodrato
+;       10/12/02 - Stefano Bodrato  (Broken release)
+;       02/10/23 - Olofsen  (Fix)
 ;
-;       $Id: log10.asm,v 1.5 2016-06-22 19:59:18 dom Exp $
+;       $Id: log10.asm $
 ;
 
 
@@ -33,14 +34,15 @@ ENDIF
 
 .log10
         call    fsetup1
+        defb	ZXFP_LN
         defb	ZXFP_STK_TEN
-	defb	ZXFP_LN
-	defb	ZXFP_STK_ONE
+        defb	ZXFP_LN
+
 IF FORlambda
-	defb	ZXFP_DIVISION + 128
+        defb	ZXFP_DIVISION + 128
 ELSE
-	defb	ZXFP_DIVISION
-	defb	ZXFP_END_CALC
+        defb	ZXFP_DIVISION
+        defb	ZXFP_END_CALC
 ENDIF
         jp      stkequ
 
