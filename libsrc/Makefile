@@ -612,12 +612,14 @@ mlambda.lib:
 	@echo '--- Building Lambda 8300 Maths Library ---'
 	@echo ''
 	$(MAKE) -C math/zxmath mlambda
+	$(MAKE) -C math/zxmath mlambdav1
 
 mlambda_tiny.lib:
 	@echo ''
 	@echo '--- Building Lambda 8300 Tiny Maths Library ---'
 	@echo ''
 	$(MAKE) -C math/zxmath mlambda_tiny
+	$(MAKE) -C math/zxmath mlambdav1_tiny
 
 # Texas Instrument's calculators: - stefano/henk
 # almost the same lib code with different -D flag set
