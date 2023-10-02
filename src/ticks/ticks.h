@@ -132,6 +132,42 @@ extern void apu_write_command(uint8_t cmd);
 extern int hook_console_out(int port, int value);
 extern int hook_console_in(int port);
 
+// ez80
+extern void ez80_lea_rr_xyd(uint8_t opcode);
+extern void ez80_lea_xy_xd(uint8_t opcode);
+extern void ez80_lea_xy_yd(uint8_t opcode);
+extern void ez80_pea_xyd(uint8_t opcode);
+extern void ez80_ld_rr_ihl(uint8_t opcode);
+extern void ez80_ld_xy_ihl(uint8_t opcode);
+extern void ez80_ld_rr_ixyd(uint8_t opcode, uint8_t prefix);
+extern void ez80_ld_ixyd_rr(uint8_t opcode, uint8_t prefix);
+extern void ez80_otd2r(uint8_t opcode);
+extern void ez80_ld_xy_ixyd(uint8_t opcode, uint8_t prefix);
+extern void ez80_ld_ixyd_xy(uint8_t opcode, uint8_t prefix);
+extern void ez80_ld_ihl_rr(uint8_t opcode);
+extern void ez80_ld_ihl_xy(uint8_t opcode);
+extern void ez80_stmix(uint8_t opcode);
+extern void ez80_rsmix(uint8_t opcode);
+extern void ez80_ini2(uint8_t opcode);
+extern void ez80_ini2r(uint8_t opcode);
+extern void ez80_outi2(uint8_t opcode);
+extern void ez80_oti2r(uint8_t opcode);
+extern void ez80_ind2(uint8_t opcode);
+extern void ez80_ind2r(uint8_t opcode);
+extern void ez80_outd2(uint8_t opcode);
+extern void ez80_outd2r(uint8_t opcode);
+extern void ez80_inirx(uint8_t opcode);
+extern void ez80_otirx(uint8_t opcode);
+extern void ez80_indrx(uint8_t opcode);
+extern void ez80_otdrx(uint8_t opcode);
+extern void ez80_ld_mb_a(uint8_t opcode);
+extern void ez80_ld_a_mb(uint8_t opcode);
+extern void ez80_ld_i_hl(uint8_t opcode);
+extern void ez80_ld_hl_i(uint8_t opcode);
+extern void ez80_inim(uint8_t opcode);
+extern void ez80_inimr(uint8_t opcode);
+extern void ez80_indm(uint8_t opcode);
+extern void ez80_indmr(uint8_t opcode);
 
 // r4k
 extern void r4k_handle_6d_page(void);
@@ -233,7 +269,8 @@ extern void r4k_ibox_a(uint8_t opcode);
 extern void r4k_ld_pd_ihtrhl(uint8_t opcode);
 extern void r4k_xor_hl_de(uint8_t opcode);
 extern void r4k_flag_cc_hl(uint8_t opcode, uint8_t set);
-
+extern void r4k_setsysp_mn(uint8_t opcode);
+extern void r4k_exp(uint8_t opcode);
 
 // rxk
 extern void rxk_ld_hl_ispn(uint8_t opcode, uint8_t ih, uint8_t iy);
@@ -318,6 +355,7 @@ extern void z180_otdm(uint8_t opcode);
 extern void z180_otdmr(uint8_t opcode);
 extern void z180_in0(uint8_t opcode);
 extern void z180_out0(uint8_t opcode);
+extern void z180_slp(uint8_t opcode);
 
 // zilog
 extern void zilog_daa(uint8_t opcode);

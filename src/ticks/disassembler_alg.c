@@ -1049,11 +1049,11 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     } else if ( z == 7 && y <= 2 &&  isez80() ) {
                                         char *instrs[] = { "ld        i,hl", "nop", "ld        hl,i"};
                                         BUF_PRINTF("%s",instrs[y]);                               
-                                    } else if ( q == 1 && z == 1 && y == 3 ) BUF_PRINTF("%-10s","exp");
-                                    else if ( q == 1 && z == 2 && y == 5 ) BUF_PRINTF("%-10s(hl)","call");
-                                    else if ( q == 1 && z == 2 && y == 7 ) BUF_PRINTF("%-10s(jkhl)","llcall");
-                                    else if ( q == 1 && z == 6 && y == 5 ) BUF_PRINTF("%-10sjkhl,bcde","xor");
-                                    else if ( q == 1 && z == 6 && y == 7 ) BUF_PRINTF("%-10shl,(sp+hl)","ld");
+                                    } else if ( q == 1 && z == 1 && y == 3 && israbbit4k()) BUF_PRINTF("%-10s","exp");
+                                    else if ( q == 1 && z == 2 && y == 5 && israbbit4k()) BUF_PRINTF("%-10s(hl)","call");
+                                    else if ( q == 1 && z == 2 && y == 7 && israbbit4k()) BUF_PRINTF("%-10s(jkhl)","llcall");
+                                    else if ( q == 1 && z == 6 && y == 5 && israbbit4k()) BUF_PRINTF("%-10sjkhl,bcde","xor");
+                                    else if ( q == 1 && z == 6 && y == 7 && israbbit4k()) BUF_PRINTF("%-10shl,(sp+hl)","ld");
                                     else if ( b == 0xfe ) BUF_PRINTF("trap");
                                     else BUF_PRINTF("nop");
                                 }

@@ -1549,6 +1549,12 @@ void r4k_llret(uint8_t opcode)
     st += 14;
 }
 
+void r4k_setsysp_mn(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "setsysp mn");
+    st += 12;
+}
+
 
 void r4k_handle_6d_page(void)
 {

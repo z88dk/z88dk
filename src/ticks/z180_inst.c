@@ -30,7 +30,7 @@ void z180_mlt(uint8_t opcode)
         l = v;
         break;
     case 0x03:      // MLT SP
-        UNIMPLEMENTED(0xed00|opcode, "MLT SP");
+        UNIMPLEMENTED(0xed00|opcode, "mlt sp");
         break;
     }
     st += isez80() ? 6 : 17;
@@ -72,4 +72,9 @@ void z180_out0(uint8_t opcode)
     uint8_t p = get_memory_inst(pc++);
     UNIMPLEMENTED(0xed00|opcode, "out0");
     st += 13;
+}
+
+void z180_slp(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "slp");
 }
