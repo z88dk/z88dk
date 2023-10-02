@@ -13,7 +13,8 @@ all: test_genmath.bin test_math16.bin test_daimath32.bin \
 	test_math32.bin test_math32_z180.bin test_math32_z80n.bin test_math32_r2ka.bin\
 	test_math48.bin test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin test_cpcmath.bin \
 	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_gbz80.bin \
-	test_9511.bin test_9511_8085.bin test_bbcmath.bin test_fixmath.bin
+	test_9511.bin test_9511_8085.bin test_bbcmath.bin test_fixmath.bin \
+	test_math32_r4k.bin
 
 test_fixmath.bin: $(FIXSOURCES)
 	$(call compile, -DFIX16 -DMATH_LIBRARY="\"\\\"fix16\\\"\"", -lm)
@@ -75,6 +76,10 @@ test_math32_z80n.bin: $(FPSOURCES)
 test_math32_r2ka.bin: $(FPSOURCES)
 	$(call compile_r2ka, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_r2ka)
 	$(runtest_r2ka)
+
+test_math32_r4k.bin: $(FPSOURCES)
+	$(call compile_r4k, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_r4k)
+	$(runtest_r4k)
 
 test_math48_rc2014_CODE.bin: $(FPSOURCES)
 	$(call compile_rc2014, -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"", -lm)

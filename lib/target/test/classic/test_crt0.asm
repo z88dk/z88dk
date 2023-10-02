@@ -79,7 +79,7 @@ ELSE
     add     hl,sp
     ld      (exitsp),hl
 ENDIF
-IF !__CPU_R2KA__
+IF !__CPU_RABBIT__
     ei
 ENDIF
 ; Optional definition for auto MALLOC init
@@ -110,7 +110,11 @@ cleanup:
 
 SYSCALL:
     ; a = command to execute
+IF __CPU_R4K__ | __CPU_R5K__
+    defb    $ED, $FD	;trap
+ELSE
     defb    $ED, $FE	;trap
+ENDIF
     ret
 
 l_dcal:

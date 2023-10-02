@@ -122,7 +122,7 @@ TOCREATE += $(call check_target,special,special_clib.lib)
 TOCREATE += $(call check_target,super80,super80_clib.lib super80_vduem_clib.lib)
 TOCREATE += $(call check_target,sv8000,sv8000_clib.lib)
 TOCREATE += $(call check_target,svi,svi_clib.lib)
-TOCREATE += $(call check_target,test,test_clib.lib testz180_clib.lib testez80_z80_clib.lib test8080_clib.lib testrcm_clib.lib testgbz80_clib.lib)
+TOCREATE += $(call check_target,test,test_clib.lib testz180_clib.lib testez80_z80_clib.lib test8080_clib.lib testrcm_clib.lib testrcm4k_clib.lib testgbz80_clib.lib)
 TOCREATE += $(call check_target,ti82,ti82_clib.lib)
 TOCREATE += $(call check_target,ti83,ti83_clib.lib)
 TOCREATE += $(call check_target,ti83p,ti83p_clib.lib)
@@ -1758,12 +1758,12 @@ testrcm_clib.lib: $(TARGET_CLIB_OBJS) testez80_z80_clib.lib
 	$(call buildgeneric,test)
 	TARGET=test TYPE=r2ka $(LIBLINKER2) -mr2ka -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
 
-testr4k_clib.lib: $(TARGET_CLIB_OBJS) testrcm_clib.lib
+testrcm4k_clib.lib: $(TARGET_CLIB_OBJS) testrcm_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (Rabbit4k) ---'
 	@echo ''
 	$(call buildgeneric,test)
-	TARGET=test TYPE=r4k $(LIBLINKER2) -mr4k -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testr4k_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
+	TARGET=test TYPE=r4k $(LIBLINKER2) -mr4k -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm4k_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
 
 test8080_clib.lib: $(TARGET_CLIB_OBJS) testrcm_clib.lib
 	@echo ''
