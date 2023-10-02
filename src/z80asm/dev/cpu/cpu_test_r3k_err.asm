@@ -378,7 +378,6 @@
  altd ld bc, (pz+126)           ; Error
  altd ld bc, (pz+hl)            ; Error
  altd ld bc, (pz-128)           ; Error
- altd ld bc, hl                 ; Error
  altd ld bcde, (0x1234)         ; Error
  altd ld bcde, (hl)             ; Error
  altd ld bcde, (ix)             ; Error
@@ -429,7 +428,6 @@
  altd ld de, (pz+126)           ; Error
  altd ld de, (pz+hl)            ; Error
  altd ld de, (pz-128)           ; Error
- altd ld de, hl                 ; Error
  altd ld hl, (pw)               ; Error
  altd ld hl, (pw+126)           ; Error
  altd ld hl, (pw+bc)            ; Error
@@ -2871,7 +2869,6 @@
  ld bc', (pz+126)               ; Error
  ld bc', (pz+hl)                ; Error
  ld bc', (pz-128)               ; Error
- ld bc', hl                     ; Error
  ld bc, (pw)                    ; Error
  ld bc, (pw+126)                ; Error
  ld bc, (pw+hl)                 ; Error
@@ -3340,7 +3337,6 @@
  ld de', (pz+126)               ; Error
  ld de', (pz+hl)                ; Error
  ld de', (pz-128)               ; Error
- ld de', hl                     ; Error
  ld de, (pw)                    ; Error
  ld de, (pw+126)                ; Error
  ld de, (pw+hl)                 ; Error

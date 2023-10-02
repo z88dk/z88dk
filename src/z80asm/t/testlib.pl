@@ -771,9 +771,13 @@ END
 			$self->_check_value($test_nr, $t, $dd_tick, $res_addr, 2, 0, $value);
 		};
 		return <<END;
+						IF !__CPU_INTEL__ && !__CPU_GBZ80__
 							exx
+						ENDIF
 							ld ($res_addr), $dd_plain
+						IF !__CPU_INTEL__ && !__CPU_GBZ80__
 							exx
+						ENDIF
 END
 	}
 	
@@ -814,10 +818,14 @@ END
 		else {
 			return <<END;
 							push af
+						IF !__CPU_INTEL__ && !__CPU_GBZ80__
 							exx
+						ENDIF
 							ld a, $r_plain
 							ld ($res_addr), a
+						IF !__CPU_INTEL__ && !__CPU_GBZ80__
 							exx
+						ENDIF
 							pop af
 END
 		}

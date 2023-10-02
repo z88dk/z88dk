@@ -889,6 +889,14 @@ for my $cpu (@CPUS) {
 		add($cpu, "altd ld bc, hl", [$V{altd}, 0x91]);
 		add($cpu, "ld bc', hl", 	[$V{altd}, 0x91]);
 	}
+	elsif ($rabbit) {
+		add($cpu, "ld bc, hl", 		[ld_r_r('b', 'h')], 
+									[ld_r_r('c', 'l')]);
+		add($cpu, "altd ld bc, hl", [$V{altd}, ld_r_r('b', 'h')], 
+									[$V{altd}, ld_r_r('c', 'l')]);
+		add($cpu, "ld bc', hl", 	[$V{altd}, ld_r_r('b', 'h')], 
+									[$V{altd}, ld_r_r('c', 'l')]);
+	}
 	else {
 		add($cpu, "ld bc, hl", [ld_r_r('b', 'h')], [ld_r_r('c', 'l')]);
 	}
@@ -916,6 +924,14 @@ for my $cpu (@CPUS) {
 		add($cpu, "ld de, hl", 		[0xB1]);
 		add($cpu, "altd ld de, hl",	[$V{altd}, 0xB1]);
 		add($cpu, "ld de', hl", 	[$V{altd}, 0xB1]);
+	}
+	elsif ($rabbit) {
+		add($cpu, "ld de, hl", 		[ld_r_r('d', 'h')], 
+									[ld_r_r('e', 'l')]);
+		add($cpu, "altd ld de, hl", [$V{altd}, ld_r_r('d', 'h')], 
+									[$V{altd}, ld_r_r('e', 'l')]);
+		add($cpu, "ld de', hl", 	[$V{altd}, ld_r_r('d', 'h')], 
+									[$V{altd}, ld_r_r('e', 'l')]);
 	}
 	else {
 	    # this 8085 instruction is slower, thanks @feilipu
@@ -962,6 +978,12 @@ for my $cpu (@CPUS) {
 		add($cpu, "altd ld hl, bc",	[$V{altd}, 0x81]);
 		add($cpu, "ld hl', bc", 	[$V{altd}, 0x81]);
 	}
+	elsif ($rabbit) {
+		add($cpu, "ld hl, bc", 		[ld_r_r('h', 'b')], 
+									[ld_r_r('l', 'c')]);
+		add($cpu, "ld hl', bc",		[0xED, 0x69]);
+		add($cpu, "altd ld hl, bc",	[0xED, 0x69]);
+	}
 	else {
 		add($cpu, "ld hl, bc", [ld_r_r('h', 'b')], [ld_r_r('l', 'c')]);
 	}
@@ -971,6 +993,12 @@ for my $cpu (@CPUS) {
 		add($cpu, "ld hl, de", 		[0xA1]);
 		add($cpu, "altd ld hl, de",	[$V{altd}, 0xA1]);
 		add($cpu, "ld hl', de", 	[$V{altd}, 0xA1]);
+	}
+	elsif ($rabbit) {
+		add($cpu, "ld hl, de", 		[ld_r_r('h', 'd')], 
+									[ld_r_r('l', 'e')]);
+		add($cpu, "ld hl', de",		[0xED, 0x61]);
+		add($cpu, "altd ld hl, de",	[0xED, 0x61]);
 	}
 	else {
 		add($cpu, "ld hl, de", [ld_r_r('h', 'd')], [ld_r_r('l', 'e')]);
@@ -1033,6 +1061,71 @@ for my $cpu (@CPUS) {
 		}
 	}
 	
+	# LD dd', BC
+	if ($rabbit) {
+		add($cpu, "ld bc', bc",		[0xED, 0x49]);
+		add($cpu, "altd ld bc, bc",	[0xED, 0x49]);
+		
+		add($cpu, "ld de', bc",		[0xED, 0x59]);
+		add($cpu, "altd ld de, bc",	[0xED, 0x59]);
+	}
+	
+	# LD dd', DE
+	if ($rabbit) {
+		add($cpu, "ld bc', de",		[0xED, 0x41]);
+		add($cpu, "altd ld bc, de",	[0xED, 0x41]);
+		
+		add($cpu, "ld de', de",		[0xED, 0x51]);
+		add($cpu, "altd ld de, de",	[0xED, 0x51]);
+	}
+	
+	# LD dd', HL
+	if ($rabbit) {
+		add($cpu, "ld hl', hl",		[push_dd('hl')], 
+									[$V{altd}, pop_dd('hl')]);
+	}
+	
+	# LD dd, dd'
+	if ($rabbit) {
+		for my $s (qw( bc de hl )) {
+			for my $d (qw( bc de hl )) {
+				add($cpu, "ld $d, $s'",	[exx()], [push_dd($s)], [exx()], 
+										[pop_dd($d)]);
+			}
+		}
+	}
+	
+	# LD dd', dd'
+	if ($rabbit) {
+		for my $s (qw( bc de hl )) {
+			for my $d (qw( bc de hl )) {
+				add($cpu, "ld $d', $s'",[exx()], [push_dd($s)], [exx()], 
+										[$V{altd}, pop_dd($d)]);
+			}
+		}
+	}
+	
+	# LD IXY, dd'
+	if ($rabbit) {
+		for my $s (qw( bc de hl )) {
+			for my $d (qw( ix iy )) {
+				add($cpu, "ld $d, $s'",	[exx()], [push_dd($s)], [exx()], 
+										[$V{$d}, pop_dd('hl')]);
+			}
+		}
+	}
+	
+	# LD dd', IXY
+	if ($rabbit) {
+		for my $s (qw( ix iy )) {
+			for my $d (qw( bc de )) {
+				add($cpu, "ld $d', $s",	[$V{$s}, push_dd('hl')], 
+										[$V{altd}, pop_dd($d)]);
+			}
+		}
+	}
+	
+	# LD HL, SP+n
     if ($i8085) {
 		add($cpu, "ld hl, sp+%u",	[ex_de_hl()], [0x38, '%u'], [ex_de_hl()]);
     }
@@ -1112,15 +1205,6 @@ for my $cpu (@CPUS) {
 		
 			add_x($cpu, "ld (sp+%u), $dd", 	[@pfx, 0xD4, '%u']);
 			add_x($cpu, "ld $dd, (sp+%u)", 	[@pfx, 0xC4, '%u']);
-		}
-		
-		if (!$r4k && !$r5k) {
-			for my $dd (qw(bc de hl)) {
-				for my $s (qw(bc de)) {
-					add($cpu, "ld $dd', $s", 		[0xED, 0x41+16*$V{$dd}+8*(1-$V{$s})]);
-					add($cpu, "altd ld $dd, $s", 	[0xED, 0x41+16*$V{$dd}+8*(1-$V{$s})]);
-				}
-			}
 		}
 		
 		for ([hl => 0xED], [ix => 0xDD], [iy => 0xFD]) {
@@ -1203,7 +1287,7 @@ for my $cpu (@CPUS) {
 		add($cpu, "ex af', af", [0x08]);
 		add($cpu, "ex af, af",  [0x08]);
 		
-		add($cpu, "exx",  [0xD9]);
+		add($cpu, "exx",  [exx()]);
 	}
 
 	if ($r4k || $r5k) {
@@ -3151,6 +3235,7 @@ sub ret		{					return 0xC9; }
 sub ret_f	{ my($_f) = @_;		return 0xC0+8*$V{$_f}; }
 sub rot_a	{ my($op) = @_;		return 0x07+8*$V{$op}; }
 sub sbc_hl_dd{my($dd) = @_; 	return (0xED, 0x42+16*$V{$dd}); }
+sub exx		{					return 0xD9; }
 
 #------------------------------------------------------------------------------
 # add opcode
@@ -3158,7 +3243,8 @@ sub sbc_hl_dd{my($dd) = @_; 	return (0xED, 0x42+16*$V{$dd}); }
 sub add {
 	my($cpu, $asm, @ops) = @_;
 	
-	#say "$cpu\t$asm" if $asm =~ /ld bcde,/;
+	#use Carp 'longmess';
+	#say "$cpu\t$asm\n".dump(longmess()) if $asm =~ /ld hl', bc/;
 	
 	# convert (ix+d) to (ix) with offset 0
 	if ($asm =~ /(ix|iy|hl|sp|pw|px|py|pz)\+%[dus]/) {

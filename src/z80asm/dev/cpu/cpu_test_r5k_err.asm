@@ -284,10 +284,6 @@
  altd ioi bit 8, (iy)           ; Error
  altd ioi bit 8, (iy+126)       ; Error
  altd ioi bit 8, (iy-128)       ; Error
- altd ld bc, bc                 ; Error
- altd ld bc, de                 ; Error
- altd ld de, bc                 ; Error
- altd ld de, de                 ; Error
  altd res -1, a                 ; Error
  altd res -1, b                 ; Error
  altd res -1, c                 ; Error
@@ -1916,8 +1912,6 @@
  ld b, srl (iy)                 ; Error
  ld b, srl (iy+126)             ; Error
  ld b, srl (iy-128)             ; Error
- ld bc', bc                     ; Error
- ld bc', de                     ; Error
  ld c, ixh                      ; Error
  ld c, ixl                      ; Error
  ld c, iyh                      ; Error
@@ -2286,8 +2280,6 @@
  ld d, srl (iy)                 ; Error
  ld d, srl (iy+126)             ; Error
  ld d, srl (iy-128)             ; Error
- ld de', bc                     ; Error
- ld de', de                     ; Error
  ld e, ixh                      ; Error
  ld e, ixl                      ; Error
  ld e, iyh                      ; Error
