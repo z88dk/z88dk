@@ -310,11 +310,11 @@
           put_memory(--sp,b);   \
         } while (0)
 
-#define POP(a, b) do {          \
+#define POP(a, b, a_, b_) do {          \
           ioi=ioe=0;            \
-          st+= isez80() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 12 : isr800() ? 3 : 10,              \
-          b= get_memory_data(sp++),  \
-          a= get_memory_data(sp++);  \
+          st+= isez80() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 12 : isr800() ? 3 : 10;              \
+          if (altd) b_= get_memory_data(sp++); else b= get_memory_data(sp++); \
+          if (altd) a_= get_memory_data(sp++); else a= get_memory_data(sp++); \
         } while (0)
 
 #define JPC(c) do {             \
@@ -1925,7 +1925,7 @@ int main (int argc, char **argv){
       case 0x44: // LD B,H // LD B,IXh // LD B,IYh
         if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else if( ih ) {
-          LDRR(b, h, h_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
+          LDRR(b, h, b_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : 4);
         } else if( iy && canixh() )
           LDRR(b, yh, b,isez80() ? 1 : isr800() ? 1 : 4);
         else if ( canixh() )
@@ -2972,18 +2972,18 @@ int main (int argc, char **argv){
         else RETCI(ff&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc1: // POP BC
-        POP(b, c);
+        POP(b, c, b_, c_);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd1: // POP DE
-        POP(d, e);
+        POP(d, e, d_, e_);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe1: // POP HL // POP IX // POP IY
         if( ih )
-          POP(h, l);
+          POP(h, l, h_, l_);
         else if( iy )
-          POP(yh, yl);
+          POP(yh, yl, yh, yl);
         else
-          POP(xh, xl);
+          POP(xh, xl, xh, xl);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf1: // POP AF // (R4K)
         if (israbbit4k() && ih==0) r4k_pop_r32(opc, iy);
