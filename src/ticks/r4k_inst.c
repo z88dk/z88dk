@@ -1436,7 +1436,7 @@ void r4k_sbox_a(uint8_t opcode)
 
 void r4k_ibox_a(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode, "sbox a");
+    UNIMPLEMENTED(0xed00|opcode, "ibox a");
     st += 4;
 }
 
