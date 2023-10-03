@@ -918,6 +918,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                         else if ( q == 1 && z == 6 && p < 3) BUF_PRINTF("%-10s%s,%s","ld", kc160_handle_register_r24(state, p),handle_immed24(state, opbuf1, sizeof(opbuf1)));
                                         else if ( q == 0 && z == 3 && p < 3) BUF_PRINTF("%-10s(%s),%s", "ldf", handle_addr24(state, opbuf1, sizeof(opbuf1)), kc160_handle_register_r24(state,p));
                                         else if ( q == 1 && z == 3 && p < 3) BUF_PRINTF("%-10s%s,(%s)", "ldf", kc160_handle_register_r24(state,p), handle_addr24(state, opbuf1, sizeof(opbuf1)));
+                                        else if ( q == 0 && z == 6 && p < 3) BUF_PRINTF("%-10s%s,sp", "ld", p == 0 ? "ix" : p == 1 ? "iy" : "hl");
                                         else if ( b == 0x33 ) BUF_PRINTF("%-10s(%s),a", "ldf", handle_addr24(state, opbuf1, sizeof(opbuf1)));
                                         else if ( b == 0x3b ) BUF_PRINTF("%-10sa,(%s)", "ldf", handle_addr24(state, opbuf1, sizeof(opbuf1)));
                                         else BUF_PRINTF("nop");
