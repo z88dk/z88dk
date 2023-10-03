@@ -20,6 +20,8 @@ static char *r4k_ps_table[] = { "pw", "px", "py", "pz" };
 static char *r4k_32b_table[] = { "bcde", "jkhl" };
 static char *r4k_16b_table[] = { "bc", "de", "ix", "iy" }; // Used for 6d page
 
+static char *kc160_p_table[] = {  "a", "xp", "yp", "zp" };
+
 typedef struct {
     int       index;
     unsigned int    pc;
@@ -1118,6 +1120,11 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                         char *instrs[] = { "ld        i,hl", "nop", "ld        hl,i"};
                                         BUF_PRINTF("%s",instrs[y]);
                                     } else if ( iskc160() && y >= 4 && z < 4) BUF_PRINTF("%-10s%s", handle_ez80_am(state, handle_block_instruction(state, z, y)), z == 0 ? "xy" : "x");                       
+                                    else if( iskc160() && z == 2 ) BUF_PRINTF("%-10s%s,%s", "jp3", cc_table[y], handle_addr24(state,opbuf1,sizeof(opbuf1)));
+                                    else if ( iskc160() && b == 0xc3 ) BUF_PRINTF("%-10s%s", "jp3", handle_addr24(state,opbuf1,sizeof(opbuf1)));
+                                    else if ( iskc160() && q == 0 && z == 4 ) BUF_PRINTF("%-10s%s,%s","ld", kc160_p_table[p], kc160_p_table[3-p]);
+                                    else if ( iskc160() && q == 0 && z == 5 ) BUF_PRINTF("%-10s%s,%s","ld", kc160_p_table[p], kc160_p_table[(3-p+2)%4]);
+                                    else if ( iskc160() && q == 1 && z == 4 ) BUF_PRINTF("%-10s%s,%s","ld", kc160_p_table[p], kc160_p_table[(p+2)%4]);
                                     else if ( q == 1 && z == 1 && y == 3 && israbbit4k()) BUF_PRINTF("%-10s","exp");
                                     else if ( q == 1 && z == 2 && y == 5 && israbbit4k()) BUF_PRINTF("%-10s(hl)","call");
                                     else if ( q == 1 && z == 2 && y == 7 && israbbit4k()) BUF_PRINTF("%-10s(jkhl)","llcall");
