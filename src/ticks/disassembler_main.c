@@ -43,6 +43,7 @@ static void usage(char *program)
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
     printf("  -m8080         Disassemble 8080 code (with z80 mnenomics)\n");
     printf("  -m8085         Disassemble 8085 code (with z80 mnenomics)\n");
+    printf("  -mkc160        Disassemble KC160\n");
     
     exit(1);
 }
@@ -129,6 +130,8 @@ int main(int argc, char **argv)
                 } else if ( strcmp(&argv[0][1],"mez80") == 0 ) {
                     c_cpu = CPU_EZ80;
                     c_adl_mode = 1;
+                } else if ( strcmp(&argv[0][1],"mkc160") == 0 ) {
+                    c_cpu = CPU_KC160;
                 } else {
                     printf("Unknown CPU: %s\n",&argv[0][2]);
                 }
