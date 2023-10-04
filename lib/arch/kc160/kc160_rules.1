@@ -6,11 +6,30 @@
 	ld	hl,%1	;const
 
 	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+=
+	ld	hl,(sp+2)
+
+	pop	bc
 	pop	de
 	push	de
 	push	bc
 =
 	ld	de,(sp+2)
+
+	pop	bc
+	push	hl
+=
+	ld	(sp+0),hl
+
+	pop	bc
+	pop	de
+	push	hl
+	push	bc
+=
+	ld	(sp+2),hl
 
 	ld	hl,0	;const
 	add	hl,sp
@@ -147,7 +166,7 @@
 	ld	hl,(sp+0)
 
 	pop	bc
-	ld	hl,(sp+0)
+	defb	$ed, $ae, 0	;ld hl,(sp+0)
 	push	bc
 =
 	ld	hl,(sp+2)
