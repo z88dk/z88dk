@@ -334,10 +334,13 @@ void kc160_ldf_r24_ilmn(uint8_t opcode)
     st += 7;
 }
 
-
+// H = remainder, L = result
 void kc160_div_hl_a(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"div hl,a");
+    l = ((h<<8)|l) / a;
+    h = ((h<<8)|l) % a;
+
+    st += 12;
 }
 
 void kc160_divs_hl_a(uint8_t opcode)
@@ -358,22 +361,47 @@ void kc160_divs_dehl_bc(uint8_t opcode)
 
 void kc160_mul_hl(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"mul hl");
+    uint16_t v;
+    v = h * l;
+    h = v >> 8;
+    l = v;
+    st += 11;
 }
 
 void kc160_muls_hl(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"muls hl");
+    uint16_t v;
+    v = (int8_t)h * (int8_t)l;
+    h = v >> 8;
+    l = v;
+    st += 11;
 }
 
+// DE:HL = HL • DE
 void kc160_mul_de_hl(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"mul de,hl");
+    uint32_t r = (d<<8)|e;
+    uint32_t result;
+
+    result = (( h * 256 ) + l) * r;
+    d = (result >> 24) & 0xff;
+    e = (result >> 16) & 0xff;
+    h  = (result >> 8 ) & 0xff;
+    l = result & 0xff;
+
+    st += 19;
 }
 
 void kc160_muls_de_hl(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"muls de,hl");
+    // DE:HL = HL • DE
+    int32_t result = (( (int32_t)(int8_t)d * 256 ) + e) * (( (int32_t)(int8_t)h * 256 ) + l);
+    d = (result >> 24) & 0xff;
+    e = (result >> 16) & 0xff;
+    h  = (result >> 8 ) & 0xff;
+    l = result & 0xff;
+
+    st += 19;
 }
 
 
