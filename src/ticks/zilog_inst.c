@@ -9,7 +9,7 @@ void zilog_daa(uint8_t opcode)
 {
     uint16_t t, u;
 
-    st+= isez80() ? 1 : isr800() ? 1 : 4;
+    st+= isez80() ? 1 : isr800() ? 1 : iskc160() ? 1 : 4;
     t= (fr^fa^fb^fb>>8) & 16;  // H flag
     u= 0;		// incr
     if ( isz180() ) {
@@ -35,7 +35,7 @@ void zilog_rld(uint8_t opcode)
 {
     uint16_t t;
 
-    st+= isr800() ? 5 : 18;
+    st+= isr800() ? 5 : iskc160() ? 7 : 18;
     t= get_memory_data(mp= l|h<<8)<<4
     | (a&15);
     a= (a &240)
@@ -51,7 +51,7 @@ void zilog_rld(uint8_t opcode)
 void zilog_rrd(uint8_t opcode)
 {
     uint16_t t;
-    st+= isr800() ? 5 : 18;
+    st+= isr800() ? 5 : iskc160() ? 7 : 18;
     t= get_memory_data(mp= l|h<<8)
     | a<<8;
     a= (a &240)
