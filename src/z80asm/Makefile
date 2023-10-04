@@ -29,6 +29,9 @@ LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 			$(UNIXem_CFLAGS)
 CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS) -Wextra -Werror -pedantic-errors \
 			-Isrc/cpp
+ifeq ($(findstring m68k, $(CC)), m68k)
+    PARSE1_CFLAGS = -mlong-jump-table-offsets
+endif
 
 # link boost::filesystem if needed
 LDFLAGS 	+= $(shell perl build_ldflags.pl $(CXX) $(CROSS))
@@ -65,7 +68,7 @@ $(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
 
 # parser is too big to optimize with -O3
 src/c/parse1.o: src/c/parse1.c
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) $(PARSE1_CFLAGS) -O0 -c -o $@ $<
 
 #------------------------------------------------------------------------------
 # libraries

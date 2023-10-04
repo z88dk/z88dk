@@ -12,7 +12,12 @@ INSTALL ?= install
 LEX     = flex
 YACC    = bison -y
 YFLAGS  = -d
-GDBLDFLAGS = -lpthread
+ifneq ($(findstring m68k-atari-mint,$(CC)),)
+  HAVE_PTHREAD=0
+else
+ HAVE_PTHREAD=1
+ GDBLDFLAGS = -lpthread
+endif
 CFLAGS += -I../../ext/uthash/src/ -g -MMD $(UNIXem_CFLAGS)
 LDFLAGS = -lm
 
@@ -21,7 +26,14 @@ ifeq ($(EXESUFFIX),.exe)
   GDBLDFLAGS += -lws2_32
 endif
 
-all: z88dk-ticks$(EXESUFFIX) z88dk-dis$(EXESUFFIX) z88dk-gdb$(EXESUFFIX)
+
+PROGRAMS = z88dk-ticks$(EXESUFFIX) z88dk-dis$(EXESUFFIX)
+ifeq ($(HAVE_PTHREAD),1)
+    PROGRAMS += z88dk-gdb$(EXESUFFIX)
+endif
+ PROGRAMS += z88dk-gdb$(EXESUFFIX)
+
+all: $(PROGRAMS)
 
 z88dk-ticks$(EXESUFFIX):	$(OBJS) $(LEXOBJS)
 	$(CC) -o $@ $(CFLAGS) $(OBJS) $(LEXOBJS) $(LDFLAGS) $(GDBLDFLAGS)
@@ -35,7 +47,9 @@ z88dk-dis$(EXESUFFIX):	$(DISOBJS)
 install: z88dk-ticks$(EXESUFFIX) z88dk-dis$(EXESUFFIX) z88dk-gdb$(EXESUFFIX)
 	$(INSTALL) z88dk-ticks$(EXESUFFIX) $(PREFIX)/bin/z88dk-ticks$(EXESUFFIX)
 	$(INSTALL) z88dk-dis$(EXESUFFIX) $(PREFIX)/bin/z88dk-dis$(EXESUFFIX)
+ifeq ($(HAVE_PTHREAD),1)
 	$(INSTALL) z88dk-gdb$(EXESUFFIX) $(PREFIX)/bin/z88dk-gdb$(EXESUFFIX)
+endif
 
 expressions.tab.c expressions.tab.h: expressions.y
 	bison -t -v -d expressions.y

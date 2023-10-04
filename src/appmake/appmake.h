@@ -21,7 +21,9 @@
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
+#ifndef __NORETURN
 #define __NORETURN __attribute((noreturn))
+#endif
 #endif
 
 #ifndef __NORETURN
