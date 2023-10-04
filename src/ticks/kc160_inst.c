@@ -13,7 +13,7 @@ uint8_t   xp, yp, zp, pp;
 
 uint8_t   spl, sph;
 
-// R goes from 0-2
+// R goes from 0-3
 static uint8_t **get_rr_from_reg(uint8_t r)
 {
     static uint8_t *reg[2] = {0};
@@ -40,6 +40,48 @@ static uint8_t **get_rr_from_reg(uint8_t r)
     }
     return reg;
 }
+
+
+// R goes from 0-2
+static uint8_t **get_r24_from_reg(uint8_t r)
+{
+    static uint8_t *reg[3] = {0};
+
+    switch ( r ) {
+    case 0:
+        reg[0] = &xl;
+        reg[1] = &xh;
+        reg[2] = &xp;
+        break;
+    case 1:
+        reg[0] = &yl;
+        reg[1] = &yh;
+        reg[2] = &yp;
+        break;
+    case 2:
+        reg[0] = &l;
+        reg[1] = &h;
+        reg[2] = &a;
+        break;
+    }
+    return reg;
+}
+
+static uint8_t *get_pp(uint8_t r)
+{
+    switch (r & 0x03) {
+    case 0:
+        return &a;
+    case 1:
+        return &xp;
+    case 2:
+        return &yp;
+    case 3:
+        return &zp;
+    }
+    return NULL;
+}
+
 
 // 0 = iy
 // 1 = ix
@@ -122,6 +164,65 @@ void kc160_ld_ixysd_xy(uint8_t opcode)
     st += 4;
 }
 
+void kc160_ldf_ilmn_rr(uint8_t opcode)
+{
+    int sr = (opcode >> 4 ) & 0x03;
+    uint8_t **src = get_rr_from_reg(sr);
+    uint32_t addr = get_memory_inst(pc) | ( get_memory_inst(pc+1) << 8 ) | ( get_memory_inst(pc+2) << 16);
+
+    put_memory_physical(addr, *src[0]);
+    put_memory_physical(addr+1, *src[1]);
+
+  
+    st += 5;
+}
+
+void kc160_ldf_rr_ilmn(uint8_t opcode)
+{
+    int dr = (opcode >> 4 ) & 0x03;
+    uint8_t **dest = get_rr_from_reg(dr);
+    uint32_t addr = get_memory_inst(pc) | ( get_memory_inst(pc+1) << 8 ) | ( get_memory_inst(pc+2) << 16);
+
+
+    *dest[0] = get_memory(addr, MEM_TYPE_PHYSICAL);
+    *dest[1] = get_memory(addr+1, MEM_TYPE_PHYSICAL);
+
+    // Fudge for SP handling
+    if ( dr == 3) sp = (sph<<8)|spl;
+  
+    st += 5;
+}
+
+void kc160_ldf_ilmn_xy(uint8_t opcode)
+{
+    uint32_t addr = get_memory_inst(pc) | ( get_memory_inst(pc+1) << 8 ) | ( get_memory_inst(pc+2) << 16);
+
+    if ((opcode & 0xf0) == 0x90) {
+        put_memory_physical(addr, yl);
+        put_memory_physical(addr+1, yh);
+    } else {
+        put_memory_physical(addr, xl);
+        put_memory_physical(addr+1, xh);
+    }
+    st += 5;
+}
+
+void kc160_ldf_xy_ilmn(uint8_t opcode)
+{
+    uint32_t addr = get_memory_inst(pc) | ( get_memory_inst(pc+1) << 8 ) | ( get_memory_inst(pc+2) << 16);
+
+    if ((opcode & 0xf0) == 0x90) {
+        yl = get_memory(addr, MEM_TYPE_PHYSICAL);
+        yh = get_memory(addr+1, MEM_TYPE_PHYSICAL);
+    } else {
+        xl = get_memory(addr, MEM_TYPE_PHYSICAL);
+        xh = get_memory(addr+1, MEM_TYPE_PHYSICAL);
+    }
+  
+    st += 5;
+}
+
+
 void kc160_jp3(uint8_t opcode, uint8_t dojump)
 {
     uint32_t addr;
@@ -150,6 +251,162 @@ void kc160_ld_hxy_sp(uint8_t opcode)
     st += 2;
 }
 
+void kc160_ld_pp_pp(uint8_t opcode)
+{
+    uint8_t z = (opcode & 0x0f);
+    uint8_t q = (opcode >> 3) & 0x1;
+    uint8_t p = (opcode >> 4) & 0x03;
+    uint8_t *dst, *src;
+
+    dst = get_pp(p);
+    if ( q == 0 && z == 4) src=get_pp(3-p);
+    else if ( q == 0 && z == 5 ) get_pp((3-p+2)%4);
+    else src = get_pp((p+2)%4);
+
+    *dst = *src;
+
+    st += 2;
+}
+// ld  ([ix|iy|sp]+d), [XIX|YIY|ahl]
+void kc160_ld_ixysd_r24(uint8_t opcode)
+{
+    int sr = (opcode >> 4 ) & 0x03;
+    uint8_t **src = get_r24_from_reg(sr);
+    uint16_t addr = get_addr_from_z(opcode & 0x0f) +  (get_memory_inst(pc++)^128)-128;
+
+    put_memory(addr, *src[0]);
+    put_memory(addr+1, *src[1]);
+    put_memory(addr+2, *src[2]);
+
+    st += 6;
+}
+
+// ld  [XIX|YIY|ahl],([ix|iy|sp]+d)
+void kc160_ld_r24_ixysd(uint8_t opcode)
+{
+    int r = (opcode >> 4 ) & 0x03;
+    uint8_t **dest = get_r24_from_reg(r);
+    uint16_t addr = get_addr_from_z(opcode & 0x0f) +  (get_memory_inst(pc++)^128)-128;
+
+    *dest[0] = get_memory_data(addr);
+    *dest[1] = get_memory_data(addr+1);
+    *dest[2] = get_memory_data(addr+2);
+
+    st += 6;
+}
+
+void kc160_ld_r24_lmn(uint8_t opcode)
+{
+    int r = (opcode >> 4 ) & 0x03;
+    uint8_t **dest = get_r24_from_reg(r);
+
+    *dest[0] = get_memory_inst(pc++);
+    *dest[1] = get_memory_inst(pc++);
+    *dest[2] = get_memory_inst(pc++);
+
+    st += 4;
+}
+
+
+void kc160_ldf_ilmn_r24(uint8_t opcode)
+{
+    int r = (opcode >> 4 ) & 0x03;
+    uint8_t **dest = get_r24_from_reg((r));
+    uint32_t addr = get_memory_inst(pc) | ( get_memory_inst(pc+1) << 8 ) | ( get_memory_inst(pc+2) << 16);
+
+    put_memory_physical(addr, *dest[0]);
+    put_memory_physical(addr+1, *dest[1]);
+    put_memory_physical(addr+2, *dest[2]);
+
+    st += 7;
+}
+
+void kc160_ldf_r24_ilmn(uint8_t opcode)
+{
+    int r = (opcode >> 4 ) & 0x03;
+    uint8_t **dest = get_r24_from_reg(r);
+    uint32_t addr = get_memory_inst(pc) | ( get_memory_inst(pc+1) << 8 ) | ( get_memory_inst(pc+2) << 16);
+
+    *dest[0] = get_memory(addr, MEM_TYPE_PHYSICAL);
+    *dest[1] = get_memory(addr+1, MEM_TYPE_PHYSICAL);
+    *dest[2] = get_memory(addr+2, MEM_TYPE_PHYSICAL);
+
+    st += 7;
+}
+
+
+void kc160_div_hl_a(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"div hl,a");
+}
+
+void kc160_divs_hl_a(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"divs hl,a");
+}
+
+void kc160_div_dehl_bc(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"div dehl,bc");
+}
+
+void kc160_divs_dehl_bc(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"divs dehl,bc");
+}
+
+
+void kc160_mul_hl(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"mul hl");
+}
+
+void kc160_muls_hl(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"muls hl");
+}
+
+void kc160_mul_de_hl(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"mul de,hl");
+}
+
+void kc160_muls_de_hl(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"muls de,hl");
+}
+
+
+
+
+
+
+void kc160_tra(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"tra");
+}
+
+void kc160_im3(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"ret3");
+}
+
+
+void kc160_call3(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"call3 lmn");
+}
+
+void kc160_ret3(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"ret3");
+}
+
+
+void kc160_retn3(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode,"retn3");
+}
 
 void kc160_ldi_xy(uint8_t opcode)
 {
