@@ -12,8 +12,8 @@ OBJS = z80svg.o
 INSTALL ?= install
 
 
-LIBS += `pkg-config --libs libxml-2.0`
-CFLAGS += `pkg-config --cflags libxml-2.0`
+LIBS += `pkg-config     --define-prefix --libs libxml-2.0`
+CFLAGS += `pkg-config     --define-prefix --cflags libxml-2.0`
 
 all: z88dk-z80svg$(EXESUFFIX)
 
