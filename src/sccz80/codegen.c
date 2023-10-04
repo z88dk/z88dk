@@ -2650,7 +2650,7 @@ void mult(LVALUE* lval)
         break;
     case KIND_CHAR:
         if ( lval->ltype->isunsigned ) {
-            if (c_cpu == CPU_Z180 || IS_EZ80() ) {
+            if (c_cpu == CPU_Z180 || IS_EZ80() || IS_KC160() ) {
                 ot("ld\th,e\n");
                 ot("mlt\thl\n");
                 break;
