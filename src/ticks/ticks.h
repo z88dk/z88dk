@@ -384,6 +384,54 @@ extern void i8085_ld_hl_ide(uint8_t opcode);
 extern void i8085_ld_ide_hl(uint8_t opcode);
 extern void i8085_sub_hl_bc(uint8_t opcode);
 
+// kc160
+extern void kc160_ld_rr_ixysd(uint8_t opcode);
+extern void kc160_ld_ixysd_rr(uint8_t opcode);
+extern void kc160_ld_hxy_sp(uint8_t opcode);
+extern void kc160_ld_xy_ixysd(uint8_t opcode);
+extern void kc160_ld_ixysd_xy(uint8_t opcode);
+extern void kc160_ldf_ilmn_rr(uint8_t opcode);
+extern void kc160_ldf_rr_ilmn(uint8_t opcode);
+extern void kc160_ldf_ilmn_xy(uint8_t opcode);
+extern void kc160_ldf_xy_ilmn(uint8_t opcode);
+extern void kc160_jp3(uint8_t opcode, uint8_t dojump);
+extern void kc160_ld_ixysd_r24(uint8_t opcode);
+extern void kc160_ld_r24_ixysd(uint8_t opcode);
+extern void kc160_ld_r24_lmn(uint8_t opcode);
+extern void kc160_ld_pp_pp(uint8_t opcode);
+extern void kc160_ldf_ilmn_r24(uint8_t opcode);
+extern void kc160_ldf_r24_ilmn(uint8_t opcode);
+extern void kc160_div_hl_a(uint8_t opcode);
+extern void kc160_divs_hl_a(uint8_t opcode);
+extern void kc160_div_dehl_bc(uint8_t opcode);
+extern void kc160_divs_dehl_bc(uint8_t opcode);
+extern void kc160_mul_hl(uint8_t opcode);
+extern void kc160_muls_hl(uint8_t opcode);
+extern void kc160_mul_de_hl(uint8_t opcode);
+extern void kc160_muls_de_hl(uint8_t opcode);
+extern void kc160_tra(uint8_t opcode);
+extern void kc160_im3(uint8_t opcode);
+extern void kc160_call3(uint8_t opcode);
+extern void kc160_ret3(uint8_t opcode);
+extern void kc160_retn3(uint8_t opcode);
+
+extern void kc160_ldi_xy(uint8_t opcode);
+extern void kc160_ldir_xy(uint8_t opcode);
+extern void kc160_ldd_xy(uint8_t opcode);
+extern void kc160_lddr_xy(uint8_t opcode);
+extern void kc160_cpi_x(uint8_t opcode);
+extern void kc160_cpir_x(uint8_t opcode);
+extern void kc160_cpd_x(uint8_t opcode);
+extern void kc160_cpdr_x(uint8_t opcode);
+extern void kc160_ini_x(uint8_t opcode);
+extern void kc160_inir_x(uint8_t opcode);
+extern void kc160_ind_x(uint8_t opcode);
+extern void kc160_indr_x(uint8_t opcode);
+extern void kc160_outi_x(uint8_t opcode);
+extern void kc160_otir_x(uint8_t opcode);
+extern void kc160_outd_x(uint8_t opcode);
+extern void kc160_otdr_x(uint8_t opcode);
+
 #ifndef WIN32
 extern int kbhit();
 extern int getch();
