@@ -31,7 +31,6 @@ PROGRAMS = z88dk-ticks$(EXESUFFIX) z88dk-dis$(EXESUFFIX)
 ifeq ($(HAVE_PTHREAD),1)
     PROGRAMS += z88dk-gdb$(EXESUFFIX)
 endif
- PROGRAMS += z88dk-gdb$(EXESUFFIX)
 
 all: $(PROGRAMS)
 
