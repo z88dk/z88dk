@@ -43,7 +43,7 @@ z88dk-gdb$(EXESUFFIX):	$(GDBOBJS) $(LEXOBJS)
 z88dk-dis$(EXESUFFIX):	$(DISOBJS)
 	$(CC) -o $@ $(CFLAGS) $(DISOBJS)
 
-install: z88dk-ticks$(EXESUFFIX) z88dk-dis$(EXESUFFIX) z88dk-gdb$(EXESUFFIX)
+install: $(PROGRAMS)
 	$(INSTALL) z88dk-ticks$(EXESUFFIX) $(PREFIX)/bin/z88dk-ticks$(EXESUFFIX)
 	$(INSTALL) z88dk-dis$(EXESUFFIX) $(PREFIX)/bin/z88dk-dis$(EXESUFFIX)
 ifeq ($(HAVE_PTHREAD),1)
