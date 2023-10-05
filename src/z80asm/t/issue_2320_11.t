@@ -159,6 +159,14 @@ Predefined constant: __SWAP_IX_IY__ = 1
 Skipping $test.a.o - different CPU-IXIY combination
 Skipping $test.b.o - different CPU-IXIY combination
 
+Predefined constant: __CPU_KC160__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
+
 END
 
 capture_ok("z88dk-z80nm -a $test.lib", <<'END');

@@ -18,7 +18,13 @@ my $OBJ_FILE_VERSION = "18";
 use vars '$test', '$null', '@CPUS';
 $test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
 $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
-@CPUS = qw( z80 z80_strict z80n z180 ez80 ez80_z80 r800 r2ka r3k r4k r5k 8080 8085 gbz80 );
+@CPUS = qw( z80 z80_strict z80n z180 
+			ez80 ez80_z80 
+			r800 
+			r2ka r3k r4k r5k 
+			8080 8085 
+			gbz80 
+			kc160 );
 
 unlink_testfiles();
 
@@ -561,6 +567,9 @@ sub cpu_compatible {
 	elsif ($code_cpu eq "gbz80") {
 		return 0;
 	}
+	elsif ($code_cpu eq "kc160") {
+		return 0;
+	}
 	else {
 		return 0;
 	}
@@ -790,12 +799,19 @@ END
 			local $Test::Builder::Level = $Test::Builder::Level + 1;
 			$self->_check_value($test_nr, $t, $r, $res_addr, 1, 0, $value);
 		};
-		return <<END;
+		if ($r eq 'A') {
+			return <<END;
+							ld ($res_addr), a
+END
+		}
+		else {
+			return <<END;
 							push af
 							ld a, $r
 							ld ($res_addr), a
 							pop af
 END
+		}
 	}
 	
 	sub test_r1_code {

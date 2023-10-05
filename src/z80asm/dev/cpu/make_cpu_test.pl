@@ -59,11 +59,13 @@ for my $cpu (@CPUS) {
 	@test = ();
 	
 	for my $asm (sort keys %{$all_opcodes{ALL}}) {
-		#say "$cpu\t$asm";
+		#say "$cpu\t$asm" if $asm =~ /ld \(sp\+/;
 
 		if (!exists $all_opcodes{$cpu}{$asm} &&
 		    !exists $all_opcodes{$cpu}{$asm =~ s/0x1234[0-9A-F]+/0x1234/r} &&
-			!exists $all_opcodes{$cpu}{$asm =~ s/0x1234\b/0x123456/r} ) {
+			!exists $all_opcodes{$cpu}{$asm =~ s/0x1234\b/0x123456/r} &&
+			!exists $all_opcodes{$cpu}{$asm =~ s/sp[+-]\d+/sp+0/r} &&
+			!exists $all_opcodes{$cpu}{$asm =~ s/sp[+-]\d+/sp-128/r} ) {
 			my $skip = 0;
 
 			# special case: 'djnz ASMPC' is translated to 'djnz NN' in 8080/8085
@@ -76,9 +78,6 @@ for my $cpu (@CPUS) {
 				}
 			}
 
-			# special case: ld hl, sp+%u vs ld hl, sp+%s
-			$skip = 1 if $asm =~ /ld hl, sp[+-]/;
-			
 			push @test, sprintf(" %-31s; Error", $asm) unless $skip;
 		}
 	}
@@ -92,7 +91,7 @@ sub add {
 	my($cpu, $asm, $bytes) = @_;
 	my @bytes = split ' ', $bytes;
 	
-	#say "$cpu\t$asm\t$bytes";
+	#say "$cpu\t$asm\t$bytes" if $asm =~ /ld hl, sp\+/;
 	
 	# special case for intel: jr and djnz %j is converted to %m
 	if ($cpu =~ /^80/ && $asm =~ /^(jr|djnz)/) {
@@ -141,6 +140,10 @@ sub add {
 		my $bytes1 = $bytes =~ s/%d/7E/r =~ s/%D/7F/r;
 		add($cpu, $asm1, $bytes1);
 		
+		$asm1 = $asm =~ s/\+%d/+0/r;
+		$bytes1 = $bytes =~ s/%d/00/r =~ s/%D/01/r;
+		add($cpu, $asm1, $bytes1);
+
 		$asm1 = $asm =~ s/\+%d/-128/r;
 		$bytes1 = $bytes =~ s/%d/80/r =~ s/%D/81/r;
 		add($cpu, $asm1, $bytes1);
@@ -150,25 +153,41 @@ sub add {
 		my $bytes1 = $bytes =~ s/%u/00/r;
 		add($cpu, $asm1, $bytes1);
 		
+		$asm1 = $asm =~ s/\+%u/+128/r;
+		$bytes1 = $bytes =~ s/%u/80/r;
+		add($cpu, $asm1, $bytes1);
+		
 		$asm1 = $asm =~ s/\+%u/+255/r;
 		$bytes1 = $bytes =~ s/%u/FF/r;
 		add($cpu, $asm1, $bytes1);
 	}
-	elsif ($asm =~ /%s/) {
+	# must be 1-byte opcode so that call to __z80asm__add_sp_s with defb %s after
+	# is diassembled correctly during z80asm tests in cpu.t
+	elsif ($asm =~ /%s/) {	
 		my $asm1 = $asm =~ s/%s/-128/r;
 		$asm1 =~ s/\+-/-/g;
 		my $bytes1 = $bytes =~ s/%s 00/80 FF/r;
 		$bytes1 =~ s/%s/80/;
 		add($cpu, $asm1, $bytes1);
 		
-		$asm1 = $asm =~ s/%s/127/r;
-		$bytes1 = $bytes =~ s/%s 00/7F 00/r;
-		$bytes1 =~ s/%s/7F/;
+		$asm1 = $asm =~ s/%s/0/r;
+		$asm1 =~ s/\+-/-/g;
+		$bytes1 = $bytes =~ s/%s 00/00 00/r;
+		$bytes1 =~ s/%s/00/;
+		add($cpu, $asm1, $bytes1);
+		
+		$asm1 = $asm =~ s/%s/126/r;
+		$bytes1 = $bytes =~ s/%s 00/7E 00/r;
+		$bytes1 =~ s/%s/7E/;
 		add($cpu, $asm1, $bytes1);
 	}
 	elsif ($asm =~ /%n/) {
 		my $asm1 = $asm =~ s/%n/-128/gr;
 		my $bytes1 = $bytes =~ s/%n/80/gr;
+		add($cpu, $asm1, $bytes1);
+		
+		$asm1 = $asm =~ s/%n/0/gr;
+		$bytes1 = $bytes =~ s/%n/00/gr;
 		add($cpu, $asm1, $bytes1);
 		
 		$asm1 = $asm =~ s/%n/127/gr;

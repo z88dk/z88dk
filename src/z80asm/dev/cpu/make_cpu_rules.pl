@@ -173,19 +173,23 @@ exit 0;
 
 sub parser_tokens {
 	local($_) = @_;
-	my $instr = qr/\b(?:call|jp|jmp|jr|jre|ret|rst|flag)\b/i;
+	my $instr_flag = qr/\b(?:call|jp|jmp|jr|jre|jp3|ret|rst|flag)\b/i;
 	my $am = qr/\b(?:l|il|is|lil|lis|sil|sis)\b/i;
 	my $flag = qr/\b(?:nz|z|nc|c|po|pe|p|m|lz|lo|nv|v|x5|nx5|k|nk|ne|eq|ltu|leu|gtu|geu|lt|le|gt|ge)\b/i;
+	my $instr_x = qr/\b(cpd|cpdr|cpi|cpir|ind|indr|ini|inir|otdr|otir|outd|outi)\s+(x)\b/i;
+	my $instr_xy = qr/\b(ldd|lddr|ldi|ldir)\s+(xy)\b/i;
 	
 	my @tokens = ();
 	
 	while (!/\G \z 				/gcx) {
 		if (/\G \s+ 			/gcx) {}
 		elsif (/\G \( (\w+)		/gcx) { push @tokens, "_TK_IND_".uc($1); }
-		elsif (/\G ($instr) \s+ ($flag) \b
+		elsif (/\G ($instr_flag) \s+ ($flag) \b
 								/gcx) { push @tokens, "_TK_".uc($1)."_".uc($2); }
-		elsif (/\G ($instr) \s* \. \s* ($am) \s+ ($flag) \b
+		elsif (/\G ($instr_flag) \s* \. \s* ($am) \s+ ($flag) \b
 								/gcx) { push @tokens, "_TK_".uc($1)."_".uc($2)."_".uc($3); }
+		elsif (/\G $instr_x		/gcx) { push @tokens, "_TK_".uc($1)."_".uc($2); }
+		elsif (/\G $instr_xy	/gcx) { push @tokens, "_TK_".uc($1)."_".uc($2); }
 		elsif (/\G , 			/gcx) { push @tokens, "_TK_COMMA"; }
 		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
 		elsif (/\G \( %[nmh] \)	/gcx) { push @tokens, "expr"; }
@@ -197,6 +201,7 @@ sub parser_tokens {
 		elsif (/\G \+   		/gcx) { push @tokens, "_TK_PLUS"; }
 		elsif (/\G \-   		/gcx) { push @tokens, "_TK_MINUS"; }
 		elsif (/\G \.   		/gcx) { push @tokens, "_TK_DOT"; }
+		elsif (/\G \:   		/gcx) { push @tokens, "_TK_COLON"; }
 		else { die "$_ ; ", substr($_, pos($_)||0) }
 	}
 	return join(' ', ('| label?', @tokens, "_TK_NEWLINE"));

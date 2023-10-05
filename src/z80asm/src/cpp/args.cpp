@@ -717,6 +717,8 @@ void Args::set_cpu(int cpu) {
 
     undefine_static_symbol("__CPU_GBZ80__");
 
+    undefine_static_symbol("__CPU_KC160__");
+
     switch (cpu) {
     case CPU_Z80:
         m_cpu = CPU_Z80;
@@ -801,6 +803,11 @@ void Args::set_cpu(int cpu) {
         m_cpu = CPU_GBZ80;
         m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_GBZ80__");
+        break;
+    case CPU_KC160:
+        m_cpu = CPU_KC160;
+        m_cpu_name = ::cpu_name(m_cpu);
+        define_static_symbol("__CPU_KC160__");
         break;
     default:
         Assert(0);

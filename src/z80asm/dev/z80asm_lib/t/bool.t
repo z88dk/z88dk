@@ -10,25 +10,24 @@ BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-for my $cpu (@CPUS) {
-	SKIP: {
-		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+my $ticks = Ticks->new;
 
-		for my $dd (qw( HL IX IY )) {
-			next if $cpu =~ /^z80_strict|^z180|^80|^gbz80/;
-			for my $v (0, 1, -1) {
-				my $r = ticks(<<END, "-m$cpu");
-						ld $dd, $v
-						bool $dd
-						rst 0
+for my $dd (qw( HL IX IY )) {
+	for my $v (0, 1, -1) {
+		my $cond = ($dd =~ /IX|IY/i) ? "!__CPU_INTEL__ && !__CPU_GBZ80__" : "1";
+		$ticks->add(<<END, 
+			IF $cond
+				ld $dd, $v
+				bool $dd
+			ENDIF
 END
-				is $r->{$dd}, $v==0 ? 0 : 1, "$dd result";
-				
-				(Test::More->builder->is_passing) or die;
-			}
-		}
+			$dd => sub { my($t) = @_;
+						 return 0 if ($dd =~ /IX|IY/i && $t->{cpu} =~ /^80|^gbz80/);
+						 return $v==0 ? 0 : 1; });
 	}
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

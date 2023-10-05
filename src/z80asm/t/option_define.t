@@ -80,42 +80,42 @@ Writing object file 'test_t_option_define.o'
 END
 
 # duplicate definition
-z80asm_ok("-b -Dabc -Dabc", "", "", "defb abc", bytes(1));
-z80asm_ok("-b -Dabc=3 -Dabc=3", "", "", "defb abc", bytes(3));
+z80asm_ok("-b -Dabcd -Dabcd", "", "", "defb abcd", bytes(1));
+z80asm_ok("-b -Dabcd=3 -Dabcd=3", "", "", "defb abcd", bytes(3));
 
-z80asm_nok("-b -Dabc=1 -Dabc=2", "", "", <<END);
-error: duplicate definition: abc
+z80asm_nok("-b -Dabcd=1 -Dabcd=2", "", "", <<END);
+error: duplicate definition: abcd
 END
 
 z80asm_ok("-b", "", "", <<END, bytes(1));
-	define abc
-	define abc
-	defb abc
+	define abcd
+	define abcd
+	defb abcd
 END
 
-z80asm_ok("-b -Dabc", "", "", <<END, bytes(1));
-	define abc
-	define abc
-	defb abc
+z80asm_ok("-b -Dabcd", "", "", <<END, bytes(1));
+	define abcd
+	define abcd
+	defb abcd
 END
 
 z80asm_nok("-b", "", <<ASM, <<ERR);
-	define abc
-	defc abc=1
+	define abcd
+	defc abcd=1
 ASM
-$test.asm:2: error: duplicate definition: abc
-  ^---- defc abc=1
+$test.asm:2: error: duplicate definition: abcd
+  ^---- defc abcd=1
 ERR
 
 z80asm_nok("-b", "", <<ASM, <<ERR);
 	section a1
-	define abc
+	define abcd
 	section a2
-	define abc
-	defb abc
+	define abcd
+	defb abcd
 ASM
-$test.asm:4: error: duplicate definition: abc
-  ^---- define abc
+$test.asm:4: error: duplicate definition: abcd
+  ^---- define abcd
 ERR
 
 unlink_testfiles;

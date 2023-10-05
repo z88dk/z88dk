@@ -445,6 +445,7 @@ spew("$test.asm", <<'END_ASM');
 		if __CPU_ZILOG__			: defb  9  : endif
 		if __CPU_RABBIT__			: defb 10  : endif
 		if __CPU_INTEL__			: defb 11  : endif
+		if __CPU_KC160__			: defb 35  : endif
 		if __SWAP_IX_IY__			: defb 12  : endif
 		if __CPU_TI83__				: defb 13  : endif
 		if __CPU_TI83PLUS__			: defb 14  : endif
@@ -541,6 +542,12 @@ check_bin_file("$test.bin", bytes(8, 20));
 
 capture_ok("z88dk-z80asm -b -mgbz80 -IXIY $test.asm", "");
 check_bin_file("$test.bin", bytes(8, 12, 20));
+
+capture_ok("z88dk-z80asm -b -mkc160 $test.asm", "");
+check_bin_file("$test.bin", bytes(35, 20));
+
+capture_ok("z88dk-z80asm -b -mkc160 -IXIY $test.asm", "");
+check_bin_file("$test.bin", bytes(35, 12, 20));
 
 capture_ok("z88dk-z80asm -b -mti83 $test.asm", "");
 check_bin_file("$test.bin", bytes(33, 9, 13, 20));

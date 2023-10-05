@@ -33,6 +33,7 @@ the_answer = 42
 	ifdef __CPU_Z80__		: defm "z80"		: endif
 	ifdef __CPU_Z80_STRICT__: defm "z80_strict"	: endif
 	ifdef __CPU_Z80N__		: defm "z80n" 		: endif
+	ifdef __CPU_KC160__		: defm "kc160" 		: endif
 	ifdef __SWAP_IX_IY__	: defm "-IXIY"		: endif
 END
 
@@ -179,6 +180,16 @@ Object  file test_t_issue_2320_27.1.lib at $0F20: Z80RMF18
     C $0000: 38 30 38 30 2D 49 58 49 59
   Symbols:
     L C $0001: __CPU_8080__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
+
+Object  file test_t_issue_2320_27.1.lib at $1048: Z80RMF18
+  Name: test_t_issue_2320_27.1
+  CPU:  kc160 (-IXIY-soft)
+  Section "": 10 bytes
+    C $0000: 6B 63 31 36 30 2D 49 58 49 59
+  Symbols:
+    L C $0001: __CPU_KC160__ (section "") (file test_t_issue_2320_27.1.asm)
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 

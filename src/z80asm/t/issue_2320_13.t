@@ -327,6 +327,26 @@ Writing object file 'test_t_issue_2320_13.b.o'
 Adding test_t_issue_2320_13.a.o to library
 Adding test_t_issue_2320_13.b.o to library
 
+Predefined constant: __CPU_KC160__ = 1
+Assembling 'test_t_issue_2320_13.a.asm'
+Writing object file 'test_t_issue_2320_13.a.o'
+
+Assembling 'test_t_issue_2320_13.b.asm'
+Writing object file 'test_t_issue_2320_13.b.o'
+
+Adding test_t_issue_2320_13.a.o to library
+Adding test_t_issue_2320_13.b.o to library
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Assembling 'test_t_issue_2320_13.a.asm'
+Writing object file 'test_t_issue_2320_13.a.o'
+
+Assembling 'test_t_issue_2320_13.b.asm'
+Writing object file 'test_t_issue_2320_13.b.o'
+
+Adding test_t_issue_2320_13.a.o to library
+Adding test_t_issue_2320_13.b.o to library
+
 END
 
 capture_ok("z88dk-z80nm -a $test.lib", <<'END');
@@ -829,6 +849,42 @@ Object  file test_t_issue_2320_13.lib at $29D8: Z80RMF18
 Object  file test_t_issue_2320_13.lib at $2AAC: Z80RMF18
   Name: b
   CPU:  8080 (-IXIY)
+  Section "": 0 bytes
+  Section code: 3 bytes
+    C $0000: 21 00 80
+  Symbols:
+    L A $0000: b (section code) (file test_t_issue_2320_13.b.asm:3)
+
+Object  file test_t_issue_2320_13.lib at $2B64: Z80RMF18
+  Name: test_t_issue_2320_13.a
+  CPU:  kc160 
+  Section "": 0 bytes
+  Section code2: 3 bytes
+    C $0000: 21 00 40
+  Symbols:
+    L A $0000: a (section code2) (file test_t_issue_2320_13.a.asm:2)
+
+Object  file test_t_issue_2320_13.lib at $2C38: Z80RMF18
+  Name: b
+  CPU:  kc160 
+  Section "": 0 bytes
+  Section code: 3 bytes
+    C $0000: 21 00 80
+  Symbols:
+    L A $0000: b (section code) (file test_t_issue_2320_13.b.asm:3)
+
+Object  file test_t_issue_2320_13.lib at $2CF0: Z80RMF18
+  Name: test_t_issue_2320_13.a
+  CPU:  kc160 (-IXIY)
+  Section "": 0 bytes
+  Section code2: 3 bytes
+    C $0000: 21 00 40
+  Symbols:
+    L A $0000: a (section code2) (file test_t_issue_2320_13.a.asm:2)
+
+Object  file test_t_issue_2320_13.lib at $2DC4: Z80RMF18
+  Name: b
+  CPU:  kc160 (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80

@@ -25,13 +25,6 @@ my @tokens = (
 	'GREATER', 'RIGHT_SHIFT', 'GREATER_EQ', 'QUESTION', 'LSQUARE', 'RSQUARE',
 	'BIN_XOR', 'POWER', 'LCURLY', 'BIN_OR', 'LOG_OR', 'RCURLY', 'BIN_NOT',
 	
-	# Indirect 8-bit register
-	'IND_C', 'IND_HTR',
-	
-	# Indirect 16-bit register
-	'IND_BC', 'IND_DE', 'IND_HL', 'IND_SP', 'IND_IX', 'IND_IY', 'IND_HLI', 'IND_HLD',
-	'IND_PW', 'IND_PX', 'IND_PY', 'IND_PZ', 
-	
 	# Assembly keywords
 	'ASMPC', 
 	
@@ -78,6 +71,7 @@ my @tokens = (
 	'CALL_IL_LTU', 'CALL_IL_LEU', 'CALL_IL_GTU', 'CALL_IL_GEU', 
 	'CALL_IL_LT',  'CALL_IL_LE',  'CALL_IL_GT',  'CALL_IL_GE', 
 
+	'CALL3_NZ', 'CALL3_Z', 'CALL3_NC', 'CALL3_C', 'CALL3_PO', 'CALL3_PE', 'CALL3_P', 'CALL3_M', 
 	'JR_NZ', 'JR_Z', 'JR_NC', 'JR_C', 'JR_PO', 'JR_PE', 'JR_P', 'JR_M', 
 	'JR_LZ', 'JR_LO', 'JR_NV', 'JR_V', 'JR_NK', 'JR_K', 'JR_NX5', 'JR_X5',
 	'JR_NE', 'JR_EQ', 
@@ -107,6 +101,12 @@ my @tokens = (
 	'JP_LIL_NE', 'JP_LIL_EQ', 
 	'JP_LIL_LTU', 'JP_LIL_LEU', 'JP_LIL_GTU', 'JP_LIL_GEU', 
 	'JP_LIL_LT',  'JP_LIL_LE',  'JP_LIL_GT',  'JP_LIL_GE', 
+
+	'JP3_NZ', 'JP3_Z', 'JP3_NC', 'JP3_C', 'JP3_PO', 'JP3_PE', 'JP3_P', 'JP3_M', 
+	'JP3_LZ', 'JP3_LO', 'JP3_NV', 'JP3_V', 'JP3_NK', 'JP3_K', 'JP3_NX5', 'JP3_X5',
+	'JP3_NE', 'JP3_EQ', 
+	'JP3_LTU', 'JP3_LEU', 'JP3_GTU', 'JP3_GEU', 
+	'JP3_LT',  'JP3_LE',  'JP3_GT',  'JP3_GE', 
 
 	'JMP_NZ', 'JMP_Z', 'JMP_NC', 'JMP_C', 'JMP_PO', 'JMP_PE', 'JMP_P', 'JMP_M', 
 	'JMP_LZ', 'JMP_LO', 'JMP_NV', 'JMP_V', 'JMP_NK', 'JMP_K', 'JMP_NX5', 'JMP_X5',
@@ -158,15 +158,38 @@ my @tokens = (
 	'FLAG_LTU', 'FLAG_LEU', 'FLAG_GTU', 'FLAG_GEU',
 	'FLAG_LT', 'FLAG_LE', 'FLAG_GT', 'FLAG_GE',
 
+	# Indirect 8-bit register
+	'IND_C', 'IND_HTR',
+	'IND_A', 'IND_XP', 'IND_YP', 'IND_PP', 'IND_ZP',
+	
+	# Indirect 16-bit register
+	'IND_BC', 'IND_DE', 'IND_HL', 'IND_SP', 'IND_IX', 'IND_IY', 'IND_HLI', 'IND_HLD',
+	'IND_PW', 'IND_PX', 'IND_PY', 'IND_PZ', 
+	
 	# 8-bit registers
 	'B', 'C', 'D', 'E', 'H', 'L', 'A', 'F', 'I', 'R', 'M',
 	'IIR', 'EIR', 'XPC', 'IXH', 'IYH', 'IXL', 'IYL', 'HTR', 'LXPC',
-
+	'XP', 'YP', 'PP', 'ZP', 
+	
 	# 16-bit registers
 	'BC', 'DE', 'HL', 'JK', 'IX', 'IY', 'AF', 'SP', 'PSW',
 
+	# 24-bit registers
+	'XBC', 'XDE', 'XHL', 'XSP', 'XIX', 'XIY', 
+	'YBC', 'YDE', 'YHL', 'YSP', 'YIX', 'YIY', 
+	'ABC', 'ADE', 'AHL', 'ASP', 'AIX', 'AIY', 
+	'PBC', 'PDE', 'PHL', 'PSP', 'PIX', 'PIY', 
+	'ZBC', 'ZDE', 'ZHL', 'ZSP', 'ZIX', 'ZIY', 
+	
+	# Indirect 24-bit registers
+	'IND_XBC', 'IND_XDE', 'IND_XHL', 'IND_XSP', 'IND_XIX', 'IND_XIY', 
+	'IND_YBC', 'IND_YDE', 'IND_YHL', 'IND_YSP', 'IND_YIX', 'IND_YIY', 
+	'IND_ABC', 'IND_ADE', 'IND_AHL', 'IND_ASP', 'IND_AIX', 'IND_AIY', 
+	'IND_PBC', 'IND_PDE', 'IND_PHL', 'IND_PSP', 'IND_PIX', 'IND_PIY', 
+	'IND_ZBC', 'IND_ZDE', 'IND_ZHL', 'IND_ZSP', 'IND_ZIX', 'IND_ZIY', 
+	
 	# 32-bit registers
-	'BCDE', 'JKHL', 'PW', 'PX', 'PY', 'PZ',
+	'BCDE', 'DEHL', 'JKHL', 'PW', 'PX', 'PY', 'PZ',
 	
 	# alternate registers
 	'B1', 'C1', 'D1', 'E1', 'H1', 'L1', 'A1', 'F1', 'BC1', 'DE1', 'JK1', 'HL1', 'AF1',
@@ -249,6 +272,14 @@ my @tokens = (
 		
 	# R800 specific opcodes
 	'MULUB', 'MULUW',
+	
+	# KC160 specific opcodes
+	'TRA', 'MULS', 'DIV', 'DIVS', 'JP3', 'CALL3', 'RET3', 'RETN3',
+	'CPD_X', 'CPDR_X', 'CPI_X', 'CPIR_X', 
+	'IND_X', 'INDR_X', 'INI_X', 'INIR_X', 
+	'OTDR_X', 'OTIR_X', 'OUTD_X', 'OUTI_X',	
+	'LDD_XY', 'LDDR_XY', 'LDI_XY', 'LDIR_XY',
+
 );
 
 # output tokens.h

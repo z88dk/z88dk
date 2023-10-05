@@ -44,6 +44,7 @@ void PreprocLevel::split_lines(ScannedLine& line) {
     for (unsigned line_start = 0; line_start < line.tokens().size(); ) {
         bool is_hash_line = false;      // line started with '#'
         int conditional = 0;            // count pairs of '?' ':'
+        int parens = 0;                 // count open parens
         bool got_eol = false;
 
         unsigned i;
@@ -56,6 +57,18 @@ void PreprocLevel::split_lines(ScannedLine& line) {
                 this_line.append({ token });
                 break;
 
+            case TType::LParen:
+                if (!is_hash_line)
+                    parens++;
+                this_line.append({ token });
+                break;
+
+            case TType::RParen:
+                if (!is_hash_line)
+                    parens--;
+                this_line.append({ token });
+                break;
+
             case TType::Quest:
                 if (!is_hash_line)
                     conditional++;
@@ -63,15 +76,18 @@ void PreprocLevel::split_lines(ScannedLine& line) {
                 break;
 
             case TType::Colon:
-                if (i == line_start + 1 && line.tokens()[line_start].type() == TType::Ident)    // label:
-                    this_line.append({ token });
-                else if (is_hash_line)
-                    this_line.append({ token });
-                else if (conditional > 0) {     // conditional
+                if (conditional > 0) {     // conditional
                     conditional--;
                     this_line.append({ token });
                 }
-                else                            // line break
+                else if (i == line_start + 1 && line.tokens()[line_start].type() == TType::Ident)    // label:
+                    this_line.append({ token });
+                else if (is_hash_line)
+                    this_line.append({ token });
+                else if (parens > 0) {          // in parens
+                    this_line.append({ token });
+                }
+                else                             // line break
                     got_eol = true;
                 break;
 
