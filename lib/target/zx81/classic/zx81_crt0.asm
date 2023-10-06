@@ -463,7 +463,7 @@ IF ((startup=301) | (startup=302))
     defc __lambda_clear_one      =  $01CF
     defc __lambda_make_room      =  $1E39
     defc __lambda_stk_store      =  $14D5
-    defc __lambda_stk_fetch      =  $0020
+    defc __lambda_stk_fetch      =  $153F
     defc __lambda_stack_bc       =  $0821
     defc __lambda_fp_to_bc       =  $05DE
     defc __lambda_reclaim_space  =  $01D2
