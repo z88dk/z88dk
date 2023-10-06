@@ -33,6 +33,7 @@ typedef struct {
     uint8_t   instr_bytes[6];
     uint8_t   am;
     uint8_t   adl;
+    uint8_t   kc_prefix;
 } dcontext;
 
 
@@ -279,17 +280,36 @@ static char *handle_immed32(dcontext *state, char *buf, size_t buflen)
 
 static char *handle_hl(int index)
 {
-    char *table[] = { "hl", "ix", "iy"};
+    static char *table[] = { "hl", "ix", "iy"};
     return table[index];
 }
 
+static char* handle_kc_prefix(uint8_t pfx)
+{
+    static char* kc160_prefix_table[] = { "x", "y", "a", "p", "", "", "", "z" };
+    if (!iskc160() || pfx > 7)
+        return "";
+    else
+        return kc160_prefix_table[pfx];
+}
+
+static char* handle_kc_segment(uint8_t pfx)
+{
+    if (!iskc160() || pfx > 7)
+        return "";
+    else {
+        static char buffer[10]; // NOTE: not reentrant
+        snprintf(buffer, sizeof(buffer), "%s%s:", handle_kc_prefix(pfx), pfx == 2 ? "" : "p");
+        return buffer;
+    }
+}
 
 static char *handle_register8(dcontext *state, uint8_t y, char *buf, size_t buflen)
 {
     static char *table[3][8] = {
-        { "b", "c", "d", "e", "h", "l", "(hl)", "a" },
-        { "b", "c", "d", "e", "ixh", "ixl", "(ix", "a" },
-        { "b", "c", "d", "e", "iyh", "iyl", "(iy", "a" }
+        { "b", "c", "d", "e", "h", "l", "hl", "a" },
+        { "b", "c", "d", "e", "ixh", "ixl", "ix", "a" },
+        { "b", "c", "d", "e", "iyh", "iyl", "iy", "a" }
     };
     size_t offs = 0;
     int index = state->index;
@@ -303,11 +323,14 @@ static char *handle_register8(dcontext *state, uint8_t y, char *buf, size_t bufl
 
         if ( state->prefix != 0xcb )
             READ_BYTE(state, displacement);
-            BUF_PRINTF("%s%s$%02x)", table[index][y],
-                                    displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
+            BUF_PRINTF("(%s%s%s$%02x)",handle_kc_prefix(state->kc_prefix),table[index][y], displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
         return buf;
     } 
-    BUF_PRINTF("%s", table[index][y]);
+    if (y == 6) {
+        BUF_PRINTF("(%s%s)",handle_kc_prefix(state->kc_prefix),table[index][y]);
+    } else {
+        BUF_PRINTF("%s", table[index][y]);
+    }
     return buf;
 }
 
@@ -367,21 +390,31 @@ static char *handle_block_instruction(dcontext *state, uint8_t z, uint8_t y)
 static char *kc160_handle_register_rel(dcontext *state, uint8_t index)
 {
     static char *table[3] = { "iy", "ix" , "sp" };
-    return table[index];
+    static char buffer[10]; // NOTE: not reentrant
+    snprintf(buffer, sizeof(buffer), "%s%s", handle_kc_prefix(state->kc_prefix), table[index]);
+    return buffer;
 }
 
-static char *handle_ed_assorted_instructions(dcontext *state, uint8_t y)
+static char* handle_ed_assorted_instructions(dcontext* state, uint8_t y)
 {
-    static char *table[] =        { "ld        i,a",   "ld        r,a",   "ld        a,i",   "ld        a,r",   "rrd",             "rld",    "ld        i,i",  "ld        r,r"};
-    static char *z180_table[] =   { "ld        i,a",   "ld        r,a",   "ld        a,i",   "ld        a,r",   "rrd",             "rld",    "nop",             "nop"};
-    static char *r2ka_table[] =   { "ld        eir,a", "ld        iir,a", "ld        a,eir", "ld        a,iir", "ld        xpc,a", "nop",    "ld        a,xpc", "nop"};
-    static char *r3k_table[] =    { "ld        eir,a", "ld        iir,a", "ld        a,eir", "ld        a,iir", "ld        xpc,a", "setusr", "ld        a,xpc", "rdmode"};
-    static char *kc160_table[] =  { "ld        i,a",   "ld        r,a",   "ld        a,i",   "ld        a,r",   "rrd",             "rld",    "mul       de,hl", "muls     de,hl" };
-    
-    return c_cpu & CPU_R2KA ? r2ka_table[y] : 
-            c_cpu & (CPU_R3K|CPU_R4K) ? r3k_table[y] : 
-            c_cpu & (CPU_Z180|CPU_EZ80) ? z180_table[y] : 
+    static char* table[] = { "ld        i,a",   "ld        r,a",   "ld        a,i",   "ld        a,r",   "rrd",             "rld",    "ld        i,i",  "ld        r,r" };
+    static char* z180_table[] = { "ld        i,a",   "ld        r,a",   "ld        a,i",   "ld        a,r",   "rrd",             "rld",    "nop",             "nop" };
+    static char* r2ka_table[] = { "ld        eir,a", "ld        iir,a", "ld        a,eir", "ld        a,iir", "ld        xpc,a", "nop",    "ld        a,xpc", "nop" };
+    static char* r3k_table[] = { "ld        eir,a", "ld        iir,a", "ld        a,eir", "ld        a,iir", "ld        xpc,a", "setusr", "ld        a,xpc", "rdmode" };
+    static char* kc160_table[] = { "ld        i,a",   "ld        r,a",   "ld        a,i",   "ld        a,r",   "rrd",             "rld",    "mul       de,hl", "muls     de,hl" };
+
+
+    if (iskc160() && state->kc_prefix < 8 && (y == 4 || y == 5)) {  // rrd, rld
+        static char buffer[20]; // NOTE: not reentrant
+        snprintf(buffer, sizeof(buffer), "%-10s(%shl)", kc160_table[y], handle_kc_prefix(state->kc_prefix));
+        return buffer;
+    }
+    else {
+        return c_cpu & CPU_R2KA ? r2ka_table[y] :
+            c_cpu & (CPU_R3K | CPU_R4K) ? r3k_table[y] :
+            c_cpu & (CPU_Z180 | CPU_EZ80) ? z180_table[y] :
             iskc160() ? kc160_table[y] : table[y];
+    }
 }
 
 static char *handle_im_instructions(dcontext *state, uint8_t y)
@@ -425,7 +458,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
 
     state->pc = pc;
     state->adl = c_adl_mode;
-    
+    state->kc_prefix = -1;
+
     label = find_symbol(pc, SYM_ADDRESS);
     if (label && (compact <= 1)) {
         offs += snprintf(bufstart + offs, buflen - offs, "%s:%s",label, compact ? "" : "\n");
@@ -505,28 +539,28 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                if ( isez80() && y == 6 && state->index )
                                    BUF_PRINTF("%-10s%s,%s",handle_ez80_am(state, "ld"), handle_hl(state->index == 1 ? 2 : 1), handle_register8(state, 6, opbuf1, sizeof(opbuf1)));
                                else BUF_PRINTF("%-10s%s,%s",handle_ez80_am(state, "ld"), handle_register16(state, p,state->index), handle_immed16(state, opbuf1, sizeof(opbuf1)));
-                           } else BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state,"add"), handle_hl(state->index), handle_register16(state, p, state->index));
+                           } else BUF_PRINTF("%-10s%s%s,%s", handle_ez80_am(state,"add"), handle_kc_prefix(state->kc_prefix),handle_hl(state->index), handle_register16(state, p, state->index));
                             break;
                         case 2:
                             if ( q == 0 ) {
-                                if ( p == 0 ) BUF_PRINTF("%-10s(bc),a",handle_ez80_am(state,"ld"));
-                                else if ( p == 1 ) BUF_PRINTF("%-10s(de),a",handle_ez80_am(state,"ld"));
-                                else if ( p == 2 && !isgbz80()) BUF_PRINTF("%-10s(%s),%s",handle_ez80_am(state,"ld"), handle_addr16(state, opbuf1, sizeof(opbuf1)), handle_hl(state->index));
+                                if ( p == 0 ) BUF_PRINTF("%-10s(%sbc),a",handle_ez80_am(state,"ld"),handle_kc_prefix(state->kc_prefix));
+                                else if ( p == 1 ) BUF_PRINTF("%-10s(%sde),a",handle_ez80_am(state,"ld"),handle_kc_prefix(state->kc_prefix));
+                                else if ( p == 2 && !isgbz80()) BUF_PRINTF("%-10s(%s%s),%s",handle_ez80_am(state,"ld"),handle_kc_segment(state->kc_prefix),handle_addr16(state, opbuf1, sizeof(opbuf1)),handle_hl(state->index));
                                 else if ( p == 2 && isgbz80() ) BUF_PRINTF("%-10s(hl+),a","ld");
-                                else if ( p == 3 && !isgbz80() ) BUF_PRINTF("%-10s(%s),a",handle_ez80_am(state,"ld"), handle_addr16(state, opbuf1, sizeof(opbuf1)));
+                                else if ( p == 3 && !isgbz80() ) BUF_PRINTF("%-10s(%s%s),a",handle_ez80_am(state,"ld"),handle_kc_segment(state->kc_prefix),handle_addr16(state, opbuf1, sizeof(opbuf1)));
                                 else if ( p == 3 && isgbz80() ) BUF_PRINTF("%-10s(hl-),a","ld");                            
                             } else if ( q == 1 ) {
-                                if ( p == 0 ) BUF_PRINTF("%-10sa,(bc)",handle_ez80_am(state,"ld"));
-                                else if ( p == 1 ) BUF_PRINTF("%-10sa,(de)",handle_ez80_am(state,"ld"));
-                                else if ( p == 2 && !isgbz80() ) BUF_PRINTF("%-10s%s,(%s)", handle_ez80_am(state,"ld"), handle_hl(state->index), handle_addr16(state, opbuf1, sizeof(opbuf1)));
+                                if ( p == 0 ) BUF_PRINTF("%-10sa,(%sbc)",handle_ez80_am(state,"ld"),handle_kc_prefix(state->kc_prefix));
+                                else if ( p == 1 ) BUF_PRINTF("%-10sa,(%sde)",handle_ez80_am(state,"ld"),handle_kc_prefix(state->kc_prefix));
+                                else if ( p == 2 && !isgbz80() ) BUF_PRINTF("%-10s%s,(%s%s)", handle_ez80_am(state,"ld"),handle_hl(state->index),handle_kc_segment(state->kc_prefix),handle_addr16(state, opbuf1, sizeof(opbuf1)));
                                 else if ( p == 2 && isgbz80() ) BUF_PRINTF("%-10sa,(hl+)", "ld");
-                                else if ( p == 3 && !isgbz80() ) BUF_PRINTF("%-10sa,(%s)", handle_ez80_am(state,"ld"), handle_addr16(state, opbuf1, sizeof(opbuf1)));
+                                else if ( p == 3 && !isgbz80() ) BUF_PRINTF("%-10sa,(%s%s)",handle_ez80_am(state,"ld"),handle_kc_segment(state->kc_prefix),handle_addr16(state, opbuf1, sizeof(opbuf1)));
                                 else if ( p == 3 && isgbz80() ) BUF_PRINTF("%-10sa,(hl-)", "ld");                            
                             } 
                             break;
                         case 3:
-                            if ( q == 0 ) BUF_PRINTF("%-10s%s", handle_ez80_am(state,"inc"), handle_register16(state, p, state->index));
-                            else BUF_PRINTF("%-10s%s", handle_ez80_am(state,"dec"), handle_register16(state, p, state->index));
+                            if ( q == 0 ) BUF_PRINTF("%-10s%s%s", handle_ez80_am(state,"inc"), handle_kc_prefix(state->kc_prefix), handle_register16(state, p, state->index));
+                            else BUF_PRINTF("%-10s%s%s", handle_ez80_am(state,"dec"), handle_kc_prefix(state->kc_prefix), handle_register16(state, p, state->index));
                             break;
                         case 4:
                             BUF_PRINTF("%-10s%s", y == 6 ? handle_ez80_am(state,"inc") : "inc",  handle_register8(state, y, opbuf1, sizeof(opbuf1)));
@@ -665,6 +699,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         } else {
                             BUF_PRINTF("%-10s", "nop");
                         }
+                    } else if ( iskc160() && z == y ) {
+                        state->kc_prefix = z; continue; 
                     } else {
                         if ( isez80() ) {
                             if ( y == z && y < 4) {
@@ -752,7 +788,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             else if ( p == 1 && is8085() ) BUF_PRINTF("%-10s(de),hl","ld");
                             else if ( p == 1 && !isgbz80() ) BUF_PRINTF("exx");
                             else if ( p == 1 && isgbz80() ) { BUF_PRINTF("reti"); dolf=1; }
-                            else if ( p == 2 ) BUF_PRINTF("%-10s(%s)",handle_ez80_am(state,"jp"),handle_register16(state, 2, state->index)); 
+                            else if ( p == 2 ) BUF_PRINTF("%-10s(%s%s)",handle_ez80_am(state,"jp"),handle_kc_prefix(state->kc_prefix),handle_register16(state, 2, state->index)); 
                             else if ( p == 3 ) BUF_PRINTF("%-10ssp,%s", handle_ez80_am(state,"ld"), handle_register16(state, 2, state->index)); 
                         }
                     } else if ( z == 2 ) { 
@@ -956,12 +992,12 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                             }
                                             break;                     
                                         case 2:
-                                            if ( q == 0 ) BUF_PRINTF("%-10shl,%s", handle_ez80_am(state,"sbc"), handle_register16(state, p, state->index));
-                                            else BUF_PRINTF("%-10shl,%s",handle_ez80_am(state,"adc"), handle_register16(state, p, state->index));
+                                            if ( q == 0 ) BUF_PRINTF("%-10s%shl,%s", handle_ez80_am(state,"sbc"), handle_kc_prefix(state->kc_prefix), handle_register16(state, p, state->index));
+                                            else BUF_PRINTF("%-10s%shl,%s",handle_ez80_am(state,"adc"), handle_kc_prefix(state->kc_prefix), handle_register16(state, p, state->index));
                                             break;
                                         case 3:
-                                            if ( q == 0 ) BUF_PRINTF("%-10s(%s),%s", handle_ez80_am(state, "ld"), handle_addr16(state, opbuf1, sizeof(opbuf1)), handle_register16(state, p, state->index));
-                                            else BUF_PRINTF("%-10s%s,(%s)", handle_ez80_am(state, "ld"), handle_register16(state, p, state->index), handle_addr16(state, opbuf1, sizeof(opbuf1)));
+                                            if ( q == 0 ) BUF_PRINTF("%-10s(%s%s),%s", handle_ez80_am(state, "ld"), handle_kc_segment(state->kc_prefix), handle_addr16(state, opbuf1, sizeof(opbuf1)), handle_register16(state, p, state->index));
+                                            else BUF_PRINTF("%-10s%s,(%s%s)", handle_ez80_am(state, "ld"), handle_register16(state, p, state->index), handle_kc_segment(state->kc_prefix), handle_addr16(state, opbuf1, sizeof(opbuf1)));
                                             break;
                                         case 4:
                                             if ( israbbit() ) {
@@ -1059,12 +1095,12 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                         // KC160, 0x80 - 0xbf page
                                         if ( q == 0 && z >=4 && z < 7 ) BUF_PRINTF("%-10s(%s%s),%s","ld",kc160_handle_register_rel(state, z - 4),handle_displacement(state, opbuf1, sizeof(opbuf1)), handle_register16(state, p, 0));
                                         else if ( q == 1 && z >=4 && z < 7 ) BUF_PRINTF("%-10s%s,(%s%s)","ld", handle_register16(state, p, 0), kc160_handle_register_rel(state, z - 4),handle_displacement(state, opbuf1, sizeof(opbuf1)));
-                                        else if ( q == 0 && z < 3 ) BUF_PRINTF("%-10s(%s%s),%s","ld",kc160_handle_register_rel(state, z - 4),handle_displacement(state, opbuf1, sizeof(opbuf1)), y == 0 ? "ix" : "iy");
-                                        else if ( q == 1 && z < 3 ) BUF_PRINTF("%-10s%s,(%s%s)","ld", y == 0 ? "ix" : "iy", kc160_handle_register_rel(state, z - 4),handle_displacement(state, opbuf1, sizeof(opbuf1)));
+                                        else if ( q == 0 && z < 3 ) BUF_PRINTF("%-10s(%s%s),%s","ld",kc160_handle_register_rel(state, z),handle_displacement(state, opbuf1, sizeof(opbuf1)), p == 0 ? "ix" : "iy");
+                                        else if ( q == 1 && z < 3 ) BUF_PRINTF("%-10s%s,(%s%s)","ld", p == 0 ? "ix" : "iy", kc160_handle_register_rel(state, z),handle_displacement(state, opbuf1, sizeof(opbuf1)));
                                         else if ( q == 0 && z == 7 ) BUF_PRINTF("%-10s(%s),%s","ldf", handle_addr24(state, opbuf1, sizeof(opbuf1)),handle_register16(state, p, 0) );
                                         else if ( q == 1 && z == 7 ) BUF_PRINTF("%-10s%s,(%s)","ldf", handle_register16(state, p, 0),handle_addr24(state, opbuf1, sizeof(opbuf1)) );
-                                        else if ( q == 0 && z == 3 ) BUF_PRINTF("%-10s(%s),%s","ldf", handle_addr24(state, opbuf1, sizeof(opbuf1)), y == 0 ? "ix" : "iy");
-                                        else if ( q == 1 && z == 3 ) BUF_PRINTF("%-10s%s,(%s)","ldf", y == 0 ? "ix" : "iy", handle_addr24(state, opbuf1, sizeof(opbuf1)));
+                                        else if ( q == 0 && z == 3 ) BUF_PRINTF("%-10s(%s),%s","ldf", handle_addr24(state, opbuf1, sizeof(opbuf1)), p == 0 ? "ix" : "iy");
+                                        else if ( q == 1 && z == 3 ) BUF_PRINTF("%-10s%s,(%s)","ldf", p == 0 ? "ix" : "iy", handle_addr24(state, opbuf1, sizeof(opbuf1)));
                                     } else if ( isz80n() ) {
                                         if ( b == 0x8a ) BUF_PRINTF("push    %s", handle_immed16_be(state, opbuf1, sizeof(opbuf1)));
                                         else if ( b == 0x90 ) BUF_PRINTF("outinb  ");
