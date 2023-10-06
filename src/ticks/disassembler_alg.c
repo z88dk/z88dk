@@ -1007,8 +1007,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                             else if ( isez80() && y == 5 ) BUF_PRINTF("%-10smb,a","ld");                                        
                                             else if ( isez80() && y == 7 ) BUF_PRINTF("%-10s","stmix");     
                                             else if ( iskc160() && y == 2 ) BUF_PRINTF("%-10s","retn3");                                   
-                                            else if ( iskc160() && y == 6 ) BUF_PRINTF("%-10shl,de","div");                                   
-                                            else if ( iskc160() && y == 7 ) BUF_PRINTF("%-10shl,de","divs");                                   
+                                            else if ( iskc160() && y == 6 ) BUF_PRINTF("%-10sdehl,bc","div");                                   
+                                            else if ( iskc160() && y == 7 ) BUF_PRINTF("%-10sdehl,bc","divs");                                   
                                             else if ( (isz180() || isez80() || iskc160()) && y != 0 ) BUF_PRINTF("nop");
                                             else if ( !israbbit() ) { BUF_PRINTF("%-10s", handle_ez80_am(state,"retn")); dolf=1; }
                                             break;
