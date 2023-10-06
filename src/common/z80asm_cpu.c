@@ -112,10 +112,7 @@ bool cpu_compatible(int code_cpu_id, int lib_cpu_id) {
         case CPU_EZ80:
             return false;
         case CPU_EZ80_Z80:
-            switch (lib_cpu_id) {
-            case CPU_Z180: case CPU_Z80_STRICT: case CPU_8080: return true;
-            default: return false;
-            }
+            return false;
         case CPU_R800:
             switch (lib_cpu_id) {
             case CPU_Z80_STRICT: case CPU_8080: return true;

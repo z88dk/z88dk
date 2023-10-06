@@ -540,8 +540,8 @@ sub cpu_compatible {
 	elsif ($code_cpu eq "ez80") {
 		return 0;
 	}
-	elsif ($code_cpu eq "ez80_z80" && ($lib_cpu eq "8080" || $lib_cpu eq "z180" || $lib_cpu eq "z80_strict")) {
-		return 1;
+	elsif ($code_cpu eq "ez80_z80") {
+		return 0;
 	}
 	elsif ($code_cpu eq "r800" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
 		return 1;
