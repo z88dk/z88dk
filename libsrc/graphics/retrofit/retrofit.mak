@@ -11,7 +11,8 @@ RETROFIT_OBJS = $(addprefix graphics/retrofit/obj/z80/, $(RETROFIT_OBJECTS)) \
 	$(addprefix graphics/retrofit/obj/z80n/,$(RETROFIT_OBJECTS)) \
 	$(addprefix graphics/retrofit/obj/8080/,$(RETROFIT_OBJECTS)) \
 	$(addprefix graphics/retrofit/obj/z180/,$(RETROFIT_OBJECTS)) \
-	$(addprefix graphics/retrofit/obj/ez80_z80/,$(RETROFIT_OBJECTS))
+	$(addprefix graphics/retrofit/obj/ez80_z80/,$(RETROFIT_OBJECTS)) \
+	$(addprefix graphics/retrofit/obj/kc160/,$(RETROFIT_OBJECTS))
 
 OBJS += $(RETROFIT_OBJS)
 CLEAN += graphics/retrofit-clean
@@ -29,6 +30,7 @@ $(eval $(call buildbit,graphics/retrofit,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,graphics/retrofit,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,graphics/retrofit,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,graphics/retrofit,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,graphics/retrofit,kc160,test,-clib=kc160,-mkc160))
 
 
 graphics/retrofit-clean:

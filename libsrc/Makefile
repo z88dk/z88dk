@@ -17,7 +17,7 @@ TOCREATE =
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
 CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxh19.lib gfxvio.lib
-GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib lib3d.lib fastmath.lib preempt.lib sp1-all
+GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib lib3d.lib fastmath.lib preempt.lib sp1-all
 GENLIBS += 8080_opt.lib 8085_opt.lib  
 GENLIBS += gfxtek.lib gfxregis.lib
 
@@ -122,7 +122,7 @@ TOCREATE += $(call check_target,special,special_clib.lib)
 TOCREATE += $(call check_target,super80,super80_clib.lib super80_vduem_clib.lib)
 TOCREATE += $(call check_target,sv8000,sv8000_clib.lib)
 TOCREATE += $(call check_target,svi,svi_clib.lib)
-TOCREATE += $(call check_target,test,test_clib.lib testz180_clib.lib testez80_z80_clib.lib test8080_clib.lib testrcm_clib.lib testrcm4k_clib.lib testgbz80_clib.lib)
+TOCREATE += $(call check_target,test,test_clib.lib testz180_clib.lib testez80_z80_clib.lib test8080_clib.lib testrcm_clib.lib testrcm4k_clib.lib testkc160_clib.lib testgbz80_clib.lib)
 TOCREATE += $(call check_target,ti82,ti82_clib.lib)
 TOCREATE += $(call check_target,ti83,ti83_clib.lib)
 TOCREATE += $(call check_target,ti83p,ti83p_clib.lib)
@@ -141,7 +141,7 @@ TOCREATE += $(call check_target,x07,x07_clib.lib)
 TOCREATE += $(call check_target,x1,x1_clib.lib x1_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,x820ii,x820ii.lib $(CPMLIBS))
 TOCREATE += $(call check_target,z1013,z1013_clib.lib)
-TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 8085_clib.lib r2ka_clib.lib r4k_clib.lib)
+TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 8085_clib.lib r2ka_clib.lib r4k_clib.lib kc160_clib.lib)
 TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
 TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
 TOCREATE += $(call check_target,z9001,z9001_clib.lib)
@@ -1245,6 +1245,14 @@ r4k_clib.lib: $(TARGET_CLIB_OBJS)
 	$(call buildgeneric,z80)
 	TARGET=z80 TYPE=r4k $(LIBLINKER2) -mr4k -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/r4k_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
+# Barebone z80/kc160 clib
+kc160_clib.lib: $(TARGET_CLIB_OBJS)
+	@echo ''
+	@echo '--- Building +z80 (kc160) Library ---'
+	@echo ''
+	$(call buildgeneric,z80)
+	TARGET=z80 TYPE=kc160 $(LIBLINKER2) -mkc160 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/kc160_clib @$(TARGET_DIRECTORY)/z80/z80.lst
+
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
 kc_clib.lib: $(TARGET_CLIB_OBJS)
@@ -1779,6 +1787,13 @@ testgbz80_clib.lib: $(TARGET_CLIB_OBJS) test8080_clib.lib
 	$(call buildgeneric,test)
 	TARGET=test TYPE=gbz80 $(LIBLINKER2) -mgbz80 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testgbz80_clib @$(TARGET_DIRECTORY)/test/testgbz80.lst
 
+testkc160_clib.lib: $(TARGET_CLIB_OBJS) testgbz80_clib.lib
+	@echo ''
+	@echo '--- Building Test System Library (kc160) ---'
+	@echo ''
+	$(call buildgeneric,test)
+	TARGET=test TYPE=kc160 $(LIBLINKER2) -mkc160 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testkc160_clib @$(TARGET_DIRECTORY)/test/test.lst
+
 
 # TRS 80 - stefano
 trs80_clib.lib: $(TARGET_CLIB_OBJS)
@@ -2185,6 +2200,13 @@ r4k_crt0.lib: $(DIRS) $(OBJS) r2ka_crt0.lib
 	@echo ''
 	$(call buildcrt)
 	TYPE=r4k $(LIBLINKER) -mr4k -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/r4k_crt0 @$(LISTFILE_DIRECTORY)/rabbit.lst
+
+kc160_crt0.lib: $(DIRS) $(OBJS) r4k_crt0.lib
+	@echo ''
+	@echo '--- Building kc160 crt Library ---'
+	@echo ''
+	$(call buildcrt)
+	TYPE=kc160 $(LIBLINKER) -mkc160 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/kc160_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
 
 
 install:

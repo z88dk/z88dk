@@ -17,7 +17,8 @@ MALLOC_OBJS = $(addprefix alloc/malloc-classic/obj/z80/, $(MALLOC_OBJECTS)) \
 	$(addprefix alloc/malloc-classic/obj/8080/,$(MALLOC_OBJECTS)) \
 	$(addprefix alloc/malloc-classic/obj/gbz80/,$(MALLOC_OBJECTS)) \
 	$(addprefix alloc/malloc-classic/obj/z180/,$(MALLOC_OBJECTS)) \
-	$(addprefix alloc/malloc-classic/obj/ez80_z80/,$(MALLOC_OBJECTS))
+	$(addprefix alloc/malloc-classic/obj/ez80_z80/,$(MALLOC_OBJECTS)) \
+	$(addprefix alloc/malloc-classic/obj/kc160/,$(MALLOC_OBJECTS))
 
 
 OBJS += $(MALLOC_OBJS) $(MALLOC_NEWLIB_TARGETS)
@@ -36,6 +37,7 @@ $(eval $(call buildbit,alloc/malloc-classic,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,alloc/malloc-classic,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,alloc/malloc-classic,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,alloc/malloc-classic,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,alloc/malloc-classic,kc160,test,-clib=kc160,-mkc160))
 
 
 alloc/malloc-classic/obj/%:

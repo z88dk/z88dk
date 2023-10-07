@@ -7,7 +7,8 @@ ADT_NEWLIB_TARGETS := adt-newlib/obj/newlib-z80-adt-newlib \
 	adt-newlib/obj/newlib-r4k-adt-newlib \
 	adt-newlib/obj/newlib-ixiy-adt-newlib \
 	adt-newlib/obj/newlib-z180-adt-newlib \
-	adt-newlib/obj/newlib-ez80_z80-adt-newlib 
+	adt-newlib/obj/newlib-ez80_z80-adt-newlib \
+	adt-newlib/obj/newlib-kc160-adt-newlib  
 
 OBJS += $(ADT_NEWLIB_TARGETS)
 CLEAN += adt-newlib-clean
@@ -60,6 +61,11 @@ adt-newlib/obj/newlib-ez80_z80-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
 	@mkdir -p adt-newlib/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(ADT_NEWLIBGLOBS)
+
+adt-newlib/obj/newlib-kc160-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
+	@mkdir -p adt-newlib/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/kc160/x -I.. -mkc160 -D__CLASSIC $(ADT_NEWLIBGLOBS)
 
 
 adt-newlib-clean:

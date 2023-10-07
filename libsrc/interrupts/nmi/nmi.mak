@@ -11,7 +11,8 @@ INT_NMI_OBJS = $(addprefix interrupts/nmi/obj/z80/, $(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/8080/,$(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/gbz80/,$(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/z180/,$(INT_NMI_OBJECTS)) \
-	$(addprefix interrupts/nmi/obj/ez80_z80/,$(INT_NMI_OBJECTS))
+	$(addprefix interrupts/nmi/obj/ez80_z80/,$(INT_NMI_OBJECTS)) \
+	$(addprefix interrupts/nmi/obj/kc160/,$(INT_NMI_OBJECTS))
 
 
 OBJS += $(INT_NMI_OBJS) 
@@ -28,6 +29,7 @@ $(eval $(call buildbit,interrupts/nmi,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,interrupts/nmi,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,interrupts/nmi,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,interrupts/nmi,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,interrupts/nmi,kc160,test,-clib=kc160,-mkc160))
 
 
 interrupts-nmi-clean:

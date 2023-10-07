@@ -7,7 +7,8 @@ OBSTACK_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/alloc/obstack/c/sccz80/*.asm $(NEW
 
 
 OBSTACK_NEWLIB_TARGETS := alloc/obstack/obj/newlib-z80-alloc-obstack alloc/obstack/obj/newlib-z80n-alloc-obstack alloc/obstack/obj/newlib-r2ka-alloc-obstack alloc/obstack/obj/newlib-ixiy-alloc-obstack  alloc/obstack/obj/newlib-8080-alloc-obstack alloc/obstack/obj/newlib-ez80_z80-alloc-obstack alloc/obstack/obj/newlib-z180-alloc-obstack \
-	alloc/obstack/obj/newlib-r4k-alloc-obstack
+	alloc/obstack/obj/newlib-r4k-alloc-obstack \
+	alloc/obstack/obj/newlib-kc160-alloc-obstack
 
 OBSTACK_OBJECTS = $(OBSTACK_CFILES:.c=.o) $(OBSTACK_AFILES:.asm=.o)
 
@@ -15,7 +16,8 @@ OBSTACK_OBJS = $(addprefix alloc/obstack/obj/z80/, $(OBSTACK_OBJECTS)) $(addpref
 	$(addprefix alloc/obstack/obj/r4k/,$(OBSTACK_OBJECTS)) \
 	$(addprefix alloc/obstack/obj/8080/,$(OBSTACK_OBJECTS)) \
 	$(addprefix alloc/obstack/obj/z180/,$(OBSTACK_OBJECTS)) \
-	$(addprefix alloc/obstack/obj/ez80_z80/,$(OBSTACK_OBJECTS))
+	$(addprefix alloc/obstack/obj/ez80_z80/,$(OBSTACK_OBJECTS)) \
+	$(addprefix alloc/obstack/obj/kc160/,$(OBSTACK_OBJECTS))
 
 
 OBJS += $(OBSTACK_OBJS) $(OBSTACK_NEWLIB_TARGETS)
@@ -34,6 +36,7 @@ $(eval $(call buildbit,alloc/obstack,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,alloc/obstack,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,alloc/obstack,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,alloc/obstack,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,alloc/obstack,kc160,test,-clib=kc160,-mkc160))
 
 
 alloc/obstack/obj/newlib-z80-alloc-obstack: $(OBSTACK_NEWLIBGLOBS_ex)
@@ -75,6 +78,11 @@ alloc/obstack/obj/newlib-ez80_z80-alloc-obstack: $(OBSTACK_NEWLIBGLOBS_ex)
 	@mkdir -p alloc/obstack/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=alloc/obstack/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(OBSTACK_NEWLIBGLOBS)
+
+alloc/obstack/obj/newlib-kc160-alloc-obstack: $(OBSTACK_NEWLIBGLOBS_ex)
+	@mkdir -p alloc/obstack/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=alloc/obstack/obj/kc160/x -I.. -mkc160 -D__CLASSIC $(OBSTACK_NEWLIBGLOBS)
 
 alloc/obstack/obj/newlib-z180-alloc-obstack: $(OBSTACK_NEWLIBGLOBS_ex)
 	@mkdir -p alloc/obstack/obj

@@ -19,7 +19,8 @@ ARCHZ80_OBJECTS = $(ARCHZ80_CFILES:.c=.o) $(ARCHZ80_AFILES:.asm=.o)
 ARCHZ80_OBJS = $(addprefix arch/z80/obj/z80/, $(ARCHZ80_OBJECTS)) $(addprefix arch/z80/obj/ixiy/,$(ARCHZ80_OBJECTS))  $(addprefix arch/z80/obj/z80n/,$(ARCHZ80_OBJECTS))  $(addprefix arch/z80/obj/r2ka/, $(ARCHZ80_R2KA_OBJECTS)) \
 	$(addprefix arch/z80/obj/r4k/, $(ARCHZ80_OBJECTS)) \
 	$(addprefix arch/z80/obj/z180/, $(ARCHZ80_OBJECTS)) \
-	$(addprefix arch/z80/obj/ez80_z80/, $(ARCHZ80_OBJECTS))
+	$(addprefix arch/z80/obj/ez80_z80/, $(ARCHZ80_OBJECTS)) \
+	$(addprefix arch/z80/obj/kc160/, $(ARCHZ80_OBJECTS))
 
 
 OBJS += $(ARCHZ80_OBJS) $(ARCHZ80_NEWLIB_TARGETS)
@@ -36,6 +37,7 @@ $(eval $(call buildbit,arch/z80,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,arch/z80,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,arch/z80,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,arch/z80,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,arch/z80,kc160,test,-clib=kc160,-mkc160))
 
 
 arch/z80/obj/newlib-z80-arch-z80: $(ARCHZ80_NEWLIBGLOBS_ex)
@@ -57,6 +59,11 @@ arch/z80/obj/newlib-ez80_z80-arch-z80: $(ARCHZ80_NEWLIBGLOBS_ex)
 	@mkdir -p arch/z80/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=arch/z80/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(ARCHZ80_NEWLIBGLOBS)
+
+arch/z80/obj/newlib-kc160-arch-z80: $(ARCHZ80_NEWLIBGLOBS_ex)
+	@mkdir -p arch/z80/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=arch/z80/obj/kc160/x -I.. -mkc160 -D__CLASSIC $(ARCHZ80_NEWLIBGLOBS)
 
 
 arch-z80-clean:

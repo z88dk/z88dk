@@ -5,11 +5,13 @@ TIME_AFILES = $(notdir $(wildcard time/*.asm))
 TIME_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/time/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/time/z80/*.asm"
 TIME_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/time/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/time/z80/*.asm
 
-TIME_NEWLIB_TARGETS := time/obj/newlib-z80-time time/obj/newlib-z80n-time time/obj/newlib-r2ka-time time/obj/newlib-ixiy-time time/obj/newlib-8080-time time/obj/newlib-gbz80-time time/obj/newlib-ez80_z80-time time/obj/newlib-z180-time time/obj/newlib-r4k-time
+TIME_NEWLIB_TARGETS := time/obj/newlib-z80-time time/obj/newlib-z80n-time time/obj/newlib-r2ka-time time/obj/newlib-ixiy-time time/obj/newlib-8080-time time/obj/newlib-gbz80-time time/obj/newlib-ez80_z80-time time/obj/newlib-z180-time time/obj/newlib-r4k-time \
+	 time/obj/newlib-kc160k-time
 
 TIME_OBJECTS = $(TIME_CFILES:.c=.o) $(TIME_AFILES:.asm=.o)
 
-TIME_OBJS = $(addprefix time/obj/z80/, $(TIME_OBJECTS)) $(addprefix time/obj/r2ka/,$(TIME_OBJECTS)) $(addprefix time/obj/ixiy/,$(TIME_OBJECTS))  $(addprefix time/obj/z80n/,$(TIME_OBJECTS)) $(addprefix time/obj/8080/,$(TIME_OBJECTS))  $(addprefix time/obj/gbz80/,$(TIME_OBJECTS)) $(addprefix time/obj/ez80_z80/,$(TIME_OBJECTS)) $(addprefix time/obj/z180/,$(TIME_OBJECTS)) $(addprefix time/obj/r4k/,$(TIME_OBJECTS))
+TIME_OBJS = $(addprefix time/obj/z80/, $(TIME_OBJECTS)) $(addprefix time/obj/r2ka/,$(TIME_OBJECTS)) $(addprefix time/obj/ixiy/,$(TIME_OBJECTS))  $(addprefix time/obj/z80n/,$(TIME_OBJECTS)) $(addprefix time/obj/8080/,$(TIME_OBJECTS))  $(addprefix time/obj/gbz80/,$(TIME_OBJECTS)) $(addprefix time/obj/ez80_z80/,$(TIME_OBJECTS)) $(addprefix time/obj/z180/,$(TIME_OBJECTS)) $(addprefix time/obj/r4k/,$(TIME_OBJECTS)) \
+	$(addprefix time/obj/kc160/,$(TIME_OBJECTS))
 
 
 OBJS += $(TIME_OBJS) $(TIME_NEWLIB_TARGETS)
@@ -28,6 +30,7 @@ $(eval $(call buildbit,time,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,time,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,time,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,time,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,time,kc160,test,-clib=kc160,-mkc160))
 
 
 time/obj/newlib-z80-time: $(TIME_NEWLIBGLOBS_ex)
@@ -74,6 +77,11 @@ time/obj/newlib-ez80_z80-time: $(TIME_NEWLIBGLOBS_ex)
 	@mkdir -p time/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=time/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(TIME_NEWLIBGLOBS)
+
+time/obj/newlib-kc160-time: $(TIME_NEWLIBGLOBS_ex)
+	@mkdir -p time/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=time/obj/kc160/x -I.. -mkc160 -D__CLASSIC $(TIME_NEWLIBGLOBS)
 
 time/obj/%:
 	@mkdir -p $@

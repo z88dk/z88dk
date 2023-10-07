@@ -35,7 +35,7 @@ EXTERN _u_free
    ld de,justret
 
 .deletenotnull
-IF __CPU_RABBIT__ | __CPU_Z180__
+IF __CPU_RABBIT__ | __CPU_Z180__ | __CPU_KC160__
    push de
    pop  ix
 ELSE

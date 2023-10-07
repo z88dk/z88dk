@@ -34,7 +34,7 @@ EXTERN _u_free
    
 .notzero
    push  ix				;save callers ix
-IF __CPU_RABBIT__ | __CPU_Z180__
+IF __CPU_RABBIT__ | __CPU_Z180__ | __CPU_KC160__
    push  de
    pop   ix
 ELSE

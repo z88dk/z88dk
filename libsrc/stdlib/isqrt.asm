@@ -23,7 +23,7 @@ IF __CPU_GBZ80__
    ld  a,(hl+)
    ld  h,(hl)
    ld  l,a
-ELIF __CPU_RABBIT__
+ELIF __CPU_RABBIT__ | __CPU_KC160__
    ld hl,(sp+2)
 ELSE
    pop de

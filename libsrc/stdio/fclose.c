@@ -21,7 +21,7 @@
 int fclose(FILE *fp)
 {
 #asm
-IF __CPU_RABBIT__
+IF __CPU_RABBIT__ | __CPU_KC160__
 	ld	hl,(sp + 2)
 ELSE
 	pop	de

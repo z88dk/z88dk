@@ -6,7 +6,9 @@ BALLOC_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/alloc/balloc/c/sccz80/*.asm" "$(NEWLI
 BALLOC_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/alloc/balloc/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/alloc/balloc/z80/*.asm
 
 BALLOC_NEWLIB_TARGETS := alloc/balloc/obj/newlib-z80-alloc-balloc alloc/balloc/obj/newlib-z80n-alloc-balloc alloc/balloc/obj/newlib-r2ka-alloc-balloc alloc/balloc/obj/newlib-ixiy-alloc-balloc alloc/balloc/obj/newlib-z180-alloc-balloc alloc/balloc/obj/newlib-ez80_z80-alloc-balloc \
-	alloc/balloc/obj/newlib-r4k-alloc-balloc
+	alloc/balloc/obj/newlib-r4k-alloc-balloc \
+	alloc/balloc/obj/newlib-kc160-alloc-balloc 
+
 
 BALLOC_OBJECTS = $(BALLOC_CFILES:.c=.o) $(BALLOC_AFILES:.asm=.o)
 
@@ -16,7 +18,8 @@ BALLOC_OBJS = $(addprefix alloc/balloc/obj/z80/, $(BALLOC_OBJECTS)) \
 	$(addprefix alloc/balloc/obj/ixiy/,$(BALLOC_OBJECTS)) \
 	$(addprefix alloc/balloc/obj/z80n/,$(BALLOC_OBJECTS)) \
 	$(addprefix alloc/balloc/obj/z180/,$(BALLOC_OBJECTS)) \
-	$(addprefix alloc/balloc/obj/ez80_z80/,$(BALLOC_OBJECTS))
+	$(addprefix alloc/balloc/obj/ez80_z80/,$(BALLOC_OBJECTS)) \
+	$(addprefix alloc/balloc/obj/kc160/,$(BALLOC_OBJECTS)) 
 
 
 OBJS += $(BALLOC_OBJS) $(BALLOC_NEWLIB_TARGETS)
@@ -35,6 +38,7 @@ $(eval $(call buildbit,alloc/balloc,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,alloc/balloc,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,alloc/balloc,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,alloc/balloc,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,alloc/balloc,kc160,test,-clib=kc160,-mkc160))
 
 
 alloc/balloc/obj/newlib-z80-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
@@ -82,6 +86,11 @@ alloc/balloc/obj/newlib-ez80_z80-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
 	@mkdir -p alloc/balloc/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
+
+alloc/balloc/obj/newlib-kc160-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
+	@mkdir -p alloc/balloc/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/kc160/x -I.. -mkc160 -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
 
 alloc/balloc/obj/%:
 	@mkdir -p $@

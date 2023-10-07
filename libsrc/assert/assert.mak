@@ -12,7 +12,8 @@ ASSERT_OBJS = $(addprefix assert/obj/z80/, $(ASSERT_OBJECTS)) \
 	$(addprefix assert/obj/8080/,$(ASSERT_OBJECTS)) \
 	$(addprefix assert/obj/gbz80/,$(ASSERT_OBJECTS)) \
 	$(addprefix assert/obj/z180/,$(ASSERT_OBJECTS)) \
-	$(addprefix assert/obj/ez80_z80/,$(ASSERT_OBJECTS))
+	$(addprefix assert/obj/ez80_z80/,$(ASSERT_OBJECTS)) \
+	$(addprefix assert/obj/kc160/,$(ASSERT_OBJECTS))
 
 OBJS += $(ASSERT_OBJS)
 CLEAN += assert-clean
@@ -30,6 +31,7 @@ $(eval $(call buildbit,assert,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,assert,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,assert,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,assert,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,assert,kc160,test,-clib=kc160,-mkc160))
 
 
 assert-clean:
