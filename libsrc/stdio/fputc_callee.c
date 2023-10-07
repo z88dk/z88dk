@@ -76,8 +76,7 @@ asm_fputc_callee:
 	ld	a,(ix+fp_flags)
 	and	_IOSTRING
 	jr	z,no_string
-	ld	e,(ix+fp_extra)
-	ld	d,(ix+fp_extra+1)
+	ld	de,(ix+fp_extra)
 	ld	a,d
 	or	e
 	jr	nz,print_char_to_buf
@@ -86,8 +85,7 @@ asm_fputc_callee:
 	ret
 .print_char_to_buf
 	dec	de
-	ld	(ix+fp_extra),e
-	ld	(ix+fp_extra+1),d
+	ld	(ix+fp_extra),de
 	ld	hl,(ix+fp_desc)
 	ld	(hl),c
 	inc	hl

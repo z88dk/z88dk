@@ -227,38 +227,38 @@
 	push	hl
 
 %eval 1 = %2 %1 -
-	ld	c,(ix%1)
-	ld	b,(ix%2)
+	ld	c,(ix%"[0-9]*"1)
+	ld	b,(ix%"[0-9]*"2)
 =
 	ld	bc,(ix%1)
 
 %eval 1 = %2 %1 -
-	ld	(ix%1),c
-	ld	(ix%2),b
+	ld	(ix%"[0-9]*"1),c
+	ld	ix%"[0-9]*"2),b
 =
 	ld	(ix%1),bc
 
 %eval 1 = %2 %1 -
-	ld	e,(ix%1)
-	ld	d,(ix%2)
+	ld	e,(ix%"[0-9]*"1)
+	ld	d,(ix%"[0-9]*"2)
 =
 	ld	de,(ix%1)
 
 %eval 1 = %2 %1 -
-	ld	(ix%1),e
-	ld	(ix%2),d
+	ld	(ix%"[0-9]*"1),e
+	ld	(ix%"[0-9]*"2),d
 =
 	ld	(ix%1),de
 
 %eval 1 = %2 %1 -
-	ld	l,(ix%1)
-	ld	h,(ix%2)
+	ld	l,(ix%"[0-9]*"1)
+	ld	h,(ix%"[0-9]*"2)
 =
 	ld	hl,(ix%1)
 
 %eval 1 = %2 %1 -
-	ld	(ix%1),l
-	ld	(ix%2),h
+	ld	(ix%"[0-9]*"1),l
+	ld	(ix%"[0-9]*"2),h
 =
 	ld	(ix%1),hl
 
