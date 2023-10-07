@@ -200,3 +200,28 @@
 =
 	ld	hl,(sp+2)
 
+
+%check 0 <= %1 <= 124
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ex	de,hl
+=
+	ld	hl,(sp+%1)
+	ld	de,(sp+%eval(%1 2 ++))
+	ld	d,0
+
+%check 0 <= %1 <= 124
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_glong2sp
+=
+	ld	hl,(sp+%1)
+	ld	de,(sp+%eval(%1 2 ++))
+	push	de
+	push	hl
