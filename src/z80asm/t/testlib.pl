@@ -24,7 +24,8 @@ $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 			r2ka r3k r4k r5k 
 			8080 8085 
 			gbz80 
-			kc160 );
+			kc160 kc160_z80
+);
 
 unlink_testfiles();
 
@@ -569,6 +570,9 @@ sub cpu_compatible {
 	}
 	elsif ($code_cpu eq "kc160") {
 		return 0;
+	}
+	elsif ($code_cpu eq "kc160_z80" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
+		return 1;
 	}
 	else {
 		return 0;

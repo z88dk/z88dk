@@ -16444,126 +16444,98 @@ _eof_trans:
 	case 1093:
 	{te = p+1;{
 	sym.tok = TK_IND_BC;
-	sym.tok_opcode = TK_IND_BC;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1094:
 	{te = p+1;{
 	sym.tok = TK_IND_DE;
-	sym.tok_opcode = TK_IND_DE;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1095:
 	{te = p+1;{
 	sym.tok = TK_IND_IX;
-	sym.tok_opcode = TK_IND_IX;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1096:
 	{te = p+1;{
 	sym.tok = TK_IND_IY;
-	sym.tok_opcode = TK_IND_IY;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1097:
 	{te = p+1;{
 	sym.tok = TK_IND_HL;
-	sym.tok_opcode = TK_IND_HL;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1098:
 	{te = p+1;{
 	sym.tok = TK_IND_SP;
-	sym.tok_opcode = TK_IND_SP;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1099:
 	{te = p+1;{
 	sym.tok = TK_IND_C;
-	sym.tok_opcode = TK_IND_C;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1100:
 	{te = p+1;{
 	sym.tok = TK_IND_HLI;
-	sym.tok_opcode = TK_IND_HLI;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1101:
 	{te = p+1;{
 	sym.tok = TK_IND_HLD;
-	sym.tok_opcode = TK_IND_HLD;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1102:
 	{te = p+1;{
 	sym.tok = TK_IND_A;
-	sym.tok_opcode = TK_IND_A;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1103:
 	{te = p+1;{
 	sym.tok = TK_IND_XP;
-	sym.tok_opcode = TK_IND_XP;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1104:
 	{te = p+1;{
 	sym.tok = TK_IND_YP;
-	sym.tok_opcode = TK_IND_YP;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1105:
 	{te = p+1;{
 	sym.tok = TK_IND_PP;
-	sym.tok_opcode = TK_IND_PP;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;
 	case 1106:
 	{te = p+1;{
 	sym.tok = TK_IND_ZP;
-	sym.tok_opcode = TK_IND_ZP;
 	p--; te--;
-	expect_opcode = false;
 	{p++; goto _out; }
 }}
 	break;

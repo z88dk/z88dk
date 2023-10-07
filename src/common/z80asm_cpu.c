@@ -143,6 +143,11 @@ bool cpu_compatible(int code_cpu_id, int lib_cpu_id) {
             return false;
 		case CPU_KC160:
             return false;
+		case CPU_KC160_Z80:
+            switch (lib_cpu_id) {
+            case CPU_Z80_STRICT: case CPU_8080: return true;
+            default: return false;
+            }
         default:
             xassert(0);
             return false;

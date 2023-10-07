@@ -51,7 +51,6 @@ Predefined constant: __SWAP_IX_IY__ = 1
 Skipping $test.a.o - different CPU-IXIY combination
 Skipping $test.b.o - different CPU-IXIY combination
 
-Predefined constant: __CPU_EZ80__ = 1
 Predefined constant: __CPU_EZ80_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Skipping $test.a.o - different CPU-IXIY combination
@@ -71,6 +70,22 @@ Skipping $test.b.o - different CPU-IXIY combination
 
 Predefined constant: __CPU_Z180__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
+
+Predefined constant: __CPU_KC160__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping $test.a.o - different CPU-IXIY combination
+Skipping $test.b.o - different CPU-IXIY combination
+
+Predefined constant: __CPU_KC160_Z80__ = 1
 Skipping $test.a.o - different CPU-IXIY combination
 Skipping $test.b.o - different CPU-IXIY combination
 
@@ -141,7 +156,6 @@ Skipping $test.a.o - different CPU-IXIY combination
 Skipping $test.b.o - different CPU-IXIY combination
 
 Predefined constant: __CPU_EZ80__ = 1
-Predefined constant: __CPU_EZ80_ADL__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Skipping $test.a.o - different CPU-IXIY combination
 Skipping $test.b.o - different CPU-IXIY combination
@@ -152,14 +166,6 @@ Skipping $test.b.o - different CPU-IXIY combination
 
 Predefined constant: __CPU_8080__ = 1
 Predefined constant: __CPU_INTEL__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __CPU_KC160__ = 1
 Skipping $test.a.o - different CPU-IXIY combination
 Skipping $test.b.o - different CPU-IXIY combination
 

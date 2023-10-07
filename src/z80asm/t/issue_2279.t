@@ -23,36 +23,30 @@ $test.asm:1: error: integer range: 2
       ^---- ASSUME ADL=2
 ERR
 
-z80asm_ok("-mez80 -b -l", "", "", <<ASM, bytes(1,3,4,5,7,9));
+z80asm_ok("-mez80 -b -l", "", "", <<ASM, bytes(1,5,7));
 	ifdef __CPU_EZ80__ 	   : defb 1 : endif
 	ifdef __CPU_EZ80_Z80__ : defb 2 : endif
-	ifdef __CPU_EZ80_ADL__ : defb 3 : endif
 
 	.ASSUME ADL=0
 	ifdef __CPU_EZ80__ 	   : defb 4 : endif
 	ifdef __CPU_EZ80_Z80__ : defb 5 : endif
-	ifdef __CPU_EZ80_ADL__ : defb 6 : endif
 	
 	.ASSUME ADL=1
 	ifdef __CPU_EZ80__ 	   : defb 7 : endif
 	ifdef __CPU_EZ80_Z80__ : defb 8 : endif
-	ifdef __CPU_EZ80_ADL__ : defb 9 : endif
 ASM
 
-z80asm_ok("-mez80_z80 -b -l", "", "", <<ASM, bytes(1,2,4,5,7,9));
+z80asm_ok("-mez80_z80 -b -l", "", "", <<ASM, bytes(2,5,7));
 	ifdef __CPU_EZ80__ 	   : defb 1 : endif
 	ifdef __CPU_EZ80_Z80__ : defb 2 : endif
-	ifdef __CPU_EZ80_ADL__ : defb 3 : endif
 
 	.ASSUME ADL=0
 	ifdef __CPU_EZ80__ 	   : defb 4 : endif
 	ifdef __CPU_EZ80_Z80__ : defb 5 : endif
-	ifdef __CPU_EZ80_ADL__ : defb 6 : endif
 	
 	.ASSUME ADL=1
 	ifdef __CPU_EZ80__ 	   : defb 7 : endif
 	ifdef __CPU_EZ80_Z80__ : defb 8 : endif
-	ifdef __CPU_EZ80_ADL__ : defb 9 : endif
 ASM
 
 z80asm_ok("-mez80_z80 -b -l", "", "", <<ASM, bytes(0xCD, 0x56, 0x34));

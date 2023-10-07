@@ -700,7 +700,6 @@ void Args::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_Z180__");
     undefine_static_symbol("__CPU_EZ80__");
     undefine_static_symbol("__CPU_EZ80_Z80__");
-    undefine_static_symbol("__CPU_EZ80_ADL__");
     undefine_static_symbol("__CPU_ZILOG__");
 
     undefine_static_symbol("__CPU_R800__");
@@ -718,6 +717,7 @@ void Args::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_GBZ80__");
 
     undefine_static_symbol("__CPU_KC160__");
+    undefine_static_symbol("__CPU_KC160_Z80__");
 
     switch (cpu) {
     case CPU_Z80:
@@ -748,13 +748,11 @@ void Args::set_cpu(int cpu) {
         m_cpu = CPU_EZ80;
         m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_EZ80__");
-        define_static_symbol("__CPU_EZ80_ADL__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_EZ80_Z80:
         m_cpu = CPU_EZ80_Z80;
         m_cpu_name = ::cpu_name(m_cpu);
-        define_static_symbol("__CPU_EZ80__");
         define_static_symbol("__CPU_EZ80_Z80__");
         define_static_symbol("__CPU_ZILOG__");
         break;
@@ -808,6 +806,11 @@ void Args::set_cpu(int cpu) {
         m_cpu = CPU_KC160;
         m_cpu_name = ::cpu_name(m_cpu);
         define_static_symbol("__CPU_KC160__");
+        break;
+    case CPU_KC160_Z80:
+        m_cpu = CPU_KC160_Z80;
+        m_cpu_name = ::cpu_name(m_cpu);
+        define_static_symbol("__CPU_KC160_Z80__");
         break;
     default:
         Assert(0);

@@ -20,6 +20,9 @@ X(CPU_R800, 12, "r800")
 
 X(CPU_Z180, 3, "z180")
 
+X(CPU_KC160, 15, "kc160")
+X(CPU_KC160_Z80, 16, "kc160_z80")
+
 X(CPU_Z80_STRICT, 2, "z80_strict")
 X(CPU_8085, 11, "8085")
 
@@ -33,7 +36,5 @@ X(CPU_GBZ80, 9, "gbz80")
 X(CPU_EZ80, 5, "ez80")
 
 X(CPU_8080, 10, "8080")
-
-X(CPU_KC160, 15, "kc160")
 
 #undef X
