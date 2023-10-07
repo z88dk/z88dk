@@ -10,10 +10,13 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS +=  -math-z88 -D__Z88__ -D__NATIVE_MATH__ -DFLOAT_IS_48BITS
 
-all: dirs $(OUTPUT_DIRECTORY)/z88_math.lib $(OUTPUT_DIRECTORY)/bbc_math.lib $(OUTPUT_DIRECTORY)/bbc_math_ixiy.lib \
+all: $(OUTPUT_DIRECTORY)/z88_math.lib $(OUTPUT_DIRECTORY)/bbc_math.lib $(OUTPUT_DIRECTORY)/bbc_math_ixiy.lib \
 	$(OUTPUT_DIRECTORY)/bbc_math_z80n.lib \
 	$(OUTPUT_DIRECTORY)/bbc_math_z180.lib \
-	$(OUTPUT_DIRECTORY)/bbc_math_ez80_z80.lib
+	$(OUTPUT_DIRECTORY)/bbc_math_ez80_z80.lib \
+	$(OUTPUT_DIRECTORY)/bbc_math_kc160.lib \
+	$(OUTPUT_DIRECTORY)/bbc_math_r2ka.lib \
+	$(OUTPUT_DIRECTORY)/bbc_math_r2ka.lib
 
 
 $(OUTPUT_DIRECTORY)/z88_math.lib: $(addprefix obj/z88/, $(OBJECTS))
@@ -31,8 +34,17 @@ $(OUTPUT_DIRECTORY)/bbc_math_ez80_z80.lib: $(addprefix obj/ez80_z80/, $(OBJECTS)
 $(OUTPUT_DIRECTORY)/bbc_math_z180.lib: $(addprefix obj/z180/, $(OBJECTS))
 	TYPE=z180 $(LIBLINKER) -mz180 -x$(OUTPUT_DIRECTORY)/bbc_math_z180 @z88math.lst
 
+$(OUTPUT_DIRECTORY)/bbc_math_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))
+	TYPE=kc160 $(LIBLINKER) -mkc160 -x$(OUTPUT_DIRECTORY)/bbc_math_kc160 @z88math.lst
+
 $(OUTPUT_DIRECTORY)/bbc_math_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/bbc_math_ixiy @z88math.lst
+
+$(OUTPUT_DIRECTORY)/bbc_math_r2ka.lib: $(addprefix obj/r2ka/, $(OBJECTS))
+	TYPE=r2ka $(LIBLINKER) -mr2ka -x$(OUTPUT_DIRECTORY)/bbc_math_r2ka @z88math.lst
+
+$(OUTPUT_DIRECTORY)/bbc_math_r4k.lib: $(addprefix obj/r4k/, $(OBJECTS))
+	TYPE=r4k $(LIBLINKER) -mr4k -x$(OUTPUT_DIRECTORY)/bbc_math_r4k @z88math.lst
 
 obj/z88/%.o: %.c
 	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
@@ -41,8 +53,6 @@ obj/z88/%.o: %.c
 obj/z88/%.o: %.asm
 	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC -DFORz88 -Oobj/z88 $^
 
-dirs:
-	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80 obj/z88/c/sccz80 obj/z80/z80 obj/ixiy/z80 obj/z88/z80 
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt
