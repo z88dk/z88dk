@@ -345,17 +345,47 @@ void kc160_div_hl_a(uint8_t opcode)
 
 void kc160_divs_hl_a(uint8_t opcode)
 {
+    l = ((int16_t)((h<<8)|l)) / (int16_t)a;
+    h = ((int16_t)((h<<8)|l)) % (int16_t)a;
+
+    st += 12;
     UNIMPLEMENTED(0xed00|opcode,"divs hl,a");
 }
 
 void kc160_div_dehl_bc(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"div dehl,bc");
+    uint32_t v = (d << 24) | (e << 16) | ( h<<8) | l;
+    uint32_t div = (b << 8 ) | c;
+    uint16_t q, r;
+
+    q = v / div;
+    r = v % div;
+
+    // hl = quotient, de = remainder
+    h = ( q >> 8 ) & 0xff;
+    l = ( q >> 0 ) & 0xff;
+    d = ( r >> 8 ) & 0xff;
+    e = ( r >> 0 ) & 0xff;
+  
+    st += 21;
 }
 
 void kc160_divs_dehl_bc(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"divs dehl,bc");
+    int32_t v = (d << 24) | (e << 16) | ( h<<8) | l;
+    int32_t div = (b << 8 ) | c;
+    int16_t q, r;
+
+    q = v / div;
+    r = v % div;
+
+    // hl = quotient, de = remainder
+    h = ( q >> 8 ) & 0xff;
+    l = ( q >> 0 ) & 0xff;
+    d = ( r >> 8 ) & 0xff;
+    e = ( r >> 0 ) & 0xff;
+  
+    st += 21;
 }
 
 
@@ -370,10 +400,11 @@ void kc160_mul_hl(uint8_t opcode)
 
 void kc160_muls_hl(uint8_t opcode)
 {
-    uint16_t v;
+    int16_t v;
+
     v = (int8_t)h * (int8_t)l;
-    h = v >> 8;
-    l = v;
+    h = (v >> 8) & 0xff;
+    l = (v >> 0) & 0xff;
     st += 11;
 }
 
