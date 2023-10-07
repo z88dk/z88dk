@@ -349,11 +349,9 @@ __scanf_ungetchar:
 IF __CPU_INTEL__
     call    __scanf_decrement_bytesread
 ELSE
-    ld      e,(ix-6)
-    ld      d,(ix-5)
+    ld      de,(ix-6)
     dec     de
-    ld      (ix-5),d
-    ld      (ix-6),e
+    ld      (ix-6),de
 ENDIF
 __scanf_ungetchar1:
     ld      l,a        ;character to unget
@@ -363,8 +361,7 @@ IF __CPU_INTEL__
     call    __scanf_get_fp
     push    hl
 ELSE
-    ld      c,(ix+8)    ;fp
-    ld      b,(ix+9)
+    ld      bc,(ix+8)    ;fp
     push    bc
 ENDIF
     call    ungetc
