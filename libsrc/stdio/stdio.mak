@@ -39,6 +39,7 @@ STDIO_OBJS = $(addprefix stdio/obj/z80/, $(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/8080-binary/,$(STDIO_8080_OBJECTS)) \
 	$(addprefix stdio/obj/gbz80/,$(STDIO_GBZ80_OBJECTS)) \
 	$(addprefix stdio/obj/ez80_z80/,$(STDIO_OBJECTS)) \
+	$(addprefix stdio/obj/kc160/,$(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/z80n/,$(STDIO_OBJECTS)) 
 
 OBJS += $(STDIO_OBJS)
@@ -62,6 +63,7 @@ $(eval $(call buildbit,stdio,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,stdio,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,stdio,z180-binary,cpm,-clib=z180,-mz180))
 $(eval $(call buildbit,stdio,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,stdio,kc160,test,-clib=kc160,-mkc160))
 
 
 stdio-clean:

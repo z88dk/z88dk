@@ -27,6 +27,8 @@ int fchkstd(FILE *fp)
 IF __CPU_RABBIT__
 	ld	hl,(sp + 2)
 	ex	de,hl
+ELIF __CPU_KC160__
+    ld  de,(sp+2)
 ELIF __CPU_GBZ80__
 	ld	hl,sp+2
 	ld	e,(hl)

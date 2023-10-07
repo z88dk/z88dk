@@ -121,7 +121,7 @@ read_byte_loop:
 read_byte_done:
 	; de = bytes read
 	; divide and return
-IF __CPU_RABBIT__
+IF __CPU_RABBIT__ | __CPU_KC160__
 	ld	hl,(sp + 8)	;size
 ELSE
 	ld	ix,0

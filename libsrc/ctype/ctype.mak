@@ -5,6 +5,7 @@ CTYPE_NEWLIB_TARGETS := ctype/obj/newlib-z80-ctype ctype/obj/newlib-z80n-ctype c
 		 ctype/obj/newlib-ixiy-ctype ctype/obj/newlib-8080-ctype ctype/obj/newlib-gbz80-ctype \
 		ctype/obj/newlib-z180-ctype \
 		ctype/obj/newlib-r4k-ctype \
+		ctype/obj/newlib-kc160-ctype \
 		ctype/obj/newlib-ez80_z80-ctype 
 		
 
@@ -59,6 +60,11 @@ ctype/obj/newlib-ez80_z80-ctype: $(CTYPE_NEWLIBGLOBS_ex)
 	@mkdir -p ctype/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=ctype/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(CTYPE_NEWLIBGLOBS)
+
+ctype/obj/newlib-kc160-ctype: $(CTYPE_NEWLIBGLOBS_ex)
+	@mkdir -p ctype/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=ctype/obj/kc160/x -I.. -mkc160 -D__CLASSIC $(CTYPE_NEWLIBGLOBS)
 
 
 ctype-clean:

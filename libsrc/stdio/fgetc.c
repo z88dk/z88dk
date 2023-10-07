@@ -224,12 +224,7 @@ ELSE
     pop     hl
     jr      fgetc_end	; always succeeds - never EOF when EOF has not been defined.
 .no_stdin
-  IF __CPU_RABBIT__
     ld      hl,(ix+fp_desc)
-  ELSE
-    ld      l,(ix+fp_desc)
-    ld      h,(ix+fp_desc+1)
-  ENDIF
     push    ix
     call	readbyte	; readbyte sorts out stack (fastcall)
     			; hl = byte read

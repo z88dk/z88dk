@@ -11,7 +11,8 @@ INT_IM1_OBJS = $(addprefix interrupts/im1/obj/z80/, $(INT_IM1_OBJECTS)) \
 	$(addprefix interrupts/im1/obj/8080/,$(INT_IM1_OBJECTS)) \
 	$(addprefix interrupts/im1/obj/gbz80/,$(INT_IM1_OBJECTS)) \
 	$(addprefix interrupts/im1/obj/z180/,$(INT_IM1_OBJECTS)) \
-	$(addprefix interrupts/im1/obj/ez80_z80/,$(INT_IM1_OBJECTS)) 
+	$(addprefix interrupts/im1/obj/ez80_z80/,$(INT_IM1_OBJECTS)) \
+	$(addprefix interrupts/im1/obj/kc160/,$(INT_IM1_OBJECTS)) 
 
 
 OBJS += $(INT_IM1_OBJS) 
@@ -28,6 +29,7 @@ $(eval $(call buildbit,interrupts/im1,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,interrupts/im1,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,interrupts/im1,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,interrupts/im1,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,interrupts/im1,kc160,test,-clib=kc160,-mkc160))
 
 
 interrupts-im1-clean:

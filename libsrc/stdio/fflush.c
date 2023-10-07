@@ -17,7 +17,7 @@
 int fflush(FILE *fp)
 {
 #asm
-IF __CPU_RABBIT__
+IF __CPU_RABBIT__ | __CPU_KC160__
 	ld	hl,(sp + 2)
 ELSE
 	pop	bc
@@ -43,8 +43,7 @@ IF __CPU_RABBIT__
 ELSE
 	push	hl
 	pop	ix
-	ld	l,(ix+fp_extra)
-	ld	h,(ix+fp_extra+1)
+	ld	hl,(ix+fp_extra)
 ENDIF
 	ld	a,__STDIO_MSG_FLUSH
 	call	l_jphl

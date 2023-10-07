@@ -10,7 +10,8 @@ DEBUG_OBJS = $(addprefix debug/obj/z80/, $(DEBUG_OBJECTS)) \
 	$(addprefix debug/obj/ixiy/,$(DEBUG_OBJECTS)) \
 	$(addprefix debug/obj/z80n/,$(DEBUG_OBJECTS))  \
 	$(addprefix debug/obj/z180/,$(DEBUG_OBJECTS))  \
-	$(addprefix debug/obj/ez80_z80/,$(DEBUG_OBJECTS))
+	$(addprefix debug/obj/ez80_z80/,$(DEBUG_OBJECTS)) \
+	$(addprefix debug/obj/kc160/,$(DEBUG_OBJECTS))
 
 OBJS += $(DEBUG_OBJS)
 CLEAN += debug-clean
@@ -26,6 +27,7 @@ $(eval $(call buildbit,debug,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,debug,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,debug,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,debug,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,debug,kc160,test,-clib=kc160,-mkc160))
 
 
 debug-clean:

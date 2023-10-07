@@ -36,6 +36,10 @@
 =
 	ld	hl,sp
 
+	call	l_mult
+=
+	muls	de,hl
+
 %check 0 <= %1 <= 127
 	ld	hl,%1	;const
 	add	hl,sp
@@ -133,14 +137,14 @@
 	ld	hl,%2
 	ld	(sp+%1),hl
 
-%check 0 <= %1 <= 255
+%check 0 <= %1 <= 126
 	ld	hl,%1	;const
 	call	l_gintspsp	;
 =
 	ld	hl,(sp+%1)
 	push	hl
 
-%check 0 <= %1 <= 251
+%check 0 <= %1 <= 124
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_glong
@@ -148,7 +152,7 @@
 	ld	de,(sp+%eval(%1 2 +))
 	ld	hl,(sp+%1)
 
-%check 0 <= %1 <= 253
+%check 0 <= %1 <= 126
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint
@@ -165,41 +169,100 @@
 =
 	ld	hl,(sp+0)
 
+	push	hl
+	call	l_gint%1sp	;
+	pop	de
+=
+	ex	de,hl
+	ld	hl,(sp+%eval(%1 2 -))
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	ld	d,0
+=
+	ld	de,(sp+%1)
+	ld	d,0
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+=
+	ld	hl,(sp+%1)
+	ld	h,0
+
 	pop	bc
-	defb	$ed, $ae, 0	;ld hl,(sp+0)
+	ld	hl,(sp+0)
 	push	bc
 =
 	ld	hl,(sp+2)
 
 
-;; Opcode conversion
-
-	ld	(sp+%1),hl
+%check 0 <= %1 <= 124
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ex	de,hl
 =
-	defb	$ed, $a6, %1	;ld (sp+%1),hl
-
 	ld	hl,(sp+%1)
+	ld	de,(sp+%eval(%1 2 ++))
+	ld	d,0
+
+%check 0 <= %1 <= 124
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_glong2sp
 =
-	defb	$ed, $ae, %1	;ld hl,(sp+%1)
+	ld	hl,(sp+%1)
+	ld	de,(sp+%eval(%1 2 ++))
+	push	de
+	push	hl
 
-	ld	(sp+%1),de
+%eval 1 = %2 %1 -
+	ld	c,(ix%"[0-9]*"1)
+	ld	b,(ix%"[0-9]*"2)
 =
-	defb	$ed, $96, %1	;ld (sp+%1),de
+	ld	bc,(ix%1)
 
-	ld	de,(sp+%1)
+%eval 1 = %2 %1 -
+	ld	(ix%"[0-9]*"1),c
+	ld	ix%"[0-9]*"2),b
 =
-	defb	$ed, $9e, %1	;ld de,(sp+%1)
+	ld	(ix%1),bc
 
-	ld	(sp+%1),bc
+%eval 1 = %2 %1 -
+	ld	e,(ix%"[0-9]*"1)
+	ld	d,(ix%"[0-9]*"2)
 =
-	defb	$ed, $86, %1	;ld (sp+%1),bc
+	ld	de,(ix%1)
 
-	ld	bc,(sp+%1)
+%eval 1 = %2 %1 -
+	ld	(ix%"[0-9]*"1),e
+	ld	(ix%"[0-9]*"2),d
 =
-	defb	$ed, $8e, %1	;ld bc,(sp+%1)
+	ld	(ix%1),de
 
-	ld	hl,sp
+%eval 1 = %2 %1 -
+	ld	l,(ix%"[0-9]*"1)
+	ld	h,(ix%"[0-9]*"2)
 =
-	defb	$ed, $26	;ld hl,sp
+	ld	hl,(ix%1)
 
+%eval 1 = %2 %1 -
+	ld	(ix%"[0-9]*"1),l
+	ld	(ix%"[0-9]*"2),h
+=
+	ld	(ix%1),hl
 
+	ld	ix,0
+	add	ix,sp
+=
+	ld	ix,sp

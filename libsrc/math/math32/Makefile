@@ -16,6 +16,7 @@ all: dirs $(OUTPUT_DIRECTORY)/math32.lib $(OUTPUT_DIRECTORY)/math32_ixiy.lib $(O
 	$(OUTPUT_DIRECTORY)/math32_ez80_z80.lib \
 	$(OUTPUT_DIRECTORY)/math32_r2ka.lib \
 	$(OUTPUT_DIRECTORY)/math32_r4k.lib \
+	$(OUTPUT_DIRECTORY)/math32_kc160.lib \
 	$(OUTPUT_DIRECTORY)/math32_z80n.lib
 
 $(OUTPUT_DIRECTORY)/math32.lib: $(addprefix obj/z80/, $(OBJECTS)) 
@@ -46,9 +47,12 @@ $(OUTPUT_DIRECTORY)/math32_ez80_z80.lib: $(addprefix obj/ez80_z80/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ez80_z80/x/x -I.. -mez80_z80 -D__CLASSIC @newlibfiles_z180.lst
 	TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -x$(OUTPUT_DIRECTORY)/math32_ez80_z80 @math32.lst
 
+$(OUTPUT_DIRECTORY)/math32_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/kc160/x/x -I.. -mkc160 -D__CLASSIC @newlibfiles_z180.lst
+	TYPE=kc160 $(LIBLINKER) -mkc160 -x$(OUTPUT_DIRECTORY)/math32_kc160 @math32.lst
 
 dirs:
-	@mkdir -p obj/z80/c obj/ixiy/c  obj/z180/c obj/z80n/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c
+	@mkdir -p obj/z80/c obj/ixiy/c  obj/z180/c obj/z80n/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt config_private.inc

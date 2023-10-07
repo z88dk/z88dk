@@ -77,7 +77,7 @@ fwrite_done:
 	; hl = bytes read
 	; divide and return
 	ex	de,hl
-  IF __CPU_RABBIT__
+  IF __CPU_RABBIT__ | __CPU_KC160__
 	ld	hl,(sp + 8)	;size
   ELSE
 	ld	ix,0

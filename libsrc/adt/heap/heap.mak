@@ -10,6 +10,7 @@ HEAP_OBJS = $(addprefix adt/heap/obj/z80/, $(HEAP_OBJECTS)) \
 	$(addprefix adt/heap/obj/r4k/,$(HEAP_OBJECTS)) \
 	$(addprefix adt/heap/obj/ixiy/,$(HEAP_OBJECTS)) \
 	$(addprefix adt/heap/obj/z80n/,$(HEAP_OBJECTS)) \
+	$(addprefix adt/heap/obj/kc160/,$(HEAP_OBJECTS)) \
 	$(addprefix adt/heap/obj/z180/,$(HEAP_OBJECTS)) \
 	$(addprefix adt/heap/obj/ez80_z80/,$(HEAP_OBJECTS)) 
 
@@ -26,6 +27,7 @@ $(eval $(call buildbit,adt/heap,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,adt/heap,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,adt/heap,r4k,test,-clib=rabbitr4k,-mr4k))
 $(eval $(call buildbit,adt/heap,z80n,test,-clib=z80n,-mz80n))
+$(eval $(call buildbit,adt/heap,kc160,test,-clib=kc160,-mkc160))
 $(eval $(call buildbit,adt/heap,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,adt/heap,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 

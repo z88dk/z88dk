@@ -5,7 +5,8 @@ LIBGEN_NEWLIB_TARGETS := libgen/obj/newlib-z80-libgen libgen/obj/newlib-z80n-lib
 		 libgen/obj/newlib-ixiy-libgen libgen/obj/newlib-8080-libgen libgen/obj/newlib-gbz80-libgen \
 		libgen/obj/newlib-r4k-libgen \
 		libgen/obj/newlib-z180-libgen \
-		libgen/obj/newlib-ez80_z80-libgen		
+		libgen/obj/newlib-kc160-libgen \
+		libgen/obj/newlib-ez80_z80-libgen
 
 OBJS += $(LIBGEN_NEWLIB_TARGETS)
 CLEAN += libgen-clean
@@ -58,6 +59,11 @@ libgen/obj/newlib-ez80_z80-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
 	@mkdir -p libgen/obj
 	$(Q)touch $@
 	$(Q)$(ASSEMBLER) -d -O=libgen/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(LIBGEN_NEWLIBGLOBS)
+
+libgen/obj/newlib-kc160-libgen: $(LIBGEN_NEWLIBGLOBS_ex)
+	@mkdir -p libgen/obj
+	$(Q)touch $@
+	$(Q)$(ASSEMBLER) -d -O=libgen/obj/kc160/x -I.. -mkc160 -D__CLASSIC $(LIBGEN_NEWLIBGLOBS)
 
 libgen-clean:
 	$(RM) -fr libgen/obj

@@ -11,7 +11,8 @@ ASTAR_OBJS = $(addprefix algorithm/AStarSearch/obj/z80/, $(ASTAR_OBJECTS)) \
 	$(addprefix algorithm/AStarSearch/obj/ixiy/,$(ASTAR_OBJECTS)) \
 	$(addprefix algorithm/AStarSearch/obj/z80n/,$(ASTAR_OBJECTS)) \
 	$(addprefix algorithm/AStarSearch/obj/z180/,$(ASTAR_OBJECTS)) \
-	$(addprefix algorithm/AStarSearch/obj/ez80_z80/,$(ASTAR_OBJECTS)) 
+	$(addprefix algorithm/AStarSearch/obj/ez80_z80/,$(ASTAR_OBJECTS))  \
+	$(addprefix algorithm/AStarSearch/obj/kc160/,$(ASTAR_OBJECTS)) 
 
 
 OBJS += $(ASTAR_OBJS) 
@@ -28,6 +29,7 @@ $(eval $(call buildbit,algorithm/AStarSearch,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,algorithm/AStarSearch,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,algorithm/AStarSearch,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,algorithm/AStarSearch,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,algorithm/AStarSearch,kc160,test,-clib=kc160,-mkc160))
 
 
 algorithm/AStarSearch/obj/%:

@@ -2236,7 +2236,11 @@ static void quikmult(int type, int32_t size, char preserve)
             if (preserve)
                 ol("push\tde");
             const2(size);
-            callrts("l_mult"); /* WATCH OUT!! */
+            if ( c_cpu & CPU_KC160) {
+                ol("mul\tde,hl");
+            } else {
+                callrts("l_mult"); /* WATCH OUT!! */
+            }
             if (preserve)
                 ol("pop\tde");
             break;
@@ -2672,10 +2676,11 @@ void mult(LVALUE* lval)
             }
         }
     default:
-        if (ulvalue(lval))
-            callrts("l_mult_u");
-        else
-            callrts("l_mult");
+        if (c_cpu & CPU_KC160 ) {
+            ol( ulvalue(lval) ? "mul\tde,hl" : "muls\tde,hl");
+        } else {
+            callrts( ulvalue(lval) ? "l_mult_u" : "l_mult");
+        }
     }
 }
 

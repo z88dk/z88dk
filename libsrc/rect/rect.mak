@@ -10,6 +10,7 @@ RECT_OBJS = $(addprefix rect/obj/z80/, $(RECT_OBJECTS)) \
 	$(addprefix rect/obj/ixiy/,$(RECT_OBJECTS)) \
 	$(addprefix rect/obj/z80n/,$(RECT_OBJECTS)) \
 	$(addprefix rect/obj/z180/,$(RECT_OBJECTS)) \
+	$(addprefix rect/obj/kc160/,$(RECT_OBJECTS)) \
 	$(addprefix rect/obj/ez80_z80/,$(RECT_OBJECTS)) 
 
 OBJS += $(RECT_OBJS)
@@ -28,6 +29,7 @@ $(eval $(call buildbit,rect,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,rect,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,rect,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,rect,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+$(eval $(call buildbit,rect,kc160,test,-clib=kc160,-mkc160))
 
 
 rect-clean:
