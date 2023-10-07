@@ -671,7 +671,7 @@ for my $cpu (@CPUS) {
 		add_suf($cpu, "ld de, (iy+%d)", [0xFD, 0x17, '%d']);
 		add_suf($cpu, "ld hl, (iy+%d)", [0xFD, 0x27, '%d']);
 	}
-	elsif ($kc160_ext) {
+	elsif ($kc160_any) {
 		add($cpu, "ld ix, (ix+%d)", 	[0xED, 0x89, '%d']);
 		add($cpu, "ld ix, (iy+%d)", 	[0xED, 0x88, '%d']);
 		add($cpu, "ld iy, (ix+%d)", 	[0xED, 0x99, '%d']);
@@ -682,7 +682,7 @@ for my $cpu (@CPUS) {
 			add($cpu, "ld $dd, (iy+%d)",[0xED, 0x8C+16*$V{$dd}, '%d']);
 		}
 	}
-	elsif ($zilog || $rabbit || $kc160_z80) {
+	elsif ($zilog || $rabbit) {
 		for my $x (qw( ix iy )) {
 			add($cpu, "ld bc, ($x+%d)", [$V{$x}, ld_r_r('c', '(hl)'), '%d'],
 										[$V{$x}, ld_r_r('b', '(hl)'), '%D']);
@@ -719,7 +719,7 @@ for my $cpu (@CPUS) {
 		add_suf($cpu, "ld (iy+%d), de", [0xFD, 0x1F, '%d']);
 		add_suf($cpu, "ld (iy+%d), hl", [0xFD, 0x2F, '%d']);
 	}
-	elsif ($kc160_ext) {
+	elsif ($kc160_any) {
 		add($cpu, "ld (ix+%d), ix", 	[0xED, 0x81, '%d']);
 		add($cpu, "ld (iy+%d), ix", 	[0xED, 0x80, '%d']);
 	
@@ -1209,7 +1209,7 @@ for my $cpu (@CPUS) {
 		add($cpu, "ldhl sp, %s",  	[0xF8, '%s']);
 		add($cpu, "ld hl, sp+%s", 	[0xF8, '%s']);
     }
-	elsif ($kc160_ext) {
+	elsif ($kc160_any) {
 		add($cpu, "ld ix, sp", 		[0xED, 0x06]);
 		add($cpu, "ld iy, sp", 		[0xED, 0x16]);
 		add($cpu, "ld hl, sp", 		[0xED, 0x26]);
@@ -1300,7 +1300,7 @@ for my $cpu (@CPUS) {
 			add($cpu, "ldp hl, ($dd)", [$pfx, 0x6C]);
 		}
 	}
-	elsif ($kc160_ext) {
+	elsif ($kc160_any) {
 		for my $dd (qw( bc de hl sp )) {
 			add($cpu, "ld (sp+%d), $dd",	[0xED, 0x86+16*$V{$dd}, '%d']);
 			add($cpu, "ld $dd, (sp+%d)",	[0xED, 0x8E+16*$V{$dd}, '%d']);
@@ -2208,7 +2208,7 @@ for my $cpu (@CPUS) {
 		add($cpu, "ld a, r", [0xED, 0x5F]);
 	}
 	
-	if ($zilog || $kc160_z80) {
+	if ($zilog) {
 		add($cpu, "im %c", [0xED, "%c(0..2)==0?0x46:%c==1?0x56:0x5E"]);
 	
 		if ($ez80_any) {
@@ -2216,7 +2216,7 @@ for my $cpu (@CPUS) {
 			add($cpu, "ld i, hl", [0xED, 0xC7]);
 		}
 	}
-	elsif ($kc160_ext) {
+	elsif ($kc160_any) {
 		add($cpu, "im %c", [0xED, "%c(0..3)==0?0x46:%c==1?0x56:%c==2?0x5E:0x4E"]);
 	}
 
@@ -2254,7 +2254,7 @@ for my $cpu (@CPUS) {
 		add($cpu, "retn", 			[0xED, 0x45]);
 	}
 	
-	if ($kc160_ext) {
+	if ($kc160_any) {
 		add($cpu, "retn3", 			[0xED, 0x55]);
 	}
 
@@ -2543,7 +2543,7 @@ for my $cpu (@CPUS) {
 	}
     
 	# JP3
-	if ($kc160_ext) {
+	if ($kc160_any) {
 		add($cpu, "jp3 %m", 	[0xED, 0xC3, '%m', '%m', '%m']);
 
 		for my $_f (qw( _nz _z _nc _c _ne _eq _geu _ltu _gtu _leu )) { 
@@ -2582,7 +2582,7 @@ for my $cpu (@CPUS) {
 		add($cpu, "call %m", [call(), '%m', '%m']);
 	}
 	
-	if ($kc160_ext) {
+	if ($kc160_any) {
 		add($cpu, "call3 %m",	[0xED, 0x4C, '%m', '%m', '%m']);
 	}
 	
@@ -2809,7 +2809,7 @@ for my $cpu (@CPUS) {
 		add($cpu, "ret.lil", 	[0x5B], [ret()]);
 	}
 	
-	if ($kc160_ext) {
+	if ($kc160_any) {
 		add($cpu, "ret3",		[0xED, 0x5C]);
 		add($cpu, "tra",		[0xED, 0x54]);
 	}
@@ -2971,7 +2971,7 @@ for my $cpu (@CPUS) {
 		add($cpu, "ldrx",	[0xED, 0xBC]);
 	}
 	
-	if ($kc160_ext) {
+	if ($kc160_any) {
 		add($cpu, "ldi xy",		[0xED, 0xE0]);
 		add($cpu, "ldir xy",	[0xED, 0xF0]);
 		add($cpu, "ldd xy", 	[0xED, 0xE8]);
@@ -2995,7 +2995,7 @@ for my $cpu (@CPUS) {
 		add($cpu, "cpdr", 		[call(), '@__z80asm__cpdr', '']);
 	}
 	
-	if ($kc160_ext) {
+	if ($kc160_any) {
 		add($cpu, "cpi x", 		[0xED, 0xE1]);
 		add($cpu, "cpir x", 	[0xED, 0xF1]);
 		add($cpu, "cpd x", 		[0xED, 0xE9]);
@@ -3064,7 +3064,7 @@ for my $cpu (@CPUS) {
 		add_suf($cpu, "otdr", 	[0xED, 0xBB]);
 	}
 	
-	if ($kc160_ext) {
+	if ($kc160_any) {
 		add($cpu, "ini x", 		[0xED, 0xE2]);
 		add($cpu, "inir x", 	[0xED, 0xF2]);
 		add($cpu, "ind x", 		[0xED, 0xEA]);
@@ -3540,7 +3540,9 @@ for my $cpu (@CPUS) {
 			add($cpu, "ld ($t:%m), a",		[$V{"const1_$p"}], 
 											[0x32, '%m', '%m']);
 		}
-		
+	}
+	
+	if ($kc160_any) {
 		# LD A, xP
 		add($cpu, "ld a, zp",				[0xED, 0xC4]);
 		add($cpu, "ld a, yp",				[0xED, 0xCC]);
@@ -3563,7 +3565,9 @@ for my $cpu (@CPUS) {
 		
 		# LDF A, (%m)
 		add($cpu, "ldf a, (%m)",			[0xED, 0x3B, '%m', '%m', '%m']);
-		
+	}
+	
+	if ($kc160_ext) {
 		# LD HL, (xP:%m)
 		for my $p (qw( x y a p z )) {
 			my $t = $p eq 'a' ? $p : $p.'p';
@@ -3609,7 +3613,9 @@ for my $cpu (@CPUS) {
 											[0xED, 0x43+16*$V{$dd}, '%m', '%m']);
 			}
 		}
-		
+	}
+	
+	if ($kc160_any) {
 		# LDF (%m), dd|IX|IY
 		for my $dd (qw( bc de hl sp )) {
 			add($cpu, "ldf (%m), $dd",		[0xED, 0x87+16*$V{$dd}, '%m', '%m', '%m']);
@@ -3623,7 +3629,9 @@ for my $cpu (@CPUS) {
 		}
 		add($cpu, "ldf ix, (%m)",			[0xED, 0x8B, '%m', '%m', '%m']);
 		add($cpu, "ldf iy, (%m)",			[0xED, 0x9B, '%m', '%m', '%m']);
-
+	}
+	
+	if ($kc160_ext) {
 		# LD (xIX+d|xIY+d), dd|IX|IY
 		for my $p (qw( x y a p z )) {
 			for my $dd (qw( bc de hl sp )) {
@@ -3663,7 +3671,9 @@ for my $cpu (@CPUS) {
 			add($cpu, "ld iy, (${p}iy+%d)",	[$V{"const1_$p"}], 
 											[0xED, 0x98, '%d']);
 		}
-		
+	}
+	
+	if ($kc160_any) {
 		for ([xix=>0], [yiy=>1], [ahl=>2]) {
 			my($pdd, $code) = @$_;
 
@@ -3687,7 +3697,9 @@ for my $cpu (@CPUS) {
 			# LD xdd, (%m)
 			add($cpu, "ldf $pdd, (%m)",		[0xED, 0x0B+16*$code, '%m', '%m', '%m']);
 		}
-		
+	}
+	
+	if ($kc160_ext) {
 		for my $p (qw( x y a p z )) {
 			for ([xix=>0], [yiy=>1], [ahl=>2]) {
 				my($pdd, $code) = @$_;
@@ -3709,7 +3721,9 @@ for my $cpu (@CPUS) {
 											[0xED, 0x08+16*$code, '%d']);
 			}
 		}
-
+	}
+	
+	if ($kc160_any) {
 		for ([xix=>0], [yiy=>1], [ahl=>2]) {
 			my($pdd, $code) = @$_;
 
@@ -3722,7 +3736,7 @@ for my $cpu (@CPUS) {
 			# POP xdd
 			add($cpu, "pop $pdd",			[0xED, 0x0F+16*$code]);
 		}
-		
+
 		# MUL/DIV
 		add($cpu, "mul hl",					[0xED, 0x76]);
 		add($cpu, "muls hl",				[0xED, 0x7E]);
@@ -3733,7 +3747,6 @@ for my $cpu (@CPUS) {
 		add($cpu, "muls de, hl",			[0xED, 0x7F]);
 		add($cpu, "div dehl, bc",			[0xED, 0x75]);
 		add($cpu, "divs dehl, bc",			[0xED, 0x7D]);
-		
 	}
 }
 
@@ -3787,7 +3800,7 @@ sub add {
 	
 	# convert (ix+d) to (ix) with offset 0
 	if ($asm =~ /[xyapz]?(ix|iy|hl|sp|pw|px|py|pz)\+%[dus]/) {
-		if (!($cpu =~ /^kc160$/ && $asm eq 'ld hl, sp+%s')) {			
+		if (!($cpu =~ /^kc160/ && $asm eq 'ld hl, sp+%s')) {			
 			(my $asm1 = $asm) =~ s/\+%[dus]//;
 			if ($asm1 ne "ld de, hl" && $asm1 !~ /ld p[wxyz], p[wxyz]/) {
 				my @ops1 = @{clone(\@ops)};

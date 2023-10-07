@@ -134,7 +134,7 @@ int main(int argc, char **argv)
                 } else if ( strcmp(&argv[0][1],"mkc160") == 0 ) {
                     c_cpu = CPU_KC160;
                 } else if ( strcmp(&argv[0][1],"mkc160_z80") == 0 ) {
-                    c_cpu = CPU_Z80;
+                    c_cpu = CPU_KC160_Z80;
                 } else {
                     printf("Unknown CPU: %s\n",&argv[0][2]);
                 }
