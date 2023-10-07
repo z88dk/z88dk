@@ -52,8 +52,7 @@ _fseek1:
 	jr	nz, call_trampoline
 ; Normal file descriptor, just call lseek
 	ld	a,c		;save whence
-	ld	c,(ix+fp_desc)
-	ld	b,(ix+fp_desc+1)
+	ld	bc,(ix+fp_desc)
 	push	bc		;descriptor
 	push	hl		;posn
 	push	de

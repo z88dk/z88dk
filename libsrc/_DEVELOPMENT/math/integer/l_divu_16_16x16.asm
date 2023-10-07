@@ -15,16 +15,21 @@ PUBLIC l_divu_16_16x16, l0_divu_16_16x16
    ; alternate entry (l0_divu_16_16x16)
    ; skips divide by zero check
 
-IF __CLIB_OPT_IMATH <= 50
+IF __CPU_KC160__
+
+   EXTERN l_kc160_divu_16_16x16, l0_kc160_divu_16_16x16
+
+   defc l_divu_16_16x16 =  l_kc160_divu_16_16x16
+   defc l0_divu_16_16x16 = l0_kc160_divu_16_16x16
+
+ELIF __CLIB_OPT_IMATH <= 50
 
    EXTERN l_small_divu_16_16x16, l0_small_divu_16_16x16
 
    defc l_divu_16_16x16 =  l_small_divu_16_16x16
    defc l0_divu_16_16x16 = l0_small_divu_16_16x16
 
-ENDIF
-
-IF __CLIB_OPT_IMATH > 50
+ELIF __CLIB_OPT_IMATH > 50
 
    EXTERN l_fast_divu_16_16x16, l0_fast_divu_16_16x16
 
