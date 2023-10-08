@@ -8,7 +8,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
 all:	test.bin test_r2ka.bin test_8080.bin test_gbz80.bin test_8085.bin test_ez80_z80.bin \
-	test_r4k.bin
+	test_r4k.bin test_kc160.bin
 
 
 
@@ -20,6 +20,10 @@ test.bin: $(SOURCES)
 test_r2ka.bin: $(SOURCES)
 	$(compile_r2ka)
 	$(runtest_r2ka)
+
+test_kc160.bin: $(SOURCES)
+	$(compile_kc160)
+	$(runtest_kc160)
 
 test_r4k.bin: $(SOURCES)
 	$(compile_r4k)

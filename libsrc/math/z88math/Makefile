@@ -16,7 +16,7 @@ all: $(OUTPUT_DIRECTORY)/z88_math.lib $(OUTPUT_DIRECTORY)/bbc_math.lib $(OUTPUT_
 	$(OUTPUT_DIRECTORY)/bbc_math_ez80_z80.lib \
 	$(OUTPUT_DIRECTORY)/bbc_math_kc160.lib \
 	$(OUTPUT_DIRECTORY)/bbc_math_r2ka.lib \
-	$(OUTPUT_DIRECTORY)/bbc_math_r2ka.lib
+	$(OUTPUT_DIRECTORY)/bbc_math_r4k.lib
 
 
 $(OUTPUT_DIRECTORY)/z88_math.lib: $(addprefix obj/z88/, $(OBJECTS))

@@ -44,7 +44,7 @@ $(OUTPUT_DIRECTORY)/math32_r4k.lib: $(addprefix obj/r4k/, $(OBJECTS))
 	TYPE=r4k $(LIBLINKER) -mr4k -x$(OUTPUT_DIRECTORY)/math32_r4k @math32.lst
 
 $(OUTPUT_DIRECTORY)/math32_ez80_z80.lib: $(addprefix obj/ez80_z80/, $(OBJECTS))
-	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ez80_z80/x/x -I.. -mez80_z80 -D__CLASSIC @newlibfiles_z180.lst
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ez80_z80/x/x -I.. -mez80_z80 -D__CLASSIC @newlibfiles_z80.lst
 	TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -x$(OUTPUT_DIRECTORY)/math32_ez80_z80 @math32.lst
 
 $(OUTPUT_DIRECTORY)/math32_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))

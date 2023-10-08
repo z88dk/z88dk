@@ -373,7 +373,7 @@ void kc160_div_dehl_bc(uint8_t opcode)
 void kc160_divs_dehl_bc(uint8_t opcode)
 {
     int32_t v = (d << 24) | (e << 16) | ( h<<8) | l;
-    int32_t div = (b << 8 ) | c;
+    int32_t div = ((int8_t)b << 8 ) | (int8_t)c;
     int16_t q, r;
 
     q = v / div;
