@@ -131,7 +131,7 @@ ENDIF
     jp      scanf_loop
 handle_f_fmt_error:
     call    __scanf_ungetchar
-    pop	    de  ;discard destinatino
+    pop         de  ;discard destinatino
     jp      scanf_exit
 
 ENDIF

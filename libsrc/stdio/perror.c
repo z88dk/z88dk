@@ -14,7 +14,7 @@
 
 void perror(const char *s)
 {
-	fputs(s,stderr);
-	fputs(": error.\n",stderr);
+    fputs(s,stderr);
+    fputs(": error.\n",stderr);
 }
 

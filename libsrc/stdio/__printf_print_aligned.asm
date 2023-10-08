@@ -62,7 +62,7 @@ buffer_done:
 
     ; Now the right padding - hl is how many characters left to print
 print_buffer_end:
-	ld	c,' '		; We have to a trailing pad with ' '
+	ld      c,' '		; We have to a trailing pad with ' '
 print_padding_loop:
     ld      a,h
     or      l

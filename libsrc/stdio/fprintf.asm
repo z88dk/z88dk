@@ -1,11 +1,11 @@
-	MODULE fprintf
-	SECTION	code_clib
+    MODULE fprintf
+    SECTION    code_clib
 
-	PUBLIC	fprintf
+    PUBLIC    fprintf
 
-	EXTERN	asm_printf
-	EXTERN	fputc_callee
-	EXTERN	__sgoioblk
+    EXTERN    asm_printf
+    EXTERN    fputc_callee
+    EXTERN    __sgoioblk
 
 
 
@@ -21,39 +21,39 @@
 ;        printf1(fp, print_func, sccz80_delta, *ct,ct-1);
 ;}
 fprintf:
-	ld	l,a
-	ld	h,0
-        add     hl,hl
-	add	hl,sp		;points to fp
+    ld      l,a
+    ld      h,0
+    add     hl,hl
+    add     hl,sp       ;points to fp
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
-	push	ix
+    push    ix
 ENDIF
-	ld	c,(hl)
-	inc	hl
-	ld	b,(hl)
-	dec	hl
-	dec	hl
-	push	bc
-	ld	bc,fputc_callee
-	push	bc
-	ld	bc,1
-	push	bc
-	ld	d,(hl)		;fmt
-	dec	hl
-	ld	e,(hl)	
-	push	de
-	dec	hl
-	dec	hl		;points too ap
-	push	hl
-	call	asm_printf
-	pop	bc
-	pop	bc	
-	pop	bc	
-	pop	bc
-	pop	bc
+    ld      c,(hl)
+    inc     hl
+    ld      b,(hl)
+    dec     hl
+    dec     hl
+    push    bc
+    ld      bc,fputc_callee
+    push    bc
+    ld      bc,1
+    push    bc
+    ld      d,(hl)      ;fmt
+    dec     hl
+    ld      e,(hl)    
+    push    de
+    dec     hl
+    dec     hl          ;points too ap
+    push    hl
+    call    asm_printf
+    pop     bc
+    pop     bc    
+    pop     bc    
+    pop     bc
+    pop     bc
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
-	pop	ix		;restore callers
+    pop     ix        ;restore callers
 ENDIF
-	ret
+    ret
 
 

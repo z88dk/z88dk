@@ -18,12 +18,12 @@ unsigned char dig[]= "0123456789ABCDEF";
 
 void printn(int number, int radix,FILE *file)
 {
-        int i;
-        if (number < 0 && radix == 10){
-                fputc('-', file);
-                number = -number;
-                }
-        if ((i = number / radix) != 0)
-                printn(i, radix, file);
-        fputc(dig[number % radix], file);
+    int i;
+    if (number < 0 && radix == 10){
+            fputc('-', file);
+            number = -number;
+            }
+    if ((i = number / radix) != 0)
+            printn(i, radix, file);
+    fputc(dig[number % radix], file);
 }

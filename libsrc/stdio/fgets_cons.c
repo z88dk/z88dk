@@ -41,12 +41,9 @@ char *fgets_cons(char *str, size_t max)
     while (ptr < max - 1) {
         c = fgetc_cons();
 
-        if (c == KEY_CAPS_LOCK)
-        {
+        if (c == KEY_CAPS_LOCK) {
             _cons_state ^= 1; // Toggle caps lock
-
-        } else if ( c == KEY_DEL)
-        {
+        } else if ( c == KEY_DEL) {
             if ( ptr > 0 )
             {
                 if ( CLIB_DISABLE_FGETS_CURSOR == 0 ) {
@@ -57,12 +54,9 @@ char *fgets_cons(char *str, size_t max)
                 docursor();
             }
 
-        } else if (c == 4 || c == -1)
-        {
+        } else if (c == 4 || c == -1) {
             break;
-
-        } else
-        {
+        } else {
             if (_cons_state)
                 c = toupper(c);
 

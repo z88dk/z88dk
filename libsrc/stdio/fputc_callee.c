@@ -22,15 +22,15 @@
 static void wrapper_fputc_callee() __naked
 {
 #asm
-    PUBLIC	_fputc_callee
+    PUBLIC    _fputc_callee
 
 fputc_callee:
 _fputc_callee:
 
     pop     de
-    pop     hl	;fp
-    pop     bc	;c
-    push 	de
+    pop     hl    ;fp
+    pop     bc    ;c
+    push     de
 
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
     push    ix
@@ -58,85 +58,85 @@ static void wrapper_fputc_callee_z80() __naked
 #asm
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
-	PUBLIC	asm_fputc_callee
+    PUBLIC    asm_fputc_callee
 
-; Entry:	ix = fp
-; 		bc = character to print
-; Exit:		hl = byte written
+; Entry:    ix = fp
+;         bc = character to print
+; Exit:        hl = byte written
 asm_fputc_callee:
-	ld	hl,-1	;EOF
-	ld	a,(ix+fp_flags)
-	and	a	;no thing
-	ret	z
+    ld      hl,-1    ;EOF
+    ld      a,(ix+fp_flags)
+    and     a    ;no thing
+    ret     z
 
-;	Check removed to allow READ+WRITE streams 
-;	and	_IOREAD
-;	ret	nz	;don`t want reading streams
+;    Check removed to allow READ+WRITE streams 
+;    and     _IOREAD
+;    ret     nz    ;don`t want reading streams
 
-	ld	a,(ix+fp_flags)
-	and	_IOSTRING
-	jr	z,no_string
-	ld	de,(ix+fp_extra)
-	ld	a,d
-	or	e
-	jr	nz,print_char_to_buf
-	ex	de,hl		;hl = 0
-	dec	hl		;hl = -1, EOF
-	ret
+    ld      a,(ix+fp_flags)
+    and     _IOSTRING
+    jr      z,no_string
+    ld      de,(ix+fp_extra)
+    ld      a,d
+    or      e
+    jr      nz,print_char_to_buf
+    ex      de,hl        ;hl = 0
+    dec     hl        ;hl = -1, EOF
+    ret
 .print_char_to_buf
-	dec	de
-	ld	(ix+fp_extra),de
-	ld	hl,(ix+fp_desc)
-	ld	(hl),c
-	inc	hl
-	ld	(ix+fp_desc),hl
-	ld	l,c	;load char to return
-	ld	h,0
-	ret
+    dec     de
+    ld      (ix+fp_extra),de
+    ld      hl,(ix+fp_desc)
+    ld      (hl),c
+    inc     hl
+    ld      (ix+fp_desc),hl
+    ld      l,c    ;load char to return
+    ld      h,0
+    ret
 .no_string
-	ld	a,(ix+fp_flags)
-	and	_IOEXTRA
-	jr	z,no_net
-	ld	hl,(ix+fp_extra)
-        ld      a,__STDIO_MSG_PUTC
-	push	bc		;save byte writte
-        call	l_jphl
-	pop	hl		;return byte written
-	ret
+    ld      a,(ix+fp_flags)
+    and     _IOEXTRA
+    jr      z,no_net
+    ld      hl,(ix+fp_extra)
+    ld      a,__STDIO_MSG_PUTC
+    push    bc        ;save byte writte
+    call    l_jphl
+    pop     hl        ;return byte written
+    ret
 .no_net
-	push	ix
-	call	fchkstd	;preserves bc
-	pop	ix
-	jr	c,no_cons
+    push    ix
+    call    fchkstd    ;preserves bc
+    pop     ix
+    jr      c,no_cons
 ; Output to console
-	push	bc
-	call	fputc_cons
-	pop	hl
-	ret
+    push    bc
+    call    fputc_cons
+    pop     hl
+    ret
 .no_cons
 ; Output to file
-	ld	hl,(ix+fp_desc)
-	push	hl	;fd
+    ld      hl,(ix+fp_desc)
+    push    hl    ;fd
 #ifdef __STDIO_BINARY
 #ifdef __STDIO_CRLF
-	ld	a,_IOTEXT	;check for text mode
-	and	(ix+fp_flags)
-	jr	z,no_binary
-	ld	a,c		;load bytes
-	cp	13
-	jr	nz,no_binary
-	push	bc	;c
-	call	writebyte
-	pop	bc
-	ld	c,10
+    ld      a,_IOTEXT    ;check for text mode
+    and     (ix+fp_flags)
+    jr      z,no_binary
+    ld      a,c        ;load bytes
+    cp      13
+    jr      nz,no_binary
+    push    bc    ;c
+    call    writebyte
+    pop     bc
+    ld      c,10
 .no_binary
 #endif
 #endif
-	push	bc	;c
-	call	writebyte
-	pop	hl	;discard values
-	pop	bc	; fd
-	ret
+    push    bc    ;c
+    call    writebyte
+    pop     hl    ;discard values
+    pop     bc    ; fd
+    ret
 ENDIF
 #endasm
 }
@@ -146,11 +146,11 @@ static void wrapper_fputc_callee_8080() __naked
 #asm
 IF __CPU_INTEL__ | __CPU_GBZ80__
 
-    PUBLIC	asm_fputc_callee
+    PUBLIC    asm_fputc_callee
 
-; Entry:	hl = fp
-; 		bc = character to print
-; Exit:		hl = byte written
+; Entry:    hl = fp
+;         bc = character to print
+; Exit:        hl = byte written
 asm_fputc_callee:
     ex      de,hl
     ld      hl,-1   ;EOF
@@ -201,7 +201,7 @@ asm_fputc_callee:
     call    writebyte
     pop     bc      ;discard values
     pop     bc
-	ret
+    ret
 ENDIF
 #endasm
 }

@@ -1,9 +1,9 @@
 /*
- *	Check for file errors
+ *    Check for file errors
  *
- *	Return 1 = Error,  0 = Ok
+ *    Return 1 = Error,  0 = Ok
  *
- *	Stefano Bodrato, Sep. 2019
+ *    Stefano Bodrato, Sep. 2019
  *
  * --------
  * $Id: ferror.c $
@@ -23,28 +23,28 @@ PUBLIC _ferror_fastcall
 ferror:
 _ferror:
 __ferror:
-    pop de
-    pop hl
-    push hl
-    push de
+    pop     de
+    pop     hl
+    push    hl
+    push    de
 ferror_fastcall:
 _ferror_fastcall:
-	inc	hl
-	inc	hl	;flags
-	ld	a,(hl)
-	ld	hl,1
-	
-	and	_IOUSE		; in use?
-	ret z
-	
+    inc     hl
+    inc     hl    ;flags
+    ld      a,(hl)
+    ld      hl,1
+    
+    and     _IOUSE        ; in use?
+    ret     z
+    
 ; check EOF only if not WRITE mode
-	and	_IOWRITE
-	jr	nz,__ferror_skip_eof
-	and	_IOEOF
-	ret	nz
+    and     _IOWRITE
+    jr      nz,__ferror_skip_eof
+    and     _IOEOF
+    ret     nz
 __ferror_skip_eof:
-	dec	hl	;hl = 0
-	ret
+    dec     hl    ;hl = 0
+    ret
 
 #endasm
 }

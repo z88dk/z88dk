@@ -1,11 +1,11 @@
-	MODULE  vfscanf
-	SECTION	code_clib
+    MODULE  vfscanf
+    SECTION code_clib
 
-	PUBLIC	vfscanf
+    PUBLIC  vfscanf
 
-	EXTERN	asm_scanf
-	EXTERN	scanf_ungetc
-	EXTERN	scanf_getc
+    EXTERN  asm_scanf
+    EXTERN  scanf_ungetc
+    EXTERN  scanf_getc
 
 
 
@@ -30,23 +30,23 @@ vfscanf:
     dec     hl
     ld      l,(hl)
     ld      h,a
-IF !__CPU_INTEL__
-	push	ix	;save callers
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+    push    ix          ;save callers
 ENDIF
 
-	push	bc	;fp
-	ld	bc,1		;sccz80
-	push	bc
-	push	de		;fmt
-	push	hl		;ap
-	call	asm_scanf
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-IF !__CPU_INTEL__
-	pop	ix
+    push    bc          ;fp
+    ld      bc,1        ;sccz80
+    push    bc
+    push    de          ;fmt
+    push    hl          ;ap
+    call    asm_scanf
+    pop     bc
+    pop     bc
+    pop     bc
+    pop     bc
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+    pop     ix
 ENDIF
-	ret
+    ret
 
 

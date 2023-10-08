@@ -12,5 +12,5 @@
 
 extern int __LIB__	fileno(FILE *fp) __z88dk_fastcall
 {
-	return (fp->desc.fd);
+    return (fp->desc.fd);
 }

@@ -109,7 +109,7 @@ ELSE
     ld      bc,8
     ldir                    ;stack parameter
 ENDIF
-	jr	rejoin
+	jr      rejoin
 try_sccz80_32bit_float:
     ld      a,CLIB_32BIT_FLOATS
     and     a

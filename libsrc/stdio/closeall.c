@@ -19,13 +19,13 @@
 
 void closeall(void)
 {
-        FILE    *fp;
+    FILE    *fp;
 
-        for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp) {
-                if (fp->flags) {
-			if ( fclose(fp) ) fabandon(fp);
-		}
-	}
+    for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp) {
+        if (fp->flags) {
+            if ( fclose(fp) ) fabandon(fp);
+        }
+    }
 }
 
 

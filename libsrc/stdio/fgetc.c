@@ -181,7 +181,7 @@ ELSE
 .no_ungetc
 ; Now do strings
     ld      a,(ix+fp_flags)
-    and	_IOSTRING
+    and     _IOSTRING
     jr      z,no_string	;not a string
     ld      hl,(ix+fp_extra)	; check the length
     ld      a,h
