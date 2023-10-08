@@ -132,7 +132,7 @@ ELSE
 ENDIF
 PNORM:
 IF __CPU_GBZ80__
-        BIT     7,A
+        BIT     7,C
         JP      Z,NORMAL        ; Not done - Keep going
 ELSE
         JP      P,NORMAL        ; Not done - Keep going
