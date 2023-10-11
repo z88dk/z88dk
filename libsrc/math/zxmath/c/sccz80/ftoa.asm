@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: ftoa.asm$
+;       $Id: ftoa.asm $
 ;
 ;
 ;void ftoa(x,prec,str)   -> Convert double to string
@@ -43,12 +43,12 @@ IF TINYMODE
 		; we cut away the precision handling
 
 IF FORzx
-		ld iy,$5C3A		; STACK-BC would fix IY already
+		ld iy,$5C3A		; Fix IY because we're in TINYMODE, STACK-BC would fix IY already
 ELSE
 IF FORts2068
-		ld iy,$5C3A		; STACK-BC would fix IY already
+		ld iy,$5C3A		; ditto.. STACK-BC would fix IY already
 ELSE
-		ld ix,$4000		; STACK-BC would fix IY already
+		ld ix,$4000		; (-IXIY) ..STACK-BC would fix IY already (not on LAMBDA V2 or CAC-3/NF300)
 ENDIF
 ENDIF
 
@@ -63,7 +63,7 @@ ELSE
 		push	hl
 		push	de
 IF FORlambda
-		ld ix,$4000
+		ld ix,$4000		; (-IXIY) On other targets IY is initialized by STACK-BC
 ENDIF
 		call	ZXFP_STACK_BC	; put precision on stack
 		pop	de
@@ -115,6 +115,7 @@ ELSE
 ENDIF
 ENDIF
 
+
 		pop	af	; now, if needed, negate the nuber
 		jr	z,noneg
 		rst	ZXFP_BEGIN_CALC
@@ -129,7 +130,11 @@ ENDIF
 		rst	ZXFP_BEGIN_CALC	; Do the string conversion !
 IF FORlambda
 		defb	ZXFP_STRS + 128
+IF LAMBDAV3
+		call	ZXFP_STK_FETCH
+ELSE
 		rst	ZXFP_STK_FETCH
+ENDIF
 ELSE
 		defb	ZXFP_STRS
 		defb	ZXFP_END_CALC
@@ -159,7 +164,17 @@ ELSE
 		jr	nz,nodash
 		ld	a,'-'
 .nodash
+IF !TINYMODE
+		cp	41
+		jr	nz,noplus
+		ld	a,'+'
+.noplus
 		
+		cp	62
+		jr	nz,noexp
+		ld	a,'e'
+.noexp
+ENDIF
 		cp	47
 		jr	nz,nodot
 		ld	a,'.'
