@@ -8,9 +8,9 @@
 
 // These values are set accordingly with the turbo loader timing and should not be changed
 
-#define	tperiod0	5
-#define	tperiod1	10
-#define	tperiod2	16
+#define tperiod0    5
+#define tperiod1    10
+#define tperiod2    16
 
 // SNA
 
@@ -101,25 +101,25 @@ void zxn_construct_page_contents(unsigned char *mem, struct memory_bank *mb, int
 // turbo Loader]
 
 static unsigned char turbo_loader[] = {
-    0x60, 0x69,	    //  ld h,b / ld l,c
-    17,52,0,        //	ld	de,52 (offset)
-    0x19,           //	add	hl,de
-    17,0x69,0xff,   //	ld	de,65385
-    1,150,0,        //	ld	bc,150
-    0xed, 0xb0,     //	ldir
-    221,33,0,64,    //	ld	ix,16384 (position [14])
+    0x60, 0x69,     //  ld h,b / ld l,c
+    17,52,0,        //  ld  de,52 (offset)
+    0x19,           //  add hl,de
+    17,0x69,0xff,   //  ld  de,65385
+    1,150,0,        //  ld  bc,150
+    0xed, 0xb0,     //  ldir
+    221,33,0,64,    //  ld  ix,16384 (position [14])
     // length is not checked, we load all the data we find
-    0,0,0,          //	placeholder for: call	65385
-    221,33,0,64,    //	ld	ix,16384
+    0,0,0,          //  placeholder for: call   65385
+    221,33,0,64,    //  ld  ix,16384
     // length is not checked, we load all the data we find
-    0,0,0,          //	placeholder for: call	65385
-    221,33,0,64,    //	ld	ix,16384
+    0,0,0,          //  placeholder for: call   65385
+    221,33,0,64,    //  ld  ix,16384
     // length is not checked, we load all the data we find
-    0,0,0,          //	placeholder for: call	65385
-    221,33,0,128,   //	ld	ix,loc	(pos 37/38)
+    0,0,0,          //  placeholder for: call   65385
+    221,33,0,128,   //  ld  ix,loc  (pos 37/38)
     // length is not checked, we load all the data we find
-    205,0x69,0xff,  //	call	65385
-    0x3a, 0x48, 0x5c, // ld a,(23624)	; Restore border color
+    205,0x69,0xff,  //  call    65385
+    0x3a, 0x48, 0x5c, // ld a,(23624)   ; Restore border color
     0x1f, 0x1f, 0x1f, // rra (3 times)
     0xd3, 254,        // out (254),a
     0xfb, 0xc9,     //  ei / ret
@@ -210,9 +210,9 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
     int     warping;
     int     i, j, blocklen;
     int     len, mlen;
-    int		blockcount, bsnum_bank;
+    int     blockcount, bsnum_bank;
     unsigned char * loader;
-    int		loader_len;
+    int     loader_len;
 
     loader = turbo_loader;
     loader_len = sizeof(turbo_loader);
@@ -415,17 +415,17 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                     /* BASIC loader */
 
                     if (zxt->turbo) {
-                        mlen += 22 + loader_len + 32;	/* extra BASIC size for REM line + turbo block + turbo caller code */
+                        mlen += 22 + loader_len + 32;   /* extra BASIC size for REM line + turbo block + turbo caller code */
                         loader[37] = pos % 256;
                         loader[38] = pos / 256;
                         if (zxt->screen) {
-                            turbo_loader[18] = 0xcd;		/* activate the extra screen block loading */
+                            turbo_loader[18] = 0xcd;        /* activate the extra screen block loading */
                             turbo_loader[19] = 0x69;
                             turbo_loader[20] = 0xff;
                         }
                     }
 
-                    if (zxt->screen && !zxt->turbo)  mlen += (5 + 17);			/* Add the space count for -- LOAD "" SCREEN$: */
+                    if (zxt->screen && !zxt->turbo)  mlen += (5 + 17);          /* Add the space count for -- LOAD "" SCREEN$: */
 
                                                                 /* Write out the BASIC header file */
                     writeword_p(19, fpout, &zxt->parity);         /* Header len */
@@ -698,7 +698,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
 
                 if (zxt->turbo && (zxt->dumb || (blockcount == 4) || (blockcount == 6))) {             /* get rid of the first byte in the data block if in turbo mode */
                     c = getc(fpin);
-                    blocklen -= 2; 	/* and of the parity byte too ! */
+                    blocklen -= 2;  /* and of the parity byte too ! */
                 }
 
                 if (zxt->turbo && ((blockcount == 4) || (blockcount == 6)))
@@ -745,14 +745,14 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                 }
             }
             else
-                for (i = 0; (i < blocklen); i++)		/* Skip the block we're excluding */
+                for (i = 0; (i < blocklen); i++)        /* Skip the block we're excluding */
                     c = getc(fpin);
 
             if ((zxt->turbo && (blockcount == 4 || blockcount == 6)) || (zxt->turbo && zxt->dumb)) {
                 //zx_rawout(fpout,1,fast);
                 zx_rawbit(fpout, tperiod0);
                 zx_rawbit(fpout, 75);
-                c = getc(fpin);	/* parity byte must go away */
+                c = getc(fpin); /* parity byte must go away */
             }
 
             if (zxt->dumb) printf("\n");
@@ -766,10 +766,10 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
         fclose(fpout);
 
         /* Now complete with the WAV header */
-		if (zxt->khz22)
-			raw2wav_22k(wavfile,2);
-		else
-			raw2wav(wavfile);
+        if (zxt->khz22)
+            raw2wav_22k(wavfile,2);
+        else
+            raw2wav(wavfile);
     }
 
     return 0;
@@ -1794,16 +1794,16 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
    .NEX file format (V1.0)
    =======================
-   unsigned char Next[4];			//"Next"
-   unsigned char VersionNumber[4];	//"V1.1"
-   unsigned char RAM_Required;		//0=768K, 1=1792K
-   unsigned char NumBanksToLoad;	//0-112 x 16K banks
-   unsigned char LoadingScreen;	    //see implementation
-   unsigned char BorderColour;		//0-7 ld a,BorderColour:out(254),a
-   unsigned short SP;				//Stack Pointer
-   unsigned short PC;				//Code Entry Point : $0000 = Don't run just load.
-   unsigned short NumExtraFiles;	//NumExtraFiles
-   unsigned char Banks[64+48];		//Which 16K Banks load
+   unsigned char Next[4];           //"Next"
+   unsigned char VersionNumber[4];  //"V1.1"
+   unsigned char RAM_Required;      //0=768K, 1=1792K
+   unsigned char NumBanksToLoad;    //0-112 x 16K banks
+   unsigned char LoadingScreen;     //see implementation
+   unsigned char BorderColour;      //0-7 ld a,BorderColour:out(254),a
+   unsigned short SP;               //Stack Pointer
+   unsigned short PC;               //Code Entry Point : $0000 = Don't run just load.
+   unsigned short NumExtraFiles;    //NumExtraFiles
+   unsigned char Banks[64+48];      //Which 16K Banks load
    unsigned char LoadBar;           //Enable the layer 2 load bar
    unsigned char LoadColour;        //Colour of the load bar
    unsigned char LoadDelay;         //Delay in interrupts after each 16k loaded
@@ -1825,6 +1825,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
 struct nex_hdr
 {
+    // V 1.1
     uint8_t Next[4];
     uint8_t VersionNumber[4];
     uint8_t RAM_Required;
@@ -1844,7 +1845,12 @@ struct nex_hdr
     uint8_t CoreMinor;
     uint8_t CoreSubMinor;
     uint8_t HiResCol;
-    uint8_t Padding[512 - (4 + 4 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 64 + 48 + 4 + 5)];
+    // V 1.2
+    uint8_t EntryBank;            // not used by z88dk
+    uint8_t FileHandleAddr[2];
+    // V 1.3
+    uint8_t ExpBusDisable;        // not used by z88dk
+    uint8_t Padding[512 - (4 + 4 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 64 + 48 + 4 + 5 + 3 + 1)];
 };
 
 struct nex_hdr nh;
@@ -1860,6 +1866,7 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
     int register_sp;
     int crt_org_code;
     int core_version;
+    int file_handle;
 
     int mainbank_occupied;
 
@@ -1897,6 +1904,7 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
     }
 
     core_version = parameter_search(zxc->crtfile, ".map", "__CRT_CORE_VERSION");
+    file_handle = parameter_search(zxc->crtfile, ".map", "__z_fd_nex");
 
     // open output file
 
@@ -2097,6 +2105,13 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     nh.DontSetNextRegs = (zxnex->noreset != 0);
 
+    if (file_handle >= 0)
+    {
+        memcpy(&nh.VersionNumber, "V1.2", 4);
+        nh.FileHandleAddr[0] = file_handle % 256;
+        nh.FileHandleAddr[1] = file_handle / 256;
+    }
+
     // write the completed header to output
 
     rewind(fout);
@@ -2121,17 +2136,17 @@ uint8_t *zx3_layout_file(uint8_t *inbuf, size_t filelen, int start_address, int 
 
      memcpy(buf,"PLUS3DOS", 8);
      buf[8] = 0x1a;
-     buf[9] = 0x01;	// Issue number
+     buf[9] = 0x01; // Issue number
      buf[10] = 0x00;    // Version number
      // 11 - 14 = filelength
      // 15 - 22 = header data
      // +---------------+-------+-------+-------+-------+-------+-------+-------+
-     // | BYTE		|   0	|   1	|   2	|   3	|   4	|   5	|   6	|
+     // | BYTE          |   0   |   1   |   2   |   3   |   4   |   5   |   6   |
      // +---------------+-------+-------+-------+-------+-------+-------+-------+
-     // | Program	    0	file length	8000h or LINE	offset to prog	|
-     // | Numeric array	    1	file length	xxx	name	xxx	xxx	|
-     // | Character array   2	file length	xxx	name	xxx	xxx	|
-     // | CODE or SCREEN$   3	file length	load address	xxx	xxx	|
+     // | Program           0      file length    8000h or LINE   offset to prog|
+     // | Numeric array     1      file length       xxx name         xxx xxx   |
+     // | Character array   2      file length       xxx name         xxx xxx   |
+     // | CODE or SCREEN$   3      file length     load address       xxx xxx   |
      // +-----------------------------------------------------------------------+
      // 127 = checksum (sum of 0..126 mod 256)
      while ( total_len < filelen ) {
@@ -2233,11 +2248,11 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *m
 
     // Write the basic file
     ptr = buffer; 
-    writebyte_b(0, &ptr);		// MSB of basic line
-    writebyte_b(10, &ptr);		// MSB
-    writeword_b(0, &ptr);		// Line length, we'll fix up later
-    writebyte_b(0xfd, &ptr);		// CLEAR
-    writebyte_b(0xb0, &ptr);		// VAL
+    writebyte_b(0, &ptr);       // MSB of basic line
+    writebyte_b(10, &ptr);      // MSB
+    writeword_b(0, &ptr);       // Line length, we'll fix up later
+    writebyte_b(0xfd, &ptr);        // CLEAR
+    writebyte_b(0xb0, &ptr);        // VAL
     if ( zxt->clear_address == -1 ) {
         zxt->clear_address = origin - 1;
     }
@@ -2245,29 +2260,29 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *m
     writestring_b(tbuf, &ptr);
     if ( zxt->screen ) {
         suffix_change(basic_filename, ".SCR");
-        writebyte_b(0xef, &ptr);	/* LOAD */
+        writebyte_b(0xef, &ptr);    /* LOAD */
         writebyte_b('"', &ptr);
         writestring_b(basic_filename, &ptr);
         writebyte_b('"', &ptr);
-        writebyte_b(0xaa, &ptr);	/* SCREEN$ */
+        writebyte_b(0xaa, &ptr);    /* SCREEN$ */
         writebyte_b(':', &ptr);
     }
     suffix_change(basic_filename, ".BIN");
-    writebyte_b(0xef, &ptr);	/* LOAD */
+    writebyte_b(0xef, &ptr);    /* LOAD */
     writebyte_b('"', &ptr);
     writestring_b(basic_filename, &ptr);
     writebyte_b('"', &ptr);
-    writebyte_b(0xaf, &ptr);	/* CODE */
+    writebyte_b(0xaf, &ptr);    /* CODE */
     writebyte_b(':', &ptr);
-    writebyte_b(0xf9, &ptr);	/* RANDOMIZE */
-    writebyte_b(0xc0, &ptr);	/* USR */
-    writebyte_b(0xb0, &ptr);	/* VAL */
+    writebyte_b(0xf9, &ptr);    /* RANDOMIZE */
+    writebyte_b(0xc0, &ptr);    /* USR */
+    writebyte_b(0xb0, &ptr);    /* VAL */
     snprintf(tbuf,sizeof(tbuf), "\"%i\"", zxt->usr_address);           /* Location for USR */
     writestring_b(tbuf, &ptr);
     writebyte_b(':', &ptr);
     writebyte_b(234, &ptr);      /* REM */
     writestring_b(basic_filename, &ptr);
-    writebyte_b(0x0d, &ptr);	/* ENTER (end of BASIC line) */
+    writebyte_b(0x0d, &ptr);    /* ENTER (end of BASIC line) */
     len = ptr - buffer;
     buffer[2] = (len-4) % 256; 
     buffer[3] = (len-4) / 256; 
