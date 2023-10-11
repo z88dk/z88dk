@@ -164,6 +164,7 @@ ELSE
 		jr	nz,nodash
 		ld	a,'-'
 .nodash
+IF !TINYMODE
 		cp	41
 		jr	nz,noplus
 		ld	a,'+'
@@ -173,7 +174,7 @@ ELSE
 		jr	nz,noexp
 		ld	a,'e'
 .noexp
-		
+ENDIF
 		cp	47
 		jr	nz,nodot
 		ld	a,'.'
