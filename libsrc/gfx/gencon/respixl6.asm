@@ -6,10 +6,10 @@
 
 
         SECTION code_clib
-    PUBLIC  respixel
+        PUBLIC  respixel
 
 
-.respixel
-    defc    NEEDunplot = 1
-    INCLUDE "pixel6.inc"
+respixel:
+        defc    NEEDunplot=1
+        INCLUDE "pixel6.inc"
 

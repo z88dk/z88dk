@@ -1,6 +1,7 @@
 
 
-SECTION bss_graphics
-PUBLIC __gfx_fatpix
+        SECTION bss_graphics
+        PUBLIC  __gfx_fatpix
 
-__gfx_fatpix:	defb	0
+__gfx_fatpix:
+        defb    0

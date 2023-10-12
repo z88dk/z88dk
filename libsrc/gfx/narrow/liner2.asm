@@ -1,10 +1,10 @@
-    INCLUDE    "graphics/grafix.inc"
+        INCLUDE "graphics/grafix.inc"
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
-      SECTION code_graphics
-    PUBLIC    Line_r
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+        SECTION code_graphics
+        PUBLIC  Line_r
 
-    EXTERN    __gfx_coords
+        EXTERN  __gfx_coords
 
 ;
 ;    $Id: liner2.asm $
@@ -93,220 +93,229 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;    ..BCDEHL/IXIY/af......    same
 ;    AF....../..../..bcdehl    different
 ;
-.Line_r    push    bc
-    push    de    ; preserve relative    vertical distance
-    push    hl    ; preserve relative    horisontal distance
+Line_r: push    bc
+        push    de                      ; preserve relative    vertical distance
+        push    hl                      ; preserve relative    horisontal distance
 
-    push    de
-    push    hl
+        push    de
+        push    hl
 
     ;exx
-    push    bc
-    push    de
-    ld    bc,(bc1save)
-    ld    de,(de1save)
-    pop    hl
-    ld    (de1save),hl
-    pop    hl
-    ld    (bc1save),hl
-    
-    pop    hl    ; get relative    horisontal movement
-    call    sgn
-    ld    d,a    ; direc_x    = SGN(x) installed
-    call    abs
-    ld    b,l    ; x = ABS(x)
+        push    bc
+        push    de
+        ld      bc, (bc1save)
+        ld      de, (de1save)
+        pop     hl
+        ld      (de1save), hl
+        pop     hl
+        ld      (bc1save), hl
 
-    pop    hl    ; get relative    vertical movement
-    call    sgn
-    ld    e,a    ; direc_y    = SGN(y) installed
-    call    abs
-    ld    c,l    ; y = ABS(y)
-    push    bc
-    
+        pop     hl                      ; get relative    horisontal movement
+        call    sgn
+        ld      d, a                    ; direc_x    = SGN(x) installed
+        call    abs
+        ld      b, l                    ; x = ABS(x)
+
+        pop     hl                      ; get relative    vertical movement
+        call    sgn
+        ld      e, a                    ; direc_y    = SGN(y) installed
+        call    abs
+        ld      c, l                    ; y = ABS(y)
+        push    bc
+
     ;exx
-    push    bc
-    push    de
-    ld    bc,(bc1save)
-    ld    de,(de1save)
-    pop    hl
-    ld    (de1save),hl
-    pop    hl
-    ld    (bc1save),hl
+        push    bc
+        push    de
+        ld      bc, (bc1save)
+        ld      de, (de1save)
+        pop     hl
+        ld      (de1save), hl
+        pop     hl
+        ld      (bc1save), hl
 
-    pop    hl    ; H = absolute    x dist., L = absolute y distance
+        pop     hl                      ; H = absolute    x dist., L = absolute y distance
 
-    ld    a,h
-    cp    l
-    jr    c, x_smaller_y    ; if    x >=    y
-       or    h    ;    if x+y = 0
-       jp    z, exit_draw    ;    return
-       
+        ld      a, h
+        cp      l
+        jr      c, x_smaller_y          ; if    x >=    y
+        or      h                       ;    if x+y = 0
+        jp      z, exit_draw            ;    return
+
        ;exx    ;    else
-       push    hl
-       push    bc
-       push    de
-       ld    bc,(bc1save)
-       ld    de,(de1save)
-       pop    hl
-       ld    (de1save),hl
-       pop    hl
-       ld    (bc1save),hl
-       pop    hl
-       
-       ld    b,d    ;    ddx = direc_x
-       ld    c,0    ;    ddy = 0
+        push    hl
+        push    bc
+        push    de
+        ld      bc, (bc1save)
+        ld      de, (de1save)
+        pop     hl
+        ld      (de1save), hl
+        pop     hl
+        ld      (bc1save), hl
+        pop     hl
+
+        ld      b, d                    ;    ddx = direc_x
+        ld      c, 0                    ;    ddy = 0
 
        ;exx
-       push    hl
-       push    bc
-       push    de
-       ld    bc,(bc1save)
-       ld    de,(de1save)
-       pop    hl
-       ld    (de1save),hl
-       pop    hl
-       ld    (bc1save),hl
-       pop    hl
-       
-       jr    init_drawloop    ; else
-.x_smaller_y    ld    a,h
-       ld    h,l    ;    H = y
-       ld    l,a    ;    L = x
-       
-       ;exx
-       push    hl
-       push    bc
-       push    de
-       ld    bc,(bc1save)
-       ld    de,(de1save)
-       pop    hl
-       ld    (de1save),hl
-       pop    hl
-       ld    (bc1save),hl
-       pop    hl
-       
-       ld    b,0    ;    ddx = 0
-       ld    c,e    ;    ddy = direc_y
-       
-       ;exx
-       push    hl
-       push    bc
-       push    de
-       ld    bc,(bc1save)
-       ld    de,(de1save)
-       pop    hl
-       ld    (de1save),hl
-       pop    hl
-       ld    (bc1save),hl
-       pop    hl
+        push    hl
+        push    bc
+        push    de
+        ld      bc, (bc1save)
+        ld      de, (de1save)
+        pop     hl
+        ld      (de1save), hl
+        pop     hl
+        ld      (bc1save), hl
+        pop     hl
 
-.init_drawloop    ld    b,h
-    ld    c,h    ; B = H
+        jr      init_drawloop           ; else
+x_smaller_y:
+        ld      a, h
+        ld      h, l                    ;    H = y
+        ld      l, a                    ;    L = x
+
+       ;exx
+        push    hl
+        push    bc
+        push    de
+        ld      bc, (bc1save)
+        ld      de, (de1save)
+        pop     hl
+        ld      (de1save), hl
+        pop     hl
+        ld      (bc1save), hl
+        pop     hl
+
+        ld      b, 0                    ;    ddx = 0
+        ld      c, e                    ;    ddy = direc_y
+
+       ;exx
+        push    hl
+        push    bc
+        push    de
+        ld      bc, (bc1save)
+        ld      de, (de1save)
+        pop     hl
+        ld      (de1save), hl
+        pop     hl
+        ld      (bc1save), hl
+        pop     hl
+
+init_drawloop:
+        ld      b, h
+        ld      c, h                    ; B = H
     ;srl    c    ; i = INT(B/2)
-	xor   a
-	add   c
-	rra
-	ld    c,a
+        xor     a
+        add     c
+        rra
+        ld      c, a
           ; FOR N=B    TO 1    STEP    -1
-.drawloop
+drawloop:
 
-    xor   a               ; (Stefano)
-	or    h               ; .. vertical line drawing was slow
-	jr    z, i_greater    ; this shortcut seems to solve the problem
+        xor     a                       ; (Stefano)
+        or      h                       ; .. vertical line drawing was slow
+        jr      z, i_greater            ; this shortcut seems to solve the problem
 
-    ld    a,c
-    add    a,l
-    jr    c, i_greater    ;    i + L > 255  (i > H)
-    cp    h
-    jr    nc, i_greater    ;    if i    < H
-       ld    c,a    ;    i = i + L
-       
+        ld      a, c
+        add     a, l
+        jr      c, i_greater            ;    i + L > 255  (i > H)
+        cp      h
+        jr      nc, i_greater           ;    if i    < H
+        ld      c, a                    ;    i = i + L
+
        ;exx
-       push    hl
-       push    bc
-       push    de
-       ld    bc,(bc1save)
-       ld    de,(de1save)
-       pop    hl
-       ld    (de1save),hl
-       pop    hl
-       ld    (bc1save),hl
-       pop    hl
-       
-       push    bc    ;    ix =    ddx:    iy =    ddy
-       
+        push    hl
+        push    bc
+        push    de
+        ld      bc, (bc1save)
+        ld      de, (de1save)
+        pop     hl
+        ld      (de1save), hl
+        pop     hl
+        ld      (bc1save), hl
+        pop     hl
+
+        push    bc                      ;    ix =    ddx:    iy =    ddy
+
        ;exx
-       push    hl
-       push    bc
-       push    de
-       ld    bc,(bc1save)
-       ld    de,(de1save)
-       pop    hl
-       ld    (de1save),hl
-       pop    hl
-       ld    (bc1save),hl
-       pop    hl
-       
-       jr    check_plot    ;    else
-.i_greater    sub    h    ;    i = i - H
-       ld    c,a
-       
+        push    hl
+        push    bc
+        push    de
+        ld      bc, (bc1save)
+        ld      de, (de1save)
+        pop     hl
+        ld      (de1save), hl
+        pop     hl
+        ld      (bc1save), hl
+        pop     hl
+
+        jr      check_plot              ;    else
+i_greater:
+        sub     h                       ;    i = i - H
+        ld      c, a
+
        ;exx
-       push    hl
-       push    bc
-       push    de
-       ld    bc,(bc1save)
-       ld    de,(de1save)
-       pop    hl
-       ld    (de1save),hl
-       pop    hl
-       ld    (bc1save),hl
-       pop    hl
-       
-       push    de    ;    ix =    direc_x: iy = direc_y
+        push    hl
+        push    bc
+        push    de
+        ld      bc, (bc1save)
+        ld      de, (de1save)
+        pop     hl
+        ld      (de1save), hl
+        pop     hl
+        ld      (bc1save), hl
+        pop     hl
+
+        push    de                      ;    ix =    direc_x: iy = direc_y
 
        ;exx    ;    endif
-       push    hl
-       push    bc
-       push    de
-       ld    bc,(bc1save)
-       ld    de,(de1save)
-       pop    hl
-       ld    (de1save),hl
-       pop    hl
-       ld    (bc1save),hl
-       pop    hl
+        push    hl
+        push    bc
+        push    de
+        ld      bc, (bc1save)
+        ld      de, (de1save)
+        pop     hl
+        ld      (de1save), hl
+        pop     hl
+        ld      (bc1save), hl
+        pop     hl
 
-.check_plot    ex    (sp),hl    ;    preserve H,L distances on stack
-    ex    de,hl    ;    D,E = ix,    iy
-    ld    hl,(__gfx_coords)
-    ld    a,l
-    add    a,e    ;
-    ld    l,a    ;    y0 =    y0 +    iy (y0 is    checked by plot)
+check_plot:
+        ex      (sp), hl                ;    preserve H,L distances on stack
+        ex      de, hl                  ;    D,E = ix,    iy
+        ld      hl, (__gfx_coords)
+        ld      a, l
+        add     a, e                    ;
+        ld      l, a                    ;    y0 =    y0 +    iy (y0 is    checked by plot)
 
-    ld    a,d
-    inc    a
-    add    a,h
-    jr    c, check_range    ;    check out    of range
-    jr    z, range_error    ;    Fz=1    & Fc=0 denotes    x0 <    0
-    jr    plot_point
-.check_range    jr    nz, range_error    ;    Fz=0    & Fc=1 denotes    x0 >    255
+        ld      a, d
+        inc     a
+        add     a, h
+        jr      c, check_range          ;    check out    of range
+        jr      z, range_error          ;    Fz=1    & Fc=0 denotes    x0 <    0
+        jr      plot_point
+check_range:
+        jr      nz, range_error         ;    Fz=0    & Fc=1 denotes    x0 >    255
 
-.plot_point    dec    a
-    ld    h,a    ;    x0 =    x0 +    ix
-    ld    de, plot_RET
-    push    de    ;    hl =    (x0,y0)...
-    jp    (ix)    ;    execute PLOT at (x0,y0)
-.plot_RET    pop    hl    ;    restore H,L distances...
+plot_point:
+        dec     a
+        ld      h, a                    ;    x0 =    x0 +    ix
+        ld      de, plot_RET
+        push    de                      ;    hl =    (x0,y0)...
+        jp      (ix)                    ;    execute PLOT at (x0,y0)
+plot_RET:
+        pop     hl                      ;    restore H,L distances...
     ;djnz    drawloop    ; NEXT N
-	dec   b
-	jp    nz,drawloop
-    jr    exit_draw
-.range_error    pop    hl    ; remove H,L distances...
-.exit_draw    pop    hl    ; restore    relative horisontal    distance
-    pop    de    ; restore    relative vertical distance
-    pop    bc
-    ret
+        dec     b
+        jp      nz, drawloop
+        jr      exit_draw
+range_error:
+        pop     hl                      ; remove H,L distances...
+exit_draw:
+        pop     hl                      ; restore    relative horisontal    distance
+        pop     de                      ; restore    relative vertical distance
+        pop     bc
+        ret
 
 
 ; ******************************************************************************
@@ -320,17 +329,18 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;    ..BCDEHL/IXIY    same
 ;    AF....../....    different
 ;
-.sgn    ld    a,h
-    or    l
-    ret    z    ; integer    is zero, return 0...
+sgn:    ld      a, h
+        or      l
+        ret     z                       ; integer    is zero, return 0...
 ;    bit    7,h
-    ld     a,128	; trying to be 8080 compatible  ;)
-	and    h
-    jr    nz, negative_int
-       ld    a,1
-       ret
-.negative_int    ld    a,-1
-       ret
+        ld      a, 128                  ; trying to be 8080 compatible  ;)
+        and     h
+        jr      nz, negative_int
+        ld      a, 1
+        ret
+negative_int:
+        ld      a, -1
+        ret
 
 
 ; ******************************************************************************
@@ -344,27 +354,29 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;    A.BCDE../IXIY    same
 ;    .F....HL/....    different
 ;
-.abs
+abs:
 ;    bit    7,h
-    ld     a,128	; trying to be 8080 compatible  ;)
-	and    h
-    ret    z    ; integer    is positive...
+        ld      a, 128                  ; trying to be 8080 compatible  ;)
+        and     h
+        ret     z                       ; integer    is positive...
 ;    push    de
 ;    ex    de,hl
     ;ld    hl,0
     ;cp    a    ; Fc    = 0,    may not be used...
     ;sbc    hl,de    ; convert    negative integer
-	xor   a
-	sub   l
-	ld    l,a
+        xor     a
+        sub     l
+        ld      l, a
 ;	ld    a,0	; values between 0..255 are expected
 ;	sbc   h
 ;	ld    h,a
 
 ;    pop    de
-    ret
+        ret
 
-     SECTION bss_graphics
-.bc1save defw    0
-.de1save defw    0
-ENDIF
+        SECTION bss_graphics
+bc1save:
+        defw    0
+de1save:
+        defw    0
+  ENDIF

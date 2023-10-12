@@ -1,11 +1,11 @@
 
-    INCLUDE "graphics/grafix.inc"
-       SECTION code_graphics
-    
-    PUBLIC    gety
-    PUBLIC    _gety
+        INCLUDE "graphics/grafix.inc"
+        SECTION code_graphics
 
-    EXTERN    __gfx_coords
+        PUBLIC  gety
+        PUBLIC  _gety
+
+        EXTERN  __gfx_coords
 
 ;
 ;    $Id: w_gety.asm $
@@ -17,8 +17,8 @@
 ;
 ;
 
-.gety
-._gety
+gety:
+_gety:
 
-    ld    hl,(__gfx_coords+2)
-    ret
+        ld      hl, (__gfx_coords+2)
+        ret

@@ -14,44 +14,44 @@
 ;; void stencil_add_lineto(int x, int y, unsigned char *stencil)
 
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
-    SECTION   code_graphics
-    PUBLIC    stencil_add_lineto
-    PUBLIC    _stencil_add_lineto
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+        SECTION code_graphics
+        PUBLIC  stencil_add_lineto
+        PUBLIC  _stencil_add_lineto
 
-    EXTERN    w_line
-    EXTERN    stencil_add_pixel 
+        EXTERN  w_line
+        EXTERN  stencil_add_pixel
 
     ;EXTERN    swapgfxbk
     ;EXTERN    swapgfxbk1
 
-    EXTERN    stencil_ptr
+        EXTERN  stencil_ptr
     ;EXTERN    __graphics_end
-    INCLUDE "graphics/grafix.inc"
+        INCLUDE "graphics/grafix.inc"
 
 
-.stencil_add_lineto
-._stencil_add_lineto
-    push    ix
-    ld    ix,2
-    add    ix,sp
+stencil_add_lineto:
+_stencil_add_lineto:
+        push    ix
+        ld      ix, 2
+        add     ix, sp
 
-    ld    l,(ix+2)    ;pointer to stencil
-    ld    h,(ix+3)
-    ld    (stencil_ptr),hl
+        ld      l, (ix+2)               ;pointer to stencil
+        ld      h, (ix+3)
+        ld      (stencil_ptr), hl
 
-    ld    l,(ix+6)    ;y1
-    ld    h,(ix+7)
-    ld    e,(ix+4)    ;x1
-    ld    d,(ix+5)
+        ld      l, (ix+6)               ;y1
+        ld      h, (ix+7)
+        ld      e, (ix+4)               ;x1
+        ld      d, (ix+5)
 
     ;call    swapgfxbk
 
-    ld     ix,stencil_add_pixel
-    call     w_line
+        ld      ix, stencil_add_pixel
+        call    w_line
 
     ;jp     __graphics_end
-    pop ix
-    ret
+        pop     ix
+        ret
 
-ENDIF
+  ENDIF

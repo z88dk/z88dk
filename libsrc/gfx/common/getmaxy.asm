@@ -7,16 +7,16 @@
 ;
 
 
-	INCLUDE	"graphics/grafix.inc"
+        INCLUDE "graphics/grafix.inc"
 
 
-    SECTION        code_graphics
-    PUBLIC    getmaxy
-    PUBLIC    _getmaxy
-    PUBLIC    ___getmaxy
+        SECTION code_graphics
+        PUBLIC  getmaxy
+        PUBLIC  _getmaxy
+        PUBLIC  ___getmaxy
 
-.getmaxy
-._getmaxy
-.___getmaxy
-    ld	hl,maxy-1
-    ret
+getmaxy:
+_getmaxy:
+___getmaxy:
+        ld      hl, maxy-1
+        ret

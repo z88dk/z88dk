@@ -15,37 +15,37 @@
 ;; void stencil_add_side(int x1, int y1, int x2, int y2, unsigned char *stencil)
 
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
-    SECTION    code_graphics
-        PUBLIC    stencil_add_side
-        PUBLIC    _stencil_add_side
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+        SECTION code_graphics
+        PUBLIC  stencil_add_side
+        PUBLIC  _stencil_add_side
 
-        EXTERN    Line
-        EXTERN    stencil_add_pixel 
+        EXTERN  Line
+        EXTERN  stencil_add_pixel
         ;EXTERN    swapgfxbk
         ;EXTERN    swapgfxbk1
     ;EXTERN    __graphics_end
-        EXTERN    stencil_ptr
+        EXTERN  stencil_ptr
 
-.stencil_add_side
-._stencil_add_side
-    push    ix
-    ld    ix,2
-    add    ix,sp
+stencil_add_side:
+_stencil_add_side:
+        push    ix
+        ld      ix, 2
+        add     ix, sp
 
-    ld    l,(ix+2)    ;pointer to stencil
-    ld    h,(ix+3)
-    ld    (stencil_ptr),hl
+        ld      l, (ix+2)               ;pointer to stencil
+        ld      h, (ix+3)
+        ld      (stencil_ptr), hl
 
-    ld    l,(ix+8)    ;y0
-    ld    h,(ix+10)    ;x0
-    ld    e,(ix+4)    ;y1
-    ld    d,(ix+6)    ;x1
+        ld      l, (ix+8)               ;y0
+        ld      h, (ix+10)              ;x0
+        ld      e, (ix+4)               ;y1
+        ld      d, (ix+6)               ;x1
 
     ;call    swapgfxbk
-        ld    ix,stencil_add_pixel
+        ld      ix, stencil_add_pixel
         call    Line
         ;jp    __graphics_end
-    pop ix
-    ret
-ENDIF
+        pop     ix
+        ret
+  ENDIF
