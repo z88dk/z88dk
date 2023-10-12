@@ -48,22 +48,23 @@ extern double_t __LIB__ atan2(double_t,double_t) __smallc; /* atan2(a,b) = arc t
 extern double_t __LIB__ cosh(double_t);  /* hyperbolic cosine */
 extern double_t __LIB__ sinh(double_t);  /* hyperbolic sine */
 extern double_t __LIB__ tanh(double_t);  /* hyperbolic tangent */
-#define asinh(x) log(2.*fabs(x)+1./(sqrt(x*x+1.)+fabs(x)))
-#define acosh(x) log(2.*x-1./(x+sqrt(x*x-1.)))
-#define atanh(x) (log((1.+x)/(1.-x))*.5)
+extern double_t __LIB__ asinh(double_t); /* arc hyberbolic sine */
+extern double_t __LIB__ acosh(double_t); /* arc hyberbolic cosine */
+extern double_t __LIB__ atanh(double_t); /* arc hyberbolic tangent */
 
 /* Power functions */
 extern double_t __LIB__ pow(double_t,double_t) __smallc;   /* pow(x,y) = x**y */
 extern double_t __LIB__ sqrt(double_t);  /* square root */
-#define cbrt(x) ((x)==0.?0.:(x)>0.?pow(x,.33333333):-pow(-x,.33333333))
-#define hypot(x,y) sqrt(x*x+y*y)
+extern double_t __LIB__ cbrt(double_t);  /* cube root */
+extern double_t __LIB__ hypot(double_t,double_t) __smallc;
+#define ispow2(x) (((x) & ((x) - 1)) == 0)
 
 /* Exponential */
 extern double_t __LIB__ exp(double_t);   /* exponential */
 extern double_t __LIB__ log(double_t);   /* natural logarithm */
 extern double_t __LIB__ log10(double_t); /* log base 10 */
-#define log1p(x) log(1.+x)
-#define log2(a) (log(a)/M_LN2)
+extern double_t __LIB__ log1p(double_t);
+extern double_t __LIB__ log2(double_t);
 #define exp2(x)  pow(2.,x)
 #define expm1(x) (exp(x)-1.)
 
