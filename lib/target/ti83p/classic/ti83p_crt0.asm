@@ -125,9 +125,9 @@ ENDIF
 IF (startup=10)
 	DEFINE ASM
 	DEFINE NOT_DEFAULT_SHELL
-	org	$9D95
-	;org	$9D93
-	;defb         $BB,$6D
+	;org	$9D95
+	org	$9D93
+	defb         $BB,$6D
 ENDIF
 
 ;-----------------
