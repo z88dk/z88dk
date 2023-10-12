@@ -7,6 +7,6 @@
         EXTERN  ___dai32_return
 
 sin:
-	call	___dai32_setup_single
-	call	___dai32_xsin
-	jp	___dai32_return
+        call    ___dai32_setup_single
+        call    ___dai32_xsin
+        jp      ___dai32_return

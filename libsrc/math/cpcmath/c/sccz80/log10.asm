@@ -6,16 +6,16 @@
 ;	$Id: log10.asm,v 1.4 2016-06-22 19:50:49 dom Exp $
 ;
 
-    SECTION smc_fp
-    INCLUDE "cpcmath.inc"
+        SECTION smc_fp
+        INCLUDE "cpcmath.inc"
 
-    PUBLIC  log10
-    PUBLIC  log10c
+        PUBLIC  log10
+        PUBLIC  log10c
 
-    EXTERN  get_para
+        EXTERN  get_para
 
-.log10
-    call    get_para
-.log10c
-    FPCALL(CPCFP_FLO_LOG10)
-    ret
+log10:
+        call    get_para
+log10c:
+        FPCALL  (CPCFP_FLO_LOG10)
+        ret

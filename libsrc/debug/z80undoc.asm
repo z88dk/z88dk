@@ -9,9 +9,9 @@
 ; *	$Id: z80undoc.asm,v 1.3 2016-03-06 21:45:13 dom Exp $
 ; *
 
-	SECTION	code_clib
-	PUBLIC	z80undoc
-	PUBLIC	_z80undoc
+        SECTION code_clib
+        PUBLIC  z80undoc
+        PUBLIC  _z80undoc
 
 
 z80undoc:
@@ -27,24 +27,24 @@ _z80undoc:
 	;pop	hl
 	;jr	nz,notgenuine
 
-	push	ix	;save callers ix	
-	xor	a
-	ld	h,a
-	ld	ix,$0101
+        push    ix                      ;save callers ix
+        xor     a
+        ld      h, a
+        ld      ix, $0101
 
 	;defb	0fdh		;
-	defb	0ddh		; ld a,xh
-	ld	a,h
+        defb    0ddh                    ; ld a,xh
+        ld      a, h
 
-	nop	; this could help z80 clones not to hurt too much
-	nop
-	
-	pop	ix	; restore callers ix
-	ld	l,a	; true (1)
-	ld	h,0
-	dec	a
-	ret	z
+        nop                             ; this could help z80 clones not to hurt too much
+        nop
+
+        pop     ix                      ; restore callers ix
+        ld      l, a                    ; true (1)
+        ld      h, 0
+        dec     a
+        ret     z
 
 notgenuine:
-	ld	l,h	; false (0)
-	ret
+        ld      l, h                    ; false (0)
+        ret

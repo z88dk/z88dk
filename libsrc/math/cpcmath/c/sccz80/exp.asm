@@ -6,16 +6,16 @@
 ;	$Id: exp.asm,v 1.4 2016-06-22 19:50:49 dom Exp $
 ;
 
-    SECTION smc_fp
-    INCLUDE "cpcmath.inc"
+        SECTION smc_fp
+        INCLUDE "cpcmath.inc"
 
-    PUBLIC  exp
-    PUBLIC  expc
+        PUBLIC  exp
+        PUBLIC  expc
 
-    EXTERN  get_para
+        EXTERN  get_para
 
-.exp
-    call    get_para
-.expc
-    FPCALL(CPCFP_FLO_EXP)
-    ret
+exp:
+        call    get_para
+expc:
+        FPCALL  (CPCFP_FLO_EXP)
+        ret

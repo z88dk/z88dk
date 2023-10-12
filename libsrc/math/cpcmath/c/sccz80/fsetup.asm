@@ -6,17 +6,17 @@
 ;	$Id: fsetup.asm,v 1.4 2016-06-22 19:50:49 dom Exp $
 ;
 
-    SECTION smc_fp
+        SECTION smc_fp
 
-    PUBLIC  fsetup
+        PUBLIC  fsetup
 
-    EXTERN  fa
+        EXTERN  fa
 
-.fsetup
-    ld      hl,fa+1			; de=fa+1
-    ex      de,hl
-    ld      hl,5
-    add     hl,sp			; hl=sp+5
-    ret
+fsetup:
+        ld      hl, fa+1                ; de=fa+1
+        ex      de, hl
+        ld      hl, 5
+        add     hl, sp                  ; hl=sp+5
+        ret
 
 

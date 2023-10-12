@@ -6,16 +6,16 @@
 ;	$Id: atan.asm,v 1.4 2016-06-22 19:50:48 dom Exp $
 ;
 
-    SECTION smc_fp
-    INCLUDE "cpcmath.inc"
+        SECTION smc_fp
+        INCLUDE "cpcmath.inc"
 
-    PUBLIC  atan
-    PUBLIC  atanc
+        PUBLIC  atan
+        PUBLIC  atanc
 
-    EXTERN  get_para
+        EXTERN  get_para
 
-.atan
-    call    get_para
-.atanc
-    FPCALL(CPCFP_FLO_ATAN)
-    ret
+atan:
+        call    get_para
+atanc:
+        FPCALL  (CPCFP_FLO_ATAN)
+        ret

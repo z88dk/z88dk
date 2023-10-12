@@ -7,13 +7,13 @@
 ; Stefano Bodrato - 2001..2013
 ;
 
-    INCLUDE  "games/games.inc"
-    SECTION    code_clib
-    PUBLIC     bit_open
-    PUBLIC     _bit_open
-    EXTERN     __snd_tick
+        INCLUDE "games/games.inc"
+        SECTION code_clib
+        PUBLIC  bit_open
+        PUBLIC  _bit_open
+        EXTERN  __snd_tick
 
-.bit_open
-._bit_open
-    ld      a,(__snd_tick)
-    ret
+bit_open:
+_bit_open:
+        ld      a, (__snd_tick)
+        ret

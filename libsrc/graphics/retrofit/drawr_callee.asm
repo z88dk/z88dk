@@ -13,23 +13,23 @@
 ; ----- void  drawr(int x2, int y2)
 
 
-SECTION code_graphics
+        SECTION code_graphics
 
-PUBLIC     drawr_callee
-PUBLIC    _drawr_callee
+        PUBLIC  drawr_callee
+        PUBLIC  _drawr_callee
 
-	EXTERN    drawr
+        EXTERN  drawr
 
-.drawr_callee
-._drawr_callee
-	pop af	; ret addr
-	pop	bc
-	pop	de
-	push af	; ret addr
-	push de
-	push bc
-	
-	call drawr
-	pop bc
-	pop bc
-	ret
+drawr_callee:
+_drawr_callee:
+        pop     af                      ; ret addr
+        pop     bc
+        pop     de
+        push    af                      ; ret addr
+        push    de
+        push    bc
+
+        call    drawr
+        pop     bc
+        pop     bc
+        ret

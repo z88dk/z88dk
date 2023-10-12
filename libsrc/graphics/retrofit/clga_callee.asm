@@ -7,27 +7,27 @@
 ;	$Id: clga_callee.asm $
 ;
 
-SECTION smc_clib
+        SECTION smc_clib
 
-PUBLIC clga_callee
-PUBLIC _clga_callee
+        PUBLIC  clga_callee
+        PUBLIC  _clga_callee
 
-	EXTERN     clga
+        EXTERN  clga
 
-.clga_callee
-._clga_callee
-	ld	hl,retaddr
-	ex (sp),hl
-	ld	(retaddr0+1),hl
-	ld	hl,clga
-	jp (hl)
-	
-.retaddr
-		pop bc
-		pop bc
-		pop bc
-		pop bc
-.retaddr0
-		ld	hl,0
-		jp (hl)
+clga_callee:
+_clga_callee:
+        ld      hl, retaddr
+        ex      (sp), hl
+        ld      (retaddr0+1), hl
+        ld      hl, clga
+        jp      (hl)
+
+retaddr:
+        pop     bc
+        pop     bc
+        pop     bc
+        pop     bc
+retaddr0:
+        ld      hl, 0
+        jp      (hl)
 

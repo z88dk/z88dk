@@ -11,32 +11,32 @@
 ;Convert from integer to FP..
 ;We could enter in here with a long in dehl, so, mod to compiler I think!
 
-                SECTION  code_fp
-IF FORz88
-                INCLUDE  "target/z88/def/fpp.def"
-ELSE
-		INCLUDE "fpp.def"
-ENDIF
+        SECTION code_fp
+  IF    FORz88
+        INCLUDE "target/z88/def/fpp.def"
+  ELSE
+        INCLUDE "fpp.def"
+  ENDIF
 
-                PUBLIC    qfloat
-		EXTERN	fa
+        PUBLIC  qfloat
+        EXTERN  fa
 
-.qfloat
-        push    de      ;msb
+qfloat:
+        push    de                      ;msb
         exx
         pop     hl
-        ld      c,0     ;no exponent
-IF FORz88
-        fpp(FP_FLT)
-ELSE
-	ld	a,+(FP_FLT)
-	call	FPP
-ENDIF
-        ld      (fa+3),hl
-        ld      a,c
-        ld      (fa+5),a
+        ld      c, 0                    ;no exponent
+  IF    FORz88
+        fpp     (FP_FLT)
+  ELSE
+        ld      a, +(FP_FLT)
+        call    FPP
+  ENDIF
+        ld      (fa+3), hl
+        ld      a, c
+        ld      (fa+5), a
         exx
-        ld      (fa+1),hl
+        ld      (fa+1), hl
         xor     a
-        ld      (fa),a
+        ld      (fa), a
         ret

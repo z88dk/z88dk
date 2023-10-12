@@ -10,26 +10,26 @@
 ;double acos(double)
 ;Number in FA..
 
-		SECTION  code_fp
-IF FORz88
-                INCLUDE  "target/z88/def/fpp.def"
-ELSE
-		INCLUDE "fpp.def"
-ENDIF
+        SECTION code_fp
+  IF    FORz88
+        INCLUDE "target/z88/def/fpp.def"
+  ELSE
+        INCLUDE "fpp.def"
+  ENDIF
 
-                PUBLIC    acos
+        PUBLIC  acos
 
-                EXTERN	fsetup
-                EXTERN	stkequ2
+        EXTERN  fsetup
+        EXTERN  stkequ2
 
-.acos
+acos:
         call    fsetup
-IF FORz88
-        fpp(FP_ACS)
-ELSE
-	ld	a,+(FP_ACS)
-	call	FPP
-ENDIF
+  IF    FORz88
+        fpp     (FP_ACS)
+  ELSE
+        ld      a, +(FP_ACS)
+        call    FPP
+  ENDIF
         jp      stkequ2
 
 

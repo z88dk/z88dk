@@ -7,6 +7,6 @@
         EXTERN  ___dai32_return
 
 log:
-	call	___dai32_setup_single
-	call	___dai32_xln
-	jp	___dai32_return
+        call    ___dai32_setup_single
+        call    ___dai32_xln
+        jp      ___dai32_return

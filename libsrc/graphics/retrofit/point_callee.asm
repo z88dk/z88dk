@@ -13,23 +13,23 @@
 ; ----- int  point(int x, int y)
 
 
-SECTION code_graphics
+        SECTION code_graphics
 
-PUBLIC     point_callee
-PUBLIC    _point_callee
+        PUBLIC  point_callee
+        PUBLIC  _point_callee
 
-	EXTERN    point
+        EXTERN  point
 
-.point_callee
-._point_callee
-	pop af	; ret addr
-	pop	bc
-	pop	de
-	push af	; ret addr
-	push de
-	push bc
-	
-	call point
-	pop bc
-	pop bc
-	ret
+point_callee:
+_point_callee:
+        pop     af                      ; ret addr
+        pop     bc
+        pop     de
+        push    af                      ; ret addr
+        push    de
+        push    bc
+
+        call    point
+        pop     bc
+        pop     bc
+        ret

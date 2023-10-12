@@ -13,23 +13,23 @@
 ; ----- void  xordrawr(int x2, int y2)
 
 
-SECTION code_graphics
+        SECTION code_graphics
 
-PUBLIC     xordrawr_callee
-PUBLIC    _xordrawr_callee
+        PUBLIC  xordrawr_callee
+        PUBLIC  _xordrawr_callee
 
-	EXTERN    xordrawr
+        EXTERN  xordrawr
 
-.xordrawr_callee
-._xordrawr_callee
-	pop af	; ret addr
-	pop	bc
-	pop	de
-	push af	; ret addr
-	push de
-	push bc
-	
-	call xordrawr
-	pop bc
-	pop bc
-	ret
+xordrawr_callee:
+_xordrawr_callee:
+        pop     af                      ; ret addr
+        pop     bc
+        pop     de
+        push    af                      ; ret addr
+        push    de
+        push    bc
+
+        call    xordrawr
+        pop     bc
+        pop     bc
+        ret
