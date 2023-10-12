@@ -2,9 +2,9 @@
 ;
 ;       ZX Maths Routines
 ;
-;       7/12/02 - Stefano Bodrato
+;       Fall 2023 - Stefano Bodrato
 ;
-;       $Id: amax.asm,v 1.7 2016-06-22 19:59:18 dom Exp $
+;       $Id: amax.asm $
 ;
 
 
@@ -26,19 +26,30 @@ IF FORlambda
 		INCLUDE  "target/lambda/def/lambdafp.def"
 ENDIF
 
-                SECTION  code_fp
-                PUBLIC    amax
+		SECTION  code_fp
+		PUBLIC    amax
+		PUBLIC    fmax
 
-                EXTERN	fsetup
-                EXTERN	stkequ
+		EXTERN	fsetupf
+		EXTERN	stkequ
 
 .amax
-        call    fsetup
-	defb	ZXFP_NO_GRTR		; Not greater
-	defb	ZXFP_JUMP_TRUE		; Don't exchange
-	defb	2			; [offset to go over the next byte]
+.fmax
+	call    fsetupf
+	
+	defb	ZXFP_ST_MEM_0
 	defb	ZXFP_EXCHANGE
-	defb	ZXFP_END_CALC
-	call	ZXFP_STK_FETCH		; take away the smaller no from stack
+	defb	ZXFP_ST_MEM_1
 
-        jp      stkequ
+	defb	ZXFP_SUBTRACT
+	defb	ZXFP_GREATER_0
+	defb	ZXFP_JUMP_TRUE
+	defb	4
+	defb	ZXFP_GET_MEM_1
+	defb	ZXFP_JUMP
+	defb	2
+	defb	ZXFP_GET_MEM_0
+
+	defb	ZXFP_END_CALC
+	
+	jp      stkequ
