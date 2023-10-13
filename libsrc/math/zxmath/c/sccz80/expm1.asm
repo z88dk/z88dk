@@ -2,13 +2,13 @@
 ;
 ;       ZX Maths Routines
 ;
-;       10/10/2023 - Stefano Bodrato
+;       Fall 2023 - Stefano Bodrato
 ;
-;       $Id: fmod.asm $
+;       $Id: expm1.asm $
 ;
 
 
-;double fmod(n,m)
+;double expm1(double)
 ;Number in FA..
 
 
@@ -26,21 +26,22 @@ IF FORlambda
 ENDIF
 
                 SECTION  code_fp
-                PUBLIC    fmod
+                PUBLIC    expm1
 
-                EXTERN	fsetupf
+                EXTERN	fsetup1
                 EXTERN	stkequ
 
-.fmod
-        call    fsetupf
+.expm1
+        call    fsetup1
 
-        defb	ZXFP_N_MOD_M
+	defb	ZXFP_EXP
+	defb	ZXFP_STK_ONE
+
 IF FORlambda
-        defb	ZXFP_DELETE + 128
+	defb	ZXFP_SUBTRACT + 128
 ELSE
-        defb	ZXFP_DELETE
-        defb	ZXFP_END_CALC
+	defb	ZXFP_SUBTRACT
+	defb	ZXFP_END_CALC
 ENDIF
-
         jp      stkequ
 

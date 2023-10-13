@@ -64,9 +64,9 @@ extern double_t __LIB__ exp(double_t);   /* exponential */
 extern double_t __LIB__ log(double_t);   /* natural logarithm */
 extern double_t __LIB__ log10(double_t); /* log base 10 */
 extern double_t __LIB__ log1p(double_t);
-extern double_t __LIB__ log2(double_t);
-#define exp2(x)  pow(2.,x)
-#define expm1(x) (exp(x)-1.)
+extern double_t __LIB__ log2(double_t);  /* log base 2 */
+extern double_t __LIB__ exp2(double_t);  /* 2^x */
+extern double_t __LIB__ expm1(double_t); /* exp(x)-1 */
 
 /* Nearest integer */
 extern double_t __LIB__ floor(double_t) __smallc;
@@ -88,6 +88,7 @@ extern double_t __LIB__ fabs(double_t) __smallc;
 extern double_t __LIB__ fmod(double_t,double_t) __smallc;
 extern double_t __LIB__ fmax(double_t,double_t) __smallc;
 extern double_t __LIB__ fmin(double_t,double_t) __smallc;
+
 #define remainder(x,y) (x-(fabs(y)*round(x/fabs(y))))
 #define fdim(a,b) (a>b?a-b:b-a)
 
@@ -101,6 +102,10 @@ extern double_t __LIB__ pi();            /* pi */
 extern double_t __LIB__ atof(char *) __smallc;
 extern void __LIB__ ftoa(double_t, int, char *) __smallc;
 extern void __LIB__ ftoe(double_t, int, char *) __smallc;
+
+/* Random numbers */
+extern double_t __LIB__ fprand(void); /* Generic only */
+extern int __LIB__ fpseed(double_t);  /* Seed random number */
 
 
 /* Classification */
