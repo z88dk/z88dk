@@ -48,8 +48,8 @@ Detailed but incomplete changelist:
 - [z80asm] add -IXIY-soft that swaps index registers but saves object file as not-swapped
 - [z80asm] add symbol table to libraries to speed-up linking
 - [z80asm] allow the creation of fat libraries with the same code for all CPUs (-m*)
-- [z80asm] add support of r800
-- [z80asm] add EQ, NE, LTU, LEU, GTU, GEU condition codes
+- [z80asm] add support of r800, r4k, r5k, kc160
+- [z80asm] add EQ, NE, LTU, LEU, GTU, GEU condition codes, allow any flag in expressions
 - [zcc] +config at any place, support for -xc
 - [make] add cmake support
 
