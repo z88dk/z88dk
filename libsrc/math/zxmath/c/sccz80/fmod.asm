@@ -34,13 +34,13 @@ ENDIF
 .fmod
         call    fsetupf
 
-IF FORlambda
-        defb	ZXFP_N_MOD_M + 128
-ELSE
         defb	ZXFP_N_MOD_M
+IF FORlambda
+        defb	ZXFP_DELETE + 128
+ELSE
+        defb	ZXFP_DELETE
         defb	ZXFP_END_CALC
 ENDIF
-        call	ZXFP_STK_FETCH		; take away the integer quotient, keep the remainder only
 
         jp      stkequ
 
