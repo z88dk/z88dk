@@ -55,23 +55,6 @@ void Parser::parse_line_main() {
     }
 }
 
-string Parser::check_label() {
-    if (m_line.peek(0).type() == TType::Dot &&
-        m_line.peek(1).type() == TType::Ident &&
-        m_line.peek(2).keyword() != Keyword::EQU) {
-        m_line.next(2);
-        return m_line.peek(-1).svalue();
-    }
-    else if (m_line.peek(0).type() == TType::Ident &&
-        m_line.peek(1).type() == TType::Colon &&
-        m_line.peek(2).keyword() != Keyword::EQU) {
-        m_line.next(2);
-        return m_line.peek(-2).svalue();
-    }
-    else
-        return string();
-}
-
 void Parser::parse_symbol_declare(Symbol::Scope scope) {
 	while (true) {
 		// get identifier
@@ -241,11 +224,8 @@ void Parser::add_opcode_nn(unsigned bytes, int target_offset) {
 
     if (target_offset != 0) {
         // build expr1 = target_offset+(expr)
-        ScannedLine line1;
-        TextScanner ts{ std::to_string(target_offset)+"+(" + expr->text() + ")", line1 };
-        shared_ptr<Expr> expr1 = make_shared<Expr>();
-        Assert(expr1->parse(line1));
-        expr = expr1;
+		string text = std::to_string(target_offset)+"+(" + expr->text() + ")";
+		expr = Expr::make_expr(text);
     }
 
     auto instr = g_asm.cur_section()->add_opcode(bytes);
@@ -260,11 +240,8 @@ void Parser::add_opcode_nnn(unsigned bytes, int target_offset) {
 
     if (target_offset != 0) {
         // build expr1 = target_offset+(expr)
-        ScannedLine line1;
-        TextScanner ts{ std::to_string(target_offset) + "+(" + expr->text() + ")", line1 };
-        shared_ptr<Expr> expr1 = make_shared<Expr>();
-        Assert(expr1->parse(line1));
-        expr = expr1;
+		string text = std::to_string(target_offset)+"+(" + expr->text() + ")";
+		expr = Expr::make_expr(text);
     }
 
     auto instr = g_asm.cur_section()->add_opcode(bytes);
@@ -279,11 +256,8 @@ void Parser::add_opcode_nnnn(unsigned bytes, int target_offset) {
 
     if (target_offset != 0) {
         // build expr1 = target_offset+(expr)
-        ScannedLine line1;
-        TextScanner ts{ std::to_string(target_offset) + "+(" + expr->text() + ")", line1 };
-        shared_ptr<Expr> expr1 = make_shared<Expr>();
-        Assert(expr1->parse(line1));
-        expr = expr1;
+		string text = std::to_string(target_offset)+"+(" + expr->text() + ")";
+		expr = Expr::make_expr(text);
     }
 
     auto instr = g_asm.cur_section()->add_opcode(bytes);
@@ -300,7 +274,7 @@ void Parser::add_opcode_NN(unsigned bytes) {
 }
 
 void Parser::add_opcode_idx(unsigned bytes) {
-	Assert(m_exprs.size() == 1);
+	Assert(m_exprs.size() >= 1);
 
 	auto patch = make_shared<SBytePatch>(m_exprs.back());
 
@@ -321,13 +295,13 @@ void Parser::add_opcode_idx_idx1(unsigned bytes0, unsigned bytes1) {
     shared_ptr<Expr> expr0 = m_exprs.back();
 
     // build expr1 = 1+(expr)
-    ScannedLine line1;
-    TextScanner ts{ "1+(" + expr0->text() + ")", line1 };
-    shared_ptr<Expr> expr1 = make_shared<Expr>();
-    Assert(expr1->parse(line1));
+	string text1 = "1+(" + expr0->text() + ")";
+	auto expr1 = Expr::make_expr(text1);
+
     add_opcode_idx(bytes0);
-    m_exprs.back() = expr1;
+    m_exprs.push_back(expr1);
     add_opcode_idx(bytes1);
+	m_exprs.pop_back();
 }
 
 void Parser::add_opcode_idx_n(unsigned bytes) {
@@ -368,11 +342,8 @@ void Parser::add_emul_call_flag(unsigned bytes_jump, unsigned bytes_call) {
 	Assert(m_exprs.size() == 1);
 
 	// create label and expression
-	string temp_label_name = g_asm.cur_section()->autolabel();
-    ScannedLine line;
-    TextScanner ts{ temp_label_name, line };        // prepare to parse expression with temp label
-	auto temp_label_expr = make_shared<Expr>();
-	Assert(temp_label_expr->parse(line));		    // parse temp label
+	string temp_label_name = Section::autolabel();
+    auto temp_label_expr = Expr::make_expr(temp_label_name);
 
 	// jp !flag, temp
 	auto instr1 = g_asm.cur_section()->add_opcode(bytes_jump);
@@ -393,10 +364,7 @@ void Parser::add_call_function(const string& function_name) {
 	g_symbols.declare(function_name, Symbol::Scope::Extern);
 
 	// create expression with function name
-    ScannedLine line;
-    TextScanner ts{ function_name, line };		// prepare to parse expression with function name
-	auto function_expr = make_shared<Expr>();
-	Assert(function_expr->parse(line));	        // parse function name
+    auto function_expr = Expr::make_expr(function_name);
 
 	// add call instruction
 	auto instr = g_asm.cur_section()->add_opcode(Z80_CALL);

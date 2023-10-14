@@ -989,6 +989,14 @@ bool Expr::is_const() const {
 	}
 }
 
+shared_ptr<Expr> Expr::make_expr(const string& text) {
+    ScannedLine line;
+    TextScanner ts{ text, line };
+    auto expr = make_shared<Expr>();
+    Assert(expr->parse(line));
+    return expr;
+}
+
 //-----------------------------------------------------------------------------
 
 Patch::Patch(shared_ptr<Expr> expr, int offset)
