@@ -17,55 +17,14 @@ adt-newlib: $(ADT_NEWLIB_TARGETS)
 
 .PHONY: adt-newlib adt-newlib-clean
 
-adt-newlib/obj/newlib-z80-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
-	@mkdir -p adt-newlib/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/z80/x -I.. -mz80 -D__CLASSIC $(ADT_NEWLIBGLOBS)
-
-adt-newlib/obj/newlib-r2ka-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
-	@mkdir -p adt-newlib/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/r2ka/x -I.. -mr2ka -D__CLASSIC $(ADT_NEWLIBGLOBS)
-
-adt-newlib/obj/newlib-r4k-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
-	@mkdir -p adt-newlib/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/r4k/x -I.. -mr4k -D__CLASSIC $(ADT_NEWLIBGLOBS)
-
-adt-newlib/obj/newlib-z80n-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
-	@mkdir -p adt-newlib/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/z80n/x -I.. -mz80n -D__CLASSIC $(ADT_NEWLIBGLOBS)
-
-adt-newlib/obj/newlib-ixiy-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
-	@mkdir -p adt-newlib/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/ixiy/x -I.. -mz80 -IXIY -D__CLASSIC $(ADT_NEWLIBGLOBS)
-
-adt-newlib/obj/newlib-8080-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
-	@mkdir -p adt-newlib/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/8080/x -I.. -m8080 -D__CLASSIC $(ADT_NEWLIBGLOBS)
-
-adt-newlib/obj/newlib-gbz80-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
-	@mkdir -p adt-newlib/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(ADT_NEWLIBGLOBS)
-
-adt-newlib/obj/newlib-z180-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
-	@mkdir -p adt-newlib/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/z180/x -I.. -mz180 -D__CLASSIC $(ADT_NEWLIBGLOBS)
-
-adt-newlib/obj/newlib-ez80_z80-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
-	@mkdir -p adt-newlib/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(ADT_NEWLIBGLOBS)
-
-adt-newlib/obj/newlib-kc160-adt-newlib: $(ADT_NEWLIBGLOBS_ex)
-	@mkdir -p adt-newlib/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=adt-newlib/obj/kc160/x -I.. -mkc160 -D__CLASSIC $(ADT_NEWLIBGLOBS)
+$(eval $(call buildnew,adt-newlib,z80,-mz80,$(ADT_NEWLIBGLOBS),$(ADT_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,adt-newlib,r2ka,-mr2ka,$(ADT_NEWLIBGLOBS),$(ADT_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,adt-newlib,r4k,-mr4k,$(ADT_NEWLIBGLOBS),$(ADT_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,adt-newlib,z80n,-mz80n,$(ADT_NEWLIBGLOBS),$(ADT_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,adt-newlib,ixiy,-mz80 -IXIY,$(ADT_NEWLIBGLOBS),$(ADT_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,adt-newlib,z180,-mz180,$(ADT_NEWLIBGLOBS),$(ADT_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,adt-newlib,ez80_z80,-mez80_z80,$(ADT_NEWLIBGLOBS),$(ADT_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,adt-newlib,kc160,-mkc160,$(ADT_NEWLIBGLOBS),$(ADT_NEWLIBGLOBS_ex)))
 
 
 adt-newlib-clean:

@@ -5,12 +5,28 @@ TIME_AFILES = $(notdir $(wildcard time/*.asm))
 TIME_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/time/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/time/z80/*.asm"
 TIME_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/time/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/time/z80/*.asm
 
-TIME_NEWLIB_TARGETS := time/obj/newlib-z80-time time/obj/newlib-z80n-time time/obj/newlib-r2ka-time time/obj/newlib-ixiy-time time/obj/newlib-8080-time time/obj/newlib-gbz80-time time/obj/newlib-ez80_z80-time time/obj/newlib-z180-time time/obj/newlib-r4k-time \
-	 time/obj/newlib-kc160k-time
+TIME_NEWLIB_TARGETS := time/obj/newlib-z80-time \
+		time/obj/newlib-z80n-time \
+		time/obj/newlib-r2ka-time \
+		time/obj/newlib-ixiy-time \
+		time/obj/newlib-8080-time \
+		time/obj/newlib-gbz80-time \
+		time/obj/newlib-ez80_z80-time \
+		time/obj/newlib-z180-time \
+		time/obj/newlib-r4k-time \
+		time/obj/newlib-kc160-time
 
 TIME_OBJECTS = $(TIME_CFILES:.c=.o) $(TIME_AFILES:.asm=.o)
 
-TIME_OBJS = $(addprefix time/obj/z80/, $(TIME_OBJECTS)) $(addprefix time/obj/r2ka/,$(TIME_OBJECTS)) $(addprefix time/obj/ixiy/,$(TIME_OBJECTS))  $(addprefix time/obj/z80n/,$(TIME_OBJECTS)) $(addprefix time/obj/8080/,$(TIME_OBJECTS))  $(addprefix time/obj/gbz80/,$(TIME_OBJECTS)) $(addprefix time/obj/ez80_z80/,$(TIME_OBJECTS)) $(addprefix time/obj/z180/,$(TIME_OBJECTS)) $(addprefix time/obj/r4k/,$(TIME_OBJECTS)) \
+TIME_OBJS = $(addprefix time/obj/z80/, $(TIME_OBJECTS)) \
+	$(addprefix time/obj/r2ka/,$(TIME_OBJECTS)) \
+	$(addprefix time/obj/ixiy/,$(TIME_OBJECTS)) \
+	$(addprefix time/obj/z80n/,$(TIME_OBJECTS)) \
+	$(addprefix time/obj/8080/,$(TIME_OBJECTS)) \
+	$(addprefix time/obj/gbz80/,$(TIME_OBJECTS)) \
+	$(addprefix time/obj/ez80_z80/,$(TIME_OBJECTS)) \
+	$(addprefix time/obj/z180/,$(TIME_OBJECTS)) \
+	$(addprefix time/obj/r4k/,$(TIME_OBJECTS)) \
 	$(addprefix time/obj/kc160/,$(TIME_OBJECTS))
 
 
@@ -32,59 +48,16 @@ $(eval $(call buildbit,time,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,time,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,time,kc160,test,-clib=kc160,-mkc160))
 
-
-time/obj/newlib-z80-time: $(TIME_NEWLIBGLOBS_ex)
-	@mkdir -p time/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=time/obj/z80/x -I.. -mz80 -D__CLASSIC $(TIME_NEWLIBGLOBS)
-
-time/obj/newlib-r2ka-time: $(TIME_NEWLIBGLOBS_ex)
-	@mkdir -p time/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=time/obj/r2ka/x -I.. -mr2ka -D__CLASSIC $(TIME_NEWLIBGLOBS)
-
-time/obj/newlib-r4k-time: $(TIME_NEWLIBGLOBS_ex)
-	@mkdir -p time/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=time/obj/r4k/x -I.. -mr4k -D__CLASSIC $(TIME_NEWLIBGLOBS)
-
-time/obj/newlib-z80n-time: $(TIME_NEWLIBGLOBS_ex)
-	@mkdir -p time/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=time/obj/z80n/x -I.. -mz80n -D__CLASSIC $(TIME_NEWLIBGLOBS)
-
-time/obj/newlib-ixiy-time: $(TIME_NEWLIBGLOBS_ex)
-	@mkdir -p time/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=time/obj/ixiy/x -I.. -mz80 -IXIY -D__CLASSIC $(TIME_NEWLIBGLOBS)
-
-time/obj/newlib-8080-time: $(TIME_NEWLIBGLOBS_ex)
-	@mkdir -p time/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=time/obj/8080/x -I.. -m8080 -D__CLASSIC $(TIME_NEWLIBGLOBS)
-
-time/obj/newlib-gbz80-time: $(TIME_NEWLIBGLOBS_ex)
-	@mkdir -p time/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=time/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(TIME_NEWLIBGLOBS)
-
-time/obj/newlib-z180-time: $(TIME_NEWLIBGLOBS_ex)
-	@mkdir -p time/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=time/obj/z1800/x -I.. -mz180 -D__CLASSIC $(TIME_NEWLIBGLOBS)
-
-time/obj/newlib-ez80_z80-time: $(TIME_NEWLIBGLOBS_ex)
-	@mkdir -p time/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=time/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(TIME_NEWLIBGLOBS)
-
-time/obj/newlib-kc160-time: $(TIME_NEWLIBGLOBS_ex)
-	@mkdir -p time/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=time/obj/kc160/x -I.. -mkc160 -D__CLASSIC $(TIME_NEWLIBGLOBS)
-
-time/obj/%:
-	@mkdir -p $@
+$(eval $(call buildnew,time,z80,-mz80,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,time,r2ka,-mr2ka,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,time,r4k,-mr4k,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,time,z80n,-mz80n,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,time,ixiy,-mz80 -IXIY,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,time,8080,-m8080,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,time,gbz80,-mgbz80,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,time,z180,-mz180,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,time,ez80_z80,-mez80_z80,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,time,kc160,-mkc160,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
 
 time-clean:
 	$(RM) -fr time/obj time/*.o

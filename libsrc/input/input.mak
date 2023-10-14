@@ -4,7 +4,13 @@ INPUT_AFILES = $(notdir $(wildcard input/*.asm))
 
 INPUT_OBJECTS = $(INPUT_CFILES:.c=.o) $(INPUT_AFILES:.asm=.o)
 
-INPUT_OBJS = $(addprefix input/obj/z80/, $(INPUT_OBJECTS)) $(addprefix input/obj/r2ka/,$(INPUT_OBJECTS)) $(addprefix input/obj/ixiy/,$(INPUT_OBJECTS))  $(addprefix input/obj/z80n/,$(INPUT_OBJECTS)) $(addprefix input/obj/8080/,$(INPUT_OBJECTS))  $(addprefix input/obj/z180/,$(INPUT_OBJECTS))  $(addprefix input/obj/r4k/,$(INPUT_OBJECTS)) \
+INPUT_OBJS = $(addprefix input/obj/z80/, $(INPUT_OBJECTS)) \
+	$(addprefix input/obj/r2ka/,$(INPUT_OBJECTS)) \
+	$(addprefix input/obj/ixiy/,$(INPUT_OBJECTS)) \
+	$(addprefix input/obj/z80n/,$(INPUT_OBJECTS)) \
+	$(addprefix input/obj/8080/,$(INPUT_OBJECTS)) \
+	$(addprefix input/obj/z180/,$(INPUT_OBJECTS)) \
+	$(addprefix input/obj/r4k/,$(INPUT_OBJECTS)) \
 	$(addprefix input/obj/kc160/,$(INPUT_OBJECTS)) \
 	$(addprefix input/obj/ez80_z80/,$(INPUT_OBJECTS)) 
 

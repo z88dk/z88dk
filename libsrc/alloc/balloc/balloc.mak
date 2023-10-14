@@ -5,9 +5,14 @@ BALLOC_AFILES = $(notdir $(wildcard alloc/balloc/*.asm))
 BALLOC_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/alloc/balloc/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/alloc/balloc/z80/*.asm"
 BALLOC_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/alloc/balloc/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/alloc/balloc/z80/*.asm
 
-BALLOC_NEWLIB_TARGETS := alloc/balloc/obj/newlib-z80-alloc-balloc alloc/balloc/obj/newlib-z80n-alloc-balloc alloc/balloc/obj/newlib-r2ka-alloc-balloc alloc/balloc/obj/newlib-ixiy-alloc-balloc alloc/balloc/obj/newlib-z180-alloc-balloc alloc/balloc/obj/newlib-ez80_z80-alloc-balloc \
-	alloc/balloc/obj/newlib-r4k-alloc-balloc \
-	alloc/balloc/obj/newlib-kc160-alloc-balloc 
+BALLOC_NEWLIB_TARGETS := alloc/balloc/obj/newlib-z80-alloc-balloc \
+		alloc/balloc/obj/newlib-z80n-alloc-balloc \
+		alloc/balloc/obj/newlib-r2ka-alloc-balloc \
+		alloc/balloc/obj/newlib-ixiy-alloc-balloc \
+		alloc/balloc/obj/newlib-z180-alloc-balloc \
+		alloc/balloc/obj/newlib-ez80_z80-alloc-balloc \
+		alloc/balloc/obj/newlib-r4k-alloc-balloc \
+		alloc/balloc/obj/newlib-kc160-alloc-balloc 
 
 
 BALLOC_OBJECTS = $(BALLOC_CFILES:.c=.o) $(BALLOC_AFILES:.asm=.o)
@@ -40,57 +45,14 @@ $(eval $(call buildbit,alloc/balloc,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,alloc/balloc,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,alloc/balloc,kc160,test,-clib=kc160,-mkc160))
 
-
-alloc/balloc/obj/newlib-z80-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
-	@mkdir -p alloc/balloc/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/z80/x -I.. -mz80 -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
-
-alloc/balloc/obj/newlib-r2ka-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
-	@mkdir -p alloc/balloc/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/r2ka/x -I.. -mr2ka -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
-
-alloc/balloc/obj/newlib-r4k-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
-	@mkdir -p alloc/balloc/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/r4k/x -I.. -mr4k -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
-
-alloc/balloc/obj/newlib-z80n-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
-	@mkdir -p alloc/balloc/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/z80n/x -I.. -mz80n -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
-
-alloc/balloc/obj/newlib-ixiy-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
-	@mkdir -p alloc/balloc/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/ixiy/x -I.. -mz80 -IXIY -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
-
-alloc/balloc/obj/newlib-8080-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
-	@mkdir -p alloc/balloc/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/8080/x -I.. -m8080 -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
-
-alloc/balloc/obj/newlib-gbz80-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
-	@mkdir -p alloc/balloc/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
-
-
-alloc/balloc/obj/newlib-z180-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
-	@mkdir -p alloc/balloc/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/z180/x -I.. -mz180 -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
-
-alloc/balloc/obj/newlib-ez80_z80-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
-	@mkdir -p alloc/balloc/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
-
-alloc/balloc/obj/newlib-kc160-alloc-balloc: $(BALLOC_NEWLIBGLOBS_ex)
-	@mkdir -p alloc/balloc/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=alloc/balloc/obj/kc160/x -I.. -mkc160 -D__CLASSIC $(BALLOC_NEWLIBGLOBS)
+$(eval $(call buildnew,alloc/balloc,z80,-mz80,$(BALLOC_NEWLIBGLOBS),$(BALLOC_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,alloc/balloc,r2ka,-mr2ka,$(BALLOC_NEWLIBGLOBS),$(BALLOC_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,alloc/balloc,r4k,-mr4k,$(BALLOC_NEWLIBGLOBS),$(BALLOC_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,alloc/balloc,z80n,-mz80n,$(BALLOC_NEWLIBGLOBS),$(BALLOC_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,alloc/balloc,ixiy,-mz80 -IXIY,$(BALLOC_NEWLIBGLOBS),$(BALLOC_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,alloc/balloc,z180,-mz180,$(BALLOC_NEWLIBGLOBS),$(BALLOC_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,alloc/balloc,ez80_z80,-mez80_z80,$(BALLOC_NEWLIBGLOBS),$(BALLOC_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,alloc/balloc,kc160,-mkc160,$(BALLOC_NEWLIBGLOBS),$(BALLOC_NEWLIBGLOBS_ex)))
 
 alloc/balloc/obj/%:
 	@mkdir -p $@

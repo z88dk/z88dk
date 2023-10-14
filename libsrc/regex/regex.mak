@@ -4,7 +4,15 @@ REGEX_AFILES = $(notdir $(wildcard regex/*.asm))
 
 REGEX_OBJECTS = $(REGEX_CFILES:.c=.o) $(REGEX_AFILES:.asm=.o)
 
-REGEX_OBJS = $(addprefix regex/obj/z80/, $(REGEX_OBJECTS)) $(addprefix regex/obj/r2ka/,$(REGEX_OBJECTS)) $(addprefix regex/obj/ixiy/,$(REGEX_OBJECTS))  $(addprefix regex/obj/z80n/,$(REGEX_OBJECTS)) $(addprefix regex/obj/8080/,$(REGEX_OBJECTS))  $(addprefix regex/obj/gbz80/,$(REGEX_OBJECTS)) $(addprefix regex/obj/ez80_z80/,$(REGEX_OBJECTS)) $(addprefix regex/obj/z180/,$(REGEX_OBJECTS))  $(addprefix regex/obj/r4k/,$(REGEX_OBJECTS)) \
+REGEX_OBJS = $(addprefix regex/obj/z80/, $(REGEX_OBJECTS)) \
+	$(addprefix regex/obj/r2ka/,$(REGEX_OBJECTS)) \
+	$(addprefix regex/obj/ixiy/,$(REGEX_OBJECTS)) \
+	$(addprefix regex/obj/z80n/,$(REGEX_OBJECTS)) \
+	$(addprefix regex/obj/8080/,$(REGEX_OBJECTS)) \
+	$(addprefix regex/obj/gbz80/,$(REGEX_OBJECTS)) \
+	$(addprefix regex/obj/ez80_z80/,$(REGEX_OBJECTS)) \
+	$(addprefix regex/obj/z180/,$(REGEX_OBJECTS)) \
+	$(addprefix regex/obj/r4k/,$(REGEX_OBJECTS)) \
 	$(addprefix regex/obj/kc160/,$(REGEX_OBJECTS))
 
 OBJS += $(REGEX_OBJS)

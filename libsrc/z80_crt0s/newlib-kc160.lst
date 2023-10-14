@@ -2,3 +2,6 @@
 ../_DEVELOPMENT/math/integer/kc160/l_kc160_muls_16_16x16
 ../_DEVELOPMENT/math/integer/kc160/l_kc160_divs_16_16x16
 ../_DEVELOPMENT/math/integer/kc160/l_kc160_mulu_16_16x16
+../_DEVELOPMENT/math/integer/kc160/l_kc160_mulu_32_16x16
+../_DEVELOPMENT/math/integer/kc160/l_kc160_muls_32_16x16
+../_DEVELOPMENT/math/integer/kc160/l_kc160_divu_32_32x16

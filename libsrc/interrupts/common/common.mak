@@ -5,8 +5,11 @@ INT_COMMON_AFILES = $(notdir $(wildcard interrupts/common/*.asm))
 
 INT_COMMON_OBJECTS = $(INT_COMMON_CFILES:.c=.o) $(INT_COMMON_AFILES:.asm=.o)
 
-INT_COMMON_OBJS = $(addprefix interrupts/common/obj/z80/, $(INT_COMMON_OBJECTS)) $(addprefix interrupts/common/obj/ixiy/,$(INT_COMMON_OBJECTS))  $(addprefix interrupts/common/obj/z80n/,$(INT_COMMON_OBJECTS)) \
-	$(addprefix interrupts/common/obj/8080/,$(INT_COMMON_OBJECTS)) $(addprefix interrupts/common/obj/gbz80/,$(INT_COMMON_OBJECTS)) \
+INT_COMMON_OBJS = $(addprefix interrupts/common/obj/z80/, $(INT_COMMON_OBJECTS)) \
+	$(addprefix interrupts/common/obj/ixiy/,$(INT_COMMON_OBJECTS)) \
+	$(addprefix interrupts/common/obj/z80n/,$(INT_COMMON_OBJECTS)) \
+	$(addprefix interrupts/common/obj/8080/,$(INT_COMMON_OBJECTS)) \
+	$(addprefix interrupts/common/obj/gbz80/,$(INT_COMMON_OBJECTS)) \
 	$(addprefix interrupts/common/obj/z180/,$(INT_COMMON_OBJECTS)) \
 	$(addprefix interrupts/common/obj/ez80_z80/,$(INT_COMMON_OBJECTS)) \
 	$(addprefix interrupts/common/obj/kc160/,$(INT_COMMON_OBJECTS))
