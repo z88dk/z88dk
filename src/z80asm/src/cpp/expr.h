@@ -68,6 +68,7 @@ public:
 		Parens,
 	};
 
+    virtual ~ExprNode() {}
 	virtual Type type() const = 0;
 	virtual ExprResult value() = 0;
 	virtual string text() const = 0;
@@ -384,6 +385,7 @@ public:
     };
 
 	Patch(shared_ptr<Expr> expr, int offset = 0);
+    virtual ~Patch() {}
 	virtual Type type() const = 0;
 	virtual int size() const = 0;
 	virtual void do_patch(vector<uint8_t>& bytes, int asmpc) = 0;
