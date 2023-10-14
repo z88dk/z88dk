@@ -336,6 +336,8 @@ public:
 	bool in_parens() const;
 	bool is_const() const;
 
+    static shared_ptr<Expr> make_expr(const string& text);      // parse text and build expression
+
 private:
 	shared_ptr<ExprNode> m_root;			// root node of expression
 	Location			m_location;			// location where defined

@@ -145,10 +145,7 @@ sub parse_code {
 			my $id = $target_jumps{$target};
 			push @code, 
 				"string target$id = Section::autolabel();",
-				"ScannedLine line$id;",
-				"TextScanner ts${id}{ target$id, line$id };",
-				"auto target_expr$id = make_shared<Expr>();",
-				"xassert(target_expr$id->parse(line$id));";
+				"auto target_expr$id = Expr::make_expr(target$id);",
 		}
 		
 		# create each opcode and corresponding label

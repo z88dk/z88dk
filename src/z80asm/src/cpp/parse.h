@@ -35,7 +35,6 @@ private:
 
 	void parse_line();
 	void parse_line_main();
-	string check_label();
 	void parse_symbol_declare(Symbol::Scope scope);
     void parse_int8_data();
     void parse_int16_data();

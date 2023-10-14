@@ -19230,10 +19230,7 @@ void Parser::parse_main_action_1511() {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	add_opcode(0xF5);
 	add_opcode(0x7C);
 	add_opcode(0xB5);
@@ -19248,10 +19245,7 @@ void Parser::parse_main_action_1511() {
 	case CPU_8080: case CPU_8085: case CPU_GBZ80: 
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	add_opcode(0xF5);
 	add_opcode(0x7C);
 	add_opcode(0xB5);
@@ -19276,10 +19270,7 @@ void Parser::parse_main_action_1512() {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80N: 
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	add_opcode(0xF5);
 	add_opcode(0xDD7C);
 	add_opcode(0xDDB5);
@@ -19294,10 +19285,7 @@ void Parser::parse_main_action_1512() {
 	case CPU_KC160: case CPU_KC160_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	add_opcode(0xF5);
 	add_opcode(0xE5);
 	add_opcode(0xDDE5);
@@ -19328,10 +19316,7 @@ void Parser::parse_main_action_1513() {
 	case CPU_KC160: case CPU_KC160_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	add_opcode(0xF5);
 	add_opcode(0xE5);
 	add_opcode(0xFDE5);
@@ -19352,10 +19337,7 @@ void Parser::parse_main_action_1513() {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80N: 
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	add_opcode(0xF5);
 	add_opcode(0xFD7C);
 	add_opcode(0xFDB5);
@@ -19441,10 +19423,7 @@ void Parser::parse_main_action_1520() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x30);
 	m_exprs.pop_back();
@@ -19471,10 +19450,7 @@ void Parser::parse_main_action_1521() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x20);
 	m_exprs.pop_back();
@@ -19501,10 +19477,7 @@ void Parser::parse_main_action_1522() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x38);
 	m_exprs.pop_back();
@@ -19523,10 +19496,7 @@ void Parser::parse_main_action_1523() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19541,10 +19511,7 @@ void Parser::parse_main_action_1523() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19559,10 +19526,7 @@ void Parser::parse_main_action_1523() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -19584,15 +19548,9 @@ void Parser::parse_main_action_1524() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19608,15 +19566,9 @@ void Parser::parse_main_action_1524() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19632,15 +19584,9 @@ void Parser::parse_main_action_1524() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -19663,10 +19609,7 @@ void Parser::parse_main_action_1525() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xE2);
 	m_exprs.pop_back();
@@ -19685,10 +19628,7 @@ void Parser::parse_main_action_1526() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xEA);
 	m_exprs.pop_back();
@@ -19715,10 +19655,7 @@ void Parser::parse_main_action_1527() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xF2);
 	m_exprs.pop_back();
@@ -19745,10 +19682,7 @@ void Parser::parse_main_action_1528() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19775,10 +19709,7 @@ void Parser::parse_main_action_1529() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xEA);
 	m_exprs.pop_back();
@@ -19805,10 +19736,7 @@ void Parser::parse_main_action_1530() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xFA);
 	m_exprs.pop_back();
@@ -19835,10 +19763,7 @@ void Parser::parse_main_action_1531() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xE2);
 	m_exprs.pop_back();
@@ -19865,10 +19790,7 @@ void Parser::parse_main_action_1532() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xEA);
 	m_exprs.pop_back();
@@ -19895,10 +19817,7 @@ void Parser::parse_main_action_1533() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xE2);
 	m_exprs.pop_back();
@@ -19968,10 +19887,7 @@ void Parser::parse_main_action_1537() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19987,10 +19903,7 @@ void Parser::parse_main_action_1537() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20013,15 +19926,9 @@ void Parser::parse_main_action_1538() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20038,15 +19945,9 @@ void Parser::parse_main_action_1538() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20223,10 +20124,7 @@ void Parser::parse_main_action_1548() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20242,10 +20140,7 @@ void Parser::parse_main_action_1548() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20268,15 +20163,9 @@ void Parser::parse_main_action_1549() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20293,15 +20182,9 @@ void Parser::parse_main_action_1549() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20463,10 +20346,7 @@ void Parser::parse_main_action_1559() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20489,15 +20369,9 @@ void Parser::parse_main_action_1560() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20629,10 +20503,7 @@ void Parser::parse_main_action_1570() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20655,15 +20526,9 @@ void Parser::parse_main_action_1571() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20795,10 +20660,7 @@ void Parser::parse_main_action_1581() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20821,15 +20683,9 @@ void Parser::parse_main_action_1582() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20961,10 +20817,7 @@ void Parser::parse_main_action_1592() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20987,15 +20840,9 @@ void Parser::parse_main_action_1593() {
 	warn_if_expr_in_parens();
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -38100,10 +37947,7 @@ void Parser::parse_main_action_3030() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -38233,10 +38077,7 @@ void Parser::parse_main_action_3040() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -38248,10 +38089,7 @@ void Parser::parse_main_action_3040() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nnn(0xCA);
 	m_exprs.pop_back();
@@ -38476,10 +38314,7 @@ void Parser::parse_main_action_3056() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	add_opcode(0x5B);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nnn(0xCA);
@@ -38655,10 +38490,7 @@ void Parser::parse_main_action_3070() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	add_opcode(0x40);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xCA);
@@ -39042,10 +38874,7 @@ void Parser::parse_main_action_3105() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nnn(0xEDCA);
 	m_exprs.pop_back();
@@ -39180,10 +39009,7 @@ void Parser::parse_main_action_3115() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -39195,10 +39021,7 @@ void Parser::parse_main_action_3115() {
 	warn_if_expr_in_parens();
 	{
 	string target1 = Section::autolabel();
-	ScannedLine line1;
-	TextScanner ts1{ target1, line1 };
-	auto target_expr1 = make_shared<Expr>();
-	xassert(target_expr1->parse(line1));
+	auto target_expr1 = Expr::make_expr(target1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -72950,10 +72773,7 @@ void Parser::parse_main_action_6077() {
 	case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -72967,10 +72787,7 @@ void Parser::parse_main_action_6077() {
 	case CPU_8080: case CPU_8085: 
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -73127,10 +72944,7 @@ void Parser::parse_main_action_6091() {
 	case CPU_EZ80_Z80: 
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -73145,10 +72959,7 @@ void Parser::parse_main_action_6091() {
 	case CPU_EZ80: 
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -73312,10 +73123,7 @@ void Parser::parse_main_action_6102() {
 	case CPU_EZ80: 
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -73449,10 +73257,7 @@ void Parser::parse_main_action_6113() {
 	case CPU_EZ80_Z80: 
 	{
 	string target2 = Section::autolabel();
-	ScannedLine line2;
-	TextScanner ts2{ target2, line2 };
-	auto target_expr2 = make_shared<Expr>();
-	xassert(target_expr2->parse(line2));
+	auto target_expr2 = Expr::make_expr(target2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
