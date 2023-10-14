@@ -1,10 +1,10 @@
 
-RECT_CFILES = $(notdir $(wildcard rect/*.c))
-RECT_AFILES = $(notdir $(wildcard rect/*.asm))
+RECT_CFILES := $(notdir $(wildcard rect/*.c))
+RECT_AFILES := $(notdir $(wildcard rect/*.asm))
 
-RECT_OBJECTS = $(RECT_CFILES:.c=.o) $(RECT_AFILES:.asm=.o)
+RECT_OBJECTS := $(RECT_CFILES:.c=.o) $(RECT_AFILES:.asm=.o)
 
-RECT_OBJS = $(addprefix rect/obj/z80/, $(RECT_OBJECTS)) \
+RECT_OBJS := $(addprefix rect/obj/z80/, $(RECT_OBJECTS)) \
 	$(addprefix rect/obj/r2ka/,$(RECT_OBJECTS)) \
 	$(addprefix rect/obj/r4k/,$(RECT_OBJECTS)) \
 	$(addprefix rect/obj/ixiy/,$(RECT_OBJECTS)) \

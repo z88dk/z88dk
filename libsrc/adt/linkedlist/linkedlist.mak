@@ -1,11 +1,11 @@
 
-LINKEDLIST_CFILES = $(notdir $(wildcard adt/linkedlist/*.c))
-LINKEDLIST_AFILES = $(notdir $(wildcard adt/linkedlist/*.asm))
+LINKEDLIST_CFILES := $(notdir $(wildcard adt/linkedlist/*.c))
+LINKEDLIST_AFILES := $(notdir $(wildcard adt/linkedlist/*.asm))
 
 
-LINKEDLIST_OBJECTS = $(LINKEDLIST_CFILES:.c=.o) $(LINKEDLIST_AFILES:.asm=.o)
+LINKEDLIST_OBJECTS := $(LINKEDLIST_CFILES:.c=.o) $(LINKEDLIST_AFILES:.asm=.o)
 
-LINKEDLIST_OBJS = $(addprefix adt/linkedlist/obj/z80/, $(LINKEDLIST_OBJECTS)) \
+LINKEDLIST_OBJS := $(addprefix adt/linkedlist/obj/z80/, $(LINKEDLIST_OBJECTS)) \
 	$(addprefix adt/linkedlist/obj/r2ka/,$(LINKEDLIST_OBJECTS)) \
 	$(addprefix adt/linkedlist/obj/r4k/,$(LINKEDLIST_OBJECTS)) \
 	$(addprefix adt/linkedlist/obj/ixiy/,$(LINKEDLIST_OBJECTS)) \

@@ -1,12 +1,12 @@
-STRINGS_AFILES = memopd.asm memopd_callee.asm memopi.asm memopi_callee.asm memops.asm $(wildcard _*.asm)
-STRINGS_CFILES = 
+STRINGS_AFILES := memopd.asm memopd_callee.asm memopi.asm memopi_callee.asm memops.asm $(wildcard _*.asm)
+STRINGS_CFILES := 
 
-STRINGS_8080_AFILES = 
-STRINGS_GBZ80_AFILES = 
+STRINGS_8080_AFILES := 
+STRINGS_GBZ80_AFILES := 
 
-STRINGS_OBJECTS = $(STRINGS_CFILES:.c=.o) $(STRINGS_AFILES:.asm=.o)
-STRINGS_8080_OBJECTS = $(STRINGS_CFILES:.c=.o) $(STRINGS_8080_AFILES:.asm=.o)
-STRINGS_GBZ80_OBJECTS = $(STRINGS_CFILES:.c=.o) $(STRINGS_GBZ80_AFILES:.asm=.o)
+STRINGS_OBJECTS := $(STRINGS_CFILES:.c=.o) $(STRINGS_AFILES:.asm=.o)
+STRINGS_8080_OBJECTS := $(STRINGS_CFILES:.c=.o) $(STRINGS_8080_AFILES:.asm=.o)
+STRINGS_GBZ80_OBJECTS := $(STRINGS_CFILES:.c=.o) $(STRINGS_GBZ80_AFILES:.asm=.o)
 
 STRINGS_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/string/z80/*.asm"
 STRINGS_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/string/z80/*.asm
@@ -22,9 +22,9 @@ STRINGS_NEWLIB_TARGETS := strings/obj/newlib-z80-strings \
 		strings/obj/newlib-r4k-strings \
 		strings/obj/newlib-kc160-strings
 
-STRINGS_OBJECTS = $(STRINGS_CFILES:.c=.o) $(STRINGS_AFILES:.asm=.o)
+STRINGS_OBJECTS := $(STRINGS_CFILES:.c=.o) $(STRINGS_AFILES:.asm=.o)
 
-STRINGS_OBJS = $(addprefix strings/obj/z80/, $(STRINGS_OBJECTS)) \
+STRINGS_OBJS := $(addprefix strings/obj/z80/, $(STRINGS_OBJECTS)) \
 	$(addprefix strings/obj/r2ka/,$(STRINGS_OBJECTS)) \
 	$(addprefix strings/obj/r4k/,$(STRINGS_OBJECTS)) \
 	$(addprefix strings/obj/ixiy/,$(STRINGS_OBJECTS)) \

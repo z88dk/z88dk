@@ -1,6 +1,6 @@
 
-OBSTACK_CFILES = $(notdir $(wildcard alloc/obstack/*.c))
-OBSTACK_AFILES = $(notdir $(wildcard alloc/obstack/*.asm))
+OBSTACK_CFILES := $(notdir $(wildcard alloc/obstack/*.c))
+OBSTACK_AFILES := $(notdir $(wildcard alloc/obstack/*.asm))
 
 OBSTACK_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/alloc/obstack/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/alloc/obstack/z80/*.asm"
 OBSTACK_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/alloc/obstack/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/alloc/obstack/z80/*.asm
@@ -16,9 +16,9 @@ OBSTACK_NEWLIB_TARGETS := alloc/obstack/obj/newlib-z80-alloc-obstack \
 		alloc/obstack/obj/newlib-r4k-alloc-obstack \
 		alloc/obstack/obj/newlib-kc160-alloc-obstack
 
-OBSTACK_OBJECTS = $(OBSTACK_CFILES:.c=.o) $(OBSTACK_AFILES:.asm=.o)
+OBSTACK_OBJECTS := $(OBSTACK_CFILES:.c=.o) $(OBSTACK_AFILES:.asm=.o)
 
-OBSTACK_OBJS = $(addprefix alloc/obstack/obj/z80/, $(OBSTACK_OBJECTS)) \
+OBSTACK_OBJS := $(addprefix alloc/obstack/obj/z80/, $(OBSTACK_OBJECTS)) \
 	$(addprefix alloc/obstack/obj/r2ka/,$(OBSTACK_OBJECTS)) \
 	$(addprefix alloc/obstack/obj/ixiy/,$(OBSTACK_OBJECTS)) \
 	$(addprefix alloc/obstack/obj/z80n/,$(OBSTACK_OBJECTS)) \

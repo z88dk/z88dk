@@ -1,6 +1,6 @@
 
-TIME_CFILES = $(notdir $(wildcard time/*.c))
-TIME_AFILES = $(notdir $(wildcard time/*.asm))
+TIME_CFILES := $(notdir $(wildcard time/*.c))
+TIME_AFILES := $(notdir $(wildcard time/*.asm))
 
 TIME_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/time/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/time/z80/*.asm"
 TIME_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/time/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/time/z80/*.asm
@@ -16,9 +16,9 @@ TIME_NEWLIB_TARGETS := time/obj/newlib-z80-time \
 		time/obj/newlib-r4k-time \
 		time/obj/newlib-kc160-time
 
-TIME_OBJECTS = $(TIME_CFILES:.c=.o) $(TIME_AFILES:.asm=.o)
+TIME_OBJECTS := $(TIME_CFILES:.c=.o) $(TIME_AFILES:.asm=.o)
 
-TIME_OBJS = $(addprefix time/obj/z80/, $(TIME_OBJECTS)) \
+TIME_OBJS := $(addprefix time/obj/z80/, $(TIME_OBJECTS)) \
 	$(addprefix time/obj/r2ka/,$(TIME_OBJECTS)) \
 	$(addprefix time/obj/ixiy/,$(TIME_OBJECTS)) \
 	$(addprefix time/obj/z80n/,$(TIME_OBJECTS)) \

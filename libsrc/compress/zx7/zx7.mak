@@ -1,11 +1,11 @@
 
-ZX7_CFILES = $(notdir $(wildcard compress/zx7/*.c))
-ZX7_AFILES = $(notdir $(wildcard compress/zx7/*.asm))
+ZX7_CFILES := $(notdir $(wildcard compress/zx7/*.c))
+ZX7_AFILES := $(notdir $(wildcard compress/zx7/*.asm))
 
 
-ZX7_OBJECTS = $(ZX7_CFILES:.c=.o) $(ZX7_AFILES:.asm=.o)
+ZX7_OBJECTS := $(ZX7_CFILES:.c=.o) $(ZX7_AFILES:.asm=.o)
 
-ZX7_OBJS = $(addprefix compress/zx7/obj/z80/, $(ZX7_OBJECTS)) \
+ZX7_OBJS := $(addprefix compress/zx7/obj/z80/, $(ZX7_OBJECTS)) \
 	$(addprefix compress/zx7/obj/r2ka/,$(ZX7_OBJECTS)) \
 	$(addprefix compress/zx7/obj/r4k/,$(ZX7_OBJECTS)) \
 	$(addprefix compress/zx7/obj/ixiy/,$(ZX7_OBJECTS)) \

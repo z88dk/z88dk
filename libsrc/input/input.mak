@@ -1,10 +1,10 @@
 
-INPUT_CFILES = $(notdir $(wildcard input/*.c))
-INPUT_AFILES = $(notdir $(wildcard input/*.asm))
+INPUT_CFILES := $(notdir $(wildcard input/*.c))
+INPUT_AFILES := $(notdir $(wildcard input/*.asm))
 
-INPUT_OBJECTS = $(INPUT_CFILES:.c=.o) $(INPUT_AFILES:.asm=.o)
+INPUT_OBJECTS := $(INPUT_CFILES:.c=.o) $(INPUT_AFILES:.asm=.o)
 
-INPUT_OBJS = $(addprefix input/obj/z80/, $(INPUT_OBJECTS)) \
+INPUT_OBJS := $(addprefix input/obj/z80/, $(INPUT_OBJECTS)) \
 	$(addprefix input/obj/r2ka/,$(INPUT_OBJECTS)) \
 	$(addprefix input/obj/ixiy/,$(INPUT_OBJECTS)) \
 	$(addprefix input/obj/z80n/,$(INPUT_OBJECTS)) \

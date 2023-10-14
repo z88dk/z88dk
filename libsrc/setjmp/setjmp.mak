@@ -1,10 +1,10 @@
 
-SETJMP_CFILES = $(notdir $(wildcard setjmp/*.c))
-SETJMP_AFILES = $(notdir $(wildcard setjmp/*.asm))
+SETJMP_CFILES := $(notdir $(wildcard setjmp/*.c))
+SETJMP_AFILES := $(notdir $(wildcard setjmp/*.asm))
 
-SETJMP_OBJECTS = $(SETJMP_CFILES:.c=.o) $(SETJMP_AFILES:.asm=.o)
+SETJMP_OBJECTS := $(SETJMP_CFILES:.c=.o) $(SETJMP_AFILES:.asm=.o)
 
-SETJMP_OBJS = $(addprefix setjmp/obj/z80/, $(SETJMP_OBJECTS)) \
+SETJMP_OBJS := $(addprefix setjmp/obj/z80/, $(SETJMP_OBJECTS)) \
 	$(addprefix setjmp/obj/r2ka/,$(SETJMP_OBJECTS)) \
 	$(addprefix setjmp/obj/r4k/,$(SETJMP_OBJECTS)) \
 	$(addprefix setjmp/obj/ixiy/,$(SETJMP_OBJECTS)) \

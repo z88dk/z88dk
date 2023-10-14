@@ -1,11 +1,11 @@
 
-QUEUE_CFILES = $(notdir $(wildcard adt/queue/*.c))
-QUEUE_AFILES = $(notdir $(wildcard adt/queue/*.asm))
+QUEUE_CFILES := $(notdir $(wildcard adt/queue/*.c))
+QUEUE_AFILES := $(notdir $(wildcard adt/queue/*.asm))
 
 
-QUEUE_OBJECTS = $(QUEUE_CFILES:.c=.o) $(QUEUE_AFILES:.asm=.o)
+QUEUE_OBJECTS := $(QUEUE_CFILES:.c=.o) $(QUEUE_AFILES:.asm=.o)
 
-QUEUE_OBJS = $(addprefix adt/queue/obj/z80/, $(QUEUE_OBJECTS)) \
+QUEUE_OBJS := $(addprefix adt/queue/obj/z80/, $(QUEUE_OBJECTS)) \
 	$(addprefix adt/queue/obj/r2ka/,$(QUEUE_OBJECTS)) \
 	$(addprefix adt/queue/obj/r4k/,$(QUEUE_OBJECTS)) \
 	$(addprefix adt/queue/obj/ixiy/,$(QUEUE_OBJECTS)) \

@@ -1,10 +1,10 @@
 
-RETROFIT_CFILES = $(notdir $(wildcard graphics/retrofit/*.c))
-RETROFIT_AFILES = $(notdir $(wildcard graphics/retrofit/*.asm))
+RETROFIT_CFILES := $(notdir $(wildcard graphics/retrofit/*.c))
+RETROFIT_AFILES := $(notdir $(wildcard graphics/retrofit/*.asm))
 
-RETROFIT_OBJECTS = $(RETROFIT_CFILES:.c=.o) $(RETROFIT_AFILES:.asm=.o)
+RETROFIT_OBJECTS := $(RETROFIT_CFILES:.c=.o) $(RETROFIT_AFILES:.asm=.o)
 
-RETROFIT_OBJS = $(addprefix graphics/retrofit/obj/z80/, $(RETROFIT_OBJECTS)) \
+RETROFIT_OBJS := $(addprefix graphics/retrofit/obj/z80/, $(RETROFIT_OBJECTS)) \
 	$(addprefix graphics/retrofit/obj/r2ka/,$(RETROFIT_OBJECTS)) \
 	$(addprefix graphics/retrofit/obj/r4k/,$(RETROFIT_OBJECTS)) \
 	$(addprefix graphics/retrofit/obj/ixiy/,$(RETROFIT_OBJECTS)) \

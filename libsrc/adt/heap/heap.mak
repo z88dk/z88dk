@@ -1,11 +1,11 @@
 
-HEAP_CFILES = $(notdir $(wildcard adt/heap/*.c))
-HEAP_AFILES = $(notdir $(wildcard adt/heap/*.asm))
+HEAP_CFILES := $(notdir $(wildcard adt/heap/*.c))
+HEAP_AFILES := $(notdir $(wildcard adt/heap/*.asm))
 
 
-HEAP_OBJECTS = $(HEAP_CFILES:.c=.o) $(HEAP_AFILES:.asm=.o)
+HEAP_OBJECTS := $(HEAP_CFILES:.c=.o) $(HEAP_AFILES:.asm=.o)
 
-HEAP_OBJS = $(addprefix adt/heap/obj/z80/, $(HEAP_OBJECTS)) \
+HEAP_OBJS := $(addprefix adt/heap/obj/z80/, $(HEAP_OBJECTS)) \
 	$(addprefix adt/heap/obj/r2ka/,$(HEAP_OBJECTS)) \
 	$(addprefix adt/heap/obj/r4k/,$(HEAP_OBJECTS)) \
 	$(addprefix adt/heap/obj/ixiy/,$(HEAP_OBJECTS)) \

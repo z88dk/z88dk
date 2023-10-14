@@ -1,11 +1,11 @@
 
-INT_IM2_CFILES = $(notdir $(wildcard interrupts/im2/*.c))
-INT_IM2_AFILES = $(notdir $(wildcard interrupts/im2/*.asm))
+INT_IM2_CFILES := $(notdir $(wildcard interrupts/im2/*.c))
+INT_IM2_AFILES := $(notdir $(wildcard interrupts/im2/*.asm))
 
 
-INT_IM2_OBJECTS = $(INT_IM2_CFILES:.c=.o) $(INT_IM2_AFILES:.asm=.o)
+INT_IM2_OBJECTS := $(INT_IM2_CFILES:.c=.o) $(INT_IM2_AFILES:.asm=.o)
 
-INT_IM2_OBJS = $(addprefix interrupts/im2/obj/z80/, $(INT_IM2_OBJECTS)) \
+INT_IM2_OBJS := $(addprefix interrupts/im2/obj/z80/, $(INT_IM2_OBJECTS)) \
 	$(addprefix interrupts/im2/obj/ixiy/,$(INT_IM2_OBJECTS)) \
 	$(addprefix interrupts/im2/obj/z80n/,$(INT_IM2_OBJECTS)) \
 	$(addprefix interrupts/im2/obj/z180/,$(INT_IM2_OBJECTS)) \

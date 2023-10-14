@@ -1,11 +1,11 @@
 
-STACK_CFILES = $(notdir $(wildcard adt/stack/*.c))
-STACK_AFILES = $(notdir $(wildcard adt/stack/*.asm))
+STACK_CFILES := $(notdir $(wildcard adt/stack/*.c))
+STACK_AFILES := $(notdir $(wildcard adt/stack/*.asm))
 
 
-STACK_OBJECTS = $(STACK_CFILES:.c=.o) $(STACK_AFILES:.asm=.o)
+STACK_OBJECTS := $(STACK_CFILES:.c=.o) $(STACK_AFILES:.asm=.o)
 
-STACK_OBJS = $(addprefix adt/stack/obj/z80/, $(STACK_OBJECTS)) \
+STACK_OBJS := $(addprefix adt/stack/obj/z80/, $(STACK_OBJECTS)) \
 	$(addprefix adt/stack/obj/r2ka/,$(STACK_OBJECTS)) \
 	$(addprefix adt/stack/obj/r4k/,$(STACK_OBJECTS)) \
 	$(addprefix adt/stack/obj/ixiy/,$(STACK_OBJECTS)) \

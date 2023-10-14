@@ -1,10 +1,10 @@
 
-REGEX_CFILES = $(notdir $(wildcard regex/*.c))
-REGEX_AFILES = $(notdir $(wildcard regex/*.asm))
+REGEX_CFILES := $(notdir $(wildcard regex/*.c))
+REGEX_AFILES := $(notdir $(wildcard regex/*.asm))
 
-REGEX_OBJECTS = $(REGEX_CFILES:.c=.o) $(REGEX_AFILES:.asm=.o)
+REGEX_OBJECTS := $(REGEX_CFILES:.c=.o) $(REGEX_AFILES:.asm=.o)
 
-REGEX_OBJS = $(addprefix regex/obj/z80/, $(REGEX_OBJECTS)) \
+REGEX_OBJS := $(addprefix regex/obj/z80/, $(REGEX_OBJECTS)) \
 	$(addprefix regex/obj/r2ka/,$(REGEX_OBJECTS)) \
 	$(addprefix regex/obj/ixiy/,$(REGEX_OBJECTS)) \
 	$(addprefix regex/obj/z80n/,$(REGEX_OBJECTS)) \

@@ -1,10 +1,10 @@
 
-SDCARD_CFILES = $(notdir $(wildcard sdcard/*.c))
-SDCARD_AFILES = $(notdir $(wildcard sdcard/*.asm))
+SDCARD_CFILES := $(notdir $(wildcard sdcard/*.c))
+SDCARD_AFILES := $(notdir $(wildcard sdcard/*.asm))
 
-SDCARD_OBJECTS = $(SDCARD_CFILES:.c=.o) $(SDCARD_AFILES:.asm=.o)
+SDCARD_OBJECTS := $(SDCARD_CFILES:.c=.o) $(SDCARD_AFILES:.asm=.o)
 
-SDCARD_OBJS = $(addprefix sdcard/obj/z80/, $(SDCARD_OBJECTS)) \
+SDCARD_OBJS := $(addprefix sdcard/obj/z80/, $(SDCARD_OBJECTS)) \
 	$(addprefix sdcard/obj/r2ka/,$(SDCARD_OBJECTS)) \
 	$(addprefix sdcard/obj/r4k/,$(SDCARD_OBJECTS)) \
 	$(addprefix sdcard/obj/ixiy/,$(SDCARD_OBJECTS)) \

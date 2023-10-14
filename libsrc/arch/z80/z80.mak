@@ -1,12 +1,12 @@
-ARCHZ80_AFILES = $(notdir $(wildcard arch/z80/*.asm))
-ARCHZ80_CFILES = $(notdir $(wildcard arch/z80/*.c))
+ARCHZ80_AFILES := $(notdir $(wildcard arch/z80/*.asm))
+ARCHZ80_CFILES := $(notdir $(wildcard arch/z80/*.c))
 
-ARCHZ80_R2KA_AFILES = 
-ARCHZ80_R2KA_CFILES = $(notdir $(wildcard arch/z80/*.c))
+ARCHZ80_R2KA_AFILES := 
+ARCHZ80_R2KA_CFILES := $(notdir $(wildcard arch/z80/*.c))
 
 
-ARCHZ80_OBJECTS = $(ARCHZ80_CFILES:.c=.o) $(ARCHZ80_AFILES:.asm=.o)
-ARCHZ80_R2KA_OBJECTS = $(ARCHZ80_R2KA_CFILES:.c=.o) $(ARCHZ80_R2KA_AFILES:.asm=.o)
+ARCHZ80_OBJECTS := $(ARCHZ80_CFILES:.c=.o) $(ARCHZ80_AFILES:.asm=.o)
+ARCHZ80_R2KA_OBJECTS := $(ARCHZ80_R2KA_CFILES:.c=.o) $(ARCHZ80_R2KA_AFILES:.asm=.o)
 
 ARCHZ80_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/z80/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/z80/z80/*.asm"
 ARCHZ80_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/z80/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/z80/z80/*.asm
@@ -16,9 +16,9 @@ ARCHZ80_NEWLIB_TARGETS := arch/z80/obj/newlib-z80-arch-z80 \
 		arch/z80/obj/newlib-z80n-arch-z80 \
 		arch/z80/obj/newlib-ixiy-arch-z80  
 
-ARCHZ80_OBJECTS = $(ARCHZ80_CFILES:.c=.o) $(ARCHZ80_AFILES:.asm=.o)
+ARCHZ80_OBJECTS := $(ARCHZ80_CFILES:.c=.o) $(ARCHZ80_AFILES:.asm=.o)
 
-ARCHZ80_OBJS = $(addprefix arch/z80/obj/z80/, $(ARCHZ80_OBJECTS)) \
+ARCHZ80_OBJS := $(addprefix arch/z80/obj/z80/, $(ARCHZ80_OBJECTS)) \
 	$(addprefix arch/z80/obj/ixiy/,$(ARCHZ80_OBJECTS)) \
 	$(addprefix arch/z80/obj/z80n/,$(ARCHZ80_OBJECTS)) \
 	$(addprefix arch/z80/obj/r2ka/, $(ARCHZ80_R2KA_OBJECTS)) \

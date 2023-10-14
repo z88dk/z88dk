@@ -1,11 +1,11 @@
 
-INT_NMI_CFILES = $(notdir $(wildcard interrupts/nmi/*.c))
-INT_NMI_AFILES = $(notdir $(wildcard interrupts/nmi/*.asm))
+INT_NMI_CFILES := $(notdir $(wildcard interrupts/nmi/*.c))
+INT_NMI_AFILES := $(notdir $(wildcard interrupts/nmi/*.asm))
 
 
-INT_NMI_OBJECTS = $(INT_NMI_CFILES:.c=.o) $(INT_NMI_AFILES:.asm=.o)
+INT_NMI_OBJECTS := $(INT_NMI_CFILES:.c=.o) $(INT_NMI_AFILES:.asm=.o)
 
-INT_NMI_OBJS = $(addprefix interrupts/nmi/obj/z80/, $(INT_NMI_OBJECTS)) \
+INT_NMI_OBJS := $(addprefix interrupts/nmi/obj/z80/, $(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/ixiy/,$(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/z80n/,$(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/8080/,$(INT_NMI_OBJECTS)) \

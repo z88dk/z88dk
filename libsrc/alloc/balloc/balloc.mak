@@ -1,6 +1,6 @@
 
-BALLOC_CFILES = $(notdir $(wildcard alloc/balloc/*.c))
-BALLOC_AFILES = $(notdir $(wildcard alloc/balloc/*.asm))
+BALLOC_CFILES := $(notdir $(wildcard alloc/balloc/*.c))
+BALLOC_AFILES := $(notdir $(wildcard alloc/balloc/*.asm))
 
 BALLOC_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/alloc/balloc/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/alloc/balloc/z80/*.asm"
 BALLOC_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/alloc/balloc/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/alloc/balloc/z80/*.asm
@@ -15,9 +15,9 @@ BALLOC_NEWLIB_TARGETS := alloc/balloc/obj/newlib-z80-alloc-balloc \
 		alloc/balloc/obj/newlib-kc160-alloc-balloc 
 
 
-BALLOC_OBJECTS = $(BALLOC_CFILES:.c=.o) $(BALLOC_AFILES:.asm=.o)
+BALLOC_OBJECTS := $(BALLOC_CFILES:.c=.o) $(BALLOC_AFILES:.asm=.o)
 
-BALLOC_OBJS = $(addprefix alloc/balloc/obj/z80/, $(BALLOC_OBJECTS)) \
+BALLOC_OBJS := $(addprefix alloc/balloc/obj/z80/, $(BALLOC_OBJECTS)) \
 	$(addprefix alloc/balloc/obj/r2ka/,$(BALLOC_OBJECTS)) \
 	$(addprefix alloc/balloc/obj/r4k/,$(BALLOC_OBJECTS)) \
 	$(addprefix alloc/balloc/obj/ixiy/,$(BALLOC_OBJECTS)) \

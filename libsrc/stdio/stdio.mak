@@ -1,31 +1,31 @@
 
 
 
-STDIO_CFILES = $(notdir $(wildcard stdio/*.c)) 
+STDIO_CFILES := $(notdir $(wildcard stdio/*.c)) 
 
-STDIO_NET_CFILES = $(STDIO_CFILES) \
+STDIO_NET_CFILES := $(STDIO_CFILES) \
 		$(patsubst %,zsock/%,$(notdir $(wildcard stdio/zsock/*.c)))
 
-STDIO_AFILES = $(notdir $(wildcard stdio/*.asm)) \
+STDIO_AFILES := $(notdir $(wildcard stdio/*.asm)) \
 		$(patsubst %,conio/%,$(notdir $(wildcard stdio/conio/*.asm))) \
 		$(patsubst %,ansi/%,$(notdir $(wildcard stdio/ansi/*.asm))) \
 		$(patsubst %,inkey/%,$(notdir $(wildcard stdio/inkey/*.asm))) \
 		$(patsubst %,ansi/generic/%,$(notdir $(wildcard stdio/ansi/generic/*.asm))) \
 		$(patsubst %,ansi/gencon/%,$(notdir $(wildcard stdio/ansi/gencon/*.asm)))
 
-STDIO_8080_AFILES = $(notdir $(wildcard stdio/*.asm))  \
+STDIO_8080_AFILES := $(notdir $(wildcard stdio/*.asm))  \
 		$(patsubst %,conio/%,$(notdir $(wildcard stdio/conio/*.asm))) \
 		$(patsubst %,inkey/%,$(notdir $(wildcard stdio/inkey/*.asm)))
 
-STDIO_GBZ80_AFILES = $(notdir $(filter-out $(wildcard stdio/*scanf*.asm),$(wildcard stdio/*.asm))) \
+STDIO_GBZ80_AFILES := $(notdir $(filter-out $(wildcard stdio/*scanf*.asm),$(wildcard stdio/*.asm))) \
 		$(patsubst %,conio/%,$(notdir $(wildcard stdio/conio/*.asm))) \
 		$(patsubst %,inkey/%,$(notdir $(wildcard stdio/inkey/*.asm)))
 
-STDIO_OBJECTS = $(STDIO_CFILES:.c=.o) $(STDIO_AFILES:.asm=.o)
-STDIO_8080_OBJECTS = $(STDIO_CFILES:.c=.o) $(STDIO_8080_AFILES:.asm=.o)
-STDIO_GBZ80_OBJECTS = $(STDIO_CFILES:.c=.o) $(STDIO_GBZ80_AFILES:.asm=.o)
+STDIO_OBJECTS := $(STDIO_CFILES:.c=.o) $(STDIO_AFILES:.asm=.o)
+STDIO_8080_OBJECTS := $(STDIO_CFILES:.c=.o) $(STDIO_8080_AFILES:.asm=.o)
+STDIO_GBZ80_OBJECTS := $(STDIO_CFILES:.c=.o) $(STDIO_GBZ80_AFILES:.asm=.o)
 
-STDIO_OBJS = $(addprefix stdio/obj/z80/, $(STDIO_OBJECTS)) \
+STDIO_OBJS := $(addprefix stdio/obj/z80/, $(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/z80/, $(STDIO_NET_CFILES:.c=.o)) \
 	$(addprefix stdio/obj/ixiy/,$(STDIO_OBJECTS)) \
 	$(addprefix stdio/obj/z80-binary/,$(STDIO_OBJECTS)) \

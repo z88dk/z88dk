@@ -1,11 +1,11 @@
 
-ASTAR_CFILES = $(notdir $(wildcard algorithm/AStarSearch/*.c))
-ASTAR_AFILES = $(notdir $(wildcard algorithm/AStarSearch/*.asm))
+ASTAR_CFILES := $(notdir $(wildcard algorithm/AStarSearch/*.c))
+ASTAR_AFILES := $(notdir $(wildcard algorithm/AStarSearch/*.asm))
 
 
-ASTAR_OBJECTS = $(ASTAR_CFILES:.c=.o) $(ASTAR_AFILES:.asm=.o)
+ASTAR_OBJECTS := $(ASTAR_CFILES:.c=.o) $(ASTAR_AFILES:.asm=.o)
 
-ASTAR_OBJS = $(addprefix algorithm/AStarSearch/obj/z80/, $(ASTAR_OBJECTS)) \
+ASTAR_OBJS := $(addprefix algorithm/AStarSearch/obj/z80/, $(ASTAR_OBJECTS)) \
 	$(addprefix algorithm/AStarSearch/obj/r2ka/,$(ASTAR_OBJECTS)) \
 	$(addprefix algorithm/AStarSearch/obj/r4k/,$(ASTAR_OBJECTS)) \
 	$(addprefix algorithm/AStarSearch/obj/ixiy/,$(ASTAR_OBJECTS)) \

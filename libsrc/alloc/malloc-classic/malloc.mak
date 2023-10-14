@@ -1,15 +1,15 @@
 
-MALLOC_CFILES = $(notdir $(wildcard alloc/malloc-classic/*.c))
-MALLOC_AFILES = $(notdir $(wildcard alloc/malloc-classic/*.asm))
+MALLOC_CFILES := $(notdir $(wildcard alloc/malloc-classic/*.c))
+MALLOC_AFILES := $(notdir $(wildcard alloc/malloc-classic/*.asm))
 
 MALLOC_NEWLIBGLOBS := 
 MALLOC_NEWLIBGLOBS_ex := 
 
 MALLOC_NEWLIB_TARGETS := 
 
-MALLOC_OBJECTS = $(MALLOC_CFILES:.c=.o) $(MALLOC_AFILES:.asm=.o)
+MALLOC_OBJECTS := $(MALLOC_CFILES:.c=.o) $(MALLOC_AFILES:.asm=.o)
 
-MALLOC_OBJS = $(addprefix alloc/malloc-classic/obj/z80/, $(MALLOC_OBJECTS)) \
+MALLOC_OBJS := $(addprefix alloc/malloc-classic/obj/z80/, $(MALLOC_OBJECTS)) \
 	$(addprefix alloc/malloc-classic/obj/r2ka/,$(MALLOC_OBJECTS)) \
 	$(addprefix alloc/malloc-classic/obj/r4k/,$(MALLOC_OBJECTS)) \
 	$(addprefix alloc/malloc-classic/obj/ixiy/,$(MALLOC_OBJECTS)) \

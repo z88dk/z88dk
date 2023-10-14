@@ -1,11 +1,11 @@
 
-X11_CFILES = $(notdir $(wildcard gfx/x11/*.c))
-X11_AFILES = $(notdir $(wildcard gfx/x11/*.asm))
+X11_CFILES := $(notdir $(wildcard gfx/x11/*.c))
+X11_AFILES := $(notdir $(wildcard gfx/x11/*.asm))
 
 
-X11_OBJECTS = $(X11_CFILES:.c=.o) $(X11_AFILES:.asm=.o)
+X11_OBJECTS := $(X11_CFILES:.c=.o) $(X11_AFILES:.asm=.o)
 
-X11_OBJS = $(addprefix gfx/x11/obj/z80/, $(X11_OBJECTS)) \
+X11_OBJS := $(addprefix gfx/x11/obj/z80/, $(X11_OBJECTS)) \
 	$(addprefix gfx/x11/obj/r2ka/,$(X11_OBJECTS)) \
 	$(addprefix gfx/x11/obj/ixiy/,$(X11_OBJECTS)) \
 	$(addprefix gfx/x11/obj/z80n/,$(X11_OBJECTS)) \
