@@ -411,10 +411,12 @@ void kc160_muls_hl(uint8_t opcode)
 // DE:HL = HL • DE
 void kc160_mul_de_hl(uint8_t opcode)
 {
-    uint32_t r = (d<<8)|e;
-    uint32_t result;
+    uint32_t x = (d<<8)|e;
+    uint32_t y = (h<<8)|l;
+    uint32_t result = x * y;
 
-    result = (( h * 256 ) + l) * r;
+
+    
     d = (result >> 24) & 0xff;
     e = (result >> 16) & 0xff;
     h  = (result >> 8 ) & 0xff;
@@ -426,11 +428,16 @@ void kc160_mul_de_hl(uint8_t opcode)
 void kc160_muls_de_hl(uint8_t opcode)
 {
     // DE:HL = HL • DE
-    int32_t result = (( (int32_t)(int8_t)d * 256 ) + e) * (( (int32_t)(int8_t)h * 256 ) + l);
+    int32_t x = (((int32_t)(int8_t)d) * 256) | (int8_t)e;
+    int32_t y = (((int32_t)(int8_t)h) * 256) | (int8_t)l;
+    int32_t result = x * y;
+
     d = (result >> 24) & 0xff;
     e = (result >> 16) & 0xff;
     h  = (result >> 8 ) & 0xff;
     l = result & 0xff;
+
+
 
     st += 19;
 }

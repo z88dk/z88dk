@@ -227,7 +227,7 @@ SHRITE: ADD     A,8+1           ; Adjust count
 SHRLP:  XOR     A               ; Flag for all done
         DEC     L               ; All shifting done?
         RET     Z               ; Yes - Return
-IF _CPU_Z80__
+IF !__CPU_INTEL__
 SHRT1:  RR      C               ; Get MSB, shift it right
         RR      D               ; Get NMSB,shift right with last bit
         RR      E               ; Get LSB, shift right with last bit
@@ -974,7 +974,7 @@ GTSIXD: CALL    DIV10           ; Divide by 10
 INRNG:  CALL    ROUND           ; Add 0.5 to FPREG
         INC     A
         CALL    FPINT           ; F.P to integer
-IF _CPU_Z80__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         LD      (FPREG),DE      ; Move BCDE to FPREG
         LD      (FPREG+2),BC
 ELSE
@@ -1251,7 +1251,7 @@ ENDIF
 SMSER1: CALL    STAKFP          ; Put value on stack
         LD      A,(HL)          ; Get number of coefficients
         INC     HL              ; Point to start of table
-IF __CPU_Z80_
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         LD      DE,FPREG        ; Move coefficient to FPREG
         LDI                     ; 4 bytes to move (HL++)->(DE++)
         LDI

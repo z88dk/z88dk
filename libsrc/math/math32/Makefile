@@ -48,7 +48,7 @@ $(OUTPUT_DIRECTORY)/math32_ez80_z80.lib: $(addprefix obj/ez80_z80/, $(OBJECTS))
 	TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -x$(OUTPUT_DIRECTORY)/math32_ez80_z80 @math32.lst
 
 $(OUTPUT_DIRECTORY)/math32_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))
-	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/kc160/x/x -I.. -mkc160 -D__CLASSIC @newlibfiles_z180.lst
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/kc160/x/x -I.. -mkc160 -D__CLASSIC @newlibfiles_kc160.lst
 	TYPE=kc160 $(LIBLINKER) -mkc160 -x$(OUTPUT_DIRECTORY)/math32_kc160 @math32.lst
 
 dirs:

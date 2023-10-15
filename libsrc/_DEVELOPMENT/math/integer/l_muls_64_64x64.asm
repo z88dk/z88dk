@@ -29,29 +29,20 @@ IF (__CPU_Z180__ || __CPU_EZ80__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMAT
    EXTERN l_z180_mulu_64_64x64
    defc l_muls_64_64x64 = l_z180_mulu_64_64x64
 
-ELSE
-
-IF __CPU_Z80N__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+ELIF __CPU_Z80N__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
    EXTERN l_z80n_mulu_64_64x64
    defc l_muls_64_64x64 = l_z80n_mulu_64_64x64
 
-ELSE
-
-IF __CLIB_OPT_IMATH <= 50
+ELIF __CLIB_OPT_IMATH <= 50
 
    EXTERN l_small_mul_64_64x64
    defc l_muls_64_64x64 = l_small_mul_64_64x64
 
-ENDIF
-
-IF __CLIB_OPT_IMATH > 50
+ELIF __CLIB_OPT_IMATH > 50
 
    EXTERN l_fast_mulu_64_64x64
    defc l_muls_64_64x64 = l_fast_mulu_64_64x64
 
 ENDIF
 
-ENDIF
-
-ENDIF

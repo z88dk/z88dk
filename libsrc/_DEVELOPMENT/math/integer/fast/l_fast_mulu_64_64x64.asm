@@ -32,22 +32,18 @@ l_fast_mulu_64_64x64:
 
    xor a
 
-   ld b,(ix+11)
-   ld c,(ix+10)
+   ld bc,(ix+10)
 
-   ld d,(ix+3)
-   ld e,(ix+2)
+   ld de,(ix+2)
 
    ld l,a
    ld h,a
 
    exx
 
-   ld b,(ix+9)
-   ld c,(ix+8)
+   ld bc,(ix+8)
 
-   ld d,(ix+1)
-   ld e,(ix+0)
+   ld de,(ix+0)
 
    ld l,a
    ld h,a
@@ -59,10 +55,8 @@ l_fast_mulu_64_64x64:
    push de
    push hl                     ; save LS32(B*D)
   
-   ld d,(ix+15)
-   ld e,(ix+14)
-   ld h,(ix+13)
-   ld l,(ix+12)
+   ld de,(ix+14)
+   ld hl,(ix+12)
 
    ld a,d
    or e
@@ -81,10 +75,8 @@ l_fast_mulu_64_64x64:
    push de
    push hl                     ; save MS32(B*D)
 
-   ld d,(ix+3)
-   ld e,(ix+2)
-   ld h,(ix+1)
-   ld l,(ix+0)
+   ld de,(ix+2)
+   ld hl,(ix+0)
 
    push ix
    call l_mulu_32_32x32        ; dehl = LS32(A*D)
@@ -93,17 +85,13 @@ l_fast_mulu_64_64x64:
    push de
    push hl                     ; save LS32(A*D)
 
-   ld d,(ix+11)
-   ld e,(ix+10)
-   ld h,(ix+9)
-   ld l,(ix+8)
+   ld de,(ix+10)
+   ld hl,(ix+8)
 
    exx
 
-   ld d,(ix+7)
-   ld e,(ix+6)
-   ld h,(ix+5)
-   ld l,(ix+4)
+   ld de,(ix+6)
+   ld hl,(ix+4)
 
    push ix
    call l_mulu_32_32x32        ; dehl = LS32(B*C)

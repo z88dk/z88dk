@@ -31,22 +31,18 @@ l_small_mul_64_64x64:
    
    xor a
    
-   ld b,(ix+11)
-   ld c,(ix+10)
+   ld bc,(ix+10)
    
-   ld d,(ix+3)
-   ld e,(ix+2)
+   ld de,(ix+2)
    
    ld l,a
    ld h,a
    
    exx
    
-   ld b,(ix+9)
-   ld c,(ix+8)
+   ld bc,(ix+8)
    
-   ld d,(ix+1)
-   ld e,(ix+0)
+   ld de,(ix+0)
    
    ld l,a
    ld h,a
@@ -58,11 +54,9 @@ l_small_mul_64_64x64:
    push de
    push hl                     ; save LS32(B*D)
    
-   ld b,(ix+13)
-   ld c,(ix+12)
+   ld bc,(ix+12)
    
-   ld d,(ix+1)
-   ld e,(ix+0)
+   ld de,(ix+0)
    
    ld hl,0
    
@@ -71,8 +65,7 @@ l_small_mul_64_64x64:
    
    exx
    
-   ld b,(ix+15)
-   ld c,(ix+14)
+   ld bc,(ix+14)
    
    or b
    or c
@@ -86,8 +79,7 @@ l_small_mul_64_64x64:
    push de
    push hl                     ; save MS32(B*D)
 
-   ld d,(ix+3)
-   ld e,(ix+2)
+   ld de,(ix+2)
    
    ld hl,0
    
@@ -98,22 +90,18 @@ l_small_mul_64_64x64:
    
    xor a
    
-   ld b,(ix+9)
-   ld c,(ix+8)
+   ld bc,(ix+8)
    
-   ld d,(ix+5)
-   ld e,(ix+4)
+   ld de,(ix+4)
    
    ld l,a
    ld h,a
    
    exx
    
-   ld b,(ix+11)
-   ld c,(ix+10)
+   ld bc,(ix+10)
    
-   ld d,(ix+7)
-   ld e,(ix+6)
+   ld de,(ix+6)
    
    ld l,a
    ld h,a
