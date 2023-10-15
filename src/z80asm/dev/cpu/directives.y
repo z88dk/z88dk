@@ -6,43 +6,20 @@
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# labels
+# EQU / DEFC
 #------------------------------------------------------------------------------
 
-IDENT :
-	{	string label = m_line.peek(-2).svalue();
-		g_asm.cur_section()->add_label(label);
-	}
+. IDENT [equ|=]
+	parse_equ(m_line.peek(start_stmt_index() + 1).svalue());
 
-. IDENT
-	{	string label = m_line.peek(-1).svalue();
-		g_asm.cur_section()->add_label(label);
-	}
+IDENT : [equ|=]
+	parse_equ(m_line.peek(start_stmt_index()).svalue());
 
-#------------------------------------------------------------------------------
-# EQU
-#------------------------------------------------------------------------------
+IDENT [equ|=]
+	parse_equ(m_line.peek(start_stmt_index()).svalue());
 
-. IDENT [equ|=] EXPR $
-	{	string name = m_line.peek(start_stmt_index() + 1).svalue();
-		auto symbol = make_shared<Symbol>(Symbol::MakeComputed(), 
-										  name, m_exprs.back());
-		g_symbols.add(symbol);
-	}
-
-IDENT : [equ|=] EXPR $
-	{	string name = m_line.peek(start_stmt_index()).svalue();
-		auto symbol = make_shared<Symbol>(Symbol::MakeComputed(), 
-										  name, m_exprs.back());
-		g_symbols.add(symbol);
-	}
-
-IDENT [equ|=] EXPR $
-	{	string name = m_line.peek(start_stmt_index()).svalue();
-		auto symbol = make_shared<Symbol>(Symbol::MakeComputed(), 
-										  name, m_exprs.back());
-		g_symbols.add(symbol);
-	}
+[defc|dc] 
+	parse_defc();
 
 #------------------------------------------------------------------------------
 # symbol declaration
@@ -95,4 +72,3 @@ org CONST_EXPR $
 
 section
 	while (!m_line.at_end()) m_line.next();
-

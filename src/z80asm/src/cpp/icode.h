@@ -31,8 +31,11 @@ class Instr;						// instructions
 template<class Child>
 class child_list {
 public:
-	auto begin() { return m_list.begin(); }
-	auto end() { return m_list.end(); }
+    auto begin() { return m_list.begin(); }
+    auto end() { return m_list.end(); }
+    auto cbegin() const { return m_list.cbegin(); }
+    auto cend() const { return m_list.cend(); }
+    auto size() const { return m_list.size(); }
 
 	// find by name, return nullptr if not found; sets m_current
 	shared_ptr<Child> find(const string& name) {
@@ -101,6 +104,8 @@ public:
 	void add_byte(int n);
 	void do_patch(shared_ptr<Patch> patch);
 
+    friend ostream& operator<<(ostream& os, const Instr& instr);
+
 private:
 	Section* m_section{ nullptr };
 	int		m_asmpc{ UndefinedAsmpc };
@@ -147,6 +152,8 @@ public:
 	void check_relative_jumps();
 	void patch_local_exprs();
 
+    friend ostream& operator<<(ostream& os, const Section& section);
+
 private:
 	string	m_name;
 	Module*	m_module{ nullptr };
@@ -178,6 +185,8 @@ public:
 	void patch_local_exprs();
 	void check_undefined_symbols();
 
+    friend ostream& operator<<(ostream& os, const Module& module);
+
 private:
 	string	m_name;					// module name
 	Object* m_object{ nullptr };	// parent
@@ -204,6 +213,8 @@ public:
 	void patch_local_exprs();
 	void check_undefined_symbols();
 	void write_obj_file();
+
+    friend ostream& operator<<(ostream& os, const Object& obj);
 
 private:
 	string m_filename;

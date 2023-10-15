@@ -36,6 +36,8 @@ public:
 	shared_ptr<Section> cur_section() { return m_object->cur_module()->cur_section(); }
 	void set_cur_section(const string& name);
 
+    friend ostream& operator<<(ostream& os, const Asm& asm_);
+
 private:
     bool                m_is_active{ false };
 	Parser				m_parser;

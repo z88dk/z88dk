@@ -259,19 +259,23 @@ string Args::reloc_filename(const string& bin_filename) {
 void Args::parse_option(const string& arg) {
 	string opt_arg;
 
+    if (arg == "-vv")
+        m_debug_verbose = true;
+    else {
 #define OPT(opt_name, opt_param, opt_code, opt_help)					\
-	if (opt_param == nullptr && string(opt_name) == arg) {				\
-		opt_code;														\
-		return;															\
-	}																	\
-	else if (opt_param != nullptr &&									\
-			 collect_opt_arg(opt_name, arg, opt_arg)) {					\
-		opt_code;														\
-		return;															\
-	}																	
+	    if (opt_param == nullptr && string(opt_name) == arg) {				\
+		    opt_code;														\
+		    return;															\
+	    }																	\
+	    else if (opt_param != nullptr &&									\
+			     collect_opt_arg(opt_name, arg, opt_arg)) {					\
+		    opt_code;														\
+		    return;															\
+	    }																	
 #include "args.def"
 
-	g_errors.error(ErrCode::IllegalOption, arg);
+        g_errors.error(ErrCode::IllegalOption, arg);
+    }
 }
 
 // return false if cannot parse integer

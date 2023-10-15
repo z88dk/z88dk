@@ -309,6 +309,23 @@ void swrite_string(const string& s, ostream& os) {
 	os.write(s.c_str(), s.size());
 }
 
+//---------------------------------------------------------------------------
+static int indent_level = 0;
+
+void indent() {
+    indent_level += 2;
+}
+
+void outdent() {
+    indent_level -= 2;
+    if (indent_level < 0)
+        indent_level = 0;
+}
+
+string indent_prefix() {
+    return string(indent_level, ' ');
+}
+
 //-----------------------------------------------------------------------------
 // string table
 //-----------------------------------------------------------------------------

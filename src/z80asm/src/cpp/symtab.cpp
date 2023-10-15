@@ -57,6 +57,11 @@ Symbol::Symbol(MakeComputed /*tag*/, const string& name, shared_ptr<Expr> expr, 
 	, m_expr(expr)
 	, m_type(Type::Computed), m_scope(scope)
 	, m_location(g_preproc.location()) {
+    ExprResult r = expr->eval_silent();
+    if (r.is_const()) {
+        m_type = Type::Constant;
+        m_value = r.value();
+    }
 }
 
 void Symbol::update(const Symbol& other) {
@@ -130,6 +135,12 @@ ExprResult Symbol::value() const {
 	return r;
 }
 
+ostream& operator<<(ostream& os, const Symbol& symbol) {
+    os << "Symbol { name=" << '"' << symbol.m_name << '"' << " value=" << symbol.value().value()
+        << "}" << endl;
+    return os;
+}
+
 //-----------------------------------------------------------------------------
 
 bool Symtab::insert(shared_ptr<Symbol> symbol) {
@@ -167,6 +178,29 @@ void Symtab::check_undefined_symbols() {
 			g_errors.pop_location();
 		}
 	}
+}
+
+shared_ptr<Symbol> Symtab::use(const string& name) {
+    shared_ptr<Symbol> symbol = find(name);
+    if (!symbol) {
+        symbol = make_shared<Symbol>(Symbol::MakeUndef(), name);
+        insert(symbol);
+    }
+    symbol->set_touched(true);
+    return symbol;
+}
+
+ostream& operator<<(ostream& os, const Symtab& symtab) {
+    os << indent_prefix() << "Symtab:" << endl;
+    {
+        indent();
+        for (auto it = symtab.m_table.begin(); it != symtab.m_table.end(); ++it) {
+            os << indent_prefix() << it->first << "="
+                << int_to_hex(it->second->value().value(), 4) << endl;
+        }
+        outdent();
+    }
+    return os;
 }
 
 //-----------------------------------------------------------------------------
@@ -456,14 +490,25 @@ void Symbols::declare_extern(const string& name) {
 	}
 }
 
-shared_ptr<Symbol> Symtab::use(const string& name) {
-	shared_ptr<Symbol> symbol = find(name);
-	if (!symbol) {
-        symbol = make_shared<Symbol>(Symbol::MakeUndef(), name);
-		insert(symbol);
-	}
-	symbol->set_touched(true);
-	return symbol;
+ostream& operator<<(ostream& os, const Symbols& symbols) {
+    os << indent_prefix() << "Symbols:" << endl;
+    {
+        indent();
+        os << indent_prefix() << "Defines:" << endl;
+        {
+            indent();
+            os << symbols.m_defines;
+            outdent();
+        }
+        os << indent_prefix() << "Globals:" << endl;
+        {
+            indent();
+            os << symbols.m_globals;
+            outdent();
+        }
+        outdent();
+    }
+    return os;
 }
 
 //-----------------------------------------------------------------------------

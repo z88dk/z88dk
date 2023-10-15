@@ -144,13 +144,11 @@ void OFileWriter::write_expr(const string& target_name, shared_ptr<Instr> instr,
     swrite_int32(m_string_table.add_string(patch->expr()->section()->name()), os);
 
     if (instr) {
-        Assert(instr);
         swrite_int32(instr->asmpc(), os);			        // ASMPC
         swrite_int32(instr->asmpc() + patch->offset(), os); // code position
         swrite_int32(instr->size(), os);                    // opcode size
     }
     else {
-        Assert(!instr);
         swrite_int32(0, os);			            // ASMPC
         swrite_int32(0, os);			            // code position
         swrite_int32(0, os);                        // opcode size

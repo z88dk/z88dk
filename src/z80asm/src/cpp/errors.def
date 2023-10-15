@@ -38,6 +38,7 @@ X(InvalidCharConst, "invalid character constant")
 // parser
 X(ColonExpected, "colon expected")
 X(CommaExpected, "comma expected")
+X(EqExpected, "'=' expected")
 X(IntOrIdentExpected, "integer or identifier expected")
 X(IdentExpected, "identifier expected")
 X(EolExpected, "end of line expected")

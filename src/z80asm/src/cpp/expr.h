@@ -338,6 +338,8 @@ public:
 
     static shared_ptr<Expr> make_expr(const string& text);      // parse text and build expression
 
+    friend ostream& operator<<(ostream& os, const Expr& expr);
+
 private:
 	shared_ptr<ExprNode> m_root;			// root node of expression
 	Location			m_location;			// location where defined
@@ -407,6 +409,8 @@ public:
 	Type type() const override { return Type::BYTE_UNSIGNED; }
 	int size() const override { return 1; }
 	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
+
+    friend ostream& operator<<(ostream& os, const UBytePatch& patch);
 };
 
 class SBytePatch : public Patch {
@@ -415,6 +419,8 @@ public:
 	Type type() const override { return Type::BYTE_SIGNED; }
 	int size() const override { return 1; }
 	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
+
+    friend ostream& operator<<(ostream& os, const SBytePatch& patch);
 };
 
 class WordPatch : public Patch {
@@ -423,6 +429,8 @@ public:
 	Type type() const override { return Type::WORD; }
 	int size() const override { return 2; }
 	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
+
+    friend ostream& operator<<(ostream& os, const WordPatch& patch);
 };
 
 class BEWordPatch : public Patch {
@@ -431,6 +439,8 @@ public:
 	Type type() const override { return Type::WORD_BE; }
 	int size() const override { return 2; }
 	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
+
+    friend ostream& operator<<(ostream& os, const BEWordPatch& patch);
 };
 
 class Ptr24Patch : public Patch {
@@ -439,6 +449,8 @@ public:
 	Type type() const override { return Type::PTR24; }
 	int size() const override { return 3; }
 	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
+
+    friend ostream& operator<<(ostream& os, const Ptr24Patch& patch);
 };
 
 class DWordPatch : public Patch {
@@ -447,6 +459,8 @@ public:
 	Type type() const override { return Type::DWORD; }
 	int size() const override { return 4; }
 	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
+
+    friend ostream& operator<<(ostream& os, const DWordPatch& patch);
 };
 
 class JrOffsetPatch : public Patch {
@@ -455,6 +469,8 @@ public:
 	Type type() const override { return Type::JR_OFFSET; }
 	int size() const override { return 1; }
 	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
+
+    friend ostream& operator<<(ostream& os, const JrOffsetPatch& patch);
 };
 
 class JreOffsetPatch : public Patch {
@@ -463,6 +479,8 @@ public:
 	Type type() const override { return Type::JRE_OFFSET; }
 	int size() const override { return 2; }
 	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
+
+    friend ostream& operator<<(ostream& os, const JreOffsetPatch& patch);
 };
 
 class UByte2WordPatch : public Patch {
@@ -471,6 +489,8 @@ public:
 	Type type() const override { return Type::BYTE_TO_WORD_UNSIGNED; }
 	int size() const override { return 2; }
 	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
+
+    friend ostream& operator<<(ostream& os, const UByte2WordPatch& patch);
 };
 
 class SByte2WordPatch : public Patch {
@@ -479,6 +499,8 @@ public:
 	Type type() const override { return Type::BYTE_TO_WORD_SIGNED; }
 	int size() const override { return 2; }
 	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
+
+    friend ostream& operator<<(ostream& os, const SByte2WordPatch& patch);
 };
 
 class HighOffsetPatch : public Patch {
@@ -487,4 +509,6 @@ public:
 	Type type() const override { return Type::HIGH_OFFSET; }
 	int size() const override { return 1; }
 	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
+
+    friend ostream& operator<<(ostream& os, const HighOffsetPatch& patch);
 };

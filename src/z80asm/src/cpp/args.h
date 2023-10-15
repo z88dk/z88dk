@@ -21,6 +21,7 @@ public:
 
 	// options
 	bool verbose() const { return m_verbose; }
+	bool debug_verbose() const { return m_debug_verbose; }
 	swap_ixiy_t swap_ixiy() const { return m_swap_ixiy; }
     void set_swap_ixiy(swap_ixiy_t swap_ixiy);
 	bool ucase() const { return m_ucase; }
@@ -74,6 +75,7 @@ public:
 private:
 	// options
 	bool			m_verbose{ false };			// -v option
+    bool            m_debug_verbose{ false };   // -vv option
     swap_ixiy_t     m_swap_ixiy{ IXIY_NO_SWAP };// -IXIY, -IXIY-soft options
 	bool			m_ucase{ false };			// -ucase option
     bool            m_raw_strings{ false };     // -raw-strings option

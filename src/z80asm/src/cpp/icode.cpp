@@ -63,6 +63,36 @@ bool Instr::is_relative_jump() const {
 	return m_patches.size() == 1 && m_patches[0]->type() == Patch::Type::JR_OFFSET;
 }
 
+ostream& operator<<(ostream& os, const Instr& instr) {
+    os << indent_prefix() << "Instr:" << endl;
+    {
+        indent();
+        os << indent_prefix() << "asmpc=" << int_to_hex(instr.m_asmpc, 4) << endl
+            << indent_prefix() << "asmpc_phased=" << int_to_hex(instr.m_asmpc_phased, 4) << endl
+            << indent_prefix() << "location=" << instr.m_location << endl
+            << indent_prefix() << "bytes=";
+        for (size_t i = 0; i < instr.m_bytes.size(); i++)
+            os << int_to_hex(instr.m_bytes[i], 2) << " ";
+        os << endl
+            << indent_prefix() << "Patches:" << endl;
+        {
+            indent();
+            for (size_t i = 0; i < instr.m_patches.size(); i++) {
+                os << indent_prefix() << "[" << i << "]:" << endl;
+                {
+                    indent();
+                    os << *(instr.m_patches[i]);
+                    outdent();
+                }
+                outdent();
+            }
+            outdent();
+        }
+        outdent();
+    }
+    return os;
+}
+
 //-----------------------------------------------------------------------------
 
 Section::Section(const string& name, Module* module)
@@ -331,6 +361,33 @@ void Section::update_asmpc(int start) {
 	}
 }
 
+ostream& operator<<(ostream& os, const Section& section) {
+    os << indent_prefix() << "Section:" << endl;
+    {
+        indent();
+        os << indent_prefix() << "name=" << '"' << section.m_name << '"' << endl
+            << indent_prefix() << "origin=" << int_to_hex(section.m_origin, 4) << endl
+            << indent_prefix() << "align=" << int_to_hex(section.m_align, 2) << endl
+            << indent_prefix() << "Instrs:" << endl;
+        {
+            indent();
+            size_t i = 0;
+            for (auto& instr : section.m_instrs) {
+                os << indent_prefix() << "[" << i << "]" << endl;
+                {
+                    indent();
+                    os << *instr;
+                    outdent();
+                }
+                i++;
+            }
+            outdent();
+        }
+        outdent();
+    }
+    return os;
+}
+
 //-----------------------------------------------------------------------------
 
 Module::Module(const string& name, Object* object)
@@ -358,6 +415,33 @@ void Module::patch_local_exprs() {
 
 void Module::check_undefined_symbols() {
 	m_symtab.check_undefined_symbols();
+}
+
+ostream& operator<<(ostream& os, const Module& module) {
+    os << indent_prefix() << "Module:" << endl;
+    {
+        indent();
+        os << indent_prefix() << "name=" << '"' << module.m_name << '"' << endl;
+        os << module.m_symtab;
+        os << indent_prefix() << "Sections:" << endl;
+        {
+            indent();
+            size_t i = 0;
+            for (auto it = module.m_sections.cbegin(); it != module.m_sections.cend(); ++it) {
+                auto section = *it;
+                os << indent_prefix() << "[" << i << "]:" << endl;
+                {
+                    indent();
+                    os << *section;
+                    outdent();
+                }
+                i++;
+            }
+            outdent();
+        }
+        outdent();
+    }
+    return os;
 }
 
 //-----------------------------------------------------------------------------
@@ -398,4 +482,30 @@ void Object::check_undefined_symbols() {
 void Object::write_obj_file() {
     OFileWriter ofile(g_args.o_filename(m_filename));
     ofile.write();
+}
+
+ostream& operator<<(ostream& os, const Object& obj) {
+    os << indent_prefix() << "Object:" << endl;
+    {
+        indent();
+        os << indent_prefix() << "filename=" << '"' << obj.m_filename << '"' << endl;
+        os << indent_prefix() << "modules:" << endl;
+        {
+            indent();
+            size_t i = 0;
+            for (auto it = obj.m_modules.cbegin(); it != obj.m_modules.cend(); ++it) {
+                auto module = *it;
+                os << indent_prefix() << "[" << i << "]:" << endl;
+                {
+                    indent();
+                    os << *module;
+                    outdent();
+                }
+                i++;
+            }
+            outdent();
+        }
+        outdent();
+    }
+    return os;
 }

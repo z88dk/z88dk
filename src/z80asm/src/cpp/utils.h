@@ -120,6 +120,11 @@ void swrite_string(const string& s, ostream& os);
 int sread_int32(istream& is);
 string sread_string(istream& is);
 
+// debug ouptut
+void indent();
+void outdent();
+string indent_prefix();
+
 //-----------------------------------------------------------------------------
 // string table
 //-----------------------------------------------------------------------------

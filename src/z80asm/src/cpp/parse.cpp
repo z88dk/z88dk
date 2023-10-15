@@ -22,11 +22,23 @@ void Parser::clear() {
 
 void Parser::parse() {
 	while (g_preproc.getline(m_line)) {
-        if (g_args.verbose())
+        if (g_args.debug_verbose())
             cout << g_preproc.location().filename() << ":" << g_preproc.location().line_num()
             << ": " << m_line.text();
 		parse_line();
+        if (g_args.debug_verbose())
+            cout << g_asm << g_symbols;
 	}
+}
+
+void Parser::error(ErrCode code) {
+    error(code, m_line.peek_text());
+}
+
+void Parser::error(ErrCode code, const string& arg) {
+    g_errors.error(code, arg);
+    while (!m_line.at_end())
+        m_line.next();
 }
 
 void Parser::parse_line() {
@@ -49,10 +61,44 @@ void Parser::parse_line_main() {
 			m_line.next();
 			break;
 		default:
+            if (parse_label())
+                continue;
             m_start_stmt = m_line.pos();
 			parse_main();
 		}
     }
+}
+
+void Parser::check_eol() {
+    switch (m_line.peek().type()) {
+    case TType::End:
+        return;
+    case TType::Newline:
+        m_line.next();
+        return;
+    default:
+        error(ErrCode::EolExpected);
+        return;
+    }
+}
+
+bool Parser::parse_label() {
+    if (m_line.peek(0).type() == TType::Dot &&
+        m_line.peek(1).type() == TType::Ident &&
+        !m_line.peek(2).is(Keyword::EQU, TType::Eq)) {
+        m_line.next(2);
+        add_label(m_line.peek(-1).svalue());
+        return true;
+    }
+    else if (m_line.peek(0).type() == TType::Ident &&
+        m_line.peek(1).type() == TType::Colon &&
+        !m_line.peek(2).is(Keyword::EQU, TType::Eq)) {
+        m_line.next(2);
+        add_label(m_line.peek(-2).svalue());
+        return true;
+    }
+    else
+        return false;
 }
 
 void Parser::parse_symbol_declare(Symbol::Scope scope) {
@@ -60,9 +106,10 @@ void Parser::parse_symbol_declare(Symbol::Scope scope) {
 		// get identifier
 		Token& token = m_line.peek();
 		if (token.type() != TType::Ident) {
-			g_errors.error(ErrCode::IdentExpected, m_line.peek_text());
+			error(ErrCode::IdentExpected);
 			return;
 		}
+
 		g_symbols.declare(token.svalue(), scope);
 
 		// get comma or end
@@ -72,14 +119,9 @@ void Parser::parse_symbol_declare(Symbol::Scope scope) {
 		case TType::Comma:
 			m_line.next();
 			continue;
-		case TType::End:
+        default:
+            check_eol();
             return;
-		case TType::Newline:
-			m_line.next();
-			return;
-		default:
-			g_errors.error(ErrCode::EolExpected, m_line.peek_text());
-			return;
 		}
 	}
 }
@@ -149,6 +191,59 @@ void Parser::parse_int32_data() {
     parse_data<DWordPatch>(m_line);
 }
 
+void Parser::parse_defc() {
+    while (true) {
+        // collect name
+        Token& token = m_line.peek();
+        if (!token.is(TType::Ident)) {
+            error(ErrCode::IdentExpected);
+            break;
+        }
+        string name = m_line.peek().svalue();
+        m_line.next();
+
+        // collect =
+        token = m_line.peek();
+        if (!token.is(TType::Eq)) {
+            error(ErrCode::EqExpected);
+            break;
+        }
+        m_line.next();
+
+        // collect expression
+        auto expr = make_shared<Expr>();
+        if (!expr->parse(m_line)) {
+            break;
+        }
+
+        // create symbol
+        do_equ(name, expr);
+
+        // check for another
+        token = m_line.peek();
+        switch (token.type()) {
+        case TType::Comma:
+            m_line.next();
+            continue;
+        default:
+            check_eol();
+            return;
+        }
+    }
+}
+
+void Parser::parse_equ(const string& name) {
+    // collect expression
+    auto expr = make_shared<Expr>();
+    if (expr->parse(m_line)) {
+
+        // create symbol
+        do_equ(name, expr);
+
+        check_eol();
+    }
+}
+
 void Parser::do_defs_n() {
     Assert(m_const_exprs.size() == 1);
     g_asm.cur_section()->add_defs(m_const_exprs.back(), g_args.filler());
@@ -162,6 +257,11 @@ void Parser::do_defs_n_n() {
 void Parser::do_defs_n_str(const string& filler) {
     Assert(m_const_exprs.size() == 1);
     g_asm.cur_section()->add_defs(m_const_exprs.back(), filler);
+}
+
+void Parser::do_equ(const string& name, shared_ptr<Expr> expr) {
+    auto symbol = make_shared<Symbol>(Symbol::MakeComputed(), name, expr);
+    g_symbols.add(symbol);
 }
 
 bool Parser::expr_in_parens() {
@@ -443,7 +543,7 @@ void Parser::add_z80n_mmu_n() {
 
 	int c = r.value();
 	if (c < 0 || c > 7)
-		g_errors.error(ErrCode::IntRange, int_to_hex(c, 2));
+		error(ErrCode::IntRange, int_to_hex(c, 2));
 	else {
 		auto instr = g_asm.cur_section()->add_opcode(Z80N_MMU_N(c));
 		auto patch = make_shared<UBytePatch>(m_exprs[1]);
@@ -459,7 +559,7 @@ void Parser::add_z80n_mmu_a() {
 
 	int c = r.value();
 	if (c < 0 || c > 7)
-		g_errors.error(ErrCode::IntRange, int_to_hex(c, 2));
+		error(ErrCode::IntRange, int_to_hex(c, 2));
 	else
 		auto instr = g_asm.cur_section()->add_opcode(Z80N_MMU_A(c));
 }
@@ -469,7 +569,7 @@ void Parser::add_restart() {
 
 	ExprResult r = m_exprs.back()->eval_noisy();
     if (!r.is_const()) {
-        g_errors.error(ErrCode::ConstExprExpected);
+        error(ErrCode::ConstExprExpected);
     }
     else {
         int addr = r.value();
@@ -489,21 +589,9 @@ void Parser::add_restart() {
             add_opcode(Z80_RST(addr));
             break;
         default:
-            g_errors.error(ErrCode::IntRange, int_to_hex(addr, 2));
+            error(ErrCode::IntRange, int_to_hex(addr, 2));
         }
     }
-}
-
-void Parser::error_syntax() {
-    g_errors.error(ErrCode::Syntax);
-}
-
-void Parser::error_illegal_ident() {
-    g_errors.error(ErrCode::IllegalIdent);
-}
-
-void Parser::error_int_range(int n) {
-    g_errors.error(ErrCode::IntRange, int_to_hex(n, 2));
 }
 
 void Parser::warn_if_expr_in_parens() {
@@ -512,5 +600,5 @@ void Parser::warn_if_expr_in_parens() {
 }
 
 void Parser::error_expr_not_in_parens() {
-    g_errors.error(ErrCode::ExprNotInParens);
+    error(ErrCode::ExprNotInParens);
 }

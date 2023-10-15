@@ -33,17 +33,24 @@ private:
 
     int start_stmt_index() const { return m_start_stmt - m_line.pos(); }
 
+    void error(ErrCode code);
+    void error(ErrCode code, const string& arg);
 	void parse_line();
 	void parse_line_main();
+    void check_eol();
+    bool parse_label();
 	void parse_symbol_declare(Symbol::Scope scope);
     void parse_int8_data();
     void parse_int16_data();
     void parse_int16be_data();
     void parse_int24_data();
     void parse_int32_data();
+    void parse_defc();
+    void parse_equ(const string& name);
     void do_defs_n();
     void do_defs_n_n();
     void do_defs_n_str(const string& filler);
+    void do_equ(const string& name, shared_ptr<Expr> expr);
 
 	bool expr_in_parens();
 
@@ -72,9 +79,6 @@ private:
 	void add_z80n_mmu_a();
 	void add_restart();
 
-    void error_syntax();
-    void error_illegal_ident();
-    void error_int_range(int n);
     void warn_if_expr_in_parens();
     void error_expr_not_in_parens();
 

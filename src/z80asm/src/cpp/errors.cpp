@@ -37,6 +37,11 @@ void Location::clear() {
     m_is_c_source = false;
 }
 
+ostream& operator<<(ostream& os, const Location& location) {
+    os << location.m_filename << ":" << location.m_line_num;
+    return os;
+}
+
 //-----------------------------------------------------------------------------
 
 Errors::Errors()
