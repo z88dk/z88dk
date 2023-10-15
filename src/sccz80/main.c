@@ -303,8 +303,9 @@ int main(int argc, char** argv)
 
 
 
-    outstr("; --- Start of Optimiser additions ---\n\n");
+    gen_switch_section("UNKNOWN");
     gen_switch_section(c_code_section);
+    outstr("; --- Start of Optimiser additions ---\n\n");
     /* dump literal queues, with label */
     /* litq starts from 1, so literp has to be -1 */
     dumplits(0, YES, litptr - 1, litlab, litq + 1);
