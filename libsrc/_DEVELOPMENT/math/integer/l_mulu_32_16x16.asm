@@ -24,7 +24,12 @@ ELIF __CPU_Z80N__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
    EXTERN l_z80n_mulu_32_16x16
    defc l_mulu_32_16x16 = l_z80n_mulu_32_16x16
 
-ELIF ( __CPU_RABBIT__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+ELIF (__CPU_R4K__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+
+   EXTERN l_r4k_mulu_32_16x16
+   defc l_mulu_32_16x16 = l_r4k_mulu_32_16x16
+
+ELIF (__CPU_R2KA__) && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
    EXTERN l_r2ka_mulu_32_16x16
    defc l_mulu_32_16x16 = l_r2ka_mulu_32_16x16
