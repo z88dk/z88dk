@@ -24,7 +24,7 @@
 ._kek3
 	defw	_a + 4
 	SECTION	code_compiler
-	SECTION	UNKNOWN
+	SECTION	bss_compiler
 	SECTION	code_compiler
 
 

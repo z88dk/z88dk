@@ -22,7 +22,7 @@
 	defw	i_1+0
 	defw	i_1+2
 	SECTION	code_compiler
-	SECTION	UNKNOWN
+	SECTION	bss_compiler
 	SECTION	code_compiler
 
 	SECTION	rodata_compiler

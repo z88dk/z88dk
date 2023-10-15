@@ -6,7 +6,7 @@
 	INCLUDE "z80_crt0.hdr"
 
 
-	SECTION	UNKNOWN
+	SECTION	bss_compiler
 	SECTION	code_compiler
 
 

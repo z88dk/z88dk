@@ -22,7 +22,7 @@
 	defw	2
 	defw	3
 	SECTION	code_compiler
-	SECTION	UNKNOWN
+	SECTION	bss_compiler
 	SECTION	code_compiler
 
 

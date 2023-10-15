@@ -79,7 +79,7 @@
 	ret
 
 
-	SECTION	UNKNOWN
+	SECTION	bss_compiler
 	SECTION	code_compiler
 	defc	i_7 = i_3
 

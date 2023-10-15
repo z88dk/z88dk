@@ -91,7 +91,7 @@
 	ret
 
 
-	SECTION	UNKNOWN
+	SECTION	bss_compiler
 	SECTION	code_compiler
 
 
