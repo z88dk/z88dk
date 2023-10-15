@@ -13,10 +13,10 @@ PUBLIC l_asr_u
 ; Exit:  hl = result
 ;
 .l_asr_u
-	ex	de,hl
+    ex  de,hl
 .l_asr_u_1
-	dec	e
-        ret     m
-        and     a
-	defb	0xfc	; rr hl
-        jp      l_asr_u_1
+    dec e
+    ret m
+    and a
+    rr hl
+    jp  l_asr_u_1

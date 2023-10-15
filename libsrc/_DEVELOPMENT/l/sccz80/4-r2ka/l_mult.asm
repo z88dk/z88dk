@@ -12,8 +12,8 @@ PUBLIC  l_mult_0
 
 .l_mult
 .l_mult_u
-    ld      bc,hl
+    ld  bc,hl
 .l_mult_0
-    defb    0xf7    ; mul : hlbc = bc * de
-    ld      hl,bc
+    mul             ; hlbc = bc * de
+    ld  hl,bc
     ret
