@@ -163,12 +163,12 @@ shared_ptr<Instr> Section::add_label_(const string& name) {
 	else
 		symbol = make_shared<Symbol>(Symbol::MakeAsmpc(), name, instr);
 
-	shared_ptr<Symbol> label = g_symbols.add(symbol);
-	if (label)			// not duplicate symbol
-		label->set_touched();
+    shared_ptr<Symbol> label = g_symbols.add(symbol);
+    if (label)			    // not duplicate symbol
+        label->set_touched();
 
-	add_instr(instr);
-	return instr;
+    add_instr(instr);
+    return instr;
 }
 
 shared_ptr<Instr> Section::add_label(const string& name) {

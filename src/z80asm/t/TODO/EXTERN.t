@@ -10,8 +10,22 @@ for my $extern (qw( extern xref lib )) {
 	z80asm_nok("", "", <<END, <<END);
 		$extern
 END
-$test.asm:1: error: syntax error
+$test.asm:1: error: identifier expected
   ^---- $extern
+END
+
+	z80asm_nok("", "", <<END, <<END);
+		$extern aa,
+END
+$test.asm:1: error: identifier expected
+  ^---- $extern aa,
+END
+
+	z80asm_nok("", "", <<END, <<END);
+		$extern aa.
+END
+$test.asm:1: error: end of line expected: .
+  ^---- $extern aa.
 END
 
 spew("$test.asm", <<END);

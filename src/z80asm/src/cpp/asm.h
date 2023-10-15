@@ -36,12 +36,16 @@ public:
 	shared_ptr<Section> cur_section() { return m_object->cur_module()->cur_section(); }
 	void set_cur_section(const string& name);
 
+    shared_ptr<Instr> asmpc_instr() { return m_asmpc_instr; }
+    void add_asmpc_instr();
+
     friend ostream& operator<<(ostream& os, const Asm& asm_);
 
 private:
     bool                m_is_active{ false };
 	Parser				m_parser;
 	shared_ptr<Object>	m_object;
+    shared_ptr<Instr>   m_asmpc_instr;              // asmpc of current instruction
     int					m_start_errors{ 0 };		// errors at start of assembly
 
 	// controler

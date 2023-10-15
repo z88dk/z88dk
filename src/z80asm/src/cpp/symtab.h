@@ -80,6 +80,8 @@ public:
 
 	ExprResult value() const;
 
+    friend ostream& operator<<(ostream& os, const Symbol& symbol);
+
 private:
 	string	m_name;					// name
 	int		m_value{ 0 };			// value if Constant

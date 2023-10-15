@@ -107,6 +107,10 @@ void Asm::set_cur_section(const string& name) {
 	cur_module()->add_section(name);
 }
 
+void Asm::add_asmpc_instr() {
+    m_asmpc_instr = g_asm.cur_section()->add_asmpc();
+}
+
 bool Asm::got_errors() {
 	return m_start_errors != g_errors.count();
 }

@@ -243,29 +243,6 @@ Define rules for a ragel-based parser.
 					   asm_XDEF | asm_XLIB | asm_XREF | asm_LIB;
 
 	/*---------------------------------------------------------------------
-	*   DEFC, DC, EQU, =
-	*--------------------------------------------------------------------*/
-#foreach <OP> in DEFC, DC
-	asm_<OP>_iter =
-			asm_<OP>_next:
-				name _TK_EQUAL expr (_TK_COMMA | _TK_NEWLINE)
-				@{	DO_STMT_LABEL();
-					asm_DEFC(Str_data(name), pop_expr(ctx));
-					if ( ctx->p->tok == TK_COMMA )
-						fgoto asm_<OP>_next;
-				};
-	asm_<OP> = label? _TK_<OP> asm_<OP>_iter ;
-#endfor  <OP>
-
-	asm_EQU = name (_TK_EQU | _TK_EQUAL) expr _TK_NEWLINE
-				@{	asm_DEFC(Str_data(name), pop_expr(ctx)); }
-			| label (_TK_EQU | _TK_EQUAL) expr _TK_NEWLINE
-				@{	asm_DEFC(Str_data(stmt_label), pop_expr(ctx)); }
-			;
-	
-	directives_assign = asm_DEFC | asm_DC | asm_EQU;
-
-	/*---------------------------------------------------------------------
 	*   Z88DK specific opcodes
 	*--------------------------------------------------------------------*/
 #foreach <OP> in CALL_OZ, CALL_PKG, FPP, INVOKE
@@ -318,7 +295,7 @@ Define rules for a ragel-based parser.
 		  _TK_END
 		| _TK_NEWLINE
 		| directives_no_args
-		| directives_name | directives_names | directives_assign
+		| directives_name | directives_names 
 		| asm_Z88DK
 		| asm_DEFGROUP
 		| asm_DEFVARS

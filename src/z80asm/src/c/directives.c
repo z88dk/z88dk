@@ -267,51 +267,6 @@ void asm_UNDEFINE(const char* name)
 }
 
 /*-----------------------------------------------------------------------------
-*   define a constant or expression
-*----------------------------------------------------------------------------*/
-void asm_DEFC(const char* name, Expr1* expr)
-{
-    Section1* cur_section = CURRENTSECTION;
-
-	int value = Expr_eval(expr, false);		/* DEFC constant expression */
-
-    /* if expression depends on one single symbol and constants, set the target
-       in the same section - #2418 */
-    Section1* used_section = NULL;
-    if (Expr_depends_on_one_symbol(expr, &used_section)) {
-        expr->section = used_section;
-        set_cur_section(used_section);
-    }
-
-	/* if expression is difference of two addresses in the same
-	   section, convert it to a constant */
-    if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
-	{
-		/* check if expression depends on itself */
-		if (Expr_is_recusive(expr, name)) {
-			error_expr_recursion(name);
-		}
-		else {
-			/* store in object file to be computed at link time */
-			expr->range = RANGE_ASSIGNMENT;
-			expr->target_name = spool_add(name);
-
-			Expr1List_push(&CURRENTMODULE->exprs, expr);
-
-			/* create symbol */
-			define_symbol(expr->target_name, 0, TYPE_COMPUTED);
-		}
-	}
-	else
-	{
-		define_symbol(name, value, TYPE_CONSTANT);
-		OBJ_DELETE(expr);
-	}
-
-    set_cur_section(cur_section);
-}
-
-/*-----------------------------------------------------------------------------
 *   DEFS - create a block of empty bytes, called by the DEFS directive
 *----------------------------------------------------------------------------*/
 void asm_DEFS(int count, int fill)
@@ -324,49 +279,12 @@ void asm_DEFS(int count, int fill)
 		append_defs(count, fill);
 }
 
-void asm_DEFS_str(int count, const char* str, int len)
-{
-	if (count < 0 || count > 0x10000)
-		error_int_range(count);
-    else if (count < len)
-		error_string_too_long();
-    else {
-        int zeros = count - len;
-        while (len-- > 0)
-            add_opcode((*str++) & 0xFF);
-        while (zeros-- > 0)
-            add_opcode(option_filler());
-    }
-}
-
-
 /*-----------------------------------------------------------------------------
 *   DEFB - add an expression or a string
 *----------------------------------------------------------------------------*/
-void asm_DEFB_str(const char* str, int length)
-{
-	while (length-- > 0)
-		add_opcode((*str++) & 0xFF);
-}
-
 void asm_DEFB_expr(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
-}
-
-void asm_DEFP(Expr1* expr)
-{
-	Pass2infoExpr(RANGE_PTR24, expr);
-}
-
-void asm_PTR(Expr1* expr)
-{
-	asm_DEFP(expr);
-}
-
-void asm_DP(Expr1* expr)
-{
-	asm_DEFP(expr);
 }
 
 /*-----------------------------------------------------------------------------
@@ -375,41 +293,6 @@ void asm_DP(Expr1* expr)
 void asm_DEFW(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_WORD, expr);
-}
-
-void asm_WORD(Expr1* expr)
-{
-	asm_DEFW(expr);
-}
-
-void asm_DW(Expr1* expr)
-{
-	asm_DEFW(expr);
-}
-
-void asm_DEFDB(Expr1* expr)
-{
-	Pass2infoExpr(RANGE_WORD_BE, expr);
-}
-
-void asm_DDB(Expr1* expr)
-{
-	asm_DEFDB(expr);
-}
-
-void asm_DEFQ(Expr1* expr)
-{
-	Pass2infoExpr(RANGE_DWORD, expr);
-}
-
-void asm_DWORD(Expr1* expr)
-{
-	asm_DEFQ(expr);
-}
-
-void asm_DQ(Expr1* expr)
-{
-	asm_DEFQ(expr);
 }
 
 void asm_ALIGN(int align, int filler)

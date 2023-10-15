@@ -938,7 +938,7 @@ shared_ptr<ExprNode> Expr::parse_primary() {
             return node;
         }
 	case TType::ASMPC:
-		instr = g_asm.cur_section()->add_asmpc();
+        instr = g_asm.asmpc_instr();
 		node = make_shared<AsmpcNode>(instr);
 		next();
 		return node;

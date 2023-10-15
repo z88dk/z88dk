@@ -145,13 +145,11 @@ void OFileWriter::write_expr(const string& target_name, shared_ptr<Instr> instr,
     swrite_int32(m_string_table.add_string(patch->expr()->section()->name()), os);
 
     if (instr) {
-        xassert(instr);
         swrite_int32(instr->asmpc(), os);			        // ASMPC
         swrite_int32(instr->asmpc() + patch->offset(), os); // code position
         swrite_int32(instr->size(), os);                    // opcode size
     }
     else {
-        xassert(!instr);
         swrite_int32(0, os);			            // ASMPC
         swrite_int32(0, os);			            // code position
         swrite_int32(0, os);                        // opcode size
@@ -185,8 +183,19 @@ void OFileWriter::write_symbols(Symtab& symtab, ofstream& os) {
         auto symbol = it.second;
 
         if (symbol->type() != Symbol::Type::Undef) {
-            // write scope
-            swrite_int32(static_cast<int>(symbol->scope()), os);
+            // write scope - see objfile.c for magic numbers
+            switch (symbol->scope()) {
+            case Symbol::Scope::None:       xassert(0); break;
+            case Symbol::Scope::Local:      swrite_int32(static_cast<int>(symbol->scope()), os); break;
+            case Symbol::Scope::Public:     swrite_int32(static_cast<int>(symbol->scope()), os); break;
+            case Symbol::Scope::Extern:     swrite_int32(static_cast<int>(symbol->scope()), os); break;
+            case Symbol::Scope::Global:
+                if (symbol->type() == Symbol::Type::Undef)
+                    swrite_int32(static_cast<int>(Symbol::Scope::Extern), os);
+                else
+                    swrite_int32(static_cast<int>(Symbol::Scope::Public), os);
+                break;
+            }
 
             // write type - see objfile.c for magic numbers
             switch (symbol->type()) {

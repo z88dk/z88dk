@@ -66,33 +66,14 @@ extern void asm_XLIB(const char* name);
 extern void asm_DEFINE(const char* name);
 extern void asm_UNDEFINE(const char* name);
 
-/* define a constant or expression */
-extern void asm_DEFC(const char* name, struct Expr1* expr);
-
 /* create a block of empty bytes, called by the DEFS directive */
 extern void asm_DEFS(int count, int fill);
-extern void asm_DEFS_str(int count, const char* str, int len);
 
 /* DEFB - add an expression or a string */
-extern void asm_DEFB_str(const char* str, int length);
 extern void asm_DEFB_expr(struct Expr1* expr);
-
-/* 24-bit pointers */
-extern void asm_DEFP(struct Expr1* expr);
-extern void asm_PTR(struct Expr1* expr);
-extern void asm_DP(struct Expr1* expr);
 
 /* DEFW, DEFQ, DEFDB - add 2-byte and 4-byte expressions */
 extern void asm_DEFW(struct Expr1* expr);
-extern void asm_WORD(struct Expr1* expr);
-extern void asm_DW(struct Expr1* expr);
-
-extern void asm_DEFDB(struct Expr1* expr);	// big-endian word
-extern void asm_DDB(struct Expr1* expr);		// big-endian word
-
-extern void asm_DEFQ(struct Expr1* expr);
-extern void asm_DWORD(struct Expr1* expr);
-extern void asm_DQ(struct Expr1* expr);
 
 /* align directive */
 extern void asm_ALIGN(int align, int filler);
