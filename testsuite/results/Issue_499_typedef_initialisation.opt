@@ -22,6 +22,8 @@
 	defw	2
 	defw	3
 	SECTION	code_compiler
+	SECTION	UNKNOWN
+	SECTION	code_compiler
 
 
 

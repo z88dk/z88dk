@@ -522,6 +522,8 @@
 	ret
 
 
+	SECTION	UNKNOWN
+	SECTION	code_compiler
 
 	SECTION	rodata_compiler
 .i_1

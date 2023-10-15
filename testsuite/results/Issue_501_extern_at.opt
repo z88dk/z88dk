@@ -38,8 +38,9 @@
 	ld	de,_buf
 	ld	bc,12
 	ldir
-
+	SECTION	UNKNOWN
 	SECTION	code_compiler
+
 
 
 	SECTION	bss_compiler

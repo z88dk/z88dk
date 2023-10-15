@@ -20,6 +20,8 @@
 	defw	4
 	defw	5
 	SECTION	code_compiler
+	SECTION	UNKNOWN
+	SECTION	code_compiler
 
 
 
