@@ -239,6 +239,8 @@ rebuild:
 	cp ../z80asm/z88dk-z80asm$(EXESUFFIX) ../../bin/
 	$(MAKE) -C ../z80nm
 	cp ../z80nm/z88dk-z80nm$(EXESUFFIX) ../../bin/
+	$(MAKE) -C ../zcc all
+	cp ../zcc/zcc$(EXESUFFIX) ../../bin/
 	$(MAKE) -C ../ticks all
 	cp ../ticks/z88dk-dis$(EXESUFFIX) ../../bin/
 	cp ../ticks/z88dk-ticks$(EXESUFFIX) ../../bin/
