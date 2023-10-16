@@ -54,7 +54,7 @@ DEPENDS		:= $(C_SRCS:.c=.d) $(CXX_SRCS:.cpp=.d)
 all: $(PROJ)$(EXESUFFIX)
 
 $(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
-	$(CXX) -o $(PROJ)$(EXESUFFIX) $(OBJS) $(LDFLAGS)
+	$(CXX) -o $(PROJ)$(EXESUFFIX) $(OBJS) $(LDFLAGS) -lstdc++fs
 
 ../config.h:
 	@echo \#define PREFIX \"/usr/local/share/z88dk\" 				 > $@
