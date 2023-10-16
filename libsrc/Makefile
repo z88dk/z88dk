@@ -212,7 +212,7 @@ TARGET_CLIB_OBJS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS)
 # Arg2: Graphics flavour
 define buildgeneric
 	$(MAKE) -C gfx TARGET=$(1) FLAVOUR=$(if $(2),$(2),narrow)
-	$(MAKE) -C psg TARGET=$(1)
+	$(MAKE) -C psg TARGET=$(1) 
 endef
 
 define buildcrt
@@ -864,7 +864,7 @@ gfxace.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=ace FLAVOUR="text narrow"
 	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -x$(OUTPUT_DIRECTORY)/gfxace @$(TARGET_DIRECTORY)/ace/gfxace.lst
 
-gfxaceudg.lib: $(TARGET_CLIB_OBJS)
+gfxaceudg.lib: $(TARGET_CLIB_OBJS) gfxace.lib
 	@echo ''
 	@echo '--- Building Jupiter Ace UDG based Graphics Library ---'
 	@echo ''
@@ -1053,7 +1053,7 @@ gfxep.lib: $(TARGET_CLIB_OBJS)
 	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/gfxep @$(TARGET_DIRECTORY)/enterprise/gfxep.lst
 
 # Enterprise HRG graphics lib - Stefano
-gfxephr.lib: $(TARGET_CLIB_OBJS)
+gfxephr.lib: $(TARGET_CLIB_OBJS) gfxep.lib
 	@echo ''
 	@echo '--- Building Enterprise 64/128 High Resolution Graphics Library ---'
 	@echo ''
@@ -1206,7 +1206,7 @@ z80_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=z80 TYPE=z80 $(LIBLINKER2) -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/z80_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Barebone z80 (ixiy swapped)clib
-ixiy_clib.lib: $(TARGET_CLIB_OBJS)
+ixiy_clib.lib: $(TARGET_CLIB_OBJS) z80_clib.lib
 	@echo ''
 	@echo '--- Building +z80 (ixiy) Library ---'
 	@echo ''
@@ -1214,7 +1214,7 @@ ixiy_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=z80 TYPE=ixiy $(LIBLINKER2) -IXIY -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/ixiy_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Barebone z80/8080 clib
-8080_clib.lib: $(TARGET_CLIB_OBJS)
+8080_clib.lib: $(TARGET_CLIB_OBJS) ixiy_clib.lib
 	@echo ''
 	@echo '--- Building +z80 (8080) Library ---'
 	@echo ''
@@ -1222,7 +1222,7 @@ ixiy_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=z80 TYPE=8080 $(LIBLINKER2) -m8080 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8080_clib @$(TARGET_DIRECTORY)/z80/808x.lst
 
 # Barebone z80/8085 clib
-8085_clib.lib: $(TARGET_CLIB_OBJS)
+8085_clib.lib: $(TARGET_CLIB_OBJS) 8080_clib.lib
 	@echo ''
 	@echo '--- Building +z80 (8085) Library ---'
 	@echo ''
@@ -1230,7 +1230,7 @@ ixiy_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=z80 TYPE=8085 $(LIBLINKER2) -m8085 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8085_clib @$(TARGET_DIRECTORY)/z80/808x.lst
 
 # Barebone z80/r2ka clib
-r2ka_clib.lib: $(TARGET_CLIB_OBJS)
+r2ka_clib.lib: $(TARGET_CLIB_OBJS) 8085_clib.lib
 	@echo ''
 	@echo '--- Building +z80 (r2ka) Library ---'
 	@echo ''
@@ -1238,7 +1238,7 @@ r2ka_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=z80 TYPE=r2ka $(LIBLINKER2) -mr2ka -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/r2ka_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Barebone z80/r4k clib
-r4k_clib.lib: $(TARGET_CLIB_OBJS)
+r4k_clib.lib: $(TARGET_CLIB_OBJS) r2ka_clib.lib
 	@echo ''
 	@echo '--- Building +z80 (r4k) Library ---'
 	@echo ''
@@ -1246,7 +1246,7 @@ r4k_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=z80 TYPE=r4k $(LIBLINKER2) -mr4k -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/r4k_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Barebone z80/kc160 clib
-kc160_clib.lib: $(TARGET_CLIB_OBJS)
+kc160_clib.lib: $(TARGET_CLIB_OBJS) r4k_clib.lib
 	@echo ''
 	@echo '--- Building +z80 (kc160) Library ---'
 	@echo ''
@@ -1515,7 +1515,7 @@ gl_clib.lib: $(TARGET_CLIB_OBJS)
 
 
 # Genius Leader 6000 - dom
-gl6000_clib.lib: $(TARGET_CLIB_OBJS)
+gl6000_clib.lib: $(TARGET_CLIB_OBJS) gl_clib.lib
 	@echo ''
 	@echo '--- Building Genius Leader 6000 Library ---'
 	@echo ''
@@ -1542,7 +1542,7 @@ gfxnc100.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=nc FLAVOUR="wide"
 	TARGET=nc TYPE=z80 $(LIBLINKER) -DFORnc100 -x$(OUTPUT_DIRECTORY)/gfxnc100 @$(TARGET_DIRECTORY)/nc100/gfxnc.lst
 
-gfxzcn.lib: $(TARGET_CLIB_OBJS)
+gfxzcn.lib: $(TARGET_CLIB_OBJS) gfxnc100.lib
 	@echo ''
 	@echo '--- Building NC-100 Graphics Library (ZCN)---'
 	@echo ''
@@ -1550,7 +1550,7 @@ gfxzcn.lib: $(TARGET_CLIB_OBJS)
 	TARGET=zcn TYPE=z80 $(LIBLINKER) -DFORnc100 -DFORzcn -x$(OUTPUT_DIRECTORY)/gfxzcn @$(TARGET_DIRECTORY)/nc100/gfxnc.lst
 
 # NC-200 graphics lib - Stefano
-gfxnc200.lib: $(TARGET_CLIB_OBJS)
+gfxnc200.lib: $(TARGET_CLIB_OBJS) gfxzcn.lib
 	@echo ''
 	@echo '--- Building NC-200 Graphics Library ---'
 	@echo ''
@@ -1611,7 +1611,7 @@ gfx128.lib: $(TARGET_CLIB_OBJS)
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/gfx128 @$(TARGET_DIRECTORY)/c128/gfx128.lst
 
 # C128 LO-REZ UDG mode graphics lib - Stefano
-gfx128udg.lib: $(TARGET_CLIB_OBJS)
+gfx128udg.lib: $(TARGET_CLIB_OBJS) gfx128.lib
 	@echo ''
 	@echo '--- Building Commodore 128 UDG Based Graphics Library ---'
 	@echo ''
@@ -1622,7 +1622,7 @@ gfx128udg.lib: $(TARGET_CLIB_OBJS)
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128udg -x$(OUTPUT_DIRECTORY)/gfx128udg @$(TARGET_DIRECTORY)/c128/gfx128udg.lst
 
 # C128 HRG graphics lib - Stefano
-gfx128hr.lib: $(TARGET_CLIB_OBJS)
+gfx128hr.lib: $(TARGET_CLIB_OBJS) gfx128udg.lib
 	@echo ''
 	@echo '--- Building Commodore 128 High Resolution Graphics Library ---'
 	@echo ''
@@ -1632,7 +1632,7 @@ gfx128hr.lib: $(TARGET_CLIB_OBJS)
 	TARGET=c128hr TYPE=z80 $(LIBLINKER) -DFORc128hr -x$(OUTPUT_DIRECTORY)/gfx128hr @$(TARGET_DIRECTORY)/c128/gfx128hr.lst
 
 # C128 640x480 HRG graphics lib - Stefano
-gfx128hr480.lib: $(TARGET_CLIB_OBJS)
+gfx128hr480.lib: $(TARGET_CLIB_OBJS) gfx128hr.lib
 	@echo ''
 	@echo '--- Building Commodore 128 640x480 HRG Library ---'
 	@echo ''
@@ -1773,7 +1773,7 @@ testrcm4k_clib.lib: $(TARGET_CLIB_OBJS) testrcm_clib.lib
 	$(call buildgeneric,test)
 	TARGET=test TYPE=r4k $(LIBLINKER2) -mr4k -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm4k_clib @$(TARGET_DIRECTORY)/test/testrcm.lst
 
-test8080_clib.lib: $(TARGET_CLIB_OBJS) testrcm_clib.lib
+test8080_clib.lib: $(TARGET_CLIB_OBJS) testrcm4k_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (8080) ---'
 	@echo ''
@@ -1813,7 +1813,7 @@ gfxtrs80.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="text6 narrow"
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(TARGET_DIRECTORY)/trs80/gfxtrs80.lst
 
-gfxtrs80m2.lib: $(TARGET_CLIB_OBJS)
+gfxtrs80m2.lib: $(TARGET_CLIB_OBJS) gfxtrs80.lib
 	@echo ''
 	@echo '--- Building TRS 80 Model II GFX Libraries ---'
 	@echo ''
@@ -1822,28 +1822,28 @@ gfxtrs80m2.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="text6 narrow" SUBTYPE=trs80m2
 	TARGET=trs80m2 TYPE=z80 $(LIBLINKER) -DFORtrs80m2 -x$(OUTPUT_DIRECTORY)/gfxtrs80m2 @$(TARGET_DIRECTORY)/trs80/gfxtrs80m2.lst
 
-gfxtrs80m4.lib: $(TARGET_CLIB_OBJS)
+gfxtrs80m4.lib: $(TARGET_CLIB_OBJS) gfxtrs80m2.lib
 	@echo ''
 	@echo '--- Building TRS 80 Model 4 GFX Libraries ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="text6 narrow" SUBTYPE=trs80m4
 	TARGET=trs80m4 TYPE=z80 $(LIBLINKER) -DFORtrs80m4 -x$(OUTPUT_DIRECTORY)/gfxtrs80m4 @$(TARGET_DIRECTORY)/trs80/gfxtrs80m4.lst
 
-gfxeg2000.lib: $(TARGET_CLIB_OBJS)
+gfxeg2000.lib: $(TARGET_CLIB_OBJS) gfxtrs80m4.lib
 	@echo ''
 	@echo '--- Building EG2000 GFX Libraries ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="narrow" SUBTYPE=eg2000
 	TARGET=eg2000 TYPE=z80 $(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(TARGET_DIRECTORY)/trs80/gfxeg2000.lst
 
-gfxhrg1.lib: $(TARGET_CLIB_OBJS)
+gfxhrg1.lib: $(TARGET_CLIB_OBJS) gfxeg2000.lib
 	@echo ''
 	@echo '--- Building HRG1 TRS80 Model I Libraries ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=hrg1
 	TARGET=hrg1 TYPE=z80 $(LIBLINKER) -DFORhrg1 -x$(OUTPUT_DIRECTORY)/gfxhrg1 @$(TARGET_DIRECTORY)/trs80/gfxhrg1.lst
 
-grafyx4_3.lib: $(TARGET_CLIB_OBJS)
+grafyx4_3.lib: $(TARGET_CLIB_OBJS) gfxhrg1.lib
 	@echo ''
 	@echo '--- Building GrafyxSolution (M4 on Model III) Libraries ---'
 	@echo ''
@@ -1851,7 +1851,7 @@ grafyx4_3.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=grafyx3
 	TARGET=grafyx3 TYPE=z80 $(LIBLINKER) -DFORgrafyx3 -x$(OUTPUT_DIRECTORY)/grafyx4_3 @$(TARGET_DIRECTORY)/trs80/grafyx.lst
 
-grafyx4.lib: $(TARGET_CLIB_OBJS)
+grafyx4.lib: $(TARGET_CLIB_OBJS) grafyx4_3.lib
 	@echo ''
 	@echo '--- Building GrafyxSolution (M4 on Model 4) Libraries ---'
 	@echo ''
