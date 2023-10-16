@@ -1,11 +1,12 @@
 #!/usr/bin/env perl
 
-use Modern::Perl;
-use Path::Tiny;
+use strict;
+use warnings;
 
 # check if we need boost::filesystem
 my $file = "build_ldflags$$";
-path("$file.cpp")->spew(<<END);
+open(my $fh, ">", "$file.cpp") or die "open $file.cpp:$!";
+print $fh <<END;
 #if __has_include(<filesystem>)	// std::filesystem from C++17
 #ifdef WIN32
 #if CROSS == 1
