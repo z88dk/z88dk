@@ -416,11 +416,12 @@ bool Args::collect_opt_arg(const string& opt_name, const string& arg,
 	}
 }
 
-void Args::parse_file(const string& arg) {
-	if (arg.empty())
-		return;
+void Args::parse_file(const string& arg_) {
+    string arg = str_strip(unquote(arg_));
+    if (arg.empty())
+        return;
 
-	if (arg[0] == '@')
+    if (arg[0] == '@')
 		expand_list_glob(arg.substr(1));
 	else
 		expand_source_glob(arg);
@@ -468,7 +469,20 @@ void Args::expand_list_glob(const string& pattern) {
 				if (g_preproc.open(file.generic_string(), false)) {
 					ScannedLine line;
 					while (g_preproc.get_unpreproc_line(line)) {
-						parse_args_in_text(expand_env_vars(line.text()));
+                        string text = str_strip(unquote(expand_env_vars(line.text())));
+                        if (!text.empty()) {
+                            switch (text[0]) {
+                            case ';':
+                            case '#':
+                                break;  // comment
+                            case '-':
+                            case '+':
+                                parse_option(text); // option
+                                break;
+                            default:
+                                parse_file(text);
+                            }
+                        }
 					}
 				}
 			}
