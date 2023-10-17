@@ -1363,7 +1363,7 @@ super80_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C games TARGET=super80
 	TARGET=super80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsuper80 -x$(OUTPUT_DIRECTORY)/super80_clib @$(TARGET_DIRECTORY)/super80/super80.lst
 
-super80_vduem_clib.lib: $(TARGET_CLIB_OBJS)
+super80_vduem_clib.lib: $(TARGET_CLIB_OBJS) super80_vduem_clib.lib
 	@echo ''
 	@echo '--- Building Super80 VDUEM Library ---'
 	@echo ''
@@ -2145,7 +2145,7 @@ z180_crt0.lib: $(DIRS) $(OBJS) ez80_z80_crt0.lib
 	$(call buildcrt)
 	TYPE=z180 $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z180_crt0 @$(LISTFILE_DIRECTORY)/z180.lst
 
-z80iy_crt0.lib: $(DIRS) $(OBJS) z80_crt0.lib
+z80iy_crt0.lib: $(DIRS) $(OBJS) z180_crt0.lib
 	@echo ''
 	@echo '--- Building ixiy crt Library ---'
 	@echo ''
@@ -2173,7 +2173,7 @@ z80iy_crt0.lib: $(DIRS) $(OBJS) z80_crt0.lib
 	$(MAKE) -C z80_crt0s
 	TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8085_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-z80n_crt0.lib: $(DIRS) $(OBJS) z80_crt0.lib
+z80n_crt0.lib: $(DIRS) $(OBJS) 8085_opt.lib
 	@echo ''
 	@echo '--- Building z80n crt Library ---'
 	@echo ''
