@@ -196,7 +196,7 @@ if [ $do_libbuild = 1 ]; then           # Build libraries or not...
   else
 	  MAKEARG=""
   fi
-  $MAKE -C libsrc $MAKEARG
+  $MAKE -C libsrc $MAKECONCURRENCY $MAKEARG
   $MAKE -C libsrc install
   $MAKE -C libsrc/_DEVELOPMENT $TARGETS
   $MAKE -C include/_DEVELOPMENT
