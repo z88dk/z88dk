@@ -4,24 +4,21 @@
 ; Entry: E'H'L'=far pointer
 ;        HL=word
 
+SECTION code_clib
+SECTION code_l_sccz80
+
+.ASSUME ADL = 0        ; use the 16 bit address, with MBASE
+
 lp_pint:
     push    hl
     exx
-    defb    $5b    ;lil
-    push    hl
-    defb    $5b    ;lil
-    ld      hl,2
-    defb    0
-    defb    $5b
-    add     hl,sp
-    defb    $5b
-    ld      (hl),e
-    defb    $5b
-    pop     hl
+    push.l  hl
+    ld.lil  hl,2
+    add.l   hl,sp
+    ld.l    (hl),e
+    pop.l   hl
     pop     de
-    defb    $5b
-    ld      (hl),e
-    inc     hl
-    defb    $5b
-    ld      (hl),d
-    ret
+    ld.l    (hl),e
+    inc.l   hl
+    ld.l    (hl),d
+    ret.l
