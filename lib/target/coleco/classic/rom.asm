@@ -183,7 +183,7 @@ ENDIF
 
 IF CRT_COLECO_SPRITE_NAME_SIZE > 0
     PUBLIC  _os7_sprite_name_table
-_os7_sprite_order_table:
+_os7_sprite_name_table:
     defs    CRT_COLECO_SPRITE_NAME_SIZE
 ENDIF
 IF CRT_COLECO_SPRITE_ORDER_SIZE > 0

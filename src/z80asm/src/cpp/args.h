@@ -45,12 +45,12 @@ public:
 	bool map() const { return m_map; }
 	bool globaldef() const { return m_globaldef; }
 	bool consol_obj_file() const { return !m_consol_obj_file.empty(); }
-	string consol_obj_file_name() const { return m_consol_obj_file; }
+	string consol_obj_file_name() const;
 	bool make_bin() const { return m_make_bin; }
 	const string& bin_file() const { return m_bin_file; }
 	int appmake() const { return m_appmake; }
-	const vector<string>& include_path() { return m_include_path; }
-	const vector<string>& files() { return m_files; }
+	const vector<string>& include_path() const { return m_include_path; }
+	const vector<string>& files() const { return m_files; }
 
 	void push_include_path(const string& dir) { push_path(m_include_path, dir); }
 	void pop_include_path() { pop_path(m_include_path); }

@@ -17,5 +17,6 @@ ok scalar(grep {/MODULE _00main_c/} path("$test.dir/00main.c.lis")->lines),
 	"found MODULE _00main_c";
 
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;
+
 unlink_testfiles;
 done_testing;

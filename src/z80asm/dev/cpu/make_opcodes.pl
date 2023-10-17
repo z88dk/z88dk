@@ -770,6 +770,12 @@ for my $cpu (@CPUS) {
 			add_x($cpu, "ld $dd, %m",  [ld_dd_m($dd), '%m', '%m']);
 		}
 		
+		# #2423 There is an option to load a 2 bytes into an ez80 24 bit register 
+		# using the ld.lis opcode
+		if ($ez80_any) {
+			add($cpu, "ld.lis $dd, %m", [0x49], [ld_dd_m($dd), '%m', '%m']);
+		}
+		
 		add($cpu, "lxi $dd, %m", [ld_dd_m($dd), '%m', '%m']);
 		add($cpu, "lxi $d, %m",	 [ld_dd_m($dd), '%m', '%m']) if $d ne $dd;
 		

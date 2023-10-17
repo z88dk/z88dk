@@ -21,6 +21,9 @@ Z88DK Z80 Module Assembler Change Log
 2023-09-29 Fix #0577: allow any flag in expressions
 2023-10-03 Fix #2388: add support of r4k and r5k
 2023-10-05 Fix #2402: add support of kc160
+2023-10-16 Fix #2420: detect '-lstdc++fs', remove external Perl dependencies
+2023-10-16 Fix #2417: accept file names with spaces in list files without quotes
+2023-10-17 Fix #2422: Parallel build issues
 
 2022
 ----
