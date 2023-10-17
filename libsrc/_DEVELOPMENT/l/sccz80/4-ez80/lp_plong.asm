@@ -14,7 +14,7 @@ lp_plong:
     push    hl
     exx
     push.l  hl
-    ld.lil  hl,2
+    ld.lis  hl,2
     add.l   hl,sp
     ld.l    (hl),e
     pop.l   hl
@@ -28,4 +28,4 @@ lp_plong:
     ld.l    (hl),e
     inc.l   hl
     ld.l    (hl),e
-    ret.l
+    ret

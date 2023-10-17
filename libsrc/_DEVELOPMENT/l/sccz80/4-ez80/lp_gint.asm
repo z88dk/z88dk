@@ -11,9 +11,9 @@ SECTION code_l_sccz80
 
 lp_gint:
     push.l  hl
-    ld.lil  hl,2
+    ld.lis  hl,2
     add.l   hl,sp
     ld.l    (hl),e
     pop.l   hl
     ld.lis  hl,(hl)
-    ret.l
+    ret

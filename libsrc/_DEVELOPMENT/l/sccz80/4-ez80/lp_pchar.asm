@@ -13,10 +13,10 @@ lp_pchar:
     push    hl
     exx
     push.l  hl
-    ld.lil  hl,2
+    ld.lis  hl,2
     add.l   hl,sp
     ld.l    (hl),e
     pop.l   hl
     pop     de
     ld.l    (hl),e
-    ret.l
+    ret

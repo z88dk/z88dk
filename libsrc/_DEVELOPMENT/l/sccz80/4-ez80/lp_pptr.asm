@@ -14,7 +14,7 @@ lp_pptr:
     push    hl
     exx
     push.l  hl
-    ld.lil  hl,2
+    ld.lis  hl,2
     add.l   hl,sp
     ld.l    (hl),e
     pop.l   hl
@@ -26,4 +26,4 @@ lp_pptr:
     inc.l   hl
     pop     de
     ld.l    (hl),e
-    ret.l
+    ret

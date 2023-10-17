@@ -11,7 +11,7 @@ SECTION code_l_sccz80
 
 lp_gptr:
     push.l  hl
-    ld.lil  hl,2
+    ld.lis  hl,2
     add.l   hl,sp
     ld.l    (hl),e
     pop.l   hl
@@ -19,4 +19,4 @@ lp_gptr:
     inc.l   hl
     inc.l   hl
     ld.l    e,(hl)
-    ret.l
+    ret
