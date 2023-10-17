@@ -20,7 +20,7 @@ Repository: https://github.com/z88dk/z88dk
 /* external functions */
 
 /* local functions */
-void Z80pass2(int start_errors)
+void Z80pass2(int start_errors, const char* obj_filename)
 {
 	Expr1ListElem* iter;
 	Expr1* expr, * expr2;
@@ -186,11 +186,11 @@ void Z80pass2(int start_errors)
 
 	/* create object file */
 	if (start_errors == get_num_errors())
-		write_obj_file(CURRENTMODULE->filename);
+		write_obj_file(obj_filename);
 
 	// add to the list of objects to link
 	if (start_errors == get_num_errors())
-        object_file_append(get_o_filename(CURRENTMODULE->filename), CURRENTMODULE);
+        object_file_append(obj_filename, CURRENTMODULE);
 
 	if (start_errors == get_num_errors() && option_symtable())
 		write_sym_file(CURRENTMODULE);

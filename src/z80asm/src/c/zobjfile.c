@@ -156,8 +156,7 @@ static objfile_t* copy_objfile(const char* obj_filename) {
     return obj;
 }
 
-void write_obj_file(const char* source_filename) {
-    const char* obj_filename = get_o_filename(source_filename);
+void write_obj_file(const char* obj_filename) {
     if (option_verbose())
         printf("Writing object file '%s'\n", path_canon(obj_filename));
 

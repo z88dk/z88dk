@@ -18,15 +18,15 @@ unlink "$test.o";
 run_ok("z88dk-z80asm $test.asm");
 ok -f "$test.o", "$test.o exists";
 
-capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF18
-  Name: $test
+capture_ok("z88dk-z80nm -a $test.o", <<'END');
+Object  file test_t_issue_0016.o at $0000: Z80RMF18
+  Name: test_t_issue_0016
   CPU:  z80 
   Section "": 2 bytes
-    C \$0000: C9 C9
+    C $0000: C9 C9
   Symbols:
-    L A \$0001: local_function (section "") (file $test.asm:3)
-    G A \$0000: test_function (section "") (file $test.asm:2)
+    L A $0001: local_function (section "") (file test_t_issue_0016.asm:3)
+    G A $0000: test_function (section "") (file test_t_issue_0016.asm:2)
 END
 
 # assemble to a new object file in a different directory
@@ -36,15 +36,15 @@ run_ok("z88dk-z80asm -O$test.dir -ozcc0000.o $test.asm");
 ok ! -f "$test.o", "no $test.o";
 ok -f "$test.dir/zcc0000.o", "$test.dir/zcc0000.o exists";
 
-capture_ok("z88dk-z80nm -a $test.dir/zcc0000.o", <<END);
-Object  file $test.dir/zcc0000.o at \$0000: Z80RMF18
-  Name: zcc0000
+capture_ok("z88dk-z80nm -a $test.dir/zcc0000.o", <<'END');
+Object  file test_t_issue_0016.dir/zcc0000.o at $0000: Z80RMF18
+  Name: test_t_issue_0016
   CPU:  z80 
   Section "": 2 bytes
-    C \$0000: C9 C9
+    C $0000: C9 C9
   Symbols:
-    L A \$0001: test_t_issue_0016_local_function (section "") (file $test.asm:3)
-    G A \$0000: test_function (section "") (file $test.asm:2)
+    L A $0001: local_function (section "") (file test_t_issue_0016.asm:3)
+    G A $0000: test_function (section "") (file test_t_issue_0016.asm:2)
 END
 
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;

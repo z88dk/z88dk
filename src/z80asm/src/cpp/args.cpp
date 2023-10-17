@@ -185,6 +185,16 @@ static string replace_ext(const string& filename, const string& ext) {
 	return file_path.generic_string();
 }
 
+string Args::consol_obj_file_name() const {
+    if (m_output_dir.empty())
+        return m_consol_obj_file;
+    else {
+        fs::path file_path{ m_output_dir };
+        file_path /= fs::path{ m_consol_obj_file };
+        return file_path.generic_string();
+    }
+}
+
 string Args::asm_filename(const string& filename) {
 	return replace_ext(filename, EXT_ASM);
 }
