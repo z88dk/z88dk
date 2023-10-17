@@ -274,11 +274,6 @@ am9511.lib:
 	@echo ''
 	$(MAKE) -C math/am9511
 
-fastmath.lib:
-	@echo ''
-	@echo '--- Building fast integer maths library ---'
-	@echo ''
-	$(MAKE) -C math/fastmath
 
 # Math48
 math48.lib:
@@ -1253,6 +1248,13 @@ kc160_clib.lib: $(TARGET_CLIB_OBJS) r4k_clib.lib
 	$(call buildgeneric,z80)
 	TARGET=z80 TYPE=kc160 $(LIBLINKER2) -mkc160 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/kc160_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
+# This re-assembles some files used by the crt0, so make it depend on them
+fastmath.lib: kc160_clib.lib
+	@echo ''
+	@echo '--- Building fast integer maths library ---'
+	@echo ''
+	$(MAKE) -C math/fastmath
+
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
 kc_clib.lib: $(TARGET_CLIB_OBJS)
@@ -1363,7 +1365,7 @@ super80_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C games TARGET=super80
 	TARGET=super80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsuper80 -x$(OUTPUT_DIRECTORY)/super80_clib @$(TARGET_DIRECTORY)/super80/super80.lst
 
-super80_vduem_clib.lib: $(TARGET_CLIB_OBJS)
+super80_vduem_clib.lib: $(TARGET_CLIB_OBJS) super80_vduem_clib.lib
 	@echo ''
 	@echo '--- Building Super80 VDUEM Library ---'
 	@echo ''
@@ -2145,7 +2147,7 @@ z180_crt0.lib: $(DIRS) $(OBJS) ez80_z80_crt0.lib
 	$(call buildcrt)
 	TYPE=z180 $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z180_crt0 @$(LISTFILE_DIRECTORY)/z180.lst
 
-z80iy_crt0.lib: $(DIRS) $(OBJS) z80_crt0.lib
+z80iy_crt0.lib: $(DIRS) $(OBJS) z180_crt0.lib
 	@echo ''
 	@echo '--- Building ixiy crt Library ---'
 	@echo ''
@@ -2173,7 +2175,7 @@ z80iy_crt0.lib: $(DIRS) $(OBJS) z80_crt0.lib
 	$(MAKE) -C z80_crt0s
 	TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8085_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-z80n_crt0.lib: $(DIRS) $(OBJS) z80_crt0.lib
+z80n_crt0.lib: $(DIRS) $(OBJS) 8085_opt.lib
 	@echo ''
 	@echo '--- Building z80n crt Library ---'
 	@echo ''
