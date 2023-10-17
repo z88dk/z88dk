@@ -47,6 +47,8 @@ $(eval $(call build_lib,mlambda,-IXIY -DFORlambda,-Ca-IXIY))
 $(eval $(call build_lib,mlambda_tiny,-DTINYMODE -IXIY -DFORlambda,-Ca-IXIY))
 $(eval $(call build_lib,mlambdav1, -DLAMBDAV1 -IXIY -DFORzx81,-Ca-IXIY))
 $(eval $(call build_lib,mlambdav1_tiny, -DLAMBDAV1 -DTINYMODE -IXIY -DFORzx81,-Ca-IXIY))
+$(eval $(call build_lib,mlambdav3, -DLAMBDAV3 -IXIY -DFORlambda,-Ca-IXIY))
+$(eval $(call build_lib,mlambdav3_tiny, -DLAMBDAV3 -DTINYMODE -IXIY -DFORlambda,-Ca-IXIY))
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt
