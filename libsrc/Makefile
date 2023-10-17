@@ -274,11 +274,6 @@ am9511.lib:
 	@echo ''
 	$(MAKE) -C math/am9511
 
-fastmath.lib:
-	@echo ''
-	@echo '--- Building fast integer maths library ---'
-	@echo ''
-	$(MAKE) -C math/fastmath
 
 # Math48
 math48.lib:
@@ -1252,6 +1247,13 @@ kc160_clib.lib: $(TARGET_CLIB_OBJS) r4k_clib.lib
 	@echo ''
 	$(call buildgeneric,z80)
 	TARGET=z80 TYPE=kc160 $(LIBLINKER2) -mkc160 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/kc160_clib @$(TARGET_DIRECTORY)/z80/z80.lst
+
+# This re-assembles some files used by the crt0, so make it depend on them
+fastmath.lib: kc160_clib.lib
+	@echo ''
+	@echo '--- Building fast integer maths library ---'
+	@echo ''
+	$(MAKE) -C math/fastmath
 
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
