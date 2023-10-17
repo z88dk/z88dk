@@ -655,7 +655,19 @@ void path_mkdir(const char *path)
 	if (!dir_exists(path)) {
 		const char *parent = path_dir(path);
 		path_mkdir(parent);
-		xmkdir(path);
+
+        // #2422 Parallel build issues
+        // ignore error if directory exists
+        int retval;
+#ifdef _WIN32
+        retval = _mkdir(path_os(path));
+#else
+        retval = mkdir(path_os(path), 0777);
+#endif
+        if (retval != 0 && !dir_exists(path)) {
+            perror(path);
+            exit(EXIT_FAILURE);
+        }
 	}
 }
 
