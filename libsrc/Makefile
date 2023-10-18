@@ -853,7 +853,7 @@ ace_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C games TARGET=ace
 	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(TARGET_DIRECTORY)/ace/ace.lst
 
-gfxace.lib: $(TARGET_CLIB_OBJS)
+gfxace.lib: $(TARGET_CLIB_OBJS) ace_clib.lib
 	@echo ''
 	@echo '--- Building Jupiter Ace Graphics Library ---'
 	@echo ''
