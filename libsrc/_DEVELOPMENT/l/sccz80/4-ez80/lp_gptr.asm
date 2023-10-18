@@ -4,21 +4,19 @@
 ; Entry: EHL=far pointer
 ; Exit: EHL=pointer stored there...
 
+SECTION code_clib
+SECTION code_l_sccz80
+
+.ASSUME ADL = 0        ; use the 16 bit address, with MBASE
+
 lp_gptr:
-    defb    $5b    ;lil
-    push    hl
-    defb    $5b    ;lil
-    ld      hl,2
-    defb    0
-    defb    $5b
-    add     hl,sp
-    defb    $5b
-    ld      (hl),e
-    defb   $5b
-    pop     hl
-    defb    $5b, $ed, $27	;ld.lil hl,(hl)
-    inc     hl
-    inc     hl
-    defb    $5b
-    ld      e,(hl)
+    push.l  hl
+    ld.lis  hl,2
+    add.l   hl,sp
+    ld.l    (hl),e
+    pop.l   hl
+    ld.lis  hl,(hl)
+    inc.l   hl
+    inc.l   hl
+    ld.l    e,(hl)
     ret
