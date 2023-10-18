@@ -1365,7 +1365,7 @@ super80_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C games TARGET=super80
 	TARGET=super80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsuper80 -x$(OUTPUT_DIRECTORY)/super80_clib @$(TARGET_DIRECTORY)/super80/super80.lst
 
-super80_vduem_clib.lib: $(TARGET_CLIB_OBJS) super80_vduem_clib.lib
+super80_vduem_clib.lib: $(TARGET_CLIB_OBJS) super80_clib.lib
 	@echo ''
 	@echo '--- Building Super80 VDUEM Library ---'
 	@echo ''
