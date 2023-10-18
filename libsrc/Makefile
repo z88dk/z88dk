@@ -608,6 +608,7 @@ mlambda.lib:
 	@echo ''
 	$(MAKE) -C math/zxmath mlambda
 	$(MAKE) -C math/zxmath mlambdav1
+	$(MAKE) -C math/zxmath mlambdav3
 
 mlambda_tiny.lib:
 	@echo ''
@@ -615,6 +616,7 @@ mlambda_tiny.lib:
 	@echo ''
 	$(MAKE) -C math/zxmath mlambda_tiny
 	$(MAKE) -C math/zxmath mlambdav1_tiny
+	$(MAKE) -C math/zxmath mlambdav3_tiny
 
 # Texas Instrument's calculators: - stefano/henk
 # almost the same lib code with different -D flag set
