@@ -13,27 +13,27 @@
 ;	$Id: swapgfxbk.asm,v 1.9 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
+        SECTION code_graphics
+        PUBLIC  swapgfxbk
+        PUBLIC  _swapgfxbk
+        PUBLIC  swapgfxbk1
+        PUBLIC  _swapgfxbk1
 
-		PUBLIC    swapgfxbk
-		PUBLIC    _swapgfxbk
-		PUBLIC	swapgfxbk1
-		PUBLIC   _swapgfxbk1
-
-		EXTERN	cpygraph
+        EXTERN  cpygraph
 
 
-.swapgfxbk1
-._swapgfxbk1
-		push	hl
-		push	de
-		push	bc
+swapgfxbk1:
+_swapgfxbk1:
+        push    hl
+        push    de
+        push    bc
 
-		call	cpygraph	; Copy GRAPH_MEM to LCD, then return
+        call    cpygraph                ; Copy GRAPH_MEM to LCD, then return
 
-		pop	bc
-		pop	de
-		pop	hl
+        pop     bc
+        pop     de
+        pop     hl
 
-.swapgfxbk
-._swapgfxbk
-		ret
+swapgfxbk:
+_swapgfxbk:
+        ret
