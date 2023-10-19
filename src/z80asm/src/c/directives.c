@@ -270,11 +270,21 @@ void asm_UNDEFINE(const char* name)
 *----------------------------------------------------------------------------*/
 void asm_DEFC(const char* name, Expr1* expr)
 {
+    Section1* cur_section = CURRENTSECTION;
+
 	int value = Expr_eval(expr, false);		/* DEFC constant expression */
+
+    /* if expression depends on one single symbol and constants, set the target
+       in the same section - #2418 */
+    Section1* used_section = NULL;
+    if (Expr_depends_on_one_symbol(expr, &used_section)) {
+        expr->section = used_section;
+        set_cur_section(used_section);
+    }
 
 	/* if expression is difference of two addresses in the same
 	   section, convert it to a constant */
-	if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
+    if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
 	{
 		/* check if expression depends on itself */
 		if (Expr_is_recusive(expr, name)) {
@@ -296,6 +306,8 @@ void asm_DEFC(const char* name, Expr1* expr)
 		define_symbol(name, value, TYPE_CONSTANT);
 		OBJ_DELETE(expr);
 	}
+
+    set_cur_section(cur_section);
 }
 
 /*-----------------------------------------------------------------------------

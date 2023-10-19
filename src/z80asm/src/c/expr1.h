@@ -148,6 +148,9 @@ extern bool Expr_is_recusive(Expr1* self, const char* name);
 /* check if expression is difference of two addresses in the same section, convert it to a constant */
 bool Expr_is_addr_diff(Expr1* expr);
 
+/* check if expression depends on one single symbol and constants */
+extern bool Expr_depends_on_one_symbol(Expr1* self, struct Section1** p_used_section);
+
 /*-----------------------------------------------------------------------------
 *	Stack for calculator
 *----------------------------------------------------------------------------*/

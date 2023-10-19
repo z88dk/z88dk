@@ -171,6 +171,7 @@ Object  file ${test}.o at \$0000: Z80RMF18
     L A \$0018: ${test}2__delay (section code) (file ${test}2.asm:16)
     L A \$001A: ${test}2__delay_1 (section code) (file ${test}2.asm:18)
     G A \$0000: main (section code) (file ${test}1.asm:4)
+    G = \$0000: main1 (section code) (file ${test}1.asm:14)
     G A \$000D: printa (section code) (file ${test}2.asm:7)
     G A \$001F: print1 (section code) (file ${test}3.asm:4)
     G A \$0025: code_end (section code) (file ${test}4.asm:4)
@@ -178,7 +179,6 @@ Object  file ${test}.o at \$0000: Z80RMF18
     L A \$0006: ${test}2_mess (section data) (file ${test}2.asm:24)
     L A \$000B: ${test}3_mess (section data) (file ${test}3.asm:11)
     L A \$000D: ${test}3_dollar (section data) (file ${test}3.asm:12)
-    G = \$0000: main1 (section data) (file ${test}1.asm:14)
   Externs:
     U         lib_start
     U         lib_end
@@ -189,11 +189,11 @@ Object  file ${test}.o at \$0000: Z80RMF18
     E W \$0003 \$0004 3: ${test}1_mess (section code) (file ${test}1.asm:6)
     E W \$0006 \$0007 3: print (section code) (file ${test}1.asm:7)
     E W \$0009 \$000A 3: lib_end (section code) (file ${test}1.asm:8)
+    E = \$0006 \$0006 0: main1 := main (section code) (file ${test}1.asm:14)
     E W \$001B \$001C 3: ${test}2__delay_1 (section code) (file ${test}2.asm:20)
     E W \$0015 \$0016 3: ${test}2_printa1 (section code) (file ${test}2.asm:14)
     E W \$0012 \$0013 3: ${test}2__delay (section code) (file ${test}2.asm:13)
     E W \$0020 \$0021 3: printa (section code) (file ${test}3.asm:6)
-    E = \$0006 \$0006 0: main1 := main (section data) (file ${test}1.asm:14)
     E W \$000D \$000D 2: \$ (section data) (file ${test}3.asm:12)
 END
 
@@ -206,7 +206,7 @@ test_t_modlink_consolobj2_mess  = $0006 ; addr, local, , , data, test_t_modlink_
 test_t_modlink_consolobj3_mess  = $000B ; addr, local, , , data, test_t_modlink_consolobj3.asm:11
 test_t_modlink_consolobj3_dollar = $000D ; addr, local, , , data, test_t_modlink_consolobj3.asm:12
 main                            = $0000 ; addr, public, , , code, test_t_modlink_consolobj1.asm:4
-main1                           = $0000 ; comput, public, , , data, test_t_modlink_consolobj1.asm:14
+main1                           = $0000 ; comput, public, , , code, test_t_modlink_consolobj1.asm:14
 print                           = $0000 ; comput, public, , , , test_t_modlink_consolobj2.asm:3
 printa                          = $000D ; addr, public, , , code, test_t_modlink_consolobj2.asm:7
 print1                          = $001F ; addr, public, , , code, test_t_modlink_consolobj3.asm:4
@@ -229,10 +229,10 @@ test_t_modlink_consolobj3_mess  = $0030 ; addr, local, , test_t_modlink_consolob
 test_t_modlink_consolobj3_dollar = $0032 ; addr, local, , test_t_modlink_consolobj, data, test_t_modlink_consolobj3.asm:12
 print                           = $001F ; addr, public, , test_t_modlink_consolobj, , test_t_modlink_consolobj2.asm:3
 main                            = $0000 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj1.asm:4
+main1                           = $0000 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj1.asm:14
 printa                          = $000D ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj2.asm:7
 print1                          = $001F ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj3.asm:4
 code_end                        = $0025 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj4.asm:4
-main1                           = $0000 ; addr, public, , test_t_modlink_consolobj, data, test_t_modlink_consolobj1.asm:14
 lib_start                       = $0000 ; const, public, , test_t_modlink_consolobjlib, , test_t_modlink_consolobjlib.asm:3
 lib_end                         = $0000 ; const, public, , test_t_modlink_consolobjlib, , test_t_modlink_consolobjlib.asm:4
 __head                          = $0000 ; const, public, def, , ,
@@ -262,10 +262,10 @@ test_t_modlink_consolobj3_mess  = $1264 ; addr, local, , test_t_modlink_consolob
 test_t_modlink_consolobj3_dollar = $1266 ; addr, local, , test_t_modlink_consolobj, data, test_t_modlink_consolobj3.asm:12
 print                           = $1253 ; addr, public, , test_t_modlink_consolobj, , test_t_modlink_consolobj2.asm:3
 main                            = $1234 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj1.asm:4
+main1                           = $1234 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj1.asm:14
 printa                          = $1241 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj2.asm:7
 print1                          = $1253 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj3.asm:4
 code_end                        = $1259 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj4.asm:4
-main1                           = $1234 ; addr, public, , test_t_modlink_consolobj, data, test_t_modlink_consolobj1.asm:14
 lib_start                       = $0000 ; const, public, , test_t_modlink_consolobjlib, , test_t_modlink_consolobjlib.asm:3
 lib_end                         = $0000 ; const, public, , test_t_modlink_consolobjlib, , test_t_modlink_consolobjlib.asm:4
 __head                          = $1234 ; const, public, def, , ,

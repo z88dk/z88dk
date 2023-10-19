@@ -992,3 +992,29 @@ bool Expr_is_addr_diff(Expr1* self) {
 
 	return ret;
 }
+
+bool Expr_depends_on_one_symbol(Expr1* self, Section1** p_used_section) {
+    *p_used_section = NULL;
+    int count_symbols = 0;
+    for (size_t i = 0; i < ExprOpArray_size(self->rpn_ops); i++) {
+        ExprOp* expr_op = ExprOpArray_item(self->rpn_ops, i);
+        switch (expr_op->op_type) {
+        case SYMBOL_OP:
+            count_symbols++;
+            if (count_symbols == 1)
+                *p_used_section = expr_op->d.symbol->section;
+            else
+                *p_used_section = NULL;
+            break;
+        case ASMPC_OP:
+        case NUMBER_OP:
+        case UNARY_OP:
+        case BINARY_OP:
+        case TERNARY_OP:
+            break;
+        default:
+            xassert(0);
+        }
+    }
+    return *p_used_section!=NULL;
+}

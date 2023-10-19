@@ -228,7 +228,7 @@ clean::
 -include $(DEPENDS)
 
 #------------------------------------------------------------------------------
-# rebuild the three tools needed for the tests
+# rebuild the tools needed for the tests
 rebuild:
 	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm.lib
 	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm_lib.lst
@@ -239,8 +239,10 @@ rebuild:
 	cp ../z80asm/z88dk-z80asm$(EXESUFFIX) ../../bin/
 	$(MAKE) -C ../z80nm
 	cp ../z80nm/z88dk-z80nm$(EXESUFFIX) ../../bin/
-	$(MAKE) -C ../zcc all
-	cp ../zcc/zcc$(EXESUFFIX) ../../bin/
+	$(MAKE) -C ../sccz80
+	cp ../sccz80/sccz80$(EXESUFFIX) ../../bin/z88dk-sccz80$(EXESUFFIX)
+	$(MAKE) -C ../zcc
+	cp ../zcc/zcc$(EXESUFFIX) ../../bin/zcc$(EXESUFFIX)
 	$(MAKE) -C ../ticks all
 	cp ../ticks/z88dk-dis$(EXESUFFIX) ../../bin/
 	cp ../ticks/z88dk-ticks$(EXESUFFIX) ../../bin/
