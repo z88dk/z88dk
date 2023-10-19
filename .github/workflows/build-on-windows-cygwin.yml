@@ -47,7 +47,7 @@ jobs:
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
-        MAKE_CONCURRENCY=-j2 ./build.sh -v -l
+        ./build.sh -v -l
     - name: Build libraries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)

@@ -54,7 +54,7 @@ jobs:
       run: |
         set -e -x
         eval $(perl -Mlocal::lib)
-        MAKE_CONCURRENCY=-j2 ./build.sh -v -l
+        ./build.sh -v -l
     - name: Build libraries
       run: |
         set -e -x
