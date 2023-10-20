@@ -97,7 +97,7 @@ int x1_exec(char* target)
     len = ftell(fpin);
 
     fseek(fpin, 0L, SEEK_SET);
-    buf = must_malloc(len);
+    buf = must_malloc_block(len,sharpx1_native_spec.sector_size);
     if (len != fread(buf, 1, len, fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",binname); }
     fclose(fpin);
 
