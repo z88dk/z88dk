@@ -186,6 +186,7 @@ include font/font_4x8/font_4x8.mak
 include font/font_8x8/font_8x8.mak
 include font/font_8x10/font_8x10.mak
 include font/fzx/fzx.mak
+include games/games.mak
 include graphics/retrofit/retrofit.mak
 include gfx/portable/portable.mak
 include gfx/x11/x11.mak
@@ -340,7 +341,7 @@ zx_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(TARGET_DIRECTORY)/zx/zx.lst
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
 
-zxn_clib.lib: $(TARGET_CLIB_OBJS)
+zxn_clib.lib: $(TARGET_CLIB_OBJS) zx_clib.lib
 	@echo ''
 	@echo '--- Building ZX Spectrum Next Library ---'
 	@echo ''
@@ -354,7 +355,7 @@ zxn_clib.lib: $(TARGET_CLIB_OBJS)
 # 64/32 column library for TS2068 - dom/stefano/alvin
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-ts2068_clib.lib: $(TARGET_CLIB_OBJS)
+ts2068_clib.lib: $(TARGET_CLIB_OBJS) zxn_clib.lib
 	@echo ''
 	@echo '--- Building TS2068 (Spectrum clone) Library ---'
 	@echo ''
@@ -366,7 +367,7 @@ ts2068_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(TARGET_DIRECTORY)/ts2068/ts2068.lst
 
 # ZXROM - stefano
-zxrom.lib:
+zxrom.lib: zx_clib.lib
 	@echo ''
 	@echo '--- Building ZXROM Library ---'
 	@echo ''
@@ -854,7 +855,7 @@ ace_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C games TARGET=ace
 	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(TARGET_DIRECTORY)/ace/ace.lst
 
-gfxace.lib: $(TARGET_CLIB_OBJS)
+gfxace.lib: $(TARGET_CLIB_OBJS) ace_clib.lib
 	@echo ''
 	@echo '--- Building Jupiter Ace Graphics Library ---'
 	@echo ''
@@ -1367,7 +1368,7 @@ super80_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C games TARGET=super80
 	TARGET=super80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsuper80 -x$(OUTPUT_DIRECTORY)/super80_clib @$(TARGET_DIRECTORY)/super80/super80.lst
 
-super80_vduem_clib.lib: $(TARGET_CLIB_OBJS) super80_vduem_clib.lib
+super80_vduem_clib.lib: $(TARGET_CLIB_OBJS) super80_clib.lib
 	@echo ''
 	@echo '--- Building Super80 VDUEM Library ---'
 	@echo ''
