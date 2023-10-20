@@ -11,7 +11,7 @@ WORLD_TARGETS = abc80 abc800 ace adam alphatro altair8800 aquarius aqplus bee c1
 	msx msx2_rom mtx multi8 myvision mz mz2500 nascom nc newbrain ondra osca oz p2000 pacman pasopia7 pc6001 \
 	pencil2 pps primo pv1000  \
 	pv2000 rcmx000 rx78 sam sc3000 smc777 sms sol20 sos spc1000 special srr super80 super80_vduem svi svi_rom svi_rom318 test ti82 ti83 ti85 ti86 ti83p \
-	trs80 ts2068 vector06c vg5k vz x07 x1 z1013 z9001 z88 zx zx80 zx81 zxn
+	trs80 ts2068 vector06c vector06c_disk vg5k vz x07 x1 z1013 z9001 z88 zx zx80 zx81 zxn
 
 WORLD_TARGETS += cpm_px8 cpm_px4 cpm_einstein cpm_einstein256 cpm_attache cpm_osborne1 cpm_kaypro83 cpm_kaypro84 \
 	cpm_mz2500 cpm_microbee cpm_qc10 cpm_nascom cpm_tiki100 cpm_svi cpm_dmv cpm_adam \

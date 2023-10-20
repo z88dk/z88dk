@@ -4,7 +4,7 @@
 # classic library.
 #
 # A final executable for a target is comprised of $(COMMON_SRCS) and all .asm and
-# .c files located within the targets directory.
+# .c files located within the target's directory.
 
 
 # Targets that you want to compile for (eg zx, multi8 etc)
@@ -85,6 +85,7 @@ ZLDFLAGS_gl4000 =
 Z88DKTARGET_gl6000 = gl
 ZCFLAGS_gl6000 = -clib=gl6000sl
 ZLDFLAGS_gl6000 = 
+
 Z88DKTARGET_gamegear = sms
 ZCFLAGS_gamegear = -subtype=gamegear
 ZLDFLAGS_gamegear = 
@@ -100,6 +101,10 @@ ZLDFLAGS_pc6001_rom =
 Z88DKTARGET_pc88_disk = pc88
 ZCFLAGS_pc88_disk = -subtype=disk
 ZLDFLAGS_pc88_disk = 
+
+Z88DKTARGET_vector06c_disk = vector06c
+ZCFLAGS_vector06c_disk = -subtype=disk
+ZLDFLAGS_vector06c_disk = 
 
 Z88DKTARGET_sam_allram = sam
 ZCFLAGS_sam_allram = -subtype=allram
