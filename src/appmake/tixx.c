@@ -267,6 +267,13 @@ int tixx_exec(char *target)
     if (ext != E_85S)
         cfwrite(str, 8 - i, fp, &chk);
 
+    /* 83+ requires 2 extra bytes */
+    if ( altfmt != 0 ) {
+        cfwritebyte(0, fp, &chk);
+		cfwritebyte(0, fp, &chk);
+    }
+
+
     /* VARIABLE LENGTH */
     i = n + 2;
     n2 = n;
