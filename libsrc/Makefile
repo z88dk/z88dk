@@ -1044,7 +1044,7 @@ enterprise_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(TARGET_DIRECTORY)/enterprise/enterprise.lst
 
 # Enterprise graphics lib - Stefano
-gfxep.lib: $(TARGET_CLIB_OBJS)
+gfxep.lib: $(TARGET_CLIB_OBJS) enterprise_clib.lib
 	@echo ''
 	@echo '--- Building Enterprise 64/128 Graphics Library ---'
 	@echo ''
@@ -1542,7 +1542,7 @@ nc_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(TARGET_DIRECTORY)/nc100/nc100.lst
 
 # NC-100 graphics lib - Stefano
-gfxnc100.lib: $(TARGET_CLIB_OBJS)
+gfxnc100.lib: $(TARGET_CLIB_OBJS) nc_clib.lib
 	@echo ''
 	@echo '--- Building NC-100 Graphics Library ---'
 	@echo ''
@@ -1608,7 +1608,7 @@ c128ansi_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(TARGET_DIRECTORY)/c128/c128.lst
 
 # C128 Base LO-REZ text mode graphics lib - Stefano
-gfx128.lib: $(TARGET_CLIB_OBJS)
+gfx128.lib: $(TARGET_CLIB_OBJS) c128ansi_clib.lib
 	@echo ''
 	@echo '--- Building Commodore 128 Base Graphics Library ---'
 	@echo ''
@@ -1813,7 +1813,7 @@ trs80_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(TARGET_DIRECTORY)/trs80/trs80.lst
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_cpm @$(TARGET_DIRECTORY)/trs80/trs80_cpm.lst
 
-gfxtrs80.lib: $(TARGET_CLIB_OBJS)
+gfxtrs80.lib: $(TARGET_CLIB_OBJS) trs80_clib.lib
 	@echo ''
 	@echo '--- Building TRS 80 GFX Libraries ---'
 	@echo ''
