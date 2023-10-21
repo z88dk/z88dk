@@ -33,5 +33,6 @@ jobs:
         set ZCCCFG=%RUNNER_WORKSPACE%\z88dk\win32-latest\z88dk\lib\config
         set path
         z88dk-z80nm -v
-        z88dk-z80asm -v
+        z88dk-z80asm -h
+        set Z80ASM=-v
         perl -S prove t\*.t
