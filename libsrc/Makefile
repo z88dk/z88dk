@@ -222,11 +222,13 @@ define buildcrt
 endef
 
 #  short script to sort out ticalc dependencies
-msxdeps:
+define msxdeps
 	$(MAKE) -C target/msx clean
+endef
 
-zx81deps:
+define zx81deps
 	$(MAKE) -C target/zx81 clean
+endef
 
 
 # Generic maths build - dom, stefano
@@ -490,104 +492,104 @@ zx80_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building ZX80 Library ---'
 	@echo ''
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(call buildgeneric,zx80)
 	$(MAKE) -C games TARGET=zx80
 	$(MAKE) -C target/zx80
 	TARGET=zx80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx80 -x$(OUTPUT_DIRECTORY)/zx80_clib @$(TARGET_DIRECTORY)/zx80/zx80.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 
 # ZX81 lib - Stefano
 zx81_clib.lib: $(TARGET_CLIB_OBJS) zx80_clib.lib
 	@echo ''
 	@echo '--- Building ZX81 Library ---'
 	@echo ''
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(call buildgeneric,zx81)
 	$(MAKE) -C games TARGET=zx81
 	TARGET=zx81 TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -IXIY -DFORzx81 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx81_clib @$(TARGET_DIRECTORY)/zx81/zx81.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 
 # Lambda 8300 lib - Stefano
 lambda_clib.lib: $(TARGET_CLIB_OBJS) zx81_clib.lib
 	@echo ''
 	@echo '--- Building Lambda 8300 Library ---'
 	@echo ''
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(call buildgeneric,zx81)
 	$(MAKE) -C games TARGET=zx81
 	TARGET=zx81 SUBTARGET=lambda TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/lambda_clib @$(TARGET_DIRECTORY)/zx81/zx81.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 
 # ZX81 std graphics lib - Stefano
 gfx81.lib: $(TARGET_CLIB_OBJS) lambda_clib.lib
 	@echo ''
 	@echo '--- Building ZX81 Standard Graphics Library ---'
 	@echo ''
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow"
 	TARGET=zx81 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/gfx81 @$(TARGET_DIRECTORY)/zx81/gfx81.lst
 	@echo ''
 	@echo '--- Building ZX81 Pseudo-HR Graphics Library ---'
 	@echo ''
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow" SUBTYPE=zx81phrg
 	TARGET=zx81phrg TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81phrg -x$(OUTPUT_DIRECTORY)/gfx81phrg @$(TARGET_DIRECTORY)/zx81/gfx81phrg.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 
 # Lambda 8300 graphics lib - Stefano
 gfxlambda.lib: $(TARGET_CLIB_OBJS) gfx81.lib
 	@echo ''
 	@echo '--- Building Lambda 8300 Graphics Library ---'
 	@echo ''
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow" SUBTYPE=lambda
 	TARGET=lambda TYPE=ixiy $(LIBLINKER) -IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/gfxlambda @$(TARGET_DIRECTORY)/zx81/gfx81.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 
 # ZX81 UDG based graphics lib - Stefano
 gfx81udg.lib: $(TARGET_CLIB_OBJS) gfxlambda.lib
 	@echo ''
 	@echo '--- Building ZX81 UDG based Graphics Library ---'
 	@echo ''
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 SUBTYPE=zx81udg FLAVOUR="narrow text6"
 	TARGET=zx81udg TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81udg -x$(OUTPUT_DIRECTORY)/gfx81udg @$(TARGET_DIRECTORY)/zx81/gfx81udg.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 
 # ZX81 HR graphics lib - Stefano
 gfx81hr64.lib: $(TARGET_CLIB_OBJS) gfx81udg.lib
 	@echo ''
 	@echo '--- Building ZX81 High Resolution Libraries (64 rows)  ---'
 	@echo ''
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81hr64
 	TARGET=zx81hr64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr64 -x$(OUTPUT_DIRECTORY)/gfx81hr64 @$(TARGET_DIRECTORY)/zx81/gfx81hr.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81hr64
 	TARGET=zx81hr64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr64 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx64 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81mt64
 	TARGET=zx81mt64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81mt64 -DMTHRG -x$(OUTPUT_DIRECTORY)/gfx81mt64 @$(TARGET_DIRECTORY)/zx81/gfx81mt.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 
 gfx81hr192.lib: $(TARGET_CLIB_OBJS) gfx81hr64.lib
 	@echo ''
 	@echo '--- Building ZX81 High Resolution Libraries (192 rows)  ---'
 	@echo ''
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81hr192
 	TARGET=zx81hr192 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81hr192 @$(TARGET_DIRECTORY)/zx81/gfx81hr.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81hr192
 	TARGET=zx81hr192 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr192 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx192 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81mt192
 	TARGET=zx81mt192 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81mt192 -DMTHRG -x$(OUTPUT_DIRECTORY)/gfx81mt192 @$(TARGET_DIRECTORY)/zx81/gfx81mt.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81g007
 	TARGET=zx81g007 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81g007 -DG007 -x$(OUTPUT_DIRECTORY)/gfx81g007 @$(TARGET_DIRECTORY)/zx81/gfx81g007.lst
-	$(MAKE) zx81deps
+	$(call zx81deps)
 
 # ZX81 maths library - Stefano
 m81.lib:
@@ -968,7 +970,7 @@ svi_clib.lib: $(TARGET_CLIB_OBJS) msx_clib.lib
 	@echo ''
 	@echo '--- Building Spectravideo Library ---'
 	@echo ''
-	$(MAKE) msxdeps
+	$(call msxdeps)
 	$(call buildgeneric,svi)
 	$(MAKE) -C games TARGET=svi
 	$(MAKE) -C target/msx/msxbios
@@ -984,7 +986,7 @@ msx_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building MSX Library ---'
 	@echo ''
-	$(MAKE) msxdeps
+	$(call msxdeps)
 	$(call buildgeneric,msx)
 	$(MAKE) -C target/cpm/fcntl
 	$(MAKE) -C games TARGET=msx
