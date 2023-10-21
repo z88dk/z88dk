@@ -47,19 +47,21 @@ static char             *conf_comment = NULL;
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
 static char              help         = 0;
-static char              altfmt       = 0;
+static char              oldfmt       = 0;
 
 /* Options that are available for this module */
 option_t tixx_options[] = {
 { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
 { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
 { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
-{  0 , "altfmt",   "Format variant for 8xp",     OPT_BOOL,  &altfmt },
+{  0 , "oldfmt",   "Format variant for 8xp",     OPT_BOOL,  &oldfmt },
 {  0,  "comment",  "File comment (42 chars)",    OPT_STR,   &conf_comment },
 {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
 enum EXT { E_82P, E_83P, E_8XP, E_85S, E_86P, E_86S };
+
+const unsigned char trailer83[] = { 0x3f, 0xd4, 0x3f, 0x30, 0x30, 0x30, 0x30, 0x3f, 0xd4 };
 
 
 int fsize(FILE *fp)
@@ -189,12 +191,17 @@ int tixx_exec(char *target)
     fp = fopen_bin(binname, NULL);
     if (!fp)
         exit_log(1,"Failed to open input file: %s\n", binname);
-    n = fsize(fp);
+
+    i = n = fsize(fp);
+	if ( oldfmt == 0 )	n+=9;
+
     buf = (char *)malloc(n);
-    if (1 != fread(buf, n, 1, fp)) { fclose(fp); exit_log(1, "Could not read required data from <%s>\n",binname); }
+    if (1 != fread(buf, i, 1, fp)) { fclose(fp); exit_log(1, "Could not read required data from <%s>\n",binname); }
     if (ferror(fp))
         exit_log(1,"Error reading input file: %s\n", binname);
     fclose(fp);
+    if ( oldfmt == 0 )
+		strncpy(buf+i,trailer83,9);
     fp = fopen(filename, "wb");
     if (!fp)
         exit_log(1,"Failed to open output file: %s\n", filename);
@@ -253,7 +260,7 @@ int tixx_exec(char *target)
         cfwrite("\x0c", 1, fp, &chk);
 
     /* TI83 Plus workaround */
-    if ( altfmt != 0 ) {
+    if ( oldfmt == 0 ) {
         cfwritebyte(0xBB, fp, &chk);
 		cfwritebyte(0x6D, fp, &chk);
     }
@@ -268,7 +275,7 @@ int tixx_exec(char *target)
         cfwrite(str, 8 - i, fp, &chk);
 
     /* 83+ requires 2 extra bytes */
-    if ( altfmt != 0 ) {
+    if ( oldfmt == 0 ) {
         cfwritebyte(0, fp, &chk);
 		cfwritebyte(0, fp, &chk);
     }
