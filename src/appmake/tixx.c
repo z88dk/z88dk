@@ -193,14 +193,14 @@ int tixx_exec(char *target)
         exit_log(1,"Failed to open input file: %s\n", binname);
 
     i = n = fsize(fp);
-	if ( oldfmt == 0 )	n+=9;
+	if ((oldfmt == 0) && (ext == E_8XP))	n+=9;
 
     buf = (char *)malloc(n);
     if (1 != fread(buf, i, 1, fp)) { fclose(fp); exit_log(1, "Could not read required data from <%s>\n",binname); }
     if (ferror(fp))
         exit_log(1,"Error reading input file: %s\n", binname);
     fclose(fp);
-    if ( oldfmt == 0 )
+    if ((oldfmt == 0) && (ext == E_8XP))
 		strncpy(buf+i,trailer83,9);
     fp = fopen(filename, "wb");
     if (!fp)
@@ -260,7 +260,7 @@ int tixx_exec(char *target)
         cfwrite("\x0c", 1, fp, &chk);
 
     /* TI83 Plus workaround */
-    if ( oldfmt == 0 ) {
+    if ((oldfmt == 0) && (ext == E_8XP)) {
         cfwritebyte(0xBB, fp, &chk);
 		cfwritebyte(0x6D, fp, &chk);
     }
@@ -275,7 +275,7 @@ int tixx_exec(char *target)
         cfwrite(str, 8 - i, fp, &chk);
 
     /* 83+ requires 2 extra bytes */
-    if ( oldfmt == 0 ) {
+    if ((oldfmt == 0) && (ext == E_8XP)) {
         cfwritebyte(0, fp, &chk);
 		cfwritebyte(0, fp, &chk);
     }
