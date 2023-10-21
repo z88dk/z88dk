@@ -186,7 +186,7 @@ export ZCCCFG
 
 
 if [ $do_build = 1 ]; then              # Build binaries or not...
-  $MAKE DESTDIR=$DESTDIR $MAKE_CONCURRENCY
+  $MAKE DESTDIR=$DESTDIR
 fi
 
 
