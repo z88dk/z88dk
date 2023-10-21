@@ -196,6 +196,7 @@ include interrupts/im1/im1.mak
 include interrupts/im2/im2.mak
 include interrupts/nmi/nmi.mak
 include libgen/libgen.mak
+include math/fix16/fix16.mak
 include rect/rect.mak
 include regex/regex.mak
 include sdcard/sdcard.mak
@@ -218,7 +219,6 @@ endef
 
 define buildcrt
 	$(MAKE) -C z80_crt0s
-	$(MAKE) -C math/fix16
 endef
 
 #  short script to sort out ticalc dependencies
