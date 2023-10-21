@@ -955,7 +955,7 @@ rex_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=rex TYPE=z80 $(LIBLINKER) -DFORrex -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(TARGET_DIRECTORY)/rex/rex6000.lst
 
 # Sam Coupe library - Stefano & Frode
-sam_clib.lib: $(TARGET_CLIB_OBJS)
+sam_clib.lib: $(TARGET_CLIB_OBJS) ts2068_clib.lib
 	@echo ''
 	@echo '--- Building Sam Coupe Library ---'
 	@echo ''
