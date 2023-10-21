@@ -36,11 +36,11 @@ jobs:
     - name: Build binaries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        ./build.sh -v -l
+        MAKE_CONCURRENCY=-j ./build.sh -v -l
     - name: Build libraries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        MAKE_CONCURRENCY=-j2 ./build.sh -v -b
+        MAKE_CONCURRENCY=-j ./build.sh -v -b
     - name: Build examples
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
