@@ -180,20 +180,30 @@
     <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
     <ClCompile Include="..\..\src\ticks\expressions.tab.c" />
     <ClCompile Include="..\..\src\ticks\exp_engine.c" />
+    <ClCompile Include="..\..\src\ticks\ez80_inst.c" />
+    <ClCompile Include="..\..\src\ticks\gbz80_inst.c" />
     <ClCompile Include="..\..\src\ticks\hook.c" />
     <ClCompile Include="..\..\src\ticks\hook_console.c" />
     <ClCompile Include="..\..\src\ticks\hook_cpm.c" />
     <ClCompile Include="..\..\src\ticks\hook_io.c" />
     <ClCompile Include="..\..\src\ticks\hook_misc.c" />
     <ClCompile Include="..\..\src\ticks\hook_rc2014.c" />
+    <ClCompile Include="..\..\src\ticks\i8085_inst.c" />
+    <ClCompile Include="..\..\src\ticks\kc160_inst.c" />
     <ClCompile Include="..\..\src\ticks\lex.yy.c" />
     <ClCompile Include="..\..\src\ticks\linenoise.c" />
     <ClCompile Include="..\..\src\ticks\memory.c" />
     <ClCompile Include="..\..\src\ticks\profiler.c" />
+    <ClCompile Include="..\..\src\ticks\rxk_inst.c" />
+    <ClCompile Include="..\..\src\ticks\r4k_inst.c" />
+    <ClCompile Include="..\..\src\ticks\r800_inst.c" />
     <ClCompile Include="..\..\src\ticks\srcfile.c" />
     <ClCompile Include="..\..\src\ticks\syms.c" />
     <ClCompile Include="..\..\src\ticks\ticks.c" />
     <ClCompile Include="..\..\src\ticks\utf8.c" />
+    <ClCompile Include="..\..\src\ticks\z180_inst.c" />
+    <ClCompile Include="..\..\src\ticks\z80n_inst.c" />
+    <ClCompile Include="..\..\src\ticks\zilog_inst.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ext\uthash\src\uthash.h" />
@@ -207,6 +217,7 @@
     <ClInclude Include="..\..\src\ticks\expressions.tab.h" />
     <ClInclude Include="..\..\src\ticks\exp_engine.h" />
     <ClInclude Include="..\..\src\ticks\linenoise.h" />
+    <ClInclude Include="..\..\src\ticks\memory.h" />
     <ClInclude Include="..\..\src\ticks\profiler.h" />
     <ClInclude Include="..\..\src\ticks\srcfile.h" />
     <ClInclude Include="..\..\src\ticks\syms.h" />

@@ -45,16 +45,13 @@ PUBLIC m32_fsnormalize
     jp S8H                      ; shift 8 bits in high
 
 .S24H                           ; shift 24 bits 0 to 3 left, count in c
-    sla e
-    rl d
+    rl de
     rl l
     jr C,S24H1
-    sla e
-    rl d
+    rl de
     rl l
     jr C,S24H2
-    sla e
-    rl d
+    rl de
     rl l
     jr C,S24H3
     ld a,-3                     ; count
@@ -62,48 +59,39 @@ PUBLIC m32_fsnormalize
 
 .S24H1
     rr l
-    rr d
-    rr e                        ; reverse overshift
+    rr de                       ; reverse overshift
     ld a,c                      ; zero adjust
     jr 	normdone0
 
 .S24H2
     rr l
-    rr d
-    rr e
+    rr de
     ld a,-1
     jr normdone
 
 .S24H3
     rr l
-    rr d
-    rr e
+    rr de
     ld a,-2
     jr normdone
 
 .S24L                           ; shift 24 bits 4-7 left, count in C
-    sla e
-    rl d
+    rl de
     rl l
-    sla e
-    rl d
+    rl de
     rl l
-    sla e
-    rl d
+    rl de
     rl l
     ld a,0f0h
     and a,l
     jp Z,S24L4more               ; if still no bits in high nibble, total of 7 shifts
-    sla e
-    rl d
+    rl de
     rl l
 ; 0, 1 or 2 shifts possible here
-    sla e
-    rl d
+    rl de
     rl l
     jr C,S24Lover1
-    sla e
-    rl d
+    rl de
     rl l
     jr C,S24Lover2
 ; 6 shift case
@@ -111,32 +99,26 @@ PUBLIC m32_fsnormalize
     jr normdone
 
 .S24L4more
-    sla e
-    rl d
+    rl de
     rl l
-    sla e
-    rl d
+    rl de
     rl l
-    sla e
-    rl d
+    rl de
     rl l
-    sla e
-    rl d
+    rl de
     rl l
     ld a,-7
     jr normdone
 
 .S24Lover1                      ; total of 4 shifts
     rr l
-    rr d
-    rr e                        ; correct overshift
+    rr de                       ; correct overshift
     ld a,-4
     jr normdone
 
 .S24Lover2                      ; total of 5 shifts
     rr l
-    rr d
-    rr e
+    rr de
     ld a,-5                     ; this is the very worst case
                                 ; drop through to .normdone
 
@@ -213,12 +195,9 @@ PUBLIC m32_fsnormalize
 ; shift 16 bit fraction by 4-7
 ; l is zero, 16 bits number in de
 .S16L
-    sla e
-    rl d
-    sla e
-    rl d
-    sla e
-    rl d                        ; 3 shifts
+    rl de
+    rl de
+    rl de                       ; 3 shifts
     ld a,0f0h
     and a,d
     jp Z,S16L4more              ; if still not bits n upper after 3
@@ -228,8 +207,7 @@ PUBLIC m32_fsnormalize
     sla e
     rl d
     jp M,S16L5                  ; complete at 5
-    sla e
-    rl d                        ; 6 shifts, case of 7 already taken care of must be good
+    rl de                       ; 6 shifts, case of 7 already taken care of must be good
     ld l,d
     ld d,e
     ld e,0
@@ -251,14 +229,10 @@ PUBLIC m32_fsnormalize
     jp normdone
 
 .S16L4more
-    sla e
-    rl d
-    sla e
-    rl d
-    sla e
-    rl d
-    sla e
-    rl d
+    rl de
+    rl de
+    rl de
+    rl de
     ld l,d
     ld d,e
     ld e,0
@@ -276,8 +250,7 @@ PUBLIC m32_fsnormalize
     rl d
     jp M,S16H3                   ; if 2 ok
 ; must be 3
-    sla e
-    rl d
+    rl de
     ld l,d
     ld d,e
     ld e,0
@@ -285,8 +258,7 @@ PUBLIC m32_fsnormalize
     jp normdone
 
 .S16H1                          ; overshift
-    rr d
-    rr e
+    rr de
     ld l,d
     ld d,e
     ld e,0
@@ -303,7 +275,7 @@ PUBLIC m32_fsnormalize
 .S16H3
     ld l,d
     ld d,e
-    ld e,0   
+    ld e,0
     ld a,-10
     jp normdone
 
@@ -339,6 +311,7 @@ PUBLIC m32_fsnormalize
 .S8H3
     rr e                        ; correct overshift
     ld l,e
-    ld e,d    
+    ld e,d
     ld a,-18
     jp normdone                ; worst case S8H
+

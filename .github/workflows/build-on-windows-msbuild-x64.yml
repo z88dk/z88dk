@@ -22,7 +22,7 @@ jobs:
     - name: Install perl prerequisites
       run: |
         perl -S cpan App::cpanminus
-        perl -S cpanm App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
+        perl -S cpanm App::Prove Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
     - name: Checkout from git
       uses: actions/checkout@v3
       with: 
@@ -50,7 +50,6 @@ jobs:
         copy /y win32-latest\z88dk\lib\z88dk-z80asm*.lib src\z80asm\
         copy /y win32-latest\z88dk\lib\clibs\*.lib lib\clibs\
         copy /y win32-latest\z88dk\bin\z88dk-zsdcc.exe bin\
-        copy /y win32-latest\z88dk\bin\z88dk-zsdcpp.exe bin\
         copy /y win32-latest\z88dk\bin\m4.exe bin\
         copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sccz80\*.lib libsrc\_DEVELOPMENT\lib\sccz80\
         copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sdcc_ix\*.lib libsrc\_DEVELOPMENT\lib\sdcc_ix\

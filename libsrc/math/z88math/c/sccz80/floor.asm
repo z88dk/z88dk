@@ -7,29 +7,29 @@
 ;       7/12/98 djm
 
 
-;double floor(double)  
+;double floor(double)
 ;Number in FA..
 
-                SECTION  code_fp
-IF FORz88
-                INCLUDE  "target/z88/def/fpp.def"
-ELSE
-		INCLUDE "fpp.def"
-ENDIF
+        SECTION code_fp
+  IF    FORz88
+        INCLUDE "target/z88/def/fpp.def"
+  ELSE
+        INCLUDE "fpp.def"
+  ENDIF
 
-                PUBLIC    floor
+        PUBLIC  floor
 
-                EXTERN	fsetup
-                EXTERN	stkequ2
+        EXTERN  fsetup
+        EXTERN  stkequ2
 
-.floor
+floor:
         call    fsetup
-IF FORz88
-        fpp(FP_INT)             ;floor it (round down!)
-ELSE
-	ld	a,+(FP_INT)
-	call	FPP
-ENDIF
+  IF    FORz88
+        fpp     (FP_INT)                ;floor it (round down!)
+  ELSE
+        ld      a, +(FP_INT)
+        call    FPP
+  ENDIF
         jp      stkequ2
 
 

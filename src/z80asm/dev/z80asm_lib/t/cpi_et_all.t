@@ -1,116 +1,160 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
-# Z88DK Z80 Macro Assembler
-#
+# z80asm assembler
 # Test z88dk-z80asm-*.lib
-#
 # Copyright (C) Paulo Custodio, 2011-2023
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+# License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
-use strict;
-use warnings;
-use v5.10;
-use Test::More;
-require '../../t/testlib.pl';
 
-# CPUs not supported by ticks: z80n z180 r3k
-my @CPUS = (qw( z80 r2ka ));
-my $test_nr;
+BEGIN { use lib '../../t'; require 'testlib.pl'; }
+
+use Modern::Perl;
+
+my $ticks = Ticks->new;
 
 # CPI / CPD
 # CPIR / CPDR with BC = 1
-for my $cpu (@CPUS) {
-	for my $carry (0, 1) {
-		for my $data (1, 2, 3) {
-			my $a = 2;
-			my $de = 0x4321;
-			for my $bc (2, 1) {
-				for my $op (qw( cpi cpd cpir cpdr )) {
-					next if $bc != 1 && $op =~ /cpir|cpdr/;
-					$test_nr++;
-					note "Test $test_nr: cpu:$cpu, carry:$carry, data:$data, a:$a, bc:$bc, op:$op";
-					my $carry_set = $carry ? "scf" : "and a";
-					my $r = ticks(<<END, "-m$cpu");
-						defc data = 0x100
-								$carry_set
-								ld de, $de
+my $test_nr = 0;
+for my $carry (0, 1) {
+	for my $data (1, 2, 3) {
+		my $a = 2;
+		my $de = 0x4000;
+		for my $bc (2, 1) {
+			for my $op (qw( cpi cpd cpir cpdr )) {
+				next if $bc != 1 && $op =~ /cpir|cpdr/;
 
-								ld hl, data
-								ld (hl), $data
-								ld a, $a
-								ld bc, $bc
-								
-								$op
-								
-								rst 0
-END
-					is $r->{F_S}, ($a <  $data 		? 1 : 0), "S";
-					is $r->{F_Z}, ($a == $data 		? 1 : 0), "Z";
-					is $r->{F_H}, ($a <  $data 		? 1 : 0), "Hf";
-					is $r->{F_PV}, ($r->{BC} == 0 	? 0 : 1), "PV";
-					is $r->{F_N}, 1,						  "N";
-					is $r->{F_C}, $carry,					  "C";					
-					is $r->{HL}, $op =~ /cpi/ ? 0x101 : 0x0FF,"HL";
-					is $r->{BC}, $bc - 1,					  "BC";
-					is $r->{DE}, $de,						  "DE";
-					
-					# die if $test_nr == 37;
-				}
-			}
-		}
-	}
-}
-
-# CPIR / CPDR with BC > 1
-for my $cpu (@CPUS) {
-	for my $carry (0, 1) {
-		for my $op (qw( cpir cpdr )) {
-			for my $data (1, 2, 3) {
-				my $a = 2;
-				my $de = 0x4321;
 				$test_nr++;
-				note "Test $test_nr: cpu:$cpu, carry:$carry, data:$data, a:$a, op:$op";
-				my $carry_set = $carry ? "scf" : "and a";
-				my $start = $op =~ /cpir/ ? 'data' : 'end-1';
-				my $r = ticks(<<END, "-m$cpu");
-								jr start
-						.data	defs 5, $data
-						.end
-								
-						.start	$carry_set
-								ld de, $de
+				note "Test $test_nr carry:$carry, data:$data, a:$a, bc:$bc, op:$op";
+				
+				my $set_carry = $carry ? "scf" : "and a";
+				my $data_label = "L${test_nr}_data";
+				
+				$ticks->add(<<END, 
+							jr data_end
+					data_start: 
+							defb 0,0,0,0,0
+					data:	defb $data
+							defb 0,0,0,0,0
+					data_end:
 
-								ld hl, $start
-								ld a, $a
-								ld bc, end-data
-								
-								$op
-								
-								rst 0
+							$set_carry
+							ld de, $de
+							ld hl, data
+
+							ld a, $a
+							ld bc, $bc
+							
+							$op
 END
-				is $r->{F_S}, ($a <  $data 		? 1 : 0), 	"S";
-				is $r->{F_Z}, ($a == $data 		? 1 : 0), 	"Z";
-				is $r->{F_H}, ($a <  $data 		? 1 : 0), 	"Hf";
-				is $r->{F_PV}, ($r->{BC} == 0 	? 0 : 1), 	"PV";
-				is $r->{F_N}, 1,						  	"N";
-				is $r->{F_C}, $carry,					  	"C";
-				if ($a == $data) {
-					is $r->{HL}, $op =~ /cpir/ ? 0x02+1 
-											   : 0x02+5-1-1, "HL";
-					is $r->{BC}, 5-1,					  	"BC";
-				}
-				else {
-					is $r->{HL}, $op =~ /cpir/ ? 0x02+5 
-											   : 0x02-1,  	"HL";
-					is $r->{BC}, 0,						  	"BC";
-				}
-				is $r->{DE}, $de,							"DE";
-					
-				# die if $test_nr == 73;
+					F_S	=> $a <  $data ? 1 : 0,
+					F_Z	=> $a == $data ? 1 : 0,
+					F_H	=> $a <  $data ? 1 : 0,
+					F_PV=> ($bc - 1)==0 ? 0 : 1,
+					F_N	=> 1,
+					F_C	=> $carry,
+					HL	=> sub { my($t) = @_;
+								 return $op =~ /cpi/ ? $t->{labels}{$data_label}+1 
+											         : $t->{labels}{$data_label}-1; },
+					BC	=> $bc - 1,
+					DE	=> $de);
 			}
 		}
 	}
 }
+
+# CPIR with BC > 1
+for my $carry (0, 1) {
+	for my $data (1, 2, 3) {
+		my $a = 2;
+		my $de = 0x4000;
+		
+		$test_nr++;
+		note "Test $test_nr: carry:$carry, data:$data, a:$a, op:cpir";
+		
+		my $set_carry = $carry ? "scf" : "and a";
+		my $data_label = "L${test_nr}_data";
+
+		$ticks->add(<<END, 
+							jr start
+					data_start: 
+							defb 0,0,0,0,0
+					data:	
+							defb $data,$data,$data,$data,$data
+					data_end:
+							defb 0,0,0,0,0
+					start:
+							$set_carry
+							ld de, $de
+
+							ld hl, data
+
+							ld a, $a
+							ld bc, data_end - data
+							
+							cpir
+END
+					F_S	=> $a <  $data ? 1 : 0,
+					F_Z	=> $a == $data ? 1 : 0,
+					F_H	=> $a <  $data ? 1 : 0,
+					F_PV=> $a == $data ? 1 : 0,
+					F_N	=> 1,
+					F_C	=> $carry,
+					HL	=> sub { my($t) = @_;
+								 return $a == $data ? $t->{labels}{$data_label}+1
+													: $t->{labels}{$data_label}+5; },
+					BC	=> $a == $data ? 5 - 1 : 0,
+					DE	=> $de);
+	}
+}
+
+# CPDR with BC > 1
+for my $carry (0, 1) {
+	for my $data (1, 2, 3) {
+		my $a = 2;
+		my $de = 0x4000;
+		
+		$test_nr++;
+		note "Test $test_nr: carry:$carry, data:$data, a:$a, op:cpdr";
+		
+		my $set_carry = $carry ? "scf" : "and a";
+		my $data_label = "L${test_nr}_data";
+
+		$ticks->add(<<END, 
+							jr start
+					data_start: 
+							defb 0,0,0,0,0
+					data:	
+							defb $data,$data,$data,$data,$data
+					data_end:
+							defb 0,0,0,0,0
+					start:
+							$set_carry
+							ld de, $de
+
+							ld hl, data_end - 1
+
+							ld a, $a
+							ld bc, data_end - data
+							
+							cpdr
+END
+					F_S	=> $a <  $data ? 1 : 0,
+					F_Z	=> $a == $data ? 1 : 0,
+					F_H	=> $a <  $data ? 1 : 0,
+					F_PV=> $a == $data ? 1 : 0,
+					F_N	=> 1,
+					F_C	=> $carry,
+					HL	=> sub { my($t) = @_;
+								 return $a == $data ? $t->{labels}{$data_label}+4-1
+													: $t->{labels}{$data_label}+4-5; },
+					BC	=> $a == $data ? 5 - 1 : 0,
+					DE	=> $de);
+	}
+}
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

@@ -28,8 +28,8 @@ l_z80n_mulu_32_32x32:
 
     ; multiplication of two 32-bit numbers into a 32-bit product
     ;
-    ; enter : dehl = 32-bit multiplicand
-    ;         dehl'= 32-bit multiplicand
+    ; enter : de hl = 32-bit multiplicand = x
+    ;         de'hl'= 32-bit multiplier   = y
     ;
     ; exit  : dehl = 32-bit product
     ;         carry reset

@@ -31,8 +31,7 @@ PUBLIC _m32_mul2f
     jr Z,infinity               ; capture overflow
     dec d
 
-    rr d                        ; return sign and exponent
-    rr e
+    rr de                       ; return sign and exponent
     ret                         ; return IEEE DEHL
 
 .zero_legal
@@ -45,7 +44,6 @@ PUBLIC _m32_mul2f
     ld e,d                      ; use 0
     ld hl,de
     dec d                       ; 0xff
-    rr d                        ; restore the sign
-    rr e
+    rr de                       ; restore the sign
     scf
     ret                         ; return IEEE signed INFINITY in DEHL

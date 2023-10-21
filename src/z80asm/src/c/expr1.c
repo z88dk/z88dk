@@ -335,21 +335,21 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 *----------------------------------------------------------------------------*/
 
 /* return size in bytes of value of given range */
-int range_size(range_t range)
-{
-	switch (range)
-	{
+int range_size(range_t range) {
+	switch (range) {
 	case RANGE_JR_OFFSET:		        return 1;
 	case RANGE_BYTE_UNSIGNED:	        return 1;
 	case RANGE_BYTE_SIGNED:		        return 1;
-	case RANGE_HIGH_OFFSET:				return 1;
 	case RANGE_WORD:			        return 2;
 	case RANGE_WORD_BE:			        return 2;
 	case RANGE_DWORD:			        return 4;
 	case RANGE_BYTE_TO_WORD_UNSIGNED:   return 2;
 	case RANGE_BYTE_TO_WORD_SIGNED:     return 2;
 	case RANGE_PTR24:					return 3;
-	default: xassert(0);
+	case RANGE_HIGH_OFFSET:				return 1;
+    case RANGE_ASSIGNMENT:              return 2;
+    case RANGE_JRE_OFFSET:		        return 2;
+    default: xassert(0);
 	}
 
 	xassert(0);
@@ -377,6 +377,7 @@ void Expr1_init(Expr1* self)
 	self->section = CURRENTSECTION;
 	self->asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();	/* BUG_0048 */
 	self->code_pos = get_cur_module_size();	/* BUG_0015 */
+	self->opcode_size = 0;
 
 	self->filename = spool_add(sfile_filename());
 	self->line_num = sfile_line_num();
@@ -990,4 +991,30 @@ bool Expr_is_addr_diff(Expr1* self) {
 	}
 
 	return ret;
+}
+
+bool Expr_depends_on_one_symbol(Expr1* self, Section1** p_used_section) {
+    *p_used_section = NULL;
+    int count_symbols = 0;
+    for (size_t i = 0; i < ExprOpArray_size(self->rpn_ops); i++) {
+        ExprOp* expr_op = ExprOpArray_item(self->rpn_ops, i);
+        switch (expr_op->op_type) {
+        case SYMBOL_OP:
+            count_symbols++;
+            if (count_symbols == 1)
+                *p_used_section = expr_op->d.symbol->section;
+            else
+                *p_used_section = NULL;
+            break;
+        case ASMPC_OP:
+        case NUMBER_OP:
+        case UNARY_OP:
+        case BINARY_OP:
+        case TERNARY_OP:
+            break;
+        default:
+            xassert(0);
+        }
+    }
+    return *p_used_section!=NULL;
 }

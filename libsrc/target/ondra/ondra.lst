@@ -4,8 +4,8 @@ target/ondra/stdio/generic_console_ioctl
 target/ondra/stdio/generic_console_vpeek
 target/ondra/stdio/CRT_FONT
 target/ondra/graphics/w_pixeladdress
-stdio/inkey/getk
-stdio/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
 @input/input_keyboard.lst
 @gfx/wide/gfx_wide.lst
 

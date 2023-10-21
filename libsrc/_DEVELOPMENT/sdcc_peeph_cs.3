@@ -4769,7 +4769,7 @@ replace restart {
 } by {
 	; peephole 12 loaded %2 into %3 (%4) directly instead of going through %1.
 	ld	%3 (%4), %2
-} if canAssign(%3 %4 %2), notVolatile(%1), notUsed(%1)
+} if canAssign(%3 %4 %2), notVolatile(%1), notUsed(%1), notSame(%1 'hl' 'de' 'bc')
 
 replace restart {
 	ld	%1, %2 (%3)
@@ -5996,7 +5996,7 @@ replace restart {
 	inc	%2 (%3)
 	ld	%1, %2 (%3)
 	; peephole 93a incremented in %2 (%3) instead of going through %1.
-}
+} if notSame(%1 'hl' 'de' 'bc')
 
 // TODO: Check for volatile?
 replace restart {
@@ -6007,7 +6007,7 @@ replace restart {
 	dec	%2 (%3)
 	ld	%1, %2 (%3)
 	; peephole 93b decremented in %2 (%3) instead of going through %1.
-}
+} if notSame(%1 'hl' 'de' 'bc')
 
 replace restart {
 	ld	%1,a

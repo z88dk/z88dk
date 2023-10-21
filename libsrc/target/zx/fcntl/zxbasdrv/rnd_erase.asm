@@ -10,12 +10,30 @@
 	SECTION code_clib
 	PUBLIC	rnd_erase
 	PUBLIC	_rnd_erase
-	
+	PUBLIC	rnd_erase_fastcall
+	PUBLIC	_rnd_erase_fastcall
 	EXTERN	zx_goto
 	EXTERN	zxgetfname2
 
 .rnd_erase
 ._rnd_erase
+IF __CPU_GBZ80__
+   ld  hl,sp+2
+   ld  a,(hl+)
+   ld  h,(hl)
+   ld  l,a
+ELIF __CPU_RABBIT__ | __CPU_KC160__
+   ld hl,(sp+2)
+ELSE
+   pop de
+   pop hl
+   push hl
+   push de
+ENDIF
+
+
+.rnd_erase_fastcall
+._rnd_erase_fastcall
 	
 	call	zxgetfname2
 	

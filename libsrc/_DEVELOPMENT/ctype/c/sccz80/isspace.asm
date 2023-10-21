@@ -5,19 +5,26 @@ SECTION code_clib
 SECTION code_ctype
 
 PUBLIC isspace
+PUBLIC isspace_fastcall
 
 EXTERN asm_isspace, error_zc
 
-IF __CLASSIC && __CPU_GBZ80__
-PUBLIC _isspace
-_isspace:
-  ld  hl,sp+2
-  ld  a,(hl+)
-  ld  h,(hl)
-  ld  l,a
+isspace:
+IF __CPU_GBZ80__
+   ld  hl,sp+2
+   ld  a,(hl+)
+   ld  h,(hl)
+   ld  l,a
+ELIF __CPU_RABBIT__ | __CPU_KC160__
+   ld hl,(sp+2)
+ELSE
+   pop de
+   pop hl
+   push hl
+   push de
 ENDIF
 
-isspace:
+isspace_fastcall:
 
    inc h
    dec h
@@ -40,8 +47,16 @@ ENDIF
    ret
 
 ; SDCC bridge for Classic
-IF __CLASSIC && !__CPU_GBZ80__
+IF __CLASSIC
 PUBLIC _isspace
 defc _isspace = isspace
+PUBLIC _isspace_fastcall
+defc _isspace_fastcall = isspace_fastcall
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___isspace
+defc ___isspace = isspace
 ENDIF
 

@@ -37,8 +37,8 @@ flags:
 no_flag:
         inc     hl
 IF __CPU_GBZ80__
-	dec	b
-	jr	nz,flag_loop
+	dec     b
+	jr      nz,flag_loop
 ELSE
         djnz    flag_loop
 ENDIF
@@ -50,10 +50,10 @@ ELSE
 ENDIF
 check_width:
 IF __CPU_INTEL__ | __CPU_GBZ80__
-	push	de
-	ld	de,0
+	push    de
+	ld      de,0
 	call	__printf_set_width
-	pop	de
+	pop     de
 ELSE
         ld      (ix-5),0        ;default width=0
         ld      (ix-6),0
@@ -94,10 +94,10 @@ ENDIF
         inc     hl
 check_precision:
 IF __CPU_INTEL__ | __CPU_GBZ80__
-	push	de
-	ld	de,-1
+	push    de
+	ld      de,-1
 	call	__printf_set_precision
-	pop	de
+	pop     de
 ELSE
         ld      (ix-7),255      ;precision = undefined
         ld      (ix-8),255

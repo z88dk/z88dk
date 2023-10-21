@@ -5,19 +5,27 @@ SECTION code_clib
 SECTION code_ctype
 
 PUBLIC isdigit
+PUBLIC isdigit_fastcall
 
 EXTERN asm_isdigit, error_zc
 
-IF __CLASSIC && __CPU_GBZ80__
-PUBLIC _isdigit
-_isdigit:
-  ld  hl,sp+2
-  ld  a,(hl+)
-  ld  h,(hl)
-  ld  l,a
-ENDIF
 
 isdigit:
+IF __CPU_GBZ80__
+   ld  hl,sp+2
+   ld  a,(hl+)
+   ld  h,(hl)
+   ld  l,a
+ELIF __CPU_RABBIT__ | __CPU_KC160__
+   ld hl,(sp+2)
+ELSE
+   pop de
+   pop hl
+   push hl
+   push de
+ENDIF
+
+isdigit_fastcall:
 
    inc h
    dec h
@@ -39,9 +47,20 @@ IF __CPU_GBZ80__
 ENDIF
    ret
 
+
+
+
 ; SDCC bridge for Classic
-IF __CLASSIC && !__CPU_GBZ80__
+IF __CLASSIC
 PUBLIC _isdigit
 defc _isdigit = isdigit
+PUBLIC _isdigit_fastcall
+defc _isdigit_fastcall = isdigit_fastcall
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___isdigit
+defc ___isdigit = isdigit
 ENDIF
 

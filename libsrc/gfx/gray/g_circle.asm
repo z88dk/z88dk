@@ -10,49 +10,49 @@
 ;Usage: g_circle(int x, int y, int radius, int skip, int GrayLevel)
 
 
-                PUBLIC    g_circle
-                PUBLIC    _g_circle
+        PUBLIC  g_circle
+        PUBLIC  _g_circle
 
-                EXTERN     draw_circle
-                EXTERN     plotpixel
-                EXTERN     respixel
-                EXTERN     graypage
+        EXTERN  draw_circle
+        EXTERN  plotpixel
+        EXTERN  respixel
+        EXTERN  graypage
 
 
-.g_circle
-._g_circle
-		ld	ix,0
-		add	ix,sp
-		ld	a,(ix+2)	;GrayLevel
-		ld	e,(ix+4)	;skip
-		ld	d,(ix+6)	;radius
-		ld	c,(ix+8)	;y
-		ld	b,(ix+10)	;x
-		
-		push	af
-		xor	a
-		call	graypage
-		pop	af
-                ld	ix,plotpixel
-		rra
-		jr	nc,set1
-                ld	ix,respixel
-.set1
-		push	af
-		push	de
-		push	bc
-                call	draw_circle
-                pop	bc
-		pop	de
-		pop	af
+g_circle:
+_g_circle:
+        ld      ix, 0
+        add     ix, sp
+        ld      a, (ix+2)               ;GrayLevel
+        ld      e, (ix+4)               ;skip
+        ld      d, (ix+6)               ;radius
+        ld      c, (ix+8)               ;y
+        ld      b, (ix+10)              ;x
 
-		push	af
-		ld	a,1
-		call	graypage
-		pop	af
-                ld	ix,plotpixel
-		rra
-		jr	nc,set2
-                ld	ix,respixel
-.set2
-                jp	draw_circle
+        push    af
+        xor     a
+        call    graypage
+        pop     af
+        ld      ix, plotpixel
+        rra
+        jr      nc, set1
+        ld      ix, respixel
+set1:
+        push    af
+        push    de
+        push    bc
+        call    draw_circle
+        pop     bc
+        pop     de
+        pop     af
+
+        push    af
+        ld      a, 1
+        call    graypage
+        pop     af
+        ld      ix, plotpixel
+        rra
+        jr      nc, set2
+        ld      ix, respixel
+set2:
+        jp      draw_circle

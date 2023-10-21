@@ -4,11 +4,11 @@
 SECTION code_clib
 SECTION code_compress_zx7
 
-PUBLIC _dzx7_mega_callee
+PUBLIC dzx7_mega_callee
 
 EXTERN asm_dzx7_mega
 
-_dzx7_mega_callee:
+dzx7_mega_callee:
 
 IF __CPU_GBZ80__
    pop bc

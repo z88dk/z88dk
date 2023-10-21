@@ -1,12 +1,12 @@
-    INCLUDE    "graphics/grafix.inc"
+        INCLUDE "graphics/grafix.inc"
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
-    SECTION    code_graphics    
-    PUBLIC    Line
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+        SECTION code_graphics
+        PUBLIC  Line
 
-    EXTERN    Line_r
+        EXTERN  Line_r
 
-    EXTERN    __gfx_coords
+        EXTERN  __gfx_coords
 
 ;
 ;    $Id: line.asm,v 1.7 2016-07-02 09:01:35 dom Exp $
@@ -42,41 +42,42 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;    ..BCDEHL/IXIY/af......    same
 ;    AF....../..../..bcdehl    different
 ;
-.Line    push    de
-    push    hl
-    IF maxx <> 256
-    ld    a,h
-    cp    maxx
-    jr    nc, exit_line    ; x0    coordinate out    of range
-    ld    a,d
-    cp    maxx
-    jr    nc, exit_line    ; x1    coordinate out    of range
+Line:   push    de
+        push    hl
+    IF  maxx<>256
+        ld      a, h
+        cp      maxx
+        jr      nc, exit_line           ; x0    coordinate out    of range
+        ld      a, d
+        cp      maxx
+        jr      nc, exit_line           ; x1    coordinate out    of range
     ENDIF
-    IF maxy <> 256
-    ld    a,l
-    cp    maxy
-    jr    nc, exit_line    ; y0    coordinate out    of range
-    ld    a,e
-    cp    maxy
-    jr    nc, exit_line    ; y1    coordinate out    of range
+    IF  maxy<>256
+        ld      a, l
+        cp      maxy
+        jr      nc, exit_line           ; y0    coordinate out    of range
+        ld      a, e
+        cp      maxy
+        jr      nc, exit_line           ; y1    coordinate out    of range
     ENDIF
-    ld    (__gfx_coords),hl    ; the starting    point is now default
-    push    hl
-    push    de
-    ld    l,h    ; L = x0
-    ld    h,d    ; H = x1
-    call    distance    ; x1    - x0    horisontal distance    in HL
-    pop    de
-    ex    (sp),hl    ; L = y0
-    ld    h,e    ; H = y1
-    call    distance    ; y1    - y0    vertical distance in HL
-    pop    de
-    ex    de,hl    ; h.dist.    = HL, v.dist. = DE
-    call    Line_r    ; draw line...
+        ld      (__gfx_coords), hl      ; the starting    point is now default
+        push    hl
+        push    de
+        ld      l, h                    ; L = x0
+        ld      h, d                    ; H = x1
+        call    distance                ; x1    - x0    horisontal distance    in HL
+        pop     de
+        ex      (sp), hl                ; L = y0
+        ld      h, e                    ; H = y1
+        call    distance                ; y1    - y0    vertical distance in HL
+        pop     de
+        ex      de, hl                  ; h.dist.    = HL, v.dist. = DE
+        call    Line_r                  ; draw line...
 
-.exit_line    pop    hl
-    pop    de
-    ret
+exit_line:
+        pop     hl
+        pop     de
+        ret
 
 
 
@@ -88,11 +89,12 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;
 ; OUT: h - l distance in    HL
 ;
-.distance    ld    a,h
-    sub    l
-    ld    l,a
-    ld    h,0
-    ret    nc
-    ld    h,-1
-    ret
-ENDIF
+distance:
+        ld      a, h
+        sub     l
+        ld      l, a
+        ld      h, 0
+        ret     nc
+        ld      h, -1
+        ret
+  ENDIF

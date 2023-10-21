@@ -47,3 +47,10 @@ PUBLIC _strlcpy
 defc _strlcpy = strlcpy
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strlcpy
+defc ___strlcpy = strlcpy
+ENDIF
+

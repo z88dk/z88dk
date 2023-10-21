@@ -79,8 +79,7 @@ signed_overflow:
 
    call error_mulu_overflow_mc
    
-   ld e,l
-   ld d,h
+   ld de,hl
 
 unsigned_overflow:
 

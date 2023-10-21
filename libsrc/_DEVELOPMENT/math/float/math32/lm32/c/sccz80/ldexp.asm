@@ -11,3 +11,9 @@ PUBLIC _ldexp
 defc _ldexp = ldexp
 ENDIF
 
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___ldexp
+defc ___ldexp = ldexp
+ENDIF
+

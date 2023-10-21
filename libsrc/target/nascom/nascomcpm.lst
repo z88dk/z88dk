@@ -4,7 +4,7 @@ target/nascom/stdio/ansi/f_ansi_attr
 target/nascom/stdio/ansi/f_ansi_bel_cpm
 target/nascom/stdio/ansi/f_ansi_char
 target/nascom/stdio/ansi/f_ansi_cls
-stdio/ansi/generic/f_ansi_dline
+stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/nascom/stdio/ansi/f_ansi_scrollup
 target/nascom/graphics/textpixl6
 @stdio/ansicore.lst

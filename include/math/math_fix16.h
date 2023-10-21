@@ -96,6 +96,18 @@ extern Accum __LIB__ tank_fastcall(Accum x) __z88dk_fastcall;
 #define tank(x) tank_fastcall(x)
 
 
+extern Accum __LIB__ coshk(Accum x);
+extern Accum __LIB__ coshk_fastcall(Accum x) __z88dk_fastcall;
+#define coshk(x) coshk_fastcall(x)
+extern Accum __LIB__ sinhk(Accum x);
+extern Accum __LIB__ sinhk_fastcall(Accum x) __z88dk_fastcall;
+#define sinhk(x) sinhk_fastcall(x)
+extern Accum __LIB__ tanhk(Accum x);
+extern Accum __LIB__ tanhk_fastcall(Accum x) __z88dk_fastcall;
+#define tanhk(x) tanhk_fastcall(x)
+
+
+
 extern Accum __LIB__ acosk(Accum x);
 extern Accum __LIB__ acosk_fastcall(Accum x) __z88dk_fastcall;
 #define acosk(x) acosk_fastcall(x)

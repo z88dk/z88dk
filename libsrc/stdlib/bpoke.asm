@@ -3,10 +3,12 @@
 SECTION code_clib
 PUBLIC bpoke
 PUBLIC _bpoke
+PUBLIC ___bpoke
 EXTERN asm_bpoke
 
 .bpoke
 ._bpoke
+.___bpoke
 
    pop bc
    pop de

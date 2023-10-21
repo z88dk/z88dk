@@ -47,6 +47,10 @@ case `uname -s` in                      # Insert default values for MAKE and INS
     MAKE="gmake"
     INSTALL="install"
     export INSTALL
+    if [ -z "$CC" ]; then                   # Insert default value for CC if CC is empty
+      CC="cc"
+      export CC
+    fi
     ;;
   Darwin)
     if ! command -v gmake &> /dev/null
@@ -162,7 +166,6 @@ if [ -z "$CC" ]; then                   # Insert default value for CC if CC is e
   export CC
 fi
 
-
 if [ -z "$CFLAGS" ]; then               # Insert default value for CFLAGS if CFLAGS is empty
   CFLAGS="-g -O2"
   export CFLAGS
@@ -193,7 +196,7 @@ if [ $do_libbuild = 1 ]; then           # Build libraries or not...
   else
 	  MAKEARG=""
   fi
-  $MAKE -C libsrc $MAKEARG
+  $MAKE -C libsrc $MAKE_CONCURRENCY $MAKEARG
   $MAKE -C libsrc install
   $MAKE -C libsrc/_DEVELOPMENT $TARGETS
   $MAKE -C include/_DEVELOPMENT

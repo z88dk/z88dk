@@ -51,8 +51,7 @@ PUBLIC _m32_frexpf
     pop bc                      ; (int8_t*)pw2
     push af                     ; return on stack
 
-    sla e                       ; get the exponent
-    rl d
+    rl de                       ; get the exponent
     rr e                        ; save the sign in e[7]
 
     ld a,d
@@ -70,6 +69,5 @@ PUBLIC _m32_frexpf
     ld  (bc),a
 
     rl e                        ; get sign back
-    rr d
-    rr e
+    rr de
     ret                         ; return IEEE DEHL fraction

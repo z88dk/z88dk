@@ -30,15 +30,13 @@ l0_fast_mulu_40_32x8:
 
    push hl
 
-   ld l,e
-   ld h,d
+   ld hl,de
 
    exx
 
    pop de
 
-   ld l,e
-   ld h,d
+   ld hl,de
 
    ;  de'de = 32-bit multiplicand
    ;      a = 8-bit multiplicand

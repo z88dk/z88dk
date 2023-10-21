@@ -7,6 +7,6 @@
         EXTERN  ___dai32_return
 
 __pow_impl:
-	call	___dai32_setup_two
-	call	___dai32_xpwr
-	jp	___dai32_return
+        call    ___dai32_setup_two
+        call    ___dai32_xpwr
+        jp      ___dai32_return

@@ -14,5 +14,5 @@
 
 double asin(double x)
 {
-	return atan(x/(1.+sqrt(1.-(x*x))));
+	return atan(x/(sqrt(1.-(x*x))));
 }

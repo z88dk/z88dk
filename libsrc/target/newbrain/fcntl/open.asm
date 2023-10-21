@@ -24,6 +24,7 @@
         SECTION code_clib
 	PUBLIC	open
    PUBLIC   _open
+   PUBLIC   ___open
 	
 	EXTERN	nbhandl
 	EXTERN	nb_open
@@ -32,6 +33,7 @@
 
 .open
 ._open
+.___open
 	push	ix		;save callers
 	ld	ix,4
 	add	ix,sp

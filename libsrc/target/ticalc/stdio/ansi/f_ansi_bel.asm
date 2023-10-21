@@ -9,9 +9,9 @@
 ;
 
         SECTION code_clib
-	PUBLIC	ansi_BEL
+        PUBLIC  ansi_BEL
 
 
-.ansi_BEL
+ansi_BEL:
         ret
 

@@ -11,3 +11,9 @@ PUBLIC _fmin
 defc _fmin = fmin
 ENDIF
 
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___fmin
+defc ___fmin = fmin
+ENDIF
+

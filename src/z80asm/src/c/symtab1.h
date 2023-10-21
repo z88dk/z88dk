@@ -42,14 +42,16 @@ extern Symbol1 *find_global_symbol(const char *name );
    create undefined symbol if not found, return symbol */
 extern Symbol1 *get_used_symbol(const char *name );
 
-/* define a static DEF symbol (e.g. from -D command line) */
+/* define/undefine a static DEF symbol (e.g. from -D command line) */
 extern Symbol1 *define_static_def_sym(const char *name, long value );
+extern void undefine_static_def_sym(const char* name);
 
 /* define a global DEF symbol (e.g. ASMSIZE, ASMTAIL) */
 extern Symbol1 *define_global_def_sym(const char *name, long value );
 
-/* define a local DEF symbol (e.g. DEFINE) */
+/* define/undefine a local DEF symbol (e.g. DEFINE) */
 extern Symbol1 *define_local_def_sym(const char *name, long value );
+extern void undefine_local_def_sym(const char* name);
 
 /* define a new symbol in the local or global tabs */
 extern Symbol1 *define_local_sym(const char *name, long value, sym_type_t type);

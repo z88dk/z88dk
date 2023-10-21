@@ -5,7 +5,7 @@ SECTION code_math
 PUBLIC l_small_divs_16_16x16, l0_small_divs_16_16x16
 
 EXTERN l_neg_hl, l_neg_de
-EXTERN l0_small_divu_16_16x16, error_divide_by_zero_mc
+EXTERN l0_divu_16_16x16, error_divide_by_zero_mc
 
    ; alternate entry to swap dividend / divisor
 
@@ -57,7 +57,7 @@ l0_small_divs_16_16x16:
 
    ; perform unsigned division
    
-   call l0_small_divu_16_16x16
+   call l0_divu_16_16x16
    
    ; hl = unsigned quotient
    ; de = unsigned remainder

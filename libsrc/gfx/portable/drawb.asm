@@ -4,6 +4,7 @@
 
 	PUBLIC	drawb
 	PUBLIC	_drawb
+	PUBLIC	___drawb
 
 	EXTERN commonbox
         EXTERN plot
@@ -12,5 +13,6 @@
 ;Note ints are actually uint8_t
 drawb:
 _drawb:
+___drawb:
 	ld	hl,plot
 	jp	commonbox

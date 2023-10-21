@@ -109,8 +109,10 @@ run_ok("z88dk-z80asm -b $test.asm");
 check_bin_file("$test.bin", bytes(0, (0) x 15, 1,2,3,4));
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF16
+Object  file $test.o at \$0000: Z80RMF18
   Name: $test
+  CPU:  z80 
+  Section "": 0 bytes
   Section code: 1 bytes
     C \$0000: 00
   Section data: 4 bytes, ALIGN 16

@@ -16,9 +16,21 @@
 .zx_hardcopy
 ._zx_hardcopy
 
-		call	restore81
+	call	restore81
+
 IF FORlambda
-		jp	$1CC3
+
+	ld a,(7)
+	cp $25
+	jp	z,$1CC3 ; Color ROM
+
+	cp $1d
+	jp z,$A0A  ; Old Monochrome ROM
+
+	jp $1E47   ; CAC-3 or NF300
+
 ELSE
-		jp	$0869
+
+	jp	$0869
+
 ENDIF

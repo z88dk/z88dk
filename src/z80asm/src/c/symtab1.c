@@ -18,7 +18,7 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 #include "fileutil.h"
 #include "if.h"
 #include "reloc_code.h"
-#include "scan.h"
+#include "scan1.h"
 #include "str.h"
 #include "symtab1.h"
 #include "types.h"
@@ -105,6 +105,12 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
 		sym->filename = get_error_filename();
 		sym->line_num = get_error_line_num();
     }
+    else if (type == TYPE_CONSTANT && scope == SCOPE_LOCAL &&
+        sym->value == value && sym->type == type && sym->scope == scope &&
+        sym->module == module && sym->section == section)
+    {
+        /* constant redefined with the same value and in the same module/section */
+    }
     else											/* already defined */
     {
         if (strncmp(name, "__CDBINFO__",11) == 0)
@@ -168,6 +174,10 @@ Symbol1 *define_static_def_sym(const char *name, long value )
 	return sym;
 }
 
+void undefine_static_def_sym(const char* name) {
+    Symbol1Hash_remove(static_symtab, name);
+}
+
 /*-----------------------------------------------------------------------------
 *   define a global static symbol (e.g. ASMSIZE, ASMTAIL)
 *----------------------------------------------------------------------------*/
@@ -181,13 +191,21 @@ Symbol1 *define_global_def_sym(const char *name, long value )
 }
 
 /*-----------------------------------------------------------------------------
-*   define a local DEF symbol (e.g. DEFINE)
+*   define/undefine a local DEF symbol (e.g. DEFINE)
 *----------------------------------------------------------------------------*/
 Symbol1 *define_local_def_sym(const char *name, long value )
 {
-	return _define_sym(name, value, TYPE_CONSTANT, SCOPE_LOCAL,
-						CURRENTMODULE, CURRENTSECTION, 
-						& CURRENTMODULE->local_symtab );
+    if (CURRENTMODULE)
+        return _define_sym(name, value, TYPE_CONSTANT, SCOPE_LOCAL,
+            CURRENTMODULE, CURRENTSECTION,
+            &CURRENTMODULE->local_symtab);
+    else
+        return NULL;
+}
+
+void undefine_local_def_sym(const char* name) {
+    if (CURRENTMODULE)
+        Symbol1Hash_remove(CURRENTMODULE->local_symtab, name);
 }
 
 /*-----------------------------------------------------------------------------
@@ -344,7 +362,7 @@ Symbol1* define_symbol(const char* name, long value, sym_type_t type)
 	}
 	else if (sym->is_defined)				/* global symbol already defined */
 	{
-		if (strncmp(name, "__CDBINFO__", 11))
+		if (strncmp(name, "__CDBINFO__", 11) != 0)
 			error_duplicate_definition(name);
 	}
 	else

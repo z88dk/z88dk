@@ -30,7 +30,7 @@ ENDIF
 
 
     ; Default, don't change the stack pointer
-    defc    TAR__register_sp = -1
+    defc    TAR__register_sp = 0xffff
     defc    TAR__clib_exit_stack_size = 32
     ; Default, halt loop
     defc    TAR__crt_on_exit = 0x10001
@@ -71,13 +71,39 @@ ENDIF
     defb    0     ;ADL mode
 ENDIF
 
-
+IF CRT_ENABLE_COMMANDLINE = 1
+cmdline:
+    defs    256
+ENDIF
 
 start:
-    defb    0x5b    ;LIL
-    push    ix
-    defb    0x5b    ;LIL
-    push    iy
+    push.l  iy
+    push.l  af
+    push.l  bc
+    push.l  de
+    push.l  ix
+    ld.l    a,(iy+8)
+    ld      (__agon_mbase),a
+    ld      iy,0      ;save sps
+    add     iy,sp
+    ld      (__restore_sp+1),iy
+    ; Now we should copy the arguments to local area
+IF CRT_ENABLE_COMMANDLINE = 1
+    ld      de,cmdline
+    ld      b,255
+copy_cmdline:
+    ld.l    a,(hl)
+    inc.l   hl
+    ld      (de),a
+    inc     de
+    and     a
+    jr      z,copy_done
+    djnz    copy_cmdline
+copy_done:
+    ld      a,255
+    sub     b
+    ld      (__cmdline_length+1),a
+ENDIF
     INCLUDE "crt/classic/crt_start_eidi.inc"
     INCLUDE "crt/classic/crt_init_sp.asm"
     ; Make room for the atexit() stack
@@ -85,27 +111,50 @@ start:
     call    crt0_init_bss
     ld      (exitsp),sp
 
-    defb    0x5b	;LIL
-    ld      a,(iy+8)
     ld      (__agon_mbase),a
+
+IF DEFINED_USING_amalloc
+    INCLUDE "crt/classic/crt_init_amalloc.asm"
+ENDIF
 
     ld      a,CLIB_DEFAULT_SCREEN_MODE
     call    asm_agon_setmode
 
+IF CRT_ENABLE_COMMANDLINE = 1
+__cmdline_length:
+    ld      a,0
+    and     a
+    jp      z,argv_done
+    ld      c,a
+    ld      b,0
+    ld      hl,cmdline
+    add     hl,bc       ; now points to end of the command line
+    INCLUDE "crt/classic/crt_command_line.asm"
+    push    hl  ;argv
+    push    bc  ;argc
+ELSE
+    ld      hl,0
+    push    hl
+    push    hl
+ENDIF
+ 
     ; Entry to the user code
     call    _main
+    pop     bc
+    pop     bc
     ; Exit code is in hl
 cleanup:
+    push    hl
     call    crt0_exit
-    defb    0x5b    ;LIL
-    pop     iy
-    defb    0x5b    ;LIL
-    pop     ix
-    defb    $5b
-    ld      hl,0
-    defb    0
-    defb    $49     ;LIS
-    ret
+    pop     hl
+__restore_sp:
+    ld      sp,0
+    pop.l   ix
+    pop.l   de
+    pop.l   bc
+    pop.l   af
+    pop.l   iy
+    ret.l
 
 
 l_dcal:

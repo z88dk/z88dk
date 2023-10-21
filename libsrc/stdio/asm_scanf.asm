@@ -32,7 +32,7 @@
     EXTERN  asm_toupper
     EXTERN  l_long_mult
     EXTERN  l_long_neg
-    EXTERN  atoi
+    EXTERN  asm_atoi
     EXTERN  atof
     EXTERN  fa
     EXTERN  l_cmp
@@ -50,7 +50,7 @@ ELSE
     add     ix,sp        ; Now the frame pointer
                 ; ix+2, ix+3 = arg pointer
 ENDIF
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_RABBIT__
     add     sp,-50
 ELSE
     ld      hl,-50        ; make some space on the stack
@@ -59,7 +59,7 @@ ELSE
 ENDIF
 
     ; -1, -2 = conversions done
-        ; -3 = flags [000a*WL0]
+        ; -3 = flags [^00a*WL0]
     ; -4 = width
     ; -5, -6 = bytes read from stream
     ; -50->-10 = fp number buffer
@@ -85,9 +85,7 @@ ELSE
     ld      (ix-6),a
 ENDIF
 
-IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
-    ld      hl,(ix+4)
-ELIF __CPU_INTEL__
+IF __CPU_INTEL__
     ld      hl,(__scanf_context)
     inc     hl
     inc     hl
@@ -98,8 +96,7 @@ ELIF __CPU_INTEL__
     ld      h,(hl)
     ld      l,a
 ELSE
-    ld      l,(ix+4)        ;format pointer
-    ld      h,(ix+5)
+    ld      hl,(ix+4)       ;format pointer
 ENDIF
 
 scanf_loop:
@@ -155,7 +152,7 @@ ELSE
     ld      d,0
 ENDIF
 scanf_exit2:
-IF __CPU_R2KA__ | __CPU_R3K__
+IF __CPU_RABBIT__
     add     sp,50
 ELSE
     ld      hl,50
@@ -189,7 +186,7 @@ width:
     ld      a,(hl)
     call    asm_isdigit
     jr      c,formatchar
-    call    atoi        ;exits hl=number, de = non numeric in fmt
+    call    asm_atoi        ;exits hl=number, de = non numeric in fmt
     ex      de,hl
 IF __CPU_INTEL__
     call    __scanf_set_width
@@ -258,11 +255,8 @@ IF __CPU_INTEL__
     inc     hl
     ld      d,(hl)
     ex      de,hl
-ELIF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
-    ld      hl,(ix+2)
 ELSE
-    ld      l,(ix+2)
-    ld      h,(ix+3)
+    ld      hl,(ix+2)
 ENDIF
     ld      e,(hl)
     inc     hl
@@ -294,11 +288,8 @@ IF __CPU_INTEL__
     ld      (hl),d
     ex      de,hl
     pop     de
-ELIF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
-    ld      (ix+2),hl
 ELSE
-    ld      (ix+2),l
-    ld      (ix+3),h
+    ld      (ix+2),hl
 ENDIF
     pop     hl    ;restore fmt
     ret
@@ -316,11 +307,8 @@ __scanf_getchar:
     push    hl        ;fmt
 IF __CPU_INTEL__
     call    __scanf_get_fp
-ELIF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
-    ld      hl,(ix+8)
 ELSE
-    ld      l,(ix+8)    ;fp
-    ld      h,(ix+9)
+    ld      hl,(ix+8)	;fp
 ENDIF
     push    hl
     call    fgetc
@@ -361,11 +349,9 @@ __scanf_ungetchar:
 IF __CPU_INTEL__
     call    __scanf_decrement_bytesread
 ELSE
-    ld      e,(ix-6)
-    ld      d,(ix-5)
+    ld      de,(ix-6)
     dec     de
-    ld      (ix-5),d
-    ld      (ix-6),e
+    ld      (ix-6),de
 ENDIF
 __scanf_ungetchar1:
     ld      l,a        ;character to unget
@@ -375,8 +361,7 @@ IF __CPU_INTEL__
     call    __scanf_get_fp
     push    hl
 ELSE
-    ld      c,(ix+8)    ;fp
-    ld      b,(ix+9)
+    ld      bc,(ix+8)    ;fp
     push    bc
 ENDIF
     call    ungetc

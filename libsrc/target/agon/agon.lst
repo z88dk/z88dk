@@ -4,6 +4,7 @@ target/agon/stdio/getk
 target/agon/stdio/generic_console
 target/agon/stdio/generic_console_ioctl
 target/agon/stdio/__agon_putc
+target/agon/stdio/conio_map_colour
 target/agon/graphics/__gfx_vars
 target/agon/graphics/__agon_setmode
 target/agon/graphics/__agon_draw
@@ -35,6 +36,10 @@ target/agon/fcntl/rename
 target/agon/fcntl/remove
 target/agon/fcntl/mkdir
 target/agon/fcntl/chdir
+target/agon/fcntl/fdtell
+target/agon/time/target_read_structtm
+target/agon/agon/agon_set_palette
+target/agon/agon/agon_set_cursor_state
 @stdio/stdio.lst
 @gfx/wide/gfx_wide.lst
 @games/games.lst

@@ -1,8 +1,8 @@
-    
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
-    SECTION    code_graphics
-    
-    PUBLIC    drawbox
+
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+        SECTION code_graphics
+
+        PUBLIC  drawbox
 
 ;
 ;    $Id: drawbox.asm $
@@ -20,71 +20,71 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;    BC    = (width,heigth)
 ;
 
-.drawbox
-    push    bc
-    push    hl
+drawbox:
+        push    bc
+        push    hl
 
 ; -- Vertical lines --
-    push    hl
-    ld    a,h
-    add    a,b
-    dec    a
-    ld    h,a
-    pop    de
-.rowloop
-    push    bc
+        push    hl
+        ld      a, h
+        add     a, b
+        dec     a
+        ld      h, a
+        pop     de
+rowloop:
+        push    bc
 
-    call p_sub
-    inc    l
-    ex    de,hl
+        call    p_sub
+        inc     l
+        ex      de, hl
 
-    call p_sub
-    inc    l
-    ex    de,hl
+        call    p_sub
+        inc     l
+        ex      de, hl
 
-    pop    bc
-    dec    c
-    jr    nz,rowloop
+        pop     bc
+        dec     c
+        jr      nz, rowloop
 
-    pop    hl
-    pop    bc
+        pop     hl
+        pop     bc
 
 ; -- Horizontal lines --
-    inc    h
-    dec b
-    dec b
-    push    hl
-    ld    a,l
-    add    a,c
-    dec    a
-    ld    l,a
-    pop    de
+        inc     h
+        dec     b
+        dec     b
+        push    hl
+        ld      a, l
+        add     a, c
+        dec     a
+        ld      l, a
+        pop     de
 
-.vrowloop
-    push    bc
-    
-    call p_sub
-    inc    h
-    ex    de,hl
-    
-    call p_sub
-    inc    h
-    ex    de,hl
-    
-    pop    bc
-    
-    djnz    vrowloop
+vrowloop:
+        push    bc
 
-    ret
+        call    p_sub
+        inc     h
+        ex      de, hl
 
-.p_sub
-    push    hl
-    push    de
-    ld    de, p_RET1
-    push    de
-    jp    (ix)    ;    execute PLOT at (h,l)
-.p_RET1
-    pop    de
-    pop    hl
-    ret
-ENDIF
+        call    p_sub
+        inc     h
+        ex      de, hl
+
+        pop     bc
+
+        djnz    vrowloop
+
+        ret
+
+p_sub:
+        push    hl
+        push    de
+        ld      de, p_RET1
+        push    de
+        jp      (ix)                    ;    execute PLOT at (h,l)
+p_RET1:
+        pop     de
+        pop     hl
+        ret
+  ENDIF

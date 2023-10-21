@@ -21,7 +21,7 @@ PUBLIC _m32_mul10uf
     sla e                       ; get exponent into d
     rl d
     jr Z,zero_legal             ; return IEEE zero
-    
+
     scf                         ; set hidden bit
     rr e                        ; return mantissa to ehl
 
@@ -30,11 +30,9 @@ PUBLIC _m32_mul10uf
     push hl
 
     srl e
-    rr h
-    rr l
+    rr hl
     srl e
-    rr h
-    rr l
+    rr hl
 
     ex de,hl
     ex (sp),hl
@@ -50,8 +48,7 @@ PUBLIC _m32_mul10uf
     jr NC,no_carry
 
     rr e                        ; shift if a carry
-    rr h
-    rr l
+    rr hl
     inc a                       ; and increment exponent
 
 .no_carry
@@ -74,7 +71,6 @@ PUBLIC _m32_mul10uf
     ld de,0
     ld hl,de
     dec d                       ; 0xff
-    rr d                        ; restore the sign
-    rr e
+    rr de                       ; restore the sign
     scf
     ret                         ; return IEEE signed INFINITY in DEHL

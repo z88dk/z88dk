@@ -21,7 +21,9 @@
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
+#ifndef __NORETURN
 #define __NORETURN __attribute((noreturn))
+#endif
 #endif
 
 #ifndef __NORETURN
@@ -650,6 +652,7 @@ extern long         get_org_addr(char *crtfile);
 extern void         suffix_change(char *name, const char *suffix);
 extern void         any_suffix_change(char *name, const char *suffix, char schar);
 
+#define must_malloc_block(sz,sector_sz) must_malloc( ((sz/sector_sz)+1) * sector_sz)
 extern void        *must_malloc(size_t sz);
 extern void        *must_realloc(void *p, size_t sz);
 extern void        *must_strdup(char *p);

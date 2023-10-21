@@ -8,15 +8,23 @@
 ;
 
 	SECTION	code_clib
-	PUBLIC    bkrestore
-	PUBLIC    _bkrestore
 	EXTERN	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
+    PUBLIC    bkrestore
+    PUBLIC    _bkrestore
+    PUBLIC    bkrestore_fastcall
+    PUBLIC    _bkrestore_fastcall
 
 .bkrestore
 ._bkrestore
+    pop de
+    pop hl
+    push hl
+    push de
 
+.bkrestore_fastcall
+._bkrestore_fastcall
 ; __FASTCALL__ : sprite ptr in HL
 	push	ix	;save callers
 	push	hl

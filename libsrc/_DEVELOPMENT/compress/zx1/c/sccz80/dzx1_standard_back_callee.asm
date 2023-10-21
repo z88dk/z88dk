@@ -15,3 +15,11 @@ dzx1_standard_back_callee:
    ex (sp),hl
 
    jp asm_dzx1_standard_back
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx1_standard_back_callee
+defc _dzx1_standard_back_callee = dzx1_standard_back_callee
+ENDIF
+
+

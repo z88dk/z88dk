@@ -19,3 +19,16 @@ dzx1_standard_back:
    push af
 
    jp asm_dzx1_standard_back
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx1_standard_back
+defc _dzx1_standard_back = dzx1_standard_back
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___dzx1_standard_back
+defc ___dzx1_standard_back = dzx1_standard_back
+ENDIF
+

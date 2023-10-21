@@ -1,6 +1,6 @@
 
-       SECTION code_graphics
-	PUBLIC	rightbitmask
+        SECTION code_graphics
+        PUBLIC  rightbitmask
 
 ;
 ;	$Id: rbitmask.asm,v 1.5 2016-04-13 21:09:09 dom Exp $
@@ -25,13 +25,15 @@
 ;    af....../....	different
 ;
 
-.rightbitmask    	cp  0       ; 7-bitpos
-       ret	z    	; no	bitmask to preserve...
-       push	bc
-       ld	b,a
-       xor	a
-.right_bitmask_loop    scf
-       rla       ; create right	bitmask
-       djnz	right_bitmask_loop
-       pop	bc
-       ret
+rightbitmask:
+        cp      0                       ; 7-bitpos
+        ret     z                       ; no	bitmask to preserve...
+        push    bc
+        ld      b, a
+        xor     a
+right_bitmask_loop:
+        scf
+        rla                             ; create right	bitmask
+        djnz    right_bitmask_loop
+        pop     bc
+        ret

@@ -1,6 +1,7 @@
 
 	MODULE	generic_console_ioctl
 	PUBLIC	generic_console_ioctl
+    PUBLIC  asm_bee_set_screenmode
 
 	SECTION	code_clib
 	INCLUDE	"ioctl.def"
@@ -54,6 +55,7 @@ check_mode:
 	cp	IOCTL_GENCON_SET_MODE
 	jr	nz,failure
 	ld	a,c
+asm_bee_set_screenmode:
 	ld	l,80
 	ld	h,24
 	ld	de,screen_80x24

@@ -67,21 +67,30 @@
 #endif
 
 extern void __LIB__              mallinit(void);
-extern void __LIB__              sbrk(void *addr, unsigned int size) __smallc;
+__ZPROTO2(void,*,sbrk,void *,addr,unsigned int,size)
+__ZPROTO2(void,*,calloc,unsigned int,nobj,unsigned int,size)
+extern void __LIB__              free(void *addr);
+extern void __LIB__              *malloc(unsigned int size);
+__ZPROTO2(void,*,realloc,void *,p,unsigned int,size)
+__ZPROTO2(void,,mallinfo, unsigned int *,total,unsigned int *,largest)
+
+
+#ifndef __STDC_ABI_ONLY
+
+extern void __LIB__    *malloc_fastcall(unsigned int size) __z88dk_fastcall;
+extern void __LIB__    free_fastcall(void *addr) __z88dk_fastcall;
 extern void __LIB__    sbrk_callee(void *addr, unsigned int size) __smallc __z88dk_callee;
-extern void __LIB__              *calloc(unsigned int nobj, unsigned int size) __smallc;
 extern void __LIB__    *calloc_callee(unsigned int nobj, unsigned int size) __smallc __z88dk_callee; 
-extern void __LIB__  free(void *addr) __z88dk_fastcall;
-extern void __LIB__  *malloc(unsigned int size) __z88dk_fastcall;
-extern void __LIB__              *realloc(void *p, unsigned int size) __smallc;
 extern void __LIB__    *realloc_callee(void *p, unsigned int size) __smallc __z88dk_callee;
-extern void __LIB__              mallinfo(unsigned int *total, unsigned int *largest) __smallc;
 extern void __LIB__    mallinfo_callee(unsigned int *total, unsigned int *largest) __smallc __z88dk_callee;
 
+#define malloc(x)      malloc_fastcall(x)
+#define free(x)        free_fastcall(x)
 #define sbrk(a,b)      sbrk_callee(a,b)
 #define calloc(a,b)    calloc_callee(a,b)
 #define realloc(a,b)   realloc_callee(a,b)
 #define mallinfo(a,b)  mallinfo_callee(a,b)
+#endif
 
 // The following is to allow programs using the
 // older version of the near malloc library to

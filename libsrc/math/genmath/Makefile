@@ -10,7 +10,9 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -fp-mode=z80 -DFLOAT_IS_48BITS
 
-all: dirs $(OUTPUT_DIRECTORY)/genmath.lib $(OUTPUT_DIRECTORY)/genmath_ixiy.lib $(OUTPUT_DIRECTORY)/genmath_zx81.lib \
+all: dirs $(OUTPUT_DIRECTORY)/genmath.lib \
+	$(OUTPUT_DIRECTORY)/genmath_ixiy.lib \
+	$(OUTPUT_DIRECTORY)/genmath_zx81.lib \
 	$(OUTPUT_DIRECTORY)/genmath_ez80_z80.lib \
 	$(OUTPUT_DIRECTORY)/genmath_z80n.lib
 
@@ -21,8 +23,12 @@ $(OUTPUT_DIRECTORY)/genmath.lib: $(addprefix obj/z80/, $(OBJECTS))
 $(OUTPUT_DIRECTORY)/genmath_z80n.lib: $(addprefix obj/z80n/, $(OBJECTS))
 	TYPE=z80n $(LIBLINKER) -mz80n -x$(OUTPUT_DIRECTORY)/genmath_z80n @genmath.lst
 
+$(OUTPUT_DIRECTORY)/genmath_r2ka.lib: $(addprefix obj/r2ka/, $(OBJECTS))
+	TYPE=r2ka $(LIBLINKER) -m42k -x$(OUTPUT_DIRECTORY)/genmath_r2ka @genmath.lst
+
 $(OUTPUT_DIRECTORY)/genmath_ez80_z80.lib: $(addprefix obj/ez80_z80/, $(OBJECTS))
 	TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -x$(OUTPUT_DIRECTORY)/genmath_ez80_z80 @genmath.lst
+
 
 $(OUTPUT_DIRECTORY)/genmath_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/genmath_ixiy @genmath.lst

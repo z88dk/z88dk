@@ -21,8 +21,10 @@
         SECTION code_clib
 	PUBLIC	writebyte
 	PUBLIC	_writebyte
+	PUBLIC	___writebyte
 	EXTERN	nb_putc
 	
 .writebyte
 ._writebyte
+.___writebyte
 	jp	nb_putc

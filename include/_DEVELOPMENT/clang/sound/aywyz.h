@@ -10,10 +10,10 @@
 #define __SOUND_AYWYZ_H__
 
 typedef struct {
-	void  *effect_table;
-	void  *instrument_table;
-	void  *note_table;
-        void  *song_table;
+    void  *effect_table;
+    void  *instrument_table;
+    void  *note_table;
+    void  *song_table;
 } wyz_song;
 
 

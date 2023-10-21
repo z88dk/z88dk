@@ -25,14 +25,13 @@ unlink_testfiles;
 spew("${test}.asm", $asm);
 
 capture_ok("z88dk-z80asm -b -v -R ${test}.asm", <<END);
-Reading library 'z88dk-z80asm-z80-.lib'
+% z88dk-z80asm -b -v -R ${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
-Assembling '${test}.asm' to '${test}.o'
-Reading '${test}.asm' = '${test}.asm'
+Reading library 'z88dk-z80asm.lib'
+Assembling '${test}.asm'
 Writing object file '${test}.o'
-Module '${test}' size: 3 bytes
 
 Code size: 3 bytes (\$0000 to \$0002)
 Creating binary '${test}.bin'
@@ -51,14 +50,13 @@ unlink_testfiles;
 spew("${test}.asm", $asm);
 
 capture_ok("z88dk-z80asm -b -v -R ${test}.asm", <<END);
-Reading library 'z88dk-z80asm-z80-.lib'
+% z88dk-z80asm -b -v -R ${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
-Assembling '${test}.asm' to '${test}.o'
-Reading '${test}.asm' = '${test}.asm'
+Reading library 'z88dk-z80asm.lib'
+Assembling '${test}.asm'
 Writing object file '${test}.o'
-Module '${test}' size: 3 bytes
 
 Code size: 3 bytes (\$0000 to \$0002)
 Creating binary '${test}.bin'
@@ -134,11 +132,11 @@ check_bin_file("${test}_data.bin",
 		
 check_text_file("${test}.map", <<END);
 start                           = \$1020 ; addr, local, , ${test}, code, ${test}.asm:3
+start1                          = \$1032 ; addr, local, , ${test}, code, ${test}.asm:15
+start2                          = \$1044 ; addr, local, , ${test}, code, ${test}.asm:26
 string                          = \$3040 ; addr, local, , ${test}, data, ${test}.asm:12
 string1                         = \$304A ; addr, local, , ${test}, data, ${test}.asm:23
 string2                         = \$3055 ; addr, local, , ${test}, data, ${test}.asm:34
-start1                          = \$1032 ; addr, local, , ${test}, code, ${test}.asm:15
-start2                          = \$1044 ; addr, local, , ${test}, code, ${test}.asm:26
 __head                          = \$0000 ; const, public, def, , ,
 __tail                          = \$3060 ; const, public, def, , ,
 __size                          = \$3060 ; const, public, def, , ,
@@ -180,11 +178,11 @@ ok ! -f "${test}_data.reloc";
 
 check_text_file("${test}.map", <<END);
 start                           = \$005F ; addr, local, , ${test}, code, ${test}.asm:3
+start1                          = \$0071 ; addr, local, , ${test}, code, ${test}.asm:15
+start2                          = \$0083 ; addr, local, , ${test}, code, ${test}.asm:26
 string                          = \$0095 ; addr, local, , ${test}, data, ${test}.asm:12
 string1                         = \$009F ; addr, local, , ${test}, data, ${test}.asm:23
 string2                         = \$00AA ; addr, local, , ${test}, data, ${test}.asm:34
-start1                          = \$0071 ; addr, local, , ${test}, code, ${test}.asm:15
-start2                          = \$0083 ; addr, local, , ${test}, code, ${test}.asm:26
 __head                          = \$005F ; const, public, def, , ,
 __tail                          = \$00B5 ; const, public, def, , ,
 __size                          = \$00B5 ; const, public, def, , ,
@@ -372,8 +370,8 @@ ok ! -f "${test}_code2.bin";
 ok ! -f "${test}_code2.reloc";
 
 check_text_file("${test}.map", <<END);
-cont                            = \$0051 ; addr, local, , ${test}, code2, ${test}.asm:9
 start                           = \$004E ; addr, local, , ${test}, code1, ${test}.asm:4
+cont                            = \$0051 ; addr, local, , ${test}, code2, ${test}.asm:9
 __head                          = \$004E ; const, public, def, , ,
 __tail                          = \$0052 ; const, public, def, , ,
 __size                          = \$0052 ; const, public, def, , ,
@@ -441,11 +439,11 @@ ok ! -f "${test}_data2.reloc";
 
 check_text_file("${test}.map", <<END);
 start                           = \$1020 ; addr, local, , ${test}, code, ${test}.asm:12
+start1                          = \$1032 ; addr, local, , ${test}, code1, ${test}.asm:20
+start2                          = \$1044 ; addr, local, , ${test}, code2, ${test}.asm:28
 string                          = \$3040 ; addr, local, , ${test}, data, ${test}.asm:36
 string1                         = \$304A ; addr, local, , ${test}, data1, ${test}.asm:39
 string2                         = \$3055 ; addr, local, , ${test}, data2, ${test}.asm:42
-start1                          = \$1032 ; addr, local, , ${test}, code1, ${test}.asm:20
-start2                          = \$1044 ; addr, local, , ${test}, code2, ${test}.asm:28
 __head                          = \$0000 ; const, public, def, , ,
 __tail                          = \$3060 ; const, public, def, , ,
 __size                          = \$3060 ; const, public, def, , ,

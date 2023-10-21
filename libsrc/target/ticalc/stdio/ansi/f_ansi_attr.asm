@@ -4,7 +4,7 @@
 ;
 ; 	Text Attributes
 ;	m - Set Graphic Rendition
-;	
+;
 ;	The most difficult thing to port:
 ;	Be careful here...
 ;
@@ -13,70 +13,70 @@
 ;
 
         SECTION code_clib
-	PUBLIC	ansi_attr
+        PUBLIC  ansi_attr
 
-	EXTERN	INVRS
-	EXTERN	BOLD
+        EXTERN  INVRS
+        EXTERN  BOLD
 
-.ansi_attr
+ansi_attr:
         and     a
-        jr      nz,noreset
-        ld	(BOLD),a
-        ld	(BOLD+1),a
+        jr      nz, noreset
+        ld      (BOLD), a
+        ld      (BOLD+1), a
         ret
-.noreset
+noreset:
         cp      1
-        jr      nz,nobold
-        ld	a,23
-        ld	(BOLD),a
-        ld	a,182
-        ld	(BOLD+1),a
+        jr      nz, nobold
+        ld      a, 23
+        ld      (BOLD), a
+        ld      a, 182
+        ld      (BOLD+1), a
         ret
-.nobold
+nobold:
         cp      2
-        jr      z,dim
+        jr      z, dim
         cp      8
-        jr      nz,nodim
-.dim
-	xor	a
-        ld	(BOLD),a
-        ld	(BOLD+1),a
-        ret
-.nodim
-        cp      4
-        jr      nz,nounderline
-        ld      a,32
-        ld      (INVRS+2),a   ; underline 1
-        ret
-.nounderline
-        cp      24
-        jr      nz,noCunderline
-        ld      a, 24
-        ld      (INVRS+2),a   ; underline 0
-        ret
-.noCunderline
-        cp      5
-        jr      nz,noblink
-        ld      a,32
-        ld      (INVRS+2),a   ; underline (blink emulation) 1
-        ret
-.noblink
-        cp      25
-        jr      nz,nocblink
-        ld      a, 24
-        ld      (INVRS+2),a   ; underline (blink emulation) 0
-        ret
-.nocblink
-        cp      7
-        jr      nz,noreverse
-        ld      a,47
-        ld      (INVRS),a     ; inverse 1
-        ret
-.noreverse
-        cp      27
-        jr      nz,noCreverse
+        jr      nz, nodim
+dim:
         xor     a
-        ld      (INVRS),a      ; inverse 0
+        ld      (BOLD), a
+        ld      (BOLD+1), a
         ret
-.noCreverse
+nodim:
+        cp      4
+        jr      nz, nounderline
+        ld      a, 32
+        ld      (INVRS+2), a            ; underline 1
+        ret
+nounderline:
+        cp      24
+        jr      nz, noCunderline
+        ld      a, 24
+        ld      (INVRS+2), a            ; underline 0
+        ret
+noCunderline:
+        cp      5
+        jr      nz, noblink
+        ld      a, 32
+        ld      (INVRS+2), a            ; underline (blink emulation) 1
+        ret
+noblink:
+        cp      25
+        jr      nz, nocblink
+        ld      a, 24
+        ld      (INVRS+2), a            ; underline (blink emulation) 0
+        ret
+nocblink:
+        cp      7
+        jr      nz, noreverse
+        ld      a, 47
+        ld      (INVRS), a              ; inverse 1
+        ret
+noreverse:
+        cp      27
+        jr      nz, noCreverse
+        xor     a
+        ld      (INVRS), a              ; inverse 0
+        ret
+noCreverse:
         ret

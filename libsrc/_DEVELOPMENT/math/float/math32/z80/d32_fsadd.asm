@@ -84,12 +84,9 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
     ld hl,002h                  ; get second operand off of the stack
     add hl,sp
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
-    ld c,(hl)
-    inc hl
+    ld e,(hl+)
+    ld d,(hl+)
+    ld c,(hl+)
     ld h,(hl)
     ld l,c                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
     jp farejoin
@@ -172,38 +169,27 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jr NC,al_2
     srl h
     rr l
-    rr d
-    rr e
+    rr de
 .al_2
     rra                         ; 1st lost bit to a
     jr NC,al_3
     srl h
     rr l
-    rr d
-    rr e
-    rr h
-    rr l
-    rr d
-    rr e
+    rr de
+    rr hl
+    rr de
 .al_3
     rra                         ; 2nd lost bit to a
     jr NC,al_4
     srl h
     rr l
-    rr d
-    rr e
-    rr h
-    rr l
-    rr d
-    rr e
-    rr h
-    rr l
-    rr d
-    rr e
-    rr h
-    rr l
-    rr d
-    rr e
+    rr de
+    rr hl
+    rr de
+    rr hl
+    rr de
+    rr hl
+    rr de
 ; check for 8 bit right shift
 .al_4
     rra                         ;  3rd lost bit to a check shift by 8,
@@ -293,10 +279,8 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     xor a
     or a,h                      ; see if overflow to h
     jr Z,doadd1
-    rr h
-    rr l
-    rr d
-    rr e
+    rr hl
+    rr de
     jr NC,doadd0
     set 0,e
 .doadd0
@@ -307,8 +291,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     add hl,hl
     ld h,c                      ; exp
     rl b
-    rr h
-    rr l
+    rr hl
     ex de,hl                    ; return DEHL
     ret
 
@@ -326,8 +309,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .alignone                       ; from fadd
     srl h
     rr l
-    rr d
-    rr e
+    rr de
     jr NC,alignone_a
     set 0,e
 .alignone_a

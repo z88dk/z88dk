@@ -18,7 +18,9 @@
 ;#define BACKWARD
 
 
+; We enter here with hl=source, de=dest
 dzx0_standard:
+       ld bc,de
 IF BACKWARD
         lxi d,1
 		push d

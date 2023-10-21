@@ -10,26 +10,26 @@
 ;double asin(double)
 ;Number in FA..
 
-                SECTION  code_fp
-IF FORz88
-                INCLUDE  "target/z88/def/fpp.def"
-ELSE
-		INCLUDE "fpp.def"
-ENDIF
+        SECTION code_fp
+  IF    FORz88
+        INCLUDE "target/z88/def/fpp.def"
+  ELSE
+        INCLUDE "fpp.def"
+  ENDIF
 
-                PUBLIC    asin
+        PUBLIC  asin
 
-                EXTERN    fsetup
-                EXTERN    stkequ2
+        EXTERN  fsetup
+        EXTERN  stkequ2
 
-.asin
+asin:
         call    fsetup
-IF FORz88
-        fpp(FP_ASN)
-ELSE
-	ld	a,+(FP_ASN)
-	call	FPP
-ENDIF
+  IF    FORz88
+        fpp     (FP_ASN)
+  ELSE
+        ld      a, +(FP_ASN)
+        call    FPP
+  ENDIF
         jp      stkequ2
 
 

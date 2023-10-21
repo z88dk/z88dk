@@ -6,10 +6,10 @@
 
 
 
-    SECTION code_clib
-    PUBLIC  pointxy
+        SECTION code_clib
+        PUBLIC  pointxy
 
 
-.pointxy
-    defc    NEEDpoint = 1
-    INCLUDE "pixel.inc"
+pointxy:
+        defc    NEEDpoint=1
+        INCLUDE "pixel.inc"

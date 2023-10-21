@@ -6,10 +6,10 @@
 
 
         SECTION code_clib
-    PUBLIC  plotpixel
+        PUBLIC  plotpixel
 
 
-.plotpixel
-    defc    NEEDplot = 1
-    INCLUDE "pixel6.inc"
+plotpixel:
+        defc    NEEDplot=1
+        INCLUDE "pixel6.inc"
 

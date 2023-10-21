@@ -14,9 +14,9 @@ Repository: https://github.com/z88dk/z88dk
 #include "if.h"
 #include "libfile.h"
 #include "modlink.h"
-#include "parse.h"
+#include "parse1.h"
 #include "reloc_code.h"
-#include "scan.h"
+#include "scan1.h"
 #include "str.h"
 #include "strutil.h"
 #include "sym.h"
@@ -26,6 +26,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "z80asm.h"
 #include "zobjfile.h"
 #include "zutils.h"
+#include "z80asm_cpu.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdio.h>
@@ -39,7 +40,9 @@ typedef struct obj_file_t {
 	int				size;				// size of library file
 	byte_t*			data;				// contents of library file, loaded before linking
 	int				i;					// point to next position to parse
-	Module1*			module;				// weak pointer to main module information, if object file
+	Module1*		module;				// weak pointer to main module information, if object file
+    bool            is_library;         // library or object file
+    string_table_t* st;
 } obj_file_t;
 
 
@@ -68,79 +71,99 @@ static void init(void) {
 	static bool inited = false;
 	if (!inited) {
 		atexit(dtor);
+        inited = true;
 	}
 }
 
-static int parse_byte(obj_file_t* obj) {
-	xassert(obj->i + 1 <= obj->size);
-	return obj->data[(obj->i)++];
-}
-
-static int parse_word(obj_file_t* obj) {
-	xassert(obj->i + 2 <= obj->size);
-	int value =
-		((obj->data[obj->i + 0] << 0) & 0x00FF) |
-		((obj->data[obj->i + 1] << 8) & 0xFF00);
-	obj->i += 2;
-	return value;
-}
-
 static int parse_int(obj_file_t* obj) {
-	xassert(obj->i + 4 <= obj->size);
-	int value =
-		((obj->data[obj->i + 0] << 0) & 0x000000FFL) |
-		((obj->data[obj->i + 1] << 8) & 0x0000FF00L) |
-		((obj->data[obj->i + 2] << 16) & 0x00FF0000L) |
-		((obj->data[obj->i + 3] << 24) & 0xFF000000L);
-	obj->i += 4;
-	if (value & 0x80000000L)
-		value |= ~0xFFFFFFFFL;		// sign-extend above bit 31
+	xassert(obj->i + sizeof(int32_t) <= obj->size);
+    uint32_t endian = 0x12345678;
+    int value = 0;
+    if (*(char*)&endian == 0x78) {
+        // little endian architecture
+        value = *(int*)&obj->data[obj->i];
+    }
+    else {
+        // big endian architecture
+        value =
+            ((obj->data[obj->i + 0] << 0) & 0x000000FFL) |
+            ((obj->data[obj->i + 1] << 8) & 0x0000FF00L) |
+            ((obj->data[obj->i + 2] << 16) & 0x00FF0000L) |
+            ((obj->data[obj->i + 3] << 24) & 0xFF000000L);
+        if (value & 0x80000000L)
+            value |= ~0xFFFFFFFFL;		// sign-extend above bit 31
+    }
+	obj->i += sizeof(int32_t);
 	return value;
-}
-
-static const char* parse_str(obj_file_t* obj, int len) {
-	xassert(obj->i + len <= obj->size);
-	const char* ret = spool_add_n((char*)obj->data + obj->i, len);
-	obj->i += len;
-	return ret;
-}
-
-static const char* parse_wcount_str(obj_file_t* obj) {
-	int len = parse_word(obj);
-	return parse_str(obj, len);
 }
 
 static bool goto_modname(obj_file_t* obj) {
-	obj->i = 8 + 0 * 4;
+	obj->i = SIGNATURE_SIZE + (2 + 0) * sizeof(int32_t);
 	obj->i = parse_int(obj);
 	return obj->i >= 0;
 }
 
 static bool goto_exprs(obj_file_t* obj) {
-	obj->i = 8 + 1 * 4;
+	obj->i = SIGNATURE_SIZE + (2 + 1) * sizeof(int32_t);
 	obj->i = parse_int(obj);
 	return obj->i >= 0;
 }
 
 static bool goto_defined_names(obj_file_t* obj) {
-	obj->i = 8 + 2 * 4;
+	obj->i = SIGNATURE_SIZE + (2 + 2) * sizeof(int32_t);
 	obj->i = parse_int(obj);
 	return obj->i >= 0;
 }
 
 static bool goto_external_names(obj_file_t* obj) {
-	obj->i = 8 + 3 * 4;
+	obj->i = SIGNATURE_SIZE + (2 + 3) * sizeof(int32_t);
 	obj->i = parse_int(obj);
 	return obj->i >= 0;
 }
 
 static bool goto_code(obj_file_t* obj) {
-	obj->i = 8 + 4 * 4;
+	obj->i = SIGNATURE_SIZE + (2 + 4) * sizeof(int32_t);
 	obj->i = parse_int(obj);
 	return obj->i >= 0;
 }
 
-static void obj_files_append(obj_file_t** plist, const char* filename, Module1* module) {
+static bool goto_string_table(obj_file_t* obj) {
+    if (obj->is_library)
+        obj->i = SIGNATURE_SIZE;
+    else
+        obj->i = SIGNATURE_SIZE + (2 + 5) * sizeof(int32_t);
+    obj->i = parse_int(obj);
+    return obj->i >= 0;
+}
+
+static void parse_string_table(obj_file_t* obj) {
+    if (obj->st == NULL) {
+        int save_pos = obj->i;
+
+        obj->st = st_new();
+
+        xassert(goto_string_table(obj));
+        int count = parse_int(obj);
+        (void)parse_int(obj);       // strings_size
+        int strings = obj->i + count * sizeof(int32_t);
+        for (int id = 0; id < count; id++) {
+            int pos = parse_int(obj);
+            const char* str = (const char*)obj->data + strings + pos;
+            xassert(id == st_add_string(obj->st, str));
+        }
+
+        obj->i = save_pos;
+    }
+}
+
+static const char* parse_st_str(obj_file_t* obj) {
+    if (obj->st == NULL)
+        parse_string_table(obj);
+    int id = parse_int(obj);
+    return st_lookup(obj->st, id);
+}
+
+static obj_file_t* obj_files_append(obj_file_t** plist, const char* filename, Module1* module) {
 	init();
 
 	// create a obj and append to list - file will be loaded when linking
@@ -148,26 +171,49 @@ static void obj_files_append(obj_file_t** plist, const char* filename, Module1* 
 	DL_APPEND(*plist, obj);
 	obj->filename = spool_add(filename);
 	obj->module = module;
+
+    return obj;
+}
+
+static bool obj_file_read_data(obj_file_t* obj) {
+    if (obj->data == NULL) {
+        obj->size = file_size(obj->filename);
+        if (obj->size < 0) {
+            error_file_open(obj->filename);
+            return false;
+        }
+
+        obj->data = xmalloc(obj->size);
+        FILE* fp = fopen(obj->filename, "rb");
+        if (!fp) {
+            error_file_open(obj->filename);
+            return false;
+        }
+        xfread(obj->data, 1, obj->size, fp);
+        fclose(fp);
+
+        if (strncmp((char*)obj->data, objfile_header(), SIGNATURE_SIZE) == 0) {
+            obj->is_library = false;
+        }
+        else if (strncmp((char*)obj->data, libfile_header(), SIGNATURE_SIZE) == 0) {
+            obj->is_library = true;
+            parse_string_table(obj);        // get list of defined symbols
+        }
+        else {
+            error_not_obj_file(obj->filename);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 static bool obj_files_read_data(obj_file_t** plist) {
 	init();
 
 	for (obj_file_t* obj = *plist; obj; obj = obj->next) {
-		obj->size = file_size(obj->filename);
-		if (obj->size < 0) {
-			error_file_open(obj->filename);
-			return false;
-		}
-
-		obj->data = xmalloc(obj->size);
-		FILE* fp = fopen(obj->filename, "rb");
-		if (!fp){
-			error_file_open(obj->filename);
-			return false;
-		}
-		xfread(obj->data, 1, obj->size, fp);
-		fclose(fp);
+        if (!obj_file_read_data(obj))
+            return false;
 	}
 
 	return true;
@@ -178,6 +224,8 @@ static void obj_files_free(obj_file_t** plist) {
 		obj_file_t* elem = *plist;
 		DL_DELETE(*plist, elem);
 		xfree(elem->data);
+        if (elem->st)
+            st_free(elem->st);
 		xfree(elem);
 	}
 }
@@ -205,7 +253,39 @@ void library_file_append(const char * filename) {
 	}
 }
 
-bool object_file_append(const char* filename, Module1* module, bool reserve_space, bool no_errors) {
+// reserve space for the module's sections
+static void object_file_reserve_space(obj_file_t* obj, Module1* module) {
+    if (!obj_file_read_data(obj))
+        return;
+
+    xassert(goto_modname(obj));
+    const char* modname = spool_add(parse_st_str(obj));     // st from obj from lib will be deleted, save modname
+    CURRENTMODULE->modname = modname;
+
+    if (goto_code(obj)) {
+        while (true) {
+            int code_size = parse_int(obj);
+            if (code_size < 0)
+                break;
+
+            // reserve space in section
+            const char* section_name = parse_st_str(obj);
+            Section1* section = new_section(section_name);
+            int origin = parse_int(obj);
+            set_origin(origin, section);
+            section->align = parse_int(obj);
+
+            append_reserve(code_size);
+
+            // align to dword size
+            unsigned aligned_size = ((code_size + (sizeof(int32_t) - 1)) & ~(sizeof(int32_t) - 1));
+
+            obj->i += aligned_size;
+        }
+    }
+}
+
+bool object_file_check_append(const char* filename, Module1* module, bool reserve_space, bool no_errors) {
 	init();
 
 	// check for empty file name
@@ -224,46 +304,29 @@ bool object_file_append(const char* filename, Module1* module, bool reserve_spac
 			return false;
 	}
 
-	// reserve space for the module's sections
-	if (reserve_space) {
-		if (!objmodule_loaded(filename)) {
-			error_not_obj_file(filename);
-			return false;
-		}
-	}
+    if (option_verbose())
+        printf("Appending object file '%s'\n", filename);
 
-	// append to the list of objects to be linked
-	obj_files_append(&g_objects, filename, module);
+    obj_file_t* obj = obj_files_append(&g_objects, filename, module);
 
-	return true;
+    // reserve space for the module's sections
+    if (reserve_space)
+        object_file_reserve_space(obj, module);
+
+    return true;
+}
+
+void object_file_append(const char* filename, Module1* module) {
+    init();
+
+    // append to the list of objects to be linked
+    obj_files_append(&g_objects, filename, module);
 }
 
 void object_module_append(obj_file_t* obj, Module1* module) {
 	init();
 
-	// reserve space for the module's sections
-	xassert(goto_modname(obj));
-	const char* modname = parse_wcount_str(obj);
-	CURRENTMODULE->modname = modname;
-
-	if (goto_code(obj)) {
-		while (true) {
-			int code_size = parse_int(obj);
-			if (code_size < 0)
-				break;
-
-			// reserve space in section
-			const char* section_name = parse_wcount_str(obj);
-			Section1* section = new_section(section_name);
-			int origin = parse_int(obj);
-			set_origin(origin, section);
-			section->align = parse_int(obj);
-
-			append_reserve(code_size);
-
-			obj->i += code_size;
-		}
-	}
+    object_file_reserve_space(obj, module);
 
 	// append a copy to the list of objects to be linked
 	obj_file_t* new_obj = xnew(obj_file_t);
@@ -312,58 +375,40 @@ static void set_expr_env(Expr1* expr, bool module_relative_addr)
 }
 
 static void read_cur_module_exprs(Expr1List* exprs, obj_file_t* obj) {
-	const char* last_filename = spool_add(obj->filename);
-
 	while (true) {
-		int type = parse_byte(obj);
-		if (type == 0)
-			break;			// end marker
+        range_t range = parse_int(obj);
+		if (range == RANGE_UNKNOWN)         // end marker
+			break;			
 
 		// source file name and line number
-		const char* source_filename = parse_wcount_str(obj);
-		if (*source_filename)
-			last_filename = source_filename;
-		else
-			source_filename = last_filename;
+		const char* source_filename = parse_st_str(obj);
 		int line_num = parse_int(obj);
 
 		// patch location
-		const char* section_name = parse_wcount_str(obj);
-		int asmpc = parse_word(obj);
-		int code_pos = parse_word(obj);
+		const char* section_name = parse_st_str(obj);
+		int asmpc = parse_int(obj);
+		int code_pos = parse_int(obj);
+		int opcode_size = parse_int(obj);
 
-		const char* target_name = parse_wcount_str(obj);
-		const char* expr_text = parse_wcount_str(obj);
+		const char* target_name = parse_st_str(obj);
+		const char* expr_text = parse_st_str(obj);
 
 		// call parser to interpret expression
 		set_asmpc_env(CURRENTMODULE, section_name, expr_text, source_filename, line_num,
 			asmpc, false);
 		Expr1* expr = parse_expr(expr_text);
-		if (expr) {
-			expr->range = 0;
-			switch (type) {
-			case 'U': expr->range = RANGE_BYTE_UNSIGNED; break;
-			case 'S': expr->range = RANGE_BYTE_SIGNED;  break;
-			case 'u': expr->range = RANGE_BYTE_TO_WORD_UNSIGNED; break;
-			case 's': expr->range = RANGE_BYTE_TO_WORD_SIGNED; break;
-			case 'C': expr->range = RANGE_WORD;			break;
-			case 'B': expr->range = RANGE_WORD_BE;		break;
-			case 'L': expr->range = RANGE_DWORD;		break;
-			case 'J': expr->range = RANGE_JR_OFFSET;	break;
-			case 'P': expr->range = RANGE_PTR24;		break;
-			case 'H': expr->range = RANGE_HIGH_OFFSET;  break;
-			case '=': expr->range = RANGE_WORD;
-				xassert(strlen(target_name) > 0);
-				expr->target_name = spool_add(target_name);	// define expression as EQU
-				break;
-			default:
-				error_not_obj_file(obj->filename);
-			}
+        if (expr) {
+            expr->range = range;
+            if (expr->range == RANGE_ASSIGNMENT) {
+                xassert(strlen(target_name) > 0);
+                expr->target_name = spool_add(target_name);	// define expression as EQU
+            }
 
 			expr->module = CURRENTMODULE;
 			expr->section = CURRENTSECTION;
 			expr->asmpc = asmpc;
 			expr->code_pos = code_pos;
+			expr->opcode_size = opcode_size;
 			expr->filename = spool_add(source_filename);
 			expr->line_num = line_num;
 			expr->listpos = -1;
@@ -605,15 +650,25 @@ static void patch_exprs(Expr1List* exprs)
 
 			case RANGE_JR_OFFSET:
 				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
-				value -= asmpc + 2;		/* get module PC at JR instruction */
+				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
-				if (value < -128 || value > 127)
-					error_int_range(value);
-
-				patch_byte(expr->code_pos, (byte_t)value);
+                if (value < -128 || value > 127)
+                    error_int_range(value);
+                else
+                    patch_byte(expr->code_pos, (byte_t)value);
 				break;
 
-			default: xassert(0);
+            case RANGE_JRE_OFFSET:
+                asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
+                value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
+
+                if (value < -0x8000 || value > 0x7FFF)
+                    error_int_range(value);
+                else
+                    patch_word(expr->code_pos, value);
+                break;
+
+            default: xassert(0);
 			}
 
 		}
@@ -746,35 +801,67 @@ static bool pending_syms(StrHash* extern_syms) {
 		return true;
 }
 
+// check if library module is for same CPU
+static bool module_same_cpu(obj_file_t* obj, int fpos) {
+    int fpos0 = obj->i;
+    obj->i = fpos;
+    int cpu_id = parse_int(obj);
+    if (!cpu_compatible(option_cpu(), cpu_id)) {
+        obj->i = fpos0;
+        return false;
+    }
+
+    swap_ixiy_t swap_ixiy = parse_int(obj);
+    if (!ixiy_compatible(option_swap_ixiy(), swap_ixiy)) {
+        obj->i = fpos0;
+        return false;
+    }
+
+    obj->i = fpos0;
+    return true;
+}
+
 // search one module for unresolved symbols and link if needed
 static bool linked_module(obj_file_t* obj, StrHash* extern_syms) {
 	bool linked = false;
 
 	// get module name
 	xassert(goto_modname(obj));
-	const char* modname = parse_wcount_str(obj);
+    const char* modname = parse_st_str(obj);
 
 	// get defined names
 	if (goto_defined_names(obj)) {
 		while (!linked) {
-			int scope = parse_byte(obj);
-			if (scope == 0)	
+            sym_scope_t scope = parse_int(obj);
+			if (scope == SCOPE_NONE)
 				break;					// end of list
-			obj->i++;					// skip type
-			parse_wcount_str(obj);		// skip section name
-			obj->i += 4;				// skip value
-			const char* symbol_name = parse_wcount_str(obj);
-			parse_wcount_str(obj);		// skip defined file name
-			obj->i += 4;				// skip line number
+            obj->i += sizeof(int32_t);  // skip type
+            obj->i += sizeof(int32_t);  // skip section name
+            obj->i += sizeof(int32_t);  // skip value
+			const char* symbol_name = parse_st_str(obj);
+            obj->i += sizeof(int32_t);  // skip defined file name
+            obj->i += sizeof(int32_t);  // skip line number
 
 			// link module if one defined symbol matches pending externals
-			if (scope == 'G' && StrHash_exists(extern_syms, symbol_name)) {
+			if (scope == SCOPE_PUBLIC && StrHash_exists(extern_syms, symbol_name)) {
 				link_lib_module(modname, obj, extern_syms);
 				linked = true;
 			}
 		}
 	}
 	return linked;
+}
+
+// check if library string table contains any of the pending symbols
+static bool lib_defines_pending_sym(obj_file_t* lib, StrHash* extern_syms) {
+    StrHashElem* elem, * next;
+    for (elem = StrHash_first(extern_syms); elem != NULL; elem = next) {
+        next = StrHash_next(elem);
+
+        if (st_find(lib->st, elem->key))
+            return true;
+    }
+    return false;
 }
 
 // search chain of libraries for modules that resolve any of the pending symbols
@@ -785,9 +872,13 @@ static bool linked_libraries(StrHash* extern_syms) {
 	bool linked = false;
 	// search all libraries
 	for (obj_file_t* lib = g_libraries; !linked && lib != NULL; lib = lib->next) {
+        if (!lib_defines_pending_sym(lib, extern_syms))     // lookup string table
+            continue;
+        
 		// search all object modules inside each library
 		int next_pos = -1;
-		for (int pos = 8; !linked && pos > 0 && pos < lib->size; pos = next_pos) {
+        int pos = SIGNATURE_SIZE + sizeof(int32_t);         // skip string table
+		for (; !linked && pos > 0 && pos < lib->size; pos = next_pos) {
 			lib->i = pos;
 			next_pos = parse_int(lib);
 			int module_size = parse_int(lib);
@@ -795,14 +886,20 @@ static bool linked_libraries(StrHash* extern_syms) {
 			if (module_size == 0)
 				continue;					// deleted module
 
+            if (!module_same_cpu(lib, lib->i + SIGNATURE_SIZE))
+                continue;                   // different CPU
+
 			// define an obj_file_t to link
 			obj_file_t obj;
+            memset(&obj, 0, sizeof(obj_file_t));
 			obj.filename = lib->filename;
 			obj.data = lib->data + lib->i;
 			obj.size = module_size;
 			obj.i = 0;
 			if (linked_module(&obj, extern_syms))
 				linked = true;
+            if (obj.st)
+                st_free(obj.st);
 		}
 	}
 	return linked;
@@ -833,7 +930,7 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 				break;
 
 			// next section
-			const char* section_name = parse_wcount_str(obj);
+			const char* section_name = parse_st_str(obj);
 			Section1* section = new_section(section_name);
 			int origin = parse_int(obj);
 			set_origin(origin, section);
@@ -843,20 +940,24 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 			if (option_relocatable() && section->origin >= 0) {
 				warn_org_ignored(obj->filename, section->name);
 
-				section->origin = -1;
+				section->origin = ORG_NOT_DEFINED;
 				section->section_split = false;
 			}
 			// if running appmake, ignore origin except for first module
 			else if (option_appmake() && section->origin >= 0 && !first_section) {
 				warn_org_ignored(obj->filename, section->name);
 
-				section->origin = -1;
+				section->origin = ORG_NOT_DEFINED;
 				section->section_split = false;
 			}
 
 			// load bytes to section
 			patch_from_memory(obj->data + obj->i, 0, code_size);
-			obj->i += code_size;
+
+            // align to dword size
+            unsigned aligned_size = ((code_size + (sizeof(int32_t) - 1)) & ~(sizeof(int32_t) - 1));
+
+			obj->i += aligned_size;
 
 			first_section = false;
 		}
@@ -865,35 +966,24 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 	// load defined names
 	if (goto_defined_names(obj)) {
 		while (true) {
-			int scope = parse_byte(obj);							// scope of symbol
-			if (scope == 0)											// end marker
+            sym_scope_t scope = parse_int(obj);						// scope of symbol
+			if (scope == SCOPE_NONE)								// end marker
 				break;
 
-			int symbol_type = parse_byte(obj);						// type of symbol
-			const char* section_name = parse_wcount_str(obj);		// section
+            sym_type_t type = parse_int(obj);				        // type of symbol
+			const char* section_name = parse_st_str(obj);		    // section
 			int value = parse_int(obj);								// value
-			const char* name = parse_wcount_str(obj);				// symbol name
-			const char* def_filename = parse_wcount_str(obj);		// where defined
+			const char* name = parse_st_str(obj);				    // symbol name
+			const char* def_filename = parse_st_str(obj);		    // where defined
 			int line_num = parse_int(obj);							// where defined
 
 			new_section(section_name);								// define CURRENTSECTION
 
-			sym_type_t type = TYPE_UNKNOWN;
-			switch (symbol_type)
-			{
-			case 'A': type = TYPE_ADDRESS;  break;
-			case 'C': type = TYPE_CONSTANT; break;
-			case '=': type = TYPE_COMPUTED; break;
-			default:
-				error_not_obj_file(obj->filename);
-				return;
-			}
-
 			Symbol1* sym = NULL;
 			switch (scope)
 			{
-			case 'L': sym = define_local_sym(name, value, type); break;
-			case 'G': sym = define_global_sym(name, value, type); break;
+			case SCOPE_LOCAL: sym = define_local_sym(name, value, type); break;
+			case SCOPE_PUBLIC: sym = define_global_sym(name, value, type); break;
 			default:
 				error_not_obj_file(obj->filename);
 				return;
@@ -908,11 +998,11 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 	}
 
 	// collect external symbols
-	xassert(goto_modname(obj));
-	int end_external_names = obj->i;
 	if (goto_external_names(obj)) {
-		while (obj->i < end_external_names) {
-			const char* name = parse_wcount_str(obj);
+		while (true) {
+			const char* name = parse_st_str(obj);
+            if (strlen(name) == 0)      // end marker
+                break;
 			StrHash_set(&extern_syms, name, (void*)name);	// remember all extern references
 		}
 	}
@@ -933,8 +1023,7 @@ static void link_lib_module(const char* modname, obj_file_t* obj, StrHash* exter
 	set_cur_module(old_module);						// restore previous current module
 }
 
-void link_modules(void)
-{
+void link_modules(void) {
 	Expr1List* exprs = NULL;
 	StrHash* extern_syms = OBJ_NEW(StrHash);
 
@@ -944,8 +1033,7 @@ void link_modules(void)
 	
 	list_set(false);
 
-	if (option_relocatable())
-	{
+	if (option_relocatable()) {
 		reloctable = m_new_n(char, 32768U);		// TODO: make this a dymanic array
 		relocptr = reloctable;
 		relocptr += 4;  /* point at first offset to store */
@@ -953,8 +1041,7 @@ void link_modules(void)
 		sizeof_reloctable = 0;  /* relocation table, still 0 elements .. */
 		curroffset = 0;
 	}
-	else
-	{
+	else {
 		reloctable = NULL;
 	}
 
@@ -1253,7 +1340,6 @@ static void touch_symtab_symbols(Symbol1Hash* symtab)
 
 	for (iter = Symbol1Hash_first(symtab); iter; iter = Symbol1Hash_next(iter)) {
 		sym = (Symbol1*)iter->value;
-		//Bug 563 -- if (sym->type == TYPE_ADDRESS || sym->scope == SCOPE_EXTERN)
 		sym->is_touched = true;
 	}
 }
@@ -1354,6 +1440,6 @@ void checkrun_appmake(void) {
 		run_appmake("+zx81", ZX81_APP_EXT, ZX81_ORIGIN_MIN, ZX81_ORIGIN_MAX);
 		break;
 	default:
-		assert(0);
+		xassert(0);
 	}
 }

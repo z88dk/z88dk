@@ -38,7 +38,7 @@ capture_ok("z88dk-z80asm -b -m ${test}.asm", "");
 check_bin_file("${test}_AAA.bin", bytes(0x02,0x00,0xCD,0x02,0x00));
 check_text_file("${test}.map", <<END);
 var_1                           = \$0002 ; addr, local, , ${test}, BBB, ${test}.asm:12
-var_2                           = \$0002 ; addr, local, , ${test}, CCC, ${test}.asm:18
+var_2                           = \$0002 ; addr, local, , ${test}, BBB, ${test}.asm:18
 __head                          = \$0000 ; const, public, def, , ,
 __tail                          = \$0005 ; const, public, def, , ,
 __size                          = \$0005 ; const, public, def, , ,

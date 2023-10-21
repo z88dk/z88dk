@@ -122,8 +122,8 @@ PUBLIC _m32_sqrf
 .fs3
     sla e                       ; adjust mantissa for exponent
     xor a                       ; set sign in C positive
-    rr b                        ; put sign and 7 exp bits into place
-    rr e                        ; put last exp bit into place
-    ld d,b                      ; put sign and exponent in D
+    ld d,b                      ; put exponent in D
+    rr de                       ; put sign and 7 exp bits into place
+                                ; put last exp bit into place
     ret                         ; return IEEE DEHL
 

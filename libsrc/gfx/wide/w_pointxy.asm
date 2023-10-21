@@ -1,11 +1,11 @@
-    INCLUDE    "graphics/grafix.inc"
+        INCLUDE "graphics/grafix.inc"
 
-    SECTION code_graphics
-    PUBLIC    w_pointxy
+        SECTION code_graphics
+        PUBLIC  w_pointxy
     ;EXTERN    l_graphics_cmp
 
 
-    EXTERN    w_pixeladdress
+        EXTERN  w_pixeladdress
 
 ;
 ;    $Id: w_pointxy.asm,v 1.5 2016-04-13 21:09:09 dom Exp $
@@ -28,7 +28,7 @@
 ;  ..bcdehl/ixiy same
 ;  af....../.... different
 ;
-.w_pointxy
+w_pointxy:
                     ;push    hl
                     ;ld     hl,maxy
                     ;call    l_graphics_cmp
@@ -40,13 +40,15 @@
                     ;call    l_graphics_cmp
                     ;pop    de
                     ;ret    c            ; Return if X overflows
-                    
-                    call    w_pixeladdress
-                    ld     b,a
-                    ld     a,1
-                    jr     z, test_pixel    ; pixel is at bit 0...
-.pix_position         rlca
-                    djnz    pix_position
-.test_pixel           ex     de,hl
-                    and    (hl)
-                    ret
+
+        call    w_pixeladdress
+        ld      b, a
+        ld      a, 1
+        jr      z, test_pixel           ; pixel is at bit 0...
+pix_position:
+        rlca
+        djnz    pix_position
+test_pixel:
+        ex      de, hl
+        and     (hl)
+        ret

@@ -1,24 +1,26 @@
 ; ----- void  undrawto(int x2, int y2)
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
-    SECTION code_graphics
-    
-    PUBLIC  undrawto
-    PUBLIC  _undrawto
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+        SECTION code_graphics
 
-    EXTERN  asm_undrawto
+        PUBLIC  undrawto
+        PUBLIC  _undrawto
+        PUBLIC  ___undrawto
+
+        EXTERN  asm_undrawto
 
 
 
-.undrawto
-._undrawto
-    pop     af    ; ret addr
-    pop     de    ; y2
-    pop     hl
-    push    hl
-    push    de
-    ld      d,l    ; x2
-    push    af    ; ret addr
-    jp      asm_undrawto
-    
-ENDIF
+undrawto:
+_undrawto:
+___undrawto:
+        pop     af                      ; ret addr
+        pop     de                      ; y2
+        pop     hl
+        push    hl
+        push    de
+        ld      d, l                    ; x2
+        push    af                      ; ret addr
+        jp      asm_undrawto
+
+  ENDIF

@@ -6,16 +6,16 @@ This is the z88dk 32-bit IEEE-754 (mostly) standard math32 floating point maths 
 Where not written by me, the functions were sourced from:
 
   * the Digi International Rabbit IEEE-754 32-bit library, copyright (C) 2015 Digi International Inc.
-  * the Hi-Tech C 32-bit floating point library, copyright (C) 1984-1987 HI-TECH SOFTWARE.
   * the Cephes Math Library Release 2.2, copyright (C) 1984, 1987, 1989 by Stephen L. Moshier.
+  * the Hi-Tech C 32-bit floating point library, copyright (C) 1984-1987 HI-TECH SOFTWARE.
   * the SDCC 32-bit floating point library, copyright (C) 1991 by Pipeline Associates, Inc, and others.
   * various Wikipedia references, especially for Newton-Raphson and Horner's Method.
 
-This library is designed for z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate the floating point mantissa calculation.
+This library is designed for z180 (ez80), z80n, and Rabbit 2000 / 3000 processors. Specifically, it is optimised for the z180 (ez80) and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate the floating point mantissa calculation. The Rabbit `32_16x16` signed multiply instruction is also implemented for r2ka/r3k machines and provides the fastest solution.
 
 This library is also designed to be as fast as possible on the z80 processor, using a `32_24x8` basis multiply function.
 
-*@feilipu, May 2019*
+*@feilipu, May 2019 - August 2023*
 
 ---
 
@@ -27,7 +27,7 @@ This library is also designed to be as fast as possible on the z80 processor, us
 
   *  Register use is limited to the main and alternate set (including af'). NO index registers were abused in the process.
 
-  *  Made for the Spectrum Next. The z80n `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
+  *  Made for the Spectrum Next (z80n) and Agon Lite (ez80). The z80n `mul de` and the z180 (ez80) `mlt nn`, and r2ka `mul` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
   *  The z80 multiply (without a hardware instruction) is implemented with a `32_24x8` unrolled multiply algorithm.
 

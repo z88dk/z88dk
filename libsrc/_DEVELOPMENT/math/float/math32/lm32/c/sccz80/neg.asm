@@ -1,13 +1,24 @@
+SECTION   code_fp_math32
+PUBLIC    neg
+EXTERN    _m32_negf
 
-	SECTION	code_fp_math32
-	PUBLIC	neg
-	EXTERN	m32_fsneg
+IFNDEF __CLASSIC
+defc   neg = _m32_negf
+ELSE
 
-	defc	neg = m32_fsneg
+; Classic has a non-fastcall implementation
+
+neg:
+    pop bc
+    pop hl
+    pop de
+    push de
+    push hl
+    push bc
+    jp _m32_negf
 
 ; SDCC bridge for Classic
-IF __CLASSIC
 PUBLIC _neg
-defc _neg = m32_fsneg
-ENDIF
+defc _neg = neg
 
+ENDIF

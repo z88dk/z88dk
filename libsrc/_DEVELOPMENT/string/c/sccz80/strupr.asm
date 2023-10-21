@@ -8,25 +8,41 @@ PUBLIC strupr
 
 EXTERN asm_strupr
 
-defc strupr = asm_strupr
 
-IF __CLASSIC && __CPU_GBZ80__
-PUBLIC _strupr
-
-_strupr:
-   ld hl,sp+2
-   ld a,(hl+)
-   ld h,(hl)
-   ld l,a
+strupr:
+IF __CPU_GBZ80__
+   ld  hl,sp+2
+   ld  a,(hl+)
+   ld  h,(hl)
+   ld  l,a
+ELIF __CPU_RABBIT__ | __CPU_KC160__
+   ld hl,(sp+2)
+ELSE
+   pop de
+   pop hl
+   push hl
+   push de
+ENDIF
+IF __CPU_GBZ80__
    call asm_strupr
    ld   d,h
    ld   e,l
    ret
+ELSE
+    jp asm_strupr
 ENDIF
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC && !__CPU_GBZ80__
 PUBLIC _strupr
 defc _strupr = strupr
+ENDIF
+
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strupr
+defc ___strupr = strupr
 ENDIF
 

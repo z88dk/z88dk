@@ -9,13 +9,13 @@
 ;      $Id: cclg.asm $
 ;
 
-    	SECTION	code_graphics
-    	PUBLIC    cclg
-        PUBLIC    _cclg
+        SECTION code_graphics
+        PUBLIC  cclg
+        PUBLIC  _cclg
+        PUBLIC  ___cclg
 
-	EXTERN	clg
-	
-.cclg
-._cclg
+        EXTERN  clg
 
-	jp clg
+        defc    cclg=clg
+        defc    _cclg=cclg
+        defc    ___cclg=cclg

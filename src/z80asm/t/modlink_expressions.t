@@ -83,51 +83,53 @@ capture_ok("z88dk-z80asm -b -l -m ${test}.o ${test}1.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 28 bytes, ORG \$1234
     C \$0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 06 00
     C \$0010: 11 00 00 21 00 00 11 00 00 01 00 00
   Symbols:
-    L A \$0000 a0 (section "") (file ${test}.asm:5)
-    G A \$0013 a1 (section "") (file ${test}.asm:13)
+    L A \$0000: a0 (section "") (file ${test}.asm:5)
+    G A \$0013: a1 (section "") (file ${test}.asm:13)
   Externs:
     U         a2
     U         __head
     U         __tail
     U         __size
   Expressions:
-    E Ub \$0000 \$0001: \$-4608 (section "") (file ${test}.asm:6)
-    E Cw \$0002 \$0003: \$ (section "") (file ${test}.asm:7)
-    E Ub \$0005 \$0006: a1-4608 (section "") (file ${test}.asm:8)
-    E Cw \$0007 \$0008: a1 (section "") (file ${test}.asm:9)
-    E Cw \$000A \$000B: a2-a1 (section "") (file ${test}.asm:10)
-    E Cw \$0010 \$0011: a2-\$ (section "") (file ${test}.asm:12)
-    E Cw \$0013 \$0014: __head (section "") (file ${test}.asm:14)
-    E Cw \$0016 \$0017: __tail (section "") (file ${test}.asm:15)
-    E Cw \$0019 \$001A: __size (section "") (file ${test}.asm:16)
-Object  file ${test}1.o at \$0000: Z80RMF16
+    E U \$0000 \$0001 2: \$-4608 (section "") (file ${test}.asm:6)
+    E W \$0002 \$0003 3: \$ (section "") (file ${test}.asm:7)
+    E U \$0005 \$0006 2: a1-4608 (section "") (file ${test}.asm:8)
+    E W \$0007 \$0008 3: a1 (section "") (file ${test}.asm:9)
+    E W \$000A \$000B 3: a2-a1 (section "") (file ${test}.asm:10)
+    E W \$0010 \$0011 3: a2-\$ (section "") (file ${test}.asm:12)
+    E W \$0013 \$0014 3: __head (section "") (file ${test}.asm:14)
+    E W \$0016 \$0017 3: __tail (section "") (file ${test}.asm:15)
+    E W \$0019 \$001A 3: __size (section "") (file ${test}.asm:16)
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 28 bytes, ORG \$1234
     C \$0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C \$0010: 11 03 00 21 00 00 11 00 00 01 00 00
   Symbols:
-    G A \$0013 a2 (section "") (file ${test}1.asm:11)
+    G A \$0013: a2 (section "") (file ${test}1.asm:11)
   Externs:
     U         a1
     U         __head
     U         __tail
     U         __size
   Expressions:
-    E Ub \$0000 \$0001: \$-4608 (section "") (file ${test}1.asm:4)
-    E Cw \$0002 \$0003: \$ (section "") (file ${test}1.asm:5)
-    E Ub \$0005 \$0006: a2-4608 (section "") (file ${test}1.asm:6)
-    E Cw \$0007 \$0008: a2 (section "") (file ${test}1.asm:7)
-    E Cw \$000A \$000B: a2-a1 (section "") (file ${test}1.asm:8)
-    E Cw \$000D \$000E: \$-a1 (section "") (file ${test}1.asm:9)
-    E Cw \$0013 \$0014: __head (section "") (file ${test}1.asm:12)
-    E Cw \$0016 \$0017: __tail (section "") (file ${test}1.asm:13)
-    E Cw \$0019 \$001A: __size (section "") (file ${test}1.asm:14)
+    E U \$0000 \$0001 2: \$-4608 (section "") (file ${test}1.asm:4)
+    E W \$0002 \$0003 3: \$ (section "") (file ${test}1.asm:5)
+    E U \$0005 \$0006 2: a2-4608 (section "") (file ${test}1.asm:6)
+    E W \$0007 \$0008 3: a2 (section "") (file ${test}1.asm:7)
+    E W \$000A \$000B 3: a2-a1 (section "") (file ${test}1.asm:8)
+    E W \$000D \$000E 3: \$-a1 (section "") (file ${test}1.asm:9)
+    E W \$0013 \$0014 3: __head (section "") (file ${test}1.asm:12)
+    E W \$0016 \$0017 3: __tail (section "") (file ${test}1.asm:13)
+    E W \$0019 \$001A 3: __size (section "") (file ${test}1.asm:14)
 END
 
 check_text_file("${test}.map", <<END);
@@ -176,26 +178,28 @@ capture_ok("z88dk-z80asm -b ${test}.o ${test}1.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 4 bytes, ORG \$1000
     C \$0000: CD 00 00 C9
   Symbols:
-    G A \$0000 func1 (section "") (file ${test}.asm:3)
+    G A \$0000: func1 (section "") (file ${test}.asm:3)
   Externs:
     U         func2
   Expressions:
-    E Cw \$0000 \$0001: func2 (section "") (file ${test}.asm:3)
-Object  file ${test}1.o at \$0000: Z80RMF16
+    E W \$0000 \$0001 3: func2 (section "") (file ${test}.asm:3)
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 4 bytes, ORG \$1000
     C \$0000: CD 00 00 C9
   Symbols:
-    G A \$0000 func2 (section "") (file ${test}1.asm:3)
+    G A \$0000: func2 (section "") (file ${test}1.asm:3)
   Externs:
     U         func1
   Expressions:
-    E Cw \$0000 \$0001: func1 (section "") (file ${test}1.asm:3)
+    E W \$0000 \$0001 3: func1 (section "") (file ${test}1.asm:3)
 END
 
 
@@ -235,26 +239,28 @@ capture_ok("z88dk-z80asm -b ${test}.o ${test}1.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 4 bytes, ORG \$1000
     C \$0000: CD 00 00 C9
   Symbols:
-    G A \$0000 func1 (section "") (file ${test}.asm:1)
+    G A \$0000: func1 (section "") (file ${test}.asm:1)
   Externs:
     U         func2
   Expressions:
-    E Cw \$0000 \$0001: func2 (section "") (file ${test}.asm:1)
-Object  file ${test}1.o at \$0000: Z80RMF16
+    E W \$0000 \$0001 3: func2 (section "") (file ${test}.asm:1)
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 4 bytes, ORG \$1000
     C \$0000: CD 00 00 C9
   Symbols:
-    G A \$0000 func2 (section "") (file ${test}1.asm:1)
+    G A \$0000: func2 (section "") (file ${test}1.asm:1)
   Externs:
     U         func1
   Expressions:
-    E Cw \$0000 \$0001: func1 (section "") (file ${test}1.asm:1)
+    E W \$0000 \$0001 3: func1 (section "") (file ${test}1.asm:1)
 END
 
 

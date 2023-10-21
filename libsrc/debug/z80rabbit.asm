@@ -9,18 +9,18 @@
 ; *	$Id: z80rabbit.asm,v 1.3 2016-03-06 21:45:13 dom Exp $
 ; *
 
-	SECTION	code_clib
-	PUBLIC	z80rabbit
-	PUBLIC	_z80rabbit
+        SECTION code_clib
+        PUBLIC  z80rabbit
+        PUBLIC  _z80rabbit
 
 z80rabbit:
 _z80rabbit:
-	ld	hl,0
-	ld	de,1
-	push	de
-	defb	$ed
-	defb	$54	; ex (sp),hl ONLY IF we're on a Rabbic Control Module
-	nop	; this could help z80 clones not to hurt too much
-	nop
-	pop	de
-	ret
+        ld      hl, 0
+        ld      de, 1
+        push    de
+        defb    $ed
+        defb    $54                     ; ex (sp),hl ONLY IF we're on a Rabbic Control Module
+        nop                             ; this could help z80 clones not to hurt too much
+        nop
+        pop     de
+        ret

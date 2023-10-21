@@ -29,3 +29,10 @@ PUBLIC _strsep_callee
 defc _strsep_callee = strsep_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strsep_callee
+defc ___strsep_callee = strsep_callee
+ENDIF
+

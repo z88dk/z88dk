@@ -412,28 +412,28 @@ main(unsigned int arg2, char *arg1)
 
 #ifdef __LAMBDA__
 
-// int
-#define ARG_INT    asm("rst\t0x08\ncall\t0x0A11\ncall\t0x1509\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
+// int   (0x28,7 = JR Z,7)
+#define ARG_INT    asm("rst\t0x08\nEXTERN\t__lambda_class_6\ncall\t__lambda_class_6\nEXTERN\t__lambda_find_int\ncall\t__lambda_find_int\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\npush\tbc\n")
 
 // unsigned int
-#define ARG_UINT   asm("rst\t0x08\ncall\t0x0A11\ncall\t0x1509\npush\tbc\n")
+#define ARG_UINT   asm("rst\t0x08\nEXTERN\t__lambda_class_6\ncall\t__lambda_class_6\nEXTERN\t__lambda_find_int\ncall\t__lambda_find_int\npush\tbc\n")
 
 // void *, struct, char *...
-#define ARG_PTR    asm("rst\t0x08\ncall\t0x0806\nrst\t0x20\npush\tde\n")
+#define ARG_PTR    asm("rst\t0x08\nEXTERN\t__lambda_scanning\ncall\t__lambda_scanning\nEXTERN\t__lambda_stk_fetch\ncall\t__lambda_stk_fetch\npush\tde\n")
 
 // C style strings (adds the string termination automatically)
-#define ARG_STR    asm("rst\t0x08\ncall\t0x0806\nld\tde,0x0008\nld\tbc,1\ncall\t0x13BC\ncall\t0x189B\nrst\t0x20\npush\tde\n")
+#define ARG_STR    asm("rst\t0x08\nEXTERN\t__lambda_scanning\ncall\t__lambda_scanning\nld\tde,0x0008\nld\tbc,1\nEXTERN\t__lambda_stk_store\ncall\t__lambda_stk_store\nEXTERN\t__lambda_strs_add\ncall\t__lambda_strs_add\nEXTERN\t__lambda_stk_fetch\ncall\t__lambda_stk_fetch\npush\tde\n")
 
 // End of argument list
 #define ARG_END    asm("push\tbc\n")
 
 // Terminate your custom statement and get back to the BASIC interpreter
-#define STMT_RET   asm("ld\tix,0x4000\nld\tsp,(0x4002)\njp\t0x1A13\n")
+#define STMT_RET   asm("ld\tix,0x4000\nld\tsp,(0x4002)\nEXTERN\t__lambda_next_one\njp\t__lambda_next_one\n")
 
 #else
 
-// int
-#define ARG_INT    asm("rst\t0x20\ncall\t0x0D92\ncall\t0x158A\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
+// int   (0x28,7 = JR Z,7)
+#define ARG_INT    asm("rst\t0x20\ncall\t0x0D92\ncall\t0x158A\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\npush\tbc\n")
 
 // unsigned int
 #define ARG_UINT   asm("rst\t0x20\ncall\t0x0D92\ncall\t0x158A\npush\tbc\n")

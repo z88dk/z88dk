@@ -1,0 +1,17 @@
+../_DEVELOPMENT/math/integer/r2ka/l_r2ka_muls_16_16x8
+../_DEVELOPMENT/math/integer/r2ka/l_r2ka_muls_16_16x16
+../_DEVELOPMENT/math/integer/r2ka/l_r2ka_muls_32_16x16
+../_DEVELOPMENT/math/integer/r2ka/l_r2ka_muls_32_32x32
+../_DEVELOPMENT/math/integer/r2ka/l_r2ka_mulu_16_16x8
+../_DEVELOPMENT/math/integer/r2ka/l_r2ka_mulu_16_16x16
+../_DEVELOPMENT/math/integer/r2ka/l_r2ka_mulu_24_16x8
+../_DEVELOPMENT/math/integer/r2ka/l_r2ka_mulu_32_16x16
+../_DEVELOPMENT/math/integer/r2ka/l_r2ka_mulu_32_32x32
+../_DEVELOPMENT/math/integer/r2ka/l_r2ka_mulu_64_32x32
+../_DEVELOPMENT/math/integer/r2ka/l_r2ka_mulu_64_64x64
+
+../_DEVELOPMENT/math/integer/r4k/l_r4k_mulu_32_16x16
+
+../_DEVELOPMENT/math/float/math32/z80/f32_r2ka_mulu_32h_24x24
+../_DEVELOPMENT/math/float/math32/z80/f32_r2ka_mulu_32h_32x32
+../_DEVELOPMENT/math/float/math32/z80/f32_r2ka_sqr_32h_24x24

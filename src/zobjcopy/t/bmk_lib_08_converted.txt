@@ -1,6 +1,7 @@
-Library file test2.lib at $0000: Z80LMF12
-Object  file test2.lib at $0010: Z80RMF12
+Library file test2.lib at $0000: Z80LMF18
+Object  file test2.lib at $0014: Z80RMF18
   Name: file1
+  CPU:  z80 
   Section "": 0 bytes
   Section text_1: 63 bytes, ORG $0000
     C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
@@ -19,27 +20,28 @@ Object  file test2.lib at $0010: Z80RMF12
   Section data_2: 10 bytes
     C $0000: 0B 0C 0D 0E 0F 10 11 12 13 14
   Symbols:
-    L A $0002 start1 (section text_1) (file "")
-    G C $0000 main (section text_1) (file "")
-    G = $0000 _start (section text_1) (file "")
-    L A $0002 start2 (section text_2) (file "")
-    G A $0002 msg1 (section data_1) (file "")
-    G A $0002 msg2 (section data_2) (file "")
+    L A $0002: start1 (section text_1) (file "")
+    G C $0000: main (section text_1) (file "")
+    G = $0000: _start (section text_1) (file "")
+    L A $0002: start2 (section text_2) (file "")
+    G A $0002: msg1 (section data_1) (file "")
+    G A $0002: msg2 (section data_2) (file "")
   Externs:
     U         ext1
     U         ext2
   Expressions:
-    E Ub $0000 $0001: start1 % 256 (section text_1) (file file1.asm:123)
-    E =  $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
-    E Sb $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
-    E Cw $0000 $0001: msg1 (section data_1) (file file1.asm:231)
-    E Cw $0000 $0001: ext1 (section data_1) (file file1.asm:231)
-    E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
-    E Ll $0000 $0001: msg2 (section data_2) (file file1.asm:321)
-    E Ll $0000 $0001: ext2 (section data_2) (file file1.asm:321)
+    E U $0000 $0001 2: start1 % 256 (section text_1) (file file1.asm:123)
+    E = $0000 $0000 2: _start := start1 (section text_1) (file file1.asm:321)
+    E S $0000 $0001 2: start2 % 127 (section text_2) (file file1.asm:132)
+    E W $0000 $0001 2: msg1 (section data_1) (file file1.asm:231)
+    E W $0000 $0001 2: ext1 (section data_1) (file file1.asm:231)
+    E W $0000 $0001 2: msg2-msg1 (section data_1) (file file1.asm:231)
+    E L $0000 $0001 2: msg2 (section data_2) (file file1.asm:321)
+    E L $0000 $0001 2: ext2 (section data_2) (file file1.asm:321)
 
-Object  file test2.lib at $02F0: Z80RMF12
+Object  file test2.lib at $0408: Z80RMF18
   Name: file1
+  CPU:  z80 
   Section "": 0 bytes
   Section text_1: 63 bytes, ORG $0000
     C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
@@ -58,22 +60,22 @@ Object  file test2.lib at $02F0: Z80RMF12
   Section data_2: 10 bytes
     C $0000: 0B 0C 0D 0E 0F 10 11 12 13 14
   Symbols:
-    L A $0002 start1 (section text_1) (file "")
-    G C $0000 main (section text_1) (file "")
-    G = $0000 _start (section text_1) (file "")
-    L A $0002 start2 (section text_2) (file "")
-    G A $0002 msg1 (section data_1) (file "")
-    G A $0002 msg2 (section data_2) (file "")
+    L A $0002: start1 (section text_1) (file "")
+    G C $0000: main (section text_1) (file "")
+    G = $0000: _start (section text_1) (file "")
+    L A $0002: start2 (section text_2) (file "")
+    G A $0002: msg1 (section data_1) (file "")
+    G A $0002: msg2 (section data_2) (file "")
   Externs:
     U         ext1
     U         ext2
   Expressions:
-    E Ub $0000 $0001: start1 % 256 (section text_1) (file file1.asm:123)
-    E =  $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
-    E Sb $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
-    E Cw $0000 $0001: msg1 (section data_1) (file file1.asm:231)
-    E Cw $0000 $0001: ext1 (section data_1) (file file1.asm:231)
-    E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
-    E Ll $0000 $0001: msg2 (section data_2) (file file1.asm:321)
-    E Ll $0000 $0001: ext2 (section data_2) (file file1.asm:321)
+    E U $0000 $0001 2: start1 % 256 (section text_1) (file file1.asm:123)
+    E = $0000 $0000 2: _start := start1 (section text_1) (file file1.asm:321)
+    E S $0000 $0001 2: start2 % 127 (section text_2) (file file1.asm:132)
+    E W $0000 $0001 2: msg1 (section data_1) (file file1.asm:231)
+    E W $0000 $0001 2: ext1 (section data_1) (file file1.asm:231)
+    E W $0000 $0001 2: msg2-msg1 (section data_1) (file file1.asm:231)
+    E L $0000 $0001 2: msg2 (section data_2) (file file1.asm:321)
+    E L $0000 $0001 2: ext2 (section data_2) (file file1.asm:321)
 

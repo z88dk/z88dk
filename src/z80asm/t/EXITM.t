@@ -82,9 +82,9 @@ z80asm_ok("", "", "", <<'END', bytes(1, 1,2));
 		ifdef name \ exitm \ endif
 		defb 2
 		endm
-		defc abc=0
-		testmacro abc
-		testmacro def
+		defc abcd=0
+		testmacro abcd
+		testmacro efgh
 END
 
 z80asm_ok("", "", "", <<'END', bytes(1,2, 1));
@@ -93,9 +93,9 @@ z80asm_ok("", "", "", <<'END', bytes(1,2, 1));
 		ifndef name \ exitm \ endif
 		defb 2
 		endm
-		defc abc=0
-		testmacro abc
-		testmacro def
+		defc abcd=0
+		testmacro abcd
+		testmacro efgh
 END
 
 z80asm_ok("", "", "", <<'END', bytes(1, 1,2));
@@ -104,9 +104,9 @@ z80asm_ok("", "", "", <<'END', bytes(1, 1,2));
 		if 0 \ exitm \ elifdef name \ exitm \ endif
 		defb 2
 		endm
-		defc abc=0
-		testmacro abc
-		testmacro def
+		defc abcd=0
+		testmacro abcd
+		testmacro efgh
 END
 
 z80asm_ok("", "", "", <<'END', bytes(1,2, 1));
@@ -115,9 +115,9 @@ z80asm_ok("", "", "", <<'END', bytes(1,2, 1));
 		if 0 \ exitm \ elifndef name \ exitm \ endif
 		defb 2
 		endm
-		defc abc=0
-		testmacro abc
-		testmacro def
+		defc abcd=0
+		testmacro abcd
+		testmacro efgh
 END
 
 unlink_testfiles;

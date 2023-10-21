@@ -12,3 +12,9 @@ PUBLIC _fmod
 defc _fmod = fmod
 ENDIF
 
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___fmod
+defc ___fmod = fmod
+ENDIF
+

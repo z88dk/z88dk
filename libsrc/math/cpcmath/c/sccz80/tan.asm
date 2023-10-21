@@ -6,16 +6,16 @@
 ;	$Id: tan.asm,v 1.4 2016-06-22 19:50:49 dom Exp $
 ;
 
-    SECTION smc_fp
-    INCLUDE "cpcmath.inc"
+        SECTION smc_fp
+        INCLUDE "cpcmath.inc"
 
-    PUBLIC  tan
-    PUBLIC  tanc
+        PUBLIC  tan
+        PUBLIC  tanc
 
-    EXTERN  get_para
+        EXTERN  get_para
 
-.tan
-    call    get_para
-.tanc
-    FPCALL(CPCFP_FLO_TAN)
-    ret
+tan:
+        call    get_para
+tanc:
+        FPCALL  (CPCFP_FLO_TAN)
+        ret

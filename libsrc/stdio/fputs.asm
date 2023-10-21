@@ -4,10 +4,12 @@ MODULE fputs
 SECTION code_clib
 PUBLIC fputs
 PUBLIC _fputs
+PUBLIC ___fputs
 EXTERN asm_fputs_callee
 
 .fputs
 ._fputs
+.___fputs
     pop     hl	;ret
     pop     bc	;fp
     pop     de	;s

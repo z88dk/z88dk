@@ -6,18 +6,18 @@
 ;	$Id: get_para.asm,v 1.4 2016-06-22 19:50:49 dom Exp $
 ;
 
-    SECTION smc_fp
+        SECTION smc_fp
 
-    PUBLIC  get_para
+        PUBLIC  get_para
 
-    EXTERN  fa
+        EXTERN  fa
 
-.get_para	
-    ld      hl,4
-    add     hl,sp
-    ld      de,fa		;(fa) <- (hl)
-    ld      bc,6
-    ldir
-    ld      hl,fa+1
-    ret
+get_para:
+        ld      hl, 4
+        add     hl, sp
+        ld      de, fa                  ;(fa) <- (hl)
+        ld      bc, 6
+        ldir
+        ld      hl, fa+1
+        ret
 

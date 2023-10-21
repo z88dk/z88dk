@@ -270,9 +270,9 @@ extern int __LIB__  a_paper(int color);
 /* Set ink color, 6 bit color encoding, (OS patch needed or 8 bit if ULA256.FID is installed) */
 extern int __LIB__  a_ink(int color);
 /* Get x cursor position in viewport */
-extern int __LIB__ a_curx();
+extern int __LIB__ a_curx(void);
 /* Get y cursor position in viewport */
-extern int __LIB__ a_cury();
+extern int __LIB__ a_cury(void);
 
 /* Get Machine */
 extern int __LIB__ a_machine(void);
@@ -282,16 +282,16 @@ extern int __LIB__ a_machine(void);
 #define M_PCW16     65    // (65 = 'A', ie "Anne")
 
 /* Get Machine HW version (or HW details on recent PCW versions) */
-extern int __LIB__ a_machinever();
+extern int __LIB__ a_machinever(void);
 /* Get BIOS version */
-extern int __LIB__ a_biosver();
+extern int __LIB__ a_biosver(void);
 
 /* Get system memory size */
-extern int __LIB__ a_memsize();
+extern int __LIB__ a_memsize(void);
 /* 2 drives available ? */
-extern int __LIB__ a_driveb();
+extern int __LIB__ a_driveb(void);
 /* Serial Port available ? */
-extern int __LIB__ a_serialport();
+extern int __LIB__ a_serialport(void);
 
 
 

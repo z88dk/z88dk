@@ -1,1 +1,1 @@
-font/font_8x8/obj/**/*.o
+font/font_8x8/obj/${TYPE}/**/*.o

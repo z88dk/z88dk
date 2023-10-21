@@ -43,8 +43,7 @@ IF __CLIB_OPT_IMATH_FAST & $08
 
    ld c,e
    ld b,a
-   ld e,l
-   ld d,h
+   ld de,hl
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

@@ -13,23 +13,23 @@
 ; ----- void  plot(int x, int y)
 
 
-SECTION code_graphics
+        SECTION code_graphics
 
-PUBLIC     plot_callee
-PUBLIC    _plot_callee
+        PUBLIC  plot_callee
+        PUBLIC  _plot_callee
 
-	EXTERN    plot
+        EXTERN  plot
 
-.plot_callee
-._plot_callee
-	pop af	; ret addr
-	pop	bc
-	pop	de
-	push af	; ret addr
-	push de
-	push bc
-	
-	call plot
-	pop bc
-	pop bc
-	ret
+plot_callee:
+_plot_callee:
+        pop     af                      ; ret addr
+        pop     bc
+        pop     de
+        push    af                      ; ret addr
+        push    de
+        push    bc
+
+        call    plot
+        pop     bc
+        pop     bc
+        ret

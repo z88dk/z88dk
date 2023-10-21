@@ -33,3 +33,10 @@ PUBLIC _strchrnul_callee
 defc _strchrnul_callee = strchrnul_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strchrnul_callee
+defc ___strchrnul_callee = strchrnul_callee
+ENDIF
+

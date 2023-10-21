@@ -14,38 +14,38 @@
 ;; void stencil_add_point(int x, int y, unsigned char *stencil)
 
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
-    SECTION   code_graphics
-        PUBLIC    stencil_add_point
-        PUBLIC    _stencil_add_point
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+        SECTION code_graphics
+        PUBLIC  stencil_add_point
+        PUBLIC  _stencil_add_point
 
-        EXTERN    line
-        EXTERN    stencil_add_pixel
+        EXTERN  line
+        EXTERN  stencil_add_pixel
 
         ;EXTERN    swapgfxbk
         ;EXTERN    swapgfxbk1
 
-        EXTERN    stencil_ptr
+        EXTERN  stencil_ptr
 
-.stencil_add_point
-._stencil_add_point
-    push    ix
-    ld    ix,2
-    add    ix,sp
+stencil_add_point:
+_stencil_add_point:
+        push    ix
+        ld      ix, 2
+        add     ix, sp
 
-    ld    l,(ix+2)    ;pointer to stencil
-    ld    h,(ix+3)
-    ld    (stencil_ptr),hl
+        ld      l, (ix+2)               ;pointer to stencil
+        ld      h, (ix+3)
+        ld      (stencil_ptr), hl
 
     ;ld    l,(ix+4)    ;pointer to leftmost vector
     ;ld    h,(ix+5)
     ;ld    (gfx_area),hl
 
-    ld    l,(ix+4)    ;y0
-    ld    h,(ix+6)    ;x0
+        ld      l, (ix+4)               ;y0
+        ld      h, (ix+6)               ;x0
 
-    pop    ix    
-    jp    stencil_add_pixel
-    
+        pop     ix
+        jp      stencil_add_pixel
 
-ENDIF
+
+  ENDIF

@@ -61,3 +61,10 @@ PUBLIC _strncasecmp
 defc _strncasecmp = strncasecmp
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strncasecmp
+defc ___strncasecmp = strncasecmp
+ENDIF
+

@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -6,38 +8,29 @@
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 
+BEGIN { use lib '../../t'; require 'testlib.pl'; }
+
 use Modern::Perl;
-use Test::More;
-use Path::Tiny;
-require '../../t/testlib.pl';
 
-my @CPUS = (qw( 8080 gbz80 r2ka z80 ));
+my $ticks = Ticks->new;
 
-my $test_nr;
-
-for my $cpu (@CPUS) {
-	for my $base (0x1000) {
-		for my $add (-2, 0, 2) {
-			$test_nr++;
-			note "Test $test_nr: cpu:$cpu base:$base add:$add";
-			
-			my $r = ticks(<<END, "-m$cpu");
-						ld		sp, $base
-						add.a 	sp, $add
-						
-						ld		hl, 0
-						add 	hl, sp
-						rst 	0
+for my $base (0, 0x1000, 0x4000, 0xFFFF) {
+	for my $add (-127, 0, 127, ) {
+		my $sum = $base + $add;
+		
+		$ticks->add(<<END, 
+					jp start
+					defs 256 ; save space for output
+			start:
+					ld		sp, $base
+					add 	sp, $add
 END
-			my $sum = $base + $add;
-			
-			is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
-			is $r->{HL}, $sum & 65535,			"result";
-					
-			(Test::More->builder->is_passing) or die;
-		}
+			F_C	=> ($sum > 0xFFFF || $sum < 0) ? 1 : 0,
+			SP	=> $sum & 0xFFFF);
 	}
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

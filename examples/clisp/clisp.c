@@ -55,6 +55,9 @@ zx81 16K, minimalistic version, graphics support
 zx81 48K, minimalistic version, graphics support, initial code must be provided @32768
   zcc +zx81 -O3 -create-app -DMINIMALISTIC -DGRAPHICS -lgfx81 -llib3d -DZEDIT -DZX81_32K clisp.c
 
+zx80 16K, minimalistic version, (add -DGRAPHICS for graphics support)
+  zcc +zx80 -DZX81 --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -llib3d clisp.c
+
 MicroBee  
   zcc +bee -O3 -create-app -DLARGEMEM=1200 -DGRAPHICS -DNOTIMER -lgfxbee512 -llib3d clisp.c
   
@@ -536,10 +539,14 @@ char gchar() {
 }
 
 void ugchar(char ch) {
+#ifndef FILES
+	ungetc(ch,stdin);
+#else
 if (c!=0 && c!=EOF)
     ungetc(ch,fpin);
 else
     ungetc(ch,stdin);
+#endif
 }
 
 #endif
@@ -701,7 +708,7 @@ l_read(void)
       ch = gchar();
     return -1;
   }
-#ifdef ZX81
+#if defined(ZX81)||defined(ZX80)
   else if (ch == '\"'){        /* quote macro */
 #else
   else if (ch == '\''){        /* quote macro */
@@ -715,7 +722,13 @@ l_read(void)
 
   } else if (ch != '('){         /* t, nil, symbol, or integer */
     token[0] = ch;
+
+// This is a workaround to skip the extra newline character (CR + LF)
+#ifdef Z80
+    for (i = 0; ; i++){
+#else
     for (i = 1; ; i++){
+#endif
       ch = gchar();
       if (isspace(ch) || iscntrl(ch) || (ch < 0) 
           || (ch == ';') || (ch == '(') || (ch == ')')){

@@ -6,22 +6,22 @@
 ;	$Id: dgt.asm,v 1.4 2016-06-22 19:50:49 dom Exp $
 ;
 
-    SECTION smc_fp
-    INCLUDE "cpcmath.inc"
+        SECTION smc_fp
+        INCLUDE "cpcmath.inc"
 
-    PUBLIC  dgt
-    PUBLIC  dgtc
+        PUBLIC  dgt
+        PUBLIC  dgtc
 
-    EXTERN  fsetup
-    EXTERN  stkequcmp
-    EXTERN  cmpfin
+        EXTERN  fsetup
+        EXTERN  stkequcmp
+        EXTERN  cmpfin
 
-.dgt
-    call    fsetup
-.dgtc
-    FPCALL(CPCFP_FLO_CMP)
-    cp      $1              ;(hl) > (de)
-    jp      z,cmpfin
-    xor     a
-    jp      stkequcmp
+dgt:
+        call    fsetup
+dgtc:
+        FPCALL  (CPCFP_FLO_CMP)
+        cp      $1                      ;(hl) > (de)
+        jp      z, cmpfin
+        xor     a
+        jp      stkequcmp
 

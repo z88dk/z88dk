@@ -52,7 +52,7 @@ extern Node    *callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
 
 
 /* cdbfile.c */
-extern void     debug_write_module();
+extern void     debug_write_module(void);
 extern void     debug_write_symbol(SYMBOL *sym);
 extern void     debug_write_type(Type *type);
 
@@ -154,7 +154,7 @@ extern void dummy(LVALUE *);
 
 extern void copy_to_stack(char *label, int stack_offset,  int size);
 extern void copy_to_extern(const char *src, const char *dest, int size);
-extern void gen_builtin_strcpy(); 
+extern void gen_builtin_strcpy(void); 
 extern void gen_builtin_strchr(int32_t c); 
 extern void gen_builtin_memset(int32_t c, int32_t s);
 extern void gen_builtin_memcpy(int32_t src, int32_t n);
@@ -194,14 +194,14 @@ extern void       array_add(array *arr, void *elem);
 extern void      *array_get_byindex(array *arr, int index);
 extern Type      *find_tag(const char *name);
 extern Type      *find_tag_field(Type *tag, const char *fieldname);
-extern Type      *parse_expr_type();
+extern Type      *parse_expr_type(void);
 extern Type      *default_function(const char *name);
 extern Type      *default_function_with_type(const char *name, Type *return_type);
 extern Type     *asm_function(const char *name);
 extern Type      *make_pointer(Type *base_type);
 extern Type      *dodeclare(enum storage_type storage);
 extern Node      *declare_local(int local_static);
-extern void       declare_func_kr();
+extern void       declare_func_kr(void);
 extern int        ispointer(Type *type);
 extern void       type_describe(Type *type, UT_string *output);
 extern int        type_matches(Type *t1, Type *t2);
@@ -248,7 +248,7 @@ extern int      rmatch2(char* lit);
 extern int      rcmatch(char lit);
 extern int      amatch(char *lit);
 extern int      swallow(char *lit);
-extern int      checkws();
+extern int      checkws(void);
 
 
 

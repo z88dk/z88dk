@@ -29,3 +29,10 @@ PUBLIC __memupr__callee
 defc __memupr__callee = _memupr__callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ____memupr__callee
+defc ____memupr__callee = _memupr__callee
+ENDIF
+

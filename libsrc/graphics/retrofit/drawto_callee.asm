@@ -13,23 +13,23 @@
 ; ----- void  drawto(int x2, int y2)
 
 
-SECTION code_graphics
+        SECTION code_graphics
 
-PUBLIC     drawto_callee
-PUBLIC    _drawto_callee
+        PUBLIC  drawto_callee
+        PUBLIC  _drawto_callee
 
-	EXTERN    drawto
+        EXTERN  drawto
 
-.drawto_callee
-._drawto_callee
-	pop af	; ret addr
-	pop	bc
-	pop	de
-	push af	; ret addr
-	push de
-	push bc
-	
-	call drawto
-	pop bc
-	pop bc
-	ret
+drawto_callee:
+_drawto_callee:
+        pop     af                      ; ret addr
+        pop     bc
+        pop     de
+        push    af                      ; ret addr
+        push    de
+        push    bc
+
+        call    drawto
+        pop     bc
+        pop     bc
+        ret

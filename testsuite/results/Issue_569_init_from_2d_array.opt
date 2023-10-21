@@ -14,6 +14,8 @@
 ._c
 	defw	_a + 22
 	SECTION	code_compiler
+	SECTION	bss_compiler
+	SECTION	code_compiler
 
 
 

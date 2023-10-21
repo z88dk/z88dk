@@ -69,12 +69,9 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     ld hl,002h                  ; get second operand off of the stack
     add hl,sp
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
-    ld c,(hl)
-    inc hl
+    ld e,(hl+)
+    ld d,(hl+)
+    ld c,(hl+)
     ld h,(hl)
     ld l,c                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
     jr fmrejoin
@@ -166,9 +163,9 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 .fm4
     sla e                       ; adjust mantissa for exponent
     sla c                       ; put sign into C
-    rr b                        ; put sign and 7 exp bits into place
-    rr e                        ; put last exp bit into place
-    ld d,b                      ; put sign and exponent in D
+    ld d,b                      ; put exponent in D
+    rr de                       ; put sign and 7 exp bits into place
+                                ; put last exp bit into place
     ret                         ; return IEEE DEHL
 
 .mulovl

@@ -10,26 +10,26 @@
 ;double log(double)     - natural log
 ;Number in FA..
 
-                SECTION  code_fp
-IF FORz88
-                INCLUDE  "target/z88/def/fpp.def"
-ELSE
-		INCLUDE "fpp.def"
-ENDIF
+        SECTION code_fp
+  IF    FORz88
+        INCLUDE "target/z88/def/fpp.def"
+  ELSE
+        INCLUDE "fpp.def"
+  ENDIF
 
-                PUBLIC    log
+        PUBLIC  log
 
-                EXTERN	fsetup
-                EXTERN	stkequ2
+        EXTERN  fsetup
+        EXTERN  stkequ2
 
-.log
+log:
         call    fsetup
-IF FORz88
-        fpp(FP_LN)
-ELSE
-	ld	a,+(FP_LN)
-	call	FPP
-ENDIF
+  IF    FORz88
+        fpp     (FP_LN)
+  ELSE
+        ld      a, +(FP_LN)
+        call    FPP
+  ENDIF
         jp      stkequ2
 
 

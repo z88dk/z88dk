@@ -7,6 +7,7 @@ z88dk v2.3 - xx.xx.202x
 Detailed but incomplete changelist:
 
 - [classic] +agon: New target
+- [classic] +aquarius: New target Aquarius Plus (-clib=aqplus)
 - [classic] +cpc: Interrupt support
 - [classic] +cpc: Graphics support for all 3 official modes
 - [classic] +cpm: Support for Xerox 820 and sound on 820ii
@@ -28,15 +29,27 @@ Detailed but incomplete changelist:
 - [classic] Arkos Tracker available for +cpc, +msx, +zx, +zxn
 - [classic] TMS99x8 library enhancements
 - [classic] A fixed point Q8.8 maths library is available
+- [classic] Support for using clang as a compiler
 - [newlib] Arkos Tracker available for +zx, +zxn
 - [sccz80] 8080, 8085, gbz80 opt-code-speed: add32, sub32, longcompare
 - [sccz80] Extended quikmult cases
 - [sccz80] Initialisation improvements
+- [ticks] Fixed Rabbit multiply, added r800 multiply instructions
+- [zsdcc] The preprocessor has been switched over to ucpp which is C99 compatible
+- [zsdcc] Upgraded to SDCC 4.3.0 r14210
 - [z80asm] Allow jr across sections
 - [z80asm] Convert address difference to constant
 - [z80asm] Support #ifdef/#endif etc in assembler
 - [z80asm] Accept ':' as statement separator
-- [z80asm] add support to ez80, both z80 memory mode and ADL memory mode
+- [z80asm] add support of ez80, both z80 memory mode and ADL memory mode
+- [z80asm] add support of -raw-strings
+- [z80asm] add support of z80_strict that only accepts the documented opcodes
+- [z80asm] do not link with object files built for a different cpu
+- [z80asm] add -IXIY-soft that swaps index registers but saves object file as not-swapped
+- [z80asm] add symbol table to libraries to speed-up linking
+- [z80asm] allow the creation of fat libraries with the same code for all CPUs (-m*)
+- [z80asm] add support of r800, r4k, r5k, kc160
+- [z80asm] add EQ, NE, LTU, LEU, GTU, GEU condition codes, allow any flag in expressions
 - [zcc] +config at any place, support for -xc
 - [make] add cmake support
 

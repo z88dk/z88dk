@@ -1,10 +1,10 @@
-    INCLUDE    "graphics/grafix.inc"
+        INCLUDE "graphics/grafix.inc"
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
-      SECTION code_graphics
-    PUBLIC    Line_r
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+        SECTION code_graphics
+        PUBLIC  Line_r
 
-    EXTERN    __gfx_coords
+        EXTERN  __gfx_coords
 
 ;
 ;    $Id: liner.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
@@ -91,100 +91,109 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;    ..BCDEHL/IXIY/af......    same
 ;    AF....../..../..bcdehl    different
 ;
-.Line_r    push    bc
-    push    de    ; preserve relative    vertical distance
-    push    hl    ; preserve relative    horisontal distance
+Line_r: push    bc
+        push    de                      ; preserve relative    vertical distance
+        push    hl                      ; preserve relative    horisontal distance
 
-    push    de
-    push    hl
-    exx
-    pop    hl    ; get relative    horisontal movement
-    call    sgn
-    ld    d,a    ; direc_x    = SGN(x) installed
-    call    abs
-    ld    b,l    ; x = ABS(x)
+        push    de
+        push    hl
+        exx
+        pop     hl                      ; get relative    horisontal movement
+        call    sgn
+        ld      d, a                    ; direc_x    = SGN(x) installed
+        call    abs
+        ld      b, l                    ; x = ABS(x)
 
-    pop    hl    ; get relative    vertical movement
-    call    sgn
-    ld    e,a    ; direc_y    = SGN(y) installed
-    call    abs
-    ld    c,l    ; y = ABS(y)
-    push    bc
-    exx
-    pop    hl    ; H = absolute    x dist., L = absolute y distance
+        pop     hl                      ; get relative    vertical movement
+        call    sgn
+        ld      e, a                    ; direc_y    = SGN(y) installed
+        call    abs
+        ld      c, l                    ; y = ABS(y)
+        push    bc
+        exx
+        pop     hl                      ; H = absolute    x dist., L = absolute y distance
 
-    ld    a,h
-    cp    l
-    jr    c, x_smaller_y    ; if    x >=    y
-       or    h    ;    if x+y = 0
-       jr    z, exit_draw    ;    return
-       exx    ;    else
-       ld    b,d    ;    ddx = direc_x
-       ld    c,0    ;    ddy = 0
-       exx
-       jr    init_drawloop    ; else
-.x_smaller_y    ld    a,h
-       ld    h,l    ;    H = y
-       ld    l,a    ;    L = x
-       exx
-       ld    b,0    ;    ddx = 0
-       ld    c,e    ;    ddy = direc_y
-       exx
+        ld      a, h
+        cp      l
+        jr      c, x_smaller_y          ; if    x >=    y
+        or      h                       ;    if x+y = 0
+        jr      z, exit_draw            ;    return
+        exx                             ;    else
+        ld      b, d                    ;    ddx = direc_x
+        ld      c, 0                    ;    ddy = 0
+        exx
+        jr      init_drawloop           ; else
+x_smaller_y:
+        ld      a, h
+        ld      h, l                    ;    H = y
+        ld      l, a                    ;    L = x
+        exx
+        ld      b, 0                    ;    ddx = 0
+        ld      c, e                    ;    ddy = direc_y
+        exx
 
-.init_drawloop    ld    b,h
-    ld    c,h    ; B = H
-    srl    c    ; i = INT(B/2)
+init_drawloop:
+        ld      b, h
+        ld      c, h                    ; B = H
+        srl     c                       ; i = INT(B/2)
           ; FOR N=B    TO 1    STEP    -1
-.drawloop
+drawloop:
 
-    xor   a               ; (Stefano)
-	or    h               ; .. vertical line drawing was slow
-	jr    z, i_greater    ; this shortcut seems to solve the problem
+        xor     a                       ; (Stefano)
+        or      h                       ; .. vertical line drawing was slow
+        jr      z, i_greater            ; this shortcut seems to solve the problem
 
-    ld    a,c
-    add    a,l
-    jr    c, i_greater    ;    i + L > 255  (i > H)
-    cp    h
-    jr    nc, i_greater    ;    if i    < H
-       ld    c,a    ;    i = i + L
-       exx
-       push    bc    ;    ix =    ddx:    iy =    ddy
-       exx
-       jr    check_plot    ;    else
-.i_greater    sub    h    ;    i = i - H
-       ld    c,a
-       exx
-       push    de    ;    ix =    direc_x: iy = direc_y
-       exx    ;    endif
+        ld      a, c
+        add     a, l
+        jr      c, i_greater            ;    i + L > 255  (i > H)
+        cp      h
+        jr      nc, i_greater           ;    if i    < H
+        ld      c, a                    ;    i = i + L
+        exx
+        push    bc                      ;    ix =    ddx:    iy =    ddy
+        exx
+        jr      check_plot              ;    else
+i_greater:
+        sub     h                       ;    i = i - H
+        ld      c, a
+        exx
+        push    de                      ;    ix =    direc_x: iy = direc_y
+        exx                             ;    endif
 
-.check_plot    ex    (sp),hl    ;    preserve H,L distances on stack
-    ex    de,hl    ;    D,E = ix,    iy
-    ld    hl,(__gfx_coords)
-    ld    a,l
-    add    a,e    ;
-    ld    l,a    ;    y0 =    y0 +    iy (y0 is    checked by plot)
+check_plot:
+        ex      (sp), hl                ;    preserve H,L distances on stack
+        ex      de, hl                  ;    D,E = ix,    iy
+        ld      hl, (__gfx_coords)
+        ld      a, l
+        add     a, e                    ;
+        ld      l, a                    ;    y0 =    y0 +    iy (y0 is    checked by plot)
 
-    ld    a,d
-    inc    a
-    add    a,h
-    jr    c, check_range    ;    check out    of range
-    jr    z, range_error    ;    Fz=1    & Fc=0 denotes    x0 <    0
-    jr    plot_point
-.check_range    jr    nz, range_error    ;    Fz=0    & Fc=1 denotes    x0 >    255
+        ld      a, d
+        inc     a
+        add     a, h
+        jr      c, check_range          ;    check out    of range
+        jr      z, range_error          ;    Fz=1    & Fc=0 denotes    x0 <    0
+        jr      plot_point
+check_range:
+        jr      nz, range_error         ;    Fz=0    & Fc=1 denotes    x0 >    255
 
-.plot_point    dec    a
-    ld    h,a    ;    x0 =    x0 +    ix
-    ld    de, plot_RET
-    push    de    ;    hl =    (x0,y0)...
-    jp    (ix)    ;    execute PLOT at (x0,y0)
-.plot_RET    pop    hl    ;    restore H,L distances...
-    djnz    drawloop    ; NEXT N
-    jr    exit_draw
-.range_error    pop    hl    ; remove H,L distances...
-.exit_draw    pop    hl    ; restore    relative horisontal    distance
-    pop    de    ; restore    relative vertical distance
-    pop    bc
-    ret
+plot_point:
+        dec     a
+        ld      h, a                    ;    x0 =    x0 +    ix
+        ld      de, plot_RET
+        push    de                      ;    hl =    (x0,y0)...
+        jp      (ix)                    ;    execute PLOT at (x0,y0)
+plot_RET:
+        pop     hl                      ;    restore H,L distances...
+        djnz    drawloop                ; NEXT N
+        jr      exit_draw
+range_error:
+        pop     hl                      ; remove H,L distances...
+exit_draw:
+        pop     hl                      ; restore    relative horisontal    distance
+        pop     de                      ; restore    relative vertical distance
+        pop     bc
+        ret
 
 
 ; ******************************************************************************
@@ -198,15 +207,16 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;    ..BCDEHL/IXIY    same
 ;    AF....../....    different
 ;
-.sgn    ld    a,h
-    or    l
-    ret    z    ; integer    is zero, return 0...
-    bit    7,h
-    jr    nz, negative_int
-       ld    a,1
-       ret
-.negative_int    ld    a,-1
-       ret
+sgn:    ld      a, h
+        or      l
+        ret     z                       ; integer    is zero, return 0...
+        bit     7, h
+        jr      nz, negative_int
+        ld      a, 1
+        ret
+negative_int:
+        ld      a, -1
+        ret
 
 
 ; ******************************************************************************
@@ -220,13 +230,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;    A.BCDE../IXIY    same
 ;    .F....HL/....    different
 ;
-.abs    bit    7,h
-    ret    z    ; integer    is positive...
-    push    de
-    ex    de,hl
-    ld    hl,0
-    cp    a    ; Fc    = 0,    may not be used...
-    sbc    hl,de    ; convert    negative integer
-    pop    de
-    ret
-ENDIF
+abs:    bit     7, h
+        ret     z                       ; integer    is positive...
+        push    de
+        ex      de, hl
+        ld      hl, 0
+        cp      a                       ; Fc    = 0,    may not be used...
+        sbc     hl, de                  ; convert    negative integer
+        pop     de
+        ret
+  ENDIF

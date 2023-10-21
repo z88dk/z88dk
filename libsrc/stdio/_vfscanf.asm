@@ -1,8 +1,8 @@
 
-	MODULE _vfscanf
-	SECTION	code_clib
+    MODULE _vfscanf
+    SECTION    code_clib
 
-	PUBLIC	_vfscanf
+    PUBLIC    _vfscanf
 
         EXTERN  asm_scanf
 
@@ -27,21 +27,21 @@ _vfscanf:
     ld      l,(hl)
     ld      h,a
 IF !__CPU_INTEL__
-	push	ix	;save callers
+    push    ix    ;save callers
 ENDIF
-	push	hl	;fp
-	ld	hl,0	;sdcc mode
-	push	hl
-	push	de	;fmt
-	push	bc	;ap
-	call	asm_scanf
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
+    push    hl    ;fp
+    ld      hl,0    ;sdcc mode
+    push    hl
+    push    de    ;fmt
+    push    bc    ;ap
+    call    asm_scanf
+    pop     bc
+    pop     bc
+    pop     bc
+    pop     bc
 IF !__CPU_INTEL__
-	pop	ix	;restore callers
+    pop     ix    ;restore callers
 ENDIF
-	ret
+    ret
 
 

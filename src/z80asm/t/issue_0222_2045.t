@@ -3,7 +3,6 @@
 BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
-
 use CPU::Z80::Assembler;
 
 # Test https://github.com/z88dk/z88dk/issues/222
@@ -133,15 +132,14 @@ unlink(qw( test.asm test.o test.map test.bin test.tap ));
 spew("test.asm", $asm);
 
 capture_ok("z88dk-z80asm +zx -v -m -L.. test.asm", <<'END');
-Library 'z88dk-z80asm-z80-.lib' not found
-Reading library '../z88dk-z80asm-z80-.lib'
+% z88dk-z80asm +zx -v -m -L.. test.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
-Assembling 'test.asm' to 'test.o'
-Reading 'test.asm' = 'test.asm'
+Library 'z88dk-z80asm.lib' not found
+Reading library '../z88dk-z80asm.lib'
+Assembling 'test.asm'
 Writing object file 'test.o'
-Module 'test' size: 7 bytes
 
 Code size: 7 bytes ($5CD0 to $5CD6)
 Creating file 'test.map'
@@ -408,15 +406,14 @@ unlink(qw( test.asm test.o test.map test.bin test.P ));
 spew("test.asm", $asm);
 
 capture_ok("z88dk-z80asm +zx81 -m -v -L.. test.asm 2> ${test}.err", <<'END');
-Library 'z88dk-z80asm-z80-.lib' not found
-Reading library '../z88dk-z80asm-z80-.lib'
+% z88dk-z80asm +zx81 -m -v -L.. test.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
-Assembling 'test.asm' to 'test.o'
-Reading 'test.asm' = 'test.asm'
+Library 'z88dk-z80asm.lib' not found
+Reading library '../z88dk-z80asm.lib'
+Assembling 'test.asm'
 Writing object file 'test.o'
-Module 'test' size: 7 bytes
 
 Code size: 7 bytes ($4082 to $4088)
 Creating file 'test.map'

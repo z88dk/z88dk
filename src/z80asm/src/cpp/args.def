@@ -19,12 +19,14 @@ OPT("-h", nullptr, exit_help(), "Show help options")
 OPT("-v", nullptr, m_verbose = true, "Be verbose")
 
 OPT_HEADER("Preprocessor Options:")
-OPT("-IXIY", nullptr, m_swap_ixiy = true, "Swap IX and IY registers")
+OPT("-IXIY", nullptr, m_swap_ixiy = IXIY_SWAP, "Swap IX and IY registers")
+OPT("-IXIY-soft", nullptr, m_swap_ixiy = IXIY_SOFT_SWAP, "Swap IX and IY registers but write object as unswapped")
 OPT("-I", "[=]DIR", push_include_path(opt_arg), "Add directory to include search path")
 OPT("-D", "[=]SYMBOL[=VALUE]", parse_define(opt_arg), "Define a static symbol in decimal or hex")
 OPT("-ucase", nullptr, m_ucase = true, "Convert identifiers to upper case")
 OPT("-float", "[=]FORMAT", set_float_format(opt_arg), "Set default float format")
-
+OPT("-raw-strings", nullptr, m_raw_strings = true, "Double-quoted strings may include any character"
+    HELP_CONTINUE "except double quotes")
 OPT_HEADER("Code Generation Options:")
 OPT("-m", "[=]CPU", set_cpu(opt_arg), "Assemble for the specified CPU, default z80")
 OPT("-opt-speed", nullptr, m_opt_speed = true, "Optimize for speed")

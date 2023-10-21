@@ -7,9 +7,11 @@
 	SECTION code_clib
 	PUBLIC	write
 	PUBLIC	_write
+	PUBLIC	___write
 
 .write
 ._write
+.___write
 	push	ix		;save callers
 	LD	IX,4
 	ADD	IX,SP

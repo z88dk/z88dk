@@ -5,17 +5,23 @@ SECTION code_clib
 SECTION code_ctype
 
 PUBLIC toascii
-
-IF __CLASSIC && __CPU_GBZ80__
-PUBLIC _toascii
-_toascii:
-  ld  hl,sp+2
-  ld  a,(hl+)
-  ld  h,(hl)
-  ld  l,a
-ENDIF
+PUBLIC toascii_fastcall
 
 toascii:
+IF __CPU_GBZ80__
+   ld  hl,sp+2
+   ld  a,(hl+)
+   ld  h,(hl)
+   ld  l,a
+ELIF __CPU_RABBIT__ | __CPU_KC160__
+   ld hl,(sp+2)
+ELSE
+   pop de
+   pop hl
+   push hl
+   push de
+ENDIF
+toascii_fastcall:
 
    ld h,0
 IF __CPU_INTEL__
@@ -31,9 +37,18 @@ IF __CPU_GBZ80__
 ENDIF
    ret
 
+
 ; SDCC bridge for Classic
-IF __CLASSIC && !__CPU_GBZ80__
+IF __CLASSIC
 PUBLIC _toascii
 defc _toascii = toascii
+PUBLIC _toascii_fastcall
+defc _toascii_fastcall = toascii_fastcall
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___toascii
+defc ___toascii = toascii
 ENDIF
 

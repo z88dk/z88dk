@@ -4,9 +4,15 @@ ZX0_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/compress/zx0//c/sccz80/*.asm $(NEWLIB_
 ZX0_8080_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/compress/zx0//c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/compress/zx0//8080/*.asm"
 ZX0_8080_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/compress/zx0//c/sccz80/*.asm $(NEWLIB_DIRECTORY)/compress/zx0//8080/*.asm
 
-ZX0_NEWLIB_TARGETS := compress/zx0/obj/newlib-z80-compress-zx0 compress/zx0/obj/newlib-z80n-compress-zx0 \
-		compress/zx0/obj/newlib-ixiy-compress-zx0 compress/zx0/obj/newlib-8080-compress-zx0 \
-		compress/zx0/obj/newlib-r2k-compress-zx0 compress/zx0/obj/newlib-ez80_z80-compress-zx0
+ZX0_NEWLIB_TARGETS := compress/zx0/obj/newlib-z80-compress-zx0 \
+	compress/zx0/obj/newlib-z80n-compress-zx0 \
+	compress/zx0/obj/newlib-ixiy-compress-zx0 \
+	compress/zx0/obj/newlib-8080-compress-zx0 \
+	compress/zx0/obj/newlib-r2ka-compress-zx0 \
+	compress/zx0/obj/newlib-ez80_z80-compress-zx0 \
+	compress/zx0/obj/newlib-z180-compress-zx0 \
+	compress/zx0/obj/newlib-r4k-compress-zx0 \
+	compress/zx0/obj/newlib-kc160-compress-zx0 
 
 OBJS += $(ZX0_NEWLIB_TARGETS)
 CLEAN += compress-zx0-clean
@@ -15,40 +21,16 @@ compress-zx0: $(ZX0_NEWLIB_TARGETS)
 
 .PHONY: compress-zx0 compress-zx0-clean
 
-compress/zx0/obj/newlib-z80-compress-zx0: $(ZX0_NEWLIBGLOBS_ex)
-	@mkdir -p compress/zx0/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=compress/zx0/obj/z80/x -I.. -mz80 -D__CLASSIC $(ZX0_NEWLIBGLOBS)
-
-compress/zx0/obj/newlib-r2k-compress-zx0: $(ZX0_NEWLIBGLOBS_ex)
-	@mkdir -p compress/zx0/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=compress/zx0/obj/r2k/x -I.. -mr2ka -D__CLASSIC $(ZX0_NEWLIBGLOBS)
-
-compress/zx0/obj/newlib-z80n-compress-zx0: $(ZX0_NEWLIBGLOBS_ex)
-	@mkdir -p compress/zx0/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=compress/zx0/obj/z80n/x -I.. -mz80n -D__CLASSIC $(ZX0_NEWLIBGLOBS)
-
-compress/zx0/obj/newlib-ixiy-compress-zx0: $(ZX0_NEWLIBGLOBS_ex)
-	@mkdir -p compress/zx0/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=compress/zx0/obj/ixiy/x -I.. -mz80 -IXIY -D__CLASSIC $(ZX0_NEWLIBGLOBS)
-
-compress/zx0/obj/newlib-8080-compress-zx0: $(ZX0_8080_NEWLIBGLOBS_ex)
-	@mkdir -p compress/zx0/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=compress/zx0/obj/8080/x -I.. -m8080 -D__CLASSIC $(ZX0_8080_NEWLIBGLOBS)
-
-compress/zx0/obj/newlib-gbz80-compress-zx0: $(ZX0_8080_NEWLIBGLOBS_ex)
-	@mkdir -p compress/zx0/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=compress/zx0/obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(ZX0_8080_NEWLIBGLOBS)
-
-compress/zx0/obj/newlib-ez80_z80-compress-zx0: $(ZX0_NEWLIBGLOBS_ex)
-	@mkdir -p compress/zx0/obj
-	$(Q)touch $@
-	$(Q)$(ASSEMBLER) -d -O=compress/zx0/obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(ZX0_NEWLIBGLOBS)
+$(eval $(call buildnew,compress/zx0,z80,-mz80,$(ZX0_NEWLIBGLOBS),$(ZX0_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,compress/zx0,r2ka,-mr2ka,$(ZX0_NEWLIBGLOBS),$(ZX0_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,compress/zx0,r4k,-mr4k,$(ZX0_NEWLIBGLOBS),$(ZX0_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,compress/zx0,z80n,-mz80n,$(ZX0_NEWLIBGLOBS),$(ZX0_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,compress/zx0,ixiy,-mz80 -IXIY,$(ZX0_NEWLIBGLOBS),$(ZX0_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,compress/zx0,8080,-m8080,$(ZX0_8080_NEWLIBGLOBS),$(ZX0_8080_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,compress/zx0,gbz80,-mgbz80,$(ZX0_8080_NEWLIBGLOBS),$(ZX0_8080_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,compress/zx0,z180,-mz180,$(ZX0_NEWLIBGLOBS),$(ZX0_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,compress/zx0,ez80_z80,-mez80_z80,$(ZX0_NEWLIBGLOBS),$(ZX0_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,compress/zx0,kc160,-mkc160,$(ZX0_NEWLIBGLOBS),$(ZX0_NEWLIBGLOBS_ex)))
 
 compress-zx0-clean:
 	$(RM) -fr compress/zx0/obj

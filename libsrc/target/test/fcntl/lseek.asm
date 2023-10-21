@@ -7,10 +7,13 @@
 
 	PUBLIC	lseek
 	PUBLIC	_lseek
+	PUBLIC	___lseek
 
 ; fd, where, whence
 .lseek
 ._lseek
+.___lseek
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         push    ix              ;save callers
         ld      ix,2
         add     ix,sp
@@ -26,4 +29,5 @@
 	ld	a,CMD_SEEK
 	call	SYSCALL
 	pop	ix		;restore callers
+ENDIF
 	ret

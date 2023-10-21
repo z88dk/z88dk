@@ -17,3 +17,10 @@ PUBLIC _bcmp_callee
 defc _bcmp_callee = bcmp_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___bcmp_callee
+defc ___bcmp_callee = bcmp_callee
+ENDIF
+

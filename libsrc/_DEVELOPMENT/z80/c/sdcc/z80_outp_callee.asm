@@ -15,6 +15,5 @@ _z80_outp_callee:
    dec sp
    pop hl
    push af
-
-   ld l,h
-   jp asm_z80_outp
+   out (c),h
+   ret

@@ -336,7 +336,7 @@ main(unsigned int arg2, char *arg1)
 //////////////
 
 extern void __LIB__  zx_lprintc(int chr);
-extern void __LIB__  zx_hardcopy();
+extern void __LIB__  zx_hardcopy(void);
 // Print out a 256 bytes buffer (8 rows)
 extern void __LIB__  zx_print_buf(char *buf) __z88dk_fastcall;
 // Print out a single graphics row (a 32 bytes buffer is required)
@@ -536,7 +536,7 @@ extern uchar __LIB__    *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __small
 #include <interrupt.h>
 
 // Setup an im2 jump table at given address
-extern void __LIB__  zx_im2_init(void *address, uchar byte) __smallc;
+__ZPROTO2(void,,zx_im2_init,void *,address,uint,byte)
 
 
 /* This routine strips the drive specifier from the filename header.

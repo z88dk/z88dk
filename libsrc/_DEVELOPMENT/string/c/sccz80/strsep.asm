@@ -32,3 +32,10 @@ PUBLIC _strsep
 defc _strsep = strsep
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strsep
+defc ___strsep = strsep
+ENDIF
+

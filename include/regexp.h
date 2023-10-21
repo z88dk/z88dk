@@ -22,8 +22,14 @@ typedef struct regexp {
 } regexp;
 
 extern regexp __LIB__ __SAVEFRAME__ *regcomp(char *);
+extern void __LIB__ __SAVEFRAME__ regerror(const char *);
+
+#ifndef __STDC_ABI_ONLY
 extern int __LIB__ __SAVEFRAME__ regexec(regexp *__prog, char *__string) __smallc;
 extern void __LIB__ __SAVEFRAME__ regsub(regexp *__prog, char *__source, char *__dest) __smallc;
-extern void __LIB__ __SAVEFRAME__ regerror(const char *);
+#else
+__ZPROTO2(int,,regexec,regexp *,__prog, char *,__string)
+__ZPROTO3(void,,regsub,regexp *,__prog, char *,__source, char *,__dest)
+#endif
 
 #endif

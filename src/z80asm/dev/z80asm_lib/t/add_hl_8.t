@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -6,43 +8,31 @@
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 
+BEGIN { use lib '../../t'; require 'testlib.pl'; }
+
 use Modern::Perl;
-use Test::More;
-use Path::Tiny;
-require '../../t/testlib.pl';
 
-my @CPUS = (qw( z80 z80n ));
+my $ticks = Ticks->new;
 
-my $test_nr;
+for my $reg (qw( BC DE HL )) {
+	for my $base (0, 255, 65534) {
+		for my $add (1, 2) {
+			note "reg:$reg base:$base add:$add";
 
-for my $cpu (@CPUS) {
-	for my $reg (qw( bc de hl )) {
-		for my $base (0, 255, 65534) {
-			for my $add (1, 2) {
-				$test_nr++;
-				note "Test $test_nr: cpu:$cpu reg:$reg base:$base add:$add";
-				
-				my $r = ticks(<<END, "-m$cpu");
-						ld		$reg, $base
-						ld		a, $add
-						
-						add 	$reg, a
-						
-						push 	$reg
-						pop		hl
-						rst 	0
+			my $sum = $base + $add;
+			
+			# z80n does not update carry, neither does emulation
+			$ticks->add(<<END, $reg=>$sum);
+					ld		$reg, $base
+					ld		a, $add
+					
+					add 	$reg, a
 END
-				my $sum = $base + $add;
-				
-				# z80n does not update carry, neither does emulation
-				#is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
-				is $r->{HL}, $sum & 65535,			"result";
-						
-				(Test::More->builder->is_passing) or die;
-			}
 		}
 	}
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

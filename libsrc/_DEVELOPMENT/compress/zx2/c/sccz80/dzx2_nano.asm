@@ -19,3 +19,16 @@ dzx2_nano:
    push af
    
    jp asm_dzx2_nano
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dzx2_nano
+defc _dzx2_nano = dzx2_nano
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___dzx2_nano
+defc ___dzx2_nano = dzx2_nano
+ENDIF
+

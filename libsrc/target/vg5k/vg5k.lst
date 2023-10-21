@@ -5,8 +5,8 @@ target/vg5k/stdio/getk
 target/vg5k/stdio/ansi/f_ansi_attr
 target/vg5k/stdio/ansi/f_ansi_bel
 target/vg5k/stdio/ansi/f_ansi_char
-stdio/ansi/generic/f_ansi_cls
-stdio/ansi/generic/f_ansi_dline
+stdio/obj/${TYPE}/ansi/generic/f_ansi_cls
+stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/vg5k/stdio/ansi/f_ansi_scrollup
 target/vg5k/stdio/generic_console
 target/vg5k/stdio/generic_console_ioctl
@@ -14,7 +14,7 @@ target/vg5k/stdio/CRT_FONT
 target/vg5k/stdio/set_character
 target/vg5k/stdio/conio_map_colour
 target/vg5k/stdio/conio_vars
-@stdio/stdio_ixiy.lst
+@stdio/stdio.lst
 
 @font/font_8x10/font_8x10.lst
 @input/input_keyboard.lst

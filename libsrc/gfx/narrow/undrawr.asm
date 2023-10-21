@@ -2,21 +2,23 @@
 ; ----- void  undrawr(int x2, int y2)
 
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
-    SECTION code_graphics
-    
-    PUBLIC  undrawr
-    PUBLIC  _undrawr
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+        SECTION code_graphics
 
-    EXTERN  asm_undrawr
+        PUBLIC  undrawr
+        PUBLIC  _undrawr
+        PUBLIC  ___undrawr
 
-.undrawr
-._undrawr
-    pop     af    ; ret addr
-    pop     de    ; y
-    pop     hl    ; x
-    push    hl
-    push    de
-    push    af    ; ret addr
-    jp      asm_undrawr
-ENDIF
+        EXTERN  asm_undrawr
+
+undrawr:
+_undrawr:
+___undrawr:
+        pop     af                      ; ret addr
+        pop     de                      ; y
+        pop     hl                      ; x
+        push    hl
+        push    de
+        push    af                      ; ret addr
+        jp      asm_undrawr
+  ENDIF

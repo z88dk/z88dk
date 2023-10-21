@@ -1,9 +1,9 @@
 target/mikro80/stdio/generic_console
 target/mikro80/stdio/fputc_cons_native
 target/mikro80/stdio/fgetc_cons
-@stdio/stdio_8080.lst
-stdio/inkey/getk
-stdio/inkey/fgetc_cons
+@stdio/stdio.lst
+stdio/obj/${TYPE}/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
 
 @input/input_keyboard.lst
 target/mikro80/graphics/textpixl

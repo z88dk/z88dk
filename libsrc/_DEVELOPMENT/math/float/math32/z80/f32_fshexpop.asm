@@ -31,8 +31,7 @@ m32_dhexpop:
     bit 7,e
     jr NZ,normdone
 
-    sla l
-    rl h
+    add hl,hl                   ; sla hl
     rl e
 
     dec a

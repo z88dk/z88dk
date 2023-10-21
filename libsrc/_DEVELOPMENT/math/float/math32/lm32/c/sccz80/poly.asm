@@ -12,3 +12,9 @@ PUBLIC _poly
 defc _poly = poly
 ENDIF
 
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___poly
+defc ___poly = poly
+ENDIF
+

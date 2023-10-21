@@ -12,7 +12,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "if.h"
 #include "limits.h"
 #include "modlink.h"
-#include "scan.h"
+#include "scan1.h"
 #include "symtab1.h"
 #include "types.h"
 #include "zobjfile.h"
@@ -20,7 +20,7 @@ Repository: https://github.com/z88dk/z88dk
 /* external functions */
 
 /* local functions */
-void Z80pass2(int start_errors)
+void Z80pass2(int start_errors, const char* obj_filename)
 {
 	Expr1ListElem* iter;
 	Expr1* expr, * expr2;
@@ -58,10 +58,10 @@ void Z80pass2(int start_errors)
 		{
 			do_patch = false;
 		}
-		else if (expr->range == RANGE_JR_OFFSET)
-		{
-			do_patch = true;
-		}
+        else if (expr->range == RANGE_JR_OFFSET || expr->range == RANGE_JRE_OFFSET)
+        {
+            do_patch = true;
+        }
 		else if (expr->type >= TYPE_ADDRESS ||
 			expr->target_name)
 		{
@@ -75,18 +75,23 @@ void Z80pass2(int start_errors)
 			{
 			case RANGE_JR_OFFSET:
 				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
-				value -= asmpc + 2;		/* get module PC at JR instruction */
+				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
-				if (value >= -128 && value <= 127)
-				{
-					patch_byte(expr->code_pos, (byte_t)value);
-					/* opcode is stored, now store relative jump */
-				}
-				else
-				{
-					error_int_range(value);
-				}
-				break;
+                if (value < -128 || value > 127)
+                    error_int_range(value);
+                else
+                    patch_byte(expr->code_pos, (byte_t)value);
+                break;
+
+			case RANGE_JRE_OFFSET:
+				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
+				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
+
+                if (value < -0x8000 || value > 0x7FFF)
+                    error_int_range(value);
+                else
+                    patch_word(expr->code_pos, value);
+                break;
 
 			case RANGE_BYTE_UNSIGNED:
 				if (value < -128 || value > 255)
@@ -181,11 +186,11 @@ void Z80pass2(int start_errors)
 
 	/* create object file */
 	if (start_errors == get_num_errors())
-		write_obj_file(CURRENTMODULE->filename);
+		write_obj_file(obj_filename);
 
 	// add to the list of objects to link
 	if (start_errors == get_num_errors())
-		object_file_append(get_o_filename(CURRENTMODULE->filename), CURRENTMODULE, false, false);
+        object_file_append(obj_filename, CURRENTMODULE);
 
 	if (start_errors == get_num_errors() && option_symtable())
 		write_sym_file(CURRENTMODULE);
@@ -198,6 +203,7 @@ bool Pass2infoExpr(range_t range, Expr1* expr)
 	{
 		expr->range = range;
 		expr->code_pos = get_cur_module_size();			/* update expression location */
+		expr->opcode_size = get_cur_opcode_size() + range_size(range);
 
 		if (list_is_on())
 			expr->listpos = expr->code_pos;

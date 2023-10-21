@@ -34,10 +34,8 @@ void AsmCall(uint16_t address, Z80_registers* regs, register_usage inRegistersDe
     ld      ix,+4
     add     ix,sp
 
-    ld      l,(ix+0)  ;HL=Routine address
-    ld      h,(ix+1)
-    ld      e,(ix+2) ;DE=regs address
-    ld      d,(ix+3)
+    ld      hl,(ix+0)  ;HL=Routine address
+    ld      de,(ix+2) ;DE=regs address
     push    de
     ld      a,(ix+5) ;A=out registers detail
     push    af
@@ -60,20 +58,15 @@ void AsmCall(uint16_t address, Z80_registers* regs, register_usage inRegistersDe
     jr	    z,ASMRUT_DOAF
     exx
 
-    ld      c,(ix+2) ;BC, DE, HL
-    ld      b,(ix+3)
-    ld      e,(ix+4)
-    ld      d,(ix+5)
-    ld      l,(ix+6)
-    ld      h,(ix+7)
+    ld      bc,(ix+2) ;BC, DE, HL
+    ld      de,(ix+4)
+    ld      hl,(ix+6)
     dec	    a
     exx
     jr	    z,ASMRUT_DOAF
 
-    ld      c,(ix+8)	 ;IX
-    ld      b,(ix+9)
-    ld      e,(ix+10) ;IY
-    ld      d,(ix+11)
+    ld      bc,(ix+8)	 ;IX
+    ld      de,(ix+10) ;IY
     push	de
     push	bc
     pop	    ix
@@ -98,30 +91,24 @@ CONT:
     ex  	af,af	;Main AF
     push	af
     pop	    hl
-    ld	    (ix+0),l
-    ld	    (ix+1),h
+    ld	    (ix+0),hl
     exx		;Main HLDEBC
     ex	    af,af	;Alternate AF
     dec 	a
     jr	    z,CALL_END
 
-    ld      (ix+2),c ;BC, DE, HL
-    ld      (ix+3),b
-    ld      (ix+4),e
-    ld      (ix+5),d
-    ld      (ix+6),l
-    ld      (ix+7),h
+    ld      (ix+2),bc ;BC, DE, HL
+    ld      (ix+4),de
+    ld      (ix+6),hl
     dec	a
     jr	z,CALL_END
 
     exx		;Alternate HLDEBC
     pop     hl
-    ld      (ix+8),l ;IX
-    ld      (ix+9),h
+    ld      (ix+8),hl ;IX
     push    iy
     pop     hl
-    ld      (ix+10),l ;IY
-    ld      (ix+11),h
+    ld      (ix+10),hl ;IY
     exx		;Main HLDEBC
 
     ex	    af,af

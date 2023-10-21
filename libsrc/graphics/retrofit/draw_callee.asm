@@ -7,27 +7,27 @@
 ;	$Id: draw_callee.asm $
 ;
 
-SECTION smc_clib
+        SECTION smc_clib
 
-PUBLIC draw_callee
-PUBLIC _draw_callee
+        PUBLIC  draw_callee
+        PUBLIC  _draw_callee
 
-	EXTERN     draw
+        EXTERN  draw
 
-.draw_callee
-._draw_callee
-	ld	hl,retaddr
-	ex (sp),hl
-	ld	(retaddr0+1),hl
-	ld	hl,draw
-	jp (hl)
-	
-.retaddr
-		pop bc
-		pop bc
-		pop bc
-		pop bc
-.retaddr0
-		ld	hl,0
-		jp (hl)
+draw_callee:
+_draw_callee:
+        ld      hl, retaddr
+        ex      (sp), hl
+        ld      (retaddr0+1), hl
+        ld      hl, draw
+        jp      (hl)
+
+retaddr:
+        pop     bc
+        pop     bc
+        pop     bc
+        pop     bc
+retaddr0:
+        ld      hl, 0
+        jp      (hl)
 

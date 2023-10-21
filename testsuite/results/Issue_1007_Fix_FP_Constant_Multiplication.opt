@@ -16,7 +16,7 @@
 ._main
 	ld	hl,9	;const
 	push	hl
-	ld	l,20	
+	ld	l,20
 	push	hl
 	call	_do_something
 	pop	bc
@@ -24,6 +24,8 @@
 	ret
 
 
+	SECTION	bss_compiler
+	SECTION	code_compiler
 
 
 

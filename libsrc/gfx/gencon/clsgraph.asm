@@ -9,15 +9,15 @@
 ;
 
 
-    INCLUDE "graphics/grafix.inc"
+        INCLUDE "graphics/grafix.inc"
 
-    SECTION code_clib
-    PUBLIC  cleargraphics
-    PUBLIC  _cleargraphics
-    EXTERN  generic_console_cls
+        SECTION code_clib
+        PUBLIC  cleargraphics
+        PUBLIC  _cleargraphics
+        PUBLIC  ___cleargraphics
+        EXTERN  generic_console_cls
 
 
-.cleargraphics
-._cleargraphics
-    call    generic_console_cls
-    ret
+        defc    cleargraphics=generic_console_cls
+        defc    _cleargraphics=cleargraphics
+        defc    ___cleargraphics=cleargraphics

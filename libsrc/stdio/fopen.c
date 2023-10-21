@@ -17,18 +17,18 @@
 FILE *
 fopen(const char *name, const char *mode)
 {
-        FILE    *fp;
+    FILE    *fp;
 
-        for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp) {
-                if (fp->flags == 0 ) break;
-	}
+    for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp) {
+        if (fp->flags == 0 ) break;
+    }
 
-        if (fp >= _sgoioblk_end) {
-		return NULL; /* No free slots */
-	}
+    if (fp >= _sgoioblk_end) {
+        return NULL; /* No free slots */
+    }
 
 
-        return (freopen(name,mode,fp));
+    return (freopen(name,mode,fp));
 }
 
 

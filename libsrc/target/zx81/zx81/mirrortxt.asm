@@ -5,7 +5,7 @@
 ; This code comes from the FidoNET Sinclair newsgroup
 ;--------------------------------------------------------------
 ;
-;       $Id: mirrortxt.asm,v 1.3 2016-06-26 20:32:08 dom Exp $
+;       $Id: mirrortxt.asm $
 ;
 ;----------------------------------------------------------------
 ;
@@ -19,8 +19,12 @@
 
 mirrortxt:
 _mirrortxt:
-	
+IF FORlambda
+	LD HL,16509
+ELSE
 	LD HL,(400CH) ; Puts the adress of the displayfile in HL
+ENDIF
+
 	LD DE,0010H   ; This is the middle of the screen
 	ADD HL,DE     ; Add to displayfile
 	LD D,H        ; leave result in DE

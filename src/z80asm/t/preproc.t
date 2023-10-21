@@ -172,10 +172,10 @@ $test.asm:1: error: missing quote
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
-ld a, "a"
+ld a, "ab"
 END_ASM
 $test.asm:1: error: syntax error
-  ^---- ld a, "a"
+  ^---- ld a, "ab"
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
@@ -202,12 +202,12 @@ END_ERR
 # invalid single quoted character was overflowing to next line
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 ld a,'he'
-ld a,"a"
+ld a,"ab"
 END_ASM
 $test.asm:1: error: invalid character constant
   ^---- ld a,'he'
 $test.asm:2: error: syntax error
-  ^---- ld a,"a"
+  ^---- ld a,"ab"
 END_ERR
 
 SKIP: {

@@ -1,4 +1,4 @@
-stdio/inkey/getk
+stdio/obj/${TYPE}/inkey/getk
 target/alphatro/stdio/generic_console
 target/alphatro/stdio/generic_console_ioctl
 target/alphatro/stdio/conio_vars

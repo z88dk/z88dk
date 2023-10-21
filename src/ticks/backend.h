@@ -2,13 +2,15 @@
 #define BACKEND_H
 
 #include "breakpoints.h"
+#include "memory.h"
 #include <inttypes.h>
 
 struct debugger_regs_t;
 
-typedef uint8_t (*get_get_memory_cb)(uint16_t at);
+typedef uint8_t (*get_get_memory_cb)(uint32_t at, memtype type);
 typedef uint16_t (*get_uint16_cb)();
 typedef long long (*get_longlong_cb)();
+typedef char* (*get_charp_cb)();
 typedef int (*get_int_cb)();
 typedef void (*reset_paging_cb)();
 typedef uint8_t (*restore_cb)(const char* file_path, uint16_t at, uint8_t set_pc);
@@ -71,6 +73,7 @@ typedef struct {
     void_cb execution_stopped;
     void_cb ctrl_c;
     uint32_t_cb time;
+	get_charp_cb script_filename;
 } backend_t;
 
 extern backend_t bk;

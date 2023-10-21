@@ -33,3 +33,10 @@ PUBLIC _strndup_callee
 defc _strndup_callee = strndup_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strndup_callee
+defc ___strndup_callee = strndup_callee
+ENDIF
+

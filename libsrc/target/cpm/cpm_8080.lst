@@ -2,9 +2,9 @@ target/cpm/stdio/obj/${TYPE}/fgetc_cons
 target/cpm/stdio/obj/${TYPE}/getk
 target/cpm/stdio/obj/${TYPE}/fputc_cons
 target/cpm/stdio/obj/${TYPE}/generic_console
-target/cpm/cpm/cpm_platform_init
-target/cpm/cpm/__bdos
-@stdio/stdio_8080.lst
+target/cpm/cpm/obj/${TYPE}/cpm_platform_init
+target/cpm/cpm/obj/${TYPE}/__bdos
+@stdio/stdio_binary.lst
 
 target/cpm/time/obj/${TYPE}/clock
 target/cpm/time/obj/${TYPE}/time
@@ -13,5 +13,5 @@ target/cpm/cpm/obj/${TYPE}/cpm_platform_init
 @target/cpm/gsx.lst
 target/cpm/cpm/obj/${TYPE}/execl
 target/cpm/cpm/obj/${TYPE}/playzb4
-games/joystick
+target/cpm/stdio/obj/${TYPE}/joystick
 

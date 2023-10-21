@@ -11,12 +11,14 @@ PUBLIC  __scanf_check_suppressed
 PUBLIC  __scanf_check_sign
 PUBLIC  __scanf_check_width
 PUBLIC  __scanf_check_long
+PUBLIC  __scanf_get_flags
 PUBLIC  __scanf_set_width
 PUBLIC  __scanf_get_width
 PUBLIC  __scanf_set_signflag
 PUBLIC  __scanf_set_longflag
 PUBLIC  __scanf_set_suppressed
 PUBLIC  __scanf_reset_flags
+PUBLIC  __scanf_set_caretflag
 PUBLIC  __scanf_context
 
 
@@ -126,12 +128,28 @@ no_width:
     pop     hl
     ret
 
+; Exit: c = flags
+__scanf_get_flags:
+    push    hl
+    ld      hl,(__scanf_context)
+    dec     hl
+    dec     hl
+    dec     hl
+    ld      c,(hl)
+    pop     hl
+    ret
+
+
 __scanf_set_signflag:
     ld      a,1
     jp      __scanf_set_flags
 
 __scanf_set_longflag:
     ld      a,2
+    jp      __scanf_set_flags
+
+__scanf_set_caretflag:
+    ld      a,128
     jp      __scanf_set_flags
 
 __scanf_set_suppressed:

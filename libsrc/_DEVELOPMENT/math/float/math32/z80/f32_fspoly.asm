@@ -81,30 +81,22 @@ PUBLIC _m32_polyf
     exx
     push hl                     ; absolute table index on stack
   
-    ld e,(hl)                   ; collect (float)d[n-1]
-    inc hl
-    ld d,(hl)
-    inc hl
-    ld c,(hl)
-    inc hl
-    ld b,(hl)                   ; sdcc_float d[n-1] in bcde
-    inc hl
+    ld e,(hl+)                   ; collect (float)d[n-1]
+    ld d,(hl+)
+    ld c,(hl+)
+    ld b,(hl+)                  ; sdcc_float d[n-1] in bcde
     push bc                     ; sdcc_float d[n-1] on stack
     push de
 
-    ld e,(hl)                   ; collect d[n]
-    inc hl
-    ld d,(hl)
-    inc hl
-    ld c,(hl)
-    inc hl
+    ld e,(hl+)                   ; collect d[n]
+    ld d,(hl+)
+    ld c,(hl+)
     ld b,(hl)                   ; sdcc_float res = d[n] in bcde
     push bc                     ; sdcc_float res = d[n] on stack
     push de
 
     exx
-    sla e
-    sla d                       ; get full exponent into d
+    rl de                       ; get full exponent into d
     rr c                        ; put sign in c
     scf
     rr e                        ; put implicit bit for mantissa in ehl
@@ -117,7 +109,7 @@ PUBLIC _m32_polyf
 .fep0
     call m32_fsmul24x32         ; x * res => bc dehl
     call m32_fsadd24x32         ; d[--n] + res * x => bc dehl
-    
+
     exx
     pop hl                      ; current absolute table index
     pop af                      ; (float)x lsw from stack
@@ -137,13 +129,10 @@ PUBLIC _m32_polyf
     push af                     ; x lsw on stack preserved for next iteration
 
     dec hl
-    ld d,(hl)
-    dec hl
-    ld e,(hl)
+    ld d,(hl-)
+    ld e,(hl-)
     push de                     ; push d[--n] msw to stack
-    dec hl
-    ld d,(hl)
-    dec hl
+    ld d,(hl-)
     ld e,(hl)                   ; sdcc_float d[--n] lsw
 
     ex (sp),hl                  ; next absolute table index to stack
@@ -169,7 +158,7 @@ PUBLIC _m32_polyf
 .fep2
     sla e
     sla c                       ; recover sign from c
-    rr b
-    rr e
-    ld d,b
+    ld d,b                      ; put exponent in D
+    rr de                       ; put sign and 7 exp bits into place
+                                ; put last exp bit into place
     ret                         ; return IEEE DEHL

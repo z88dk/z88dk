@@ -256,7 +256,7 @@ void outname(const char* sname, char pref)
 }
 
 
-void reset_namespace()
+void reset_namespace(void)
 {
     current_nspace = NULL;
 }
@@ -2236,7 +2236,11 @@ static void quikmult(int type, int32_t size, char preserve)
             if (preserve)
                 ol("push\tde");
             const2(size);
-            callrts("l_mult"); /* WATCH OUT!! */
+            if ( c_cpu & CPU_KC160) {
+                ol("mul\tde,hl");
+            } else {
+                callrts("l_mult"); /* WATCH OUT!! */
+            }
             if (preserve)
                 ol("pop\tde");
             break;
@@ -2650,7 +2654,7 @@ void mult(LVALUE* lval)
         break;
     case KIND_CHAR:
         if ( lval->ltype->isunsigned ) {
-            if (c_cpu == CPU_Z180 || IS_EZ80() ) {
+            if (c_cpu == CPU_Z180 || IS_EZ80() || IS_KC160() ) {
                 ot("ld\th,e\n");
                 ot("mlt\thl\n");
                 break;
@@ -2672,10 +2676,11 @@ void mult(LVALUE* lval)
             }
         }
     default:
-        if (ulvalue(lval))
-            callrts("l_mult_u");
-        else
-            callrts("l_mult");
+        if (c_cpu & CPU_KC160 ) {
+            ol( ulvalue(lval) ? "mul\tde,hl" : "muls\tde,hl");
+        } else {
+            callrts( ulvalue(lval) ? "l_mult_u" : "l_mult");
+        }
     }
 }
 
@@ -5326,7 +5331,7 @@ void gen_emit_line(int line)
 
 /* Prefix for assembler */
 
-void prefix()
+void prefix(void)
 {
     outbyte('.');
 }
@@ -5338,7 +5343,7 @@ void printlabel(int label)
 }
 
 /* Print a label suffix */
-void col()
+void col(void)
 {
     //outstr(":");
 }
@@ -5435,7 +5440,7 @@ void gen_pop_frame(void)
 }
 
 
-void gen_builtin_strcpy()
+void gen_builtin_strcpy(void)
 {
     int label;
     // hl holds src on entry, on stack= dest

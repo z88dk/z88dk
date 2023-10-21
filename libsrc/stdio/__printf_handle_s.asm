@@ -4,7 +4,7 @@
     EXTERN  __printf_loop
     EXTERN  __printf_print_aligned
     EXTERN  get_16bit_ap_parameter
-    EXTERN  strlen
+    EXTERN  asm_strlen
     EXTERN  l_uge
 
     EXTERN  __printf_get_precision
@@ -19,7 +19,7 @@ __printf_handle_s:
     ld      hl,nullstr
 printstr:
     push    hl              ;save string
-    call    strlen          ;exits hl=length
+    call    asm_strlen          ;exits hl=length
     ex      de,hl           ;de=length
 IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __printf_get_precision
@@ -30,7 +30,7 @@ ENDIF
     push    hl
     call    l_uge		;disturbs hl, bc
     pop     hl
-    jr      nc,use_strlen	;precision > strlen, use strlen
+    jr      nc,use_strlen	;precision > asm_strlen, use asm_strlen
     ex      de,hl 		;de = precision
 use_strlen:
     pop     bc              ;get string back

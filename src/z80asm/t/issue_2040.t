@@ -4,6 +4,9 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
+# https://github.com/z88dk/z88dk/issues/2040
+# z80asm: allow options and filenames in @ files
+
 #------------------------------------------------------------------------------
 # allow filenames with spaces
 unlink_testfiles;
@@ -26,8 +29,11 @@ path("${test}.dir")->remove_tree;
 
 path("${test}.dir")->mkpath;
 spew("${test}.dir/file 1.lst", <<END);
-	"${test}.dir/file 1.asm" '${test}.dir/file 2.asm' 	; comment
-	${test}.dir/file3.asm								# comment
+	; comment
+	# comment
+	"${test}.dir/file 1.asm"
+	'${test}.dir/file 2.asm' 	
+	${test}.dir/file3.asm								
 END
 spew("${test}.dir/file 1.asm", "defb 1");
 spew("${test}.dir/file 2.asm", "defb 2");
@@ -56,8 +62,13 @@ make_3_asm_files($test);
 spew("${test}.1.lst", <<END);
 ; comment ${test}.1.asm
 # comment ${test}.2.asm
-${test}.1.asm -b ${test}.2.asm	# comment ${test}.1.asm
--l ${test}.3.asm 				; comment ${test}.1.asm
+${test}.1.asm 
+-b 
+${test}.2.asm	
+# comment ${test}.1.asm
+-l 
+${test}.3.asm
+; comment ${test}.1.asm
 END
 
 run_ok("z88dk-z80asm -b ".quote_os("\@${test}.1.lst"));

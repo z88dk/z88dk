@@ -30,6 +30,8 @@
 	ret
 
 
+	SECTION	bss_compiler
+	SECTION	code_compiler
 	defc	i_5 = i_2
 	defc	i_2 = i_3
 

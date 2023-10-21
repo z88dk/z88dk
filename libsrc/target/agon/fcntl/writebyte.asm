@@ -1,12 +1,14 @@
 SECTION code_clib
 PUBLIC writebyte
 PUBLIC _writebyte
+PUBLIC ___writebyte
 
 INCLUDE "target/agon/def/mos_api.inc"
 
 ;int writebyte(int fd, int byte)
 writebyte:
 _writebyte:
+___writebyte:
     push    ix
     ld      ix,4
     add     ix,sp

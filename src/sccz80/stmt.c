@@ -51,7 +51,7 @@ static int incritical = 0;  /* Are we in a __critical block */
  * this routine performs that statement
  * and returns a number telling which one
  */
-struct nodepair *statement()
+struct nodepair *statement(void)
 {
     int st = 0;
     int locstatic; /* have we had the static keyword */
@@ -224,7 +224,7 @@ struct nodepair *statement()
  *
  * called whenever syntax requires a semicolon
  */
-void ns()
+void ns(void)
 {
     if (cmatch(';') == 0)
         errorfmt("Expected ';'",1);
@@ -235,7 +235,7 @@ void ns()
  *
  * allow any number of statements to fall between "{}"
  */
-Node *compound()
+Node *compound(void)
 {
     SYMBOL* savloc;
     array  *array = array_init(NULL);
@@ -266,7 +266,16 @@ Node *compound()
 }
 
 
-Node *doiferror()
+/*
+ *    "iferror" statement
+ *    This is z88dk specific and is used to check for
+ *    an error from a package call..highly non standard!
+ *
+ *    I sense getting into trouble with purists but trying
+ *    to combine C and asm compactly and efficiently requires
+ *     this sort of extension (much like return_c/_nc
+ */
+Node *doiferror(void)
 {
     int flab1, flab2;
     flab1 = getlabel(); /* Get label for false branch */
@@ -292,7 +301,7 @@ Node *doiferror()
 /*
  *              "if" statement
  */
-Node *doif()
+Node *doif(void)
 {
     int flab1, flab2;
     int testtype;
@@ -354,7 +363,7 @@ Node *doif()
 /*
  * perform expression (including commas)
  */
-struct nodepair *doexpr()
+struct nodepair *doexpr(void)
 {
     char *before, *start;
     zdouble val;
@@ -380,7 +389,7 @@ struct nodepair *doexpr()
 /*
  *      "while" statement
  */
-Node *dowhile()
+Node *dowhile(void)
 {
     WHILE_TAB wq; /* allocate local queue */
     t_buffer  *buf;
@@ -420,7 +429,7 @@ Node *dowhile()
 /*
  * "do - while" statement
  */
-Node *dodo()
+Node *dodo(void)
 {
     WHILE_TAB wq;
     int top;
@@ -460,7 +469,7 @@ Node *dodo()
 /*
  * "for" statement (zrin)
  */
-Node *dofor()
+Node *dofor(void)
 {
     WHILE_TAB wq;
     int l_condition;
@@ -560,7 +569,7 @@ Node *dofor()
 /*
  * "switch" statement
  */
-Node *doswitch()
+Node *doswitch(void)
 {
     WHILE_TAB wq;
     int endlab, swact, swdef;
@@ -625,7 +634,7 @@ Node *doswitch()
 /*
  * "case" statement
  */
-Node *docase()
+Node *docase(void)
 {
     double value;
     Kind   valtype;
@@ -645,7 +654,7 @@ Node *docase()
     return ast_label((swnext-1)->label, NULL);
 }
 
-Node *dodefault()
+Node *dodefault(void)
 {
     if (swactive) {
         if (swdefault)
@@ -706,7 +715,7 @@ Node *doreturn(char type)
 /*
  *      "break" statement
  */
-Node *dobreak()
+Node *dobreak(void)
 {
     WHILE_TAB* ptr;
     SYMBOL *sptr;
@@ -733,7 +742,7 @@ Node *dobreak()
 /*
  *      "continue" statement
  */
-Node *docont()
+Node *docont(void)
 {
     WHILE_TAB* ptr;
     SYMBOL *sptr;
@@ -833,7 +842,7 @@ Node *doasmfunc(char wantbr)
  *      passed intact through parser
  */
 
-Node *doasm()
+Node *doasm(void)
 {
     cmode = 0; /* mark mode as "asm" */
 
@@ -868,7 +877,7 @@ static void set_section(char **dest_section)
 }
 
 /* #pragma statement */
-void dopragma()
+void dopragma(void)
 {
     blanks();
     if (amatch("proto"))
@@ -906,7 +915,7 @@ void dopragma()
     }
 }
 
-static Node *dostaticassert() 
+static Node *dostaticassert(void)
 {
     Kind   valtype;
     double val;

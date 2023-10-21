@@ -9,11 +9,31 @@
 SECTION code_clib
 PUBLIC isqrt
 PUBLIC _isqrt
+PUBLIC ___isqrt
+PUBLIC isqrt_fastcall
+PUBLIC _isqrt_fastcall
 
 ; ----- uint __FASTCALL__ isqrt(uint val)
 
-.isqrt
-._isqrt
+isqrt:
+_isqrt:
+___isqrt:
+IF __CPU_GBZ80__
+   ld  hl,sp+2
+   ld  a,(hl+)
+   ld  h,(hl)
+   ld  l,a
+ELIF __CPU_RABBIT__ | __CPU_KC160__
+   ld hl,(sp+2)
+ELSE
+   pop de
+   pop hl
+   push hl
+   push de
+ENDIF
+
+.isqrt_fastcall
+._isqrt_fastcall
 
    ld b,l                    ; b = LSB of val
    ld l,h                    ; l = MSB of val

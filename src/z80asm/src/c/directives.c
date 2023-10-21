@@ -15,12 +15,13 @@ Assembly directives.
 #include "fileutil.h"
 #include "if.h"
 #include "module1.h"
-#include "parse.h"
+#include "parse1.h"
 #include "strutil.h"
 #include "symtab1.h"
 #include "types.h"
 #include "utstring.h"
 #include "z80asm.h"
+#include "z80asm_cpu.h"
 
 static void check_org_align();
 
@@ -32,7 +33,7 @@ static void url_encode(const char *s, char *enc)
     const char *hex = "0123456789abcdef";
 
     int pos = 0;
-    for (int i = 0, t = strlen(s); i < t; i++)
+    for (int i = 0, t = (int)strlen(s); i < t; i++)
     {
         if (('a' <= s[i] && s[i] <= 'z')
         || ('A' <= s[i] && s[i] <= 'Z')
@@ -181,35 +182,6 @@ void asm_LSTOFF(void)
 /*-----------------------------------------------------------------------------
 *   directives with number argument
 *----------------------------------------------------------------------------*/
-void asm_LINE(int line_num, const char* filename) {
-	sfile_set_filename(filename);
-	sfile_set_line_num(line_num, 1);
-	sfile_set_c_source(false);
-
-	set_error_location(filename, line_num);
-}
-
-void asm_C_LINE(int line_num, const char* filename) {
-	sfile_set_filename(filename);
-	sfile_set_line_num(line_num, 0);		// do not increment line numbers
-	sfile_set_c_source(true);
-
-	set_error_location(filename, line_num);
-
-	if (option_debug()) {
-		STR_DEFINE(name, STR_SIZE);
-
-		char fname_encoded[FILENAME_MAX * 2];
-		url_encode(filename, fname_encoded);
-
-		Str_sprintf(name, "__C_LINE_%ld_%s", line_num, fname_encoded);
-		if (!find_local_symbol(Str_data(name)))
-			asm_LABEL(Str_data(name));
-
-		STR_DELETE(name);
-	}
-}
-
 void asm_ORG(int address)
 {
 	set_origin_directive(address);
@@ -290,7 +262,7 @@ void asm_DEFINE(const char* name)
 
 void asm_UNDEFINE(const char* name)
 {
-	Symbol1Hash_remove(CURRENTMODULE->local_symtab, name);
+    undefine_local_def_sym(name);
 }
 
 /*-----------------------------------------------------------------------------
@@ -298,11 +270,21 @@ void asm_UNDEFINE(const char* name)
 *----------------------------------------------------------------------------*/
 void asm_DEFC(const char* name, Expr1* expr)
 {
+    Section1* cur_section = CURRENTSECTION;
+
 	int value = Expr_eval(expr, false);		/* DEFC constant expression */
+
+    /* if expression depends on one single symbol and constants, set the target
+       in the same section - #2418 */
+    Section1* used_section = NULL;
+    if (Expr_depends_on_one_symbol(expr, &used_section)) {
+        expr->section = used_section;
+        set_cur_section(used_section);
+    }
 
 	/* if expression is difference of two addresses in the same
 	   section, convert it to a constant */
-	if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
+    if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
 	{
 		/* check if expression depends on itself */
 		if (Expr_is_recusive(expr, name)) {
@@ -310,7 +292,7 @@ void asm_DEFC(const char* name, Expr1* expr)
 		}
 		else {
 			/* store in object file to be computed at link time */
-			expr->range = RANGE_WORD;
+			expr->range = RANGE_ASSIGNMENT;
 			expr->target_name = spool_add(name);
 
 			Expr1List_push(&CURRENTMODULE->exprs, expr);
@@ -324,6 +306,8 @@ void asm_DEFC(const char* name, Expr1* expr)
 		define_symbol(name, value, TYPE_CONSTANT);
 		OBJ_DELETE(expr);
 	}
+
+    set_cur_section(cur_section);
 }
 
 /*-----------------------------------------------------------------------------

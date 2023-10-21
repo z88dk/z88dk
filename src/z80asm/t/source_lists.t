@@ -17,7 +17,9 @@ spew("${test}1.lst", <<END);
 ; comment followed by blank line
 
 # comment
- ${test}2.asm \@${test}2.lst ; comment
+ ${test}2.asm 
+ \@${test}2.lst 
+ ; comment
 END
 
 # list file with different EOL chars

@@ -1,0 +1,7 @@
+
+
+
+
+    ; For text we avoid the top row since it sets the border colour
+    defc    DISPLAY = 12328
+    defc    COLOUR_MAP = DISPLAY + 1024

@@ -18,6 +18,7 @@ __agon_drawto:
     pop     af
     call    __agon_putc
 
+    ; Plot pixel at start
     ld      a,25
     call    __agon_putc
     ld      a,$41
@@ -26,14 +27,26 @@ __agon_drawto:
     call    __agon_putword
     ld      hl,(__gfx_coords+2)
     call    __agon_putword
+
+    ; We also have to move the graphics cursor
+    ld      a,25
+    call    __agon_putc
+    ld      a,4
+    call    __agon_putc
+    ld      hl,(__gfx_coords)
+    call    __agon_putword
+    ld      hl,(__gfx_coords+2)
+    call    __agon_putword
+
+    ; And now we can draw a line
     ld      a,25
     call    __agon_putc
     ld      a,5
     call    __agon_putc
-    defb    $dd, $27, 2	; ld hl,(ix+2) (y2)
+    ld      hl,(ix+2)	;x2
     ld      (__gfx_coords),hl
     call    __agon_putword
-    defb    $dd, $27, 0	; ld hl,(ix+0) (y2)
+    ld      hl,(ix+0)	;y2
     ld      (__gfx_coords+2),hl
     call    __agon_putword
     ret

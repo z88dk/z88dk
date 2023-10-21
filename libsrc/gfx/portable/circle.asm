@@ -4,6 +4,7 @@
 
 	PUBLIC	circle
 	PUBLIC	_circle
+	PUBLIC	___circle
 
 	EXTERN commoncircle
 	EXTERN plot
@@ -12,5 +13,6 @@
 ;Note ints are actually uint8_t
 circle:
 _circle:
+___circle:
 	ld	hl,plot
 	jp	commoncircle

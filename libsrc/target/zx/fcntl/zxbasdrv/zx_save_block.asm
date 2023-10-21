@@ -10,6 +10,7 @@
 	SECTION code_clib
 	PUBLIC	zx_save_block
 	PUBLIC	_zx_save_block
+	PUBLIC	___zx_save_block
 	
 	EXTERN	zx_setint
 	EXTERN	zx_goto
@@ -19,6 +20,7 @@
 
 .zx_save_block
 ._zx_save_block
+.___zx_save_block
 
 	pop	af
 	pop	bc

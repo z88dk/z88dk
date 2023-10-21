@@ -1318,8 +1318,10 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
 
             for (p = buffer; isspace(*p); ++p) ;
 
-            if (*p)
-                fprintf(stderr, "Warning: Unable to parse line from map file\n\t%s\n", buffer);
+            if (*p) {
+                fprintf(stderr, "Error: Unable to parse line from map file\n\t%s\n", buffer);
+                exit(EXIT_FAILURE);
+            }
         }
     }
 

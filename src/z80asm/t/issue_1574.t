@@ -29,13 +29,14 @@ __size                          = \$0005 ; const, public, def, , ,
 END
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF16
+Object  file $test.o at \$0000: Z80RMF18
   Name: $test
+  CPU:  z80 
   Section "": 5 bytes
     C \$0000: 01 05 00 00 00
   Symbols:
-    L A \$0000 foo (section "") (file $test.asm:1)
-    L A \$0005 bar (section "") (file $test.asm:5)
+    L A \$0000: foo (section "") (file $test.asm:1)
+    L A \$0005: bar (section "") (file $test.asm:5)
 END
 
 check_bin_file("$test.reloc", bytes());

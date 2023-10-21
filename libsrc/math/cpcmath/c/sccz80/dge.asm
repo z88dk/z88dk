@@ -6,24 +6,24 @@
 ;	$Id: dge.asm,v 1.4 2016-06-22 19:50:49 dom Exp $
 ;
 
-    SECTION smc_fp
-    INCLUDE "cpcmath.inc"
+        SECTION smc_fp
+        INCLUDE "cpcmath.inc"
 
-    PUBLIC  dge
-    PUBLIC  dgec
+        PUBLIC  dge
+        PUBLIC  dgec
 
-    EXTERN  fsetup
-    EXTERN  stkequcmp
-    EXTERN  cmpfin
+        EXTERN  fsetup
+        EXTERN  stkequcmp
+        EXTERN  cmpfin
 
-.dge
-    call    fsetup
-.dgec
-    FPCALL(CPCFP_FLO_CMP)
-    cp      0               ;(hl) <= (de)
-    jp      z,cmpfin
-    cp      1
-    jp      z,cmpfin
-    xor     a
-    jp      stkequcmp
+dge:
+        call    fsetup
+dgec:
+        FPCALL  (CPCFP_FLO_CMP)
+        cp      0                       ;(hl) <= (de)
+        jp      z, cmpfin
+        cp      1
+        jp      z, cmpfin
+        xor     a
+        jp      stkequcmp
 

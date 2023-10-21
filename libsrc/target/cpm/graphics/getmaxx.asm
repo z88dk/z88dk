@@ -34,8 +34,18 @@
 		push   de
 		call   l_mult
 		pop    de
+IF __CPU_INTEL__
+		ld	a,d
+		and	a
+		rra
+		ld	d,a
+		ld	a,e
+		rra
+		ld	e,a
+ELSE
 		srl    d
 		rr     e
+ENDIF
 		add    hl,de
 		ret
 

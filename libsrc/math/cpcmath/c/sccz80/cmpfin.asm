@@ -6,13 +6,13 @@
 ;	$Id: cmpfin.asm,v 1.4 2016-06-22 19:50:48 dom Exp $
 ;
 
-    SECTION smc_fp
+        SECTION smc_fp
 
-    PUBLIC  cmpfin
+        PUBLIC  cmpfin
 
-    EXTERN  stkequcmp
+        EXTERN  stkequcmp
 
 
-.cmpfin
-    ld      a,1
-    jp      stkequcmp
+cmpfin:
+        ld      a, 1
+        jp      stkequcmp

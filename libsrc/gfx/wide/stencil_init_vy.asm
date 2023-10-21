@@ -15,42 +15,42 @@
 ;	$Id: stencil_init_vy.asm $
 ;
 
-IF !__CPU_INTEL__
-	INCLUDE	"graphics/grafix.inc"
-		SECTION   code_graphics
+  IF    !__CPU_INTEL__
+        INCLUDE "graphics/grafix.inc"
+        SECTION code_graphics
 
-		PUBLIC    stencil_init
-		PUBLIC    _stencil_init
+        PUBLIC  stencil_init
+        PUBLIC  _stencil_init
 
-		EXTERN		getmaxy
+        EXTERN  getmaxy
 
 
-.stencil_init
-._stencil_init
+stencil_init:
+_stencil_init:
 		; __FASTCALL__ means no need to pick HL ptr from stack
-		
-		push hl
 
-		call getmaxy
-		inc hl		; maxy+1 = vector size for one side
-		add hl,hl	; HL = total stencil size
+        push    hl
 
-		pop de
-		push hl	; maxy*2
+        call    getmaxy
+        inc     hl                      ; maxy+1 = vector size for one side
+        add     hl, hl                  ; HL = total stencil size
 
-		ld	h,d	; hl=de=vector ptr
-		ld	l,e
-		inc	de
+        pop     de
+        push    hl                      ; maxy*2
 
-		ld	(hl),127	; big enough but stay in the positive range !
-		pop bc	; maxy*2
-		push	bc
-		ldir
+        ld      h, d                    ; hl=de=vector ptr
+        ld      l, e
+        inc     de
+
+        ld      (hl), 127               ; big enough but stay in the positive range !
+        pop     bc                      ; maxy*2
+        push    bc
+        ldir
 
 
-		ld	(hl),0		; right side vector follows
-		pop	bc
-		dec	bc	; (maxy*2)-1
-		ldir
-		ret
-ENDIF
+        ld      (hl), 0                 ; right side vector follows
+        pop     bc
+        dec     bc                      ; (maxy*2)-1
+        ldir
+        ret
+  ENDIF

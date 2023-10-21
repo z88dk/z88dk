@@ -3,11 +3,13 @@
 ; $Id: writebyte.asm,v 1.5 2016-03-06 21:39:54 dom Exp $
 ;
 
-                SECTION code_clib
+        SECTION code_clib
 
-		PUBLIC	writebyte
-		PUBLIC	_writebyte
+        PUBLIC  writebyte
+        PUBLIC  _writebyte
+        PUBLIC  ___writebyte
 
-.writebyte
-._writebyte
-	ret
+writebyte:
+_writebyte:
+___writebyte:
+        ret

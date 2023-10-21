@@ -1,13 +1,29 @@
+SECTION   code_fp_math32
+PUBLIC    ceil
+EXTERN    _m32_ceilf
 
-	SECTION	code_fp_math32
-	PUBLIC	ceil
-	EXTERN	m32_ceil_fastcall
+IFNDEF __CLASSIC
+defc   ceil = _m32_ceilf
+ELSE
 
-	defc	ceil = m32_ceil_fastcall
+; Classic has a non-fastcall implementation
+
+ceil:
+    pop bc
+    pop hl
+    pop de
+    push de
+    push hl
+    push bc
+    jp _m32_ceilf
 
 ; SDCC bridge for Classic
-IF __CLASSIC
 PUBLIC _ceil
-defc _ceil = m32_ceil_fastcall
-ENDIF
+defc _ceil = ceil
 
+
+; Clang bridge for Classic
+PUBLIC _ceilf
+defc _ceilf = ceil
+
+ENDIF

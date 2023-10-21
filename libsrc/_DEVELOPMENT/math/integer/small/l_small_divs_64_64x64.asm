@@ -131,19 +131,15 @@ divide_by_zero:
 
    call error_divide_by_zero_mc
 
-   ld d,(ix+7)
-   ld e,(ix+6)
-   ld h,(ix+5)
-   ld l,(ix+4)
+   ld de,(ix+6)
+   ld hl,(ix+4)
 
    bit 7,d
    
    exx
    
-   ld b,(ix+3)
-   ld c,(ix+2)
-   ld d,(ix+1)
-   ld e,(ix+0)
+   ld bc,(ix+2)
+   ld de,(ix+0)
 
    push ix
    pop hl
@@ -168,7 +164,6 @@ pos_inf:
 exit:
 
    ex de,hl
-   ld e,c
-   ld d,b
+   ld de,bc
    
    ret

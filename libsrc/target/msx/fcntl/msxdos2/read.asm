@@ -3,6 +3,7 @@
 
 		PUBLIC	read
 		PUBLIC	_read
+		PUBLIC	___read
                 EXTERN  MSXDOS
                 EXTERN  msxdos_error
 
@@ -10,6 +11,7 @@
 ; (fd, buf,len)
 .read
 ._read
+.___read
 	pop	af	;ret
 	pop	hl	;len
 	pop	de	;buf

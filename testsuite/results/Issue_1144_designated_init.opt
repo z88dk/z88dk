@@ -25,6 +25,8 @@
 	defs	3
 	defw	i_1+0
 	SECTION	code_compiler
+	SECTION	bss_compiler
+	SECTION	code_compiler
 
 	SECTION	rodata_compiler
 .i_1

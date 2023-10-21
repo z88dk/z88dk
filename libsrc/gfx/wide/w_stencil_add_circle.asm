@@ -14,49 +14,49 @@
 
 ;; void stencil_add_circle(int x1, int y1, int x2, int y2, unsigned char *stencil)
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
-    SECTION     code_graphics
-    PUBLIC    stencil_add_circle
-    PUBLIC    _stencil_add_circle
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+        SECTION code_graphics
+        PUBLIC  stencil_add_circle
+        PUBLIC  _stencil_add_circle
 
-    EXTERN    w_draw_circle
-    EXTERN    stencil_add_pixel 
+        EXTERN  w_draw_circle
+        EXTERN  stencil_add_pixel
 
     ;EXTERN    swapgfxbk
     ;EXTERN    swapgfxbk1
 
-    EXTERN    stencil_ptr
+        EXTERN  stencil_ptr
     ;EXTERN    __graphics_end
 
-.stencil_add_circle
-._stencil_add_circle
-    push    ix
-    ld    ix,2
-    add    ix,sp
+stencil_add_circle:
+_stencil_add_circle:
+        push    ix
+        ld      ix, 2
+        add     ix, sp
 
-    ld    l,(ix+2)    ;pointer to stencil
-    ld    h,(ix+3)
-    ld    (stencil_ptr),hl
+        ld      l, (ix+2)               ;pointer to stencil
+        ld      h, (ix+3)
+        ld      (stencil_ptr), hl
 
     ;ld    l,(ix+4)    ;pointer to leftmost vector
     ;ld    h,(ix+5)
     ;ld    (gfx_area),hl
 
-    ld a,(ix+4)    ;skip
-    ld c,(ix+6)    ;radius
-    ld b,(ix+7)
-    ld l,(ix+8)    ;y
-    ld h,(ix+9)
-    ld e,(ix+10)    ;x
-    ld d,(ix+11)
+        ld      a, (ix+4)               ;skip
+        ld      c, (ix+6)               ;radius
+        ld      b, (ix+7)
+        ld      l, (ix+8)               ;y
+        ld      h, (ix+9)
+        ld      e, (ix+10)              ;x
+        ld      d, (ix+11)
 
     ;call    swapgfxbk
 
-    ld     ix,stencil_add_pixel
-    call    w_draw_circle
+        ld      ix, stencil_add_pixel
+        call    w_draw_circle
 
     ;jp     __graphics_end
-    pop ix
-    ret
+        pop     ix
+        ret
 
-ENDIF
+  ENDIF

@@ -7,9 +7,11 @@
 	SECTION code_clib
 	PUBLIC	read
 	PUBLIC	_read
+	PUBLIC	___read
 
 .read
 ._read
+.___read
 	push	ix		;save caller
 	LD	IX,4
 	ADD	IX,SP

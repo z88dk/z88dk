@@ -43,12 +43,11 @@ l0_small_divu_64_64x8:
 loop_11:
 
    add hl,hl
-   rl e
-   rl d
+   rl de
    exx
+
    adc hl,hl
-   rl e
-   rl d
+   rl de
    exx
    
    rla

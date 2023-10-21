@@ -57,6 +57,11 @@ IF CRT_ORG_CODE = 0x0000
 ENDIF
 
 program:
+IF __CPU_R4K__ || __CPU_R5K__
+    ;; Enable R4K instruction mode on the R4K
+    ld      a,$c0
+    ioi ld  ($0420),a       ;EDMR register (p299 in R4000UM.pdf)
+ENDIF
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
@@ -74,7 +79,7 @@ ELSE
     add     hl,sp
     ld      (exitsp),hl
 ENDIF
-IF !__CPU_R2KA__
+IF !__CPU_RABBIT__
     ei
 ENDIF
 ; Optional definition for auto MALLOC init
@@ -105,7 +110,11 @@ cleanup:
 
 SYSCALL:
     ; a = command to execute
+IF __CPU_R4K__ | __CPU_R5K__
+    defb    $ED, $FD	;trap
+ELSE
     defb    $ED, $FE	;trap
+ENDIF
     ret
 
 l_dcal:

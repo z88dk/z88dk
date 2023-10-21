@@ -1,6 +1,6 @@
 @stdio/ansicore.lst
-stdio/inkey/fgetc_cons
-stdio/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
 
 @input/input_keyboard.lst
 @video/tms9918/video_tms9918.lst

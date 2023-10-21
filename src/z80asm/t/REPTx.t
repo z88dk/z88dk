@@ -45,7 +45,6 @@ z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 END_ASM
 $test.asm:1: error: syntax error
   ^---- .l1 rept 10
-      ^---- l1:rept 10
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
@@ -117,7 +116,6 @@ z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 END_ASM
 $test.asm:1: error: syntax error
   ^---- .l1 reptc var, "hello"
-      ^---- l1:reptc var,"hello"
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
@@ -227,7 +225,6 @@ z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 END_ASM
 $test.asm:1: error: syntax error
   ^---- .l1 repti var, "hello"
-      ^---- l1:repti var,"hello"
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);

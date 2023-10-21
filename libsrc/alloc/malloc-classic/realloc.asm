@@ -3,11 +3,13 @@
 SECTION code_clib
 PUBLIC realloc
 PUBLIC _realloc
+PUBLIC ___realloc
 
 EXTERN asm_realloc
 
 .realloc
 ._realloc
+.___realloc
 
    pop de
    pop bc

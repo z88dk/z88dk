@@ -150,7 +150,7 @@ not_text_fp:
   ENDIF
 ELSE
 
-  IF __CPU_R2KA__ | __CPU_R3K__
+  IF __CPU_RABBIT__
     ld      hl,(sp + 2)
     push    ix		;save callers ix
     ld      ix,hl
@@ -181,39 +181,19 @@ ELSE
 .no_ungetc
 ; Now do strings
     ld      a,(ix+fp_flags)
-    and	_IOSTRING
+    and     _IOSTRING
     jr      z,no_string	;not a string
-  IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      hl,(ix+fp_extra)	; check the length
-  ELSE
-    ld      l,(ix+fp_extra)	; check the length
-    ld      h,(ix+fp_extra+1)
-  ENDIF
     ld      a,h
     or      l
     jp      z,is_eof
     dec     hl
-  IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      (ix+fp_extra),hl
-  ELSE
-    ld      (ix+fp_extra),l
-    ld      (ix+fp_extra+1),h
-  ENDIF
 
-  IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      hl,(ix+fp_desc)
-  ELSE
-    ld      l,(ix+fp_desc)
-    ld      h,(ix+fp_desc+1)
-  ENDIF
     ld      a,(hl)
     inc     hl
-  IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      (ix+fp_desc),hl
-  ELSE
-    ld      (ix+fp_desc),l
-    ld      (ix+fp_desc+1),h
-  ENDIF
     and     a		;test for zero
     jr      z,is_eof	;return EOF if so
     ld      l,a		;else return character
@@ -223,12 +203,7 @@ ELSE
     ld      a,(ix+fp_flags)
     and     _IOEXTRA
     jr      z,not_extra_fp
-  IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
     ld      hl,(ix + fp_extra)
-  ELSE
-    ld      l,(ix+fp_extra)
-    ld      h,(ix+fp_extra+1)
-  ENDIF
     ld      a,__STDIO_MSG_GETC
     call	l_jphl
     jr      nc, fgetc_end
@@ -249,12 +224,7 @@ ELSE
     pop     hl
     jr      fgetc_end	; always succeeds - never EOF when EOF has not been defined.
 .no_stdin
-  IF __CPU_R2KA__ | __CPU_R3K__
     ld      hl,(ix+fp_desc)
-  ELSE
-    ld      l,(ix+fp_desc)
-    ld      h,(ix+fp_desc+1)
-  ENDIF
     push    ix
     call	readbyte	; readbyte sorts out stack (fastcall)
     			; hl = byte read

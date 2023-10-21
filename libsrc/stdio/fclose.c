@@ -21,81 +21,76 @@
 int fclose(FILE *fp)
 {
 #asm
-IF __CPU_R2KA__ | __CPU_R3K__
-	ld	hl,(sp + 2)
+IF __CPU_RABBIT__ | __CPU_KC160__
+    ld      hl,(sp + 2)
 ELSE
-	pop	de
-	pop	hl
-	push	hl
-	push	de
+    pop     de
+    pop     hl
+    push    hl
+    push    de
 ENDIF
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	inc	hl
-	ld	a,(hl)
-	and	_IOUSE		;inuse?
-	jr	nz, fclose_inuse
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    inc     hl
+    ld      a,(hl)
+    and     _IOUSE        ;inuse?
+    jr      nz, fclose_inuse
 fclose_error:
-	ld	hl,-1		;EOF
-	ret
+    ld      hl,-1        ;EOF
+    ret
 fclose_inuse:
-	ld	a,(hl)
-	and	_IOSTRING
-	jr	nz,fclose_success
+    ld      a,(hl)
+    and     _IOSTRING
+    jr      nz,fclose_success
 IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_GBZ80__
-	ld	a,(hl)
-	and	_IOEXTRA
-	jr	z,fclose_no_net
+    ld      a,(hl)
+    and     _IOEXTRA
+    jr      z,fclose_no_net
 ; We have to go via trampoline here
-	push	hl	;save flags pointer
-	dec	hl
-	dec	hl	;hl = fp
-	push	ix	;Save callers ix
-	push	hl
-	pop	ix	;ix = fp
-IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_EZ80__
-	ld	hl,(ix+fp_extra)
-ELSE
-	ld	l,(ix+fp_extra)
-	ld	h,(ix+fp_extra+1)
-ENDIF
-	ld	a,__STDIO_MSG_CLOSE
-	call	l_jphl
-	pop	ix	;restore callers ix
-	jr	fclose_check_success
+    push    hl    ;save flags pointer
+    dec     hl
+    dec     hl    ;hl = fp
+    push    ix    ;Save callers ix
+    push    hl
+    pop     ix    ;ix = fp
+    ld      hl,(ix+fp_extra)
+    ld      a,__STDIO_MSG_CLOSE
+    call    l_jphl
+    pop     ix    ;restore callers ix
+    jr      fclose_check_success
 ENDIF
 fclose_no_net:
-	ld	a,(hl)
-	and	_IOSYSTEM
-	jr	nz, fclose_success
+    ld      a,(hl)
+    and     _IOSYSTEM
+    jr      nz, fclose_success
 
-	push	hl	; points to flags
-	push	de
-	call	close
-	pop	bc	;fd
+    push    hl    ; points to flags
+    push    de
+    call    close
+    pop     bc    ;fd
 fclose_check_success:
-	pop	de	;flags pointer
-	ld	a,h	; an error
-	or	l
+    pop     de    ;flags pointer
+    ld      a,h    ; an error
+    or    l
 IF __CPU_GBZ80__
-	jr	nz,fclose_assign_ret
+    jr      nz,fclose_assign_ret
 ELSE
-	ret	nz
+    ret    nz
 ENDIF
-	ex	de,hl
+    ex      de,hl
 fclose_success:
-	ld	de,0
-	ld	(hl),e	;flags
-	dec	hl
-	ld	(hl),e	;descriptor + 1
-	dec	hl
-	ld	(hl),e
-	ex	de,hl
+    ld      de,0
+    ld      (hl),e    ;flags
+    dec     hl
+    ld      (hl),e    ;descriptor + 1
+    dec     hl
+    ld      (hl),e
+    ex      de,hl
 IF __CPU_GBZ80__
 fclose_assign_ret:
-	ld	d,h
-	ld	e,l
+    ld      d,h
+    ld      e,l
 ENDIF
 #endasm
 }

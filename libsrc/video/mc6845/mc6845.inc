@@ -89,3 +89,11 @@ IF FORbondwell
 	defc	register_r = 0x11
 	defc	register_w = 0x11
 ENDIF
+
+IF FORtrs80m2
+	defc	address_r = 0
+	defc	address_w = 0xfc
+	defc	status_r = 0
+	defc	register_r = 0
+	defc	register_w = 0xfd
+ENDIF

@@ -11,22 +11,22 @@
 ; IN:  A=Page Number (0/1)
 ; all registers are saved
 
-		PUBLIC	graypage
-		
-                EXTERN    base_graphics
-		EXTERN	graybit1
-		EXTERN	graybit2
-		
-.graypage
-		push	hl
-		and	a
-		jr	nz,flippage
-		ld	hl,(graybit1)
-		ld	(base_graphics),hl
-		pop	hl
-		ret
-.flippage
-		ld	hl,(graybit2)
-		ld	(base_graphics),hl
-		pop	hl
-		ret
+        PUBLIC  graypage
+
+        EXTERN  base_graphics
+        EXTERN  graybit1
+        EXTERN  graybit2
+
+graypage:
+        push    hl
+        and     a
+        jr      nz, flippage
+        ld      hl, (graybit1)
+        ld      (base_graphics), hl
+        pop     hl
+        ret
+flippage:
+        ld      hl, (graybit2)
+        ld      (base_graphics), hl
+        pop     hl
+        ret

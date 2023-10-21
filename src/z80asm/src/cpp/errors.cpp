@@ -4,10 +4,12 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "args.h"
 #include "errors.h"
 #include "float.h"
 #include "if.h"
 #include "utils.h"
+#include "z80asm_cpu.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -20,19 +22,22 @@ static const char* err_messages[] = {
 #	include "errors.def"
 };
 
-Location::Location(const string& filename_, int line_num_,
-	const string& source_line_, const string& expanded_line_)
-	: filename(filename_), line_num(line_num_)
-	, source_line(source_line_), expanded_line(expanded_line_) {
+Location::Location(const string& filename, int line_num,
+	const string& source_line, const string& expanded_line)
+	: m_filename(filename), m_line_num(line_num)
+	, m_source_line(source_line), m_expanded_line(expanded_line) {
 }
 
 void Location::clear() {
-	filename.clear();
-	line_num = 0;
-	line_inc = 1;
-	source_line.clear();
-	expanded_line.clear();
+	m_filename.clear();
+	m_line_num = 0;
+	m_line_inc = 1;
+	m_source_line.clear();
+	m_expanded_line.clear();
+    m_is_c_source = false;
 }
+
+//-----------------------------------------------------------------------------
 
 Errors::Errors()
 	: m_count(0) {
@@ -55,25 +60,23 @@ void Errors::set_file_location(const string& filename, int line_num) {
 	Assert(!m_locations.empty());
 	Location& location = m_locations.back();
 
-	location.filename = filename;
-	location.line_num = line_num;
-	location.source_line.clear();
-	location.expanded_line.clear();
+    location.set_filename(filename);
+	location.set_line_num(line_num);
+    location.set_source_line("");
 }
 
 void Errors::set_source_line(const string& line) {
 	Assert(!m_locations.empty());
 	Location& location = m_locations.back();
 
-	location.source_line = line;
-	location.expanded_line.clear();
+    location.set_source_line(line);
 }
 
 void Errors::set_expanded_line(const string& line) {
 	Assert(!m_locations.empty());
 	Location& location = m_locations.back();
 
-	location.expanded_line = line;
+    location.set_expanded_line(line);
 }
 
 void Errors::error(ErrCode code, const string& arg) {
@@ -96,15 +99,17 @@ void Errors::pop_location() {
 		clear();
 }
 
-void Errors::show_error(const string& prefix, ErrCode code, const string& arg) {
+void Errors::show_error(const string& prefix, ErrCode code, const string& arg_) {
 	Assert(!m_locations.empty());
 	Location& location = m_locations.back();
 
+    string arg = str_chomp(arg_);
+
 	// error message
-	if (!location.filename.empty()) {
-		cerr << location.filename << ":";
-		if (location.line_num)
-			cerr << location.line_num << ":";
+	if (!location.filename().empty()) {
+		cerr << location.filename() << ":";
+		if (location.line_num())
+			cerr << location.line_num() << ":";
 		cerr << " ";
 	}
 	cerr << prefix << ": " << err_messages[static_cast<int>(code)];
@@ -113,8 +118,8 @@ void Errors::show_error(const string& prefix, ErrCode code, const string& arg) {
 	cerr << endl;
 
 	// source line - remove extra spaces
-	string striped_source_line = str_remove_extra_blanks(location.source_line);
-	string striped_expanded_line = str_remove_extra_blanks(location.expanded_line);
+	string striped_source_line = str_remove_extra_blanks(location.source_line());
+	string striped_expanded_line = str_remove_extra_blanks(location.expanded_line());
 
 	if (!striped_source_line.empty()) {
 		cerr << "  ^---- " << striped_source_line << endl;
@@ -146,12 +151,12 @@ void set_error_location(const char* filename, int line_num) {
 }
 
 const char* get_error_filename() {
-	string filename = g_errors.location().filename;
+	string filename = g_errors.location().filename();
 	return spool_add(filename.c_str());
 }
 
 int get_error_line_num() {
-	return g_errors.location().line_num;
+	return g_errors.location().line_num();
 }
 
 void set_error_source_line(const char* line) {
@@ -356,4 +361,42 @@ void error_cmd_failed(const char* cmd) {
 
 void error_assert_failed() {
 	g_errors.error(ErrCode::AssertFailed);
+}
+
+void error_cpu_incompatible(const char* filename, int got_cpu_id) {
+    ostringstream error;
+    const char* cpu_str = cpu_name(got_cpu_id);
+    if (cpu_str == NULL)
+        error_cpu_invalid(filename, got_cpu_id);
+    else {
+        error << "file " << filename << " compiled for " << cpu_str
+            << ", incompatible with " << cpu_name(option_cpu());
+        g_errors.error(ErrCode::CPUIncompatible, error.str());
+    }
+}
+
+void error_cpu_invalid(const char* filename, int got_cpu_id) {
+    ostringstream error;
+    error << "file " << filename << ", cpu_id = " << got_cpu_id;
+    g_errors.error(ErrCode::CPUInvalid, error.str());
+}
+
+static const char* ixiy_to_string(swap_ixiy_t swap_ixiy) {
+    switch (swap_ixiy) {
+    case IXIY_NO_SWAP: return "(no option)"; 
+    case IXIY_SWAP: return "-IXIY";
+    case IXIY_SOFT_SWAP: return "-IXIY-soft";
+    default: Assert(0); return "";
+    }
+}
+
+void error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy) {
+    ostringstream error;
+    error << "file " << filename << " compiled with " << ixiy_to_string(swap_ixiy)
+        << ", incompatible with " << ixiy_to_string(g_args.swap_ixiy());
+    g_errors.error(ErrCode::IXIYIncompatible, error.str());
+}
+
+void error_date_and_mstar_incompatible() {
+    g_errors.error(ErrCode::DateAndMstarIncompatible);
 }

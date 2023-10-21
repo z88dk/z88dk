@@ -45,14 +45,10 @@ PUBLIC m32__dtoa_digits
                                 ; 10*a = 2*(4*a + a)     
     push de                     ; DEHL *= 10
     push hl
-    sla l
-    rl h
-    rl e
-    rl d
-    sla l
-    rl h
-    rl e
-    rl d
+    add hl,hl                   ; sla hl
+    rl de
+    add hl,hl                   ; sla hl
+    rl de
     ex de,hl
     ex (sp),hl
     add hl,de
@@ -61,10 +57,8 @@ PUBLIC m32__dtoa_digits
     adc hl,de
     ex de,hl
     pop hl
-    sla l
-    rl h
-    rl e
-    rl d
+    add hl,hl                   ; sla hl
+    rl de
 
     exx
     dec c                       ; significant digits --

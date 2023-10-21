@@ -5,6 +5,10 @@ adc_hl_sp.asm
 add_bc_a.asm
 add_de_a.asm
 add_hl_a.asm
+add_sp_s.asm
+call_hl.asm
+call_ix.asm
+call_iy.asm
 cpd.asm
 cpdr.asm
 cpi.asm

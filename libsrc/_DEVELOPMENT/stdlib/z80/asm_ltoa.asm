@@ -42,7 +42,7 @@ asm_ltoa:
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
-IF __CPU_Z180__ || __CPU_R2KA__ || __CPU_R3K__
+IF __CPU_Z180__ |  __CPU_RABBIT__ | __CPU_KC160__
 
    push ix
    ex (sp),hl

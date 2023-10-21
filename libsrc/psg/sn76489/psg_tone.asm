@@ -3,8 +3,10 @@
 IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
 	PUBLIC	set_sound_freq
 	PUBLIC	_set_sound_freq
+	PUBLIC	___set_sound_freq
 	PUBLIC	psg_tone
 	PUBLIC	_psg_tone
+	PUBLIC	___psg_tone
 	
 ;	$Id: psg_tone.asm $
 
@@ -18,8 +20,10 @@ IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
 
 .set_sound_freq
 ._set_sound_freq
+.___set_sound_freq
 .psg_tone
 ._psg_tone
+.___psg_tone
 
 	ld	hl, 2
 	add	hl, sp

@@ -3,12 +3,14 @@
 ; $Id: open.asm,v 1.6 2016-03-06 21:39:54 dom Exp $
 ;
 
-                SECTION code_clib
+        SECTION code_clib
 
-		PUBLIC	open
-		PUBLIC	_open
+        PUBLIC  open
+        PUBLIC  _open
+        PUBLIC  ___open
 
-.open
-._open
-	ld	hl,-1	;error
-	ret
+open:
+_open:
+___open:
+        ld      hl, -1                  ;error
+        ret

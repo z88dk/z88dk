@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "z80asm_cpu.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -16,6 +17,15 @@ extern "C" {
 
 #define TOSTR(x)	_TOSTR(x)
 #define _TOSTR(x)	#x
+
+// program name
+#define Z80ASM_PROG	    "z88dk-z80asm"
+
+// environment variable
+#define Z80ASM_ENVVAR	"Z80ASM"
+
+// library base name
+#define Z80ASM_LIB_BASE	Z80ASM_PROG
 
 // default file name extensions
 #define EXT_ASM     ".asm"    
@@ -42,36 +52,6 @@ extern "C" {
 #define ZX81_ORIGIN_MIN	ZX81_ORIGIN
 #define ZX81_ORIGIN_MAX	ZX81_ORIGIN
 #define ZX81_APP_EXT	".P"		// ZX81 .P file
-
-
-// CPU types
-#define CPU_Z80     (1 << 0)
-#define CPU_Z80N	(1 << 1)
-#define CPU_Z180    (1 << 2)
-#define CPU_EZ80	(1 << 3)
-#define CPU_R2KA	(1 << 4)
-#define CPU_R3K		(1 << 5)
-#define CPU_8080	(1 << 6)
-#define CPU_8085	(1 << 7)
-#define CPU_GBZ80	(1 << 8)
-
-#define CPU_Z80_NAME		"z80"
-#define CPU_Z80N_NAME		"z80n"
-#define CPU_Z180_NAME		"z180"
-#define CPU_EZ80_NAME		"ez80"
-#define CPU_EZ80_Z80_NAME	"ez80_z80"
-#define CPU_R2KA_NAME		"r2ka"
-#define CPU_R3K_NAME		"r3k"
-#define CPU_8080_NAME		"8080"
-#define CPU_8085_NAME		"8085"
-#define CPU_GBZ80_NAME		"gbz80"
-#define ARCH_TI83_NAME		"ti83"
-#define ARCH_TI83PLUS_NAME	"ti83plus"
-
-#define CPU_ZILOG	(CPU_Z80 | CPU_Z80N | CPU_Z180 | CPU_EZ80)
-#define CPU_RABBIT	(CPU_R2KA | CPU_R3K)
-#define CPU_ALL		(CPU_ZILOG | CPU_RABBIT)
-#define CPU_NOT_Z80	(CPU_ALL & ~(CPU_Z80 | CPU_Z80N))
 
 // main routine
 int z80asm_main();
@@ -141,23 +121,28 @@ void warn_dma_half_cycle_timing();
 void warn_dma_ready_signal_unsupported();
 void error_cmd_failed(const char* cmd);
 void error_assert_failed();
+void error_cpu_incompatible(const char* filename, int got_cpu_id);
+void error_cpu_invalid(const char* filename, int cpu_id);
+void error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy);
+void error_date_and_mstar_incompatible();
 
 // options
 bool option_verbose();
-bool option_swap_ixiy();
+swap_ixiy_t option_swap_ixiy();
+void set_swap_ixiy_option(swap_ixiy_t swap_ixiy);
 void push_includes(const char* dir);
 void pop_includes();
 const char* search_includes(const char* filename);
 int option_cpu();
+void set_cpu_option(int cpu);
 const char* option_cpu_name();
 bool option_ti83();
 bool option_ti83plus();
-bool option_ez80_adl();
-void set_ez80_adl_option(bool f);
 bool option_speed();
 bool option_debug();
 const char* search_libraries(const char* filename);
 const char* option_lib_file();
+bool option_lib_for_all_cpus();
 void library_file_append(const char* filename);
 const char* option_bin_file();
 bool option_make_bin();
@@ -192,6 +177,14 @@ const char* get_sym_filename(const char* filename);
 const char* get_map_filename(const char* filename);
 const char* get_reloc_filename(const char* filename);
 
+// symbol table
+struct Symbol1;
+struct Symbol1* define_static_def_sym(const char* name, long value);
+void undefine_static_def_sym(const char* name);
+struct Symbol1* define_local_def_sym(const char* name, long value);
+void undefine_local_def_sym(const char* name);
+struct Symbol1* find_local_symbol(const char* name);
+
 // expressions
 void parse_const_expr_eval(const char* expr_text, int* result, bool* error);
 void parse_expr_eval_if_condition(const char *expr_text, bool* condition, bool* error);
@@ -201,18 +194,13 @@ bool check_ifdef_condition(const char* name);
 bool sfile_open(const char* filename, bool search_include_path);
 void sfile_hold_input();
 void sfile_unhold_input();
-char* sfile_getline();			// NOTE: user must free returned pointer
-char* sfile_get_source_line();	// NOTE: user must free returned pointer
+char* sfile_getline();	// NOTE: user must free returned pointer
 const char* sfile_filename();
 int sfile_line_num();
 bool sfile_is_c_source();
 void sfile_set_filename(const char* filename);
 void sfile_set_line_num(int line_num, int line_inc);
 void sfile_set_c_source(bool f);
-
-// symbol table
-struct Symbol1;
-struct Symbol1* define_static_def_sym(const char* name, long value);
 
 // code area
 int get_PC();

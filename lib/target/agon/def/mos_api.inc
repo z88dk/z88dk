@@ -171,56 +171,69 @@ MACRO MOSCALL func
     rst  $08
 ENDM
 
-IF 0
+MACRO AGONPUTC
+    defb    $49         ;LIS
+    rst     $10
+ENDM
+
 ;
 ; FatFS structures
 ; These mirror the structures contained in src_fatfs/ff.h in the MOS project
 ;
 ; Object ID and allocation information (FFOBJID)
 ;
-FFOBJID	.STRUCT
-	fs:		DS	3	; Pointer to the hosting volume of this object
-	id:		DS	2	; Hosting volume mount ID
-	attr:		DS	1	; Object attribute
-	stat:		DS	1	; Object chain status (b1-0: =0:not contiguous, =2:contiguous, =3:fragmented in this session, b2:sub-directory stretched)
-	sclust:		DS	4	; Object data start cluster (0:no cluster or root directory)
-	objsize:	DS	4	; Object size (valid when sclust != 0)
-FFOBJID_SIZE .ENDSTRUCT FFOBJID
+;FFOBJID	.STRUCT
+DEFVARS 0
+{
+	ffobjid_fs		ds.b	3	; Pointer to the hosting volume of this object
+	ffobjid_id		ds.b	2	; Hosting volume mount ID
+	ffobjid_attr		ds.b	1	; Object attribute
+	ffobjid_stat		ds.b	1	; Object chain status (b1-0: =0:not contiguous, =2:contiguous, =3:fragmented in this session, b2:sub-directory stretched)
+	ffobjid_sclust		ds.b	4	; Object data start cluster (0:no cluster or root directory)
+	ffobjid_objsize		 ds.b	4	; Object size (valid when sclust != 0)
+}
+
 ;
 ; File object structure (FIL)
 ;
-FIL .STRUCT
-	obj:		.TAG	FFOBJID	; Object identifier
-	flag:		DS	1	; File status flags
-	err:		DS	1	; Abort flag (error code)
-	fptr:		DS	4	; File read/write pointer (Zeroed on file open)
-	clust:		DS	4	; Current cluster of fpter (invalid when fptr is 0)
-	sect:		DS	4	; Sector number appearing in buf[] (0:invalid)
-	dir_sect:	DS	4	; Sector number containing the directory entry
-	dir_ptr:	DS	3	; Pointer to the directory entry in the win[]
-FIL_SIZE .ENDSTRUCT FIL
+;FIL .STRUCT
+DEFVARS 0 
+{
+	fil_obj		ds.b	15	; Object identifier
+	fil_flag	ds.b	1	; File status flags
+	fil_err		ds.b	1	; Abort flag (error code)
+	fil_fptr	ds.b	4	; File read/write pointer (Zeroed on file open)
+	fil_clust	ds.b	4	; Current cluster of fpter (invalid when fptr is 0)
+	fil_sect	ds.b	4	; Sector number appearing in buf[] (0:invalid)
+	fil_dir_sect	ds.b	4	; Sector number containing the directory entry
+	fil_dir_ptr	ds.b	3	; Pointer to the directory entry in the win[]
+}
 ;
 ; Directory object structure (DIR)
 ; 
-DIR .STRUCT
-	obj:		.TAG	FFOBJID	; Object identifier
-	dptr:		DS	4	; Current read/write offset
-	clust:		DS	4	; Current cluster
-	sect:		DS	4	; Current sector (0:Read operation has terminated)
-	dir:		DS	3	; Pointer to the directory item in the win[]
-	fn:		DS	12	; SFN (in/out) {body[8],ext[3],status[1]}
-	blk_ofs:	DS	4	; Offset of current entry block being processed (0xFFFFFFFF:Invalid)
-DIR_SIZE .ENDSTRUCT DIR
+;DIR .STRUCT
+DEFVARS 0
+{
+	dir_obj		ds.b	15	; Object identifier
+	dir_dptr	ds.b	4	; Current read/write offset
+	dir_clust	ds.b	4	; Current cluster
+	dir_sect	ds.b	4	; Current sector (0:Read operation has terminated)
+	dir_dir		ds.b	3	; Pointer to the directory item in the win[]
+	dir_fn		ds.b	12	; SFN (in/out) {body[8],ext[3],status[1]}
+	dir_blk_ofs	ds.b	4	; Offset of current entry block being processed (0xFFFFFFFF:Invalid)
+}
+
 ;
 ; File information structure (FILINFO)
 ;
-FILINFO .STRUCT
-	fsize:		DS 	4	; File size
-	fdate:		DS	2	; Modified date
-	ftime:		DS	2	; Modified time
-	fattrib:	DS	1	; File attribute
-	altname:	DS	13	; Alternative file name
-	fname:		DS	256	; Primary file name
-FILINFO_SIZE .ENDSTRUCT FILINFO
+;FILINFO .STRUCT
+DEFVARS 0
+{
+	filinfo_fsize		ds.b 	4	; File size
+	filinfo_fdate		ds.b	2	; Modified date
+	filinfo_ftime		ds.b	2	; Modified time
+	filinfo_fattrib		ds.b	1	; File attribute
+	filinfo_altname		ds.b	13	; Alternative file name
+	filinfo_fname		ds.b	256	; Primary file name
+}
 
-ENDIF

@@ -14,10 +14,10 @@
 ; int vfprintf1(FILE *fp, void __CALLEE__ (*output_fn)(int c,FILE *fp), int sccz80, unsigned char *fmt,void *ap)
 
 _vsnprintf:
-	ld	hl,2	
-	add	hl,sp		;&buf
+	ld      hl,2	
+	add     hl,sp		;&buf
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
-	push	ix
+	push    ix
 ENDIF
         ld      c,(hl)  ;buf
         inc     hl
@@ -43,18 +43,18 @@ ENDIF
         ld      b,(hl)
         inc     hl
         push    bc              ;fmt
-	ld	c,(hl)
-	inc	hl
-	ld	b,(hl)
+	ld      c,(hl)
+	inc     hl
+	ld      b,(hl)
         push    bc              ;ap
         call    asm_printf
-	ex	de,hl
-	ld	hl,10+4
-	add	hl,sp
-	ld	sp,hl
-	ex	de,hl
+	ex      de,hl
+	ld      hl,10+4
+	add     hl,sp
+	ld      sp,hl
+	ex      de,hl
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
-	pop	ix
+	pop     ix
 ENDIF
 	ret
 

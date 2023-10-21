@@ -5,18 +5,27 @@ SECTION code_clib
 SECTION code_ctype
 
 PUBLIC iscntrl
+PUBLIC iscntrl_fastcall
 
 EXTERN asm_iscntrl, error_znc
 
-IF __CLASSIC && __CPU_GBZ80__
-PUBLIC _iscntrl
-_iscntrl:
-  ld  hl,sp+2
-  ld  a,(hl+)
-  ld  h,(hl)
-  ld  l,a
-ENDIF
+
 iscntrl:
+IF __CPU_GBZ80__
+   ld  hl,sp+2
+   ld  a,(hl+)
+   ld  h,(hl)
+   ld  l,a
+ELIF __CPU_RABBIT__ | __CPU_KC160__
+   ld hl,(sp+2)
+ELSE
+   pop de
+   pop hl
+   push hl
+   push de
+ENDIF
+
+iscntrl_fastcall:
 
    inc h
    dec h
@@ -39,8 +48,16 @@ ENDIF
    ret
 
 ; SDCC bridge for Classic
-IF __CLASSIC && !__CPU_GBZ80__
+IF __CLASSIC
 PUBLIC _iscntrl
 defc _iscntrl = iscntrl
+PUBLIC _iscntrl_fastcall
+defc _iscntrl_fastcall = iscntrl_fastcall
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___iscntrl
+defc ___iscntrl = iscntrl
 ENDIF
 

@@ -14,11 +14,9 @@ m32_fpclassify:
     ;               = 3 if inf
     ;
     ; uses  : af
-    sla e
-    rl d
+    rl de
     ld a,d
-    rr d
-    rr e
+    rr de
 
     ; Zero  -     sign  = whatever
     ;         exponent  = all 0s

@@ -1,4 +1,4 @@
-stdio/inkey/getk
+stdio/obj/${TYPE}/inkey/getk
 @stdio/ansicore.lst
 target/alphatro/stdio/ansi/f_ansi_attr
 target/alphatro/stdio/ansi/f_ansi_bel

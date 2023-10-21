@@ -69,6 +69,7 @@ enum {
     CPU_MAP_TOOL_COPT,
     CPU_MAP_TOOL_CPURULES,
     CPU_MAP_TOOL_LIBNAME,
+    CPU_MAP_TOOL_EZ80CLANG,
     CPU_MAP_TOOL_SIZE,
 };
 
@@ -76,13 +77,16 @@ enum {
     CPU_TYPE_Z80 = 0,
     CPU_TYPE_Z80N,
     CPU_TYPE_Z180,
-    CPU_TYPE_R2K,
+    CPU_TYPE_R2KA,
     CPU_TYPE_R3K,
+    CPU_TYPE_R4K,
     CPU_TYPE_8080,
     CPU_TYPE_8085,
     CPU_TYPE_GBZ80,
     CPU_TYPE_EZ80,
+    CPU_TYPE_KC160,
     CPU_TYPE_IXIY,
+    CPU_TYPE_STRICT,
     CPU_TYPE_SIZE
 };
 
@@ -150,6 +154,7 @@ static void            PragmaExport(option *arg, char *);
 static void            PragmaRedirect(option *arg, char *);
 static void            PragmaNeed(option *arg, char *);
 static void            PragmaBytes(option *arg, char *);
+static void            PragmaString(option *arg, char *);
 static void            PragmaInclude(option *arg, char *);
 static void            AddArray(arg_t *arg, char *);
 static void            conf_opt_code_speed(option *arg, char *);
@@ -179,9 +184,9 @@ static void            parse_configfile_line(char *config_line);
 static void            KillEOL(char *line);
 static int             add_variant_args(char *wanted, int num_choices, char **choices);
 
-static void            configure_assembler();
-static void            configure_compiler();
-static void            configure_misc_options();
+static void            configure_assembler(void);
+static void            configure_compiler(void);
+static void            configure_misc_options(void);
 static void            configure_maths_library(char **libstring);
 
 static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext);
@@ -197,8 +202,8 @@ static void            find_zcc_config_fileFile(const char *program, char *arg, 
 static void            parse_option(char *option);
 static void            add_zccopt(char *fmt, ...);
 static char           *replace_str(const char *str, const char *old, const char *new);
-static void            setup_default_configuration();
-static void            print_specs();
+static void            setup_default_configuration(void);
+static void            print_specs(void);
 static int             isquote(unsigned char c);
 static char           *qstrtok(char *s, const char *delim);
 static char           *strip_inner_quotes(char *p);
@@ -302,8 +307,9 @@ static int             linker_output_separate_arg = 0;
 
 static enum iostyle    compiler_style = outimplied;
 
-#define CC_SCCZ80 0
-#define CC_SDCC   1
+#define CC_SCCZ80    0
+#define CC_SDCC      1
+#define CC_EZ80CLANG 2
 static char           *c_compiler_type = "sccz80";
 static int             compiler_type = CC_SCCZ80;
 
@@ -328,12 +334,13 @@ static char  *c_options = NULL;
 
 static char  *c_z80asm_exe = "z88dk-z80asm";
 
+static char  *c_ez80clang_exe = "ez80-clang";
 static char  *c_clang_exe = "zclang";
 static char  *c_llvm_exe = "zllvm-cbe";
 static char  *c_sdcc_exe = "z88dk-zsdcc";
 static char  *c_sccz80_exe = "z88dk-sccz80";
 static char  *c_cpp_exe = "z88dk-ucpp";
-static char  *c_sdcc_preproc_exe = "z88dk-zsdcpp";
+static char  *c_sdcc_preproc_exe = "z88dk-ucpp";
 static char  *c_zpragma_exe = "z88dk-zpragma";
 static char  *c_copt_exe = "z88dk-copt";
 static char  *c_appmake_exe = "z88dk-appmake";
@@ -354,6 +361,7 @@ static char  *c_coptrules_user = NULL;
 static char  *c_coptrules_sccz80 = NULL;
 static char  *c_coptrules_target = NULL;
 static char  *coptrules_cpu = NULL;
+static char  *c_ez80clang_opt = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
@@ -372,7 +380,7 @@ static char  *c_asmopts = NULL;
 static char  *c_altmathlib = NULL;
 static char  *c_altmathflags = NULL;        /* "-math-z88 -D__NATIVE_MATH__"; */
 static char  *c_startuplib = "z80_crt0";
-static char  *c_genmathlib = "genmath";
+static char  *c_genmathlib = "genmath@{ZCC_LIBCPU}";
 static int    c_stylecpp = outspecified;
 
 static char  *c_extension = NULL;
@@ -424,6 +432,7 @@ static arg_t  config[] = {
     { "COPTRULES9", 0, SetStringConfig, &c_coptrules9, NULL, "", "\"DESTDIR/lib/z80rules.9\"" },
     { "COPTRULESINLINE", 0, SetStringConfig, &c_coptrules_sccz80, NULL, "Optimisation file for inlining sccz80 ops", "\"DESTDIR/lib/z80rules.8\"" },
     { "COPTRULESTARGET", 0, SetStringConfig, &c_coptrules_target, NULL, "Optimisation file for target specific operations",NULL },
+    { "EZ80CLANGRULES", 0, SetStringConfig, &c_ez80clang_opt, NULL, "Rules for ez80 clang", "DESTDIR/lib/clang_rules.1"},
     { "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1\"" },
     { "SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2\"" },
     { "SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3\"" },
@@ -462,12 +471,15 @@ static option options[] = {
     { 0, "m8085", OPT_ASSIGN|OPT_INT, "Generate output for the i8085", &c_cpu, NULL, CPU_TYPE_8085 },
     { 0, "mz80", OPT_ASSIGN|OPT_INT, "Generate output for the z80", &c_cpu, NULL, CPU_TYPE_Z80 },
     { 0, "mz80_ixiy", OPT_ASSIGN|OPT_INT, "Generate output for the z80 with ix/iy swap", &c_cpu, NULL, CPU_TYPE_IXIY },
+    { 0, "mz80_strict", OPT_ASSIGN|OPT_INT, "Generate output for the documented z80", &c_cpu, NULL, CPU_TYPE_STRICT },
     { 0, "mz80n", OPT_ASSIGN|OPT_INT, "Generate output for the z80n", &c_cpu, NULL, CPU_TYPE_Z80N },
     { 0, "mz180", OPT_ASSIGN|OPT_INT, "Generate output for the z180", &c_cpu, NULL, CPU_TYPE_Z180 },
-    { 0, "mr2ka", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000", &c_cpu, NULL, CPU_TYPE_R2K },
+    { 0, "mr2ka", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000", &c_cpu, NULL, CPU_TYPE_R2KA },
     { 0, "mr3k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 3000", &c_cpu, NULL, CPU_TYPE_R3K },
+    { 0, "mr4k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 4000", &c_cpu, NULL, CPU_TYPE_R4K },
     { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the gbz80", &c_cpu, NULL, CPU_TYPE_GBZ80 },
     { 0, "mez80_z80", OPT_ASSIGN|OPT_INT, "Generate output for the ez80 (z80 mode)", &c_cpu, NULL, CPU_TYPE_EZ80 },
+    { 0, "mkc160", OPT_ASSIGN|OPT_INT, "Generate output for the KC160 (z80 mode)", &c_cpu, NULL, CPU_TYPE_KC160 },
 
     { 0, "", OPT_HEADER, "Target options:", NULL, NULL, 0 },
     { 0, "subtype", OPT_STRING,  "Set the target subtype" , &c_subtype, NULL, 0},
@@ -484,7 +496,8 @@ static option options[] = {
     { 0, "pragma-output", OPT_FUNCTION,  "Define the option in zcc_opt.def (same as above)" , NULL, PragmaDefine, 0},
     { 0, "pragma-export", OPT_FUNCTION,  "Define the option in zcc_opt.def and export as public" , NULL, PragmaExport, 0},
     { 0, "pragma-need", OPT_FUNCTION,  "NEED the option in zcc_opt.def" , NULL, PragmaNeed, 0},
-    { 0, "pragma-bytes", OPT_FUNCTION,  "Dump a string of bytes zcc_opt.def" , NULL, PragmaBytes, 0},
+    { 0, "pragma-bytes", OPT_FUNCTION,  "Dump a sequence of bytes zcc_opt.def" , NULL, PragmaBytes, 0},
+    { 0, "pragma-string", OPT_FUNCTION,  "Dump a string zcc_opt.def" , NULL, PragmaString, 0},
     { 0, "pragma-include", OPT_FUNCTION,  "Process include file containing pragmas" , NULL, PragmaInclude, 0},
 
     { 0, "", OPT_HEADER, "Lifecycle options:", NULL, NULL, 0 },
@@ -563,18 +576,20 @@ static option options[] = {
 
 
 cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
-    {{ "-mz80"   , "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", ""   }},          /* CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
-    {{ "-mz80n"  , "-mz80n"  , "-mz80n"  , "-mz80n","DESTDIR/lib/arch/z80n/z80n_rules.1", "_z80n"  }},          /* CPU_TYPE_Z80N    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC                */
-    {{ "-mz180"  , "-mz180"  , "-mz180 -portmode=z180", "-mz180", "DESTDIR/lib/arch/z180/z180_rules.1", "_z180" }},    /* CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mr2ka"  , "-mr2ka"  , "-mr2ka"  , "-mr2ka", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2k"  }},          /* CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mr3k"   , "-mr3k"   , "-mr3ka"  , "-mr3k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2k"   }},          /* CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-m8080"  , "-m8080"  , "-mz80"   , "-m8080", "DESTDIR/lib/arch/8080/8080_rules.1", "_8080"  }},          /* CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-m8085"  , "-m8085"  , "-mz80"   , "-m8085", "DESTDIR/lib/arch/8085/8085_rules.1", "_8085"  }},          /* CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mgbz80" , "-mgbz80" , "-msm83" , "-mgbz80", "DESTDIR/lib/arch/gbz80/gbz80_rules.1", "_gbz80" }},       /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mez80_z80"   , "-mez80_z80" ,  "-mez80_z80" ,   "-mez80", "DESTDIR/lib/arch/ez80/ez80_rules.1", "_ez80_z80" }},           /* CPU_TYPE_EZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mz80 -IXIY"   , "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", "_ixiy"   }},          /* CPU_TYPE_IXIY     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
+    {{ "-mz80"   , "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", "", "-triple z80"   }},          /* CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
+    {{ "-mz80n"  , "-mz80n"  , "-mz80n"  , "-mz80n","DESTDIR/lib/arch/z80n/z80n_rules.1", "_z80n", "-triple z80"  }},          /* CPU_TYPE_Z80N    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC                */
+    {{ "-mz180"  , "-mz180"  , "-mz180 -portmode=z180", "-mz180", "DESTDIR/lib/arch/z180/z180_rules.1", "_z180", "-triple z180" }},    /* CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mr2ka"  , "-mr2ka"  , "-mr2ka"  , "-mr2ka", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2ka", NULL  }},          /* CPU_TYPE_R2KA     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mr3k"   , "-mr3k"   , "-mr3ka"  , "-mr3k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2ka", NULL   }},          /* CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mr4k"   , "-mr4k"   , "-mr4ka"  , "-mr4k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r4k", NULL   }},          /* CPU_TYPE_R4K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-m8080"  , "-m8080"  , NULL   , "-m8080", "DESTDIR/lib/arch/8080/8080_rules.1", "_8080", NULL  }},          /* CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-m8085"  , "-m8085"  , NULL   , "-m8085", "DESTDIR/lib/arch/8085/8085_rules.1", "_8085", NULL  }},          /* CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mgbz80" , "-mgbz80" , "-msm83" , "-mgbz80", "DESTDIR/lib/arch/gbz80/gbz80_rules.1", "_gbz80", NULL }},       /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mez80_z80"   , "-mez80_z80" ,  "-mez80_z80" ,   "-mez80", "DESTDIR/lib/arch/ez80/ez80_rules.1", "_ez80_z80",  "-triple z80" }},           /* CPU_TYPE_EZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mkc160" , "-mkc160" ,  "-mz80" , "-mkc160", "DESTDIR/lib/arch/kc160/kc160_rules.1", "_kc160",  "-triple z180" }},           /* CPU_TYPE_KC160   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mz80 -IXIY"   , "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", "_ixiy",  "-triple z80"   }},          /* CPU_TYPE_IXIY     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
+    {{ "-mz80_strict",  "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", "_strict",  "-triple z80"   }},          /* CPU_TYPE_STRICT  : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
 };
-
 
 char *select_cpu(int n)
 {
@@ -690,12 +705,12 @@ static char *changesuffix(char *name, char *suffix)
     return (r);
 }
 
-static int explicit_file_type_defined()
+static int explicit_file_type_defined(void)
 {
     return explicit_file_type_c;
 }
 
-static char* get_explicit_file_type()
+static char* get_explicit_file_type(void)
 {
     if (explicit_file_type_c) {
         return ".c";
@@ -1291,7 +1306,7 @@ int main(int argc, char **argv)
         if (i == nfiles) i = 0;                            /* HACK 2 OF 2 */
         if (verbose) printf("\nPROCESSING %s\n", original_filenames[i]);
     SWITCH_REPEAT:
-        switch (get_filetype_by_suffix(filelist[i]))
+        switch ( (ft = get_filetype_by_suffix(filelist[i])))
         {
         case M4FILE:
             // Strip off the .m4 suffix and find the underlying extension
@@ -1350,6 +1365,7 @@ int main(int argc, char **argv)
             original_filenames[i] = ptr;
             filelist[i] = muststrdup(ptr);
         case CFILE:
+        case CXXFILE:
             if (m4only) continue;
             /* special treatment for clang+llvm */
             if ((strcmp(c_compiler_type, "clang") == 0) && !hassuffix(filelist[i], ".cbe.c")) {
@@ -1361,15 +1377,14 @@ int main(int argc, char **argv)
             if (hassuffix(filelist[i], ".cbe.c"))
                 BuildOptions(&cpparg, clangcpparg);
             /* past clang+llvm related pre-processing */
-            if (compiler_type == CC_SDCC) {
+            if (compiler_type == CC_SDCC || compiler_type == CC_EZ80CLANG) {
                 char zpragma_args[1024];
                 snprintf(zpragma_args, sizeof(zpragma_args),"-zcc-opt=\"%s\"", zcc_opt_def);
-                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
+                if (process(ft == CXXFILE ? ".cpp" : ".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
                     exit(1);
-            }
-            else {
+            } else {
                 char zpragma_args[1024];
                 snprintf(zpragma_args, sizeof(zpragma_args),"-sccz80 -zcc-opt=\"%s\"", zcc_opt_def);
 
@@ -1379,9 +1394,26 @@ int main(int argc, char **argv)
                     exit(1);
             }
         case CPPFILE:
-            if (m4only || clangonly || llvmonly || preprocessonly) continue;
-            if (process(".i", ".opt", c_compiler, comparg, compiler_style, i, YES, NO))
-                exit(1);
+            {
+                char *compiler_arg = NULL;
+
+                if (m4only || clangonly || llvmonly || preprocessonly) continue;
+
+                if ( get_filetype_by_suffix(original_filenames[i]) == CXXFILE ) {
+                    if ( compiler_type != CC_EZ80CLANG) {
+                        fprintf(stderr, "Only -compiler=ez80clang supports c++\n");
+                        exit(1);
+                    }
+                    // Nobble compiler args so we compile c++
+                    compiler_arg = replace_str(comparg, "-cc1", "-cc1 -x c++");
+                } else {
+                    compiler_arg = strdup(comparg);
+                }
+            
+                if (process(".i", ".opt", c_compiler, compiler_arg, compiler_style, i, YES, NO))
+                    exit(1);
+                free(compiler_arg);
+            }
         case OPTFILE:
             if (m4only || clangonly || llvmonly || preprocessonly) continue;
             if (compiler_type == CC_SDCC) {
@@ -1428,6 +1460,14 @@ int main(int argc, char **argv)
                     apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".s");
                 else
                     apply_copt_rules(i, num_rules, rules, ".op1", ".opt", ".asm");
+            } else if ( compiler_type == CC_EZ80CLANG) {
+                char  *rules[MAX_COPT_RULE_FILES];
+                int    num_rules = 0;
+
+                rules[num_rules++] = c_ez80clang_opt;
+
+                apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
+
             } else {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
@@ -1630,8 +1670,10 @@ int main(int argc, char **argv)
         if (nfiles > 1) outputfile = NULL;
         copy_output_files_to_destdir(".asm", 1);
         copy_output_files_to_destdir(".s", 1);
+        copy_output_files_to_destdir(".adb", 1);
         exit(0);
     }
+    copy_output_files_to_destdir(".adb", 1);
 
     {
         char *tempofile = outputfile;
@@ -2096,6 +2138,8 @@ int get_filetype_by_suffix(char *name)
     }
     if (strcmp(ext, ".c") == 0)
         return CFILE;
+    if (strcmp(ext, ".cpp") == 0)
+        return CXXFILE;
     if (strcmp(ext, ".i") == 0)
         return CPPFILE;
     if (strcmp(ext, ".opt") == 0)
@@ -2756,7 +2800,7 @@ void parse_configfile_line(char *arg)
     return;
 }
 
-static void configure_misc_options()
+static void configure_misc_options(void)
 {
     char     buf[256];
 
@@ -2814,7 +2858,7 @@ static void configure_maths_library(char **libstring)
     }
 }
 
-static void configure_assembler()
+static void configure_assembler(void)
 {
     char            buf[FILENAME_MAX+1];
     char           *assembler = NULL;
@@ -2848,18 +2892,27 @@ static void configure_assembler()
 
 
 
-static void configure_compiler()
+static void configure_compiler(void)
 {
     char *preprocarg;
     char  buf[256];
 
     compiler_type = CC_SCCZ80;
+    BuildOptions(&cpparg, "-D__Z88DK");
 
     /* compiler= */
     if ((strcmp(c_compiler_type, "clang") == 0) || (strcmp(c_compiler_type, "sdcc") == 0)) {
+        char *cpuarg = select_cpu(CPU_MAP_TOOL_ZSDCC);
+
+        if ( cpuarg == NULL ) {
+            fprintf(stderr, "Selected CPU is not supported by zsdcc\n");
+            exit(1);
+        }
+
+
         compiler_type = CC_SDCC;
         snprintf(buf, sizeof(buf), "%s --no-optsdcc-in-asm --c1mode --emit-externs %s %s %s ", \
-            select_cpu(CPU_MAP_TOOL_ZSDCC), \
+            cpuarg, \
             (sdcc_signed_char ? "--fsigned-char" : ""), \
             (c_code_in_asm ? "" : "--no-c-code-in-asm"), \
             (opt_code_size ? "--opt-code-size" : ""));
@@ -2880,8 +2933,8 @@ static void configure_compiler()
     } else if (strcmp(c_compiler_type,"sccz80") == 0 ) {
         preprocarg = " -DSCCZ80 -DSMALL_C -D__SCCZ80";
         BuildOptions(&cpparg, preprocarg);
-                BuildOptions(&asmargs, "-D__SCCZ80");
-                BuildOptions(&linkargs, "-D__SCCZ80");
+        BuildOptions(&asmargs, "-D__SCCZ80");
+        BuildOptions(&linkargs, "-D__SCCZ80");
         /* Indicate to sccz80 what assembler we want */
         snprintf(buf, sizeof(buf), "-ext=opt %s -zcc-opt=\"%s\"", select_cpu(CPU_MAP_TOOL_SCCZ80),zcc_opt_def);
         add_option_to_compiler(buf);
@@ -2902,6 +2955,23 @@ static void configure_compiler()
         }
         c_compiler = c_sccz80_exe;
         compiler_style = outspecified_flag;
+    } else if (strcmp(c_compiler_type,"ez80clang") == 0 ) {
+        char *cpuarg = select_cpu(CPU_MAP_TOOL_EZ80CLANG);
+
+        if ( cpuarg == NULL ) {
+            fprintf(stderr, "Selected CPU is not supported by ez80-clang\n");
+            exit(1);
+        }
+
+        preprocarg = " -E -D__CLANG";
+        BuildOptions(&cpparg, preprocarg);
+        snprintf(buf, sizeof(buf), "-cc1 %s -S -O3", cpuarg);
+        add_option_to_compiler(buf);
+        compiler_type = CC_EZ80CLANG;
+        c_compiler = c_ez80clang_exe;
+        c_cpp_exe = c_ez80clang_exe;
+        compiler_style = filter_outspecified_flag;
+        c_stylecpp = filter_out;
     } else {
         printf("Unknown compiler type: %s\n",c_compiler_type);
         exit(1);
@@ -3014,8 +3084,26 @@ void PragmaBytes(option *arg, char *val)
     }
 
     add_zccopt("\nIF NEED_%s\n", ptr);
-    add_zccopt("\tDEFINED\tDEFINED_NEED_%s\n", ptr);
+    add_zccopt("\tDEFINE\tDEFINED_NEED_%s\n", ptr);
     add_zccopt("\tdefb\t%s\n", value);
+    add_zccopt("ENDIF\n\n");
+}
+
+void PragmaString(option *arg, char *val)
+{
+    char *ptr = val;
+    char *value;
+
+    if ((value = strchr(ptr, '=')) != NULL) {
+        *value++ = 0;
+    }
+    else {
+        return;
+    }
+
+    add_zccopt("\nIF NEED_%s\n", ptr);
+    add_zccopt("\tDEFINE\tDEFINED_NEED_%s\n", ptr);
+    add_zccopt("\tdefm\t\"%s\"\n", value);
     add_zccopt("ENDIF\n\n");
 }
 
@@ -3089,7 +3177,7 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
                         exit(1);
                     }
                 }
-            }
+            } 
 
             free(ptr);
         }
@@ -3293,7 +3381,7 @@ char *replace_str(const char *str, const char *old, const char *new)
     return ret;
 }
 
-static void setup_default_configuration()
+static void setup_default_configuration(void)
 {
     char    buf[1024];
     arg_t  *pargs = config;
@@ -3307,7 +3395,7 @@ static void setup_default_configuration()
     }
 }
 
-static void print_specs()
+static void print_specs(void)
 {
     arg_t  *pargs = config;
     int     i;

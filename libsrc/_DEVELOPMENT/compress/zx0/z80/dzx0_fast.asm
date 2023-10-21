@@ -198,13 +198,21 @@ RepMatch:
         inc     c
         add     a, a
         jr      nc, LongerRepMatch
+IF __CPU_R4K__ | __CPU_R5K__
+        jp      nz, CopyMatch1          ; NZ after NC == "confirmed C"
+ELSE
         jr      nz, CopyMatch1          ; NZ after NC == "confirmed C"
+ENDIF
         
         ld      a, (hl)                 ; reload bits
         inc     hl
         rla
 
+IF __CPU_R4K__ | __CPU_R5K__
+        jp      c, CopyMatch1
+ELSE
         jr      c, CopyMatch1
+ENDIF
 
 LongerRepMatch:
         add     a, a                    ; inline read gamma

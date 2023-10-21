@@ -3,13 +3,27 @@ Z88DK Z80 Module Assembler Change Log
 
 2023
 ----
-2023-03-16 Fix #2066: Use boost::filesystem as fallback to std::filesystem from C++17
+2023-03-16 Fix #2066: use boost::filesystem as fallback to std::filesystem from C++17
 2023-03-19 Fix nightly build failure - z80asm cannot find std::filesystem dll entry point
-2023-04-17 Fix #2227: Support #ifdef/#endif etc in assembler
+2023-04-17 Fix #2227: support #ifdef/#endif etc in assembler
 2023-05-13 Fix #2254: move the object file into place once it's been generated
 2023-05-13 Fix #2251: accept ':' as statement separator
 2023-05-18 Fix #2260: output dir prepended twice
-2023-06--9 Fix #2279: add support to ez80, both z80 memory mode and ADL memory mode
+2023-06-09 Fix #2279: add support to ez80, both z80 memory mode and ADL memory mode
+2023-07-05 Fix #2338, #2333: add -raw-strings option
+2023-08-09 Fix #2320: do not link with object files built for a different cpu
+2023-08-09 Fix #2320: add -IXIY-soft that swaps index registers but saves object file as not-swapped
+2023-08-09 Fix #2320: add symbol table to libraries to speed-up linking
+2023-08-09 Fix #2373: create cpu z80_strict with just the documented opcodes
+2023-08-09 Fix #2373: allow the creation of fat libraries with the same code for all CPUs (-m*)
+2023-08-09 Fix #2377: add support of r800
+2023-09-12 Add EQ, NE, LTU, LEU, GTU, GEU condition codes
+2023-09-29 Fix #0577: allow any flag in expressions
+2023-10-03 Fix #2388: add support of r4k and r5k
+2023-10-05 Fix #2402: add support of kc160
+2023-10-16 Fix #2420: detect '-lstdc++fs', remove external Perl dependencies
+2023-10-16 Fix #2417: accept file names with spaces in list files without quotes
+2023-10-17 Fix #2422: Parallel build issues
 
 2022
 ----

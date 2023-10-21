@@ -6,7 +6,7 @@
 ; 
 ;	int __CALLEE__ zx_setfloat_callee(char *variable, float value); 
 ; 
-;	$Id: zx_setfloat_callee.asm,v 1.6 2016-06-26 20:32:08 dom Exp $ 
+;	$Id: zx_setfloat_callee.asm $
 ;  	
 
 SECTION code_clib
@@ -64,7 +64,8 @@ vlcount:
 	ld	hl,($4014)      ; E_LINE
 	dec	hl		; now HL points to end of VARS
 IF FORlambda
-	call	$1CB5
+	EXTERN  __lambda_make_room
+	call    __lambda_make_room
 ELSE
 	;;ld	hl,(16400)	; VARS
 	call	$099E		; MAKE-ROOM

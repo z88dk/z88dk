@@ -11,8 +11,26 @@ PUBLIC l_divu_32_32x8, l0_divu_32_32x8
 
    ; alternate entry (l0_divu_32_32x8)
    ; skips divide by zero check
+IF __CPU_KC160__
+l_divu_32_32x8:
 
-IF __CLIB_OPT_IMATH <= 50
+   scf
+
+l0_divu_32_32x8:
+
+   EXTERN l_kc160_divu_32_32x16, l0_kc160_divu_32_32x16
+   ld b,0
+
+   call nc, l0_kc160_divu_32_32x16
+   call c, l_kc160_divu_32_32x16
+
+   exx
+   ld a,l
+   exx
+
+   ret   
+
+ELIF __CLIB_OPT_IMATH <= 50
 
    EXTERN l_small_divu_32_32x32, l0_small_divu_32_32x32
 
@@ -23,29 +41,27 @@ l_divu_32_32x8:
 l0_divu_32_32x8:
 
    ld a,c
-   
+
    exx
-   
+
    ld l,a
    ld de,0
    ld h,d
-   
+
    call nc, l0_small_divu_32_32x32
    call c, l_small_divu_32_32x32
-   
+
    exx
    ld a,l
    exx
-   
+
    ret
 
-ENDIF
-
-IF __CLIB_OPT_IMATH > 50
+ELIF __CLIB_OPT_IMATH > 50
 
    EXTERN l_fast_divu_32_32x8, l0_fast_divu_32_32x8
-   
-   defc  l_divu_32_32x8 =  l_fast_divu_32_32x8
+
+   defc l_divu_32_32x8 =  l_fast_divu_32_32x8
    defc l0_divu_32_32x8 = l0_fast_divu_32_32x8
 
 ENDIF

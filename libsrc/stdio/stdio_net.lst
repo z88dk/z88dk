@@ -1,4 +1,4 @@
-stdio/obj/net/zsock/fgetc_net
-stdio/obj/net/zsock/fputc_net
-stdio/obj/net/zsock/fopen_zsock
-stdio/obj/net/zsock/zsock_trampoline
+stdio/obj/${TYPE}/zsock/fgetc_net
+stdio/obj/${TYPE}/zsock/fputc_net
+stdio/obj/${TYPE}/zsock/fopen_zsock
+stdio/obj/${TYPE}/zsock/zsock_trampoline

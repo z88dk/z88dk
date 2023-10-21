@@ -1,6 +1,7 @@
 SECTION code_clib
 PUBLIC open
 PUBLIC _open
+PUBLIC ___open
 
 INCLUDE "target/agon/def/mos_api.inc"
 
@@ -15,6 +16,7 @@ INCLUDE "target/agon/def/mos_api.inc"
 
 open:
 _open:
+___open:
     push	ix
     ld      ix,2
     add     ix,sp

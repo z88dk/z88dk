@@ -44,7 +44,7 @@ static bool is_big_endian() {
 	else if (*c == 0x10)
 		return false;
 	else {
-		assert(0);
+		Assert(0);
 		return false;	// not reached
 	}
 }
@@ -367,13 +367,12 @@ vector<uint8_t> float_to_am9511(double value) {
 
 //-----------------------------------------------------------------------------
 
-FloatExpr::FloatExpr(Lexer& lexer)
-	: m_lexer(lexer) {}
-
-bool FloatExpr::parse() {
+bool FloatExpr::parse(ScannedLine& line) {
 	m_parse_error = m_eval_error = false;
 	errno = 0;
+    m_line = &line;
 	m_value = parse_expr();
+    m_line = nullptr;
 	if (errno != 0)
 		m_eval_error = true;
 	return !m_parse_error;
@@ -387,9 +386,9 @@ double FloatExpr::parse_addition() {
 	double a = parse_multiplication();
 	if (m_parse_error) return 0.0;
 
-	while (m_lexer.peek().is(TType::Plus, TType::Minus)) {
-		TType op = m_lexer.peek().ttype;
-		m_lexer.next();
+	while (m_line->peek().is(TType::Plus, TType::Minus)) {
+		TType op = m_line->peek().type();
+		m_line->next();
 
 		double b = parse_multiplication();
 		if (m_parse_error) return 0.0;
@@ -406,14 +405,14 @@ double FloatExpr::parse_multiplication() {
 	double a = parse_power();
 	if (m_parse_error) return 0.0;
 
-	while (m_lexer.peek().is(TType::Mul, TType::Div)) {
-		TType op = m_lexer.peek().ttype;
-		m_lexer.next();
+	while (m_line->peek().is(TType::Mult, TType::Div)) {
+		TType op = m_line->peek().type();
+		m_line->next();
 
 		double b = parse_power();
 		if (m_parse_error) return 0.0;
 
-		if (op == TType::Mul)
+		if (op == TType::Mult)
 			a *= b;
 		else if (b == 0.0) {
 			m_eval_error = true;		// division by zero
@@ -429,8 +428,8 @@ double FloatExpr::parse_power() {
 	double a = parse_unary();
 	if (m_parse_error) return 0.0;
 
-	while (m_lexer.peek().is(TType::Pow)) {
-		m_lexer.next();
+	while (m_line->peek().is(TType::Power)) {
+		m_line->next();
 
 		double b = parse_power();
 		if (m_parse_error) return 0.0;
@@ -442,27 +441,27 @@ double FloatExpr::parse_power() {
 
 double FloatExpr::parse_unary() {
 	double a;
-	switch (m_lexer.peek().ttype) {
+	switch (m_line->peek().type()) {
 	case TType::Minus:
-		m_lexer.next();
+		m_line->next();
 		a = parse_unary();
 		if (m_parse_error) return 0.0;
 		return -a;
 	case TType::Plus:
-		m_lexer.next();
+		m_line->next();
 		a = parse_unary();
 		if (m_parse_error) return 0.0;
 		return a;
 	case TType::LParen:
-		m_lexer.next();
+		m_line->next();
 		a = parse_expr();
 		if (m_parse_error) return 0.0;
-		if (!m_lexer.peek().is(TType::RParen)) {
+		if (!m_line->peek().is(TType::RParen)) {
 			m_parse_error = true;
 			return 0.0;
 		}
 		else {
-			m_lexer.next();
+			m_line->next();
 			return a;
 		}
 	default:
@@ -474,46 +473,46 @@ double FloatExpr::parse_unary() {
 
 double FloatExpr::parse_primary() {
 	double a;
-	switch (m_lexer.peek().ttype) {
+	switch (m_line->peek().type()) {
 	case TType::Integer: 
-		a = (double)m_lexer.peek().ivalue;
-		m_lexer.next();
+		a = (double)m_line->peek().ivalue();
+		m_line->next();
 		return a;
 	case TType::Floating: 
-		a = m_lexer.peek().fvalue;
-		m_lexer.next();
+		a = m_line->peek().fvalue();
+		m_line->next();
 		return a;
 	case TType::Ident:
-        switch (m_lexer.peek().keyword) {
-		case Keyword::SIN: m_lexer.next(); return parse_func(sin);
-		case Keyword::COS: m_lexer.next(); return parse_func(cos);
-		case Keyword::TAN: m_lexer.next(); return parse_func(tan);
-		case Keyword::ASIN: m_lexer.next(); return parse_func(asin);
-		case Keyword::ACOS: m_lexer.next(); return parse_func(acos);
-		case Keyword::ATAN: m_lexer.next(); return parse_func(atan);
-		case Keyword::ATAN2: m_lexer.next(); return parse_func2(atan2);
-		case Keyword::SINH: m_lexer.next(); return parse_func(sinh);
-		case Keyword::COSH: m_lexer.next(); return parse_func(cosh);
-		case Keyword::TANH: m_lexer.next(); return parse_func(tanh);
-        case Keyword::ASINH: m_lexer.next(); return parse_func(asinh);
-        case Keyword::ACOSH: m_lexer.next(); return parse_func(acosh);
-        case Keyword::ATANH: m_lexer.next(); return parse_func(atanh);
-        case Keyword::LOG: m_lexer.next(); return parse_func(log);
-        case Keyword::LOG10: m_lexer.next(); return parse_func(log10);
-        case Keyword::LOG2: m_lexer.next(); return parse_func(log2);
-        case Keyword::EXP: m_lexer.next(); return parse_func(exp);
-        case Keyword::EXP2: m_lexer.next(); return parse_func(exp2);
-        case Keyword::POW: m_lexer.next(); return parse_func2(pow);
-        case Keyword::SQRT: m_lexer.next(); return parse_func(sqrt);
-        case Keyword::CBRT: m_lexer.next(); return parse_func(cbrt);
-        case Keyword::CEIL: m_lexer.next(); return parse_func(ceil);
-        case Keyword::FLOOR: m_lexer.next(); return parse_func(floor);
-        case Keyword::TRUNC: m_lexer.next(); return parse_func(trunc);
-        case Keyword::ABS: m_lexer.next(); return parse_func(abs);
-        case Keyword::HYPOT: m_lexer.next(); return parse_func2(hypot);
-        case Keyword::FMOD: m_lexer.next(); return parse_func2(fmod);
-		case Keyword::PI: m_lexer.next(); return atan(1)*4;
-		case Keyword::E: m_lexer.next(); return exp(1);
+        switch (m_line->peek().keyword()) {
+		case Keyword::SIN: m_line->next(); return parse_func(sin);
+		case Keyword::COS: m_line->next(); return parse_func(cos);
+		case Keyword::TAN: m_line->next(); return parse_func(tan);
+		case Keyword::ASIN: m_line->next(); return parse_func(asin);
+		case Keyword::ACOS: m_line->next(); return parse_func(acos);
+		case Keyword::ATAN: m_line->next(); return parse_func(atan);
+		case Keyword::ATAN2: m_line->next(); return parse_func2(atan2);
+		case Keyword::SINH: m_line->next(); return parse_func(sinh);
+		case Keyword::COSH: m_line->next(); return parse_func(cosh);
+		case Keyword::TANH: m_line->next(); return parse_func(tanh);
+        case Keyword::ASINH: m_line->next(); return parse_func(asinh);
+        case Keyword::ACOSH: m_line->next(); return parse_func(acosh);
+        case Keyword::ATANH: m_line->next(); return parse_func(atanh);
+        case Keyword::LOG: m_line->next(); return parse_func(log);
+        case Keyword::LOG10: m_line->next(); return parse_func(log10);
+        case Keyword::LOG2: m_line->next(); return parse_func(log2);
+        case Keyword::EXP: m_line->next(); return parse_func(exp);
+        case Keyword::EXP2: m_line->next(); return parse_func(exp2);
+        case Keyword::POW: m_line->next(); return parse_func2(pow);
+        case Keyword::SQRT: m_line->next(); return parse_func(sqrt);
+        case Keyword::CBRT: m_line->next(); return parse_func(cbrt);
+        case Keyword::CEIL: m_line->next(); return parse_func(ceil);
+        case Keyword::FLOOR: m_line->next(); return parse_func(floor);
+        case Keyword::TRUNC: m_line->next(); return parse_func(trunc);
+        case Keyword::ABS: m_line->next(); return parse_func(abs);
+        case Keyword::HYPOT: m_line->next(); return parse_func2(hypot);
+        case Keyword::FMOD: m_line->next(); return parse_func2(fmod);
+		case Keyword::PI: m_line->next(); return atan(1)*4;
+		case Keyword::E: m_line->next(); return exp(1);
 		default:
 			m_parse_error = true;
 			return 0.0;
@@ -525,7 +524,7 @@ double FloatExpr::parse_primary() {
 }
 
 double FloatExpr::parse_func(double(*f)(double)) {
-	if (!m_lexer.peek().is(TType::LParen)) {
+	if (!m_line->peek().is(TType::LParen)) {
 		m_parse_error = true;
 		return 0.0;
 	}
@@ -537,30 +536,30 @@ double FloatExpr::parse_func(double(*f)(double)) {
 }
 
 double FloatExpr::parse_func2(double(*f)(double, double)) {
-	if (!m_lexer.peek().is(TType::LParen)) {
+	if (!m_line->peek().is(TType::LParen)) {
 		m_parse_error = true;
 		return 0.0;
 	}
 	else {
-		m_lexer.next();
+		m_line->next();
 		double a = parse_expr();
 		if (m_parse_error) return 0.0;
 
-		if (!m_lexer.peek().is(TType::Comma)) {
+		if (!m_line->peek().is(TType::Comma)) {
 			m_parse_error = true;
 			return 0.0;
 		}
 		else {
-			m_lexer.next();
+			m_line->next();
 			double b = parse_expr();
 			if (m_parse_error) return 0.0;
 
-			if (!m_lexer.peek().is(TType::RParen)) {
+			if (!m_line->peek().is(TType::RParen)) {
 				m_parse_error = true;
 				return 0.0;
 			}
 			else {
-				m_lexer.next();
+				m_line->next();
 				return f(a, b);
 			}
 		}
@@ -577,7 +576,7 @@ string FloatFormat::get_type() const {
 	};
 
 	auto found = map.find(m_format);
-	assert(found != map.end());
+	Assert(found != map.end());
 	return found->second;
 }
 
@@ -607,7 +606,7 @@ vector<uint8_t> FloatFormat::float_to_bytes(double value) {
 #		define X(type)	case Format::type: return float_to_##type(value);
 #		include "float.def"
 	default:
-		assert(0); return vector<uint8_t>();
+		Assert(0); return vector<uint8_t>();
 	}
 }
 

@@ -109,8 +109,7 @@ PUBLIC asm_f24_invsqrt
     ld d,a
 
     scf                         ; restore mantissa leading bit
-    rr h
-    rr l
+    rr hl
                                 ; (f24) w[0] in dehl
 
 ;----------- snip ----------    ; Iteration 1

@@ -61,9 +61,9 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		line THE_LINE
 		line THE_LINE, "file1.asm"
 END_ASM
-$test.asm:2: error: constant expression expected
+$test.asm:2: error: syntax error
   ^---- line THE_LINE
-$test.asm:3: error: constant expression expected
+$test.asm:3: error: syntax error
   ^---- line THE_LINE, "file1.asm"
 END_ERR
 
@@ -72,9 +72,9 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		c_line THE_LINE
 		c_line THE_LINE, "file1.asm"
 END_ASM
-$test.asm:2: error: constant expression expected
+$test.asm:2: error: syntax error
   ^---- c_line THE_LINE
-$test.asm:3: error: constant expression expected
+$test.asm:3: error: syntax error
   ^---- c_line THE_LINE, "file1.asm"
 END_ERR
 

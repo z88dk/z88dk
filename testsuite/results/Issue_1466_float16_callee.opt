@@ -11,6 +11,8 @@
 .powf16
 	GLOBAL	_powf16
 ._powf16
+	GLOBAL	___powf16
+.___powf16
 	ld	hl,4	;const
 	call	l_gintspsp	;
 	ld	hl,0	;const
@@ -72,6 +74,8 @@
 	ret
 
 
+	SECTION	bss_compiler
+	SECTION	code_compiler
 
 
 

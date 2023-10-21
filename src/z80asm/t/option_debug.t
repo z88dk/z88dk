@@ -83,11 +83,11 @@ spew("${test}1.map", @map);
 
 check_text_file("${test}1.map", <<'END');
 __C_LINE_0_test_5ft_5foption_5fdebug_2ec = $80CD ; addr, local, , test_t_option_debug_c, , test_t_option_debug.c:0
-__C_LINE_1_test_5ft_5foption_5fdebug_2ec = $80CD ; addr, local, , test_t_option_debug_c, , test_t_option_debug.c:1
+__C_LINE_2_test_5ft_5foption_5fdebug_2ec = $80CD ; addr, local, , test_t_option_debug_c, , test_t_option_debug.c:2
 __C_LINE_0_test_5ft_5foption_5fdebug_2eh = $80CD ; addr, local, , test_t_option_debug_c, , test_t_option_debug.h:0
 __C_LINE_3_test_5ft_5foption_5fdebug_2eh = $80CD ; addr, local, , test_t_option_debug_c, , test_t_option_debug.h:3
-__C_LINE_5_test_5ft_5foption_5fdebug_2eh = $80CD ; addr, local, , test_t_option_debug_c, , test_t_option_debug.h:5
-__C_LINE_2_test_5ft_5foption_5fdebug_2ec = $80CD ; addr, local, , test_t_option_debug_c, , test_t_option_debug.c:2
+__C_LINE_6_test_5ft_5foption_5fdebug_2eh = $80CD ; addr, local, , test_t_option_debug_c, , test_t_option_debug.h:6
+__C_LINE_1_test_5ft_5foption_5fdebug_2ec = $80CD ; addr, local, , test_t_option_debug_c, , test_t_option_debug.c:1
 __C_LINE_2_test_5ft_5foption_5fdebug_2ec_3a_3amain_3a_3a0_3a_3a1 = $829F ; addr, local, , test_t_option_debug_c, code_compiler, test_t_option_debug.c::main::0::1:2
 __C_LINE_3_test_5ft_5foption_5fdebug_2ec_3a_3amain_3a_3a1_3a_3a2 = $82A2 ; addr, local, , test_t_option_debug_c, code_compiler, test_t_option_debug.c::main::1::2:3
 __ASM_LINE_2_test_5ft_5foption_5fdebug1_2easm = $80CD ; addr, local, , test_t_option_debug1_asm, , test_t_option_debug1.asm:2

@@ -55,8 +55,7 @@ l_small_divu_64_64x64:
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
  
-   ld b,(ix+13)
-   ld c,(ix+12)
+   ld bc,(ix+12)
    
    ld a,b
    or c
@@ -124,12 +123,11 @@ loop_0:
    ; rotate remainder left, dividend bit in
 
    adc hl,hl
-   rl e
-   rl d
+   rl de
    exx
+
    adc hl,hl
-   rl e
-   rl d
+   rl de
    exx
    
    ; remainder > divisor ?
@@ -201,27 +199,23 @@ m_32_bit:
    ld l,a
    ld h,a
 
-   ld e,(ix+8)
-   ld d,(ix+9)
+   ld de,(ix+8)
    
-   ld c,(ix+0)
-   ld b,(ix+1)
+   ld bc,(ix+0)
    
    ld a,d
    or e
    
    exx
    
-   ld e,(ix+10)
-   ld d,(ix+11)
+   ld de,(ix+10)
    
    or d
    or e
    
    jr z, divide_by_zero
    
-   ld c,(ix+2)
-   ld b,(ix+3)
+   ld bc,(ix+2)
    
    ld hl,0
    
@@ -234,10 +228,8 @@ m_32_bit:
    ; dehl = quotient
    ; dehl'= remainder
    
-   ld (ix+0),l
-   ld (ix+1),h
-   ld (ix+2),e
-   ld (ix+3),d
+   ld (ix+0),hl
+   ld (ix+2),de
 
    xor a
    
@@ -251,17 +243,13 @@ m_32_bit:
   
 divide_by_zero:
 
-   ld d,(ix+7)
-   ld e,(ix+6)
-   ld h,(ix+5)
-   ld l,(ix+4)
+   ld de,(ix+6)
+   ld hl,(ix+4)
 
    exx
    
-   ld b,(ix+3)
-   ld c,(ix+2)
-   ld d,(ix+1)
-   ld e,(ix+0)
+   ld bc,(ix+2)
+   ld de,(ix+0)
    
    call error_divide_by_zero_mc
    
@@ -273,7 +261,6 @@ divide_by_zero:
    call l_setmem_hl - 16
    
    ex de,hl
-   ld e,c
-   ld d,b
+   ld de,bc
    
    ret

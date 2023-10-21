@@ -9,6 +9,7 @@
 #include "breakpoints.h"
 
 uint8_t verbose = 0;
+char* script_file = NULL;
 
 long long get_st()
 {
@@ -30,14 +31,18 @@ uint16_t get_sp()
     return sp;
 }
 
-uint8_t get_ticks_memory(uint16_t at)
+uint8_t get_ticks_memory(uint32_t at, memtype type)
 {
-    return get_memory(at);
+    return get_memory(at, type);
 }
 
 uint8_t is_verbose()
 {
     return verbose;
+}
+
+char* script_filename() {
+	return script_file;
 }
 
 void get_regs(struct debugger_regs_t* regs)
@@ -146,7 +151,7 @@ void next(uint8_t add_bp)
     int len;
     const unsigned short pc = bk.pc();
 
-    uint8_t opcode = bk.get_memory(pc);
+    uint8_t opcode = bk.get_memory(pc, MEM_TYPE_INST);
 
     len = disassemble2(pc, buf, sizeof(buf), 0);
 
@@ -230,6 +235,7 @@ backend_t ticks_debugger_backend = {
     .enable_breakpoint = &do_nothing,
     .breakpoints_check = &breakpoints_check,
     .is_verbose = is_verbose,
+	.script_filename = script_filename,
     .remote_connect = NULL,
     .is_remote_connected = NULL,
     .console = stdout_log,

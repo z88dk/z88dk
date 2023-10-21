@@ -5,13 +5,19 @@
 #ifndef __LIBGEN_H__
 #define __LIBGEN_H__
 
-extern char __LIB__ *basename(char *path) __smallc __z88dk_fastcall;
+extern char __LIB__ *basename(char *path) __smallc ;
+extern char __LIB__ *basename_fastcall(char *path) __z88dk_fastcall;
+#define basename(a) basename_fastcall(a)
 
 
-extern char __LIB__ *basename_ext(char *path) __smallc __z88dk_fastcall;
+extern char __LIB__ *basename_ext(char *path) __smallc ;
+extern char __LIB__ *basename_ext_fastcall(char *path) __z88dk_fastcall;
+#define basename_ext(a) basename_ext_fastcall(a)
 
 
-extern char __LIB__ *dirname(char *path) __smallc __z88dk_fastcall;
+extern char __LIB__ *dirname(char *path) __smallc ;
+extern char __LIB__ *dirname_fastcall(char *path) __z88dk_fastcall;
+#define dirname(a) dirname_fastcall(a)
 
 
 extern unsigned char __LIB__ glob(const char *s,const char *pattern) __smallc;
@@ -29,7 +35,9 @@ extern unsigned char __LIB__ glob_fat_callee(const char *s,const char *pattern) 
 #define glob_fat(a,b) glob_fat_callee(a,b)
 
 
-extern char __LIB__ *pathnice(char *path) __smallc __z88dk_fastcall;
+extern char __LIB__ *pathnice(char *path) __smallc ;
+extern char __LIB__ *pathnice_fastcall(char *path) __z88dk_fastcall;
+#define pathnice(a) pathnice_fastcall(a)
 
 
 

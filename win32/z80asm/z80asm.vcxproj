@@ -190,21 +190,13 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">
-      <Project>{7d0213a3-87fa-4f56-a5d6-cc23682acad8}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\z80asm-common\z80asm-common.vcxproj">
-      <Project>{00bce225-fe40-4c33-b15e-c8fb6ada74eb}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\src\cpp\args.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\errors.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\defines.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\float.h" />
-    <ClInclude Include="..\..\src\z80asm\src\cpp\lex.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\lstfile.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\preproc.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpp\scan.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\utils.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\alloc.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\array.h" />
@@ -213,6 +205,8 @@
     <ClInclude Include="..\..\src\z80asm\src\c\classlist.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\codearea.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\common.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\cpu_rules.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\cpu_rules_action.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\dbg.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\directives.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\expr1.h" />
@@ -224,11 +218,11 @@
     <ClInclude Include="..\..\src\z80asm\src\c\modlink.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\module1.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\opcodes.h" />
-    <ClInclude Include="..\..\src\z80asm\src\c\parse.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\parse1.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\parse_rules.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\queue.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\reloc_code.h" />
-    <ClInclude Include="..\..\src\z80asm\src\c\scan.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\scan1.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\scan_def.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\scan_rules.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\str.h" />
@@ -245,16 +239,17 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\defines.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\float.cpp" />
-    <ClCompile Include="..\..\src\z80asm\src\cpp\lex.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\lstfile.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\main.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\preproc.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\c\alloc.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\array.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\class.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\codearea.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\common.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\cpu_rules_action.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\dbg.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\directives.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\expr1.c" />
@@ -264,9 +259,9 @@
     <ClCompile Include="..\..\src\z80asm\src\c\modlink.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\module1.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\opcodes.c" />
-    <ClCompile Include="..\..\src\z80asm\src\c\parse.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\parse1.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\reloc_code.c" />
-    <ClCompile Include="..\..\src\z80asm\src\c\scan.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\scan1.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\str.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\strhash.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\sym.c" />
@@ -280,9 +275,15 @@
     <None Include="..\..\src\z80asm\src\cpp\errors.def" />
     <None Include="..\..\src\z80asm\src\cpp\float.def" />
     <None Include="..\..\src\z80asm\src\cpp\keyword.def" />
-    <None Include="..\..\src\z80asm\src\cpp\lex.re" />
+    <None Include="..\..\src\z80asm\src\cpp\scan.def" />
+    <None Include="..\..\src\z80asm\src\cpp\scan.re" />
     <None Include="..\..\src\z80asm\src\c\parse_rules.rl" />
     <None Include="..\..\src\z80asm\src\c\scan_rules.rl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\common.vcxproj">
+      <Project>{d7bc7a18-5bc5-4543-9f93-87a055319826}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

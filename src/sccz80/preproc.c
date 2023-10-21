@@ -17,7 +17,7 @@ static int iflevel = 0; /* current #if nest level */
 static int skiplevel = 0; /* level at which #if skipping started */
 
 
-void junk()
+void junk(void)
 {
     if (an(inbyte()))
         while (an(ch()))
@@ -31,19 +31,19 @@ void junk()
     blanks();
 }
 
-char ch()
+char ch(void)
 {
     return line[lptr];
 }
 
-char nch()
+char nch(void)
 {
     if (ch())
         return line[lptr + 1];
     return 0;
 }
 
-char gch()
+char gch(void)
 {
     int i;
     if (ch()) {
@@ -55,13 +55,13 @@ char gch()
     return 0;
 }
 
-void clear()
+void clear(void)
 {
     lptr = 0;
     line[0] = 0;
 }
 
-char inbyte()
+char inbyte(void)
 {
     while (ch() == 0) {
         if (eof)
@@ -71,7 +71,7 @@ char inbyte()
     return gch();
 }
 
-void vinline()
+void vinline(void)
 {
     FILE* unit;
     int k;
@@ -121,7 +121,7 @@ void vinline()
 /*
  * ifline - part of preprocessor to handle #ifdef, etc
  */
-void ifline()
+void ifline(void)
 {
     char sname[NAMESIZE];
 
@@ -219,7 +219,7 @@ void ifline()
     }
 }
 
-void noiferr()
+void noiferr(void)
 {
     errorfmt( "No matching #if", 0 );
 }
@@ -232,13 +232,13 @@ void keepch(char c)
 }
 
 /* Preprocessing is minimal - we need an external preprocessor */
-void preprocess()
+void preprocess(void)
 {
     ifline();
     return;
 }
 
-void addmac()
+void addmac(void)
 {
     char sname[NAMESIZE];
 
@@ -257,7 +257,7 @@ void addmac()
 }
 
 /* delete macro from symbol table, but leave entry so hashing still works */
-void delmac()
+void delmac(void)
 {
     char sname[NAMESIZE];
     SYMBOL* ptr;
@@ -344,7 +344,7 @@ void push_buffer_fp(FILE *fp)
     buffer_fps[buffer_fps_num++] = fp;
 }
 
-void pop_buffer_fp()
+void pop_buffer_fp(void)
 {
     buffer_fps[buffer_fps_num] = NULL;
     buffer_fps_num--;

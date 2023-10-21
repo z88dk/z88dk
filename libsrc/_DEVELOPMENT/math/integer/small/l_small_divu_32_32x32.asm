@@ -46,8 +46,7 @@ l0_small_divu_32_32x32:
    xor a
    push hl
    exx
-   ld c,l
-   ld b,h
+   ld bc,hl
    pop hl
    push de
    ex de,hl

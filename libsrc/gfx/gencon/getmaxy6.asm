@@ -1,18 +1,18 @@
 
-    SECTION code_clib
-    PUBLIC  getmaxy
-    PUBLIC  _getmaxy
+        SECTION code_clib
+        PUBLIC  getmaxy
 
-    EXTERN  __console_h
+        EXTERN  __console_h
 
+        PUBLIC  _getmaxy
+        defc    _getmaxy=getmaxy
 
 getmaxy:
-_getmaxy:
-    ld      a,(__console_h)
-    ld      l,a
-    add     a
-    add     l
-    dec     a
-    ld      l,a
-    ld      h,0
-    ret
+        ld      a, (__console_h)
+        ld      l, a
+        add     a
+        add     l
+        dec     a
+        ld      l, a
+        ld      h, 0
+        ret

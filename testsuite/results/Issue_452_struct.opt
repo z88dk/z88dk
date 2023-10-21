@@ -64,6 +64,8 @@
 	ret
 
 
+	SECTION	bss_compiler
+	SECTION	code_compiler
 
 
 

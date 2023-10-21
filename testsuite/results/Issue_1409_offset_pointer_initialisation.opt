@@ -37,6 +37,8 @@
 	defw	_data + 8
 	defw	_data + 12
 	SECTION	code_compiler
+	SECTION	bss_compiler
+	SECTION	code_compiler
 
 
 

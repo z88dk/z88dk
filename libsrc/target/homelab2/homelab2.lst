@@ -1,7 +1,7 @@
 target/homelab2/stdio/generic_console
 @stdio/stdio.lst
-stdio/inkey/getk
-stdio/inkey/fgetc_cons
+stdio/obj/${TYPE}/inkey/getk
+stdio/obj/${TYPE}/inkey/fgetc_cons
 target/homelab2/graphics/textpixl
 @gfx/gencon/gfx_gencon.lst
 @input/input_keyboard.lst

@@ -10,11 +10,13 @@
 		SECTION code_clib
 		PUBLIC	creat
 		PUBLIC	_creat
+		PUBLIC	___creat
 		EXTERN	open
 		EXTERN	close
 
 .creat
 ._creat
+.___creat
 	pop	bc
 	pop	hl
 	push	hl

@@ -14,7 +14,7 @@
 
 int puts(const char *s)
 {
-	fputs(s,stdout);
-	fputs("\n",stdout);
+    fputs(s,stdout);
+    fputs("\n",stdout);
 }
 

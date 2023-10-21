@@ -1,0 +1,268 @@
+	push	hl
+	ld	hl,%1	;const
+	pop	de
+=
+	ex	de,hl
+	ld	hl,%1	;const
+
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+=
+	ld	hl,(sp+2)
+
+	pop	bc
+	pop	de
+	push	de
+	push	bc
+=
+	ld	de,(sp+2)
+
+	pop	bc
+	push	hl
+=
+	ld	(sp+0),hl
+
+	pop	bc
+	pop	de
+	push	hl
+	push	bc
+=
+	ld	(sp+2),hl
+
+	ld	hl,0	;const
+	add	hl,sp
+=
+	ld	hl,sp
+
+	call	l_mult
+=
+	muls	de,hl
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+=
+	ld	hl,(sp+%1)
+	ld	h,0
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%2
+=
+	ld	de,(sp+%1)
+	ld	hl,%2
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	ld	hl,(sp+%1)
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(sp+%1)
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	ld	hl,%2
+=
+	ld	bc,(sp+%1)
+	ld	hl,%2
+
+	ld	c,l
+	ld	b,h
+	ld	hl,%2	;const
+	add	hl,bc
+=
+	ld	bc,%2
+	add	hl,bc
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	inc	(hl)
+	ld	a,(hl)
+	inc	hl
+	jr	nz,ASMPC+3
+	inc	(hl)
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(sp+%1)
+	inc	hl
+	ld	(sp+%1),hl
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	dec	(hl)
+	ld	a,(hl)
+	inc	hl
+	cp	255
+	jr	nz,ASMPC+3
+	dec	(hl)
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(sp+%1)
+	dec	hl
+	ld	(sp+%1),hl
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	de,%2
+	ex	de,hl
+	call	l_pint
+=
+	ld	hl,%2
+	ld	(sp+%1),hl
+
+%check 0 <= %1 <= 126
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+=
+	ld	hl,(sp+%1)
+	push	hl
+
+%check 0 <= %1 <= 124
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_glong
+=
+	ld	de,(sp+%eval(%1 2 +))
+	ld	hl,(sp+%1)
+
+%check 0 <= %1 <= 126
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint
+=
+	ld	hl,(sp+%1)
+
+	pop	bc
+	push	hl
+=
+	ld	(sp+0),hl
+
+	pop	hl
+	push	hl
+=
+	ld	hl,(sp+0)
+
+	push	hl
+	call	l_gint%1sp	;
+	pop	de
+=
+	ex	de,hl
+	ld	hl,(sp+%eval(%1 2 -))
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	ld	d,0
+=
+	ld	de,(sp+%1)
+	ld	d,0
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+=
+	ld	hl,(sp+%1)
+	ld	h,0
+
+	pop	bc
+	ld	hl,(sp+0)
+	push	bc
+=
+	ld	hl,(sp+2)
+
+
+%check 0 <= %1 <= 124
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ex	de,hl
+=
+	ld	hl,(sp+%1)
+	ld	de,(sp+%eval(%1 2 ++))
+	ld	d,0
+
+%check 0 <= %1 <= 124
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_glong2sp
+=
+	ld	hl,(sp+%1)
+	ld	de,(sp+%eval(%1 2 ++))
+	push	de
+	push	hl
+
+%eval 1 = %2 %1 -
+	ld	c,(ix%"[0-9]*"1)
+	ld	b,(ix%"[0-9]*"2)
+=
+	ld	bc,(ix%1)
+
+%eval 1 = %2 %1 -
+	ld	(ix%"[0-9]*"1),c
+	ld	ix%"[0-9]*"2),b
+=
+	ld	(ix%1),bc
+
+%eval 1 = %2 %1 -
+	ld	e,(ix%"[0-9]*"1)
+	ld	d,(ix%"[0-9]*"2)
+=
+	ld	de,(ix%1)
+
+%eval 1 = %2 %1 -
+	ld	(ix%"[0-9]*"1),e
+	ld	(ix%"[0-9]*"2),d
+=
+	ld	(ix%1),de
+
+%eval 1 = %2 %1 -
+	ld	l,(ix%"[0-9]*"1)
+	ld	h,(ix%"[0-9]*"2)
+=
+	ld	hl,(ix%1)
+
+%eval 1 = %2 %1 -
+	ld	(ix%"[0-9]*"1),l
+	ld	(ix%"[0-9]*"2),h
+=
+	ld	(ix%1),hl
+
+	ld	ix,0
+	add	ix,sp
+=
+	ld	ix,sp

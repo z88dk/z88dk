@@ -5,7 +5,7 @@ target/oz/stdio/ansi/f_ansi_attr
 target/oz/stdio/ansi/f_ansi_bel
 target/oz/stdio/ansi/f_ansi_char
 target/oz/stdio/ansi/f_ansi_cls
-stdio/ansi/generic/f_ansi_dline
+stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/oz/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
 target/oz/graphics/clg

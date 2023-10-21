@@ -32,3 +32,10 @@ PUBLIC _strcasecmp
 defc _strcasecmp = strcasecmp
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strcasecmp
+defc ___strcasecmp = strcasecmp
+ENDIF
+

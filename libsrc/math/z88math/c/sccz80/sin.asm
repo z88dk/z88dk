@@ -10,26 +10,26 @@
 ;double sin(double)
 ;Number in FA..
 
-                SECTION  code_fp
-IF FORz88
-                INCLUDE  "target/z88/def/fpp.def"
-ELSE
-		INCLUDE "fpp.def"
-ENDIF
+        SECTION code_fp
+  IF    FORz88
+        INCLUDE "target/z88/def/fpp.def"
+  ELSE
+        INCLUDE "fpp.def"
+  ENDIF
 
-                PUBLIC    sin
+        PUBLIC  sin
 
-                EXTERN	fsetup
-                EXTERN	stkequ2
+        EXTERN  fsetup
+        EXTERN  stkequ2
 
-.sin
+sin:
         call    fsetup
-IF FORz88
-        fpp(FP_SIN)
-ELSE
-	ld	a,+(FP_SIN)
-	call	FPP
-ENDIF
+  IF    FORz88
+        fpp     (FP_SIN)
+  ELSE
+        ld      a, +(FP_SIN)
+        call    FPP
+  ENDIF
         jp      stkequ2
 
 

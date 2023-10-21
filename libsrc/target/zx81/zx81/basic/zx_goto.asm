@@ -11,7 +11,7 @@
 ;
 ;   GOTO etc are not supported, a minimum of conditional code is possible with an IF..THEN line
 ;
-;	$Id: zx_goto.asm$
+;	$Id: zx_goto.asm $
 ;
 
 SECTION code_clib
@@ -24,7 +24,8 @@ EXTERN	restore81
 zx_goto:
 _zx_goto:
 IF FORlambda
-        call    $0B36           ; routine LINE-ADDR (LAMBDA)
+	EXTERN  __lambda_line_addr
+        jp	__lambda_line_addr
 ELSE
         call    $09D8           ; routine LINE-ADDR (ZX81)
 ENDIF
@@ -53,7 +54,8 @@ basic_loop:
 	push	bc
 	ld	($4002),sp	; update error handling routine
 IF FORlambda
-        jp	$088
+	EXTERN  __lambda_line_run
+        jp	__lambda_line_run
 ELSE
         jp	$cc1	; single line
 ENDIF

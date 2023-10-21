@@ -5,9 +5,11 @@
 		SECTION code_clib
 		PUBLIC open
 		PUBLIC _open
+		PUBLIC ___open
 
 .open
 ._open
+.___open
 	pop af			; return address
 	pop bc			; don't care
 	pop de			; read or write

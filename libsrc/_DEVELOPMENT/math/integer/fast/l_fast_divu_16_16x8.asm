@@ -41,7 +41,11 @@ l_fast_divu_16_16x8:
    
    inc e
    dec e
+IF __CPU_R4K__ | __CPU_R5K__
+   jp z, divide_by_zero
+ELSE
    jr z, divide_by_zero
+ENDIF
 
 l0_fast_divu_16_16x8:
 

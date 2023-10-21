@@ -41,6 +41,7 @@ IF FORzx81
 ENDIF
 IF FORlambda
 	call  restore81
-	call  $1C7D
+	EXTERN  __lambda_cls
+	call    __lambda_cls
 	jp    zx_topleft
 ENDIF

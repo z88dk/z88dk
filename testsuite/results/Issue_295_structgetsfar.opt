@@ -61,6 +61,8 @@
 	defb	0
 
 	SECTION	code_compiler
+	SECTION	bss_compiler
+	SECTION	code_compiler
 
 
 

@@ -91,7 +91,6 @@ void read_symbol_file(char *filename)
 {
     FILE *fp = fopen(filename,"r");
     UT_string* temp;
-    int length;
 
     if ( fp != NULL ) {
         while ( fgets(read_symbol_buf, sizeof(read_symbol_buf), fp) != NULL ) {
@@ -459,6 +458,7 @@ void symbol_add_autolabel(int address, char *label)
     sym->name = strdup(label);
     sym->address = address;
     sym->symtype = SYM_ADDRESS;
+    sym->unique = 1;
     LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
     HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
 

@@ -24,8 +24,7 @@ l_fast_mulu_24_16x8:
 IF __CLIB_OPT_IMATH_FAST & $08
 
    ld a,e
-   ld e,l
-   ld d,h
+   ld de,hl
 
    ld c,0
 

@@ -1,16 +1,16 @@
 
-    SECTION	code_clib
-    PUBLIC  getmaxx
-    PUBLIC  _getmaxx
+        SECTION code_clib
+        PUBLIC  getmaxx
 
-    EXTERN  __console_w
+        EXTERN  __console_w
 
+        PUBLIC  _getmaxx
+        defc    _getmaxx=getmaxx
 
 getmaxx:
-_getmaxx:
-    ld      a,(__console_w)
-    add     a
-    dec     a
-    ld      l,a
-    ld      h,0
-    ret
+        ld      a, (__console_w)
+        add     a
+        dec     a
+        ld      l, a
+        ld      h, 0
+        ret

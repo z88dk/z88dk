@@ -27,6 +27,7 @@
 #define NS_TO_US(ns)    ((ns)/1000)
 
 static uint8_t verbose = 0;
+static char* script_file = NULL;
 int c_autolabel = 0;
 uint8_t temporary_break = 0;
 static uint8_t has_clock_register = 0;
@@ -345,6 +346,11 @@ uint8_t is_verbose()
     return verbose;
 }
 
+char* script_filename()
+{
+    return script_file;
+}
+
 uint16_t get_pc()
 {
     return fetch_registers()->pc;
@@ -355,8 +361,10 @@ uint16_t get_sp()
     return fetch_registers()->sp;
 }
 
-uint8_t get_memory(uint16_t at)
+uint8_t get_memory(uint32_t at, memtype type)
 {
+    at &= 0xffff;
+
     if (at >= mem_requested_at && (int)at < (int)(mem_requested_at + mem_requested_amount))
     {
         return mem_fetch[at - mem_requested_at];
@@ -613,7 +621,7 @@ void debugger_next(uint8_t add_bp)
     int len;
     const unsigned short pc = bk.pc();
 
-    uint8_t opcode = bk.get_memory(pc);
+    uint8_t opcode = bk.get_memory(pc, MEM_TYPE_INST);
 
     len = disassemble2(pc, buf, sizeof(buf), 0);
 
@@ -1200,7 +1208,8 @@ static backend_t gdb_backend = {
     .debug = stdout_log,
     .execution_stopped = gdb_execution_stopped,
     .ctrl_c = ctrl_c,
-    .time = gdb_profiler_time
+    .time = gdb_profiler_time,
+	.script_filename = script_filename
 };
 
 static void process_scheduled_actions()
@@ -1272,6 +1281,11 @@ int main(int argc, char **argv) {
             read_symbol_file(debug_symbols);
             if (bk.is_verbose()) {
                 bk.debug("OK\n");
+            }
+        } else if (strcmp(argv[i], "--script") == 0) {
+            script_file = argv[++i];
+            if (bk.is_verbose()) {
+                bk.debug("Will load script file...");
             }
         } else if (strcmp(argv[i], "-v") == 0) {
             verbose = 1;
@@ -1351,5 +1365,10 @@ int main(int argc, char **argv) {
         }
     }
 
+    return 0;
+}
+
+int israbbit4k(void)
+{
     return 0;
 }

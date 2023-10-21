@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -6,36 +8,27 @@
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 
+BEGIN { use lib '../../t'; require 'testlib.pl'; }
+
 use Modern::Perl;
-use Test::More;
-use Path::Tiny;
-require '../../t/testlib.pl';
 
-my @CPUS = (qw( 8080 z80 r2ka ));
+my $ticks = Ticks->new;
 
-my $test_nr;
+for my $reg (qw( de )) {
+	for my $a (0, 0xAAAA) {
+		for my $b (0x5555, 0xFFFF) {
+			note "reg:$reg a:$a b:$b";
 
-for my $cpu (@CPUS) {
-	for my $reg (qw( de bc )) {
-		for my $a (0, 0xAAAA) {
-			for my $b (0x5555, 0xFFFF) {
-				$test_nr++;
-				note "Test $test_nr: cpu:$cpu reg:$reg a:$a b:$b";
-
-				my $r = ticks(<<END, "-m$cpu");
-							ld		hl, $a
-							ld		$reg, $b
-							and.a	hl, $reg
-							rst 	0
+			$ticks->add(<<END, HL=>$a & $b);
+						ld		hl, $a
+						ld		$reg, $b
+						and		hl, $reg
 END
-				my $x = $a & $b;
-				is $r->{HL}, $x,			"result";
-						
-				(Test::More->builder->is_passing) or die; 
-			}
 		}
 	}
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

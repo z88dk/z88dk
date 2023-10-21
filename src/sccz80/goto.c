@@ -38,7 +38,7 @@ static int gotocnt = 0;
  *      We chase up the goto stack adjust queue after leaving function
  */
 
-Node *dolabel()
+Node *dolabel(void)
 {
     int savelptr;
     char sname[NAMESIZE];
@@ -72,7 +72,7 @@ Node *dolabel()
  * dogoto, parse goto, this is where things can go completely wrong!
  */
 
-Node *dogoto()
+Node *dogoto(void)
 {
     SYMBOL* ptr;
     char sname[NAMESIZE];

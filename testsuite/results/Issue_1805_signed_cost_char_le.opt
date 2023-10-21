@@ -39,6 +39,8 @@
 	ret
 
 
+	SECTION	bss_compiler
+	SECTION	code_compiler
 
 	SECTION	rodata_compiler
 .i_1

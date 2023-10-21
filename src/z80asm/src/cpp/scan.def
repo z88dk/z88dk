@@ -1,0 +1,56 @@
+//-----------------------------------------------------------------------------
+// z80asm
+// scanner
+// Copyright (C) Paulo Custodio, 2011-2023
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+#ifndef X
+#define X(id, text)
+#endif
+
+X(End, "")
+X(Newline, "\n")
+X(Backslash, "\\")
+X(Semicolon, ";")
+X(Ident, "")
+X(Integer, "")
+X(Floating, "")
+X(String, "")
+X(ASMPC, "$")
+X(BinNot, "~")
+X(LogNot, "!")
+X(BinAnd, "&")
+X(LogAnd, "&&")
+X(BinOr, "|")
+X(LogOr, "||")
+X(BinXor, "^")
+X(LogXor, "^^")
+X(Plus, "+")
+X(Minus, "-")
+X(Mult, "*")
+X(Power, "**")
+X(Div, "/")
+X(Mod, "%")
+X(Eq, "=")
+X(Ne, "!=")
+X(Lt, "<")
+X(Le, "<=")
+X(Gt, ">")
+X(Ge, ">=")
+X(LShift, "<<")
+X(RShift, ">>")
+X(Quest, "?")
+X(Colon, ":")
+X(Dot, ".")
+X(Comma, ",")
+X(Hash, "#")
+X(DblHash, "##")
+X(LParen, "(")
+X(RParen, ")")
+X(LSquare, "[")
+X(RSquare, "]")
+X(LBrace, "{")
+X(RBrace, "}")
+
+#undef X

@@ -1,9 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 20991-4398ebbb5d-20230509
+;  Version: 21234-4d9c2f0cbb-20230615
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu May 18 15:08:34 2023
+;	Module compile time: Thu Jun 15 13:54:56 2023
 
 
 	C_LINE	0,"am9511_fmax.c"
@@ -178,34 +178,35 @@
 	C_LINE	39,"/home/phillip/Z80/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"am9511_math.h"
 	C_LINE	37,"am9511_math.h"
-	C_LINE	96,"am9511_math.h"
 	C_LINE	97,"am9511_math.h"
 	C_LINE	98,"am9511_math.h"
 	C_LINE	99,"am9511_math.h"
 	C_LINE	100,"am9511_math.h"
 	C_LINE	101,"am9511_math.h"
-	C_LINE	103,"am9511_math.h"
-	C_LINE	106,"am9511_math.h"
+	C_LINE	102,"am9511_math.h"
+	C_LINE	104,"am9511_math.h"
 	C_LINE	107,"am9511_math.h"
 	C_LINE	108,"am9511_math.h"
 	C_LINE	109,"am9511_math.h"
 	C_LINE	110,"am9511_math.h"
 	C_LINE	111,"am9511_math.h"
-	C_LINE	114,"am9511_math.h"
+	C_LINE	112,"am9511_math.h"
 	C_LINE	115,"am9511_math.h"
 	C_LINE	116,"am9511_math.h"
-	C_LINE	118,"am9511_math.h"
+	C_LINE	117,"am9511_math.h"
 	C_LINE	119,"am9511_math.h"
 	C_LINE	120,"am9511_math.h"
-	C_LINE	123,"am9511_math.h"
+	C_LINE	121,"am9511_math.h"
 	C_LINE	124,"am9511_math.h"
 	C_LINE	125,"am9511_math.h"
 	C_LINE	126,"am9511_math.h"
 	C_LINE	127,"am9511_math.h"
-	C_LINE	130,"am9511_math.h"
-	C_LINE	131,"am9511_math.h"
+	C_LINE	128,"am9511_math.h"
+	C_LINE	129,"am9511_math.h"
 	C_LINE	132,"am9511_math.h"
 	C_LINE	133,"am9511_math.h"
+	C_LINE	134,"am9511_math.h"
+	C_LINE	135,"am9511_math.h"
 	C_LINE	9,"am9511_fmax.c"
 	C_LINE	12,"am9511_fmax.c"
 	SECTION	code_compiler
@@ -221,24 +222,14 @@
 	call	l_glong2sp
 	ld	de,sp+6
 	ex	de,hl
-	call	l_glong2sp
-	ld	de,sp+4
-	ex	de,hl
-	call	l_glong2sp
-	ld	de,sp+4
-	ex	de,hl
 	call	l_glong
 	call	l_f32_gt
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	ld	de,sp+14
+	ld	de,sp+6
 	ex	de,hl
 	call	l_glong
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
 	pop	bc
 	pop	af
 	pop	af
@@ -249,13 +240,9 @@
 
 
 .i_2
-	ld	de,sp+10
+	ld	de,sp+2
 	ex	de,hl
 	call	l_glong
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
 	pop	bc
 	pop	af
 	pop	af
@@ -265,13 +252,13 @@
 	ret
 
 
-	C_LINE	21,"am9511_fmax.c::am9511_fmax_callee::0::1"
+	C_LINE	19,"am9511_fmax.c::am9511_fmax_callee::0::1"
 
 ; Function am9511_fmax flags 0x00000200 __smallc 
 ; double am9511_fmax(double x, double y)
 ; parameter 'double y' at sp+2 size(4)
 ; parameter 'double x' at sp+6 size(4)
-	C_LINE	22,"am9511_fmax.c::am9511_fmax::0::1"
+	C_LINE	20,"am9511_fmax.c::am9511_fmax::0::1"
 ._am9511_fmax
 	ld	de,sp+6
 	ex	de,hl
@@ -380,7 +367,7 @@
 	GLOBAL	frexp
 	GLOBAL	frexp_callee
 	GLOBAL	_fabs
-	GLOBAL	fmod
+	GLOBAL	_fmod
 	GLOBAL	hypot
 	GLOBAL	hypot_callee
 	GLOBAL	atof

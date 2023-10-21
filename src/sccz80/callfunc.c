@@ -514,6 +514,7 @@ struct printf_format_s {
     { 'B', 2, 0x100, 0x100000 },
     { 's', 1, 0x200, 0x0 },
     { 'c', 1, 0x400, 0x0 },
+    { '[', 0, 0x200000, 0x0 },
     { 'a', 0, 0x400000, 0x0 },
     { 'A', 0, 0x800000, 0x0 },
     { 'e', 3, 0x1000000, 0x1000000 },
@@ -570,6 +571,9 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr)
                 if (complex < fmt->complex)
                     complex = fmt->complex;
                 format_option |= islong ? fmt->lval : fmt->val;
+                if ( *arg == '[') {
+                    while (*arg && *arg != ']') arg++;
+                }
                 break;
             }
             fmt++;

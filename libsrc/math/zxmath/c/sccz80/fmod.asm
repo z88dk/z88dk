@@ -2,9 +2,9 @@
 ;
 ;       ZX Maths Routines
 ;
-;       9/12/02 - Stefano Bodrato
+;       10/10/2023 - Stefano Bodrato
 ;
-;       $Id: fmod.asm,v 1.5 2016-06-22 19:59:18 dom Exp $
+;       $Id: fmod.asm $
 ;
 
 
@@ -28,12 +28,19 @@ ENDIF
                 SECTION  code_fp
                 PUBLIC    fmod
 
-                EXTERN	fsetup
+                EXTERN	fsetupf
                 EXTERN	stkequ
 
 .fmod
-        call    fsetup
-	defb	ZXFP_N_MOD_M
-	defb	ZXFP_END_CALC
+        call    fsetupf
+
+        defb	ZXFP_N_MOD_M
+IF FORlambda
+        defb	ZXFP_DELETE + 128
+ELSE
+        defb	ZXFP_DELETE
+        defb	ZXFP_END_CALC
+ENDIF
+
         jp      stkequ
 

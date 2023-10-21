@@ -24,3 +24,10 @@ PUBLIC _strxfrm_callee
 defc _strxfrm_callee = strxfrm_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___strxfrm_callee
+defc ___strxfrm_callee = strxfrm_callee
+ENDIF
+

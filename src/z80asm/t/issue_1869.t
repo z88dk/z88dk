@@ -4,8 +4,8 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-# z80asm: assertion failed in modlink.c:512
 # https://github.com/z88dk/z88dk/issues/1869
+# z80asm: assertion failed in modlink.c:512
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
         defc    i_64 = i_61

@@ -19,34 +19,35 @@
 ;  af..dehl/.... different
 
 
-    INCLUDE    "graphics/grafix.inc"
-    SECTION    code_graphics
-        PUBLIC    stencil_add_pixel
-        PUBLIC    _stencil_add_pixel
-        PUBLIC    stencil_ptr
-        EXTERN    __gfx_coords
+        INCLUDE "graphics/grafix.inc"
+        SECTION code_graphics
+        PUBLIC  stencil_add_pixel
+        PUBLIC  _stencil_add_pixel
+        PUBLIC  stencil_ptr
+        EXTERN  __gfx_coords
 
 
-.stencil_add_pixel
-._stencil_add_pixel
-    ld    (__gfx_coords),hl    ; update plot coordinates
-    ld    d,0
-    ld    e,l
-    ld    a,h    ; current X coordinate
-    ld    hl,(stencil_ptr) ; right side vector
-    add    hl,de
-    
-    cp    (hl)
-    jr    nc,lo_higher
-    ld    (hl),a
-.lo_higher
-    ld    de,maxy
-    add    hl,de
+stencil_add_pixel:
+_stencil_add_pixel:
+        ld      (__gfx_coords), hl      ; update plot coordinates
+        ld      d, 0
+        ld      e, l
+        ld      a, h                    ; current X coordinate
+        ld      hl, (stencil_ptr)       ; right side vector
+        add     hl, de
 
-    cp    (hl)
-    ret    c    ; hi_lower
-    ld    (hl),a
-    ret
+        cp      (hl)
+        jr      nc, lo_higher
+        ld      (hl), a
+lo_higher:
+        ld      de, maxy
+        add     hl, de
 
-    SECTION   bss_graphics
-.stencil_ptr    defw    0
+        cp      (hl)
+        ret     c                       ; hi_lower
+        ld      (hl), a
+        ret
+
+        SECTION bss_graphics
+stencil_ptr:
+        defw    0

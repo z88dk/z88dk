@@ -7,6 +7,6 @@
         EXTERN  ___dai32_return
 
 cos:
-	call	___dai32_setup_single
-	call	___dai32_xcos
-	jp	___dai32_return
+        call    ___dai32_setup_single
+        call    ___dai32_xcos
+        jp      ___dai32_return

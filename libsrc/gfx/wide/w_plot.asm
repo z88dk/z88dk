@@ -1,20 +1,22 @@
 ; ----- void  plot(int x, int y)
 
 
-    SECTION code_graphics
-    
-    PUBLIC  plot
-    PUBLIC  _plot
-    
-    EXTERN  asm_plot
+        SECTION code_graphics
 
-.plot
-._plot
-    pop     af
-    pop     de    ; y
-    pop     hl    ; x
-    push    hl
-    push    de
-    push    af
-    jp      asm_plot
-   
+        PUBLIC  plot
+        PUBLIC  _plot
+        PUBLIC  ___plot
+
+        EXTERN  asm_plot
+
+plot:
+_plot:
+___plot:
+        pop     bc
+        pop     de                      ; y
+        pop     hl                      ; x
+        push    hl
+        push    de
+        push    bc
+        jp      asm_plot
+

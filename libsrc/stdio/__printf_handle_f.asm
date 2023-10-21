@@ -10,7 +10,7 @@
    EXTERN   __printf_print_the_buffer
    EXTERN   ftoa
    EXTERN   ftoe
-   EXTERN   strlen
+   EXTERN   asm_strlen
    EXTERN   __convert_sdccf2reg
    EXTERN   CLIB_32BIT_FLOATS
    EXTERN   CLIB_64BIT_FLOATS
@@ -109,7 +109,7 @@ ELSE
     ld      bc,8
     ldir                    ;stack parameter
 ENDIF
-	jr	rejoin
+	jr      rejoin
 try_sccz80_32bit_float:
     ld      a,CLIB_32BIT_FLOATS
     and     a
@@ -211,7 +211,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     pop     ix              ;get ix back
 ENDIF
     call    __printf_get_buffer_address
-    call    strlen          ;get the length of it
+    call    asm_strlen          ;get the length of it
 IF __CPU_INTEL__ | __CPU_GBZ80__
     call    __printf_set_buffer_length
 ELSE

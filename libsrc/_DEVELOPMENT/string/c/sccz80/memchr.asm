@@ -47,3 +47,10 @@ PUBLIC _memchr
 defc _memchr = memchr
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memchr
+defc ___memchr = memchr
+ENDIF
+

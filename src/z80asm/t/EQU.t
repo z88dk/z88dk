@@ -5,8 +5,8 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 use Modern::Perl;
 
 for my $equ ('equ', '=') {
-	ok 1, "Test with $equ";
-	my $space = $equ eq '=' ? "" : " ";
+	my $space = $equ eq 'equ' ? ' ' : '';
+	ok 1, "Test with '$space$equ'";
 
 	z80asm_nok("", "", "aa $equ", <<END_ERR);
 $test.asm:1: error: syntax error

@@ -28,8 +28,10 @@ PUBLIC  asm_am9511_compare_sccz80
 ;
 ;       Exit:      Z = number is zero
 ;               (NZ) = number is non-zero
-;                  C = number is negative 
+;                  C = number is negative
 ;                 NC = number is positive
+;
+;       NOTE: Changes (mutates) the input stack parameters!
 ;
 ;       Uses: af, bc, de, hl
 .asm_am9511_compare_sccz80

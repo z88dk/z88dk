@@ -165,6 +165,8 @@
 	ret
 
 
+	SECTION	bss_compiler
+	SECTION	code_compiler
 
 	SECTION	rodata_compiler
 .i_1
@@ -244,7 +246,9 @@
 	GLOBAL	strcspn
 	GLOBAL	strcspn_callee
 	GLOBAL	strdup
+	GLOBAL	strdup_fastcall
 	GLOBAL	strerror
+	GLOBAL	strerror_fastcall
 	GLOBAL	stricmp
 	GLOBAL	stricmp_callee
 	GLOBAL	strlcat
@@ -252,12 +256,14 @@
 	GLOBAL	strlcpy
 	GLOBAL	strlcpy_callee
 	GLOBAL	strlen
+	GLOBAL	strlen_fastcall
 	GLOBAL	strlwr
+	GLOBAL	strlwr_fastcall
 	GLOBAL	strncasecmp
 	GLOBAL	strncasecmp_callee
 	GLOBAL	strncat
 	GLOBAL	strncat_callee
-	GLOBAL	strnchr
+	GLOBAL	strnchar
 	GLOBAL	strnchr_callee
 	GLOBAL	strncmp
 	GLOBAL	strncmp_callee
@@ -269,16 +275,18 @@
 	GLOBAL	strnicmp_callee
 	GLOBAL	strnlen
 	GLOBAL	strnlen_callee
-	GLOBAL	strpbrk
+	GLOBAL	strpkbrk
 	GLOBAL	strpbrk_callee
 	GLOBAL	strrchr
 	GLOBAL	strrchr_callee
 	GLOBAL	strrcspn
 	GLOBAL	strrcspn_callee
 	GLOBAL	strrev
+	GLOBAL	strrev_fastcall
 	GLOBAL	strrspn
 	GLOBAL	strrspn_callee
 	GLOBAL	strrstrip
+	GLOBAL	strrstrip_fastcall
 	GLOBAL	strsep
 	GLOBAL	strsep_callee
 	GLOBAL	strspn
@@ -286,11 +294,13 @@
 	GLOBAL	strstr
 	GLOBAL	strstr_callee
 	GLOBAL	strstrip
+	GLOBAL	strstrip_fastcall
 	GLOBAL	strtok
 	GLOBAL	strtok_callee
 	GLOBAL	strtok_r
 	GLOBAL	strtok_r_callee
 	GLOBAL	strupr
+	GLOBAL	strupr_fastcall
 	GLOBAL	strxfrm
 	GLOBAL	strxfrm_callee
 	GLOBAL	strrstr

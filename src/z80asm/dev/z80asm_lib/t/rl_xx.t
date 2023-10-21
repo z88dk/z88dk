@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
@@ -6,38 +8,30 @@
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 
+BEGIN { use lib '../../t'; require 'testlib.pl'; }
+
 use Modern::Perl;
-use Test::More;
-use Path::Tiny;
-require '../../t/testlib.pl';
 
-my @CPUS = (qw( 8080 8085 gbz80 z80 r2ka ));
+my $ticks = Ticks->new;
 
-my $test_nr;
+for my $reg (qw( BC DE HL )) {
+	for my $carry (0, 1) {
+		for my $init (0, 0x1111, 0x2222, 0x8888) {
+			my $init_carry = $carry ? "scf" : "and a";
+			my $res = (($init << 1) & 0xFFFF)|$carry;
 
-for my $cpu (@CPUS) {
-	for my $reg (qw( BC DE HL )) {
-		for my $carry (0, 1) {
-			for my $init (0, 0x1111, 0x2222, 0x8888) {
-                $test_nr++;
-                note "Test $test_nr: cpu:$cpu reg:$reg carry:$carry init:$init";
-                my $init_carry = $carry ? "scf" : "and a";
-                my $r = ticks(<<END, "-m$cpu");
-                        ld		$reg, $init
-                        $init_carry 
-                        rl      $reg
-                        jr	 	0		; need to keep SP
+			$ticks->add(<<END,
+					$init_carry 
+					ld		$reg, $init
+					rl      $reg
 END
-                my $res = (($init << 1) & 0xFFFF)|$carry;
-                
-                is $r->{F_C}, ($init & 0x8000) ? 1 : 0, "carry";
-                is $r->{$reg}, $res, "result";
-                        
-                (Test::More->builder->is_passing) or die;
-			}
+				F_C	=> ($init & 0x8000) ? 1 : 0,
+				$reg => $res);
 		}
 	}
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

@@ -4,8 +4,8 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-# z80asm: illegal identifier swap a
 # https://github.com/z88dk/z88dk/issues/1874
+# z80asm: illegal identifier swap a
 
 my $got_zsdcc = -f "../../bin/z88dk-zsdcc$Config{_exe}";
 if (!$got_zsdcc) {

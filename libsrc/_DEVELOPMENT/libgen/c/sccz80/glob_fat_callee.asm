@@ -29,3 +29,10 @@ PUBLIC _glob_fat_callee
 defc _glob_fat_callee = glob_fat_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC __glob_fat_callee
+defc __glob_fat_callee = glob_fat_callee
+ENDIF
+

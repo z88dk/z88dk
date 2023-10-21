@@ -12,10 +12,10 @@ path($dir)->mkpath;
 
 spew("$dir/lib.lst", <<END);
 $dir/f1.asm
-$dir/f2.o
+$dir/f2.asm
 $dir/f3
 f4.asm
-f5.o
+f5.asm
 f6
 $dir/f7.asm
 $dir/f8.o

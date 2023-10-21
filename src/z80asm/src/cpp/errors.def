@@ -16,6 +16,8 @@ X(NotObjFile, "not an object file")
 X(ObjFileVersion, "invalid object file version")
 X(LibFileVersion, "invalid library file version")
 X(FileRename, "file rename")
+X(FileCreate, "file create")
+X(DirCreate, "directory create")
 
 // options
 X(NoSrcFile, "source file expected")
@@ -26,6 +28,7 @@ X(InvalidDefineOption, "invalid define (-Dvar=value) option")
 X(InvalidFillerOption, "invalid filler (-f) option")
 X(CmdFailed, "command failed")
 X(InvalidCpu, "invalid cpu")
+X(DateAndMstarIncompatible, "cannot build libraries with -m* and -d")
 
 // lexer
 X(InvalidChar, "invalid character")
@@ -34,8 +37,11 @@ X(InvalidCharConst, "invalid character constant")
 
 // parser
 X(ColonExpected, "colon expected")
-X(UnbalancedParens, "unbalanced parens")
+X(CommaExpected, "comma expected")
 X(IntOrIdentExpected, "integer or identifier expected")
+X(IdentExpected, "identifier expected")
+X(EolExpected, "end of line expected")
+X(UnbalancedParens, "unbalanced parens")
 
 // symbols
 X(DuplicateDefinition, "duplicate definition")
@@ -56,6 +62,7 @@ X(InvalidFloatFormat, "invalid float format, expected")
 
 // assembler
 X(ExprInParens, "interpreting indirect value as immediate")
+X(ExprNotInParens, "expecting indirect expression")
 X(IllegalIdent, "illegal identifier")
 X(IntRange, "integer range")
 X(MissingBlock, "missing {} block")
@@ -89,5 +96,8 @@ X(OrgRedefined, "ORG redefined")
 X(SegmentOverflow, "segment overflow")
 X(OrgNotAligned, "ORG not aligned")
 X(InvalidOrg, "invalid ORG")
+X(CPUIncompatible, "CPU incompatible")
+X(CPUInvalid, "CPU invalid")
+X(IXIYIncompatible, "-IXIY incompatible")
 
 #undef X

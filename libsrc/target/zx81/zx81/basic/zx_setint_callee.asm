@@ -6,7 +6,7 @@
 ; 
 ;	int __CALLEE__ zx_setint_callee(char *variable, int value); 
 ; 
-;	$Id: zx_setint_callee.asm,v 1.6 2016-06-26 20:32:09 dom Exp $ 
+;	$Id: zx_setint_callee.asm $
 ;  	
 
 SECTION code_clib
@@ -64,7 +64,8 @@ vlcount:
 	ld	hl,($4014)      ; E_LINE
 	dec	hl		; now HL points to end of VARS
 IF FORlambda
-	call	$1CB5
+	EXTERN  __lambda_make_room
+	call    __lambda_make_room
 ELSE
 	;;ld	hl,(16400)	; VARS
 	call	$099E		; MAKE-ROOM
@@ -131,9 +132,17 @@ store2:
 
 	pop	bc
 	push	hl			; save pointer to variable value
-	call	ZXFP_STACK_BC
-	rst	ZXFP_BEGIN_CALC
-	defb	ZXFP_END_CALC		; Now HL points to the float on the FP stack
+IF FORlambda
+	EXTERN  __lambda_stack_bc
+	call    __lambda_stack_bc
+	ld de,(401Ch)		; STKEND
+	ld hl,-5
+	add hl,de
+ELSE
+	call  ZXFP_STACK_BC
+	rst   ZXFP_BEGIN_CALC
+	defb  ZXFP_END_CALC		; Now HL points to the float on the FP stack
+ENDIF
 	ld	(ZXFP_STK_PTR),hl	; update the FP stack pointer (equalise)
 	pop	de			; restore pointer to variable value
 	ld	bc,5

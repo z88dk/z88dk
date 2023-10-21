@@ -1,14 +1,19 @@
 
 
 
-		SECTION		code_clib
+    SECTION code_clib
 
-		PUBLIC		msleep
-		PUBLIC		_msleep
+    PUBLIC  msleep
+    PUBLIC  _msleep
 
-		EXTERN		asm_z80_delay_ms
+    EXTERN  asm_z80_delay_ms
 
-		; int msleep(unsigned int millis) __z88dk_fastcall
+    ; int msleep(unsigned int millis)
 
-		defc		msleep = asm_z80_delay_ms
-		defc		_msleep = asm_z80_delay_ms
+msleep:
+_msleep:
+    pop     de
+    pop     hl
+    push    hl
+    push    de
+    jp      asm_z80_delay_ms

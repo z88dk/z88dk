@@ -92,20 +92,16 @@ EXTERN m32_fsnormalize
 ; here shift right 4-8
     srl h
     rr l
-    rr d
-    rr e
+    rr de
     srl h
     rr l
-    rr d
-    rr e
+    rr de
     srl h
     rr l
-    rr d
-    rr e
+    rr de
     srl h
     rr l
-    rr d
-    rr e                        ; 4 for sure
+    rr de                       ; 4 for sure
     ld c,154                    ; exponent for no more shifts
 ; here shift right 1-4 more
 .dldf4
@@ -114,32 +110,28 @@ EXTERN m32_fsnormalize
     jr Z,dldf8                  ; done right
     srl h
     rr l
-    rr d
-    rr e
+    rr de
     inc c
     ld a,h
     or a
     jr Z,dldf8
     srl h
     rr l
-    rr d
-    rr e
+    rr de
     inc c
     ld a,h
     or a
     jr Z,dldf8
     srl h
     rr l
-    rr d
-    rr e
+    rr de
     inc c
     ld a,h
     or a
     jr Z,dldf8
     srl h
     rr l
-    rr d
-    rr e
+    rr de
     inc c
 .dldf8                          ; pack up the floating point mantissa in lde, exponent in c, sign in b[7]
     sla l

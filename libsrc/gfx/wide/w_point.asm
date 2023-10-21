@@ -2,19 +2,21 @@
 ;Result is true/false
 
 
-    SECTION code_graphics
-    
-    PUBLIC  point
-    PUBLIC  _point
-    
-    EXTERN  asm_point
+        SECTION code_graphics
 
-.point
-._point
-    pop     bc
-    pop     de    ; y
-    pop     hl    ; x
-    push    hl
-    push    de
-    push    bc
-    jp      asm_point
+        PUBLIC  point
+        PUBLIC  _point
+        PUBLIC  ___point
+
+        EXTERN  asm_point
+
+point:
+_point:
+___point:
+        pop     bc
+        pop     de                      ; y
+        pop     hl                      ; x
+        push    hl
+        push    de
+        push    bc
+        jp      asm_point

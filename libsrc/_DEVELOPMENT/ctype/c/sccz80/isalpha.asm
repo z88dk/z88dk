@@ -5,18 +5,26 @@ SECTION code_clib
 SECTION code_ctype
 
 PUBLIC isalpha
+PUBLIC isalpha_fastcall
 
 EXTERN asm_isalpha, error_zc
 
-IF __CLASSIC && __CPU_GBZ80__
-PUBLIC _isalpha
-_isalpha:
-  ld  hl,sp+2
-  ld  a,(hl+)
-  ld  h,(hl)
-  ld  l,a
-ENDIF
 isalpha:
+IF __CPU_GBZ80__
+   ld  hl,sp+2
+   ld  a,(hl+)
+   ld  h,(hl)
+   ld  l,a
+ELIF __CPU_RABBIT__ | __CPU_KC160__
+   ld hl,(sp+2)
+ELSE
+   pop de
+   pop hl
+   push hl
+   push de
+ENDIF
+
+isalpha_fastcall:
 
    inc h
    dec h
@@ -38,9 +46,12 @@ IF __CPU_GBZ80__
 ENDIF
    ret
 
+
+
 ; SDCC bridge for Classic
-IF __CLASSIC && !__CPU_GBZ80__
+IF __CLASSIC
 PUBLIC _isalpha
 defc _isalpha = isalpha
+PUBLIC _isalpha_fastcall
+defc _isalpha_fastcall = isalpha_fastcall
 ENDIF
-

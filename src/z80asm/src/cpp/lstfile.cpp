@@ -71,7 +71,7 @@ void LstFile::expanded_line(int asmpc, int phased_pc, const string& text) {
 		out_line();
 
 		m_line_started = true;
-		m_location.line_num = 0;
+        m_location.set_line_num(0);
 		m_asmpc = asmpc;
 		m_phased_pc = phased_pc;
 		m_bytes.clear();
@@ -93,7 +93,7 @@ void LstFile::patch_bytes(int asmpc, const vector<uint8_t>& bytes) {
 		for (int i = 0; i < static_cast<int>(bytes.size()); i++) {
 			int addr = asmpc + i;
 			auto it = m_patch_pos.find(addr);
-			assert(it != m_patch_pos.end());		// address must exist
+			Assert(it != m_patch_pos.end());		// address must exist
 
 			m_ofs.seekp(it->second);				// seek position and patch in file
 			m_ofs << setw(2)
@@ -113,9 +113,9 @@ void LstFile::end_line() {
 
 void LstFile::out_filename() {
 	if (m_ofs.is_open()) {
-		if (m_location.filename != m_last_filename) {
-			m_ofs << m_location.filename << ":" << endl;
-			m_last_filename = m_location.filename;
+		if (m_location.filename() != m_last_filename) {
+			m_ofs << m_location.filename() << ":" << endl;
+			m_last_filename = m_location.filename();
 		}
 	}
 }
@@ -126,8 +126,8 @@ void LstFile::out_line() {
 		out_filename();
 
 		// output line number
-		if (m_location.line_num > 0)
-			m_ofs << setw(LineNumWidth) << m_location.line_num
+		if (m_location.line_num() > 0)
+			m_ofs << setw(LineNumWidth) << m_location.line_num()
 			<< setw(SeparatorWidth) << "";
 		else
 			m_ofs << setw(LineNumWidth + SeparatorWidth) << "";

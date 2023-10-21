@@ -13,23 +13,23 @@
 ; ----- void  undrawr(int x2, int y2)
 
 
-SECTION code_graphics
+        SECTION code_graphics
 
-PUBLIC     undrawr_callee
-PUBLIC    _undrawr_callee
+        PUBLIC  undrawr_callee
+        PUBLIC  _undrawr_callee
 
-	EXTERN    undrawr
+        EXTERN  undrawr
 
-.undrawr_callee
-._undrawr_callee
-	pop af	; ret addr
-	pop	bc
-	pop	de
-	push af	; ret addr
-	push de
-	push bc
-	
-	call undrawr
-	pop bc
-	pop bc
-	ret
+undrawr_callee:
+_undrawr_callee:
+        pop     af                      ; ret addr
+        pop     bc
+        pop     de
+        push    af                      ; ret addr
+        push    de
+        push    bc
+
+        call    undrawr
+        pop     bc
+        pop     bc
+        ret

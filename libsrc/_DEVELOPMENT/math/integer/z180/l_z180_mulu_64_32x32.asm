@@ -17,8 +17,7 @@ l_z180_mulu_64_32x32:
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    ld c,l
-    ld b,h
+    ld bc,hl
     push de
     exx
     pop bc

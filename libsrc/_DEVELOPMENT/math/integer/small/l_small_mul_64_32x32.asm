@@ -23,8 +23,7 @@ l_small_mul_64_32x32:
    ; uses  : af, bc, de, hl, bc', de', hl'
 
    xor a
-   ld c,l
-   ld b,h
+   ld bc,hl
    ld l,a
    ld h,a
    push de
@@ -44,7 +43,7 @@ l0_small_mul_64_32x32:
 
    ld a,b
    ld b,33
-   
+
    jr start
 
 loop_0:
@@ -59,21 +58,18 @@ loop_0:
 loop_1:
 
    exx
-   rr h
-   rr l
+   rr hl
    exx
-   rr h
-   rr l
+   rr hl
 
 start:
 
    exx
-   rr b
-   rr c
+   rr bc
    exx
    rra
    rr c
-   
+
    djnz loop_0
 
    ; result = hl' hl bc' ac
@@ -82,9 +78,8 @@ start:
    exx
    ex (sp),hl
    ld h,a
-   ld e,c
-   ld d,b
+   ld de,bc
    exx
    pop de
-   
+
    ret

@@ -1,8 +1,8 @@
-    
 
-        SECTION    code_graphics
-    PUBLIC    cleararea
-    EXTERN    respixel
+
+        SECTION code_graphics
+        PUBLIC  cleararea
+        EXTERN  respixel
 
 ;
 ;    $Id: clrarea.asm,v 1.5 2016-04-13 21:09:09 dom Exp $
@@ -20,24 +20,24 @@
 ;    BC    = (width,heigth)
 ;
 
-.cleararea
+cleararea:
 
-    push    hl
-    push    bc
-.rowloop
-    push    hl
-    push    de
-    push    bc
-    call    respixel
-    pop    bc
-    pop    de
-    pop    hl
-    
-    inc    h
-    djnz    rowloop
-    pop    bc
-    pop    hl
-    inc    l
-    dec    c
-    jr    nz,cleararea
-    ret
+        push    hl
+        push    bc
+rowloop:
+        push    hl
+        push    de
+        push    bc
+        call    respixel
+        pop     bc
+        pop     de
+        pop     hl
+
+        inc     h
+        djnz    rowloop
+        pop     bc
+        pop     hl
+        inc     l
+        dec     c
+        jr      nz, cleararea
+        ret

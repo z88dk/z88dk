@@ -3,6 +3,7 @@
 
 	PUBLIC	zx_im2_init
 	PUBLIC	_zx_im2_init
+	PUBLIC	___zx_im2_init
 
 	EXTERN	l_push_di
 	EXTERN	l_pop_ei
@@ -13,6 +14,7 @@
 ; void zx_im2_init(void *table, uint8_t byte) __smallc
 zx_im2_init:
 _zx_im2_init:
+___zx_im2_init:
 	push	ix
 	ld	ix,4
 	add	ix,sp

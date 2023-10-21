@@ -97,8 +97,9 @@ capture_ok("z88dk-z80asm -b -l -m ${test}.o ${test}1.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
   Section "": 0 bytes, ORG \$1234
   Section code: 28 bytes
     C \$0000: 21 00 00 01 00 00 CD 00 00 21 00 00 01 00 00 CD
@@ -106,41 +107,42 @@ Object  file ${test}.o at \$0000: Z80RMF16
   Section data: 11 bytes
     C \$0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64
   Symbols:
-    L A \$0000 mes1 (section data) (file ${test}.asm:10)
-    L A \$0000 start (section code) (file ${test}.asm:6)
-    L A \$0005 mes1end (section data) (file ${test}.asm:11)
-    L A \$0005 mes2 (section data) (file ${test}.asm:20)
-    L A \$000B mes2end (section data) (file ${test}.asm:21)
+    L A \$0000: start (section code) (file ${test}.asm:6)
+    L A \$0000: mes1 (section data) (file ${test}.asm:10)
+    L A \$0005: mes1end (section data) (file ${test}.asm:11)
+    L A \$0005: mes2 (section data) (file ${test}.asm:20)
+    L A \$000B: mes2end (section data) (file ${test}.asm:21)
   Externs:
     U         prmes
     U         mes0
     U         mes0end
   Expressions:
-    E Cw \$0000 \$0001: mes1 (section code) (file ${test}.asm:6)
-    E Cw \$0003 \$0004: mes1end-mes1 (section code) (file ${test}.asm:7)
-    E Cw \$0006 \$0007: prmes (section code) (file ${test}.asm:13)
-    E Cw \$0009 \$000A: mes2 (section code) (file ${test}.asm:16)
-    E Cw \$000C \$000D: mes2end-mes2 (section code) (file ${test}.asm:17)
-    E Cw \$000F \$0010: prmes (section code) (file ${test}.asm:23)
-    E Cw \$0012 \$0013: mes0 (section code) (file ${test}.asm:25)
-    E Cw \$0015 \$0016: mes0end-mes0 (section code) (file ${test}.asm:26)
-    E Cw \$0018 \$0019: prmes (section code) (file ${test}.asm:27)
-Object  file ${test}1.o at \$0000: Z80RMF16
+    E W \$0000 \$0001 3: mes1 (section code) (file ${test}.asm:6)
+    E W \$0003 \$0004 3: mes1end-mes1 (section code) (file ${test}.asm:7)
+    E W \$0006 \$0007 3: prmes (section code) (file ${test}.asm:13)
+    E W \$0009 \$000A 3: mes2 (section code) (file ${test}.asm:16)
+    E W \$000C \$000D 3: mes2end-mes2 (section code) (file ${test}.asm:17)
+    E W \$000F \$0010 3: prmes (section code) (file ${test}.asm:23)
+    E W \$0012 \$0013 3: mes0 (section code) (file ${test}.asm:25)
+    E W \$0015 \$0016 3: mes0end-mes0 (section code) (file ${test}.asm:26)
+    E W \$0018 \$0019 3: prmes (section code) (file ${test}.asm:27)
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
   Section "": 0 bytes, ORG \$1234
   Section code: 9 bytes
     C \$0000: 78 B1 C8 7E 23 D7 0B 18 F7
   Section data: 1 bytes
     C \$0000: 2E
   Symbols:
-    G A \$0000 prmes (section code) (file ${test}1.asm:6)
-    G A \$0000 mes0 (section data) (file ${test}1.asm:2)
-    G A \$0001 mes0end (section data) (file ${test}1.asm:3)
+    G A \$0000: prmes (section code) (file ${test}1.asm:6)
+    G A \$0000: mes0 (section data) (file ${test}1.asm:2)
+    G A \$0001: mes0end (section data) (file ${test}1.asm:3)
 END
 
 check_text_file("${test}.map", <<END);
-mes1                            = \$1259 ; addr, local, , ${test}, data, ${test}.asm:10
 start                           = \$1234 ; addr, local, , ${test}, code, ${test}.asm:6
+mes1                            = \$1259 ; addr, local, , ${test}, data, ${test}.asm:10
 mes1end                         = \$125E ; addr, local, , ${test}, data, ${test}.asm:11
 mes2                            = \$125E ; addr, local, , ${test}, data, ${test}.asm:20
 mes2end                         = \$1264 ; addr, local, , ${test}, data, ${test}.asm:21
@@ -203,20 +205,26 @@ capture_ok("z88dk-z80asm -b -l -m ${test}.o ${test}1.o ${test}2.o", "");
 check_bin_file("${test}.bin", $bin);
 
 capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o ${test}2.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
+  Section "": 0 bytes
   Section code: 0 bytes
   Section data: 0 bytes
   Section bss: 1 bytes
     C \$0000: 03
-Object  file ${test}1.o at \$0000: Z80RMF16
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
+  Section "": 0 bytes
   Section code: 0 bytes
   Section data: 1 bytes
     C \$0000: 02
   Section bss: 0 bytes
-Object  file ${test}2.o at \$0000: Z80RMF16
+Object  file ${test}2.o at \$0000: Z80RMF18
   Name: ${test}2
+  CPU:  z80 
+  Section "": 0 bytes
   Section code: 1 bytes
     C \$0000: 01
   Section data: 0 bytes

@@ -5,19 +5,26 @@ SECTION code_clib
 SECTION code_ctype
 
 PUBLIC islower
+PUBLIC islower_fastcall
 
 EXTERN asm_islower, error_zc
 
-IF __CLASSIC && __CPU_GBZ80__
-PUBLIC _islower
-_islower:
-  ld  hl,sp+2
-  ld  a,(hl+)
-  ld  h,(hl)
-  ld  l,a
+islower:
+IF __CPU_GBZ80__
+   ld  hl,sp+2
+   ld  a,(hl+)
+   ld  h,(hl)
+   ld  l,a
+ELIF __CPU_RABBIT__ | __CPU_KC160__
+   ld hl,(sp+2)
+ELSE
+   pop de
+   pop hl
+   push hl
+   push de
 ENDIF
 
-islower:
+islower_fastcall:
 
    inc h
    dec h
@@ -39,9 +46,20 @@ IF __CPU_GBZ80__
 ENDIF
    ret
 
+
+
+
 ; SDCC bridge for Classic
-IF __CLASSIC && !__CPU_GBZ80__
+IF __CLASSIC
 PUBLIC _islower
 defc _islower = islower
+PUBLIC _islower_fastcall
+defc _islower_fastcall = islower_fastcall
+ENDIF
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___islower
+defc ___islower = islower
 ENDIF
 

@@ -62,23 +62,61 @@ z80asm_ok("-b ".quote_os("-D_value\${TEST_ENV}23"), "", "",
 # -D with verbose
 spew("${test}.asm", "nop");
 capture_ok("z88dk-z80asm -v ".
-		   "-Dmten=-+-+-10 -Dmnine=-9 -Dzero=0 -Done -Dnine=+9 -Dten=10 ${test}.asm", <<END);
-Predefined constant: mten = -\$000a
+		   "-Dmten=-+-+-10 -Dmnine=-9 -Dzero=0 -Done -Dnine=+9 -Dten=10 ${test}.asm", <<'END');
+% z88dk-z80asm -v -Dmten=-+-+-10 -Dmnine=-9 -Dzero=0 -Done -Dnine=+9 -Dten=10 test_t_option_define.asm
+Predefined constant: mten = -$000a
 Predefined constant: mnine = -9
 Predefined constant: zero = 0
 Predefined constant: one = 1
 Predefined constant: nine = 9
-Predefined constant: ten = \$000a
-Reading library 'z88dk-z80asm-z80-.lib'
+Predefined constant: ten = $000a
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
-Assembling 'test_t_option_define.asm' to 'test_t_option_define.o'
-Reading 'test_t_option_define.asm' = 'test_t_option_define.asm'
+Reading library 'z88dk-z80asm.lib'
+Assembling 'test_t_option_define.asm'
 Writing object file 'test_t_option_define.o'
-Module 'test_t_option_define' size: 1 bytes
 
 END
+
+# duplicate definition
+z80asm_ok("-b -Dabcd -Dabcd", "", "", "defb abcd", bytes(1));
+z80asm_ok("-b -Dabcd=3 -Dabcd=3", "", "", "defb abcd", bytes(3));
+
+z80asm_nok("-b -Dabcd=1 -Dabcd=2", "", "", <<END);
+error: duplicate definition: abcd
+END
+
+z80asm_ok("-b", "", "", <<END, bytes(1));
+	define abcd
+	define abcd
+	defb abcd
+END
+
+z80asm_ok("-b -Dabcd", "", "", <<END, bytes(1));
+	define abcd
+	define abcd
+	defb abcd
+END
+
+z80asm_nok("-b", "", <<ASM, <<ERR);
+	define abcd
+	defc abcd=1
+ASM
+$test.asm:2: error: duplicate definition: abcd
+  ^---- defc abcd=1
+ERR
+
+z80asm_nok("-b", "", <<ASM, <<ERR);
+	section a1
+	define abcd
+	section a2
+	define abcd
+	defb abcd
+ASM
+$test.asm:4: error: duplicate definition: abcd
+  ^---- define abcd
+ERR
 
 unlink_testfiles;
 done_testing;

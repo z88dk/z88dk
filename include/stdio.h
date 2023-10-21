@@ -179,14 +179,19 @@ extern int __LIB__ fileno(FILE *stream) __smallc __z88dk_fastcall;
 
 /* Our new and improved functions!! */
 
-extern FILE __LIB__ *fopen(const char *name, const char *mode) __smallc;
-extern FILE __LIB__ *freopen(const char *name, const char *mode, FILE *fp) __smallc;
-extern FILE __LIB__ *fdopen(const int fildes, const char *mode) __smallc;
-extern FILE __LIB__ *_freopen1(const char *name, int fd, const char *mode, FILE *fp) __smallc;
-extern FILE __LIB__ *fmemopen(void *buf, size_t size, const char *mode) __smallc;
+__ZPROTO2(FILE,*,fopen,const char *,name, const char *,mode)
+__ZPROTO3(FILE,*,freopen,const char *,name, const char *,mode,FILE *,fp)
+__ZPROTO2(FILE,*,fdopen,const int, fileds,const char *,mode)
+
+__ZPROTO4(FILE,*,_freopen1,const char *,name, int, fd, const char *,mode, FILE *,fp)
+__ZPROTO3(FILE,*,fmemopen,void *,buf, size_t, size, const char *,mode)
+
+// Leaving this one, it's complicated
+#ifndef __STDC_ABI_ONLY
 extern FILE __LIB__ *funopen(const void     *cookie, int (*readfn)(void *, char *, int),
                     int (*writefn)(void *, const char *, int),
                     fpos_t (*seekfn)(void *, fpos_t, int), int (*closefn)(void *)) __smallc;
+#endif
 
 extern int __LIB__  fclose(FILE *fp);
 extern int __LIB__  fflush(FILE *);
@@ -194,79 +199,78 @@ extern int __LIB__  fflush(FILE *);
 extern void __LIB__ closeall(void);
 
 
-#ifdef SIMPLIFIED_STDIO
-
-/* --------------------------------------------------------------*/
-/* The "8080" stdio lib is at the moment used only by the        */
-/* Rabbit Control Module, which is not fully z80 compatible      */
-
-extern char __LIB__ *fgets( char *s, int, FILE *fp) __smallc;
-extern int __LIB__ fputs( char *s,  FILE *fp) __smallc;
-extern int __LIB__ fputc(int c, FILE *fp) __smallc;
-extern int __LIB__ fgetc(FILE *fp);
-#define getc(f) fgetc(f)
-extern int __LIB__ ungetc(int c, FILE *) __smallc;
-extern int __LIB__ feof(FILE *fp) __z88dk_fastcall;
-extern int __LIB__ ferror(FILE *fp) __z88dk_fastcall;
-extern int __LIB__ puts(char *s);
-
-/* Some standard macros */
-#define putc(bp,fp) fputc(bp,fp)
-#define putchar(bp) fputc(bp,stdout)
-#define getchar()  fgetc(stdin)
-
-/* --------------------------------------------------------------*/
-
-#else
 
 /* --------------------------------------------------------------*/
 /* Optimized stdio uses the 'CALLEE' convention here and there   */
 
-extern char __LIB__ *fgets(char *s, int, FILE *fp) __smallc;
+__ZPROTO3(char,*,fgets,char *,s,int,l,FILE *,fp)
 
-extern int __LIB__ fputs(const char *s,  FILE *fp) __smallc;
-extern int __LIB__ fputc(int c, FILE *fp) __smallc;
-
+__ZPROTO2(int,,fputs,const char *,s,FILE *,fp)
+#ifndef __STDC_ABI_ONLY
 extern int __LIB__  fputs_callee(const char *s,  FILE *fp) __smallc __z88dk_callee;
-extern int __LIB__  fputc_callee(int c, FILE *fp) __smallc __z88dk_callee;
-extern int __LIB__ fgetc(FILE *fp);
-
-#define getc(f) fgetc(f)
-extern int __LIB__ ungetc(int c, FILE *) __smallc;
-extern int __LIB__ feof(FILE *fp) __z88dk_fastcall;
-extern int __LIB__ ferror(FILE *fp) __z88dk_fastcall;
-extern int __LIB__ puts(const char *);
-
 #define fputs(a,b)   fputs_callee(a,b)
-#define fputc(a,b)   fputc_callee(a,b)
+#endif
 
-/* Some standard macros */
+
+
+extern int __LIB__ fputc(int c, FILE *fp) __smallc;
+#ifndef __STDC_ABI_ONLY
+extern int __LIB__  fputc_callee(int c, FILE *fp) __smallc __z88dk_callee;
+#define fputc(a,b)   fputc_callee(a,b)
 #define putc(bp,fp) fputc_callee(bp,fp)
 #define putchar(bp) fputc_callee(bp,stdout)
-#define getchar()  fgetc(stdin)
+#else
+// clang expects putchar to be a library function not just a macro
+extern int putchar(int);
+#define putc(bp,fp) fputc(bp,fp)
+#endif
 
-/* --------------------------------------------------------------*/
+extern int __LIB__ fgetc(FILE *fp);
+#define getc(f) fgetc(f)
+
+__ZPROTO2(int,,ungetc,int,c,FILE *,fp)
+
+extern int __LIB__ feof(FILE *fp);
+#ifndef __STDC_ABI_ONLY
+extern int __LIB__ feof_fastcall(FILE *fp) __z88dk_fastcall;
+#define feof(f) feof_fastcall(f)
+#endif
+
+
+extern int __LIB__ ferror(FILE *fp);
+#ifndef __STDC_ABI_ONLY
+extern int __LIB__ ferror_fastcall(FILE *fp) __z88dk_fastcall;
+#define ferror(f) ferror_fastcall(f)
+#endif
+
+extern int __LIB__ puts(const char *);
+
+#ifdef __STDC_ABI_ONLYe
 
 #endif
+#define getchar()  fgetc(stdin)
+
 
 /* Routines for file positioning */
 extern fpos_t __LIB__ ftell(FILE *fp);
-extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
+__ZPROTO2(int,,fgetpos,FILE *,fp,fpos_t *, pos)
+
+
+#ifndef __STDC_ABI_ONLY
+extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __smallc;
+#else
+__ZPROTO3(int,,fseek,FILE *,fp,fpos_t,offset,int,whence)
+#endif
 #define fsetpos(fp,pos) fseek(fp,pos,SEEK_SET)
 #define rewind(fp) fseek(fp,0L,SEEK_SET)
-extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __smallc;
+
 
 /* Block read/writing */
-extern int __LIB__  fread(void *ptr, size_t size, size_t num, FILE *) __smallc;
-extern int __LIB__  fwrite(const void *ptr, size_t size, size_t num, FILE *) __smallc;
+__ZPROTO4(int,,fread,void *,ptr,size_t,size,size_t,num,FILE *,fp)
+__ZPROTO4(int,,fwrite,void *,ptr,size_t,size,size_t,num,FILE *,fp)
 
 
-/* You shouldn't use gets. z88 gets() is limited to 255 characters */
-//#ifdef __STDIO_CRLF
-//#define gets(x) fgets_cons(x,255)
-//#else
 extern char __LIB__ *gets(char *s);
-//#endif
 
 extern int __LIB__ printf(const char *fmt,...) __vasmallc;
 extern int __LIB__ fprintf(FILE *f,const char *fmt,...) __vasmallc;
@@ -319,7 +323,7 @@ extern int __LIB__ fgetc_cons_inkey(void);
 extern int __LIB__ fputc_cons(char c);
 
 /* Read a string using the default keyboard driver */
-extern char __LIB__ *fgets_cons(char *s, size_t n) __smallc;
+__ZPROTO2(char,*,fgets_cons,char *,s,size_t,n)
 
 extern int __LIB__ puts_cons(char *s);
 
@@ -327,9 +331,9 @@ extern int __LIB__ puts_cons(char *s);
 extern void __LIB__ fabandon(FILE *);
 /* Get file position for file handle fd */
 extern long __LIB__ fdtell(int fd);
-extern int __LIB__ fdgetpos(int fd, fpos_t *posn) __smallc;
+__ZPROTO2(int,,fdgetpos,int,fd,fpos_t *,pos)
 /* Rename a file */
-extern int __LIB__ rename(const char *s, const char *d) __smallc;
+__ZPROTO2(int,,rename,const char *,s,const char *,d)
 /* Remove a file */
 extern int __LIB__ remove(const char *name);
 

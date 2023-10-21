@@ -11,6 +11,7 @@
     EXTERN  __scanf_handle_o
     EXTERN  __scanf_handle_B
     EXTERN  __scanf_handle_i
+    EXTERN  __scanf_handle_bkt
 
 __scanf_format_table:
     defb    'd'
@@ -29,4 +30,6 @@ __scanf_format_table:
     defw    __scanf_handle_B
     defb    'i'
     defw    __scanf_handle_i
+    defb    '['
+    defw    __scanf_handle_bkt
     defb    0

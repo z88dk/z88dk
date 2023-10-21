@@ -60,8 +60,16 @@ IF (startup=3)
 ELSE
 
   defb  $20,$20,0,0
-  defm  "z80.mc"
-  defb  0,0,0,0,0,0,0,0,0,0,0
+  DEFINE NEED_vzname
+  INCLUDE "zcc_opt.def"
+  UNDEFINE NEED_vzname
+  IF !DEFINED_NEED_vzname
+      defm  "z80.mc"
+  ENDIF
+  defs 21 - ASMPC
+IF ASMPC != 21
+  defw vzname_is_too_long
+ENDIF
   
 IF (startup=2)
   ; BASIC startup mode

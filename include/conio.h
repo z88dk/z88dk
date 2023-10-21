@@ -28,9 +28,30 @@
 enum colors { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY, DARKGRAY,
               LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE };
 
+// CONIO_NATIVE_VT100 and CONIO_NATIVE_VT52 provide basic
+// functionality when run on terminals of that type
+#ifdef CONIO_NATIVE_VT100
+// Color translation table
+static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
+#define	textattr(a)		cprintf("\x1b[%dm",a)
+#define	clrscr()		cprintf("\x1b[2J")
+#define	gotoxy(x,y)		cprintf("\x1b[%d;%df",y,x)
+#define textcolor(a)	        cprintf("\x1b[%um",PCDOS_COLORS[a]+30)
+#define textbackground(a)	cprintf("\x1b[%um",PCDOS_COLORS[a]+40)
+#define textattr(a)	        cprintf("\x1b[%um\033[%um",PCDOS_COLORS[a&0xF]+30,PCDOS_COLORS[a>>4]+40)
+#define highvideo()	        cprintf("\x1b[1m")
+#define lowvideo()	        cprintf("\x1b[2m")
+#define normvideo()	        cprintf("\x1b[m")
+#define clreol()                cprintf("\x1b[K")
 
-#ifdef __CONIO_VT100
+#elif CONIO_NATIVE_VT52
+#define	gotoxy(x,y)		cprintf("\x1bY%c%c",y+32,x+32)
+#define	clrscr()		cprintf("\x1bH\x1bE");
+#define textcolor(a)            cprintf("\x1bb%c",a+32);
+#define textbackground(a)       cprintf("\x1bc%c",a+32);
+
+#elif __CONIO_VT100
 // Much faster shortcut passing the colors in vt-ansi mode (equivalent to a "set text rendition" ESC sequence)
 extern void   __LIB__      vtrendition(unsigned int attribute) __z88dk_fastcall;
 
@@ -60,6 +81,7 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 // VT52, but may drag in more code than intended.
 
 extern void __LIB__        textcolor(int c) __z88dk_fastcall;
+extern void __LIB__        textcolour(int c) __z88dk_fastcall;
 extern void __LIB__        textbackground(int c) __z88dk_fastcall;
 #define clrscr()           fputc_cons(12)
 #endif
@@ -68,14 +90,17 @@ extern void __LIB__        textbackground(int c) __z88dk_fastcall;
 
 extern int     __LIB__     wherex (void);
 extern int     __LIB__     wherey (void);
-extern void    __LIB__     gotoxy(unsigned int x, unsigned int y) __smallc;
+__ZPROTO2(void,,gotoxy,unsigned int,x,unsigned int,y)
+#ifndef __STDC_ABI_ONLY
 extern void    __LIB__     gotoxy_callee(unsigned int x, unsigned int y) __smallc __z88dk_callee;
-
-extern void    __LIB__     screensize(unsigned int *x, unsigned int *y) __smallc;
-extern void    __LIB__     screensize_callee(unsigned int *x, unsigned int *y) __smallc __z88dk_callee;
-
 #define gotoxy(a,b) gotoxy_callee(a,b)
+#endif
+
+__ZPROTO2(void,,screensize,unsigned int *,x,unsigned int *,y)
+#ifndef __STDC_ABI_ONLY
+extern void    __LIB__     screensize_callee(unsigned int *x, unsigned int *y) __smallc __z88dk_callee;
 #define screensize(a,b) screensize_callee(a,b)
+#endif
 
 
 /* The leading underscores are for compatibility with the 
@@ -108,15 +133,15 @@ extern int __LIB__ kbhit(void);
 extern int __LIB__ getch(void);
 
 // Get the character that is on screen at the specified location
-extern int __LIB__ cvpeek(int x, int y) __smallc;
-
+__ZPROTO2(int,,cvpeek,int,x,int,y)
 
 // Get the character that is on screen at the specified location (no charset
 // translations will be made)
-extern int __LIB__ cvpeekr(int x, int y) __smallc;
+__ZPROTO2(int,,cvpeekr,int,x,int,y)
 
 // Set the border colour, may not be implemented on all ports
 extern int __LIB__ bordercolor(int c) __z88dk_fastcall;
+extern int __LIB__ bordercolour(int c) __z88dk_fastcall;
 
 // Missing functions, not implemented
 //extern int  __LIB__ movetext (int _left, int _top, int _right, int _bottom, int _destleft, int _desttop);

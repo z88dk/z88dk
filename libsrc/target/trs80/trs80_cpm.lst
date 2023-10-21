@@ -8,5 +8,6 @@ target/trs80/games/bit_open_di
 target/trs80/games/bit_close
 target/trs80/games/bit_close_ei
 games/obj/${TARGET}/playzb4
+games/joystick
 @games/games.lst
 @video/mc6845/mc6845.lst

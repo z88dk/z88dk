@@ -1,11 +1,17 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
+#------------------------------------------------------------------------------
+# z80asm assembler
 # test standard loop vs faster loop 
 # see https://github.com/z88dk/z88dk/issues/1911
+# Copyright (C) Paulo Custodio, 2011-2023
+# License: http://www.perlfoundation.org/artistic_license_2_0
+# Repository: https://github.com/z88dk/z88dk
+#------------------------------------------------------------------------------
+
+BEGIN { use lib '../../t'; require 'testlib.pl'; }
 
 use Modern::Perl;
-use Test::More;
-use Path::Tiny;
 
 sub old_loop {
 	my($bc) = @_;
@@ -47,19 +53,13 @@ for my $count (1, 255, 256, 257, 65535, 65536) {
 }
 
 # performance test - Copy a ZX Spectrum screen
-path("test-old.asm")->spew(<<'END');
+path("$test-old.asm")->spew(<<'END');
 		ld 		hl, 0x8000
 		ld 		de, 0x4000
 		ld 		bc, 32*192
 loop:
-IF  __CPU_GBZ80__
         ld      a, (hl+)
-ELSE
-        ld      a, (hl)
-        inc     hl
-ENDIF
-        ld      (de), a
-        inc     de
+        ld      (de+), a
 		
 		dec		bc
 		ld		a, b
@@ -68,7 +68,7 @@ ENDIF
 		ret
 END
 
-path("test-new.asm")->spew(<<'END');
+path("$test-new.asm")->spew(<<'END');
 		ld 		hl, 0x8000
 		ld 		de, 0x4000
 		ld 		bc, 32*192
@@ -78,14 +78,8 @@ path("test-new.asm")->spew(<<'END');
 		inc 	b 
 		inc 	c 
 loop:
-IF  __CPU_GBZ80__
         ld      a, (hl+)
-ELSE
-        ld      a, (hl)
-        inc     hl
-ENDIF
-        ld      (de), a
-        inc     de
+        ld      (de+), a
 		
         ; iterate
 		dec 	c       
@@ -96,36 +90,37 @@ END
 
 my %data;
 for my $cpu (qw( 8080 8085 gbz80 r2ka z180 z80 z80n )) {
-	for my $test ("test-old", "test-new") {
+	for my $base ("$test-old", "$test-new") {
 		# assemble
-		run("z88dk-z80asm -b -l -m$cpu $test.asm");
+		run("z88dk-z80asm -b -l -m$cpu $base.asm");
 		
 		# get end address
-		for (path("$test.lis")->lines) {
-			if (/^\d+\s+([0-9A-F]{4})\s+C9\s+ret/) { 
-				$data{$cpu}{$test}{end} = $1; 
+		for (path("$base.lis")->lines) {
+			if (/^\s*\d+\s+([0-9a-f]{4})\s+c9\s+ret/) { 
+				$data{$cpu}{$base}{end} = $1; 
 				last; 
 			}
 		}
-		defined($data{$cpu}{$test}{end}) or die "end address not found\n";
+		defined($data{$cpu}{$base}{end}) or die "end address not found in $base.lis\n";
 		
 		# run ticks
-		run("z88dk-ticks -m$cpu -start 0000 -end $data{$cpu}{$test}{end} ".
-		    "$test.bin >$test.out");
-		my $t = path("$test.out")->slurp;
+		run("z88dk-ticks -m$cpu -start 0000 -end $data{$cpu}{$base}{end} ".
+		    "$base.bin >$base.out");
+		my $t = path("$base.out")->slurp;
 		$t =~ /^(\d+)\s*$/ or die "expected ticks count, got $t\n";
-		$data{$cpu}{$test}{ticks} = 0+$t;
+		$data{$cpu}{$base}{ticks} = 0+$t;
 		
-		unlink("$test.o","$test.lis","$test.bin","$test.out");
+		unlink("$base.o","$base.lis","$base.bin","$base.out");
 	}
-	$data{$cpu}{speed_increase} = $data{$cpu}{"test-new"}{ticks}
-					            / $data{$cpu}{"test-old"}{ticks};
+	$data{$cpu}{speed_increase} = $data{$cpu}{"$test-new"}{ticks}
+					            / $data{$cpu}{"$test-old"}{ticks};
+	ok $data{$cpu}{speed_increase} < 1, "$cpu speed increase ".$data{$cpu}{speed_increase};
 }
-unlink("test-old.asm","test-new.asm");
+unlink("$test-old.asm","$test-new.asm");
 
 # output data
-use Data::Dump 'dump';
-diag dump \%data;
+#use Data::Dump 'dump';
+#diag dump \%data;
 
 done_testing;
 

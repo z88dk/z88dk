@@ -31,7 +31,7 @@ EXTERN l_jpix, memops
 
    push hl
 
-IF __CPU_R2KA__|__CPU_R3K__
+IF __CPU_RABBIT__ | __CPU_Z180__ | __CPU_KC160__
 
    push ix
    pop hl
@@ -100,7 +100,7 @@ ENDIF
    pop hl
    ret
 
-IF __CPU_R2KA__|__CPU_R3K__
+IF __CPU_RABBIT__ | __CPU_Z180__ | __CPU_KC160__
 
 .func_enter
 

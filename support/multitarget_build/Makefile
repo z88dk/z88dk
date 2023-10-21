@@ -4,7 +4,7 @@
 # classic library.
 #
 # A final executable for a target is comprised of $(COMMON_SRCS) and all .asm and
-# .c files located within the targets directory.
+# .c files located within the target's directory.
 
 
 # Targets that you want to compile for (eg zx, multi8 etc)
@@ -42,6 +42,10 @@ ZLDFLAGS_adam =
 Z88DKTARGET_aquarius_rom = aquarius
 ZCFLAGS_aquarius_rom = -subtype=rom
 ZLDFLAGS_aquarius_rom = 
+
+Z88DKTARGET_aqplus = aquarius
+ZCFLAGS_aqplus = -clib=aqplus
+ZLDFLAGS_aqplus = 
 
 Z88DKTARGET_bit90 = coleco
 ZCFLAGS_bit90 = -subtype=bit90
@@ -81,6 +85,7 @@ ZLDFLAGS_gl4000 =
 Z88DKTARGET_gl6000 = gl
 ZCFLAGS_gl6000 = -clib=gl6000sl
 ZLDFLAGS_gl6000 = 
+
 Z88DKTARGET_gamegear = sms
 ZCFLAGS_gamegear = -subtype=gamegear
 ZLDFLAGS_gamegear = 
@@ -96,6 +101,10 @@ ZLDFLAGS_pc6001_rom =
 Z88DKTARGET_pc88_disk = pc88
 ZCFLAGS_pc88_disk = -subtype=disk
 ZLDFLAGS_pc88_disk = 
+
+Z88DKTARGET_vector06c_disk = vector06c
+ZCFLAGS_vector06c_disk = -subtype=disk
+ZLDFLAGS_vector06c_disk = 
 
 Z88DKTARGET_sam_allram = sam
 ZCFLAGS_sam_allram = -subtype=allram
@@ -136,8 +145,9 @@ ZLDFLAGS_zx_rom = -lndos
 # Setup the CP/M mappings to +cpm
 CPMSUBTYPES = aussie px pxansi px8 pxansi px4 px4ansi einstein einstein256 attache osborne1 kaypro83 \
 	kaypro84 mz2500 microbee qc10 nascom tiki100 svi dmv adam smc777 pasopia \
-	msx bic excali64 lynx x1 rc700 fp1100 zxplus3 vector06c bondwell bw2  \
-	cpc pcw40 pcw80 corvette nabu mbc200 mbc1100 mbc1160 mbc2000 x820 partner v1050
+	msx bic excali64 lynx x1 rc700 fp1100 zxplus3 vector06c bondwell bondwell2  \
+	cpc pcw40 pcw80 corvette nabu mbc200 mbc1100 mbc1160 mbc2000 x820 partner v1050 \
+	tim011 hz89 hz100 ptcpm
 
 define setup_cpm_subtypes
 Z88DKTARGET_cpm_$(1) = cpm
@@ -203,7 +213,9 @@ build/$(1)/$(2): $(addprefix build/$(1)/,$(patsubst %.c,%.o,$(filter %.c,$(3))))
 	$(Q)zcc +$(Z88DKTARGET_$(1)) -m -o $$@ $$^ $(CFLAGS) $(LDFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(basename $(2))) $(CFLAGS_$(1)_$(basename $(2))) $(ZCFLAGS_$(1)) $(LDFLAGS_$(1)) $(LDFLAGS_$(basename $(2))) $(LDFLAGS_$(1)_$(basename $(2)))  $(ZLDFLAGS_$(1)) -create-app 
 # delete object files to solve problem with appmake +zx80 creating a .o file
 # that is a tape image and not an object file, causing a second make to fail
+ifeq ($(1),zx80)
 	$(Q)$(RM) build/$(1)/*.o
+endif
 endef
 
 

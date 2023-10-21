@@ -39,11 +39,19 @@ lognat:
    jr nz,$+9
    inc l
    dec l
-   jr nz,normalizeln-1
+IF __CPU_R4K__ | __CPU_R5K__
+   jp nz,normalizeln_pre
+ELSE
+   jr nz,normalizeln_pre
+ENDIF
    ld l,177
    ret
    inc h
+IF __CPU_R4K__ | __CPU_R5K__
+   jp nz,normalizeln
+ELSE
    jr nz,normalizeln
+ENDIF
    ld b,h
    ld c,l
    ld e,l
@@ -129,6 +137,7 @@ HL_Div_DE:
    adc a,a
    ret
 
+normalizeln_pre:
    inc h
 normalizeln:
    xor a

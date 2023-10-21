@@ -49,14 +49,13 @@ END
 unlink("${test}.bin");
 
 capture_ok("z88dk-z80asm -b -v ${test}.asm", <<END);
-Reading library 'z88dk-z80asm-z80-.lib'
+% z88dk-z80asm -b -v ${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
-Assembling '${test}.asm' to '${test}.o'
-Reading '${test}.asm' = '${test}.asm'
+Reading library 'z88dk-z80asm.lib'
+Assembling '${test}.asm'
 Writing object file '${test}.o'
-Module '${test}' size: 4 bytes
 
 Linking library module 'rld'
 Code size: 38 bytes (\$0000 to \$0025)
@@ -75,18 +74,17 @@ chdir("${test}dir") or die;
 				$ENV{PATH});
 
 $ENV{ZCCCFG} = "root/lib/config";
-copy('../z88dk-z80asm-z80-.lib', $ENV{ZCCCFG}.'/../z88dk-z80asm-z80-.lib');
+copy('../z88dk-z80asm.lib', $ENV{ZCCCFG}.'/../z88dk-z80asm.lib');
 
 capture_ok("z88dk-z80asm -b -v ../${test}.asm", <<END);
-Library 'z88dk-z80asm-z80-.lib' not found
-Reading library 'root/lib/z88dk-z80asm-z80-.lib'
+% z88dk-z80asm -b -v ../${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
-Assembling '../${test}.asm' to '../${test}.o'
-Reading '../${test}.asm' = '../${test}.asm'
+Library 'z88dk-z80asm.lib' not found
+Reading library 'root/lib/z88dk-z80asm.lib'
+Assembling '../${test}.asm'
 Writing object file '../${test}.o'
-Module '${test}' size: 4 bytes
 
 Linking library module 'rld'
 Code size: 38 bytes (\$0000 to \$0025)
@@ -102,15 +100,14 @@ delete $ENV{ZCCCFG};
 unlink("../${test}.bin");
 
 capture_ok("z88dk-z80asm -b -v -Lroot/lib ../${test}.asm", <<END);
-Library 'z88dk-z80asm-z80-.lib' not found
-Reading library 'root/lib/z88dk-z80asm-z80-.lib'
+% z88dk-z80asm -b -v -Lroot/lib ../${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
-Assembling '../${test}.asm' to '../${test}.o'
-Reading '../${test}.asm' = '../${test}.asm'
+Library 'z88dk-z80asm.lib' not found
+Reading library 'root/lib/z88dk-z80asm.lib'
+Assembling '../${test}.asm'
 Writing object file '../${test}.o'
-Module '${test}' size: 4 bytes
 
 Linking library module 'rld'
 Code size: 38 bytes (\$0000 to \$0025)
@@ -126,15 +123,14 @@ unlink("../${test}.bin");
 run_nok("z88dk-z80asm -b -v ../${test}.asm > ../${test}.out 2> ../${test}.err");
 
 check_text_file("../${test}.out", <<END);
-Library 'z88dk-z80asm-z80-.lib' not found
-Library '$default_lib_path/z88dk-z80asm-z80-.lib' not found
+% z88dk-z80asm -b -v ../${test}.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
-Assembling '../${test}.asm' to '../${test}.o'
-Reading '../${test}.asm' = '../${test}.asm'
+Library 'z88dk-z80asm.lib' not found
+Library '$default_lib_path/z88dk-z80asm.lib' not found
+Assembling '../${test}.asm'
 Writing object file '../${test}.o'
-Module '${test}' size: 4 bytes
 
 Code size: 4 bytes (\$0000 to \$0003)
 END
@@ -159,10 +155,6 @@ for my $cpu ("", qw(z80 z80n z180 gbz80 8080 8085 r2ka r3k)) {
 		$cmd .= "-IXIY " if $ixiy;
 		$cmd .= "${test}.asm";
 		
-		my $lib = "z88dk-z80asm-$real_cpu-";
-		$lib .= "ixiy" if $ixiy;
-		$lib .= ".lib";
-		
 		my @bytes = (0xCD, 0x04, 0x00, 0xC9);
 		if ($cpu =~ /^80/) {
 			push @bytes, @INTEL_RLD_AT_0004;
@@ -172,7 +164,7 @@ for my $cpu ("", qw(z80 z80n z180 gbz80 8080 8085 r2ka r3k)) {
 		}
 		
 		unlink("${test}.bin");
-		capture_ok($cmd, exp_output($real_cpu, $ixiy, $lib));
+		capture_ok($cmd, exp_output($cmd, $real_cpu, $ixiy));
 		check_bin_file("${test}.bin", bytes(@bytes));
 		
 		die unless Test::More->builder->is_passing;
@@ -187,23 +179,22 @@ done_testing;
 
 
 sub exp_output {
-	my($cpu, $ixiy, $library) = @_;
+	my($cmd, $cpu, $ixiy) = @_;
 	
 	my $CPU = uc($cpu);
 	my $family = ($cpu =~ /^z/i)  ? "ZILOG" :
 				 ($cpu =~ /^r/i)  ? "RABBIT" :
 				 ($cpu =~ /^80/i) ? "INTEL" : "";
-
-	my $out = 	"Reading library '$library'\n";
+	
+	my $out = 	"% $cmd\n";
 	$out .=		"Predefined constant: __CPU_${CPU}__ = 1\n";
 	$out .= 	"Predefined constant: __CPU_${family}__ = 1\n" if $family;
 	$out .= 	"Predefined constant: __SWAP_IX_IY__ = 1\n" if $ixiy;
 	$out .= <<END;
 Predefined constant: __FLOAT_GENMATH__ = 1
-Assembling '${test}.asm' to '${test}.o'
-Reading '${test}.asm' = '${test}.asm'
+Reading library 'z88dk-z80asm.lib'
+Assembling '${test}.asm'
 Writing object file '${test}.o'
-Module '${test}' size: 4 bytes
 
 Linking library module 'rld'
 END

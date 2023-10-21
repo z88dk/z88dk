@@ -3,6 +3,7 @@
 	SECTION	code_clib
 	PUBLIC	disz80
 	PUBLIC	_disz80
+	PUBLIC	___disz80
 	EXTERN	fputc_cons
 
 
@@ -11,6 +12,7 @@
 
 .disz80
 ._disz80
+.___disz80
 	pop	hl
 	pop	bc
 	pop	de

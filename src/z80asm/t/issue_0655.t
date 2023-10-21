@@ -38,8 +38,10 @@ END
 capture_ok("z88dk-z80asm -l ${test}.asm", "");
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
+Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
+  CPU:  z80 
+  Section "": 0 bytes
   Section rodata_driver: 257 bytes
     C \$0000: 55 C3 08 D8 C3 07 D8 AA C9 C9 00 00 00 00 00 00
     C \$0010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -60,16 +62,16 @@ Object  file ${test}.o at \$0000: Z80RMF16
     C \$0100: 00
   Section bss_user: 0 bytes
   Symbols:
-    L A \$0000 TESTING1 (section rodata_driver) (file ${test}.asm:3)
-    L C \$D900 _cpm_bdos_head (section rodata_driver) (file ${test}.asm:21)
-    L = \$0000 ENTRY (section rodata_driver) (file ${test}.asm:5)
-    L A \$0001 _rodata_cpm_ccp_head (section rodata_driver) (file ${test}.asm:7)
-    L C \$D808 COMMAND (section rodata_driver) (file ${test}.asm:17)
-    L C \$D800 CBASE (section rodata_driver) (file ${test}.asm:11)
-    L C \$D807 CLEARBUF (section rodata_driver) (file ${test}.asm:16)
-    L C \$D806 TESTING2 (section rodata_driver) (file ${test}.asm:14)
+    L A \$0000: TESTING1 (section rodata_driver) (file ${test}.asm:3)
+    L C \$D900: _cpm_bdos_head (section rodata_driver) (file ${test}.asm:21)
+    L = \$0000: ENTRY (section rodata_driver) (file ${test}.asm:5)
+    L A \$0001: _rodata_cpm_ccp_head (section rodata_driver) (file ${test}.asm:7)
+    L C \$D808: COMMAND (section rodata_driver) (file ${test}.asm:17)
+    L C \$D800: CBASE (section rodata_driver) (file ${test}.asm:11)
+    L C \$D807: CLEARBUF (section rodata_driver) (file ${test}.asm:16)
+    L C \$D806: TESTING2 (section rodata_driver) (file ${test}.asm:14)
   Expressions:
-    E =  \$0001 \$0001: ENTRY := _cpm_bdos_head (section rodata_driver) (file ${test}.asm:5)
+    E = \$0001 \$0001 0: ENTRY := _cpm_bdos_head (section rodata_driver) (file ${test}.asm:5)
 END
 
 unlink_testfiles;

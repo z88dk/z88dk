@@ -30,7 +30,7 @@ l_fast_mulu_32_32x32:
    ; error reported on overflow
    ;
    ; enter : dehl = 32-bit multiplicand
-   ;         dehl'= 32-bit multiplicand
+   ;         dehl'= 32-bit multiplier
    ;
    ; exit  : success
    ;
@@ -76,8 +76,7 @@ overflow:
 
    call error_mulu_overflow_mc
 
-   ld e,l
-   ld d,h
+   ld de,hl
 
    ret
 
@@ -183,7 +182,11 @@ ELSE
 
    inc e
    dec e
+IF __CPU_R4K__ | __CPU_R5K__
+   jp NZ, _16b_16b
+ELSE
    jr NZ, _16b_16b
+ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

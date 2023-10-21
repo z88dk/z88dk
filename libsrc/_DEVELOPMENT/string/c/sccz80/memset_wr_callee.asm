@@ -23,3 +23,10 @@ PUBLIC _memset_wr_callee
 defc _memset_wr_callee = memset_wr_callee
 ENDIF
 
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memset_wr_callee
+defc ___memset_wr_callee = memset_wr_callee
+ENDIF
+
