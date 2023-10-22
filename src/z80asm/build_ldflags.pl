@@ -8,7 +8,7 @@ my($gcc, $cross) = @ARGV;
 
 my $file = "build_ldflags$$";
 
-# when corss compiling, need to link statically
+# when cross compiling, need to link statically
 if ($cross) {
 	print "-static-libstdc++ -static-libgcc ";
 }
