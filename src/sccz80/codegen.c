@@ -1679,6 +1679,23 @@ void scale(Kind type, Type *tag)
 
 static void quikmult(int type, int32_t size, char preserve)
 {
+#define mult2l() do {             \
+        ol("add\thl,hl");         \
+        if ( IS_8085() ) {        \
+            ol("rl\tde");         \
+        } else if ( IS_8080() ) { \
+            ol("ld\ta,e");        \
+            ol("rla");            \
+            ol("ld\te,a");        \
+            ol("ld\ta,d");        \
+            ol("rla");            \
+            ol("ld\td,a");        \
+        } else {                  \
+            ol("rl\te");          \
+            ol("rl\td");          \
+        }                         \
+    } while (0)
+
      if ( type == KIND_LONG ) {
 
         /* Normal long multiplication is:
@@ -1695,164 +1712,34 @@ static void quikmult(int type, int32_t size, char preserve)
                 vconst(0);
                 break;
             case 128:
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
-                }
+                mult2l();
                 /* Fall through to x64 */
             case 64:
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
-                }
+                mult2l();
                 /* Fall through to x32 */
             case 32:
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
-                }
+                mult2l();
                 /* Fall through to x16 */
             case 16:
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
-                }
+                mult2l();
                 /* Fall through to x8 */
             case 8:
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
-                }
+                mult2l();
                 /* Fall through to x4 */
             case 4:
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
-                }
+                mult2l();
                 /* Fall through to x2 */
             case 2:
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
-                }
+                mult2l();
                 break;
             case 2048:
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
-                }
+                mult2l();
                 /* Fall through to x1024 */
             case 1024:
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
-                }
+                mult2l();
                 /* Fall through to x512 */
             case 512:
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
-                }
+                mult2l();
                 /* Fall through to x256 */
             case 256:
                 ol("ld\td,e");
