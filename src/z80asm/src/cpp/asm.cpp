@@ -57,7 +57,9 @@ void Asm::assemble1(const string& filename) {
     string o_filename = g_args.o_filename(filename);
     string parent_dir = fs::path(o_filename).parent_path().generic_string();
     if (!parent_dir.empty() && !std::filesystem::is_directory(parent_dir)) {
-        if (!fs::create_directories(parent_dir)) {
+        // check if it failed, and it was not created by another process
+        if (!fs::create_directories(parent_dir) &&
+            !std::filesystem::is_directory(parent_dir)) {    
             g_errors.error(ErrCode::DirCreate, parent_dir);
             perror(parent_dir.c_str());
             return;

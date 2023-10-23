@@ -94,7 +94,7 @@ static void parse_data(ScannedLine& m_line) {
     while (true) {
         // get expresion or string
         Token& token = m_line.peek();
-        if (typeid(TPatch)==typeid(UBytePatch) &&
+        if (typeid(TPatch) == typeid(UBytePatch) &&
             token.is(TType::String)) {      // load string
             for (auto& c : token.svalue())
                 instr->bytes().push_back(c & 0xff);
