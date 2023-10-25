@@ -27,7 +27,7 @@ jobs:
     - name: Build binaries
       run: |
         export PATH=/usr/local/bin:$PATH
-        ./build.sh -v -l
+        MAKE_CONCURRENCY=-j3 ./build.sh -v -l
     - name: Build libraries
       run: |
         export PATH=/usr/local/bin:$PATH
