@@ -590,6 +590,7 @@ Node *doswitch(void)
     needchar(')');
     swdefault = 0;
     swactive = 1;
+    endlab = getlabel(); // TODO: Unused, remove
 
 
     buf = startbuffer(100);
@@ -597,6 +598,7 @@ Node *doswitch(void)
     /* gen_jp_label(wq.exit) ; */
     suspendbuffer();
 
+    postlabel(endlab);
     gen_switch_preamble(switch_type->kind);
     array_add(arr,ast_switch(switch_type, sw_expr->node, pair->node));
 

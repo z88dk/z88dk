@@ -13,12 +13,15 @@
 	pop	hl
 	push	hl
 	push	bc
+.i_4
 	call	l_case
-	defw	i_4
-	defw	1
 	defw	i_5
+	defw	1
+	defw	i_6
 	defw	3
 	defw	0
+	ret
+.i_5
 	ld	hl,1	;const
 	push	hl
 	call	_dofunc

@@ -260,7 +260,7 @@ void print_ast(UT_string *output, Node *node) {
             utstring_printf(output, "%Lf",node->zval);
             break;
         default:
-            utstring_printf(output, "LIT");
+            utstring_printf(output, "\"%s\"",litq+(int)node->zval+1);
             break;
         }
         break;
