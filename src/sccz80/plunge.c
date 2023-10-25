@@ -15,19 +15,25 @@
 int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int dropval, int endval, int (*heir)(LVALUE* lval), LVALUE* lval)
 {
     int droplab, endlab, hits, k;
+    Node *left, *right;
 
     hits = 0;
     while (1) {
+        left = lval->node;
         k = plnge1(heir, lval);
+        right = lval->node;
         if (streq(line + lptr, opstr) == 2) {
             inbyte();
             inbyte();
             if (hits == 0) {
                 hits = 1;
                 droplab = getlabel();
+            } else {
+                lval->node = ast_binop(strcmp(opstr,"||") ? OP_ANDAND : OP_OROR, left, right);
             }
             dropout(k, testfuncz, testfuncq, droplab, lval);
         } else if (hits) {
+            lval->node = ast_binop(strcmp(opstr,"||") ? OP_ANDAND : OP_OROR, left, right);
             dropout(k, testfuncz, testfuncq, droplab, lval);
             // TODO: Change to a carry?
             vconst(endval);

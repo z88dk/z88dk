@@ -714,6 +714,8 @@ void size_of(LVALUE* lval)
     lval->is_const = 1;
     lval->val_type = KIND_INT;
     lval->ptr_type = KIND_NONE;
+    lval->ltype = type_int;
+    lval->node =  ast_literal(lval->ltype, lval->const_val);
     vconst(lval->const_val);
 }
 

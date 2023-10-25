@@ -890,6 +890,8 @@ void cscale(Type *type, int* val)
 int docast(LVALUE* lval, LVALUE *dest_lval)
 {
     Kind   t1 = lval->cast_type->kind, t2 = dest_lval->ltype->kind;
+
+    dest_lval->node = ast_cast(lval->cast_type, dest_lval->node);
     
     if ( t1 == KIND_ARRAY || t1 == KIND_PTR ) {
         t1 = KIND_INT;

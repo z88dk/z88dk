@@ -208,6 +208,14 @@ Node *ast_switch_case(Type *sw_type, Node *value, int label)
     return ret;
 }
 
+Node *ast_cast(Type *to, Node *value)
+{
+    Node *ret = calloc(1,sizeof(*ret));
+    ret->ast_type = OP_CAST;
+    ret->type = to;
+    ret->operand = value;
+    return ret;
+}
 
 static void print_uop(UT_string *output, char *op, Node *node) {
     utstring_printf(output,"(%s ",op);
@@ -263,12 +271,12 @@ void print_ast(UT_string *output, Node *node) {
         utstring_printf(output, "(gv=%s)",node->sym->ctype->name);
         break;
     case AST_FUNC_CALL:
-        utstring_printf(output, "(%s",node->type->name);
+        utstring_printf(output, "callfunc(%s(",node->type->name);
         for ( int i = 0; i < array_len(node->args); i++ ) {
-            utstring_printf(output, " ");
+            utstring_printf(output, "%s ", i != 0 ? "," : "");
             print_ast(output, array_get_byindex(node->args,i));
         }
-        utstring_printf(output, ")");
+        utstring_printf(output, "))");
         break;
     // AST_FUNCPTR_CALL,
 
@@ -329,6 +337,13 @@ void print_ast(UT_string *output, Node *node) {
         break;
     // OP_SIZEOF,
     // OP_CAST,
+    case OP_CAST:
+        utstring_printf(output,"(cast (");
+        type_describe(node->type,output);
+        utstring_printf(output,")");
+        print_ast(output, node->operand);
+        utstring_printf(output,")");
+        break;
     case OP_USHR: print_binop(output,">>U", node); break;
     case OP_USHL: print_binop(output,"<<U", node); break;
     case OP_SSHR: print_binop(output,">>S", node); break;
@@ -365,6 +380,8 @@ void print_ast(UT_string *output, Node *node) {
     case OP_COMP:  print_uop(output, "~", node); break;
     case OP_LNEG:  print_uop(output, "!", node); break;
     case OP_NEG:   print_uop(output, "-", node); break;
+    case OP_OROR:  print_binop(output,"||", node); break;
+    case OP_ANDAND: print_binop(output,"&&", node); break;
         break;
     // OP_DEREF,
     // OP_ADDR

@@ -512,6 +512,8 @@ enum asttype {
     OP_LT,
     OP_LE,
 
+    OP_OROR,
+    OP_ANDAND,
 
     OP_COMP,
     OP_LNEG,
