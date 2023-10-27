@@ -51,7 +51,7 @@ static char              combine_pages   =0;
 option_t ti8xk_options[] = {
 { 'h', "help",     "Display this help",                 OPT_BOOL,  &help},
 { 's', "single-page",     "Compile as single paged",    OPT_BOOL,  &single_page},
-{ 'c', "combine-pages",     "Signal that you are combining pages", OPT_BOOL,  &combine_pages},
+{ 'j', "combine-pages",     "Signal that you are combining pages", OPT_BOOL,  &combine_pages},
 { 'p', "other-pages", "A comma separated list of the pages without any spaces (ex main.o,page_1.o)", OPT_STR, &other_pages},
 { 'b', "binfile",  "Linked binary file",                OPT_STR,   &binname },
 { 'o', "output",   "Name of output file",               OPT_STR,   &outfile },
@@ -70,6 +70,10 @@ unsigned char header8xk[] = {
 	8,                                  /* Length of name. */
 	0,0,0,0,0,0,0,0}; 
 
+
+
+
+/* Constants required for cryptography */
 const unsigned char nbuf[]= {
 	0xAD,0x24,0x31,0xDA,0x22,0x97,0xE4,0x17,
 	0x5E,0xAC,0x61,0xA3,0x15,0x4F,0xA3,0xD8,
@@ -290,10 +294,19 @@ int ti8xk_exec(char *target){
     unsigned char *buffer;
 
 
-    if ( help || (binname == NULL && single_page) || appname == NULL ) {
-		printf("Appmake must receive a -binfile and -name\n");
+    if ( help ) {
+		// printf("Appmake must receive a -name\n");
         return -1;
     }
+	if (binname == NULL && single_page){
+		printf("Appmake: Binary file not found\n");
+		return -1;
+	}
+	if (appname == NULL){
+		printf("Appmake: App name not found\n");
+		return -1;
+	}
+
 	if (!(single_page || combine_pages )){
 		printf("Appmake must be marked as -single-page or -combine-pages\n");
 		return -1;
@@ -359,7 +372,6 @@ int ti8xk_exec(char *target){
 				other_pages++;
 			}
 			
-			fprintf(stderr, "Opening '%s' \n", fileName);
 			FILE* page_fp = fopen_bin(fileName, NULL);
 			size = i = pageStart + fsize(page_fp);
 			fread(buffer+pageStart, fsize(page_fp), 1, page_fp);
@@ -372,7 +384,7 @@ int ti8xk_exec(char *target){
 		}
 	}
 
-	fprintf(stderr, "Finished opening with a size of %i \n", size);
+
 
 
 
@@ -409,18 +421,16 @@ int ti8xk_exec(char *target){
 
 
 
-    /* Fix app header fields */
-    /* Length Field: set to size of app - 6 */
+
 	if (!(buffer[0] == 0x80 && buffer[1] == 0x0F)) {
 		free(buffer);
 		// SetLastSPASMError(SPASM_ERR_SIGNER_MISSING_LENGTH);
-        printf("Length field missing\n");
+        printf("App header not detected\n");
 		return -1;
 	}
 
-
-
-
+    /* Fix app header fields */
+    /* Length Field: set to size of app - 6 */
 
 
 	size -= 6;
