@@ -40,16 +40,22 @@
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
 static char             *appname      = NULL;
-static char              help         = 0;
+static char             *other_pages  = NULL;
+static char              help         =0;
+static char              single_page  =0;
+static char              multi_page   =0;
 
 
 /* Options that are available for this module */
 option_t ti8xk_options[] = {
-{ 'h', "help",     "Display this help",          OPT_BOOL,  &help},
-{ 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
-{ 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+{ 'h', "help",     "Display this help",                 OPT_BOOL,  &help},
+{ 's', "single-page",     "Compile as single paged",    OPT_BOOL,  &single_page},
+{ 'm', "multi-page",     "Compile with multiple pages", OPT_BOOL,  &multi_page},
+{ 'p', "other-pages", "A comma separated list of the other .bin files", OPT_STR}
+{ 'b', "binfile",  "Linked binary file",                OPT_STR,   &binname },
+{ 'o', "output",   "Name of output file",               OPT_STR,   &outfile },
 { 'n', "name",   "Name of app to be displayed on the calc (8 chars)",        OPT_STR,   &appname },
-{  0,  NULL,       NULL,                         OPT_NONE,  NULL }
+{  0,  NULL,       NULL,                                OPT_NONE,  NULL }
 };
 
 
@@ -284,14 +290,23 @@ int ti8xk_exec(char *target){
 
 
     if ( help || binname == NULL || appname == NULL ) {
+		printf("Appmake must receive a --binfile and --name\n");
         return -1;
     }
+	if (!(single_page || multi_page )){
+		printf("Appmake must be marked as --single-page or --multi-page");
+		return -1;
+	}
+	if (single_page && multi_page){
+		printf("Appmake must not be marked as --single-page and --multi-page at the same time");
+		return -1;
+	}
+
 
     if (outfile == NULL){
         int temp_size = strlen(binname);
         outfile = malloc(temp_size+5); // Small memory leak
         strncpy(outfile,binname,temp_size);
-        temp_size--;
         outfile[temp_size] = '.';
         outfile[temp_size+1] = '8';
         outfile[temp_size+2] = 'x';
@@ -309,6 +324,18 @@ int ti8xk_exec(char *target){
     size = i = fsize(fp);
     buffer = (unsigned char *) calloc(1, size+256);
     fread(buffer, size, 1, fp); // To memory
+
+
+	if (single_page && size >= 1<<14){
+		free(buffer);
+		printf("App marked as single paged, but is too large for just one page");
+		return -1;
+	}
+	if (multi_page && size <= 1<<14){
+		free(buffer);
+		printf("App marked as multi paged, but smaller than one page");
+		return -1;
+	}
 
 
 
@@ -373,6 +400,8 @@ int ti8xk_exec(char *target){
 	pages = size>>14; /* this is safe because we know there's enough room for the sig */
 	if (size & 0x3FFF) pages++;
 	buffer[pnt] = pages;
+
+	
     /* Name Field: Can be a variable number of characters, no checking if valid */
 	if (findfield_flex(0x40, buffer, &pnt, &field_sz)) {
 		free(buffer);
@@ -435,9 +464,9 @@ int ti8xk_exec(char *target){
 
 
     fclose(fp2);
-    
+	
 
-    printf("Size of file %i '%s'\n", size, safe_name);
+    printf("Automatically converting to %s as a flash app containing %i pages\n", outfile, pages);
 
 
 
