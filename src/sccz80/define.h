@@ -141,6 +141,7 @@ struct type_s {
         uint16_t shortcall_value;
         uint16_t hlcall_module;
         uint16_t hlcall_addr;
+        uint16_t bcall_value;
     } funcattrs;
 
     UT_hash_handle hh;
@@ -188,6 +189,7 @@ enum symbol_flags {
         HL_CALL = 0x20000,    /* Call via ld hl, (module) call (addr) */
         INTERRUPT = 0x40000,   /* Function is used for interrupts */
         ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
+        TI_BCALL      =0x100000, /*Function must be called with bcall() instead of call (ti83p/ti84p)*/
 };
 
 

@@ -43,6 +43,7 @@ int c_params_offset = 2;
 int c_old_diagnostic_fmt = 0;
 char *c_zcc_opt = "zcc_opt.def";
 
+
 /* Settings for genmath + math48 */
 int c_fp_mantissa_bytes = 5;
 int c_fp_exponent_bias = 128;

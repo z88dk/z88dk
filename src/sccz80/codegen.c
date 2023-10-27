@@ -1131,6 +1131,19 @@ void gen_call(int arg_count, const char *name, SYMBOL *sym)
     ot("call\t"); outname(name, dopref(sym)); nl();
 }
 
+/* Output the bcall 'op code' */
+void gen_bcall_ti(int arg_count, uint16_t addr, SYMBOL *sym)
+{
+    if (sym->ctype->return_type->kind == KIND_LONGLONG) {
+        ol("ld\tbc,__i64_acc");
+        push("bc");
+    }
+    if (arg_count != -1 ) {
+        loadargc(arg_count);
+    }
+    outfmt("\trst 40\n");
+    outfmt("defw\t%i\n", addr);
+}
 void gen_shortcall(Type *functype, int rst, int value)
 {
     if ((functype->flags & SHORTCALL_HL) == SHORTCALL_HL) {

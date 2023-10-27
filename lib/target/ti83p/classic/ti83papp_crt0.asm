@@ -163,8 +163,6 @@
 		DEFW 0x508F
 		rst 0x28 ; bcall(_ClrLCDFull)
 		DEFW 0x4540
-		ld hl, 123
-		ld hl, start-HEADER_START
 		call	_main		; call main()
 	cleanup:			; exit() jumps to this point
 		ld	iy,_IY_TABLE	; Restore flag pointer

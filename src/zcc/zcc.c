@@ -555,7 +555,7 @@ static option options[] = {
     { 0, "l", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library" , NULL, AddLinkLibrary, 0},
     { 0, "bn", OPT_STRING,  "Set the output file for the linker stage" , &c_linker_output_file, NULL, 0},
     { 0, "reloc-info", OPT_BOOL,  "Generate binary file relocation information" , &relocinfo, NULL, 0},
-    { 'm', "gen-map-file", OPT_BOOL,  "Generate an output map of the final executable" , &mapon, NULL, 0},
+    { 'm', "gen-map-file", OPT_BOOL,  "Generate an output map of the final executable" , &mapon, NULL, 0}, 
     { 's', "gen-symbol-file", OPT_BOOL,  "Generate a symbol map of the final executable" , &symbolson, NULL, 0},
     { 0, "list", OPT_BOOL|OPT_DOUBLE_DASH,  "Generate list files" , &lston, NULL, 0},
     { 'R', NULL, OPT_BOOL|OPT_DEPRECATED,  "Generate relocatable code (deprecated)" , &relocate, NULL, 0},
@@ -2942,6 +2942,7 @@ static void configure_compiler(void)
         if (sccz80arg) {
             add_option_to_compiler(sccz80arg);
         }
+
         if (c_code_in_asm) {
             add_option_to_compiler("-cc");
         }
