@@ -14,6 +14,9 @@ static char *c_zcc_opt = "zcc_opt.def";
 static int  lineno = 0;
 static int  sccz80_mode = 0;
 
+static char log_next_line = 0;
+static FILE* log_file;
+
 
 char *skip_ws(char *ptr)
 {
@@ -192,6 +195,36 @@ void write_redirect(char *sname, char *value)
     fclose(fp);
 }
 
+/* logfile is for being logging important lines to be inputted into other programs (ex for function signatures to shared in multi-page applications for the ti83p/ti84p) */
+void logline(char* ptr){
+    if (*(ptr++) != ' ' || *ptr == 0 || *ptr == '\n'){
+        fprintf(stderr, "%s:%d Invalid syntax for #pragma, must be like '#pragma logline FILE.EXT'\n", filename, lineno);
+        exit(1);
+    }
+    char name[256] = {0};
+    int tempI = 0;
+    char* temp = (char*)&name;
+    ptr = skip_ws(ptr);
+    while (tempI < 255 && *(ptr) != '\0' && *(ptr) != '\n') { // Copy name of file from source code
+        *(temp++) = *(ptr++);
+        tempI++;
+    }
+    if (*ptr == '\n'){
+
+    }
+
+
+    if ( (log_file=fopen((char*) name,"a")) == NULL ) {
+        fprintf(stderr,"%s:%d Cannot open log file\n", filename, lineno);
+        exit(1);
+    }
+    log_next_line = 1;
+    fprintf(log_file, "%s:%d:", filename, lineno+1);
+
+
+}
+
+
 typedef struct convspec_s {
     char fmt;
     char complex;
@@ -349,6 +382,15 @@ int main(int argc, char **argv)
     while ( fgets(buf, sizeof(buf) - 1, stdin) != NULL ) {
         lineno++;
         ptr = skip_ws(buf);
+        
+        if (log_next_line){
+            fputs(buf, log_file);
+            
+            log_next_line=0;
+            fclose(log_file);
+            log_file=NULL;
+        }
+
         if ( strncmp(ptr,"#pragma", 7) == 0 ) {
             int  ol = 1;
 
@@ -403,6 +445,8 @@ int main(int argc, char **argv)
                 write_bytes(ptr + 5, 1);
             } else if ( strncmp(ptr, "byte", 4) == 0 ) {
                 write_bytes(ptr + 5, 0);
+            }else if ( strncmp(ptr, "logline", 7) == 0 ) {
+                logline(ptr+7);
             } else if ( sccz80_mode == 0 && strncmp(ptr, "asm", 3) == 0 ) {
                 fputs("__asm\n",stdout);
                 ol = 0;
@@ -462,5 +506,9 @@ int main(int argc, char **argv)
 
             fputs(buf,stdout);
         }
+    }
+    if (log_file != NULL){
+        fputc('\n', log_file);
+        fclose(log_file);
     }
 }
