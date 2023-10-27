@@ -209,9 +209,6 @@ void logline(char* ptr){
         *(temp++) = *(ptr++);
         tempI++;
     }
-    if (*ptr == '\n'){
-
-    }
 
 
     if ( (log_file=fopen((char*) name,"a")) == NULL ) {
