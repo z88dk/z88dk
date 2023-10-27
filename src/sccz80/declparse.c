@@ -894,9 +894,8 @@ static void parse_trailing_modifiers(Type *type)
             
         } else if (amatch("__ti_branch")){
            handle_ti_branch(type);
-
-
-
+        }else if (amatch("__ti_multipage_callable")){
+            type->flags |= TI_MULTIPAGE_CALLABLE;
         } else {
             break;
         }
@@ -2109,6 +2108,8 @@ static void declfunc(Type *functype, enum storage_type storage)
         gen_interrupt_enter(currfn);
     } else if ( (functype->flags & CRITICAL) == CRITICAL ) {
         gen_critical_enter();
+    } else if ( (functype->flags & TI_MULTIPAGE_CALLABLE) == TI_MULTIPAGE_CALLABLE){
+        gen_ti_multipage_enter();
     }
 
     gen_push_frame();

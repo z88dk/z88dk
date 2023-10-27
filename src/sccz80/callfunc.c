@@ -369,7 +369,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             gen_hl_call(functype, functype->funcattrs.hlcall_module, functype->funcattrs.hlcall_addr);
         } else if ( functype->flags & BANKED ) {
             gen_bankedcall(ptr);
-        } else if (functype->flags & TI_BCALL){
+        } else if ((functype->flags & TI_BCALL) == TI_BCALL){
             gen_bcall_ti(va_arg_count, functype->funcattrs.bcall_value, ptr);
         }else {
             

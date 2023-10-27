@@ -190,6 +190,7 @@ enum symbol_flags {
         INTERRUPT = 0x40000,   /* Function is used for interrupts */
         ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
         TI_BCALL      =0x100000, /*Function must be called with bcall() instead of call (ti83p/ti84p)*/
+        TI_MULTIPAGE_CALLABLE = 0x200000,
 };
 
 

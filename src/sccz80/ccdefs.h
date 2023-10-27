@@ -84,7 +84,8 @@ extern void gen_push_primary(LVALUE *lval);
 extern int zinterruptoffset(SYMBOL *sym);
 extern void gen_interrupt_enter(SYMBOL *func);
 extern void gen_interrupt_leave(SYMBOL *func);
-
+extern void gen_ti_multipage_leave(void);
+extern void gen_ti_multipage_enter(void);
 extern void gen_critical_enter(void);
 extern void gen_critical_leave(void);
 extern void gen_shortcall(Type *functype, int rst, int value);

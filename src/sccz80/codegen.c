@@ -26,6 +26,7 @@
  */
 
 #include "ccdefs.h"
+#include "define.h"
 #include <time.h>
 #include <math.h>
 
@@ -1504,6 +1505,9 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
     if (type)
         setcond(type);
+    if ((currfn->flags & TI_MULTIPAGE_CALLABLE) == TI_MULTIPAGE_CALLABLE){
+        gen_ti_multipage_leave();
+    }
     ol("ret"); nl(); nl(); /* and exit function */
 }
 
@@ -5623,7 +5627,84 @@ void gen_interrupt_leave(SYMBOL *func)
     nl();
 }
 
+void gen_ti_multipage_enter(void){
+        int from_bcall = getlabel();
+        int not_from_bcall = getlabel();
 
+        // ol("di");
+        ol("exx");                    
+        ol("pop de");
+        
+        ol("ld a, d");
+        ol("cp $2b");  // Test if in a bcall()                
+        outstr("\tjr\tnz,"); printlabel(not_from_bcall); nl(); // If not, fix stack and return
+        
+        ol("ld hl, (0x9824)"); // Floating Point Stack for storing values
+        ol("ld (hl), d"); 
+        ol("inc hl");            
+        ol("ld (hl), e");       
+        ol("inc hl");
+        ol("pop de");
+        ol("ld (hl), d");
+        ol("inc hl");
+        ol("ld (hl), e");
+        ol("inc hl");
+        ol("ld (0x9824), hl"); // put back the incremented Floating Point Stack
+        outstr("jr\t"); printlabel(from_bcall); nl(); // Exit
+        
+        postlabel(not_from_bcall);
+
+        ol("push de");
+
+        postlabel(from_bcall);
+
+        ol("exx");
+        // ol("ei");
+
+}
+void gen_ti_multipage_leave(void){
+        int from_bcall = getlabel();
+        int not_from_bcall = getlabel();
+
+// Safely restore the stack for exiting the bcall on the ti83p/ti84p multi-page flash app (if applicable)
+        // ol("di");
+        ol("exx");
+        nl();
+        ol("ld hl, (0x9824)"); // Floating point stack for saving values
+        ol("push hl");
+        ol("dec hl    ");
+        ol("ld e, (hl)");
+        ol("dec hl    ");
+        ol("ld d, (hl)");
+        ol("dec hl    ");
+        ol("ld c, (hl)");
+        ol("dec hl    ");
+        ol("ld b, (hl)");
+        ol("ld a, $2b "); // Test if starts with bcall return value
+        nl();
+        ol("cp a, b");
+
+        outstr("\tjr\tnz,"); printlabel(not_from_bcall); nl();
+        nl(); nl();    
+
+        ol("pop af");
+        ol("push de");
+        ol("push bc");
+
+        outstr("jr\t"); printlabel(from_bcall); nl();
+        nl(); nl();    
+
+
+        postlabel(not_from_bcall);
+
+        ol("pop hl");
+        ol("ld (0x9824), hl");
+        
+        postlabel(from_bcall);
+        ol("exx");
+        // ol("ei");
+
+}
 
 void gen_critical_enter(void)
 {
