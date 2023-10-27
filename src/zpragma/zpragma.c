@@ -195,30 +195,48 @@ void write_redirect(char *sname, char *value)
     fclose(fp);
 }
 
-/* logfile is for being logging important lines to be inputted into other programs (ex for function signatures to shared in multi-page applications for the ti83p/ti84p) */
-void logline(char* ptr){
-    if (*(ptr++) != ' ' || *ptr == 0 || *ptr == '\n'){
-        fprintf(stderr, "%s:%d Invalid syntax for #pragma, must be like '#pragma logline FILE.EXT'\n", filename, lineno);
+void data_from_file(char *line){
+    FILE *fp, *data_file;
+    char data_name[256] = {0};
+    char file_name[256] = {0};
+    int data_name_len = 0;
+    int file_name_len = 0;
+
+
+
+    if ( (fp=fopen(c_zcc_opt,"a")) == NULL ) {
+        fprintf(stderr,"%s:%d Cannot open zcc_opt.def file\n", filename, lineno);
         exit(1);
     }
-    char name[256] = {0};
-    int tempI = 0;
-    char* temp = (char*)&name;
-    ptr = skip_ws(ptr);
-    while (tempI < 255 && *(ptr) != '\0' && *(ptr) != '\n') { // Copy name of file from source code
-        *(temp++) = *(ptr++);
-        tempI++;
-    }
 
-
-    if ( (log_file=fopen((char*) name,"a")) == NULL ) {
-        fprintf(stderr,"%s:%d Cannot open log file\n", filename, lineno);
+    line = skip_ws(line);
+    while (data_name_len < 255 && !isspace(*line) && *line != 0 && *line != ';' && *line != '\n')
+        data_name[data_name_len++] = *(line++);
+    
+    if (*line == 0 || *line == '\n' || *line == ';'){
+        fprintf(stderr, "%s:%d Invalid syntax for #pragma line\n", filename, lineno);
         exit(1);
     }
-    log_next_line = 1;
-    fprintf(log_file, "%s:%d:", filename, lineno+1);
 
+    line = skip_ws(line);
+    while (file_name_len < 255 && !isspace(*line) && *line != 0 && *line != ';' && *line != '\n')
+        file_name[file_name_len++] = *(line++);
+    
+    if ( (data_file=fopen(file_name,"r")) == NULL ) {
+        fprintf(stderr,"%s:%d Cannot open %s file\n", filename, lineno, file_name);
+        exit(1);
+    }
 
+    fprintf(fp,"\nIF NEED_%s\n",data_name);
+    char byte_from_data_file = fgetc(data_file);
+    while (byte_from_data_file!=EOF){
+        fputc(byte_from_data_file, fp);
+        byte_from_data_file=fgetc(data_file);
+    }
+
+    fprintf(fp,"ENDIF\n\n");
+    fclose(fp);
+    fclose(data_file);
 }
 
 
@@ -438,13 +456,13 @@ int main(int argc, char **argv)
                 write_defined("CLIB_OPT_SCANF_2", (int32_t)((value >> 32) & 0xffffffff), 0);
             } else if ( strncmp(ptr,"string",6) == 0 ) {
                 write_pragma_string(ptr + 6);
-            } else if ( strncmp(ptr, "data", 4) == 0 ) {
+            }else if ( strncmp(ptr, "data_from_file", 7) == 0 ) {
+                data_from_file(ptr+15);
+            }  else if ( strncmp(ptr, "data", 4) == 0 ) {
                 write_bytes(ptr + 5, 1);
             } else if ( strncmp(ptr, "byte", 4) == 0 ) {
                 write_bytes(ptr + 5, 0);
-            }else if ( strncmp(ptr, "logline", 7) == 0 ) {
-                logline(ptr+7);
-            } else if ( sccz80_mode == 0 && strncmp(ptr, "asm", 3) == 0 ) {
+            }else if ( sccz80_mode == 0 && strncmp(ptr, "asm", 3) == 0 ) {
                 fputs("__asm\n",stdout);
                 ol = 0;
             } else if ( sccz80_mode == 0 && strncmp(ptr, "endasm", 6) == 0 ) {
