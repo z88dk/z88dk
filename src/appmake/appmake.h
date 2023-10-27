@@ -239,6 +239,9 @@ extern option_t  svi_options;
 extern int       tixx_exec(char *target);
 extern option_t  tixx_options;
 
+extern int       ti8xk_exec(char *target);
+extern option_t  ti8xk_options;
+
 extern int       trs80_exec(char *target);
 extern option_t  trs80_options;
 
@@ -525,6 +528,10 @@ struct {
       "DGOS, KCS variant for Sorcerer Exidy and Microbee, also WAV format",
       NULL,
       sorcerer_exec,    &sorcerer_options },
+    { "bin2var",   "ti8xk",       "(C) 2023 z88dk, HeronErin, Spasm-ng",
+      "Creates a .8xk file. This is for ti83p/ti84p flash apps. Requires to use the 83/84 crt",
+      NULL,
+      ti8xk_exec,      &ti8xk_options },
     { "bin2var",   "ti82",       "(C) 2000,2003 David Phillips et al",
       "Creates a .82p file",
       NULL,

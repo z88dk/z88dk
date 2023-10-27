@@ -11,7 +11,7 @@ else
 endif
 
 CC			?= gcc
-CFLAGS		+= -Wall -std=gnu11 -MMD -pedantic -I../common
+CFLAGS		+= -Wall -std=gnu11 -MMD -pedantic -I../common -lgmp -lssl -lcrypto
 
 INSTALL 	?= install
 
@@ -31,7 +31,7 @@ all: $(1)$(EXESUFFIX)
 
 $(1)$(EXESUFFIX): $(2)
 	$(CC) $(CFLAGS) -o $(1)$(EXESUFFIX) $(2) $(LDFLAGS)
-	
+
 clean::
 	$(RM) $(1)$(EXESUFFIX) $(2)
 
@@ -49,7 +49,7 @@ $(eval $(call MAKE_EXE,$(PROJ),$(OBJS_ALL),0))
 
 #------------------------------------------------------------------------------
 clean::
-	$(RM) $(OBJS) $(DEPENDS) 
+	$(RM) $(OBJS) $(DEPENDS)
 
 #------------------------------------------------------------------------------
 install: $(PROJ)$(EXESUFFIX)
