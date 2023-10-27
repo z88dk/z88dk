@@ -124,6 +124,7 @@ void write_bytes(char *line, int flag)
                 fprintf(stderr, "%s:%d Invalid syntax for #pragma line\n", filename, lineno);
                 break;
             }
+            line++;
             line = skip_ws(line);
             count++;
             if ( count == 9 ) count=0;
@@ -398,10 +399,10 @@ int main(int argc, char **argv)
                 write_defined("CLIB_OPT_SCANF_2", (int32_t)((value >> 32) & 0xffffffff), 0);
             } else if ( strncmp(ptr,"string",6) == 0 ) {
                 write_pragma_string(ptr + 6);
-            } else if ( strncmp(ptr, "data", 4) == 0 && isspace(*(ptr+4)) ) {
-                write_bytes(ptr + 4, 1);
+            } else if ( strncmp(ptr, "data", 4) == 0 ) {
+                write_bytes(ptr + 5, 1);
             } else if ( strncmp(ptr, "byte", 4) == 0 ) {
-                write_bytes(ptr + 4, 0);
+                write_bytes(ptr + 5, 0);
             } else if ( sccz80_mode == 0 && strncmp(ptr, "asm", 3) == 0 ) {
                 fputs("__asm\n",stdout);
                 ol = 0;
