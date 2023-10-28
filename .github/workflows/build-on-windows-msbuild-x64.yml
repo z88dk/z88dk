@@ -18,7 +18,7 @@ jobs:
     steps:
     - name: Install choco packages
       run: |
-        choco install unzip gmp
+        choco install unzip
     - name: Install perl prerequisites
       run: |
         perl -S cpan App::cpanminus

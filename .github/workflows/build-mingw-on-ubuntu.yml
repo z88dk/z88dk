@@ -22,7 +22,7 @@ jobs:
         sudo apt-get update -y
     - name: Install apt dependencies
       run: |
-        sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 dos2unix ragel re2c libgmp3-dev libssl-dev
+        sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 dos2unix ragel re2c libgmp-dev libssl-dev
     - name: Install libxml2
       run: |
         set -ex
@@ -41,6 +41,11 @@ jobs:
         wget https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zlib-1.2.12-1-any.pkg.tar.zst
         zstd -d mingw-w64-x86_64-zlib-1.2.12-1-any.pkg.tar.zst
         ( mkdir mingw-w64-x86_64-zlib-1.2.12-1-any && cd mingw-w64-x86_64-zlib-1.2.12-1-any && tar xvf ../mingw-w64-x86_64-zlib-1.2.12-1-any.pkg.tar && cd mingw64 && rsync -avhH . /usr/x86_64-w64-mingw32 )
+    - name: Install OpenSSL headers for MinGW
+      run: |
+        set -ex
+        pacman -S --noconfirm mingw-w64-x86_64-openssl
+
     - name: Build binaries
       run: |
         set -ex
