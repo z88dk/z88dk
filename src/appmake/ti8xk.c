@@ -23,7 +23,7 @@
 #  include <openssl/md5.h>
 #endif
 
-#include <gmp.h>
+#include "gmp.h"
 
 
 
