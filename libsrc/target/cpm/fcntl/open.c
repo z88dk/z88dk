@@ -42,7 +42,7 @@ int open(char *name, int flags, mode_t mode)
 		
         if ( bdos(CPM_OPN,fc) == -1 ) {
             clearfcb(fc);
-            if ( (flags & 0xff))  { /* If returned error and writer then create */
+            if ( (flags & O_CREAT))  { /* If returned error and writer then create */
                 fd = creat(name,0);
                 swapuid(uid);
                 if ( fd == -1 )

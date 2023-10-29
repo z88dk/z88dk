@@ -7,4 +7,4 @@ eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 #export BUILD_SDCC=1
 #export BUILD_SDCC_HTTP=1
 chmod 777 build.sh
-./build.sh
+./build.sh -l
