@@ -1003,6 +1003,19 @@ shared_ptr<Expr> Expr::make_expr(const string& text) {
 Patch::Patch(shared_ptr<Expr> expr, int offset)
 	: m_expr(expr), m_offset(offset) {}
 
+ostream& operator<<(ostream& os, const Patch& patch) {
+    indent();
+    os << indent_prefix() << patch.type_name() << ":" << endl;
+    {
+        indent();
+        os << indent_prefix() << "expr=" << patch.m_expr->text() << endl;
+        os << indent_prefix() << "offset=" << patch.m_offset << endl;
+        outdent();
+    }
+    outdent();
+    return os;
+}
+
 void UBytePatch::do_patch(vector<uint8_t>& bytes, int /*asmpc*/) {
 	xassert(m_offset + size() <= static_cast<int>(bytes.size()));
 	ExprResult r = m_expr->eval_noisy();
@@ -1104,4 +1117,3 @@ void HighOffsetPatch::do_patch(vector<uint8_t>& bytes, int /*asmpc*/) {
 	}
 	bytes[m_offset] = value & 0xff;
 }
-

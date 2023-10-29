@@ -170,6 +170,19 @@ void Symtab::check_undefined_symbols() {
 	}
 }
 
+ostream& operator<<(ostream& os, const Symtab& symtab) {
+    os << indent_prefix() << "Symtab:" << endl;
+    {
+        indent();
+        for (auto it = symtab.m_table.begin(); it != symtab.m_table.end(); ++it) {
+            os << indent_prefix() << it->first << "="
+                << int_to_hex(it->second->value().value(), 4) << endl;
+        }
+        outdent();
+    }
+    return os;
+}
+
 //-----------------------------------------------------------------------------
 
 shared_ptr<Symbol> Symbols::find_local(const string& name) {
@@ -465,6 +478,27 @@ shared_ptr<Symbol> Symtab::use(const string& name) {
 	}
 	symbol->set_touched(true);
 	return symbol;
+}
+
+ostream& operator<<(ostream& os, const Symbols& symbols) {
+    os << indent_prefix() << "Symbols:" << endl;
+    {
+        indent();
+        os << indent_prefix() << "Defines:" << endl;
+        {
+            indent();
+            os << symbols.m_defines;
+            outdent();
+        }
+        os << indent_prefix() << "Globals:" << endl;
+        {
+            indent();
+            os << symbols.m_globals;
+            outdent();
+        }
+        outdent();
+    }
+    return os;
 }
 
 //-----------------------------------------------------------------------------

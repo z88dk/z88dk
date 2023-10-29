@@ -110,3 +110,8 @@ void Asm::set_cur_section(const string& name) {
 bool Asm::got_errors() {
 	return m_start_errors != g_errors.count();
 }
+
+ostream& operator<<(ostream& os, const Asm& asm_) {
+    os << *asm_.m_object;
+    return os;
+}

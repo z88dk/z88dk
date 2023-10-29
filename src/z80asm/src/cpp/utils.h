@@ -77,8 +77,9 @@ int ipow(int base, int exp);
 // convert int to hex
 // https://stackoverflow.com/questions/5100718/integer-to-hex-string-in-c
 template<typename T>
-string int_to_hex(T i, int width)
+string int_to_hex(T i_, int width)
 {
+    int i = static_cast<int>(i_);
 	std::ostringstream ss;
 	if (i <= -10)
 		ss << "-$"
@@ -111,6 +112,11 @@ void swrite_string(const string& s, ostream& os);
 
 int sread_int32(istream& is);
 string sread_string(istream& is);
+
+// debug ouptut
+void indent();
+void outdent();
+string indent_prefix();
 
 //-----------------------------------------------------------------------------
 // string table

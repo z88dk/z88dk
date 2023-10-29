@@ -110,6 +110,8 @@ public:
 
     shared_ptr<Symbol> use(const string& name);
 
+    friend ostream& operator<<(ostream& os, const Symtab& symtab);
+
 private:
 	map<string, shared_ptr<Symbol>>	m_table;	// symbols table
 };
@@ -132,6 +134,8 @@ public:
 	shared_ptr<Symbol> add(shared_ptr<Symbol> new_symbol);
 	void declare(const string& name, Symbol::Scope scope);
 	void check_undefined_symbols();
+
+    friend ostream& operator<<(ostream& os, const Symbols& symbols);
 
 private:
 	Symtab	m_defines;

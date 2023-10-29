@@ -35,6 +35,8 @@ public:
     void set_expanded_line(const string& line) { m_expanded_line = line; }
     void set_c_source(bool f) { m_is_c_source = f; }
 
+    friend ostream& operator<<(ostream& os, const Location& location);
+
 private:
 	string	m_filename;		        // current assembly file
 	int		m_line_num{ 0 };	    // curremt assembly line number

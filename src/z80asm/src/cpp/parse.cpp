@@ -23,10 +23,12 @@ void Parser::clear() {
 
 void Parser::parse() {
 	while (g_preproc.getline(m_line)) {
-        if (g_args.verbose())
+        if (g_args.debug_verbose())
             cout << g_preproc.location().filename() << ":" << g_preproc.location().line_num()
             << ": " << m_line.text();
 		parse_line();
+        if (g_args.debug_verbose())
+            cout << g_asm << g_symbols;
 	}
 }
 
