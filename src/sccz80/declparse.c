@@ -2109,7 +2109,8 @@ static void declfunc(Type *functype, enum storage_type storage)
     } else if ( (functype->flags & CRITICAL) == CRITICAL ) {
         gen_critical_enter();
     } else if ( (functype->flags & TI_MULTIPAGE_CALLABLE) == TI_MULTIPAGE_CALLABLE){
-        gen_ti_multipage_enter();
+        ol("EXTERN l_fixup_banked_epilogue");
+        callrts("l_fixup_banked_epilogue");
     }
 
     gen_push_frame();

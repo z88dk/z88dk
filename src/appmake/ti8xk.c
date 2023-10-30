@@ -1,15 +1,15 @@
 /** It should be notes that is is for compling FLASH APPS not ram programs.
  *  For ram programs see tixx.c
- * 
+ *
  *  This file originally made by HeronErin. (github.com/HeronErin)
- * 
- * 
- * 
+ *
+ *
+ *
  * *Heavily* Based on https://github.com/alberthdev/spasm-ng/blob/master/export.cpp
- * All credit to spasm for most of this 
+ * All credit to spasm for most of this
  *
  *
- */ 
+ */
 
 
 #include <ctype.h>
@@ -18,7 +18,7 @@
 #if defined(__APPLE__)
 #  define COMMON_DIGEST_FOR_OPENSSL
 #  include <CommonCrypto/CommonDigest.h>
-#  define SHA1 CC_SHA1
+#  define MD5 CC_MD5
 #else
 #  include <openssl/md5.h>
 #endif
@@ -68,7 +68,7 @@ unsigned char header8xk[] = {
 	1, 0x88,                            /* unsure, but always set like this */
 	0x01, 0x01, 0x19, 0x97,             /* Always sets date to jan. 1, 1997 */
 	8,                                  /* Length of name. */
-	0,0,0,0,0,0,0,0}; 
+	0,0,0,0,0,0,0,0};
 
 
 
@@ -121,9 +121,9 @@ void intelhex_spasm (FILE* outfile, const unsigned char* buffer, int size, unsig
 	unsigned int ci, temp, i, address;
 	unsigned char chksum;
 	unsigned char outbuf[128];
-	
+
 	//We are in binary mode, we must handle carriage return ourselves.
-   
+
 	while (bpnt < size){
 		fprintf(outfile,":02000002%04X%02X\r\n",page,(unsigned char) ( (~(0x04 + page)) +1));
 		page++;
@@ -140,7 +140,7 @@ void intelhex_spasm (FILE* outfile, const unsigned char* buffer, int size, unsig
 			ci>>=1;
 			fprintf(outfile,":%02X%04X00%s%02X\r\n",ci,address,outbuf,(unsigned char)( ~(chksum + ci)+1));
 			address +=0x20;
-		}         
+		}
 	}
 	fprintf(outfile,":00000001FF");
 }
@@ -149,10 +149,10 @@ void intelhex_spasm (FILE* outfile, const unsigned char* buffer, int size, unsig
 
 int siggen(const unsigned char* hashbuf, unsigned char* sigbuf, int* outf) {
 	mpz_t mhash, p, q, r, s, temp, result;
-	
+
 	unsigned int lp,lq;
 	int siglength;
-	
+
 /* Intiate vars */
 	mpz_init(mhash);
 	mpz_init(p);
@@ -161,7 +161,7 @@ int siggen(const unsigned char* hashbuf, unsigned char* sigbuf, int* outf) {
 	mpz_init(s);
 	mpz_init(temp);
 	mpz_init(result);
-	
+
 /* Import vars */
 	mpz_import(mhash, 16, -1, 1, -1, 0, hashbuf);
 	mpz_import(p, sizeof(pbuf), -1, 1, -1, 0, pbuf);
@@ -170,7 +170,7 @@ int siggen(const unsigned char* hashbuf, unsigned char* sigbuf, int* outf) {
 /*      M' = m*256+1      */
 	mpz_mul_ui(mhash, mhash, 256);
 	mpz_add_ui(mhash, mhash, 1);
-	
+
 /* calc f {2, 3,  0, 1 }  */
 	lp = mpz_legendre(mhash, p) == 1 ? 0 : 1;
 	lq = mpz_legendre(mhash, q) == 1 ? 1 : 0;
@@ -187,31 +187,31 @@ int siggen(const unsigned char* hashbuf, unsigned char* sigbuf, int* outf) {
 /* r = ( M' ^ ( ( p + 1) / 4 ) ) mod p */
 	mpz_import(result, sizeof(p14buf), -1, 1, -1, 0, p14buf);
 	mpz_powm(r, mhash, result, p);
-	
+
 /* s = ( M' ^ ( ( q + 1) / 4 ) ) mod q */
 	mpz_import(result, sizeof(q14buf), -1, 1, -1, 0, q14buf);
 	mpz_powm(s, mhash, result, q);
-	
+
 /* r-s */
 	mpz_set_ui(temp, 0);
 	mpz_sub(temp, r, s);
-	
+
 /* q ^ (p - 2)) */
 	mpz_import(result, sizeof(qpowpbuf), -1, 1, -1, 0, qpowpbuf);
-	
+
 /* (r-s) * q^(p-2) mod p */
 	mpz_mul(temp, temp, result);
 	mpz_mod(temp, temp, p);
-	
+
 /* ((r-s) * q^(p-2) mod p) * q + s */
 	mpz_mul(result, temp, q);
 	mpz_add(result, result, s);
-	
+
 /* export sig */
 	siglength = mpz_sizeinbase(result, 16);
 	siglength = (siglength + 1) / 2;
 	mpz_export(sigbuf, NULL, -1, 1, -1, 0, result);
-	
+
 /* Clean Up */
 	mpz_clear(p);
 	mpz_clear(q);
@@ -371,7 +371,7 @@ int ti8xk_exec(char *target){
 				fileNameIndex++;
 				other_pages++;
 			}
-			
+
 			FILE* page_fp = fopen_bin(fileName, NULL);
 			size = i = pageStart + fsize(page_fp);
 			fread(buffer+pageStart, fsize(page_fp), 1, page_fp);
@@ -458,12 +458,12 @@ int ti8xk_exec(char *target){
         printf("Page count field missing\n");
 		return -1;
 	}
-	
+
 	pages = size>>14; /* this is safe because we know there's enough room for the sig */
 	if (size & 0x3FFF) pages++;
 	buffer[pnt] = pages;
 
-	
+
     /* Name Field: Can be a variable number of characters, no checking if valid */
 	if (findfield_flex(0x40, buffer, &pnt, &field_sz)) {
 		free(buffer);
@@ -496,7 +496,7 @@ int ti8xk_exec(char *target){
 	if (f) {
 		buffer[total_size++] = 1;
 		buffer[total_size++] = f;
-	} 
+	}
     else buffer[total_size++] = 0;
     /* sig must be 96 bytes ( don't ask me why) */
 	tempnum = 96 - (total_size - size);
@@ -520,13 +520,13 @@ int ti8xk_exec(char *target){
 	fputc((tempnum >> 8) & 0xFF, fp2);
 	fputc((tempnum >> 16)& 0xFF, fp2);
 	fputc( tempnum >> 24, fp2);
-	
+
 /* Convert to 8xk */
 	intelhex_spasm(fp2, buffer, total_size, 0x4000);
 
 
     fclose(fp2);
-	
+
 
     printf("Automatically converting to %s as a flash app containing %i pages\n", outfile, pages);
 
