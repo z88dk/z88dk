@@ -14,10 +14,11 @@ CFILES = \
 	write.c  \
 	lseek.c  \
 	creat.c  \
-	remove.c
+	remove.c 
 
-AFILES = $(CFILES:.c=.asm)
-OFILES = $(CFILES:.c=.o)
+AFILES = fsync.asm
+
+OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 OBJECTS = $(addprefix obj/,$(OFILES))
 
 all: dirs $(OBJECTS)
@@ -25,6 +26,9 @@ all: dirs $(OBJECTS)
 
 
 obj/%.o: %.c
+	$(ZCC) +trs80 $(CFLAGS) $^ -o $@
+
+obj/%.o: %.asm
 	$(ZCC) +trs80 $(CFLAGS) $^ -o $@
 
 dirs:

@@ -5,6 +5,7 @@ cpc_openin
 cpc_openout
 cpc_setup_open
 open
+fsync
 readbyte
 read
 rename

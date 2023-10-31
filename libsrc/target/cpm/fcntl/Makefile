@@ -22,6 +22,7 @@ CFILES = \
 	get_dir_name.c \
 	fdtell.c \
 	fdgetpos.c \
+        fsync.c \
 	getfcb.c \
 	lseek.c \
 	open.c \

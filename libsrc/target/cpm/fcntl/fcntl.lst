@@ -21,6 +21,7 @@ target/cpm/fcntl/obj/${TYPE}/${DEVICE}/fdtell
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/getfcb
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/lseek
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/open
+target/cpm/fcntl/obj/${TYPE}/${DEVICE}/fsync
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/parsefcb
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/_putoffset
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/read

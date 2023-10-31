@@ -50,6 +50,7 @@ __ZPROTO3(long,,lseek,int,fd,long,posn,int,whence)
 extern int __LIB__ readbyte(int fd) __z88dk_fastcall;  // TODO: Clang
 __ZPROTO2(int,,writebyte,int,fd,int,c)
 
+extern int __LIB__ fsync(int fd);
 
 /* mkdir is defined in sys/stat.h */
 /* extern int __LIB__ mkdir(char *, int mode); */

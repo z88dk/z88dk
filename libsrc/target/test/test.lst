@@ -10,6 +10,7 @@ target/test/fcntl/close
 target/test/fcntl/creat
 target/test/fcntl/fdgetpos
 target/test/fcntl/fdtell
+target/test/fcntl/fsync
 target/test/fcntl/lseek
 target/test/fcntl/open
 target/test/fcntl/read

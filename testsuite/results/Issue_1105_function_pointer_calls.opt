@@ -396,6 +396,7 @@
 	GLOBAL	lseek
 	GLOBAL	readbyte
 	GLOBAL	writebyte
+	GLOBAL	fsync
 	GLOBAL	getcwd
 	GLOBAL	chdir
 	GLOBAL	getwd

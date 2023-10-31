@@ -11,3 +11,4 @@ rename
 write
 writebyte
 gets
+fsync

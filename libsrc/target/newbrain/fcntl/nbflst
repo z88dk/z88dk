@@ -1,6 +1,7 @@
 nbhandl
 close
 creat
+fsync
 fdgetpos
 fdtell
 lseek

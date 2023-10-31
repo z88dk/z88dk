@@ -15,3 +15,4 @@ zx_load_block
 zx_save_block
 zx_hardcopy
 zxgetfname
+fsync
