@@ -11,8 +11,8 @@ else
 endif
 
 CC			?= gcc
-CFLAGS		+= -Wall -std=gnu11 -MMD -pedantic -I../common -lgmp -lssl -lcrypto
-
+CFLAGS		+= -Wall -std=gnu11 -MMD -pedantic -I../common
+LDFLAGS     += -lgmp
 INSTALL 	?= install
 
 SRCS 		:= $(wildcard *.c) ../common/dirname.c
