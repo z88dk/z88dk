@@ -90,6 +90,7 @@
     <ClCompile Include="..\..\src\appmake\spc1000.c" />
     <ClCompile Include="..\..\src\appmake\svi.c" />
     <ClCompile Include="..\..\src\appmake\tixx.c" />
+    <ClCompile Include="..\..\src\appmake\ti8xk.c" />
     <ClCompile Include="..\..\src\appmake\trs80.c" />
     <ClCompile Include="..\..\src\appmake\tvc.c" />
     <ClCompile Include="..\..\src\appmake\vector06c.c" />
