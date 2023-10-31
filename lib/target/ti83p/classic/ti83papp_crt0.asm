@@ -1,6 +1,6 @@
 ;	Stub for the TI 83+ calculator for building as an app
 ;
-;  This is perferable to ti83papp.asm
+;  This is preferable to ti83papp.asm
 ;
 ;
 	MODULE  Ti83plus_App_crt0
@@ -112,18 +112,28 @@
 		DEFB 0,0,0,0		;Reserved
 		DEFB 0,0,0,0		;Reserved
 		
-		jp start
-		DEFB 0
+	;--------------------------------------------
+	; End of header, begin of branch table stuff
+	;--------------------------------------------
+	jp start    ; Skips branch table (if present) and by testing if followed by zero alerts appmake to a present branch table 
+
+
+
+	IF DEFINED_CRT0_BCALL_TABLE_SIZE
 		
-	DEFINE NEED_branch_table
-	INCLUDE	"zcc_opt.def"	; Get icon from zcc_opt.def
-	UNDEFINE NEED_branch_table
+		DEFB 0 ; Branch table must begin with multiple of 3
 
+	start_branch_table:
 
+		DEFS CRT0_BCALL_TABLE_SIZE, 0 
+		
+		; Appmake will fill this area
 
-	;-------------------------------------
-	; End of header, begin of startup part
-	;-------------------------------------
+	ENDIF
+	;--------------------------------------------
+	; End of branch table, begin of startup stuff
+	;--------------------------------------------
+
 	start:
 	IF DEFINED_GimmeSpeed
 		ld	a,1		; switch to 15MHz (extra fast)

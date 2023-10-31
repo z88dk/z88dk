@@ -141,7 +141,7 @@ struct type_s {
         uint16_t shortcall_value;
         uint16_t hlcall_module;
         uint16_t hlcall_addr;
-        uint16_t bcall_value;
+        int ticalc_banked_call_count;
     } funcattrs;
 
     UT_hash_handle hh;
@@ -189,8 +189,6 @@ enum symbol_flags {
         HL_CALL = 0x20000,    /* Call via ld hl, (module) call (addr) */
         INTERRUPT = 0x40000,   /* Function is used for interrupts */
         ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
-        TI_BCALL      =0x100000, /*Function must be called with bcall() instead of call (ti83p/ti84p)*/
-        TI_MULTIPAGE_CALLABLE = 0x200000,
 };
 
 
@@ -362,7 +360,12 @@ struct gototab_s {
 #define DBG_ALL   99
 
 #define Z80ASM_PREFIX "_"
+// Prefix used for ticalc style banked call
+#define BANKED_SYMBOL_PREFIX "__banked_import_"
 
+// Styles of banked call
+#define BANKED_STYLE_REGULAR 1
+#define BANKED_STYLE_TICALC  2
 
 
 #define CPU_Z80      1

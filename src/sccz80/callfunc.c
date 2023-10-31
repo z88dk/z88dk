@@ -7,7 +7,6 @@
  */
 
 #include "ccdefs.h"
-#include "define.h"
 
 #ifdef WIN32
 #include <process.h>
@@ -368,11 +367,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         } else if ( functype->flags & HL_CALL ) {
             gen_hl_call(functype, functype->funcattrs.hlcall_module, functype->funcattrs.hlcall_addr);
         } else if ( functype->flags & BANKED ) {
-            gen_bankedcall(ptr);
-        } else if ((functype->flags & TI_BCALL) == TI_BCALL){
-            gen_bcall_ti(va_arg_count, functype->funcattrs.bcall_value, ptr);
-        }else {
-            
+            gen_bankedcall(ptr, functype);
+        } else {
             gen_call(va_arg_count, funcname, ptr);
         }
     } else {

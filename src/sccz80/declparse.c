@@ -2,10 +2,6 @@
 #include "ccdefs.h"
 #include "define.h" 
 #include "utlist.h"
-#include <ctype.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
 
 static void declfunc(Type *type, enum storage_type storage);
 static void handle_kr_type_parameters(Type *func);
@@ -619,129 +615,6 @@ static Type *parse_type(void)
     // Successful
     return type;
 }
-static void handle_ti_branch(Type *type){
-    double page;
-    Kind pageKind;
-    needchar('(');
-    if (constexpr(&page,&pageKind, 0) == 0 ) {
-        errorfmt("Expecting a page number",1);
-    }
-    int quote_count=0;
-    int current_count=0;
-    
-    char label[256] = {0};
-    char map_file[256] = {0};
-
-
-    char c;
-    while ((c=ch())){
-        lptr++;
-        if (c==')' || c=='\n'){
-            errorfmt("__ti_branch parse error",1);
-        }
-        else if (c=='"' || c=='\''){
-            quote_count++;
-            current_count=0;
-        }else if (quote_count==1){
-            if (current_count<256)
-                label[current_count]=c;
-            current_count++;
-        }else if(quote_count==3){
-            if (current_count<256)
-                map_file[current_count]=c;
-            current_count++;
-        }
-        
-        if (quote_count==4) break;
-        
-    }
-    
-
-        
-    FILE* ti_branch_table;
-    FILE* map_fp;
-    if (NULL==(ti_branch_table = fopen("ti_branch_table.inc", "r+"))){
-        if (NULL==(ti_branch_table = fopen("ti_branch_table.inc", "w+"))){
-            errorfmt("Can not open ti_branch_table.inc",1);    
-        }
-    }
-
-    if (NULL==(map_fp = fopen(map_file, "r"))){
-        errorfmt("Can not open %s",1, map_file);   
-    }
-    int branchIndex = 0;
-    int label_len = strlen(label);
-    // Create the branch table file
-    if (ti_branch_table && map_fp){
-        char *line = NULL;
-        
-        int bin_address;
-        char found_addr = 0;
-
-        // Allocate memory for line
-        line = (char *)malloc(1024); // Adjust the size as needed
-
-        // Read lines from map_fp
-        while (fgets(line, 1024, map_fp) != NULL) {
-            if (strncmp(line, label, label_len) == 0) { 
-                if (isspace(line[label_len])) {
-                    int addr = label_len;
-                    for (; line[addr] && line[addr] != '$'; addr++) {}
-
-                    addr++;
-                    bin_address = strtol(line + addr, NULL, 16);
-                    found_addr = 1;
-                    break;
-                }
-            }
-        }
-
-        if (!found_addr)
-            errorfmt("Can not find '%s' in '%s'", 1, label, map_file);   
-        else {
-            int foundAtLine = -1;
-            int branchIndex = 0;
-            
-            // Rewind the file pointer to the beginning
-            fseek(ti_branch_table, 0, SEEK_SET);
-
-            // Read lines from ti_branch_table
-            while (fgets(line, 1024, ti_branch_table) != NULL) { // Adjust the size accordingly
-                if (strncmp(line, "DEFW", 4) == 0) { 
-                    if (isspace(line[4])) { 
-                        int addr = 4;
-                        for (; line[addr] && line[addr] != '$'; addr++) {}
-
-                        addr++;
-                        int bin_address2 = strtol(line + addr, NULL, 16);
-
-                        if (bin_address2 == bin_address) {
-                            foundAtLine = branchIndex;
-                            break;
-                        }
-                    }
-                }
-                branchIndex++;
-            }
-
-            if (foundAtLine == -1)
-                fprintf(ti_branch_table, "DEFW $%04x\nDEFB $%02x\n", (uint32_t)bin_address, (unsigned char)page);
-        }
-
-        // Free allocated memory for line
-        free(line);
-
-        fclose(map_fp);
-        fclose(ti_branch_table);
-    }
-
-    type->flags|=TI_BCALL;
-    type->funcattrs.bcall_value = (branchIndex/2*3) + 132;
-
-
-    needchar(')');
-}
-
 
 static void parse_trailing_modifiers(Type *type)
 {
@@ -874,28 +747,6 @@ static void parse_trailing_modifiers(Type *type)
             }
 
             needchar(')');
-        } else if (amatch("__ti_bcall")){  /* __ti_bcall(call_location) this should not be use manually unless you know what your doing */
-            double bcall_value;
-            Kind  valtype;
-
-            needchar('(');
-
-            if (constexpr(&bcall_value,&valtype, 0) == 0 ) {
-                errorfmt("Expecting a bcall number",1);
-            } else {
-                if (bcall_value > UINT16_MAX){
-                    errorfmt("__ti_bcall number too large for a 16-bit number",1);
-                }else{
-                    type->flags |= TI_BCALL;
-                    type->funcattrs.bcall_value = bcall_value;
-                }
-            }   
-            needchar(')');
-            
-        } else if (amatch("__ti_branch")){
-           handle_ti_branch(type);
-        }else if (amatch("__ti_multipage_callable")){
-            type->flags |= TI_MULTIPAGE_CALLABLE;
         } else {
             break;
         }
@@ -1691,10 +1542,6 @@ void flags_describe(Type *type, int32_t flags, UT_string *output)
         utstring_printf(output,"__z88dk_params_offset(%d) ", type->funcattrs.params_offset);
     }
 
-    if ( flags & TI_BCALL){
-        utstring_printf(output,"__ti_bcall(%d) ", type->funcattrs.bcall_value);
-    }
-
 }
 
 void type_describe(Type *type, UT_string *output)
@@ -2108,11 +1955,11 @@ static void declfunc(Type *functype, enum storage_type storage)
         gen_interrupt_enter(currfn);
     } else if ( (functype->flags & CRITICAL) == CRITICAL ) {
         gen_critical_enter();
-    } else if ( (functype->flags & TI_MULTIPAGE_CALLABLE) == TI_MULTIPAGE_CALLABLE){
+    }
+    if ((functype->flags&BANKED)==BANKED && c_banked_style == BANKED_STYLE_TICALC){
         ol("EXTERN l_fixup_banked_prologue");
         callrts("l_fixup_banked_prologue");
     }
-
     gen_push_frame();
 
     if (array_len(functype->parameters) && (functype->flags & (FASTCALL|NAKED)) == FASTCALL ) {

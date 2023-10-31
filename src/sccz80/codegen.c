@@ -1132,19 +1132,6 @@ void gen_call(int arg_count, const char *name, SYMBOL *sym)
     ot("call\t"); outname(name, dopref(sym)); nl();
 }
 
-/* Output the bcall 'op code' */
-void gen_bcall_ti(int arg_count, uint16_t addr, SYMBOL *sym)
-{
-    if (sym->ctype->return_type->kind == KIND_LONGLONG) {
-        ol("ld\tbc,__i64_acc");
-        push("bc");
-    }
-    if (arg_count != -1 ) {
-        loadargc(arg_count);
-    }
-    outfmt("\trst 40\n");
-    outfmt("defw\t%i\n", addr);
-}
 void gen_shortcall(Type *functype, int rst, int value)
 {
     if ((functype->flags & SHORTCALL_HL) == SHORTCALL_HL) {
@@ -1174,15 +1161,29 @@ void gen_hl_call(Type *functype, int module, int address)
     outfmt("\tcall\t%d\n", address);
 }
 
-void gen_bankedcall(SYMBOL *sym)
+void gen_bankedcall(SYMBOL *sym, Type* functype)
 {
     if (sym->ctype->return_type->kind == KIND_LONGLONG) {
         ol("ld\tbc,__i64_acc");
         push("bc");
     }
-    ol("call\tbanked_call");
-    ot("defq\t"); outname(sym->name, dopref(sym)); nl();
-}
+    if ( c_banked_style == BANKED_STYLE_TICALC ) {
+        ol("rst\t$28");            // BCALL, meaning the system will handle paging for us
+
+        outfmt(".%s%s%s%s%x\n",    // This label can be exported as a .map for appmake
+            BANKED_SYMBOL_PREFIX, 
+            dopref(sym) ? "_" : "",
+            sym->name,                  // Label must to the same to label in the other page file
+            dopref(sym) ? "_" : "",  
+            functype->funcattrs.ticalc_banked_call_count++ // All labels must be unique
+            ); 
+        ol("defw 0"); // Should be replaced with appmake
+
+    } else {
+        ol("call\tbanked_call");
+        ot("defq\t"); outname(sym->name, dopref(sym)); nl();
+    }
+ }
 
 /* djm (move this!) Decide whether to print a prefix or not
  * This uses new flags bit LIBRARY
@@ -1505,7 +1506,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
     if (type)
         setcond(type);
-    if ((currfn->flags & TI_MULTIPAGE_CALLABLE) == TI_MULTIPAGE_CALLABLE){
+    if ((currfn->flags&BANKED)==BANKED && c_banked_style == BANKED_STYLE_TICALC){
         ol("EXTERN l_fixup_banked_epilogue");
         callrts("l_fixup_banked_epilogue");
     }
@@ -5627,6 +5628,7 @@ void gen_interrupt_leave(SYMBOL *func)
     nl();
     nl();
 }
+
 
 
 void gen_critical_enter(void)

@@ -70,7 +70,6 @@ extern void gen_conv_uint2long(void);
 extern void gen_conv_sint2long(void);
 extern void gen_conv_carry2int(void);
 extern void gen_call(int nargs_count, const char *name, SYMBOL *sym);
-extern void gen_bcall_ti(int arg_count, uint16_t addr, SYMBOL *sym);
 
 extern void gen_intrinsic_in(SYMBOL *sym);
 extern void gen_intrinsic_out(SYMBOL *sym);
@@ -84,12 +83,11 @@ extern void gen_push_primary(LVALUE *lval);
 extern int zinterruptoffset(SYMBOL *sym);
 extern void gen_interrupt_enter(SYMBOL *func);
 extern void gen_interrupt_leave(SYMBOL *func);
-extern void gen_ti_multipage_leave(void);
-extern void gen_ti_multipage_enter(void);
+
 extern void gen_critical_enter(void);
 extern void gen_critical_leave(void);
 extern void gen_shortcall(Type *functype, int rst, int value);
-extern void gen_bankedcall(SYMBOL *sym);
+extern void gen_bankedcall(SYMBOL *sym, Type* functype);
 extern void gen_hl_call(Type *functype, int module, int address);
 extern void gen_emit_line(int);
 
@@ -270,6 +268,7 @@ extern int      c_params_offset;
 extern int      c_fp_mantissa_bytes;
 extern int      c_fp_exponent_bias;
 extern int      c_old_diagnostic_fmt;
+
 
 #include "misc.h"
 
