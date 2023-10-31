@@ -239,8 +239,14 @@ extern option_t  svi_options;
 extern int       tixx_exec(char *target);
 extern option_t  tixx_options;
 
+#ifndef _MSC_VER
 extern int       ti8xk_exec(char *target);
 extern option_t  ti8xk_options;
+#else
+// GMP can't be used in msbuild (see PR #2433)
+int       ti8xk_exec(char *target){}
+#define ti8xk_options tixx_options
+#endif
 
 extern int       trs80_exec(char *target);
 extern option_t  trs80_options;

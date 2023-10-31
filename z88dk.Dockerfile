@@ -16,8 +16,7 @@ ENV Z88DK_PATH="/opt/z88dk"
 RUN apk add --no-cache build-base libxml2 m4 curl gmp-dev gmp \
     && apk add --no-cache -t .build_deps bison flex libxml2-dev git subversion boost-dev texinfo \
 		perl-template-toolkit perl-app-cpanminus \
-    && git clone --depth 1 --recursive https://github.com/HeronErin/z88dk.git ${Z88DK_PATH} 
-# Using my github for testing (todo: set back to z88dk main github after finished)
+    && git clone --depth 1 --recursive https://github.com/z88dk/z88dk.git ${Z88DK_PATH} 
 
 RUN cpanm -l $HOME/perl5 --no-wget local::lib Template::Plugin::YAML 
 
