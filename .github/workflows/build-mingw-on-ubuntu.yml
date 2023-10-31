@@ -22,7 +22,7 @@ jobs:
         sudo apt-get update -y
     - name: Install apt dependencies
       run: |
-        sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 dos2unix ragel re2c
+        sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 dos2unix ragel re2c libgmp-dev
     - name: Install libxml2
       run: |
         set -ex
