@@ -674,67 +674,67 @@ static void handle_ti_branch(Type *type){
     // Create the branch table file
     if (ti_branch_table && map_fp){
         char *line = NULL;
-        size_t len = 0;
-        ssize_t read;
-
+        
         int bin_address;
-        char found_addr =0;
+        char found_addr = 0;
 
-        while ((read = getline(&line, &len, map_fp)) != -1) { 
-            if (strncmp(line, label, label_len)==0){ // If starts with label
-                if (isspace(line[label_len])){ // Line starts with label then space
-                    int addr =   label_len;
+        // Allocate memory for line
+        line = (char *)malloc(1024); // Adjust the size as needed
 
-                    for (; line[addr] && line[addr] != '$'; addr++){} // Find first '$'
+        // Read lines from map_fp
+        while (fgets(line, 1024, map_fp) != NULL) {
+            if (strncmp(line, label, label_len) == 0) { 
+                if (isspace(line[label_len])) {
+                    int addr = label_len;
+                    for (; line[addr] && line[addr] != '$'; addr++) {}
+
                     addr++;
-
-                    bin_address = strtol(line+addr, NULL, 16);
-                    found_addr=1;
+                    bin_address = strtol(line + addr, NULL, 16);
+                    found_addr = 1;
                     break;
                 }
             }
         }
-        
-
-        
 
         if (!found_addr)
-            errorfmt("Can not find '%s' in '%s'",1, label, map_file);   
-        else{
+            errorfmt("Can not find '%s' in '%s'", 1, label, map_file);   
+        else {
             int foundAtLine = -1;
-            while ((read = getline(&line, &len, ti_branch_table)) != -1) { 
-                if (strncmp(line, "DEFW", 4)==0){ // If starts with DEFW
-                    if (isspace(line[4])){ // Line starts with DEFW then space
-                        int addr =   4;
+            int branchIndex = 0;
+            
+            // Rewind the file pointer to the beginning
+            fseek(ti_branch_table, 0, SEEK_SET);
 
-                        for (; line[addr] && line[addr] != '$'; addr++){} // Find first '$'
+            // Read lines from ti_branch_table
+            while (fgets(line, 1024, ti_branch_table) != NULL) { // Adjust the size accordingly
+                if (strncmp(line, "DEFW", 4) == 0) { 
+                    if (isspace(line[4])) { 
+                        int addr = 4;
+                        for (; line[addr] && line[addr] != '$'; addr++) {}
+
                         addr++;
+                        int bin_address2 = strtol(line + addr, NULL, 16);
 
-                        int bin_address2 = strtol(line+addr, NULL, 16);
-                        
-                        if (bin_address2 == bin_address){
-                            foundAtLine=branchIndex;
+                        if (bin_address2 == bin_address) {
+                            foundAtLine = branchIndex;
                             break;
                         }
-
-                        
                     }
                 }
                 branchIndex++;
             }
+
             if (foundAtLine == -1)
                 fprintf(ti_branch_table, "DEFW $%04x\nDEFB $%02x\n", (uint32_t)bin_address, (unsigned char)page);
-            
         }
 
+        // Free allocated memory for line
         free(line);
 
         fclose(map_fp);
-            
         fclose(ti_branch_table);
-
-
     }
+
     type->flags|=TI_BCALL;
     type->funcattrs.bcall_value = (branchIndex/2*3) + 132;
 
