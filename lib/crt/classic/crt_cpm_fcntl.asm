@@ -1,8 +1,12 @@
 ; CP/M style FCB support (CP/M + MSXDOS1)
 
 
-
-
+    ; Control whether extending a file will write an empty record
+    IF !DEFINED_CPM_WRITE_EMPTY_RECORD
+        DEFC    CPM_WRITE_EMPTY_RECORD = 1
+    ENDIF
+    PUBLIC  __CPM_WRITE_EMPTY_RECORD
+    defc    __CPM_WRITE_EMPTY_RECORD = CPM_WRITE_EMPTY_RECORD
 
     SECTION bss_crt
 
