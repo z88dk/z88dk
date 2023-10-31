@@ -61,6 +61,7 @@ target/aquarius/fcntl/fdtell
 target/aquarius/fcntl/lseek
 target/aquarius/fcntl/mkdir
 target/aquarius/fcntl/open
+target/aquarius/fcntl/fsync
 target/aquarius/fcntl/read
 target/aquarius/fcntl/readbyte
 target/aquarius/fcntl/remove

@@ -11,6 +11,7 @@ obj/addext
 obj/open
 obj/close
 obj/creat
+obj/fsync
 obj/readbyte
 obj/writebyte
 obj/read

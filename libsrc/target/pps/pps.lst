@@ -17,6 +17,7 @@ target/pps/fcntl/close
 target/pps/fcntl/creat
 target/pps/fcntl/fdgetpos
 target/pps/fcntl/fdtell
+target/pps/fcntl/fsync
 target/pps/fcntl/lseek
 target/pps/fcntl/open
 target/pps/fcntl/read

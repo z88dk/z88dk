@@ -12,6 +12,7 @@
 #endif
 
 #include <stdio.h>
+#include <fcntl.h>
 
 
 int fflush(FILE *fp)
@@ -31,6 +32,13 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !_CPU_GBZ80__
     ld      d,(hl)
     inc     hl
     ld      a,(hl)
+    and     _IOUSE|_IOSYSTEM|_IOWRITE
+    cp      _IOUSE|_IOWRITE
+    ld      a,(hl)
+    jr      check_extra
+    call    fsync
+    ret
+check_extra:
     and     _IOUSE|_IOEXTRA
     cp      _IOUSE|_IOEXTRA
     jr      nz,fflush_error     ;not used
