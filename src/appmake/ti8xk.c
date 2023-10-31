@@ -15,15 +15,9 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#if defined(__APPLE__)
-#  define COMMON_DIGEST_FOR_OPENSSL
-#  include <CommonCrypto/CommonDigest.h>
-#  define MD5 CC_MD5
-#else
-#  include <openssl/md5.h>
-#endif
+#include "md5.h" // No longer need openssl for this one function
 
-#include "gmp.h"
+#include "gmp.h" // Not much you can do about The GNU multi-percision library 
 
 
 
@@ -481,12 +475,18 @@ int ti8xk_exec(char *target){
 
 
     /* Md5 stuff */
-    unsigned char hashbuf[16];
-    MD5 (buffer, size, hashbuf);
+    
+	MD5Context ctx;
+	md5Init(&ctx);
+	md5Update(&ctx, buffer, size);
+	md5Finalize(&ctx);
+
+
+    // MD5 (buffer, size, hashbuf);
 
 
     /* Generate the signature to the buffer */
-	siglength = siggen(hashbuf, buffer+size+3, &f );
+	siglength = siggen(ctx.digest, buffer+size+3, &f );
 
     /* append sig */
 	buffer[size + 0] = 0x02;

@@ -1506,8 +1506,8 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     if (type)
         setcond(type);
     if ((currfn->flags & TI_MULTIPAGE_CALLABLE) == TI_MULTIPAGE_CALLABLE){
-        ol("EXTERN l_fixup_banked_prologue");
-        callrts("l_fixup_banked_prologue");
+        ol("EXTERN l_fixup_banked_epilogue");
+        callrts("l_fixup_banked_epilogue");
     }
     ol("ret"); nl(); nl(); /* and exit function */
 }
