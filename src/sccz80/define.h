@@ -528,7 +528,7 @@ struct node_s {
     const char *filename;
     int         line;
     Type       *type;
-     SYMBOL   *sym;   // Defining a variable - TODO, may change
+    SYMBOL     *sym;   // Defining a variable - TODO, may change
     union {
          zdouble   zval;  // Constant
          // Binary operators

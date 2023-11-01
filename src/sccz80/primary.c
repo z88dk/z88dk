@@ -723,6 +723,7 @@ void smartstore(LVALUE* lval)
 
 void rvalue(LVALUE* lval)
 {
+    lval->node = ast_uop(OP_DEREF, lval->node);
     if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
         warningfmt("maybe-uninitialized","Variable '%s' may be used before initialisation", lval->symbol->name);
     }

@@ -316,9 +316,9 @@ void print_ast(UT_string *output, Node *node) {
         }
         break;
     case AST_DEREF:
-    case OP_DEREF: print_uop(output, "deref", node);
+    case OP_DEREF: print_uop(output, "deref", node); break;
     case AST_ADDR:
-    case OP_ADDR:  print_uop(output, "addr", node);
+    case OP_ADDR:  print_uop(output, "addr", node); break;
     case AST_CRITICAL:
         utstring_printf(output, "(critical ");
         print_ast(output, node->operand);

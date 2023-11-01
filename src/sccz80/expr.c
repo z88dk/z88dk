@@ -703,6 +703,7 @@ int heirb(LVALUE* lval)
                         clearstage(before, 0);
                         //        if (lval->symbol->more)
                         //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
+                        lval->node = ast_binop(OP_ADD, lval->node, ast_literal(type_int, val-lval->offset));
                         zadd_const(lval, val  - lval->offset);
                         lval->offset = 0;
                     }
@@ -853,8 +854,9 @@ int heirb(LVALUE* lval)
                     }
                 }
                 lval->flags = flags;
+                lval->node = ast_binop(OP_ADD, lval->node, ast_literal(type_int,member_type->offset));
                 zadd_const(lval, member_type->offset);
-	        lval->offset = member_type->offset;
+                lval->offset = member_type->offset;
                 lval->symbol = NULL;
                 lval->ltype = member_type;
                 lval->indirect_kind = lval->val_type = member_type->kind;
