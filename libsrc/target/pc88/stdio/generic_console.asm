@@ -30,6 +30,7 @@
 	EXTERN		generic_console_flags
 	EXTERN		__console_x
 	EXTERN		__CLIB_PC8800_V2_ENABLED
+        EXTERN         conio_map_colour
 
 	INCLUDE	"target/pc88/def/pc88.def"
 
@@ -38,11 +39,13 @@
 
 
 generic_console_set_paper:
+        call    conio_map_colour
 	and	7
 	ld	(__pc88_paper),a
 	ret
 
 generic_console_set_ink:
+        call    conio_map_colour
 	and	7
 	ld	(__pc88_ink),a
 	rrca
