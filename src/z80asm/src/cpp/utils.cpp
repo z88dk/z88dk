@@ -280,7 +280,9 @@ void expand_glob(vector<fs::path>& result, const string& pattern) {
 }
 
 int ipow(int base, int exp) {
-	int result = 1;
+    if (exp < 0)
+        return 0;
+    int result = 1;
 	for (;;) {
 		if (exp & 1)
 			result *= base;
