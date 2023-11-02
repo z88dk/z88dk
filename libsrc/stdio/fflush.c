@@ -27,18 +27,20 @@ ELSE
     push    bc
 ENDIF
 IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !_CPU_GBZ80__
-    ld      e,(hl)
+    ld      e,(hl)   ;fd
     inc     hl
     ld      d,(hl)
     inc     hl
     ld      a,(hl)
     and     _IOUSE|_IOSYSTEM|_IOWRITE
     cp      _IOUSE|_IOWRITE
-    ld      a,(hl)
-    jr      check_extra
+    jr      nz,check_extra
+    push    de       ;fd
     call    fsync
+    pop     bc       ;dump param
     ret
 check_extra:
+    ld      a,(hl)
     and     _IOUSE|_IOEXTRA
     cp      _IOUSE|_IOEXTRA
     jr      nz,fflush_error     ;not used
