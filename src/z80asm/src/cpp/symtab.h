@@ -138,6 +138,7 @@ public:
     void declare_public(const string& name);
     void declare_extern(const string& name);
     void check_undefined_symbols();
+    bool check_ifdef_condition(const string& name);
 
     friend ostream& operator<<(ostream& os, const Symbols& symbols);
 
@@ -148,7 +149,7 @@ private:
 	shared_ptr<Symbol> create_or_update(Symtab& symtab, shared_ptr<Symbol> new_symbol);
 	shared_ptr<Symbol> add_local_symbol(shared_ptr<Symbol> new_symbol);
 	shared_ptr<Symbol> add_global_symbol(shared_ptr<Symbol> new_symbol);
-
+    bool check_ifdef_condition(shared_ptr<Symbol> symbol);
 };
 
 extern Symbols g_symbols;

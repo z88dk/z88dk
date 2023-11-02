@@ -27,7 +27,7 @@ END_ERR
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		${H}if 1,
 END_ASM
-$test.asm:1: error: syntax error
+$test.asm:1: error: end of line expected: ,
   ^---- ${H}if 1,
 END_ERR
 

@@ -16,10 +16,13 @@
 #include <fstream>
 
 OFileWriter::OFileWriter(const string& filename)
-    : m_filename(filename) {
+    : m_filename(filename), m_start_errors(g_errors.count()) {
 }
 
 bool OFileWriter::write() {
+    if (got_errors())
+        return false;
+
     if (g_args.verbose())
         cout << "Writing object file '" << m_filename << "'" << endl;
 
@@ -37,15 +40,22 @@ bool OFileWriter::write() {
 
     // delete old object and rename temp file
     os.close();
-    std::remove(m_filename.c_str());
-    int rv = std::rename(temp_filename.c_str(), m_filename.c_str());
-    if (rv != 0) {
-        g_errors.error(ErrCode::FileRename, temp_filename);
-        perror(temp_filename.c_str());
+
+    if (got_errors()) {
+        std::remove(temp_filename.c_str());
+        std::remove(m_filename.c_str());
         return false;
     }
-
-    return true;
+    else {
+        std::remove(m_filename.c_str());
+        int rv = std::rename(temp_filename.c_str(), m_filename.c_str());
+        if (rv != 0) {
+            g_errors.error(ErrCode::FileRename, temp_filename);
+            perror(temp_filename.c_str());
+            return false;
+        }
+        return true;
+    }
 }
 
 streampos OFileWriter::write(ofstream& os) {
@@ -259,9 +269,11 @@ streampos OFileWriter::write_sections(ofstream& os) {
 
     for (auto& section : g_asm.cur_module()->sections()) {
         write_sections(section, os);
+        if (got_errors())
+            break;
     }
 
-    // return -1 if no symbols written
+    // return -1 if no sections written
     streampos end_fpos = os.tellp();
     if (start_fpos == end_fpos)
         return -1;
@@ -277,24 +289,29 @@ void OFileWriter::write_sections(shared_ptr<Section> section, ofstream& os) {
 
     // write size
     unsigned size = section->size();
-    swrite_int32(size, os);
-
-    // write section name
-    swrite_int32(m_string_table.add_string(section->name()), os);
-
-    // write ORG and ALIGN
-    swrite_int32(section->origin(), os);
-    swrite_int32(section->align(), os);
-
-    // write bytes
-    for (auto& instr : section->instrs()) {
-        if (instr->size() > 0) {
-            os.write(reinterpret_cast<const char*>(&instr->bytes()[0]), instr->size());
-        }
+    if (size > 0x10000) {
+        g_errors.error(ErrCode::SegmentOverflow);
     }
+    else {
+        swrite_int32(size, os);
 
-    // align to dword size
-    unsigned aligned_size = (size + (sizeof(int32_t) - 1)) & ~(sizeof(int32_t) - 1);
-    int extra_bytes = aligned_size - size;
-    os.write(align, extra_bytes);
+        // write section name
+        swrite_int32(m_string_table.add_string(section->name()), os);
+
+        // write ORG and ALIGN
+        swrite_int32(section->origin(), os);
+        swrite_int32(section->align(), os);
+
+        // write bytes
+        for (auto& instr : section->instrs()) {
+            if (instr->size() > 0) {
+                os.write(reinterpret_cast<const char*>(&instr->bytes()[0]), instr->size());
+            }
+        }
+
+        // align to dword size
+        unsigned aligned_size = (size + (sizeof(int32_t) - 1)) & ~(sizeof(int32_t) - 1);
+        int extra_bytes = aligned_size - size;
+        os.write(align, extra_bytes);
+    }
 }

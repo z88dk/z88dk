@@ -18,6 +18,8 @@ class OFileWriter {
 public:
     OFileWriter(const string& filename);
 	bool write();		// write g_asm, g_symtab
+    bool got_errors() const { return g_errors.count() > m_start_errors; }
+
     streampos write(ofstream& os);
 
 private:
@@ -38,4 +40,5 @@ private:
 	streampos write_modname(ofstream& os);
 	streampos write_sections(ofstream& os);
 	void write_sections(shared_ptr<Section> section, ofstream& os);
+    int m_start_errors{ 0 };
 };

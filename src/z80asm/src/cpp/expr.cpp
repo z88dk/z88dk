@@ -637,10 +637,10 @@ string Expr::text() const {
 bool Expr::parse(ScannedLine& line) {
     m_line = &line;
 	m_root = parse_expr();
-    m_line = nullptr;
+    bool ret = true;
 
     if (m_root) {
-		return true;
+        ret = true;
     }
     else {
         if (!m_in_can_parse) {
@@ -648,14 +648,28 @@ bool Expr::parse(ScannedLine& line) {
             g_errors.error(ErrCode::SyntaxExpr, m_line->peek_text());
             g_errors.pop_location();
         }
-		return false;
+        ret = false;
     }
+
+    m_line = nullptr;
+    return ret;
 }
 
 bool Expr::parse_if_statement(ScannedLine& line) {
     m_line = &line;
     m_parsing_if_statement = true;
     bool out = parse(line);
+
+    while (line.peek().is(TType::Newline))
+        line.next();
+
+    if (!line.at_end()) {
+        g_errors.push_location(m_location);
+        g_errors.error(ErrCode::EolExpected, line.peek_text());
+        g_errors.pop_location();
+        out = false;
+    }
+
     m_parsing_if_statement = false;
     m_line = nullptr;
     return out;
@@ -682,12 +696,10 @@ shared_ptr<ExprNode> Expr::parse_expr() {
 
 	try {
 		node = parse_ternary_condition();
-	}
-	catch (ExprException& e) {
-		if (!m_in_can_parse)
-            g_errors.error(e.err(), e.text());
-		ok = false;
-	}
+    }
+	catch (ExprException& ) {
+        ok = false;
+    }
 
 	if (ok)
 		return node;
@@ -991,11 +1003,24 @@ bool Expr::is_const() const {
 }
 
 shared_ptr<Expr> Expr::make_expr(const string& text) {
+    g_errors.push_location(g_errors.location());
+
     ScannedLine line;
     TextScanner ts{ text, line };
     auto expr = make_shared<Expr>();
     xassert(expr->parse(line));
-    return expr;
+    while (line.peek().is(TType::Newline))
+        line.next();
+
+    g_errors.pop_location();
+
+    if (!line.at_end()) {
+        g_errors.error(ErrCode::EolExpected);
+        return nullptr;
+    }
+    else {
+        return expr;
+    }
 }
 
 //-----------------------------------------------------------------------------

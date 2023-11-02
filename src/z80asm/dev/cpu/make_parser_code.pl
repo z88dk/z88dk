@@ -437,7 +437,7 @@ void Parser::$parse_function(int start_state) {
 			xassert(expr->parse(m_line));
 			m_exprs.push_back(expr);
 			if (longest.expr_type[i] == 2) {
-				ExprResult r = expr->eval_noisy();
+				ExprResult r = expr->eval_silent();
 				if (!r.is_const()) {
 					m_line.set_pos(longest.expr_pos[i]);
 					g_errors.error(ErrCode::ConstExprExpected, m_line.peek_text());

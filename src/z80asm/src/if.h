@@ -185,11 +185,6 @@ struct Symbol1* define_local_def_sym(const char* name, long value);
 void undefine_local_def_sym(const char* name);
 struct Symbol1* find_local_symbol(const char* name);
 
-// expressions
-void parse_const_expr_eval(const char* expr_text, int* result, bool* error);
-void parse_expr_eval_if_condition(const char *expr_text, bool* condition, bool* error);
-bool check_ifdef_condition(const char* name);
-
 // source file input
 bool sfile_open(const char* filename, bool search_include_path);
 void sfile_hold_input();

@@ -19230,6 +19230,7 @@ void Parser::parse_main_action_1511() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	add_opcode(0xF5);
 	add_opcode(0x7C);
 	add_opcode(0xB5);
@@ -19245,6 +19246,7 @@ void Parser::parse_main_action_1511() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	add_opcode(0xF5);
 	add_opcode(0x7C);
 	add_opcode(0xB5);
@@ -19270,6 +19272,7 @@ void Parser::parse_main_action_1512() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	add_opcode(0xF5);
 	add_opcode(0xDD7C);
 	add_opcode(0xDDB5);
@@ -19285,6 +19288,7 @@ void Parser::parse_main_action_1512() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	add_opcode(0xF5);
 	add_opcode(0xE5);
 	add_opcode(0xDDE5);
@@ -19316,6 +19320,7 @@ void Parser::parse_main_action_1513() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	add_opcode(0xF5);
 	add_opcode(0xE5);
 	add_opcode(0xFDE5);
@@ -19337,6 +19342,7 @@ void Parser::parse_main_action_1513() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	add_opcode(0xF5);
 	add_opcode(0xFD7C);
 	add_opcode(0xFDB5);
@@ -19423,6 +19429,7 @@ void Parser::parse_main_action_1520() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x30);
 	m_exprs.pop_back();
@@ -19450,6 +19457,7 @@ void Parser::parse_main_action_1521() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x20);
 	m_exprs.pop_back();
@@ -19477,6 +19485,7 @@ void Parser::parse_main_action_1522() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x38);
 	m_exprs.pop_back();
@@ -19496,6 +19505,7 @@ void Parser::parse_main_action_1523() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19511,6 +19521,7 @@ void Parser::parse_main_action_1523() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19526,6 +19537,7 @@ void Parser::parse_main_action_1523() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -19548,8 +19560,10 @@ void Parser::parse_main_action_1524() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19566,8 +19580,10 @@ void Parser::parse_main_action_1524() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19584,8 +19600,10 @@ void Parser::parse_main_action_1524() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -19609,6 +19627,7 @@ void Parser::parse_main_action_1525() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xE2);
 	m_exprs.pop_back();
@@ -19628,6 +19647,7 @@ void Parser::parse_main_action_1526() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xEA);
 	m_exprs.pop_back();
@@ -19655,6 +19675,7 @@ void Parser::parse_main_action_1527() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xF2);
 	m_exprs.pop_back();
@@ -19682,6 +19703,7 @@ void Parser::parse_main_action_1528() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19709,6 +19731,7 @@ void Parser::parse_main_action_1529() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xEA);
 	m_exprs.pop_back();
@@ -19736,6 +19759,7 @@ void Parser::parse_main_action_1530() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xFA);
 	m_exprs.pop_back();
@@ -19763,6 +19787,7 @@ void Parser::parse_main_action_1531() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xE2);
 	m_exprs.pop_back();
@@ -19790,6 +19815,7 @@ void Parser::parse_main_action_1532() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xEA);
 	m_exprs.pop_back();
@@ -19817,6 +19843,7 @@ void Parser::parse_main_action_1533() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xE2);
 	m_exprs.pop_back();
@@ -19887,6 +19914,7 @@ void Parser::parse_main_action_1537() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19903,6 +19931,7 @@ void Parser::parse_main_action_1537() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19926,8 +19955,10 @@ void Parser::parse_main_action_1538() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -19945,8 +19976,10 @@ void Parser::parse_main_action_1538() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20124,6 +20157,7 @@ void Parser::parse_main_action_1548() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20140,6 +20174,7 @@ void Parser::parse_main_action_1548() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20163,8 +20198,10 @@ void Parser::parse_main_action_1549() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20182,8 +20219,10 @@ void Parser::parse_main_action_1549() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20346,6 +20385,7 @@ void Parser::parse_main_action_1559() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20369,8 +20409,10 @@ void Parser::parse_main_action_1560() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20503,6 +20545,7 @@ void Parser::parse_main_action_1570() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20526,8 +20569,10 @@ void Parser::parse_main_action_1571() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20660,6 +20705,7 @@ void Parser::parse_main_action_1581() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20683,8 +20729,10 @@ void Parser::parse_main_action_1582() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20817,6 +20865,7 @@ void Parser::parse_main_action_1592() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -20840,8 +20889,10 @@ void Parser::parse_main_action_1593() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -37970,6 +38021,7 @@ void Parser::parse_main_action_3031() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -38100,6 +38152,7 @@ void Parser::parse_main_action_3041() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -38112,6 +38165,7 @@ void Parser::parse_main_action_3041() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nnn(0xCA);
 	m_exprs.pop_back();
@@ -38337,6 +38391,7 @@ void Parser::parse_main_action_3057() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	add_opcode(0x5B);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nnn(0xCA);
@@ -38513,6 +38568,7 @@ void Parser::parse_main_action_3071() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	add_opcode(0x40);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xCA);
@@ -38897,6 +38953,7 @@ void Parser::parse_main_action_3106() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nnn(0xEDCA);
 	m_exprs.pop_back();
@@ -39032,6 +39089,7 @@ void Parser::parse_main_action_3116() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -39044,6 +39102,7 @@ void Parser::parse_main_action_3116() {
 	{
 	string target1 = Section::autolabel();
 	auto target_expr1 = Expr::make_expr(target1);
+	xassert(target_expr1);
 	m_exprs.push_back(target_expr1);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -72802,6 +72861,7 @@ void Parser::parse_main_action_6078() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -72816,6 +72876,7 @@ void Parser::parse_main_action_6078() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_opcode_nn(0xCA);
 	m_exprs.pop_back();
@@ -72973,6 +73034,7 @@ void Parser::parse_main_action_6092() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -72988,6 +73050,7 @@ void Parser::parse_main_action_6092() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -73152,6 +73215,7 @@ void Parser::parse_main_action_6103() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();
@@ -73286,6 +73350,7 @@ void Parser::parse_main_action_6114() {
 	{
 	string target2 = Section::autolabel();
 	auto target_expr2 = Expr::make_expr(target2);
+	xassert(target_expr2);
 	m_exprs.push_back(target_expr2);
 	add_jump_relative(0x28);
 	m_exprs.pop_back();

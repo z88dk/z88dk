@@ -481,6 +481,30 @@ void Symbols::declare_extern(const string& name) {
 	}
 }
 
+bool Symbols::check_ifdef_condition(const string& name) {
+    auto symbol = find_local(name);
+    if (check_ifdef_condition(symbol))
+        return true;
+
+    symbol = find_global(name);
+    if (check_ifdef_condition(symbol))
+        return true;
+
+    return false;
+}
+
+bool Symbols::check_ifdef_condition(shared_ptr<Symbol> symbol) {
+    if (symbol) {
+        if (symbol->type() != Symbol::Type::Undef)
+            return true;
+        else if (symbol->scope() == Symbol::Scope::Extern ||
+            symbol->scope() == Symbol::Scope::Global
+            )
+            return true;
+    }
+    return false;
+}
+
 ostream& operator<<(ostream& os, const Symbols& symbols) {
     os << indent_prefix() << "Symbols:" << endl;
     {

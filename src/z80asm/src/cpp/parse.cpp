@@ -70,6 +70,8 @@ void Parser::parse_line_main(int start_state) {
                 continue;
             m_start_stmt = m_line.pos();
 			parse_main(start_state);
+            if (g_asm.cur_section()->size() > 0x10000) 
+                g_errors.error(ErrCode::SegmentOverflow);
 		}
     }
 }
@@ -123,14 +125,11 @@ static void parse_data(ScannedLine& m_line) {
         }
         else {
             auto expr = make_shared<Expr>();
-            if (expr->parse(m_line)) {
-                auto patch = make_shared<TPatch>(expr);
-                instr->add_patch(patch);
-            }
-            else {
-                g_errors.error(ErrCode::Syntax, m_line.peek_text());
+            if (!expr->parse(m_line))
                 return;
-            }
+
+            auto patch = make_shared<TPatch>(expr);
+            instr->add_patch(patch);
         }
 
         // get comma or end of line
@@ -253,6 +252,7 @@ void Parser::add_opcode_nn(unsigned bytes, int target_offset) {
         // build expr1 = target_offset+(expr)
 		string text = std::to_string(target_offset)+"+(" + expr->text() + ")";
 		expr = Expr::make_expr(text);
+        xassert(expr);
     }
 
     auto instr = g_asm.cur_section()->add_opcode(bytes);
@@ -269,6 +269,7 @@ void Parser::add_opcode_nnn(unsigned bytes, int target_offset) {
         // build expr1 = target_offset+(expr)
 		string text = std::to_string(target_offset)+"+(" + expr->text() + ")";
 		expr = Expr::make_expr(text);
+        xassert(expr);
     }
 
     auto instr = g_asm.cur_section()->add_opcode(bytes);
@@ -285,6 +286,7 @@ void Parser::add_opcode_nnnn(unsigned bytes, int target_offset) {
         // build expr1 = target_offset+(expr)
 		string text = std::to_string(target_offset)+"+(" + expr->text() + ")";
 		expr = Expr::make_expr(text);
+        xassert(expr);
     }
 
     auto instr = g_asm.cur_section()->add_opcode(bytes);
@@ -324,6 +326,7 @@ void Parser::add_opcode_idx_idx1(unsigned bytes0, unsigned bytes1) {
     // build expr1 = 1+(expr)
 	string text1 = "1+(" + expr0->text() + ")";
 	auto expr1 = Expr::make_expr(text1);
+    xassert(expr1);
 
     add_opcode_idx(bytes0);
     m_exprs.push_back(expr1);
@@ -371,6 +374,7 @@ void Parser::add_emul_call_flag(unsigned bytes_jump, unsigned bytes_call) {
 	// create label and expression
 	string temp_label_name = Section::autolabel();
     auto temp_label_expr = Expr::make_expr(temp_label_name);
+    xassert(temp_label_expr);
 
 	// jp !flag, temp
 	auto instr1 = g_asm.cur_section()->add_opcode(bytes_jump);
@@ -392,6 +396,7 @@ void Parser::add_call_function(const string& function_name) {
 
 	// create expression with function name
     auto function_expr = Expr::make_expr(function_name);
+    xassert(function_expr);
 
 	// add call instruction
 	auto instr = g_asm.cur_section()->add_opcode(Z80_CALL);

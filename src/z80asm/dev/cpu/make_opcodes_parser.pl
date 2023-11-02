@@ -146,6 +146,7 @@ sub parse_code {
 			push @code, 
 				"string target$id = Section::autolabel();",
 				"auto target_expr$id = Expr::make_expr(target$id);",
+				"xassert(target_expr$id);";
 		}
 		
 		# create each opcode and corresponding label

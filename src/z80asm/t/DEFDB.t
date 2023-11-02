@@ -4,16 +4,16 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-for my $defdb (qw(defdb ddb)) {
+for my $defdb (qw(defdb ddb wordbe)) {
 	ok 1, "Test with $defdb";
 
 	z80asm_nok("", "", "xx: $defdb", <<END_ERR);
-$test.asm:1: error: syntax error
+$test.asm:1: error: syntax error in expression
   ^---- xx: $defdb
 END_ERR
 
 	z80asm_nok("", "", "xx: $defdb xx,", <<END_ERR);
-$test.asm:1: error: syntax error
+$test.asm:1: error: syntax error in expression
   ^---- xx: $defdb xx,
 END_ERR
 

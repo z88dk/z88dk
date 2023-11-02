@@ -111,10 +111,6 @@ void Asm::add_asmpc_instr() {
     m_asmpc_instr = g_asm.cur_section()->add_asmpc();
 }
 
-bool Asm::got_errors() {
-	return m_start_errors != g_errors.count();
-}
-
 ostream& operator<<(ostream& os, const Asm& asm_) {
     os << *asm_.m_object;
     return os;

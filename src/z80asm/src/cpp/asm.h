@@ -52,7 +52,7 @@ private:
 	void assemble1(const string& filename);
 
 	// errors
-	bool got_errors();
+    bool got_errors() const { return g_errors.count() > m_start_errors; }
 };
 
 extern Asm g_asm;

@@ -58,8 +58,6 @@ extern bool parse_statement(ParseCtx *ctx);
 
 /* save the current scanner context and parse the given expression */
 extern struct Expr1 *parse_expr(const char *expr_text);
-extern void parse_const_expr_eval(const char* expr_text, int* result, bool* error);
-extern void parse_expr_eval_if_condition(const char *expr_text, bool* condition, bool* error);
 
 /* push current expression */
 void push_expr(ParseCtx* ctx);
@@ -69,10 +67,6 @@ struct Expr1* pop_expr(ParseCtx* ctx);
 
 /* Pop and compute expression, issue error on failure */
 void pop_eval_expr(ParseCtx* ctx, int* pvalue, bool* perror);
-
-/* check IF conditions */
-extern bool check_if_condition(struct Expr1 *expr);
-extern bool check_ifdef_condition(const char *name);
 
 /* return new auto-label in strpool */
 extern const char *autolabel(void);

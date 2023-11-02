@@ -8,12 +8,12 @@ for my $defp (qw(defp ptr dp)) {
 	ok 1, "Test with $defp";
 
 	z80asm_nok("", "", "xx: $defp", <<END_ERR);
-$test.asm:1: error: syntax error
+$test.asm:1: error: syntax error in expression
   ^---- xx: $defp
 END_ERR
 
 	z80asm_nok("", "", "xx: $defp xx,", <<END_ERR);
-$test.asm:1: error: syntax error
+$test.asm:1: error: syntax error in expression
   ^---- xx: $defp xx,
 END_ERR
 

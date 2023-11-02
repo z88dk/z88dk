@@ -8,12 +8,12 @@ for my $defb (qw(defb db defm dm byte)) {
 	ok 1, "Test with $defb";
 
 	z80asm_nok("", "", "xx: $defb", <<END_ERR);
-$test.asm:1: error: syntax error
+$test.asm:1: error: syntax error in expression
   ^---- xx: $defb
 END_ERR
 
 	z80asm_nok("", "", "xx: $defb xx,", <<END_ERR);
-$test.asm:1: error: syntax error
+$test.asm:1: error: syntax error in expression
   ^---- xx: $defb xx,
 END_ERR
 

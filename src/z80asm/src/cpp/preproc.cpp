@@ -10,6 +10,7 @@
 #include "expr.h"
 #include "float.h"
 #include "if.h"
+#include "symtab.h"
 #include "preproc.h"
 #include "scan.h"
 #include "utils.h"
@@ -205,6 +206,10 @@ bool Preproc::getline1(ScannedLine& line) {
             return false;
         }
         else if (m_files.back().get_token_line(line)) {	// read from file
+            if (g_args.debug_verbose())
+                cout << g_preproc.location().filename() << ":" << g_preproc.location().line_num()
+                << ": " << line.text();
+
             if (m_reading_macro_body)
                 m_output.push_back(line);
             else
@@ -371,7 +376,7 @@ bool Preproc::symbol_defined(const Token& ident) {
 		return true;
 
 	// check assembler symbol
-	if (check_ifdef_condition(expanded_name.c_str()))
+	if (g_symbols.check_ifdef_condition(expanded_name))
 		return true;
 	else
 		return false;
@@ -1100,26 +1105,29 @@ void Preproc::do_rept() {
 	if (m_line.peek().is(TType::Newline))
 		g_errors.error(ErrCode::Syntax);
 	else {
-		int count = 0;
-		bool error = false;
-
         // expand macros in count
         vector<Token> count_tokens = m_line.peek_tokens();
         ScannedLine count_line{ Token::to_string(count_tokens), count_tokens };
         ExpandedLine expanded_count = expand(count_line, defines());
         string count_text = expanded_count.to_string();
-		parse_const_expr_eval(count_text.c_str(), &count, &error);
-		if (!error) {
-			ScannedLine body = collect_macro_body(Keyword::REPT, Keyword::ENDR);
+        auto count_expr = Expr::make_expr(count_text);
+        if (count_expr) {
+            auto r = count_expr->eval_silent();
+            if (!r.is_const())
+                g_errors.error(ErrCode::ConstExprExpected);
+            else {
+                int count = r.value();
+                ScannedLine body = collect_macro_body(Keyword::REPT, Keyword::ENDR);
 
-			// create new level for expansion
-			m_levels.emplace_back(&defines());
-            ScannedLine block;
-            for (int i = 0; i < count; i++)
-                block.append(body);
+                // create new level for expansion
+                m_levels.emplace_back(&defines());
+                ScannedLine block;
+                for (int i = 0; i < count; i++)
+                    block.append(body);
 
-			m_levels.back().split_lines(block);
-		}
+                m_levels.back().split_lines(block);
+            }
+        }
 	}
 }
 
@@ -1150,7 +1158,7 @@ void Preproc::do_reptc() {
                 block.append({ Token{TType::Hash, false },
                                Token{TType::Ident, false, "define"},
                                Token{TType::Ident, false, var},
-                               Token{TType::Ident, false, std::to_string(c)},
+                               Token{TType::Integer, false, c},
                                Token{TType::Newline, false } });
 
                 block.append(body);
