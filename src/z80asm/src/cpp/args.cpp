@@ -406,10 +406,15 @@ void Args::set_float_format(const string& format) {
 
 void Args::set_origin(const string& opt_arg) {
 	int value = 0;
-	if (!parse_opt_int(value, opt_arg) || value < 0)	// value can be >0xffff for banked address
-		g_errors.error(ErrCode::InvalidOrgOption, opt_arg);
-	else
-		set_origin_option(value);
+    if (!parse_opt_int(value, opt_arg) || value < 0)	// value can be >0xffff for banked address
+        g_errors.error(ErrCode::InvalidOrgOption, opt_arg);
+    else
+        set_origin(value);
+}
+
+void Args::set_origin(int origin) {
+    m_origin = origin;
+    m_origin_found = true;
 }
 
 bool Args::collect_opt_arg(const string& opt_name, const string& arg,

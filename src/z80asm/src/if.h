@@ -151,7 +151,6 @@ bool option_date_stamp();
 bool option_relocatable();
 bool option_reloc_info();
 int option_filler();
-void set_origin_option(int origin);
 bool option_symtable();
 bool option_list_file();
 bool option_map();

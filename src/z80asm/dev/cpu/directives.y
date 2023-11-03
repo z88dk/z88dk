@@ -100,12 +100,21 @@ global [START_STATE_GLOBAL] IDENT [$|,]
 	parse_int16be_data();
 	
 #------------------------------------------------------------------------------
-# others
+# Sections
 #------------------------------------------------------------------------------
 
+align CONST_EXPR $
+	int align  = m_const_exprs.back(); m_const_exprs.pop_back();
+	do_align(align, g_args.filler());
+	
+align CONST_EXPR , CONST_EXPR $
+	int filler = m_const_exprs.back(); m_const_exprs.pop_back();
+	int align  = m_const_exprs.back(); m_const_exprs.pop_back();
+	do_align(align, filler);
+	
 org CONST_EXPR $
-	/*set_origin(expr);*/
-	while (!m_line.at_end()) m_line.next();
+	do_org(m_const_exprs.back());
 
-section
-	while (!m_line.at_end()) m_line.next();
+section IDENT $
+	string name = m_line.peek(start_stmt_index() + 1).svalue();
+	do_section(name);

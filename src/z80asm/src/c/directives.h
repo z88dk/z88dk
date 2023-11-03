@@ -44,7 +44,6 @@ extern void asm_DEFGROUP_define_const(const char* name);
 extern void asm_LSTON(void);
 extern void asm_LSTOFF(void);
 
-extern void asm_ORG(int address);
 extern void asm_PHASE(int address);
 extern void asm_DEPHASE();
 
@@ -56,13 +55,6 @@ extern void asm_SECTION(const char* name);
 extern void asm_MODULE_default(void);
 
 /* directives with list of names argument, function called for each argument */
-extern void asm_GLOBAL(const char* name);
-extern void asm_EXTERN(const char* name);
-extern void asm_XREF(const char* name);
-extern void asm_LIB(const char* name);
-extern void asm_PUBLIC(const char* name);
-extern void asm_XDEF(const char* name);
-extern void asm_XLIB(const char* name);
 extern void asm_DEFINE(const char* name);
 extern void asm_UNDEFINE(const char* name);
 
@@ -74,9 +66,6 @@ extern void asm_DEFB_expr(struct Expr1* expr);
 
 /* DEFW, DEFQ, DEFDB - add 2-byte and 4-byte expressions */
 extern void asm_DEFW(struct Expr1* expr);
-
-/* align directive */
-extern void asm_ALIGN(int align, int filler);
 
 /* Z80 DMA commands */
 extern void asm_DMA_command(int cmd, UT_array* exprs);	// stack of exprs, top is last

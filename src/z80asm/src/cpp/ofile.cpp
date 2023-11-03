@@ -299,7 +299,13 @@ void OFileWriter::write_sections(shared_ptr<Section> section, ofstream& os) {
         swrite_int32(m_string_table.add_string(section->name()), os);
 
         // write ORG and ALIGN
-        swrite_int32(section->origin(), os);
+        if (section->section_split())
+            swrite_int32(ORG_SECTION_SPLIT, os);
+        else if (section->origin() < 0)
+            swrite_int32(ORG_NOT_DEFINED, os);
+        else
+            swrite_int32(section->origin(), os);
+
         swrite_int32(section->align(), os);
 
         // write bytes

@@ -231,16 +231,14 @@ Define rules for a ragel-based parser.
 	*   directives with list of names argument, function called for each
 	*	argument
 	*--------------------------------------------------------------------*/
-#foreach <OP> in GLOBAL, PUBLIC, EXTERN, DEFINE, UNDEFINE, XDEF, XLIB, XREF, LIB
+#foreach <OP> in DEFINE, UNDEFINE
 	action <OP>_action { asm_<OP>(Str_data(name)); }
 
 	asm_<OP> = _TK_<OP> name @<OP>_action
 		    ( _TK_COMMA name @<OP>_action )*
 		    _TK_NEWLINE ;
 #endfor  <OP>
-	directives_names = asm_GLOBAL | asm_PUBLIC | asm_EXTERN |
-					   asm_DEFINE | asm_UNDEFINE |
-					   asm_XDEF | asm_XLIB | asm_XREF | asm_LIB;
+	directives_names = asm_DEFINE | asm_UNDEFINE;
 
 	/*---------------------------------------------------------------------
 	*   Z88DK specific opcodes
@@ -311,33 +309,6 @@ Define rules for a ragel-based parser.
 				error_assert_failed();
 			else 
 				; 
-		}
-		| label? _TK_ALIGN const_expr _TK_NEWLINE @{
-		    DO_STMT_LABEL();
-			if (ctx->expr_error)
-				error_expected_const_expr();
-			else
-				asm_ALIGN(ctx->expr_value, option_filler());
-		}
-		| label? _TK_ALIGN const_expr _TK_COMMA
-				@{ if (ctx->expr_error)
-					   error_expected_const_expr();
-				   value1 = ctx->expr_error ? 0 : ctx->expr_value;
-				   ctx->expr_error = false;
-				}
-				const_expr _TK_NEWLINE @{
-			DO_STMT_LABEL();
-		    if (ctx->expr_error)
-				error_expected_const_expr();
-			else
-				asm_ALIGN(value1, ctx->expr_value);
-		}
-
-		| _TK_ORG const_expr _TK_NEWLINE @{
-			if (ctx->expr_error)
-				error_expected_const_expr();
-			else
-				asm_ORG(ctx->expr_value);
 		}
 
 		| _TK_PHASE const_expr _TK_NEWLINE @{
@@ -445,7 +416,6 @@ static int get_start_state(ParseCtx *ctx)
 
 static bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 {
-	int  value1 = 0;
 	int  start_num_errors = get_num_errors();
 	ctx->expr_value = 0;			/* last computed expression value */
 	ctx->expr_error = false;		/* last computed expression error */

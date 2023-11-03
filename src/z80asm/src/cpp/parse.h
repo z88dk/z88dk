@@ -53,6 +53,9 @@ private:
     void do_defs_n_n();
     void do_defs_n_str(const string& filler);
     void do_equ(const string& name, shared_ptr<Expr> expr);
+    void do_align(int align, int filler);
+    void do_org(int origin);
+    void do_section(const string& name);
 
 	bool expr_in_parens();
 

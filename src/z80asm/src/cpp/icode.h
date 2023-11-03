@@ -37,6 +37,8 @@ public:
     auto cbegin() const { return m_list.cbegin(); }
     auto cend() const { return m_list.cend(); }
     auto size() const { return m_list.size(); }
+    auto front() const { return m_list.front(); }
+    auto back() const { return m_list.back(); }
 
 	// find by name, return nullptr if not found; sets m_current
 	shared_ptr<Child> find(const string& name) {
@@ -140,7 +142,12 @@ public:
 	int pc() const;
     unsigned size() const;
     int origin() const { return m_origin; }
+    void set_origin(int origin);
+    void set_cmdline_origin(int origin);
+    bool section_split() const { return m_section_split; }
     int align() const { return m_align; }
+    void do_align(int align, int filler);
+    bool is_first_section() const;
 
 	shared_ptr<Instr> add_asmpc();
     shared_ptr<Instr> add_label(const string& name);
@@ -156,15 +163,18 @@ public:
     friend ostream& operator<<(ostream& os, const Section& section);
 
 private:
-	string	m_name;
+	string	m_name;                         // name of section
 	Module*	m_module{ nullptr };
 	list<shared_ptr<Instr>> m_instrs;
-    int m_origin{ ORG_NOT_DEFINED };
-    int m_align{ 1 };
+    int  m_origin{ ORG_NOT_DEFINED };       // ORG address of section, -1 if not defined
+    bool m_origin_found{ false };
+    bool m_section_split{ false };          // ORG -1,  that this section should be output to a new binary file
+    int  m_align{ 1 };                      // if align>1, section is aligned at align-boundaries
+    bool m_align_found{ false };            // ALIGN already found in this section
 
 	shared_ptr<Instr> add_label_(const string& name);
-
     void update_asmpc(int start = 0);
+    void check_org_align();
 };
 
 //-----------------------------------------------------------------------------

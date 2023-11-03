@@ -12,6 +12,7 @@
 X(None, "", 0)
 
 // preprocessor
+X(ALIGN, "align", 0)
 X(ASMPC, "asmpc", 0)
 X(BINARY, "binary", 0)
 X(C_LINE, "c_line", 0)

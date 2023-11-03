@@ -150,6 +150,63 @@ string Section::autolabel() {
 	return ss.str();
 }
 
+void Section::set_origin(int origin) {
+    if (m_origin_found) {
+        g_errors.error(ErrCode::OrgRedefined);
+    }
+    else if (origin == -1) {				    // signal split section binary file
+        m_section_split = true;
+    }
+    else if (origin >= 0) {
+        m_origin = (is_first_section() && g_args.origin_found()) ? g_args.origin() : origin;
+        m_section_split = false;
+        check_org_align();
+    }
+    else {
+        g_errors.error(ErrCode::IntRange, int_to_hex(origin, 2));
+    }
+    m_origin_found = true;
+}
+
+void Section::set_cmdline_origin(int origin) {
+    m_origin_found = false;
+    set_origin(origin);
+    m_origin_found = false;
+}
+
+void Section::do_align(int align, int filler) {
+    if (align < 1 || align > 0xFFFF) {
+        g_errors.error(ErrCode::IntRange, int_to_hex(align, 2));
+    }
+    else {
+        // first ALIGN defines section alignment
+        if (asmpc() == 0) {
+            if (m_align_found) {
+                g_errors.error(ErrCode::AlignRedefined);
+            }
+            else {
+                m_align = align;
+                m_align_found = true;
+                check_org_align();
+            }
+        }
+        // other ALIGN reserves space with DEFS
+        else {
+            int above = pc() % align;
+            if (above > 0)
+                add_defs(align - above, filler);
+        }
+    }
+}
+
+bool Section::is_first_section() const {
+    xassert(m_module);
+    if (this == &(*(m_module->sections().front())))
+        return true;
+    else
+        return false;
+}
+
 shared_ptr<Instr> Section::add_asmpc() {
     return add_instr();
 }
@@ -361,6 +418,12 @@ void Section::update_asmpc(int start) {
 	}
 }
 
+void Section::check_org_align() {
+    if (m_origin >= 0 && m_align > 1 && (m_origin % m_align) != 0)
+        g_errors.error(ErrCode::OrgNotAligned,
+            "origin=" + int_to_hex(m_origin, 4) + ", align=" + int_to_hex(m_align, 2));
+}
+
 ostream& operator<<(ostream& os, const Section& section) {
     os << indent_prefix() << "Section:" << endl;
     {
@@ -393,6 +456,8 @@ ostream& operator<<(ostream& os, const Section& section) {
 Module::Module(const string& name, Object* object)
 	: m_name(name), m_object(object) {
 	add_section("");			// create default section
+    if (g_args.origin_found())
+        m_sections.back()->set_cmdline_origin(g_args.origin());
 }
 
 shared_ptr<Section> Module::add_section(const string& name) {

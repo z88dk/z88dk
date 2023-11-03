@@ -58,10 +58,10 @@ OPT("-g", nullptr, m_globaldef = true, "Create global definition file" EXT_DEF)
 
 OPT_HEADER("Appmake Options:")
 OPT("+zx81", nullptr, \
-	m_appmake = APPMAKE_ZX81; m_make_bin = true; set_origin_option(ZX81_ORIGIN), \
+	m_appmake = APPMAKE_ZX81; m_make_bin = true; set_origin(ZX81_ORIGIN), \
 	"Generate ZX81 " ZX81_APP_EXT " file, origin at " TOSTR(ZX81_ORIGIN))
 OPT("+zx", nullptr, \
-	m_appmake = APPMAKE_ZX; m_make_bin = true; set_origin_option(ZX_ORIGIN), \
+	m_appmake = APPMAKE_ZX; m_make_bin = true; set_origin(ZX_ORIGIN), \
 	"Generate ZX Spectrum " ZX_APP_EXT " file, origin defaults to" HELP_CONTINUE \
 	TOSTR(ZX_ORIGIN) " (in a REM), but can be set with -rORG >= 24000" HELP_CONTINUE \
 	"for above RAMTOP")

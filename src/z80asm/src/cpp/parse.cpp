@@ -483,6 +483,14 @@ void Parser::add_z80n_mmu_n() {
 	}
 }
 
+void Parser::do_align(int align, int filler) {
+    g_asm.cur_section()->do_align(align, filler);
+}
+
+void Parser::do_org(int origin) {
+    g_asm.cur_section()->set_origin(origin);
+}
+
 void Parser::add_z80n_mmu_a() {
 	xassert(m_exprs.size() == 1);
 
@@ -524,6 +532,10 @@ void Parser::add_restart() {
             error(ErrCode::IntRange, int_to_hex(addr, 2));
         }
     }
+}
+
+void Parser::do_section(const string& name) {
+    g_asm.cur_module()->add_section(name);
 }
 
 void Parser::warn_if_expr_in_parens() {

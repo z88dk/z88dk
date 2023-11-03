@@ -24,8 +24,6 @@ Assembly directives.
 #include "z80asm.h"
 #include "z80asm_defs.h"
 
-static void check_org_align();
-
 /*-----------------------------------------------------------------------------
 *   Encoding for C_LINE and ASM_LINE
 *----------------------------------------------------------------------------*/
@@ -183,12 +181,6 @@ void asm_LSTOFF(void)
 /*-----------------------------------------------------------------------------
 *   directives with number argument
 *----------------------------------------------------------------------------*/
-void asm_ORG(int address)
-{
-	set_origin_directive(address);
-	check_org_align();
-}
-
 void asm_PHASE(int address)
 {
 	set_phase_directive(address);
@@ -221,41 +213,6 @@ void asm_SECTION(const char* name)
 /*-----------------------------------------------------------------------------
 *   directives with list of names argument, function called for each argument
 *----------------------------------------------------------------------------*/
-void asm_GLOBAL(const char* name)
-{
-	declare_global_symbol(name);
-}
-
-void asm_EXTERN(const char* name)
-{
-	declare_extern_symbol(name);
-}
-
-void asm_XREF(const char* name)
-{
-	declare_extern_symbol(name);
-}
-
-void asm_LIB(const char* name)
-{
-	declare_extern_symbol(name);
-}
-
-void asm_PUBLIC(const char* name)
-{
-	declare_public_symbol(name);
-}
-
-void asm_XDEF(const char* name)
-{
-	declare_public_symbol(name);
-}
-
-void asm_XLIB(const char* name)
-{
-	declare_public_symbol(name);
-}
-
 void asm_DEFINE(const char* name)
 {
 	define_local_def_sym(name, 1);
@@ -293,41 +250,6 @@ void asm_DEFB_expr(Expr1* expr)
 void asm_DEFW(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_WORD, expr);
-}
-
-void asm_ALIGN(int align, int filler)
-{
-	if (align < 1 || align > 0xFFFF) {
-		error_int_range(align);
-	}
-	else {
-		// first ALIGN defines section alignment
-		if (CURRENTSECTION->asmpc == 0) {
-			if (CURRENTSECTION->align_found) {
-				error_align_redefined();
-			}
-			else {
-				CURRENTSECTION->align = align;
-				CURRENTSECTION->align_found = true;
-				check_org_align();
-			}
-		}
-		// other ALIGN reserves space with DEFS
-		else {
-			int pc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
-			int above = pc % align;
-			if (above > 0)
-				asm_DEFS(align - above, filler);
-		}
-	}
-}
-
-static void check_org_align()
-{
-	int org = CURRENTSECTION->origin;
-	int align = CURRENTSECTION->align;
-	if (org >= 0 && align > 1 && (org % align) != 0)
-		error_org_not_aligned(org, align);
 }
 
 /*-----------------------------------------------------------------------------

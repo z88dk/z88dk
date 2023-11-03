@@ -47,7 +47,7 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		extern	SIXTEEN
 		align	SIXTEEN
 END_ASM
-$test.asm:2: error: constant expression expected
+$test.asm:2: error: constant expression expected: SIXTEEN
   ^---- align SIXTEEN
 END_ERR
 
@@ -55,7 +55,7 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		extern	SIXTEEN, FILL
 		align	SIXTEEN, FILL
 END_ASM
-$test.asm:2: error: constant expression expected
+$test.asm:2: error: constant expression expected: SIXTEEN,FILL
   ^---- align SIXTEEN, FILL
 END_ERR
 
@@ -117,6 +117,10 @@ Object  file $test.o at \$0000: Z80RMF18
     C \$0000: 00
   Section data: 4 bytes, ALIGN 16
     C \$0000: 01 02 03 04
+  Symbols:
+    L C \$0001: __CPU_Z80__ (section "") (file "")
+    L C \$0001: __CPU_ZILOG__ (section "") (file "")
+    L C \$0001: __FLOAT_GENMATH__ (section "") (file "")
 END
 
 run_ok("z88dk-z80asm -b -f0xff $test.asm");

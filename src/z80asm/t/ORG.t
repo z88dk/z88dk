@@ -27,7 +27,7 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		extern start
 		org start
 END_ASM
-$test.asm:2: error: constant expression expected
+$test.asm:2: error: constant expression expected: start
   ^---- org start
 END_ERR
 
@@ -105,17 +105,17 @@ END
 
 # BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		jr ASMPC+2-129
+		jr \$+2-129
 END_ASM
 $test.asm:1: error: integer range: -\$81
-  ^---- \$+2-129
+  ^---- jr \$+2-129
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		jr ASMPC+2+128
+		jr \$+2+128
 END_ASM
 $test.asm:1: error: integer range: \$80
-  ^---- \$+2+128
+  ^---- jr \$+2+128
 END_ERR
 
 # -split-bin, ORG -1
@@ -179,6 +179,28 @@ check_bin_file("${test}.bin", 		words(0, 2));
 ok ! -f "${test}_code.bin", "${test}_code.bin";
 check_bin_file("${test}_data.bin", 	words(0x4000));
 check_bin_file("${test}_bss.bin", 	words(0x4002));
+
+unlink_testfiles;
+spew("$test.asm", <<END);
+	defw ASMPC
+	
+	section code
+	defw ASMPC
+	
+	section data	; split file here
+	org 0x4000
+	defw ASMPC
+	
+	section bss		; split file here
+	org -1
+	defw ASMPC
+END
+run_ok("z88dk-z80asm -r0x1000 -b $test.asm");
+check_bin_file("${test}.bin", 		words(0x1000, 0x1002));
+ok ! -f "${test}_code.bin", "${test}_code.bin";
+check_bin_file("${test}_data.bin", 	words(0x4000));
+check_bin_file("${test}_bss.bin", 	words(0x4002));
+
 
 unlink_testfiles;
 done_testing;

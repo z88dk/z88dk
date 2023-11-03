@@ -614,45 +614,6 @@ void codearea_close_remove(CodeareaFile* binfile, CodeareaFile* relocfile) {
 *   Assembly directives
 *----------------------------------------------------------------------------*/
 
-/* define a new origin, called by the ORG directive
-*  if origin is -1, the section is split creating a new binary file */
-void set_origin_directive(int origin)
-{
-	if (CURRENTSECTION->origin_found)
-		error_org_redefined();
-	else
-	{
-		CURRENTSECTION->origin_found = true;
-		if (origin == -1)					/* signal split section binary file */
-			CURRENTSECTION->section_split = true;
-		else if (origin >= 0)
-		{
-			if (CURRENTSECTION->origin_opts && CURRENTSECTION->origin >= 0)
-				; /* ignore ORG, as -r from command line overrides */
-			else
-				CURRENTSECTION->origin = origin;
-		}
-		else
-			error_int_range(origin);
-	}
-}
-
-/* define a new origin, called by the --orgin command line option */
-void set_origin_option(int origin)
-{
-	Section1 *default_section;
-
-	if (origin < 0)		// value can be >0xffff for banked address
-		error_int_range((long)origin);
-	else
-	{
-		default_section = get_first_section(NULL);
-		default_section->origin = origin;
-		default_section->origin_opts = true;
-	}
-}
-
-
 void read_origin(FILE* file, Section1 *section) {
 	int origin = xfread_dword(file);
 	set_origin(origin, section);

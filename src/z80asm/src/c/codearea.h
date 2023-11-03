@@ -172,13 +172,6 @@ extern void codearea_close_remove(CodeareaFile* binfile, CodeareaFile* relocfile
 *   Assembly directives
 *----------------------------------------------------------------------------*/
 
-/* define a new origin, called by the ORG directive
-*  if origin is -1, the section is split creating a new binary file */
-extern void set_origin_directive(int origin);
-
-/* define a new origin, called by the --orgin command line option */
-extern void set_origin_option(int origin);
-
 /* read/write origin to/from input file, for these cases:
    origin = 0..0xFFFF - origin defined;
    origin = -1 - origin not defined 
