@@ -1170,12 +1170,11 @@ void gen_bankedcall(SYMBOL *sym, Type* functype)
     if ( c_banked_style == BANKED_STYLE_TICALC ) {
         ol("rst\t$28");            // BCALL, meaning the system will handle paging for us
 
-        outfmt(".%s%s%s%s%x\n",    // This label can be exported as a .map for appmake
+        outfmt(".%s%x%s%s\n",    // This label can be exported as a .map for appmake
             BANKED_SYMBOL_PREFIX, 
+            (functype->funcattrs.ticalc_banked_call_count)++, // All labels must be unique
             dopref(sym) ? "_" : "",
-            sym->name,                  // Label must to the same to label in the other page file
-            dopref(sym) ? "_" : "",  
-            functype->funcattrs.ticalc_banked_call_count++ // All labels must be unique
+            sym->name                  // Label must to the same to label in the other page file
             ); 
         ol("defw 0"); // Should be replaced with appmake
 

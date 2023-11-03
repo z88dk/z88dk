@@ -24,6 +24,7 @@
 #include "appmake.h"
 #include <stdio.h>
 
+
 #if !defined(__MSDOS__) && !defined(__TURBOC__)
 #ifndef _WIN32
 #define stricmp strcasecmp
@@ -31,13 +32,19 @@
 #endif
 
 
+// Globals
+unsigned char          *branch_table_ptr  = NULL;
+int                     branch_table_index= 0;
 
-static char             *binname      = NULL;
-static char             *outfile      = NULL;
-static char             *appname      = NULL;
-static char             *other_pages  = NULL;
-static char              help         =0;
-static char              single_page  =0;
+
+
+// Command args
+static char             *binname         = NULL;
+static char             *outfile         = NULL;
+static char             *appname         = NULL;
+static char             *other_pages     = NULL;
+static char              help            =0;
+static char              single_page     =0;
 static char              combine_pages   =0;
 
 
@@ -280,11 +287,230 @@ int findfield_flex( unsigned char prefix_byte, const unsigned char* buffer, int 
 
 
 
+struct FoundLabels{
+	char label_name[256];
+	char page;
+	int branch_table_index;
+	int found_address;
+};
+
+
+
+char* asMapExt(char* src){
+	char* map_file_name = calloc(1, 256+5);
+	char* map_file_name_temp = map_file_name;
+
+	strncpy(map_file_name_temp, src, 255);
+
+	// Seek to file ext (if present)
+	while (*map_file_name_temp != 0 && *map_file_name_temp != '.') map_file_name_temp++;
+	if (map_file_name_temp-map_file_name >= 256+3){
+		fprintf(stderr, "Filename too large: %s", src);
+		exit(-1);
+	}
+	*map_file_name_temp = '.';
+	map_file_name_temp++;
+	*map_file_name_temp = 'm';
+	map_file_name_temp++;
+	*map_file_name_temp = 'a';
+	map_file_name_temp++;
+	*map_file_name_temp = 'p';
+	map_file_name_temp++;
+	*map_file_name_temp = 0;
+
+	return map_file_name;
+}
+
+void insert_to_branch_table(struct FoundLabels* label_info){
+	if (branch_table_ptr == NULL){
+		fprintf(stderr, "Appmake: branch table pointer == NULL\n");
+		exit(-1);
+	}
+	if (*branch_table_ptr != 0){
+		fprintf(stderr, "Appmake: Too many functions called cross-page, increase your 'MULTI_PAGE_CALLS'\n");
+		exit(-2);
+	}
+	*(branch_table_ptr++) = (unsigned char)(label_info->found_address & 0xFF); //little endian address
+	*(branch_table_ptr++) = (unsigned char)((label_info->found_address >> 8) & 0xFF);
+	*(branch_table_ptr++) = label_info->page;
+	label_info->branch_table_index = branch_table_index+0x84;
+
+	branch_table_index+=3;
+}
+
+
+void handle_found_branch_call(unsigned char* buffer, char* func_name, struct FoundLabels **labels){
+	char found = 0;
+	int found_address;
+	struct FoundLabels* label_obj;
+
+
+	size_t func_name_len = 0;
+	while (func_name[func_name_len] && !isspace(func_name[func_name_len])) func_name_len++; // Get the length of the fuctions label untill it finds a space	
+	func_name[func_name_len] = 0;
+
+
+	// See if that func has been found before
+	while (*labels != NULL){
+		if (0==strncmp(func_name, (*labels)->label_name, func_name_len-1)){
+			found = 1;
+			label_obj = *labels;
+			
+			break;
+		}
+		labels+=sizeof(struct FoundLabels*);
+	}
+
+
+	
+
+	unsigned char current_page = 0;
+
+
+	// Otherwise search other .maps
+	char other_file[256] = {0};
+	char* itr;
+	char* itr2 = other_pages;
+	while (*itr2 && !isspace(*itr2) && !found){
+		itr = other_file;
+		while (*itr2 && *itr2 != ',' && itr < other_file + 256) *(itr++) = *(itr2++); // Copy name of .map file to other_file
+		if (itr > other_file + 256) {
+			fprintf(stderr, "Other page name too long in appmake\n");
+			exit(-1);
+		}
+
+		itr2++;
+		*(itr) = 0;
+		
+
+		char* map_file_to_search = asMapExt(other_file);
+		FILE* fp = fopen(map_file_to_search, "r");
+		if (fp == NULL){
+			found=1;
+
+			fprintf(stderr, "Can't open %s in appmake\n", map_file_to_search);
+			exit(-1);
+		}
+	
+
+		// Loop over lines
+		char line[512] = {0};
+		while (!found){
+			if (NULL==fgets((char*)line, 512, fp)) break;
+			
+			// Starts with func_name
+			if (0==strncmp(func_name,line , func_name_len)){
+				if (!isspace(*(line+1+func_name_len))) continue; // Make sure that it is followed by a space
+
+
+				found = 1;
+
+				
+				char* address_of_func = line+func_name_len;
+				while (*address_of_func && *address_of_func != '$') address_of_func++;
+
+				if (!*address_of_func){
+					fprintf(stderr, "Map file parse error for %s\n", line);
+					exit(-1);
+				}
+				found_address = strtol(address_of_func+1, NULL, 16); // Convert to int
+				if (0x4000 > found_address || 0x8000 < found_address){
+					fprintf(stderr, "Issue with the label on line '%s'. Must be between 0x4000 and 0x8000\n", line);
+					exit(-1);
+				}
+				label_obj = malloc(sizeof(struct FoundLabels));
+				if (func_name_len > 256){
+					fprintf(stderr, "Appmake label name too large for banked function %s\n", func_name);
+					exit(-1);
+				}
+				strncpy(label_obj->label_name, func_name, func_name_len);
+				label_obj->label_name[func_name_len]=0; // Makes sure string is null terminated
+				label_obj->found_address = found_address;
+				label_obj->page = current_page;
+				insert_to_branch_table(label_obj);
+				if (branch_table_index/3 < 1024){
+					*labels = label_obj;
+				}
+				
+
+			}
+		}
+		
+
+
+		fclose(fp);
+		free(map_file_to_search);
+		current_page++;
+	}
+	if (!found){
+		printf("Appmake +ti8xk can't resolve cross-page call for %s\n", func_name);
+		exit(-1);
+	}else{
+		fprintf(stderr, "Found the label %x %x %x\n", label_obj->page, label_obj->branch_table_index, label_obj->found_address);
+		fprintf(stderr, "%s %x\n", label_obj->label_name, *(buffer));
+
+		// Rewrite bcall to index in branch table
+		*(buffer++) = (unsigned char)(label_obj->branch_table_index & 0xFF); //little endian address
+		*(buffer) = (unsigned char)((label_obj->branch_table_index >> 8) & 0xFF);
+
+	}
+
+
+
+}
+void handle_page_branches(unsigned char* buffer, int size, struct FoundLabels **labels, char* fname){
+	char* map_file_name = asMapExt(fname);
+	FILE* fp = fopen(map_file_name, "r");
+	if (fp == NULL){
+		fprintf(stderr, "Can't open file %s\n", map_file_name);
+		exit(-1);
+	}
+	char line[512] = {0};
+	while (1){
+		if (NULL==fgets((char*)line, 512, fp)) break;
+		if (0==strncmp("__banked_import_", (char*)line, 16)){
+			
+			char* stripped_line = line+16;
+			
+			while(*stripped_line != 0 && *stripped_line != '_') stripped_line++; // Seek to "_"
+
+			if (*stripped_line == 0){
+				fprintf(stderr, "Appmake parse error 1 on line %s in %s\n", line, map_file_name);
+				exit(-1);
+			}
+
+			char* line_addr = stripped_line;
+			while(*line_addr != 0 && *line_addr != '$') line_addr++; // Seek to "$"
+
+			if (*line_addr == 0){
+				fprintf(stderr, "Appmake parse error 2 on line %s in %s\n", line, map_file_name);
+				exit(-1);
+			}
+			int call_at_address = strtol(line_addr+1, NULL, 16)-0x4000; // where the cross page function is called (minus the ORG)
+			if (0 > call_at_address || 0x4000 < call_at_address){
+				fprintf(stderr, "Issue with the label on line '%s' in %s. Must be between 0x4000 and 0x8000\n", line, map_file_name);
+				exit(-1);
+			}
+
+			handle_found_branch_call(buffer+call_at_address, stripped_line, labels);
+		}
+	}
+
+	fclose(fp);
+
+	free(map_file_name);
+
+}
+
+
+
+
 
 int ti8xk_exec(char *target){
     FILE *fp, *fp2;
     int size, tempnum, pnt, field_sz, pages, i, siglength, total_size, f;
     char safe_name[9] = {0};
+	struct FoundLabels* labels[1024] = {NULL};
     unsigned char *buffer;
 
 
@@ -347,33 +573,40 @@ int ti8xk_exec(char *target){
 		char fileName[256]={0};
 
 		buffer = malloc(bufferSize);
-
+		char* other_pages_temp = other_pages;
 		while (1){
 			bufferSize+=1<<14;
 			buffer=realloc(buffer, bufferSize);
-
 			fileNameIndex=0;
 			while(1){
-				if (isspace(*other_pages) || *other_pages == ',' || *other_pages==0){
+				if (isspace(*other_pages_temp) || *other_pages_temp == ',' || *other_pages_temp==0){
 					if (fileNameIndex < 255)
 						fileName[fileNameIndex] =0;
 					break;
 				}
 				if (fileNameIndex < 255)
-					fileName[fileNameIndex] = *other_pages;
+					fileName[fileNameIndex] = *other_pages_temp;
 
 				fileNameIndex++;
-				other_pages++;
+				other_pages_temp++;
 			}
 
 			FILE* page_fp = fopen_bin(fileName, NULL);
-			size = i = pageStart + fsize(page_fp);
-			fread(buffer+pageStart, fsize(page_fp), 1, page_fp);
-
+			int psize = fsize(page_fp);
+			size = i = pageStart + psize;
+			fread(buffer+pageStart, psize, 1, page_fp);
 			fclose(page_fp);
-			if (isspace(*other_pages) || *other_pages==0)
+
+			if (pageStart == 0) // If first page
+				branch_table_ptr = buffer + 0x84; // 0x84 _SHOULD_ be the end of the head and start of the branch table 		
+
+
+			handle_page_branches(buffer+pageStart, psize, labels, fileName);
+
+
+			if (isspace(*other_pages_temp) || *other_pages_temp==0)
 				break;
-			other_pages++;
+			other_pages_temp++;
 			pageStart+=1<<14;
 		}
 	}
@@ -542,6 +775,3 @@ int ti8xk_exec(char *target){
 	return 0;
 
 }
-
-
-

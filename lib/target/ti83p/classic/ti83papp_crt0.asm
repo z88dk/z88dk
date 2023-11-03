@@ -118,14 +118,13 @@
 	jp start    ; Skips branch table (if present) and by testing if followed by zero alerts appmake to a present branch table 
 
 
-
-	IF DEFINED_CRT0_BCALL_TABLE_SIZE
+	IF DEFINED_MULTI_PAGE_CALLS
 		
 		DEFB 0 ; Branch table must begin with multiple of 3
 
 	start_branch_table:
 
-		DEFS CRT0_BCALL_TABLE_SIZE, 0 
+		DEFS MULTI_PAGE_CALLS*3, 0 
 		
 		; Appmake will fill this area
 
