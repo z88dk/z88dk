@@ -185,9 +185,6 @@
     <ClCompile Include="..\..\src\appmake\tixx.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\appmake\ti8xk.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\appmake\trs80.c">
       <Filter>Source Files</Filter>
     </ClCompile>

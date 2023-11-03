@@ -27,7 +27,7 @@
         defc    TAR__clib_exit_stack_size = 3
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 6000000
-        INCLUDE "crt/classic/crt_rules.inc"
+        
 	
 
 
@@ -38,23 +38,33 @@
 	org $4000
 
 
-	; No header or main is needed for anything other than the first page. (Or a single page apps)
+PUBLIC	cpygraph	; TI calc specific stuff
+PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
 
-	IF (startup=0 || startup=1)
+
+; No header or main is needed for anything other than the first page. (Or a single page apps)
+IF (startup=0 || startup=1)
 
 
 		PUBLIC	cleanup		; used by exit()
-		PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
+		
 
 
-		PUBLIC	cpygraph	; TI calc specific stuff
+		
 		PUBLIC	tidi		;
 		PUBLIC	tiei		;
+		PUBLIC  __crt_org_bss ;
+
+		; statVars (531 bytes of free space) See graylib83p.asm
+		defc __crt_org_bss =   $8A3A
+		
+
+
 		defc intcount = $8A8D
 
 
-
-
+		
+		INCLUDE "crt/classic/crt_rules.inc"
 
 		HEADER_START:
 
@@ -139,11 +149,12 @@
 		rst	28		; bcall(SetExSpeed)
 		defw	SetExSpeed	;
 	ENDIF				;
-		ld	(__restore_sp_onexit+1),sp	;
-			INCLUDE "crt/classic/crt_init_sp.asm"
-			INCLUDE "crt/classic/crt_init_atexit.asm"
-			call    crt0_init_bss
-			ld      (exitsp),sp
+		; ld	(__restore_sp_onexit+1),sp	; This fails, but it still works without it?
+
+		INCLUDE "crt/classic/crt_init_sp.asm"
+		INCLUDE "crt/classic/crt_init_atexit.asm"
+		call    crt0_init_bss
+		ld      (exitsp),sp
 
 	IF DEFINED_USING_amalloc
 		INCLUDE "crt/classic/crt_init_amalloc.asm"
@@ -182,7 +193,7 @@
 		defw	SetExSpeed	;
 	ENDIF				;
 	__restore_sp_onexit:
-		ld	sp,0		; Restore SP
+		;ld	sp,0		; Restore SP
 	IF TSE				; TSE Kernel
 		call	_tseForceYield	; Task-switch back to shell (can return...)
 		jp	start		; begin again if needed...
@@ -195,9 +206,11 @@
 		DEFW      4027h;
 	tidi:	ret			;
 
+ENDIF
 	;----------------------------------------
 	; End of startup part, routines following
 	;----------------------------------------
+
 	l_dcal:
 		jp	(hl)		; used as "call (hl)"
 
@@ -268,10 +281,14 @@
 		SECTION	code_crt_init
 		ld	hl,plotSScreen
 		ld	(base_graphics),hl
+		; No ret?
 
 
 
+SECTION bss_user
+
+restore_sp:
+DEFW 0
 
 
 
-ENDIF
