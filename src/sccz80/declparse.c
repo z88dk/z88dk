@@ -1647,6 +1647,7 @@ void type_describe(Type *type, UT_string *output)
  * We can assign two pointers if:
  * 
  * - Same type exactly
+ * - LHS is const X * and rhs is const X const *
  * - LHS is const void * and rhs is const * or just *
  * - LHS is volatile void * and rhs is anything
  */
@@ -1676,6 +1677,11 @@ int type_matches_pointer(Type *t1, Type *t2)
             return 0;
         }
         return 1;
+    } else {
+        // Check that pointing to const objects of the same type
+        if ( p1->kind == p2->kind && p1->isconst && p2->isconst ) {
+            return 1;
+        }
     }
 
 
