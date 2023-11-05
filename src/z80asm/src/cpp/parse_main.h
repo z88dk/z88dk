@@ -4,10 +4,10 @@ private:
 void parse_main(int start_state);
 void parse_main_action(int action);
 
-static inline const int START_STATE_DEFC = 8617;
+static inline const int START_STATE_DEFC = 8620;
 static inline const int START_STATE_EQU = 0;
-static inline const int START_STATE_EXTERN = 33936;
-static inline const int START_STATE_GLOBAL = 8878;
+static inline const int START_STATE_EXTERN = 33939;
+static inline const int START_STATE_GLOBAL = 8881;
 static inline const int START_STATE_MAIN = 0;
-static inline const int START_STATE_PUBLIC = 33412;
+static inline const int START_STATE_PUBLIC = 33415;
 

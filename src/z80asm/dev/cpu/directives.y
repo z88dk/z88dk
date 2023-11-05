@@ -118,3 +118,12 @@ org CONST_EXPR $
 section IDENT $
 	string name = m_line.peek(start_stmt_index() + 1).svalue();
 	do_section(name);
+
+#------------------------------------------------------------------------------
+# Miscelaeous
+#------------------------------------------------------------------------------
+
+assert CONST_EXPR $
+	bool f  = !!m_const_exprs.back(); m_const_exprs.pop_back();
+	if (!f)
+		error(ErrCode::AssertFailed);

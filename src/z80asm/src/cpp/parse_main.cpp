@@ -28,7 +28,7 @@ void Parser::parse_main(int start_state) {
 		while (!states.empty()) {
 			parse_state st = states.front();
 			states.pop_front();
-			xassert(st.state > -6839 && st.state < 33960);
+			xassert(st.state > -6840 && st.state < 33963);
 			
 			if (st.state < 0) {
 				new_states.push_back(st);
@@ -42,7 +42,7 @@ void Parser::parse_main(int start_state) {
 				
 				// try keyword
 				int keyword_nr = static_cast<int>(token.keyword());
-				xassert(keyword_nr >= 0 && keyword_nr < 600);
+				xassert(keyword_nr >= 0 && keyword_nr < 601);
 				
 				st.next = -state_keyword_action[st.state][keyword_nr];
 				if (st.next != 0) 
@@ -6980,6 +6980,7 @@ void Parser::parse_main_action(int action) {
 	case 6836: parse_main_action_6836(); return;
 	case 6837: parse_main_action_6837(); return;
 	case 6838: parse_main_action_6838(); return;
+	case 6839: parse_main_action_6839(); return;
 	default: 
 		xassert(0);
 		return; // not reached

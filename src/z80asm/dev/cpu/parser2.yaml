@@ -1,6 +1,7 @@
 ---
 'Keyword::ALIGN const_expr TType::Comma const_expr TType::End': "int filler = m_const_exprs.back(); m_const_exprs.pop_back();\nint align  = m_const_exprs.back(); m_const_exprs.pop_back();\ndo_align(align, filler);\n"
 'Keyword::ALIGN const_expr TType::End': "int align  = m_const_exprs.back(); m_const_exprs.pop_back();\ndo_align(align, g_args.filler());\n"
+'Keyword::ASSERT const_expr TType::End': "bool f  = !!m_const_exprs.back(); m_const_exprs.pop_back();\nif (!f)\n\terror(ErrCode::AssertFailed);\n"
 Keyword::BYTE: "parse_int8_data();\n"
 Keyword::DB: "parse_int8_data();\n"
 'Keyword::DC Keyword::START_STATE_DEFC TType::Ident TType::Eq expr TType::Comma': "string name = m_line.peek(start_stmt_index() + 1).svalue();\ndo_equ(name, m_exprs.back());\n// repeat if comma\nif (m_line.peek(-1).is(TType::Comma)) {\n\tm_start_stmt = m_line.pos() - 1;\n\tparse_main(START_STATE_DEFC);\n}\n"
