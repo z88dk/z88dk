@@ -26,7 +26,6 @@ ELSE
     push    hl
     push    bc
 ENDIF
-IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !_CPU_GBZ80__
     ld      e,(hl)   ;fd
     inc     hl
     ld      d,(hl)
@@ -34,11 +33,16 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !_CPU_GBZ80__
     ld      a,(hl)
     and     _IOUSE|_IOSYSTEM|_IOWRITE
     cp      _IOUSE|_IOWRITE
+IF __CPU_INTEL__ | __CPU_GBZ80__ 
+    jr      nz,fflush_error
+ELSE
     jr      nz,check_extra
+ENDIF
     push    de       ;fd
     call    fsync
     pop     bc       ;dump param
     ret
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 check_extra:
     ld      a,(hl)
     and     _IOUSE|_IOEXTRA
@@ -47,34 +51,29 @@ check_extra:
     push    ix    ;save callers ix
     dec     hl
     dec     hl    ;hl = fp
-IF __CPU_RABBIT__
+  IF __CPU_RABBIT__
     ld      ix,hl
-    ld      hl,(ix+fp_extra)
-ELSE
+  ELSE
     push    hl
     pop     ix
+  ENDIF
     ld      hl,(ix+fp_extra)
-ENDIF
     ld      a,__STDIO_MSG_FLUSH
     call    l_jphl
     pop     ix    ;restore callers
-IF __CPU_RABBIT__
+  IF __CPU_RABBIT__
     bool    hl
     rr    hl
-ELSE
+  ELSE
     ld      hl,0
-  IF __CPU_GBZ80__
-        ld      d,h
-        ld      e,l
   ENDIF
-ENDIF
     ret
 ENDIF
 .fflush_error
     ld      hl,-1    ; EOF
 IF __CPU_GBZ80__
-        ld      d,h
-        ld      e,l
+    ld      d,h
+    ld      e,l
 ENDIF
 #endasm
 }
