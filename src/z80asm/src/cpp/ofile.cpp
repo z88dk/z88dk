@@ -192,7 +192,9 @@ void OFileWriter::write_symbols(Symtab& symtab, ofstream& os) {
     for (auto& it : symtab) {
         auto symbol = it.second;
 
-        if (symbol->type() != Symbol::Type::Undef) {
+        if (symbol->type() != Symbol::Type::Undef &&
+            (symbol->is_touched() ||
+                symbol->scope() == Symbol::Scope::Public || symbol->scope() == Symbol::Scope::Global)) {
             // write scope - see objfile.c for magic numbers
             switch (symbol->scope()) {
             case Symbol::Scope::None:       xassert(0); break;

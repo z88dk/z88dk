@@ -920,7 +920,6 @@ static void link_libraries(StrHash* extern_syms) {
 *   link
 *----------------------------------------------------------------------------*/
 
-
 static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 	// load code sections
 	if (goto_code(obj)) {

@@ -117,10 +117,6 @@ Object  file $test.o at \$0000: Z80RMF18
     C \$0000: 00
   Section data: 4 bytes, ALIGN 16
     C \$0000: 01 02 03 04
-  Symbols:
-    L C \$0001: __CPU_Z80__ (section "") (file "")
-    L C \$0001: __CPU_ZILOG__ (section "") (file "")
-    L C \$0001: __FLOAT_GENMATH__ (section "") (file "")
 END
 
 run_ok("z88dk-z80asm -b -f0xff $test.asm");
