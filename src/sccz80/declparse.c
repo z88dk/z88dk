@@ -1957,7 +1957,6 @@ static void declfunc(Type *functype, enum storage_type storage)
         gen_critical_enter();
     }
     if ((functype->flags&BANKED)==BANKED && c_banked_style == BANKED_STYLE_TICALC){
-        ol("EXTERN l_fixup_banked_prologue");
         callrts("l_fixup_banked_prologue");
     }
     gen_push_frame();

@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 
+
 #if !defined(__MSDOS__) && !defined(__TURBOC__)
 #ifndef _WIN32
 #define stricmp strcasecmp
@@ -35,13 +36,12 @@
 // Globals
 unsigned char          *branch_table_ptr  = NULL;
 int                     branch_table_index= 0;
-
-
+int                     branch_table_start_loc = 0;
+char                   *app_name = NULL;
 
 // Command args
 static char             *binname         = NULL;
 static char             *outfile         = NULL;
-static char             *appname         = NULL;
 static char             *other_pages     = NULL;
 static char              help            =0;
 static char              single_page     =0;
@@ -56,20 +56,19 @@ option_t ti8xk_options[] = {
 { 'p', "other-pages", "A comma separated list of the pages without any spaces (ex main.o,page_1.o)", OPT_STR, &other_pages},
 { 'b', "binfile",  "Linked binary file",                OPT_STR,   &binname },
 { 'o', "output",   "Name of output file",               OPT_STR,   &outfile },
-{ 'n', "name",   "Name of app to be displayed on the calc (8 chars)",        OPT_STR,   &appname },
 {  0,  NULL,       NULL,                                OPT_NONE,  NULL }
 };
 
 
-#define name    (header8xk + 17)
 #define hleng   sizeof(header8xk)
+
+// MISSING NAME! This is added in later.
 unsigned char header8xk[] = {
 	'*','*','T','I','F','L','*','*',    /* required identifier */
 	1, 1,                               /* version */
 	1, 0x88,                            /* unsure, but always set like this */
 	0x01, 0x01, 0x19, 0x97,             /* Always sets date to jan. 1, 1997 */
-	8,                                  /* Length of name. */
-	0,0,0,0,0,0,0,0};
+	};
 
 
 
@@ -223,7 +222,30 @@ int siggen(const unsigned char* hashbuf, unsigned char* sigbuf, int* outf) {
 	return siglength;
 }
 
+char* asMapExt(char* src){
+	char* map_file_name = calloc(1, 256+5);
+	char* map_file_name_temp = map_file_name;
 
+	strncpy(map_file_name_temp, src, 255);
+
+	// Seek to file ext (if present)
+	while (*map_file_name_temp != 0 && *map_file_name_temp != '.') map_file_name_temp++;
+	if (map_file_name_temp-map_file_name >= 256+3){
+		printf( "Filename too large: %s", src);
+		exit(-1);
+	}
+	*map_file_name_temp = '.';
+	map_file_name_temp++;
+	*map_file_name_temp = 'm';
+	map_file_name_temp++;
+	*map_file_name_temp = 'a';
+	map_file_name_temp++;
+	*map_file_name_temp = 'p';
+	map_file_name_temp++;
+	*map_file_name_temp = 0;
+
+	return map_file_name;
+}
 
 
 int fsize(FILE *fp);
@@ -231,22 +253,7 @@ int fsize(FILE *fp);
 
 
 
-// Apps need to be exactly 8 chars in length
-void pad_tik_name(char* to, char* from){
-    char is_finished = 0;
-    for (char i = 0; i < 8; ++i){
-        char c = (is_finished ? ' ' : *from);
-        if (c==0){
-            c = ' ';
-            is_finished = 1;
-        }
-        *to = c;
 
-
-        to++;
-        from++;
-    }
-}
 /* Starting from 0006 searches for a field
  * in the in file buffer. */
 int findfield( unsigned char byte, const unsigned char* buffer ) {
@@ -285,6 +292,45 @@ int findfield_flex( unsigned char prefix_byte, const unsigned char* buffer, int 
 	return 1;
 }
 
+int search_for_branch_start(){
+	char filename[256];
+	char line[2048];
+	FILE *fp;
+	char* end = strchr(other_pages, ',');
+	if (end != NULL){
+		if (end-other_pages >= 256){
+			printf( "Appmake: file name too long in other pages\n");
+			exit(-1);
+		}
+		strncpy(filename, other_pages, end-other_pages);
+	}else{
+		printf( "Appmake: Compiling with multi-page app, however only one page found. (Make sure no spaces were used in list of file, if filenames contain space(s) wrap in double quotes)\n");
+		exit(-1);
+	}
+	fp = fopen( asMapExt(filename), "r");
+	if (fp == NULL){
+		printf( "Appmake: Can't open file %s\n", asMapExt(filename));
+		exit(-1);
+	}
+	while(NULL!=fgets(line, 2048, fp)){
+		if (0==strncmp("start_branch_table ", line, 10)){
+			fclose(fp);
+			char* addr = strchr(line, '$');
+			if (addr == NULL){
+				printf( "Appmake: Parse error in map file. Can't find addr");
+				exit(-1);
+			}
+			return strtol(addr+1, NULL, 16);
+		}
+	}
+
+	fclose(fp);
+	printf( "Appmake: Can't find branch table in multi-page app.");
+	exit(-1);
+
+}
+
+
 
 
 struct FoundLabels{
@@ -296,38 +342,15 @@ struct FoundLabels{
 
 
 
-char* asMapExt(char* src){
-	char* map_file_name = calloc(1, 256+5);
-	char* map_file_name_temp = map_file_name;
 
-	strncpy(map_file_name_temp, src, 255);
-
-	// Seek to file ext (if present)
-	while (*map_file_name_temp != 0 && *map_file_name_temp != '.') map_file_name_temp++;
-	if (map_file_name_temp-map_file_name >= 256+3){
-		fprintf(stderr, "Filename too large: %s", src);
-		exit(-1);
-	}
-	*map_file_name_temp = '.';
-	map_file_name_temp++;
-	*map_file_name_temp = 'm';
-	map_file_name_temp++;
-	*map_file_name_temp = 'a';
-	map_file_name_temp++;
-	*map_file_name_temp = 'p';
-	map_file_name_temp++;
-	*map_file_name_temp = 0;
-
-	return map_file_name;
-}
 
 void insert_to_branch_table(struct FoundLabels* label_info){
 	if (branch_table_ptr == NULL){
-		fprintf(stderr, "Appmake: branch table pointer == NULL\n");
+		printf( "Appmake: branch table pointer == NULL\n");
 		exit(-1);
 	}
 	if (*branch_table_ptr != 0){
-		fprintf(stderr, "Appmake: Too many functions called cross-page, increase your 'MULTI_PAGE_CALLS'\n");
+		printf( "Appmake: Too many functions called cross-page, increase your 'MULTI_PAGE_CALLS'\n");
 		exit(-2);
 	}
 	*(branch_table_ptr++) = (unsigned char)(label_info->found_address & 0xFF); //little endian address
@@ -375,7 +398,7 @@ void handle_found_branch_call(unsigned char* buffer, char* func_name, struct Fou
 		itr = other_file;
 		while (*itr2 && *itr2 != ',' && itr < other_file + 256) *(itr++) = *(itr2++); // Copy name of .map file to other_file
 		if (itr > other_file + 256) {
-			fprintf(stderr, "Other page name too long in appmake\n");
+			printf( "Other page name too long in appmake\n");
 			exit(-1);
 		}
 
@@ -388,15 +411,15 @@ void handle_found_branch_call(unsigned char* buffer, char* func_name, struct Fou
 		if (fp == NULL){
 			found=1;
 
-			fprintf(stderr, "Can't open %s in appmake\n", map_file_to_search);
+			printf( "Can't open %s in appmake\n", map_file_to_search);
 			exit(-1);
 		}
 	
 
 		// Loop over lines
-		char line[512] = {0};
+		char line[2048] = {0};
 		while (!found){
-			if (NULL==fgets((char*)line, 512, fp)) break;
+			if (NULL==fgets((char*)line, 2048, fp)) break;
 			
 			// Starts with func_name
 			if (0==strncmp(func_name,line , func_name_len)){
@@ -410,17 +433,17 @@ void handle_found_branch_call(unsigned char* buffer, char* func_name, struct Fou
 				while (*address_of_func && *address_of_func != '$') address_of_func++;
 
 				if (!*address_of_func){
-					fprintf(stderr, "Map file parse error for %s\n", line);
+					printf( "Map file parse error for %s\n", line);
 					exit(-1);
 				}
 				found_address = strtol(address_of_func+1, NULL, 16); // Convert to int
 				if (0x4000 > found_address || 0x8000 < found_address){
-					fprintf(stderr, "Issue with the label on line '%s'. Must be between 0x4000 and 0x8000\n", line);
+					printf( "Issue with the label on line '%s'. Must be between 0x4000 and 0x8000\n", line);
 					exit(-1);
 				}
 				label_obj = malloc(sizeof(struct FoundLabels));
 				if (func_name_len > 256){
-					fprintf(stderr, "Appmake label name too large for banked function %s\n", func_name);
+					printf( "Appmake label name too large for banked function %s\n", func_name);
 					exit(-1);
 				}
 				strncpy(label_obj->label_name, func_name, func_name_len);
@@ -446,8 +469,8 @@ void handle_found_branch_call(unsigned char* buffer, char* func_name, struct Fou
 		printf("Appmake +ti8xk can't resolve cross-page call for %s\n", func_name);
 		exit(-1);
 	}else{
-		fprintf(stderr, "Found the label %x %x %x\n", label_obj->page, label_obj->branch_table_index, label_obj->found_address);
-		fprintf(stderr, "%s %x\n", label_obj->label_name, *(buffer));
+		printf( "Found the label %x %x %x\n", label_obj->page, label_obj->branch_table_index, label_obj->found_address);
+		printf( "%s %x\n", label_obj->label_name, *(buffer));
 
 		// Rewrite bcall to index in branch table
 		*(buffer++) = (unsigned char)(label_obj->branch_table_index & 0xFF); //little endian address
@@ -462,12 +485,12 @@ void handle_page_branches(unsigned char* buffer, int size, struct FoundLabels **
 	char* map_file_name = asMapExt(fname);
 	FILE* fp = fopen(map_file_name, "r");
 	if (fp == NULL){
-		fprintf(stderr, "Can't open file %s\n", map_file_name);
+		printf( "Can't open file %s\n", map_file_name);
 		exit(-1);
 	}
-	char line[512] = {0};
+	char line[2048] = {0};
 	while (1){
-		if (NULL==fgets((char*)line, 512, fp)) break;
+		if (NULL==fgets((char*)line, 2048, fp)) break;
 		if (0==strncmp("__banked_import_", (char*)line, 16)){
 			
 			char* stripped_line = line+16;
@@ -475,7 +498,7 @@ void handle_page_branches(unsigned char* buffer, int size, struct FoundLabels **
 			while(*stripped_line != 0 && *stripped_line != '_') stripped_line++; // Seek to "_"
 
 			if (*stripped_line == 0){
-				fprintf(stderr, "Appmake parse error 1 on line %s in %s\n", line, map_file_name);
+				printf( "Appmake parse error 1 on line %s in %s\n", line, map_file_name);
 				exit(-1);
 			}
 
@@ -483,12 +506,12 @@ void handle_page_branches(unsigned char* buffer, int size, struct FoundLabels **
 			while(*line_addr != 0 && *line_addr != '$') line_addr++; // Seek to "$"
 
 			if (*line_addr == 0){
-				fprintf(stderr, "Appmake parse error 2 on line %s in %s\n", line, map_file_name);
+				printf( "Appmake parse error 2 on line %s in %s\n", line, map_file_name);
 				exit(-1);
 			}
 			int call_at_address = strtol(line_addr+1, NULL, 16)-0x4000; // where the cross page function is called (minus the ORG)
 			if (0 > call_at_address || 0x4000 < call_at_address){
-				fprintf(stderr, "Issue with the label on line '%s' in %s. Must be between 0x4000 and 0x8000\n", line, map_file_name);
+				printf( "Issue with the label on line '%s' in %s. Must be between 0x4000 and 0x8000\n", line, map_file_name);
 				exit(-1);
 			}
 
@@ -520,10 +543,6 @@ int ti8xk_exec(char *target){
     }
 	if (binname == NULL && single_page){
 		printf("Appmake: Binary file not found\n");
-		return -1;
-	}
-	if (appname == NULL){
-		printf("Appmake: App name not found\n");
 		return -1;
 	}
 
@@ -572,6 +591,8 @@ int ti8xk_exec(char *target){
 		int fileNameIndex;
 		char fileName[256]={0};
 
+		branch_table_start_loc = search_for_branch_start()-0x4000;
+
 		buffer = malloc(bufferSize);
 		char* other_pages_temp = other_pages;
 		while (1){
@@ -598,7 +619,7 @@ int ti8xk_exec(char *target){
 			fclose(page_fp);
 
 			if (pageStart == 0) // If first page
-				branch_table_ptr = buffer + 0x84; // 0x84 _SHOULD_ be the end of the head and start of the branch table 		
+				branch_table_ptr = buffer + branch_table_start_loc; // 0x84 _SHOULD_ be the end of the head and start of the branch table 		
 
 
 			handle_page_branches(buffer+pageStart, psize, labels, fileName);
@@ -695,18 +716,18 @@ int ti8xk_exec(char *target){
 	if (findfield_flex(0x40, buffer, &pnt, &field_sz)) {
 		free(buffer);
 		// SetLastSPASMError(SPASM_ERR_SIGNER_MISSING_NAME);
-        printf("Name field missing\n");
+        printf("Name field missing or too long.\n");
 		return -1;
 	}
-
-    pad_tik_name((char*)&safe_name, appname);
-
-	/* Set name length */
-	*(name - 1) = 8;
-	/* Only copy the part of the name defined in the size returned */
-	for (i=0; i < 8; i++) name[i]=buffer[i+pnt]=safe_name[i];
-
-
+	if (field_sz > 8){
+		printf(stderr, "Warning: Appname is greater than 8 in length. App validation may fail, and it may not show up in full on the calculator.");
+	}
+	int lsize =  (field_sz >= 8) ? field_sz : 8;
+	app_name = calloc(1, lsize+1); // Another small memory leak. 
+	app_name[0] = (unsigned char) field_sz;
+	
+	for (i=0; i < lsize; i++) app_name[i+1]=buffer[i+pnt];
+	
     /* Md5 stuff */
     
 	MD5Context ctx;
@@ -742,6 +763,12 @@ int ti8xk_exec(char *target){
 
 
     for (i = 0; i < hleng; i++) fputc(header8xk[i], fp2);
+
+	unsigned char alen = *app_name;
+	
+	fputc(alen, fp2); // Length of app name
+	for (i = 0; i < alen; i++) {fputc(app_name[i+1], fp2);}
+
 	for (i = 0; i < 23; i++)    fputc(0, fp2);
 	fputc(0x73, fp2);
 	fputc(0x24, fp2);

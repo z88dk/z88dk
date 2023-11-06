@@ -1,6 +1,5 @@
-;	Stub for the TI 83+ calculator for building as an app
-;
-;  This is preferable to ti83papp.asm
+;	Stub for the TI 83+ calculator for building as an app. Required for appmake when using "+ti83papp"
+;   Rewritten for modern z88dk by HeronErin
 ;
 ;
 	MODULE  Ti83plus_App_crt0
@@ -40,7 +39,10 @@
 
 PUBLIC	cpygraph	; TI calc specific stuff
 PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
+PUBLIC  __crt_org_bss ;
 
+; statVars (531 bytes of free space) See graylib83p.asm
+defc __crt_org_bss =   $8A3A
 
 ; No header or main is needed for anything other than the first page. (Or a single page apps)
 IF (startup=0 || startup=1)
@@ -53,10 +55,6 @@ IF (startup=0 || startup=1)
 		
 		PUBLIC	tidi		;
 		PUBLIC	tiei		;
-		PUBLIC  __crt_org_bss ;
-
-		; statVars (531 bytes of free space) See graylib83p.asm
-		defc __crt_org_bss =   $8A3A
 		
 
 
@@ -82,10 +80,39 @@ IF (startup=0 || startup=1)
 		DEFB $01		;Build = 1
 
 
-		DEFB $80,$48		;Field: App Name
+		DEFB $80,$40 + endname_true-beginname		;Field: App Name
 
-
-		DEFm "TI83+APP"		;App Name (Needs to be 8 bytes)
+		beginname:
+		DEFINE NEED_name
+			INCLUDE	"zcc_opt.def"		; Get namestring from zcc_opt.def
+			UNDEFINE NEED_name
+		IF !DEFINED_NEED_name
+			DEFm	"TI83+APP"
+		ENDIF
+		endname:
+		defc NameLength = (endname-beginname)
+		IF NameLength < 2	; Padd spaces if not 8 bytes... (horrible)
+		defm ' '
+		ENDIF
+		IF NameLength < 3
+		defm ' '
+		ENDIF
+		IF NameLength < 4
+		defm ' '
+		ENDIF
+		IF NameLength < 5
+		defm ' '
+		ENDIF
+		IF NameLength < 6
+		defm ' '
+		ENDIF
+		IF NameLength < 7
+		defm ' '
+		ENDIF
+		IF NameLength < 8
+		defm ' '
+		ENDIF
+		endname_true:
 
 
 
@@ -285,10 +312,7 @@ ENDIF
 
 
 
-SECTION bss_user
 
-restore_sp:
-DEFW 0
 
 
 

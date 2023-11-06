@@ -1172,7 +1172,7 @@ void gen_bankedcall(SYMBOL *sym, Type* functype)
 
         outfmt(".%s%x%s%s\n",    // This label can be exported as a .map for appmake
             BANKED_SYMBOL_PREFIX, 
-            (functype->funcattrs.ticalc_banked_call_count)++, // All labels must be unique
+            getlabel(), // All labels must be unique
             dopref(sym) ? "_" : "",
             sym->name                  // Label must to the same to label in the other page file
             ); 
@@ -1506,7 +1506,6 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     if (type)
         setcond(type);
     if ((currfn->flags&BANKED)==BANKED && c_banked_style == BANKED_STYLE_TICALC){
-        ol("EXTERN l_fixup_banked_epilogue");
         callrts("l_fixup_banked_epilogue");
     }
     ol("ret"); nl(); nl(); /* and exit function */
