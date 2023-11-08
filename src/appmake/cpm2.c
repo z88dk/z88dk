@@ -136,6 +136,27 @@ static disc_spec attache_spec = {
 };
 
 
+// "Aussie Byte" - SMF Knight 2000
+static disc_spec aussie_spec = {
+    .name = "Knight_2000",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 256,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 1, 3 }
+};
+
+
 // SSSD osborne 1 disks, see section 7.7 of the Osborne 1 technical manual
 // http://dunfield.classiccmp.org/osborne/o1techm.pdf
 
@@ -1416,6 +1437,7 @@ static struct formats {
     { "ampro",     "Ampro 48tpi",           &ampro_spec, 0, NULL, 1 },
     { "apple2",    "Apple II Softcard",     &apple2_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
+    { "aussie",    "AussieByte Knight2000", &aussie_spec, 0, NULL, 1 },
     { "bbc",       "BBC Micro Z80CPU SSSD", &bbc_spec, 0, NULL, 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bigboard",  "X820/Bigboard, 8in",    &bigboard_spec, 0, NULL, 1 },
