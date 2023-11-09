@@ -349,13 +349,17 @@ void insert_to_branch_table(struct FoundLabels* label_info){
 		printf( "Appmake: branch table pointer == NULL\n");
 		exit(-1);
 	}
+
 	if (*branch_table_ptr != 0){
 		printf( "Appmake: Too many functions called cross-page, increase your 'MULTI_PAGE_CALLS'\n");
 		exit(-2);
 	}
 	*(branch_table_ptr++) = (unsigned char)(label_info->found_address & 0xFF); //little endian address
 	*(branch_table_ptr++) = (unsigned char)((label_info->found_address >> 8) & 0xFF);
-	*(branch_table_ptr++) = label_info->page;
+	*(branch_table_ptr++) = (unsigned char)(label_info->page);
+	
+	
+
 	label_info->branch_table_index = branch_table_index+0x84;
 
 	branch_table_index+=3;
@@ -532,7 +536,6 @@ void handle_page_branches(unsigned char* buffer, int size, struct FoundLabels **
 int ti8xk_exec(char *target){
     FILE *fp, *fp2;
     int size, tempnum, pnt, field_sz, pages, i, siglength, total_size, f;
-    char safe_name[9] = {0};
 	struct FoundLabels* labels[1024] = {NULL};
     unsigned char *buffer;
 
@@ -588,7 +591,9 @@ int ti8xk_exec(char *target){
 	}else{
 		int bufferSize = 256;
 		int pageStart = 0;
+		char firstPage = 1;
 		int fileNameIndex;
+		unsigned char* oldBuffer; // ftfdytfyggbb ibvgfctcghvjhghhu
 		char fileName[256]={0};
 
 		branch_table_start_loc = search_for_branch_start()-0x4000;
@@ -597,6 +602,7 @@ int ti8xk_exec(char *target){
 		char* other_pages_temp = other_pages;
 		while (1){
 			bufferSize+=1<<14;
+			oldBuffer=buffer;
 			buffer=realloc(buffer, bufferSize);
 			fileNameIndex=0;
 			while(1){
@@ -618,10 +624,13 @@ int ti8xk_exec(char *target){
 			fread(buffer+pageStart, psize, 1, page_fp);
 			fclose(page_fp);
 
-			if (pageStart == 0) // If first page
+			if (firstPage) // If first page
 				branch_table_ptr = buffer + branch_table_start_loc; // 0x84 _SHOULD_ be the end of the head and start of the branch table 		
-
-
+			else
+				branch_table_ptr = 
+								(unsigned char*)((size_t)
+									branch_table_ptr+buffer-oldBuffer // Correct the branch table pointer after realloc and before handle_page_branches
+								);                                    // Otherwise insert_to_branch_table has a use after free
 			handle_page_branches(buffer+pageStart, psize, labels, fileName);
 
 
@@ -629,6 +638,7 @@ int ti8xk_exec(char *target){
 				break;
 			other_pages_temp++;
 			pageStart+=1<<14;
+			firstPage=0;
 		}
 	}
 
@@ -651,28 +661,21 @@ int ti8xk_exec(char *target){
 
 
 
-    if ((tempnum = ((size+96)%16384))) {
-		if (tempnum < 97 && size > 16384)
+    if ((tempnum = ((size+96) % 0x4000))) {
+		if (tempnum < 97 && size > 0x4000)
 		{
-			free(buffer);
 			printf("Signing error: Not enough room for signature on last page\n");
-            // SetLastSPASMError(SPASM_ERR_SIGNER_ROOM_FOR_SIG);
-
 			return -1;
 		}
 		if (tempnum<1024 && (size+96)>>14)
-		{
             printf("Signing warning: Only %d bytes are used on the last APP page\n", tempnum);
-			// SetLastSPASMWarning(SPASM_WARN_SMALL_LAST_PAGE, tempnum);
-		}
+		
 	}
 
 
 
 
 	if (!(buffer[0] == 0x80 && buffer[1] == 0x0F)) {
-		free(buffer);
-		// SetLastSPASMError(SPASM_ERR_SIGNER_MISSING_LENGTH);
         printf("App header not detected\n");
 		return -1;
 	}
@@ -692,8 +695,6 @@ int ti8xk_exec(char *target){
     /* Program Type Field: Must be present and shareware (0104) */
 	pnt = findfield(0x12, buffer);
 	if (!pnt || ( buffer[pnt++]!=1) || (buffer[pnt]!=4) ) {
-		free(buffer);
-		// SetLastSPASMError(SPASM_ERR_SIGNER_PRGM_TYPE);
         printf("Program type field missing or incorrect\n");
 		return -1;
 	}
@@ -701,8 +702,6 @@ int ti8xk_exec(char *target){
     /* Pages Field: Corrects page num*/
 	pnt = findfield(0x81, buffer);
 	if (!pnt) {
-		free(buffer);
-		// SetLastSPASMError(SPASM_ERR_SIGNER_MISSING_PAGES);
         printf("Page count field missing\n");
 		return -1;
 	}
@@ -714,14 +713,12 @@ int ti8xk_exec(char *target){
 
     /* Name Field: Can be a variable number of characters, no checking if valid */
 	if (findfield_flex(0x40, buffer, &pnt, &field_sz)) {
-		free(buffer);
-		// SetLastSPASMError(SPASM_ERR_SIGNER_MISSING_NAME);
         printf("Name field missing or too long.\n");
 		return -1;
 	}
-	if (field_sz > 8){
-		printf(stderr, "Warning: Appname is greater than 8 in length. App validation may fail, and it may not show up in full on the calculator.");
-	}
+	if (field_sz > 8)
+		printf("Warning: Appname is greater than 8 in length. App validation may fail, and the name may not show up in full on the calculator.\n");
+	
 	int lsize =  (field_sz >= 8) ? field_sz : 8;
 	app_name = calloc(1, lsize+1); // Another small memory leak. 
 	app_name[0] = (unsigned char) field_sz;
@@ -736,8 +733,6 @@ int ti8xk_exec(char *target){
 	md5Finalize(&ctx);
 
 
-    // MD5 (buffer, size, hashbuf);
-
 
     /* Generate the signature to the buffer */
 	siglength = siggen(ctx.digest, buffer+size+3, &f );
@@ -751,7 +746,10 @@ int ti8xk_exec(char *target){
 		buffer[total_size++] = 1;
 		buffer[total_size++] = f;
 	}
-    else buffer[total_size++] = 0;
+    else 
+		buffer[total_size++] = 0;
+
+	
     /* sig must be 96 bytes ( don't ask me why) */
 	tempnum = 96 - (total_size - size);
 	while (tempnum--) buffer[total_size++] = 0xFF;
@@ -781,7 +779,8 @@ int ti8xk_exec(char *target){
 	fputc((tempnum >> 16)& 0xFF, fp2);
 	fputc( tempnum >> 24, fp2);
 
-/* Convert to 8xk */
+
+	/* Convert bin to 8xk */
 	intelhex_spasm(fp2, buffer, total_size, 0x4000);
 
 
