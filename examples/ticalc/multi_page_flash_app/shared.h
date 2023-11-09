@@ -1,4 +1,5 @@
 #pragma once
+
 // We need this to initilize the branch table
 #pragma define MULTI_PAGE_CALLS = 100
 
@@ -18,4 +19,5 @@ extern char add_two_number_(char x, char y) __banked;
 
 #ifndef page1
 extern char add_three_numbers_(char x, char y, char z) __banked;
+extern char add_plus_1_(char x, char y) __banked;
 #endif

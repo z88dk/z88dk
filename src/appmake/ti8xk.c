@@ -473,9 +473,6 @@ void handle_found_branch_call(unsigned char* buffer, char* func_name, struct Fou
 		printf("Appmake +ti8xk can't resolve cross-page call for %s\n", func_name);
 		exit(-1);
 	}else{
-		printf( "Found the label %x %x %x\n", label_obj->page, label_obj->branch_table_index, label_obj->found_address);
-		printf( "%s %x\n", label_obj->label_name, *(buffer));
-
 		// Rewrite bcall to index in branch table
 		*(buffer++) = (unsigned char)(label_obj->branch_table_index & 0xFF); //little endian address
 		*(buffer) = (unsigned char)((label_obj->branch_table_index >> 8) & 0xFF);
@@ -540,21 +537,19 @@ int ti8xk_exec(char *target){
     unsigned char *buffer;
 
 
-    if ( help ) {
-		// printf("Appmake must receive a -name\n");
-        return -1;
-    }
+    if (help) return -1;
+    
 	if (binname == NULL && single_page){
-		printf("Appmake: Binary file not found\n");
+		printf("Appmake: Binary file not found\n\n");
 		return -1;
 	}
 
 	if (!(single_page || combine_pages )){
-		printf("Appmake must be marked as -single-page or -combine-pages\n");
+		printf("Appmake: must be marked as -single-page or -combine-pages\n");
 		return -1;
 	}
 	if (single_page && combine_pages){
-		printf("Appmake must not be marked as -single-page and -combine-pages at the same time\n");
+		printf("Appmake: must not be marked as -single-page and -combine-pages at the same time\n");
 		return -1;
 	}
 
@@ -568,7 +563,7 @@ int ti8xk_exec(char *target){
         outfile[temp_size+2] = 'x';
         outfile[temp_size+3] = 'k';
         outfile[temp_size+4] = 0;
-    }else if(outfile == NULL&&combine_pages){
+    }else if(outfile == NULL && combine_pages){
 		printf("Multi page apps must have an output file");
 		return -1;
 	}
@@ -583,7 +578,7 @@ int ti8xk_exec(char *target){
 		buffer = (unsigned char *) calloc(1, size+256);
 		fread(buffer, size, 1, fp); // To memory
 
-		if (size >= 1<<14){
+		if (size >= 0x4000){
 			free(buffer);
 			printf("App marked as single paged, but is too large for just one page");
 			return -1;
@@ -593,7 +588,7 @@ int ti8xk_exec(char *target){
 		int pageStart = 0;
 		char firstPage = 1;
 		int fileNameIndex;
-		unsigned char* oldBuffer; // ftfdytfyggbb ibvgfctcghvjhghhu
+		unsigned char* oldBuffer;
 		char fileName[256]={0};
 
 		branch_table_start_loc = search_for_branch_start()-0x4000;
@@ -601,9 +596,11 @@ int ti8xk_exec(char *target){
 		buffer = malloc(bufferSize);
 		char* other_pages_temp = other_pages;
 		while (1){
-			bufferSize+=1<<14;
-			oldBuffer=buffer;
+			bufferSize+=0x4000;
+
+			oldBuffer=buffer; // Save old addr for later in adjusting the branch table pointer
 			buffer=realloc(buffer, bufferSize);
+			
 			fileNameIndex=0;
 			while(1){
 				if (isspace(*other_pages_temp) || *other_pages_temp == ',' || *other_pages_temp==0){
@@ -637,7 +634,7 @@ int ti8xk_exec(char *target){
 			if (isspace(*other_pages_temp) || *other_pages_temp==0)
 				break;
 			other_pages_temp++;
-			pageStart+=1<<14;
+			pageStart+=0x4000;
 			firstPage=0;
 		}
 	}
@@ -648,12 +645,12 @@ int ti8xk_exec(char *target){
 
 
 
-	if (single_page && size >= 1<<14){
+	if (single_page && size >= 0x4000){
 		free(buffer);
 		printf("App marked as single paged, but is too large for just one page");
 		return -1;
 	}
-	if (combine_pages && size <= 1<<14){
+	if (combine_pages && size <= 0x4000){
 		free(buffer);
 		printf("App marked as multi paged, but smaller than one page");
 		return -1;

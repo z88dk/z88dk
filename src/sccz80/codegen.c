@@ -1505,9 +1505,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
     if (type)
         setcond(type);
-    if ((currfn->flags&BANKED)==BANKED && c_banked_style == BANKED_STYLE_TICALC){
-        callrts("l_fixup_banked_epilogue");
-    }
+
     ol("ret"); nl(); nl(); /* and exit function */
 }
 

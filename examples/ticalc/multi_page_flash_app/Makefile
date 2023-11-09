@@ -13,3 +13,5 @@ page1.bin : page1.c
 
 build.8xk: main.bin page1.bin
 	z88dk-appmake +ti83papp --combine-pages --output out.8xk --other-pages main.bin,page1.bin
+
+	rm *.map *.bin

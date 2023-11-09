@@ -665,6 +665,8 @@ static void parse_trailing_modifiers(Type *type)
             }
         } else if ( amatch("__banked")) {
             type->flags |= BANKED;
+            if (c_banked_style == BANKED_STYLE_TICALC)
+                type->funcattrs.params_offset = 4;
         } else if ( amatch("__z88dk_hl_call")) {
             double module, addr;
             Kind  valtype;
@@ -1538,7 +1540,10 @@ void flags_describe(Type *type, int32_t flags, UT_string *output)
         utstring_printf(output,"__z88dk_shortcall_hl ");
     }
 
-    if ( type->funcattrs.params_offset ) {
+    // BANKED_STYLE_TICALC sets type->funcattrs.params_offset
+    if ( type->funcattrs.params_offset && 
+           ( c_banked_style != BANKED_STYLE_TICALC || !(type->flags & BANKED)  )
+             ) {
         utstring_printf(output,"__z88dk_params_offset(%d) ", type->funcattrs.params_offset);
     }
 
@@ -1956,9 +1961,7 @@ static void declfunc(Type *functype, enum storage_type storage)
     } else if ( (functype->flags & CRITICAL) == CRITICAL ) {
         gen_critical_enter();
     }
-    if ((functype->flags&BANKED)==BANKED && c_banked_style == BANKED_STYLE_TICALC){
-        callrts("l_fixup_banked_prologue");
-    }
+
     gen_push_frame();
 
     if (array_len(functype->parameters) && (functype->flags & (FASTCALL|NAKED)) == FASTCALL ) {

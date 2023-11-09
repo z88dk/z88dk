@@ -1,5 +1,3 @@
-target/ticalc/obj/${TARGET}/banked_stack_repair.asm
-
 target/ticalc/obj/${TARGET}/stdio/fputc_cons
 target/ticalc/obj/${TARGET}/stdio/fgetc_cons
 target/ticalc/obj/${TARGET}/stdio/getk
