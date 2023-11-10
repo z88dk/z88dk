@@ -23,7 +23,17 @@ int fsync(int fd)
     switch ( fc->use ) {
     case U_WRITE:
     case U_RDWR:
-        cpm_cache_flush(fc);
+        switch ( cpm_cache_flush(fc) ) {
+        case -1: // Error
+            // We couldn't write the sector to disc
+            return -1;
+        default:  // We did it, close and reopen the file
+            bdos(CPM_CLS,fc);
+            if ( bdos(CPM_OPN,fc) == -1 ) {
+                // TODO: Set error
+                return -1;
+            }
+        }
         return 0;
     }
     // TODO: Set EINVAL

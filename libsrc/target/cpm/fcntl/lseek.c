@@ -32,6 +32,7 @@ long lseek(int fd,long posn, int whence)
         pos = fc->rwptr + posn;
         break;
     case 2:
+        if ( (fc->use == U_WRITE || fc->use == U_RDWR) && fsync(fd) != 0 ) return -1L;
         bdos(CPM_CFS,fc); 
         pos = (unsigned long) (fc->ranrec[0] + 256 * fc->ranrec[1]) * 128L; 
         if (fc->ranrec[2]&1) 

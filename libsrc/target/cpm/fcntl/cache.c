@@ -27,6 +27,11 @@ int cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int for_read)
     return 0;
 }
 
+/**
+ * \retval 0 = Nothing to do
+ * \retval 1 = Flushed cache
+ * \retval -1 = Error flushing
+ */
 int cpm_cache_flush(struct fcb *fcb)
 {
     if ( fcb->dirty ) {
@@ -34,7 +39,7 @@ int cpm_cache_flush(struct fcb *fcb)
         bdos(CPM_SDMA,fcb->buffer);
         if ( bdos(CPM_WRAN,fcb) == 0 ) {
             fcb->dirty = 0;
-            return 0;
+            return 1;
         }
         return -1;
     }
