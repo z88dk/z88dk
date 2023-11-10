@@ -5,10 +5,10 @@ clean:
 	$(RM) *.bin *.map *.8xk
 
 main.bin: main.c
-	zcc +ti83p main.c $(CFLAGS) -o main.bin -subtype=app_first_page
+	zcc +ti83p main.c -o main.bin -subtype=app_first_page
 
 page1.bin : page1.c
-	zcc +ti83p page1.c $(CFLAGS) -o page1.bin -subtype=app_sub_page
+	zcc +ti83p page1.c -o page1.bin -subtype=app_sub_page
 
 
 build.8xk: main.bin page1.bin
