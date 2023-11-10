@@ -14,9 +14,6 @@ static char *c_zcc_opt = "zcc_opt.def";
 static int  lineno = 0;
 static int  sccz80_mode = 0;
 
-static char log_next_line = 0;
-static FILE* log_file;
-
 
 char *skip_ws(char *ptr)
 {
@@ -127,7 +124,6 @@ void write_bytes(char *line, int flag)
                 fprintf(stderr, "%s:%d Invalid syntax for #pragma line\n", filename, lineno);
                 break;
             }
-            line++;
             line = skip_ws(line);
             count++;
             if ( count == 9 ) count=0;
@@ -194,7 +190,6 @@ void write_redirect(char *sname, char *value)
     fprintf(fp,"ENDIF\n\n");
     fclose(fp);
 }
-
 
 typedef struct convspec_s {
     char fmt;
@@ -353,15 +348,6 @@ int main(int argc, char **argv)
     while ( fgets(buf, sizeof(buf) - 1, stdin) != NULL ) {
         lineno++;
         ptr = skip_ws(buf);
-        
-        if (log_next_line){
-            fputs(buf, log_file);
-            
-            log_next_line=0;
-            fclose(log_file);
-            log_file=NULL;
-        }
-
         if ( strncmp(ptr,"#pragma", 7) == 0 ) {
             int  ol = 1;
 
@@ -412,11 +398,11 @@ int main(int argc, char **argv)
                 write_defined("CLIB_OPT_SCANF_2", (int32_t)((value >> 32) & 0xffffffff), 0);
             } else if ( strncmp(ptr,"string",6) == 0 ) {
                 write_pragma_string(ptr + 6);
-            } else if ( strncmp(ptr, "data", 4) == 0 ) {
-                write_bytes(ptr + 5, 1);
+            } else if ( strncmp(ptr, "data", 4) == 0 && isspace(*(ptr+4)) ) {
+                write_bytes(ptr + 4, 1);
             } else if ( strncmp(ptr, "byte", 4) == 0 ) {
-                write_bytes(ptr + 5, 0);
-            }else if ( sccz80_mode == 0 && strncmp(ptr, "asm", 3) == 0 ) {
+                write_bytes(ptr + 4, 0);
+            } else if ( sccz80_mode == 0 && strncmp(ptr, "asm", 3) == 0 ) {
                 fputs("__asm\n",stdout);
                 ol = 0;
             } else if ( sccz80_mode == 0 && strncmp(ptr, "endasm", 6) == 0 ) {
@@ -475,9 +461,5 @@ int main(int argc, char **argv)
 
             fputs(buf,stdout);
         }
-    }
-    if (log_file != NULL){
-        fputc('\n', log_file);
-        fclose(log_file);
     }
 }
