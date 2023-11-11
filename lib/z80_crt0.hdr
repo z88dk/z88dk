@@ -42,10 +42,6 @@
 	; Used for banked calls for __banked for sccz80 + sdcc
 	EXTERN	banked_call
 
-	; Only used for now in sccz80 for __banked
-	EXTERN l_fixup_banked_epilogue
-	EXTERN l_fixup_banked_prologue
-
 ;------------------------------------
 ; Scopes for integer library routines
 ;------------------------------------

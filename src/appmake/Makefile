@@ -11,7 +11,7 @@ else
 endif
 
 CC			?= gcc
-CFLAGS		+= -Wall -std=gnu11 -MMD -pedantic -I../common -lgmp # Gmp seems needed for both cflags and ldflags depending on compiler
+CFLAGS		+= -Wall -std=gnu11 -MMD -pedantic -I../common
 LDFLAGS     += -lgmp
 INSTALL 	?= install
 
