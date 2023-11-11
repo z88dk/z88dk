@@ -2,8 +2,6 @@
 
 # Note: just building hello worlds
 
-CFLAGS += -v
-
 
 all: world82.82p world83.83p world83.8xk world83.8xp world85.85s world86.86p
 
