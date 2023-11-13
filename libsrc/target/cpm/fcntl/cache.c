@@ -3,9 +3,6 @@
 #include <cpm.h>
 #include <string.h>
 
-extern void *_CPM_WRITE_EMPTY_RECORD;
-#define CPM_WRITE_EMPTY_RECORD &_CPM_WRITE_EMPTY_RECORD
-
 int cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int for_read)
 {
     // We've already got it cached, just use it
@@ -18,10 +15,8 @@ int cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int for_read)
     bdos(CPM_SDMA,fcb->buffer);
     if ( bdos(CPM_RRAN,fcb) ) {
         if ( for_read ) return -1;
-        // It's for a write, lets push it out to disc
+        // It's for a write, unknown sector, fill with EOF marker
         memset(fcb->buffer, 26, SECSIZE);
-        if ( CPM_WRITE_EMPTY_RECORD )
-            bdos(CPM_WRAN,fcb);
     }
     fcb->cached_record = record_nr;
     return 0;
