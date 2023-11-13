@@ -44,7 +44,7 @@ option_t cpm2_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
-static void              dump_formats();
+static void              dump_formats(void);
 static void              bic_write_system_file(disc_handle *h);
 
 
@@ -1367,6 +1367,24 @@ static disc_spec naburn_spec = {
      .has_skew = 0,
 };
 
+static disc_spec nshd8_spec = {
+     .name = "Northstar Virtual Disk 8",
+     .sectors_per_track = 16,
+     .tracks = 1024,
+     .sides = 1,
+     .sector_size = 512,
+     .gap3_length = 0x2a,   //?
+     .filler_byte = 0xe5,
+     .boottracks = 0,
+     .directory_entries = 256,
+     .alternate_sides = 0,
+     .extent_size = 8192,
+     .byte_size_extents = 0,
+     .first_sector_offset = 0,
+     .has_skew = 0,
+};
+
+
 static disc_spec idpfdd_spec = {
       .name = "Iskra Delta Partner FDD",
       .sectors_per_track = 18,
@@ -1468,6 +1486,7 @@ static struct formats {
     { "naburn",    "Nabu PC (8mb)",         &naburn_spec, 0, NULL, 1 },
     { "nabupc",    "Nabu PC",               &nabupc_spec, 0, NULL, 1 },
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
+    { "nshd8",     "Northstar Virtual 8",   &nshd8_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
@@ -1508,7 +1527,7 @@ static struct formats {
     { NULL, NULL }
 };
 
-static void dump_formats()
+static void dump_formats(void)
 {
     struct formats* f = &formats[0];
 
