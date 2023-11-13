@@ -74,3 +74,4 @@ extern uint32_t c_speed_optimisation;
 extern int c_fp_size;
 extern int c_fp_fudge_offset;
 extern enum maths_mode c_maths_mode;
+extern int c_banked_style;
