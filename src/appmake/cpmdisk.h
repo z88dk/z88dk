@@ -39,6 +39,10 @@ typedef struct {
     uint8_t   has_skew;
     uint16_t  skew_track_start;
     uint8_t   skew_tab[32];
+
+    // Optional 2nd side options
+    uint8_t   side2_sector_numbering;   /* If set, sector numbering is progressive from side 0 to side 1 */
+
 } disc_spec;
 
 typedef struct disc_handle_s disc_handle;
