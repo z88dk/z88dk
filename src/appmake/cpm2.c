@@ -506,6 +506,25 @@ static disc_spec kayproii_spec = {
 };
 
 
+static disc_spec kaypro4_spec = {
+    .name = "Kaypro4/10",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+	.side2_sector_numbering = 1
+};
+
+
 static disc_spec mz2500cpm_spec = {
     .name = "MZ2500CPM",
     .sectors_per_track = 16,
@@ -1475,6 +1494,7 @@ static struct formats {
     { "hp125",     "HP 125/120",            &hp125_spec, 0, NULL, 1 },
     { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
+    { "kaypro4",   "Kaypro 4/10",           &kaypro4_spec,  0, NULL, 1 },
     { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
