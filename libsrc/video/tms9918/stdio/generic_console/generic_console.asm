@@ -23,7 +23,6 @@
     EXTERN  __vdp_mode0_term
     EXTERN  __vdp_mode1_term
     EXTERN  __vdp_mode0_80col_term
-    EXTERN  __vdp_mode0_80col_f18a_term
     EXTERN  __vdp_mode2_term
     EXTERN  __vdp_mode3_term
     EXTERN  __vdp_mode4_term
@@ -163,12 +162,9 @@ loop:
 mode_term_table:
     defb    0
     defw    __vdp_mode0_term
-IFDEF V9938
+IF V9938 | F18A
     defb    80
     defw    __vdp_mode0_80col_term
-ELIF F18A
-    defb    80
-    defw    __vdp_mode0_80col_f18a_term
 ENDIF
     defb    1
     defw    __vdp_mode1_term

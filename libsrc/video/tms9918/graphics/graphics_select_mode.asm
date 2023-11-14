@@ -60,7 +60,6 @@ SECTION rodata_video_vdp
 
 EXTERN  __vdp_mode0_graphics
 EXTERN  __vdp_mode0_80col_graphics
-EXTERN  __vdp_mode0_80col_f18a_graphics
 EXTERN  __vdp_mode1_graphics
 EXTERN  __vdp_mode2_graphics
 EXTERN  __vdp_mode3_graphics
@@ -88,11 +87,11 @@ IFDEF V9938
     defw    __vdp_mode6_graphics
     defb    8
     defw    __vdp_mode8_graphics
+ENDIF
+
+IF V9938 | F18A
     defb    80
     defw    __vdp_mode0_80col_graphics
-ELIF F18A
-    defb    80
-    defw    __vdp_mode0_80col_f18a_graphics
 ENDIF
     defb    81
     defw    __vdp_mode1_2_graphics
