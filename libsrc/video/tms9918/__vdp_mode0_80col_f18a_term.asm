@@ -1,0 +1,6 @@
+
+
+PUBLIC __vdp_mode0_80col_f18a_term
+EXTERN __vdp_modetext_term
+
+defc __vdp_mode0_80col_f18a_term = __vdp_modetext_term

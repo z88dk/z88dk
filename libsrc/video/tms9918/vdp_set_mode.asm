@@ -7,6 +7,7 @@ PUBLIC   _vdp_set_mode
 
 EXTERN  __vdp_mode0
 EXTERN  __vdp_mode0_80col
+EXTERN  __vdp_mode0_80col_f18a
 EXTERN  __vdp_mode1
 EXTERN  __vdp_mode2
 EXTERN  __vdp_mode3
@@ -46,6 +47,9 @@ mode_table:
 IFDEF V9938
     defb    80
     defw    __vdp_mode0_80col
+ELIF F18A
+    defb    80
+    defw    __vdp_mode0_80col_f18a
 ENDIF
     defb    1
     defw    __vdp_mode1
