@@ -325,12 +325,20 @@ int disc_write_edsk(disc_handle* h, const char* filename)
                 *ptr++ = s; // Side
 
                 // Implementing SKEW is not necessary (tested on MAME)
-				// TODO: side2_sector_numbering
-                if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
-                    *ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
-                } else {
-                    *ptr++ = j + h->spec.first_sector_offset; // Sector ID
-                }
+				// side2_sector_numbering option tested on MAME (Kaypro4)
+				if ( (! h->spec.side2_sector_numbering) || (! s) ) {
+					if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+						*ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
+					} else {
+						*ptr++ = j + h->spec.first_sector_offset; // Sector ID
+					}
+				} else {
+					if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+						*ptr++ = skew_sector(h, j, i) + h->spec.boot_tracks_sector_offset + h->spec.sectors_per_track; // Sector ID
+					} else {
+						*ptr++ = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ; // Sector ID
+					}
+				}
 
                 *ptr++ = sector_size;
                 *ptr++ = 0; // FDC status register 1
