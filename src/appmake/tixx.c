@@ -64,17 +64,6 @@ enum EXT { E_82P, E_83P, E_8XP, E_85S, E_86P, E_86S };
 const unsigned char trailer83[] = { 0x3f, 0xd4, 0x3f, 0x30, 0x30, 0x30, 0x30, 0x3f, 0xd4 };
 
 
-int fsize(FILE *fp)
-{
-    int p, size;
-
-    p = ftell(fp);
-    fseek(fp, 0L, SEEK_END);
-    size = ftell(fp);
-    fseek(fp, p, SEEK_SET);
-
-    return size;
-}
 
 void cfwritebyte(int i, FILE *fp, unsigned short *chk)
 {
@@ -192,7 +181,7 @@ int tixx_exec(char *target)
     if (!fp)
         exit_log(1,"Failed to open input file: %s\n", binname);
 
-    i = n = fsize(fp);
+    i = n = get_file_size(fp);
 	if ((oldfmt == 0) && (ext == E_8XP))	n+=9;
 
     buf = (char *)malloc(n);
