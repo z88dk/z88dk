@@ -1050,6 +1050,30 @@ static disc_spec gemini_spec = {
 };
 
 
+// Gnat Computers, Inc. - System 10
+// The D88 dik container worked with ALIENC.COM on MAME/Microbee
+static disc_spec gnat_spec = {
+    .name = "Gnat_10",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 },
+    .side2_sector_numbering = 1
+};
+
+
 // HP 120/125, DSDD
 static disc_spec hp125_spec = {
     .name = "HP125",
@@ -1491,6 +1515,7 @@ static struct formats {
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
     { "fp1100",    "Casio FP1100",          &fp1100_spec, 0, NULL, 1 },
     { "gemini",    "GeminiGalaxy",          &gemini_spec, 0, NULL, 1 },
+    { "gnat10",    "Gnat System 10",        &gnat_spec, 0, NULL, 1 },
     { "hp125",     "HP 125/120",            &hp125_spec, 0, NULL, 1 },
     { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
