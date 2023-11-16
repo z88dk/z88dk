@@ -91,15 +91,8 @@ int z1013_exec(char* target)
         exit_log(1, "Can't open input file %s\n", binname);
     }
 
-    if (fseek(fpin, 0, SEEK_END)) {
-        fclose(fpin);
-        exit_log(1,"Couldn't determine size of file\n");
-    }
-
-    len = ftell(fpin);
-
-    fseek(fpin, 0L, SEEK_SET);
-
+    len = get_file_size(fpin);
+    
     if ((fpout = fopen(filename, "wb")) == NULL) {
         fclose(fpin);
         exit_log(1,"Can't open output file\n");

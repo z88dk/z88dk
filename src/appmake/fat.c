@@ -185,12 +185,7 @@ int fat_write_file_to_image(const char *disc_format, const char *container, cons
     if ((binary_fp = fopen_bin(binary_name, crt_filename)) == NULL) {
         exit_log(1, "Can't open extra input file <%s>\n", binary_name);
     }
-    if (fseek(binary_fp, 0, SEEK_END)) {
-        fclose(binary_fp);
-        exit_log(1, "Couldn't determine size of file\n");
-    }
-    binlen = ftell(binary_fp);
-    fseek(binary_fp, 0L, SEEK_SET);
+    binlen = get_file_size(binary_fp);
     filebuf = malloc(binlen);
     if (1 != fread(filebuf, binlen, 1, binary_fp)) { fclose(binary_fp); exit_log(1, "Could not read required data from <%s>\n",binary_name); }
     fclose(binary_fp);
