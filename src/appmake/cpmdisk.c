@@ -325,12 +325,20 @@ int disc_write_edsk(disc_handle* h, const char* filename)
                 *ptr++ = s; // Side
 
                 // Implementing SKEW is not necessary (tested on MAME)
-				// TODO: side2_sector_numbering
-                if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
-                    *ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
-                } else {
-                    *ptr++ = j + h->spec.first_sector_offset; // Sector ID
-                }
+				// side2_sector_numbering option tested on MAME (Kaypro4)
+				if ( (! h->spec.side2_sector_numbering) || (! s) ) {
+					if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+						*ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
+					} else {
+						*ptr++ = j + h->spec.first_sector_offset; // Sector ID
+					}
+				} else {
+					if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+						*ptr++ = skew_sector(h, j, i) + h->spec.boot_tracks_sector_offset + h->spec.sectors_per_track; // Sector ID
+					} else {
+						*ptr++ = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ; // Sector ID
+					}
+				}
 
                 *ptr++ = sector_size;
                 *ptr++ = 0; // FDC status register 1
@@ -409,7 +417,7 @@ int disc_write_d88(disc_handle* h, const char* filename)
             if ( h->spec.alternate_sides == 0 ) {
                 offs = track_length * i + (s * track_length * h->spec.tracks);
             } else {
-                offs = track_length * ( 2* i + s);
+                offs = track_length * (2*i + s);
             }
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                  uint8_t *ptr = header;
@@ -417,7 +425,6 @@ int disc_write_d88(disc_handle* h, const char* filename)
                  *ptr++ = i;                //track
                  *ptr++ = s;                //head
 
-                 // TODO: verify that SKEW works everywhere, it's not applied to sector numbering
                  if ( (! h->spec.side2_sector_numbering) || (! s) )
                     *ptr++ =  skew_sector(h, j, i) + h->spec.first_sector_offset;       //sector
                  else
