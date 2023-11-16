@@ -14,8 +14,32 @@
 #include <algorithm>
 using namespace std;
 
+ExprResult::ExprResult() {
+}
+
 ExprResult::ExprResult(int value)
-	: m_value(value) {}
+	: m_value(value), m_type(Type::Const) {
+}
+
+ExprResult::ExprResult(shared_ptr<Instr> instr)
+    : m_instr(instr) {
+}
+
+int ExprResult::value() const {
+    auto instr_ptr = m_instr.lock();
+    if (instr_ptr)
+        return instr_ptr->pc();
+    else
+        return m_value;
+}
+
+ExprResult::Type ExprResult::type() const {
+    auto instr_ptr = m_instr.lock();
+    if (instr_ptr)
+        return instr_ptr->is_phased() ? Type::Const : Type::Addr;
+    else
+        return m_type;
+}
 
 bool ExprResult::is_const() const {         // TODO: check this with constant symbols in expression
 	if (m_depends_on_asmpc || undefined_symbol())

@@ -21,10 +21,21 @@ class Instr;
 
 class ExprResult {
 public:
-	ExprResult(int value = 0);
+    enum class Type { Undef, Const, Addr, Computed };
+	ExprResult();
+	ExprResult(int value);
+	ExprResult(shared_ptr<Instr> instr);
 
-	int value() const { return m_value; }
+    int value() const;
 	void set_value(int n) { m_value = n; }
+
+    Type type() const;
+    void set_type(Type t) { m_type = t; }
+
+    shared_ptr<Instr> instr() const { return m_instr.lock(); }
+    void set_instr(shared_ptr<Instr> instr) { m_instr = instr; }
+    void reset_instr() { m_instr.reset(); }
+
 
 	bool is_const() const;
 
@@ -48,6 +59,8 @@ public:
 
 private:
 	int m_value{ 0 };
+    Type m_type{ Type::Undef };
+    weak_ptr<Instr> m_instr;
 	bool m_depends_on_asmpc{ false };
 	bool m_cross_section{ false };
 	bool m_division_by_zero{ false };
