@@ -100,6 +100,29 @@ static disc_spec ampro_spec = {
 };
 
 
+// Amust Compak 5.25" 80T (5.25" DS DD 80T 5x512 s/t)
+// the original disks should have 16x256 s/t on track 0
+static disc_spec amust_spec = {
+    .name = "Amust",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 320, // 128 ?
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 1,
+    .skew_tab = { 0, 2, 4, 1, 3 }
+};
+
+
 // Apple II CP/M on Softcard
 static disc_spec apple2_spec = {
     .name = "A2Softcard",
@@ -1517,6 +1540,7 @@ static struct formats {
     { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
     { "altos580",  "Altos 580",             &altos580_spec, 0, NULL, 1 },
     { "ampro",     "Ampro 48tpi",           &ampro_spec, 0, NULL, 1 },
+    { "amust",     "Amust Compak",          &amust_spec, 0, NULL, 1 },
     { "apple2",    "Apple II Softcard",     &apple2_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "aussie",    "AussieByte Knight2000", &aussie_spec, 0, NULL, 1 },
