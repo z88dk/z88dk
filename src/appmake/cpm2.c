@@ -63,18 +63,39 @@ static disc_spec einstein_spec = {
 };
 
 
+// Accesss Matrix (Actrix AM) - SS
+static disc_spec actrixss_spec = {
+    .name = "Actrix_SS",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,   // 0x55 ?
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 6, 1, 4, 7, 2, 5, 8 }
+};
+
+// Accesss Matrix (Actrix AM) - DS
 static disc_spec actrix_spec = {
-    .name = "Actrix",
+    .name = "Actrix_DS",
     .disk_mode = MFM250,
     .sectors_per_track = 9,
     .tracks = 40,
     .sides = 2,
+    .alternate_sides = 1,
     .sector_size = 512,
     .gap3_length = 0x2a,
-    .filler_byte = 0x55,
+    .filler_byte = 0xe5,   // 0x55 ?
     .boottracks = 2,
-    .directory_entries = 32,
-    .extent_size = 1024,
+    .directory_entries = 64,
+    .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
     .has_skew = 1,
@@ -100,7 +121,7 @@ static disc_spec ampro_spec = {
 };
 
 
-// Amust Compak 5.25" 80T (5.25" DS DD 80T 5x512 s/t)
+// Amust Compak / Amust Executive
 // the original disks should have 16x256 s/t on track 0
 static disc_spec amust_spec = {
     .name = "Amust",
@@ -113,13 +134,33 @@ static disc_spec amust_spec = {
     .gap3_length = 0x2a,
     .filler_byte = 0xe5,
     .boottracks = 2,
-    .directory_entries = 320, // 128 ?
+    .directory_entries = 320,
     .extent_size = 2048,
     .byte_size_extents = 0,
     .first_sector_offset = 1,
     .has_skew = 1,
     .skew_track_start = 1,
     .skew_tab = { 0, 2, 4, 1, 3 }
+};
+
+static disc_spec amustold_spec = {
+    .name = "Amust_old",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 320,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 1,
+    .skew_tab = { 0, 3, 1, 4, 2 }
 };
 
 
@@ -139,6 +180,29 @@ static disc_spec apple2_spec = {
     .first_sector_offset = 1,
     .has_skew = 1,
     .skew_tab = { 0,6,12,3,9,15,14,5,11,2,8,7,13,4,10,1 }
+};
+
+
+// Archives, Inc.
+// Archive II & III - DSDD 96 tpi 5.25"
+static disc_spec archive_spec = {
+    .name = "Archives_Inc",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 320, // 128 ?
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 3, 1, 4, 2 }
 };
 
 
@@ -177,6 +241,26 @@ static disc_spec aussie_spec = {
     .alternate_sides = 1,
     .has_skew = 1,
     .skew_tab = { 0, 2, 4, 1, 3 }
+};
+
+
+// Beehive Topper
+// It looks like a Topper II existed with a different system disk
+static disc_spec beehive_spec = {
+    .name = "Topper",
+    .disk_mode = MFM300,
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
 };
 
 
@@ -1535,15 +1619,19 @@ static struct formats {
      char           force_com_extension;
      void         (*extra_hook)(disc_handle *handle);
 } formats[] = {
-    { "actrix",    "Actrix Access",         &actrix_spec, 0, NULL, 1 },
+    { "actrixss",  "Accesss Matrix SS",     &actrixss_spec, 0, NULL, 1 },
+    { "actrix",    "Accesss Matrix DS",     &actrix_spec, 0, NULL, 1 },
     { "alphatro",  "Alphatronic PC",        &alphatro_spec, 0, NULL, 1 },
     { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
     { "altos580",  "Altos 580",             &altos580_spec, 0, NULL, 1 },
     { "ampro",     "Ampro 48tpi",           &ampro_spec, 0, NULL, 1 },
-    { "amust",     "Amust Compak",          &amust_spec, 0, NULL, 1 },
+    { "amust",     "Amust Executive",       &amust_spec, 0, NULL, 1 },
+    { "amustold",  "Amust Executive (old)", &amustold_spec, 0, NULL, 1 },
     { "apple2",    "Apple II Softcard",     &apple2_spec, 0, NULL, 1 },
+    { "archive",   "Archive II & III",      &archive_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "aussie",    "AussieByte Knight2000", &aussie_spec, 0, NULL, 1 },
+    { "beehive",   "Beehive Topper",        &beehive_spec, 0, NULL, 1 },
     { "bbc",       "BBC Micro Z80CPU SSSD", &bbc_spec, 0, NULL, 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bigboard",  "X820/Bigboard, 8in",    &bigboard_spec, 0, NULL, 1 },
