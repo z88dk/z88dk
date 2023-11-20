@@ -63,18 +63,39 @@ static disc_spec einstein_spec = {
 };
 
 
+// Accesss Matrix (Actrix AM) - SS
+static disc_spec actrixss_spec = {
+    .name = "Actrix_SS",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,   // 0x55 ?
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 6, 1, 4, 7, 2, 5, 8 }
+};
+
+// Accesss Matrix (Actrix AM) - DS
 static disc_spec actrix_spec = {
-    .name = "Actrix",
+    .name = "Actrix_DS",
     .disk_mode = MFM250,
     .sectors_per_track = 9,
     .tracks = 40,
     .sides = 2,
+    .alternate_sides = 1,
     .sector_size = 512,
     .gap3_length = 0x2a,
-    .filler_byte = 0x55,
+    .filler_byte = 0xe5,   // 0x55 ?
     .boottracks = 2,
-    .directory_entries = 32,
-    .extent_size = 1024,
+    .directory_entries = 64,
+    .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
     .has_skew = 1,
