@@ -1619,7 +1619,8 @@ static struct formats {
      char           force_com_extension;
      void         (*extra_hook)(disc_handle *handle);
 } formats[] = {
-    { "actrix",    "Actrix Access",         &actrix_spec, 0, NULL, 1 },
+    { "actrixss",  "Accesss Matrix SS",     &actrixss_spec, 0, NULL, 1 },
+    { "actrix",    "Accesss Matrix DS",     &actrix_spec, 0, NULL, 1 },
     { "alphatro",  "Alphatronic PC",        &alphatro_spec, 0, NULL, 1 },
     { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
     { "altos580",  "Altos 580",             &altos580_spec, 0, NULL, 1 },
