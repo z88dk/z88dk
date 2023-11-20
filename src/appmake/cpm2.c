@@ -142,6 +142,29 @@ static disc_spec apple2_spec = {
 };
 
 
+// Archives, Inc.
+// Archive II & III - DSDD 96 tpi 5.25"
+static disc_spec archive_spec = {
+    .name = "Archives_Inc",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 320, // 128 ?
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 3, 1, 4, 2 }
+};
+
+
 static disc_spec attache_spec = {
     .name = "Attache",
     .disk_mode = MFM300,	
@@ -1562,6 +1585,7 @@ static struct formats {
     { "ampro",     "Ampro 48tpi",           &ampro_spec, 0, NULL, 1 },
     { "amust",     "Amust Compak",          &amust_spec, 0, NULL, 1 },
     { "apple2",    "Apple II Softcard",     &apple2_spec, 0, NULL, 1 },
+    { "archive",   "Archive II & III",      &archive_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "aussie",    "AussieByte Knight2000", &aussie_spec, 0, NULL, 1 },
     { "beehive",   "Beehive Topper",        &beehive_spec, 0, NULL, 1 },
