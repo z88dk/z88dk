@@ -180,6 +180,26 @@ static disc_spec aussie_spec = {
 };
 
 
+// Beehive Topper
+// It looks like a Topper II existed with a different system disk
+static disc_spec beehive_spec = {
+    .name = "Topper",
+    .disk_mode = MFM300,
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+};
+
+
 // SSSD osborne 1 disks, see section 7.7 of the Osborne 1 technical manual
 // http://dunfield.classiccmp.org/osborne/o1techm.pdf
 
@@ -1544,6 +1564,7 @@ static struct formats {
     { "apple2",    "Apple II Softcard",     &apple2_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "aussie",    "AussieByte Knight2000", &aussie_spec, 0, NULL, 1 },
+    { "beehive",   "Beehive Topper",        &beehive_spec, 0, NULL, 1 },
     { "bbc",       "BBC Micro Z80CPU SSSD", &bbc_spec, 0, NULL, 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bigboard",  "X820/Bigboard, 8in",    &bigboard_spec, 0, NULL, 1 },
