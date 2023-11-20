@@ -670,6 +670,44 @@ static disc_spec mz2500cpm_spec = {
 };
 
 
+// Teletek Systemaster (integrated FDC on an S100 Z80 board)
+static disc_spec teletekss_spec = {
+    .name = "Teletek_SS",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,6,12,1,7,13,2,8,14,3,9,15,4,10,16,5,11,17 }
+};
+
+static disc_spec teletek_spec = {
+    .name = "Teletek",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,6,12,1,7,13,2,8,14,3,9,15,4,10,16,5,11,17 }
+};
+
+
 static disc_spec televideo_spec = {
     .name = "Televideo",
     .disk_mode = MFM250,
@@ -1682,6 +1720,8 @@ static struct formats {
     { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
     { "svi-40ss",  "SVI 40ss (174k)",       &svi40ss_spec, 0, NULL, 1 },
+    { "teletekds", "Teletek Systemaster",   &teletek_spec, 0, NULL, 1 },
+    { "teletekss", "Teletek (SS)",          &teletekss_spec, 0, NULL, 1 },
     { "televideo", "Televideo TS80x/TPC1",  &televideo_spec, 0, NULL, 1 },
     { "tiki100ss", "Tiki 100 (200k)",       &tiki100_ss_spec, 0, NULL, 1 },
     { "tiki100ds", "Tiki 100 (400k)",       &tiki100_ds_spec, 0, NULL, 1 },
