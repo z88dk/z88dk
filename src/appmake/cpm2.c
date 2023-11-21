@@ -1159,6 +1159,7 @@ static disc_spec bic_spec = {
 
 
 // 8" floppy disk on Xerox 820 or Ferguson BigBoard
+// The Datamax-8000 apparently has this same format
 static disc_spec bigboard_spec = {
     .name = "BigBoard",
     .disk_mode = FM500,
@@ -1680,6 +1681,7 @@ static struct formats {
     { "col1",      "Coleco ADAM 40T SSDD",  &col1_spec, 0, NULL, 1 },
     { "corvette",  "Corvette", &corvette_spec, 32,         "\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8c\x01\x7f\x00\xc0\x00\x20\x00\x01\x00\x11", 1 },
     { "corvboot",  "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
+    { "datamax",   "Datamax-8000, 8in",     &bigboard_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "eagle2",    "Eagle II",              &eagle2_spec, 0, NULL, 1 },
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
