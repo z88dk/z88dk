@@ -430,9 +430,9 @@ static disc_spec microbee40_spec = {
 };
 
 
-// PMC-101 MicroMate (Type "A")
-static disc_spec pmc101a_spec = {
-    .name = "PMC-101_A",
+// PMC-101 MicroMate
+static disc_spec pmc101_spec = {
+    .name = "PMC-101",
     .disk_mode = MFM250,
     .sectors_per_track = 5,
     .tracks = 40,
@@ -445,7 +445,7 @@ static disc_spec pmc101a_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-    .alternate_sides = 1,
+    .alternate_sides = 1
 };
 
 
@@ -1695,6 +1695,7 @@ static struct formats {
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds40",  "Microbee DS40",    &microbee40_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
+    { "micromate", "PMC-101 MicroMate",     &pmc101_spec, 0, NULL, 1 },
     { "morrow2",   "Morrow MD 2 (SS)",      &md2_spec, 0, NULL, 1 },
     { "morrow3",   "Morrow MD 3 (DS)",      &md3_spec, 0, NULL, 1 },
     { "mbc1000",   "Sanyo MBC-1000/1150",   &mbc1000_spec, 0, NULL, 1 },
