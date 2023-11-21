@@ -9,6 +9,15 @@
 // HCCA_MODE_RB:  Reading mode uses a ringbuffer, this will wrap if you don't consume data
 // HCCA_MODE_HDR: When reading, initally read a 3 byte header and extract the next block length from bytes 1 + 2
 // HCCA_MODE_BLOCK: Read or write the block of memory passed into hcca_start_write()/hcca_start_read()
+//
+//
+// HCCA_MODE_RB uses a buffer of size CLIB_RXBUF_SIZE and CLIB_TXBUF_SIZE for reading/writing. These values
+// default to 256 bytes, so if you need to read/write larger messages use:
+//
+// -pragma-define:CLIB_RXBUF_SIZE=nnn
+// -pragma-define:CLIB_TXBUF_SIZE=nnn
+//
+// where nnn is a multiple of 256 or use the other zerocopy read/write methods.
 #define HCCA_MODE_RB    255
 #define HCCA_MODE_HDR   0
 #define HCCA_MODE_BLOCK 1
