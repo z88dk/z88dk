@@ -7,6 +7,7 @@
 *.h     text eol=lf
 *.hh    text eol=lf
 *.in    text eol=lf
+*.l     text eol=lf
 *.lst   text eol=lf
 *.md    text eol=lf
 *.opt   text eol=lf
