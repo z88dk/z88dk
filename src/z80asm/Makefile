@@ -229,7 +229,7 @@ clean::
 
 #------------------------------------------------------------------------------
 # rebuild the tools needed for the tests
-rebuild:
+rebuild: clean
 	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm.lib
 	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm_lib.lst
 	touch ../z80asm/Makefile ../z80asm/dev/z80asm_lib/Makefile ../z80asm/dev/cpu/Makefile

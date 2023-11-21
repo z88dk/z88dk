@@ -14,6 +14,7 @@ extern "C" {
 #include "types.h"
 #include "utarray.h"
 #include "utstring.h"
+#include "z80asm_defs.h"
 #include "z80asm_cpu.h"
 #include "uthash.h"
 #include "utarray.h"
@@ -77,27 +78,6 @@ long write_string_table(string_table_t* st, FILE* fp);  // write string table, r
 // a defined symbol
 //-----------------------------------------------------------------------------
 
-// Scope of symbol, Initially defined as LOCAL
-typedef enum {
-    SCOPE_NONE,     // 0
-    SCOPE_LOCAL,    // 1 "L"
-    SCOPE_PUBLIC,   // 2 "G"            - defined and exported
-    SCOPE_EXTERN,   // 3                - not defined and imported
-    SCOPE_GLOBAL,   // 4 "G" if defined - PUBLIC if defined, EXTERN if not defined
-} sym_scope_t;
-
-extern const char* sym_scope_str[];
-
-// Type of symbol - Expressions have the type of the greatest symbol used
-typedef enum {
-    TYPE_UNKNOWN,   // 0     - symbol not defined
-    TYPE_CONSTANT,	// 1 "C" - can be computed
-    TYPE_ADDRESS,	// 2 "A" - depends on ASMPC, can be computed after address allocation
-    TYPE_COMPUTED,	// 3 "=" - depends on the result of an expression that has this symbol as target
-} sym_type_t;
-
-extern char* sym_type_str[];
-
 typedef struct symbol_s
 {
 	UT_string*  name;
@@ -119,23 +99,6 @@ extern void symbol_free(symbol_t* self);
 //-----------------------------------------------------------------------------
 // an expression
 //-----------------------------------------------------------------------------
-
-// Expression range
-typedef enum {
-    RANGE_UNKNOWN,                  // 0  
-    RANGE_JR_OFFSET,                // 1  "J"
-    RANGE_BYTE_UNSIGNED,            // 2  "U"
-    RANGE_BYTE_SIGNED,              // 3  "S"
-    RANGE_WORD,						// 4  "W"  // 16-bit value little-endian
-    RANGE_WORD_BE,					// 5  "B"  // 16-bit value big-endian
-    RANGE_DWORD,                    // 6  "L"  // 32-bit signed
-    RANGE_BYTE_TO_WORD_UNSIGNED,    // 7  "u"  // unsigned byte extended to 16 bits
-    RANGE_BYTE_TO_WORD_SIGNED,      // 8  "s"  // signed byte sign-extended to 16 bits
-    RANGE_PTR24,					// 9  "P"  // 24-bit pointer
-    RANGE_HIGH_OFFSET,				// 10 "H"  // byte offset to 0xFF00
-    RANGE_ASSIGNMENT,               // 11 "="  // DEFC expression assigning a symbol
-    RANGE_JRE_OFFSET,               // 12 "j"  // 16-bit relative offset for JRE
-} range_t;
 
 typedef struct expr_s {
 	UT_string* text;

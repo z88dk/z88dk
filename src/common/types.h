@@ -27,4 +27,6 @@ typedef unsigned int uint_t;
 						(((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 // number of elements of array
-#define NUM_ELEMS(a)	((sizeof(a) / sizeof((a)[0])))
+#ifndef NUM_ELEMS
+#define NUM_ELEMS(a)    (sizeof(a) / sizeof(a[0]))
+#endif

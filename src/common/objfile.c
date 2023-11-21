@@ -29,28 +29,6 @@ bool opt_obj_hide_code = false;
 static void objfile_read_strid(objfile_t* obj, FILE* fp, UT_string* str);
 
 //-----------------------------------------------------------------------------
-// constants tables
-//-----------------------------------------------------------------------------
-const char* sym_scope_str[] = {
-    "none",     // 0
-    "local",    // 1
-    "public",   // 2
-    "extern",   // 3
-    "global",   // 4
-};
-
-/*-----------------------------------------------------------------------------
-*   Constant tables
-*----------------------------------------------------------------------------*/
-char* sym_type_str[] = {
-    "undef",    // 0
-    "const",    // 1
-    "addr",     // 2
-    "comput",   // 3
-};
-
-
-//-----------------------------------------------------------------------------
 // string table
 //-----------------------------------------------------------------------------
 static UT_icd UT_string_item_icd = { sizeof(string_item_t*), NULL, NULL, NULL };
@@ -133,7 +111,7 @@ bool st_find(string_table_t* st, const char* str) {
 
 const char* st_lookup(string_table_t* st, int id) {
     xassert(id >= 0 && id < (int)HASH_COUNT(st->strs_hash));
-    string_item_t* elem = *(string_item_t**)utarray_eltptr(st->strs_list, id);
+    string_item_t* elem = *(string_item_t**)utarray_eltptr(st->strs_list, (size_t)id);
     xassert(elem);
     xassert(elem->str);
     return elem->str;
@@ -271,10 +249,10 @@ static void print_bytes(UT_array* data)
 {
 	unsigned addr = 0;
 	byte_t* p = (byte_t*)utarray_front(data);
-	unsigned size = utarray_len(data);
+	size_t size = utarray_len(data);
 	bool need_nl = false;
 
-	for (unsigned i = 0; i < size; i++) {
+	for (size_t i = 0; i < size; i++) {
 		if ((addr % 16) == 0) {
 			if (need_nl) {
 				printf("\n");
@@ -301,7 +279,7 @@ symbol_t* symbol_new() {
 
     utstring_new(self->name);
     self->scope = SCOPE_NONE;
-    self->type = TYPE_UNKNOWN;
+    self->type = TYPE_UNDEFINED;
 	self->value = 0;
 	self->section = NULL;
     utstring_new(self->filename);
@@ -325,7 +303,7 @@ expr_t* expr_new() {
 	expr_t* self = xnew(expr_t);
 
     utstring_new(self->text);
-    self->range = RANGE_UNKNOWN;
+    self->range = RANGE_UNDEFINED;
     self->asmpc = self->code_pos = 0;
     self->opcode_size = 2;      // default for normal JR
 	self->section = NULL;
@@ -452,7 +430,7 @@ static void objfile_read_sections(objfile_t* obj, FILE* fp, long fpos_start) {
 			if (code_size < 0)
 				break;
 
-            // red section name
+            // read section name
             UT_string* name;
             utstring_new(name);
             if (obj->version >= 18)
@@ -557,38 +535,32 @@ static void objfile_read_symbols(objfile_t* obj, FILE* fp, long fpos_start, long
         sym_scope_t scope = SCOPE_NONE;
         if (obj->version >= 18) {
             scope = xfread_dword(fp);
+            if (scope == SCOPE_NONE)            // end marker 
+                break;
         }
         else {
             char old_scope = xfread_byte(fp);
-            switch (old_scope) {
-            case '\0': scope = SCOPE_NONE; break;
-            case 'L': scope = SCOPE_LOCAL; break;
-            case 'G': scope = SCOPE_PUBLIC; break;
-            default:
+            if (old_scope == '\0')                  // end marker
+                break;
+
+            scope = sym_scope_ofile_code(old_scope);
+            if (scope == SCOPE_NONE) {
                 printf("\nError symbol scope %d\n", old_scope);
                 exit(EXIT_FAILURE);
-                break;
             }
         }
 		
-		if (scope == SCOPE_NONE)            // end marker 
-			break;							
-
         // read type
-        sym_type_t type = TYPE_UNKNOWN;
+        sym_type_t type = TYPE_UNDEFINED;
         if (obj->version >= 18) {
             type = xfread_dword(fp);
         }
         else {
             char old_type = xfread_byte(fp);
-            switch (old_type) {
-            case 'C': type = TYPE_CONSTANT; break;
-            case 'A': type = TYPE_ADDRESS;  break;
-            case '=': type = TYPE_COMPUTED; break;
-            default:
+            type = sym_type_ofile_code(old_type);
+            if (type == TYPE_UNDEFINED) {
                 printf("\nError symbol type %d\n", old_type);
                 exit(EXIT_FAILURE);
-                break;
             }
         }
 
@@ -624,26 +596,21 @@ static void objfile_read_symbols(objfile_t* obj, FILE* fp, long fpos_start, long
 
 		if (opt_obj_list) {
 			if (!(opt_obj_hide_local && symbol->scope == SCOPE_LOCAL)) {
-                printf("    ");
-                switch (symbol->scope) {
-                case SCOPE_LOCAL: printf("L"); break;
-                case SCOPE_PUBLIC: printf("G"); break;
-                default:
+                const char* scope_str = sym_scope_str_short(symbol->scope);
+                if (scope_str == NULL) {
                     printf("\nError symbol scope %d\n", symbol->scope);
                     exit(EXIT_FAILURE);
-                    break;
                 }
-                printf(" ");
-                switch (symbol->type) {
-                case TYPE_CONSTANT: printf("C"); break;
-                case TYPE_ADDRESS: printf("A"); break;
-                case TYPE_COMPUTED: printf("="); break;
-                default:
+                printf("    %s", scope_str);
+
+                const char* type_str = sym_type_str_short(symbol->type);
+                if (type_str == NULL) {
                     printf("\nError symbol type %d\n", symbol->type);
                     exit(EXIT_FAILURE);
-                    break;
                 }
-				printf(" $%04X: %s", symbol->value, utstring_body(symbol->name));
+                printf(" %s", type_str);
+
+                printf(" $%04X: %s", symbol->value, utstring_body(symbol->name));
 
 				if (obj->version >= 5)
 					print_section(symbol->section->name);
@@ -710,56 +677,30 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
 
 	xfseek(fp, fpos_start, SEEK_SET);
     while (ftell(fp) < fpos_end) {
-        range_t range = RANGE_UNKNOWN;
+        range_t range = RANGE_UNDEFINED;
         if (obj->version >= 18) {
             range = xfread_dword(fp);
-            if (range == RANGE_UNKNOWN)             // end marker
+            if (range == RANGE_UNDEFINED)             // end marker
                 break;
         }
         else {
             char old_range = xfread_byte(fp);
             if (old_range == '\0')                  // end marker
                 break;
-            switch (old_range) {
-            case 'J': range = RANGE_JR_OFFSET; break;
-            case 'U': range = RANGE_BYTE_UNSIGNED; break;
-            case 'S': range = RANGE_BYTE_SIGNED; break;
-            case 'C': range = RANGE_WORD; break;
-            case 'B': range = RANGE_WORD_BE; break;
-            case 'L': range = RANGE_DWORD; break;
-            case 'u': range = RANGE_BYTE_TO_WORD_UNSIGNED; break;
-            case 's': range = RANGE_BYTE_TO_WORD_SIGNED; break;
-            case 'P': range = RANGE_PTR24; break;
-            case 'H': range = RANGE_HIGH_OFFSET; break;
-            case '=': range = RANGE_ASSIGNMENT; break;
-            case 'j': range = RANGE_JRE_OFFSET; break;
-            default:
+            range = range_ofile_code(old_range);
+            if (range == RANGE_UNDEFINED) {
                 printf("\nError expression range %d\n", old_range);
                 exit(EXIT_FAILURE);
-                break;
             }
         }
 
         if (show_expr) {
-            printf("    E ");
-            switch (range) {
-            case RANGE_JR_OFFSET:               printf("J"); break;
-            case RANGE_BYTE_UNSIGNED:           printf("U"); break;
-            case RANGE_BYTE_SIGNED:             printf("S"); break;
-            case RANGE_WORD:                    printf("W"); break;
-            case RANGE_WORD_BE:                 printf("B"); break;
-            case RANGE_DWORD:                   printf("L"); break;
-            case RANGE_BYTE_TO_WORD_UNSIGNED:   printf("u"); break;
-            case RANGE_BYTE_TO_WORD_SIGNED:     printf("s"); break;
-            case RANGE_PTR24:                   printf("P"); break;
-            case RANGE_HIGH_OFFSET:             printf("H"); break;
-            case RANGE_ASSIGNMENT:              printf("="); break;
-            case RANGE_JRE_OFFSET:              printf("j"); break;
-            default:
+            const char* range_str = range_str_short(range);
+            if (range_str == NULL) {
                 printf("\nError expression range %d\n", range);
                 exit(EXIT_FAILURE);
-                break;
             }
+            printf("    E %s", range_str);
         }
 
 		// create a new expression
@@ -1024,7 +965,7 @@ static long objfile_write_exprs(objfile_t* obj, FILE* fp)
 	}
 
 	if (has_exprs) {
-        xfwrite_dword(RANGE_UNKNOWN, fp);	    		    // store end-terminator
+        xfwrite_dword(RANGE_UNDEFINED, fp);	    		    // store end-terminator
 		return fpos0;
 	}
 	else
@@ -1092,7 +1033,7 @@ static long objfile_write_sections(objfile_t* obj, FILE* fp) {
 
 	section_t* section;
     DL_FOREACH(obj->sections, section) {
-        xfwrite_dword(utarray_len(section->data), fp);
+        xfwrite_dword((int)utarray_len(section->data), fp);
         objfile_write_strid(obj, fp, utstring_body(section->name));
         xfwrite_dword(section->org, fp);
         xfwrite_dword(section->align, fp);
@@ -1101,7 +1042,7 @@ static long objfile_write_sections(objfile_t* obj, FILE* fp) {
         // align to dword size
         unsigned aligned_size = ((utarray_len(section->data) + (sizeof(int32_t) - 1))
             & ~(sizeof(int32_t) - 1));
-        int extra_bytes = aligned_size - utarray_len(section->data);
+        int extra_bytes = aligned_size - (int)utarray_len(section->data);
         xfwrite(align, 1, extra_bytes, fp);
     }
 
@@ -1409,7 +1350,7 @@ static bool delete_merged_section(objfile_t* obj, section_t** p_merged_section,
 		delete_section = false;
 	}
 	else {
-		merged_base = utarray_len(merged_section->data);
+		merged_base = (int)utarray_len(merged_section->data);
 
 		// handle alignment
 		int above = merged_base % section->align;

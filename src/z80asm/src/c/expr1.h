@@ -82,9 +82,6 @@ typedef struct ExprOp				/* hold one operation or operand */
 
 ARRAY(ExprOp);					/* hold list of Expr1 operations/operands */
 
-/* return size in bytes of value of given range */
-extern int range_size(range_t range);
-
 /*-----------------------------------------------------------------------------
 *	Expression
 *----------------------------------------------------------------------------*/

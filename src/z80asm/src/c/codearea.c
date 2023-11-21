@@ -106,7 +106,7 @@ void reset_codearea( void )
 int get_section_size( Section1 *section )
 {
     init_module();
-    return ByteArray_size( section->bytes );
+    return (int)ByteArray_size(section->bytes);
 }
 
 /*-----------------------------------------------------------------------------
@@ -151,7 +151,7 @@ Section1 *new_section( const char *name )
 		/* define start address of all existing modules = 0, except for default section */
 		if ( g_default_section != NULL && *name != '\0' )
 		{
-			last_id = intArray_size( g_default_section->module_start ) - 1;
+            last_id = (int)intArray_size(g_default_section->module_start) - 1;
 			if ( last_id >= 0 )
 				intArray_item( g_cur_section->module_start, last_id );		/* init [0..module_id] to zero */
 		}
@@ -209,7 +209,7 @@ Section1 *get_next_section(  Section1HashElem **piter )
 static int get_last_module_id( void )
 {
 	init_module();
-	return intArray_size( g_default_section->module_start ) - 1;
+    return (int)(intArray_size(g_default_section->module_start) - 1);
 }
 
 int get_cur_module_id( void )
@@ -236,7 +236,7 @@ static int section_module_start( Section1 *section, int module_id )
 	int cur_size;
 	
     init_module();
-	cur_size = intArray_size( section->module_start );
+    cur_size = (int)intArray_size(section->module_start);
 	if ( cur_size > module_id )
 		addr = *( intArray_item( section->module_start, module_id ) );
 	else

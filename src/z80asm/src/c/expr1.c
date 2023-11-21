@@ -283,7 +283,7 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 			{
 				expr->result.extern_symbol = true;
 			}
-			else if (self->d.symbol->type == TYPE_UNKNOWN)
+			else if (self->d.symbol->type == TYPE_UNDEFINED)
 			{
 				expr->result.undefined_symbol = true;
 				if (not_defined_error)
@@ -331,32 +331,6 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 }
 
 /*-----------------------------------------------------------------------------
-*	Expression range
-*----------------------------------------------------------------------------*/
-
-/* return size in bytes of value of given range */
-int range_size(range_t range) {
-	switch (range) {
-	case RANGE_JR_OFFSET:		        return 1;
-	case RANGE_BYTE_UNSIGNED:	        return 1;
-	case RANGE_BYTE_SIGNED:		        return 1;
-	case RANGE_WORD:			        return 2;
-	case RANGE_WORD_BE:			        return 2;
-	case RANGE_DWORD:			        return 4;
-	case RANGE_BYTE_TO_WORD_UNSIGNED:   return 2;
-	case RANGE_BYTE_TO_WORD_SIGNED:     return 2;
-	case RANGE_PTR24:					return 3;
-	case RANGE_HIGH_OFFSET:				return 1;
-    case RANGE_ASSIGNMENT:              return 2;
-    case RANGE_JRE_OFFSET:		        return 2;
-    default: xassert(0);
-	}
-
-	xassert(0);
-	return -1;	/* not reached */
-}
-
-/*-----------------------------------------------------------------------------
 *	Class to hold one parsed expression
 *----------------------------------------------------------------------------*/
 DEF_CLASS(Expr1);
@@ -369,7 +343,7 @@ void Expr1_init(Expr1* self)
 
 	self->text = Str_new(STR_SIZE);
 
-	self->type = TYPE_UNKNOWN;
+	self->type = TYPE_UNDEFINED;
 
 	self->target_name = NULL;
 
@@ -844,7 +818,7 @@ static bool Expr_is_addr_diff1(Expr1* self, struct stack_item** phead) {
 			if (!op->d.symbol->is_defined)
 				return false;
 			switch (op->d.symbol->type) {
-			case TYPE_UNKNOWN:
+			case TYPE_UNDEFINED:
 				return false;
 			case TYPE_CONSTANT:
 				elt = xnew(struct stack_item);

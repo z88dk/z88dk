@@ -26,6 +26,7 @@ CSRCS		:= ../common/zutils.c \
 			../common/objfile.c \
 			../common/fileutil.c \
 			../common/strutil.c \
+			../common/z80asm_defs.c \
 			../common/z80asm_cpu.c \
 			$(wildcard ../../ext/regex/reg*.c)
 

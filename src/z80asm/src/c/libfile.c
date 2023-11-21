@@ -76,7 +76,7 @@ static bool add_object_modules(FILE* lib_fp, string_table_t* st) {
             xfread_bytes(obj_file_data, obj_size, obj_fp);
 
             // write file pointer of next file
-            xfwrite_dword(fptr + 2 * sizeof(int32_t) + obj_size, lib_fp);
+            xfwrite_dword((int)(fptr + 2 * sizeof(int32_t) + obj_size), lib_fp);
 
             // write module size
             xfwrite_dword(obj_size, lib_fp);

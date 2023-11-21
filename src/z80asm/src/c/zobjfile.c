@@ -84,7 +84,7 @@ static void copy_objfile_symbols_symtab(objfile_t* obj, Section1* in_section, se
                 (in_sym->scope == SCOPE_LOCAL) ? SCOPE_LOCAL :
                 SCOPE_NONE;
 
-            if (scope != SCOPE_NONE && in_sym->is_touched && in_sym->type != TYPE_UNKNOWN) {
+            if (scope != SCOPE_NONE && in_sym->is_touched && in_sym->type != TYPE_UNDEFINED) {
                 symbol_t* out_sym = symbol_new();
                 utstring_printf(out_sym->name, "%s", in_sym->name);
 

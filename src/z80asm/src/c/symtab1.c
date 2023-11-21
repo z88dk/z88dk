@@ -146,7 +146,7 @@ Symbol1 *get_used_symbol(const char *name )
 
         if ( sym == NULL )
         {
-            sym = Symbol_create( name, 0, TYPE_UNKNOWN, SCOPE_LOCAL, 
+            sym = Symbol_create( name, 0, TYPE_UNDEFINED, SCOPE_LOCAL, 
 								 CURRENTMODULE, CURRENTSECTION );
             Symbol1Hash_set( & CURRENTMODULE->local_symtab, name, sym );
         }
@@ -419,7 +419,7 @@ void declare_global_symbol(const char *name)
 		if (sym == NULL)
 		{
 			/* not local, not global -> declare symbol as global */
-			sym = Symbol_create(name, 0, TYPE_UNKNOWN, SCOPE_GLOBAL, CURRENTMODULE, CURRENTSECTION);
+			sym = Symbol_create(name, 0, TYPE_UNDEFINED, SCOPE_GLOBAL, CURRENTMODULE, CURRENTSECTION);
 			Symbol1Hash_set(&global_symtab, name, sym);
 		}
 		else if (sym->module == CURRENTMODULE && (sym->scope == SCOPE_PUBLIC || sym->scope == SCOPE_EXTERN))
@@ -478,7 +478,7 @@ void declare_public_symbol(const char *name)
 		if (sym == NULL)
 		{
 			/* not local, not global -> declare symbol as global */
-			sym = Symbol_create(name, 0, TYPE_UNKNOWN, SCOPE_PUBLIC, CURRENTMODULE, CURRENTSECTION);
+			sym = Symbol_create(name, 0, TYPE_UNDEFINED, SCOPE_PUBLIC, CURRENTMODULE, CURRENTSECTION);
 			Symbol1Hash_set(&global_symtab, name, sym);
 		}
 		else if (sym->module == CURRENTMODULE && sym->scope == SCOPE_EXTERN)
@@ -601,11 +601,11 @@ static void _write_symbol_file(const char *filename, Module1 *module, bool(*cond
 	Symbol1Hash *symbols;
 	Symbol1HashElem *iter;
 	Symbol1         *sym;
-	long			reloc_offset;
+	int 			reloc_offset;
 	STR_DEFINE(line, STR_SIZE);
 
-	if (option_relocatable() && module == NULL)		// module is NULL in link phase
-		reloc_offset = sizeof_relocroutine + sizeof_reloctable + 4;
+    if (option_relocatable() && module == NULL)		// module is NULL in link phase
+        reloc_offset = (int)(sizeof_relocroutine + sizeof_reloctable + 4);
 	else
 		reloc_offset = 0;
 
@@ -626,8 +626,8 @@ static void _write_symbol_file(const char *filename, Module1 *module, bool(*cond
 		Str_append_sprintf(line, " = $%04lX ", sym->value + reloc_offset);
 
 		if (type_flag) {
-			Str_append_sprintf(line, "; %s", sym_type_str[sym->type]);
-			Str_append_sprintf(line, ", %s", sym_scope_str[sym->scope]);
+            Str_append_sprintf(line, "; %s", sym_type_str_long(sym->type));
+            Str_append_sprintf(line, ", %s", sym_scope_str_long(sym->scope));
 			Str_append_sprintf(line, ", %s", sym->is_global_def ? "def" : "");
 			Str_append_sprintf(line, ", %s", (module == NULL && sym->module != NULL) ? sym->module->modname : "");
 			Str_append_sprintf(line, ", %s", sym->section->name);
