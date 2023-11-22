@@ -430,9 +430,9 @@ static disc_spec microbee40_spec = {
 };
 
 
-// PMC-101 MicroMate (Type "A")
-static disc_spec pmc101a_spec = {
-    .name = "PMC-101_A",
+// PMC-101 MicroMate
+static disc_spec pmc101_spec = {
+    .name = "PMC-101",
     .disk_mode = MFM250,
     .sectors_per_track = 5,
     .tracks = 40,
@@ -445,7 +445,7 @@ static disc_spec pmc101a_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-    .alternate_sides = 1,
+    .alternate_sides = 1
 };
 
 
@@ -565,12 +565,13 @@ static disc_spec mbc1200_spec = {
 };
 
   
+// Sanyo MBC-2000 (80T, Single Side) , CPU:8085A
 static disc_spec mbc2000_spec = {
     .name = "MBC-2000",
     .disk_mode = MFM250,
     .sectors_per_track = 16,
-    .tracks = 40,
-    .sides = 2,
+    .tracks = 80,
+    .sides = 1,
     .sector_size = 256,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
@@ -579,10 +580,10 @@ static disc_spec mbc2000_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-    .alternate_sides = 1,
     .has_skew = 1,
     .skew_tab = { 0,5,10,15,4,9,14,3,8,13,2,7,12,1,6,11 }
 };
+
 
 // Unverified gap size
 static disc_spec bondwell12_spec = {
@@ -1159,6 +1160,7 @@ static disc_spec bic_spec = {
 
 
 // 8" floppy disk on Xerox 820 or Ferguson BigBoard
+// The Datamax-8000 apparently has this same format
 static disc_spec bigboard_spec = {
     .name = "BigBoard",
     .disk_mode = FM500,
@@ -1331,6 +1333,24 @@ static disc_spec alphatro_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 1,
     .alternate_sides = 1,
+};
+
+
+// Seequa Chameleon
+static disc_spec seequa_spec = {
+    .name = "Seequa Chameleon",
+    .disk_mode = MFM300,
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x50,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1
 };
 
 
@@ -1680,6 +1700,7 @@ static struct formats {
     { "col1",      "Coleco ADAM 40T SSDD",  &col1_spec, 0, NULL, 1 },
     { "corvette",  "Corvette", &corvette_spec, 32,         "\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8c\x01\x7f\x00\xc0\x00\x20\x00\x01\x00\x11", 1 },
     { "corvboot",  "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
+    { "datamax",   "Datamax-8000, 8in",     &bigboard_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "eagle2",    "Eagle II",              &eagle2_spec, 0, NULL, 1 },
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
@@ -1695,11 +1716,12 @@ static struct formats {
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds40",  "Microbee DS40",    &microbee40_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
+    { "micromate", "PMC-101 MicroMate",     &pmc101_spec, 0, NULL, 1 },
     { "morrow2",   "Morrow MD 2 (SS)",      &md2_spec, 0, NULL, 1 },
     { "morrow3",   "Morrow MD 3 (DS)",      &md3_spec, 0, NULL, 1 },
     { "mbc1000",   "Sanyo MBC-1000/1150",   &mbc1000_spec, 0, NULL, 1 },
     { "mbc1200",   "Sanyo MBC-200/1250",    &mbc1200_spec, 0, NULL, 1 },
-    { "mbc2000",   "Sanyo MBC-2000",        &mbc2000_spec, 0, NULL, 1 },
+    { "mbc2000",   "Sanyo MBC-2000 SS80T",  &mbc2000_spec, 0, NULL, 1 },
     { "naburn",    "Nabu PC (8mb)",         &naburn_spec, 0, NULL, 1 },
     { "nabupc",    "Nabu PC",               &nabupc_spec, 0, NULL, 1 },
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
@@ -1717,6 +1739,7 @@ static struct formats {
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
     { "rainbow",   "DEC Rainbow 100",       &rainbow_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
+    { "seequa",    "Seequa Chameleon (SS)", &seequa_spec, 0, NULL, 1 },
     { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
     { "svi-40ss",  "SVI 40ss (174k)",       &svi40ss_spec, 0, NULL, 1 },
