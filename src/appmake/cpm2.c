@@ -1335,6 +1335,24 @@ static disc_spec alphatro_spec = {
 };
 
 
+// Seequa Chameleon
+static disc_spec seequa_spec = {
+    .name = "Seequa Chameleon",
+    .disk_mode = MFM300,
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x50,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1
+};
+
+
 static disc_spec sharpx1_spec = {
     .name = "Sharp-X1",
     .disk_mode = MFM250,
@@ -1720,6 +1738,7 @@ static struct formats {
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
     { "rainbow",   "DEC Rainbow 100",       &rainbow_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
+    { "seequa",    "Seequa Chameleon (SS)", &seequa_spec, 0, NULL, 1 },
     { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
     { "svi-40ss",  "SVI 40ss (174k)",       &svi40ss_spec, 0, NULL, 1 },
