@@ -565,12 +565,13 @@ static disc_spec mbc1200_spec = {
 };
 
   
+// Sanyo MBC-2000 (80T, Single Side) , CPU:8085A
 static disc_spec mbc2000_spec = {
     .name = "MBC-2000",
     .disk_mode = MFM250,
     .sectors_per_track = 16,
-    .tracks = 40,
-    .sides = 2,
+    .tracks = 80,
+    .sides = 1,
     .sector_size = 256,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
@@ -579,10 +580,10 @@ static disc_spec mbc2000_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-    .alternate_sides = 1,
     .has_skew = 1,
     .skew_tab = { 0,5,10,15,4,9,14,3,8,13,2,7,12,1,6,11 }
 };
+
 
 // Unverified gap size
 static disc_spec bondwell12_spec = {
@@ -1720,7 +1721,7 @@ static struct formats {
     { "morrow3",   "Morrow MD 3 (DS)",      &md3_spec, 0, NULL, 1 },
     { "mbc1000",   "Sanyo MBC-1000/1150",   &mbc1000_spec, 0, NULL, 1 },
     { "mbc1200",   "Sanyo MBC-200/1250",    &mbc1200_spec, 0, NULL, 1 },
-    { "mbc2000",   "Sanyo MBC-2000",        &mbc2000_spec, 0, NULL, 1 },
+    { "mbc2000",   "Sanyo MBC-2000 SS80T",  &mbc2000_spec, 0, NULL, 1 },
     { "naburn",    "Nabu PC (8mb)",         &naburn_spec, 0, NULL, 1 },
     { "nabupc",    "Nabu PC",               &nabupc_spec, 0, NULL, 1 },
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
