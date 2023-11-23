@@ -195,6 +195,10 @@ l_dcal:	jp	(hl)		;Used for call by function ptr
 
 ; Memory banking for Spectrum +3
 IF (startup=3)
+
+    PUBLIC	RG0SAV
+RG0SAV:	defb 0
+
     PUBLIC	pixelbyte
 pixelbyte:	defb	0		; temp byte storage for VDP driver
 
