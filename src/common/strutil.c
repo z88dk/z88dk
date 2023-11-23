@@ -117,7 +117,7 @@ void argv_set(argv_t *argv, size_t idx, const char *str)
 		utarray_reserve(argv, newlen + 1 - curlen);		// +1 for end marker
 		memset(_utarray_eltptr(argv, curlen),
 			0,
-			_utarray_eltptr(argv, newlen) - _utarray_eltptr(argv, curlen));
+			(char*)_utarray_eltptr(argv, newlen) - (char*)_utarray_eltptr(argv, curlen));
 		utarray_len(argv) = newlen;
 	}
 
