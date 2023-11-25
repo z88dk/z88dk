@@ -668,8 +668,8 @@ static int hassuffix(char *name, char *suffix)
         }
     }
 
-    nlen = strlen(name);
-    slen = strlen(suffix);
+    nlen = (int)strlen(name);
+    slen = (int)strlen(suffix);
 
     if (slen > nlen)
         return (0);
@@ -743,7 +743,7 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
     switch (ios) {
     case outimplied:
         /* Dropping the suffix for Z80..cheating! */
-        tstore = strlen(filelist[number]) - strlen(suffix);
+        tstore = (int)strlen(filelist[number]) - (int)strlen(suffix);
         if (!needsuffix)
             filelist[number][tstore] = 0;
         snprintf(buffer, sizeof(buffer), "%s%s %s \"%s\"", bin_dir, processor, extraargs, filelist[number]);
@@ -861,7 +861,7 @@ int linkthem(char *linker)
 
         fclose(out);
 
-        len += strlen(tname) + 5;
+        len += (int)strlen(tname) + 5;
         cmdline = calloc(len, sizeof(char));
 
         snprintf(cmdline, len, "%s \"@%s\"", temp, tname);
@@ -873,7 +873,7 @@ int linkthem(char *linker)
         /* place source files on the command line */
 
         for (i = 0; i < nfiles; i++)
-            len += strlen(filelist[i]) + 7;
+            len += (int)strlen(filelist[i]) + 7;
         len++;
 
         /* So the total length we need is now in len, let's malloc and do it */
@@ -1564,7 +1564,7 @@ int main(int argc, char **argv)
                         *tmp = '\0';
 #endif
                     if (p) {
-                        len = strlen(tmp);
+                        len = (int)strlen(tmp);
                         snprintf(tmp + len, sizeof(tmp) - len - 1, "/%.*s", (int)(p - filelist[i]), filelist[i]);
                     }
 
@@ -3163,7 +3163,7 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
                     if (f) {
                         static char buf[1024];
                         unsigned long nread;
-                        while ((nread = fread(buf, 1, sizeof(buf), f)) > 0)
+                        while ((nread = (unsigned long)fread(buf, 1, sizeof(buf), f)) > 0)
                             fwrite(buf, 1, nread, stdout);
                         fclose(f);
                     }
@@ -3570,7 +3570,7 @@ static int zcc_vasprintf(char **s, const char *fmt, va_list ap)
         *s = NULL;
         req = -1;
     }
-    return req;
+    return (int)req;
 }
 
 
