@@ -15,7 +15,6 @@ Handle object file contruction, reading and writing
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
-#include "objfile.h"
 #include "str.h"
 #include "strutil.h"
 #include "utstring.h"
@@ -23,6 +22,7 @@ Handle object file contruction, reading and writing
 #include "zobjfile.h"
 #include "zutils.h"
 #include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 
 /*-----------------------------------------------------------------------------
 *   Write module to object file

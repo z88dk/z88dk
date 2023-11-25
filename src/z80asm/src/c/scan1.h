@@ -20,10 +20,10 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 *----------------------------------------------------------------------------*/
 typedef struct sym_t 
 {
-	tokid_t  tok;		/* token */
+	tokid_t  tok;		    /* token */
 	tokid_t	 tok_opcode;	/* e.g. TK_IX, when tok = TK_NAME and token is "ix" */
-	char	*	 tstart;		/* start of recognized token with input buffer */
-	int 		 tlen;		/* length of recognized token with input buffer */
+	char*	 tstart;		/* start of recognized token with input buffer */
+	size_t   tlen;		    /* length of recognized token with input buffer */
 	int		 number;		/* number to return with TK_NUMBER */
 } Sym;
 

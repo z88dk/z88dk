@@ -113,11 +113,11 @@ void save_scan_state(void)
 	save.found_EOL = found_EOL;
 	save.cs = cs;
 	save.act = act;
-	save.p   = p   ? p   - Str_data(input_buf) : -1;
-	save.pe  = pe  ? pe  - Str_data(input_buf) : -1;
-	save.eof_ = eof_ ? eof_ - Str_data(input_buf) : -1;
-	save.ts  = ts  ? ts  - Str_data(input_buf) : -1;
-	save.te  = te  ? te  - Str_data(input_buf) : -1;
+	save.p   = (int)(p   ? p   - Str_data(input_buf) : -1);
+	save.pe  = (int)(pe  ? pe  - Str_data(input_buf) : -1);
+	save.eof_ = (int)(eof_ ? eof_ - Str_data(input_buf) : -1);
+	save.ts  = (int)(ts  ? ts  - Str_data(input_buf) : -1);
+	save.te  = (int)(te  ? te  - Str_data(input_buf) : -1);
 //	save.sym_string = m_strdup(sym_string->str);
 	save.expect_opcode = expect_opcode;
 
@@ -181,7 +181,7 @@ void scan_expect_operands(void)
 /*-----------------------------------------------------------------------------
 *	convert number to int, range warning if greater than INT_MAX
 *----------------------------------------------------------------------------*/
-static long scan_num ( char *text, int length, int base )
+static long scan_num ( char *text, size_t length, int base )
 {
 	long value;
 	int digit = 0;

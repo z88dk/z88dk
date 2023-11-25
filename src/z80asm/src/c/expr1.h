@@ -15,9 +15,9 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "array.h"
 #include "class.h"
 #include "classlist.h"
-#include "objfile.h"
 #include "scan1.h"
 #include "sym.h"
+#include "z80asm_defs.h"
 #include "utarray.h"
 
 struct Module1;

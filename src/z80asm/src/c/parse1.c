@@ -262,8 +262,8 @@ static void read_token(ParseCtx *ctx)
 	int p_index;
 	int expr_start_index;
 
-	p_index = ctx->p ? ctx->p - (Sym *)utarray_front(ctx->tokens) : -1;
-	expr_start_index = ctx->expr_start ? ctx->expr_start - (Sym *)utarray_front(ctx->tokens) : -1;
+	p_index = (int)(ctx->p ? ctx->p - (Sym *)utarray_front(ctx->tokens) : -1);
+	expr_start_index = (int)(ctx->expr_start ? ctx->expr_start - (Sym *)utarray_front(ctx->tokens) : -1);
 
 	sym_copy = sym;
 

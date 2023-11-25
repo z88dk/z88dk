@@ -1818,11 +1818,11 @@ bool FileScanner::fill() {
         return false;
     else {
         // save indexes
-        unsigned line_start_index = line_start - m_buffer.c_str();
-        unsigned line_end_index = line_end - m_buffer.c_str();
-        unsigned p_index = p - m_buffer.c_str();
-        unsigned p0_index = p0 - m_buffer.c_str();
-        unsigned marker_index = marker - m_buffer.c_str();
+        size_t line_start_index = line_start - m_buffer.c_str();
+        size_t line_end_index = line_end - m_buffer.c_str();
+        size_t p_index = p - m_buffer.c_str();
+        size_t p0_index = p0 - m_buffer.c_str();
+        size_t marker_index = marker - m_buffer.c_str();
 
         // remove all before line_start
         m_buffer.erase(m_buffer.begin(), m_buffer.begin() + line_start_index);
@@ -1834,7 +1834,7 @@ bool FileScanner::fill() {
         line_start_index = 0;
 
         // read from file
-        unsigned cur_size = m_buffer.size();
+        size_t cur_size = m_buffer.size();
         m_buffer.resize(cur_size + FILL_SIZE + YYMAXFILL);      // reserve extra YYMAXFILL for re2c
         m_ifs.read(&m_buffer[cur_size], FILL_SIZE);
         m_buffer.resize(cur_size + m_ifs.gcount());

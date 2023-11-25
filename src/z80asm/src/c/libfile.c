@@ -10,10 +10,10 @@
 #include "libfile.h"
 #include "modlink.h"
 #include "utlist.h"
-#include "objfile.h"
 #include "zobjfile.h"
 #include "z80asm.h"
 #include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 
 /*-----------------------------------------------------------------------------
 *	define a library file name from the command line
