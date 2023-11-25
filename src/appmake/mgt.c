@@ -298,7 +298,7 @@ void mgt_writefile(disc_handle *h, char mgt_filename[11], mgt_filetype filetype,
     direntry[0] = sector[0] = filetype; // SAM code (todo)
     memcpy(direntry+1, mgt_filename, 10);
 
-    i = (len + 9) / 510;  // number of sectors used
+    i = ((int)len + 9) / 510;  // number of sectors used
     direntry[11] = i / 256;      // MSB sectors used
     direntry[12] = i % 256;      // LSB sectors used
     direntry[13] = 0;            // Start Track
@@ -328,9 +328,9 @@ void mgt_writefile(disc_handle *h, char mgt_filename[11], mgt_filetype filetype,
          */
         direntry[211] = sector[0] = 3;
         direntry[212] = sector[1] = len % 256;
-        direntry[213] = sector[2] = len / 256;
-        direntry[214] = sector[3] = org / 256;
-        direntry[215] = sector[4] = org / 256;
+        direntry[213] = sector[2] = (len / 256) % 256;
+        direntry[214] = sector[3] = (org / 256) % 256;
+        direntry[215] = sector[4] = (org / 256) % 256;
         if ( isexec ) {
             direntry[218] = sector[7] = org / 256;
             direntry[219] = sector[8] = org / 256;
@@ -340,10 +340,10 @@ void mgt_writefile(disc_handle *h, char mgt_filename[11], mgt_filetype filetype,
     case MGT_SAM_CODE:
         direntry[236] = sector[8] = 1;
         direntry[237] = sector[3] = org % 256;
-        direntry[238] = sector[4] = org / 256;
-        direntry[239] = sector[7] = len / 16384;
+        direntry[238] = sector[4] = (org / 256) % 256;
+        direntry[239] = sector[7] = (len / 16384) % 256;
         direntry[240] = sector[1] = len % 256;
-        direntry[241] = sector[2] = (len % 16384) / 256;
+        direntry[241] = sector[2] = ((len % 16384) / 256) % 256;
         if ( isexec ) {
             direntry[242] = 2; // Page
             direntry[243] = org % 256; // lsb

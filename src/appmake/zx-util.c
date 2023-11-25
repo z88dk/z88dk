@@ -417,7 +417,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                     if (zxt->turbo) {
                         mlen += 22 + loader_len + 32;   /* extra BASIC size for REM line + turbo block + turbo caller code */
                         loader[37] = pos % 256;
-                        loader[38] = pos / 256;
+                        loader[38] = (pos / 256) % 256;
                         if (zxt->screen) {
                             turbo_loader[18] = 0xcd;        /* activate the extra screen block loading */
                             turbo_loader[19] = 0x69;
@@ -2157,18 +2157,18 @@ uint8_t *zx3_layout_file(uint8_t *inbuf, size_t filelen, int start_address, int 
      // Now populate the +3 dos header
      buf[15] = file_type;
      buf[16] = total_len % 256;
-     buf[17] = total_len / 256;
+     buf[17] = (total_len / 256) % 256;
      buf[18] = start_address % 256;
      buf[19] = start_address / 256;
      buf[20] = file_type == 0 ? total_len % 256 : 0;
-     buf[21] = file_type == 0 ? total_len / 256 : 0;
+     buf[21] = file_type == 0 ? (total_len / 256) % 256 : 0;
 
      // And then the overall file header
      total_len += 128;
      buf[11] = total_len % 256;
      buf[12] = (total_len / 256) % 256;
      buf[13] = (total_len / 65536) % 256;
-     buf[14] = (total_len / 65536) / 256;
+     buf[14] = ((total_len / 65536) / 256) % 256;
 
      // And now do the checksum
      for ( i = 0, cksum = 0; i < 127; i++ ) {
@@ -2254,7 +2254,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *m
     writebyte_b(0xfd, &ptr);        // CLEAR
     writebyte_b(0xb0, &ptr);        // VAL
     if ( zxt->clear_address == -1 ) {
-        zxt->clear_address = origin - 1;
+        zxt->clear_address = (int)origin - 1;
     }
     snprintf(tbuf,sizeof(tbuf),"\"%i\":", zxt->clear_address);
     writestring_b(tbuf, &ptr);
@@ -2283,7 +2283,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *m
     writebyte_b(234, &ptr);      /* REM */
     writestring_b(basic_filename, &ptr);
     writebyte_b(0x0d, &ptr);    /* ENTER (end of BASIC line) */
-    len = ptr - buffer;
+    len = (int)(ptr - buffer);
     buffer[2] = (len-4) % 256; 
     buffer[3] = (len-4) / 256; 
 
@@ -2317,7 +2317,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *m
     // And write it
     suffix_change(basic_filename, ".BIN");
     cpm_create_filename(basic_filename, cpm_filename, 0, 0);
-    file_buf = zx3_layout_file(ptr, binary_length, origin, 3, &file_len);
+    file_buf = zx3_layout_file(ptr, binary_length, (int)origin, 3, &file_len);
     disc_write_file(h, cpm_filename, file_buf, file_len);
     free(file_buf);
     free(ptr);

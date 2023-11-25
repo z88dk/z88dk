@@ -78,7 +78,7 @@ int z88elf_exec(char* target)
         exit_log(1,"The source binary is over 65,536 bytes in length.\n");
     }
 
-    readlen = fread(memory, 1, filesize, binfile);
+    readlen = (int)fread(memory, 1, filesize, binfile);
 
     if (filesize != readlen) {
         fclose(binfile);
@@ -122,7 +122,7 @@ int z88elf_exec(char* target)
     header[22] = 0x00;
     header[23] = 0x00;
     header[24] = start % 256;	//  entry address
-    header[25] = start / 256;
+    header[25] = (start / 256) % 256;
     header[26] = 0x00;
     header[27] = 0x00;
     header[28] = 0x34;  //  program header offset
@@ -167,7 +167,7 @@ int z88elf_exec(char* target)
        *ptr++ = 0x00;
        *ptr++ = 0x00;
        *ptr++ = (start+bankoffs) % 256;  // virtual address
-       *ptr++ = (start+bankoffs) / 256; 
+       *ptr++ = ((start+bankoffs) / 256) % 256; 
        *ptr++ = 0x00;
        *ptr++ = 0x00;
        *ptr++ = 0x00;	// physical address

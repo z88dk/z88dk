@@ -130,7 +130,7 @@ int newbrain_exec()
 
             checksum=0x3b;                 /* Init checksum */
                 fputc (0,fpout2);
-            writeword_cksum(strlen(blockname), fpout2, &checksum);
+            writeword_cksum((int)strlen(blockname), fpout2, &checksum);
             for (i=0; i<strlen(blockname); i++) {
                 fputc (blockname[i],fpout2);
                 checksum += blockname[i];
@@ -300,7 +300,7 @@ int newbrain_exec()
             checksum=0x3b;              /* Init checksum */
 
             fputc (0,fpout2);
-            writeword_cksum(strlen(filename), fpout2, &checksum);
+            writeword_cksum((int)strlen(filename), fpout2, &checksum);
             for (i=0; i<strlen(filename); i++) {
                 fputc (filename[i],fpout2);             /* +1 ?? */
                 checksum += filename[i];

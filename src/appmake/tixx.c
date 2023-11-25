@@ -214,7 +214,7 @@ int tixx_exec(char *target)
     if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
         i = n + 17;
     else if (ext == E_85S)
-        i = n + 10 + strlen(str);
+        i = n + 10 + (int)strlen(str);
     else
         i = n + 18;
     writeword(i, fp);
@@ -229,7 +229,7 @@ int tixx_exec(char *target)
         cfwrite("\x0b\0x00", 2, fp, &chk);
     else if (ext == E_85S)
     {
-        i = 4 + strlen(str);
+        i = 4 + (int)strlen(str);
         cfwritebyte(i, fp, &chk);
         cfwrite("\0x00", 1, fp, &chk);
     }
@@ -255,7 +255,7 @@ int tixx_exec(char *target)
     }
 
     /* VARIABLE NAME */
-    i = strlen(str);
+    i = (int)strlen(str);
     if ((ext == E_85S) || (ext == E_86P) || (ext == E_86S))
         cfwritebyte(i, fp, &chk);
     cfwrite(str, i, fp, &chk);
