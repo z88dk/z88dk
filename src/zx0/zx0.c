@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
     /* read input file */
     total_counter = 0;
     do {
-        partial_counter = fread(input_data+total_counter, sizeof(char), input_size-total_counter, ifp);
+        partial_counter = (int)fread(input_data+total_counter, sizeof(char), input_size-total_counter, ifp);
         total_counter += partial_counter;
     } while (partial_counter > 0);
 

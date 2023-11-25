@@ -124,7 +124,7 @@ void write_bytes(int offset, int length) {
         exit(1);
     }
     while (length-- > 0) {
-        i = output_index-offset;
+        i = (int)output_index-offset;
         write_byte(output_data[i >= 0 ? i : BUFFER_SIZE+i]);
     }
 }
