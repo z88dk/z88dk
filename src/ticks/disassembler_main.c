@@ -159,7 +159,7 @@ int main(int argc, char **argv)
                 {
                     amount = r;
                 }
-                end = start + amount;
+                end = start + (int)amount;
             } else {
                 fprintf(stderr, "Cannot load file '%s'\n",argv[1]);
             }

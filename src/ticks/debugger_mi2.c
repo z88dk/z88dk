@@ -1136,7 +1136,6 @@ static void cmd_break_insert(const char* flow, int argc, char **argv) {
     }
 
     if (insert_path) {
-        const char *sym;
         breakpoint *elem;
         const char* corrected_source = insert_path;
         int value = parse_address(insert_path, &corrected_source);

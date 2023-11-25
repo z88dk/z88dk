@@ -192,6 +192,9 @@
     <ClCompile Include="..\..\src\ticks\sxmlsearch.c" />
     <ClCompile Include="..\..\src\ticks\syms.c" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\ticks\expressions.l" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

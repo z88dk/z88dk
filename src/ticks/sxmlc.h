@@ -922,7 +922,7 @@ int XMLDoc_parse_buffer_SAX_len(const SXML_CHAR* buffer, int buffer_len, const S
 /**
  * \brief For backward compatibility (buffer length is `strlen(buffer)`).
  */
-#define XMLDoc_parse_buffer_SAX(buffer, name, sax, user) XMLDoc_parse_buffer_SAX_len(buffer, sx_strlen(buffer), name, sax, user)
+#define XMLDoc_parse_buffer_SAX(buffer, name, sax, user) XMLDoc_parse_buffer_SAX_len(buffer, (int)sx_strlen(buffer), name, sax, user)
 
 /**
  * \brief Parse an XML file using the DOM implementation.

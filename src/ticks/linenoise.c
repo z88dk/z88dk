@@ -186,7 +186,7 @@ void sb_realloc(stringbuf *sb, int newlen)
 
 void sb_append(stringbuf *sb, const char *str)
 {
-	sb_append_len(sb, str, strlen(str));
+	sb_append_len(sb, str, (int)strlen(str));
 }
 
 void sb_append_len(stringbuf *sb, const char *str, int len)
@@ -269,7 +269,7 @@ void sb_insert(stringbuf *sb, int index, const char *str)
 		sb_append(sb, str);
 	}
 	else {
-		int len = strlen(str);
+		int len = (int)strlen(str);
 
 		sb_insert_space(sb, index, len);
 		memcpy(sb->data + index, str, len);
@@ -291,7 +291,7 @@ void sb_delete(stringbuf *sb, int index, int len)
 			len = sb->last;
 		}
 
-		sb_delete_space(sb, pos - sb->data, len);
+		sb_delete_space(sb, (int)(pos - sb->data), len);
 	}
 }
 
@@ -2157,7 +2157,7 @@ static int reverseIncrementalSearch(struct current *current)
             if (rchars) {
                 int p_ind = utf8_index(rbuf, --rchars);
                 rbuf[p_ind] = 0;
-                rlen = strlen(rbuf);
+                rlen = (int)strlen(rbuf);
             }
             continue;
         }
@@ -2211,7 +2211,7 @@ static int reverseIncrementalSearch(struct current *current)
                 }
                 /* Copy the matching line and set the cursor position */
                 set_current(current,history[searchpos]);
-                current->pos = utf8_strlen(history[searchpos], p - history[searchpos]);
+                current->pos = utf8_strlen(history[searchpos], (int)(p - history[searchpos]));
                 break;
             }
         }

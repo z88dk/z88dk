@@ -416,7 +416,7 @@ static void debugger_print_prompt(char *prompt, size_t prompt_size, char *buf, s
 
 	if (interact_with_tty) {
 		if (blockmode) {
-			snprintf(prompt, prompt_size, "\n" FNT_BCK "    ..." FNT_RST " ", bk.pc(), buf);
+			snprintf(prompt, prompt_size, "\n" FNT_BCK "    ..." FNT_RST " ");
 		} else {
 			snprintf(prompt, prompt_size, "\n" FNT_BCK "    $%04x    (%s)>" FNT_RST " ", bk.pc(), buf);
 		}
@@ -614,11 +614,11 @@ void debugger()
             max_hotspot_addr = pc;
         }
         if ( last_hotspot_addr != -1 ) {
-            hotspots_t[last_hotspot_addr] += st - last_hotspot_st;
+            hotspots_t[last_hotspot_addr] += (int)st - last_hotspot_st;
         }
         hotspots[pc]++;
         last_hotspot_addr = pc;
-        last_hotspot_st = st;
+        last_hotspot_st = (int)st;
     }
 
     int dodebug = process_temp_breakpoints();

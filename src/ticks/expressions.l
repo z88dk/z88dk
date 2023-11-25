@@ -27,7 +27,7 @@ multiple_words "unsigned char"|"unsigned short"|"unsigned int"|"unsigned long"
 -?[0-9]+\.[0-9]+ 	{
     zero_expression_result(&yylval.val);
     yylval.val.type.first = malloc_type(TYPE_FLOAT);
-    yylval.val.as_float = atof(yytext);
+    yylval.val.as_float = (float)atof(yytext);
     return T_PRIMITIVE_VALUE;
 }
 -?[0-9]+		    {

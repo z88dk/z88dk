@@ -744,7 +744,6 @@ void r4k_ldf_r32_ilmn(uint8_t opcode, uint8_t isjkhl)
 void r4k_ldf_ilmn_r32(uint8_t opcode, uint8_t isjkhl)
 {
     uint32_t addr;
-    uint32_t v;
     uint8_t **reg32;
     
     altd = 0;
