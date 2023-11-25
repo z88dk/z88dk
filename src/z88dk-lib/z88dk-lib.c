@@ -107,7 +107,7 @@ char *generate_path(int n, ...)
 
     for (*tmp = 0; n; --n)
     {
-        tmplen = strlen(tmp);
+        tmplen = (int)strlen(tmp);
         snprintf(tmp + tmplen, sizeof(tmp) / sizeof(*tmp) - tmplen - 1, "%s", (char *)va_arg(arg, char*));
     }
 
@@ -363,7 +363,7 @@ int main(int argc, char **argv)
             exit_log(1, "Unrecognized option %s\n", argv[i]);
         else
         {
-            int len = strlen(libnames);
+            int len = (int)strlen(libnames);
             snprintf(libnames + len, sizeof(libnames) / sizeof(*libnames) - len, "%s ", argv[i]);
             ++numlibs;
         }
