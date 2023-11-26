@@ -29,11 +29,11 @@ static void str_remove_data(Str *str)
 	str->flag.data_alloc = false;
 }
 
-Str *Str_new_(int size)
+Str *Str_new_(size_t size)
 {
 	Str *str;
 
-	check(size > 1, "size=%d", size);
+	check(size > 1, "size=%zd", size);
 
 	str = m_new(Str);
 	m_set_destructor(str, (destructor_t) str_remove_data);
@@ -62,10 +62,10 @@ void Str_delete_(Str *str)
 }
 
 /* expand string buffer if needed */
-void Str_reserve(Str *str, int size)
+void Str_reserve(Str *str, size_t size)
 {
 	char *new_data;
-	int   new_size;
+	size_t new_size;
 
 	check_node(str);
 
@@ -107,13 +107,13 @@ void Str_sync_len(Str *str)
 }
 
 /* set / append bytes */
-void Str_set_bytes(Str *str, const char *source, int size)
+void Str_set_bytes(Str *str, const char *source, size_t size)
 {
 	Str_clear(str);
 	Str_append_bytes(str, source, size);
 }
 
-void Str_append_bytes(Str *str, const char *source, int size)
+void Str_append_bytes(Str *str, const char *source, size_t size)
 {
 	/* expand string if needed */
 	Str_reserve(str, size);
@@ -137,15 +137,15 @@ void Str_append(Str *str, const char *source)
 }
 
 /* set / append substring */
-void Str_set_n(Str *str, const char *source, int count)
+void Str_set_n(Str *str, const char *source, size_t count)
 {
 	Str_clear(str);
 	Str_append_n(str, source, count);
 }
 
-void Str_append_n(Str *str, const char *source, int count)
+void Str_append_n(Str *str, const char *source, size_t count)
 {
-	int num_copy = strlen(source);
+	size_t num_copy = strlen(source);
 
 	Str_append_bytes(str, source, MIN(count, num_copy));
 }
@@ -176,7 +176,7 @@ void Str_vsprintf(Str *str, const char *format, va_list argptr)
 
 void Str_append_vsprintf(Str *str, const char *format, va_list argptr)
 {
-	int free_space;      /* may be negative */
+	int free_space;     /* may be negative */
 	int need_space;
 	va_list savearg;	/* save argptr before new invocations of vsnprintf */
 	bool ok;
@@ -185,7 +185,7 @@ void Str_append_vsprintf(Str *str, const char *format, va_list argptr)
 	do
 	{
 		/* NOTE: Linux vsnprintf always terminates string; Win32 only if there is enough space */
-		free_space = str->size - str->len;
+		free_space = (int)(str->size - str->len);
 
 		if (free_space > 0)
 			need_space = vsnprintf(str->data + str->len, free_space, format, argptr);

@@ -14,6 +14,7 @@ Manage the code area in memory
 #include "if.h"
 #include "init.h"
 #include "module1.h"
+#include "objfile.h"
 #include "strutil.h"
 #include "utstring.h"
 #include "z80asm.h"

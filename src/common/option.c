@@ -10,9 +10,9 @@ static void set_option(option *arg, char *value)
 {
     if ( arg->type & OPT_ASSIGN ) {
         if ( arg->type & (OPT_BOOL|OPT_INT) ) {
-            *(int *)arg->value = arg->data;
+            *(int *)arg->value = (int) arg->data;
         } else if ( arg->type & OPT_STRING ) {
-            *(char *)arg->value = arg->data;
+            *(char *)arg->value = (char) arg->data;
         }
     } else if (arg->type & OPT_OR ) {
         *(int *)arg->value |= arg->data;

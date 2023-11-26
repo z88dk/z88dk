@@ -198,7 +198,7 @@ int hex(char ch)
 char *mem2hex(const uint8_t *mem, char *buf, uint32_t count)
 {
     unsigned char ch;
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < (int)count; i++)
     {
         ch = *(mem++);
         *buf++ = hexchars[ch >> 4];
@@ -211,7 +211,7 @@ char *mem2hex(const uint8_t *mem, char *buf, uint32_t count)
 uint8_t *hex2mem(const char *buf, uint8_t *mem, uint32_t count)
 {
     unsigned char ch;
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < (int)count; i++)
     {
         ch = hex(*buf++) << 4;
         ch = ch + hex(*buf++);
@@ -395,7 +395,7 @@ uint8_t get_memory(uint32_t at, memtype type)
     sprintf(req, "m%zx,%zx", (size_t)mem_requested_at, (size_t)mem_requested_amount);
 
     const char* mem = send_request(req);
-    uint32_t bytes_recv = strlen(mem) / 2;
+    uint32_t bytes_recv = (int)strlen(mem) / 2;
     if (bytes_recv != mem_requested_amount)
     {
         bk.debug("Warning: received incorrect amount of data.");
@@ -689,7 +689,7 @@ uint8_t debugger_restore(const char* file_path, uint16_t at, uint8_t set_pc)
         UT_string s;
         utstring_init(&s);
         utstring_printf(&s, "M%zx,%zx:", addr, read_);
-        mem2hex(buff, hex_buff, read_);
+        mem2hex(buff, hex_buff, (uint32_t)read_);
         utstring_bincpy(&s, hex_buff, read_ * 2);
         const char* response = send_request(utstring_body(&s));
         if (strcmp(response, "OK") != 0)
@@ -833,7 +833,7 @@ static uint8_t process_packet()
         return 0;
     }
 
-    int packetend = packetend_ptr - inbuf;
+    int packetend = (int)(packetend_ptr - inbuf);
     inbuf[packetend] = '\0';
 
     uint8_t checksum = 0;
@@ -944,7 +944,7 @@ static uint8_t is_gdbserver_connected()
 
 static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
 {
-    connection_socket = socket(AF_INET, SOCK_STREAM, 0);
+    connection_socket = (int)socket(AF_INET, SOCK_STREAM, 0);
 #ifdef _WIN32
 	if (connection_socket == SOCKET_ERROR) {
 		bk.debug("Socket error: %d\n", WSAGetLastError());

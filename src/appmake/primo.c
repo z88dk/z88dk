@@ -118,13 +118,13 @@ blk_name_t *add_name_blk(char *ptpname) {
     int crc = 0;
     nameblk->type = (char)0x83;       // BASIC prg name block
     nameblk->bn = 0x00;    // always 0x00
-    nameblk->ns = strlen(ptpname);
+    nameblk->ns = (int)strlen(ptpname);
     nameblk->name = ptpname;
     crc+=nameblk->ns;
     for(int i=0; i<strlen(ptpname); i++)
         crc += ptpname[i];
     nameblk->crc = crc % 256;
-    nameblk->blksize = 4 + strlen(ptpname);
+    nameblk->blksize = 4 + (int)strlen(ptpname);
     add_ptp_block((char *)nameblk);
     return nameblk;
 }

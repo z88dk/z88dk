@@ -15,10 +15,9 @@ Handle object file contruction, reading and writing
 #include "class.h"
 #include "if.h"
 #include "module1.h"
-#include "objfile.h"
 #include "types.h"
 #include "if.h"
-#include "objfile.h"
+#include "z80asm_defs.h"
 #include <stdio.h>
 #include <stdlib.h>
 

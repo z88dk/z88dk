@@ -49,14 +49,14 @@ void pktbuf_insert(struct packet_buf *pkt, const uint8_t *buf, ssize_t len)
         exit(-2);
     }
     memcpy(pkt->buf + pkt->end, buf, len);
-    pkt->end += len;
+    pkt->end += (int)len;
     pkt->buf[pkt->end] = 0;
 }
 
 void pktbuf_erase_head(struct packet_buf *pkt, ssize_t end)
 {
     memmove(pkt->buf, pkt->buf + end, pkt->end - end);
-    pkt->end -= end;
+    pkt->end -= (int)end;
     pkt->buf[pkt->end] = 0;
 }
 
@@ -86,7 +86,7 @@ void write_flush(sock_t sockfd)
     while (write_index < out.end)
     {
         ssize_t nwritten;
-        nwritten = send(sockfd, out.buf + write_index, out.end - write_index, 0);
+        nwritten = send(sockfd, out.buf + write_index, (int)(out.end - write_index), 0);
         if (nwritten < 0)
         {
             printf("Write error\n");

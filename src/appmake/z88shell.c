@@ -85,7 +85,7 @@ int z88shell_exec(char* target)
         exit_log(1,"The source binary is over 65,536 bytes in length.\n");
     }
 
-    readlen = fread(memory, 1, filesize, binfile);
+    readlen = (int)fread(memory, 1, filesize, binfile);
 
     if (filesize != readlen) {
         fclose(binfile);

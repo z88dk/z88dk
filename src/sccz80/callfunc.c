@@ -41,7 +41,7 @@ static char **tmpfiles = NULL;
 static int    tmpfiles_num = 0;
 
 
-static void cleanup_tmpfiles() {
+static void cleanup_tmpfiles(void) {
     int  i;
 
     for ( i = 0; i < tmpfiles_num; i++ ) {
@@ -274,7 +274,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             if ( (functype->flags & SMALLC) == SMALLC)  {
                 proto_argnumber = argnumber - 1;                
             } else {
-                proto_argnumber = array_len(functype->parameters) - argnumber;                
+                proto_argnumber = (int)array_len(functype->parameters) - argnumber;
             }
             prototype = array_get_byindex(functype->parameters, proto_argnumber);
 

@@ -211,7 +211,7 @@ int c7420_exec(char* target)
 
         location = 0x88c1;
         writeword(location, fpout); /* BASIC program location */
-        writeword(16 + 13 + 22 + strlen(msbbuf) + strlen(lsbbuf), fpout); /* block length */
+        writeword(16 + 13 + 22 + (int)strlen(msbbuf) + (int)strlen(lsbbuf), fpout); /* block length */
         writeword(0, fpout); /* checksum, offset=286 ..we'll update it in a next step */
 
         /* Write out the loader program */
@@ -233,7 +233,7 @@ int c7420_exec(char* target)
         writebyte_cksum(0x99, fpout, &checksum); /* CLOAD */
         writebyte_cksum(0, fpout, &checksum); /* prog line termination */
 
-        location += 22 + strlen(msbbuf) + strlen(lsbbuf);
+        location += 22 + (int)strlen(msbbuf) + (int)strlen(lsbbuf);
         writeword_cksum(location, fpout, &checksum);
         writeword_cksum(20, fpout, &checksum); /*  20 POKE-30756,<MSB>:POKE-30757,<LSB> */
         writebyte_cksum(0x93, fpout, &checksum); /* POKE */

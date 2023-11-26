@@ -796,9 +796,9 @@ int debug_resolve_source(char *name, const char** corrected_name)
         } else {
             // try and do partial match
             cfile *elem, *tmp;
-            uint32_t filename_len = strlen(filename);
+            uint32_t filename_len = (int)strlen(filename);
             HASH_ITER(hh, cfiles, elem, tmp) {
-                uint32_t elem_file_len = strlen(elem->file);
+                uint32_t elem_file_len = (int)strlen(elem->file);
 
                 if (elem_file_len < filename_len)
                     continue;
@@ -988,7 +988,7 @@ int get_type_memory_size(type_chain* chain) {
                 child = child->next;
             }
             if (max_child) {
-                return max_child->offset + max_child->symbol->type_record.size;
+                return max_child->offset + (int)max_child->symbol->type_record.size;
             }
             return 0;
         }

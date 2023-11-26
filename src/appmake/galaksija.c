@@ -210,7 +210,7 @@ int gal_exec(char* target)
         /* *** Name block *** */
 
         fputc(GTP_BLOCK_NAME, fpout); /* Block ID: NAME    */
-        writeword(strlen(blockname) + 1, fpout); /* NAME block size   */
+        writeword((int)strlen(blockname) + 1, fpout); /* NAME block size   */
         fputc(0, fpout);
         fputc(0, fpout);
         for (i = 0; i <= strlen(blockname); i++) { /* block name string */

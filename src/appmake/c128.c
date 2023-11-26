@@ -68,7 +68,7 @@ int c128_exec(char *target)
     /* strupr(filename);
        not available on all platforms */
     
-    for (i = strlen(filename) - 1; i >= 0 && filename[i] != '/' && filename[i] != '\\'; i--)
+    for (i = (int)strlen(filename) - 1; i >= 0 && filename[i] != '/' && filename[i] != '\\'; i--)
         filename[i] = toupper(filename[i]);
 
     suffix_change(filename,"");
@@ -76,7 +76,7 @@ int c128_exec(char *target)
     strcpy(ldrfile,filename);
     suffix_change(ldrfile,".LDR");
 
-    namelen=strlen(filename)-1;
+    namelen=(int)strlen(filename)-1;
 
     if ( strcmp(binname,filename) == 0 ) {
         exit_log(1,"Input and output file names must be different\n");

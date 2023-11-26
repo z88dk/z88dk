@@ -88,7 +88,7 @@ int spc1000_exec(char* target)
     writebyte((len + 13) / 256, fpout);
     /* Loading address */
     writebyte(pos % 256, fpout);
-    writebyte(pos / 256, fpout);
+    writebyte((pos / 256) % 256, fpout);
     writebyte(0x00, fpout);
     writebyte(0x00, fpout);
     writebyte(0x3a, fpout); // ??
@@ -105,7 +105,7 @@ int spc1000_exec(char* target)
     writebyte(0xb9, fpout);
     writebyte(0x11, fpout);
     writebyte(pos % 256, fpout);
-    writebyte(pos / 256, fpout);
+    writebyte((pos / 256) % 256, fpout);
 #if 0
     writebyte( 0x00, fpout);
     writebyte( 0x00, fpout);

@@ -76,7 +76,7 @@ int zxvgs_exec(char* target)
         exit_log(1,"The source binary is over 49152 bytes in length.\n");
     }
 
-    readlen = fread(memory, 1, filesize, binfile);
+    readlen = (int)fread(memory, 1, filesize, binfile);
     if (filesize != readlen) {
         fclose(binfile);
         exit_log(1,"Couldn't read in binary file\n");
@@ -90,7 +90,7 @@ int zxvgs_exec(char* target)
         exit_log(1,"Can't open output file %s\n", name);
     }
     header[0] = 1;
-    header[1] = zorg / 256;
+    header[1] = (zorg / 256) % 256;
     header[2] = zorg % 256;
     if (fwrite(&header, 1, 3, fp) != 3)
         exit_log(1, "Can't write to output file %s\n", name);
@@ -107,7 +107,7 @@ int zxvgs_exec(char* target)
         filesize -= chunk;
     }
     header[0] = 0;
-    header[1] = zorg / 256;
+    header[1] = (zorg / 256) % 256;
     header[2] = zorg % 256;
     if (fwrite(&header, 1, 3, fp) != 3)
         exit_log(1, "Can't write to output file %s\n", name);

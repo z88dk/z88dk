@@ -11,9 +11,9 @@ One symbol from the assembly code - label or constant.
 
 #pragma once
 
-#include "objfile.h"
 #include "class.h"
 #include "types.h"
+#include "z80asm_defs.h"
 
 struct Module1;
 struct Section1;

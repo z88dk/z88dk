@@ -203,7 +203,7 @@ uint8_t breakpoints_check()
 
 static uint32_t ticks_time()
 {
-    return st;
+    return (uint32_t)st;
 }
 
 backend_t ticks_debugger_backend = {

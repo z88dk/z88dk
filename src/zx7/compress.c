@@ -85,7 +85,7 @@ unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t inpu
     }
 
     /* initialize delta */
-    diff = *output_size - input_size + skip;
+    diff = (long)(*output_size - input_size + skip);
     *delta = 0;
 
     /* un-reverse optimal sequence */

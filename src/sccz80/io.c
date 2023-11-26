@@ -126,7 +126,7 @@ t_buffer* startbuffer(size_t blocks)
 }
 
 int bufferlen(t_buffer *buf) {
-    return buf->next - buf->start;
+    return (int)(buf->next - buf->start);
 }
 
 void suspendbuffer(void)
@@ -350,7 +350,7 @@ void outd2(long n)
         outd2(n / 10);
         n %= 10;
     }
-    outbyte('0' + n);
+    outbyte('0' + (n & 0xff));
 }
 
 /* convert lower case to upper */

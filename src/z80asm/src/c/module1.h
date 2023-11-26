@@ -12,14 +12,14 @@ Assembled module, i.e. result of assembling a .asm file
 #pragma once
 
 #include "class.h"
-#include "classlist.h"
 #include "classhash.h"
+#include "classlist.h"
 #include "codearea.h"
 #include "expr1.h"
+#include "objfile.h"
 #include "symtab1.h"
 #include "types.h"
-
-#include "objfile.h"
+#include "z80asm_defs.h"
 
 /*-----------------------------------------------------------------------------
 *   Assembly module

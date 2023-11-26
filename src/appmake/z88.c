@@ -198,7 +198,7 @@ int z88_exec(char* target)
     /* Check to see if we will infringe on the ROM header, if not then load it in */
     if (zorg + filesize <= MAX_ADDR) {
 
-        readlen = fread(memory + zorg, 1, filesize, binfile);
+        readlen = (int)fread(memory + zorg, 1, filesize, binfile);
 
         if (filesize != readlen) {
             fclose(binfile);
@@ -225,7 +225,7 @@ int z88_exec(char* target)
     hdr->cardid[0] = (cardidno % 256) & 127;
     hdr->cardid[1] = (cardidno / 256) & 127;
     hdr->cardid[2] = (cardidno % 65536) & 127;
-    hdr->cardid[3] = (cardidno / 65336) | 128;
+    hdr->cardid[3] = ((cardidno / 65336) | 128) % 256;
 
     hdr->cardsize = (char)pages;
     hdr->subtype = 0;
