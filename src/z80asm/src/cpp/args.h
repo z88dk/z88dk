@@ -8,7 +8,7 @@
 
 #include "if.h"
 #include "utils.h"
-#include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -25,7 +25,7 @@ public:
     void set_swap_ixiy(swap_ixiy_t swap_ixiy);
 	bool ucase() const { return m_ucase; }
     bool raw_strings() const { return m_raw_strings; }
-	int cpu() const { return m_cpu; }
+	cpu_t cpu() const { return m_cpu; }
 	const string& cpu_name() const { return m_cpu_name; }
     void set_cpu(int cpu);
 	bool ti83() const { return m_ti83; }
@@ -77,7 +77,7 @@ private:
     swap_ixiy_t     m_swap_ixiy{ IXIY_NO_SWAP };// -IXIY, -IXIY-soft options
 	bool			m_ucase{ false };			// -ucase option
     bool            m_raw_strings{ false };     // -raw-strings option
-	int				m_cpu{ 0 };			        // -m option
+	cpu_t			m_cpu{ CPU_Z80 };	        // -m option
 	string			m_cpu_name;
     bool            m_got_cpu_option{ false };  // got -m option
 	bool			m_ti83{ false };			// -mti83 option

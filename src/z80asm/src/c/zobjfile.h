@@ -47,5 +47,5 @@ extern bool check_obj_lib_file(
     void(*do_error_file_open)(const char*),
 	void(*do_error_file_type)(const char*),
 	void(*do_error_version)(const char*, int, int),
-    void(*do_error_cpu_incompatible)(const char*, int),
+    void(*do_error_cpu_incompatible)(const char*, cpu_t),
     void(*do_error_ixiy_incompatible)(const char*, swap_ixiy_t));

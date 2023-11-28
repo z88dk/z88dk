@@ -12,7 +12,6 @@
 #include "utlist.h"
 #include "zobjfile.h"
 #include "z80asm.h"
-#include "z80asm_cpu.h"
 #include "z80asm_defs.h"
 
 /*-----------------------------------------------------------------------------

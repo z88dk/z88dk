@@ -28,7 +28,6 @@ CSRCS		:= ../common/zutils.c \
 			../common/strutil.c \
 			../common/optparse.c \
 			../common/z80asm_defs.c \
-			../common/z80asm_cpu.c \
 			$(wildcard ../../ext/regex/reg*.c)
 
 OBJS	:= $(CXXSRCS:.cpp=.o) $(CSRCS:.c=.o) \

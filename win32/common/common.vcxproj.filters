@@ -42,9 +42,6 @@
     <ClInclude Include="..\..\src\common\option.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\common\z80asm_cpu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\common\z80asm_defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -74,16 +71,8 @@
     <ClCompile Include="..\..\src\common\option.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\z80asm_cpu.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\common\z80asm_defs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\src\common\z80asm_cpu.def">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

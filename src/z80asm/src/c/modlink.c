@@ -26,7 +26,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "z80asm.h"
 #include "zobjfile.h"
 #include "zutils.h"
-#include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdio.h>
@@ -805,7 +805,7 @@ static bool pending_syms(StrHash* extern_syms) {
 static bool module_same_cpu(obj_file_t* obj, int fpos) {
     int fpos0 = obj->i;
     obj->i = fpos;
-    int cpu_id = parse_int(obj);
+    cpu_t cpu_id = parse_int(obj);
     if (!cpu_compatible(option_cpu(), cpu_id)) {
         obj->i = fpos0;
         return false;

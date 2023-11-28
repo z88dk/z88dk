@@ -11,7 +11,7 @@ Define CPU opcodes
 
 #pragma once
 
-#include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 
 /* forward declaration without include cycle */
 struct Expr1;

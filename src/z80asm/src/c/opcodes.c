@@ -13,7 +13,7 @@ Define CPU opcodes
 #include "codearea.h"
 #include "directives.h"
 #include "expr1.h"
-#include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 #include "opcodes.h"
 #include "parse1.h"
 #include "symtab1.h"

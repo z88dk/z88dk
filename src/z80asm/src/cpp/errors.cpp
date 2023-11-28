@@ -9,7 +9,7 @@
 #include "float.h"
 #include "if.h"
 #include "utils.h"
-#include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -363,7 +363,7 @@ void error_assert_failed() {
 	g_errors.error(ErrCode::AssertFailed);
 }
 
-void error_cpu_incompatible(const char* filename, int got_cpu_id) {
+void error_cpu_incompatible(const char* filename, cpu_t got_cpu_id) {
     ostringstream error;
     const char* cpu_str = cpu_name(got_cpu_id);
     if (cpu_str == NULL)
@@ -375,7 +375,7 @@ void error_cpu_incompatible(const char* filename, int got_cpu_id) {
     }
 }
 
-void error_cpu_invalid(const char* filename, int got_cpu_id) {
+void error_cpu_invalid(const char* filename, cpu_t got_cpu_id) {
     ostringstream error;
     error << "file " << filename << ", cpu_id = " << got_cpu_id;
     g_errors.error(ErrCode::CPUInvalid, error.str());

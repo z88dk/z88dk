@@ -11,7 +11,7 @@
 #include "scan.h"
 #include "preproc.h"
 #include "utils.h"
-#include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 #include "../config.h"
 #include <iostream>
 #include <iomanip>
@@ -860,7 +860,7 @@ void Args::set_cpu(const string& name) {
     }
     else {
         int id = cpu_id(name.c_str());
-        if (id >= 0)
+        if (id != CPU_UNDEF)
             set_cpu(id);
         else {
             string error = name + "; expected: " + cpu_list() + ",";
@@ -1046,7 +1046,7 @@ const char* search_includes(const char* filename) {
 	return spool_add(searched_file.c_str());
 }
 
-int option_cpu() {
+cpu_t option_cpu() {
 	return g_args.cpu();
 }
 

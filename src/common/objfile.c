@@ -10,7 +10,7 @@
 #include "utlist.h"
 #include "utstring.h"
 #include "zutils.h"
-#include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 #include <ctype.h>
 
 #include <sys/types.h>	// needed before regex.h

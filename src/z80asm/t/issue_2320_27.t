@@ -68,15 +68,15 @@ Object  file test_t_issue_2320_27.1.lib at $013C: Z80RMF18
 
 Object  file test_t_issue_2320_27.1.lib at $0264: Z80RMF18
   Name: test_t_issue_2320_27.1
-  CPU:  ez80_z80 (-IXIY-soft)
-  Section "": 15 bytes
-    C $0000: 65 7A 38 30 5F 7A 38 30 20 2D 49 58 49 59 20
+  CPU:  z180 (-IXIY-soft)
+  Section "": 11 bytes
+    C $0000: 7A 31 38 30 20 2D 49 58 49 59 20
   Symbols:
-    L C $0001: __CPU_EZ80_Z80__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __CPU_Z180__ (section "") (file test_t_issue_2320_27.1.asm)
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 
-Object  file test_t_issue_2320_27.1.lib at $0394: Z80RMF18
+Object  file test_t_issue_2320_27.1.lib at $038C: Z80RMF18
   Name: test_t_issue_2320_27.1
   CPU:  r800 (-IXIY-soft)
   Section "": 11 bytes
@@ -86,27 +86,7 @@ Object  file test_t_issue_2320_27.1.lib at $0394: Z80RMF18
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 
-Object  file test_t_issue_2320_27.1.lib at $04BC: Z80RMF18
-  Name: test_t_issue_2320_27.1
-  CPU:  z180 (-IXIY-soft)
-  Section "": 11 bytes
-    C $0000: 7A 31 38 30 20 2D 49 58 49 59 20
-  Symbols:
-    L C $0001: __CPU_Z180__ (section "") (file test_t_issue_2320_27.1.asm)
-    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
-    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
-
-Object  file test_t_issue_2320_27.1.lib at $05E4: Z80RMF18
-  Name: test_t_issue_2320_27.1
-  CPU:  kc160 (-IXIY-soft)
-  Section "": 12 bytes
-    C $0000: 6B 63 31 36 30 20 2D 49 58 49 59 20
-  Symbols:
-    L C $0001: __CPU_KC160__ (section "") (file test_t_issue_2320_27.1.asm)
-    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
-    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
-
-Object  file test_t_issue_2320_27.1.lib at $070C: Z80RMF18
+Object  file test_t_issue_2320_27.1.lib at $04B4: Z80RMF18
   Name: test_t_issue_2320_27.1
   CPU:  kc160_z80 (-IXIY-soft)
   Section "": 16 bytes
@@ -116,7 +96,7 @@ Object  file test_t_issue_2320_27.1.lib at $070C: Z80RMF18
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 
-Object  file test_t_issue_2320_27.1.lib at $083C: Z80RMF18
+Object  file test_t_issue_2320_27.1.lib at $05E4: Z80RMF18
   Name: test_t_issue_2320_27.1
   CPU:  z80_strict (-IXIY-soft)
   Section "": 17 bytes
@@ -127,37 +107,7 @@ Object  file test_t_issue_2320_27.1.lib at $083C: Z80RMF18
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 
-Object  file test_t_issue_2320_27.1.lib at $0970: Z80RMF18
-  Name: test_t_issue_2320_27.1
-  CPU:  8085 (-IXIY-soft)
-  Section "": 11 bytes
-    C $0000: 38 30 38 35 20 2D 49 58 49 59 20
-  Symbols:
-    L C $0001: __CPU_8085__ (section "") (file test_t_issue_2320_27.1.asm)
-    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
-    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
-
-Object  file test_t_issue_2320_27.1.lib at $0A98: Z80RMF18
-  Name: test_t_issue_2320_27.1
-  CPU:  r5k (-IXIY-soft)
-  Section "": 10 bytes
-    C $0000: 72 35 6B 20 2D 49 58 49 59 20
-  Symbols:
-    L C $0001: __CPU_R5K__ (section "") (file test_t_issue_2320_27.1.asm)
-    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
-    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
-
-Object  file test_t_issue_2320_27.1.lib at $0BC0: Z80RMF18
-  Name: test_t_issue_2320_27.1
-  CPU:  r4k (-IXIY-soft)
-  Section "": 10 bytes
-    C $0000: 72 34 6B 20 2D 49 58 49 59 20
-  Symbols:
-    L C $0001: __CPU_R4K__ (section "") (file test_t_issue_2320_27.1.asm)
-    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
-    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
-
-Object  file test_t_issue_2320_27.1.lib at $0CE8: Z80RMF18
+Object  file test_t_issue_2320_27.1.lib at $0718: Z80RMF18
   Name: test_t_issue_2320_27.1
   CPU:  r3k (-IXIY-soft)
   Section "": 10 bytes
@@ -167,27 +117,37 @@ Object  file test_t_issue_2320_27.1.lib at $0CE8: Z80RMF18
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 
-Object  file test_t_issue_2320_27.1.lib at $0E10: Z80RMF18
+Object  file test_t_issue_2320_27.1.lib at $0840: Z80RMF18
   Name: test_t_issue_2320_27.1
-  CPU:  r2ka (-IXIY-soft)
+  CPU:  8085 (-IXIY-soft)
   Section "": 11 bytes
-    C $0000: 72 32 6B 61 20 2D 49 58 49 59 20
+    C $0000: 38 30 38 35 20 2D 49 58 49 59 20
   Symbols:
-    L C $0001: __CPU_R2KA__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __CPU_8085__ (section "") (file test_t_issue_2320_27.1.asm)
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 
-Object  file test_t_issue_2320_27.1.lib at $0F38: Z80RMF18
+Object  file test_t_issue_2320_27.1.lib at $0968: Z80RMF18
   Name: test_t_issue_2320_27.1
-  CPU:  gbz80 (-IXIY-soft)
-  Section "": 12 bytes
-    C $0000: 67 62 7A 38 30 20 2D 49 58 49 59 20
+  CPU:  r5k (-IXIY-soft)
+  Section "": 10 bytes
+    C $0000: 72 35 6B 20 2D 49 58 49 59 20
   Symbols:
-    L C $0001: __CPU_GBZ80__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __CPU_R5K__ (section "") (file test_t_issue_2320_27.1.asm)
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 
-Object  file test_t_issue_2320_27.1.lib at $1060: Z80RMF18
+Object  file test_t_issue_2320_27.1.lib at $0A90: Z80RMF18
+  Name: test_t_issue_2320_27.1
+  CPU:  ez80_z80 (-IXIY-soft)
+  Section "": 15 bytes
+    C $0000: 65 7A 38 30 5F 7A 38 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_EZ80_Z80__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
+
+Object  file test_t_issue_2320_27.1.lib at $0BC0: Z80RMF18
   Name: test_t_issue_2320_27.1
   CPU:  ez80 (-IXIY-soft)
   Section "": 11 bytes
@@ -197,13 +157,53 @@ Object  file test_t_issue_2320_27.1.lib at $1060: Z80RMF18
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 
-Object  file test_t_issue_2320_27.1.lib at $1188: Z80RMF18
+Object  file test_t_issue_2320_27.1.lib at $0CE8: Z80RMF18
+  Name: test_t_issue_2320_27.1
+  CPU:  r2ka (-IXIY-soft)
+  Section "": 11 bytes
+    C $0000: 72 32 6B 61 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_R2KA__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
+
+Object  file test_t_issue_2320_27.1.lib at $0E10: Z80RMF18
+  Name: test_t_issue_2320_27.1
+  CPU:  gbz80 (-IXIY-soft)
+  Section "": 12 bytes
+    C $0000: 67 62 7A 38 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_GBZ80__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
+
+Object  file test_t_issue_2320_27.1.lib at $0F38: Z80RMF18
   Name: test_t_issue_2320_27.1
   CPU:  8080 (-IXIY-soft)
   Section "": 11 bytes
     C $0000: 38 30 38 30 20 2D 49 58 49 59 20
   Symbols:
     L C $0001: __CPU_8080__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
+
+Object  file test_t_issue_2320_27.1.lib at $1060: Z80RMF18
+  Name: test_t_issue_2320_27.1
+  CPU:  r4k (-IXIY-soft)
+  Section "": 10 bytes
+    C $0000: 72 34 6B 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_R4K__ (section "") (file test_t_issue_2320_27.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
+
+Object  file test_t_issue_2320_27.1.lib at $1188: Z80RMF18
+  Name: test_t_issue_2320_27.1
+  CPU:  kc160 (-IXIY-soft)
+  Section "": 12 bytes
+    C $0000: 6B 63 31 36 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_KC160__ (section "") (file test_t_issue_2320_27.1.asm)
     L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_27.1.asm)
     G C $002A: the_answer (section "") (file test_t_issue_2320_27.1.asm:2)
 

@@ -15,7 +15,6 @@ extern "C" {
 #include "utarray.h"
 #include "utstring.h"
 #include "z80asm_defs.h"
-#include "z80asm_cpu.h"
 #include "uthash.h"
 #include "utarray.h"
 #include <stdbool.h>
@@ -154,7 +153,7 @@ typedef struct objfile_s
 	UT_string*  modname;
 	int			version;
 	int			global_org;
-    int         cpu_id;
+    cpu_t       cpu_id;
     swap_ixiy_t swap_ixiy;
 	argv_t*     externs;
 	section_t*  sections;
