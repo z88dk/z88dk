@@ -6,10 +6,11 @@
 //-----------------------------------------------------------------------------
 
 #include "utils.h"
+#include "xassert.h"
+#include <algorithm>
+#include <cstdint>
 #include <regex>
 #include <set>
-#include <cstdint>
-#include <algorithm>
 
 bool is_ident(const string& ident) {
     if (ident.empty())
@@ -304,7 +305,7 @@ void swrite_int32(int n, ostream& os) {
 }
 
 void swrite_string(const string& s, ostream& os) {
-	Assert(s.size() <= INT16_MAX);
+	xassert(s.size() <= INT16_MAX);
 	swrite_int16(static_cast<int>(s.size()), os);
 	os.write(s.c_str(), s.size());
 }

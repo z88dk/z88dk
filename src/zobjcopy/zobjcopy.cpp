@@ -4,6 +4,7 @@
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "zobjcopy.h"
+#include "xassert.h"
 
 //-----------------------------------------------------------------------------
 // Usage and command line options
@@ -62,6 +63,8 @@ static struct optparse_long longopts[] = {
 //-----------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
+    xassert_init(argv[0]);
+
 	UT_array *commands;
 	utarray_new(commands, &ut_str_icd);
 

@@ -8,6 +8,7 @@
 #include "strutil.h"
 #include "uthash.h"
 #include "utstring.h"
+#include "xassert.h"
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>

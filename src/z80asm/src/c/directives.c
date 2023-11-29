@@ -20,6 +20,7 @@ Assembly directives.
 #include "symtab1.h"
 #include "types.h"
 #include "utstring.h"
+#include "xassert.h"
 #include "z80asm.h"
 #include "z80asm_defs.h"
 

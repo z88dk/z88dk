@@ -26,14 +26,6 @@ using namespace std;
 	namespace fs = boost::filesystem;
 #endif
 
-// Assert for internal errors, similar to assert but not removed in release builds
-#define Assert(f)    do { \
-                        if (!(f)) { \
-                            cerr << Z80ASM_PROG << " panic at " << __FILE__ << ":" << __LINE__ << endl; \
-                            exit(EXIT_FAILURE); \
-                        } \
-                    } while(0)
-
 // ctype.h on MSVC asserts that character is in range -1 to 255; this fails for signed chars
 inline bool is_alnum(char c) { return c > 0 && isalnum(c); }
 inline bool is_alpha(char c) { return c > 0 && isalpha(c); }

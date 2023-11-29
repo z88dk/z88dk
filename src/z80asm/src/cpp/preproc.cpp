@@ -6,12 +6,13 @@
 //-----------------------------------------------------------------------------
 
 #include "args.h"
+#include "errors.h"
 #include "float.h"
 #include "if.h"
-#include "scan.h"
 #include "preproc.h"
+#include "scan.h"
 #include "utils.h"
-#include "errors.h"
+#include "xassert.h"
 #include <cassert>
 using namespace std;
 
@@ -649,7 +650,7 @@ bool Preproc::check_z80_ld_bit_opcodes() {
 
         string reg8 = m_line.peek(1).svalue();
         out.append(m_line.peek_tokens(3));
-        Assert(out.tokens().back().is(TType::Newline));
+        xassert(out.tokens().back().is(TType::Newline));
         out.tokens().pop_back();
         out.append({ Token{TType::Comma, false}, Token{TType::Ident, false, reg8},
                      Token{TType::Newline, false} });
@@ -666,7 +667,7 @@ bool Preproc::check_z80_ld_bit_opcodes() {
 
         string reg8 = m_line.peek(1).svalue();
         out.append(m_line.peek_tokens(3));
-        Assert(out.tokens().back().is(TType::Newline));
+        xassert(out.tokens().back().is(TType::Newline));
         out.tokens().pop_back();
         out.append({ Token{TType::Comma, false}, Token{TType::Ident, false, reg8},
                      Token{TType::Newline, false} });

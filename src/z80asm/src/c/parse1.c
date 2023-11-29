@@ -17,7 +17,6 @@ Define ragel-based parser.
 #include "expr1.h"
 #include "if.h"
 #include "module1.h"
-#include "z80asm_defs.h"
 #include "opcodes.h"
 #include "parse1.h"
 #include "scan1.h"
@@ -27,6 +26,8 @@ Define ragel-based parser.
 #include "symtab1.h"
 #include "utarray.h"
 #include "utstring.h"
+#include "xassert.h"
+#include "z80asm_defs.h"
 #include "zutils.h"
 #include <ctype.h>
 

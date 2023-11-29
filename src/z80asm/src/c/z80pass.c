@@ -15,6 +15,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "scan1.h"
 #include "symtab1.h"
 #include "types.h"
+#include "xassert.h"
 #include "zobjfile.h"
 
 /* external functions */

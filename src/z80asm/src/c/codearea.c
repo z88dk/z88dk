@@ -17,6 +17,7 @@ Manage the code area in memory
 #include "objfile.h"
 #include "strutil.h"
 #include "utstring.h"
+#include "xassert.h"
 #include "z80asm.h"
 #include <memory.h>
 

@@ -4,10 +4,12 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "z80asm_defs.h"
+#include "types.h"
 #include "utarray.h"
 #include "uthash.h"
 #include "utstring.h"
+#include "xassert.h"
+#include "z80asm_defs.h"
 #include <limits.h>
 #include <string.h>
 

@@ -9,6 +9,7 @@
 #include "float.h"
 #include "if.h"
 #include "utils.h"
+#include "xassert.h"
 #include "z80asm_defs.h"
 #include <iostream>
 #include <string>
@@ -45,19 +46,19 @@ Errors::Errors()
 }
 
 void Errors::clear() {
-	Assert(!m_locations.empty());
+	xassert(!m_locations.empty());
 	Location& location = m_locations.back();
 
 	location.clear();
 }
 
 void Errors::set_location(const Location& location) {
-	Assert(!m_locations.empty());
+	xassert(!m_locations.empty());
 	m_locations.back() = location;
 }
 
 void Errors::set_file_location(const string& filename, int line_num) {
-	Assert(!m_locations.empty());
+	xassert(!m_locations.empty());
 	Location& location = m_locations.back();
 
     location.set_filename(filename);
@@ -66,14 +67,14 @@ void Errors::set_file_location(const string& filename, int line_num) {
 }
 
 void Errors::set_source_line(const string& line) {
-	Assert(!m_locations.empty());
+	xassert(!m_locations.empty());
 	Location& location = m_locations.back();
 
     location.set_source_line(line);
 }
 
 void Errors::set_expanded_line(const string& line) {
-	Assert(!m_locations.empty());
+	xassert(!m_locations.empty());
 	Location& location = m_locations.back();
 
     location.set_expanded_line(line);
@@ -100,7 +101,7 @@ void Errors::pop_location() {
 }
 
 void Errors::show_error(const string& prefix, ErrCode code, const string& arg_) {
-	Assert(!m_locations.empty());
+	xassert(!m_locations.empty());
 	Location& location = m_locations.back();
 
     string arg = str_chomp(arg_);
@@ -386,7 +387,7 @@ static const char* ixiy_to_string(swap_ixiy_t swap_ixiy) {
     case IXIY_NO_SWAP: return "(no option)"; 
     case IXIY_SWAP: return "-IXIY";
     case IXIY_SOFT_SWAP: return "-IXIY-soft";
-    default: Assert(0); return "";
+    default: xassert(0); return "";
     }
 }
 

@@ -4,20 +4,21 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "if.h"
+#include "../config.h"
 #include "args.h"
 #include "errors.h"
 #include "float.h"
-#include "scan.h"
+#include "if.h"
 #include "preproc.h"
+#include "scan.h"
 #include "utils.h"
+#include "xassert.h"
 #include "z80asm_defs.h"
-#include "../config.h"
-#include <iostream>
-#include <iomanip>
 #include <cassert>
-#include <cstring>
 #include <climits>
+#include <cstring>
+#include <iomanip>
+#include <iostream>
 #include <map>
 using namespace std;
 
@@ -148,7 +149,7 @@ void Args::set_swap_ixiy(swap_ixiy_t swap_ixiy) {
         define_static_symbol("__SWAP_IX_IY__");
         break;
     default:
-        Assert(0);
+        xassert(0);
     }
 }
 
@@ -837,7 +838,7 @@ void Args::set_cpu(int cpu) {
         define_static_symbol("__CPU_KC160_Z80__");
         break;
     default:
-        Assert(0);
+        xassert(0);
     }
 }
 

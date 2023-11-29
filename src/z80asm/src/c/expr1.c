@@ -21,8 +21,9 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "strutil.h"
 #include "sym.h"
 #include "symtab1.h"
-#include "utstring.h"
 #include "utlist.h"
+#include "utstring.h"
+#include "xassert.h"
 
 /*-----------------------------------------------------------------------------
 *	UT_array of Expr1*

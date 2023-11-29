@@ -8,6 +8,7 @@
 #include "fileutil.h"
 #include "strutil.h"
 #include "utstring.h"
+#include "xassert.h"
 #include "zutils.h"
 #include <ctype.h>
 #include <dirent.h>

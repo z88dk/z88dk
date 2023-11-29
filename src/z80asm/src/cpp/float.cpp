@@ -7,6 +7,7 @@
 #include "float.h"
 #include "if.h"
 #include "utils.h"
+#include "xassert.h"
 #include <cassert>
 #include <cerrno>
 #include <cmath>
@@ -44,7 +45,7 @@ static bool is_big_endian() {
 	else if (*c == 0x10)
 		return false;
 	else {
-		Assert(0);
+		xassert(0);
 		return false;	// not reached
 	}
 }
@@ -576,7 +577,7 @@ string FloatFormat::get_type() const {
 	};
 
 	auto found = map.find(m_format);
-	Assert(found != map.end());
+	xassert(found != map.end());
 	return found->second;
 }
 
@@ -606,7 +607,7 @@ vector<uint8_t> FloatFormat::float_to_bytes(double value) {
 #		define X(type)	case Format::type: return float_to_##type(value);
 #		include "float.def"
 	default:
-		Assert(0); return vector<uint8_t>();
+		xassert(0); return vector<uint8_t>();
 	}
 }
 

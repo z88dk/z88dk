@@ -1,4 +1,4 @@
 stdout:
 stderr:
-assertion failed in t/t_die.c:19
+Assertion failed: 0, file t/t_die.c, line 19
 exit: 1

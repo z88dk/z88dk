@@ -23,10 +23,11 @@ Repository: https://github.com/z88dk/z88dk
 #include "symtab1.h"
 #include "types.h"
 #include "utstring.h"
+#include "xassert.h"
 #include "z80asm.h"
+#include "z80asm_defs.h"
 #include "zobjfile.h"
 #include "zutils.h"
-#include "z80asm_defs.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdio.h>

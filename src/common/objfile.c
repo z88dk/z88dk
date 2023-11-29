@@ -9,6 +9,7 @@
 #include "strutil.h"
 #include "utlist.h"
 #include "utstring.h"
+#include "xassert.h"
 #include "zutils.h"
 #include "z80asm_defs.h"
 #include <ctype.h>

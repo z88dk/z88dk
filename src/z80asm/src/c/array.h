@@ -14,9 +14,10 @@ Repository: https://github.com/z88dk/z88dk
 
 #include "alloc.h"
 #include "class.h"
-#include "types.h"
-#include "str.h"
 #include "die.h"
+#include "str.h"
+#include "types.h"
+#include "xassert.h"
 #include <stdlib.h>
 
 /*-----------------------------------------------------------------------------

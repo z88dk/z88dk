@@ -6,6 +6,7 @@
 #pragma once
 
 #include "fileutil.h"
+#include "xassert.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,16 +24,6 @@
 
 // error message and exit program
 extern void die(const char *msg, ...);
-
-// assertion that is not removed in a release compile
-#ifndef xassert
-#define xassert(f)      do { \
-							if (!(f)) { \
-								fprintf(stderr, "assertion failed in %s:%d\n", __FILE__, __LINE__); \
-                                exit(EXIT_FAILURE); \
-                            } \
-						} while(0)
-#endif
 
 // check alloc result, die if error
 extern void *check_alloc(void *p, const char *file, int line_num);

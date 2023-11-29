@@ -3,30 +3,12 @@
 // Copyright (C) Paulo Custodio, 2011-2023
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
-
 #pragma once
 
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifndef NUM_ELEMS
-#define NUM_ELEMS(a)    (sizeof(a) / sizeof(a[0]))
-#endif
-
-// assertion that is not removed in a release compile
-#ifndef xassert
-#define xassert(f)  \
-    do { \
-	    if (!(f)) { \
-		    fprintf(stderr, "assertion failed in %s:%d\n", __FILE__, __LINE__); \
-            exit(EXIT_FAILURE); \
-        } \
-    } while(0)
 #endif
 
 //-----------------------------------------------------------------------------

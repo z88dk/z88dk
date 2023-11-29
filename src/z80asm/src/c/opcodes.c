@@ -13,12 +13,12 @@ Define CPU opcodes
 #include "codearea.h"
 #include "directives.h"
 #include "expr1.h"
-#include "z80asm_defs.h"
 #include "opcodes.h"
 #include "parse1.h"
 #include "symtab1.h"
+#include "xassert.h"
 #include "z80asm.h"
-#include <assert.h>
+#include "z80asm_defs.h"
 
 /* add 1 to 4 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xCB00 */
