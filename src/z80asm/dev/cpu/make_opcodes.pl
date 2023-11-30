@@ -1558,6 +1558,26 @@ for my $cpu (@CPUS) {
 								[0x7F, ld_r_r('c', 'l')],
 								[pop_dd('hl')]);				# pop hl
 	}
+	elsif ($ez80_adl) {
+		add($cpu, "add hl, %m",	[push_dd('de')],				# push de
+								[ld_dd_m('de'), '%m', '%m', '%m'],	# ld de,%m
+								[add_hl_dd('de')],				# add hl,de
+								[pop_dd('de')]);				# pop de
+
+		add($cpu, "add de, %m",	[push_dd('hl')],				# push hl
+								[ld_dd_m('hl'), '%m', '%m', '%m'],	# ld hl,%m
+								[add_hl_dd('de')],				# add hl,de
+								[ld_r_r('d', 'h')],				# ld de, hl											
+								[ld_r_r('e', 'l')],
+								[pop_dd('hl')]);				# pop hl
+
+		add($cpu, "add bc, %m",	[push_dd('hl')],				# push hl
+								[ld_dd_m('hl'), '%m', '%m', '%m'],	# ld hl,%m
+								[add_hl_dd('bc')],				# add hl,bc
+								[ld_r_r('b', 'h')],				# ld bc, hl											
+								[ld_r_r('c', 'l')],
+								[pop_dd('hl')]);				# pop hl
+	}
 	else {
 		add($cpu, "add hl, %m",	[push_dd('de')],				# push de
 								[ld_dd_m('de'), '%m', '%m'],	# ld de,%m

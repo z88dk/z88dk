@@ -3186,7 +3186,7 @@ return true;
 
 bool cpu_rules_action_276(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
-case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
 if (ctx->expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
@@ -3210,6 +3210,20 @@ add_opcode_nn(0x21, Expr1_clone(expr), 0);
 DO_stmt(0x09);
 DO_stmt(0x7F44);
 DO_stmt(0x7F4D);
+DO_stmt(0xE1);
+OBJ_DELETE(expr);
+}
+break;
+case CPU_EZ80: 
+if (ctx->expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0xE5);
+add_opcode_nnn(0x21, Expr1_clone(expr), 0);
+DO_stmt(0x09);
+DO_stmt(0x44);
+DO_stmt(0x4D);
 DO_stmt(0xE1);
 OBJ_DELETE(expr);
 }
@@ -3270,7 +3284,7 @@ return true;
 
 bool cpu_rules_action_280(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
-case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
 if (ctx->expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
@@ -3294,6 +3308,20 @@ add_opcode_nn(0x21, Expr1_clone(expr), 0);
 DO_stmt(0x19);
 DO_stmt(0x7F54);
 DO_stmt(0x7F5D);
+DO_stmt(0xE1);
+OBJ_DELETE(expr);
+}
+break;
+case CPU_EZ80: 
+if (ctx->expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0xE5);
+add_opcode_nnn(0x21, Expr1_clone(expr), 0);
+DO_stmt(0x19);
+DO_stmt(0x54);
+DO_stmt(0x5D);
 DO_stmt(0xE1);
 OBJ_DELETE(expr);
 }
@@ -4548,13 +4576,25 @@ return true;
 
 bool cpu_rules_action_393(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
-case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
+case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
 if (ctx->expr_in_parens) warn_expr_in_parens();
 {
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0xD5);
 add_opcode_nn(0x11, Expr1_clone(expr), 0);
+DO_stmt(0x19);
+DO_stmt(0xD1);
+OBJ_DELETE(expr);
+}
+break;
+case CPU_EZ80: 
+if (ctx->expr_in_parens) warn_expr_in_parens();
+{
+DO_STMT_LABEL();
+Expr1 *expr = pop_expr(ctx);
+DO_stmt(0xD5);
+add_opcode_nnn(0x11, Expr1_clone(expr), 0);
 DO_stmt(0x19);
 DO_stmt(0xD1);
 OBJ_DELETE(expr);
