@@ -69,21 +69,21 @@ check_bin_file("${test}.bin", pack("C*",
 ));
 
 check_text_file("${test}.map", <<END);
+__head                          = \$0000 ; const, public, def, , ,
+__size                          = \$2C008 ; const, public, def, , ,
+__tail                          = \$2C008 ; const, public, def, , ,
+__test1_head                    = \$1C000 ; const, public, def, , ,
+__test1_size                    = \$0007 ; const, public, def, , ,
+__test1_tail                    = \$1C007 ; const, public, def, , ,
+__test2_head                    = \$2C000 ; const, public, def, , ,
+__test2_size                    = \$0008 ; const, public, def, , ,
+__test2_tail                    = \$2C008 ; const, public, def, , ,
+__test_head                     = \$0000 ; const, public, def, , ,
+__test_size                     = \$000F ; const, public, def, , ,
+__test_tail                     = \$000F ; const, public, def, , ,
 banked_call                     = \$0000 ; addr, local, , ${test}, test, ${test}.asm:3
 func1                           = \$1C000 ; addr, public, , ${test}1, test1, ${test}1.asm:4
 func2                           = \$2C001 ; addr, public, , ${test}2, test2, ${test}2.asm:5
-__head                          = \$0000 ; const, public, def, , ,
-__tail                          = \$2C008 ; const, public, def, , ,
-__size                          = \$2C008 ; const, public, def, , ,
-__test_head                     = \$0000 ; const, public, def, , ,
-__test_tail                     = \$000F ; const, public, def, , ,
-__test_size                     = \$000F ; const, public, def, , ,
-__test1_head                    = \$1C000 ; const, public, def, , ,
-__test1_tail                    = \$1C007 ; const, public, def, , ,
-__test1_size                    = \$0007 ; const, public, def, , ,
-__test2_head                    = \$2C000 ; const, public, def, , ,
-__test2_tail                    = \$2C008 ; const, public, def, , ,
-__test2_size                    = \$0008 ; const, public, def, , ,
 END
 
 unlink_testfiles;

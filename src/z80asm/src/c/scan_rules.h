@@ -9604,8 +9604,7 @@ static void set_scan_buf( const char *text, bool _at_bol )
 	act = 0;
 	}
 }
-static tokid_t _scan_get( void )
-{
+static Sym _scan_next(void) {
 	{
 	int _klen;
 	unsigned int _trans;
@@ -17247,12 +17246,12 @@ _eof_trans:
    if (Str_len(string) == 1)
     sym.number = Str_data(string)[0];
    else
-    error_invalid_char_const();
+                error(ErrInvalidCharConst, NULL);
    STR_DELETE(string);
   }
   else
   {
-   error_invalid_char_const();
+            error(ErrInvalidCharConst, NULL);
   }
   ts = te = p;
   {p++; goto _out; }
@@ -17262,7 +17261,7 @@ _eof_trans:
 	{te = p+1;{
   sym.tok = TK_STRING;
   if ( ! get_sym_string() )
-   error_missing_quote();
+            error(ErrMissingQuote, NULL);
   {p++; goto _out; }
  }}
 	break;
@@ -25866,5 +25865,19 @@ _again:
 	}
 	_out: {}
 	}
+ return sym;
+}
+static tokid_t _scan_get(void) {
+ sym = _scan_next();
+ if (at_bol && sym.tok != TK_NAME) {
+  const char* p = te;
+  while (*p && isspace(*p))
+   p++;
+  if (*p == '=' ||
+      (tolower(p[0])=='e' && tolower(p[1])=='q' && tolower(p[2])=='u' && !isalnum(p[3]) && p[3] != '_')) {
+   sym.tok = sym.tok_opcode = TK_NAME;
+   scan_expect_opcode();
+  }
+ }
  return sym.tok;
 }

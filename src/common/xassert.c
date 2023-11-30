@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // assertion that is not removed in a release compile
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
 static const char* g_progname = "";
 
-extern void xassert_init(const char* progname) {
+void xassert_init(const char* progname) {
     g_progname = progname;
 }
 

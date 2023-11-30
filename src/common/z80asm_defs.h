@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #pragma once
@@ -35,8 +35,8 @@ typedef enum {
     CPU_UNDEF       = -1,
 } cpu_t;
 
-#define ARCH_TI83_NAME		"ti83"
-#define ARCH_TI83PLUS_NAME	"ti83plus"
+#define ARCH_TI83_NAME      "ti83"
+#define ARCH_TI83PLUS_NAME  "ti83plus"
 
 // convert cpu_t to string, NULL if not found
 extern const char* cpu_name(cpu_t id);

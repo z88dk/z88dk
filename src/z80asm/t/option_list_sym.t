@@ -64,10 +64,10 @@ z80asm_ok("-b -s -l", "", "", <<END, bytes(0, 1, 0, 1));
 END
 
 check_text_file("${test}.sym", <<END);
-local0                          = \$0002 ; addr, local, , , , ${test}.asm:5
-local1                          = \$0003 ; addr, local, , , , ${test}.asm:6
 global0                         = \$0000 ; addr, public, , , , ${test}.asm:3
 global1                         = \$0001 ; addr, public, , , , ${test}.asm:4
+local0                          = \$0002 ; addr, local, , , , ${test}.asm:5
+local1                          = \$0003 ; addr, local, , , , ${test}.asm:6
 END
 
 check_text_file("${test}.lis", <<END);
@@ -387,15 +387,15 @@ z80asm_ok("-b -s -l", "", "", <<END, bytes(0..8));
 END
 
 check_text_file("${test}.sym", <<END);
-SYM_NULL                        = \$0000 ; const, local, , , , ${test}.asm:3
-SYM_DQUOTE                      = \$0001 ; const, local, , , , ${test}.asm:3
-SYM_SQUOTE                      = \$0002 ; const, local, , , , ${test}.asm:3
-SYM_SEMICOLON                   = \$0003 ; const, local, , , , ${test}.asm:3
 SYM_COMMA                       = \$0004 ; const, local, , , , ${test}.asm:4
+SYM_DQUOTE                      = \$0001 ; const, local, , , , ${test}.asm:3
 SYM_FULLSTOP                    = \$0005 ; const, local, , , , ${test}.asm:4
-SYM_LPAREN                      = \$0006 ; const, local, , , , ${test}.asm:4
 SYM_LCURLY                      = \$0007 ; const, local, , , , ${test}.asm:5
+SYM_LPAREN                      = \$0006 ; const, local, , , , ${test}.asm:4
+SYM_NULL                        = \$0000 ; const, local, , , , ${test}.asm:3
 SYM_RCURLY                      = \$0008 ; const, local, , , , ${test}.asm:5
+SYM_SEMICOLON                   = \$0003 ; const, local, , , , ${test}.asm:3
+SYM_SQUOTE                      = \$0002 ; const, local, , , , ${test}.asm:3
 END
 
 check_text_file("${test}.lis", <<END);

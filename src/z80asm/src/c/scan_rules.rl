@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Macro Assembler
 
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -248,13 +248,13 @@ main := |*
 			if (Str_len(string) == 1)
 				sym.number = Str_data(string)[0];
 			else
-				error_invalid_char_const(); 
+                error(ErrInvalidCharConst, NULL);
 				
 			STR_DELETE(string);
 		}
 		else
 		{
-			error_invalid_char_const(); 
+            error(ErrInvalidCharConst, NULL);
 		}
 		ts = te = p;
 		fbreak;
@@ -265,7 +265,7 @@ main := |*
 	{ 
 		sym.tok = TK_STRING;
 		if ( ! get_sym_string() )	/* consumes input up to end quote or \n */
-			error_missing_quote(); 
+            error(ErrMissingQuote, NULL);
 		fbreak;
 	};
 	
@@ -296,8 +296,25 @@ static void set_scan_buf( const char *text, bool _at_bol )
 	%%write init;
 }
 
-static tokid_t _scan_get( void )
-{
+static Sym _scan_next(void) {
 	%%write exec;
+	return sym;
+}
+
+static tokid_t _scan_get(void) {
+	sym = _scan_next();
+	
+	// 2466: accept keyword as EQU argument
+	if (at_bol && sym.tok != TK_NAME) {
+		const char* p = te;
+		while (*p && isspace(*p))
+			p++;
+		if (*p == '=' || 
+		    (tolower(p[0])=='e' && tolower(p[1])=='q' && tolower(p[2])=='u' && !isalnum(p[3]) && p[3] != '_')) {
+			sym.tok = sym.tok_opcode = TK_NAME;
+			scan_expect_opcode();
+		}
+	}
+	
 	return sym.tok;
 }

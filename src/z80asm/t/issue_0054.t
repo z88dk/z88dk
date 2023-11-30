@@ -33,31 +33,31 @@ ret
 END
 
 check_text_file("${test}.sym", <<END);
-here                            = \$0000 ; addr, local, , , , ${test}.asm:20
-there                           = \$0000 ; addr, local, , , , ${test}.asm:21
-program                         = \$0000 ; addr, public, , , , ${test}.asm:19
+asm_BIFROST2_showNext2Tiles     = \$C9C2 ; const, public, , , , ${test}.asm:11
 asm_BIFROST2_start              = \$C9A9 ; const, public, , , , ${test}.asm:9
 asm_BIFROST2_stop               = \$0000 ; comput, public, , , , ${test}.asm:10
-asm_BIFROST2_showNext2Tiles     = \$C9C2 ; const, public, , , , ${test}.asm:11
+here                            = \$0000 ; addr, local, , , , ${test}.asm:20
+program                         = \$0000 ; addr, public, , , , ${test}.asm:19
+there                           = \$0000 ; addr, local, , , , ${test}.asm:21
 END
 
 check_text_file("${test}.map", <<END);
-here                            = \$FDE8 ; addr, local, , ${test}, , ${test}.asm:20
-there                           = \$FDE8 ; addr, local, , ${test}, , ${test}.asm:21
-program                         = \$FDE8 ; addr, public, , ${test}, , ${test}.asm:19
+__head                          = \$FDE8 ; const, public, def, , ,
+__size                          = \$0001 ; const, public, def, , ,
+__tail                          = \$FDE9 ; const, public, def, , ,
+asm_BIFROST2_showNext2Tiles     = \$C9C2 ; const, public, , ${test}, , ${test}.asm:11
 asm_BIFROST2_start              = \$C9A9 ; const, public, , ${test}, , ${test}.asm:9
 asm_BIFROST2_stop               = \$C9B2 ; const, public, , ${test}, , ${test}.asm:10
-asm_BIFROST2_showNext2Tiles     = \$C9C2 ; const, public, , ${test}, , ${test}.asm:11
-__head                          = \$FDE8 ; const, public, def, , ,
-__tail                          = \$FDE9 ; const, public, def, , ,
-__size                          = \$0001 ; const, public, def, , ,
+here                            = \$FDE8 ; addr, local, , ${test}, , ${test}.asm:20
+program                         = \$FDE8 ; addr, public, , ${test}, , ${test}.asm:19
+there                           = \$FDE8 ; addr, local, , ${test}, , ${test}.asm:21
 END
 
 check_text_file("${test}.def", <<END);
-DEFC program                         = \$FDE8
+DEFC asm_BIFROST2_showNext2Tiles     = \$C9C2
 DEFC asm_BIFROST2_start              = \$C9A9
 DEFC asm_BIFROST2_stop               = \$C9B2
-DEFC asm_BIFROST2_showNext2Tiles     = \$C9C2
+DEFC program                         = \$FDE8
 END
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
@@ -69,10 +69,10 @@ Object  file ${test}.o at \$0000: Z80RMF18
   Symbols:
     L A \$0000: here (section "") (file ${test}.asm:20)
     L A \$0000: there (section "") (file ${test}.asm:21)
-    G A \$0000: program (section "") (file ${test}.asm:19)
+    G C \$C9C2: asm_BIFROST2_showNext2Tiles (section "") (file ${test}.asm:11)
     G C \$C9A9: asm_BIFROST2_start (section "") (file ${test}.asm:9)
     G = \$0000: asm_BIFROST2_stop (section "") (file ${test}.asm:10)
-    G C \$C9C2: asm_BIFROST2_showNext2Tiles (section "") (file ${test}.asm:11)
+    G A \$0000: program (section "") (file ${test}.asm:19)
   Expressions:
     E = \$0000 \$0000 0: asm_BIFROST2_stop := 51634+here-there (section "") (file ${test}.asm:10)
 END

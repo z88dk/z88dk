@@ -513,5 +513,58 @@ for my $cpu (@CPUS, qw( ti83 ti83plus )) {
 	}
 }
 
+#-------------------------------------------------------------------------------
+# Float defines
+#-------------------------------------------------------------------------------
+spew("$test.asm", <<'END_ASM');
+	macro show_vars
+	if __FLOAT_GENMATH__	: defm "genmath "	: endif
+	if __FLOAT_MATH48__		: defm "math48 "  	: endif
+	if __FLOAT_IEEE16__		: defm "ieee16 "  	: endif
+	if __FLOAT_IEEE32__		: defm "ieee32 "  	: endif
+	if __FLOAT_IEEE64__		: defm "ieee64 "  	: endif
+	if __FLOAT_Z80__		: defm "z80 "  		: endif
+	if __FLOAT_ZX81__		: defm "zx81 "  	: endif
+	if __FLOAT_ZX__			: defm "zx "  		: endif
+	if __FLOAT_Z88__		: defm "z88 "  		: endif
+	if __FLOAT_MBFS__		: defm "mbfs "  	: endif
+	if __FLOAT_MBF40__		: defm "mbf40 "  	: endif
+	if __FLOAT_MBF64__		: defm "mbf64 "  	: endif
+	if __FLOAT_AM9511__		: defm "am9511 "  	: endif
+	endm
+
+	show_vars
+	setfloat genmath 	: show_vars
+	setfloat math48 	: show_vars
+	setfloat ieee16 	: show_vars
+	setfloat ieee32 	: show_vars
+	setfloat ieee64 	: show_vars
+	setfloat z80 		: show_vars
+	setfloat zx81 		: show_vars
+	setfloat zx 		: show_vars
+	setfloat z88 		: show_vars
+	setfloat mbfs 		: show_vars
+	setfloat mbf40 		: show_vars
+	setfloat mbf64 		: show_vars
+	setfloat am9511 	: show_vars
+END_ASM
+
+capture_ok("z88dk-z80asm -b $test.asm", "");
+check_bin_file("$test.bin", 	
+	"genmath "	.
+	"genmath "	.
+	"math48 "  	.
+	"ieee16 "  	.
+	"ieee32 "  	.
+	"ieee64 "  	.
+	"z80 "  	.
+	"zx81 "  	.
+	"zx "  		.
+	"z88 "  	.
+	"mbfs "  	.
+	"mbf40 "  	.
+	"mbf64 "  	.
+	"am9511 ");
+
 unlink_testfiles;
 done_testing;

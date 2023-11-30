@@ -131,10 +131,6 @@ sub add {
 		add($cpu, $asm =~ s/\(c\)/( c )/r, $bytes);	# ( c ) to break recursion
 		add($cpu, $asm =~ s/ldh /ld /r =~ s/\(c\)/(0xff00+c)/r, $bytes);
 	}
-	elsif ($asm =~ /^ldh .*\(%h\)/) {
-		add($cpu, $asm =~ s/\(%h\)/( %h )/r, $bytes);	# ( %h ) to break recursion
-		add($cpu, $asm =~ s/ldh /ld /r =~ s/\(%h\)/(0xff00+%h)/r, $bytes);
-	}
 	elsif ($asm =~ /%d/) {
 		my $asm1 = $asm =~ s/\+%d/+126/r;
 		my $bytes1 = $bytes =~ s/%d/7E/r =~ s/%D/7F/r;

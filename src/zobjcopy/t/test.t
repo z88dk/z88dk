@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #-----------------------------------------------------------------------------
 # zobjcopy - manipulate z80asm object files
-# Copyright (C) Paulo Custodio, 2011-2022
+# Copyright (C) Paulo Custodio, 2011-2024
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #-----------------------------------------------------------------------------
 

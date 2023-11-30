@@ -1,18 +1,21 @@
 //-----------------------------------------------------------------------------
 // z80asm restart
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: http://www.perlfoundation.org/artistic_license_2_0
 // Repository: https://github.com/z88dk/z88dk
 //-----------------------------------------------------------------------------
 
+#include "errors.h"
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
 #include "modlink.h"
+#include "options.h"
 #include "utlist.h"
-#include "zobjfile.h"
-#include "z80asm.h"
+#include "xmalloc.h"
 #include "z80asm_defs.h"
+#include "z80asm1.h"
+#include "zobjfile.h"
 
 /*-----------------------------------------------------------------------------
 *	define a library file name from the command line
@@ -23,7 +26,7 @@ static const char *search_libfile(const char *filename )
 		return get_lib_filename( filename );		/* add '.lib' extension */
 	else
 	{
-		error_not_lib_file(filename);
+		error_invalid_library_file(filename);
         return NULL;
 	}
 }
@@ -32,7 +35,7 @@ static const char *search_libfile(const char *filename )
 *	make library from source files; convert each source to object file name
 *   add only object files for the same CPU-IXIY combination
 *----------------------------------------------------------------------------*/
-static bool add_object_modules(FILE* lib_fp, string_table_t* st) {
+static bool add_object_modules(FILE* lib_fp, strtable_t* st) {
     char* obj_file_data = NULL;
 
     for (size_t i = 0; i < option_files_size(); i++) {
@@ -104,7 +107,7 @@ void make_library(const char *lib_filename) {
 	if ( lib_filename == NULL )
 		return;					            // ERROR
 
-    string_table_t* st = st_new();          // list of all defined symbols
+    strtable_t* st = strtable_new();          // list of all defined symbols
 
     // #2254 - write temp file
     UT_string* temp_filename;
@@ -136,10 +139,10 @@ void make_library(const char *lib_filename) {
 
         // assemble or include object for each cpu-ixiy combination and append to library
         for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
-            set_cpu_option(*cpu);
+            option_set_cpu(*cpu);
 
             for (swap_ixiy_t ixiy = first_ixiy; ixiy <= last_ixiy; ixiy++) {
-                set_swap_ixiy_option(ixiy);
+                option_set_swap_ixiy(ixiy);
 
                 for (size_t i = 0; i < option_files_size(); i++) {
                     const char* filename = option_file(i);
@@ -147,7 +150,7 @@ void make_library(const char *lib_filename) {
                     if (got_asm)
                         assemble_file(option_file(i));
 
-                    if (get_num_errors()) {
+                    if (get_error_count()) {
                         xfclose(fp);			/* error */
                         remove(utstring_body(temp_filename));
                         goto cleanup_and_return;
@@ -179,7 +182,8 @@ void make_library(const char *lib_filename) {
     xfwrite_dword(0, fp);         // size = 0  - deleted
 
     // write string table
-    long st_pos = write_string_table(st, fp);
+    long st_pos = ftell(fp);
+    strtable_fwrite(st, fp);
     long fpos = ftell(fp);
     fseek(fp, st_ptr, SEEK_SET);
     xfwrite_dword(st_pos, fp);
@@ -191,11 +195,13 @@ void make_library(const char *lib_filename) {
     // #2254 - rename temp file
     remove(lib_filename);
     int rv = rename(utstring_body(temp_filename), lib_filename);
-    if (rv != 0)
-        error_file_rename(utstring_body(temp_filename));
+    if (rv != 0) {
+        error(ErrFileRename, utstring_body(temp_filename));
+        perror(utstring_body(temp_filename));
+    }
 
 cleanup_and_return:
-    st_free(st);
+    strtable_free(st);
     utstring_free(temp_filename);
 }
 
@@ -207,8 +213,8 @@ bool check_library_file(const char *src_filename)
         libfile_header(),
         error_file_not_found,
         error_file_open,
-		error_not_lib_file,
-		error_lib_file_version,
-        error_cpu_incompatible,
-        error_ixiy_incompatible);
+		error_invalid_library_file,
+		error_invalid_library_file_version,
+        error_incompatible_cpu,
+        error_incompatible_ixiy);
 }

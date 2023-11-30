@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // preprocessor
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@
 #include "defines.h"
 #include "errors.h"
 #include "if.h"
-#include "scan.h"
+#include "scan2.h"
 #include <deque>
 #include <fstream>
 #include <iostream>
@@ -61,7 +61,7 @@ class Preproc {
 public:
 	Preproc();
 
-	bool open(const string& filename, bool search_include_path);
+	bool open(const string& filename);
 	void close();
 	bool getline(ScannedLine& line);
 	bool get_unpreproc_line(ScannedLine& line);
@@ -69,7 +69,7 @@ public:
 	bool is_c_source() const;
     void set_location(Location location);
 	void set_filename(const string& filename);
-	void set_line_num(int line_num, int line_inc = 1);
+    void set_line_num(int line_num);
 	void set_c_source(bool f);
 
 private:

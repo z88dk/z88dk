@@ -1,0 +1,97 @@
+//-----------------------------------------------------------------------------
+// z80asm
+// Copyright (C) Paulo Custodio, 2011-2024
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+#ifndef X
+#define X(code, message)
+#endif
+
+// X(code, message)
+X(ErrOk, "ok")
+
+// files
+X(ErrFileNotFound, "file not found")
+X(ErrFileOpen, "file open")
+X(ErrIncludeRecursion, "include recursion")
+X(ErrNotLibFile, "not a library file")
+X(ErrNotObjFile, "not an object file")
+X(ErrObjFileVersion, "invalid object file version")
+X(ErrLibFileVersion, "invalid library file version")
+X(ErrFileRename, "file rename")
+
+// options
+X(ErrNoSrcFile, "source file expected")
+X(ErrIllegalOption, "illegal option")
+X(ErrGlobNoFiles, "pattern returned no files")
+X(ErrInvalidOrgOption, "invalid origin (-r) option")
+X(ErrInvalidDefineOption, "invalid define (-Dvar=value) option")
+X(ErrInvalidFillerOption, "invalid filler (-f) option")
+X(ErrCmdFailed, "command failed")
+X(ErrIllegalCpuOption, "illegal -m option")
+X(ErrCpusList, "list of available CPUs")
+X(ErrDateAndMstarIncompatible, "cannot build libraries with -m* and -d")
+X(ErrIllegalFloatOption, "illegal -float option")
+X(ErrFloatFormatsList, "list of available float formats")
+
+// lexer
+X(ErrInvalidChar, "invalid character")
+X(ErrMissingQuote, "missing quote")
+X(ErrInvalidCharConst, "invalid character constant")
+
+// symbols
+X(ErrDuplicateDefinition, "duplicate definition")
+X(ErrUndefinedSymbol, "undefined symbol")
+X(ErrSymbolRedeclaration, "symbol redeclaration")
+
+// expressions
+X(ErrConstExprExpected, "constant expression expected")
+X(ErrDivisionByZero, "division by zero")
+X(ErrExprRecursion, "recursive expression")
+
+// preprocessor
+X(ErrMacroArgsNumber, "number of macro arguments")
+X(ErrExprEval, "expression evaluation")
+X(ErrIllegalFloatFormat, "illegal float format")
+
+// assembler
+X(ErrExprInParens, "interpreting indirect value as immediate")
+X(ErrIllegalIdent, "illegal identifier")
+X(ErrIntRange, "integer range")
+X(ErrMissingBlock, "missing {} block")
+X(ErrMissingCloseBlock, "{} block not closed")
+X(ErrStrTooLong, "string longer than reserved space")
+X(ErrSyntax, "syntax error")
+X(ErrSyntaxExpr, "syntax error in expression")
+X(ErrUnbalancedStruct, "unbalanced control structure")
+X(ErrUnbalancedStructStartedAt, "unbalanced control structure started at")
+X(ErrAssertFailed, "assertion failed")
+
+// DMA
+X(ErrDMABaseRegisterIllegal, "DMA base register byte illegal")
+X(ErrDMAMissingArgs, "DMA missing register group member(s)")
+X(ErrDMAExtraArgs, "DMA too many arguments")
+X(ErrDMAIllegalPortATiming, "DMA illegal port A timing")
+X(ErrDMAIllegalPortBTiming, "DMA illegal port B timing")
+X(ErrDMAUnsupportedInterrupts, "DMA does not support interrupts")
+X(ErrDMAUnsupportedFeatures, "DMA does not support some features")
+X(ErrDMAUnsupportedCommand, "DMA does not implement this command")
+X(ErrDMAIllegalMode, "DMA illegal mode")
+X(ErrDMAIllegalCommand, "DMA illegal command")
+X(ErrDMAIllegalReadMask, "DMA illegal read mask")
+X(ErrDMAHalfCycleTiming, "DMA does not support half cycle timing")
+X(ErrDMAUnsupportedReadySignal, "DMA does not support ready signals")
+
+// linker
+X(ErrAlignRedefined, "ALIGN redefined")
+X(ErrOrgIgnored, "ORG ignored")
+X(ErrOrgRedefined, "ORG redefined")
+X(ErrSegmentOverflow, "segment overflow")
+X(ErrOrgNotAligned, "ORG not aligned")
+X(ErrInvalidOrg, "invalid ORG")
+X(ErrCPUIncompatible, "CPU incompatible")
+X(ErrCPUInvalid, "CPU invalid")
+X(ErrIXIYIncompatible, "-IXIY incompatible")
+
+#undef X

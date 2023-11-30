@@ -7,7 +7,7 @@
 use Modern::Perl;
 use YAML::Tiny;
 
-@ARGV==2 or die "Usage $0 input_file.yaml output_file.h\n";
+@ARGV==2 or die "Usage: $0 input_file.yaml output_file.h\n";
 my($input_file, $output_file) = @ARGV;
 
 my $aux_func_name = $output_file =~ s/\..*/_action_/r;
@@ -46,9 +46,11 @@ say $aux_h <<END;
 #pragma once
 #include "codearea.h"
 #include "directives.h"
+#include "errors.h"
 #include "expr1.h"
 #include "if.h"
 #include "opcodes.h"
+#include "options.h"
 #include "parse1.h"
 #include "str.h"
 
@@ -406,19 +408,19 @@ sub parse_code_opcode {
 	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
 		push @code, 
 			"DO_STMT_LABEL();",
-			"if (ctx->expr_error) { error_expected_const_expr(); }".
+			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); }".
 			"else { add_rst_opcode(ctx->expr_value); }";
 	}
 	elsif ($asm =~ /^mmu %c, %n/) {
 		push @code, 
-			"if (ctx->expr_error) { error_expected_const_expr(); } else {",
-			"if (ctx->expr_value < 0 || ctx->expr_value > 7) error_int_range(ctx->expr_value);",
+			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {",
+			"if (ctx->expr_value < 0 || ctx->expr_value > 7) error_hex2(ErrIntRange, ctx->expr_value);",
 			"DO_stmt_n(0xED9150 + ctx->expr_value);}";
 	}
 	elsif ($asm =~ /^mmu %c, a/) {
 		push @code, 
-			"if (ctx->expr_error) { error_expected_const_expr(); } else {",
-			"if (ctx->expr_value < 0 || ctx->expr_value > 7) error_int_range(ctx->expr_value);",
+			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {",
+			"if (ctx->expr_value < 0 || ctx->expr_value > 7) error_hex2(ErrIntRange, ctx->expr_value);",
 			"DO_stmt(0xED9250 + ctx->expr_value);}";
 		my $code = join("\n", @code);
 		return $code;
@@ -469,10 +471,10 @@ sub parse_code_opcode {
 		my @values = eval($1); die "$cpu, $asm, @bin, $1" if $@;
 		$bin =~ s/%c/ctx->expr_value/g;		# replace all other %c in bin
 		push @code,
-			"if (ctx->expr_error) { error_expected_const_expr(); } else {",
+			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {",
 			"switch (ctx->expr_value) {",
 			join(" ", map {"case $_:"} @values)." break;",
-			"default: error_int_range(ctx->expr_value);",
+			"default: error_hex2(ErrIntRange, ctx->expr_value);",
 			"}}";
 			
 		if ($bin =~ s/ %d// || $bin =~ s/%d //) {
@@ -558,7 +560,7 @@ sub merge_cpu {
 			$ret .= "\n$code\nbreak;\n"
 		}
 		$ret .= "default: ".
-				"error_illegal_ident(); ".
+				"error(ErrIllegalIdent, NULL); ".
 				"}\n";
 	}
 	
@@ -581,7 +583,7 @@ sub merge_parens {
 				parse_code($cpu, @{$t->{expr_in_parens}});			
 	}
 	elsif ($t->{expr_no_parens} && !$t->{expr_in_parens}) {
-		return "if (ctx->expr_in_parens) warn_expr_in_parens();\n".
+		return "if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);\n".
 				parse_code($cpu, @{$t->{expr_no_parens}});
 	}
 	elsif ($t->{expr_no_parens} && $t->{expr_in_parens}) {

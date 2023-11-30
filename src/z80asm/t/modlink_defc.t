@@ -36,10 +36,10 @@ Object  file ${test}.o at \$0000: Z80RMF18
   Section "": 8 bytes, ORG \$0100
     C \$0000: 00 00 00 00 00 00 00 00
   Symbols:
-    L A \$0000: start (section "") (file ${test}.asm:2)
     L A \$0008: end1 (section "") (file ${test}.asm:4)
     L A \$0008: end2 (section "") (file ${test}.asm:5)
     L A \$0008: end3 (section "") (file ${test}.asm:6)
+    L A \$0000: start (section "") (file ${test}.asm:2)
   Expressions:
     E W \$0000 \$0000 2: start (section "") (file ${test}.asm:3)
     E W \$0000 \$0002 4: end1 (section "") (file ${test}.asm:3)
@@ -120,9 +120,9 @@ Object  file ${test}.o at \$0000: Z80RMF18
     C \$0000: CD 00 00 CD 00 00 C3 00 00
   Section lib: 0 bytes
   Externs:
+    U         computed_end
     U         func1_alias
     U         func2_alias
-    U         computed_end
   Expressions:
     E W \$0000 \$0001 3: func1_alias (section code) (file ${test}.asm:7)
     E W \$0003 \$0004 3: func2_alias (section code) (file ${test}.asm:8)
@@ -147,9 +147,9 @@ Object  file ${test}2.o at \$0000: Z80RMF18
   Symbols:
     L = \$0000: chain1 (section lib) (file ${test}2.asm:11)
     L A \$0000: chain2 (section lib) (file ${test}2.asm:12)
+    G = \$0000: computed_end (section lib) (file ${test}2.asm:10)
     G = \$0000: func1_alias (section lib) (file ${test}2.asm:7)
     G = \$0000: func2_alias (section lib) (file ${test}2.asm:8)
-    G = \$0000: computed_end (section lib) (file ${test}2.asm:10)
   Externs:
     U         func1
     U         func2
@@ -231,8 +231,8 @@ Object  file ${test}2.o at \$0000: Z80RMF18
   Symbols:
     L A \$0000: start (section "") (file ${test}2.asm:4)
   Externs:
-    U         asm_b_vector_at
     U         asm_b_array_at
+    U         asm_b_vector_at
   Expressions:
     E W \$0000 \$0001 3: asm_b_vector_at (section "") (file ${test}2.asm:5)
     E W \$0003 \$0004 3: asm_b_array_at (section "") (file ${test}2.asm:6)

@@ -11,7 +11,7 @@ use Modern::Perl;
 z80asm_nok("", "", <<ASM, <<ERR);
 	defc aaa = aaa
 ASM
-${test}.asm:1: error: recursive expression
+${test}.asm:1: error: recursive expression: aaa
   ^---- defc aaa = aaa
 ERR
 

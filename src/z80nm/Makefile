@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------
 # z80nm - dump z80asm object files
-# Copyright (C) Paulo Custodio, 2011-2023
+# Copyright (C) Paulo Custodio, 2011-2024
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #-----------------------------------------------------------------------------
 PROJ		:= z88dk-z80nm
@@ -26,7 +26,9 @@ CSRCS		:= \
 			../common/fileutil.c \
 			../common/objfile.c \
 			../common/strutil.c \
+			../common/strtable.c \
 			../common/xassert.c \
+			../common/xmalloc.c \
 			../common/z80asm_defs.c \
 			../common/zutils.c \
 			$(wildcard ../../ext/regex/reg*.c)

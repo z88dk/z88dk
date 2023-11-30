@@ -47,13 +47,13 @@ spew("${test}1.asm", $asm1);
 run_ok("z88dk-z80asm -b -g ${test}.asm ${test}1.asm");
 ok -f "${test}.def", "no definitions file";
 check_text_file("${test}.def", <<END);
+DEFC alias_last                      = \$0004
+DEFC alias_main                      = \$0000
+DEFC func                            = \$0006
+DEFC last                            = \$0004
 DEFC main                            = \$0000
 DEFC x31_x31_x31_x31_x31_x31_x31_x31 = \$0004
 DEFC x_32_x32_x32_x32_x32_x32_x32_x32 = \$0005
-DEFC last                            = \$0004
-DEFC alias_main                      = \$0000
-DEFC alias_last                      = \$0004
-DEFC func                            = \$0006
 END
 
 unlink_testfiles;

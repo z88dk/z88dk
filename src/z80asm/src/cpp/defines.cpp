@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // macro symbols
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ Macro::Macro(const string& name, const ScannedLine& body)
 
 void Macro::push_arg(const string& arg) {
 	if (find(m_args.begin(), m_args.end(), arg) != m_args.end())
-		g_errors.error(ErrCode::DuplicateDefinition, arg);
+		g_errors.error(ErrDuplicateDefinition, arg);
 	else
 		m_args.push_back(arg);
 }
@@ -30,7 +30,7 @@ Macros::Macros(Macros* parent)
 void Macros::add(shared_ptr<Macro> macro) {
 	const string& name = macro->name();
 	if (m_table.find(name) != m_table.end())
-		g_errors.error(ErrCode::DuplicateDefinition, name);
+		g_errors.error(ErrDuplicateDefinition, name);
 	else
 		m_table[name] = macro;
 }

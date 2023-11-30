@@ -30,24 +30,24 @@ z80asm_ok("-b -s -g -m -Ddummy", "", "", <<'END', bytes(0xC9));
 END
 
 check_text_file("${test}.sym", <<END);
-program                         = \$0000 ; addr, public, , , , ${test}.asm:18
 asm_BIFROST2_start              = \$C9A9 ; const, public, , , , ${test}.asm:8
 asm_BIFROST2_stop               = \$C9B2 ; const, public, , , , ${test}.asm:9
+program                         = \$0000 ; addr, public, , , , ${test}.asm:18
 END
 
 check_text_file("${test}.map", <<END);
-program                         = \$FDE8 ; addr, public, , ${test}, , ${test}.asm:18
+__head                          = \$FDE8 ; const, public, def, , ,
+__size                          = \$0001 ; const, public, def, , ,
+__tail                          = \$FDE9 ; const, public, def, , ,
 asm_BIFROST2_start              = \$C9A9 ; const, public, , ${test}, , ${test}.asm:8
 asm_BIFROST2_stop               = \$C9B2 ; const, public, , ${test}, , ${test}.asm:9
-__head                          = \$FDE8 ; const, public, def, , ,
-__tail                          = \$FDE9 ; const, public, def, , ,
-__size                          = \$0001 ; const, public, def, , ,
+program                         = \$FDE8 ; addr, public, , ${test}, , ${test}.asm:18
 END
 
 check_text_file("${test}.def", <<'END');
-DEFC program                         = $FDE8
 DEFC asm_BIFROST2_start              = $C9A9
 DEFC asm_BIFROST2_stop               = $C9B2
+DEFC program                         = $FDE8
 END
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
@@ -57,9 +57,9 @@ Object  file ${test}.o at \$0000: Z80RMF18
   Section "": 1 bytes, ORG \$FDE8
     C \$0000: C9
   Symbols:
-    G A \$0000: program (section "") (file ${test}.asm:18)
     G C \$C9A9: asm_BIFROST2_start (section "") (file ${test}.asm:8)
     G C \$C9B2: asm_BIFROST2_stop (section "") (file ${test}.asm:9)
+    G A \$0000: program (section "") (file ${test}.asm:18)
 END
 
 

@@ -2,7 +2,7 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -14,18 +14,20 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 */
 
 #include "die.h"
+#include "errors.h"
 #include "expr1.h"
 #include "fileutil.h"
 #include "if.h"
+#include "options.h"
 #include "reloc_code.h"
 #include "scan1.h"
 #include "str.h"
+#include "strutil.h"
 #include "symtab1.h"
 #include "types.h"
 #include "xassert.h"
-#include "z80asm.h"
+#include "z80asm1.h"
 #include "zobjfile.h"
-#include "zutils.h"
 
 #define COLUMN_WIDTH	32
 
@@ -93,6 +95,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
     {
 		sym = Symbol_create(name, value, type, scope, module, section);
 		sym->is_defined = true;
+        sym->is_touched = false;
         Symbol1Hash_set( psymtab, name, sym );
     }
     else if ( ! sym->is_defined )	/* already declared but not defined */
@@ -101,6 +104,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
 		sym->type = MAX( sym->type, type );
         sym->scope = scope;
 		sym->is_defined = true;
+        sym->is_touched = false;
         sym->module = module;
 		sym->section = section;
 		sym->filename = get_error_filename();
@@ -111,6 +115,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
         sym->module == module && sym->section == section)
     {
         /* constant redefined with the same value and in the same module/section */
+        sym->is_touched = false;
     }
     else											/* already defined */
     {
@@ -123,7 +128,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
 		if (sym->module && sym->module != module && sym->module->modname)
 			error_duplicate_definition_module(sym->module->modname, name);
 		else
-			error_duplicate_definition(name);
+            error(ErrDuplicateDefinition, name);
     }
 
     return sym;
@@ -248,6 +253,10 @@ static void copy_full_sym_names( Symbol1Hash **ptarget, Symbol1Hash *source,
 *   get the symbols for which the passed function returns true,
 *   mapped NAME@MODULE -> Symbol1, needs to be deleted by OBJ_DELETE()
 *----------------------------------------------------------------------------*/
+static int Symbol1Hash_compare(Symbol1HashElem* a, Symbol1HashElem* b) {
+    return strcmp(a->key, b->key);
+}
+
 static Symbol1Hash *_select_module_symbols(Module1 *module, bool(*cond)(Symbol1 *sym))
 {
 	Module1ListElem *iter;
@@ -262,7 +271,8 @@ static Symbol1Hash *_select_module_symbols(Module1 *module, bool(*cond)(Symbol1 
 	}
 	copy_full_sym_names(&all_syms, global_symtab, cond);
 
-	return all_syms;
+    Symbol1Hash_sort(all_syms, Symbol1Hash_compare);
+    return all_syms;
 }
 
 Symbol1Hash *select_symbols( bool (*cond)(Symbol1 *sym) )
@@ -328,7 +338,7 @@ static Symbol1* define_local_symbol(const char* name, long value, sym_type_t typ
 		Symbol1Hash_set(&CURRENTMODULE->local_symtab, name, sym);
 	}
 	else if (sym->is_defined)			/* local symbol already defined */
-		error_duplicate_definition(name);
+        error(ErrDuplicateDefinition, name);
 	else								/* symbol declared local, but not yet defined */
 	{
 		sym->value = value;
@@ -364,7 +374,7 @@ Symbol1* define_symbol(const char* name, long value, sym_type_t type)
 	else if (sym->is_defined)				/* global symbol already defined */
 	{
 		if (strncmp(name, "__CDBINFO__", 11) != 0)
-			error_duplicate_definition(name);
+            error(ErrDuplicateDefinition, name);
 	}
 	else
 	{
@@ -394,7 +404,7 @@ void update_symbol(const char *name, long value, sym_type_t type )
 		sym = find_symbol( name, global_symtab );
 
     if ( sym == NULL )
-		error_undefined_symbol(name);
+        error(ErrUndefinedSymbol, name);
 	else
 	{
 		sym->value = value;
@@ -429,7 +439,7 @@ void declare_global_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_GLOBAL)
 		{
-			error_symbol_redecl(name);
+            error(ErrSymbolRedeclaration, name);
 		}
 		else
 		{
@@ -493,7 +503,7 @@ void declare_public_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_PUBLIC)
 		{
-			error_symbol_redecl(name);
+            error(ErrSymbolRedeclaration, name);
 		}
 		else
 		{
@@ -552,7 +562,7 @@ void declare_extern_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_EXTERN)
 		{
-			error_symbol_redecl(name);
+            error(ErrSymbolRedeclaration, name);
 		}
 		else
 		{
@@ -581,13 +591,13 @@ void declare_extern_symbol(const char *name)
             else
             {
                 /* already declared local */
-                error_symbol_redecl( name );
+                error(ErrSymbolRedeclaration, name);
             }
         }
         else 
         {
 			/* re-declaration not allowed */
-			error_symbol_redecl(name);
+            error(ErrSymbolRedeclaration, name);
 		}
     }
 }
@@ -705,7 +715,7 @@ void check_undefined_symbols(Symbol1Hash *symtab)
 
 		if (sym->scope == SCOPE_PUBLIC && !sym->is_defined) {
 			set_error_location(sym->filename, sym->line_num);
-			error_undefined_symbol(sym->name);
+            error(ErrUndefinedSymbol, sym->name);
 		}
 	}
 	clear_error_location();

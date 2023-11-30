@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // assertion that is not removed in a release compile
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #pragma once
@@ -11,8 +11,8 @@ extern "C" {
 
 #define xassert(f)      ((void)((!!(f)) || xassert_(#f, __FILE__, __LINE__)))
 
-extern void xassert_init(const char* progname);
-extern int xassert_(const char* expr, const char* file, unsigned line_num);
+void xassert_init(const char* progname);
+int xassert_(const char* expr, const char* file, unsigned line_num);
 
 #ifdef __cplusplus
 }

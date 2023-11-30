@@ -45,5 +45,12 @@ $test.asm:1: error: assertion failed
   ^---- assert 0
 END_ERR
 
+z80asm_nok("", "", <<'END_ASM', <<END_ERR);
+		assert 0, "this value should not be zero"
+END_ASM
+$test.asm:1: error: assertion failed: this value should not be zero
+  ^---- assert 0, "this value should not be zero"
+END_ERR
+
 unlink_testfiles;
 done_testing;

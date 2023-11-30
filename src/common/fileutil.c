@@ -1,15 +1,15 @@
 //-----------------------------------------------------------------------------
 // file utilities
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
 #include "die.h"
 #include "fileutil.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "utstring.h"
 #include "xassert.h"
-#include "zutils.h"
 #include <ctype.h>
 #include <dirent.h>
 #include <string.h>
@@ -739,3 +739,77 @@ const char *path_search(const char *filename, argv_t *dir_list)
 	// not found, return original file name
 	return path_canon(filename);
 }
+
+bool is_little_endian(void) {
+    uint32_t endian = 0x12345678;
+    if (*(byte_t*)&endian == 0x78)
+        return true;
+    else
+        return false;
+}
+
+int parse_le_int32(const byte_t* mem) {
+    int value = 0;
+    if (is_little_endian()) {
+        // little endian architecture
+        value = *(int*)mem;
+    }
+    else {
+        // big endian architecture
+        value =
+            ((mem[0] << 0) & 0x000000FFL) |
+            ((mem[1] << 8) & 0x0000FF00L) |
+            ((mem[2] << 16) & 0x00FF0000L) |
+            ((mem[3] << 24) & 0xFF000000L);
+        if (value & 0x80000000L)
+            value |= ~0xFFFFFFFFL;		// sign-extend above bit 31
+    }
+    return value;
+}
+
+void write_le_int32(byte_t* mem, int value) {
+    if (is_little_endian()) {
+        // little endian architecture
+        *(int*)mem = value;
+    }
+    else {
+        // big endian architecture
+        mem[0] = (value >> 0) & 0x000000FFL;
+        mem[1] = (value >> 8) & 0x000000FFL;
+        mem[2] = (value >> 16) & 0x000000FFL;
+        mem[3] = (value >> 24) & 0x000000FFL;
+    }
+}
+
+int check_retval(int retval, const char* file, const char* source_file, int line_num)
+{
+    if (retval) {
+        perror(file);
+        exit(EXIT_FAILURE);
+    }
+    return retval;
+}
+
+int xglob(const char* pattern, int flags,
+    int(*errfunc)(const char* epath, int eerrno), glob_t* pglob)
+{
+    int ret = glob(pattern, flags, errfunc, pglob);
+
+#ifdef DEBUG
+    printf("GLOB(%s)=", pattern);
+    for (int i = 0; i < pglob->gl_pathc; i++) {
+        char* found = pglob->gl_pathv[i];
+        printf("%s ", found);
+    }
+    printf("\n");
+#endif
+
+    if (ret != GLOB_NOMATCH && ret != 0)
+        die("glob pattern '%s': %s\n",
+            pattern,
+            (ret == GLOB_ABORTED ? "filesystem problem" :
+                ret == GLOB_NOSPACE ? "no dynamic memory" :
+                "unknown problem"));
+    return ret;
+}
+

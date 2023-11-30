@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -12,24 +12,30 @@ Handle object file contruction, reading and writing
 #include "class.h"
 #include "codearea.h"
 #include "die.h"
+#include "errors.h"
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
+#include "options.h"
 #include "str.h"
 #include "strutil.h"
-#include "utstring.h"
 #include "utlist.h"
-#include "zobjfile.h"
-#include "zutils.h"
+#include "utstring.h"
 #include "z80asm_defs.h"
+#include "zobjfile.h"
 
 /*-----------------------------------------------------------------------------
 *   Write module to object file
 *----------------------------------------------------------------------------*/
 
+static int Symbol1Hash_compare(Symbol1HashElem* a, Symbol1HashElem* b) {
+    return strcmp(a->key, b->key);
+}
+
 static void copy_objfile_externs(objfile_t* obj) {
     Symbol1* sym;
-    for (Symbol1HashElem* iter = Symbol1Hash_first(global_symtab); iter!=NULL;
+    Symbol1Hash_sort(global_symtab, Symbol1Hash_compare);
+    for (Symbol1HashElem* iter = Symbol1Hash_first(global_symtab); iter != NULL;
         iter = Symbol1Hash_next(iter)
         ) {
         sym = (Symbol1*)iter->value;
@@ -72,6 +78,7 @@ static void copy_objfile_exprs(objfile_t* obj, Section1* in_section, section_t* 
 
 static void copy_objfile_symbols_symtab(objfile_t* obj, Section1* in_section, section_t* out_section,
     Symbol1Hash* symtab) {
+    Symbol1Hash_sort(symtab, Symbol1Hash_compare);
     for (Symbol1HashElem* iter = Symbol1Hash_first(symtab); iter != NULL;
         iter = Symbol1Hash_next(iter)
         ) {
@@ -145,9 +152,9 @@ static void copy_objfile_sections(objfile_t* obj) {
 static objfile_t* copy_objfile(const char* obj_filename) {
     objfile_t* obj = objfile_new();
     utstring_printf(obj->filename, "%s", obj_filename);
-    utstring_printf(obj->signature, "%s" SIGNATURE_VERS, SIGNATURE_OBJ, CUR_VERSION);
+    utstring_printf(obj->signature, "%s" SIGNATURE_VERS, OBJ_FILE_SIGNATURE, OBJ_FILE_VERSION);
     utstring_printf(obj->modname, "%s", CURRENTMODULE->modname);
-    obj->version = CUR_VERSION;
+    obj->version = OBJ_FILE_VERSION;
     obj->cpu_id = option_cpu();
     obj->swap_ixiy = option_swap_ixiy();
     copy_objfile_externs(obj);
@@ -175,8 +182,10 @@ void write_obj_file(const char* obj_filename) {
 	// #2254 - rename temp file
 	remove(obj_filename);
 	int rv = rename(utstring_body(temp_filename), obj_filename);
-	if (rv != 0) 
-		error_file_rename(utstring_body(temp_filename));
+    if (rv != 0) {
+        error(ErrFileRename, utstring_body(temp_filename));
+        perror(utstring_body(temp_filename));
+    }
 
 	utstring_free(temp_filename);
     objfile_free(obj);
@@ -190,10 +199,10 @@ bool check_object_file(const char* obj_filename)
         objfile_header(),
         error_file_not_found,
         error_file_open,
-		error_not_obj_file,
-		error_obj_file_version,
-        error_cpu_incompatible,
-        error_ixiy_incompatible);
+		error_invalid_object_file,
+		error_invalid_object_file_version,
+        error_incompatible_cpu,
+        error_incompatible_ixiy);
 }
 
 static void no_error_file(const char* filename) {}
@@ -263,8 +272,8 @@ bool check_obj_lib_file(
         fclose(fp);
         return false;
     }
-    if (version != CUR_VERSION) {
-        do_error_version(filename, version, CUR_VERSION);
+    if (version != OBJ_FILE_VERSION) {
+        do_error_version(filename, version, OBJ_FILE_VERSION);
         fclose(fp);
         return false;
     }

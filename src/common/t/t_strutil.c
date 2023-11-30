@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // String Utilities - based on UT_string
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -85,7 +85,7 @@ void t_strutil_cstr_strip_compress_escapes(void)
 	for (int i = 0; i < 256; i++)
 	{
 		sprintf(cs, "\\%o \\x%x", i, i);
-		int len = str_compress_escapes(cs);
+		int len = (int)str_compress_escapes(cs);
 		TEST_ASSERT_EQUAL(3, len);
 		TEST_ASSERT_EQUAL((char)i, cs[0]);
 		TEST_ASSERT_EQUAL(' ', cs[1]);

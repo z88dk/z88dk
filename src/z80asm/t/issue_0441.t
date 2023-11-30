@@ -206,7 +206,8 @@ path($test_dir)->remove_tree;
 path("${test_dir}/src/s1/s2")->mkpath;
 spew("${test}.lis", "${test_dir}/**");
 capture_nok("z88dk-z80asm -b -s -l -m -g ".quote_os("\@${test}.lis"), <<END);
-${test}.lis:2: error: source file expected
+${test}.lis:1: error: pattern returned no files: ${test_dir}/**
+  ^---- ${test_dir}/**
 END
 
 path($test_dir)->remove_tree if Test::More->builder->is_passing;

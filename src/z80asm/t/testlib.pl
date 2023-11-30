@@ -2,9 +2,9 @@
 
 use Modern::Perl;
 use Test::More;
+use Test::HexDifferences;
 use Config;
 use Capture::Tiny 'capture_merged';
-use Data::HexDump;
 use Path::Tiny;
 use Text::Diff;
 
@@ -35,12 +35,7 @@ sub check_bin_file {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
 	my $got_bin = slurp($got_file);
-	my $got_hex = HexDump($got_bin);
-	
-	my $exp_hex = HexDump($exp_bin);
-	
-	my $diff = diff(\$exp_hex, \$got_hex, {STYLE => 'Context'});
-	is $diff, "", "bin file $got_file ok";
+	eq_or_dump_diff($got_bin, $exp_bin, "bin file $got_file ok");
 	
 	(Test::More->builder->is_passing) or die;
 }
@@ -53,7 +48,7 @@ sub check_text_file {
 	(my $got_text = slurp($got_file)) =~ s/\r\n/\n/g;
 	$exp_text =~ s/\r\n/\n/g;
 	
-	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Context'});
+	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Table'});
 	is $diff, "", "text file $got_file ok";
 	
 	(Test::More->builder->is_passing) or die;
@@ -518,6 +513,33 @@ sub slurp {
 	}
 	
 	(Test::More->builder->is_passing) or die;
+}
+
+#------------------------------------------------------------------------------
+# read map file, retun map of symbols to values
+sub read_map_file {
+	my($file) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+	my $open_ok = open(my $fh, "<:raw", $file);
+	ok $open_ok, "read $file";
+
+	my %map;	
+	if ($open_ok) {
+		while (<$fh>) {
+			chomp;
+			if (/^(\w+)\s*=\s*\$([0-9a-f]+)/i) {
+				$map{$1} = hex($2);
+			}
+			else {
+				ok 0, "cannot parse $_";
+			}
+		}
+	}
+
+	(Test::More->builder->is_passing) or die;
+
+	return %map;
 }
 
 #------------------------------------------------------------------------------

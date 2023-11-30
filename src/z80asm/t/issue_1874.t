@@ -12,6 +12,10 @@ if (!$got_zsdcc) {
     diag("z88dk-zsdcc not found, test skipped");
     ok 1;
 }
+elsif (!$ENV{DEVELOPER}) {
+	diag "only run with DEVELOPER=1";		# fails in snapcraft tests
+    ok 1;
+}
 else {
 	path("$test.dir")->mkpath;
 	spew("$test.dir/test.c", <<END_C);

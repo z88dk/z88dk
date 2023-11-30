@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -13,17 +13,20 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "array.h"
 #include "codearea.h"
 #include "die.h"
+#include "errors.h"
 #include "expr1.h"
 #include "if.h"
 #include "init.h"
 #include "module1.h"
 #include "strhash.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symtab1.h"
 #include "utlist.h"
 #include "utstring.h"
 #include "xassert.h"
+#include "xmalloc.h"
 
 /*-----------------------------------------------------------------------------
 *	UT_array of Expr1*
@@ -76,7 +79,7 @@ static long _calc_divide(long a, long b)
 {
 	if (b == 0)
 	{
-		error_division_by_zero();	/* BUG_0040 */
+        error(ErrDivisionByZero, NULL);	/* BUG_0040 */
 		return 0;
 	}
 
@@ -87,7 +90,7 @@ static long _calc_mod(long a, long b)
 {
 	if (b == 0)
 	{
-		error_division_by_zero();	/* BUG_0040 */
+        error(ErrDivisionByZero, NULL);	/* BUG_0040 */
 		return 0;
 	}
 
@@ -288,7 +291,7 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 			{
 				expr->result.undefined_symbol = true;
 				if (not_defined_error)
-					error_undefined_symbol(self->d.symbol->name);
+                    error(ErrUndefinedSymbol, self->d.symbol->name);
 			}
 
 			Calc_push(0);
@@ -603,7 +606,7 @@ Expr1* expr_parse(void) {
 	if (!Expr_parse_ternary_cond(self))
 	{
 		/* syntax error in expression */
-		error_syntax_expr();
+        error(ErrSyntaxExpr, NULL);
 
 		OBJ_DELETE(self);
 		self = NULL;
@@ -981,7 +984,11 @@ bool Expr_depends_on_one_symbol(Expr1* self, Section1** p_used_section) {
             else
                 *p_used_section = NULL;
             break;
-        case ASMPC_OP:
+        case ASMPC_OP:              // #2469
+            count_symbols++;
+            if (count_symbols != 1)
+                *p_used_section = NULL;
+            break;
         case NUMBER_OP:
         case UNARY_OP:
         case BINARY_OP:

@@ -2,7 +2,7 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -11,15 +11,18 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
 #include "alloc.h"
 #include "die.h"
+#include "errors.h"
 #include "if.h"
 #include "init.h"
 #include "list.h"
+#include "options.h"
 #include "scan1.h"
 #include "str.h"
+#include "strutil.h"
 #include "utarray.h"
 #include "xassert.h"
+#include "xmalloc.h"
 #include "z80asm_defs.h"
-#include "zutils.h"
 #include <ctype.h>
 
 /*-----------------------------------------------------------------------------
@@ -379,7 +382,7 @@ void CurSymExpect(tokid_t expected_tok)
 	init_module();
 
 	if (sym.tok != expected_tok)
-		error_syntax();
+        error(ErrSyntax, NULL);
 }
 
 
