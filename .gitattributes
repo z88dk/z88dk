@@ -23,6 +23,7 @@
 *.txt   text eol=lf
 *.vcxproj text eol=crlf
 *.vcxproj.filters text eol=crlf
+*.y     text eol=lf
 *.yaml  text eol=lf
 *.yml   text eol=lf
 Makefile text eol=lf
