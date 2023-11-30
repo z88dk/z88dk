@@ -145,7 +145,7 @@ void make_library(const char *lib_filename) {
                     const char* filename = option_file(i);
                     bool got_asm = strcmp(filename + strlen(filename) - strlen(EXT_O), EXT_O) != 0;
                     if (got_asm)
-                        assemble_file(option_file(i));
+                        g_asm_assemble_file(option_file(i));
 
                     if (get_num_errors()) {
                         xfclose(fp);			/* error */

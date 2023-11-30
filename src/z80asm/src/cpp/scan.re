@@ -7,11 +7,12 @@
 
 #include "args.h"
 #include "if.h"
+#include "preproc.h"
 #include "scan.h"
 #include "utils.h"
-#include <unordered_map>
 #include <cassert>
 #include <cmath>
+#include <unordered_map>
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -87,12 +88,12 @@ bool keyword_is_reg_8(Keyword keyword) {
     return keyword_flags[static_cast<int>(keyword)] & KW_REG_8;
 }
 
-bool keyword_is_reg_ix_iy(Keyword keyword) {
-    return keyword_flags[static_cast<int>(keyword)] & KW_REG_IX_IY;
-}
-
 bool keyword_is_z80_ld_bit(Keyword keyword) {
     return keyword_flags[static_cast<int>(keyword)] & KW_Z80_LD_BIT;
+}
+
+bool keyword_is_reg(Keyword keyword) {
+    return keyword_flags[static_cast<int>(keyword)] & KW_REG;
 }
 
 //-----------------------------------------------------------------------------
@@ -126,7 +127,10 @@ string Token::to_string() const {
     case TType::String:
         return string_bytes(m_svalue);
     default:
-        return tokens[static_cast<int>(m_type)];
+        if (g_args.swap_ixiy() != IXIY_NO_SWAP)
+            return str_swap_x_y(tokens[static_cast<int>(m_type)]);
+        else
+            return tokens[static_cast<int>(m_type)];
     }
 }
 
@@ -608,4 +612,15 @@ void FileScanner::scan_error(ErrCode code, const string& arg) {
     if (!m_got_error)
         g_errors.error(code, arg);
     m_got_error = true;
+}
+
+//-----------------------------------------------------------------------------
+
+TextScanner::TextScanner(const string& text, ScannedLine& out_line) {
+    out_line.clear();
+    FileScanner fs;
+    fs.scan_text(g_preproc.location(), text);
+    ScannedLine line;
+    while (fs.get_token_line(line))
+        out_line.append(line);
 }

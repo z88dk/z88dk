@@ -24,9 +24,9 @@ enum class TType {
 
 // keywords
 enum KeywordFlags {
-    KW_REG_8 = 1 << 1,
-    KW_REG_IX_IY = 1 << 2,
-    KW_Z80_LD_BIT = 1 << 3,
+    KW_REG_8 = 1 << 0,
+    KW_Z80_LD_BIT = 1 << 1,
+    KW_REG = 1 << 2,
 };
 
 enum class Keyword {
@@ -36,8 +36,8 @@ enum class Keyword {
 
 Keyword keyword_lookup(const string& text);
 bool keyword_is_reg_8(Keyword keyword);
-bool keyword_is_reg_ix_iy(Keyword keyword);
 bool keyword_is_z80_ld_bit(Keyword keyword);
+bool keyword_is_reg(Keyword keyword);
 
 // token
 class Token {
@@ -150,4 +150,10 @@ private:
     bool fill();                            // fill buffer from file
     int yyfill() { return fill() ? 0 : 1; } // interface to re2c
     void notify_new_line(const string& text);
+};
+
+// text scanner
+class TextScanner {
+public:
+    TextScanner(const string& text, ScannedLine& out_line);     // scan the given text, split into tokens
 };

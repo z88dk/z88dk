@@ -7,6 +7,7 @@
 
 #include "args.h"
 #include "errors.h"
+#include "expr.h"
 #include "float.h"
 #include "if.h"
 #include "preproc.h"
@@ -332,7 +333,7 @@ void Preproc::parse_line(const ScannedLine& line) {
 	if (check_macro()) return;
 	if (check_reptx()) return;
 	if (check_hash()) return;
-	if (check_gbz80_opcodes()) return;
+	if (check_gbz80_ldh_opcodes()) return;
 	if (check_z80_ld_bit_opcodes()) return;
 
 	// last check - macro call
@@ -563,13 +564,40 @@ bool Preproc::check_reptx() {
 		return false;
 }
 
-bool Preproc::check_gbz80_opcodes() {
+bool Preproc::check_gbz80_ldh_opcodes() {
     ScannedLine out;
 
+    // ld (0xff00+c), a
+    if (m_line.peek(0).is(Keyword::LD) &&
+        m_line.peek(1).is(TType::LParen) &&
+        m_line.peek(2).is(TType::Integer) && m_line.peek(2).ivalue() == 0xff00 &&
+        m_line.peek(3).is(TType::Plus) &&
+        m_line.peek(4).is(Keyword::C)) {
+        out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::LParen, false},
+                     Token{ TType::Ident, false, "c" } });
+        out.append(m_line.peek_tokens(5));
+        push_expanded(out, defines());
+        return true;
+    }
+    // ld a, (0xff00+c)
+    else if (m_line.peek(0).is(Keyword::LD) &&
+        m_line.peek(1).is(Keyword::A) &&
+        m_line.peek(2).is(TType::Comma) &&
+        m_line.peek(3).is(TType::LParen) &&
+        m_line.peek(4).is(TType::Integer) && m_line.peek(4).ivalue() == 0xff00 &&
+        m_line.peek(5).is(TType::Plus) &&
+        m_line.peek(6).is(Keyword::C)) {
+        out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::Ident, false, "a"},
+            Token{TType::Comma, false}, Token{TType::LParen, false},
+                     Token{ TType::Ident, false, "c" } });
+        out.append(m_line.peek_tokens(7));
+        push_expanded(out, defines());
+        return true;
+    }
     // ld ($ff00+xxx --> ldh (xxx
 	// ld ($ff00-xxx --> ldh (-xxx
 	// ld ($ff00)xxx --> ldh (0)xxx
-	if (m_line.peek(0).is(Keyword::LD) &&
+	else if (m_line.peek(0).is(Keyword::LD) &&
 		m_line.peek(1).is(TType::LParen) &&
 		m_line.peek(2).is(TType::Integer) && m_line.peek(2).ivalue() == 0xff00) {
 		switch (m_line.peek(3).type()) {
@@ -646,7 +674,7 @@ bool Preproc::check_z80_ld_bit_opcodes() {
 		m_line.peek(4).is(TType::Integer) &&
 		m_line.peek(5).is(TType::Comma) &&
 		m_line.peek(6).is(TType::LParen) &&
-		keyword_is_reg_ix_iy(m_line.peek(7).keyword())) {
+        (m_line.peek(7).is(Keyword::IX) || m_line.peek(7).is(Keyword::IY))) {
 
         string reg8 = m_line.peek(1).svalue();
         out.append(m_line.peek_tokens(3));
@@ -662,8 +690,8 @@ bool Preproc::check_z80_ld_bit_opcodes() {
 		keyword_is_reg_8(m_line.peek(1).keyword()) &&
 		m_line.peek(2).is(TType::Comma) &&
 		keyword_is_z80_ld_bit(m_line.peek(3).keyword()) &&
-		m_line.peek(4).is(TType::LParen) &&
-		keyword_is_reg_ix_iy(m_line.peek(5).keyword())) {
+        m_line.peek(4).is(TType::LParen) &&
+        (m_line.peek(5).is(Keyword::IX) || m_line.peek(5).is(Keyword::IY))) {
 
         string reg8 = m_line.peek(1).svalue();
         out.append(m_line.peek_tokens(3));
@@ -687,8 +715,19 @@ void Preproc::do_if() {
     string cond_text = expanded_cond.to_string();
 
 	// check condition
-	bool flag, error;
-	parse_expr_eval_if_condition(cond_text.c_str(), &flag, &error);
+    bool flag = true, error = false;
+
+    ScannedLine line;
+    TextScanner ts{ cond_text, line };
+    Expr cond;
+    if (!cond.parse_if_statement(line))
+        error = true;
+    else {
+        ExprResult r = cond.eval_silent();
+        if (r.value() == 0)         // ignore undefined values=0
+            flag = false;
+    }
+
 	if (!error) {
 		m_if_stack.emplace_back(Keyword::IF, m_files.back().location(), flag);
 		m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
@@ -774,8 +813,19 @@ void Preproc::do_elif() {
             string cond_text = expanded_cond.to_string();
 
 			// check condition
-			bool flag, error;
-			parse_expr_eval_if_condition(cond_text.c_str(), &flag, &error);
+            bool flag = true, error = false;
+
+            ScannedLine line;
+            TextScanner ts{ cond_text, line };
+            Expr cond;
+            if (!cond.parse_if_statement(line))
+                error = true;
+            else {
+                ExprResult r = cond.eval_silent();
+                if (r.value() == 0)         // ignore undefined values=0
+                    flag = false;
+            }
+
 			if (!error) {
 				if (m_if_stack.back().done_if)
 					flag = false;
