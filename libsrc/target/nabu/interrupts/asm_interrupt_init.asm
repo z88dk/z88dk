@@ -91,7 +91,7 @@ handle_keyboard:
     ld      hl,__nabu_j1
     cp      1
     jr      z,handle_joy
-    ld      hl,__nabu_j1
+    ld      hl,__nabu_j2
     cp      2
     jr      z,handle_joy
     in      a,($90)
