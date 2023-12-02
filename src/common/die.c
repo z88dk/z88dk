@@ -4,6 +4,7 @@
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "die.h"
+#include "xmalloc.h"
 #include <assert.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -22,13 +23,6 @@ void die(const char *msg, ...)
 	va_end(argptr);
 
     exit(EXIT_FAILURE);
-}
-
-void *check_alloc(void *p, const char *file, int line_num)
-{
-	if (!p)
-		die("memory allocation error at %s:%d\n", file, line_num);
-	return p;
 }
 
 int check_retval(int retval, const char *file, const char *source_file, int line_num)

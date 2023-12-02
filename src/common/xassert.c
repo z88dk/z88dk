@@ -11,7 +11,7 @@
 
 static const char* g_progname = "";
 
-extern void xassert_init(const char* progname) {
+void xassert_init(const char* progname) {
     g_progname = progname;
 }
 

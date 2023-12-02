@@ -7,12 +7,14 @@
 #include "args.h"
 #include "if.h"
 #include "xassert.h"
+#include "xmalloc.h"
 #include <string>
 #include <vector>
 using namespace std;
 
 int main(int argc, char *argv[]) {
     xassert_init(argv[0]);
+    xmalloc_init(argv[0]);
 
 	vector<string> args{ argv + 1, argv + argc };
 	g_args.parse_args(args);

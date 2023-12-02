@@ -15,9 +15,10 @@ extern "C" {
 #include "utarray.h"
 #include "utstring.h"
 #include "z80asm_defs.h"
-#include "uthash.h"
-#include "utarray.h"
-#include <stdbool.h>
+#include "strtable.h"
+//#include "uthash.h"
+//#include "utarray.h"
+//#include <stdbool.h>
 #include <stdio.h>
 
 #define MIN_VERSION				1
@@ -49,29 +50,6 @@ typedef enum file_type
 	is_library,
 	is_object
 } file_type_e;
-
-//-----------------------------------------------------------------------------
-// string table
-//-----------------------------------------------------------------------------
-typedef struct string_item_s {
-    char* str;              // actual string in alloc space
-    int id;                 // index into string table in file
-    UT_hash_handle hh;
-} string_item_t;
-
-typedef struct string_table_s {
-    UT_array* strs_list;        // each item is a weak pointer to a string_item_t
-    string_item_t* strs_hash;   // holds the strings
-} string_table_t;
-
-string_table_t* st_new(void);
-void st_free(string_table_t* st);
-void st_clear(string_table_t* st);
-int st_add_string(string_table_t* st, const char* str); // return ID of existing string, or adds new
-bool st_find(string_table_t* st, const char* str);      // check if string exists
-const char* st_lookup(string_table_t* st, int id);      // return string of given ID
-int st_count(string_table_t* st);                       // number of strings in table
-long write_string_table(string_table_t* st, FILE* fp);  // write string table, return address of start
 
 //-----------------------------------------------------------------------------
 // a defined symbol
@@ -157,7 +135,7 @@ typedef struct objfile_s
     swap_ixiy_t swap_ixiy;
 	argv_t*     externs;
 	section_t*  sections;
-    string_table_t* st;
+    strtable_t* st;
 
 	struct objfile_s* next, * prev;
 } objfile_t;
@@ -166,7 +144,7 @@ extern objfile_t* objfile_new();
 extern void objfile_free(objfile_t* obj);
 extern void objfile_read(objfile_t* obj, FILE* fp);
 extern void objfile_write(objfile_t* obj, FILE* fp);
-void objfile_get_defined_symbols(objfile_t* obj, string_table_t* st);
+void objfile_get_defined_symbols(objfile_t* obj, strtable_t* st);
 
 //-----------------------------------------------------------------------------
 // one file - either object or library
@@ -178,7 +156,7 @@ typedef struct file_s
 	file_type_e  type;
 	int			 version;
 	objfile_t* objs;					// either one or multiple object files
-    string_table_t* st;                 // symbols defined in this library
+    strtable_t* st;                 // symbols defined in this library
 } file_t;
 
 extern file_t* file_new();

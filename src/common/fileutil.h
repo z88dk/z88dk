@@ -8,8 +8,13 @@
 #include "strutil.h"
 #include "types.h"
 #include "utstring.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // pathname manipulation - strings are allocated in spool, no need to free
 
@@ -95,3 +100,11 @@ extern long file_size(const char *filename);		// -1 if not regular file
 
 // search for a file on the given directory list, return full path name in strin pool
 extern const char *path_search(const char *filename, argv_t *dir_list);
+
+// convert between file-representation (little-endian) to internal representation
+bool is_little_endian(void);
+int32_t int32_swap_bytes(int32_t data);
+
+#ifdef __cplusplus
+}
+#endif

@@ -6,7 +6,6 @@
 #pragma once
 
 #include "fileutil.h"
-#include "xassert.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,18 +23,6 @@
 
 // error message and exit program
 extern void die(const char *msg, ...);
-
-// check alloc result, die if error
-extern void *check_alloc(void *p, const char *file, int line_num);
-#define Check_alloc(type, p)	((type)(check_alloc((p), __FILE__, __LINE__)))
-
-#define xmalloc(size)		Check_alloc(void*, malloc(size))
-#define xcalloc(count,size)	Check_alloc(void*, calloc((count), (size)))
-#define xrealloc(p,size)	Check_alloc(void*, realloc((p), (size)))
-#define xfree(p)			(free(p), (p) = NULL)
-#define xstrdup(s)			Check_alloc(char*, strdup(s))
-
-#define xnew(type)			Check_alloc(type*, calloc(1, sizeof(type)))
 
 // check OS retval
 extern int check_retval(int retval, const char *file, const char *source_file, int line_num);
