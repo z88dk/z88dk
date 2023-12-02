@@ -3,17 +3,12 @@
 // Copyright (C) Paulo Custodio, 2011-2023
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
-#pragma once
+#include "unity.h"
+#include "xassert.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define xassert(f)      ((void)((!!(f)) || xassert_(#f, __FILE__, __LINE__)))
-
-void xassert_init(const char* progname);
-int xassert_(const char* expr, const char* file, unsigned line_num);
-
-#ifdef __cplusplus
+void run_die_xassert(void)
+{
+    xassert(1);
+    xassert(0);
 }
-#endif
+

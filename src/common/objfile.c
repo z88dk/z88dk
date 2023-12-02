@@ -10,8 +10,9 @@
 #include "utlist.h"
 #include "utstring.h"
 #include "xassert.h"
-#include "zutils.h"
+#include "xmalloc.h"
 #include "z80asm_defs.h"
+#include "zutils.h"
 #include <ctype.h>
 
 #include <sys/types.h>	// needed before regex.h
@@ -32,7 +33,6 @@ static void objfile_read_strid(objfile_t* obj, FILE* fp, UT_string* str);
 //-----------------------------------------------------------------------------
 // string table
 //-----------------------------------------------------------------------------
-static UT_icd UT_string_item_icd = { sizeof(string_item_t*), NULL, NULL, NULL };
 
 const char* objfile_header() {
     static UT_string* header = NULL;
@@ -52,75 +52,6 @@ const char* libfile_header() {
     return utstring_body(header);
 }
 
-string_table_t* st_new(void) {
-    string_table_t* st = xnew(string_table_t);
-    utarray_new(st->strs_list, &UT_string_item_icd);
-    st_add_string(st, "");          // empty string is id 0
-    return st;
-}
-
-static void st_clear_all(string_table_t* st) {
-    string_item_t* elem, * tmp;
-    HASH_ITER(hh, st->strs_hash, elem, tmp) {
-        HASH_DEL(st->strs_hash, elem);
-        xfree(elem->str);
-        xfree(elem);
-    }
-    utarray_clear(st->strs_list);
-}
-
-void st_free(string_table_t* st) {
-    st_clear_all(st);
-    utarray_free(st->strs_list);
-    xfree(st);
-}
-
-void st_clear(string_table_t* st) {
-    st_clear_all(st);
-    st_add_string(st, "");
-}
-
-int st_add_string(string_table_t* st, const char* str) {
-    string_item_t* found;
-    HASH_FIND_STR(st->strs_hash, str, found);
-    if (found)
-        return found->id;
-    else {
-        // create new item
-        string_item_t* elem = xnew(string_item_t);
-        elem->str = xstrdup(str);
-        elem->id = (int)HASH_COUNT(st->strs_hash);
-
-        // add to hash table
-        HASH_ADD_STR(st->strs_hash, str, elem);
-
-        // add to string list
-        utarray_push_back(st->strs_list, &elem);
-
-        return elem->id;
-    }
-}
-
-bool st_find(string_table_t* st, const char* str) {
-    string_item_t* found;
-    HASH_FIND_STR(st->strs_hash, str, found);
-    if (found)
-        return true;
-    else
-        return false;
-}
-
-const char* st_lookup(string_table_t* st, int id) {
-    xassert(id >= 0 && id < (int)HASH_COUNT(st->strs_hash));
-    string_item_t* elem = *(string_item_t**)utarray_eltptr(st->strs_list, (size_t)id);
-    xassert(elem);
-    xassert(elem->str);
-    return elem->str;
-}
-
-int st_count(string_table_t* st) {
-    return (int)HASH_COUNT(st->strs_hash);
-}
 
 //-----------------------------------------------------------------------------
 // read from file
@@ -389,7 +320,7 @@ objfile_t* objfile_new()
 	self->sections = NULL;
 	DL_APPEND(self->sections, section);
 
-    self->st = st_new();
+    self->st = strtable_new();
 
 	self->next = self->prev = NULL;
 
@@ -409,8 +340,7 @@ void objfile_free(objfile_t* self)
 		section_free(section);
 	}
 
-    st_free(self->st);
-
+    strtable_free(self->st);
 	xfree(self);
 }
 
@@ -420,7 +350,7 @@ void objfile_free(objfile_t* self)
 static void objfile_read_strid(objfile_t* obj, FILE* fp, UT_string* str) {
     unsigned strid = xfread_dword(fp);
     utstring_clear(str);
-    utstring_printf(str, "%s", st_lookup(obj->st, strid));
+    utstring_printf(str, "%s", strtable_lookup(obj->st, strid));
 }
 
 static void objfile_read_sections(objfile_t* obj, FILE* fp, long fpos_start) {
@@ -804,36 +734,6 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
 	}
 }
 
-static void objfile_read_string_table(objfile_t* obj, FILE* fp, long fpos_start) {
-    st_clear(obj->st);
-
-    // go to start of index table and read sizes
-    xfseek(fp, fpos_start, SEEK_SET);
-    unsigned count = xfread_dword(fp);
-    unsigned aligned_strings_size = xfread_dword(fp);
-
-    // go to start of strings and read them
-    xfseek(fp, fpos_start + (2 + count) * sizeof(int32_t), SEEK_SET);
-    UT_string* strings;
-    utstring_new(strings);
-    utstring_reserve(strings, aligned_strings_size + 1);        // add space for '\0'
-    xfread(utstring_body(strings), 1, aligned_strings_size, fp);
-    utstring_len(strings) = aligned_strings_size;
-
-    // go to start of table and add each string to the st
-    xfseek(fp, fpos_start + 2 * sizeof(int32_t), SEEK_SET);
-    for (unsigned i = 0; i < count; i++) {
-        unsigned pos = xfread_dword(fp);
-        const char* str = utstring_body(strings) + pos;
-        unsigned id = st_add_string(obj->st, str);
-        xassert(id == i);
-    }
-
-    xfseek(fp, fpos_start + (2 + count) * sizeof(int32_t) + aligned_strings_size, SEEK_SET);
-
-    utstring_free(strings);
-}
-
 void objfile_read(objfile_t* obj, FILE* fp)
 {
 	long fpos0 = ftell(fp) - SIGNATURE_SIZE;	// before signature
@@ -864,7 +764,8 @@ void objfile_read(objfile_t* obj, FILE* fp)
     if (obj->version >= 18) {
         fpos_st = xfread_dword(fp);
         long save_fpos = ftell(fp);
-        objfile_read_string_table(obj, fp, fpos0 + fpos_st);
+        xfseek(fp, fpos0 + fpos_st, SEEK_SET);
+        obj->st = strtable_fread(fp);
         xfseek(fp, save_fpos, SEEK_SET);
     }
 
@@ -928,7 +829,7 @@ void objfile_read(objfile_t* obj, FILE* fp)
 // object file write
 //-----------------------------------------------------------------------------
 static void objfile_write_strid(objfile_t* obj, FILE* fp, const char* str) {
-    unsigned id = st_add_string(obj->st, str);
+    unsigned id = strtable_add_string(obj->st, str);
     xfwrite_dword(id, fp);
 }
 
@@ -1052,47 +953,6 @@ static long objfile_write_sections(objfile_t* obj, FILE* fp) {
 	return fpos0;
 }
 
-long write_string_table(string_table_t* st, FILE* fp) {
-    // alignment data
-    static const char align[sizeof(int32_t)] = { 0 };
-
-    long fpos0 = ftell(fp);
-
-    // write size of table and placeholder for size of strings
-    unsigned count = st_count(st);
-    xfwrite_dword(count, fp);
-    long fpos_strings_size = ftell(fp);
-    xfwrite_dword(0, fp);
-
-    // write index of each string into array of strings concatenated separated by '\0'
-    unsigned str_table = 0;
-    for (unsigned id = 0; id < count; id++) {
-        const char* str = st_lookup(st, id);
-        unsigned pos = str_table;               // position of this string in table
-        str_table += (unsigned)strlen(str) + 1; // next position
-
-        xfwrite_dword(pos, fp);                 // index into strings
-    }
-
-    // write all strings together
-    for (unsigned id = 0; id < count; id++) {
-        const char* str = st_lookup(st, id);
-        xfwrite(str, 1, strlen(str) + 1, fp);       // write string including '\0'
-    }
-
-    // align to dword size
-    unsigned aligned_str_table = ((str_table + (sizeof(int32_t) - 1)) & ~(sizeof(int32_t) - 1));
-    int extra_bytes = aligned_str_table - str_table;
-    xfwrite(align, 1, extra_bytes, fp);
-
-    long fpos_end = ftell(fp);
-    xfseek(fp, fpos_strings_size, SEEK_SET);
-    xfwrite_dword(aligned_str_table, fp);
-    xfseek(fp, fpos_end, SEEK_SET);
-
-    return fpos0;
-}
-
 void objfile_write(objfile_t* obj, FILE* fp) {
 	long fpos0 = ftell(fp);
 
@@ -1114,7 +974,8 @@ void objfile_write(objfile_t* obj, FILE* fp) {
 	long externs_ptr = objfile_write_externs(obj, fp);      
 	long modname_ptr = objfile_write_modname(obj, fp);      
 	long sections_ptr = objfile_write_sections(obj, fp);    
-    long st_ptr = write_string_table(obj->st, fp);      
+    long st_ptr = ftell(fp);
+    strtable_fwrite(obj->st, fp);
 	long end_ptr = ftell(fp);
 
 	// write pointers to areas
@@ -1143,7 +1004,7 @@ file_t* file_new() {
 	file->type = is_none;
 	file->version = -1;
 	file->objs = NULL;
-    file->st = st_new();
+    file->st = strtable_new();
 
 	return file;
 }
@@ -1158,7 +1019,7 @@ void file_free(file_t* file) {
 		objfile_free(obj);
 	}
 
-    st_free(file->st);
+    strtable_free(file->st);
 	xfree(file);
 }
 
@@ -1260,20 +1121,20 @@ static void file_write_object(file_t* file, FILE* fp) {
 	objfile_write(file->objs, fp);
 }
 
-void objfile_get_defined_symbols(objfile_t* obj, string_table_t* st) {
+void objfile_get_defined_symbols(objfile_t* obj, strtable_t* st) {
     section_t* section;
     DL_FOREACH(obj->sections, section) {
         symbol_t* symbol;
         DL_FOREACH(section->symbols, symbol) {
             if (symbol->scope == SCOPE_PUBLIC)
-                st_add_string(st, utstring_body(symbol->name)); // add public symbols to string table
+                strtable_add_string(st, utstring_body(symbol->name)); // add public symbols to string table
         }
     }
 }
 
 static void file_write_library(file_t* file, FILE* fp) {
     // init string table
-    st_clear(file->st);
+    strtable_clear(file->st);
 
     // write header
 	write_signature(fp, is_library);
@@ -1304,7 +1165,8 @@ static void file_write_library(file_t* file, FILE* fp) {
     xfwrite_dword(0, fp);
 
     // write string table
-    long st_pos = write_string_table(file->st, fp);
+    long st_pos = ftell(fp);
+    strtable_fwrite(file->st, fp);
     long fpos = ftell(fp);
     fseek(fp, st_ptr, SEEK_SET);
     xfwrite_dword(st_pos, fp);

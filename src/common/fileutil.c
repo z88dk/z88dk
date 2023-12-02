@@ -739,3 +739,21 @@ const char *path_search(const char *filename, argv_t *dir_list)
 	// not found, return original file name
 	return path_canon(filename);
 }
+
+bool is_little_endian(void) {
+    uint32_t endian = 0x12345678;
+    if (*(byte_t*)&endian == 0x78)
+        return true;
+    else
+        return false;
+}
+
+int32_t int32_swap_bytes(int32_t data) {
+    const byte_t* p = (const byte_t*)&data;
+    int32_t value =
+        ((p[0] << 24) & 0xFF000000L) |
+        ((p[1] << 16) & 0x00FF0000L) |
+        ((p[2] << 8) & 0x0000FF00L) |
+        ((p[3] << 0) & 0x000000FFL);
+    return value;
+}

@@ -1,4 +1,4 @@
 stdout:
 stderr:
-Assertion failed: 0, file t/t_die.c, line 19
+Test: Assertion failed: 0, file t/t_xassert.c, line 12
 exit: 1

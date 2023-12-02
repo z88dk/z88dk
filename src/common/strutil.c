@@ -9,6 +9,7 @@
 #include "uthash.h"
 #include "utstring.h"
 #include "xassert.h"
+#include "xmalloc.h"
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>

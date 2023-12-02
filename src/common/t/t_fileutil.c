@@ -6,6 +6,7 @@
 #include "unity.h"
 #include "die.h"
 #include "fileutil.h"
+#include "xassert.h"
 #include "zutils.h"
 
 #include <limits.h>
@@ -1193,4 +1194,13 @@ void t_fileutil_path_find_glob(void)
 
 	path_rmdir("test_dir");
 	TEST_ASSERT(!dir_exists("test_dir"));
+}
+
+void t_fileutil_int32_swap_bytes(void) {
+    TEST_ASSERT_EQUAL(0x12345678, int32_swap_bytes(0x78563412));
+    TEST_ASSERT_EQUAL(0x78563412, int32_swap_bytes(0x12345678));
+
+#ifdef _WIN32
+    TEST_ASSERT(is_little_endian());
+#endif
 }

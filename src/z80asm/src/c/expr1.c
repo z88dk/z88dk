@@ -24,6 +24,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "utlist.h"
 #include "utstring.h"
 #include "xassert.h"
+#include "xmalloc.h"
 
 /*-----------------------------------------------------------------------------
 *	UT_array of Expr1*
