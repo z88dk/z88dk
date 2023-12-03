@@ -18,6 +18,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "reloc_code.h"
 #include "scan1.h"
 #include "str.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symtab1.h"
@@ -28,7 +29,6 @@ Repository: https://github.com/z88dk/z88dk
 #include "z80asm.h"
 #include "z80asm_defs.h"
 #include "zobjfile.h"
-#include "zutils.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdio.h>

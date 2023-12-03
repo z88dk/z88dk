@@ -21,6 +21,7 @@ Define ragel-based parser.
 #include "parse1.h"
 #include "scan1.h"
 #include "str.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symtab1.h"
@@ -28,7 +29,6 @@ Define ragel-based parser.
 #include "utstring.h"
 #include "xassert.h"
 #include "z80asm_defs.h"
-#include "zutils.h"
 #include <ctype.h>
 
 /*-----------------------------------------------------------------------------

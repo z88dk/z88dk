@@ -16,11 +16,11 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #include "list.h"
 #include "scan1.h"
 #include "str.h"
+#include "strutil.h"
 #include "utarray.h"
 #include "xassert.h"
 #include "xmalloc.h"
 #include "z80asm_defs.h"
-#include "zutils.h"
 #include <ctype.h>
 
 /*-----------------------------------------------------------------------------

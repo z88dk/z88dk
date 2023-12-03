@@ -16,6 +16,7 @@ Assembly directives.
 #include "if.h"
 #include "module1.h"
 #include "parse1.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "symtab1.h"
 #include "types.h"

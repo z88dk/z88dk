@@ -15,9 +15,9 @@ Repository: https://github.com/z88dk/z88dk
 #include "alloc.h"
 #include "str.h"
 #include "strhash.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "utstring.h"
-#include "zutils.h"
 
 /*-----------------------------------------------------------------------------
 *   Define the class

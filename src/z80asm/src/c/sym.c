@@ -13,6 +13,7 @@ One symbol from the assembly code - label or constant.
 #include "if.h"
 #include "scan1.h"
 #include "str.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symtab1.h"

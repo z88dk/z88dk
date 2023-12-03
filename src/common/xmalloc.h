@@ -23,7 +23,7 @@ char* xmalloc_strndup_(const char* str, size_t n);
 #define xrealloc(p,size)	XMALLOC_CHECK(void*, realloc((p), (size)))
 #define xfree(p)			(free(p), (p) = NULL)
 #define xstrdup(s)			XMALLOC_CHECK(char*, strdup(s))
-#define xstrndup(s, n)		XMALLOC_CHECK(char*, xmalloc_strndup_(s), (n))
+#define xstrndup(s, n)		XMALLOC_CHECK(char*, xmalloc_strndup_((s), (n)))
 
 #define xnew(type)			XMALLOC_CHECK(type*, calloc(1, sizeof(type)))
 

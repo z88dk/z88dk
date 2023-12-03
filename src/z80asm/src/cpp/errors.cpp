@@ -8,6 +8,7 @@
 #include "errors.h"
 #include "float.h"
 #include "if.h"
+#include "strpool.h"
 #include "utils.h"
 #include "xassert.h"
 #include "z80asm_defs.h"

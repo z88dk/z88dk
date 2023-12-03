@@ -14,6 +14,37 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
+#if defined(_WIN32) || defined(WIN32)
+#ifndef strcasecmp
+#define strcasecmp(s1, s2)		stricmp((s1), (s2))
+#endif
+#ifndef strncasecmp
+#define strncasecmp(s1, s2, n)	strnicmp((s1), (s2), (n))
+#endif
+#else
+#include <strings.h>
+#endif
+
+//-----------------------------------------------------------------------------
+// C-strings
+//-----------------------------------------------------------------------------
+
+// convert string to upper / lower case -modify in place,
+// return address of string
+char* strtoupper(char* str);
+char* strtolower(char* str);
+
+// remove end newline and whitespace - modify in place, return address of string
+char* strchomp(char* str);
+
+// remove begin and end whitespace - modify in place, return address of string
+char* strstrip(char* str);
+
+// convert C-escape sequences - modify in place, return final length
+// to allow strings with '\0' characters
+// accepts \b, \f, \n, \r, \t, \v, \xhh, \? \ooo
+size_t str_compress_escapes(char* str);
+
 //-----------------------------------------------------------------------------
 // argv_t: alias to UT_array of strings
 //-----------------------------------------------------------------------------
@@ -43,12 +74,6 @@ extern char *argv_get(argv_t *argv, size_t idx);
 // set element at idx
 // grows array if needed to make index valid, fills empty values with NULL
 extern void argv_set(argv_t *argv, size_t idx, const char *str);
-
-//-----------------------------------------------------------------------------
-// string pool
-//-----------------------------------------------------------------------------
-extern const char *spool_add(const char *str);
-extern const char *spool_add_n(const char *str, size_t n);
 
 #ifdef __cplusplus
 }

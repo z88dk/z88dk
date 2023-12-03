@@ -18,6 +18,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "init.h"
 #include "module1.h"
 #include "strhash.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symtab1.h"

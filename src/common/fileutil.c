@@ -6,10 +6,10 @@
 
 #include "die.h"
 #include "fileutil.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "utstring.h"
 #include "xassert.h"
-#include "zutils.h"
 #include <ctype.h>
 #include <dirent.h>
 #include <string.h>
@@ -757,3 +757,36 @@ int32_t int32_swap_bytes(int32_t data) {
         ((p[3] << 0) & 0x000000FFL);
     return value;
 }
+
+int check_retval(int retval, const char* file, const char* source_file, int line_num)
+{
+    if (retval) {
+        perror(file);
+        exit(EXIT_FAILURE);
+    }
+    return retval;
+}
+
+int xglob(const char* pattern, int flags,
+    int(*errfunc)(const char* epath, int eerrno), glob_t* pglob)
+{
+    int ret = glob(pattern, flags, errfunc, pglob);
+
+#ifdef DEBUG
+    printf("GLOB(%s)=", pattern);
+    for (int i = 0; i < pglob->gl_pathc; i++) {
+        char* found = pglob->gl_pathv[i];
+        printf("%s ", found);
+    }
+    printf("\n");
+#endif
+
+    if (ret != GLOB_NOMATCH && ret != 0)
+        die("glob pattern '%s': %s\n",
+            pattern,
+            (ret == GLOB_ABORTED ? "filesystem problem" :
+                ret == GLOB_NOSPACE ? "no dynamic memory" :
+                "unknown problem"));
+    return ret;
+}
+
