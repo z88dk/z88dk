@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 #include "zobjcopy.h"
 #include "xassert.h"
+#include "xmalloc.h"
 
 //-----------------------------------------------------------------------------
 // Usage and command line options
@@ -61,9 +62,9 @@ static struct optparse_long longopts[] = {
 //-----------------------------------------------------------------------------
 // Parse command line
 //-----------------------------------------------------------------------------
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     xassert_init(argv[0]);
+    xmalloc_init(argv[0]);
 
 	UT_array *commands;
 	utarray_new(commands, &ut_str_icd);

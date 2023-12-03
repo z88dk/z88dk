@@ -24,6 +24,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "types.h"
 #include "utstring.h"
 #include "xassert.h"
+#include "xmalloc.h"
 #include "z80asm.h"
 #include "z80asm_defs.h"
 #include "zobjfile.h"
@@ -43,7 +44,7 @@ typedef struct obj_file_t {
 	int				i;					// point to next position to parse
 	Module1*		module;				// weak pointer to main module information, if object file
     bool            is_library;         // library or object file
-    string_table_t* st;
+    strtable_t* st;
 } obj_file_t;
 
 
@@ -140,19 +141,8 @@ static bool goto_string_table(obj_file_t* obj) {
 static void parse_string_table(obj_file_t* obj) {
     if (obj->st == NULL) {
         int save_pos = obj->i;
-
-        obj->st = st_new();
-
         xassert(goto_string_table(obj));
-        int count = parse_int(obj);
-        (void)parse_int(obj);       // strings_size
-        int strings = obj->i + count * sizeof(int32_t);
-        for (int id = 0; id < count; id++) {
-            int pos = parse_int(obj);
-            const char* str = (const char*)obj->data + strings + pos;
-            xassert(id == st_add_string(obj->st, str));
-        }
-
+        obj->st = strtable_parse(obj->data + obj->i);
         obj->i = save_pos;
     }
 }
@@ -161,7 +151,7 @@ static const char* parse_st_str(obj_file_t* obj) {
     if (obj->st == NULL)
         parse_string_table(obj);
     int id = parse_int(obj);
-    return st_lookup(obj->st, id);
+    return strtable_lookup(obj->st, id);
 }
 
 static obj_file_t* obj_files_append(obj_file_t** plist, const char* filename, Module1* module) {
@@ -226,7 +216,7 @@ static void obj_files_free(obj_file_t** plist) {
 		DL_DELETE(*plist, elem);
 		xfree(elem->data);
         if (elem->st)
-            st_free(elem->st);
+            strtable_free(elem->st);
 		xfree(elem);
 	}
 }
@@ -859,7 +849,7 @@ static bool lib_defines_pending_sym(obj_file_t* lib, StrHash* extern_syms) {
     for (elem = StrHash_first(extern_syms); elem != NULL; elem = next) {
         next = StrHash_next(elem);
 
-        if (st_find(lib->st, elem->key))
+        if (strtable_find(lib->st, elem->key))
             return true;
     }
     return false;
@@ -900,7 +890,7 @@ static bool linked_libraries(StrHash* extern_syms) {
 			if (linked_module(&obj, extern_syms))
 				linked = true;
             if (obj.st)
-                st_free(obj.st);
+                strtable_free(obj.st);
 		}
 	}
 	return linked;

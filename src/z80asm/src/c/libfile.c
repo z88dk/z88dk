@@ -13,6 +13,7 @@
 #include "zobjfile.h"
 #include "z80asm.h"
 #include "z80asm_defs.h"
+#include "xmalloc.h"
 
 /*-----------------------------------------------------------------------------
 *	define a library file name from the command line
@@ -32,7 +33,7 @@ static const char *search_libfile(const char *filename )
 *	make library from source files; convert each source to object file name
 *   add only object files for the same CPU-IXIY combination
 *----------------------------------------------------------------------------*/
-static bool add_object_modules(FILE* lib_fp, string_table_t* st) {
+static bool add_object_modules(FILE* lib_fp, strtable_t* st) {
     char* obj_file_data = NULL;
 
     for (size_t i = 0; i < option_files_size(); i++) {
@@ -104,7 +105,7 @@ void make_library(const char *lib_filename) {
 	if ( lib_filename == NULL )
 		return;					            // ERROR
 
-    string_table_t* st = st_new();          // list of all defined symbols
+    strtable_t* st = strtable_new();          // list of all defined symbols
 
     // #2254 - write temp file
     UT_string* temp_filename;
@@ -179,7 +180,8 @@ void make_library(const char *lib_filename) {
     xfwrite_dword(0, fp);         // size = 0  - deleted
 
     // write string table
-    long st_pos = write_string_table(st, fp);
+    long st_pos = ftell(fp);
+    strtable_fwrite(st, fp);
     long fpos = ftell(fp);
     fseek(fp, st_ptr, SEEK_SET);
     xfwrite_dword(st_pos, fp);
@@ -195,7 +197,7 @@ void make_library(const char *lib_filename) {
         error_file_rename(utstring_body(temp_filename));
 
 cleanup_and_return:
-    st_free(st);
+    strtable_free(st);
     utstring_free(temp_filename);
 }
 
