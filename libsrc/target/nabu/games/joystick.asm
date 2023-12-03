@@ -42,10 +42,9 @@ doread:
     ld      b,0
     ld      hl,table
     add     hl,bc
-    ld      e,(hl)
     ld      a,d
     and     @00011000
-    or      e
+    or      (hl)
     ld      l,a
     ld      h,0
     ret

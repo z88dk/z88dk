@@ -89,15 +89,25 @@ int_noop:
 handle_keyboard:
     ld      a,(__nabu_key_mode)
     ld      hl,__nabu_j1
-    cp      1
+    cp      $80
     jr      z,handle_joy
-    ld      hl,__nabu_j2
-    cp      2
+    inc     hl  ; __nabu_j2
+    cp      $81
+    jr      z,handle_joy
+    inc     hl  ; __nabu_j3
+    cp      $82
+    jr      z,handle_joy
+    inc     hl  ; __nabu_j3
+    cp      $83
     jr      z,handle_joy
     in      a,($90)
     cp      $80
     jr      z,set_joystick
     cp      $81
+    jr      z,set_joystick
+    cp      $82
+    jr      z,set_joystick
+    cp      $83
     jr      z,set_joystick
     cp      $90
     jr      c,set_key
@@ -109,7 +119,6 @@ set_key:
     ret
 
 set_joystick:
-    sub     $7f
     ld      (__nabu_key_mode),a
     ret
 
