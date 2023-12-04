@@ -16,6 +16,17 @@
 extern "C" {
 #endif
 
+#ifdef _WIN32
+#include <direct.h>
+#endif
+
+#if defined(_WIN32) && !defined(_CYGWIN)
+#include <unixem/glob.h>
+#endif
+#include <glob.h>
+#include <dirent.h>
+
+
 // pathname manipulation - strings are allocated in spool, no need to free
 
 // change to forward slashes, remove extra slashes and dots
@@ -104,6 +115,23 @@ extern const char *path_search(const char *filename, argv_t *dir_list);
 // convert between file-representation (little-endian) to internal representation
 bool is_little_endian(void);
 int32_t int32_swap_bytes(int32_t data);
+
+// check OS retval
+extern int check_retval(int retval, const char* file, const char* source_file, int line_num);
+#define Check_retval(rv, file)	check_retval((rv), (file), __FILE__, __LINE__)
+
+#define xremove(file)		Check_retval(remove(file), (file))
+
+#ifdef _WIN32
+#define xmkdir(dir)			Check_retval(_mkdir(path_os(dir)), (dir))
+#define xrmdir(dir)			Check_retval(_rmdir(path_os(dir)), (dir))
+#else
+#define xmkdir(dir)			Check_retval(mkdir(path_os(dir), 0777), (dir))
+#define xrmdir(dir)			Check_retval(rmdir(path_os(dir)), (dir))
+#endif
+
+int xglob(const char* pattern, int flags, int(*errfunc) (const char* epath, int eerrno),
+    glob_t* pglob);
 
 #ifdef __cplusplus
 }

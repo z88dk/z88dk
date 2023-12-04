@@ -15,6 +15,7 @@ Manage the code area in memory
 #include "init.h"
 #include "module1.h"
 #include "objfile.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "utstring.h"
 #include "xassert.h"

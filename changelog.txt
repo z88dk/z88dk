@@ -51,6 +51,7 @@ Detailed but incomplete changelist:
 - [z80asm] allow the creation of fat libraries with the same code for all CPUs (-m*)
 - [z80asm] add support of r800, r4k, r5k, kc160
 - [z80asm] add EQ, NE, LTU, LEU, GTU, GEU condition codes, allow any flag in expressions
+- [z80asm] allow parallel builds
 - [zcc] +config at any place, support for -xc
 - [make] add cmake support
 

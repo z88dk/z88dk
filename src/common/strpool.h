@@ -1,22 +1,18 @@
 //-----------------------------------------------------------------------------
-// die - check results and die on error
+// string pool
 // Copyright (C) Paulo Custodio, 2011-2023
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #pragma once
 
-#include "fileutil.h"
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// error message and exit program
-extern void die(const char *msg, ...);
+extern const char* spool_add(const char* str);
+extern const char* spool_add_n(const char* str, size_t n);
 
 #ifdef __cplusplus
 }

@@ -20,7 +20,6 @@ Handle object file contruction, reading and writing
 #include "utstring.h"
 #include "utlist.h"
 #include "zobjfile.h"
-#include "zutils.h"
 #include "z80asm_defs.h"
 
 /*-----------------------------------------------------------------------------

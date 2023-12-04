@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\ext\Unity\src\unity.c" />
     <ClCompile Include="..\..\src\common\t\test.c" />
+    <ClCompile Include="..\..\src\common\t\t_strpool.c" />
     <ClCompile Include="..\..\src\common\t\t_strtable.c" />
     <ClCompile Include="..\..\src\common\t\t_xassert.c" />
     <ClCompile Include="..\..\src\common\t\t_die.c" />

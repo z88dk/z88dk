@@ -11,6 +11,7 @@
 #include "if.h"
 #include "preproc.h"
 #include "scan.h"
+#include "strpool.h"
 #include "utils.h"
 #include "xassert.h"
 #include <cassert>

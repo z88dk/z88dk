@@ -4,16 +4,15 @@
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "fileutil.h"
-#include "objfile.h"
-#include "strutil.h"
-#include "utlist.h"
-#include "utstring.h"
-#include "xassert.h"
-#include "xmalloc.h"
-#include "z80asm_defs.h"
-#include "zutils.h"
 #include <ctype.h>
+#include "z80asm_defs.h"
+#include "xmalloc.h"
+#include "xassert.h"
+#include "utstring.h"
+#include "utlist.h"
+#include "strutil.h"
+#include "objfile.h"
+#include "fileutil.h"
 
 #include <sys/types.h>	// needed before regex.h
 #include "regex.h"

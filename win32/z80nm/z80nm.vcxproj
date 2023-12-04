@@ -171,7 +171,6 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\common\zutils.c" />
     <ClCompile Include="..\..\src\z80nm\ar.cpp" />
   </ItemGroup>
   <ItemGroup>
