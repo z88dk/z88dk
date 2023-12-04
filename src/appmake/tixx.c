@@ -276,11 +276,10 @@ int tixx_exec(char *target)
     if (ext != E_85S)
         cfwrite(str, 8 - file_size, fp, &chk);
 
-    /* 83+ requires 2 extra bytes */
+    /* TI83 Plus requires 2 extra bytes */
     if ((oldfmt == 0) && (ext == E_8XP)) {
         cfwritebyte(0, fp, &chk);
 		cfwritebyte(0, fp, &chk);
-        base_size-=2; // Undo the extra size added earlier
     }
 
 
@@ -293,10 +292,11 @@ int tixx_exec(char *target)
     /*printf("Var Length (i) : %04X\n", i);
     printf("Var Length (n2) : %04X\n", n2); */
 
-    /* TI83 Plus workaround */
+    /* TI83 Plus workaround (AsmPrgm token) */
     if ((oldfmt == 0) && (ext == E_8XP)) {
         cfwritebyte(0xBB, fp, &chk);
 		cfwritebyte(0x6D, fp, &chk);
+        base_size-=2; // Undo the extra size added earlier
     }
     cfwrite(buf, base_size, fp, &chk);
     writeword(chk, fp);
