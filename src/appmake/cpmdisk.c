@@ -685,8 +685,8 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
             direntry[15] = 0x80;
             extents_to_write = extents_per_entry;
         } else {
-            direntry[15] = (((len % (extents_per_entry * h->spec.extent_size))+ 127) / 128);
-            extents_to_write = (num_extents - (i * extents_per_entry));
+            direntry[15] = (((len % (extents_per_entry * h->spec.extent_size))+ 127) / 128) % 256;
+            extents_to_write = ((int)num_extents - (i * extents_per_entry));
         }
         for (j = 0; j < extents_per_entry; j++) {
             if (j < extents_to_write) {
@@ -723,7 +723,7 @@ disc_handle *fat_create(disc_spec* spec)
 
     current_fat_handle = h;
     // Create a file system
-    if ( (res = f_mkfs("1", spec->fat_format_flags, spec->cluster_size, buf, sizeof(buf), spec->number_of_fats, spec->directory_entries)) != FR_OK) {
+    if ( (res = f_mkfs("1", (BYTE)spec->fat_format_flags, spec->cluster_size, buf, sizeof(buf), spec->number_of_fats, spec->directory_entries)) != FR_OK) {
         exit_log(1, "Cannot create FAT filesystem: %d\n",res);
     }
 
@@ -745,7 +745,7 @@ static void fat_write_file(disc_handle* h, char *filename, void* data, size_t le
         exit_log(1, "Cannot create file <%s> on FAT image", filename);
     }
 
-    if ( f_write(&file, data, len, &written) != FR_OK ) {
+    if ( f_write(&file, data, (UINT)len, &written) != FR_OK ) {
         exit_log(1, "Cannot write file contents to FAT image");
     }
 
