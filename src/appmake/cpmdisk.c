@@ -243,6 +243,15 @@ int skew_sector(disc_handle* h, int j, int track)
 }
 
 
+// Invert or xor in some way the disk data if needed
+void xorblock(uint8_t *pos, int count, int mask)
+{
+    int i;
+	for ( i = 0; i < count; i++ )
+		pos[i] ^= mask;
+}
+
+
 // Write a raw disk, no headers for tracks etc
 int disc_write_raw(disc_handle* h, const char* filename)
 {
@@ -263,6 +272,7 @@ int disc_write_raw(disc_handle* h, const char* filename)
                 offs = track_length * ( 2* i + s);
             }
             for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
                  fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
@@ -348,6 +358,7 @@ int disc_write_edsk(disc_handle* h, const char* filename)
             }
             fwrite(header, 256, 1, fp);
             for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
                  fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
@@ -444,6 +455,7 @@ int disc_write_d88(disc_handle* h, const char* filename)
                  *ptr++ = (h->spec.sector_size % 256);
                  *ptr++ = (h->spec.sector_size / 256);
                  fwrite(header, ptr - header, 1, fp);
+                 xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
                  fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
@@ -504,6 +516,7 @@ int disc_write_anadisk(disc_handle* h, const char* filename)
                 header[7] = h->spec.sector_size / 256;
 
                 fwrite(header, 8, 1, fp);
+                xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
                 fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
@@ -576,6 +589,7 @@ int disc_write_imd(disc_handle* h, const char* filename)
             }
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                 fputc(1, fp);   // Sector type 1  = has data
+                xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
                 fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
