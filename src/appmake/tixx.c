@@ -61,7 +61,7 @@ option_t tixx_options[] = {
 
 enum EXT { E_82P, E_83P, E_8XP, E_85S, E_86P, E_86S };
 
-const unsigned char trailer83[] = { 0x3f, 0xd4, 0x3f, 0x30, 0x30, 0x30, 0x30, 0x3f, 0xd4 };
+// const unsigned char trailer83[] = { 0x3f, 0xd4, 0x3f, 0x30, 0x30, 0x30, 0x30, 0x3f, 0xd4 };
 
 
 
@@ -190,7 +190,7 @@ int tixx_exec(char *target)
         exit_log(1,"Failed to open input file: %s\n", binname);
 
     file_size = base_size = get_file_size(fp);
-	
+	if ((oldfmt == 0) && (ext == E_8XP)) base_size+=2;
 
     buf = (char *)malloc(base_size);
     if (1 != fread(buf, file_size, 1, fp)) { fclose(fp); exit_log(1, "Could not read required data from <%s>\n",binname); }
@@ -256,7 +256,7 @@ int tixx_exec(char *target)
     /* VARIABLE LENGTH */
     file_size = base_size + 2;    
     cfwriteword(file_size, fp, &chk);
-    printf("asd");
+
     /* VARIABLE TYPE ID BYTE */
     if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
         cfwrite("\x06", 1, fp, &chk);
@@ -280,16 +280,19 @@ int tixx_exec(char *target)
     if ((oldfmt == 0) && (ext == E_8XP)) {
         cfwritebyte(0, fp, &chk);
 		cfwritebyte(0, fp, &chk);
+        base_size-=2; // Undo the extra size added earlier
     }
 
 
     /* VARIABLE LENGTH */
     file_size = base_size + 2;
+    
     n2 = base_size;
     cfwriteword(file_size, fp, &chk);
     cfwriteword(n2, fp, &chk);
     /*printf("Var Length (i) : %04X\n", i);
     printf("Var Length (n2) : %04X\n", n2); */
+
     /* TI83 Plus workaround */
     if ((oldfmt == 0) && (ext == E_8XP)) {
         cfwritebyte(0xBB, fp, &chk);
