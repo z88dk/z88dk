@@ -100,9 +100,17 @@ void writecomment(FILE *fp, const char *comment)
 void genname(const char *fname, char *name)
 {
     char str[256], *c;
+    char* upperPath;
+
+    if (NULL!=(upperPath=strrchr(fname, '/'))) // Go to uppermost dir
+        fname = upperPath+1;
 
     strcpy(str, fname);
-    c = strchr(str, '.');
+
+
+    c = strrchr(str, '.');
+
+
     if ((c - str) > 8)
         c[8] = 0;
     else
@@ -126,7 +134,7 @@ int tixx_exec(char *target)
     FILE *fp;
     char *buf, str[256];
     char *suffix;
-    int i, n, ext = E_83P, n2;
+    int file_size, base_size, ext = E_83P, n2;
     unsigned short chk;
 
     if ( help || binname == NULL ) {
@@ -181,16 +189,16 @@ int tixx_exec(char *target)
     if (!fp)
         exit_log(1,"Failed to open input file: %s\n", binname);
 
-    i = n = get_file_size(fp);
-	if ((oldfmt == 0) && (ext == E_8XP))	n+=9;
+    file_size = base_size = get_file_size(fp);
+	
 
-    buf = (char *)malloc(n);
-    if (1 != fread(buf, i, 1, fp)) { fclose(fp); exit_log(1, "Could not read required data from <%s>\n",binname); }
+    buf = (char *)malloc(base_size);
+    if (1 != fread(buf, file_size, 1, fp)) { fclose(fp); exit_log(1, "Could not read required data from <%s>\n",binname); }
     if (ferror(fp))
         exit_log(1,"Error reading input file: %s\n", binname);
     fclose(fp);
-    if ((oldfmt == 0) && (ext == E_8XP))
-		strncpy(buf+i,trailer83,9);
+    // if ((oldfmt == 0) && (ext == E_8XP))
+		// strncpy(buf+file_size,trailer83,9);
     fp = fopen(filename, "wb");
     if (!fp)
         exit_log(1,"Failed to open output file: %s\n", filename);
@@ -212,12 +220,15 @@ int tixx_exec(char *target)
 
     /* DATA SECTION LENGTH */
     if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
-        i = n + 17;
+        file_size = base_size + 17;
     else if (ext == E_85S)
-        i = n + 10 + (int)strlen(str);
+        file_size = base_size + 10 + (int)strlen(str);
     else
-        i = n + 18;
-    writeword(i, fp);
+        file_size = base_size + 18;
+
+    if ((oldfmt == 0) && (ext == E_8XP))  file_size+=2;
+
+    writeword(file_size, fp);
     /* printf("Data Length: %04X\n", i); */
 
     /****************/
@@ -225,21 +236,27 @@ int tixx_exec(char *target)
     /****************/
 
     /* VARIABLE TYPE MARKER */
-    if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
+    if ((ext == E_82P) || (ext == E_83P))
         cfwrite("\x0b\0x00", 2, fp, &chk);
     else if (ext == E_85S)
     {
-        i = 4 + (int)strlen(str);
-        cfwritebyte(i, fp, &chk);
+        file_size = 4 + (int)strlen(str);
+        cfwritebyte(file_size, fp, &chk);
         cfwrite("\0x00", 1, fp, &chk);
+    }
+    else if (ext == E_8XP){
+        if (oldfmt == 0)
+            cfwrite("\x0D\0x00", 2, fp, &chk);
+        else
+            cfwrite("\x0B\0x00", 2, fp, &chk);
     }
     else
         cfwrite("\x0c\0x00", 2, fp, &chk);
     
     /* VARIABLE LENGTH */
-    i = n + 2;    
-    cfwriteword(i, fp, &chk);
-
+    file_size = base_size + 2;    
+    cfwriteword(file_size, fp, &chk);
+    printf("asd");
     /* VARIABLE TYPE ID BYTE */
     if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
         cfwrite("\x06", 1, fp, &chk);
@@ -248,20 +265,16 @@ int tixx_exec(char *target)
     else if ((ext == E_85S) || (ext == E_86S))
         cfwrite("\x0c", 1, fp, &chk);
 
-    /* TI83 Plus workaround */
-    if ((oldfmt == 0) && (ext == E_8XP)) {
-        cfwritebyte(0xBB, fp, &chk);
-		cfwritebyte(0x6D, fp, &chk);
-    }
+
 
     /* VARIABLE NAME */
-    i = (int)strlen(str);
+    file_size = (int)strlen(str);
     if ((ext == E_85S) || (ext == E_86P) || (ext == E_86S))
-        cfwritebyte(i, fp, &chk);
-    cfwrite(str, i, fp, &chk);
+        cfwritebyte(file_size, fp, &chk);
+    cfwrite(str, file_size, fp, &chk);
     memset(str, 0, 8);
     if (ext != E_85S)
-        cfwrite(str, 8 - i, fp, &chk);
+        cfwrite(str, 8 - file_size, fp, &chk);
 
     /* 83+ requires 2 extra bytes */
     if ((oldfmt == 0) && (ext == E_8XP)) {
@@ -271,14 +284,18 @@ int tixx_exec(char *target)
 
 
     /* VARIABLE LENGTH */
-    i = n + 2;
-    n2 = n;
-    cfwriteword(i, fp, &chk);
+    file_size = base_size + 2;
+    n2 = base_size;
+    cfwriteword(file_size, fp, &chk);
     cfwriteword(n2, fp, &chk);
     /*printf("Var Length (i) : %04X\n", i);
     printf("Var Length (n2) : %04X\n", n2); */
-
-    cfwrite(buf, n, fp, &chk);
+    /* TI83 Plus workaround */
+    if ((oldfmt == 0) && (ext == E_8XP)) {
+        cfwritebyte(0xBB, fp, &chk);
+		cfwritebyte(0x6D, fp, &chk);
+    }
+    cfwrite(buf, base_size, fp, &chk);
     writeword(chk, fp);
 
     if (ferror(fp))
