@@ -654,6 +654,27 @@ static disc_spec kaypro4_spec = {
 };
 
 
+// Sharp MZ-800 Personal CP/M
+// a valid boot track on side 0 should have SKEW4,
+// ..on side 1 SKEW8, 16 tracks x 256 sectors
+static disc_spec mz800_spec = {
+    .name = "Sharp MZ80",
+    .disk_mode = MFM250,
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1
+};
+
+
+// Sharp MZ-2500
 static disc_spec mz2500cpm_spec = {
     .name = "MZ2500CPM",
     .sectors_per_track = 16,
@@ -1787,6 +1808,7 @@ static struct formats {
     { "nabupc",    "Nabu PC",               &nabupc_spec, 0, NULL, 1 },
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
     { "nshd8",     "Northstar Virtual 8",   &nshd8_spec, 0, NULL, 1 },
+    { "mz800",     "Sharp MZ800",           &mz800_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
