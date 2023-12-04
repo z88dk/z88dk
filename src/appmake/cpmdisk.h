@@ -37,6 +37,7 @@ typedef struct {
     // Image layout
     uint8_t   alternate_sides;
     uint8_t   has_skew;
+    uint8_t   xor_data;
     uint16_t  skew_track_start;
     uint8_t   skew_tab[32];
 
