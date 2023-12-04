@@ -63,6 +63,7 @@ parts:
       - libclone-perl
       - libfile-slurp-perl
       - libyaml-tiny-perl
+      - libgmp3-dev
       - pkg-config
     stage-packages:
       - libicu66
