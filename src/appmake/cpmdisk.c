@@ -243,6 +243,15 @@ int skew_sector(disc_handle* h, int j, int track)
 }
 
 
+// Invert or xor in some way the disk data if needed
+void xorblock(uint8_t *pos, int count, int mask)
+{
+    int i;
+	for ( i = 0; i < count; i++ )
+		pos[i] ^= mask;
+}
+
+
 // Write a raw disk, no headers for tracks etc
 int disc_write_raw(disc_handle* h, const char* filename)
 {
@@ -263,6 +272,7 @@ int disc_write_raw(disc_handle* h, const char* filename)
                 offs = track_length * ( 2* i + s);
             }
             for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
                  fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
@@ -348,6 +358,7 @@ int disc_write_edsk(disc_handle* h, const char* filename)
             }
             fwrite(header, 256, 1, fp);
             for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
                  fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
@@ -444,6 +455,7 @@ int disc_write_d88(disc_handle* h, const char* filename)
                  *ptr++ = (h->spec.sector_size % 256);
                  *ptr++ = (h->spec.sector_size / 256);
                  fwrite(header, ptr - header, 1, fp);
+                 xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
                  fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
@@ -504,6 +516,7 @@ int disc_write_anadisk(disc_handle* h, const char* filename)
                 header[7] = h->spec.sector_size / 256;
 
                 fwrite(header, 8, 1, fp);
+                xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
                 fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
@@ -576,6 +589,7 @@ int disc_write_imd(disc_handle* h, const char* filename)
             }
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                 fputc(1, fp);   // Sector type 1  = has data
+                xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
                 fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
@@ -671,8 +685,8 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
             direntry[15] = 0x80;
             extents_to_write = extents_per_entry;
         } else {
-            direntry[15] = (((len % (extents_per_entry * h->spec.extent_size))+ 127) / 128) % 256;
-            extents_to_write = ((int)num_extents - (i * extents_per_entry));
+            direntry[15] = (((len % (extents_per_entry * h->spec.extent_size))+ 127) / 128);
+            extents_to_write = (num_extents - (i * extents_per_entry));
         }
         for (j = 0; j < extents_per_entry; j++) {
             if (j < extents_to_write) {
@@ -709,7 +723,7 @@ disc_handle *fat_create(disc_spec* spec)
 
     current_fat_handle = h;
     // Create a file system
-    if ( (res = f_mkfs("1", (BYTE)spec->fat_format_flags, spec->cluster_size, buf, sizeof(buf), spec->number_of_fats, spec->directory_entries)) != FR_OK) {
+    if ( (res = f_mkfs("1", spec->fat_format_flags, spec->cluster_size, buf, sizeof(buf), spec->number_of_fats, spec->directory_entries)) != FR_OK) {
         exit_log(1, "Cannot create FAT filesystem: %d\n",res);
     }
 
@@ -731,7 +745,7 @@ static void fat_write_file(disc_handle* h, char *filename, void* data, size_t le
         exit_log(1, "Cannot create file <%s> on FAT image", filename);
     }
 
-    if ( f_write(&file, data, (UINT)len, &written) != FR_OK ) {
+    if ( f_write(&file, data, len, &written) != FR_OK ) {
         exit_log(1, "Cannot write file contents to FAT image");
     }
 
