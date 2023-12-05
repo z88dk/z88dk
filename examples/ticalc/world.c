@@ -1,8 +1,8 @@
 /* Hello world. See Makefile for building commands */
 
 #include <stdio.h>
-/* Description string for Ti calcs. This is truncated in apps */
-#pragma string name Hello World
+/* Description string for Ti calcs.  In apps this should be 8 or less characters or it can not be sent.*/
+#pragma string name WORLD
 
 /* Icon for Ti calcs ('waving' hand). This is not used in asm( or apps */
 #pragma data icon 0x18,0x3C,0x3C,0xBC,0x7C,0x7C,0x3C,0x38;
