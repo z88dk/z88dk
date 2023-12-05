@@ -36,6 +36,7 @@ the real meaning of each written byte/word but only checked some of them).
 */
 
 #include "appmake.h"
+#include <ctype.h>
 
 #if !defined(__MSDOS__) && !defined(__TURBOC__)
 #ifndef _WIN32
@@ -116,9 +117,23 @@ void genname(const char *fname, char *name)
     else
         *c = 0;
     c = str - 1;
+
+    char has_warned_of_spaces = 0;
+    char has_warned_of_number = 0;
     do {
         c++;
         *c = toupper(*c);
+        
+        // Warnings of bad ideas in variable names
+        if (*c == ' ' && !has_warned_of_spaces){
+            has_warned_of_spaces=1;
+            fprintf(stderr, "Warning: Use of spaces in the variable name is not certain to work on all calculators!\n");
+        }
+        if (*c >= '0' && *c <= '9' && !has_warned_of_number){
+            has_warned_of_number=1;
+            fprintf(stderr, "Warning: Use of numbers in the variable name is not certain to work on all calculators!\n");
+        }
+
         if (!isalnum(*c))
             *c = 0;
     } while (*c != 0);
