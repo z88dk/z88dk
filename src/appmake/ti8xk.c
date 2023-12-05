@@ -694,7 +694,7 @@ int ti8xk_exec(char *target)
         return -1;
     }
     if (field_sz > 8)
-        printf("Warning: Appname is greater than 8 in length.\n");
+        printf("Warning: Appname is greater than 8 in length. App validation may fail, and the name may not show up in full on the calculator.\n");
     
     int lsize =  (field_sz >= 8) ? field_sz : 8;
     app_name = calloc(1, lsize+1); // Another small memory leak. 

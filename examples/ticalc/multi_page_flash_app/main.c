@@ -11,7 +11,7 @@ int main(){
 
 	// Adding a number to '0' is a quick way to get the ascii for a single diget number as text
 	putchar('0'+ add_three_numbers_(1, 2, 3));
-	puts("1+2+1:");
+	puts("\n1+2+1:");
 	putchar('0'+ add_plus_1_(1, 2));
 	
 
