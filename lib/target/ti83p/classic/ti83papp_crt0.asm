@@ -158,11 +158,11 @@ IF (startup=0 || startup=1)
 	IF DEFINED_MULTI_PAGE_CALLS
 	END_OF_HEADER:
 		; Pad Header until it is divisable by 8
-		defc header_length = END_OF_HEADER-HEADER_START
-		IF header_length%3 == 2
+		defc header_mod = (END_OF_HEADER-HEADER_START)%3
+		IF header_mod = 2
 			DEFB 0
 		ENDIF
-		IF header_length%3 == 1
+		IF header_mod = 1
 			DEFB 0
 			DEFB 0
 		ENDIF
