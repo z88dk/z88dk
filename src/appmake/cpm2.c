@@ -658,7 +658,7 @@ static disc_spec kaypro4_spec = {
 // a valid boot track on side 0 should have SKEW4,
 // ..on side 1 SKEW8, 16 tracks x 256 sectors
 static disc_spec mz800_spec = {
-    .name = "Sharp MZ80",
+    .name = "Sharp MZ800",
     .disk_mode = MFM250,
     .sectors_per_track = 8,
     .tracks = 40,
@@ -670,7 +670,35 @@ static disc_spec mz800_spec = {
     .directory_entries = 64,
     .extent_size = 2048,
     .byte_size_extents = 1,
-    .first_sector_offset = 1
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 4, 1, 5, 2, 6, 3, 7 }
+};
+
+
+// Sharp MZ-80A and MZ-80B
+static disc_spec mz80_spec = {
+    .name = "Sharp MZ80",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 35,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+	.xor_data = 0xff,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 },
+	.inverted_sides = 1,
+	.side2_sector_numbering = 1
 };
 
 
@@ -1808,6 +1836,7 @@ static struct formats {
     { "nabupc",    "Nabu PC",               &nabupc_spec, 0, NULL, 1 },
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
     { "nshd8",     "Northstar Virtual 8",   &nshd8_spec, 0, NULL, 1 },
+    { "mz80",      "Sharp MZ80A/80B",       &mz80_spec, 0, NULL, 1 },
     { "mz800",     "Sharp MZ800",           &mz800_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
