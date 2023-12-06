@@ -62,9 +62,6 @@ option_t tixx_options[] = {
 
 enum EXT { E_82P, E_83P, E_8XP, E_85S, E_86P, E_86S };
 
-// const unsigned char trailer83[] = { 0x3f, 0xd4, 0x3f, 0x30, 0x30, 0x30, 0x30, 0x3f, 0xd4 };
-
-
 
 void cfwritebyte(int i, FILE *fp, unsigned short *chk)
 {
