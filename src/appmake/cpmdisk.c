@@ -103,12 +103,9 @@ void disc_write_sector_lba(disc_handle *h, int sector_nr, int count, const void 
         int sector = sector_nr % h->spec.sectors_per_track;
         int head;
 
-        if ( h->spec.alternate_sides == 0 ) {
             head = track % 2;
                    track /= 2;
-            } else {
-                   head = track >= h->spec.tracks ? 1 : 0;
-        }
+
         disc_write_sector(h, track, sector, head, ptr);
         sector_nr++;
         ptr += h->spec.sector_size;
@@ -121,9 +118,9 @@ void disc_write_sector(disc_handle *h, int track, int sector, int head, const vo
     size_t track_length = h->spec.sectors_per_track * h->spec.sector_size;
 
     if ( h->spec.alternate_sides == 0 ) {
-        offset = track_length * track + (head * track_length * h->spec.tracks);
+        offset = track_length * track + ((h->spec.inverted_sides ^ head) * track_length * h->spec.tracks);
     } else {
-        offset = track_length * ( 2* track + head);
+        offset = track_length * ( 2* track + (h->spec.inverted_sides ^ head));
     }
 
     offset += sector * h->spec.sector_size;
@@ -140,12 +137,9 @@ void disc_read_sector_lba(disc_handle *h, int sector_nr, int count, void *data)
         int sector = sector_nr % h->spec.sectors_per_track;
         int head;
 
-        if ( h->spec.alternate_sides == 0 ) {
             head = track % 2;
                    track /= 2;
-            } else {
-                   head = track >= h->spec.tracks ? 1 : 0;
-        }
+
         disc_read_sector(h, track, sector, head, ptr);
         sector_nr++;
         ptr += h->spec.sector_size;
@@ -158,9 +152,9 @@ void disc_read_sector(disc_handle *h, int track, int sector, int head, void *dat
     size_t track_length = h->spec.sectors_per_track * h->spec.sector_size;
 
     if ( h->spec.alternate_sides == 0 ) {
-        offset = track_length * track + (head * track_length * h->spec.tracks);
+        offset = track_length * track + ((h->spec.inverted_sides ^ head) * track_length * h->spec.tracks);
     } else {
-        offset = track_length * ( 2* track + head);
+        offset = track_length * ( 2* track + (h->spec.inverted_sides ^ head));
     }
 
     offset += sector * h->spec.sector_size;
@@ -267,9 +261,9 @@ int disc_write_raw(disc_handle* h, const char* filename)
     for (i = 0; i < h->spec.tracks; i++) {
         for (s = 0; s < h->spec.sides; s++) {
             if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + (s * track_length * h->spec.tracks);
+                offs = track_length * i + ((h->spec.inverted_sides ^ s) * track_length * h->spec.tracks);
             } else {
-                offs = track_length * ( 2* i + s);
+                offs = track_length * ( 2* i + (h->spec.inverted_sides ^ s));
             }
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                  xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
@@ -317,9 +311,9 @@ int disc_write_edsk(disc_handle* h, const char* filename)
             uint8_t* ptr;
 
             if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + (s * track_length * h->spec.tracks);
+                offs = track_length * i + ((h->spec.inverted_sides ^ s) * track_length * h->spec.tracks);
             } else {
-                offs = track_length * ( 2* i + s);
+                offs = track_length * ( 2* i + (h->spec.inverted_sides ^ s));
             }
             memset(header, 0, 256);
             memcpy(header, "Track-Info\r\n", 12);
@@ -336,11 +330,11 @@ int disc_write_edsk(disc_handle* h, const char* filename)
 
                 // Implementing SKEW is not necessary (tested on MAME)
 				// side2_sector_numbering option tested on MAME (Kaypro4)
-				if ( (! h->spec.side2_sector_numbering) || (! s) ) {
+				if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) ) {
 					if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
-						*ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
+						*ptr++ = skew_sector(h, j, i) + h->spec.boot_tracks_sector_offset; // Sector ID
 					} else {
-						*ptr++ = j + h->spec.first_sector_offset; // Sector ID
+						*ptr++ = skew_sector(h, j, i) + h->spec.first_sector_offset; // Sector ID
 					}
 				} else {
 					if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
@@ -426,17 +420,18 @@ int disc_write_d88(disc_handle* h, const char* filename)
         for (s = 0; s < h->spec.sides; s++) {
 
             if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + (s * track_length * h->spec.tracks);
+                offs = track_length * i + ((h->spec.inverted_sides ^ s) * track_length * h->spec.tracks);
             } else {
-                offs = track_length * (2*i + s);
+                offs = track_length * ( 2* i + (h->spec.inverted_sides ^ s));
             }
+
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                  uint8_t *ptr = header;
 
                  *ptr++ = i;                //track
                  *ptr++ = s;                //head
 
-                 if ( (! h->spec.side2_sector_numbering) || (! s) )
+                 if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
                     *ptr++ =  skew_sector(h, j, i) + h->spec.first_sector_offset;       //sector
                  else
                     *ptr++ =  skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ;   //sector (2nd side)
@@ -488,9 +483,9 @@ int disc_write_anadisk(disc_handle* h, const char* filename)
         for (s = 0; s < h->spec.sides; s++) {
 
             if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + (s * track_length * h->spec.tracks);
+                offs = track_length * i + ((h->spec.inverted_sides ^ s) * track_length * h->spec.tracks);
             } else {
-                offs = track_length * ( 2* i + s);
+                offs = track_length * ( 2* i + (h->spec.inverted_sides ^ s));
             }
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                 uint8_t header[8] = { 0 };
@@ -583,9 +578,9 @@ int disc_write_imd(disc_handle* h, const char* filename)
 
             // And now write each sector - we don't do compression and all sectors are good
             if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + (s * track_length * h->spec.tracks);
+                offs = track_length * i + ((h->spec.inverted_sides ^ s) * track_length * h->spec.tracks);
             } else {
-                offs = track_length * ( 2* i + s);
+                offs = track_length * ( 2* i + (h->spec.inverted_sides ^ s));
             }
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                 fputc(1, fp);   // Sector type 1  = has data
