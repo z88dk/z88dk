@@ -3,7 +3,7 @@
 # Note: just building hello worlds
 
 
-all: world82.82p world83.83p world83.8xk world83.8xp world85.85s world86.86p
+all: world.82p world.83p world.8xk world.8xp world.85s world.86p
 
 clean:
 	$(RM) build/*.8xp build/*.bin build/*.8xk build/*.82p build/*.83p build/*.85s build/*.86p
