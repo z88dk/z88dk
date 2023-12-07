@@ -328,19 +328,36 @@ int disc_write_edsk(disc_handle* h, const char* filename)
                 *ptr++ = i; // Track
                 *ptr++ = s; // Side
 
-                // Implementing SKEW is not necessary (tested on MAME)
 				// side2_sector_numbering option tested on MAME (Kaypro4)
-				if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) ) {
-					if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
-						*ptr++ = skew_sector(h, j, i) + h->spec.boot_tracks_sector_offset; // Sector ID
+				if ( h->spec.side2_sector_numbering || h->spec.inverted_sides ) {
+					// SKEW table introduced to support the Sharp MZ80A, MZ80B..
+					if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) ) {
+						if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+							*ptr++ = skew_sector(h, j, i) + h->spec.boot_tracks_sector_offset; // Sector ID
+						} else {
+							*ptr++ = skew_sector(h, j, i) + h->spec.first_sector_offset; // Sector ID
+						}
 					} else {
-						*ptr++ = skew_sector(h, j, i) + h->spec.first_sector_offset; // Sector ID
+						if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+							*ptr++ = skew_sector(h, j, i) + h->spec.boot_tracks_sector_offset + h->spec.sectors_per_track; // Sector ID
+						} else {
+							*ptr++ = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ; // Sector ID
+						}
 					}
 				} else {
-					if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
-						*ptr++ = skew_sector(h, j, i) + h->spec.boot_tracks_sector_offset + h->spec.sectors_per_track; // Sector ID
+					// Usually implementing SKEW is not necessary (tested on MAME)
+					if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) ) {
+						if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+							*ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
+						} else {
+							*ptr++ = j + h->spec.first_sector_offset; // Sector ID
+						}
 					} else {
-						*ptr++ = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ; // Sector ID
+						if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+							*ptr++ = j + h->spec.boot_tracks_sector_offset + h->spec.sectors_per_track; // Sector ID
+						} else {
+							*ptr++ = j + h->spec.first_sector_offset + h->spec.sectors_per_track ; // Sector ID
+						}
 					}
 				}
 
@@ -566,12 +583,27 @@ int disc_write_imd(disc_handle* h, const char* filename)
             *ptr++ = sector_size; // Size of sector
 
             // Write sector map
+			// "If ImageDisk is unable to obtain all sector numbers in a single revolution of the disk, it will report 
+			// 'Unable to determine interleave' and rearrange the sector numbers into a simple sequential list."
+			// In most of the situations the sequential map is the best choice, but on the MZ80A/MZ80B which are
+			// currently the only case with the disk sides swapped.
+            // At the moment we use "spec.inverted_sides" to trigger an accurete skew map.
+
+			if (h->spec.inverted_sides) {
 				for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
-					if ( (! h->spec.side2_sector_numbering) || (! s) )
+					if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
+						*ptr++ = skew_sector(h, j, 99)  +  h->spec.first_sector_offset;
+					else
+						*ptr++ = skew_sector(h, j, 99)  +  h->spec.first_sector_offset + h->spec.sectors_per_track;
+				}
+			} else {
+				for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
+					if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
 						*ptr++ = j  +  h->spec.first_sector_offset;
 					else
 						*ptr++ = j  +  h->spec.first_sector_offset + h->spec.sectors_per_track;
 				}
+			}
 
             // And write the header
             fwrite(buffer, ptr - buffer, 1, fp);
