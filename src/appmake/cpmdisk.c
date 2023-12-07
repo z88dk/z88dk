@@ -566,12 +566,27 @@ int disc_write_imd(disc_handle* h, const char* filename)
             *ptr++ = sector_size; // Size of sector
 
             // Write sector map
+			// "If ImageDisk is unable to obtain all sector numbers in a single revolution of the disk, it will report 
+			// 'Unable to determine interleave' and rearrange the sector numbers into a simple sequential list."
+			// In most of the situations the sequential map is the best choice, but on the MZ80A/MZ80B which are
+			// currently the only case with the disk sides swapped.
+            // At the moment we use "spec.inverted_sides" to trigger an accurete skew map.
+
+			if (h->spec.inverted_sides) {
 				for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
-					if ( (! h->spec.side2_sector_numbering) || (! s) )
+					if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
+						*ptr++ = skew_sector(h, j, 99)  +  h->spec.first_sector_offset;
+					else
+						*ptr++ = skew_sector(h, j, 99)  +  h->spec.first_sector_offset + h->spec.sectors_per_track;
+				}
+			} else {
+				for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
+					if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
 						*ptr++ = j  +  h->spec.first_sector_offset;
 					else
 						*ptr++ = j  +  h->spec.first_sector_offset + h->spec.sectors_per_track;
 				}
+			}
 
             // And write the header
             fwrite(buffer, ptr - buffer, 1, fp);
