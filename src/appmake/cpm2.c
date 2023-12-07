@@ -388,8 +388,11 @@ static disc_spec pcw80_spec = {
 };
 
 
+// Microbee 3.5" Modular DS80
+// approximated (wrong sector numbering on boot tracks)
 static disc_spec microbee_spec = {
     .name = "Microbee",
+    .disk_mode = MFM250,
     .sectors_per_track = 10,
     .tracks = 80,
     .sides = 2,
@@ -400,11 +403,10 @@ static disc_spec microbee_spec = {
     .directory_entries = 128,
     .extent_size = 4096,
     .byte_size_extents = 1,
-    .first_sector_offset = 0x15,
-    .boot_tracks_sector_offset = 1,
+    .first_sector_offset = 0x15,    // <- yet another oddity
     .alternate_sides = 1,
     .has_skew = 1,
-    .skew_track_start = 5,
+    .skew_track_start = 2,
     .skew_tab = { 1, 4, 7, 0, 3, 6, 9, 2, 5, 8 }
 };
 
