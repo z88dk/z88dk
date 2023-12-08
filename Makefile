@@ -270,3 +270,8 @@ examples-clean:
 	$(MAKE) -C examples clean
 
 .PHONY: test testsuite
+
+.PHONY: snap
+
+snap: snap/snacraft.yaml
+	snapcraft --use-lxd
