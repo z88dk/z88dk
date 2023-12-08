@@ -271,7 +271,15 @@ examples-clean:
 
 .PHONY: test testsuite
 
+
 .PHONY: snap
 
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	SNAP_OPTS=
+else 
+	SNAP_OPTS= --use-lxd
+endif
+
 snap: snap/snapcraft.yaml
-	snapcraft --use-lxd
+	snapcraft $(SNAP_OPTS)
