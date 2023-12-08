@@ -273,5 +273,5 @@ examples-clean:
 
 .PHONY: snap
 
-snap: snap/snacraft.yaml
+snap: snap/snapcraft.yaml
 	snapcraft --use-lxd
