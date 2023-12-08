@@ -82,7 +82,7 @@ DESTDIR=/usr/local
 
 builddir=$(pwd)
 ZCCCFG=$builddir/lib/config
-PATH=$builddir/bin:$PATH
+PATH="$builddir/bin:$PATH"
 export ZCCCFG
 export PATH
 
@@ -174,8 +174,8 @@ fi
 
 path=`pwd`/bin                          # Add bin directory to path if it's not already there
 mkdir -p $path                          # Guarantee that the directory exists
-if [ $PATH != *$path* ]; then
-  PATH=$path:$PATH
+if [ "$PATH" != *$path* ]; then
+  PATH="$path:$PATH"
   export PATH
 fi
 
