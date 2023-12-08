@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\ext\Unity\src\unity.c" />
     <ClCompile Include="..\..\src\common\t\test.c" />
+    <ClCompile Include="..\..\src\common\t\t_stack_trace.c" />
     <ClCompile Include="..\..\src\common\t\t_strpool.c" />
     <ClCompile Include="..\..\src\common\t\t_strtable.c" />
     <ClCompile Include="..\..\src\common\t\t_xassert.c" />
@@ -143,13 +144,13 @@
     <ClCompile Include="..\..\src\common\t\t_xmalloc.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\common\t\test1.hh" />
+    <ClInclude Include="..\..\src\common\t\test2.hh" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\common\common.vcxproj">
       <Project>{d7bc7a18-5bc5-4543-9f93-87a055319826}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\common\t\test1.hh" />
-    <ClInclude Include="..\..\src\common\t\test2.hh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

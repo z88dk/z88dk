@@ -14,7 +14,7 @@ CXX			?= g++
 INSTALL 	?= install
 RE2C		= re2c -W --tags --no-debug-info --no-generation-date 
 
-OPT 		= -O3
+OPT 		= -O3 -ggdb
 #OPT		= -g -Wextra 
 
 COMMON_FLAGS = -MMD -Wall $(OPT) \
@@ -34,7 +34,15 @@ ifeq ($(findstring m68k, $(CC)), m68k)
 endif
 
 # link boost::filesystem if needed
-LDFLAGS 	+= $(shell perl build_ldflags.pl $(CXX) $(CROSS))
+LDFLAGS 	+= $(shell perl build_ldflags.pl $(CXX) $(CROSS)) 
+
+# needed for stack_trace
+UNAME = $(shell uname)
+ifeq ($(UNAME), Linux)
+ifeq ($(CROSS), 0)
+LDFLAGS 	+= -rdynamic
+endif
+endif
 
 #------------------------------------------------------------------------------
 # Object files

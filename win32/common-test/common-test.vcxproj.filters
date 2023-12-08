@@ -48,6 +48,9 @@
     <ClCompile Include="..\..\src\common\t\t_strpool.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\t\t_stack_trace.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\common\t\test1.hh">

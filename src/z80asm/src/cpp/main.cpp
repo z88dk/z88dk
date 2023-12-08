@@ -6,6 +6,7 @@
 
 #include "args.h"
 #include "if.h"
+#include "stack_trace.h"
 #include "xassert.h"
 #include "xmalloc.h"
 #include <string>
@@ -13,6 +14,7 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
+	dump_stack_on_sigsegv();
     xassert_init(argv[0]);
     xmalloc_init(argv[0]);
 
