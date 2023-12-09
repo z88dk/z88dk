@@ -16,9 +16,6 @@ extern "C" {
 #include "utstring.h"
 #include "z80asm_defs.h"
 #include "strtable.h"
-//#include "uthash.h"
-//#include "utarray.h"
-//#include <stdbool.h>
 #include <stdio.h>
 
 #define MIN_VERSION				1

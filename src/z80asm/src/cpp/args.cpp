@@ -920,7 +920,7 @@ void Args::parse_env_vars() {
 void Args::set_consol_obj_options() {
 	if (!m_make_bin && !m_bin_file.empty()) {
 		m_consol_obj_file = m_bin_file;
-		m_make_bin = false;
+		m_bin_file.clear();
 	}
 }
 

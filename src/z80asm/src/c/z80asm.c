@@ -61,7 +61,7 @@ void assemble_file( const char *filename ) {
 	// when building libraries need to reset codearea to allow total library size > 64K
 	// when building binary cannot reset codearea so that each module is linked
 	// after the previous one, allocating addresses
-	if (!(option_make_bin() || option_bin_file()))
+	if (!(option_make_bin() || option_bin_file() || option_consol_obj_file()))
 		reset_codearea();
 
 	// Create module data structures for new file
