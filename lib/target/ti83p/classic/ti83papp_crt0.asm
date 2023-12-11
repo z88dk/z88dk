@@ -156,8 +156,16 @@ IF (startup=0 || startup=1)
 
 
 	IF DEFINED_MULTI_PAGE_CALLS
-		
-		DEFB 0 ; Branch table must begin with multiple of 3
+	END_OF_HEADER:
+		; Pad Header until it is divisable by 3
+		defc header_mod = (END_OF_HEADER-HEADER_START)%3
+		IF header_mod = 2
+			DEFB 0
+		ENDIF
+		IF header_mod = 1
+			DEFB 0
+			DEFB 0
+		ENDIF
 
 	start_branch_table:
 

@@ -1,4 +1,4 @@
-/** It should be notes that is is for compling FLASH APPS not ram programs.
+/** It should be notes that this is for compiling FLASH APPS not ram programs.
  *  For ram programs see tixx.c
  *
  *  This file originally made by HeronErin. (github.com/HeronErin)
