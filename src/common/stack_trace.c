@@ -28,10 +28,10 @@ void dump_stack(void) {
 }
 
 #ifdef __linux__
-static void signal_handler(int sig, siginfo_t *si, void *) {
+static void signal_handler(int sig, siginfo_t *si, void *ignore) {
     fprintf(stderr, "Got SIGSEGV=%d at address: 0x%lx\n", sig, (long)si->si_addr);
     dump_stack();
-	exit(EXIT_FAILURE);
+    exit(EXIT_FAILURE);
 }
 #endif
 
