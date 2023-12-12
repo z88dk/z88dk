@@ -1448,6 +1448,29 @@ static disc_spec alphatro_spec = {
 };
 
 
+// "FOX OS" for the SAGA FOX
+// (Torino - Italy)
+static disc_spec sagafox_spec = {
+    .name = "SAGA FOX",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 35,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 },
+	.xor_data = 0xff
+};
+
+
 // Seequa Chameleon
 static disc_spec seequa_spec = {
     .name = "Seequa Chameleon",
@@ -1856,6 +1879,7 @@ static struct formats {
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
     { "rainbow",   "DEC Rainbow 100",       &rainbow_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
+    { "sagafox",   "SAGA FOX OS",           &sagafox_spec, 0, NULL, 1 },
     { "seequa",    "Seequa Chameleon (SS)", &seequa_spec, 0, NULL, 1 },
     { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
