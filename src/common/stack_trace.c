@@ -11,15 +11,18 @@
 #include <stdlib.h>
 
 #ifdef __linux__
+#ifdef __GLIBC__
+#define DO_STACKTRACE 
 #include <execinfo.h>
 #include <signal.h>
 #include <unistd.h>
+#endif
 #endif
 
 #define MAX_STACK_DEPTH 100
 
 void dump_stack(void) {
-#ifdef __linux__
+#ifdef DO_STACKTRACE
     void *buffer[MAX_STACK_DEPTH] = {0};
 	int nptrs = backtrace(buffer, MAX_STACK_DEPTH);
 	fprintf(stderr, "backtrace() returned %d addresses:\n", nptrs);
@@ -27,7 +30,7 @@ void dump_stack(void) {
 #endif
 }
 
-#ifdef __linux__
+#ifdef DO_STACKTRACE
 static void signal_handler(int sig, siginfo_t *si, void *ignore) {
     fprintf(stderr, "Got SIGSEGV=%d at address: 0x%lx\n", sig, (long)si->si_addr);
     dump_stack();
@@ -36,7 +39,7 @@ static void signal_handler(int sig, siginfo_t *si, void *ignore) {
 #endif
 
 void dump_stack_on_sigsegv(void) {
-#ifdef __linux__
+#ifdef DO_STACKTRACE
     static bool inited = false;
     if (!inited) {          // setup signal handler
         struct sigaction sa;
