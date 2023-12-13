@@ -64,6 +64,10 @@ void strtable_clear(void* st_) {
 }
 
 uint_t strtable_add_string(void* st_, const char* str) {
+	xassert(st_);
+	xassert(str);
+	xassert(strlen(str)>=0);
+	
     strtable_t* st = st_;
     strtable_item_t* found;
     HASH_FIND_STR(st->strs_hash, str, found);
