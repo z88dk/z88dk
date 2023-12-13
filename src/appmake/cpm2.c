@@ -1558,6 +1558,26 @@ static disc_spec v1050_spec = {
 };
 
 
+// Cortex CW/P, close to the Visual 1050
+// definition taken from ALIENC.COM (MicroBee tool)
+// and compared to V1050 
+static disc_spec cortex_spec = {
+    .name = "Cortex",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
 // Heath H89/Zenith Z89 SSSD (H17 disk unit)
 // H77/Z-77 or H87/Z-87 drives with soft-sectored controller
 static disc_spec hz17_spec = {
@@ -1901,6 +1921,7 @@ static struct formats {
     { "m4cpm3",    "TRS80 4 CP/M Plus",     &trs80_cpm3_spec, 0, NULL, 1 },
     { "vector06c", "Vector 06c",            &vector06c_spec, 0, NULL, 1 },
     { "v1050",     "Visual 1050",           &v1050_spec, 0, NULL, 1 },
+    { "cortex",    "Cortex CW/P",           &cortex_spec, 0, NULL, 1 },
     { "vt180",     "DEC VT-180",            &vt180_spec, 0, NULL, 1 },
     { "x820",      "Xerox 820",             &x820_spec, 0, NULL, 1 },
     { "hz89",      "Zenith Z89, Z17-SSSD",  &hz17_spec, 0, NULL, 1 },
