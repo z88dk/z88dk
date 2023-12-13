@@ -60,6 +60,8 @@ public:
 	void pop_library_path() { pop_path(m_library_path); }
 	string search_library_path(const string& file) { return search_path(m_library_path, file); }
 
+    bool debug_z80asm() const { return m_debug_z80asm; }
+
 	// file names
 	string asm_filename(const string& filename);
 	string lis_filename(const string& filename);
@@ -103,6 +105,7 @@ private:
 	vector<string>	m_include_path;				// -I option
 	vector<string>	m_library_path;				// -L option
 	vector<string>	m_files;					// command line files
+    bool            m_debug_z80asm{ false };    // -vv
 
 	// parsing
 	void parse_option(const string& arg);

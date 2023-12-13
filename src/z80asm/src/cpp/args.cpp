@@ -269,6 +269,12 @@ string Args::reloc_filename(const string& bin_filename) {
 void Args::parse_option(const string& arg) {
 	string opt_arg;
 
+    if (arg == "-vv") {
+        m_debug_z80asm = true;
+        m_verbose = true;
+        return;
+    }
+
 #define OPT(opt_name, opt_param, opt_code, opt_help)					\
 	if (opt_param == nullptr && string(opt_name) == arg) {				\
 		opt_code;														\
@@ -1228,4 +1234,8 @@ size_t option_files_size() {
 
 const char* option_file(size_t n) {
 	return spool_add(g_args.files().at(n).c_str());
+}
+
+bool option_debug_z80asm() {
+    return g_args.debug_z80asm();
 }

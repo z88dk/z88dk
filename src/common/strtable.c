@@ -43,6 +43,12 @@ static void strtable_clear_all(void* st_) {
     utarray_clear(st->strs_list);
 }
 
+void strtable_clear(void* st_) {
+    strtable_t* st = st_;
+    strtable_clear_all(st);
+    strtable_add_string(st, "");          // empty string is id 0
+}
+
 void* strtable_new(void) {
     strtable_t* st = xnew(strtable_t);
     utarray_new(st->strs_list, &ut_ptr_icd);
@@ -57,22 +63,30 @@ void strtable_free_(void* st_) {
     xfree(st);
 }
 
-void strtable_clear(void* st_) {
-    strtable_t* st = st_;
-    strtable_clear_all(st);
-    strtable_add_string(st, "");          // empty string is id 0
+static bool option_debug_z80asm() {
+    const char* envp = getenv("Z80ASM");
+    if (envp != NULL && strstr(envp, "-vv") != NULL)
+        return true;
+    else
+        return false;
 }
 
 uint_t strtable_add_string(void* st_, const char* str) {
-	xassert(st_);
-	xassert(str);
-	xassert(strlen(str)>=0);
-	
     strtable_t* st = st_;
+    if (option_debug_z80asm()) {
+        printf("strtable_add_string(\"%s\") - string table count %d=%d\n",
+            str, (int)utarray_len(st->strs_list), (int)HASH_COUNT(st->strs_hash));
+    }
+	
     strtable_item_t* found;
     HASH_FIND_STR(st->strs_hash, str, found);
-    if (found)
+    if (found) {
+        if (option_debug_z80asm()) {
+            printf("- string already in table, id=%d\n", found->id);
+        }
+
         return found->id;
+    }
     else {
         // create new item
         strtable_item_t* elem = xnew(strtable_item_t);
@@ -84,6 +98,10 @@ uint_t strtable_add_string(void* st_, const char* str) {
 
         // add to string list
         utarray_push_back(st->strs_list, &elem);
+
+        if (option_debug_z80asm()) {
+            printf("- string added to table, id=%d\n", elem->id);
+        }
 
         return elem->id;
     }

@@ -161,6 +161,7 @@ bool option_consol_obj_file();
 const char* option_consol_obj_file_name();
 size_t option_files_size();
 const char* option_file(size_t n);
+bool option_debug_z80asm();
 
 // filesystem
 const char* path_parent_dir(const char* filename);
