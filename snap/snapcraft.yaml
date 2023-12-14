@@ -30,7 +30,8 @@ parts:
       - BUILD_SDCC: "1"
       - BUILD_SDCC_HTTP: "1"
     override-build: |
-      cpanm -n -L $SNAPCRAFT_PART_INSTALL Path::Tiny App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
+      eval $(perl -I $SNAPCRAFT_PART_INSTALL/perl5/lib/perl5/ -Mlocal::lib=$SNAPCRAFT_PART_INSTALL/perl5)
+      cpanm -n Path::Tiny App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
       make -C src/z80asm test
       ./build.sh -t -e -i $SNAP
       make DESTDIR=$SNAPCRAFT_PART_INSTALL PREFIX= install
