@@ -14,8 +14,8 @@ CXX			?= g++
 INSTALL 	?= install
 RE2C		= re2c -W --tags --no-debug-info --no-generation-date 
 
-OPT 		= -O3 -ggdb
-#OPT		= -g -Wextra 
+OPT 		= -O0 -ggdb
+#OPT		= -O3 -g -Wextra 
 
 COMMON_FLAGS = -MMD -Wall $(OPT) \
 			-I. -Isrc -I../common
