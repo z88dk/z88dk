@@ -190,12 +190,12 @@ void* strtable_parse(const byte_t* mem) {
     strtable_t* st = strtable_new();
 
     const byte_t* p = mem;
-    uint_t num_strings = parse_int(p); p += sizeof(int32_t);
+    uint_t num_strings = parse_le_int32(p); p += sizeof(int32_t);
     p += sizeof(int32_t);   // string size
 
     const char* strings = (const char*)p + num_strings * sizeof(int32_t);
     for (uint_t id = 0; id < num_strings; id++) {
-        uint_t pos = parse_int(p); p += sizeof(int32_t);
+        uint_t pos = parse_le_int32(p); p += sizeof(int32_t);
         const char* str = strings + pos;
         xassert(id == strtable_add_string(st, str));
     }
