@@ -1083,6 +1083,23 @@ static disc_spec trs80_cpm3_spec = {
     .first_sector_offset = 1,
 };
 
+// Lobo MAX-80 CP/M 3 5.25" SSDD (TRS-80 clone)
+static disc_spec lobo_spec = {
+    .name = "MAX80",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .sides = 1,
+    .tracks = 40,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+};
+
 // LNW-80 (TRS80 clone)
 static disc_spec lnw80_spec = {
     .name = "LNW 80",
@@ -1867,8 +1884,9 @@ static struct formats {
     { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "kaypro4",   "Kaypro 4/10",           &kaypro4_spec,  0, NULL, 1 },
-    { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
+    { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
+	{ "max80cpm3", "Lobo MAX-80 CPM3 SS",   &lobo_spec, 0, NULL, 1 },
     { "microbee-ds40",  "Microbee DS40",    &microbee40_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
     { "micromate", "PMC-101 MicroMate",     &pmc101_spec, 0, NULL, 1 },
