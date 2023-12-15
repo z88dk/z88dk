@@ -63,28 +63,11 @@ void strtable_free_(void* st_) {
     xfree(st);
 }
 
-static bool option_debug_z80asm() {
-    const char* envp = getenv("Z80ASM");
-    if (envp != NULL && strstr(envp, "-vv") != NULL)
-        return true;
-    else
-        return false;
-}
-
 uint_t strtable_add_string(void* st_, const char* str) {
     strtable_t* st = st_;
-    if (option_debug_z80asm()) {
-        printf("strtable_add_string(\"%s\") - string table count %d=%d\n",
-            str, (int)utarray_len(st->strs_list), (int)HASH_COUNT(st->strs_hash));
-    }
-	
     strtable_item_t* found;
     HASH_FIND_STR(st->strs_hash, str, found);
     if (found) {
-        if (option_debug_z80asm()) {
-            printf("- string already in table, id=%d\n", found->id);
-        }
-
         return found->id;
     }
     else {
@@ -98,10 +81,6 @@ uint_t strtable_add_string(void* st_, const char* str) {
 
         // add to string list
         utarray_push_back(st->strs_list, &elem);
-
-        if (option_debug_z80asm()) {
-            printf("- string added to table, id=%d\n", elem->id);
-        }
 
         return elem->id;
     }
@@ -207,18 +186,16 @@ void* strtable_fread(FILE* fp) {
     return st;
 }
 
-
 void* strtable_parse(const byte_t* mem) {
     strtable_t* st = strtable_new();
 
-    bool little_endian = is_little_endian();
+    const byte_t* p = mem;
+    uint_t num_strings = parse_int(p); p += sizeof(int32_t);
+    p += sizeof(int32_t);   // string size
 
-    const uint_t* ptrs = (uint_t*)mem;
-    uint_t num_strings = little_endian ? ptrs[0] : int32_swap_bytes(ptrs[0]);
-
-    const char* strings = (const char*)mem + (2 + num_strings) * sizeof(int32_t);
+    const char* strings = (const char*)p + num_strings * sizeof(int32_t);
     for (uint_t id = 0; id < num_strings; id++) {
-        uint_t pos = little_endian ? ptrs[2 + id] : int32_swap_bytes(ptrs[2 + id]);
+        uint_t pos = parse_int(p); p += sizeof(int32_t);
         const char* str = strings + pos;
         xassert(id == strtable_add_string(st, str));
     }

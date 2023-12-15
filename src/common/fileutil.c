@@ -748,13 +748,22 @@ bool is_little_endian(void) {
         return false;
 }
 
-int32_t int32_swap_bytes(int32_t data) {
-    const byte_t* p = (const byte_t*)&data;
-    int32_t value =
-        ((p[0] << 24) & 0xFF000000L) |
-        ((p[1] << 16) & 0x00FF0000L) |
-        ((p[2] << 8) & 0x0000FF00L) |
-        ((p[3] << 0) & 0x000000FFL);
+int parse_int(const byte_t* mem) {
+    int value = 0;
+    if (is_little_endian()) {
+        // little endian architecture
+        value = *(int*)mem;
+    }
+    else {
+        // big endian architecture
+        value =
+            ((mem[0] << 0) & 0x000000FFL) |
+            ((mem[1] << 8) & 0x0000FF00L) |
+            ((mem[2] << 16) & 0x00FF0000L) |
+            ((mem[3] << 24) & 0xFF000000L);
+        if (value & 0x80000000L)
+            value |= ~0xFFFFFFFFL;		// sign-extend above bit 31
+    }
     return value;
 }
 

@@ -14,10 +14,10 @@ CXX			?= g++
 INSTALL 	?= install
 RE2C		= re2c -W --tags --no-debug-info --no-generation-date 
 
-OPT 		= -O0 -ggdb
+OPT 		= -O3
 #OPT		= -O3 -g -Wextra 
 
-COMMON_FLAGS = -MMD -Wall $(OPT) \
+COMMON_FLAGS = -MMD -Wall -ggdb $(OPT) \
 			-I. -Isrc -I../common
 
 LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \

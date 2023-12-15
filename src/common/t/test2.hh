@@ -23,7 +23,7 @@ extern void t_fileutil_path_mkdir(void); RUN_TEST(t_fileutil_path_mkdir);
 extern void t_fileutil_path_search(void); RUN_TEST(t_fileutil_path_search);
 extern void t_fileutil_path_find_all(void); RUN_TEST(t_fileutil_path_find_all);
 extern void t_fileutil_path_find_glob(void); RUN_TEST(t_fileutil_path_find_glob);
-extern void t_fileutil_int32_swap_bytes(void); RUN_TEST(t_fileutil_int32_swap_bytes);
+extern void t_fileutil_parse_int(void); RUN_TEST(t_fileutil_parse_int);
 extern void t_strpool_spool_add(void); RUN_TEST(t_strpool_spool_add);
 extern void t_strpool_spool_add_n(void); RUN_TEST(t_strpool_spool_add_n);
 extern void t_strtable_memory(void); RUN_TEST(t_strtable_memory);

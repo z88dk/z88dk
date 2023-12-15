@@ -77,55 +77,40 @@ static void init(void) {
 	}
 }
 
-static int parse_int(obj_file_t* obj) {
+static int parse_obj_file_int(obj_file_t* obj) {
 	xassert(obj->i + sizeof(int32_t) <= obj->size);
-    uint32_t endian = 0x12345678;
-    int value = 0;
-    if (*(char*)&endian == 0x78) {
-        // little endian architecture
-        value = *(int*)&obj->data[obj->i];
-    }
-    else {
-        // big endian architecture
-        value =
-            ((obj->data[obj->i + 0] << 0) & 0x000000FFL) |
-            ((obj->data[obj->i + 1] << 8) & 0x0000FF00L) |
-            ((obj->data[obj->i + 2] << 16) & 0x00FF0000L) |
-            ((obj->data[obj->i + 3] << 24) & 0xFF000000L);
-        if (value & 0x80000000L)
-            value |= ~0xFFFFFFFFL;		// sign-extend above bit 31
-    }
+    int value = parse_int(&obj->data[obj->i]);
 	obj->i += sizeof(int32_t);
 	return value;
 }
 
 static bool goto_modname(obj_file_t* obj) {
 	obj->i = SIGNATURE_SIZE + (2 + 0) * sizeof(int32_t);
-	obj->i = parse_int(obj);
+	obj->i = parse_obj_file_int(obj);
 	return obj->i >= 0;
 }
 
 static bool goto_exprs(obj_file_t* obj) {
 	obj->i = SIGNATURE_SIZE + (2 + 1) * sizeof(int32_t);
-	obj->i = parse_int(obj);
+	obj->i = parse_obj_file_int(obj);
 	return obj->i >= 0;
 }
 
 static bool goto_defined_names(obj_file_t* obj) {
 	obj->i = SIGNATURE_SIZE + (2 + 2) * sizeof(int32_t);
-	obj->i = parse_int(obj);
+	obj->i = parse_obj_file_int(obj);
 	return obj->i >= 0;
 }
 
 static bool goto_external_names(obj_file_t* obj) {
 	obj->i = SIGNATURE_SIZE + (2 + 3) * sizeof(int32_t);
-	obj->i = parse_int(obj);
+	obj->i = parse_obj_file_int(obj);
 	return obj->i >= 0;
 }
 
 static bool goto_code(obj_file_t* obj) {
 	obj->i = SIGNATURE_SIZE + (2 + 4) * sizeof(int32_t);
-	obj->i = parse_int(obj);
+	obj->i = parse_obj_file_int(obj);
 	return obj->i >= 0;
 }
 
@@ -134,7 +119,7 @@ static bool goto_string_table(obj_file_t* obj) {
         obj->i = SIGNATURE_SIZE;
     else
         obj->i = SIGNATURE_SIZE + (2 + 5) * sizeof(int32_t);
-    obj->i = parse_int(obj);
+    obj->i = parse_obj_file_int(obj);
     return obj->i >= 0;
 }
 
@@ -150,7 +135,7 @@ static void parse_string_table(obj_file_t* obj) {
 static const char* parse_st_str(obj_file_t* obj) {
     if (obj->st == NULL)
         parse_string_table(obj);
-    int id = parse_int(obj);
+    int id = parse_obj_file_int(obj);
     return strtable_lookup(obj->st, id);
 }
 
@@ -255,16 +240,16 @@ static void object_file_reserve_space(obj_file_t* obj, Module1* module) {
 
     if (goto_code(obj)) {
         while (true) {
-            int code_size = parse_int(obj);
+            int code_size = parse_obj_file_int(obj);
             if (code_size < 0)
                 break;
 
             // reserve space in section
             const char* section_name = parse_st_str(obj);
             Section1* section = new_section(section_name);
-            int origin = parse_int(obj);
+            int origin = parse_obj_file_int(obj);
             set_origin(origin, section);
-            section->align = parse_int(obj);
+            section->align = parse_obj_file_int(obj);
 
             append_reserve(code_size);
 
@@ -367,19 +352,19 @@ static void set_expr_env(Expr1* expr, bool module_relative_addr)
 
 static void read_cur_module_exprs(Expr1List* exprs, obj_file_t* obj) {
 	while (true) {
-        range_t range = parse_int(obj);
+        range_t range = parse_obj_file_int(obj);
 		if (range == RANGE_UNDEFINED)         // end marker
 			break;			
 
 		// source file name and line number
 		const char* source_filename = parse_st_str(obj);
-		int line_num = parse_int(obj);
+		int line_num = parse_obj_file_int(obj);
 
 		// patch location
 		const char* section_name = parse_st_str(obj);
-		int asmpc = parse_int(obj);
-		int code_pos = parse_int(obj);
-		int opcode_size = parse_int(obj);
+		int asmpc = parse_obj_file_int(obj);
+		int code_pos = parse_obj_file_int(obj);
+		int opcode_size = parse_obj_file_int(obj);
 
 		const char* target_name = parse_st_str(obj);
 		const char* expr_text = parse_st_str(obj);
@@ -796,13 +781,13 @@ static bool pending_syms(StrHash* extern_syms) {
 static bool module_same_cpu(obj_file_t* obj, int fpos) {
     int fpos0 = obj->i;
     obj->i = fpos;
-    cpu_t cpu_id = parse_int(obj);
+    cpu_t cpu_id = parse_obj_file_int(obj);
     if (!cpu_compatible(option_cpu(), cpu_id)) {
         obj->i = fpos0;
         return false;
     }
 
-    swap_ixiy_t swap_ixiy = parse_int(obj);
+    swap_ixiy_t swap_ixiy = parse_obj_file_int(obj);
     if (!ixiy_compatible(option_swap_ixiy(), swap_ixiy)) {
         obj->i = fpos0;
         return false;
@@ -823,7 +808,7 @@ static bool linked_module(obj_file_t* obj, StrHash* extern_syms) {
 	// get defined names
 	if (goto_defined_names(obj)) {
 		while (!linked) {
-            sym_scope_t scope = parse_int(obj);
+            sym_scope_t scope = parse_obj_file_int(obj);
 			if (scope == SCOPE_NONE)
 				break;					// end of list
             obj->i += sizeof(int32_t);  // skip type
@@ -871,8 +856,8 @@ static bool linked_libraries(StrHash* extern_syms) {
         int pos = SIGNATURE_SIZE + sizeof(int32_t);         // skip string table
 		for (; !linked && pos > 0 && pos < lib->size; pos = next_pos) {
 			lib->i = pos;
-			next_pos = parse_int(lib);
-			int module_size = parse_int(lib);
+			next_pos = parse_obj_file_int(lib);
+			int module_size = parse_obj_file_int(lib);
 
 			if (module_size == 0)
 				continue;					// deleted module
@@ -916,16 +901,16 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 	if (goto_code(obj)) {
 		bool first_section = true;
 		while (true) {				// read sections until end marker
-			int code_size = parse_int(obj);
+			int code_size = parse_obj_file_int(obj);
 			if (code_size < 0)		// end marker
 				break;
 
 			// next section
 			const char* section_name = parse_st_str(obj);
 			Section1* section = new_section(section_name);
-			int origin = parse_int(obj);
+			int origin = parse_obj_file_int(obj);
 			set_origin(origin, section);
-			section->align = parse_int(obj);
+			section->align = parse_obj_file_int(obj);
 
 			// if creating relocatable code, ignore origin 
 			if (option_relocatable() && section->origin >= 0) {
@@ -957,16 +942,16 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 	// load defined names
 	if (goto_defined_names(obj)) {
 		while (true) {
-            sym_scope_t scope = parse_int(obj);						// scope of symbol
+            sym_scope_t scope = parse_obj_file_int(obj);			// scope of symbol
 			if (scope == SCOPE_NONE)								// end marker
 				break;
 
-            sym_type_t type = parse_int(obj);				        // type of symbol
+            sym_type_t type = parse_obj_file_int(obj);				// type of symbol
 			const char* section_name = parse_st_str(obj);		    // section
-			int value = parse_int(obj);								// value
+			int value = parse_obj_file_int(obj);					// value
 			const char* name = parse_st_str(obj);				    // symbol name
 			const char* def_filename = parse_st_str(obj);		    // where defined
-			int line_num = parse_int(obj);							// where defined
+			int line_num = parse_obj_file_int(obj);					// where defined
 
 			new_section(section_name);								// define CURRENTSECTION
 
