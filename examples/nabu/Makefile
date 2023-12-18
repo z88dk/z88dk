@@ -29,10 +29,10 @@ EXECFILES = $(CFILES:.c=.NABU)
 
 ifeq ($(COMPILER),sdcc)
    CFLAGS += -compiler=sdcc  -SO3 --max-allocs-per-node200000 --fsigned-char 
-all: ex1.NABU ex1b.NABU ex2.NABU ex3.NABU ex6.NABU ex7.NABU ex10.NABU ex10b.NABU vpoke.NABU vtstone.NABU
+all: ex1.NABU ex1b.NABU ex2.NABU ex3.NABU ex6.NABU ex7.NABU ex10.NABU ex10b.NABU vpoke.NABU vtstone.NABU retronet.NABU inputtest.NABU
 else
    CFLAGS += 
-all: $(EXECFILES) dstar.NABU microman.NABU othello.NABU globe.NABU snakes.NABU vtstone.NABU psgtest.NABU retronet.NABU
+all: $(EXECFILES) dstar.NABU microman.NABU othello.NABU globe.NABU snakes.NABU vtstone.NABU psgtest.NABU retronet.NABU inputtest.NABU
 endif
 
 showlib3d.NABU: ../msx/showlib3d.c
@@ -70,6 +70,9 @@ psgtest.NABU: ../sound/psgtest.c
 
 retronet.NABU: retronet.c
 	$(CC) $(CFLAGS) retronet.c -DNODELAY -create-app -oretronet.bin
+
+inputtest.NABU: inputtest.c
+	$(CC) $(CFLAGS) inputtest.c -DNODELAY -create-app -oinputtest.bin
 
 clean:
 	$(RM) *.obj *.sym *.map *.o* *.bin zcc_opt.def *.reloc *.NABU
