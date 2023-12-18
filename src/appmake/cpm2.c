@@ -1252,6 +1252,27 @@ static disc_spec quorum_spec = {
 };
 
 
+// ICE FELIX HC-91 (ZX Spectrum clones)
+static disc_spec hc91_spec = {
+    .name = "HC-91",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
+};
+
+
 // BBC Micro, Acorn Z80 2nd processor
 static disc_spec bbc_spec = {
     .name = "BBC Micro",
@@ -1913,6 +1934,7 @@ static struct formats {
     { "plus3",     "ZX Spectrum +3 173k",   &plus3_spec, 0, NULL, 1 },
     { "scorpion",  "ZX Scorpion ZS-256",    &scoprpion_spec, 0, NULL, 1 },
     { "atmturbo",  "ZX MicroART ATM Turbo", &atmturbo_spec, 0, NULL, 1 },
+    { "hc91",      "ZX ICE Felix HC-91",    &hc91_spec, 0, NULL, 1 },
     { "quorum",    "ZX Quorum or KLUGCPM",  &quorum_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
     { "rainbow",   "DEC Rainbow 100",       &rainbow_spec, 0, NULL, 1 },
