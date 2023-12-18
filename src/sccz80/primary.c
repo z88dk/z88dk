@@ -538,11 +538,14 @@ void prestep(
     if (heira(lval) == 0) {
         needlval();
     } else {
+        int saved = 0;  // Have we saved a pointer on the stack
+
         if (lval->indirect_kind) {
+            saved = 1;
             addstk(lval);
             gen_save_pointer(lval);
         }
-        rvalue(lval);
+        rvalue(lval);  // Load the parameter
         //intcheck(lval, lval);
         switch (lval->ptr_type) {
         case KIND_LONGLONG:
@@ -568,7 +571,15 @@ void prestep(
             (*step)(lval);
             break;
         }
-        store(lval);
+        if ( saved == 0 ) {
+            // We've not saved a pointer on stack, eg for a global variable
+            Kind save = lval->indirect_kind;
+            lval->indirect_kind = KIND_NONE;
+            store(lval);
+            lval->indirect_kind = save;
+        } else {
+            store(lval);
+        }
     }
 }
 

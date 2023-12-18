@@ -266,3 +266,38 @@
 	add	ix,sp
 =
 	ld	ix,sp
+
+	ld	hl,(sp+%1)
+	push	hl
+	ld	hl,(sp+%2)
+	pop	de
+=
+	ld	de,(sp+%1)
+	ld	hl,(sp+%2)
+
+	pop	de
+	push	de
+	ld	hl,(sp+%1)
+	ex	de,hl
+=
+	ld	hl,(sp+0)
+	ld	de,(sp+%1)
+
+%check 0 <= %1 <= 128
+	push	hl
+	ld	l,%1
+	call	l_gintspsp	;
+	pop	de
+	pop	hl
+=
+	ld	de,(sp+%eval(%1 2 -))
+
+	ld	hl,(sp+%1)
+	ld	d,h
+	ld	e,l
+	add	hl,de
+	pop	de
+=
+	ld	hl,(sp+%1)
+	add	hl,hl
+	pop	de
