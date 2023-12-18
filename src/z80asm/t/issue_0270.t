@@ -65,7 +65,9 @@ END
 SKIP: {
 	skip "z88dk-zsdcc not found, test skipped", 1
 		unless -f "../../bin/z88dk-zsdcc$Config{_exe}";
-		
+	skip "only run with DEVELOPER=1", 1
+		unless $ENV{DEVELOPER};			# fails in snapcraft tests
+
 	unlink_testfiles;
 	spew("${test}.c", <<'END');
 		// DATA

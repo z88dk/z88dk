@@ -114,7 +114,8 @@ extern const char *path_search(const char *filename, argv_t *dir_list);
 
 // convert between file-representation (little-endian) to internal representation
 bool is_little_endian(void);
-int  parse_int(const byte_t* mem);
+int  parse_le_int32(const byte_t* mem);
+void write_le_int32(byte_t* mem, int value);
 
 // check OS retval
 extern int check_retval(int retval, const char* file, const char* source_file, int line_num);

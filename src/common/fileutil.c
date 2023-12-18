@@ -748,7 +748,7 @@ bool is_little_endian(void) {
         return false;
 }
 
-int parse_int(const byte_t* mem) {
+int parse_le_int32(const byte_t* mem) {
     int value = 0;
     if (is_little_endian()) {
         // little endian architecture
@@ -765,6 +765,20 @@ int parse_int(const byte_t* mem) {
             value |= ~0xFFFFFFFFL;		// sign-extend above bit 31
     }
     return value;
+}
+
+void write_le_int32(byte_t* mem, int value) {
+    if (is_little_endian()) {
+        // little endian architecture
+        *(int*)mem = value;
+    }
+    else {
+        // big endian architecture
+        mem[0] = (value >> 0) & 0x000000FFL;
+        mem[1] = (value >> 8) & 0x000000FFL;
+        mem[2] = (value >> 16) & 0x000000FFL;
+        mem[3] = (value >> 24) & 0x000000FFL;
+    }
 }
 
 int check_retval(int retval, const char* file, const char* source_file, int line_num)

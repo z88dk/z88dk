@@ -79,7 +79,7 @@ static void init(void) {
 
 static int parse_obj_file_int(obj_file_t* obj) {
 	xassert(obj->i + sizeof(int32_t) <= obj->size);
-    int value = parse_int(&obj->data[obj->i]);
+    int value = parse_le_int32(&obj->data[obj->i]);
 	obj->i += sizeof(int32_t);
 	return value;
 }

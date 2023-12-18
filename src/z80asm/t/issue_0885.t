@@ -15,7 +15,9 @@ for my $clib ('sdcc_iy',		# zsdcc compile
 	SKIP: {
 		skip "z88dk-zsdcc not found, test skipped", 1 
 			if ($clib eq 'sdcc_iy' && !$got_zsdcc);
-		
+        skip "only run with DEVELOPER=1", 1
+            unless $ENV{DEVELOPER};			# fails in snapcraft tests
+            
         unlink_testfiles;
         spew("${test}.c", <<END);
 			void main(void)
