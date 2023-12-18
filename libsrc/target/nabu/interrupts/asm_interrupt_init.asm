@@ -17,6 +17,7 @@ EXTERN __nabu_lastk
 EXTERN __nabu_key_mode
 EXTERN __nabu_j1
 EXTERN __nabu_j2
+EXTERN __nabu_p1
 
 
 ; It's assumed that im2 is already setup before entry
@@ -64,7 +65,13 @@ int_keyboard:
     di
     push    af
     push    hl
+    push    bc
+    push    ix
+    push    iy
     call    handle_keyboard
+    pop     iy
+    pop     ix
+    pop     bc
     pop     hl
     pop     af
     ei
@@ -100,6 +107,21 @@ handle_keyboard:
     inc     hl  ; __nabu_j3
     cp      $83
     jr      z,handle_joy
+    ld      ix,__nabu_p1
+    cp      $84
+    jr      z,handle_paddle
+    inc     ix
+    inc     ix
+    cp      $86
+    jr      z,handle_paddle
+    inc     ix
+    inc     ix
+    cp      $88
+    jr      z,handle_paddle
+    inc     ix
+    inc     ix
+    cp      $8a
+    jr      z,handle_paddle
     in      a,($90)
     cp      $80
     jr      z,set_joystick
@@ -108,6 +130,14 @@ handle_keyboard:
     cp      $82
     jr      z,set_joystick
     cp      $83
+    jr      z,set_joystick
+    cp      $84
+    jr      z,set_joystick
+    cp      $86
+    jr      z,set_joystick
+    cp      $88
+    jr      z,set_joystick
+    cp      $8a
     jr      z,set_joystick
     cp      $90
     jr      c,set_key
@@ -120,6 +150,8 @@ set_key:
 
 set_joystick:
     ld      (__nabu_key_mode),a
+    xor     a
+    ld      (paddle_input_index),a
     ret
 
 handle_joy:
@@ -128,6 +160,43 @@ handle_joy:
     ld      (hl),a
     xor     a
     ld      (__nabu_key_mode),a
+    ret
+
+handle_paddle:
+    ld      hl,paddle_input_array
+    ld      b,0
+    ld      a,(paddle_input_index)
+    ld      c,a
+    in      a,($90)
+    add     hl,bc
+    ld      (hl),a
+    ld      a,c
+    inc     a
+    ld      (paddle_input_index),a
+    cp      4
+    ret     nz
+    ld      iy,paddle_input_array
+    ld      a,(iy+0)
+    and     $0f
+    ld      b,(iy+1)
+    sla     b
+    sla     b
+    sla     b
+    sla     b
+    or      b
+    ld      (ix+0),a
+    ld      a,(iy+2)
+    and     $0f
+    ld      b,(iy+3)
+    sla     b
+    sla     b
+    sla     b
+    sla     b
+    or      b
+    ld      (ix+1),a
+    xor     a
+    ld      (__nabu_key_mode),a
+    ld      (paddle_input_index),a
     ret
 
 handle_vdp:
@@ -172,6 +241,11 @@ def_ints:
     defw    int_noop       ; Card1
     defw    int_noop       ; Card2
     defw    int_noop       ; Card3
+
+paddle_input_index:
+    defb    0
+paddle_input_array:
+    defb    0,0,0,0
 
 SECTION bss_clib
 
