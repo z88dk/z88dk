@@ -201,9 +201,9 @@ test: $(PROJ)$(EXESUFFIX) z80asm_lib
 	perl -S prove --state=slow,save -j9 t/*.t
 
 testdev: $(PROJ)$(EXESUFFIX)
-	$(MAKE) dev
-	$(MAKE) z80asm_lib
-	$(MAKE) test
+	$(MAKE) DEVELOPER=1 dev
+	$(MAKE) DEVELOPER=1 z80asm_lib
+	$(MAKE) DEVELOPER=1 test
 
 testlib:
 	$(MAKE) -C lib test
