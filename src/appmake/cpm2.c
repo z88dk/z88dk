@@ -1233,9 +1233,9 @@ static disc_spec atmturbo_spec = {
 };
 
 
-// Quorum 128 and PROFI (ZX Spectrum clones)
+// Quorum 128, Profi and Hobbit (ZX Spectrum clones)
 static disc_spec quorum_spec = {
-    .name = "ZX_Quorum_Profi",
+    .name = "ZX_800K",
     .disk_mode = MFM250,
     .sectors_per_track = 5,
     .tracks = 80,
@@ -1957,7 +1957,7 @@ static struct formats {
     { "atmturbo",  "ZX MicroART ATM Turbo", &atmturbo_spec, 0, NULL, 1 },
     { "hc91",      "ZX ICE Felix HC-91",    &hc91_spec, 0, NULL, 1 },
     { "hc2000",    "ZX HC-2000 / CoBra",    &hc2000_spec, 0, NULL, 1 },
-    { "quorum",    "ZX Quorum or KLUGCPM",  &quorum_spec, 0, NULL, 1 },
+    { "quorum",    "ZX Quorum,Profi,Hobb.", &quorum_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
     { "rainbow",   "DEC Rainbow/DECmate",   &rainbow_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
