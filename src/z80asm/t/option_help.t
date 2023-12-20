@@ -45,6 +45,7 @@ Preprocessor Options:
   -float[=]FORMAT       Set default float format
   -raw-strings          Double-quoted strings may include any character
                         except double quotes
+  -m4[=]OPTIONS         Pass options to the m4 subprocess
 
 Code Generation Options:
   -m[=]CPU              Assemble for the specified CPU, default z80

@@ -106,6 +106,7 @@ private:
 	vector<string>	m_library_path;				// -L option
 	vector<string>	m_files;					// command line files
     bool            m_debug_z80asm{ false };    // -vv
+    string          m_m4_options;               // options to the m4 subprocess
 
 	// parsing
 	void parse_option(const string& arg);

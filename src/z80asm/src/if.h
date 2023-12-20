@@ -36,7 +36,8 @@ extern "C" {
 #define EXT_LIB     ".lib"    
 #define EXT_SYM     ".sym"    
 #define EXT_MAP     ".map"    
-#define EXT_RELOC   ".reloc"  
+#define EXT_RELOC   ".reloc"
+#define EXT_M4      ".m4"
 
 // appmake
 #define APPMAKE_NONE	0

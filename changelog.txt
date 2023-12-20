@@ -1,6 +1,12 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
+z88dk v2.4 - xx.xx.2024
+
+Future release changes:
+
+- [z80asm] process file.asm.m4 by m4 and assemble resulting file.asm
+
 
 z88dk v2.3 - 20.12.2023
 
