@@ -964,6 +964,7 @@ sam_clib.lib: $(TARGET_CLIB_OBJS) ts2068_clib.lib
 	$(MAKE) -C target/zx TARGET=sam
 	$(MAKE) -C target/zx-common TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(TARGET_DIRECTORY)/sam/sam.lst
+	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_cpm @$(TARGET_DIRECTORY)/sam/sam_cpm.lst
 
 # Spectravideo SVI library - Stefano
 svi_clib.lib: $(TARGET_CLIB_OBJS) msx_clib.lib
