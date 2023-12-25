@@ -296,8 +296,25 @@ static void set_scan_buf( const char *text, bool _at_bol )
 	%%write init;
 }
 
-static tokid_t _scan_get( void )
-{
+static Sym _scan_next(void) {
 	%%write exec;
+	return sym;
+}
+
+static tokid_t _scan_get(void) {
+	sym = _scan_next();
+	
+	// 2466: accept keyword as EQU argument
+	if (at_bol && sym.tok != TK_NAME) {
+		const char* p = te;
+		while (*p && isspace(*p))
+			p++;
+		if (*p == '=' || 
+		    (tolower(p[0])=='e' && tolower(p[1])=='q' && tolower(p[2])=='u' && !isalnum(p[3]) && p[3] != '_')) {
+			sym.tok = sym.tok_opcode = TK_NAME;
+			scan_expect_opcode();
+		}
+	}
+	
 	return sym.tok;
 }
