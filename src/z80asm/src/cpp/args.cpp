@@ -521,7 +521,8 @@ string Args::search_source(const string& filename) {
         if (m_verbose)
             cout << "% " << m4_cmd << endl;
         if (0 != system(m4_cmd.c_str())) {
-            perror(m4_cmd.c_str());
+			g_errors.error(ErrCode::CmdFailed, m4_cmd);
+            perror("m4");
             exit(EXIT_FAILURE);
         }
         return search_source(asm_filename);
