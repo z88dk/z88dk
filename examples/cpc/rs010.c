@@ -5,7 +5,7 @@
 	zcc +cpc -lndos -create-app -Cz--audio rs010.c
  */
 
- #include <cpc.h>
+ #include <arch/cpc/cpc.h>
 
 extern unsigned char sprite[];
 
