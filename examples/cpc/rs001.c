@@ -5,7 +5,7 @@
 	zcc +cpc -lndos -create-app -Cz--audio -lm rs001.c
  */
 
-#include <cpc.h>	// CPC Library
+#include <arch/cpc/cpc.h>	// CPC Library
 
 
 void main (void) {
