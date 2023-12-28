@@ -5,7 +5,7 @@
 	zcc +cpc -lndos -create-app -Cz--audio -lm rs006.c
  */
 
-#include <cpc.h>
+#include <arch/cpc/cpc.h>
 extern unsigned char binary_data[];
 #asm
 ._binary_data
