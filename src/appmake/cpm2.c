@@ -355,6 +355,24 @@ static disc_spec cpcsystem_spec = {
 };
 
 
+static disc_spec cpcvortex_spec = {
+    .name = "CPCVortex",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .alternate_sides = 1,
+    .directory_entries = 256,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1
+};
+
+
 static disc_spec pcw40_spec = {
     .name = "PCW40",
     .sectors_per_track = 9,
@@ -1911,6 +1929,7 @@ static struct formats {
     { "bw2",       "Bondwell Model 2",      &bondwell2_spec, 0, NULL, 1 },
     { "caos",      "CAOS/NANOS/z1013 CP/M", &caos_spec, 0, NULL, 1 },
     { "cpcsystem", "CPC System Disc",       &cpcsystem_spec, 0, NULL, 0 },
+    { "cpcvortex", "CPC Vortex CP/M Disc ", &cpcvortex_spec, 0, NULL, 0 },
     { "col1",      "Coleco ADAM 40T SSDD",  &col1_spec, 0, NULL, 1 },
     { "corvette",  "Corvette", &corvette_spec, 32,         "\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8c\x01\x7f\x00\xc0\x00\x20\x00\x01\x00\x11", 1 },
     { "corvboot",  "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
