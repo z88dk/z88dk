@@ -35,8 +35,8 @@ arch/zxn/esxdos/c/sdcc_iy/esx_f_getcwd_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_f_getcwd_drive
 arch/zxn/esxdos/c/sdcc_iy/esx_f_getcwd_drive_callee
 arch/zxn/esxdos/c/sdcc_iy/esx_f_getfree
-arch/zxn/esxdos/c/sdcc_iy/esx_f_getpos
-arch/zxn/esxdos/c/sdcc_iy/esx_f_getpos_fastcall
+arch/zxn/esxdos/c/sdcc_iy/esx_f_fgetpos
+arch/zxn/esxdos/c/sdcc_iy/esx_f_fgetpos_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_f_mkdir
 arch/zxn/esxdos/c/sdcc_iy/esx_f_mkdir_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_f_open

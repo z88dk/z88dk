@@ -2,11 +2,11 @@
 
 SECTION code_esxdos
 
-PUBLIC _esx_f_getpos
+PUBLIC _esx_f_fgetpos
 
 EXTERN asm_esx_f_fgetpos
 
-_esx_f_getpos:
+_esx_f_fgetpos:
 
    pop af
    pop hl
