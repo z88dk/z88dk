@@ -983,7 +983,11 @@ bool Expr_depends_on_one_symbol(Expr1* self, Section1** p_used_section) {
             else
                 *p_used_section = NULL;
             break;
-        case ASMPC_OP:
+        case ASMPC_OP:              // #2469
+            count_symbols++;
+            if (count_symbols != 1)
+                *p_used_section = NULL;
+            break;
         case NUMBER_OP:
         case UNARY_OP:
         case BINARY_OP:

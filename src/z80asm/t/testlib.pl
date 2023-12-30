@@ -521,6 +521,33 @@ sub slurp {
 }
 
 #------------------------------------------------------------------------------
+# read map file, retun map of symbols to values
+sub read_map_file {
+	my($file) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+	my $open_ok = open(my $fh, "<:raw", $file);
+	ok $open_ok, "read $file";
+
+	my %map;	
+	if ($open_ok) {
+		while (<$fh>) {
+			chomp;
+			if (/^(\w+)\s*=\s*\$([0-9a-f]+)/i) {
+				$map{$1} = hex($2);
+			}
+			else {
+				ok 0, "cannot parse $_";
+			}
+		}
+	}
+
+	(Test::More->builder->is_passing) or die;
+
+	return %map;
+}
+
+#------------------------------------------------------------------------------
 sub cpu_compatible {
 	my($code_cpu, $lib_cpu) = @_;
 	if ($code_cpu eq $lib_cpu) {
