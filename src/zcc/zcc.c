@@ -1409,9 +1409,11 @@ int main(int argc, char **argv)
                 } else {
                     compiler_arg = strdup(comparg);
                 }
-            
-                if (process(".i", ".opt", c_compiler, compiler_arg, compiler_style, i, YES, NO))
+
+                if (process(".i", ".opt", c_compiler, compiler_arg, compiler_style, i, YES, NO)) {
+                    perror(c_compiler);
                     exit(1);
+                }
                 free(compiler_arg);
             }
         case OPTFILE:
