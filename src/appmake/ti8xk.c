@@ -17,7 +17,7 @@
 #include <string.h>
 #include "md5.h" // No longer need openssl for this one function
 
-#include <gmp.h> // Not much you can do about The GNU multi-percision library 
+#include <gmp.h> // Not much you can do about The GNU multi-precision library 
 
 
 
