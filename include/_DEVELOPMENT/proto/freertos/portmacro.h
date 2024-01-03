@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Phillip Stevens  All Rights Reserved.
+ * Copyright (C) 2024 Phillip Stevens  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -45,16 +45,16 @@ include(__link__.m4)
 
 /* Type definitions. */
 
-typedef uint16_t                    StackType_t;
-typedef int8_t                      BaseType_t;
-typedef uint8_t                     UBaseType_t;
+typedef uint16_t            StackType_t;
+typedef int8_t              BaseType_t;
+typedef uint8_t             UBaseType_t;
 
-#if configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS
-    typedef uint16_t                TickType_t;
-    #define portMAX_DELAY           ( TickType_t ) 0xffff
+#if ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS )
+    typedef uint16_t        TickType_t;
+    #define portMAX_DELAY    ( TickType_t ) ( 0xffff )
 #elif ( configTICK_TYPE_WIDTH_IN_BITS  == TICK_TYPE_WIDTH_32_BITS )
-    typedef uint32_t                TickType_t;
-    #define portMAX_DELAY           ( TickType_t ) 0xffffffffUL
+    typedef uint32_t        TickType_t;
+    #define portMAX_DELAY   ( TickType_t ) ( 0xffffffffUL )
 #else
     #error configTICK_TYPE_WIDTH_IN_BITS set to unsupported tick type width.
 #endif
@@ -65,14 +65,6 @@ typedef uint8_t                     UBaseType_t;
 
 #define string(a) __string(a)
 #define __string(a) #a
-
-/*-----------------------------------------------------------*/
-
-/* Architecture specifics. */
-
-#define portSTACK_GROWTH            ( -1 )
-#define portTICK_PERIOD_MS          ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
-#define portBYTE_ALIGNMENT          1
 
 /*-----------------------------------------------------------*/
 
@@ -237,6 +229,14 @@ typedef uint8_t                     UBaseType_t;
             "DEPHASE            \n" \
             );                      \
     }while(0)
+
+/*-----------------------------------------------------------*/
+
+/* Architecture specifics. */
+
+#define portSTACK_GROWTH    ( -1 )
+#define portTICK_PERIOD_MS  ( ( TickType_t ) ( 1000 / configTICK_RATE_HZ ) )
+#define portBYTE_ALIGNMENT  1
 
 /*-----------------------------------------------------------*/
 

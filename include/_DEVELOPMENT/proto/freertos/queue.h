@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.1+
+ * FreeRTOS Kernel V11.0.1
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -268,7 +268,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
 /**
  * queue. h
  * @code{c}
- * BaseType_t xQueueSendToToFront(
+ * BaseType_t xQueueSendToFront(
  *                                 QueueHandle_t    xQueue,
  *                                 const void       *pvItemToQueue,
  *                                 TickType_t       xTicksToWait
@@ -1017,7 +1017,7 @@ __OPROTO(,,void,,vQueueDelete,QueueHandle_t xQueue)
  * @param pxHigherPriorityTaskWoken xQueueSendToFrontFromISR() will set
  * *pxHigherPriorityTaskWoken to pdTRUE if sending to the queue caused a task
  * to unblock, and the unblocked task has a priority higher than the currently
- * running task.  If xQueueSendToFromFromISR() sets this value to pdTRUE then
+ * running task.  If xQueueSendToFrontFromISR() sets this value to pdTRUE then
  * a context switch should be requested before the interrupt is exited.
  *
  * @return pdTRUE if the data was successfully sent to the queue, otherwise
@@ -1207,9 +1207,12 @@ __OPROTO(,,void,,vQueueDelete,QueueHandle_t xQueue)
  *  {
  *      // Writing to the queue caused a task to unblock and the unblocked task
  *      // has a priority higher than or equal to the priority of the currently
- *      // executing task (the task this interrupt interrupted).  Perform a context
+ *      // executing task (the task this interrupt interrupted). Perform a context
  *      // switch so this interrupt returns directly to the unblocked task.
- *      portYIELD_FROM_ISR(); // or portEND_SWITCHING_ISR() depending on the port.
+ *      // The macro used is port specific and will be either
+ *      // portYIELD_FROM_ISR() or portEND_SWITCHING_ISR() - refer to the documentation
+ *      // page for the port being used.
+ *      portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
  *  }
  * }
  * @endcode
@@ -1282,8 +1285,11 @@ __OPROTO(,,void,,vQueueDelete,QueueHandle_t xQueue)
  *  // Now the buffer is empty we can switch context if necessary.
  *  if( xHigherPriorityTaskWoken )
  *  {
- *      // Actual macro used here is port specific.
- *      portYIELD_FROM_ISR ();
+ *       // As xHigherPriorityTaskWoken is now set to pdTRUE then a context
+ *       // switch should be requested. The macro used is port specific and
+ *       // will be either portYIELD_FROM_ISR() or portEND_SWITCHING_ISR() -
+ *       // refer to the documentation page for the port being used.
+ *       portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
  *  }
  * }
  * @endcode
@@ -1359,11 +1365,14 @@ __OPROTO(,,void,,vQueueDelete,QueueHandle_t xQueue)
  *
  *  } while( portINPUT_BYTE( BUFFER_COUNT ) );
  *
- *  // Now the buffer is empty we can switch context if necessary.  Note that the
- *  // name of the yield function required is port specific.
+ *  // Now the buffer is empty we can switch context if necessary.
  *  if( xHigherPriorityTaskWokenByPost )
  *  {
- *      portYIELD_FROM_ISR();
+ *       // As xHigherPriorityTaskWokenByPost is now set to pdTRUE then a context
+ *       // switch should be requested. The macro used is port specific and
+ *       // will be either portYIELD_FROM_ISR() or portEND_SWITCHING_ISR() -
+ *       // refer to the documentation page for the port being used.
+ *       portYIELD_FROM_ISR( xHigherPriorityTaskWokenByPost );
  *  }
  * }
  * @endcode
@@ -1498,25 +1507,48 @@ __OPROTO(,,UBaseType_t,,uxQueueMessagesWaitingFromISR,const QueueHandle_t xQueue
  */
 /*
 QueueHandle_t xQueueCreateMutex( const uint8_t ucQueueType ) PRIVILEGED_FUNCTION;
-QueueHandle_t xQueueCreateMutexStatic( const uint8_t ucQueueType,
-                                       StaticQueue_t * pxStaticQueue ) PRIVILEGED_FUNCTION;
-QueueHandle_t xQueueCreateCountingSemaphore( const UBaseType_t uxMaxCount,
-                                             const UBaseType_t uxInitialCount ) PRIVILEGED_FUNCTION;
-QueueHandle_t xQueueCreateCountingSemaphoreStatic( const UBaseType_t uxMaxCount,
-                                                   const UBaseType_t uxInitialCount,
-                                                   StaticQueue_t * pxStaticQueue ) PRIVILEGED_FUNCTION;
-BaseType_t xQueueSemaphoreTake( QueueHandle_t xQueue,
-                                TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-TaskHandle_t xQueueGetMutexHolder( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
-TaskHandle_t xQueueGetMutexHolderFromISR( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
  */
 __OPROTO(,,QueueHandle_t,,xQueueCreateMutex,const uint8_t ucQueueType)
-__OPROTO(,,QueueHandle_t,,xQueueCreateMutexStatic,const uint8_t ucQueueType,StaticQueue_t * pxStaticQueue)
+
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+/*
+    QueueHandle_t xQueueCreateMutexStatic( const uint8_t ucQueueType,
+                                           StaticQueue_t * pxStaticQueue ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,QueueHandle_t,,xQueueCreateMutexStatic,const uint8_t ucQueueType,StaticQueue_t * pxStaticQueue)
+#endif
+
+#if ( configUSE_COUNTING_SEMAPHORES == 1 )
+/*
+    QueueHandle_t xQueueCreateCountingSemaphore( const UBaseType_t uxMaxCount,
+                                                 const UBaseType_t uxInitialCount ) PRIVILEGED_FUNCTION;
+ */
 __OPROTO(,,QueueHandle_t,,xQueueCreateCountingSemaphore,const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount)
-__OPROTO(,,QueueHandle_t,,xQueueCreateCountingSemaphoreStatic,const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount,StaticQueue_t * pxStaticQueue)
+#endif
+
+#if ( ( configUSE_COUNTING_SEMAPHORES == 1 ) && ( configSUPPORT_STATIC_ALLOCATION == 1 ) )
+/*
+    QueueHandle_t xQueueCreateCountingSemaphoreStatic( const UBaseType_t uxMaxCount,
+                                                       const UBaseType_t uxInitialCount,
+                                                       StaticQueue_t * pxStaticQueue ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,QueueHandle_t,,xQueueCreateCountingSemaphoreStatic,const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount,StaticQueue_t * pxStaticQueue)
+#endif
+
+/*
+BaseType_t xQueueSemaphoreTake( QueueHandle_t xQueue,
+                                TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
+ */
 __OPROTO(,,BaseType_t,,xQueueSemaphoreTake,QueueHandle_t xQueue,TickType_t xTicksToWait)
-__OPROTO(,,TaskHandle_t,,xQueueGetMutexHolder,QueueHandle_t xSemaphore)
-__OPROTO(,,TaskHandle_t,,xQueueGetMutexHolderFromISR,QueueHandle_t xSemaphore)
+
+#if ( ( configUSE_MUTEXES == 1 ) && ( INCLUDE_xSemaphoreGetMutexHolder == 1 ) )
+/*
+    TaskHandle_t xQueueGetMutexHolder( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
+    TaskHandle_t xQueueGetMutexHolderFromISR( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,TaskHandle_t,,xQueueGetMutexHolder,QueueHandle_t xSemaphore)
+    __OPROTO(,,TaskHandle_t,,xQueueGetMutexHolderFromISR,QueueHandle_t xSemaphore)
+#endif
 
 /*
  * For internal use only.  Use xSemaphoreTakeMutexRecursive() or
@@ -1698,10 +1730,13 @@ __OPROTO(,,BaseType_t,,xQueueGiveMutexRecursive,QueueHandle_t xMutex)
  * @return If the queue set is created successfully then a handle to the created
  * queue set is returned.  Otherwise NULL is returned.
  */
+#if ( ( configUSE_QUEUE_SETS == 1 ) && ( configSUPPORT_DYNAMIC_ALLOCATION == 1 ) )
 /*
-QueueSetHandle_t xQueueCreateSet( const UBaseType_t uxEventQueueLength ) PRIVILEGED_FUNCTION;
+    QueueSetHandle_t xQueueCreateSet( const UBaseType_t uxEventQueueLength ) PRIVILEGED_FUNCTION;
  */
 __OPROTO(,,QueueSetHandle_t,,xQueueCreateSet,const UBaseType_t uxEventQueueLength)
+
+#endif
 
 /*
  * Adds a queue or semaphore to a queue set that was previously created by a
@@ -1725,11 +1760,13 @@ __OPROTO(,,QueueSetHandle_t,,xQueueCreateSet,const UBaseType_t uxEventQueueLengt
  * queue set because it is already a member of a different queue set then pdFAIL
  * is returned.
  */
+#if ( configUSE_QUEUE_SETS == 1 )
 /*
-BaseType_t xQueueAddToSet( QueueSetMemberHandle_t xQueueOrSemaphore,
-                           QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
+    BaseType_t xQueueAddToSet( QueueSetMemberHandle_t xQueueOrSemaphore,
+                               QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
 __OPROTO(,,QueueSetHandle_t,,xQueueAddToSet,QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet)
+#endif
 
 /*
  * Removes a queue or semaphore from a queue set.  A queue or semaphore can only
@@ -1748,11 +1785,13 @@ __OPROTO(,,QueueSetHandle_t,,xQueueAddToSet,QueueSetMemberHandle_t xQueueOrSemap
  * then pdPASS is returned.  If the queue was not in the queue set, or the
  * queue (or semaphore) was not empty, then pdFAIL is returned.
  */
+#if ( configUSE_QUEUE_SETS == 1 )
 /*
-BaseType_t xQueueRemoveFromSet( QueueSetMemberHandle_t xQueueOrSemaphore,
-                                QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
+    BaseType_t xQueueRemoveFromSet( QueueSetMemberHandle_t xQueueOrSemaphore,
+                                    QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
 __OPROTO(,,QueueSetHandle_t,,xQueueRemoveFromSet,QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet)
+#endif
 
 /*
  * xQueueSelectFromSet() selects from the members of a queue set a queue or
@@ -1788,19 +1827,23 @@ __OPROTO(,,QueueSetHandle_t,,xQueueRemoveFromSet,QueueSetMemberHandle_t xQueueOr
  * in the queue set that is available, or NULL if no such queue or semaphore
  * exists before before the specified block time expires.
  */
+#if ( configUSE_QUEUE_SETS == 1 )
 /*
-QueueSetMemberHandle_t xQueueSelectFromSet( QueueSetHandle_t xQueueSet,
-                                            const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
+    QueueSetMemberHandle_t xQueueSelectFromSet( QueueSetHandle_t xQueueSet,
+                                                const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
  */
 __OPROTO(,,QueueSetMemberHandle_t,,xQueueSelectFromSet,QueueSetHandle_t xQueueSet,const TickType_t xTicksToWait)
+#endif
 
 /*
  * A version of xQueueSelectFromSet() that can be used from an ISR.
  */
+#if ( configUSE_QUEUE_SETS == 1 )
 /*
-QueueSetMemberHandle_t xQueueSelectFromSetFromISR( QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
+    QueueSetMemberHandle_t xQueueSelectFromSetFromISR( QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
 __OPROTO(,,QueueSetMemberHandle_t,,xQueueSelectFromSetFromISR,QueueSetHandle_t xQueueSet)
+#endif
 
 /* Not public API functions. */
 /*
@@ -1820,6 +1863,34 @@ __OPROTO(,,void,,vQueueSetQueueNumber,QueueHandle_t xQueue,UBaseType_t uxQueueNu
 __OPROTO(,,UBaseType_t,,uxQueueGetQueueNumber,QueueHandle_t xQueue)
 __OPROTO(,,uint8_t,,ucQueueGetQueueType,QueueHandle_t xQueue)
 
+#if ( configUSE_TRACE_FACILITY == 1 )
+/*
+    void vQueueSetQueueNumber( QueueHandle_t xQueue,
+                               UBaseType_t uxQueueNumber ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,void,,vQueueSetQueueNumber, QueueHandle_t xQueue,UBaseType_t uxQueueNumber)
+#endif
+
+#if ( configUSE_TRACE_FACILITY == 1 )
+/*
+    UBaseType_t uxQueueGetQueueNumber( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,BaseType_t,,uxQueueGetQueueNumber, QueueHandle_t xQueue)
+#endif
+
+#if ( configUSE_TRACE_FACILITY == 1 )
+/*
+    uint8_t ucQueueGetQueueType( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,uint8_t,,ucQueueGetQueueType, QueueHandle_t xQueue)
+#endif
+
+/*
+UBaseType_t uxQueueGetQueueItemSize( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
+UBaseType_t uxQueueGetQueueLength( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
+ */
+__OPROTO(,,UBaseType_t,,uxQueueGetQueueItemSize, QueueHandle_t xQueue)
+__OPROTO(,,UBaseType_t,,uxQueueGetQueueLength, QueueHandle_t xQueue)
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

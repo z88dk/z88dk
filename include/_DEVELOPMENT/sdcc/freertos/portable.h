@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.1+
+ * FreeRTOS Kernel V11.0.1
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -58,23 +58,23 @@
 #endif
 
 #if portBYTE_ALIGNMENT == 32
-    #define portBYTE_ALIGNMENT_MASK     ( 0x001f )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x001f )
 #elif portBYTE_ALIGNMENT == 16
-    #define portBYTE_ALIGNMENT_MASK     ( 0x000f )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x000f )
 #elif portBYTE_ALIGNMENT == 8
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0007 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0007 )
 #elif portBYTE_ALIGNMENT == 4
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0003 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0003 )
 #elif portBYTE_ALIGNMENT == 2
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0001 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0001 )
 #elif portBYTE_ALIGNMENT == 1
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0000 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0000 )
 #else /* if portBYTE_ALIGNMENT == 32 */
     #error "Invalid portBYTE_ALIGNMENT definition"
 #endif /* if portBYTE_ALIGNMENT == 32 */
 
 #ifndef portUSING_MPU_WRAPPERS
-    #define portUSING_MPU_WRAPPERS      0
+    #define portUSING_MPU_WRAPPERS    0
 #endif
 
 #ifndef portNUM_CONFIGURABLE_REGIONS
@@ -86,7 +86,7 @@
 #endif
 
 #ifndef portARCH_NAME
-    #define portARCH_NAME               NULL
+    #define portARCH_NAME    NULL
 #endif
 
 #ifndef configSTACK_ALLOCATION_FROM_SEPARATE_HEAP
@@ -238,7 +238,7 @@ extern size_t xPortGetMinimumEverFreeHeapSize(void);
  * This hook function is called when allocation failed.
  */
 /*
-    void vApplicationMallocFailedHook( void ); /*lint !e526 Symbol not defined as it is an application callback. */
+    void vApplicationMallocFailedHook( void );
  */
     extern void vApplicationMallocFailedHook(void);
 

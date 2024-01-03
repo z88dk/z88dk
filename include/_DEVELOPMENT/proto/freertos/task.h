@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.1+
+ * FreeRTOS Kernel V11.0.1
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -54,9 +54,9 @@ include(__link__.m4)
  * The tskKERNEL_VERSION_MAJOR, tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD
  * values will reflect the last released version number.
  */
-#define tskKERNEL_VERSION_NUMBER       "V10.5.1+"
-#define tskKERNEL_VERSION_MAJOR        10
-#define tskKERNEL_VERSION_MINOR        5
+#define tskKERNEL_VERSION_NUMBER       "V11.0.1"
+#define tskKERNEL_VERSION_MAJOR        11
+#define tskKERNEL_VERSION_MINOR        0
 #define tskKERNEL_VERSION_BUILD        1
 
 /* MPU region parameters passed in ulParameters
@@ -66,6 +66,11 @@ include(__link__.m4)
 #define tskMPU_REGION_EXECUTE_NEVER    ( 1UL << 2UL )
 #define tskMPU_REGION_NORMAL_MEMORY    ( 1UL << 3UL )
 #define tskMPU_REGION_DEVICE_MEMORY    ( 1UL << 4UL )
+
+/* MPU region permissions stored in MPU settings to
+ * authorize access requests. */
+#define tskMPU_READ_PERMISSION         ( 1UL << 0UL )
+#define tskMPU_WRITE_PERMISSION        ( 1UL << 1UL )
 
 /* The direct to task notification feature used to have only a single notification
  * per task.  Now there is an array of notifications per task that is dimensioned by
@@ -86,12 +91,13 @@ include(__link__.m4)
  */
 struct TaskControlBlock_t;
 typedef struct TaskControlBlock_t * TaskHandle_t;
+typedef const struct TaskControlBlock_t   * ConstTaskHandle_t;
 
 /*
  * Defines the prototype to which the application task hook function must
  * conform.
  */
-typedef BaseType_t (* TaskHookFunction_t)( void * );
+typedef BaseType_t (* TaskHookFunction_t)( void * arg );
 
 /* Task states returned by eTaskGetState. */
 typedef enum
@@ -139,7 +145,7 @@ typedef struct xMEMORY_REGION
 typedef struct xTASK_PARAMETERS
 {
     TaskFunction_t pvTaskCode;
-    const char * pcName; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+    const char * pcName;
     configSTACK_DEPTH_TYPE uxStackDepth;
     void * pvParameters;
     UBaseType_t uxPriority;
@@ -155,18 +161,21 @@ typedef struct xTASK_PARAMETERS
 typedef struct xTASK_STATUS
 {
     TaskHandle_t xHandle;                         /* The handle of the task to which the rest of the information in the structure relates. */
-    const char * pcTaskName;                      /* A pointer to the task's name.  This value will be invalid if the task was deleted since the structure was populated! */ /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+    const char * pcTaskName;                      /* A pointer to the task's name.  This value will be invalid if the task was deleted since the structure was populated! */
     UBaseType_t xTaskNumber;                      /* A number unique to the task. */
     eTaskState eCurrentState;                     /* The state in which the task existed when the structure was populated. */
     UBaseType_t uxCurrentPriority;                /* The priority at which the task was running (may be inherited) when the structure was populated. */
     UBaseType_t uxBasePriority;                   /* The priority to which the task will return if the task's current priority has been inherited to avoid unbounded priority inversion when obtaining a mutex.  Only valid if configUSE_MUTEXES is defined as 1 in FreeRTOSConfig.h. */
     configRUN_TIME_COUNTER_TYPE ulRunTimeCounter; /* The total run time allocated to the task so far, as defined by the run time stats clock.  See https://www.FreeRTOS.org/rtos-run-time-stats.html.  Only valid when configGENERATE_RUN_TIME_STATS is defined as 1 in FreeRTOSConfig.h. */
     StackType_t * pxStackBase;                    /* Points to the lowest address of the task's stack area. */
-    #if ( ( portSTACK_GROWTH > 0 ) && ( configRECORD_STACK_HIGH_ADDRESS == 1 ) )
+    #if ( ( portSTACK_GROWTH > 0 ) || ( configRECORD_STACK_HIGH_ADDRESS == 1 ) )
         StackType_t * pxTopOfStack;               /* Points to the top address of the task's stack area. */
         StackType_t * pxEndOfStack;               /* Points to the end address of the task's stack area. */
     #endif
     configSTACK_DEPTH_TYPE uxStackHighWaterMark;  /* The minimum amount of stack space that has remained for the task since the task was created.  The closer this value is to zero the closer the task has come to overflowing its stack. */
+    #if ( ( configUSE_CORE_AFFINITY == 1 ) && ( configNUMBER_OF_CORES > 1 ) )
+        UBaseType_t uxCoreAffinityMask;           /* The core affinity mask for the task */
+    #endif
 } TaskStatus_t;
 
 /* Possible return values for eTaskConfirmSleepModeStatus(). */
@@ -187,6 +196,13 @@ typedef enum
 #define tskIDLE_PRIORITY    ( ( UBaseType_t ) 0U )
 
 /**
+ * Defines affinity to all available cores.
+ *
+ * \ingroup TaskUtils
+ */
+#define tskNO_AFFINITY      ( ( UBaseType_t ) -1 )
+
+/**
  * task. h
  *
  * Macro for forcing a context switch.
@@ -194,7 +210,7 @@ typedef enum
  * \defgroup taskYIELD taskYIELD
  * \ingroup SchedulerControl
  */
-#define taskYIELD()                        portYIELD()
+#define taskYIELD()                          portYIELD()
 
 /**
  * task. h
@@ -208,8 +224,12 @@ typedef enum
  * \defgroup taskENTER_CRITICAL taskENTER_CRITICAL
  * \ingroup SchedulerControl
  */
-#define taskENTER_CRITICAL()               portENTER_CRITICAL()
-#define taskENTER_CRITICAL_FROM_ISR()      portSET_INTERRUPT_MASK_FROM_ISR()
+#define taskENTER_CRITICAL()                 portENTER_CRITICAL()
+#if ( configNUMBER_OF_CORES == 1 )
+    #define taskENTER_CRITICAL_FROM_ISR()    portSET_INTERRUPT_MASK_FROM_ISR()
+#else
+    #define taskENTER_CRITICAL_FROM_ISR()    portENTER_CRITICAL_FROM_ISR()
+#endif
 
 /**
  * task. h
@@ -223,8 +243,12 @@ typedef enum
  * \defgroup taskEXIT_CRITICAL taskEXIT_CRITICAL
  * \ingroup SchedulerControl
  */
-#define taskEXIT_CRITICAL()                portEXIT_CRITICAL()
-#define taskEXIT_CRITICAL_FROM_ISR( x )    portCLEAR_INTERRUPT_MASK_FROM_ISR( x )
+#define taskEXIT_CRITICAL()                    portEXIT_CRITICAL()
+#if ( configNUMBER_OF_CORES == 1 )
+    #define taskEXIT_CRITICAL_FROM_ISR( x )    portCLEAR_INTERRUPT_MASK_FROM_ISR( x )
+#else
+    #define taskEXIT_CRITICAL_FROM_ISR( x )    portEXIT_CRITICAL_FROM_ISR( x )
+#endif
 
 /**
  * task. h
@@ -234,7 +258,7 @@ typedef enum
  * \defgroup taskDISABLE_INTERRUPTS taskDISABLE_INTERRUPTS
  * \ingroup SchedulerControl
  */
-#define taskDISABLE_INTERRUPTS()           portDISABLE_INTERRUPTS()
+#define taskDISABLE_INTERRUPTS()    portDISABLE_INTERRUPTS()
 
 /**
  * task. h
@@ -244,7 +268,7 @@ typedef enum
  * \defgroup taskENABLE_INTERRUPTS taskENABLE_INTERRUPTS
  * \ingroup SchedulerControl
  */
-#define taskENABLE_INTERRUPTS()            portENABLE_INTERRUPTS()
+#define taskENABLE_INTERRUPTS()     portENABLE_INTERRUPTS()
 
 /* Definitions returned by xTaskGetSchedulerState().  taskSCHEDULER_SUSPENDED is
  * 0 to generate more optimal code when configASSERT() is defined as the constant
@@ -253,6 +277,8 @@ typedef enum
 #define taskSCHEDULER_NOT_STARTED    ( ( BaseType_t ) 1 )
 #define taskSCHEDULER_RUNNING        ( ( BaseType_t ) 2 )
 
+/* Checks if core ID is valid. */
+#define taskVALID_CORE_ID( xCoreID )    ( ( ( ( ( BaseType_t ) 0 <= ( xCoreID ) ) && ( ( xCoreID ) < ( BaseType_t ) configNUMBER_OF_CORES ) ) ) ? ( pdTRUE ) : ( pdFALSE ) )
 
 /*-----------------------------------------------------------
 * TASK CREATION API
@@ -362,6 +388,19 @@ typedef enum
                             TaskHandle_t * const pxCreatedTask ) PRIVILEGED_FUNCTION;
  */
     __OPROTO(,,BaseType_t,,xTaskCreate,TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE uxStackDepth,void * const pvParameters,UBaseType_t uxPriority,TaskHandle_t * const pxCreatedTask)
+#endif
+
+#if ( ( configSUPPORT_DYNAMIC_ALLOCATION == 1 ) && ( configNUMBER_OF_CORES > 1 ) && ( configUSE_CORE_AFFINITY == 1 ) )
+/*
+    BaseType_t xTaskCreateAffinitySet( TaskFunction_t pxTaskCode,
+                                       const char * const pcName,
+                                       const configSTACK_DEPTH_TYPE uxStackDepth,
+                                       void * const pvParameters,
+                                       UBaseType_t uxPriority,
+                                       UBaseType_t uxCoreAffinityMask,
+                                       TaskHandle_t * const pxCreatedTask ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,BaseType_t,,xTaskCreateAffinitySet,TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE uxStackDepth,void * const pvParameters,UBaseType_t uxPriority,UBaseType_t uxCoreAffinityMask,TaskHandle_t * const pxCreatedTask)
 #endif
 
 /**
@@ -485,6 +524,20 @@ typedef enum
     __OPROTO(,,TaskHandle_t,,xTaskCreateStatic,TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE uxStackDepth,void * const pvParameters,UBaseType_t uxPriority,StackType_t * const puxStackBuffer,StaticTask_t * const pxTaskBuffer)
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
+#if ( ( configSUPPORT_STATIC_ALLOCATION == 1 ) && ( configNUMBER_OF_CORES > 1 ) && ( configUSE_CORE_AFFINITY == 1 ) )
+/*
+    TaskHandle_t xTaskCreateStaticAffinitySet( TaskFunction_t pxTaskCode,
+                                               const char * const pcName,
+                                               const configSTACK_DEPTH_TYPE uxStackDepth,
+                                               void * const pvParameters,
+                                               UBaseType_t uxPriority,
+                                               StackType_t * const puxStackBuffer,
+                                               StaticTask_t * const pxTaskBuffer,
+                                               UBaseType_t uxCoreAffinityMask ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,TaskHandle_t,,xTaskCreateStaticAffinitySet,TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE uxStackDepth,void * const pvParameters,UBaseType_t uxPriority,StackType_t * const puxStackBuffer,StaticTask_t * const pxTaskBuffer,UBaseType_t uxCoreAffinityMask)
+#endif
+
 /**
  * task. h
  * @code{c}
@@ -564,6 +617,15 @@ typedef enum
                                       TaskHandle_t * pxCreatedTask ) PRIVILEGED_FUNCTION;
  */
     __OPROTO(,,BaseType_t,,xTaskCreateRestricted,const TaskParameters_t * const pxTaskDefinition,TaskHandle_t * pxCreatedTask)
+#endif
+
+#if ( ( portUSING_MPU_WRAPPERS == 1 ) && ( configNUMBER_OF_CORES > 1 ) && ( configUSE_CORE_AFFINITY == 1 ) )
+/*
+    BaseType_t xTaskCreateRestrictedAffinitySet( const TaskParameters_t * const pxTaskDefinition,
+                                                 UBaseType_t uxCoreAffinityMask,
+                                                 TaskHandle_t * pxCreatedTask ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,BaseType_t,,xTaskCreateRestrictedAffinitySet,const TaskParameters_t * const pxTaskDefinition,UBaseType_t uxCoreAffinityMask,TaskHandle_t * pxCreatedTask)
 #endif
 
 /**
@@ -659,6 +721,15 @@ typedef enum
     __OPROTO(,,BaseType_t,,xTaskCreateRestrictedStatic,const TaskParameters_t * const pxTaskDefinition,TaskHandle_t * pxCreatedTask)
 #endif
 
+#if ( ( portUSING_MPU_WRAPPERS == 1 ) && ( configSUPPORT_STATIC_ALLOCATION == 1 ) && ( configNUMBER_OF_CORES > 1 ) && ( configUSE_CORE_AFFINITY == 1 ) )
+/*
+    BaseType_t xTaskCreateRestrictedStaticAffinitySet( const TaskParameters_t * const pxTaskDefinition,
+                                                       UBaseType_t uxCoreAffinityMask,
+                                                       TaskHandle_t * pxCreatedTask ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,BaseType_t,,xTaskCreateRestrictedStaticAffinitySet,const TaskParameters_t * const pxTaskDefinition,UBaseType_t uxCoreAffinityMask,TaskHandle_t * pxCreatedTask)
+#endif
+
 /**
  * task. h
  * @code{c}
@@ -669,7 +740,7 @@ typedef enum
  * a call to xTaskCreateRestricted().  These regions can be redefined using
  * vTaskAllocateMPURegions().
  *
- * @param xTask The handle of the task being updated.
+ * @param xTaskToModify The handle of the task being updated.
  *
  * @param[in] pxRegions A pointer to a MemoryRegion_t structure that contains the
  * new memory region definitions.
@@ -706,11 +777,13 @@ typedef enum
  * \defgroup vTaskAllocateMPURegions vTaskAllocateMPURegions
  * \ingroup Tasks
  */
+#if ( portUSING_MPU_WRAPPERS == 1 )
 /*
-void vTaskAllocateMPURegions( TaskHandle_t xTask,
-                              const MemoryRegion_t * const pxRegions ) PRIVILEGED_FUNCTION;
+    void vTaskAllocateMPURegions( TaskHandle_t xTaskToModify,
+                                  const MemoryRegion_t * const pxRegions ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,void,,vTaskAllocateMPURegions,TaskHandle_t xTask,const MemoryRegion_t * const pxRegions)
+    __OPROTO(,,void,,vTaskAllocateMPURegions,TaskHandle_t xTaskToModify,const MemoryRegion_t * const pxRegions)
+#endif
 
 /**
  * task. h
@@ -926,10 +999,12 @@ __OPROTO(,,BaseType_t,,xTaskDelayUntil,TickType_t * const pxPreviousWakeTime,con
  * \defgroup xTaskAbortDelay xTaskAbortDelay
  * \ingroup TaskCtrl
  */
+#if ( INCLUDE_xTaskAbortDelay == 1 )
 /*
-BaseType_t xTaskAbortDelay( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+    BaseType_t xTaskAbortDelay( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,BaseType_t,,xTaskAbortDelay,TaskHandle_t xTask)
+    __OPROTO(,,BaseType_t,,xTaskAbortDelay,TaskHandle_t xTask)
+#endif
 
 /**
  * task. h
@@ -999,6 +1074,43 @@ __OPROTO(,,UBaseType_t,,uxTaskPriorityGetFromISR,const TaskHandle_t xTask)
 /**
  * task. h
  * @code{c}
+ * UBaseType_t uxTaskBasePriorityGet( const TaskHandle_t xTask );
+ * @endcode
+ *
+ * INCLUDE_uxTaskPriorityGet and configUSE_MUTEXES must be defined as 1 for this
+ * function to be available. See the configuration section for more information.
+ *
+ * Obtain the base priority of any task.
+ *
+ * @param xTask Handle of the task to be queried.  Passing a NULL
+ * handle results in the base priority of the calling task being returned.
+ *
+ * @return The base priority of xTask.
+ *
+ * \defgroup uxTaskPriorityGet uxTaskBasePriorityGet
+ * \ingroup TaskCtrl
+ */
+/*
+UBaseType_t uxTaskBasePriorityGet( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+ */
+__OPROTO(,,UBaseType_t,,uxTaskBasePriorityGet,const TaskHandle_t xTask )
+
+/**
+ * task. h
+ * @code{c}
+ * UBaseType_t uxTaskBasePriorityGetFromISR( const TaskHandle_t xTask );
+ * @endcode
+ *
+ * A version of uxTaskBasePriorityGet() that can be used from an ISR.
+ */
+/*
+UBaseType_t uxTaskBasePriorityGetFromISR( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+ */
+__OPROTO(,,UBaseType_t,,uxTaskBasePriorityGetFromISR,const TaskHandle_t xTask )
+
+/**
+ * task. h
+ * @code{c}
  * eTaskState eTaskGetState( TaskHandle_t xTask );
  * @endcode
  *
@@ -1014,10 +1126,12 @@ __OPROTO(,,UBaseType_t,,uxTaskPriorityGetFromISR,const TaskHandle_t xTask)
  * state of the task might change between the function being called, and the
  * functions return value being tested by the calling task.
  */
+#if ( ( INCLUDE_eTaskGetState == 1 ) || ( configUSE_TRACE_FACILITY == 1 ) || ( INCLUDE_xTaskAbortDelay == 1 ) )
 /*
-eTaskState eTaskGetState( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+    eTaskState eTaskGetState( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,eTaskState,,eTaskGetState,TaskHandle_t xTask)
+    __OPROTO(,,eTaskState,,eTaskGetState,TaskHandle_t xTask)
+#endif
 
 /**
  * task. h
@@ -1075,13 +1189,15 @@ __OPROTO(,,eTaskState,,eTaskGetState,TaskHandle_t xTask)
  * \defgroup vTaskGetInfo vTaskGetInfo
  * \ingroup TaskCtrl
  */
+#if ( configUSE_TRACE_FACILITY == 1 )
 /*
-void vTaskGetInfo( TaskHandle_t xTask,
-                   TaskStatus_t * pxTaskStatus,
-                   BaseType_t xGetFreeStackSpace,
-                   eTaskState eState ) PRIVILEGED_FUNCTION;
+    void vTaskGetInfo( TaskHandle_t xTask,
+                       TaskStatus_t * pxTaskStatus,
+                       BaseType_t xGetFreeStackSpace,
+                       eTaskState eState ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,void,,vTaskGetInfo,TaskHandle_t xTask,TaskStatus_t * pxTaskStatus,BaseType_t xGetFreeStackSpace,eTaskState eState)
+    __OPROTO(,,void,,vTaskGetInfo,TaskHandle_t xTask,TaskStatus_t * pxTaskStatus,BaseType_t xGetFreeStackSpace,eTaskState eState)
+#endif
 
 /**
  * task. h
@@ -1274,6 +1390,176 @@ __OPROTO(,,void,,vTaskResume,TaskHandle_t xTaskToResume)
 BaseType_t xTaskResumeFromISR( TaskHandle_t xTaskToResume ) PRIVILEGED_FUNCTION;
  */
 __OPROTO(,,BaseType_t,,xTaskResumeFromISR,TaskHandle_t xTaskToResume)
+
+#if ( configUSE_CORE_AFFINITY == 1 )
+
+/**
+ * @brief Sets the core affinity mask for a task.
+ *
+ * It sets the cores on which a task can run. configUSE_CORE_AFFINITY must
+ * be defined as 1 for this function to be available.
+ *
+ * @param xTask The handle of the task to set the core affinity mask for.
+ * Passing NULL will set the core affinity mask for the calling task.
+ *
+ * @param uxCoreAffinityMask A bitwise value that indicates the cores on
+ * which the task can run. Cores are numbered from 0 to configNUMBER_OF_CORES - 1.
+ * For example, to ensure that a task can run on core 0 and core 1, set
+ * uxCoreAffinityMask to 0x03.
+ *
+ * Example usage:
+ *
+ * // The function that creates task.
+ * void vAFunction( void )
+ * {
+ * TaskHandle_t xHandle;
+ * UBaseType_t uxCoreAffinityMask;
+ *
+ *      // Create a task, storing the handle.
+ *      xTaskCreate( vTaskCode, "NAME", STACK_SIZE, NULL, tskIDLE_PRIORITY, &( xHandle ) );
+ *
+ *      // Define the core affinity mask such that this task can only run
+ *      // on core 0 and core 2.
+ *      uxCoreAffinityMask = ( ( 1 << 0 ) | ( 1 << 2 ) );
+ *
+ *      //Set the core affinity mask for the task.
+ *      vTaskCoreAffinitySet( xHandle, uxCoreAffinityMask );
+ * }
+ */
+/*
+    void vTaskCoreAffinitySet( const TaskHandle_t xTask,
+                               UBaseType_t uxCoreAffinityMask );
+ */
+    __OPROTO(,,void,,vTaskCoreAffinitySet,const TaskHandle_t xTask,UBaseType_t uxCoreAffinityMask)
+#endif
+
+#if ( ( configNUMBER_OF_CORES > 1 ) && ( configUSE_CORE_AFFINITY == 1 ) )
+
+/**
+ * @brief Gets the core affinity mask for a task.
+ *
+ * configUSE_CORE_AFFINITY must be defined as 1 for this function to be
+ * available.
+ *
+ * @param xTask The handle of the task to get the core affinity mask for.
+ * Passing NULL will get the core affinity mask for the calling task.
+ *
+ * @return The core affinity mask which is a bitwise value that indicates
+ * the cores on which a task can run. Cores are numbered from 0 to
+ * configNUMBER_OF_CORES - 1. For example, if a task can run on core 0 and core 1,
+ * the core affinity mask is 0x03.
+ *
+ * Example usage:
+ *
+ * // Task handle of the networking task - it is populated elsewhere.
+ * TaskHandle_t xNetworkingTaskHandle;
+ *
+ * void vAFunction( void )
+ * {
+ * TaskHandle_t xHandle;
+ * UBaseType_t uxNetworkingCoreAffinityMask;
+ *
+ *     // Create a task, storing the handle.
+ *     xTaskCreate( vTaskCode, "NAME", STACK_SIZE, NULL, tskIDLE_PRIORITY, &( xHandle ) );
+ *
+ *     //Get the core affinity mask for the networking task.
+ *     uxNetworkingCoreAffinityMask = vTaskCoreAffinityGet( xNetworkingTaskHandle );
+ *
+ *     // Here is a hypothetical scenario, just for the example. Assume that we
+ *     // have 2 cores - Core 0 and core 1. We want to pin the application task to
+ *     // the core different than the networking task to ensure that the
+ *     // application task does not interfere with networking.
+ *     if( ( uxNetworkingCoreAffinityMask & ( 1 << 0 ) ) != 0 )
+ *     {
+ *         // The networking task can run on core 0, pin our task to core 1.
+ *         vTaskCoreAffinitySet( xHandle, ( 1 << 1 ) );
+ *     }
+ *     else
+ *     {
+ *         // Otherwise, pin our task to core 0.
+ *         vTaskCoreAffinitySet( xHandle, ( 1 << 0 ) );
+ *     }
+ * }
+ */
+/*
+    UBaseType_t vTaskCoreAffinityGet( ConstTaskHandle_t xTask );
+ */
+    __OPROTO(,,UBaseType_t,,vTaskCoreAffinityGet,ConstTaskHandle_t xTask)
+#endif
+
+#if ( configUSE_TASK_PREEMPTION_DISABLE == 1 )
+
+/**
+ * @brief Disables preemption for a task.
+ *
+ * @param xTask The handle of the task to disable preemption. Passing NULL
+ * disables preemption for the calling task.
+ *
+ * Example usage:
+ *
+ * void vTaskCode( void *pvParameters )
+ * {
+ *     // Silence warnings about unused parameters.
+ *     ( void ) pvParameters;
+ *
+ *     for( ;; )
+ *     {
+ *         // ... Perform some function here.
+ *
+ *         // Disable preemption for this task.
+ *         vTaskPreemptionDisable( NULL );
+ *
+ *         // The task will not be preempted when it is executing in this portion ...
+ *
+ *         // ... until the preemption is enabled again.
+ *         vTaskPreemptionEnable( NULL );
+ *
+ *         // The task can be preempted when it is executing in this portion.
+ *     }
+ * }
+ */
+/*
+    void vTaskPreemptionDisable( const TaskHandle_t xTask );
+ */
+    __OPROTO(,,void,,vTaskPreemptionDisable,const TaskHandle_t xTask)
+#endif
+
+#if ( configUSE_TASK_PREEMPTION_DISABLE == 1 )
+
+/**
+ * @brief Enables preemption for a task.
+ *
+ * @param xTask The handle of the task to enable preemption. Passing NULL
+ * enables preemption for the calling task.
+ *
+ * Example usage:
+ *
+ * void vTaskCode( void *pvParameters )
+ * {
+ *     // Silence warnings about unused parameters.
+ *     ( void ) pvParameters;
+ *
+ *     for( ;; )
+ *     {
+ *         // ... Perform some function here.
+ *
+ *         // Disable preemption for this task.
+ *         vTaskPreemptionDisable( NULL );
+ *
+ *         // The task will not be preempted when it is executing in this portion ...
+ *
+ *         // ... until the preemption is enabled again.
+ *         vTaskPreemptionEnable( NULL );
+ *
+ *         // The task can be preempted when it is executing in this portion.
+ *     }
+ * }
+ */
+/*
+    void vTaskPreemptionEnable( const TaskHandle_t xTask );
+ */
+    __OPROTO(,,void,,vTaskPreemptionEnable,const TaskHandle_t xTask)
+#endif
 
 /*-----------------------------------------------------------
 * SCHEDULER CONTROL
@@ -1583,10 +1869,12 @@ __OPROTO(,,char,*,pcTaskGetName,TaskHandle_t xTaskToQuery)
  * \defgroup pcTaskGetHandle pcTaskGetHandle
  * \ingroup TaskUtils
  */
+#if ( INCLUDE_xTaskGetHandle == 1 )
 /*
-TaskHandle_t xTaskGetHandle( const char * pcNameToQuery ) PRIVILEGED_FUNCTION;
+    TaskHandle_t xTaskGetHandle( const char * pcNameToQuery ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,TaskHandle_t,,xTaskGetHandle,const char * pcNameToQuery)
+    __OPROTO(,,TaskHandle_t,,xTaskGetHandle,const char * pcNameToQuery)
+#endif
 
 /**
  * task. h
@@ -1750,6 +2038,9 @@ __OPROTO(,,configSTACK_DEPTH_TYPE,,uxTaskGetStackHighWaterMark,TaskHandle_t xTas
  * @param xTask the task that just exceeded its stack boundaries.
  * @param pcTaskName A character string containing the name of the offending task.
  */
+    /* MISRA Ref 8.6.1 [External linkage] */
+    /* More details at: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/MISRA.md#rule-86 */
+    /* coverity[misra_c_2012_rule_8_6_violation] */
 /*
     void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                         char * pcTaskName );
@@ -1758,7 +2049,28 @@ __OPROTO(,,configSTACK_DEPTH_TYPE,,uxTaskGetStackHighWaterMark,TaskHandle_t xTas
 
 #endif
 
-#if  ( configUSE_TICK_HOOK > 0 )
+#if ( configUSE_IDLE_HOOK == 1 )
+
+/**
+ * task.h
+ * @code{c}
+ * void vApplicationIdleHook( void );
+ * @endcode
+ *
+ * The application idle hook is called by the idle task.
+ * This allows the application designer to add background functionality without
+ * the overhead of a separate task.
+ * NOTE: vApplicationIdleHook() MUST NOT, UNDER ANY CIRCUMSTANCES, CALL A FUNCTION THAT MIGHT BLOCK.
+ */
+    /* MISRA Ref 8.6.1 [External linkage] */
+    /* More details at: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/MISRA.md#rule-86 */
+    /* coverity[misra_c_2012_rule_8_6_violation] */
+    void vApplicationIdleHook( void );
+
+#endif
+
+
+#if  ( configUSE_TICK_HOOK != 0 )
 
 /**
  *  task.h
@@ -1768,6 +2080,9 @@ __OPROTO(,,configSTACK_DEPTH_TYPE,,uxTaskGetStackHighWaterMark,TaskHandle_t xTas
  *
  * This hook function is called in the system tick handler after any OS work is completed.
  */
+    /* MISRA Ref 8.6.1 [External linkage] */
+    /* More details at: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/MISRA.md#rule-86 */
+    /* coverity[misra_c_2012_rule_8_6_violation] */
 /*
     void vApplicationTickHook( void );
  */
@@ -1796,7 +2111,41 @@ __OPROTO(,,configSTACK_DEPTH_TYPE,,uxTaskGetStackHighWaterMark,TaskHandle_t xTas
                                         configSTACK_DEPTH_TYPE * puxIdleTaskStackSize );
  */
     __OPROTO(,,void,,vApplicationGetIdleTaskMemory,StaticTask_t ** ppxIdleTaskTCBBuffer,StackType_t ** ppxIdleTaskStackBuffer,configSTACK_DEPTH_TYPE * puxIdleTaskStackSize)
-#endif
+
+/**
+ * task.h
+ * @code{c}
+ * void vApplicationGetPassiveIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer, StackType_t ** ppxIdleTaskStackBuffer, configSTACK_DEPTH_TYPE * puxIdleTaskStackSize, BaseType_t xCoreID )
+ * @endcode
+ *
+ * This function is used to provide a statically allocated block of memory to FreeRTOS to hold the Idle Tasks TCB.  This function is required when
+ * configSUPPORT_STATIC_ALLOCATION is set.  For more information see this URI: https://www.FreeRTOS.org/a00110.html#configSUPPORT_STATIC_ALLOCATION
+ *
+ * In the FreeRTOS SMP, there are a total of configNUMBER_OF_CORES idle tasks:
+ *  1. 1 Active idle task which does all the housekeeping.
+ *  2. ( configNUMBER_OF_CORES - 1 ) Passive idle tasks which do nothing.
+ * These idle tasks are created to ensure that each core has an idle task to run when
+ * no other task is available to run.
+ *
+ * The function vApplicationGetPassiveIdleTaskMemory is called with passive idle
+ * task index 0, 1 ... ( configNUMBER_OF_CORES - 2 ) to get memory for passive idle
+ * tasks.
+ *
+ * @param ppxIdleTaskTCBBuffer A handle to a statically allocated TCB buffer
+ * @param ppxIdleTaskStackBuffer A handle to a statically allocated Stack buffer for the idle task
+ * @param puxIdleTaskStackSize A pointer to the number of elements that will fit in the allocated stack buffer
+ * @param xPassiveIdleTaskIndex The passive idle task index of the idle task buffer
+ */
+    #if ( configNUMBER_OF_CORES > 1 )
+/*
+        void vApplicationGetPassiveIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer,
+                                                   StackType_t ** ppxIdleTaskStackBuffer,
+                                                   configSTACK_DEPTH_TYPE * puxIdleTaskStackSize,
+                                                   BaseType_t xPassiveIdleTaskIndex );
+ */
+        __OPROTO(,,void,,ApplicationGetPassiveIdleTaskMemory,StaticTask_t ** ppxIdleTaskTCBBuffer,StackType_t ** ppxIdleTaskStackBuffer,configSTACK_DEPTH_TYPE * puxIdleTaskStackSize,BaseType_t xPassiveIdleTaskIndex)
+    #endif /* #if ( configNUMBER_OF_CORES > 1 ) */
+#endif /* if ( configSUPPORT_STATIC_ALLOCATION == 1 ) */
 
 /**
  * task.h
@@ -1811,23 +2160,44 @@ __OPROTO(,,configSTACK_DEPTH_TYPE,,uxTaskGetStackHighWaterMark,TaskHandle_t xTas
  * wants.  The return value is the value returned by the task hook function
  * registered by the user.
  */
+#if ( configUSE_APPLICATION_TASK_TAG == 1 )
 /*
-BaseType_t xTaskCallApplicationTaskHook( TaskHandle_t xTask,
-                                         void * pvParameter ) PRIVILEGED_FUNCTION;
+    BaseType_t xTaskCallApplicationTaskHook( TaskHandle_t xTask,
+                                             void * pvParameter ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,BaseType_t,,xTaskCallApplicationTaskHook,TaskHandle_t xTask,void * pvParameter)
+    __OPROTO(,,BaseType_t,,xTaskCallApplicationTaskHook,TaskHandle_t xTask,void * pvParameter)
+#endif
 
 /**
  * xTaskGetIdleTaskHandle() is only available if
  * INCLUDE_xTaskGetIdleTaskHandle is set to 1 in FreeRTOSConfig.h.
  *
- * Simply returns the handle of the idle task.  It is not valid to call
- * xTaskGetIdleTaskHandle() before the scheduler has been started.
+ * In single-core FreeRTOS, this function simply returns the handle of the idle
+ * task. It is not valid to call xTaskGetIdleTaskHandle() before the scheduler
+ * has been started.
+ *
+ * In the FreeRTOS SMP, there are a total of configNUMBER_OF_CORES idle tasks:
+ *  1. 1 Active idle task which does all the housekeeping.
+ *  2. ( configNUMBER_OF_CORES - 1 ) Passive idle tasks which do nothing.
+ * These idle tasks are created to ensure that each core has an idle task to run when
+ * no other task is available to run. Call xTaskGetIdleTaskHandle() or
+ * xTaskGetIdleTaskHandleForCore() with xCoreID set to 0  to get the Active
+ * idle task handle. Call xTaskGetIdleTaskHandleForCore() with xCoreID set to
+ * 1,2 ... ( configNUMBER_OF_CORES - 1 ) to get the Passive idle task handles.
  */
+#if ( INCLUDE_xTaskGetIdleTaskHandle == 1 )
+    #if ( configNUMBER_OF_CORES == 1 )
 /*
-TaskHandle_t xTaskGetIdleTaskHandle( void ) PRIVILEGED_FUNCTION;
+        TaskHandle_t xTaskGetIdleTaskHandle( void ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,TaskHandle_t,,xTaskGetIdleTaskHandle,void)
+        __OPROTO(,,TaskHandle_t,,xTaskGetIdleTaskHandle,void)
+    #endif /* #if ( configNUMBER_OF_CORES == 1 ) */
+
+/*
+    TaskHandle_t xTaskGetIdleTaskHandleForCore( BaseType_t xCoreID ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,TaskHandle_t,,xTaskGetIdleTaskHandleForCore,BaseType_t xCoreID)
+#endif /* #if ( INCLUDE_xTaskGetIdleTaskHandle == 1 ) */
 
 /**
  * configUSE_TRACE_FACILITY must be defined as 1 in FreeRTOSConfig.h for
@@ -1926,12 +2296,73 @@ __OPROTO(,,TaskHandle_t,,xTaskGetIdleTaskHandle,void)
  *  }
  *  @endcode
  */
+#if ( configUSE_TRACE_FACILITY == 1 )
 /*
-UBaseType_t uxTaskGetSystemState( TaskStatus_t * const pxTaskStatusArray,
-                                  const UBaseType_t uxArraySize,
-                                  configRUN_TIME_COUNTER_TYPE * const pulTotalRunTime ) PRIVILEGED_FUNCTION;
+    UBaseType_t uxTaskGetSystemState( TaskStatus_t * const pxTaskStatusArray,
+                                      const UBaseType_t uxArraySize,
+                                      configRUN_TIME_COUNTER_TYPE * const pulTotalRunTime ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,UBaseType_t,,uxTaskGetSystemState,TaskStatus_t * const pxTaskStatusArray,const UBaseType_t uxArraySize,configRUN_TIME_COUNTER_TYPE * const pulTotalRunTime)
+    __OPROTO(,,UBaseType_t,,uxTaskGetSystemState,TaskStatus_t * const pxTaskStatusArray,const UBaseType_t uxArraySize,configRUN_TIME_COUNTER_TYPE * const pulTotalRunTime)
+#endif
+
+/**
+ * task. h
+ * @code{c}
+ * void vTaskListTasks( char *pcWriteBuffer, size_t uxBufferLength );
+ * @endcode
+ *
+ * configUSE_TRACE_FACILITY and configUSE_STATS_FORMATTING_FUNCTIONS must
+ * both be defined as 1 for this function to be available.  See the
+ * configuration section of the FreeRTOS.org website for more information.
+ *
+ * NOTE 1: This function will disable interrupts for its duration.  It is
+ * not intended for normal application runtime use but as a debug aid.
+ *
+ * Lists all the current tasks, along with their current state and stack
+ * usage high water mark.
+ *
+ * Tasks are reported as blocked ('B'), ready ('R'), deleted ('D') or
+ * suspended ('S').
+ *
+ * PLEASE NOTE:
+ *
+ * This function is provided for convenience only, and is used by many of the
+ * demo applications.  Do not consider it to be part of the scheduler.
+ *
+ * vTaskListTasks() calls uxTaskGetSystemState(), then formats part of the
+ * uxTaskGetSystemState() output into a human readable table that displays task:
+ * names, states, priority, stack usage and task number.
+ * Stack usage specified as the number of unused StackType_t words stack can hold
+ * on top of stack - not the number of bytes.
+ *
+ * vTaskListTasks() has a dependency on the snprintf() C library function that might
+ * bloat the code size, use a lot of stack, and provide different results on
+ * different platforms.  An alternative, tiny, third party, and limited
+ * functionality implementation of snprintf() is provided in many of the
+ * FreeRTOS/Demo sub-directories in a file called printf-stdarg.c (note
+ * printf-stdarg.c does not provide a full snprintf() implementation!).
+ *
+ * It is recommended that production systems call uxTaskGetSystemState()
+ * directly to get access to raw stats data, rather than indirectly through a
+ * call to vTaskListTasks().
+ *
+ * @param pcWriteBuffer A buffer into which the above mentioned details
+ * will be written, in ASCII form.  This buffer is assumed to be large
+ * enough to contain the generated report.  Approximately 40 bytes per
+ * task should be sufficient.
+ *
+ * @param uxBufferLength Length of the pcWriteBuffer.
+ *
+ * \defgroup vTaskListTasks vTaskListTasks
+ * \ingroup TaskUtils
+ */
+#if ( ( configUSE_TRACE_FACILITY == 1 ) && ( configUSE_STATS_FORMATTING_FUNCTIONS > 0 ) )
+/*
+    void vTaskListTasks( char * pcWriteBuffer,
+                         size_t uxBufferLength ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,void,,vTaskListTasks,char * pcWriteBuffer,size_t uxBufferLength)
+#endif
 
 /**
  * task. h
@@ -1942,6 +2373,11 @@ __OPROTO(,,UBaseType_t,,uxTaskGetSystemState,TaskStatus_t * const pxTaskStatusAr
  * configUSE_TRACE_FACILITY and configUSE_STATS_FORMATTING_FUNCTIONS must
  * both be defined as 1 for this function to be available.  See the
  * configuration section of the FreeRTOS.org website for more information.
+ *
+ * WARN: This function assumes that the pcWriteBuffer is of length
+ * configSTATS_BUFFER_MAX_LENGTH. This function is there only for
+ * backward compatibility. New applications are recommended to
+ * use vTaskListTasks and supply the length of the pcWriteBuffer explicitly.
  *
  * NOTE 1: This function will disable interrupts for its duration.  It is
  * not intended for normal application runtime use but as a debug aid.
@@ -1963,10 +2399,10 @@ __OPROTO(,,UBaseType_t,,uxTaskGetSystemState,TaskStatus_t * const pxTaskStatusAr
  * Stack usage specified as the number of unused StackType_t words stack can hold
  * on top of stack - not the number of bytes.
  *
- * vTaskList() has a dependency on the sprintf() C library function that might
+ * vTaskList() has a dependency on the snprintf() C library function that might
  * bloat the code size, use a lot of stack, and provide different results on
  * different platforms.  An alternative, tiny, third party, and limited
- * functionality implementation of sprintf() is provided in many of the
+ * functionality implementation of snprintf() is provided in many of the
  * FreeRTOS/Demo sub-directories in a file called printf-stdarg.c (note
  * printf-stdarg.c does not provide a full snprintf() implementation!).
  *
@@ -1982,10 +2418,71 @@ __OPROTO(,,UBaseType_t,,uxTaskGetSystemState,TaskStatus_t * const pxTaskStatusAr
  * \defgroup vTaskList vTaskList
  * \ingroup TaskUtils
  */
-/*
-void vTaskList( char * pcWriteBuffer ) PRIVILEGED_FUNCTION;
+#define vTaskList( pcWriteBuffer )    vTaskListTasks( pcWriteBuffer, configSTATS_BUFFER_MAX_LENGTH )
+
+/**
+ * task. h
+ * @code{c}
+ * void vTaskGetRunTimeStatistics( char *pcWriteBuffer, size_t uxBufferLength );
+ * @endcode
+ *
+ * configGENERATE_RUN_TIME_STATS and configUSE_STATS_FORMATTING_FUNCTIONS
+ * must both be defined as 1 for this function to be available.  The application
+ * must also then provide definitions for
+ * portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() and portGET_RUN_TIME_COUNTER_VALUE()
+ * to configure a peripheral timer/counter and return the timers current count
+ * value respectively.  The counter should be at least 10 times the frequency of
+ * the tick count.
+ *
+ * NOTE 1: This function will disable interrupts for its duration.  It is
+ * not intended for normal application runtime use but as a debug aid.
+ *
+ * Setting configGENERATE_RUN_TIME_STATS to 1 will result in a total
+ * accumulated execution time being stored for each task.  The resolution
+ * of the accumulated time value depends on the frequency of the timer
+ * configured by the portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() macro.
+ * Calling vTaskGetRunTimeStatistics() writes the total execution time of each
+ * task into a buffer, both as an absolute count value and as a percentage
+ * of the total system execution time.
+ *
+ * NOTE 2:
+ *
+ * This function is provided for convenience only, and is used by many of the
+ * demo applications.  Do not consider it to be part of the scheduler.
+ *
+ * vTaskGetRunTimeStatistics() calls uxTaskGetSystemState(), then formats part of
+ * the uxTaskGetSystemState() output into a human readable table that displays the
+ * amount of time each task has spent in the Running state in both absolute and
+ * percentage terms.
+ *
+ * vTaskGetRunTimeStatistics() has a dependency on the snprintf() C library function
+ * that might bloat the code size, use a lot of stack, and provide different
+ * results on different platforms.  An alternative, tiny, third party, and
+ * limited functionality implementation of snprintf() is provided in many of the
+ * FreeRTOS/Demo sub-directories in a file called printf-stdarg.c (note
+ * printf-stdarg.c does not provide a full snprintf() implementation!).
+ *
+ * It is recommended that production systems call uxTaskGetSystemState() directly
+ * to get access to raw stats data, rather than indirectly through a call to
+ * vTaskGetRunTimeStatistics().
+ *
+ * @param pcWriteBuffer A buffer into which the execution times will be
+ * written, in ASCII form.  This buffer is assumed to be large enough to
+ * contain the generated report.  Approximately 40 bytes per task should
+ * be sufficient.
+ *
+ * @param uxBufferLength Length of the pcWriteBuffer.
+ *
+ * \defgroup vTaskGetRunTimeStatistics vTaskGetRunTimeStatistics
+ * \ingroup TaskUtils
  */
-__OPROTO(,,void,,vTaskList,char * pcWriteBuffer)
+#if ( ( configGENERATE_RUN_TIME_STATS == 1 ) && ( configUSE_STATS_FORMATTING_FUNCTIONS > 0 ) && ( configUSE_TRACE_FACILITY == 1 ) )
+/*
+    void vTaskGetRunTimeStatistics( char * pcWriteBuffer,
+                                    size_t uxBufferLength ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,void,,vTaskGetRunTimeStatistics,char * pcWriteBuffer,size_t uxBufferLength)
+#endif
 
 /**
  * task. h
@@ -2000,6 +2497,12 @@ __OPROTO(,,void,,vTaskList,char * pcWriteBuffer)
  * to configure a peripheral timer/counter and return the timers current count
  * value respectively.  The counter should be at least 10 times the frequency of
  * the tick count.
+ *
+ * WARN: This function assumes that the pcWriteBuffer is of length
+ * configSTATS_BUFFER_MAX_LENGTH. This function is there only for
+ * backward compatiblity. New applications are recommended to use
+ * vTaskGetRunTimeStatistics and supply the length of the pcWriteBuffer
+ * explicitly.
  *
  * NOTE 1: This function will disable interrupts for its duration.  It is
  * not intended for normal application runtime use but as a debug aid.
@@ -2022,10 +2525,10 @@ __OPROTO(,,void,,vTaskList,char * pcWriteBuffer)
  * amount of time each task has spent in the Running state in both absolute and
  * percentage terms.
  *
- * vTaskGetRunTimeStats() has a dependency on the sprintf() C library function
+ * vTaskGetRunTimeStats() has a dependency on the snprintf() C library function
  * that might bloat the code size, use a lot of stack, and provide different
  * results on different platforms.  An alternative, tiny, third party, and
- * limited functionality implementation of sprintf() is provided in many of the
+ * limited functionality implementation of snprintf() is provided in many of the
  * FreeRTOS/Demo sub-directories in a file called printf-stdarg.c (note
  * printf-stdarg.c does not provide a full snprintf() implementation!).
  *
@@ -2041,10 +2544,7 @@ __OPROTO(,,void,,vTaskList,char * pcWriteBuffer)
  * \defgroup vTaskGetRunTimeStats vTaskGetRunTimeStats
  * \ingroup TaskUtils
  */
-/*
-void vTaskGetRunTimeStats( char * pcWriteBuffer ) PRIVILEGED_FUNCTION;
- */
-__OPROTO(,,void,,vTaskGetRunTimeStats,char * pcWriteBuffer)
+#define vTaskGetRunTimeStats( pcWriteBuffer )    vTaskGetRunTimeStatistics( pcWriteBuffer, configSTATS_BUFFER_MAX_LENGTH )
 
 /**
  * task. h
@@ -2079,12 +2579,14 @@ __OPROTO(,,void,,vTaskGetRunTimeStats,char * pcWriteBuffer)
  * \defgroup ulTaskGetRunTimeCounter ulTaskGetRunTimeCounter
  * \ingroup TaskUtils
  */
+#if ( configGENERATE_RUN_TIME_STATS == 1 )
 /*
-configRUN_TIME_COUNTER_TYPE ulTaskGetRunTimeCounter( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-configRUN_TIME_COUNTER_TYPE ulTaskGetRunTimePercent( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+    configRUN_TIME_COUNTER_TYPE ulTaskGetRunTimeCounter( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+    configRUN_TIME_COUNTER_TYPE ulTaskGetRunTimePercent( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,configRUN_TIME_COUNTER_TYPE,,ulTaskGetRunTimeCounter,const TaskHandle_t xTask)
-__OPROTO(,,configRUN_TIME_COUNTER_TYPE,,ulTaskGetRunTimePercent,const TaskHandle_t xTask)
+    __OPROTO(,,configRUN_TIME_COUNTER_TYPE,,ulTaskGetRunTimeCounter,const TaskHandle_t xTask)
+    __OPROTO(,,configRUN_TIME_COUNTER_TYPE,,ulTaskGetRunTimePercent,const TaskHandle_t xTask)
+#endif
 /**
  * task. h
  * @code{c}
@@ -2122,12 +2624,14 @@ __OPROTO(,,configRUN_TIME_COUNTER_TYPE,,ulTaskGetRunTimePercent,const TaskHandle
  * \defgroup ulTaskGetIdleRunTimeCounter ulTaskGetIdleRunTimeCounter
  * \ingroup TaskUtils
  */
+#if ( ( configGENERATE_RUN_TIME_STATS == 1 ) && ( INCLUDE_xTaskGetIdleTaskHandle == 1 ) )
 /*
-configRUN_TIME_COUNTER_TYPE ulTaskGetIdleRunTimeCounter( void ) PRIVILEGED_FUNCTION;
-configRUN_TIME_COUNTER_TYPE ulTaskGetIdleRunTimePercent( void ) PRIVILEGED_FUNCTION;
+    configRUN_TIME_COUNTER_TYPE ulTaskGetIdleRunTimeCounter( void ) PRIVILEGED_FUNCTION;
+    configRUN_TIME_COUNTER_TYPE ulTaskGetIdleRunTimePercent( void ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,configRUN_TIME_COUNTER_TYPE,,ulTaskGetIdleRunTimeCounter,void)
-__OPROTO(,,configRUN_TIME_COUNTER_TYPE,,ulTaskGetIdleRunTimePercent,void)
+    __OPROTO(,,configRUN_TIME_COUNTER_TYPE,,ulTaskGetIdleRunTimeCounter,void)
+    __OPROTO(,,configRUN_TIME_COUNTER_TYPE,,ulTaskGetIdleRunTimePercent,void)
+#endif
 
 /**
  * task. h
@@ -3108,6 +3612,12 @@ __OPROTO(,,BaseType_t,,xTaskCatchUpTicks,TickType_t xTicksToCatchUp)
 * SCHEDULER INTERNALS AVAILABLE FOR PORTING PURPOSES
 *----------------------------------------------------------*/
 
+#if ( configNUMBER_OF_CORES == 1 )
+    #define taskYIELD_WITHIN_API()    portYIELD_WITHIN_API()
+#else /* #if ( configNUMBER_OF_CORES == 1 ) */
+    #define taskYIELD_WITHIN_API()    vTaskYieldWithinAPI()
+#endif /* #if ( configNUMBER_OF_CORES == 1 ) */
+
 /*
  * THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS ONLY
  * INTENDED FOR USE WHEN IMPLEMENTING A PORT OF THE SCHEDULER AND IS
@@ -3227,10 +3737,17 @@ __OPROTO(,,void,,vTaskRemoveFromUnorderedEventList,ListItem_t * pxEventListItem,
  * Sets the pointer to the current TCB to the TCB of the highest priority task
  * that is ready to run.
  */
+#if ( configNUMBER_OF_CORES == 1 )
 /*
-portDONT_DISCARD void vTaskSwitchContext( void ) PRIVILEGED_FUNCTION;
+    portDONT_DISCARD void vTaskSwitchContext( void ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,void,,vTaskSwitchContext,void)
+    __OPROTO(,,void,,vTaskSwitchContext,void)
+#else
+/*
+    portDONT_DISCARD void vTaskSwitchContext( BaseType_t xCoreID ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,void,,vTaskSwitchContext,BaseType_t xCoreID)
+#endif
 
 /*
  * THESE FUNCTIONS MUST NOT BE USED FROM APPLICATION CODE.  THEY ARE USED BY
@@ -3249,6 +3766,15 @@ TaskHandle_t xTaskGetCurrentTaskHandle( void ) PRIVILEGED_FUNCTION;
  */
 __OPROTO(,,TaskHandle_t,,xTaskGetCurrentTaskHandle,void)
 
+/*
+ * Return the handle of the task running on specified core.
+ */
+#if ( configNUMBER_OF_CORES > 1 )
+/*
+    TaskHandle_t xTaskGetCurrentTaskHandleForCore( BaseType_t xCoreID ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,TaskHandle_t,,xTaskGetCurrentTaskHandleForCore,BaseType_t xCoreID)
+#endif
 /*
  * Shortcut used by the queue implementation to prevent unnecessary call to
  * taskYIELD();
@@ -3302,20 +3828,24 @@ __OPROTO(,,void,,vTaskPriorityDisinheritAfterTimeout,TaskHandle_t const pxMutexH
 /*
  * Get the uxTaskNumber assigned to the task referenced by the xTask parameter.
  */
+#if ( configUSE_TRACE_FACILITY == 1 )
 /*
-UBaseType_t uxTaskGetTaskNumber( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+    UBaseType_t uxTaskGetTaskNumber( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,UBaseType_t,,uxTaskGetTaskNumber,TaskHandle_t xTask)
+    __OPROTO(,,UBaseType_t,,uxTaskGetTaskNumber,TaskHandle_t xTask)
+#endif
 
 /*
  * Set the uxTaskNumber of the task referenced by the xTask parameter to
  * uxHandle.
  */
+#if ( configUSE_TRACE_FACILITY == 1 )
 /*
-void vTaskSetTaskNumber( TaskHandle_t xTask,
-                         const UBaseType_t uxHandle ) PRIVILEGED_FUNCTION;
+    void vTaskSetTaskNumber( TaskHandle_t xTask,
+                             const UBaseType_t uxHandle ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,void,,vTaskSetTaskNumber,TaskHandle_t xTask,const UBaseType_t uxHandle)
+    __OPROTO(,,void,,vTaskSetTaskNumber,TaskHandle_t xTask,const UBaseType_t uxHandle)
+#endif
 
 /*
  * Only available when configUSE_TICKLESS_IDLE is set to 1.
@@ -3325,10 +3855,12 @@ __OPROTO(,,void,,vTaskSetTaskNumber,TaskHandle_t xTask,const UBaseType_t uxHandl
  * to date with the actual execution time by being skipped forward by a time
  * equal to the idle period.
  */
+#if ( configUSE_TICKLESS_IDLE != 0 )
 /*
-void vTaskStepTick( TickType_t xTicksToJump ) PRIVILEGED_FUNCTION;
+    void vTaskStepTick( TickType_t xTicksToJump ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,void,,vTaskStepTick,TickType_t xTicksToJump)
+    __OPROTO(,,void,,vTaskStepTick,TickType_t xTicksToJump)
+#endif
 
 /*
  * Only available when configUSE_TICKLESS_IDLE is set to 1.
@@ -3344,10 +3876,12 @@ __OPROTO(,,void,,vTaskStepTick,TickType_t xTicksToJump)
  * critical section between the timer being stopped and the sleep mode being
  * entered to ensure it is ok to proceed into the sleep mode.
  */
+#if ( configUSE_TICKLESS_IDLE != 0 )
 /*
-eSleepModeStatus eTaskConfirmSleepModeStatus( void ) PRIVILEGED_FUNCTION;
+    eSleepModeStatus eTaskConfirmSleepModeStatus( void ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,eSleepModeStatus,,eTaskConfirmSleepModeStatus,void)
+    __OPROTO(,,eSleepModeStatus,,eTaskConfirmSleepModeStatus,void)
+#endif
 
 /*
  * For internal use only.  Increment the mutex held count when a mutex is
@@ -3367,6 +3901,113 @@ void vTaskInternalSetTimeOutState( TimeOut_t * const pxTimeOut ) PRIVILEGED_FUNC
  */
 __OPROTO(,,void,,vTaskInternalSetTimeOutState,TimeOut_t * const pxTimeOut)
 
+/*
+ * For internal use only. Same as portYIELD_WITHIN_API() in single core FreeRTOS.
+ * For SMP this is not defined by the port.
+ */
+#if ( configNUMBER_OF_CORES > 1 )
+/*
+    void vTaskYieldWithinAPI( void );
+ */
+    __OPROTO(,,void,,vTaskYieldWithinAPI,void)
+#endif
+
+/*
+ * This function is only intended for use when implementing a port of the scheduler
+ * and is only available when portCRITICAL_NESTING_IN_TCB is set to 1 or configNUMBER_OF_CORES
+ * is greater than 1. This function can be used in the implementation of portENTER_CRITICAL
+ * if port wants to maintain critical nesting count in TCB in single core FreeRTOS.
+ * It should be used in the implementation of portENTER_CRITICAL if port is running a
+ * multiple core FreeRTOS.
+ */
+#if ( ( portCRITICAL_NESTING_IN_TCB == 1 ) || ( configNUMBER_OF_CORES > 1 ) )
+/*
+    void vTaskEnterCritical( void );
+ */
+    __OPROTO(,,void,,vTaskEnterCritical,void)
+#endif
+
+/*
+ * This function is only intended for use when implementing a port of the scheduler
+ * and is only available when portCRITICAL_NESTING_IN_TCB is set to 1 or configNUMBER_OF_CORES
+ * is greater than 1. This function can be used in the implementation of portEXIT_CRITICAL
+ * if port wants to maintain critical nesting count in TCB in single core FreeRTOS.
+ * It should be used in the implementation of portEXIT_CRITICAL if port is running a
+ * multiple core FreeRTOS.
+ */
+#if ( ( portCRITICAL_NESTING_IN_TCB == 1 ) || ( configNUMBER_OF_CORES > 1 ) )
+/*
+    void vTaskExitCritical( void );
+ */
+    __OPROTO(,,void,,vTaskExitCritical,void)
+#endif
+
+/*
+ * This function is only intended for use when implementing a port of the scheduler
+ * and is only available when configNUMBER_OF_CORES is greater than 1. This function
+ * should be used in the implementation of portENTER_CRITICAL_FROM_ISR if port is
+ * running a multiple core FreeRTOS.
+ */
+#if ( configNUMBER_OF_CORES > 1 )
+/*
+    UBaseType_t vTaskEnterCriticalFromISR( void );
+ */
+    __OPROTO(,,UBaseType_t,,vTaskEnterCriticalFromISR,void)
+#endif
+
+/*
+ * This function is only intended for use when implementing a port of the scheduler
+ * and is only available when configNUMBER_OF_CORES is greater than 1. This function
+ * should be used in the implementation of portEXIT_CRITICAL_FROM_ISR if port is
+ * running a multiple core FreeRTOS.
+ */
+#if ( configNUMBER_OF_CORES > 1 )
+/*
+    void vTaskExitCriticalFromISR( UBaseType_t uxSavedInterruptStatus );
+ */
+    __OPROTO(,,void,,vTaskExitCriticalFromISR,UBaseType_t uxSavedInterruptStatus)
+#endif
+
+#if ( portUSING_MPU_WRAPPERS == 1 )
+
+/*
+ * For internal use only.  Get MPU settings associated with a task.
+ */
+/*
+    xMPU_SETTINGS * xTaskGetMPUSettings( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,xMPU_SETTINGS,*,xTaskGetMPUSettings,TaskHandle_t xTask)
+
+#endif /* portUSING_MPU_WRAPPERS */
+
+
+#if ( ( portUSING_MPU_WRAPPERS == 1 ) && ( configUSE_MPU_WRAPPERS_V1 == 0 ) && ( configENABLE_ACCESS_CONTROL_LIST == 1 ) )
+
+/*
+ * For internal use only.  Grant/Revoke a task's access to a kernel object.
+ */
+/*
+    void vGrantAccessToKernelObject( TaskHandle_t xExternalTaskHandle,
+                                     int32_t lExternalKernelObjectHandle ) PRIVILEGED_FUNCTION;
+    void vRevokeAccessToKernelObject( TaskHandle_t xExternalTaskHandle,
+                                      int32_t lExternalKernelObjectHandle ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,void,,vGrantAccessToKernelObject,TaskHandle_t xExternalTaskHandle,int32_t lExternalKernelObjectHandle)
+    __OPROTO(,,void,,vRevokeAccessToKernelObject,TaskHandle_t xExternalTaskHandle,int32_t lExternalKernelObjectHandle)
+
+/*
+ * For internal use only.  Grant/Revoke a task's access to a kernel object.
+ */
+/*
+    void vPortGrantAccessToKernelObject( TaskHandle_t xInternalTaskHandle,
+                                         int32_t lInternalIndexOfKernelObject ) PRIVILEGED_FUNCTION;
+    void vPortRevokeAccessToKernelObject( TaskHandle_t xInternalTaskHandle,
+                                          int32_t lInternalIndexOfKernelObject ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,void,,vPortGrantAccessToKernelObject,TaskHandle_t xInternalTaskHandle,int32_t lInternalIndexOfKernelObject)
+    __OPROTO(,,void,,vPortRevokeAccessToKernelObject,TaskHandle_t xInternalTaskHandle,int32_t lInternalIndexOfKernelObject)
+
+#endif /* #if ( ( portUSING_MPU_WRAPPERS == 1 ) && ( configUSE_MPU_WRAPPERS_V1 == 0 ) && ( configENABLE_ACCESS_CONTROL_LIST == 1 ) ) */
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
