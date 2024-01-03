@@ -2157,8 +2157,12 @@ extern configSTACK_DEPTH_TYPE __LIB__ uxTaskGetStackHighWaterMark(TaskHandle_t x
     /* MISRA Ref 8.6.1 [External linkage] */
     /* More details at: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/MISRA.md#rule-86 */
     /* coverity[misra_c_2012_rule_8_6_violation] */
+/*
     void vApplicationIdleHook( void );
+ */
+    extern void __LIB__ vApplicationIdleHook(void) __smallc;
 
+ 
 #endif
 
 

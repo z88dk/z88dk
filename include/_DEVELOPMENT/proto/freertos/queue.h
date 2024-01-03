@@ -1496,7 +1496,7 @@ BaseType_t xQueueIsQueueEmptyFromISR( const QueueHandle_t xQueue ) PRIVILEGED_FU
 BaseType_t xQueueIsQueueFullFromISR( const QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
 UBaseType_t uxQueueMessagesWaitingFromISR( const QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,BaseType_t,,xQueueIsQueueEmptyFromISR,const QueueHandle_t xQueue)  
+__OPROTO(,,BaseType_t,,xQueueIsQueueEmptyFromISR,const QueueHandle_t xQueue)
 __OPROTO(,,BaseType_t,,xQueueIsQueueFullFromISR,const QueueHandle_t xQueue)
 __OPROTO(,,UBaseType_t,,uxQueueMessagesWaitingFromISR,const QueueHandle_t xQueue)
 
@@ -1523,7 +1523,7 @@ __OPROTO(,,QueueHandle_t,,xQueueCreateMutex,const uint8_t ucQueueType)
     QueueHandle_t xQueueCreateCountingSemaphore( const UBaseType_t uxMaxCount,
                                                  const UBaseType_t uxInitialCount ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,QueueHandle_t,,xQueueCreateCountingSemaphore,const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount)
+    __OPROTO(,,QueueHandle_t,,xQueueCreateCountingSemaphore,const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount)
 #endif
 
 #if ( ( configUSE_COUNTING_SEMAPHORES == 1 ) && ( configSUPPORT_STATIC_ALLOCATION == 1 ) )
@@ -1734,7 +1734,7 @@ __OPROTO(,,BaseType_t,,xQueueGiveMutexRecursive,QueueHandle_t xMutex)
 /*
     QueueSetHandle_t xQueueCreateSet( const UBaseType_t uxEventQueueLength ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,QueueSetHandle_t,,xQueueCreateSet,const UBaseType_t uxEventQueueLength)
+    __OPROTO(,,QueueSetHandle_t,,xQueueCreateSet,const UBaseType_t uxEventQueueLength)
 
 #endif
 
@@ -1765,7 +1765,7 @@ __OPROTO(,,QueueSetHandle_t,,xQueueCreateSet,const UBaseType_t uxEventQueueLengt
     BaseType_t xQueueAddToSet( QueueSetMemberHandle_t xQueueOrSemaphore,
                                QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,QueueSetHandle_t,,xQueueAddToSet,QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet)
+    __OPROTO(,,BaseType_t,,xQueueAddToSet,QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet)
 #endif
 
 /*
@@ -1790,7 +1790,7 @@ __OPROTO(,,QueueSetHandle_t,,xQueueAddToSet,QueueSetMemberHandle_t xQueueOrSemap
     BaseType_t xQueueRemoveFromSet( QueueSetMemberHandle_t xQueueOrSemaphore,
                                     QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,QueueSetHandle_t,,xQueueRemoveFromSet,QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet)
+    __OPROTO(,,BaseType_t,,xQueueRemoveFromSet,QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet)
 #endif
 
 /*
@@ -1832,7 +1832,7 @@ __OPROTO(,,QueueSetHandle_t,,xQueueRemoveFromSet,QueueSetMemberHandle_t xQueueOr
     QueueSetMemberHandle_t xQueueSelectFromSet( QueueSetHandle_t xQueueSet,
                                                 const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,QueueSetMemberHandle_t,,xQueueSelectFromSet,QueueSetHandle_t xQueueSet,const TickType_t xTicksToWait)
+    __OPROTO(,,QueueSetMemberHandle_t,,xQueueSelectFromSet,QueueSetHandle_t xQueueSet,const TickType_t xTicksToWait)
 #endif
 
 /*
@@ -1842,7 +1842,7 @@ __OPROTO(,,QueueSetMemberHandle_t,,xQueueSelectFromSet,QueueSetHandle_t xQueueSe
 /*
     QueueSetMemberHandle_t xQueueSelectFromSetFromISR( QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,QueueSetMemberHandle_t,,xQueueSelectFromSetFromISR,QueueSetHandle_t xQueueSet)
+    __OPROTO(,,QueueSetMemberHandle_t,,xQueueSelectFromSetFromISR,QueueSetHandle_t xQueueSet)
 #endif
 
 /* Not public API functions. */
@@ -1875,7 +1875,7 @@ __OPROTO(,,uint8_t,,ucQueueGetQueueType,QueueHandle_t xQueue)
 /*
     UBaseType_t uxQueueGetQueueNumber( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
  */
-    __OPROTO(,,BaseType_t,,uxQueueGetQueueNumber, QueueHandle_t xQueue)
+    __OPROTO(,,UBaseType_t,,uxQueueGetQueueNumber, QueueHandle_t xQueue)
 #endif
 
 #if ( configUSE_TRACE_FACILITY == 1 )

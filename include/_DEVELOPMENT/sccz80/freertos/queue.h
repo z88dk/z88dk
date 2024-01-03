@@ -1520,7 +1520,7 @@ UBaseType_t uxQueueMessagesWaitingFromISR( const QueueHandle_t xQueue ) PRIVILEG
  */
 extern BaseType_t __LIB__ xQueueIsQueueEmptyFromISR(const QueueHandle_t xQueue) __smallc;
 
-  
+
 extern BaseType_t __LIB__ xQueueIsQueueFullFromISR(const QueueHandle_t xQueue) __smallc;
 
 
@@ -1555,7 +1555,7 @@ extern QueueHandle_t __LIB__ xQueueCreateMutex(const uint8_t ucQueueType) __smal
     QueueHandle_t xQueueCreateCountingSemaphore( const UBaseType_t uxMaxCount,
                                                  const UBaseType_t uxInitialCount ) PRIVILEGED_FUNCTION;
  */
-extern QueueHandle_t __LIB__ xQueueCreateCountingSemaphore(const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount) __smallc;
+    extern QueueHandle_t __LIB__ xQueueCreateCountingSemaphore(const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount) __smallc;
 
 
 #endif
@@ -1792,7 +1792,7 @@ extern BaseType_t __LIB__ xQueueGiveMutexRecursive(QueueHandle_t xMutex) __small
 /*
     QueueSetHandle_t xQueueCreateSet( const UBaseType_t uxEventQueueLength ) PRIVILEGED_FUNCTION;
  */
-extern QueueSetHandle_t __LIB__ xQueueCreateSet(const UBaseType_t uxEventQueueLength) __smallc;
+    extern QueueSetHandle_t __LIB__ xQueueCreateSet(const UBaseType_t uxEventQueueLength) __smallc;
 
 
 
@@ -1825,7 +1825,7 @@ extern QueueSetHandle_t __LIB__ xQueueCreateSet(const UBaseType_t uxEventQueueLe
     BaseType_t xQueueAddToSet( QueueSetMemberHandle_t xQueueOrSemaphore,
                                QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
-extern QueueSetHandle_t __LIB__ xQueueAddToSet(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc;
+    extern BaseType_t __LIB__ xQueueAddToSet(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc;
 
 
 #endif
@@ -1852,7 +1852,7 @@ extern QueueSetHandle_t __LIB__ xQueueAddToSet(QueueSetMemberHandle_t xQueueOrSe
     BaseType_t xQueueRemoveFromSet( QueueSetMemberHandle_t xQueueOrSemaphore,
                                     QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
-extern QueueSetHandle_t __LIB__ xQueueRemoveFromSet(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc;
+    extern BaseType_t __LIB__ xQueueRemoveFromSet(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc;
 
 
 #endif
@@ -1896,7 +1896,7 @@ extern QueueSetHandle_t __LIB__ xQueueRemoveFromSet(QueueSetMemberHandle_t xQueu
     QueueSetMemberHandle_t xQueueSelectFromSet( QueueSetHandle_t xQueueSet,
                                                 const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
  */
-extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSet(QueueSetHandle_t xQueueSet,const TickType_t xTicksToWait) __smallc;
+    extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSet(QueueSetHandle_t xQueueSet,const TickType_t xTicksToWait) __smallc;
 
 
 #endif
@@ -1908,7 +1908,7 @@ extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSet(QueueSetHandle_t xQueu
 /*
     QueueSetMemberHandle_t xQueueSelectFromSetFromISR( QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
-extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSetFromISR(QueueSetHandle_t xQueueSet) __smallc;
+    extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSetFromISR(QueueSetHandle_t xQueueSet) __smallc;
 
 
 #endif
@@ -1955,7 +1955,7 @@ extern uint8_t __LIB__ ucQueueGetQueueType(QueueHandle_t xQueue) __smallc;
 /*
     UBaseType_t uxQueueGetQueueNumber( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
  */
-    extern BaseType_t __LIB__ uxQueueGetQueueNumber(QueueHandle_t xQueue) __smallc;
+    extern UBaseType_t __LIB__ uxQueueGetQueueNumber(QueueHandle_t xQueue) __smallc;
 
 
 #endif
