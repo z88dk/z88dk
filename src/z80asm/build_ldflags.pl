@@ -40,4 +40,4 @@ END
 	close($pipe);
 }
 print "\n";
-unlink "$file.cpp", "$file.err", $file;
+unlink "$file.cpp", "$file.err", "$file.exe", $file;
