@@ -72,6 +72,7 @@ public:
 	string sym_filename(const string& filename);
 	string map_filename(const string& filename);
 	string reloc_filename(const string& bin_filename);
+    string norm_filename(const string& filename);
 
 private:
 	// options

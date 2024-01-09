@@ -266,6 +266,16 @@ string Args::reloc_filename(const string& bin_filename) {
 	return replace_ext(bin_filename, EXT_RELOC);
 }
 
+// Issue #2476: on msys2 a path "/d/xxx" must be changed to "d:/xxx"
+string Args::norm_filename(const string& filename) {
+    string cur_path = fs::current_path().generic_string();
+    if (cur_path.size() > 2 && isalpha(cur_path[0]) && cur_path[1] == ':' &&
+        filename.size() > 3 && filename[0] == '/' && isalpha(filename[1]) && filename[2] == '/')
+        return string(1, filename[1]) + ":" + filename.substr(2);
+    else
+        return filename;
+}
+
 void Args::parse_option(const string& arg) {
 	string opt_arg;
 
@@ -445,14 +455,15 @@ void Args::parse_file(const string& arg_) {
 		expand_source_glob(arg);
 }
 
-void Args::expand_source_glob(const string& pattern) {
+// get list of files from pattern
+void Args::expand_source_glob(const string& pattern_) {
+    string pattern = norm_filename(pattern_);           // #2476
 	size_t wc_pos = pattern.find_first_of("*?");
 	if (wc_pos == string::npos)
 		m_files.push_back(search_source(pattern));
 	else {
 		vector<fs::path> files;
 		expand_glob(files, pattern);
-
 		if (files.empty())
 			g_errors.error(ErrCode::GlobNoFiles, pattern);
 
@@ -463,8 +474,9 @@ void Args::expand_source_glob(const string& pattern) {
 	}
 }
 
-void Args::expand_list_glob(const string& pattern) {
-	// get list of files from pattern
+// get list of files from pattern
+void Args::expand_list_glob(const string& pattern_) {
+    string pattern = norm_filename(pattern_);           // #2476
 	vector<fs::path> files;
 	size_t wc_pos = pattern.find_first_of("*?");
 	if (wc_pos == string::npos) {
@@ -475,7 +487,7 @@ void Args::expand_list_glob(const string& pattern) {
 	}
 	else {
 		expand_glob(files, pattern);			// list of files
-		if (files.empty())
+        if (files.empty())
 			g_errors.error(ErrCode::GlobNoFiles, pattern);
 	}
 
