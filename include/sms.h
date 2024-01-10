@@ -113,7 +113,7 @@ typedef union _fixed {
   UWORD w;
 } fixed;
 
-extern void __LIB__ clear_vram();
+extern void __LIB__ clear_vram(void);
 // Load a 6 bit palette - for both gamegear and sms
 extern void __LIB__ load_palette(unsigned char *data, int index, int count) __smallc;
 // Load a 12 bit palette - gamegear only
@@ -121,13 +121,13 @@ extern void __LIB__ load_palette_gamegear(unsigned int *data, int index, int cou
 extern void __LIB__ load_tiles(unsigned char *data, int index, int count, int bpp) __smallc;
 extern void __LIB__ set_bkg_map(unsigned int *data, int x, int y, int w, int h) __smallc;
 extern void __LIB__ scroll_bkg(int x, int y) __smallc;
-extern int __LIB__ get_vcount();
-extern int __LIB__ wait_vblank_noint();
+extern int __LIB__ get_vcount(void);
+extern int __LIB__ wait_vblank_noint(void);
 extern void __LIB__ set_sprite(int n, int x, int y, int tile) __smallc;
 
 // Following two methods return __SMS_JOY_XX
-extern int __LIB__ read_joypad1();
-extern int __LIB__ read_joypad2();
+extern int __LIB__ read_joypad1(void);
+extern int __LIB__ read_joypad2(void);
 
 #ifndef gotoxy
 // gotoxy is defined in conio.h, so avoid the clash

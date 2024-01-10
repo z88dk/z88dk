@@ -96,8 +96,8 @@ extern double_t __LIB__ fmin(double_t,double_t) __smallc;
 
 
 /* Utility */
-extern double_t __LIB__ halfpi();        /* pi / 2 */
-extern double_t __LIB__ pi();            /* pi */
+extern double_t __LIB__ halfpi(void);        /* pi / 2 */
+extern double_t __LIB__ pi(void);            /* pi */
 
 /* Helper functions */
 extern double_t __LIB__ atof(char *) __smallc;
