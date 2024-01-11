@@ -7,7 +7,7 @@
 
 #include "args.h"
 #include "if.h"
-#include "scan.h"
+#include "scan2.h"
 #include "utils.h"
 #include <unordered_map>
 #include <cassert>
@@ -113,7 +113,7 @@ Token::Token(TType type, bool blank_before, const string& svalue)
 string Token::to_string() const {
     static string tokens[] = {
 #define X(id, text)     text,
-#include "scan.def"
+#include "scan2.def"
     };
 
     switch (m_type) {

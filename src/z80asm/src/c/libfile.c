@@ -11,7 +11,7 @@
 #include "modlink.h"
 #include "utlist.h"
 #include "zobjfile.h"
-#include "z80asm.h"
+#include "z80asm1.h"
 #include "z80asm_defs.h"
 #include "xmalloc.h"
 
@@ -24,7 +24,7 @@ static const char *search_libfile(const char *filename )
 		return get_lib_filename( filename );		/* add '.lib' extension */
 	else
 	{
-		error_not_lib_file(filename);
+		error_invalid_library_file(filename);
         return NULL;
 	}
 }
@@ -209,8 +209,8 @@ bool check_library_file(const char *src_filename)
         libfile_header(),
         error_file_not_found,
         error_file_open,
-		error_not_lib_file,
-		error_lib_file_version,
-        error_cpu_incompatible,
-        error_ixiy_incompatible);
+		error_invalid_library_file,
+		error_invalid_library_file_version,
+        error_incompatible_cpu,
+        error_incompatible_ixiy);
 }

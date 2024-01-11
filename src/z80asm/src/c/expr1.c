@@ -605,7 +605,7 @@ Expr1* expr_parse(void) {
 	if (!Expr_parse_ternary_cond(self))
 	{
 		/* syntax error in expression */
-		error_syntax_expr();
+		error_syntax_error_in_expression();
 
 		OBJ_DELETE(self);
 		self = NULL;

@@ -144,9 +144,9 @@ static void copy_objfile_sections(objfile_t* obj) {
 static objfile_t* copy_objfile(const char* obj_filename) {
     objfile_t* obj = objfile_new();
     utstring_printf(obj->filename, "%s", obj_filename);
-    utstring_printf(obj->signature, "%s" SIGNATURE_VERS, SIGNATURE_OBJ, CUR_VERSION);
+    utstring_printf(obj->signature, "%s" SIGNATURE_VERS, OBJ_FILE_SIGNATURE, OBJ_FILE_VERSION);
     utstring_printf(obj->modname, "%s", CURRENTMODULE->modname);
-    obj->version = CUR_VERSION;
+    obj->version = OBJ_FILE_VERSION;
     obj->cpu_id = option_cpu();
     obj->swap_ixiy = option_swap_ixiy();
     copy_objfile_externs(obj);
@@ -189,10 +189,10 @@ bool check_object_file(const char* obj_filename)
         objfile_header(),
         error_file_not_found,
         error_file_open,
-		error_not_obj_file,
-		error_obj_file_version,
-        error_cpu_incompatible,
-        error_ixiy_incompatible);
+		error_invalid_object_file,
+		error_invalid_object_file_version,
+        error_incompatible_cpu,
+        error_incompatible_ixiy);
 }
 
 static void no_error_file(const char* filename) {}
@@ -262,8 +262,8 @@ bool check_obj_lib_file(
         fclose(fp);
         return false;
     }
-    if (version != CUR_VERSION) {
-        do_error_version(filename, version, CUR_VERSION);
+    if (version != OBJ_FILE_VERSION) {
+        do_error_version(filename, version, OBJ_FILE_VERSION);
         fclose(fp);
         return false;
     }

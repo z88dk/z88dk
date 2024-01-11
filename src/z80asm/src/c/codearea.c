@@ -19,7 +19,7 @@ Manage the code area in memory
 #include "strutil.h"
 #include "utstring.h"
 #include "xassert.h"
-#include "z80asm.h"
+#include "z80asm1.h"
 #include <memory.h>
 
 /*-----------------------------------------------------------------------------
@@ -634,7 +634,7 @@ void set_origin_directive(int origin)
 				CURRENTSECTION->origin = origin;
 		}
 		else
-			error_int_range(origin);
+			error_integer_range(origin);
 	}
 }
 
@@ -644,7 +644,7 @@ void set_origin_option(int origin)
 	Section1 *default_section;
 
 	if (origin < 0)		// value can be >0xffff for banked address
-		error_int_range((long)origin);
+		error_integer_range((long)origin);
 	else
 	{
 		default_section = get_first_section(NULL);
@@ -689,7 +689,7 @@ void set_phase_directive(int address)
 	if (address >= 0 && address <= 0xFFFF)
 		CURRENTSECTION->asmpc_phase = address;
 	else
-		error_int_range(address);
+		error_integer_range(address);
 }
 
 void clear_phase_directive()

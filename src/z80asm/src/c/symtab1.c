@@ -24,7 +24,7 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 #include "symtab1.h"
 #include "types.h"
 #include "xassert.h"
-#include "z80asm.h"
+#include "z80asm1.h"
 #include "zobjfile.h"
 
 #define COLUMN_WIDTH	32
@@ -429,7 +429,7 @@ void declare_global_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_GLOBAL)
 		{
-			error_symbol_redecl(name);
+			error_symbol_redeclaration(name);
 		}
 		else
 		{
@@ -493,7 +493,7 @@ void declare_public_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_PUBLIC)
 		{
-			error_symbol_redecl(name);
+			error_symbol_redeclaration(name);
 		}
 		else
 		{
@@ -552,7 +552,7 @@ void declare_extern_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_EXTERN)
 		{
-			error_symbol_redecl(name);
+			error_symbol_redeclaration(name);
 		}
 		else
 		{
@@ -581,13 +581,13 @@ void declare_extern_symbol(const char *name)
             else
             {
                 /* already declared local */
-                error_symbol_redecl( name );
+                error_symbol_redeclaration( name );
             }
         }
         else 
         {
 			/* re-declaration not allowed */
-			error_symbol_redecl(name);
+			error_symbol_redeclaration(name);
 		}
     }
 }

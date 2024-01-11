@@ -26,7 +26,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "utstring.h"
 #include "xassert.h"
 #include "xmalloc.h"
-#include "z80asm.h"
+#include "z80asm1.h"
 #include "z80asm_defs.h"
 #include "zobjfile.h"
 #include <ctype.h>
@@ -176,7 +176,7 @@ static bool obj_file_read_data(obj_file_t* obj) {
             parse_string_table(obj);        // get list of defined symbols
         }
         else {
-            error_not_obj_file(obj->filename);
+            error_invalid_object_file(obj->filename);
             return false;
         }
     }
@@ -211,7 +211,7 @@ void library_file_append(const char * filename) {
 
 	// check for empty file name
 	if (!*filename) {
-		error_not_lib_file(filename);
+		error_invalid_library_file(filename);
 	}
 	else {
 		// search library path
@@ -266,7 +266,7 @@ bool object_file_check_append(const char* filename, Module1* module, bool reserv
 
 	// check for empty file name
 	if (!*filename) {
-		error_not_obj_file(filename);
+		error_invalid_object_file(filename);
 		return false;
 	}
 
@@ -539,14 +539,14 @@ static void patch_exprs(Expr1List* exprs)
 			{
 			case RANGE_BYTE_UNSIGNED:
 				if (value < -128 || value > 255)
-					warn_int_range(value);
+					warning_integer_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				break;
 
 			case RANGE_BYTE_SIGNED:
 				if (value < -128 || value > 127)
-					warn_int_range(value);
+					warning_integer_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				break;
@@ -554,7 +554,7 @@ static void patch_exprs(Expr1List* exprs)
 			case RANGE_HIGH_OFFSET:
 				if ((value & 0xff00) != 0) {
 					if ((value & 0xff00) != 0xff00)
-						warn_int_range(value);
+						warning_integer_range(value);
 				}
 
 				patch_byte(expr->code_pos, (byte_t)(value & 0xff));
@@ -562,7 +562,7 @@ static void patch_exprs(Expr1List* exprs)
 
 			case RANGE_BYTE_TO_WORD_UNSIGNED:
 				if (value < 0 || value > 255)
-					warn_int_range(value);
+					warning_integer_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				patch_byte(expr->code_pos + 1, 0);
@@ -570,7 +570,7 @@ static void patch_exprs(Expr1List* exprs)
 
 			case RANGE_BYTE_TO_WORD_SIGNED:
 				if (value < -128 || value > 127)
-					warn_int_range(value);
+					warning_integer_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
@@ -629,7 +629,7 @@ static void patch_exprs(Expr1List* exprs)
 				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
                 if (value < -128 || value > 127)
-                    error_int_range(value);
+                    error_integer_range(value);
                 else
                     patch_byte(expr->code_pos, (byte_t)value);
 				break;
@@ -639,7 +639,7 @@ static void patch_exprs(Expr1List* exprs)
                 value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
                 if (value < -0x8000 || value > 0x7FFF)
-                    error_int_range(value);
+                    error_integer_range(value);
                 else
                     patch_word(expr->code_pos, value);
                 break;
@@ -914,14 +914,14 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 
 			// if creating relocatable code, ignore origin 
 			if (option_relocatable() && section->origin >= 0) {
-				warn_org_ignored(obj->filename, section->name);
+				warning_org_ignored(obj->filename, section->name);
 
 				section->origin = ORG_NOT_DEFINED;
 				section->section_split = false;
 			}
 			// if running appmake, ignore origin except for first module
 			else if (option_appmake() && section->origin >= 0 && !first_section) {
-				warn_org_ignored(obj->filename, section->name);
+				warning_org_ignored(obj->filename, section->name);
 
 				section->origin = ORG_NOT_DEFINED;
 				section->section_split = false;
@@ -961,7 +961,7 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 			case SCOPE_LOCAL: sym = define_local_sym(name, value, type); break;
 			case SCOPE_PUBLIC: sym = define_global_sym(name, value, type); break;
 			default:
-				error_not_obj_file(obj->filename);
+				error_invalid_object_file(obj->filename);
 				return;
 			}
 
@@ -1399,7 +1399,7 @@ static void run_appmake(const char* appmake_opts, const char* out_ext,
 
 		int rv = system(utstring_body(cmd));
 		if (rv != 0)
-			error_cmd_failed(utstring_body(cmd));
+			error_command_failed(utstring_body(cmd));
 
 		utstring_free(cmd);
 	}

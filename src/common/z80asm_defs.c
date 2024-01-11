@@ -37,7 +37,7 @@ typedef struct {
 // CPUs
 //-----------------------------------------------------------------------------
 
-static cpu_lookup_t cpu_lu[] = {
+static cpu_lookup_t cpu_lut[] = {
     { "z80",        CPU_Z80,            CPU_Z80_STRICT,     },  // 1
     { "z80_strict", CPU_Z80_STRICT,     CPU_8080,           },  // 2
     { "z180",       CPU_Z180,           CPU_Z80_STRICT,     },  // 3
@@ -67,8 +67,8 @@ static int by_str(const cpu_lookup_t* a, const cpu_lookup_t* b) {
 
 static cpu_lookup_t* cpu_id_to_lookup(cpu_t id) {
     int i = (int)id - 1;
-    if (i >= 0 && i < NUM_ELEMS(cpu_lu))
-        return &cpu_lu[i];
+    if (i >= 0 && i < NUM_ELEMS(cpu_lut))
+        return &cpu_lut[i];
     else
         return NULL;
 }
@@ -77,9 +77,9 @@ static void init_cpus() {
     static bool inited = false;
     if (!inited) {
         // init hash table
-        for (size_t i = 0; i < NUM_ELEMS(cpu_lu); i++) {
-            const char* name = cpu_lu[i].name;
-            HASH_ADD_STR(cpu_lu_hash, name, &cpu_lu[i]);
+        for (size_t i = 0; i < NUM_ELEMS(cpu_lut); i++) {
+            const char* name = cpu_lut[i].name;
+            HASH_ADD_STR(cpu_lu_hash, name, &cpu_lut[i]);
         }
         HASH_SORT(cpu_lu_hash, by_str);
 
@@ -92,24 +92,24 @@ static void init_cpus() {
         }
 
         // init dependency level
-        for (size_t i = 0; i < NUM_ELEMS(cpu_lu); i++) {
-            if (cpu_lu[i].compat_parent == CPU_UNDEF)
-                cpu_lu[i].level = 0;            // no comaptibility
+        for (size_t i = 0; i < NUM_ELEMS(cpu_lut); i++) {
+            if (cpu_lut[i].compat_parent == CPU_UNDEF)
+                cpu_lut[i].level = 0;            // no comaptibility
             else
-                cpu_lu[i].level = -1;           // still to check
+                cpu_lut[i].level = -1;           // still to check
         }
 
         bool done = false;
         do {
             done = true;
-            for (size_t i = 0; i < NUM_ELEMS(cpu_lu); i++) {
-                if (cpu_lu[i].level < 0) {      // not yet traversed
-                    cpu_t parent = cpu_lu[i].compat_parent;
+            for (size_t i = 0; i < NUM_ELEMS(cpu_lut); i++) {
+                if (cpu_lut[i].level < 0) {      // not yet traversed
+                    cpu_t parent = cpu_lut[i].compat_parent;
                     cpu_lookup_t* parent_p = cpu_id_to_lookup(parent);
                     if (parent_p->level >= 0) {
-                        cpu_lu[i].level = parent_p->level + 1;
-                        if (cpu_lu[i].level > max_cpu_compat_level)
-                            max_cpu_compat_level = cpu_lu[i].level;
+                        cpu_lut[i].level = parent_p->level + 1;
+                        if (cpu_lut[i].level > max_cpu_compat_level)
+                            max_cpu_compat_level = cpu_lut[i].level;
                     }
 
                     done = false;
@@ -120,9 +120,9 @@ static void init_cpus() {
         // init orderd list of cpu-ids in library link order
         utarray_new(cpu_ids_array, &ut_int_icd);
         for (int level = max_cpu_compat_level; level >= 0; level--) {
-            for (size_t i = 0; i < NUM_ELEMS(cpu_lu); i++) {
-                if (cpu_lu[i].level == level)
-                    utarray_push_back(cpu_ids_array, &cpu_lu[i].id);
+            for (size_t i = 0; i < NUM_ELEMS(cpu_lut); i++) {
+                if (cpu_lut[i].level == level)
+                    utarray_push_back(cpu_ids_array, &cpu_lut[i].id);
             }
         }
         int id = CPU_UNDEF;

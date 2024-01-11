@@ -10,7 +10,7 @@
 #include "float.h"
 #include "if.h"
 #include "preproc.h"
-#include "scan.h"
+#include "scan2.h"
 #include "strpool.h"
 #include "utils.h"
 #include "xassert.h"

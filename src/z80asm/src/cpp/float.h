@@ -7,7 +7,7 @@
 #pragma once
 
 #include "if.h"
-#include "scan.h"
+#include "scan2.h"
 #include <cstdint>
 #include <vector>
 using namespace std;

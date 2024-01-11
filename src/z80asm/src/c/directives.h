@@ -11,6 +11,7 @@ Assembly directives.
 
 #pragma once
 
+#include "if.h"
 #include "str.h"
 #include "utarray.h"
 

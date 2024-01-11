@@ -17,7 +17,7 @@ Define CPU opcodes
 #include "parse1.h"
 #include "symtab1.h"
 #include "xassert.h"
-#include "z80asm.h"
+#include "z80asm1.h"
 #include "z80asm_defs.h"
 
 /* add 1 to 4 bytes opcode opcode to object code 
@@ -293,7 +293,7 @@ void add_rst_opcode(int arg) {
         break;
     case 0x10: case 0x18: case 0x20: case 0x28: case 0x38:
         add_opcode(0xC7 + arg); break;
-    default: error_int_range(arg);
+    default: error_integer_range(arg);
     }
 }
 
@@ -342,7 +342,7 @@ void add_Z88_CALL_OZ(int argument)
 		append_word(argument);
 	}
 	else
-		error_int_range(argument);
+		error_integer_range(argument);
 }
 
 void add_Z88_CALL_PKG(int argument)
@@ -353,7 +353,7 @@ void add_Z88_CALL_PKG(int argument)
 		append_word(argument);
 	}
 	else
-		error_int_range(argument);
+		error_integer_range(argument);
 }
 
 void add_Z88_FPP(int argument)
@@ -364,7 +364,7 @@ void add_Z88_FPP(int argument)
 		append_byte(argument);
 	}
 	else
-		error_int_range(argument);
+		error_integer_range(argument);
 }
 
 void add_Z88_INVOKE(int argument)
@@ -378,10 +378,10 @@ void add_Z88_INVOKE(int argument)
 		if (argument >= 0)
 			append_word(argument);
 		else
-			error_int_range(argument);
+			error_integer_range(argument);
 	}
 	else
-		error_illegal_ident();
+		error_illegal_identifier();
 }
 
 // cu.wait VER, HOR   ->  16 - bit encoding 0x8000 + (HOR << 9) + VER
@@ -389,7 +389,7 @@ void add_Z88_INVOKE(int argument)
 void add_copper_unit_wait(Expr1 *ver, Expr1 *hor)
 { 
 	if (option_cpu() != CPU_Z80N)
-		error_illegal_ident();
+		error_illegal_identifier();
 	else {
 		char expr_text[MAXLINE];
 		snprintf(expr_text, sizeof(expr_text),
@@ -407,7 +407,7 @@ void add_copper_unit_wait(Expr1 *ver, Expr1 *hor)
 void add_copper_unit_move(Expr1 *reg, Expr1 *val)
 {
 	if (option_cpu() != CPU_Z80N)
-		error_illegal_ident();
+		error_illegal_identifier();
 	else {
 		char expr_text[MAXLINE];
 		snprintf(expr_text, sizeof(expr_text),
@@ -425,7 +425,7 @@ void add_copper_unit_move(Expr1 *reg, Expr1 *val)
 void add_copper_unit_stop()
 {
 	if (option_cpu() != CPU_Z80N)
-		error_illegal_ident();
+		error_illegal_identifier();
 	else
 		append_word_be(0xFFFF);
 }
@@ -434,7 +434,7 @@ void add_copper_unit_stop()
 void add_copper_unit_nop()
 {
 	if (option_cpu() != CPU_Z80N)
-		error_illegal_ident();
+		error_illegal_identifier();
 	else
 		append_word_be(0x0000);
 }

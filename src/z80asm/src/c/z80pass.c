@@ -79,7 +79,7 @@ void Z80pass2(int start_errors, const char* obj_filename)
 				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
                 if (value < -128 || value > 127)
-                    error_int_range(value);
+                    error_integer_range(value);
                 else
                     patch_byte(expr->code_pos, (byte_t)value);
                 break;
@@ -89,21 +89,21 @@ void Z80pass2(int start_errors, const char* obj_filename)
 				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
                 if (value < -0x8000 || value > 0x7FFF)
-                    error_int_range(value);
+                    error_integer_range(value);
                 else
                     patch_word(expr->code_pos, value);
                 break;
 
 			case RANGE_BYTE_UNSIGNED:
 				if (value < -128 || value > 255)
-					warn_int_range(value);
+					warning_integer_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				break;
 
 			case RANGE_BYTE_SIGNED:
 				if (value < -128 || value > 127)
-					warn_int_range(value);
+					warning_integer_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				break;
@@ -111,7 +111,7 @@ void Z80pass2(int start_errors, const char* obj_filename)
 			case RANGE_HIGH_OFFSET:
 				if ((value & 0xff00) != 0) {
 					if ((value & 0xff00) != 0xff00)
-						warn_int_range(value);
+						warning_integer_range(value);
 				}
 
 				patch_byte(expr->code_pos, (byte_t)(value & 0xff));
@@ -123,7 +123,7 @@ void Z80pass2(int start_errors, const char* obj_filename)
 
 			case RANGE_BYTE_TO_WORD_UNSIGNED:
 				if (value < 0 || value > 255)
-					warn_int_range(value);
+					warning_integer_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				patch_byte(expr->code_pos + 1, 0);
@@ -131,7 +131,7 @@ void Z80pass2(int start_errors, const char* obj_filename)
 
 			case RANGE_BYTE_TO_WORD_SIGNED:
 				if (value < -128 || value > 127)
-					warn_int_range(value);
+					warning_integer_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
@@ -238,7 +238,7 @@ bool Pass2info(range_t range)
 			break;				/* proceed to evaluate expression */
 
 		default:                /* Syntax error, e.g. (ix 4) */
-			error_syntax();
+			error_syntax_error();
 			return false;		/* FAIL */
 		}
 
@@ -248,7 +248,7 @@ bool Pass2info(range_t range)
 
 	if (range == RANGE_BYTE_SIGNED && sym.tok != TK_RPAREN)
 	{
-		error_syntax();
+		error_syntax_error();
 		return false;		/* FAIL */
 	}
 

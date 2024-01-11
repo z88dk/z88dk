@@ -37,7 +37,7 @@ const char* objfile_header() {
     static UT_string* header = NULL;
     if (!header) {
         utstring_new(header);
-        utstring_printf(header, SIGNATURE_OBJ SIGNATURE_VERS, CUR_VERSION);
+        utstring_printf(header, OBJ_FILE_SIGNATURE SIGNATURE_VERS, OBJ_FILE_VERSION);
     }
     return utstring_body(header);
 }
@@ -46,7 +46,7 @@ const char* libfile_header() {
     static UT_string* header = NULL;
     if (!header) {
         utstring_new(header);
-        utstring_printf(header, SIGNATURE_LIB SIGNATURE_VERS, CUR_VERSION);
+        utstring_printf(header, LIB_FILE_SIGNATURE SIGNATURE_VERS, OBJ_FILE_VERSION);
     }
     return utstring_body(header);
 }
@@ -68,9 +68,9 @@ static file_type_e read_signature(FILE* fp, const char* filename,
 		die("error: signature not found in '%s'\n", filename);
 	file_signature[SIGNATURE_SIZE] = '\0';
 
-	if (strncmp(file_signature, SIGNATURE_OBJ, 6) == 0)
+	if (strncmp(file_signature, OBJ_FILE_SIGNATURE, 6) == 0)
 		type = is_object;
-	else if (strncmp(file_signature, SIGNATURE_LIB, 6) == 0)
+	else if (strncmp(file_signature, LIB_FILE_SIGNATURE, 6) == 0)
 		type = is_library;
 	else
 		die("error: file '%s' not object nor library\n", filename);
@@ -101,8 +101,8 @@ static void write_signature(FILE* fp, file_type_e type)
     utstring_new(signature);
 
     utstring_printf(signature, "%s" SIGNATURE_VERS,
-		type == is_object ? SIGNATURE_OBJ : SIGNATURE_LIB,
-		CUR_VERSION);
+		type == is_object ? OBJ_FILE_SIGNATURE : LIB_FILE_SIGNATURE,
+		OBJ_FILE_VERSION);
 
 	xfwrite_bytes(utstring_body(signature), SIGNATURE_SIZE, fp);
 
@@ -1176,7 +1176,7 @@ void file_write(file_t* file, const char* filename)
 {
 	if (opt_obj_verbose)
 		printf("Writing file '%s': %s version %d\n",
-			filename, file->type == is_object ? "object" : "library", CUR_VERSION);
+			filename, file->type == is_object ? "object" : "library", OBJ_FILE_VERSION);
 
 	FILE* fp = xfopen(filename, "wb");
 

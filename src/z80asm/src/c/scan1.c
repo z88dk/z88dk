@@ -380,7 +380,7 @@ void CurSymExpect(tokid_t expected_tok)
 	init_module();
 
 	if (sym.tok != expected_tok)
-		error_syntax();
+		error_syntax_error();
 }
 
 

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "scan.h"
+#include "scan2.h"
 #include <memory>
 #include <string>
 #include <unordered_map>

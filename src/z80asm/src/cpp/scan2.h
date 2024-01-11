@@ -19,7 +19,7 @@ using namespace std;
 // token types
 enum class TType {
 #define X(id, text)     id,
-#include "scan.def"
+#include "scan2.def"
 };
 
 // keywords

@@ -82,7 +82,7 @@ struct Expr1 *parse_expr(const char *expr_text)
 			expr = expr_parse();		/* may output error */
 			if (sym.tok != TK_END && sym.tok != TK_NEWLINE &&
 				num_errors == get_num_errors()) {
-				error_syntax();
+				error_syntax_error();
 				OBJ_DELETE(expr);
 				expr = NULL;
 			}
@@ -338,7 +338,7 @@ void parse_const_expr_eval(const char* expr_text, int* result, bool* error) {
 		// eval and discard expression
 		*result = Expr_eval(expr, true);
 		if (expr->result.not_evaluable) {
-			error_expected_const_expr();
+			error_constant_expression_expected();
 			*error = true;
 		}
 		OBJ_DELETE(expr);
@@ -409,7 +409,7 @@ static void parseline(ParseCtx *ctx)
 	else if (!parse_statement(ctx))
 	{
 		if (get_num_errors() == start_num_errors) {	/* no error output yet */
-			error_syntax();
+			error_syntax_error();
 			ctx->current_sm = SM_MAIN;				/* reset state machine */
 		}
 

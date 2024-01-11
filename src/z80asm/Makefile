@@ -197,7 +197,7 @@ src/c/reloc_code.c: dev/reloc_code.asm dev/make_reloc_code.pl Makefile
 endif
 
 # re2c
-$(eval $(call MAKE_RE2C,src/cpp/scan))
+$(eval $(call MAKE_RE2C,src/cpp/scan2))
 
 #------------------------------------------------------------------------------
 # test

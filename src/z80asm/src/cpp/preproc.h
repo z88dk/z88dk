@@ -10,7 +10,7 @@
 #include "defines.h"
 #include "errors.h"
 #include "if.h"
-#include "scan.h"
+#include "scan2.h"
 #include <deque>
 #include <fstream>
 #include <iostream>

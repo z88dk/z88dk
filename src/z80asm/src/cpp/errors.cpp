@@ -201,11 +201,11 @@ void error_invalid_char_const() {
 	g_errors.error(ErrCode::InvalidCharConst);
 }
 
-void error_syntax() {
+void error_syntax_error() {
 	g_errors.error(ErrCode::Syntax);
 }
 
-void error_syntax_expr() {
+void error_syntax_error_in_expression() {
 	g_errors.error(ErrCode::SyntaxExpr);
 }
 
@@ -213,7 +213,7 @@ void error_segment_overflow() {
 	g_errors.error(ErrCode::SegmentOverflow);
 }
 
-void warn_org_ignored(const char* filename, const char* section) {
+void warning_org_ignored(const char* filename, const char* section) {
 	g_errors.warning(ErrCode::OrgIgnored,
 		string("file ") + string(filename) + ", section " + string(section));
 }
@@ -222,27 +222,27 @@ void error_org_redefined() {
 	g_errors.error(ErrCode::OrgRedefined);
 }
 
-void error_int_range(int value) {
+void error_integer_range(int value) {
 	g_errors.error(ErrCode::IntRange, int_to_hex(value, 2));
 }
 
-void warn_int_range(int value) {
+void warning_integer_range(int value) {
 	g_errors.warning(ErrCode::IntRange, int_to_hex(value, 2));
 }
 
-void error_not_obj_file(const char* filename) {
+void error_invalid_object_file(const char* filename) {
 	g_errors.error(ErrCode::NotObjFile, filename);
 }
 
-void error_not_lib_file(const char* filename) {
+void error_invalid_library_file(const char* filename) {
 	g_errors.error(ErrCode::NotLibFile, filename);
 }
 
-void warn_expr_in_parens() {
+void warning_expr_in_parens() {
 	g_errors.warning(ErrCode::ExprInParens);
 }
 
-void error_string_too_long() {
+void error_string_longer_than_reserved_space() {
 	g_errors.error(ErrCode::StrTooLong);
 }
 
@@ -250,11 +250,11 @@ void error_division_by_zero() {
 	g_errors.error(ErrCode::DivisionByZero);
 }
 
-void error_missing_block() {
+void error_missing_bracket_block() {
 	g_errors.error(ErrCode::MissingBlock);
 }
 
-void error_missing_close_block() {
+void error_bracket_block_not_closed() {
 	g_errors.error(ErrCode::MissingCloseBlock);
 }
 
@@ -262,19 +262,19 @@ void error_undefined_symbol(const char* name) {
 	g_errors.error(ErrCode::UndefinedSymbol, name);
 }
 
-void error_illegal_ident() {
+void error_illegal_identifier() {
 	g_errors.error(ErrCode::IllegalIdent);
 }
 
-void error_expected_const_expr() {
+void error_constant_expression_expected() {
 	g_errors.error(ErrCode::ConstExprExpected);
 }
 
-void error_symbol_redecl(const char* name) {
+void error_symbol_redeclaration(const char* name) {
 	g_errors.error(ErrCode::SymbolRedeclaration, name);
 }
 
-void error_expr_recursion() {
+void error_recursive_expression() {
 	g_errors.error(ErrCode::ExprRecursion);
 }
 
@@ -291,49 +291,49 @@ void error_invalid_org(int origin) {
 	g_errors.error(ErrCode::InvalidOrg, int_to_hex(origin, 4));
 }
 
-void error_obj_file_version(const char* filename, int found_version, int expected_version) {
+void error_invalid_object_file_version(const char* filename, int found_version, int expected_version) {
 	g_errors.error(ErrCode::ObjFileVersion,
 		"file=" + string(filename) +
 		", found=" + to_string(found_version) +
 		", expected=" + to_string(expected_version));
 }
 
-void error_lib_file_version(const char* filename, int found_version, int expected_version) {
+void error_invalid_library_file_version(const char* filename, int found_version, int expected_version) {
 	g_errors.error(ErrCode::LibFileVersion,
 		"file=" + string(filename) +
 		", found=" + to_string(found_version) +
 		", expected=" + to_string(expected_version));
 }
 
-void error_dma_base_register_illegal(int value) {
+void error_dma_base_register_byte_illegal(int value) {
 	g_errors.error(ErrCode::DMABaseRegisterIllegal, int_to_hex(value, 2));
 }
 
-void error_dma_missing_args() {
+void error_dma_missing_register_group_members() {
 	g_errors.error(ErrCode::DMAMissingArgs);
 }
 
-void error_dma_extra_args() {
+void error_dma_too_many_arguments() {
 	g_errors.error(ErrCode::DMAExtraArgs);
 }
 
-void error_dma_illegal_port_A_timing() {
+void error_dma_illegal_port_a_timing() {
 	g_errors.error(ErrCode::DMAIllegalPortATiming);
 }
 
-void error_dma_illegal_port_B_timing() {
+void error_dma_illegal_port_b_timing() {
 	g_errors.error(ErrCode::DMAIllegalPortBTiming);
 }
 
-void error_dma_unsupported_interrupts() {
+void error_dma_does_not_support_interrupts() {
 	g_errors.error(ErrCode::DMAUnsupportedInterrupts);
 }
 
-void warn_dma_unsupported_features() {
+void warning_dma_does_not_support_some_features() {
 	g_errors.warning(ErrCode::DMAUnsupportedFeatures);
 }
 
-void warn_dma_unsupported_command() {
+void warning_dma_does_not_implement_this_command() {
 	g_errors.warning(ErrCode::DMAUnsupportedCommand);
 }
 
@@ -349,27 +349,27 @@ void error_dma_illegal_read_mask() {
 	g_errors.error(ErrCode::DMAIllegalReadMask);
 }
 
-void warn_dma_half_cycle_timing() {
+void warning_dma_does_not_support_half_cycle_timing() {
 	g_errors.warning(ErrCode::DMAHalfCycleTiming);
 }
 
-void warn_dma_ready_signal_unsupported() {
+void warning_dma_does_not_support_ready_signals() {
 	g_errors.warning(ErrCode::DMAUnsupportedReadySignal);
 }
 
-void error_cmd_failed(const char* cmd) {
+void error_command_failed(const char* cmd) {
 	g_errors.error(ErrCode::CmdFailed, cmd);
 }
 
-void error_assert_failed() {
+void error_assertion_failed() {
 	g_errors.error(ErrCode::AssertFailed);
 }
 
-void error_cpu_incompatible(const char* filename, cpu_t got_cpu_id) {
+void error_incompatible_cpu(const char* filename, cpu_t got_cpu_id) {
     ostringstream error;
     const char* cpu_str = cpu_name(got_cpu_id);
     if (cpu_str == NULL)
-        error_cpu_invalid(filename, got_cpu_id);
+        error_illegal_cpu(filename, got_cpu_id);
     else {
         error << "file " << filename << " compiled for " << cpu_str
             << ", incompatible with " << cpu_name(option_cpu());
@@ -377,7 +377,7 @@ void error_cpu_incompatible(const char* filename, cpu_t got_cpu_id) {
     }
 }
 
-void error_cpu_invalid(const char* filename, cpu_t got_cpu_id) {
+void error_illegal_cpu(const char* filename, cpu_t got_cpu_id) {
     ostringstream error;
     error << "file " << filename << ", cpu_id = " << got_cpu_id;
     g_errors.error(ErrCode::CPUInvalid, error.str());
@@ -392,7 +392,7 @@ static const char* ixiy_to_string(swap_ixiy_t swap_ixiy) {
     }
 }
 
-void error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy) {
+void error_incompatible_ixiy(const char* filename, swap_ixiy_t swap_ixiy) {
     ostringstream error;
     error << "file " << filename << " compiled with " << ixiy_to_string(swap_ixiy)
         << ", incompatible with " << ixiy_to_string(g_args.swap_ixiy());
