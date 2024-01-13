@@ -1312,6 +1312,25 @@ static disc_spec hc2000_spec = {
 };
 
 
+// Dataputer DISCFACE, Floppy disk interface for the ZX Spectrum
+static disc_spec discface_spec = {
+    .name = "ZX DiscFace",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
 // BBC Micro, Acorn Z80 2nd processor
 static disc_spec bbc_spec = {
     .name = "BBC Micro",
@@ -1974,6 +1993,7 @@ static struct formats {
     { "plus3",     "ZX Spectrum +3 173k",   &plus3_spec, 0, NULL, 1 },
     { "scorpion",  "ZX Scorpion, Profi",    &scoprpion_spec, 0, NULL, 1 },
     { "atmturbo",  "ZX MicroART ATM Turbo", &atmturbo_spec, 0, NULL, 1 },
+    { "discface",  "ZX Dataputer DISCFACE", &discface_spec, 0, NULL, 1 },
     { "hc91",      "ZX ICE Felix HC-91",    &hc91_spec, 0, NULL, 1 },
     { "hc2000",    "ZX HC-2000 / CoBra",    &hc2000_spec, 0, NULL, 1 },
     { "quorum",    "ZX Quorum,Profi,Hobb.", &quorum_spec, 0, NULL, 1 },
