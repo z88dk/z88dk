@@ -1312,9 +1312,9 @@ static disc_spec hc2000_spec = {
 };
 
 
-// Dataputer DISCFACE, Floppy disk interface for the ZX Spectrum
-static disc_spec discface_spec = {
-    .name = "ZX DiscFace",
+// Dataputer DISKFACE, Floppy disk interface for the ZX Spectrum
+static disc_spec diskface_spec = {
+    .name = "ZX DiskFace",
     .disk_mode = MFM250,
     .sectors_per_track = 9,
     .tracks = 40,
@@ -1993,7 +1993,7 @@ static struct formats {
     { "plus3",     "ZX Spectrum +3 173k",   &plus3_spec, 0, NULL, 1 },
     { "scorpion",  "ZX Scorpion, Profi",    &scoprpion_spec, 0, NULL, 1 },
     { "atmturbo",  "ZX MicroART ATM Turbo", &atmturbo_spec, 0, NULL, 1 },
-    { "discface",  "ZX Dataputer DISCFACE", &discface_spec, 0, NULL, 1 },
+    { "diskface",  "ZX Dataputer DISKFACE", &diskface_spec, 0, NULL, 1 },
     { "hc91",      "ZX ICE Felix HC-91",    &hc91_spec, 0, NULL, 1 },
     { "hc2000",    "ZX HC-2000 / CoBra",    &hc2000_spec, 0, NULL, 1 },
     { "quorum",    "ZX Quorum,Profi,Hobb.", &quorum_spec, 0, NULL, 1 },
