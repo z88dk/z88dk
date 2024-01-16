@@ -1331,6 +1331,25 @@ static disc_spec diskface_spec = {
 };
 
 
+// Elwro 800 Junior (ZX Spectrum clone)
+static disc_spec elwro_spec = {
+    .name = "Elwro 800J",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+};
+
+
 // BBC Micro, Acorn Z80 2nd processor
 static disc_spec bbc_spec = {
     .name = "BBC Micro",
@@ -1994,6 +2013,7 @@ static struct formats {
     { "scorpion",  "ZX Scorpion, Profi",    &scoprpion_spec, 0, NULL, 1 },
     { "atmturbo",  "ZX MicroART ATM Turbo", &atmturbo_spec, 0, NULL, 1 },
     { "diskface",  "ZX Dataputer DISKFACE", &diskface_spec, 0, NULL, 1 },
+    { "elwro",     "ZX Elwro 800 Junior",   &elwro_spec, 0, NULL, 1 },
     { "hc91",      "ZX ICE Felix HC-91",    &hc91_spec, 0, NULL, 1 },
     { "hc2000",    "ZX HC-2000 / CoBra",    &hc2000_spec, 0, NULL, 1 },
     { "quorum",    "ZX Quorum,Profi,Hobb.", &quorum_spec, 0, NULL, 1 },
