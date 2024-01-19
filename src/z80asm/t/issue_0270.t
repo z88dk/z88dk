@@ -45,18 +45,18 @@ END
 	check_bin_file("${test}_DATA.bin",	bytes(10, 11, 12, 13));
 	check_bin_file("${test}_BSS.bin", 	bytes(0, 0, 0));
 	check_text_file("${test}.map", <<'END');
-__head                          = $0000 ; const, public, def, , ,
-__tail                          = $8007 ; const, public, def, , ,
-__size                          = $8007 ; const, public, def, , ,
-__CODE_head                     = $0000 ; const, public, def, , ,
-__CODE_tail                     = $0005 ; const, public, def, , ,
-__CODE_size                     = $0005 ; const, public, def, , ,
-__DATA_head                     = $8000 ; const, public, def, , ,
-__DATA_tail                     = $8004 ; const, public, def, , ,
-__DATA_size                     = $0004 ; const, public, def, , ,
 __BSS_head                      = $8004 ; const, public, def, , ,
-__BSS_tail                      = $8007 ; const, public, def, , ,
 __BSS_size                      = $0003 ; const, public, def, , ,
+__BSS_tail                      = $8007 ; const, public, def, , ,
+__CODE_head                     = $0000 ; const, public, def, , ,
+__CODE_size                     = $0005 ; const, public, def, , ,
+__CODE_tail                     = $0005 ; const, public, def, , ,
+__DATA_head                     = $8000 ; const, public, def, , ,
+__DATA_size                     = $0004 ; const, public, def, , ,
+__DATA_tail                     = $8004 ; const, public, def, , ,
+__head                          = $0000 ; const, public, def, , ,
+__size                          = $8007 ; const, public, def, , ,
+__tail                          = $8007 ; const, public, def, , ,
 END
 }
 

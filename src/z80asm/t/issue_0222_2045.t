@@ -118,11 +118,11 @@ capture_ok("z88dk-z80asm +zx -m test.asm", "");
 check_bin_file("test.bin", bin_code($zx_rem_org));
 check_bin_file("test.tap", $rem_tap);
 check_text_file("test.map", <<'END');
+__head                          = $5CD0 ; const, public, def, , ,
+__size                          = $0007 ; const, public, def, , ,
+__tail                          = $5CD7 ; const, public, def, , ,
 asm_code                        = $5CD0 ; addr, local, , test, , test.asm:1
 l1                              = $5CD6 ; addr, local, , test, , test.asm:4
-__head                          = $5CD0 ; const, public, def, , ,
-__tail                          = $5CD7 ; const, public, def, , ,
-__size                          = $0007 ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -150,11 +150,11 @@ END
 check_bin_file("test.bin", bin_code($zx_rem_org));
 check_bin_file("test.tap", $rem_tap);
 check_text_file("test.map", <<'END');
+__head                          = $5CD0 ; const, public, def, , ,
+__size                          = $0007 ; const, public, def, , ,
+__tail                          = $5CD7 ; const, public, def, , ,
 asm_code                        = $5CD0 ; addr, local, , test, , test.asm:1
 l1                              = $5CD6 ; addr, local, , test, , test.asm:4
-__head                          = $5CD0 ; const, public, def, , ,
-__tail                          = $5CD7 ; const, public, def, , ,
-__size                          = $0007 ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -168,11 +168,11 @@ capture_ok("z88dk-z80asm +zx -m test.asm", "");
 check_bin_file("test.bin", bin_code($zx_rem_org));
 check_bin_file("test.tap", $rem_tap);
 check_text_file("test.map", <<'END');
+__head                          = $5CD0 ; const, public, def, , ,
+__size                          = $0007 ; const, public, def, , ,
+__tail                          = $5CD7 ; const, public, def, , ,
 asm_code                        = $5CD0 ; addr, local, , test, , test.asm:2
 l1                              = $5CD6 ; addr, local, , test, , test.asm:5
-__head                          = $5CD0 ; const, public, def, , ,
-__tail                          = $5CD7 ; const, public, def, , ,
-__size                          = $0007 ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -188,11 +188,11 @@ END
 check_bin_file("test.bin", bin_code($zx_rem_org-1));
 ok ! -f "test.tap", "no test.tap";
 check_text_file("test.map", <<'END');
+__head                          = $5CCF ; const, public, def, , ,
+__size                          = $0007 ; const, public, def, , ,
+__tail                          = $5CD6 ; const, public, def, , ,
 asm_code                        = $5CCF ; addr, local, , test, , test.asm:1
 l1                              = $5CD5 ; addr, local, , test, , test.asm:4
-__head                          = $5CCF ; const, public, def, , ,
-__tail                          = $5CD6 ; const, public, def, , ,
-__size                          = $0007 ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -223,17 +223,17 @@ END
 check_bin_file("test.bin", bin_code($zx_rem_org));
 check_bin_file("test.tap", $rem_tap);
 check_text_file("test.map", <<'END');
+__code1_head                    = $5CD0 ; const, public, def, , ,
+__code1_size                    = $0006 ; const, public, def, , ,
+__code1_tail                    = $5CD6 ; const, public, def, , ,
+__code2_head                    = $5CD6 ; const, public, def, , ,
+__code2_size                    = $0001 ; const, public, def, , ,
+__code2_tail                    = $5CD7 ; const, public, def, , ,
+__head                          = $5CD0 ; const, public, def, , ,
+__size                          = $0007 ; const, public, def, , ,
+__tail                          = $5CD7 ; const, public, def, , ,
 asm_code                        = $5CD0 ; addr, local, , test, code1, test.asm:4
 l1                              = $5CD6 ; addr, local, , test, code2, test.asm:11
-__head                          = $5CD0 ; const, public, def, , ,
-__tail                          = $5CD7 ; const, public, def, , ,
-__size                          = $0007 ; const, public, def, , ,
-__code1_head                    = $5CD0 ; const, public, def, , ,
-__code1_tail                    = $5CD6 ; const, public, def, , ,
-__code1_size                    = $0006 ; const, public, def, , ,
-__code2_head                    = $5CD6 ; const, public, def, , ,
-__code2_tail                    = $5CD7 ; const, public, def, , ,
-__code2_size                    = $0001 ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -269,17 +269,17 @@ END
 check_bin_file("test.bin", bin_code($zx_rem_org));
 check_bin_file("test.tap", $rem_tap);
 check_text_file("test.map", <<'END');
+__code1_head                    = $5CD0 ; const, public, def, , ,
+__code1_size                    = $0006 ; const, public, def, , ,
+__code1_tail                    = $5CD6 ; const, public, def, , ,
+__code2_head                    = $5CD6 ; const, public, def, , ,
+__code2_size                    = $0001 ; const, public, def, , ,
+__code2_tail                    = $5CD7 ; const, public, def, , ,
+__head                          = $5CD0 ; const, public, def, , ,
+__size                          = $0007 ; const, public, def, , ,
+__tail                          = $5CD7 ; const, public, def, , ,
 asm_code                        = $5CD0 ; addr, local, , test, code1, test.asm:5
 l1                              = $5CD6 ; addr, public, , test1, code2, test1.asm:5
-__head                          = $5CD0 ; const, public, def, , ,
-__tail                          = $5CD7 ; const, public, def, , ,
-__size                          = $0007 ; const, public, def, , ,
-__code1_head                    = $5CD0 ; const, public, def, , ,
-__code1_tail                    = $5CD6 ; const, public, def, , ,
-__code1_size                    = $0006 ; const, public, def, , ,
-__code2_head                    = $5CD6 ; const, public, def, , ,
-__code2_tail                    = $5CD7 ; const, public, def, , ,
-__code2_size                    = $0001 ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -296,11 +296,11 @@ END
 check_bin_file("test.bin", bin_code($zx_ramtop_org));
 check_bin_file("test.tap", $ramtop_tap);
 check_text_file("test.map", <<'END');
+__head                          = $5DC0 ; const, public, def, , ,
+__size                          = $0007 ; const, public, def, , ,
+__tail                          = $5DC7 ; const, public, def, , ,
 asm_code                        = $5DC0 ; addr, local, , test, , test.asm:1
 l1                              = $5DC6 ; addr, local, , test, , test.asm:4
-__head                          = $5DC0 ; const, public, def, , ,
-__tail                          = $5DC7 ; const, public, def, , ,
-__size                          = $0007 ; const, public, def, , ,
 END
 
 
@@ -392,11 +392,11 @@ END
 check_bin_file("test.bin", bin_code($zx81_rem_org));
 check_bin_file("test.P", $rem_P);
 check_text_file("test.map", <<'END');
+__head                          = $4082 ; const, public, def, , ,
+__size                          = $0007 ; const, public, def, , ,
+__tail                          = $4089 ; const, public, def, , ,
 asm_code                        = $4082 ; addr, local, , test, , test.asm:1
 l1                              = $4088 ; addr, local, , test, , test.asm:4
-__head                          = $4082 ; const, public, def, , ,
-__tail                          = $4089 ; const, public, def, , ,
-__size                          = $0007 ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -427,11 +427,11 @@ END
 check_bin_file("test.bin", bin_code($zx81_rem_org));
 check_bin_file("test.P", $rem_P);
 check_text_file("test.map", <<'END');
+__head                          = $4082 ; const, public, def, , ,
+__size                          = $0007 ; const, public, def, , ,
+__tail                          = $4089 ; const, public, def, , ,
 asm_code                        = $4082 ; addr, local, , test, , test.asm:1
 l1                              = $4088 ; addr, local, , test, , test.asm:4
-__head                          = $4082 ; const, public, def, , ,
-__tail                          = $4089 ; const, public, def, , ,
-__size                          = $0007 ; const, public, def, , ,
 END
 
 

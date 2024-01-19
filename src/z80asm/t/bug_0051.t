@@ -22,21 +22,21 @@ END
 	bytes(1, 2, 3, 4, 9));
 
 check_text_file("$test.def", <<END);
-DEFC minus_d_var                     = \$0001
 DEFC defc_var                        = \$0002
 DEFC defvars_var                     = \$0003
+DEFC minus_d_var                     = \$0001
 DEFC public_label                    = \$0004
 END
 
 check_text_file("$test.map", <<END);
-local_label                     = \$0009 ; addr, local, , $test, , $test.asm:12
-minus_d_var                     = \$0001 ; const, public, , $test, , $test.asm:0
+__head                          = \$0004 ; const, public, def, , ,
+__size                          = \$0005 ; const, public, def, , ,
+__tail                          = \$0009 ; const, public, def, , ,
 defc_var                        = \$0002 ; const, public, , $test, , $test.asm:2
 defvars_var                     = \$0003 ; const, public, , $test, , $test.asm:4
+local_label                     = \$0009 ; addr, local, , $test, , $test.asm:12
+minus_d_var                     = \$0001 ; const, public, , $test, , $test.asm:0
 public_label                    = \$0004 ; addr, public, , $test, , $test.asm:6
-__head                          = \$0004 ; const, public, def, , ,
-__tail                          = \$0009 ; const, public, def, , ,
-__size                          = \$0005 ; const, public, def, , ,
 END
 
 unlink_testfiles;

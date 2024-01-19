@@ -248,6 +248,10 @@ static void copy_full_sym_names( Symbol1Hash **ptarget, Symbol1Hash *source,
 *   get the symbols for which the passed function returns true,
 *   mapped NAME@MODULE -> Symbol1, needs to be deleted by OBJ_DELETE()
 *----------------------------------------------------------------------------*/
+static int Symbol1Hash_compare(Symbol1HashElem* a, Symbol1HashElem* b) {
+    return strcmp(a->key, b->key);
+}
+
 static Symbol1Hash *_select_module_symbols(Module1 *module, bool(*cond)(Symbol1 *sym))
 {
 	Module1ListElem *iter;
@@ -262,7 +266,8 @@ static Symbol1Hash *_select_module_symbols(Module1 *module, bool(*cond)(Symbol1 
 	}
 	copy_full_sym_names(&all_syms, global_symtab, cond);
 
-	return all_syms;
+    Symbol1Hash_sort(all_syms, Symbol1Hash_compare);
+    return all_syms;
 }
 
 Symbol1Hash *select_symbols( bool (*cond)(Symbol1 *sym) )

@@ -193,8 +193,9 @@ void make_library(const char *lib_filename) {
     // #2254 - rename temp file
     remove(lib_filename);
     int rv = rename(utstring_body(temp_filename), lib_filename);
-    if (rv != 0)
+    if (rv != 0) {
         error_file_rename(utstring_body(temp_filename));
+    }
 
 cleanup_and_return:
     strtable_free(st);

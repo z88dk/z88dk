@@ -4257,10 +4257,10 @@ capture_ok("z88dk-z80asm ${test}.asm", "");
 
 check_bin_file("${test}.o", objfile(NAME => $test,
 		       SYMBOLS => [
-					["L", "C", "", 3, "value8", "${test}.asm", 1],
-					["L", "C", "", 3, "value16", "${test}.asm", 2],
 					["L", "C", "", 127, "value127", "${test}.asm", 3],
 					["L", "C", "", 128, "value128", "${test}.asm", 4],
+					["L", "C", "", 3, "value16", "${test}.asm", 2],
+					["L", "C", "", 3, "value8", "${test}.asm", 1],
 				],
 		       CODE => [["", -1, 1,
 					bytes(0x3E,0x0C,
@@ -4283,10 +4283,10 @@ Object  file ${test}.o at \$0000: Z80RMF18
     C \$0010: 39 EB EB 21 00 00 39 EB EB 21 7F 00 39 EB 21 80
     C \$0020: FF 39 21 00 00 39 21 7F 00 39
   Symbols:
-    L C \$0003: value8 (section "") (file ${test}.asm:1)
-    L C \$0003: value16 (section "") (file ${test}.asm:2)
     L C \$007F: value127 (section "") (file ${test}.asm:3)
     L C \$0080: value128 (section "") (file ${test}.asm:4)
+    L C \$0003: value16 (section "") (file ${test}.asm:2)
+    L C \$0003: value8 (section "") (file ${test}.asm:1)
 END
 
 
@@ -4314,10 +4314,10 @@ capture_ok("z88dk-z80asm ${test}.asm", "");
 
 check_bin_file("${test}.o", objfile(NAME => $test,
 		       SYMBOLS => [
-					["L", "C", "", 3, "value8", "${test}.asm", 12],
-					["L", "C", "", 3, "value16", "${test}.asm", 13],
-					["L", "C", "", 128, "value128", "${test}.asm", 15],
 					["L", "C", "", 127, "value127", "${test}.asm", 14],
+					["L", "C", "", 128, "value128", "${test}.asm", 15],
+					["L", "C", "", 3, "value16", "${test}.asm", 13],
+					["L", "C", "", 3, "value8", "${test}.asm", 12],
 				],
 		       CODE => [["", -1, 1,
 					bytes(0x3E,0x0C,
@@ -4340,14 +4340,13 @@ Object  file ${test}.o at \$0000: Z80RMF18
     C \$0010: 39 EB EB 21 00 00 39 EB EB 21 7F 00 39 EB 21 80
     C \$0020: FF 39 21 00 00 39 21 7F 00 39
   Symbols:
-    L C \$0003: value8 (section "") (file ${test}.asm:12)
-    L C \$0003: value16 (section "") (file ${test}.asm:13)
-    L C \$0080: value128 (section "") (file ${test}.asm:15)
     L C \$007F: value127 (section "") (file ${test}.asm:14)
+    L C \$0080: value128 (section "") (file ${test}.asm:15)
+    L C \$0003: value16 (section "") (file ${test}.asm:13)
+    L C \$0003: value8 (section "") (file ${test}.asm:12)
 END
 
 
-#
 unlink_testfiles;
 
 spew("${test}.inc", <<END);
@@ -4425,9 +4424,9 @@ check_bin_file("${test}.o", objfile(NAME => $test,
 				["C", "${test}.asm",6, "", 1, 2, 3, "", "extobj"],
 				["C", "${test}.asm",7, "", 4, 5, 3, "", "extlib"]],
 		       SYMBOLS => [
-					["L", "A", "", 0, "local", "${test}.asm", 5],
+					  ["L", "A", "", 0, "local", "${test}.asm", 5],
 				    ["G", "A", "", 1, "global", "${test}.asm", 6]],
-		       EXTERNS => ["extobj","extlib"],
+		       EXTERNS => ["extlib","extobj"],
 		       CODE => [["", -1, 1,
 						bytes(0x00,
 							  0xCD,0x00,0x00,
@@ -4443,8 +4442,8 @@ Object  file ${test}.o at \$0000: Z80RMF18
     L A \$0000: local (section "") (file ${test}.asm:5)
     G A \$0001: global (section "") (file ${test}.asm:6)
   Externs:
-    U         extobj
     U         extlib
+    U         extobj
   Expressions:
     E W \$0001 \$0002 3: extobj (section "") (file ${test}.asm:6)
     E W \$0004 \$0005 3: extlib (section "") (file ${test}.asm:7)

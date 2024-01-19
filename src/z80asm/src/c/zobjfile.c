@@ -26,9 +26,14 @@ Handle object file contruction, reading and writing
 *   Write module to object file
 *----------------------------------------------------------------------------*/
 
+static int Symbol1Hash_compare(Symbol1HashElem* a, Symbol1HashElem* b) {
+    return strcmp(a->key, b->key);
+}
+
 static void copy_objfile_externs(objfile_t* obj) {
     Symbol1* sym;
-    for (Symbol1HashElem* iter = Symbol1Hash_first(global_symtab); iter!=NULL;
+    Symbol1Hash_sort(global_symtab, Symbol1Hash_compare);
+    for (Symbol1HashElem* iter = Symbol1Hash_first(global_symtab); iter != NULL;
         iter = Symbol1Hash_next(iter)
         ) {
         sym = (Symbol1*)iter->value;
@@ -71,6 +76,7 @@ static void copy_objfile_exprs(objfile_t* obj, Section1* in_section, section_t* 
 
 static void copy_objfile_symbols_symtab(objfile_t* obj, Section1* in_section, section_t* out_section,
     Symbol1Hash* symtab) {
+    Symbol1Hash_sort(symtab, Symbol1Hash_compare);
     for (Symbol1HashElem* iter = Symbol1Hash_first(symtab); iter != NULL;
         iter = Symbol1Hash_next(iter)
         ) {

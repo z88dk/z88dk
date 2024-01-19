@@ -93,10 +93,10 @@ Object  file ${test}.o at \$0000: Z80RMF18
     L A \$0000: a0 (section "") (file ${test}.asm:5)
     G A \$0013: a1 (section "") (file ${test}.asm:13)
   Externs:
-    U         a2
     U         __head
-    U         __tail
     U         __size
+    U         __tail
+    U         a2
   Expressions:
     E U \$0000 \$0001 2: \$-4608 (section "") (file ${test}.asm:6)
     E W \$0002 \$0003 3: \$ (section "") (file ${test}.asm:7)
@@ -116,10 +116,10 @@ Object  file ${test}1.o at \$0000: Z80RMF18
   Symbols:
     G A \$0013: a2 (section "") (file ${test}1.asm:11)
   Externs:
-    U         a1
     U         __head
-    U         __tail
     U         __size
+    U         __tail
+    U         a1
   Expressions:
     E U \$0000 \$0001 2: \$-4608 (section "") (file ${test}1.asm:4)
     E W \$0002 \$0003 3: \$ (section "") (file ${test}1.asm:5)
@@ -133,12 +133,12 @@ Object  file ${test}1.o at \$0000: Z80RMF18
 END
 
 check_text_file("${test}.map", <<END);
+__head                          = \$1234 ; const, public, def, , ,
+__size                          = \$0038 ; const, public, def, , ,
+__tail                          = \$126C ; const, public, def, , ,
 a0                              = \$1234 ; addr, local, , ${test}, , ${test}.asm:5
 a1                              = \$1247 ; addr, public, , ${test}, , ${test}.asm:13
 a2                              = \$1263 ; addr, public, , ${test}1, , ${test}1.asm:11
-__head                          = \$1234 ; const, public, def, , ,
-__tail                          = \$126C ; const, public, def, , ,
-__size                          = \$0038 ; const, public, def, , ,
 END
 
 
