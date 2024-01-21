@@ -8,12 +8,10 @@ use Math::Trig;
 #-------------------------------------------------------------------------------
 # errors
 #-------------------------------------------------------------------------------
-my $invalid_format_error = "invalid float format, expected: ".
-	"genmath,math48,ieee16,ieee32,ieee64,z80,zx81,zx,z88,mbfs,mbf40,mbf64,am9511";
 
 spew("${test}.asm", "");
 capture_nok("z88dk-z80asm -float=x ${test}.asm", <<END);
-error: $invalid_format_error
+error: illegal -float option: x
 END
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
@@ -33,7 +31,7 @@ END_ERR
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		setfloat xx
 END_ASM
-$test.asm:1: error: $invalid_format_error
+$test.asm:1: error: illegal float format: xx
   ^---- setfloat xx
 END_ERR
 

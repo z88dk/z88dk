@@ -66,6 +66,8 @@ string str_remove_extra_blanks(const string& str);	// replace sequences of blank
 // search_replace
 string str_replace_all(string text, const string& find, const string& replace);
 
+vector<string> split(const string& s);
+
 // globs a pattern including *, ? and ** and returns all matching files and directories
 void expand_glob(vector<fs::path>& result, const string& pattern);
 

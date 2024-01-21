@@ -412,7 +412,12 @@ string Args::expand_env_vars(string text) {
 
 void Args::set_float_format(const string& format) {
 	if (!g_float_format.set_text(format))
-		g_errors.error(ErrCode::InvalidFloatFormat, FloatFormat::get_formats());
+		g_errors.error(ErrCode::IllegalFloatFormat, format);
+}
+
+void Args::set_float_option(const string& format) {
+	if (!g_float_format.set_text(format))
+		g_errors.error(ErrCode::IllegalFloatOption, format);
 }
 
 void Args::set_origin(const string& opt_arg) {
@@ -464,14 +469,18 @@ void Args::expand_source_glob(const string& pattern_) {
 	else {
 		vector<fs::path> files;
 		expand_glob(files, pattern);
-		if (files.empty())
-			g_errors.error(ErrCode::GlobNoFiles, pattern);
-
+		
+        bool found = false;
 		for (auto& file : files) {
-			if (fs::is_regular_file(file))
+            if (fs::is_regular_file(file)) {
 				m_files.push_back(search_source(file.generic_string()));
+                found = true;
+            }
 		}
-	}
+
+        if (!found)
+            g_errors.error(ErrCode::GlobNoFiles, pattern);
+    }
 }
 
 // get list of files from pattern
@@ -897,13 +906,8 @@ void Args::set_cpu(const string& name) {
         int id = cpu_id(name.c_str());
         if (id != CPU_UNDEF)
             set_cpu(id);
-        else {
-            string error = name + "; expected: " + cpu_list() + ",";
-            error += string(ARCH_TI83_NAME) + ",";
-            error += string(ARCH_TI83PLUS_NAME) + ",";
-            error.pop_back(); // remove last comma
-            g_errors.error(ErrCode::InvalidCpu, error);
-        }
+        else 
+            g_errors.error(ErrCode::IllegalCpuOption, name);
     }
 }
 

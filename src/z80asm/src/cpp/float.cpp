@@ -619,6 +619,14 @@ string FloatFormat::get_formats() {
 	return out;
 }
 
+vector<string> FloatFormat::get_all_defines() {
+    string all_defines;
+#	define X(type)	all_defines += str_toupper(string("__FLOAT_") + #type + "__") + " ";
+#	include "float.def"
+
+    return split(all_defines);
+}
+
 //-----------------------------------------------------------------------------
 
 const char* get_float_format_define(void) {

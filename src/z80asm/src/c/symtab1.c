@@ -93,6 +93,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
     {
 		sym = Symbol_create(name, value, type, scope, module, section);
 		sym->is_defined = true;
+        sym->is_touched = false;
         Symbol1Hash_set( psymtab, name, sym );
     }
     else if ( ! sym->is_defined )	/* already declared but not defined */
@@ -101,6 +102,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
 		sym->type = MAX( sym->type, type );
         sym->scope = scope;
 		sym->is_defined = true;
+        sym->is_touched = false;
         sym->module = module;
 		sym->section = section;
 		sym->filename = get_error_filename();
@@ -111,6 +113,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
         sym->module == module && sym->section == section)
     {
         /* constant redefined with the same value and in the same module/section */
+        sym->is_touched = false;
     }
     else											/* already defined */
     {

@@ -1232,8 +1232,16 @@ void Preproc::do_setfloat() {
 		if (!sublexer.peek().is(TType::Newline))
 			g_errors.error(ErrCode::Syntax);
 		else if (!g_float_format.set_text(format))
-			g_errors.error(ErrCode::InvalidFloatFormat, FloatFormat::get_formats());
-		else {}
+			g_errors.error(ErrCode::IllegalFloatFormat, format);
+		else {
+            for (auto& define : FloatFormat::get_all_defines()) {
+                undefine_static_def_sym(define.c_str());
+                undefine_local_def_sym(define.c_str());
+            }
+
+            define_static_def_sym(get_float_format_define(), 1);
+            define_local_def_sym(get_float_format_define(), 1);
+		}
 	}
 }
 

@@ -143,6 +143,7 @@ private:
 	static string unquote(string text);
 	static string expand_env_vars(string text);
 	static void set_float_format(const string& format);
+	static void set_float_option(const string& format);
 	static void set_origin(const string& opt_arg);
     static void define_static_symbol(const string& name, int value = 1);
     static void undefine_static_symbol(const string& name);

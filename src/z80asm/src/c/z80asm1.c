@@ -106,8 +106,8 @@ static void do_assemble(const char *src_filename, const char* obj_filename)
 	/* initialize local symtab with copy of static one (-D defines) */
 	copy_static_syms();
 
-	/* Init ASMPC */
-	set_PC(0);
+    /* Init ASMPC */
+    set_PC(0);
 
 	if (option_verbose())
 		printf("Assembling '%s'\n", path_canon(src_filename));

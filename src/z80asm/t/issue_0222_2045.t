@@ -135,7 +135,7 @@ capture_ok("z88dk-z80asm +zx -v -m -L.. test.asm", <<'END');
 % z88dk-z80asm +zx -v -m -L.. test.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Predefined constant: __FLOAT_GENMATH__ = 1
+Predefined constant: __FLOAT_ZX__ = 1
 Library 'z88dk-z80asm.lib' not found
 Reading library '../z88dk-z80asm.lib'
 Assembling 'test.asm'
@@ -409,7 +409,7 @@ capture_ok("z88dk-z80asm +zx81 -m -v -L.. test.asm 2> ${test}.err", <<'END');
 % z88dk-z80asm +zx81 -m -v -L.. test.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Predefined constant: __FLOAT_GENMATH__ = 1
+Predefined constant: __FLOAT_ZX81__ = 1
 Library 'z88dk-z80asm.lib' not found
 Reading library '../z88dk-z80asm.lib'
 Assembling 'test.asm'

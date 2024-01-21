@@ -52,6 +52,7 @@ public:
 	vector<uint8_t> float_to_bytes(double value);
 
 	static string get_formats();
+    static vector<string> get_all_defines();
 
 private:
 	Format m_format{ Format::genmath };
