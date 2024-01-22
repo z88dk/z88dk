@@ -112,7 +112,7 @@ ENDIF
     ld      hl,0
     add     hl,sp
     ld      (__restore_sp_onexit+1),hl	;Save entry stack
-IF (startup=3)
+IF (startup=3) | (startup=4)
     ; Increase to cover +3 MEM banking
     defc    __clib_exit_stack_size_t  = __clib_exit_stack_size + 18 + 18
     UNDEFINE __clib_exit_stack_size
@@ -127,7 +127,8 @@ ENDIF
     ld      (exitsp),hl
 
 ; Memory banking for Spectrum +3
-IF (startup=3)
+IF (startup=3) | (startup=4)
+
 	PUBLIC    p3_poke
 	PUBLIC    p3_peek
 	
@@ -194,7 +195,7 @@ __restore_sp_onexit:
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
 ; Memory banking for Spectrum +3
-IF (startup=3)
+IF (startup=3) | (startup=4)
 
     PUBLIC	RG0SAV
 RG0SAV:	defb 0
@@ -213,18 +214,35 @@ pokebyte_code:
 		; ..$15 00010101 -> banks 4,5,6,3
 		; ..$11 00010001 -> banks 0,1,2,3 (TPA)
 		ex  af,af
+
+IF (startup=4)
+		; Dataputer DISKFACE
+		call $EFD9
+		nop
+		nop
+		nop
+		nop
+ELSE
 		ld	a,$15
 		;ld	a,$0D
 		;ld	a,$05
 		ld bc,$1ffd
 		out(c),a
+ENDIF
+
 		ex af,af
 		ld (hl),a
+IF (startup=4)
+		; Dataputer DISKFACE
+		call $EFF3
+		nop
+ELSE
 		ld	a,$11		; avoid using ($FF01) to be compatible with CP/M 2.2 
 		;ld	a,$09
 		;ld	a,$01
 		;ld	a,($FF01)	; saved value
 		out(c),a
+ENDIF
 		ei
 		ret
 		; adjust code size
@@ -233,18 +251,35 @@ peekbyte_code:
 		di
 		; ..$15 00010101 -> banks 4,5,6,3
 		; ..$11 00010001 -> banks 0,1,2,3 (TPA)
+
+IF (startup=4)
+		; Dataputer DISKFACE
+		call $EFD9
+		nop
+		nop
+		nop
+		nop
+ELSE
 		ld	a,$15
 		;ld	a,$0D
 		;ld	a,$05
 		ld bc,$1ffd
 		out(c),a
+ENDIF
+
 		ld a,(hl)
 		ex  af,af
+IF (startup=4)
+		; Dataputer DISKFACE
+		call $EFF3
+		nop
+ELSE
 		ld	a,$11		; avoid using ($FF01) to be compatible with CP/M 2.2 
 		;ld	a,$09
 		;ld	a,$01
 		;ld	a,($FF01)	; saved value
 		out(c),a
+ENDIF
 		ex  af,af
 		ei
 		ret
