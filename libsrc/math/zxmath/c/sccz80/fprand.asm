@@ -47,7 +47,11 @@ ENDIF
 .fprand
 
 	LD      BC,1111      ; SEED 
-	CALL    ZXFP_STACK_BC 
+	LD		A,R          ; Add a little bit of randomness by shuffling FPSEED with R.
+	XOR		B            ; It avoids vertical patterns with PLOT RND*255, RND*176
+	LD		B,A          ; fpseed can't be used anymore to get a predictable sequence,
+	                     ; but setting fpseed to RANDOMIZE is still recommended.
+	CALL    ZXFP_STACK_BC
 
 	rst	ZXFP_BEGIN_CALC
 
