@@ -1,0 +1,833 @@
+#if EXEC_TEST==0
+extern void test_cpu_lookup_int();
+test_cpu_lookup_int();
+#endif
+
+#if EXEC_TEST==0
+extern void test_cpu_lookup_string();
+test_cpu_lookup_string();
+#endif
+
+#if EXEC_TEST==0
+extern void test_cpu_name();
+test_cpu_name();
+#endif
+
+#if EXEC_TEST==0
+extern void test_cpu_all_defines();
+test_cpu_all_defines();
+#endif
+
+#if EXEC_TEST==0
+extern void test_cpu_defines();
+test_cpu_defines();
+#endif
+
+#if EXEC_TEST==0
+extern void test_cpu_all_cpus();
+test_cpu_all_cpus();
+#endif
+
+#if EXEC_TEST==0
+extern void test_cpu_compatible();
+test_cpu_compatible();
+#endif
+
+#if EXEC_TEST==0
+extern void test_swap_ixiy_lookup_int();
+test_swap_ixiy_lookup_int();
+#endif
+
+#if EXEC_TEST==0
+extern void test_swap_ixiy_name();
+test_swap_ixiy_name();
+#endif
+
+#if EXEC_TEST==0
+extern void test_swap_ixiy_all_defines();
+test_swap_ixiy_all_defines();
+#endif
+
+#if EXEC_TEST==0
+extern void test_swap_ixiy_defines();
+test_swap_ixiy_defines();
+#endif
+
+#if EXEC_TEST==0
+extern void test_swap_ixiy_compatible();
+test_swap_ixiy_compatible();
+#endif
+
+#if EXEC_TEST==0
+extern void test_appmake();
+test_appmake();
+#endif
+
+#if EXEC_TEST==0
+extern void test_zfloat_lookup_string();
+test_zfloat_lookup_string();
+#endif
+
+#if EXEC_TEST==0
+extern void test_zfloat_name();
+test_zfloat_name();
+#endif
+
+#if EXEC_TEST==0
+extern void test_zfloat_all_defines();
+test_zfloat_all_defines();
+#endif
+
+#if EXEC_TEST==0
+extern void test_zfloat_defines();
+test_zfloat_defines();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_envvars();
+test_option_envvars();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_no_files();
+test_option_no_files();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_no_files") {
+    extern int exec_option_no_files();
+    int rv = exec_option_no_files();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_copyright();
+test_option_copyright();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_copyright") {
+    extern int exec_option_copyright();
+    int rv = exec_option_copyright();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_help();
+test_option_help();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_help") {
+    extern int exec_option_help();
+    int rv = exec_option_help();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_verbose();
+test_option_verbose();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_verbose") {
+    extern int exec_option_verbose();
+    int rv = exec_option_verbose();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_debug_z80asm();
+test_option_debug_z80asm();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_debug_z80asm") {
+    extern int exec_option_debug_z80asm();
+    int rv = exec_option_debug_z80asm();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_swap_ixiy();
+test_option_swap_ixiy();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_include();
+test_option_include();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_include") {
+    extern int exec_option_include();
+    int rv = exec_option_include();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_define();
+test_option_define();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_ucase();
+test_option_ucase();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_float();
+test_option_float();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_float") {
+    extern int exec_option_float();
+    int rv = exec_option_float();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_raw_strings();
+test_option_raw_strings();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_cpu();
+test_option_cpu();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_cpu") {
+    extern int exec_option_cpu();
+    int rv = exec_option_cpu();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_opt_speed();
+test_option_opt_speed();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_debug();
+test_option_debug();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_library_path();
+test_option_library_path();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_library_path") {
+    extern int exec_option_library_path();
+    int rv = exec_option_library_path();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_make_library();
+test_option_make_library();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_make_library") {
+    extern int exec_option_make_library();
+    int rv = exec_option_make_library();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_library();
+test_option_library();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_library") {
+    extern int exec_option_library();
+    int rv = exec_option_library();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_output_dir();
+test_option_output_dir();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_output_dir") {
+    extern int exec_option_output_dir();
+    int rv = exec_option_output_dir();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_output_file();
+test_option_output_file();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_output_file") {
+    extern int exec_option_output_file();
+    int rv = exec_option_output_file();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_make_bin();
+test_option_make_bin();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_split_bin();
+test_option_split_bin();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_date_stamp();
+test_option_date_stamp();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_date_stamp") {
+    extern int exec_option_date_stamp();
+    int rv = exec_option_date_stamp();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_relocatable();
+test_option_relocatable();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_reloc_info();
+test_option_reloc_info();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_origin();
+test_option_origin();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_origin") {
+    extern int exec_option_origin();
+    int rv = exec_option_origin();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_filler();
+test_option_filler();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_filler_1") {
+    extern int exec_option_filler_1();
+    int rv = exec_option_filler_1();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_filler_2") {
+    extern int exec_option_filler_2();
+    int rv = exec_option_filler_2();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_symtable();
+test_option_symtable();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_list_file();
+test_option_list_file();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_map_file();
+test_option_map_file();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_globaldef();
+test_option_globaldef();
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_appmake();
+test_option_appmake();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_option_appmake") {
+    extern int exec_option_appmake();
+    int rv = exec_option_appmake();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_option_m4();
+test_option_m4();
+#endif
+
+#if EXEC_TEST==0
+extern void test_location();
+test_location();
+#endif
+
+#if EXEC_TEST==0
+extern void test_error();
+test_error();
+#endif
+
+#if EXEC_TEST==2
+if (test == "exec_error") {
+    extern int exec_error(const string& arg);
+    int rv = exec_error(arg);
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==2
+if (test == "exec_warning") {
+    extern int exec_warning(const string& arg);
+    int rv = exec_warning(arg);
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_file_reader1();
+test_file_reader1();
+#endif
+
+#if EXEC_TEST==0
+extern void test_file_reader2();
+test_file_reader2();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_file_reader2") {
+    extern int exec_file_reader2();
+    int rv = exec_file_reader2();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_file_reader3();
+test_file_reader3();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_file_reader3") {
+    extern int exec_file_reader3();
+    int rv = exec_file_reader3();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_static_defines();
+test_static_defines();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_static_defines1") {
+    extern int exec_static_defines1();
+    int rv = exec_static_defines1();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_static_defines2") {
+    extern int exec_static_defines2();
+    int rv = exec_static_defines2();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_lookup_keyword();
+test_lookup_keyword();
+#endif
+
+#if EXEC_TEST==0
+extern void test_tokens1();
+test_tokens1();
+#endif
+
+#if EXEC_TEST==0
+extern void test_tokens2();
+test_tokens2();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_tokens1") {
+    extern int exec_tokens1();
+    int rv = exec_tokens1();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_tokens2") {
+    extern int exec_tokens2();
+    int rv = exec_tokens2();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_tokens3") {
+    extern int exec_tokens3();
+    int rv = exec_tokens3();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_tokens4") {
+    extern int exec_tokens4();
+    int rv = exec_tokens4();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_tokens5") {
+    extern int exec_tokens5();
+    int rv = exec_tokens5();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_tokens6") {
+    extern int exec_tokens6();
+    int rv = exec_tokens6();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_diag();
+test_diag();
+#endif
+
+#if EXEC_TEST==0
+extern void test_ok();
+test_ok();
+#endif
+
+#if EXEC_TEST==0
+extern void test_nok();
+test_nok();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_();
+test_is_();
+#endif
+
+#if EXEC_TEST==0
+extern void test_isnt_();
+test_isnt_();
+#endif
+
+#if EXEC_TEST==0
+extern void test_str_is_();
+test_str_is_();
+#endif
+
+#if EXEC_TEST==0
+extern void test_str_like_();
+test_str_like_();
+#endif
+
+#if EXEC_TEST==0
+extern void test_exec_();
+test_exec_();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_test_1") {
+    extern int exec_test_1();
+    int rv = exec_test_1();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_test_2") {
+    extern int exec_test_2();
+    int rv = exec_test_2();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_test_3") {
+    extern int exec_test_3();
+    int rv = exec_test_3();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_test_4") {
+    extern int exec_test_4();
+    int rv = exec_test_4();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_num_elems();
+test_num_elems();
+#endif
+
+#if EXEC_TEST==0
+extern void test_xassert();
+test_xassert();
+#endif
+
+#if EXEC_TEST==1
+if (test == "exec_xassert") {
+    extern int exec_xassert();
+    int rv = exec_xassert();
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_alnum();
+test_is_alnum();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_alpha();
+test_is_alpha();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_lower();
+test_is_lower();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_upper();
+test_is_upper();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_digit();
+test_is_digit();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_xdigit();
+test_is_xdigit();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_cntrl();
+test_is_cntrl();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_graph();
+test_is_graph();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_print();
+test_is_print();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_punct();
+test_is_punct();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_space();
+test_is_space();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_blank();
+test_is_blank();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_eol();
+test_is_eol();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_ident_char_start();
+test_is_ident_char_start();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_ident_char();
+test_is_ident_char();
+#endif
+
+#if EXEC_TEST==0
+extern void test_to_lower();
+test_to_lower();
+#endif
+
+#if EXEC_TEST==0
+extern void test_to_upper();
+test_to_upper();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_ident();
+test_is_ident();
+#endif
+
+#if EXEC_TEST==0
+extern void test_int_to_hex();
+test_int_to_hex();
+#endif
+
+#if EXEC_TEST==0
+extern void test_expand_env_vars();
+test_expand_env_vars();
+#endif
+
+#if EXEC_TEST==0
+extern void test_unquote();
+test_unquote();
+#endif
+
+#if EXEC_TEST==0
+extern void test_str_chomp();
+test_str_chomp();
+#endif
+
+#if EXEC_TEST==0
+extern void test_str_strip();
+test_str_strip();
+#endif
+
+#if EXEC_TEST==0
+extern void test_str_remove_all_blanks();
+test_str_remove_all_blanks();
+#endif
+
+#if EXEC_TEST==0
+extern void test_str_remove_extra_blanks();
+test_str_remove_extra_blanks();
+#endif
+
+#if EXEC_TEST==0
+extern void test_str_replace_all();
+test_str_replace_all();
+#endif
+
+#if EXEC_TEST==0
+extern void test_str_tolower();
+test_str_tolower();
+#endif
+
+#if EXEC_TEST==0
+extern void test_str_toupper();
+test_str_toupper();
+#endif
+
+#if EXEC_TEST==0
+extern void test_str_ends_with();
+test_str_ends_with();
+#endif
+
+#if EXEC_TEST==0
+extern void test_str_to_cstr();
+test_str_to_cstr();
+#endif
+
+#if EXEC_TEST==0
+extern void test_split();
+test_split();
+#endif
+
+#if EXEC_TEST==0
+extern void test_is_little_endian();
+test_is_little_endian();
+#endif
+
+#if EXEC_TEST==0
+extern void test_parse_le_int32();
+test_parse_le_int32();
+#endif
+
+#if EXEC_TEST==0
+extern void test_write_le_int32();
+test_write_le_int32();
+#endif
+
+#if EXEC_TEST==0
+extern void test_safe_getline();
+test_safe_getline();
+#endif
+
+#if EXEC_TEST==0
+extern void test_expand_glob();
+test_expand_glob();
+#endif
+
+#if EXEC_TEST==0
+extern void test_pool_str();
+test_pool_str();
+#endif
+
+#if EXEC_TEST==0
+extern void test_string_table();
+test_string_table();
+#endif
+
+#if EXEC_TEST==0
+extern void test_object();
+test_object();
+#endif
+
+#if EXEC_TEST==2
+if (test == "exec_object") {
+    extern int exec_object(const string& arg);
+    int rv = exec_object(arg);
+    exit(rv);
+}
+#endif
+
+#if EXEC_TEST==0
+extern void test_filenames();
+test_filenames();
+#endif
+

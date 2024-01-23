@@ -6,7 +6,7 @@
 
 #include "float.h"
 #include "if.h"
-#include "utils.h"
+#include "utils1.h"
 #include "xassert.h"
 #include <cassert>
 #include <cerrno>
@@ -387,14 +387,14 @@ double FloatExpr::parse_addition() {
 	double a = parse_multiplication();
 	if (m_parse_error) return 0.0;
 
-	while (m_line->peek().is(TType::Plus, TType::Minus)) {
-		TType op = m_line->peek().type();
+	while (m_line->peek().is(TType1::Plus, TType1::Minus)) {
+		TType1 op = m_line->peek().type();
 		m_line->next();
 
 		double b = parse_multiplication();
 		if (m_parse_error) return 0.0;
 
-		if (op == TType::Plus)
+		if (op == TType1::Plus)
 			a += b;
 		else
 			a -= b;
@@ -406,14 +406,14 @@ double FloatExpr::parse_multiplication() {
 	double a = parse_power();
 	if (m_parse_error) return 0.0;
 
-	while (m_line->peek().is(TType::Mult, TType::Div)) {
-		TType op = m_line->peek().type();
+	while (m_line->peek().is(TType1::Mult, TType1::Div)) {
+		TType1 op = m_line->peek().type();
 		m_line->next();
 
 		double b = parse_power();
 		if (m_parse_error) return 0.0;
 
-		if (op == TType::Mult)
+		if (op == TType1::Mult)
 			a *= b;
 		else if (b == 0.0) {
 			m_eval_error = true;		// division by zero
@@ -429,7 +429,7 @@ double FloatExpr::parse_power() {
 	double a = parse_unary();
 	if (m_parse_error) return 0.0;
 
-	while (m_line->peek().is(TType::Power)) {
+	while (m_line->peek().is(TType1::Power)) {
 		m_line->next();
 
 		double b = parse_power();
@@ -443,21 +443,21 @@ double FloatExpr::parse_power() {
 double FloatExpr::parse_unary() {
 	double a;
 	switch (m_line->peek().type()) {
-	case TType::Minus:
+	case TType1::Minus:
 		m_line->next();
 		a = parse_unary();
 		if (m_parse_error) return 0.0;
 		return -a;
-	case TType::Plus:
+	case TType1::Plus:
 		m_line->next();
 		a = parse_unary();
 		if (m_parse_error) return 0.0;
 		return a;
-	case TType::LParen:
+	case TType1::LParen:
 		m_line->next();
 		a = parse_expr();
 		if (m_parse_error) return 0.0;
-		if (!m_line->peek().is(TType::RParen)) {
+		if (!m_line->peek().is(TType1::RParen)) {
 			m_parse_error = true;
 			return 0.0;
 		}
@@ -475,45 +475,45 @@ double FloatExpr::parse_unary() {
 double FloatExpr::parse_primary() {
 	double a;
 	switch (m_line->peek().type()) {
-	case TType::Integer: 
+	case TType1::Integer: 
 		a = (double)m_line->peek().ivalue();
 		m_line->next();
 		return a;
-	case TType::Floating: 
+	case TType1::Floating: 
 		a = m_line->peek().fvalue();
 		m_line->next();
 		return a;
-	case TType::Ident:
+	case TType1::Ident:
         switch (m_line->peek().keyword()) {
-		case Keyword::SIN: m_line->next(); return parse_func(sin);
-		case Keyword::COS: m_line->next(); return parse_func(cos);
-		case Keyword::TAN: m_line->next(); return parse_func(tan);
-		case Keyword::ASIN: m_line->next(); return parse_func(asin);
-		case Keyword::ACOS: m_line->next(); return parse_func(acos);
-		case Keyword::ATAN: m_line->next(); return parse_func(atan);
-		case Keyword::ATAN2: m_line->next(); return parse_func2(atan2);
-		case Keyword::SINH: m_line->next(); return parse_func(sinh);
-		case Keyword::COSH: m_line->next(); return parse_func(cosh);
-		case Keyword::TANH: m_line->next(); return parse_func(tanh);
-        case Keyword::ASINH: m_line->next(); return parse_func(asinh);
-        case Keyword::ACOSH: m_line->next(); return parse_func(acosh);
-        case Keyword::ATANH: m_line->next(); return parse_func(atanh);
-        case Keyword::LOG: m_line->next(); return parse_func(log);
-        case Keyword::LOG10: m_line->next(); return parse_func(log10);
-        case Keyword::LOG2: m_line->next(); return parse_func(log2);
-        case Keyword::EXP: m_line->next(); return parse_func(exp);
-        case Keyword::EXP2: m_line->next(); return parse_func(exp2);
-        case Keyword::POW: m_line->next(); return parse_func2(pow);
-        case Keyword::SQRT: m_line->next(); return parse_func(sqrt);
-        case Keyword::CBRT: m_line->next(); return parse_func(cbrt);
-        case Keyword::CEIL: m_line->next(); return parse_func(ceil);
-        case Keyword::FLOOR: m_line->next(); return parse_func(floor);
-        case Keyword::TRUNC: m_line->next(); return parse_func(trunc);
-        case Keyword::ABS: m_line->next(); return parse_func(abs);
-        case Keyword::HYPOT: m_line->next(); return parse_func2(hypot);
-        case Keyword::FMOD: m_line->next(); return parse_func2(fmod);
-		case Keyword::PI: m_line->next(); return atan(1)*4;
-		case Keyword::E: m_line->next(); return exp(1);
+		case Keyword1::SIN: m_line->next(); return parse_func(sin);
+		case Keyword1::COS: m_line->next(); return parse_func(cos);
+		case Keyword1::TAN: m_line->next(); return parse_func(tan);
+		case Keyword1::ASIN: m_line->next(); return parse_func(asin);
+		case Keyword1::ACOS: m_line->next(); return parse_func(acos);
+		case Keyword1::ATAN: m_line->next(); return parse_func(atan);
+		case Keyword1::ATAN2: m_line->next(); return parse_func2(atan2);
+		case Keyword1::SINH: m_line->next(); return parse_func(sinh);
+		case Keyword1::COSH: m_line->next(); return parse_func(cosh);
+		case Keyword1::TANH: m_line->next(); return parse_func(tanh);
+        case Keyword1::ASINH: m_line->next(); return parse_func(asinh);
+        case Keyword1::ACOSH: m_line->next(); return parse_func(acosh);
+        case Keyword1::ATANH: m_line->next(); return parse_func(atanh);
+        case Keyword1::LOG: m_line->next(); return parse_func(log);
+        case Keyword1::LOG10: m_line->next(); return parse_func(log10);
+        case Keyword1::LOG2: m_line->next(); return parse_func(log2);
+        case Keyword1::EXP: m_line->next(); return parse_func(exp);
+        case Keyword1::EXP2: m_line->next(); return parse_func(exp2);
+        case Keyword1::POW: m_line->next(); return parse_func2(pow);
+        case Keyword1::SQRT: m_line->next(); return parse_func(sqrt);
+        case Keyword1::CBRT: m_line->next(); return parse_func(cbrt);
+        case Keyword1::CEIL: m_line->next(); return parse_func(ceil);
+        case Keyword1::FLOOR: m_line->next(); return parse_func(floor);
+        case Keyword1::TRUNC: m_line->next(); return parse_func(trunc);
+        case Keyword1::ABS: m_line->next(); return parse_func(abs);
+        case Keyword1::HYPOT: m_line->next(); return parse_func2(hypot);
+        case Keyword1::FMOD: m_line->next(); return parse_func2(fmod);
+		case Keyword1::PI: m_line->next(); return atan(1)*4;
+		case Keyword1::E: m_line->next(); return exp(1);
 		default:
 			m_parse_error = true;
 			return 0.0;
@@ -525,7 +525,7 @@ double FloatExpr::parse_primary() {
 }
 
 double FloatExpr::parse_func(double(*f)(double)) {
-	if (!m_line->peek().is(TType::LParen)) {
+	if (!m_line->peek().is(TType1::LParen)) {
 		m_parse_error = true;
 		return 0.0;
 	}
@@ -537,7 +537,7 @@ double FloatExpr::parse_func(double(*f)(double)) {
 }
 
 double FloatExpr::parse_func2(double(*f)(double, double)) {
-	if (!m_line->peek().is(TType::LParen)) {
+	if (!m_line->peek().is(TType1::LParen)) {
 		m_parse_error = true;
 		return 0.0;
 	}
@@ -546,7 +546,7 @@ double FloatExpr::parse_func2(double(*f)(double, double)) {
 		double a = parse_expr();
 		if (m_parse_error) return 0.0;
 
-		if (!m_line->peek().is(TType::Comma)) {
+		if (!m_line->peek().is(TType1::Comma)) {
 			m_parse_error = true;
 			return 0.0;
 		}
@@ -555,7 +555,7 @@ double FloatExpr::parse_func2(double(*f)(double, double)) {
 			double b = parse_expr();
 			if (m_parse_error) return 0.0;
 
-			if (!m_line->peek().is(TType::RParen)) {
+			if (!m_line->peek().is(TType1::RParen)) {
 				m_parse_error = true;
 				return 0.0;
 			}

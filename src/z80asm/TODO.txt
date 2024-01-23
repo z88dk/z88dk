@@ -1,0 +1,9 @@
+[ ] integrate cpp preprocessor
+[ ] create arch for definitions like character set and BASIC interface
+[x] link to old assembler to test
+[x] create def file with repititions
+[x] create errors for each kind or error, move strings to error class
+[x] protect options that heve getter/setter
+[ ] ti83 and ti83plus shpuld be an architecture instead of flags
+[ ] implement high-level constructs (selection, loops, calls)
+[ ] list file with addresses after linking

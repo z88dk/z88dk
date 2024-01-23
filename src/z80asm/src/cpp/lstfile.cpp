@@ -5,10 +5,9 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "args.h"
 #include "if.h"
 #include "lstfile.h"
-#include "utils.h"
+#include "utils1.h"
 #include "xassert.h"
 #include <cassert>
 #include <iomanip>
@@ -32,8 +31,9 @@ void LstFile::open(const string& filename) {
 	close();
 	if (option_list_file()) {			// if -l option
 		m_ofs.open(filename);
-		if (!m_ofs.is_open())
-			error_file_open(filename.c_str());
+        if (!m_ofs.is_open()) {
+            error_file_open(filename.c_str());
+        }
 		else {
 			m_patch_pos.clear();
 			m_line_started = false;
@@ -72,7 +72,7 @@ void LstFile::expanded_line(int asmpc, int phased_pc, const string& text) {
 		out_line();
 
 		m_line_started = true;
-        m_location.set_line_num(0);
+        m_location.line_num = 0;
 		m_asmpc = asmpc;
 		m_phased_pc = phased_pc;
 		m_bytes.clear();
@@ -114,9 +114,9 @@ void LstFile::end_line() {
 
 void LstFile::out_filename() {
 	if (m_ofs.is_open()) {
-		if (m_location.filename() != m_last_filename) {
-			m_ofs << m_location.filename() << ":" << endl;
-			m_last_filename = m_location.filename();
+		if (m_location.filename != m_last_filename) {
+			m_ofs << m_location.filename << ":" << endl;
+			m_last_filename = m_location.filename;
 		}
 	}
 }
@@ -127,8 +127,8 @@ void LstFile::out_line() {
 		out_filename();
 
 		// output line number
-		if (m_location.line_num() > 0)
-			m_ofs << setw(LineNumWidth) << m_location.line_num()
+		if (m_location.line_num > 0)
+			m_ofs << setw(LineNumWidth) << m_location.line_num
 			<< setw(SeparatorWidth) << "";
 		else
 			m_ofs << setw(LineNumWidth + SeparatorWidth) << "";
@@ -243,7 +243,7 @@ void list_got_source_line(const char* filename, int line_num, const char* text) 
 
 // send line to list file
 void list_got_expanded_line(const char* text) {
-	if (list_is_on() && g_args.verbose()) {
+	if (list_is_on() && g_args.opt_verbose) {
 		string line = string("      + ") + text;
 		list_expanded_line(
 			get_PC(), get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),

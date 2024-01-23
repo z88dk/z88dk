@@ -150,9 +150,9 @@ for my $cpu ("", qw(z80 z80n z180 gbz80 8080 8085 r2ka r3k)) {
 		my $real_cpu = $cpu ? $cpu : "z80";
 	
 		my $cmd = "z88dk-z80asm ";
+		$cmd .= "-IXIY " if $ixiy;
 		$cmd .= "-m$cpu " if $cpu;
 		$cmd .= "-b -v ";
-		$cmd .= "-IXIY " if $ixiy;
 		$cmd .= "${test}.asm";
 		
 		my @bytes = (0xCD, 0x04, 0x00, 0xC9);
@@ -168,7 +168,6 @@ for my $cpu ("", qw(z80 z80n z180 gbz80 8080 8085 r2ka r3k)) {
 		check_bin_file("${test}.bin", bytes(@bytes));
 		
 		die unless Test::More->builder->is_passing;
-		
 	}
 }
 
@@ -187,11 +186,11 @@ sub exp_output {
 				 ($cpu =~ /^80/i) ? "INTEL" : "";
 	
 	my $out = 	"% $cmd\n";
+	$out .= 	"Predefined constant: __SWAP_IX_IY__ = 1\n" if $ixiy;
 	$out .=		"Predefined constant: __CPU_${CPU}__ = 1\n";
 	$out .= 	"Predefined constant: __CPU_${family}__ = 1\n" if $family;
-	$out .= 	"Predefined constant: __SWAP_IX_IY__ = 1\n" if $ixiy;
+	$out .= 	"Predefined constant: __FLOAT_GENMATH__ = 1\n";
 	$out .= <<END;
-Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
 Assembling '${test}.asm'
 Writing object file '${test}.o'

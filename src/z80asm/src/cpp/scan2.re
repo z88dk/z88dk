@@ -5,10 +5,9 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "args.h"
 #include "if.h"
 #include "scan2.h"
-#include "utils.h"
+#include "utils1.h"
 #include <unordered_map>
 #include <cassert>
 #include <cmath>
@@ -70,67 +69,67 @@ static int keyword_flags[] = {
 #include "keyword.def"
 };
 
-Keyword keyword_lookup(const string& text) {
-    static unordered_map<string, Keyword> keywords = {
-#define X(id, text, flags)      { text, Keyword::id },
+Keyword1 keyword_lookup1(const string& text) {
+    static unordered_map<string, Keyword1> keywords = {
+#define X(id, text, flags)      { text, Keyword1::id },
 #include "keyword.def"
     };
 
     auto it = keywords.find(str_tolower(text));
     if (it == keywords.end())
-        return Keyword::None;
+        return Keyword1::None;
     else
         return it->second;
 }
 
-bool keyword_is_reg_8(Keyword keyword) {
+bool keyword_is_reg_8(Keyword1 keyword) {
     return keyword_flags[static_cast<int>(keyword)] & KW_REG_8;
 }
 
-bool keyword_is_reg_ix_iy(Keyword keyword) {
+bool keyword_is_reg_ix_iy(Keyword1 keyword) {
     return keyword_flags[static_cast<int>(keyword)] & KW_REG_IX_IY;
 }
 
-bool keyword_is_z80_ld_bit(Keyword keyword) {
+bool keyword_is_z80_ld_bit(Keyword1 keyword) {
     return keyword_flags[static_cast<int>(keyword)] & KW_Z80_LD_BIT;
 }
 
 //-----------------------------------------------------------------------------
 
-Token::Token(TType type, bool blank_before, int ivalue)
-    : m_type(type), m_blank_before(blank_before), m_ivalue(ivalue), m_keyword(Keyword::None) {
+Token1::Token1(TType1 type, bool blank_before, int ivalue)
+    : m_type(type), m_blank_before(blank_before), m_ivalue(ivalue), m_keyword(Keyword1::None) {
 }
 
-Token::Token(TType type, bool blank_before, double fvalue)
-    : m_type(type), m_blank_before(blank_before), m_fvalue(fvalue), m_keyword(Keyword::None) {
+Token1::Token1(TType1 type, bool blank_before, double fvalue)
+    : m_type(type), m_blank_before(blank_before), m_fvalue(fvalue), m_keyword(Keyword1::None) {
 }
 
-Token::Token(TType type, bool blank_before, const string& svalue)
+Token1::Token1(TType1 type, bool blank_before, const string& svalue)
     : m_type(type), m_blank_before(blank_before), m_svalue(svalue) {
-    m_keyword = keyword_lookup(svalue);
+    m_keyword = keyword_lookup1(svalue);
 }
 
-string Token::to_string() const {
+string Token1::to_string() const {
     static string tokens[] = {
 #define X(id, text)     text,
 #include "scan2.def"
     };
 
     switch (m_type) {
-    case TType::Ident:
+    case TType1::Ident:
         return m_svalue;
-    case TType::Integer:
+    case TType1::Integer:
         return std::to_string(m_ivalue);
-    case TType::Floating:
+    case TType1::Floating:
         return std::to_string(m_fvalue);
-    case TType::String:
+    case TType1::String:
         return string_bytes(m_svalue);
     default:
         return tokens[static_cast<int>(m_type)];
     }
 }
 
-string Token::to_string(const vector<Token>& tokens) {
+string Token1::to_string(const vector<Token1>& tokens) {
     string out = "";
     for (auto& token : tokens) {
         out = concat(out, token.to_string());
@@ -138,7 +137,7 @@ string Token::to_string(const vector<Token>& tokens) {
     return out;
 }
 
-string Token::string_bytes(const string& text) {
+string Token1::string_bytes(const string& text) {
     string out = "\"";
     for (auto c : text) {
         switch (c) {
@@ -169,7 +168,7 @@ string Token::string_bytes(const string& text) {
     return out;
 }
 
-string Token::concat(const string& s1, const string& s2) {
+string Token1::concat(const string& s1, const string& s2) {
     if (s1.empty() || s2.empty())
         return s1 + s2;
     else if (str_ends_with(s1, "##"))   // cpp-style concatenation
@@ -199,18 +198,18 @@ string Token::concat(const string& s1, const string& s2) {
 
 //-----------------------------------------------------------------------------
 
-ScannedLine::ScannedLine(const string& text, const vector<Token>& tokens)
+ScannedLine::ScannedLine(const string& text, const vector<Token1>& tokens)
     : m_text(text), m_pos(0) {
     std::copy(tokens.begin(), tokens.end(), std::back_inserter(m_tokens));
 }
 
 void ScannedLine::append(const ScannedLine& other) {
-    m_text = Token::concat(m_text, other.text());
+    m_text = Token1::concat(m_text, other.text());
     std::copy(other.tokens().begin(), other.tokens().end(), std::back_inserter(m_tokens));
 }
 
-void ScannedLine::append(const vector<Token>& tokens) {
-    ScannedLine other{ Token::to_string(tokens), tokens };
+void ScannedLine::append(const vector<Token1>& tokens) {
+    ScannedLine other{ Token1::to_string(tokens), tokens };
     append(other);
 }
 
@@ -220,8 +219,8 @@ void ScannedLine::clear() {
     m_pos = 0;
 }
 
-Token& ScannedLine::peek(int offset) {
-    static Token end{ TType::End, false };
+Token1& ScannedLine::peek(int offset) {
+    static Token1 end{ TType1::End, false };
     unsigned index = m_pos + offset;
     if (index >= m_tokens.size())
         return end;
@@ -235,8 +234,8 @@ void ScannedLine::next(int n) {
         m_pos = static_cast<unsigned>(m_tokens.size());
 }
 
-vector<Token> ScannedLine::peek_tokens(int offset) {
-    vector<Token> out;
+vector<Token1> ScannedLine::peek_tokens(int offset) {
+    vector<Token1> out;
     unsigned index = m_pos + offset;
     for (unsigned i = index; i < m_tokens.size(); i++)
         out.push_back(m_tokens[i]);
@@ -244,8 +243,8 @@ vector<Token> ScannedLine::peek_tokens(int offset) {
 }
 
 string ScannedLine::peek_text(int offset) {
-    vector<Token> out = peek_tokens(offset);
-    return Token::to_string(out);
+    vector<Token1> out = peek_tokens(offset);
+    return Token1::to_string(out);
 }
 
 //-----------------------------------------------------------------------------
@@ -260,14 +259,13 @@ bool FileScanner::open(const string& filename) {
     line_start = line_end = p = p0 = marker = limit = m_buffer.c_str();
 
     if (!fs::is_regular_file(fs::path(filename))) {
-        g_errors.error(ErrCode::FileNotFound, filename);
+        g_errors.error(Errors::Code::file_not_found, filename);
         return false;
     }
     else {
         m_ifs.open(filename, ios::binary);
         if (!m_ifs.is_open()) {
-            g_errors.error(ErrCode::FileOpen, filename);
-            perror(filename.c_str());
+            g_errors.os_error(Errors::Code::file_open, filename);
             return false;
         }
         else {
@@ -283,7 +281,7 @@ bool FileScanner::open(const string& filename) {
 void FileScanner::scan_text(Location location, const string& text) {
     if (m_ifs.is_open())
         m_ifs.close();
-    m_filename = location.filename();
+    m_filename = location.filename;
     m_location = location;
     m_buffer = text;
     line_start = line_end = p = p0 = marker = m_buffer.c_str();
@@ -308,7 +306,7 @@ bool FileScanner::peek_text_line(ScannedLine& line) {
     while (true) {
         /*!re2c
             end             { p--; goto end; }
-            nl              { m_location.inc_line(); goto end; }
+            nl              { m_location.inc_line_num(); goto end; }
             $               { goto end; }
             *               { continue; }
         */
@@ -332,7 +330,7 @@ bool FileScanner::get_token_line(ScannedLine& line) {
     line.clear();
     string str, error;
     int quote = 0;
-    bool raw_strings = g_args.raw_strings();
+    bool raw_strings = g_args.opt_raw_strings;
     m_got_error = false;
     m_blank_before = false;
 
@@ -350,58 +348,58 @@ main_loop:
         /*!re2c
             end             { p--; goto end; }
             $               { goto end; }
-            *               { scan_error(ErrCode::InvalidChar); continue; }
+            *               { error_invalid_character(); continue; }
             ws+             { m_blank_before = true; continue; }
             nl              { goto end; }
             ';'	[^\r\n\000]* { continue; }
-            '#'             { PUSH_TOKEN1(TType::Hash); continue; }
-            '##'            { PUSH_TOKEN1(TType::DblHash); continue; }
+            '#'             { PUSH_TOKEN1(TType1::Hash); continue; }
+            '##'            { PUSH_TOKEN1(TType1::DblHash); continue; }
             '\\' nl         { line_start = p; peek_text_line(line); continue; }
-            '\\'            { PUSH_TOKEN1(TType::Backslash); continue; }
-            ':'             { PUSH_TOKEN1(TType::Colon); continue; }
-            '?'             { PUSH_TOKEN1(TType::Quest); continue; }
+            '\\'            { PUSH_TOKEN1(TType1::Backslash); continue; }
+            ':'             { PUSH_TOKEN1(TType1::Colon); continue; }
+            '?'             { PUSH_TOKEN1(TType1::Quest); continue; }
             '"'             { quote = 2; goto string_loop; }
             "'"             { quote = 1; goto string_loop; }
-            '!'				{ PUSH_TOKEN1(TType::LogNot); continue; }
-            '$'				{ PUSH_TOKEN1(TType::ASMPC); continue; }
-            '%'				{ PUSH_TOKEN1(TType::Mod); continue; }
-            '&'				{ PUSH_TOKEN1(TType::BinAnd); continue; }
-            '&&'			{ PUSH_TOKEN1(TType::LogAnd); continue; }
-            '('				{ PUSH_TOKEN1(TType::LParen); continue; }
-            ')'				{ PUSH_TOKEN1(TType::RParen); continue; }
-            '*'				{ PUSH_TOKEN1(TType::Mult); continue; }
-            '**'			{ PUSH_TOKEN1(TType::Power); continue; }
-            '+'				{ PUSH_TOKEN1(TType::Plus); continue; }
-            ','				{ PUSH_TOKEN1(TType::Comma); continue; }
-            '-'				{ PUSH_TOKEN1(TType::Minus); continue; }
-            '.'				{ PUSH_TOKEN1(TType::Dot); continue; }
-            '/'				{ PUSH_TOKEN1(TType::Div); continue; }
-            '<'				{ PUSH_TOKEN1(TType::Lt); continue; }
-            '<='			{ PUSH_TOKEN1(TType::Le); continue; }
-            '<<'			{ PUSH_TOKEN1(TType::LShift); continue; }
-            '='  | '=='		{ PUSH_TOKEN1(TType::Eq); continue; }
-            '!=' | '<>'		{ PUSH_TOKEN1(TType::Ne); continue; }
-            '>'				{ PUSH_TOKEN1(TType::Gt); continue; }
-            '>='			{ PUSH_TOKEN1(TType::Ge); continue; }
-            '>>'			{ PUSH_TOKEN1(TType::RShift); continue; }
-            '['				{ PUSH_TOKEN1(TType::LSquare); continue; }
-            ']'				{ PUSH_TOKEN1(TType::RSquare); continue; }
-            '^'				{ PUSH_TOKEN1(TType::BinXor); continue; }
-            '^^'			{ PUSH_TOKEN1(TType::LogXor); continue; }
-            '{'				{ PUSH_TOKEN1(TType::LBrace); continue; }
-            '|'				{ PUSH_TOKEN1(TType::BinOr); continue; }
-            '||'			{ PUSH_TOKEN1(TType::LogOr); continue; }
-            '}'				{ PUSH_TOKEN1(TType::RBrace); continue; }
-            '~'				{ PUSH_TOKEN1(TType::BinNot); continue; }
+            '!'				{ PUSH_TOKEN1(TType1::LogNot); continue; }
+            '$'				{ PUSH_TOKEN1(TType1::ASMPC); continue; }
+            '%'				{ PUSH_TOKEN1(TType1::Mod); continue; }
+            '&'				{ PUSH_TOKEN1(TType1::BinAnd); continue; }
+            '&&'			{ PUSH_TOKEN1(TType1::LogAnd); continue; }
+            '('				{ PUSH_TOKEN1(TType1::LParen); continue; }
+            ')'				{ PUSH_TOKEN1(TType1::RParen); continue; }
+            '*'				{ PUSH_TOKEN1(TType1::Mult); continue; }
+            '**'			{ PUSH_TOKEN1(TType1::Power); continue; }
+            '+'				{ PUSH_TOKEN1(TType1::Plus); continue; }
+            ','				{ PUSH_TOKEN1(TType1::Comma); continue; }
+            '-'				{ PUSH_TOKEN1(TType1::Minus); continue; }
+            '.'				{ PUSH_TOKEN1(TType1::Dot); continue; }
+            '/'				{ PUSH_TOKEN1(TType1::Div); continue; }
+            '<'				{ PUSH_TOKEN1(TType1::Lt); continue; }
+            '<='			{ PUSH_TOKEN1(TType1::Le); continue; }
+            '<<'			{ PUSH_TOKEN1(TType1::LShift); continue; }
+            '='  | '=='		{ PUSH_TOKEN1(TType1::Eq); continue; }
+            '!=' | '<>'		{ PUSH_TOKEN1(TType1::Ne); continue; }
+            '>'				{ PUSH_TOKEN1(TType1::Gt); continue; }
+            '>='			{ PUSH_TOKEN1(TType1::Ge); continue; }
+            '>>'			{ PUSH_TOKEN1(TType1::RShift); continue; }
+            '['				{ PUSH_TOKEN1(TType1::LSquare); continue; }
+            ']'				{ PUSH_TOKEN1(TType1::RSquare); continue; }
+            '^'				{ PUSH_TOKEN1(TType1::BinXor); continue; }
+            '^^'			{ PUSH_TOKEN1(TType1::LogXor); continue; }
+            '{'				{ PUSH_TOKEN1(TType1::LBrace); continue; }
+            '|'				{ PUSH_TOKEN1(TType1::BinOr); continue; }
+            '||'			{ PUSH_TOKEN1(TType1::LogOr); continue; }
+            '}'				{ PUSH_TOKEN1(TType1::RBrace); continue; }
+            '~'				{ PUSH_TOKEN1(TType1::BinNot); continue; }
 
-            mantissa exp? 	{ PUSH_TOKEN2(TType::Floating, a2f(p0, p)); continue; }
-            dec+ 'd'?		{ PUSH_TOKEN2(TType::Integer, a2i(p0, p, 10)); continue; }
-            dec hex* 'h'	{ PUSH_TOKEN2(TType::Integer, a2i(p0, p, 16)); continue; }
-            "$" hex+		{ PUSH_TOKEN2(TType::Integer, a2i(p0+1, p, 16)); continue; }
-            '0x' hex+		{ PUSH_TOKEN2(TType::Integer, a2i(p0+2, p, 16)); continue; }
-            bin+ 'b'		{ PUSH_TOKEN2(TType::Integer, a2i(p0, p, 2)); continue; }
-            [%@] bin+		{ PUSH_TOKEN2(TType::Integer, a2i(p0+1, p, 2)); continue; }
-            '0b' bin+		{ PUSH_TOKEN2(TType::Integer, a2i(p0+2, p, 2)); continue; }
+            mantissa exp? 	{ PUSH_TOKEN2(TType1::Floating, a2f(p0, p)); continue; }
+            dec+ 'd'?		{ PUSH_TOKEN2(TType1::Integer, a2i(p0, p, 10)); continue; }
+            dec hex* 'h'	{ PUSH_TOKEN2(TType1::Integer, a2i(p0, p, 16)); continue; }
+            "$" hex+		{ PUSH_TOKEN2(TType1::Integer, a2i(p0+1, p, 16)); continue; }
+            '0x' hex+		{ PUSH_TOKEN2(TType1::Integer, a2i(p0+2, p, 16)); continue; }
+            bin+ 'b'		{ PUSH_TOKEN2(TType1::Integer, a2i(p0, p, 2)); continue; }
+            [%@] bin+		{ PUSH_TOKEN2(TType1::Integer, a2i(p0+1, p, 2)); continue; }
+            '0b' bin+		{ PUSH_TOKEN2(TType1::Integer, a2i(p0+2, p, 2)); continue; }
 
             [%@] '"' [-#]* '"' {
                               int n = 0;
@@ -409,54 +407,54 @@ main_loop:
                                   n *= 2;
                                   if (*i == '#') n++;
                               }
-                              PUSH_TOKEN2(TType::Integer, n);
+                              PUSH_TOKEN2(TType1::Integer, n);
                               continue;
                             }
 
             ident "'"?      { str = string(p0, p);
 
                               // to upper
-                              if (g_args.ucase()) str = str_toupper(str);
+                              if (g_args.opt_ucase) str = str_toupper(str);
 
                               // handle af' et all
-                              Keyword keyword = keyword_lookup(str);
-                              if (str.back() == '\'' && keyword == Keyword::None) { // drop quote
+                              Keyword1 keyword = keyword_lookup1(str);
+                              if (str.back() == '\'' && keyword == Keyword1::None) { // drop quote
                                 str.pop_back();
                                 p--;
-                                keyword = keyword_lookup(str);
+                                keyword = keyword_lookup1(str);
                               }
 
                               // check for -IXIY
-                              if (g_args.swap_ixiy() != IXIY_NO_SWAP) {
+                              if (g_args.opt_swap_ixiy != SwapIXIY::no_swap) {
                                 switch (keyword) {
-                                case Keyword::IX: case Keyword::IXH: case Keyword::IXL:
-                                case Keyword::IY: case Keyword::IYH: case Keyword::IYL:
+                                case Keyword1::IX: case Keyword1::IXH: case Keyword1::IXL:
+                                case Keyword1::IY: case Keyword1::IYH: case Keyword1::IYL:
                                   str = str_swap_x_y(str);
-                                  keyword = keyword_lookup(str);
+                                  keyword = keyword_lookup1(str);
                                   break;
                                 default:;
                                 }
                               }
 
                               // check for .ASSUME
-                              if (keyword == Keyword::ASSUME && !line.tokens().empty() &&
-                                  line.tokens().back().is(TType::Dot))
+                              if (keyword == Keyword1::ASSUME && !line.tokens().empty() &&
+                                  line.tokens().back().is(TType1::Dot))
                                 line.tokens().pop_back();       // remove '.'
 
                               // need raw strings after INCLUDE, BINARY, INCBIN, LINE, C_LINE
                               switch (keyword) {
-                              case Keyword::INCLUDE: case Keyword::BINARY: case Keyword::INCBIN:
-                              case Keyword::LINE:    case Keyword::C_LINE:
+                              case Keyword1::INCLUDE: case Keyword1::BINARY: case Keyword1::INCBIN:
+                              case Keyword1::LINE:    case Keyword1::C_LINE:
                                 raw_strings = true;
                                 break;
                               default:;
                               }
 
                               // check for ASMPC
-                              if (keyword == Keyword::ASMPC)
-                                PUSH_TOKEN1(TType::ASMPC);
+                              if (keyword == Keyword1::ASMPC)
+                                PUSH_TOKEN1(TType1::ASMPC);
                               else
-                                PUSH_TOKEN2(TType::Ident, str);
+                                PUSH_TOKEN2(TType1::Ident, str);
                               continue;
                             }
         */
@@ -468,22 +466,22 @@ string_loop:
     while (true) {
         p0 = p;
         /*!re2c
-            end             { p--; scan_error(ErrCode::MissingQuote, error); goto end; }
-            $               { scan_error(ErrCode::MissingQuote, error); goto end; }
+            end             { p--; error_missing_quote(error); goto end; }
+            $               { error_missing_quote(error); goto end; }
             *               { str.push_back(*p0); continue; }
             nl              { if (raw_strings) {
                                 str.append(string(p0, p));
-                                error = "started at " + m_location.filename() +
-                                        ":" + std::to_string(m_location.line_num());
+                                error = string("started at ") + string(m_location.filename) +
+                                        ":" + std::to_string(m_location.line_num);
                                 line_start = p; peek_text_line(line);
                                 continue;
                               }
                               else {
-                                scan_error(ErrCode::MissingQuote, error); goto end;
+                                error_missing_quote(error); goto end;
                               }
                             }
             '"'             { if (quote == 2) {
-                                PUSH_TOKEN2(TType::String, str);
+                                PUSH_TOKEN2(TType1::String, str);
                                 goto main_loop;
                               }
                               else {
@@ -493,11 +491,11 @@ string_loop:
                             }
             "'"             { if (quote == 1) {
                                 if (str.length() != 1) {
-                                  scan_error(ErrCode::InvalidCharConst);
+                                  error_invalid_character_constant();
                                   goto main_loop;
                                 }
                                 else {
-                                  PUSH_TOKEN2(TType::Integer, str[0]);
+                                  PUSH_TOKEN2(TType1::Integer, str[0]);
                                   goto main_loop;
                                 }
                               }
@@ -542,7 +540,7 @@ end:
         if (m_got_error)
             line.tokens().clear();
 
-        PUSH_TOKEN1(TType::Newline);
+        PUSH_TOKEN1(TType1::Newline);
         line_start = line_end = p0 = marker = p;
         return true;
     }
@@ -598,14 +596,9 @@ bool FileScanner::fill() {
 
 void FileScanner::notify_new_line(const string& text_) {
     string text = str_chomp(text_) + "\n";
-    m_location.set_source_line(text);
-    g_errors.set_location(m_location);
-    list_got_source_line(m_location.filename().c_str(), m_location.line_num(),
-        m_location.source_line().c_str());
-}
-
-void FileScanner::scan_error(ErrCode code, const string& arg) {
-    if (!m_got_error)
-        g_errors.error(code, arg);
-    m_got_error = true;
+    g_errors.source_line = text;
+    g_errors.expanded_line.clear();
+    g_errors.location = m_location;
+    list_got_source_line(m_location.filename.c_str(), m_location.line_num,
+        g_errors.source_line.c_str());
 }

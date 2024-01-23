@@ -1,0 +1,136 @@
+//-----------------------------------------------------------------------------
+// z80asm
+// Copyright (C) Paulo Custodio, 2011-2024
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// CPU
+//-----------------------------------------------------------------------------
+#ifndef XCPU
+#define XCPU(id, name, parent_id, defines)
+#endif
+
+/*  0 */ XCPU(undef, "", undef, "")
+/*  1 */ XCPU(z80, "z80", z80_strict, "__CPU_Z80__ __CPU_ZILOG__")
+/*  2 */ XCPU(z80_strict, "z80_strict", i8080, "__CPU_Z80_STRICT__ __CPU_ZILOG__")
+/*  3 */ XCPU(z180, "z180", z80_strict, "__CPU_Z180__ __CPU_ZILOG__")
+/*  4 */ XCPU(ez80_z80, "ez80_z80", undef, "__CPU_EZ80_Z80__ __CPU_ZILOG__")
+/*  5 */ XCPU(ez80, "ez80", undef, "__CPU_EZ80__ __CPU_ZILOG__")
+/*  6 */ XCPU(z80n, "z80n", z80, "__CPU_Z80N__ __CPU_ZILOG__")
+/*  7 */ XCPU(r2ka, "r2ka", undef, "__CPU_R2KA__ __CPU_RABBIT__")
+/*  8 */ XCPU(r3k, "r3k", r2ka, "__CPU_R3K__ __CPU_RABBIT__")
+/*  9 */ XCPU(gbz80, "gbz80", undef, "__CPU_GBZ80__")
+/* 10 */ XCPU(i8080, "8080", undef, "__CPU_8080__ __CPU_INTEL__")
+/* 11 */ XCPU(i8085, "8085", i8080, "__CPU_8085__ __CPU_INTEL__")
+/* 12 */ XCPU(r800, "r800", z80_strict, "__CPU_R800__")
+/* 13 */ XCPU(r4k, "r4k", undef, "__CPU_R4K__ __CPU_RABBIT__")
+/* 14 */ XCPU(r5k, "r5k", r4k, "__CPU_R5K__ __CPU_RABBIT__")
+/* 15 */ XCPU(kc160, "kc160", undef, "__CPU_KC160__")
+/* 16 */ XCPU(kc160_z80, "kc160_z80", z80_strict, "__CPU_KC160_Z80__")
+
+#undef XCPU
+
+//-----------------------------------------------------------------------------
+// Swap IXIY
+//-----------------------------------------------------------------------------
+
+#ifndef XSWAP_IXIY
+#define XSWAP_IXIY(id, option_name, defines)
+#endif
+
+/*  0 */ XSWAP_IXIY(no_swap, "(no option)", "")
+/*  1 */ XSWAP_IXIY(swap, "-IXIY", "__SWAP_IX_IY__")
+/*  2 */ XSWAP_IXIY(soft_swap, "-IXIY-soft", "__SWAP_IX_IY__")
+/*  3 */ XSWAP_IXIY(undef, "", "")
+
+#undef XSWAP_IXIY
+
+//-----------------------------------------------------------------------------
+// Appmake
+//-----------------------------------------------------------------------------
+
+#ifndef XAPPMAKE
+#define XAPPMAKE(id, org, org_min, org_max, file_ext)
+#endif
+
+XAPPMAKE(none, ORG_NOT_DEFINED, ORG_NOT_DEFINED, ORG_NOT_DEFINED, "")
+XAPPMAKE(zx81, ZX81_ORIGIN, ZX81_ORIGIN, ZX81_ORIGIN, ".P")
+XAPPMAKE(zx, ZX_ORIGIN, ZX_ORIGIN, 0xffff, ".tap")
+
+#undef XAPPMAKE
+
+//-----------------------------------------------------------------------------
+// Float
+//-----------------------------------------------------------------------------
+#ifndef XFLOAT
+#define XFLOAT(id, name, defines)
+#endif
+
+XFLOAT(genmath, "genmath", "__FLOAT_GENMATH__") // zcc -l, Classic z80 mode 48-bit format
+XFLOAT(math48, "math48", "__FLOAT_MATH48__")    // zcc -lmath48, same format as genmath
+XFLOAT(ieee16, "ieee16", "__FLOAT_IEEE16__")    // zcc --math16, 16 bit ieee
+XFLOAT(ieee32, "ieee32", "__FLOAT_IEEE32__")    // zcc --math32, 32 bit ieee-754
+XFLOAT(ieee64, "ieee64", "__FLOAT_IEEE64__")    // 64 bit ieee-754
+XFLOAT(z80, "z80", "__FLOAT_Z80__")             // zcc -fp-mode=z80, Classic z80 mode with 48 bits
+XFLOAT(zx81, "zx81", "__FLOAT_ZX81__")          // ZX-81 40 bit format
+XFLOAT(zx, "zx", "__FLOAT_ZX__")                // ZX-Spectrum 40 bit format
+XFLOAT(z88, "z88", "__FLOAT_Z88__")             // zcc -math-z88, 40 bit format for Z88
+XFLOAT(mbfs, "mbfs", "__FLOAT_MBFS__")          // zcc -fp-mode=mbf32, 32 bit MS single precision
+XFLOAT(mbf40, "mbf40", "__FLOAT_MBF40__")       // zcc -fp-mode=mbf40, 40 bit MS
+XFLOAT(mbf64, "mbf64", "__FLOAT_MBF64__")       // zcc -fp-mode=mbf64, 64 bit MS double precision
+XFLOAT(am9511, "am9511", "__FLOAT_AM9511__")    // zcc -fp-mode=am9511, AM9511 math processor format
+XFLOAT(undef, "", "")
+
+#undef XFLOAT
+//-----------------------------------------------------------------------------
+// command line options
+//-----------------------------------------------------------------------------
+#ifndef XOPT
+#define XOPT(opt_name, opt_has_param, opt_code)
+#endif
+
+XOPT("-h", 0, exit_help())
+XOPT("-v", 0, opt_verbose = true)
+XOPT("-vv", 0, opt_debug_z80asm = opt_verbose = true)
+XOPT("-IXIY", 0, set_swap_ixiy(SwapIXIY::swap))
+XOPT("-IXIY-soft", 0, set_swap_ixiy(SwapIXIY::soft_swap))
+XOPT("-I", 1, opt_include_path.push_back(opt_arg))
+XOPT("-D", 1, parse_define(opt_arg))
+XOPT("-ucase", 0, opt_ucase = true)
+XOPT("-float", 1, if (!set_zfloat(opt_arg)) g_errors.error(Errors::Code::illegal_float_option, opt_arg))
+XOPT("-raw-strings", 0, opt_raw_strings = true)
+XOPT("-m4", 1, opt_m4_options += opt_arg + " ")
+XOPT("-m", 1, if (!set_cpu(opt_arg)) g_errors.error(Errors::Code::illegal_cpu_option, opt_arg))
+XOPT("-opt-speed", 0, opt_speed = true)
+XOPT("-debug", 0, opt_debug = opt_map_file = true)
+XOPT("-L", 1, opt_library_path.push_back(opt_arg))
+XOPT("-x", 1, opt_lib_file = opt_arg)
+XOPT("-l", 1, opt_libraries.push_back(search_library(opt_arg)))
+XOPT("-O", 1, opt_output_dir = opt_arg)
+XOPT("-o", 1, opt_bin_file = opt_arg)
+XOPT("-b", 0, opt_make_bin = true)
+XOPT("-split-bin", 0, opt_split_bin = true)
+XOPT("-d", 0, opt_date_stamp = true)
+XOPT("-R", 0, opt_relocatable = true)
+XOPT("-reloc-info", 0, opt_reloc_info = true)
+XOPT("-r", 1, parse_origin(opt_arg))
+XOPT("-f", 1, parse_filler(opt_arg))
+XOPT("-s", 0, opt_symtable = true)
+XOPT("-l", 0, opt_list_file = true)
+XOPT("-m", 0, opt_map_file = true)
+XOPT("-g", 0, opt_globaldef = true)
+
+XOPT("+zx81", 0, opt_make_bin = true; \
+    opt_appmake = Appmake::zx81; \
+    opt_origin = ZX81_ORIGIN; \
+    set_cpu(CpuId::z80); \
+    set_zfloat(ZFloat::zx81))
+
+XOPT("+zx", 0, opt_make_bin = true; \
+    opt_appmake = Appmake::zx; \
+    opt_origin = ZX_ORIGIN; \
+    set_cpu(CpuId::z80); \
+    set_zfloat(ZFloat::zx))
+
+#undef XOPT

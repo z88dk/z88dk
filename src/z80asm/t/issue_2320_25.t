@@ -60,7 +60,8 @@ END
 				if (!cpu_compatible($code_cpu, $lib_cpu)) {
 					capture_nok("z88dk-z80asm -b -m$code_cpu $code_ixiy ".
 						    "$test.asm $test.1.o", <<END);
-error: CPU incompatible: file $test.1.o compiled for $lib_cpu, incompatible with $code_cpu
+error: incompatible CPU: $lib_cpu
+error: invalid object file: $test.1.o
 END
 
 					capture_nok("z88dk-z80asm -b -m$code_cpu $code_ixiy ".
@@ -72,7 +73,8 @@ END
 				elsif (!ixiy_compatible($code_ixiy, $lib_ixiy)) {
 					capture_nok("z88dk-z80asm -b -m$code_cpu $code_ixiy ".
 						    "$test.asm $test.1.o", <<END);
-error: -IXIY incompatible: file $test.1.o compiled with $IXIY_ERROR{$lib_ixiy}, incompatible with $IXIY_ERROR{$code_ixiy}
+error: incompatible -IXIY: $IXIY_ERROR{$lib_ixiy}
+error: invalid object file: test_t_issue_2320_25.1.o
 END
 
 					capture_nok("z88dk-z80asm -b -m$code_cpu $code_ixiy ".

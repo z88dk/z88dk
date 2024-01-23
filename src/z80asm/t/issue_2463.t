@@ -21,10 +21,10 @@ END
 
 capture_ok("z88dk-z80asm -v -b -m4=-DINPUT=4 $test.asm.m4", <<'END');
 % z88dk-z80asm -v -b -m4=-DINPUT=4 test_t_issue_2463.asm.m4
-% m4 -DINPUT=4  "test_t_issue_2463.asm.m4" > "test_t_issue_2463.asm"
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
+% m4 -DINPUT=4  "test_t_issue_2463.asm.m4" > "test_t_issue_2463.asm"
 Reading library 'z88dk-z80asm.lib'
 Assembling 'test_t_issue_2463.asm'
 Writing object file 'test_t_issue_2463.o'

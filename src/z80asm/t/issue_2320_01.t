@@ -23,11 +23,13 @@ Object  file test_t_issue_2320_01.o at $0000: Z80RMF18
 END
 
 capture_nok("z88dk-z80asm -b $test.o", <<'END');
-error: CPU invalid: file test_t_issue_2320_01.o, cpu_id = -1
+error: illegal CPU: -1
+error: invalid object file: test_t_issue_2320_01.o
 END
 
 capture_nok("z88dk-z80asm -d -b $test.o", <<'END');
-error: CPU invalid: file test_t_issue_2320_01.o, cpu_id = -1
+error: illegal CPU: -1
+error: invalid object file: test_t_issue_2320_01.o
 END
 
 sleep(1);

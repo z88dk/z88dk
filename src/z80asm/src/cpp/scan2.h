@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "errors.h"
+#include "../z80asm.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -17,7 +17,7 @@
 using namespace std;
 
 // token types
-enum class TType {
+enum class TType1 {
 #define X(id, text)     id,
 #include "scan2.def"
 };
@@ -29,34 +29,34 @@ enum KeywordFlags {
     KW_Z80_LD_BIT = 1 << 3,
 };
 
-enum class Keyword {
+enum class Keyword1 {
 #define X(id, text, flags)		id,
 #include "keyword.def"
 };
 
-Keyword keyword_lookup(const string& text);
-bool keyword_is_reg_8(Keyword keyword);
-bool keyword_is_reg_ix_iy(Keyword keyword);
-bool keyword_is_z80_ld_bit(Keyword keyword);
+Keyword1 keyword_lookup1(const string& text);
+bool keyword_is_reg_8(Keyword1 keyword);
+bool keyword_is_reg_ix_iy(Keyword1 keyword);
+bool keyword_is_z80_ld_bit(Keyword1 keyword);
 
 // token
-class Token {
+class Token1 {
 public:
-    Token(TType type, bool blank_before, int ivalue = 0);
-    Token(TType type, bool blank_before, double fvalue);
-    Token(TType type, bool blank_before, const string& svalue);
+    Token1(TType1 type, bool blank_before, int ivalue = 0);
+    Token1(TType1 type, bool blank_before, double fvalue);
+    Token1(TType1 type, bool blank_before, const string& svalue);
 
-    TType type() const { return m_type; }
+    TType1 type() const { return m_type; }
     bool blank_before() const { return m_blank_before; }
     int ivalue() const { return m_ivalue; }
     double fvalue() const { return m_fvalue; }
     const string& svalue() const { return m_svalue; }
-    Keyword keyword() const { return m_keyword; }
+    Keyword1 keyword() const { return m_keyword; }
 
     string to_string() const;
 
-    bool is(TType type) { return this->m_type == type; }
-    bool is(Keyword keyword) { return this->m_keyword == keyword; }
+    bool is(TType1 type) { return this->m_type == type; }
+    bool is(Keyword1 keyword) { return this->m_keyword == keyword; }
     template <typename T, typename... Types>
     bool is(T var1, Types... var2) {
         if (is(var1))
@@ -67,16 +67,16 @@ public:
             return false;
     }
 
-    static string to_string(const vector<Token>& tokens);
+    static string to_string(const vector<Token1>& tokens);
     static string concat(const string& s1, const string& s2);
 
 private:
-    TType m_type{ TType::End };             // token type
+    TType1 m_type{ TType1::End };             // token type
     bool m_blank_before{ false };           // has a blank before
     int m_ivalue{ 0 };                      // integer value, if any
     double m_fvalue{ 0.0 };                 // floating point value, if any
     string m_svalue;                        // string value, if any
-    Keyword m_keyword{ Keyword::None };     // keyword value, if any
+    Keyword1 m_keyword{ Keyword1::None };     // keyword value, if any
 
     static string string_bytes(const string& text);
 };
@@ -84,33 +84,33 @@ private:
 // scanned line
 class ScannedLine {
 public:
-    ScannedLine(const string& text = "", const vector<Token>& tokens = {});
+    ScannedLine(const string& text = "", const vector<Token1>& tokens = {});
     void append(const ScannedLine& other);
-    void append(const vector<Token>& tokens);
+    void append(const vector<Token1>& tokens);
     void clear();
 
     const string& text() const { return m_text; }
     void set_text(const string& text) { m_text = text; }
 
-    vector<Token>& tokens() { return m_tokens; }
-    const vector<Token>& tokens() const { return m_tokens; }
+    vector<Token1>& tokens() { return m_tokens; }
+    const vector<Token1>& tokens() const { return m_tokens; }
 
     bool empty() const { return m_text.empty() && m_tokens.empty(); }
-    string to_string() const { return Token::to_string(m_tokens); }
+    string to_string() const { return Token1::to_string(m_tokens); }
 
     void rewind() { m_pos = 0; }
     bool at_end() const { return m_pos >= m_tokens.size(); }
     unsigned pos() const { return m_pos; }
     void set_pos(unsigned pos) { m_pos = pos; }
 
-    Token& peek(int offset = 0);			// 0: current; 1: next; -1: previous
+    Token1& peek(int offset = 0);			// 0: current; 1: next; -1: previous
     void next(int n = 1);
-    vector<Token> peek_tokens(int offset = 0);
+    vector<Token1> peek_tokens(int offset = 0);
     string peek_text(int offset = 0);
 
 private:
     string  m_text;                         // read text
-    vector<Token> m_tokens;                 // scanned tokens
+    vector<Token1> m_tokens;                 // scanned tokens
     unsigned m_pos{ 0 };                    // current token
 };
 
@@ -145,7 +145,21 @@ private:
 
     bool peek_text_line(ScannedLine& line); // read line, setup line number for errors
 
-    void scan_error(ErrCode code, const string& arg = "");
+    void error_invalid_character(const string& arg = "") {
+        if (!m_got_error)
+            g_errors.error(Errors::Code::invalid_character, arg);
+        m_got_error = true;
+    }
+    void error_invalid_character_constant(const string& arg = "") {
+        if (!m_got_error)
+            g_errors.error(Errors::Code::invalid_character_constant, arg);
+        m_got_error = true;
+    }
+    void error_missing_quote(const string& arg = "") {
+        if (!m_got_error)
+            g_errors.error(Errors::Code::missing_quote, arg);
+        m_got_error = true;
+    }
 
     bool fill();                            // fill buffer from file
     int yyfill() { return fill() ? 0 : 1; } // interface to re2c

@@ -27,7 +27,8 @@ END
 capture_ok("z88dk-z80asm -mz80 $test.a.asm", "");
 capture_ok("z88dk-z80asm -mr3k $test.b.asm", "");
 capture_nok("z88dk-z80asm -x$test.lib -mz80 $test.*.o", <<'END');
-error: CPU incompatible: file test_t_issue_2320_08.b.o compiled for r3k, incompatible with z80
+error: incompatible CPU: r3k
+error: invalid object file: test_t_issue_2320_08.b.o
 END
 
 

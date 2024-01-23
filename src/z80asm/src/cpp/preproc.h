@@ -7,8 +7,8 @@
 
 #pragma once
 
+#include "../z80asm.h"
 #include "defines.h"
-#include "errors.h"
 #include "if.h"
 #include "scan2.h"
 #include <deque>
@@ -36,7 +36,7 @@ private:
 
 class ExpandedLine : public ScannedLine {
 public:
-    ExpandedLine(const string& text = "", const vector<Token>& tokens = {});
+    ExpandedLine(const string& text = "", const vector<Token1>& tokens = {});
 
 	bool got_error() const { return m_error; }
 	void set_error(bool f) { m_error = f; }
@@ -47,12 +47,12 @@ private:
 //-----------------------------------------------------------------------------
 
 struct IfNest {
-	Keyword		keyword;
+	Keyword1		keyword;
 	Location	location;
 	bool		flag;
 	bool		done_if;
 
-	IfNest(Keyword keyword, Location location, bool flag);
+	IfNest(Keyword1 keyword, Location location, bool flag);
 };
 
 //-----------------------------------------------------------------------------
@@ -90,14 +90,14 @@ private:
 	void got_eof();
 	void parse_line(const ScannedLine& line);     // sets m_line
 	bool ifs_active();
-	bool symbol_defined(const Token& ident);
+	bool symbol_defined(const Token1& ident);
 
     int check_label_index();    // -1 if no label, else index of Ident token
     void do_label(int label_index);
 
-    bool check_opcode(Keyword keyword, void (Preproc::* do_action)());
-	bool check_hash_directive(Keyword keyword, void (Preproc::* do_action)());
-	bool check_opt_hash_opcode(Keyword keyword, void (Preproc::* do_action)());
+    bool check_opcode(Keyword1 keyword, void (Preproc::* do_action)());
+	bool check_hash_directive(Keyword1 keyword, void (Preproc::* do_action)());
+	bool check_opt_hash_opcode(Keyword1 keyword, void (Preproc::* do_action)());
 	bool check_hash();
 	bool check_defl();
 	bool check_macro();
@@ -135,13 +135,13 @@ private:
 
     void push_expanded(ScannedLine& line, Macros& defines);
 	ExpandedLine expand(ScannedLine& line, Macros& defines);
-	void expand_ident(ExpandedLine& out, const Token& ident, ScannedLine& line, Macros& defines);
-	ExpandedLine expand_define_call(const Token& ident, ScannedLine& line, Macros& defines);
+	void expand_ident(ExpandedLine& out, const Token1& ident, ScannedLine& line, Macros& defines);
+	ExpandedLine expand_define_call(const Token1& ident, ScannedLine& line, Macros& defines);
 	ScannedLine collect_param(ScannedLine& line);
 	vector<ScannedLine> collect_macro_params(ScannedLine& line);
 	vector<string> collect_name_list(ScannedLine& line);
-    ScannedLine collect_macro_body(Keyword start_keyword, Keyword end_keyword);
-    ScannedLine collect_macro_body1(Keyword start_keyword, Keyword end_keyword);
+    ScannedLine collect_macro_body(Keyword1 start_keyword, Keyword1 end_keyword);
+    ScannedLine collect_macro_body1(Keyword1 start_keyword, Keyword1 end_keyword);
 	string collect_reptc_arg(ScannedLine& line);
 };
 

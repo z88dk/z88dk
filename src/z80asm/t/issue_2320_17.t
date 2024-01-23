@@ -28,7 +28,7 @@ capture_ok("z88dk-z80asm -mz80 $test.a.asm", "");
 capture_ok("z88dk-z80asm -mr3k $test.b.asm", "");
 spew("$test.b.o", "invalid");
 capture_nok("z88dk-z80asm -x$test.lib -mz80 $test.*.o", <<'END');
-error: not an object file: test_t_issue_2320_17.b.o
+error: invalid object file: test_t_issue_2320_17.b.o
 END
 
 

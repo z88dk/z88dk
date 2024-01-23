@@ -11,7 +11,7 @@ delete $ENV{ZCCCFG};
 
 spew("$test.asm", "nop");
 capture_nok("z88dk-z80asm -b -l$test $test.asm", <<END);
-error: file not found: $test.lib
+error: library not found: $test
 END
 
 unlink_testfiles;

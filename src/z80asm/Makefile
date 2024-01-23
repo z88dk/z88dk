@@ -58,11 +58,14 @@ endif
 # Object files
 #------------------------------------------------------------------------------
 C_SRCS		:= $(filter-out src/c/test.c, $(wildcard src/c/*.c ../common/*.c ../../ext/regex/reg*.c))
-CXX_SRCS	:= $(wildcard src/cpp/*.cpp)
+CXX_SRCS	:= $(wildcard *.cpp src/*.cpp src/cpp/*.cpp)
 OBJS_ALL	:= $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o) $(UNIXem_OBJS)
 OBJS		:= $(filter-out main.o, $(OBJS_ALL))
 
-DEPENDS		:= $(C_SRCS:.c=.d) $(CXX_SRCS:.cpp=.d)
+T_SRCS	 	:= $(wildcard t/*.cpp)
+T_OBJS		:= $(T_SRCS:.cpp=.o)
+
+DEPENDS		:= $(C_SRCS:.c=.d) $(CXX_SRCS:.cpp=.d) $(T_SRCS:.cpp=.d)
 
 #------------------------------------------------------------------------------
 .PHONY: all clean test install
@@ -198,13 +201,28 @@ endif
 
 # re2c
 $(eval $(call MAKE_RE2C,src/cpp/scan2))
+$(eval $(call MAKE_RE2C,scan_re))
 
 #------------------------------------------------------------------------------
 # test
 #------------------------------------------------------------------------------
 
-test: $(TARGET_EXE) $(TARGET_LIB)
+$(eval $(call MAKE_EXE,t/test,$(T_OBJS) $(OBJS)))
+
+test: t/test$(EXESUFFIX)
+
+t/test$(EXESUFFIX): t/test.o
+
+t/test.o: t/test.def
+
+ifeq ($(DEVELOPER),1)
+t/test.def: $(T_SRCS) Makefile t/make_tests.pl
+	perl t/make_tests.pl
+endif
+
+test: $(TARGET_EXE) $(TARGET_LIB) t/test$(EXESUFFIX)
 	$(MAKE) -C dev/z80asm_lib test
+	t/test$(EXESUFFIX)
 	perl -S prove --state=slow,save -j9 t/*.t
 
 testzcc : $(TARGET_EXE)

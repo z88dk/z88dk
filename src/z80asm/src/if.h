@@ -128,14 +128,13 @@ void error_date_and_mstar_incompatible();
 
 // options
 bool option_verbose();
-swap_ixiy_t option_swap_ixiy();
-void set_swap_ixiy_option(swap_ixiy_t swap_ixiy);
+int option_swap_ixiy();
+void set_swap_ixiy_option(int swap_ixiy);
 void push_includes(const char* dir);
 void pop_includes();
 const char* search_includes(const char* filename);
-cpu_t option_cpu();
+int option_cpu();
 void set_cpu_option(int cpu);
-const char* option_cpu_name();
 bool option_ti83();
 bool option_ti83plus();
 bool option_speed();
@@ -162,6 +161,8 @@ const char* option_consol_obj_file_name();
 size_t option_files_size();
 const char* option_file(size_t n);
 bool option_debug_z80asm();
+void copy_static_defines();
+int option_origin();
 
 // filesystem
 const char* path_parent_dir(const char* filename);
@@ -226,6 +227,10 @@ const char* get_float_format_define(void);
 // object files
 bool check_object_file(const char* obj_filename);
 bool check_object_file_no_errors(const char* obj_filename);
+
+int z80asm_main();
+void append_option_libraries();
+void set_global_float_format();
 
 #ifdef __cplusplus
 }

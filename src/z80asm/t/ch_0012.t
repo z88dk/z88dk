@@ -31,7 +31,7 @@ unlink "$test.lib";
 z80asm_nok("-b -l$test", "", <<END_ASM, <<END_ERR);
     NOP
 END_ASM
-error: file not found: $test.lib
+error: library not found: $test
 END_ERR
 
 unlink_testfiles;

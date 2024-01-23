@@ -104,6 +104,7 @@ static void do_assemble(const char *src_filename, const char* obj_filename)
     int start_errors = get_num_errors();     /* count errors in this source file */
 
 	/* initialize local symtab with copy of static one (-D defines) */
+    copy_static_defines();
 	copy_static_syms();
 
     /* Init ASMPC */
@@ -136,6 +137,12 @@ static void do_assemble(const char *src_filename, const char* obj_filename)
  * Main entry of Z80asm
  ***************************************************************************************************/
 int z80asm_main() {
+    // setup from args
+    if (option_origin() != ORG_NOT_DEFINED)
+        set_origin_option(option_origin());
+    append_option_libraries();
+    set_global_float_format();
+
 	if (!get_num_errors()) {		/* if no errors in command line parsing */
         if (!option_lib_for_all_cpus()) {
             for (size_t i = 0; i < option_files_size(); i++)

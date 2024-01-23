@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "../z80asm.h"
 #include "preproc.h"
 #include <cstdint>
 #include <fstream>
