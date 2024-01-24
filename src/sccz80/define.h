@@ -247,7 +247,7 @@ struct namespace_s {
 
 /* switch table */
 
-#define NUMCASE 256
+#define NUMCASE 512
 
 typedef struct switchtab_s SW_TAB;
 
