@@ -1673,6 +1673,9 @@ rcmx000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building RCM2/3000 Library ---'
 	@echo ''
+	m4 -DCFG_ASM_DEF ../include/arch/r2ka/config_rcm2024.m4 > ../include/arch/r2ka/config_rcm2024_private.inc
+	m4 -DCFG_ASM_PUB ../include/arch/r2ka/config_rcm2024.m4 > ../include/arch/r2ka/config_rcm2024_public.inc
+	m4 -DCFG_C_DEF ../include/arch/r2ka/config_rcm2024.m4 > ../include/arch/rcm2024.h
 	$(call buildgeneric,rcmx000)
 	TARGET=rcmx000 TYPE=r2ka $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(TARGET_DIRECTORY)/rcmx000/rcmx000.lst
 
@@ -2199,6 +2202,9 @@ r2ka_crt0.lib: $(DIRS) $(OBJS) gbz80_crt0.lib
 	@echo ''
 	@echo '--- Building r2ka crt Library ---'
 	@echo ''
+	m4 -DCFG_ASM_DEF ../include/arch/r2ka/config/config_cpu.m4 > ../include/arch/r2ka/config_r2ka_private.inc
+	m4 -DCFG_ASM_PUB ../include/arch/r2ka/config/config_cpu.m4 > ../include/arch/r2ka/config_r2ka_public.inc
+	m4 -DCFG_C_DEF ../include/arch/r2ka/config/config_cpu.m4 > ../include/arch/r2ka.h
 	$(call buildcrt)
 	TYPE=r2ka $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/r2ka_crt0 @$(LISTFILE_DIRECTORY)/rabbit.lst
 
