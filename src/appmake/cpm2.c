@@ -1350,6 +1350,26 @@ static disc_spec elwro_spec = {
 };
 
 
+// ZX Timex/Zebra FDD-3000
+static disc_spec fdd3000_spec = {
+    .name = "FDD-3000",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 35,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,5,10,15,4,9,14,3,8,13,2,7,12,1,6,11 }
+};
+
+
 // BBC Micro, Acorn Z80 2nd processor
 static disc_spec bbc_spec = {
     .name = "BBC Micro",
@@ -2014,6 +2034,7 @@ static struct formats {
     { "atmturbo",  "ZX MicroART ATM Turbo", &atmturbo_spec, 0, NULL, 1 },
     { "diskface",  "ZX Dataputer DISKFACE", &diskface_spec, 0, NULL, 1 },
     { "elwro",     "ZX Elwro 800 Junior",   &elwro_spec, 0, NULL, 1 },
+    { "fdd3000",   "ZX Timex FDD-3000",     &fdd3000_spec, 0, NULL, 1 },
     { "hc91",      "ZX ICE Felix HC-91",    &hc91_spec, 0, NULL, 1 },
     { "hc2000",    "ZX HC-2000 / CoBra",    &hc2000_spec, 0, NULL, 1 },
     { "quorum",    "ZX Quorum,Profi,Hobb.", &quorum_spec, 0, NULL, 1 },
