@@ -66,6 +66,7 @@ if(BUILD_SDCC)
     install(PROGRAMS ${PROJECT_SOURCE_DIR}/${SDCC_PATH}/src/sdcc DESTINATION bin RENAME z88dk-zsdcc)
 endif()
 
+add_subdirectory(src/common)
 add_subdirectory(src/copt)
 add_subdirectory(src/sccz80)
 add_subdirectory(src/ucpp)

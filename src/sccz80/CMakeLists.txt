@@ -19,16 +19,10 @@ add_executable(z88dk-sccz80
     "sym.c"
     "while.c"
     "declparse.c"
-    "../common/option.c"
 )
-
-target_include_directories(z88dk-sccz80 PRIVATE
-    "../common"
-    "../../ext/uthash/src"
-)
-
 target_link_libraries(z88dk-sccz80 PRIVATE
     m # This caught me so off guard
+    common
 )
 
 install(TARGETS z88dk-sccz80 DESTINATION bin)

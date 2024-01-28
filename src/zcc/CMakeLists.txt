@@ -5,18 +5,13 @@ add_executable(zcc
     "../copt/regex/regerror.c"
     "../copt/regex/regexec.c"
     "../copt/regex/regfree.c"
-
-    "../common/dirname.c"
-    "../common/option.c"
 )
 
 target_include_directories(zcc PRIVATE
     "."
     "../copt"
-    "../common"
-    "../../ext/uthash/src"
 )
-
 target_compile_definitions(zcc PRIVATE LOCAL_REGEXP)
+target_link_libraries(zcc PRIVATE common)
 
 install(TARGETS zcc DESTINATION bin)
