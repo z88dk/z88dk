@@ -15,9 +15,6 @@ file(GLOB CXX_SRCS
 add_executable(z88dk-z80asm
     ${C_SRCS}
     ${CXX_SRCS}
-
-    # External stuff
-    "../../ext/Unity/src/unity.c"
 )
 target_include_directories(z88dk-z80asm PRIVATE
     # Common stuff
@@ -35,4 +32,5 @@ target_include_directories(z88dk-z80asm PRIVATE
     # Idk where this is declared from, so I'll put it here
     "../../ext/Unity/src/"
 )
+target_compile_features(z88dk-z80asm PRIVATE cxx_std_17)
 install(TARGETS z88dk-z80asm DESTINATION bin)
