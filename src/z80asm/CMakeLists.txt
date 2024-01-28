@@ -1,18 +1,41 @@
-# $(filter-out src/c/test.c, $(wildcard src/c/*.c ../common/*.c ../../ext/regex/reg*.c))
-file(GLOB C_SRCS
-    "src/c/*.c"
-)
-list(REMOVE_ITEM C_SRCS
-    "src/c/test.c"
-)
-# $(wildcard src/cpp/*.cpp)
-file(GLOB CXX_SRCS
-    "src/cpp/*.cpp"
-)
-
 add_executable(z88dk-z80asm
-    ${C_SRCS}
-    ${CXX_SRCS}
+    # ${C_SRCS}
+    "src/c/alloc.c"
+    "src/c/array.c"
+    "src/c/class.c"
+    "src/c/codearea.c"
+    "src/c/common.c"
+    "src/c/cpu_rules_action.c"
+    "src/c/dbg.c"
+    "src/c/directives.c"
+    "src/c/expr1.c"
+    "src/c/libfile.c"
+    "src/c/list.c"
+    "src/c/minunit.c"
+    "src/c/modlink.c"
+    "src/c/module1.c"
+    "src/c/opcodes.c"
+    "src/c/parse1.c"
+    "src/c/reloc_code.c"
+    "src/c/scan1.c"
+    "src/c/str.c"
+    "src/c/strhash.c"
+    "src/c/sym.c"
+    "src/c/symtab1.c"
+    "src/c/z80asm1.c"
+    "src/c/z80pass.c"
+    "src/c/zobjfile.c"
+
+    # ${CXX_SRCS}
+    "src/cpp/args.cpp"
+    "src/cpp/defines.cpp"
+    "src/cpp/errors.cpp"
+    "src/cpp/float.cpp"
+    "src/cpp/lstfile.cpp"
+    "src/cpp/main.cpp"
+    "src/cpp/preproc.cpp"
+    "src/cpp/scan2.cpp"
+    "src/cpp/utils.cpp"
 )
 target_include_directories(z88dk-z80asm PRIVATE
     "./"
