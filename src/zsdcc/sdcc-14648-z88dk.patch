@@ -1,6 +1,6 @@
 Index: ChangeLog
 ===================================================================
---- ChangeLog	(revision 14648)
+--- ChangeLog	(revision 145648)
 +++ ChangeLog	(working copy)
 @@ -53459,4 +53463,4 @@
  	* as/mcs51/lklex.c:  accept everything as symbol name in rel-files, bug fix ID 452601
@@ -223,15 +223,15 @@ Index: src/z80/main.c
    { -1, 0, 0, 4, 0, 3, 0 },
    { 
      -1,                         /* shifts never use support routines */
-@@ -2356,7 +2356,7 @@
-     NULL,
-     1,                          /* CODE  is read-only */
-     false,                      // unqualified pointers cannot point to __sfr.
--    1                           /* No fancy alignments supported. */
-+    0                           /* No fancy alignments supported. */
+@@ -2359,7 +2359,7 @@
+     1                           /* No fancy alignments supported. */
    },
    { NULL, NULL },
-   1,                            /* ABI revision */
+-  1,                            /* ABI revision */
++  0,                            /* ABI revision */
+   { -1, 0, 0, 4, 0, 3, 0 },
+   { 
+     -1,                         /* shifts never use support routines */
 Index: src/z80/peep.c
 ===================================================================
 --- src/z80/peep.c	(revision 14648)
