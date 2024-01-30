@@ -1,6 +1,6 @@
 Index: ChangeLog
 ===================================================================
---- ChangeLog	(revision 145648)
+--- ChangeLog	(revision 14648)
 +++ ChangeLog	(working copy)
 @@ -53459,4 +53463,4 @@
  	* as/mcs51/lklex.c:  accept everything as symbol name in rel-files, bug fix ID 452601
