@@ -5,6 +5,7 @@ z88dk v2.4 - xx.xx.2024
 
 Future release changes:
 
+- [zsdcc] Upgraded to SDCC 4.4.0 r14648
 - [z80asm] process file.asm.m4 by m4 and assemble resulting file.asm
 
 
