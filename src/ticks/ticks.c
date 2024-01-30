@@ -1151,6 +1151,19 @@ int main (int argc, char **argv){
         *get_memory_addr(5, MEM_TYPE_INST) = 0xED;
         *get_memory_addr(6, MEM_TYPE_INST) = 0xFE;
         *get_memory_addr(7, MEM_TYPE_INST) = 0xC9;
+        // Trap BIOS entry as well + 3 + 5
+        *get_memory_addr(0, MEM_TYPE_INST) = 0xED;
+        *get_memory_addr(1, MEM_TYPE_INST) = 0x05;
+        *get_memory_addr(2, MEM_TYPE_INST) = 0x00;
+
+        *get_memory_addr(8, MEM_TYPE_INST) = 0xED;
+        *get_memory_addr(9, MEM_TYPE_INST) = 0xFE;
+        *get_memory_addr(10, MEM_TYPE_INST) = 0xC9;
+
+        *get_memory_addr(11, MEM_TYPE_INST) = 0xED;
+        *get_memory_addr(12, MEM_TYPE_INST) = 0xFE;
+        *get_memory_addr(13, MEM_TYPE_INST) = 0xC9;
+
         pc = 256;
         // CP/M emulator
         if (1 != fread(get_memory_addr(256, MEM_TYPE_INST), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }

@@ -5674,9 +5674,11 @@ $notcpu 8085
 	ld	(hl),a
 	inc	hl
 	ld	(hl),a
+	ld	hl,%2
 =
 	ld	hl,0	;const
 	ld	(_%1),hl
+	ld	hl,%2
 
 %title Signed char extension after truncation
 	call	l_gchar
