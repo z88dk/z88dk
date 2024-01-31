@@ -72,9 +72,6 @@ add_subdirectory(src/zcc)
 add_subdirectory(src/zpragma)
 add_subdirectory(src/zx0)
 
-# Standard library for the compiler
-install(DIRECTORY lib DESTINATION share/z88dk)
-
 # `libsrc` stuff
 include(ProcessorCount)
 ProcessorCount(NPROC)
