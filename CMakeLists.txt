@@ -3,7 +3,7 @@ project(Z88DK)
 option(BUILD_SDCC "Build SDCC" ON)
 option(BUILD_SDCC_HTTP "Download SDCC using HTTP instead of SVN" ON)
 set(SDCC_PATH "src/sdcc-build" CACHE STRING "Path to SDCC")
-set(SDCC_VERSION "14210" CACHE STRING "SDCC version")
+set(SDCC_VERSION "14648" CACHE STRING "SDCC version")
 
 # Third-party libraries
 add_subdirectory("ext/Unity")
