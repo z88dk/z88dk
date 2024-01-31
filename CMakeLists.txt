@@ -88,6 +88,10 @@ add_custom_target(libsrc
     COMMAND make -C ${PROJECT_SOURCE_DIR}/libsrc ${LIBSRC_OVERRIDES} -j${NPROC} && make -C ${PROJECT_SOURCE_DIR}/libsrc install
     COMMAND make -C ${PROJECT_SOURCE_DIR}/libsrc/_DEVELOPMENT ${LIBSRC_OVERRIDES} -j${NPROC}
     COMMAND make -C ${PROJECT_SOURCE_DIR}/include/_DEVELOPMENT ${LIBSRC_OVERRIDES} -j${NPROC}
+
+    # Cleanup
+    COMMAND find ${PROJECT_SOURCE_DIR}/libsrc -name "*.o" -type f -delete # Intermediate files, not needed
+    COMMAND find ${PROJECT_SOURCE_DIR}/libsrc -name "*.lib" -type f -delete # They'd already be moved to `lib/clibs`
 )
 
 # Install standard library
