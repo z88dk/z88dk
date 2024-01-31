@@ -42,7 +42,10 @@ target_include_directories(z88dk-z80asm PRIVATE
     "src/"
     "src/c/"
     "t/"
+
+    # Idk where this is declared from, so I'll put it here
+    "../../ext/Unity/src/"
 )
 target_compile_features(z88dk-z80asm PRIVATE cxx_std_17)
-target_link_libraries(z88dk-z80asm PRIVATE common unity)
+target_link_libraries(z88dk-z80asm PRIVATE common)
 install(TARGETS z88dk-z80asm DESTINATION bin)
