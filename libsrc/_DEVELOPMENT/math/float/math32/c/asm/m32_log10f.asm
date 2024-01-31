@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.2.0 #13131 (Linux)
+; File Created by SDCC : free open source ISO C Compiler
+; Version 4.4.0 #14648 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -343,14 +343,14 @@
 	GLOBAL _log10
 	GLOBAL _log_fastcall
 	GLOBAL _log
+	GLOBAL _ilogb_fastcall
+	GLOBAL _ilogb
 	GLOBAL _scalbln_callee
 	GLOBAL _scalbln
 	GLOBAL _scalbn_callee
 	GLOBAL _scalbn
 	GLOBAL _ldexp_callee
 	GLOBAL _ldexp
-	GLOBAL _ilogb_fastcall
-	GLOBAL _ilogb
 	GLOBAL _frexp_callee
 	GLOBAL _frexp
 	GLOBAL _expm1_fastcall
@@ -566,111 +566,119 @@ l_m32_log10f_00105:
 	ld	h,(ix-9)
 	push	hl
 	call	___fssub_callee
+	push	hl
+	push	de
+	push	de
+	push	hl
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	push	bc
+	ld	c,(ix-6)
+	ld	b,(ix-5)
+	push	bc
+	call	___fsadd_callee
+	ld	(ix-10),l
+	ld	(ix-9),h
+	ld	(ix-8),e
+	ld	c, e
+	ld	(ix-7),d
+	ld	b,d
+	push	bc
+	ld	c,(ix-10)
+	ld	b,(ix-9)
+	push	bc
+	ld	bc,0x3a37
+	push	bc
+	ld	bc,0xb152
+	push	bc
+	call	___fsmul_callee
+	ld	(ix-10),l
+	ld	(ix-9),h
+	ld	(ix-8),e
+	ld	(ix-7),d
+	pop	de
+	pop	hl
+	push	de
+	push	hl
+	ld	hl,0x3ede
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	call	___fsmul_callee
+	push	de
+	push	hl
+	ld	l,(ix-8)
+	ld	h,(ix-7)
+	push	hl
+	ld	l,(ix-10)
+	ld	h,(ix-9)
+	push	hl
+	call	___fsadd_callee
+	ld	(ix-10),l
+	ld	(ix-9),h
+	ld	(ix-8),e
+	ld	(ix-7),d
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	push	hl
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	push	hl
+	ld	hl,0x3ede
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	call	___fsmul_callee
+	push	de
+	push	hl
+	ld	l,(ix-8)
+	ld	h,(ix-7)
+	push	hl
+	ld	l,(ix-10)
+	ld	h,(ix-9)
+	push	hl
+	call	___fsadd_callee
 	ld	(ix-14),l
 	ld	(ix-13),h
 	ld	(ix-12),e
 	ld	(ix-11),d
-	push	de
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	call	___fsadd_callee
-	push	de
-	push	hl
-	ld	hl,0x3a37
-	push	hl
-	ld	hl,0xb152
-	push	hl
-	call	___fsmul_callee
-	ld	(ix-10),l
-	ld	(ix-9),h
-	ld	(ix-8),e
-	ld	(ix-7),d
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
-	ld	l,(ix-14)
-	ld	h,(ix-13)
-	push	hl
-	ld	hl,0x3ede
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fsmul_callee
-	push	de
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
-	call	___fsadd_callee
-	ld	(ix-10),l
-	ld	(ix-9),h
-	ld	(ix-8),e
-	ld	(ix-7),d
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	ld	hl,0x3ede
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fsmul_callee
-	push	de
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
-	call	___fsadd_callee
-	ld	(ix-10),l
-	ld	(ix-9),h
-	ld	(ix-8),e
-	ld	(ix-7),d
 	ld	l,(ix-2)
 	ld	h,(ix-1)
 	push	hl
 	call	___sint2fs_callee
-	ld	(ix-14),l
-	ld	(ix-13),h
-	ld	(ix-12),e
-	ld	(ix-11),d
+	push	hl
+	push	de
 	push	de
 	push	hl
-	ld	hl,0x3982
-	push	hl
-	ld	hl,0x6a14
-	push	hl
+	ld	bc,0x3982
+	push	bc
+	ld	bc,0x6a14
+	push	bc
 	call	___fsmul_callee
-	push	de
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
+	ld	(ix-10),l
+	ld	(ix-9),h
+	ld	(ix-8),e
+	ld	c, e
+	ld	(ix-7),d
+	ld	b,d
+	push	bc
+	ld	c,(ix-10)
+	ld	b,(ix-9)
+	push	bc
+	ld	c,(ix-12)
+	ld	b,(ix-11)
+	push	bc
+	ld	c,(ix-14)
+	ld	b,(ix-13)
+	push	bc
 	call	___fsadd_callee
 	ld	(ix-10),l
 	ld	(ix-9),h
 	ld	(ix-8),e
 	ld	(ix-7),d
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
-	ld	l,(ix-14)
-	ld	h,(ix-13)
+	pop	de
+	pop	hl
+	push	de
 	push	hl
 	ld	hl,0x3e9a
 	push	hl

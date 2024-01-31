@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.2.0 #13131 (Linux)
+; File Created by SDCC : free open source ISO C Compiler
+; Version 4.4.0 #14648 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -343,14 +343,14 @@
 	GLOBAL _log10
 	GLOBAL _log_fastcall
 	GLOBAL _log
+	GLOBAL _ilogb_fastcall
+	GLOBAL _ilogb
 	GLOBAL _scalbln_callee
 	GLOBAL _scalbln
 	GLOBAL _scalbn_callee
 	GLOBAL _scalbn
 	GLOBAL _ldexp_callee
 	GLOBAL _ldexp
-	GLOBAL _ilogb_fastcall
-	GLOBAL _ilogb
 	GLOBAL _frexp_callee
 	GLOBAL _frexp
 	GLOBAL _expm1_fastcall
@@ -431,31 +431,41 @@ _m32_tanhf:
 	push	af
 	push	af
 	call	_m32_expf
-	ex	(sp), hl
-	ld	(ix-6),e
-	ld	(ix-5),d
-	pop	hl
 	push	hl
-	ld	e,(ix-6)
-	ld	d,(ix-5)
+	push	de
 	call	_m32_invf
-	push	hl
-	push	de
-	push	de
-	push	hl
-	ld	c,(ix-6)
-	ld	b,(ix-5)
-	push	bc
-	ld	c,(ix-8)
-	ld	b,(ix-7)
-	push	bc
-	call	___fssub_callee
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
 	pop	de
 	pop	hl
+	push	hl
+	push	de
+	ld	c,(ix-2)
+	ld	b,(ix-1)
+	push	bc
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	push	bc
+	push	de
+	push	hl
+	call	___fssub_callee
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
+	pop	de
+	pop	hl
+	ld	c,(ix-2)
+	ld	b,(ix-1)
+	push	bc
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	push	bc
+	push	de
+	push	hl
+	call	___fsadd_callee
 	push	de
 	push	hl
 	ld	l,(ix-6)
@@ -463,15 +473,6 @@ _m32_tanhf:
 	push	hl
 	ld	l,(ix-8)
 	ld	h,(ix-7)
-	push	hl
-	call	___fsadd_callee
-	push	de
-	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
 	push	hl
 	call	___fsdiv
 	ld	sp,ix

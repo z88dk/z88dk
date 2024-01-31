@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.2.0 #13131 (Linux)
+; File Created by SDCC : free open source ISO C Compiler
+; Version 4.4.0 #14648 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -431,15 +431,15 @@ _am9511_round:
 	and	a,0x7f
 	ld	(ix-1),a
 	ld	a,0x17
-l_am9511_round_00141:
+l_am9511_round_00151:
 	srl	(ix-1)
 	rr	(ix-2)
 	rr	(ix-3)
 	rr	(ix-4)
 	dec	a
-	jr	NZ, l_am9511_round_00141
-	ld	l,(ix-3)
+	jr	NZ, l_am9511_round_00151
 	ld	a,(ix-4)
+	ld	l,0x00
 	add	a,0x81
 	ld	(ix-10),a
 	ld	a, l
@@ -464,7 +464,8 @@ l_am9511_round_00141:
 	and	a,(ix-9)
 	inc	a
 	jp	NZ,l_am9511_round_00113
-	set	7, e
+	ld	bc,0x0000
+	ld	e,0x80
 	ld	a, d
 	or	a,0x3f
 	ld	d, a
@@ -476,15 +477,15 @@ l_am9511_round_00106:
 	xor	a, a
 	ld	(ix-1),a
 	inc	a
-	jr	l_am9511_round_00146
-l_am9511_round_00145:
+	jr	l_am9511_round_00156
+l_am9511_round_00155:
 	sra	(ix-1)
 	rr	(ix-2)
 	rr	(ix-3)
 	rr	(ix-4)
-l_am9511_round_00146:
+l_am9511_round_00156:
 	dec	a
-	jr	NZ, l_am9511_round_00145
+	jr	NZ, l_am9511_round_00155
 	ld	l,(ix-4)
 	ld	h,(ix-3)
 	ld	(ix-8),l
@@ -504,6 +505,7 @@ l_am9511_round_00146:
 	ld	a,(ix-11)
 	and	a,(ix-5)
 	ld	(ix-1),a
+	ld	a,0x00
 	or	a,(ix-2)
 	or	a,(ix-3)
 	or	a,(ix-4)
@@ -518,38 +520,35 @@ l_am9511_round_00104:
 	ld	de,0x0040
 	pop	af
 	inc	a
-	jr	l_am9511_round_00148
-l_am9511_round_00147:
+	jr	l_am9511_round_00158
+l_am9511_round_00157:
 	sra	d
 	rr	e
 	rr	b
 	rr	c
-l_am9511_round_00148:
+l_am9511_round_00158:
 	dec	a
-	jr	NZ, l_am9511_round_00147
+	jr	NZ, l_am9511_round_00157
 	ld	a, c
 	add	a,(ix-14)
-	ld	c, a
+	ld	(ix-4),a
 	ld	a, b
 	adc	a,(ix-13)
-	ld	b, a
+	ld	(ix-3),a
 	ld	a, e
 	adc	a,(ix-12)
-	ld	e, a
+	ld	(ix-2),a
 	ld	a, d
 	adc	a,(ix-11)
-	ld	d, a
+	ld	(ix-1),a
 	ld	a, l
 	cpl
-	ld	l, a
+	ld	c, a
 	ld	a, h
 	cpl
-	ld	(ix-4),l
-	ld	(ix-3),a
-	xor	a, a
-	ld	(ix-2),a
-	ld	(ix-1),a
+	ld	b, a
 	ld	a, c
+	ld	de,0x0000
 	and	a,(ix-4)
 	ld	c, a
 	ld	a, b

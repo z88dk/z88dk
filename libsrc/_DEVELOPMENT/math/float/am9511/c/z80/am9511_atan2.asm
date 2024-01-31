@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.2.0 #13131 (Linux)
+; File Created by SDCC : free open source ISO C Compiler
+; Version 4.4.0 #14648 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -438,7 +438,7 @@ _am9511_atan2:
 	ld	h,(ix-3)
 	push	hl
 	call	___fslt_callee
-	bit	0,l
+	bit	0, l
 	jr	NZ,l_am9511_atan2_00110
 	ld	l,(ix+10)
 	ld	h,(ix+11)

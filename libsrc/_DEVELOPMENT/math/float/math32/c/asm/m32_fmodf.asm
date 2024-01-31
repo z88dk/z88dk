@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.2.0 #13131 (Linux)
+; File Created by SDCC : free open source ISO C Compiler
+; Version 4.4.0 #14648 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -343,14 +343,14 @@
 	GLOBAL _log10
 	GLOBAL _log_fastcall
 	GLOBAL _log
+	GLOBAL _ilogb_fastcall
+	GLOBAL _ilogb
 	GLOBAL _scalbln_callee
 	GLOBAL _scalbln
 	GLOBAL _scalbn_callee
 	GLOBAL _scalbn
 	GLOBAL _ldexp_callee
 	GLOBAL _ldexp
-	GLOBAL _ilogb_fastcall
-	GLOBAL _ilogb
 	GLOBAL _frexp_callee
 	GLOBAL _frexp
 	GLOBAL _expm1_fastcall
