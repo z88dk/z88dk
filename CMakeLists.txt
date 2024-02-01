@@ -83,7 +83,7 @@ set(LIBSRC_OVERRIDES
 
 add_custom_target(libsrc
     ALL
-    DEPENDS zcc z88dk-ucpp z88dk-zpragma z88dk-sccz80 z88dk-copt z88dk-z80asm
+    DEPENDS zcc z88dk-ucpp z88dk-zpragma z88dk-sccz80 z88dk-copt z88dk-z80asm z88dk-zx0
     BYPRODUCTS ${CMAKE_BINARY_DIR}/libsrc
     COMMAND make -C ${PROJECT_SOURCE_DIR}/libsrc ${LIBSRC_OVERRIDES} -j${NPROC} && make -C ${PROJECT_SOURCE_DIR}/libsrc install
     COMMAND make -C ${PROJECT_SOURCE_DIR}/libsrc/_DEVELOPMENT ${LIBSRC_OVERRIDES} -j${NPROC}
