@@ -114,7 +114,7 @@ extern unsigned char IO_E7;
 extern unsigned char IO_SPI_CONTROL;
 extern unsigned char IO_SPI_STATUS;
 extern unsigned char IO_EB;
-extern unsigned char IO_SPI_DATA
+extern unsigned char IO_SPI_DATA;
 extern unsigned char IO_103B;
 extern unsigned char IO_I2C_SCL;
 extern unsigned char IO_113B;
