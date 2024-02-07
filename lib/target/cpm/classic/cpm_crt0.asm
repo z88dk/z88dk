@@ -112,7 +112,7 @@ ENDIF
     ld      hl,0
     add     hl,sp
     ld      (__restore_sp_onexit+1),hl	;Save entry stack
-IF (startup=3) | (startup=4)
+IF (startup=3) | (startup=4) | (startup=5)
     ; Increase to cover +3 MEM banking
     defc    __clib_exit_stack_size_t  = __clib_exit_stack_size + 18 + 18
     UNDEFINE __clib_exit_stack_size
@@ -127,7 +127,7 @@ ENDIF
     ld      (exitsp),hl
 
 ; Memory banking for Spectrum +3
-IF (startup=3) | (startup=4)
+IF (startup=3) | (startup=4) | (startup=5)
 
 	PUBLIC    p3_poke
 	PUBLIC    p3_peek
@@ -195,7 +195,7 @@ __restore_sp_onexit:
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
 ; Memory banking for Spectrum +3
-IF (startup=3) | (startup=4)
+IF (startup=3) | (startup=4) | (startup=5)
 
     PUBLIC	RG0SAV
 RG0SAV:	defb 0
@@ -223,11 +223,20 @@ IF (startup=4)
 		nop
 		nop
 ELSE
+IF  (startup=5)
+		xor a
+		out ($fd),a
+		nop
+		nop
+		nop
+		nop
+ELSE
 		ld	a,$15
 		;ld	a,$0D
 		;ld	a,$05
 		ld bc,$1ffd
 		out(c),a
+ENDIF
 ENDIF
 
 		ex af,af
@@ -237,11 +246,16 @@ IF (startup=4)
 		call $EFF3
 		nop
 ELSE
+IF  (startup=5)
+		ld a,$80
+		out ($fd),a
+ELSE
 		ld	a,$11		; avoid using ($FF01) to be compatible with CP/M 2.2 
 		;ld	a,$09
 		;ld	a,$01
 		;ld	a,($FF01)	; saved value
 		out(c),a
+ENDIF
 ENDIF
 		ei
 		ret
@@ -260,11 +274,20 @@ IF (startup=4)
 		nop
 		nop
 ELSE
+IF  (startup=5)
+		xor a
+		out ($fd),a
+		nop
+		nop
+		nop
+		nop
+ELSE
 		ld	a,$15
 		;ld	a,$0D
 		;ld	a,$05
 		ld bc,$1ffd
 		out(c),a
+ENDIF
 ENDIF
 
 		ld a,(hl)
@@ -274,11 +297,16 @@ IF (startup=4)
 		call $EFF3
 		nop
 ELSE
+IF  (startup=5)
+		ld a,$80
+		out ($fd),a
+ELSE
 		ld	a,$11		; avoid using ($FF01) to be compatible with CP/M 2.2 
 		;ld	a,$09
 		;ld	a,$01
 		;ld	a,($FF01)	; saved value
 		out(c),a
+ENDIF
 ENDIF
 		ex  af,af
 		ei
