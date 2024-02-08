@@ -210,7 +210,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
     int     c = 0, d;
     int     warping;
     int     i, j, blocklen;
-    int     len, len_pad, mlen;
+    int     len, mlen;
     int     blockcount, bsnum_bank;
     unsigned char * loader;
     int     loader_len;
@@ -318,7 +318,6 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
         }
 
         len = ftell(fpin);
-        len_pad = 0;
 
         fseek(fpin, 0L, SEEK_SET);
 
@@ -623,7 +622,6 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                 snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, zxt->blockname);
 
                 if (zxt->lec_cpm) {
-                    //len_pad = 256-(len%256);
                     dotpos = strchr(name,'.');
                     if (dotpos)
                         memset (dotpos, ' ', name+10-dotpos);
@@ -635,7 +633,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
 
                 for (i = 0; i <= 9; i++)
                     writebyte_p(name[i], fpout, &zxt->parity);
-                writeword_p(len + len_pad, fpout, &zxt->parity);
+                writeword_p(len, fpout, &zxt->parity);
                 writeword_p(pos, fpout, &zxt->parity);        /* load address */
 
                 if (zxt->lec_cpm)
@@ -647,7 +645,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
             }
 
             /* Now onto the data bit */
-            writeword_p(len + len_pad + 2, fpout, &zxt->parity);      /* Length of next block */
+            writeword_p(len + 2, fpout, &zxt->parity);      /* Length of next block */
 
             zxt->parity = 0;
             writebyte_p(255, fpout, &zxt->parity);        /* Data is a type 255 block */
@@ -655,10 +653,6 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                 c = getc(fpin);
                 writebyte_p(c, fpout, &zxt->parity);
             }
-
-//            if (zxt->lec_cpm)
-//                for (i=0; i<len_pad;i++)
-//                    writebyte(0,fpout);
 
             writebyte_p(zxt->parity, fpout, &zxt->parity);
 
