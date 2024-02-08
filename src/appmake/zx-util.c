@@ -628,7 +628,8 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                     if (dotpos)
                         memset (dotpos, ' ', name+10-dotpos);
                     strcpy(name+7,"COM");
-                    strupr(name);
+                    for (i = 0; i <= 9; i++)
+                        name[i]=toupper(name[i]);
                     printf ("Program name:   %.7s.COM\n",name);
                 }
 
