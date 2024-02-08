@@ -203,6 +203,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
     char    filename[FILENAME_MAX + 1];
     char    wavfile[FILENAME_MAX + 1];
     char    name[11];
+    char    *dotpos;
     char    mybuf[20];
     FILE    *fpin, *fpout, *fpmerge;
     long    pos = 0;
@@ -216,6 +217,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
 
     loader = turbo_loader;
     loader_len = sizeof(turbo_loader);
+
 
     if (zxt->extreme) {
         //loader = xtreme_loader;
@@ -285,6 +287,23 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
           zxt->usr_address = pos;
         }
 
+        if (zxt->lec_cpm)
+        {
+            if (pos != 256) {
+                fprintf(stderr, "WARNING: ORG position should be 100h for CP/M programs.\n");
+            }
+
+            if ( zxt->turbo || zxt->extreme ) {
+                exit_log(1,"ERROR: turbo mode conflicts with the LEC CP/M tape format.\n");
+            }
+            
+            if (zxt->screen != NULL) {
+                exit_log(1,"ERROR: title screen option conflicts with the LEC CP/M tape format.\n");
+            }
+
+            zxt->noloader = TRUE;    /* If we're building a LEC CP/M file we need a single block */
+        }
+
         if ((fpin = fopen_bin(zxc->binname, zxc->crtfile)) == NULL) {
             exit_log(1, "Can't open input file %s\n", zxc->binname);
         }
@@ -299,6 +318,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
         }
 
         len = ftell(fpin);
+
         fseek(fpin, 0L, SEEK_SET);
 
         if ((fpout = fopen(filename, "wb")) == NULL) {
@@ -360,9 +380,9 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
             writebyte_p(zxt->parity, fpout, &zxt->parity);
         }
         else {
-            /* ===============
-            Loader block
-            =============== */
+            /* ================
+                 Loader block
+               ================ */
 
             mlen = 0;
             if (!zxt->noloader) {
@@ -601,11 +621,26 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                 /* Deal with the filename */
                 snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, zxt->blockname);
 
+                if (zxt->lec_cpm) {
+                    dotpos = strchr(name,'.');
+                    if (dotpos)
+                        memset (dotpos, ' ', name+10-dotpos);
+                    strcpy(name+7,"COM");
+                    for (i = 0; i <= 9; i++)
+                        name[i]=toupper(name[i]);
+                    printf ("Program name:   %.7s.COM\n",name);
+                }
+
                 for (i = 0; i <= 9; i++)
                     writebyte_p(name[i], fpout, &zxt->parity);
                 writeword_p(len, fpout, &zxt->parity);
                 writeword_p(pos, fpout, &zxt->parity);        /* load address */
-                writeword_p(0, fpout, &zxt->parity);          /* offset */
+
+                if (zxt->lec_cpm)
+                    writeword_p(0x8020, fpout, &zxt->parity);     /* offset (different on LEC CP/M) */
+                else
+                    writeword_p(0, fpout, &zxt->parity);          /* offset */
+
                 writebyte_p(zxt->parity, fpout, &zxt->parity);
             }
 
@@ -618,6 +653,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                 c = getc(fpin);
                 writebyte_p(c, fpout, &zxt->parity);
             }
+
             writebyte_p(zxt->parity, fpout, &zxt->parity);
 
             // Write the memory banks

@@ -1,8 +1,8 @@
-/*
+/* 
  *        Quick 'n' dirty mym to tap converter
- *
+ * 
  *        Usage: bin2tap [binfile] [tapfile]
- *
+ * 
  *        Dominic Morris  - 08/02/2000 - tapmaker
  *        Stefano Bodrato - 03/12/2000 - bin2tap
  *        Stefano Bodrato - 29/05/2001 - ORG parameter added
@@ -13,7 +13,7 @@
  *        Stefano Bodrato - 13/02/2013 - Extreme turbo tape option
  *        Alvin Albrecht  - 08/2017    - ESXDOS dot command generation
  *        Alvin Albrecht  - 09/2017    - SNA snapshot generation
- *
+ * 
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        You can use tapmaker to customize your work.
  * 
@@ -41,7 +41,7 @@
  *        taken from a previously prepared audio file using the dumb/turbo options).
  * 
  *        See zx-util.c
- *
+ * 
  *        $Id: zx.c $
  */
 
@@ -78,6 +78,7 @@ static struct zx_tape zxt = {
     0,          // extreme
     0,          // fast
     0,          // dumb
+    0,          // lec_cpm
     0,          // noloader
     0,          // noheader
     0,          // parity
@@ -151,6 +152,7 @@ option_t zx_options[] = {
     { 0,  "fast",      "Create a fast loading WAV", OPT_BOOL,  &zxt.fast },
     { 0,  "22",        "22Khz, lower rate WAV format", OPT_BOOL,  &zxt.khz22 },
     { 0,  "dumb",      "Just convert to WAV a tape file", OPT_BOOL, &zxt.dumb },
+    { 0,  "lec-cpm",   "CP/M 2.2 on LEC memory MOD",   OPT_BOOL,  &zxt.lec_cpm },
     { 0,  "noloader",  "Don't create the loader block", OPT_BOOL, &zxt.noloader },
     { 0,  "noheader",  "Don't create the header",   OPT_BOOL,  &zxt.noheader },
     { 0 , "merge",     "Merge a custom loader from external TAP file", OPT_STR, &zxt.merge },
