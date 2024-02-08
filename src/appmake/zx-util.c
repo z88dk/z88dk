@@ -626,7 +626,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                     //len_pad = 256-(len%256);
                     dotpos = strchr(name,'.');
                     if (dotpos)
-                        strnset (dotpos, ' ', name+10-dotpos);
+                        memset (dotpos, ' ', name+10-dotpos);
                     strcpy(name+7,"COM");
                     strupr(name);
                     printf ("Program name:   %.7s.COM\n",name);
