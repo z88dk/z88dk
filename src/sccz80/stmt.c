@@ -447,14 +447,11 @@ void dofor(void)
     suspendbuffer();
 
     if ( testresult != 0 ) {  /* So it's either true or non-constant */
-        if (bufferlen(buf2) > 0 ) 
-            gen_jp_label(l_condition,1); /*         goto condition             */
+        gen_jp_label(l_condition,1); /*         goto condition             */
         postlabel(wq.loop); /* .loop                              */
         clearbuffer(buf3); /*         modification               */
-        if (bufferlen(buf2) > 0 )  {
-            postlabel(l_condition); /* .condition                         */
-            clearbuffer(buf2); /*         if (!condition) goto exit  */
-        }
+        postlabel(l_condition); /* .condition                         */
+        clearbuffer(buf2); /*         if (!condition) goto exit  */
         statement(); /*         statement                  */
         gen_jp_label(wq.loop,1); /*         goto loop                  */
         postlabel(wq.exit); /* .exit                              */
