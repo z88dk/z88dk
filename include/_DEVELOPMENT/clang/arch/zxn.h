@@ -116,7 +116,7 @@ extern unsigned char IO_E7;
 extern unsigned char IO_SPI_CONTROL;
 extern unsigned char IO_SPI_STATUS;
 extern unsigned char IO_EB;
-extern unsigned char IO_SPI_DATA
+extern unsigned char IO_SPI_DATA;
 extern unsigned char IO_103B;
 extern unsigned char IO_I2C_SCL;
 extern unsigned char IO_113B;
@@ -535,12 +535,19 @@ __sfr __banked __at __IO_LED_L IO_LED_L;
 ///////////////////////////////////////////////////////////////
 
 // tbblue registry system
+#ifdef __CLANG
+extern unsigned char IO_243B;
+extern unsigned char IO_NEXTREG_REG;
 
+extern unsigned char IO_253B;
+extern unsigned char IO_NEXTREG_DAT;
+#else
 __sfr __banked __at 0x243b IO_243B;
 __sfr __banked __at __IO_NEXTREG_REG IO_NEXTREG_REG;
 
 __sfr __banked __at 0x253b IO_253B;
 __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
+#endif
 
 // zx next registry
 
