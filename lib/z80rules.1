@@ -833,6 +833,7 @@
 	ld	c,%1
 	call	l_long_asr%2o
 
+%title Swapload1
 %check 0 <= %1 <= 65535
 	ld	l,(hl)
 	ld	h,0
@@ -2081,14 +2082,36 @@
 	ld	a,(hl)
 	sub	e
 
+%title Subsimplify1
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,%1	;const
 	ld	a,l
 	sub	e
+	ld	a,%"d|h"2
+	sbc	%"d|h"3
+	jp	%4
 =
 	ld	a,%eval(%1 256 %%)
 	sub	(hl)
+	jp	%4
+
+%title Subsimplify2
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1	;const
+	ld	a,l
+	sub	e
+	ld	a,%"d|h"2
+	sbc	%"d|h"3
+	ccf
+	jp	%4
+=
+	ld	a,%eval(%1 256 %%)
+	sub	(hl)
+	ccf
+	jp	%4
+
 
 	ld	e,(hl)
 	ld	d,0
