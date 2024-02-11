@@ -4,6 +4,7 @@
 #define ARCH_NABU_H
 
 #include <sys/compiler.h>
+#include <stdint.h>
 
 __sfr __at 0x00 IO_CONTROL;
 
@@ -33,7 +34,11 @@ __sfr __at 0xB0 IO_PRINTER;
 
 
 
-extern void __LIB__ nabu_set_interrupt(int enabled) __z88dk_fastcall;
+extern void __LIB__    nabu_set_interrupt(int enabled) __z88dk_fastcall;
+extern uint8_t __LIB__ nabu_set_interrupts(void);
+extern void __LIB__    nabu_enable_interrupt(uint8_t flags) __z88dk_fastcall;
+extern void __LIB__    nabu_disable_interrupt(uint8_t flags) __z88dk_fastcall;
+
 
 
 #endif
