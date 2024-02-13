@@ -131,21 +131,21 @@ check_bin_file("${test}_data.bin",
 		z80asm(data_asm("").data_asm("1").data_asm("2")));
 		
 check_text_file("${test}.map", <<END);
-start                           = \$1020 ; addr, local, , ${test}, code, ${test}.asm:3
+__code_head                     = \$1020 ; const, public, def, , ,
+__code_size                     = \$0036 ; const, public, def, , ,
+__code_tail                     = \$1056 ; const, public, def, , ,
+__data_head                     = \$3040 ; const, public, def, , ,
+__data_size                     = \$0020 ; const, public, def, , ,
+__data_tail                     = \$3060 ; const, public, def, , ,
+__head                          = \$0000 ; const, public, def, , ,
+__size                          = \$3060 ; const, public, def, , ,
+__tail                          = \$3060 ; const, public, def, , ,
 start1                          = \$1032 ; addr, local, , ${test}, code, ${test}.asm:15
 start2                          = \$1044 ; addr, local, , ${test}, code, ${test}.asm:26
-string                          = \$3040 ; addr, local, , ${test}, data, ${test}.asm:12
+start                           = \$1020 ; addr, local, , ${test}, code, ${test}.asm:3
 string1                         = \$304A ; addr, local, , ${test}, data, ${test}.asm:23
 string2                         = \$3055 ; addr, local, , ${test}, data, ${test}.asm:34
-__head                          = \$0000 ; const, public, def, , ,
-__tail                          = \$3060 ; const, public, def, , ,
-__size                          = \$3060 ; const, public, def, , ,
-__code_head                     = \$1020 ; const, public, def, , ,
-__code_tail                     = \$1056 ; const, public, def, , ,
-__code_size                     = \$0036 ; const, public, def, , ,
-__data_head                     = \$3040 ; const, public, def, , ,
-__data_tail                     = \$3060 ; const, public, def, , ,
-__data_size                     = \$0020 ; const, public, def, , ,
+string                          = \$3040 ; addr, local, , ${test}, data, ${test}.asm:12
 END
 
 #------------------------------------------------------------------------------
@@ -177,21 +177,21 @@ ok ! -f "${test}_data.bin";
 ok ! -f "${test}_data.reloc";
 
 check_text_file("${test}.map", <<END);
-start                           = \$005F ; addr, local, , ${test}, code, ${test}.asm:3
+__code_head                     = \$005F ; const, public, def, , ,
+__code_size                     = \$0095 ; const, public, def, , ,
+__code_tail                     = \$0095 ; const, public, def, , ,
+__data_head                     = \$0095 ; const, public, def, , ,
+__data_size                     = \$007F ; const, public, def, , ,
+__data_tail                     = \$00B5 ; const, public, def, , ,
+__head                          = \$005F ; const, public, def, , ,
+__size                          = \$00B5 ; const, public, def, , ,
+__tail                          = \$00B5 ; const, public, def, , ,
 start1                          = \$0071 ; addr, local, , ${test}, code, ${test}.asm:15
 start2                          = \$0083 ; addr, local, , ${test}, code, ${test}.asm:26
-string                          = \$0095 ; addr, local, , ${test}, data, ${test}.asm:12
+start                           = \$005F ; addr, local, , ${test}, code, ${test}.asm:3
 string1                         = \$009F ; addr, local, , ${test}, data, ${test}.asm:23
 string2                         = \$00AA ; addr, local, , ${test}, data, ${test}.asm:34
-__head                          = \$005F ; const, public, def, , ,
-__tail                          = \$00B5 ; const, public, def, , ,
-__size                          = \$00B5 ; const, public, def, , ,
-__code_head                     = \$005F ; const, public, def, , ,
-__code_tail                     = \$0095 ; const, public, def, , ,
-__code_size                     = \$0095 ; const, public, def, , ,
-__data_head                     = \$0095 ; const, public, def, , ,
-__data_tail                     = \$00B5 ; const, public, def, , ,
-__data_size                     = \$007F ; const, public, def, , ,
+string                          = \$0095 ; addr, local, , ${test}, data, ${test}.asm:12
 END
 
 #------------------------------------------------------------------------------
@@ -241,21 +241,21 @@ check_bin_file("${test}_data.bin",
 check_bin_file("${test}_data.reloc", "");
 
 check_text_file("${test}.map", <<END);
-start                           = \$1020 ; addr, public, , ${test}, code, ${test}.asm:5
-string                          = \$3040 ; addr, public, , ${test}, data, ${test}.asm:14
-start1                          = \$1032 ; addr, public, , ${test}1, code, ${test}1.asm:4
-string1                         = \$304A ; addr, public, , ${test}1, data, ${test}1.asm:12
-start2                          = \$1044 ; addr, public, , ${test}2, code, ${test}2.asm:4
-string2                         = \$3055 ; addr, public, , ${test}2, data, ${test}2.asm:12
-__head                          = \$0000 ; const, public, def, , ,
-__tail                          = \$3060 ; const, public, def, , ,
-__size                          = \$3060 ; const, public, def, , ,
 __code_head                     = \$1020 ; const, public, def, , ,
-__code_tail                     = \$1056 ; const, public, def, , ,
 __code_size                     = \$0036 ; const, public, def, , ,
+__code_tail                     = \$1056 ; const, public, def, , ,
 __data_head                     = \$3040 ; const, public, def, , ,
-__data_tail                     = \$3060 ; const, public, def, , ,
 __data_size                     = \$0020 ; const, public, def, , ,
+__data_tail                     = \$3060 ; const, public, def, , ,
+__head                          = \$0000 ; const, public, def, , ,
+__size                          = \$3060 ; const, public, def, , ,
+__tail                          = \$3060 ; const, public, def, , ,
+start1                          = \$1032 ; addr, public, , ${test}1, code, ${test}1.asm:4
+start2                          = \$1044 ; addr, public, , ${test}2, code, ${test}2.asm:4
+start                           = \$1020 ; addr, public, , ${test}, code, ${test}.asm:5
+string1                         = \$304A ; addr, public, , ${test}1, data, ${test}1.asm:12
+string2                         = \$3055 ; addr, public, , ${test}2, data, ${test}2.asm:12
+string                          = \$3040 ; addr, public, , ${test}, data, ${test}.asm:14
 END
 
 #------------------------------------------------------------------------------
@@ -310,21 +310,21 @@ ok ! -f "${test}_data.bin";
 ok ! -f "${test}_data.reloc";
 
 check_text_file("${test}.map", <<END);
-start                           = \$005F ; addr, public, , ${test}, code, ${test}.asm:5
-string                          = \$0095 ; addr, public, , ${test}, data, ${test}.asm:14
-start1                          = \$0071 ; addr, public, , ${test}1, code, ${test}1.asm:4
-string1                         = \$009F ; addr, public, , ${test}1, data, ${test}1.asm:12
-start2                          = \$0083 ; addr, public, , ${test}2, code, ${test}2.asm:4
-string2                         = \$00AA ; addr, public, , ${test}2, data, ${test}2.asm:12
-__head                          = \$005F ; const, public, def, , ,
-__tail                          = \$00B5 ; const, public, def, , ,
-__size                          = \$00B5 ; const, public, def, , ,
 __code_head                     = \$005F ; const, public, def, , ,
-__code_tail                     = \$0095 ; const, public, def, , ,
 __code_size                     = \$0095 ; const, public, def, , ,
+__code_tail                     = \$0095 ; const, public, def, , ,
 __data_head                     = \$0095 ; const, public, def, , ,
-__data_tail                     = \$00B5 ; const, public, def, , ,
 __data_size                     = \$007F ; const, public, def, , ,
+__data_tail                     = \$00B5 ; const, public, def, , ,
+__head                          = \$005F ; const, public, def, , ,
+__size                          = \$00B5 ; const, public, def, , ,
+__tail                          = \$00B5 ; const, public, def, , ,
+start1                          = \$0071 ; addr, public, , ${test}1, code, ${test}1.asm:4
+start2                          = \$0083 ; addr, public, , ${test}2, code, ${test}2.asm:4
+start                           = \$005F ; addr, public, , ${test}, code, ${test}.asm:5
+string1                         = \$009F ; addr, public, , ${test}1, data, ${test}1.asm:12
+string2                         = \$00AA ; addr, public, , ${test}2, data, ${test}2.asm:12
+string                          = \$0095 ; addr, public, , ${test}, data, ${test}.asm:14
 END
 
 #------------------------------------------------------------------------------
@@ -370,17 +370,17 @@ ok ! -f "${test}_code2.bin";
 ok ! -f "${test}_code2.reloc";
 
 check_text_file("${test}.map", <<END);
-start                           = \$004E ; addr, local, , ${test}, code1, ${test}.asm:4
-cont                            = \$0051 ; addr, local, , ${test}, code2, ${test}.asm:9
-__head                          = \$004E ; const, public, def, , ,
-__tail                          = \$0052 ; const, public, def, , ,
-__size                          = \$0052 ; const, public, def, , ,
 __code1_head                    = \$004E ; const, public, def, , ,
-__code1_tail                    = \$0051 ; const, public, def, , ,
 __code1_size                    = \$0051 ; const, public, def, , ,
+__code1_tail                    = \$0051 ; const, public, def, , ,
 __code2_head                    = \$0051 ; const, public, def, , ,
-__code2_tail                    = \$0052 ; const, public, def, , ,
 __code2_size                    = \$004F ; const, public, def, , ,
+__code2_tail                    = \$0052 ; const, public, def, , ,
+__head                          = \$004E ; const, public, def, , ,
+__size                          = \$0052 ; const, public, def, , ,
+__tail                          = \$0052 ; const, public, def, , ,
+cont                            = \$0051 ; addr, local, , ${test}, code2, ${test}.asm:9
+start                           = \$004E ; addr, local, , ${test}, code1, ${test}.asm:4
 END
 
 #------------------------------------------------------------------------------
@@ -438,33 +438,33 @@ ok ! -f "${test}_data2.bin";
 ok ! -f "${test}_data2.reloc";
 
 check_text_file("${test}.map", <<END);
-start                           = \$1020 ; addr, local, , ${test}, code, ${test}.asm:12
+__code1_head                    = \$1032 ; const, public, def, , ,
+__code1_size                    = \$0012 ; const, public, def, , ,
+__code1_tail                    = \$1044 ; const, public, def, , ,
+__code2_head                    = \$1044 ; const, public, def, , ,
+__code2_size                    = \$0012 ; const, public, def, , ,
+__code2_tail                    = \$1056 ; const, public, def, , ,
+__code_head                     = \$1020 ; const, public, def, , ,
+__code_size                     = \$0012 ; const, public, def, , ,
+__code_tail                     = \$1032 ; const, public, def, , ,
+__data1_head                    = \$304A ; const, public, def, , ,
+__data1_size                    = \$000B ; const, public, def, , ,
+__data1_tail                    = \$3055 ; const, public, def, , ,
+__data2_head                    = \$3055 ; const, public, def, , ,
+__data2_size                    = \$000B ; const, public, def, , ,
+__data2_tail                    = \$3060 ; const, public, def, , ,
+__data_head                     = \$3040 ; const, public, def, , ,
+__data_size                     = \$000A ; const, public, def, , ,
+__data_tail                     = \$304A ; const, public, def, , ,
+__head                          = \$0000 ; const, public, def, , ,
+__size                          = \$3060 ; const, public, def, , ,
+__tail                          = \$3060 ; const, public, def, , ,
 start1                          = \$1032 ; addr, local, , ${test}, code1, ${test}.asm:20
 start2                          = \$1044 ; addr, local, , ${test}, code2, ${test}.asm:28
-string                          = \$3040 ; addr, local, , ${test}, data, ${test}.asm:36
+start                           = \$1020 ; addr, local, , ${test}, code, ${test}.asm:12
 string1                         = \$304A ; addr, local, , ${test}, data1, ${test}.asm:39
 string2                         = \$3055 ; addr, local, , ${test}, data2, ${test}.asm:42
-__head                          = \$0000 ; const, public, def, , ,
-__tail                          = \$3060 ; const, public, def, , ,
-__size                          = \$3060 ; const, public, def, , ,
-__code_head                     = \$1020 ; const, public, def, , ,
-__code_tail                     = \$1032 ; const, public, def, , ,
-__code_size                     = \$0012 ; const, public, def, , ,
-__code1_head                    = \$1032 ; const, public, def, , ,
-__code1_tail                    = \$1044 ; const, public, def, , ,
-__code1_size                    = \$0012 ; const, public, def, , ,
-__code2_head                    = \$1044 ; const, public, def, , ,
-__code2_tail                    = \$1056 ; const, public, def, , ,
-__code2_size                    = \$0012 ; const, public, def, , ,
-__data_head                     = \$3040 ; const, public, def, , ,
-__data_tail                     = \$304A ; const, public, def, , ,
-__data_size                     = \$000A ; const, public, def, , ,
-__data1_head                    = \$304A ; const, public, def, , ,
-__data1_tail                    = \$3055 ; const, public, def, , ,
-__data1_size                    = \$000B ; const, public, def, , ,
-__data2_head                    = \$3055 ; const, public, def, , ,
-__data2_tail                    = \$3060 ; const, public, def, , ,
-__data2_size                    = \$000B ; const, public, def, , ,
+string                          = \$3040 ; addr, local, , ${test}, data, ${test}.asm:36
 END
 
 unlink_testfiles;

@@ -1,6 +1,7 @@
 close
 lseek
 mkdir
+fsync
 open
 read
 readbyte

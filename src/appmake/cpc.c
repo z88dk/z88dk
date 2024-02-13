@@ -113,7 +113,7 @@ void putbyte(FILE* f, unsigned char b, unsigned long int* filesize)
 
 void putblock(FILE* f, unsigned char* block, unsigned int size, unsigned long int* filesize)
 {
-    int i;
+    unsigned int i;
     for (i = 0; i < size; i++)
         putbyte(f, block[i], filesize);
 }
@@ -550,21 +550,21 @@ uint8_t *cpc_layout_file(uint8_t *inbuf, char *fileName, size_t filelen, int sta
     // memory with the file type #16, "Unprotected ASCII v1")
     buf[0x12] = file_type;
     buf[0x15] = start_address % 256;
-    buf[0x16] = start_address / 256;
+    buf[0x16] = (start_address / 256) % 256;
 
     buf[0x18] = filelen % 256;
-    buf[0x19] = filelen / 256;
+    buf[0x19] = (filelen / 256) % 256;
 
     buf[0x1A] = start_address % 256;
-    buf[0x1B] = start_address / 256;
+    buf[0x1B] = (start_address / 256) % 256;
 
     buf[0x40] = filelen % 256;
-    buf[0x41] = filelen / 256;
+    buf[0x41] = (filelen / 256) % 256;
 
     cksum = cpc_checksum(buf, 0x42);
 
     buf[0x43] = cksum % 256;
-    buf[0x44] = cksum / 256;
+    buf[0x44] = (cksum / 256) % 256;
 
     while (total_len < filelen)
     {
@@ -757,7 +757,7 @@ int cpc_exec(char* target)
     outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, binary_length, pos, 2, &file_len);
     free(inFileBuff);
 
-    writeFile(filename, outFileBuff, file_len);
+    writeFile(filename, outFileBuff, (int)file_len);
 
     if (disk)
     {
@@ -805,7 +805,7 @@ int cpc_exec(char* target)
                     cpm_create_filename(tmpBlockName, cpm_filename, 0, 0);
                     outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, mb->secbin->size, mb->secbin->org, 2, &file_len);
 
-                    writeFile(filename, outFileBuff, file_len);
+                    writeFile(filename, outFileBuff, (int)file_len);
 
                     disc_write_file(h, cpm_filename, outFileBuff, file_len);
 
@@ -875,7 +875,7 @@ int cpc_exec(char* target)
                     cpm_create_filename(tmpBlockName, cpm_filename, 0, 0);
                     outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, mb->secbin->size, mb->secbin->org, 2, &file_len);
 
-                    writeFile(filename, outFileBuff, file_len);
+                    writeFile(filename, outFileBuff, (int)file_len);
 
                     totalSize += bin2wav(fpWav, filename, &wavSize);
 

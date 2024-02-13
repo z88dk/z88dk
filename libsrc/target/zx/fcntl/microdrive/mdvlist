@@ -8,3 +8,4 @@ rename
 fdtell
 write
 writebyte
+fsync

@@ -63,6 +63,8 @@ int main()
 #ifdef __HAVE_PSG_AY_VT2
    ay_vt2_play();
 #endif
+   // Test that fsync is available everywhere
+   fflush(stdin);
 }
 
 #if defined(__Z88__) && defined(__Z88_APPLICATION)

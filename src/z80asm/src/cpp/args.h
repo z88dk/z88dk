@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -8,7 +8,7 @@
 
 #include "if.h"
 #include "utils.h"
-#include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -25,7 +25,7 @@ public:
     void set_swap_ixiy(swap_ixiy_t swap_ixiy);
 	bool ucase() const { return m_ucase; }
     bool raw_strings() const { return m_raw_strings; }
-	int cpu() const { return m_cpu; }
+	cpu_t cpu() const { return m_cpu; }
 	const string& cpu_name() const { return m_cpu_name; }
     void set_cpu(int cpu);
 	bool ti83() const { return m_ti83; }
@@ -60,6 +60,8 @@ public:
 	void pop_library_path() { pop_path(m_library_path); }
 	string search_library_path(const string& file) { return search_path(m_library_path, file); }
 
+    bool debug_z80asm() const { return m_debug_z80asm; }
+
 	// file names
 	string asm_filename(const string& filename);
 	string lis_filename(const string& filename);
@@ -70,6 +72,7 @@ public:
 	string sym_filename(const string& filename);
 	string map_filename(const string& filename);
 	string reloc_filename(const string& bin_filename);
+    string norm_filename(const string& filename);
 
 private:
 	// options
@@ -77,7 +80,7 @@ private:
     swap_ixiy_t     m_swap_ixiy{ IXIY_NO_SWAP };// -IXIY, -IXIY-soft options
 	bool			m_ucase{ false };			// -ucase option
     bool            m_raw_strings{ false };     // -raw-strings option
-	int				m_cpu{ 0 };			        // -m option
+	cpu_t			m_cpu{ CPU_Z80 };	        // -m option
 	string			m_cpu_name;
     bool            m_got_cpu_option{ false };  // got -m option
 	bool			m_ti83{ false };			// -mti83 option
@@ -103,6 +106,8 @@ private:
 	vector<string>	m_include_path;				// -I option
 	vector<string>	m_library_path;				// -L option
 	vector<string>	m_files;					// command line files
+    bool            m_debug_z80asm{ false };    // -vv
+    string          m_m4_options;               // options to the m4 subprocess
 
 	// parsing
 	void parse_option(const string& arg);
@@ -138,6 +143,7 @@ private:
 	static string unquote(string text);
 	static string expand_env_vars(string text);
 	static void set_float_format(const string& format);
+	static void set_float_option(const string& format);
 	static void set_origin(const string& opt_arg);
     static void define_static_symbol(const string& name, int value = 1);
     static void undefine_static_symbol(const string& name);

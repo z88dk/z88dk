@@ -12,6 +12,14 @@ void PatchZ80(void)
     if ( pc == 7 ) {
         hook_cpm();
         return;
+    } else if ( pc == 10 ) {
+       // CPM console status
+       a = kbhit() == 1 ? 1 : 0;
+       return;
+    } else if ( pc == 13 ) {
+       // CPM console in
+       a = getch();
+       return;
     }
 
     if ( rc2014_mode && (pc == 0x08 + 2 || pc == 0x10 + 2|| pc == 0x18 + 2) ) {

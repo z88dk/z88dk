@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.1+
+ * FreeRTOS Kernel V11.0.1
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -270,7 +270,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
 /**
  * queue. h
  * @code{c}
- * BaseType_t xQueueSendToToFront(
+ * BaseType_t xQueueSendToFront(
  *                                 QueueHandle_t    xQueue,
  *                                 const void       *pvItemToQueue,
  *                                 TickType_t       xTicksToWait
@@ -1033,7 +1033,7 @@ extern void __LIB__ vQueueDelete(QueueHandle_t xQueue) __smallc;
  * @param pxHigherPriorityTaskWoken xQueueSendToFrontFromISR() will set
  * *pxHigherPriorityTaskWoken to pdTRUE if sending to the queue caused a task
  * to unblock, and the unblocked task has a priority higher than the currently
- * running task.  If xQueueSendToFromFromISR() sets this value to pdTRUE then
+ * running task.  If xQueueSendToFrontFromISR() sets this value to pdTRUE then
  * a context switch should be requested before the interrupt is exited.
  *
  * @return pdTRUE if the data was successfully sent to the queue, otherwise
@@ -1223,9 +1223,12 @@ extern void __LIB__ vQueueDelete(QueueHandle_t xQueue) __smallc;
  *  {
  *      // Writing to the queue caused a task to unblock and the unblocked task
  *      // has a priority higher than or equal to the priority of the currently
- *      // executing task (the task this interrupt interrupted).  Perform a context
+ *      // executing task (the task this interrupt interrupted). Perform a context
  *      // switch so this interrupt returns directly to the unblocked task.
- *      portYIELD_FROM_ISR(); // or portEND_SWITCHING_ISR() depending on the port.
+ *      // The macro used is port specific and will be either
+ *      // portYIELD_FROM_ISR() or portEND_SWITCHING_ISR() - refer to the documentation
+ *      // page for the port being used.
+ *      portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
  *  }
  * }
  * @endcode
@@ -1298,8 +1301,11 @@ extern void __LIB__ vQueueDelete(QueueHandle_t xQueue) __smallc;
  *  // Now the buffer is empty we can switch context if necessary.
  *  if( xHigherPriorityTaskWoken )
  *  {
- *      // Actual macro used here is port specific.
- *      portYIELD_FROM_ISR ();
+ *       // As xHigherPriorityTaskWoken is now set to pdTRUE then a context
+ *       // switch should be requested. The macro used is port specific and
+ *       // will be either portYIELD_FROM_ISR() or portEND_SWITCHING_ISR() -
+ *       // refer to the documentation page for the port being used.
+ *       portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
  *  }
  * }
  * @endcode
@@ -1375,11 +1381,14 @@ extern void __LIB__ vQueueDelete(QueueHandle_t xQueue) __smallc;
  *
  *  } while( portINPUT_BYTE( BUFFER_COUNT ) );
  *
- *  // Now the buffer is empty we can switch context if necessary.  Note that the
- *  // name of the yield function required is port specific.
+ *  // Now the buffer is empty we can switch context if necessary.
  *  if( xHigherPriorityTaskWokenByPost )
  *  {
- *      portYIELD_FROM_ISR();
+ *       // As xHigherPriorityTaskWokenByPost is now set to pdTRUE then a context
+ *       // switch should be requested. The macro used is port specific and
+ *       // will be either portYIELD_FROM_ISR() or portEND_SWITCHING_ISR() -
+ *       // refer to the documentation page for the port being used.
+ *       portYIELD_FROM_ISR( xHigherPriorityTaskWokenByPost );
  *  }
  * }
  * @endcode
@@ -1511,7 +1520,7 @@ UBaseType_t uxQueueMessagesWaitingFromISR( const QueueHandle_t xQueue ) PRIVILEG
  */
 extern BaseType_t __LIB__ xQueueIsQueueEmptyFromISR(const QueueHandle_t xQueue) __smallc;
 
-  
+
 extern BaseType_t __LIB__ xQueueIsQueueFullFromISR(const QueueHandle_t xQueue) __smallc;
 
 
@@ -1526,43 +1535,66 @@ extern UBaseType_t __LIB__ uxQueueMessagesWaitingFromISR(const QueueHandle_t xQu
  */
 /*
 QueueHandle_t xQueueCreateMutex( const uint8_t ucQueueType ) PRIVILEGED_FUNCTION;
-QueueHandle_t xQueueCreateMutexStatic( const uint8_t ucQueueType,
-                                       StaticQueue_t * pxStaticQueue ) PRIVILEGED_FUNCTION;
-QueueHandle_t xQueueCreateCountingSemaphore( const UBaseType_t uxMaxCount,
-                                             const UBaseType_t uxInitialCount ) PRIVILEGED_FUNCTION;
-QueueHandle_t xQueueCreateCountingSemaphoreStatic( const UBaseType_t uxMaxCount,
-                                                   const UBaseType_t uxInitialCount,
-                                                   StaticQueue_t * pxStaticQueue ) PRIVILEGED_FUNCTION;
-BaseType_t xQueueSemaphoreTake( QueueHandle_t xQueue,
-                                TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-TaskHandle_t xQueueGetMutexHolder( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
-TaskHandle_t xQueueGetMutexHolderFromISR( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
  */
 extern QueueHandle_t __LIB__ xQueueCreateMutex(const uint8_t ucQueueType) __smallc;
 
 
-extern QueueHandle_t __LIB__ xQueueCreateMutexStatic(const uint8_t ucQueueType,StaticQueue_t * pxStaticQueue) __smallc;
+
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+/*
+    QueueHandle_t xQueueCreateMutexStatic( const uint8_t ucQueueType,
+                                           StaticQueue_t * pxStaticQueue ) PRIVILEGED_FUNCTION;
+ */
+    extern QueueHandle_t __LIB__ xQueueCreateMutexStatic(const uint8_t ucQueueType,StaticQueue_t * pxStaticQueue) __smallc;
 
 
-extern QueueHandle_t __LIB__ xQueueCreateCountingSemaphore(const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount) __smallc;
+#endif
+
+#if ( configUSE_COUNTING_SEMAPHORES == 1 )
+/*
+    QueueHandle_t xQueueCreateCountingSemaphore( const UBaseType_t uxMaxCount,
+                                                 const UBaseType_t uxInitialCount ) PRIVILEGED_FUNCTION;
+ */
+    extern QueueHandle_t __LIB__ xQueueCreateCountingSemaphore(const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount) __smallc;
 
 
-extern QueueHandle_t __LIB__ xQueueCreateCountingSemaphoreStatic(const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount,StaticQueue_t * pxStaticQueue) __smallc;
+#endif
+
+#if ( ( configUSE_COUNTING_SEMAPHORES == 1 ) && ( configSUPPORT_STATIC_ALLOCATION == 1 ) )
+/*
+    QueueHandle_t xQueueCreateCountingSemaphoreStatic( const UBaseType_t uxMaxCount,
+                                                       const UBaseType_t uxInitialCount,
+                                                       StaticQueue_t * pxStaticQueue ) PRIVILEGED_FUNCTION;
+ */
+    extern QueueHandle_t __LIB__ xQueueCreateCountingSemaphoreStatic(const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount,StaticQueue_t * pxStaticQueue) __smallc;
 
 
+#endif
+
+/*
+BaseType_t xQueueSemaphoreTake( QueueHandle_t xQueue,
+                                TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
+ */
 extern BaseType_t __LIB__ xQueueSemaphoreTake(QueueHandle_t xQueue,TickType_t xTicksToWait) __smallc;
 
 
-extern TaskHandle_t __LIB__ xQueueGetMutexHolder(QueueHandle_t xSemaphore) __smallc;
+
+#if ( ( configUSE_MUTEXES == 1 ) && ( INCLUDE_xSemaphoreGetMutexHolder == 1 ) )
+/*
+    TaskHandle_t xQueueGetMutexHolder( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
+    TaskHandle_t xQueueGetMutexHolderFromISR( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
+ */
+    extern TaskHandle_t __LIB__ xQueueGetMutexHolder(QueueHandle_t xSemaphore) __smallc;
 
 
-extern TaskHandle_t __LIB__ xQueueGetMutexHolderFromISR(QueueHandle_t xSemaphore) __smallc;
+    extern TaskHandle_t __LIB__ xQueueGetMutexHolderFromISR(QueueHandle_t xSemaphore) __smallc;
 
 
+#endif
 
 /*
- * For internal use only.  Use xSemaphoreTakeMutexRecursive() or
- * xSemaphoreGiveMutexRecursive() instead of calling these functions directly.
+ * For internal use only.  Use xSemaphoreTakeRecursive() or
+ * xSemaphoreGiveRecursive() instead of calling these functions directly.
  */
 /*
 BaseType_t xQueueTakeMutexRecursive( QueueHandle_t xMutex,
@@ -1756,12 +1788,15 @@ extern BaseType_t __LIB__ xQueueGiveMutexRecursive(QueueHandle_t xMutex) __small
  * @return If the queue set is created successfully then a handle to the created
  * queue set is returned.  Otherwise NULL is returned.
  */
+#if ( ( configUSE_QUEUE_SETS == 1 ) && ( configSUPPORT_DYNAMIC_ALLOCATION == 1 ) )
 /*
-QueueSetHandle_t xQueueCreateSet( const UBaseType_t uxEventQueueLength ) PRIVILEGED_FUNCTION;
+    QueueSetHandle_t xQueueCreateSet( const UBaseType_t uxEventQueueLength ) PRIVILEGED_FUNCTION;
  */
-extern QueueSetHandle_t __LIB__ xQueueCreateSet(const UBaseType_t uxEventQueueLength) __smallc;
+    extern QueueSetHandle_t __LIB__ xQueueCreateSet(const UBaseType_t uxEventQueueLength) __smallc;
 
 
+
+#endif
 
 /*
  * Adds a queue or semaphore to a queue set that was previously created by a
@@ -1785,13 +1820,15 @@ extern QueueSetHandle_t __LIB__ xQueueCreateSet(const UBaseType_t uxEventQueueLe
  * queue set because it is already a member of a different queue set then pdFAIL
  * is returned.
  */
+#if ( configUSE_QUEUE_SETS == 1 )
 /*
-BaseType_t xQueueAddToSet( QueueSetMemberHandle_t xQueueOrSemaphore,
-                           QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
+    BaseType_t xQueueAddToSet( QueueSetMemberHandle_t xQueueOrSemaphore,
+                               QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
-extern QueueSetHandle_t __LIB__ xQueueAddToSet(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc;
+    extern BaseType_t __LIB__ xQueueAddToSet(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc;
 
 
+#endif
 
 /*
  * Removes a queue or semaphore from a queue set.  A queue or semaphore can only
@@ -1810,13 +1847,15 @@ extern QueueSetHandle_t __LIB__ xQueueAddToSet(QueueSetMemberHandle_t xQueueOrSe
  * then pdPASS is returned.  If the queue was not in the queue set, or the
  * queue (or semaphore) was not empty, then pdFAIL is returned.
  */
+#if ( configUSE_QUEUE_SETS == 1 )
 /*
-BaseType_t xQueueRemoveFromSet( QueueSetMemberHandle_t xQueueOrSemaphore,
-                                QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
+    BaseType_t xQueueRemoveFromSet( QueueSetMemberHandle_t xQueueOrSemaphore,
+                                    QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
-extern QueueSetHandle_t __LIB__ xQueueRemoveFromSet(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc;
+    extern BaseType_t __LIB__ xQueueRemoveFromSet(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc;
 
 
+#endif
 
 /*
  * xQueueSelectFromSet() selects from the members of a queue set a queue or
@@ -1852,23 +1891,27 @@ extern QueueSetHandle_t __LIB__ xQueueRemoveFromSet(QueueSetMemberHandle_t xQueu
  * in the queue set that is available, or NULL if no such queue or semaphore
  * exists before before the specified block time expires.
  */
+#if ( configUSE_QUEUE_SETS == 1 )
 /*
-QueueSetMemberHandle_t xQueueSelectFromSet( QueueSetHandle_t xQueueSet,
-                                            const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
+    QueueSetMemberHandle_t xQueueSelectFromSet( QueueSetHandle_t xQueueSet,
+                                                const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
  */
-extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSet(QueueSetHandle_t xQueueSet,const TickType_t xTicksToWait) __smallc;
+    extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSet(QueueSetHandle_t xQueueSet,const TickType_t xTicksToWait) __smallc;
 
 
+#endif
 
 /*
  * A version of xQueueSelectFromSet() that can be used from an ISR.
  */
+#if ( configUSE_QUEUE_SETS == 1 )
 /*
-QueueSetMemberHandle_t xQueueSelectFromSetFromISR( QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
+    QueueSetMemberHandle_t xQueueSelectFromSetFromISR( QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
  */
-extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSetFromISR(QueueSetHandle_t xQueueSet) __smallc;
+    extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSetFromISR(QueueSetHandle_t xQueueSet) __smallc;
 
 
+#endif
 
 /* Not public API functions. */
 /*
@@ -1896,6 +1939,44 @@ extern UBaseType_t __LIB__ uxQueueGetQueueNumber(QueueHandle_t xQueue) __smallc;
 
 extern uint8_t __LIB__ ucQueueGetQueueType(QueueHandle_t xQueue) __smallc;
 
+
+
+#if ( configUSE_TRACE_FACILITY == 1 )
+/*
+    void vQueueSetQueueNumber( QueueHandle_t xQueue,
+                               UBaseType_t uxQueueNumber ) PRIVILEGED_FUNCTION;
+ */
+    extern void __LIB__ vQueueSetQueueNumber(QueueHandle_t xQueue,UBaseType_t uxQueueNumber) __smallc;
+
+
+#endif
+
+#if ( configUSE_TRACE_FACILITY == 1 )
+/*
+    UBaseType_t uxQueueGetQueueNumber( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
+ */
+    extern UBaseType_t __LIB__ uxQueueGetQueueNumber(QueueHandle_t xQueue) __smallc;
+
+
+#endif
+
+#if ( configUSE_TRACE_FACILITY == 1 )
+/*
+    uint8_t ucQueueGetQueueType( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
+ */
+    extern uint8_t __LIB__ ucQueueGetQueueType(QueueHandle_t xQueue) __smallc;
+
+
+#endif
+
+/*
+UBaseType_t uxQueueGetQueueItemSize( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
+UBaseType_t uxQueueGetQueueLength( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
+ */
+extern UBaseType_t __LIB__ uxQueueGetQueueItemSize(QueueHandle_t xQueue) __smallc;
+
+
+extern UBaseType_t __LIB__ uxQueueGetQueueLength(QueueHandle_t xQueue) __smallc;
 
 
 

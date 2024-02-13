@@ -2,8 +2,10 @@ SECTION rodata_font
 SECTION rodata_font_8x8
 
 PUBLIC _font_8x8_pmd85_system
+PUBLIC _font_6x8_pmd85_system
 PUBLIC _font_8x8_pmd85_system_end
 
+_font_6x8_pmd85_system:
 _font_8x8_pmd85_system:
 
 IF __CPU_GBZ80__

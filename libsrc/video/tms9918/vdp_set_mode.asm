@@ -43,7 +43,7 @@ SECTION rodata_video_vdp
 mode_table:
     defb    0
     defw    __vdp_mode0
-IFDEF V9938
+IF V9938 | F18A
     defb    80
     defw    __vdp_mode0_80col
 ENDIF

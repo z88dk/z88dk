@@ -12,9 +12,10 @@
 ;	- 4 if it is a Spectrum +3
 ;	- 5 if it is a Spectrum +2A or +3 fixed for games
 ;	- 6 TS2068
-;	(disabled) - 7 Scorpion or similar clone
+;	- 7 Scorpion
+;	- 8 Profi
 ;
-;	$Id: zx_model.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
+;	$Id: zx_model.asm $
 ;
 
 	SECTION code_clib
@@ -24,7 +25,28 @@
 zx_model:
 _zx_model:
 
+check_profi:
+	ld hl,$80
+	ld de,$1000
+	ld bc,$dffd
+	out (c),d      ; check for port #DFFD bit 4 (on Profi RAM gets paged over the ROM)
+	nop
+	
+	LD A,(HL)      ; read byte
+	INC (HL)       ; change it		
+	CP (HL)        ; compare with the read		
+	LD (HL), A     ; restore byte		
+	OUT (C),E      ; restore ROM		
+	JR Z,no_profi
+	ld	hl,8
+	ret
+
+no_profi:
 	ld	hl,0
+	ld	a,(8)
+	cp	$C3
+	jr  z,have_scorpion
+
 	ld	a,(75)
 	cp	191
 	jr	z,classiclike
@@ -60,6 +82,7 @@ loop:
 	ld	bc,$2ffd
 	in	a,(c)
 	cp	56	; If you find ULA related data, then you have a Scorpion like clone
+have_scorpion:
 	ld	l,7	; sadly you'll never fall here !
 	ret	z
 	and	a
@@ -69,7 +92,7 @@ loop:
 	ld	l,4
 	ret	z
 	cp	255
-	jr	nz,plus3	; ..or should it be unknowk ?
+	jr	nz,plus3	; ..or should it be unknown ?
 endloop:
 	dec	de
 	ld	a,d

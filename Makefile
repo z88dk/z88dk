@@ -35,7 +35,7 @@ endif
 
 Z88DK_PATH	= $(shell pwd)
 SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
-SDCC_VERSION	= 14210
+SDCC_VERSION	= 14648
 
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
@@ -270,3 +270,16 @@ examples-clean:
 	$(MAKE) -C examples clean
 
 .PHONY: test testsuite
+
+
+.PHONY: snap
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	SNAP_OPTS=
+else 
+	SNAP_OPTS= --use-lxd
+endif
+
+snap: snap/snapcraft.yaml
+	snapcraft $(SNAP_OPTS)

@@ -783,7 +783,7 @@ YY_RULE_SETUP
 {
     zero_expression_result(&yylval.val);
     yylval.val.type.first = malloc_type(TYPE_FLOAT);
-    yylval.val.as_float = atof(yytext);
+    yylval.val.as_float = (float)atof(yytext);
     return T_PRIMITIVE_VALUE;
 }
 	YY_BREAK

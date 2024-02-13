@@ -75,47 +75,6 @@ Writing object file '$test.b.o'
 Adding $test.a.o to library
 Adding $test.b.o to library
 
-Predefined constant: __CPU_EZ80_Z80__ = 1
-Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __CPU_R800__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
 Predefined constant: __CPU_Z180__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Assembling '$test.a.asm'
@@ -137,7 +96,7 @@ Writing object file '$test.b.o'
 Adding $test.a.o to library
 Adding $test.b.o to library
 
-Predefined constant: __CPU_KC160__ = 1
+Predefined constant: __CPU_R800__ = 1
 Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
@@ -179,6 +138,27 @@ Adding $test.b.o to library
 
 Predefined constant: __CPU_Z80_STRICT__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
+Assembling '$test.a.asm'
+Writing object file '$test.a.o'
+
+Assembling '$test.b.asm'
+Writing object file '$test.b.o'
+
+Adding $test.a.o to library
+Adding $test.b.o to library
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Assembling '$test.a.asm'
+Writing object file '$test.a.o'
+
+Assembling '$test.b.asm'
+Writing object file '$test.b.o'
+
+Adding $test.a.o to library
+Adding $test.b.o to library
+
+Predefined constant: __CPU_R3K__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
 Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
@@ -240,8 +220,8 @@ Writing object file '$test.b.o'
 Adding $test.a.o to library
 Adding $test.b.o to library
 
-Predefined constant: __CPU_R4K__ = 1
-Predefined constant: __CPU_RABBIT__ = 1
+Predefined constant: __CPU_EZ80_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
 Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
@@ -261,8 +241,8 @@ Writing object file '$test.b.o'
 Adding $test.a.o to library
 Adding $test.b.o to library
 
-Predefined constant: __CPU_R3K__ = 1
-Predefined constant: __CPU_RABBIT__ = 1
+Predefined constant: __CPU_EZ80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
 Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
@@ -323,8 +303,8 @@ Writing object file '$test.b.o'
 Adding $test.a.o to library
 Adding $test.b.o to library
 
-Predefined constant: __CPU_EZ80__ = 1
-Predefined constant: __CPU_ZILOG__ = 1
+Predefined constant: __CPU_8080__ = 1
+Predefined constant: __CPU_INTEL__ = 1
 Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
@@ -344,8 +324,28 @@ Writing object file '$test.b.o'
 Adding $test.a.o to library
 Adding $test.b.o to library
 
-Predefined constant: __CPU_8080__ = 1
-Predefined constant: __CPU_INTEL__ = 1
+Predefined constant: __CPU_R4K__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
+Assembling '$test.a.asm'
+Writing object file '$test.a.o'
+
+Assembling '$test.b.asm'
+Writing object file '$test.b.o'
+
+Adding $test.a.o to library
+Adding $test.b.o to library
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Assembling '$test.a.asm'
+Writing object file '$test.a.o'
+
+Assembling '$test.b.asm'
+Writing object file '$test.b.o'
+
+Adding $test.a.o to library
+Adding $test.b.o to library
+
+Predefined constant: __CPU_KC160__ = 1
 Assembling '$test.a.asm'
 Writing object file '$test.a.o'
 
@@ -443,7 +443,7 @@ Object  file test_t_issue_2320_12.lib at $058C: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $0644: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  ez80_z80 
+  CPU:  z180 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -452,7 +452,7 @@ Object  file test_t_issue_2320_12.lib at $0644: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $0718: Z80RMF18
   Name: b
-  CPU:  ez80_z80 
+  CPU:  z180 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -461,7 +461,7 @@ Object  file test_t_issue_2320_12.lib at $0718: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $07D0: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  ez80_z80 (-IXIY)
+  CPU:  z180 (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -470,7 +470,7 @@ Object  file test_t_issue_2320_12.lib at $07D0: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $08A4: Z80RMF18
   Name: b
-  CPU:  ez80_z80 (-IXIY)
+  CPU:  z180 (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -515,7 +515,7 @@ Object  file test_t_issue_2320_12.lib at $0BBC: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $0C74: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  z180 
+  CPU:  kc160_z80 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -524,7 +524,7 @@ Object  file test_t_issue_2320_12.lib at $0C74: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $0D48: Z80RMF18
   Name: b
-  CPU:  z180 
+  CPU:  kc160_z80 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -533,7 +533,7 @@ Object  file test_t_issue_2320_12.lib at $0D48: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $0E00: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  z180 (-IXIY)
+  CPU:  kc160_z80 (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -542,7 +542,7 @@ Object  file test_t_issue_2320_12.lib at $0E00: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $0ED4: Z80RMF18
   Name: b
-  CPU:  z180 (-IXIY)
+  CPU:  kc160_z80 (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -551,7 +551,7 @@ Object  file test_t_issue_2320_12.lib at $0ED4: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $0F8C: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  kc160 
+  CPU:  z80_strict 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -560,7 +560,7 @@ Object  file test_t_issue_2320_12.lib at $0F8C: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1060: Z80RMF18
   Name: b
-  CPU:  kc160 
+  CPU:  z80_strict 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -569,7 +569,7 @@ Object  file test_t_issue_2320_12.lib at $1060: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1118: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  kc160 (-IXIY)
+  CPU:  z80_strict (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -578,7 +578,7 @@ Object  file test_t_issue_2320_12.lib at $1118: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $11EC: Z80RMF18
   Name: b
-  CPU:  kc160 (-IXIY)
+  CPU:  z80_strict (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -587,7 +587,7 @@ Object  file test_t_issue_2320_12.lib at $11EC: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $12A4: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  kc160_z80 
+  CPU:  r3k 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -596,7 +596,7 @@ Object  file test_t_issue_2320_12.lib at $12A4: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1378: Z80RMF18
   Name: b
-  CPU:  kc160_z80 
+  CPU:  r3k 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -605,7 +605,7 @@ Object  file test_t_issue_2320_12.lib at $1378: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1430: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  kc160_z80 (-IXIY)
+  CPU:  r3k (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -614,7 +614,7 @@ Object  file test_t_issue_2320_12.lib at $1430: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1504: Z80RMF18
   Name: b
-  CPU:  kc160_z80 (-IXIY)
+  CPU:  r3k (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -623,7 +623,7 @@ Object  file test_t_issue_2320_12.lib at $1504: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $15BC: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  z80_strict 
+  CPU:  8085 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -632,7 +632,7 @@ Object  file test_t_issue_2320_12.lib at $15BC: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1690: Z80RMF18
   Name: b
-  CPU:  z80_strict 
+  CPU:  8085 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -641,7 +641,7 @@ Object  file test_t_issue_2320_12.lib at $1690: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1748: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  z80_strict (-IXIY)
+  CPU:  8085 (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -650,7 +650,7 @@ Object  file test_t_issue_2320_12.lib at $1748: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $181C: Z80RMF18
   Name: b
-  CPU:  z80_strict (-IXIY)
+  CPU:  8085 (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -659,7 +659,7 @@ Object  file test_t_issue_2320_12.lib at $181C: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $18D4: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  8085 
+  CPU:  r5k 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -668,7 +668,7 @@ Object  file test_t_issue_2320_12.lib at $18D4: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $19A8: Z80RMF18
   Name: b
-  CPU:  8085 
+  CPU:  r5k 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -677,7 +677,7 @@ Object  file test_t_issue_2320_12.lib at $19A8: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1A60: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  8085 (-IXIY)
+  CPU:  r5k (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -686,7 +686,7 @@ Object  file test_t_issue_2320_12.lib at $1A60: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1B34: Z80RMF18
   Name: b
-  CPU:  8085 (-IXIY)
+  CPU:  r5k (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -695,7 +695,7 @@ Object  file test_t_issue_2320_12.lib at $1B34: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1BEC: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  r5k 
+  CPU:  ez80_z80 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -704,7 +704,7 @@ Object  file test_t_issue_2320_12.lib at $1BEC: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1CC0: Z80RMF18
   Name: b
-  CPU:  r5k 
+  CPU:  ez80_z80 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -713,7 +713,7 @@ Object  file test_t_issue_2320_12.lib at $1CC0: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1D78: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  r5k (-IXIY)
+  CPU:  ez80_z80 (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -722,7 +722,7 @@ Object  file test_t_issue_2320_12.lib at $1D78: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1E4C: Z80RMF18
   Name: b
-  CPU:  r5k (-IXIY)
+  CPU:  ez80_z80 (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -731,43 +731,43 @@ Object  file test_t_issue_2320_12.lib at $1E4C: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $1F04: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  r4k 
+  CPU:  ez80 
   Section "": 0 bytes
-  Section code2: 3 bytes
-    C $0000: 21 00 40
+  Section code2: 4 bytes
+    C $0000: 21 00 40 00
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_12.a.asm:2)
 
 Object  file test_t_issue_2320_12.lib at $1FD8: Z80RMF18
   Name: b
-  CPU:  r4k 
+  CPU:  ez80 
   Section "": 0 bytes
-  Section code: 3 bytes
-    C $0000: 21 00 80
+  Section code: 4 bytes
+    C $0000: 21 00 80 00
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_12.b.asm:3)
 
 Object  file test_t_issue_2320_12.lib at $2090: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  r4k (-IXIY)
+  CPU:  ez80 (-IXIY)
   Section "": 0 bytes
-  Section code2: 3 bytes
-    C $0000: 21 00 40
+  Section code2: 4 bytes
+    C $0000: 21 00 40 00
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_12.a.asm:2)
 
 Object  file test_t_issue_2320_12.lib at $2164: Z80RMF18
   Name: b
-  CPU:  r4k (-IXIY)
+  CPU:  ez80 (-IXIY)
   Section "": 0 bytes
-  Section code: 3 bytes
-    C $0000: 21 00 80
+  Section code: 4 bytes
+    C $0000: 21 00 80 00
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_12.b.asm:3)
 
 Object  file test_t_issue_2320_12.lib at $221C: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  r3k 
+  CPU:  r2ka 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -776,7 +776,7 @@ Object  file test_t_issue_2320_12.lib at $221C: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $22F0: Z80RMF18
   Name: b
-  CPU:  r3k 
+  CPU:  r2ka 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -785,7 +785,7 @@ Object  file test_t_issue_2320_12.lib at $22F0: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $23A8: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  r3k (-IXIY)
+  CPU:  r2ka (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -794,7 +794,7 @@ Object  file test_t_issue_2320_12.lib at $23A8: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $247C: Z80RMF18
   Name: b
-  CPU:  r3k (-IXIY)
+  CPU:  r2ka (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -803,7 +803,7 @@ Object  file test_t_issue_2320_12.lib at $247C: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $2534: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  r2ka 
+  CPU:  gbz80 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -812,7 +812,7 @@ Object  file test_t_issue_2320_12.lib at $2534: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $2608: Z80RMF18
   Name: b
-  CPU:  r2ka 
+  CPU:  gbz80 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -821,7 +821,7 @@ Object  file test_t_issue_2320_12.lib at $2608: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $26C0: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  r2ka (-IXIY)
+  CPU:  gbz80 (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -830,7 +830,7 @@ Object  file test_t_issue_2320_12.lib at $26C0: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $2794: Z80RMF18
   Name: b
-  CPU:  r2ka (-IXIY)
+  CPU:  gbz80 (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -839,7 +839,7 @@ Object  file test_t_issue_2320_12.lib at $2794: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $284C: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  gbz80 
+  CPU:  8080 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -848,7 +848,7 @@ Object  file test_t_issue_2320_12.lib at $284C: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $2920: Z80RMF18
   Name: b
-  CPU:  gbz80 
+  CPU:  8080 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -857,7 +857,7 @@ Object  file test_t_issue_2320_12.lib at $2920: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $29D8: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  gbz80 (-IXIY)
+  CPU:  8080 (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -866,7 +866,7 @@ Object  file test_t_issue_2320_12.lib at $29D8: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $2AAC: Z80RMF18
   Name: b
-  CPU:  gbz80 (-IXIY)
+  CPU:  8080 (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -875,43 +875,43 @@ Object  file test_t_issue_2320_12.lib at $2AAC: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $2B64: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  ez80 
+  CPU:  r4k 
   Section "": 0 bytes
-  Section code2: 4 bytes
-    C $0000: 21 00 40 00
+  Section code2: 3 bytes
+    C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_12.a.asm:2)
 
 Object  file test_t_issue_2320_12.lib at $2C38: Z80RMF18
   Name: b
-  CPU:  ez80 
+  CPU:  r4k 
   Section "": 0 bytes
-  Section code: 4 bytes
-    C $0000: 21 00 80 00
+  Section code: 3 bytes
+    C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_12.b.asm:3)
 
 Object  file test_t_issue_2320_12.lib at $2CF0: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  ez80 (-IXIY)
+  CPU:  r4k (-IXIY)
   Section "": 0 bytes
-  Section code2: 4 bytes
-    C $0000: 21 00 40 00
+  Section code2: 3 bytes
+    C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_12.a.asm:2)
 
 Object  file test_t_issue_2320_12.lib at $2DC4: Z80RMF18
   Name: b
-  CPU:  ez80 (-IXIY)
+  CPU:  r4k (-IXIY)
   Section "": 0 bytes
-  Section code: 4 bytes
-    C $0000: 21 00 80 00
+  Section code: 3 bytes
+    C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_12.b.asm:3)
 
 Object  file test_t_issue_2320_12.lib at $2E7C: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  8080 
+  CPU:  kc160 
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -920,7 +920,7 @@ Object  file test_t_issue_2320_12.lib at $2E7C: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $2F50: Z80RMF18
   Name: b
-  CPU:  8080 
+  CPU:  kc160 
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80
@@ -929,7 +929,7 @@ Object  file test_t_issue_2320_12.lib at $2F50: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $3008: Z80RMF18
   Name: test_t_issue_2320_12.a
-  CPU:  8080 (-IXIY)
+  CPU:  kc160 (-IXIY)
   Section "": 0 bytes
   Section code2: 3 bytes
     C $0000: 21 00 40
@@ -938,7 +938,7 @@ Object  file test_t_issue_2320_12.lib at $3008: Z80RMF18
 
 Object  file test_t_issue_2320_12.lib at $30DC: Z80RMF18
   Name: b
-  CPU:  8080 (-IXIY)
+  CPU:  kc160 (-IXIY)
   Section "": 0 bytes
   Section code: 3 bytes
     C $0000: 21 00 80

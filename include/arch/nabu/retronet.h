@@ -133,7 +133,7 @@ typedef struct {
 /// passed to it. If the fileHandle that you passed is already in use, a new file handle will be assigned
 /// to you and returned. 
 /// </summary>
-extern uint8_t __LIB__ rn_fileOpen(uint8_t filenameLen, char *filename, uint16_t fileFlag, uint8_t fileHandle);
+extern uint8_t __LIB__ rn_fileOpen(uint8_t filenameLen, char *filename, uint16_t fileFlag, uint8_t fileHandle) __smallc;
 
 /// <summary>
 /// Closes and releases the file with the specified fileHandle. The handle can be used again for another
@@ -143,7 +143,7 @@ extern uint8_t __LIB__ rn_fileOpen(uint8_t filenameLen, char *filename, uint16_t
 /// If the NABU is reset and the program therefore cannot close the file, the Internet Adapter will close all files
 /// when an INIT command is received.
 /// </summary>
-extern void __LIB__ rn_fileHandleClose(uint8_t fileHandle);
+extern void __LIB__ rn_fileHandleClose(uint8_t fileHandle) __smallc;
 
 /// <summary>
 /// Get the file size of the specified file, or returns -1 if file does not exist.
@@ -151,7 +151,7 @@ extern void __LIB__ rn_fileHandleClose(uint8_t fileHandle);
 /// a file handle is assigned. If you want to see if a file exists without creating it first, this
 /// is the function you would use. 
 /// </summary>
-extern int32_t __LIB__ rn_fileSize(uint8_t filenameLen, char *filename);
+extern int32_t __LIB__ rn_fileSize(uint8_t filenameLen, char *filename) __smallc;
 
 /// <summary>
 /// Get the file size of the specified file handle.
@@ -162,7 +162,7 @@ extern int32_t __LIB__ rn_fileSize(uint8_t filenameLen, char *filename);
 /// If a URL is used and the URL was not downloaded, the file size will be -1. You will only ever get
 /// a -1 from a URL, not a file.
 /// </summary>
-extern int32_t __LIB__ rn_fileHandleSize(uint8_t fileHandle);
+extern int32_t __LIB__ rn_fileHandleSize(uint8_t fileHandle) __smallc;
 
 /// <summary>
 /// Get the file details by filename.
@@ -170,7 +170,7 @@ extern int32_t __LIB__ rn_fileHandleSize(uint8_t fileHandle);
 /// The FileDetailStruct is populated with details about the file. If the file does not exist,
 /// the FileDetailStruct->Exists will reflect that.
 /// </summary>
-extern void __LIB__ rn_fileDetails(uint8_t filenameLen, char *filename, FileDetailsStruct* s);
+extern void __LIB__ rn_fileDetails(uint8_t filenameLen, char *filename, FileDetailsStruct* s) __smallc;
 
 /// <summary>
 /// Get the file details by file handle.
@@ -178,7 +178,7 @@ extern void __LIB__ rn_fileDetails(uint8_t filenameLen, char *filename, FileDeta
 /// The FileDetailStruct is populated with details about the file. If the file does not exist,
 /// the FileDetailStruct->Exists will reflect that.
 /// </summary>
-extern void __LIB__ rn_fileHandleDetails(int8_t fileHandle, FileDetailsStruct* s);
+extern void __LIB__ rn_fileHandleDetails(int8_t fileHandle, FileDetailsStruct* s) __smallc;
 
 /// <summary>
 /// Read data from the specified filename.
@@ -192,7 +192,7 @@ extern void __LIB__ rn_fileHandleDetails(int8_t fileHandle, FileDetailsStruct* s
 /// 
 /// Returns the number of bytes read or 0 if there was an error or reached EOF
 /// </summary>
-extern uint16_t __LIB__ rn_fileHandleRead(uint8_t fileHandle, uint8_t* buffer, uint16_t bufferOffset, uint32_t readOffset, uint16_t readLength);
+extern uint16_t __LIB__ rn_fileHandleRead(uint8_t fileHandle, uint8_t* buffer, uint16_t bufferOffset, uint32_t readOffset, uint16_t readLength) __smallc;
 
 /// <summary>
 /// Append data to the end of the specified file in the filestore. If the file does not exist, 
@@ -204,7 +204,7 @@ extern uint16_t __LIB__ rn_fileHandleRead(uint8_t fileHandle, uint8_t* buffer, u
 /// - dataLen is the length of data that will be written 
 /// - data is a pointer to the data
 /// </summary>
-extern void __LIB__ rn_fileHandleAppend(uint8_t fileHandle, uint16_t dataOffset, uint16_t dataLen, void *data);
+extern void __LIB__ rn_fileHandleAppend(uint8_t fileHandle, uint16_t dataOffset, uint16_t dataLen, void *data) __smallc;
 
 /// <summary>
 /// Insert data in the file at the specified offset. This function will shift all data following the
@@ -216,7 +216,7 @@ extern void __LIB__ rn_fileHandleAppend(uint8_t fileHandle, uint16_t dataOffset,
 /// - dataLen is the length of data that will be written 
 /// - data is a pointer to the data
 /// </summary>
-extern void __LIB__ rn_fileHandleInsert(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, void *data);
+extern void __LIB__ rn_fileHandleInsert(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, void *data) __smallc;
 
 /// <summary>
 /// Delete range of bytes from within file handle
@@ -225,14 +225,14 @@ extern void __LIB__ rn_fileHandleInsert(uint8_t fileHandle, uint32_t fileOffset,
 /// - fileOffset is the offset of the file where the data will be removed
 /// - deleteLen is the length of data that will be removed
 /// </summary>
-extern void __LIB__ rn_fileHandleDeleteRange(uint8_t fileHandle, uint32_t fileOffset, uint16_t deleteLen);
+extern void __LIB__ rn_fileHandleDeleteRange(uint8_t fileHandle, uint32_t fileOffset, uint16_t deleteLen) __smallc;
 
 /// <summary>
 /// Delete all the content of the file and leave the file as a 0 byte length
 /// 
 /// - fileHandle is the obtained by rn_fileOpen()
 /// </summary>
-extern void __LIB__ rn_fileHandleEmptyFile(uint8_t fileHandle);
+extern void __LIB__ rn_fileHandleEmptyFile(uint8_t fileHandle) __smallc;
 
 /// <summary>
 /// Replace data in a file by overwriting bytes with the data
@@ -245,7 +245,7 @@ extern void __LIB__ rn_fileHandleEmptyFile(uint8_t fileHandle);
 /// - dataLen is the length of data that will be written 
 /// - data is a pointer to the data
 /// </summary>
-extern void __LIB__ rn_fileHandleReplace(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, void *data);
+extern void __LIB__ rn_fileHandleReplace(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, void *data) __smallc;
 
 /// <summary>
 /// Delete the physical file from the store. If the file has a handle, it is closed
@@ -253,7 +253,7 @@ extern void __LIB__ rn_fileHandleReplace(uint8_t fileHandle, uint32_t fileOffset
 /// - filenameLen is the length of the filename
 /// - filename is the filename string
 /// </summary>
-extern void __LIB__ rn_fileDelete(uint8_t filenameLen, char *filename);
+extern void __LIB__ rn_fileDelete(uint8_t filenameLen, char *filename) __smallc;
 
 /// <summary>
 /// Copy the src file to the dest file. The source file can be of any type (http, ftp, file) but the
@@ -266,7 +266,7 @@ extern void __LIB__ rn_fileDelete(uint8_t filenameLen, char *filename);
 /// - destFilename is a pointer to the filename of the destionation file
 /// - copyMoveFlag is one of #define COPY_MOVE_FLAG_* 
 /// </summary>
-extern void __LIB__ rn_fileHandleCopy(uint8_t srcFilenameLen, uint8_t* srcFilename, uint8_t destFilenameLen, uint8_t* destFilename, uint8_t copyMoveFlag);
+extern void __LIB__ rn_fileHandleCopy(uint8_t srcFilenameLen, uint8_t* srcFilename, uint8_t destFilenameLen, uint8_t* destFilename, uint8_t copyMoveFlag) __smallc;
 
 /// <summary>
 /// Move the src file to the dest file.
@@ -281,7 +281,7 @@ extern void __LIB__ rn_fileHandleCopy(uint8_t srcFilenameLen, uint8_t* srcFilena
 /// - destFilename is a pointer to the filename of the destionation file
 /// - copyMoveFlag is one of #define COPY_MOVE_FLAG_* 
 /// </summary>
-extern void __LIB__ rn_fileHandleMove(uint8_t srcFilenameLen, uint8_t* srcFilename, uint8_t destFilenameLen, uint8_t* destFilename, uint8_t copyMoveFlag);
+extern void __LIB__ rn_fileHandleMove(uint8_t srcFilenameLen, uint8_t* srcFilename, uint8_t destFilenameLen, uint8_t* destFilename, uint8_t copyMoveFlag) __smallc;
 
 /// <summary>
 /// Returns the number of files within the path, including wildcards.
@@ -307,13 +307,13 @@ extern void __LIB__ rn_fileHandleMove(uint8_t srcFilenameLen, uint8_t* srcFilena
 /// 
 /// Returns the number of matching files. Call rn_fileListItem() from 0 to N
 /// </summary>
-extern uint16_t __LIB__ rn_fileList(uint8_t pathLen, char *path, uint8_t wildcardLen, char *wildcard, uint8_t fileListFlags);
+extern uint16_t __LIB__ rn_fileList(uint8_t pathLen, char *path, uint8_t wildcardLen, char *wildcard, uint8_t fileListFlags) __smallc;
 
 /// <summary>
 /// Populates buffer with the size, created datetime, modified datetime, 
 /// filename length, and filename of the file at the fileItemIndex.
 /// </summary>
-extern void __LIB__ rn_fileListItem(uint16_t fileItemIndex, FileDetailsStruct* s);
+extern void __LIB__ rn_fileListItem(uint16_t fileItemIndex, FileDetailsStruct* s) __smallc;
 
 /// <summary>
 /// Sequentially read data from the specified filename. That means continue reading from the
@@ -331,7 +331,7 @@ extern void __LIB__ rn_fileListItem(uint16_t fileItemIndex, FileDetailsStruct* s
 /// either an error had occurred or the End Of File was reached. 0 will be returned if the end of
 /// the file has been reached
 /// </summary>
-extern uint16_t __LIB__ rn_fileHandleReadSeq(uint8_t fileHandle, uint8_t* buffer, uint16_t bufferOffset, uint16_t readLength);
+extern uint16_t __LIB__ rn_fileHandleReadSeq(uint8_t fileHandle, uint8_t* buffer, uint16_t bufferOffset, uint16_t readLength) __smallc;
 
 /// <summary>
 /// Sets the sequential read position within the file for using rn_fileHandleReadSeq()
@@ -352,7 +352,7 @@ extern uint16_t __LIB__ rn_fileHandleReadSeq(uint8_t fileHandle, uint8_t* buffer
 /// the end of a file, or before a file. That is why we give you this value so you can be sure
 /// the pointer is always within the file.
 /// </summary>
-extern uint32_t __LIB__ rn_fileHandleSeek(uint8_t fileHandle, int32_t offset, uint8_t seekOption);
+extern uint32_t __LIB__ rn_fileHandleSeek(uint8_t fileHandle, int32_t offset, uint8_t seekOption) __smallc;
 
 
 // Internal codes for the transport

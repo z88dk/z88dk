@@ -17,6 +17,7 @@ target/z88/fcntl/fdtell
 target/z88/fcntl/rename
 target/z88/fcntl/remove
 target/z88/fcntl/open
+target/z88/fcntl/fsync
 target/z88/fcntl/close
 target/z88/fcntl/lseek
 target/z88/fcntl/read

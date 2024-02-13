@@ -109,23 +109,23 @@ test_t_PHASE.asm:
 END
 
 check_text_file("$test.map", <<END);
-part1                           = \$0000 ; addr, local, , $test, PART_1, $test.asm:2
-start                           = \$0012 ; addr, local, , $test, PART_1, $test.asm:11
-end                             = \$001A ; addr, local, , $test, PART_1, $test.asm:24
-l1                              = \$000D ; addr, local, , $test, PART_1, $test.asm:8
-f2                              = \$8003 ; const, local, , $test, PART_1, $test.asm:14
-f1                              = \$8000 ; const, local, , $test, PART_1, $test.asm:13
-l2                              = \$8005 ; const, local, , $test, PART_1, $test.asm:21
-part2                           = \$001C ; addr, local, , $test, PART_2, $test.asm:17
-__head                          = \$0000 ; const, public, def, , ,
-__tail                          = \$0020 ; const, public, def, , ,
-__size                          = \$0020 ; const, public, def, , ,
 __PART_1_head                   = \$0000 ; const, public, def, , ,
-__PART_1_tail                   = \$001C ; const, public, def, , ,
 __PART_1_size                   = \$001C ; const, public, def, , ,
+__PART_1_tail                   = \$001C ; const, public, def, , ,
 __PART_2_head                   = \$001C ; const, public, def, , ,
-__PART_2_tail                   = \$0020 ; const, public, def, , ,
 __PART_2_size                   = \$0004 ; const, public, def, , ,
+__PART_2_tail                   = \$0020 ; const, public, def, , ,
+__head                          = \$0000 ; const, public, def, , ,
+__size                          = \$0020 ; const, public, def, , ,
+__tail                          = \$0020 ; const, public, def, , ,
+end                             = \$001A ; addr, local, , $test, PART_1, $test.asm:24
+f1                              = \$8000 ; const, local, , $test, PART_1, $test.asm:13
+f2                              = \$8003 ; const, local, , $test, PART_1, $test.asm:14
+l1                              = \$000D ; addr, local, , $test, PART_1, $test.asm:8
+l2                              = \$8005 ; const, local, , $test, PART_1, $test.asm:21
+part1                           = \$0000 ; addr, local, , $test, PART_1, $test.asm:2
+part2                           = \$001C ; addr, local, , $test, PART_2, $test.asm:17
+start                           = \$0012 ; addr, local, , $test, PART_1, $test.asm:11
 END
 
 unlink_testfiles;

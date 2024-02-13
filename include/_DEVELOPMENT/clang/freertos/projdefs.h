@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.1+
+ * FreeRTOS Kernel V11.0.1
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -37,7 +37,7 @@
  * Defines the prototype to which task functions must conform.  Defined in this
  * file to ensure the type is known before portable.h is included.
  */
-typedef void (* TaskFunction_t)( void * );
+typedef void (* TaskFunction_t)( void * arg );
 
 /* Converts a time in milliseconds to a time in ticks.  This macro can be
  * overridden by a macro of the same name defined in FreeRTOSConfig.h in case the
@@ -48,6 +48,13 @@ typedef void (* TaskFunction_t)( void * );
     #else
         #define pdMS_TO_TICKS( xTimeInMs )   ( ( TickType_t ) ( ( ( TickType_t ) ( xTimeInMs ) * ( TickType_t ) configTICK_RATE_HZ ) / ( TickType_t ) 1000U ) )
     #endif
+#endif
+
+/* Converts a time in ticks to a time in milliseconds.  This macro can be
+ * overridden by a macro of the same name defined in FreeRTOSConfig.h in case the
+ * definition here is not suitable for your application. */
+#ifndef pdTICKS_TO_MS
+    #define pdTICKS_TO_MS( xTimeInTicks )    ( ( TickType_t ) ( ( ( uint32_t ) ( xTimeInTicks ) * ( TickType_t ) 1000U ) / ( TickType_t ) configTICK_RATE_HZ ) )
 #endif
 
 #define pdFALSE                                  ( ( BaseType_t ) 0 )

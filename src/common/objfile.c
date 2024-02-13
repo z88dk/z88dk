@@ -1,17 +1,18 @@
 //-----------------------------------------------------------------------------
 // zobjfile - manipulate z80asm object files
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "fileutil.h"
-#include "objfile.h"
-#include "strutil.h"
-#include "utlist.h"
-#include "utstring.h"
-#include "zutils.h"
-#include "z80asm_cpu.h"
 #include <ctype.h>
+#include "z80asm_defs.h"
+#include "xmalloc.h"
+#include "xassert.h"
+#include "utstring.h"
+#include "utlist.h"
+#include "strutil.h"
+#include "objfile.h"
+#include "fileutil.h"
 
 #include <sys/types.h>	// needed before regex.h
 #include "regex.h"
@@ -29,37 +30,14 @@ bool opt_obj_hide_code = false;
 static void objfile_read_strid(objfile_t* obj, FILE* fp, UT_string* str);
 
 //-----------------------------------------------------------------------------
-// constants tables
-//-----------------------------------------------------------------------------
-const char* sym_scope_str[] = {
-    "none",     // 0
-    "local",    // 1
-    "public",   // 2
-    "extern",   // 3
-    "global",   // 4
-};
-
-/*-----------------------------------------------------------------------------
-*   Constant tables
-*----------------------------------------------------------------------------*/
-char* sym_type_str[] = {
-    "undef",    // 0
-    "const",    // 1
-    "addr",     // 2
-    "comput",   // 3
-};
-
-
-//-----------------------------------------------------------------------------
 // string table
 //-----------------------------------------------------------------------------
-static UT_icd UT_string_item_icd = { sizeof(string_item_t*), NULL, NULL, NULL };
 
 const char* objfile_header() {
     static UT_string* header = NULL;
     if (!header) {
         utstring_new(header);
-        utstring_printf(header, SIGNATURE_OBJ SIGNATURE_VERS, CUR_VERSION);
+        utstring_printf(header, OBJ_FILE_SIGNATURE SIGNATURE_VERS, OBJ_FILE_VERSION);
     }
     return utstring_body(header);
 }
@@ -68,80 +46,11 @@ const char* libfile_header() {
     static UT_string* header = NULL;
     if (!header) {
         utstring_new(header);
-        utstring_printf(header, SIGNATURE_LIB SIGNATURE_VERS, CUR_VERSION);
+        utstring_printf(header, LIB_FILE_SIGNATURE SIGNATURE_VERS, OBJ_FILE_VERSION);
     }
     return utstring_body(header);
 }
 
-string_table_t* st_new(void) {
-    string_table_t* st = xnew(string_table_t);
-    utarray_new(st->strs_list, &UT_string_item_icd);
-    st_add_string(st, "");          // empty string is id 0
-    return st;
-}
-
-static void st_clear_all(string_table_t* st) {
-    string_item_t* elem, * tmp;
-    HASH_ITER(hh, st->strs_hash, elem, tmp) {
-        HASH_DEL(st->strs_hash, elem);
-        xfree(elem->str);
-        xfree(elem);
-    }
-    utarray_clear(st->strs_list);
-}
-
-void st_free(string_table_t* st) {
-    st_clear_all(st);
-    utarray_free(st->strs_list);
-    xfree(st);
-}
-
-void st_clear(string_table_t* st) {
-    st_clear_all(st);
-    st_add_string(st, "");
-}
-
-int st_add_string(string_table_t* st, const char* str) {
-    string_item_t* found;
-    HASH_FIND_STR(st->strs_hash, str, found);
-    if (found)
-        return found->id;
-    else {
-        // create new item
-        string_item_t* elem = xnew(string_item_t);
-        elem->str = xstrdup(str);
-        elem->id = (int)HASH_COUNT(st->strs_hash);
-
-        // add to hash table
-        HASH_ADD_STR(st->strs_hash, str, elem);
-
-        // add to string list
-        utarray_push_back(st->strs_list, &elem);
-
-        return elem->id;
-    }
-}
-
-bool st_find(string_table_t* st, const char* str) {
-    string_item_t* found;
-    HASH_FIND_STR(st->strs_hash, str, found);
-    if (found)
-        return true;
-    else
-        return false;
-}
-
-const char* st_lookup(string_table_t* st, int id) {
-    xassert(id >= 0 && id < (int)HASH_COUNT(st->strs_hash));
-    string_item_t* elem = *(string_item_t**)utarray_eltptr(st->strs_list, id);
-    xassert(elem);
-    xassert(elem->str);
-    return elem->str;
-}
-
-int st_count(string_table_t* st) {
-    return (int)HASH_COUNT(st->strs_hash);
-}
 
 //-----------------------------------------------------------------------------
 // read from file
@@ -159,9 +68,9 @@ static file_type_e read_signature(FILE* fp, const char* filename,
 		die("error: signature not found in '%s'\n", filename);
 	file_signature[SIGNATURE_SIZE] = '\0';
 
-	if (strncmp(file_signature, SIGNATURE_OBJ, 6) == 0)
+	if (strncmp(file_signature, OBJ_FILE_SIGNATURE, 6) == 0)
 		type = is_object;
-	else if (strncmp(file_signature, SIGNATURE_LIB, 6) == 0)
+	else if (strncmp(file_signature, LIB_FILE_SIGNATURE, 6) == 0)
 		type = is_library;
 	else
 		die("error: file '%s' not object nor library\n", filename);
@@ -192,8 +101,8 @@ static void write_signature(FILE* fp, file_type_e type)
     utstring_new(signature);
 
     utstring_printf(signature, "%s" SIGNATURE_VERS,
-		type == is_object ? SIGNATURE_OBJ : SIGNATURE_LIB,
-		CUR_VERSION);
+		type == is_object ? OBJ_FILE_SIGNATURE : LIB_FILE_SIGNATURE,
+		OBJ_FILE_VERSION);
 
 	xfwrite_bytes(utstring_body(signature), SIGNATURE_SIZE, fp);
 
@@ -271,10 +180,10 @@ static void print_bytes(UT_array* data)
 {
 	unsigned addr = 0;
 	byte_t* p = (byte_t*)utarray_front(data);
-	unsigned size = utarray_len(data);
+	size_t size = utarray_len(data);
 	bool need_nl = false;
 
-	for (unsigned i = 0; i < size; i++) {
+	for (size_t i = 0; i < size; i++) {
 		if ((addr % 16) == 0) {
 			if (need_nl) {
 				printf("\n");
@@ -301,7 +210,7 @@ symbol_t* symbol_new() {
 
     utstring_new(self->name);
     self->scope = SCOPE_NONE;
-    self->type = TYPE_UNKNOWN;
+    self->type = TYPE_UNDEFINED;
 	self->value = 0;
 	self->section = NULL;
     utstring_new(self->filename);
@@ -325,7 +234,7 @@ expr_t* expr_new() {
 	expr_t* self = xnew(expr_t);
 
     utstring_new(self->text);
-    self->range = RANGE_UNKNOWN;
+    self->range = RANGE_UNDEFINED;
     self->asmpc = self->code_pos = 0;
     self->opcode_size = 2;      // default for normal JR
 	self->section = NULL;
@@ -410,7 +319,7 @@ objfile_t* objfile_new()
 	self->sections = NULL;
 	DL_APPEND(self->sections, section);
 
-    self->st = st_new();
+    self->st = strtable_new();
 
 	self->next = self->prev = NULL;
 
@@ -430,8 +339,7 @@ void objfile_free(objfile_t* self)
 		section_free(section);
 	}
 
-    st_free(self->st);
-
+    strtable_free(self->st);
 	xfree(self);
 }
 
@@ -441,7 +349,7 @@ void objfile_free(objfile_t* self)
 static void objfile_read_strid(objfile_t* obj, FILE* fp, UT_string* str) {
     unsigned strid = xfread_dword(fp);
     utstring_clear(str);
-    utstring_printf(str, "%s", st_lookup(obj->st, strid));
+    utstring_printf(str, "%s", strtable_lookup(obj->st, strid));
 }
 
 static void objfile_read_sections(objfile_t* obj, FILE* fp, long fpos_start) {
@@ -452,7 +360,7 @@ static void objfile_read_sections(objfile_t* obj, FILE* fp, long fpos_start) {
 			if (code_size < 0)
 				break;
 
-            // red section name
+            // read section name
             UT_string* name;
             utstring_new(name);
             if (obj->version >= 18)
@@ -557,38 +465,32 @@ static void objfile_read_symbols(objfile_t* obj, FILE* fp, long fpos_start, long
         sym_scope_t scope = SCOPE_NONE;
         if (obj->version >= 18) {
             scope = xfread_dword(fp);
+            if (scope == SCOPE_NONE)            // end marker 
+                break;
         }
         else {
             char old_scope = xfread_byte(fp);
-            switch (old_scope) {
-            case '\0': scope = SCOPE_NONE; break;
-            case 'L': scope = SCOPE_LOCAL; break;
-            case 'G': scope = SCOPE_PUBLIC; break;
-            default:
+            if (old_scope == '\0')                  // end marker
+                break;
+
+            scope = sym_scope_ofile_code(old_scope);
+            if (scope == SCOPE_NONE) {
                 printf("\nError symbol scope %d\n", old_scope);
                 exit(EXIT_FAILURE);
-                break;
             }
         }
 		
-		if (scope == SCOPE_NONE)            // end marker 
-			break;							
-
         // read type
-        sym_type_t type = TYPE_UNKNOWN;
+        sym_type_t type = TYPE_UNDEFINED;
         if (obj->version >= 18) {
             type = xfread_dword(fp);
         }
         else {
             char old_type = xfread_byte(fp);
-            switch (old_type) {
-            case 'C': type = TYPE_CONSTANT; break;
-            case 'A': type = TYPE_ADDRESS;  break;
-            case '=': type = TYPE_COMPUTED; break;
-            default:
+            type = sym_type_ofile_code(old_type);
+            if (type == TYPE_UNDEFINED) {
                 printf("\nError symbol type %d\n", old_type);
                 exit(EXIT_FAILURE);
-                break;
             }
         }
 
@@ -624,26 +526,21 @@ static void objfile_read_symbols(objfile_t* obj, FILE* fp, long fpos_start, long
 
 		if (opt_obj_list) {
 			if (!(opt_obj_hide_local && symbol->scope == SCOPE_LOCAL)) {
-                printf("    ");
-                switch (symbol->scope) {
-                case SCOPE_LOCAL: printf("L"); break;
-                case SCOPE_PUBLIC: printf("G"); break;
-                default:
+                const char* scope_str = sym_scope_str_short(symbol->scope);
+                if (scope_str == NULL) {
                     printf("\nError symbol scope %d\n", symbol->scope);
                     exit(EXIT_FAILURE);
-                    break;
                 }
-                printf(" ");
-                switch (symbol->type) {
-                case TYPE_CONSTANT: printf("C"); break;
-                case TYPE_ADDRESS: printf("A"); break;
-                case TYPE_COMPUTED: printf("="); break;
-                default:
+                printf("    %s", scope_str);
+
+                const char* type_str = sym_type_str_short(symbol->type);
+                if (type_str == NULL) {
                     printf("\nError symbol type %d\n", symbol->type);
                     exit(EXIT_FAILURE);
-                    break;
                 }
-				printf(" $%04X: %s", symbol->value, utstring_body(symbol->name));
+                printf(" %s", type_str);
+
+                printf(" $%04X: %s", symbol->value, utstring_body(symbol->name));
 
 				if (obj->version >= 5)
 					print_section(symbol->section->name);
@@ -710,56 +607,30 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
 
 	xfseek(fp, fpos_start, SEEK_SET);
     while (ftell(fp) < fpos_end) {
-        range_t range = RANGE_UNKNOWN;
+        range_t range = RANGE_UNDEFINED;
         if (obj->version >= 18) {
             range = xfread_dword(fp);
-            if (range == RANGE_UNKNOWN)             // end marker
+            if (range == RANGE_UNDEFINED)             // end marker
                 break;
         }
         else {
             char old_range = xfread_byte(fp);
             if (old_range == '\0')                  // end marker
                 break;
-            switch (old_range) {
-            case 'J': range = RANGE_JR_OFFSET; break;
-            case 'U': range = RANGE_BYTE_UNSIGNED; break;
-            case 'S': range = RANGE_BYTE_SIGNED; break;
-            case 'C': range = RANGE_WORD; break;
-            case 'B': range = RANGE_WORD_BE; break;
-            case 'L': range = RANGE_DWORD; break;
-            case 'u': range = RANGE_BYTE_TO_WORD_UNSIGNED; break;
-            case 's': range = RANGE_BYTE_TO_WORD_SIGNED; break;
-            case 'P': range = RANGE_PTR24; break;
-            case 'H': range = RANGE_HIGH_OFFSET; break;
-            case '=': range = RANGE_ASSIGNMENT; break;
-            case 'j': range = RANGE_JRE_OFFSET; break;
-            default:
+            range = range_ofile_code(old_range);
+            if (range == RANGE_UNDEFINED) {
                 printf("\nError expression range %d\n", old_range);
                 exit(EXIT_FAILURE);
-                break;
             }
         }
 
         if (show_expr) {
-            printf("    E ");
-            switch (range) {
-            case RANGE_JR_OFFSET:               printf("J"); break;
-            case RANGE_BYTE_UNSIGNED:           printf("U"); break;
-            case RANGE_BYTE_SIGNED:             printf("S"); break;
-            case RANGE_WORD:                    printf("W"); break;
-            case RANGE_WORD_BE:                 printf("B"); break;
-            case RANGE_DWORD:                   printf("L"); break;
-            case RANGE_BYTE_TO_WORD_UNSIGNED:   printf("u"); break;
-            case RANGE_BYTE_TO_WORD_SIGNED:     printf("s"); break;
-            case RANGE_PTR24:                   printf("P"); break;
-            case RANGE_HIGH_OFFSET:             printf("H"); break;
-            case RANGE_ASSIGNMENT:              printf("="); break;
-            case RANGE_JRE_OFFSET:              printf("j"); break;
-            default:
+            const char* range_str = range_str_short(range);
+            if (range_str == NULL) {
                 printf("\nError expression range %d\n", range);
                 exit(EXIT_FAILURE);
-                break;
             }
+            printf("    E %s", range_str);
         }
 
 		// create a new expression
@@ -862,36 +733,6 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
 	}
 }
 
-static void objfile_read_string_table(objfile_t* obj, FILE* fp, long fpos_start) {
-    st_clear(obj->st);
-
-    // go to start of index table and read sizes
-    xfseek(fp, fpos_start, SEEK_SET);
-    unsigned count = xfread_dword(fp);
-    unsigned aligned_strings_size = xfread_dword(fp);
-
-    // go to start of strings and read them
-    xfseek(fp, fpos_start + (2 + count) * sizeof(int32_t), SEEK_SET);
-    UT_string* strings;
-    utstring_new(strings);
-    utstring_reserve(strings, aligned_strings_size + 1);        // add space for '\0'
-    xfread(utstring_body(strings), 1, aligned_strings_size, fp);
-    utstring_len(strings) = aligned_strings_size;
-
-    // go to start of table and add each string to the st
-    xfseek(fp, fpos_start + 2 * sizeof(int32_t), SEEK_SET);
-    for (unsigned i = 0; i < count; i++) {
-        unsigned pos = xfread_dword(fp);
-        const char* str = utstring_body(strings) + pos;
-        unsigned id = st_add_string(obj->st, str);
-        xassert(id == i);
-    }
-
-    xfseek(fp, fpos_start + (2 + count) * sizeof(int32_t) + aligned_strings_size, SEEK_SET);
-
-    utstring_free(strings);
-}
-
 void objfile_read(objfile_t* obj, FILE* fp)
 {
 	long fpos0 = ftell(fp) - SIGNATURE_SIZE;	// before signature
@@ -922,7 +763,8 @@ void objfile_read(objfile_t* obj, FILE* fp)
     if (obj->version >= 18) {
         fpos_st = xfread_dword(fp);
         long save_fpos = ftell(fp);
-        objfile_read_string_table(obj, fp, fpos0 + fpos_st);
+        xfseek(fp, fpos0 + fpos_st, SEEK_SET);
+        obj->st = strtable_fread(fp);
         xfseek(fp, save_fpos, SEEK_SET);
     }
 
@@ -986,7 +828,7 @@ void objfile_read(objfile_t* obj, FILE* fp)
 // object file write
 //-----------------------------------------------------------------------------
 static void objfile_write_strid(objfile_t* obj, FILE* fp, const char* str) {
-    unsigned id = st_add_string(obj->st, str);
+    unsigned id = strtable_add_string(obj->st, str);
     xfwrite_dword(id, fp);
 }
 
@@ -1024,7 +866,7 @@ static long objfile_write_exprs(objfile_t* obj, FILE* fp)
 	}
 
 	if (has_exprs) {
-        xfwrite_dword(RANGE_UNKNOWN, fp);	    		    // store end-terminator
+        xfwrite_dword(RANGE_UNDEFINED, fp);	    		    // store end-terminator
 		return fpos0;
 	}
 	else
@@ -1092,7 +934,7 @@ static long objfile_write_sections(objfile_t* obj, FILE* fp) {
 
 	section_t* section;
     DL_FOREACH(obj->sections, section) {
-        xfwrite_dword(utarray_len(section->data), fp);
+        xfwrite_dword((int)utarray_len(section->data), fp);
         objfile_write_strid(obj, fp, utstring_body(section->name));
         xfwrite_dword(section->org, fp);
         xfwrite_dword(section->align, fp);
@@ -1101,54 +943,13 @@ static long objfile_write_sections(objfile_t* obj, FILE* fp) {
         // align to dword size
         unsigned aligned_size = ((utarray_len(section->data) + (sizeof(int32_t) - 1))
             & ~(sizeof(int32_t) - 1));
-        int extra_bytes = aligned_size - utarray_len(section->data);
+        int extra_bytes = aligned_size - (int)utarray_len(section->data);
         xfwrite(align, 1, extra_bytes, fp);
     }
 
 	xfwrite_dword(-1, fp);					// end marker
 
 	return fpos0;
-}
-
-long write_string_table(string_table_t* st, FILE* fp) {
-    // alignment data
-    static const char align[sizeof(int32_t)] = { 0 };
-
-    long fpos0 = ftell(fp);
-
-    // write size of table and placeholder for size of strings
-    unsigned count = st_count(st);
-    xfwrite_dword(count, fp);
-    long fpos_strings_size = ftell(fp);
-    xfwrite_dword(0, fp);
-
-    // write index of each string into array of strings concatenated separated by '\0'
-    unsigned str_table = 0;
-    for (unsigned id = 0; id < count; id++) {
-        const char* str = st_lookup(st, id);
-        unsigned pos = str_table;               // position of this string in table
-        str_table += (unsigned)strlen(str) + 1; // next position
-
-        xfwrite_dword(pos, fp);                 // index into strings
-    }
-
-    // write all strings together
-    for (unsigned id = 0; id < count; id++) {
-        const char* str = st_lookup(st, id);
-        xfwrite(str, 1, strlen(str) + 1, fp);       // write string including '\0'
-    }
-
-    // align to dword size
-    unsigned aligned_str_table = ((str_table + (sizeof(int32_t) - 1)) & ~(sizeof(int32_t) - 1));
-    int extra_bytes = aligned_str_table - str_table;
-    xfwrite(align, 1, extra_bytes, fp);
-
-    long fpos_end = ftell(fp);
-    xfseek(fp, fpos_strings_size, SEEK_SET);
-    xfwrite_dword(aligned_str_table, fp);
-    xfseek(fp, fpos_end, SEEK_SET);
-
-    return fpos0;
 }
 
 void objfile_write(objfile_t* obj, FILE* fp) {
@@ -1172,7 +973,8 @@ void objfile_write(objfile_t* obj, FILE* fp) {
 	long externs_ptr = objfile_write_externs(obj, fp);      
 	long modname_ptr = objfile_write_modname(obj, fp);      
 	long sections_ptr = objfile_write_sections(obj, fp);    
-    long st_ptr = write_string_table(obj->st, fp);      
+    long st_ptr = ftell(fp);
+    strtable_fwrite(obj->st, fp);
 	long end_ptr = ftell(fp);
 
 	// write pointers to areas
@@ -1201,7 +1003,7 @@ file_t* file_new() {
 	file->type = is_none;
 	file->version = -1;
 	file->objs = NULL;
-    file->st = st_new();
+    file->st = strtable_new();
 
 	return file;
 }
@@ -1216,7 +1018,7 @@ void file_free(file_t* file) {
 		objfile_free(obj);
 	}
 
-    st_free(file->st);
+    strtable_free(file->st);
 	xfree(file);
 }
 
@@ -1318,20 +1120,20 @@ static void file_write_object(file_t* file, FILE* fp) {
 	objfile_write(file->objs, fp);
 }
 
-void objfile_get_defined_symbols(objfile_t* obj, string_table_t* st) {
+void objfile_get_defined_symbols(objfile_t* obj, strtable_t* st) {
     section_t* section;
     DL_FOREACH(obj->sections, section) {
         symbol_t* symbol;
         DL_FOREACH(section->symbols, symbol) {
             if (symbol->scope == SCOPE_PUBLIC)
-                st_add_string(st, utstring_body(symbol->name)); // add public symbols to string table
+                strtable_add_string(st, utstring_body(symbol->name)); // add public symbols to string table
         }
     }
 }
 
 static void file_write_library(file_t* file, FILE* fp) {
     // init string table
-    st_clear(file->st);
+    strtable_clear(file->st);
 
     // write header
 	write_signature(fp, is_library);
@@ -1362,7 +1164,8 @@ static void file_write_library(file_t* file, FILE* fp) {
     xfwrite_dword(0, fp);
 
     // write string table
-    long st_pos = write_string_table(file->st, fp);
+    long st_pos = ftell(fp);
+    strtable_fwrite(file->st, fp);
     long fpos = ftell(fp);
     fseek(fp, st_ptr, SEEK_SET);
     xfwrite_dword(st_pos, fp);
@@ -1373,7 +1176,7 @@ void file_write(file_t* file, const char* filename)
 {
 	if (opt_obj_verbose)
 		printf("Writing file '%s': %s version %d\n",
-			filename, file->type == is_object ? "object" : "library", CUR_VERSION);
+			filename, file->type == is_object ? "object" : "library", OBJ_FILE_VERSION);
 
 	FILE* fp = xfopen(filename, "wb");
 
@@ -1409,7 +1212,7 @@ static bool delete_merged_section(objfile_t* obj, section_t** p_merged_section,
 		delete_section = false;
 	}
 	else {
-		merged_base = utarray_len(merged_section->data);
+		merged_base = (int)utarray_len(merged_section->data);
 
 		// handle alignment
 		int above = merged_base % section->align;

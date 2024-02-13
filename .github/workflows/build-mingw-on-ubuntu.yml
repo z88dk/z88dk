@@ -41,6 +41,12 @@ jobs:
         wget https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zlib-1.2.12-1-any.pkg.tar.zst
         zstd -d mingw-w64-x86_64-zlib-1.2.12-1-any.pkg.tar.zst
         ( mkdir mingw-w64-x86_64-zlib-1.2.12-1-any && cd mingw-w64-x86_64-zlib-1.2.12-1-any && tar xvf ../mingw-w64-x86_64-zlib-1.2.12-1-any.pkg.tar && cd mingw64 && rsync -avhH . /usr/x86_64-w64-mingw32 )
+    - name: Install GMP
+      run: |
+        set -ex
+        wget https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gmp-6.3.0-2-any.pkg.tar.zst
+        zstd -d mingw-w64-x86_64-gmp-6.3.0-2-any.pkg.tar.zst
+        ( mkdir mingw-w64-x86_64-gmp-6.3.0-2-any && cd mingw-w64-x86_64-gmp-6.3.0-2-any && tar xvf ../mingw-w64-x86_64-gmp-6.3.0-2-any.pkg.tar && cd mingw64 && rsync -avhH . /usr/x86_64-w64-mingw32 )
     - name: Build binaries
       run: |
         set -ex

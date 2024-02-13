@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // preprocessor
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@
 #include "defines.h"
 #include "errors.h"
 #include "if.h"
-#include "scan.h"
+#include "scan2.h"
 #include <deque>
 #include <fstream>
 #include <iostream>

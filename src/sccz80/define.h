@@ -1,4 +1,4 @@
-/*      Define system dependent parameters     
+/*      Define system dependent parameters
  *
  * $Id: define.h,v 1.18 2016-09-19 09:17:50 dom Exp $
  */
@@ -23,7 +23,7 @@
 #define YES             1
 
 /* Maximum size of the mantissa, write_double_queue() doesn't respect this yet */
-#define MAX_MANTISSA_SIZE  7 
+#define MAX_MANTISSA_SIZE  7
 
 /*      System wide name size (for symbols)     */
 
@@ -111,25 +111,25 @@ struct type_s {
     char      isconst;
     char      isfar;  // Valid for pointers/array
     char      isvolatile;
-    char      name[NAMESIZE]; 
+    char      name[NAMESIZE];
     char     *namespace; // Which namespace is this object in
-    
+
     Type     *ptr;   // For array, or pointer
     int       len;   // Length of the array
-    
+
     int32_t   value; // For enum, goto position, short call value
 
     // bitfields
     int       bit_offset;
     int       bit_size;
-    
+
     // Structures
     Type   *tag;     // Reference to the structure type
     array    *fields; // Fields within the structure (Type)
     size_t    offset;  // Offset to the member
     char      weak;
     char      isstruct;
-    
+
     // Function
     Type    *return_type;
     array    *parameters; // (Type)
@@ -238,7 +238,7 @@ typedef struct namespace_s namespace;
 struct namespace_s {
     char        *name;
     SYMBOL      *bank_function;
-    namespace   *next;       
+    namespace   *next;
 };
 
 
@@ -249,7 +249,7 @@ struct namespace_s {
 
 /* switch table */
 
-#define NUMCASE 256
+#define NUMCASE 512
 
 typedef struct switchtab_s SW_TAB;
 
@@ -362,7 +362,12 @@ struct gototab_s {
 #define DBG_ALL   99
 
 #define Z80ASM_PREFIX "_"
+// Prefix used for ticalc style banked call
+#define BANKED_SYMBOL_PREFIX "__banked_import_"
 
+// Styles of banked call
+#define BANKED_STYLE_REGULAR 1
+#define BANKED_STYLE_TICALC  2
 
 
 #define CPU_Z80      1
@@ -426,7 +431,7 @@ struct lvalue_s {
         Node *node;                     /* Node that is built up as we recurse */
 } ;
 
-/* Enable optimisations that are longer than the conventional sequence */ 
+/* Enable optimisations that are longer than the conventional sequence */
 enum optimisation {
         OPT_LSHIFT32       = (1 << 0),
         OPT_RSHIFT32       = (1 << 1),
@@ -444,7 +449,7 @@ enum maths_mode {
     MATHS_Z80,  // Classic z80 mode
     MATHS_IEEE, // 32 bit ieee
     MATHS_MBFS,  // 32 bit Microsoft single precision
-    MATHS_MBF40, // 40 bit Microsoft 
+    MATHS_MBF40, // 40 bit Microsoft
     MATHS_MBF64, // 64 bit Microsoft double precision
     MATHS_Z88,   // Special handling for z88 (subtype of MATHS_Z80)
     MATHS_IEEE16, // Used for _Float16

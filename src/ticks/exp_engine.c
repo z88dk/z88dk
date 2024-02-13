@@ -117,7 +117,7 @@ void expression_primitive_func_call_1(const char* call, struct expression_result
             to->as_int = a->type.first->size;
         } else {
             to->type.first = malloc_type(TYPE_INT);
-            to->as_int = a->type.size;
+            to->as_int = (int)a->type.size;
         }
         return;
     }

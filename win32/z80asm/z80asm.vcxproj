@@ -196,7 +196,7 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\float.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\lstfile.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\preproc.h" />
-    <ClInclude Include="..\..\src\z80asm\src\cpp\scan.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpp\scan2.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\utils.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\alloc.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\array.h" />
@@ -230,7 +230,7 @@
     <ClInclude Include="..\..\src\z80asm\src\c\sym.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\symtab1.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\tokens.h" />
-    <ClInclude Include="..\..\src\z80asm\src\c\z80asm.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\z80asm1.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\zobjfile.h" />
     <ClInclude Include="..\..\src\z80asm\src\if.h" />
   </ItemGroup>
@@ -242,7 +242,7 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\lstfile.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\main.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\preproc.cpp" />
-    <ClCompile Include="..\..\src\z80asm\src\cpp\scan.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\scan2.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\c\alloc.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\array.c" />
@@ -266,7 +266,7 @@
     <ClCompile Include="..\..\src\z80asm\src\c\strhash.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\sym.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\symtab1.c" />
-    <ClCompile Include="..\..\src\z80asm\src\c\z80asm.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\z80asm1.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\z80pass.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\zobjfile.c" />
   </ItemGroup>
@@ -275,8 +275,8 @@
     <None Include="..\..\src\z80asm\src\cpp\errors.def" />
     <None Include="..\..\src\z80asm\src\cpp\float.def" />
     <None Include="..\..\src\z80asm\src\cpp\keyword.def" />
-    <None Include="..\..\src\z80asm\src\cpp\scan.def" />
-    <None Include="..\..\src\z80asm\src\cpp\scan.re" />
+    <None Include="..\..\src\z80asm\src\cpp\scan2.def" />
+    <None Include="..\..\src\z80asm\src\cpp\scan2.re" />
     <None Include="..\..\src\z80asm\src\c\parse_rules.rl" />
     <None Include="..\..\src\z80asm\src\c\scan_rules.rl" />
   </ItemGroup>

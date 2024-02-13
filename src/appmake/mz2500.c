@@ -155,7 +155,7 @@ int mz2500_exec(char* target)
        if (bytes_read == 0) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n", binname); }
 
        write_sector(h, track, sector, head);               // Write sector buffer to sector on dsk
-       bytes_to_write -= bytes_read;
+       bytes_to_write -= (int)bytes_read;
 
        sector++;                                           // Adjust track, sector, head to write next
        if ( sector == 16 ) {

@@ -77,7 +77,7 @@ for %%t in (%targets%) do (
 
       if exist target\%%t\library\%%t_macro.lst (
          echo   %%t_macro.m4
-         zcc +z80 -vn -clib=new -m4 --lstcwd @target/%%t/library/%%t_macro.lst
+         zcc +z80 -vn -clib=new -m4 -copy-back-after-m4 --lstcwd @target/%%t/library/%%t_macro.lst
       )
 
       echo   %%t_sccz80.lib

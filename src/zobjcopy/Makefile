@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------
 # zobjcopy - manipulate z80asm object files
-# Copyright (C) Paulo Custodio, 2011-2023
+# Copyright (C) Paulo Custodio, 2011-2024
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #-----------------------------------------------------------------------------
 PROJ		:= z88dk-zobjcopy
@@ -21,13 +21,17 @@ CXXFLAGS 	+= -std=gnu++17 $(COMMON_FLAGS)
 INSTALL 	?= install
 
 CXXSRCS		:= $(wildcard *.cpp)
-CSRCS		:= ../common/zutils.c \
+CSRCS		:= \
 			../common/die.c \
-			../common/objfile.c \
 			../common/fileutil.c \
-			../common/strutil.c \
+			../common/objfile.c \
 			../common/optparse.c \
-			../common/z80asm_cpu.c \
+			../common/strutil.c \
+			../common/strtable.c \
+			../common/strpool.c \
+			../common/xassert.c \
+			../common/xmalloc.c \
+			../common/z80asm_defs.c \
 			$(wildcard ../../ext/regex/reg*.c)
 
 OBJS	:= $(CXXSRCS:.cpp=.o) $(CSRCS:.c=.o) \

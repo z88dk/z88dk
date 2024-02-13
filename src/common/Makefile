@@ -1,16 +1,24 @@
 #-----------------------------------------------------------------------------
 # Test common utils
-# Copyright (C) Paulo Custodio, 2011-2023
+# Copyright (C) Paulo Custodio, 2011-2024
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #-----------------------------------------------------------------------------
 
 include ../Make.common
 
 CC			?= gcc
-CFLAGS		+= -Wall -std=gnu11 -MMD \
+CFLAGS		+= -Wall -std=gnu11 -MMD -ggdb \
 -I../../ext/uthash/src \
 -I../../ext/regex \
 -I../../ext/optparse 
+
+# needed for stack_trace
+UNAME = $(shell uname)
+ifeq ($(UNAME), Linux)
+ifeq ($(CROSS), 0)
+LDFLAGS 	+= -rdynamic
+endif
+endif
 
 SRCS 		:= \
 $(wildcard *.c) \

@@ -250,4 +250,16 @@ extern void __LIB__ object_render_flatshading(surface_t* s, object_t* obj, vecto
 extern void __LIB__ object_render_wireframe(surface_t* s, object_t* obj, vector_t* pbuffer) __smallc;
 
 
+// Routines to handle F18a
+
+// Returns 0,1 if f18a is available and unlocked
+extern int __LIB__ vdp_f18a_present(void);
+
+// (un)lock the F18a
+// 
+// These routines may corrupt the mode setting of the VDP, so call unlock prior
+// to setting the screen mode
+extern void __LIB__ vdp_f18a_lock(void);
+extern void __LIB__ vdp_f18a_unlock(void);
+
 #endif

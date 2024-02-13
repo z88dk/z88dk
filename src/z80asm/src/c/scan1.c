@@ -2,7 +2,7 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -14,11 +14,13 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #include "if.h"
 #include "init.h"
 #include "list.h"
-#include "z80asm_cpu.h"
 #include "scan1.h"
 #include "str.h"
+#include "strutil.h"
 #include "utarray.h"
-#include "zutils.h"
+#include "xassert.h"
+#include "xmalloc.h"
+#include "z80asm_defs.h"
 #include <ctype.h>
 
 /*-----------------------------------------------------------------------------
@@ -113,11 +115,11 @@ void save_scan_state(void)
 	save.found_EOL = found_EOL;
 	save.cs = cs;
 	save.act = act;
-	save.p   = p   ? p   - Str_data(input_buf) : -1;
-	save.pe  = pe  ? pe  - Str_data(input_buf) : -1;
-	save.eof_ = eof_ ? eof_ - Str_data(input_buf) : -1;
-	save.ts  = ts  ? ts  - Str_data(input_buf) : -1;
-	save.te  = te  ? te  - Str_data(input_buf) : -1;
+	save.p   = (int)(p   ? p   - Str_data(input_buf) : -1);
+	save.pe  = (int)(pe  ? pe  - Str_data(input_buf) : -1);
+	save.eof_ = (int)(eof_ ? eof_ - Str_data(input_buf) : -1);
+	save.ts  = (int)(ts  ? ts  - Str_data(input_buf) : -1);
+	save.te  = (int)(te  ? te  - Str_data(input_buf) : -1);
 //	save.sym_string = m_strdup(sym_string->str);
 	save.expect_opcode = expect_opcode;
 
@@ -181,7 +183,7 @@ void scan_expect_operands(void)
 /*-----------------------------------------------------------------------------
 *	convert number to int, range warning if greater than INT_MAX
 *----------------------------------------------------------------------------*/
-static long scan_num ( char *text, int length, int base )
+static long scan_num ( char *text, size_t length, int base )
 {
 	long value;
 	int digit = 0;
@@ -378,7 +380,7 @@ void CurSymExpect(tokid_t expected_tok)
 	init_module();
 
 	if (sym.tok != expected_tok)
-		error_syntax();
+		error_syntax_error();
 }
 
 

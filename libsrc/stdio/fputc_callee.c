@@ -123,9 +123,10 @@ asm_fputc_callee:
     and     (ix+fp_flags)
     jr      z,no_binary
     ld      a,c        ;load bytes
-    cp      13
+    cp      10
     jr      nz,no_binary
-    push    bc    ;c
+    ld      c,13
+    push    bc
     call    writebyte
     pop     bc
     ld      c,10

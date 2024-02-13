@@ -142,7 +142,6 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\common\zutils.c" />
     <ClCompile Include="..\..\src\zobjcopy\zobjcopy.cpp" />
   </ItemGroup>
   <ItemGroup>

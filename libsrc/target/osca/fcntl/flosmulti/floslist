@@ -2,6 +2,7 @@ close
 lseek
 mkdir
 open
+fsync
 read
 readbyte
 remove

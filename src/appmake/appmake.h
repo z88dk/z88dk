@@ -239,6 +239,18 @@ extern option_t  svi_options;
 extern int       tixx_exec(char *target);
 extern option_t  tixx_options;
 
+#ifndef _MSC_VER
+extern int       ti8xk_exec(char *target);
+extern option_t  ti8xk_options;
+#else
+// GMP can't be used in msbuild (see PR #2433)
+static int ti8xk_exec(char *target){
+  fprintf(stderr, "TI8xk disabled for msbuild!");
+  return 0;
+}
+#define ti8xk_options tixx_options
+#endif
+
 extern int       trs80_exec(char *target);
 extern option_t  trs80_options;
 
@@ -525,6 +537,10 @@ struct {
       "DGOS, KCS variant for Sorcerer Exidy and Microbee, also WAV format",
       NULL,
       sorcerer_exec,    &sorcerer_options },
+    { "bin2app",   "ti83papp",       "(C) 2023 z88dk, HeronErin, Spasm-ng",
+      "Creates a .8xk file. This is for ti83p/ti84p flash apps. Requires to use the 83/84 app crt",
+      NULL,
+      ti8xk_exec,      &ti8xk_options },
     { "bin2var",   "ti82",       "(C) 2000,2003 David Phillips et al",
       "Creates a .82p file",
       NULL,

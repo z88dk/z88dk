@@ -5,7 +5,7 @@ Template array that grows on request. Items may move in memory on reallocation.
 Uses strutil.h for implementation.
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 */
@@ -14,9 +14,10 @@ Repository: https://github.com/z88dk/z88dk
 
 #include "alloc.h"
 #include "class.h"
-#include "types.h"
-#include "str.h"
 #include "die.h"
+#include "str.h"
+#include "types.h"
+#include "xassert.h"
 #include <stdlib.h>
 
 /*-----------------------------------------------------------------------------

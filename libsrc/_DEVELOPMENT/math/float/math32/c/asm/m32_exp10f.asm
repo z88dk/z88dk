@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.2.0 #13131 (Linux)
+; File Created by SDCC : free open source ISO C Compiler
+; Version 4.4.0 #14648 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -343,14 +343,14 @@
 	GLOBAL _log10
 	GLOBAL _log_fastcall
 	GLOBAL _log
+	GLOBAL _ilogb_fastcall
+	GLOBAL _ilogb
 	GLOBAL _scalbln_callee
 	GLOBAL _scalbln
 	GLOBAL _scalbn_callee
 	GLOBAL _scalbn
 	GLOBAL _ldexp_callee
 	GLOBAL _ldexp
-	GLOBAL _ilogb_fastcall
-	GLOBAL _ilogb
 	GLOBAL _frexp_callee
 	GLOBAL _frexp
 	GLOBAL _expm1_fastcall
@@ -461,14 +461,12 @@ l_m32_exp10f_00102:
 	ld	hl,0x9a78
 	push	hl
 	call	___fsmul_callee
-	ld	c, l
-	ld	b, h
-	ld	hl,0x3f00
-	push	hl
-	ld	h, l
-	push	hl
-	push	de
+	ld	bc,0x3f00
 	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
 	call	_m32_floorf
 	ld	(ix-8),l

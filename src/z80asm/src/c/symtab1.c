@@ -2,7 +2,7 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -20,11 +20,12 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 #include "reloc_code.h"
 #include "scan1.h"
 #include "str.h"
+#include "strutil.h"
 #include "symtab1.h"
 #include "types.h"
-#include "z80asm.h"
+#include "xassert.h"
+#include "z80asm1.h"
 #include "zobjfile.h"
-#include "zutils.h"
 
 #define COLUMN_WIDTH	32
 
@@ -92,6 +93,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
     {
 		sym = Symbol_create(name, value, type, scope, module, section);
 		sym->is_defined = true;
+        sym->is_touched = false;
         Symbol1Hash_set( psymtab, name, sym );
     }
     else if ( ! sym->is_defined )	/* already declared but not defined */
@@ -100,6 +102,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
 		sym->type = MAX( sym->type, type );
         sym->scope = scope;
 		sym->is_defined = true;
+        sym->is_touched = false;
         sym->module = module;
 		sym->section = section;
 		sym->filename = get_error_filename();
@@ -110,6 +113,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
         sym->module == module && sym->section == section)
     {
         /* constant redefined with the same value and in the same module/section */
+        sym->is_touched = false;
     }
     else											/* already defined */
     {
@@ -146,7 +150,7 @@ Symbol1 *get_used_symbol(const char *name )
 
         if ( sym == NULL )
         {
-            sym = Symbol_create( name, 0, TYPE_UNKNOWN, SCOPE_LOCAL, 
+            sym = Symbol_create( name, 0, TYPE_UNDEFINED, SCOPE_LOCAL, 
 								 CURRENTMODULE, CURRENTSECTION );
             Symbol1Hash_set( & CURRENTMODULE->local_symtab, name, sym );
         }
@@ -247,6 +251,10 @@ static void copy_full_sym_names( Symbol1Hash **ptarget, Symbol1Hash *source,
 *   get the symbols for which the passed function returns true,
 *   mapped NAME@MODULE -> Symbol1, needs to be deleted by OBJ_DELETE()
 *----------------------------------------------------------------------------*/
+static int Symbol1Hash_compare(Symbol1HashElem* a, Symbol1HashElem* b) {
+    return strcmp(a->key, b->key);
+}
+
 static Symbol1Hash *_select_module_symbols(Module1 *module, bool(*cond)(Symbol1 *sym))
 {
 	Module1ListElem *iter;
@@ -261,7 +269,8 @@ static Symbol1Hash *_select_module_symbols(Module1 *module, bool(*cond)(Symbol1 
 	}
 	copy_full_sym_names(&all_syms, global_symtab, cond);
 
-	return all_syms;
+    Symbol1Hash_sort(all_syms, Symbol1Hash_compare);
+    return all_syms;
 }
 
 Symbol1Hash *select_symbols( bool (*cond)(Symbol1 *sym) )
@@ -419,7 +428,7 @@ void declare_global_symbol(const char *name)
 		if (sym == NULL)
 		{
 			/* not local, not global -> declare symbol as global */
-			sym = Symbol_create(name, 0, TYPE_UNKNOWN, SCOPE_GLOBAL, CURRENTMODULE, CURRENTSECTION);
+			sym = Symbol_create(name, 0, TYPE_UNDEFINED, SCOPE_GLOBAL, CURRENTMODULE, CURRENTSECTION);
 			Symbol1Hash_set(&global_symtab, name, sym);
 		}
 		else if (sym->module == CURRENTMODULE && (sym->scope == SCOPE_PUBLIC || sym->scope == SCOPE_EXTERN))
@@ -428,7 +437,7 @@ void declare_global_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_GLOBAL)
 		{
-			error_symbol_redecl(name);
+			error_symbol_redeclaration(name);
 		}
 		else
 		{
@@ -478,7 +487,7 @@ void declare_public_symbol(const char *name)
 		if (sym == NULL)
 		{
 			/* not local, not global -> declare symbol as global */
-			sym = Symbol_create(name, 0, TYPE_UNKNOWN, SCOPE_PUBLIC, CURRENTMODULE, CURRENTSECTION);
+			sym = Symbol_create(name, 0, TYPE_UNDEFINED, SCOPE_PUBLIC, CURRENTMODULE, CURRENTSECTION);
 			Symbol1Hash_set(&global_symtab, name, sym);
 		}
 		else if (sym->module == CURRENTMODULE && sym->scope == SCOPE_EXTERN)
@@ -492,7 +501,7 @@ void declare_public_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_PUBLIC)
 		{
-			error_symbol_redecl(name);
+			error_symbol_redeclaration(name);
 		}
 		else
 		{
@@ -551,7 +560,7 @@ void declare_extern_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_EXTERN)
 		{
-			error_symbol_redecl(name);
+			error_symbol_redeclaration(name);
 		}
 		else
 		{
@@ -580,13 +589,13 @@ void declare_extern_symbol(const char *name)
             else
             {
                 /* already declared local */
-                error_symbol_redecl( name );
+                error_symbol_redeclaration( name );
             }
         }
         else 
         {
 			/* re-declaration not allowed */
-			error_symbol_redecl(name);
+			error_symbol_redeclaration(name);
 		}
     }
 }
@@ -601,11 +610,11 @@ static void _write_symbol_file(const char *filename, Module1 *module, bool(*cond
 	Symbol1Hash *symbols;
 	Symbol1HashElem *iter;
 	Symbol1         *sym;
-	long			reloc_offset;
+	int 			reloc_offset;
 	STR_DEFINE(line, STR_SIZE);
 
-	if (option_relocatable() && module == NULL)		// module is NULL in link phase
-		reloc_offset = sizeof_relocroutine + sizeof_reloctable + 4;
+    if (option_relocatable() && module == NULL)		// module is NULL in link phase
+        reloc_offset = (int)(sizeof_relocroutine + sizeof_reloctable + 4);
 	else
 		reloc_offset = 0;
 
@@ -626,8 +635,8 @@ static void _write_symbol_file(const char *filename, Module1 *module, bool(*cond
 		Str_append_sprintf(line, " = $%04lX ", sym->value + reloc_offset);
 
 		if (type_flag) {
-			Str_append_sprintf(line, "; %s", sym_type_str[sym->type]);
-			Str_append_sprintf(line, ", %s", sym_scope_str[sym->scope]);
+            Str_append_sprintf(line, "; %s", sym_type_str_long(sym->type));
+            Str_append_sprintf(line, ", %s", sym_scope_str_long(sym->scope));
 			Str_append_sprintf(line, ", %s", sym->is_global_def ? "def" : "");
 			Str_append_sprintf(line, ", %s", (module == NULL && sym->module != NULL) ? sym->module->modname : "");
 			Str_append_sprintf(line, ", %s", sym->section->name);

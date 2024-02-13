@@ -26,6 +26,7 @@
  */
 
 #include "ccdefs.h"
+#include "define.h"
 #include <time.h>
 #include <math.h>
 
@@ -1160,15 +1161,28 @@ void gen_hl_call(Type *functype, int module, int address)
     outfmt("\tcall\t%d\n", address);
 }
 
-void gen_bankedcall(SYMBOL *sym)
+void gen_bankedcall(SYMBOL *sym, Type* functype)
 {
     if (sym->ctype->return_type->kind == KIND_LONGLONG) {
         ol("ld\tbc,__i64_acc");
         push("bc");
     }
-    ol("call\tbanked_call");
-    ot("defq\t"); outname(sym->name, dopref(sym)); nl();
-}
+    if ( c_banked_style == BANKED_STYLE_TICALC ) {
+        ol("rst\t$28");            // BCALL, meaning the system will handle paging for us
+
+        outfmt(".%s%x%s%s\n",    // This label can be exported as a .map for appmake
+            BANKED_SYMBOL_PREFIX, 
+            getlabel(), // All labels must be unique
+            dopref(sym) ? "_" : "",
+            sym->name                  // Label must to the same to label in the other page file
+            ); 
+        ol("defw 0"); // Should be replaced with appmake
+
+    } else {
+        ol("call\tbanked_call");
+        ot("defq\t"); outname(sym->name, dopref(sym)); nl();
+    }
+ }
 
 /* djm (move this!) Decide whether to print a prefix or not
  * This uses new flags bit LIBRARY
@@ -1491,6 +1505,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
     if (type)
         setcond(type);
+
     ol("ret"); nl(); nl(); /* and exit function */
 }
 

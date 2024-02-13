@@ -113,9 +113,9 @@ Object  file ${test}.o at \$0000: Z80RMF18
     L A \$0005: mes2 (section data) (file ${test}.asm:20)
     L A \$000B: mes2end (section data) (file ${test}.asm:21)
   Externs:
-    U         prmes
     U         mes0
     U         mes0end
+    U         prmes
   Expressions:
     E W \$0000 \$0001 3: mes1 (section code) (file ${test}.asm:6)
     E W \$0003 \$0004 3: mes1end-mes1 (section code) (file ${test}.asm:7)
@@ -141,23 +141,23 @@ Object  file ${test}1.o at \$0000: Z80RMF18
 END
 
 check_text_file("${test}.map", <<END);
-start                           = \$1234 ; addr, local, , ${test}, code, ${test}.asm:6
+__code_head                     = \$1234 ; const, public, def, , ,
+__code_size                     = \$0025 ; const, public, def, , ,
+__code_tail                     = \$1259 ; const, public, def, , ,
+__data_head                     = \$1259 ; const, public, def, , ,
+__data_size                     = \$000C ; const, public, def, , ,
+__data_tail                     = \$1265 ; const, public, def, , ,
+__head                          = \$1234 ; const, public, def, , ,
+__size                          = \$0031 ; const, public, def, , ,
+__tail                          = \$1265 ; const, public, def, , ,
+mes0                            = \$1264 ; addr, public, , ${test}1, data, ${test}1.asm:2
+mes0end                         = \$1265 ; addr, public, , ${test}1, data, ${test}1.asm:3
 mes1                            = \$1259 ; addr, local, , ${test}, data, ${test}.asm:10
 mes1end                         = \$125E ; addr, local, , ${test}, data, ${test}.asm:11
 mes2                            = \$125E ; addr, local, , ${test}, data, ${test}.asm:20
 mes2end                         = \$1264 ; addr, local, , ${test}, data, ${test}.asm:21
 prmes                           = \$1250 ; addr, public, , ${test}1, code, ${test}1.asm:6
-mes0                            = \$1264 ; addr, public, , ${test}1, data, ${test}1.asm:2
-mes0end                         = \$1265 ; addr, public, , ${test}1, data, ${test}1.asm:3
-__head                          = \$1234 ; const, public, def, , ,
-__tail                          = \$1265 ; const, public, def, , ,
-__size                          = \$0031 ; const, public, def, , ,
-__code_head                     = \$1234 ; const, public, def, , ,
-__code_tail                     = \$1259 ; const, public, def, , ,
-__code_size                     = \$0025 ; const, public, def, , ,
-__data_head                     = \$1259 ; const, public, def, , ,
-__data_tail                     = \$1265 ; const, public, def, , ,
-__data_size                     = \$000C ; const, public, def, , ,
+start                           = \$1234 ; addr, local, , ${test}, code, ${test}.asm:6
 END
 
 #------------------------------------------------------------------------------

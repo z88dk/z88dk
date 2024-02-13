@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -11,7 +11,7 @@ Define CPU opcodes
 
 #pragma once
 
-#include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 
 /* forward declaration without include cycle */
 struct Expr1;

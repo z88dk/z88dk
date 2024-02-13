@@ -8,6 +8,7 @@ target/zxvgs/zxvgs/bnkfree
 target/zxvgs/zxvgs/loadany
 target/zxvgs/zxvgs/saveany
 target/zxvgs/fcntl/close
+target/zxvgs/fcntl/fsync
 target/zxvgs/fcntl/lseek
 target/zxvgs/fcntl/fdtell
 target/zxvgs/fcntl/fdgetpos

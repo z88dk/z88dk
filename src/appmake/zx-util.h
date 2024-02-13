@@ -32,6 +32,7 @@ struct zx_tape
     char           extreme;
     char           fast;
     char           dumb;
+    char           lec_cpm;
     char           noloader;
     char           noheader;
     unsigned char  parity;

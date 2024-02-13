@@ -29,10 +29,10 @@ unlink("$test.o", "$test.bin");
 capture_ok("z88dk-z80asm -b -m -l$test.1.lib $test.asm", "");
 check_bin_file("$test.bin", bytes(42));
 check_text_file("$test.map", <<'END');
-the_answer                      = $002A ; const, public, , test_t_issue_2320_24.1, , test_t_issue_2320_24.1.asm:2
 __head                          = $0000 ; const, public, def, , ,
-__tail                          = $0001 ; const, public, def, , ,
 __size                          = $0001 ; const, public, def, , ,
+__tail                          = $0001 ; const, public, def, , ,
+the_answer                      = $002A ; const, public, , test_t_issue_2320_24.1, , test_t_issue_2320_24.1.asm:2
 END
 
 

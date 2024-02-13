@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -15,9 +15,9 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "array.h"
 #include "class.h"
 #include "classlist.h"
-#include "objfile.h"
 #include "scan1.h"
 #include "sym.h"
+#include "z80asm_defs.h"
 #include "utarray.h"
 
 struct Module1;
@@ -81,9 +81,6 @@ typedef struct ExprOp				/* hold one operation or operand */
 } ExprOp;
 
 ARRAY(ExprOp);					/* hold list of Expr1 operations/operands */
-
-/* return size in bytes of value of given range */
-extern int range_size(range_t range);
 
 /*-----------------------------------------------------------------------------
 *	Expression

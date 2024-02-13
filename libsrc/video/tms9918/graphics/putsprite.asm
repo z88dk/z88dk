@@ -196,7 +196,9 @@ IF VDP_CMD < 0
     ld      a,(__tms9918_pixelbyte)
     ld      (-VDP_DATA),a
     ; And now the attribute
-    ld      a,l
+    push    hl		;11	- delay a little
+    pop     hl		;10
+    ld      a,l		;4
     ld      (-VDP_CMD),a
     ld      a,h
     add     $20
@@ -217,8 +219,9 @@ ELSE
     ld      bc,VDP_DATA
     out     (c),a
     ; And now the attribute
-    ld      bc,VDP_CMD
-    ld      a,l
+    ld      bc,VDP_CMD	;10
+    ld      bc,VDP_CMD	;10 - delay a little
+    ld      a,l         ;4
     out     (c),a
     ld      a,h
     add     $20
@@ -256,6 +259,8 @@ ELSE
     and     @00111111	; masked with "read command" bits
     out     (c),a
     ld      bc,VDP_DATAIN
+    ld      bc,VDP_DATAIN  ;delay
+    nop
     in      a,(c)
     pop     bc
 ENDIF
@@ -299,6 +304,8 @@ ELSE
     ld      a,(__tms9918_pixelbyte)
     out     (c),a
     ld      bc,VDP_CMD
+    ld      bc,VDP_CMD	;delay
+    nop
     out     (c),l
     ld      a,h		; MSB of video mem ptr
     add     $20

@@ -1,13 +1,12 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// interface between C and C++ components
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
 #pragma once
 
-#include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -36,7 +35,8 @@ extern "C" {
 #define EXT_LIB     ".lib"    
 #define EXT_SYM     ".sym"    
 #define EXT_MAP     ".map"    
-#define EXT_RELOC   ".reloc"  
+#define EXT_RELOC   ".reloc"
+#define EXT_M4      ".m4"
 
 // appmake
 #define APPMAKE_NONE	0
@@ -76,54 +76,54 @@ void set_error_source_line(const char* line);
 void set_error_expanded_line(const char* line);
 
 void error_align_redefined();
-void error_expected_const_expr();
+void error_constant_expression_expected();
 void error_division_by_zero();
 void error_duplicate_definition(const char* name);
 void error_duplicate_definition_module(const char* modulename, const char* name);
-void error_expr_recursion();
+void error_recursive_expression();
 void error_file_not_found(const char* filename);
 void error_file_open(const char* filename);
 void error_file_rename(const char* filename);
-void error_illegal_ident();
-void error_int_range(int value);
+void error_illegal_identifier();
+void error_integer_range(int value);
 void error_invalid_char_const();
 void error_invalid_org(int origin);
-void error_lib_file_version(const char* filename, int found_version, int expected_version);
-void error_missing_block();
-void error_missing_close_block();
+void error_invalid_library_file_version(const char* filename, int found_version, int expected_version);
+void error_missing_bracket_block();
+void error_bracket_block_not_closed();
 void error_missing_quote();
-void error_not_lib_file(const char* filename);
-void error_not_obj_file(const char* filename);
-void error_obj_file_version(const char* filename, int found_version, int expected_version);
+void error_invalid_library_file(const char* filename);
+void error_invalid_object_file(const char* filename);
+void error_invalid_object_file_version(const char* filename, int found_version, int expected_version);
 void error_org_not_aligned(int origin, int align);
 void error_org_redefined();
 void error_segment_overflow();
-void error_string_too_long();
-void error_symbol_redecl(const char* name);
-void error_syntax();
-void error_syntax_expr();
+void error_string_longer_than_reserved_space();
+void error_symbol_redeclaration(const char* name);
+void error_syntax_error();
+void error_syntax_error_in_expression();
 void error_undefined_symbol(const char* name);
-void warn_expr_in_parens();
-void warn_org_ignored(const char* filename, const char* section);
-void warn_int_range(int value);
-void error_dma_base_register_illegal(int value);
-void error_dma_missing_args();
-void error_dma_extra_args();
-void error_dma_illegal_port_A_timing();
-void error_dma_illegal_port_B_timing();
-void error_dma_unsupported_interrupts();
-void warn_dma_unsupported_features();
-void warn_dma_unsupported_command();
+void warning_expr_in_parens();
+void warning_org_ignored(const char* filename, const char* section);
+void warning_integer_range(int value);
+void error_dma_base_register_byte_illegal(int value);
+void error_dma_missing_register_group_members();
+void error_dma_too_many_arguments();
+void error_dma_illegal_port_a_timing();
+void error_dma_illegal_port_b_timing();
+void error_dma_does_not_support_interrupts();
+void warning_dma_does_not_support_some_features();
+void warning_dma_does_not_implement_this_command();
 void error_dma_illegal_mode();
 void error_dma_illegal_command();
 void error_dma_illegal_read_mask();
-void warn_dma_half_cycle_timing();
-void warn_dma_ready_signal_unsupported();
-void error_cmd_failed(const char* cmd);
-void error_assert_failed();
-void error_cpu_incompatible(const char* filename, int got_cpu_id);
-void error_cpu_invalid(const char* filename, int cpu_id);
-void error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy);
+void warning_dma_does_not_support_half_cycle_timing();
+void warning_dma_does_not_support_ready_signals();
+void error_command_failed(const char* cmd);
+void error_assertion_failed();
+void error_incompatible_cpu(const char* filename, cpu_t got_cpu_id);
+void error_illegal_cpu(const char* filename, cpu_t cpu_id);
+void error_incompatible_ixiy(const char* filename, swap_ixiy_t swap_ixiy);
 void error_date_and_mstar_incompatible();
 
 // options
@@ -133,7 +133,7 @@ void set_swap_ixiy_option(swap_ixiy_t swap_ixiy);
 void push_includes(const char* dir);
 void pop_includes();
 const char* search_includes(const char* filename);
-int option_cpu();
+cpu_t option_cpu();
 void set_cpu_option(int cpu);
 const char* option_cpu_name();
 bool option_ti83();
@@ -161,6 +161,7 @@ bool option_consol_obj_file();
 const char* option_consol_obj_file_name();
 size_t option_files_size();
 const char* option_file(size_t n);
+bool option_debug_z80asm();
 
 // filesystem
 const char* path_parent_dir(const char* filename);

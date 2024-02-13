@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.2.0 #13131 (Linux)
+; File Created by SDCC : free open source ISO C Compiler
+; Version 4.4.0 #14648 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -343,14 +343,14 @@
 	GLOBAL _log10
 	GLOBAL _log_fastcall
 	GLOBAL _log
+	GLOBAL _ilogb_fastcall
+	GLOBAL _ilogb
 	GLOBAL _scalbln_callee
 	GLOBAL _scalbln
 	GLOBAL _scalbn_callee
 	GLOBAL _scalbn
 	GLOBAL _ldexp_callee
 	GLOBAL _ldexp
-	GLOBAL _ilogb_fastcall
-	GLOBAL _ilogb
 	GLOBAL _frexp_callee
 	GLOBAL _frexp
 	GLOBAL _expm1_fastcall
@@ -427,20 +427,25 @@ _m32_atanf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	push	af
-	push	af
-	push	af
-	push	af
-	ld	(ix-4),l
-	ld	(ix-3),h
+	ld	c, l
+	ld	b, h
+	ld	hl, -9
+	add	hl, sp
+	ld	sp, hl
+	ld	(ix-4),c
+	ld	(ix-3),b
 	ld	(ix-2),e
 	ld	(ix-1),d
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	ld	e,(ix-2)
+	ld	d,(ix-1)
 	call	_m32_fabsf
 	ld	c,l
 	ld	b,h
 	ex	(sp),hl
-	ld	(ix-6),e
-	ld	(ix-5),d
+	ld	(ix-7),e
+	ld	(ix-6),d
 	ld	a, d
 	and	a,0x7f
 	or	a, e
@@ -466,37 +471,31 @@ l_m32_atanf_00102:
 	ld	hl,0x0000
 	push	hl
 	call	___fslt_callee
+	ld	(ix-5),l
 	ld	a,l
-	or	a,a
-	ld	c,l
+	or	a, a
 	jr	Z,l_m32_atanf_00104
-	ld	e,c
-	ld	d,b
 	pop	hl
 	push	hl
-	push	de
-	ld	e,(ix-6)
-	ld	d,(ix-5)
+	ld	e,(ix-7)
+	ld	d,(ix-6)
 	call	_m32_invf
-	pop	bc
 	ex	(sp), hl
-	ld	(ix-6),e
-	ld	(ix-5),d
+	ld	(ix-7),e
+	ld	(ix-6),d
 l_m32_atanf_00104:
-	push	bc
 	ld	hl,0x0007
 	push	hl
 	ld	hl,_m32_coeff_atan
 	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
+	ld	l,(ix-7)
+	ld	h,(ix-6)
 	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
+	ld	l,(ix-9)
+	ld	h,(ix-8)
 	push	hl
 	call	_m32_polyf
-	pop	bc
-	ld	a, c
+	ld	a,(ix-5)
 	or	a, a
 	jr	Z,l_m32_atanf_00106
 	push	de

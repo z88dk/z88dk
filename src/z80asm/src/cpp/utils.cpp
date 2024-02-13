@@ -1,15 +1,17 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // utils
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
 #include "utils.h"
+#include "xassert.h"
+#include <algorithm>
+#include <cstdint>
+#include <iterator>
 #include <regex>
 #include <set>
-#include <cstdint>
-#include <algorithm>
 
 bool is_ident(const string& ident) {
     if (ident.empty())
@@ -175,6 +177,14 @@ string str_replace_all(string text, const string& find, const string& replace) {
 	return text;
 }
 
+// https://www.bing.com/search?q=c%2B%2B+split+blank+delimited+string+into+vector+of+stringsd&showconv=1&sendquery=1&form=WSBQFC&qs=SW&cvid=286798d5917e488fb05cbeda30b71104&pq=c%2B%2B+split+blank+delimited+string+into+vector+of+stringsd&cc=PT&setlang=en-US&nclid=9310176510014EEEAB71B45D62C6D720&ts=1703540528160&wsso=Moderate
+vector<string> split(const string& s) {
+    istringstream iss(s);
+    vector<string> tokens{ istream_iterator<string>{iss},
+                           istream_iterator<string>{} };
+    return tokens;
+}
+
 static void expand_glob_1(set<fs::path>& result, const string& pattern);
 
 static void expand_wildcards(set<fs::path>& result,
@@ -304,7 +314,7 @@ void swrite_int32(int n, ostream& os) {
 }
 
 void swrite_string(const string& s, ostream& os) {
-	Assert(s.size() <= INT16_MAX);
+	xassert(s.size() <= INT16_MAX);
 	swrite_int16(static_cast<int>(s.size()), os);
 	os.write(s.c_str(), s.size());
 }

@@ -1,13 +1,13 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
 #pragma once
 
 #include "if.h"
-#include "scan.h"
+#include "scan2.h"
 #include <cstdint>
 #include <vector>
 using namespace std;
@@ -52,6 +52,7 @@ public:
 	vector<uint8_t> float_to_bytes(double value);
 
 	static string get_formats();
+    static vector<string> get_all_defines();
 
 private:
 	Format m_format{ Format::genmath };

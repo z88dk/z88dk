@@ -833,6 +833,7 @@
 	ld	c,%1
 	call	l_long_asr%2o
 
+%title Swapload1
 %check 0 <= %1 <= 65535
 	ld	l,(hl)
 	ld	h,0
@@ -2081,14 +2082,36 @@
 	ld	a,(hl)
 	sub	e
 
+%title Subsimplify1
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,%1	;const
 	ld	a,l
 	sub	e
+	ld	a,%"d|h"2
+	sbc	%"d|h"3
+	jp	%4
 =
 	ld	a,%eval(%1 256 %%)
 	sub	(hl)
+	jp	%4
+
+%title Subsimplify2
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1	;const
+	ld	a,l
+	sub	e
+	ld	a,%"d|h"2
+	sbc	%"d|h"3
+	ccf
+	jp	%4
+=
+	ld	a,%eval(%1 256 %%)
+	sub	(hl)
+	ccf
+	jp	%4
+
 
 	ld	e,(hl)
 	ld	d,0
@@ -5674,9 +5697,11 @@ $notcpu 8085
 	ld	(hl),a
 	inc	hl
 	ld	(hl),a
+	ld	hl,%2
 =
 	ld	hl,0	;const
 	ld	(_%1),hl
+	ld	hl,%2
 
 %title Signed char extension after truncation
 	call	l_gchar

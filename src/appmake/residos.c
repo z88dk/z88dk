@@ -112,18 +112,18 @@ int residos_exec(char* target)
 
     strcpy((char *)memory, "ZXPKG");
     memory[5] = 0; /* Capabilities */
-    memory[6] = package_id;
+    memory[6] = package_id % 256;
     memory[7] = 0x23; /* Minimum Residos version is v2.23 */
     memory[8] = 0x02;
-    memory[9] = (table_end - table_start) / 2;
+    memory[9] = ((table_end - table_start) / 2) % 256;
     memory[10] = table_start % 256;
-    memory[11] = table_start / 256;
+    memory[11] = (table_start / 256) % 256;
     memory[12] = 0; /* Hook code terminator */
     memory[13] = 0; /* Channel name terminator */
     memory[14] = 0; /* Syntax table terminator */
     memory[15] = 0; /* Function table terminator */
     fseek(binfile, 0, SEEK_SET);
-    readlen = fread(memory + HEADER_SIZE, 1, filesize, binfile);
+    readlen = (long)fread(memory + HEADER_SIZE, 1, filesize, binfile);
 
     if (filesize != readlen) {
         fclose(binfile);

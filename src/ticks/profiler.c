@@ -227,7 +227,7 @@ static void profiler_dump_function_calls()
 {
     struct profile_function_t* f = profiling_functions;
     while (f) {
-        uint32_t own_time = f->total_time - f->sub_calls_time;
+        uint32_t own_time = (uint32_t)(f->total_time - f->sub_calls_time);
         double time_percent = (double)f->total_time / (double)total_total_time;
         int time_percent_int = (int)(time_percent * 100.0f);
         double own_time_percent = (double)own_time / (double)total_total_time;

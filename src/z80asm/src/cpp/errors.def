@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ X(InvalidOrgOption, "invalid origin (-r) option")
 X(InvalidDefineOption, "invalid define (-Dvar=value) option")
 X(InvalidFillerOption, "invalid filler (-f) option")
 X(CmdFailed, "command failed")
-X(InvalidCpu, "invalid cpu")
+X(IllegalCpuOption, "illegal -m option")
 X(DateAndMstarIncompatible, "cannot build libraries with -m* and -d")
 
 // lexer
@@ -58,7 +58,8 @@ X(ExprRecursion, "recursive expression")
 // preprocessor
 X(MacroArgsNumber, "number of macro arguments")
 X(ExprEval, "expression evaluation")
-X(InvalidFloatFormat, "invalid float format, expected")
+X(IllegalFloatFormat, "illegal float format")
+X(IllegalFloatOption, "illegal -float option")
 
 // assembler
 X(ExprInParens, "interpreting indirect value as immediate")

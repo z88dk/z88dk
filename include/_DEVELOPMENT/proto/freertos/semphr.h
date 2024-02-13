@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.1+
+ * FreeRTOS Kernel V11.0.1
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -97,13 +97,13 @@ typedef QueueHandle_t SemaphoreHandle_t;
  */
 #if ( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
     #define vSemaphoreCreateBinary( xSemaphore )                                                                                     \
-    {                                                                                                                                \
+    do {                                                                                                                             \
         ( xSemaphore ) = xQueueGenericCreate( ( UBaseType_t ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH, queueQUEUE_TYPE_BINARY_SEMAPHORE ); \
         if( ( xSemaphore ) != NULL )                                                                                                 \
         {                                                                                                                            \
             ( void ) xSemaphoreGive( ( xSemaphore ) );                                                                               \
         }                                                                                                                            \
-    }
+    } while( 0 )
 #endif
 
 /**
@@ -1195,7 +1195,8 @@ typedef QueueHandle_t SemaphoreHandle_t;
 /**
  * semphr.h
  * @code{c}
- * BaseType_t xSemaphoreGetStaticBuffer( SemaphoreHandle_t xSemaphore );
+ * BaseType_t xSemaphoreGetStaticBuffer( SemaphoreHandle_t xSemaphore,
+ *                                       StaticSemaphore_t ** ppxSemaphoreBuffer );
  * @endcode
  *
  * Retrieve pointer to a statically created binary semaphore, counting semaphore,

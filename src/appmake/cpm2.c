@@ -44,7 +44,7 @@ option_t cpm2_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
-static void              dump_formats();
+static void              dump_formats(void);
 static void              bic_write_system_file(disc_handle *h);
 
 
@@ -63,18 +63,39 @@ static disc_spec einstein_spec = {
 };
 
 
+// Accesss Matrix (Actrix AM) - SS
+static disc_spec actrixss_spec = {
+    .name = "Actrix_SS",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,   // 0x55 ?
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 6, 1, 4, 7, 2, 5, 8 }
+};
+
+// Accesss Matrix (Actrix AM) - DS
 static disc_spec actrix_spec = {
-    .name = "Actrix",
+    .name = "Actrix_DS",
     .disk_mode = MFM250,
     .sectors_per_track = 9,
     .tracks = 40,
     .sides = 2,
+    .alternate_sides = 1,
     .sector_size = 512,
     .gap3_length = 0x2a,
-    .filler_byte = 0x55,
+    .filler_byte = 0xe5,   // 0x55 ?
     .boottracks = 2,
-    .directory_entries = 32,
-    .extent_size = 1024,
+    .directory_entries = 64,
+    .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
     .has_skew = 1,
@@ -100,6 +121,49 @@ static disc_spec ampro_spec = {
 };
 
 
+// Amust Compak / Amust Executive
+// the original disks should have 16x256 s/t on track 0
+static disc_spec amust_spec = {
+    .name = "Amust",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 320,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 1,
+    .skew_tab = { 0, 2, 4, 1, 3 }
+};
+
+static disc_spec amustold_spec = {
+    .name = "Amust_old",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 320,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 1,
+    .skew_tab = { 0, 3, 1, 4, 2 }
+};
+
+
 // Apple II CP/M on Softcard
 static disc_spec apple2_spec = {
     .name = "A2Softcard",
@@ -119,6 +183,29 @@ static disc_spec apple2_spec = {
 };
 
 
+// Archives, Inc.
+// Archive II & III - DSDD 96 tpi 5.25"
+static disc_spec archive_spec = {
+    .name = "Archives_Inc",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 320, // 128 ?
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 3, 1, 4, 2 }
+};
+
+
 static disc_spec attache_spec = {
     .name = "Attache",
     .disk_mode = MFM300,	
@@ -133,6 +220,47 @@ static disc_spec attache_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
+};
+
+
+// "Aussie Byte" - SMF Knight 2000
+static disc_spec aussie_spec = {
+    .name = "Knight_2000",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 256,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 1, 3 }
+};
+
+
+// Beehive Topper
+// It looks like a Topper II existed with a different system disk
+static disc_spec beehive_spec = {
+    .name = "Topper",
+    .disk_mode = MFM300,
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
 };
 
 
@@ -227,6 +355,24 @@ static disc_spec cpcsystem_spec = {
 };
 
 
+static disc_spec cpcvortex_spec = {
+    .name = "CPCVortex",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .alternate_sides = 1,
+    .directory_entries = 256,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1
+};
+
+
 static disc_spec pcw40_spec = {
     .name = "PCW40",
     .sectors_per_track = 9,
@@ -260,8 +406,11 @@ static disc_spec pcw80_spec = {
 };
 
 
+// Microbee 3.5" Modular DS80
+// approximated (wrong sector numbering on boot tracks)
 static disc_spec microbee_spec = {
     .name = "Microbee",
+    .disk_mode = MFM250,
     .sectors_per_track = 10,
     .tracks = 80,
     .sides = 2,
@@ -272,18 +421,38 @@ static disc_spec microbee_spec = {
     .directory_entries = 128,
     .extent_size = 4096,
     .byte_size_extents = 1,
-    .first_sector_offset = 0x15,
-    .boot_tracks_sector_offset = 1,
+    .first_sector_offset = 0x15,    // <- yet another oddity
     .alternate_sides = 1,
     .has_skew = 1,
-    .skew_track_start = 5,
+    .skew_track_start = 2,
     .skew_tab = { 1, 4, 7, 0, 3, 6, 9, 2, 5, 8 }
 };
 
 
-// PMC-101 MicroMate (Type "A")
-static disc_spec pmc101a_spec = {
-    .name = "PMC-101_A",
+static disc_spec microbee40_spec = {
+    .name = "Microbee_40T",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 1, 4, 7, 0, 3, 6, 9, 2, 5, 8 }
+};
+
+
+// PMC-101 MicroMate
+static disc_spec pmc101_spec = {
+    .name = "PMC-101",
     .disk_mode = MFM250,
     .sectors_per_track = 5,
     .tracks = 40,
@@ -296,7 +465,7 @@ static disc_spec pmc101a_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-    .alternate_sides = 1,
+    .alternate_sides = 1
 };
 
 
@@ -377,6 +546,25 @@ static disc_spec altos5_spec = {
 };
 
 
+static disc_spec altos580_spec = {
+    .name = "Altos 580",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 256,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
+};
+
+
 static disc_spec mbc1200_spec = {
     .name = "MBC-1200",
     .disk_mode = MFM250,
@@ -397,12 +585,13 @@ static disc_spec mbc1200_spec = {
 };
 
   
+// Sanyo MBC-2000 (80T, Single Side) , CPU:8085A
 static disc_spec mbc2000_spec = {
     .name = "MBC-2000",
     .disk_mode = MFM250,
     .sectors_per_track = 16,
-    .tracks = 40,
-    .sides = 2,
+    .tracks = 80,
+    .sides = 1,
     .sector_size = 256,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
@@ -411,10 +600,10 @@ static disc_spec mbc2000_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-    .alternate_sides = 1,
     .has_skew = 1,
     .skew_tab = { 0,5,10,15,4,9,14,3,8,13,2,7,12,1,6,11 }
 };
+
 
 // Unverified gap size
 static disc_spec bondwell12_spec = {
@@ -466,6 +655,74 @@ static disc_spec kayproii_spec = {
 };
 
 
+static disc_spec kaypro4_spec = {
+    .name = "Kaypro4/10",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+	.side2_sector_numbering = 1
+};
+
+
+// Sharp MZ-800 Personal CP/M
+// a valid boot track on side 0 should have SKEW4,
+// ..on side 1 SKEW8, 16 tracks x 256 sectors
+static disc_spec mz800_spec = {
+    .name = "Sharp MZ800",
+    .disk_mode = MFM250,
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 4, 1, 5, 2, 6, 3, 7 }
+};
+
+
+// Sharp MZ-80A and MZ-80B
+static disc_spec mz80_spec = {
+    .name = "Sharp MZ80",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 35,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+	.xor_data = 0xff,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 },
+	.inverted_sides = 1,
+	.side2_sector_numbering = 1
+};
+
+
+// Sharp MZ-2500
 static disc_spec mz2500cpm_spec = {
     .name = "MZ2500CPM",
     .sectors_per_track = 16,
@@ -480,6 +737,44 @@ static disc_spec mz2500cpm_spec = {
     .byte_size_extents = 0,
     .first_sector_offset = 1,
     .alternate_sides = 1
+};
+
+
+// Teletek Systemaster (integrated FDC on an S100 Z80 board)
+static disc_spec teletekss_spec = {
+    .name = "Teletek_SS",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,6,12,1,7,13,2,8,14,3,9,15,4,10,16,5,11,17 }
+};
+
+static disc_spec teletek_spec = {
+    .name = "Teletek",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,6,12,1,7,13,2,8,14,3,9,15,4,10,16,5,11,17 }
 };
 
 
@@ -806,6 +1101,23 @@ static disc_spec trs80_cpm3_spec = {
     .first_sector_offset = 1,
 };
 
+// Lobo MAX-80 CP/M 3 5.25" SSDD (TRS-80 clone)
+static disc_spec lobo_spec = {
+    .name = "MAX80",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .sides = 1,
+    .tracks = 40,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+};
+
 // LNW-80 (TRS80 clone)
 static disc_spec lnw80_spec = {
     .name = "LNW 80",
@@ -897,6 +1209,167 @@ static disc_spec plus3_spec = {
 };
 
 
+// Scorpion ZS-256 (ZX Spectrum clone)
+// (tested only on RAW/TRD mode)
+static disc_spec scoprpion_spec = {
+    .name = "ZX_Scorpion",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0,2,4,6,8,10,12,14,1,3,5,7,9,11,13,15 }
+};
+
+
+// MicroART ATM Turbo (ZX Spectrum clone)
+static disc_spec atmturbo_spec = {
+    .name = "ZX_ATMturbo",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1
+};
+
+
+// Quorum 128, Profi and Hobbit (ZX Spectrum clones)
+static disc_spec quorum_spec = {
+    .name = "ZX_800K",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+};
+
+
+// ICE FELIX HC-91 (ZX Spectrum clones)
+static disc_spec hc91_spec = {
+    .name = "HC-91",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
+};
+
+
+// ICE FELIX HC-2000 (ZX Spectrum clones)
+static disc_spec hc2000_spec = {
+    .name = "HC-2000",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 64,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
+};
+
+
+// Dataputer DISKFACE, Floppy disk interface for the ZX Spectrum
+static disc_spec diskface_spec = {
+    .name = "ZX DiskFace",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
+// Elwro 800 Junior (ZX Spectrum clone)
+static disc_spec elwro_spec = {
+    .name = "Elwro 800J",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+};
+
+
+// ZX Timex/Zebra FDD-3000
+static disc_spec fdd3000_spec = {
+    .name = "FDD-3000",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 35,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,5,10,15,4,9,14,3,8,13,2,7,12,1,6,11 }
+};
+
+
 // BBC Micro, Acorn Z80 2nd processor
 static disc_spec bbc_spec = {
     .name = "BBC Micro",
@@ -934,6 +1407,7 @@ static disc_spec bic_spec = {
 
 
 // 8" floppy disk on Xerox 820 or Ferguson BigBoard
+// The Datamax-8000 apparently has this same format
 static disc_spec bigboard_spec = {
     .name = "BigBoard",
     .disk_mode = FM500,
@@ -988,6 +1462,30 @@ static disc_spec gemini_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 0,
     .alternate_sides = 1,
+};
+
+
+// Gnat Computers, Inc. - System 10
+// The D88 dik container worked with ALIENC.COM on MAME/Microbee
+static disc_spec gnat_spec = {
+    .name = "Gnat_10",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 },
+    .side2_sector_numbering = 1
 };
 
 
@@ -1085,6 +1583,47 @@ static disc_spec alphatro_spec = {
 };
 
 
+// "FOX OS" for the SAGA FOX
+// (Torino - Italy)
+static disc_spec sagafox_spec = {
+    .name = "SAGA FOX",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 35,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 },
+	.xor_data = 0xff
+};
+
+
+// Seequa Chameleon
+static disc_spec seequa_spec = {
+    .name = "Seequa Chameleon",
+    .disk_mode = MFM300,
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x50,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1
+};
+
+
 static disc_spec sharpx1_spec = {
     .name = "Sharp-X1",
     .disk_mode = MFM250,
@@ -1149,6 +1688,26 @@ static disc_spec v1050_spec = {
     .boottracks = 2,
     .directory_entries = 128,
     .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
+// Cortex CW/P, close to the Visual 1050
+// definition taken from ALIENC.COM (MicroBee tool)
+// and compared to V1050 
+static disc_spec cortex_spec = {
+    .name = "Cortex",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
 };
@@ -1327,6 +1886,24 @@ static disc_spec naburn_spec = {
      .has_skew = 0,
 };
 
+static disc_spec nshd8_spec = {
+     .name = "Northstar Virtual Disk 8",
+     .sectors_per_track = 16,
+     .tracks = 1024,
+     .sides = 1,
+     .sector_size = 512,
+     .gap3_length = 0x2a,   //?
+     .filler_byte = 0xe5,
+     .boottracks = 0,
+     .directory_entries = 256,
+     .alternate_sides = 0,
+     .extent_size = 8192,
+     .byte_size_extents = 0,
+     .first_sector_offset = 0,
+     .has_skew = 0,
+};
+
+
 static disc_spec idpfdd_spec = {
       .name = "Iskra Delta Partner FDD",
       .sectors_per_track = 18,
@@ -1390,12 +1967,19 @@ static struct formats {
      char           force_com_extension;
      void         (*extra_hook)(disc_handle *handle);
 } formats[] = {
-    { "actrix",    "Actrix Access",         &actrix_spec, 0, NULL, 1 },
+    { "actrixss",  "Accesss Matrix SS",     &actrixss_spec, 0, NULL, 1 },
+    { "actrix",    "Accesss Matrix DS",     &actrix_spec, 0, NULL, 1 },
     { "alphatro",  "Alphatronic PC",        &alphatro_spec, 0, NULL, 1 },
     { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
+    { "altos580",  "Altos 580",             &altos580_spec, 0, NULL, 1 },
     { "ampro",     "Ampro 48tpi",           &ampro_spec, 0, NULL, 1 },
+    { "amust",     "Amust Executive",       &amust_spec, 0, NULL, 1 },
+    { "amustold",  "Amust Executive (old)", &amustold_spec, 0, NULL, 1 },
     { "apple2",    "Apple II Softcard",     &apple2_spec, 0, NULL, 1 },
+    { "archive",   "Archive II & III",      &archive_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
+    { "aussie",    "AussieByte Knight2000", &aussie_spec, 0, NULL, 1 },
+    { "beehive",   "Beehive Topper",        &beehive_spec, 0, NULL, 1 },
     { "bbc",       "BBC Micro Z80CPU SSSD", &bbc_spec, 0, NULL, 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bigboard",  "X820/Bigboard, 8in",    &bigboard_spec, 0, NULL, 1 },
@@ -1403,29 +1987,39 @@ static struct formats {
     { "bw2",       "Bondwell Model 2",      &bondwell2_spec, 0, NULL, 1 },
     { "caos",      "CAOS/NANOS/z1013 CP/M", &caos_spec, 0, NULL, 1 },
     { "cpcsystem", "CPC System Disc",       &cpcsystem_spec, 0, NULL, 0 },
+    { "cpcvortex", "CPC Vortex CP/M Disc ", &cpcvortex_spec, 0, NULL, 0 },
     { "col1",      "Coleco ADAM 40T SSDD",  &col1_spec, 0, NULL, 1 },
     { "corvette",  "Corvette", &corvette_spec, 32,         "\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8c\x01\x7f\x00\xc0\x00\x20\x00\x01\x00\x11", 1 },
     { "corvboot",  "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
+    { "datamax",   "Datamax-8000, 8in",     &bigboard_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "eagle2",    "Eagle II",              &eagle2_spec, 0, NULL, 1 },
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
     { "fp1100",    "Casio FP1100",          &fp1100_spec, 0, NULL, 1 },
     { "gemini",    "GeminiGalaxy",          &gemini_spec, 0, NULL, 1 },
+    { "gnat10",    "Gnat System 10",        &gnat_spec, 0, NULL, 1 },
     { "hp125",     "HP 125/120",            &hp125_spec, 0, NULL, 1 },
     { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
-    { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
+    { "kaypro4",   "Kaypro 4/10",           &kaypro4_spec,  0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
+    { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
+	{ "max80cpm3", "Lobo MAX-80 CPM3 SS",   &lobo_spec, 0, NULL, 1 },
+    { "microbee-ds40",  "Microbee DS40",    &microbee40_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
+    { "micromate", "PMC-101 MicroMate",     &pmc101_spec, 0, NULL, 1 },
     { "morrow2",   "Morrow MD 2 (SS)",      &md2_spec, 0, NULL, 1 },
     { "morrow3",   "Morrow MD 3 (DS)",      &md3_spec, 0, NULL, 1 },
     { "mbc1000",   "Sanyo MBC-1000/1150",   &mbc1000_spec, 0, NULL, 1 },
     { "mbc1200",   "Sanyo MBC-200/1250",    &mbc1200_spec, 0, NULL, 1 },
-    { "mbc2000",   "Sanyo MBC-2000",        &mbc2000_spec, 0, NULL, 1 },
+    { "mbc2000",   "Sanyo MBC-2000 SS80T",  &mbc2000_spec, 0, NULL, 1 },
     { "naburn",    "Nabu PC (8mb)",         &naburn_spec, 0, NULL, 1 },
     { "nabupc",    "Nabu PC",               &nabupc_spec, 0, NULL, 1 },
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
+    { "nshd8",     "Northstar Virtual 8",   &nshd8_spec, 0, NULL, 1 },
+    { "mz80",      "Sharp MZ80A/80B",       &mz80_spec, 0, NULL, 1 },
+    { "mz800",     "Sharp MZ800",           &mz800_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
@@ -1435,13 +2029,25 @@ static struct formats {
     { "pc88",      "NEC PC8001/8801,FM7/8", &pc88_spec, 0, NULL, 1 },
     { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "pcw40",     "Amstrad PCW, 40T",      &pcw40_spec, 16, "\x00\x00\x28\x09\x02\x01\x03\x02\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
-    { "plus3",     "Spectrum +3 173k",      &plus3_spec, 0, NULL, 1 },
+    { "plus3",     "ZX Spectrum +3 173k",   &plus3_spec, 0, NULL, 1 },
+    { "scorpion",  "ZX Scorpion, Profi",    &scoprpion_spec, 0, NULL, 1 },
+    { "atmturbo",  "ZX MicroART ATM Turbo", &atmturbo_spec, 0, NULL, 1 },
+    { "diskface",  "ZX Dataputer DISKFACE", &diskface_spec, 0, NULL, 1 },
+    { "elwro",     "ZX Elwro 800 Junior",   &elwro_spec, 0, NULL, 1 },
+    { "fdd3000",   "ZX Timex FDD-3000",     &fdd3000_spec, 0, NULL, 1 },
+    { "hc91",      "ZX ICE Felix HC-91",    &hc91_spec, 0, NULL, 1 },
+    { "hc2000",    "ZX HC-2000 / CoBra",    &hc2000_spec, 0, NULL, 1 },
+    { "quorum",    "ZX Quorum,Profi,Hobb.", &quorum_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
-    { "rainbow",   "DEC Rainbow 100",       &rainbow_spec, 0, NULL, 1 },
+    { "rainbow",   "DEC Rainbow/DECmate",   &rainbow_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
+    { "sagafox",   "SAGA FOX OS",           &sagafox_spec, 0, NULL, 1 },
+    { "seequa",    "Seequa Chameleon (SS)", &seequa_spec, 0, NULL, 1 },
     { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
     { "svi-40ss",  "SVI 40ss (174k)",       &svi40ss_spec, 0, NULL, 1 },
+    { "teletekds", "Teletek Systemaster",   &teletek_spec, 0, NULL, 1 },
+    { "teletekss", "Teletek (SS)",          &teletekss_spec, 0, NULL, 1 },
     { "televideo", "Televideo TS80x/TPC1",  &televideo_spec, 0, NULL, 1 },
     { "tiki100ss", "Tiki 100 (200k)",       &tiki100_ss_spec, 0, NULL, 1 },
     { "tiki100ds", "Tiki 100 (400k)",       &tiki100_ds_spec, 0, NULL, 1 },
@@ -1457,6 +2063,7 @@ static struct formats {
     { "m4cpm3",    "TRS80 4 CP/M Plus",     &trs80_cpm3_spec, 0, NULL, 1 },
     { "vector06c", "Vector 06c",            &vector06c_spec, 0, NULL, 1 },
     { "v1050",     "Visual 1050",           &v1050_spec, 0, NULL, 1 },
+    { "cortex",    "Cortex CW/P",           &cortex_spec, 0, NULL, 1 },
     { "vt180",     "DEC VT-180",            &vt180_spec, 0, NULL, 1 },
     { "x820",      "Xerox 820",             &x820_spec, 0, NULL, 1 },
     { "hz89",      "Zenith Z89, Z17-SSSD",  &hz17_spec, 0, NULL, 1 },
@@ -1466,7 +2073,7 @@ static struct formats {
     { NULL, NULL }
 };
 
-static void dump_formats()
+static void dump_formats(void)
 {
     struct formats* f = &formats[0];
 

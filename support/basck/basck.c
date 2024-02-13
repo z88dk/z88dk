@@ -968,7 +968,7 @@ void clear_token () {
 
 void append_c(char c) {
 	int sl;
-	sl=strlen(token);
+	sl=(int)strlen(token);
 	switch (c) {
 		case '(':
 			token[sl] = '_';

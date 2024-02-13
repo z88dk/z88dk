@@ -1,13 +1,12 @@
 //-----------------------------------------------------------------------------
 // String Utilities - based on UT_string
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
 #include "strutil.h"
 #include "unity.h"
 #include "utstring.h"
-#include "zutils.h"
 
 void t_strutil_cstr_toupper(void)
 {
@@ -85,7 +84,7 @@ void t_strutil_cstr_strip_compress_escapes(void)
 	for (int i = 0; i < 256; i++)
 	{
 		sprintf(cs, "\\%o \\x%x", i, i);
-		int len = str_compress_escapes(cs);
+		int len = (int)str_compress_escapes(cs);
 		TEST_ASSERT_EQUAL(3, len);
 		TEST_ASSERT_EQUAL((char)i, cs[0]);
 		TEST_ASSERT_EQUAL(' ', cs[1]);
@@ -345,43 +344,5 @@ void t_strutil_argv_sort(void)
 	TEST_ASSERT_EQUAL_STRING("25", *p); p++;
 	TEST_ASSERT_NULL(*p);
 	argv_free(argv);
-}
-
-void t_strutil_spool_add(void)
-{
-#define NUM_STRINGS 10
-#define STRING_SIZE	5
-	struct {
-		char source[STRING_SIZE];
-		const char *pool;
-	} strings[NUM_STRINGS];
-
-	const char *pool;
-	int i;
-
-	// first run - create pool for all strings
-	for (i = 0; i < NUM_STRINGS; i++) {
-		sprintf(strings[i].source, "%d", i);		// number i
-
-		pool = spool_add(strings[i].source);
-		TEST_ASSERT_NOT_NULL(pool);
-		TEST_ASSERT(pool != strings[i].source);
-		TEST_ASSERT_EQUAL_STRING(strings[i].source, pool);
-
-		strings[i].pool = pool;
-	}
-
-	// second run - check that pool did not move
-	for (i = 0; i < NUM_STRINGS; i++) {
-		pool = spool_add(strings[i].source);
-		TEST_ASSERT_NOT_NULL(pool);
-		TEST_ASSERT(pool != strings[i].source);
-		TEST_ASSERT_EQUAL_STRING(strings[i].source, pool);
-		TEST_ASSERT_EQUAL(strings[i].pool, pool);
-	}
-
-	// check NULL case
-	pool = spool_add(NULL);
-	TEST_ASSERT_NULL(pool);
 }
 

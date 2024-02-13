@@ -181,6 +181,7 @@ IF FORnabu
 	defc VRAM_SIZE   = 16
 	defc VDP_EXPORT_DIRECT = 1
 	defc VDP_EXPORT_GFX_DIRECT = 1
+	defc F18A = 1
 ENDIF
 
 ; Macro to help writing to ports

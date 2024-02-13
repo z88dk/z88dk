@@ -12,6 +12,12 @@
 **/*.orig
 **/*.output
 **/*.tap
+**/*.8xk
+**/*.82p
+**/*.83p
+**/*.8xp
+**/*.85s
+**/*.86p
 **/*.vcxproj.user
 **/.prove*
 **/.vscode/

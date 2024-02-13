@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -15,22 +15,25 @@ Handle object file contruction, reading and writing
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
-#include "objfile.h"
 #include "str.h"
 #include "strutil.h"
 #include "utstring.h"
 #include "utlist.h"
 #include "zobjfile.h"
-#include "zutils.h"
-#include "z80asm_cpu.h"
+#include "z80asm_defs.h"
 
 /*-----------------------------------------------------------------------------
 *   Write module to object file
 *----------------------------------------------------------------------------*/
 
+static int Symbol1Hash_compare(Symbol1HashElem* a, Symbol1HashElem* b) {
+    return strcmp(a->key, b->key);
+}
+
 static void copy_objfile_externs(objfile_t* obj) {
     Symbol1* sym;
-    for (Symbol1HashElem* iter = Symbol1Hash_first(global_symtab); iter!=NULL;
+    Symbol1Hash_sort(global_symtab, Symbol1Hash_compare);
+    for (Symbol1HashElem* iter = Symbol1Hash_first(global_symtab); iter != NULL;
         iter = Symbol1Hash_next(iter)
         ) {
         sym = (Symbol1*)iter->value;
@@ -73,6 +76,7 @@ static void copy_objfile_exprs(objfile_t* obj, Section1* in_section, section_t* 
 
 static void copy_objfile_symbols_symtab(objfile_t* obj, Section1* in_section, section_t* out_section,
     Symbol1Hash* symtab) {
+    Symbol1Hash_sort(symtab, Symbol1Hash_compare);
     for (Symbol1HashElem* iter = Symbol1Hash_first(symtab); iter != NULL;
         iter = Symbol1Hash_next(iter)
         ) {
@@ -84,7 +88,7 @@ static void copy_objfile_symbols_symtab(objfile_t* obj, Section1* in_section, se
                 (in_sym->scope == SCOPE_LOCAL) ? SCOPE_LOCAL :
                 SCOPE_NONE;
 
-            if (scope != SCOPE_NONE && in_sym->is_touched && in_sym->type != TYPE_UNKNOWN) {
+            if (scope != SCOPE_NONE && in_sym->is_touched && in_sym->type != TYPE_UNDEFINED) {
                 symbol_t* out_sym = symbol_new();
                 utstring_printf(out_sym->name, "%s", in_sym->name);
 
@@ -146,9 +150,9 @@ static void copy_objfile_sections(objfile_t* obj) {
 static objfile_t* copy_objfile(const char* obj_filename) {
     objfile_t* obj = objfile_new();
     utstring_printf(obj->filename, "%s", obj_filename);
-    utstring_printf(obj->signature, "%s" SIGNATURE_VERS, SIGNATURE_OBJ, CUR_VERSION);
+    utstring_printf(obj->signature, "%s" SIGNATURE_VERS, OBJ_FILE_SIGNATURE, OBJ_FILE_VERSION);
     utstring_printf(obj->modname, "%s", CURRENTMODULE->modname);
-    obj->version = CUR_VERSION;
+    obj->version = OBJ_FILE_VERSION;
     obj->cpu_id = option_cpu();
     obj->swap_ixiy = option_swap_ixiy();
     copy_objfile_externs(obj);
@@ -191,15 +195,15 @@ bool check_object_file(const char* obj_filename)
         objfile_header(),
         error_file_not_found,
         error_file_open,
-		error_not_obj_file,
-		error_obj_file_version,
-        error_cpu_incompatible,
-        error_ixiy_incompatible);
+		error_invalid_object_file,
+		error_invalid_object_file_version,
+        error_incompatible_cpu,
+        error_incompatible_ixiy);
 }
 
 static void no_error_file(const char* filename) {}
 static void no_error_version(const char* filename, int version, int expected) {}
-static void no_error_cpu_incompatible(const char* filename, int cpu_id) {}
+static void no_error_cpu_incompatible(const char* filename, cpu_t cpu_id) {}
 static void no_error_ixiy_incompatible(const char* filename, swap_ixiy_t swap_ixiy) {}
 
 bool check_object_file_no_errors(const char* obj_filename) {
@@ -223,7 +227,7 @@ bool check_obj_lib_file(
     void(*do_error_file_open)(const char*),
     void(*do_error_file_type)(const char*),
     void(*do_error_version)(const char*, int, int),
-    void(*do_error_cpu_incompatible)(const char*, int),
+    void(*do_error_cpu_incompatible)(const char*, cpu_t),
     void(*do_error_ixiy_incompatible)(const char*, swap_ixiy_t))
 {
     FILE* fp = NULL;
@@ -264,8 +268,8 @@ bool check_obj_lib_file(
         fclose(fp);
         return false;
     }
-    if (version != CUR_VERSION) {
-        do_error_version(filename, version, CUR_VERSION);
+    if (version != OBJ_FILE_VERSION) {
+        do_error_version(filename, version, OBJ_FILE_VERSION);
         fclose(fp);
         return false;
     }
@@ -279,7 +283,7 @@ bool check_obj_lib_file(
     // only for object files
     
     // has right CPU?
-    int cpu_id = xfread_dword(fp);
+    cpu_t cpu_id = xfread_dword(fp);
     if (!cpu_compatible(option_cpu(), cpu_id)) {
         do_error_cpu_incompatible(filename, cpu_id);
         fclose(fp);

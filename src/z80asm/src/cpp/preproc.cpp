@@ -1,17 +1,19 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // preprocessor
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
 #include "args.h"
+#include "errors.h"
 #include "float.h"
 #include "if.h"
-#include "scan.h"
 #include "preproc.h"
+#include "scan2.h"
+#include "strpool.h"
 #include "utils.h"
-#include "errors.h"
+#include "xassert.h"
 #include <cassert>
 using namespace std;
 
@@ -649,7 +651,7 @@ bool Preproc::check_z80_ld_bit_opcodes() {
 
         string reg8 = m_line.peek(1).svalue();
         out.append(m_line.peek_tokens(3));
-        Assert(out.tokens().back().is(TType::Newline));
+        xassert(out.tokens().back().is(TType::Newline));
         out.tokens().pop_back();
         out.append({ Token{TType::Comma, false}, Token{TType::Ident, false, reg8},
                      Token{TType::Newline, false} });
@@ -666,7 +668,7 @@ bool Preproc::check_z80_ld_bit_opcodes() {
 
         string reg8 = m_line.peek(1).svalue();
         out.append(m_line.peek_tokens(3));
-        Assert(out.tokens().back().is(TType::Newline));
+        xassert(out.tokens().back().is(TType::Newline));
         out.tokens().pop_back();
         out.append({ Token{TType::Comma, false}, Token{TType::Ident, false, reg8},
                      Token{TType::Newline, false} });
@@ -1230,8 +1232,16 @@ void Preproc::do_setfloat() {
 		if (!sublexer.peek().is(TType::Newline))
 			g_errors.error(ErrCode::Syntax);
 		else if (!g_float_format.set_text(format))
-			g_errors.error(ErrCode::InvalidFloatFormat, FloatFormat::get_formats());
-		else {}
+			g_errors.error(ErrCode::IllegalFloatFormat, format);
+		else {
+            for (auto& define : FloatFormat::get_all_defines()) {
+                undefine_static_def_sym(define.c_str());
+                undefine_local_def_sym(define.c_str());
+            }
+
+            define_static_def_sym(get_float_format_define(), 1);
+            define_local_def_sym(get_float_format_define(), 1);
+		}
 	}
 }
 

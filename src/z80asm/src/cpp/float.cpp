@@ -1,12 +1,13 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
 #include "float.h"
 #include "if.h"
 #include "utils.h"
+#include "xassert.h"
 #include <cassert>
 #include <cerrno>
 #include <cmath>
@@ -44,7 +45,7 @@ static bool is_big_endian() {
 	else if (*c == 0x10)
 		return false;
 	else {
-		Assert(0);
+		xassert(0);
 		return false;	// not reached
 	}
 }
@@ -576,7 +577,7 @@ string FloatFormat::get_type() const {
 	};
 
 	auto found = map.find(m_format);
-	Assert(found != map.end());
+	xassert(found != map.end());
 	return found->second;
 }
 
@@ -606,7 +607,7 @@ vector<uint8_t> FloatFormat::float_to_bytes(double value) {
 #		define X(type)	case Format::type: return float_to_##type(value);
 #		include "float.def"
 	default:
-		Assert(0); return vector<uint8_t>();
+		xassert(0); return vector<uint8_t>();
 	}
 }
 
@@ -616,6 +617,14 @@ string FloatFormat::get_formats() {
 #	include "float.def"
 	if (!out.empty()) out.pop_back();	// remove end comma
 	return out;
+}
+
+vector<string> FloatFormat::get_all_defines() {
+    string all_defines;
+#	define X(type)	all_defines += str_toupper(string("__FLOAT_") + #type + "__") + " ";
+#	include "float.def"
+
+    return split(all_defines);
 }
 
 //-----------------------------------------------------------------------------

@@ -556,16 +556,22 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 if ( doconst_oper == 0 ) {
                     vllongconst_tostack(lval->const_val);
                 }
-                lval->val_type = KIND_LONGLONG;
-                lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
+                if (!ispointer(lval->ltype)) {
+                    lval->val_type = KIND_LONGLONG;
+                    lval->ltype = lval->ltype->isunsigned ? type_ulonglong : type_longlong;
+                }
             } else if ( lval2->val_type == KIND_LONG ) {
                 if ( doconst_oper == 0 ) {
                     vlongconst_tostack(lval->const_val); 
                 }
-                lval->val_type = KIND_LONG;
-                lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
+                if (!ispointer(lval->ltype)) {
+                    lval->val_type = KIND_LONG;
+                    lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
+                }
             } else {
-                lval->ltype = lval2->ltype->isunsigned ? type_uint : type_int;  
+                if (!ispointer(lval->ltype)) {
+                    lval->ltype = lval2->ltype->isunsigned ? type_uint : type_int;  
+                }
                 if ( doconst_oper == 0 ) {              
                     const2(lval->const_val);
                 }
@@ -580,6 +586,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     } else {
         /* non-constant on left - it's already loaded */
         int savesp1 = Zsp;
+
 
         setstage(&before1, &start1);
         // Get LHS onto the stack

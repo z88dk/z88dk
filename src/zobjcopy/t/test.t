@@ -1,7 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #-----------------------------------------------------------------------------
 # zobjcopy - manipulate z80asm object files
-# Copyright (C) Paulo Custodio, 2011-2022
+# Copyright (C) Paulo Custodio, 2011-2024
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #-----------------------------------------------------------------------------
 
@@ -142,18 +142,34 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 	unlink "test2.o";
 
 	ok check_z80nm("test.o", 		sprintf("t/bmk_obj_%02d.txt", $version));
+	(Test::More->builder->is_passing) or die;
+
 	ok check_zobjcopy("test.o", 	sprintf("t/bmk_obj_%02d.txt", $version));
+	(Test::More->builder->is_passing) or die;
+
 	ok run("z88dk-zobjcopy test.o test2.o");
+	(Test::More->builder->is_passing) or die;
+
 	ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_converted.txt", $version));
+	(Test::More->builder->is_passing) or die;
+
 	unlink "test.o", "test2.o";
 	
 	path("test.lib")->spew_raw($libfile[$version]);
 	unlink "test2.lib";
 	
 	ok check_z80nm("test.lib", 		sprintf("t/bmk_lib_%02d.txt", $version));
+	(Test::More->builder->is_passing) or die;
+
 	ok check_zobjcopy("test.lib", 	sprintf("t/bmk_lib_%02d.txt", $version));
+	(Test::More->builder->is_passing) or die;
+
 	ok run("z88dk-zobjcopy test.lib test2.lib");
+	(Test::More->builder->is_passing) or die;
+
 	ok check_zobjcopy("test2.lib", 	sprintf("t/bmk_lib_%02d_converted.txt", $version));
+	(Test::More->builder->is_passing) or die;
+	
 	unlink "test.lib", "test2.lib";
 }
 

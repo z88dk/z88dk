@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.2.0 #13131 (Linux)
+; File Created by SDCC : free open source ISO C Compiler
+; Version 4.4.0 #14648 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -400,40 +400,47 @@ _am9511_tanh:
 	push	af
 	push	af
 	call	_exp_fastcall
-	ex	(sp), hl
-	ld	(ix-6),e
-	ld	(ix-5),d
-	pop	de
-	pop	hl
 	push	hl
 	push	de
-	ex	de,hl
-	pop	hl
-	push	hl
 	push	de
 	push	hl
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
+	ld	bc,0x3f80
+	push	bc
+	ld	bc,0x0000
+	push	bc
 	call	___fsdiv_callee
-	push	hl
-	push	de
-	push	de
-	push	hl
-	ld	c,(ix-6)
-	ld	b,(ix-5)
-	push	bc
-	ld	c,(ix-8)
-	ld	b,(ix-7)
-	push	bc
-	call	___fssub_callee
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
 	pop	de
 	pop	hl
+	push	hl
+	push	de
+	ld	c,(ix-2)
+	ld	b,(ix-1)
+	push	bc
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	push	bc
+	push	de
+	push	hl
+	call	___fssub_callee
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
+	pop	de
+	pop	hl
+	ld	c,(ix-2)
+	ld	b,(ix-1)
+	push	bc
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	push	bc
+	push	de
+	push	hl
+	call	___fsadd_callee
 	push	de
 	push	hl
 	ld	l,(ix-6)
@@ -441,15 +448,6 @@ _am9511_tanh:
 	push	hl
 	ld	l,(ix-8)
 	ld	h,(ix-7)
-	push	hl
-	call	___fsadd_callee
-	push	de
-	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
 	push	hl
 	call	___fsdiv
 	ld	sp,ix

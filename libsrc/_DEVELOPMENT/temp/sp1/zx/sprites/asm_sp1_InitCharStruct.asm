@@ -5,10 +5,11 @@
 SECTION code_clib
 SECTION code_temp_sp1
 
+INCLUDE "config_private.inc"
+
 PUBLIC asm_sp1_InitCharStruct
 
 EXTERN _sp1_struct_cs_prototype
-EXTERN SP1V_ROTTBL
 
 asm_sp1_InitCharStruct:
 

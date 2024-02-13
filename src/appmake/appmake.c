@@ -1180,7 +1180,7 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
         {
             // find out if symbol corresponds to a section name
 
-            int len = strlen(symbol_name);
+            int len = (int)strlen(symbol_name);
             int type = 0;
 
             if ((len >= 6) && (symbol_name[0] == '_') && (symbol_name[1] == '_'))

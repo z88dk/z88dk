@@ -7,7 +7,7 @@
 void gbz80_ld_inm_sp(void)
 {
     mp= get_memory_inst(pc++);
-    put_memory(mp|= get_memory_inst(pc++)<<8, sp);
+    put_memory(mp|= get_memory_inst(pc++)<<8, sp & 0xff);
     put_memory(++mp,sp>>8);
     st += 20;
 }

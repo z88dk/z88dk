@@ -190,7 +190,7 @@ static int flushOutput(struct current *current)
 static int outputChars(struct current *current, const char *buf, int len)
 {
     if (len < 0) {
-        len = strlen(buf);
+        len = (int)strlen(buf);
     }
     assert(current->output);
 

@@ -46,7 +46,7 @@ IF VDP_CMD < 256
     ld      a,h		;4
     and     @00111111	;7
     VDPOUT(VDP_CMD)
-    push    bc
+    push    bc		;delay
     pop     bc
     VDPIN(VDP_DATAIN)
 ELSE
@@ -57,7 +57,7 @@ ELSE
     and     @00111111	; masked with "read command" bits
     out     (c), a
     ld      bc,VDP_DATAIN
-    push    bc
+    push    bc		;delay
     pop     bc
     in      a,(c)
     pop     bc
@@ -85,9 +85,11 @@ IF VDP_CMD < 256
     or      @01000000
     VDPOUT(VDP_CMD)
     ld      a,(__tms9918_pixelbyte)
-    push    bc
+    push    bc		;delay
     pop     bc
     VDPOUT(VDP_DATA)
+    push    bc		;delay
+    pop     bc
     ; And support colour as well
     ld      a,e
     VDPOUT(VDP_CMD)
@@ -113,7 +115,7 @@ ELSE
     pop     bc
     out     (c),a
     ld      bc,VDP_CMD
-    push    bc
+    push    bc		;delay
     pop     bc
     out     (c),e
     ld      a,d		; MSB of video mem ptr

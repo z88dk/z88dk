@@ -188,23 +188,17 @@ int z88_exec(char* target)
         exit_log(1, "Can't open binary file\n");
     }
 
-    if (fseek(binfile, 0, SEEK_END)) {
-        fclose(binfile);
-        exit_log(1, "Couldn't determine the size of the file\n");
-    }
-
-    filesize = ftell(binfile);
+    filesize = get_file_size(binfile);
+    
     if (filesize > 65536L) {
         fclose(binfile);
         exit_log(1, "The source binary is over 65,536 bytes in length.\n");
     }
 
-    fseek(binfile, 0, SEEK_SET);
-
     /* Check to see if we will infringe on the ROM header, if not then load it in */
     if (zorg + filesize <= MAX_ADDR) {
 
-        readlen = fread(memory + zorg, 1, filesize, binfile);
+        readlen = (int)fread(memory + zorg, 1, filesize, binfile);
 
         if (filesize != readlen) {
             fclose(binfile);
@@ -231,7 +225,7 @@ int z88_exec(char* target)
     hdr->cardid[0] = (cardidno % 256) & 127;
     hdr->cardid[1] = (cardidno / 256) & 127;
     hdr->cardid[2] = (cardidno % 65536) & 127;
-    hdr->cardid[3] = (cardidno / 65336) | 128;
+    hdr->cardid[3] = ((cardidno / 65336) | 128) % 256;
 
     hdr->cardsize = (char)pages;
     hdr->subtype = 0;

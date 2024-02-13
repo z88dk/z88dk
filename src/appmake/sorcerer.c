@@ -281,7 +281,7 @@ int sorcerer_exec(char* target)
 			writebyte_pk(toupper(name[2]), fpout, &parity);
 			writebyte_pk(0x5c, fpout, &parity);	/* Filename end marker */
 			/* Program Location */
-			writebyte_pk(pos/256, fpout, &parity);  /* MSB */
+			writebyte_pk((pos/256) % 256, fpout, &parity);  /* MSB */
 			writebyte_pk(pos%256, fpout, &parity);  /* LSB */
 			/* Program Length */
 			writebyte_pk(len/256, fpout, &parity);  /* MSB */

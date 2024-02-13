@@ -160,7 +160,7 @@ int dai_exec(char *target)
     size = binname_sb.st_size;
     writebyte_dai(0x31, fpout,fpwav,&cksum);  // File type
     cksum = 0x56;
-    size = strlen(blockname);
+    size = (int)strlen(blockname);
     writebyte_dai((size >> 8) & 0xff,fpout,fpwav,&cksum);
     writebyte_dai(size & 0xff,fpout,fpwav, &cksum);
     writebyte_dai(cksum,fpout,fpwav,&cksum);

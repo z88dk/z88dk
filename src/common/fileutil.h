@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // file utilities
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #pragma once
@@ -8,8 +8,24 @@
 #include "strutil.h"
 #include "types.h"
 #include "utstring.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef _WIN32
+#include <direct.h>
+#endif
+
+#if defined(_WIN32) && !defined(_CYGWIN)
+#include <unixem/glob.h>
+#endif
+#include <glob.h>
+#include <dirent.h>
+
 
 // pathname manipulation - strings are allocated in spool, no need to free
 
@@ -95,3 +111,29 @@ extern long file_size(const char *filename);		// -1 if not regular file
 
 // search for a file on the given directory list, return full path name in strin pool
 extern const char *path_search(const char *filename, argv_t *dir_list);
+
+// convert between file-representation (little-endian) to internal representation
+bool is_little_endian(void);
+int  parse_le_int32(const byte_t* mem);
+void write_le_int32(byte_t* mem, int value);
+
+// check OS retval
+extern int check_retval(int retval, const char* file, const char* source_file, int line_num);
+#define Check_retval(rv, file)	check_retval((rv), (file), __FILE__, __LINE__)
+
+#define xremove(file)		Check_retval(remove(file), (file))
+
+#ifdef _WIN32
+#define xmkdir(dir)			Check_retval(_mkdir(path_os(dir)), (dir))
+#define xrmdir(dir)			Check_retval(_rmdir(path_os(dir)), (dir))
+#else
+#define xmkdir(dir)			Check_retval(mkdir(path_os(dir), 0777), (dir))
+#define xrmdir(dir)			Check_retval(rmdir(path_os(dir)), (dir))
+#endif
+
+int xglob(const char* pattern, int flags, int(*errfunc) (const char* epath, int eerrno),
+    glob_t* pglob);
+
+#ifdef __cplusplus
+}
+#endif

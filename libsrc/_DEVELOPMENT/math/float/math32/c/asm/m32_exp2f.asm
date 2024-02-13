@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.2.0 #13131 (Linux)
+; File Created by SDCC : free open source ISO C Compiler
+; Version 4.4.0 #14648 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -343,14 +343,14 @@
 	GLOBAL _log10
 	GLOBAL _log_fastcall
 	GLOBAL _log
+	GLOBAL _ilogb_fastcall
+	GLOBAL _ilogb
 	GLOBAL _scalbln_callee
 	GLOBAL _scalbln
 	GLOBAL _scalbn_callee
 	GLOBAL _scalbn
 	GLOBAL _ldexp_callee
 	GLOBAL _ldexp
-	GLOBAL _ilogb_fastcall
-	GLOBAL _ilogb
 	GLOBAL _frexp_callee
 	GLOBAL _frexp
 	GLOBAL _expm1_fastcall
@@ -456,42 +456,38 @@ l_m32_exp2f_00102:
 	push	hl
 	call	___fsadd_callee
 	call	_m32_floorf
+	push	hl
+	push	de
+	push	de
+	push	hl
+	ld	c,(ix-6)
+	ld	b,(ix-5)
+	push	bc
+	ld	c,(ix-8)
+	ld	b,(ix-7)
+	push	bc
+	call	___fssub_callee
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
+	pop	de
+	pop	hl
 	push	de
 	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
+	call	___fs2sint_callee
 	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
+	ld	hl,0x0009
 	push	hl
-	call	___fssub_callee
+	ld	hl,_m32_coeff_exp2f
 	push	hl
-	push	de
 	ld	l,(ix-2)
 	ld	h,(ix-1)
 	push	hl
 	ld	l,(ix-4)
 	ld	h,(ix-3)
 	push	hl
-	call	___fs2sint_callee
-	ld	(ix-2),l
-	ld	(ix-1),h
-	pop	de
-	pop	bc
-	ld	hl,0x0009
-	push	hl
-	ld	hl,_m32_coeff_exp2f
-	push	hl
-	push	de
-	push	bc
 	call	_m32_polyf
-	ld	c,(ix-2)
-	ld	b,(ix-1)
-	push	bc
 	push	de
 	push	hl
 	call	_m32_ldexpf

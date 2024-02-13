@@ -520,14 +520,11 @@ Node *dofor(void)
     suspendbuffer();
 
     if ( testresult != 0 ) {  /* So it's either true or non-constant */      
-        if (bufferlen(buf2) > 0 ) 
-            gen_jp_label(l_condition,1); /*         goto loop                  */
+        gen_jp_label(l_condition,1); /*         goto loop                  */
         postlabel(wq.loop); /* .loop                              */
         clearbuffer(buf3); /*         modification               */
-        if (bufferlen(buf2) > 0 )  {
-            postlabel(l_condition); /* .condition                         */
-            clearbuffer(buf2); /*         if (!condition) goto exit  */
-        }
+        postlabel(l_condition); /* .condition                         */
+        clearbuffer(buf2); /*         if (!condition) goto exit  */
         pair = statement(); /*         statement                  */
         body = pair->node;
         gen_jp_label(wq.loop,1); /*         goto loop                  */

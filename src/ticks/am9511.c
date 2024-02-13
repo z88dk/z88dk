@@ -177,10 +177,10 @@ static void _apu_push_fix32(int64_t data) {
 		data += 4294967296L;
 	}
 	if (data > 4294967295UL || data < 0) _apu_status |= _APU_F_OVERFLOW;
-	_apu_push8(data);
-	_apu_push8(data >> 8);
-	_apu_push8(data >> 16);
-	_apu_push8(data >> 24);
+	_apu_push8(data & 0xff);
+	_apu_push8((data >> 8) & 0xff);
+	_apu_push8((data >> 16) & 0xff);
+	_apu_push8((data >> 24) & 0xff);
 }
 
 /* Foreword for FLOAT handling: I use natural float (well, double ...)

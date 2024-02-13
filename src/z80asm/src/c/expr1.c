@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -18,11 +18,14 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "init.h"
 #include "module1.h"
 #include "strhash.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symtab1.h"
-#include "utstring.h"
 #include "utlist.h"
+#include "utstring.h"
+#include "xassert.h"
+#include "xmalloc.h"
 
 /*-----------------------------------------------------------------------------
 *	UT_array of Expr1*
@@ -283,7 +286,7 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 			{
 				expr->result.extern_symbol = true;
 			}
-			else if (self->d.symbol->type == TYPE_UNKNOWN)
+			else if (self->d.symbol->type == TYPE_UNDEFINED)
 			{
 				expr->result.undefined_symbol = true;
 				if (not_defined_error)
@@ -331,32 +334,6 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 }
 
 /*-----------------------------------------------------------------------------
-*	Expression range
-*----------------------------------------------------------------------------*/
-
-/* return size in bytes of value of given range */
-int range_size(range_t range) {
-	switch (range) {
-	case RANGE_JR_OFFSET:		        return 1;
-	case RANGE_BYTE_UNSIGNED:	        return 1;
-	case RANGE_BYTE_SIGNED:		        return 1;
-	case RANGE_WORD:			        return 2;
-	case RANGE_WORD_BE:			        return 2;
-	case RANGE_DWORD:			        return 4;
-	case RANGE_BYTE_TO_WORD_UNSIGNED:   return 2;
-	case RANGE_BYTE_TO_WORD_SIGNED:     return 2;
-	case RANGE_PTR24:					return 3;
-	case RANGE_HIGH_OFFSET:				return 1;
-    case RANGE_ASSIGNMENT:              return 2;
-    case RANGE_JRE_OFFSET:		        return 2;
-    default: xassert(0);
-	}
-
-	xassert(0);
-	return -1;	/* not reached */
-}
-
-/*-----------------------------------------------------------------------------
 *	Class to hold one parsed expression
 *----------------------------------------------------------------------------*/
 DEF_CLASS(Expr1);
@@ -369,7 +346,7 @@ void Expr1_init(Expr1* self)
 
 	self->text = Str_new(STR_SIZE);
 
-	self->type = TYPE_UNKNOWN;
+	self->type = TYPE_UNDEFINED;
 
 	self->target_name = NULL;
 
@@ -628,7 +605,7 @@ Expr1* expr_parse(void) {
 	if (!Expr_parse_ternary_cond(self))
 	{
 		/* syntax error in expression */
-		error_syntax_expr();
+		error_syntax_error_in_expression();
 
 		OBJ_DELETE(self);
 		self = NULL;
@@ -844,7 +821,7 @@ static bool Expr_is_addr_diff1(Expr1* self, struct stack_item** phead) {
 			if (!op->d.symbol->is_defined)
 				return false;
 			switch (op->d.symbol->type) {
-			case TYPE_UNKNOWN:
+			case TYPE_UNDEFINED:
 				return false;
 			case TYPE_CONSTANT:
 				elt = xnew(struct stack_item);
@@ -1006,7 +983,11 @@ bool Expr_depends_on_one_symbol(Expr1* self, Section1** p_used_section) {
             else
                 *p_used_section = NULL;
             break;
-        case ASMPC_OP:
+        case ASMPC_OP:              // #2469
+            count_symbols++;
+            if (count_symbols != 1)
+                *p_used_section = NULL;
+            break;
         case NUMBER_OP:
         case UNARY_OP:
         case BINARY_OP:

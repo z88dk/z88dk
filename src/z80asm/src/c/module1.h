@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -12,14 +12,14 @@ Assembled module, i.e. result of assembling a .asm file
 #pragma once
 
 #include "class.h"
-#include "classlist.h"
 #include "classhash.h"
+#include "classlist.h"
 #include "codearea.h"
 #include "expr1.h"
+#include "objfile.h"
 #include "symtab1.h"
 #include "types.h"
-
-#include "objfile.h"
+#include "z80asm_defs.h"
 
 /*-----------------------------------------------------------------------------
 *   Assembly module

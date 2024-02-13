@@ -1,23 +1,25 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "if.h"
+#include "../config.h"
 #include "args.h"
 #include "errors.h"
 #include "float.h"
-#include "scan.h"
+#include "if.h"
 #include "preproc.h"
+#include "scan2.h"
+#include "strpool.h"
 #include "utils.h"
-#include "z80asm_cpu.h"
-#include "../config.h"
-#include <iostream>
-#include <iomanip>
+#include "xassert.h"
+#include "z80asm_defs.h"
 #include <cassert>
-#include <cstring>
 #include <climits>
+#include <cstring>
+#include <iomanip>
+#include <iostream>
 #include <map>
 using namespace std;
 
@@ -35,7 +37,7 @@ Args g_args;
 #define Z88DK_VERSION "build " __DATE__
 #endif
 
-#define COPYRIGHT		"InterLogic 1993-2009, Paulo Custodio 2011-2023"
+#define COPYRIGHT		"InterLogic 1993-2009, Paulo Custodio 2011-2024"
 
 #define COPYRIGHT_MSG	"Z80 Macro Assembler " Z88DK_VERSION "\n(c) " COPYRIGHT
 
@@ -148,7 +150,7 @@ void Args::set_swap_ixiy(swap_ixiy_t swap_ixiy) {
         define_static_symbol("__SWAP_IX_IY__");
         break;
     default:
-        Assert(0);
+        xassert(0);
     }
 }
 
@@ -264,8 +266,24 @@ string Args::reloc_filename(const string& bin_filename) {
 	return replace_ext(bin_filename, EXT_RELOC);
 }
 
+// Issue #2476: on msys2 a path "/d/xxx" must be changed to "d:/xxx"
+string Args::norm_filename(const string& filename) {
+    string cur_path = fs::current_path().generic_string();
+    if (cur_path.size() > 2 && isalpha(cur_path[0]) && cur_path[1] == ':' &&
+        filename.size() > 3 && filename[0] == '/' && isalpha(filename[1]) && filename[2] == '/')
+        return string(1, filename[1]) + ":" + filename.substr(2);
+    else
+        return filename;
+}
+
 void Args::parse_option(const string& arg) {
 	string opt_arg;
+
+    if (arg == "-vv") {
+        m_debug_z80asm = true;
+        m_verbose = true;
+        return;
+    }
 
 #define OPT(opt_name, opt_param, opt_code, opt_help)					\
 	if (opt_param == nullptr && string(opt_name) == arg) {				\
@@ -394,7 +412,12 @@ string Args::expand_env_vars(string text) {
 
 void Args::set_float_format(const string& format) {
 	if (!g_float_format.set_text(format))
-		g_errors.error(ErrCode::InvalidFloatFormat, FloatFormat::get_formats());
+		g_errors.error(ErrCode::IllegalFloatFormat, format);
+}
+
+void Args::set_float_option(const string& format) {
+	if (!g_float_format.set_text(format))
+		g_errors.error(ErrCode::IllegalFloatOption, format);
 }
 
 void Args::set_origin(const string& opt_arg) {
@@ -437,26 +460,32 @@ void Args::parse_file(const string& arg_) {
 		expand_source_glob(arg);
 }
 
-void Args::expand_source_glob(const string& pattern) {
+// get list of files from pattern
+void Args::expand_source_glob(const string& pattern_) {
+    string pattern = norm_filename(pattern_);           // #2476
 	size_t wc_pos = pattern.find_first_of("*?");
 	if (wc_pos == string::npos)
 		m_files.push_back(search_source(pattern));
 	else {
 		vector<fs::path> files;
 		expand_glob(files, pattern);
-
-		if (files.empty())
-			g_errors.error(ErrCode::GlobNoFiles, pattern);
-
+		
+        bool found = false;
 		for (auto& file : files) {
-			if (fs::is_regular_file(file))
+            if (fs::is_regular_file(file)) {
 				m_files.push_back(search_source(file.generic_string()));
+                found = true;
+            }
 		}
-	}
+
+        if (!found)
+            g_errors.error(ErrCode::GlobNoFiles, pattern);
+    }
 }
 
-void Args::expand_list_glob(const string& pattern) {
-	// get list of files from pattern
+// get list of files from pattern
+void Args::expand_list_glob(const string& pattern_) {
+    string pattern = norm_filename(pattern_);           // #2476
 	vector<fs::path> files;
 	size_t wc_pos = pattern.find_first_of("*?");
 	if (wc_pos == string::npos) {
@@ -467,7 +496,7 @@ void Args::expand_list_glob(const string& pattern) {
 	}
 	else {
 		expand_glob(files, pattern);			// list of files
-		if (files.empty())
+        if (files.empty())
 			g_errors.error(ErrCode::GlobNoFiles, pattern);
 	}
 
@@ -505,60 +534,75 @@ void Args::expand_list_glob(const string& pattern) {
 // search for the first file in path, with the given extension,
 // with .asm extension and with .o extension
 // if not found, output error and return original file
+// run m4 if file is .asm.m4
 string Args::search_source(const string& filename) {
-    string out_filename;
+    if (str_ends_with(filename, EXT_M4)) {
+        string asm_filename = filename.substr(0, filename.size() - strlen(EXT_M4));
+        string m4_cmd = "m4 " + m_m4_options + " \"" + filename + "\" > \"" + asm_filename + "\"";
+        if (m_verbose)
+            cout << "% " << m4_cmd << endl;
+        if (0 != system(m4_cmd.c_str())) {
+			g_errors.error(ErrCode::CmdFailed, m4_cmd);
+            perror("m4");
+            exit(EXIT_FAILURE);
+        }
+        return search_source(asm_filename);
+    }
+    else {
+        string out_filename;
 
-    // check plain filename
-    if (check_source(filename, out_filename))
-        return out_filename;
+        // check plain filename
+        if (check_source(filename, out_filename))
+            return out_filename;
 
-    // check plain file in include path
-    string found_file = search_include_path(filename);
-    if (found_file != filename && check_source(found_file, out_filename))
-        return out_filename;
+        // check plain file in include path
+        string found_file = search_include_path(filename);
+        if (found_file != filename && check_source(found_file, out_filename))
+            return out_filename;
 
-    // check filename with .asm extension
-    string asm_file = filename + EXT_ASM;
-    if (check_source(asm_file, out_filename))
-        return out_filename;
+        // check filename with .asm extension
+        string asm_file = filename + EXT_ASM;
+        if (check_source(asm_file, out_filename))
+            return out_filename;
 
-    // check filename with .asm extension in include path
-    found_file = search_include_path(asm_file);
-    if (found_file != asm_file && check_source(found_file, out_filename))
-        return out_filename;
+        // check filename with .asm extension in include path
+        found_file = search_include_path(asm_file);
+        if (found_file != asm_file && check_source(found_file, out_filename))
+            return out_filename;
 
-    // check filename with .o extension
-    string o_file = filename + EXT_O;
-    if (check_source(o_file, out_filename))
-        return out_filename;
+        // check filename with .o extension
+        string o_file = filename + EXT_O;
+        if (check_source(o_file, out_filename))
+            return out_filename;
 
-    // check filename with .o extension in include path
-    found_file = search_include_path(o_file);
-    if (found_file != o_file && check_source(found_file, out_filename))
-        return out_filename;
+        // check filename with .o extension in include path
+        found_file = search_include_path(o_file);
+        if (found_file != o_file && check_source(found_file, out_filename))
+            return out_filename;
 
-    // check object file in the output directory
-    o_file = o_filename(filename);
-    if (check_source(o_file, out_filename))
-        return out_filename;
+        // check object file in the output directory
+        o_file = o_filename(filename);
+        if (check_source(o_file, out_filename))
+            return out_filename;
 
-    // check filename with .o extension in include path
-    found_file = search_include_path(o_file);
-    if (found_file != o_file && check_source(found_file, out_filename))
-        return out_filename;
+        // check filename with .o extension in include path
+        found_file = search_include_path(o_file);
+        if (found_file != o_file && check_source(found_file, out_filename))
+            return out_filename;
 
-    // not found, avoid cascade of errors
-    if (g_errors.count() == 0)
-        g_errors.error(ErrCode::FileNotFound, filename);
+        // not found, avoid cascade of errors
+        if (!g_errors.count())
+            g_errors.error(ErrCode::FileNotFound, filename);
 
-    return fs::path(filename).generic_string();
+        return fs::path(filename).generic_string();
+    }
 }
 
 bool Args::check_source(const string& filename, string& out_filename) {
     out_filename.clear();
 
     // avoid cascade of errors
-    if (g_errors.count() > 0) {
+    if (g_errors.count()) {
         out_filename = fs::path(filename).generic_string();
         return true;
     }
@@ -577,7 +621,7 @@ bool Args::check_source(const string& filename, string& out_filename) {
         src_file = file_path;
         obj_file = o_filename(filename);
     }
-    else if (fs::is_regular_file(file_path)) {      // ASM with different extentension
+    else if (fs::is_regular_file(file_path)) {      // ASM with different extension
         got_obj = false;
         src_file = file_path;
         obj_file = o_filename(filename);
@@ -837,7 +881,7 @@ void Args::set_cpu(int cpu) {
         define_static_symbol("__CPU_KC160_Z80__");
         break;
     default:
-        Assert(0);
+        xassert(0);
     }
 }
 
@@ -860,15 +904,10 @@ void Args::set_cpu(const string& name) {
     }
     else {
         int id = cpu_id(name.c_str());
-        if (id >= 0)
+        if (id != CPU_UNDEF)
             set_cpu(id);
-        else {
-            string error = name + "; expected: " + cpu_list() + ",";
-            error += string(ARCH_TI83_NAME) + ",";
-            error += string(ARCH_TI83PLUS_NAME) + ",";
-            error.pop_back(); // remove last comma
-            g_errors.error(ErrCode::InvalidCpu, error);
-        }
+        else 
+            g_errors.error(ErrCode::IllegalCpuOption, name);
     }
 }
 
@@ -918,7 +957,7 @@ void Args::parse_env_vars() {
 void Args::set_consol_obj_options() {
 	if (!m_make_bin && !m_bin_file.empty()) {
 		m_consol_obj_file = m_bin_file;
-		m_make_bin = false;
+		m_bin_file.clear();
 	}
 }
 
@@ -1046,7 +1085,7 @@ const char* search_includes(const char* filename) {
 	return spool_add(searched_file.c_str());
 }
 
-int option_cpu() {
+cpu_t option_cpu() {
 	return g_args.cpu();
 }
 
@@ -1226,4 +1265,8 @@ size_t option_files_size() {
 
 const char* option_file(size_t n) {
 	return spool_add(g_args.files().at(n).c_str());
+}
+
+bool option_debug_z80asm() {
+    return g_args.debug_z80asm();
 }

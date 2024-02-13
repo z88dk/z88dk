@@ -28,6 +28,7 @@ target/agon/graphics/w_pointxy
 target/agon/graphics/w_xorpixl
 target/agon/fcntl/open
 target/agon/fcntl/close
+target/agon/fcntl/fsync
 target/agon/fcntl/read
 target/agon/fcntl/readbyte
 target/agon/fcntl/write

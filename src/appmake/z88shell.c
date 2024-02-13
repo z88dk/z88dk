@@ -78,20 +78,14 @@ int z88shell_exec(char* target)
     if (binfile == NULL)
         exit_log(1,"Can't open binary file\n");
 
-    if (fseek(binfile, 0, SEEK_END)) {
-        fclose(binfile);
-        exit_log(1,"Couldn't determine the size of the file\n", 1);
-    }
-
-    filesize = ftell(binfile);
+    filesize = get_file_size(binfile);
+    
     if (filesize > 65536L) {
         fclose(binfile);
         exit_log(1,"The source binary is over 65,536 bytes in length.\n");
     }
 
-    fseek(binfile, 0, SEEK_SET);
-
-    readlen = fread(memory, 1, filesize, binfile);
+    readlen = (int)fread(memory, 1, filesize, binfile);
 
     if (filesize != readlen) {
         fclose(binfile);

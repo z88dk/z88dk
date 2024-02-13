@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // utils
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -25,14 +25,6 @@ using namespace std;
 	#include <boost/filesystem.hpp>
 	namespace fs = boost::filesystem;
 #endif
-
-// Assert for internal errors, similar to assert but not removed in release builds
-#define Assert(f)    do { \
-                        if (!(f)) { \
-                            cerr << Z80ASM_PROG << " panic at " << __FILE__ << ":" << __LINE__ << endl; \
-                            exit(EXIT_FAILURE); \
-                        } \
-                    } while(0)
 
 // ctype.h on MSVC asserts that character is in range -1 to 255; this fails for signed chars
 inline bool is_alnum(char c) { return c > 0 && isalnum(c); }
@@ -73,6 +65,8 @@ string str_remove_extra_blanks(const string& str);	// replace sequences of blank
 
 // search_replace
 string str_replace_all(string text, const string& find, const string& replace);
+
+vector<string> split(const string& s);
 
 // globs a pattern including *, ? and ** and returns all matching files and directories
 void expand_glob(vector<fs::path>& result, const string& pattern);

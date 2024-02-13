@@ -61,7 +61,6 @@ extern "C" {
 #include <sys/compiler.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <math.h>
 
 // fixed point arithmetic
 
@@ -92,6 +91,7 @@ extern int __LIB__ f2i (long v) __z88dk_fastcall;
 
 #ifdef __MATH_AM9511
 
+    #include <math.h>
     #define ELEMENT     float_t
 
     #define INV(x)      1/(x)
@@ -104,6 +104,7 @@ extern int __LIB__ f2i (long v) __z88dk_fastcall;
 
 #elif __MATH_MATH32
 
+    #include <math.h>
     #define ELEMENT     float_t
 
     #define INV(x)      inv(x)
@@ -116,6 +117,7 @@ extern int __LIB__ f2i (long v) __z88dk_fastcall;
 
 #elif __MATH_MATH16
 
+    #include <math.h>
     #define ELEMENT     _Float16
 
     #define INV(x)      invf16(x)

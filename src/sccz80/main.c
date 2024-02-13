@@ -17,6 +17,8 @@ static char   *c_output_file = NULL;
 static char    c_debug_adb_file = 0;
 static char    c_debug_adb_defc = 0;
        char    c_debug_entry_points = 0;
+int     c_banked_style = BANKED_STYLE_REGULAR;
+
 
 static int      gargc; /* global copies of command line args */
 static char   **gargv;
@@ -104,7 +106,9 @@ static option  sccz80_opts[] = {
     { 0, "params-offset", OPT_INT, "=<num> Base offset for the function parameters (default: 2)",&c_params_offset,NULL, 0},
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, NULL, 0 },
     { 0, "math-z88", OPT_ASSIGN|OPT_INT, "(deprecated) Make FP constants match z88", &c_maths_mode, NULL, MATHS_Z88 },
-
+    { 0, "banked-style=regular", OPT_ASSIGN|OPT_INT, "Use regular banked calling style", &c_banked_style, NULL, BANKED_STYLE_REGULAR },
+    { 0, "banked-style=ti", OPT_ASSIGN|OPT_INT, "Use ticalc banked calling style", &c_banked_style, NULL, BANKED_STYLE_TICALC },
+    
     { 0, "fp-exponent-bias", OPT_INT, "=<num> FP exponent bias (default: 128)", &c_fp_exponent_bias, NULL, 0 },
     { 0, "fp-mantissa-size", OPT_INT, "=<num> FP mantissa size (default: 5 bytes)", &c_fp_mantissa_bytes, NULL, 0 },
     { 0, "fp-mode=z80", OPT_ASSIGN|OPT_INT, "Use 48 bit doubles", &c_maths_mode, NULL, MATHS_Z80 },
@@ -438,7 +442,7 @@ void info(void)
 {
     fputs(titlec, stderr);
     fputs(Version, stderr);
-    fputs("\n(C) 1980-2022 Cain, Van Zandt, Hendrix, Yorston, z88dk\n", stderr);
+    fputs("\n(C) 1980-2023 Cain, Van Zandt, Hendrix, Yorston, z88dk\n", stderr);
     fprintf(stderr, "Usage: %s [flags] [file]\n", gargv[0]);
 }
 
@@ -504,6 +508,11 @@ static void dumpfns(void)
                     GlobalPrefix();                    
                     outname(ptr->name, dopref(ptr)); nl();
                     debug_write_symbol(ptr);
+                    if ( ptr->ctype->flags & BANKED && c_banked_style == BANKED_STYLE_TICALC) {
+                         GlobalPrefix();
+                         outstr(BANKED_SYMBOL_PREFIX);
+                         outname(ptr->name, dopref(ptr)); nl();
+                    }
                 }
                 if ( ptr->flags & ASSIGNED_ADDR ) {
                     outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("\t= %d\n", ptr->ctype->value);
@@ -998,3 +1007,4 @@ void* mymalloc(size_t size)
     }
     return 0; /* Sigh */
 }
+

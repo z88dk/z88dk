@@ -2,7 +2,7 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -17,17 +17,18 @@ Define ragel-based parser.
 #include "expr1.h"
 #include "if.h"
 #include "module1.h"
-#include "z80asm_cpu.h"
 #include "opcodes.h"
 #include "parse1.h"
 #include "scan1.h"
 #include "str.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symtab1.h"
 #include "utarray.h"
 #include "utstring.h"
-#include "zutils.h"
+#include "xassert.h"
+#include "z80asm_defs.h"
 #include <ctype.h>
 
 /*-----------------------------------------------------------------------------
@@ -81,7 +82,7 @@ struct Expr1 *parse_expr(const char *expr_text)
 			expr = expr_parse();		/* may output error */
 			if (sym.tok != TK_END && sym.tok != TK_NEWLINE &&
 				num_errors == get_num_errors()) {
-				error_syntax();
+				error_syntax_error();
 				OBJ_DELETE(expr);
 				expr = NULL;
 			}
@@ -262,8 +263,8 @@ static void read_token(ParseCtx *ctx)
 	int p_index;
 	int expr_start_index;
 
-	p_index = ctx->p ? ctx->p - (Sym *)utarray_front(ctx->tokens) : -1;
-	expr_start_index = ctx->expr_start ? ctx->expr_start - (Sym *)utarray_front(ctx->tokens) : -1;
+	p_index = (int)(ctx->p ? ctx->p - (Sym *)utarray_front(ctx->tokens) : -1);
+	expr_start_index = (int)(ctx->expr_start ? ctx->expr_start - (Sym *)utarray_front(ctx->tokens) : -1);
 
 	sym_copy = sym;
 
@@ -337,7 +338,7 @@ void parse_const_expr_eval(const char* expr_text, int* result, bool* error) {
 		// eval and discard expression
 		*result = Expr_eval(expr, true);
 		if (expr->result.not_evaluable) {
-			error_expected_const_expr();
+			error_constant_expression_expected();
 			*error = true;
 		}
 		OBJ_DELETE(expr);
@@ -408,7 +409,7 @@ static void parseline(ParseCtx *ctx)
 	else if (!parse_statement(ctx))
 	{
 		if (get_num_errors() == start_num_errors) {	/* no error output yet */
-			error_syntax();
+			error_syntax_error();
 			ctx->current_sm = SM_MAIN;				/* reset state machine */
 		}
 

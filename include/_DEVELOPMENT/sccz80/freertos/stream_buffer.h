@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.1+
+ * FreeRTOS Kernel V11.0.1
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -986,6 +986,67 @@ extern BaseType_t __LIB__ xStreamBufferReceiveCompletedFromISR(StreamBufferHandl
 
 
 
+/**
+ * stream_buffer.h
+ *
+ * @code{c}
+ * UBaseType_t uxStreamBufferGetStreamBufferNotificationIndex( StreamBufferHandle_t xStreamBuffer );
+ * @endcode
+ *
+ * Get the task notification index used for the supplied stream buffer which can
+ * be set using vStreamBufferSetStreamBufferNotificationIndex. If the task
+ * notification index for the stream buffer is not changed using
+ * vStreamBufferSetStreamBufferNotificationIndex, this function returns the
+ * default value (tskDEFAULT_INDEX_TO_NOTIFY).
+ *
+ * @param xStreamBuffer The handle of the stream buffer for which the task
+ * notification index is retrieved.
+ *
+ * @return The task notification index for the stream buffer.
+ *
+ * \defgroup uxStreamBufferGetStreamBufferNotificationIndex uxStreamBufferGetStreamBufferNotificationIndex
+ * \ingroup StreamBufferManagement
+ */
+/*
+UBaseType_t uxStreamBufferGetStreamBufferNotificationIndex( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
+ */
+extern UBaseType_t __LIB__ uxStreamBufferGetStreamBufferNotificationIndex(StreamBufferHandle_t xStreamBuffer) __smallc;
+
+
+
+/**
+ * stream_buffer.h
+ *
+ * @code{c}
+ * void vStreamBufferSetStreamBufferNotificationIndex ( StreamBuffer_t xStreamBuffer, UBaseType_t uxNotificationIndex );
+ * @endcode
+ *
+ * Set the task notification index used for the supplied stream buffer.
+ * Successive calls to stream buffer APIs (like xStreamBufferSend or
+ * xStreamBufferReceive) for this stream buffer will use this new index for
+ * their task notifications.
+ *
+ * If this function is not called, the default index (tskDEFAULT_INDEX_TO_NOTIFY)
+ * is used for task notifications. It is recommended to call this function
+ * before attempting to send or receive data from the stream buffer to avoid
+ * inconsistencies.
+ *
+ * @param xStreamBuffer The handle of the stream buffer for which the task
+ * notification index is set.
+ *
+ * @param uxNotificationIndex The task notification index to set.
+ *
+ * \defgroup vStreamBufferSetStreamBufferNotificationIndex vStreamBufferSetStreamBufferNotificationIndex
+ * \ingroup StreamBufferManagement
+ */
+/*
+void vStreamBufferSetStreamBufferNotificationIndex( StreamBufferHandle_t xStreamBuffer,
+                                                    UBaseType_t uxNotificationIndex ) PRIVILEGED_FUNCTION;
+ */
+extern void __LIB__ vStreamBufferSetStreamBufferNotificationIndex(StreamBufferHandle_t xStreamBuffer,UBaseType_t uxNotificationIndex) __smallc;
+
+
+
 /* Functions below here are not part of the public API. */
 /*
 StreamBufferHandle_t xStreamBufferGenericCreate( size_t xBufferSizeBytes,
@@ -993,24 +1054,29 @@ StreamBufferHandle_t xStreamBufferGenericCreate( size_t xBufferSizeBytes,
                                                  BaseType_t xIsMessageBuffer,
                                                  StreamBufferCallbackFunction_t pxSendCompletedCallback,
                                                  StreamBufferCallbackFunction_t pxReceiveCompletedCallback ) PRIVILEGED_FUNCTION;
-
-
-StreamBufferHandle_t xStreamBufferGenericCreateStatic( size_t xBufferSizeBytes,
-                                                       size_t xTriggerLevelBytes,
-                                                       BaseType_t xIsMessageBuffer,
-                                                       uint8_t * const pucStreamBufferStorageArea,
-                                                       StaticStreamBuffer_t * const pxStaticStreamBuffer,
-                                                       StreamBufferCallbackFunction_t pxSendCompletedCallback,
-                                                       StreamBufferCallbackFunction_t pxReceiveCompletedCallback ) PRIVILEGED_FUNCTION;
-
-size_t xStreamBufferNextMessageLengthBytes( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-*/
+ */
 extern StreamBufferHandle_t __LIB__ xStreamBufferGenericCreate(size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,StreamBufferCallbackFunction_t pxSendCompletedCallback,StreamBufferCallbackFunction_t pxReceiveCompletedCallback) __smallc;
 
 
-extern StreamBufferHandle_t __LIB__ xStreamBufferGenericCreateStatic(size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,uint8_t * const pucStreamBufferStorageArea,StaticStreamBuffer_t * const pxStaticStreamBuffer,StreamBufferCallbackFunction_t pxSendCompletedCallback,StreamBufferCallbackFunction_t pxReceiveCompletedCallback) __smallc;
+
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+/*
+    StreamBufferHandle_t xStreamBufferGenericCreateStatic( size_t xBufferSizeBytes,
+                                                           size_t xTriggerLevelBytes,
+                                                           BaseType_t xIsMessageBuffer,
+                                                           uint8_t * const pucStreamBufferStorageArea,
+                                                           StaticStreamBuffer_t * const pxStaticStreamBuffer,
+                                                           StreamBufferCallbackFunction_t pxSendCompletedCallback,
+                                                           StreamBufferCallbackFunction_t pxReceiveCompletedCallback ) PRIVILEGED_FUNCTION;
+ */
+    extern StreamBufferHandle_t __LIB__ xStreamBufferGenericCreateStatic(size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,uint8_t * const pucStreamBufferStorageArea,StaticStreamBuffer_t * const pxStaticStreamBuffer,StreamBufferCallbackFunction_t pxSendCompletedCallback,StreamBufferCallbackFunction_t pxReceiveCompletedCallback) __smallc;
 
 
+#endif
+
+/*
+size_t xStreamBufferNextMessageLengthBytes( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
+*/
 extern size_t __LIB__ xStreamBufferNextMessageLengthBytes(StreamBufferHandle_t xStreamBuffer) __smallc;
 
 

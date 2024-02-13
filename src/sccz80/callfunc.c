@@ -41,7 +41,7 @@ static char **tmpfiles = NULL;
 static int    tmpfiles_num = 0;
 
 
-static void cleanup_tmpfiles() {
+static void cleanup_tmpfiles(void) {
     int  i;
 
     for ( i = 0; i < tmpfiles_num; i++ ) {
@@ -282,7 +282,7 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
             if ( (functype->flags & SMALLC) == SMALLC)  {
                 proto_argnumber = argnumber - 1;                
             } else {
-                proto_argnumber = array_len(functype->parameters) - argnumber;                
+                proto_argnumber = (int)array_len(functype->parameters) - argnumber;
             }
             prototype = array_get_byindex(functype->parameters, proto_argnumber);
 
@@ -375,7 +375,7 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
         } else if ( functype->flags & HL_CALL ) {
             gen_hl_call(functype, functype->funcattrs.hlcall_module, functype->funcattrs.hlcall_addr);
         } else if ( functype->flags & BANKED ) {
-            gen_bankedcall(ptr);
+            gen_bankedcall(ptr, functype);
         } else {
             gen_call(va_arg_count, funcname, ptr);
         }

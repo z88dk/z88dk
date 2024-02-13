@@ -169,7 +169,7 @@ int mu_compare_ans(void)
 	FILE *ans_file = NULL, *out_file = NULL;
 	int result = MU_FAIL;
 	char buffer1[1024], buffer2[1024];
-	int  read1, read2;
+	size_t read1, read2;
 
 	if ( g_run_test != NULL )
 		return MU_PASS;					/* not running all tests, don't check .out file */

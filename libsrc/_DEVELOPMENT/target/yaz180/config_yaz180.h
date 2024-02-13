@@ -23,7 +23,7 @@
 
 
 #undef  __Z88DK
-#define __Z88DK  2200
+#define __Z88DK  2300
 
 
 

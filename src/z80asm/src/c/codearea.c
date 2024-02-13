@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Macro Assembler
 
-Copyright (C) Paulo Custodio, 2011-2023
+Copyright (C) Paulo Custodio, 2011-2024
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -14,9 +14,12 @@ Manage the code area in memory
 #include "if.h"
 #include "init.h"
 #include "module1.h"
+#include "objfile.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "utstring.h"
-#include "z80asm.h"
+#include "xassert.h"
+#include "z80asm1.h"
 #include <memory.h>
 
 /*-----------------------------------------------------------------------------
@@ -106,7 +109,7 @@ void reset_codearea( void )
 int get_section_size( Section1 *section )
 {
     init_module();
-    return ByteArray_size( section->bytes );
+    return (int)ByteArray_size(section->bytes);
 }
 
 /*-----------------------------------------------------------------------------
@@ -151,7 +154,7 @@ Section1 *new_section( const char *name )
 		/* define start address of all existing modules = 0, except for default section */
 		if ( g_default_section != NULL && *name != '\0' )
 		{
-			last_id = intArray_size( g_default_section->module_start ) - 1;
+            last_id = (int)intArray_size(g_default_section->module_start) - 1;
 			if ( last_id >= 0 )
 				intArray_item( g_cur_section->module_start, last_id );		/* init [0..module_id] to zero */
 		}
@@ -209,7 +212,7 @@ Section1 *get_next_section(  Section1HashElem **piter )
 static int get_last_module_id( void )
 {
 	init_module();
-	return intArray_size( g_default_section->module_start ) - 1;
+    return (int)(intArray_size(g_default_section->module_start) - 1);
 }
 
 int get_cur_module_id( void )
@@ -236,7 +239,7 @@ static int section_module_start( Section1 *section, int module_id )
 	int cur_size;
 	
     init_module();
-	cur_size = intArray_size( section->module_start );
+    cur_size = (int)intArray_size(section->module_start);
 	if ( cur_size > module_id )
 		addr = *( intArray_item( section->module_start, module_id ) );
 	else
@@ -631,7 +634,7 @@ void set_origin_directive(int origin)
 				CURRENTSECTION->origin = origin;
 		}
 		else
-			error_int_range(origin);
+			error_integer_range(origin);
 	}
 }
 
@@ -641,7 +644,7 @@ void set_origin_option(int origin)
 	Section1 *default_section;
 
 	if (origin < 0)		// value can be >0xffff for banked address
-		error_int_range((long)origin);
+		error_integer_range((long)origin);
 	else
 	{
 		default_section = get_first_section(NULL);
@@ -686,7 +689,7 @@ void set_phase_directive(int address)
 	if (address >= 0 && address <= 0xFFFF)
 		CURRENTSECTION->asmpc_phase = address;
 	else
-		error_int_range(address);
+		error_integer_range(address);
 }
 
 void clear_phase_directive()

@@ -21,7 +21,7 @@ __agon_draw:
     ; Plot the origin pixel
     ld      a,25
     call    __agon_putc
-    ld      a,$41
+    ld      a,$45
     call    __agon_putc
     ld      hl,(ix+6)
     call    __agon_putword

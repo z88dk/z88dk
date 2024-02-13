@@ -5,4 +5,4 @@ arch/zx/bifrost_l/z80/asm_BIFROSTL_resetAnim2Frames
 arch/zx/bifrost_l/z80/asm_BIFROSTL_resetAnim4Frames
 arch/zx/bifrost_l/z80/asm_BIFROSTL_setTile
 arch/zx/bifrost_l/z80/asm_BIFROSTL_stop
-arch/zx/bifrost_l/z80/BIFROSTL_ENGINE
+arch/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm.m4

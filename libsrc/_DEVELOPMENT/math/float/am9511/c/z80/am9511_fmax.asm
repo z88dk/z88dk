@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.2.0 #13131 (Linux)
+; File Created by SDCC : free open source ISO C Compiler
+; Version 4.4.0 #14648 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -432,7 +432,6 @@ l_am9511_fmax_callee_00103:
 	pop	af
 	push	bc
 	ret
-	SECTION code_compiler
 ;	---------------------------------
 ; Function am9511_fmax
 ; ---------------------------------

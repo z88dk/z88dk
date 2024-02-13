@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // list files
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -9,6 +9,7 @@
 #include "if.h"
 #include "lstfile.h"
 #include "utils.h"
+#include "xassert.h"
 #include <cassert>
 #include <iomanip>
 using namespace std;
@@ -93,7 +94,7 @@ void LstFile::patch_bytes(int asmpc, const vector<uint8_t>& bytes) {
 		for (int i = 0; i < static_cast<int>(bytes.size()); i++) {
 			int addr = asmpc + i;
 			auto it = m_patch_pos.find(addr);
-			Assert(it != m_patch_pos.end());		// address must exist
+			xassert(it != m_patch_pos.end());		// address must exist
 
 			m_ofs.seekp(it->second);				// seek position and patch in file
 			m_ofs << setw(2)

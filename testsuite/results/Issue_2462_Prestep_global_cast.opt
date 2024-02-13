@@ -1,0 +1,123 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func_global
+	ld	hl,(_gsp)
+	dec	hl
+	dec	hl
+	ld	(_gsp),hl
+	push	hl
+	ld	hl,(_gdi)
+	inc	hl
+	inc	hl
+	ld	(_gdi),hl
+	call	l_gint	;
+	pop	de
+	call	l_pint
+	ret
+
+
+
+._func_local
+	push	bc
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	dec	hl
+	pop	de
+	call	l_pint
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	inc	hl
+	inc	hl
+	pop	de
+	call	l_pint
+	call	l_gint	;
+	pop	de
+	call	l_pint
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func_mixed1
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	dec	hl
+	pop	de
+	call	l_pint
+	push	hl
+	ld	hl,(_gdi)
+	inc	hl
+	inc	hl
+	ld	(_gdi),hl
+	call	l_gint	;
+	pop	de
+	call	l_pint
+	pop	bc
+	ret
+
+
+
+._func_mixed2
+	push	bc
+	ld	hl,(_gsp)
+	dec	hl
+	dec	hl
+	ld	(_gsp),hl
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	inc	hl
+	inc	hl
+	pop	de
+	call	l_pint
+	call	l_gint	;
+	pop	de
+	call	l_pint
+	pop	bc
+	ret
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	SECTION	bss_compiler
+._gdi	defs	2
+._gsp	defs	2
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_gdi
+	GLOBAL	_gsp
+	GLOBAL	_func_global
+	GLOBAL	_func_local
+	GLOBAL	_func_mixed1
+	GLOBAL	_func_mixed2
+
+
+
+

@@ -1,13 +1,14 @@
 //-----------------------------------------------------------------------------
 // file utilities
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2024
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
-#include "unity.h"
+
 #include "die.h"
 #include "fileutil.h"
-#include "zutils.h"
-
+#include "strutil.h"
+#include "unity.h"
+#include "xassert.h"
 #include <limits.h>
 #include <stdio.h>
 
@@ -1193,4 +1194,20 @@ void t_fileutil_path_find_glob(void)
 
 	path_rmdir("test_dir");
 	TEST_ASSERT(!dir_exists("test_dir"));
+}
+
+void t_fileutil_is_little_endian(void) {
+#ifdef _WIN32
+    TEST_ASSERT(is_little_endian());
+#endif
+}
+
+void t_fileutil_parse_le_int32(void) {
+    TEST_ASSERT_EQUAL(0x12345678, parse_le_int32((const byte_t*)"\x78\x56\x34\x12"));
+}
+
+void t_fileutil_write_le_int32(void) {
+    byte_t mem[sizeof(int32_t)];
+    write_le_int32(mem, 0x12345678);
+    TEST_ASSERT_EQUAL(0, memcmp(mem, "\x78\x56\x34\x12", sizeof(int32_t)));
 }

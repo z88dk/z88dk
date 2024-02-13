@@ -21,7 +21,7 @@ __agon_drawr:
     ;Plot pixel
     ld      a,25
     call    __agon_putc
-    ld      a,$41
+    ld      a,$45
     call    __agon_putc
     ld      hl,(__gfx_coords)
     call    __agon_putword

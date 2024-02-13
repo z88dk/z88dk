@@ -24,6 +24,10 @@ Z88DK Z80 Module Assembler Change Log
 2023-10-16 Fix #2420: detect '-lstdc++fs', remove external Perl dependencies
 2023-10-16 Fix #2417: accept file names with spaces in list files without quotes
 2023-10-17 Fix #2422: Parallel build issues
+2023-10-17 Fix #2422: Ignore mkdir error if dir exists
+2023-10-19 Fix #2418: move DEFC alias to section of copied symbol
+2023-11-30 Fix "add dd,NNN" on ez80 ADL mode
+2323-12-21 Fix #2463: add m4 preprocessing to z80asm
 
 2022
 ----

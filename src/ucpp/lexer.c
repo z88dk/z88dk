@@ -683,7 +683,7 @@ static int utf8_to_string(unsigned char buf[], unsigned long utf8)
 		val = x4 | (x3 << 6) | (x2 << 12) | (x1 << 16);
 	} else val = utf8;
 	if (val < 128) {
-		buf[0] = val;
+		buf[0] = val & 0xff;
 		buf[1] = 0;
 		return 1;
 	} else if (val < 0xffffUL) {
