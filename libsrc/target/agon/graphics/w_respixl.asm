@@ -41,7 +41,7 @@ w_respixel:
     ; VDU 25, n, 640; 512;
     ld      a,25
     call    __agon_putc
-    ld      a,$41
+    ld      a,$45
     call    __agon_putc
     call    __agon_putword
     ex      de,hl
