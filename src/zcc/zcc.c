@@ -1749,12 +1749,15 @@ int main(int argc, char **argv)
         }
 
 		// z80asm now generates def file with same basename as output binary, i.e. a.def
-		/*
+
+        /*
 		if (globaldefon && copy_defc_file(c_crt0, ".def", filenamebuf, ".def")) {
+        */
+        if (globaldefon && copy_defc_file(filenamebuf, ".def", filenamebuf, ".dfc")) {
             fprintf(stderr, "Cannot create global defc file\n");
             status = 1;
         }
-		*/
+		
 
         if (lston && copy_file(c_crt0, ".lis", filenamebuf, ".lis")) {
             fprintf(stderr, "Cannot copy crt0 list file\n");
