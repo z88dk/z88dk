@@ -11,7 +11,11 @@ static char             *crtfile      = NULL;
 static char              khz_22       = 0;
 static int               origin       = -1;
 static int               exec         = -1;
+static char              loud         = 0;
 static char              help         = 0;
+
+static uint8_t           h_lvl;
+static uint8_t           l_lvl;
 
 static void writebyte_dai(uint8_t byte, FILE *fp, FILE *wavfile, uint8_t *cksump);
 
@@ -22,6 +26,7 @@ option_t dai_options[] = {
     {  0 , "org",        "Origin of the embedded binary",    OPT_INT,   &origin },
     {  0 , "exec",       "Starting execution address",       OPT_INT,   &exec },
     {  0,  "22",         "22050hz bitrate option",           OPT_BOOL,  &khz_22 },
+    {  0,  "loud",       "Louder audio volume",              OPT_BOOL,  &loud },
     { 'c', "crt0file",   "crt0 used to link binary",         OPT_STR,   &crtfile },
     { 'o', "output",     "Name of output file",              OPT_STR,   &outfile },
     {  0,   NULL,        NULL,                               OPT_NONE,  NULL }
@@ -47,9 +52,6 @@ static int lengths[4][4] = {
     // Trailer
     { 9, 9, 12, 13 }
 };
-
-static uint8_t    h_lvl = 0xff;
-static uint8_t    l_lvl = 0x00;
 
 static void dai_bit(FILE* fpout, int index)
 {
@@ -96,6 +98,14 @@ int dai_exec(char *target)
 
     if ( binname == NULL ) {
         return -1;
+    }
+
+    if (loud) {
+        h_lvl = 0xFd;
+        l_lvl = 2;
+    } else {
+        h_lvl = 0xe0;
+        l_lvl = 0x20;
     }
 
     if ( outfile == NULL ) {

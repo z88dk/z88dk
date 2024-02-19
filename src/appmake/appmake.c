@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.50 2016-08-26 05:35:33 aralbrec Exp $
+ *   $Id: appmake.c$
  */
 
 
@@ -838,7 +838,8 @@ void raw2wav(char *wavfile)
 		// It should be enough for all the emulators to accept it as a valid feed
 		// still permitting a good compression rate to the LZ algorithms
       c=getc(fpin);
-      fputc(c-(i&1),fpout);
+	  if ( (i&1) && (c>0) ) c--;
+      fputc(c,fpout);
     }
 
     fclose(fpin);
@@ -908,7 +909,8 @@ void raw2wav_22k(char *wavfile, int mode)
 	// Small alteration of the square wave to make it look analogue
 	// It should be enough for all the emulators to accept it as a valid feed
 	// still permitting a good compression rate to the LZ algorithms
-      fputc(c-(i&1),fpout);
+	  if ( (i&1) && (c>0) ) c--;
+      fputc(c,fpout);
     }
 
     fclose(fpin);
