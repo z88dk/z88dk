@@ -12,6 +12,7 @@ static char              khz_22       = 0;
 static int               origin       = -1;
 static int               exec         = -1;
 static char              loud         = 0;
+static char              fast         = 0;
 static char              help         = 0;
 
 static uint8_t           h_lvl;
@@ -27,6 +28,7 @@ option_t dai_options[] = {
     {  0 , "exec",       "Starting execution address",       OPT_INT,   &exec },
     {  0,  "22",         "22050hz bitrate option",           OPT_BOOL,  &khz_22 },
     {  0,  "loud",       "Louder audio volume",              OPT_BOOL,  &loud },
+    {  0,  "fast",      "Tweak the audio tones to run a bit faster",  OPT_BOOL,  &fast },
     { 'c', "crt0file",   "crt0 used to link binary",         OPT_STR,   &crtfile },
     { 'o', "output",     "Name of output file",              OPT_STR,   &outfile },
     {  0,   NULL,        NULL,                               OPT_NONE,  NULL }
@@ -53,22 +55,50 @@ static int lengths[4][4] = {
     { 9, 9, 12, 13 }
 };
 
+
+static int flengths[4][4] = {
+    // Leader
+    { 11, 11, 11, 11 },
+    // Bit 0
+    { 11, 11, 20, 20 },
+    // Bit 1
+    { 20, 20, 11, 11 },
+    // Trailer
+    { 9, 9, 12, 13 }
+};
+
+
 static void dai_bit(FILE* fpout, int index)
 {
     int  i;
 
-    for ( i = 0; i < lengths[index][0]; i++ ) {
-        fputc(h_lvl, fpout);
-    }
-    for ( i = 0; i < lengths[index][1]; i++ ) {
-        fputc(l_lvl, fpout);
-    }
-    for ( i = 0; i < lengths[index][2]; i++ ) {
-        fputc(h_lvl, fpout);
-    }
-    for ( i = 0; i < lengths[index][3]; i++ ) {
-        fputc(l_lvl, fpout);
-    }
+	if (fast)  {
+		for ( i = 0; i < flengths[index][0]; i++ ) {
+			fputc(h_lvl, fpout);
+		}
+		for ( i = 0; i < flengths[index][1]; i++ ) {
+			fputc(l_lvl, fpout);
+		}
+		for ( i = 0; i < flengths[index][2]; i++ ) {
+			fputc(h_lvl, fpout);
+		}
+		for ( i = 0; i < flengths[index][3]; i++ ) {
+			fputc(l_lvl, fpout);
+		}
+	} else {
+		for ( i = 0; i < lengths[index][0]; i++ ) {
+			fputc(h_lvl, fpout);
+		}
+		for ( i = 0; i < lengths[index][1]; i++ ) {
+			fputc(l_lvl, fpout);
+		}
+		for ( i = 0; i < lengths[index][2]; i++ ) {
+			fputc(h_lvl, fpout);
+		}
+		for ( i = 0; i < lengths[index][3]; i++ ) {
+			fputc(l_lvl, fpout);
+		}
+	}
 }
 
 static void dai_rawout(FILE *fpout, unsigned char b)
