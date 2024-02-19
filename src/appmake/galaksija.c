@@ -150,8 +150,8 @@ int gal_exec(char* target)
     }
 
     if (loud) {
-        gal_h_lvl = 0xFF;
-        gal_l_lvl = 0;
+        gal_h_lvl = 0xFE;
+        gal_l_lvl = 2;
     } else {
         gal_h_lvl = 0xe0;
         gal_l_lvl = 0x20;

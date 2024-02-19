@@ -114,8 +114,8 @@ int x07_exec(char* target)
         return -1;
     }
     if (loud) {
-        x07_h_lvl = 0xFF;
-        x07_l_lvl = 0;
+        x07_h_lvl = 0xFD;
+        x07_l_lvl = 2;
     } else {
         x07_h_lvl = 0xe0;
         x07_l_lvl = 0x20;

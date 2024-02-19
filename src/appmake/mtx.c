@@ -125,8 +125,8 @@ int mtx_exec(char* target)
     }
 
     if (loud) {
-        mtx_h_lvl = 0xFF;
-        mtx_l_lvl = 0;
+        mtx_h_lvl = 0xFD;
+        mtx_l_lvl = 2;
     } else {
         mtx_h_lvl = 0xe0;
         mtx_l_lvl = 0x20;
