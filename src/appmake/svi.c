@@ -146,8 +146,8 @@ int svi_exec(char* target)
     }
 
     if (loud) {
-        h_lvl = 0xFF;
-        l_lvl = 0;
+        h_lvl = 0xFD;
+        l_lvl = 2;
     } else {
         h_lvl = 0xe0;
         l_lvl = 0x20;
