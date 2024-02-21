@@ -2,7 +2,7 @@
 ;Based on the SG C Tools 1.7
 ;(C) 1993 Steve Goldsmith
 ;
-; SpecDrum ZX Spectrum interface
+; SpecDrum/Covox ZX Spectrum interfaces
 ; calibrated for a fixed 8khz bitrate
 
 ;
@@ -36,16 +36,20 @@ push	bc
 
 rep1:
 ;; delay 1
-ld   b,32
+ld   b,31
 rep1b:                   ;repeat
 djnz rep1b
 
 ld      a,(hl)          ; a = sample byte
 and     $f0             ; 4 bit nibble
-out		($df),a
+out		($dd),a         ; Covox on Scorpion ZS 256
+out		($df),a         ; SpecDrum
+out		($fb),a         ; Covox on Pentagon 128
+
+
 
 ;; delay 2
-ld   b,32
+ld   b,31
 rep2:                   ;repeat
 djnz rep2
 
@@ -55,7 +59,9 @@ rlca                    ;
 rlca                    ;
 rlca                    ;
 and     $f0             ; 4 bit nibble
-out		($df),a
+out		($dd),a         ; Covox on Scorpion ZS 256
+out		($df),a         ; SpecDrum
+out		($fb),a         ; Covox on Pentagon 128
 
 inc     hl              ; hl = hl+1
 dec     e               ;
