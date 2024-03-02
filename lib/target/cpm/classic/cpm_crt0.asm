@@ -179,18 +179,31 @@ ENDIF
     pop     bc	;kill argv
     pop     bc	;kill argc
 
-    ld      a,(defltdsk)	;Restore default disc
-    ld      e,a
-    ld      c,14
-    call    5
-
 cleanup:
+    ld      (0x80),hl   ;Save exit value for CP/M 2.2
     push    hl		;Save return value
     call    crt0_exit
-    pop     bc		;Get exit() value into bc
+    pop     hl
+
+; For CP/M 3 return the exit value via BDOS P_CODE
 __restore_sp_onexit:
-    ld      sp,0		;Pick up entry sp
-    jp      0
+    ld      sp,0	;Pick up entry sp
+    ld      c,12        ;Get CPM version
+    call    5
+    cp      $30 
+    jp      c,0         ;Warm boot for CP/M < 3
+    ld      a,l
+    and     127
+    ld      e,a
+    ld      a,h         ;Exit with d=$ff for error, or d=$00 for no error
+    or      l
+    jr      z,do_exit_v3
+    ld      a,255       ;Indicate error
+do_exit_v3:
+    ld      d,a
+    ld      c,108
+    call    5           ;Report error
+    rst     0
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
@@ -337,5 +350,13 @@ ENDIF
     ld      c,25
     call    5
     ld      (defltdsk),a
+
+    SECTION code_crt_exit
+
+    ld      a,(defltdsk)        ;Restore default disc
+    ld      e,a
+    ld      c,14
+    call    5
+
 
 
