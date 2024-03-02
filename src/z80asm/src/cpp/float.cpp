@@ -257,24 +257,31 @@ vector<uint8_t> float_to_zx(double value) {
 // 4 bytes mantissa, with first bit replaced by sign bit
 vector<uint8_t> float_to_zx81(double value) {
 	vector<uint8_t>	out;
-	mydouble f;
-	f.value = value;
 
-	// convert to zx81 format
-	uint64_t exponent = ((f.raw >> 52) & 0x7ff) - mydouble_exp_bias + 129;
-	uint64_t mantissa = (f.raw >> (52 - 32 + 1));	// align first bit to bit30, bit31 is sign
-	if (value < 0.0)
-		mantissa |= 1LL << 31;
-	else
-		mantissa &= ~(1LL << 31);
+    if (value == 0.0) {
+        for (int i = 0; i < 5; i++)
+            out.push_back(0);
+    }
+    else {
+        mydouble f;
+        f.value = value;
 
-	// return
-	out.push_back(exponent & 0xff);
-	for (size_t i = 0; i < 4; i++) {
-		out.push_back((mantissa >> 24) & 0xff);
-		mantissa <<= 8;
-	}
-	return out;
+        // convert to zx81 format
+        uint64_t exponent = ((f.raw >> 52) & 0x7ff) - mydouble_exp_bias + 129;
+        uint64_t mantissa = (f.raw >> (52 - 32 + 1));	// align first bit to bit30, bit31 is sign
+        if (value < 0.0)
+            mantissa |= 1LL << 31;
+        else
+            mantissa &= ~(1LL << 31);
+
+        // return
+        out.push_back(exponent & 0xff);
+        for (size_t i = 0; i < 4; i++) {
+            out.push_back((mantissa >> 24) & 0xff);
+            mantissa <<= 8;
+        }
+    }
+    return out;
 }
 
 vector<uint8_t> float_to_z88(double value) {
