@@ -9,6 +9,7 @@ Repository: https://github.com/z88dk/z88dk
 
 #include "alloc.h"
 #include "codearea.h"
+#include "errors.h"
 #include "expr1.h"
 #include "fileutil.h"
 #include "if.h"
@@ -493,7 +494,7 @@ static void check_equ_exprs_solved(Expr1List* exprs, bool module_relative_addr) 
 		Expr1* expr = iter->obj;
 		if (expr->target_name) {
 			set_expr_env(expr, module_relative_addr);
-			error_undefined_symbol(expr->target_name);
+            error(ErrUndefinedSymbol, expr->target_name);
 		}
 		iter = Expr1List_next(iter);
 	}
@@ -539,14 +540,14 @@ static void patch_exprs(Expr1List* exprs)
 			{
 			case RANGE_BYTE_UNSIGNED:
 				if (value < -128 || value > 255)
-					warning_integer_range(value);
+                    warning_hex2(ErrIntRange, value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				break;
 
 			case RANGE_BYTE_SIGNED:
 				if (value < -128 || value > 127)
-					warning_integer_range(value);
+                    warning_hex2(ErrIntRange, value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				break;
@@ -554,7 +555,7 @@ static void patch_exprs(Expr1List* exprs)
 			case RANGE_HIGH_OFFSET:
 				if ((value & 0xff00) != 0) {
 					if ((value & 0xff00) != 0xff00)
-						warning_integer_range(value);
+                        warning_hex2(ErrIntRange, value);
 				}
 
 				patch_byte(expr->code_pos, (byte_t)(value & 0xff));
@@ -562,7 +563,7 @@ static void patch_exprs(Expr1List* exprs)
 
 			case RANGE_BYTE_TO_WORD_UNSIGNED:
 				if (value < 0 || value > 255)
-					warning_integer_range(value);
+                    warning_hex2(ErrIntRange, value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				patch_byte(expr->code_pos + 1, 0);
@@ -570,7 +571,7 @@ static void patch_exprs(Expr1List* exprs)
 
 			case RANGE_BYTE_TO_WORD_SIGNED:
 				if (value < -128 || value > 127)
-					warning_integer_range(value);
+                    warning_hex2(ErrIntRange, value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
@@ -629,7 +630,7 @@ static void patch_exprs(Expr1List* exprs)
 				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
                 if (value < -128 || value > 127)
-                    error_integer_range(value);
+                    error_hex2(ErrIntRange, value);
                 else
                     patch_byte(expr->code_pos, (byte_t)value);
 				break;
@@ -639,7 +640,7 @@ static void patch_exprs(Expr1List* exprs)
                 value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
                 if (value < -0x8000 || value > 0x7FFF)
-                    error_integer_range(value);
+                    error_hex4(ErrIntRange, value);
                 else
                     patch_word(expr->code_pos, value);
                 break;
@@ -884,7 +885,7 @@ static bool linked_libraries(StrHash* extern_syms) {
 // link libraries in the order given in the command line
 static void link_libraries(StrHash* extern_syms) {
 	// while symbols to resolve and new module pulled in
-	while (!get_num_errors() &&
+	while (!get_error_count() &&
 		pending_syms(extern_syms) &&
 		linked_libraries(extern_syms)) {
 		// loop
@@ -1036,7 +1037,7 @@ void link_modules(void) {
 	// </TODO>
 
 	// link all .o modules
-	for (obj_file_t* obj = g_objects; !get_num_errors() && obj != NULL; obj = obj->next) {
+	for (obj_file_t* obj = g_objects; !get_error_count() && obj != NULL; obj = obj->next) {
 		set_cur_module(obj->module);
 
 		set_error_location(CURRENTMODULE->filename, 0);
@@ -1046,40 +1047,40 @@ void link_modules(void) {
 	}
 
 	// link libraries, unless building a consol_obj_file 
-	if (!get_num_errors() && !option_consol_obj_file() && g_libraries != NULL)
+	if (!get_error_count() && !option_consol_obj_file() && g_libraries != NULL)
 		link_libraries(extern_syms);
 
 	clear_error_location();
 
 	/* allocate segment addresses and compute absolute addresses of symbols */
 	/* in consol_obj_file sections are zero-based */
-	if (!get_num_errors() && !option_consol_obj_file())
+	if (!get_error_count() && !option_consol_obj_file())
 		sections_alloc_addr();
 
 	/* relocate address symbols */
-	if (!get_num_errors())
+	if (!get_error_count())
 		relocate_symbols();
 
 	/* define assembly size */
-	if (!get_num_errors() && !option_consol_obj_file())
+	if (!get_error_count() && !option_consol_obj_file())
 		define_location_symbols();
 
 	if (option_consol_obj_file()) {
-		if (!get_num_errors())
+		if (!get_error_count())
 			merge_modules(extern_syms);
 	}
 	else {
 		/* collect expressions from all modules */
 		exprs = OBJ_NEW(Expr1List);
-		if (!get_num_errors())
+		if (!get_error_count())
 			read_module_exprs(exprs);
 
 		/* compute all EQU expressions */
-		if (!get_num_errors())
+		if (!get_error_count())
 			compute_equ_exprs(exprs, true, false);
 
 		/* patch all other expressions */
-		if (!get_num_errors())
+		if (!get_error_count())
 			patch_exprs(exprs);
 
 		OBJ_DELETE(exprs);
@@ -1087,7 +1088,7 @@ void link_modules(void) {
 
 	clear_error_location();
 
-	if (!get_num_errors()) {
+	if (!get_error_count()) {
 		if (option_map())
 			write_map_file();
 
@@ -1380,7 +1381,7 @@ static void run_appmake(const char* appmake_opts, const char* out_ext,
 
 	int origin = first_section->origin;
 	if (origin < origin_min || origin > origin_max) {
-		error_invalid_org(origin);
+        error_hex4(ErrInvalidOrg, origin);
 	}
 	else {
 		const char* bin_filename = get_bin_filename(get_first_module(NULL)->filename, "");
@@ -1399,7 +1400,7 @@ static void run_appmake(const char* appmake_opts, const char* out_ext,
 
 		int rv = system(utstring_body(cmd));
 		if (rv != 0)
-			error_command_failed(utstring_body(cmd));
+			error(ErrCmdFailed, utstring_body(cmd));
 
 		utstring_free(cmd);
 	}

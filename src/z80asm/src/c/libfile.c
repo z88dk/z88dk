@@ -5,15 +5,16 @@
 // Repository: https://github.com/z88dk/z88dk
 //-----------------------------------------------------------------------------
 
+#include "errors.h"
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
 #include "modlink.h"
 #include "utlist.h"
-#include "zobjfile.h"
-#include "z80asm1.h"
-#include "z80asm_defs.h"
 #include "xmalloc.h"
+#include "z80asm_defs.h"
+#include "z80asm1.h"
+#include "zobjfile.h"
 
 /*-----------------------------------------------------------------------------
 *	define a library file name from the command line
@@ -148,7 +149,7 @@ void make_library(const char *lib_filename) {
                     if (got_asm)
                         assemble_file(option_file(i));
 
-                    if (get_num_errors()) {
+                    if (get_error_count()) {
                         xfclose(fp);			/* error */
                         remove(utstring_body(temp_filename));
                         goto cleanup_and_return;
@@ -194,7 +195,8 @@ void make_library(const char *lib_filename) {
     remove(lib_filename);
     int rv = rename(utstring_body(temp_filename), lib_filename);
     if (rv != 0) {
-        error_file_rename(utstring_body(temp_filename));
+        error(ErrFileRename, utstring_body(temp_filename));
+        perror(utstring_body(temp_filename));
     }
 
 cleanup_and_return:

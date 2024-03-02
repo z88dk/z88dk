@@ -13,6 +13,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "array.h"
 #include "codearea.h"
 #include "die.h"
+#include "errors.h"
 #include "expr1.h"
 #include "if.h"
 #include "init.h"
@@ -78,7 +79,7 @@ static long _calc_divide(long a, long b)
 {
 	if (b == 0)
 	{
-		error_division_by_zero();	/* BUG_0040 */
+        error(ErrDivisionByZero, NULL);	/* BUG_0040 */
 		return 0;
 	}
 
@@ -89,7 +90,7 @@ static long _calc_mod(long a, long b)
 {
 	if (b == 0)
 	{
-		error_division_by_zero();	/* BUG_0040 */
+        error(ErrDivisionByZero, NULL);	/* BUG_0040 */
 		return 0;
 	}
 
@@ -290,7 +291,7 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 			{
 				expr->result.undefined_symbol = true;
 				if (not_defined_error)
-					error_undefined_symbol(self->d.symbol->name);
+                    error(ErrUndefinedSymbol, self->d.symbol->name);
 			}
 
 			Calc_push(0);
@@ -605,7 +606,7 @@ Expr1* expr_parse(void) {
 	if (!Expr_parse_ternary_cond(self))
 	{
 		/* syntax error in expression */
-		error_syntax_error_in_expression();
+        error(ErrSyntaxExpr, NULL);
 
 		OBJ_DELETE(self);
 		self = NULL;

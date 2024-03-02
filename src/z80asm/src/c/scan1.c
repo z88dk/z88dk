@@ -11,6 +11,7 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
 #include "alloc.h"
 #include "die.h"
+#include "errors.h"
 #include "if.h"
 #include "init.h"
 #include "list.h"
@@ -380,7 +381,7 @@ void CurSymExpect(tokid_t expected_tok)
 	init_module();
 
 	if (sym.tok != expected_tok)
-		error_syntax_error();
+        error(ErrSyntax, NULL);
 }
 
 

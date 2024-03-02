@@ -9,6 +9,7 @@
 #include "if.h"
 #include "lstfile.h"
 #include "utils.h"
+#include "utils2.h"
 #include "xassert.h"
 #include <cassert>
 #include <iomanip>
@@ -114,9 +115,9 @@ void LstFile::end_line() {
 
 void LstFile::out_filename() {
 	if (m_ofs.is_open()) {
-		if (m_location.filename() != m_last_filename) {
-			m_ofs << m_location.filename() << ":" << endl;
-			m_last_filename = m_location.filename();
+		if (m_location.filename != m_last_filename) {
+			m_ofs << m_location.filename << ":" << endl;
+			m_last_filename = m_location.filename;
 		}
 	}
 }
@@ -127,8 +128,8 @@ void LstFile::out_line() {
 		out_filename();
 
 		// output line number
-		if (m_location.line_num() > 0)
-			m_ofs << setw(LineNumWidth) << m_location.line_num()
+		if (m_location.line_num > 0)
+			m_ofs << setw(LineNumWidth) << m_location.line_num
 			<< setw(SeparatorWidth) << "";
 		else
 			m_ofs << setw(LineNumWidth + SeparatorWidth) << "";

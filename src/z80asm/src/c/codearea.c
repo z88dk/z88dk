@@ -10,6 +10,7 @@ Manage the code area in memory
 
 #include "codearea.h"
 #include "die.h"
+#include "errors.h"
 #include "fileutil.h"
 #include "if.h"
 #include "init.h"
@@ -404,7 +405,7 @@ static void check_space( int addr, int num_bytes )
 {
 	init_module();
 	if (addr + num_bytes > MAXCODESIZE && !g_cur_section->max_codesize_issued) {
-		error_segment_overflow();
+        error(ErrSegmentOverflow, NULL);
 		g_cur_section->max_codesize_issued = true;
 	}
 }
@@ -620,7 +621,7 @@ void codearea_close_remove(CodeareaFile* binfile, CodeareaFile* relocfile) {
 void set_origin_directive(int origin)
 {
 	if (CURRENTSECTION->origin_found)
-		error_org_redefined();
+        error(ErrOrgRedefined, NULL);
 	else
 	{
 		CURRENTSECTION->origin_found = true;
@@ -634,7 +635,7 @@ void set_origin_directive(int origin)
 				CURRENTSECTION->origin = origin;
 		}
 		else
-			error_integer_range(origin);
+            error_hex4(ErrIntRange, origin);
 	}
 }
 
@@ -644,7 +645,7 @@ void set_origin_option(int origin)
 	Section1 *default_section;
 
 	if (origin < 0)		// value can be >0xffff for banked address
-		error_integer_range((long)origin);
+        error_hex4(ErrIntRange, origin);
 	else
 	{
 		default_section = get_first_section(NULL);
@@ -689,7 +690,7 @@ void set_phase_directive(int address)
 	if (address >= 0 && address <= 0xFFFF)
 		CURRENTSECTION->asmpc_phase = address;
 	else
-		error_integer_range(address);
+        error_hex4(ErrIntRange, address);
 }
 
 void clear_phase_directive()

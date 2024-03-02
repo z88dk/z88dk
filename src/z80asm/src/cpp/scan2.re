@@ -9,6 +9,7 @@
 #include "if.h"
 #include "scan2.h"
 #include "utils.h"
+#include "utils2.h"
 #include <unordered_map>
 #include <cassert>
 #include <cmath>
@@ -260,13 +261,13 @@ bool FileScanner::open(const string& filename) {
     line_start = line_end = p = p0 = marker = limit = m_buffer.c_str();
 
     if (!fs::is_regular_file(fs::path(filename))) {
-        g_errors.error(ErrCode::FileNotFound, filename);
+        g_errors.error(ErrFileNotFound, filename);
         return false;
     }
     else {
         m_ifs.open(filename, ios::binary);
         if (!m_ifs.is_open()) {
-            g_errors.error(ErrCode::FileOpen, filename);
+            g_errors.error(ErrFileOpen, filename);
             perror(filename.c_str());
             return false;
         }
@@ -283,7 +284,7 @@ bool FileScanner::open(const string& filename) {
 void FileScanner::scan_text(Location location, const string& text) {
     if (m_ifs.is_open())
         m_ifs.close();
-    m_filename = location.filename();
+    m_filename = location.filename;
     m_location = location;
     m_buffer = text;
     line_start = line_end = p = p0 = marker = m_buffer.c_str();
@@ -308,7 +309,7 @@ bool FileScanner::peek_text_line(ScannedLine& line) {
     while (true) {
         /*!re2c
             end             { p--; goto end; }
-            nl              { m_location.inc_line(); goto end; }
+            nl              { m_location.inc_line_num(); goto end; }
             $               { goto end; }
             *               { continue; }
         */
@@ -350,7 +351,7 @@ main_loop:
         /*!re2c
             end             { p--; goto end; }
             $               { goto end; }
-            *               { scan_error(ErrCode::InvalidChar); continue; }
+            *               { scan_error(ErrInvalidChar); continue; }
             ws+             { m_blank_before = true; continue; }
             nl              { goto end; }
             ';'	[^\r\n\000]* { continue; }
@@ -468,18 +469,18 @@ string_loop:
     while (true) {
         p0 = p;
         /*!re2c
-            end             { p--; scan_error(ErrCode::MissingQuote, error); goto end; }
-            $               { scan_error(ErrCode::MissingQuote, error); goto end; }
+            end             { p--; scan_error(ErrMissingQuote, error); goto end; }
+            $               { scan_error(ErrMissingQuote, error); goto end; }
             *               { str.push_back(*p0); continue; }
             nl              { if (raw_strings) {
                                 str.append(string(p0, p));
-                                error = "started at " + m_location.filename() +
-                                        ":" + std::to_string(m_location.line_num());
+                                error = "started at " + m_location.filename +
+                                        ":" + std::to_string(m_location.line_num);
                                 line_start = p; peek_text_line(line);
                                 continue;
                               }
                               else {
-                                scan_error(ErrCode::MissingQuote, error); goto end;
+                                scan_error(ErrMissingQuote, error); goto end;
                               }
                             }
             '"'             { if (quote == 2) {
@@ -493,7 +494,7 @@ string_loop:
                             }
             "'"             { if (quote == 1) {
                                 if (str.length() != 1) {
-                                  scan_error(ErrCode::InvalidCharConst);
+                                  scan_error(ErrInvalidCharConst);
                                   goto main_loop;
                                 }
                                 else {
@@ -599,9 +600,9 @@ bool FileScanner::fill() {
 void FileScanner::notify_new_line(const string& text_) {
     string text = str_chomp(text_) + "\n";
     m_location.set_source_line(text);
-    g_errors.set_location(m_location);
-    list_got_source_line(m_location.filename().c_str(), m_location.line_num(),
-        m_location.source_line().c_str());
+    g_errors.location = m_location;
+    list_got_source_line(m_location.filename.c_str(), m_location.line_num,
+        m_location.source_line.c_str());
 }
 
 void FileScanner::scan_error(ErrCode code, const string& arg) {

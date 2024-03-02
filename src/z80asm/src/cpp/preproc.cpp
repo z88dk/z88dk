@@ -13,6 +13,7 @@
 #include "scan2.h"
 #include "strpool.h"
 #include "utils.h"
+#include "utils2.h"
 #include "xassert.h"
 #include <cassert>
 using namespace std;
@@ -163,7 +164,7 @@ bool Preproc::open(const string& filename_, bool search_include_path) {
 
 	// check for recursive includes
 	if (recursive_include(found_filename)) {
-		g_errors.error(ErrCode::IncludeRecursion, filename);
+		g_errors.error(ErrIncludeRecursion, filename);
 		return false;
 	}
 
@@ -219,7 +220,7 @@ bool Preproc::getline(ScannedLine& line) {
     if (getline1(line)) {
         if (!m_reading_macro_body) {
             // publish expanded line
-            string source_line = location().source_line();
+            string source_line = location().source_line;
             string source_line_no_blanks = str_remove_all_blanks(source_line);
             string expanded_line = line.to_string();
             string expanded_line_no_blanks = str_remove_all_blanks(expanded_line);
@@ -259,7 +260,7 @@ bool Preproc::is_c_source() const {
 	if (m_files.empty())
 		return false;
 	else
-		return m_files.back().location().is_c_source();
+		return m_files.back().location().is_c_source;
 }
 
 void Preproc::set_location(Location location) {
@@ -272,15 +273,15 @@ void Preproc::set_filename(const string& filename) {
 		m_files.back().location().set_filename(filename);
 }
 
-void Preproc::set_line_num(int line_num, int line_inc) {
+void Preproc::set_line_num(int line_num) {
 	if (!m_files.empty()) {
-		m_files.back().location().set_line_num(line_num - line_inc, line_inc);
+		m_files.back().location().set_line_num(line_num);
 	}
 }
 
 void Preproc::set_c_source(bool f) {
     if (!m_files.empty())
-        m_files.back().location().set_c_source(f);
+        m_files.back().location().is_c_source = f;
 }
 
 bool Preproc::recursive_include(const string& filename) {
@@ -293,9 +294,9 @@ bool Preproc::recursive_include(const string& filename) {
 
 void Preproc::got_eof() {
 	if (!m_if_stack.empty()) {
-		g_errors.error(ErrCode::UnbalancedStructStartedAt,
-			m_if_stack.back().location.filename() + ":" +
-			std::to_string(m_if_stack.back().location.line_num()));
+		g_errors.error(ErrUnbalancedStructStartedAt,
+			m_if_stack.back().location.filename + ":" +
+			std::to_string(m_if_stack.back().location.line_num));
 		m_if_stack.clear();
 	}
 	close();
@@ -489,15 +490,15 @@ bool Preproc::check_macro() {
 		return true;
 	}
     else if (label_index >= 0 && m_line.peek(2).is(Keyword::ENDM, Keyword::ENDR)) {
-        g_errors.error(ErrCode::Syntax);
+        g_errors.error(ErrSyntax);
         return true;
     }
     else if (m_line.peek(0).is(TType::Ident) && m_line.peek(1).is(Keyword::ENDM, Keyword::ENDR)) {
-        g_errors.error(ErrCode::Syntax);
+        g_errors.error(ErrSyntax);
         return true;
     }
     else if (m_line.peek(0).is(Keyword::ENDM, Keyword::ENDR)) {
-        g_errors.error(ErrCode::UnbalancedStruct);
+        g_errors.error(ErrUnbalancedStruct);
 		return true;
 	}
     else {
@@ -557,7 +558,7 @@ bool Preproc::check_reptx() {
 		return true;
 	}
 	else if (m_line.peek(0).is(Keyword::ENDR) && !m_line.peek(1).is(TType::Colon)) {
-		g_errors.error(ErrCode::UnbalancedStruct);
+		g_errors.error(ErrUnbalancedStruct);
 		return true;
 	}
 	else
@@ -698,15 +699,15 @@ void Preproc::do_if() {
 
 void Preproc::do_else() {
 	if (!m_line.peek().is(TType::Newline))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else if (m_if_stack.empty())
-		g_errors.error(ErrCode::UnbalancedStruct);
+		g_errors.error(ErrUnbalancedStruct);
 	else {
 		Keyword last = m_if_stack.back().keyword;
 		if (last != Keyword::IF && last != Keyword::ELIF)
-			g_errors.error(ErrCode::UnbalancedStructStartedAt,
-				m_if_stack.back().location.filename() + ":" +
-				std::to_string(m_if_stack.back().location.line_num()));
+			g_errors.error(ErrUnbalancedStructStartedAt,
+				m_if_stack.back().location.filename + ":" +
+				std::to_string(m_if_stack.back().location.line_num));
 		else {
 			bool flag = !m_if_stack.back().done_if;
 			m_if_stack.back().keyword = Keyword::ELSE;
@@ -718,15 +719,15 @@ void Preproc::do_else() {
 
 void Preproc::do_endif() {
 	if (!m_line.peek().is(TType::Newline))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else if (m_if_stack.empty())
-		g_errors.error(ErrCode::UnbalancedStruct);
+		g_errors.error(ErrUnbalancedStruct);
 	else {
 		Keyword last = m_if_stack.back().keyword;
 		if (last != Keyword::IF && last != Keyword::ELIF && last != Keyword::ELSE)
-			g_errors.error(ErrCode::UnbalancedStructStartedAt,
-				m_if_stack.back().location.filename() + ":" +
-				std::to_string(m_if_stack.back().location.line_num()));
+			g_errors.error(ErrUnbalancedStructStartedAt,
+				m_if_stack.back().location.filename + ":" +
+				std::to_string(m_if_stack.back().location.line_num));
 		else
 			m_if_stack.pop_back();
 	}
@@ -734,12 +735,12 @@ void Preproc::do_endif() {
 
 void Preproc::do_ifdef_ifndef(bool invert) {
 	if (!m_line.peek().is(TType::Ident))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else {
         Token name = m_line.peek();
 		m_line.next();
 		if (!m_line.peek().is(TType::Newline))
-			g_errors.error(ErrCode::Syntax);
+			g_errors.error(ErrSyntax);
 		else {
 			bool f = symbol_defined(name);
 			if (invert)
@@ -760,13 +761,13 @@ void Preproc::do_ifndef() {
 
 void Preproc::do_elif() {
 	if (m_if_stack.empty())
-		g_errors.error(ErrCode::UnbalancedStruct);
+		g_errors.error(ErrUnbalancedStruct);
 	else {
 		Keyword last = m_if_stack.back().keyword;
 		if (last != Keyword::IF && last != Keyword::ELIF)
-			g_errors.error(ErrCode::UnbalancedStructStartedAt,
-				m_if_stack.back().location.filename() + ":" +
-				std::to_string(m_if_stack.back().location.line_num()));
+			g_errors.error(ErrUnbalancedStructStartedAt,
+				m_if_stack.back().location.filename + ":" +
+				std::to_string(m_if_stack.back().location.line_num));
 		else {
 			// expand macros in condition
             vector<Token> cond_tokens = m_line.peek_tokens();
@@ -790,21 +791,21 @@ void Preproc::do_elif() {
 
 void Preproc::do_elifdef_elifndef(bool invert) {
 	if (m_if_stack.empty())
-		g_errors.error(ErrCode::UnbalancedStruct);
+		g_errors.error(ErrUnbalancedStruct);
 	else {
 		Keyword last = m_if_stack.back().keyword;
 		if (last != Keyword::IF && last != Keyword::ELIF)
-			g_errors.error(ErrCode::UnbalancedStructStartedAt,
-				m_if_stack.back().location.filename() + ":" +
-				std::to_string(m_if_stack.back().location.line_num()));
+			g_errors.error(ErrUnbalancedStructStartedAt,
+				m_if_stack.back().location.filename + ":" +
+				std::to_string(m_if_stack.back().location.line_num));
 		else {
 			if (!m_line.peek().is(TType::Ident))
-				g_errors.error(ErrCode::Syntax);
+				g_errors.error(ErrSyntax);
 			else {
                 Token name = m_line.peek();
 				m_line.next();
 				if (!m_line.peek().is(TType::Newline))
-					g_errors.error(ErrCode::Syntax);
+					g_errors.error(ErrSyntax);
 				else {
 					bool f = symbol_defined(name);
 					if (invert)
@@ -830,12 +831,12 @@ void Preproc::do_elifndef() {
 
 void Preproc::do_include() {
 	if (!m_line.peek().is(TType::String))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else {
 		string filename = m_line.peek().svalue();
 		m_line.next();
 		if (!m_line.peek().is(TType::Newline))
-			g_errors.error(ErrCode::Syntax);
+			g_errors.error(ErrSyntax);
 		else {
 			open(filename, true);
 		}
@@ -844,24 +845,24 @@ void Preproc::do_include() {
 
 void Preproc::do_binary() {
 	if (!m_line.peek().is(TType::String))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else {
 		string filename = m_line.peek().svalue();
 		m_line.next();
 		if (!m_line.peek().is(TType::Newline))
-			g_errors.error(ErrCode::Syntax);
+			g_errors.error(ErrSyntax);
 		else {
 			// search file in path
 			string found_filename = search_includes(filename.c_str());
 
 			// open file
 			if (!fs::is_regular_file(fs::path(found_filename))) {
-				g_errors.error(ErrCode::FileNotFound, found_filename);
+				g_errors.error(ErrFileNotFound, found_filename);
 			}
 			else {
 				ifstream ifs(found_filename, ios::binary);
 				if (!ifs.is_open())
-					g_errors.error(ErrCode::FileOpen, found_filename);
+					g_errors.error(ErrFileOpen, found_filename);
 				else {
 					// output DEFB lines
 					const int line_len = 16;
@@ -890,7 +891,7 @@ void Preproc::do_binary() {
 
 void Preproc::do_define() {
     if (!m_line.peek().is(TType::Ident)) {
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
     }
 	else {
 		// get name
@@ -910,7 +911,7 @@ void Preproc::do_define() {
 			m_line.next();						// skip '('
 			while (!m_line.at_end()) {
 				if (!m_line.peek().is(TType::Ident)) {
-					g_errors.error(ErrCode::Syntax);
+					g_errors.error(ErrSyntax);
 					return;
 				}
 				string arg = m_line.peek().svalue();
@@ -926,7 +927,7 @@ void Preproc::do_define() {
 					break;
 				}
 				else {
-					g_errors.error(ErrCode::Syntax);
+					g_errors.error(ErrSyntax);
 					return;
 				}
 			}
@@ -943,13 +944,13 @@ void Preproc::do_define() {
 
 void Preproc::do_undef() {
 	if (!m_line.peek().is(TType::Ident))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else {
 		// get name
 		string name = m_line.peek().svalue();
 		m_line.next();
 		if (!m_line.peek().is(TType::Newline))
-			g_errors.error(ErrCode::Syntax);
+			g_errors.error(ErrSyntax);
 		else
 			defines_base().remove(name);
 	}
@@ -957,7 +958,7 @@ void Preproc::do_undef() {
 
 void Preproc::do_defl(const string& name) {
 	if (m_line.peek().is(TType::Newline))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else {
 		// if name is not defined, create an empty one
 		if (!defines_base().find(name)) {
@@ -1003,7 +1004,7 @@ void Preproc::do_macro_call(shared_ptr<Macro> macro) {
 	if (macro->args().size() != 0) {
 		params = collect_macro_params(m_line);
 		if (macro->args().size() != params.size()) {
-			g_errors.error(ErrCode::MacroArgsNumber, macro->name());
+			g_errors.error(ErrMacroArgsNumber, macro->name());
 			return;
 		}
 	}
@@ -1040,16 +1041,16 @@ void Preproc::do_local() {
 
 void Preproc::do_exitm() {
 	if (!m_line.peek().is(TType::Newline))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else if (m_levels.size() == 1)
-		g_errors.error(ErrCode::UnbalancedStruct);
+		g_errors.error(ErrUnbalancedStruct);
 	else
 		m_levels.back().exitm_called = true;
 }
 
 void Preproc::do_rept() {
 	if (m_line.peek().is(TType::Newline))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else {
 		int count = 0;
 		bool error = false;
@@ -1076,13 +1077,13 @@ void Preproc::do_rept() {
 
 void Preproc::do_reptc() {
 	if (!m_line.peek().is(TType::Ident))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else {
 		// get variable to iterate
 		string var = m_line.peek().svalue();
 		m_line.next();
 		if (!m_line.peek().is(TType::Comma))
-			g_errors.error(ErrCode::Syntax);
+			g_errors.error(ErrSyntax);
 		else {
 			m_line.next();
 			// build string to iterate
@@ -1115,22 +1116,22 @@ void Preproc::do_reptc() {
 
 void Preproc::do_repti() {
 	if (!m_line.peek().is(TType::Ident))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else {
 		// get variable to iterate
 		string var = m_line.peek().svalue();
 		m_line.next();
 		if (!m_line.peek().is(TType::Comma))
-			g_errors.error(ErrCode::Syntax);
+			g_errors.error(ErrSyntax);
 		else {
 			m_line.next();
 			if (m_line.peek().is(TType::Newline))
-				g_errors.error(ErrCode::Syntax);
+				g_errors.error(ErrSyntax);
 			else {
 				// collect params to iterate
 				vector<ScannedLine> params = collect_macro_params(m_line);
 				if (!m_line.peek().is(TType::Newline))
-					g_errors.error(ErrCode::Syntax);
+					g_errors.error(ErrSyntax);
 				else {
 					ScannedLine body = collect_macro_body(Keyword::REPTI, Keyword::ENDR);
 
@@ -1171,17 +1172,17 @@ void Preproc::do_float() {
 	ScannedLine sublexer{ expanded };
 
 	if (sublexer.peek().is(TType::Newline))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else {
 		while (true) {
 			// parse expression
             FloatExpr expr;
 			if (!expr.parse(sublexer)) {
-				g_errors.error(ErrCode::Syntax, expanded.to_string());
+				g_errors.error(ErrSyntax, expanded.to_string());
 				return;
 			}
 			else if (expr.eval_error()) {
-				g_errors.error(ErrCode::ExprEval, expanded.to_string());
+				g_errors.error(ErrExprEval, expanded.to_string());
 				return;
 			}
 			else {
@@ -1213,7 +1214,7 @@ void Preproc::do_float() {
 			else if (sublexer.peek().is(TType::Newline))
 				break;
 			else {
-				g_errors.error(ErrCode::Syntax);
+				g_errors.error(ErrSyntax);
 				return;
 			}
 		}
@@ -1225,14 +1226,14 @@ void Preproc::do_setfloat() {
 	ScannedLine sublexer{ expanded };
 
 	if (sublexer.peek().is(TType::Newline))
-		g_errors.error(ErrCode::Syntax);
+		g_errors.error(ErrSyntax);
 	else if (sublexer.peek().is(TType::Ident)) {
 		string format = sublexer.peek().svalue();
 		sublexer.next();
 		if (!sublexer.peek().is(TType::Newline))
-			g_errors.error(ErrCode::Syntax);
+			g_errors.error(ErrSyntax);
 		else if (!g_float_format.set_text(format))
-			g_errors.error(ErrCode::IllegalFloatFormat, format);
+			g_errors.error(ErrIllegalFloatFormat, format);
 		else {
             for (auto& define : FloatFormat::get_all_defines()) {
                 undefine_static_def_sym(define.c_str());
@@ -1248,7 +1249,7 @@ void Preproc::do_setfloat() {
 void Preproc::do_line() {
     if (m_line.peek(0).is(TType::Integer)) {
         int line_num = m_line.peek(0).ivalue();
-        set_line_num(line_num, 1);
+        set_line_num(line_num - 1);
         set_c_source(false);
         m_line.next();
 
@@ -1263,9 +1264,9 @@ void Preproc::do_line() {
     }
 
     if (!m_line.peek(0).is(TType::Newline, TType::End))
-        g_errors.error(ErrCode::Syntax);
+        g_errors.error(ErrSyntax);
 
-    set_error_location(location().filename().c_str(), location().line_num());
+    set_error_location(location().filename.c_str(), location().line_num);
 }
 
 static string url_encode(const string& str) {
@@ -1284,7 +1285,7 @@ static string url_encode(const string& str) {
 void Preproc::do_c_line() {
     if (m_line.peek(0).is(TType::Integer)) {
         int line_num = m_line.peek(0).ivalue();
-        set_line_num(line_num, 0);
+        set_line_num(line_num - 0);
         set_c_source(true);
         m_line.next();
 
@@ -1299,14 +1300,14 @@ void Preproc::do_c_line() {
     }
 
     if (!m_line.peek(0).is(TType::Newline, TType::End))
-        g_errors.error(ErrCode::Syntax);
+        g_errors.error(ErrSyntax);
 
-    set_error_location(location().filename().c_str(), location().line_num());
+    set_error_location(location().filename.c_str(), location().line_num);
 
     // add debug symbol
     if (g_args.debug()) {
-        string symbol_name = "__C_LINE_" + std::to_string(location().line_num()) +
-            "_" + url_encode(location().filename());
+        string symbol_name = "__C_LINE_" + std::to_string(location().line_num) +
+            "_" + url_encode(location().filename);
         if (!find_local_symbol(symbol_name.c_str())) {
             ScannedLine label_line;
             label_line.append({ Token{TType::Ident, false, symbol_name}, Token{TType::Colon, false},
@@ -1371,7 +1372,7 @@ ExpandedLine Preproc::expand_define_call(const Token& ident, ScannedLine& line, 
 	if (macro->args().size() != 0) {
 		params = collect_macro_params(line);
 		if (macro->args().size() != params.size()) {
-			g_errors.error(ErrCode::MacroArgsNumber, macro->name());
+			g_errors.error(ErrMacroArgsNumber, macro->name());
 			return out;
 		}
 	}
@@ -1462,12 +1463,12 @@ vector<ScannedLine> Preproc::collect_macro_params(ScannedLine& line) {
 			return params;
 
 		default:
-			g_errors.error(ErrCode::Syntax);
+			g_errors.error(ErrSyntax);
 			return params;
 		}
 	}
 
-    g_errors.error(ErrCode::Syntax);
+    g_errors.error(ErrSyntax);
     return params;
 }
 
@@ -1475,7 +1476,7 @@ vector<string> Preproc::collect_name_list(ScannedLine& line) {
 	vector<string> names;
 	while (true) {
 		if (!line.peek().is(TType::Ident)) {
-			g_errors.error(ErrCode::Syntax);
+			g_errors.error(ErrSyntax);
 			break;
 		}
 		string name = line.peek().svalue();
@@ -1487,7 +1488,7 @@ vector<string> Preproc::collect_name_list(ScannedLine& line) {
 		else if (line.peek().is(TType::Newline))
 			break;
 		else {
-			g_errors.error(ErrCode::Syntax);
+			g_errors.error(ErrSyntax);
 			break;
 		}
 	}
@@ -1513,15 +1514,15 @@ ScannedLine Preproc::collect_macro_body1(Keyword start_keyword, Keyword end_keyw
         if ((label_index >= 0 && m_line.peek(2).is(start_keyword)) ||
             (m_line.peek(0).is(TType::Ident) && m_line.peek(1).is(start_keyword)) ||
             (m_line.peek(0).is(start_keyword))) {
-            g_errors.error(ErrCode::UnbalancedStructStartedAt,
-                start_location.filename() + ":" +
-                std::to_string(start_location.line_num()));
+            g_errors.error(ErrUnbalancedStructStartedAt,
+                start_location.filename + ":" +
+                std::to_string(start_location.line_num));
             return empty;
         }
         else if (m_line.peek(0).is(end_keyword)) {
             m_line.next();
             if (!m_line.peek(0).is(TType::Newline)) {
-                g_errors.error(ErrCode::Syntax);
+                g_errors.error(ErrSyntax);
                 return empty;
             }
             else {
@@ -1533,9 +1534,9 @@ ScannedLine Preproc::collect_macro_body1(Keyword start_keyword, Keyword end_keyw
         }
     }
 
-    g_errors.error(ErrCode::UnbalancedStruct,
-        start_location.filename() + ":" +
-        std::to_string(start_location.line_num()));
+    g_errors.error(ErrUnbalancedStruct,
+        start_location.filename + ":" +
+        std::to_string(start_location.line_num));
     return empty;
 }
 
@@ -1549,7 +1550,7 @@ string Preproc::collect_reptc_arg(ScannedLine& line) {
 		case TType::String:
 			line.next();
 			if (!line.peek().is(TType::End, TType::Newline)) {
-				g_errors.error(ErrCode::Syntax);
+				g_errors.error(ErrSyntax);
 				return "";
 			}
 			else
@@ -1557,7 +1558,7 @@ string Preproc::collect_reptc_arg(ScannedLine& line) {
 		case TType::Integer:
 			line.next();
 			if (!line.peek().is(TType::End, TType::Newline)) {
-				g_errors.error(ErrCode::Syntax);
+				g_errors.error(ErrSyntax);
 				return "";
 			}
 			else
@@ -1566,7 +1567,7 @@ string Preproc::collect_reptc_arg(ScannedLine& line) {
 			ExpandedLine expanded = expand(line, defines());
 			string expanded_text = str_chomp(expanded.to_string());
 			if (!line.peek().is(TType::End, TType::Newline)) {
-				g_errors.error(ErrCode::Syntax);
+				g_errors.error(ErrSyntax);
 				return "";
 			}
 			else if (expanded_text == prev_expanded) {		// detect loop
@@ -1580,12 +1581,12 @@ string Preproc::collect_reptc_arg(ScannedLine& line) {
 			}
 		}
 		default:
-			g_errors.error(ErrCode::Syntax);
+			g_errors.error(ErrSyntax);
 			return "";
 		}
 	}
 
-    g_errors.error(ErrCode::Syntax);
+    g_errors.error(ErrSyntax);
     return "";
 }
 
@@ -1615,29 +1616,17 @@ char* sfile_getline() {
 }
 
 const char* sfile_filename() {
-	if (g_preproc.location().filename().empty())
+	if (g_preproc.location().filename.empty())
 		return nullptr;
 	else
-		return spool_add(g_preproc.location().filename().c_str());
+		return spool_add(g_preproc.location().filename.c_str());
 }
 
 int sfile_line_num() {
-	return g_preproc.location().line_num();
+	return g_preproc.location().line_num;
 }
 
 bool sfile_is_c_source() {
 	return g_preproc.is_c_source();
-}
-
-void sfile_set_filename(const char* filename) {
-	g_preproc.set_filename(filename);
-}
-
-void sfile_set_line_num(int line_num, int line_inc) {
-	g_preproc.set_line_num(line_num, line_inc);
-}
-
-void sfile_set_c_source(bool f) {
-	g_preproc.set_c_source(f);
 }
 

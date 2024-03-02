@@ -13,6 +13,7 @@
 #include "scan2.h"
 #include "strpool.h"
 #include "utils.h"
+#include "utils2.h"
 #include "xassert.h"
 #include "z80asm_defs.h"
 #include <cassert>
@@ -115,7 +116,7 @@ void Args::parse_args(const vector<string>& args) {
         cout << endl;
     }
 
-	if (g_errors.count() > 0)
+	if (g_errors.count > 0)
 		return;
 
 	bool got_dash_dash = false;
@@ -130,7 +131,7 @@ void Args::parse_args(const vector<string>& args) {
 		else
 			parse_file(arg1);
 
-		if (g_errors.count() > 0)
+		if (g_errors.count > 0)
 			return;
 	}
 
@@ -297,7 +298,7 @@ void Args::parse_option(const string& arg) {
 	}																	
 #include "args.def"
 
-	g_errors.error(ErrCode::IllegalOption, arg);
+	g_errors.error(ErrIllegalOption, arg);
 }
 
 // return false if cannot parse integer
@@ -358,7 +359,7 @@ void Args::parse_define(const string& opt_arg) {
 		ident = opt_arg.substr(0, equal_pos);
 
 	if (!is_ident(ident))
-		g_errors.error(ErrCode::IllegalIdent, ident);
+		g_errors.error(ErrIllegalIdent, ident);
 	else {
 		if (equal_pos == string::npos) {
             define_static_symbol(ident.c_str(), 1);
@@ -368,7 +369,7 @@ void Args::parse_define(const string& opt_arg) {
 			if (parse_opt_int(value, opt_arg.substr(equal_pos + 1))) 
 				define_static_symbol(ident.c_str(), value);
 			else
-				g_errors.error(ErrCode::InvalidDefineOption, opt_arg);
+				g_errors.error(ErrInvalidDefineOption, opt_arg);
 		}
 	}
 }
@@ -412,18 +413,18 @@ string Args::expand_env_vars(string text) {
 
 void Args::set_float_format(const string& format) {
 	if (!g_float_format.set_text(format))
-		g_errors.error(ErrCode::IllegalFloatFormat, format);
+		g_errors.error(ErrIllegalFloatFormat, format);
 }
 
 void Args::set_float_option(const string& format) {
 	if (!g_float_format.set_text(format))
-		g_errors.error(ErrCode::IllegalFloatOption, format);
+		g_errors.error(ErrIllegalFloatOption, format);
 }
 
 void Args::set_origin(const string& opt_arg) {
 	int value = 0;
 	if (!parse_opt_int(value, opt_arg) || value < 0)	// value can be >0xffff for banked address
-		g_errors.error(ErrCode::InvalidOrgOption, opt_arg);
+		g_errors.error(ErrInvalidOrgOption, opt_arg);
 	else
 		set_origin_option(value);
 }
@@ -479,7 +480,7 @@ void Args::expand_source_glob(const string& pattern_) {
 		}
 
         if (!found)
-            g_errors.error(ErrCode::GlobNoFiles, pattern);
+            g_errors.error(ErrGlobNoFiles, pattern);
     }
 }
 
@@ -492,12 +493,12 @@ void Args::expand_list_glob(const string& pattern_) {
 		if (fs::is_regular_file(fs::path(pattern)))
 			files.push_back(fs::path(pattern));		// only one file
 		else
-			g_errors.error(ErrCode::FileNotFound, pattern);
+			g_errors.error(ErrFileNotFound, pattern);
 	}
 	else {
 		expand_glob(files, pattern);			// list of files
         if (files.empty())
-			g_errors.error(ErrCode::GlobNoFiles, pattern);
+			g_errors.error(ErrGlobNoFiles, pattern);
 	}
 
 	for (auto& file : files) {
@@ -542,7 +543,7 @@ string Args::search_source(const string& filename) {
         if (m_verbose)
             cout << "% " << m4_cmd << endl;
         if (0 != system(m4_cmd.c_str())) {
-			g_errors.error(ErrCode::CmdFailed, m4_cmd);
+			g_errors.error(ErrCmdFailed, m4_cmd);
             perror("m4");
             exit(EXIT_FAILURE);
         }
@@ -591,8 +592,8 @@ string Args::search_source(const string& filename) {
             return out_filename;
 
         // not found, avoid cascade of errors
-        if (!g_errors.count())
-            g_errors.error(ErrCode::FileNotFound, filename);
+        if (!g_errors.count)
+            g_errors.error(ErrFileNotFound, filename);
 
         return fs::path(filename).generic_string();
     }
@@ -602,7 +603,7 @@ bool Args::check_source(const string& filename, string& out_filename) {
     out_filename.clear();
 
     // avoid cascade of errors
-    if (g_errors.count()) {
+    if (g_errors.count) {
         out_filename = fs::path(filename).generic_string();
         return true;
     }
@@ -907,14 +908,14 @@ void Args::set_cpu(const string& name) {
         if (id != CPU_UNDEF)
             set_cpu(id);
         else 
-            g_errors.error(ErrCode::IllegalCpuOption, name);
+            g_errors.error(ErrIllegalCpuOption, name);
     }
 }
 
 void Args::set_filler(const string& opt_arg) {
 	int value = 0;
 	if (!parse_opt_int(value, opt_arg) || value < 0 || value > 0xFF)
-		g_errors.error(ErrCode::InvalidFillerOption, opt_arg);
+		g_errors.error(ErrInvalidFillerOption, opt_arg);
 	else
 		m_filler = value;
 }
@@ -924,12 +925,12 @@ void Args::post_parsing_actions() {
 
     // check if -d and -m* were given
     if (m_date_stamp && m_lib_for_all_cpus) {
-        g_errors.error(ErrCode::DateAndMstarIncompatible);
+        g_errors.error(ErrDateAndMstarIncompatible);
     }
 
 	// check if we have any file to process
     if (m_files.empty()) {
-		g_errors.error(ErrCode::NoSrcFile);
+		g_errors.error(ErrNoSrcFile);
     }
 
 	// make output directory if needed

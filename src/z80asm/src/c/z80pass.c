@@ -8,6 +8,7 @@ Repository: https://github.com/z88dk/z88dk
 */
 
 #include "die.h"
+#include "errors.h"
 #include "expr1.h"
 #include "if.h"
 #include "limits.h"
@@ -79,7 +80,7 @@ void Z80pass2(int start_errors, const char* obj_filename)
 				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
                 if (value < -128 || value > 127)
-                    error_integer_range(value);
+                    error_hex2(ErrIntRange, value);
                 else
                     patch_byte(expr->code_pos, (byte_t)value);
                 break;
@@ -89,21 +90,21 @@ void Z80pass2(int start_errors, const char* obj_filename)
 				value -= asmpc + expr->opcode_size;		/* get module PC at JR instruction */
 
                 if (value < -0x8000 || value > 0x7FFF)
-                    error_integer_range(value);
+                    error_hex4(ErrIntRange, value);
                 else
                     patch_word(expr->code_pos, value);
                 break;
 
 			case RANGE_BYTE_UNSIGNED:
 				if (value < -128 || value > 255)
-					warning_integer_range(value);
+                    warning_hex2(ErrIntRange, value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				break;
 
 			case RANGE_BYTE_SIGNED:
 				if (value < -128 || value > 127)
-					warning_integer_range(value);
+                    warning_hex2(ErrIntRange, value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				break;
@@ -111,7 +112,7 @@ void Z80pass2(int start_errors, const char* obj_filename)
 			case RANGE_HIGH_OFFSET:
 				if ((value & 0xff00) != 0) {
 					if ((value & 0xff00) != 0xff00)
-						warning_integer_range(value);
+                        warning_hex2(ErrIntRange, value);
 				}
 
 				patch_byte(expr->code_pos, (byte_t)(value & 0xff));
@@ -123,7 +124,7 @@ void Z80pass2(int start_errors, const char* obj_filename)
 
 			case RANGE_BYTE_TO_WORD_UNSIGNED:
 				if (value < 0 || value > 255)
-					warning_integer_range(value);
+                    warning_hex2(ErrIntRange, value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				patch_byte(expr->code_pos + 1, 0);
@@ -131,7 +132,7 @@ void Z80pass2(int start_errors, const char* obj_filename)
 
 			case RANGE_BYTE_TO_WORD_SIGNED:
 				if (value < -128 || value > 127)
-					warning_integer_range(value);
+                    warning_hex2(ErrIntRange, value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
 				patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
@@ -186,14 +187,14 @@ void Z80pass2(int start_errors, const char* obj_filename)
 	clear_error_location();
 
 	/* create object file */
-	if (start_errors == get_num_errors())
+	if (start_errors == get_error_count())
 		write_obj_file(obj_filename);
 
 	// add to the list of objects to link
-	if (start_errors == get_num_errors())
+	if (start_errors == get_error_count())
         object_file_append(obj_filename, CURRENTMODULE);
 
-	if (start_errors == get_num_errors() && option_symtable())
+	if (start_errors == get_error_count() && option_symtable())
 		write_sym_file(CURRENTMODULE);
 }
 
@@ -238,7 +239,7 @@ bool Pass2info(range_t range)
 			break;				/* proceed to evaluate expression */
 
 		default:                /* Syntax error, e.g. (ix 4) */
-			error_syntax_error();
+            error(ErrSyntax, NULL);
 			return false;		/* FAIL */
 		}
 
@@ -248,7 +249,7 @@ bool Pass2info(range_t range)
 
 	if (range == RANGE_BYTE_SIGNED && sym.tok != TK_RPAREN)
 	{
-		error_syntax_error();
+        error(ErrSyntax, NULL);
 		return false;		/* FAIL */
 	}
 

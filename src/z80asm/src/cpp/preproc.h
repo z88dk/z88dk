@@ -69,7 +69,7 @@ public:
 	bool is_c_source() const;
     void set_location(Location location);
 	void set_filename(const string& filename);
-	void set_line_num(int line_num, int line_inc = 1);
+    void set_line_num(int line_num);
 	void set_c_source(bool f);
 
 private:

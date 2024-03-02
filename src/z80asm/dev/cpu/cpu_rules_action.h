@@ -3,6 +3,7 @@
 #include "directives.h"
 #include "expr1.h"
 #include "if.h"
+#include "errors.h"
 #include "opcodes.h"
 #include "parse1.h"
 #include "str.h"

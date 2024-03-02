@@ -12,6 +12,7 @@ Handle object file contruction, reading and writing
 #include "class.h"
 #include "codearea.h"
 #include "die.h"
+#include "errors.h"
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
@@ -180,8 +181,10 @@ void write_obj_file(const char* obj_filename) {
 	// #2254 - rename temp file
 	remove(obj_filename);
 	int rv = rename(utstring_body(temp_filename), obj_filename);
-	if (rv != 0) 
-		error_file_rename(utstring_body(temp_filename));
+    if (rv != 0) {
+        error(ErrFileRename, utstring_body(temp_filename));
+        perror(utstring_body(temp_filename));
+    }
 
 	utstring_free(temp_filename);
     objfile_free(obj);

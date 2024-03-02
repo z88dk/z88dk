@@ -9,6 +9,7 @@ Repository: https://github.com/z88dk/z88dk
 
 #include "die.h"
 #include "directives.h"
+#include "errors.h"
 #include "expr1.h"
 #include "fileutil.h"
 #include "if.h"
@@ -101,7 +102,7 @@ void assemble_file( const char *filename ) {
 *----------------------------------------------------------------------------*/
 static void do_assemble(const char *src_filename, const char* obj_filename)
 {
-    int start_errors = get_num_errors();     /* count errors in this source file */
+    int start_errors = get_error_count();     /* count errors in this source file */
 
 	/* initialize local symtab with copy of static one (-D defines) */
 	copy_static_syms();
@@ -121,7 +122,7 @@ static void do_assemble(const char *src_filename, const char* obj_filename)
 	list_close();
 
 	/* remove incomplete object file */
-	if (start_errors != get_num_errors())
+	if (start_errors != get_error_count())
 		remove(obj_filename);
 
 	remove_all_local_syms();
@@ -136,7 +137,7 @@ static void do_assemble(const char *src_filename, const char* obj_filename)
  * Main entry of Z80asm
  ***************************************************************************************************/
 int z80asm_main() {
-	if (!get_num_errors()) {		/* if no errors in command line parsing */
+	if (!get_error_count()) {		/* if no errors in command line parsing */
         if (!option_lib_for_all_cpus()) {
             for (size_t i = 0; i < option_files_size(); i++)
                 assemble_file(option_file(i));
@@ -144,17 +145,17 @@ int z80asm_main() {
 	}
 
 	/* Create output file */
-	if (!get_num_errors()) {
+	if (!get_error_count()) {
 		if (option_lib_file()) {
 			make_library(option_lib_file());
 		}
 		else if (option_make_bin()) {
 			link_modules();
 
-			if (!get_num_errors())
+			if (!get_error_count())
 				CreateBinFile();
 
-			if (!get_num_errors())
+			if (!get_error_count())
 				checkrun_appmake();		/* call appmake if requested in the options */
 		}
         else if (option_consol_obj_file() && option_files_size() > 1) {	// -o consolidated obj
@@ -165,10 +166,10 @@ int z80asm_main() {
             CURRENTMODULE->filename = get_asm_filename(option_consol_obj_file_name());
             CURRENTMODULE->modname = remove_extension(path_file(CURRENTMODULE->filename));
 
-            if (!get_num_errors())
+            if (!get_error_count())
                 write_obj_file(option_consol_obj_file_name());
 
-            if (!get_num_errors() && option_symtable())
+            if (!get_error_count() && option_symtable())
                 write_sym_file(CURRENTMODULE);
         }
 	}
@@ -181,7 +182,7 @@ int z80asm_main() {
 			m_free(reloctable);
 	}
 
-	if (get_num_errors())
+	if (get_error_count())
 		return EXIT_FAILURE;
 	else
 		return EXIT_SUCCESS;

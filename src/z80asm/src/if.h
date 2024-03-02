@@ -66,66 +66,6 @@ void* must_realloc(void* block, size_t size);
 void must_free(void* block);
 char* must_strdup(const char* str);
 
-// errors
-int get_num_errors();
-void clear_error_location();
-void set_error_location(const char* filename, int line_num);
-const char* get_error_filename();
-int get_error_line_num();
-void set_error_source_line(const char* line);
-void set_error_expanded_line(const char* line);
-
-void error_align_redefined();
-void error_constant_expression_expected();
-void error_division_by_zero();
-void error_duplicate_definition(const char* name);
-void error_duplicate_definition_module(const char* modulename, const char* name);
-void error_recursive_expression();
-void error_file_not_found(const char* filename);
-void error_file_open(const char* filename);
-void error_file_rename(const char* filename);
-void error_illegal_identifier();
-void error_integer_range(int value);
-void error_invalid_char_const();
-void error_invalid_org(int origin);
-void error_invalid_library_file_version(const char* filename, int found_version, int expected_version);
-void error_missing_bracket_block();
-void error_bracket_block_not_closed();
-void error_missing_quote();
-void error_invalid_library_file(const char* filename);
-void error_invalid_object_file(const char* filename);
-void error_invalid_object_file_version(const char* filename, int found_version, int expected_version);
-void error_org_not_aligned(int origin, int align);
-void error_org_redefined();
-void error_segment_overflow();
-void error_string_longer_than_reserved_space();
-void error_symbol_redeclaration(const char* name);
-void error_syntax_error();
-void error_syntax_error_in_expression();
-void error_undefined_symbol(const char* name);
-void warning_expr_in_parens();
-void warning_org_ignored(const char* filename, const char* section);
-void warning_integer_range(int value);
-void error_dma_base_register_byte_illegal(int value);
-void error_dma_missing_register_group_members();
-void error_dma_too_many_arguments();
-void error_dma_illegal_port_a_timing();
-void error_dma_illegal_port_b_timing();
-void error_dma_does_not_support_interrupts();
-void warning_dma_does_not_support_some_features();
-void warning_dma_does_not_implement_this_command();
-void error_dma_illegal_mode();
-void error_dma_illegal_command();
-void error_dma_illegal_read_mask();
-void warning_dma_does_not_support_half_cycle_timing();
-void warning_dma_does_not_support_ready_signals();
-void error_command_failed(const char* cmd);
-void error_assertion_failed();
-void error_incompatible_cpu(const char* filename, cpu_t got_cpu_id);
-void error_illegal_cpu(const char* filename, cpu_t cpu_id);
-void error_incompatible_ixiy(const char* filename, swap_ixiy_t swap_ixiy);
-void error_date_and_mstar_incompatible();
-
 // options
 bool option_verbose();
 swap_ixiy_t option_swap_ixiy();
@@ -199,9 +139,6 @@ char* sfile_getline();	// NOTE: user must free returned pointer
 const char* sfile_filename();
 int sfile_line_num();
 bool sfile_is_c_source();
-void sfile_set_filename(const char* filename);
-void sfile_set_line_num(int line_num, int line_inc);
-void sfile_set_c_source(bool f);
 
 // code area
 int get_PC();

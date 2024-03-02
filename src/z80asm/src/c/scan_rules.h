@@ -17246,12 +17246,12 @@ _eof_trans:
    if (Str_len(string) == 1)
     sym.number = Str_data(string)[0];
    else
-    error_invalid_char_const();
+                error(ErrInvalidCharConst, NULL);
    STR_DELETE(string);
   }
   else
   {
-   error_invalid_char_const();
+            error(ErrInvalidCharConst, NULL);
   }
   ts = te = p;
   {p++; goto _out; }
@@ -17261,7 +17261,7 @@ _eof_trans:
 	{te = p+1;{
   sym.tok = TK_STRING;
   if ( ! get_sym_string() )
-   error_missing_quote();
+            error(ErrMissingQuote, NULL);
   {p++; goto _out; }
  }}
 	break;

@@ -58,7 +58,7 @@ endif
 # Object files
 #------------------------------------------------------------------------------
 C_SRCS		:= $(filter-out src/c/test.c, $(wildcard src/c/*.c ../common/*.c ../../ext/regex/reg*.c))
-CXX_SRCS	:= $(wildcard src/cpp/*.cpp)
+CXX_SRCS	:= $(wildcard src/*.cpp src/cpp/*.cpp)
 OBJS_ALL	:= $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o) $(UNIXem_OBJS)
 OBJS		:= $(filter-out main.o, $(OBJS_ALL))
 

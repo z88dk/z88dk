@@ -248,13 +248,13 @@ main := |*
 			if (Str_len(string) == 1)
 				sym.number = Str_data(string)[0];
 			else
-				error_invalid_char_const(); 
+                error(ErrInvalidCharConst, NULL);
 				
 			STR_DELETE(string);
 		}
 		else
 		{
-			error_invalid_char_const(); 
+            error(ErrInvalidCharConst, NULL);
 		}
 		ts = te = p;
 		fbreak;
@@ -265,7 +265,7 @@ main := |*
 	{ 
 		sym.tok = TK_STRING;
 		if ( ! get_sym_string() )	/* consumes input up to end quote or \n */
-			error_missing_quote(); 
+            error(ErrMissingQuote, NULL);
 		fbreak;
 	};
 	

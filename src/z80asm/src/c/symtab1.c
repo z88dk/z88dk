@@ -14,6 +14,7 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 */
 
 #include "die.h"
+#include "errors.h"
 #include "expr1.h"
 #include "fileutil.h"
 #include "if.h"
@@ -126,7 +127,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
 		if (sym->module && sym->module != module && sym->module->modname)
 			error_duplicate_definition_module(sym->module->modname, name);
 		else
-			error_duplicate_definition(name);
+            error(ErrDuplicateDefinition, name);
     }
 
     return sym;
@@ -336,7 +337,7 @@ static Symbol1* define_local_symbol(const char* name, long value, sym_type_t typ
 		Symbol1Hash_set(&CURRENTMODULE->local_symtab, name, sym);
 	}
 	else if (sym->is_defined)			/* local symbol already defined */
-		error_duplicate_definition(name);
+        error(ErrDuplicateDefinition, name);
 	else								/* symbol declared local, but not yet defined */
 	{
 		sym->value = value;
@@ -372,7 +373,7 @@ Symbol1* define_symbol(const char* name, long value, sym_type_t type)
 	else if (sym->is_defined)				/* global symbol already defined */
 	{
 		if (strncmp(name, "__CDBINFO__", 11) != 0)
-			error_duplicate_definition(name);
+            error(ErrDuplicateDefinition, name);
 	}
 	else
 	{
@@ -402,7 +403,7 @@ void update_symbol(const char *name, long value, sym_type_t type )
 		sym = find_symbol( name, global_symtab );
 
     if ( sym == NULL )
-		error_undefined_symbol(name);
+        error(ErrUndefinedSymbol, name);
 	else
 	{
 		sym->value = value;
@@ -437,7 +438,7 @@ void declare_global_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_GLOBAL)
 		{
-			error_symbol_redeclaration(name);
+            error(ErrSymbolRedeclaration, name);
 		}
 		else
 		{
@@ -501,7 +502,7 @@ void declare_public_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_PUBLIC)
 		{
-			error_symbol_redeclaration(name);
+            error(ErrSymbolRedeclaration, name);
 		}
 		else
 		{
@@ -560,7 +561,7 @@ void declare_extern_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_EXTERN)
 		{
-			error_symbol_redeclaration(name);
+            error(ErrSymbolRedeclaration, name);
 		}
 		else
 		{
@@ -589,13 +590,13 @@ void declare_extern_symbol(const char *name)
             else
             {
                 /* already declared local */
-                error_symbol_redeclaration( name );
+                error(ErrSymbolRedeclaration, name);
             }
         }
         else 
         {
 			/* re-declaration not allowed */
-			error_symbol_redeclaration(name);
+            error(ErrSymbolRedeclaration, name);
 		}
     }
 }
@@ -713,7 +714,7 @@ void check_undefined_symbols(Symbol1Hash *symtab)
 
 		if (sym->scope == SCOPE_PUBLIC && !sym->is_defined) {
 			set_error_location(sym->filename, sym->line_num);
-			error_undefined_symbol(sym->name);
+            error(ErrUndefinedSymbol, sym->name);
 		}
 	}
 	clear_error_location();
