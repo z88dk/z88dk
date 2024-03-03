@@ -31,7 +31,8 @@
     PUBLIC    l_dcal		;jp(hl)
 
     defc    TAR__clib_exit_stack_size = 32
-    defc    TAR__register_sp = -1
+    ; Set sp to be &bdos, this sorts out CP/M 3 compatibility
+    defc    TAR__register_sp = -6
     defc	__CPU_CLOCK = 4000000
 
     IF !DEFINED_CRT_ORG_CODE
