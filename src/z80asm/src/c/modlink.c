@@ -8,6 +8,7 @@ Repository: https://github.com/z88dk/z88dk
 */
 
 #include "alloc.h"
+#include "args.h"
 #include "codearea.h"
 #include "errors.h"
 #include "expr1.h"
@@ -1047,14 +1048,14 @@ void link_modules(void) {
 	}
 
 	// link libraries, unless building a consol_obj_file 
-	if (!get_error_count() && !option_consol_obj_file() && g_libraries != NULL)
+	if (!get_error_count() && !option_is_consol_obj_file() && g_libraries != NULL)
 		link_libraries(extern_syms);
 
 	clear_error_location();
 
 	/* allocate segment addresses and compute absolute addresses of symbols */
 	/* in consol_obj_file sections are zero-based */
-	if (!get_error_count() && !option_consol_obj_file())
+	if (!get_error_count() && !option_is_consol_obj_file())
 		sections_alloc_addr();
 
 	/* relocate address symbols */
@@ -1062,10 +1063,10 @@ void link_modules(void) {
 		relocate_symbols();
 
 	/* define assembly size */
-	if (!get_error_count() && !option_consol_obj_file())
+	if (!get_error_count() && !option_is_consol_obj_file())
 		define_location_symbols();
 
-	if (option_consol_obj_file()) {
+	if (option_is_consol_obj_file()) {
 		if (!get_error_count())
 			merge_modules(extern_syms);
 	}
@@ -1089,10 +1090,10 @@ void link_modules(void) {
 	clear_error_location();
 
 	if (!get_error_count()) {
-		if (option_map())
+		if (option_map_file())
 			write_map_file();
 
-		if (option_globaldef())
+		if (option_global_def())
 			write_def_file();
 	}
 

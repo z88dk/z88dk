@@ -10,6 +10,7 @@ Define CPU opcodes
 */
 
 #include "../portability.h"
+#include "args.h"
 #include "codearea.h"
 #include "directives.h"
 #include "errors.h"
@@ -18,8 +19,8 @@ Define CPU opcodes
 #include "parse1.h"
 #include "symtab1.h"
 #include "xassert.h"
-#include "z80asm1.h"
 #include "z80asm_defs.h"
+#include "z80asm1.h"
 
 /* add 1 to 4 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xCB00 */

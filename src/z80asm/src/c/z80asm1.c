@@ -7,6 +7,7 @@ License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_licens
 Repository: https://github.com/z88dk/z88dk
 */
 
+#include "args.h"
 #include "die.h"
 #include "directives.h"
 #include "errors.h"
@@ -62,7 +63,7 @@ void assemble_file( const char *filename ) {
 	// when building libraries need to reset codearea to allow total library size > 64K
 	// when building binary cannot reset codearea so that each module is linked
 	// after the previous one, allocating addresses
-	if (!(option_make_bin() || option_bin_file() || option_consol_obj_file()))
+	if (!(option_make_bin() || option_bin_file() || option_is_consol_obj_file()))
 		reset_codearea();
 
 	// Create module data structures for new file
@@ -74,7 +75,7 @@ void assemble_file( const char *filename ) {
 	}
 	else {
         // check -o file as output of a single assembly file
-        if (option_consol_obj_file() && option_files_size() == 1) {
+        if (option_is_consol_obj_file() && option_files_size() == 1) {
             obj_filename = option_consol_obj_file_name();
         }
 
@@ -158,7 +159,7 @@ int z80asm_main() {
 			if (!get_error_count())
 				checkrun_appmake();		/* call appmake if requested in the options */
 		}
-        else if (option_consol_obj_file() && option_files_size() > 1) {	// -o consolidated obj
+        else if (option_is_consol_obj_file() && option_files_size() > 1) {	// -o consolidated obj
             link_modules();
 
             set_cur_module(get_first_module(NULL));

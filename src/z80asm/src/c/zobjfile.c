@@ -9,6 +9,7 @@ Repository: https://github.com/z88dk/z88dk
 Handle object file contruction, reading and writing
 */
 
+#include "args.h"
 #include "class.h"
 #include "codearea.h"
 #include "die.h"

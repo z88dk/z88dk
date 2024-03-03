@@ -175,14 +175,14 @@ string Token::concat(const string& s1, const string& s2) {
         return s1 + s2;
     else if (str_ends_with(s1, "##"))   // cpp-style concatenation
         return s1.substr(0, s1.length() - 2) + s2;
-    else if (is_space(s1.back()) || is_space(s2.front()))
+    else if (isspace(s1.back()) || isspace(s2.front()))
         return s1 + s2;
     else if (is_ident(s1.back()) && is_ident(s2.front()))
         return s1 + " " + s2;
-    else if (s1.back() == '$' && is_xdigit(s2.front()))
+    else if (s1.back() == '$' && isxdigit(s2.front()))
         return s1 + " " + s2;
     else if ((s1.back() == '%' || s1.back() == '@') &&
-        (is_digit(s2.front()) || s2.front() == '"'))
+        (isdigit(s2.front()) || s2.front() == '"'))
         return s1 + " " + s2;
     else if ((s1.back() == '&' && s2.front() == '&') ||
         (s1.back() == '|' && s2.front() == '|') ||
@@ -333,7 +333,7 @@ bool FileScanner::get_token_line(ScannedLine& line) {
     line.clear();
     string str, error;
     int quote = 0;
-    bool raw_strings = g_args.raw_strings();
+    bool raw_strings = g_args.raw_strings;
     m_got_error = false;
     m_blank_before = false;
 
@@ -417,7 +417,7 @@ main_loop:
             ident "'"?      { str = string(p0, p);
 
                               // to upper
-                              if (g_args.ucase()) str = str_toupper(str);
+                              if (g_args.ucase) str = str_toupper(str);
 
                               // handle af' et all
                               Keyword keyword = keyword_lookup(str);
@@ -428,7 +428,7 @@ main_loop:
                               }
 
                               // check for -IXIY
-                              if (g_args.swap_ixiy() != IXIY_NO_SWAP) {
+                              if (g_args.get_swap_ixiy() != IXIY_NO_SWAP) {
                                 switch (keyword) {
                                 case Keyword::IX: case Keyword::IXH: case Keyword::IXL:
                                 case Keyword::IY: case Keyword::IYH: case Keyword::IYL:

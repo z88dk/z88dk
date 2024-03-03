@@ -5,6 +5,7 @@
 // Repository: https://github.com/z88dk/z88dk
 //-----------------------------------------------------------------------------
 
+#include "args.h"
 #include "errors.h"
 #include "fileutil.h"
 #include "if.h"
@@ -138,10 +139,10 @@ void make_library(const char *lib_filename) {
 
         // assemble or include object for each cpu-ixiy combination and append to library
         for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
-            set_cpu_option(*cpu);
+            option_set_cpu(*cpu);
 
             for (swap_ixiy_t ixiy = first_ixiy; ixiy <= last_ixiy; ixiy++) {
-                set_swap_ixiy_option(ixiy);
+                option_set_swap_ixiy(ixiy);
 
                 for (size_t i = 0; i < option_files_size(); i++) {
                     const char* filename = option_file(i);

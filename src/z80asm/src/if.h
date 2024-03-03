@@ -66,42 +66,8 @@ void* must_realloc(void* block, size_t size);
 void must_free(void* block);
 char* must_strdup(const char* str);
 
-// options
-bool option_verbose();
-swap_ixiy_t option_swap_ixiy();
-void set_swap_ixiy_option(swap_ixiy_t swap_ixiy);
-void push_includes(const char* dir);
-void pop_includes();
-const char* search_includes(const char* filename);
-cpu_t option_cpu();
-void set_cpu_option(int cpu);
-const char* option_cpu_name();
-bool option_ti83();
-bool option_ti83plus();
-bool option_speed();
-bool option_debug();
-const char* search_libraries(const char* filename);
-const char* option_lib_file();
-bool option_lib_for_all_cpus();
 void library_file_append(const char* filename);
-const char* option_bin_file();
-bool option_make_bin();
-bool option_split_bin();
-bool option_date_stamp();
-bool option_relocatable();
-bool option_reloc_info();
-int option_filler();
 void set_origin_option(int origin);
-bool option_symtable();
-bool option_list_file();
-bool option_map();
-bool option_globaldef();
-int option_appmake();
-bool option_consol_obj_file();
-const char* option_consol_obj_file_name();
-size_t option_files_size();
-const char* option_file(size_t n);
-bool option_debug_z80asm();
 
 // filesystem
 const char* path_parent_dir(const char* filename);

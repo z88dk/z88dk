@@ -14,34 +14,6 @@
 #include <regex>
 #include <set>
 
-bool is_ident(const string& ident) {
-    if (ident.empty())
-        return false;
-    else if (!is_ident_start(ident[0]))
-        return false;
-    else {
-        for (auto c : ident) {
-            if (!is_ident(c))
-                return false;
-        }
-        return true;
-    }
-}
-
-int char_digit(char c) {
-    return is_digit(c) ? c - '0' : is_xdigit(c) ? 10 + to_upper(c) - 'A' : -1;
-}
-
-string str_tolower(string str) {
-    std::transform(str.begin(), str.end(), str.begin(), [](char c) {return to_lower(c); });
-    return str;
-}
-
-string str_toupper(string str) {
-    std::transform(str.begin(), str.end(), str.begin(), [](char c) {return to_upper(c); });
-    return str;
-}
-
 // convert "\xnn" et all to characters
 string str_compress_escapes(const string& in) {
 	string out;
@@ -125,132 +97,12 @@ string str_expand_escapes(const string& in) {
 	return out;
 }
 
-// https://stackoverflow.com/questions/874134/find-out-if-string-ends-with-another-string-in-c
-bool str_ends_with(const string& str, const string& ending) {
-	if (str.length() >= ending.length())
-		return (0 == str.compare(str.length() - ending.length(), ending.length(), ending));
-	else
-		return false;
-}
-
-string str_replace_all(string text, const string& find, const string& replace) {
-	size_t p = 0;
-	while ((p = text.find(find, p)) != std::string::npos) {
-		text.replace(p, find.length(), replace);
-		p += replace.length();
-	}
-	return text;
-}
-
 // https://www.bing.com/search?q=c%2B%2B+split+blank+delimited+string+into+vector+of+stringsd&showconv=1&sendquery=1&form=WSBQFC&qs=SW&cvid=286798d5917e488fb05cbeda30b71104&pq=c%2B%2B+split+blank+delimited+string+into+vector+of+stringsd&cc=PT&setlang=en-US&nclid=9310176510014EEEAB71B45D62C6D720&ts=1703540528160&wsso=Moderate
 vector<string> split(const string& s) {
     istringstream iss(s);
     vector<string> tokens{ istream_iterator<string>{iss},
                            istream_iterator<string>{} };
     return tokens;
-}
-
-static void expand_glob_1(set<fs::path>& result, const string& pattern);
-
-static void expand_wildcards(set<fs::path>& result,
-	const vector<string>& elems, size_t cur_elem) {
-	// build prefix and suffix
-	fs::path prefix;
-    for (size_t i = 0; i < cur_elem; i++) {
-        prefix /= fs::path(elems[i]);
-    }
-    if (prefix.empty()) {
-        prefix = ".";
-    }
-
-	fs::path suffix;
-    for (size_t i = cur_elem + 1; i < elems.size(); i++) {
-		suffix /= elems[i];
-    }
-
-	// expand current element
-	if (elems[cur_elem] == "**") {
-		fs::path new_path{ prefix };
-		if (!suffix.empty())
-			new_path /= suffix;
-		expand_glob_1(result, new_path.generic_string());		// recurse
-
-		for (auto& entry : fs::recursive_directory_iterator(prefix)) {
-			if (fs::is_directory(entry)) {
-				fs::path new_path{ entry };
-				if (!suffix.empty())
-					new_path /= suffix;
-				expand_glob_1(result, new_path.generic_string());		// recurse
-			}
-			else if (suffix.empty() && fs::is_regular_file(entry)) {
-				expand_glob_1(result, entry.path().generic_string());
-			}
-		}
-	}
-	else {
-		// make a regex pattern
-		string pattern = elems[cur_elem];
-		pattern = str_replace_all(pattern, ".", "\\.");
-		pattern = str_replace_all(pattern, "*", ".*");
-		pattern = str_replace_all(pattern, "?", ".");
-		std::regex re{ pattern };
-
-		// iterate through directory and recurse for each match
-		if (fs::is_directory(prefix)) {
-			for (auto& entry : fs::directory_iterator(prefix)) {
-				string entry_basename_str = entry.path().filename().generic_string();
-				if (regex_match(entry_basename_str, re)) {
-					fs::path new_path{ entry };
-					if (!suffix.empty())
-						new_path /= suffix;
-					expand_glob_1(result, new_path.generic_string());		// recurse
-				}
-			}
-		}
-	}
-}
-
-static void expand_glob_1(set<fs::path>& result, const string& pattern) {
-	// split path in directory/file elements
-	fs::path full_path{ pattern };
-	vector<string> elems;
-	for (auto elem : full_path) {
-		elems.push_back(elem.generic_string());
-	}
-
-	// iterate through element looking for wildcards
-	for (size_t i = 0; i < elems.size(); i++) {
-		// check if this element has wildcards
-		size_t wc_pos = elems[i].find_first_of("?*");
-		if (wc_pos != string::npos) {
-			expand_wildcards(result, elems, i);
-			return;
-		}
-	}
-
-	// if we reached here, there are no wildcards
-	fs::path path{ pattern };
-	if (fs::is_directory(path) || fs::is_regular_file(path))
-		result.insert(path);
-}
-
-// use set in recursion to eliminate duplicates
-void expand_glob(vector<fs::path>& result, const string& pattern) {
-    set<fs::path> files;
-    expand_glob_1(files, pattern);
-
-    // #2380 - remove ./ prefix if it was added during glob search
-    bool pattern_has_dot_slash = (pattern.substr(0, 2) == "./");
-    for (auto& file : files) {
-        string file_str = file.generic_string();
-
-        if (!pattern_has_dot_slash && file_str.substr(0, 2) == "./") {
-            // ./ was added during glob search
-            file_str.erase(file_str.begin(), file_str.begin() + 2);
-        }
-
-        result.push_back(file_str);
-    }
 }
 
 int ipow(int base, int exp) {

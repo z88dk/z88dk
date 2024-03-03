@@ -1273,7 +1273,7 @@ static string url_encode(const string& str) {
     const char* hex = "0123456789abcdef";
     ostringstream out;
     for (auto c : str) {
-        if (is_alnum(c))
+        if (isalnum(c))
             out << c;
         else
             out << '_' << hex[(c >> 4) & 0xf] << hex[c & 0xf];
@@ -1305,7 +1305,7 @@ void Preproc::do_c_line() {
     set_error_location(location().filename.c_str(), location().line_num);
 
     // add debug symbol
-    if (g_args.debug()) {
+    if (g_args.debug) {
         string symbol_name = "__C_LINE_" + std::to_string(location().line_num) +
             "_" + url_encode(location().filename);
         if (!find_local_symbol(symbol_name.c_str())) {

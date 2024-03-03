@@ -8,6 +8,7 @@ Repository: https://github.com/z88dk/z88dk
 Manage the code area in memory
 */
 
+#include "args.h"
 #include "codearea.h"
 #include "die.h"
 #include "errors.h"

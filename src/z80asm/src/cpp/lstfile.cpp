@@ -244,7 +244,7 @@ void list_got_source_line(const char* filename, int line_num, const char* text) 
 
 // send line to list file
 void list_got_expanded_line(const char* text) {
-	if (list_is_on() && g_args.verbose()) {
+	if (list_is_on() && g_args.verbose) {
 		string line = string("      + ") + text;
 		list_expanded_line(
 			get_PC(), get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),

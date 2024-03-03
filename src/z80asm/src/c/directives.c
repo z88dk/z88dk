@@ -9,6 +9,7 @@ Repository: https://github.com/z88dk/z88dk
 Assembly directives.
 */
 
+#include "args.h"
 #include "errors.h"
 #include "codearea.h"
 #include "die.h"

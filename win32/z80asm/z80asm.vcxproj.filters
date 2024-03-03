@@ -51,9 +51,6 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\lstfile.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\cpp\args.h">
-      <Filter>Header Files\cpp</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\alloc.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
@@ -165,6 +162,9 @@
     <ClInclude Include="..\..\src\z80asm\src\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\args.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\src\c\alloc.c">
@@ -257,9 +257,6 @@
     <ClCompile Include="..\..\src\z80asm\src\c\reloc_code.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\cpp\args.cpp">
-      <Filter>Source Files\cpp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\cpp\scan2.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
@@ -270,6 +267,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\args.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -286,9 +286,6 @@
     <None Include="..\..\src\z80asm\src\cpp\float.def">
       <Filter>Resource Files\cpp</Filter>
     </None>
-    <None Include="..\..\src\z80asm\src\cpp\args.def">
-      <Filter>Resource Files\cpp</Filter>
-    </None>
     <None Include="..\..\src\z80asm\src\cpp\scan2.def">
       <Filter>Resource Files\cpp</Filter>
     </None>
@@ -296,6 +293,9 @@
       <Filter>Resource Files\cpp</Filter>
     </None>
     <None Include="..\..\src\z80asm\src\errors.def">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\src\args.def">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

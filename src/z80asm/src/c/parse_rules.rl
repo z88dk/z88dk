@@ -503,8 +503,8 @@ Define rules for a ragel-based parser.
 				error(ErrConstExprExpected, NULL);
             else {
                 switch (ctx->expr_value) {
-                case 0: set_cpu_option(CPU_EZ80_Z80); break;
-                case 1: set_cpu_option(CPU_EZ80); break;
+                case 0: option_set_cpu(CPU_EZ80_Z80); break;
+                case 1: option_set_cpu(CPU_EZ80); break;
                 default: error_hex2(ErrIntRange, ctx->expr_value);
                 }
             }

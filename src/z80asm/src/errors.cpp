@@ -4,7 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "cpp/args.h"
+#include "args.h"
 #include "errors.h"
 #include "strpool.h"
 #include "utils.h"
@@ -233,7 +233,7 @@ static const char* ixiy_to_string(swap_ixiy_t swap_ixiy) {
 void error_incompatible_ixiy(const char* filename, swap_ixiy_t swap_ixiy) {
     ostringstream error;
     error << "file " << filename << " compiled with " << ixiy_to_string(swap_ixiy)
-        << ", incompatible with " << ixiy_to_string(g_args.swap_ixiy());
+        << ", incompatible with " << ixiy_to_string(g_args.get_swap_ixiy());
     g_errors.error(ErrIXIYIncompatible, error.str());
 }
 
