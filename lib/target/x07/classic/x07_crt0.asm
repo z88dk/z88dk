@@ -40,10 +40,7 @@ start:
     call	crt0_init_bss
     ld      (exitsp),sp
 
-
-IF DEFINED_USING_amalloc
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
     ;ld a,65	; (Debugging:  print 'A' char)
     ;call $009F

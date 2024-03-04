@@ -54,9 +54,8 @@ ENDIF
     call    crt0_init_bss
 
 
-IF DEFINED_USING_amalloc
-;    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+;    INCLUDE "crt/classic/crt_init_heap.asm"
+
     exx
     ex      de,hl
     ld      hl,-128		;Copy argument to stack, max length is 128 characters

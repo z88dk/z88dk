@@ -105,9 +105,9 @@ start:
     ld      (exitsp),sp
     INCLUDE "crt/classic/crt_start_eidi.inc"
     call    asm_lcd_init
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+
+    INCLUDE "crt/classic/crt_init_heap.asm"
+
     call    _main
 cleanup:
     INCLUDE "crt/classic/crt_terminate.inc"

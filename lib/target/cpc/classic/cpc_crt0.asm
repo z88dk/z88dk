@@ -120,10 +120,8 @@ ENDIF
     ei
 
 
-IF DEFINED_USING_amalloc
     defc    CRT_MAX_HEAP_ADDRESS = 0xa600
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
 IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
     ld      a,CLIB_DEFAULT_SCREEN_MODE

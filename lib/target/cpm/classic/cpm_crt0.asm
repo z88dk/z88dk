@@ -150,12 +150,7 @@ IF (startup=3) | (startup=4) | (startup=5)
 	pop hl
 ENDIF
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
 IF CRT_ENABLE_COMMANDLINE = 1
     ld      hl,$80
@@ -187,6 +182,7 @@ cleanup:
     pop     hl
 
 ; For CP/M 3 return the exit value via BDOS P_CODE
+PUBLIC __restore_sp_onexit
 __restore_sp_onexit:
     ld      sp,0	;Pick up entry sp
     ld      c,12        ;Get CPM version

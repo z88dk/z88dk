@@ -89,9 +89,8 @@ start:
     ld      (exitsp),sp
 
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
+
     ; Copy variables from "text graphics mem" to "video graphics mem page 0"
     ld      hl,$efc0
     ld      b,64

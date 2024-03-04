@@ -280,34 +280,33 @@ has48k:
     defc    __register_sp = -1
 ENDIF
         
-        ;ei
-        ;xor     a
-        ;out     ($80),a
-        ;call    $c021      ; setup text page (ptr in HL)
-       
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm" 
-	call	crt0_init_bss
-	ld	(exitsp),sp
-		
-IF DEFINED_USING_amalloc
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-		
-        call    _main
-cleanup:
-        push    hl
-        call    crt0_exit
+    ;ei
+    ;xor     a
+    ;out     ($80),a
+    ;call    $c021      ; setup text page (ptr in HL)
+    
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm" 
+    call	crt0_init_bss
+    ld	(exitsp),sp
+        
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
-        pop     bc
+
+    call    _main
+cleanup:
+    push    hl
+    call    crt0_exit
+
+    pop     bc
 __restore_sp_onexit:
-        ld      sp,0
+    ld      sp,0
 
 IF (startup=2)
-        ;jp      $C000  ; BASIC entry (COLD RESET)
-        jp      $C003  ; BASIC entry (WARM RESET)
+    ;jp      $C000  ; BASIC entry (COLD RESET)
+    jp      $C003  ; BASIC entry (WARM RESET)
 ELSE
-	ret
+    ret
 ENDIF
 
 l_dcal:

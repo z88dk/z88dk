@@ -28,9 +28,7 @@ start:
     call    crt0_init_bss
     ld      (exitsp),sp
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
 IF startup = 3
     call    loadbanks

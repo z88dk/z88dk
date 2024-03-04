@@ -169,13 +169,11 @@ ENDIF
 ;-------------------------------------
 start:
 	ld	(__restore_sp_onexit+1),sp
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-        call    crt0_init_bss
-        ld      (exitsp),sp
-IF DEFINED_USING_amalloc
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+    ld      (exitsp),sp
+	INCLUDE "crt/classic/crt_init_heap.asm"
 
 
 	EXTERN	fputc_cons

@@ -82,7 +82,7 @@ program:
     ld      hl,palette
     call    asm_load_palette
 
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    INCLUDE "crt/classic/crt_init_heap.asm"
     INCLUDE "crt/classic/crt_start_eidi.inc"
     ld      hl,0
     push    hl

@@ -53,7 +53,7 @@ start:
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call	crt0_init_bss
     INCLUDE "crt/classic/crt_start_eidi.inc"
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    INCLUDE "crt/classic/crt_init_heap.asm"
     call    _main           ; Call user program
 cleanup:
     call    crt0_exit

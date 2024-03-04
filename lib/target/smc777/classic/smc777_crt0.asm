@@ -71,7 +71,7 @@ program:
     ; Enable interrupts (by default)
     INCLUDE "crt/classic/crt_start_eidi.inc"
 
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    INCLUDE "crt/classic/crt_init_heap.asm"
     ld      hl,0
     push    hl      ;argv
     push    hl      ;argc

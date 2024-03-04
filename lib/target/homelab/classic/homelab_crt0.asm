@@ -38,9 +38,7 @@ start:
     call    crt0_init_bss
     ld      (exitsp),sp
     out     ($ff),a
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
     INCLUDE "crt/classic/crt_start_eidi.inc"
     ld      hl,0
     push    hl	;argv

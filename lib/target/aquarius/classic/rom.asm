@@ -28,9 +28,7 @@ program:
     ld      (exitsp),sp
 
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
 ; Entry to the user code
     call    _main

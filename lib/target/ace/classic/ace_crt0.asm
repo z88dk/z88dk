@@ -72,10 +72,7 @@ IF DEFINED_CRT_FONT
     ldir
 ENDIF
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
 IF (startup=2)
 

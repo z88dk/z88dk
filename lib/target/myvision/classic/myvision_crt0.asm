@@ -88,12 +88,8 @@ start:
     out     ($01),a
 
     ei
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
+
     call    _main
 cleanup:
     rst     0       ;Restart when main finishes

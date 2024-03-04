@@ -297,12 +297,9 @@ IF 0
     ld      a,h
     ld      (hl+),a
 ENDIF
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+
+    INCLUDE "crt/classic/crt_init_heap.asm"
+
     ei
     push    hl	;argv
     push    bc	;argc

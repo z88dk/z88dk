@@ -75,9 +75,8 @@ start:
     ld  (exitsp),sp
 
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
+
 IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
     EXTERN asm_bee_set_screenmode
     ld     a,CLIB_DEFAULT_SCREEN_MODE

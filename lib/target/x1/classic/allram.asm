@@ -43,11 +43,8 @@ program:
 
     call    crt0_init_bss
     ld      (exitsp),sp
-IF DEFINED_USING_amalloc
-    ld      hl,0
-    add     hl,sp
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
+
     ; Install the keyboard interrupt handler
     ld      de,asm_x1_keyboard_handler
     call    asm_im1_install_isr

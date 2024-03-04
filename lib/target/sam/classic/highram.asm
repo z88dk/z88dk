@@ -29,9 +29,7 @@ program:
 
 
     ; Setup heap between end program and sp
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
     ; Now, page the screen into 0000-0x7fff
     INCLUDE "target/sam/classic/sam_switchmode.inc"
