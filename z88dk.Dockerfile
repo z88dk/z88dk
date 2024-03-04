@@ -18,7 +18,7 @@ RUN apk add --no-cache build-base libxml2 m4 curl gmp-dev gmp \
 		perl-template-toolkit perl-app-cpanminus \
     && git clone --depth 1 --recursive https://github.com/z88dk/z88dk.git ${Z88DK_PATH} 
 
-RUN cpanm -l $HOME/perl5 --no-wget local::lib Test::HexDifferences Template::Plugin::YAML 
+RUN cpanm -l $HOME/perl5 --no-wget local::lib Template::Plugin::YAML 
 
 # Add, edit or uncomment the following lines to customize the z88dk compilation
 # COPY clib_const.m4 ${Z88DK_PATH}/libsrc/_DEVELOPMENT/target/
