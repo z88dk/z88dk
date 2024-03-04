@@ -232,6 +232,7 @@
     <ClInclude Include="..\..\src\z80asm\src\c\z80asm1.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\zobjfile.h" />
     <ClInclude Include="..\..\src\z80asm\src\errors.h" />
+    <ClInclude Include="..\..\src\z80asm\src\file_reader.h" />
     <ClInclude Include="..\..\src\z80asm\src\if.h" />
     <ClInclude Include="..\..\src\z80asm\src\utils.h" />
   </ItemGroup>
@@ -270,6 +271,7 @@
     <ClCompile Include="..\..\src\z80asm\src\c\z80pass.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\zobjfile.c" />
     <ClCompile Include="..\..\src\z80asm\src\errors.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\file_reader.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\utils.cpp" />
   </ItemGroup>
   <ItemGroup>

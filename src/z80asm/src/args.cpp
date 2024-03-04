@@ -7,7 +7,7 @@
 #include "../config.h"
 #include "args.h"
 #include "cpp/float.h"
-#include "cpp/preproc.h"
+#include "file_reader.h"
 #include "cpp/scan2.h"
 #include "errors.h"
 #include "if.h"
@@ -450,7 +450,7 @@ void Args::parse_file(const string& arg_) {
         return;
 
     if (arg[0] == '@')
-		expand_list_glob(arg.substr(1));
+		expand_list_glob(str_strip(arg.substr(1)));
 	else
 		expand_source_glob(arg);
 }
@@ -458,7 +458,7 @@ void Args::parse_file(const string& arg_) {
 // get list of files from pattern
 void Args::expand_source_glob(const string& pattern_) {
     string pattern = norm_filename(pattern_);           // #2476
-	size_t wc_pos = pattern.find_first_of("*?");
+    size_t wc_pos = pattern.find_first_of("*?");
 	if (wc_pos == string::npos)
 		input_files.push_back(search_source(pattern));
 	else {
@@ -484,7 +484,8 @@ void Args::expand_list_glob(const string& pattern_) {
 	vector<fs::path> files;
 	size_t wc_pos = pattern.find_first_of("*?");
 	if (wc_pos == string::npos) {
-		if (fs::is_regular_file(fs::path(pattern)))
+        pattern = search_include_path(pattern);
+        if (fs::is_regular_file(fs::path(pattern)))
 			files.push_back(fs::path(pattern));		// only one file
 		else
 			g_errors.error(ErrFileNotFound, pattern);
@@ -500,21 +501,21 @@ void Args::expand_list_glob(const string& pattern_) {
 			// append the directoy of the list file to the include path	and remove it at the end
 			g_args.include_path.push_back(file.parent_path().generic_string());
 			{
-				if (g_preproc.open(file.generic_string(), false)) {
-					ScannedLine line;
-					while (g_preproc.get_unpreproc_line(line)) {
-                        string text = str_strip(unquote(expand_env_vars(line.text())));
-                        if (!text.empty()) {
-                            switch (text[0]) {
+				if (g_file_reader.open(file.generic_string())) {
+					string line;
+					while (g_file_reader.getline(line)) {
+                        line = str_strip(unquote(expand_env_vars(line)));
+                        if (!line.empty()) {
+                            switch (line[0]) {
                             case ';':
                             case '#':
                                 break;  // comment
                             case '-':
                             case '+':
-                                parse_option(text); // option
+                                parse_option(line); // option
                                 break;
                             default:
-                                parse_file(text);
+                                parse_file(line);
                             }
                         }
 					}

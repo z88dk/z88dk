@@ -42,6 +42,8 @@ string str_replace_all(string text, const string& find, const string& replace);
 // globs a pattern including *, ? and ** and returns all matching files and directories
 void expand_glob(vector<fs::path>& result, const string& pattern);
 
+istream& safe_getline(istream& is, string& t);
+
 // convert int to hex
 template<typename T>
 string int_to_hex(T i, int width) {

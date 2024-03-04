@@ -36,12 +36,12 @@ bool str_ends_with(const string& str, const string& ending) {
 }
 
 string str_tolower(string str) {
-    std::transform(str.begin(), str.end(), str.begin(), [](char c) {return tolower(c); });
+    transform(str.begin(), str.end(), str.begin(), [](char c) {return tolower(c); });
     return str;
 }
 
 string str_toupper(string str) {
-    std::transform(str.begin(), str.end(), str.begin(), [](char c) {return toupper(c); });
+    transform(str.begin(), str.end(), str.begin(), [](char c) {return toupper(c); });
     return str;
 }
 
@@ -83,7 +83,7 @@ string str_remove_extra_blanks(const string& str) {
 
 string str_replace_all(string text, const string& find, const string& replace) {
     size_t p = 0;
-    while ((p = text.find(find, p)) != std::string::npos) {
+    while ((p = text.find(find, p)) != string::npos) {
         text.replace(p, find.length(), replace);
         p += replace.length();
     }
@@ -133,7 +133,7 @@ static void expand_wildcards(set<fs::path>& result,
         pattern = str_replace_all(pattern, ".", "\\.");
         pattern = str_replace_all(pattern, "*", ".*");
         pattern = str_replace_all(pattern, "?", ".");
-        std::regex re{ pattern };
+        regex re{ pattern };
 
         // iterate through directory and recurse for each match
         if (fs::is_directory(prefix)) {
@@ -193,3 +193,34 @@ void expand_glob(vector<fs::path>& result, const string& pattern) {
     }
 }
 
+istream& safe_getline(istream& is, string& t) {
+    t.clear();
+
+    // The characters in the stream are read one-by-one using a streambuf.
+    // That is faster than reading them one-by-one using the istream.
+    // Code that uses streambuf this way must be guarded by a sentry object.
+    // The sentry object performs various tasks,
+    // such as thread synchronization and updating the stream state.
+
+    istream::sentry se(is, true);
+    streambuf* sb = is.rdbuf();
+
+    for (;;) {
+        int c = sb->sbumpc();
+        switch (c) {
+        case '\n':
+            return is;
+        case '\r':
+            if (sb->sgetc() == '\n')
+                sb->sbumpc();
+            return is;
+        case streambuf::traits_type::eof():
+            // Also handle the case when the last line has no line ending
+            if (t.empty())
+                is.setstate(ios::eofbit);
+            return is;
+        default:
+            t += (char)c;
+        }
+    }
+}
