@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 project(Z88DK)
 option(BUILD_SDCC "Build SDCC" ON)
-option(BUILD_SDCC_HTTP "Download SDCC using HTTP instead of SVN" ON)
+option(BUILD_SDCC_HTTP "Download SDCC using HTTP instead of SVN" OFF)
 set(SDCC_PATH "src/sdcc-build" CACHE STRING "Path to SDCC")
 set(SDCC_VERSION "14648" CACHE STRING "SDCC version")
 
