@@ -31,7 +31,7 @@ parts:
       - BUILD_SDCC_HTTP: "1"
     override-build: |
       eval $(perl -I $SNAPCRAFT_PART_INSTALL/perl5/lib/perl5/ -Mlocal::lib=$SNAPCRAFT_PART_INSTALL/perl5)
-      cpanm -n Path::Tiny App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
+      cpanm -n Path::Tiny App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny Test::HexDifferences
       ./build.sh -t -e -i $SNAP
       make DESTDIR=$SNAPCRAFT_PART_INSTALL PREFIX= install
     build-packages:
