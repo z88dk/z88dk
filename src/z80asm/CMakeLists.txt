@@ -27,15 +27,16 @@ add_executable(z88dk-z80asm
     "src/c/zobjfile.c"
 
     # ${CXX_SRCS}
-    "src/cpp/args.cpp"
+    "src/args.cpp"
+    "src/errors.cpp"
+    "src/utils.cpp"
     "src/cpp/defines.cpp"
-    "src/cpp/errors.cpp"
     "src/cpp/float.cpp"
     "src/cpp/lstfile.cpp"
     "src/cpp/main.cpp"
     "src/cpp/preproc.cpp"
     "src/cpp/scan2.cpp"
-    "src/cpp/utils.cpp"
+    "src/cpp/utils2.cpp"
 )
 target_include_directories(z88dk-z80asm PRIVATE
     "./"
