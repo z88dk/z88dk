@@ -162,7 +162,7 @@ ELSE
     ld      (exitsp),sp
 
 
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
     defc    CRT_MAX_HEAP_ADDRESS = 65535 - 169
     INCLUDE "crt/classic/crt_init_heap.asm"
 ENDIF

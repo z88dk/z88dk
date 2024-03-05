@@ -49,7 +49,7 @@ ELSE
 	org     CRT_ORG_CODE
 	jp	start
 
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
 ;EXTERN ASMTAIL
 PUBLIC _heap
 ; We have 509 bytes we can use here..
@@ -85,7 +85,7 @@ start:
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
+	IF DEFINED_CRT_HEAP_ENABLE
 		ld hl,_heap
 		; compact way to do "mallinit()"
 		xor	a
@@ -119,5 +119,5 @@ __restore_sp_onexit:
 l_dcal:	jp	(hl)
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
-    UNDEFINE DEFINED_USING_amalloc
+    UNDEFINE DEFINED_CRT_HEAP_ENABLE
     INCLUDE "crt/classic/crt_section.asm"

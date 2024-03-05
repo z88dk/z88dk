@@ -63,7 +63,7 @@ start:
     call    crt0_init_bss
     ld      (exitsp),sp
 
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
     ld      hl,(__restore_sp_onexit+1)
     defc    CRT_MAX_HEAP_ADDRESS_hl = 1
     INCLUDE "crt/classic/crt_init_heap.asm"

@@ -143,7 +143,7 @@ init_continue:			;We had enough memory
     call    crt0_init_bss
     ld      (exitsp),sp
 
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
 crt0_reqpag_check1:
     ld      hl,0        ; reqpag  address
     defc CRT_MAX_HEAP_ADDRESS_hl = 1

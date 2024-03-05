@@ -58,7 +58,7 @@ IF CRT_ENABLE_STDIO = 1 && CLIB_FOPEN_MAX > 0
     ld      hl,__sgoioblk+22
     ld      (hl),21 ;stderr
 ENDIF
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
   IFDEF CRT_HEAP_ADDRESS
         defc __heap_start = CRT_HEAP_ADDRESS
   ELSE
@@ -128,7 +128,7 @@ exitsp:
     defw    0                   ;atexit() stack
 exitcount:
     defb    0                   ;Number of atexit() routines
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
     PUBLIC  _heap
     ; The heap pointer will be wiped at bss initialisation.
     ; Its value (based on __tail) will be set later if set

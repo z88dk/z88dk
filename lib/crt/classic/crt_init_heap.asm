@@ -7,7 +7,7 @@
 ; Such (long) pointer will hold, at startup, the (word) value of __tail
 ; that points to the last used byte in the compiled program:
 
-;IF DEFINED_USING_amalloc
+;IF DEFINED_CRT_HEAP_ENABLE
 ;EXTERN __tail
 ;PUBLIC _heap
 ;._heap
@@ -30,7 +30,7 @@ MACRO MALLSUB_HLDE
 ENDM
 
 
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
 
   IF CRT_MAX_HEAP_ADDRESS
     ld      hl,CRT_MAX_HEAP_ADDRESS
@@ -108,11 +108,11 @@ IF DEFINED_USING_amalloc
    ; Reduce to heap size to 75% of available memory
    MALLSUB_HLDE
    ; Reduce to 50% if needed
-   IF USING_amalloc & 2
+   IF CRT_HEAP_ENABLE & 2
    MALLSUB_HLDE
    ENDIF
   ; Reduce to 25% if needed
-   IF USING_amalloc & 4
+   IF CRT_HEAP_ENABLE & 4
    MALLSUB_HLDE
    ENDIF
   ENDIF

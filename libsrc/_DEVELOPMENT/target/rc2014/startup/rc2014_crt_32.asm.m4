@@ -249,7 +249,7 @@ ENDIF
 
     include "../crt_set_interrupt_mode.inc"
 
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
     
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
@@ -260,7 +260,7 @@ IF DEFINED_USING_amalloc
     ld hl,__BSS_END_tail
     ld (_heap),hl
 
-    include "../../../../lib/crt/classic/crt_init_amalloc.asm"
+    include "../../../../lib/crt/classic/crt_init_heap.asm"
 
 ENDIF
 
@@ -365,7 +365,7 @@ ENDIF
 .exitsp     defw    0           ; atexit() stack
 .exitcount  defb    0           ; number of atexit() routines
 
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
 
     PUBLIC _heap
     ; The heap pointer will be wiped at bss initialisation.

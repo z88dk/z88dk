@@ -74,7 +74,7 @@ start:
 ; Optional definition for auto MALLOC init; it takes
 ; all the space between the end of the program and himem
 ; on TRS-80 the stack is defined elsewhere
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
     defc    CRT_MAX_HEAP_ADDRESS_hl = 1
     ld      a,($54)					; Get byte from ROM
     dec     a						; Determine if Mod 1 or 3
