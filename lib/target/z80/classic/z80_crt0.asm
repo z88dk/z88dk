@@ -66,6 +66,7 @@ IF __CPU_INTEL__
 ELSE
     ld      (exitsp),sp
 ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
     ; Entry to the user code
     call    _main
