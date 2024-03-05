@@ -108,11 +108,11 @@ IF DEFINED_USING_amalloc
    ; Reduce to heap size to 75% of available memory
    MALLSUB_HLDE
    ; Reduce to 50% if needed
-   IF DEFINED_USING_amalloc_2
+   IF USING_amalloc & 2
    MALLSUB_HLDE
    ENDIF
   ; Reduce to 25% if needed
-   IF DEFINED_USING_amalloc_1
+   IF USING_amalloc & 4
    MALLSUB_HLDE
    ENDIF
   ENDIF
