@@ -16,6 +16,10 @@
     UNDEFINE CONSOLE_ROWS
     defc    CONSOLE_ROWS = 22
 
+IF !DEFINED_CRT_MAX_HEAP_ADDRESS
+    defc CRT_MAX_HEAP_ADDRESS = 65535
+ENDIF
+
     ; Point palette store to the system variables
     PUBLIC  SAM_PALETTE_VALUES
     defc    SAM_PALETTE_VALUES = 0x55D8
@@ -35,7 +39,6 @@ start:
     call    crt0_init_bss
     ld      (exitsp),sp
 
-    defc CRT_MAX_HEAP_ADDRESS = 65535
     INCLUDE "crt/classic/crt_init_heap.asm"
 
     ; Special SAM stuff goes here

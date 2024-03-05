@@ -43,6 +43,11 @@ IF CRT_DISABLE_FIRMWARE_ISR = 0
     defc CRT_EVENT_BLOCKS_NUM = 8
 ENDIF
 
+
+IF !DEFINED_CRT_MAX_HEAP_ADDRESS
+    defc    CRT_MAX_HEAP_ADDRESS = 0xa600
+ENDIF
+
     ; Floating point accumulator needs to be in middle 32k
     PUBLIC  fa
     defc    fa = 0xa680
@@ -120,7 +125,6 @@ ENDIF
     ei
 
 
-    defc    CRT_MAX_HEAP_ADDRESS = 0xa600
     INCLUDE "crt/classic/crt_init_heap.asm"
 
 IF DEFINED_CLIB_DEFAULT_SCREEN_MODE

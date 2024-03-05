@@ -5,6 +5,9 @@
     defc __crt_org_code = CRT_ORG_CODE
     PUBLIC __crt_org_code
 
+IF !DEFINED_CRT_MAX_HEAP_ADDRESS
+    defc	CRT_MAX_HEAP_ADDRESS = 65535 - 169
+ENDIF
         
     ; We use the generic driver by default
     defc    TAR__fputc_cons_generic = 1
@@ -27,7 +30,6 @@ start:
     call	crt0_init_bss
     ld      (exitsp),sp
 
-    defc	CRT_MAX_HEAP_ADDRESS = 65535 - 169
     INCLUDE "crt/classic/crt_init_heap.asm"
 
     call    _main           ; Call user program

@@ -10,6 +10,10 @@ IF      !DEFINED_CRT_ORG_CODE
     defc  CRT_ORG_CODE  = 50000
 ENDIF
 
+IF !DEFINED_CRT_MAX_HEAP_ADDRESS
+    defc    CRT_MAX_HEAP_ADDRESS = $F500
+ENDIF
+
     org	  CRT_ORG_CODE
 
 program:
@@ -21,7 +25,6 @@ program:
     add     hl,sp
     ld      (exitsp),hl
 
-    defc    CRT_MAX_HEAP_ADDRESS = $F500
     INCLUDE "crt/classic/crt_init_heap.asm"
 
     push    bc	;argv

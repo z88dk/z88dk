@@ -36,6 +36,10 @@
         defc REG__register_sp = 0xff57	; below UDG, keep eye when using banks
     ENDIF
 
+    IF !DEFINED_CRT_MAX_HEAP_ADDRESS
+        defc    CRT_MAX_HEAP_ADDRESS = 65535 - 169
+    ENDIF
+
 
     PUBLIC    _FRAMES
     IF startup != 2
@@ -161,11 +165,7 @@ ELSE
     call    crt0_init_bss
     ld      (exitsp),sp
 
-
-IF DEFINED_CRT_HEAP_ENABLE
-    defc    CRT_MAX_HEAP_ADDRESS = 65535 - 169
     INCLUDE "crt/classic/crt_init_heap.asm"
-ENDIF
 
 
   IF DEFINED_ZXVGS
