@@ -87,9 +87,7 @@ ENDIF
 
 
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
 
     call    _main	;Call user program

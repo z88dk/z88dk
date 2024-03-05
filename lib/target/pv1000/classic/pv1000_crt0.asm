@@ -76,7 +76,7 @@ program:
     im      1
     INCLUDE "crt/classic/crt_start_eidi.inc"
 
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    INCLUDE "crt/classic/crt_init_heap.asm"
     call    _main
 cleanup:
     call    crt0_exit

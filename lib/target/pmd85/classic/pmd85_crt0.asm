@@ -66,7 +66,7 @@ program:
     ld      hl,0
     add     hl,sp
     ld      (exitsp),hl
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    INCLUDE "crt/classic/crt_init_heap.asm"
     INCLUDE "crt/classic/crt_start_eidi.inc"
     ld      bc,0
     push    bc	;argv

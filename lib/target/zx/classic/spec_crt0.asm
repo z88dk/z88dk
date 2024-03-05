@@ -160,12 +160,13 @@ ELSE
     INCLUDE	"crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      (exitsp),sp
-; Optional definition for auto MALLOC init; it takes
-; all the space between the end of the program and UDG
+
+
 IF DEFINED_USING_amalloc
     defc    CRT_MAX_HEAP_ADDRESS = 65535 - 169
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    INCLUDE "crt/classic/crt_init_heap.asm"
 ENDIF
+
 
   IF DEFINED_ZXVGS
 ;setting variables needed for proper keyboard reading

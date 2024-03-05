@@ -39,7 +39,7 @@ start:
     call	crt0_init_bss
     ld      (exitsp),sp
 
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
 
     call    _main           ; Call user program

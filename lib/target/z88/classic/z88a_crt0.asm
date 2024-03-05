@@ -146,7 +146,8 @@ init_continue:			;We had enough memory
 IF DEFINED_USING_amalloc
 crt0_reqpag_check1:
     ld      hl,0        ; reqpag  address
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    defc CRT_MAX_HEAP_ADDRESS_hl = 1
+    INCLUDE "crt/classic/crt_init_heap.asm"
 ENDIF
 IF DEFINED_farheapsz
     call    init_far	;Initialise far memory if required

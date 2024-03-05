@@ -26,10 +26,7 @@ start:
     ld      a,(SYSVAR_PORT29_COPY)
     ld      (__port29_copy),a
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
     call    _main    ;Call user program
 

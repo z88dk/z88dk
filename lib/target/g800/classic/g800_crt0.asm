@@ -52,19 +52,18 @@ start:
     call	crt0_init_bss
     ld      (exitsp),sp
 
-IF DEFINED_USING_amalloc
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
-        call    _main           ;Call user program
+    call    _main           ;Call user program
 
 cleanup:
-        call    crt0_exit
+    call    crt0_exit
 
 
 cleanup_exit:
-__restore_sp_onexit:ld      sp,0            ;Restore stack to entry value
-        ret
+__restore_sp_onexit:
+    ld      sp,0            ;Restore stack to entry value
+    ret
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 

@@ -129,14 +129,7 @@ start:
 
 ; INIT math identify platform
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    ld      hl,0
-    add     hl,sp
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
     call    _main
 

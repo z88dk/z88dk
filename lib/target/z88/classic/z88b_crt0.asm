@@ -65,7 +65,8 @@ start:
 
 IF DEFINED_USING_amalloc
     ld      hl,(__restore_sp_onexit+1)
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    defc    CRT_MAX_HEAP_ADDRESS_hl = 1
+    INCLUDE "crt/classic/crt_init_heap.asm"
 ENDIF
 
     call    doerrhan    ;Initialise a laughable error handler

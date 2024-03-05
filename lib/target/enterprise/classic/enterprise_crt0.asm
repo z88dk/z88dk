@@ -149,25 +149,21 @@ ENDIF
 ;        rst   30h
 ;        defb  11
 
-        ld    a, 66h
-        ld    bc, $0101                ; @@DISP, from first line
-        ld    de, $1901                ; to line 25, at screen line 1
-        rst   30h
-        defb  11						; set 40x25 characters window
+    ld      a, 66h
+    ld      bc, $0101               ; @@DISP, from first line
+    ld      de, $1901               ; to line 25, at screen line 1
+    rst     30h
+    defb    11                      ; set 40x25 characters window
 
 
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+    ld      (exitsp),sp
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
 
-        call    _main
+    INCLUDE "crt/classic/crt_init_heap.asm"
+
+    call    _main
 	
 cleanup:
     call    crt0_exit

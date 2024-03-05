@@ -234,19 +234,14 @@ ENDIF
 	; the stack will be moved to make room
 	; for high-resolution graphics.
 	
-        ld      (__restore_sp_onexit+1),sp   ;Save entry stack
+    ld      (__restore_sp_onexit+1),sp   ;Save entry stack
 
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    call	crt0_init_bss
+    ld      (exitsp),sp
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
         call    _main   ;Call user program
         

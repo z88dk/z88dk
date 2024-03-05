@@ -113,9 +113,7 @@ ENDIF
 
     ld      (__agon_mbase),a
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
     ld      a,CLIB_DEFAULT_SCREEN_MODE
     call    asm_agon_setmode

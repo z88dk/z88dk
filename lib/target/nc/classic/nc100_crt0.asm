@@ -118,6 +118,6 @@ __restore_sp_onexit:
 
 l_dcal:	jp	(hl)
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-	UNDEFINE DEFINED_USING_amalloc
-        INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    UNDEFINE DEFINED_USING_amalloc
+    INCLUDE "crt/classic/crt_section.asm"

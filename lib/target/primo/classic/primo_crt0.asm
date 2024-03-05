@@ -53,12 +53,7 @@ program:
     ; Entry stack is is ~ $e800 for 64k
     ;		      $a800 for 48k?
     ;		      $6800 for 32k
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
     ld      hl,($0013)
     ld      (__primo_screen_base),hl
     ld      hl,0

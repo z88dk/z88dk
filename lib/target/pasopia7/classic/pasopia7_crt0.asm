@@ -59,30 +59,26 @@ if (ASMPC<>$0000)
         defs    CODE_ALIGNMENT_ERROR
 endif
 
-        jp      program
+    jp      program
 
-	INCLUDE	"crt/classic/crt_z80_rsts.asm"
+    INCLUDE	"crt/classic/crt_z80_rsts.asm"
 
 program:
-	di
+    di
 
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-	call    crt0_init_bss
-	ld	(exitsp),sp
-	ld	a,2
-	ld	(__pasopia_page),a
-	im	1
-    	ei
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-	call	_main
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+    ld      (exitsp),sp
+    ld      a,2
+    ld      (__pasopia_page),a
+    im      1
+    ei
+
+    INCLUDE "crt/classic/crt_init_heap.asm"
+    call    _main
 cleanup:
-	jp	cleanup
+    jp      cleanup
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls

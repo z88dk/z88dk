@@ -16,14 +16,31 @@
 ;ENDIF
 
 
-; $Id: amalloc.def,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
+MACRO MALLSUB_HLDE
+  IF __CPU_INTEL__ || __CPU_GBZ80__
+    ld      a,l     ;  leave 2/4 of the free memory for the stack
+    sub     e
+    ld      l,a
+    ld      a,h
+    sbc     d
+    ld      h,a
+  ELSE
+    sbc     hl,de
+  ENDIF
+ENDM
+
+
 IF DEFINED_USING_amalloc
 
-IF CRT_MAX_HEAP_ADDRESS
+  IF CRT_MAX_HEAP_ADDRESS
     ld      hl,CRT_MAX_HEAP_ADDRESS
-ELSE
+    defc __crt_skip_heapsize_calcs = 1
+  ELIFNDEF CRT_MAX_HEAP_ADDRESS_hl
     ld      hl,sp
-ENDIF
+  ELSE
+    ;hl holds top address
+    defc __crt_skip_heapsize_calcs = 1
+  ENDIF
     ; HL must hold SP or the end of free memory
     ex      de,hl
 
@@ -40,29 +57,32 @@ ENDIF
 
     ex      de,hl   ; sp or the end of free memory
 
-IF __CPU_8085__
+  IF __CPU_8085__
     sub     hl,bc   ; hl = total free memory
-ELIF __CPU_8080__ || __CPU_GBZ80
+  ELIF __CPU_8080__ || __CPU_GBZ80
     ld      a,l
     sub     c
     ld      l,a
     ld      a,h
     sbc     b
     ld      h,a
-ELSE
+  ELSE
     sbc     hl,bc   ; hl = total free memory
-ENDIF
+   ENDIF
 
+
+  IFNDEF __crt_skip_heapsize_calcs
     ld      de,hl
-
-IF __CPU_8085__
+; AMALLOC initialisation
+; First of all find a 25% of the free memory
+   IF __CPU_8085__
     sra     hl
     sra     hl
     ld      a,$3F
     and     h
     ld      h,a
     ex      de,hl
-ELIF __CPU_8080__ || __CPU_GBZ80
+   ELIF __CPU_8080__ || __CPU_GBZ80
     and     a
     ld      a,d
     rra
@@ -77,50 +97,26 @@ ELIF __CPU_8080__ || __CPU_GBZ80
     ld      a,e
     rra
     ld      e,a
-ELSE
+   ELSE
     srl     d
     rr      e
     srl     d
     rr      e
-ENDIF
+   ENDIF
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
 
-IF DEFINED_USING_amalloc_2
-    ld      a,l     ;  leave 2/4 of the free memory for the stack
-    sub     e
-    ld      l,a
-    ld      a,h
-    sbc     d
-    ld      h,a
-IF DEFINED_USING_amalloc_1
-    ld      a,l     ;  leave 3/4 of the free memory for the stack
-    sub     e
-    ld      l,a
-    ld      a,h
-    sbc     d
-    ld      h,a
-ENDIF
-ENDIF
-    ld      a,l     ;  leave 1/4 of the free memory for the stack
-    sub     e
-    ld      l,a
-    ld      a,h
-    sbc     d
-    ld      h,a
-
-ELSE
-
-IF DEFINED_USING_amalloc_2
-    sbc     hl,de   ;  leave 2/4 of the free memory for the stack
-IF DEFINED_USING_amalloc_1
-    sbc     hl,de   ;  leave 3/4 of the free memory for the stack
-ENDIF
-ENDIF
-    sbc     hl,de   ;  leave 1/4 of the free memory for the stack
-
-ENDIF
-
+   ; Reduce to heap size to 75% of available memory
+   MALLSUB_HLDE
+   ; Reduce to 50% if needed
+   IF DEFINED_USING_amalloc_2
+   MALLSUB_HLDE
+   ENDIF
+  ; Reduce to 25% if needed
+   IF DEFINED_USING_amalloc_1
+   MALLSUB_HLDE
+   ENDIF
+  ENDIF
+   
     push    bc      ; main address for malloc area
     push    hl      ; area size
     EXTERN  sbrk_callee

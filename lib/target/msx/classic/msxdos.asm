@@ -65,9 +65,7 @@ ENDIF
     jp      c,cleanup
   ENDIF
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
     ;ld      a,($F306)
     ;ld      (defltdsk),a

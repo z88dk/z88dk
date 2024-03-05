@@ -206,20 +206,15 @@ IF STDASM | LASM		; asm( executable
 	call	_runindicoff	; stop anoing run-indicator
 ENDIF
 
-	ld	hl,0
-	add	hl,sp
-	ld	(__restore_sp_onexit+1),hl
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-        call    crt0_init_bss
-        ld      (exitsp),sp
+    ld      hl,0
+    add     hl,sp
+    ld      (__restore_sp_onexit+1),hl
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+    ld      (exitsp),sp
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+    INCLUDE "crt/classic/crt_init_heap.asm"
 
 
 ;  IF NONANSI

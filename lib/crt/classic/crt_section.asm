@@ -59,14 +59,19 @@ IF CRT_ENABLE_STDIO = 1 && CLIB_FOPEN_MAX > 0
     ld      (hl),21 ;stderr
 ENDIF
 IF DEFINED_USING_amalloc
+  IFDEF CRT_HEAP_ADDRESS
+        defc __heap_start = CRT_HEAP_ADDRESS
+  ELSE
+        defc __heap_start = __BSS_END_tail
+  ENDIF
   IF __CPU_GBZ80__
-    ld      hl,__BSS_END_tail
+    ld      hl,__heap_start
     ld      a,l
     ld      (_heap),a
     ld      a,h
     ld      (_heap+1),a
   ELSE
-    ld      hl,__BSS_END_tail
+    ld      hl,__heap_start
     ld      (_heap),hl
   ENDIF
 ENDIF
@@ -129,7 +134,7 @@ IF DEFINED_USING_amalloc
     ; Its value (based on __tail) will be set later if set
     ; by sbrk() during AMALLOC initialisation.
 _heap:
-    defw __BSS_END_tail         ; Initialised by code_crt_init - location of the last program byte
+    defw 0             ; __BSS_END_tail         ; Initialised by code_crt_init - location of the last program byte
     defw 0
 ENDIF
 
