@@ -55,8 +55,8 @@ begin:
 ENDIF
 
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
 
@@ -66,7 +66,7 @@ ENDIF
   ENDIF
 
     INCLUDE "crt/classic/crt_init_heap.asm"
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     ;ld      a,($F306)
     ;ld      (defltdsk),a
@@ -80,7 +80,7 @@ IF CRT_ENABLE_COMMANDLINE = 1
     ld      c,a
     inc     hl
     add     hl,bc   ;now points to the end of the command line
-    INCLUDE	"crt/classic/crt_command_line.asm"
+    INCLUDE	"crt/classic/crt_command_line.inc"
     push    hl	;argv
     push    bc	;argc
 ELSE
@@ -315,10 +315,10 @@ tempsp: defw    tempstack + CLIB_BANKING_STACK_SIZE
 
 ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 IF CLIB_MSXDOS = 1
-    INCLUDE "crt/classic/crt_cpm_fcntl.asm"
+    INCLUDE "crt/classic/crt_cpm_fcntl.inc"
 ENDIF
 
     SECTION bss_crt

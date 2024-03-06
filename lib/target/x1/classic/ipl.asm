@@ -22,8 +22,8 @@ if (CRT_ORG_CODE < 32768)
     defs    ZORG_TOO_LOW
 endif
 
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
 
     INCLUDE "crt/classic/crt_init_heap.asm"

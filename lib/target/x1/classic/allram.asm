@@ -34,12 +34,12 @@ endif
     di
     jp      program
 
-    INCLUDE "crt/classic/crt_z80_rsts.asm"
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
 
 program:
 ; Make room for the atexit() stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
     call    crt0_init_bss
     ld      (exitsp),sp

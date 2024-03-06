@@ -104,16 +104,16 @@ copy_done:
     sub     b
     ld      (__cmdline_length+1),a
 ENDIF
-    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
     ; Make room for the atexit() stack
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
 
     ld      (__agon_mbase),a
 
     INCLUDE "crt/classic/crt_init_heap.asm"
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     ld      a,CLIB_DEFAULT_SCREEN_MODE
     call    asm_agon_setmode
@@ -127,7 +127,7 @@ __cmdline_length:
     ld      b,0
     ld      hl,cmdline
     add     hl,bc       ; now points to end of the command line
-    INCLUDE "crt/classic/crt_command_line.asm"
+    INCLUDE "crt/classic/crt_command_line.inc"
     push    hl  ;argv
     push    bc  ;argc
 ELSE
@@ -194,14 +194,14 @@ __agon_de24:
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 
     ; If we were given a model then use it
 IF DEFINED_CRT_MODEL
     defc __crt_model = CRT_MODEL
 ENDIF
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
     SECTION bss_crt
 PUBLIC __agon_mbase

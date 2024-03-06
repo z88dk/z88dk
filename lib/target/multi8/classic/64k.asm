@@ -26,12 +26,12 @@
 
     org     CRT_ORG_CODE
 
-    INCLUDE    "crt/classic/crt_z80_rsts.asm"
+    INCLUDE    "crt/classic/crt_z80_rsts.inc"
 
 program:
     ; Make room for the atexit() stack
-    INCLUDE    "crt/classic/crt_init_sp.asm"
-    INCLUDE    "crt/classic/crt_init_atexit.asm"
+    INCLUDE    "crt/classic/crt_init_sp.inc"
+    INCLUDE    "crt/classic/crt_init_atexit.inc"
 
     call    crt0_init_bss
     ld      (exitsp),sp
@@ -40,7 +40,7 @@ program:
     ld      (__port29_copy),a
     INCLUDE "crt/classic/crt_init_heap.asm"
     im      1
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 ; Entry to the user code
     call    _main

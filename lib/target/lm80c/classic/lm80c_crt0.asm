@@ -86,13 +86,13 @@ basicstart:
 
 start:
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
 
     INCLUDE "crt/classic/crt_init_heap.asm"
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 	; Setup NMI if required
 	; Apparently the NMI is buggy, a 0.01second tick is available
@@ -140,10 +140,10 @@ no_vbl:
 ENDIF
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
     ; And include handling disabling screenmodes
     INCLUDE "crt/classic/tms9918/mode_disable.asm"
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 

@@ -52,8 +52,8 @@ start:
 	ld	de,(shell_cmdaddr)
 	add	hl,de
 	ld	(hl),0		; terminate command line
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
+	INCLUDE	"crt/classic/crt_init_sp.inc"
+	INCLUDE	"crt/classic/crt_init_atexit.inc"
 	call	crt0_init_bss
 	ld      (exitsp),sp	
 
@@ -179,7 +179,7 @@ errescpressed:
         jr      cleanup		;Exit the program
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 ;--------
 ; Far memory setup
@@ -284,7 +284,7 @@ shellapi_back:
 ;--------
 ; Which printf core routine do we need?
 ;--------
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 
 
@@ -294,7 +294,7 @@ IF DEFINED_farheapsz
 	defc	__crt_org_bss_compiler_start = ASMTAIL_bss_crt
 ENDIF
 
-	INCLUDE	"crt/classic/crt_section.asm"
+	INCLUDE	"crt/classic/crt_section.inc"
 
 
 IF DEFINED_farheapsz

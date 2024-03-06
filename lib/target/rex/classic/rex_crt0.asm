@@ -56,12 +56,12 @@ lib:
     push    hl
     jp      _LibMain
 start:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp	;Store atexit() stack
 
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     ; Entry to the user code
     call    _main		;Call the users code
 cleanup:
@@ -80,8 +80,8 @@ farret:             ;Used for farcall logic
 ELSE
 
 start:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call	crt0_init_bss
     ld      (exitsp),sp	;Store atexit() stack
     ; Entry to the user code
@@ -97,8 +97,8 @@ l_dcal:	jp	(hl)		;Used for call by function pointer
 ENDIF
 
 
-;	INCLUDE	"crt/classic/crt_runtime_selection.asm"
+;	INCLUDE	"crt/classic/crt_runtime_selection.inc"
     defc	__crt_org_bss = $f033
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
 

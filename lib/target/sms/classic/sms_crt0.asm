@@ -154,8 +154,8 @@ filler3:
 
 start:
 ;    Make room for the atexit() stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 ; Clear static memory
     ld      hl,RAM_Start
     ld      de,RAM_Start+1
@@ -291,7 +291,7 @@ banked_call:
     ret
 ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     ; And include handling disabling screenmodes
     INCLUDE "crt/classic/tms9918/mode_disable.asm"
@@ -309,7 +309,7 @@ ENDIF
     ELSE
         defc __crt_model = 1
     ENDIF
-    INCLUDE    "crt/classic/crt_section.asm"
+    INCLUDE    "crt/classic/crt_section.inc"
 
 
 IF CRT_ENABLE_BANKED_CALLS = 1

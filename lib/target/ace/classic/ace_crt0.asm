@@ -57,8 +57,8 @@ ace_ramtest:
     ld      sp,hl
 ELSE
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 ENDIF
     call    crt0_init_bss
     ld      (exitsp),sp
@@ -73,7 +73,7 @@ IF DEFINED_CRT_FONT
 ENDIF
 
     INCLUDE "crt/classic/crt_init_heap.asm"
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 IF (startup=2)
 
@@ -141,7 +141,7 @@ l_dcal:
     jp      (hl)
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 ;---------------------------------------------------------------------------
 IF (startup=2) 
@@ -167,5 +167,5 @@ IF DEFINED_CRT_ORG_BSS
     defc    __crt_org_bss = CRT_ORG_BSS
 ENDIF
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 

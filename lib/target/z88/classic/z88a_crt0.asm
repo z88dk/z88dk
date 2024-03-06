@@ -138,8 +138,8 @@ init_continue:			;We had enough memory
     ld      hl,clrscr2
     call_oz(gn_sop)
 
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
 
@@ -247,7 +247,7 @@ _cpfar2near:
     ret
 ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 ;-------
 ; Text to define the BASIC style window
@@ -303,7 +303,7 @@ ENDIF
 IF CRT_Z88_SAFEDATA = 0
     defc __crt_org_bss_fardata_start = 8192
 ENDIF
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION bss_crt
 l_erraddr:       defw    0       ;Not sure if these are used...

@@ -55,8 +55,8 @@ ENDIF
 
 start:
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
     INCLUDE "crt/classic/crt_init_heap.asm"
@@ -69,7 +69,7 @@ start:
     ld      a,' '
     ld      c,$56		;CLEAR
     rst     $10
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 ; Work out argc/argv - same as the CPM version 
 IF CRT_ENABLE_COMMANDLINE = 1
     ld      hl,0    ; NULL pointer at the end
@@ -82,7 +82,7 @@ IF CRT_ENABLE_COMMANDLINE = 1
     ld      c,a
     add     hl,bc   ;now points to end of arguments
 
-    INCLUDE	"crt/classic/crt_command_line.asm"
+    INCLUDE	"crt/classic/crt_command_line.inc"
     push    hl	;argv
     push    bc	;argc
 ELSE
@@ -108,8 +108,8 @@ l_dcal:
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION  bss_crt
 

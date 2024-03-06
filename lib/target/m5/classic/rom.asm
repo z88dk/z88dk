@@ -38,14 +38,14 @@ start:
     ld      ($7006),hl
 
 
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
     call    crt0_init_bss
     ld      (exitsp),sp
     ld      hl,2
     call    vdp_set_mode
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     INCLUDE "crt/classic/crt_init_heap.asm"
 

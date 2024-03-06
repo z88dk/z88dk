@@ -193,7 +193,7 @@ program:
     di
     ld      d,a	    ;Save CPU type
     xor     a
-    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
     ; Clear from 0xc00 to 0xdfff
     ld      hl,0xdfff
     ld      c,0x20
@@ -652,9 +652,9 @@ __printTStates:
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION	bss_crt
 

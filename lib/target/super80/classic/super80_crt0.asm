@@ -58,12 +58,12 @@ endif
     di
     jp      program
 
-    INCLUDE "crt/classic/crt_z80_rsts.asm"
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
 
 
 program:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
     im      1
@@ -101,7 +101,7 @@ is_super80v:
     out     ($F1),a
     ld      (PORT_F1_COPY),a
     INCLUDE "crt/classic/crt_init_heap.asm"
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     call    _main
 cleanup:
     call    crt0_exit
@@ -112,9 +112,9 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION bss_crt
     PUBLIC  PORT_F0_COPY

@@ -99,11 +99,11 @@ ENDIF
 
 
 start:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     call    asm_lcd_init
 
     INCLUDE "crt/classic/crt_init_heap.asm"
@@ -117,7 +117,7 @@ cleanup:
 l_dcal:
     jp      (hl)            ;Used for function pointer calls
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
     defc	__crt_org_bss = CRT_ORG_BSS
     IF DEFINED_CRT_MODEL
@@ -125,5 +125,5 @@ l_dcal:
     ELSE
         defc __crt_model = 1
     ENDIF
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 

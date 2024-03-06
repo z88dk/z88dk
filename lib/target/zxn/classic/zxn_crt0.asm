@@ -72,7 +72,7 @@ IF NEED_fzxterminal
     defc    _fgets_cons_erase_character = fgets_cons_erase_character_fzx
 ENDIF
 
-    INCLUDE	"crt/classic/crt_runtime_selection.asm"
+    INCLUDE	"crt/classic/crt_runtime_selection.inc"
 
     PUBLIC __CLIB_TILES_PALETTE_SET_INDEX
 IFDEF CLIB_TILES_PALETTE_SET_INDEX

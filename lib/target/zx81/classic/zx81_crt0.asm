@@ -236,8 +236,8 @@ ENDIF
 	
     ld      (__restore_sp_onexit+1),sp   ;Save entry stack
 
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
     call	crt0_init_bss
     ld      (exitsp),sp
 
@@ -496,6 +496,6 @@ _hr_rows:
 ENDIF
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-	INCLUDE "crt/classic/crt_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
+	INCLUDE "crt/classic/crt_section.inc"
 

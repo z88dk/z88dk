@@ -55,17 +55,17 @@ ENDIF
 
 IF CRT_ORG_CODE = 0x0000
     jp      start
-    INCLUDE	"crt/classic/crt_z80_rsts.asm"
+    INCLUDE	"crt/classic/crt_z80_rsts.inc"
 ENDIF
 
 start:
-    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
     ; Make room for the atexit() stack
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
     call	crt0_init_bss
     ld      (exitsp),sp
 
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     ; Entry to the user code
     call    _main
     ; Exit code is in hl
@@ -76,7 +76,7 @@ l_dcal:
     jp      (hl)
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     ; If we were given a model then use it
     IF DEFINED_CRT_MODEL
@@ -84,4 +84,4 @@ l_dcal:
     ELSE
         defc __crt_model = 1
     ENDIF
-	INCLUDE	"crt/classic/crt_section.asm"
+	INCLUDE	"crt/classic/crt_section.inc"

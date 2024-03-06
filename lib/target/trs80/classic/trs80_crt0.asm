@@ -66,8 +66,8 @@ ENDIF
 start:
     ld      (cmdline+1),hl
     ld      (__restore_sp_onexit+1),sp   ;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
 
@@ -125,7 +125,7 @@ find_end:
     xor     a
     ld      (hl),a
     dec     hl
-    INCLUDE	"crt/classic/crt_command_line.asm"
+    INCLUDE	"crt/classic/crt_command_line.inc"
 
     push	hl	;argv for "main"
     push	bc	;argc
@@ -165,7 +165,7 @@ IF CRT_ENABLE_STDIO = 1
 crt_no_reopen:
   ENDIF
 ENDIF
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     call    _main           ;Call user program
     pop     bc	;kill argv
     pop     bc	;kill argc
@@ -179,8 +179,8 @@ l_dcal:
     jp      (hl)            ;Used for function pointer calls
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE	"crt/classic/crt_section.inc"
 
 
 

@@ -40,7 +40,7 @@ start:
     ld      ix,4
     add     ix,sp
     ld      (__restore_sp_onexit+1),sp	;Save starting stack
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp	
 
@@ -122,10 +122,10 @@ _system:
     ret
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION bss_crt
 l_erraddr:       defw    0       ;Not sure if these are used...

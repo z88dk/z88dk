@@ -52,8 +52,8 @@ ENDIF
 
 start:
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     di
     ld      a,$ff
     ld      i,a
@@ -69,7 +69,7 @@ start:
     call    vdp_set_mode
 
     INCLUDE "crt/classic/crt_init_heap.asm"
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
 cleanup:
@@ -85,11 +85,11 @@ l_dcal:
     jp      (hl)
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
     ; And include handling disabling screenmodes
     INCLUDE "crt/classic/tms9918/mode_disable.asm"
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
     INCLUDE "target/nabu/classic/nabu_hccabuf.asm"
 

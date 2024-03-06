@@ -35,8 +35,8 @@ ENDIF
 
 start:
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     dec     sp
     call    crt0_init_bss
     ld      (exitsp),sp
@@ -74,9 +74,9 @@ find_end:
     ; now HL points to the end of command line
     ; and C holds the length of args buffer
     ld      b,0
-    INCLUDE	"crt/classic/crt_command_line.asm"
+    INCLUDE	"crt/classic/crt_command_line.inc"
 
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     push    hl      ;argv
     push    bc      ;argc
@@ -95,8 +95,8 @@ __restore_sp_onexit:
 l_dcal:
     jp  (hl)		;Used for call by function ptr
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
 

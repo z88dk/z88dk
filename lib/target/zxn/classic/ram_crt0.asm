@@ -25,8 +25,8 @@ start:
     ld      iy,23610        ; restore the right iy value, 
                             ; fixing the self-relocating trick, if any
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
     call	crt0_init_bss
     ld      (exitsp),sp
 

@@ -49,8 +49,8 @@ ELSE
     ENDIF
 ENDIF
 
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
 
 
@@ -84,7 +84,7 @@ found_end:
     ld      b,0
     ; hl = argument ends
     ;  c = length, b = 0
-    INCLUDE "crt/classic/crt_command_line.asm"
+    INCLUDE "crt/classic/crt_command_line.inc"
 
     push    hl	;argv
     push    bc	;argc

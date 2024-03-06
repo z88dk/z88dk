@@ -35,7 +35,7 @@ endif
     ld      sp,0xffff
     jp      program
 
-    INCLUDE "crt/classic/crt_z80_rsts.asm"
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
 
     ; IM1 interrupt routine
     INCLUDE "crt/classic/tms9918/interrupt.asm"
@@ -51,13 +51,13 @@ int_VBL:
     reti
 
 program:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
     INCLUDE "crt/classic/crt_init_heap.asm"
     im      1
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
 cleanup:

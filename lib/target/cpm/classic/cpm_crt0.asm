@@ -119,8 +119,8 @@ IF (startup=3) | (startup=4) | (startup=5)
     UNDEFINE __clib_exit_stack_size
     defc    __clib_exit_stack_size = __clib_exit_stack_size_t
 ENDIF
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss   
     call    cpm_platform_init	;Any platform specific init
     ld      hl,0
@@ -151,7 +151,7 @@ IF (startup=3) | (startup=4) | (startup=5)
 ENDIF
 
     INCLUDE "crt/classic/crt_init_heap.asm"
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 IF CRT_ENABLE_COMMANDLINE = 1
     ld      hl,$80
@@ -164,7 +164,7 @@ IF CRT_ENABLE_COMMANDLINE = 1
     ld      c,a
     add     hl,bc   ;now points to the end of the command line
     dec     c
-    INCLUDE	"crt/classic/crt_command_line.asm"
+    INCLUDE	"crt/classic/crt_command_line.inc"
     push    hl	;argv
     push    bc	;argc
 ELSE
@@ -327,9 +327,9 @@ ENDIF
 ENDIF
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE	"crt/classic/crt_section.asm"
-    INCLUDE "crt/classic/crt_cpm_fcntl.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE	"crt/classic/crt_section.inc"
+    INCLUDE "crt/classic/crt_cpm_fcntl.inc"
 
 IF __HAVE_TMS99X8
     ; And include handling disabling screenmodes

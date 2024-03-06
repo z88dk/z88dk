@@ -118,19 +118,19 @@ start:
     defb    70h     ; clear text
 
 
-    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
 	
 ;	im 2
 ;	ei
 
 
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
 
 ; INIT math identify platform
 
     INCLUDE "crt/classic/crt_init_heap.asm"
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
 
@@ -169,9 +169,9 @@ IF !DEFINED_ansicolumns
     defc ansicolumns = 40
 ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
 
     SECTION code_crt_init

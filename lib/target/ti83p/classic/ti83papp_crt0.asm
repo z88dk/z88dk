@@ -186,8 +186,8 @@ IF (startup=0 || startup=1)
 	ENDIF				;
 		; ld	(__restore_sp_onexit+1),sp	; This fails, but it still works without it?
 
-		INCLUDE "crt/classic/crt_init_sp.asm"
-		INCLUDE "crt/classic/crt_init_atexit.asm"
+		INCLUDE "crt/classic/crt_init_sp.inc"
+		INCLUDE "crt/classic/crt_init_atexit.inc"
 		call    crt0_init_bss
 		ld      (exitsp),sp
 
@@ -308,8 +308,8 @@ ENDIF
 				defc ansicolumns = 32
 			ENDIF
 			
-			INCLUDE "crt/classic/crt_runtime_selection.asm"
-		INCLUDE	"crt/classic/crt_section.asm"
+			INCLUDE "crt/classic/crt_runtime_selection.inc"
+		INCLUDE	"crt/classic/crt_section.inc"
 
 		SECTION	code_crt_init
 		ld	hl,plotSScreen

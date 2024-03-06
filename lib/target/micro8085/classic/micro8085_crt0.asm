@@ -219,7 +219,7 @@ target_init:
         defc    __crt_org_bss = CRT_ORG_BSS
         defc    __crt_model = 1
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm" 
-        INCLUDE "crt/classic/crt_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc" 
+        INCLUDE "crt/classic/crt_section.inc"
  
 ;-------------------------------------------------------------------------

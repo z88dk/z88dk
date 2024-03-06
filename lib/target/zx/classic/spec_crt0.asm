@@ -130,7 +130,7 @@ endif
 
 init:
 
-    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
 
     ld      a,@111000       ; White PAPER, black INK
     call    zx_internal_cls
@@ -138,7 +138,7 @@ init:
     ld      bc,42239
     ldir
 
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
 
     im      1
@@ -160,8 +160,8 @@ ELSE
   IF !DEFINED_ZXVGS
         ld      (__restore_sp_onexit+1),sp   ; Save entry stack
   ENDIF
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
 
@@ -262,7 +262,7 @@ IF NEED_fzxterminal
     defc    _fgets_cons_erase_character = fgets_cons_erase_character_fzx
 ENDIF
 
-    INCLUDE	"crt/classic/crt_runtime_selection.asm"
+    INCLUDE	"crt/classic/crt_runtime_selection.inc"
 
 ;---------------------------------------------
 ; Some +3 stuff - this needs to be below 49152
@@ -384,7 +384,7 @@ IF CRT_ORG_CODE < 32768
     SECTION CONTENDED
 ENDIF
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
     SECTION	code_crt_init
     ld      a,@111000       ; White PAPER, black INK

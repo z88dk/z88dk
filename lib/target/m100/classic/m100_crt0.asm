@@ -48,7 +48,7 @@ ENDIF
  
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 

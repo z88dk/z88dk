@@ -120,7 +120,7 @@ ENDIF
         ld      (__restore_sp_onexit+1),sp
         ld    a, 004h
         out   (0bfh), a
-	INCLUDE "crt/classic/crt_init_sp.asm"
+	INCLUDE "crt/classic/crt_init_sp.inc"
         ld    a, 0ffh
         out   (0b2h), a
 
@@ -156,11 +156,11 @@ ENDIF
     defb    11                      ; set 40x25 characters window
 
 
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
 
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     INCLUDE "crt/classic/crt_init_heap.asm"
 
     call    _main
@@ -312,8 +312,8 @@ __VideoVariables:
 end:	 defb	0
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-	INCLUDE	"crt/classic/crt_section.asm"
+	INCLUDE	"crt/classic/crt_section.inc"
 
 

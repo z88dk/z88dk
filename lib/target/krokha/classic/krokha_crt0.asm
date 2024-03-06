@@ -56,18 +56,18 @@ if (ASMPC<>$0000)
 endif
 
     jp      start
-    INCLUDE	"crt/classic/crt_z80_rsts.asm"
+    INCLUDE	"crt/classic/crt_z80_rsts.inc"
 ENDIF
 
 start:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      hl,0
     add     hl,sp
     ld      (exitsp),hl
     INCLUDE "crt/classic/crt_init_heap.asm"
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     ld      hl,0
     push    hl	;argv
     push    hl	;argc
@@ -87,5 +87,5 @@ ELSE
     defc __crt_model = 1
 ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
+    INCLUDE	"crt/classic/crt_section.inc"

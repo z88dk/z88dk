@@ -32,15 +32,15 @@
 
 start:
 
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
     ld      (__restore_sp_onexit+1),sp   ; Save entry stack
     call	crt0_init_bss
     ld      (exitsp),sp
 
     INCLUDE "crt/classic/crt_init_heap.asm"
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main           ; Call user program
 cleanup:
@@ -98,8 +98,8 @@ ENDIF
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 
     EXTERN  vpeek_noop
 

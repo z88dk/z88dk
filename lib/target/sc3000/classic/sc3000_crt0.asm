@@ -32,7 +32,7 @@ l_dcal:
     jp      (hl)
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     ; And include handling disabling screenmodes
     INCLUDE "crt/classic/tms9918/mode_disable.asm"
@@ -46,7 +46,7 @@ msxbios:
     ret
 
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION data_crt
     PUBLIC  _sc_cursor_pos

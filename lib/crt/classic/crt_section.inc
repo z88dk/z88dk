@@ -15,7 +15,7 @@ IF __MMAP == -1
     INCLUDE  "./mmap.inc"
 ELSE
     ; Include the standard memory map
-    INCLUDE  "crt/classic/crt_section_standard.asm"
+    INCLUDE  "crt/classic/crt_section_standard.inc"
 ENDIF
 
 

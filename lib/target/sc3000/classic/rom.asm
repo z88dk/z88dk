@@ -44,7 +44,7 @@ if (ASMPC = $0000)
     di
     jp      program
 
-    INCLUDE	"crt/classic/crt_z80_rsts.asm"
+    INCLUDE	"crt/classic/crt_z80_rsts.inc"
 
     ; Interrupt routine, defines tms9918_interrupt
     INCLUDE	"crt/classic/tms9918/interrupt.asm"
@@ -63,8 +63,8 @@ ENDIF
 
 
 program:
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
     call    crt0_init_bss
     ld      (exitsp),sp
@@ -75,7 +75,7 @@ program:
     ld      hl,1
     call    vdp_set_mode
     im      1
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 ; Entry to the user code
     call    _main

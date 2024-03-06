@@ -70,8 +70,8 @@ ENDIF
 start:
     ;Entry point at $c2220
     ld      (__restore_sp_onexit+1),sp   ;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call	crt0_init_bss
     ld      (exitsp),sp
 
@@ -97,7 +97,7 @@ IF DEFINED_CRT_HEAP_ENABLE
     call    sbrk_callee
 ENDIF
 
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     call    _main		;Call user code
 
 cleanup:
@@ -110,6 +110,6 @@ __restore_sp_onexit:
 
 l_dcal:	jp	(hl)
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
     UNDEFINE DEFINED_CRT_HEAP_ENABLE
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"

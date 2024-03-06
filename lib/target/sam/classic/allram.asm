@@ -39,7 +39,7 @@ ENDIF
 CRT_START:
     jr      initialise
 
-    INCLUDE "crt/classic/crt_z80_rsts.asm"
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
 
 ; This code has to run relatively, it's located at $8000
 initialise:
@@ -61,7 +61,7 @@ setup_in_low_memory:
 program:
     ; Make room for the atexit() stack
     ld      sp,stacktop
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
 
@@ -179,7 +179,7 @@ stack:
     defs    CRT_STACK_SIZE
 stacktop:
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     ; The paging on the sam is awkward to say the least. So, a decision
     ; has been made that this model will require the bottom 32k to remain
@@ -201,4 +201,4 @@ stacktop:
     SECTION rodata_font_4x4
     SECTION rodata_font_8x8
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"

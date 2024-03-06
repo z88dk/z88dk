@@ -2331,7 +2331,7 @@ IF __MMAP = 0
    ;; standard CODE/DATA/BSS memory map ;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   INCLUDE "crt/classic/crt_section.asm"
+   INCLUDE "crt/classic/crt_section.inc"
 
 
    SECTION BANK_0

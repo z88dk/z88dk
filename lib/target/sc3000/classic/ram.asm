@@ -22,8 +22,8 @@ start:
     ld      hl,0
     add     hl,sp
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
 ;  ******************** ********************
 ;    BACK TO COMMON CODE FOR ROM AND BASIC

@@ -83,8 +83,8 @@ ENDIF
 start:
     ld      (__restore_sp_onexit+1),sp
 
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
 
@@ -103,7 +103,7 @@ copy_loop:
     ld      (hl),c
     inc     hl
     djnz    copy_loop
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main   ;Call user program
 
@@ -119,8 +119,8 @@ l_dcal:
     jp      (hl)    ;Used for function pointer calls
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION code_crt_init
     ld      hl,$EC00

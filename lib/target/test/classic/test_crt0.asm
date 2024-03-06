@@ -53,7 +53,7 @@ IF CRT_ORG_CODE = 0x0000
 
     jp  program
 
-    INCLUDE "crt/classic/crt_z80_rsts.asm"
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
 ENDIF
 
 program:
@@ -62,8 +62,8 @@ IF __CPU_R4K__ || __CPU_R5K__
     ld      a,$c0
     ioi ld  ($0420),a       ;EDMR register (p299 in R4000UM.pdf)
 ENDIF
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
 IF __CPU_GBZ80__
     ld      hl,sp+0
@@ -90,9 +90,9 @@ ENDIF
     ld      b,0
     ld      hl,argv_start
     add     hl,bc	; now points to end of the command line
-    INCLUDE "crt/classic/crt_command_line.asm"
+    INCLUDE "crt/classic/crt_command_line.inc"
 
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     push    hl	;argv
     push    bc	;argc
     call    _main
@@ -119,6 +119,6 @@ l_dcal:
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
+    INCLUDE	"crt/classic/crt_section.inc"
 
