@@ -13,6 +13,8 @@ ENDIF
 
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0xffff
+    defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $10001
 
     ; VDP signals delivered to im1 usually
     defc    TAR__crt_enable_rst = $8080
@@ -53,15 +55,14 @@ program:
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      (exitsp),sp
-    im      1
-    ei
     INCLUDE "crt/classic/crt_init_heap.asm"
+    im      1
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
     call    _main
 cleanup:
     call    crt0_exit
-    di
-    halt
-    jp      cleanup
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 l_dcal:

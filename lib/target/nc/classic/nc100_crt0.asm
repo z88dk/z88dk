@@ -85,27 +85,27 @@ start:
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
-	IF DEFINED_CRT_HEAP_ENABLE
-		ld hl,_heap
-		; compact way to do "mallinit()"
-		xor	a
-		ld	(hl),a
-		inc hl
-		ld	(hl),a
-		inc hl
-		ld	(hl),a
-		inc hl
-		ld	(hl),a
-		
-		ld hl,_mblock
-		push hl	; data block
-		ld hl,505
-		push hl	; area size
-		EXTERN sbrk_callee
-		call	sbrk_callee
-	ENDIF
+IF DEFINED_CRT_HEAP_ENABLE
+    ld      hl,_heap
+    ; compact way to do "mallinit()"
+    xor     a
+    ld      (hl),a
+    inc     hl
+    ld      (hl),a
+    inc     hl
+    ld      (hl),a
+    inc     hl
+    ld      (hl),a
+    ld      hl,_mblock
+    push    hl	; data block
+    ld      hl,505
+    push    hl	; area size
+    EXTERN  sbrk_callee
+    call    sbrk_callee
+ENDIF
 
-        call    _main		;Call user code
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+    call    _main		;Call user code
 
 cleanup:
 	push	hl

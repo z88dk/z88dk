@@ -10,6 +10,7 @@
 
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x7fff
+    defc    TAR__crt_enable_eidi = $02 ; enable ei on entry
     ; Default, halt loop
     defc    TAR__crt_on_exit = 0x10001
     INCLUDE "crt/classic/crt_rules.inc"
@@ -44,7 +45,7 @@ start:
     ld      (exitsp),sp
     ld      hl,2
     call    vdp_set_mode
-    ei
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     INCLUDE "crt/classic/crt_init_heap.asm"
 

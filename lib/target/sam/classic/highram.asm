@@ -5,6 +5,7 @@
     defc    TAR__register_sp = 0xfd00
     defc    TAR__clib_exit_stack_size = 4
     defc    TAR__fputc_cons_generic = 1
+    defc    TAR__crt_enable_eidi = $02
 
     ; Where the screen is located
     defc    SCREEN_BASE = 0x0000
@@ -67,8 +68,7 @@ IF !CRT_DISABLE_INT_TICK
     defc     _FRAMES = tick_count
 ENDIF
     im      2
-    ei
-
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     ; Entry to the user code
     call    _main
 cleanup:

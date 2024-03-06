@@ -7,6 +7,7 @@
     defc    TAR__register_sp = 0xc000
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__fputc_cons_generic = 1
+    defc    TAR__crt_enable_eidi = $02
 
     ; No interrupts registered
     defc    TAR__crt_enable_rst = $0000
@@ -43,7 +44,7 @@ program:
     ld  a,2			;Enable vsync interrupt only
     out ($e4),a
     out ($e6),a
-    ei
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
 ; Entry to the user code
     call    _main

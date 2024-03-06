@@ -194,13 +194,14 @@ ENDIF
 		;push    hl
 
 ;------- Z88DK specific code (begin) -------
-		ld      (__restore_sp_onexit+1),sp	;Save entry stack
-		INCLUDE	"crt/classic/crt_init_sp.asm"
-		INCLUDE	"crt/classic/crt_init_atexit.asm"
-		call	crt0_init_bss
-		ld      (exitsp),sp
+    ld      (__restore_sp_onexit+1),sp	;Save entry stack
+    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+    ld      (exitsp),sp
 
-		INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
 ;-------- Z88DK specific code (end) -------
 

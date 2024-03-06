@@ -103,6 +103,7 @@ copy_loop:
     ld      (hl),c
     inc     hl
     djnz    copy_loop
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     call    _main   ;Call user program
 

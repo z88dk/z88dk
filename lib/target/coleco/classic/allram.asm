@@ -11,10 +11,11 @@
 
     ; No interrupts registered
     defc    TAR__crt_enable_rst = $0000
-    IFNDEF CRT_ENABLE_NMI
-        defc        TAR__crt_enable_nmi = 1
-        defc        _z80_nmi = nmi_handler
-    ENDIF
+    defc    TAR__crt_on_exit = 0x10001  ;Loop forever
+IFNDEF CRT_ENABLE_NMI
+    defc        TAR__crt_enable_nmi = 1
+    defc        _z80_nmi = nmi_handler
+ENDIF
 
     defc    CRT_ORG_CODE = 0
 
@@ -42,14 +43,15 @@ program:
     call    vdp_set_mode
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
-        ; Entry to the user code
+    ; Entry to the user code
     call    _main
 
 cleanup:
     call    crt0_exit
-endloop:
-    jr      endloop
+    INCLUDE "crt/classic/crt_terminate.inc"
+
 
 l_dcal:
     jp      (hl)

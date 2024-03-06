@@ -14,6 +14,8 @@
 
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = -0xfc4a
+    defc    TAR__crt_enable_eidi = $02 ; ei on entry
+    defc    TAR__crt_on_exit = 0x10001  ;loop forever
     INCLUDE "crt/classic/crt_rules.inc"
 
 ;
@@ -64,23 +66,20 @@ start:
     call    $0024       ;enable page 2
                         ;beware: this call returns with ints disabled!
 
-    ;; reenable interrupts
-    ei
 
     INCLUDE	"crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     call    _main
 
 ; end program
 
 cleanup:
-endloop:
-    di
-    halt
-    jr      endloop
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 l_dcal:	jp	(hl)		;Used for call by function pointer

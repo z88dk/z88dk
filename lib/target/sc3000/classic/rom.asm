@@ -20,6 +20,7 @@ ENDIF
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__fgetc_cons_inkey = 1
     defc	__CPU_CLOCK = 3580000
+    defc    TAR__crt_enable_eidi = $02
 
     ; VDP signals delivered to im1
     defc    TAR__crt_enable_rst = $8080
@@ -74,7 +75,7 @@ program:
     ld      hl,1
     call    vdp_set_mode
     im      1
-    ;	ei
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
 ; Entry to the user code
     call    _main
@@ -82,7 +83,7 @@ program:
 cleanup:
     push    hl
     call    crt0_exit
-
+    pop     hl
     INCLUDE "crt/classic/crt_terminate.inc"
 
 

@@ -54,6 +54,8 @@ program:
     ;		      $a800 for 48k?
     ;		      $6800 for 32k
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
     ld      hl,($0013)
     ld      (__primo_screen_base),hl
     ld      hl,0
@@ -61,6 +63,7 @@ program:
     push    hl	;argc
     call    _main
 cleanup:
+    call    crt0_exit
     ld      sp,(__sp)
     ret
 

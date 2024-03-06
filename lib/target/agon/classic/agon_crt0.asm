@@ -104,7 +104,6 @@ copy_done:
     sub     b
     ld      (__cmdline_length+1),a
 ENDIF
-    INCLUDE "crt/classic/crt_start_eidi.inc"
     INCLUDE "crt/classic/crt_init_sp.asm"
     ; Make room for the atexit() stack
     INCLUDE "crt/classic/crt_init_atexit.asm"
@@ -114,6 +113,7 @@ ENDIF
     ld      (__agon_mbase),a
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     ld      a,CLIB_DEFAULT_SCREEN_MODE
     call    asm_agon_setmode

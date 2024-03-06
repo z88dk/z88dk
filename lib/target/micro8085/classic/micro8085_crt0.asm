@@ -173,7 +173,9 @@ program:
 
         call    _main           ;void main(void) so no args or retval
 
-cleanup: jp     rst0            ;restart if main should return
+cleanup:
+        call    crt0_exit
+        jp      rst0            ;restart if main should return
 
 l_dcal:  jp     (hl)            ;Used for function pointer calls
 

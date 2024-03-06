@@ -147,7 +147,9 @@ program:
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
-    ei
+
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
     push    bc	;argv
     push    bc	;argc
     call    _main

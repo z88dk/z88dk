@@ -40,13 +40,13 @@ start:
 
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     call    _main
         
 cleanup:
     push	hl
     call    crt0_exit
-
     pop     bc
 __restore_sp_onexit:
     ld      sp,0

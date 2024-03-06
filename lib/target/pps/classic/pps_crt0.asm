@@ -69,6 +69,7 @@ start:
     ld      a,' '
     ld      c,$56		;CLEAR
     rst     $10
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 ; Work out argc/argv - same as the CPM version 
 IF CRT_ENABLE_COMMANDLINE = 1
     ld      hl,0    ; NULL pointer at the end

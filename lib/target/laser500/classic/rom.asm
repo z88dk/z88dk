@@ -32,12 +32,13 @@ program:
     ei
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     call    _main
 cleanup:
-    di
-    halt
-    jp      cleanup
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_terminate.inc"
+
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls

@@ -41,6 +41,7 @@ start:
     ld      (exitsp),sp
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     ;ld a,65	; (Debugging:  print 'A' char)
     ;call $009F

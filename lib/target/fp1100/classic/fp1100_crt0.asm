@@ -57,6 +57,7 @@ start:
 
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     ld      a,SUB_BEEPOFF
     call    TRNC1

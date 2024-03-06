@@ -181,13 +181,13 @@ ENDIF
 
 
 IF DEFINED_NEEDresidos
-        call    residos_detect
-        jp      c,cleanup_exit
+    call    residos_detect
+    jp      c,cleanup_exit
 ENDIF
-        call    _main           ; Call user program
+    call    _main           ; Call user program
 cleanup:
-        push    hl
-      call    crt0_exit
+    push    hl
+    call    crt0_exit
 
 
 

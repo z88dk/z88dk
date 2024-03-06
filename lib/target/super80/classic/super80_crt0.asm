@@ -36,6 +36,8 @@
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0xbdff
+    defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $10001       ;loop forever
 
     defc    TAR__crt_enable_rst = $8080
     EXTERN  asm_im1_handler
@@ -98,13 +100,12 @@ is_super80v:
     ld      a,$BE
     out     ($F1),a
     ld      (PORT_F1_COPY),a
-    ei
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     call    _main
 cleanup:
-    di
-    halt
-    jp      cleanup
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls

@@ -91,6 +91,8 @@ ENDIF
     ld      hl,argv_start
     add     hl,bc	; now points to end of the command line
     INCLUDE "crt/classic/crt_command_line.asm"
+
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     push    hl	;argv
     push    bc	;argc
     call    _main

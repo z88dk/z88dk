@@ -307,9 +307,9 @@ ENDIF
     defw    _main
     defw    1		;Bank
 cleanup:
-    halt
-    nop
-    jr	cleanup
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_terminate.inc"
+
 
 
 

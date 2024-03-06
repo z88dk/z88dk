@@ -63,6 +63,8 @@ program:
     ld      (exitsp),hl
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
 cleanup:
     ld      hl,0
     push    hl

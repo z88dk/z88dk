@@ -32,6 +32,7 @@
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0xebff
+    defc    TAR__crt_enable_eidi = $02
     defc    __CPU_CLOCK = 4090909
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -48,9 +49,9 @@ start:
     ld      hl,interrupt
     ld      (0xe788),hl		;RAM interrupt vector
     call    crt0_init_bss
-    ei
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
 
     call    _main           ; Call user program

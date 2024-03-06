@@ -165,7 +165,7 @@ IF CRT_ENABLE_STDIO = 1
 crt_no_reopen:
   ENDIF
 ENDIF
-
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     call    _main           ;Call user program
     pop     bc	;kill argv
     pop     bc	;kill argc

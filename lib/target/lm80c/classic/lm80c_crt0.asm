@@ -92,7 +92,7 @@ start:
     ld      (exitsp),sp
 
     INCLUDE "crt/classic/crt_init_heap.asm"
-
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
 	; Setup NMI if required
 	; Apparently the NMI is buggy, a 0.01second tick is available

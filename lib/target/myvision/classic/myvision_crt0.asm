@@ -36,6 +36,8 @@ ENDIF
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0xa800
+    defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = 0x0000   ;jp to 0 for restart
     defc	CRT_KEY_DEL = 127
     defc	__CPU_CLOCK = 3579545
 
@@ -87,12 +89,14 @@ start:
     res     6,a
     out     ($01),a
 
-    ei
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
 
     call    _main
 cleanup:
-    rst     0       ;Restart when main finishes
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 ; Safe BIOS call

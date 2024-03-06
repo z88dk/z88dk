@@ -287,10 +287,11 @@ ENDIF
     
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm" 
-    call	crt0_init_bss
-    ld	(exitsp),sp
+    call    crt0_init_bss
+    ld      (exitsp),sp
         
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
 
     call    _main
@@ -315,10 +316,9 @@ l_dcal:
 		
 ; If we were given an address for the BSS then use it
 IF DEFINED_CRT_ORG_BSS
-	defc	__crt_org_bss = CRT_ORG_BSS
+    defc    __crt_org_bss = CRT_ORG_BSS
 ENDIF
 
-
-	INCLUDE "crt/classic/crt_runtime_selection.asm"
-	INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE	"crt/classic/crt_section.asm"
 

@@ -76,6 +76,7 @@ start:
 
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
 IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
     EXTERN asm_bee_set_screenmode

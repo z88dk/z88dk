@@ -29,7 +29,7 @@ start:
 
     exx
     push    hl
-
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     call    _main
         

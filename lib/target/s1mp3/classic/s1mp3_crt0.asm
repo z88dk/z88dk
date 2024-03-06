@@ -10,6 +10,7 @@
 
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x4000
+    defc    TAR__crt_on_exit = 0x10001 ; Loop forever
 
     defc    CONSOLE_COLUMNS = 16
     defc    CONSOLE_ROWS = 4
@@ -88,11 +89,12 @@ program:
     call    crt0_init_bss
     ld      (exitsp),sp
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
     call    _main
 cleanup:
-    di
-    halt
-    jp      cleanup
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls

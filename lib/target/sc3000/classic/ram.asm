@@ -40,7 +40,7 @@ start:
 cleanup:
     push    hl
     call    crt0_exit
-
+    pop     hl
 
 __restore_sp_onexit:
     ld      sp,0

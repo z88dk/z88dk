@@ -50,6 +50,7 @@ ENDIF
     defc    TAR__clib_exit_stack_size = 32
     ;defc    TAR__register_sp = $5fff
     defc    TAR__register_sp = -1
+    defc    TAR__crt_on_exit = $1904        ;BASIC USR() function, pass hl as parameter
     defc	__CPU_CLOCK = 4000000
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -66,7 +67,7 @@ start:
 
 
     INCLUDE "crt/classic/crt_init_heap.asm"
-
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     call    _main
 cleanup:
@@ -76,9 +77,8 @@ cleanup:
     pop     hl
 __restore_sp_onexit:
     ld      sp,0
-    jp      $1904		; pass HL as a result to the USR(n) BASIC function
-    ;ret
-
+    INCLUDE "crt/classic/crt_terminate.inc"
+    
 l_dcal:
     jp      (hl)
 

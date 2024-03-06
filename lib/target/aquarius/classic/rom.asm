@@ -6,6 +6,7 @@
     defc    CRT_ORG_CODE  = 0xe000
     defc    TAR__register_sp = 0x3fff
     defc    TAR__clib_exit_stack_size = 0
+    defc    TAR__crt_on_exit = 0x10001  ;Loop forever
     defc	RAM_Start = 0x3900
     INCLUDE	"crt/classic/crt_rules.inc"
 
@@ -29,16 +30,16 @@ program:
 
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
 ; Entry to the user code
     call    _main
 
 cleanup:
-    push    hl
     call    crt0_exit
 
 endloop:
-    jr      endloop
+    INCLUDE "crt/classic/crt_terminate.inc"
 
     defc	__crt_org_bss = RAM_Start
     ; If we were given a model then use it

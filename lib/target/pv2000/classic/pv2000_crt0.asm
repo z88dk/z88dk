@@ -37,6 +37,7 @@ ENDIF
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x7fff
+    defc    TAR__crt_enable_eidi = $02
     defc    __CPU_CLOCK = 3579000 
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -64,19 +65,15 @@ start:
     ld      (exitsp),sp
     ld      hl,2
     call    vdp_set_mode
-    ei
-
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
 
     call    _main   ; Call user program
 cleanup:
     push    hl      ; return code
     call    crt0_exit
-
-
-
 cleanup_exit:
 
     pop     hl      ; return code (still not sure it is teh right one !)

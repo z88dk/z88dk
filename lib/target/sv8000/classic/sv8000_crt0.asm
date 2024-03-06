@@ -30,6 +30,7 @@
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x83ff
+    defc    TAR__crt_on_exit = $10001       ;loop forever
     defc	CRT_KEY_DEL = 127
     defc	__CPU_CLOCK = 3579545
 
@@ -73,10 +74,13 @@ program:
     out     ($83),a
 	
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
     call    _main
 cleanup:
-    di
-    halt
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_terminate.inc"
+
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 

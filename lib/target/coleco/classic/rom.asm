@@ -17,7 +17,8 @@ ENDIF
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x7400
-    defc        CRT_KEY_DEL = 127
+    defc    TAR__crt_enable_eidi = $02  ; ei on startup
+    defc    CRT_KEY_DEL = 127
 
     ;; RAM trimming
 IF !DEFINED_CLIB_FOPEN_MAX
@@ -121,12 +122,13 @@ IF CLIB_DEFAULT_SCREEN_MODE != -1
     call    vdp_set_mode
 ENDIF
     im      1
-    ei
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     INCLUDE "crt/classic/crt_init_heap.asm"
 
     call     _main
 cleanup:
+    call    crt0_exit
     rst     0                ;Restart when main finishes
 
 

@@ -62,6 +62,7 @@ ENDIF
     defc    TAR__register_sp = -1
     defc    TAR__clib_exit_stack_size = 8
     defc    TAR__clib_banking_stack_size = 16
+    defc    TAR__crt_enable_eidi = $02  ; ei on startup
     defc    CRT_KEY_DEL = 12
     defc    __CPU_CLOCK = 4000000
     INCLUDE "crt/classic/crt_rules.inc"
@@ -122,8 +123,7 @@ ENDIF
     ; enable process exx set
     ; install interrupt interposer
     call    cpc_enable_process_exx_set
-    ei
-
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     INCLUDE "crt/classic/crt_init_heap.asm"
 

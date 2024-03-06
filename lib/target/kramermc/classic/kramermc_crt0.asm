@@ -27,6 +27,8 @@
 
     defc    TAR__clib_exit_stack_size = 4
     defc    TAR__register_sp = -1
+    defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = RESTART      ;Jump to 0 on finish
     defc    CRT_KEY_DEL = 8
     defc    __CPU_CLOCK = 1500000
     defc    CONSOLE_COLUMNS = 64
@@ -48,8 +50,8 @@ program:
     ld      hl,0
     add     hl,sp
     ld      (exitsp),hl
-    ei
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     ld      hl,0
     push    hl	;argv
     push    hl	;argc
@@ -57,7 +59,8 @@ program:
     pop     bc
     pop     bc
 cleanup:
-    jp      RESTART
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 

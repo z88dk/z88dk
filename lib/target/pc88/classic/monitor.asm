@@ -29,6 +29,7 @@ start:
     ld      (exitsp),sp	
 
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
 ;	ld	a,(defltdsk)
 ;	ld	($EC85),a

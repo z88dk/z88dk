@@ -47,6 +47,7 @@ start:
     pop     bc
     pop     bc
 cleanup:
+    call    crt0_exit
     INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal:

@@ -6,6 +6,7 @@
     defc    CRT_ORG_CODE  = 0x0000
     defc    TAR__register_sp = 0xffff
     defc    TAR__clib_exit_stack_size = 0
+    defc    TAR__crt_enable_eidi = $02
     defc    VRAM_IN = 0x37;
     defc    VRAM_OUT = 0x2f
 
@@ -41,6 +42,7 @@ program:
     INCLUDE "crt/classic/crt_init_heap.asm"
 
     im      1
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     ei
 
 ; Entry to the user code

@@ -23,6 +23,7 @@
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = -1
     defc    TAR__fputc_cons_generic = 0
+    defc    TAR__crt_on_exit = $f800        ;Jump here when finished
     defc    CLIB_DISABLE_FGETS_CURSOR = 1
     defc    CRT_KEY_DEL = 127
     defc    __CPU_CLOCK = 1777000
@@ -66,12 +67,14 @@ program:
     ld      (exitsp),hl
     ei
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     ld      hl,0
     push    hl	;argv
     push    hl	;argc
     call    _main
 cleanup:
-    jp  $f800
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 

@@ -36,6 +36,7 @@ ENDIF
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x7800
+    defc    TAR__crt_enable_eidi = $02
     defc	CRT_KEY_DEL = 127
     defc	__CPU_CLOCK = 3579545
     INCLUDE "crt/classic/crt_rules.inc"
@@ -108,10 +109,12 @@ program:
     ld      hl,2
     call    vdp_set_mode
     im      1
-    ei
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
     call    _main
 cleanup:
+    call    crt0_exit
     rst	0       ;Restart when main finishes
 
 

@@ -76,6 +76,8 @@ find_end:
     ld      b,0
     INCLUDE	"crt/classic/crt_command_line.asm"
 
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
     push    hl      ;argv
     push    bc      ;argc
     call    _main		;Call user code

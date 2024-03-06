@@ -51,13 +51,15 @@ program:
     ld      (exitsp),hl
 
     INCLUDE "crt/classic/crt_init_heap.asm"
-cleanup:
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
     ld      hl,0
     push    hl
     push    hl
     call    _main
     pop     bc
     pop     bc
+cleanup:
     push    hl
     call    crt0_exit
     pop     hl

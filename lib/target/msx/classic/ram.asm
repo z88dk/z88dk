@@ -25,13 +25,16 @@ start:
     call    crt0_init_bss
     ld      (exitsp),sp
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
-
     ld      ix,$CC	; Hide function key strings
     call    msxbios
     call    _main
     ld      ix,$d2	; TOTEXT - force text mode on exit
     call    msxbios
+
+    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+
+
 cleanup:
     call    crt0_exit
 __restore_sp_onexit:

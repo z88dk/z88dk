@@ -27,6 +27,7 @@ ENDIF
     defc    TAR__clib_exit_stack_size = 4
     ;	defc    TAR__fputc_cons_generic = 1
     defc    TAR__register_sp = -1 
+    defc    TAR__crt_enable_eidi = $02 ; ei on entry
     defc    CRT_KEY_DEL = 8
     defc    __CPU_CLOCK = 2400000
 

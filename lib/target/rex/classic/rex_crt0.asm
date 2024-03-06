@@ -60,6 +60,8 @@ start:
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      (exitsp),sp	;Store atexit() stack
+
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     ; Entry to the user code
     call    _main		;Call the users code
 cleanup:

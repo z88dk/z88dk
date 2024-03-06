@@ -58,6 +58,7 @@ program:
     ld      (exitsp),hl
     ei
     INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     push    bc	;argv
     push    bc	;argc
     call    _main

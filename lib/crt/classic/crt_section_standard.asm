@@ -27,6 +27,8 @@ IF !__crt_model
 ENDIF
     INCLUDE "crt/classic/crt_section_bss.inc"
 
+; For ROM compilation, the data section has to sit in RAM. It's placed
+; after the BSS section
 IF __crt_model > 0
     SECTION DATA
     org     -1
@@ -35,6 +37,9 @@ IF __crt_model > 0
 ENDIF
     SECTION BSS_END
 
+; On some targets, the program sits in low memory AND the screen can
+; only be accessed by paging it into low memory. To mitigate this
+; routines that access the screen are placed in high memory. 
 IF __crt_org_graphics
     SECTION	HIMEM
     org	__crt_org_graphics
