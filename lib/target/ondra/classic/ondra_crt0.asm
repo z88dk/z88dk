@@ -31,6 +31,7 @@ ENDIF
     defc    CONSOLE_COLUMNS = 40
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = 0xbfff
+    defc    TAR__crt_on_exit = $0000
     defc	CRT_KEY_DEL = 127
     defc	__CPU_CLOCK = 2000000
     INCLUDE "crt/classic/crt_rules.inc"
@@ -69,7 +70,7 @@ cleanup:
     push    hl
     call    crt0_exit
     pop     hl
-    jp      0
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 

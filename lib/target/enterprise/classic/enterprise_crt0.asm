@@ -171,33 +171,33 @@ cleanup:
 
 IF (!DEFINED_startup | (startup=1))
 warmreset:
-		PUBLIC    warmreset
-        ld      sp, 0100h
-        ld      a, 0ffh
-        out     (0b2h), a
-        ld      c, 60h
-        rst		30h
-        defb	0
-        ld      de, _basiccmd
-        rst		30h
-        defb	26
-        ld      a, 01h
-        out     (0b3h), a
-        ld      a, 6
-        jp      0c00dh
+    PUBLIC    warmreset
+    ld      sp, 0100h
+    ld      a, 0ffh
+    out     (0b2h), a
+    ld      c, 60h
+    rst		30h
+    defb	0
+    ld      de, _basiccmd
+    rst		30h
+    defb	26
+    ld      a, 01h
+    out     (0b3h), a
+    ld      a, 6
+    jp      0c00dh
 
 _basiccmd:
-        defb    5
-        defm    "BASIC"
+    defb    5
+    defm    "BASIC"
 ENDIF
 
 __restore_sp_onexit:
-        ld      sp,0
-        ret
+    ld      sp,0
+    ret
 
 
 l_dcal:
-        jp      (hl)
+    jp      (hl)
 
 
 

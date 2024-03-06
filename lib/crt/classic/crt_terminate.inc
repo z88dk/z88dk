@@ -6,7 +6,11 @@ INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 IF __crt_on_exit < 0x10000
     ; Jump to an address
-    jp      __crt_on_exit
+    IF  __crt_on_exit = 0
+        rst 0
+    ELSE
+        jp      __crt_on_exit
+    ENDIF
 ELIF __crt_on_exit = 0x10001
     ; Halt
 crt_exit_loop_forever:

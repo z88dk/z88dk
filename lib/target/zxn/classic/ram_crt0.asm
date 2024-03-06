@@ -36,8 +36,6 @@ start:
 cleanup:
     push    hl
     call    crt0_exit
-
-cleanup_exit:
     ld      hl,10072        ;Restore hl' to what basic wants
     exx
     pop     bc

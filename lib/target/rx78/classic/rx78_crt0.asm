@@ -33,6 +33,7 @@
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0xebff
     defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $0000
     defc    __CPU_CLOCK = 4090909
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -56,18 +57,8 @@ start:
 
     call    _main           ; Call user program
 cleanup:
-    push    hl              ; return code
-
     call    crt0_exit
-
-
-
-cleanup_exit:
-
-    pop     bc              ; return code (still not sure it is teh right one !)
-
-end:
-    rst     0
+    INCLUDE "crt/classic/crt_terminate.inc"
     
 interrupt:
     ei

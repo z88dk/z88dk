@@ -14,62 +14,55 @@
 
 
 
-	MODULE  nc100_crt0
+    MODULE  nc100_crt0
 
-;--------
-; Include zcc_opt.def to find out some info
-;--------
-
-        defc    crt0 = 1
-	INCLUDE "zcc_opt.def"
-
-;--------
-; Some scope definitions
-;--------
-
-		EXTERN    _main		;main() is always external to crt0 code
-
-		PUBLIC    cleanup		;jp'd to by exit()
-		PUBLIC    l_dcal		;jp(hl)
-
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
-	defc	__CPU_CLOCK = 4606000
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
 
-IF (startup=2)
-	defc    CRT_ORG_CODE  = $8C00
-	org     CRT_ORG_CODE
-	jp	start
 
+    EXTERN    _main		;main() is always external to crt0 code
+
+    PUBLIC    cleanup		;jp'd to by exit()
+    PUBLIC    l_dcal		;jp(hl)
+
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = -1
+    defc	__CPU_CLOCK = 4606000
+    INCLUDE "crt/classic/crt_rules.inc"
+
+
+    IF (startup=2)
+    defc    CRT_ORG_CODE  = $8C00
+    org     CRT_ORG_CODE
+    jp      start
 ELSE
 
-	defc    CRT_ORG_CODE  = $C000
-	org     CRT_ORG_CODE
-	jp	start
+    defc    CRT_ORG_CODE  = $C000
+    org     CRT_ORG_CODE
+    jp      start
 
 IF DEFINED_CRT_HEAP_ENABLE
 ;EXTERN ASMTAIL
 PUBLIC _heap
 ; We have 509 bytes we can use here..
 _heap:
-	defw 0
-	defw 0
+    defw    0
+    defw    0
 _mblock:
-	defs	505		; Few bytes for malloc() stuff
+    defs    505		; Few bytes for malloc() stuff
 ELSE
-	defs	509		; Waste 509 bytes of space
+	defs    509		; Waste 509 bytes of space
 ENDIF
 
 ;--------
 ; Card header
 ;--------
-	defm	"NC100PRG"	
-	defb	0,0,0,0,0,0,0,0
-	jp	start			;c210
-	defm	"z88dk NC100"
-	defb	0,0
+    defm    "NC100PRG"	
+    defb    0,0,0,0,0,0,0,0
+    jp      start			;c210
+    defm    "z88dk NC100"
+    defb    0,0
 
 ENDIF
 
@@ -108,13 +101,12 @@ ENDIF
     call    _main		;Call user code
 
 cleanup:
-	push	hl
+    push    hl
     call    crt0_exit
-
-	pop	bc
+    pop     bc
 __restore_sp_onexit:
-	ld	sp,0
-	ret
+    ld      sp,0
+    ret
 
 l_dcal:	jp	(hl)
 

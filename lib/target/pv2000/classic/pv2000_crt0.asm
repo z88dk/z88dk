@@ -74,8 +74,6 @@ start:
 cleanup:
     push    hl      ; return code
     call    crt0_exit
-cleanup_exit:
-
     pop     hl      ; return code (still not sure it is teh right one !)
 
 __restore_sp_onexit:

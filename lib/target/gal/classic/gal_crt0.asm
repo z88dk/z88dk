@@ -55,9 +55,6 @@ start:
 
 cleanup:
     call    crt0_exit
-
-
-cleanup_exit:
     halt
     im      1
 __restore_sp_onexit:

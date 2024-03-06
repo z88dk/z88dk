@@ -37,6 +37,7 @@ ENDIF
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x7800
     defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $0000
     defc	CRT_KEY_DEL = 127
     defc	__CPU_CLOCK = 3579545
     INCLUDE "crt/classic/crt_rules.inc"
@@ -115,7 +116,7 @@ program:
     call    _main
 cleanup:
     call    crt0_exit
-    rst	0       ;Restart when main finishes
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 

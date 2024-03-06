@@ -4,29 +4,29 @@
 ;
 ;
 
-	defc	CRT_ORG_CODE = 0x0000
-	defc	TAR__register_sp = 0x0000
+    defc    CRT_ORG_CODE = 0x0000
+    defc    TAR__register_sp = 0x0000
 
-        ; We want to intercept rst38 to our interrupt manager that reads the 
-	; keyboard
-        defc    TAR__crt_enable_rst = $8080
-        EXTERN  asm_im1_handler
-        defc    _z80_rst_38h = asm_im1_handler
+    ; We want to intercept rst38 to our interrupt manager that reads the 
+    ; keyboard
+    defc    TAR__crt_enable_rst = $8080
+    EXTERN  asm_im1_handler
+    defc    _z80_rst_38h = asm_im1_handler
 
-	; Add NMI for good measure
-        IFNDEF CRT_ENABLE_NMI
-            defc        TAR__crt_enable_nmi = 1
-            EXTERN      asm_nmi_handler
-            defc        _z80_nmi = asm_nmi_handler
-        ENDIF	
+    ; Add NMI for good measure
+IFNDEF CRT_ENABLE_NMI
+    defc        TAR__crt_enable_nmi = 1
+    EXTERN      asm_nmi_handler
+    defc        _z80_nmi = asm_nmi_handler
+ENDIF	
 
-	INCLUDE	"crt/classic/crt_rules.inc"
+    INCLUDE	"crt/classic/crt_rules.inc"
 
-	org	CRT_ORG_CODE
+    org	CRT_ORG_CODE
 
-        EXTERN asm_im1_handler
-        EXTERN asm_nmi_handler
-        EXTERN asm_im1_install_isr
+    EXTERN asm_im1_handler
+    EXTERN asm_nmi_handler
+    EXTERN asm_im1_install_isr
 
 if (ASMPC<>$0000)
     defs    CODE_ALIGNMENT_ERROR
@@ -67,6 +67,3 @@ cleanup:
 end:
     jr	end
     rst	0
-
-cleanup_exit:
-    ret

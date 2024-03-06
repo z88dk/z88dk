@@ -34,8 +34,7 @@ start:
 cleanup:
     push    hl
     call    crt0_exit
-
-
-    pop    bc
-__restore_sp_onexit:   ld    sp,0        ;Restore stack to entry value
+    pop     bc
+__restore_sp_onexit:
+    ld      sp,0        ;Restore stack to entry value
     ret

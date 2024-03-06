@@ -52,9 +52,6 @@ start:
 
 cleanup:
     call    crt0_exit
-
-
-cleanup_exit:
 __restore_sp_onexit:
     ld      sp,0            ;Restore stack to entry value
     ret

@@ -73,8 +73,6 @@ cleanup:
 end:
     jr      end
 
-cleanup_exit:
-	ret
 
 _kbd_isr:
     push    af
