@@ -58,7 +58,7 @@ cleanup:
 
 
 
-    INCLUDE	"crt/classic/tms9918/interrupt.asm"
+    INCLUDE	"crt/classic/tms99x8/tms99x8_interrupt.inc"
     ei
     reti
 

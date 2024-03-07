@@ -143,7 +143,7 @@ ENDIF
     INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
     ; And include handling disabling screenmodes
-    INCLUDE "crt/classic/tms9918/mode_disable.asm"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_disable.inc"
 
     INCLUDE	"crt/classic/crt_section.inc"
 

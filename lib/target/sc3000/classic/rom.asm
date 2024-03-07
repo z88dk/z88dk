@@ -47,7 +47,7 @@ if (ASMPC = $0000)
     INCLUDE	"crt/classic/crt_z80_rsts.inc"
 
     ; Interrupt routine, defines tms9918_interrupt
-    INCLUDE	"crt/classic/tms9918/interrupt.asm"
+    INCLUDE	"crt/classic/tms99x8/tms99x8_interrupt.inc"
     ei
     reti
 
