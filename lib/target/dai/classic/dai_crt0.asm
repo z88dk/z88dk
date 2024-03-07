@@ -54,7 +54,6 @@ program:
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
-cleanup:
     ld      hl,0
     push    hl
     push    hl
