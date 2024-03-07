@@ -26,7 +26,7 @@ start:
     ld      a,(SYSVAR_PORT29_COPY)
     ld      (__port29_copy),a
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main    ;Call user program

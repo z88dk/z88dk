@@ -82,7 +82,7 @@ ENDIF
 IF !__CPU_RABBIT__
     ei
 ENDIF
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     ld      a,(argv_length)
     and     a
     jp      z,argv_done

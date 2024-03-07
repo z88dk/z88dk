@@ -39,7 +39,7 @@ start:
     ld      (exitsp),sp
 
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main

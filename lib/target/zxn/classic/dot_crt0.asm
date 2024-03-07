@@ -54,7 +54,7 @@ ENDIF
     call    crt0_init_bss
 
 
-;    INCLUDE "crt/classic/crt_init_heap.asm"
+;    INCLUDE "crt/classic/crt_init_heap.inc"
 
     exx
     ex      de,hl

@@ -125,7 +125,7 @@ ENDIF
     call    cpc_enable_process_exx_set
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
 IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
     ld      a,CLIB_DEFAULT_SCREEN_MODE

@@ -200,7 +200,7 @@ ENDIF
     call    crt0_init_bss
     ld      (exitsp),sp
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 ;-------- Z88DK specific code (end) -------

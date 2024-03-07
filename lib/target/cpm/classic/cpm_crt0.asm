@@ -150,7 +150,7 @@ IF (startup=3) | (startup=4) | (startup=5)
 	pop hl
 ENDIF
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 IF CRT_ENABLE_COMMANDLINE = 1

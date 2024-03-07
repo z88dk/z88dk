@@ -57,7 +57,7 @@ program:
     ld      a, @00000001
     out     (3),a
     di
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     ld      bc,0

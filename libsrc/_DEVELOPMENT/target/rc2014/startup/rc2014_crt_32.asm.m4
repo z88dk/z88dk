@@ -260,7 +260,7 @@ IF DEFINED_CRT_HEAP_ENABLE
     ld hl,__BSS_END_tail
     ld (_heap),hl
 
-    include "../../../../lib/crt/classic/crt_init_heap.asm"
+    include "../../../../lib/crt/classic/crt_init_heap.inc"
 
 ENDIF
 

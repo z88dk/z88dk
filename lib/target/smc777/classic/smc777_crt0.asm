@@ -68,7 +68,7 @@ program:
 
     ; TODO: Add a keyboard interrupt handler?
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ; Enable interrupts (by default)
     INCLUDE "crt/classic/crt_init_eidi.inc"

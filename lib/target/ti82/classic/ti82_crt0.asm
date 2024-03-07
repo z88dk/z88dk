@@ -69,7 +69,7 @@ start:
     call    crt0_init_bss
     ld	(exitsp),sp
 
-	INCLUDE "crt/classic/crt_init_heap.asm"
+	INCLUDE "crt/classic/crt_init_heap.inc"
 
 	EXTERN	fputc_cons
 	ld	hl,12

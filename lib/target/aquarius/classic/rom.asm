@@ -29,7 +29,7 @@ program:
     ld      (exitsp),sp
 
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 ; Entry to the user code

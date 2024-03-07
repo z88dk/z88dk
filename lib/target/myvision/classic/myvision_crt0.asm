@@ -89,7 +89,7 @@ start:
     res     6,a
     out     ($01),a
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 

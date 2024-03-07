@@ -43,7 +43,7 @@ program:
 
     call    crt0_init_bss
     ld      (exitsp),sp
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ; Install the keyboard interrupt handler
     ld      de,asm_x1_keyboard_handler

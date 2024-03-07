@@ -55,7 +55,7 @@ program:
     INCLUDE "crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
     ld      (exitsp),sp
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     im      1
     INCLUDE "crt/classic/crt_init_eidi.inc"
 

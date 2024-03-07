@@ -30,7 +30,7 @@ program:
 
 
     ; Setup heap between end program and sp
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ; Now, page the screen into 0000-0x7fff
     INCLUDE "target/sam/classic/sam_switchmode.inc"

@@ -51,7 +51,7 @@ start:
     ld      (0xe788),hl		;RAM interrupt vector
     call    crt0_init_bss
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 

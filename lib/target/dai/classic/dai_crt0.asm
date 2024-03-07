@@ -51,7 +51,7 @@ program:
     add     hl,sp
     ld      (exitsp),hl
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 cleanup:
@@ -61,10 +61,10 @@ cleanup:
     call    _main
     pop     bc
     pop     bc
+cleanup:
     push    hl
     call    crt0_exit
     pop     hl
-finished:
     ret
 
 l_dcal: jp      (hl)            ;Used for function pointer calls

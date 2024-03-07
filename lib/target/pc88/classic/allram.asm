@@ -37,7 +37,7 @@ program:
     call    crt0_init_bss
     ld      (exitsp),sp
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ld  hl,asm_im1_handler
     ld  ($f302),hl		;vsync interrupt

@@ -42,7 +42,7 @@ program:
     ld      hl,2
     call    vdp_set_mode
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     ; Entry to the user code

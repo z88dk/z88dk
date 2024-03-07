@@ -31,7 +31,7 @@ start:
     ld      ix,$d2	; TOTEXT - force text mode on exit
     call    msxbios
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 

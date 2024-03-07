@@ -169,7 +169,7 @@ _get_msec:
 program:
         call    target_init
         call    crt0_init_bss
-        INCLUDE "crt/classic/crt_init_heap.asm"
+        INCLUDE "crt/classic/crt_init_heap.inc"
 
         call    _main           ;void main(void) so no args or retval
 

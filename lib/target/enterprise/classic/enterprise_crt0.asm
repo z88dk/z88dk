@@ -161,7 +161,7 @@ ENDIF
     ld      (exitsp),sp
 
     INCLUDE "crt/classic/crt_init_eidi.inc"
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     call    _main
 	

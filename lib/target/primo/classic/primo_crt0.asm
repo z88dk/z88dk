@@ -53,7 +53,7 @@ program:
     ; Entry stack is is ~ $e800 for 64k
     ;		      $a800 for 48k?
     ;		      $6800 for 32k
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     ld      hl,($0013)

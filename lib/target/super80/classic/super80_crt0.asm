@@ -100,7 +100,7 @@ is_super80v:
     ld      a,$BE
     out     ($F1),a
     ld      (PORT_F1_COPY),a
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
     call    _main
 cleanup:

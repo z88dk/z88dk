@@ -165,7 +165,7 @@ ELSE
     call    crt0_init_bss
     ld      (exitsp),sp
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
 
   IF DEFINED_ZXVGS

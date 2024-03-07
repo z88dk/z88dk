@@ -89,7 +89,7 @@ start:
     ld      (exitsp),sp
 
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ; Copy variables from "text graphics mem" to "video graphics mem page 0"
     ld      hl,$efc0

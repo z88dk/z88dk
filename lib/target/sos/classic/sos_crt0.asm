@@ -40,7 +40,7 @@ start:
     dec     sp
     call    crt0_init_bss
     ld      (exitsp),sp
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
 
 ; Push pointers to argv[n] onto the stack now

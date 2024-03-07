@@ -26,7 +26,7 @@ endif
     INCLUDE	"crt/classic/crt_init_atexit.inc"
     call    crt0_init_bss
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ; re-activate IPL
     ld      bc,$1D00

@@ -110,7 +110,7 @@ program:
     ld      hl,2
     call    vdp_set_mode
     im      1
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main

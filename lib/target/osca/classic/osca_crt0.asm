@@ -133,7 +133,7 @@ start:
     INCLUDE "crt/classic/crt_init_atexit.inc"
     call	crt0_init_bss
     ld      (exitsp),sp
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
 IF (!DEFINED_osca_notimer)
     ld      hl,(FLOS_irq_vector)            		; The label "irq_vector" = $A01 (contained in equates file)

@@ -298,7 +298,7 @@ IF 0
     ld      (hl+),a
 ENDIF
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ei
     push    hl	;argv

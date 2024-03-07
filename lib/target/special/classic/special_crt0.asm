@@ -57,7 +57,7 @@ program:
     add     hl,sp
     ld      (exitsp),hl
     ei
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
     push    bc	;argv
     push    bc	;argc

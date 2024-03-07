@@ -106,7 +106,7 @@ start:
     INCLUDE "crt/classic/crt_init_eidi.inc"
     call    asm_lcd_init
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     call    _main
 cleanup:

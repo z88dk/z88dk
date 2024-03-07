@@ -64,7 +64,7 @@ start:
     call    crt0_init_bss
     ld      (exitsp),sp
 
-    INCLUDE "crt/classic/crt_init_heap.asm"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     di
     ld      hl,$47D0  ;INTHK - Hook Code for Interrupt
