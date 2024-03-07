@@ -61,7 +61,7 @@ class Preproc {
 public:
 	Preproc();
 
-	bool open(const string& filename, bool search_include_path);
+	bool open(const string& filename);
 	void close();
 	bool getline(ScannedLine& line);
 	bool get_unpreproc_line(ScannedLine& line);

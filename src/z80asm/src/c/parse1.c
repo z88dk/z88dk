@@ -422,7 +422,7 @@ void parse_file(const char* filename)
 {
 	ParseCtx* ctx = ParseCtx_new();
 	{
-		if (sfile_open(filename, true)) {
+		if (sfile_open(filename)) {
 			sym.tok = TK_NIL;
 			while (sym.tok != TK_END)
 				parseline(ctx);				/* before parsing it */

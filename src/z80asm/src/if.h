@@ -98,7 +98,7 @@ void parse_expr_eval_if_condition(const char *expr_text, bool* condition, bool* 
 bool check_ifdef_condition(const char* name);
 
 // source file input
-bool sfile_open(const char* filename, bool search_include_path);
+bool sfile_open(const char* filename);
 void sfile_hold_input();
 void sfile_unhold_input();
 char* sfile_getline();	// NOTE: user must free returned pointer

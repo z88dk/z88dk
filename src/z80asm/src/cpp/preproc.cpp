@@ -153,14 +153,12 @@ Preproc::Preproc() {
 	m_levels.emplace_back();
 }
 
-bool Preproc::open(const string& filename_, bool search_include_path) {
+bool Preproc::open(const string& filename_) {
 	// canonize path
 	string filename = fs::path(filename_).generic_string();
 
 	// search file in path
-	string found_filename = filename;
-	if (search_include_path)
-		found_filename = search_includes(filename.c_str());
+	string found_filename = g_args.search_include_path(filename);
 
 	// check for recursive includes
 	if (recursive_include(found_filename)) {
@@ -838,7 +836,7 @@ void Preproc::do_include() {
 		if (!m_line.peek().is(TType::Newline))
 			g_errors.error(ErrSyntax);
 		else {
-			open(filename, true);
+			open(filename);
 		}
 	}
 }
@@ -1600,8 +1598,8 @@ void sfile_unhold_input() {
 	g_hold_getline = false;
 }
 
-bool sfile_open(const char* filename, bool search_include_path) {
-	return g_preproc.open(filename, search_include_path);
+bool sfile_open(const char* filename) {
+	return g_preproc.open(filename);
 }
 
 // NOTE: user must free returned pointer
