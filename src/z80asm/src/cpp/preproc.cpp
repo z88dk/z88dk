@@ -52,38 +52,38 @@ void PreprocLevel::split_lines(ScannedLine& line) {
 
         unsigned i;
         for (i = line_start; !got_eol && i < line.tokens().size(); i++) {
-            Token token = line.tokens()[i];
+            Token1 token = line.tokens()[i];
             switch (token.type()) {
-            case TType::Hash:
+            case TType1::Hash:
                 if (this_line.tokens().empty())
                     is_hash_line = true;
                 this_line.append({ token });
                 break;
 
-            case TType::LParen:
+            case TType1::LParen:
                 if (!is_hash_line)
                     parens++;
                 this_line.append({ token });
                 break;
 
-            case TType::RParen:
+            case TType1::RParen:
                 if (!is_hash_line)
                     parens--;
                 this_line.append({ token });
                 break;
 
-            case TType::Quest:
+            case TType1::Quest:
                 if (!is_hash_line)
                     conditional++;
                 this_line.append({ token });
                 break;
 
-            case TType::Colon:
+            case TType1::Colon:
                 if (conditional > 0) {     // conditional
                     conditional--;
                     this_line.append({ token });
                 }
-                else if (i == line_start + 1 && line.tokens()[line_start].type() == TType::Ident)    // label:
+                else if (i == line_start + 1 && line.tokens()[line_start].type() == TType1::Ident)    // label:
                     this_line.append({ token });
                 else if (is_hash_line)
                     this_line.append({ token });
@@ -94,14 +94,14 @@ void PreprocLevel::split_lines(ScannedLine& line) {
                     got_eol = true;
                 break;
 
-            case TType::Backslash:
+            case TType1::Backslash:
                 if (is_hash_line) 
                     this_line.append({ token });
                 else                            // line break
                     got_eol = true;
                 break;
 
-            case TType::Newline:
+            case TType1::Newline:
                 got_eol = true;                 // line break
                 break;
 
@@ -110,7 +110,7 @@ void PreprocLevel::split_lines(ScannedLine& line) {
             }
         }
 
-        this_line.append({ Token{TType::Newline, false} });
+        this_line.append({ Token1{TType1::Newline, false} });
         m_lines.push_back(this_line);
         this_line.clear();
         line_start = i;
@@ -118,7 +118,7 @@ void PreprocLevel::split_lines(ScannedLine& line) {
 
     // push tokens after last separator
     if (!this_line.tokens().empty()) {
-        this_line.append({ Token{TType::Newline, false} });
+        this_line.append({ Token1{TType1::Newline, false} });
         m_lines.push_back(this_line);
     }
 }
@@ -138,13 +138,13 @@ bool PreprocLevel::getline(ScannedLine& line) {
 
 //-----------------------------------------------------------------------------
 
-ExpandedLine::ExpandedLine(const string& text, const vector<Token>& tokens)
+ExpandedLine::ExpandedLine(const string& text, const vector<Token1>& tokens)
     : ScannedLine(text, tokens) {
 }
 
 //-----------------------------------------------------------------------------
 
-IfNest::IfNest(Keyword keyword, Location location, bool flag)
+IfNest::IfNest(Keyword1 keyword, Location location, bool flag)
 	: keyword(keyword), location(location), flag(flag), done_if(false) {}
 
 //-----------------------------------------------------------------------------
@@ -305,29 +305,29 @@ void Preproc::parse_line(const ScannedLine& line) {
     m_line.rewind();
 
 	// do these irrespective of ifs_active()
-	if (check_opt_hash_opcode(Keyword::IF, &Preproc::do_if)) return;
-	if (check_opt_hash_opcode(Keyword::ELSE, &Preproc::do_else)) return;
-	if (check_opt_hash_opcode(Keyword::ENDIF, &Preproc::do_endif)) return;
-	if (check_opt_hash_opcode(Keyword::IFDEF, &Preproc::do_ifdef)) return;
-	if (check_opt_hash_opcode(Keyword::IFNDEF, &Preproc::do_ifndef)) return;
-	if (check_opt_hash_opcode(Keyword::ELIF, &Preproc::do_elif)) return;
-	if (check_opt_hash_opcode(Keyword::ELIFDEF, &Preproc::do_elifdef)) return;
-	if (check_opt_hash_opcode(Keyword::ELIFNDEF, &Preproc::do_elifndef)) return;
+	if (check_opt_hash_opcode(Keyword1::IF, &Preproc::do_if)) return;
+	if (check_opt_hash_opcode(Keyword1::ELSE, &Preproc::do_else)) return;
+	if (check_opt_hash_opcode(Keyword1::ENDIF, &Preproc::do_endif)) return;
+	if (check_opt_hash_opcode(Keyword1::IFDEF, &Preproc::do_ifdef)) return;
+	if (check_opt_hash_opcode(Keyword1::IFNDEF, &Preproc::do_ifndef)) return;
+	if (check_opt_hash_opcode(Keyword1::ELIF, &Preproc::do_elif)) return;
+	if (check_opt_hash_opcode(Keyword1::ELIFDEF, &Preproc::do_elifdef)) return;
+	if (check_opt_hash_opcode(Keyword1::ELIFNDEF, &Preproc::do_elifndef)) return;
 
 	if (!ifs_active()) return;
 
 	// do these only if ifs_active()
-	if (check_hash_directive(Keyword::DEFINE, &Preproc::do_define)) return;
-	if (check_opt_hash_opcode(Keyword::INCLUDE, &Preproc::do_include)) return;
-	if (check_hash_directive(Keyword::UNDEF, &Preproc::do_undef)) return;
-	if (check_opcode(Keyword::BINARY, &Preproc::do_binary)) return;
-	if (check_opcode(Keyword::EXITM, &Preproc::do_exitm)) return;
-	if (check_opcode(Keyword::FLOAT, &Preproc::do_float)) return;
-	if (check_opcode(Keyword::INCBIN, &Preproc::do_binary)) return;
-	if (check_opcode(Keyword::LOCAL, &Preproc::do_local)) return;
-	if (check_opcode(Keyword::SETFLOAT, &Preproc::do_setfloat)) return;
-	if (check_opcode(Keyword::LINE, &Preproc::do_line)) return;
-	if (check_opcode(Keyword::C_LINE, &Preproc::do_c_line)) return;
+	if (check_hash_directive(Keyword1::DEFINE, &Preproc::do_define)) return;
+	if (check_opt_hash_opcode(Keyword1::INCLUDE, &Preproc::do_include)) return;
+	if (check_hash_directive(Keyword1::UNDEF, &Preproc::do_undef)) return;
+	if (check_opcode(Keyword1::BINARY, &Preproc::do_binary)) return;
+	if (check_opcode(Keyword1::EXITM, &Preproc::do_exitm)) return;
+	if (check_opcode(Keyword1::FLOAT, &Preproc::do_float)) return;
+	if (check_opcode(Keyword1::INCBIN, &Preproc::do_binary)) return;
+	if (check_opcode(Keyword1::LOCAL, &Preproc::do_local)) return;
+	if (check_opcode(Keyword1::SETFLOAT, &Preproc::do_setfloat)) return;
+	if (check_opcode(Keyword1::LINE, &Preproc::do_line)) return;
+	if (check_opcode(Keyword1::C_LINE, &Preproc::do_c_line)) return;
 	if (check_defl()) return;
 	if (check_macro()) return;
 	if (check_reptx()) return;
@@ -353,7 +353,7 @@ bool Preproc::ifs_active() {
 	return true;
 }
 
-bool Preproc::symbol_defined(const Token& ident) {
+bool Preproc::symbol_defined(const Token1& ident) {
 	// expand macros in condition
     string name = ident.svalue();
     ScannedLine symbol_line{ name, {ident} };
@@ -377,25 +377,25 @@ bool Preproc::symbol_defined(const Token& ident) {
 }
 
 int Preproc::check_label_index() {
-    if (m_line.peek(0).is(TType::Ident) && m_line.peek(1).is(TType::Colon))
+    if (m_line.peek(0).is(TType1::Ident) && m_line.peek(1).is(TType1::Colon))
         return 0;
-    else if (m_line.peek(0).is(TType::Dot) && m_line.peek(1).is(TType::Ident))
+    else if (m_line.peek(0).is(TType1::Dot) && m_line.peek(1).is(TType1::Ident))
         return 1;
     else
         return -1;
 }
 
 void Preproc::do_label(int label_index) {
-    Token label_token = m_line.peek(label_index);
+    Token1 label_token = m_line.peek(label_index);
     m_line.next(2);
 
     ScannedLine label_line;
-    label_line.append({ label_token, Token{TType::Colon, false},
-                        Token{TType::Newline, false} });
+    label_line.append({ label_token, Token1{TType1::Colon, false},
+                        Token1{TType1::Newline, false} });
     push_expanded(label_line, defines());
 }
 
-bool Preproc::check_opcode(Keyword keyword, void(Preproc::* do_action)()) {
+bool Preproc::check_opcode(Keyword1 keyword, void(Preproc::* do_action)()) {
     int label_index = check_label_index();
     if (label_index >= 0 && m_line.peek(2).is(keyword)) {
         if (ifs_active())
@@ -406,7 +406,7 @@ bool Preproc::check_opcode(Keyword keyword, void(Preproc::* do_action)()) {
         ((*this).*(do_action))();
         return true;
     }
-	else if (m_line.peek(0).is(keyword) && !m_line.peek(1).is(TType::Colon)) {
+	else if (m_line.peek(0).is(keyword) && !m_line.peek(1).is(TType1::Colon)) {
 		m_line.next();
 		((*this).*(do_action))();
 		return true;
@@ -415,8 +415,8 @@ bool Preproc::check_opcode(Keyword keyword, void(Preproc::* do_action)()) {
 		return false;
 }
 
-bool Preproc::check_hash_directive(Keyword keyword, void(Preproc::* do_action)()) {
-	if (m_line.peek(0).is(TType::Hash) && m_line.peek(1).is(keyword)) {
+bool Preproc::check_hash_directive(Keyword1 keyword, void(Preproc::* do_action)()) {
+	if (m_line.peek(0).is(TType1::Hash) && m_line.peek(1).is(keyword)) {
 		m_line.next(2);
 		((*this).*(do_action))();
 		return true;
@@ -425,7 +425,7 @@ bool Preproc::check_hash_directive(Keyword keyword, void(Preproc::* do_action)()
 		return false;
 }
 
-bool Preproc::check_opt_hash_opcode(Keyword keyword, void(Preproc::* do_action)()) {
+bool Preproc::check_opt_hash_opcode(Keyword1 keyword, void(Preproc::* do_action)()) {
 	if (check_hash_directive(keyword, do_action))
 		return true;
 	else if (check_opcode(keyword, do_action))
@@ -435,7 +435,7 @@ bool Preproc::check_opt_hash_opcode(Keyword keyword, void(Preproc::* do_action)(
 }
 
 bool Preproc::check_hash() {
-	if (m_line.peek(0).is(TType::Hash))
+	if (m_line.peek(0).is(TType1::Hash))
 		return true;
 	else
 		return false;
@@ -443,21 +443,21 @@ bool Preproc::check_hash() {
 
 bool Preproc::check_defl() {
     int label_index = check_label_index();
-    if (label_index >= 0 && m_line.peek(2).is(Keyword::DEFL)) {
+    if (label_index >= 0 && m_line.peek(2).is(Keyword1::DEFL)) {
         string name = m_line.peek(label_index).svalue();
         m_line.next(3);			// skip name: DEFL
         do_defl(name);
         return true;
     }
-    else if (m_line.peek(0).is(TType::Ident) && m_line.peek(1).is(Keyword::DEFL)) {
+    else if (m_line.peek(0).is(TType1::Ident) && m_line.peek(1).is(Keyword1::DEFL)) {
         string name = m_line.peek(0).svalue();
         m_line.next(2);			// skip name DEFL
         do_defl(name);
         return true;
     }
-	else if (m_line.peek(0).is(Keyword::DEFL) &&
-		m_line.peek(1).is(TType::Ident) &&
-		m_line.peek(2).is(TType::Eq)) { 
+	else if (m_line.peek(0).is(Keyword1::DEFL) &&
+		m_line.peek(1).is(TType1::Ident) &&
+		m_line.peek(2).is(TType1::Eq)) { 
 		string name = m_line.peek(1).svalue();
 		m_line.next(3);			// skip DEFL name=
 		do_defl(name);
@@ -469,33 +469,33 @@ bool Preproc::check_defl() {
 
 bool Preproc::check_macro() {
     int label_index = check_label_index();
-    if (label_index >= 0 && m_line.peek(2).is(Keyword::MACRO)) {
+    if (label_index >= 0 && m_line.peek(2).is(Keyword1::MACRO)) {
         string name = m_line.peek(label_index).svalue();
         m_line.next(3);			// skip name: MACRO
         do_macro(name);
         return true;
     }
-    else if (m_line.peek(0).is(TType::Ident) && m_line.peek(1).is(Keyword::MACRO)) {
+    else if (m_line.peek(0).is(TType1::Ident) && m_line.peek(1).is(Keyword1::MACRO)) {
         string name = m_line.peek(0).svalue();
         m_line.next(2);			// skip name MACRO
         do_macro(name);
         return true;
     }
-	else if (m_line.peek(0).is(Keyword::MACRO) && m_line.peek(1).is(TType::Ident)) {
+	else if (m_line.peek(0).is(Keyword1::MACRO) && m_line.peek(1).is(TType1::Ident)) {
 		string name = m_line.peek(1).svalue();
 		m_line.next(2);			// skip MACRO name
 		do_macro(name);
 		return true;
 	}
-    else if (label_index >= 0 && m_line.peek(2).is(Keyword::ENDM, Keyword::ENDR)) {
+    else if (label_index >= 0 && m_line.peek(2).is(Keyword1::ENDM, Keyword1::ENDR)) {
         g_errors.error(ErrSyntax);
         return true;
     }
-    else if (m_line.peek(0).is(TType::Ident) && m_line.peek(1).is(Keyword::ENDM, Keyword::ENDR)) {
+    else if (m_line.peek(0).is(TType1::Ident) && m_line.peek(1).is(Keyword1::ENDM, Keyword1::ENDR)) {
         g_errors.error(ErrSyntax);
         return true;
     }
-    else if (m_line.peek(0).is(Keyword::ENDM, Keyword::ENDR)) {
+    else if (m_line.peek(0).is(Keyword1::ENDM, Keyword1::ENDR)) {
         g_errors.error(ErrUnbalancedStruct);
 		return true;
 	}
@@ -506,7 +506,7 @@ bool Preproc::check_macro() {
 
 bool Preproc::check_macro_call() {
     int label_index = check_label_index();
-    if (label_index >= 0 && m_line.peek(2).is(TType::Ident)) {
+    if (label_index >= 0 && m_line.peek(2).is(TType1::Ident)) {
         string name = m_line.peek(2).svalue();
 
         // find in MACRO macros OR in #define macros
@@ -521,7 +521,7 @@ bool Preproc::check_macro_call() {
             return true;
         }
     }
-    else if (label_index < 0 && m_line.peek(0).is(TType::Ident)) {
+    else if (label_index < 0 && m_line.peek(0).is(TType1::Ident)) {
 		string name = m_line.peek(0).svalue();
 
         // find in MACRO macros OR in #define macros
@@ -540,22 +540,22 @@ bool Preproc::check_macro_call() {
 }
 
 bool Preproc::check_reptx() {
-	if (m_line.peek(0).is(Keyword::REPT) && !m_line.peek(1).is(TType::Colon)) {
+	if (m_line.peek(0).is(Keyword1::REPT) && !m_line.peek(1).is(TType1::Colon)) {
 		m_line.next();
 		do_rept();
 		return true;
 	}
-	else if (m_line.peek(0).is(Keyword::REPTC) && !m_line.peek(1).is(TType::Colon)) {
+	else if (m_line.peek(0).is(Keyword1::REPTC) && !m_line.peek(1).is(TType1::Colon)) {
 		m_line.next();
 		do_reptc();
 		return true;
 	}
-	else if (m_line.peek(0).is(Keyword::REPTI) && !m_line.peek(1).is(TType::Colon)) {
+	else if (m_line.peek(0).is(Keyword1::REPTI) && !m_line.peek(1).is(TType1::Colon)) {
 		m_line.next();
 		do_repti();
 		return true;
 	}
-	else if (m_line.peek(0).is(Keyword::ENDR) && !m_line.peek(1).is(TType::Colon)) {
+	else if (m_line.peek(0).is(Keyword1::ENDR) && !m_line.peek(1).is(TType1::Colon)) {
 		g_errors.error(ErrUnbalancedStruct);
 		return true;
 	}
@@ -569,25 +569,25 @@ bool Preproc::check_gbz80_opcodes() {
     // ld ($ff00+xxx --> ldh (xxx
 	// ld ($ff00-xxx --> ldh (-xxx
 	// ld ($ff00)xxx --> ldh (0)xxx
-	if (m_line.peek(0).is(Keyword::LD) &&
-		m_line.peek(1).is(TType::LParen) &&
-		m_line.peek(2).is(TType::Integer) && m_line.peek(2).ivalue() == 0xff00) {
+	if (m_line.peek(0).is(Keyword1::LD) &&
+		m_line.peek(1).is(TType1::LParen) &&
+		m_line.peek(2).is(TType1::Integer) && m_line.peek(2).ivalue() == 0xff00) {
 		switch (m_line.peek(3).type()) {
-		case TType::Plus:
-            out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::LParen, false} });
+		case TType1::Plus:
+            out.append({ Token1{TType1::Ident, false, "ldh"}, Token1{TType1::LParen, false} });
             out.append(m_line.peek_tokens(4));
             push_expanded(out, defines());
 			return true;
 
-		case TType::Minus:
-            out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::LParen, false} });
+		case TType1::Minus:
+            out.append({ Token1{TType1::Ident, false, "ldh"}, Token1{TType1::LParen, false} });
             out.append(m_line.peek_tokens(3));
             push_expanded(out, defines());
             return true;
 
-		case TType::RParen:
-            out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::LParen, false},
-                Token{TType::Integer, false, 0} });
+		case TType1::RParen:
+            out.append({ Token1{TType1::Ident, false, "ldh"}, Token1{TType1::LParen, false},
+                Token1{TType1::Integer, false, 0} });
             out.append(m_line.peek_tokens(3));
             push_expanded(out, defines());
             return true;
@@ -599,30 +599,30 @@ bool Preproc::check_gbz80_opcodes() {
 	// ld ($ff00+xxx --> ldh (xxx
 	// ld ($ff00-xxx --> ldh (-xxx
 	// ld ($ff00)xxx --> ldh (0)xxx
-	if (m_line.peek(0).is(Keyword::LD) &&
-		m_line.peek(1).is(Keyword::A) &&
-		m_line.peek(2).is(TType::Comma) &&
-		m_line.peek(3).is(TType::LParen) &&
-		m_line.peek(4).is(TType::Integer) && m_line.peek(4).ivalue() == 0xff00) {
+	if (m_line.peek(0).is(Keyword1::LD) &&
+		m_line.peek(1).is(Keyword1::A) &&
+		m_line.peek(2).is(TType1::Comma) &&
+		m_line.peek(3).is(TType1::LParen) &&
+		m_line.peek(4).is(TType1::Integer) && m_line.peek(4).ivalue() == 0xff00) {
 		switch (m_line.peek(5).type()) {
-		case TType::Plus:
-            out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::Ident, false, "a"},
-                         Token{TType::Comma, false}, Token{TType::LParen, false} });
+		case TType1::Plus:
+            out.append({ Token1{TType1::Ident, false, "ldh"}, Token1{TType1::Ident, false, "a"},
+                         Token1{TType1::Comma, false}, Token1{TType1::LParen, false} });
             out.append(m_line.peek_tokens(6));
             push_expanded(out, defines());
             return true;
 
-		case TType::Minus:
-            out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::Ident, false, "a"},
-                         Token{TType::Comma, false}, Token{TType::LParen, false} });
+		case TType1::Minus:
+            out.append({ Token1{TType1::Ident, false, "ldh"}, Token1{TType1::Ident, false, "a"},
+                         Token1{TType1::Comma, false}, Token1{TType1::LParen, false} });
             out.append(m_line.peek_tokens(5));
             push_expanded(out, defines());
             return true;
 
-		case TType::RParen:
-            out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::Ident, false, "a"},
-                         Token{TType::Comma, false}, Token{TType::LParen, false},
-                         Token{TType::Integer, false, 0} });
+		case TType1::RParen:
+            out.append({ Token1{TType1::Ident, false, "ldh"}, Token1{TType1::Ident, false, "a"},
+                         Token1{TType1::Comma, false}, Token1{TType1::LParen, false},
+                         Token1{TType1::Integer, false, 0} });
             out.append(m_line.peek_tokens(5));
             push_expanded(out, defines());
             return true;
@@ -639,38 +639,38 @@ bool Preproc::check_z80_ld_bit_opcodes() {
     ScannedLine out;
 
     // ld a, res 0, (ix+127) --> res 0, (ix+126), a
-	if (m_line.peek(0).is(Keyword::LD) &&
+	if (m_line.peek(0).is(Keyword1::LD) &&
 		keyword_is_reg_8(m_line.peek(1).keyword()) &&
-		m_line.peek(2).is(TType::Comma) &&
+		m_line.peek(2).is(TType1::Comma) &&
 		keyword_is_z80_ld_bit(m_line.peek(3).keyword()) &&
-		m_line.peek(4).is(TType::Integer) &&
-		m_line.peek(5).is(TType::Comma) &&
-		m_line.peek(6).is(TType::LParen) &&
+		m_line.peek(4).is(TType1::Integer) &&
+		m_line.peek(5).is(TType1::Comma) &&
+		m_line.peek(6).is(TType1::LParen) &&
 		keyword_is_reg_ix_iy(m_line.peek(7).keyword())) {
 
         string reg8 = m_line.peek(1).svalue();
         out.append(m_line.peek_tokens(3));
-        xassert(out.tokens().back().is(TType::Newline));
+        xassert(out.tokens().back().is(TType1::Newline));
         out.tokens().pop_back();
-        out.append({ Token{TType::Comma, false}, Token{TType::Ident, false, reg8},
-                     Token{TType::Newline, false} });
+        out.append({ Token1{TType1::Comma, false}, Token1{TType1::Ident, false, reg8},
+                     Token1{TType1::Newline, false} });
         push_expanded(out, defines());
 		return true;
 	}
 	// ld a,rl (ix+127) --> rl (ix+127), a
-	else if (m_line.peek(0).is(Keyword::LD) &&
+	else if (m_line.peek(0).is(Keyword1::LD) &&
 		keyword_is_reg_8(m_line.peek(1).keyword()) &&
-		m_line.peek(2).is(TType::Comma) &&
+		m_line.peek(2).is(TType1::Comma) &&
 		keyword_is_z80_ld_bit(m_line.peek(3).keyword()) &&
-		m_line.peek(4).is(TType::LParen) &&
+		m_line.peek(4).is(TType1::LParen) &&
 		keyword_is_reg_ix_iy(m_line.peek(5).keyword())) {
 
         string reg8 = m_line.peek(1).svalue();
         out.append(m_line.peek_tokens(3));
-        xassert(out.tokens().back().is(TType::Newline));
+        xassert(out.tokens().back().is(TType1::Newline));
         out.tokens().pop_back();
-        out.append({ Token{TType::Comma, false}, Token{TType::Ident, false, reg8},
-                     Token{TType::Newline, false} });
+        out.append({ Token1{TType1::Comma, false}, Token1{TType1::Ident, false, reg8},
+                     Token1{TType1::Newline, false} });
         push_expanded(out, defines());
         return true;
 	}
@@ -681,8 +681,8 @@ bool Preproc::check_z80_ld_bit_opcodes() {
 
 void Preproc::do_if() {
 	// expand macros in condition
-    vector<Token> cond_tokens = m_line.peek_tokens();
-    ScannedLine cond_line{ Token::to_string(cond_tokens), cond_tokens };
+    vector<Token1> cond_tokens = m_line.peek_tokens();
+    ScannedLine cond_line{ Token1::to_string(cond_tokens), cond_tokens };
     ExpandedLine expanded_cond = expand(cond_line, defines());
     string cond_text = expanded_cond.to_string();
 
@@ -690,25 +690,25 @@ void Preproc::do_if() {
 	bool flag, error;
 	parse_expr_eval_if_condition(cond_text.c_str(), &flag, &error);
 	if (!error) {
-		m_if_stack.emplace_back(Keyword::IF, m_files.back().location(), flag);
+		m_if_stack.emplace_back(Keyword1::IF, m_files.back().location(), flag);
 		m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
 	}
 }
 
 void Preproc::do_else() {
-	if (!m_line.peek().is(TType::Newline))
+	if (!m_line.peek().is(TType1::Newline))
 		g_errors.error(ErrSyntax);
 	else if (m_if_stack.empty())
 		g_errors.error(ErrUnbalancedStruct);
 	else {
-		Keyword last = m_if_stack.back().keyword;
-		if (last != Keyword::IF && last != Keyword::ELIF)
+		Keyword1 last = m_if_stack.back().keyword;
+		if (last != Keyword1::IF && last != Keyword1::ELIF)
 			g_errors.error(ErrUnbalancedStructStartedAt,
 				m_if_stack.back().location.filename + ":" +
 				std::to_string(m_if_stack.back().location.line_num));
 		else {
 			bool flag = !m_if_stack.back().done_if;
-			m_if_stack.back().keyword = Keyword::ELSE;
+			m_if_stack.back().keyword = Keyword1::ELSE;
 			m_if_stack.back().flag = flag;
 			m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
 		}
@@ -716,13 +716,13 @@ void Preproc::do_else() {
 }
 
 void Preproc::do_endif() {
-	if (!m_line.peek().is(TType::Newline))
+	if (!m_line.peek().is(TType1::Newline))
 		g_errors.error(ErrSyntax);
 	else if (m_if_stack.empty())
 		g_errors.error(ErrUnbalancedStruct);
 	else {
-		Keyword last = m_if_stack.back().keyword;
-		if (last != Keyword::IF && last != Keyword::ELIF && last != Keyword::ELSE)
+		Keyword1 last = m_if_stack.back().keyword;
+		if (last != Keyword1::IF && last != Keyword1::ELIF && last != Keyword1::ELSE)
 			g_errors.error(ErrUnbalancedStructStartedAt,
 				m_if_stack.back().location.filename + ":" +
 				std::to_string(m_if_stack.back().location.line_num));
@@ -732,18 +732,18 @@ void Preproc::do_endif() {
 }
 
 void Preproc::do_ifdef_ifndef(bool invert) {
-	if (!m_line.peek().is(TType::Ident))
+	if (!m_line.peek().is(TType1::Ident))
 		g_errors.error(ErrSyntax);
 	else {
-        Token name = m_line.peek();
+        Token1 name = m_line.peek();
 		m_line.next();
-		if (!m_line.peek().is(TType::Newline))
+		if (!m_line.peek().is(TType1::Newline))
 			g_errors.error(ErrSyntax);
 		else {
 			bool f = symbol_defined(name);
 			if (invert)
 				f = !f;
-			m_if_stack.emplace_back(Keyword::IF, m_files.back().location(), f);
+			m_if_stack.emplace_back(Keyword1::IF, m_files.back().location(), f);
 			m_if_stack.back().done_if = m_if_stack.back().done_if || f;
 		}
 	}
@@ -761,15 +761,15 @@ void Preproc::do_elif() {
 	if (m_if_stack.empty())
 		g_errors.error(ErrUnbalancedStruct);
 	else {
-		Keyword last = m_if_stack.back().keyword;
-		if (last != Keyword::IF && last != Keyword::ELIF)
+		Keyword1 last = m_if_stack.back().keyword;
+		if (last != Keyword1::IF && last != Keyword1::ELIF)
 			g_errors.error(ErrUnbalancedStructStartedAt,
 				m_if_stack.back().location.filename + ":" +
 				std::to_string(m_if_stack.back().location.line_num));
 		else {
 			// expand macros in condition
-            vector<Token> cond_tokens = m_line.peek_tokens();
-            ScannedLine cond_line{ Token::to_string(cond_tokens), cond_tokens };
+            vector<Token1> cond_tokens = m_line.peek_tokens();
+            ScannedLine cond_line{ Token1::to_string(cond_tokens), cond_tokens };
             ExpandedLine expanded_cond = expand(cond_line, defines());
             string cond_text = expanded_cond.to_string();
 
@@ -779,7 +779,7 @@ void Preproc::do_elif() {
 			if (!error) {
 				if (m_if_stack.back().done_if)
 					flag = false;
-				m_if_stack.back().keyword = Keyword::ELIF;
+				m_if_stack.back().keyword = Keyword1::ELIF;
 				m_if_stack.back().flag = flag;
 				m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
 			}
@@ -791,18 +791,18 @@ void Preproc::do_elifdef_elifndef(bool invert) {
 	if (m_if_stack.empty())
 		g_errors.error(ErrUnbalancedStruct);
 	else {
-		Keyword last = m_if_stack.back().keyword;
-		if (last != Keyword::IF && last != Keyword::ELIF)
+		Keyword1 last = m_if_stack.back().keyword;
+		if (last != Keyword1::IF && last != Keyword1::ELIF)
 			g_errors.error(ErrUnbalancedStructStartedAt,
 				m_if_stack.back().location.filename + ":" +
 				std::to_string(m_if_stack.back().location.line_num));
 		else {
-			if (!m_line.peek().is(TType::Ident))
+			if (!m_line.peek().is(TType1::Ident))
 				g_errors.error(ErrSyntax);
 			else {
-                Token name = m_line.peek();
+                Token1 name = m_line.peek();
 				m_line.next();
-				if (!m_line.peek().is(TType::Newline))
+				if (!m_line.peek().is(TType1::Newline))
 					g_errors.error(ErrSyntax);
 				else {
 					bool f = symbol_defined(name);
@@ -810,7 +810,7 @@ void Preproc::do_elifdef_elifndef(bool invert) {
 						f = !f;
 					if (m_if_stack.back().done_if)
 						f = false;
-					m_if_stack.back().keyword = Keyword::ELIF;
+					m_if_stack.back().keyword = Keyword1::ELIF;
 					m_if_stack.back().flag = f;
 					m_if_stack.back().done_if = m_if_stack.back().done_if || f;
 				}
@@ -828,12 +828,12 @@ void Preproc::do_elifndef() {
 }
 
 void Preproc::do_include() {
-	if (!m_line.peek().is(TType::String))
+	if (!m_line.peek().is(TType1::String))
 		g_errors.error(ErrSyntax);
 	else {
 		string filename = m_line.peek().svalue();
 		m_line.next();
-		if (!m_line.peek().is(TType::Newline))
+		if (!m_line.peek().is(TType1::Newline))
 			g_errors.error(ErrSyntax);
 		else {
 			open(filename);
@@ -842,12 +842,12 @@ void Preproc::do_include() {
 }
 
 void Preproc::do_binary() {
-	if (!m_line.peek().is(TType::String))
+	if (!m_line.peek().is(TType1::String))
 		g_errors.error(ErrSyntax);
 	else {
 		string filename = m_line.peek().svalue();
 		m_line.next();
-		if (!m_line.peek().is(TType::Newline))
+		if (!m_line.peek().is(TType1::Newline))
 			g_errors.error(ErrSyntax);
 		else {
 			// search file in path
@@ -871,13 +871,13 @@ void Preproc::do_binary() {
 						unsigned num_read = static_cast<unsigned>(ifs.gcount());
 						if (num_read > 0) {
                             ScannedLine out;
-                            out.append({ Token{TType::Ident, false, "defb"} });
+                            out.append({ Token1{TType1::Ident, false, "defb"} });
                             for (unsigned i = 0; i < num_read; i++) {
                                 if (i != 0)
-                                    out.append({ Token{TType::Comma, false} });
-                                out.append({ Token{TType::Integer, false, bytes[i]} });
+                                    out.append({ Token1{TType1::Comma, false} });
+                                out.append({ Token1{TType1::Integer, false, bytes[i]} });
 							}
-                            out.append({ Token{TType::Newline, false} });
+                            out.append({ Token1{TType1::Newline, false} });
                             push_expanded(out, defines());
                         }
 					}
@@ -888,7 +888,7 @@ void Preproc::do_binary() {
 }
 
 void Preproc::do_define() {
-    if (!m_line.peek().is(TType::Ident)) {
+    if (!m_line.peek().is(TType1::Ident)) {
 		g_errors.error(ErrSyntax);
     }
 	else {
@@ -898,7 +898,7 @@ void Preproc::do_define() {
 
 		// check if name is followed by '(' without spaces
         bool has_space = m_line.peek().blank_before();
-		bool has_args = (!has_space && m_line.peek().is(TType::LParen));
+		bool has_args = (!has_space && m_line.peek().is(TType1::LParen));
 
 		// create macro
 		auto macro = make_shared<Macro>(name);
@@ -908,7 +908,7 @@ void Preproc::do_define() {
 		if (has_args) {
 			m_line.next();						// skip '('
 			while (!m_line.at_end()) {
-				if (!m_line.peek().is(TType::Ident)) {
+				if (!m_line.peek().is(TType1::Ident)) {
 					g_errors.error(ErrSyntax);
 					return;
 				}
@@ -916,11 +916,11 @@ void Preproc::do_define() {
 				macro->push_arg(arg);
 				m_line.next();					// skip name
 
-				if (m_line.peek().is(TType::Comma)) {
+				if (m_line.peek().is(TType1::Comma)) {
 					m_line.next();				// skip ','
 					continue;
 				}
-				else if (m_line.peek().is(TType::RParen)) {
+				else if (m_line.peek().is(TType1::RParen)) {
 					m_line.next();				// skip ')'
 					break;
 				}
@@ -932,22 +932,22 @@ void Preproc::do_define() {
 		}
 
 		// collect body
-        vector<Token> body_tokens = m_line.peek_tokens();
-        if (!body_tokens.empty() && body_tokens.back().is(TType::Newline))
+        vector<Token1> body_tokens = m_line.peek_tokens();
+        if (!body_tokens.empty() && body_tokens.back().is(TType1::Newline))
             body_tokens.pop_back();     // remove newline
-        ScannedLine body{ Token::to_string(body_tokens), body_tokens };
+        ScannedLine body{ Token1::to_string(body_tokens), body_tokens };
 		macro->push_body(body);
 	}
 }
 
 void Preproc::do_undef() {
-	if (!m_line.peek().is(TType::Ident))
+	if (!m_line.peek().is(TType1::Ident))
 		g_errors.error(ErrSyntax);
 	else {
 		// get name
 		string name = m_line.peek().svalue();
 		m_line.next();
-		if (!m_line.peek().is(TType::Newline))
+		if (!m_line.peek().is(TType1::Newline))
 			g_errors.error(ErrSyntax);
 		else
 			defines_base().remove(name);
@@ -955,7 +955,7 @@ void Preproc::do_undef() {
 }
 
 void Preproc::do_defl(const string& name) {
-	if (m_line.peek().is(TType::Newline))
+	if (m_line.peek().is(TType1::Newline))
 		g_errors.error(ErrSyntax);
 	else {
 		// if name is not defined, create an empty one
@@ -965,10 +965,10 @@ void Preproc::do_defl(const string& name) {
 		}
 
 		// expand macros in expression, may refer to name
-        vector<Token> expr_tokens = m_line.peek_tokens();
-        if (!expr_tokens.empty() && expr_tokens.back().is(TType::Newline))
+        vector<Token1> expr_tokens = m_line.peek_tokens();
+        if (!expr_tokens.empty() && expr_tokens.back().is(TType1::Newline))
             expr_tokens.pop_back();     // remove newline
-        ScannedLine expr_line{ Token::to_string(expr_tokens), expr_tokens };
+        ScannedLine expr_line{ Token1::to_string(expr_tokens), expr_tokens };
         ExpandedLine expanded_expr = expand(expr_line, defines());
 
 		// redefine name
@@ -985,14 +985,14 @@ void Preproc::do_macro(const string& name) {
 	m_macros.add(macro);								// create macro
 
 	// collect args
-	if (!m_line.peek().is(TType::Newline)) {
+	if (!m_line.peek().is(TType1::Newline)) {
 		vector<string> args = collect_name_list(m_line);
 		for (auto& arg : args)
 			macro->push_arg(arg);
 	}
 
 	// collect body
-	ScannedLine body = collect_macro_body(Keyword::MACRO, Keyword::ENDM);
+	ScannedLine body = collect_macro_body(Keyword1::MACRO, Keyword1::ENDM);
 	macro->push_body(body);
 }
 
@@ -1031,14 +1031,14 @@ void Preproc::do_local() {
 		// define new name
 		string def_name = unique_name(name);
 		auto macro = make_shared<Macro>(name);
-        ScannedLine body{ def_name, { Token{TType::Ident, false, def_name} } };
+        ScannedLine body{ def_name, { Token1{TType1::Ident, false, def_name} } };
         macro->push_body(body);
 		defines().add(macro);			// add to top layer
 	}
 }
 
 void Preproc::do_exitm() {
-	if (!m_line.peek().is(TType::Newline))
+	if (!m_line.peek().is(TType1::Newline))
 		g_errors.error(ErrSyntax);
 	else if (m_levels.size() == 1)
 		g_errors.error(ErrUnbalancedStruct);
@@ -1047,20 +1047,20 @@ void Preproc::do_exitm() {
 }
 
 void Preproc::do_rept() {
-	if (m_line.peek().is(TType::Newline))
+	if (m_line.peek().is(TType1::Newline))
 		g_errors.error(ErrSyntax);
 	else {
 		int count = 0;
 		bool error = false;
 
         // expand macros in count
-        vector<Token> count_tokens = m_line.peek_tokens();
-        ScannedLine count_line{ Token::to_string(count_tokens), count_tokens };
+        vector<Token1> count_tokens = m_line.peek_tokens();
+        ScannedLine count_line{ Token1::to_string(count_tokens), count_tokens };
         ExpandedLine expanded_count = expand(count_line, defines());
         string count_text = expanded_count.to_string();
 		parse_const_expr_eval(count_text.c_str(), &count, &error);
 		if (!error) {
-			ScannedLine body = collect_macro_body(Keyword::REPT, Keyword::ENDR);
+			ScannedLine body = collect_macro_body(Keyword1::REPT, Keyword1::ENDR);
 
 			// create new level for expansion
 			m_levels.emplace_back(&defines());
@@ -1074,34 +1074,34 @@ void Preproc::do_rept() {
 }
 
 void Preproc::do_reptc() {
-	if (!m_line.peek().is(TType::Ident))
+	if (!m_line.peek().is(TType1::Ident))
 		g_errors.error(ErrSyntax);
 	else {
 		// get variable to iterate
 		string var = m_line.peek().svalue();
 		m_line.next();
-		if (!m_line.peek().is(TType::Comma))
+		if (!m_line.peek().is(TType1::Comma))
 			g_errors.error(ErrSyntax);
 		else {
 			m_line.next();
 			// build string to iterate
 			string str = collect_reptc_arg(m_line);
-			ScannedLine body = collect_macro_body(Keyword::REPTC, Keyword::ENDR);
+			ScannedLine body = collect_macro_body(Keyword1::REPTC, Keyword1::ENDR);
 
 			// create new level for expansion
 			m_levels.emplace_back(&defines());
             ScannedLine block;
 			for (auto& c : str) {
-                block.append({ Token{TType::Hash, false },
-                               Token{TType::Ident, false, "undef"},
-                               Token{TType::Ident, false, var},
-                               Token{TType::Newline, false } });
+                block.append({ Token1{TType1::Hash, false },
+                               Token1{TType1::Ident, false, "undef"},
+                               Token1{TType1::Ident, false, var},
+                               Token1{TType1::Newline, false } });
 
-                block.append({ Token{TType::Hash, false },
-                               Token{TType::Ident, false, "define"},
-                               Token{TType::Ident, false, var},
-                               Token{TType::Ident, false, std::to_string(c)},
-                               Token{TType::Newline, false } });
+                block.append({ Token1{TType1::Hash, false },
+                               Token1{TType1::Ident, false, "define"},
+                               Token1{TType1::Ident, false, var},
+                               Token1{TType1::Ident, false, std::to_string(c)},
+                               Token1{TType1::Newline, false } });
 
                 block.append(body);
 			}
@@ -1113,25 +1113,25 @@ void Preproc::do_reptc() {
 }
 
 void Preproc::do_repti() {
-	if (!m_line.peek().is(TType::Ident))
+	if (!m_line.peek().is(TType1::Ident))
 		g_errors.error(ErrSyntax);
 	else {
 		// get variable to iterate
 		string var = m_line.peek().svalue();
 		m_line.next();
-		if (!m_line.peek().is(TType::Comma))
+		if (!m_line.peek().is(TType1::Comma))
 			g_errors.error(ErrSyntax);
 		else {
 			m_line.next();
-			if (m_line.peek().is(TType::Newline))
+			if (m_line.peek().is(TType1::Newline))
 				g_errors.error(ErrSyntax);
 			else {
 				// collect params to iterate
 				vector<ScannedLine> params = collect_macro_params(m_line);
-				if (!m_line.peek().is(TType::Newline))
+				if (!m_line.peek().is(TType1::Newline))
 					g_errors.error(ErrSyntax);
 				else {
-					ScannedLine body = collect_macro_body(Keyword::REPTI, Keyword::ENDR);
+					ScannedLine body = collect_macro_body(Keyword1::REPTI, Keyword1::ENDR);
 
 					// expand macros in parameters
                     for (auto& param : params) {
@@ -1143,16 +1143,16 @@ void Preproc::do_repti() {
 					m_levels.emplace_back(&defines());
                     ScannedLine block;
                     for (auto& param : params) {
-                        block.append({ Token{TType::Hash, false },
-                                       Token{TType::Ident, false, "undef"},
-                                       Token{TType::Ident, false, var},
-                                       Token{TType::Newline, false } });
+                        block.append({ Token1{TType1::Hash, false },
+                                       Token1{TType1::Ident, false, "undef"},
+                                       Token1{TType1::Ident, false, var},
+                                       Token1{TType1::Newline, false } });
 
-                        block.append({ Token{TType::Hash, false },
-                                       Token{TType::Ident, false, "define"},
-                                       Token{TType::Ident, false, var} });
+                        block.append({ Token1{TType1::Hash, false },
+                                       Token1{TType1::Ident, false, "define"},
+                                       Token1{TType1::Ident, false, var} });
                         block.append(param);
-                        block.append({ Token{TType::Newline, false } });
+                        block.append({ Token1{TType1::Newline, false } });
 
                         block.append(body);
 					}
@@ -1169,7 +1169,7 @@ void Preproc::do_float() {
 	ExpandedLine expanded = expand(m_line, defines());	// expand macros in line
 	ScannedLine sublexer{ expanded };
 
-	if (sublexer.peek().is(TType::Newline))
+	if (sublexer.peek().is(TType1::Newline))
 		g_errors.error(ErrSyntax);
 	else {
 		while (true) {
@@ -1187,29 +1187,29 @@ void Preproc::do_float() {
 				double value = expr.value();
 				vector<uint8_t> bytes = g_float_format.float_to_bytes(value);
                 ScannedLine line;
-                line.append({ Token{TType::Ident, false, "defb"} });
+                line.append({ Token1{TType1::Ident, false, "defb"} });
                 for (unsigned i = 0; i < bytes.size(); i++) {
                     if (i != 0)
-                        line.append({ Token{TType::Comma, false} });
-                    line.append({ Token{TType::Integer, false, bytes[i]}});
+                        line.append({ Token1{TType1::Comma, false} });
+                    line.append({ Token1{TType1::Integer, false, bytes[i]}});
                 }
-                line.append({ Token{TType::Semicolon, false},
-                              Token{TType::Ident, false, "float"},
-                              Token{TType::Dot, false},
-                              Token{TType::Ident, false, g_float_format.get_type()},
-                              Token{TType::LParen, false},
-                              Token{TType::Floating, false, value},
-                              Token{TType::RParen, false},
-                              Token{TType::Newline, false} });
+                line.append({ Token1{TType1::Semicolon, false},
+                              Token1{TType1::Ident, false, "float"},
+                              Token1{TType1::Dot, false},
+                              Token1{TType1::Ident, false, g_float_format.get_type()},
+                              Token1{TType1::LParen, false},
+                              Token1{TType1::Floating, false, value},
+                              Token1{TType1::RParen, false},
+                              Token1{TType1::Newline, false} });
 				m_output.push_back(line);
 			}
 
 			// check for next
-			if (sublexer.peek().is(TType::Comma)) {
+			if (sublexer.peek().is(TType1::Comma)) {
 				sublexer.next();
 				continue;
 			}
-			else if (sublexer.peek().is(TType::Newline))
+			else if (sublexer.peek().is(TType1::Newline))
 				break;
 			else {
 				g_errors.error(ErrSyntax);
@@ -1223,12 +1223,12 @@ void Preproc::do_setfloat() {
 	ExpandedLine expanded = expand(m_line, defines());	// expand macros in line
 	ScannedLine sublexer{ expanded };
 
-	if (sublexer.peek().is(TType::Newline))
+	if (sublexer.peek().is(TType1::Newline))
 		g_errors.error(ErrSyntax);
-	else if (sublexer.peek().is(TType::Ident)) {
+	else if (sublexer.peek().is(TType1::Ident)) {
 		string format = sublexer.peek().svalue();
 		sublexer.next();
-		if (!sublexer.peek().is(TType::Newline))
+		if (!sublexer.peek().is(TType1::Newline))
 			g_errors.error(ErrSyntax);
 		else if (!g_float_format.set_text(format))
 			g_errors.error(ErrIllegalFloatFormat, format);
@@ -1245,15 +1245,15 @@ void Preproc::do_setfloat() {
 }
 
 void Preproc::do_line() {
-    if (m_line.peek(0).is(TType::Integer)) {
+    if (m_line.peek(0).is(TType1::Integer)) {
         int line_num = m_line.peek(0).ivalue();
         set_line_num(line_num - 1);
         set_c_source(false);
         m_line.next();
 
-        if (m_line.peek(0).is(TType::Comma)) {
+        if (m_line.peek(0).is(TType1::Comma)) {
             m_line.next();
-            if (m_line.peek(0).is(TType::String)) {
+            if (m_line.peek(0).is(TType1::String)) {
                 string filename = m_line.peek(0).svalue();
                 set_filename(filename);
                 m_line.next();
@@ -1261,7 +1261,7 @@ void Preproc::do_line() {
         }
     }
 
-    if (!m_line.peek(0).is(TType::Newline, TType::End))
+    if (!m_line.peek(0).is(TType1::Newline, TType1::End))
         g_errors.error(ErrSyntax);
 
     set_error_location(location().filename.c_str(), location().line_num);
@@ -1281,15 +1281,15 @@ static string url_encode(const string& str) {
 
 
 void Preproc::do_c_line() {
-    if (m_line.peek(0).is(TType::Integer)) {
+    if (m_line.peek(0).is(TType1::Integer)) {
         int line_num = m_line.peek(0).ivalue();
         set_line_num(line_num - 0);
         set_c_source(true);
         m_line.next();
 
-        if (m_line.peek(0).is(TType::Comma)) {
+        if (m_line.peek(0).is(TType1::Comma)) {
             m_line.next();
-            if (m_line.peek(0).is(TType::String)) {
+            if (m_line.peek(0).is(TType1::String)) {
                 string filename = m_line.peek(0).svalue();
                 set_filename(filename);
                 m_line.next();
@@ -1297,7 +1297,7 @@ void Preproc::do_c_line() {
         }
     }
 
-    if (!m_line.peek(0).is(TType::Newline, TType::End))
+    if (!m_line.peek(0).is(TType1::Newline, TType1::End))
         g_errors.error(ErrSyntax);
 
     set_error_location(location().filename.c_str(), location().line_num);
@@ -1308,8 +1308,8 @@ void Preproc::do_c_line() {
             "_" + url_encode(location().filename);
         if (!find_local_symbol(symbol_name.c_str())) {
             ScannedLine label_line;
-            label_line.append({ Token{TType::Ident, false, symbol_name}, Token{TType::Colon, false},
-                                Token{TType::Newline, false} });
+            label_line.append({ Token1{TType1::Ident, false, symbol_name}, Token1{TType1::Colon, false},
+                                Token1{TType1::Newline, false} });
             push_expanded(label_line, defines());
         }
     }
@@ -1327,10 +1327,10 @@ ExpandedLine Preproc::expand(ScannedLine& line, Macros& defines) {
     ExpandedLine out;
 
 	while (!line.at_end()) {
-		Token token = line.peek(0);
+		Token1 token = line.peek(0);
 		line.next();
 
-        if (token.is(TType::Ident))
+        if (token.is(TType1::Ident))
             expand_ident(out, token, line, defines);
         else
             out.append({ token });
@@ -1338,7 +1338,7 @@ ExpandedLine Preproc::expand(ScannedLine& line, Macros& defines) {
 	return out;
 }
 
-void Preproc::expand_ident(ExpandedLine& out, const Token& ident, ScannedLine& line, Macros& defines) {
+void Preproc::expand_ident(ExpandedLine& out, const Token1& ident, ScannedLine& line, Macros& defines) {
 	unsigned pos = line.pos();
     ExpandedLine expanded = expand_define_call(ident, line, defines);
 	if (expanded.got_error()) {
@@ -1349,7 +1349,7 @@ void Preproc::expand_ident(ExpandedLine& out, const Token& ident, ScannedLine& l
 		out.append(expanded);
 }
 
-ExpandedLine Preproc::expand_define_call(const Token& ident, ScannedLine& line, Macros& defines) {
+ExpandedLine Preproc::expand_define_call(const Token1& ident, ScannedLine& line, Macros& defines) {
     ExpandedLine out;
 
 	shared_ptr<Macro> macro = defines.find_all(ident.svalue());
@@ -1386,7 +1386,7 @@ ExpandedLine Preproc::expand_define_call(const Token& ident, ScannedLine& line, 
 
 	// expand macro
 	macro->set_expanding(true);
-    ScannedLine sub_lexer{ Token::to_string(macro->body().tokens()), macro->body().tokens() };
+    ScannedLine sub_lexer{ Token1::to_string(macro->body().tokens()), macro->body().tokens() };
 	out = expand(sub_lexer, sub_defines);
 	macro->set_expanding(false);
 	return out;
@@ -1396,18 +1396,18 @@ ScannedLine Preproc::collect_param(ScannedLine& line) {
     ScannedLine out;
     int open_parens = 0;
 	while (!line.at_end()) {
-        Token token = line.peek(0);
+        Token1 token = line.peek(0);
         switch (token.type()) {
-        case TType::Newline:
+        case TType1::Newline:
             return out;
 
-        case TType::LParen:
+        case TType1::LParen:
             open_parens++;
             out.append({ token });
             line.next();
             break;
 
-        case TType::RParen:
+        case TType1::RParen:
             open_parens--;
             if (open_parens < 0) {
                 return out;
@@ -1418,7 +1418,7 @@ ScannedLine Preproc::collect_param(ScannedLine& line) {
             }
             break;
 
-        case TType::Comma:
+        case TType1::Comma:
             if (open_parens == 0) {
                 return out;
             }
@@ -1440,7 +1440,7 @@ ScannedLine Preproc::collect_param(ScannedLine& line) {
 vector<ScannedLine> Preproc::collect_macro_params(ScannedLine& line) {
 	vector<ScannedLine> params;
 
-	bool in_parens = line.peek().is(TType::LParen);
+	bool in_parens = line.peek().is(TType1::LParen);
     if (in_parens)
 		line.next();
 
@@ -1448,16 +1448,16 @@ vector<ScannedLine> Preproc::collect_macro_params(ScannedLine& line) {
 	while (!line.at_end()) {
 		params.push_back(collect_param(line));
 		switch (line.peek().type()) {
-		case TType::Comma:
+		case TType1::Comma:
 			line.next();
 			continue;
 
-		case TType::RParen:
+		case TType1::RParen:
 			if (in_parens)
 				line.next();
 			return params;
 
-		case TType::Newline:
+		case TType1::Newline:
 			return params;
 
 		default:
@@ -1473,7 +1473,7 @@ vector<ScannedLine> Preproc::collect_macro_params(ScannedLine& line) {
 vector<string> Preproc::collect_name_list(ScannedLine& line) {
 	vector<string> names;
 	while (true) {
-		if (!line.peek().is(TType::Ident)) {
+		if (!line.peek().is(TType1::Ident)) {
 			g_errors.error(ErrSyntax);
 			break;
 		}
@@ -1481,9 +1481,9 @@ vector<string> Preproc::collect_name_list(ScannedLine& line) {
 		names.push_back(name);
 		line.next();
 
-		if (line.peek().is(TType::Comma)) 
+		if (line.peek().is(TType1::Comma)) 
 			line.next();
-		else if (line.peek().is(TType::Newline))
+		else if (line.peek().is(TType1::Newline))
 			break;
 		else {
 			g_errors.error(ErrSyntax);
@@ -1493,14 +1493,14 @@ vector<string> Preproc::collect_name_list(ScannedLine& line) {
 	return names;
 }
 
-ScannedLine Preproc::collect_macro_body(Keyword start_keyword, Keyword end_keyword) {
+ScannedLine Preproc::collect_macro_body(Keyword1 start_keyword, Keyword1 end_keyword) {
     m_reading_macro_body = true;
     ScannedLine out = collect_macro_body1(start_keyword, end_keyword);
     m_reading_macro_body = false;
     return out;
 }
 
-ScannedLine Preproc::collect_macro_body1(Keyword start_keyword, Keyword end_keyword) {
+ScannedLine Preproc::collect_macro_body1(Keyword1 start_keyword, Keyword1 end_keyword) {
     Location start_location = m_files.back().location();
 
     // collect body
@@ -1510,7 +1510,7 @@ ScannedLine Preproc::collect_macro_body1(Keyword start_keyword, Keyword end_keyw
 
         int label_index = check_label_index();
         if ((label_index >= 0 && m_line.peek(2).is(start_keyword)) ||
-            (m_line.peek(0).is(TType::Ident) && m_line.peek(1).is(start_keyword)) ||
+            (m_line.peek(0).is(TType1::Ident) && m_line.peek(1).is(start_keyword)) ||
             (m_line.peek(0).is(start_keyword))) {
             g_errors.error(ErrUnbalancedStructStartedAt,
                 start_location.filename + ":" +
@@ -1519,7 +1519,7 @@ ScannedLine Preproc::collect_macro_body1(Keyword start_keyword, Keyword end_keyw
         }
         else if (m_line.peek(0).is(end_keyword)) {
             m_line.next();
-            if (!m_line.peek(0).is(TType::Newline)) {
+            if (!m_line.peek(0).is(TType1::Newline)) {
                 g_errors.error(ErrSyntax);
                 return empty;
             }
@@ -1543,28 +1543,28 @@ string Preproc::collect_reptc_arg(ScannedLine& line) {
 
 	string prev_expanded;
 	while (!line.at_end()) {
-		Token token = line.peek();
+		Token1 token = line.peek();
 		switch (token.type()) {
-		case TType::String:
+		case TType1::String:
 			line.next();
-			if (!line.peek().is(TType::End, TType::Newline)) {
+			if (!line.peek().is(TType1::End, TType1::Newline)) {
 				g_errors.error(ErrSyntax);
 				return "";
 			}
 			else
 				return token.svalue();
-		case TType::Integer:
+		case TType1::Integer:
 			line.next();
-			if (!line.peek().is(TType::End, TType::Newline)) {
+			if (!line.peek().is(TType1::End, TType1::Newline)) {
 				g_errors.error(ErrSyntax);
 				return "";
 			}
 			else
 				return std::to_string(token.ivalue());
-		case TType::Ident: {
+		case TType1::Ident: {
 			ExpandedLine expanded = expand(line, defines());
 			string expanded_text = str_chomp(expanded.to_string());
-			if (!line.peek().is(TType::End, TType::Newline)) {
+			if (!line.peek().is(TType1::End, TType1::Newline)) {
 				g_errors.error(ErrSyntax);
 				return "";
 			}

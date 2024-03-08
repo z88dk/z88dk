@@ -54,67 +54,67 @@ static int keyword_flags[] = {
 #include "keyword.def"
 };
 
-Keyword keyword_lookup(const string& text) {
-    static unordered_map<string, Keyword> keywords = {
-#define X(id, text, flags)      { text, Keyword::id },
+Keyword1 keyword_lookup1(const string& text) {
+    static unordered_map<string, Keyword1> keywords = {
+#define X(id, text, flags)      { text, Keyword1::id },
 #include "keyword.def"
     };
 
     auto it = keywords.find(str_tolower(text));
     if (it == keywords.end())
-        return Keyword::None;
+        return Keyword1::None;
     else
         return it->second;
 }
 
-bool keyword_is_reg_8(Keyword keyword) {
+bool keyword_is_reg_8(Keyword1 keyword) {
     return keyword_flags[static_cast<int>(keyword)] & KW_REG_8;
 }
 
-bool keyword_is_reg_ix_iy(Keyword keyword) {
+bool keyword_is_reg_ix_iy(Keyword1 keyword) {
     return keyword_flags[static_cast<int>(keyword)] & KW_REG_IX_IY;
 }
 
-bool keyword_is_z80_ld_bit(Keyword keyword) {
+bool keyword_is_z80_ld_bit(Keyword1 keyword) {
     return keyword_flags[static_cast<int>(keyword)] & KW_Z80_LD_BIT;
 }
 
 //-----------------------------------------------------------------------------
 
-Token::Token(TType type, bool blank_before, int ivalue)
-    : m_type(type), m_blank_before(blank_before), m_ivalue(ivalue), m_keyword(Keyword::None) {
+Token1::Token1(TType1 type, bool blank_before, int ivalue)
+    : m_type(type), m_blank_before(blank_before), m_ivalue(ivalue), m_keyword(Keyword1::None) {
 }
 
-Token::Token(TType type, bool blank_before, double fvalue)
-    : m_type(type), m_blank_before(blank_before), m_fvalue(fvalue), m_keyword(Keyword::None) {
+Token1::Token1(TType1 type, bool blank_before, double fvalue)
+    : m_type(type), m_blank_before(blank_before), m_fvalue(fvalue), m_keyword(Keyword1::None) {
 }
 
-Token::Token(TType type, bool blank_before, const string& svalue)
+Token1::Token1(TType1 type, bool blank_before, const string& svalue)
     : m_type(type), m_blank_before(blank_before), m_svalue(svalue) {
-    m_keyword = keyword_lookup(svalue);
+    m_keyword = keyword_lookup1(svalue);
 }
 
-string Token::to_string() const {
+string Token1::to_string() const {
     static string tokens[] = {
 #define X(id, text)     text,
 #include "scan2.def"
     };
 
     switch (m_type) {
-    case TType::Ident:
+    case TType1::Ident:
         return m_svalue;
-    case TType::Integer:
+    case TType1::Integer:
         return std::to_string(m_ivalue);
-    case TType::Floating:
+    case TType1::Floating:
         return std::to_string(m_fvalue);
-    case TType::String:
+    case TType1::String:
         return string_bytes(m_svalue);
     default:
         return tokens[static_cast<int>(m_type)];
     }
 }
 
-string Token::to_string(const vector<Token>& tokens) {
+string Token1::to_string(const vector<Token1>& tokens) {
     string out = "";
     for (auto& token : tokens) {
         out = concat(out, token.to_string());
@@ -122,7 +122,7 @@ string Token::to_string(const vector<Token>& tokens) {
     return out;
 }
 
-string Token::string_bytes(const string& text) {
+string Token1::string_bytes(const string& text) {
     string out = "\"";
     for (auto c : text) {
         switch (c) {
@@ -153,7 +153,7 @@ string Token::string_bytes(const string& text) {
     return out;
 }
 
-string Token::concat(const string& s1, const string& s2) {
+string Token1::concat(const string& s1, const string& s2) {
     if (s1.empty() || s2.empty())
         return s1 + s2;
     else if (str_ends_with(s1, "##"))   // cpp-style concatenation
@@ -183,18 +183,18 @@ string Token::concat(const string& s1, const string& s2) {
 
 //-----------------------------------------------------------------------------
 
-ScannedLine::ScannedLine(const string& text, const vector<Token>& tokens)
+ScannedLine::ScannedLine(const string& text, const vector<Token1>& tokens)
     : m_text(text), m_pos(0) {
     std::copy(tokens.begin(), tokens.end(), std::back_inserter(m_tokens));
 }
 
 void ScannedLine::append(const ScannedLine& other) {
-    m_text = Token::concat(m_text, other.text());
+    m_text = Token1::concat(m_text, other.text());
     std::copy(other.tokens().begin(), other.tokens().end(), std::back_inserter(m_tokens));
 }
 
-void ScannedLine::append(const vector<Token>& tokens) {
-    ScannedLine other{ Token::to_string(tokens), tokens };
+void ScannedLine::append(const vector<Token1>& tokens) {
+    ScannedLine other{ Token1::to_string(tokens), tokens };
     append(other);
 }
 
@@ -204,8 +204,8 @@ void ScannedLine::clear() {
     m_pos = 0;
 }
 
-Token& ScannedLine::peek(int offset) {
-    static Token end{ TType::End, false };
+Token1& ScannedLine::peek(int offset) {
+    static Token1 end{ TType1::End, false };
     unsigned index = m_pos + offset;
     if (index >= m_tokens.size())
         return end;
@@ -219,8 +219,8 @@ void ScannedLine::next(int n) {
         m_pos = static_cast<unsigned>(m_tokens.size());
 }
 
-vector<Token> ScannedLine::peek_tokens(int offset) {
-    vector<Token> out;
+vector<Token1> ScannedLine::peek_tokens(int offset) {
+    vector<Token1> out;
     unsigned index = m_pos + offset;
     for (unsigned i = index; i < m_tokens.size(); i++)
         out.push_back(m_tokens[i]);
@@ -228,8 +228,8 @@ vector<Token> ScannedLine::peek_tokens(int offset) {
 }
 
 string ScannedLine::peek_text(int offset) {
-    vector<Token> out = peek_tokens(offset);
-    return Token::to_string(out);
+    vector<Token1> out = peek_tokens(offset);
+    return Token1::to_string(out);
 }
 
 //-----------------------------------------------------------------------------
@@ -534,7 +534,7 @@ yyFillLabel5:
 					goto yy17;
 			}
 yy17:
-			{ PUSH_TOKEN1(TType::LogNot); continue; }
+			{ PUSH_TOKEN1(TType1::LogNot); continue; }
 yy18:
 			++p;
 			{ quote = 2; goto string_loop; }
@@ -551,7 +551,7 @@ yyFillLabel6:
 					goto yy20;
 			}
 yy20:
-			{ PUSH_TOKEN1(TType::Hash); continue; }
+			{ PUSH_TOKEN1(TType1::Hash); continue; }
 yy21:
 			++p;
 yyFillLabel7:
@@ -586,7 +586,7 @@ yyFillLabel7:
 					goto yy22;
 			}
 yy22:
-			{ PUSH_TOKEN1(TType::ASMPC); continue; }
+			{ PUSH_TOKEN1(TType1::ASMPC); continue; }
 yy23:
 			yyaccept = 0;
 			marker = ++p;
@@ -603,7 +603,7 @@ yyFillLabel8:
 					goto yy24;
 			}
 yy24:
-			{ PUSH_TOKEN1(TType::Mod); continue; }
+			{ PUSH_TOKEN1(TType1::Mod); continue; }
 yy25:
 			++p;
 yyFillLabel9:
@@ -617,16 +617,16 @@ yyFillLabel9:
 					goto yy26;
 			}
 yy26:
-			{ PUSH_TOKEN1(TType::BinAnd); continue; }
+			{ PUSH_TOKEN1(TType1::BinAnd); continue; }
 yy27:
 			++p;
 			{ quote = 1; goto string_loop; }
 yy28:
 			++p;
-			{ PUSH_TOKEN1(TType::LParen); continue; }
+			{ PUSH_TOKEN1(TType1::LParen); continue; }
 yy29:
 			++p;
-			{ PUSH_TOKEN1(TType::RParen); continue; }
+			{ PUSH_TOKEN1(TType1::RParen); continue; }
 yy30:
 			++p;
 yyFillLabel10:
@@ -640,16 +640,16 @@ yyFillLabel10:
 					goto yy31;
 			}
 yy31:
-			{ PUSH_TOKEN1(TType::Mult); continue; }
+			{ PUSH_TOKEN1(TType1::Mult); continue; }
 yy32:
 			++p;
-			{ PUSH_TOKEN1(TType::Plus); continue; }
+			{ PUSH_TOKEN1(TType1::Plus); continue; }
 yy33:
 			++p;
-			{ PUSH_TOKEN1(TType::Comma); continue; }
+			{ PUSH_TOKEN1(TType1::Comma); continue; }
 yy34:
 			++p;
-			{ PUSH_TOKEN1(TType::Minus); continue; }
+			{ PUSH_TOKEN1(TType1::Minus); continue; }
 yy35:
 			++p;
 yyFillLabel11:
@@ -672,10 +672,10 @@ yyFillLabel11:
 					goto yy36;
 			}
 yy36:
-			{ PUSH_TOKEN1(TType::Dot); continue; }
+			{ PUSH_TOKEN1(TType1::Dot); continue; }
 yy37:
 			++p;
-			{ PUSH_TOKEN1(TType::Div); continue; }
+			{ PUSH_TOKEN1(TType1::Div); continue; }
 yy38:
 			yyaccept = 1;
 			marker = ++p;
@@ -694,7 +694,7 @@ yyFillLabel12:
 				default: goto yy41;
 			}
 yy39:
-			{ PUSH_TOKEN2(TType::Integer, a2i(p0, p, 10)); continue; }
+			{ PUSH_TOKEN2(TType1::Integer, a2i(p0, p, 10)); continue; }
 yy40:
 			yyaccept = 1;
 			marker = ++p;
@@ -772,7 +772,7 @@ yyFillLabel14:
 			}
 yy43:
 			++p;
-			{ PUSH_TOKEN1(TType::Colon); continue; }
+			{ PUSH_TOKEN1(TType1::Colon); continue; }
 yy44:
 			++p;
 yyFillLabel15:
@@ -804,7 +804,7 @@ yyFillLabel16:
 					goto yy47;
 			}
 yy47:
-			{ PUSH_TOKEN1(TType::Lt); continue; }
+			{ PUSH_TOKEN1(TType1::Lt); continue; }
 yy48:
 			++p;
 yyFillLabel17:
@@ -818,7 +818,7 @@ yyFillLabel17:
 					goto yy49;
 			}
 yy49:
-			{ PUSH_TOKEN1(TType::Eq); continue; }
+			{ PUSH_TOKEN1(TType1::Eq); continue; }
 yy50:
 			++p;
 yyFillLabel18:
@@ -833,10 +833,10 @@ yyFillLabel18:
 					goto yy51;
 			}
 yy51:
-			{ PUSH_TOKEN1(TType::Gt); continue; }
+			{ PUSH_TOKEN1(TType1::Gt); continue; }
 yy52:
 			++p;
-			{ PUSH_TOKEN1(TType::Quest); continue; }
+			{ PUSH_TOKEN1(TType1::Quest); continue; }
 yy53:
 			yyaccept = 2;
 			marker = ++p;
@@ -934,49 +934,49 @@ yy55:
                               if (g_args.ucase) str = str_toupper(str);
 
                               // handle af' et all
-                              Keyword keyword = keyword_lookup(str);
-                              if (str.back() == '\'' && keyword == Keyword::None) { // drop quote
+                              Keyword1 keyword = keyword_lookup1(str);
+                              if (str.back() == '\'' && keyword == Keyword1::None) { // drop quote
                                 str.pop_back();
                                 p--;
-                                keyword = keyword_lookup(str);
+                                keyword = keyword_lookup1(str);
                               }
 
                               // check for -IXIY
                               if (g_args.get_swap_ixiy() != IXIY_NO_SWAP) {
                                 switch (keyword) {
-                                case Keyword::IX: case Keyword::IXH: case Keyword::IXL:
-                                case Keyword::IY: case Keyword::IYH: case Keyword::IYL:
+                                case Keyword1::IX: case Keyword1::IXH: case Keyword1::IXL:
+                                case Keyword1::IY: case Keyword1::IYH: case Keyword1::IYL:
                                   str = str_swap_x_y(str);
-                                  keyword = keyword_lookup(str);
+                                  keyword = keyword_lookup1(str);
                                   break;
                                 default:;
                                 }
                               }
 
                               // check for .ASSUME
-                              if (keyword == Keyword::ASSUME && !line.tokens().empty() &&
-                                  line.tokens().back().is(TType::Dot))
+                              if (keyword == Keyword1::ASSUME && !line.tokens().empty() &&
+                                  line.tokens().back().is(TType1::Dot))
                                 line.tokens().pop_back();       // remove '.'
 
                               // need raw strings after INCLUDE, BINARY, INCBIN, LINE, C_LINE
                               switch (keyword) {
-                              case Keyword::INCLUDE: case Keyword::BINARY: case Keyword::INCBIN:
-                              case Keyword::LINE:    case Keyword::C_LINE:
+                              case Keyword1::INCLUDE: case Keyword1::BINARY: case Keyword1::INCBIN:
+                              case Keyword1::LINE:    case Keyword1::C_LINE:
                                 raw_strings = true;
                                 break;
                               default:;
                               }
 
                               // check for ASMPC
-                              if (keyword == Keyword::ASMPC)
-                                PUSH_TOKEN1(TType::ASMPC);
+                              if (keyword == Keyword1::ASMPC)
+                                PUSH_TOKEN1(TType1::ASMPC);
                               else
-                                PUSH_TOKEN2(TType::Ident, str);
+                                PUSH_TOKEN2(TType1::Ident, str);
                               continue;
                             }
 yy56:
 			++p;
-			{ PUSH_TOKEN1(TType::LSquare); continue; }
+			{ PUSH_TOKEN1(TType1::LSquare); continue; }
 yy57:
 			++p;
 yyFillLabel21:
@@ -991,10 +991,10 @@ yyFillLabel21:
 					goto yy58;
 			}
 yy58:
-			{ PUSH_TOKEN1(TType::Backslash); continue; }
+			{ PUSH_TOKEN1(TType1::Backslash); continue; }
 yy59:
 			++p;
-			{ PUSH_TOKEN1(TType::RSquare); continue; }
+			{ PUSH_TOKEN1(TType1::RSquare); continue; }
 yy60:
 			++p;
 yyFillLabel22:
@@ -1008,10 +1008,10 @@ yyFillLabel22:
 					goto yy61;
 			}
 yy61:
-			{ PUSH_TOKEN1(TType::BinXor); continue; }
+			{ PUSH_TOKEN1(TType1::BinXor); continue; }
 yy62:
 			++p;
-			{ PUSH_TOKEN1(TType::LBrace); continue; }
+			{ PUSH_TOKEN1(TType1::LBrace); continue; }
 yy63:
 			++p;
 yyFillLabel23:
@@ -1025,19 +1025,19 @@ yyFillLabel23:
 					goto yy64;
 			}
 yy64:
-			{ PUSH_TOKEN1(TType::BinOr); continue; }
+			{ PUSH_TOKEN1(TType1::BinOr); continue; }
 yy65:
 			++p;
-			{ PUSH_TOKEN1(TType::RBrace); continue; }
+			{ PUSH_TOKEN1(TType1::RBrace); continue; }
 yy66:
 			++p;
-			{ PUSH_TOKEN1(TType::BinNot); continue; }
+			{ PUSH_TOKEN1(TType1::BinNot); continue; }
 yy67:
 			++p;
-			{ PUSH_TOKEN1(TType::Ne); continue; }
+			{ PUSH_TOKEN1(TType1::Ne); continue; }
 yy68:
 			++p;
-			{ PUSH_TOKEN1(TType::DblHash); continue; }
+			{ PUSH_TOKEN1(TType1::DblHash); continue; }
 yy69:
 			++p;
 yyFillLabel24:
@@ -1072,7 +1072,7 @@ yyFillLabel24:
 					goto yy70;
 			}
 yy70:
-			{ PUSH_TOKEN2(TType::Integer, a2i(p0+1, p, 16)); continue; }
+			{ PUSH_TOKEN2(TType1::Integer, a2i(p0+1, p, 16)); continue; }
 yy71:
 			++p;
 yyFillLabel25:
@@ -1111,13 +1111,13 @@ yyFillLabel26:
 					goto yy74;
 			}
 yy74:
-			{ PUSH_TOKEN2(TType::Integer, a2i(p0+1, p, 2)); continue; }
+			{ PUSH_TOKEN2(TType1::Integer, a2i(p0+1, p, 2)); continue; }
 yy75:
 			++p;
-			{ PUSH_TOKEN1(TType::LogAnd); continue; }
+			{ PUSH_TOKEN1(TType1::LogAnd); continue; }
 yy76:
 			++p;
-			{ PUSH_TOKEN1(TType::Power); continue; }
+			{ PUSH_TOKEN1(TType1::Power); continue; }
 yy77:
 			yyaccept = 3;
 			marker = ++p;
@@ -1143,7 +1143,7 @@ yyFillLabel27:
 					goto yy78;
 			}
 yy78:
-			{ PUSH_TOKEN2(TType::Floating, a2f(p0, p)); continue; }
+			{ PUSH_TOKEN2(TType1::Floating, a2f(p0, p)); continue; }
 yy79:
 			++p;
 yyFillLabel28:
@@ -1216,7 +1216,7 @@ yyFillLabel29:
 					goto yy81;
 			}
 yy81:
-			{ PUSH_TOKEN2(TType::Integer, a2i(p0, p, 2)); continue; }
+			{ PUSH_TOKEN2(TType1::Integer, a2i(p0, p, 2)); continue; }
 yy82:
 			yyaccept = 1;
 			marker = ++p;
@@ -1255,7 +1255,7 @@ yyFillLabel30:
 			}
 yy83:
 			++p;
-			{ PUSH_TOKEN2(TType::Integer, a2i(p0, p, 16)); continue; }
+			{ PUSH_TOKEN2(TType1::Integer, a2i(p0, p, 16)); continue; }
 yy84:
 			++p;
 yyFillLabel31:
@@ -1327,19 +1327,19 @@ yyFillLabel32:
 			}
 yy86:
 			++p;
-			{ PUSH_TOKEN1(TType::LShift); continue; }
+			{ PUSH_TOKEN1(TType1::LShift); continue; }
 yy87:
 			++p;
-			{ PUSH_TOKEN1(TType::Le); continue; }
+			{ PUSH_TOKEN1(TType1::Le); continue; }
 yy88:
 			++p;
 			goto yy49;
 yy89:
 			++p;
-			{ PUSH_TOKEN1(TType::Ge); continue; }
+			{ PUSH_TOKEN1(TType1::Ge); continue; }
 yy90:
 			++p;
-			{ PUSH_TOKEN1(TType::RShift); continue; }
+			{ PUSH_TOKEN1(TType1::RShift); continue; }
 yy91:
 			++p;
 			goto yy55;
@@ -1361,10 +1361,10 @@ yyFillLabel33:
 			}
 yy95:
 			++p;
-			{ PUSH_TOKEN1(TType::LogXor); continue; }
+			{ PUSH_TOKEN1(TType1::LogXor); continue; }
 yy96:
 			++p;
-			{ PUSH_TOKEN1(TType::LogOr); continue; }
+			{ PUSH_TOKEN1(TType1::LogOr); continue; }
 yy97:
 			++p;
 			{
@@ -1373,7 +1373,7 @@ yy97:
                                   n *= 2;
                                   if (*i == '#') n++;
                               }
-                              PUSH_TOKEN2(TType::Integer, n);
+                              PUSH_TOKEN2(TType1::Integer, n);
                               continue;
                             }
 yy98:
@@ -1437,7 +1437,7 @@ yy100:
 					goto yy101;
 			}
 yy101:
-			{ PUSH_TOKEN2(TType::Integer, a2i(p0+2, p, 2)); continue; }
+			{ PUSH_TOKEN2(TType1::Integer, a2i(p0+2, p, 2)); continue; }
 yy102:
 			++p;
 yyFillLabel36:
@@ -1472,7 +1472,7 @@ yyFillLabel36:
 					goto yy103;
 			}
 yy103:
-			{ PUSH_TOKEN2(TType::Integer, a2i(p0+2, p, 16)); continue; }
+			{ PUSH_TOKEN2(TType1::Integer, a2i(p0+2, p, 16)); continue; }
 yy104:
 			++p;
 yyFillLabel37:
@@ -1581,7 +1581,7 @@ yyFillLabel40:
 yy114:
 			++p;
 			{ if (quote == 2) {
-                                PUSH_TOKEN2(TType::String, str);
+                                PUSH_TOKEN2(TType1::String, str);
                                 goto main_loop;
                               }
                               else {
@@ -1597,7 +1597,7 @@ yy115:
                                   goto main_loop;
                                 }
                                 else {
-                                  PUSH_TOKEN2(TType::Integer, str[0]);
+                                  PUSH_TOKEN2(TType1::Integer, str[0]);
                                   goto main_loop;
                                 }
                               }
@@ -1806,7 +1806,7 @@ end:
         if (m_got_error)
             line.tokens().clear();
 
-        PUSH_TOKEN1(TType::Newline);
+        PUSH_TOKEN1(TType1::Newline);
         line_start = line_end = p0 = marker = p;
         return true;
     }

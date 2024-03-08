@@ -234,6 +234,7 @@
     <ClInclude Include="..\..\src\z80asm\src\errors.h" />
     <ClInclude Include="..\..\src\z80asm\src\file_reader.h" />
     <ClInclude Include="..\..\src\z80asm\src\if.h" />
+    <ClInclude Include="..\..\src\z80asm\src\scan.h" />
     <ClInclude Include="..\..\src\z80asm\src\utils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -272,6 +273,7 @@
     <ClCompile Include="..\..\src\z80asm\src\c\zobjfile.c" />
     <ClCompile Include="..\..\src\z80asm\src\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\file_reader.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -283,6 +285,8 @@
     <None Include="..\..\src\z80asm\src\c\parse_rules.rl" />
     <None Include="..\..\src\z80asm\src\c\scan_rules.rl" />
     <None Include="..\..\src\z80asm\src\errors.def" />
+    <None Include="..\..\src\z80asm\src\scan.def" />
+    <None Include="..\..\src\z80asm\src\scan.re" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\common\common.vcxproj">

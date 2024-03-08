@@ -168,6 +168,9 @@
     <ClInclude Include="..\..\src\z80asm\src\file_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\scan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\src\c\alloc.c">
@@ -278,6 +281,9 @@
     <ClCompile Include="..\..\src\z80asm\src\file_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\scan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\src\c\scan_rules.rl">
@@ -302,6 +308,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\src\z80asm\src\args.def">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\src\scan.re">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\src\scan.def">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
