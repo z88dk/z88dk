@@ -1,15 +1,16 @@
 ;       Small C+ Math Library
 ;       General "fudging routine"
 
-        SECTION code_fp
-        PUBLIC    hlsub
+    SECTION code_fp
+    PUBLIC  hlsub
 
-        EXTERN	ldbchl
-        EXTERN	fsub
+    EXTERN  ldbchl
+    EXTERN  fsub
 
 
 ;
 
-.hlsub  CALL    ldbchl
-        JP      fsub
+hlsub:
+    CALL    ldbchl
+    JP      fsub
 ;

@@ -1,12 +1,12 @@
 
-        SECTION code_fp_dai32
+    SECTION code_fp_dai32
 
-        PUBLIC  asin
-        EXTERN  ___dai32_setup_single
-        EXTERN  ___dai32_xasin
-        EXTERN  ___dai32_return
+    PUBLIC  asin
+    EXTERN  ___dai32_setup_single
+    EXTERN  ___dai32_xasin
+    EXTERN  ___dai32_return
 
 asin:
-        call    ___dai32_setup_single
-        call    ___dai32_xasin
-        jp      ___dai32_return
+    call    ___dai32_setup_single
+    call    ___dai32_xasin
+    jp      ___dai32_return

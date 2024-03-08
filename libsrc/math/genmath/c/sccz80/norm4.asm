@@ -7,12 +7,14 @@
 ;
 ;       $Id: norm4.asm,v 1.4 2016-06-21 21:16:49 dom Exp $:
 
-        SECTION code_fp
-	PUBLIC	norm4
+    SECTION code_fp
+    PUBLIC  norm4
 
 
-	EXTERN	fa
+    EXTERN  fa
 
-.norm4  XOR     A
-.norm6  LD      (fa+5),A
-        RET
+norm4:
+    XOR     A
+norm6:
+    LD      (fa+5), A
+    RET

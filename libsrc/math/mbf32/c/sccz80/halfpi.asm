@@ -1,9 +1,9 @@
-	SECTION	code_fp_mbf32
+    SECTION code_fp_mbf32
 
-	PUBLIC	halfpi
+    PUBLIC  halfpi
 
 halfpi:
-	ld	hl,$0fdb
-	ld	de,$8149
-	ret
-	
+    ld      hl, $0fdb
+    ld      de, $8149
+    ret
+

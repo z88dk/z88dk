@@ -2,10 +2,10 @@
 ;       Converts integer in hl to fp number
 
 
-        SECTION code_fp
-        PUBLIC    ufloat
+    SECTION code_fp
+    PUBLIC  ufloat
 
-        EXTERN    float1
+    EXTERN  float1
 
 
 ;
@@ -13,6 +13,6 @@
 ;       a floating point number in FA
 ;
 
-.ufloat
-        xor     a               ;signify no sign
-        jp      float1
+ufloat:
+    xor     a                           ;signify no sign
+    jp      float1

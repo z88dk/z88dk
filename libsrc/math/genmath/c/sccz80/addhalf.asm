@@ -2,15 +2,16 @@
 ;       General "fudging routine"
 
 
-	SECTION   code_fp
-        PUBLIC    addhalf
+    SECTION code_fp
+    PUBLIC  addhalf
 
-	EXTERN	hladd
+    EXTERN  hladd
 
 
-.addhalf
-	ld	hl,half
-	jp	hladd
+addhalf:
+    ld      hl, half
+    jp      hladd
 
-		SECTION rodata_fp
-.half   DEFB    0,0,0,0,0,$80   ;0.5
+    SECTION rodata_fp
+half:
+    DEFB    0, 0, 0, 0, 0, $80          ;0.5

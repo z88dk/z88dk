@@ -8,48 +8,48 @@
 ;
 
 
-;double amin (double x,double y)  
+;double amin (double x,double y)
 ;
 ;returns the smaller of x and y
 
 
-IF FORts2068
-		INCLUDE  "target/ts2068/def/ts2068fp.def"
+IF  FORts2068
+    INCLUDE "target/ts2068/def/ts2068fp.def"
 ENDIF
-IF FORzx
-		INCLUDE  "target/zx/def/zxfp.def"
+IF  FORzx
+    INCLUDE "target/zx/def/zxfp.def"
 ENDIF
-IF FORzx81
-		INCLUDE  "target/zx81/def/81fp.def"
+IF  FORzx81
+    INCLUDE "target/zx81/def/81fp.def"
 ENDIF
-IF FORlambda
-		INCLUDE  "target/lambda/def/lambdafp.def"
+IF  FORlambda
+    INCLUDE "target/lambda/def/lambdafp.def"
 ENDIF
 
-		SECTION  code_fp
-		PUBLIC    amin
-		PUBLIC    fmin
+    SECTION code_fp
+    PUBLIC  amin
+    PUBLIC  fmin
 
-		EXTERN	fsetupf
-		EXTERN	stkequ
+    EXTERN  fsetupf
+    EXTERN  stkequ
 
-.amin
-.fmin
-	call    fsetupf
-	
-	defb	ZXFP_ST_MEM_0
-	defb	ZXFP_EXCHANGE
-	defb	ZXFP_ST_MEM_1
+amin:
+fmin:
+    call    fsetupf
 
-	defb	ZXFP_SUBTRACT
-	defb	ZXFP_GREATER_0
-	defb	ZXFP_JUMP_TRUE
-	defb	4
-	defb	ZXFP_GET_MEM_0
-	defb	ZXFP_JUMP
-	defb	2
-	defb	ZXFP_GET_MEM_1
+    defb    ZXFP_ST_MEM_0
+    defb    ZXFP_EXCHANGE
+    defb    ZXFP_ST_MEM_1
 
-	defb	ZXFP_END_CALC
-	
-	jp      stkequ
+    defb    ZXFP_SUBTRACT
+    defb    ZXFP_GREATER_0
+    defb    ZXFP_JUMP_TRUE
+    defb    4
+    defb    ZXFP_GET_MEM_0
+    defb    ZXFP_JUMP
+    defb    2
+    defb    ZXFP_GET_MEM_1
+
+    defb    ZXFP_END_CALC
+
+    jp      stkequ
