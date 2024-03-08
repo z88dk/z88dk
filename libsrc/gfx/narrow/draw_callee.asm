@@ -2,51 +2,51 @@
 
 
   IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        SECTION code_graphics
+    SECTION code_graphics
 
-        PUBLIC  draw_callee
-        PUBLIC  _draw_callee
+    PUBLIC  draw_callee
+    PUBLIC  _draw_callee
 
-        PUBLIC  asm_draw
+    PUBLIC  asm_draw
 
-        EXTERN  swapgfxbk
-        EXTERN  __graphics_end
+    EXTERN  swapgfxbk
+    EXTERN  __graphics_end
 
-        EXTERN  Line
-        EXTERN  plotpixel
-        INCLUDE "graphics/grafix.inc"
+    EXTERN  Line
+    EXTERN  plotpixel
+    INCLUDE "graphics/grafix.inc"
 
 
 draw_callee:
 _draw_callee:
-        pop     af                      ; ret addr
-        pop     de                      ; y2
-        pop     hl
-        ld      d, l                    ; x2
-        pop     hl                      ; y
-        pop     bc
-        ld      h, c                    ; x
-        push    af                      ; ret addr
+    pop     af                          ; ret addr
+    pop     de                          ; y2
+    pop     hl
+    ld      d, l                        ; x2
+    pop     hl                          ; y
+    pop     bc
+    ld      h, c                        ; x
+    push    af                          ; ret addr
 
 asm_draw:
-        push    ix
+    push    ix
     IF  NEED_swapgfxbk=1
-        call    swapgfxbk
+    call    swapgfxbk
     ENDIF
-        push    hl
-        push    de
-        call    plotpixel
-        pop     de
-        pop     hl
-        ld      ix, plotpixel
-        call    Line
+    push    hl
+    push    de
+    call    plotpixel
+    pop     de
+    pop     hl
+    ld      ix, plotpixel
+    call    Line
     IF  NEED_swapgfxbk
-        jp      __graphics_end
+    jp      __graphics_end
     ELSE
       IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        pop     ix
+    pop     ix
       ENDIF
-        ret
+    ret
     ENDIF
 
   ENDIF

@@ -2,23 +2,23 @@
 
 
   IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        SECTION code_graphics
+    SECTION code_graphics
 
-        PUBLIC  drawr
-        PUBLIC  _drawr
-        PUBLIC  ___drawr
+    PUBLIC  drawr
+    PUBLIC  _drawr
+    PUBLIC  ___drawr
 
-        EXTERN  asm_drawr
+    EXTERN  asm_drawr
 
 
 drawr:
 _drawr:
 ___drawr:
-        pop     af                      ; ret addr
-        pop     de                      ; y
-        pop     hl                      ; x
-        push    hl
-        push    de
-        push    af                      ; ret addr
-        jp      asm_drawr
+    pop     af                          ; ret addr
+    pop     de                          ; y
+    pop     hl                          ; x
+    push    hl
+    push    de
+    push    af                          ; ret addr
+    jp      asm_drawr
   ENDIF

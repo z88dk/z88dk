@@ -12,14 +12,14 @@
 ;
 
 
-        PUBLIC  plotpixel
+    PUBLIC  plotpixel
 
-        EXTERN  pixel
-        EXTERN  pixmode
+    EXTERN  pixel
+    EXTERN  pixmode
 
 plotpixel:
-        push    hl
-        ld      hl, 182                 ; OR (HL)
-        ld      (pixmode), hl
-        pop     hl
-        jp      pixel
+    push    hl
+    ld      hl, 182                     ; OR (HL)
+    ld      (pixmode), hl
+    pop     hl
+    jp      pixel

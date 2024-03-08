@@ -16,50 +16,50 @@
 
 
   IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        SECTION code_graphics
-        PUBLIC  stencil_add_side
-        PUBLIC  _stencil_add_side
+    SECTION code_graphics
+    PUBLIC  stencil_add_side
+    PUBLIC  _stencil_add_side
 
-        EXTERN  w_line
-        EXTERN  stencil_add_pixel
-        EXTERN  swapgfxbk
-        EXTERN  swapgfxbk1
-        EXTERN  stencil_ptr
-        EXTERN  __graphics_end
-        INCLUDE "graphics/grafix.inc"
+    EXTERN  w_line
+    EXTERN  stencil_add_pixel
+    EXTERN  swapgfxbk
+    EXTERN  swapgfxbk1
+    EXTERN  stencil_ptr
+    EXTERN  __graphics_end
+    INCLUDE "graphics/grafix.inc"
 
 
 stencil_add_side:
 _stencil_add_side:
-        push    ix
-        ld      ix, 2
-        add     ix, sp
+    push    ix
+    ld      ix, 2
+    add     ix, sp
 
-        ld      l, (ix+2)               ;pointer to stencil
-        ld      h, (ix+3)
-        ld      (stencil_ptr), hl
+    ld      l, (ix+2)                   ;pointer to stencil
+    ld      h, (ix+3)
+    ld      (stencil_ptr), hl
 
-        ld      l, (ix+10)
-        ld      h, (ix+11)
-        ld      e, (ix+8)
-        ld      d, (ix+9)
+    ld      l, (ix+10)
+    ld      h, (ix+11)
+    ld      e, (ix+8)
+    ld      d, (ix+9)
 
     IF  NEED_swapgfxbk=1
-        call    swapgfxbk
+    call    swapgfxbk
     ENDIF
-        call    stencil_add_pixel
+    call    stencil_add_pixel
 
-        ld      l, (ix+6)
-        ld      h, (ix+7)
-        ld      e, (ix+4)
-        ld      d, (ix+5)
+    ld      l, (ix+6)
+    ld      h, (ix+7)
+    ld      e, (ix+4)
+    ld      d, (ix+5)
 
-        ld      ix, stencil_add_pixel
-        call    w_line
+    ld      ix, stencil_add_pixel
+    call    w_line
     IF  NEED_swapgfxbk
-        jp      __graphics_end
+    jp      __graphics_end
     ELSE
-        pop     ix
-        ret
+    pop     ix
+    ret
     ENDIF
   ENDIF

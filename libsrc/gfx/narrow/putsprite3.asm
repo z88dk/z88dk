@@ -15,19 +15,19 @@
 ;
 
   IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        SECTION smc_clib
+    SECTION smc_clib
 
-        PUBLIC  putsprite
-        PUBLIC  _putsprite
-        PUBLIC  ___putsprite
+    PUBLIC  putsprite
+    PUBLIC  _putsprite
+    PUBLIC  ___putsprite
 
-        EXTERN  swapgfxbk
-        EXTERN  __graphics_end
+    EXTERN  swapgfxbk
+    EXTERN  __graphics_end
 
-        EXTERN  plotpixel
-        EXTERN  respixel
-        EXTERN  xorpixel
-        INCLUDE "graphics/grafix.inc"
+    EXTERN  plotpixel
+    EXTERN  respixel
+    EXTERN  xorpixel
+    INCLUDE "graphics/grafix.inc"
 
 ; __gfx_coords: h,l (vert-horz)
 ; sprite: (ix)
@@ -36,121 +36,123 @@ putsprite:
 _putsprite:
 ___putsprite:
     IF  NEED_swapgfxbk=1
-        call    swapgfxbk
+    call    swapgfxbk
     ENDIF
-        ld      hl, 2
-        add     hl, sp
-        ld      e, (hl)
-        inc     hl
-        ld      d, (hl)                 ;sprite address
-        push    ix
-        push    de
-        pop     ix
+    ld      hl, 2
+    add     hl, sp
+    ld      e, (hl)
+    inc     hl
+    ld      d, (hl)                     ;sprite address
+    push    ix
+    push    de
+    pop     ix
 
-        inc     hl
-        ld      e, (hl)
-        inc     hl
-        inc     hl
-        ld      d, (hl)                 ; x and y __gfx_coords
+    inc     hl
+    ld      e, (hl)
+    inc     hl
+    inc     hl
+    ld      d, (hl)                     ; x and y __gfx_coords
 
-        inc     hl
+    inc     hl
 
-        inc     hl
-        ld      a, (hl)                 ; and/or/xor mode
+    inc     hl
+    ld      a, (hl)                     ; and/or/xor mode
 
-        cp      166                     ; and(hl) opcode
-        jr      nz, nodoand
-        ld      hl, respixel
-        ld      (called+1), hl
-        jr      doxor
+    cp      166                         ; and(hl) opcode
+    jr      nz, nodoand
+    ld      hl, respixel
+    ld      (called+1), hl
+    jr      doxor
 nodoand:
 
-        cp      182                     ; or(hl) opcode
-        jr      nz, nodoor
-        ld      hl, plotpixel
-        ld      (called+1), hl
-        jr      doxor
+    cp      182                         ; or(hl) opcode
+    jr      nz, nodoor
+    ld      hl, plotpixel
+    ld      (called+1), hl
+    jr      doxor
 
     ; 182 - or
     ; 174 - xor
 
 nodoor:
-        ld      hl, xorpixel
-        ld      (called+1), hl
+    ld      hl, xorpixel
+    ld      (called+1), hl
 
 doxor:
-        ld      h, d
-        ld      l, e
+    ld      h, d
+    ld      l, e
 
-        ld      a, (ix+0)               ; Width
-        ld      b, (ix+1)               ; Height
-oloopx: push    bc                      ;Save # of rows
-        push    af
+    ld      a, (ix+0)                   ; Width
+    ld      b, (ix+1)                   ; Height
+oloopx:
+    push    bc                          ;Save # of rows
+    push    af
 
     ;ld    b,a    ;Load width
-        ld      b, 0                    ; Better, start from zero !!
+    ld      b, 0                        ; Better, start from zero !!
 
-        ld      c, (ix+2)               ;Load one line of image
+    ld      c, (ix+2)                   ;Load one line of image
 
-iloopx: sla     c                       ;Test leftmost pixel
-        jr      nc, noplotx             ;See if a plot is needed
+iloopx:
+    sla     c                           ;Test leftmost pixel
+    jr      nc, noplotx                 ;See if a plot is needed
 
-        push    hl
+    push    hl
     ;push    bc    ; this should be done by the called routine
-        push    de
-        ld      a, h
-        add     a, b
-        ld      h, a
+    push    de
+    ld      a, h
+    add     a, b
+    ld      h, a
 called:
-        call    xorpixel
-        pop     de
+    call    xorpixel
+    pop     de
     ;pop    bc
-        pop     hl
+    pop     hl
 
 noplotx:
 
-        inc     b                       ; witdh counter
+    inc     b                           ; witdh counter
 
-        pop     af
-        push    af
+    pop     af
+    push    af
 
-        cp      b                       ; end of row ?
+    cp      b                           ; end of row ?
 
-        jr      nz, noblkx
+    jr      nz, noblkx
 
-        inc     ix
-        ld      c, (ix+2)               ;Load next byte of image
+    inc     ix
+    ld      c, (ix+2)                   ;Load next byte of image
 
-        jr      noblockx
+    jr      noblockx
 
 noblkx:
 
-        ld      a, b                    ; next byte in row ?
+    ld      a, b                        ; next byte in row ?
     ;dec    a
-        and     a
-        jr      z, iloopx
-        and     7
+    and     a
+    jr      z, iloopx
+    and     7
 
-        jr      nz, iloopx
+    jr      nz, iloopx
 
 blockx:
-        inc     ix
-        ld      c, (ix+2)               ;Load next byte of image
-        jr      iloopx
+    inc     ix
+    ld      c, (ix+2)                   ;Load next byte of image
+    jr      iloopx
 
 noblockx:
 
-        inc     l
+    inc     l
 
-        pop     af
-        pop     bc                      ;Restore data
-        djnz    oloopx
+    pop     af
+    pop     bc                          ;Restore data
+    djnz    oloopx
     IF  NEED_swapgfxbk
-        jp      __graphics_end
+    jp      __graphics_end
     ELSE
       IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        pop     ix
+    pop     ix
       ENDIF
-        ret
+    ret
     ENDIF
   ENDIF

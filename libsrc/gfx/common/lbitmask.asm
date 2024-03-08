@@ -1,6 +1,6 @@
 
-        SECTION code_graphics
-        PUBLIC  leftbitmask
+    SECTION code_graphics
+    PUBLIC  leftbitmask
 
 ;
 ;	$Id: lbitmask.asm,v 1.4 2016-04-13 21:09:09 dom Exp $
@@ -25,14 +25,14 @@
 ;    af....../....	different
 ;
 leftbitmask:
-        xor     7                       ; 7-bitpos
-        ret     z                       ; no	bitmask to preserve...
-        push    bc
-        ld      b, a
-        xor     a
+    xor     7                           ; 7-bitpos
+    ret     z                           ; no	bitmask to preserve...
+    push    bc
+    ld      b, a
+    xor     a
 left_bitmask_loop:
-        scf
-        rra                             ; create left bitmask
-        djnz    left_bitmask_loop
-        pop     bc
-        ret
+    scf
+    rra                                 ; create left bitmask
+    djnz    left_bitmask_loop
+    pop     bc
+    ret

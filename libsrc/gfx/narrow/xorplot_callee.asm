@@ -2,40 +2,40 @@
 
 
   IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        SECTION code_graphics
+    SECTION code_graphics
 
-        PUBLIC  xorplot_callee
-        PUBLIC  _xorplot_callee
-        PUBLIC  asm_xorplot
+    PUBLIC  xorplot_callee
+    PUBLIC  _xorplot_callee
+    PUBLIC  asm_xorplot
 
-        EXTERN  swapgfxbk
-        EXTERN  __graphics_end
+    EXTERN  swapgfxbk
+    EXTERN  __graphics_end
 
-        EXTERN  xorpixel
-        INCLUDE "graphics/grafix.inc"
+    EXTERN  xorpixel
+    INCLUDE "graphics/grafix.inc"
 
 
 
 xorplot_callee:
 _xorplot_callee:
-        pop     af                      ; ret addr
-        pop     hl                      ; y
-        pop     de                      ; x
-        ld      h, e
-        push    af                      ; ret addr
+    pop     af                          ; ret addr
+    pop     hl                          ; y
+    pop     de                          ; x
+    ld      h, e
+    push    af                          ; ret addr
 
 asm_xorplot:
-        push    ix
+    push    ix
     IF  NEED_swapgfxbk=1
-        call    swapgfxbk
+    call    swapgfxbk
     ENDIF
-        call    xorpixel
+    call    xorpixel
     IF  NEED_swapgfxbk
-        jp      __graphics_end
+    jp      __graphics_end
     ELSE
       IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        pop     ix
+    pop     ix
       ENDIF
-        ret
+    ret
     ENDIF
   ENDIF

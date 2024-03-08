@@ -5,22 +5,23 @@
 ;      $Id: pen_down.asm $
 ;
 
-        SECTION code_graphics
-        PUBLIC  pen_down
-        PUBLIC  _pen_down
+    SECTION code_graphics
+    PUBLIC  pen_down
+    PUBLIC  _pen_down
 
 
 pen_down:
 _pen_down:
-        ld      hl, __pen
-        ld      a, 128
-        or      (hl)
-        ld      (hl), a
-        ret
+    ld      hl, __pen
+    ld      a, 128
+    or      (hl)
+    ld      (hl), a
+    ret
 
 
-        SECTION bss_graphics
-        PUBLIC  __pen
+    SECTION bss_graphics
+    PUBLIC  __pen
 
-__pen:  defb    0                       ; leftmost bit: pen up/down
+__pen:
+    defb    0                           ; leftmost bit: pen up/down
 

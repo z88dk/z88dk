@@ -2,24 +2,24 @@
 
 
   IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        SECTION code_graphics
+    SECTION code_graphics
 
-        PUBLIC  circle
-        PUBLIC  _circle
-        PUBLIC  ___circle
+    PUBLIC  circle
+    PUBLIC  _circle
+    PUBLIC  ___circle
 
-        EXTERN  asm_circle
+    EXTERN  asm_circle
 
 
 circle:
 _circle:
 ___circle:
-        push    ix
-        ld      ix, 2
-        add     ix, sp
-        ld      e, (ix+2)               ;skip
-        ld      d, (ix+4)               ;radius
-        ld      c, (ix+6)               ;y
-        ld      b, (ix+8)               ;x
-        jp      asm_circle
+    push    ix
+    ld      ix, 2
+    add     ix, sp
+    ld      e, (ix+2)                   ;skip
+    ld      d, (ix+4)                   ;radius
+    ld      c, (ix+6)                   ;y
+    ld      b, (ix+8)                   ;x
+    jp      asm_circle
   ENDIF

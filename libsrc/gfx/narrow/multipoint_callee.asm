@@ -16,76 +16,76 @@
 ;pick a vertical or horizontal bit bar, up to 16 bits long
 
 
-        SECTION code_graphics
-        PUBLIC  multipoint_callee
-        PUBLIC  _multipoint_callee
-        PUBLIC  asm_multipoint
+    SECTION code_graphics
+    PUBLIC  multipoint_callee
+    PUBLIC  _multipoint_callee
+    PUBLIC  asm_multipoint
 
-        EXTERN  pointxy
-        EXTERN  swapgfxbk
-        EXTERN  swapgfxbk1
-        INCLUDE "graphics/grafix.inc"
+    EXTERN  pointxy
+    EXTERN  swapgfxbk
+    EXTERN  swapgfxbk1
+    INCLUDE "graphics/grafix.inc"
 
 
 multipoint_callee:
 _multipoint_callee:
 
-        pop     af                      ; ret addr
-        pop     hl                      ; y
-        pop     de                      ; x
-        ld      h, e
-        pop     bc
-        ld      b, c                    ; length
-        pop     de
-        ld      c, e                    ; h/v
-        push    af                      ; ret addr
+    pop     af                          ; ret addr
+    pop     hl                          ; y
+    pop     de                          ; x
+    ld      h, e
+    pop     bc
+    ld      b, c                        ; length
+    pop     de
+    ld      c, e                        ; h/v
+    push    af                          ; ret addr
 asm_multipoint:
-        push    ix
+    push    ix
     IF  NEED_swapgfxbk=1
-        call    swapgfxbk
+    call    swapgfxbk
     ENDIF
-        ld      de, 0
-        rr      c
-        jr      nc, horizontal
+    ld      de, 0
+    rr      c
+    jr      nc, horizontal
 vertical:
-        sla     e
-        rl      d
-        push    de
-        push    hl
-        push    bc
-        call    pointxy
-        pop     bc
-        pop     hl
-        pop     de
-        jr      z, jv
-        inc     de
+    sla     e
+    rl      d
+    push    de
+    push    hl
+    push    bc
+    call    pointxy
+    pop     bc
+    pop     hl
+    pop     de
+    jr      z, jv
+    inc     de
 jv:
-        inc     l
-        djnz    vertical
-        jr      exit
+    inc     l
+    djnz    vertical
+    jr      exit
 horizontal:
-        sla     e
-        rl      d
-        push    de
-        push    hl
-        push    bc
-        call    pointxy
-        pop     bc
-        pop     hl
-        pop     de
-        jr      z, jh
-        inc     de
+    sla     e
+    rl      d
+    push    de
+    push    hl
+    push    bc
+    call    pointxy
+    pop     bc
+    pop     hl
+    pop     de
+    jr      z, jh
+    inc     de
 jh:
-        inc     h
-        djnz    horizontal
+    inc     h
+    djnz    horizontal
 exit:
     IF  NEED_swapgfxbk=1
-        call    swapgfxbk1
+    call    swapgfxbk1
     ENDIF
-        pop     ix
-        ld      h, d
-        ld      l, e
-        ret
+    pop     ix
+    ld      h, d
+    ld      l, e
+    ret
 
 
   ENDIF
