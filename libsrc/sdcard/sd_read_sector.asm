@@ -13,21 +13,21 @@
 ;	$Id: sd_read_sector.asm,v 1.7 2017-01-03 00:27:43 aralbrec Exp $
 ;
 
-        PUBLIC  sd_read_sector
-        PUBLIC  _sd_read_sector
+    PUBLIC  sd_read_sector
+    PUBLIC  _sd_read_sector
 
-        EXTERN  asm_sd_read_sector
+    EXTERN  asm_sd_read_sector
 
 sd_read_sector:
 _sd_read_sector:
-        pop     af                      ; ret addr
-        pop     hl                      ; dst addr
-        exx
-        pop     hl                      ; sector pos lsb
-        pop     de                      ; sector pos msb
-        pop     ix                      ; SD_INFO struct
+    pop     af                          ; ret addr
+    pop     hl                          ; dst addr
+    exx
+    pop     hl                          ; sector pos lsb
+    pop     de                          ; sector pos msb
+    pop     ix                          ; SD_INFO struct
 
-        push    af
+    push    af
 
-        jp      asm_sd_read_sector
+    jp      asm_sd_read_sector
 
