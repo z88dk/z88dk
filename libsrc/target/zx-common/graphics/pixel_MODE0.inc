@@ -7,68 +7,68 @@
     EXTERN  __set_zx_pixel_colour
     EXTERN  __sam_graphics_pagein
     EXTERN  __sam_graphics_pageout
-    
+
 
 ; We enter here with: hl = x, de = y
-IF FORzxn | FORts2068 | FORsam
-    ld      a,h
+IF  FORzxn|FORts2068|FORsam
+    ld      a, h
     and     a
     ret     nz
-    ld      a,d
+    ld      a, d
     and     a
     ret     nz
-    ld      a,e
+    ld      a, e
     cp      192
     ret     nc
-    ld      (__gfx_coords),hl
-    ld      (__gfx_coords+2),de
+    ld      (__gfx_coords), hl
+    ld      (__gfx_coords+2), de
 
     ; Now get them into 8 bit parameters
-    ld      h,l
-    ld      l,e
+    ld      h, l
+    ld      l, e
 ELSE
-    ld      a,l
+    ld      a, l
     cp      192
     ret     nc
-    ld      (__gfx_coords),hl
+    ld      (__gfx_coords), hl
 ENDIF
-    push    bc        ;Save callers
-IF FORsam
+    push    bc                          ;Save callers
+IF  FORsam
     call    __sam_graphics_pagein
 ENDIF
     call    pixeladdress_MODE0
-    ld      b,a
-    ld      a,1
-    jr      z, continue    ; pixel is at bit 0...
-.plot_position 
+    ld      b, a
+    ld      a, 1
+    jr      z, continue                 ; pixel is at bit 0...
+plot_position:
     rlca
     djnz    plot_position
 continue:
     ; So here we have de=hl=screen location
     ; a = pixel mask
-IF NEEDplot    
+IF  NEEDplot
     or      (hl)
-    ld      (hl),a
+    ld      (hl), a
     call    __set_zx_pixel_colour
 ENDIF
-IF NEEDunplot
+IF  NEEDunplot
     cpl
     and     (hl)
-    ld      (hl),a
+    ld      (hl), a
     call    __set_zx_pixel_colour
 ENDIF
-IF NEEDxor
+IF  NEEDxor
     xor     (hl)
-    ld      (hl),a
+    ld      (hl), a
     call    __set_zx_pixel_colour
 ENDIF
-IF NEEDpoint
+IF  NEEDpoint
     and     (hl)
 ENDIF
-IF FORsam
+IF  FORsam
     call    __sam_graphics_pageout
 ENDIF
-    pop     bc    ;Restore callers
+    pop     bc                          ;Restore callers
     ret
 
 

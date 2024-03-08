@@ -12,58 +12,58 @@
     ; This is wide
     ; hl = x
     ; de = y
-    ld      a,d      ;Check y
+    ld      a, d                        ;Check y
     and     a
     ret     nz
-    ld      a,e
+    ld      a, e
     cp      200
 ;    ret     nc
 
-    ex      de,hl           ;de = x, hl = y
-    push    hl              ;save y
-    ld      hl,320          ;max x
+    ex      de, hl                      ;de = x, hl = y
+    push    hl                          ;save y
+    ld      hl, 320                     ;max x
     inc     hl
     call    l_cmp
     pop     hl
     ret     nc
-    ex      de,hl
-    ld      (__gfx_coords),hl       ;x
-    ld      (__gfx_coords+2),de     ;y
-    push    bc    ;Save callers value
+    ex      de, hl
+    ld      (__gfx_coords), hl          ;x
+    ld      (__gfx_coords+2), de        ;y
+    push    bc                          ;Save callers value
     call    __aquarius_video_pagein
-    ld      hl,(__gfx_coords)       ;x
-    call    w_pixeladdress    ;hl = address, a = pixel number
-    ld      d,b		      ;keep it safe
-    ld      b,a
-    ld      a,1
-    jr      z, rotated      ; pixel is at bit 0...
-.plot_position
+    ld      hl, (__gfx_coords)          ;x
+    call    w_pixeladdress              ;hl = address, a = pixel number
+    ld      d, b                        ;keep it safe
+    ld      b, a
+    ld      a, 1
+    jr      z, rotated                  ; pixel is at bit 0...
+plot_position:
     rlca
     djnz    plot_position
     ; a = byte holding pixel mask
     ; hl = address
 rotated:
-IF NEEDplot
+IF  NEEDplot
     or      (hl)
-    ld      (hl),a
-    ld      b,d
+    ld      (hl), a
+    ld      b, d
     call    __aquarius_set_attribute
-ELIF NEEDunplot
+ELIF    NEEDunplot
     cpl
     and     (hl)
-    ld      (hl),a
-    ld      b,d
+    ld      (hl), a
+    ld      b, d
     call    __aquarius_set_attribute
-ELIF NEEDxor
+ELIF    NEEDxor
     xor     (hl)
-    ld      (hl),a
-    ld      b,d
+    ld      (hl), a
+    ld      b, d
     call    __aquarius_set_attribute
-ELIF NEEDpoint
+ELIF    NEEDpoint
     and     (hl)
-ENDIF    
-    ex      af,af
+ENDIF
+    ex      af, af
     call    __aquarius_video_pageout
-    ex      af,af
-    pop     bc    ;Restore callers
+    ex      af, af
+    pop     bc                          ;Restore callers
     ret
