@@ -15,8 +15,8 @@ _fdtell:
     push    bc
     push    hl
     MOSCALL (mos_getfil)                ;exits with hlu = file structure
-    push    .lhl
-    pop     .lix
-    ld      .lhl, (ix+fil_fptr)
-    ld      .lde, (ix+fil_fptr+2)
+    push.l   hl
+    pop.l    ix
+    ld.l     hl, (ix+fil_fptr)
+    ld.l     de, (ix+fil_fptr+2)
     ret
