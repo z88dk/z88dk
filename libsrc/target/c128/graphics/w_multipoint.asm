@@ -13,70 +13,70 @@
 ;pick a vertical or horizontal bit bar, up to 16 bits long
 
 
-		SECTION	  code_clib
-                PUBLIC    multipoint
-                PUBLIC    _multipoint
+    SECTION code_clib
+    PUBLIC  multipoint
+    PUBLIC  _multipoint
 
-                EXTERN     w_pointxy
-                EXTERN     swapgfxbk
-                EXTERN     swapgfxbk1
+    EXTERN  w_pointxy
+    EXTERN  swapgfxbk
+    EXTERN  swapgfxbk1
 
 
-.multipoint
-._multipoint
-		push	ix		;save callers
-                ld      ix,2
-                add     ix,sp
-                ld      e,(ix+2)
-                ld      d,(ix+3)
-                ld      l,(ix+4)
-                ld      h,(ix+5)
-                ld      a,(ix+6)
+multipoint:
+_multipoint:
+    push    ix                          ;save callers
+    ld      ix, 2
+    add     ix, sp
+    ld      e, (ix+2)
+    ld      d, (ix+3)
+    ld      l, (ix+4)
+    ld      h, (ix+5)
+    ld      a, (ix+6)
 
-                call    swapgfxbk
+    call    swapgfxbk
 
-                ld      bc,0
-                bit     0,(ix+8)
-                jr      z,horizontal                
-.vertical
-                sla     c
-                rl      b
-                push	af
-                push	hl
-                push	de
-                push	bc
-                call    w_pointxy
-                pop	bc
-                pop	de
-                pop	hl
-                jr      z,jv
-                inc     bc
-.jv		pop	af
-                inc     de
-                dec	a
-                jr	nz,vertical
-                jr      exit
-.horizontal
-                sla     c
-                rl      b
-                push	af
-                push	hl
-                push	de
-                push	bc
-                call    w_pointxy
-                pop	bc
-                pop	de
-                pop	hl
-                jr      z,jh
-                inc     bc
-.jh		pop	af
-                inc     hl
-                dec	a
-                jr	nz,horizontal
-.exit
-                call    swapgfxbk1
+    ld      bc, 0
+    bit     0, (ix+8)
+    jr      z, horizontal
+vertical:
+    sla     c
+    rl      b
+    push    af
+    push    hl
+    push    de
+    push    bc
+    call    w_pointxy
+    pop     bc
+    pop     de
+    pop     hl
+    jr      z, jv
+    inc     bc
+jv: pop     af
+    inc     de
+    dec     a
+    jr      nz, vertical
+    jr      exit
+horizontal:
+    sla     c
+    rl      b
+    push    af
+    push    hl
+    push    de
+    push    bc
+    call    w_pointxy
+    pop     bc
+    pop     de
+    pop     hl
+    jr      z, jh
+    inc     bc
+jh: pop     af
+    inc     hl
+    dec     a
+    jr      nz, horizontal
+exit:
+    call    swapgfxbk1
 
-                ld      h,b
-                ld      l,c
-		pop	ix		;restore latest
-                ret
+    ld      h, b
+    ld      l, c
+    pop     ix                          ;restore latest
+    ret

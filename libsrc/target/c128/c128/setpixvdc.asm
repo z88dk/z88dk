@@ -8,13 +8,13 @@
 ;set pixel in 640 x 200 bit map mode.  math and local vdc i/o optimized
 ;for speed.
 
-		SECTION code_clib
-		PUBLIC	setpixvdc
-		PUBLIC	_setpixvdc
-		EXTERN	_vdcDispMem
-		
-		EXTERN	vdcset
-		EXTERN	vdcget
+    SECTION code_clib
+    PUBLIC  setpixvdc
+    PUBLIC  _setpixvdc
+    EXTERN  _vdcDispMem
+
+    EXTERN  vdcset
+    EXTERN  vdcget
 
 ;fast pixel look up using x mod 8 as index into bit table
 
@@ -33,59 +33,59 @@
 setpixvdc:
 _setpixvdc:
 
-        pop     hl              ;return address
-        pop     de              ;y
-        pop     bc              ;x
-        push    bc
-        push    de
-        push    hl
+    pop     hl                          ;return address
+    pop     de                          ;y
+    pop     bc                          ;x
+    push    bc
+    push    de
+    push    hl
                                 ;calc (y * 80) + (x / 8) + bit map start
-        ld      l,e             ;hl = y
-        ld      h,d
+    ld      l, e                        ;hl = y
+    ld      h, d
 
-        add     hl,hl           ;hl = y * 64;
-        add     hl,hl
-        add     hl,hl
-        add     hl,hl
-        add     hl,hl
-        add     hl,hl
+    add     hl, hl                      ;hl = y * 64;
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
 
-        ex      de,hl           ;de = y * 64; hl = y
+    ex      de, hl                      ;de = y * 64; hl = y
 
-        add     hl,hl           ;hl = y * 16
-        add     hl,hl
-        add     hl,hl
-        add     hl,hl
+    add     hl, hl                      ;hl = y * 16
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
 
-        add     hl,de           ;hl = (y * 64)+(y * 16)
+    add     hl, de                      ;hl = (y * 64)+(y * 16)
 
-        ld      e,c             ;de = x
-        ld      d,b
+    ld      e, c                        ;de = x
+    ld      d, b
 
-        srl     d               ;de = x / 8
-        rr      e
-        srl     d
-        rr      e
-        srl     d
-        rr      e
+    srl     d                           ;de = x / 8
+    rr      e
+    srl     d
+    rr      e
+    srl     d
+    rr      e
 
-        add     hl,de           ;hl = (y * 80) + (x / 8)
-        ld      de,(_vdcDispMem)
-        add     hl,de           ;hl = (y * 80) + (x / 8) + bit map offset
+    add     hl, de                      ;hl = (y * 80) + (x / 8)
+    ld      de, (_vdcDispMem)
+    add     hl, de                      ;hl = (y * 80) + (x / 8) + bit map offset
 
-        ld      a,c             ;a = x low byte
-        and     07h             ;a = x mod 8
+    ld      a, c                        ;a = x low byte
+    and     07h                         ;a = x mod 8
         ;ld      d,0             ;de = x mod 8
         ;ld      e,a
-        
-	xor	7
-	ld	b,a
-	ld	a,1
-	jr	z, or_pixel		; pixel is at bit 0...
-.plot_position
-	rlca
-	djnz	plot_position
-.or_pixel
+
+    xor     7
+    ld      b, a
+    ld      a, 1
+    jr      z, or_pixel                 ; pixel is at bit 0...
+plot_position:
+    rlca
+    djnz    plot_position
+or_pixel:
 
         ;push    ix
         ;ld      ix,BitTable     ;get address of bit table
@@ -93,32 +93,32 @@ _setpixvdc:
         ;ld      a,(ix+0)        ;a = bit to set from bit table
         ;pop     ix
 
-        ld      d,18            ;set vdc update addr
-        ld      e,h
-        call    vdcset
+    ld      d, 18                       ;set vdc update addr
+    ld      e, h
+    call    vdcset
 
-        ld      d,19
-        ld      e,l
-        call    vdcset
+    ld      d, 19
+    ld      e, l
+    call    vdcset
 
-        ld      d,31            ;get current byte
-        call    vdcget
+    ld      d, 31                       ;get current byte
+    call    vdcget
 
-        or      e               ;a = current byte or bit table bit
+    or      e                           ;a = current byte or bit table bit
 
-        ld      d,18            ;set vdc update addr
-        ld      e,h
-        call    vdcset
+    ld      d, 18                       ;set vdc update addr
+    ld      e, h
+    call    vdcset
 
-        ld      d,19
-        ld      e,l
-        call    vdcset
+    ld      d, 19
+    ld      e, l
+    call    vdcset
 
-        ld      d,31            ;set pixel
-        ld      e,a
-        call    vdcset
+    ld      d, 31                       ;set pixel
+    ld      e, a
+    call    vdcset
 
-        ret
+    ret
 
 
 ;
