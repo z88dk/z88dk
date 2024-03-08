@@ -8,14 +8,14 @@
 ;	$Id: h19_sendchar.asm $
 ;
 
-	SECTION	code_clib
-	PUBLIC	h19_sendchar
-	PUBLIC	_h19_sendchar
-	
+    SECTION code_clib
+    PUBLIC  h19_sendchar
+    PUBLIC  _h19_sendchar
+
 ;	EXTERN __bdos
 
-.h19_sendchar
-._h19_sendchar
+h19_sendchar:
+_h19_sendchar:
 
 
 ;	push af
@@ -34,19 +34,19 @@
 ;
 
 ; ..using the BIOS
-	push af
-	push bc
-	push de
-	ld c,l
-	ld   de,9	; shift ptr to CONOUT
-	ld   hl,(1)	; WBOOT (BIOS)
-	add  hl,de
-	call __chl
-	pop de
-	pop bc
-	pop af
-	ret
-	
+    push    af
+    push    bc
+    push    de
+    ld      c, l
+    ld      de, 9                       ; shift ptr to CONOUT
+    ld      hl, (1)                     ; WBOOT (BIOS)
+    add     hl, de
+    call    __chl
+    pop     de
+    pop     bc
+    pop     af
+    ret
+
 __chl:
-	jp   (hl)
+    jp      (hl)
 

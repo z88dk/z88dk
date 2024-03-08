@@ -2,7 +2,7 @@
 ; 	ANSI Video handling for the MSX
 ;
 ; 	CLS - Clear the screen
-;	
+;
 ;
 ;	Stefano Bodrato - Sept. 2017
 ;
@@ -21,23 +21,23 @@
     EXTERN  __tms9918_colour_table
     EXTERN  __tms9918_pattern_generator
 
-    EXTERN	FILVRM
+    EXTERN  FILVRM
 
-    INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
 
-.ansi_cls
-._ansi_cls
-    ld      hl,2            ; set graphics mode
+ansi_cls:
+_ansi_cls:
+    ld      hl, 2                       ; set graphics mode
     call    vdp_set_mode
 __tms9918_mode2_cls:
-    ld      a,(__tms9918_attribute)
-    ld      hl,(__tms9918_colour_table)
-    ld      bc,6144
+    ld      a, (__tms9918_attribute)
+    ld      hl, (__tms9918_colour_table)
+    ld      bc, 6144
     push    bc
     call    FILVRM
-    pop     bc          ; clear VRAM picture area
+    pop     bc                          ; clear VRAM picture area
     xor     a
-    ld      hl,(__tms9918_pattern_generator)
+    ld      hl, (__tms9918_pattern_generator)
     jp      FILVRM
 

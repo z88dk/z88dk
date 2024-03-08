@@ -11,12 +11,12 @@
 ;
 
     SECTION code_video_vdp
-    PUBLIC	vpoke
-    PUBLIC	_vpoke
-    PUBLIC	vdp_vpoke
-    PUBLIC	_vdp_vpoke
+    PUBLIC  vpoke
+    PUBLIC  _vpoke
+    PUBLIC  vdp_vpoke
+    PUBLIC  _vdp_vpoke
 
-    EXTERN asm_vdp_vpoke
+    EXTERN  asm_vdp_vpoke
 
 
 vpoke:
@@ -24,12 +24,12 @@ _vpoke:
 vdp_vpoke:
 _vdp_vpoke:
 
-    pop	bc
-    pop	de
-    pop	hl
-    push	hl	; VRAM address
-    push	de	; value
-    push	bc	; RET address
+    pop     bc
+    pop     de
+    pop     hl
+    push    hl                          ; VRAM address
+    push    de                          ; value
+    push    bc                          ; RET address
 
-    jp asm_vdp_vpoke
+    jp      asm_vdp_vpoke
 

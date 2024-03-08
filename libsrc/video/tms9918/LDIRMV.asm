@@ -12,19 +12,19 @@
     PUBLIC  _LDIRMV
     EXTERN  SETRD
 
-    INCLUDE	"video/tms9918/vdp.inc"
-	
+    INCLUDE "video/tms9918/vdp.inc"
+
 LDIRMV:
 _LDIRMV:
     push    bc
     call    SETRD
-    pop     hl	
+    pop     hl
 loop:
-    VDPIN(VDP_DATAIN)
-    ld      (de),a
+    VDPIN   (VDP_DATAIN)
+    ld      (de), a
     inc     de
     dec     hl
-    ld      a,h
+    ld      a, h
     or      l
-    jr      nz,loop
+    jr      nz, loop
     ret

@@ -1,14 +1,14 @@
 
 
-		SECTION		code_clib
+    SECTION code_clib
 
-		PUBLIC		asm_set_lcd_mode
+    PUBLIC  asm_set_lcd_mode
 
-		INCLUDE		"msm6255.inc"
+    INCLUDE "msm6255.inc"
 
 
 ;	Set the mode of LCD controller
-	
+
 ;	0000000x -> GRAPHICS (1), TEXT (0)
 ;	00000xx0 -> 4bit parallel (01) / serial (00) / serial EVEN-ODD (10) -> Bondwell 2 is EVEN-ODD
 ;	0000x000 -> Display ON/OFF
@@ -28,20 +28,20 @@
 
 asm_set_lcd_mode:
 
-	xor a
-IF address_w > 256
-	ld	bc,address_w
-	out	(c),a
+    xor     a
+IF  address_w>256
+    ld      bc, address_w
+    out     (c), a
 ELSE
-	out	(address_w),a
+    out     (address_w), a
 ENDIF
 
-IF register_w > 256
-	ld	bc,register_w
-	out	(c),l
+IF  register_w>256
+    ld      bc, register_w
+    out     (c), l
 ELSE
-	ld	a,l	
-	out	(register_w),a
+    ld      a, l
+    out     (register_w), a
 ENDIF
-	ret
+    ret
 

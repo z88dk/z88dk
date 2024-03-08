@@ -1,13 +1,13 @@
 
-SECTION rodata_video_vdp
+    SECTION rodata_video_vdp
 
-PUBLIC  __vdp_mode5_graphics
+    PUBLIC  __vdp_mode5_graphics
 
-EXTERN  __v9938_mode5_cls
-EXTERN  __v9938_plot
-EXTERN  __v9938_res
-EXTERN  __v9938_xor
-EXTERN  __v9938_pointxy
+    EXTERN  __v9938_mode5_cls
+    EXTERN  __v9938_plot
+    EXTERN  __v9938_res
+    EXTERN  __v9938_xor
+    EXTERN  __v9938_pointxy
 
 __vdp_mode5_graphics:
     defw    __v9938_mode5_cls
