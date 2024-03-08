@@ -5,7 +5,7 @@
 ;      $Id: w_move.asm $
 ;
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  move
     PUBLIC  _move
@@ -30,9 +30,9 @@ ___move:
     ld      l, (ix+4)
     ld      h, (ix+5)
 
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      a, (__pen)
     ld      ix, w_setxy
     rla
@@ -41,10 +41,10 @@ ___move:
 pen_up:
 
     call    w_line_r
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
+  ELSE
     pop     ix
     ret
-    ENDIF
   ENDIF
+ENDIF

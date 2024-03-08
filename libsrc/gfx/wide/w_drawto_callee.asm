@@ -1,7 +1,7 @@
 ; ----- void __CALLEE__ drawto_callee(int x, int y)
 
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  drawto_callee
     PUBLIC  _drawto_callee
@@ -23,18 +23,18 @@ _drawto_callee:
 
 asm_drawto:
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      ix, w_plotpixel
     call    w_line
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
-
+    ret
   ENDIF
+
+ENDIF

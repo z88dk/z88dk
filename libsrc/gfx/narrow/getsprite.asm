@@ -12,7 +12,7 @@
 ;
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION smc_clib
     PUBLIC  getsprite
     PUBLIC  _getsprite
@@ -57,9 +57,9 @@ getsprite_sub:
 
     ld      (actcoord), hl              ; save current coordinates
 
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     call    pixeladdress
     xor     7
 
@@ -119,15 +119,15 @@ zpos:
     pop     bc                          ;Restore data
     djnz    _oloop
 
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
+    ret
+  ENDIF
     SECTION bss_graphics
 actcoord:
     defw    0
-  ENDIF
+ENDIF

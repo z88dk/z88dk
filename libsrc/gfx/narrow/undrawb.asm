@@ -4,7 +4,7 @@
 ;
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  undrawb
@@ -26,4 +26,4 @@ ___undrawb:
     ld      h, (ix+8)
     pop     ix
     jp      asm_undrawb
-  ENDIF
+ENDIF

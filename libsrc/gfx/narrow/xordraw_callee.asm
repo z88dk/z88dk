@@ -1,6 +1,6 @@
 ; ----- void __CALLEE__ xordraw(int x, int y, int x2, int y2)
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xordraw_callee
@@ -29,9 +29,9 @@ _xordraw_callee:
 
 asm_xordraw:
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     push    hl
     push    de
     call    xorpixel
@@ -39,13 +39,13 @@ asm_xordraw:
     pop     hl
     ld      ix, xorpixel
     call    Line
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
-
+    ret
   ENDIF
+
+ENDIF

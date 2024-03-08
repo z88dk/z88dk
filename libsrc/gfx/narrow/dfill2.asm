@@ -17,7 +17,7 @@
 ;
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     INCLUDE "graphics/grafix.inc"
 
     SECTION code_graphics
@@ -185,4 +185,4 @@ dontret:
     SECTION bss_graphics
 spsave:
     defw    0
-  ENDIF
+ENDIF

@@ -14,7 +14,7 @@
 ; $Id: w_putsprite4.asm $
 ;
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION smc_clib
     PUBLIC  putsprite
     PUBLIC  _putsprite
@@ -163,4 +163,4 @@ noblocko:
 oldx:
     defw    0
 
-  ENDIF
+ENDIF

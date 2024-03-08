@@ -7,7 +7,7 @@
 ;	$Id: putsprite_callee.asm $
 ;
 
-  IF    !__CPU_GBZ80__
+IF  !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  putsprite_callee
     PUBLIC  _putsprite_callee
@@ -32,4 +32,4 @@ retaddr:
     jp      (hl)
 
 
-  ENDIF
+ENDIF

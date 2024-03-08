@@ -6,7 +6,7 @@
 ;    $Id: bkrestore.asm $
 ;
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION smc_clib
 
     EXTERN  pixeladdress
@@ -69,4 +69,4 @@ rloop:
     djnz    bkrestores
     pop     ix
     ret
-  ENDIF
+ENDIF

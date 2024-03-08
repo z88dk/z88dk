@@ -6,7 +6,7 @@
 ;    $Id: w_bksave.asm $
 ;
 
-  IF    !__CPU_INTEL__
+IF  !__CPU_INTEL__
     SECTION smc_clib
 
     PUBLIC  bksave
@@ -90,4 +90,4 @@ x_coord:
     djnz    bksaves
     pop     ix
     ret
-  ENDIF
+ENDIF

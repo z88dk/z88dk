@@ -1,7 +1,7 @@
 ; ----- void __CALLEE__ xorborder(int x, int y, int x2, int y2)
 
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xorborder
@@ -28,4 +28,4 @@ ___xorborder:
 
     push    af                          ; ret addr
     jp      asm_xorborder
-  ENDIF
+ENDIF

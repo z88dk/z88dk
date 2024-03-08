@@ -4,7 +4,7 @@
 ;pick a vertical or horizontal bit bar, up to 16 bits long
 
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  multipoint_callee
     PUBLIC  _multipoint_callee
@@ -33,9 +33,9 @@ _multipoint_callee:
 asm_multipoint:
 
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      a, b
     rr      c
     ld      bc, 0
@@ -80,11 +80,11 @@ jh:
     dec     a
     jr      nz, horizontal
 exit:
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk1
-    ENDIF
+  ENDIF
     pop     ix
     ld      h, b
     ld      l, c
     ret
-  ENDIF
+ENDIF

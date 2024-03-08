@@ -15,7 +15,7 @@
 ;; void stencil_add_side(int x1, int y1, int x2, int y2, unsigned char *stencil)
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  stencil_add_side
     PUBLIC  _stencil_add_side
@@ -44,9 +44,9 @@ _stencil_add_side:
     ld      e, (ix+8)
     ld      d, (ix+9)
 
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     call    stencil_add_pixel
 
     ld      l, (ix+6)
@@ -56,10 +56,10 @@ _stencil_add_side:
 
     ld      ix, stencil_add_pixel
     call    w_line
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
+  ELSE
     pop     ix
     ret
-    ENDIF
   ENDIF
+ENDIF

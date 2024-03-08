@@ -1,5 +1,5 @@
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xorborder_callee
@@ -44,9 +44,9 @@ _xorborder_callee:
 asm_xorborder:
 
 
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     push    bc
     push    hl
 
@@ -98,9 +98,9 @@ vrowloop:
     inc     h
     pop     bc
     djnz    vrowloop
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     jp      swapgfxbk1
-    ELSE
+  ELSE
     ret
-    ENDIF
   ENDIF
+ENDIF

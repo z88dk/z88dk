@@ -1,4 +1,4 @@
-  IF    !__CPU_GBZ80__&!__CPU_INTEL__
+IF  !__CPU_GBZ80__&!__CPU_INTEL__
     SECTION code_graphics
     PUBLIC  scroll_left
 
@@ -220,4 +220,4 @@ scrollleft:
     add     hl, hl
     djnz    scrollleft
     ret
-  ENDIF
+ENDIF

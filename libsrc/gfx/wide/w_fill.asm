@@ -9,7 +9,7 @@
     INCLUDE "graphics/grafix.inc"
 
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     MODULE  w_fill
     SECTION code_graphics
 
@@ -118,4 +118,4 @@ ___fill:
 
     ret
 
-  ENDIF
+ENDIF

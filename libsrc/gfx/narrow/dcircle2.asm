@@ -1,7 +1,7 @@
 
 ; This version of the CIRCLE function leaves AF' untouched
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  draw_circle
 
@@ -165,4 +165,4 @@ doplot:
 jpix:
     jp      (ix)
 
-  ENDIF
+ENDIF

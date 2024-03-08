@@ -1,6 +1,6 @@
 ;void fillb_callee(int tlx, int tly, int width, int height)
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  fillb
     PUBLIC  _fillb
@@ -25,4 +25,4 @@ ___fillb:
     push    af                          ; ret addr
 
     jp      asm_fillb
-  ENDIF
+ENDIF

@@ -1,6 +1,6 @@
 ; ----- void __CALLEE__ xorborder_callee(int x, int y, int x2, int y2)
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xorborder_callee
@@ -29,9 +29,9 @@ _xorborder_callee:
 asm_xorborder:
 
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     push    hl
     push    de
     exx
@@ -115,12 +115,12 @@ yloop1:
     jr      nz, yloop1
 endyloop:
 
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
+  ELSE
     pop     ix
     ret
-    ENDIF
+  ENDIF
 
 
 
@@ -135,4 +135,4 @@ plot_sub:
     pop     bc
     ret
 
-  ENDIF
+ENDIF

@@ -1,7 +1,7 @@
 ; ----- void  drawr(int x, int y)
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  drawr
@@ -21,4 +21,4 @@ ___drawr:
     push    de
     push    af                          ; ret addr
     jp      asm_drawr
-  ENDIF
+ENDIF

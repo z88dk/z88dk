@@ -9,7 +9,7 @@
 ;    hline_dither(int x1, int y1, int x2, unsigned char intensity)
 ;
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  surface_hline_dither
     PUBLIC  _surface_hline_dither
@@ -222,4 +222,4 @@ _dithpat:
     defb    @11111111
     defb    @11111111
     defb    @11111111
-  ENDIF
+ENDIF

@@ -1,6 +1,6 @@
     INCLUDE "graphics/grafix.inc"
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__&&!__CPU_Z180__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__&&!__CPU_Z180__
     SECTION code_graphics
     PUBLIC  w_line_r
 
@@ -278,4 +278,4 @@ abs:
     sbc     hl, de                      ; convert negative integer
     pop     de
     ret
-  ENDIF
+ENDIF

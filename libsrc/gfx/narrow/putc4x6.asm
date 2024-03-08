@@ -70,12 +70,12 @@ nolower:
 
     ld      (chr), a
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
-  ENDIF
-  IF    NEED_swapgfxbk=1
+ENDIF
+IF  NEED_swapgfxbk=1
     call    swapgfxbk
-  ENDIF
+ENDIF
     ld      a, (chr)
     rra
 
@@ -109,13 +109,13 @@ iseven:
     ld      d, 0
     ld      e, a
 colloop:
-  IF    __CPU_INTEL__
+IF  __CPU_INTEL__
     ld      a, c
     rla
     ld      c, a
-  ELSE
+ELSE
     rl      c                           ; cy = pixel status
-  ENDIF
+ENDIF
     push    bc
     push    de
     ld      a, (y_4x6)
@@ -161,13 +161,13 @@ lrloop:
     djnz    lrloop
     ld      a, e                        ; new x position
 
-  IF    maxx<>256
+IF  maxx<>256
     cp      maxx
     call    nc, do_nl
-  ELSE
+ELSE
     and     a
     call    z, do_nl
-  ENDIF
+ENDIF
 
     ld      (x_4x6), a                  ; update x position
 
@@ -175,14 +175,14 @@ lrloop:
     sub     5
     ld      (y_4x6), a
 
-  IF    NEED_swapgfxbk
+IF  NEED_swapgfxbk
     jp      __graphics_end
-  ELSE
-    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+ELSE
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-    ENDIF
-    ret
   ENDIF
+    ret
+ENDIF
 do_nl:
     ld      a, (y_4x6)
     add     6

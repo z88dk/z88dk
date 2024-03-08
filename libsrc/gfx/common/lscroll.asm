@@ -1,6 +1,6 @@
 ;Usage: void lscroll(int x, int y, int width, int height, int pixels)
 
-  IF    !__CPU_GBZ80__&!__CPU_INTEL__
+IF  !__CPU_GBZ80__&!__CPU_INTEL__
 
     SECTION code_graphics
     PUBLIC  lscroll
@@ -24,4 +24,4 @@ ___lscroll:
     ld      h, (ix+10)
     pop     ix
     jp      scroll_left
-  ENDIF
+ENDIF

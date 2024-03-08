@@ -32,17 +32,17 @@
 ;
 
 xorpixel:
-  IF    maxx<>256
+IF  maxx<>256
     ld      a, h
     cp      maxx
     ret     nc
-  ENDIF
+ENDIF
 
-  IF    maxy<>256
+IF  maxy<>256
     ld      a, l
     cp      maxy
     ret     nc                          ; y0    out of range
-  ENDIF
+ENDIF
 
     ld      (__gfx_coords), hl
 

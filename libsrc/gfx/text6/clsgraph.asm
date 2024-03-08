@@ -26,11 +26,11 @@ _cleargraphics:
 ___cleargraphics:
 
     ld      hl, (base_graphics)
-  IF    GFXTEXT3
+IF  GFXTEXT3
     ld      bc, maxx*maxy/3-1
-  ELSE
+ELSE
     ld      bc, maxx*maxy/6-1
-  ENDIF
+ENDIF
 clean:
     ld      (hl), blankch
     inc     hl

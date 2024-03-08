@@ -34,11 +34,11 @@ commoncircle:
     ld      d, (hl)
     push    de
     call    _circledraw
-  IF    __CPU_GBZ80__
+IF  __CPU_GBZ80__
     add     sp, 10
-  ELSE
+ELSE
     ld      hl, 10
     add     hl, sp
     ld      sp, hl
-  ENDIF
+ENDIF
     ret

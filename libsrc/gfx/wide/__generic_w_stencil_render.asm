@@ -12,7 +12,7 @@
 
     INCLUDE "graphics/grafix.inc"
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  __generic_stencil_render
     EXTERN  dither_pattern
@@ -33,9 +33,9 @@ __generic_stencil_render:
     push    ix                          ;save callers
     ld      ix, 4
     add     ix, sp
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      bc, maxy
     ld      hl, (__gfx_coords)
     push    hl
@@ -142,4 +142,4 @@ done:
 in_row:
     pop     af
     jp      xloop                       ; otherwise, loop
-  ENDIF
+ENDIF

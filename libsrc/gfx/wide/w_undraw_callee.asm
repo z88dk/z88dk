@@ -1,6 +1,6 @@
 ; ----- void __CALLEE__ undraw_callee(int x, int y, int x2, int y2)
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  undraw_callee
     PUBLIC  _undraw_callee
@@ -32,9 +32,9 @@ asm_undraw:
     push    hl                          ;x1
     push    de                          ;y1
 
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     call    w_respixel
 
     exx
@@ -50,11 +50,11 @@ asm_undraw:
 
     ld      ix, w_respixel
     call    w_line_r
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
+  ELSE
     pop     ix
     ret
-    ENDIF
-
   ENDIF
+
+ENDIF

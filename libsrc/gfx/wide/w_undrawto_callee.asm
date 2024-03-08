@@ -1,7 +1,7 @@
 ; ----- void __CALLEE__ undrawto_callee(int x, int y)
 
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  undrawto_callee
     PUBLIC  _undrawto_callee
@@ -23,16 +23,16 @@ _undrawto_callee:
 
 asm_undrawto:
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      ix, w_respixel
     call    w_line
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
+  ELSE
     pop     ix
     ret
-    ENDIF
-
   ENDIF
+
+ENDIF

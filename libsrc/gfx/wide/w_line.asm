@@ -1,6 +1,6 @@
     INCLUDE "graphics/grafix.inc"
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  w_line
 
@@ -32,4 +32,4 @@ w_line:
     sbc     hl, bc
 
     jp      w_line_r
-  ENDIF
+ENDIF

@@ -1,6 +1,6 @@
 ; ----- void  plot_callee(int x, int y)
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     SECTION code_graphics
 
@@ -23,16 +23,16 @@ _plot_callee:
     push    af                          ; ret addr
 asm_plot:
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
-    call    plotpixel
-    IF  NEED_swapgfxbk
-    jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
-    pop     ix
-      ENDIF
-    ret
-    ENDIF
   ENDIF
+    call    plotpixel
+  IF    NEED_swapgfxbk
+    jp      __graphics_end
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
+    ENDIF
+    ret
+  ENDIF
+ENDIF

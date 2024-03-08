@@ -15,7 +15,7 @@
 ;	$Id: stencil_init_vy.asm $
 ;
 
-  IF    !__CPU_INTEL__
+IF  !__CPU_INTEL__
     INCLUDE "graphics/grafix.inc"
     SECTION code_graphics
 
@@ -53,4 +53,4 @@ _stencil_init:
     dec     bc                          ; (maxy*2)-1
     ldir
     ret
-  ENDIF
+ENDIF

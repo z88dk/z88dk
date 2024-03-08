@@ -1,7 +1,7 @@
 ;Usage: clga(int tlx, int tly, int tlx2, int tly2)
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  clga
@@ -22,4 +22,4 @@ ___clga:
     ld      h, (ix+8)
     pop     ix
     jp      asm_clga
-  ENDIF
+ENDIF

@@ -2,7 +2,7 @@
 ;Result is true/false
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
 
     SECTION code_graphics
@@ -29,19 +29,19 @@ _point_callee:
 
 asm_point:
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     call    pointxy
 
     push    af
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk1
-    ENDIF
+  ENDIF
     pop     af
     pop     ix
     ld      hl, 1
     ret     nz                          ;pixel set
     dec     hl
     ret
-  ENDIF
+ENDIF

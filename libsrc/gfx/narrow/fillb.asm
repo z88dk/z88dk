@@ -1,6 +1,6 @@
 ;void fillb(int tlx, int tly, int width, int height)
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  fillb
@@ -21,4 +21,4 @@ ___fillb:
     ld      h, (ix+8)
     pop     ix
     jp      asm_fillb
-  ENDIF
+ENDIF

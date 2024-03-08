@@ -1,6 +1,6 @@
 ; void undrawb_callee(int tlx, int tly, int width, int height)
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  undrawb_callee
@@ -28,15 +28,15 @@ _undrawb_callee:
     exx
 asm_undrawb:
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      ix, w_respixel
     call    drawbox
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
+  ELSE
     pop     ix
     ret
-    ENDIF
   ENDIF
+ENDIF

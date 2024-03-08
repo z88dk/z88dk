@@ -16,7 +16,7 @@
 c_point:
 _c_point:
 ___c_point:
-  IF    __CPU_INTEL__|__CPU_GBZ80__
+IF  __CPU_INTEL__|__CPU_GBZ80__
     pop     bc
     pop     hl
     pop     de
@@ -24,25 +24,25 @@ ___c_point:
     push    hl
     push    bc
     ld      h, e
-  ELSE
+ELSE
     push    ix
     ld      ix, 2
     add     ix, sp
     ld      l, (ix+2)
     ld      h, (ix+4)
-  ENDIF
-  IF    NEED_swapgfxbk=1
+ENDIF
+IF  NEED_swapgfxbk=1
     call    swapgfxbk
-  ENDIF
+ENDIF
     call    c_pointxy
-  IF    NEED_swapgfxbk=1
+IF  NEED_swapgfxbk=1
     push    af
     call    swapgfxbk1
     pop     af
-  ENDIF
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+ENDIF
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-  ENDIF
+ENDIF
     ld      hl, 1
     ret     nz                          ;pixel set
     dec     hl

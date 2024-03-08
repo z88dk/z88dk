@@ -1,6 +1,6 @@
     INCLUDE "graphics/grafix.inc"
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  Line
 
@@ -45,22 +45,22 @@
 Line:
     push    de
     push    hl
-    IF  maxx<>256
+  IF    maxx<>256
     ld      a, h
     cp      maxx
     jr      nc, exit_line               ; x0    coordinate out    of range
     ld      a, d
     cp      maxx
     jr      nc, exit_line               ; x1    coordinate out    of range
-    ENDIF
-    IF  maxy<>256
+  ENDIF
+  IF    maxy<>256
     ld      a, l
     cp      maxy
     jr      nc, exit_line               ; y0    coordinate out    of range
     ld      a, e
     cp      maxy
     jr      nc, exit_line               ; y1    coordinate out    of range
-    ENDIF
+  ENDIF
     ld      (__gfx_coords), hl          ; the starting    point is now default
     push    hl
     push    de
@@ -98,4 +98,4 @@ distance:
     ret     nc
     ld      h, -1
     ret
-  ENDIF
+ENDIF

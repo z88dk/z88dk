@@ -8,7 +8,7 @@
 ;
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 ; ----- bool  multipoint(int hv, int length, int x, int y)
 
@@ -41,9 +41,9 @@ _multipoint_callee:
     push    af                          ; ret addr
 asm_multipoint:
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      de, 0
     rr      c
     jr      nc, horizontal
@@ -79,13 +79,13 @@ jh:
     inc     h
     djnz    horizontal
 exit:
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk1
-    ENDIF
+  ENDIF
     pop     ix
     ld      h, d
     ld      l, e
     ret
 
 
-  ENDIF
+ENDIF

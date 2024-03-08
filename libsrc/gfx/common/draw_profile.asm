@@ -9,7 +9,7 @@
 ;
 
 
-  IF    !__CPU_GBZ80__&&!__CPU_INTEL__
+IF  !__CPU_GBZ80__&&!__CPU_INTEL__
     INCLUDE "graphics/grafix.inc"
 
 
@@ -62,11 +62,11 @@ getx:
     ld      l, a
     call    l_mult
 
-    IF  ((maxx/(maxy+1))>1)
+  IF    ((maxx/(maxy+1))>1)
     ld      de, 25                      ; 50/2
-    ELSE
+  ELSE
     ld      de, 50
-    ENDIF
+  ENDIF
     jr      perc_div
 
 
@@ -116,21 +116,21 @@ _draw_profile:
     rr      l
     ld      (_percent), hl
     ld      l, (ix+6)
-    IF  (maxx>256)
+  IF    (maxx>256)
     ld      h, (ix+7)
-    ENDIF
+  ENDIF
     ld      (_vy), hl
     ld      l, (ix+8)
-    IF  (maxx>256)
+  IF    (maxx>256)
     ld      h, (ix+9)
-    ENDIF
+  ENDIF
     ld      (_vx), hl
 
-    IF  (maxx>256)
+  IF    (maxx>256)
     ld      hl, -maxy*4                 ; create space for stencil on stack
-    ELSE
+  ELSE
     ld      hl, -maxy*2                 ; create space for stencil on stack
-    ENDIF
+  ENDIF
     add     hl, sp                      ; The stack usage depends on the display height.
     ld      sp, hl
     ld      (_stencil), hl
@@ -150,11 +150,11 @@ norepeat:
 	;******
 	; EXIT
 	;******
-    IF  (maxx>256)
+  IF    (maxx>256)
     ld      hl, maxy*4                  ; release the stack space for _stencil
-    ELSE
+  ELSE
     ld      hl, maxy*2                  ; release the stack space for _stencil
-    ENDIF
+  ENDIF
     add     hl, sp
     ld      sp, hl
     pop     ix
@@ -382,11 +382,11 @@ plend2:
 
     push    hl
     ld      hl, (_stencil)              ; adjust the right side
-    IF  (maxx>256)
+  IF    (maxx>256)
     ld      de, maxy*2
-    ELSE
+  ELSE
     ld      de, maxy
-    ENDIF
+  ENDIF
     add     hl, de
     ld      e, 1                        ; 1 bit larger
     call    resize
@@ -466,13 +466,13 @@ nolblack:
 
 resize:
 
-    IF  (maxx>256)
+  IF    (maxx>256)
 
 	;EXTERN  l_graphics_cmp
 	; TODO
     ret
 
-    ELSE
+  ELSE
 
     ld      b, maxy-1
 rslp:
@@ -488,7 +488,7 @@ slimit:
     djnz    rslp
     ret
 
-    ENDIF
+  ENDIF
 
 ; NZ if we have prepared a ptr for two-pass mode
 is_areamode:
@@ -576,4 +576,4 @@ repcnt:
 ;;_stencil:	defs	maxy*2
 _stencil:
     defw    0
-  ENDIF
+ENDIF

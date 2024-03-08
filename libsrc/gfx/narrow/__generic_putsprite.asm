@@ -11,7 +11,7 @@
 ;
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  __generic_putsprite
 
@@ -27,9 +27,9 @@
 ; sprite: (ix)
 
 __generic_putsprite:
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      hl, 2
     add     hl, sp
     ld      e, (hl)
@@ -131,14 +131,14 @@ noblockx:
     pop     bc                          ;Restore data
     djnz    oloopx
     ;pop    ix
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
+    ret
+  ENDIF
 
 
 doand:
@@ -283,12 +283,12 @@ noblocko:
     pop     bc                          ;Restore data
     djnz    oloopo
     ;pop    ix
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
+    ret
   ENDIF
+ENDIF

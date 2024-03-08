@@ -10,7 +10,7 @@
 ;
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  drawb_callee
@@ -39,16 +39,16 @@ _drawb_callee:
 asm_drawb:
     push    ix
     ld      ix, plotpixel
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
-    call    drawbox
-    IF  NEED_swapgfxbk
-    jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
-    pop     ix
-      ENDIF
-    ret
-    ENDIF
   ENDIF
+    call    drawbox
+  IF    NEED_swapgfxbk
+    jp      __graphics_end
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
+    ENDIF
+    ret
+  ENDIF
+ENDIF

@@ -1,7 +1,7 @@
 ; ----- int point_callee(int x, int y)
 ;Result is true/false
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  point_callee
@@ -24,19 +24,19 @@ _point_callee:
 
 asm_point:
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     call    w_pointxy
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     push    af
     call    swapgfxbk1
     pop     af
-    ENDIF
+  ENDIF
     pop     ix
     ld      hl, 1
     ret     nz                          ;pixel set
     dec     hl
     ret
-  ENDIF
+ENDIF
 

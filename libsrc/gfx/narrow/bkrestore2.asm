@@ -6,7 +6,7 @@
 ;    $Id: bkrestore2.asm $
 ;
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_clib
 
 
@@ -71,4 +71,4 @@ _bkrestore_fastcall:
     pop     de
 
     ret
-  ENDIF
+ENDIF

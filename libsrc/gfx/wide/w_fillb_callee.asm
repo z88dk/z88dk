@@ -1,5 +1,5 @@
 ; void fillb(int tlx, int tly, int width, int height)
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  fillb_callee
@@ -29,18 +29,18 @@ _fillb_callee:
 asm_fillb:
 
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      ix, w_plotpixel
     call    w_area
 
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
+    ret
   ENDIF
+ENDIF

@@ -22,7 +22,7 @@
 ;  af..dehl/.... different
 
 
-  IF    !__CPU_INTEL__
+IF  !__CPU_INTEL__
     INCLUDE "graphics/grafix.inc"
     SECTION code_graphics
     PUBLIC  stencil_add_pixel
@@ -114,4 +114,4 @@ yvect_smc:
     SECTION bss_graphics
 stencil_ptr:
     defw    0
-  ENDIF
+ENDIF

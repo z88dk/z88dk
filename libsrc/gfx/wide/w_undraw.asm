@@ -1,6 +1,6 @@
 ; ----- void  undraw(int x, int y, int x2, int y2)
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  undraw
     PUBLIC  _undraw
@@ -27,4 +27,4 @@ ___undraw:
 
     jp      asm_undraw
 
-  ENDIF
+ENDIF

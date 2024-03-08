@@ -13,7 +13,7 @@
 ; $Id: w___generic_putsprite2.asm,v 2017 Stefano Exp $
 ;
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     MODULE  __generic_w_putsprite
     PUBLIC  __generic_putsprite
@@ -276,4 +276,4 @@ noblocko:
 oldx:
     defw    0
 
-  ENDIF
+ENDIF

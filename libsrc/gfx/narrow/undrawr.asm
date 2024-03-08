@@ -2,7 +2,7 @@
 ; ----- void  undrawr(int x2, int y2)
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  undrawr
@@ -21,4 +21,4 @@ ___undrawr:
     push    de
     push    af                          ; ret addr
     jp      asm_undrawr
-  ENDIF
+ENDIF

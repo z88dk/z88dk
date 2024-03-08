@@ -9,7 +9,7 @@
 ; $Id: putsprite.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
 ;
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION smc_clib
     PUBLIC  putsprite
     PUBLIC  _putsprite
@@ -62,9 +62,9 @@ ___putsprite:
 
     ld      (actcoord), hl              ; save current coordinates
 
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     call    pixeladdress
 
     ld      hl, offsets_table
@@ -121,14 +121,14 @@ _notedge:
 
     pop     bc                          ;Restore data
     djnz    _oloop
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
+    ret
+  ENDIF
 
 putspritew:
     ld      d, (ix+0)
@@ -174,14 +174,14 @@ wsmc2:
 
     pop     bc                          ;Restore data
     djnz    woloop
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
+    ret
+  ENDIF
 
 wover_1:
     ld      c, (ix+2)
@@ -202,14 +202,14 @@ wover_1:
 
     pop     bc
     djnz    woloop
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
+    ret
+  ENDIF
     SECTION bss_graphics
 actcoord:
     defw    0
@@ -218,4 +218,4 @@ actcoord:
 
 offsets_table:
     defb    1, 2, 4, 8, 16, 32, 64, 128
-  ENDIF
+ENDIF

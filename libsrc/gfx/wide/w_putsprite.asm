@@ -9,7 +9,7 @@
 ; $Id: w_putsprite.asm $
 ;
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION smc_clib
     PUBLIC  putsprite
     PUBLIC  _putsprite
@@ -59,9 +59,9 @@ ___putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF                               ; @@@@@@@@@@@@
+  ENDIF                                 ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c
     ld      (curx), hl
@@ -147,12 +147,12 @@ _notedge:
     pop     bc                          ;Restore data
     djnz    _oloop
 
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
+  ELSE
     pop     ix
     ret
-    ENDIF
+  ENDIF
 
 putspritew:
     ld      d, a
@@ -222,12 +222,12 @@ nextline:
 
     pop     bc                          ;Restore data
     djnz    woloop
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
+  ELSE
     pop     ix
     ret
-    ENDIF
+  ENDIF
 
 wover_1:
     ld      c, (ix+2)
@@ -252,4 +252,4 @@ cury:
 offsets_table:
     defb    1, 2, 4, 8, 16, 32, 64, 128
 
-  ENDIF
+ENDIF

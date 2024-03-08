@@ -1,6 +1,6 @@
 ; ----- void __CALLEE__ draw(int x, int y, int x2, int y2)
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  draw_callee
     PUBLIC  _draw_callee
@@ -28,9 +28,9 @@ asm_draw:
     push    ix
     push    hl                          ;x1
     push    de                          ;y1
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     call    w_plotpixel
 
     exx
@@ -46,13 +46,13 @@ asm_draw:
 
     ld      ix, w_plotpixel
     call    w_line_r
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
-
+    ret
   ENDIF
+
+ENDIF

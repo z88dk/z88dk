@@ -11,7 +11,7 @@
 
     INCLUDE "graphics/grafix.inc"
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  draw_profile
     PUBLIC  _draw_profile
@@ -480,4 +480,4 @@ repcmd:
 repcnt:
     defb    0
 
-  ENDIF
+ENDIF

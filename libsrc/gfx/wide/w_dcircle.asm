@@ -7,7 +7,7 @@
 ;
 
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  w_draw_circle
     EXTERN  l_graphics_cmp
@@ -293,4 +293,4 @@ dahi:
 scale:
     defb    0
 
-  ENDIF
+ENDIF

@@ -6,7 +6,7 @@
 ;    $Id: w_bkrestore.asm $
 ;
 
-  IF    !__CPU_INTEL__
+IF  !__CPU_INTEL__
     SECTION smc_clib
 
 
@@ -83,4 +83,4 @@ x_coord:
     djnz    bkrestores
     pop     ix
     ret
-  ENDIF
+ENDIF

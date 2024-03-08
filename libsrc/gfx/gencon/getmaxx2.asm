@@ -8,12 +8,12 @@
     defc    _getmaxx=getmaxx
 
 getmaxx:
-  IF    __CPU_GBZ80__
+IF  __CPU_GBZ80__
     ld      hl, __console_w
     ld      l, (hl)
-  ELSE
+ELSE
     ld      hl, (__console_w)
-  ENDIF
+ENDIF
     ld      h, 0
     dec     hl
     ret

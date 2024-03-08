@@ -1,6 +1,6 @@
 ; void undrawb_callee(int tlx, int tly, int width, int height)
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  undrawb
     PUBLIC  _undrawb
@@ -26,4 +26,4 @@ ___undrawb:
     push    af                          ; ret addr
 
     jp      asm_undrawb
-  ENDIF
+ENDIF

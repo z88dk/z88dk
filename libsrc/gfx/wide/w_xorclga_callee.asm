@@ -1,6 +1,6 @@
 ; void xorclga_callee(int tlx, int tly, int tlx2, int tly2)
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xorclga_callee
@@ -28,15 +28,15 @@ _xorclga_callee:
 
 asm_xorclga:
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      ix, w_xorpixel
     call    w_area
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
+  ELSE
     pop     ix
     ret
-    ENDIF
   ENDIF
+ENDIF

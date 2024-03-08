@@ -1,7 +1,7 @@
 ; void clga(int tlx, int tly, int tlx2, int tly2)
 ; CLGA  -  clear rect area
 ;
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
 
     SECTION code_graphics
     PUBLIC  clga
@@ -25,4 +25,4 @@ ___clga:
     push    de
     push    af                          ; ret addr
     jp      asm_clga
-  ENDIF
+ENDIF

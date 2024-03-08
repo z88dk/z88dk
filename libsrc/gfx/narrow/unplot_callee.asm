@@ -1,7 +1,7 @@
 ; ----- void  unplot(int x, int y)
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  unplot_callee
@@ -25,16 +25,16 @@ _unplot_callee:
 
 asm_unplot:
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
-    call    respixel
-    IF  NEED_swapgfxbk
-    jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
-    pop     ix
-      ENDIF
-    ret
-    ENDIF
   ENDIF
+    call    respixel
+  IF    NEED_swapgfxbk
+    jp      __graphics_end
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
+    ENDIF
+    ret
+  ENDIF
+ENDIF

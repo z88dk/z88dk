@@ -17,7 +17,7 @@
 c_unplot:
 _c_unplot:
 ___c_unplot:
-  IF    __CPU_INTEL__|__CPU_GBZ80__
+IF  __CPU_INTEL__|__CPU_GBZ80__
     pop     bc
     pop     hl
     pop     de
@@ -25,22 +25,22 @@ ___c_unplot:
     push    hl
     push    bc
     ld      h, e
-  ELSE
+ELSE
     push    ix
     ld      ix, 2
     add     ix, sp
     ld      l, (ix+2)
     ld      h, (ix+4)
-  ENDIF
-  IF    NEED_swapgfxbk=1
+ENDIF
+IF  NEED_swapgfxbk=1
     call    swapgfxbk
-  ENDIF
+ENDIF
     call    c_respixel
-  IF    NEED_swapgfxbk
+IF  NEED_swapgfxbk
     jp      __graphics_end
-  ELSE
-    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+ELSE
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-    ENDIF
-    ret
   ENDIF
+    ret
+ENDIF

@@ -1,6 +1,6 @@
     INCLUDE "graphics/grafix.inc"
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  Line_r
 
@@ -381,4 +381,4 @@ bc1save:
     defw    0
 de1save:
     defw    0
-  ENDIF
+ENDIF

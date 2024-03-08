@@ -1,5 +1,5 @@
 ; void drawb(int tlx, int tly, int width, int height)
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  drawb
     PUBLIC  _drawb
@@ -27,4 +27,4 @@ ___drawb:
     push    af                          ; ret addr
 
     jp      asm_drawb
-  ENDIF
+ENDIF

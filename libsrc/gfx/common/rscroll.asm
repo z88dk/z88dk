@@ -1,6 +1,6 @@
 ; void rscroll(int x, int y, int width, int height, int pixels)
 
-  IF    !__CPU_GBZ80__&!__CPU_INTEL__
+IF  !__CPU_GBZ80__&!__CPU_INTEL__
 
     SECTION code_graphics
     PUBLIC  rscroll
@@ -23,4 +23,4 @@ ___rscroll:
     ld      h, (ix+10)
     pop     ix
     jp      scroll_right
-  ENDIF
+ENDIF

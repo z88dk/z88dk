@@ -1,7 +1,7 @@
 ; Usage: xorcircle(int x, int y, int radius, int skip);
 
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xorcircle_callee
@@ -32,16 +32,16 @@ _xorcircle_callee:
 asm_xorcircle:
     push    ix
     push    af
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     pop     af
     ld      ix, w_xorpixel
     call    w_draw_circle
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
+  ELSE
     pop     ix
     ret
-    ENDIF
   ENDIF
+ENDIF

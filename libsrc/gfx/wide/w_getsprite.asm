@@ -13,7 +13,7 @@
 ;
 
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION smc_clib
 
     PUBLIC  getsprite
@@ -58,9 +58,9 @@ getsprite_sub:
     dec     h
     ld      c, h                        ; keep copy of X position
 
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      b, (ix+0)                   ; x size (iloop)
     ld      d, (ix+1)                   ; y size (oloop)
 
@@ -134,12 +134,12 @@ noinc:
     dec     d
     jr      nz, oloop
 
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
+    ret
   ENDIF
+ENDIF

@@ -1,7 +1,7 @@
 ;Usage: xorclga(struct *pixels)
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xorclga_callee
@@ -30,17 +30,17 @@ _xorclga_callee:
 
 asm_xorclga:
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
-    call    xorclrarea
-    IF  NEED_swapgfxbk
-    jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
-    pop     ix
-      ENDIF
-    ret
-    ENDIF
-
   ENDIF
+    call    xorclrarea
+  IF    NEED_swapgfxbk
+    jp      __graphics_end
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
+    ENDIF
+    ret
+  ENDIF
+
+ENDIF

@@ -6,7 +6,7 @@
 ;    $Id: bksave.asm,v 1.7 2016-07-02 09:01:35 dom Exp $
 ;
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION smc_clib
     PUBLIC  bksave
     PUBLIC  _bksave
@@ -75,4 +75,4 @@ rloop:
     djnz    bksaves
     pop     ix
     ret
-  ENDIF
+ENDIF

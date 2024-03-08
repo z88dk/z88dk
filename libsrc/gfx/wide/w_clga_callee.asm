@@ -1,6 +1,6 @@
 ;Usage: clga(int tlx, int tly, int tlx2, int tly2)
 
-  IF    !__CPU_INTEL__
+IF  !__CPU_INTEL__
 
     SECTION code_graphics
 
@@ -32,18 +32,18 @@ _clga_callee:
 asm_clga:
 
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      ix, w_respixel
     call    w_area
 
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-      ENDIF
-    ret
     ENDIF
+    ret
   ENDIF
+ENDIF

@@ -1,7 +1,7 @@
 ; ----- void  unplot(int x, int y)
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  unplot
@@ -21,4 +21,4 @@ ___unplot:
     ld      h, e
     push    bc                          ; ret addr
     jp      asm_unplot
-  ENDIF
+ENDIF

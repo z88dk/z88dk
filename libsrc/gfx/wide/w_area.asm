@@ -10,7 +10,7 @@
 ;
 
 
-  IF    !__CPU_INTEL__
+IF  !__CPU_INTEL__
 
     SECTION code_graphics
     PUBLIC  w_area
@@ -65,4 +65,4 @@ p_RET1:
 
     ret
 
-  ENDIF
+ENDIF

@@ -13,7 +13,7 @@
 
     INCLUDE "graphics/grafix.inc"
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION smc_clib
     PUBLIC  stencil_render
     PUBLIC  _stencil_render
@@ -35,17 +35,17 @@ _stencil_render:
     ld      ix, 4
     add     ix, sp
 
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      bc, __graphics_end
     push    bc
 
-    IF  maxy<>256
+  IF    maxy<>256
     ld      c, maxy
-    ELSE
+  ELSE
     ld      c, 0
-    ENDIF
+  ENDIF
     push    bc
 yloop:
     pop     bc
@@ -63,13 +63,13 @@ yloop:
     ld      a, (hl)                     ;X1
 
 
-    IF  maxy<>256
+  IF    maxy<>256
     ld      e, maxy
     add     hl, de
-    ELSE
+  ELSE
     ld      e, 0
     inc     h
-    ENDIF
+  ENDIF
     cp      (hl)                        ; if x1>x2, return
     jr      nc, yloop
 
@@ -155,9 +155,9 @@ onebyte:
     ; Prepare an edge byte, basing on the byte mask in A
     ; and on the pattern being set in (pattern1+1)
 mask_pattern:
-    IF  BITS_reversed
+  IF    BITS_reversed
     xor     255
-    ENDIF
+  ENDIF
     ld      d, a                        ; keep a copy of mask
     and     (hl)                        ; mask data on screen
     ld      e, a                        ; save masked data
@@ -167,4 +167,4 @@ pattern1:
     and     0                           ; prepare fill pattern portion
     or      e                           ; mix with masked data
     ret
-  ENDIF
+ENDIF

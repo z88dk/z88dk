@@ -1,7 +1,7 @@
 ; ----- void  xorplot(int x, int y)
 
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xorplot
@@ -20,4 +20,4 @@ ___xorplot:
     push    de
     push    af
     jp      asm_xorplot
-  ENDIF
+ENDIF

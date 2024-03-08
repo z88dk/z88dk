@@ -1,6 +1,6 @@
 ;Usage: xorclga(struct *pixels)
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     SECTION code_graphics
 
@@ -22,4 +22,4 @@ ___xorclga:
     ld      h, (ix+8)
     pop     ix
     jp      asm_xorclga
-  ENDIF
+ENDIF

@@ -4,7 +4,7 @@
 ;      Stefano Bodrato 19/7/2007
 ; Usage: multipoint(int hv, int length, int x, int y)
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  multipoint
     PUBLIC  _multipoint
@@ -32,4 +32,4 @@ ___multipoint:
     push    de
     push    af                          ; ret addr
     jp      asm_multipoint
-  ENDIF
+ENDIF

@@ -1,5 +1,5 @@
 ; void xordrawb(int tlx, int tly, int width, int height)
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  xordrawb
     PUBLIC  _xordrawb
@@ -22,5 +22,5 @@ ___xordrawb:
     push    de
     push    af                          ; ret addr
     jp      asm_xordrawb
-  ENDIF
+ENDIF
 

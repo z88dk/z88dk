@@ -9,12 +9,12 @@
     defc    _getmaxy=getmaxy
 
 getmaxy:
-  IF    __CPU_GBZ80__
+IF  __CPU_GBZ80__
     ld      hl, __console_h
     ld      l, (hl)
-  ELSE
+ELSE
     ld      hl, (__console_h)
-  ENDIF
+ENDIF
     ld      h, 0
     ld      a, (__gfx_fatpix)
     and     a

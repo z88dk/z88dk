@@ -1,5 +1,5 @@
 ; void drawb(int tlx, int tly, int width, int height)
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  drawb_callee
@@ -32,11 +32,11 @@ _drawb_callee:
 asm_drawb:
 
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      ix, w_plotpixel
     call    drawbox
 
     jp      __graphics_end
-  ENDIF
+ENDIF

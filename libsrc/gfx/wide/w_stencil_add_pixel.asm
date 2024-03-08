@@ -19,7 +19,7 @@
 ;  af..dehl/.... different
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     INCLUDE "graphics/grafix.inc"
     SECTION code_graphics
     PUBLIC  stencil_add_pixel
@@ -88,4 +88,4 @@ noplot:
     SECTION bss_graphics
 stencil_ptr:
     defw    0
-  ENDIF
+ENDIF

@@ -1,7 +1,7 @@
 ; ----- void undrawto(int x, int y)
 
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  undrawto
     PUBLIC  _undrawto
@@ -18,4 +18,4 @@ ___undrawto:
     push    de
     push    af
     jp      asm_undrawto
-  ENDIF
+ENDIF

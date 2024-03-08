@@ -1,6 +1,6 @@
 ; void xordrawto(int x2, int y2);
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  xordrawto
     PUBLIC  _xordrawto
@@ -18,4 +18,4 @@ ___xordrawto:
     push    de
     push    bc
     jp      asm_xordrawto
-  ENDIF
+ENDIF

@@ -49,20 +49,20 @@ pointxy:
     ld      a, (hl)
     ld      c, a                        ; y/3
 
-  IF    !GFXTEXT3
+IF  !GFXTEXT3
     srl     b                           ; x/2
-  ENDIF
+ENDIF
     ld      hl, (base_graphics)
     ld      a, c
     ld      c, b                        ; !!
 
     and     a
 
-  IF    GFXTEXT3
+IF  GFXTEXT3
     ld      de, maxx
-  ELSE
+ELSE
     ld      de, maxx/2
-  ENDIF
+ENDIF
     sbc     hl, de
 
     jr      z, r_zero
@@ -85,11 +85,11 @@ r_zero:                                 ; hl = char address
     push    bc                          ; keep y/3
     ld      hl, textpixl
     ld      e, 0
-  IF    GFXTEXT3
+IF  GFXTEXT3
     ld      b, 8
-  ELSE
+ELSE
     ld      b, 64                       ; whole symbol table size
-  ENDIF
+ENDIF
 ckmap:
     cp      (hl)                        ; compare symbol with the one in map
     jr      z, chfound
@@ -119,23 +119,23 @@ chfound:
     jr      z, iszero
     bit     0, l
     jr      nz, is1
-  IF    !GFXTEXT3
+IF  !GFXTEXT3
     add     a, a
-  ENDIF
+ENDIF
     add     a, a
 is1:
-  IF    !GFXTEXT3
+IF  !GFXTEXT3
     add     a, a
-  ENDIF
+ENDIF
     add     a, a
 iszero:
 
-  IF    !GFXTEXT3
+IF  !GFXTEXT3
     bit     0, h
     jr      z, evenrow
     add     a, a                        ; move down the bit
 evenrow:
-  ENDIF
+ENDIF
 
     and     c
 

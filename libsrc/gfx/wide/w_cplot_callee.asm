@@ -24,13 +24,13 @@ _cplot_callee:
 asm_cplot:
     ld      a, c
     ld      (__gfx_color), a
-  IF    NEED_swapgfxbk=1
+IF  NEED_swapgfxbk=1
     call    swapgfxbk
-  ENDIF
+ENDIF
     call    w_cplotpixel
-  IF    NEED_swapgfxbk=1
+IF  NEED_swapgfxbk=1
     jp      swapgfxbk1
-  ELSE
+ELSE
     ret
-  ENDIF
+ENDIF
 

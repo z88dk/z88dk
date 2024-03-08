@@ -11,7 +11,7 @@
 ; $Id: w_putc4x6.asm $
 ;
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
 
@@ -75,9 +75,9 @@ nolower:
     ld      (chr), a
 
     push    ix
-    IF  NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
-    ENDIF
+  ENDIF
     ld      a, (chr)
     rra
 
@@ -167,12 +167,12 @@ lrloop:
     ld      (y_4x6), hl
     pop     hl
 
-    IF  NEED_swapgfxbk
+  IF    NEED_swapgfxbk
     jp      __graphics_end
-    ELSE
+  ELSE
     pop     ix
     ret
-    ENDIF
+  ENDIF
 do_nl:
     push    hl
     ld      hl, (y_4x6)
@@ -244,4 +244,4 @@ font4x5:
     defb    0x40, 0xA0, 0x00, 0x00, 0x0E
     defb    0x40, 0x26, 0x0A, 0x0A, 0x06
 
-  ENDIF
+ENDIF

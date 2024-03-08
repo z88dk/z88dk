@@ -1,6 +1,6 @@
 ; ----- void  plot(int x, int y)
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  plot
@@ -21,4 +21,4 @@ ___plot:
     ld      h, e
     push    af                          ; ret addr
     jp      asm_plot
-  ENDIF
+ENDIF

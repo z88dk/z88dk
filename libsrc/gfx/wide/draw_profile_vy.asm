@@ -16,7 +16,7 @@
 ;
 
 
-  IF    !__CPU_GBZ80__&&!__CPU_INTEL__
+IF  !__CPU_GBZ80__&&!__CPU_INTEL__
     INCLUDE "graphics/grafix.inc"
 
 
@@ -70,11 +70,11 @@ getx:
     ld      l, a
     call    l_mult
 
-    IF  ((maxx/(maxy+1))>1)
+  IF    ((maxx/(maxy+1))>1)
     ld      de, 25                      ; 50/2
-    ELSE
+  ELSE
     ld      de, 50
-    ENDIF
+  ENDIF
     jr      perc_div
 
 
@@ -602,4 +602,4 @@ _sp_space:
     defw    0
 _stencil:
     defw    0
-  ENDIF
+ENDIF

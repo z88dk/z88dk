@@ -10,7 +10,7 @@
 ;
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  drawb
@@ -33,4 +33,4 @@ ___drawb:
     pop     ix
 
     jp      asm_drawb
-  ENDIF
+ENDIF
