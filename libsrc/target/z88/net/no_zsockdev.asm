@@ -4,11 +4,11 @@
 ;
 ;	djm  7/2/2001
 
-        SECTION code_clib
-	PUBLIC	no_zsock
+    SECTION code_clib
+    PUBLIC  no_zsock
 
 
 
 
-.no_zsock
-	ret
+no_zsock:
+    ret

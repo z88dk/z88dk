@@ -13,27 +13,27 @@
 ;
 
 
-        SECTION code_clib
-	PUBLIC	ansi_del_line
+    SECTION code_clib
+    PUBLIC  ansi_del_line
 
 
-.ansi_del_line
-	push	af
-	ld	a,4
-	call $60C0
-	
-	pop af
-	call $60C0
+ansi_del_line:
+    push    af
+    ld      a, 4
+    call    $60C0
 
-	ld	a,0
-	call $60C0
+    pop     af
+    call    $60C0
 
-	ld b,40
-.dline	
-	push bc
-	ld a,' '
-	call $60C0
-	pop bc
-	djnz dline
+    ld      a, 0
+    call    $60C0
 
-	ret
+    ld      b, 40
+dline:
+    push    bc
+    ld      a, ' '
+    call    $60C0
+    pop     bc
+    djnz    dline
+
+    ret

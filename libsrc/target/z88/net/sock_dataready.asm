@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: sock_dataready
 
-        SECTION code_clib
-	PUBLIC	sock_dataready
-	PUBLIC	_sock_dataready
+    SECTION code_clib
+    PUBLIC  sock_dataready
+    PUBLIC  _sock_dataready
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.sock_dataready
-._sock_dataready
-	ld	a,r_sock_dataready
-	call_pkg(tcp_all)
-	ret	nc
+sock_dataready:
+_sock_dataready:
+    ld      a, r_sock_dataready
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,sock_dataready
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, sock_dataready
+    jp      no_zsock

@@ -5,23 +5,23 @@
 ; Used:  hl,bc,f
 ;
 
-	MODULE	code_clib
-	PUBLIC	conio_map_colour
+    MODULE  code_clib
+    PUBLIC  conio_map_colour
 
-	EXTERN	__CLIB_CONIO_NATIVE_COLOUR
+    EXTERN  __CLIB_CONIO_NATIVE_COLOUR
 
 conio_map_colour:
-        ld      c,__CLIB_CONIO_NATIVE_COLOUR
-        rr      c
-        ret     c
+    ld      c, __CLIB_CONIO_NATIVE_COLOUR
+    rr      c
+    ret     c
 
-	and	15
-	ld	c,a
-	ld	b,0
-	ld	hl,table_rgb
-	add	hl,bc
-	ld	a,(hl)
-	ret
+    and     15
+    ld      c, a
+    ld      b, 0
+    ld      hl, table_rgb
+    add     hl, bc
+    ld      a, (hl)
+    ret
 
 ; Nibble        Composite       RGB
 ;0      Black   Black
@@ -43,22 +43,22 @@ conio_map_colour:
 
 
 ; We'll go with the RGB table
-	SECTION	rodata_clib
+    SECTION rodata_clib
 table_rgb:
-        defb    $0	;BLACK -> BLACK
-	defb	$2	;BLUE -> BLUE
-	defb	$4	;GREEN -> GREEN
-	defb	$6	;CYAN -> CYAN
-	defb	$8	;RED -> RED
-	defb	$b	;MAGENTA -> MAGENTA
-	defb	$a	;BROWN -> PURPLE
-	defb	$e	;LIGHTGRAY -> OFF WHITE
-	defb	$1 	;DARKGRAY -> BLACK
-	defb	$3	;LIGHTBLUE -> LIGHT BLUE
-	defb	$5	;LIGHTGREEN -> BRIGHT GREEN
-	defb	$7	;LIGHTCYAN -> TURQUOISE
-	defb	$9	;LIGHTRED -> RED
-	defb	$3	;LIGHTMAGENTA -> MAGENTA
-	defb	$d	;YELLOW -> YELLOW
-	defb	$f	;WHITE -> BRIGH WHITE
+    defb    $0                          ;BLACK -> BLACK
+    defb    $2                          ;BLUE -> BLUE
+    defb    $4                          ;GREEN -> GREEN
+    defb    $6                          ;CYAN -> CYAN
+    defb    $8                          ;RED -> RED
+    defb    $b                          ;MAGENTA -> MAGENTA
+    defb    $a                          ;BROWN -> PURPLE
+    defb    $e                          ;LIGHTGRAY -> OFF WHITE
+    defb    $1                          ;DARKGRAY -> BLACK
+    defb    $3                          ;LIGHTBLUE -> LIGHT BLUE
+    defb    $5                          ;LIGHTGREEN -> BRIGHT GREEN
+    defb    $7                          ;LIGHTCYAN -> TURQUOISE
+    defb    $9                          ;LIGHTRED -> RED
+    defb    $3                          ;LIGHTMAGENTA -> MAGENTA
+    defb    $d                          ;YELLOW -> YELLOW
+    defb    $f                          ;WHITE -> BRIGH WHITE
 

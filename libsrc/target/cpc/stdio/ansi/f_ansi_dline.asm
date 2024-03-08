@@ -12,17 +12,17 @@
 ;
 
 
-        SECTION code_clib
-        PUBLIC	ansi_del_line
+    SECTION code_clib
+    PUBLIC  ansi_del_line
 
-        INCLUDE "target/cpc/def/cpcfirm.def"
+    INCLUDE "target/cpc/def/cpcfirm.def"
 
-.ansi_del_line
-        ld      a,$11
-        call    firmware
-        defw    txt_output
-        ld      a,$12
-        call    firmware
-        defw    txt_output
-        ret
+ansi_del_line:
+    ld      a, $11
+    call    firmware
+    defw    txt_output
+    ld      a, $12
+    call    firmware
+    defw    txt_output
+    ret
 

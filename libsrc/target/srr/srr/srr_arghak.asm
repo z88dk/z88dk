@@ -7,24 +7,24 @@
 ; VERY FIRST THING a function does
 ;
 
-SECTION code_clib
+    SECTION code_clib
 
-PUBLIC srr_arghak
-EXTERN srr_args
+    PUBLIC  srr_arghak
+    EXTERN  srr_args
 
 srr_arghak:
-    LD  DE,srr_args ;destination for block move in DE
-    LD  HL,4    ;pass over two return address
-    ADD HL,SP   ;source for block move in HL
+    LD      DE, srr_args                ;destination for block move in DE
+    LD      HL, 4                       ;pass over two return address
+    ADD     HL, SP                      ;source for block move in HL
 
-    LD  B,14    ;countdown in B
+    LD      B, 14                       ;countdown in B
 srr_arghk2:
-    LD  A,(HL)  ;copy loop
-    LD  (DE),A
-    INC HL
-    INC DE
-    DEC B
-    JP  NZ,srr_arghk2
+    LD      A, (HL)                     ;copy loop
+    LD      (DE), A
+    INC     HL
+    INC     DE
+    DEC     B
+    JP      NZ, srr_arghk2
 
     RET
 

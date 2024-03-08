@@ -8,21 +8,21 @@
 ;	$Id:
 ;
 
-        SECTION code_clib
-	PUBLIC	getk
-	PUBLIC	_getk
+    SECTION code_clib
+    PUBLIC  getk
+    PUBLIC  _getk
 
-.getk
-._getk
-	call $a22
+getk:
+_getk:
+    call    $a22
 
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
-.not_return
-ENDIF
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_return
+    ld      a, 10
+not_return:
+  ENDIF
 
-	ld h,0
-	ld l,a
-	ret
+    ld      h, 0
+    ld      l, a
+    ret

@@ -11,35 +11,35 @@
 
 ;Usage: xorclga(struct *pixels)
 
- 	SECTION code_graphics
-	
-	PUBLIC	xorclga_callee
-	PUBLIC	_xorclga_callee
-	
-	PUBLIC	asm_xorclga
+    SECTION code_graphics
 
-	EXTERN	w_area
+    PUBLIC  xorclga_callee
+    PUBLIC  _xorclga_callee
 
-	EXTERN	swapgfxbk
-	EXTERN	__graphics_end
+    PUBLIC  asm_xorclga
 
-	
-.xorclga_callee
-._xorclga_callee
+    EXTERN  w_area
 
-		pop af
-		
-		pop de
-		pop	hl
-		exx			; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
-		pop de
-		pop hl
-		
-		push af		; ret addr
-		
-		exx
-		
-.asm_xorclga
-		
-		ld	a,3
-		jp	w_area
+    EXTERN  swapgfxbk
+    EXTERN  __graphics_end
+
+
+xorclga_callee:
+_xorclga_callee:
+
+    pop     af
+
+    pop     de
+    pop     hl
+    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    pop     de
+    pop     hl
+
+    push    af                          ; ret addr
+
+    exx
+
+asm_xorclga:
+
+    ld      a, 3
+    jp      w_area

@@ -8,23 +8,23 @@
 ;	ZSock Lib function: device_online
 
 
-	SECTION code_clib
-	PUBLIC 	GoTCP
-	PUBLIC 	_GoTCP
+    SECTION code_clib
+    PUBLIC  GoTCP
+    PUBLIC  _GoTCP
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.GoTCP
-._GoTCP
-	call_pkg(tcp_GoTCP)
-	ret	nc
+GoTCP:
+_GoTCP:
+    call_pkg    (tcp_GoTCP)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,GoTCP
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, GoTCP
+    jp      no_zsock

@@ -13,14 +13,14 @@
 ;
 ;----------------------------------------------------------------
 
-	SECTION	  code_clib
-        PUBLIC    break_key
-        PUBLIC    _break_key
+    SECTION code_clib
+    PUBLIC  break_key
+    PUBLIC  _break_key
 
 break_key:
 _break_key:
-				call $1fcd
-				ld	hl,0	; assume break is not pressed
-                ret nz
-                inc l
-                ret
+    call    $1fcd
+    ld      hl, 0                       ; assume break is not pressed
+    ret     nz
+    inc     l
+    ret

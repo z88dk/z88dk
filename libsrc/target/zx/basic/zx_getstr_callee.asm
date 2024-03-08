@@ -1,84 +1,85 @@
-; 
-;	ZX Spectrum specific routines 
-;	by Stefano Bodrato, 22/06/2006 
+;
+;	ZX Spectrum specific routines
+;	by Stefano Bodrato, 22/06/2006
 ;	Fixed by Antonio Schifano, Dec 2008
 ;
-;	Copy a variable from basic 
+;	Copy a variable from basic
 ;
-;	int __CALLEE__ zx_getstr_callee(char variable, char *value); 
+;	int __CALLEE__ zx_getstr_callee(char variable, char *value);
 ;
 ;	Debugged version by Antonio Schifano, 29/12/2008
 ;
-;	$Id: zx_getstr_callee.asm $ 
+;	$Id: zx_getstr_callee.asm $
 ;
 
-SECTION code_clib
-PUBLIC	zx_getstr_callee
-PUBLIC	_zx_getstr_callee
-PUBLIC	asm_zx_getstr
-EXTERN	call_rom3
+    SECTION code_clib
+    PUBLIC  zx_getstr_callee
+    PUBLIC  _zx_getstr_callee
+    PUBLIC  asm_zx_getstr
+    EXTERN  call_rom3
 
 zx_getstr_callee:
 _zx_getstr_callee:
 
-	pop	bc
-	pop	hl
-	pop	de
-	push	bc
+    pop     bc
+    pop     hl
+    pop     de
+    push    bc
 
 ; enter : hl = char *value
 ;          e = char variable
 
-.asm_zx_getstr
+asm_zx_getstr:
 
-	ld	a,e
-	and	95
-	
-	ld	d,a
-	push	hl			; save destination
-	
-	ld	hl,($5c4b) 		; VARS
+    ld      a, e
+    and     95
 
-loop:	ld	a,(hl)
-	cp	128
-	jr	z,notfound		;  n.b. z => nc
+    ld      d, a
+    push    hl                          ; save destination
 
-	cp	d
-	jr	z,found
+    ld      hl, ($5c4b)                 ; VARS
 
-	push	de
-	call	call_rom3
-IF FORts2068
-	defw	$1720		; NEXT-ONE (find next variable)
-ELSE
-	defw	$19b8		; find next variable
-ENDIF
-	ex	de,hl
-	pop	de
-	jr	loop
+loop:
+    ld      a, (hl)
+    cp      128
+    jr      z, notfound                 ;  n.b. z => nc
 
-found:	
-	inc	hl
-	ld	c,(hl)
-	ld	a,c
-	inc	hl
-	ld	b,(hl)
-	or	b
-	inc	hl
+    cp      d
+    jr      z, found
 
-	pop	de
-	jr	z,zerolen
-	ldir
+    push    de
+    call    call_rom3
+  IF    FORts2068
+    defw    $1720                       ; NEXT-ONE (find next variable)
+  ELSE
+    defw    $19b8                       ; find next variable
+  ENDIF
+    ex      de, hl
+    pop     de
+    jr      loop
+
+found:
+    inc     hl
+    ld      c, (hl)
+    ld      a, c
+    inc     hl
+    ld      b, (hl)
+    or      b
+    inc     hl
+
+    pop     de
+    jr      z, zerolen
+    ldir
 zerolen:
-	xor	a
-	ld	(de),a
-	ld	h,a
-	ld	l,a
-	ret
-	
+    xor     a
+    ld      (de), a
+    ld      h, a
+    ld      l, a
+    ret
+
 notfound:
-	pop	hl
-	ld	hl,-1
-	ret
+    pop     hl
+    ld      hl, -1
+    ret
 
 

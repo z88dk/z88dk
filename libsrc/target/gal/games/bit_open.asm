@@ -8,13 +8,13 @@
 ;
 
     SECTION code_clib
-    PUBLIC     bit_open
-    PUBLIC     _bit_open
-    EXTERN     __snd_tick
+    PUBLIC  bit_open
+    PUBLIC  _bit_open
+    EXTERN  __snd_tick
 
-.bit_open
-._bit_open
-          ld   a,@10111000
-          ld   (__snd_tick),a
-          ld   (8248),a
-          ret
+bit_open:
+_bit_open:
+    ld      a, @10111000
+    ld      (__snd_tick), a
+    ld      (8248), a
+    ret

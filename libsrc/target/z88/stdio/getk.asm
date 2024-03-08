@@ -7,29 +7,29 @@
 ;	$Id: getk.asm,v 1.7 2016-04-29 20:35:11 dom Exp $
 ;
 
-                INCLUDE "stdio.def"
+    INCLUDE "stdio.def"
 
-		SECTION	  code_clib
+    SECTION code_clib
 
-                PUBLIC    getk    ;Read keys
-                PUBLIC    _getk    ;Read keys
-                EXTERN     getcmd
+    PUBLIC  getk                        ;Read keys
+    PUBLIC  _getk                       ;Read keys
+    EXTERN  getcmd
 
 
 
-.getk
-._getk
-        ld      bc,0
-        call_oz(os_tin)		;preserves ix
-        ld      hl,0
-        ret     c
-        and     a
-        jp      z,getcmd
-IF STANDARDESCAPECHARS
-        cp      13
-        jr      nz,not_nln
-        ld      a,10
-.not_nln
-ENDIF
-        ld      l,a
-        ret
+getk:
+_getk:
+    ld      bc, 0
+    call_oz (os_tin)                    ;preserves ix
+    ld      hl, 0
+    ret     c
+    and     a
+    jp      z, getcmd
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_nln
+    ld      a, 10
+not_nln:
+  ENDIF
+    ld      l, a
+    ret

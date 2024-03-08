@@ -1,33 +1,33 @@
 
-SECTION code_clib
+    SECTION code_clib
 
-INCLUDE "target/msx/def/msxdos2.def"
+    INCLUDE "target/msx/def/msxdos2.def"
 
-PUBLIC  setenv
-PUBLIC  _setenv
-PUBLIC  ___setenv
+    PUBLIC  setenv
+    PUBLIC  _setenv
+    PUBLIC  ___setenv
 
 
-EXTERN  MSXDOS
-EXTERN  msxdos_error
+    EXTERN  MSXDOS
+    EXTERN  msxdos_error
 
 setenv:
 _setenv:
 ___setenv:
-   pop af  ;ret
-   pop bc  ;overwrite flag
-   pop de ; value
-   pop hl ; arg
-   push hl
-   push de
-   push bc
-   push bc
-   ld c,_SENV
-   call MSXDOS
-   ld  hl,0
-   ld  (msxdos_error),a
-   and  a
-   ret  z
-   dec  hl
-   ret
-   
+    pop     af                          ;ret
+    pop     bc                          ;overwrite flag
+    pop     de                          ; value
+    pop     hl                          ; arg
+    push    hl
+    push    de
+    push    bc
+    push    bc
+    ld      c, _SENV
+    call    MSXDOS
+    ld      hl, 0
+    ld      (msxdos_error), a
+    and     a
+    ret     z
+    dec     hl
+    ret
+

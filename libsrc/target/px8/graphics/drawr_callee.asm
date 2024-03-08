@@ -10,25 +10,25 @@
 ;	$Id: drawr_callee.asm $
 ;
 
-	SECTION   code_graphics
+    SECTION code_graphics
 
-	PUBLIC    drawr_callee
-	PUBLIC    _drawr_callee
-	
-	PUBLIC    asm_drawr
+    PUBLIC  drawr_callee
+    PUBLIC  _drawr_callee
 
-	EXTERN    do_drawr
+    PUBLIC  asm_drawr
+
+    EXTERN  do_drawr
 
 
-.drawr_callee
-._drawr_callee	
-	pop	af	; ret addr
-	pop de	; y
-	pop hl	; x
-	push	af	; ret addr
-	
-.asm_drawr
-	ld		a,2
-	jp      do_drawr
+drawr_callee:
+_drawr_callee:
+    pop     af                          ; ret addr
+    pop     de                          ; y
+    pop     hl                          ; x
+    push    af                          ; ret addr
+
+asm_drawr:
+    ld      a, 2
+    jp      do_drawr
 
 

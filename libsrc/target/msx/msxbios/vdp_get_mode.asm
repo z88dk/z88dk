@@ -14,15 +14,15 @@
     PUBLIC  vdp_get_mode
     PUBLIC  _vdp_get_mode
 
-IF FORmsx
-        INCLUDE "target/msx/def/msxbasic.def"
-ELSE
-        INCLUDE "target/svi/def/svibasic.def"
-ENDIF
+  IF    FORmsx
+    INCLUDE "target/msx/def/msxbasic.def"
+  ELSE
+    INCLUDE "target/svi/def/svibasic.def"
+  ENDIF
 
 vdp_get_mode:
 _vdp_get_mode:
-    ld      a,(SCRMOD)
-    ld      h,0
-    ld      l,a
+    ld      a, (SCRMOD)
+    ld      h, 0
+    ld      l, a
     ret

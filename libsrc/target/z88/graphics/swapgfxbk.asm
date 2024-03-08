@@ -13,35 +13,35 @@
 ;	$Id: swapgfxbk.asm,v 1.8 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
-		SECTION   code_clib
-                PUBLIC    swapgfxbk
-                PUBLIC    _swapgfxbk
+    SECTION code_clib
+    PUBLIC  swapgfxbk
+    PUBLIC  _swapgfxbk
 
-                EXTERN    gfx_bank
-		EXTERN	  z88_map_bank
+    EXTERN  gfx_bank
+    EXTERN  z88_map_bank
 
-		PUBLIC	swapgfxbk1
-      PUBLIC   _swapgfxbk1
+    PUBLIC  swapgfxbk1
+    PUBLIC  _swapgfxbk1
 
 
-		INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-.swapgfxbk
-._swapgfxbk
-.swapgfxbk1
-._swapgfxbk1
-                push    hl
-                push    de
-                ld      hl,z88_map_bank       ;$4Dx
-                ld      e,(hl)
-                ld      a,(gfx_bank)    ;in crt0
-                ld      (hl),a
-                out     (z88_map_bank-$400),a
-                ld      a,e
-                ld      (gfx_bank),a
-                pop     de
-                pop     hl
-                ret
+swapgfxbk:
+_swapgfxbk:
+swapgfxbk1:
+_swapgfxbk1:
+    push    hl
+    push    de
+    ld      hl, z88_map_bank            ;$4Dx
+    ld      e, (hl)
+    ld      a, (gfx_bank)               ;in crt0
+    ld      (hl), a
+    out     (z88_map_bank-$400), a
+    ld      a, e
+    ld      (gfx_bank), a
+    pop     de
+    pop     hl
+    ret
 
 
 

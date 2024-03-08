@@ -1,9 +1,9 @@
-; 
-;	ZX Spectrum ZXMMC specific routines 
+;
+;	ZX Spectrum ZXMMC specific routines
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;
-;	$Id: mmc_wait_response.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
+;	$Id: mmc_wait_response.asm,v 1.3 2016-06-10 21:28:03 dom Exp $
 ;
 ;
 ;-----------------------------------------------------------------------------------------
@@ -25,27 +25,27 @@
 ;-----------------------------------------------------------------------------------------
 ;
 
-	SECTION code_clib
-	PUBLIC	mmc_wait_response
-	PUBLIC	_mmc_wait_response
+    SECTION code_clib
+    PUBLIC  mmc_wait_response
+    PUBLIC  _mmc_wait_response
 
-	INCLUDE "target/zx/def/zxmmc.def"
-	
+    INCLUDE "target/zx/def/zxmmc.def"
+
 
 
 mmc_wait_response:
 _mmc_wait_response:
-	push bc
-	ld bc,50		; retry counter
+    push    bc
+    ld      bc, 50                      ; retry counter
 l_response:
-	in a,(SPI_PORT)		; reads a byte from MMC
-	cp $FF			; $FF = no card data line activity
-	jr nz,resp_ok
-	djnz l_response
-	dec c
-	jr nz,l_response
+    in      a, (SPI_PORT)               ; reads a byte from MMC
+    cp      $FF                         ; $FF = no card data line activity
+    jr      nz, resp_ok
+    djnz    l_response
+    dec     c
+    jr      nz, l_response
 resp_ok:
-	pop bc
-	ld	h,0
-	ld	l,a
-	ret
+    pop     bc
+    ld      h, 0
+    ld      l, a
+    ret

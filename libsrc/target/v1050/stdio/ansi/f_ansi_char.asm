@@ -12,11 +12,11 @@
 ;	$Id: f_ansi_char.asm $
 ;
 
-        SECTION  code_clib
+    SECTION code_clib
 
-	PUBLIC	ansi_CHAR
-	EXTERN	generic_console_printc
+    PUBLIC  ansi_CHAR
+    EXTERN  generic_console_printc
 
 
-.ansi_CHAR
-		jp generic_console_printc
+ansi_CHAR:
+    jp      generic_console_printc

@@ -11,36 +11,36 @@
 
 ;Usage: fillb(struct *pixels)
 
- 	SECTION code_graphics
-	
-	PUBLIC	fillb_callee
-	PUBLIC	_fillb_callee
-	
-	PUBLIC	asm_fillb
+    SECTION code_graphics
 
-	EXTERN	w_area
+    PUBLIC  fillb_callee
+    PUBLIC  _fillb_callee
 
-	EXTERN	swapgfxbk
-	EXTERN	__graphics_end
+    PUBLIC  asm_fillb
 
-	
-.fillb_callee
-._fillb_callee
+    EXTERN  w_area
 
-		pop af
-		
-		pop de
-		pop	hl
-		exx			; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
-		pop de
-		pop hl
-		
-		push af		; ret addr
-		
-		exx
-		
-.asm_fillb
-		
-		ld	a,2
-		jp	w_area
+    EXTERN  swapgfxbk
+    EXTERN  __graphics_end
+
+
+fillb_callee:
+_fillb_callee:
+
+    pop     af
+
+    pop     de
+    pop     hl
+    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    pop     de
+    pop     hl
+
+    push    af                          ; ret addr
+
+    exx
+
+asm_fillb:
+
+    ld      a, 2
+    jp      w_area
 

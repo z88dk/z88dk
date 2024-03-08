@@ -5,11 +5,11 @@
 ;
 
 
-        SECTION   code_graphics
-		
-		PUBLIC    w_pixeladdress
+    SECTION code_graphics
 
-		INCLUDE "graphics/grafix.inc"
+    PUBLIC  w_pixeladdress
+
+    INCLUDE "graphics/grafix.inc"
 
 
 ;
@@ -31,38 +31,38 @@
 ;  afbcde../.... different
 ;
 
-.w_pixeladdress
-	push bc
-	ex	de,hl		; hl=y
-	add hl,hl
-	ld  bc,0B600h   ;RAM Scroller area
-	add hl,bc
-	ld  a,(hl)
-	inc hl
-	ld  h,(hl)
-	ld  l,a			; hl = roller ram value
-	add hl,hl
-	and 00000111b
-	ld  c,a
-	ld  a,l
-	and 11110000b
-	or  c
-	ld  l,a			; hl = screen ram Y address
+w_pixeladdress:
+    push    bc
+    ex      de, hl                      ; hl=y
+    add     hl, hl
+    ld      bc, 0B600h                  ;RAM Scroller area
+    add     hl, bc
+    ld      a, (hl)
+    inc     hl
+    ld      h, (hl)
+    ld      l, a                        ; hl = roller ram value
+    add     hl, hl
+    and     00000111b
+    ld      c, a
+    ld      a, l
+    and     11110000b
+    or      c
+    ld      l, a                        ; hl = screen ram Y address
 
-	ld  a,e		; x
-	ld  c,a
-	and 11111000b
-	ld  e,a
-	add hl,de		; hl = screen ram X,Y address
-	
-	ld	d,h
-	ld	e,l
+    ld      a, e                        ; x
+    ld      c, a
+    and     11111000b
+    ld      e, a
+    add     hl, de                      ; hl = screen ram X,Y address
 
-	ld  a,c
-	and 00000111b
-	pop bc
+    ld      d, h
+    ld      e, l
+
+    ld      a, c
+    and     00000111b
+    pop     bc
 
 ; z88dk has its own way to deal with pixels
-	xor 7
-	ret
-        
+    xor     7
+    ret
+

@@ -6,13 +6,13 @@
 ;
 
     SECTION code_clib
-    PUBLIC     beeper
-    PUBLIC     _beeper
+    PUBLIC  beeper
+    PUBLIC  _beeper
 
-    INCLUDE  "games/games.inc"
+    INCLUDE "games/games.inc"
 
-    EXTERN      bit_open_di
-    EXTERN      bit_close_ei
+    EXTERN  bit_open_di
+    EXTERN  bit_close_ei
 
 ;
 ; Ported by Dominic Morris
@@ -51,65 +51,66 @@
 ;         DE = 1308 - 1 = 0x051B
 ;
 ; The resulting waveform has a duty ratio of exactly 50%.
-; 
+;
 ; ----------------------------------------------------------------
 
 
-.beeper
-._beeper
-	push	ix	;save callers
-          ld   a,l
-          srl  l
-          srl  l
-          cpl
-          and  3
-          ld   c,a
-          ld   b,0
-          ld   ix,beixp3
-          add  ix,bc
-          call bit_open_di
+beeper:
+_beeper:
+    push    ix                          ;save callers
+    ld      a, l
+    srl     l
+    srl     l
+    cpl
+    and     3
+    ld      c, a
+    ld      b, 0
+    ld      ix, beixp3
+    add     ix, bc
+    call    bit_open_di
 
-.beixp3
-          nop
-          nop
-          nop
-          inc  b
-          inc  c
-.behllp   dec  c
-          jr   nz,behllp
-          ld   c,$3F
-          dec  b
-          jp   nz,behllp
+beixp3:
+    nop
+    nop
+    nop
+    inc     b
+    inc     c
+behllp:
+    dec     c
+    jr      nz, behllp
+    ld      c, $3F
+    dec     b
+    jp      nz, behllp
 
-          xor  SOUND_ONEBIT_mask
+    xor     SOUND_ONEBIT_mask
 
 ;-----
-          out  (255),a
-          jp   z,isz
+    out     (255), a
+    jp      z, isz
 
-          ld   b,a
-          in   a,(254)
-          ld   a,b
-.isz
+    ld      b, a
+    in      a, (254)
+    ld      a, b
+isz:
 ;-----
 
-          ld   b,h
-          ld   c,a
-          bit  SOUND_ONEBIT_bit,a            ;if o/p go again!
-          jr   nz,be_again
+    ld      b, h
+    ld      c, a
+    bit     SOUND_ONEBIT_bit, a         ;if o/p go again!
+    jr      nz, be_again
 
-          ld   a,d
-          or   e
-          jr   z,be_end
-          ld   a,c
-          ld   c,l
-          dec  de
-          jp   (ix)
-.be_again
-          ld   c,l
-          inc  c
-          jp   (ix)
-.be_end
-	  pop	ix		;restore callers
-          jp   bit_close_ei
+    ld      a, d
+    or      e
+    jr      z, be_end
+    ld      a, c
+    ld      c, l
+    dec     de
+    jp      (ix)
+be_again:
+    ld      c, l
+    inc     c
+    jp      (ix)
+be_end:
+    pop     ix                          ;restore callers
+    jp      bit_close_ei
 

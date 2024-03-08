@@ -44,7 +44,7 @@
     PUBLIC  _hcca_write_wait_finished
     PUBLIC  hcca_read_wait_finished
     PUBLIC  _hcca_read_wait_finished
-    
+
     PUBLIC  hcca_read_byte
     PUBLIC  _hcca_read_byte
     PUBLIC  hcca_readByte
@@ -64,18 +64,18 @@ hcca_write_byte:
 _hcca_write_byte:
 hcca_writeByte:
 _hcca_writeByte:
-    ld      hl,2
-    add     hl,sp
-    ld      a,(hl)
+    ld      hl, 2
+    add     hl, sp
+    ld      a, (hl)
 ; Entry: a = byte to write
 ; Uses: dehl
 asm_write_byte:
-    ld      de,(__nabu_hcca_txcount)
-    ld      hl,__nabu_hcca_txbuf
-    add     hl,de
-    ld      (hl),a
+    ld      de, (__nabu_hcca_txcount)
+    ld      hl, __nabu_hcca_txbuf
+    add     hl, de
+    ld      (hl), a
     inc     de
-    ld      (__nabu_hcca_txcount),de
+    ld      (__nabu_hcca_txcount), de
     ret
 
 ;
@@ -88,11 +88,11 @@ asm_write_byte:
 hcca_reset_write:
 _hcca_reset_write:
     di
-    ld      hl,__nabu_hcca_txbuf
-    ld      (__nabu_hcca_txpos),hl
-    ld      hl,0
-    ld      (__nabu_hcca_txcount),hl
-    ld      l,INT_MASK_HCCATX
+    ld      hl, __nabu_hcca_txbuf
+    ld      (__nabu_hcca_txpos), hl
+    ld      hl, 0
+    ld      (__nabu_hcca_txcount), hl
+    ld      l, INT_MASK_HCCATX
     call    nabu_disable_interrupt
     ei
     ret
@@ -114,46 +114,46 @@ _hcca_reset_write:
 hcca_start_write:
 _hcca_start_write:
     di
-    ld      hl,2
-    add     hl,sp
-    ld      e,(hl)
+    ld      hl, 2
+    add     hl, sp
+    ld      e, (hl)
     inc     hl
-    ld      d,(hl)
+    ld      d, (hl)
     inc     hl
-    ld      (__nabu_hcca_write_blocklen),de
-    ld      e,(hl)
+    ld      (__nabu_hcca_write_blocklen), de
+    ld      e, (hl)
     inc     hl
-    ld      d,(hl)
+    ld      d, (hl)
     inc     hl
-    ld      (__nabu_hcca_write_block),de
-    ld      a,(hl)
-    ld      (__nabu_hcca_txmode),a
+    ld      (__nabu_hcca_write_block), de
+    ld      a, (hl)
+    ld      (__nabu_hcca_txmode), a
     xor     a
-    ld      (__nabu_hcca_txfinished),a
-    ld      a,i
-    ld      h,a
-    ld      l,2
-    ld      de,hcca_write_int
-    ld      (hl),e
+    ld      (__nabu_hcca_txfinished), a
+    ld      a, i
+    ld      h, a
+    ld      l, 2
+    ld      de, hcca_write_int
+    ld      (hl), e
     inc     hl
-    ld      (hl),d
-    ld      l,INT_MASK_HCCATX
+    ld      (hl), d
+    ld      l, INT_MASK_HCCATX
     call    nabu_enable_interrupt
     ei
     ret
 
 hcca_write_wait_finished:
 _hcca_write_wait_finished:
-    ld      a,(__nabu_hcca_txfinished)
+    ld      a, (__nabu_hcca_txfinished)
     and     a
-    jr      z,hcca_write_wait_finished
+    jr      z, hcca_write_wait_finished
     ret
 
 hcca_read_wait_finished:
 _hcca_read_wait_finished:
-    ld      a,(__nabu_hcca_rxfinished)
+    ld      a, (__nabu_hcca_rxfinished)
     and     a
-    jr      z,hcca_read_wait_finished
+    jr      z, hcca_read_wait_finished
     ret
 
 ;
@@ -165,34 +165,34 @@ _hcca_read_wait_finished:
 hcca_write_int:
     push    af
     push    hl
-    ld      hl,(__nabu_hcca_txpos)
-    ld      a,(hl)
-    out     (IO_HCCA),a
+    ld      hl, (__nabu_hcca_txpos)
+    ld      a, (hl)
+    out     (IO_HCCA), a
     inc     hl
-    ld      (__nabu_hcca_txpos),hl
-    ld      hl,(__nabu_hcca_txcount)
+    ld      (__nabu_hcca_txpos), hl
+    ld      hl, (__nabu_hcca_txcount)
     dec     hl
-    ld      (__nabu_hcca_txcount),hl
-    ld      a,h
+    ld      (__nabu_hcca_txcount), hl
+    ld      a, h
     or      l
-    jr      nz,not_finished_tx
-    ; Finished writing that segment 
-    ld      a,(__nabu_hcca_txmode)
+    jr      nz, not_finished_tx
+    ; Finished writing that segment
+    ld      a, (__nabu_hcca_txmode)
     and     a
-    jr      nz,finished_writing
+    jr      nz, finished_writing
     inc     a
-    ld      (__nabu_hcca_txmode),a
-    ld      hl,(__nabu_hcca_write_block)
-    ld      (__nabu_hcca_txpos),hl
-    ld      hl,(__nabu_hcca_write_blocklen)
-    ld      (__nabu_hcca_txcount),hl
+    ld      (__nabu_hcca_txmode), a
+    ld      hl, (__nabu_hcca_write_block)
+    ld      (__nabu_hcca_txpos), hl
+    ld      hl, (__nabu_hcca_write_blocklen)
+    ld      (__nabu_hcca_txcount), hl
     jr      not_finished_tx
 
 finished_writing:
     ; Signal that we've finished writing
-    ld      (__nabu_hcca_txfinished),a      ;a != 0
+    ld      (__nabu_hcca_txfinished), a ;a != 0
     ; Finished writing, disable the interrupt
-    ld      l,INT_MASK_HCCATX
+    ld      l, INT_MASK_HCCATX
     call    nabu_disable_interrupt
 not_finished_tx:
     pop     hl
@@ -216,58 +216,58 @@ not_finished_tx:
 hcca_start_read:
 _hcca_start_read:
     di
-    ld      hl,2
-    add     hl,sp
-    ld      e,(hl)
+    ld      hl, 2
+    add     hl, sp
+    ld      e, (hl)
     inc     hl
-    ld      d,(hl)
+    ld      d, (hl)
     inc     hl
-    ld      (__nabu_hcca_read_block),de
-    ld      e,(hl)
+    ld      (__nabu_hcca_read_block), de
+    ld      e, (hl)
     inc     hl
-    ld      d,(hl)
+    ld      d, (hl)
     inc     hl
-    ld      (__nabu_hcca_read_blocklen),de
-    ld      a,(hl)
-    ld      (__nabu_hcca_rxmode),a
+    ld      (__nabu_hcca_read_blocklen), de
+    ld      a, (hl)
+    ld      (__nabu_hcca_rxmode), a
     ; 255 = ring buffer
     ; 0 = header
     ; 1 = block
     cp      255
-    jr      z,setup_read_rb
+    jr      z, setup_read_rb
     and     a
-    jr      z,setup_read_header
+    jr      z, setup_read_header
 
     ; Must be reading a block to memory
-    ld      hl,(__nabu_hcca_read_block)
-    ld      (__nabu_hcca_rxpos),hl
-    ld      hl,(__nabu_hcca_read_blocklen)
-    ld      (__nabu_hcca_rxcount),hl
+    ld      hl, (__nabu_hcca_read_block)
+    ld      (__nabu_hcca_rxpos), hl
+    ld      hl, (__nabu_hcca_read_blocklen)
+    ld      (__nabu_hcca_rxcount), hl
     jr      setup_read_int
 
 setup_read_header:
-    ld      hl,__nabu_hcca_rxheader
-    ld      (__nabu_hcca_rxpos),hl
-    ld      hl,3
-    ld      (__nabu_hcca_rxcount),hl
+    ld      hl, __nabu_hcca_rxheader
+    ld      (__nabu_hcca_rxpos), hl
+    ld      hl, 3
+    ld      (__nabu_hcca_rxcount), hl
     jr      setup_read_int
 
 
 setup_read_rb:
-    ld      hl,0
-    ld      (__nabu_hcca_rxpos),hl
-    ld      (__nabu_hcca_rxrpos),hl
+    ld      hl, 0
+    ld      (__nabu_hcca_rxpos), hl
+    ld      (__nabu_hcca_rxrpos), hl
 
-    
+
 setup_read_int:
-    ld      a,i
-    ld      h,a
-    ld      l,0
-    ld      de,hcca_read_int
-    ld      (hl),e
+    ld      a, i
+    ld      h, a
+    ld      l, 0
+    ld      de, hcca_read_int
+    ld      (hl), e
     inc     hl
-    ld      (hl),d
-    ld      l,INT_MASK_HCCARX
+    ld      (hl), d
+    ld      l, INT_MASK_HCCARX
     call    nabu_enable_interrupt
     ei
     ret
@@ -281,22 +281,22 @@ hcca_read_byte:
 _hcca_read_byte:
 hcca_readByte:
 _hcca_readByte:
-    ld      hl,(__nabu_hcca_rxpos)
-    ld      de,(__nabu_hcca_rxrpos)
+    ld      hl, (__nabu_hcca_rxpos)
+    ld      de, (__nabu_hcca_rxrpos)
     and     a
-    sbc     hl,de
-    ld      a,h
+    sbc     hl, de
+    ld      a, h
     or      l
-    jr      z,hcca_read_byte
-    ld      hl,__nabu_hcca_rxbuf
-    add     hl,de
-    ld      l,(hl)
-    ld      h,0
+    jr      z, hcca_read_byte
+    ld      hl, __nabu_hcca_rxbuf
+    add     hl, de
+    ld      l, (hl)
+    ld      h, 0
     inc     de
-    ld      a,d
-    and     +((CLIB_RXBUF_SIZE -1) / 256)
-    ld      d,a
-    ld      (__nabu_hcca_rxrpos),de
+    ld      a, d
+    and     +((CLIB_RXBUF_SIZE-1)/256)
+    ld      d, a
+    ld      (__nabu_hcca_rxrpos), de
     ret
 
 ead_mode:
@@ -307,47 +307,47 @@ hcca_read_int:
     push    af
     push    de
     push    hl
-    ld      a,(__nabu_hcca_rxmode)
+    ld      a, (__nabu_hcca_rxmode)
     inc     a
-    jp      z,hcca_read_ringbuf
+    jp      z, hcca_read_ringbuf
 
     ; We're now in the "zero-copy"/headed reading code
-    ld      hl,(__nabu_hcca_rxpos)
-    in      a,(IO_HCCA)
-    ld      (hl),a
+    ld      hl, (__nabu_hcca_rxpos)
+    in      a, (IO_HCCA)
+    ld      (hl), a
     inc     hl
-    ld      (__nabu_hcca_rxpos),hl
-    ld      hl,(__nabu_hcca_rxcount)
+    ld      (__nabu_hcca_rxpos), hl
+    ld      hl, (__nabu_hcca_rxcount)
     dec     hl
-    ld      (__nabu_hcca_rxcount),hl
-    ld      a,h
+    ld      (__nabu_hcca_rxcount), hl
+    ld      a, h
     or      l
-    jr      nz,continue_reading
+    jr      nz, continue_reading
 
     ; We've read everything in this block, what do we do next?
-    ld      a,(__nabu_hcca_rxmode)
+    ld      a, (__nabu_hcca_rxmode)
     and     a
-    jr      nz,signal_block_read
+    jr      nz, signal_block_read
     inc     a
-    ld      (__nabu_hcca_rxmode),a
-    ld      hl,(__nabu_hcca_rxheader+1)
-    ld      (__nabu_hcca_rxcount),hl
-    ld      hl,(__nabu_hcca_read_block)
-    ld      (__nabu_hcca_rxpos),hl
+    ld      (__nabu_hcca_rxmode), a
+    ld      hl, (__nabu_hcca_rxheader+1)
+    ld      (__nabu_hcca_rxcount), hl
+    ld      hl, (__nabu_hcca_read_block)
+    ld      (__nabu_hcca_rxpos), hl
     jr      continue_reading
 
 signal_block_read:
-    ld      (__nabu_hcca_rxfinished),a        ; a != 0
+    ld      (__nabu_hcca_rxfinished), a ; a != 0
 
     ; Reset reading variables
     xor     a
-    ld      (__nabu_hcca_rxmode),a
-    ld      hl,3
-    ld      (__nabu_hcca_rxcount),hl
-    ld      hl,__nabu_hcca_rxheader
-    ld      (__nabu_hcca_rxpos),hl
+    ld      (__nabu_hcca_rxmode), a
+    ld      hl, 3
+    ld      (__nabu_hcca_rxcount), hl
+    ld      hl, __nabu_hcca_rxheader
+    ld      (__nabu_hcca_rxpos), hl
 
-    ld      l,INT_MASK_HCCARX
+    ld      l, INT_MASK_HCCARX
     call    nabu_disable_interrupt
 
 
@@ -360,18 +360,18 @@ continue_reading:
 
 
 hcca_read_ringbuf:
-    ld      hl,(__nabu_hcca_rxpos)
-    ld      de,__nabu_hcca_rxbuf
-    ex      de,hl
-    add     hl,de
-    in      a,(IO_HCCA)
-    ld      (hl),a
-    ex      de,hl
+    ld      hl, (__nabu_hcca_rxpos)
+    ld      de, __nabu_hcca_rxbuf
+    ex      de, hl
+    add     hl, de
+    in      a, (IO_HCCA)
+    ld      (hl), a
+    ex      de, hl
     inc     hl
-    ld      a,h
-    and     +((CLIB_RXBUF_SIZE-1) / 256)
-    ld      h,a
-    ld      (__nabu_hcca_rxpos),hl
+    ld      a, h
+    and     +((CLIB_RXBUF_SIZE-1)/256)
+    ld      h, a
+    ld      (__nabu_hcca_rxpos), hl
     pop     hl
     pop     de
     pop     af
@@ -379,4 +379,4 @@ hcca_read_ringbuf:
     ret
 
 
- 
+

@@ -13,23 +13,23 @@
 ;
 ;	$Id: fputc_cons.asm,v 1.3 2016-05-15 20:15:46 dom Exp $
 ;
-	SECTION code_clib
-	PUBLIC	fputc_cons_native
-	EXTERN	rcmx000_cnvtab
+    SECTION code_clib
+    PUBLIC  fputc_cons_native
+    EXTERN  rcmx000_cnvtab
 
-	EXTERN __sendchar
-			
-.fputc_cons_native
+    EXTERN  __sendchar
+
+fputc_cons_native:
 	; extern int __LIB__ fputc(int c, FILE *fp);
 
 	; int c is in register BC (i.e. C)
 	; We ignore FILE* fp (in DE) for now
 
-	ld a,c
-		
-	call __sendchar
-	
-	ld hl,0	
+    ld      a, c
 
-	ret
+    call    __sendchar
+
+    ld      hl, 0
+
+    ret
 

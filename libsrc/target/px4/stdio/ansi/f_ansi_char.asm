@@ -4,7 +4,7 @@
 ;
 ; 	Handles Attributes INVERSE + UNDERLINED
 ;
-;	** alternate (smaller) 4bit font capability: 
+;	** alternate (smaller) 4bit font capability:
 ;	** use the PACKEDFONT flag
 ;
 ;	set it up with:
@@ -21,19 +21,19 @@
 ;
 
 
-        SECTION code_clib
-	PUBLIC	ansi_CHAR
-	
-	EXTERN	__console_y
-	EXTERN	__console_x
-	
-	EXTERN	ansicharacter_pixelwidth
-	EXTERN	ansifont_is_packed
-	EXTERN	ansifont
-	
+    SECTION code_clib
+    PUBLIC  ansi_CHAR
+
+    EXTERN  __console_y
+    EXTERN  __console_x
+
+    EXTERN  ansicharacter_pixelwidth
+    EXTERN  ansifont_is_packed
+    EXTERN  ansifont
+
 ; Dirty thing for self modifying code
-	PUBLIC	INVRS
-	PUBLIC	BOLD
+    PUBLIC  INVRS
+    PUBLIC  BOLD
 
 
 ; -pragma-need=ansiterminal -pragma-define:ansipixels=240 -pragma-define:ansicolumns=xx
@@ -47,165 +47,165 @@
 
 
 
-.ansi_CHAR
-  	ld (char+1),a
+ansi_CHAR:
+    ld      (char+1), a
 
-  	ld  hl,$e000
+    ld      hl, $e000
 
-	ld	a,(__console_y)
+    ld      a, (__console_y)
 
-	and	a
-	jr	z,ZROW
-	add	a,a
-	add	a,a
-	add	a,a
-	ld	b,a	; b=a*8  (8 is the font height)
-	ld	de,32	; row_bytes
-.Rloop
-	add	hl,de
-	djnz	Rloop
-.ZROW
+    and     a
+    jr      z, ZROW
+    add     a, a
+    add     a, a
+    add     a, a
+    ld      b, a                        ; b=a*8  (8 is the font height)
+    ld      de, 32                      ; row_bytes
+Rloop:
+    add     hl, de
+    djnz    Rloop
+ZROW:
 
-  ld (RIGA+1),hl	; RIGA+1=ROW Location
-  ld hl,DOTS+1
-  ld b,(hl)		; b=DOTS
+    ld      (RIGA+1), hl                ; RIGA+1=ROW Location
+    ld      hl, DOTS+1
+    ld      b, (hl)                     ; b=DOTS
 
-  ld hl,0
+    ld      hl, 0
 
-  ld a,(__console_x)       ; Column text position
-  ld e,a
-  ld d,0
-  or d
-  jr z,ZCL
+    ld      a, (__console_x)            ; Column text position
+    ld      e, a
+    ld      d, 0
+    or      d
+    jr      z, ZCL
 
-.LP
-  add hl,de
-  djnz LP
-
-
-  ld b,3
-.LDIV
-  srl h
-  rr l
-  rra
-  djnz LDIV
+LP:
+    add     hl, de
+    djnz    LP
 
 
-  ld b,5
-.RGTA
-  srl a
-  djnz RGTA
-  
-.ZCL
-  ld (PRE+1),a
-  ld e,a
-  ld a,(DOTS+1)
-  add a,e
-  ld e,a
-  ld a,16
-  sub e
-.NOC
-  ld (POST+1),a
-.RIGA
-  ld de,0	; ROW  Location on screen
-  add hl,de
-  push hl
-  pop ix
+    ld      b, 3
+LDIV:
+    srl     h
+    rr      l
+    rra
+    djnz    LDIV
 
-.char
-  ld b,'A'      ; Put here the character to be printed
-  
-  ld a,ansifont_is_packed
-  ld	hl,ansifont	- 256
-  and	a
-  jr    z,got_font_location
 
-  xor	a
-  rr	b
-  jr	c,even
-  ld	a,4
-.even
-  ld	(ROLL+1),a
-  ld hl,ansifont - 128
+    ld      b, 5
+RGTA:
+    srl     a
+    djnz    RGTA
 
-.got_font_location
+ZCL:
+    ld      (PRE+1), a
+    ld      e, a
+    ld      a, (DOTS+1)
+    add     a, e
+    ld      e, a
+    ld      a, 16
+    sub     e
+NOC:
+    ld      (POST+1), a
+RIGA:
+    ld      de, 0                       ; ROW  Location on screen
+    add     hl, de
+    push    hl
+    pop     ix
 
-  ld de,8
+char:
+    ld      b, 'A'                      ; Put here the character to be printed
 
-.LFONT
-  add hl,de
-  djnz LFONT
+    ld      a, ansifont_is_packed
+    ld      hl, ansifont-256
+    and     a
+    jr      z, got_font_location
 
-  ld de,32      ; ROW Lenght (in bytes)
-  
-  ld c,8
-.PRE
+    xor     a
+    rr      b
+    jr      c, even
+    ld      a, 4
+even:
+    ld      (ROLL+1), a
+    ld      hl, ansifont-128
 
-  ld b,4
-  rl (ix+1)
-  rl (ix+0)
-  inc b
-  dec b
-  jr z,DTS
-.L1
-  rl (ix+1)
-  rl (ix+0)
-  djnz L1
-.DTS
-  
-  ld a,(hl)
-.BOLD
-  nop	;	rla
-  nop	;	or (hl)
-  ld b,a
-  ld a,ansifont_is_packed
-  and  a
-  ld a,b
-  jr   z,INVRS
+got_font_location:
 
-.ROLL
-  jr INVRS
-  rla
-  rla
-  rla
-  rla
+    ld      de, 8
+
+LFONT:
+    add     hl, de
+    djnz    LFONT
+
+    ld      de, 32                      ; ROW Lenght (in bytes)
+
+    ld      c, 8
+PRE:
+
+    ld      b, 4
+    rl      (ix+1)
+    rl      (ix+0)
+    inc     b
+    dec     b
+    jr      z, DTS
+L1:
+    rl      (ix+1)
+    rl      (ix+0)
+    djnz    L1
+DTS:
+
+    ld      a, (hl)
+BOLD:
+    nop                                 ;	rla
+    nop                                 ;	or (hl)
+    ld      b, a
+    ld      a, ansifont_is_packed
+    and     a
+    ld      a, b
+    jr      z, INVRS
+
+ROLL:
+    jr      INVRS
+    rla
+    rla
+    rla
+    rla
 
 ; --- --- Inverse text handling
-.INVRS
+INVRS:
 ;  cpl		; Set to NOP to disable INVERSE
-  nop
+    nop
 ; --- ---
 
 ; --- --- Underlined text handling
-  dec c
+    dec     c
 ;  jr nz,UNDRL	; Set to JR UNDRL to disable underlined text (loc. INVRS+2)
-  jr UNDRL
-  ld a,255
-.UNDRL
-  inc c
+    jr      UNDRL
+    ld      a, 255
+UNDRL:
+    inc     c
 ; --- --- end of underlined text handling
 
-.DOTS
-  ld b,ansicharacter_pixelwidth
-.L2
-  rla
-  rl (ix+1)
-  rl (ix+0)
-  djnz L2
-.POST
-  ld b,6
-  inc b
-  dec b
-  jr z,NEXT
-.L3
-  rl (ix+1)
-  rl (ix+0)
-  djnz L3
+DOTS:
+    ld      b, ansicharacter_pixelwidth
+L2:
+    rla
+    rl      (ix+1)
+    rl      (ix+0)
+    djnz    L2
+POST:
+    ld      b, 6
+    inc     b
+    dec     b
+    jr      z, NEXT
+L3:
+    rl      (ix+1)
+    rl      (ix+0)
+    djnz    L3
 
-.NEXT
-  add ix,de
-  inc hl
-  dec c
-  jr nz,PRE
-  
-  ret
+NEXT:
+    add     ix, de
+    inc     hl
+    dec     c
+    jr      nz, PRE
+
+    ret

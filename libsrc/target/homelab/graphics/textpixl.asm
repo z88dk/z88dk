@@ -19,12 +19,12 @@
 ;       XX XX XX XX
 
 
-        SECTION rodata_clib
-	PUBLIC	textpixl
+    SECTION rodata_clib
+    PUBLIC  textpixl
 
 
-.textpixl
-		defb	 32,  27,  28,  31
-		defb	 30, 213,  25,  22
-		defb	 29,  26, 234,  23
-		defb	 18,  21,  24, 255
+textpixl:
+    defb    32, 27, 28, 31
+    defb    30, 213, 25, 22
+    defb    29, 26, 234, 23
+    defb    18, 21, 24, 255

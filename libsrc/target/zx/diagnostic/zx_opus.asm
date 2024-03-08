@@ -15,22 +15,26 @@
 ;	$Id: zx_opus.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC	zx_opus
-	PUBLIC	_zx_opus
-	EXTERN	zx_syntax
+    SECTION code_clib
+    PUBLIC  zx_opus
+    PUBLIC  _zx_opus
+    EXTERN  zx_syntax
 
 zx_opus:
 _zx_opus:
-		ld	hl,testcmd
-		call	zx_syntax
-		xor	a
-		or	l
-		ret	z
-		ld	hl,testcmd2	; further test (Disciple might accept "POINT")
-		jp	zx_syntax
+    ld      hl, testcmd
+    call    zx_syntax
+    xor     a
+    or      l
+    ret     z
+    ld      hl, testcmd2                ; further test (Disciple might accept "POINT")
+    jp      zx_syntax
 
 
-testcmd:	defb	169,35,195,167,44,188,167,13    ; POINT # NOT PI,SGN PI <CR>
-testcmd2:	defb	239,42,167,59,34,65,34,13	; LOAD *PI;"A"
+testcmd:
+    defb    169, 35, 195, 167, 44, 188, 167, 13
+                                        ; POINT # NOT PI,SGN PI <CR>
+testcmd2:
+    defb    239, 42, 167, 59, 34, 65, 34, 13
+                                        ; LOAD *PI;"A"
 

@@ -9,22 +9,22 @@
 ;	$Id: fgetc_cons.asm,v 1.1 2016-11-15 08:11:11 stefano Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	fgetc_cons
-	PUBLIC	_fgetc_cons
+    SECTION code_clib
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
 
-.fgetc_cons
-._fgetc_cons
-	call $803F
-	jr nz,fgetc_cons
+fgetc_cons:
+_fgetc_cons:
+    call    $803F
+    jr      nz, fgetc_cons
 
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
-.not_return
-ENDIF
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_return
+    ld      a, 10
+not_return:
+  ENDIF
 
-	ld	h,0
-	ld	l,a
-	ret
+    ld      h, 0
+    ld      l, a
+    ret

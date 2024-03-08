@@ -1,16 +1,16 @@
 
-	SECTION	code_clib
+    SECTION code_clib
 
-	PUBLIC	fgetc_cons
-	PUBLIC	_fgetc_cons
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
 
-	EXTERN  getk
+    EXTERN  getk
 
 
 fgetc_cons:
 _fgetc_cons:
-	call	getk
-	ld	a,l
-	and	a
-	jr	z,fgetc_cons
-	ret
+    call    getk
+    ld      a, l
+    and     a
+    jr      z, fgetc_cons
+    ret

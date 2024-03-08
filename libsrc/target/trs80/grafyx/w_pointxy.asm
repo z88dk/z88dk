@@ -4,10 +4,10 @@
 ;       Stefano Bodrato 2021
 ;
 
-        INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION   code_clib
-        PUBLIC    w_pointxy
+    SECTION code_clib
+    PUBLIC  w_pointxy
 
         ;EXTERN     l_cmp
         ;EXTERN     w_pixeladdress
@@ -34,40 +34,40 @@
 ;  ......../ixiy same
 ;  afbcdehl/.... different
 ;
-.w_pointxy
-		
-		ld		bc,128
+w_pointxy:
 
-		ld		a,l
-		
-        srl     h               ;hl = x / 8
-        rr      l
-        srl     h
-        rr      l
-        srl     h
-        rr      l
-		
-		out		(c),l			; set X byte coordinate
-		inc     bc
-		out		(c),e			; set Y byte coordinate
+    ld      bc, 128
 
-        and     7               ;a = x mod 8
-        xor     7
+    ld      a, l
+
+    srl     h                           ;hl = x / 8
+    rr      l
+    srl     h
+    rr      l
+    srl     h
+    rr      l
+
+    out     (c), l                      ; set X byte coordinate
+    inc     bc
+    out     (c), e                      ; set Y byte coordinate
+
+    and     7                           ;a = x mod 8
+    xor     7
 
 	;call	w_pixeladdress
 
-	ld	d,a
-	ld	a,1
-	jr	z, or_pixel		; pixel is at bit 0...
-.plot_position
-	rlca
-	dec d
-	jr	nz,plot_position
-.or_pixel
+    ld      d, a
+    ld      a, 1
+    jr      z, or_pixel                 ; pixel is at bit 0...
+plot_position:
+    rlca
+    dec     d
+    jr      nz, plot_position
+or_pixel:
 
-		inc	bc	; 130
-        in	e,(c)
+    inc     bc                          ; 130
+    in      e, (c)
 
-        and	e
+    and     e
 
-        ret
+    ret

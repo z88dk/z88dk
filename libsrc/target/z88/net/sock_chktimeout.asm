@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: sock_chktimeout
 
-        SECTION code_clib
-	PUBLIC	sock_chktimeout
-	PUBLIC	_sock_chktimeout
+    SECTION code_clib
+    PUBLIC  sock_chktimeout
+    PUBLIC  _sock_chktimeout
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.sock_chktimeout
-._sock_chktimeout
-	ld	a,r_sock_chktimeout
-	call_pkg(tcp_all)
-	ret	nc
+sock_chktimeout:
+_sock_chktimeout:
+    ld      a, r_sock_chktimeout
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,sock_chktimeout
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, sock_chktimeout
+    jp      no_zsock

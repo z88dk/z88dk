@@ -1,14 +1,14 @@
 
-	INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION	  code_clib
+    SECTION code_clib
 
-	PUBLIC    __mbc_pixel
+    PUBLIC  __mbc_pixel
 
-	EXTERN     l_cmp
+    EXTERN  l_cmp
 
-	EXTERN    __gfx_coords
-	EXTERN    mbc_sendchar
+    EXTERN  __gfx_coords
+    EXTERN  mbc_sendchar
 
 ;
 ;       $Id: __mbc_pixel.asm $
@@ -16,7 +16,7 @@
 
 ; ******************************************************************
 ;
-; Plot/unplot pixel at (x,y) coordinate, "S" or "R" operation in register C 
+; Plot/unplot pixel at (x,y) coordinate, "S" or "R" operation in register C
 ;
 ; Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
@@ -33,37 +33,37 @@
 
 __mbc_pixel:
 
-        push    hl
-        ld      hl,maxy
-        call    l_cmp
-        pop     hl
-        ret     nc               ; Return if Y overflows
+    push    hl
+    ld      hl, maxy
+    call    l_cmp
+    pop     hl
+    ret     nc                          ; Return if Y overflows
 
-        push    de
-        ld      de,maxx
-        call    l_cmp
-        pop     de
-        ret     c                ; Return if X overflows
-        
-        ld      (__gfx_coords),hl      ; store X
-        ld      (__gfx_coords+2),de    ; store Y: COORDS must be 2 bytes wider
-		
-		push hl
-		
-		ld l,27
-		call mbc_sendchar
-		ld l,c			; "R"eset or "S"et
-		call mbc_sendchar
+    push    de
+    ld      de, maxx
+    call    l_cmp
+    pop     de
+    ret     c                           ; Return if X overflows
+
+    ld      (__gfx_coords), hl          ; store X
+    ld      (__gfx_coords+2), de        ; store Y: COORDS must be 2 bytes wider
+
+    push    hl
+
+    ld      l, 27
+    call    mbc_sendchar
+    ld      l, c                        ; "R"eset or "S"et
+    call    mbc_sendchar
 
 		; Y
-		ld l,d
-		call mbc_sendchar
-		ld l,e
-		call mbc_sendchar
+    ld      l, d
+    call    mbc_sendchar
+    ld      l, e
+    call    mbc_sendchar
 
-		pop de
+    pop     de
 		; X
-		ld l,d
-		call mbc_sendchar
-		ld l,e
-		jp mbc_sendchar
+    ld      l, d
+    call    mbc_sendchar
+    ld      l, e
+    jp      mbc_sendchar

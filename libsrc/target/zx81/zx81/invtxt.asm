@@ -13,25 +13,27 @@
 ;
 ;----------------------------------------------------------------
 
-        SECTION code_clib
-        PUBLIC    invtxt
-        PUBLIC    _invtxt
+    SECTION code_clib
+    PUBLIC  invtxt
+    PUBLIC  _invtxt
 
 invtxt:
 _invtxt:
-IF FORlambda
-                ld	hl,16509
-ELSE
-                LD HL,(400CH)        ; DFILE ADDR
-ENDIF
-                LD C,16H             ; LINES=22
-LOOP2:          LD B,20H             ; CHARS=32
-LOOP1:          INC HL               ; INC DFILE
-                LD A,(HL)            ; DFILE CHAR
-                XOR 80H              ; ** invert it **
-                LD (HL),A            ; POKE DFILE
-                DJNZ LOOP1           ; LINE COUNTER
-                INC HL               ; NEW LINE
-                DEC C                ; 
-                JR NZ, LOOP2         ; UNTIL C=0
-                RET
+  IF    FORlambda
+    ld      hl, 16509
+  ELSE
+    LD      HL, (400CH)                 ; DFILE ADDR
+  ENDIF
+    LD      C, 16H                      ; LINES=22
+LOOP2:
+    LD      B, 20H                      ; CHARS=32
+LOOP1:
+    INC     HL                          ; INC DFILE
+    LD      A, (HL)                     ; DFILE CHAR
+    XOR     80H                         ; ** invert it **
+    LD      (HL), A                     ; POKE DFILE
+    DJNZ    LOOP1                       ; LINE COUNTER
+    INC     HL                          ; NEW LINE
+    DEC     C                           ;
+    JR      NZ, LOOP2                   ; UNTIL C=0
+    RET

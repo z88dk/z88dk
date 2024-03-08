@@ -9,15 +9,15 @@
 ;	$Id: zx_basic_length.asm,v 1.4 2016-06-10 20:02:04 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	zx_basic_length
-	PUBLIC	_zx_basic_length
-	
+    SECTION code_clib
+    PUBLIC  zx_basic_length
+    PUBLIC  _zx_basic_length
+
 zx_basic_length:
 _zx_basic_length:
 
-	ld	de,($5c53) 	; PROG :location of BASIC program 
-	ld	hl,($5c4b)	; VARS :location of variables
-	and	a
-	sbc	hl,de
-	ret
+    ld      de, ($5c53)                 ; PROG :location of BASIC program
+    ld      hl, ($5c4b)                 ; VARS :location of variables
+    and     a
+    sbc     hl, de
+    ret

@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: reverse_addr_lookup
 
-        SECTION code_clib
-	PUBLIC	reverse_addr_lookup
-	PUBLIC	_reverse_addr_lookup
+    SECTION code_clib
+    PUBLIC  reverse_addr_lookup
+    PUBLIC  _reverse_addr_lookup
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.reverse_addr_lookup
-._reverse_addr_lookup
-	ld	a,r_reverse_addr_lookup
-	call_pkg(tcp_all)
-	ret	nc
+reverse_addr_lookup:
+_reverse_addr_lookup:
+    ld      a, r_reverse_addr_lookup
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,reverse_addr_lookup
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, reverse_addr_lookup
+    jp      no_zsock

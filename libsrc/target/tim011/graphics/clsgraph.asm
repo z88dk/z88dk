@@ -1,8 +1,8 @@
-	SECTION	code_clib
-	PUBLIC	cleargraphics
-	PUBLIC   _cleargraphics
+    SECTION code_clib
+    PUBLIC  cleargraphics
+    PUBLIC  _cleargraphics
 
     EXTERN  generic_console_cls
 
-    defc    cleargraphics = generic_console_cls
-    defc    _cleargraphics = cleargraphics
+    defc    cleargraphics=generic_console_cls
+    defc    _cleargraphics=cleargraphics

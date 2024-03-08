@@ -5,9 +5,9 @@
     PUBLIC  __rx78_ink
     PUBLIC  __rx78_paper
 
-__rx78_ink: 
+__rx78_ink:
     defb    0x07
-__rx78_paper:   
+__rx78_paper:
     defb    0x00
 
 
@@ -17,11 +17,11 @@ __rx78_paper:
     ld      hl, initial_palette
     ld      b, 8
 pal_loop:
-    ld      a,(hl)
+    ld      a, (hl)
     inc     hl
-    ld      c,(hl)
+    ld      c, (hl)
     inc     hl
-    out     (c),a
+    out     (c), a
     djnz    pal_loop
 
     SECTION rodata_clib

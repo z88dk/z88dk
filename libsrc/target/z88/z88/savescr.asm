@@ -14,22 +14,22 @@
 ;       Returns 0 on failure, or handle on success
 
 
-        SECTION code_clib
+    SECTION code_clib
 
-               PUBLIC    savescr
-               PUBLIC    _savescr
+    PUBLIC  savescr
+    PUBLIC  _savescr
 
-                INCLUDE "saverst.def"
+    INCLUDE "saverst.def"
 
-.savescr
-._savescr
-	push	ix
-        ld      a,SR_SUS
-        call_oz(os_sr)
-        push    ix
-        pop     de
-	pop	ix
-	ret	nc
-        ld      hl,0
-        ret
-        
+savescr:
+_savescr:
+    push    ix
+    ld      a, SR_SUS
+    call_oz (os_sr)
+    push    ix
+    pop     de
+    pop     ix
+    ret     nc
+    ld      hl, 0
+    ret
+

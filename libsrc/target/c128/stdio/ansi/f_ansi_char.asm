@@ -13,40 +13,40 @@
 ;	$Id: f_ansi_char.asm,v 1.5 2016-04-04 18:31:22 dom Exp $
 ;
 
-        SECTION  code_clib
-	PUBLIC	ansi_CHAR
-	
-	PUBLIC	INVRS
+    SECTION code_clib
+    PUBLIC  ansi_CHAR
 
-	EXTERN	__console_y
-	EXTERN	__console_x
-	EXTERN	__c128_attr
-	
-	
-.ansi_CHAR
+    PUBLIC  INVRS
 
-	push	af
-	ld	hl,$2000
-	ld	a,(__console_y)
-	and	a
-	jr	z,r_zero
-	ld	b,a
-	ld	de,40
-.r_loop
-	add	hl,de
-	djnz	r_loop
-.r_zero
-	ld	a,(__console_x)
-	ld	d,0
-	ld	e,a
-	add	hl,de
-	pop	af
-	
-	cp	96
-	jr	c,nolower
-	sub	96
-	jr	setout
-.nolower
+    EXTERN  __console_y
+    EXTERN  __console_x
+    EXTERN  __c128_attr
+
+
+ansi_CHAR:
+
+    push    af
+    ld      hl, $2000
+    ld      a, (__console_y)
+    and     a
+    jr      z, r_zero
+    ld      b, a
+    ld      de, 40
+r_loop:
+    add     hl, de
+    djnz    r_loop
+r_zero:
+    ld      a, (__console_x)
+    ld      d, 0
+    ld      e, a
+    add     hl, de
+    pop     af
+
+    cp      96
+    jr      c, nolower
+    sub     96
+    jr      setout
+nolower:
 
 ; These lines aren't needed when we use the alternate font
 ;	cp	64
@@ -54,15 +54,15 @@
 ;	sub	64
 ;.noupper
 
-.setout
+setout:
 
-.INVRS
-	or	0	; This byte is set to 128 when INVERSE is ON
-	ld	(hl),a
+INVRS:
+    or      0                           ; This byte is set to 128 when INVERSE is ON
+    ld      (hl), a
 
-	ld	de,$1000
-	sbc	hl,de		; Color map location
-	ld	a,(__c128_attr)
-	ld	(hl),a		; This byte is the current attribute
+    ld      de, $1000
+    sbc     hl, de                      ; Color map location
+    ld      a, (__c128_attr)
+    ld      (hl), a                     ; This byte is the current attribute
 
-	ret
+    ret

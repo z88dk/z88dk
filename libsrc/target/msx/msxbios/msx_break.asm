@@ -10,25 +10,25 @@
 ;	$Id: msx_break.asm,v 1.5 2016-06-16 19:30:25 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	msx_break
-	PUBLIC	_msx_break
-	EXTERN     msxbios
-	
-IF FORmsx
-        INCLUDE "target/msx/def/msxbios.def"
-ELSE
-        INCLUDE "target/svi/def/svibios.def"
-ENDIF
+    SECTION code_clib
+    PUBLIC  msx_break
+    PUBLIC  _msx_break
+    EXTERN  msxbios
+
+  IF    FORmsx
+    INCLUDE "target/msx/def/msxbios.def"
+  ELSE
+    INCLUDE "target/svi/def/svibios.def"
+  ENDIF
 
 msx_break:
 _msx_break:
-	push	ix
-	ld	ix,BREAKX
-	call	msxbios
-	sbc	a,a
-	and	1	; if pressed, BREAKX returns $FF
-	ld	l,a
-	ld	h,0
-	pop	ix
-	ret
+    push    ix
+    ld      ix, BREAKX
+    call    msxbios
+    sbc     a, a
+    and     1                           ; if pressed, BREAKX returns $FF
+    ld      l, a
+    ld      h, 0
+    pop     ix
+    ret

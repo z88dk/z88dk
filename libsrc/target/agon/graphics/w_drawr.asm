@@ -1,24 +1,24 @@
-SECTION code_clib
+    SECTION code_clib
 
-PUBLIC drawr_callee
-PUBLIC _drawr_callee
-PUBLIC drawr
-PUBLIC _drawr
+    PUBLIC  drawr_callee
+    PUBLIC  _drawr_callee
+    PUBLIC  drawr
+    PUBLIC  _drawr
 
 
-EXTERN __agon_drawr
-EXTERN __agon_putc
-EXTERN __agon_putword
-EXTERN __agon_fgcol
+    EXTERN  __agon_drawr
+    EXTERN  __agon_putc
+    EXTERN  __agon_putword
+    EXTERN  __agon_fgcol
 
 
 ; extern void __LIB__ drawr(int x_delta, int y_delta) __smallc;
 drawr:
 _drawr:
     push    ix
-    ld      ix,4
-    add     ix,sp
-    ld      a,(__agon_fgcol)
+    ld      ix, 4
+    add     ix, sp
+    ld      a, (__agon_fgcol)
     call    __agon_drawr
     pop     ix
     ret
@@ -27,9 +27,9 @@ _drawr:
 drawr_callee:
 _drawr_callee:
     push    ix
-    ld      ix,4
-    add     ix,sp
-    ld      a,(__agon_fgcol)
+    ld      ix, 4
+    add     ix, sp
+    ld      a, (__agon_fgcol)
     call    __agon_drawr
     pop     ix
     pop     bc

@@ -11,15 +11,15 @@
 ; $Id: ozsetlcr.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozsetlcr
-	PUBLIC	_ozsetlcr
+    SECTION code_clib
+    PUBLIC  ozsetlcr
+    PUBLIC  _ozsetlcr
 
 
 ozsetlcr:
 _ozsetlcr:
-        ld hl,2
-        add hl,sp
-        ld a,(hl)
-        out (43h),a
-        ret
+    ld      hl, 2
+    add     hl, sp
+    ld      a, (hl)
+    out     (43h), a
+    ret

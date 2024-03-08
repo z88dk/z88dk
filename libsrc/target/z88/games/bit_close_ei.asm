@@ -8,27 +8,27 @@
 ; Based on the Dominic Morris' code
 ;
 
-    SECTION   code_clib
-    PUBLIC     bit_close_ei
-    PUBLIC     _bit_close_ei
-    INCLUDE  "interrpt.def"
+    SECTION code_clib
+    PUBLIC  bit_close_ei
+    PUBLIC  _bit_close_ei
+    INCLUDE "interrpt.def"
 
-    EXTERN     __bit_irqstatus
+    EXTERN  __bit_irqstatus
 
-    EXTERN     snd_asave
+    EXTERN  snd_asave
 
-.bit_close_ei
-._bit_close_ei
+bit_close_ei:
+_bit_close_ei:
 
-	push hl
-	ld	hl,(__bit_irqstatus)
-	ex	(sp),hl
-	pop af
+    push    hl
+    ld      hl, (__bit_irqstatus)
+    ex      (sp), hl
+    pop     af
 
-    ld   a,(snd_asave)
+    ld      a, (snd_asave)
 
-	ret po
+    ret     po
 
-	jp  oz_ei
+    jp      oz_ei
 
 

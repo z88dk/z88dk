@@ -6,29 +6,29 @@
 ;      int msxtape_rd_cls();
 ;
 
-PUBLIC msxtape_rd_cls
-PUBLIC _msxtape_rd_cls
+    PUBLIC  msxtape_rd_cls
+    PUBLIC  _msxtape_rd_cls
 
 
-EXTERN	msxbios
+    EXTERN  msxbios
 
-IF FORmsx
-        INCLUDE "target/msx/def/msxbios.def"
-ELSE
-        INCLUDE "target/svi/def/svibios.def"
-ENDIF
+  IF    FORmsx
+    INCLUDE "target/msx/def/msxbios.def"
+  ELSE
+    INCLUDE "target/svi/def/svibios.def"
+  ENDIF
 
 
-.msxtape_rd_cls
-._msxtape_rd_cls
+msxtape_rd_cls:
+_msxtape_rd_cls:
 
-	push	ix
-	ld	ix,TAPIOF
-	call	msxbios
-	pop	ix
+    push    ix
+    ld      ix, TAPIOF
+    call    msxbios
+    pop     ix
 
-	ld  hl,0
-	ret nc
-	dec hl		;error, break condition occured
-	ret
+    ld      hl, 0
+    ret     nc
+    dec     hl                          ;error, break condition occured
+    ret
 

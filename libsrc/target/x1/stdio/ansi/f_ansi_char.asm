@@ -21,7 +21,7 @@
     EXTERN  __console_x
 
 ansi_CHAR:
-    ld      bc,(__console_x)
-    ld      d,a
-    ld      e,0     ;not in raw mode
-    jp      generic_console_printc	
+    ld      bc, (__console_x)
+    ld      d, a
+    ld      e, 0                        ;not in raw mode
+    jp      generic_console_printc

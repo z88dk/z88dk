@@ -1,6 +1,6 @@
-	
-	SECTION code_graphics
-	PUBLIC	cleargraphics
+
+    SECTION code_graphics
+    PUBLIC  cleargraphics
 
 ;	$Id: cleargraphics.asm $
 
@@ -15,10 +15,10 @@
 ;		a.bcdehl/ixiy	same
 ;		.f....../....	different
 ;
-.cleargraphics
-	ld	hl,$f800
-	ld	de,$f801
-	ld	bc,+(80 * 25) - 1
-	ld	(hl),' '
-	ldir
-	ret
+cleargraphics:
+    ld      hl, $f800
+    ld      de, $f801
+    ld      bc, +(80*25)-1
+    ld      (hl), ' '
+    ldir
+    ret

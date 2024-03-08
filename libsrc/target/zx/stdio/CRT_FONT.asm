@@ -3,4 +3,4 @@
 
     PUBLIC  CRT_FONT
 
-    defc    CRT_FONT = 15616
+    defc    CRT_FONT=15616

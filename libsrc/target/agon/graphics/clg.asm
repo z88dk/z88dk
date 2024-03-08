@@ -1,14 +1,14 @@
 
 
-SECTION code_clib
+    SECTION code_clib
 
-PUBLIC clg
-PUBLIC _clg
+    PUBLIC  clg
+    PUBLIC  _clg
 
-EXTERN __agon_putc
+    EXTERN  __agon_putc
 
 
 clg:
 _clg:
-    ld      a,16
+    ld      a, 16
     jp      __agon_putc

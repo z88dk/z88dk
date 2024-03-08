@@ -6,5 +6,5 @@
 
     EXTERN  getk_inkey
 
-    defc getk = getk_inkey
-    defc _getk = getk
+    defc    getk=getk_inkey
+    defc    _getk=getk

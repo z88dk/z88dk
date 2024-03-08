@@ -31,10 +31,10 @@ __zx_print_routine:
 ; 6 = hires
 ; bit 6 set = tilemap (ZXN)
 __zx_screenmode:
-IF FORsam
-    defb    3       ;Mode 4 is the default mode
-ELSE
-    defb    0       ;If set TS2068 hrgmode is active
-ENDIF
+  IF    FORsam
+    defb    3                           ;Mode 4 is the default mode
+  ELSE
+    defb    0                           ;If set TS2068 hrgmode is active
+  ENDIF
 
 

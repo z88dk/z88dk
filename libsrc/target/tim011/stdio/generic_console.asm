@@ -7,13 +7,13 @@
 ;
 ; There is a scroll register which affects the top row position
 ;
-; Display bits are reversed with the left hand pixel being bits 0-1 
+; Display bits are reversed with the left hand pixel being bits 0-1
 ; in display.
 ;
 
     SECTION code_clib
 
-    MODULE tim011_generic_console
+    MODULE  tim011_generic_console
 
     PUBLIC  generic_console_cls
     PUBLIC  generic_console_printc
@@ -36,14 +36,14 @@
     EXTERN  __tim011_paper
     EXTERN  __tim011_scroll
 
-    defc    SCROLL_REG = $d0
+    defc    SCROLL_REG=$d0
 
 
 generic_console_set_paper:
     rrca
     rrca
     and     @11000000
-    ld      (__tim011_paper),a
+    ld      (__tim011_paper), a
     ret
 
 generic_console_set_attribute:
@@ -54,46 +54,46 @@ generic_console_set_ink:
     rrca
     rrca
     and     @11000000
-    ld      (__tim011_ink),a
+    ld      (__tim011_ink), a
     ret
 
 generic_console_cls:
-    ld      de,+(512 / 4) * 256
+    ld      de, +(512/4)*256
     ; This will actually clear from left to right
-    ld      bc,$8000
-    ld      l,0     ;May want to clear with bg colour?
+    ld      bc, $8000
+    ld      l, 0                        ;May want to clear with bg colour?
 loop:
-    out     (c),l
+    out     (c), l
     inc     bc
     dec     de
-    ld      a,d
+    ld      a, d
     or      e
-    jr      nz,loop
+    jr      nz, loop
     ; Reset scroll register
 reset_scroll:
     xor     a
-    out0    (SCROLL_REG),a
-    ld      (__tim011_scroll),a
+    out0    (SCROLL_REG), a
+    ld      (__tim011_scroll), a
     ret
 
 generic_console_scrollup:
     push    bc
     push    de
-    ld      a,(__tim011_scroll)
+    ld      a, (__tim011_scroll)
     add     8
-    ld      (__tim011_scroll),a
-    out0    (SCROLL_REG),a
-    ld      b,31
-    ld      c,0
+    ld      (__tim011_scroll), a
+    out0    (SCROLL_REG), a
+    ld      b, 31
+    ld      c, 0
 scrollup_1:
     push    bc
-    ld      a,' '
+    ld      a, ' '
     call    generic_console_printc
     pop     bc
     inc     c
-    ld      a,c
+    ld      a, c
     cp      64
-    jr      nz,scrollup_1
+    jr      nz, scrollup_1
     pop     de
     pop     bc
     ret
@@ -103,50 +103,50 @@ scrollup_1:
 ; a = d = character
 generic_console_printc:
     exx
-    ld      bc,(generic_console_font32)
+    ld      bc, (generic_console_font32)
     dec     b
-    bit     7,a
-    jr      z,handle_characters
-    ld      bc,(generic_console_udg32)
-    res     7,a
+    bit     7, a
+    jr      z, handle_characters
+    ld      bc, (generic_console_udg32)
+    res     7, a
 handle_characters:
-    ld      l,a
-    ld      h,0
-    add     hl,hl
-    add     hl,hl
-    add     hl,hl
-    add     hl,bc
-    ld      a,(generic_console_flags)
-    ld      b,a
+    ld      l, a
+    ld      h, 0
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
+    add     hl, bc
+    ld      a, (generic_console_flags)
+    ld      b, a
     rlca
-    sbc     a,a             ; ; c = 0/ c = 255
-    ld      c,a
-    exx    
+    sbc     a, a                        ; ; c = 0/ c = 255
+    ld      c, a
+    exx
     ; bc = b = y, c = x, coordinates to print at
     ; hl' = font
     ; c' = inverse flag
     ; b' = flags
     call    generic_console_xypos
     ; So now hl = VRAM port
-    ld      bc,hl
+    ld      bc, hl
 
 
-    ld      l,8         ;8 rows
+    ld      l, 8                        ;8 rows
 row_loop:
     push    hl
-    ld      a,l
+    ld      a, l
     exx
-    bit     3,b
-    jr      z,printc_no_underline
-    cp      1       ;bottom row
-    jr      nz,printc_no_underline
-    ld      a,255
+    bit     3, b
+    jr      z, printc_no_underline
+    cp      1                           ;bottom row
+    jr      nz, printc_no_underline
+    ld      a, 255
     jr      printc_not_bold
 printc_no_underline:
-    ld      a,(hl)
-    bit     4,b
-    ld      a,(hl)
-    jr      z,printc_not_bold
+    ld      a, (hl)
+    bit     4, b
+    ld      a, (hl)
+    jr      z, printc_not_bold
     rrca
     or      (hl)
 printc_not_bold:
@@ -170,74 +170,74 @@ printc_not_bold:
     ; xor     h
 
 
-    ld      h,2
+    ld      h, 2
 printc_2:
-    ld      de,(__tim011_ink)    ;e = ink, b = paper
+    ld      de, (__tim011_ink)          ;e = ink, b = paper
     push    hl
     push    bc
-    ld      l,a
-    ld      b,4    ;4 iterations
-    ld      h,0    ;final byte
+    ld      l, a
+    ld      b, 4                        ;4 iterations
+    ld      h, 0                        ;final byte
 printc_3:
     rr      l
-    ld      a,d
-    jr      nc,is_paper
-    ld      a,e
+    ld      a, d
+    jr      nc, is_paper
+    ld      a, e
 is_paper:
     or      h
-    ld      h,a
+    ld      h, a
     srl     d
     srl     d
     srl     e
     srl     e
     djnz    printc_3
-    ld      a,l    ;Save the character for a moment
+    ld      a, l                        ;Save the character for a moment
     pop     bc
-    out     (c),h
+    out     (c), h
     dec     b
     pop     hl
     dec     h
-    jr      nz,printc_2
+    jr      nz, printc_2
     ; Move to next row of screen
     inc     b
     inc     b
     inc     c
     pop     hl
     dec     l
-    jr      nz,row_loop
+    jr      nz, row_loop
     ret
 
 ; Entry: b = row
 ;        c = column
 ; Exit:	hl = address
 generic_console_xypos:
-    ld      h,c
+    ld      h, c
     sla     h
     inc     h
-    set     7,h
-    ld      l,b
+    set     7, h
+    ld      l, b
     sla     l
     sla     l
     sla     l
-    ld      a,(__tim011_scroll)
+    ld      a, (__tim011_scroll)
     add     l
-    ld      l,a
+    ld      l, a
     ret
 
     SECTION code_crt_init
 
-    ld      a,64
-    ld      (__console_w),a
-    ld      a,32
-    ld      (__console_h),a
+    ld      a, 64
+    ld      (__console_w), a
+    ld      a, 32
+    ld      (__console_h), a
     call    reset_scroll
     ; Disable cursor - this is on a 100ms tick
-    ld      a,$c9
-    ld      ($e806),a
+    ld      a, $c9
+    ld      ($e806), a
 
     SECTION code_crt_exit
     ; Re-enable cursor
-    ld      a,$c3
-    ld      ($e806),a
+    ld      a, $c3
+    ld      ($e806), a
 
 

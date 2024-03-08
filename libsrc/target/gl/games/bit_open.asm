@@ -6,8 +6,8 @@
 
     INCLUDE "games/games.inc"
 
-.bit_open
-._bit_open
-	in	a,($12)
-        ld      (__snd_tick),a
-	ret
+bit_open:
+_bit_open:
+    in      a, ($12)
+    ld      (__snd_tick), a
+    ret

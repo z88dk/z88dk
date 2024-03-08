@@ -8,39 +8,39 @@
 ; $Id: fdgetpos.asm,v 1.6 2017-01-02 21:02:22 aralbrec Exp $
 
 
-		SECTION	code_clib
-		PUBLIC	fdgetpos
-      PUBLIC   _fdgetpos
+    SECTION code_clib
+    PUBLIC  fdgetpos
+    PUBLIC  _fdgetpos
 
-		INCLUDE "target/zx/def/p3dos.def"
+    INCLUDE "target/zx/def/p3dos.def"
 
-		EXTERN	l_plong
+    EXTERN  l_plong
 
-		EXTERN	dodos
+    EXTERN  dodos
 
 
-.fdgetpos
-._fdgetpos
-	pop	hl	;ret address
-	pop	de	;where to store it
-	pop	bc	;lower 8 is file handle
-	push	bc
-	pop	de
-	push	hl
-	ld	b,c
-	push	de	;save store location
-	push	ix
-	ld	ix,DOS_GET_POSITION
-	call	dodos
-	pop	ix
-	pop	bc	;get store location back
-	jr	nc,fdgetpos_store
-	ld	hl,-1
-	ret
-.fdgetpos_store
-IF !idedos
-	ld	d,0	;clear upper byte
-ENDIF
-	call	l_plong
-	ld	hl,0
-	ret
+fdgetpos:
+_fdgetpos:
+    pop     hl                          ;ret address
+    pop     de                          ;where to store it
+    pop     bc                          ;lower 8 is file handle
+    push    bc
+    pop     de
+    push    hl
+    ld      b, c
+    push    de                          ;save store location
+    push    ix
+    ld      ix, DOS_GET_POSITION
+    call    dodos
+    pop     ix
+    pop     bc                          ;get store location back
+    jr      nc, fdgetpos_store
+    ld      hl, -1
+    ret
+fdgetpos_store:
+  IF    !idedos
+    ld      d, 0                        ;clear upper byte
+  ENDIF
+    call    l_plong
+    ld      hl, 0
+    ret

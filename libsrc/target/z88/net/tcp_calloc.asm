@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: tcp_calloc
 
-        SECTION code_clib
-	PUBLIC	tcp_calloc
-	PUBLIC	_tcp_calloc
+    SECTION code_clib
+    PUBLIC  tcp_calloc
+    PUBLIC  _tcp_calloc
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.tcp_calloc
-._tcp_calloc
-	ld	a,r_tcp_calloc
-	call_pkg(tcp_all)
-	ret	nc
+tcp_calloc:
+_tcp_calloc:
+    ld      a, r_tcp_calloc
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,tcp_calloc
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, tcp_calloc
+    jp      no_zsock

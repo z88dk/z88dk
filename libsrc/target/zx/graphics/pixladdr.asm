@@ -1,10 +1,10 @@
 
-	SECTION	code_clib
-	PUBLIC	pixeladdress
+    SECTION code_clib
+    PUBLIC  pixeladdress
 
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	EXTERN	base_graphics
+    EXTERN  base_graphics
 
 ;
 ;	$Id: pixladdr.asm,v 1.9 2016-04-22 20:17:17 dom Exp $
@@ -25,7 +25,7 @@
 ;  afbcde../.... different
 ;
 
-.pixeladdress
+pixeladdress:
 
 	;; Ported from the ZX ROM PIXEL-ADD routine
 
@@ -41,29 +41,29 @@
 ;		ret
 
 
-		LD	A,L
-	        AND     A
-	        RRA
-	        SCF			; Set Carry Flag
-	        RRA
-	        AND     A
-	        RRA
-	        XOR     L
-	        AND     @11111000
-	        XOR     L
-	        LD      D,A
-	        LD      A,H
-	        RLCA
-	        RLCA
-	        RLCA
-	        XOR     L
-	        AND     @11000111
-	        XOR     L
-	        RLCA
-	        RLCA
-	        LD      E,A
-	        LD      A,H
-	        AND     @00000111
-	        XOR	@00000111
-	        
-	        RET
+    LD      A, L
+    AND     A
+    RRA
+    SCF                                 ; Set Carry Flag
+    RRA
+    AND     A
+    RRA
+    XOR     L
+    AND     @11111000
+    XOR     L
+    LD      D, A
+    LD      A, H
+    RLCA
+    RLCA
+    RLCA
+    XOR     L
+    AND     @11000111
+    XOR     L
+    RLCA
+    RLCA
+    LD      E, A
+    LD      A, H
+    AND     @00000111
+    XOR     @00000111
+
+    RET

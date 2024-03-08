@@ -8,27 +8,27 @@
 ;	$Id: getk.asm $
 ;
 
-		SECTION code_clib
-		PUBLIC	getk
-		PUBLIC	_getk
+    SECTION code_clib
+    PUBLIC  getk
+    PUBLIC  _getk
 
-.getk
-._getk
-	
-	XOR A
-	LD	(4),A	; LASTK
+getk:
+_getk:
 
-	rst $20
-	defb 4		; 'INKEY' function
+    XOR     A
+    LD      (4), A                      ; LASTK
 
-.getk_done
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
-.not_return
-ENDIF
+    rst     $20
+    defb    4                           ; 'INKEY' function
 
-	ld	l,a
-	ld	h,0
-	ret
+getk_done:
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_return
+    ld      a, 10
+not_return:
+  ENDIF
+
+    ld      l, a
+    ld      h, 0
+    ret

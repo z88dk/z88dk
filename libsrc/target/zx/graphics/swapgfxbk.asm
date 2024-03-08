@@ -14,24 +14,24 @@
 ;
 
 
-		SECTION	code_clib
-                PUBLIC    swapgfxbk
-                PUBLIC    _swapgfxbk
+    SECTION code_clib
+    PUBLIC  swapgfxbk
+    PUBLIC  _swapgfxbk
 
-		PUBLIC	swapgfxbk1
-      PUBLIC   _swapgfxbk1
+    PUBLIC  swapgfxbk1
+    PUBLIC  _swapgfxbk1
 
 
 
-.swapgfxbk
-._swapgfxbk
-		di
-		ret
-.swapgfxbk1
-._swapgfxbk1
-		ld	iy,23610
-		ei
-                ret
+swapgfxbk:
+_swapgfxbk:
+    di
+    ret
+swapgfxbk1:
+_swapgfxbk1:
+    ld      iy, 23610
+    ei
+    ret
 
 
 

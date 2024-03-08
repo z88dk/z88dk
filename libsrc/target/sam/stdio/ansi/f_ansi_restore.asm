@@ -4,26 +4,26 @@
 ; 	ANSI Video handling for SAM Coupé
 ;
 ; 	Restors the attributes to previous setting
-;	
+;
 ;
 ;	Frode Tennebø - 29/12/2002
 ;
 
-        SECTION code_clib
-	PUBLIC	ansi_restore
-	
-	EXTERN    FOREGR
-	EXTERN    BACKGR
+    SECTION code_clib
+    PUBLIC  ansi_restore
 
-.ansi_restore
-        ld      a,16            ; INK
-        rst     16
-        ld      a,(FOREGR)      ; fetch colour
-        rst     16
+    EXTERN  FOREGR
+    EXTERN  BACKGR
 
-        ld      a,17            ; PAPER
-        rst     16
-        ld      a,(BACKGR)      ; fetch colour
-        rst     16
+ansi_restore:
+    ld      a, 16                       ; INK
+    rst     16
+    ld      a, (FOREGR)                 ; fetch colour
+    rst     16
 
-        ret
+    ld      a, 17                       ; PAPER
+    rst     16
+    ld      a, (BACKGR)                 ; fetch colour
+    rst     16
+
+    ret

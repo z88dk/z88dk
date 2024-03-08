@@ -13,62 +13,62 @@
 
 
 ; TODO: Have a separate implementation for SAM, it doesn't need this complexity
-IF FORsam
+  IF    FORsam
     EXTERN  SCREEN_BASE
-ELSE
-    defc    SCREEN_BASE = 16384
-ENDIF
+  ELSE
+    defc    SCREEN_BASE=16384
+  ENDIF
 
 
 generic_console_cls:
     push    de
     push    bc
-    ld      hl,SCREEN_BASE
-    ld      de,SCREEN_BASE+1
+    ld      hl, SCREEN_BASE
+    ld      de, SCREEN_BASE+1
 
-IF FORts2068 | FORzxn
-    ld      a,(__zx_screenmode)
-  IF FORzxn
-    bit     6,a
-    jp      nz,generic_console_zxn_tile_cls
-  ENDIF
+  IF    FORts2068|FORzxn
+    ld      a, (__zx_screenmode)
+    IF  FORzxn
+    bit     6, a
+    jp      nz, generic_console_zxn_tile_cls
+    ENDIF
     cp      1
-    jr      nz,clear_main_screen
-    ld      hl,$6000
-    ld      de,$6001
+    jr      nz, clear_main_screen
+    ld      hl, $6000
+    ld      de, $6001
 clear_main_screen:
-ENDIF
-    ld      bc,6144
-    ld      (hl),l
+  ENDIF
+    ld      bc, 6144
+    ld      (hl), l
     ldir
-IF FORts2068 | FORzxn
-    ld      a,(__zx_screenmode)
+  IF    FORts2068|FORzxn
+    ld      a, (__zx_screenmode)
     and     a
-    jr      z,clear_attributes
+    jr      z, clear_attributes
     cp      1
-    jr      z,clear_attributes
+    jr      z, clear_attributes
     cp      2
-    jr      z,clear_attribute_hicolour
+    jr      z, clear_attribute_hicolour
     ; And here we clear the hires screen
-    xor    a
+    xor     a
 clear_screen1:
-    ld      hl,$6000
-    ld      de,$6001
-    ld      bc,6144
-    ld      (hl),a
+    ld      hl, $6000
+    ld      de, $6001
+    ld      bc, 6144
+    ld      (hl), a
     ldir
     jr      done
 
 clear_attribute_hicolour:
-    ld      a,(__zx_console_attr)
+    ld      a, (__zx_console_attr)
     jr      clear_screen1
-ENDIF
+  ENDIF
 clear_attributes:
-    ld      a,(__zx_console_attr)
-    ld      (hl),a
-    ld      bc,767
+    ld      a, (__zx_console_attr)
+    ld      (hl), a
+    ld      bc, 767
     ldir
 done:
-    pop    bc
-    pop    de
+    pop     bc
+    pop     de
     ret

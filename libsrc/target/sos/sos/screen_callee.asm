@@ -10,26 +10,26 @@
 ;	$Id: screen_callee\040.asm,v 1.5 2016-06-19 20:58:00 dom Exp $
 ;
 
-SECTION   code_clib
-PUBLIC	screen_callee
-PUBLIC	_screen_callee
-PUBLIC	asm_screen
+    SECTION code_clib
+    PUBLIC  screen_callee
+    PUBLIC  _screen_callee
+    PUBLIC  asm_screen
 
 
 screen_callee:
 _screen_callee:
-	pop  bc
-	pop  de
-	pop  hl
-	push  bc
+    pop     bc
+    pop     de
+    pop     hl
+    push    bc
 
 ; enter : l = x
 ;         e = y
 
-.asm_screen
+asm_screen:
 ;jr asmentry
-	ld h,e
-	call	$201B
-	ld	h,0
-	ld	l,a
-	ret
+    ld      h, e
+    call    $201B
+    ld      h, 0
+    ld      l, a
+    ret

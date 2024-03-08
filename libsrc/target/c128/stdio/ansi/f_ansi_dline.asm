@@ -11,23 +11,23 @@
 ;
 
 
-        SECTION code_clib
-	PUBLIC	ansi_del_line
+    SECTION code_clib
+    PUBLIC  ansi_del_line
 
 
-.ansi_del_line
-	ld	hl,$2000
-	and	a
-	jr	z,isz
-	ld	de,40
-.sum_loop
-	add	hl,de
-	dec	a
-	jr	nz,sum_loop
-.isz
-	ld	b,39
-.dlineloop
-	ld	(hl),32
-	inc	hl
-	djnz	dlineloop
-	ret
+ansi_del_line:
+    ld      hl, $2000
+    and     a
+    jr      z, isz
+    ld      de, 40
+sum_loop:
+    add     hl, de
+    dec     a
+    jr      nz, sum_loop
+isz:
+    ld      b, 39
+dlineloop:
+    ld      (hl), 32
+    inc     hl
+    djnz    dlineloop
+    ret

@@ -10,18 +10,18 @@
 
     INCLUDE "graphics/grafix.inc"
 
-.drawto_callee
-._drawto_callee
+drawto_callee:
+_drawto_callee:
     pop     af
     pop     de
     pop     hl
     push    af
 
 ; de = x1, hl = y1, hl'=x2, de'=y2
-.asm_drawto
+asm_drawto:
     exx
-    ld      de,(__gfx_coords+2)
-    ld      hl,(__gfx_coords)
+    ld      de, (__gfx_coords+2)
+    ld      hl, (__gfx_coords)
 
-	ld      c,'0'
-    jp    __v1050_line
+    ld      c, '0'
+    jp      __v1050_line

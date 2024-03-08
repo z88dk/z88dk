@@ -3,13 +3,13 @@
 
 
 
-        SECTION code_clib
-        PUBLIC  xorpixel
+    SECTION code_clib
+    PUBLIC  xorpixel
 
 
-	EXTERN	xor_MODE0
+    EXTERN  xor_MODE0
 
-	defc xorpixel = xor_MODE0
+    defc    xorpixel=xor_MODE0
 
 
 

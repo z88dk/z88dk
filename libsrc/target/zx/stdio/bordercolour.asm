@@ -11,7 +11,7 @@
 
 bordercolor:
 _bordercolor:
-    ld      a,l
+    ld      a, l
     call    conio_map_colour
-    ld      l,a
+    ld      l, a
     jp      zx_border

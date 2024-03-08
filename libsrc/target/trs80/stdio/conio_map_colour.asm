@@ -5,26 +5,26 @@
 ; Used:  hl,bc,f
 ;
 
-	MODULE	code_clib
-	PUBLIC	conio_map_colour
+    MODULE  code_clib
+    PUBLIC  conio_map_colour
 
-	EXTERN	__CLIB_CONIO_NATIVE_COLOUR
+    EXTERN  __CLIB_CONIO_NATIVE_COLOUR
 
 
 conio_map_colour:
-        ld      c,__CLIB_CONIO_NATIVE_COLOUR
-        rr      c
-        ret     c
+    ld      c, __CLIB_CONIO_NATIVE_COLOUR
+    rr      c
+    ret     c
 
-	and	15
-	ld	c,a
-	ld	b,0
-	ld	hl,table
-	add	hl,bc
-	ld	a,(hl)
-	ret
+    and     15
+    ld      c, a
+    ld      b, 0
+    ld      hl, table
+    add     hl, bc
+    ld      a, (hl)
+    ret
 
-	SECTION	rodata_clib
+    SECTION rodata_clib
 ; European colours:
 ;const rgb_t cgenie_state::m_palette_eu[] =
 ;{
@@ -47,20 +47,20 @@ conio_map_colour:
 ;};
 
 table:
-        defb    $0	;BLACK -> GREY
-	defb	$8	;BLUE -> BLUE
-	defb	$5	;GREEN -> GREEN
-	defb	$1	;CYAN -> CYAN
-	defb	$2	;RED -> RED
-	defb	$e	;MAGENTA -> MAGENTA
-	defb	$6	;BROWN -> ORANGE
-	defb	$3	;LIGHTGRAY -> WHITE
-	defb	$c	;DARKGRAY -> LIGHT GREY
-	defb	$9	;LIGHTBLUE -> LIGHT BLUE
-	defb	$7	;LIGHTGREEN -> LIGHT YELLOW
-	defb	$d	;LIGHTCYAN -> TURQUOISE
-	defb	$a	;LIGHTRED -> PINK
-	defb	$b	;LIGHTMAGENTA -> PURPLE
-	defb	$4	;YELLOW -> YELLOW
-	defb	$f	;WHITE -> BRIGHT WHITE
+    defb    $0                          ;BLACK -> GREY
+    defb    $8                          ;BLUE -> BLUE
+    defb    $5                          ;GREEN -> GREEN
+    defb    $1                          ;CYAN -> CYAN
+    defb    $2                          ;RED -> RED
+    defb    $e                          ;MAGENTA -> MAGENTA
+    defb    $6                          ;BROWN -> ORANGE
+    defb    $3                          ;LIGHTGRAY -> WHITE
+    defb    $c                          ;DARKGRAY -> LIGHT GREY
+    defb    $9                          ;LIGHTBLUE -> LIGHT BLUE
+    defb    $7                          ;LIGHTGREEN -> LIGHT YELLOW
+    defb    $d                          ;LIGHTCYAN -> TURQUOISE
+    defb    $a                          ;LIGHTRED -> PINK
+    defb    $b                          ;LIGHTMAGENTA -> PURPLE
+    defb    $4                          ;YELLOW -> YELLOW
+    defb    $f                          ;WHITE -> BRIGHT WHITE
 

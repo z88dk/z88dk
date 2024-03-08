@@ -5,31 +5,31 @@
 ;	Move pen to dX;dY (BC;DE) relatively
 ;
 
-	SECTION code_clib
-	PUBLIC move
+    SECTION code_clib
+    PUBLIC  move
     INCLUDE "target/tvc/def/tvc.def"
 
 
 
-.move
-._move
+move:
+_move:
 
-    ld      hl,2
-    add     hl,sp
-    ld      e,(hl)  ; getting dY
+    ld      hl, 2
+    add     hl, sp
+    ld      e, (hl)                     ; getting dY
     inc     hl
-    ld      d,(hl)
+    ld      d, (hl)
     inc     hl
-    ld      c,(hl)  ; getting dX
+    ld      c, (hl)                     ; getting dX
     inc     hl
-    ld      b,(hl)
+    ld      b, (hl)
 
-    ld      hl,0 ; y=-y
+    ld      hl, 0                       ; y=-y
     xor     a
-    sbc     hl,de
-    ex      de,hl
+    sbc     hl, de
+    ex      de, hl
 
 
     rst     $30
-    defb    BREL ; GRAPHICS - MOVE CURSOR RELATIVE
-	ret
+    defb    BREL                        ; GRAPHICS - MOVE CURSOR RELATIVE
+    ret

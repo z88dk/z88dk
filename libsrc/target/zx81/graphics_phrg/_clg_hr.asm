@@ -7,28 +7,28 @@
 ;	$Id: _clg_hr.asm $
 ;
 
-	MODULE    __pseudohrg_clg_hr
+    MODULE  __pseudohrg_clg_hr
 
-	SECTION   code_graphics
-	PUBLIC    _clg_hr
-	PUBLIC    __clg_hr
+    SECTION code_graphics
+    PUBLIC  _clg_hr
+    PUBLIC  __clg_hr
 
-	EXTERN	base_graphics
-	
-	EXTERN	_gfxhr_pixtab
+    EXTERN  base_graphics
 
-	EXTERN	hrg_on
+    EXTERN  _gfxhr_pixtab
 
-	INCLUDE "graphics/grafix.inc"
+    EXTERN  hrg_on
+
+    INCLUDE "graphics/grafix.inc"
 
 
-._clg_hr
-.__clg_hr
+_clg_hr:
+__clg_hr:
 
-        ld      hl,(base_graphics)
-        ld      a,h
-        or      l
-        call    z,HRG_Interface_BaseRamtop	; if zero, make space and adjust ramtop for 16K
+    ld      hl, (base_graphics)
+    ld      a, h
+    or      l
+    call    z, HRG_Interface_BaseRamtop ; if zero, make space and adjust ramtop for 16K
 
 ;--------------------------------------------------------------------
 ;
@@ -40,26 +40,26 @@
 ;
 ;--------------------------------------------------------------------
 
-	ld	hl,(base_graphics)
+    ld      hl, (base_graphics)
 
-	ld	a,maxy
-	ld	c,a
+    ld      a, maxy
+    ld      c, a
 	;push af
 
-	ld	a,(_gfxhr_pixtab)
-.floop
-	ld b,32
-.zloop
-	ld (hl),a
-	inc hl
-	djnz zloop
-	
-	ld (hl),201
-	inc hl
-	dec c
-	jr nz,floop
+    ld      a, (_gfxhr_pixtab)
+floop:
+    ld      b, 32
+zloop:
+    ld      (hl), a
+    inc     hl
+    djnz    zloop
 
-	jp hrg_on
+    ld      (hl), 201
+    inc     hl
+    dec     c
+    jr      nz, floop
+
+    jp      hrg_on
 
 
 
@@ -75,28 +75,28 @@
 ;DEFC   MODE    = 16390 ;byte   Specified K, L, F or G cursor.
 ;DEFC   PPC     = 16391 ;word   Line number of statement currently being executed
 
-DEFC    ERR_SP  = 16386 ;word   Address of first item on machine stack (after GOSUB returns).
-DEFC    RAMTOP  = 16388 ;word   Address of first byte above BASIC system area. 
+    DEFC    ERR_SP=16386                ;word   Address of first item on machine stack (after GOSUB returns).
+    DEFC    RAMTOP=16388                ;word   Address of first byte above BASIC system area.
 
 
 
 
-IF DEFINED_MEM8K
-    DEFC  TOPOFRAM    = $6000
-ELSE
-    DEFC  TOPOFRAM    = $8000
-ENDIF
+  IF    DEFINED_MEM8K
+    DEFC    TOPOFRAM=$6000
+  ELSE
+    DEFC    TOPOFRAM=$8000
+  ENDIF
 
 
-DEFC  BASE_VRAM   = TOPOFRAM - (maxy*33)
-DEFC  NEW_RAMTOP  = BASE_VRAM - 128
-DEFC  WHOLEMEM    = (maxy*33) + 128   ; size of graphics map in 256x192 mode
+    DEFC    BASE_VRAM=TOPOFRAM-(maxy*33)
+    DEFC    NEW_RAMTOP=BASE_VRAM-128
+    DEFC    WHOLEMEM=(maxy*33)+128      ; size of graphics map in 256x192 mode
 
 
 
 
 
-IF !DEFINED_hrgpage
+  IF    !DEFINED_hrgpage
 ;--------------------------------------------------------------
 ;
 ; HRG_Interface_BaseRamtop
@@ -110,61 +110,61 @@ IF !DEFINED_hrgpage
 ;--------------------------------------------------------------
 HRG_Interface_BaseRamtop:
 
-        ld      hl,(RAMTOP)
-        ld      de,TOPOFRAM     ;is RAMTOP in original 8k/16k position?
-        xor     a
-        sbc     hl,de
-        ld      a,h
-        or      l
-        jr      z,HRG_Interface_BaseRamtopModify
-        ld      hl,(RAMTOP)
-        ld      de,NEW_RAMTOP    ;is RAMTOP already lowered?
-        xor     a
-        sbc     hl,de
-        ld      a,h
-        or      l               ;no, so this is a problem!
-        jr      nz,HRG_Interface_BaseRamError
+    ld      hl, (RAMTOP)
+    ld      de, TOPOFRAM                ;is RAMTOP in original 8k/16k position?
+    xor     a
+    sbc     hl, de
+    ld      a, h
+    or      l
+    jr      z, HRG_Interface_BaseRamtopModify
+    ld      hl, (RAMTOP)
+    ld      de, NEW_RAMTOP              ;is RAMTOP already lowered?
+    xor     a
+    sbc     hl, de
+    ld      a, h
+    or      l                           ;no, so this is a problem!
+    jr      nz, HRG_Interface_BaseRamError
 
-        ld      hl,BASE_VRAM      ;yes, then set base_graphics
-        ld      (base_graphics),hl
-        ret
-
-
-HRG_Interface_BaseRamtopModify: 
-        ld      hl,BASE_VRAM
-        ld      (base_graphics),hl
-
-        ld      hl,NEW_RAMTOP    ;lower RAMTOP
-        ld      (RAMTOP),hl
-        
-        ld      hl,(ERR_SP)
-        ld      de,WHOLEMEM
-        xor     a
-        sbc     hl,de
-        ld      (ERR_SP),hl     ;lower ERR_SP
+    ld      hl, BASE_VRAM               ;yes, then set base_graphics
+    ld      (base_graphics), hl
+    ret
 
 
-        ld      hl,$0000
-        add     hl,sp           ;load SP into HL
-        push    hl		; *** stack pointer
-        ld      de,TOPOFRAM     ;prepare to copy the stack
-        ex      de,hl
-        xor     a
-        sbc     hl,de
-        ld      de,$0040
-        add     hl,de           ;stackdeepth in HL
-        push    hl
-        pop     bc              ;stackdeepth in BC
-        
-        ld	hl,TOPOFRAM-1   ;make a copy of the stack
-        ld      de,NEW_RAMTOP-1
-        lddr
+HRG_Interface_BaseRamtopModify:
+    ld      hl, BASE_VRAM
+    ld      (base_graphics), hl
 
-        pop     hl              ; *** stackpointer in HL
-        ld      de,WHOLEMEM
-        xor     a
-        sbc     hl,de           ;lower the stackpointer
-        ld      sp,hl           ;WOW!
+    ld      hl, NEW_RAMTOP              ;lower RAMTOP
+    ld      (RAMTOP), hl
+
+    ld      hl, (ERR_SP)
+    ld      de, WHOLEMEM
+    xor     a
+    sbc     hl, de
+    ld      (ERR_SP), hl                ;lower ERR_SP
+
+
+    ld      hl, $0000
+    add     hl, sp                      ;load SP into HL
+    push    hl                          ; *** stack pointer
+    ld      de, TOPOFRAM                ;prepare to copy the stack
+    ex      de, hl
+    xor     a
+    sbc     hl, de
+    ld      de, $0040
+    add     hl, de                      ;stackdeepth in HL
+    push    hl
+    pop     bc                          ;stackdeepth in BC
+
+    ld      hl, TOPOFRAM-1              ;make a copy of the stack
+    ld      de, NEW_RAMTOP-1
+    lddr
+
+    pop     hl                          ; *** stackpointer in HL
+    ld      de, WHOLEMEM
+    xor     a
+    sbc     hl, de                      ;lower the stackpointer
+    ld      sp, hl                      ;WOW!
 
 
 HRG_Interface_BaseRamError:
@@ -175,10 +175,10 @@ HRG_Interface_BaseRamError:
 	; Nothig is as expected: let's put graphics just above the actual RAMTOP
 	; and cross fingers
 
-        ld      hl,(RAMTOP)
-        ld      (base_graphics),hl
-        
-        ret
+    ld      hl, (RAMTOP)
+    ld      (base_graphics), hl
 
-ENDIF
+    ret
+
+  ENDIF
 

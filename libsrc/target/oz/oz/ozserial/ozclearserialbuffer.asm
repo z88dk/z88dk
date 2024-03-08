@@ -11,22 +11,22 @@
 ; $Id: ozclearserialbuffer.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozclearserialbuffer
-	PUBLIC	_ozclearserialbuffer
+    SECTION code_clib
+    PUBLIC  ozclearserialbuffer
+    PUBLIC  _ozclearserialbuffer
 
-	EXTERN	serial_int
-	EXTERN	SerialBuffer
-	EXTERN	ozserbufget
-	EXTERN	ozrxxoff
+    EXTERN  serial_int
+    EXTERN  SerialBuffer
+    EXTERN  ozserbufget
+    EXTERN  ozrxxoff
 
 
 ozclearserialbuffer:
 _ozclearserialbuffer:
-        ld      hl,ozserbufget
-        ld      a,(hl)
-        inc     hl
-        ld      (hl),a
-        xor     a
-        ld      (ozrxxoff),a
-        ret
+    ld      hl, ozserbufget
+    ld      a, (hl)
+    inc     hl
+    ld      (hl), a
+    xor     a
+    ld      (ozrxxoff), a
+    ret

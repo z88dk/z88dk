@@ -1,9 +1,9 @@
-SECTION code_clib
+    SECTION code_clib
 
-PUBLIC close
-PUBLIC _close
+    PUBLIC  close
+    PUBLIC  _close
 
-INCLUDE "target/agon/def/mos_api.inc"
+    INCLUDE "target/agon/def/mos_api.inc"
 
 close:
 _close:
@@ -12,7 +12,7 @@ _close:
     push    bc
     push    de
     push    ix
-    MOSCALL(mos_fclose)
-    ld      hl,0
+    MOSCALL (mos_fclose)
+    ld      hl, 0
     pop     ix
     ret

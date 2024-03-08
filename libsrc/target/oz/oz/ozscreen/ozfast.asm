@@ -15,16 +15,16 @@
 ; $Id: ozfast.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozfast
-	PUBLIC	_ozfast
-	
-	EXTERN	ozblankscreen
-	
+    SECTION code_clib
+    PUBLIC  ozfast
+    PUBLIC  _ozfast
+
+    EXTERN  ozblankscreen
+
 ozfast:
 _ozfast:
-        call    ozblankscreen
-        xor     a
-        out     (20h),a
-        out     (24h),a
-        ret
+    call    ozblankscreen
+    xor     a
+    out     (20h), a
+    out     (24h), a
+    ret
