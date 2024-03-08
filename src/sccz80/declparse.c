@@ -1826,7 +1826,7 @@ static void declfunc(Type *functype, enum storage_type storage)
             }
         }
         // Take the prototype flags
-        functype->flags = (functype->flags & ~(SMALLC)) | currfn->ctype->flags;
+        currfn->flags = functype->flags = (functype->flags & ~(SMALLC)) | currfn->ctype->flags;
         if ( currfn->ctype->funcattrs.params_offset ) 
             functype->funcattrs.params_offset = currfn->ctype->funcattrs.params_offset;
         functype->funcattrs.shortcall_rst = currfn->ctype->funcattrs.shortcall_rst;
@@ -2010,6 +2010,7 @@ static void declfunc(Type *functype, enum storage_type storage)
     
     stackargs = where;
     lastst = STEXP;
+
     if (statement() != STRETURN && (functype->flags & NAKED) == 0 ) {
         if ( functype->return_type->kind != KIND_VOID && lastst != STASM) {
             warningfmt("return-type","Control reaches end of non-void function");

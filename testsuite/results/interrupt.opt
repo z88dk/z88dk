@@ -80,6 +80,24 @@
 	reti
 
 
+
+._interrupt
+	ei
+	push	af
+	push	bc
+	push	de
+	push	hl
+	push	ix
+	push	iy
+	pop	iy
+	pop	ix
+	pop	hl
+	pop	de
+	pop	bc
+	pop	af
+	reti
+
+
 	SECTION	bss_compiler
 	SECTION	code_compiler
 
@@ -94,6 +112,7 @@
 	GLOBAL	_funcnmi
 	GLOBAL	_func2im2
 	GLOBAL	_func2im1
+	GLOBAL	_interrupt
 
 
 
