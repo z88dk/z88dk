@@ -1312,6 +1312,26 @@ static disc_spec hc2000_spec = {
 };
 
 
+// LEC CP/M on BetaDisk interface
+// 3" floppy disk drive (80 trk, 9 sec)
+static disc_spec zxlec_spec = {
+    .name = "ZXLEC_80T",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+};
+
+
 // Dataputer DISKFACE, Floppy disk interface for the ZX Spectrum
 static disc_spec diskface_spec = {
     .name = "ZX DiskFace",
@@ -2037,6 +2057,7 @@ static struct formats {
     { "fdd3000",   "ZX Timex FDD-3000",     &fdd3000_spec, 0, NULL, 1 },
     { "hc91",      "ZX ICE Felix HC-91",    &hc91_spec, 0, NULL, 1 },
     { "hc2000",    "ZX HC-2000 / CoBra",    &hc2000_spec, 0, NULL, 1 },
+    { "lec80t",    "ZX LEC Betadisk 80T",   &zxlec_spec, 0, NULL, 1 },
     { "quorum",    "ZX Quorum,Profi,Hobb.", &quorum_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
     { "rainbow",   "DEC Rainbow/DECmate",   &rainbow_spec, 0, NULL, 1 },
