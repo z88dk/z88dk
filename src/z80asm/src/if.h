@@ -54,7 +54,7 @@ extern "C" {
 #define ZX81_APP_EXT	".P"		// ZX81 .P file
 
 // main routine
-int z80asm_main();
+int z80asm_linker();
 
 // string pool
 const char* spool_add(const char* str);
@@ -129,6 +129,10 @@ const char* get_float_format_define(void);
 // object files
 bool check_object_file(const char* obj_filename);
 bool check_object_file_no_errors(const char* obj_filename);
+
+// assembler
+void assemble_file(const char* filename);
+void g_asm_assemble_file(const char* filename);
 
 #ifdef __cplusplus
 }

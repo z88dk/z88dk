@@ -224,3 +224,20 @@ istream& safe_getline(istream& is, string& t) {
         }
     }
 }
+
+int ipow(int base, int exp) {
+    if (exp < 0)
+        return 0;
+    else {
+        int result = 1;
+        for (;;) {
+            if (exp & 1)
+                result *= base;
+            exp >>= 1;
+            if (!exp)
+                break;
+            base *= base;
+        }
+        return result;
+    }
+}

@@ -105,19 +105,6 @@ vector<string> split(const string& s) {
     return tokens;
 }
 
-int ipow(int base, int exp) {
-	int result = 1;
-	for (;;) {
-		if (exp & 1)
-			result *= base;
-		exp >>= 1;
-		if (!exp)
-			break;
-		base *= base;
-	}
-	return result;
-}
-
 void swrite_int16(int n, ostream& os) {
 	os.put((n >> 0) & 0xff);
 	os.put((n >> 8) & 0xff);

@@ -15,11 +15,16 @@ struct OpenFile {
     ifstream    ifs;            // input file handle
     string      filename;       // name of file opened
     Location    location;       // current input location
+    int         count_open{ 0 };// number of times open called
 
+    OpenFile();
+    virtual ~OpenFile();
     bool open(const string& filename);
+    OpenFile(OpenFile& other) = delete;
+    OpenFile& operator=(OpenFile& other) = delete;
 };
 
-// reade text files
+// read text files
 struct FileReader {
     list<OpenFile> open_files;
 
@@ -39,3 +44,5 @@ struct SourceReader : public FileReader {
 private:
     bool getline1(string& line) override;
 };
+
+extern SourceReader g_source_reader;

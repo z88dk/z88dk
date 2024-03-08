@@ -176,7 +176,7 @@ string Token::c_string(const string& text) {
 
 //-----------------------------------------------------------------------------
 
-bool Scanner::set_text(const string& text) {
+bool Lexer::set_text(const string& text) {
     clear();
     string str;
     int quote = 0;
@@ -284,8 +284,7 @@ main_loop:
                               }
 
                               // check for .ASSUME
-                              if (keyword == KW_ASSUME && !tokens.empty() &&
-                                  tokens.back().is(TK_DOT))
+                              if (keyword == KW_ASSUME && !tokens.empty() && tokens.back().code == TK_DOT)
                                   tokens.pop_back();       // remove '.'
 
                               // need raw strings after INCLUDE, BINARY, INCBIN, LINE, C_LINE
@@ -362,15 +361,27 @@ end:
     return !got_error;
 }
 
-string Scanner::get_text() const {
+string Lexer::get_text() const {
     return Token::to_string(tokens);
 }
 
-const Token& Scanner::peek(int i) {
-    static const Token end{ TK_END,false };
+string Lexer::peek_text(int idx) const {
+    vector<Token> pending_tokens;
+    for (int i = pos + idx; i < (int)tokens.size(); i++)
+        if (i >= 0)
+            pending_tokens.push_back(tokens[i]);
+    return Token::to_string(pending_tokens);
+}
+
+const Token& Lexer::peek(int i) {
+    static const Token end{ TK_END, false };
     int idx = pos + i;
     if (idx >= 0 && idx < (int)tokens.size())
         return tokens[idx];
     else
         return end;
+}
+
+bool Lexer::at_end() const {
+    return pos >= (int)tokens.size();
 }

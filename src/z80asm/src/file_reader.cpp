@@ -13,6 +13,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 
 FileReader g_file_reader;
+SourceReader g_source_reader;
 
 //-----------------------------------------------------------------------------
 
@@ -25,8 +26,22 @@ bool OpenFile::open(const string& filename_) {
         perror(filename.c_str());
         return false;
     }
-    else
+    else {
+        string parent_dir = fs::path(filename).parent_path().generic_string();
+        if (!parent_dir.empty()) {
+            count_open++;
+            g_args.include_path.push_back(parent_dir);
+        }
         return true;
+    }
+}
+
+OpenFile::OpenFile() {
+}
+
+OpenFile::~OpenFile() {
+    for (int i = 0; i < count_open; i++)
+        g_args.include_path.pop_back();
 }
 
 bool FileReader::open(const string& filename_) {

@@ -16,6 +16,8 @@ X(ErrNotObjFile, "not an object file")
 X(ErrObjFileVersion, "invalid object file version")
 X(ErrLibFileVersion, "invalid library file version")
 X(ErrFileRename, "file rename")
+X(ErrFileCreate, "file create")
+X(ErrDirCreate, "directory create")
 
 // options
 X(ErrNoSrcFile, "source file expected")
@@ -42,6 +44,9 @@ X(ErrSymbolRedeclaration, "symbol redeclaration")
 X(ErrConstExprExpected, "constant expression expected")
 X(ErrDivisionByZero, "division by zero")
 X(ErrExprRecursion, "recursive expression")
+X(ErrColonExpected, "colon expected")
+X(ErrUnbalancedParens, "unbalanced parens")
+X(ErrIntOrIdentExpected, "integer or identifier expected")
 
 // preprocessor
 X(ErrMacroArgsNumber, "number of macro arguments")
@@ -61,6 +66,7 @@ X(ErrSyntaxExpr, "syntax error in expression")
 X(ErrUnbalancedStruct, "unbalanced control structure")
 X(ErrUnbalancedStructStartedAt, "unbalanced control structure started at")
 X(ErrAssertFailed, "assertion failed")
+X(ErrEosExpected, "end of statement expected")
 
 // DMA
 X(ErrDMABaseRegisterIllegal, "DMA base register byte illegal")

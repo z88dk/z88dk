@@ -60,3 +60,6 @@ string int_to_hex(T i, int width) {
         << std::hex << i << std::dec;
     return ss.str();
 }
+
+// integer power function
+int ipow(int base, int exp);

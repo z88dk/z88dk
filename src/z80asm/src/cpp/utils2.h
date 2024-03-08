@@ -23,9 +23,6 @@ string str_expand_escapes(const string& in);
 
 vector<string> split(const string& s);
 
-// integer power function
-int ipow(int base, int exp);
-
 // convert vector of integers to string of comma-separated values
 template<typename T>
 string vector_to_csv(vector<T> items) {

@@ -171,6 +171,12 @@
     <ClInclude Include="..\..\src\z80asm\src\scan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\parse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\src\c\alloc.c">
@@ -242,9 +248,6 @@
     <ClCompile Include="..\..\src\z80asm\src\c\zobjfile.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\cpp\main.cpp">
-      <Filter>Source Files\cpp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\cpp\preproc.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
@@ -282,6 +285,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\scan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\parse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
