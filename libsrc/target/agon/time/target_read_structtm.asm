@@ -36,32 +36,32 @@ target_read_structtm:
     ; And now we can read the values we care about rather than the string
     push    ix
     MOSCALL (mos_sysvars)
-    ld      .la, (ix+sysvar_rtc+7)      ;seconds
+    ld.l    a, (ix+sysvar_rtc+7)      ;seconds
     ld      (hl), a
     inc     hl
     ld      (hl), 0
     inc     hl
-    ld      .la, (ix+sysvar_rtc+6)      ;minutes
+    ld.l    a, (ix+sysvar_rtc+6)      ;minutes
     ld      (hl), a
     inc     hl
     ld      (hl), 0
     inc     hl
-    ld      .la, (ix+sysvar_rtc+5)      ;hours
+    ld.l    a, (ix+sysvar_rtc+5)      ;hours
     ld      (hl), a
     inc     hl
     ld      (hl), 0
     inc     hl
-    ld      .la, (ix+sysvar_rtc+2)      ;day
+    ld.l    a, (ix+sysvar_rtc+2)      ;day
     ld      (hl), a
     inc     hl
     ld      (hl), 0
     inc     hl
-    ld      .la, (ix+sysvar_rtc+1)      ;month
+    ld.l    a, (ix+sysvar_rtc+1)      ;month
     ld      (hl), a
     inc     hl
     ld      (hl), 0
     inc     hl
-    ld      .la, (ix+sysvar_rtc+0)      ;year - epoch = 1980
+    ld.l    a, (ix+sysvar_rtc+0)      ;year - epoch = 1980
     add     80
     ld      (hl), a
     inc     hl
