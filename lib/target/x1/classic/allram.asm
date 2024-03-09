@@ -65,4 +65,4 @@ program:
 cleanup:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
-    INCLUDE "crt/classic/crt_termiante.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
