@@ -8,11 +8,11 @@
 ;	$Id: getk.asm,v 1.3 2016-06-12 17:32:01 dom Exp $
 ;
 
-	SECTION	code_clib
-	PUBLIC	getk
-	PUBLIC	_getk
+    SECTION code_clib
+    PUBLIC  getk
+    PUBLIC  _getk
 
-.getk
-._getk
-	xor	a
-	jp $C90A
+getk:
+_getk:
+    xor     a
+    jp      $C90A

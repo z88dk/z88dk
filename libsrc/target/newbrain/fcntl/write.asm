@@ -18,14 +18,14 @@
 ; $Id: write.asm,v 1.3 2016-06-19 20:26:58 dom Exp $
 
 
-        SECTION code_clib
-	PUBLIC	write
-	PUBLIC	_write
-	PUBLIC	___write
+    SECTION code_clib
+    PUBLIC  write
+    PUBLIC  _write
+    PUBLIC  ___write
 
-	EXTERN	nb_putblock
-	
-.write
-._write
-.___write
-	jp	nb_putblock
+    EXTERN  nb_putblock
+
+write:
+_write:
+___write:
+    jp      nb_putblock

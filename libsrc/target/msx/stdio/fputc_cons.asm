@@ -9,47 +9,47 @@
 ;	$Id: fputc_cons.asm,v 1.8 2016-05-15 20:15:45 dom Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC  fputc_cons_native
-        EXTERN	msxbios
+    SECTION code_clib
+    PUBLIC  fputc_cons_native
+    EXTERN  msxbios
 
 
-IF FORmsx
-        INCLUDE "target/msx/def/msxbios.def"
-ELSE
-        INCLUDE "target/svi/def/svibios.def"
-ENDIF
+  IF    FORmsx
+    INCLUDE "target/msx/def/msxbios.def"
+  ELSE
+    INCLUDE "target/svi/def/svibios.def"
+  ENDIF
 
 
 ;
 ; Entry:        hl = points to char
 ;
-.fputc_cons_native
-	ld      hl,2
-	add     hl,sp
-	ld	a,(hl)
-	push	ix		;save callers
+fputc_cons_native:
+    ld      hl, 2
+    add     hl, sp
+    ld      a, (hl)
+    push    ix                          ;save callers
 
-	ld	ix,CHPUT	; Print char
-IF STANDARDESCAPECHARS
-	cp	10
-ELSE
-	cp	13
-ENDIF
-	jr	nz,nocrlf
+    ld      ix, CHPUT                   ; Print char
+  IF    STANDARDESCAPECHARS
+    cp      10
+  ELSE
+    cp      13
+  ENDIF
+    jr      nz, nocrlf
 
-	call	msxbios
-IF STANDARDESCAPECHARS
-	ld	a,13
-ELSE
-	ld	a,10
-ENDIF
+    call    msxbios
+  IF    STANDARDESCAPECHARS
+    ld      a, 13
+  ELSE
+    ld      a, 10
+  ENDIF
 
-.nocrlf
-	cp	12	; CLS ?
-	jr	nz,nocls
-	ld	ix,CLS
-.nocls
-	call	msxbios
-	pop	ix		;restore callers
-	ret
+nocrlf:
+    cp      12                          ; CLS ?
+    jr      nz, nocls
+    ld      ix, CLS
+nocls:
+    call    msxbios
+    pop     ix                          ;restore callers
+    ret

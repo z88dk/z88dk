@@ -9,6 +9,6 @@ plot_MODE1:
     dec     h
     dec     h
     dec     h
-    ld      a,(__z9001_attr)
-    ld      (hl),a
+    ld      a, (__z9001_attr)
+    ld      (hl), a
     ret

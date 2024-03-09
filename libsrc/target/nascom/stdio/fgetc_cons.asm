@@ -9,42 +9,42 @@
 ;
 
 
-		SECTION	code_clib
-		PUBLIC	fgetc_cons
-		EXTERN	montest
+    SECTION code_clib
+    PUBLIC  fgetc_cons
+    EXTERN  montest
 
-.fgetc_cons
+fgetc_cons:
 
-	call	montest
-	jr	nz,nassys
+    call    montest
+    jr      nz, nassys
 
 ; NASBUG 'T' monitor
-.tin
-	call	0c4dh
-	jr	nc,tin
-	
-	cp	1dh
-	jr	nz,notbs
-	ld	a,8
-.notbs
-	cp	1fh
-	jr	nz,notcr
-	ld	a,13
-.notcr
-	jr	fgetcc_exit
+tin:
+    call    0c4dh
+    jr      nc, tin
+
+    cp      1dh
+    jr      nz, notbs
+    ld      a, 8
+notbs:
+    cp      1fh
+    jr      nz, notcr
+    ld      a, 13
+notcr:
+    jr      fgetcc_exit
 
 ; NASSYS monitor
-.nassys
-	rst	8
-	
-.fgetcc_exit
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
-.not_return
-ENDIF
+nassys:
+    rst     8
 
-	ld	l,a
-	ld	h,0
-	ret
+fgetcc_exit:
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_return
+    ld      a, 10
+not_return:
+  ENDIF
+
+    ld      l, a
+    ld      h, 0
+    ret

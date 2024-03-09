@@ -4,15 +4,15 @@
 ;       Stefano Bodrato 2021
 ;
 
-        INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-		SECTION	  code_clib
-        PUBLIC    w_respixel
+    SECTION code_clib
+    PUBLIC  w_respixel
 
-        EXTERN     l_cmp
-        EXTERN     w_pixeladdress
+    EXTERN  l_cmp
+    EXTERN  w_pixeladdress
 
-        EXTERN    __gfx_coords
+    EXTERN  __gfx_coords
 
 ;
 ;       $Id: w_respixl.asm $
@@ -34,42 +34,42 @@
 ;  ......../ixiy same
 ;  afbcdehl/.... different
 ;
-.w_respixel
-        push    hl
-        ld      hl,maxy
-        call    l_cmp
-        pop     hl
-        ret     nc               ; Return if Y overflows
+w_respixel:
+    push    hl
+    ld      hl, maxy
+    call    l_cmp
+    pop     hl
+    ret     nc                          ; Return if Y overflows
 
-        push    de
-        ld      de,maxx
-        call    l_cmp
-        pop     de
-        ret     c                ; Return if X overflows
-        
-        ld      (__gfx_coords),hl      ; store X
-        ld      (__gfx_coords+2),de    ; store Y: COORDS must be 2 bytes wider
+    push    de
+    ld      de, maxx
+    call    l_cmp
+    pop     de
+    ret     c                           ; Return if X overflows
 
-
-		call	w_pixeladdress
+    ld      (__gfx_coords), hl          ; store X
+    ld      (__gfx_coords+2), de        ; store Y: COORDS must be 2 bytes wider
 
 
-		ld	b,a
-		ld	a,1
-		jr	z, or_pixel		; pixel is at bit 0...
-.plot_position
-		rlca
-		djnz plot_position
-.or_pixel
+    call    w_pixeladdress
 
 
-		ld	bc,4
-        in	e,(c)	; data read
+    ld      b, a
+    ld      a, 1
+    jr      z, or_pixel                 ; pixel is at bit 0...
+plot_position:
+    rlca
+    djnz    plot_position
+or_pixel:
 
-        cpl
-        and	e	; set pixel in current byte
 
-		inc	bc
-        out	(c),a	; data write
-        
-		ret
+    ld      bc, 4
+    in      e, (c)                      ; data read
+
+    cpl
+    and     e                           ; set pixel in current byte
+
+    inc     bc
+    out     (c), a                      ; data write
+
+    ret

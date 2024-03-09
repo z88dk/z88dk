@@ -9,13 +9,13 @@
 ;	$Id: getk.asm - stefano Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	getk
-	PUBLIC	_getk
+    SECTION code_clib
+    PUBLIC  getk
+    PUBLIC  _getk
 
-	EXTERN key_to_asc
-	
-.getk
-._getk
-	call $be53
-	jp key_to_asc
+    EXTERN  key_to_asc
+
+getk:
+_getk:
+    call    $be53
+    jp      key_to_asc

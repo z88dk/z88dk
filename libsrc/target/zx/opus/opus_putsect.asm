@@ -7,26 +7,26 @@
 ;	A standard 178K Opus disk has 0..718 sectors
 ;	Each sector is 256 bytes long
 ;
-;	int opus_putsect(int drive, int sector, char * buffer); 
+;	int opus_putsect(int drive, int sector, char * buffer);
 ;
 ;	$Id: opus_putsect.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
-SECTION code_clib
-PUBLIC opus_putsect
-PUBLIC _opus_putsect
-EXTERN asm_opus_putsect
+    SECTION code_clib
+    PUBLIC  opus_putsect
+    PUBLIC  _opus_putsect
+    EXTERN  asm_opus_putsect
 
-.opus_putsect
-._opus_putsect
+opus_putsect:
+_opus_putsect:
 
-	pop af
-	pop de		; buffer location
-	pop hl		; sector number
-	pop bc		; c=drive#
-	push bc		; c=drive#
-	push hl		; sector number
-	push de		; buffer location
-	push af
-	
-	jp	asm_opus_putsect
+    pop     af
+    pop     de                          ; buffer location
+    pop     hl                          ; sector number
+    pop     bc                          ; c=drive#
+    push    bc                          ; c=drive#
+    push    hl                          ; sector number
+    push    de                          ; buffer location
+    push    af
+
+    jp      asm_opus_putsect

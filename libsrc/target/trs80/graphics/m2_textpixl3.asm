@@ -12,12 +12,12 @@
 ;
 
 
-	PUBLIC	textpixl
+    PUBLIC  textpixl
 
 
-.textpixl
-		defb	32
-		defb	0x1b+128, 0x16, 0x19+128
-		defb	0x18, 0x16+128, 0x1a
-		defb	32+128
+textpixl:
+    defb    32
+    defb    0x1b+128, 0x16, 0x19+128
+    defb    0x18, 0x16+128, 0x1a
+    defb    32+128
 

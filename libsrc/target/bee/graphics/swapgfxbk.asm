@@ -14,24 +14,24 @@
 ;
 
 
-		SECTION	code_clib
-                PUBLIC    swapgfxbk
-                PUBLIC    _swapgfxbk
+    SECTION code_clib
+    PUBLIC  swapgfxbk
+    PUBLIC  _swapgfxbk
 
-		PUBLIC	swapgfxbk1
-      PUBLIC   _swapgfxbk1
+    PUBLIC  swapgfxbk1
+    PUBLIC  _swapgfxbk1
 
 
-.swapgfxbk
-._swapgfxbk
-		di
-		ret
+swapgfxbk:
+_swapgfxbk:
+    di
+    ret
 
-.swapgfxbk1
-._swapgfxbk1
-	di
+swapgfxbk1:
+_swapgfxbk1:
+    di
 ;	ld a,128		; premium graphics on
 ;	out ($1c),a
 		;ei
-		ret
+    ret
 

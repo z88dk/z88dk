@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: killdaemon
 
-        SECTION code_clib
-	PUBLIC	killdaemon
-	PUBLIC	_killdaemon
+    SECTION code_clib
+    PUBLIC  killdaemon
+    PUBLIC  _killdaemon
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.killdaemon
-._killdaemon
-	ld	a,r_killdaemon
-	call_pkg(tcp_all)
-	ret	nc
+killdaemon:
+_killdaemon:
+    ld      a, r_killdaemon
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,killdaemon
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, killdaemon
+    jp      no_zsock

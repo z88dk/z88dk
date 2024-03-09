@@ -9,33 +9,33 @@
 ;
 ;	$Id: mbc_getword.asm $
 ;
-		SECTION code_clib
+    SECTION code_clib
 
-		PUBLIC    mbc_getword
-		PUBLIC    _mbc_getword
-		
-		EXTERN  mbc_rcv_rdy
+    PUBLIC  mbc_getword
+    PUBLIC  _mbc_getword
+
+    EXTERN  mbc_rcv_rdy
 
 
 mbc_getword:
 _mbc_getword:
 
-	ld b,0
-	call mbc_rcv_rdy
-	ld hl,-1		; error
-	ret z
-	
-	in a,($e8)      ; Master PPI, port A
-	ld h,a          ; MSB
+    ld      b, 0
+    call    mbc_rcv_rdy
+    ld      hl, -1                      ; error
+    ret     z
 
-	ld b,4
-	call mbc_rcv_rdy
-	jr nz,no_err
-	ld hl,-1		; error
-	ret
+    in      a, ($e8)                    ; Master PPI, port A
+    ld      h, a                        ; MSB
+
+    ld      b, 4
+    call    mbc_rcv_rdy
+    jr      nz, no_err
+    ld      hl, -1                      ; error
+    ret
 
 no_err:
-	in a,($e8)      ; Master PPI, port A
-	ld l,a          ; LSB
-	ret
+    in      a, ($e8)                    ; Master PPI, port A
+    ld      l, a                        ; LSB
+    ret
 

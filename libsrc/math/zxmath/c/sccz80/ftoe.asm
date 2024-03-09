@@ -10,9 +10,9 @@
 
 ;	Just a dirty placeholder..   :oP
 
-                SECTION  code_fp
-		PUBLIC	ftoe
-		EXTERN	ftoa
-		
-.ftoe
-		jp	ftoa
+    SECTION code_fp
+    PUBLIC  ftoe
+    EXTERN  ftoa
+
+ftoe:
+    jp      ftoa

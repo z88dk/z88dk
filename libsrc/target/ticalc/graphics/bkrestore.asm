@@ -7,63 +7,63 @@
 ; $Id: bkrestore.asm,v 1.9 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
-        SECTION code_graphics
-        EXTERN  cpygraph
-        EXTERN  pixeladdress
+    SECTION code_graphics
+    EXTERN  cpygraph
+    EXTERN  pixeladdress
 
-        INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-        PUBLIC  bkrestore
-        PUBLIC  _bkrestore
-        PUBLIC  bkrestore_fastcall
-        PUBLIC  _bkrestore_fastcall
+    PUBLIC  bkrestore
+    PUBLIC  _bkrestore
+    PUBLIC  bkrestore_fastcall
+    PUBLIC  _bkrestore_fastcall
 
 bkrestore:
 _bkrestore:
-        pop     de
-        pop     hl
-        push    hl
-        push    de
+    pop     de
+    pop     hl
+    push    hl
+    push    de
 
 bkrestore_fastcall:
 _bkrestore_fastcall:
 
 ; __FASTCALL__ : sprite ptr in HL
 
-        push    hl
-        pop     ix
+    push    hl
+    pop     ix
 
-        ld      h, (ix+2)               ; restore sprite position
-        ld      l, (ix+3)
+    ld      h, (ix+2)                   ; restore sprite position
+    ld      l, (ix+3)
 
-        ld      a, (ix+0)
-        ld      b, (ix+1)
+    ld      a, (ix+0)
+    ld      b, (ix+1)
 
-        dec     a
-        srl     a
-        srl     a
-        srl     a
-        inc     a
-        inc     a                       ; INT ((Xsize-1)/8+2)
-        ld      (rbytes+1), a
+    dec     a
+    srl     a
+    srl     a
+    srl     a
+    inc     a
+    inc     a                           ; INT ((Xsize-1)/8+2)
+    ld      (rbytes+1), a
 
 _sloop:
-        push    bc
-        push    hl
+    push    bc
+    push    hl
 
 rbytes:
-        ld      b, 0
+    ld      b, 0
 rloop:
-        ld      a, (ix+4)
-        ld      (hl), a
-        inc     hl
-        inc     ix
-        djnz    rloop
+    ld      a, (ix+4)
+    ld      (hl), a
+    inc     hl
+    inc     ix
+    djnz    rloop
 
-        pop     hl
-        ld      bc, row_bytes           ;Go to next line
-        add     hl, bc
+    pop     hl
+    ld      bc, row_bytes               ;Go to next line
+    add     hl, bc
 
-        pop     bc
-        djnz    _sloop
-        jp      cpygraph
+    pop     bc
+    djnz    _sloop
+    jp      cpygraph

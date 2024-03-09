@@ -1,8 +1,8 @@
 
-	SECTION	code_himem
+    SECTION code_himem
 
-	PUBLIC	xorpixel
+    PUBLIC  xorpixel
 
-.xorpixel
-        defc    NEEDxor = 1
-        INCLUDE "target/lviv/graphics/pixel.inc"
+xorpixel:
+    defc    NEEDxor=1
+    INCLUDE "target/lviv/graphics/pixel.inc"

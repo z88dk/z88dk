@@ -5,12 +5,12 @@
 
 
 
-        SECTION code_clib
-	PUBLIC	w_pointxy
-        EXTERN  __spc1000_mode
-        defc    NEEDpoint= 1
+    SECTION code_clib
+    PUBLIC  w_pointxy
+    EXTERN  __spc1000_mode
+    defc    NEEDpoint=1
 
 
-.w_pointxy			
-	INCLUDE "w_pixel.inc"
+w_pointxy:
+    INCLUDE "w_pixel.inc"
 

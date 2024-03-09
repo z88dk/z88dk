@@ -9,13 +9,13 @@
 ;
 
 
-        SECTION code_clib
-	PUBLIC	fgetc_cons
-	PUBLIC	_fgetc_cons
+    SECTION code_clib
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
 
-.fgetc_cons
-._fgetc_cons
-	xor	a
-	call $C90A
-	jr	z,fgetc_cons
-	ret
+fgetc_cons:
+_fgetc_cons:
+    xor     a
+    call    $C90A
+    jr      z, fgetc_cons
+    ret

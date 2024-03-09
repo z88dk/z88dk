@@ -10,9 +10,9 @@
 im1_init:
 _im1_init:
     call    l_push_di
-    ld      (__saved_iy),iy
-    ld      (im_patch+1),iy
-    ld      iy,im1_handler
+    ld      (__saved_iy), iy
+    ld      (im_patch+1), iy
+    ld      iy, im1_handler
     call    l_pop_ei
     ret
 
@@ -20,7 +20,7 @@ _im1_init:
     SECTION smc_clib
 
 im1_handler:
-    ld      hl,im1_vectors
+    ld      hl, im1_vectors
     call    asm_interrupt_handler
 im_patch:
     jp      0
@@ -34,5 +34,5 @@ __saved_iy:
     SECTION code_crt_exit
 
     di
-    ld    iy,(__saved_iy)
+    ld      iy, (__saved_iy)
     ei

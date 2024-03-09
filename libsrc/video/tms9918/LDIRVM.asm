@@ -12,23 +12,23 @@
     PUBLIC  _LDIRVM
     EXTERN  SETWRT
 
-    INCLUDE	"video/tms9918/vdp.inc"
-	
+    INCLUDE "video/tms9918/vdp.inc"
+
 LDIRVM:
 _LDIRVM:
-    ex      de,hl
+    ex      de, hl
     push    bc
     call    SETWRT
     pop     hl
-IF VDP_DATA >= 256
-    ld      bc,VDP_DATA
+IF  VDP_DATA>=256
+    ld      bc, VDP_DATA
 ENDIF
-loop: 	
-    ld      a,(de)
-    VDPOUT(VDP_DATA)
+loop:
+    ld      a, (de)
+    VDPOUT  (VDP_DATA)
     inc     de
     dec     hl
-    ld      a,h
+    ld      a, h
     or      l
-    jr      nz,loop
+    jr      nz, loop
     ret

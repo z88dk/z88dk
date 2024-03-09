@@ -3,13 +3,13 @@
 
 
 
-        SECTION code_clib
-        PUBLIC  respixel
+    SECTION code_clib
+    PUBLIC  respixel
 
 
-	EXTERN	res_MODE0
+    EXTERN  res_MODE0
 
-	defc respixel = res_MODE0
+    defc    respixel=res_MODE0
 
 
 

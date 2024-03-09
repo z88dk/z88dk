@@ -9,18 +9,18 @@
 ;       $Id: clsgraph.asm,v 1.4 2017-01-02 22:58:00 aralbrec Exp $
 ;
 
-		        SECTION code_clib
-			PUBLIC    cleargraphics
-         PUBLIC    _cleargraphics
+    SECTION code_clib
+    PUBLIC  cleargraphics
+    PUBLIC  _cleargraphics
 			;EXTERN    loadudg6
-			EXTERN  filltxt
+    EXTERN  filltxt
 			;EXTERN  base_graphics
 
-			INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
 
-.cleargraphics
-._cleargraphics
-	
-	ld   l,0
-	jp  filltxt
+cleargraphics:
+_cleargraphics:
+
+    ld      l, 0
+    jp      filltxt

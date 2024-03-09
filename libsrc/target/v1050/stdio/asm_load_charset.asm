@@ -2,12 +2,12 @@
 ; Visual 1050, character redefinition.
 ; Stefano, May 2023
 
-        PUBLIC  asm_load_charset
-        PUBLIC  asm_load_8x8_chr
+    PUBLIC  asm_load_charset
+    PUBLIC  asm_load_8x8_chr
 
-        EXTERN  v1050_sendchar
-        EXTERN  __v1050_byte
-        EXTERN  CRT_FONT
+    EXTERN  v1050_sendchar
+    EXTERN  __v1050_byte
+    EXTERN  CRT_FONT
 
 
 ; Load a series of characters
@@ -31,39 +31,39 @@ asm_load_charset:
 	; Load a character
 	; HL points to data
 	; C = chr$ code (0 = ' ', etc..)
-	;	
+	;
 	; HL is updated to point to the next character
 
 asm_load_8x8_chr:
-		push hl
-		
-		xor a
-		ld d,a
-		call asm_load_8x8_byte
+    push    hl
+
+    xor     a
+    ld      d, a
+    call    asm_load_8x8_byte
 
 chr_loop:
-		inc d
-		pop hl
-		ld a,(hl)
-		inc hl
-		push hl
-		call asm_load_8x8_byte
-		ld a,8
-		sub d
-		jr nz,chr_loop
-		
-		call asm_load_8x8_zbyte
-		call asm_load_8x8_zbyte
-		call asm_load_8x8_zbyte
-		
-		pop hl
-		ret
+    inc     d
+    pop     hl
+    ld      a, (hl)
+    inc     hl
+    push    hl
+    call    asm_load_8x8_byte
+    ld      a, 8
+    sub     d
+    jr      nz, chr_loop
+
+    call    asm_load_8x8_zbyte
+    call    asm_load_8x8_zbyte
+    call    asm_load_8x8_zbyte
+
+    pop     hl
+    ret
 
 
 
 asm_load_8x8_zbyte:
-		xor a
-		inc d
+    xor     a
+    inc     d
 
 	; Load a single byte,
 	; C = chr$ code (0 = ' ', etc..)
@@ -74,26 +74,26 @@ asm_load_8x8_byte:
 
 		; ESC > c ; row ; byte_value F
 
-		push af
-		
-		ld l,27
-		call v1050_sendchar
-		ld l,'>'
-		call v1050_sendchar
+    push    af
 
-		ld a,c
-		call __v1050_byte
-		ld l,';'
-		call v1050_sendchar
+    ld      l, 27
+    call    v1050_sendchar
+    ld      l, '>'
+    call    v1050_sendchar
 
-		ld a,d
-		call __v1050_byte
-		ld l,';'
-		call v1050_sendchar
+    ld      a, c
+    call    __v1050_byte
+    ld      l, ';'
+    call    v1050_sendchar
 
-		pop af
-		call __v1050_byte
-		ld l,'F'
-		jp v1050_sendchar
+    ld      a, d
+    call    __v1050_byte
+    ld      l, ';'
+    call    v1050_sendchar
+
+    pop     af
+    call    __v1050_byte
+    ld      l, 'F'
+    jp      v1050_sendchar
 
 

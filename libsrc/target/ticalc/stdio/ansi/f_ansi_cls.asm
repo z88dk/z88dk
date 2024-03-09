@@ -8,20 +8,20 @@
 ;	$Id: f_ansi_cls.asm,v 1.6 2016-06-12 16:06:43 dom Exp $
 ;
 
-        INCLUDE "target/ticalc/stdio/ansi/ticalc.inc"
+    INCLUDE "target/ticalc/stdio/ansi/ticalc.inc"
 
-        SECTION code_clib
-        PUBLIC  ansi_cls
-        EXTERN  base_graphics
-        EXTERN  cpygraph
+    SECTION code_clib
+    PUBLIC  ansi_cls
+    EXTERN  base_graphics
+    EXTERN  cpygraph
 
 ansi_cls:
-        ld      hl, (base_graphics)
-        ld      (hl), 0
-        ld      d, h
-        ld      e, l
-        inc     de
-        ld      bc, row_bytes*64
-        ldir
+    ld      hl, (base_graphics)
+    ld      (hl), 0
+    ld      d, h
+    ld      e, l
+    inc     de
+    ld      bc, row_bytes*64
+    ldir
 
-        jp      cpygraph                ; Copy GRAPH_MEM to LCD, then return
+    jp      cpygraph                    ; Copy GRAPH_MEM to LCD, then return

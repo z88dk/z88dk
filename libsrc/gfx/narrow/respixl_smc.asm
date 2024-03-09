@@ -12,14 +12,14 @@
 ;
 
 
-        PUBLIC  respixel
+    PUBLIC  respixel
 
-        EXTERN  pixel
-        EXTERN  pixmode
+    EXTERN  pixel
+    EXTERN  pixmode
 
 respixel:
-        push    hl
-        ld      hl, 0A62Fh              ; CPL - AND (HL)
-        ld      (pixmode), hl
-        pop     hl
-        jp      pixel
+    push    hl
+    ld      hl, 0A62Fh                  ; CPL - AND (HL)
+    ld      (pixmode), hl
+    pop     hl
+    jp      pixel

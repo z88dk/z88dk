@@ -9,25 +9,25 @@
 ;	$Id: fgetc_cons.asm,v 1.3 2016-03-13 18:14:13 dom Exp $
 ;
 
-		SECTION	  code_clib
+    SECTION code_clib
 
-                PUBLIC    fgetc_cons
+    PUBLIC  fgetc_cons
 
 
-.fgetc_cons
-	push	ix
-	ld	b,$30		;WAITKEY
-	ld	c,$35		;K_CLEAR
-	rst	$10
-	pop	ix
-IF STANDARDESCAPECHARS
-	ld	a,13
-	cp	e
-	jr	nz,not_return
-	ld	e,10
-.not_return
-ENDIF
+fgetc_cons:
+    push    ix
+    ld      b, $30                      ;WAITKEY
+    ld      c, $35                      ;K_CLEAR
+    rst     $10
+    pop     ix
+  IF    STANDARDESCAPECHARS
+    ld      a, 13
+    cp      e
+    jr      nz, not_return
+    ld      e, 10
+not_return:
+  ENDIF
 
-	ld	l,e		;e= = ascii code
-	ld	h,0
-	ret
+    ld      l, e                        ;e= = ascii code
+    ld      h, 0
+    ret

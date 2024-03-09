@@ -14,7 +14,7 @@
 ; ******************************************************************
 ; Get absolute  pixel address in map of virtual (x,y) coordinate.
 ; in: (x,y) coordinate of pixel (h,l)
-; 
+;
 ; out: de = hl  = address of pixel byte
 ;          a    = bit number of byte where pixel is to be placed
 ;         fz    = 1 if bit number is 0 of pixel position
@@ -23,29 +23,29 @@
 ;  ..bc..../ixiy same
 ;  af..dehl/.... different
 
-.pixeladdress
-    ex      de,hl
-    ld      a,e
+pixeladdress:
+    ex      de, hl
+    ld      a, e
     and     7
     out     (KRT_PORT), a
-    ld      l,e         ;Already *8
-    ld      h,0
-    add     hl,hl       ;*16
-    add     hl,hl       ;*32
-    ld      a,l
+    ld      l, e                        ;Already *8
+    ld      h, 0
+    add     hl, hl                      ;*16
+    add     hl, hl                      ;*32
+    ld      a, l
     and     @11100000
-    ld      e,d
+    ld      e, d
     srl     e
     srl     e
     srl     e
     add     e
-    ld      l,a
-    ld	    a,+(KRT_ADDRESS / 256)
+    ld      l, a
+    ld      a, +(KRT_ADDRESS/256)
     add     h
-    ld      h,a
-    ld      a,d
+    ld      h, a
+    ld      a, d
     and     7
     xor     7
-    ld      d,h
-    ld      e,l
+    ld      d, h
+    ld      e, l
     ret

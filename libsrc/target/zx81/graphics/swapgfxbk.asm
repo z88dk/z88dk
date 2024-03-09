@@ -6,25 +6,25 @@
 ;	$Id: swapgfxbk.asm,v 1.11 2017-01-02 22:58:00 aralbrec Exp $
 ;
 
-	        SECTION code_clib
-                PUBLIC    swapgfxbk
-                PUBLIC    _swapgfxbk
+    SECTION code_clib
+    PUBLIC  swapgfxbk
+    PUBLIC  _swapgfxbk
 
-		PUBLIC	swapgfxbk1
-      PUBLIC   _swapgfxbk1
-		
+    PUBLIC  swapgfxbk1
+    PUBLIC  _swapgfxbk1
+
 		;EXTERN	save81
 		;EXTERN	restore81
 
-.swapgfxbk
-._swapgfxbk
+swapgfxbk:
+_swapgfxbk:
 	        ;jp	$2E7	;setfast
-		ret
+    ret
 		;jp	save81
-.swapgfxbk1
-._swapgfxbk1
+swapgfxbk1:
+_swapgfxbk1:
 		; This will become IY when swapped !
-		ld	ix,16384 
+    ld      ix, 16384
 		;jp	$207
-		ret
+    ret
                 ;jp	restore81

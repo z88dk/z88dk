@@ -9,26 +9,26 @@
 ;
 ;	$Id: mbc_sendchar.asm $
 ;
-		SECTION code_clib
+    SECTION code_clib
 
-		PUBLIC    mbc_sendchar
-		PUBLIC    _mbc_sendchar
-		
+    PUBLIC  mbc_sendchar
+    PUBLIC  _mbc_sendchar
+
 
 mbc_sendchar:
 _mbc_sendchar:
 
 wait_obf:
-	in a,($ea)         ; Master PPI, port C
-	and $80            ; test OBF signal
-	jr z,wait_obf
-	
-	in a,($e9)         ; Master PPI, port B
-	and $fe            ; PB0 -> mapped to PA5 of the slave PPI
+    in      a, ($ea)                    ; Master PPI, port C
+    and     $80                         ; test OBF signal
+    jr      z, wait_obf
+
+    in      a, ($e9)                    ; Master PPI, port B
+    and     $fe                         ; PB0 -> mapped to PA5 of the slave PPI
 	; or 1
-	out($e9),a
-	
-	ld a,l             ; FASTCALL:  HL holds the byte to be sent
-	out ($e8),a        ; Master PPI, port A
-	
-	ret
+    out     ($e9), a
+
+    ld      a, l                        ; FASTCALL:  HL holds the byte to be sent
+    out     ($e8), a                    ; Master PPI, port A
+
+    ret

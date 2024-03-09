@@ -1,8 +1,8 @@
 
 
-        SECTION code_graphics
-        PUBLIC  xorclrarea
-        EXTERN  xorpixel
+    SECTION code_graphics
+    PUBLIC  xorclrarea
+    EXTERN  xorpixel
 
 ;
 ;    $Id: xorclrarea.asm $
@@ -22,22 +22,22 @@
 
 xorclrarea:
 
-        push    hl
-        push    bc
+    push    hl
+    push    bc
 rowloop:
-        push    hl
-        push    de
-        push    bc
-        call    xorpixel
-        pop     bc
-        pop     de
-        pop     hl
+    push    hl
+    push    de
+    push    bc
+    call    xorpixel
+    pop     bc
+    pop     de
+    pop     hl
 
-        inc     h
-        djnz    rowloop
-        pop     bc
-        pop     hl
-        inc     l
-        dec     c
-        jr      nz, xorclrarea
-        ret
+    inc     h
+    djnz    rowloop
+    pop     bc
+    pop     hl
+    inc     l
+    dec     c
+    jr      nz, xorclrarea
+    ret

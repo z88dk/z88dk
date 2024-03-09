@@ -6,23 +6,23 @@
 ;    $Id: w_fill.asm $
 ;
 
-        INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
-        MODULE  w_fill
-        SECTION code_graphics
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
+    MODULE  w_fill
+    SECTION code_graphics
 
-        PUBLIC  fill
-        PUBLIC  _fill
-        PUBLIC  ___fill
+    PUBLIC  fill
+    PUBLIC  _fill
+    PUBLIC  ___fill
 
-        EXTERN  l_graphics_cmp
+    EXTERN  l_graphics_cmp
 
-        EXTERN  point
-        EXTERN  plot
-        EXTERN  getmaxx
-        EXTERN  getmaxy
+    EXTERN  point
+    EXTERN  plot
+    EXTERN  getmaxx
+    EXTERN  getmaxy
 
 
 ;ix points to the table on stack (above)
@@ -44,78 +44,78 @@
 fill:
 _fill:
 ___fill:
-        pop     bc
-        pop     de                      ; y
-        pop     hl                      ; x
-        push    hl
-        push    de
-        push    bc
+    pop     bc
+    pop     de                          ; y
+    pop     hl                          ; x
+    push    hl
+    push    de
+    push    bc
 
-        push    hl
-        call    getmaxy
-        call    l_graphics_cmp
-        pop     hl
-        ret     nc                      ; Return if Y overflows
+    push    hl
+    call    getmaxy
+    call    l_graphics_cmp
+    pop     hl
+    ret     nc                          ; Return if Y overflows
 
-        push    de
-        ex      de, hl
-        call    getmaxx
-        call    l_graphics_cmp
-        ex      de, hl
-        pop     de
-        ret     nc                      ; Return if X overflows
+    push    de
+    ex      de, hl
+    call    getmaxx
+    call    l_graphics_cmp
+    ex      de, hl
+    pop     de
+    ret     nc                          ; Return if X overflows
 
-        push    hl
-        push    de
-        call    point
-        pop     de
-        pop     hl
+    push    hl
+    push    de
+    call    point
+    pop     de
+    pop     hl
 
-        ret     nz
+    ret     nz
 
     ;    -- -- -- -- -- -- -- --
 
-        push    hl
-        push    de
-        call    plot
-        pop     de
-        pop     hl
+    push    hl
+    push    de
+    call    plot
+    pop     de
+    pop     hl
 
-        inc     hl
+    inc     hl
 
-        push    hl
-        push    de
-        call    fill
-        pop     de
-        pop     hl
+    push    hl
+    push    de
+    call    fill
+    pop     de
+    pop     hl
 
-        dec     hl
-        dec     hl
+    dec     hl
+    dec     hl
 
-        push    hl
-        push    de
-        call    fill
-        pop     de
-        pop     hl
+    push    hl
+    push    de
+    call    fill
+    pop     de
+    pop     hl
 
-        inc     hl
-        inc     de
+    inc     hl
+    inc     de
 
-        push    hl
-        push    de
-        call    fill
-        pop     de
-        pop     hl
+    push    hl
+    push    de
+    call    fill
+    pop     de
+    pop     hl
 
-        dec     de
-        dec     de
+    dec     de
+    dec     de
 
-        push    hl
-        push    de
-        call    fill
-        pop     de
-        pop     hl
+    push    hl
+    push    de
+    call    fill
+    pop     de
+    pop     hl
 
-        ret
+    ret
 
-  ENDIF
+ENDIF

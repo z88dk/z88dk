@@ -21,7 +21,7 @@
     EXTERN  scrollup_MODE1
     EXTERN  __z1013_mode
 
-    defc    DISPLAY = 0xEC00
+    defc    DISPLAY=0xEC00
 
 
 generic_console_set_ink:
@@ -30,15 +30,15 @@ generic_console_set_attribute:
     ret
 
 generic_console_cls:
-    ld      a,(__z1013_mode)
+    ld      a, (__z1013_mode)
     and     a
-    jp      nz,cls_MODE1
-    ld      a,KRT_DISABLE
-    out     (KRT_PORT),a
+    jp      nz, cls_MODE1
+    ld      a, KRT_DISABLE
+    out     (KRT_PORT), a
     ld      hl, DISPLAY
-    ld      de, DISPLAY +1
-    ld      bc, +(CONSOLE_COLUMNS * CONSOLE_ROWS) - 1
-    ld      (hl),32
+    ld      de, DISPLAY+1
+    ld      bc, +(CONSOLE_COLUMNS*CONSOLE_ROWS)-1
+    ld      (hl), 32
     ldir
     ret
 
@@ -47,12 +47,12 @@ generic_console_cls:
 ; a = character to print
 ; e = raw
 generic_console_printc:
-    ld      a,(__z1013_mode)
+    ld      a, (__z1013_mode)
     and     a
-    ld      a,d
-    jp      nz,printc_MODE1
+    ld      a, d
+    jp      nz, printc_MODE1
     call    xypos
-    ld      (hl),a
+    ld      (hl), a
     ret
 
 ;Entry: c = x,
@@ -62,41 +62,41 @@ generic_console_printc:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
-    ld      a,(__z1013_mode)
+    ld      a, (__z1013_mode)
     and     a
-    jp      nz,vpeek_MODE1
+    jp      nz, vpeek_MODE1
     call    xypos
-    ld      a,(hl)
+    ld      a, (hl)
     and     a
     ret
 
 
 xypos:
-    ld      hl,DISPLAY - CONSOLE_COLUMNS
-    ld      de,CONSOLE_COLUMNS
+    ld      hl, DISPLAY-CONSOLE_COLUMNS
+    ld      de, CONSOLE_COLUMNS
     inc     b
 generic_console_printc_1:
-    add     hl,de
+    add     hl, de
     djnz    generic_console_printc_1
 generic_console_printc_3:
-    add     hl,bc			;hl now points to address in display
+    add     hl, bc                      ;hl now points to address in display
     ret
 
 
 generic_console_scrollup:
-    ld      a,(__z1013_mode)
+    ld      a, (__z1013_mode)
     and     a
-    jp      nz,scrollup_MODE1
+    jp      nz, scrollup_MODE1
     push    de
     push    bc
-    ld      hl, DISPLAY + CONSOLE_COLUMNS
+    ld      hl, DISPLAY+CONSOLE_COLUMNS
     ld      de, DISPLAY
-    ld      bc,+ ((CONSOLE_COLUMNS) * (CONSOLE_ROWS-1))
+    ld      bc, +((CONSOLE_COLUMNS)*(CONSOLE_ROWS-1))
     ldir
-    ex      de,hl
-    ld      b,CONSOLE_COLUMNS
+    ex      de, hl
+    ld      b, CONSOLE_COLUMNS
 generic_console_scrollup_3:
-    ld      (hl),32
+    ld      (hl), 32
     inc     hl
     djnz    generic_console_scrollup_3
     pop     bc

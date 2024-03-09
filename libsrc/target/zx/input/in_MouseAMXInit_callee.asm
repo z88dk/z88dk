@@ -41,26 +41,26 @@
 ; joystick interface ($1f), the Disciple disk interface ($1f) and
 ; the Multiface ($3f).
 
-SECTION code_clib
-PUBLIC in_MouseAMXInit_callee
-PUBLIC _in_MouseAMXInit_callee
-PUBLIC asm_in_MouseAMXInit
+    SECTION code_clib
+    PUBLIC  in_MouseAMXInit_callee
+    PUBLIC  _in_MouseAMXInit_callee
+    PUBLIC  asm_in_MouseAMXInit
 
-EXTERN im2_InstallISR_callee
-EXTERN asm_im2_InstallISR
+    EXTERN  im2_InstallISR_callee
+    EXTERN  asm_im2_InstallISR
 
-EXTERN _in_AMXdeltaX, _in_AMXdeltaY
-EXTERN _in_AMXcoordX, _in_AMXcoordY
+    EXTERN  _in_AMXdeltaX, _in_AMXdeltaY
+    EXTERN  _in_AMXcoordX, _in_AMXcoordY
 
-.in_MouseAMXInit_callee
-._in_MouseAMXInit_callee
+in_MouseAMXInit_callee:
+_in_MouseAMXInit_callee:
 
-   pop hl
-   pop bc
-   ex (sp),hl
-   ld b,l
+    pop     hl
+    pop     bc
+    ex      (sp), hl
+    ld      b, l
 
-.asm_in_MouseAMXInit
+asm_in_MouseAMXInit:
 
 ; enter: B = im 2 vector for X interrupts (even, 0..254)
 ;        C = im 2 vector for Y interrupts (even, 0..254)
@@ -71,102 +71,102 @@ EXTERN _in_AMXcoordX, _in_AMXcoordY
 ; note : 1) disable interrupts prior to calling
 ;        2) uses im2.lib to register interrupt service routines
 
-   ld l,b
-   ld de,XInterrupt
-   call asm_im2_InstallISR
+    ld      l, b
+    ld      de, XInterrupt
+    call    asm_im2_InstallISR
 
-   ld l,c
-   ld de,YInterrupt
-   call asm_im2_InstallISR
+    ld      l, c
+    ld      de, YInterrupt
+    call    asm_im2_InstallISR
 
-   ld a,b
-   out ($5f),a                ; PIO vector for X
-   ld a,$97
-   out ($5f),a                ; PIO enable interrupt generation for X
-   ld a,$4f
-   out ($5f),a                ; PIO select input mode for X
+    ld      a, b
+    out     ($5f), a                    ; PIO vector for X
+    ld      a, $97
+    out     ($5f), a                    ; PIO enable interrupt generation for X
+    ld      a, $4f
+    out     ($5f), a                    ; PIO select input mode for X
 
-   ld a,c
-   out ($7f),a                ; PIO vector for Y
-   ld a,$97
-   out ($7f),a                ; PIO enable interrupt generation for Y
-   ld a,$4f
-   out ($7f),a                ; PIO select input mode for Y
+    ld      a, c
+    out     ($7f), a                    ; PIO vector for Y
+    ld      a, $97
+    out     ($7f), a                    ; PIO enable interrupt generation for Y
+    ld      a, $4f
+    out     ($7f), a                    ; PIO select input mode for Y
 
-   ld hl,$0100
-   ld (_in_AMXdeltaX),hl
-   ld (_in_AMXdeltaY),hl
+    ld      hl, $0100
+    ld      (_in_AMXdeltaX), hl
+    ld      (_in_AMXdeltaY), hl
 
-   ld h,0
-   ld (_in_AMXcoordX),hl
-   ld (_in_AMXcoordY),hl
-   ret
+    ld      h, 0
+    ld      (_in_AMXcoordX), hl
+    ld      (_in_AMXcoordY), hl
+    ret
 
 
 ; interrupt service routines
 
-.XInterrupt
+XInterrupt:
 
-   push af
-   push de
-   push hl
+    push    af
+    push    de
+    push    hl
 
-   ld de,(_in_AMXdeltaX)
-   ld hl,(_in_AMXcoordX)
+    ld      de, (_in_AMXdeltaX)
+    ld      hl, (_in_AMXcoordX)
 
-   in a,($1f)
-   or a
-   jr z,posx
-   sbc hl,de
-   jp nc, contx
-   ld hl,0
-   jp contx
+    in      a, ($1f)
+    or      a
+    jr      z, posx
+    sbc     hl, de
+    jp      nc, contx
+    ld      hl, 0
+    jp      contx
 
-.posx
+posx:
 
-   add hl,de
-   jp nc, contx
-   ld hl,$ffff
+    add     hl, de
+    jp      nc, contx
+    ld      hl, $ffff
 
-.contx
+contx:
 
-   ld (_in_AMXcoordX),hl
-   pop hl
-   pop de
-   pop af
-   ei
-   reti
+    ld      (_in_AMXcoordX), hl
+    pop     hl
+    pop     de
+    pop     af
+    ei
+    reti
 
 
-.YInterrupt
+YInterrupt:
 
-   push af
-   push de
-   push hl
+    push    af
+    push    de
+    push    hl
 
-   ld de,(_in_AMXdeltaY)
-   ld hl,(_in_AMXcoordY)
+    ld      de, (_in_AMXdeltaY)
+    ld      hl, (_in_AMXcoordY)
 
-   in a,($3f)
-   or a
-   jr z,posy
-   add hl,de
-   jp nc, conty
-   ld hl,$ffff
-   jp conty
+    in      a, ($3f)
+    or      a
+    jr      z, posy
+    add     hl, de
+    jp      nc, conty
+    ld      hl, $ffff
+    jp      conty
 
-.posy
+posy:
 
-   sbc hl,de
-   jp nc, conty
-   ld hl,0
+    sbc     hl, de
+    jp      nc, conty
+    ld      hl, 0
 
-.conty
+conty:
 
-   ld (_in_AMXcoordY),hl
-   pop hl
-   pop de
-   pop af
-   ei
-   reti
+    ld      (_in_AMXcoordY), hl
+    pop     hl
+    pop     de
+    pop     af
+    ei
+    reti
 

@@ -11,15 +11,15 @@
 ;	$Id: zx_kempston.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC	zx_kempston
-	PUBLIC	_zx_kempston
-	
+    SECTION code_clib
+    PUBLIC  zx_kempston
+    PUBLIC  _zx_kempston
+
 zx_kempston:
 _zx_kempston:
-	ld	hl,0
-	in	a,(31)
-	cp	32
-	ret	nc
-	inc	hl
-	ret
+    ld      hl, 0
+    in      a, (31)
+    cp      32
+    ret     nc
+    inc     hl
+    ret

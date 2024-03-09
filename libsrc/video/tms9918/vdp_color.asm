@@ -9,64 +9,65 @@
 ;
 
     SECTION code_video_vdp
-    PUBLIC	vdp_color
-    PUBLIC	_vdp_color
+    PUBLIC  vdp_color
+    PUBLIC  _vdp_color
 
-    EXTERN	SETWRT
-    EXTERN	FILVRM
+    EXTERN  SETWRT
+    EXTERN  FILVRM
 
-    EXTERN	vdp_set_reg
+    EXTERN  vdp_set_reg
     EXTERN  __tms9918_attribute
     EXTERN  __tms9918_colour_table
     EXTERN  __tms9918_border
     EXTERN  __tms9918_screen_mode
-	
+
 	;EXTERN	SCRMOD
 
-	INCLUDE	"video/tms9918/vdp.inc"
+    INCLUDE "video/tms9918/vdp.inc"
 
 vdp_color:
 _vdp_color:
-    push    ix		;save callers
-    ld      ix,2
-    add     ix,sp
-    ld      a,(ix+6)	;foreground
+    push    ix                          ;save callers
+    ld      ix, 2
+    add     ix, sp
+    ld      a, (ix+6)                   ;foreground
     rlca
     rlca
     rlca
     rlca
     and     $F0
-    ld      l,a
-    ld      a,(ix+4)	;background
+    ld      l, a
+    ld      a, (ix+4)                   ;background
     and     15
     or      l
-    ld      (__tms9918_attribute),a
-    ld      h,a		;background + foreground
-    ld      a,(__tms9918_screen_mode)
+    ld      (__tms9918_attribute), a
+    ld      h, a                        ;background + foreground
+    ld      a, (__tms9918_screen_mode)
     push    af
     and     a
-    jr      z,set_colour	;in 32x24 graphics mode
-    ld      a,(ix+2)	;border
+    jr      z, set_colour               ;in 32x24 graphics mode
+    ld      a, (ix+2)                   ;border
     and     15
-    ld      (__tms9918_border),a
+    ld      (__tms9918_border), a
     or      l
-    ld      h,a		;foreground + border
+    ld      h, a                        ;foreground + border
 set_colour:
-    ld      bc,7		;register
+    ld      bc, 7                       ;register
     push    bc
-    ld      c,h		;value
+    ld      c, h                        ;value
     push    bc
-    call    vdp_set_reg		;; This is wrong
-    pop     af		;dump parameters
+    call    vdp_set_reg                 ;; This is wrong
+    pop     af                          ;dump parameters
     pop     af
-    pop     af		;Screen mode 
+    pop     af                          ;Screen mode
     and     a
-    jr      nz,not_mode_0
-    ld      a,(__tms9918_attribute)
-    ld      hl,(__tms9918_colour_table)	;Colour table
-    ld      bc,32
+    jr      nz, not_mode_0
+    ld      a, (__tms9918_attribute)
+    ld      hl, (__tms9918_colour_table)
+                                        ;Colour table
+    ld      bc, 32
     call    FILVRM
 not_mode_0:
-    pop     ix		;restore callers
+    pop     ix                          ;restore callers
     ret
 

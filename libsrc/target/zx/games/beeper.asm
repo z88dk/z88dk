@@ -5,10 +5,10 @@
 ; Stefano Bodrato - 2019
 ;
 
-	SECTION		code_clib
+    SECTION code_clib
 
-	PUBLIC		beeper
-	PUBLIC		_beeper
+    PUBLIC  beeper
+    PUBLIC  _beeper
 
 ;
 ; Spectrum beeper routine!!
@@ -44,24 +44,24 @@
 ;         DE = 1308 - 1 = 0x051B
 ;
 ; The resulting waveform has a duty ratio of exactly 50%.
-; 
+;
 ; ----------------------------------------------------------------
 
-	EXTERN	call_rom3
-	EXTERN	bit_open_di
-	EXTERN	bit_close_ei
+    EXTERN  call_rom3
+    EXTERN  bit_open_di
+    EXTERN  bit_close_ei
 
-.beeper
-._beeper
-     call    bit_open_di
-	push	ix		;save callers ix
-IF FORts2068
-	 call    1011
-ELSE
-	 call    call_rom3
-	 defw    949
-ENDIF
-	pop	ix		;restore callers ix
-	 di
-	 call    bit_close_ei
-	 ret
+beeper:
+_beeper:
+    call    bit_open_di
+    push    ix                          ;save callers ix
+  IF    FORts2068
+    call    1011
+  ELSE
+    call    call_rom3
+    defw    949
+  ENDIF
+    pop     ix                          ;restore callers ix
+    di
+    call    bit_close_ei
+    ret

@@ -3,11 +3,11 @@
 
 
 
-      SECTION code_clib
-    PUBLIC    respixel
-      defc    NEEDunplot = 1
+    SECTION code_clib
+    PUBLIC  respixel
+    defc    NEEDunplot=1
 
 
-.respixel          
+respixel:
     INCLUDE "pixel.inc"
 

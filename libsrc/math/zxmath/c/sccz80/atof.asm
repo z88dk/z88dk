@@ -9,91 +9,93 @@
 
 ;double atof(char *)     - convert string to number, leave in fa
 
-IF FORts2068
-		INCLUDE  "target/ts2068/def/ts2068fp.def"
+IF  FORts2068
+    INCLUDE "target/ts2068/def/ts2068fp.def"
 ENDIF
-IF FORzx
-		INCLUDE  "target/zx/def/zxfp.def"
+IF  FORzx
+    INCLUDE "target/zx/def/zxfp.def"
 ENDIF
-IF FORzx81
-		INCLUDE  "target/zx81/def/81fp.def"
+IF  FORzx81
+    INCLUDE "target/zx81/def/81fp.def"
 ENDIF
-IF FORlambda
-		INCLUDE  "target/lambda/def/lambdafp.def"
+IF  FORlambda
+    INCLUDE "target/lambda/def/lambdafp.def"
 ENDIF
 
-                SECTION  code_fp
-                PUBLIC    atof
+    SECTION code_fp
+    PUBLIC  atof
 
-                EXTERN	stkequ
+    EXTERN  stkequ
 
 ;.casave		defw	0
 
-.atof
-		pop	hl
-		pop	de	;the string
-		push	de
-		push	hl
+atof:
+    pop     hl
+    pop     de                          ;the string
+    push    de
+    push    hl
 
-		ld	hl,(ZXFP_CH_ADD)
-		push	hl
-		
-.nobloop	ld	a,(de)			; load the first number digit in A
-		cp	' '			; skip spaces
-		jr	nz,noblank
-		inc	de
-		jr	nobloop
-.noblank	
-		cp	'-'
-		push	af
-		jr	nz,noneg
-		inc	de
-		ld	a,(de)
-.noneg
+    ld      hl, (ZXFP_CH_ADD)
+    push    hl
 
-IF (FORzx | FORts2068)
+nobloop:
+    ld      a, (de)                     ; load the first number digit in A
+    cp      ' '                         ; skip spaces
+    jr      nz, noblank
+    inc     de
+    jr      nobloop
+noblank:
+    cp      '-'
+    push    af
+    jr      nz, noneg
+    inc     de
+    ld      a, (de)
+noneg:
+
+IF  (FORzx|FORts2068)
 ELSE
-		ld	hl,txtbuffer
-		push	hl
-.nloop
-		cp	0
-		jr	z,converted
-		sub	20
-		cp	26
-		jr	nz,nodot
-		ld	a,27
-.nodot
-		ld	(hl),a
-		inc	hl
-		inc	de
-		ld	a,(de)
-		jr	nloop
- 
-.txtbuffer	defs	15
+    ld      hl, txtbuffer
+    push    hl
+nloop:
+    cp      0
+    jr      z, converted
+    sub     20
+    cp      26
+    jr      nz, nodot
+    ld      a, 27
+nodot:
+    ld      (hl), a
+    inc     hl
+    inc     de
+    ld      a, (de)
+    jr      nloop
 
-.converted
-		ld	a,$76
-		ld	(de),a
-		pop	de
-		ld	a,(de)
-		
+txtbuffer:
+    defs    15
+
+converted:
+    ld      a, $76
+    ld      (de), a
+    pop     de
+    ld      a, (de)
+
 ENDIF
 
-		ld	(ZXFP_CH_ADD),de		; Init the BASIC interpreter pointer
-		call	ZXFP_DEC_TO_FP		; ask BASIC to load the string into a number
-		
-		pop	af
-		jr	nz,noneg1
-		rst	ZXFP_BEGIN_CALC
-IF FORlambda
-	defb	ZXFP_NEGATE + 128
+    ld      (ZXFP_CH_ADD), de           ; Init the BASIC interpreter pointer
+    call    ZXFP_DEC_TO_FP              ; ask BASIC to load the string into a number
+
+    pop     af
+    jr      nz, noneg1
+    rst     ZXFP_BEGIN_CALC
+IF  FORlambda
+    defb    ZXFP_NEGATE+128
 ELSE
-	defb	ZXFP_NEGATE
-	defb	ZXFP_END_CALC
+    defb    ZXFP_NEGATE
+    defb    ZXFP_END_CALC
 ENDIF
-.noneg1
+noneg1:
 
-		pop	hl
-		ld	(ZXFP_CH_ADD),hl		; restore the pointer
+    pop     hl
+    ld      (ZXFP_CH_ADD), hl           ; restore the pointer
 
-		jp      stkequ
+    jp      stkequ

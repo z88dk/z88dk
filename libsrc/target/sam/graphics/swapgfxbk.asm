@@ -1,7 +1,7 @@
 ;
 ;       Z88 Graphics Functions - Small C+ stubs
 ;
-;       SAM Coup version by Frode Tenneb 
+;       SAM Coup version by Frode Tenneb
 ;
 ;       Page the graphics bank in/out - used by all gfx functions
 ;       Simply does a swap...
@@ -12,10 +12,10 @@
 ; registers changed after return:
 ;  ..bcdejl/..iy same
 ;  af....../ix.. different
-; NB! Mad hack! I hope that iy is not used for anything else around. 
+; NB! Mad hack! I hope that iy is not used for anything else around.
 
 
-    SECTION code_clib	
+    SECTION code_clib
     PUBLIC  swapgfxbk
     PUBLIC  _swapgfxbk
 
@@ -24,8 +24,8 @@
 
 
 
-.swapgfxbk
-._swapgfxbk
-.swapgfxbk1
-._swapgfxbk1
-        ret
+swapgfxbk:
+_swapgfxbk:
+swapgfxbk1:
+_swapgfxbk1:
+    ret

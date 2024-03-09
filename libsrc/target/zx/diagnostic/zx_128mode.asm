@@ -11,18 +11,18 @@
 ;	$Id: zx_128mode.asm,v 1.3 2016-06-10 20:02:04 dom Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC	zx_128mode
-	PUBLIC	_zx_128mode
-	
+    SECTION code_clib
+    PUBLIC  zx_128mode
+    PUBLIC  _zx_128mode
+
 zx_128mode:
 _zx_128mode:
-	ld	hl,0
-	ld	a,(75)
-	cp	191
-	ret	z
-	ld	a,(23611)
-	and	16
-	ret	z
-	inc	hl
-	ret
+    ld      hl, 0
+    ld      a, (75)
+    cp      191
+    ret     z
+    ld      a, (23611)
+    and     16
+    ret     z
+    inc     hl
+    ret

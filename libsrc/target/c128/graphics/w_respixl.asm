@@ -1,12 +1,12 @@
-        INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION	  code_clib
-        PUBLIC    w_respixel
+    SECTION code_clib
+    PUBLIC  w_respixel
 
-        EXTERN     l_cmp
-        EXTERN     w_pixeladdress
+    EXTERN  l_cmp
+    EXTERN  w_pixeladdress
 
-        EXTERN    __gfx_coords
+    EXTERN  __gfx_coords
 
 ;
 ;       $Id: w_respixl.asm,v 1.5 2016-07-02 09:01:35 dom Exp $
@@ -28,97 +28,97 @@
 ;  ......../ixiy same
 ;  afbcdehl/.... different
 ;
-.w_respixel
-        push    hl
-        ld      hl,maxy
-        call    l_cmp
-        pop     hl
-        ret     nc               ; Return if Y overflows
+w_respixel:
+    push    hl
+    ld      hl, maxy
+    call    l_cmp
+    pop     hl
+    ret     nc                          ; Return if Y overflows
 
-        push    de
-        ld      de,maxx
-        call    l_cmp
-        pop     de
-        ret     c                ; Return if X overflows
-        
-        ld      (__gfx_coords),hl      ; store X
-        ld      (__gfx_coords+2),de    ; store Y: COORDS must be 2 bytes wider
+    push    de
+    ld      de, maxx
+    call    l_cmp
+    pop     de
+    ret     c                           ; Return if X overflows
 
-	call	w_pixeladdress
+    ld      (__gfx_coords), hl          ; store X
+    ld      (__gfx_coords+2), de        ; store Y: COORDS must be 2 bytes wider
 
-	ld	b,a
-	ld	a,1
-	jr	z, res_pixel		; pixel is at bit 0...
-.plot_position
-	rlca
-	djnz	plot_position
-.res_pixel
+    call    w_pixeladdress
 
-	ex	af,af
-	ld	d,18
-        ld      bc,0d600h
-        out     (c),d
+    ld      b, a
+    ld      a, 1
+    jr      z, res_pixel                ; pixel is at bit 0...
+plot_position:
+    rlca
+    djnz    plot_position
+res_pixel:
+
+    ex      af, af
+    ld      d, 18
+    ld      bc, 0d600h
+    out     (c), d
 loop1:
-        in      a,(c)
-        rla
-        jp      nc,loop1
-        inc	c
-        out     (c),h
+    in      a, (c)
+    rla
+    jp      nc, loop1
+    inc     c
+    out     (c), h
 
-        dec	c
-        inc	d
-        out     (c),d
+    dec     c
+    inc     d
+    out     (c), d
 loop2:
-        in      a,(c)
-        rla
-        jp      nc,loop2
-        inc	c
-        out     (c),l
+    in      a, (c)
+    rla
+    jp      nc, loop2
+    inc     c
+    out     (c), l
 
-        dec	c
-        ld	a,31
-        out     (c),a
+    dec     c
+    ld      a, 31
+    out     (c), a
 loop3:
-        in      a,(c)
-        rla
-        jp      nc,loop3
-        inc	c
+    in      a, (c)
+    rla
+    jp      nc, loop3
+    inc     c
 
-	ex	af,af
-        in	e,(c)
-        cpl
-        and	e	; set pixel in current byte
-        ex	af,af
-        
-        dec	c
-        dec	d
-        out     (c),d
+    ex      af, af
+    in      e, (c)
+    cpl
+    and     e                           ; set pixel in current byte
+    ex      af, af
+
+    dec     c
+    dec     d
+    out     (c), d
 loop4:
-        in      a,(c)
-        rla
-        jp      nc,loop4
-        inc	c
-        out     (c),h
+    in      a, (c)
+    rla
+    jp      nc, loop4
+    inc     c
+    out     (c), h
 
-        dec	c
-        inc	d
-        out     (c),d
+    dec     c
+    inc     d
+    out     (c), d
 loop5:
-        in      a,(c)
-        rla
-        jp      nc,loop5
-        inc	c
-        out     (c),l
+    in      a, (c)
+    rla
+    jp      nc, loop5
+    inc     c
+    out     (c), l
 
-        dec	c
-        ld	a,31
-        out     (c),a
+    dec     c
+    ld      a, 31
+    out     (c), a
 loop6:
-        in      a,(c)
-        rla
-        jp      nc,loop6
-        inc	c
-        ex	af,af
-        out	(c),a
-        
-	ret
+    in      a, (c)
+    rla
+    jp      nc, loop6
+    inc     c
+    ex      af, af
+    out     (c), a
+
+    ret

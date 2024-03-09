@@ -1,10 +1,10 @@
 
-        SECTION code_fp
+    SECTION code_fp
 
-        PUBLIC  ldexp
+    PUBLIC  ldexp
 
-        EXTERN  dload
-        EXTERN  fa
+    EXTERN  dload
+    EXTERN  fa
 
 ;
 ; double ldexp (double x, int exp);
@@ -13,16 +13,16 @@
 ; raised to the power of exp (the exponent).
 
 ldexp:
-        ld      hl, 4
-        add     hl, sp
-        call    dload
-        ld      hl, 2
-        add     hl, sp
-        ld      c, (hl)
-        ld      hl, fa+5
-        ld      a, (hl)
-        and     a
-        ret     z
-        add     c
-        ld      (hl), a
-        ret
+    ld      hl, 4
+    add     hl, sp
+    call    dload
+    ld      hl, 2
+    add     hl, sp
+    ld      c, (hl)
+    ld      hl, fa+5
+    ld      a, (hl)
+    and     a
+    ret     z
+    add     c
+    ld      (hl), a
+    ret

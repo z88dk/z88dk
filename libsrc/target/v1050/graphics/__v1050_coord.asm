@@ -1,12 +1,12 @@
 
-	INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION	  code_clib
+    SECTION code_clib
 
-	PUBLIC    __v1050_coord
+    PUBLIC  __v1050_coord
 
-	EXTERN    v1050_sendchar
-	EXTERN    v1050_sendchar_fast
+    EXTERN  v1050_sendchar
+    EXTERN  v1050_sendchar_fast
 
 ;
 ;       $Id: __v1050_coord.asm $
@@ -16,17 +16,17 @@
 __v1050_coord:
 
 ;; Short way, binary spec, LSB/MSB
-	push hl
-	ld l,'='
-	call v1050_sendchar
-	pop hl
-	push hl
-	call v1050_sendchar_fast
-	pop hl
-	ld l,h
-	call v1050_sendchar
-	ret
-	
+    push    hl
+    ld      l, '='
+    call    v1050_sendchar
+    pop     hl
+    push    hl
+    call    v1050_sendchar_fast
+    pop     hl
+    ld      l, h
+    call    v1050_sendchar
+    ret
+
 ;; Alternative way, ASCII-decimal values
 ;;--------------------------------------------------
 ;; Binary to BCD conversion
@@ -66,7 +66,7 @@ __v1050_coord:
 ;	add '0'
 ;	ld l,a
 ;	call v1050_sendchar_fast
-;	
+;
 ;	ld a,e
 ;	srl a
 ;	srl a

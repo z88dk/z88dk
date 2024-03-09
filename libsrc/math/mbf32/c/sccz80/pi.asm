@@ -1,9 +1,9 @@
-	SECTION	code_fp_mbf32
+    SECTION code_fp_mbf32
 
-	PUBLIC	pi
+    PUBLIC  pi
 
 pi:
-    ld      hl,$0fdb
-    ld      de,$8249
+    ld      hl, $0fdb
+    ld      de, $8249
     ret
-	
+

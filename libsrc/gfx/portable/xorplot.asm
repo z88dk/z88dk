@@ -1,32 +1,32 @@
 
-	SECTION	code_graphics
+    SECTION code_graphics
 
-	PUBLIC	xorplot
-	PUBLIC	_xorplot
-	PUBLIC	___xorplot
-	PUBLIC	xorplot_callee
-	PUBLIC	_xorplot_callee
-	PUBLIC	asm_xorplot
+    PUBLIC  xorplot
+    PUBLIC  _xorplot
+    PUBLIC  ___xorplot
+    PUBLIC  xorplot_callee
+    PUBLIC  _xorplot_callee
+    PUBLIC  asm_xorplot
 
-	EXTERN	xorpixel
+    EXTERN  xorpixel
 
 ; int xorplot(int x, int y) __smallc;
 xorplot:
 _xorplot:
 ___xorplot:
-	ld	hl,sp+2
-	ld	e,(hl)		;y
-	ld	hl,sp+4
-	ld	d,(hl)		;x
-	ex	de,hl
-	jp	xorpixel
+    ld      hl, sp+2
+    ld      e, (hl)                     ;y
+    ld      hl, sp+4
+    ld      d, (hl)                     ;x
+    ex      de, hl
+    jp      xorpixel
 
 xorplot_callee:
 _xorplot_callee:
-	pop	bc		;return
-	pop	hl		;y
-	pop	de		
-	ld	h,e		;x
-	push	bc		;return address
+    pop     bc                          ;return
+    pop     hl                          ;y
+    pop     de
+    ld      h, e                        ;x
+    push    bc                          ;return address
 asm_xorplot:
-	jp	xorpixel
+    jp      xorpixel

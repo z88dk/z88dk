@@ -13,19 +13,19 @@
 ; If so, A and (£012E) are set to $FF and the key code is put in (£011C).
 ; Otherwise, A and (£012E) are set to $00.
 
-        SECTION code_clib
-	PUBLIC	fgetc_cons
-	PUBLIC	_fgetc_cons
+    SECTION code_clib
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
 
 fgetc_cons:
 _fgetc_cons:
-	call $C006
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
-.not_return
-ENDIF
-	ld l,a
-	ld h,0
-	ret
+    call    $C006
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_return
+    ld      a, 10
+not_return:
+  ENDIF
+    ld      l, a
+    ld      h, 0
+    ret

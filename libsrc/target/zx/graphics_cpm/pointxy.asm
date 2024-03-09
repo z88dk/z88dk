@@ -1,10 +1,10 @@
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-        SECTION code_clib
-	PUBLIC	pointxy
+    SECTION code_clib
+    PUBLIC  pointxy
 
-	EXTERN	pixeladdress
-	EXTERN	p3_peek
+    EXTERN  pixeladdress
+    EXTERN  p3_peek
 
 ;
 ;	$Id: pointxy.asm,v 1.1 2016-10-26 13:03:31 stefano Exp $
@@ -25,34 +25,36 @@
 ;  ..bcdehl/ixiy same
 ;  af....../.... different
 ;
-.pointxy
-			IF maxx <> 256
-				ld	a,h
-				cp	maxx
-				ret	nc
-			ENDIF
+pointxy:
+  IF    maxx<>256
+    ld      a, h
+    cp      maxx
+    ret     nc
+  ENDIF
 
-				ld	a,l
-				cp	maxy
-				ret	nc			; y0	out of range
+    ld      a, l
+    cp      maxy
+    ret     nc                          ; y0	out of range
 
-				push	bc
-				push	de
-				push	hl
+    push    bc
+    push    de
+    push    hl
 
-				call	pixeladdress
-				ld	b,a
-				ld	a,1
-				jr	z, test_pixel		; pixel is at bit 0...
-.pixel_position	rlca
-				djnz	pixel_position
-.test_pixel			ex	de,hl
+    call    pixeladdress
+    ld      b, a
+    ld      a, 1
+    jr      z, test_pixel               ; pixel is at bit 0...
+pixel_position:
+    rlca
+    djnz    pixel_position
+test_pixel:
+    ex      de, hl
 
-				ld e,a
-				call p3_peek
-				and e
-				
-				pop	hl
-				pop	de
-				pop	bc
-				ret
+    ld      e, a
+    call    p3_peek
+    and     e
+
+    pop     hl
+    pop     de
+    pop     bc
+    ret

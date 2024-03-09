@@ -9,23 +9,23 @@
 ;	$Id: getk.asm,v 1.8 2016-06-12 17:32:01 dom Exp $
 ;
 
-        SECTION code_clib
-        PUBLIC  getk
-        PUBLIC  _getk
-        EXTERN  getk_decode
-        EXTERN  tidi
-        EXTERN  tiei
+    SECTION code_clib
+    PUBLIC  getk
+    PUBLIC  _getk
+    EXTERN  getk_decode
+    EXTERN  tidi
+    EXTERN  tiei
 
-        INCLUDE "target/ticalc/stdio/ansi/ticalc.inc"
+    INCLUDE "target/ticalc/stdio/ansi/ticalc.inc"
 
 getk:
 _getk:
-        call    tiei
+    call    tiei
   IF    FORti83p
-        rst     $28
-        defw    getkey
+    rst     $28
+    defw    getkey
   ELSE
-        call    getkey
+    call    getkey
   ENDIF
-        call    tidi
-        jp      getk_decode
+    call    tidi
+    jp      getk_decode

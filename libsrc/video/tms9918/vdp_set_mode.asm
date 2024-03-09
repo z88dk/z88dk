@@ -1,49 +1,49 @@
 
 
-SECTION  code_video_vdp
-PUBLIC   vdp_set_mode
-PUBLIC   _vdp_set_mode
+    SECTION code_video_vdp
+    PUBLIC  vdp_set_mode
+    PUBLIC  _vdp_set_mode
 
 
-EXTERN  __vdp_mode0
-EXTERN  __vdp_mode0_80col
-EXTERN  __vdp_mode1
-EXTERN  __vdp_mode2
-EXTERN  __vdp_mode3
-EXTERN  __vdp_mode4
-EXTERN  __vdp_mode5
-EXTERN  __vdp_mode6
-EXTERN  __vdp_mode8
-EXTERN  vdp_set_mangled_mode
+    EXTERN  __vdp_mode0
+    EXTERN  __vdp_mode0_80col
+    EXTERN  __vdp_mode1
+    EXTERN  __vdp_mode2
+    EXTERN  __vdp_mode3
+    EXTERN  __vdp_mode4
+    EXTERN  __vdp_mode5
+    EXTERN  __vdp_mode6
+    EXTERN  __vdp_mode8
+    EXTERN  vdp_set_mangled_mode
 
-INCLUDE "video/tms9918/vdp.inc"
+    INCLUDE "video/tms9918/vdp.inc"
 
 vdp_set_mode:
 _vdp_set_mode:
-    ex      de,hl
-    ld      hl,mode_table - 2
+    ex      de, hl
+    ld      hl, mode_table-2
 loop:
     inc     hl
     inc     hl
-    ld      a,(hl)
+    ld      a, (hl)
     inc     hl
     cp      255
     ret     z
     cp      e
-    jr      nz,loop
-    ld      e,(hl)
+    jr      nz, loop
+    ld      e, (hl)
     inc     hl
-    ld      d,(hl)
-    ex      de,hl
+    ld      d, (hl)
+    ex      de, hl
     jp      (hl)
 
 
-SECTION rodata_video_vdp
+    SECTION rodata_video_vdp
 
 mode_table:
     defb    0
     defw    __vdp_mode0
-IF V9938 | F18A
+IF  V9938|F18A
     defb    80
     defw    __vdp_mode0_80col
 ENDIF
@@ -53,7 +53,7 @@ ENDIF
     defw    __vdp_mode2
     defb    3
     defw    __vdp_mode3
-IFDEF V9938
+IFDEF   V9938
     defb    4
     defw    __vdp_mode4
     defb    5

@@ -14,95 +14,95 @@
 ;	$Id: zx_syntax.asm $
 ;
 
-SECTION code_clib
-PUBLIC	zx_syntax
-PUBLIC	_zx_syntax
-EXTERN	zx_interface1
-EXTERN	call_rom3
+    SECTION code_clib
+    PUBLIC  zx_syntax
+    PUBLIC  _zx_syntax
+    EXTERN  zx_interface1
+    EXTERN  call_rom3
 
 	; max space for BASIC command(s)
-	defc	cmdlen = 20
-	
+    defc    cmdlen=20
+
 zx_syntax:
 _zx_syntax:
-		push	hl
-		call	zx_interface1	; force IF1 activation to avoid crashes
-		call	call_rom3
-IF FORts2068
-		defw	$133F		; SET-MIN: clear buffers
-ELSE
-		defw	$16b0		; clear buffers
-ENDIF
-		pop	de
-		
-		ld	hl,($5c5d)	; save CH-ADD
-		push	hl
-		ld	hl,($5c5f)	; save X-PTR
-		push	hl
+    push    hl
+    call    zx_interface1               ; force IF1 activation to avoid crashes
+    call    call_rom3
+  IF    FORts2068
+    defw    $133F                       ; SET-MIN: clear buffers
+  ELSE
+    defw    $16b0                       ; clear buffers
+  ENDIF
+    pop     de
 
-		ld	hl,($5c59)	; E-LINE
-		push	hl
-		ld	bc,cmdlen
-		push	bc
-		push	de
-IF FORts2068
-		call	$12BB		; MAKE-ROOM
-ELSE
-		call	call_rom3
-		defw	$1655		; MAKE-ROOM
-ENDIF
-		pop	hl
-		pop	bc
-		pop	de
-		ldir			; copy command to E-LINE
+    ld      hl, ($5c5d)                 ; save CH-ADD
+    push    hl
+    ld      hl, ($5c5f)                 ; save X-PTR
+    push    hl
 
-		ld	hl,$5c44	; NSPPC
-		ld	a,(hl)
-		push	af
-		ld	(hl),1		; set to first statement in line
+    ld      hl, ($5c59)                 ; E-LINE
+    push    hl
+    ld      bc, cmdlen
+    push    bc
+    push    de
+  IF    FORts2068
+    call    $12BB                       ; MAKE-ROOM
+  ELSE
+    call    call_rom3
+    defw    $1655                       ; MAKE-ROOM
+  ENDIF
+    pop     hl
+    pop     bc
+    pop     de
+    ldir                                ; copy command to E-LINE
 
-		ld	a,($5c47)	;
-		push	af		; keep SUBPPC (statement number 
+    ld      hl, $5c44                   ; NSPPC
+    ld      a, (hl)
+    push    af
+    ld      (hl), 1                     ; set to first statement in line
+
+    ld      a, ($5c47)                  ;
+    push    af                          ; keep SUBPPC (statement number
 					; within line being executed)
 
-		ld	bc,($5c3d)
-		push	bc		; save original ERR_SP
+    ld      bc, ($5c3d)
+    push    bc                          ; save original ERR_SP
 
-		ld	bc,return
-		push	bc
-		ld	($5c3d),sp	; update error handling routine
-		
-		call	call_rom3
-IF FORts2068
-		defw	$1A27		; LINE-SCAN: check syntax
-ELSE
-		defw	$1b17		; check syntax
-ENDIF
-		
+    ld      bc, return
+    push    bc
+    ld      ($5c3d), sp                 ; update error handling routine
+
+    call    call_rom3
+  IF    FORts2068
+    defw    $1A27                       ; LINE-SCAN: check syntax
+  ELSE
+    defw    $1b17                       ; check syntax
+  ENDIF
+
 		;ld	(iy+0),255	; set ERR_NR to OK
-		pop	bc
+    pop     bc
 return:
-		pop	bc
-		ld	($5c3d),bc	; restore ERR_SP
+    pop     bc
+    ld      ($5c3d), bc                 ; restore ERR_SP
 
-		xor	a
-		bit	7,(iy+0)	; test ERR_NR
-		ld	(iy+0),255	; reset ERR_NR
-		jr	z,nook
-		inc	a
+    xor     a
+    bit     7, (iy+0)                   ; test ERR_NR
+    ld      (iy+0), 255                 ; reset ERR_NR
+    jr      z, nook
+    inc     a
 nook:
-		ld	(result+1),a
-		
+    ld      (result+1), a
+
 		; Restore system variables to original values
 
-		set	7,(iy+48)	; signal line execution
+    set     7, (iy+48)                  ; signal line execution
 
-		pop	af
-		ld	($5c47),a	; restore original SUBPPC
+    pop     af
+    ld      ($5c47), a                  ; restore original SUBPPC
 
-		pop	af
-		ld	($5c44),a	; restore original NSPPC
-		
+    pop     af
+    ld      ($5c44), a                  ; restore original NSPPC
+
 ;		bit	0,(iy+124)	; test FLAGS3: coming from paged ROM ?
 ;		jr	nz,stderr
 ;		ld	(iy+124),0	; yes, reset FLAGS3
@@ -111,17 +111,18 @@ nook:
 		;set     5,(iy+$37)	; force to EDIT mode
 		;call	$1097		; CLEAR-SP
 		;res     5,(iy+$37)	; unset EDIT mode
-		call	call_rom3
-IF FORts2068
-		defw	$133F		; SET-MIN: clear buffers
-ELSE
-		defw	$16b0		; clear buffers
-ENDIF
-		
-		pop	hl
-		ld	($5c5f),hl	; restore X-PTR
-		pop	hl
-		ld	($5c5d),hl	; restore CH-ADD
+    call    call_rom3
+  IF    FORts2068
+    defw    $133F                       ; SET-MIN: clear buffers
+  ELSE
+    defw    $16b0                       ; clear buffers
+  ENDIF
 
-result:		ld	hl,0
-		ret
+    pop     hl
+    ld      ($5c5f), hl                 ; restore X-PTR
+    pop     hl
+    ld      ($5c5d), hl                 ; restore CH-ADD
+
+result:
+    ld      hl, 0
+    ret

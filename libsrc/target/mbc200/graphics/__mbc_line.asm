@@ -1,14 +1,14 @@
 
-	INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION	  code_clib
+    SECTION code_clib
 
-	PUBLIC    __mbc_line
+    PUBLIC  __mbc_line
 
-	EXTERN     l_cmp
+    EXTERN  l_cmp
 
-	EXTERN    __gfx_coords
-	EXTERN    mbc_sendchar
+    EXTERN  __gfx_coords
+    EXTERN  mbc_sendchar
 
 ;
 ;       $Id: __mbc_line.asm $
@@ -23,44 +23,44 @@
 
 __mbc_line:
 
-		push hl
-		ld h,c
-		
-		ld l,27
-		call mbc_sendchar
-		ld l,'P'
-		call mbc_sendchar
-		ld l,c			; "0" (draw) or "1" (undraw)
-		call mbc_sendchar
+    push    hl
+    ld      h, c
+
+    ld      l, 27
+    call    mbc_sendchar
+    ld      l, 'P'
+    call    mbc_sendchar
+    ld      l, c                        ; "0" (draw) or "1" (undraw)
+    call    mbc_sendchar
 
 		; Y
-		ld l,d
-		call mbc_sendchar
-		ld l,e
-		call mbc_sendchar
+    ld      l, d
+    call    mbc_sendchar
+    ld      l, e
+    call    mbc_sendchar
 
-		pop de
+    pop     de
 		; X
-		ld l,d
-		call mbc_sendchar
-		ld l,e
-		call mbc_sendchar
-		
-		exx
-        ld      (__gfx_coords),hl      ; store X
-        ld      (__gfx_coords+2),de    ; store Y: COORDS must be 2 bytes wider
-		push hl
+    ld      l, d
+    call    mbc_sendchar
+    ld      l, e
+    call    mbc_sendchar
+
+    exx
+    ld      (__gfx_coords), hl          ; store X
+    ld      (__gfx_coords+2), de        ; store Y: COORDS must be 2 bytes wider
+    push    hl
 
 		; Y
-		ld l,d
-		call mbc_sendchar
-		ld l,e
-		call mbc_sendchar
+    ld      l, d
+    call    mbc_sendchar
+    ld      l, e
+    call    mbc_sendchar
 
-		pop de
+    pop     de
 		; X
-		ld l,d
-		call mbc_sendchar
-		ld l,e
-		jp mbc_sendchar
+    ld      l, d
+    call    mbc_sendchar
+    ld      l, e
+    jp      mbc_sendchar
 

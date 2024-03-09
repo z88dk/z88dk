@@ -6,18 +6,18 @@
 ;	$Id: pixel.asm,v 1.1 2016-10-26 13:03:30 stefano Exp $
 ;
 
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-        SECTION code_clib
-	PUBLIC	pixel
+    SECTION code_clib
+    PUBLIC  pixel
 
-	EXTERN pixeladdress
-	EXTERN	__gfx_coords
-	
-	EXTERN	pixmode
-	EXTERN	pixelbyte
-	EXTERN	p3_peek
-	EXTERN	p3_poke
+    EXTERN  pixeladdress
+    EXTERN  __gfx_coords
+
+    EXTERN  pixmode
+    EXTERN  pixelbyte
+    EXTERN  p3_peek
+    EXTERN  p3_poke
 
 ;
 ;	$Id: pixel.asm,v 1.1 2016-10-26 13:03:30 stefano Exp $
@@ -37,39 +37,41 @@
 ;  ..bc..../ixiy same
 ;  af..dehl/.... different
 ;
-.pixel
-			IF maxx <> 256
-				ld	a,h
-				cp	maxx
-				ret	nc
-			ENDIF
+pixel:
+  IF    maxx<>256
+    ld      a, h
+    cp      maxx
+    ret     nc
+  ENDIF
 
-				ld	a,l
-				cp	maxy
-				ret	nc			; y0	out of range
-				
-				ld	(__gfx_coords),hl
+    ld      a, l
+    cp      maxy
+    ret     nc                          ; y0	out of range
 
-				push	bc
-				call	pixeladdress
-				ld	b,a
-				ld	a,1
-				jr	z, or_pixel		; pixel is at bit 0...
-.plot_position			rlca
-				djnz	plot_position
-.or_pixel			ex	de,hl
-		ld e,a
-		 call p3_peek
-		 push hl
+    ld      (__gfx_coords), hl
+
+    push    bc
+    call    pixeladdress
+    ld      b, a
+    ld      a, 1
+    jr      z, or_pixel                 ; pixel is at bit 0...
+plot_position:
+    rlca
+    djnz    plot_position
+or_pixel:
+    ex      de, hl
+    ld      e, a
+    call    p3_peek
+    push    hl
 		 ;ex de,hl
-		 ld hl,pixelbyte
-		 ld (hl),a
-		 ld a,e
-.pixmode
-				or	(hl)
-				nop
-		 pop hl
-		 call p3_poke
+    ld      hl, pixelbyte
+    ld      (hl), a
+    ld      a, e
+pixmode:
+    or      (hl)
+    nop
+    pop     hl
+    call    p3_poke
 
-		 pop	bc
-				ret
+    pop     bc
+    ret

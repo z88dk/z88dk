@@ -15,29 +15,29 @@
 ;Close the map screen and restore memory map to normal
 
 
-                INCLUDE "graphics/grafix.inc"    ; Contains fn defs
-                INCLUDE "map.def"
+    INCLUDE "graphics/grafix.inc"       ; Contains fn defs
+    INCLUDE "map.def"
 
-		SECTION	code_clib
+    SECTION code_clib
 
-                PUBLIC    closegfx
-                PUBLIC    _closegfx
-
-
+    PUBLIC  closegfx
+    PUBLIC  _closegfx
 
 
-.closegfx
-._closegfx
-                pop     bc
-                pop     hl      ;window
-                push    hl 
-                push    bc
 
-		push	ix
-                ld      a,(hl)		;window number
-                ld      bc,mp_del
-                call_oz(os_map)
-                ld      hl,0            ;NULL=success
-		pop	ix
-                ret
+
+closegfx:
+_closegfx:
+    pop     bc
+    pop     hl                          ;window
+    push    hl
+    push    bc
+
+    push    ix
+    ld      a, (hl)                     ;window number
+    ld      bc, mp_del
+    call_oz (os_map)
+    ld      hl, 0                       ;NULL=success
+    pop     ix
+    ret
 

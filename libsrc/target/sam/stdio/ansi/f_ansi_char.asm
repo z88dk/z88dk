@@ -6,7 +6,7 @@
 ;
 ; 	Handles colors referring to current PAPER/INK/etc. settings
 ;
-;	** alternate (smaller) 4bit font capability: 
+;	** alternate (smaller) 4bit font capability:
 ;	** use the -DPACKEDFONT flag
 ;	** ROM font -DROMFONT
 ;
@@ -26,46 +26,46 @@
 ;
 
     SECTION code_clib
-    PUBLIC	ansi_CHAR
-	
-    EXTERN	__console_y
-    EXTERN	__console_x
+    PUBLIC  ansi_CHAR
 
-    PUBLIC	UNDRLN
+    EXTERN  __console_y
+    EXTERN  __console_x
+
+    PUBLIC  UNDRLN
 
     EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
     PUBLIC  ___ansi_char_native_protection
-    defc ___ansi_char_native_protection = THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+    defc    ___ansi_char_native_protection=THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
 
-	
-.ansi_CHAR
-	ld	b,a		; Save char to print
 
-        ld      a,255		;stop scroll
-        ld      (0x5C8C),a
+ansi_CHAR:
+    ld      b, a                        ; Save char to print
 
-	ld	a,22		; AT
-	rst	16
-	ld	a,(__console_y)
-	rst	16
-	ld	a,(__console_x)
-	rst	16
-	ld	a,b		; char
-	rst	16
+    ld      a, 255                      ;stop scroll
+    ld      (0x5C8C), a
 
-	ld	a,(UNDRLN)	; check for underline
-	and	a
-	jr	z,nounderline
+    ld      a, 22                       ; AT
+    rst     16
+    ld      a, (__console_y)
+    rst     16
+    ld      a, (__console_x)
+    rst     16
+    ld      a, b                        ; char
+    rst     16
 
-	ld	a,8		; LEFT
-	rst	16
-	ld	a,'_'
-	rst	16
-	
-.nounderline	
-	ret
+    ld      a, (UNDRLN)                 ; check for underline
+    and     a
+    jr      z, nounderline
 
-	
+    ld      a, 8                        ; LEFT
+    rst     16
+    ld      a, '_'
+    rst     16
+
+nounderline:
+    ret
+
+
 ; .ansi_CHAR
 ;   ld (char+1),a
 ;   ld a,(__console_y)       ; Line text position
@@ -176,7 +176,7 @@
 ;   djnz L1
 ; .DTS
 ;   ld a,(hl)
-  
+
 ; IF ROMFONT
 ; 	; nothing here !
 ; ELSE
@@ -190,7 +190,7 @@
 ; 	ENDIF
 ; ENDIF
 
-; .INVRS				
+; .INVRS
 ; ;  cpl           ; Set to NOP to disable INVERSE
 ;    nop
 
@@ -251,5 +251,6 @@
 ;         BINARY  "stdio/ansi/F4PACK.BIN"		; <- put the FONT name here !
 ; ENDIF
 
-        SECTION bss_clib
-.UNDRLN     defb 0
+    SECTION bss_clib
+UNDRLN:
+    defb    0

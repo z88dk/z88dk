@@ -8,19 +8,19 @@
 ;
 
     SECTION code_clib
-    PUBLIC     bit_open
-    PUBLIC     _bit_open
-    EXTERN      bit_close
-    EXTERN     __snd_tick
+    PUBLIC  bit_open
+    PUBLIC  _bit_open
+    EXTERN  bit_close
+    EXTERN  __snd_tick
 
-.bit_open
-._bit_open
+bit_open:
+_bit_open:
     ;di
-    call	bit_close
+    call    bit_close
 
-    ld    a,8 ; Select amplitude register for channel A.
-    out   ($20),a
-    xor   a
-    ld    (__snd_tick),a
+    ld      a, 8                        ; Select amplitude register for channel A.
+    out     ($20), a
+    xor     a
+    ld      (__snd_tick), a
 
     ret

@@ -1,10 +1,10 @@
 
 
-		SECTION		code_clib
+    SECTION code_clib
 
-		PUBLIC		asm_set_cursor_state
+    PUBLIC  asm_set_cursor_state
 
-		INCLUDE		"mc6845.inc"
+    INCLUDE "mc6845.inc"
 
 ; Set the state of the hardware cursor
 ;
@@ -18,32 +18,32 @@
 ;
 ; Uses: af, l, bc (on some targets)
 asm_set_cursor_state:
-	ld	a,0x0a
-IF address_w > 256
-	ld	bc,address_w
-	out	(c),a
+    ld      a, 0x0a
+IF  address_w>256
+    ld      bc, address_w
+    out     (c), a
 ELSE
-	out	(address_w),a
+    out     (address_w), a
 ENDIF
-IF register_w > 256
-	ld	bc,register_w
-	out	(c),l
+IF  register_w>256
+    ld      bc, register_w
+    out     (c), l
 ELSE
-	ld	a,l	
-	out	(register_w),a
+    ld      a, l
+    out     (register_w), a
 ENDIF
-	ld	a,0x0b
-IF address_w > 256
-	ld	bc,address_w
-	out	(c),a
+    ld      a, 0x0b
+IF  address_w>256
+    ld      bc, address_w
+    out     (c), a
 ELSE
-	out	(address_w),a
+    out     (address_w), a
 ENDIF
-IF register_w > 256
-	ld	bc,register_w
-	out	(c),h
+IF  register_w>256
+    ld      bc, register_w
+    out     (c), h
 ELSE
-	ld	a,h
-	out	(register_w),a
+    ld      a, h
+    out     (register_w), a
 ENDIF
-	ret
+    ret

@@ -1,10 +1,10 @@
-; 
-; 
-;	ZX Spectrum ZXMMC specific routines 
+;
+;
+;	ZX Spectrum ZXMMC specific routines
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Mar 2010
 ;
-;	$Id: mmc_write_block.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
+;	$Id: mmc_write_block.asm,v 1.3 2016-06-10 21:28:03 dom Exp $
 ;
 ; Write a 512 byte data block to the MMC card
 ; extern int __LIB__ mmc_write_block(struct MMC mmc_descriptor, long card_address, unsigned char *address);
@@ -26,92 +26,92 @@
 ;-----------------------------------------------------------------------------------------
 ;
 
-	SECTION  code_clib
-	PUBLIC   mmc_write_block
-	PUBLIC   _mmc_write_block
+    SECTION code_clib
+    PUBLIC  mmc_write_block
+    PUBLIC  _mmc_write_block
 
-	EXTERN    mmc_write_command
-	EXTERN    mmc_write_data
-	EXTERN    mmc_send_command
-	EXTERN    mmc_wait_response
-	EXTERN    clock32
-	EXTERN    cs_high
+    EXTERN  mmc_write_command
+    EXTERN  mmc_write_data
+    EXTERN  mmc_send_command
+    EXTERN  mmc_wait_response
+    EXTERN  clock32
+    EXTERN  cs_high
 
-	EXTERN   __mmc_card_select
+    EXTERN  __mmc_card_select
 
-	INCLUDE "target/zx/def/zxmmc.def"
+    INCLUDE "target/zx/def/zxmmc.def"
 
-	
+
 mmc_write_block:
 _mmc_write_block:
 
 
-	ld	ix,0
-	add	ix,sp
-	
-	ld	l,(ix+8)
-	ld	h,(ix+9)	; MMC struct
-	ld	a,(hl)
-	inc	hl			; ptr to MMC mask to be used to select port
-	ld	a,(hl)
-	ld	(__mmc_card_select), a
-	
-	ld	l,(ix+6)
-	ld	h,(ix+7)	; RAM ptr
-	push hl
-	ld	e,(ix+2)	; LSB
-	ld	d,(ix+3)	; .
-	ld	l,(ix+4)	; .
-	ld	h,(ix+5)	; MSB
+    ld      ix, 0
+    add     ix, sp
+
+    ld      l, (ix+8)
+    ld      h, (ix+9)                   ; MMC struct
+    ld      a, (hl)
+    inc     hl                          ; ptr to MMC mask to be used to select port
+    ld      a, (hl)
+    ld      (__mmc_card_select), a
+
+    ld      l, (ix+6)
+    ld      h, (ix+7)                   ; RAM ptr
+    push    hl
+    ld      e, (ix+2)                   ; LSB
+    ld      d, (ix+3)                   ; .
+    ld      l, (ix+4)                   ; .
+    ld      h, (ix+5)                   ; MSB
 	;;pop ix
 
 
-        ld a,MMC_WRITE_SINGLE_BLOCK     ; Command code for block read
-        call mmc_send_command
-        and a
-		jr	z,noerror
-		pop	hl
-        ld	h,0
-		ld	l,a
-		ret
-		
+    ld      a, MMC_WRITE_SINGLE_BLOCK   ; Command code for block read
+    call    mmc_send_command
+    and     a
+    jr      z, noerror
+    pop     hl
+    ld      h, 0
+    ld      l, a
+    ret
+
 noerror:
-        ld a,$FE
-        out (SPI_PORT),a                ; first byte to be sent = DATA TOKEN
+    ld      a, $FE
+    out     (SPI_PORT), a               ; first byte to be sent = DATA TOKEN
 
 ;;;write_mmc_block:
         ;;push bc
-        ld bc,SPI_PORT                  ; C = PORT, B = 0 for 256 bytes on first OTIR
+    ld      bc, SPI_PORT                ; C = PORT, B = 0 for 256 bytes on first OTIR
         ;push hl
         ;push ix
         ;pop hl
-		
-		pop	hl
 
-        otir
-        nop                             ; without this NOP, the 2nd half of the 512 bytes block would miss some write cycles
-        otir                            ; on the CPLD if Z80 runs at 21MHz
+    pop     hl
+
+    otir
+    nop                                 ; without this NOP, the 2nd half of the 512 bytes block would miss some write cycles
+    otir                                ; on the CPLD if Z80 runs at 21MHz
 
         ;push hl
         ;pop ix
         ;pop hl
 
-        ld a,$95                        ; CRC... (!)
-        out (SPI_PORT),a
-        nop
-        nop
-        out (SPI_PORT),a
+    ld      a, $95                      ; CRC... (!)
+    out     (SPI_PORT), a
+    nop
+    nop
+    out     (SPI_PORT), a
 
-        call mmc_wait_response
+    call    mmc_wait_response
 
         ;;pop bc
 
-        and $1F                         ; masks useful response bits
-        cp 5
+    and     $1F                         ; masks useful response bits
+    cp      5
         ;jr z,write_mmc_block             ; OK
-		jr z,wait_busy             ; OK
-        ld hl,2                          ; no data token from MMC
-        ret
+    jr      z, wait_busy                ; OK
+    ld      hl, 2                       ; no data token from MMC
+    ret
 
 ;write_mmc_block:
 ;        ld a,d                          ; update the pointer with the block to be written
@@ -122,12 +122,12 @@ noerror:
 ;        ld d,a
 
 wait_busy:
-        call mmc_wait_response          ; MMC will report "00" until busy
-        and a
-        jr z,wait_busy
+    call    mmc_wait_response           ; MMC will report "00" until busy
+    and     a
+    jr      z, wait_busy
 
-        call cs_high
-        call clock32                    ; 32 more clock cycles
+    call    cs_high
+    call    clock32                     ; 32 more clock cycles
 
-        ld	hl,0
-        ret
+    ld      hl, 0
+    ret

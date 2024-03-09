@@ -8,16 +8,16 @@
 
 ceilk:
 _ceilk:
-    ld      hl,2
-    add     hl,sp
-    ld      a,(hl)
+    ld      hl, 2
+    add     hl, sp
+    ld      a, (hl)
     inc     hl
-    ld      h,(hl)
+    ld      h, (hl)
     inc     hl
-    ld      l,a
+    ld      l, a
 ceilk_fastcall:
 _ceilk_fastcall:
-    ld      l,0
+    ld      l, 0
     inc     h
     ret
-    
+

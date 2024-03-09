@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: sock_getinfo
 
-        SECTION code_clib
-	PUBLIC	sock_getinfo
-	PUBLIC	_sock_getinfo
+    SECTION code_clib
+    PUBLIC  sock_getinfo
+    PUBLIC  _sock_getinfo
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.sock_getinfo
-._sock_getinfo
-	ld	a,r_sock_getinfo
-	call_pkg(tcp_all)
-	ret	nc
+sock_getinfo:
+_sock_getinfo:
+    ld      a, r_sock_getinfo
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,sock_getinfo
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, sock_getinfo
+    jp      no_zsock

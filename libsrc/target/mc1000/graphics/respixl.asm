@@ -1,11 +1,11 @@
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION code_clib
-	PUBLIC	respixel
+    SECTION code_clib
+    PUBLIC  respixel
 
-	EXTERN pixeladdress
-	EXTERN	__gfx_coords
-	EXTERN	pix_return
+    EXTERN  pixeladdress
+    EXTERN  __gfx_coords
+    EXTERN  pix_return
 
 ;
 ;	$Id: respixl.asm,v 1.6 2016-07-02 09:01:35 dom Exp $
@@ -23,29 +23,30 @@
 ;  ..bc..../ixiy same
 ;  af..dehl/.... different
 ;
-.respixel
-			IF maxx <> 256
-				ld	a,h
-				cp	maxx
-				ret	nc
-			ENDIF
+respixel:
+  IF    maxx<>256
+    ld      a, h
+    cp      maxx
+    ret     nc
+  ENDIF
 
-				ld	a,l
-				cp	maxy
-				ret	nc			; y0	out of range
+    ld      a, l
+    cp      maxy
+    ret     nc                          ; y0	out of range
 
-				ld	(__gfx_coords),hl
+    ld      (__gfx_coords), hl
 
-				push	bc
-				call	pixeladdress
-				ld	b,a
-				ld	a,1
-				jr	z, reset_pixel
-.reset_position			rlca
-				djnz	reset_position
-.reset_pixel			;ex	de,hl
-				cpl
-				and	(hl)
-				call	pix_return
-				pop bc
-				ret
+    push    bc
+    call    pixeladdress
+    ld      b, a
+    ld      a, 1
+    jr      z, reset_pixel
+reset_position:
+    rlca
+    djnz    reset_position
+reset_pixel:                            ;ex	de,hl
+    cpl
+    and     (hl)
+    call    pix_return
+    pop     bc
+    ret

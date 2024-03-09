@@ -10,13 +10,13 @@
 ;	$Id: f_ansi_bel.asm,v 1.1 2016-08-05 07:04:10 stefano Exp $
 ;
 
-        SECTION  code_clib
-	PUBLIC	ansi_BEL
+    SECTION code_clib
+    PUBLIC  ansi_BEL
 
 
 ; No sound, for now!
 
-.ansi_BEL
+ansi_BEL:
 
-        ret
+    ret
 

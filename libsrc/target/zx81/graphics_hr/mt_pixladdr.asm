@@ -5,8 +5,8 @@
 ;
 ;	$Id: mt_pixladdr.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
-	SECTION code_clib
-	PUBLIC	pixeladdress
+    SECTION code_clib
+    PUBLIC  pixeladdress
 
 	;;EXTERN	base_graphics
 
@@ -26,44 +26,44 @@
 ;  afbcde../.... different
 ;
 
-.pixeladdress
+pixeladdress:
 
 	; add y-times the nuber of bytes per line (33)
-	ld	a,h
-	ld	b,a
+    ld      a, h
+    ld      b, a
 
-	ld	h,0
-	ld	d,h
-	ld	e,l
+    ld      h, 0
+    ld      d, h
+    ld      e, l
 
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,de
-	inc	hl
-	inc	hl
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
+    add     hl, de
+    inc     hl
+    inc     hl
 
-	ld		de,($407B)
+    ld      de, ($407B)
 	;;ld	de,(base_graphics)
-	add	hl,de
+    add     hl, de
 
 	; add x divided by 8
-	
-	;or	a
-	rra
-	srl a
-	srl a
-	ld	e,a
-	ld	d,0
-	add	hl,de
-	
-	ld	d,h
-	ld	e,l
 
-	ld	a,b
-	and	7
-	xor	7
-	
-	ret
+	;or	a
+    rra
+    srl     a
+    srl     a
+    ld      e, a
+    ld      d, 0
+    add     hl, de
+
+    ld      d, h
+    ld      e, l
+
+    ld      a, b
+    and     7
+    xor     7
+
+    ret

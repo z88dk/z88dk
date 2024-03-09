@@ -12,18 +12,18 @@
 ;	$Id: zx_type.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC	zx_type
-	PUBLIC	_zx_type
-	
+    SECTION code_clib
+    PUBLIC  zx_type
+    PUBLIC  _zx_type
+
 zx_type:
 _zx_type:
-	ld	hl,0
-	ld	a,(75)
-	cp	191
-	ret	z
-	inc	hl
-	cp	225
-	ret	nz
-	inc	hl
-	ret
+    ld      hl, 0
+    ld      a, (75)
+    cp      191
+    ret     z
+    inc     hl
+    cp      225
+    ret     nz
+    inc     hl
+    ret

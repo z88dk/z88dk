@@ -8,28 +8,28 @@
 ;	$Id: fgetc_cons.asm,v 1.4 2016-06-12 17:32:01 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	fgetc_cons
-	PUBLIC	_fgetc_cons
+    SECTION code_clib
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
 
-.fgetc_cons
-._fgetc_cons
+fgetc_cons:
+_fgetc_cons:
 
-.nokey
-	rst	20h
-	defb	39h
-	jr	c,nokey
-	rst	20h	; Convert Key code
-	defb	3Ah
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
-.not_return
-ENDIF
-	ld	h,0
-	ld	l,a
-	ret
+nokey:
+    rst     20h
+    defb    39h
+    jr      c, nokey
+    rst     20h                         ; Convert Key code
+    defb    3Ah
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_return
+    ld      a, 10
+not_return:
+  ENDIF
+    ld      h, 0
+    ld      l, a
+    ret
 
 	;ld	e,0	; already waits for ENTER, then pushes all the keys.
 	;rst	20h

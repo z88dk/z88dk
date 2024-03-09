@@ -9,11 +9,11 @@
 
 absk:
 _absk:
-    ld      hl,2
-    add     hl,sp
-    ld      a,(hl)
+    ld      hl, 2
+    add     hl, sp
+    ld      a, (hl)
     inc     hl
-    ld      h,(hl)
+    ld      h, (hl)
     inc     hl
-    ld      l,a
+    ld      l, a
     jp      asm_fix16_fabs

@@ -8,8 +8,8 @@
 ;	$Id: h19_backbuffer.asm $
 ;
 
-	SECTION	code_clib
-	PUBLIC	h19_backbuffer
+    SECTION code_clib
+    PUBLIC  h19_backbuffer
 
-.h19_backbuffer
-	defs 80*26
+h19_backbuffer:
+    defs    80*26

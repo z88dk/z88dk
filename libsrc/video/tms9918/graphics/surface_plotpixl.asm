@@ -2,16 +2,16 @@
 ;	MSX extension for "GFX - a small graphics library" by Jannone
 ;
 
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION code_video_vdp
-	PUBLIC	surface_plotpixel
+    SECTION code_video_vdp
+    PUBLIC  surface_plotpixel
 
-	EXTERN	surface_pixeladdress
-	EXTERN	__gfx_coords
+    EXTERN  surface_pixeladdress
+    EXTERN  __gfx_coords
 
-	EXTERN	__graphics_end
-	EXTERN swapgfxbk
+    EXTERN  __graphics_end
+    EXTERN  swapgfxbk
 
 ;
 ;	$Id: surface_plotpixl.asm $
@@ -31,31 +31,33 @@
 ;  ..bc..../ixiy same
 ;  af..dehl/.... different
 ;
-.surface_plotpixel
-			IF maxx <> 256
-				ld	a,h
-				cp	maxx
-				ret	nc
-			ENDIF
+surface_plotpixel:
+IF  maxx<>256
+    ld      a, h
+    cp      maxx
+    ret     nc
+ENDIF
 
-				ld	a,l
-				cp	maxy
-				ret	nc			; y0	out of range
-				
-				ld	(__gfx_coords),hl
+    ld      a, l
+    cp      maxy
+    ret     nc                          ; y0	out of range
 
-				call	swapgfxbk
-				push	ix
-				
-				push	bc
-				call	surface_pixeladdress
-				ld	b,a
-				ld	a,1
-				jr	z, or_pixel		; pixel is at bit 0...
-.plot_position			rlca
-				djnz	plot_position
-.or_pixel			ex	de,hl
-				or	(hl)
-				ld	(hl),a
-				pop	bc
-				jp __graphics_end
+    ld      (__gfx_coords), hl
+
+    call    swapgfxbk
+    push    ix
+
+    push    bc
+    call    surface_pixeladdress
+    ld      b, a
+    ld      a, 1
+    jr      z, or_pixel                 ; pixel is at bit 0...
+plot_position:
+    rlca
+    djnz    plot_position
+or_pixel:
+    ex      de, hl
+    or      (hl)
+    ld      (hl), a
+    pop     bc
+    jp      __graphics_end

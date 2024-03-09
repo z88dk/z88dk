@@ -14,34 +14,34 @@
 
 
     MODULE  csleep_z88
-    SECTION	code_clib
+    SECTION code_clib
     INCLUDE "time.def"
 
-    PUBLIC    csleep
-    PUBLIC    _csleep
-    PUBLIC    asm_csleep
+    PUBLIC  csleep
+    PUBLIC  _csleep
+    PUBLIC  asm_csleep
 
 
 ;csleep(int time);
 
 
-.csleep
-._csleep
-        pop     hl
-        pop     bc      ;number of centi-seconds..
-        push    bc
-        push    hl
+csleep:
+_csleep:
+    pop     hl
+    pop     bc                          ;number of centi-seconds..
+    push    bc
+    push    hl
 
-.asm_csleep
+asm_csleep:
 
-        ld      a,b
-        or      c
-        jr      z,csleep1
-        call_oz(os_dly)		;preserves ix
-        ld      hl,1
-        ret     c
-.csleep1
-        ld      hl,0
-        ret
+    ld      a, b
+    or      c
+    jr      z, csleep1
+    call_oz (os_dly)                    ;preserves ix
+    ld      hl, 1
+    ret     c
+csleep1:
+    ld      hl, 0
+    ret
 
 

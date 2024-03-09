@@ -5,10 +5,11 @@
 ;	Supporting helpers
 ;
 
-		SECTION code_clib
-		PUBLIC _fsizehandle
-		PUBLIC __fsizehandle
+    SECTION code_clib
+    PUBLIC  _fsizehandle
+    PUBLIC  __fsizehandle
 ; fastcall
-.__fsizehandle
-._fsizehandle	ex de, hl
-		jp 0xB8B7		; fsizehandle
+__fsizehandle:
+_fsizehandle:
+    ex      de, hl
+    jp      0xB8B7                      ; fsizehandle

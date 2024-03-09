@@ -10,25 +10,25 @@
 ;	$Id: set_psg.asm $
 ;
 
-IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_RABBIT__&!__CPU_GBZ80__
     SECTION code_clib
-    PUBLIC	set_psg
-    PUBLIC	_set_psg
-    PUBLIC	___set_psg
-    EXTERN  asm_set_psg	
+    PUBLIC  set_psg
+    PUBLIC  _set_psg
+    PUBLIC  ___set_psg
+    EXTERN  asm_set_psg
 
 set_psg:
 _set_psg:
 ___set_psg:
 
-	pop	bc
-	pop	de
-	pop	hl
+    pop     bc
+    pop     de
+    pop     hl
 
-	push	hl
-	push	de
-	push	bc
-	
-	jp asm_set_psg
+    push    hl
+    push    de
+    push    bc
+
+    jp      asm_set_psg
 
 ENDIF

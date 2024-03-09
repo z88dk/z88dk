@@ -11,24 +11,24 @@
 ;	$Id: f_ansi_bel.asm $
 ;
 
-	SECTION	code_clib
-	PUBLIC	ansi_BEL
+    SECTION code_clib
+    PUBLIC  ansi_BEL
 
-	EXTERN	montest
+    EXTERN  montest
 
 
 
-.ansi_BEL
+ansi_BEL:
 
-	call	montest
-	jr	nz,nassys
-	
+    call    montest
+    jr      nz, nassys
+
 ; T monitor
-	ld	a,7
-	jp	0c4ah
+    ld      a, 7
+    jp      0c4ah
 
-.nassys
+nassys:
 ; NASSYS monitor
-	ld	a,7
-	defb	0f7h
-	ret
+    ld      a, 7
+    defb    0f7h
+    ret

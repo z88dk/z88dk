@@ -9,37 +9,37 @@
 ;	$Id: invhrg.asm $
 ;
 
-	MODULE    __pseudohrg_invhrg
+    MODULE  __pseudohrg_invhrg
 
-	SECTION   code_graphics
-	PUBLIC	invhrg
-	PUBLIC	_invhrg
+    SECTION code_graphics
+    PUBLIC  invhrg
+    PUBLIC  _invhrg
 
-	EXTERN	base_graphics
+    EXTERN  base_graphics
 
-	INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
 
 invhrg:
 _invhrg:
-	ld	hl,(base_graphics)
+    ld      hl, (base_graphics)
 
-	ld	a,maxy
-	ld	c,a
+    ld      a, maxy
+    ld      c, a
 	;push af
 
-.floop
-	ld b,32
-.zloop
-	ld a,(hl)
-	xor 128
-	ld (hl),a
-	inc hl
-	djnz zloop
-	
+floop:
+    ld      b, 32
+zloop:
+    ld      a, (hl)
+    xor     128
+    ld      (hl), a
+    inc     hl
+    djnz    zloop
+
 ;	ld (hl),201
-	inc hl
-	dec c
-	jr nz,floop
-	ret
+    inc     hl
+    dec     c
+    jr      nz, floop
+    ret
 

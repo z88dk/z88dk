@@ -11,11 +11,11 @@
 ;	$Id: f_ansi_scrollup.asm $
 ;
 
-	SECTION	code_clib
-	PUBLIC	ansi_SCROLLUP
+    SECTION code_clib
+    PUBLIC  ansi_SCROLLUP
 
-	EXTERN	generic_console_scrollup
+    EXTERN  generic_console_scrollup
 
 
-.ansi_SCROLLUP
-	jp generic_console_scrollup
+ansi_SCROLLUP:
+    jp      generic_console_scrollup

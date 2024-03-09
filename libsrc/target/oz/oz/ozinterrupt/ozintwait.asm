@@ -13,33 +13,33 @@
 ; $Id: ozintwait.asm,v 1.4 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozintwait
-	PUBLIC	_ozintwait
-	EXTERN	ozcustomisr
-	
-	PUBLIC	serial_check_hook
+    SECTION code_clib
+    PUBLIC  ozintwait
+    PUBLIC  _ozintwait
+    EXTERN  ozcustomisr
 
-	EXTERN	KeyBufGetPos
-	EXTERN	KeyBufPutPos
+    PUBLIC  serial_check_hook
+
+    EXTERN  KeyBufGetPos
+    EXTERN  KeyBufPutPos
 
 
 ozintwait:
 _ozintwait:
 
-        di
+    di
 serial_check_hook:
-        jp NoSerialCheck
+    jp      NoSerialCheck
 ;$serial_check_hook equ $-2
 NoSerialCheck:
-        ld a,(KeyBufGetPos)
-        ld c,a
-        ld a,(KeyBufPutPos)
-        cp c
-        jr nz,getout
-        ei
-        halt
+    ld      a, (KeyBufGetPos)
+    ld      c, a
+    ld      a, (KeyBufPutPos)
+    cp      c
+    jr      nz, getout
+    ei
+    halt
 getout:
-        ei
-        ret
+    ei
+    ret
 

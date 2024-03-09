@@ -1,10 +1,10 @@
 
-	SECTION	code_clib
-	PUBLIC	pixeladdress
+    SECTION code_clib
+    PUBLIC  pixeladdress
 
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	EXTERN	base_graphics
+    EXTERN  base_graphics
 
 ;
 ;	$Id: pixladdr.asm,v 1.9 2016-04-22 20:17:17 dom Exp $
@@ -21,20 +21,20 @@
 ;	  fz	= 1 if bit number is 0 of pixel position
 ;
 
-.pixeladdress
-	ld	a,h	;Save x
-	ld	h,0
-	add	hl,hl	;*32
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	ld	e,a
-	srl	e
-	srl	e
-	srl	e
-	ld	d,$c0		;Screen address
-	add	hl,de
-	ex	de,hl
-	and	7
-	ret
+pixeladdress:
+    ld      a, h                        ;Save x
+    ld      h, 0
+    add     hl, hl                      ;*32
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
+    ld      e, a
+    srl     e
+    srl     e
+    srl     e
+    ld      d, $c0                      ;Screen address
+    add     hl, de
+    ex      de, hl
+    and     7
+    ret

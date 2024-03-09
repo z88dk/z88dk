@@ -1,9 +1,9 @@
 ; uint in_JoyTimex2(void)
 ; 2002 aralbrec
 
-SECTION code_clib
-PUBLIC in_JoyTimex2
-PUBLIC _in_JoyTimex2
+    SECTION code_clib
+    PUBLIC  in_JoyTimex2
+    PUBLIC  _in_JoyTimex2
 
 ; exit : A = HL = F000RLDU active high
 ; uses : AF,HL
@@ -17,20 +17,20 @@ PUBLIC _in_JoyTimex2
 ;   with interrupts, eg by putting joystick reads
 ;   into the interrupt routine.
 
-.in_JoyTimex2
-._in_JoyTimex2
-   ld a,7
-   out ($f5),a         ; select R7 on AY chip
-   in a,($f6)          ; read R7
-   and $bf             ; bit 6 = 0 selects i/o port A read
-   out ($f6),a
-   ld a,14
-   out ($f5),a         ; select R14, attached to i/o port A
+in_JoyTimex2:
+_in_JoyTimex2:
+    ld      a, 7
+    out     ($f5), a                    ; select R7 on AY chip
+    in      a, ($f6)                    ; read R7
+    and     $bf                         ; bit 6 = 0 selects i/o port A read
+    out     ($f6), a
+    ld      a, 14
+    out     ($f5), a                    ; select R14, attached to i/o port A
 
-   ld a,1              ; right joystick
-   in a,($f6)
-   cpl
-   and $8f
-   ld l,a
-   ld h,0
-   ret
+    ld      a, 1                        ; right joystick
+    in      a, ($f6)
+    cpl
+    and     $8f
+    ld      l, a
+    ld      h, 0
+    ret

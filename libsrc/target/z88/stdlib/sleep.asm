@@ -13,39 +13,39 @@
 ; $Id: sleep.asm,v 1.9 2016-07-02 15:44:16 dom Exp $
 
 
-		MODULE  sleep_z88
-		INCLUDE "time.def"
+    MODULE  sleep_z88
+    INCLUDE "time.def"
 
-		SECTION	  code_clib
-		PUBLIC    sleep
-		PUBLIC    _sleep
-		EXTERN	l_mult
-		EXTERN	l_div_u
-		PUBLIC asm_sleep
+    SECTION code_clib
+    PUBLIC  sleep
+    PUBLIC  _sleep
+    EXTERN  l_mult
+    EXTERN  l_div_u
+    PUBLIC  asm_sleep
 
 ;sleep(int time) __z88dk_fastcall;
 
 
-.sleep
-._sleep
-	ex	de,hl
-        
-.asm_sleep
-                
-	ld	hl,100
-	call	l_mult
-	ld	c,l
-	ld	b,h
-        call_oz(os_dly)
-	ld	hl,0
-	ret	nc	;NULL - normal
+sleep:
+_sleep:
+    ex      de, hl
+
+asm_sleep:
+
+    ld      hl, 100
+    call    l_mult
+    ld      c, l
+    ld      b, h
+    call_oz (os_dly)
+    ld      hl, 0
+    ret     nc                          ;NULL - normal
 ; Now found out how long is left to sleep for..
-	ld	e,c
-	ld	d,b
-	ld	hl,100
-	call	l_div_u
-	ld	c,l
-	ld	b,h
-	ret	
+    ld      e, c
+    ld      d, b
+    ld      hl, 100
+    call    l_div_u
+    ld      c, l
+    ld      b, h
+    ret
 
 

@@ -12,27 +12,27 @@
 ;	$Id: f_ansi_char.asm $
 ;
 
-        SECTION  code_clib
+    SECTION code_clib
 
-	PUBLIC	ansi_CHAR
+    PUBLIC  ansi_CHAR
 
-	EXTERN	generic_console_printc
-	EXTERN	__sanyo_attr
-	EXTERN	mbc_sendchar
+    EXTERN  generic_console_printc
+    EXTERN  __sanyo_attr
+    EXTERN  mbc_sendchar
 
-.ansi_CHAR
+ansi_CHAR:
 
-		ex af,af
+    ex      af, af
 
-		ld l,27
-		call mbc_sendchar
-		ld l,'t'
-		call mbc_sendchar
-		ld a,(__sanyo_attr)
-		ld l,a
-		call mbc_sendchar
+    ld      l, 27
+    call    mbc_sendchar
+    ld      l, 't'
+    call    mbc_sendchar
+    ld      a, (__sanyo_attr)
+    ld      l, a
+    call    mbc_sendchar
 
-		ex af,af
+    ex      af, af
 
 
-		jp generic_console_printc
+    jp      generic_console_printc

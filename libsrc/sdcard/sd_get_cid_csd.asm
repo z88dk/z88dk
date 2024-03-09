@@ -15,33 +15,33 @@
 ;--------------------------------------------------------------------------------------------------------
 ;
 
-        PUBLIC  sd_get_cid_csd
+    PUBLIC  sd_get_cid_csd
 
-        EXTERN  sd_send_command_string
-        EXTERN  sd_send_command_null_args
-        EXTERN  sd_wait_data_token
-        EXTERN  sd_read_bytes
+    EXTERN  sd_send_command_string
+    EXTERN  sd_send_command_null_args
+    EXTERN  sd_wait_data_token
+    EXTERN  sd_read_bytes
 
 
-        INCLUDE "sdcard.def"
+    INCLUDE "sdcard.def"
 
 
 sd_get_cid_csd:
 
-        ld      (hl), 0                 ; kill the OEM ID, just to touch the CID a little
-        push    hl
-        call    sd_send_command_null_args
-        pop     hl
+    ld      (hl), 0                     ; kill the OEM ID, just to touch the CID a little
+    push    hl
+    call    sd_send_command_null_args
+    pop     hl
 
-        ld      a, sd_error_bad_command_response
-        ret     nz                      ; ZF set if command response = 00
+    ld      a, sd_error_bad_command_response
+    ret     nz                          ; ZF set if command response = 00
 
-        call    sd_wait_data_token      ; wait for the data token
-        ld      a, sd_error_data_token_timeout
-        ret     nz
+    call    sd_wait_data_token          ; wait for the data token
+    ld      a, sd_error_data_token_timeout
+    ret     nz
 
-        ld      b, 18                   ; read the card info to sector buffer (16 bytes + 2 CRC)
-        call    sd_read_bytes
+    ld      b, 18                       ; read the card info to sector buffer (16 bytes + 2 CRC)
+    call    sd_read_bytes
 
-        xor     a
-        ret
+    xor     a
+    ret

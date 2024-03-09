@@ -3,6 +3,6 @@
 
     PUBLIC  __krt_res
 
-.__krt_res
-    defc    NEEDunplot = 1
+__krt_res:
+    defc    NEEDunplot=1
     INCLUDE "pixel_krt.inc"

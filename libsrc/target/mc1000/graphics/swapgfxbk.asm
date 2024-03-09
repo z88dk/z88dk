@@ -1,6 +1,6 @@
 ;
 ;       Page the graphics bank in/out - used by all gfx functions
-;       Doesn't really page on the MC-1000, but we hang the interrupts, 
+;       Doesn't really page on the MC-1000, but we hang the interrupts,
 ;		just in case they become critical.
 ;
 ;
@@ -8,20 +8,20 @@
 ;
 
 
-		SECTION	  code_clib
-		PUBLIC    swapgfxbk
-      PUBLIC    _swapgfxbk
-		EXTERN	pixeladdress
+    SECTION code_clib
+    PUBLIC  swapgfxbk
+    PUBLIC  _swapgfxbk
+    EXTERN  pixeladdress
 
-		PUBLIC	swapgfxbk1
-      PUBLIC   _swapgfxbk1
+    PUBLIC  swapgfxbk1
+    PUBLIC  _swapgfxbk1
 
-.swapgfxbk
-._swapgfxbk
-		di
-		ret
+swapgfxbk:
+_swapgfxbk:
+    di
+    ret
 
-.swapgfxbk1
-._swapgfxbk1
-		ei
-		ret
+swapgfxbk1:
+_swapgfxbk1:
+    ei
+    ret

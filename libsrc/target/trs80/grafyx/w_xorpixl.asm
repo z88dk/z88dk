@@ -4,15 +4,15 @@
 ;       Stefano Bodrato 2021
 ;
 
-        INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION   code_clib
-        PUBLIC    w_xorpixel
+    SECTION code_clib
+    PUBLIC  w_xorpixel
 
-        EXTERN     l_cmp
+    EXTERN  l_cmp
         ;EXTERN     w_pixeladdress
 
-        EXTERN    __gfx_coords
+    EXTERN  __gfx_coords
 
 ;
 ;       $Id: w_xorpixl.asm $
@@ -34,57 +34,57 @@
 ;  ......../ixiy same
 ;  afbcdehl/.... different
 ;
-.w_xorpixel
-        push    hl
-        ld      hl,maxy
-        call    l_cmp
-        pop     hl
-        ret     nc               ; Return if Y overflows
+w_xorpixel:
+    push    hl
+    ld      hl, maxy
+    call    l_cmp
+    pop     hl
+    ret     nc                          ; Return if Y overflows
 
-        push    de
-        ld      de,maxx
-        call    l_cmp
-        pop     de
-        ret     c                ; Return if X overflows
-        
-        ld      (__gfx_coords),hl      ; store X
-        ld      (__gfx_coords+2),de    ; store Y: COORDS must be 2 bytes wider
+    push    de
+    ld      de, maxx
+    call    l_cmp
+    pop     de
+    ret     c                           ; Return if X overflows
 
-		ld		bc,128
+    ld      (__gfx_coords), hl          ; store X
+    ld      (__gfx_coords+2), de        ; store Y: COORDS must be 2 bytes wider
 
-		ld		a,l
-		
-        srl     h               ;hl = x / 8
-        rr      l
-        srl     h
-        rr      l
-        srl     h
-        rr      l
-		
-		out		(c),l			; set X byte coordinate
-		inc     bc
-		out		(c),e			; set Y byte coordinate
+    ld      bc, 128
 
-        and     7               ;a = x mod 8
-        xor     7
+    ld      a, l
+
+    srl     h                           ;hl = x / 8
+    rr      l
+    srl     h
+    rr      l
+    srl     h
+    rr      l
+
+    out     (c), l                      ; set X byte coordinate
+    inc     bc
+    out     (c), e                      ; set Y byte coordinate
+
+    and     7                           ;a = x mod 8
+    xor     7
 
 	;call	w_pixeladdress
 
-	ld	d,a
-	ld	a,1
-	jr	z, or_pixel		; pixel is at bit 0...
-.plot_position
-	rlca
-	dec d
-	jr	nz,plot_position
-.or_pixel
+    ld      d, a
+    ld      a, 1
+    jr      z, or_pixel                 ; pixel is at bit 0...
+plot_position:
+    rlca
+    dec     d
+    jr      nz, plot_position
+or_pixel:
 
-		inc	bc	; 130
-        in	e,(c)
+    inc     bc                          ; 130
+    in      e, (c)
 
-        xor	e	; set pixel in current byte
+    xor     e                           ; set pixel in current byte
 
-        out	(c),a
-        
-	ret
-  
+    out     (c), a
+
+    ret
+

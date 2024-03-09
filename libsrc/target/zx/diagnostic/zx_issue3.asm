@@ -11,25 +11,25 @@
 ;	$Id: zx_issue3.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC	zx_issue3
-	PUBLIC	_zx_issue3
-	EXTERN  __SYSVAR_BORDCR
-	
+    SECTION code_clib
+    PUBLIC  zx_issue3
+    PUBLIC  _zx_issue3
+    EXTERN  __SYSVAR_BORDCR
+
 zx_issue3:
 _zx_issue3:
-	ld	a,(__SYSVAR_BORDCR)  
-	rrca
-	rrca
-	rrca
-	or	8
-	out	(254),a
+    ld      a, (__SYSVAR_BORDCR)
+    rrca
+    rrca
+    rrca
+    or      8
+    out     (254), a
 
-	ld	bc,57342
-	in	a,(c)
-	in	a,(c)
-	ld	hl,1		; true
-	xor	255
-	ret	nz
-	dec	hl
-	ret
+    ld      bc, 57342
+    in      a, (c)
+    in      a, (c)
+    ld      hl, 1                       ; true
+    xor     255
+    ret     nz
+    dec     hl
+    ret

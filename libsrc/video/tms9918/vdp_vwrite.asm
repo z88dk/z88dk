@@ -19,20 +19,20 @@
 
 vdp_vwrite:
 _vdp_vwrite:
-    push    ix          ;save callers
-    ld      ix,4
-    add     ix,sp
+    push    ix                          ;save callers
+    ld      ix, 4
+    add     ix, sp
 
-    ld      c,(ix+0)    ; count
-    ld      b,(ix+1)
+    ld      c, (ix+0)                   ; count
+    ld      b, (ix+1)
 
-    ld      e, (ix+2)   ; dest
+    ld      e, (ix+2)                   ; dest
     ld      d, (ix+3)
 
-    ld      l, (ix+4)   ; source
+    ld      l, (ix+4)                   ; source
     ld      h, (ix+5)
 
     call    LDIRVM
-    pop     ix          ; resotre callers
+    pop     ix                          ; resotre callers
     ret
-	
+

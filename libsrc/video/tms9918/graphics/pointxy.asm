@@ -8,9 +8,9 @@
     INCLUDE "graphics/grafix.inc"
     INCLUDE "video/tms9918/vdp.inc"
 
-IF VDP_EXPORT_GFX_DIRECT = 1
+IF  VDP_EXPORT_GFX_DIRECT=1
     PUBLIC  pointxy
-    defc    pointxy = __tms9918_pointxy
+    defc    pointxy=__tms9918_pointxy
 ENDIF
 
 
@@ -21,7 +21,7 @@ ENDIF
 ;  in:        hl =        (x,y) coordinate of pixel to test
 ; out:        Fz =        0, if pixel is set, otherwise Fz = 1.
 
-.__tms9918_pointxy
-    ex      de,hl
-    ld      hl,(__tms9918_graphics_point)
+__tms9918_pointxy:
+    ex      de, hl
+    ld      hl, (__tms9918_graphics_point)
     jp      (hl)

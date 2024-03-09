@@ -1,11 +1,11 @@
 
 
-SECTION code_clib
-PUBLIC chdir
-PUBLIC _chdir
-EXTERN  __agon_hl24
+    SECTION code_clib
+    PUBLIC  chdir
+    PUBLIC  _chdir
+    EXTERN  __agon_hl24
 
-INCLUDE "target/agon/def/mos_api.inc"
+    INCLUDE "target/agon/def/mos_api.inc"
 
 chdir:
 _chdir:
@@ -15,9 +15,9 @@ _chdir:
     push    bc
     push    ix
     call    __agon_hl24
-    MOSCALL(mos_cd)
+    MOSCALL (mos_cd)
     pop     ix
-    ld      hl,0
+    ld      hl, 0
     and     a
     ret     z
     dec     hl

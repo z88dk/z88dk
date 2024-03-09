@@ -3,13 +3,13 @@
 
 
 
-        SECTION code_clib
-        PUBLIC  plotpixel
+    SECTION code_clib
+    PUBLIC  plotpixel
 
 
-	EXTERN	plot_MODE0
+    EXTERN  plot_MODE0
 
-	defc plotpixel = plot_MODE0
+    defc    plotpixel=plot_MODE0
 
 
 

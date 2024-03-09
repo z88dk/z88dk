@@ -7,23 +7,23 @@
 ;
 ;	ZSock Lib function: user_pagein
 
-        SECTION code_clib
-	PUBLIC	tcp_pagein
-	PUBLIC	_tcp_pagein
+    SECTION code_clib
+    PUBLIC  tcp_pagein
+    PUBLIC  _tcp_pagein
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.tcp_pagein
-._tcp_pagein
-	call_pkg(tcp_pgin)
-	ret	nc
+tcp_pagein:
+_tcp_pagein:
+    call_pkg    (tcp_pgin)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,tcp_pagein
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, tcp_pagein
+    jp      no_zsock

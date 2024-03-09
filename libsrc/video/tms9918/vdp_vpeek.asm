@@ -16,47 +16,47 @@
     PUBLIC  _vdp_vpeek
     EXTERN  l_tms9918_disable_interrupts
     EXTERN  l_tms9918_enable_interrupts
-    
-    INCLUDE        "video/tms9918/vdp.inc"
+
+    INCLUDE "video/tms9918/vdp.inc"
 
 
 vdp_vpeek:
 _vdp_vpeek:
     ; (FASTCALL) -> HL = address
     ; enter vdp address pointer
-    ld      a,l
+    ld      a, l
     call    l_tms9918_disable_interrupts
 
 
-IF VDP_CMD >= 256
-    ld      bc,VDP_CMD
+IF  VDP_CMD>=256
+    ld      bc, VDP_CMD
 ENDIF
 
-IFDEF V9938
+IFDEF   V9938
     ; High bit of address (bits 14,15,16)
-    ld      a,h
+    ld      a, h
     rlca
     rlca
-    and     3           ;Ignoring bit 16
-    VDPOUT(VDP_CMD)
-    ld      a,14 + 0x80
-    VDPOUT(VDP_CMD)
+    and     3                           ;Ignoring bit 16
+    VDPOUT  (VDP_CMD)
+    ld      a, 14+0x80
+    VDPOUT  (VDP_CMD)
 ENDIF
-    ld      a,l
-    VDPOUT(VDP_CMD)
-    ld      a,h
+    ld      a, l
+    VDPOUT  (VDP_CMD)
+    ld      a, h
     and     @00111111
-    VDPOUT(VDP_CMD)
+    VDPOUT  (VDP_CMD)
     ; TODO: timing?
 
-IF VDP_DATAIN >= 256
-    ld      bc,VDP_DATAIN
+IF  VDP_DATAIN>=256
+    ld      bc, VDP_DATAIN
 ENDIF
-    VDPIN(VDP_DATAIN)
+    VDPIN   (VDP_DATAIN)
 
-    
-    ld      h,0
-    ld      l,a
+
+    ld      h, 0
+    ld      l, a
     call    l_tms9918_enable_interrupts
     ret
 

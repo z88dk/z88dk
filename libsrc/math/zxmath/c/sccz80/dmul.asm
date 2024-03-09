@@ -8,31 +8,31 @@
 ;
 
 
-IF FORts2068
-		INCLUDE  "target/ts2068/def/ts2068fp.def"
+IF  FORts2068
+    INCLUDE "target/ts2068/def/ts2068fp.def"
 ENDIF
-IF FORzx
-		INCLUDE  "target/zx/def/zxfp.def"
+IF  FORzx
+    INCLUDE "target/zx/def/zxfp.def"
 ENDIF
-IF FORzx81
-		INCLUDE  "target/zx81/def/81fp.def"
+IF  FORzx81
+    INCLUDE "target/zx81/def/81fp.def"
 ENDIF
-IF FORlambda
-		INCLUDE  "target/lambda/def/lambdafp.def"
+IF  FORlambda
+    INCLUDE "target/lambda/def/lambdafp.def"
 ENDIF
 
-                SECTION  code_fp
-                PUBLIC    dmul
+    SECTION code_fp
+    PUBLIC  dmul
 
-                EXTERN	fsetup
-                EXTERN	stkequ
+    EXTERN  fsetup
+    EXTERN  stkequ
 
-.dmul
-        call    fsetup
-IF FORlambda
-	defb	ZXFP_MULTIPLY + 128
+dmul:
+    call    fsetup
+IF  FORlambda
+    defb    ZXFP_MULTIPLY+128
 ELSE
-	defb	ZXFP_MULTIPLY
-	defb	ZXFP_END_CALC
+    defb    ZXFP_MULTIPLY
+    defb    ZXFP_END_CALC
 ENDIF
-        jp      stkequ
+    jp      stkequ

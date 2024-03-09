@@ -8,33 +8,33 @@
 ;
 
 
-IF FORts2068
-		INCLUDE  "target/ts2068/def/ts2068fp.def"
+IF  FORts2068
+    INCLUDE "target/ts2068/def/ts2068fp.def"
 ENDIF
-IF FORzx
-		INCLUDE  "target/zx/def/zxfp.def"
+IF  FORzx
+    INCLUDE "target/zx/def/zxfp.def"
 ENDIF
-IF FORzx81
-		INCLUDE  "target/zx81/def/81fp.def"
+IF  FORzx81
+    INCLUDE "target/zx81/def/81fp.def"
 ENDIF
-IF FORlambda
-		INCLUDE  "target/lambda/def/lambdafp.def"
+IF  FORlambda
+    INCLUDE "target/lambda/def/lambdafp.def"
 ENDIF
 
-                SECTION  code_fp
-                PUBLIC    dgt
+    SECTION code_fp
+    PUBLIC  dgt
 
-                EXTERN	fsetup
-                EXTERN	f_yesno
+    EXTERN  fsetup
+    EXTERN  f_yesno
 
-.dgt
-        call    fsetup
-	defb	ZXFP_SUBTRACT
-IF FORlambda
-	defb	ZXFP_GREATER_0 + 128
+dgt:
+    call    fsetup
+    defb    ZXFP_SUBTRACT
+IF  FORlambda
+    defb    ZXFP_GREATER_0+128
 ELSE
-	defb	ZXFP_GREATER_0
-	defb	ZXFP_END_CALC
+    defb    ZXFP_GREATER_0
+    defb    ZXFP_END_CALC
 ENDIF
-	
-	jp	f_yesno
+
+    jp      f_yesno

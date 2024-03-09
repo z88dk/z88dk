@@ -4,30 +4,30 @@
 ;
 
 
-                SECTION   code_clib
-                PUBLIC    rename
-                PUBLIC    _rename
-                PUBLIC    ___rename
+    SECTION code_clib
+    PUBLIC  rename
+    PUBLIC  _rename
+    PUBLIC  ___rename
 
 ;int rename(char *s1,char *s2)
 ;on stack:
 ;return address,s2,s1
 ;s1=orig filename, s2=dest filename
 
-.rename
-._rename
-.___rename
-        pop     bc
-        pop     de      ;dest filename
-        pop     hl      ;orig filename
-        push    hl
-        push    de
-        push    bc
-	push	ix
-	ld	c,$10	;REANAME
-	rst	$10
-	ld	hl,0
-	pop	ix
-	ret	nc
-	dec	hl
-	ret
+rename:
+_rename:
+___rename:
+    pop     bc
+    pop     de                          ;dest filename
+    pop     hl                          ;orig filename
+    push    hl
+    push    de
+    push    bc
+    push    ix
+    ld      c, $10                      ;REANAME
+    rst     $10
+    ld      hl, 0
+    pop     ix
+    ret     nc
+    dec     hl
+    ret

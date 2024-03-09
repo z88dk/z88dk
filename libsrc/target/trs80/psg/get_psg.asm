@@ -10,21 +10,21 @@
 ;	$Id: get_psg.asm $
 ;
 
-	SECTION	 smc_clib
-	PUBLIC	get_psg
-	PUBLIC	get_psg2
-	PUBLIC	_get_psg
-	PUBLIC	_get_psg2
-	
+    SECTION smc_clib
+    PUBLIC  get_psg
+    PUBLIC  get_psg2
+    PUBLIC  _get_psg
+    PUBLIC  _get_psg2
+
 get_psg:
 _get_psg:
-    LD	BC,31
-	OUT	(C),l
+    LD      BC, 31
+    OUT     (C), l
 
 get_psg2:
 _get_psg2:
-    LD	c,30
-	in	a,(C)
+    LD      c, 30
+    in      a, (C)
 
-	ld	l,a
-	ret
+    ld      l, a
+    ret

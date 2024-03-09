@@ -14,15 +14,15 @@
 ; $Id: ozweekday.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozweekday
-	PUBLIC	_ozweekday
-	
+    SECTION code_clib
+    PUBLIC  ozweekday
+    PUBLIC  _ozweekday
+
 
 ozweekday:
 _ozweekday:
-        in      a,(36h)
-        and     0fh
-        ld      l,a
-        ld      h,0
-        ret
+    in      a, (36h)
+    and     0fh
+    ld      l, a
+    ld      h, 0
+    ret

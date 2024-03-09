@@ -9,27 +9,29 @@
 
 ; Fastcall so implicit push
 
-		SECTION  code_clib
-                PUBLIC   rs232_put
-                PUBLIC   _rs232_put
+    SECTION code_clib
+    PUBLIC  rs232_put
+    PUBLIC  _rs232_put
 
 rs232_put:
 _rs232_put:
-                ld   bc,$f8ee
+    ld      bc, $f8ee
 
-wait:           in   a,(c)
-                bit  7,a
-                jr   z,wait
-                ld   c,$e1
-cts:            in   a,(c)
-                bit  2,a
-                jr   nz,cts
+wait:
+    in      a, (c)
+    bit     7, a
+    jr      z, wait
+    ld      c, $e1
+cts:
+    in      a, (c)
+    bit     2, a
+    jr      nz, cts
 
-                ld      a,l     ;get byte
-                ld   c,$ef
-                out  (c),a
+    ld      a, l                        ;get byte
+    ld      c, $ef
+    out     (c), a
 
-                ld   hl,0       ;RS_ERR_OK
-                ret
+    ld      hl, 0                       ;RS_ERR_OK
+    ret
 
 
