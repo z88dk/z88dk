@@ -27,7 +27,7 @@
 
 
 
-IF __CPU_GBZ80__ || __CPU_INTEL__
+IF  __CPU_GBZ80__||__CPU_INTEL__
 ;---------------------------------------------
 
 
@@ -35,170 +35,175 @@ ELSE
 ;---------------------------------------------
 
 
-SECTION code_clib
-PUBLIC qsort_sdcc_callee
-PUBLIC _qsort_sdcc_callee
-PUBLIC qsort_sdcc_enter
+    SECTION code_clib
+    PUBLIC  qsort_sdcc_callee
+    PUBLIC  _qsort_sdcc_callee
+    PUBLIC  qsort_sdcc_enter
 
-EXTERN   l_mult
-EXTERN l_le
-EXTERN memswap_callee
+    EXTERN  l_mult
+    EXTERN  l_le
+    EXTERN  memswap_callee
 
 
-.qsort_sdcc_callee
-._qsort_sdcc_callee
+qsort_sdcc_callee:
+_qsort_sdcc_callee:
 
-   pop af
-   pop bc
-   exx
-   pop hl
-   pop de
-   pop bc
-   exx
-   push af
-   
+    pop     af
+    pop     bc
+    exx
+    pop     hl
+    pop     de
+    pop     bc
+    exx
+    push    af
+
 qsort_sdcc_enter:
 
-   push bc
-   exx
-   ex (sp),ix
-   
-   call asm_qsort
-   
-   pop ix
-   ret
+    push    bc
+    exx
+    ex      (sp), ix
+
+    call    asm_qsort
+
+    pop     ix
+    ret
 
 asm_qsort:
 
-   push de  ; ngap
-   push hl ;width
-   ld (_base),bc
+    push    de                          ; ngap
+    push    hl                          ;width
+    ld      (_base), bc
 
    ; t1 = nel * width;
-   call  l_mult
-   ld (_t1),hl
+    call    l_mult
+    ld      (_t1), hl
 
    ; for (ngap = nel / 2; ngap > 0; ngap /= 2) {
-.i_3
-   pop de   ; width
-   pop hl  ; ngap
-   srl h       ; _ngap/2 ..bit rotation
-   rr  l
-   ld a,h
-   or l
+i_3:
+    pop     de                          ; width
+    pop     hl                          ; ngap
+    srl     h                           ; _ngap/2 ..bit rotation
+    rr      l
+    ld      a, h
+    or      l
 
-   ret z
-   push hl ; ngap
-   push de  ; width
-   
+    ret     z
+    push    hl                          ; ngap
+    push    de                          ; width
+
    ; gap = ngap * width;
    ;ld d,h
    ;ld e,l
    ;ld   hl,(_width)
-   call  l_mult
-   ld (_gap),hl
+    call    l_mult
+    ld      (_gap), hl
    ; t2 = gap + width;
 
-   pop de
-   push de
+    pop     de
+    push    de
 
-   push hl
+    push    hl
    ;ex   de,hl
    ;ld   hl,(_width)
-   add   hl,de
-   ld (_t2),hl
+    add     hl, de
+    ld      (_t2), hl
 
    ; jd = (unsigned int) base + gap;
-   ld de,(_base)
-   ex (sp),hl     ; retrieve 'gap'
-   add   hl,de
-   ld (_jd),hl
-   pop hl         ; t2
-   jr i_8
-   
-.i_6
-   ld de,(_i)
-   pop hl
-   push hl
+    ld      de, (_base)
+    ex      (sp), hl                    ; retrieve 'gap'
+    add     hl, de
+    ld      (_jd), hl
+    pop     hl                          ; t2
+    jr      i_8
+
+i_6:
+    ld      de, (_i)
+    pop     hl
+    push    hl
    ;ld   hl,(_width)
-   add   hl,de
+    add     hl, de
    ;ld   (_i),hl
 
    ; for (i = t2 ....
-.i_8
-   ld (_i),hl
-   ld de,(_t1)
-   ex de,hl
-   call  l_le
-   jr nc,i_3
+i_8:
+    ld      (_i), hl
+    ld      de, (_t1)
+    ex      de, hl
+    call    l_le
+    jr      nc, i_3
 
    ; for (j =  i - t2..
-   ld de,(_i)
-   ld hl,(_t2)
+    ld      de, (_i)
+    ld      hl, (_t2)
 
-.i_11
-   ex de,hl    ; same subtraction is used twice in the for loop
-   and   a
-   sbc   hl,de
-   ld (_j),hl
+i_11:
+    ex      de, hl                      ; same subtraction is used twice in the for loop
+    and     a
+    sbc     hl, de
+    ld      (_j), hl
 
    ; for ..; j>0; ..
-   jp m,i_6
+    jp      m, i_6
 
-   push ix
-   
+    push    ix
+
    ; 1st arg: jd+j
-   push hl
-   ld de,(_jd)
-   add hl,de
-   ex (sp),hl
-   
+    push    hl
+    ld      de, (_jd)
+    add     hl, de
+    ex      (sp), hl
+
    ; 2nd arg: base+j
-   ld de,(_base)
-   add hl,de
-   push hl
+    ld      de, (_base)
+    add     hl, de
+    push    hl
 
-   ld bc,ret_addr
-   push bc
-   jp (ix)     ; compare function
-.ret_addr
+    ld      bc, ret_addr
+    push    bc
+    jp      (ix)                        ; compare function
+ret_addr:
 
-   pop de      ; we're keeping the same args for the next call !
-   pop bc
+    pop     de                          ; we're keeping the same args for the next call !
+    pop     bc
 
-   pop ix
-   
+    pop     ix
+
    ; if ((*compar)(base+j, jd+j) <=0) break;
-   dec hl
-   bit 7,h
-   jr nz,i_6   ; Negative sign ?   exit loop
+    dec     hl
+    bit     7, h
+    jr      nz, i_6                     ; Negative sign ?   exit loop
 
-   
-   pop hl      ; width
-   push hl
-   
-   push de  ; 1st arg:  base+j
-   push bc ; 2nd arg: jd+j
-   push hl ; width
 
-   call  memswap_callee
+    pop     hl                          ; width
+    push    hl
+
+    push    de                          ; 1st arg:  base+j
+    push    bc                          ; 2nd arg: jd+j
+    push    hl                          ; width
+
+    call    memswap_callee
 
    ; for ... j -= gap)
-   ld de,(_j)
-   ld hl,(_gap)
-   jr i_11
+    ld      de, (_j)
+    ld      hl, (_gap)
+    jr      i_11
 
-SECTION bss_clib
+    SECTION bss_clib
 
-._i   defs  2
-._j   defs  2
-._t1  defs  2
-._t2  defs  2
-._jd  defs  2
+_i: defs    2
+_j: defs    2
+_t1:
+    defs    2
+_t2:
+    defs    2
+_jd:
+    defs    2
 ;._width defs  2
-._base   defs  2
+_base:
+    defs    2
 ; ._ngap defs  2
-._gap defs  2
+_gap:
+    defs    2
 
 
 ENDIF
