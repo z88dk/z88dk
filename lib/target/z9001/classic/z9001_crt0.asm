@@ -75,6 +75,7 @@ ENDIF
     defc    TAR__no_ansifont = 1
     defc    TAR__register_sp = CRT_ORG_CODE - 2
     defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__crt_on_exit = $f000
     defc    __CPU_CLOCK = 2457600
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -111,9 +112,10 @@ cleanup:
     push    hl
     call    crt0_exit
     pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
-    jp      $F000
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal: 
     jp      (hl)    ;Used for function pointer calls

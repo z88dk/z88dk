@@ -36,6 +36,7 @@ ENDIF
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1
+    defc    TAR__crt_interrupt_mode_exit = 1
     defc    __CPU_CLOCK = 3072000
     INCLUDE	"crt/classic/crt_rules.inc"
 
@@ -56,7 +57,7 @@ start:
 cleanup:
     call    crt0_exit
     halt
-    im      1
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0            ;Restore stack to entry value
 vpeek_noop: 

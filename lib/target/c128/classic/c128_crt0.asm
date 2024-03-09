@@ -130,7 +130,7 @@ z80start:
 		
 cleanup:
     call    crt0_exit
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 	;ld	bc,$d030
 	;xor	a

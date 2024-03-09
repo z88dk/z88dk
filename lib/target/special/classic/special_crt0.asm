@@ -28,7 +28,8 @@ ENDIF
 
     defc    TAR__clib_exit_stack_size = 4
     defc    TAR__fputc_cons_generic = 1
-    defc    TAR__register_sp = -1 
+    defc    TAR__register_sp = -1
+    defc    TAR__crt_on_exit = $c800        ;Jump to here
     defc    CRT_KEY_DEL = 12
     defc    __CPU_CLOCK = 2000000
     defc    CONSOLE_COLUMNS = 48
@@ -68,7 +69,8 @@ cleanup:
     push    hl
     call    crt0_exit
     pop     hl
-    jp      $c800
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 

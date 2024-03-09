@@ -126,6 +126,7 @@ ENDIF
     call    _main
 cleanup:
     call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0
     ;ei

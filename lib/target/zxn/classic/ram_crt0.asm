@@ -31,6 +31,7 @@ start:
     ld      (exitsp),sp
 
     INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_start_eidi.inc"
 
     call    _main           ; Call user program
 cleanup:
@@ -39,6 +40,7 @@ cleanup:
     ld      hl,10072        ;Restore hl' to what basic wants
     exx
     pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0            ;Restore stack to entry value
     ret

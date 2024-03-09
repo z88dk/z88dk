@@ -42,7 +42,7 @@ cleanup:
     exx
     pop     hl
     exx
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0
     ret

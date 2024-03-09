@@ -118,7 +118,7 @@ IF !DEFINED_nointerrupsaving
     ld      ($01EA),hl
   ENDIF
 ENDIF
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 	pop	bc
 __restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value

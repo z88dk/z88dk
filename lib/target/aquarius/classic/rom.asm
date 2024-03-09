@@ -37,8 +37,7 @@ program:
 
 cleanup:
     call    crt0_exit
-
-endloop:
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"
 
     defc	__crt_org_bss = RAM_Start

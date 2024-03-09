@@ -64,6 +64,7 @@ IF (startup=2)
 	ld	hl,(oldintaddr)
 	ld	(57),hl
 ENDIF
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0            ;Restore stack to entry value
     ret

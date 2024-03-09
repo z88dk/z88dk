@@ -4,6 +4,8 @@
     defc    TAR__register_sp = 0x0000       ;Not used
     defc    TAR__clib_exit_stack_size = 4
     defc    TAR__fputc_cons_generic = 1
+    defc    TAR__crt_on_exit = $10001   ;loop forever
+    defc    TAR__crt_enable_eidi = $02  ;enable interrupts on entry
     defc    CLIB_SAM_IS_BASIC = 0
 IF !DEFINED_CRT_MAX_HEAP_ADDRESS
     defc    CRT_MAX_HEAP_ADDRESS = 65535
@@ -78,14 +80,14 @@ IF !CRT_DISABLE_INT_TICK
     EXTERN   tick_count
     defc     _FRAMES = tick_count
 ENDIF
-
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     ei
     ; Entry to the user code
     call    _main
 cleanup:
     call    crt0_exit
-endloop:
-    jr      endloop
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal:
     jp      (hl)

@@ -50,6 +50,7 @@ cleanup:
     call    crt0_exit
 
     pop     bc      ;Get exit() value into bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0    ;Pick up entry sp
     jp      $e003   ; Monitor warm start

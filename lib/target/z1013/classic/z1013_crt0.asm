@@ -74,6 +74,7 @@ ENDIF
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__register_sp = 0xdfff
     defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__crt_on_exit = $F000
     defc    __CPU_CLOCK = 1000000
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -94,9 +95,10 @@ cleanup:
 	push    hl
     call    crt0_exit
     pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
-    jp      $F000
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal:
     jp      (hl)    ;Used for function pointer calls

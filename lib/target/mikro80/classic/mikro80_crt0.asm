@@ -65,6 +65,7 @@ cleanup:
     push    hl
     call    crt0_exit
     pop     hl
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     jp      $8000
 
 l_dcal: jp      (hl)            ;Used for function pointer calls

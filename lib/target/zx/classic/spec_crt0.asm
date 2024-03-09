@@ -188,7 +188,7 @@ ENDIF
 cleanup:
     push    hl
     call    crt0_exit
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 
 IF (startup=2)      ; ROM ?

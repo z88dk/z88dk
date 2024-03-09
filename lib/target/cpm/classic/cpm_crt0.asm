@@ -181,6 +181,7 @@ cleanup:
     push    hl		;Save return value
     call    crt0_exit
     pop     hl
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 ; For CP/M 3 return the exit value via BDOS P_CODE
 PUBLIC __restore_sp_onexit

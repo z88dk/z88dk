@@ -105,6 +105,7 @@ is_super80v:
     call    _main
 cleanup:
     call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"
 
 

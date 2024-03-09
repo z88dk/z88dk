@@ -167,7 +167,7 @@ ENDIF
 	
 cleanup:
     call    crt0_exit
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 IF (!DEFINED_startup | (startup=1))
 warmreset:

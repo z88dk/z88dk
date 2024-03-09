@@ -6,6 +6,7 @@
     defc    TAR__clib_exit_stack_size = 4
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $10001       ;loop forever
 
     ; Where the screen is located
     defc    SCREEN_BASE = 0x0000
@@ -73,8 +74,9 @@ ENDIF
     call    _main
 cleanup:
     call    crt0_exit
-endloop:
-    jr      endloop
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
+
 
 ; Paging routines for graphics
 __sam_graphics_pagein:

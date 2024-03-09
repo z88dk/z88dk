@@ -68,6 +68,7 @@ cleanup:
 
 
     pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 ;       Special SAM stuff goes here
 

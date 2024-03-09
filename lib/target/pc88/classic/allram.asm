@@ -8,6 +8,7 @@
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $10001
 
     ; No interrupts registered
     defc    TAR__crt_enable_rst = $0000
@@ -51,8 +52,8 @@ program:
 
 cleanup:
     call    crt0_exit
-endloop:
-    jr      endloop
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal:
     jp      (hl)

@@ -39,6 +39,7 @@ cleanup:
     call    crt0_exit
 
     pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0
     ret

@@ -10,6 +10,7 @@
     ; We want to intercept rst38 to our interrupt manager that reads the 
     ; keyboard
     defc    TAR__crt_enable_rst = $8080
+    defc    TAR__crt_on_exit = $10001       ;loop forever
     EXTERN  asm_im1_handler
     defc    _z80_rst_38h = asm_im1_handler
 
@@ -63,7 +64,5 @@ program:
 
 cleanup:
     call    crt0_exit
-
-end:
-    jr	end
-    rst	0
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_termiante.inc"

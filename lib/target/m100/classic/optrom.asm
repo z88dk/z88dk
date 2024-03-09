@@ -159,4 +159,5 @@ cleanup:
     push    hl
     call    crt0_exit
     pop     hl
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     jp      exit

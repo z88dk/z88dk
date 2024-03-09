@@ -11,7 +11,9 @@ IF      !DEFINED_CRT_ORG_CODE
 ENDIF
 
     defc TAR__register_sp = 0xFDFF
-
+    defc TAR__crt_on_exit = $10001      ;loop forever
+    defc TAR__crt_interrupt_mode = 2
+    defc TAR__crt_enable_eidi = $02     ;enable interrupts
 
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -50,9 +52,8 @@ isr_table_fill:
     ld      hl,_kbd_isr
     ld      ($FE52),hl
 
-    im      2
-    ei
-
+    INCLUDE "crt/classic/crt_init_interupt_mode.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _wait_sub_cpu
     ld      bc, $1900
@@ -65,14 +66,9 @@ isr_table_fill:
     call    _main
 
 cleanup:
-
     call    crt0_exit
-
-
-	push    hl				; return code
-end:
-    jr      end
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 _kbd_isr:
     push    af

@@ -77,6 +77,7 @@ cleanup:
     pop     hl
 __restore_sp_onexit:
     ld      sp,0
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"
     
 l_dcal:

@@ -53,6 +53,7 @@ start:
     call    _main           ; Call user program
 cleanup:
     call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     ; How does the program end?
     INCLUDE "crt/classic/crt_terminate.inc"
 

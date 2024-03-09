@@ -7,7 +7,8 @@
    defc DEF__crt_enable_restart        = 0       ;; if non-zero, restart the program on exit (correct initialization of static variables with rom models only)
    defc DEF__crt_on_exit               = 0x10001 ;; halt on exit (see documentation for other exit behaviours)
    defc DEF__crt_enable_eidi           = 0       ;; bit flags: 0x01 = di on start, 0x02 = ei on start, 0x10 = di on exit, 0x20 = ei on exit
-
+   defc DEF__crt_interrupt_mode        = -1      ;; if 0-2 crt inserts appropriate im x instruction
+   defc DEF__crt_interrupt_mode_exit   = -1      ;; if 0-2 crt inserts appropriate im x instruction on exit
    defc DEF__crt_enable_rst            = 0       ;; if non-zero and in some crts with code org = 0, set bits indicate which rst locations are implemented with user code
    defc DEF__crt_enable_nmi            = 0       ;; if non-zero and in some crts with code org = 0, a jump to user code to service the nmi is inserted
 

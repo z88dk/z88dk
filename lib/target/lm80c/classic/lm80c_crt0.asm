@@ -111,7 +111,7 @@ cleanup:
 	; We should probably disable VDP interrupts before doing this
 ;	ld	hl,$45ED	;retn
 ;	ld	(NMIUSR),hl
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     pop     bc
 __restore_sp_onexit:
     ld      sp,0

@@ -37,6 +37,7 @@
     defc	TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__fputc_cons_generic = 1
+    defc    TAR__crt_on_exit = $10001       ;loop forever
     defc	__CPU_CLOCK = 6000000
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -138,11 +139,9 @@ cleanup:
 
     call    crt0_exit
 
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
-    ;push    hl				; return code
-
-    di
-    halt
 
 cleanup_exit:
     ret

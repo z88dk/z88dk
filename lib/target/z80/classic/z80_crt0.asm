@@ -37,6 +37,7 @@ ENDIF
 
     ; Default, don't change the stack pointer
     defc    TAR__register_sp = -1
+    ; Default, 32 functions can be registered for atexit()
     defc    TAR__clib_exit_stack_size = 32
     ; Default, halt loop
     defc    TAR__crt_on_exit = 0x10001
@@ -54,11 +55,12 @@ IF CRT_ORG_CODE = 0x0000
 ENDIF
 
 start:
-    INCLUDE "crt/classic/crt_init_eidi.inc"
     INCLUDE "crt/classic/crt_init_sp.inc"
     ; Make room for the atexit() stack
     INCLUDE "crt/classic/crt_init_atexit.inc"
+    ; Setup BSS memory and perform other initialisation
     call    crt0_init_bss
+    ; Save the locaton of the atexit stack
 IF __CPU_INTEL__
     ld      hl,0
     add     hl,sp
@@ -66,13 +68,23 @@ IF __CPU_INTEL__
 ELSE
     ld      (exitsp),sp
 ENDIF
+    ; Setup AMALLOC heap if required
     INCLUDE "crt/classic/crt_init_heap.inc"
+
+    ; Setup the desired interrupt mode
+    INCLUDE "crt/classic/crt_init_interrupt_mode.inc"
+    ; Turn on interrupts if desired
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     ; Entry to the user code
     call    _main
     ; Exit code is in hl
 cleanup:
+    ; Cleanup any resources
     call    crt0_exit
+
+    ; Set the interrupt mode on exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
     ; How does the program end?
     INCLUDE "crt/classic/crt_terminate.inc"

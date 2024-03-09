@@ -210,6 +210,7 @@ IF (!DEFINED_osca_notimer)
     ei
 ENDIF
         pop	hl	; restore exit value
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
         ld	sp,0
         xor	a
