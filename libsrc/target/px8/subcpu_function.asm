@@ -13,17 +13,17 @@
 ;
 
 
-	SECTION	code_clib
-	
-	PUBLIC	subcpu_function
-	PUBLIC	_subcpu_function
-	
-	EXTERN	subcpu_call
-	
+    SECTION code_clib
+
+    PUBLIC  subcpu_function
+    PUBLIC  _subcpu_function
+
+    EXTERN  subcpu_call
+
 subcpu_function:
 _subcpu_function:
 
-.asmentry
-	ld	hl,2
-	add	hl,sp
-	jp	subcpu_call
+asmentry:
+    ld      hl, 2
+    add     hl, sp
+    jp      subcpu_call

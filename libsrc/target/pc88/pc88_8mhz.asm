@@ -13,15 +13,15 @@
 ;	$Id: pc88_8mhz.asm $
 ;
 
-        SECTION code_clib
-	PUBLIC	pc88_8mhz
-	PUBLIC	_pc88_8mhz
-	
+    SECTION code_clib
+    PUBLIC  pc88_8mhz
+    PUBLIC  _pc88_8mhz
+
 pc88_8mhz:
 _pc88_8mhz:
-    in	a,($6E)                 ;bit7:0=8MHz 1=4MHz (FH??)
-	ld	hl,0
+    in      a, ($6E)                    ;bit7:0=8MHz 1=4MHz (FH??)
+    ld      hl, 0
     rlca
-	ret	c
-	inc	hl
-	ret
+    ret     c
+    inc     hl
+    ret

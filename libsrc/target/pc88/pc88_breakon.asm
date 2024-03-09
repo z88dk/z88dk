@@ -10,14 +10,14 @@
 ;	$Id: pc88_breakon.asm $
 ;
 
-        SECTION code_clib
-	PUBLIC	pc88_breakon
-	PUBLIC	_pc88_breakon
+    SECTION code_clib
+    PUBLIC  pc88_breakon
+    PUBLIC  _pc88_breakon
 
-	EXTERN	__brksave
+    EXTERN  __brksave
 
 pc88_breakon:
 _pc88_breakon:
-	xor a
-	ld	(__brksave),a
-	ret
+    xor     a
+    ld      (__brksave), a
+    ret

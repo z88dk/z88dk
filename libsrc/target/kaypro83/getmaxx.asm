@@ -7,12 +7,12 @@
 ;
 
 
-                SECTION   code_graphics
-                PUBLIC    getmaxx
-                PUBLIC    _getmaxx
-		EXTERN	CONSOLE_COLUMNS
+    SECTION code_graphics
+    PUBLIC  getmaxx
+    PUBLIC  _getmaxx
+    EXTERN  CONSOLE_COLUMNS
 
-.getmaxx
-._getmaxx
-		ld	hl,CONSOLE_COLUMNS - 1
-		ret
+getmaxx:
+_getmaxx:
+    ld      hl, CONSOLE_COLUMNS-1
+    ret

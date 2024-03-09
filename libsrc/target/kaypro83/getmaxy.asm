@@ -8,18 +8,18 @@
 
 
 
-        SECTION code_graphics
-        PUBLIC  getmaxy
-        PUBLIC  _getmaxy
-	EXTERN	CONSOLE_ROWS
-	EXTERN	__kayproii_gfxmode
+    SECTION code_graphics
+    PUBLIC  getmaxy
+    PUBLIC  _getmaxy
+    EXTERN  CONSOLE_ROWS
+    EXTERN  __kayproii_gfxmode
 
-.getmaxy
-._getmaxy
-	ld	hl, CONSOLE_ROWS - 1
-	ld	a,(__kayproii_gfxmode)
-	and	a
-	ret     z
-	add	hl,hl
-	inc	hl
-	ret
+getmaxy:
+_getmaxy:
+    ld      hl, CONSOLE_ROWS-1
+    ld      a, (__kayproii_gfxmode)
+    and     a
+    ret     z
+    add     hl, hl
+    inc     hl
+    ret

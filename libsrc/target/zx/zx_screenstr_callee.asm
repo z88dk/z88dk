@@ -8,21 +8,21 @@
 ; if the bit pattern contains a mixture of inverted
 ; and non-inverted bit patterns.
 
-SECTION code_clib
-PUBLIC zx_screenstr_callee
-PUBLIC _zx_screenstr_callee
-PUBLIC asm_zx_screenstr
+    SECTION code_clib
+    PUBLIC  zx_screenstr_callee
+    PUBLIC  _zx_screenstr_callee
+    PUBLIC  asm_zx_screenstr
 
-EXTERN asm_zx_cxy2saddr
+    EXTERN  asm_zx_cxy2saddr
 
-.zx_screenstr_callee
-._zx_screenstr_callee
+zx_screenstr_callee:
+_zx_screenstr_callee:
 
-   pop hl
-   pop de
-   ex (sp),hl
-   ld h,l
-   ld l,e
+    pop     hl
+    pop     de
+    ex      (sp), hl
+    ld      h, l
+    ld      l, e
 
 asm_zx_screenstr:
    ; h = char Y 0..23
@@ -30,60 +30,60 @@ asm_zx_screenstr:
    ;
    ; exit : hl = ascii char code if match, else 0 and carry set
 
-   call asm_zx_cxy2saddr
-   
+    call    asm_zx_cxy2saddr
+
    ; hl = screen address
-   
-   ld c,96                     ; number of chars to match against
-   ld de,(23606)               ; use CHARS system variable to locate character set bitmap
-   inc d
 
-.charloop
+    ld      c, 96                       ; number of chars to match against
+    ld      de, (23606)                 ; use CHARS system variable to locate character set bitmap
+    inc     d
 
-   ld b,8                      ; match 8 pixel rows
-   push hl
+charloop:
 
-.mloop
+    ld      b, 8                        ; match 8 pixel rows
+    push    hl
 
-   ld a,(de)
-   xor (hl)
-   jr z, cont1                 ; jump if bit patterns match
-   inc a
-   jr nz, nomatch              ; jump if bit patterns are not inverses
+mloop:
 
-.cont1
+    ld      a, (de)
+    xor     (hl)
+    jr      z, cont1                    ; jump if bit patterns match
+    inc     a
+    jr      nz, nomatch                 ; jump if bit patterns are not inverses
 
-   inc de
-   inc h
-   djnz mloop
-   
-.match
+cont1:
 
-   pop hl
-   
-   ld a,128
-   sub c
+    inc     de
+    inc     h
+    djnz    mloop
 
-   ld l,a                      ; hl = ascii char code
-   ld h,b
-   ret
-   
-.nomatch
+match:
 
-   ld a,b			;Remaining rows in font left
-   add a,e
-   ld e,a
-   jp nc, cont2
-   inc d
+    pop     hl
 
-.cont2
+    ld      a, 128
+    sub     c
 
-   pop hl
-   dec c
-   jp nz, charloop
-   
-   ld l,c
-   ld h,c                      ; return with 0 to indicate no match
-   scf
-   ret
+    ld      l, a                        ; hl = ascii char code
+    ld      h, b
+    ret
+
+nomatch:
+
+    ld      a, b                        ;Remaining rows in font left
+    add     a, e
+    ld      e, a
+    jp      nc, cont2
+    inc     d
+
+cont2:
+
+    pop     hl
+    dec     c
+    jp      nz, charloop
+
+    ld      l, c
+    ld      h, c                        ; return with 0 to indicate no match
+    scf
+    ret
 

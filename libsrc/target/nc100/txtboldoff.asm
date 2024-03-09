@@ -1,9 +1,9 @@
 
 
-                SECTION code_clib
-		PUBLIC	txtboldoff
-		PUBLIC	_txtboldoff
+    SECTION code_clib
+    PUBLIC  txtboldoff
+    PUBLIC  _txtboldoff
 
-.txtboldoff
-._txtboldoff
-		jp 0xB83F
+txtboldoff:
+_txtboldoff:
+    jp      0xB83F

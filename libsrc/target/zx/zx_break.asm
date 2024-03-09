@@ -13,20 +13,20 @@
 ;	$Id: zx_break.asm,v 1.4 2016-06-10 19:39:39 dom Exp $
 ;
 
-SECTION code_clib
-	PUBLIC	zx_break
-	PUBLIC	_zx_break
-	
+    SECTION code_clib
+    PUBLIC  zx_break
+    PUBLIC  _zx_break
+
 zx_break:
 _zx_break:
-	ld	hl,0	; assume break is not pressed
-	ld	a,$7f
-	in	a,($fe)
-	rra
-	ret	c	; space not pressed
-	ld	a,$fe
-	in	a,($fe)
-	rra
-	ret	c
-	inc	l	; both shift & space pressed, 
-	ret
+    ld      hl, 0                       ; assume break is not pressed
+    ld      a, $7f
+    in      a, ($fe)
+    rra
+    ret     c                           ; space not pressed
+    ld      a, $fe
+    in      a, ($fe)
+    rra
+    ret     c
+    inc     l                           ; both shift & space pressed,
+    ret
