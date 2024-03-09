@@ -32,7 +32,13 @@ ENDIF
         EXTERN asm_nmi_handler
         defc _z80_nmi = asm_nmi_handler
     ENDIF
+
+    IF !DEFINED_CLIB_DEFAULT_SCREEN_MODE
+        defc    CLIB_DEFAULT_SCREEN_MODE = 1
+    ENDIF
+
     INCLUDE	"crt/classic/crt_rules.inc"
+
 
     EXTERN  vdp_set_mode
     EXTERN  im1_vectors
@@ -71,9 +77,10 @@ program:
 
     INCLUDE "crt/classic/crt_init_heap.inc"
 
-    ; Initialise mode 2 by default
-    ld      hl,1
+IF CLIB_DEFAULT_SCREEN_MODE != -1
+    ld      hl,CLIB_DEFAULT_SCREEN_MODE
     call    vdp_set_mode
+ENDIF
     im      1
     INCLUDE "crt/classic/crt_init_eidi.inc"
 

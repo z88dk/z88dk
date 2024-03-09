@@ -17,6 +17,11 @@ IFNDEF CRT_ENABLE_NMI
     defc        _z80_nmi = nmi_handler
 ENDIF
 
+IF !DEFINED_CLIB_DEFAULT_SCREEN_MODE
+    defc    CLIB_DEFAULT_SCREEN_MODE = 2
+ENDIF
+
+
     defc    CRT_ORG_CODE = 0
 
     EXTERN  nmi_vectors
@@ -39,8 +44,10 @@ program:
     call    crt0_init_bss
     ld      (exitsp),sp
 
-    ld      hl,2
+IF CLIB_DEFAULT_SCREEN_MODE != -1
+    ld      hl,CLIB_DEFAULT_SCREEN_MODE
     call    vdp_set_mode
+ENDIF
 
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"

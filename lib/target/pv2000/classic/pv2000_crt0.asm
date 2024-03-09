@@ -39,6 +39,11 @@ ENDIF
     defc    TAR__register_sp = 0x7fff
     defc    TAR__crt_enable_eidi = $02
     defc    __CPU_CLOCK = 3579000 
+
+IF !DEFINED_CLIB_DEFAULT_SCREEN_MODE
+    defc    CLIB_DEFAULT_SCREEN_MODE = 2
+ENDIF
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     org     CRT_ORG_CODE
@@ -63,8 +68,10 @@ start:
     ld      (__restore_sp_onexit+1),sp   ; Save entry stack
     call    crt0_init_bss
     ld      (exitsp),sp
-    ld      hl,2
+IF CLIB_DEFAULT_SCREEN_MODE != -1
+    ld      hl,CLIB_DEFAULT_SCREEN_MODE
     call    vdp_set_mode
+ENDIF
 
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"

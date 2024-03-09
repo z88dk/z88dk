@@ -13,6 +13,11 @@
     defc    TAR__crt_enable_eidi = $02 ; enable ei on entry
     ; Default, halt loop
     defc    TAR__crt_on_exit = 0x10001
+
+IFNDEF CLIB_DEFAULT_SCREEN_MODE
+    defc    CLIB_DEFAULT_SCREEN_MODE = 2
+ENDIF
+
     INCLUDE "crt/classic/crt_rules.inc"
 
 
@@ -43,8 +48,10 @@ start:
 
     call    crt0_init_bss
     ld      (exitsp),sp
-    ld      hl,2
+IF CLIB_DEFAULT_SCREEN_MODE != -1
+    ld      hl,CLIB_DEFAULT_SCREEN_MODE
     call    vdp_set_mode
+ENDIF
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
