@@ -147,8 +147,9 @@ IF DEFINED_CRT_HEAP_ENABLE
 crt0_reqpag_check1:
     ld      hl,0        ; reqpag  address
     defc CRT_MAX_HEAP_ADDRESS_hl = 1
-    INCLUDE "crt/classic/crt_init_heap.inc"
 ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+
 IF DEFINED_farheapsz
     call    init_far	;Initialise far memory if required
 ENDIF

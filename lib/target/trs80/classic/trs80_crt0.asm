@@ -83,25 +83,8 @@ IF DEFINED_CRT_HEAP_ENABLE
     ld      hl,($4049)				; himem ptr on Model I
 
 set_max_heap_addr:
-    push    hl
-    ld      hl,_heap
-    ld      c,(hl)
-    inc     hl
-    ld      b,(hl)
-    inc     bc
-    xor     a
-    ld      (hl),a
-    dec     hl
-    ld      (hl),a
-    pop     hl	; sp
-    sbc     hl,bc	; hl = total free memory
-
-    push    bc ; main address for malloc area
-    push    hl	; area size
-    EXTERN sbrk_callee
-    call    sbrk_callee
 ENDIF
-
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ; Push pointers to argv[n] onto the stack now
     ; We must start from the end 
