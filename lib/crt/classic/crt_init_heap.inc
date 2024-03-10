@@ -30,7 +30,14 @@ MACRO MALLSUB_HLDE
 ENDM
 
 
-IF DEFINED_CRT_HEAP_ENABLE
+IF DEFINED_CLIB_MALLOC_HEAP_SIZE && CLIB_MALLOC_HEAP_SIZE > 0
+    ld      bc,__autoheap
+    ld      hl,CLIB_MALLOC_HEAP_SIZE
+    push    bc      ; main address for malloc area
+    push    hl      ; area size
+    EXTERN  sbrk_callee
+    call    sbrk_callee
+ELIF DEFINED_CRT_HEAP_ENABLE
 
   IF CRT_MAX_HEAP_ADDRESS
     ld      hl,CRT_MAX_HEAP_ADDRESS

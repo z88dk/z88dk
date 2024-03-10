@@ -128,13 +128,21 @@ exitsp:
     defw    0                   ;atexit() stack
 exitcount:
     defb    0                   ;Number of atexit() routines
-IF DEFINED_CRT_HEAP_ENABLE
+
+IF DEFINED_CLIB_MALLOC_HEAP_SIZE && CLIB_MALLOC_HEAP_SIZE > 0
+    PUBLIC  _heap
+_heap:
+    defw    0,0                 ;populated by crt_heap_init.inc
+__autoheap:
+    defs    CLIB_MALLOC_HEAP_SIZE
+
+ELIF DEFINED_CRT_HEAP_ENABLE
     PUBLIC  _heap
     ; The heap pointer will be wiped at bss initialisation.
     ; Its value (based on __tail) will be set later if set
     ; by sbrk() during AMALLOC initialisation.
 _heap:
-    defw 0             ; __BSS_END_tail         ; Initialised by code_crt_init - location of the last program byte
+    defw 0             ; __BSS_END_tail - populated by crt_heap_init.inc
     defw 0
 ENDIF
 
