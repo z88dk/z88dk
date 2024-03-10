@@ -838,7 +838,7 @@ abc80_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=abc80 TYPE=z80 $(LIBLINKER)  -DFORabc80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc80_clib @$(TARGET_DIRECTORY)/abc80/abc80.lst
 
 # ABC800 library - Stefano
-abc800_clib.lib: $(TARGET_CLIB_OBJS)
+abc800_clib.lib: $(TARGET_CLIB_OBJS) abc80_clib.lib
 	@echo ''
 	@echo '--- Building ABC800 Library ---'
 	@echo ''
