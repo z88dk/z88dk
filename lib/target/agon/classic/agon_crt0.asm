@@ -29,11 +29,8 @@ IFNDEF CLIB_DEFAULT_SCREEN_MODE
 ENDIF
 
 
-    ; Default, don't change the stack pointer
     defc    TAR__register_sp = 0xffff
     defc    TAR__clib_exit_stack_size = 32
-    ; Default, halt loop
-    defc    TAR__crt_on_exit = 0x10001
 
     defc    __CPU_CLOCK = 4000000
     INCLUDE "crt/classic/crt_rules.inc"

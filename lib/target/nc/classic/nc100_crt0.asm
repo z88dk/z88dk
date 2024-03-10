@@ -78,17 +78,9 @@ start:
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
+    INCLUDE "crt/classic/crt_init_heap.inc"
 IF DEFINED_CRT_HEAP_ENABLE
-    ld      hl,_heap
-    ; compact way to do "mallinit()"
-    xor     a
-    ld      (hl),a
-    inc     hl
-    ld      (hl),a
-    inc     hl
-    ld      (hl),a
-    inc     hl
-    ld      (hl),a
+    ; Add in an extra 505 bytes to the heap
     ld      hl,_mblock
     push    hl	; data block
     ld      hl,505

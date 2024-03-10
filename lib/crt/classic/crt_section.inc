@@ -58,23 +58,6 @@ IF CRT_ENABLE_STDIO = 1 && CLIB_FOPEN_MAX > 0
     ld      hl,__sgoioblk+22
     ld      (hl),21 ;stderr
 ENDIF
-IF DEFINED_CRT_HEAP_ENABLE
-  IFDEF CRT_HEAP_ADDRESS
-        defc __heap_start = CRT_HEAP_ADDRESS
-  ELSE
-        defc __heap_start = __BSS_END_tail
-  ENDIF
-  IF __CPU_GBZ80__
-    ld      hl,__heap_start
-    ld      a,l
-    ld      (_heap),a
-    ld      a,h
-    ld      (_heap+1),a
-  ELSE
-    ld      hl,__heap_start
-    ld      (_heap),hl
-  ENDIF
-ENDIF
 IF ( __crt_model = 1 )
     ; Just copy the DATA section
     EXTERN  __ROMABLE_END_tail
@@ -138,11 +121,8 @@ __autoheap:
 
 ELIF DEFINED_CRT_HEAP_ENABLE
     PUBLIC  _heap
-    ; The heap pointer will be wiped at bss initialisation.
-    ; Its value (based on __tail) will be set later if set
-    ; by sbrk() during AMALLOC initialisation.
 _heap:
-    defw 0             ; __BSS_END_tail - populated by crt_heap_init.inc
+    defw 0
     defw 0
 ENDIF
 

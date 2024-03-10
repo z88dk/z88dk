@@ -4,16 +4,7 @@
 ; the compiled program and the stack pointer
 
 ; It works only with a _heap pointer defined somewhere else in the crt0.
-; Such (long) pointer will hold, at startup, the (word) value of __tail
-; that points to the last used byte in the compiled program:
-
-;IF DEFINED_CRT_HEAP_ENABLE
-;EXTERN __tail
-;PUBLIC _heap
-;._heap
-;   defw __tail    ; Location of the last program byte
-;   defw 0
-;ENDIF
+; Such (long) pointer will hold, at startup
 
 
 MACRO MALLSUB_HLDE
@@ -49,20 +40,14 @@ ELIF DEFINED_CRT_HEAP_ENABLE
     defc __crt_skip_heapsize_calcs = 1
   ENDIF
     ; HL must hold SP or the end of free memory
-    ex      de,hl
+  IFDEF CRT_HEAP_ADDRESS
+    ld      bc,CRT_HEAP_ADDRESS
+  ELSE
+    ld      bc,__BSS_END_tail
+  ENDIF
 
-    ld      hl,_heap
-    ld      c,(hl)
-    inc     hl
-    ld      b,(hl)
-    inc     bc
-    ; compact way to do "mallinit()"
-    xor     a
-    ld      (hl),a
-    dec     hl
-    ld      (hl),a
-
-    ex      de,hl   ; sp or the end of free memory
+; hl = sp/end of heap
+; bc = start of heap
 
   IF __CPU_8085__
     sub     hl,bc   ; hl = total free memory
