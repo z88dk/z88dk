@@ -9,7 +9,7 @@
 
 	EXTERN	_main		; No matter what set up we have, main is
 				;  always, always external to this file.
-	PUBLIC	__Exit
+	GLOBAL	__Exit
 
 
 
