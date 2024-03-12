@@ -19,7 +19,7 @@
     PUBLIC  exit_fastcall
     PUBLIC  _exit_fastcall
 
-    EXTERN  __Exit, exitsp, exitcount
+    EXTERN  __Exit, __exit_atexit_funcs, __exit_atexit_count
 
     EXTERN  l_jphl
 
@@ -44,7 +44,7 @@ asm_exit:
 
     push    hl                          ; save exit value
 
-    ld      a, (exitcount)
+    ld      a, (__exit_atexit_count)
     or      a
     jr      z, end
 
@@ -53,12 +53,12 @@ asm_exit:
     ld      e, a
     ld      d, 0
 IF  __CPU_GBZ80__
-    ld      hl, exitsp
+    ld      hl, __exit_atexit_funcs
     ld      a, (hl+)
     ld      h, (hl)
     ld      l, a
 ELSE
-    ld      hl, (exitsp)                ; hl = & atexit stack
+    ld      hl, (__exit_atexit_funcs)                ; hl = & atexit stack
 ENDIF
     add     hl, de                      ; hl = & last function in exit stack + 2b
 

@@ -19,7 +19,7 @@
     PUBLIC  _atexit_fastcall
 
     EXTERN  __clib_exit_stack_size
-    EXTERN  exitsp, exitcount
+    EXTERN  __exit_atexit_funcs, __exit_atexit_count
 
 
 atexit:
@@ -39,7 +39,7 @@ _atexit_fastcall:
 
     ex      de, hl                      ; de = function to register
 
-    ld      hl, exitcount
+    ld      hl, __exit_atexit_count
     ld      a, (hl)
     cp      __clib_exit_stack_size      ; can only hold 32 levels..
     ret     nc                          ; if full returns with hl!=0
@@ -49,12 +49,12 @@ _atexit_fastcall:
     ld      c, a
     ld      b, 0
 IF  __CPU_GBZ80__
-    ld      hl, exitsp
+    ld      hl, __exit_atexit_funcs
     ld      a, (hl+)
     ld      h, (hl)
     ld      l, a
 ELSE
-    ld      hl, (exitsp)
+    ld      hl, (__exit_atexit_funcs)
 ENDIF
     add     hl, bc
     ld      (hl), e                     ; write atexit function

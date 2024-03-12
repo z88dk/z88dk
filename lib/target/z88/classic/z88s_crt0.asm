@@ -140,8 +140,6 @@ __restore_sp_onexit	ld	sp,0		;Restore stack to entry value
 ; Install the error handler
 ;-----------
 doerrhan:
-        xor     a
-        ld      (exitcount),a
         ld      b,0
         ld      hl,errhand
         call_oz(os_erh)
