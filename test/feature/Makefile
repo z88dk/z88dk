@@ -20,6 +20,8 @@ FEATURE_TARGETS += cpm_px8 cpm_px4 cpm_einstein cpm_einstein256 cpm_attache cpm_
 	cpm_mbc200 cpm_mbc1100 cpm_mbc1160 cpm_mbc2000 cpm_x820 cpm_partner cpm_v1050 \
 	cpm_tim011 cpm_hz89 cpm_hz100 
 
+CFLAGS += -pragma-define:CRT_HEAP_AMALLOC=1
+
 LDFLAGS_ace_feature = -lgfxace
 LDFLAGS_c128_feature = -lgfx128
 LDFLAGS_cpc_feature = -lcpcfs
