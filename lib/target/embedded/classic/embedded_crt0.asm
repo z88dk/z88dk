@@ -16,7 +16,7 @@
 
 
     EXTERN    _main           ;main() is always external to crt0 code
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
     EXTERN	  asm_im1_handler
     EXTERN	  asm_nmi_handler
@@ -60,16 +60,15 @@ ENDIF
 
 start:
     INCLUDE	"crt/classic/crt_init_sp.inc"
-    ; Make room for the atexit() stack
+    call	crt0_init
     INCLUDE	"crt/classic/crt_init_atexit.inc"
-    call	crt0_init_bss
-    ld      (exitsp),sp
+
 
     INCLUDE "crt/classic/crt_init_eidi.inc"
     ; Entry to the user code
     call    _main
     ; Exit code is in hl
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"

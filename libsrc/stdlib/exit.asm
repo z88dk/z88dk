@@ -19,7 +19,7 @@
     PUBLIC  exit_fastcall
     PUBLIC  _exit_fastcall
 
-    EXTERN  cleanup, exitsp, exitcount
+    EXTERN  __Exit, exitsp, exitcount
 
     EXTERN  l_jphl
 
@@ -86,5 +86,5 @@ end:                                    ; disrupt stack completely and exit with
 
     pop     hl
     ld      a, l                        ; was here so left as is, something to do with z88?
-    jp      cleanup                     ;  perhaps should be in the z88 crt0?
+    jp      __Exit                      ;  perhaps should be in the z88 crt0?
 

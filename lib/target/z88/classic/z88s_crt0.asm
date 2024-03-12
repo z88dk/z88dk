@@ -6,7 +6,7 @@
 ;	$Id: z88s_crt0.asm,v 1.21 2016-07-15 21:38:08 dom Exp $
 
 
-        PUBLIC    cleanup               ;jp'd to by exit()
+        PUBLIC    __Exit               ;jp'd to by exit()
         PUBLIC    l_dcal                ;jp(hl)
 
 
@@ -53,9 +53,8 @@ start:
 	add	hl,de
 	ld	(hl),0		; terminate command line
 	INCLUDE	"crt/classic/crt_init_sp.inc"
-	INCLUDE	"crt/classic/crt_init_atexit.inc"
-	call	crt0_init_bss
-	ld      (exitsp),sp	
+	call	crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
 
@@ -125,7 +124,7 @@ ENDIF
 	pop	bc		; kill argv
 	pop	bc		; kill argc
 	
-cleanup:			;Jump back here from exit() if needed
+__Exit:			;Jump back here from exit() if needed
     call    crt0_exit
 
         call    resterrhan	;Restore the original error handler
@@ -176,7 +175,7 @@ l_dcal:	jp	(hl)		;Used for function pointer calls also
 
 errescpressed:
         call_oz(Os_Esc)		;Acknowledge escape pressed
-        jr      cleanup		;Exit the program
+        jr      crt0_exit		;Exit the program
 
 
         INCLUDE "crt/classic/crt_runtime_selection.inc"
@@ -298,7 +297,7 @@ ENDIF
 
 
 IF DEFINED_farheapsz
-	SECTION	crt0_init_bss
+	SECTION	crt0_init
 	INCLUDE	"target/z88/classic/init_far.asm"
 
         SECTION bss_fardata

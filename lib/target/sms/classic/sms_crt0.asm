@@ -28,7 +28,7 @@
 ;-------
 
     EXTERN    _main           ;main() is always external to crt0 code
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
         
@@ -155,15 +155,14 @@ filler3:
 start:
 ;    Make room for the atexit() stack
     INCLUDE "crt/classic/crt_init_sp.inc"
-    INCLUDE "crt/classic/crt_init_atexit.inc"
 ; Clear static memory
     ld      hl,RAM_Start
     ld      de,RAM_Start+1
     ld      bc,RAM_Length-1
     ld      (hl),0
     ldir
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
     
     call    DefaultInitialiseVDP
@@ -172,7 +171,7 @@ start:
     ei
     call    _main
 
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
 endloop:

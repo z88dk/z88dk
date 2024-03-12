@@ -31,10 +31,9 @@
 program:
     ; Make room for the atexit() stack
     INCLUDE    "crt/classic/crt_init_sp.inc"
-    INCLUDE    "crt/classic/crt_init_atexit.inc"
 
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE    "crt/classic/crt_init_atexit.inc"
 
     ld      a,(SYSVAR_PORT29_COPY)
     ld      (__port29_copy),a
@@ -45,7 +44,7 @@ program:
 ; Entry to the user code
     call    _main
 
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"

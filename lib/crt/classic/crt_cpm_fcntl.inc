@@ -2,7 +2,7 @@
 
 
     ; Control whether extending a file will write an empty record
-    IF !DEFINED_CPM_WRITE_EMPTY_RECORD
+    IFNDEF CPM_WRITE_EMPTY_RECORD
         DEFC    CPM_WRITE_EMPTY_RECORD = 1
     ENDIF
     PUBLIC  __CPM_WRITE_EMPTY_RECORD

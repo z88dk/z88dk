@@ -11,7 +11,7 @@
 
     EXTERN    _main           ; main() is always external to crt0 code
 
-    PUBLIC    cleanup         ; jp'd to by exit()
+    PUBLIC    __Exit         ; jp'd to by exit()
     PUBLIC    l_dcal          ; jp(hl)
 
     defc	CRT_ORG_CODE = 0x7cdd
@@ -31,19 +31,17 @@
     jp      start
 
 start:
-
-    INCLUDE "crt/classic/crt_init_sp.inc"
-    INCLUDE "crt/classic/crt_init_atexit.inc"
-
     ld      (__restore_sp_onexit+1),sp   ; Save entry stack
-    call	crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+
+    call	crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main           ; Call user program
-cleanup:
+__Exit:
     push    hl              ; return code
     call    crt0_exit
     pop     bc

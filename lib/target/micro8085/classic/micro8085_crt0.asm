@@ -16,7 +16,7 @@
 ;-------------------------------------------------------------------------
         EXTERN    _main           ;main() is always external to crt0 code
 
-        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    __Exit         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
         
         PUBLIC    _urxbuf
@@ -168,12 +168,12 @@ _get_msec:
 ;-------------------------------------------------------------------------
 program:
         call    target_init
-        call    crt0_init_bss
+        call    crt0_init
         INCLUDE "crt/classic/crt_init_heap.inc"
 
         call    _main           ;void main(void) so no args or retval
 
-cleanup:
+__Exit:
         call    crt0_exit
         jp      rst0            ;restart if main should return
 

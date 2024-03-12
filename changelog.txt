@@ -5,6 +5,9 @@ z88dk v2.4 - xx.xx.2024
 
 Future release changes:
 
+- [classic] Support more ways of configuring the heap size
+- [classic] Additional pragma support for interrupts added to targets
+- [cpm] Stack now setup correctly when running on CP/M Plus
 - [zsdcc] Upgraded to SDCC 4.4.0 r14648
 - [z80asm] process file.asm.m4 by m4 and assemble resulting file.asm
 

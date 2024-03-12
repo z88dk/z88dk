@@ -14,7 +14,7 @@
 
     EXTERN    _main		;main() is always external to crt0
 
-    PUBLIC    cleanup		;jp'd to by exit()
+    PUBLIC    __Exit		;jp'd to by exit()
     PUBLIC    l_dcal		;jp(hl)
 
 
@@ -36,10 +36,9 @@ ENDIF
 start:
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
     INCLUDE "crt/classic/crt_init_sp.inc"
-    INCLUDE "crt/classic/crt_init_atexit.inc"
     dec     sp
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     INCLUDE "crt/classic/crt_init_heap.inc"
 
 
@@ -84,7 +83,7 @@ find_end:
     pop     bc	;kill argv
     pop     bc	;kill argc
 
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     bc      ;Get exit() value into bc

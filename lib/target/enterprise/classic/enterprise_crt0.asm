@@ -33,7 +33,7 @@
 
         EXTERN    _main
 
-        PUBLIC    cleanup
+        PUBLIC    __Exit
         PUBLIC    l_dcal
 
 
@@ -156,16 +156,15 @@ ENDIF
     defb    11                      ; set 40x25 characters window
 
 
+    call    crt0_init
     INCLUDE	"crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp),sp
 
     INCLUDE "crt/classic/crt_init_eidi.inc"
     INCLUDE "crt/classic/crt_init_heap.inc"
 
     call    _main
 	
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
 

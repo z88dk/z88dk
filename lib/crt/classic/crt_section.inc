@@ -22,7 +22,7 @@ ENDIF
 ; The classic CRTs need some things setup, so do it
 
     SECTION code_crt_init
-crt0_init_bss:
+crt0_init:
     EXTERN  __BSS_head
     EXTERN  __BSS_END_tail
 IF CRT_INITIALIZE_BSS = 1
@@ -43,12 +43,8 @@ init_8080:
     dec     b
     jr      NZ,init_8080
   ENDIF
-ELSE
-    xor     a
 ENDIF
 
-    ; a = 0 - reset exitcount
-    ld      (exitcount),a
 IF CRT_ENABLE_STDIO = 1 && CLIB_FOPEN_MAX > 0
     ; Setup std* streams
     ld      hl,__sgoioblk+2
@@ -105,21 +101,15 @@ IF !DEFINED_basegraphics
 base_graphics:
     defw    0                   ;Address of graphics map
 ENDIF
-    PUBLIC  exitsp
-    PUBLIC  exitcount
-exitsp:
-    defw    0                   ;atexit() stack
-exitcount:
-    defb    0                   ;Number of atexit() routines
 
-IF DEFINED_CLIB_MALLOC_HEAP_SIZE && CLIB_MALLOC_HEAP_SIZE > 0
+IF __clib_malloc_heap_size > 0
     PUBLIC  _heap
 _heap:
     defw    0,0                 ;populated by crt_heap_init.inc
 __autoheap:
-    defs    CLIB_MALLOC_HEAP_SIZE
+    defs    __clib_malloc_heap_size
 
-ELIF DEFINED_CRT_HEAP_ENABLE
+ELIF DEFINED_CRT_HEAP_AMALLOC ||  __crt_stack_size > 0
     PUBLIC  _heap
 _heap:
     defw 0

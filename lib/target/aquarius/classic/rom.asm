@@ -20,14 +20,10 @@
     defb    $53,$43,$30,$38,$4B,$9C,$B5,$B0,$A8,$6C,$AC,$64,$CC,$A8,$06,$70
 
 program:
-
-; Make room for the atexit() stack
     INCLUDE "crt/classic/crt_init_sp.inc"
+
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-
-    call    crt0_init_bss
-    ld      (exitsp),sp
-
 
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
@@ -35,7 +31,7 @@ program:
 ; Entry to the user code
     call    _main
 
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"

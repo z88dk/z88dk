@@ -39,7 +39,7 @@
     PUBLIC  __sendchar	;  Used by stdio
     PUBLIC  __recvchar
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
     defc    TAR__register_sp = -1
@@ -56,10 +56,10 @@ start:
     ; any register for any purpose Wheee!!
     ld      (__restore_sp_onexit),sp
     include "target/rcmx000/classic/rcmx000_boot.asm"
-    call    crt0_init_bss
+    call    crt0_init
     call    _main	;Call user program
         
-cleanup:
+__Exit:
     push	hl
     call    crt0_exit
     pop     bc

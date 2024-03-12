@@ -124,6 +124,27 @@
       ENDIF
    ENDIF
 
+   ;; Some heapsize definitions
+   IFDEF CRT_STACK_SIZE
+      defc __crt_stack_size = CRT_STACK_SIZE
+   ELSE
+      IFDEF TAR__crt_stack_size
+         defc __crt_stack_size = TAR__crt_stack_size
+      ELSE
+         defc __crt_stack_size = DEF__crt_stack_size
+      ENDIF
+   ENDIF
+
+   IFDEF CLIB_MALLOC_HEAP_SIZE
+      defc __clib_malloc_heap_size = CLIB_MALLOC_HEAP_SIZE
+   ELSE
+      IFDEF TAR__clib_malloc_heap_size
+         defc __clib_malloc_heap_size = TAR__clib_malloc_heap_size
+      ELSE
+         defc __clib_malloc_heap_size = DEF__clib_malloc_heap_size
+      ENDIF
+   ENDIF
+
 
    PUBLIC __CRT_KEY_DEL
    IFDEF CRT_KEY_DEL

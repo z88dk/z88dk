@@ -2,7 +2,7 @@
 ;       Startup stub for z88 OZ5 shell
 ;
 
-    PUBLIC    cleanup               ;jp'd to by exit()
+    PUBLIC    __Exit               ;jp'd to by exit()
     PUBLIC    l_dcal                ;jp(hl)
 
 
@@ -40,9 +40,8 @@ start:
     ld      ix,4
     add     ix,sp
     ld      (__restore_sp_onexit+1),sp	;Save starting stack
-    INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp),sp	
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
 
@@ -56,7 +55,7 @@ start:
     pop     bc          ; kill argv
     pop     bc          ; kill argc
 	
-cleanup:			;Jump back here from exit() if needed
+__Exit:			;Jump back here from exit() if needed
     call    crt0_exit
 
     call    resterrhan	;Restore the original error handler
@@ -105,7 +104,7 @@ l_dcal:
 
 errescpressed:
     call_oz(Os_Esc)		;Acknowledge escape pressed
-    jr      cleanup		;Exit the program
+    jr      crt0_exit		;Exit the program
 
 
 

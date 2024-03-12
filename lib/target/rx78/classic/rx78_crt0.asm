@@ -14,7 +14,7 @@
 
     EXTERN    _main           ; main() is always external to crt0 code
 
-    PUBLIC    cleanup         ; jp'd to by exit()
+    PUBLIC    __Exit         ; jp'd to by exit()
     PUBLIC    l_dcal          ; jp(hl)
 
 
@@ -49,14 +49,14 @@ start:
     INCLUDE "crt/classic/crt_init_atexit.inc"
     ld      hl,interrupt
     ld      (0xe788),hl		;RAM interrupt vector
-    call    crt0_init_bss
+    call    crt0_init
 
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 
     call    _main           ; Call user program
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"

@@ -26,7 +26,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
 
@@ -81,9 +81,8 @@ ENDIF
 
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
     INCLUDE "crt/classic/crt_init_sp.inc"	
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"	
-    call    crt0_init_bss
-    ld      (exitsp),sp
 
 
 
@@ -92,7 +91,7 @@ ENDIF
 
     call    _main	;Call user program
 
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
 

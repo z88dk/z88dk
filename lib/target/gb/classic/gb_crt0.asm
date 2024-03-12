@@ -19,7 +19,7 @@
     EXTERN  _main           ;main() is always external to crt0 code
     EXTERN  asm_im1_handler
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
     PUBLIC  add_VBL
@@ -231,7 +231,7 @@ clear3:
     ld      a,7
     ldh     (WX),a
 
-    call    crt0_init_bss
+    call    crt0_init
 
 	; Copy refresh_OAM routine to high ram
     ld      bc,refresh_OAM
@@ -287,17 +287,8 @@ copy1:
     ld      A,0x80
     ldh     (SC),a         ; Use external clock
 
-IF 0
-    ld      hl,sp+0
-    ld      d,h
-    ld      e,l
-    ld      hl,exitsp
-    ld      a,l
-    ld      (hl+),a
-    ld      a,h
-    ld      (hl+),a
-ENDIF
 
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     INCLUDE "crt/classic/crt_init_heap.inc"
 
     ei
@@ -306,7 +297,7 @@ ENDIF
     call    banked_call
     defw    _main
     defw    1		;Bank
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"

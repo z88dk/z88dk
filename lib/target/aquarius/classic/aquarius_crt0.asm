@@ -19,7 +19,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
     PUBLIC  CLIB_VIDEO_PAGE_PORT    ;Video paging port for aq+

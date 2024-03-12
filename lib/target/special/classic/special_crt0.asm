@@ -19,7 +19,7 @@
     EXTERN    _main           ;main() is always external to crt0 code
     EXTERN    asm_im1_handler
 
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
 IFNDEF CLIB_FGETC_CONS_DELAY
@@ -52,11 +52,8 @@ endif
 
 program:
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      hl,0
-    add     hl,sp
-    ld      (exitsp),hl
     ei
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
@@ -65,7 +62,7 @@ program:
     call    _main
     pop     bc
     pop     bc
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     hl

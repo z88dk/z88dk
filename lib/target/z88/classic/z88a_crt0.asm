@@ -21,7 +21,7 @@
 ;
 ;	$Id: app_crt0.asm,v 1.30 2016-07-15 19:32:43 dom Exp $
 
-    PUBLIC    cleanup               ;jp'd to by exit()
+    PUBLIC    __Exit               ;jp'd to by exit()
     PUBLIC    l_dcal                ;jp(hl)
 
 
@@ -139,9 +139,8 @@ init_continue:			;We had enough memory
     call_oz(gn_sop)
 
     INCLUDE	"crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE	"crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp),sp
 
 IF DEFINED_CRT_HEAP_ENABLE
 crt0_reqpag_check1:
@@ -155,7 +154,7 @@ IF DEFINED_farheapsz
 ENDIF
     call    _main   ;Call the users code
     ld      l,0     ;Default return value is 0
-cleanup:            ;Jump back to here from exit()
+__Exit:            ;Jump back to here from exit()
     push	hl      ;Save exit value
     call    crt0_exit
  IF DEFINED_farheapsz
@@ -202,7 +201,7 @@ IF DEFINED_applicationquit
     call    applicationquit
 ENDIF
     ld      l,0
-    jr      cleanup
+    jr      __Exit
 not_quit:
     xor     a
     ret

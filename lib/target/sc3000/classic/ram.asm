@@ -23,21 +23,20 @@ start:
     add     hl,sp
     ld      (__restore_sp_onexit+1),sp
     INCLUDE	"crt/classic/crt_init_sp.inc"
-    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
 ;  ******************** ********************
 ;    BACK TO COMMON CODE FOR ROM AND BASIC
 ;  ******************** ********************
 
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
 
 ; Entry to the user code
     call    _main
 
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     hl

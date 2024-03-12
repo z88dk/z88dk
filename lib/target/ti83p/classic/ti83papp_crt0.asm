@@ -9,7 +9,8 @@
 
 	EXTERN	_main		; No matter what set up we have, main is
 				;  always, always external to this file.
-	
+	PUBLIC	__Exit
+
 
 
 
@@ -19,12 +20,12 @@
 ;-------------------------
 
 	INCLUDE "Ti83p.def"	; ROM / RAM adresses on Ti83+[SE]
-        defc    crt0 = 1
+	defc    crt0 = 1
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 
 	defc	CONSOLE_ROWS = 8
-        defc    TAR__clib_exit_stack_size = 3
-        defc    TAR__register_sp = -1
+	defc    TAR__clib_exit_stack_size = 3
+	defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 6000000
         
 	
@@ -48,7 +49,7 @@ defc __crt_org_bss =   $8A3A
 IF (startup=0 || startup=1)
 
 
-		PUBLIC	cleanup		; used by exit()
+		PUBLIC	crt0_exit		; used by exit()
 		
 
 
@@ -187,9 +188,8 @@ IF (startup=0 || startup=1)
 		; ld	(__restore_sp_onexit+1),sp	; This fails, but it still works without it?
 
 		INCLUDE "crt/classic/crt_init_sp.inc"
-		INCLUDE "crt/classic/crt_init_atexit.inc"
-		call    crt0_init_bss
-		ld      (exitsp),sp
+		call    crt0_init
+        INCLUDE "crt/classic/crt_init_atexit.inc"
 
 		INCLUDE "crt/classic/crt_init_heap.inc"
 
@@ -217,7 +217,7 @@ IF (startup=0 || startup=1)
 		rst 0x28 ; bcall(_ClrLCDFull)
 		DEFW 0x4540
 		call	_main		; call main()
-	cleanup:			; exit() jumps to this point
+	__Exit:			; exit() jumps to this point
 		ld	iy,_IY_TABLE	; Restore flag pointer
 		im	1		;
 	IF DEFINED_GimmeSpeed		;

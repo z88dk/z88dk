@@ -42,12 +42,9 @@ start:
     ld      hl,tms9918_interrupt
     ld      ($7006),hl
 
-
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-
-    call    crt0_init_bss
-    ld      (exitsp),sp
 IF CLIB_DEFAULT_SCREEN_MODE != -1
     ld      hl,CLIB_DEFAULT_SCREEN_MODE
     call    vdp_set_mode
@@ -58,7 +55,7 @@ ENDIF
 
 
     call    _main           ; Call user program
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     ; How does the program end?

@@ -18,7 +18,7 @@
 
     EXTERN    _main           ;main() is always external to crt0 code
 
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
     defc    CONSOLE_COLUMNS = 32
@@ -87,9 +87,8 @@ basicstart:
 start:
     ld      (__restore_sp_onexit+1),sp
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp),sp
 
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
@@ -104,7 +103,7 @@ start:
 
 
     call    _main
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
 

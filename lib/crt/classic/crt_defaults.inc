@@ -12,6 +12,9 @@
    defc DEF__crt_enable_rst            = 0       ;; if non-zero and in some crts with code org = 0, set bits indicate which rst locations are implemented with user code
    defc DEF__crt_enable_nmi            = 0       ;; if non-zero and in some crts with code org = 0, a jump to user code to service the nmi is inserted
 
+   defc DEF__crt_stack_size            = -1      ;; Overhead for stack if heap required 
+   defc DEF__clib_malloc_heap_size     = -1      ;; Default heap size (bytes)
+
 
    ; clib defaults
    defc DEF__clib_exit_stack_size      = 32      ;; max number of functions that can be registered with atexit()

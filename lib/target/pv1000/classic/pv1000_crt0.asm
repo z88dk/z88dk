@@ -26,7 +26,7 @@
     EXTERN  nmi_vectors
     EXTERN  asm_interrupt_handler
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
     ; 2 columns on left and 2 column on right are lost
@@ -70,15 +70,14 @@ endif
 
 program:
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp),sp
     im      1
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
     call    _main
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"

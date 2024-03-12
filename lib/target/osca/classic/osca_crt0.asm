@@ -42,7 +42,7 @@
 ; Some variables which are needed for both app and basic startup
 ;
 
-        PUBLIC    cleanup
+        PUBLIC    __Exit
         PUBLIC    l_dcal
 
 
@@ -130,9 +130,8 @@ start:
 
     ld      (__restore_sp_onexit+1),sp
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call	crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call	crt0_init_bss
-    ld      (exitsp),sp
     INCLUDE "crt/classic/crt_init_heap.inc"
 
 IF (!DEFINED_osca_notimer)
@@ -191,7 +190,7 @@ find_end:
     pop     bc	;kill argv
     pop     bc	;kill argc
 
-cleanup:
+__Exit:
     push	hl		;save exit value
     call    crt0_exit
 

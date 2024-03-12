@@ -21,7 +21,7 @@ IF (startup=2)                 ; Library ?
 ENDIF
 
     PUBLIC	l_dcal		;jp(hl) instruction
-    PUBLIC	cleanup
+    PUBLIC	crt0_exit
 
 
 ;	defm	"ApplicationName:Addin",10,13
@@ -57,14 +57,13 @@ lib:
     jp      _LibMain
 start:
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp),sp	;Store atexit() stack
 
     INCLUDE "crt/classic/crt_init_eidi.inc"
     ; Entry to the user code
     call    _main		;Call the users code
-cleanup:
+__Exit:
     ld      de,$42	;DS_ADDIN_TERMINATE
     ld      ($c000),de
     rst     $10		;Exit the addin
@@ -81,12 +80,11 @@ ELSE
 
 start:
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call	crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call	crt0_init_bss
-    ld      (exitsp),sp	;Store atexit() stack
     ; Entry to the user code
     call    _main		;Call the users code
-cleanup:
+__Exit:
     ld      de,$42	;DS_ADDIN_TERMINATE
     ld      ($c000),de
     rst     $10		;Exit the addin

@@ -27,7 +27,7 @@
     EXTERN	cpm_platform_init
     EXTERN    _main		;main() is always external to crt0
 
-    PUBLIC    cleanup		;jp'd to by exit()
+    PUBLIC    __Exit		;jp'd to by exit()
     PUBLIC    l_dcal		;jp(hl)
 
     defc    TAR__clib_exit_stack_size = 32
@@ -120,12 +120,9 @@ IF (startup=3) | (startup=4) | (startup=5)
     defc    __clib_exit_stack_size = __clib_exit_stack_size_t
 ENDIF
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init   
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss   
     call    cpm_platform_init	;Any platform specific init
-    ld      hl,0
-    add     hl,sp
-    ld      (exitsp),hl
 
 ; Memory banking for Spectrum +3
 IF (startup=3) | (startup=4) | (startup=5)
@@ -176,7 +173,7 @@ ENDIF
     pop     bc	;kill argv
     pop     bc	;kill argc
 
-cleanup:
+__Exit:
     ld      (0x80),hl   ;Save exit value for CP/M 2.2
     push    hl		;Save return value
     call    crt0_exit

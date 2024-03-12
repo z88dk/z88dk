@@ -25,12 +25,13 @@
 	EXTERN	_main		; No matter what set up we have, main is
 				;  always, always external to this file.
 
-	PUBLIC	cleanup		; used by exit()
+	PUBLIC	crt0_exit		; used by exit()
 	PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
 
 	PUBLIC	cpygraph	; TI calc specific stuff
 	PUBLIC	tidi		;
 	PUBLIC	tiei		;
+	PUBLIC	__Exit
 
 ;-------------------------
 ; Begin of (shell) headers
@@ -210,9 +211,8 @@ ENDIF
     add     hl,sp
     ld      (__restore_sp_onexit+1),hl
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp),sp
 
     INCLUDE "crt/classic/crt_init_heap.inc"
 
@@ -237,7 +237,7 @@ ENDIF
 	call	tidi
 	call	_flushallmenus
 	call	_main
-cleanup:			; exit() jumps to this point
+__Exit:			; exit() jumps to this point
 __restore_sp_onexit:
 	ld	sp,0
 IF DEFINED_GRAYlib

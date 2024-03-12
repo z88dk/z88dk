@@ -13,7 +13,7 @@
     EXTERN	asm_im1_handler
     EXTERN	asm_nmi_handler
 
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
 
@@ -60,9 +60,8 @@ program:
     di
 
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp),sp
     ld      a,2
     ld      (__pasopia_page),a
     im      1
@@ -72,7 +71,7 @@ program:
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"

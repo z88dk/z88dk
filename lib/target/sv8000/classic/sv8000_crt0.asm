@@ -14,7 +14,7 @@
     EXTERN  _main           ;main() is always external to crt0 code
     EXTERN  asm_im1_handler
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
     defc    CONSOLE_COLUMNS = 32
@@ -54,9 +54,8 @@ noop:
 
 program:
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp),sp
     ei
     ; Enable AY ports
     ld      a,7
@@ -77,7 +76,7 @@ program:
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"

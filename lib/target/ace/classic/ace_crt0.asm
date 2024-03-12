@@ -15,7 +15,7 @@
 
     EXTERN    _main
 
-    PUBLIC    cleanup
+    PUBLIC    __Exit
     PUBLIC    l_dcal
 
 
@@ -58,10 +58,9 @@ ace_ramtest:
 ELSE
     ld      (__restore_sp_onexit+1),sp
     INCLUDE	"crt/classic/crt_init_sp.inc"
-    INCLUDE	"crt/classic/crt_init_atexit.inc"
 ENDIF
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
 IF DEFINED_CRT_FONT
     defc    CHAR_TABLE = 0x2C00
@@ -102,7 +101,7 @@ nobit2: rrca
     inc     l
     jr      nz,gfx_bloop
 
-    ; a bit of cleanup (we should load a font, here!)
+    ; a bit of __Exit (we should load a font, here!)
     xor  a
 blankloop:
     ld      (hl),a
@@ -124,7 +123,7 @@ ELSE
 ENDIF
 
     call    _main
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     bc

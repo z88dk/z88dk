@@ -1,5 +1,5 @@
 ;
-; A configurable CRT for bare-metal
+; A configurable CRT for bare-metal targets
 ;
 ;
 
@@ -17,7 +17,7 @@
 ;-------
 
     EXTERN    _main           ;main() is always external to crt0 code
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
     EXTERN	  asm_im1_handler
     EXTERN	  asm_nmi_handler
@@ -56,19 +56,12 @@ ENDIF
 
 start:
     INCLUDE "crt/classic/crt_init_sp.inc"
+    ; Setup BSS memory and perform other initialisation
+    call    crt0_init
     ; Make room for the atexit() stack
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    ; Setup BSS memory and perform other initialisation
-    call    crt0_init_bss
-    ; Save the locaton of the atexit stack
-IF __CPU_INTEL__
-    ld      hl,0
-    add     hl,sp
-    ld      (exitsp),hl
-ELSE
-    ld      (exitsp),sp
-ENDIF
-    ; Setup AMALLOC heap if required
+
+    ; Setup heap if required
     INCLUDE "crt/classic/crt_init_heap.inc"
 
     ; Setup the desired interrupt mode
@@ -79,8 +72,8 @@ ENDIF
     ; Entry to the user code
     call    _main
     ; Exit code is in hl
-cleanup:
-    ; Cleanup any resources
+__Exit:
+    ; crt0_exit any resources
     call    crt0_exit
 
     ; Set the interrupt mode on exit

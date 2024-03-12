@@ -52,15 +52,14 @@ int_VBL:
 
 program:
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp),sp
     INCLUDE "crt/classic/crt_init_heap.inc"
     im      1
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"

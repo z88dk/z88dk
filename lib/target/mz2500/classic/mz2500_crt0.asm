@@ -21,7 +21,7 @@
     EXTERN    _main
     EXTERN    _mz2500_printf
 
-    PUBLIC    cleanup 
+    PUBLIC    __Exit 
     PUBLIC    l_dcal
 
 
@@ -125,8 +125,8 @@ start:
 ;	ei
 
 
+    call    crt0_init
     INCLUDE	"crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
 
 ; INIT math identify platform
 
@@ -135,7 +135,7 @@ start:
 
     call    _main
 
-cleanup:
+__Exit:
 
     call    crt0_exit
 
@@ -143,13 +143,13 @@ cleanup:
     INCLUDE "crt/classic/crt_terminate.inc"
 
 
-cleanup_exit:
+crt0_exit_exit:
     ret
 
 
 ;IF (!DEFINED_startup | (startup=1))
 ;
-;        defs    56-cleanup_exit-1
+;        defs    56-crt0_exit_exit-1
 ;
 ;if (ASMPC<>$0038)
 ;        defs    CODE_ALIGNMENT_ERROR
@@ -171,10 +171,5 @@ ENDIF
     INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     INCLUDE	"crt/classic/crt_section.inc"
-
-
-    SECTION code_crt_init
-    ld      hl,TAR__register_sp
-    ld      (exitsp),hl
 
 

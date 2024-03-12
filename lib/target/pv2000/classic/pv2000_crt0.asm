@@ -10,7 +10,7 @@
 
     EXTERN  _main           ; main() is always external to crt0 code
 
-    PUBLIC  cleanup         ; jp'd to by exit()
+    PUBLIC  __Exit         ; jp'd to by exit()
     PUBLIC  l_dcal          ; jp(hl)
 
 
@@ -61,13 +61,12 @@ start:
     ld      ($749b),a	;jp
     ld      hl,mask_int
     ld      ($749c),hl
+    ld      (__restore_sp_onexit+1),sp   ; Save entry stack
 
     INCLUDE "crt/classic/crt_init_sp.inc"
-    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-    ld      (__restore_sp_onexit+1),sp   ; Save entry stack
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 IF CLIB_DEFAULT_SCREEN_MODE != -1
     ld      hl,CLIB_DEFAULT_SCREEN_MODE
     call    vdp_set_mode
@@ -78,7 +77,7 @@ ENDIF
 
 
     call    _main   ; Call user program
-cleanup:
+__Exit:
     push    hl      ; return code
     call    crt0_exit
     pop     hl      ; return code (still not sure it is teh right one !)

@@ -41,7 +41,7 @@
 
     EXTERN  _main		;main() is always external to crt0 code
     EXTERN  _irq_handler	;Interrupt handlers
-    PUBLIC  cleanup
+    PUBLIC  __Exit
     PUBLIC  l_dcal          ;jp(hl)
 
 
@@ -69,7 +69,7 @@ ENDIF
 ; reset
 	di
 	ld sp,Stack_Top		; setup stack
-	call	crt0_init_bss
+	call	crt0_init
 	jp start		; jump to start
 
 
@@ -132,7 +132,7 @@ start:
 	ei
 ; Entry to the user code
 	call    _main
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"

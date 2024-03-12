@@ -18,7 +18,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
     defc    CONSOLE_COLUMNS = 32
@@ -57,16 +57,15 @@ ENDIF
 start:
     ld      (__restore_sp_onexit+1),sp
     INCLUDE "crt/classic/crt_init_sp.inc"
-    INCLUDE "crt/classic/crt_init_atexit.inc"
     di
     ld      a,$ff
     ld      i,a
     im      2
-    call    crt0_init_bss
+    call    crt0_init
     ; Code is shared with CP/M. This is a noop, but pulls in code
     ; into crt0_init and crt0_exit
     call    cpm_platform_init 
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
 IF CLIB_DEFAULT_SCREEN_MODE != -1
     ld      hl,CLIB_DEFAULT_SCREEN_MODE
@@ -77,7 +76,7 @@ ENDIF
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     bc

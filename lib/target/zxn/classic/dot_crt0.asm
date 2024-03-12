@@ -51,7 +51,7 @@ ENDIF
 
     INCLUDE "crt/classic/crt_init_sp.inc"
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
+    call    crt0_init
 
 
 ;    INCLUDE "crt/classic/crt_init_heap.inc"
@@ -91,7 +91,7 @@ found_end:
     call    _main
     pop     bc
     pop     bc
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     hl

@@ -10,7 +10,7 @@
     EXTERN  msxbios
 
     PUBLIC  l_dcal
-    PUBLIC  cleanup
+    PUBLIC  __Exit
     defc    CONSOLE_COLUMNS = 32
 IF !DEFINED_CONSOLE_ROWS
     defc    CONSOLE_ROWS = 24

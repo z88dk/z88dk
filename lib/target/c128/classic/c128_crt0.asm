@@ -23,7 +23,7 @@
 
         EXTERN    _main           ;main() is always external to crt0 code
 
-        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    __Exit         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
         defc    CONSOLE_COLUMNS = 40
@@ -80,6 +80,7 @@ start:
 
 z80start:
 	di
+    ld      (__restore_sp_onexit+1),hl
 	
 	;ld	bc,$d030
 	;ld	a,1
@@ -105,11 +106,9 @@ z80start:
 	ld sp,$FBFF
 ;        ld      hl,0
 ;        add     hl,sp
-    ld      (__restore_sp_onexit+1),hl
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call	crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call	crt0_init_bss
-    ld      (exitsp),sp
 
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
@@ -128,7 +127,7 @@ z80start:
 ;		cp	b
 ;		jr	z,brdloop ;no key pressed
 		
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
 

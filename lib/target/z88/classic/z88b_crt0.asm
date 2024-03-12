@@ -5,7 +5,7 @@
 ;	$Id: bas_crt0.asm,v 1.21 2016-06-21 20:49:06 dom Exp $
 
 
-    PUBLIC  cleanup               ;jp'd to by exit()
+    PUBLIC  __Exit               ;jp'd to by exit()
     PUBLIC  l_dcal                ;jp(hl)
 
 
@@ -64,11 +64,10 @@ bas_last:
 start:
     ld      (__restore_sp_onexit+1),sp	;Save starting stack
     INCLUDE	"crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE	"crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp),sp
 
-IF DEFINED_CRT_HEAP_ENABLE
+IF DEFINED_CRT_HEAP_AMALLOC
     ld      hl,(__restore_sp_onexit+1)
     defc    CRT_MAX_HEAP_ADDRESS_hl = 1
 ENDIF
@@ -77,7 +76,7 @@ ENDIF
     call    doerrhan    ;Initialise a laughable error handler
 
     call    _main       ;Run the program
-cleanup:                ;Jump back here from exit() if needed
+__Exit:                ;Jump back here from exit() if needed
     call    crt0_exit
 
     call_oz(gn_nln)     ;Print a new line
@@ -89,8 +88,6 @@ __restore_sp_onexit:
 ; Install the error handler
 ;-----------
 doerrhan:
-    xor     a
-    ld      (exitcount),a
     ld      b,0
     ld      hl,errhand
     call_oz(os_erh)
@@ -125,7 +122,7 @@ l_dcal:	jp	(hl)		;Used for function pointer calls also
 
 errescpressed:
     call_oz(Os_Esc)		;Acknowledge escape pressed
-    jr      cleanup		;Exit the program
+    jr      crt0_exit		;Exit the program
 
 
 

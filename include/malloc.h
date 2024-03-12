@@ -47,20 +47,20 @@
 
 // Automatic Preset for malloc:  3/4 of the free memory
 #ifdef AMALLOC
-#pragma define CRT_HEAP_ENABLE = 0x01
+#pragma define CRT_HEAP_AMALLOC = 0x01
 #endif
 #ifdef AMALLOC3
-#pragma define CRT_HEAP_ENABLE = 0x01
+#pragma define CRT_HEAP_AMALLOC = 0x01
 #endif
 
 // Automatic Preset for malloc:  2/4 of the free memory
 #ifdef AMALLOC2
-#pragma define CRT_HEAP_ENABLE = 0x03
+#pragma define CRT_HEAP_AMALLOC = 0x03
 #endif
 
 // Automatic Preset for malloc:  1/4 of the free memory
 #ifdef AMALLOC1
-#pragma define CRT_HEAP_ENABLE = 0x07
+#pragma define CRT_HEAP_AMALLOC = 0x07
 #endif
 
 extern void __LIB__              mallinit(void);

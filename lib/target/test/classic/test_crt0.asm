@@ -14,7 +14,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
 
@@ -63,22 +63,8 @@ IF __CPU_R4K__ || __CPU_R5K__
     ioi ld  ($0420),a       ;EDMR register (p299 in R4000UM.pdf)
 ENDIF
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-IF __CPU_GBZ80__
-    ld      hl,sp+0
-    ld      d,h
-    ld      e,l
-    ld      hl,exitsp
-    ld      a,l
-    ld      (hl+),a
-    ld      a,h
-    ld      (hl+),a
-ELSE
-    ld      hl,0
-    add     hl,sp
-    ld      (exitsp),hl
-ENDIF
 IF !__CPU_RABBIT__
     ei
 ENDIF
@@ -98,7 +84,7 @@ ENDIF
     call    _main
     pop     bc
     pop     bc
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     hl

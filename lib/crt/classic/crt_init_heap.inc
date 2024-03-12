@@ -1,15 +1,22 @@
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-
-; It works only with a _heap pointer defined somewhere else in the crt0.
-; Such (long) pointer will hold, at startup
+; Heap setup. We have a few ways to setup the heap
+;
+; 1. -pragma-define:CLIB_MALLOC_HEAP_SIZE - creates a heap in BSS
+; 2. -pragma-define:CRT_STACK_SIZE - leaves x for stack, rest is heap
+; 3. -DAMALLOC etc - divides up the space. Last address either programmatic or defined by
+; CRT_MAX_HEAP_ADDRESS
+; 4. Some ports call in with fixed addresses to use
+;
+; For 2 and 3, heap runs from either _BSS_TAIL or CRT_HEAP_ADDRESS
+;
+; Note: This code must be called after crt0_init for two reasons:
+; 1. The heap pointer is within bss (so would get wiped)
+; 2. Some targets have a himem blob sitting after bss on load
 
 
 MACRO MALLSUB_HLDE
   IF __CPU_INTEL__ || __CPU_GBZ80__
-    ld      a,l     ;  leave 2/4 of the free memory for the stack
+    ld      a,l
     sub     e
     ld      l,a
     ld      a,h
@@ -21,15 +28,33 @@ MACRO MALLSUB_HLDE
 ENDM
 
 
-IF DEFINED_CLIB_MALLOC_HEAP_SIZE && CLIB_MALLOC_HEAP_SIZE > 0
+IF __clib_malloc_heap_size > 0
+    ;; The heap is in BSS section already, just need to register it
     ld      bc,__autoheap
-    ld      hl,CLIB_MALLOC_HEAP_SIZE
+    ld      hl,__clib_malloc_heap_size
     push    bc      ; main address for malloc area
     push    hl      ; area size
     EXTERN  sbrk_callee
     call    sbrk_callee
-ELIF DEFINED_CRT_HEAP_ENABLE
-
+ELIF __crt_stack_size > 0
+    ;; Support the newlib model where we set how much stack we want and then the rest is heap
+    ld      hl,sp
+    ld      de,__crt_stack_size
+    and     a
+    MALLSUB_HLDE
+  IFDEF CRT_HEAP_ADDRESS
+    ld      de,CRT_HEAP_ADDRESS
+  ELSE
+    ld      de,__BSS_END_tail
+  ENDIF
+    and     a
+    MALLSUB_HLDE
+    push    de      ; main address for malloc area
+    push    hl      ; area size
+    EXTERN  sbrk_callee
+    call    sbrk_callee
+ELIF DEFINED_CRT_HEAP_AMALLOC
+  ;; -DAMALLOC handling 
   IF CRT_MAX_HEAP_ADDRESS
     ld      hl,CRT_MAX_HEAP_ADDRESS
     defc __crt_skip_heapsize_calcs = 1
@@ -60,7 +85,7 @@ ELIF DEFINED_CRT_HEAP_ENABLE
     ld      h,a
   ELSE
     sbc     hl,bc   ; hl = total free memory
-   ENDIF
+  ENDIF
 
 
   IFNDEF __crt_skip_heapsize_calcs
@@ -100,11 +125,11 @@ ELIF DEFINED_CRT_HEAP_ENABLE
    ; Reduce to heap size to 75% of available memory
    MALLSUB_HLDE
    ; Reduce to 50% if needed
-   IF CRT_HEAP_ENABLE & 2
+   IF CRT_HEAP_AMALLOC & 2
    MALLSUB_HLDE
    ENDIF
   ; Reduce to 25% if needed
-   IF CRT_HEAP_ENABLE & 4
+   IF CRT_HEAP_AMALLOC & 4
    MALLSUB_HLDE
    ENDIF
   ENDIF

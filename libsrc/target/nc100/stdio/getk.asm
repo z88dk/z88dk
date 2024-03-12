@@ -17,7 +17,7 @@
     PUBLIC  getk
     PUBLIC  _getk
 
-    EXTERN  cleanup                     ;in crt0
+    EXTERN  __Exit                     ;in crt0
 
 getk:
 _getk:
@@ -47,7 +47,7 @@ nocr:
     call    $B8d2                       ;kmgetyellow
     pop     hl                          ;get it back
     ret     nc                          ;no yellow
-    jp      cleanup                     ;was yellow so outta here
+    jp      __Exit                      ;was yellow so outta here
 
 
 

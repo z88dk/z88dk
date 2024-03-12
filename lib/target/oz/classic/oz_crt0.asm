@@ -31,7 +31,7 @@
 
     EXTERN  _main                       ;main() is always external to crt0 code
 
-    PUBLIC  cleanup                     ;jp'd to by exit()
+    PUBLIC  __Exit                     ;jp'd to by exit()
     PUBLIC  l_dcal                      ;jp(hl)
 
 
@@ -167,7 +167,7 @@ IF  DEFINED_ozgetch2
     pop     bc
     ld      a, l
     or      h
-    jr      nz, __exit
+    jr      nz, crt0_exit
 ENDIF
 
 		;ld      hl,1
@@ -183,9 +183,8 @@ ENDIF
 ;------- Z88DK specific code (begin) -------
     ld      (__restore_sp_onexit+1), sp ;Save entry stack
     INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    call    crt0_init_bss
-    ld      (exitsp), sp
 
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
@@ -196,7 +195,7 @@ ENDIF
 ; __ozspare1end:
 
 ;------- Z88DK specific code (begin) -------
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
 
@@ -214,7 +213,6 @@ _exit:
     ld      a, 4
     out     (4), a                      ;; page in proper second page
 		;call    __ozcallexitfunctions
-__exit:
 s_init_unblank:                         ; ozblankscreen or ozfast might have hidden everything;
     call    ret_only                    ; if so, ret_only is changed into "ozunblankscreen" to make it back visible.
 

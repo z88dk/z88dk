@@ -38,12 +38,10 @@ endif
     INCLUDE "crt/classic/crt_z80_rsts.inc"
 
 program:
-; Make room for the atexit() stack
     INCLUDE "crt/classic/crt_init_sp.inc"
-    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     INCLUDE "crt/classic/crt_init_heap.inc"
 
     ; Install the keyboard interrupt handler
@@ -62,7 +60,7 @@ program:
     out     (c), a
     call    _main
 
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"

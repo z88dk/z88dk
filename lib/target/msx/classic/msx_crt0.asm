@@ -7,7 +7,7 @@
 
     EXTERN  _main
 
-    PUBLIC  cleanup
+    PUBLIC  __Exit
     PUBLIC  l_dcal
     PUBLIC  msxbios
 

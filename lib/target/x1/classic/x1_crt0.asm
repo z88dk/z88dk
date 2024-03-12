@@ -15,7 +15,7 @@
     EXTERN    _main
     EXTERN    _x1_printf
 
-    PUBLIC    cleanup 
+    PUBLIC    __Exit 
     PUBLIC    l_dcal
 
     PUBLIC	_wait_sub_cpu

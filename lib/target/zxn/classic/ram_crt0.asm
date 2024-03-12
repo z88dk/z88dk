@@ -26,15 +26,14 @@ start:
                             ; fixing the self-relocating trick, if any
     ld      (__restore_sp_onexit+1),sp
     INCLUDE	"crt/classic/crt_init_sp.inc"
+    call	crt0_init
     INCLUDE	"crt/classic/crt_init_atexit.inc"
-    call	crt0_init_bss
-    ld      (exitsp),sp
 
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main           ; Call user program
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     ld      hl,10072        ;Restore hl' to what basic wants

@@ -128,7 +128,7 @@ include(`crt_memory_map.inc')
 SECTION CODE
 
 PUBLIC __Start, __Exit
-PUBLIC  cleanup                 ; jumped to by exit()
+PUBLIC  crt0_exit                 ; jumped to by exit()
 
 EXTERN _main
 
@@ -249,20 +249,8 @@ ENDIF
 
     include "../crt_set_interrupt_mode.inc"
 
-IF DEFINED_CRT_HEAP_ENABLE
-    
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-
-    EXTERN  __BSS_END_tail
-
-    ld hl,__BSS_END_tail
-    ld (_heap),hl
-
     include "../../../../lib/crt/classic/crt_init_heap.inc"
 
-ENDIF
 
 SECTION code_crt_init           ; user and library initialization
 
@@ -287,7 +275,6 @@ IF __clib_exit_stack_size > 0
 
 ENDIF
 
-.cleanup
 .__Exit
 
 IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
@@ -360,21 +347,20 @@ IF CRT_ENABLE_STDIO = 1
 
 ENDIF
 
-    PUBLIC  exitsp
-    PUBLIC  exitcount
-.exitsp     defw    0           ; atexit() stack
-.exitcount  defb    0           ; number of atexit() routines
 
-IF DEFINED_CRT_HEAP_ENABLE
-
+IF  __clib_malloc_heap_size > 0
+    PUBLIC  _heap
+_heap:
+    defw    0,0                 ;populated by crt_heap_init.inc
+__autoheap:
+    defs    __clib_malloc_heap_size
+ELIF DEFINED_CRT_HEAP_AMALLOC ||  __crt_stack_size > 0
     PUBLIC _heap
     ; The heap pointer will be wiped at bss initialisation.
     ; Its value (based on __tail) will be set later if set
     ; by sbrk() during AMALLOC initialisation.
 ._heap
     defw 0                      ; initialised by code_crt_init - location of the last program byte
-    defw 0
-
 ENDIF
 
 IF CLIB_BALLOC_TABLE_SIZE > 0

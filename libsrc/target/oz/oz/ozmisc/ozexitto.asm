@@ -16,7 +16,7 @@
 
     EXTERN  ozkeyclear
     EXTERN  ozungetch2
-    EXTERN  cleanup                     ;exit
+    EXTERN  __Exit                      ;exit
 
 
 ozexitto:
@@ -31,5 +31,5 @@ _ozexitto:
     call    ozungetch2
     pop     hl                          ;; use previous copy of key on stack as argument
     call    ozungetch2
-    jp      cleanup
+    jp      __Exit
 

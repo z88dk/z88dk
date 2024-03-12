@@ -32,11 +32,11 @@ defc	intcount = $8980
 	or	a			;  needed for the 2nd screen
 	sbc	hl,de			;
 	pop	hl			;
-	jr	c,cleanup		; If not, stop the program...
+	jr	c,crt0_exit		; If not, stop the program...
 
 	and	@11000000		; Test if our block of memory is
 	cp	@11000000		;  within the range addressable
-	jr	nz,cleanup		;  by the LCD hardware
+	jr	nz,crt0_exit		;  by the LCD hardware
 
 	ld	(graybit2),hl		; Save the address of our 2nd Screen
 
