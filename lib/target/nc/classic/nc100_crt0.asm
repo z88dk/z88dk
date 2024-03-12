@@ -42,7 +42,7 @@ ELSE
     org     CRT_ORG_CODE
     jp      start
 
-IF DEFINED_CRT_HEAP_AMALLOC
+IF DEFINED_CRT_HEAP_AMALLOC || CLIB_MALLOC_HEAP_SIZE > 0 || CRT_STACK_SIZE > 0
 ;EXTERN ASMTAIL
 PUBLIC _heap
 ; We have 509 bytes we can use here..
@@ -78,7 +78,7 @@ start:
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
     INCLUDE "crt/classic/crt_init_heap.inc"
-IF DEFINED_CRT_HEAP_AMALLOC
+IF DEFINED_CRT_HEAP_AMALLOC || CLIB_MALLOC_HEAP_SIZE > 0 || CRT_STACK_SIZE > 0
     ; Add in an extra 505 bytes to the heap
     ld      hl,_mblock
     push    hl	; data block
