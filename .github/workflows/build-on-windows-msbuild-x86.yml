@@ -27,12 +27,12 @@ jobs:
       uses: actions/checkout@v4
       with: 
         submodules: 'true'
-    - name: Get lastest nightly
+    - name: Get latest nightly
       run: |
         curl -L -o z88dk-win32-latest.zip http://nightly.z88dk.org/z88dk-win32-latest.zip
         unzip -d win32-latest z88dk-win32-latest.zip
     - name: Find MSBuild
-      uses: microsoft/setup-msbuild@v1.1
+      uses: microsoft/setup-msbuild@v2
       with:
         msbuild-architecture: x86
     - name: Create config.h
