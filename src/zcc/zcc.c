@@ -2278,15 +2278,14 @@ void SetStringConfig(arg_t *argument, char *arg)
 
 void SetNumber(arg_t *argument, char *arg)
 {
-    char *ptr = arg + 1;
+    char *ptr = arg;
     char *end;
     int   val;
-
     if (strncmp(ptr, argument->name, strlen(argument->name)) == 0) {
         ptr += strlen(argument->name);
     }
-
     while (ispunct(*ptr)) ++ptr;
+
     val = (int)strtol(ptr, &end, 0);
 
     if (end != ptr) {
