@@ -73,7 +73,7 @@ TOCREATE += $(call check_target,mbc200,mbc200.lib $(CPMLIBS))
 TOCREATE += $(call check_target,mc1000,mc1000_clib.lib)
 TOCREATE += $(call check_target,micro8085,micro8085_clib.lib)
 TOCREATE += $(call check_target,mikro80,mikro80_clib.lib)
-TOCREATE += $(call check_target,msx,msx_clib.lib msx2.lib cpm_msx.lib)
+TOCREATE += $(call check_target,msx,msx_clib.lib msx2.lib)
 TOCREATE += $(call check_target,mtx,mtx_clib.lib)
 TOCREATE += $(call check_target,multi8,multi8_clib.lib)
 TOCREATE += $(call check_target,myvision,myvision_clib.lib)
@@ -996,11 +996,6 @@ msx_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C psg TARGET=msx
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(TARGET_DIRECTORY)/msx/msx.lst
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msxbios @$(TARGET_DIRECTORY)/msx/arch_msxbios.lst
-
-cpm_msx.lib: msx_clib.lib
-	@echo ''
-	@echo '--- Building MSX (CP/M) Library ---'
-	@echo ''
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/cpm_msx @$(TARGET_DIRECTORY)/msx/cpm_msx.lst
 
 
