@@ -52,8 +52,8 @@ start:
     INCLUDE "crt/classic/crt_init_sp.inc"
     INCLUDE "crt/classic/crt_init_atexit.inc"
     call	crt0_init
-    INCLUDE "crt/classic/crt_init_eidi.inc"
     INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     call    _main           ; Call user program
 __Exit:
     call    crt0_exit

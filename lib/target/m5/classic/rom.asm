@@ -49,9 +49,9 @@ IF CLIB_DEFAULT_SCREEN_MODE != -1
     ld      hl,CLIB_DEFAULT_SCREEN_MODE
     call    vdp_set_mode
 ENDIF
-    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 
     call    _main           ; Call user program

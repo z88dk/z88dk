@@ -122,9 +122,9 @@ ENDIF
     ; enable process exx set
     ; install interrupt interposer
     call    cpc_enable_process_exx_set
-    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
     ld      a,CLIB_DEFAULT_SCREEN_MODE

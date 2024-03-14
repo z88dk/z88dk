@@ -64,6 +64,7 @@ start:
     INCLUDE	"crt/classic/crt_init_atexit.inc"
 
 
+    INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
     ; Entry to the user code
     call    _main
