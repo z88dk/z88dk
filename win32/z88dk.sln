@@ -98,6 +98,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-font2pv1000", "z88dk-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common-test", "common-test\common-test.vcxproj", "{4128F3D3-4ED7-4C8D-8305-F76A250520BC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-z80asm2", "z88dk-z80asm2\z88dk-z80asm2.vcxproj", "{A58CBA63-8425-49DD-AA14-D744D349757F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-z80asm2-test", "z88dk-z80asm2-test\z88dk-z80asm2-test.vcxproj", "{2027B297-9322-4590-BCD9-166B1ED2A2F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -306,6 +310,22 @@ Global
 		{4128F3D3-4ED7-4C8D-8305-F76A250520BC}.Release|Win32.Build.0 = Release|Win32
 		{4128F3D3-4ED7-4C8D-8305-F76A250520BC}.Release|x64.ActiveCfg = Release|x64
 		{4128F3D3-4ED7-4C8D-8305-F76A250520BC}.Release|x64.Build.0 = Release|x64
+		{A58CBA63-8425-49DD-AA14-D744D349757F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A58CBA63-8425-49DD-AA14-D744D349757F}.Debug|Win32.Build.0 = Debug|Win32
+		{A58CBA63-8425-49DD-AA14-D744D349757F}.Debug|x64.ActiveCfg = Debug|x64
+		{A58CBA63-8425-49DD-AA14-D744D349757F}.Debug|x64.Build.0 = Debug|x64
+		{A58CBA63-8425-49DD-AA14-D744D349757F}.Release|Win32.ActiveCfg = Release|Win32
+		{A58CBA63-8425-49DD-AA14-D744D349757F}.Release|Win32.Build.0 = Release|Win32
+		{A58CBA63-8425-49DD-AA14-D744D349757F}.Release|x64.ActiveCfg = Release|x64
+		{A58CBA63-8425-49DD-AA14-D744D349757F}.Release|x64.Build.0 = Release|x64
+		{2027B297-9322-4590-BCD9-166B1ED2A2F5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2027B297-9322-4590-BCD9-166B1ED2A2F5}.Debug|Win32.Build.0 = Debug|Win32
+		{2027B297-9322-4590-BCD9-166B1ED2A2F5}.Debug|x64.ActiveCfg = Debug|x64
+		{2027B297-9322-4590-BCD9-166B1ED2A2F5}.Debug|x64.Build.0 = Debug|x64
+		{2027B297-9322-4590-BCD9-166B1ED2A2F5}.Release|Win32.ActiveCfg = Release|Win32
+		{2027B297-9322-4590-BCD9-166B1ED2A2F5}.Release|Win32.Build.0 = Release|Win32
+		{2027B297-9322-4590-BCD9-166B1ED2A2F5}.Release|x64.ActiveCfg = Release|x64
+		{2027B297-9322-4590-BCD9-166B1ED2A2F5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
