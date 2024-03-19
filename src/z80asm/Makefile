@@ -204,7 +204,7 @@ $(eval $(call MAKE_RE2C,src/cpp/scan2))
 # test
 #------------------------------------------------------------------------------
 
-test: $(TARGET_EXE) $(TARGET_LIB)
+test:: $(TARGET_EXE) $(TARGET_LIB)
 	$(MAKE) -C dev/z80asm_lib test
 	perl -S prove --state=slow,save -j9 t/*.t
 
@@ -281,3 +281,16 @@ retest: rebuild
 	$(MAKE) -C ../common test
 	$(MAKE) -C ../z80asm test
 	$(MAKE) -C ../zobjcopy test
+
+#------------------------------------------------------------------------------
+# z80asm2
+#------------------------------------------------------------------------------
+all:
+	$(MAKE) -C z80asm2
+
+test::
+	$(MAKE) -C z80asm2 test
+
+clean::
+	$(MAKE) -C z80asm2 clean
+

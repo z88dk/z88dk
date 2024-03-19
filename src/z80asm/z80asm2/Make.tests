@@ -1,0 +1,1 @@
+$(eval $(call MAKE_EXE,t/test_errors,t/test_errors.o errors.o t/test_errors_driver.o t/test.o,1))
