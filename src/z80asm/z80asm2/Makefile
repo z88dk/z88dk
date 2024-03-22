@@ -65,7 +65,7 @@ clean::
 
 ifeq ($(3),1)
 test:: $(1)$(EXESUFFIX)
-	perl -S prove $(1)$(EXESUFFIX)
+	$(1)$(EXESUFFIX)
 endif
 endef
 

@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// z80asm
+// z80asm - output error messages
 // Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
@@ -59,13 +59,13 @@ void test_error_message_with_numeric_arg() {
 void test_error_message_with_invalid_err_code() {
     RUN_NOK(exec_error_message_with_invalid_err_code1);
     OUT_IS("");
-    ERR_IS("Assertion failed: err_code >= 0 && err_code < NUM_ELEMS(messages), "
-        "file errors.cpp, line 46\n");
+    ERR_IS("Assertion failed: err_code < NUM_ELEMS(messages), "
+        "file errors.cpp, line 47\n");
 
     RUN_NOK(exec_error_message_with_invalid_err_code2);
     OUT_IS("");
-    ERR_IS("Assertion failed: err_code >= 0 && err_code < NUM_ELEMS(messages), "
-        "file errors.cpp, line 46\n");
+    ERR_IS("Assertion failed: err_code < NUM_ELEMS(messages), "
+        "file errors.cpp, line 47\n");
 }
 
 int exec_error_message_with_invalid_err_code1() {

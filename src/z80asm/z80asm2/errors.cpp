@@ -43,7 +43,8 @@ string Errors::error_message(ErrCode err_code) {
 #define X(code, message)    message,
 #include "errors.def"
     };
-    assert(err_code >= 0 && err_code < NUM_ELEMS(messages));
+
+    assert(err_code < NUM_ELEMS(messages));
     return messages[(int)err_code];
 }
 
