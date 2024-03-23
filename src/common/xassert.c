@@ -11,8 +11,19 @@
 
 static const char* g_progname = "";
 
+// search last '/' or '\\'
+static const char* basename(const char* filename) {
+    const char* p = filename + strlen(filename) - 1;
+    while (p > filename) {
+        if (*p == '/' || *p == '\\')
+            return p + 1;
+        p--;
+    }
+    return filename;
+}
+
 void xassert_init(const char* progname) {
-    g_progname = progname;
+    g_progname = basename(progname);
 }
 
 int xassert_(const char* expr, const char* file, unsigned line_num) {

@@ -30,9 +30,10 @@ CXX			?= g++
 INSTALL 	?= install
 
 OPT 		= -O3
-
-CXX_FLAGS	+= -std=gnu++17 -MMD -I. -Wall -ggdb $(OPT) \
-			-Wextra -Werror -pedantic-errors 
+COMMON_FLAGS = -MMD -Wall -ggdb -Wextra -Werror -pedantic-errors $(OPT) \
+			-I. -I../../common
+CFLAGS 		+= -std=gnu11 $(COMMON_FLAGS)
+CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS)
 
 # link boost::filesystem if needed
 LDFLAGS 	+= $(shell perl ../tools/build_ldflags.pl $(CXX) $(CROSS)) 
@@ -41,10 +42,11 @@ LDFLAGS 	+= $(shell perl ../tools/build_ldflags.pl $(CXX) $(CROSS))
 # Object files
 #------------------------------------------------------------------------------
 
-SRCS		:= $(wildcard *.cpp)
+C_SRCS		:= ../../common/xassert.c
+CXX_SRCS	:= $(wildcard *.cpp)
 TSRCS		:= $(wildcard t/*.cpp)
-OBJS		:= $(SRCS:.cpp=.o)
-DEPENDS		:= $(SRCS:.cpp=.d) $(TSRCS:.cpp=.d)
+OBJS		:= $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o)
+DEPENDS		:= $(CXX_SRCS:.cpp=.d) $(TSRCS:.cpp=.d)
 
 #------------------------------------------------------------------------------
 .PHONY: all clean test install
@@ -68,6 +70,9 @@ test:: $(1)$(EXESUFFIX)
 	$(1)$(EXESUFFIX)
 endif
 endef
+
+%.o: %.c
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -c -o $@ $<
 
 %.o: %.cpp
 	$(CXX) $(CXX_FLAGS) -c -o $@ $<

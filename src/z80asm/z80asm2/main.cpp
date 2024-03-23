@@ -4,4 +4,9 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-int main() {}
+#include "xassert.h"
+using namespace std;
+
+int main(int /*argc*/, char* argv[]) {
+    xassert_init(argv[0]);
+}

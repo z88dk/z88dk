@@ -1,4 +1,5 @@
 #include "test.h"
+#include "xassert.h"
 #include "../errors.h"
 #include <string>
 using namespace std;
@@ -16,6 +17,7 @@ int exec_error_message_with_invalid_err_code1();
 int exec_error_message_with_invalid_err_code2();
 
 int main(int argc, char* argv[]) {
+	xassert_init(argv[0]);
     start_testing(argv[0]);
 
     if (argc == 2) {
