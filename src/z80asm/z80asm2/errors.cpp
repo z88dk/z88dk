@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "errors.h"
-#include <cassert>
+#include "xassert.h"
 #include <iomanip>
 #include <sstream>
 using namespace std;
@@ -44,7 +44,7 @@ string Errors::error_message(ErrCode err_code) {
 #include "errors.def"
     };
 
-    assert(err_code < NUM_ELEMS(messages));
+    xassert(err_code < NUM_ELEMS(messages));
     return messages[(int)err_code];
 }
 

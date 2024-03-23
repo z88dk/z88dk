@@ -9,9 +9,6 @@
 use Modern::Perl;
 use Path::Tiny;
 
-# get compiler and flags
-my @cxx = @ARGV;
-
 # get source files with unit tests and list of tests
 my @test_sources;
 for my $source_file (<*.cpp>) {
@@ -19,7 +16,8 @@ for my $source_file (<*.cpp>) {
 	(my $header_file = $source_file) =~ s/\.cpp$/.h/;
 	(my $test_driver_file = $test_source_file) =~ s/\.cpp$/_driver.cpp/;
 	if (-f $test_source_file) {
-		push @test_sources, [$test_source_file, $source_file, $test_driver_file, "t/test.cpp"];
+		push @test_sources, [$test_source_file, $source_file, $test_driver_file, 
+						     "t/test.cpp", "../../common/xassert.c"];
 		
 		my(@inline_tests, @exec_tests);
 		for my $line (path($test_source_file)->lines) {
@@ -34,6 +32,7 @@ for my $source_file (<*.cpp>) {
 		# build driver code
 		my @driver_lines = <<END;
 #include "test.h"
+#include "xassert.h"
 #include "../$header_file"
 #include <string>
 using namespace std;
@@ -49,6 +48,7 @@ END
 		push @driver_lines, <<END;
 
 int main(int argc, char* argv[]) {
+	xassert_init(argv[0]);
     start_testing(argv[0]);
 
     if (argc == 2) {
@@ -95,7 +95,7 @@ my $makefile = "Make.tests";
 my @makefile_lines;
 for (@test_sources) {
 	my @files = @$_;
-	@files = map {s/\.cpp$/.o/; $_} @files;
+	@files = map {s/\.c(pp)?$/.o/; $_} @files;
 	(my $main_file = $files[0]) =~ s/\.o$//;
 	push @makefile_lines, "\$(eval \$(call MAKE_EXE,$main_file,@files,1))\n";
 }

@@ -1,4 +1,5 @@
 #include "test.h"
+#include "xassert.h"
 #include "../location.h"
 #include <string>
 using namespace std;
@@ -20,6 +21,7 @@ void test_to_string_filename();
 void test_to_string_filename_line_num();
 
 int main(int argc, char* argv[]) {
+	xassert_init(argv[0]);
     start_testing(argv[0]);
 
     if (argc == 2) {
