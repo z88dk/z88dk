@@ -33,6 +33,7 @@ public:
     void warning(ErrCode err_code, int argument);
     void set_location(const Location& location);
     void set_source_line(const string& line);
+    void set_expanded_line(const string& line);
     void clear_location();
 
 private:
@@ -40,6 +41,7 @@ private:
     int count_{ 0 };                // count errors
     Location location_;             // source location of error
     string source_line_;            // input line where error detected
+    string expanded_line_;          // input line after macro processing
 
     string error_prefix();
     string error_suffix();

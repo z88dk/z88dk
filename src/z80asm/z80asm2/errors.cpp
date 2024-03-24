@@ -47,11 +47,17 @@ void Errors::set_location(const Location& location) {
 
 void Errors::set_source_line(const string& line) {
     source_line_ = line;
+    expanded_line_.clear();
+}
+
+void Errors::set_expanded_line(const string& line) {
+    expanded_line_ = line;
 }
 
 void Errors::clear_location() {
     location_.clear();
     source_line_.clear();
+    expanded_line_.clear();
 }
 
 string Errors::error_prefix() {
@@ -63,8 +69,15 @@ string Errors::error_prefix() {
 
 string Errors::error_suffix() {
     ostringstream oss;
-    if (!source_line_.empty())
+    if (!source_line_.empty()) {
         oss << endl << "  ^---- " << str_remove_extra_blanks(source_line_);
+        if (!expanded_line_.empty()) {
+            string source_wo_spaces = str_remove_all_blanks(source_line_);
+            string expanded_wo_spaces = str_remove_all_blanks(expanded_line_);
+            if (source_wo_spaces != expanded_wo_spaces)
+                oss << endl << "    ^---- " << str_remove_extra_blanks(expanded_line_);
+        }
+    }
     return oss.str();
 }
 
