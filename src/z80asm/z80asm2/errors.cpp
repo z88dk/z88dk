@@ -60,6 +60,18 @@ void Errors::clear_location() {
     expanded_line_.clear();
 }
 
+const Location& Errors::location() {
+    return location_;
+}
+
+string Errors::source_line() {
+    return source_line_;
+}
+
+string Errors::expanded_line() {
+    return expanded_line_;
+}
+
 string Errors::error_prefix() {
     ostringstream oss;
     if (!location_.empty())

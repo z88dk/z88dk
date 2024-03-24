@@ -7,9 +7,12 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 using namespace std;
 
 string str_chomp(const string& str);
 string str_strip(const string& str);
 string str_remove_extra_blanks(const string& str);
 string str_remove_all_blanks(const string& str);
+
+istream& safe_getline(istream& is, string& t);

@@ -11,5 +11,8 @@
 // X(code, message)
 X(ErrOk, "ok")
 
+X(ErrFileOpen, "file open")
+X(ErrIncludeRecursion, "include recursion")
+
 #undef X
 

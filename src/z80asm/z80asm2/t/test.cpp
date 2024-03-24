@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "test.h"
+#include "utils.h"
 #include <cassert>
 #include <iostream>
 #include <fstream>
@@ -15,8 +16,6 @@ int utests_test_nr = 0;
 string utests_progname = "test";
 string utests_out;
 string utests_err;
-
-static string read_file(const string& filename);
 
 void start_testing(const string& progname) {
     utests_progname = progname;
@@ -39,19 +38,24 @@ bool run_exec_test(const string& funcname) {
     string err_filename = base_filename + ".err";
     string command = utests_progname + " " + funcname + " > " + out_filename + " 2> " + err_filename;
     int rv = system(command.c_str());
-    utests_out = read_file(out_filename);
+    utests_out = test_slurp(out_filename);
     remove(out_filename.c_str());
-    utests_err = read_file(err_filename);
+    utests_err = test_slurp(err_filename);
     remove(err_filename.c_str());
     return rv == 0;
 }
 
-static string read_file(const string& filename) {
+void test_spew(const string& filename, const string& text) {
+    ofstream ofs(filename, ios::binary);
+    ofs << text;
+}
+
+string test_slurp(const string& filename) {
     string out;
-    ifstream ifs(filename);
+    ifstream ifs(filename, ios::binary);
     if (ifs.is_open()) {
         string line;
-        while (!getline(ifs, line).eof())
+        while (!safe_getline(ifs, line).eof())
             out += line + "\n";
     }
     return out;

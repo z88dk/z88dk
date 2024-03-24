@@ -35,6 +35,9 @@ public:
     void set_source_line(const string& line);
     void set_expanded_line(const string& line);
     void clear_location();
+    const Location& location();
+    string source_line();
+    string expanded_line();
 
 private:
     ostream* os_{ &cerr };          // output stream for errors

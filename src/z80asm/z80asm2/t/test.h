@@ -41,3 +41,5 @@ extern string utests_err;
 void start_testing(const string& progname);
 void done_testing();
 bool run_exec_test(const string & funcname);
+void test_spew(const string & filename, const string & text);
+string test_slurp(const string & filename);
