@@ -23,6 +23,7 @@ INSTALL ?= install
 CXXSRCS		:= $(wildcard *.cpp ../common/*.cpp)
 CSRCS		:= \
 			../common/die.c \
+			../common/dirname.c \
 			../common/fileutil.c \
 			../common/objfile.c \
 			../common/strutil.c \
