@@ -59,11 +59,11 @@ void test_error_message_with_numeric_arg() {
 void test_error_message_with_invalid_err_code() {
     RUN_NOK(exec_error_message_with_invalid_err_code1);
     OUT_IS("");
-    ERR_IS("test_errors: Assertion failed: (size_t)err_code < NUM_ELEMS(messages), file errors.cpp, line 77\n");
+    ERR_IS("test_errors: Assertion failed: (size_t)err_code < NUM_ELEMS(messages), file errors.cpp, line 90\n");
 
     RUN_NOK(exec_error_message_with_invalid_err_code2);
     OUT_IS("");
-    ERR_IS("test_errors: Assertion failed: (size_t)err_code < NUM_ELEMS(messages), file errors.cpp, line 77\n");
+    ERR_IS("test_errors: Assertion failed: (size_t)err_code < NUM_ELEMS(messages), file errors.cpp, line 90\n");
 }
 
 int exec_error_message_with_invalid_err_code1() {
@@ -241,4 +241,76 @@ void test_error_with_source_text7() {
     errors.clear_location();
     errors.error(ErrOk, "argument");
     IS(oss.str(), "error: ok: argument\n");
+}
+
+void test_error_with_expanded_text1() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\t$1f");
+    errors.set_expanded_line("ld a,31");
+    errors.error(ErrOk);
+    IS(oss.str(), "f1.asm:11: error: ok\n  ^---- ld a, $1f\n    ^---- ld a,31\n");
+}
+
+void test_error_with_expanded_text2() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\t31");
+    errors.set_expanded_line("ld a,31");
+    errors.error(ErrOk);
+    IS(oss.str(), "f1.asm:11: error: ok\n  ^---- ld a, 31\n");
+}
+
+void test_error_with_expanded_text3() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\t$1f");
+    errors.set_expanded_line("ld a,31");
+    errors.error(ErrOk, "argument");
+    IS(oss.str(), "f1.asm:11: error: ok: argument\n  ^---- ld a, $1f\n    ^---- ld a,31\n");
+}
+
+void test_error_with_expanded_text4() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\t$1f");
+    errors.set_expanded_line("ld a,31");
+    errors.error(ErrOk, 31);
+    IS(oss.str(), "f1.asm:11: error: ok: $1f\n  ^---- ld a, $1f\n    ^---- ld a,31\n");
+}
+
+void test_error_with_expanded_text5() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\t$1f");
+    errors.set_expanded_line("ld a,31");
+    errors.warning(ErrOk);
+    IS(oss.str(), "f1.asm:11: warning: ok\n  ^---- ld a, $1f\n    ^---- ld a,31\n");
+}
+
+void test_error_with_expanded_text6() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\t31");
+    errors.set_expanded_line("ld a,31");
+    errors.warning(ErrOk);
+    IS(oss.str(), "f1.asm:11: warning: ok\n  ^---- ld a, 31\n");
+}
+
+void test_error_with_expanded_text7() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\t$1f");
+    errors.set_expanded_line("ld a,31");
+    errors.warning(ErrOk, "argument");
+    IS(oss.str(), "f1.asm:11: warning: ok: argument\n  ^---- ld a, $1f\n    ^---- ld a,31\n");
+}
+
+void test_error_with_expanded_text8() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\t$1f");
+    errors.set_expanded_line("ld a,31");
+    errors.warning(ErrOk, 31);
+    IS(oss.str(), "f1.asm:11: warning: ok: $1f\n  ^---- ld a, $1f\n    ^---- ld a,31\n");
 }

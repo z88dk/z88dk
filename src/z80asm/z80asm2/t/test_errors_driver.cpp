@@ -30,6 +30,14 @@ void test_error_with_source_text4();
 void test_error_with_source_text5();
 void test_error_with_source_text6();
 void test_error_with_source_text7();
+void test_error_with_expanded_text1();
+void test_error_with_expanded_text2();
+void test_error_with_expanded_text3();
+void test_error_with_expanded_text4();
+void test_error_with_expanded_text5();
+void test_error_with_expanded_text6();
+void test_error_with_expanded_text7();
+void test_error_with_expanded_text8();
 int exec_error_message_with_invalid_err_code1();
 int exec_error_message_with_invalid_err_code2();
 
@@ -73,6 +81,14 @@ int main(int argc, char* argv[]) {
         test_error_with_source_text5();
         test_error_with_source_text6();
         test_error_with_source_text7();
+        test_error_with_expanded_text1();
+        test_error_with_expanded_text2();
+        test_error_with_expanded_text3();
+        test_error_with_expanded_text4();
+        test_error_with_expanded_text5();
+        test_error_with_expanded_text6();
+        test_error_with_expanded_text7();
+        test_error_with_expanded_text8();
     }
 
     done_testing();
