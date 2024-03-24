@@ -17,7 +17,7 @@ for my $source_file (<*.cpp>) {
 	(my $test_driver_file = $test_source_file) =~ s/\.cpp$/_driver.cpp/;
 	if (-f $test_source_file) {
 		push @test_sources, [$test_source_file, $source_file, $test_driver_file, 
-						     "t/test.cpp", "../../common/xassert.c"];
+						     "t/test.cpp", "\$(LIB_OBJS)"];
 		
 		my(@inline_tests, @exec_tests);
 		for my $line (path($test_source_file)->lines) {

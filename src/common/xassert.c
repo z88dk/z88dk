@@ -5,25 +5,28 @@
 //-----------------------------------------------------------------------------
 
 #include "xassert.h"
+#include "xmalloc.h"
+#include "dirname.h"
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-static const char* g_progname = "";
+static char* g_progname = NULL;
 
-// search last '/' or '\\'
-static const char* basename(const char* filename) {
-    const char* p = filename + strlen(filename) - 1;
-    while (p > filename) {
-        if (*p == '/' || *p == '\\')
-            return p + 1;
-        p--;
-    }
-    return filename;
+static void xassert_free(void) {
+    free(g_progname);
 }
 
-void xassert_init(const char* progname) {
-    g_progname = basename(progname);
+void xassert_init(char* progname) {
+    static bool inited = false;
+    if (!inited) {
+        atexit(xassert_free);
+        inited = true;
+    }
+
+    g_progname = xstrdup(zbasename(progname));
+    remove_ext(g_progname);
 }
 
 int xassert_(const char* expr, const char* file, unsigned line_num) {

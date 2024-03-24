@@ -11,7 +11,7 @@ extern "C" {
 
 #define xassert(f)      ((void)((!!(f)) || xassert_(#f, __FILE__, __LINE__)))
 
-void xassert_init(const char* progname);
+void xassert_init(char* progname);
 int xassert_(const char* expr, const char* file, unsigned line_num);
 
 #ifdef __cplusplus

@@ -42,11 +42,13 @@ LDFLAGS 	+= $(shell perl ../tools/build_ldflags.pl $(CXX) $(CROSS))
 # Object files
 #------------------------------------------------------------------------------
 
-C_SRCS		:= ../../common/xassert.c
+LIB_SRCS	:= ../../common/xassert.c ../../common/xmalloc.c ../../common/dirname.c
+LIB_OBJS	:= $(LIB_SRCS:.c=.o) 
+
 CXX_SRCS	:= $(wildcard *.cpp)
 TSRCS		:= $(wildcard t/*.cpp)
-OBJS		:= $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o)
-DEPENDS		:= $(CXX_SRCS:.cpp=.d) $(TSRCS:.cpp=.d)
+OBJS		:= $(CXX_SRCS:.cpp=.o) $(LIB_OBJS)
+DEPENDS		:= $(CXX_SRCS:.cpp=.d) $(TSRCS:.cpp=.d) $(LIB_SRCS:.c=.d)
 
 #------------------------------------------------------------------------------
 .PHONY: all clean test install
@@ -59,11 +61,11 @@ DEPENDS		:= $(CXX_SRCS:.cpp=.d) $(TSRCS:.cpp=.d)
 define MAKE_EXE
 all: $(1)$(EXESUFFIX)
 
-$(1)$(EXESUFFIX): $(2)
-	$(CXX) $(CXXFLAGS) $(2) $(LDFLAGS) -o $(1)$(EXESUFFIX)
+$(1)$(EXESUFFIX): $(2) lib$(PROJ).a
+	$(CXX) $(CXXFLAGS) $(2) $(LDFLAGS) -L. -l$(PROJ) -o $(1)$(EXESUFFIX)
 	
 clean::
-	$(RM) $(1) $(1)$(EXESUFFIX) $(2)
+	$(RM) $(1) $(1)$(EXESUFFIX) $(2) lib$(PROJ).a
 
 ifeq ($(3),1)
 test:: $(1)$(EXESUFFIX)
@@ -92,8 +94,11 @@ $(TARGET_EXE): ../../config.h
 # test
 #------------------------------------------------------------------------------
 
-test::
+test:: lib$(PROJ).a
 	perl build_unit_tests.pl
+
+lib$(PROJ).a: $(OBJS)
+	ar -crs lib$(PROJ).a $(OBJS)
 
 -include Make.tests
 
