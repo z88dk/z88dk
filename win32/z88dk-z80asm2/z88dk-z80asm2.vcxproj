@@ -134,10 +134,12 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\main.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\errors.def" />
