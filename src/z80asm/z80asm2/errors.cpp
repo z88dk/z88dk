@@ -74,7 +74,7 @@ string Errors::error_message(ErrCode err_code) {
 #include "errors.def"
     };
 
-    xassert(err_code < NUM_ELEMS(messages));
+    xassert((size_t)err_code < NUM_ELEMS(messages));
     return messages[(int)err_code];
 }
 
