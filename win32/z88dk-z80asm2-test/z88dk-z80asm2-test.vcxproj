@@ -131,10 +131,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_errors.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_errors_driver.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_location.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_location_driver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h" />

@@ -59,11 +59,11 @@ void test_error_message_with_numeric_arg() {
 void test_error_message_with_invalid_err_code() {
     RUN_NOK(exec_error_message_with_invalid_err_code1);
     OUT_IS("");
-    ERR_IS("test_errors: Assertion failed: err_code < NUM_ELEMS(messages), file errors.cpp, line 47\n");
+    ERR_IS("test_errors: Assertion failed: err_code < NUM_ELEMS(messages), file errors.cpp, line 76\n");
 
     RUN_NOK(exec_error_message_with_invalid_err_code2);
     OUT_IS("");
-    ERR_IS("test_errors: Assertion failed: err_code < NUM_ELEMS(messages), file errors.cpp, line 47\n");
+    ERR_IS("test_errors: Assertion failed: err_code < NUM_ELEMS(messages), file errors.cpp, line 76\n");
 }
 
 int exec_error_message_with_invalid_err_code1() {
@@ -114,3 +114,131 @@ void test_count_of_warnings() {
     IS(errors.count(), 0);
 }
 
+void test_error_at_location1() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm"));
+    errors.error(ErrOk, "argument");
+    IS(oss.str(), "f1.asm: error: ok: argument\n");
+}
+
+void test_error_at_location2() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.error(ErrOk);
+    IS(oss.str(), "f1.asm:11: error: ok\n");
+}
+
+void test_error_at_location3() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.error(ErrOk, "argument");
+    IS(oss.str(), "f1.asm:11: error: ok: argument\n");
+}
+
+void test_error_at_location4() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.error(ErrOk, 31);
+    IS(oss.str(), "f1.asm:11: error: ok: $1f\n");
+}
+
+void test_error_at_location5() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm"));
+    errors.warning(ErrOk, "argument");
+    IS(oss.str(), "f1.asm: warning: ok: argument\n");
+}
+
+void test_error_at_location6() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.warning(ErrOk);
+    IS(oss.str(), "f1.asm:11: warning: ok\n");
+}
+
+void test_error_at_location7() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.warning(ErrOk, "argument");
+    IS(oss.str(), "f1.asm:11: warning: ok: argument\n");
+}
+
+void test_error_at_location8() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.warning(ErrOk, 31);
+    IS(oss.str(), "f1.asm:11: warning: ok: $1f\n");
+}
+
+void test_error_at_location9() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.clear_location();
+    errors.error(ErrOk, "argument");
+    IS(oss.str(), "error: ok: argument\n");
+}
+
+void test_error_at_location10() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.clear_location();
+    errors.warning(ErrOk, "argument");
+    IS(oss.str(), "warning: ok: argument\n");
+}
+
+void test_error_with_source_text1() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\tb");
+    errors.error(ErrOk);
+    IS(oss.str(), "f1.asm:11: error: ok\n  ^---- \tld\ta,\tb\n");    // TODO: normalize blanks, trim
+}
+
+void test_error_with_source_text2() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\tb");
+    errors.error(ErrOk, "argument");
+    IS(oss.str(), "f1.asm:11: error: ok: argument\n  ^---- \tld\ta,\tb\n");    // TODO: normalize blanks, trim
+}
+
+void test_error_with_source_text3() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\tb");
+    errors.error(ErrOk, 31);
+    IS(oss.str(), "f1.asm:11: error: ok: $1f\n  ^---- \tld\ta,\tb\n");    // TODO: normalize blanks, trim
+}
+
+void test_error_with_source_text4() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\tb");
+    errors.warning(ErrOk);
+    IS(oss.str(), "f1.asm:11: warning: ok\n  ^---- \tld\ta,\tb\n");    // TODO: normalize blanks, trim
+}
+
+void test_error_with_source_text5() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\tb");
+    errors.warning(ErrOk, "argument");
+    IS(oss.str(), "f1.asm:11: warning: ok: argument\n  ^---- \tld\ta,\tb\n");    // TODO: normalize blanks, trim
+}
+
+void test_error_with_source_text6() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\tb");
+    errors.warning(ErrOk, 31);
+    IS(oss.str(), "f1.asm:11: warning: ok: $1f\n  ^---- \tld\ta,\tb\n");    // TODO: normalize blanks, trim
+}
+
+void test_error_with_source_text7() {
+    SETUP(errors);
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\tb");
+    errors.clear_location();
+    errors.error(ErrOk, "argument");
+    IS(oss.str(), "error: ok: argument\n");
+}
