@@ -16,26 +16,55 @@ void Errors::set_output(ostream& os) {
 
 void Errors::error(ErrCode err_code, const string& argument) {
     count_++;
-    *os_ << "error: " << error_message(err_code);
+    *os_ << error_prefix() << "error: " << error_message(err_code);
     if (!argument.empty())
         *os_ << ": " << argument;
-    *os_ << endl;
+    *os_ << error_suffix() << endl;
 }
 
 void Errors::error(ErrCode err_code, int argument) {
     count_++;
-    *os_ << "error: " << error_message(err_code) << ": " << num_to_text(argument) << endl;
+    *os_ << error_prefix() << "error: " << error_message(err_code)
+        << ": " << num_to_text(argument) << error_suffix() << endl;
 }
 
 void Errors::warning(ErrCode err_code, const string& argument) {
-    *os_ << "warning: " << error_message(err_code);
+    *os_ << error_prefix() << "warning: " << error_message(err_code);
     if (!argument.empty())
         *os_ << ": " << argument;
-    *os_ << endl;
+    *os_ << error_suffix() << endl;
 }
 
 void Errors::warning(ErrCode err_code, int argument) {
-    *os_ << "warning: " << error_message(err_code) << ": " << num_to_text(argument) << endl;
+    *os_ << error_prefix() << "warning: " << error_message(err_code)
+        << ": " << num_to_text(argument) << error_suffix() << endl;
+}
+
+void Errors::set_location(const Location& location) {
+    location_ = location;
+}
+
+void Errors::set_source_line(const string& line) {
+    source_line_ = line;
+}
+
+void Errors::clear_location() {
+    location_.clear();
+    source_line_.clear();
+}
+
+string Errors::error_prefix() {
+    ostringstream oss;
+    if (!location_.empty())
+        oss << location_.to_string() << ": ";
+    return oss.str();
+}
+
+string Errors::error_suffix() {
+    ostringstream oss;
+    if (!source_line_.empty())
+        oss << endl << "  ^---- " << source_line_;
+    return oss.str();
 }
 
 string Errors::error_message(ErrCode err_code) {

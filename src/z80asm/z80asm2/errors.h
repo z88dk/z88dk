@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "location.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -30,11 +31,18 @@ public:
     void error(ErrCode err_code, int argument);
     void warning(ErrCode err_code, const string& argument = "");
     void warning(ErrCode err_code, int argument);
+    void set_location(const Location& location);
+    void set_source_line(const string& line);
+    void clear_location();
 
 private:
     ostream* os_{ &cerr };          // output stream for errors
     int count_{ 0 };                // count errors
+    Location location_;             // source location of error
+    string source_line_;            // input line where error detected
 
+    string error_prefix();
+    string error_suffix();
     static string error_message(ErrCode err_code);
     static string num_to_text(int n);
 };
