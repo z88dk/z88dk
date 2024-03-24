@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "errors.h"
+#include "utils.h"
 #include "xassert.h"
 #include <iomanip>
 #include <sstream>
@@ -63,7 +64,7 @@ string Errors::error_prefix() {
 string Errors::error_suffix() {
     ostringstream oss;
     if (!source_line_.empty())
-        oss << endl << "  ^---- " << source_line_;
+        oss << endl << "  ^---- " << str_remove_extra_blanks(source_line_);
     return oss.str();
 }
 
