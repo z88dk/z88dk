@@ -59,11 +59,11 @@ void test_error_message_with_numeric_arg() {
 void test_error_message_with_invalid_err_code() {
     RUN_NOK(exec_error_message_with_invalid_err_code1);
     OUT_IS("");
-    ERR_IS("test_errors: Assertion failed: err_code < NUM_ELEMS(messages), file errors.cpp, line 77\n");
+    ERR_IS("test_errors: Assertion failed: (size_t)err_code < NUM_ELEMS(messages), file errors.cpp, line 77\n");
 
     RUN_NOK(exec_error_message_with_invalid_err_code2);
     OUT_IS("");
-    ERR_IS("test_errors: Assertion failed: err_code < NUM_ELEMS(messages), file errors.cpp, line 77\n");
+    ERR_IS("test_errors: Assertion failed: (size_t)err_code < NUM_ELEMS(messages), file errors.cpp, line 77\n");
 }
 
 int exec_error_message_with_invalid_err_code1() {
