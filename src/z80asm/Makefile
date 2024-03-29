@@ -40,6 +40,7 @@ LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS) -Wextra -Werror -pedantic-errors \
 			-Isrc/cpp
 ifeq ($(findstring m68k, $(CC)), m68k)
+	LOCAL_CFLAGS := $(subst -ggdb, , $(LOCAL_CFLAGS))
     PARSE1_CFLAGS = -mlong-jump-table-offsets
 endif
 
