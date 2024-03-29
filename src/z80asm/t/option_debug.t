@@ -53,6 +53,9 @@ END
 
 
 # ASM and C code
+SKIP: {
+	skip "fails in SNAPcraft" if $ENV{SNAPcraft};
+
 unlink_testfiles();
 spew("${test}1.asm", <<END);
 	public _one
@@ -94,6 +97,8 @@ __C_LINE_6_test_5ft_5foption_5fdebug_2eh = $80D1 ; addr, local, , test_t_option_
 _main                           = $82A0 ; addr, public, , test_t_option_debug_c, code_compiler, test_t_option_debug.c::main::0::1:2
 _one                            = $80D1 ; addr, public, , test_t_option_debug1_asm, , test_t_option_debug1.asm:2
 END
+
+}
 
 unlink_testfiles;
 done_testing;
