@@ -54,7 +54,7 @@ END
 
 # ASM and C code
 SKIP: {
-	skip "fails in SNAPcraft" if $ENV{SNAPcraft};
+	skip "fails in SNAPcraft" if $ENV{SNAP};
 
 unlink_testfiles();
 spew("${test}1.asm", <<END);
