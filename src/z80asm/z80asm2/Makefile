@@ -26,8 +26,10 @@ PROJ		:= z88dk-$(BARE_PROJ)
 
 TARGET_EXE	:= $(PROJ)$(EXESUFFIX)
 
+CC 			?= gcc
 CXX			?= g++
 INSTALL 	?= install
+RE2C		= re2c -W --tags --no-debug-info --no-generation-date 
 
 OPT 		= -O3
 COMMON_FLAGS = -MMD -Wall -ggdb -Wextra -Werror -pedantic-errors $(OPT) \
@@ -74,16 +76,31 @@ endif
 endef
 
 %.o: %.c
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 %.o: %.cpp
 	$(CXX) $(CXX_FLAGS) -c -o $@ $<
+
+#------------------------------------------------------------------------------
+# rule to call re2c
+#------------------------------------------------------------------------------
+
+define MAKE_RE2C
+$(TARGET_EXE): $(1).o
+
+ifeq ($(DEVELOPER),1)
+$(1).cpp: $(1).re $(1).def Makefile
+	$(RE2C) -o $(1).cpp $(1).re
+	dos2unix $(1).cpp 2> /dev/null
+endif
+endef
 
 #------------------------------------------------------------------------------
 # main
 #------------------------------------------------------------------------------
 
 $(eval $(call MAKE_EXE,$(PROJ),$(OBJS),0))
+$(eval $(call MAKE_RE2C,scan))
 
 $(TARGET_EXE): ../../config.h
 

@@ -18,14 +18,16 @@ extern string utests_err;
 
 #define DIAG(out) cout << "# " << out << endl
 #define _OK(cond, has_diag, diag) \
-    if (cond) \
-        cout << "ok " << (++utests_test_nr) << endl; \
-    else { \
-        utests_failed_nr++; \
-        cout << "not ok " << (++utests_test_nr) << endl; \
-        DIAG("  Failed test at " << __FILE__ << " line " << __LINE__ << "."); \
-        if (has_diag) DIAG(diag); \
-    }
+    do { \
+        if (cond) \
+            cout << "ok " << (++utests_test_nr) << endl; \
+        else { \
+            utests_failed_nr++; \
+            cout << "not ok " << (++utests_test_nr) << endl; \
+            DIAG("  Failed test at " << __FILE__ << " line " << __LINE__ << "."); \
+            if (has_diag) DIAG(diag); \
+        } \
+    } while(0)
 
 #define OK(cond)        _OK((cond),     0, "")
 #define NOK(cond)       _OK(!(cond),    0, "")

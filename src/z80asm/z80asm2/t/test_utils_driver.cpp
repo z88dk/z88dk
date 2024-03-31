@@ -4,6 +4,13 @@
 #include <string>
 using namespace std;
 
+void test_is_ident_start();
+void test_is_ident_char();
+void test_is_ident_str();
+void test_char_digit();
+void test_str_ends_with();
+void test_str_tolower();
+void test_str_toupper();
 void test_str_chomp();
 void test_str_strip();
 void test_remove_extra_blanks();
@@ -19,6 +26,13 @@ int main(int argc, char* argv[]) {
         DIAG("invalid test " << arg);
     }
     else {
+        test_is_ident_start();
+        test_is_ident_char();
+        test_is_ident_str();
+        test_char_digit();
+        test_str_ends_with();
+        test_str_tolower();
+        test_str_toupper();
         test_str_chomp();
         test_str_strip();
         test_remove_extra_blanks();

@@ -45,6 +45,7 @@ void test_open_file_non_existent() {
         IS(g_include_path.size(), 0);
     }
     IS(g_include_path.size(), 0);
+	g_errors.clear();
 }
 
 #define T_LOCATION(fn, n, line)    \
@@ -103,8 +104,8 @@ void test_open_file_ok() {
         IS(of.filename(), "./test.asm");
     }
     IS(g_include_path.size(), 0);
-    g_errors.clear_location();
     remove("test.asm");
+    g_errors.clear();
 }
 
 #undef T_LOCATION
@@ -121,8 +122,8 @@ void test_file_reader_non_existent() {
         IS(g_include_path.size(), 0);
     }
     IS(g_include_path.size(), 0);
-    g_errors.clear_location();
     remove("test.asm");
+    g_errors.clear();
 }
 
 void test_file_reader_recursive() {
@@ -137,8 +138,8 @@ void test_file_reader_recursive() {
         IS(oss.str(), "test.asm: error: include recursion: test.asm\n");
     }
     g_include_path.clear();
-    g_errors.clear_location();
     remove("test.asm");
+    g_errors.clear();
 }
 
 #define T_LOCATION(fn, n, line)    \
@@ -192,7 +193,7 @@ void test_file_reader_ok() {
     fs::remove_all("test");
     remove("test1.asm");
     g_include_path.clear();
-    g_errors.clear_location();
+    g_errors.clear();
 }
 
 #undef T_LOCATION
@@ -223,7 +224,7 @@ void test_source_reader_ok() {
         T_LOCATION("", 0, "");
     }
     remove("test.asm");
-    g_errors.clear_location();
+    g_errors.clear();
 }
 
 #undef T_LOCATION

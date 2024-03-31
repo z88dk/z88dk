@@ -25,6 +25,7 @@ enum ErrCode {
 // output error messages
 class Errors {
 public:
+    void clear();
     void set_output(ostream& os);
     int count() { return count_; }
     void error(ErrCode err_code, const string& argument = "");

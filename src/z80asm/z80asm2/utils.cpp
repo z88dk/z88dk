@@ -5,10 +5,56 @@
 //-----------------------------------------------------------------------------
 
 #include "utils.h"
+#include <algorithm>
 #include <cctype>
 using namespace std;
 
 //-----------------------------------------------------------------------------
+
+bool is_ident_start(char c) {
+    return c == '_' || isalpha(c);
+}
+
+bool is_ident(char c) {
+    return c == '_' || c == '$' || isalnum(c);
+}
+
+bool is_ident(const string& ident) {
+    if (ident.empty())
+        return false;
+    else if (!is_ident_start(ident[0]))
+        return false;
+    else {
+        for (auto c : ident) {
+            if (!is_ident(c))
+                return false;
+        }
+        return true;
+    }
+}
+
+int char_digit(char c) {
+    return isdigit(c) ? c - '0' : isxdigit(c) ? 10 + toupper(c) - 'A' : -1;
+}
+
+//-----------------------------------------------------------------------------
+
+bool str_ends_with(const string& str, const string& ending) {
+    if (str.length() >= ending.length())
+        return (0 == str.compare(str.length() - ending.length(), ending.length(), ending));
+    else
+        return false;
+}
+
+string str_tolower(string str) {
+    transform(str.begin(), str.end(), str.begin(), [](char c) {return tolower(c); });
+    return str;
+}
+
+string str_toupper(string str) {
+    transform(str.begin(), str.end(), str.begin(), [](char c) {return toupper(c); });
+    return str;
+}
 
 string str_chomp(const string& str_) {
     string str = str_;

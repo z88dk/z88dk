@@ -11,6 +11,12 @@
 #include <sstream>
 using namespace std;
 
+void Errors::clear() {
+    os_ = &cerr;
+    count_ = 0;
+    clear_location();
+}
+
 void Errors::set_output(ostream& os) {
     os_ = &os;
 }

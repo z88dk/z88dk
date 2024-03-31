@@ -10,6 +10,14 @@
 #include <iostream>
 using namespace std;
 
+bool is_ident_start(char c);
+bool is_ident(char c);
+bool is_ident(const string& ident);
+int char_digit(char c);
+
+bool str_ends_with(const string& str, const string& ending);
+string str_tolower(string str);
+string str_toupper(string str);
 string str_chomp(const string& str);
 string str_strip(const string& str);
 string str_remove_extra_blanks(const string& str);
