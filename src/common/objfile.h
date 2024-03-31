@@ -98,9 +98,6 @@ extern void expr_free(expr_t* self);
 // one section
 //-----------------------------------------------------------------------------
 
-#define ORG_NOT_DEFINED     -1
-#define ORG_SECTION_SPLIT   -2
-
 typedef struct section_s
 {
 	UT_string* name;

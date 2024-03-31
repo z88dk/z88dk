@@ -23,6 +23,8 @@ enum Keyword {
 
 Keyword keyword_lookup(const string& text);
 
+class Symbol;
+
 // token
 class Token {
 public:
@@ -36,6 +38,13 @@ public:
     double fvalue() const;
     string svalue() const;
     bool blank_before() const;
+    Symbol* symbol() const;
+
+    void set_code(TkCode code);
+    void set_ivalue(int ivalue);
+    void set_fvalue(double fvalue);
+    void set_svalue(const string& svalue);
+    void set_symbol(Symbol* symbol);
 
     string to_string() const;
     static string to_string(const vector<Token>& tokens);
@@ -49,6 +58,7 @@ private:
     double  fvalue_{ 0.0 };             // floating point value, if any
     string  svalue_;                    // string value, if any
     bool    blank_before_{ false };     // has a blank before
+    Symbol* symbol_{ nullptr };         // pointer to symbol if identifier
 };
 
 // scanner

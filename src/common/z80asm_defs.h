@@ -63,6 +63,12 @@ typedef enum {
 
 extern bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixiy);
 
+
+// Origin
+
+#define ORG_NOT_DEFINED     -1
+#define ORG_SECTION_SPLIT   -2
+
 //-----------------------------------------------------------------------------
 // Opcodes
 //-----------------------------------------------------------------------------

@@ -60,6 +60,7 @@ X(ErrIllegalFloatOption, "illegal -float option")
 
 // assembler
 X(ErrExprInParens, "interpreting indirect value as immediate")
+X(ErrExprNotInParens, "expression not in parens")
 X(ErrIllegalIdent, "illegal identifier")
 X(ErrIntRange, "integer range")
 X(ErrMissingBlock, "missing {} block")

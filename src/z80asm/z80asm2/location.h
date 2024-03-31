@@ -33,3 +33,15 @@ private:
 };
 
 string to_string(const Location& location);
+
+class HasLocation {
+public:
+    HasLocation();
+
+    const Location& location() const;
+    void set_location(const Location& location);
+    void clear();
+
+private:
+    Location location_;
+};

@@ -44,6 +44,138 @@ string search_path(const string& filename, const vector<string>& path) {
     return file_path.generic_string();
 }
 
+string file_basename(const string& filename) {
+    return fs::path(filename).stem().generic_string();
+}
+
+string file_replace_extension(const string& filename, const string& extension) {
+    fs::path file_path{ filename };
+    file_path.replace_extension(extension);
+    return file_path.generic_string();
+}
+
+string file_prepend_output_dir(const string& filename_) {
+    string filename = fs::path(filename_).generic_string();     // convert backslashes
+    if (g_output_dir.empty())
+        return filename;
+    else if (filename.substr(0, g_output_dir.size() + 1) == g_output_dir + "/") {
+        // #2260: may be called with an object file already with the path prepended; do not add it twice
+        return filename;
+    }
+    else {
+        // NOTE: concatenation (/) of a relative fs::path and an
+        // absolute fs::path discards the first one! Do our magic
+        // with strings instead.
+        // is it a win32 absolute path?
+        string file;
+        if (isalpha(filename[0]) && filename[1] == ':') {	// C:
+            file += g_output_dir + "/";
+            file += string(1, filename[0]) + "/";
+            file += string(filename.substr(2));
+        }
+        else {
+            file += g_output_dir + "/";
+            file += filename;
+        }
+        fs::path path{ file };
+        return path.generic_string();
+    }
+}
+
+string file_parent_dir(const string& filename) {
+    string parent_dir = fs::path(filename).parent_path().generic_string();
+    if (parent_dir.empty())
+        return ".";
+    else
+        return parent_dir;
+}
+
+bool file_is_regular_file(const string& filename) {
+    return fs::is_regular_file(filename);
+}
+
+bool file_is_directory(const string& filename) {
+    return fs::is_directory(filename);
+}
+
+bool file_create_directories(const string& dirname) {
+    if (file_is_directory(dirname))
+        return true;
+    else
+        return fs::create_directories(dirname);
+}
+
+string file_asm_filename(const string& filename) {
+    return file_replace_extension(filename, EXT_ASM);
+}
+
+string file_lis_filename(const string& filename) {
+    return file_prepend_output_dir(file_replace_extension(filename, EXT_LIS));
+}
+
+string file_o_filename(const string& filename) {
+    return file_prepend_output_dir(file_replace_extension(filename, EXT_O));
+}
+
+string file_def_filename(const string& filename) {
+    return file_prepend_output_dir(file_replace_extension(filename, EXT_DEF));
+}
+
+// see https://github.com/z88dk/z88dk/issues/2049
+// No fix, to avoid breaking too many things:
+// -oFILE generates single binary FILE
+// -oFILE.EXT generates single binary file FILE.EXT
+// section outputs are always FILE_CODE.bin
+string file_bin_filename(const string& filename, const string& section) {
+    fs::path file_path, file_ext;
+
+    if (g_bin_filename.empty()) {
+        file_path = filename;
+        file_ext = EXT_BIN;
+    }
+    else {
+        // output file may have no extension
+        file_path = g_bin_filename;
+        file_ext = file_path.extension();
+    }
+
+    string filename1 = file_prepend_output_dir(file_path.generic_string());
+    string filename2 = file_replace_extension(filename1, file_ext.generic_string());
+    file_path = filename2;
+
+    if (!section.empty()) {
+        // output file with section has .bin extension
+        fs::path new_path;
+        new_path = file_path.parent_path();
+        if (file_path.stem() != EXT_BIN)
+            new_path /= file_path.stem();
+        else
+            new_path /= "";
+        new_path += "_";
+        new_path += section;
+        new_path += EXT_BIN;
+        file_path = new_path;
+    }
+
+    return file_path.generic_string();
+}
+
+string file_lib_filename(const string& filename) {
+    return file_replace_extension(filename, EXT_LIB);
+}
+
+string file_sym_filename(const string& filename) {
+    return file_prepend_output_dir(file_replace_extension(filename, EXT_SYM));
+}
+
+string file_map_filename(const string& filename) {
+    return file_prepend_output_dir(file_replace_extension(filename, EXT_MAP));
+}
+
+string file_reloc_filename(const string& filename) {
+    return file_prepend_output_dir(file_replace_extension(filename, EXT_RELOC));
+}
+
 //-----------------------------------------------------------------------------
 
 OpenFile::OpenFile() {
@@ -178,3 +310,4 @@ bool SourceReader::getline1(string& line) {
         return true;
     }
 }
+

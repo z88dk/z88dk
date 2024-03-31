@@ -47,10 +47,6 @@ void Errors::warning(ErrCode err_code, int argument) {
         << ": " << num_to_text(argument) << error_suffix() << endl;
 }
 
-void Errors::set_location(const Location& location) {
-    location_ = location;
-}
-
 void Errors::set_source_line(const string& line) {
     source_line_ = line;
     expanded_line_.clear();
@@ -61,13 +57,9 @@ void Errors::set_expanded_line(const string& line) {
 }
 
 void Errors::clear_location() {
-    location_.clear();
+    HasLocation::clear();
     source_line_.clear();
     expanded_line_.clear();
-}
-
-const Location& Errors::location() {
-    return location_;
 }
 
 string Errors::source_line() {
@@ -80,8 +72,8 @@ string Errors::expanded_line() {
 
 string Errors::error_prefix() {
     ostringstream oss;
-    if (!location_.empty())
-        oss << location_.to_string() << ": ";
+    if (!location().empty())
+        oss << location().to_string() << ": ";
     return oss.str();
 }
 

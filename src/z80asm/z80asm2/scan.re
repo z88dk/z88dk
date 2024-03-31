@@ -8,6 +8,7 @@
 #include "errors.h"
 #include "scan.h"
 #include "utils.h"
+#include "xassert.h"
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -411,4 +412,30 @@ bool Lexer::at_end() const {
 
 void Lexer::flush() {
     pos_ = (int)tokens_.size();
+}
+
+Symbol* Token::symbol() const {
+    xassert(symbol_);
+    return symbol_;
+}
+
+void Token::set_code(TkCode code) {
+    code_ = code;
+}
+
+void Token::set_ivalue(int ivalue) {
+    ivalue_ = ivalue;
+}
+
+void Token::set_fvalue(double fvalue) {
+    fvalue_ = fvalue;
+}
+
+void Token::set_svalue(const string& svalue) {
+    svalue_ = svalue;
+    keyword_ = keyword_lookup(svalue_);
+}
+
+void Token::set_symbol(Symbol* symbol) {
+    symbol_ = symbol;
 }

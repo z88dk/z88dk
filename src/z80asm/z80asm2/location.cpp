@@ -4,10 +4,13 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "common.h"
 #include "location.h"
 #include <iostream>
 #include <sstream>
 using namespace std;
+
+//-----------------------------------------------------------------------------
 
 Location::Location(const string& filename, int line_num, bool is_c_file)
     : filename_(filename), line_num_(line_num), is_c_file_(is_c_file) {
@@ -80,4 +83,22 @@ string Location::to_string() const {
 
 string to_string(const Location& location) {
     return location.to_string();
+}
+
+//-----------------------------------------------------------------------------
+
+HasLocation::HasLocation()
+    : location_(g_errors.location()) {
+}
+
+const Location& HasLocation::location() const {
+    return location_;
+}
+
+void HasLocation::set_location(const Location& location) {
+    location_ = location;
+}
+
+void HasLocation::clear() {
+    location_.clear();
 }

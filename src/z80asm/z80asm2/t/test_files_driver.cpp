@@ -11,6 +11,22 @@ void test_file_reader_non_existent();
 void test_file_reader_recursive();
 void test_file_reader_ok();
 void test_source_reader_ok();
+void test_file_basename();
+void test_file_replace_extension();
+void test_file_prepend_output_dir();
+void test_file_parent_dir();
+void test_file_is_regular_file();
+void test_file_is_directory();
+void test_file_create_directories();
+void test_file_asm_filename();
+void test_file_lis_filename();
+void test_file_o_filename();
+void test_file_def_filename();
+void test_file_bin_filename();
+void test_file_lib_filename();
+void test_file_sym_filename();
+void test_file_map_filename();
+void test_file_reloc_filename();
 
 int main(int argc, char* argv[]) {
 	xassert_init(argv[0]);
@@ -29,6 +45,22 @@ int main(int argc, char* argv[]) {
         test_file_reader_recursive();
         test_file_reader_ok();
         test_source_reader_ok();
+        test_file_basename();
+        test_file_replace_extension();
+        test_file_prepend_output_dir();
+        test_file_parent_dir();
+        test_file_is_regular_file();
+        test_file_is_directory();
+        test_file_create_directories();
+        test_file_asm_filename();
+        test_file_lis_filename();
+        test_file_o_filename();
+        test_file_def_filename();
+        test_file_bin_filename();
+        test_file_lib_filename();
+        test_file_sym_filename();
+        test_file_map_filename();
+        test_file_reloc_filename();
     }
 
     done_testing();

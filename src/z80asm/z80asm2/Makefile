@@ -44,7 +44,11 @@ LDFLAGS 	+= $(shell perl ../tools/build_ldflags.pl $(CXX) $(CROSS))
 # Object files
 #------------------------------------------------------------------------------
 
-LIB_SRCS	:= ../../common/xassert.c ../../common/xmalloc.c ../../common/dirname.c
+LIB_SRCS	:= ../../common/xassert.c \
+			   ../../common/xmalloc.c \
+			   ../../common/dirname.c \
+			   ../../common/z80asm_defs.c
+			   
 LIB_OBJS	:= $(LIB_SRCS:.c=.o) 
 
 CXX_SRCS	:= $(wildcard *.cpp)
@@ -105,7 +109,13 @@ $(eval $(call MAKE_RE2C,scan))
 $(TARGET_EXE): ../../config.h
 
 ../../config.h:
-	make -C ../../.. src/config.h
+	$(MAKE) -C ../../.. src/config.h
+
+ifeq ($(DEVELOPER),1)
+parser.o: cpu/parse_code.h
+cpu/parse_code.h: $(wildcard cpu/*.pl cpu/*.yaml)
+	$(MAKE) -C cpu
+endif
 
 #------------------------------------------------------------------------------
 # test

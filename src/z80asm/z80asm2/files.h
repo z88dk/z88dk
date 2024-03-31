@@ -14,7 +14,37 @@
 #include <vector>
 using namespace std;
 
+// default file name extensions
+#define EXT_ASM     ".asm"    
+#define EXT_LIS		".lis"    
+#define EXT_O		".o"	  
+#define EXT_DEF     ".def"    
+#define EXT_BIN     ".bin"    
+#define EXT_LIB     ".lib"    
+#define EXT_SYM     ".sym"    
+#define EXT_MAP     ".map"    
+#define EXT_RELOC   ".reloc"
+#define EXT_M4      ".m4"
+
+// file names
 string search_path(const string& filename, const vector<string>& path);
+string file_basename(const string& filename);
+string file_replace_extension(const string& filename, const string& extension);
+string file_prepend_output_dir(const string& filename);
+string file_parent_dir(const string& filename);
+bool file_is_regular_file(const string& filename);
+bool file_is_directory(const string& filename);
+bool file_create_directories(const string& dirname);
+
+string file_asm_filename(const string& filename);
+string file_lis_filename(const string& filename);
+string file_o_filename(const string& filename);
+string file_def_filename(const string& filename);
+string file_bin_filename(const string& filename, const string& section = "");
+string file_lib_filename(const string& filename);
+string file_sym_filename(const string& filename);
+string file_map_filename(const string& filename);
+string file_reloc_filename(const string& bin_filename);
 
 class OpenFile {
 public:
@@ -57,3 +87,4 @@ class SourceReader : public FileReader {
 protected:
     bool getline1(string& line) override;
 };
+

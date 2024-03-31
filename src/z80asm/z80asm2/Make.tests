@@ -1,5 +1,7 @@
 $(eval $(call MAKE_EXE,t/test_errors,t/test_errors.o errors.o t/test_errors_driver.o t/test.o $(LIB_OBJS),1))
+$(eval $(call MAKE_EXE,t/test_expr,t/test_expr.o expr.o t/test_expr_driver.o t/test.o $(LIB_OBJS),1))
 $(eval $(call MAKE_EXE,t/test_files,t/test_files.o files.o t/test_files_driver.o t/test.o $(LIB_OBJS),1))
 $(eval $(call MAKE_EXE,t/test_location,t/test_location.o location.o t/test_location_driver.o t/test.o $(LIB_OBJS),1))
 $(eval $(call MAKE_EXE,t/test_scan,t/test_scan.o scan.o t/test_scan_driver.o t/test.o $(LIB_OBJS),1))
+$(eval $(call MAKE_EXE,t/test_symtab,t/test_symtab.o symtab.o t/test_symtab_driver.o t/test.o $(LIB_OBJS),1))
 $(eval $(call MAKE_EXE,t/test_utils,t/test_utils.o utils.o t/test_utils_driver.o t/test.o $(LIB_OBJS),1))

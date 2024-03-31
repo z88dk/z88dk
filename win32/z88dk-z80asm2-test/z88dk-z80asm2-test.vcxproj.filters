@@ -48,10 +48,31 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_scan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_scan_driver.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_expr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\symtab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_symtab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_files_driver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\assembler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
