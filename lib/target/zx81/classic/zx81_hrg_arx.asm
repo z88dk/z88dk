@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg_arx.def,v 1.13 2015-07-07 07:11:17 stefano Exp $
+;       $Id: zx81_hrg_arx.def $
 ;
 ; - - - - - - -
 
@@ -281,7 +281,10 @@ pointedbyix:
         call    $0220          ; first PUSH register, then do VSYNC and get KEYBD
 
 IF ((startup=13)|(startup=15))
-        call    $0F46          ; check break (space) key
+        ;call    $0F46          ; check break (space) key
+        LD      A,$7F           ; read port $7FFE - keys B,N,M,.,SPACE.
+        IN      A,($FE)         ;
+        RRA                     ; carry will be set if space not pressed.
         jp      c,nobrkk
         ld      a,(hrgbrkflag)     ; set to '0' if program isn't running
         and	a
