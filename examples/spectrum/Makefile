@@ -8,7 +8,7 @@ all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap hangman.tap \
 	smallgfx.tap stencil.tap clock.tap showlib3d.tap smallgfx2.tap marilyn.tap eagle.tap \
 	fern.tap thuemorse.tap wintest.tap sinwave_fast.tap sinwave_small.tap coswave_fast.tap \
 	coswave_small.tap spritest.tap smile.tap xample.tap psgtest.tap \
-	ex12.tap clicktest.tap fx.tap sndtest.tap synthdemo.tap fontexample.tap
+	carpet.tap ex12.tap clicktest.tap fx.tap sndtest.tap synthdemo.tap fontexample.tap
 
 
 fontexample.tap: fontexample.c
@@ -139,6 +139,9 @@ showlib3d.tap: ../graphics/showlib3d.c
 
 marilyn.tap: ../graphics/marilyn.c
 	zcc +zx -vn ../graphics/marilyn.c -lndos -create-app -omarilyn.bin
+
+carpet.tap: ../graphics/carpet.c
+	zcc +zx -vn ../graphics/carpet.c -lndos -create-app -ocarpet.bin
 
 eagle.tap: ../graphics/eagle.c
 	zcc +zx -vn ../graphics/eagle.c -lndos -create-app -oeagle.bin
