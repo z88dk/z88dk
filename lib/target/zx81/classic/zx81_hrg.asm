@@ -9,7 +9,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.26 2015-01-23 07:30:51 stefano Exp $
+;       $Id: zx81_hrg.def $
 ;
 ; - - - - - - -
 
@@ -298,7 +298,10 @@ pointedbyix:
         call    $0220          ; first PUSH register, then do VSYNC and get KEYBD
 
 IF ((startup=3)|(startup=5))
-        call    $0F46          ; check break (space) key
+        ;call    $0F46          ; check break (space) key
+        LD      A,$7F           ; read port $7FFE - keys B,N,M,.,SPACE.
+        IN      A,($FE)         ;
+        RRA                     ; carry will be set if space not pressed.
         jp      c,nobrkk
         ld      a,(hrgbrkflag)     ; set to '0' if program isn't running
         and	a
@@ -323,14 +326,13 @@ ENDIF
 
 IF ((startup=7)|(startup=27))
 	ld	hl,gcount
-	;res	7,(hl)
-	inc	(hl)
+	dec	(hl)
 	ld	a,(hl)
 	dec	a
 	jp	z,Display_pic1
 	dec	a
 	jp	z,Display_pic2
-	ld	(hl),0
+	ld	(hl),3
 Display_pic1:
 	ld	hl,(graybit1)
 	jp	setpage
@@ -352,7 +354,7 @@ IF ((startup=7)|(startup=27))
 		PUBLIC	graybit1
 		PUBLIC	graybit2
 gcount:
-		defb	0
+		defb	3
 current_graphics:
 		defw	0
 graybit1:
