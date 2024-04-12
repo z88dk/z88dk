@@ -283,9 +283,15 @@ __crt_loader_filename:
     defm    "BANK.00"
     defs    12
 
-
+    PUBLIC __msx_bank_mappings
+__msx_bank_mappings:
 bank_mappings:
     defs        256	    ;This is far too many
+
+    PUBLIC PUT_P0
+    PUBLIC PUT_P1
+    PUBLIC PUT_P2
+    PUBLIC PUT_P3
 
 ; Jump table (copied from on high)
 dos2_jump:
