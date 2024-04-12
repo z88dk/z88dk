@@ -207,6 +207,7 @@ ADP_DELAY:
         LD   iy,ARX_DRIVER_VSYNC                ; 14            "pointedbyix"  Set the display vector address to point at the VSync pulse generation routine.
 
 
+gray_patch:
 ;; Initialise registers required by the ARX display driver.
         ld      a,$20                           ; 7 T  The first character set begins at $2000
         ld      i,a                             ; load MSB into I register which is RFSH address MSB
@@ -358,28 +359,24 @@ ENDIF
 
 IF (startup=17)
 	ld	hl,gcount
-	;res	7,(hl)
-	inc	(hl)
+	dec	(hl)
 	ld	a,(hl)
 	dec	a
 	jp	z,Display_pic1
 	dec	a
 	jp	z,Display_pic2
-	ld	(hl),0
+	ld	(hl),3
 Display_pic1:
-	ld hl,HRG_LineStart + $8000
-	ld (g_patch1+1),hl
-	ld hl,HRG_LineStart2 + $8000
-	ld (g_patch2+1),hl
+;	ex af,af
+	ld a,$20
 	jp	page_set
 Display_pic2:
-	ld hl,HRG_LineStart + $8100
-	ld (g_patch1+1),hl
-	ld hl,HRG_LineStart2 + $8100
-	ld (g_patch2+1),hl
-	jp	page_set
+;	ex af,af
+	ld a,$28
 
 page_set:
+	ld (gray_patch+1),a
+;	ex af,af
 
 ENDIF
 
@@ -422,7 +419,7 @@ IF (startup=17)
 		PUBLIC	graybit1
 		PUBLIC	graybit2
 gcount:
-		defb	0
+		defb	3
 graybit1:
 		defw	0
 graybit2:
