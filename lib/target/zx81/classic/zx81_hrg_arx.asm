@@ -101,7 +101,7 @@ _zx_noblank:
         ld      hl,HRG_handler  ; starts the hires mode when JP (IX) is made
         call	HRG_Sync
 IF (startup<15)
-		ld	a,-8
+		xor a
 		ld	(HRG_blank_patch+1),a
 ENDIF
         ret
@@ -112,7 +112,7 @@ _zx_blank:
         ld      hl,HRG_BlankHandler
         call	HRG_Sync
 IF (startup<15)
-		ld	a,140-8
+		ld	a,140
 		ld	(HRG_blank_patch+1),a
 ENDIF
         ret
