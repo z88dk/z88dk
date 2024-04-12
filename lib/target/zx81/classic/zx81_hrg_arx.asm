@@ -9,7 +9,7 @@
 ; startup=14 - full screen, on exit returns immediately to text mode
 ; startup=15 - 64 rows, on exit requires BREAK to get back to text mode
 ; startup=16 - 64 rows, on exit returns immediately to text mode
-; startup=17 - untested 4 levels grayscale, 64 rows
+; startup=17 - 4 levels grayscale, 64 rows
 ;
 ;
 ; - - - - - - -
@@ -90,10 +90,9 @@ ENDIF
 IF (startup=17)
         ld  hl,(base_graphics)
         ld	(graybit1),hl
-        ld	de,$2000
+        ld	de,2048
         add	hl,de
         ld	(graybit2),hl
-        ld	(current_graphics),hl
 ENDIF
 
 ;----------------------------------------------------------------
@@ -208,13 +207,9 @@ ADP_DELAY:
         LD   iy,ARX_DRIVER_VSYNC                ; 14            "pointedbyix"  Set the display vector address to point at the VSync pulse generation routine.
 
 
-; Initialise registers required by the ARX display driver.
-IF (startup=17)                 ; 
-        ld      a,(current_graphics+1)   ; 13 T We will get the MSB, $20 or $40
-ELSE
-        ld      a,$20                    ; 7 T  The first character set begins at $2000
-ENDIF
-        ld      i,a             ; load MSB into I register which is RFSH address MSB
+;; Initialise registers required by the ARX display driver.
+        ld      a,$20                           ; 7 T  The first character set begins at $2000
+        ld      i,a                             ; load MSB into I register which is RFSH address MSB
 
 
 IF (startup>=15)
@@ -237,6 +232,7 @@ ADP_ROW1_LOOP:
 
         LD   A,I                                ; 9                     Restore the value of I into A since this will be incremented by 2 to advance to the next character set.
 
+g_patch1:
 L41C7:  CALL HRG_LineStart + $8000              ; 17+(32*4)+10=155      Output a line of the row by 'executing' the echo of it.
         DEC  C                                  ; 4                     Decrement the count of the number of lines in the row.
         JR   Z,ADP_ROW1_DONE                    ; 12/7                  Jump ahead if all lines of the row have been output.
@@ -256,6 +252,7 @@ ADP_ROW2_LOOP:
         ADD HL,HL                               ; 11                    Delay.
         CP  (HL)                                ; 7                     Delay. This will read from address $0000 and so will not accidentally invoke any RAM based memory mapped devices.
 
+g_patch2:
         CALL HRG_LineStart2 + $8000             ; 17+(32*4)+10=155      Output a line of the row by 'executing' the echo of it.
         DEC  C                                  ; 4                     Decrement the count of the number of lines in the row.
         JR   Z,ADP_ROW2_DONE                    ; 12/7                  Jump ahead if all lines of the row have been output.
@@ -298,11 +295,11 @@ HRG_postproc:
 
 HRG_blank_patch:	; WARNING: the values change due to the patching, don't tune here !!
 IF (startup>=15)
-        add     140-8    ; more blank lines for fast application code and correct sync
+        add     140    ; more blank lines for fast application code and correct sync
         			; For the WRX version Siegfried Engel reports that values between 
         			; 80 and 159 worked fine on both a normal TV and an LCD one
-ELSE
-        add		-8             ; reduce by 8 scan lines
+; ELSE
+;        add		-8             ; reduce by 8 scan lines
 ENDIF
 
         ld      c,a            ; load C with MARGIN
@@ -346,6 +343,7 @@ ENDIF
 
 IF (startup<15)
         nop
+;		nop
 ENDIF
 
         pop     ix
@@ -369,12 +367,20 @@ IF (startup=17)
 	jp	z,Display_pic2
 	ld	(hl),0
 Display_pic1:
-	ld	hl,(graybit1)
-	jp	setpage
+	ld hl,HRG_LineStart + $8000
+	ld (g_patch1+1),hl
+	ld hl,HRG_LineStart2 + $8000
+	ld (g_patch2+1),hl
+	jp	page_set
 Display_pic2:
-	ld	hl,(graybit2)
-setpage:
-	ld	(current_graphics),hl
+	ld hl,HRG_LineStart + $8100
+	ld (g_patch1+1),hl
+	ld hl,HRG_LineStart2 + $8100
+	ld (g_patch2+1),hl
+	jp	page_set
+
+page_set:
+
 ENDIF
 
 HRG_handler_patch:
@@ -417,8 +423,6 @@ IF (startup=17)
 		PUBLIC	graybit2
 gcount:
 		defb	0
-current_graphics:
-		defw	0
 graybit1:
 		defw	0
 graybit2:
