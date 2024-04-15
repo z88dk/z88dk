@@ -325,18 +325,20 @@ ENDIF
         ld    ($4034),hl
 
 IF ((startup=7)|(startup=27))
+
+; ^^^    <-   3 frames (dark gray) + 1 frame (light gray)
+;    -
 	ld	hl,gcount
 	dec	(hl)
 	ld	a,(hl)
-	dec	a
-	jp	z,Display_pic1
-	dec	a
-	jp	z,Display_pic2
-	ld	(hl),3
-Display_pic1:
+
+	jp	nz,Display_pic1
+	ld	(hl),4
+
+Display_pic2:
 	ld	hl,(graybit1)
 	jp	setpage
-Display_pic2:
+Display_pic1:
 	ld	hl,(graybit2)
 setpage:
 	ld	(current_graphics),hl
