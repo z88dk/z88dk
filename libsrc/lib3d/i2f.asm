@@ -5,6 +5,7 @@
 ;    integer to fixed point 26.6;
 ;
 
+IF !__CPU_INTEL__
     SECTION code_clib
     PUBLIC  i2f
     PUBLIC  _i2f
@@ -40,3 +41,4 @@
     rr      l
 
     ret
+ENDIF
