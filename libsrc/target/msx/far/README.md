@@ -25,3 +25,5 @@ What's missing:
 `$ make`
 
 This generates the file `memoryman.com`. It prints allocation, read, write benchmarks.
+
+![FAR MALLOC BENCHMARKS](screenshot.png?raw=true "FAR MALLOC BENCHMARKS")
