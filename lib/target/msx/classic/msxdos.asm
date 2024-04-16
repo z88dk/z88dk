@@ -292,6 +292,10 @@ bank_mappings:
     PUBLIC PUT_P1
     PUBLIC PUT_P2
     PUBLIC PUT_P3
+    PUBLIC GET_P0
+    PUBLIC GET_P1
+    PUBLIC GET_P2
+    PUBLIC GET_P3
 
 ; Jump table (copied from on high)
 dos2_jump:
