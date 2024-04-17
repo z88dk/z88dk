@@ -157,8 +157,6 @@ typedef struct vector_s
     ELEMENT w;              /// w dimension
 } vector_t;
 
-//#define Vector_t vector_t
-
 /// a triangle made of 3 vertexes
 typedef struct {
     vector_t* vertexes[3];  ///< 3 vertexes
@@ -186,12 +184,12 @@ typedef struct {
 
 typedef struct {
     int x, y;
-} Point_t;
+} point_t;
 
 typedef struct {
     int pitch, roll, yaw;
     int x, y, z;
-} Cam_t;
+} cam_t;
 
 typedef struct matrix_s // homogeneous coordinate system
 {
@@ -208,8 +206,8 @@ typedef struct matrix_s // homogeneous coordinate system
 extern void __LIB__ ozrotatepointx(vector_t *v, int rot) __smallc;
 extern void __LIB__ ozrotatepointy(vector_t *v, int rot) __smallc;
 extern void __LIB__ ozrotatepointz(vector_t *v, int rot) __smallc;
-extern void __LIB__ ozplotpointcam(vector_t *v, Cam_t *c, Point_t *p) __smallc;
-extern void __LIB__ ozplotpoint(vector_t *v, Point_t *p) __smallc;
+extern void __LIB__ ozplotpointcam(vector_t *v, cam_t *c, point_t *p) __smallc;
+extern void __LIB__ ozplotpoint(vector_t *v, point_t *p) __smallc;
 extern void __LIB__ ozcopyvector(vector_t *dest, vector_t *src) __smallc;
 extern void __LIB__ oztranslatevector(vector_t *v, vector_t *offset) __smallc;
 

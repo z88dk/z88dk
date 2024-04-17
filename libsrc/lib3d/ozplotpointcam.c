@@ -3,13 +3,13 @@ lib3d.c
 
 Standard Wizard 3d and 4d math functions
 
-Copyright© 2002, Mark Hamilton
+Copyright 2002, Mark Hamilton
 
 */
 
 #include <lib3d.h>
 
-void ozplotpointcam(vector_t *v, Cam_t *c, Point_t *p)
+void ozplotpointcam(vector_t *v, cam_t *c, point_t *p)
 {
     static vector_t temp;
     static vector_t offset;
