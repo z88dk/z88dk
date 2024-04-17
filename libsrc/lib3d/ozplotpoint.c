@@ -13,7 +13,7 @@ void ozplotpoint(vector_t *v, point_t *p)
 {
     vector_t temp;
 
-    /* flip x and y to rotate points */
+    /* flip x and y to rotate points 90 deg */
     temp.x = v->y;
     temp.y = v->x;
     temp.z = v->z + 256; /* add a large number so it doesn't look too big */
