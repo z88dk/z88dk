@@ -5,7 +5,7 @@ TARGET = msx
 SUBDIRS = asmlib msxbios fcntl
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
-ASMFILES = $(wildcard *.asm)
+ASMFILES = $(wildcard *.asm) $(wildcard far/*.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
 
 all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))

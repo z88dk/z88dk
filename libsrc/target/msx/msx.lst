@@ -30,3 +30,4 @@ target/msx/psg/asm_arkos_msx_rom
 @psg/ay/wyz/psg_wyz.lst
 @psg/ay/arkos/psg_arkos.lst
 @target/msx/arch_msx.lst
+target/msx/obj/msx/far/**
