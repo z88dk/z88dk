@@ -3,7 +3,7 @@
 
 Demo using standard Wizard 3d and 4d math functions
 
-Copyright© 2002, Mark Hamilton
+CopyrightÂ© 2002, Mark Hamilton
 
 Flickering (non paged graphics) port to Z88DK by Stefano Bodrato - Oct 2003
 
@@ -31,7 +31,7 @@ use keys 1 and 2 to enlarge/reduce the cube
 #define MX	96/2
 #define MY	64/2
 
-Vector_t cube[8]
+vector_t cube[8]
 = { { -20 ,  20,   20 },
 	{  20 ,  20,   20 },
 	{  20 , -20,   20 },
@@ -43,9 +43,9 @@ Vector_t cube[8]
 
 void main(void)
 {
-	static Vector_t rot;
-	static Vector_t t;
-	static Point_t p[8];
+	static vector_t rot;
+	static vector_t t;
+	static point_t p[8];
 	static unsigned c = 0;
 	static int i;
 	static int zf = 0;
