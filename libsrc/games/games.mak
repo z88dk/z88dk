@@ -14,7 +14,7 @@ GAMES_NEWLIB_TARGETS := games/obj/newlib-z80-games \
 	games/obj/newlib-ez80_z80-games
 
 OBJS += $(GAMES_NEWLIB_TARGETS)
-CLEAN += ctype-clean
+CLEAN += games-clean
 
 games: $(GAMES_NEWLIB_TARGES)
 

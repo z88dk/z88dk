@@ -9,7 +9,7 @@
 CC = zcc
 
 COMPILER ?= sccz80
-CFLAGS = +nabu -llib3d  -lm -lndos -create-app -DAMALLOC
+CFLAGS = +nabu  -lm -lndos -create-app -DAMALLOC
 
 
 CFILES = \

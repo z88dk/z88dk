@@ -44,22 +44,22 @@ z88dk build hints:
 
 Spectrum 
 zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
-zcc +zx -lndos -O3 -create-app -DLARGEMEM=3000 -DGRAPHICS -llib3d -DSHORT -DSPECLISP clisp.c
+zcc +zx -lndos -O3 -create-app -DLARGEMEM=3000 -DGRAPHICS  -DSHORT -DSPECLISP clisp.c
 
 zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded), 2 programs needed
   zcc +zx81 -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DINITONLY clisp.c
   zcc +zx81 -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DNOINIT clisp.c
   
 zx81 16K, minimalistic version, graphics support
-  zcc +zx81 -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -DGRAPHICS -lgfx81 -llib3d clisp.c
+  zcc +zx81 -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -DGRAPHICS -lgfx81  clisp.c
 zx81 48K, minimalistic version, graphics support, initial code must be provided @32768
-  zcc +zx81 -O3 -create-app -DMINIMALISTIC -DGRAPHICS -lgfx81 -llib3d -DZEDIT -DZX81_32K clisp.c
+  zcc +zx81 -O3 -create-app -DMINIMALISTIC -DGRAPHICS -lgfx81  -DZEDIT -DZX81_32K clisp.c
 
 zx80 16K, minimalistic version, (add -DGRAPHICS for graphics support)
-  zcc +zx80 -DZX81 --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -llib3d clisp.c
+  zcc +zx80 -DZX81 --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC  clisp.c
 
 MicroBee  
-  zcc +bee -O3 -create-app -DLARGEMEM=1200 -DGRAPHICS -DNOTIMER -lgfxbee512 -llib3d clisp.c
+  zcc +bee -O3 -create-app -DLARGEMEM=1200 -DGRAPHICS -DNOTIMER -lgfxbee512  clisp.c
   
 Plain CP/M with file support to load programs
   zcc +cpm -O3 -create-app -DLARGEMEM=2000 -DFILES clisp.c

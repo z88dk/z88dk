@@ -27,14 +27,12 @@ Compile with:   zcc +msx -lm -startup=2 ex5.c
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
+#include <lib3d.h>
 #include <video/tms99x8.h>
 
-typedef struct {
-	int x;
-	int y;
-} point_t;
 
 #define MAX_POINT	12
+
 
 uint8_t buf[MODE2_MAX];
 //uint8_t* buf;

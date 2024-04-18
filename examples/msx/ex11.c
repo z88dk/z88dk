@@ -20,7 +20,7 @@ Contact the author:
 
 
 /*
-	zcc +msx -create-app -llib3d -lm -lmsxbios -DAMALLOC ex11.c
+	zcc +msx -create-app  -lm -lmsxbios -DAMALLOC ex11.c
 */
 
 

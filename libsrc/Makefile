@@ -17,7 +17,7 @@ TOCREATE =
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
 CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxh19.lib gfxvio.lib
-GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib lib3d.lib fastmath.lib preempt.lib sp1-all
+GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib preempt.lib sp1-all
 GENLIBS += 8080_opt.lib 8085_opt.lib  
 GENLIBS += gfxtek.lib gfxregis.lib
 
@@ -195,6 +195,7 @@ include interrupts/common/common.mak
 include interrupts/im1/im1.mak
 include interrupts/im2/im2.mak
 include interrupts/nmi/nmi.mak
+include lib3d/lib3d.mak
 include libgen/libgen.mak
 include math/fix16/fix16.mak
 include rect/rect.mak
@@ -291,13 +292,6 @@ z88_math.lib:
 	@echo '--- Building Z88 Maths Library ---'
 	@echo ''
 	$(MAKE) -C math/z88math
-
-# Fast vector 3D library - stefano
-lib3d.lib:
-	@echo ''
-	@echo '--- Building 3D Library ---'
-	@echo ''
-	$(MAKE) -C lib3d
 
 ndos.lib:
 	$(MAKE) -C fcntl/dummy
@@ -2231,7 +2225,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C math clean
 	$(MAKE) -C z80_crt0s clean
 	$(MAKE) -C alloc/farz88 clean
-	$(MAKE) -C lib3d clean
 	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean

@@ -6,7 +6,7 @@
 	Demonstrates the use of bitwise operators in C and the 'turtle graphics' instructions
 	
 	
-	to build:   zcc +<target> -lndos -create-app -llib3d thuemorse.c
+	to build:   zcc +<target> -lndos -create-app  thuemorse.c
 
 
 	
