@@ -171,6 +171,7 @@ include adt/stack/stack.mak
 include adt-newlib/adtnewlib.mak
 include algorithm/AStarSearch/astar.mak
 include alloc/balloc/balloc.mak
+include alloc/farmalloc/farmalloc.mak
 include alloc/malloc-classic/malloc.mak
 include alloc/obstack/obstack.mak
 include arch/z80/z80.mak
