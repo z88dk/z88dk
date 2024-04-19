@@ -5,6 +5,7 @@
 @compress/zx1/compress_zx1.lst
 @ctype/ctype.lst
 @font/font.lst
+@lib3d/lib3d.lst
 @libgen/libgen.lst
 @setjmp/setjmp.lst
 @stdlib/stdlib.lst
