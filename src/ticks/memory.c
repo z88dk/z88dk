@@ -25,10 +25,17 @@ static uint8_t *z180_get_memory_addr(uint32_t pc, memtype type);
 static void     z180_handle_out(int port, int value);
 static void     rabbit_init(void);
 static uint8_t *rabbit_get_memory_addr(uint32_t pc, memtype type);
+static void     msx_init(void);
+static uint8_t *msx_get_memory_addr(uint32_t pc, memtype type);
+static void     msx_handle_out(int port, int value);
 
 static unsigned char *mem;
 static unsigned char  zxnext_mmu[8] = {0xff};
 static unsigned char *zxn_banks[256];
+
+
+static unsigned char  msx_mmu[4] = { 0, 1, 2, 3 };
+static unsigned char *msx_banks[256];
 
 static unsigned char  zx_pages[4] = { 0x11, 0x05, 0x02, 0x00 };
 static unsigned char *zx_banks[8];
@@ -52,6 +59,8 @@ void memory_init(char *model) {
         z180_init();
     } else if ( strcmp(model, "rabbit") == 0 ) {
         rabbit_init();
+    } else if ( strcmp(model, "msx") == 0 ) {
+        msx_init();
     } else {
         fprintf(stderr, "Unknown memory model %s\n",model);
         exit(1);
@@ -328,3 +337,50 @@ int rabbit_get_ioi_reg(int reg)
 }
 
 
+// MSX: 256 pages of 16k, paged in at a 16k boundary
+static void msx_init(void) 
+{
+    int  i;
+
+    for ( i = 0; i < 256; i++ ) {
+        zxn_banks[i] = calloc(16384,1);
+    }
+
+
+    standard_init();
+    get_mem_addr = msx_get_memory_addr;
+    handle_out = msx_handle_out;
+}
+
+static uint8_t *msx_get_memory_addr(uint32_t pc, memtype type)
+{
+  int segment = pc / 16384;
+  pc &= 0xffff;
+
+  if ( msx_mmu[segment] != 0xff ) {
+    return &msx_banks[msx_mmu[segment]][pc % 16384];
+  }
+  return &mem[pc & 65535];
+}
+
+
+static void msx_handle_out(int port, int value)
+{
+  static int nextport = 0;
+
+  switch ( port ) {
+  case 0xfc:
+    msx_mmu[0] = value;
+    break;
+  case 0xfd:
+    msx_mmu[1] = value;
+    break;
+  case 0xfe:
+    msx_mmu[2] = value;
+    break;
+  case 0xff:
+    msx_mmu[3] = value;
+    break;
+  }
+  return;
+}

@@ -929,7 +929,7 @@ int main (int argc, char **argv){
     printf("  -d             Enable debugger\n"),
     printf("  -v             Verbose logging\n"),
     printf("  -l X           Load file to address\n"),
-    printf("  -b <model>     Memory model (zxn/zx/z180)\n"),
+    printf("  -b <model>     Memory model (zxn/zx/z180/msx)\n"),
     printf("  -m8080         Emulate an 8080\n"),
     printf("  -m8085         Emulate an 8085 (mostly)\n"),
     printf("  -mgbz80        Emulate a gbz80 (mostly)\n"),
