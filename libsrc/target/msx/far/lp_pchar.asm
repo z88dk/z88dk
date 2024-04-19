@@ -3,7 +3,7 @@ PUBLIC  lp_pchar
 
 EXTERN  GET_P2
 EXTERN  PUT_P2
-EXTERN  __msx_virt2log_page
+EXTERN  __far_page
 
 
 ; Entry: e'h'l' = logical address
@@ -13,7 +13,7 @@ lp_pchar:
     ex      af,af
     exx
     ld      bc,hl
-    call     __msx_virt2log_page
+    call     __far_page
     exx
     ld      a,l
     exx

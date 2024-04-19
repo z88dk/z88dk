@@ -3,7 +3,7 @@ PUBLIC  lp_gchar
 
 EXTERN  GET_P2
 EXTERN  PUT_P2
-EXTERN  __msx_virt2log_page
+EXTERN  __far_page
 
 
 ; Entry ehl = extended address
@@ -12,7 +12,7 @@ lp_gchar:
     call   GET_P2
     ex     af,af
     ld     bc,hl
-    call    __msx_virt2log_page
+    call    __far_page
     ; hl = physical address
     ld      l,(hl)
     ld      h,0

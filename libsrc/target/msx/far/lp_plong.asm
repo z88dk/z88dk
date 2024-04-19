@@ -3,8 +3,8 @@ PUBLIC  lp_plong
 
 EXTERN  GET_P2
 EXTERN  PUT_P2
-EXTERN  __msx_virt2log_page
-EXTERN  __msx_incptr
+EXTERN  __far_page
+EXTERN  __far_incptr
 
 ; Entry: e'h'l' = logical address
 ;         dehl  = long to write
@@ -13,22 +13,22 @@ lp_plong:
     ex      af,af
     exx
     ld      bc,hl
-    call     __msx_virt2log_page
+    call     __far_page
     exx
     ld      a,l
     exx
     ld      (hl),a
-    call    __msx_incptr
+    call    __far_incptr
     exx
     ld      a,h
     exx
     ld      (hl),a
-    call    __msx_incptr
+    call    __far_incptr
     exx
     ld      a,e
     exx
     ld      (hl),a
-    call    __msx_incptr
+    call    __far_incptr
     exx
     ld      a,d
     exx
