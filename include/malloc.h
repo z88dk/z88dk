@@ -2,6 +2,7 @@
 #define __MALLOC_H__
 
 #include <sys/compiler.h>
+#include <sys/types.h>
 
 
 // The Near Malloc Library is still a simple first
