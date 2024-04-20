@@ -40,19 +40,19 @@ void *__far realloc_far(void * __far ptr, size_t size)
 {
 	void *__far ret;
 	header_t * __far h, * __far next_free, * __far prev_free;
-	header_t *__far *f, *__far *pf;
+	header_t *__far * __far f, *__far * __far pf;
 	size_t blocksize, oldblocksize, maxblocksize;
 
 	if(ptr == NULL)
-		return(malloc(size));
+		return(malloc_far(size));
 
 	if(size == 0) {
-		free(ptr);
+		free_far(ptr);
 		return(0);
 	}
 
 	prev_free = 0, pf = 0;
-	for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h && h < ptr; prev_free = h, pf = f, f = &(h->next_free), h = h->next_free); // Find adjacent blocks in free list
+	for(h = __far_heap, f = &__far_heap; h && h < ptr; prev_free = h, pf = f, f = &(h->next_free), h = h->next_free); // Find adjacent blocks in free list
 	next_free = h;
 
 	if(size + offsetof(struct header, next_free) < size) // Handle overflow
@@ -74,7 +74,7 @@ void *__far realloc_far(void * __far ptr, size_t size)
 	{
 		if(prev_free && prev_free->next == h) // Always move into previous block to defragment
 		{
-			memmove(prev_free, h, blocksize <= oldblocksize ? blocksize : oldblocksize);
+			memmove_far(prev_free, h, blocksize <= oldblocksize ? blocksize : oldblocksize);
 			h = prev_free;
 			*pf = next_free;
 			f = pf;
@@ -101,8 +101,8 @@ void *__far realloc_far(void * __far ptr, size_t size)
 	if(ret = malloc(size))
 	{
 		size_t oldsize = oldblocksize - offsetof(struct header, next_free);
-		memcpy(ret, ptr, size <= oldsize ? size : oldsize);
-		free(ptr);
+		memcpy_far(ret, ptr, size <= oldsize ? size : oldsize);
+		free_far(ptr);
 		return(ret);
 	}
 

@@ -1,13 +1,15 @@
-SECTION code_l_sccz80
-PUBLIC  lp_glong
+IF !__CPU_RABBIT__ && !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CPU_KC160__
 
-EXTERN  GET_P2
-EXTERN  PUT_P2
+SECTION code_l_sccz80
+PUBLIC  lp_gptr
+
+EXTERN  __far_init
+EXTERN  __far_reset
 EXTERN  __far_page
 EXTERN  __far_incptr
 
-lp_glong:
-    call   GET_P2
+lp_gptr:
+    call   __far_init
     ex     af,af
     ld     bc,hl
     call    __far_page
@@ -18,12 +20,11 @@ lp_glong:
     ld      a,(hl)
     ld      ixh,a
     call    __far_incptr
-    ld      a,(hl)
-    call    __far_incptr
-    ld      d,(hl)
-    ld      e,a
+    ld      e,(hl)
+    ld      d,0
     push    ix
     pop     hl
     ex      af,af
-    call    PUT_P2
+    call    __far_reset
     ret
+ENDIF

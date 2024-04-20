@@ -80,4 +80,12 @@ ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_mod
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_ge
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_div_u
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_u64_toi32
+${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_gchar
+${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_gint
+${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_glong
+${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_gptr
+${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_pchar
+${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_pint
+${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_plong
+${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_pptr
 @${NEWLIB_ROOT}l/sccz80/8080.lst

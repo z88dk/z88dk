@@ -45,7 +45,7 @@ void *__far malloc_far(size_t size)
 		size = sizeof(struct header);
 
 
-	for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h; f = &(h->next_free), h = h->next_free)
+	for(h = __far_heap, f = &__far_heap; h; f = &(h->next_free), h = h->next_free)
 	{
 		size_t blocksize = (char * __far)(h->next) - (char *__far)h;
 		if(blocksize >= size) // Found free block of sufficient size.

@@ -11,6 +11,15 @@ struct header
         header_t * HEAPSPACE next_free; // Next free block. Used in free blocks only. Overlaps with user data in non-free blocks. Linked list of free blocks, 0-terminated.
 };
 
-extern header_t *HEAPSPACE __sdcc_heap_free;
+extern header_t *HEAPSPACE __far_heap;
+
+
+extern void *__far malloc_far(size_t sz);
+extern void *__far realloc_far(void *__far ptr, size_t sz);
+extern void        free_far(void *__far ptr);
+
+
+extern void *__far memmove_far(void *__far dst, const void *__far src, size_t len);
+extern void *__far memcpy_far(void *__far dst, const void *__far src, size_t len);
 
 #endif

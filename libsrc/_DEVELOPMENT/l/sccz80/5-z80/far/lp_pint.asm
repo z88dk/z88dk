@@ -1,15 +1,16 @@
+IF !__CPU_RABBIT__ && !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CPU_KC160__
 SECTION code_l_sccz80
 PUBLIC  lp_pint
 
-EXTERN  GET_P2
-EXTERN  PUT_P2
+EXTERN  __far_init
+EXTERN  __far_reset
 EXTERN  __far_page
 EXTERN  __far_incptr
 
 ; Entry: e'h'l' = logical address
 ;           hl  = int to write
 lp_pint:
-    call    GET_P2
+    call    __far_init
     ex      af,af
     exx
     ld      bc,hl
@@ -24,5 +25,6 @@ lp_pint:
     exx
     ld      (hl),a
     ex      af,af
-    call    PUT_P2
+    call    __far_reset
     ret
+ENDIF

@@ -1,15 +1,17 @@
-SECTION code_l_sccz80
-PUBLIC  lp_plong
+IF !__CPU_RABBIT__ && !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CPU_KC160__
 
-EXTERN  GET_P2
-EXTERN  PUT_P2
+SECTION code_l_sccz80
+PUBLIC  lp_pptr
+
+EXTERN  __far_init
+EXTERN  __far_reset
 EXTERN  __far_page
 EXTERN  __far_incptr
 
 ; Entry: e'h'l' = logical address
-;         dehl  = long to write
-lp_plong:
-    call    GET_P2
+;           hl  = int to write
+lp_pptr:
+    call    __far_init
     ex      af,af
     exx
     ld      bc,hl
@@ -28,11 +30,7 @@ lp_plong:
     ld      a,e
     exx
     ld      (hl),a
-    call    __far_incptr
-    exx
-    ld      a,d
-    exx
-    ld      (hl),a
     ex      af,af
-    call    PUT_P2
+    call    __far_reset
     ret
+ENDIF
