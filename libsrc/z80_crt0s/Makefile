@@ -8,7 +8,7 @@ all: obj/z80-crt0 obj/ixiy-crt0 obj/8080-crt0 obj/8085-crt0 \
 	obj/ez80_z80-crt0 obj/z180-crt0 obj/z80n-crt0  obj/r4k-crt0 obj/kc160-crt0
 
 obj/z80-crt0:
-	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/z80/z80 -I.. -mz80 @crt0_z80.lst
+	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/z80/z80 -I.. -D__SDCC_IX -mz80 @crt0_z80.lst
 	@touch $@
 
 obj/z80n-crt0:
