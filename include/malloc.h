@@ -157,6 +157,7 @@ extern void __LIB__    HeapInfo_callee(unsigned int *total, unsigned int *larges
 
 extern void __LIB__ * __far malloc_far(size_t sz);
 extern void __LIB__         free_far(void * __far ptr);
+extern void __LIB__         sbrk_far(void *__far ptr, size_t sz);
 
 // Not on z88
 extern void __LIB__ * __far calloc_far(size_t n, size_t sz);

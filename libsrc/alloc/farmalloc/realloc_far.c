@@ -33,9 +33,37 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "farmalloc.h"
 
+#if 1
+// Just replaces the block.
+void *__far realloc_far(void * __far ptr, size_t size)
+{
+    header_t * __far h;
+    size_t oldblocksize;
+    void *__far ret;
+
+    if(ptr == NULL)
+        return(malloc_far(size));
+
+	if(size == 0) {
+		free_far(ptr);
+		return(0);
+	}
+
+	h = (void * __far)((char * __far)ptr - offsetof(struct header, next_free));
+	oldblocksize = (char * __far)(h->next) - (char * __far)h - offsetof(struct header, next_free);
+
+    ret = malloc_far(size);
+    memcpyf(ret, ptr, size < oldblocksize ? size : oldblocksize);
+    free_far(ptr);
+    return ret;
+}
+#else
+
+// Heap is corrupted with this, either a bug here or in pointer handling...
 void *__far realloc_far(void * __far ptr, size_t size)
 {
 	void *__far ret;
@@ -54,6 +82,7 @@ void *__far realloc_far(void * __far ptr, size_t size)
 	prev_free = 0, pf = 0;
 	for(h = __far_heap, f = &__far_heap; h && h < ptr; prev_free = h, pf = f, f = &(h->next_free), h = h->next_free); // Find adjacent blocks in free list
 	next_free = h;
+    printf("Next free block is %lX\n",next_free);
 
 	if(size + offsetof(struct header, next_free) < size) // Handle overflow
 		return(0);
@@ -61,8 +90,10 @@ void *__far realloc_far(void * __far ptr, size_t size)
 	if(blocksize < sizeof(struct header)) // Requiring a minimum size makes it easier to implement free(), and avoid memory leaks.
 		blocksize = sizeof(struct header);
 
-	h = (void * __far)((char * __far)(ptr) - offsetof(struct header, next_free));
+	h = (void * __far)((char * __far)ptr - offsetof(struct header, next_free));
 	oldblocksize = (char * __far)(h->next) - (char * __far)h;
+
+    printf("Old block size %u\n",oldblocksize);
 
 	maxblocksize = oldblocksize;
 	if(prev_free && prev_free->next == h) // Can merge with previous block
@@ -70,11 +101,13 @@ void *__far realloc_far(void * __far ptr, size_t size)
 	if(next_free == h->next) // Can merge with next block
 		maxblocksize += (char * __far)(next_free->next) - (char * __far)next_free;
 
+    printf("Block size %u max=%u\n",blocksize,maxblocksize);
 	if(blocksize <= maxblocksize) // Can resize in place.
 	{
 		if(prev_free && prev_free->next == h) // Always move into previous block to defragment
 		{
-			memmove_far(prev_free, h, blocksize <= oldblocksize ? blocksize : oldblocksize);
+			//memmove_far(prev_free, h, blocksize <= oldblocksize ? blocksize : oldblocksize);
+			memcpyf(prev_free, h, blocksize <= oldblocksize ? blocksize : oldblocksize);
 			h = prev_free;
 			*pf = next_free;
 			f = pf;
@@ -98,14 +131,15 @@ void *__far realloc_far(void * __far ptr, size_t size)
 		return(&(h->next_free));
 	}
 
-	if(ret = malloc(size))
+	if(ret = malloc_far(size))
 	{
 		size_t oldsize = oldblocksize - offsetof(struct header, next_free);
-		memcpy_far(ret, ptr, size <= oldsize ? size : oldsize);
+		memcpyf(ret, ptr, size <= oldsize ? size : oldsize);
 		free_far(ptr);
 		return(ret);
 	}
 
 	return(0);
 }
+#endif
 

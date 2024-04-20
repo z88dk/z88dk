@@ -132,5 +132,7 @@ string/c/sccz80/strncatf
 string/c/sccz80/strncpyf
 string/c/sccz80/strrchrf
 string/c/sccz80/struprf
+string/c/sccz80/memcpyf
+string/c/sccz80/memsetf
 
 @string/string_asm.lst

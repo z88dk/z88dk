@@ -43,11 +43,11 @@ void free_far(void * __far ptr)
 		return;
 
 	prev_free = 0;
-	for(h = __far_heap, f = &__far_heap; h && h < ptr; prev_free = h, f = &(h->next_free), h = h->next_free); // Find adjacent blocks in free list
+	for(h = __far_heap, f = &__far_heap; h && h < ptr; prev_free = h, f = &(h->next_free), h = h->next_free)
+        ; // Find adjacent blocks in free list
 	next_free = h;
 
 	h = (void * __far)((char * __far)(ptr) - (uint32_t)offsetof(struct header, next_free));
-	printf("Freeing block %lX\n",h);
 	// Insert into free list.
 	h->next_free = next_free;
 	*f = h;

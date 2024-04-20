@@ -44,10 +44,12 @@ void *__far malloc_far(size_t size)
 	if(size < sizeof(struct header)) // Requiring a minimum size makes it easier to implement free(), and avoid memory leaks.
 		size = sizeof(struct header);
 
-
+    
 	for(h = __far_heap, f = &__far_heap; h; f = &(h->next_free), h = h->next_free)
 	{
 		size_t blocksize = (char * __far)(h->next) - (char *__far)h;
+
+      //  printf("h = %lX Blocksize is %u we want %u\n",h,blocksize,size);
 		if(blocksize >= size) // Found free block of sufficient size.
 		{
 			if(blocksize >= size + sizeof(struct header)) // It is worth creating a new free block
@@ -63,7 +65,6 @@ void *__far malloc_far(size_t size)
 			return(&(h->next_free));
 		}
 	}
-        // Add another page
         
 
 	return(0);
