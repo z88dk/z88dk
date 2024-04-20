@@ -318,6 +318,8 @@
 	GLOBAL	struprf
 	GLOBAL	strchrf
 	GLOBAL	strrchrf
+	GLOBAL	memcpyf
+	GLOBAL	memsetf
 	GLOBAL	strdupf
 	GLOBAL	__builtin_memset
 	GLOBAL	__builtin_memcpy
