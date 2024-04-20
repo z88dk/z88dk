@@ -419,51 +419,21 @@ extern void __LIB__    *memopd_callee(void *, void *, uint, uint) __smallc __z88
 #endif
 #endif
 
-/*
- * Now handle far stuff
- */
+#ifdef __SCCZ80
+// Far string functions - only a short selection
 
-#ifdef FARDATA
-
-#undef strlen
-#define strlen(s) strlen_far(s)
 extern int __LIB__ strlen_far(far char *);
+extern far char __LIB__ *strcatf(far char *, far char *) __smallc;
+extern far char __LIB__ *strcpyf(far char *, far char *) __smallc;
+extern far char __LIB__ *strncatf(far char *, far char *, int) __smallc;
+extern far char __LIB__ *strncpyf(far char *, far char *, int) __smallc;
+extern far char __LIB__ *strlwrf(far char *);
+extern far char __LIB__ *struprf(far char *);
+extern far char __LIB__ *strchrf(far unsigned char *, unsigned char) __smallc;
+extern far char __LIB__ *strrchrf(far unsigned char *, unsigned char) __smallc;
 
-#undef strcat
-#define strcat(s1,s2) strcat_far(s1,s2)
-extern far char __LIB__ *strcat_far(far char *, far char *) __smallc;
 
-#undef strcpy
-#define strcpy(s1,s2) strcpy_far(s1,s2)
-extern far char __LIB__ *strcpy_far(far char *, far char *) __smallc;
-
-#undef strncat
-#define strncat(s1,s2) strncat_far(s1,s2,n)
-extern far char __LIB__ *strncat_far(far char *, far char *, int) __smallc;
-
-#undef strncpy
-#define strncpy(s1,s2) strncpy_far(s1,s2,n)
-extern far char __LIB__ *strncpy_far(far char *, far char *, int) __smallc;
-
-#undef strlwr
-#define strlwr(s) strlwr_far(s)
-extern far char __LIB__ *strlwr_far(far char *);
-
-#undef strupr
-#define strupr(s) strupr_far(s)
-extern far char __LIB__ *strupr_far(far char *);
-
-#undef strchr
-#define strchr(s,c) strchr_far(s1,c)
-extern far char __LIB__ *strchr_far(far unsigned char *, unsigned char) __smallc;
-
-#undef strrchr
-#define strrchr(s,c) strrchr_far(s1,c)
-extern far char __LIB__ *strrchr_far(far unsigned char *, unsigned char) __smallc;
-
-#undef strdup
-#define strdup(s) strdup_far(s)
-extern far char __LIB__ *strdup_far(far char *);
+extern far char __LIB__ *strdupf(far char *);
 
 #endif
 

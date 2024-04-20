@@ -9,17 +9,17 @@
 ;	 HL=local address (bound to seg 1)
 ;
 ;
-; $Id: farseg1.asm,v 1.4 2016-06-10 22:42:22 dom Exp $
+; $Id: __far_page.asm,v 1.4 2016-06-10 22:42:22 dom Exp $
 ;
 
 
 	SECTION code_clib
-	PUBLIC	farseg1
+	PUBLIC	__far_page
 
         EXTERN    malloc_table
 
 
-.farseg1
+.__far_page
         ld      a,e
         and     a
         jr      z,localfar      ; move on if we've got a local pointer

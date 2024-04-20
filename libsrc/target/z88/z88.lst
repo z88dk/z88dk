@@ -87,3 +87,9 @@ target/z88/graphics/window
 target/z88/input/in_Pause
 target/z88/input/in_WaitForKey
 target/z88/input/in_WaitForNoKey
+target/z88/far/__far_funcs.asm
+target/z88/far/__far_incptr.asm
+target/z88/far/__far_page.asm
+target/z88/far/free_far.asm
+target/z88/far/freeall_far.asm
+target/z88/far/malloc_far.asm

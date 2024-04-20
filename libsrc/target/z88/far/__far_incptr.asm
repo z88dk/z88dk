@@ -1,19 +1,19 @@
 ; Internal routine to read increment local address HL with far pointer EBC
 ; 31/3/00 GWL
 
-; Corrupts D via farseg1, but preserves A
+; Corrupts D via __far_page, but preserves A
 
 ;
-; $Id: incfar.asm,v 1.4 2016-06-10 22:42:22 dom Exp $
+; $Id: __far_incptr.asm,v 1.4 2016-06-10 22:42:22 dom Exp $
 ;
 
         SECTION code_clib
-        PUBLIC    incfar
+        PUBLIC    __far_incptr
 
-        EXTERN     farseg1
+        EXTERN     __far_page
 
 
-.incfar
+.__far_incptr
         inc     hl
         inc     c
         ret     nz
@@ -22,7 +22,7 @@
         inc     e
 .skiphigh
         push    af
-        call    farseg1
+        call    __far_page
         pop     af
         ret
 
