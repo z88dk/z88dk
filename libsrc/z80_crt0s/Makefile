@@ -28,23 +28,23 @@ obj/gbz80-crt0:
 	@touch $@
 
 obj/z180-crt0:
-	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/z180/z180 -I..  -mz180 @crt0_z180.lst
+	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/z180/z180 -I.. -D__SDCC_IX  -mz180 @crt0_z180.lst
 	@touch $@
 
 obj/ez80_z80-crt0:
-	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/ez80_z80/ez80 -I..  -mez80_z80 -DEZ80 @crt0_ez80.lst
+	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/ez80_z80/ez80 -I.. -D__SDCC_IX -mez80_z80 -DEZ80 @crt0_ez80.lst
 	@touch $@
 
 obj/r2ka-crt0:
-	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/r2ka/r2ka -I.. -mr2ka  @crt0_r2ka.lst
+	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/r2ka/r2ka -I.. -D__SDCC_IX -mr2ka  @crt0_r2ka.lst
 	@touch $@
 
 obj/r4k-crt0:
-	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/r4k/r4k -I.. -mr4k  @crt0_r2ka.lst
+	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/r4k/r4k -I.. -D__SDCC_IX -mr4k  @crt0_r2ka.lst
 	@touch $@
 
 obj/kc160-crt0:
-	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/kc160/kc160 -I.. -mkc160  @crt0_kc160.lst
+	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/kc160/kc160 -I.. -D__SDCC_IX -mkc160  @crt0_kc160.lst
 	@touch $@
 
 
