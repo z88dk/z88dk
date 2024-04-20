@@ -25,7 +25,7 @@ l_compare_de_hl:
    push ix
 
 ;******************************
-IF __SDCC | __SDCC_IX | __SDCC_IY
+IF (__SDCC | __SDCC_IX | __SDCC_IY) && !__CLASSIC
 ;******************************
 
    push hl
