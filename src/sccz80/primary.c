@@ -436,7 +436,7 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
 
     if (lval2->val_type == KIND_LONG) {
         /* Second operator is long */
-        if (lval->val_type != KIND_LONG) {
+        if (lval->val_type != KIND_LONG && lval->val_type != KIND_CPTR) {
             zwiden_stack_to_long(lval);
             if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
                 lval->ltype = type_ulong;

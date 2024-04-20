@@ -1,4 +1,4 @@
-/*-------------------------------------------------------------------------
+ /*-------------------------------------------------------------------------
    free.c - deallocate memory.
 
    Copyright (C) 2015, Philipp Klaus Krause, pkk@spth.de
@@ -29,13 +29,16 @@
 #include <stdlib.h>
 #include <stddef.h>
 
+#include <stdio.h>
+
 #include "farmalloc.h"
 
 void free_far(void * __far ptr)
 {
 	header_t * __far h, * __far next_free, * __far prev_free;
-	header_t *__far *f;
+	header_t *__far * __far f;
 
+	printf("Enter free %lX\n",ptr);
 	if(!ptr)
 		return;
 
@@ -43,8 +46,8 @@ void free_far(void * __far ptr)
 	for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h && h < ptr; prev_free = h, f = &(h->next_free), h = h->next_free); // Find adjacent blocks in free list
 	next_free = h;
 
-	h = (void * __far)((char * __far)(ptr) - offsetof(struct header, next_free));
-
+	h = (void * __far)((char * __far)(ptr) - (uint32_t)offsetof(struct header, next_free));
+	printf("Freeing block %lX\n",h);
 	// Insert into free list.
 	h->next_free = next_free;
 	*f = h;

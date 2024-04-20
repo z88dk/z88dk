@@ -19,3 +19,15 @@ target/test/fcntl/remove
 target/test/fcntl/rename
 target/test/fcntl/write
 target/test/fcntl/writebyte
+
+target/test/far/__far_incptr
+target/test/far/__far_misc
+target/test/far/__far_page
+target/test/far/lp_gchar
+target/test/far/lp_gint
+target/test/far/lp_glong
+target/test/far/lp_gptr
+target/test/far/lp_pchar
+target/test/far/lp_pint
+target/test/far/lp_plong
+target/test/far/lp_pptr

@@ -27,6 +27,7 @@
 -------------------------------------------------------------------------*/
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <stddef.h>
 
 #include "farmalloc.h"
@@ -35,13 +36,14 @@
 void *__far malloc_far(size_t size)
 {
 	header_t *__far h;
-	header_t *__far *f;
+	header_t *__far * __far f;
 
 	if(!size || size + offsetof(struct header, next_free) < size)
 		return(0);
 	size += offsetof(struct header, next_free);
 	if(size < sizeof(struct header)) // Requiring a minimum size makes it easier to implement free(), and avoid memory leaks.
 		size = sizeof(struct header);
+
 
 	for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h; f = &(h->next_free), h = h->next_free)
 	{
@@ -50,7 +52,7 @@ void *__far malloc_far(size_t size)
 		{
 			if(blocksize >= size + sizeof(struct header)) // It is worth creating a new free block
 			{
-				header_t * __far newheader = (header_t * __far )((char *__far)h + (uint32_t)size);
+				header_t * __far newheader = (header_t * __far )((uint32_t)h + (uint32_t)size);
 				newheader->next = h->next;
 				newheader->next_free = h->next_free;
 				*f = newheader;
@@ -58,7 +60,6 @@ void *__far malloc_far(size_t size)
 			}
 			else
 				*f = h->next_free;
-
 			return(&(h->next_free));
 		}
 	}

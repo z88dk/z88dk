@@ -811,6 +811,7 @@ int in(int port){
   if ( (val = hook_console_in(port)) != -1 ) return val;
   if ( (val = apu_in(port)) != -1 ) return val;
   if ( (val = acia_in(port)) != -1 ) return val;
+  if ( (val = memory_in(port)) != -1 ) return val;
 
   return port&1 ? 255 : ear;
 }
