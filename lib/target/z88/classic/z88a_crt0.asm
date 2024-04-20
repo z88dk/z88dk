@@ -213,7 +213,7 @@ not_quit:
 ; Prototype is extern void __FASTCALL__ *cpfar2near(far void *)
 ;--------
 IF DEFINED_farheapsz
-    EXTERN	strcpy_far
+    EXTERN	strcpyf
 _cpfar2near:
     pop     bc	;ret address
     pop     hl
@@ -229,7 +229,7 @@ _cpfar2near:
     push    bc	;dest
     push    de	;source
     push    hl
-    call    strcpy_far
+    call    strcpyf
     pop     bc	;dump args
     pop     bc
     pop     bc
