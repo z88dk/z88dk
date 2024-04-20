@@ -141,6 +141,7 @@ TOCREATE += $(call check_target,x07,x07_clib.lib)
 TOCREATE += $(call check_target,x1,x1_clib.lib x1_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,x820ii,x820ii.lib $(CPMLIBS))
 TOCREATE += $(call check_target,z1013,z1013_clib.lib)
+TOCREATE += $(call check_target,z80retro,z80retro_cpm.lib)
 TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 8085_clib.lib r2ka_clib.lib r4k_clib.lib kc160_clib.lib)
 TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
 TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
@@ -1506,6 +1507,15 @@ nabu_int.lib: nabu_clib.lib
 	@echo ''
 	$(MAKE) -C target/nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_int @$(TARGET_DIRECTORY)/nabu/nabu_int.lst
+
+z80retro_cpm.lib: 
+	@echo ''
+	@echo '--- Building z80retro! CP/M Library ---'
+	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=z80retro
+	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=z80retro
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=z80retro
+	TARGET=z80retro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80retro -x$(OUTPUT_DIRECTORY)/z80retro_cpm @$(TARGET_DIRECTORY)/z80retro/z80retro.lst
 
 
 # Genius Leader 2000/4000 - dom

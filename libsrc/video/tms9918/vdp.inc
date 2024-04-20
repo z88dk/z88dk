@@ -184,6 +184,17 @@ IF FORnabu
 	defc F18A = 1
 ENDIF
 
+IF FORz80retro
+	defc VDP_DATA    = $80
+	defc VDP_DATAIN  = $80
+	defc VDP_CMD     = $81
+	defc VDP_STATUS  = $81
+	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
+ENDIF
+
+
 ; Macro to help writing to ports
 ; If port >= 256 we expect bc to hold the port
 MACRO VDPOUT PORT
