@@ -63,7 +63,6 @@ ELIF __crt_org_far
     SECTION data_far
     SECTION rodata_far
     SECTION bss_far
-
-    SECTION HIMEM_END
 ENDIF
+    SECTION HIMEM_END
 ENDIF
