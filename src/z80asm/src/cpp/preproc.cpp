@@ -585,13 +585,6 @@ bool Preproc::check_gbz80_opcodes() {
             push_expanded(out, defines());
             return true;
 
-		case TType::RParen:
-            out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::LParen, false},
-                Token{TType::Integer, false, 0} });
-            out.append(m_line.peek_tokens(3));
-            push_expanded(out, defines());
-            return true;
-
 		default:
 			return false;
 		}
@@ -615,14 +608,6 @@ bool Preproc::check_gbz80_opcodes() {
 		case TType::Minus:
             out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::Ident, false, "a"},
                          Token{TType::Comma, false}, Token{TType::LParen, false} });
-            out.append(m_line.peek_tokens(5));
-            push_expanded(out, defines());
-            return true;
-
-		case TType::RParen:
-            out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::Ident, false, "a"},
-                         Token{TType::Comma, false}, Token{TType::LParen, false},
-                         Token{TType::Integer, false, 0} });
             out.append(m_line.peek_tokens(5));
             push_expanded(out, defines());
             return true;
