@@ -1,4 +1,4 @@
-SECTION code_l_sccz80
+SECTION code_l_sccz80_far
 PUBLIC  __far_page
 
 EXTERN  PUT_P2

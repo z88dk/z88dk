@@ -7,8 +7,9 @@
 
 IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CPU_KC160__
     SECTION   code_clib
-    EXTERN __far_init    ;Get the initial bindings
-    EXTERN __far_reset   ;Reset to initial bindings
+    SECTION   code_far
+    EXTERN __far_start    ;Get the initial bindings
+    EXTERN __far_end   ;Reset to initial bindings
     EXTERN __far_page    ;Page in the far segment
     EXTERN __far_incptr  ;Increment a far pointer (returning near address)
     PUBLIC strchrf
@@ -29,7 +30,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     push    bc
     push    iy
     push    hl	
-    call    __far_init
+    call    __far_start
     ex      af,af'  ; save seg 1 binding
     call    __far_page
 .strchr1
@@ -46,6 +47,6 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     ld      h,b
     ld      l,c		; EHL=pointer to character, or NULL
     ex      af,af'
-    call    __far_reset
+    call    __far_end
     ret
 ENDIF

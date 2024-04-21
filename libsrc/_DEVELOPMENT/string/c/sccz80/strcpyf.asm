@@ -8,8 +8,9 @@
 
 IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CPU_KC160__
     SECTION   code_clib
-    EXTERN __far_init    ;Get the initial bindings
-    EXTERN __far_reset   ;Reset to initial bindings
+    SECTION   code_far
+    EXTERN __far_start    ;Get the initial bindings
+    EXTERN __far_end   ;Reset to initial bindings
     EXTERN __far_page    ;Page in the far segment
     EXTERN __far_incptr  ;Increment a far pointer (returning near address)
     PUBLIC strcpyf
@@ -32,7 +33,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     ld      c,(ix+0)
     ld      b,(ix+1)
     ld      e,(ix+2)        ; EBC=s2
-    call    __far_init
+    call    __far_start
     ex      af,af'          ; save original binding
 .strcpy1
     call    __far_page
@@ -48,7 +49,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     and     a
     jr      nz,strcpy1
     ex      af,af'
-    call    __far_reset
+    call    __far_end
     ld      l,(ix+4)
     ld      h,(ix+5)
     ld      e,(ix+6)        ; EHL=s1

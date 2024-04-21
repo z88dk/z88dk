@@ -1,7 +1,7 @@
-SECTION code_l_sccz80
+SECTION code_l_sccz80_far
 PUBLIC  __far_page
 
-EXTERN  __far_reset
+EXTERN  __far_end
 EXTERN  __msx_bank_mappings
 
 ; Entry: ebc = logical address

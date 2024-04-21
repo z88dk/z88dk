@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#pragma codeseg code_far
+#pragma bssseg bss_far
+#pragma dataseg data_far
+#pragma constseg rodata_far
+
 typedef struct header header_t;
 
 struct header

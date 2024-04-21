@@ -38,7 +38,6 @@ void free_far(void * __far ptr)
 	header_t * __far h, * __far next_free, * __far prev_free;
 	header_t *__far * __far f;
 
-	printf("Enter free %lX\n",ptr);
 	if(!ptr)
 		return;
 

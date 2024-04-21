@@ -8,8 +8,9 @@
 IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CPU_KC160__
 
     SECTION   code_clib
-    EXTERN __far_init    ;Get the initial bindings
-    EXTERN __far_reset   ;Reset to initial bindings
+    SECTION   code_far
+    EXTERN __far_start    ;Get the initial bindings
+    EXTERN __far_end   ;Reset to initial bindings
     EXTERN __far_page    ;Page in the far segment
     EXTERN __far_incptr  ;Increment a far pointer (returning near address)
     PUBLIC struprf
@@ -27,7 +28,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     push    de
     push    bc
     push    hl
-    call    __far_init
+    call    __far_start
     ex      af,af'
     call    __far_page
 .strupr1
@@ -45,7 +46,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     jr      strupr1
 .struprend
     ex      af,af'
-    call    __far_reset
+    call    __far_end
     pop     hl
     pop     bc
     pop     de      ; get EBC=pointer again
