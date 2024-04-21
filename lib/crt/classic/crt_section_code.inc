@@ -10,6 +10,10 @@
     SECTION code_l_sdcc
     SECTION code_l_sccz80
     SECTION code_l_clang
+IF !__crt_org_far
+    SECTION code_l_sccz80_far
+    SECTION code_far
+ENDIF
     SECTION code_z80
     SECTION rodata_driver       ;Keep it in low memoey
     SECTION code_compiler

@@ -220,7 +220,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             } else if ( lval2->val_type == KIND_LONG ) {
                 vlongconst_tostack(lval->const_val); 
                 lval->val_type = KIND_LONG;  
-                lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;        
+                lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
+            } else if ( lval2->val_type == KIND_CPTR ) {
+                vlongconst_tostack(lval->const_val); 
+                lval->val_type = KIND_LONG;  
+                lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;  
             } else {
                 const2(lval->const_val);
             }
@@ -289,7 +293,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 // Even if LHS is int, we promote to long. 
                 lval2->val_type = KIND_LONG;
                 lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;    
-                load_constant(lval2);   
+                load_constant(lval2);
+            } else if (lval->val_type == KIND_CPTR  || lval2->val_type == KIND_CPTR ) {
+                lval2->val_type = KIND_LONG;
+                lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;    
+                load_constant(lval2); 
             } else if ( kind_is_fixed(lval->val_type)) {
                 lval2->val_type = lval->val_type;
                 lval2->ltype = lval->ltype;

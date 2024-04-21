@@ -95,6 +95,7 @@ extern void      hook_console_init(hook_command *cmds);
 
 extern void memory_init(char *model);
 extern void memory_handle_paging(int port, int value);
+extern int memory_in(int port);
 extern void memory_reset_paging();
 extern int       rabbit_get_ioi_reg(int reg);
 

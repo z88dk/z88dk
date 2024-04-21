@@ -583,6 +583,8 @@ int heira(LVALUE *lval)
             return 0;
         }
         lval->ltype = make_pointer(lval->ltype);
+        if ( lval->flags & FARACC ) lval->ltype->kind = KIND_CPTR;
+
         lval->ptr_type = lval->ltype->ptr->kind;
         lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
 
@@ -773,7 +775,6 @@ int heirb(LVALUE* lval)
                     str = lval->cast_type;
                 }
                 name_result = symname(sname);
-
                 if ( str->kind == KIND_PTR || str->kind == KIND_CPTR) {
                     if ( direct ) {
                         UT_string *us;
@@ -827,7 +828,7 @@ int heirb(LVALUE* lval)
                 }
                 lval->flags = flags;
                 zadd_const(lval, member_type->offset);
-	        lval->offset = member_type->offset;
+	            lval->offset = member_type->offset;
                 lval->symbol = NULL;
                 lval->ltype = member_type;
                 lval->indirect_kind = lval->val_type = member_type->kind;

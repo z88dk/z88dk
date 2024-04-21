@@ -1,29 +1,15 @@
-# FAR MEMORY SUPPORT FOR MSX
-This is a toy implementation of far memory [specifications](https://github.com/z88dk/z88dk/wiki/More-Than-64k) for MSXDOS2 memory mapper. It's slow and partial, but it's a starting point.
-The malloc just increment a global pointer (one per segment). Free is just a stub and realloc is not implemented yet.
+# Far memory implementation for MSXDOS2
 
-The files included are:
-* `msxmapper.c`: code to interact with the MSXDOS2 memory mapper
-* `memoryman.c`: C implementation of the specifications
-* `mallocfar.s`: asm code interfaces
+Implements a 24bit pointer providing linear access to extended memory.
 
-The functions implemented are:
+The 24bit pointer provides a logical address which is then mapped to a physical segment via the mapping table kept in the MSXDOS crt0 file.
 
-* `malloc_far`
-* `free_far` (just a stub)
-* `lp_gchar`, `lp_pchar`
-* `lp_gint`, `lp_pint`
-* `lp_gptr`, `lp_pptr`
+A 24 bit pointer is passed in ehl, and can be mapped into 16kb chunks as follows:
 
-What's missing:
+e = 0 = near memory, whatever is paged in
+e = 1 0x0000 -> 0x3fff	= bank 1 (__msx_bank_mappings + 1)
+e = 1 0x4000 -> 0x7fff	= bank 2 (__msx_bank_mappings + 2)
+e = 1 0x8000 -> 0xbfff	= bank 3
+e = 1 0xc000 -> 0xffff	= bank 4
 
-* read/write code for long and double (easy to implement starting from the functions above)
-* string related functions, such as strlen_far, strcat_far, etc
-
-## Test it
-
-`$ make`
-
-This generates the file `memoryman.com`. It prints allocation, read, write benchmarks.
-
-![FAR MALLOC BENCHMARKS](screenshot.png?raw=true "FAR MALLOC BENCHMARKS")
+etc 

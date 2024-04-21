@@ -17,7 +17,7 @@ cubez88.bas: cube.c
 	zcc +z88 $^ -o $@
 
 farmalloc.63: farmalloc.c
-	zcc +z88 $^ -subtype=app -create-app -o $(@:.63=.bin) -lfarz88
+	zcc +z88 $^ -subtype=app -create-app -o $(@:.63=.bin) 
 
 cubeflt16.63: cube.c
 	zcc +z88 $^ --math16 -subtype=app -create-app -o $(@:.63=.bin)

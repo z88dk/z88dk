@@ -207,6 +207,11 @@
        defc __crt_org_graphics = CRT_ORG_GRAPHICS
    ENDIF
 
+   ; Allow far data access code to placed at a different point in memory
+   IF DEFINED_CRT_ORG_FAR
+       defc __crt_org_far = CRT_ORG_FAR
+   ENDIF
+
    ; If 32 bit floats are defined, then we need to indicate to the library
    ; that they are in use (mainly for printf/scanf)
    PUBLIC CLIB_32BIT_FLOATS

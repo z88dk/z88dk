@@ -141,6 +141,7 @@ TOCREATE += $(call check_target,x07,x07_clib.lib)
 TOCREATE += $(call check_target,x1,x1_clib.lib x1_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,x820ii,x820ii.lib $(CPMLIBS))
 TOCREATE += $(call check_target,z1013,z1013_clib.lib)
+TOCREATE += $(call check_target,z80retro,z80retro_cpm.lib)
 TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 8085_clib.lib r2ka_clib.lib r4k_clib.lib kc160_clib.lib)
 TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
 TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
@@ -171,6 +172,7 @@ include adt/stack/stack.mak
 include adt-newlib/adtnewlib.mak
 include algorithm/AStarSearch/astar.mak
 include alloc/balloc/balloc.mak
+include alloc/farmalloc/farmalloc.mak
 include alloc/malloc-classic/malloc.mak
 include alloc/obstack/obstack.mak
 include arch/z80/z80.mak
@@ -209,7 +211,7 @@ include time/time.mak
 
 
 # Targets depend on some common code + target specific (include stdio in here)
-TARGET_CLIB_OBJS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS)
+TARGET_CLIB_OBJS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) $(RETROFIT_OBJS)
 
 # Arg1: target
 # Arg2: Graphics flavour
@@ -313,7 +315,6 @@ z88_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building Z88 Library ---'
 	@echo ''
 	$(call buildgeneric,z88)
-	$(MAKE) -C alloc/farz88
 	$(MAKE) -C games TARGET=z88
 	$(MAKE) -C target/z88
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(TARGET_DIRECTORY)/z88/z88.lst
@@ -1507,6 +1508,15 @@ nabu_int.lib: nabu_clib.lib
 	$(MAKE) -C target/nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_int @$(TARGET_DIRECTORY)/nabu/nabu_int.lst
 
+z80retro_cpm.lib: cpm_clib.lib
+	@echo ''
+	@echo '--- Building z80retro! CP/M Library ---'
+	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=z80retro
+	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=z80retro
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=z80retro
+	TARGET=z80retro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80retro -x$(OUTPUT_DIRECTORY)/z80retro_cpm @$(TARGET_DIRECTORY)/z80retro/z80retro.lst
+
 
 # Genius Leader 2000/4000 - dom
 gl_clib.lib: $(TARGET_CLIB_OBJS)
@@ -2224,7 +2234,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C fcntl clean
 	$(MAKE) -C math clean
 	$(MAKE) -C z80_crt0s clean
-	$(MAKE) -C alloc/farz88 clean
 	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
