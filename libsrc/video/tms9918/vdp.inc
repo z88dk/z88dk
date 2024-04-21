@@ -190,7 +190,7 @@ IF FORz80retro
 	defc VDP_CMD     = $81
 	defc VDP_STATUS  = $81
 	defc VRAM_SIZE   = 16
-	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_DIRECT = 0
 	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 

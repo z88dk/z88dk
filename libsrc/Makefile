@@ -211,7 +211,7 @@ include time/time.mak
 
 
 # Targets depend on some common code + target specific (include stdio in here)
-TARGET_CLIB_OBJS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS)
+TARGET_CLIB_OBJS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) $(RETROFIT_OBJS)
 
 # Arg1: target
 # Arg2: Graphics flavour
@@ -1508,7 +1508,7 @@ nabu_int.lib: nabu_clib.lib
 	$(MAKE) -C target/nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_int @$(TARGET_DIRECTORY)/nabu/nabu_int.lst
 
-z80retro_cpm.lib: 
+z80retro_cpm.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building z80retro! CP/M Library ---'
 	@echo ''
