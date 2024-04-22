@@ -6,7 +6,7 @@ PUBLIC  lp_gint
 EXTERN  __far_start
 EXTERN  __far_end
 EXTERN  __far_page
-EXTERN  __far_incptr
+EXTERN  l_far_incptrs
 
 lp_gint:
     call   __far_start
@@ -15,7 +15,7 @@ lp_gint:
     call    __far_page
     ; hl = physical address
     ld      a,(hl)
-    call    __far_incptr
+    call    l_far_incptrs
     ld      h,(hl)
     ld      l,a
     ex      af,af

@@ -13,7 +13,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     EXTERN __far_start    ;Get the initial bindings
     EXTERN __far_end   ;Reset to initial bindings
     EXTERN __far_page    ;Page in the far segment
-    EXTERN __far_incptr  ;Increment a far pointer (returning near address)
+    EXTERN l_far_incptrs  ;Increment a far pointer (returning near address)
     PUBLIC strlwrf
     PUBLIC _strlwrf
 
@@ -42,7 +42,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     or      32
     ld      (hl),a
 .strlwr2
-    call    __far_incptr
+    call    l_far_incptrs
     jr      strlwr1
 .strlwrend
     ex      af,af'

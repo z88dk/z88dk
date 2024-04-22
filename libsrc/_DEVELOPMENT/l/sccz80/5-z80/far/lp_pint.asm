@@ -5,7 +5,7 @@ PUBLIC  lp_pint
 EXTERN  __far_start
 EXTERN  __far_end
 EXTERN  __far_page
-EXTERN  __far_incptr
+EXTERN  l_far_incptrs
 
 ; Entry: e'h'l' = logical address
 ;           hl  = int to write
@@ -19,7 +19,7 @@ lp_pint:
     ld      a,l
     exx
     ld      (hl),a
-    call    __far_incptr
+    call    l_far_incptrs
     exx
     ld      a,h
     exx

@@ -6,7 +6,7 @@ PUBLIC  lp_glong
 EXTERN  __far_start
 EXTERN  __far_end
 EXTERN  __far_page
-EXTERN  __far_incptr
+EXTERN  l_far_incptrs
 
 lp_glong:
     call   __far_start
@@ -16,12 +16,12 @@ lp_glong:
     ; hl = physical address
     ld      a,(hl)
     ld      ixl,a
-    call    __far_incptr
+    call    l_far_incptrs
     ld      a,(hl)
     ld      ixh,a
-    call    __far_incptr
+    call    l_far_incptrs
     ld      a,(hl)
-    call    __far_incptr
+    call    l_far_incptrs
     ld      d,(hl)
     ld      e,a
     push    ix

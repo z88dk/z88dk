@@ -1,11 +1,11 @@
 SECTION code_l_sccz80_far
-PUBLIC  __far_incptr
+PUBLIC  l_far_incptrs
 
 EXTERN  __far_page
 
 ; Entry: hl = physical address
 ;       ebc = logical address
-__far_incptr:
+l_far_incptrs:
     inc     hl
     inc     c
     ret     nz
@@ -13,7 +13,7 @@ __far_incptr:
     jr      nz,skiphigh
     inc     e
 skiphigh:
-    ; We end up repaging every 256 bytes which isn't optimal§
+    ; We end up repaging every 256 bytes which isn't optimal
     push    af
     call    __far_page
     pop    af

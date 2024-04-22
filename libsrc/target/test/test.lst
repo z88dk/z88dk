@@ -20,6 +20,5 @@ target/test/fcntl/rename
 target/test/fcntl/write
 target/test/fcntl/writebyte
 
-target/test/far/__far_incptr
 target/test/far/__far_misc
 target/test/far/__far_page

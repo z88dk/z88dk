@@ -88,4 +88,6 @@ ${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_pchar
 ${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_pint
 ${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_plong
 ${NEWLIB_ROOT}l/sccz80/5-z80/far/lp_pptr
+${NEWLIB_ROOT}l/sccz80/5-z80/far/l_far_incptrs
+${NEWLIB_ROOT}l/sccz80/5-z80/far/l_far_decptrs
 @${NEWLIB_ROOT}l/sccz80/8080.lst

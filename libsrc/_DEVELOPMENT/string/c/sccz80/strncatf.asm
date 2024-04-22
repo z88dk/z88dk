@@ -11,7 +11,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     EXTERN __far_start    ;Get the initial bindings
     EXTERN __far_end   ;Reset to initial bindings
     EXTERN __far_page    ;Page in the far segment
-    EXTERN __far_incptr  ;Increment a far pointer (returning near address)
+    EXTERN l_far_incptrs  ;Increment a far pointer (returning near address)
     PUBLIC  strncatf
     PUBLIC  _strncatf
 
@@ -40,7 +40,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     call    __far_page      ; start with s1
     jr      startfind
 .findend
-    call    __far_incptr
+    call    l_far_incptrs
 .startfind
     ld      a,(hl)          ; char from s1
     and     a
@@ -53,12 +53,12 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     call    __far_page
     ld      a,(hl)          ; char from s2
     ld      iyl,a
-    call    __far_incptr
+    call    l_far_incptrs
     exx
     call    __far_page
     ld      a,iyl
     ld      (hl),a          ; place in s1
-    call    __far_incptr
+    call    l_far_incptrs
     exx
     dec     ix
     and     a
