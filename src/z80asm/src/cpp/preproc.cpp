@@ -564,10 +564,12 @@ bool Preproc::check_reptx() {
 }
 
 bool Preproc::check_gbz80_opcodes() {
+    if (g_args.get_cpu() != CPU_GBZ80)
+        return false;
+
     ScannedLine out;
 
     // ld ($ff00+xxx --> ldh (xxx
-	// ld ($ff00-xxx --> ldh (-xxx
 	// ld ($ff00)xxx --> ldh (0)xxx
 	if (m_line.peek(0).is(Keyword::LD) &&
 		m_line.peek(1).is(TType::LParen) &&
@@ -579,8 +581,9 @@ bool Preproc::check_gbz80_opcodes() {
             push_expanded(out, defines());
 			return true;
 
-		case TType::Minus:
-            out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::LParen, false} });
+		case TType::RParen:
+            out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::LParen, false},
+                Token{TType::Integer, false, 0} });
             out.append(m_line.peek_tokens(3));
             push_expanded(out, defines());
             return true;
@@ -590,7 +593,6 @@ bool Preproc::check_gbz80_opcodes() {
 		}
 	}
 	// ld ($ff00+xxx --> ldh (xxx
-	// ld ($ff00-xxx --> ldh (-xxx
 	// ld ($ff00)xxx --> ldh (0)xxx
 	if (m_line.peek(0).is(Keyword::LD) &&
 		m_line.peek(1).is(Keyword::A) &&
@@ -605,9 +607,10 @@ bool Preproc::check_gbz80_opcodes() {
             push_expanded(out, defines());
             return true;
 
-		case TType::Minus:
+		case TType::RParen:
             out.append({ Token{TType::Ident, false, "ldh"}, Token{TType::Ident, false, "a"},
-                         Token{TType::Comma, false}, Token{TType::LParen, false} });
+                         Token{TType::Comma, false}, Token{TType::LParen, false},
+                         Token{TType::Integer, false, 0} });
             out.append(m_line.peek_tokens(5));
             push_expanded(out, defines());
             return true;

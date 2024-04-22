@@ -14,53 +14,27 @@ spew("$test.asm", <<END);
 	ld a,(0xff00+0)
 	ld (0xff00+1),a
 	ld a,(0xff00+1)
-	ld (0xff00-1),a
-	ld a,(0xff00-1)
 END
 
 capture_ok("z88dk-z80asm -mgbz80 -l -b $test.asm", "");
-check_bin_file("$test.bin", bytes(0xEA, 0, 0xFF, 0xFA, 0, 0xFF,
-								  0xE0, 0, 0xF0, 0,
-								  0xE0, 1, 0xF0, 1,
-								  0xE0, 0xFF, 0xF0, 0xFF));
-
-spew("$test.asm", <<END);
-	ld (0xff00),a
-	ld a,(0xff00)
-END
+check_bin_file("$test.bin", bytes(0xE0,  0, 0xF0,  0,
+								  0xE0,  0, 0xF0,  0,
+								  0xE0,  1, 0xF0,  1));
 
 capture_ok("z88dk-z80asm -mz80 -l -b $test.asm", "");
-check_bin_file("$test.bin", bytes(0x32, 0,0xFF, 0x3A, 0,0xFF));
+check_bin_file("$test.bin", bytes(0x32,  0, 0xFF, 0x3A,  0, 0xFF,
+								  0x32,  0, 0xFF, 0x3A,  0, 0xFF,
+								  0x32,  1, 0xFF, 0x3A,  1, 0xFF));
 
 spew("$test.asm", <<END);
-	ld (0xff00+0),a
-	ld a,(0xff00+0)
-	ld (0xff00+1),a
-	ld a,(0xff00+1)
-	ld (0xff00-1),a
-	ld a,(0xff00-1)
+	ld (0xff00+c),a
+	ld a,(0xff00+c)
 END
 
-capture_nok("z88dk-z80asm -mz80 -l -b $test.asm", <<END);
-$test.asm:1: error: illegal identifier
-  ^---- ld (0xff00+0),a
-      ^---- ldh(0),a
-$test.asm:2: error: illegal identifier
-  ^---- ld a,(0xff00+0)
-      ^---- ldh a,(0)
-$test.asm:3: error: illegal identifier
-  ^---- ld (0xff00+1),a
-      ^---- ldh(1),a
-$test.asm:4: error: illegal identifier
-  ^---- ld a,(0xff00+1)
-      ^---- ldh a,(1)
-$test.asm:5: error: illegal identifier
-  ^---- ld (0xff00-1),a
-      ^---- ldh(-1),a
-$test.asm:6: error: illegal identifier
-  ^---- ld a,(0xff00-1)
-      ^---- ldh a,(-1)
-END
+capture_ok("z88dk-z80asm -mgbz80 -l -b $test.asm", "");
+check_bin_file("$test.bin", bytes(0xE2,
+								  0xF2));
+
 
 unlink_testfiles;
 done_testing;
