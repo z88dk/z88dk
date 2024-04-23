@@ -112,12 +112,16 @@ unsigned char oz_background[1244]={240,40,240,40};
 
 #define ozdelay(a) msleep(a)
 
-#define ozgetpoint(a,b) point(a,b)
 
+// File/directory management
+#define FIND_RESET 1
+#define ozgetnextfilename(a) (a?dir_move_first():dir_move_next())?NULL:dir_get_entry_name()
 #define open1(a,b) (ozfile1=open(a,b,_IOTEXT))
 #define close1() close(ozfile1)
 #define read1(a,b) read(ozfile1,a,b)
+#define ozreadfilebyte() fgetc(ozfile1)
 #define write1(a,b) write(ozfile1,a,b)
+
 
 
 // Drawing mode: 0:WHITE, 1=BLACK, 3=XOR
@@ -127,6 +131,9 @@ unsigned char oz_background[1244]={240,40,240,40};
 
 #undef ozpoint
 #define ozpoint(a,b,c) switch(c){case 1: plot(a,b); case 0: unplot(a,b); default: xorplot(a,b);}
+
+#undef ozgetpoint
+#define ozgetpoint(a,b) point(a,b)
 
 #undef ozline
 #define ozline(a,b,d,e,c) switch(c){case 1: draw(a,b,d,e); case 0: undraw(a,b,d,e); default: xordraw(a,b,d,e);}
