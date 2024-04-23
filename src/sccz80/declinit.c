@@ -291,7 +291,6 @@ static int init(Type *type, int dump)
     double value;
     Kind   valtype;
     int sz = 0; /* number of chars in queue */
-    int parencount = 0;  // Opening ( encountered
 
     if ((sz = qstr(&value)) != -1) {
         sz++;
@@ -352,19 +351,15 @@ static int init(Type *type, int dump)
 
         gotref = cmatch('&');
 
-
-
-again:
         // Might be a cast afterwards as well
         if (rcmatch('(') ) {
             Type  *ctype;
+            int klptr = lptr;
             lptr++;
             if ( ch() && (ctype = parse_expr_type()) != NULL ) {
                 needchar(')');
             } else {
-                parencount++;
-                goto again;
-               // lptr = klptr;
+                lptr = klptr;
             }
         }
 
@@ -431,9 +426,7 @@ again:
                     errorfmt("Dodgy declaration (not pointer)", 0);
                     junk();
                 }
-                while (parencount--) {
-                    needchar(')');
-                }
+
             } else {
                 errorfmt("Unknown symbol: %s", 1, sname);
                 junk();
@@ -533,9 +526,7 @@ constdecl:
                 // if (ident == ID_ARRAY && more == 0) {
                 //     dumpzero(size, (dim) - 1);
                 // }
-                while (parencount--) {
-                    needchar(')');
-                }
+
             } else {
                 if ( type->kind == KIND_DOUBLE ) {
                     unsigned char  fa[6];
