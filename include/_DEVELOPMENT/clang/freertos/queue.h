@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V11.0.1
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V11.1.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -305,7 +305,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *  char ucData[ 20 ];
  * } xMessage;
  *
- * uint32_t ulVar = 10UL;
+ * uint32_t ulVar = 10U;
  *
  * void vATask( void *pvParameters )
  * {
@@ -388,7 +388,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *  char ucData[ 20 ];
  * } xMessage;
  *
- * uint32_t ulVar = 10UL;
+ * uint32_t ulVar = 10U;
  *
  * void vATask( void *pvParameters )
  * {
@@ -473,7 +473,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *  char ucData[ 20 ];
  * } xMessage;
  *
- * uint32_t ulVar = 10UL;
+ * uint32_t ulVar = 10U;
  *
  * void vATask( void *pvParameters )
  * {
@@ -646,7 +646,7 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  *  char ucData[ 20 ];
  * } xMessage;
  *
- * uint32_t ulVar = 10UL;
+ * uint32_t ulVar = 10U;
  *
  * void vATask( void *pvParameters )
  * {
@@ -1920,24 +1920,11 @@ void vQueueWaitForMessageRestricted( QueueHandle_t xQueue,
                                      const BaseType_t xWaitIndefinitely ) PRIVILEGED_FUNCTION;
 BaseType_t xQueueGenericReset( QueueHandle_t xQueue,
                                BaseType_t xNewQueue ) PRIVILEGED_FUNCTION;
-void vQueueSetQueueNumber( QueueHandle_t xQueue,
-                           UBaseType_t uxQueueNumber ) PRIVILEGED_FUNCTION;
-UBaseType_t uxQueueGetQueueNumber( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
-uint8_t ucQueueGetQueueType( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
  */
 extern void vQueueWaitForMessageRestricted(QueueHandle_t xQueue,TickType_t xTicksToWait,const BaseType_t xWaitIndefinitely);
 
 
 extern BaseType_t xQueueGenericReset(QueueHandle_t xQueue,BaseType_t xNewQueue);
-
-
-extern void vQueueSetQueueNumber(QueueHandle_t xQueue,UBaseType_t uxQueueNumber);
-
-
-extern UBaseType_t uxQueueGetQueueNumber(QueueHandle_t xQueue);
-
-
-extern uint8_t ucQueueGetQueueType(QueueHandle_t xQueue);
 
 
 
