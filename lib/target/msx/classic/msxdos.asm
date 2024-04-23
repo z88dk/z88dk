@@ -156,7 +156,7 @@ sbrk_loop:
     djnz    sbrk_loop
 handle_residual:
     ; And any left over pages we can just add mnually
-IF ( CLIB|CLIB_FARHEAP_BANKS % 4) > 0
+IF (CLIB_FARHEAP_BANKS % 4) > 0
     ld      a,+( CLIB_FARHEAP_BANKS % 4)
     and     a
     ret     z

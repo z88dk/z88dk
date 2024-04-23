@@ -10,4 +10,6 @@ target/pcw/psg/set_psg
 target/pcw/psg/set_psg_callee
 target/pcw/psg/get_psg
 target/pcw/psg/psg_init
+target/pcw/far/__far_misc
+target/pcw/far/__far_page
 @psg/ay/psg.lst
