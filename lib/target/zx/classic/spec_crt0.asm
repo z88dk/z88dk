@@ -166,6 +166,22 @@ ELSE
 
     INCLUDE "crt/classic/crt_init_heap.inc"
 
+  IF CLIB_FARHEAP_BANKS > 0
+    IF CLIB_FARHEAP_BANKS > 4
+        defs    CANT_ALLOCATE_MORE_THAN_64K_TO_FARHEAP
+    ENDIF
+    EXTERN  sbrk_far
+    ld      de,$0001
+    ld      hl,0
+    push    de
+    push    hl
+    ld      bc,+(CLIB_FARHEAP_BANKS * 16384) - 1
+    push    bc
+    call    sbrk_far
+    pop     af
+    pop     af
+    pop     af
+  ENDIF
 
   IF DEFINED_ZXVGS
 ;setting variables needed for proper keyboard reading
