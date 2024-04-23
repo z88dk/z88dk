@@ -818,12 +818,11 @@ void gen_load_indirect(LVALUE* lval)
     if (flags & FARACC) { /* Access via far method */
         switch (typeobj) {
         case KIND_CHAR:
-            callrts("lp_gchar");
             if (!sign) {
-                ol("ld\ta,l");
-                callrts("l_sxt");
+                callrts("lp_gchar");
+            } else {
+                callrts("lp_guchar");
             }
-            /*                        else ol("ld\th,0"); */
             break;
         case KIND_CPTR:
             callrts("lp_gptr");

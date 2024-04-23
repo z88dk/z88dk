@@ -15,8 +15,6 @@
 	add	hl,sp
 	call	l_getptr
 	call	lp_gchar
-	ld	a,l
-	call	l_sxt
 	inc	sp
 	pop	bc
 	ret
@@ -35,8 +33,6 @@
 	call	l_putptr
 	call	l_declong
 	call	lp_gchar
-	ld	a,l
-	call	l_sxt
 	inc	sp
 	pop	bc
 	ret
@@ -54,8 +50,6 @@
 	pop	bc
 	call	l_putptr
 	call	lp_gchar
-	ld	a,l
-	call	l_sxt
 	inc	sp
 	pop	bc
 	ret
@@ -73,8 +67,6 @@
 	jr	nc,ASMPC+3
 	inc	de
 	call	lp_gchar
-	ld	a,l
-	call	l_sxt
 	inc	sp
 	pop	bc
 	ret

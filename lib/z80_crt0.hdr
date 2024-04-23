@@ -308,6 +308,7 @@
 ;--------------------------------------------------
 
 	EXTERN	lp_gchar
+	EXTERN	lp_guchar
 	EXTERN	lp_gdoub
 	EXTERN	lp_gint
 	EXTERN	lp_glong

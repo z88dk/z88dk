@@ -68,8 +68,6 @@
 	pop	bc
 	pop	bc
 	call	lp_gchar
-	ld	a,l
-	call	l_sxt
 	ret
 
 
