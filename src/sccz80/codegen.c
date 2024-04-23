@@ -819,8 +819,10 @@ void gen_load_indirect(LVALUE* lval)
         switch (typeobj) {
         case KIND_CHAR:
             callrts("lp_gchar");
-            if (!sign)
+            if (!sign) {
+                ol("ld\ta,l");
                 callrts("l_sxt");
+            }
             /*                        else ol("ld\th,0"); */
             break;
         case KIND_CPTR:
