@@ -309,7 +309,7 @@
 	GLOBAL	memopi_callee
 	GLOBAL	memopd
 	GLOBAL	memopd_callee
-	GLOBAL	strlen_far
+	GLOBAL	strlenf
 	GLOBAL	strcatf
 	GLOBAL	strcpyf
 	GLOBAL	strncatf
