@@ -291,6 +291,7 @@ static int init(Type *type, int dump)
     double value;
     Kind   valtype;
     int sz = 0; /* number of chars in queue */
+    int klptr, parencount;
 
     if ((sz = qstr(&value)) != -1) {
         sz++;
@@ -352,14 +353,17 @@ static int init(Type *type, int dump)
         gotref = cmatch('&');
 
         // Might be a cast afterwards as well
+        parencount = 0;
+        klptr = lptr;
+again:
         if (rcmatch('(') ) {
             Type  *ctype;
-            int klptr = lptr;
             lptr++;
             if ( ch() && (ctype = parse_expr_type()) != NULL ) {
                 needchar(')');
             } else {
-                lptr = klptr;
+                parencount++;
+                goto again;
             }
         }
 
@@ -420,13 +424,15 @@ static int init(Type *type, int dump)
                         defbyte(); outdec(0); nl();
                     }
                 } else if (ptr->type == KIND_ENUM) {
-                    value = ptr->size;
+                    lptr = klptr;
+                    constexpr(&value, &valtype, 1);
                     goto constdecl;
                 } else {
                     errorfmt("Dodgy declaration (not pointer)", 0);
                     junk();
                 }
-
+                while ( parencount--) 
+                    needchar(')');
             } else {
                 errorfmt("Unknown symbol: %s", 1, sname);
                 junk();
@@ -435,8 +441,9 @@ static int init(Type *type, int dump)
 #if 0
             dumpzero(size,*dim);
 #endif
+            lptr = klptr;
             return 0;
-        } else if (constexpr(&value, &valtype, 1)) {
+        } else if ( lptr= klptr, constexpr(&value, &valtype, 1)) {
 constdecl:
             check_assign_range(type, value);
             if (dump) {
@@ -546,6 +553,7 @@ constdecl:
                 }
             }
         } else {
+            lptr = klptr;
             return 0; // Nothing parsed
         }
     } 
