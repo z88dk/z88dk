@@ -422,7 +422,7 @@ extern void __LIB__    *memopd_callee(void *, void *, uint, uint) __smallc __z88
 #ifdef __SCCZ80
 // Far string functions - only a short selection
 
-extern int __LIB__ strlen_far(char *__far );
+extern int __LIB__ strlenf(char *__far );
 extern char __LIB__ *__far strcatf(char *__far, char *__far) __smallc;
 extern char __LIB__ *__far strcpyf(char *__far,  char *__far) __smallc;
 extern char __LIB__ *__far strncatf(char *__far, char *__far, int) __smallc;
