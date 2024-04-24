@@ -422,22 +422,29 @@ extern void __LIB__    *memopd_callee(void *, void *, uint, uint) __smallc __z88
 #ifdef __SCCZ80
 // Far string functions - only a short selection
 
-extern int __LIB__ strlenf(char *__far );
-extern char __LIB__ *__far strcatf(char *__far, char *__far) __smallc;
-extern char __LIB__ *__far strcpyf(char *__far,  char *__far) __smallc;
-extern char __LIB__ *__far strncatf(char *__far, char *__far, int) __smallc;
-extern char __LIB__ *__far strncpyf(char *__far, char *__far, int) __smallc;
+extern char __LIB__ *__far strdupf(const char *__far orig);:
+
+extern int __LIB__         strlenf(const char *__far );
+
+extern int __LIB__         strcmpf(const char *__far,  const char *__far) __smallc;
+extern int __LIB__         strncmpf(const char *__far, const char *__far, size_t) __smallc;
+
+extern char __LIB__ *__far strcpyf(char *__far,  const char *__far) __smallc;
+extern char __LIB__ *__far strncpyf(char *__far, const char *__far, size_t) __smallc;
+
+extern char __LIB__ *__far strcatf(char *__far, const char *__far) __smallc;
+extern char __LIB__ *__far strncatf(char *__far, const char *__far, size_t) __smallc;
+
 extern char __LIB__ *__far strlwrf(char *__far);
 extern char __LIB__ *__far struprf(char *__far);
-extern char __LIB__ *__far strchrf(unsigned char *__far, unsigned char) __smallc;
-extern char __LIB__ *__far strrchrf(unsigned char *__far, unsigned char) __smallc;
+
+extern char __LIB__ *__far strchrf(const char *__far, unsigned char) __smallc;
+extern char __LIB__ *__far strrchrf(const char *__far, unsigned char) __smallc;
 
 extern void __LIB__      *__far memcpyf(void *__far dst,const void * __far src,size_t n) __smallc;
 extern void __LIB__      *__far memsetf(void *__far dst,int c,size_t n) __smallc;
 
 
-
-extern char __LIB__ *__far strdupf( char *__far);
 
 #endif
 
