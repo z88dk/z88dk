@@ -41,6 +41,9 @@ jobs:
         ./build.sh -v -b -l -e
     - name: Build sdcc needed for tests
       run: |
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+        export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
+        export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
         export PATH=/usr/local/bin:$PATH
         make BUILD_SDCC=1 BUILD_SDCC_HTTP=1 bin/z88dk-zsdcc
     - name: Run tests
