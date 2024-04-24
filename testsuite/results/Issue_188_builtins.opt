@@ -309,18 +309,20 @@
 	GLOBAL	memopi_callee
 	GLOBAL	memopd
 	GLOBAL	memopd_callee
+	GLOBAL	strdupf
 	GLOBAL	strlenf
-	GLOBAL	strcatf
+	GLOBAL	strcmpf
+	GLOBAL	strncmpf
 	GLOBAL	strcpyf
-	GLOBAL	strncatf
 	GLOBAL	strncpyf
+	GLOBAL	strcatf
+	GLOBAL	strncatf
 	GLOBAL	strlwrf
 	GLOBAL	struprf
 	GLOBAL	strchrf
 	GLOBAL	strrchrf
 	GLOBAL	memcpyf
 	GLOBAL	memsetf
-	GLOBAL	strdupf
 	GLOBAL	__builtin_memset
 	GLOBAL	__builtin_memcpy
 	GLOBAL	__builtin_strcpy
