@@ -46,7 +46,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     call    l_far_incptrs
     dec     ix
     and     a
-    jr      nz,zeroreturn
+    jr      z,zeroreturn
     ld      a,ixh
     or      ixl
     jr      nz,strnchrf1
