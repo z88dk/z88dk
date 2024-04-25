@@ -426,6 +426,7 @@ extern char __LIB__ *__far strdupf(const char *__far orig);:
 
 extern int __LIB__         strlenf(const char *__far );
 
+extern int __LIB__         strcasecmpf(const char *__far,  const char *__far) __smallc;
 extern int __LIB__         strcmpf(const char *__far,  const char *__far) __smallc;
 extern int __LIB__         strncmpf(const char *__far, const char *__far, size_t) __smallc;
 
@@ -439,10 +440,13 @@ extern char __LIB__ *__far strlwrf(char *__far);
 extern char __LIB__ *__far struprf(char *__far);
 
 extern char __LIB__ *__far strchrf(const char *__far, unsigned char) __smallc;
+extern char __LIB__ *__far strnchrf(const char *__far s,size_t n,int c) __smallc;
 extern char __LIB__ *__far strrchrf(const char *__far, unsigned char) __smallc;
 
-extern void __LIB__      *__far memcpyf(void *__far dst,const void * __far src,size_t n) __smallc;
-extern void __LIB__      *__far memsetf(void *__far dst,int c,size_t n) __smallc;
+extern void __LIB__ *__far memcpyf(void *__far dst,const void * __far src,size_t n) __smallc;
+extern void __LIB__ *__far memsetf(void *__far dst,int c,size_t n) __smallc;
+extern void __LIB__ *__far memchrf(const void *__far s,int c,size_t n) __smallc;
+extern int __LIB__         memcmpf(const void *__far s1,const void *__far s2,size_t n) __smallc;
 
 
 

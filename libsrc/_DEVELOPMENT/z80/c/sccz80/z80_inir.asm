@@ -21,8 +21,9 @@ z80_inir:
    push af
 
    ld b,e
-   jp asm_z80_inir
-
+   inir
+   ret
+   
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _z80_inir

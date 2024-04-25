@@ -14,5 +14,5 @@ _z80_otir_callee:
    pop hl
    pop bc
    push af
-   
-  jp asm_z80_otir
+   otir
+   ret

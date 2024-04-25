@@ -17,5 +17,5 @@ _z80_otir:
    push bc
    push hl
    push af
-   
-   jp asm_z80_otir
+   otir
+   ret

@@ -16,8 +16,9 @@ z80_otir_callee:
    ex (sp),hl
 
    ld b,e
-   jp asm_z80_otir
-
+   otir
+   ret
+   
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _z80_otir_callee

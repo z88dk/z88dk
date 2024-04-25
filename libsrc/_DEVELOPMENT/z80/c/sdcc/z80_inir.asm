@@ -17,5 +17,5 @@ _z80_inir:
    push bc
    push hl
    push af
-   
-   jp asm_z80_inir
+   inir
+   ret

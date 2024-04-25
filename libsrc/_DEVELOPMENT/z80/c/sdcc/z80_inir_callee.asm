@@ -14,5 +14,5 @@ _z80_inir_callee:
    pop hl
    pop bc
    push af
-
-   jp asm_z80_inir
+   inir
+   ret

@@ -22,6 +22,13 @@
         defc MSXDOS = 5
     ENDIF
 
+    ; Configures the first entry in bank_mappings to use for the heap
+    ; At some point later autocalculate this based on banks being loaded
+    IFNDEF CLIB_FARHEAP_FIRST
+        defc CLIB_FARHEAP_FIRST = $70
+    ENDIF
+
+
     IF !DEFINED_CRT_DISABLELOADER
         defc CRT_DISABLELOADER = 1
     ENDIF
@@ -107,6 +114,7 @@ l_dcal:
     jp      (hl)
 
 
+
 IF CLIB_FARHEAP_BANKS
     defc __need_msx_bank_mappings = 1
     EXTERN  sbrk_far
@@ -115,7 +123,7 @@ setup_far_heap:
     jp      c,print_message
 
     ld      b,CLIB_FARHEAP_BANKS    ;For -1 this is 0xff
-    ld      c,$7c           ;Start off using bank $7c (we have a dec d in paging to work with named spaces)
+    ld      c,CLIB_FARHEAP_FIRST           ;Start off using bank $7c (we have a dec d in paging to work with named spaces)
 allocate_loop:
     push    bc
     ; Allocate a bank
@@ -136,7 +144,7 @@ allocate_loop:
 
 calc_allocated:
     ld      a,c
-    sub     $7c                 ;Starting bank
+    sub     CLIB_FARHEAP_FIRST  ;Starting bank
 IF CLIB_FARHEAP_BANKS > 0
     cp      CLIB_FARHEAP_BANKS
     ld      de,msg_cantallocate
@@ -145,7 +153,7 @@ ENDIF
     push    af                  ;Save it
     srl     a                   ;/4
     srl     a
-    ld      de,$0020            ;($20 - 1) << 2 == $x7c
+    ld      de,+(((CLIB_FARHEAP_FIRST >> 2) +1) % 256)     ;($20 - 1) << 2 == $x7c
     ld      hl,0
     and     a
     jr      z,handle_residual
