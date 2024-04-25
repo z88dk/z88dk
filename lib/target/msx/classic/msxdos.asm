@@ -64,7 +64,7 @@ ENDIF
     jp      c,crt0_exit
   ENDIF
 
-  IF CLIB_FARHEAP_BANKS > 0
+  IF CLIB_FARHEAP_BANKS
     call    setup_far_heap
     jp      c,crt0_exit
   ENDIF
@@ -107,14 +107,14 @@ l_dcal:
     jp      (hl)
 
 
-IF CLIB_FARHEAP_BANKS > 0
+IF CLIB_FARHEAP_BANKS
     defc __need_msx_bank_mappings = 1
     EXTERN  sbrk_far
 setup_far_heap:
     call    get_ext_bios
     jp      c,print_message
 
-    ld      b,CLIB_FARHEAP_BANKS
+    ld      b,CLIB_FARHEAP_BANKS    ;For -1 this is 0xff
     ld      c,$7c           ;Start off using bank $7c (we have a dec d in paging to work with named spaces)
 allocate_loop:
     push    bc
@@ -122,9 +122,8 @@ allocate_loop:
     ld      b,0             ;Primary mapper
     ld      a,0             ;Allocate user segment
     call    ALL_SEG
-    ld      de,msg_cantallocate
-    jp      c,print_message_pop
     pop     bc
+    jr      c,calc_allocated
     push    bc
     ld      b,0
     ld      hl,bank_mappings + 1
@@ -132,10 +131,20 @@ allocate_loop:
     ld      (hl),a         ;Save mapping
     pop     bc
     inc     c
+    jr      z,calc_allocated    ;Only happens for -1 case
     djnz    allocate_loop
 
-    ; Now we need to sbrk the allocated memory
-    ld      a,+(CLIB_FARHEAP_BANKS/4)
+calc_allocated:
+    ld      a,c
+    sub     $7c                 ;Starting bank
+IF CLIB_FARHEAP_BANKS > 0
+    cp      CLIB_FARHEAP_BANKS
+    ld      de,msg_cantallocate
+    jp      nz,print_message
+ENDIF
+    push    af                  ;Save it
+    srl     a                   ;/4
+    srl     a
     ld      de,$0020            ;($20 - 1) << 2 == $x7c
     ld      hl,0
     and     a
@@ -155,10 +164,10 @@ sbrk_loop:
     pop     bc      ;Loop count
     djnz    sbrk_loop
 handle_residual:
+    pop     af
     ; And any left over pages we can just add mnually
-IF (CLIB_FARHEAP_BANKS % 4) > 0
-    ld      a,+( CLIB_FARHEAP_BANKS % 4)
-    and     a
+IF (CLIB_FARHEAP_BANKS % 4) > 0 || CLIB_FARHEAP_BANKS == -1
+    and     3
     ret     z
     ld      bc,$3fff
     cp      1

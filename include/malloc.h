@@ -163,6 +163,9 @@ extern void __LIB__         sbrk_far(void *__far ptr, size_t sz);
 extern void __LIB__ * __far calloc_far(size_t n, size_t sz);
 extern void __LIB__ * __far realloc_far(void * __far ptr, size_t sz);
 
+extern void __LIB__         mallinfo_far(unsigned long *total, unsigned long *largest);
+
+
 // z88 only
 extern void __LIB__         freeall_far(void);
 
