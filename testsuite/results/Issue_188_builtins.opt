@@ -311,6 +311,7 @@
 	GLOBAL	memopd_callee
 	GLOBAL	strdupf
 	GLOBAL	strlenf
+	GLOBAL	strcasecmpf
 	GLOBAL	strcmpf
 	GLOBAL	strncmpf
 	GLOBAL	strcpyf
@@ -320,9 +321,12 @@
 	GLOBAL	strlwrf
 	GLOBAL	struprf
 	GLOBAL	strchrf
+	GLOBAL	strnchrf
 	GLOBAL	strrchrf
 	GLOBAL	memcpyf
 	GLOBAL	memsetf
+	GLOBAL	memchrf
+	GLOBAL	memcmpf
 	GLOBAL	__builtin_memset
 	GLOBAL	__builtin_memcpy
 	GLOBAL	__builtin_strcpy
