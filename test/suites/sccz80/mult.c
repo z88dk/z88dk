@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
 void test_mult_longlong() 
 {
      long long val1 = 3;
@@ -198,8 +198,8 @@ int suite_mult()
     suite_add_test(test_mult_long);
     suite_add_test(test_mult_unsigned_long);
 
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
     suite_add_test(test_mult_longlong);
     suite_add_test(test_mult_unsigned_longlong);
   #endif

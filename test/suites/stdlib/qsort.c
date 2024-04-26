@@ -1,5 +1,5 @@
 
-#ifndef __8080__
+#ifndef __8080
 
 #include "stdlib_tests.h"
 #include <stdint.h>

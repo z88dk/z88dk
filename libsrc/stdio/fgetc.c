@@ -112,7 +112,7 @@ fgetc_assign_ret:
     push    de
     call    readbyte    ;readbyte sorts out stack (fastcall)
     pop     de          ;get fp back
-  IF __GBZ80__
+  IF __CPU_GBZ80__
     jr      nc,fgetc_assign_ret
   ELSE
 #ifdef __STDIO_BINARY

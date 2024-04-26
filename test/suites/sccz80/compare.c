@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
     #define ENABLE_LLTESTS 1
   #endif
 #endif

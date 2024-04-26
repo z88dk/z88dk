@@ -15,7 +15,7 @@
 
 int ungetc(int c, FILE *fp)
 {
-#ifdef Z80
+#ifdef __SCCZ80
 #asm
     pop     hl      ;ret
     pop     de      ;fp

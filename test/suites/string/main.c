@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     res += test_strrev();
     res += test_strncat();
     res += test_strchr();
-#ifdef Z80
+#ifdef __Z80__
     res += test_strncatf();
     res += test_strcmpf();
     res += test_strcasecmpf();

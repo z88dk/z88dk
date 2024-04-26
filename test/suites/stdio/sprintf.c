@@ -5,7 +5,7 @@
 #include "test.h"
 
 
-#if __RCMX000__ | __GBZ80__ | __8080__
+#if __RCMX000__ | __GBZ80 | __8080
 #pragma output CLIB_OPT_PRINTF=0x40ffffff
 #else
 #pragma output CLIB_OPT_PRINTF=0x7fffffff
@@ -127,7 +127,7 @@ void test_sprintf_long_positive()
        ++test;
     }
 }
-#if __RCMX000__ | __GBZ80__ | __8080__
+#if __RCMX000__ | __GBZ80 | __8080
 #else
 struct sprintf_test double_tests[] = {
     { "%f", "1.234500" },
@@ -182,7 +182,7 @@ int test_scanf()
     suite_add_test(test_sprintf_int);
     suite_add_test(test_sprintf_int_negative);
     suite_add_test(test_sprintf_long_positive);
-#if __RCMX000__ | __GBZ80__ | __8080__
+#if __RCMX000__ | __GBZ80 | __8080
 #else
     suite_add_test(test_sprintf_double);
 #endif

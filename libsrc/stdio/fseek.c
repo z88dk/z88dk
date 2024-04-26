@@ -12,10 +12,7 @@
  */
 
 #define ANSI_STDIO
-
-#ifdef Z80
 #define STDIO_ASM
-#endif
 
 #include <stdio.h>
 #include <fcntl.h>

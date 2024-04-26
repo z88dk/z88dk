@@ -11,7 +11,7 @@ extern int __LIB__ bcmp_callee(const void *b1,const void *b2,size_t len) __small
 #endif
 
 __ZPROTO3(void,,bcopy,const void *,src,void *,dst,size_t,len)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ bcopy_callee(const void *src,void *dst,size_t len) __smallc __z88dk_callee; 
 #define bcopy(a,b,c) bcopy_callee(a,b,c)
 #endif
@@ -42,7 +42,7 @@ extern char __LIB__ *strset_callee(char *s,int c) __smallc __z88dk_callee;
 #endif
 
 __ZPROTO3(char,*,strnset, char *,s,int,c,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strnset_callee(char *s,int c,size_t n) __smallc __z88dk_callee;
 #define strnset(a,b,c) strnset_callee(a,b,c)
 #endif
@@ -61,7 +61,7 @@ extern char __LIB__ *_memlwr__callee(void *p,size_t n) __smallc __z88dk_callee;
 #endif
 
 __ZPROTO3(char,*,_memstrcpy_,void *,p,const char *,s,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *_memstrcpy__callee(void *p,const char *s,size_t n) __smallc __z88dk_callee;
 #define _memstrcpy_(a,b,c) _memstrcpy__callee(a,b,c)
 #endif
@@ -85,26 +85,26 @@ extern void __LIB__ *memccpy_callee(void *dst,const void *src,int c,size_t n) __
 #endif
 
 __ZPROTO3(void,*,memchr,const void *,s,int,c,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memchr_callee(const void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memchr(a,b,c) memchr_callee(a,b,c)
 #endif
 
 
 __ZPROTO3(int,,memcmp,const void *,s1,const void *,s2,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern int __LIB__ memcmp_callee(const void *s1,const void *s2,size_t n) __smallc __z88dk_callee;
 #define memcmp(a,b,c) memcmp_callee(a,b,c)
 #endif
 
 
 __ZPROTO3(void,*,memcpy,void *,dst,const void *,src,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memcpy_callee(void *dst,const void *src,size_t n) __smallc __z88dk_callee;
 #define memcpy(a,b,c) memcpy_callee(a,b,c)
 #endif
 
-#if !__GBZ80__ && !__8080__ && !__8085__
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ *memmem(const void *haystack,size_t haystack_len,const void *needle,size_t needle_len) __smallc;
 #ifndef __STDC_ABI_ONLY
 extern void __LIB__ *memmem_callee(const void *haystack,size_t haystack_len,const void *needle,size_t needle_len) __smallc __z88dk_callee;
@@ -113,20 +113,20 @@ extern void __LIB__ *memmem_callee(const void *haystack,size_t haystack_len,cons
 #endif
 
 __ZPROTO3(void,*,memmove,void *,dst,const void *,src,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memmove_callee(void *dst,const void *src,size_t n) __smallc __z88dk_callee;
 #define memmove(a,b,c) memmove_callee(a,b,c)
 #endif
 
 
 __ZPROTO3(void,*,memrchr,const void *,s,int,c,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memrchr_callee(const void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memrchr(a,b,c) memrchr_callee(a,b,c)
 #endif
 
 __ZPROTO3(void,*,memset,void *,s,int,c,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memset_callee(void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memset(a,b,c) memset_callee(a,b,c)
 #endif
@@ -136,13 +136,13 @@ extern void __LIB__ *memset_callee(void *s,int c,size_t n) __smallc __z88dk_call
  * for INTEL / GBZ80 it is faster than memset().
  */
 __ZPROTO3(void,*,memset_wr,volatile void *,s,int,c,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memset_wr_callee(volatile void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memset_wr(a,b,c) memset_wr_callee(a,b,c)
 #endif
 
 __ZPROTO3(void,*,memswap,void *,s,void *,s2,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern void __LIB__ *memswap_callee(void *s1,void *s2,size_t n) __smallc __z88dk_callee;
 #define memswap(a,b,c) memswap_callee(a,b,c)
 #endif
@@ -155,7 +155,7 @@ extern char __LIB__ *stpcpy_callee(char *dst,const char *src) __smallc __z88dk_c
 
 
 __ZPROTO3(char,*,stpncpy,char *,dst,const char *,src,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *stpncpy_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define stpncpy(a,b,c) stpncpy_callee(a,b,c)
 #endif
@@ -230,13 +230,13 @@ extern int __LIB__ stricmp_callee(const char *s1,const char *s2) __smallc __z88d
 #endif
 
 __ZPROTO3(size_t,,strlcat,char *,dest,const char *,src,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern size_t __LIB__ strlcat_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strlcat(a,b,c) strlcat_callee(a,b,c)
 #endif
 
 __ZPROTO3(size_t,,strlcpy,char *,dest,const char *,src,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern size_t __LIB__ strlcpy_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strlcpy(a,b,c) strlcpy_callee(a,b,c)
 #endif
@@ -257,32 +257,32 @@ extern char __LIB__  *strlwr_fastcall(char *s) __z88dk_fastcall;
 #endif
 
 __ZPROTO3(int,,strncasecmp,const char *,s1,const char *,s2,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern int __LIB__ strncasecmp_callee(const char *s1,const char *s2,size_t n) __smallc __z88dk_callee;
 #define strncasecmp(a,b,c) strncasecmp_callee(a,b,c)
 #endif
 
 __ZPROTO3(int,,strncat,char *,dst,const char *,src,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strncat_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strncat(a,b,c) strncat_callee(a,b,c)
 #endif
 
 __ZPROTO3(char,*,strnchar,const char *,s,size_t,n,int,c)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strnchr_callee(const char *s,size_t n,int c) __smallc __z88dk_callee;
 #define strnchr(a,b,c) strnchr_callee(a,b,c)
 #endif
 
 
 __ZPROTO3(int,,strncmp,const char *,s1, const char *,s2, size_t, n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern int __LIB__ strncmp_callee(const char *s1,const char *s2,size_t n) __smallc __z88dk_callee;
 #define strncmp(a,b,c) strncmp_callee(a,b,c)
 #endif
 
 __ZPROTO3(char,*,strncpy,char *,dest, const char *,src, size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strncpy_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strncpy(a,b,c) strncpy_callee(a,b,c)
 #endif
@@ -379,7 +379,7 @@ extern char __LIB__ *strtok_callee(char *s,const char *delim) __smallc __z88dk_c
 #endif
 
 __ZPROTO3(char,*,strtok_r,char *,s,const char *,delim,char **,last_s)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern char __LIB__ *strtok_r_callee(char *s,const char *delim,char **last_s) __smallc __z88dk_callee;
 #define strtok_r(a,b,c) strtok_r_callee(a,b,c)
 #endif
@@ -392,7 +392,7 @@ extern char __LIB__  *strupr_fastcall(char *s) __z88dk_fastcall;
 
 
 __ZPROTO3(size_t,,strxfrm,char *,dst,const char *,src,size_t,n)
-#if !__GBZ80__ && !defined(__STDC_ABI_ONLY)
+#if !__GBZ80 && !defined(__STDC_ABI_ONLY)
 extern size_t __LIB__ strxfrm_callee(char *dst,const char *src,size_t n) __smallc __z88dk_callee;
 #define strxfrm(a,b,c) strxfrm_callee(a,b,c)
 #endif
@@ -447,7 +447,6 @@ extern void __LIB__ *__far memcpyf(void *__far dst,const void * __far src,size_t
 extern void __LIB__ *__far memsetf(void *__far dst,int c,size_t n) __smallc;
 extern void __LIB__ *__far memchrf(const void *__far s,int c,size_t n) __smallc;
 extern int __LIB__         memcmpf(const void *__far s1,const void *__far s2,size_t n) __smallc;
-
 
 
 #endif

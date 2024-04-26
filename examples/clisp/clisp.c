@@ -424,7 +424,7 @@ char *errmsg_stack_of   = "STACK OVERFLOW";
 char *errmsg_zero_div   = "DIVISION BY ZERO: ";
 char *errmsg_no_memory  = "\nno memory. abort.\n";
 
-#ifdef Z80
+#ifdef __Z80
 #define FASTCALL_MODE __z88dk_fastcall;
 #else
 #define FASTCALL_MODE ;
@@ -471,7 +471,7 @@ long D_GET_DATA(long s) {
         return (s & D_MASK_DATA);
 }
 
-#ifdef Z80
+#ifdef __Z80
 
 #ifdef ZX81_32K
 char buf[] @43440+shift;   /* 43400+(STACK_SIZE*4); */
@@ -648,7 +648,7 @@ init(void)
   for (i = 0; funcs[i].key != NULL; i++) {
     symb_make(funcs[i].key);
     t_symb_ftype[i] = funcs[i].ftype;
-#ifndef Z80
+#ifndef __Z80
     if (i != funcs[i].i){
       printf("Function install error: %s\n", funcs[i].key);
       quit();
@@ -724,7 +724,7 @@ l_read(void)
     token[0] = ch;
 
 // This is a workaround to skip the extra newline character (CR + LF)
-#ifdef Z80
+#ifdef __Z80
     for (i = 0; ; i++){
 #else
     for (i = 1; ; i++){

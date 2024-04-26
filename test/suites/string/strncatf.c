@@ -1,4 +1,4 @@
-#ifdef Z80
+#ifdef __Z80__
 
 
 

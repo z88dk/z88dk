@@ -17,7 +17,7 @@
 
 int fputs_callee(const char *s,FILE *fp)
 {
-//#ifdef Z80
+#ifdef __SCCZ80
 #asm
 
     pop     hl      ;ret
@@ -79,11 +79,9 @@ ENDIF
     ret     z
     jr      loop
 #endasm
-/*
 #else
     while (*s) {
         if ( fputc(*s++,fp) == EOF) return(EOF);
     }
 #endif
-*/
 }
