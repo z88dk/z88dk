@@ -1,4 +1,5 @@
-#ifdef __Z80__
+#ifdef __TESTTARGET__
+#ifdef __Z80
 
 
 
@@ -49,4 +50,5 @@ int test_strncatf()
     return suite_run();
 }
 
+#endif
 #endif

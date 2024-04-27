@@ -1,4 +1,5 @@
-#ifdef __Z80__
+#ifdef __TESTTARGET__
+#ifdef __Z80
 
 #include "string_tests.h"
 
@@ -8,7 +9,7 @@ void strchrf_tests()
 {
    char *haystack = "needle";
 
-   Assert((char *__far)(haystack + 1) == strchrf(haystack,'e'), "Should find at position 1");
+   Assert((char *__far)haystack + 1 == strchrf(haystack,'e'), "Should find at position 1");
    Assert(NULL == strchrf(haystack,'a'), "Should not find");
 }
 
@@ -16,7 +17,7 @@ void strnchrf_tests()
 {
    char *haystack = "needle";
 
-   Assert((char *__far)(haystack + 1) == strnchrf(haystack,5,'e'), "Should find at position 1");
+   Assert((char *__far)haystack + 1 == strnchrf(haystack,5,'e'), "Should find at position 1");
    Assert(NULL == strnchrf(haystack,1,'e'), "Should not find in range");
    Assert(NULL == strnchrf(haystack,5,'a'), "Should not find");
 }
@@ -30,4 +31,5 @@ int test_strchrf()
 
     return suite_run();
 }
+#endif
 #endif

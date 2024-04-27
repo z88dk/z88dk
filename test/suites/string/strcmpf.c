@@ -1,4 +1,5 @@
-#ifdef __Z80__
+#ifdef __TESTTARGET__
+#ifdef __Z80
 
 #include "string_tests.h"
 
@@ -30,4 +31,5 @@ int test_strcmpf()
 
     return suite_run();
 }
+#endif
 #endif

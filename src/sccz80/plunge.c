@@ -543,8 +543,10 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if (lval->val_type == KIND_LONG) {
             // LongConstant +/- lvalue
             widenintegers(lval, lval2);
-            lval2->val_type = KIND_LONG;
-            lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long; 
+            if (!ispointer(lval2->ltype)) {
+                lval2->val_type = KIND_LONG;
+                lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long; 
+            }
             if ( doconst_oper == 0 ) {
                 vlongconst_tostack(lval->const_val); 
             }
@@ -577,7 +579,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         }
         if ( doconst_oper ) {
             lval->is_const = 0;
-            zadd_const(lval, lval->const_val);
+            zadd_const(lval2, lval->const_val);
             result(lval, lval2);
             return;
         }

@@ -434,17 +434,19 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
 
 
 
-    if (lval2->val_type == KIND_LONG) {
+    if (lval2->val_type == KIND_LONG || lval2->val_type == KIND_CPTR) {
         /* Second operator is long */
         if (lval->val_type != KIND_LONG && lval->val_type != KIND_CPTR) {
             zwiden_stack_to_long(lval);
-            if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
+            if ( lval2->val_type == KIND_CPTR) {
+            } else if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
                 lval->ltype = type_ulong;
             } else {
                 lval->ltype = type_long;
             }
             lval->val_type = KIND_LONG;
-        } else {
+
+        } else if ( lval2->val_type == KIND_LONG) {
             if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
                 lval->ltype = type_ulong;
             } else {
@@ -454,14 +456,16 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
         return;
     }
 
-    if (lval->val_type == KIND_LONG) {
+    if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
         if (lval2->val_type != KIND_LONG && lval2->val_type != KIND_CPTR) {
             zconvert_to_long(lval->ltype->isunsigned, lval2->val_type, lval2->ltype->isunsigned);
         }
-        if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
-            lval->ltype = type_ulong;
-        } else {
-            lval->ltype = type_long;
+        if ( lval->val_type == KIND_LONG ) {
+            if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
+                lval->ltype = type_ulong;
+            } else {
+                lval->ltype = type_long;
+            }
         }
         return;
     }
