@@ -8,13 +8,13 @@
 
 
 # Targets that you want to compile for (eg zx, multi8 etc)
-TARGETS = 
+TARGETS ?= 
 
 # Name of the output binary
-APPNAME = 
+APPNAME ?= 
 
 # Source files shared between all z88dk targets (eg $(wildcard *.c) $(wildcard *.asm))
-COMMON_SRCS =  
+COMMON_SRCS ?  
 
 
 
