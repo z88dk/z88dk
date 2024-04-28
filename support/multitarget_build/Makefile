@@ -14,7 +14,7 @@ TARGETS ?=
 APPNAME ?= 
 
 # Source files shared between all z88dk targets (eg $(wildcard *.c) $(wildcard *.asm))
-COMMON_SRCS ?  
+COMMON_SRCS ?=  
 
 
 
