@@ -1,4 +1,4 @@
-; Default set of formatters for printf
+ ; Default set of formatters for printf
 ;
 ; These will be used by default when sdcc pulls in printf
 

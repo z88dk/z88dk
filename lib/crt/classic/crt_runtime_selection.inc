@@ -45,6 +45,7 @@
 ; bit 28 = $10000000 = enable %g
 ; bit 29 = $20000000 = enable %G
 ; bit 30 = $40000000 = enable flags handling
+; bit 31 = $80000000 = enable %S (far string printf)
 
 IF DEFINED_CLIB_OPT_SCANF
 	; User has specified the configuration level - force scanf to be included
@@ -198,6 +199,7 @@ IF NEED_printf
 	EXTERN	__printf_handle_c
 	EXTERN	__printf_handle_n
 	EXTERN	__printf_handle_B
+	EXTERN	__printf_handle_far_s
 	EXTERN	__printf_handle_ll
 	EXTERN	__printf_handle_lld
 	EXTERN	__printf_handle_llu
@@ -270,6 +272,10 @@ ENDIF
 IF CLIB_OPT_PRINTF & $10000000
 	defb	'g'
 	defw	__printf_handle_f
+ENDIF
+IF CLIB_OPT_PRINTF & $80000000
+	defb	'S'
+	defw	__printf_handle_far_s
 ENDIF
 IF CLIB_OPT_PRINTF_2
 	defb	'l'

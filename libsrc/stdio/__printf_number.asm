@@ -10,6 +10,7 @@
     EXTERN  l_div_u
     EXTERN  l_neg
     EXTERN  get_16bit_ap_parameter
+    EXTERN  get_32bit_ap_parameter
 
     EXTERN  __printf_add_offset
     EXTERN  __printf_issccz80
@@ -32,53 +33,13 @@ ELSE
     bit     6,(ix-4)
 ENDIF
     jr      z,printf_number16
-IF __CPU_INTEL__ | __CPU_GBZ80__
-    call    __printf_issccz80
-ELSE
-    bit     0,(ix+6)        ;sccz80 flag
-ENDIF
-    jr      nz,pickuplong_sccz80
-    ; Picking up a long sdcc style
-    ex      de,hl           ;hl=where tp pick up from
-    ld      e,(hl)          ;LSW
-    inc     hl
-    ld      d,(hl)
-    inc     hl
-IF __CPU_GBZ80__
-    ld      a,(hl+)
-ELSE
-    ld      a,(hl)
-    inc     hl
-ENDIF
-    ld      b,(hl)
-    inc     hl
-    push    hl              ; save ap
-    ld      h,b
-    ld      l,a
-    ex      de,hl           ;dehl=long, c: 1=signed, 0=unsigned
+    call    get_32bit_ap_parameter
 printlong:
-    ld      a,c
-    jp      miniprintn
-pickuplong_sccz80:
-    ex      de,hl
-    ld      e,(hl)          ;MSW
-    inc     hl
-    ld      d,(hl)
-    dec     hl
-    dec     hl
-    ld      b,(hl)          ;LSW
-    dec     hl
-IF __CPU_GBZ80__
-    ld      a,(hl-)
-ELSE
-    ld      a,(hl)
-    dec     hl
-ENDIF
-    dec     hl
-    push    hl              ;Save ap for next time
-    ld      h,b
+    push    hl              ; save ap
     ld      l,a
-    jr      printlong
+    ld      h,b
+    jr      miniprintn   ;dehl=long, c: 1=signed, 0=unsigned
+
 
 printf_number16:
     call    get_16bit_ap_parameter  ;de = new ap, hl = number to print
@@ -87,8 +48,6 @@ printf_number16:
     ld      a,c             ;signed?
     and     a
     call    nz,l_int2long_s ;extend it out
-    jr      printlong
-
 
 ; Entry:        a = flag (0=unsigned, 1 = signed)
 ;               dehl =  number

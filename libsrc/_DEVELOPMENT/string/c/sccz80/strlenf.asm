@@ -28,6 +28,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     push    de
     push    bc
     push    hl
+    push    ix
     call    __far_start
     ex      af,af'  ; save seg 1 binding
     ld      ix,0    ; our counter
@@ -44,5 +45,6 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     call    __far_end
     push    ix
     pop     hl      ; HL=length
+    pop     ix
     ret
 ENDIF
