@@ -334,7 +334,7 @@ IF ((startup=13)|(startup=15))
 nobrkk:
 
 ELSE
-IF (startup=14)
+IF ((startup=14)|(startup=16))
         SCF
 ENDIF
         nop
@@ -357,26 +357,20 @@ IF ((startup=13)|(startup=15))
 nobrkk2:
 ENDIF
 
-
-
-; ^^^    <-   3 frames (dark gray) + 1 frame (light gray)
-;    -
-
-
 IF (startup=17)
 	ld	hl,gcount
 	dec	(hl)
 	ld	a,(hl)
-
-	jp	nz,Display_pic1
-	ld	(hl),4
-
-
-Display_pic2:
+	dec	a
+	jp	z,Display_pic1
+	dec	a
+	jp	z,Display_pic2
+	ld	(hl),3
+Display_pic1:
 ;	ex af,af
 	ld a,$20
 	jp	page_set
-Display_pic1:
+Display_pic2:
 ;	ex af,af
 	ld a,$28
 
@@ -425,7 +419,7 @@ IF (startup=17)
 		PUBLIC	graybit1
 		PUBLIC	graybit2
 gcount:
-		defb	4
+		defb	3
 graybit1:
 		defw	0
 graybit2:
