@@ -29,7 +29,7 @@ option_t newbrain_options[] = {
 };
 
 
-int newbrain_exec()
+int newbrain_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
     FILE    *fpin, *fpout, *fpout2;

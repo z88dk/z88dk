@@ -140,7 +140,7 @@ static void execute_command(char *target, int argc, char **argv, int chainmode)
                 }
             }
             
-            if ( machines[i].exec(target, machines[i].ident) == -1 ) {
+            if ( machines[i].exec(target) == -1 ) {
                 option_print(machines[i].execname, machines[i].ident,machines[i].copyright, machines[i].desc, machines[i].longdesc, machines[i].options);
                 exit(1);
             }

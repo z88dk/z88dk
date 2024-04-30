@@ -298,7 +298,7 @@ static int findfield_flex( unsigned char prefix_byte, const unsigned char* buffe
     return 1;
 }
 
-static int search_for_branch_start()
+static int search_for_branch_start(void)
 {
     char filename[256];
     char line[2048];

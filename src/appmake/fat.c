@@ -83,7 +83,7 @@ static struct formats {
     { NULL, NULL }
 };
 
-static void dump_formats()
+static void dump_formats(void)
 {
     struct formats* f = &formats[0];
 

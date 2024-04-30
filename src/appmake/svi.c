@@ -27,7 +27,7 @@ static unsigned char              h_lvl;
 static unsigned char              l_lvl;
 
 
-static int	create_disk();
+static int	create_disk(void);
 
 /* Options that are available for this module */
 option_t svi_options[] = {
@@ -316,7 +316,7 @@ int svi_exec(char* target)
 
 static uint8_t    sectorbuf[256];
 
-static int create_disk()
+static int create_disk(void)
 {
     char    disc_name[FILENAME_MAX+1];
     char    bootname[FILENAME_MAX+1];
