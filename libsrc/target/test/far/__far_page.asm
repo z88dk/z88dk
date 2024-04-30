@@ -27,12 +27,8 @@ __far_page:
     ld      h,a
     ld      l,c
     ; hl = offset within bank
-    push    hl
-    push    de
     ld      a,d
     out     ($fe),a
-    pop     de
-    pop     hl
     ret
 
 localfar:

@@ -1,7 +1,7 @@
 #ifdef __TESTTARGET__
 #ifdef __Z80
 
-#include "string_tests.h"
+#include "far_tests.h"
 
 
 
