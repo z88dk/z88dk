@@ -182,7 +182,7 @@ IF (startup>100)
 ELSE
 
 IF (startup>=2)
- IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
+ IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=20)|(startup=23)|(startup=25))
         ld	a,1
         ld      (hrgbrkflag),a
  ENDIF
@@ -268,7 +268,7 @@ IF (startup>100)
     ENDIF
 ELSE
 IF (startup>=2)
- IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
+ IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=20)|(startup=23)|(startup=25))
         xor	a
         ld      (hrgbrkflag),a
  ELSE
@@ -345,7 +345,7 @@ ELSE
 ;-------------------------------------------------
 
     IF (startup>=3)
-	IF ((startup<=7)|(startup>=23))
+	IF ((startup<=7)|(startup=20)|(startup>=23))
             INCLUDE "target/zx81/classic/zx81_hrg.asm"
         ENDIF
     ENDIF
@@ -486,10 +486,14 @@ IF (startup>=3)
 text_rows:
 hr_rows:
 _hr_rows:
-  IF ((startup=5)|(startup=6)|(startup=7)|(startup=15)|(startup=16)|(startup=17)|(startup=25)|(startup=26)|(startup=27))
-		defw	8	; Current number of text rows in graphics mode
+  IF (startup=20)
+		defw	48	; Current number of text rows in graphics mode
   ELSE
+    IF ((startup=5)|(startup=6)|(startup=7)|(startup=15)|(startup=16)|(startup=17)|(startup=25)|(startup=26)|(startup=27))
+		defw	8	; Current number of text rows in graphics mode
+    ELSE
 		defw	24	; Current number of text rows in graphics mode
+    ENDIF
   ENDIF
  ENDIF
 ENDIF
