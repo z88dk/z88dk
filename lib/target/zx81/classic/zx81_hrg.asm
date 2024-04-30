@@ -29,6 +29,8 @@ PUBLIC	zx_slow
 PUBLIC	_zx_slow
 
 
+; Normal raster or grayscale display
+
 IF (((startup>=5)&(startup<13))|(startup>=25))
  IF ((startup=7)|(startup=27))
   IF DEFINED_MEM8K
@@ -66,7 +68,8 @@ ELSE
     DEFC  WHOLEMEM    = 6144+128   ; size of graphics map in 256x192 mode
 ENDIF
 
-IF ((startup=3)|(startup=5)|(startup=23)|(startup=25))
+
+IF ((startup=3)|(startup=5)|(startup=23)|(startup=20)|(startup=25))
 hrgbrkflag:
         defb    0
 ENDIF
@@ -116,10 +119,14 @@ IF !DEFINED_hrgpage
         or      l
         call    z,HRG_Interface_BaseRamtop	; if zero, make space and adjust ramtop for 16K
 ENDIF
-IF ((startup=7)|(startup=27))
+IF ((startup=7)|(startup=27)|(startup=20))
         ld      hl,(base_graphics)
         ld      (graybit1),hl
+IF (startup=20)
+	ld	de,6144
+ELSE
 	ld	de,2048
+ENDIF
 	add	hl,de
 	ld	(graybit2),hl
         ld	(current_graphics),hl
@@ -213,7 +220,11 @@ IF (startup>=23)		; CHROMA_81
 
 ELSE					; WRX
 
+IF (startup=20)
+        ld      b,5
+ELSE
         ld      b,6             ; delay sets the left edge of the screen
+ENDIF
 HRG_wait_left:
         djnz    HRG_wait_left   ; delay loop
         
@@ -225,7 +236,7 @@ HRG_wait_left:
 
 ENDIF
 		
-IF ((startup=7)|(startup=27))
+IF ((startup=7)|(startup=27)|(startup=20))
         ld      hl,(current_graphics)
 ELSE
         ld      hl,(base_graphics)
@@ -241,7 +252,11 @@ IF (startup>=23)		; CHROMA_81
 
 ELSE					; WRX
 
+IF (startup=20)
+        ld      de,34
+ELSE
         ld      de,32           ; 32 bytes offset is added to HL for next hline
+ENDIF
 IF (((startup>=5)&(startup<13))|(startup>=25))
         ld      b,64            ; 64 lines per hires screen
 ELSE
@@ -297,7 +312,7 @@ pointedbyix:
 
         call    $0220          ; first PUSH register, then do VSYNC and get KEYBD
 
-IF ((startup=3)|(startup=5))
+IF ((startup=3)|(startup=5)|(startup=20))
         ;call    $0F46          ; check break (space) key
         LD      A,$7F           ; read port $7FFE - keys B,N,M,.,SPACE.
         IN      A,($FE)         ;
@@ -312,7 +327,7 @@ ENDIF
 
         pop     ix
 
-IF ((startup=3)|(startup=5))
+IF ((startup=3)|(startup=5)|(startup=20))
 		jp		c,nobrkk2
         ld      a,$1e           ; the I register is restored with the MSB address
         ld      i,a             ; of the ROM pattern table in case of BREAK key down
@@ -323,6 +338,23 @@ ENDIF
         ld    hl,($4034)        ; FRAMES, used also by clock handler
         dec   hl
         ld    ($4034),hl
+
+IF (startup=20)
+	ld	hl,gcount
+	dec	(hl)
+	ld	a,(hl)
+	and	a
+	jp	z,Display_pic2
+Display_pic1:
+	ld	hl,(graybit1)
+	jp	setpage
+Display_pic2:
+	ld	(hl),2
+	ld	hl,(graybit2)
+setpage:
+	ld	(current_graphics),hl
+ENDIF
+
 
 IF ((startup=7)|(startup=27))
 	ld	hl,gcount
@@ -350,11 +382,15 @@ HRG_handler_patch:
 ;  Variables for grayscale graphics
 ;----------------------------------------------------------------
 
-IF ((startup=7)|(startup=27))
+IF ((startup=7)|(startup=27)|(startup=20))
 		PUBLIC	graybit1
 		PUBLIC	graybit2
 gcount:
+IF (startup=20)
+		defb	2
+ELSE
 		defb	3
+ENDIF
 current_graphics:
 		defw	0
 graybit1:
@@ -368,7 +404,7 @@ ENDIF
 ; This is a dummy-line used for HRG output
 ;
 ;----------------------------------------------------------------
-IF (startup<13)
+IF ((startup<13)|(startup=20))
 
 HRG_LineStart:
         ld      r,a             ; load LSB to R register which is RFSH address LSB
@@ -380,6 +416,9 @@ HRG_LineStart:
         defb    0, 0, 0, 0
         defb    0, 0, 0, 0
         defb    0, 0, 0, 0
+IF (startup=20)
+        defb    0, 0
+ENDIF
         ret     nz              ; always returns because Z flag=0
 
 ELSE		; CHROMA_81
@@ -731,6 +770,11 @@ ENDIF
 
 
 IF !DEFINED_hrgpage
+
+; Stop building a program with 12K display memory
+; if the display page location hasn't been defined
+ASSERT (startup!=20)
+
 ;--------------------------------------------------------------
 ;
 ; HRG_Interface_BaseRamtop
@@ -742,6 +786,7 @@ IF !DEFINED_hrgpage
 ; HRG base is set to the location over RAMTOP
 ;
 ;--------------------------------------------------------------
+
 HRG_Interface_BaseRamtop:
 
         ld      hl,(RAMTOP)
