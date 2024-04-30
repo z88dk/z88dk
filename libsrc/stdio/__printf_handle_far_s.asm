@@ -54,6 +54,7 @@ use_strlen:
     pop     de          ;length
     call    __far_start
     push    af
+    ex      af,af
     call    __printf_print_aligned
     pop     af
     call    __far_end

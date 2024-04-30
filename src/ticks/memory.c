@@ -352,8 +352,6 @@ static void msx_init(void)
 {
     int  i;
 
-    printf("Setting up MSX memory]\n");
-
     for ( i = 0; i < 256; i++ ) {
         msx_banks[i] = calloc(16384,1);
     }

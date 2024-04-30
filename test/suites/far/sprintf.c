@@ -20,7 +20,22 @@ struct sprintf_test {
     { NULL, NULL }
 };
 
-void test_sprintf_s()
+void test_sprintf_near_string()
+{
+    char    buf[100];
+    struct sprintf_test *test = &stests[0];
+    char   *teststr = "HelloWorld";
+
+    while ( test->pattern != NULL ) {
+       sprintf(buf,test->pattern, (char *__far)teststr);
+       printf("Testing <%s> expect <%s> got <%s>\n",test->pattern, test->result,buf);
+       Assert(strcmp(buf, test->result) == 0, "Result didn't match");
+       ++test;
+    }
+}
+
+
+void test_sprintf_far_string()
 {
     char    buf[100];
     struct sprintf_test *test = &stests[0];
@@ -54,7 +69,8 @@ int test_sprintf()
 {
     suite_setup("Sprintf (far) Tests");
 
-    suite_add_test(test_sprintf_s);
+    suite_add_test(test_sprintf_near_string);
+    suite_add_test(test_sprintf_far_string);
     suite_add_test(test_sprintff_s);
 
     return suite_run();

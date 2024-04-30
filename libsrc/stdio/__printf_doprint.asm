@@ -22,6 +22,9 @@ IF __CPU_Z80__
     push    bc
     push    de
     exx
+    ex      af,af
+    push    af
+    ex      af,af
 ENDIF
     inc     (ix-2)          ;increment characters written
     jr      nz,no_inc
@@ -47,6 +50,9 @@ ENDIF
     jp      (hl)
 doprint_return:
 IF __CPU_Z80__
+    ex      af,af
+    pop     af
+    ex      af,af
     exx
     pop     de
     pop     bc
