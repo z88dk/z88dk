@@ -315,6 +315,9 @@
 	GLOBAL	snprintf
 	GLOBAL	vfprintf
 	GLOBAL	vsnprintf
+	GLOBAL	sprintff
+	GLOBAL	snprintff
+	GLOBAL	vsnprintff
 	GLOBAL	printn
 	GLOBAL	scanf
 	GLOBAL	fscanf
