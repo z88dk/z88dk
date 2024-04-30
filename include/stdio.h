@@ -282,6 +282,16 @@ extern int __LIB__ vsnprintf(char *str, size_t n,const char *fmt,void *ap);
 #define vprintf(ctl,arg) vfprintf(stdout,ctl,arg)
 #define vsprintf(buf,ctl,arg) vsnprintf(buf,65535,ctl,arg)
 
+
+// Some far variants of functions
+#ifdef __SCCZ80
+extern int __LIB__ sprintff(char *__far s,const char *fmt,...) __vasmallc;
+extern int __LIB__ snprintff(char *__far s,size_t n,const char *fmt,...) __vasmallc;
+extern int __LIB__ vsnprintff(char *__far str, size_t n,const char *fmt,void *ap);
+#define vsprintff(buf,ctl,arg) vsnprintff(buf,65535,ctl,arg)
+
+#endif
+
 /* Routines used by the old printf - will be removed soon */
 extern void __LIB__ printn(int number, int radix,FILE *file) __smallc;
 
