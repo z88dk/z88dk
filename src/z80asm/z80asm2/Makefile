@@ -33,7 +33,7 @@ RE2C		= re2c -W --tags --no-debug-info --no-generation-date
 
 OPT 		= -O3
 COMMON_FLAGS = -MMD -Wall -ggdb $(OPT) \
-			-I. -I../../common -I../../../ext/uthash/include
+			-I. -I../../common -I../../../ext/uthash/src
 CFLAGS 		+= -std=gnu11 $(COMMON_FLAGS)
 CXX_FLAGS	+= -std=gnu++17 -Wextra -Werror -pedantic-errors $(COMMON_FLAGS)
 
