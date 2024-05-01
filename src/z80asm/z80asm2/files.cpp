@@ -7,6 +7,9 @@
 #include "common.h"
 #include "files.h"
 #include "utils.h"
+#include <exception>
+#include <string>
+#include <vector>
 using namespace std;
 
 #if __has_include(<filesystem>)
@@ -21,7 +24,17 @@ namespace fs = boost::filesystem;
 
 //-----------------------------------------------------------------------------
 
-string search_path(const string& filename, const vector<string>& path) {
+static string norm_path(string filename) {
+    size_t p = 0;
+    while ((p = filename.find("\\")) != string::npos)
+        filename[p] = '/';
+    while ((p = filename.find("//")) != string::npos)
+        filename.replace(p, 2, "/");
+    return filename;
+}
+
+string search_path(const string& filename_, const vector<string>& path) {
+    string filename = norm_path(filename_);
     fs::path file_path{ filename };
 
     // if path is empty, return filename as-is
@@ -44,45 +57,52 @@ string search_path(const string& filename, const vector<string>& path) {
     return file_path.generic_string();
 }
 
-string file_basename(const string& filename) {
+string file_basename(const string& filename_) {
+    string filename = norm_path(filename_);
     return fs::path(filename).stem().generic_string();
 }
 
-string file_replace_extension(const string& filename, const string& extension) {
+string file_replace_extension(const string& filename_, const string& extension) {
+    string filename = norm_path(filename_);
     fs::path file_path{ filename };
     file_path.replace_extension(extension);
     return file_path.generic_string();
 }
 
 string file_prepend_output_dir(const string& filename_) {
-    string filename = fs::path(filename_).generic_string();     // convert backslashes
+    string filename = norm_path(filename_);
     if (g_output_dir.empty())
         return filename;
-    else if (filename.substr(0, g_output_dir.size() + 1) == g_output_dir + "/") {
-        // #2260: may be called with an object file already with the path prepended; do not add it twice
-        return filename;
-    }
     else {
-        // NOTE: concatenation (/) of a relative fs::path and an
-        // absolute fs::path discards the first one! Do our magic
-        // with strings instead.
-        // is it a win32 absolute path?
-        string file;
-        if (isalpha(filename[0]) && filename[1] == ':') {	// C:
-            file += g_output_dir + "/";
-            file += string(1, filename[0]) + "/";
-            file += string(filename.substr(2));
+        string output_dir = norm_path(g_output_dir);
+        if (!output_dir.empty() && output_dir.back() == '/')
+            output_dir.pop_back();
+        if (filename.substr(0, output_dir.size() + 1) == output_dir + "/") {
+            // #2260: may be called with an object file already with the path prepended; do not add it twice
+            return filename;
         }
         else {
-            file += g_output_dir + "/";
-            file += filename;
+            // NOTE: concatenation (/) of a relative fs::path and an
+            // absolute fs::path discards the first one! Do our magic
+            // with strings instead.
+            // is it a win32 absolute path?
+            string file;
+            if (isalpha(filename[0]) && filename[1] == ':') {	// C:
+                file += output_dir + "/";
+                file += string(1, filename[0]) + "/";
+                file += string(filename.substr(2));
+            }
+            else {
+                file += output_dir + "/";
+                file += filename;
+            }
+            return norm_path(file);
         }
-        fs::path path{ file };
-        return path.generic_string();
     }
 }
 
-string file_parent_dir(const string& filename) {
+string file_parent_dir(const string& filename_) {
+    string filename = norm_path(filename_);
     string parent_dir = fs::path(filename).parent_path().generic_string();
     if (parent_dir.empty())
         return ".";
@@ -101,8 +121,16 @@ bool file_is_directory(const string& filename) {
 bool file_create_directories(const string& dirname) {
     if (file_is_directory(dirname))
         return true;
-    else
-        return fs::create_directories(dirname);
+    else {
+        bool ok = true;
+        try {
+            fs::create_directories(dirname);
+        }
+        catch (exception&) {
+            ok = false;
+        }
+        return ok;
+    }
 }
 
 string file_asm_filename(const string& filename) {
@@ -126,7 +154,8 @@ string file_def_filename(const string& filename) {
 // -oFILE generates single binary FILE
 // -oFILE.EXT generates single binary file FILE.EXT
 // section outputs are always FILE_CODE.bin
-string file_bin_filename(const string& filename, const string& section) {
+string file_bin_filename(const string& filename_, const string& section) {
+    string filename = norm_path(filename_);
     fs::path file_path, file_ext;
 
     if (g_bin_filename.empty()) {

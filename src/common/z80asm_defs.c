@@ -66,8 +66,8 @@ static int by_str(const cpu_lookup_t* a, const cpu_lookup_t* b) {
 }
 
 static cpu_lookup_t* cpu_id_to_lookup(cpu_t id) {
-    int i = (int)id - 1;
-    if (i >= 0 && i < NUM_ELEMS(cpu_lut))
+    size_t i = (size_t)id - 1;
+    if (i < NUM_ELEMS(cpu_lut))
         return &cpu_lut[i];
     else
         return NULL;
@@ -224,7 +224,7 @@ const char* sym_scope_str_long(sym_scope_t type) {
 
 // convert object file old-style letter code to sym_scope_t
 sym_scope_t sym_scope_ofile_code(int code) {
-    for (int i = 0; i < NUM_ELEMS(sym_scope_lu); i++) {
+    for (size_t i = 0; i < NUM_ELEMS(sym_scope_lu); i++) {
         if (sym_scope_lu[i].code == code)
             return (sym_scope_t)i;
     }

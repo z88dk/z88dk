@@ -281,7 +281,29 @@ void test_file_prepend_output_dir() {
     IS(file_prepend_output_dir("x.o"), "/obj/x.o");
     IS(file_prepend_output_dir("/obj/x.o"), "/obj/x.o");
 
+    g_output_dir = "/obj/";
+    IS(file_prepend_output_dir(""), "/obj/");
+    IS(file_prepend_output_dir("x"), "/obj/x");
+    IS(file_prepend_output_dir("x.o"), "/obj/x.o");
+    IS(file_prepend_output_dir("dir/x.o"), "/obj/dir/x.o");
+    IS(file_prepend_output_dir("/dir/x.o"), "/obj/dir/x.o");
+    IS(file_prepend_output_dir("\\dir\\x.o"), "/obj/dir/x.o");
+    IS(file_prepend_output_dir("c:\\dir\\x.o"), "/obj/c/dir/x.o");
+
+    // #2260: may be called with an object file already with the path prepended; do not add it twice
+    IS(file_prepend_output_dir("x.o"), "/obj/x.o");
+    IS(file_prepend_output_dir("/obj/x.o"), "/obj/x.o");
+
     g_output_dir = "c:\\obj";
+    IS(file_prepend_output_dir(""), "c:/obj/");
+    IS(file_prepend_output_dir("x"), "c:/obj/x");
+    IS(file_prepend_output_dir("x.o"), "c:/obj/x.o");
+    IS(file_prepend_output_dir("dir/x.o"), "c:/obj/dir/x.o");
+    IS(file_prepend_output_dir("/dir/x.o"), "c:/obj/dir/x.o");
+    IS(file_prepend_output_dir("\\dir\\x.o"), "c:/obj/dir/x.o");
+    IS(file_prepend_output_dir("c:\\dir\\x.o"), "c:/obj/c/dir/x.o");
+
+    g_output_dir = "c:\\obj\\";
     IS(file_prepend_output_dir(""), "c:/obj/");
     IS(file_prepend_output_dir("x"), "c:/obj/x");
     IS(file_prepend_output_dir("x.o"), "c:/obj/x.o");
@@ -344,13 +366,7 @@ void test_file_create_directories() {
     fs::remove_all("test.x");
 
     test_spew("test.x", "");
-    try {
-        file_create_directories("test.x");
-        FAIL();
-    }
-    catch (exception&) {
-        PASS();
-    }
+    NOK(file_create_directories("test.x"));
     remove("test.x");
 }
 

@@ -99,6 +99,15 @@ string str_remove_all_blanks(const string& str) {
     return out;
 }
 
+string str_replace_all(string text, const string& find, const string& replace) {
+    size_t p = 0;
+    while ((p = text.find(find, p)) != string::npos) {
+        text.replace(p, find.length(), replace);
+        p += replace.length();
+    }
+    return text;
+}
+
 //-----------------------------------------------------------------------------
 
 istream& safe_getline(istream& is, string& t) {

@@ -32,10 +32,10 @@ INSTALL 	?= install
 RE2C		= re2c -W --tags --no-debug-info --no-generation-date 
 
 OPT 		= -O3
-COMMON_FLAGS = -MMD -Wall -ggdb -Wextra -Werror -pedantic-errors $(OPT) \
-			-I. -I../../common
+COMMON_FLAGS = -MMD -Wall -ggdb $(OPT) \
+			-I. -I../../common -I../../../ext/uthash/include
 CFLAGS 		+= -std=gnu11 $(COMMON_FLAGS)
-CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS)
+CXX_FLAGS	+= -std=gnu++17 -Wextra -Werror -pedantic-errors $(COMMON_FLAGS)
 
 # link boost::filesystem if needed
 LDFLAGS 	+= $(shell perl ../tools/build_ldflags.pl $(CXX) $(CROSS)) 
