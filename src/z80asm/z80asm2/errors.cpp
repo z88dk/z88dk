@@ -56,8 +56,16 @@ void Errors::set_expanded_line(const string& line) {
     expanded_line_ = line;
 }
 
+const Location& Errors::location() const {
+    return location_;
+}
+
+void Errors::set_location(const Location& location) {
+    location_ = location;
+}
+
 void Errors::clear_location() {
-    HasLocation::clear();
+    location_.clear();
     source_line_.clear();
     expanded_line_.clear();
 }

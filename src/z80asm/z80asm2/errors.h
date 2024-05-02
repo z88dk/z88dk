@@ -23,7 +23,7 @@ enum ErrCode {
 };
 
 // output error messages
-class Errors : public HasLocation {
+class Errors {
 public:
     void clear();
     void set_output(ostream& os);
@@ -34,6 +34,8 @@ public:
     void warning(ErrCode err_code, int argument);
     void set_source_line(const string& line);
     void set_expanded_line(const string& line);
+    const Location& location() const;
+    void set_location(const Location& location);
     void clear_location();
     string source_line();
     string expanded_line();
@@ -43,6 +45,7 @@ private:
     int count_{ 0 };                // count errors
     string source_line_;            // input line where error detected
     string expanded_line_;          // input line after macro processing
+    Location location_;             // error location
 
     string error_prefix();
     string error_suffix();
