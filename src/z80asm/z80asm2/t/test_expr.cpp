@@ -59,10 +59,9 @@ void test_error_expr_result() {
 //-----------------------------------------------------------------------------
 
 void test_empty_expr() {
-    Assembler assembler;
     ostringstream oss;
     g_errors.set_output(oss);
-    Expr expr(assembler);
+    Expr expr;
 
     IS(oss.str(), "");
     IS(expr.text(), "0");

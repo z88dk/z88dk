@@ -14,13 +14,12 @@
 #include <object.h>
 using namespace std;
 
-class Assembler;
 class Expr;
 
 // parse source
 class Parser {
 public:
-    Parser(Assembler& assembler);
+    Parser();
     virtual ~Parser();
     Parser(const Parser& other) = delete;
     Parser& operator=(const Parser& other) = delete;
@@ -31,7 +30,6 @@ private:
     enum State { ST_MAIN };
 
     State state_{ ST_MAIN };        // state of parser
-    Assembler* assembler_;          // assembler instance
     int start_error_count_{ 0 };    // errors found before parse
     SourceReader source_reader_;    // source file reader
     Lexer lexer_;                   // scanner

@@ -13,8 +13,7 @@ using namespace std;
 
 #include "cpu/parse_code.h"
 
-Parser::Parser(Assembler& assembler)
-    : assembler_(&assembler) {
+Parser::Parser() {
 }
 
 Parser::~Parser() {
@@ -61,7 +60,7 @@ void Parser::parse_main() {
         }
         if (lexer_.at_end())
             break;
-        assembler_->add_asmpc_instr();
+        g_asm.add_asmpc_instr();
         if (!parse_directive() && !parse_opcode())
             error(ErrSyntax);
     }
@@ -72,14 +71,14 @@ void Parser::parse_label() {
     if (lexer_.peek(0).code() == TK_IDENT &&
         lexer_.peek(1).code() == TK_COLON &&
         lexer_.peek(2).keyword() != KW_EQU) {
-        assembler_->add_label(lexer_.peek(0).svalue());
+        g_asm.add_label(lexer_.peek(0).svalue());
         lexer_.next(2);
     }
     // .label
     else if (lexer_.peek(0).code() == TK_DOT &&
         lexer_.peek(1).code() == TK_IDENT &&
         lexer_.peek(2).keyword() != KW_EQU) {
-        assembler_->add_label(lexer_.peek(1).svalue());
+        g_asm.add_label(lexer_.peek(1).svalue());
         lexer_.next(2);
     }
 }
@@ -159,7 +158,7 @@ bool Parser::match_eos() {
 }
 
 bool Parser::parse_expr() {
-    Expr expr(*assembler_);
+    Expr expr;
     if (expr.parse_expr(&lexer_)) {
         exprs_.push_back(&expr);
         return true;
@@ -212,20 +211,20 @@ void Parser::error_int_range(int value) {
 }
 
 Instr* Parser::add_opcode(int opcode) {
-    return assembler_->add_instr(opcode);
+    return g_asm.add_instr(opcode);
 }
 
 Instr* Parser::add_opcode(int opcode, range_t range, int delta) {
     xassert(!exprs_.empty());
 
-    Instr* instr = assembler_->add_instr(opcode);
+    Instr* instr = g_asm.add_instr(opcode);
 
     Expr* expr = exprs_.front();
     exprs_.pop_front();
 
     // add delta if asked
     if (delta != 0) {
-        Expr* expr1 = new Expr(*assembler_, "+(" + expr->text() + ")+" + to_string(delta));
+        Expr* expr1 = new Expr("+(" + expr->text() + ")+" + to_string(delta));
         delete expr;
         expr = expr1;
     }
@@ -327,8 +326,8 @@ Instr* Parser::add_opcode_jre(int opcode) {
 }
 
 Instr* Parser::add_call_function(const string& name) {
-    assembler_->declare_extern(name);
-    Expr* expr = new Expr(*assembler_, name);
+    g_asm.declare_extern(name);
+    Expr* expr = new Expr(name);
     exprs_.push_front(expr);
     Instr* instr = add_opcode_nn(Z80_CALL);
     return instr;
@@ -364,9 +363,9 @@ void Parser::add_restart(int arg) {
 }
 
 Symbol* Parser::add_label(const string& name) {
-    return assembler_->add_label(name);
+    return g_asm.add_label(name);
 }
 
 string Parser::autolabel() {
-    return assembler_->autolabel();
+    return g_asm.autolabel();
 }

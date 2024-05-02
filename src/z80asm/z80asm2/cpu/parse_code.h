@@ -188133,7 +188133,7 @@ break;
 case CPU_EZ80: case CPU_EZ80_Z80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode(0xF5);
 add_opcode(0x7C);
@@ -188147,7 +188147,7 @@ break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: 
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode(0xF5);
 add_opcode(0x7C);
@@ -188171,7 +188171,7 @@ break;
 case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80N: 
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode(0xF5);
 add_opcode(0xDD7C);
@@ -188185,7 +188185,7 @@ break;
 case CPU_KC160: case CPU_KC160_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode(0xF5);
 add_opcode(0xE5);
@@ -188215,7 +188215,7 @@ break;
 case CPU_KC160: case CPU_KC160_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: 
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode(0xF5);
 add_opcode(0xE5);
@@ -188235,7 +188235,7 @@ break;
 case CPU_EZ80: case CPU_EZ80_Z80: case CPU_R800: case CPU_Z80N: 
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode(0xF5);
 add_opcode(0xFD7C);
@@ -188320,7 +188320,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x30);
 add_opcode_nn(0xCD);
@@ -188351,7 +188351,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x20);
 add_opcode_nn(0xCD);
@@ -188382,7 +188382,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x38);
 add_opcode_nn(0xCD);
@@ -188402,7 +188402,7 @@ case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -188414,7 +188414,7 @@ case CPU_EZ80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -188426,7 +188426,7 @@ case CPU_8080: case CPU_8085:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_nn(0xCA);
 add_opcode_nn(0xDA);
@@ -188447,10 +188447,10 @@ case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_jr(0x30);
@@ -188463,10 +188463,10 @@ case CPU_EZ80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_jr(0x30);
@@ -188479,10 +188479,10 @@ case CPU_8080: case CPU_8085:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xCA);
 add_opcode_nn(0xD2);
@@ -188504,7 +188504,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xE2);
 add_opcode_nn(0xCD);
@@ -188524,7 +188524,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xEA);
 add_opcode_nn(0xCD);
@@ -188552,7 +188552,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xF2);
 add_opcode_nn(0xCD);
@@ -188583,7 +188583,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_nn(0xCD);
@@ -188611,7 +188611,7 @@ case CPU_R2KA: case CPU_R3K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xEA);
 add_opcode_nn(0xCD);
@@ -188638,7 +188638,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xFA);
 add_opcode_nn(0xCD);
@@ -188666,7 +188666,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xE2);
 add_opcode_nn(0xCD);
@@ -188694,7 +188694,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xEA);
 add_opcode_nn(0xCD);
@@ -188722,7 +188722,7 @@ case CPU_R2KA: case CPU_R3K:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xE2);
 add_opcode_nn(0xCD);
@@ -188794,7 +188794,7 @@ case CPU_EZ80_Z80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -188807,7 +188807,7 @@ case CPU_EZ80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -188827,10 +188827,10 @@ case CPU_EZ80_Z80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_jr(0x30);
@@ -188844,10 +188844,10 @@ case CPU_EZ80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_jr(0x30);
@@ -189027,7 +189027,7 @@ case CPU_EZ80_Z80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -189040,7 +189040,7 @@ case CPU_EZ80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -189060,10 +189060,10 @@ case CPU_EZ80_Z80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_jr(0x30);
@@ -189077,10 +189077,10 @@ case CPU_EZ80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_jr(0x30);
@@ -189245,7 +189245,7 @@ case CPU_EZ80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -189265,10 +189265,10 @@ case CPU_EZ80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_jr(0x30);
@@ -189403,7 +189403,7 @@ case CPU_EZ80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -189423,10 +189423,10 @@ case CPU_EZ80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_jr(0x30);
@@ -189561,7 +189561,7 @@ case CPU_EZ80_Z80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -189581,10 +189581,10 @@ case CPU_EZ80_Z80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_jr(0x30);
@@ -189719,7 +189719,7 @@ case CPU_EZ80_Z80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -189739,10 +189739,10 @@ case CPU_EZ80_Z80:
 warn_if_expr_in_parens();
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_jr(0x30);
@@ -207842,7 +207842,7 @@ case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: 
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xCA);
 add_opcode_nn(0xD2);
@@ -207997,7 +207997,7 @@ case CPU_8080: case CPU_8085: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xCA);
 add_opcode_nn(0xD2);
@@ -208008,7 +208008,7 @@ case CPU_EZ80:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nnn(0xCA);
 add_opcode_nnn(0xD2);
@@ -208266,7 +208266,7 @@ case CPU_EZ80: case CPU_EZ80_Z80:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode(0x5B);
 add_opcode_nnn(0xCA);
@@ -208473,7 +208473,7 @@ case CPU_EZ80: case CPU_EZ80_Z80:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode(0x40);
 add_opcode_nn(0xCA);
@@ -208899,7 +208899,7 @@ case CPU_KC160: case CPU_KC160_Z80:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nnn(0xEDCA);
 add_opcode_nnn(0xEDD2);
@@ -209039,7 +209039,7 @@ case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_jr(0x28);
 add_opcode_jr(0x30);
@@ -209050,7 +209050,7 @@ case CPU_8080: case CPU_8085:
 warn_if_expr_in_parens();
 {
 string target1 = autolabel();
-Expr* target_expr1 = new Expr(*assembler_, target1);
+Expr* target_expr1 = new Expr(target1);
 exprs_.push_back(target_expr1);
 add_opcode_nn(0xCA);
 add_opcode_nn(0xD2);
@@ -244119,7 +244119,7 @@ switch (g_cpu) {
 case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -244130,7 +244130,7 @@ break;
 case CPU_8080: case CPU_8085: 
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_nn(0xCA);
 add_opcode_nn(0xDA);
@@ -244310,7 +244310,7 @@ switch (g_cpu) {
 case CPU_EZ80_Z80: 
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -244322,7 +244322,7 @@ break;
 case CPU_EZ80: 
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -244489,7 +244489,7 @@ switch (g_cpu) {
 case CPU_EZ80: 
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);
@@ -244626,7 +244626,7 @@ switch (g_cpu) {
 case CPU_EZ80_Z80: 
 {
 string target2 = autolabel();
-Expr* target_expr2 = new Expr(*assembler_, target2);
+Expr* target_expr2 = new Expr(target2);
 exprs_.push_back(target_expr2);
 add_opcode_jr(0x28);
 add_opcode_jr(0x38);

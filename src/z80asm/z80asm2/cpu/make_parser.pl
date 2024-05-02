@@ -271,7 +271,7 @@ sub parse_code {
 			my $id = $target_jumps{$target};
 			push @code, 
 				"string target$id = autolabel();",
-				"Expr* target_expr$id = new Expr(*assembler_, target$id);",
+				"Expr* target_expr$id = new Expr(target$id);",
 				"exprs_.push_back(target_expr$id);";
 		}
 		

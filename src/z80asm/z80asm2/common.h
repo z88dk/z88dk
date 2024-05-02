@@ -6,12 +6,16 @@
 
 #pragma once
 
+#include "assembler.h"
 #include "errors.h"
 #include "z80asm_defs.h"
 #include <string>
 #include <vector>
 #include <unordered_map>
 using namespace std;
+
+// application class
+extern Assembler g_asm;
 
 // errors
 extern Errors g_errors;

@@ -29,7 +29,7 @@ bool Assembler::assemble(const string& filename) {
     // create object and parser
     filename_ = filename;
     object_ = new Object(filename);
-    parser_ = new Parser(*this);
+    parser_ = new Parser();
 
     // clear globals
     global_symbols_.clear();

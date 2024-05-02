@@ -6,6 +6,7 @@
 
 #include "common.h"
 
+Assembler g_asm;
 Errors g_errors;
 vector<string> g_include_path;
 vector<string> g_library_path;

@@ -68,8 +68,7 @@ void ExprResult::error() {
 
 //-----------------------------------------------------------------------------
 
-Expr::Expr(Assembler& assembler, const string& expr_text)
-    : assembler_(&assembler) {
+Expr::Expr(const string& expr_text) {
     Lexer lexer(expr_text);
     if (!parse_expr(&lexer))
         g_errors.error(ErrSyntaxExpr, expr_text);
@@ -628,7 +627,7 @@ void Expr::parse_primary() {
 
         // do not create symbols refered to in IF or while checking if code is expr
         if (parsing_if_) {
-            Symbol* symbol = assembler_->find_symbol(name);
+            Symbol* symbol = g_asm.find_symbol(name);
             if (symbol) {
                 symbol_token = token();
                 symbol_token.set_symbol(symbol);
@@ -642,7 +641,7 @@ void Expr::parse_primary() {
             }
         }
         else {
-            Symbol* symbol = assembler_->use_symbol(name);
+            Symbol* symbol = g_asm.use_symbol(name);
             symbol_token = token();
             symbol_token.set_symbol(symbol);
             rpn_tokens_.push_back(symbol_token);
@@ -651,10 +650,10 @@ void Expr::parse_primary() {
         break;
 
     case TK_ASMPC:
-        xassert(assembler_->asmpc());
+        xassert(g_asm.asmpc());
         symbol_token = token();
-        symbol_token.set_svalue(assembler_->asmpc()->name());
-        symbol_token.set_symbol(assembler_->asmpc());
+        symbol_token.set_svalue(g_asm.asmpc()->name());
+        symbol_token.set_symbol(g_asm.asmpc());
         rpn_tokens_.push_back(symbol_token);
         consume_token();
         break;
