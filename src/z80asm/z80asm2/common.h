@@ -17,9 +17,6 @@ using namespace std;
 // application class
 extern Assembler g_asm;
 
-// errors
-extern Errors g_errors;
-
 // include and library path
 extern vector<string> g_include_path;       // -I option
 extern vector<string> g_library_path;       // -L option

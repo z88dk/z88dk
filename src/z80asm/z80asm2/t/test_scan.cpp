@@ -414,52 +414,52 @@ void test_lexer_file_string() {
 
 void test_lexer_invalid_char() {
     ostringstream oss;
-    g_errors.set_output(oss);
+    g_asm.set_error_output(oss);
     Lexer l;
     NOK(l.set_text("` hello world"));
     IS(oss.str(), "error: invalid character: ` hello world\n");
     OK(l.at_end());
-    g_errors.clear();
+    g_asm.clear();
 }
 
 void test_lexer_invalid_double_quoted_string() {
     ostringstream oss;
-    g_errors.set_output(oss);
+    g_asm.set_error_output(oss);
     Lexer l;
     NOK(l.set_text("\"hello world"));
     IS(oss.str(), "error: missing quote: \"hello world\n");
     OK(l.at_end());
-    g_errors.clear();
+    g_asm.clear();
 }
 
 void test_lexer_invalid_single_quoted_string() {
     ostringstream oss;
-    g_errors.set_output(oss);
+    g_asm.set_error_output(oss);
     Lexer l;
     NOK(l.set_text("'hello world"));
     IS(oss.str(), "error: missing quote: 'hello world\n");
     OK(l.at_end());
-    g_errors.clear();
+    g_asm.clear();
 }
 
 void test_lexer_invalid_character_constant1() {
     ostringstream oss;
-    g_errors.set_output(oss);
+    g_asm.set_error_output(oss);
     Lexer l;
     NOK(l.set_text("''"));
     IS(oss.str(), "error: invalid character constant: ''\n");
     OK(l.at_end());
-    g_errors.clear();
+    g_asm.clear();
 }
 
 void test_lexer_invalid_character_constant2() {
     ostringstream oss;
-    g_errors.set_output(oss);
+    g_asm.set_error_output(oss);
     Lexer l;
     NOK(l.set_text("'ab'"));
     IS(oss.str(), "error: invalid character constant: 'ab'\n");
     OK(l.at_end());
-    g_errors.clear();
+    g_asm.clear();
 }
 
 void test_character_constant() {

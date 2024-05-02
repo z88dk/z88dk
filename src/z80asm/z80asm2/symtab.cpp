@@ -106,7 +106,7 @@ bool Symtab::insert(Symbol* symbol) {
         if (str_begins_with(symbol->name(), "__CDBINFO__"))
             return true;	// ignore duplicates of these
         else {
-            g_errors.error(ErrDuplicateDefinition, symbol->name());
+            g_asm.error(ErrDuplicateDefinition, symbol->name());
             return false;
         }
     }

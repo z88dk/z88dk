@@ -15,16 +15,30 @@
 using namespace std;
 
 Assembler::Assembler() {
+    locations_.emplace_back();          // stack always has at least one element
 }
 
 Assembler::~Assembler() {
+}
+
+void Assembler::clear() {
+    locations_.clear();
+    locations_.emplace_back();          // stack always has at least one element
+    errors_.clear();
+    filename_.clear();
+    object_ = nullptr;
+    parser_ = nullptr;
+    defines_.clear();
+    global_symbols_.clear();
+    asmpc_ = nullptr;
+    start_errors_ = 0;
 }
 
 bool Assembler::assemble(const string& filename) {
     if (g_verbose)
         cout << "Assembling '" << filename << "'" << endl;
 
-    start_errors_ = g_errors.count();
+    start_errors_ = errors_.count();
 
     // create object and parser
     filename_ = filename;
@@ -46,6 +60,73 @@ bool Assembler::assemble(const string& filename) {
 
     // exit true if no more errors
     return !got_errors();
+}
+
+void Assembler::push_location(const Location& location) {
+    locations_.push_back(location);
+    errors_.set_location(location);
+}
+
+void Assembler::pop_location() {
+    if (locations_.size() > 1)
+        locations_.pop_back();
+    else
+        locations_.back().clear();
+    errors_.set_location(locations_.back());
+}
+
+const Location& Assembler::location() const {
+    return locations_.back();
+}
+
+void Assembler::set_location(const Location& location) {
+    locations_.back() = location;
+    errors_.set_location(location);
+}
+
+void Assembler::clear_location() {
+    locations_.back().clear();
+    errors_.clear_location();
+}
+
+void Assembler::set_source_line(const string& line) {
+    errors_.set_source_line(line);
+}
+
+void Assembler::set_expanded_line(const string& line) {
+    errors_.set_expanded_line(line);
+}
+
+string Assembler::source_line() {
+    return errors_.source_line();
+}
+
+string Assembler::expanded_line() {
+    return errors_.expanded_line();
+}
+
+int Assembler::error_count() const {
+    return errors_.count();
+}
+
+void Assembler::set_error_output(ostream& os) {
+    errors_.set_output(os);
+}
+
+void Assembler::error(ErrCode err_code, const string& argument) {
+    errors_.error(err_code, argument);
+}
+
+void Assembler::error(ErrCode err_code, int argument) {
+    errors_.error(err_code, argument);
+}
+
+void Assembler::warning(ErrCode err_code, const string& argument) {
+    errors_.warning(err_code, argument);
+}
+
+void Assembler::warning(ErrCode err_code, int argument) {
+    errors_.warning(err_code, argument);
 }
 
 string Assembler::autolabel() {
@@ -122,11 +203,11 @@ Symbol* Assembler::add_symbol(const string& name) {
     }
     else if (symbol->type() == TYPE_UNDEFINED) {// already declared
         symbol->set_type(TYPE_CONSTANT);
-        symbol->set_location(g_errors.location());
+        symbol->set_location(location());
         return symbol;
     }
     else {                                      // already defined
-        g_errors.error(ErrDuplicateDefinition, name);
+        error(ErrDuplicateDefinition, name);
         return nullptr;
     }
 }
@@ -164,7 +245,7 @@ Symbol* Assembler::add_define(const string& name, int value) {
             return nullptr;
         }
         else if (res.value() != value) {
-            g_errors.error(ErrDuplicateDefinition, name);
+            error(ErrDuplicateDefinition, name);
             return nullptr;
         }
         else {
@@ -282,7 +363,7 @@ Symbol* Assembler::find_global_define(const string& name) {
 }
 
 bool Assembler::got_errors() const {
-    return start_errors_ != g_errors.count();
+    return start_errors_ != errors_.count();
 }
 
 void Assembler::assemble1() {
@@ -291,7 +372,7 @@ void Assembler::assemble1() {
     string parent_dir = file_parent_dir(o_filename);
     if (!file_is_directory(parent_dir)) {
         if (!file_create_directories(parent_dir)) {
-            g_errors.error(ErrDirCreate, parent_dir);
+            error(ErrDirCreate, parent_dir);
             perror(parent_dir.c_str());
             return;
         }

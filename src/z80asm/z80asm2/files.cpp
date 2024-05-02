@@ -228,7 +228,7 @@ bool OpenFile::open(const string& filename) {
     location_ = Location(filename);
     ifs_.open(filename, ios::binary);
     if (!ifs_.is_open()) {
-        g_errors.error(ErrFileOpen, filename);
+        g_asm.error(ErrFileOpen, filename);
         perror(filename.c_str());
         return false;
     }
@@ -238,8 +238,8 @@ bool OpenFile::open(const string& filename) {
             count_open_++;
             g_include_path.push_back(parent_dir);
         }
-        g_errors.clear_location();
-        g_errors.set_location(location_);
+        g_asm.clear_location();
+        g_asm.set_location(location_);
         return true;
     }
 }
@@ -249,8 +249,8 @@ bool OpenFile::getline(string& line) {
     bool ok = !safe_getline(ifs_, line).eof();
     if (ok) {
         location_.inc_line_num();
-        g_errors.set_location(location_);
-        g_errors.set_source_line(line);
+        g_asm.set_location(location_);
+        g_asm.set_source_line(line);
         return true;
     }
     else
@@ -284,7 +284,7 @@ bool FileReader::open(const string& filename_) {
 
     // check for recursive includes
     if (recursive_include(found_filename)) {
-        g_errors.error(ErrIncludeRecursion, filename);
+        g_asm.error(ErrIncludeRecursion, filename);
         return false;
     }
 
@@ -302,9 +302,9 @@ bool FileReader::getline(string& line) {
             return true;
         else {
             open_files_.pop_back();
-            g_errors.clear_location();
+            g_asm.clear_location();
             if (!open_files_.empty())
-                g_errors.set_location(open_files_.back().location());
+                g_asm.set_location(open_files_.back().location());
         }
     }
 }
@@ -335,7 +335,7 @@ bool SourceReader::getline1(string& line) {
             ok = FileReader::getline1(cont_line);
             line += cont_line;
         }
-        g_errors.set_source_line(line);
+        g_asm.set_source_line(line);
         return true;
     }
 }

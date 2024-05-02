@@ -314,7 +314,7 @@ yy1:
 yy2:
 			++p;
 yy3:
-			{ g_errors.error(ErrInvalidChar, p0); got_error = true; goto end; }
+			{ g_asm.error(ErrInvalidChar, p0); got_error = true; goto end; }
 yy4:
 			yych = *++p;
 			switch (yych) {
@@ -1120,7 +1120,7 @@ string_loop:
 			}
 yy92:
 			++p;
-			{ p--; g_errors.error(ErrMissingQuote, pstr); got_error = true; goto end; }
+			{ p--; g_asm.error(ErrMissingQuote, pstr); got_error = true; goto end; }
 yy93:
 			++p;
 yy94:
@@ -1140,7 +1140,7 @@ yy96:
 			++p;
 			{ if (quote == 1) {
                                   if (str.length() != 1) {
-                                      g_errors.error(ErrInvalidCharConst, pstr); got_error = true; goto end;
+                                      g_asm.error(ErrInvalidCharConst, pstr); got_error = true; goto end;
                                   }
                                   else {
                                       PUSH_TOKEN2(TK_INTEGER, str[0]);

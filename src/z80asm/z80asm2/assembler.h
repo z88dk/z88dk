@@ -6,8 +6,11 @@
 
 #pragma once
 
+#include "errors.h"
+#include "location.h"
 #include "object.h"
 #include "symtab.h"
+#include <iostream>
 #include <string>
 using namespace std;
 
@@ -20,9 +23,30 @@ public:
     virtual ~Assembler();
     Assembler(const Assembler& other) = delete;
     Assembler& operator=(const Assembler& other) = delete;
+    void clear();
 
     // assemble source file
     bool assemble(const string& filename);              // assemble one source file
+
+    // handle errors
+    void push_location(const Location& location);
+    void pop_location();
+    const Location& location() const;
+    void set_location(const Location& location);
+    void clear_location();
+
+    void set_source_line(const string& line);
+    void set_expanded_line(const string& line);
+    string source_line();
+    string expanded_line();
+
+    int error_count() const;
+
+    void set_error_output(ostream& os);
+    void error(ErrCode err_code, const string& argument = "");
+    void error(ErrCode err_code, int argument);
+    void warning(ErrCode err_code, const string& argument = "");
+    void warning(ErrCode err_code, int argument);
 
     // labels
     static string autolabel();
@@ -45,6 +69,8 @@ public:
     Symbol* declare_global(const string& name);
 
 private:
+    Errors errors_;                 // handle errors
+    vector<Location> locations_;    // location stack
     string filename_;               // source filename 
     Object* object_{ nullptr };     // object file being created
     Parser* parser_{ nullptr };     // parser of input

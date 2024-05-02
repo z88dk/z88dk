@@ -40,7 +40,7 @@ const string& ExprException::err_arg() const {
 }
 
 void ExprException::error() {
-    g_errors.error(err_code_, err_arg_);
+    g_asm.error(err_code_, err_arg_);
 }
 
 //-----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ ErrCode ExprResult::err_code() const {
 
 void ExprResult::error() {
     if (!ok())
-        g_errors.error(err_code_, err_arg_);
+        g_asm.error(err_code_, err_arg_);
 }
 
 //-----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ void ExprResult::error() {
 Expr::Expr(const string& expr_text) {
     Lexer lexer(expr_text);
     if (!parse_expr(&lexer))
-        g_errors.error(ErrSyntaxExpr, expr_text);
+        g_asm.error(ErrSyntaxExpr, expr_text);
 }
 
 const string& Expr::text() const {
@@ -360,7 +360,7 @@ bool Expr::parse_expr1(Lexer* lexer) {
 bool Expr::parse_expr() {
     text_.clear();
     rpn_tokens_.clear();
-    set_location(g_errors.location());
+    set_location(g_asm.location());
 
     bool ok = true;
     try {

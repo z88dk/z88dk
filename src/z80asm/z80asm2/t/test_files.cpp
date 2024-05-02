@@ -37,7 +37,7 @@ void test_search_path() {
 void test_open_file_non_existent() {
     ostringstream oss;
     g_include_path.clear();
-    g_errors.set_output(oss);
+    g_asm.set_error_output(oss);
     remove("test.asm");
     {
         OpenFile of;
@@ -46,16 +46,16 @@ void test_open_file_non_existent() {
         IS(g_include_path.size(), 0);
     }
     IS(g_include_path.size(), 0);
-	g_errors.clear();
+	g_asm.clear();
 }
 
 #define T_LOCATION(fn, n, line)    \
         IS(of.location().filename(), fn);   \
         IS(of.location().line_num(), n);    \
-        IS(g_errors.location().filename(), fn); \
-        IS(g_errors.location().line_num(), n);  \
-        IS(g_errors.source_line(), line);   \
-        IS(g_errors.expanded_line(), "")
+        IS(g_asm.location().filename(), fn); \
+        IS(g_asm.location().line_num(), n);  \
+        IS(g_asm.source_line(), line);   \
+        IS(g_asm.expanded_line(), "")
 
 void test_open_file_ok() {
     test_spew("test.asm",
@@ -106,7 +106,7 @@ void test_open_file_ok() {
     }
     IS(g_include_path.size(), 0);
     remove("test.asm");
-    g_errors.clear();
+    g_asm.clear();
 }
 
 #undef T_LOCATION
@@ -114,7 +114,7 @@ void test_open_file_ok() {
 void test_file_reader_non_existent() {
     ostringstream oss;
     g_include_path.clear();
-    g_errors.set_output(oss);
+    g_asm.set_error_output(oss);
     remove("test.asm");
     {
         FileReader fr;
@@ -124,13 +124,13 @@ void test_file_reader_non_existent() {
     }
     IS(g_include_path.size(), 0);
     remove("test.asm");
-    g_errors.clear();
+    g_asm.clear();
 }
 
 void test_file_reader_recursive() {
     ostringstream oss;
     g_include_path.clear();
-    g_errors.set_output(oss);
+    g_asm.set_error_output(oss);
     test_spew("test.asm", "");
     {
         FileReader fr;
@@ -140,16 +140,16 @@ void test_file_reader_recursive() {
     }
     g_include_path.clear();
     remove("test.asm");
-    g_errors.clear();
+    g_asm.clear();
 }
 
 #define T_LOCATION(fn, n, line)    \
         IS(fr.location().filename(), fn);   \
         IS(fr.location().line_num(), n);    \
-        IS(g_errors.location().filename(), fn); \
-        IS(g_errors.location().line_num(), n);  \
-        IS(g_errors.source_line(), line);   \
-        IS(g_errors.expanded_line(), "")
+        IS(g_asm.location().filename(), fn); \
+        IS(g_asm.location().line_num(), n);  \
+        IS(g_asm.source_line(), line);   \
+        IS(g_asm.expanded_line(), "")
 
 void test_file_reader_ok() {
     fs::create_directories("test/x");
@@ -194,7 +194,7 @@ void test_file_reader_ok() {
     fs::remove_all("test");
     remove("test1.asm");
     g_include_path.clear();
-    g_errors.clear();
+    g_asm.clear();
 }
 
 #undef T_LOCATION
@@ -202,10 +202,10 @@ void test_file_reader_ok() {
 #define T_LOCATION(fn, n, line)    \
         IS(sr.location().filename(), fn);   \
         IS(sr.location().line_num(), n);    \
-        IS(g_errors.location().filename(), fn); \
-        IS(g_errors.location().line_num(), n);  \
-        IS(g_errors.source_line(), line);   \
-        IS(g_errors.expanded_line(), "")
+        IS(g_asm.location().filename(), fn); \
+        IS(g_asm.location().line_num(), n);  \
+        IS(g_asm.source_line(), line);   \
+        IS(g_asm.expanded_line(), "")
 
 void test_source_reader_ok() {
     test_spew("test.asm",
@@ -225,7 +225,7 @@ void test_source_reader_ok() {
         T_LOCATION("", 0, "");
     }
     remove("test.asm");
-    g_errors.clear();
+    g_asm.clear();
 }
 
 #undef T_LOCATION

@@ -27,7 +27,7 @@ class Errors {
 public:
     void clear();
     void set_output(ostream& os);
-    int count() { return count_; }
+    int count() const { return count_; }
     void error(ErrCode err_code, const string& argument = "");
     void error(ErrCode err_code, int argument);
     void warning(ErrCode err_code, const string& argument = "");
