@@ -10,9 +10,6 @@
     defc	RAM_Start = 0x3900
     INCLUDE	"crt/classic/crt_rules.inc"
 
-    ; Page video into 0x8000 - 0xc000
-    defc    CLIB_VIDEO_PAGE_PORT = PORT_BANK2
-
 
     org     CRT_ORG_CODE
 

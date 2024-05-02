@@ -29,7 +29,7 @@ TOCREATE += $(call check_target,abc800,abc800_clib.lib)
 TOCREATE += $(call check_target,adam,adam.lib $(CPMLIBS))
 TOCREATE += $(call check_target,agon,agon_clib.lib)
 TOCREATE += $(call check_target,alphatro,alphatro_clib.lib)
-TOCREATE += $(call check_target,aquarius,aquarius_clib.lib gfxaq48.lib gfxaqplus.lib)
+TOCREATE += $(call check_target,aquarius,aquarius_clib.lib gfxaq48.lib aqplus.lib)
 TOCREATE += $(call check_target,attache,attache.lib $(CPMLIBS))
 TOCREATE += $(call check_target,aussie,aussie.lib $(CPMLIBS))
 TOCREATE += $(call check_target,bee,bee_clib.lib microbee.lib $(CPMLIBS))
@@ -883,12 +883,12 @@ gfxaq48.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=aquarius SUBTYPE=aq48 FLAVOUR="text narrow"
 	TARGET=aq48 TYPE=z80 $(LIBLINKER) -DFORaq48 -x$(OUTPUT_DIRECTORY)/gfxaq48 @$(TARGET_DIRECTORY)/aquarius/gfxaq48.lst
 
-gfxaqplus.lib: $(TARGET_CLIB_OBJS)
+aqplus.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
-	@echo '--- Building Mattel Aquarius Plus Graphics lib ---'
+	@echo '--- Building Mattel Aquarius Plus lib ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=aquarius SUBTYPE=aqplus FLAVOUR="wide"
-	TARGET=aqplus TYPE=z80 $(LIBLINKER) -DFORaqplus -x$(OUTPUT_DIRECTORY)/gfxaqplus @$(TARGET_DIRECTORY)/aquarius/gfxaqplus.lst
+	TARGET=aqplus TYPE=z80 $(LIBLINKER) -DFORaqplus -x$(OUTPUT_DIRECTORY)/aqplus @$(TARGET_DIRECTORY)/aquarius/aqplus.lst
 
 
 # Aussie Byte library - Stefano

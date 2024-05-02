@@ -4,6 +4,8 @@
 
 
 
+; First RAM page that is free for us to use
+defc AQPLUS_FIRST_BANK  = 35
 
 defc PORT_VCTRL         = $e0
 
