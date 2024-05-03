@@ -7,13 +7,3 @@
 #include "common.h"
 
 Assembler g_asm;
-
-vector<string> g_include_path;
-vector<string> g_library_path;
-bool g_verbose = false;
-bool g_raw_strings = false;
-bool g_upper_case = false;
-cpu_t g_cpu = CPU_Z80;
-swap_ixiy_t g_swap_ixiy = IXIY_NO_SWAP;
-string g_output_dir;
-string g_bin_filename;

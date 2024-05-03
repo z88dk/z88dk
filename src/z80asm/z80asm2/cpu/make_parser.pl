@@ -153,6 +153,7 @@ output_array($fh, "const_expr_stt", 1, @const_expr_stt);
 output_array($fh, "accept_stt", 1, @accept_stt);
 
 say $fh "void Parser::parse_action(int action) {";
+say $fh "cpu_t cpu = g_asm.options().cpu();";
 say $fh "switch (action) {";
 for my $i (1 .. $#actions) {
 	say $fh "case $i:";
@@ -574,7 +575,7 @@ sub merge_cpu {
 	}
 	else {
 		# variants per CPU
-		$ret .= "switch (g_cpu) {\n";
+		$ret .= "switch (cpu) {\n";
 		for my $code (sort keys %code) {
 			for my $cpu (sort keys %{$code{$code}}) {
 				$ret .= "case CPU_".uc($cpu).": ";

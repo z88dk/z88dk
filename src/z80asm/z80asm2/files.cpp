@@ -71,10 +71,10 @@ string file_replace_extension(const string& filename_, const string& extension) 
 
 string file_prepend_output_dir(const string& filename_) {
     string filename = norm_path(filename_);
-    if (g_output_dir.empty())
+    string output_dir = norm_path(g_asm.options().output_dir());
+    if (output_dir.empty())
         return filename;
     else {
-        string output_dir = norm_path(g_output_dir);
         if (!output_dir.empty() && output_dir.back() == '/')
             output_dir.pop_back();
         if (filename.substr(0, output_dir.size() + 1) == output_dir + "/") {
@@ -158,13 +158,14 @@ string file_bin_filename(const string& filename_, const string& section) {
     string filename = norm_path(filename_);
     fs::path file_path, file_ext;
 
-    if (g_bin_filename.empty()) {
+    string bin_filename = g_asm.options().bin_filename();
+    if (bin_filename.empty()) {
         file_path = filename;
         file_ext = EXT_BIN;
     }
     else {
         // output file may have no extension
-        file_path = g_bin_filename;
+        file_path = bin_filename;
         file_ext = file_path.extension();
     }
 
@@ -212,7 +213,7 @@ OpenFile::OpenFile() {
 
 OpenFile::~OpenFile() {
     for (int i = 0; i < count_open_; i++)
-        g_include_path.pop_back();
+        g_asm.options().include_path().pop_back();
 }
 
 const string& OpenFile::filename() const {
@@ -236,7 +237,7 @@ bool OpenFile::open(const string& filename) {
         string parent_dir = fs::path(filename).parent_path().generic_string();
         if (!parent_dir.empty()) {
             count_open_++;
-            g_include_path.push_back(parent_dir);
+            g_asm.options().include_path().push_back(parent_dir);
         }
         g_asm.clear_location();
         g_asm.set_location(location_);
@@ -280,7 +281,7 @@ bool FileReader::open(const string& filename_) {
     string filename = fs::path(filename_).generic_string();
 
     // search file in path
-    string found_filename = search_path(filename, g_include_path);
+    string found_filename = search_path(filename, g_asm.options().include_path());
 
     // check for recursive includes
     if (recursive_include(found_filename)) {

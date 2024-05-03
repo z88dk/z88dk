@@ -107,7 +107,7 @@ void test_lexer_ident() {
 }
 
 void test_lexer_uppercase() {
-    g_upper_case = true;
+    g_asm.options().set_upper_case(true);
 
     Lexer l;
     OK(l.set_text("af af'start _abc$123"));
@@ -135,12 +135,12 @@ void test_lexer_uppercase() {
     IS(l.peek(0).code(), TK_END);
     OK(l.at_end());
 
-    g_upper_case = false;
+    g_asm.options().set_upper_case(false);
 }
 
 void test_lexer_swap_ixiy() {
     Lexer l;
-    g_swap_ixiy = IXIY_NO_SWAP;
+    g_asm.options().set_swap_ixiy(IXIY_NO_SWAP);
     OK(l.set_text("hl ix iy h ixh iyh l ixl iyl"));
 
     IS(l.peek(0).code(), TK_IDENT);
@@ -182,7 +182,7 @@ void test_lexer_swap_ixiy() {
     IS(l.peek(9).code(), TK_END);
 
 
-    g_swap_ixiy = IXIY_SWAP;
+    g_asm.options().set_swap_ixiy(IXIY_SWAP);
     OK(l.set_text("hl ix iy h ixh iyh l ixl iyl"));
 
     IS(l.peek(0).code(), TK_IDENT);
@@ -223,7 +223,48 @@ void test_lexer_swap_ixiy() {
 
     IS(l.peek(9).code(), TK_END);
 
-    g_swap_ixiy = IXIY_NO_SWAP;
+    g_asm.options().set_swap_ixiy(IXIY_SOFT_SWAP);
+    OK(l.set_text("hl ix iy h ixh iyh l ixl iyl"));
+
+    IS(l.peek(0).code(), TK_IDENT);
+    IS(l.peek(0).keyword(), KW_HL);
+    IS(l.peek(0).svalue(), "hl");
+
+    IS(l.peek(1).code(), TK_IDENT);
+    IS(l.peek(1).keyword(), KW_IY);
+    IS(l.peek(1).svalue(), "iy");
+
+    IS(l.peek(2).code(), TK_IDENT);
+    IS(l.peek(2).keyword(), KW_IX);
+    IS(l.peek(2).svalue(), "ix");
+
+    IS(l.peek(3).code(), TK_IDENT);
+    IS(l.peek(3).keyword(), KW_H);
+    IS(l.peek(3).svalue(), "h");
+
+    IS(l.peek(4).code(), TK_IDENT);
+    IS(l.peek(4).keyword(), KW_IYH);
+    IS(l.peek(4).svalue(), "iyh");
+
+    IS(l.peek(5).code(), TK_IDENT);
+    IS(l.peek(5).keyword(), KW_IXH);
+    IS(l.peek(5).svalue(), "ixh");
+
+    IS(l.peek(6).code(), TK_IDENT);
+    IS(l.peek(6).keyword(), KW_L);
+    IS(l.peek(6).svalue(), "l");
+
+    IS(l.peek(7).code(), TK_IDENT);
+    IS(l.peek(7).keyword(), KW_IYL);
+    IS(l.peek(7).svalue(), "iyl");
+
+    IS(l.peek(8).code(), TK_IDENT);
+    IS(l.peek(8).keyword(), KW_IXL);
+    IS(l.peek(8).svalue(), "ixl");
+
+    IS(l.peek(9).code(), TK_END);
+
+    g_asm.options().set_swap_ixiy(IXIY_NO_SWAP);
 }
 
 void test_lexer_integer() {
@@ -333,7 +374,7 @@ void test_lexer_floating() {
 void test_lexer_string() {
     Lexer l;
 
-    g_raw_strings = false;
+    g_asm.options().set_raw_strings(false);
     OK(l.set_text("\"\\1\\x02\\a\\b\\e\\f\\n\\r\\t\\v\\\\hello\""));
 
     IS(l.peek(0).code(), TK_STRING);
@@ -341,7 +382,7 @@ void test_lexer_string() {
 
     IS(l.peek(1).code(), TK_END);
 
-    g_raw_strings = true;
+    g_asm.options().set_raw_strings(true);
     OK(l.set_text("\"\\1\\x02\\a\\b\\e\\f\\n\\r\\t\\v\\\\hello\""));
 
     IS(l.peek(0).code(), TK_STRING);
@@ -349,13 +390,13 @@ void test_lexer_string() {
 
     IS(l.peek(1).code(), TK_END);
 
-    g_raw_strings = false;
+    g_asm.options().set_raw_strings(false);
 }
 
 void test_lexer_file_string() {
     Lexer l;
 
-    g_raw_strings = false;
+    g_asm.options().set_raw_strings(false);
     OK(l.set_text("include \"dir\\tab\\newline\""));
 
     IS(l.peek(0).code(), TK_IDENT);

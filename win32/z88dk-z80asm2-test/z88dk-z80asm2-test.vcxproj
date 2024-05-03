@@ -142,6 +142,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\files.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\object.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\symtab.cpp" />
@@ -149,11 +150,12 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_files.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_files_driver.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_location.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_symtab.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_utils.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_utils_driver.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
   </ItemGroup>
   <ItemGroup>

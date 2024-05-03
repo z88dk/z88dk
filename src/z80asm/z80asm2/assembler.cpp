@@ -35,7 +35,7 @@ void Assembler::clear() {
 }
 
 bool Assembler::assemble(const string& filename) {
-    if (g_verbose)
+    if (options_.verbose())
         cout << "Assembling '" << filename << "'" << endl;
 
     start_errors_ = errors_.count();
@@ -51,7 +51,7 @@ bool Assembler::assemble(const string& filename) {
     // assemble
     assemble1();
 
-    if (g_verbose)
+    if (options_.verbose())
         cout << endl;
 
     filename_.clear();
@@ -60,6 +60,10 @@ bool Assembler::assemble(const string& filename) {
 
     // exit true if no more errors
     return !got_errors();
+}
+
+Options& Assembler::options() {
+    return options_;
 }
 
 void Assembler::push_location(const Location& location) {

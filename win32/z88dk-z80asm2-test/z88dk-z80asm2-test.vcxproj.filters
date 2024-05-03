@@ -69,10 +69,16 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_symtab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_files_driver.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\assembler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\assembler.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_options.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_utils_driver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

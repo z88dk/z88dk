@@ -25,27 +25,27 @@ void test_search_path() {
     test_spew("test/x/test.asm", "");
     remove("test.asm");
 
-    g_include_path.clear();
-    IS(search_path("test.asm", g_include_path), "test.asm");
-    g_include_path.push_back("test/x");
-    IS(search_path("test.asm", g_include_path), "test/x/test.asm");
+    g_asm.options().include_path().clear();
+    IS(search_path("test.asm", g_asm.options().include_path()), "test.asm");
+    g_asm.options().include_path().push_back("test/x");
+    IS(search_path("test.asm", g_asm.options().include_path()), "test/x/test.asm");
 
-    g_include_path.clear();
+    g_asm.options().include_path().clear();
     fs::remove_all("test");
 }
 
 void test_open_file_non_existent() {
     ostringstream oss;
-    g_include_path.clear();
+    g_asm.options().include_path().clear();
     g_asm.set_error_output(oss);
     remove("test.asm");
     {
         OpenFile of;
         NOK(of.open("test.asm"));
         IS(oss.str(), "error: file open: test.asm\n");
-        IS(g_include_path.size(), 0);
+        IS(g_asm.options().include_path().size(), 0);
     }
-    IS(g_include_path.size(), 0);
+    IS(g_asm.options().include_path().size(), 0);
 	g_asm.clear();
 }
 
@@ -65,11 +65,11 @@ void test_open_file_ok() {
         "Hello\r\n"
         "World");
 
-    g_include_path.clear();
+    g_asm.options().include_path().clear();
     {
         OpenFile of;
         OK(of.open("test.asm"));
-        IS(g_include_path.size(), 0);
+        IS(g_asm.options().include_path().size(), 0);
         IS(of.filename(), "test.asm");
         T_LOCATION("test.asm", 0, "");
 
@@ -100,11 +100,11 @@ void test_open_file_ok() {
     {
         OpenFile of;
         OK(of.open("./test.asm"));
-        IS(g_include_path.size(), 1);
-        IS(g_include_path[0], ".");
+        IS(g_asm.options().include_path().size(), 1);
+        IS(g_asm.options().include_path()[0], ".");
         IS(of.filename(), "./test.asm");
     }
-    IS(g_include_path.size(), 0);
+    IS(g_asm.options().include_path().size(), 0);
     remove("test.asm");
     g_asm.clear();
 }
@@ -113,23 +113,23 @@ void test_open_file_ok() {
 
 void test_file_reader_non_existent() {
     ostringstream oss;
-    g_include_path.clear();
+    g_asm.options().include_path().clear();
     g_asm.set_error_output(oss);
     remove("test.asm");
     {
         FileReader fr;
         NOK(fr.open("test.asm"));
         IS(oss.str(), "error: file open: test.asm\n");
-        IS(g_include_path.size(), 0);
+        IS(g_asm.options().include_path().size(), 0);
     }
-    IS(g_include_path.size(), 0);
+    IS(g_asm.options().include_path().size(), 0);
     remove("test.asm");
     g_asm.clear();
 }
 
 void test_file_reader_recursive() {
     ostringstream oss;
-    g_include_path.clear();
+    g_asm.options().include_path().clear();
     g_asm.set_error_output(oss);
     test_spew("test.asm", "");
     {
@@ -138,7 +138,7 @@ void test_file_reader_recursive() {
         NOK(fr.open("test.asm"));
         IS(oss.str(), "test.asm: error: include recursion: test.asm\n");
     }
-    g_include_path.clear();
+    g_asm.options().include_path().clear();
     remove("test.asm");
     g_asm.clear();
 }
@@ -159,8 +159,8 @@ void test_file_reader_ok() {
     test_spew("test/x/test2.asm",
         "Hello\n"
         "World\n");
-    g_include_path.clear();
-    g_include_path.push_back("test/x");
+    g_asm.options().include_path().clear();
+    g_asm.options().include_path().push_back("test/x");
 
     {
         FileReader fr;
@@ -193,7 +193,7 @@ void test_file_reader_ok() {
 
     fs::remove_all("test");
     remove("test1.asm");
-    g_include_path.clear();
+    g_asm.options().include_path().clear();
     g_asm.clear();
 }
 
@@ -259,7 +259,7 @@ void test_file_replace_extension() {
 }
 
 void test_file_prepend_output_dir() {
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
     IS(file_prepend_output_dir(""), "");
     IS(file_prepend_output_dir("x"), "x");
     IS(file_prepend_output_dir("x.o"), "x.o");
@@ -268,7 +268,7 @@ void test_file_prepend_output_dir() {
     IS(file_prepend_output_dir("\\dir\\x.o"), "/dir/x.o");
     IS(file_prepend_output_dir("c:\\dir\\x.o"), "c:/dir/x.o");
 
-    g_output_dir = "/obj";
+    g_asm.options().set_output_dir("/obj");
     IS(file_prepend_output_dir(""), "/obj/");
     IS(file_prepend_output_dir("x"), "/obj/x");
     IS(file_prepend_output_dir("x.o"), "/obj/x.o");
@@ -281,7 +281,7 @@ void test_file_prepend_output_dir() {
     IS(file_prepend_output_dir("x.o"), "/obj/x.o");
     IS(file_prepend_output_dir("/obj/x.o"), "/obj/x.o");
 
-    g_output_dir = "/obj/";
+    g_asm.options().set_output_dir("/obj/");
     IS(file_prepend_output_dir(""), "/obj/");
     IS(file_prepend_output_dir("x"), "/obj/x");
     IS(file_prepend_output_dir("x.o"), "/obj/x.o");
@@ -294,7 +294,7 @@ void test_file_prepend_output_dir() {
     IS(file_prepend_output_dir("x.o"), "/obj/x.o");
     IS(file_prepend_output_dir("/obj/x.o"), "/obj/x.o");
 
-    g_output_dir = "c:\\obj";
+    g_asm.options().set_output_dir("c:\\obj");
     IS(file_prepend_output_dir(""), "c:/obj/");
     IS(file_prepend_output_dir("x"), "c:/obj/x");
     IS(file_prepend_output_dir("x.o"), "c:/obj/x.o");
@@ -303,7 +303,7 @@ void test_file_prepend_output_dir() {
     IS(file_prepend_output_dir("\\dir\\x.o"), "c:/obj/dir/x.o");
     IS(file_prepend_output_dir("c:\\dir\\x.o"), "c:/obj/c/dir/x.o");
 
-    g_output_dir = "c:\\obj\\";
+    g_asm.options().set_output_dir("c:\\obj\\");
     IS(file_prepend_output_dir(""), "c:/obj/");
     IS(file_prepend_output_dir("x"), "c:/obj/x");
     IS(file_prepend_output_dir("x.o"), "c:/obj/x.o");
@@ -312,7 +312,7 @@ void test_file_prepend_output_dir() {
     IS(file_prepend_output_dir("\\dir\\x.o"), "c:/obj/dir/x.o");
     IS(file_prepend_output_dir("c:\\dir\\x.o"), "c:/obj/c/dir/x.o");
 
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
 }
 
 void test_file_parent_dir() {
@@ -381,7 +381,7 @@ void test_file_asm_filename() {
 }
 
 void test_file_lis_filename() {
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
     IS(file_lis_filename(""), ".lis");
     IS(file_lis_filename("x"), "x.lis");
     IS(file_lis_filename("x.asm"), "x.lis");
@@ -390,7 +390,7 @@ void test_file_lis_filename() {
     IS(file_lis_filename("\\dir\\x.asm"), "/dir/x.lis");
     IS(file_lis_filename("c:\\dir\\x.asm"), "c:/dir/x.lis");
 
-    g_output_dir = "/obj";
+    g_asm.options().set_output_dir("/obj");
     IS(file_lis_filename(""), "/obj/.lis");
     IS(file_lis_filename("x"), "/obj/x.lis");
     IS(file_lis_filename("x.asm"), "/obj/x.lis");
@@ -399,7 +399,7 @@ void test_file_lis_filename() {
     IS(file_lis_filename("\\dir\\x.asm"), "/obj/dir/x.lis");
     IS(file_lis_filename("c:\\dir\\x.asm"), "/obj/c/dir/x.lis");
 
-    g_output_dir = "c:\\obj";
+    g_asm.options().set_output_dir("c:\\obj");
     IS(file_lis_filename(""), "c:/obj/.lis");
     IS(file_lis_filename("x"), "c:/obj/x.lis");
     IS(file_lis_filename("x.asm"), "c:/obj/x.lis");
@@ -408,11 +408,11 @@ void test_file_lis_filename() {
     IS(file_lis_filename("\\dir\\x.asm"), "c:/obj/dir/x.lis");
     IS(file_lis_filename("c:\\dir\\x.asm"), "c:/obj/c/dir/x.lis");
 
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
 }
 
 void test_file_o_filename() {
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
     IS(file_o_filename(""), ".o");
     IS(file_o_filename("x"), "x.o");
     IS(file_o_filename("x.asm"), "x.o");
@@ -421,7 +421,7 @@ void test_file_o_filename() {
     IS(file_o_filename("\\dir\\x.asm"), "/dir/x.o");
     IS(file_o_filename("c:\\dir\\x.asm"), "c:/dir/x.o");
 
-    g_output_dir = "/obj";
+    g_asm.options().set_output_dir("/obj");
     IS(file_o_filename(""), "/obj/.o");
     IS(file_o_filename("x"), "/obj/x.o");
     IS(file_o_filename("x.asm"), "/obj/x.o");
@@ -430,7 +430,7 @@ void test_file_o_filename() {
     IS(file_o_filename("\\dir\\x.asm"), "/obj/dir/x.o");
     IS(file_o_filename("c:\\dir\\x.asm"), "/obj/c/dir/x.o");
 
-    g_output_dir = "c:\\obj";
+    g_asm.options().set_output_dir("c:\\obj");
     IS(file_o_filename(""), "c:/obj/.o");
     IS(file_o_filename("x"), "c:/obj/x.o");
     IS(file_o_filename("x.asm"), "c:/obj/x.o");
@@ -439,11 +439,11 @@ void test_file_o_filename() {
     IS(file_o_filename("\\dir\\x.asm"), "c:/obj/dir/x.o");
     IS(file_o_filename("c:\\dir\\x.asm"), "c:/obj/c/dir/x.o");
 
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
 }
 
 void test_file_def_filename() {
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
     IS(file_def_filename(""), ".def");
     IS(file_def_filename("x"), "x.def");
     IS(file_def_filename("x.asm"), "x.def");
@@ -452,7 +452,7 @@ void test_file_def_filename() {
     IS(file_def_filename("\\dir\\x.asm"), "/dir/x.def");
     IS(file_def_filename("c:\\dir\\x.asm"), "c:/dir/x.def");
 
-    g_output_dir = "/obj";
+    g_asm.options().set_output_dir("/obj");
     IS(file_def_filename(""), "/obj/.def");
     IS(file_def_filename("x"), "/obj/x.def");
     IS(file_def_filename("x.asm"), "/obj/x.def");
@@ -461,7 +461,7 @@ void test_file_def_filename() {
     IS(file_def_filename("\\dir\\x.asm"), "/obj/dir/x.def");
     IS(file_def_filename("c:\\dir\\x.asm"), "/obj/c/dir/x.def");
 
-    g_output_dir = "c:\\obj";
+    g_asm.options().set_output_dir("c:\\obj");
     IS(file_def_filename(""), "c:/obj/.def");
     IS(file_def_filename("x"), "c:/obj/x.def");
     IS(file_def_filename("x.asm"), "c:/obj/x.def");
@@ -470,13 +470,13 @@ void test_file_def_filename() {
     IS(file_def_filename("\\dir\\x.asm"), "c:/obj/dir/x.def");
     IS(file_def_filename("c:\\dir\\x.asm"), "c:/obj/c/dir/x.def");
 
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
 }
 
 void test_file_bin_filename() {
     // no section
-    g_output_dir.clear();
-    g_bin_filename.clear();
+    g_asm.options().set_output_dir();
+    g_asm.options().set_bin_filename();
 
     IS(file_bin_filename(""), ".bin");
     IS(file_bin_filename("x"), "x.bin");
@@ -486,8 +486,8 @@ void test_file_bin_filename() {
     IS(file_bin_filename("\\dir\\x.asm"), "/dir/x.bin");
     IS(file_bin_filename("c:\\dir\\x.asm"), "c:/dir/x.bin");
 
-    g_output_dir.clear();
-    g_bin_filename = "xxx";
+    g_asm.options().set_output_dir();
+    g_asm.options().set_bin_filename("xxx");
 
     IS(file_bin_filename(""), "xxx");
     IS(file_bin_filename("x"), "xxx");
@@ -497,8 +497,8 @@ void test_file_bin_filename() {
     IS(file_bin_filename("\\dir\\x.asm"), "xxx");
     IS(file_bin_filename("c:\\dir\\x.asm"), "xxx");
 
-    g_output_dir.clear();
-    g_bin_filename = "x.P";
+    g_asm.options().set_output_dir();
+    g_asm.options().set_bin_filename("x.P");
 
     IS(file_bin_filename(""), "x.P");
     IS(file_bin_filename("x"), "x.P");
@@ -508,8 +508,8 @@ void test_file_bin_filename() {
     IS(file_bin_filename("\\dir\\x.asm"), "x.P");
     IS(file_bin_filename("c:\\dir\\x.asm"), "x.P");
 
-    g_output_dir = "/obj";
-    g_bin_filename.clear();
+    g_asm.options().set_output_dir("/obj");
+    g_asm.options().set_bin_filename();
 
     IS(file_bin_filename(""), "/obj/.bin");
     IS(file_bin_filename("x"), "/obj/x.bin");
@@ -520,8 +520,8 @@ void test_file_bin_filename() {
     IS(file_bin_filename("c:\\dir\\x.asm"), "/obj/c/dir/x.bin");
 
     // with section
-    g_output_dir.clear();
-    g_bin_filename.clear();
+    g_asm.options().set_output_dir();
+    g_asm.options().set_bin_filename();
 
     IS(file_bin_filename("", "CODE"), "_CODE.bin");
     IS(file_bin_filename("x", "CODE"), "x_CODE.bin");
@@ -531,8 +531,8 @@ void test_file_bin_filename() {
     IS(file_bin_filename("\\dir\\x.asm", "CODE"), "/dir/x_CODE.bin");
     IS(file_bin_filename("c:\\dir\\x.asm", "CODE"), "c:/dir/x_CODE.bin");
 
-    g_output_dir.clear();
-    g_bin_filename = "xxx";
+    g_asm.options().set_output_dir();
+    g_asm.options().set_bin_filename("xxx");
 
     IS(file_bin_filename("", "CODE"), "xxx_CODE.bin");
     IS(file_bin_filename("x", "CODE"), "xxx_CODE.bin");
@@ -542,8 +542,8 @@ void test_file_bin_filename() {
     IS(file_bin_filename("\\dir\\x.asm", "CODE"), "xxx_CODE.bin");
     IS(file_bin_filename("c:\\dir\\x.asm", "CODE"), "xxx_CODE.bin");
 
-    g_output_dir.clear();
-    g_bin_filename = "x.P";
+    g_asm.options().set_output_dir();
+    g_asm.options().set_bin_filename("x.P");
 
     IS(file_bin_filename("", "CODE"), "x_CODE.bin");
     IS(file_bin_filename("x", "CODE"), "x_CODE.bin");
@@ -553,8 +553,8 @@ void test_file_bin_filename() {
     IS(file_bin_filename("\\dir\\x.asm", "CODE"), "x_CODE.bin");
     IS(file_bin_filename("c:\\dir\\x.asm", "CODE"), "x_CODE.bin");
 
-    g_output_dir = "/obj";
-    g_bin_filename.clear();
+    g_asm.options().set_output_dir("/obj");
+    g_asm.options().set_bin_filename();
 
     IS(file_bin_filename("", "CODE"), "/obj/_CODE.bin");
     IS(file_bin_filename("x", "CODE"), "/obj/x_CODE.bin");
@@ -564,8 +564,8 @@ void test_file_bin_filename() {
     IS(file_bin_filename("\\dir\\x.asm", "CODE"), "/obj/dir/x_CODE.bin");
     IS(file_bin_filename("c:\\dir\\x.asm", "CODE"), "/obj/c/dir/x_CODE.bin");
 
-    g_output_dir.clear();
-    g_bin_filename.clear();
+    g_asm.options().set_output_dir();
+    g_asm.options().set_bin_filename();
 }
 
 void test_file_lib_filename() {
@@ -579,7 +579,7 @@ void test_file_lib_filename() {
 }
 
 void test_file_sym_filename() {
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
     IS(file_sym_filename(""), ".sym");
     IS(file_sym_filename("x"), "x.sym");
     IS(file_sym_filename("x.asm"), "x.sym");
@@ -588,7 +588,7 @@ void test_file_sym_filename() {
     IS(file_sym_filename("\\dir\\x.asm"), "/dir/x.sym");
     IS(file_sym_filename("c:\\dir\\x.asm"), "c:/dir/x.sym");
 
-    g_output_dir = "/obj";
+    g_asm.options().set_output_dir("/obj");
     IS(file_sym_filename(""), "/obj/.sym");
     IS(file_sym_filename("x"), "/obj/x.sym");
     IS(file_sym_filename("x.asm"), "/obj/x.sym");
@@ -597,7 +597,7 @@ void test_file_sym_filename() {
     IS(file_sym_filename("\\dir\\x.asm"), "/obj/dir/x.sym");
     IS(file_sym_filename("c:\\dir\\x.asm"), "/obj/c/dir/x.sym");
 
-    g_output_dir = "c:\\obj";
+    g_asm.options().set_output_dir("c:\\obj");
     IS(file_sym_filename(""), "c:/obj/.sym");
     IS(file_sym_filename("x"), "c:/obj/x.sym");
     IS(file_sym_filename("x.asm"), "c:/obj/x.sym");
@@ -606,11 +606,11 @@ void test_file_sym_filename() {
     IS(file_sym_filename("\\dir\\x.asm"), "c:/obj/dir/x.sym");
     IS(file_sym_filename("c:\\dir\\x.asm"), "c:/obj/c/dir/x.sym");
 
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
 }
 
 void test_file_map_filename() {
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
     IS(file_map_filename(""), ".map");
     IS(file_map_filename("x"), "x.map");
     IS(file_map_filename("x.asm"), "x.map");
@@ -619,7 +619,7 @@ void test_file_map_filename() {
     IS(file_map_filename("\\dir\\x.asm"), "/dir/x.map");
     IS(file_map_filename("c:\\dir\\x.asm"), "c:/dir/x.map");
 
-    g_output_dir = "/obj";
+    g_asm.options().set_output_dir("/obj");
     IS(file_map_filename(""), "/obj/.map");
     IS(file_map_filename("x"), "/obj/x.map");
     IS(file_map_filename("x.asm"), "/obj/x.map");
@@ -628,7 +628,7 @@ void test_file_map_filename() {
     IS(file_map_filename("\\dir\\x.asm"), "/obj/dir/x.map");
     IS(file_map_filename("c:\\dir\\x.asm"), "/obj/c/dir/x.map");
 
-    g_output_dir = "c:\\obj";
+    g_asm.options().set_output_dir("c:\\obj");
     IS(file_map_filename(""), "c:/obj/.map");
     IS(file_map_filename("x"), "c:/obj/x.map");
     IS(file_map_filename("x.asm"), "c:/obj/x.map");
@@ -637,11 +637,11 @@ void test_file_map_filename() {
     IS(file_map_filename("\\dir\\x.asm"), "c:/obj/dir/x.map");
     IS(file_map_filename("c:\\dir\\x.asm"), "c:/obj/c/dir/x.map");
 
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
 }
 
 void test_file_reloc_filename() {
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
     IS(file_reloc_filename(""), ".reloc");
     IS(file_reloc_filename("x"), "x.reloc");
     IS(file_reloc_filename("x.asm"), "x.reloc");
@@ -650,7 +650,7 @@ void test_file_reloc_filename() {
     IS(file_reloc_filename("\\dir\\x.asm"), "/dir/x.reloc");
     IS(file_reloc_filename("c:\\dir\\x.asm"), "c:/dir/x.reloc");
 
-    g_output_dir = "/obj";
+    g_asm.options().set_output_dir("/obj");
     IS(file_reloc_filename(""), "/obj/.reloc");
     IS(file_reloc_filename("x"), "/obj/x.reloc");
     IS(file_reloc_filename("x.asm"), "/obj/x.reloc");
@@ -659,7 +659,7 @@ void test_file_reloc_filename() {
     IS(file_reloc_filename("\\dir\\x.asm"), "/obj/dir/x.reloc");
     IS(file_reloc_filename("c:\\dir\\x.asm"), "/obj/c/dir/x.reloc");
 
-    g_output_dir = "c:\\obj";
+    g_asm.options().set_output_dir("c:\\obj");
     IS(file_reloc_filename(""), "c:/obj/.reloc");
     IS(file_reloc_filename("x"), "c:/obj/x.reloc");
     IS(file_reloc_filename("x.asm"), "c:/obj/x.reloc");
@@ -668,6 +668,6 @@ void test_file_reloc_filename() {
     IS(file_reloc_filename("\\dir\\x.asm"), "c:/obj/dir/x.reloc");
     IS(file_reloc_filename("c:\\dir\\x.asm"), "c:/obj/c/dir/x.reloc");
 
-    g_output_dir.clear();
+    g_asm.options().set_output_dir();
 }
 

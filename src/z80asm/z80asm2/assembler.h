@@ -9,6 +9,7 @@
 #include "errors.h"
 #include "location.h"
 #include "object.h"
+#include "options.h"
 #include "symtab.h"
 #include <iostream>
 #include <string>
@@ -27,6 +28,9 @@ public:
 
     // assemble source file
     bool assemble(const string& filename);              // assemble one source file
+
+    // command line options
+    Options& options();
 
     // handle errors
     void push_location(const Location& location);
@@ -69,6 +73,7 @@ public:
     Symbol* declare_global(const string& name);
 
 private:
+    Options options_;               // command line options
     Errors errors_;                 // handle errors
     vector<Location> locations_;    // location stack
     string filename_;               // source filename 

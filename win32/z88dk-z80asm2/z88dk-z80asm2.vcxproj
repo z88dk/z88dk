@@ -143,6 +143,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\main.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\object.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\symtab.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\files.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\object.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\parser.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\scan.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\symtab.h" />

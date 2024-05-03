@@ -184,7 +184,7 @@ bool Lexer::set_text(const string& text) {
     clear();
     string str;
     int quote = 0;
-    bool raw_strings = g_raw_strings;
+    bool raw_strings = g_asm.options().raw_strings();
     bool got_error = false;
     bool blank_before = false;
     const char* p = text.c_str();
@@ -635,7 +635,7 @@ yy44:
 			{ str = string(p0, p);
 
                               // to upper
-                              if (g_upper_case) str = str_toupper(str);
+                              if (g_asm.options().upper_case()) str = str_toupper(str);
 
                               // handle af' et all
                               Keyword keyword = keyword_lookup(str);
@@ -646,7 +646,7 @@ yy44:
                               }
 
                               // check for -IXIY
-                              if (g_swap_ixiy != IXIY_NO_SWAP) {
+                              if (g_asm.options().swap_ixiy() != IXIY_NO_SWAP) {
                                   switch (keyword) {
                                   case KW_IX: case KW_IXH: case KW_IXL:
                                   case KW_IY: case KW_IYH: case KW_IYL:

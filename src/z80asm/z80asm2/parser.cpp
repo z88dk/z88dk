@@ -347,11 +347,12 @@ Instr* Parser::add_call_function_n(const string& name) {
 }
 
 void Parser::add_restart(int arg) {
+    cpu_t cpu = g_asm.options().cpu();
     if (arg > 0 && arg < 8)
         arg *= 8;
     switch (arg) {
     case 0x00: case 0x08: case 0x30:
-        if (g_cpu == CPU_R2KA || g_cpu == CPU_R3K || g_cpu == CPU_R4K || g_cpu == CPU_R5K)
+        if (cpu == CPU_R2KA || cpu == CPU_R3K || cpu == CPU_R4K || cpu == CPU_R5K)
             add_opcode(0xCD0000 + (arg << 8));
         else
             add_opcode(0xC7 + arg);
