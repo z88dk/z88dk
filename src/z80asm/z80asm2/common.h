@@ -8,5 +8,15 @@
 
 #include "assembler.h"
 
+// program name
+#define Z80ASM_PROG	    "z88dk-z80asm"
+
+// environment variables
+#define Z80ASM_ENVVAR	"Z80ASM"
+#define ZCC_ENVVAR      "ZCCCFG"
+
+// library base name
+#define Z80ASM_LIB_BASE	Z80ASM_PROG
+
 // application class
 extern Assembler g_asm;

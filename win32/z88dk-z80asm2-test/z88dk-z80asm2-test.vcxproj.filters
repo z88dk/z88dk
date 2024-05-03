@@ -78,10 +78,10 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_options.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_utils_driver.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\zfloat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\zfloat.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_files_driver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_zfloat.cpp">

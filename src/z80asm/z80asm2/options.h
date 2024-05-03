@@ -6,8 +6,11 @@
 
 #pragma once
 
+#include "files.h"
 #include "z80asm_defs.h"
+#include "zfloat.h"
 #include <string>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -30,6 +33,8 @@ enum appmake_t {
 class Options {
 public:
     void parse_args(const vector<string>& args);
+    void parse_option(const string& arg);
+    void parse_file(const string& arg);
 
     // help
     void exit_copyright();
@@ -54,6 +59,7 @@ public:
     bool date_stamp() const;		    // -d option
     bool relocatable() const;		    // -R option
     bool reloc_info() const;		    // -reloc-info option
+    int origin() const;                 // -r option
     int filler() const;				    // -f option
     bool symtable() const;		        // -s option
     bool list_file() const;		        // -l option
@@ -64,21 +70,38 @@ public:
     const string& m4_options() const;   // options to the m4 subprocess
     vector<string>& include_path();		// -I option
     vector<string>& library_path();		// -L option
-    const string& consol_obj_filename() const;
+    vector<string>& libraries();        // -l option
+    string consol_obj_filename() const; // -o without -b options
+    unordered_map<string, int>& defines(); // -D option
+    void define_symbol(const string& name, int value = 1);
+    void undefine_symbol(const string& name);
+    FloatFormat& float_format();        // -float option
+    vector<string>& input_files();	    // input files to process
 
     // set options
     void set_cpu(cpu_t cpu = CPU_Z80);
+    void set_cpu(const string& name);
     void set_swap_ixiy(swap_ixiy_t swap = IXIY_SWAP);
     void set_upper_case(bool f = true);
     void set_raw_strings(bool f = true);
     void set_output_dir(const string& dir = "");
+    void set_origin(int origin);
+    void set_origin(const string& arg);
+    void set_filler(int filler);
+    void set_filler(const string& arg);
     void set_bin_filename(const string& filename = "");
+    void add_library(const string& name);
+    void set_float_format(float_format_t format = FLOAT_genmath);
+    void set_float_format(const string& format);
 
 private:
+    // options
     cpu_t   cpu_{ CPU_Z80 };            // -mCPU option
+    bool    got_cpu_option_{ false };
     bool    ti83_{ false };             // -mCPU option
     bool    ti83plus_{ false };         // -mCPU option
     swap_ixiy_t swap_ixiy_{ IXIY_NO_SWAP }; // -IXIY option
+    bool    got_swap_ixiy_option_{ false };
     bool	verbose_{ false };			// -v option
     bool	upper_case_{ false };		// -ucase option
     bool    raw_strings_{ false };      // -raw-strings option
@@ -93,6 +116,7 @@ private:
     bool	date_stamp_{ false };		// -d option
     bool	relocatable_{ false };		// -R option
     bool	reloc_info_{ false };		// -reloc-info option
+    int     origin_{ ORG_NOT_DEFINED }; // -r option
     int		filler_{ 0 };				// -f option
     bool	symtable_{ false };		    // -s option
     bool	list_file_{ false };		// -l option
@@ -103,6 +127,37 @@ private:
     string  m4_options_;                // options to the m4 subprocess
     vector<string>	include_path_;		// -I option
     vector<string>	library_path_;		// -L option
+    vector<string>	libraries_;		    // -l option
     string	consol_obj_filename_;		// -o without -b options
+    unordered_map<string, int> defines_;// -D option
+    FloatFormat float_format_;          // -float option
+    bool    got_float_format_option_{ false };
+    vector<string>	input_files_;	    // input files to process
+    FileReader  file_reader_;           // reader for @ files
 
+    // parsing
+    void parse_env_vars();
+    void parse_args_in_text(const string& text);
+    bool collect_opt_arg(const string& opt_name, const string& arg, string& opt_arg);
+    void parse_define(const string& opt_arg);
+    bool parse_opt_int(int& value, const string& opt_arg);
+    string unquote(string text);
+    string expand_env_vars(string text);
+
+    // option actions
+    void post_parsing_actions();
+    void set_consol_obj_options();
+    void define_assembly_defines();
+
+    // z80asm library
+    void include_z80asm_lib();
+    string search_z80asm_lib();
+    string z80asm_lib_filename();
+
+    // parsing files
+    string norm_msys2_arg_filename(const string& filename);
+    void expand_source_glob(const string& pattern);
+    void expand_list_glob(const string& pattern);
+    string search_source(const string& filename);
+    bool check_source(const string& filename, string& out_filename);
 };

@@ -47,7 +47,8 @@ LDFLAGS 	+= $(shell perl ../tools/build_ldflags.pl $(CXX) $(CROSS))
 LIB_SRCS	:= ../../common/xassert.c \
 			   ../../common/xmalloc.c \
 			   ../../common/dirname.c \
-			   ../../common/z80asm_defs.c
+			   ../../common/z80asm_defs.c \
+			   ../../common/stack_trace.c
 			   
 LIB_OBJS	:= $(LIB_SRCS:.c=.o) 
 
