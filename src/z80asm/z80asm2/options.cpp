@@ -4,11 +4,21 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "../../config.h"       // Z88DK_VERSION
+#include "files.h"
 #include "options.h"
+#include <iomanip>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 using namespace std;
+
+#define TOSTR(x)	_TOSTR(x)
+#define _TOSTR(x)	#x
+
+#define COPYRIGHT		"InterLogic 1993-2009, Paulo Custodio 2011-2024"
+#define COPYRIGHT_MSG	"Z80 Macro Assembler " Z88DK_VERSION "\n(c) " COPYRIGHT
+
 
 void Options::parse_args(const vector<string>& args) {
     for (auto& arg : args)
@@ -153,4 +163,45 @@ void Options::set_output_dir(const string& dir) {
 
 void Options::set_bin_filename(const string& filename) {
     bin_filename_ = filename;
+}
+
+void Options::exit_copyright() {
+    cout << COPYRIGHT_MSG << endl;
+    exit(0);
+}
+
+void Options::exit_help() {
+    cout << COPYRIGHT_MSG << endl
+        << endl
+        << "Usage:" << endl
+        << "  z80asm [options] { @<modulefile> | <filename> }" << endl
+        << endl
+        << "  [] = optional, {} = may be repeated, | = OR clause." << endl
+        << endl
+        << "  To assemble 'fred" EXT_ASM "' use 'fred' or 'fred" EXT_ASM "'" << endl
+        << endl
+        << "  <modulefile> contains list of file names of all modules to be linked," << endl
+        << "  one module per line." << endl
+        << endl
+        << "  File types recognized or created by z80asm:" << endl
+        << "    " EXT_ASM "   = source file" << endl
+        << "    " EXT_O "     = object file" << endl
+        << "    " EXT_LIS "   = list file" << endl
+        << "    " EXT_BIN "   = Z80 binary file" << endl
+        << "    " EXT_SYM "   = symbols file" << endl
+        << "    " EXT_MAP "   = map file" << endl
+        << "    " EXT_RELOC " = reloc file" << endl
+        << "    " EXT_DEF "   = global address definition file" << endl;
+
+#define OPT_HEADER(opt_header)	cout << endl << opt_header << endl;
+#define OPT(opt_name, opt_param, opt_code, opt_help)					\
+		{																\
+			string opt_text = "  " + string(opt_name);					\
+			if (opt_param)												\
+				opt_text += string(opt_param);							\
+			cout << setw(24) << left << opt_text << opt_help << endl;	\
+		}
+#include "options.def"
+
+    exit(0);
 }

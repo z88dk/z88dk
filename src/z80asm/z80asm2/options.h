@@ -31,6 +31,10 @@ class Options {
 public:
     void parse_args(const vector<string>& args);
 
+    // help
+    void exit_copyright();
+    void exit_help();
+
     // options
     cpu_t cpu() const;                  // -mCPU option
     bool ti83() const;                  // -mCPU option

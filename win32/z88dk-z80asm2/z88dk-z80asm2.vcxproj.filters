@@ -109,5 +109,8 @@
     <None Include="..\..\src\z80asm\z80asm2\scan.re">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\src\z80asm\z80asm2\options.def">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

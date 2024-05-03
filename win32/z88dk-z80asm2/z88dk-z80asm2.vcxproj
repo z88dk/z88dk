@@ -166,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\errors.def" />
+    <None Include="..\..\src\z80asm\z80asm2\options.def" />
     <None Include="..\..\src\z80asm\z80asm2\scan.def" />
     <None Include="..\..\src\z80asm\z80asm2\scan.re" />
   </ItemGroup>
