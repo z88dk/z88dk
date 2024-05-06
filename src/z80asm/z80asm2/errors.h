@@ -11,11 +11,6 @@
 #include <string>
 using namespace std;
 
-// number of elements of array
-#ifndef NUM_ELEMS
-#define NUM_ELEMS(a)    (sizeof(a) / sizeof(a[0]))
-#endif
-
 // error code
 enum ErrCode {
 #define X(code, message)    code,

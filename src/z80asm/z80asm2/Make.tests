@@ -6,3 +6,4 @@ $(eval $(call MAKE_EXE,t/test_options,t/test_options.o options.o t/test_options_
 $(eval $(call MAKE_EXE,t/test_scan,t/test_scan.o scan.o t/test_scan_driver.o t/test.o $(LIB_OBJS),1))
 $(eval $(call MAKE_EXE,t/test_symtab,t/test_symtab.o symtab.o t/test_symtab_driver.o t/test.o $(LIB_OBJS),1))
 $(eval $(call MAKE_EXE,t/test_utils,t/test_utils.o utils.o t/test_utils_driver.o t/test.o $(LIB_OBJS),1))
+$(eval $(call MAKE_EXE,t/test_zfloat,t/test_zfloat.o zfloat.o t/test_zfloat_driver.o t/test.o $(LIB_OBJS),1))

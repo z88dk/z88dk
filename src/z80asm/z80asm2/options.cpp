@@ -7,14 +7,12 @@
 #include "../../config.h"       // Z88DK_VERSION
 #include "files.h"
 #include "options.h"
+#include "utils.h"
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
 using namespace std;
-
-#define TOSTR(x)	_TOSTR(x)
-#define _TOSTR(x)	#x
 
 #define COPYRIGHT		"InterLogic 1993-2009, Paulo Custodio 2011-2024"
 #define COPYRIGHT_MSG	"Z80 Macro Assembler " Z88DK_VERSION "\n(c) " COPYRIGHT

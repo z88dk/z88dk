@@ -9,6 +9,7 @@
 #include "zfloat.h"
 #include <cerrno>
 #include <cmath>
+#include <cstring>
 #include <unordered_map>
 using namespace std;
 
@@ -643,7 +644,7 @@ vector<uint8_t> FloatFormat::float_to_bytes(double value) {
 
 string FloatFormat::get_all_formats() {
     string formats;
-#define X(type)	        formats += #type + ",";
+#define X(type)	        formats += string(#type) + ",";
 #include "zfloat.def"
     if (!formats.empty())
         formats.pop_back();     // remove end comma

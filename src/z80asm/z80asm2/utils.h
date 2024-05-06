@@ -12,6 +12,14 @@
 #include <string>
 using namespace std;
 
+// number of elements of array
+#define NUM_ELEMS(a)    (sizeof(a) / sizeof(a[0]))
+
+// convert argument to string
+#define TOSTR(x)	_TOSTR(x)
+#define _TOSTR(x)	#x
+
+
 bool is_ident_start(char c);
 bool is_ident(char c);
 bool is_ident(const string& ident);
