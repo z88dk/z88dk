@@ -161,6 +161,43 @@
 	ret
 
 
+
+._func6
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	ld	bc,17
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	call	lp_gptr
+	push	de
+	push	hl
+	call	_callit
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func6a
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	ld	bc,17
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	call	lp_gptr
+	call	lp_glong
+	push	de
+	push	hl
+	call	_callit
+	pop	bc
+	pop	bc
+	ret
+
+
 	SECTION	bss_compiler
 	SECTION	code_compiler
 
@@ -182,6 +219,8 @@
 	GLOBAL	_func4
 	GLOBAL	_func5
 	GLOBAL	_func5a
+	GLOBAL	_func6
+	GLOBAL	_func6a
 
 
 

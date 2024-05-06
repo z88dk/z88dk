@@ -13,6 +13,7 @@ typedef struct {
   un_t pt;
   char arr[10];
   struct x *extra;
+  struct x *__far extraf;
 } st_t;
 
 void callit();
@@ -46,11 +47,17 @@ void func4(st_t *__far far_p) {
 
 
 void func5(st_t *__far far_p) {
-  // This is incorrect, c is accessed via far
   callit(&far_p->extra->c);
 }
 
 void func5a(st_t *__far far_p) {
-  // This is incorrect, c is accessed via far
   callit(far_p->extra->c);
+}
+
+void func6(st_t *__far far_p) {
+  callit(&far_p->extraf->c);
+}
+
+void func6a(st_t *__far far_p) {
+  callit(far_p->extraf->c);
 }
