@@ -579,15 +579,12 @@ int heira(LVALUE *lval)
         if (heira(lval) == 0) {
             lval->ltype = make_pointer(lval->ltype);
             lval->ptr_type = lval->ltype->ptr->kind;
-            lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
+            lval->val_type = lval->ltype->kind = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
             return 0;
         }
         lval->ltype = make_pointer(lval->ltype);
-        if ( lval->flags & FARACC ) lval->ltype->kind = KIND_CPTR;
-
         lval->ptr_type = lval->ltype->ptr->kind;
-        lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
-
+        lval->val_type = lval->ltype->kind = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
         if (lval->symbol) {
             lval->symbol->isassigned = YES;
         }
@@ -812,6 +809,7 @@ int heirb(LVALUE* lval)
                     junk();
                     return 0;
                 }
+
                 /*
                  * Here, we're trying to chase our member up, we have to be careful
                  * not to access via far methods near data..
@@ -821,10 +819,9 @@ int heirb(LVALUE* lval)
 
                 debug(DBG_FAR1, "prev=%s name=%s flags %d oflags %d", lval->symbol->name, ptr->name, lval->flags, lval->oflags);
                 flags = member_type->flags;
-                if (direct == 0) {
-                    if ( lval->ltype->kind == KIND_CPTR ) {
-                        flags |= FARACC;
-                    }
+
+                if ( (lval->flags & FARACC) || lval->ltype->kind == KIND_CPTR ) {
+                    flags |= FARACC;
                 }
                 lval->flags = flags;
                 zadd_const(lval, member_type->offset);
