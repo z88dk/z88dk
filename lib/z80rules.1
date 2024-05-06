@@ -7077,3 +7077,18 @@ $notcpu 8085
 	ld	b,0
 	push	bc
 	inc	hl
+
+%title Far struct+array access
+	ld	bc,%1
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	ld	bc,%2
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+=
+	ld	bc,%eval( %1 %2 +)
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
