@@ -14,6 +14,9 @@ ENDIF
     PUBLIC  THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES
     defc    THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES = 1
 
+    PUBLIC  THIS_FUNCTION_ONLY_WORKS_WITH_ALLRAM_SUBTYPE
+    defc    THIS_FUNCTION_ONLY_WORKS_WITH_ALLRAM_SUBTYPE = 1
+
     PUBLIC  __sam_graphics_pagein
     PUBLIC  __sam_graphics_pageout
 
@@ -46,10 +49,13 @@ CRT_START:
 ; This code has to run relatively, it's located at $8000
 initialise:
     di
+    in      a,(LMPR)
+    and     31
+    ld      (sysvarpage + 0x8000),a
     ; Page this page into low memory
     in      a,(HMPR)
     and     31
-    or      @00100000	;Page video memory in low, turn off ROM
+    or      @00100000	;Turn off ROM
     out     (LMPR),a
     jp      setup_in_low_memory
 setup_in_low_memory:
@@ -79,6 +85,9 @@ IF !CRT_DISABLE_INT_TICK
     EXTERN   tick_count
     defc     _FRAMES = tick_count
 ENDIF
+IF CLIB_FARHEAP_BANKS
+    call    setup_far_heap
+ENDIF
     INCLUDE "crt/classic/crt_init_eidi.inc"
     ei
     ; Entry to the user code
@@ -95,6 +104,103 @@ l_dcal:
 highpage:   
         defb    0
 
+; Page where system variables are stored
+sysvarpage:
+        defb    0
+
+
+IF CLIB_FARHEAP_BANKS
+    PUBLIC  __sam_bank_mappings
+    EXTERN  sbrk_far
+
+setup_far_heap:
+    in      a,(HMPR)
+    push    af
+    and     @11100000
+    ld      b,a
+    ld      a,(sysvarpage)
+    and     31
+    or      b
+    out     (HMPR),A
+    ; Sysvars are now paged in to 0x8000
+
+    ld      ix,__sam_bank_mappings
+    ld      hl, $5100 + $8000
+again:
+    ld      a,(hl)
+    and     a
+    jr      nz,next
+    inc     hl
+    ld      a,(hl)
+    dec     hl
+    and     a
+    jr      nz,next
+    ; So we two free pages availale now
+    ld      (ix+0),l
+    inc     ix
+    inc     hl
+next:
+    inc     hl
+    ld      a,l
+    cp      $20
+    jr      c,again
+    pop     af
+    out     (HMPR),a
+
+
+    push    ix
+    pop     hl
+    ld      de,__sam_bank_mappings
+    and     a
+    sbc     hl,de
+
+    ld      a,l         ;Number of 32k pages we saw
+    push    af          ;Save for later
+    ld      de,1        ;First far address 0x010000
+    ld      hl,0
+    srl     a
+    and     a
+    jr      z,sbrk_residual
+
+    ; Now loop, adding 64k heap chunks
+    ld      b,a
+sbrk_loop:
+    push    bc
+    push    de
+    push    hl
+    ld      bc,$ffff
+    push    bc
+    call    sbrk_far
+    pop     bc
+    pop     hl
+    pop     de
+    inc     e
+    pop     bc      ;Loop count
+    djnz    sbrk_loop
+
+sbrk_residual:
+    pop     af
+    and     1
+    ret     z
+    ; We have a 32k page still
+    push    de
+    push    hl
+    ld      bc,$7fff
+    push    bc
+    call    sbrk_far
+    pop     bc
+    pop     hl
+    pop     de
+    ret
+
+
+
+
+; We page in 32k blocks, so using internal memory we only need 16 blocks
+__sam_bank_mappings:
+        defs    16
+
+ENDIF
 
 ; Interrupt handler
 

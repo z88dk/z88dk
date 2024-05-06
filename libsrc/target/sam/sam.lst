@@ -115,6 +115,10 @@ target/shared/clock
 
 target/sam/time/target_read_structtm
 
+; Far routines work on the allram subtype
+target/sam/far/__far_misc
+target/sam/far/__far_page
+
 
 ; Just some standard stuff now
 @stdio/ansicore.lst
