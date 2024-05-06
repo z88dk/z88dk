@@ -6,6 +6,8 @@
 
 #include "utils.h"
 #include "t/test.h"
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 void test_is_ident_start() {
@@ -106,10 +108,67 @@ void test_remove_all_blanks() {
     IS(str_remove_all_blanks("\t\f\r\n\vx\t\f\r\n\vy\t\f\r\n\v"), "xy");
 }
 
+void test_replace_all() {
+    IS(str_replace_all("helo helo", "", "xx"), "helo helo");
+    IS(str_replace_all("helo helo", "l", "ll"), "hello hello");
+    IS(str_replace_all("", "l", "ll"), "");
+}
+
+void test_safe_getline() {
+    test_spew("test.txt",
+        "line1\r"
+        "line2\n"
+        "line3\r\n"
+        "line4");
+    ifstream ifs("test.txt", ios::binary);
+    string text;
+
+    text = "x";
+    OK(!safe_getline(ifs, text).eof());
+    IS(text, "line1");
+
+    text = "x";
+    OK(!safe_getline(ifs, text).eof());
+    IS(text, "line2");
+
+    text = "x";
+    OK(!safe_getline(ifs, text).eof());
+    IS(text, "line3");
+
+    text = "x";
+    OK(!safe_getline(ifs, text).eof());
+    IS(text, "line4");
+
+    text = "x";
+    NOK(!safe_getline(ifs, text).eof());
+    IS(text, "");
+
+    text = "x";
+    NOK(!safe_getline(ifs, text).eof());
+    IS(text, "");
+
+    ifs.close();
+    remove("test.txt");
+}
+
 void test_ipow() {
     IS(ipow(10, -1), 0);
     IS(ipow(10, 0), 1);
     IS(ipow(10, 1), 10);
     IS(ipow(10, 2), 100);
     IS(ipow(10, 3), 1000);
+}
+
+void test_int_to_hex() {
+    IS(int_to_hex(-256, 2), "-$100");
+    IS(int_to_hex(-255, 2), "-$ff");
+    IS(int_to_hex(-10, 2), "-$0a");
+    IS(int_to_hex(-9, 2), "-9");
+    IS(int_to_hex(-1, 2), "-1");
+    IS(int_to_hex(0, 2), "0");
+    IS(int_to_hex(1, 2), "1");
+    IS(int_to_hex(9, 2), "9");
+    IS(int_to_hex(10, 2), "$0a");
+    IS(int_to_hex(255, 2), "$ff");
+    IS(int_to_hex(256, 2), "$100");
 }

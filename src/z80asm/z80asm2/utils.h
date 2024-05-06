@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 using namespace std;
 
 // number of elements of array
@@ -18,7 +19,6 @@ using namespace std;
 // convert argument to string
 #define TOSTR(x)	_TOSTR(x)
 #define _TOSTR(x)	#x
-
 
 bool is_ident_start(char c);
 bool is_ident(char c);
