@@ -23,6 +23,7 @@
     defc    LMPR = 250
 
     ; Controls 0x8000 - ffff
+    ; MCCBBBBB
     ; B=Bank 
     ; C=mode 3 color lookup
     ; M=use external memory expansion
@@ -39,4 +40,27 @@
     ; The high byte is set with the clut index to modify
     defc    CLUT = $f8
 
+    ; Controls external memory bank for 0x8000 - 0xbfff
+    ; 
+    ; Set HMBPR & $80 to take effect
+    ;
+    ; EEBBBBBB
+    ;
+    ; B = bank 
+    ; E = extension device
+    ;
+    ; Write only port
+    defc LEPR = $80
+
+    ; Controls external memory bank for 0xc000 - 0xffff
+    ; 
+    ; Set HMBPR & $80 to take effect
+    ;
+    ; EEBBBBBB
+    ;
+    ; B = bank 
+    ; E = extension device
+    ;
+    ; Write only port
+    defc HEPR = $81
         

@@ -950,6 +950,13 @@ void gen_push_primary(LVALUE *lval)
     case KIND_CPTR:
         lpush();
         break;
+    case KIND_ARRAY:
+        if ( lval->flags & FARACC ) {
+            lpush();
+        } else {
+            zpush();
+        }
+        break;
     default:
         zpush();
     }
