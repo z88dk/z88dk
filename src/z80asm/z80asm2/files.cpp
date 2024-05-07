@@ -33,7 +33,7 @@ static string norm_path(string filename) {
     return filename;
 }
 
-string search_path(const string& filename_, const vector<string>& path) {
+string file_search_path(const string& filename_, const vector<string>& path) {
     string filename = norm_path(filename_);
     fs::path file_path{ filename };
 
@@ -208,6 +208,40 @@ string file_reloc_filename(const string& filename) {
 
 //-----------------------------------------------------------------------------
 
+istream& safe_getline(istream& is, string& t) {
+    t.clear();
+
+    // The characters in the stream are read one-by-one using a streambuf.
+    // That is faster than reading them one-by-one using the istream.
+    // Code that uses streambuf this way must be guarded by a sentry object.
+    // The sentry object performs various tasks,
+    // such as thread synchronization and updating the stream state.
+
+    istream::sentry se(is, true);
+    streambuf* sb = is.rdbuf();
+
+    for (;;) {
+        int c = sb->sbumpc();
+        switch (c) {
+        case '\n':
+            return is;
+        case '\r':
+            if (sb->sgetc() == '\n')
+                sb->sbumpc();
+            return is;
+        case streambuf::traits_type::eof():
+            // Also handle the case when the last line has no line ending
+            if (t.empty())
+                is.setstate(ios::eofbit);
+            return is;
+        default:
+            t += (char)c;
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 OpenFile::OpenFile() {
 }
 
@@ -281,7 +315,7 @@ bool FileReader::open(const string& filename_) {
     string filename = fs::path(filename_).generic_string();
 
     // search file in path
-    string found_filename = search_path(filename, g_asm.options().include_path());
+    string found_filename = file_search_path(filename, g_asm.options().include_path());
 
     // check for recursive includes
     if (recursive_include(found_filename)) {

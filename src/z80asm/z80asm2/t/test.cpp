@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "test.h"
-#include "utils.h"
+#include "files.h"
 #include <cassert>
 #include <iostream>
 #include <fstream>

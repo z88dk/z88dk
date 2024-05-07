@@ -8,6 +8,7 @@
 #include "files.h"
 #include "options.h"
 #include "utils.h"
+#include <climits>
 #include <iomanip>
 #include <iostream>
 #include <string>

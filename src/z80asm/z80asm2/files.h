@@ -27,7 +27,7 @@ using namespace std;
 #define EXT_M4      ".m4"
 
 // file names
-string search_path(const string& filename, const vector<string>& path);
+string file_search_path(const string& filename, const vector<string>& path);
 string file_basename(const string& filename);
 string file_replace_extension(const string& filename, const string& extension);
 string file_prepend_output_dir(const string& filename);
@@ -45,6 +45,8 @@ string file_lib_filename(const string& filename);
 string file_sym_filename(const string& filename);
 string file_map_filename(const string& filename);
 string file_reloc_filename(const string& bin_filename);
+
+istream& safe_getline(istream& is, string& t);
 
 class OpenFile {
 public:

@@ -114,43 +114,6 @@ void test_replace_all() {
     IS(str_replace_all("", "l", "ll"), "");
 }
 
-void test_safe_getline() {
-    test_spew("test.txt",
-        "line1\r"
-        "line2\n"
-        "line3\r\n"
-        "line4");
-    ifstream ifs("test.txt", ios::binary);
-    string text;
-
-    text = "x";
-    OK(!safe_getline(ifs, text).eof());
-    IS(text, "line1");
-
-    text = "x";
-    OK(!safe_getline(ifs, text).eof());
-    IS(text, "line2");
-
-    text = "x";
-    OK(!safe_getline(ifs, text).eof());
-    IS(text, "line3");
-
-    text = "x";
-    OK(!safe_getline(ifs, text).eof());
-    IS(text, "line4");
-
-    text = "x";
-    NOK(!safe_getline(ifs, text).eof());
-    IS(text, "");
-
-    text = "x";
-    NOK(!safe_getline(ifs, text).eof());
-    IS(text, "");
-
-    ifs.close();
-    remove("test.txt");
-}
-
 void test_ipow() {
     IS(ipow(10, -1), 0);
     IS(ipow(10, 0), 1);

@@ -35,8 +35,6 @@ string str_remove_extra_blanks(const string& str);
 string str_remove_all_blanks(const string& str);
 string str_replace_all(string text, const string& find, const string& replace);
 
-istream& safe_getline(istream& is, string& t);
-
 int ipow(int base, int exp);
 
 // convert int to hex

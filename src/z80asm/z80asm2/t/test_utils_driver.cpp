@@ -17,7 +17,6 @@ void test_str_strip();
 void test_remove_extra_blanks();
 void test_remove_all_blanks();
 void test_replace_all();
-void test_safe_getline();
 void test_ipow();
 void test_int_to_hex();
 
@@ -44,7 +43,6 @@ int main(int argc, char* argv[]) {
         test_remove_extra_blanks();
         test_remove_all_blanks();
         test_replace_all();
-        test_safe_getline();
         test_ipow();
         test_int_to_hex();
     }
