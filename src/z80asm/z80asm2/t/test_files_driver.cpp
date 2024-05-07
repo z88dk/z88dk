@@ -4,14 +4,21 @@
 #include <string>
 using namespace std;
 
+void test_file_norm_path();
 void test_file_search_path();
 void test_file_basename();
+void test_file_extension();
 void test_file_replace_extension();
 void test_file_prepend_output_dir();
-void test_file_parent_dir();
+void test_file_parent_path();
 void test_file_is_regular_file();
 void test_file_is_directory();
 void test_file_create_directories();
+void test_file_is_object_file();
+void test_file_is_library_file();
+void test_file_current_path();
+void test_file_expand_glob();
+void test_file_newer();
 void test_file_asm_filename();
 void test_file_lis_filename();
 void test_file_o_filename();
@@ -39,14 +46,21 @@ int main(int argc, char* argv[]) {
         DIAG("invalid test " << arg);
     }
     else {
+        test_file_norm_path();
         test_file_search_path();
         test_file_basename();
+        test_file_extension();
         test_file_replace_extension();
         test_file_prepend_output_dir();
-        test_file_parent_dir();
+        test_file_parent_path();
         test_file_is_regular_file();
         test_file_is_directory();
         test_file_create_directories();
+        test_file_is_object_file();
+        test_file_is_library_file();
+        test_file_current_path();
+        test_file_expand_glob();
+        test_file_newer();
         test_file_asm_filename();
         test_file_lis_filename();
         test_file_o_filename();

@@ -373,7 +373,7 @@ bool Assembler::got_errors() const {
 void Assembler::assemble1() {
     // create parent directory of object file
     string o_filename = file_o_filename(filename_);
-    string parent_dir = file_parent_dir(o_filename);
+    string parent_dir = file_parent_path(o_filename);
     if (!file_is_directory(parent_dir)) {
         if (!file_create_directories(parent_dir)) {
             error(ErrDirCreate, parent_dir);

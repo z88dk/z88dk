@@ -6,7 +6,9 @@
 
 #include "common.h"
 #include "files.h"
+#include "utils.h"
 #include "t/test.h"
+#include <algorithm>
 #include <iostream>
 #include <exception>
 using namespace std;
@@ -21,15 +23,26 @@ namespace fs = std::filesystem;
 namespace fs = boost::filesystem;
 #endif
 
+void test_file_norm_path() {
+    IS(file_norm_path(""), "");
+    IS(file_norm_path("/"), "/");
+    IS(file_norm_path("//"), "/");
+    IS(file_norm_path("///"), "/");
+    IS(file_norm_path("\\"), "/");
+    IS(file_norm_path("\\\\"), "/");
+    IS(file_norm_path("\\\\\\"), "/");
+    IS(file_norm_path("//a\\\\b//c"), "/a/b/c");
+}
+
 void test_file_search_path() {
     fs::create_directories("test/x");
-    test_spew("test/x/test.asm", "");
-    remove("test.asm");
+    test_spew("test/x/test~.asm", "");
+    remove("test~.asm");
 
     g_asm.options().include_path().clear();
-    IS(file_search_path("test.asm", g_asm.options().include_path()), "test.asm");
+    IS(file_search_path("test~.asm", g_asm.options().include_path()), "test~.asm");
     g_asm.options().include_path().push_back("test/x");
-    IS(file_search_path("test.asm", g_asm.options().include_path()), "test/x/test.asm");
+    IS(file_search_path("test~.asm", g_asm.options().include_path()), "test/x/test~.asm");
 
     g_asm.options().include_path().clear();
     fs::remove_all("test");
@@ -39,10 +52,22 @@ void test_file_basename() {
     IS(file_basename(""), "");
     IS(file_basename("x"), "x");
     IS(file_basename("x.asm"), "x");
+    IS(file_basename("x.c.asm"), "x.c");
     IS(file_basename("dir/x.asm"), "x");
     IS(file_basename("/dir/x.asm"), "x");
     IS(file_basename("\\dir\\x.asm"), "x");
     IS(file_basename("c:\\dir\\x.asm"), "x");
+}
+
+void test_file_extension() {
+    IS(file_extension(""), "");
+    IS(file_extension("x"), "");
+    IS(file_extension("x.asm"), ".asm");
+    IS(file_extension("x.c.asm"), ".asm");
+    IS(file_extension("dir/x.asm"), ".asm");
+    IS(file_extension("/dir/x.asm"), ".asm");
+    IS(file_extension("\\dir\\x.asm"), ".asm");
+    IS(file_extension("c:\\dir\\x.asm"), ".asm");
 }
 
 void test_file_replace_extension() {
@@ -120,59 +145,183 @@ void test_file_prepend_output_dir() {
     g_asm.options().set_output_dir();
 }
 
-void test_file_parent_dir() {
-    IS(file_parent_dir(""), ".");
-    IS(file_parent_dir("x"), ".");
-    IS(file_parent_dir("x.o"), ".");
-    IS(file_parent_dir("dir/x.o"), "dir");
-    IS(file_parent_dir("/dir/x.o"), "/dir");
-    IS(file_parent_dir("\\dir\\x.o"), "/dir");
-    IS(file_parent_dir("c:\\dir\\x.o"), "c:/dir");
+void test_file_parent_path() {
+    IS(file_parent_path(""), ".");
+    IS(file_parent_path("x"), ".");
+    IS(file_parent_path("x.o"), ".");
+    IS(file_parent_path("dir/x.o"), "dir");
+    IS(file_parent_path("/dir/x.o"), "/dir");
+    IS(file_parent_path("\\dir\\x.o"), "/dir");
+    IS(file_parent_path("c:\\dir\\x.o"), "c:/dir");
 }
 
 void test_file_is_regular_file() {
-    remove("test.x");
-    NOK(file_is_regular_file("test.x"));
+    remove("test~.x");
+    NOK(file_is_regular_file("test~.x"));
 
-    fs::create_directories("test.x");
-    NOK(file_is_regular_file("test.x"));
+    fs::create_directories("test~.x");
+    NOK(file_is_regular_file("test~.x"));
 
-    fs::remove_all("test.x");
-    NOK(file_is_regular_file("test.x"));
+    fs::remove_all("test~.x");
+    NOK(file_is_regular_file("test~.x"));
 
-    test_spew("test.x", "");
-    OK(file_is_regular_file("test.x"));
+    test_spew("test~.x", "");
+    OK(file_is_regular_file("test~.x"));
 
-    remove("test.x");
+    remove("test~.x");
 }
 
 void test_file_is_directory() {
-    remove("test.x");
-    NOK(file_is_directory("test.x"));
+    remove("test~.x");
+    NOK(file_is_directory("test~.x"));
 
-    fs::create_directories("test.x");
-    OK(file_is_directory("test.x"));
+    fs::create_directories("test~.x");
+    OK(file_is_directory("test~.x"));
 
-    fs::remove_all("test.x");
-    NOK(file_is_directory("test.x"));
+    fs::remove_all("test~.x");
+    NOK(file_is_directory("test~.x"));
 
-    test_spew("test.x", "");
-    NOK(file_is_directory("test.x"));
+    test_spew("test~.x", "");
+    NOK(file_is_directory("test~.x"));
 
-    remove("test.x");
+    remove("test~.x");
 }
 
 void test_file_create_directories() {
-    fs::remove_all("test.x");
-    OK(file_create_directories("test.x"));
-    OK(file_create_directories("test.x"));
-    OK(file_create_directories("test.x/aa/bb"));
-    OK(file_is_directory("test.x/aa/bb"));
-    fs::remove_all("test.x");
+    fs::remove_all("test~.x");
+    OK(file_create_directories("test~.x"));
+    OK(file_create_directories("test~.x"));
+    OK(file_create_directories("test~.x/aa/bb"));
+    OK(file_is_directory("test~.x/aa/bb"));
+    fs::remove_all("test~.x");
 
-    test_spew("test.x", "");
-    NOK(file_create_directories("test.x"));
-    remove("test.x");
+    test_spew("test~.x", "");
+    NOK(file_create_directories("test~.x"));
+    remove("test~.x");
+}
+
+void test_file_is_object_file() {
+    remove("test~.o");
+    NOK(file_is_object_file("test~.o"));
+
+    test_spew("test~.o", "");
+    NOK(file_is_object_file("test~.o"));
+
+    test_spew("test~.o", "12345678");
+    NOK(file_is_object_file("test~.o"));
+
+    test_spew("test~.o", OBJ_FILE_SIGNATURE "00" "xx");
+    NOK(file_is_object_file("test~.o"));
+
+    test_spew("test~.o", OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
+    OK(file_is_object_file("test~.o"));
+
+    remove("test~.o");
+}
+
+void test_file_is_library_file() {
+    remove("test~.lib");
+    NOK(file_is_library_file("test~.lib"));
+
+    test_spew("test~.lib", "");
+    NOK(file_is_library_file("test~.lib"));
+
+    test_spew("test~.lib", "12345678");
+    NOK(file_is_library_file("test~.lib"));
+
+    test_spew("test~.lib", LIB_FILE_SIGNATURE "00" "xx");
+    NOK(file_is_library_file("test~.lib"));
+
+    test_spew("test~.lib", LIB_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
+    OK(file_is_library_file("test~.lib"));
+
+    remove("test~.lib");
+}
+
+void test_file_current_path() {
+    IS(file_current_path(), fs::current_path().generic_string());
+}
+
+void test_file_expand_glob() {
+    fs::remove_all("test~");
+    fs::create_directories("test~/1/a");
+    fs::create_directories("test~/2/b");
+    fs::create_directories("test~/3/c");
+    fs::create_directories("test~/4/d");
+    test_spew("test~/1/a/test1.asm", "");
+    test_spew("test~/2/b/test2.asm", "");
+    test_spew("test~/3/c/test3.asm", "");
+    test_spew("test~/4/d/test4.asm", "");
+    test_spew("test~/1/a/test1.o", "");
+    test_spew("test~/2/b/test2.o", "");
+    test_spew("test~/3/c/test3.o", "");
+    test_spew("test~/4/d/test4.o", "");
+
+    vector<string> files;
+
+    files.push_back("dummy");
+    file_expand_glob(files, "test~/*.asm");
+    sort(files.begin(), files.end());
+    IS(files.size(), 0);
+
+    files.push_back("dummy");
+    file_expand_glob(files, "test~/*/*.asm");
+    sort(files.begin(), files.end());
+    IS(files.size(), 0);
+
+    files.push_back("dummy");
+    file_expand_glob(files, "test~/*/*/*.asm");
+    sort(files.begin(), files.end());
+    IS(files.size(), 4);
+    IS(files[0], "test~/1/a/test1.asm");
+    IS(files[1], "test~/2/b/test2.asm");
+    IS(files[2], "test~/3/c/test3.asm");
+    IS(files[3], "test~/4/d/test4.asm");
+
+    files.push_back("dummy");
+    file_expand_glob(files, "test~/**/*.asm");
+    sort(files.begin(), files.end());
+    IS(files.size(), 4);
+    IS(files[0], "test~/1/a/test1.asm");
+    IS(files[1], "test~/2/b/test2.asm");
+    IS(files[2], "test~/3/c/test3.asm");
+    IS(files[3], "test~/4/d/test4.asm");
+
+    files.push_back("dummy");
+    file_expand_glob(files, "test~/**/*");
+    sort(files.begin(), files.end());
+    IS(files.size(), 16);
+    IS(files[ 0], "test~/1");
+    IS(files[ 1], "test~/1/a");
+    IS(files[ 2], "test~/1/a/test1.asm");
+    IS(files[ 3], "test~/1/a/test1.o");
+    IS(files[ 4], "test~/2");
+    IS(files[ 5], "test~/2/b");
+    IS(files[ 6], "test~/2/b/test2.asm");
+    IS(files[ 7], "test~/2/b/test2.o");
+    IS(files[ 8], "test~/3");
+    IS(files[ 9], "test~/3/c");
+    IS(files[10], "test~/3/c/test3.asm");
+    IS(files[11], "test~/3/c/test3.o");
+    IS(files[12], "test~/4");
+    IS(files[13], "test~/4/d");
+    IS(files[14], "test~/4/d/test4.asm");
+    IS(files[15], "test~/4/d/test4.o");
+
+    fs::remove_all("test~");
+}
+
+void test_file_newer() {
+    test_spew("test~1.txt", "");
+    system("perl -e 'sleep(1)'");
+    test_spew("test~2.txt", "");
+
+    NOK(file_newer("test~1.txt", "test~2.txt"));
+    OK(file_newer("test~1.txt", "test~1.txt"));
+    OK(file_newer("test~2.txt", "test~1.txt"));
+
+    remove("test~1.txt");
+    remove("test~2.txt");
 }
 
 void test_file_asm_filename() {
@@ -477,12 +626,12 @@ void test_file_reloc_filename() {
 }
 
 void test_safe_getline() {
-    test_spew("test.txt",
+    test_spew("test~.txt",
         "line1\r"
         "line2\n"
         "line3\r\n"
         "line4");
-    ifstream ifs("test.txt", ios::binary);
+    ifstream ifs("test~.txt", ios::binary);
     string text;
 
     text = "x";
@@ -510,18 +659,18 @@ void test_safe_getline() {
     IS(text, "");
 
     ifs.close();
-    remove("test.txt");
+    remove("test~.txt");
 }
 
 void test_open_file_non_existent() {
     ostringstream oss;
     g_asm.options().include_path().clear();
     g_asm.set_error_output(oss);
-    remove("test.asm");
+    remove("test~.asm");
     {
         OpenFile of;
-        NOK(of.open("test.asm"));
-        IS(oss.str(), "error: file open: test.asm\n");
+        NOK(of.open("test~.asm"));
+        IS(oss.str(), "error: file open: test~.asm\n");
         IS(g_asm.options().include_path().size(), 0);
     }
     IS(g_asm.options().include_path().size(), 0);
@@ -537,7 +686,7 @@ void test_open_file_non_existent() {
         IS(g_asm.expanded_line(), "")
 
 void test_open_file_ok() {
-    test_spew("test.asm",
+    test_spew("test~.asm",
         "hello\n"
         "world\r"
         "\r"
@@ -547,44 +696,44 @@ void test_open_file_ok() {
     g_asm.options().include_path().clear();
     {
         OpenFile of;
-        OK(of.open("test.asm"));
+        OK(of.open("test~.asm"));
         IS(g_asm.options().include_path().size(), 0);
-        IS(of.filename(), "test.asm");
-        T_LOCATION("test.asm", 0, "");
+        IS(of.filename(), "test~.asm");
+        T_LOCATION("test~.asm", 0, "");
 
         string line;
         OK(of.getline(line));
         IS(line, "hello");
-        T_LOCATION("test.asm", 1, "hello");
+        T_LOCATION("test~.asm", 1, "hello");
 
         OK(of.getline(line));
         IS(line, "world");
-        T_LOCATION("test.asm", 2, "world");
+        T_LOCATION("test~.asm", 2, "world");
 
         OK(of.getline(line));
         IS(line, "");
-        T_LOCATION("test.asm", 3, "");
+        T_LOCATION("test~.asm", 3, "");
 
         OK(of.getline(line));
         IS(line, "Hello");
-        T_LOCATION("test.asm", 4, "Hello");
+        T_LOCATION("test~.asm", 4, "Hello");
 
         OK(of.getline(line));
         IS(line, "World");
-        T_LOCATION("test.asm", 5, "World");
+        T_LOCATION("test~.asm", 5, "World");
 
         NOK(of.getline(line));
-        T_LOCATION("test.asm", 5, "World");
+        T_LOCATION("test~.asm", 5, "World");
     }
     {
         OpenFile of;
-        OK(of.open("./test.asm"));
+        OK(of.open("./test~.asm"));
         IS(g_asm.options().include_path().size(), 1);
         IS(g_asm.options().include_path()[0], ".");
-        IS(of.filename(), "./test.asm");
+        IS(of.filename(), "./test~.asm");
     }
     IS(g_asm.options().include_path().size(), 0);
-    remove("test.asm");
+    remove("test~.asm");
     g_asm.clear();
 }
 
@@ -594,15 +743,15 @@ void test_file_reader_non_existent() {
     ostringstream oss;
     g_asm.options().include_path().clear();
     g_asm.set_error_output(oss);
-    remove("test.asm");
+    remove("test~.asm");
     {
         FileReader fr;
-        NOK(fr.open("test.asm"));
-        IS(oss.str(), "error: file open: test.asm\n");
+        NOK(fr.open("test~.asm"));
+        IS(oss.str(), "error: file open: test~.asm\n");
         IS(g_asm.options().include_path().size(), 0);
     }
     IS(g_asm.options().include_path().size(), 0);
-    remove("test.asm");
+    remove("test~.asm");
     g_asm.clear();
 }
 
@@ -610,15 +759,15 @@ void test_file_reader_recursive() {
     ostringstream oss;
     g_asm.options().include_path().clear();
     g_asm.set_error_output(oss);
-    test_spew("test.asm", "");
+    test_spew("test~.asm", "");
     {
         FileReader fr;
-        OK(fr.open("test.asm"));
-        NOK(fr.open("test.asm"));
-        IS(oss.str(), "test.asm: error: include recursion: test.asm\n");
+        OK(fr.open("test~.asm"));
+        NOK(fr.open("test~.asm"));
+        IS(oss.str(), "test~.asm: error: include recursion: test~.asm\n");
     }
     g_asm.options().include_path().clear();
-    remove("test.asm");
+    remove("test~.asm");
     g_asm.clear();
 }
 
@@ -687,25 +836,24 @@ void test_file_reader_ok() {
         IS(g_asm.expanded_line(), "")
 
 void test_source_reader_ok() {
-    test_spew("test.asm",
+    test_spew("test~.asm",
         "hello\\\n"
         "world\\");
     {
         SourceReader sr;
-        OK(sr.open("test.asm"));
-        T_LOCATION("test.asm", 0, "");
+        OK(sr.open("test~.asm"));
+        T_LOCATION("test~.asm", 0, "");
 
         string line;
         OK(sr.getline(line));
         IS(line, "hello world ");
-        T_LOCATION("test.asm", 2, "hello world ");
+        T_LOCATION("test~.asm", 2, "hello world ");
 
         NOK(sr.getline(line));
         T_LOCATION("", 0, "");
     }
-    remove("test.asm");
+    remove("test~.asm");
     g_asm.clear();
 }
 
 #undef T_LOCATION
-

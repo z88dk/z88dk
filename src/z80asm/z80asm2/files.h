@@ -14,6 +14,13 @@
 #include <vector>
 using namespace std;
 
+// object file signature
+#define OBJ_FILE_VERSION		18
+#define SIGNATURE_SIZE			8
+#define SIGNATURE_BASE_SIZE		6
+#define OBJ_FILE_SIGNATURE		"Z80RMF"
+#define LIB_FILE_SIGNATURE		"Z80LMF"
+
 // default file name extensions
 #define EXT_ASM     ".asm"    
 #define EXT_LIS		".lis"    
@@ -27,14 +34,21 @@ using namespace std;
 #define EXT_M4      ".m4"
 
 // file names
+string file_norm_path(string filename);
 string file_search_path(const string& filename, const vector<string>& path);
 string file_basename(const string& filename);
+string file_extension(const string& filename);
 string file_replace_extension(const string& filename, const string& extension);
 string file_prepend_output_dir(const string& filename);
-string file_parent_dir(const string& filename);
+string file_parent_path(const string& filename);
 bool file_is_regular_file(const string& filename);
 bool file_is_directory(const string& filename);
 bool file_create_directories(const string& dirname);
+bool file_is_object_file(const string& filename);
+bool file_is_library_file(const string& filename);
+string file_current_path();
+void file_expand_glob(vector<string>& result, const string& pattern);
+bool file_newer(const string& filename1, const string& filename2);
 
 string file_asm_filename(const string& filename);
 string file_lis_filename(const string& filename);

@@ -8,6 +8,8 @@
 #include "files.h"
 #include "utils.h"
 #include <exception>
+#include <regex>
+#include <set>
 #include <string>
 #include <vector>
 using namespace std;
@@ -24,7 +26,7 @@ namespace fs = boost::filesystem;
 
 //-----------------------------------------------------------------------------
 
-static string norm_path(string filename) {
+string file_norm_path(string filename) {
     size_t p = 0;
     while ((p = filename.find("\\")) != string::npos)
         filename[p] = '/';
@@ -34,7 +36,7 @@ static string norm_path(string filename) {
 }
 
 string file_search_path(const string& filename_, const vector<string>& path) {
-    string filename = norm_path(filename_);
+    string filename = file_norm_path(filename_);
     fs::path file_path{ filename };
 
     // if path is empty, return filename as-is
@@ -58,20 +60,24 @@ string file_search_path(const string& filename_, const vector<string>& path) {
 }
 
 string file_basename(const string& filename_) {
-    string filename = norm_path(filename_);
+    string filename = file_norm_path(filename_);
     return fs::path(filename).stem().generic_string();
 }
 
+string file_extension(const string& filename) {
+    return fs::path(filename).extension().generic_string();
+}
+
 string file_replace_extension(const string& filename_, const string& extension) {
-    string filename = norm_path(filename_);
+    string filename = file_norm_path(filename_);
     fs::path file_path{ filename };
     file_path.replace_extension(extension);
     return file_path.generic_string();
 }
 
 string file_prepend_output_dir(const string& filename_) {
-    string filename = norm_path(filename_);
-    string output_dir = norm_path(g_asm.options().output_dir());
+    string filename = file_norm_path(filename_);
+    string output_dir = file_norm_path(g_asm.options().output_dir());
     if (output_dir.empty())
         return filename;
     else {
@@ -96,13 +102,13 @@ string file_prepend_output_dir(const string& filename_) {
                 file += output_dir + "/";
                 file += filename;
             }
-            return norm_path(file);
+            return file_norm_path(file);
         }
     }
 }
 
-string file_parent_dir(const string& filename_) {
-    string filename = norm_path(filename_);
+string file_parent_path(const string& filename_) {
+    string filename = file_norm_path(filename_);
     string parent_dir = fs::path(filename).parent_path().generic_string();
     if (parent_dir.empty())
         return ".";
@@ -133,6 +139,154 @@ bool file_create_directories(const string& dirname) {
     }
 }
 
+static bool check_signature(const string& filename, const string& signature_base, int version) {
+    ifstream ifs(filename, ios::binary);
+
+    // open file
+    if (!ifs.is_open())
+        return false;
+
+    // read signature
+    char buffer[SIGNATURE_SIZE];
+    ifs.read(buffer, sizeof(buffer));
+    if (ifs.gcount() != sizeof(buffer))
+        return false;
+
+    // check signature_base
+    string got_signature_base = string(buffer, buffer + SIGNATURE_BASE_SIZE);
+    if (got_signature_base != signature_base)
+        return false;
+
+    // check version
+    int got_version = atoi(buffer + SIGNATURE_BASE_SIZE);
+    if (got_version != version)
+        return false;
+
+    return true;
+}
+
+bool file_is_object_file(const string& filename) {
+    return check_signature(filename, OBJ_FILE_SIGNATURE, OBJ_FILE_VERSION);
+}
+
+bool file_is_library_file(const string& filename) {
+    return check_signature(filename, LIB_FILE_SIGNATURE, OBJ_FILE_VERSION);
+}
+
+string file_current_path() {
+    return file_norm_path(fs::current_path().generic_string());
+}
+
+static void expand_glob_1(set<fs::path>& result, const string& pattern);
+
+static void expand_wildcards(set<fs::path>& result, const vector<string>& elems, size_t cur_elem) {
+    // build prefix and suffix
+    fs::path prefix;
+    for (size_t i = 0; i < cur_elem; i++) {
+        prefix /= fs::path(elems[i]);
+    }
+    if (prefix.empty()) {
+        prefix = ".";
+    }
+
+    fs::path suffix;
+    for (size_t i = cur_elem + 1; i < elems.size(); i++) {
+        suffix /= elems[i];
+    }
+
+    // expand current element
+    if (elems[cur_elem] == "**") {
+        fs::path new_path{ prefix };
+        if (!suffix.empty())
+            new_path /= suffix;
+        expand_glob_1(result, new_path.generic_string());		// recurse
+
+        for (auto& entry : fs::recursive_directory_iterator(prefix)) {
+            if (fs::is_directory(entry)) {
+                fs::path new_path{ entry };
+                if (!suffix.empty())
+                    new_path /= suffix;
+                expand_glob_1(result, new_path.generic_string());		// recurse
+            }
+            else if (suffix.empty() && fs::is_regular_file(entry)) {
+                expand_glob_1(result, entry.path().generic_string());
+            }
+        }
+    }
+    else {
+        // make a regex pattern
+        string pattern = elems[cur_elem];
+        pattern = str_replace_all(pattern, ".", "\\.");
+        pattern = str_replace_all(pattern, "*", ".*");
+        pattern = str_replace_all(pattern, "?", ".");
+        regex re{ pattern };
+
+        // iterate through directory and recurse for each match
+        if (fs::is_directory(prefix)) {
+            for (auto& entry : fs::directory_iterator(prefix)) {
+                string entry_basename_str = entry.path().filename().generic_string();
+                if (regex_match(entry_basename_str, re)) {
+                    fs::path new_path{ entry };
+                    if (!suffix.empty())
+                        new_path /= suffix;
+                    expand_glob_1(result, new_path.generic_string());		// recurse
+                }
+            }
+        }
+    }
+}
+
+static void expand_glob_1(set<fs::path>& result, const string& pattern) {
+    // split path in directory/file elements
+    fs::path full_path{ pattern };
+    vector<string> elems;
+    for (auto elem : full_path) {
+        elems.push_back(elem.generic_string());
+    }
+
+    // iterate through element looking for wildcards
+    for (size_t i = 0; i < elems.size(); i++) {
+        // check if this element has wildcards
+        size_t wc_pos = elems[i].find_first_of("?*");
+        if (wc_pos != string::npos) {
+            expand_wildcards(result, elems, i);
+            return;
+        }
+    }
+
+    // if we reached here, there are no wildcards
+    fs::path path{ pattern };
+    if (fs::is_directory(path) || fs::is_regular_file(path))
+        result.insert(path);
+}
+
+// use set in recursion to eliminate duplicates
+void file_expand_glob(vector<string>& result, const string& pattern) {
+    result.clear();
+
+    set<fs::path> filenames;
+    expand_glob_1(filenames, pattern);
+
+    // #2380 - remove ./ prefix if it was added during glob search
+    bool pattern_has_dot_slash = (pattern.substr(0, 2) == "./");
+    for (auto& filename : filenames) {
+        string filename_str = filename.generic_string();
+        if (!pattern_has_dot_slash && filename_str.substr(0, 2) == "./") {
+            // ./ was added during glob search
+            filename_str.erase(filename_str.begin(), filename_str.begin() + 2);
+        }
+
+        result.push_back(filename_str);
+    }
+}
+
+bool file_newer(const string& filename1, const string& filename2) {
+    if (fs::last_write_time(filename1) >= fs::last_write_time(filename2))
+        return true;
+    else
+        return false;
+}
+
 string file_asm_filename(const string& filename) {
     return file_replace_extension(filename, EXT_ASM);
 }
@@ -155,7 +309,7 @@ string file_def_filename(const string& filename) {
 // -oFILE.EXT generates single binary file FILE.EXT
 // section outputs are always FILE_CODE.bin
 string file_bin_filename(const string& filename_, const string& section) {
-    string filename = norm_path(filename_);
+    string filename = file_norm_path(filename_);
     fs::path file_path, file_ext;
 
     string bin_filename = g_asm.options().bin_filename();
