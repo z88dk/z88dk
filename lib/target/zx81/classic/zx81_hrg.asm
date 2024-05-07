@@ -17,6 +17,8 @@ PUBLIC	hrg_on
 PUBLIC	_hrg_on
 PUBLIC	hrg_off
 PUBLIC	_hrg_off
+PUBLIC	hrg_phase
+PUBLIC	_hrg_phase
 PUBLIC	HRG_LineStart
 PUBLIC	HRG_handler
 PUBLIC	zx_blank
@@ -90,6 +92,21 @@ ENDIF
 DEFC    ERR_SP  = 16386 ;word   Address of first item on machine stack (after GOSUB returns).
 DEFC    RAMTOP  = 16388 ;word   Address of first byte above BASIC system area. 
 
+
+;----------------------------------------------------------------
+;
+; Invert the frames phase when in interlaced super HRG mode
+;
+;----------------------------------------------------------------
+IF (startup=20)
+hrg_phase:
+_hrg_phase:
+	ld	hl,(graybit1)
+	ld	de,(graybit2)
+	ld	(graybit1),de
+	ld	(graybit2),hl
+	ret
+ENDIF
 
 ;----------------------------------------------------------------
 ;
@@ -220,11 +237,7 @@ IF (startup>=23)		; CHROMA_81
 
 ELSE					; WRX
 
-IF (startup=20)
-        ld      b,5
-ELSE
         ld      b,6             ; delay sets the left edge of the screen
-ENDIF
 HRG_wait_left:
         djnz    HRG_wait_left   ; delay loop
         
@@ -252,11 +265,7 @@ IF (startup>=23)		; CHROMA_81
 
 ELSE					; WRX
 
-IF (startup=20)
-        ld      de,34
-ELSE
         ld      de,32           ; 32 bytes offset is added to HL for next hline
-ENDIF
 IF (((startup>=5)&(startup<13))|(startup>=25))
         ld      b,64            ; 64 lines per hires screen
 ELSE
@@ -416,9 +425,6 @@ HRG_LineStart:
         defb    0, 0, 0, 0
         defb    0, 0, 0, 0
         defb    0, 0, 0, 0
-IF (startup=20)
-        defb    0, 0
-ENDIF
         ret     nz              ; always returns because Z flag=0
 
 ELSE		; CHROMA_81
