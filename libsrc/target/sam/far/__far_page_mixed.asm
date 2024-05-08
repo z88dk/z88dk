@@ -1,6 +1,6 @@
 SECTION code_l_sccz80_far
-PUBLIC  __far_page
-EXTERN  __far_end
+PUBLIC  __far_page_mixed
+EXTERN  __far_end_mixed
 
 EXTERN __sam_bank_mappings
 
@@ -10,13 +10,25 @@ EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_ALLRAM_SUBTYPE
 defc    __subtype_protection=THIS_FUNCTION_ONLY_WORKS_WITH_ALLRAM_SUBTYPE
 
 
+; This routine only addresses internal memory
+;
+;
+; For external memory, we'll do something like this:
+;
+; Bit 7 = 1
+; Bit 6->5 = external interface
+; Bit 4->0 = 31 pages (shifted right, so we lose lsb, no hassle since we bank in pairs)
+; 
+; Internal (regular value of HMPR (bit 7 = 0)
+;
+;
 ; Entry: ebc = logical address
 ;         a' = local memory page
 ; Exit:   hl = physical address to access (bank paged in)
 ;        ebc = logical address
 ;
 ; Corrupts: d,a
-__far_page:
+__far_page_mixed:
     ld      a,e        ;With e=0 it refers to local memory
     and     a
     jr      z,localfar
@@ -39,14 +51,14 @@ __far_page:
     ld      d,0
     add     hl,de
     ld      a,(hl)
-    out     (HMPR),a
+    call    __far_end_mixed
     pop     de
     pop     hl
     ret
 
 localfar:
     ex     af,af
-    out    (HMPR),a
+    call   __far_end_mixed
     ex     af,af
     ld     hl,bc
     ret

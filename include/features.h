@@ -4340,7 +4340,7 @@
 #define __HAVE_GFX_POINTXY 1
 #define __HAVE_GFX_XORPLOT 1
 #define __HAVE_COLOUR 1
-// #define __HAVE_FARHEAP 0
+#define __HAVE_FARHEAP 1
 // #define __HAVE_BANKED_CALL 0
 
 #elif defined(__SAM__)  && defined(__HIGHRAM__)
