@@ -28,7 +28,7 @@
     ld      d,e
     ld      e,b
     add     hl,de
-    add     hl,deba     ; HL points to 2-byte entry
+    add     hl,de       ; HL points to 2-byte entry
     ld      e,d
     inc     e           ; restore EBC
     ld      a,(hl)      ; A=bank
