@@ -516,6 +516,12 @@ static inline int read_char(struct lexer_state *ls)
 		if (x == EOF) return -1;
 		c = x;
 #endif
+		if (c == '\r') {
+			/*
+			 * We found a '\r'; let's skip it
+             */
+            continue;
+		}
 		if (ls->flags & COPY_LINE) {
 			if (c == '\n') {
 				ls->copy_line[ls->cli] = 0;
@@ -523,17 +529,6 @@ static inline int read_char(struct lexer_state *ls)
 			} else if (ls->cli < (COPY_LINE_LENGTH - 1)) {
 				ls->copy_line[ls->cli ++] = c;
 			}
-		}
-		if (c == '\r') {
-			/*
-			 * We found a '\r'; we handle it as a newline.
-			 * For '\r\n' cases (Windows) prefer to ignore this one and use '\n' later.
-			 */
-            if (ls->pbuf != ls->ebuf && ls->input_buf[ls->pbuf] == '\n')
-            {
-                continue;
-            }
-			c = '\n';
 		}
 		break;
 	}
