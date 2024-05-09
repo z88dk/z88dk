@@ -17,6 +17,10 @@ There are several ways to install z88dk.
 
 ## The Tools
 
+The front end of z88dk is called `zcc`, it is this that you should call if you want to do any compilations. It can process C files (.c) , preprocessed C files(.i), compiled C files (.asm), optimised compiled file (.opt) or assembled files (.o), any combination of them can be mixed together and the relevant processes will be done on them. Also processing of a file list is supported, with processing of each file done in turn (i.e. preprocess, compile, optimise, assemble), and at the end all processed files may be linked into a correctly formatted single executable if desired.
+
+It is not typically necessary for a new user (or for an established platform) to need to use the other tools individually. 
+
 Many tools have a `z88dk-` prefix to distinguish them from tools from other packages that may be installed with the same name. The documentation
 generally omits the prefix when referring to them.
 
@@ -49,8 +53,6 @@ The assembly language libraries supplied by z88dk give it performance advantages
 * **Sieve of Eratosthenes**  Popular benchmark for small machine compilers because just about everything is able to compile it.  As a benchmark it doesn't reveal much more than loop overhead.
 * **Whetstone 1.2**  Whetstone is a common synthetic floating point benchmark.
 * **Program Size**  Program size has great importance for small machines.  A collection of test programs were compiled for the common cp/m target and resulting binary sizes were compared.
-
-
 
 ## Using cmake to build z88dk projects
 
