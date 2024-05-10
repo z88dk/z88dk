@@ -9,7 +9,7 @@
     EXTERN  base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.6 2016-06-27 20:26:33 dom Exp $
+;	$Id: pixladdr.asm $
 ;
 
 ; ******************************************************************
@@ -31,7 +31,7 @@ pixeladdress:
 
 	; add y-times the nuber of bytes per line (32)
 	; or just multiply y by 32 and the add
-    ld      e, l
+;    ld      e, l
     ld      a, h
     ld      b, a
 
