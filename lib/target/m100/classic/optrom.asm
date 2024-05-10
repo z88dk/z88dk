@@ -8,7 +8,6 @@
     defc ALTLCD_RAM = $FCC0
     defc ALTLCD_LEN = 320        
 
-    defc OPON = $FAA4
     defc CRT_ORG_DATA = ALTLCD_RAM
     defc CRT_ORG_CODE = $0000
 
@@ -85,7 +84,7 @@ stdcall:
 	ex	(sp), hl
 
 	push	hl
-	ld	hl, OPON
+	ld	hl, OPTROMSIG
 	ex	(sp), hl
 	
 	push	hl
@@ -116,7 +115,7 @@ intcall:
 	dec	hl
 
 	push	hl	
-	ld	hl, OPON
+	ld	hl, OPTROMSIG
 
 	shlx
 	pop	hl
@@ -128,7 +127,7 @@ intcall:
 stdon:
 	push	af
 	push	hl ; 26C8, F1 C9  POP PSW, RET
-	ld	hl, $26c8 ; it returns to this location --> pop psw; ret
+	ld	hl, POPAFRET ; it returns to this location --> pop psw; ret
 	ex	(sp), hl
 opexit:
 	xor	a

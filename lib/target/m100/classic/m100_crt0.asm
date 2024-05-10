@@ -38,6 +38,26 @@ ENDIF
 
     INCLUDE "crt/classic/crt_rules.inc"
 
+    ; ROM calls that the library use, they vary between the supported clones
+    PUBLIC  KYREAD
+    PUBLIC  KYPEND
+    PUBLIC  CLS
+    PUBLIC  CHROUT
+    PUBLIC  CURPOS
+    PUBLIC  CURSON
+    PUBLIC  CURSOFF
+    PUBLIC  BEEP
+    PUBLIC  LCDSET
+    PUBLIC  LCDRES
+
+IFDEF __M10
+    INCLUDE "target/m100/def/m10_romcalls.def"
+ELIFDEF __KC85
+    INCLUDE "target/m100/def/kc85_romcalls.def"
+ELSE
+    INCLUDE "target/m100/def/m100_romcalls.def"
+ENDIF
+
 IF startup = 1 
     defc	ROMCALL_OP = $CD	; CALL
     INCLUDE	"target/m100/classic/ram.asm"

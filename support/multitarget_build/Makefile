@@ -90,6 +90,22 @@ Z88DKTARGET_gamegear = sms
 ZCFLAGS_gamegear = -subtype=gamegear
 ZLDFLAGS_gamegear = 
 
+Z88DKTARGET_m10 = m100
+ZCFLAGS_m10 = -clib=m10
+ZLDFLAGS_m100 = 
+
+Z88DKTARGET_m10_optrom = m100
+ZCFLAGS_m10_optrom = -clib=m10 -subtype=optrom
+ZLDFLAGS_m100_optrom = 
+
+Z88DKTARGET_kc85 = m100
+ZCFLAGS_kc85 = -clib=kc85
+ZLDFLAGS_kc85 = 
+
+Z88DKTARGET_kc85_optrom = m100
+ZCFLAGS_kc85_optrom = -clib=kc85 -subtype=optrom
+ZLDFLAGS_kc85_optrom = 
+
 Z88DKTARGET_m100_optrom = m100
 ZCFLAGS_m100_optrom = -subtype=optrom
 ZLDFLAGS_m100_optrom = 
