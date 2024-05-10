@@ -17,8 +17,10 @@ PUBLIC	hrg_on
 PUBLIC	_hrg_on
 PUBLIC	hrg_off
 PUBLIC	_hrg_off
+IF (startup=20)
 PUBLIC	hrg_phase
 PUBLIC	_hrg_phase
+ENDIF
 PUBLIC	HRG_LineStart
 PUBLIC	HRG_handler
 PUBLIC	zx_blank

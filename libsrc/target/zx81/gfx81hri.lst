@@ -1,0 +1,5 @@
+target/zx81/graphics_hr/clg
+target/zx81/graphics_hr/_clg_hr
+target/zx81/graphics_hr/i_pixladdr
+target/zx81/graphics_hr/i_putsprite
+@gfx/wide/gfx_wide.lst

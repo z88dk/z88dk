@@ -4,19 +4,19 @@
 ;--------------------------------------------------------------
 
     SECTION code_clib
-    PUBLIC  pixeladdress
+    PUBLIC  w_pixeladdress
 
     EXTERN  base_graphics
 
 ;
-;	$Id: pixladdr.asm $
+;	$Id: i_pixladdr.asm $
 ;
 
 ; ******************************************************************
 ;
 ; Get absolute	pixel address in map of virtual (x,y) coordinate.
 ;
-; in:  hl	= (x,y) coordinate of pixel (h,l)
+; in:  hl	= (x,y) coordinate of pixel (h,l)   <<<  HL,DE (x,y) converted to H,L first
 ;
 ; out: de	= address	of pixel byte
 ;	   a	= bit number of byte where pixel is to be placed
@@ -27,13 +27,20 @@
 ;  afbcde../.... different
 ;
 
-pixeladdress:
+w_pixeladdress:
 
 	; add y-times the nuber of bytes per line (32)
 	; or just multiply y by 32 and the add
+	
+	ld		h,l
+	rr      d
+	rr      e
+	ld      l,e
+	
 ;    ld      e, l
     ld      a, h
     ld      b, a
+	push    af
 
     ld      h, 0
 
@@ -45,6 +52,12 @@ pixeladdress:
 
     ld      de, (base_graphics)
     add     hl, de
+
+	pop    af
+	jr     nc,evenrow
+	ld     de,6144
+    add    hl,de
+evenrow:
 
 	; add x divided by 8
 
