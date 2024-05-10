@@ -181,6 +181,12 @@ IF FORzx81hr192
     defc maxy    = 192
 ENDIF
 
+IF FORzx81hr384
+    DEFINE gotgfx
+    defc maxx    = 256
+    defc maxy    = 384
+ENDIF
+
 IF FORzx81mt64
     DEFINE gotgfx
     defc maxx    = 248
