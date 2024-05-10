@@ -1,4 +1,19 @@
-
+;--------------------------------------------------------------
+; This code comes from the 'HRG_Tool'
+; by Matthias Swatosch
+;--------------------------------------------------------------
+;
+;       Fast CLS for hi-rez ZX81
+;
+;       Stefano - 10/1/2007
+;
+;
+;	$Id: _clg_hr.asm$
+;
+    SECTION code_clib
+    PUBLIC  _clg_hr
+    PUBLIC  __clg_hr
+    EXTERN  base_graphics
     EXTERN  hr_rows
 
 _clg_hr:
