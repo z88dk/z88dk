@@ -37,8 +37,8 @@ extern string utests_err;
 #define FAIL()          _OK(false,      0, "")
 #define RUN_OK(func)    OK(run_exec_test(#func))
 #define RUN_NOK(func)   NOK(run_exec_test(#func))
-#define OUT_IS(a)       IS((a), (utests_out))
-#define ERR_IS(a)       IS((a), (utests_err))
+#define OUT_IS(a)       IS((utests_out), (a))
+#define ERR_IS(a)       IS((utests_err), (a))
 
 void start_testing(const string& progname);
 void done_testing();

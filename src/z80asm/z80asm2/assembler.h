@@ -45,6 +45,7 @@ public:
     string expanded_line();
 
     int error_count() const;
+    int exit_code() const;
 
     void set_error_output(ostream& os);
     void error(ErrCode err_code, const string& argument = "");

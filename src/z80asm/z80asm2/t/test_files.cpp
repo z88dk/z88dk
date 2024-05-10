@@ -313,7 +313,7 @@ void test_file_expand_glob() {
 
 void test_file_newer() {
     test_spew("test~1.txt", "");
-    system("perl -e 'sleep(1)'");
+    OK(0 == system("perl -e 'sleep(1)'"));
     test_spew("test~2.txt", "");
 
     NOK(file_newer("test~1.txt", "test~2.txt"));

@@ -16,4 +16,6 @@ int main(int argc, char* argv[]) {
 
     vector<string> args{ argv + 1, argv + argc };
     g_asm.options().parse_args(args);
+
+    exit(g_asm.exit_code());
 }

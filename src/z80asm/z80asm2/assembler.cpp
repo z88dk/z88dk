@@ -113,6 +113,10 @@ int Assembler::error_count() const {
     return errors_.count();
 }
 
+int Assembler::exit_code() const {
+    return errors_.count() == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
 void Assembler::set_error_output(ostream& os) {
     errors_.set_output(os);
 }

@@ -6,7 +6,8 @@
 
 #include "test.h"
 #include "files.h"
-#include <cassert>
+#include "utils.h"
+#include "xassert.h"
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -46,8 +47,18 @@ bool run_exec_test(const string& funcname) {
 }
 
 void test_spew(const string& filename, const string& text) {
-    ofstream ofs(filename, ios::binary);
-    ofs << text;
+    while (true) {
+        ofstream ofs(filename, ios::binary);
+        ofs << text;
+        ofs.close();
+
+        // msys2 hack: sometimes reading the file immediatelly after writing fails
+        if (str_remove_all_blanks(test_slurp(filename)) == str_remove_all_blanks(text))
+            break;
+        else
+            xassert(0 == system("perl -e 'sleep(1)'"));
+        // end of hack
+    }
 }
 
 string test_slurp(const string& filename) {
@@ -58,5 +69,6 @@ string test_slurp(const string& filename) {
         while (!safe_getline(ifs, line).eof())
             out += line + "\n";
     }
+    ifs.close();
     return out;
 }

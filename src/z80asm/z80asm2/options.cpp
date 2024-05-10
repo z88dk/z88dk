@@ -178,8 +178,8 @@ bool Options::debug() const {
     return debug_;
 }
 
-const string& Options::lib_file() const {
-    return lib_file_;
+const string& Options::lib_filename() const {
+    return lib_filename_;
 }
 
 bool Options::lib_for_all_cpus() const {
@@ -270,7 +270,7 @@ unordered_map<string, int>& Options::defines() {
     return defines_;
 }
 
-void Options::define_symbol(const string& name, int value) {
+void Options::symbol_define(const string& name, int value) {
     auto it = defines_.find(name);
     if (it != defines_.end()) {     // already exists
         if (value != it->second)
@@ -283,8 +283,21 @@ void Options::define_symbol(const string& name, int value) {
     }
 }
 
-void Options::undefine_symbol(const string& name) {
+void Options::symbol_undefine(const string& name) {
     defines_.erase(name);
+}
+
+bool Options::symbol_exists(const string& name) {
+    auto it = defines_.find(name);
+    return it != defines_.end();
+}
+
+int Options::symbol_value(const string& name) {
+    auto it = defines_.find(name);
+    if (it != defines_.end())
+        return it->second;
+    else
+        return 0;
 }
 
 FloatFormat& Options::float_format() {
@@ -296,107 +309,107 @@ vector<string>& Options::input_files() {
 }
 
 void Options::set_cpu(cpu_t cpu) {
-    undefine_symbol("__CPU_Z80__");
-    undefine_symbol("__CPU_Z80_STRICT__");
-    undefine_symbol("__CPU_Z80N__");
-    undefine_symbol("__CPU_Z180__");
-    undefine_symbol("__CPU_EZ80__");
-    undefine_symbol("__CPU_EZ80_Z80__");
-    undefine_symbol("__CPU_ZILOG__");
+    symbol_undefine("__CPU_Z80__");
+    symbol_undefine("__CPU_Z80_STRICT__");
+    symbol_undefine("__CPU_Z80N__");
+    symbol_undefine("__CPU_Z180__");
+    symbol_undefine("__CPU_EZ80__");
+    symbol_undefine("__CPU_EZ80_Z80__");
+    symbol_undefine("__CPU_ZILOG__");
 
-    undefine_symbol("__CPU_R800__");
+    symbol_undefine("__CPU_R800__");
 
-    undefine_symbol("__CPU_R2KA__");
-    undefine_symbol("__CPU_R3K__");
-    undefine_symbol("__CPU_R4K__");
-    undefine_symbol("__CPU_R5K__");
-    undefine_symbol("__CPU_RABBIT__");
+    symbol_undefine("__CPU_R2KA__");
+    symbol_undefine("__CPU_R3K__");
+    symbol_undefine("__CPU_R4K__");
+    symbol_undefine("__CPU_R5K__");
+    symbol_undefine("__CPU_RABBIT__");
 
-    undefine_symbol("__CPU_8080__");
-    undefine_symbol("__CPU_8085__");
-    undefine_symbol("__CPU_INTEL__");
+    symbol_undefine("__CPU_8080__");
+    symbol_undefine("__CPU_8085__");
+    symbol_undefine("__CPU_INTEL__");
 
-    undefine_symbol("__CPU_GBZ80__");
+    symbol_undefine("__CPU_GBZ80__");
 
-    undefine_symbol("__CPU_KC160__");
-    undefine_symbol("__CPU_KC160_Z80__");
+    symbol_undefine("__CPU_KC160__");
+    symbol_undefine("__CPU_KC160_Z80__");
 
     switch (cpu) {
     case CPU_Z80:
         cpu_ = CPU_Z80;
-        define_symbol("__CPU_Z80__");
-        define_symbol("__CPU_ZILOG__");
+        symbol_define("__CPU_Z80__");
+        symbol_define("__CPU_ZILOG__");
         break;
     case CPU_Z80_STRICT:
         cpu_ = CPU_Z80_STRICT;
-        define_symbol("__CPU_Z80_STRICT__");
-        define_symbol("__CPU_ZILOG__");
+        symbol_define("__CPU_Z80_STRICT__");
+        symbol_define("__CPU_ZILOG__");
         break;
     case CPU_Z80N:
         cpu_ = CPU_Z80N;
-        define_symbol("__CPU_Z80N__");
-        define_symbol("__CPU_ZILOG__");
+        symbol_define("__CPU_Z80N__");
+        symbol_define("__CPU_ZILOG__");
         break;
     case CPU_Z180:
         cpu_ = CPU_Z180;
-        define_symbol("__CPU_Z180__");
-        define_symbol("__CPU_ZILOG__");
+        symbol_define("__CPU_Z180__");
+        symbol_define("__CPU_ZILOG__");
         break;
     case CPU_EZ80:
         cpu_ = CPU_EZ80;
-        define_symbol("__CPU_EZ80__");
-        define_symbol("__CPU_ZILOG__");
+        symbol_define("__CPU_EZ80__");
+        symbol_define("__CPU_ZILOG__");
         break;
     case CPU_EZ80_Z80:
         cpu_ = CPU_EZ80_Z80;
-        define_symbol("__CPU_EZ80_Z80__");
-        define_symbol("__CPU_ZILOG__");
+        symbol_define("__CPU_EZ80_Z80__");
+        symbol_define("__CPU_ZILOG__");
         break;
     case CPU_R800:
         cpu_ = CPU_R800;
-        define_symbol("__CPU_R800__");
+        symbol_define("__CPU_R800__");
         break;
     case CPU_R2KA:
         cpu_ = CPU_R2KA;
-        define_symbol("__CPU_R2KA__");
-        define_symbol("__CPU_RABBIT__");
+        symbol_define("__CPU_R2KA__");
+        symbol_define("__CPU_RABBIT__");
         break;
     case CPU_R3K:
         cpu_ = CPU_R3K;
-        define_symbol("__CPU_R3K__");
-        define_symbol("__CPU_RABBIT__");
+        symbol_define("__CPU_R3K__");
+        symbol_define("__CPU_RABBIT__");
         break;
     case CPU_R4K:
         cpu_ = CPU_R4K;
-        define_symbol("__CPU_R4K__");
-        define_symbol("__CPU_RABBIT__");
+        symbol_define("__CPU_R4K__");
+        symbol_define("__CPU_RABBIT__");
         break;
     case CPU_R5K:
         cpu_ = CPU_R5K;
-        define_symbol("__CPU_R5K__");
-        define_symbol("__CPU_RABBIT__");
+        symbol_define("__CPU_R5K__");
+        symbol_define("__CPU_RABBIT__");
         break;
     case CPU_8080:
         cpu_ = CPU_8080;
-        define_symbol("__CPU_8080__");
-        define_symbol("__CPU_INTEL__");
+        symbol_define("__CPU_8080__");
+        symbol_define("__CPU_INTEL__");
         break;
     case CPU_8085:
         cpu_ = CPU_8085;
-        define_symbol("__CPU_8085__");
-        define_symbol("__CPU_INTEL__");
+        symbol_define("__CPU_8085__");
+        symbol_define("__CPU_INTEL__");
         break;
     case CPU_GBZ80:
         cpu_ = CPU_GBZ80;
-        define_symbol("__CPU_GBZ80__");
+        symbol_define("__CPU_GBZ80__");
         break;
     case CPU_KC160:
         cpu_ = CPU_KC160;
-        define_symbol("__CPU_KC160__");
+        symbol_define("__CPU_KC160__");
         break;
     case CPU_KC160_Z80:
         cpu_ = CPU_KC160_Z80;
-        define_symbol("__CPU_KC160_Z80__");
+        symbol_define("__CPU_KC160_Z80__");
         break;
     default:
         xassert(0);
@@ -405,6 +418,7 @@ void Options::set_cpu(cpu_t cpu) {
 
 void Options::set_cpu(const string& name) {
     got_cpu_option_ = true;
+    lib_for_all_cpus_ = false;
 
     if (name == "*") {
         set_cpu(CPU_Z80);
@@ -435,14 +449,14 @@ void Options::set_swap_ixiy(swap_ixiy_t swap) {
     got_swap_ixiy_option_ = true;
     swap_ixiy_ = swap;
 
-    undefine_symbol("__SWAP_IX_IY__");
+    symbol_undefine("__SWAP_IX_IY__");
 
     switch (swap_ixiy_) {
     case IXIY_NO_SWAP:
         break;
     case IXIY_SWAP:
     case IXIY_SOFT_SWAP:
-        define_symbol("__SWAP_IX_IY__");
+        symbol_define("__SWAP_IX_IY__");
         break;
     default:
         xassert(0);
@@ -504,10 +518,10 @@ void Options::set_float_format(float_format_t format) {
 
     vector<string> all_defines = FloatFormat::get_all_defines();
     for (auto& define : all_defines)
-        undefine_symbol(define);
+        symbol_undefine(define);
 
     string float_symbol = float_format_.get_define();
-    define_symbol(float_symbol);
+    symbol_define(float_symbol);
 }
 
 void Options::set_float_format(const string& format) {
@@ -515,8 +529,10 @@ void Options::set_float_format(const string& format) {
         g_asm.error(ErrIllegalFloatOption, format);
         g_asm.error(ErrFloatFormatsList, FloatFormat::get_all_formats());
     }
-    else
+    else {
         got_float_format_option_ = true;
+        set_float_format(float_format_.get());
+    }
 }
 
 // parse environment variable options
@@ -618,12 +634,12 @@ void Options::parse_define(const string& opt_arg) {
         g_asm.error(ErrIllegalIdent, ident);
     else {
         if (equal_pos == string::npos) {
-            define_symbol(ident, 1);
+            symbol_define(ident, 1);
         }
         else {
             int value = 0;
             if (parse_opt_int(value, opt_arg.substr(equal_pos + 1)))
-                define_symbol(ident, value);
+                symbol_define(ident, value);
             else
                 g_asm.error(ErrInvalidDefineOption, opt_arg);
         }
@@ -664,6 +680,9 @@ bool Options::parse_opt_int(int& value, const string& opt_arg) {
     else {
         radix = 10;
     }
+
+    if (*p == '\0')
+        return false;
 
     char* end = nullptr;
     long lval = strtol(p, &end, radix);
@@ -751,12 +770,12 @@ void Options::define_assembly_defines() {
         set_swap_ixiy(swap_ixiy_);
 
     if (ti83_) {
-        define_symbol("__CPU_TI83__");
-        undefine_symbol("__CPU_TI83PLUS__");
+        symbol_define("__CPU_TI83__");
+        symbol_undefine("__CPU_TI83PLUS__");
     }
     else if (ti83plus_) {
-        undefine_symbol("__CPU_TI83__");
-        define_symbol("__CPU_TI83PLUS__");
+        symbol_undefine("__CPU_TI83__");
+        symbol_define("__CPU_TI83PLUS__");
     }
 
     // __FLOAT__xxx__
@@ -824,10 +843,13 @@ string Options::norm_msys2_arg_filename(const string& filename) {
 
 // get list of files from pattern
 void Options::expand_source_glob(const string& pattern_) {
+    string result_filename;
     string pattern = norm_msys2_arg_filename(pattern_);           // #2476
     size_t wc_pos = pattern.find_first_of("*?");
-    if (wc_pos == string::npos)
-        input_files_.push_back(search_source(pattern));
+    if (wc_pos == string::npos) {
+        if (search_source(pattern, result_filename))
+            input_files_.push_back(file_norm_path(result_filename));
+    }
     else {
         vector<string> files;
         file_expand_glob(files, pattern);
@@ -835,7 +857,8 @@ void Options::expand_source_glob(const string& pattern_) {
         bool found = false;
         for (auto& file : files) {
             if (file_is_regular_file(file)) {
-                input_files_.push_back(search_source(file));
+                if (search_source(file, result_filename))
+                    input_files_.push_back(file_norm_path(result_filename));
                 found = true;
             }
         }
@@ -895,68 +918,67 @@ void Options::expand_list_glob(const string& pattern_) {
 
 // search for the first file in path, with the given extension,
 // with .asm extension and with .o extension
-// if not found, output error and return original file
+// if not found, output error and return false
 // run m4 if file is .asm.m4
-string Options::search_source(const string& filename) {
-    if (str_ends_with(filename, EXT_M4)) {
-        string asm_filename = filename.substr(0, filename.size() - strlen(EXT_M4));
+bool Options::search_source(const string& filename, string& out_filename) {
+    if (file_extension(filename) == EXT_M4) {                                           // file.asm.m4
+        string asm_filename = filename.substr(0, filename.size() - strlen(EXT_M4));     // file.asm
         string m4_cmd = "m4 " + m4_options_ + " \"" + filename + "\" > \"" + asm_filename + "\"";
         if (verbose_)
             cout << "% " << m4_cmd << endl;
         if (0 != system(m4_cmd.c_str())) {
             g_asm.error(ErrCmdFailed, m4_cmd);
             perror("m4");
-            exit(EXIT_FAILURE);
+            return false;
         }
-        return file_norm_path(search_source(asm_filename));
+        else
+            return search_source(asm_filename, out_filename);
     }
     else {
-        string out_filename;
-
         // check plain filename
         if (check_source(filename, out_filename))
-            return file_norm_path(out_filename);
+            return true;
 
         // check plain file in include path
         string found_file = file_search_path(filename, include_path_);
         if (found_file != filename && check_source(found_file, out_filename))
-            return file_norm_path(out_filename);
+            return true;
 
         // check filename with .asm extension
         string asm_file = filename + EXT_ASM;
         if (check_source(asm_file, out_filename))
-            return file_norm_path(out_filename);
+            return true;
 
         // check filename with .asm extension in include path
         found_file = file_search_path(asm_file, include_path_);
         if (found_file != asm_file && check_source(found_file, out_filename))
-            return file_norm_path(out_filename);
+            return true;
 
         // check filename with .o extension
         string o_file = filename + EXT_O;
         if (check_source(o_file, out_filename))
-            return file_norm_path(out_filename);
+            return true;
 
         // check filename with .o extension in include path
         found_file = file_search_path(o_file, include_path_);
         if (found_file != o_file && check_source(found_file, out_filename))
-            return file_norm_path(out_filename);
+            return true;
 
         // check object file in the output directory
         o_file = file_o_filename(filename);
         if (check_source(o_file, out_filename))
-            return file_norm_path(out_filename);
+            return true;
 
         // check filename with .o extension in include path
         found_file = file_search_path(o_file, include_path_);
         if (found_file != o_file && check_source(found_file, out_filename))
-            return file_norm_path(out_filename);
+            return true;
 
         // not found, avoid cascade of errors
         if (!g_asm.error_count())
             g_asm.error(ErrFileNotFound, filename);
 
-        return file_norm_path(filename);
+        return false;
     }
 }
 

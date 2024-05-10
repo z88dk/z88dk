@@ -59,7 +59,7 @@ OPT_HEADER("Libraries:")
 
 OPT("-L", "[=]DIR", library_path_.push_back(opt_arg),
     "Add directory to library search path")
-OPT("-x", "[=]FILE[" EXT_LIB "]", lib_file_ = opt_arg, 
+OPT("-x", "[=]FILE[" EXT_LIB "]", lib_filename_ = file_lib_filename(opt_arg), 
 	"Create a library file" EXT_LIB)
 OPT("-l", "[=]FILE[" EXT_LIB "]", add_library(opt_arg), \
 	"Use library file" EXT_LIB)

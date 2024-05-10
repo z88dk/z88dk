@@ -50,7 +50,8 @@ public:
     bool raw_strings() const;           // -raw-strings option
     bool opt_speed() const;	            // -opt-speed option
     bool debug() const;			        // -debug option
-    const string& lib_file() const;		// -x option
+    bool debug_z80asm() const;          // -vv
+    const string& lib_filename() const;	// -x option
     bool lib_for_all_cpus() const;      // build multi-target library
     const string& output_dir() const;	// -O option
     const string& bin_filename() const;	// -o option
@@ -66,15 +67,16 @@ public:
     bool map_file() const;			    // -m option
     bool global_def() const;		    // -g option
     appmake_t appmake() const;	        // +zx or +zx81 options
-    bool debug_z80asm() const;          // -vv
     const string& m4_options() const;   // options to the m4 subprocess
     vector<string>& include_path();		// -I option
     vector<string>& library_path();		// -L option
     vector<string>& libraries();        // -l option
     string consol_obj_filename() const; // -o without -b options
     unordered_map<string, int>& defines(); // -D option
-    void define_symbol(const string& name, int value = 1);
-    void undefine_symbol(const string& name);
+    void symbol_define(const string& name, int value = 1);
+    void symbol_undefine(const string& name);
+    bool symbol_exists(const string& name);
+    int symbol_value(const string& name);
     FloatFormat& float_format();        // -float option
     vector<string>& input_files();	    // input files to process
 
@@ -107,7 +109,7 @@ private:
     bool    raw_strings_{ false };      // -raw-strings option
     bool	opt_speed_{ false };	    // -opt-speed option
     bool	debug_{ false };			// -debug option
-    string	lib_file_;					// -x option
+    string	lib_filename_;				// -x option
     bool    lib_for_all_cpus_{ false }; // build multi-target library
     string	output_dir_;				// -O option
     string	bin_filename_;				// -o option
@@ -158,6 +160,6 @@ private:
     string norm_msys2_arg_filename(const string& filename);
     void expand_source_glob(const string& pattern);
     void expand_list_glob(const string& pattern);
-    string search_source(const string& filename);
+    bool search_source(const string& filename, string& out_filename);
     bool check_source(const string& filename, string& out_filename);
 };
