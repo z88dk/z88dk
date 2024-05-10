@@ -11,6 +11,15 @@ IF !DEFINED_CRT_MAX_HEAP_ADDRESS
     defc    CRT_MAX_HEAP_ADDRESS = 65535
 ENDIF
 
+; Configure whether we use internal and external memory for the farheap
+IFNDEF CLIB_FARHEAP_USE_EXTERNAL
+    defc    CLIB_FARHEAP_USE_EXTERNAL = 0
+ENDIF
+
+IFNDEF CLIB_FARHEAP_USE_INTERNAL
+    defc    CLIB_FARHEAP_USE_INTERNAL = 1
+ENDIF
+
     PUBLIC  THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES
     defc    THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES = 1
 
@@ -89,7 +98,6 @@ IF CLIB_FARHEAP_BANKS
     call    setup_far_heap
 ENDIF
     INCLUDE "crt/classic/crt_init_eidi.inc"
-    ei
     ; Entry to the user code
     call    _main
 __Exit:
@@ -114,6 +122,8 @@ IF CLIB_FARHEAP_BANKS
     EXTERN  sbrk_far
 
 setup_far_heap:
+    ld      ix,__sam_bank_mappings
+  IF CLIB_FARHEAP_USE_INTERNAL != 0
     in      a,(HMPR)
     push    af
     and     @11100000
@@ -124,7 +134,7 @@ setup_far_heap:
     out     (HMPR),A
     ; Sysvars are now paged in to 0x8000
 
-    ld      ix,__sam_bank_mappings
+
     ld      hl, $5100 + $8000
 again:
     ld      a,(hl)
@@ -147,6 +157,8 @@ next:
     pop     af
     out     (HMPR),a
 
+
+    push    ix
 
     push    ix
     pop     hl
@@ -181,7 +193,7 @@ sbrk_loop:
 sbrk_residual:
     pop     af
     and     1
-    ret     z
+    jr      z,add_external_memory
     ; We have a 32k page still
     push    de
     push    hl
@@ -191,14 +203,111 @@ sbrk_residual:
     pop     bc
     pop     hl
     pop     de
+add_external_memory:
+    pop     ix
+  ELSE
+    ld      de,1        ;First far address 0x010000
+    ld      hl,0
+  ENDIF
+
+  IF !CLIB_FARHEAP_USE_EXTERNAL
     ret
+  ELSE
+    EXTERN __far_end_mixed
+    EXTERN __far_start_mixed
+    EXTERN __far_page_mixed
+    PUBLIC __far_end
+    PUBLIC __far_start
+    PUBLIC __far_page
+    defc   __far_end = __far_end_mixed
+    defc   __far_start = __far_start_mixed
+    defc   __far_page = __far_page_mixed
+
+    push    de          ;Save far address to sbrk from
+    push    hl
+    push    ix          ;Save starting point
+
+    in      a,(HMPR)    ;Enable external memory
+    push    af
+    set     7,a
+    out     (HMPR),a
+
+    ld      hl,$ffff
+    ld      c,0
+next_extension:
+    ld      a,c
+    out     (HEPR),a
+
+    ld      hl,$ffff    ;Test if the 
+    ld      (hl),0
+    ld      a,(hl)
+    and     a
+    jr      nz,not_ram
+    ld      (hl),1
+    ld      a,(hl)
+    dec     a
+    jr      nz,not_ram
+
+    ; So we've got a 1mb extension here, we can add the pages to the allocation table
+    ld      b,32
+    ld      a,c
+    rrca
+    set     7,a
+alloc_extended_loop:
+    ld      (ix+0),a
+    inc     ix
+    inc     a
+    djnz    alloc_extended_loop
+
+    ; And loop round to try the next extension RAM
+not_ram:
+    ld      a,c
+    add     $40
+    ld      c,a
+    jr      nc,next_extension
+
+    pop     af      ;Page extended out again
+    out     (HMPR),a
+
+    push    ix      ;Where we might have started writing from
+    pop     hl
+    pop     de      ;The old value of ix
+    and     a
+    sbc     hl,de
+    ld      a,l     ;Number of 32k pages we saw
+    srl     a       ;Number of 64k blocks we can sbrk
+
+    pop     hl      ;Next far address to allocate
+    pop     de
+    and     a
+    ret     z
+
+    ld      b,a
+sbrk_extended_loop:
+    push    bc
+    push    de
+    push    hl
+    ld      bc,$ffff
+    push    bc
+    call    sbrk_far
+    pop     bc
+    pop     hl
+    pop     de
+    inc     e
+    pop     bc      ;Loop count
+    djnz    sbrk_extended_loop
+    ret
+ENDIF
 
 
 
-
-; We page in 32k blocks, so using internal memory we only need 16 blocks
+; We page in 32k blocks, so using internal memory we only need 16 blocks for internal
+; 
 __sam_bank_mappings:
-        defs    16
+        defs    16          ;internal mappings
+  IF CLIB_FARHEAP_USE_EXTERNAL
+        defs    128         ;external mappings
+  ENDIF
 
 ENDIF
 
@@ -298,6 +407,7 @@ stacktop:
     SECTION code_l
     SECTION code_l_sdcc
     SECTION code_l_sccz80
+    SECTION code_l_sccz80_far
     SECTION code_graphics
     SECTION code_driver
     SECTION data_graphics

@@ -296,7 +296,7 @@ int disc_write_edsk(disc_handle* h, const char* filename)
         return -1;
     }
     memset(header, 0, 256);
-    memcpy(header, "EXTENDED CPC DSK FILE\r\nDisk-Info\r\n", 34);
+    memcpy(header, "EXTENDED CPC DSK File\r\nDisk-Info\r\n", 34);
     snprintf(title,sizeof(title),"z88dk/%s", h->spec.name ? h->spec.name : "appmake");
     memcpy(header + 0x22, title, strlen(title));
     header[0x30] = h->spec.tracks % 256;

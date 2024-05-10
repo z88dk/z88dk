@@ -118,6 +118,8 @@ target/sam/time/target_read_structtm
 ; Far routines work on the allram subtype
 target/sam/far/__far_misc
 target/sam/far/__far_page
+target/sam/far/__far_misc_mixed
+target/sam/far/__far_page_mixed
 
 
 ; Just some standard stuff now
