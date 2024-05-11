@@ -106,6 +106,10 @@ Z88DKTARGET_kc85_optrom = m100
 ZCFLAGS_kc85_optrom = -clib=kc85 -subtype=optrom
 ZLDFLAGS_kc85_optrom = 
 
+Z88DKTARGET_pc8201 = m100
+ZCFLAGS_pc8201 = -clib=pc8201
+ZLDFLAGS_pc8201 = 
+
 Z88DKTARGET_m100_optrom = m100
 ZCFLAGS_m100_optrom = -subtype=optrom
 ZLDFLAGS_m100_optrom = 

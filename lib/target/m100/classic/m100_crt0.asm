@@ -54,6 +54,8 @@ IFDEF __M10
     INCLUDE "target/m100/def/m10_romcalls.def"
 ELIFDEF __KC85
     INCLUDE "target/m100/def/kc85_romcalls.def"
+ELIFDEF __PC8201
+    INCLUDE "target/m100/def/pc8201_romcalls.def"
 ELSE
     INCLUDE "target/m100/def/m100_romcalls.def"
 ENDIF

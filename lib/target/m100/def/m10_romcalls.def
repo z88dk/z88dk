@@ -1,6 +1,4 @@
-; M100 firmware macros and defs
-; Applicable to American M100/M102 ONLY (probably, I've never seen any European M100)
-; Nov 2020
+; Olivetti M10 firmware macros and defs
 ;
 ; M100 system ROM aka firmware can be called in atleast a couple of ways
 ; If we're calling it from OPTROM made with Stephen Adolph's template, we do
