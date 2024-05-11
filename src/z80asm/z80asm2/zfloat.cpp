@@ -252,13 +252,12 @@ vector<uint8_t> float_to_zx(double value) {
 // 1 byte exponent
 // 4 bytes mantissa, with first bit replaced by sign bit
 vector<uint8_t> float_to_zx81(double value) {
-    vector<uint8_t>	out;
 
     if (value == 0.0) {
-        for (int i = 0; i < 5; i++)
-            out.push_back(0);
+        return vector<uint8_t>{0, 0, 0, 0, 0};
     }
     else {
+        vector<uint8_t>	out;
         mydouble f;
         f.value = value;
 
@@ -276,8 +275,8 @@ vector<uint8_t> float_to_zx81(double value) {
             out.push_back((mantissa >> 24) & 0xff);
             mantissa <<= 8;
         }
+        return out;
     }
-    return out;
 }
 
 vector<uint8_t> float_to_z88(double value) {
