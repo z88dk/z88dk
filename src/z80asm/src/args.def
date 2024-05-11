@@ -41,7 +41,7 @@ OPT("-debug", nullptr, debug = map_file = true, "Add debug info to map file")
 
 OPT_HEADER("Libraries:")
 OPT("-L", "[=]DIR", library_path.push_back(opt_arg), "Add directory to library search path")
-OPT("-x", "[=]FILE[" EXT_LIB "]", lib_file = opt_arg, \
+OPT("-x", "[=]FILE[" EXT_LIB "]", lib_file = g_args.lib_filename(opt_arg), \
 	"Create a library file" EXT_LIB)
 OPT("-l", "[=]FILE[" EXT_LIB "]", library_file_append(opt_arg.c_str()), \
 	"Use library file" EXT_LIB)
