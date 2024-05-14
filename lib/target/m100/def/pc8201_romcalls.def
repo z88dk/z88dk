@@ -14,6 +14,8 @@
 	
 ; ROM calls:
 
+#define OPTROM_SIG "AB"
+
 ; call 62393 to start an optrom
 defc    POPAFRET = $2BA3	;On NEC is tail of different machine
 defc    OPTROMSIG = 0 		;XXX can't find this routine

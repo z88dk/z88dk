@@ -16,6 +16,9 @@
 	
 ; ROM calls:
 
+#define OPTROM_SIG "TC"
+
+
 defc    POPAFRET = $26C8
 defc    OPTROMSIG = $FAA4
 

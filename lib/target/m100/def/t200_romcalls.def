@@ -1,0 +1,29 @@
+; T200 firmware macros and defs
+;
+; Values mapped from m100 using:
+; https://ftp.whtech.com/club100/ref/equate.200
+; via: http://www.club100.org/library/libref.html
+
+	EXTERN	ROMCALL_OP ; it's defined in m100_crt0.asm
+#define ROMCALL defb ROMCALL_OP
+	
+; ROM calls:
+
+#define OPTROM_SIG "TC"
+
+
+defc    POPAFRET = $1533
+defc    OPTROMSIG = $FAA4		;XX - need to find
+
+defc	KYREAD	= $12f7	; wait for key from the keyboard
+defc	KYPEND	= $1422 ; check keyboard queue for pending characters
+
+defc	CLS	= $4f4d	; clear screen
+defc	CHROUT	= $5a05	; print character in reg. A to LCD/printer
+defc	CURPOS	= $4f9b	; position cursor; H=column (1-40), L=row(1-16)
+defc	CURSON	= $4f68	; turn cursor on
+defc	CURSOFF	= $4f6d	; ...and off
+defc	BEEP	= $4f45	; sound the beeper
+
+defc	LCDSET	= $8d76 ; LCD set pixel (D, E)
+defc	LCDRES	= $8d77 ; LCD reset pixel (D, E)
