@@ -16,5 +16,5 @@ target/zx/graphics/bkrestore
 target/zx/graphics/rowtab
 target/zx/graphics/pixladdr
 target/zx/graphics/zx_hardcopy
-gfx/narrow/obj/zx/stencil_render
+gfx/narrow/obj/${TARGET}/stencil_render
 @gfx/narrow/gfx_narrow.lst
