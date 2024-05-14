@@ -30,6 +30,7 @@ target/mc1000/graphics/bksave
 target/mc1000/graphics/bkrestore
 target/mc1000/graphics/swapgfxbk
 target/mc1000/graphics/stencil_render
+gfx/narrow/obj/${TARGET}/clrarea2
 @gfx/narrow/gfx_narrow.lst
 target/mc1000/time/clock
 target/mc1000/games/joystick
