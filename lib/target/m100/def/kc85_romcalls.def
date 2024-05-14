@@ -15,6 +15,7 @@
 ; ROM calls:
 
 #define OPTROM_SIG "AB"
+defc    CONSOLE_ROWS = 8
 
 defc    POPAFRET = $26A1
 defc    OPTROMSIG = $FAAB

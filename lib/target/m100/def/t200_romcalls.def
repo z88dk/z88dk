@@ -10,7 +10,7 @@
 ; ROM calls:
 
 #define OPTROM_SIG "TC"
-
+defc    CONSOLE_ROWS = 16
 
 defc    POPAFRET = $1533
 defc    OPTROMSIG = $FAA4		;XX - need to find

@@ -32,7 +32,6 @@ ENDIF
     defc    __CPU_CLOCK = 2400000
 
     defc    CONSOLE_COLUMNS = 40
-    defc    CONSOLE_ROWS = 8
     defc    CLIB_DISABLE_FGETS_CURSOR = 1
 
 
@@ -56,6 +55,8 @@ ELIFDEF __KC85
     INCLUDE "target/m100/def/kc85_romcalls.def"
 ELIFDEF __PC8201
     INCLUDE "target/m100/def/pc8201_romcalls.def"
+ELIFDEF __T200
+    INCLUDE "target/m100/def/t200_romcalls.def"
 ELSE
     INCLUDE "target/m100/def/m100_romcalls.def"
 ENDIF
