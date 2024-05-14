@@ -419,6 +419,15 @@ Define rules for a ragel-based parser.
 			else 
 				; 
 		}
+		| label? _TK_ASSERT const_expr _TK_COMMA string _TK_NEWLINE @{
+			DO_STMT_LABEL();
+			if (ctx->expr_error)
+				error(ErrConstExprExpected, NULL);
+			else if (ctx->expr_value == 0)
+				error(ErrAssertFailed, Str_data(name));
+			else 
+				; 
+		}
 		| label? _TK_ALIGN const_expr _TK_NEWLINE @{
 		    DO_STMT_LABEL();
 			if (ctx->expr_error)
