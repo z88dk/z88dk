@@ -91,7 +91,7 @@ private:
 	void parse_args_in_text(const string& text);	// list files or environment
 	void expand_source_glob(const string& pattern);
 	void expand_list_glob(const string& pattern);
-	string search_source(const string& filename);
+	bool search_source(const string& filename, string& out_filename);
 	bool check_source(const string& filename, string& out_filename);
 	void post_parsing_actions();
 	void parse_env_vars();

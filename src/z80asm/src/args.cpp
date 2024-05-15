@@ -457,10 +457,13 @@ void Args::parse_file(const string& arg_) {
 
 // get list of files from pattern
 void Args::expand_source_glob(const string& pattern_) {
+    string result_filename;
     string pattern = norm_filename(pattern_);           // #2476
     size_t wc_pos = pattern.find_first_of("*?");
-	if (wc_pos == string::npos)
-		input_files.push_back(search_source(pattern));
+    if (wc_pos == string::npos) {
+        if (search_source(pattern, result_filename))
+            input_files.push_back(norm_filename(result_filename));
+    }
 	else {
 		vector<fs::path> files;
 		expand_glob(files, pattern);
@@ -468,7 +471,8 @@ void Args::expand_source_glob(const string& pattern_) {
         bool found = false;
 		for (auto& file : files) {
             if (fs::is_regular_file(file)) {
-				input_files.push_back(search_source(file.generic_string()));
+                if (search_source(file.generic_string(), result_filename))
+                    input_files.push_back(norm_filename(result_filename));
                 found = true;
             }
 		}
@@ -529,68 +533,67 @@ void Args::expand_list_glob(const string& pattern_) {
 
 // search for the first file in path, with the given extension,
 // with .asm extension and with .o extension
-// if not found, output error and return original file
+// if not found, output error and return false
 // run m4 if file is .asm.m4
-string Args::search_source(const string& filename) {
-    if (str_ends_with(filename, EXT_M4)) {
-        string asm_filename = filename.substr(0, filename.size() - strlen(EXT_M4));
+bool Args::search_source(const string& filename, string& out_filename) {
+    if (str_ends_with(filename, EXT_M4)) {                                     		// file.asm.m4
+        string asm_filename = filename.substr(0, filename.size() - strlen(EXT_M4));	// file.asm
         string m4_cmd = "m4 " + m4_options + " \"" + filename + "\" > \"" + asm_filename + "\"";
         if (verbose)
             cout << "% " << m4_cmd << endl;
         if (0 != system(m4_cmd.c_str())) {
 			g_errors.error(ErrCmdFailed, m4_cmd);
             perror("m4");
-            exit(EXIT_FAILURE);
+            return false;
         }
-        return search_source(asm_filename);
+        else
+            return search_source(asm_filename, out_filename);
     }
     else {
-        string out_filename;
-
         // check plain filename
         if (check_source(filename, out_filename))
-            return out_filename;
+            return true;
 
         // check plain file in include path
         string found_file = search_include_path(filename);
         if (found_file != filename && check_source(found_file, out_filename))
-            return out_filename;
+            return true;
 
         // check filename with .asm extension
         string asm_file = filename + EXT_ASM;
         if (check_source(asm_file, out_filename))
-            return out_filename;
+            return true;
 
         // check filename with .asm extension in include path
         found_file = search_include_path(asm_file);
         if (found_file != asm_file && check_source(found_file, out_filename))
-            return out_filename;
+            return true;
 
         // check filename with .o extension
         string o_file = filename + EXT_O;
         if (check_source(o_file, out_filename))
-            return out_filename;
+            return true;
 
         // check filename with .o extension in include path
         found_file = search_include_path(o_file);
         if (found_file != o_file && check_source(found_file, out_filename))
-            return out_filename;
+            return true;
 
         // check object file in the output directory
         o_file = o_filename(filename);
         if (check_source(o_file, out_filename))
-            return out_filename;
+            return true;
 
         // check filename with .o extension in include path
         found_file = search_include_path(o_file);
         if (found_file != o_file && check_source(found_file, out_filename))
-            return out_filename;
+            return true;
 
         // not found, avoid cascade of errors
         if (!g_errors.count)
             g_errors.error(ErrFileNotFound, filename);
 
-        return fs::path(filename).generic_string();
+        return false;
     }
 }
 
