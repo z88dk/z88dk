@@ -38,7 +38,7 @@ ok -f "${test}.o", "object file";
 
 ok abs((-M "${test}.o") - $date_obj) > 0, "new object";
 
-# remove source, give -d -> uses existing object - with extensiom
+# remove source, give -d -> uses existing object - with extension
 unlink "${test}.asm";
 
 $date_obj = -M "${test}.o";
@@ -48,7 +48,7 @@ ok -f "${test}.o", "object file";
 
 is -M "${test}.o", $date_obj, "same object";
 
-# remove source, give -d -> uses existing object - without extensiom
+# remove source, give -d -> uses existing object - without extension
 unlink "${test}.asm";
 
 $date_obj = -M "${test}.o";
