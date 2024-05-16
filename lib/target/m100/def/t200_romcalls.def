@@ -16,7 +16,7 @@ defc    POPAFRET = $1533
 defc    OPTROMSIG = $FAA4		;XX - need to find
 
 defc	KYREAD	= $12f7	; wait for key from the keyboard
-defc	KYPEND	= $1422 ; check keyboard queue for pending characters
+defc	KYPEND	= $140a ; check keyboard queue for pending characters
 
 defc	CLS	= $4f4d	; clear screen
 defc	CHROUT	= $5a05	; print character in reg. A to LCD/printer
