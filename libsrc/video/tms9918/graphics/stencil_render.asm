@@ -23,6 +23,7 @@
     EXTERN  __tms9918_screen_mode
     EXTERN  __tms9918_pixeladdress
     EXTERN  __tms9918_pixelbyte
+    EXTERN  __tms9918_store
     EXTERN  l_tms9918_disable_interrupts
     EXTERN  l_tms9918_enable_interrupts
     EXTERN  leftbitmask, rightbitmask
@@ -131,7 +132,7 @@ yloop:
 
     ld      de, 8
 
-    call    store_byte
+    call    __tms9918_store
 
     add     hl, de
         ;inc        hl                        ; offset += 1 (8 bits)
@@ -142,7 +143,7 @@ pattern2:
     jr      z, bitmaskr
 
 fill_row_loop:                          ; do
-    call    store_byte
+    call    __tms9918_store
     add     hl, de
         ;inc     hl                        ; offset += 1 (8 bits)
     djnz    fill_row_loop               ; while ( r-- != 0 )
@@ -151,7 +152,7 @@ fill_row_loop:                          ; do
 bitmaskr:
     ld      a, 0
     call    mask_pattern
-    call    store_byte
+    call    __tms9918_store
 
     jr      yloop
 
@@ -176,46 +177,3 @@ pattern1:
     or      e                           ; mix with masked data
     ret
 
-
-;--- --- --- --- --- --- --- --- --- --- --- ---
-store_byte:
-         ; ->   ld (hl),a ... (offset) = pattern
-
-    ex      af, af
-    call    l_tms9918_disable_interrupts
-    ld      a, l                        ; LSB of video memory ptr
-IF  VDP_CMD<0
-    ld      (-VDP_CMD), a
-    ld      a, h
-    and     @00111111
-    or      @01000000
-    ld      (-VDP_CMD), a
-    ex      af, af
-    ld      (-VDP_DATA), a
-ELSE
-	;	 out      (VDP_CMD),a
-	;	 ld       a,h		; MSB of video mem ptr
-	;	 and      @00111111	; masked with "write command" bits
-	;	 or       @01000000
-	;	 ;ei
-	;	 out      (VDP_CMD), a
-	;	 ex      af,af
-	;	 ;;;ld       a,(pattern2+1) ; pattern
-	;	 out      (VDP_DATA), a
-    push    bc
-    ld      bc, VDP_CMD
-    out     (c), a
-    ld      a, h                        ; MSB of video mem ptr
-    and     @00111111                   ; masked with "write command" bits
-    or      @01000000
-    out     (c), a
-    ex      af, af
-    ld      bc, VDP_DATA
-    out     (c), a
-    pop     bc
-ENDIF
-    ex      af, af
-    call    l_tms9918_enable_interrupts
-    ex      af, af
-    ret
-;--- --- --- --- --- --- --- --- --- --- --- ---
