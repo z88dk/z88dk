@@ -4,6 +4,7 @@ gfx/narrow/obj/${TARGET}/bkrestore3
 gfx/narrow/obj/${TARGET}/bksave2
 gfx/narrow/obj/${TARGET}/circle
 gfx/narrow/obj/${TARGET}/circle_callee
+gfx/narrow/obj/${TARGET}/__generic_clrarea
 gfx/narrow/obj/${TARGET}/clga
 gfx/narrow/obj/${TARGET}/clga_callee
 gfx/narrow/obj/${TARGET}/clrarea
