@@ -12,19 +12,38 @@
 #include "z80asm_defs.h"
 using namespace std;
 
+class Section;
+
 //-----------------------------------------------------------------------------
 
 class ExprResult {
 public:
-    ExprResult(int value = 0, ErrCode err_code = ErrOk, const string& err_arg = "");
+    ExprResult(sym_type_t type = TYPE_UNDEFINED, int value = 0,
+        ErrCode err_code = ErrOk, const string& err_arg = "");
 
+    sym_type_t type() const;
     int value() const;
+    Section* section() const;
+    bool multi_section() const;
     bool ok() const;
     ErrCode err_code() const;
+    const string& err_arg() const;
     void error();
 
+    void set_type(sym_type_t type);
+    void set_value(int value);
+    void set_section(Section* section);
+    void set_multi_section(bool f = true);
+    void set_error(ErrCode err_code, const string& err_arg = "");
+
+    static ExprResult combine(const ExprResult& a, const ExprResult& b,
+        TkCode op, int value);
+
 private:
+    sym_type_t type_{ TYPE_UNDEFINED }; // type of expression
     int     value_{ 0 };				// result of expression evaluation
+    Section* section_{ nullptr };       // section from value, if TYPE_ADDRESS
+    bool    multi_section_{ false };    // combination of more than one different sections
     ErrCode err_code_{ ErrOk };			// error message during expression evaluation
     string	err_arg_;					// argument for error message
 };

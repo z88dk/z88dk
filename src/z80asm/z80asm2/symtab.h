@@ -9,10 +9,12 @@
 #include "expr.h"
 #include "location.h"
 #include "z80asm_defs.h"
+#include <list>
 #include <string>
 #include <unordered_map>
 using namespace std;
 
+class Assembler;
 class Section;
 class Instr;
 
@@ -21,15 +23,23 @@ class Instr;
 class Symbol : public HasLocation {
 public:
     Symbol(const string& name, sym_scope_t scope, sym_type_t type, Section* section, int value = 0);
+    virtual ~Symbol();
+    Symbol(const Symbol& other) = delete;
+    Symbol& operator=(const Symbol& other) = delete;
 
     const string& name() const;
     sym_scope_t scope() const;
     sym_type_t type() const;
     Section* section() const;
+    Expr* expr() const;
+    Instr* instr() const;
+
     bool is_touched() const;
     bool is_global_def() const;
 
+    void set_scope(sym_scope_t scope);
     void set_type(sym_type_t type);
+    void set_section(Section* section);
     void set_value(int value);
     void set_expr(Expr* expr);
     void set_instr(Instr* instr);
@@ -69,7 +79,10 @@ public:
     bool insert(Symbol* symbol);            // false if already exists
     Symbol* find(const string& name);       // nullptr if not found
     Symbol* erase(const string& name);      // nullptr if not found
+    void push_deleted(Symbol* symbol);      // store in deleted_ list
 
 private:
     unordered_map<string, Symbol*> symbols_;// holds symbols
+    list<Symbol*> deleted_;                 // holds deleted symbols that may still be
+                                            // referenced by expressions
 };

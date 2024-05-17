@@ -9,6 +9,7 @@ void test_error_message_with_string_arg();
 void test_error_message_with_numeric_arg();
 void test_error_message_with_invalid_err_code();
 void test_count_of_errors();
+void test_errors_exit_code();
 void test_warning_message();
 void test_warning_message_with_string_arg();
 void test_warning_message_with_numeric_arg();
@@ -38,6 +39,7 @@ void test_error_with_expanded_text5();
 void test_error_with_expanded_text6();
 void test_error_with_expanded_text7();
 void test_error_with_expanded_text8();
+void test_error_push_location();
 int exec_error_message_with_invalid_err_code1();
 int exec_error_message_with_invalid_err_code2();
 
@@ -60,6 +62,7 @@ int main(int argc, char* argv[]) {
         test_error_message_with_numeric_arg();
         test_error_message_with_invalid_err_code();
         test_count_of_errors();
+        test_errors_exit_code();
         test_warning_message();
         test_warning_message_with_string_arg();
         test_warning_message_with_numeric_arg();
@@ -89,6 +92,7 @@ int main(int argc, char* argv[]) {
         test_error_with_expanded_text6();
         test_error_with_expanded_text7();
         test_error_with_expanded_text8();
+        test_error_push_location();
     }
 
     done_testing();

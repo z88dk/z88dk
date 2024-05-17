@@ -32,6 +32,8 @@ enum appmake_t {
 
 class Options {
 public:
+    Options();
+    void clear();
     void parse_args(const vector<string>& args);
     void parse_option(const string& arg);
     void parse_file(const string& arg);
@@ -98,34 +100,34 @@ public:
 
 private:
     // options
-    cpu_t   cpu_{ CPU_Z80 };            // -mCPU option
-    bool    got_cpu_option_{ false };
-    bool    ti83_{ false };             // -mCPU option
-    bool    ti83plus_{ false };         // -mCPU option
-    swap_ixiy_t swap_ixiy_{ IXIY_NO_SWAP }; // -IXIY option
-    bool    got_swap_ixiy_option_{ false };
-    bool	verbose_{ false };			// -v option
-    bool	upper_case_{ false };		// -ucase option
-    bool    raw_strings_{ false };      // -raw-strings option
-    bool	opt_speed_{ false };	    // -opt-speed option
-    bool	debug_{ false };			// -debug option
+    cpu_t   cpu_;                       // -mCPU option
+    bool    got_cpu_option_;
+    bool    ti83_;                      // -mCPU option
+    bool    ti83plus_;                  // -mCPU option
+    swap_ixiy_t swap_ixiy_;             // -IXIY option
+    bool    got_swap_ixiy_option_;
+    bool	verbose_;       			// -v option
+    bool	upper_case_;		        // -ucase option
+    bool    raw_strings_;               // -raw-strings option
+    bool	opt_speed_;	                // -opt-speed option
+    bool	debug_;         			// -debug option
     string	lib_filename_;				// -x option
-    bool    lib_for_all_cpus_{ false }; // build multi-target library
+    bool    lib_for_all_cpus_;          // build multi-target library
     string	output_dir_;				// -O option
     string	bin_filename_;				// -o option
-    bool	make_bin_{ false };		    // -b option
-    bool	split_bin_{ false };		// -split-bin option
-    bool	date_stamp_{ false };		// -d option
-    bool	relocatable_{ false };		// -R option
-    bool	reloc_info_{ false };		// -reloc-info option
-    int     origin_{ ORG_NOT_DEFINED }; // -r option
-    int		filler_{ 0 };				// -f option
-    bool	symtable_{ false };		    // -s option
-    bool	list_file_{ false };		// -l option
-    bool	map_file_{ false };			// -m option
-    bool	global_def_{ false };		// -g option
-    appmake_t appmake_{ APPMAKE_NONE };	// +zx or +zx81 options
-    bool    debug_z80asm_{ false };     // -vv
+    bool	make_bin_;      		    // -b option
+    bool	split_bin_;         		// -split-bin option
+    bool	date_stamp_;		        // -d option
+    bool	relocatable_;		        // -R option
+    bool	reloc_info_;		        // -reloc-info option
+    int     origin_;                    // -r option
+    int		filler_;				    // -f option
+    bool	symtable_;		            // -s option
+    bool	list_file_;		            // -l option
+    bool	map_file_;			        // -m option
+    bool	global_def_;		        // -g option
+    appmake_t appmake_;	                // +zx or +zx81 options
+    bool    debug_z80asm_;              // -vv
     string  m4_options_;                // options to the m4 subprocess
     vector<string>	include_path_;		// -I option
     vector<string>	library_path_;		// -L option
@@ -133,7 +135,7 @@ private:
     string	consol_obj_filename_;		// -o without -b options
     unordered_map<string, int> defines_;// -D option
     FloatFormat float_format_;          // -float option
-    bool    got_float_format_option_{ false };
+    bool    got_float_format_option_;
     vector<string>	input_files_;	    // input files to process
     FileReader  file_reader_;           // reader for @ files
 

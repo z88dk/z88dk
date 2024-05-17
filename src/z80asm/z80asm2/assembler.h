@@ -32,26 +32,14 @@ public:
     // command line options
     Options& options();
 
-    // handle errors
-    void push_location(const Location& location);
-    void pop_location();
-    const Location& location() const;
-    void set_location(const Location& location);
-    void clear_location();
+    // errors
+    Errors& errors();
 
-    void set_source_line(const string& line);
-    void set_expanded_line(const string& line);
-    string source_line();
-    string expanded_line();
-
-    int error_count() const;
-    int exit_code() const;
-
-    void set_error_output(ostream& os);
-    void error(ErrCode err_code, const string& argument = "");
-    void error(ErrCode err_code, int argument);
-    void warning(ErrCode err_code, const string& argument = "");
-    void warning(ErrCode err_code, int argument);
+    // object file
+    void add_object(const string& filename);
+    Object& object();                                   // asserts object was added
+    void delete_object();
+    void copy_defines();            // copy defines to locals
 
     // labels
     static string autolabel();
@@ -64,11 +52,11 @@ public:
     Instr* add_instr(int opcode);
 
     // symbol table
-    Symbol* find_symbol(const string& name);            // search local/global symbols and defines
-    Symbol* add_symbol(const string& name);             // nullptr if duplicate
+    Symbol* find_symbol(const string& name);            // search symbols
+    Symbol* define_symbol(const string& name, int value = 0); // nullptr and error if duplicate
+    void undefine_symbol(const string& name);           // undefine symbol
+    Symbol* add_equ(const string& name, Expr* expr);
     Symbol* use_symbol(const string& name);             // return pointer to new or existing symbol
-    Symbol* add_define(const string& name, int value);
-    void erase_define(const string& name);
     Symbol* declare_extern(const string& name);
     Symbol* declare_public(const string& name);
     Symbol* declare_global(const string& name);
@@ -76,20 +64,10 @@ public:
 private:
     Options options_;               // command line options
     Errors errors_;                 // handle errors
-    vector<Location> locations_;    // location stack
-    string filename_;               // source filename 
-    Object* object_{ nullptr };     // object file being created
-    Parser* parser_{ nullptr };     // parser of input
-    Symtab defines_;                // -D and predefined constants
-    Symtab global_symbols_;         // global symbols
+    Object* object_;                // object file
     Symbol* asmpc_{ nullptr };      // asmpc of current statement
-    int start_errors_{ 0 };         // errors at start of assembly
 
-    Module* cur_module();           // nullptr if none
-    Symbol* find_local_symbol(const string& name);      // nullptr if not found
-    Symbol* find_global_symbol(const string& name);     // nullptr if not found
-    Symbol* find_global_define(const string& name);     // nullptr if not found
-    bool got_errors() const;        // check if errors occured
+    Module& cur_module();           // nullptr if none
     void assemble1();               // worker of assemble()
     void check_relative_jumps();    // change JR to JP if needed
     void patch_local_exprs();       // patch values of expressions

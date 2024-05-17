@@ -73,6 +73,7 @@ public:
     Location& location();
 
     bool open(const string& filename);
+    void close();
     bool getline(string& line);
 
 private:
@@ -85,6 +86,9 @@ private:
 // read text files
 class FileReader {
 public:
+    FileReader();
+    void clear();
+
     const string& filename() const;
     Location& location();
 

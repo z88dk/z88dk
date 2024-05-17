@@ -592,6 +592,14 @@ double FloatExpr::parse_func2(double(*f)(double, double)) {
 
 //-----------------------------------------------------------------------------
 
+FloatFormat::FloatFormat() {
+    clear();
+}
+
+void FloatFormat::clear() {
+    float_format_ = FLOAT_genmath;
+}
+
 float_format_t FloatFormat::get() const {
     return float_format_;
 }

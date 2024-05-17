@@ -5,7 +5,9 @@
 //-----------------------------------------------------------------------------
 
 #include "common.h"
+#include "files.h"
 #include "stack_trace.h"
+#include "xmalloc.h"
 #include "xassert.h"
 #include <iostream>
 using namespace std;
@@ -13,9 +15,23 @@ using namespace std;
 int main(int argc, char* argv[]) {
     dump_stack_on_sigsegv();
     xassert_init(argv[0]);
+    xmalloc_init(argv[0]);
 
+    // parse command line
     vector<string> args{ argv + 1, argv + argc };
-    g_asm.options().parse_args(args);
+    g_options().parse_args(args);
+    if (g_errors().count())
+        return EXIT_FAILURE;
 
-    exit(g_asm.exit_code());
+    // asssemble required files
+    if (!g_options().lib_for_all_cpus()) {
+        for (auto& file : g_options().input_files()) {
+            if (file_extension(file) != EXT_O)
+                g_asm.assemble(file);
+        }
+    }
+    if (g_errors().count())
+        return EXIT_FAILURE;
+
+    exit(g_errors().exit_code());
 }

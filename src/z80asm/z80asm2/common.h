@@ -20,3 +20,9 @@
 
 // application class
 extern Assembler g_asm;
+
+// shortcuts
+inline Options& g_options() { return g_asm.options(); }
+inline Errors& g_errors() { return g_asm.errors(); }
+inline Module& g_module() { return g_asm.object().cur_module(); }
+inline Symtab& g_symtab() { return g_module().symtab(); }

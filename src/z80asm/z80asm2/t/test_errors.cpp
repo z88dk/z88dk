@@ -59,11 +59,11 @@ void test_error_message_with_numeric_arg() {
 void test_error_message_with_invalid_err_code() {
     RUN_NOK(exec_error_message_with_invalid_err_code1);
     OUT_IS("");
-    ERR_IS("test_errors: Assertion failed: (size_t)err_code < NUM_ELEMS(messages), file errors.cpp, line 108\n");
+    ERR_IS("test_errors: Assertion failed: (size_t)err_code < NUM_ELEMS(messages), file errors.cpp, line 135\n");
 
     RUN_NOK(exec_error_message_with_invalid_err_code2);
     OUT_IS("");
-    ERR_IS("test_errors: Assertion failed: (size_t)err_code < NUM_ELEMS(messages), file errors.cpp, line 108\n");
+    ERR_IS("test_errors: Assertion failed: (size_t)err_code < NUM_ELEMS(messages), file errors.cpp, line 135\n");
 }
 
 int exec_error_message_with_invalid_err_code1() {
@@ -87,6 +87,13 @@ void test_count_of_errors() {
     IS(errors.count(), 0);
     errors.error(ErrOk);
     IS(errors.count(), 1);
+}
+
+void test_errors_exit_code() {
+    SETUP(errors);
+    IS(errors.exit_code(), EXIT_SUCCESS);
+    errors.error(ErrOk);
+    IS(errors.exit_code(), EXIT_FAILURE);
 }
 
 void test_warning_message() {
@@ -313,4 +320,33 @@ void test_error_with_expanded_text8() {
     errors.set_expanded_line("ld a,31");
     errors.warning(ErrOk, 31);
     IS(oss.str(), "f1.asm:11: warning: ok: $1f\n  ^---- ld a, $1f\n    ^---- ld a,31\n");
+}
+
+void test_error_push_location() {
+    SETUP(errors);
+    string output;
+
+    errors.set_location(Location("f1.asm", 11));
+    errors.set_source_line("\tld\ta,\t$1f");
+    errors.set_expanded_line("ld a,31");
+
+    errors.warning(ErrOk, "argument");
+    output += "f1.asm:11: warning: ok: argument\n  ^---- ld a, $1f\n    ^---- ld a,31\n";
+    IS(oss.str(), output);
+
+    errors.push_location(Location("f2.c", 21, true));
+    errors.set_source_line("main()");
+    errors.warning(ErrOk, "argument");
+    output += "f2.c:21: warning: ok: argument\n  ^---- main()\n";
+    IS(oss.str(), output);
+
+    errors.pop_location();
+    errors.warning(ErrOk, "argument");
+    output += "f1.asm:11: warning: ok: argument\n  ^---- ld a, $1f\n    ^---- ld a,31\n";
+    IS(oss.str(), output);
+
+    errors.pop_location();
+    errors.warning(ErrOk, "argument");
+    output += "warning: ok: argument\n";
+    IS(oss.str(), output);
 }

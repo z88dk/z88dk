@@ -14,7 +14,9 @@
 #include <object.h>
 using namespace std;
 
+class Object;
 class Expr;
+class Instr;
 
 // parse source
 class Parser {
@@ -33,9 +35,10 @@ private:
     int start_error_count_{ 0 };    // errors found before parse
     SourceReader source_reader_;    // source file reader
     Lexer lexer_;                   // scanner
-    deque<Expr*> exprs_;           // list of expressions parsed
-    deque<int> const_exprs_;       // list of const expressions parsed
+    deque<Expr*> exprs_;            // list of expressions parsed
+    deque<int> const_exprs_;        // list of const expressions parsed
 
+    void delete_exprs();            // delete temporary expressions
     void error(ErrCode err_code);   // syntax error and flush lexer
     bool parse();                   // parse full input
     void parse_line();              // switch to each state-parser

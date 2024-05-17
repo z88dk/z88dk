@@ -43,6 +43,9 @@ enum float_format_t {
 
 class FloatFormat {
 public:
+    FloatFormat();
+    void clear();
+
     float_format_t get() const;
     string get_type() const;
     string get_define() const;
@@ -55,7 +58,7 @@ public:
     static vector<string> get_all_defines();
 
 private:
-    float_format_t float_format_{ FLOAT_genmath };
+    float_format_t float_format_;
 };
 
 vector<uint8_t> float_to_genmath(double value);

@@ -8,6 +8,7 @@
 
 #include "expr.h"
 #include "location.h"
+#include "parser.h"
 #include "symtab.h"
 #include <cstdint>
 #include <list>
@@ -19,6 +20,7 @@ using namespace std;
 
 typedef uint8_t Byte;
 typedef vector<Byte> Bytes;
+class Assembler;
 
 //-----------------------------------------------------------------------------
 
@@ -86,14 +88,14 @@ public:
     auto end() { return sections_.end(); }
     void select_section(const string& name);
     Section* cur_section() const;
-    Symtab* local_symbols();
+    Symtab& symtab();
 
 private:
     string name_;                           // name based on filename, or given by directive
     list<Section*> sections_;               // list of sections in this module
     unordered_map<string, Section*> section_by_name_;   // index sections by name
     Section* cur_section_{ nullptr };       // current section
-    Symtab local_symbols_;                  // local symbols
+    Symtab symtab_;                         // all symbols
 
     void clear_all();
     void create_default_section();          // create default section (named "")
@@ -109,12 +111,16 @@ public:
     Object& operator=(const Object& other) = delete;
     void clear();
 
+    const string& filename() const;
+
     auto begin() { return modules_.begin(); }
     auto end() { return modules_.end(); }
     void select_module(const string& name);
-    Module* cur_module() const;
+    Module& cur_module() const;
+    bool parse();
 
 private:
+    Parser parser_;                         // parser of input
     string filename_;                       // name based on filename
     list<Module*> modules_;                 // list of modules in this object
     unordered_map<string, Module*> module_by_name_; // index modules by name

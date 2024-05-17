@@ -153,7 +153,7 @@ output_array($fh, "const_expr_stt", 1, @const_expr_stt);
 output_array($fh, "accept_stt", 1, @accept_stt);
 
 say $fh "void Parser::parse_action(int action) {";
-say $fh "cpu_t cpu = g_asm.options().cpu();";
+say $fh "cpu_t cpu = g_options().cpu();";
 say $fh "switch (action) {";
 for my $i (1 .. $#actions) {
 	say $fh "case $i:";

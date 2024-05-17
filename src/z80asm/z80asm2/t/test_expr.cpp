@@ -17,7 +17,7 @@ using namespace std;
 void test_empty_expr_result() {
     ExprResult res;
     ostringstream oss;
-    g_asm.set_error_output(oss);
+    g_errors().set_output(oss);
 
     IS(res.value(), 0);
     OK(res.ok());
@@ -25,42 +25,44 @@ void test_empty_expr_result() {
     res.error();
     IS(oss.str(), "");
 
-    g_asm.clear();
+    g_errors().clear();
 }
 
 void test_ok_expr_result() {
-    ExprResult res{ 27 };
+    ExprResult res(TYPE_CONSTANT, 27);
     ostringstream oss;
-    g_asm.set_error_output(oss);
+    g_errors().set_output(oss);
 
+    IS(res.type(), TYPE_CONSTANT);
     IS(res.value(), 27);
     OK(res.ok());
     IS(res.err_code(), ErrOk);
     res.error();
     IS(oss.str(), "");
 
-    g_asm.clear();
+    g_errors().clear();
 }
 
 void test_error_expr_result() {
-    ExprResult res{ 0, ErrIntRange, "256" };
+    ExprResult res(TYPE_UNDEFINED, 0, ErrIntRange, "256");
     ostringstream oss;
-    g_asm.set_error_output(oss);
+    g_errors().set_output(oss);
 
+    IS(res.type(), TYPE_UNDEFINED);
     IS(res.value(), 0);
     NOK(res.ok());
     IS(res.err_code(), ErrIntRange);
     res.error();
     IS(oss.str(), "error: integer range: 256\n");
 
-    g_asm.clear();
+    g_errors().clear();
 }
 
 //-----------------------------------------------------------------------------
 
 void test_empty_expr() {
     ostringstream oss;
-    g_asm.set_error_output(oss);
+    g_errors().set_output(oss);
     Expr expr;
 
     IS(oss.str(), "");
@@ -69,5 +71,5 @@ void test_empty_expr() {
     IS(res.value(), 0);
     OK(res.ok());
 
-    g_asm.clear();
+    g_errors().clear();
 }

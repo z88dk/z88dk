@@ -9,10 +9,16 @@
 #include "object.h"
 #include "symtab.h"
 #include "utils.h"
+#include "xassert.h"
 using namespace std;
 
 Symbol::Symbol(const string& name, sym_scope_t scope, sym_type_t type, Section* section, int value)
     : name_(name), scope_(scope), type_(type), value_(value), section_(section) {
+}
+
+Symbol::~Symbol() {
+    if (expr_)
+        delete expr_;
 }
 
 const string& Symbol::name() const {
@@ -31,6 +37,14 @@ Section* Symbol::section() const {
     return section_;
 }
 
+Expr* Symbol::expr() const {
+    return expr_;
+}
+
+Instr* Symbol::instr() const {
+    return instr_;
+}
+
 bool Symbol::is_touched() const {
     return is_touched_;
 }
@@ -39,8 +53,16 @@ bool Symbol::is_global_def() const {
     return is_global_def_;
 }
 
+void Symbol::set_scope(sym_scope_t scope) {
+    scope_ = scope;
+}
+
 void Symbol::set_type(sym_type_t type) {
     type_ = type;
+}
+
+void Symbol::set_section(Section* section) {
+    section_ = section;
 }
 
 void Symbol::set_value(int value) {
@@ -65,7 +87,7 @@ void Symbol::set_global_def(bool f) {
 
 ExprResult Symbol::eval() {
     if (recurse_count_ != 0)
-        return ExprResult(0, ErrExprRecursion);
+        return ExprResult(TYPE_UNDEFINED, 0, ErrExprRecursion);
     else {
         recurse_count_++;
         ExprResult result = eval1();
@@ -76,13 +98,13 @@ ExprResult Symbol::eval() {
 
 ExprResult Symbol::eval1() {
     if (type_ == TYPE_UNDEFINED)
-        return ExprResult(0, ErrUndefinedSymbol, name_);
+        return ExprResult(TYPE_UNDEFINED, 0, ErrUndefinedSymbol, name_);
     else if (expr_)
         return expr_->eval();
     else if (instr_)
-        return instr_->asmpc();
+        return ExprResult(TYPE_ADDRESS, instr_->asmpc());
     else
-        return value_;
+        return ExprResult(TYPE_CONSTANT, value_);
 }
 
 //-----------------------------------------------------------------------------
@@ -98,20 +120,24 @@ void Symtab::clear() {
     for (auto& it : symbols_)
         delete it.second;
     symbols_.clear();
+    for (auto& symbol : deleted_)
+        delete symbol;
+    deleted_.clear();
 }
 
 bool Symtab::insert(Symbol* symbol) {
-    auto it = symbols_.find(symbol->name());
+    string name = symbol->name();
+    auto it = symbols_.find(name);
     if (it != symbols_.end()) {
-        if (str_begins_with(symbol->name(), "__CDBINFO__"))
+        if (str_begins_with(name, "__CDBINFO__"))
             return true;	// ignore duplicates of these
         else {
-            g_asm.error(ErrDuplicateDefinition, symbol->name());
+            g_errors().error(ErrDuplicateDefinition, name);
             return false;
         }
     }
     else {
-        symbols_[symbol->name()] = symbol;
+        symbols_[name] = symbol;
         return true;
     }
 }
@@ -133,4 +159,8 @@ Symbol* Symtab::erase(const string& name) {
     }
     else
         return nullptr;
+}
+
+void Symtab::push_deleted(Symbol* symbol) {
+    deleted_.push_back(symbol);
 }

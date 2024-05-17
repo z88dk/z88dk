@@ -40,17 +40,29 @@ const string& ExprException::err_arg() const {
 }
 
 void ExprException::error() {
-    g_asm.error(err_code_, err_arg_);
+    g_errors().error(err_code_, err_arg_);
 }
 
 //-----------------------------------------------------------------------------
 
-ExprResult::ExprResult(int value, ErrCode err_code, const string& err_arg)
-    : value_(value), err_code_(err_code), err_arg_(err_arg) {
+ExprResult::ExprResult(sym_type_t type, int value, ErrCode err_code, const string& err_arg)
+    : type_(type), value_(value), err_code_(err_code), err_arg_(err_arg) {
+}
+
+sym_type_t ExprResult::type() const {
+    return type_;
 }
 
 int ExprResult::value() const {
     return value_;
+}
+
+Section* ExprResult::section() const {
+    return section_;
+}
+
+bool ExprResult::multi_section() const {
+    return multi_section_;
 }
 
 bool ExprResult::ok() const {
@@ -61,9 +73,131 @@ ErrCode ExprResult::err_code() const {
     return err_code_;
 }
 
+const string& ExprResult::err_arg() const {
+    return err_arg_;
+}
+
 void ExprResult::error() {
     if (!ok())
-        g_asm.error(err_code_, err_arg_);
+        g_errors().error(err_code_, err_arg_);
+}
+
+void ExprResult::set_type(sym_type_t type) {
+    type_ = type;
+}
+
+void ExprResult::set_value(int value) {
+    value_ = value;
+}
+
+void ExprResult::set_section(Section* section) {
+    section_ = section;
+}
+
+void ExprResult::set_multi_section(bool f) {
+    multi_section_ = f;
+}
+
+void ExprResult::set_error(ErrCode err_code, const string& err_arg) {
+    err_code_ = err_code;
+    err_arg_ = err_arg;
+}
+
+ExprResult ExprResult::combine(const ExprResult& a, const ExprResult& b, TkCode op, int value) {
+    ExprResult res;
+
+    // merge type
+    switch (a.type()) {
+    case TYPE_UNDEFINED:
+        res.set_type(TYPE_UNDEFINED);
+        break;
+    case TYPE_CONSTANT:
+        switch (b.type()) {
+        case TYPE_UNDEFINED:
+            res.set_type(TYPE_UNDEFINED);
+            break;
+        case TYPE_CONSTANT:
+            res.set_type(TYPE_CONSTANT);
+            break;
+        case TYPE_ADDRESS:
+            res.set_type(TYPE_ADDRESS);
+            res.set_section(b.section());
+            res.set_multi_section(b.multi_section());
+            break;
+        case TYPE_COMPUTED:
+            res.set_type(TYPE_COMPUTED);
+            break;
+        default:
+            xassert(0);
+        }
+        break;
+    case TYPE_ADDRESS:
+        switch (b.type()) {
+        case TYPE_UNDEFINED:
+            res.set_type(TYPE_UNDEFINED);
+            break;
+        case TYPE_CONSTANT:
+            res.set_type(TYPE_ADDRESS);
+            res.set_section(a.section());
+            res.set_multi_section(a.multi_section());
+            break;
+        case TYPE_ADDRESS:
+            if (a.multi_section() || b.multi_section()) {
+                res.set_section(nullptr);
+                res.set_multi_section();
+            }
+            else if (a.section() != b.section()) {
+                res.set_section(nullptr);
+                res.set_multi_section();
+            }
+            else if (op == TK_MINUS) {
+                res.set_type(TYPE_CONSTANT);
+            }
+            else {
+                res.set_type(TYPE_COMPUTED);
+            }
+            break;
+        case TYPE_COMPUTED:
+            res.set_type(TYPE_COMPUTED);
+            break;
+        default:
+            xassert(0);
+        }
+        break;
+    case TYPE_COMPUTED:
+        switch (b.type()) {
+        case TYPE_UNDEFINED:
+            res.set_type(TYPE_UNDEFINED);
+            break;
+        case TYPE_CONSTANT:
+            res.set_type(TYPE_COMPUTED);
+            break;
+        case TYPE_ADDRESS:
+            res.set_type(TYPE_COMPUTED);
+            break;
+        case TYPE_COMPUTED:
+            res.set_type(TYPE_COMPUTED);
+            break;
+        default:
+            xassert(0);
+        }
+        break;
+    default:
+        xassert(0);
+    }
+
+    // set value
+    res.set_value(value);
+
+    // merge errors
+    if (!a.ok())
+        res.set_error(a.err_code(), a.err_arg());
+    else if (!b.ok())
+        res.set_error(b.err_code(), b.err_arg());
+    else
+        res.set_error(ErrOk);
+
+    return res;
 }
 
 //-----------------------------------------------------------------------------
@@ -71,7 +205,7 @@ void ExprResult::error() {
 Expr::Expr(const string& expr_text) {
     Lexer lexer(expr_text);
     if (!parse_expr(&lexer))
-        g_asm.error(ErrSyntaxExpr, expr_text);
+        g_errors().error(ErrSyntaxExpr, expr_text);
 }
 
 const string& Expr::text() const {
@@ -89,9 +223,9 @@ bool Expr::parse_if_expr(Lexer* lexer) {
 }
 
 ExprResult Expr::eval() const {
-    vector<int> stack;
-    int a, b, c;
-    ExprResult result;
+    vector<ExprResult> stack;
+    ExprResult a, b, c;
+    ExprResult res;
 
     for (auto& token : rpn_tokens_) {
         switch (token.code()) {
@@ -100,7 +234,7 @@ ExprResult Expr::eval() const {
             c = stack.back(); stack.pop_back();
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (a)
+            if (a.value()) 
                 stack.push_back(b);
             else
                 stack.push_back(c);
@@ -110,179 +244,175 @@ ExprResult Expr::eval() const {
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (a || b)
-                stack.push_back(1);
-            else
-                stack.push_back(0);
+            res = ExprResult::combine(a, b, token.code(), (a.value() || b.value()) ? 1 : 0);
+            stack.push_back(res);
             break;
 
         case TK_LOGXOR:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (!!a != !!b)
-                stack.push_back(1);
-            else
-                stack.push_back(0);
+            res = ExprResult::combine(a, b, token.code(), (!!a.value() != !!b.value()) ? 1 : 0);
+            stack.push_back(res);
             break;
 
         case TK_LOGAND:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (a && b)
-                stack.push_back(1);
-            else
-                stack.push_back(0);
+            res = ExprResult::combine(a, b, token.code(), (a.value() && b.value()) ? 1 : 0);
+            stack.push_back(res);
             break;
 
         case TK_BINOR:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            stack.push_back(a | b);
+            res = ExprResult::combine(a, b, token.code(), a.value() | b.value());
+            stack.push_back(res);
             break;
 
         case TK_BINXOR:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            stack.push_back(a ^ b);
+            res = ExprResult::combine(a, b, token.code(), a.value() ^ b.value());
+            stack.push_back(res);
             break;
 
         case TK_BINAND:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            stack.push_back(a & b);
+            res = ExprResult::combine(a, b, token.code(), a.value() & b.value());
+            stack.push_back(res);
             break;
 
         case TK_LT:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (a < b)
-                stack.push_back(1);
-            else
-                stack.push_back(0);
+            res = ExprResult::combine(a, b, token.code(), (a.value() < b.value()) ? 1 : 0);
+            stack.push_back(res);
             break;
 
         case TK_LE:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (a <= b)
-                stack.push_back(1);
-            else
-                stack.push_back(0);
+            res = ExprResult::combine(a, b, token.code(), (a.value() <= b.value()) ? 1 : 0);
+            stack.push_back(res);
             break;
 
         case TK_GT:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (a > b)
-                stack.push_back(1);
-            else
-                stack.push_back(0);
+            res = ExprResult::combine(a, b, token.code(), (a.value() > b.value()) ? 1 : 0);
+            stack.push_back(res);
             break;
 
         case TK_GE:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (a >= b)
-                stack.push_back(1);
-            else
-                stack.push_back(0);
+            res = ExprResult::combine(a, b, token.code(), (a.value() >= b.value()) ? 1 : 0);
+            stack.push_back(res);
             break;
 
         case TK_EQ:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (a == b)
-                stack.push_back(1);
-            else
-                stack.push_back(0);
+            res = ExprResult::combine(a, b, token.code(), (a.value() == b.value()) ? 1 : 0);
+            stack.push_back(res);
             break;
 
         case TK_NE:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (a != b)
-                stack.push_back(1);
-            else
-                stack.push_back(0);
+            res = ExprResult::combine(a, b, token.code(), (a.value() != b.value()) ? 1 : 0);
+            stack.push_back(res);
             break;
 
         case TK_LSHIFT:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            stack.push_back(a << b);
+            res = ExprResult::combine(a, b, token.code(), a.value() << b.value());
+            stack.push_back(res);
             break;
 
         case TK_RSHIFT:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            stack.push_back(a >> b);
+            res = ExprResult::combine(a, b, token.code(), a.value() >> b.value());
+            stack.push_back(res);
             break;
 
         case TK_PLUS:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            stack.push_back(a + b);
+            res = ExprResult::combine(a, b, token.code(), a.value() + b.value());
+            stack.push_back(res);
             break;
 
         case TK_MINUS:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            stack.push_back(a - b);
+            res = ExprResult::combine(a, b, token.code(), a.value() - b.value());
+            stack.push_back(res);
             break;
 
         case TK_MULT:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            stack.push_back(a * b);
+            res = ExprResult::combine(a, b, token.code(), a.value() * b.value());
+            stack.push_back(res);
             break;
 
         case TK_DIV:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (b == 0)
-                return ExprResult(0, ErrDivisionByZero);
-            else
-                stack.push_back(a / b);
+            if (b.value() == 0)
+                return ExprResult(TYPE_UNDEFINED, 0, ErrDivisionByZero);
+            else {
+                res = ExprResult::combine(a, b, token.code(), a.value() / b.value());
+                stack.push_back(res);
+            }
             break;
 
         case TK_MOD:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            if (b == 0)
-                return ExprResult(0, ErrDivisionByZero);
-            else
-                stack.push_back(a % b);
+            if (b.value() == 0)
+                return ExprResult(TYPE_UNDEFINED, 0, ErrDivisionByZero);
+            else {
+                res = ExprResult::combine(a, b, token.code(), a.value() % b.value());
+                stack.push_back(res);
+            }
             break;
 
         case TK_POWER:
             xassert(stack.size() >= 2);
             b = stack.back(); stack.pop_back();
             a = stack.back(); stack.pop_back();
-            stack.push_back(ipow(a, b));
+            res = ExprResult::combine(a, b, token.code(), ipow(a.value(), b.value()));
+            stack.push_back(res);
             break;
 
         case TK_UNARY_MINUS:
             xassert(stack.size() >= 1);
             a = stack.back(); stack.pop_back();
-            stack.push_back(-a);
+            a.set_value(-a.value());
+            stack.push_back(a);
             break;
 
         case TK_UNARY_PLUS:
@@ -292,13 +422,15 @@ ExprResult Expr::eval() const {
         case TK_LOGNOT:
             xassert(stack.size() >= 1);
             a = stack.back(); stack.pop_back();
-            stack.push_back(!a);
+            a.set_value(!a.value());
+            stack.push_back(a);
             break;
 
         case TK_BINNOT:
             xassert(stack.size() >= 1);
             a = stack.back(); stack.pop_back();
-            stack.push_back(~a);
+            a.set_value(~a.value());
+            stack.push_back(a);
             break;
 
         case TK_LPAREN:
@@ -307,15 +439,16 @@ ExprResult Expr::eval() const {
 
         case TK_IDENT:
             xassert(token.symbol());
-            result = token.symbol()->eval();
-            if (result.err_code() != ErrOk)
-                return result;
+            res = token.symbol()->eval();
+            res.set_section(token.symbol()->section());
+            if (res.err_code() != ErrOk)
+                return res;                     // return error
             else
-                stack.push_back(result.value());
+                stack.push_back(res);
             break;
 
         case TK_INTEGER:
-            stack.push_back(token.ivalue());
+            stack.push_back(ExprResult(TYPE_CONSTANT, token.ivalue()));
             break;
 
         default:
@@ -324,8 +457,8 @@ ExprResult Expr::eval() const {
     }
 
     xassert(stack.size() == 1);
-    int x = stack.back();
-    return ExprResult(x, ErrOk);
+    res = stack.back();
+    return res;
 }
 
 bool Expr::in_parens() const {
@@ -360,7 +493,7 @@ bool Expr::parse_expr1(Lexer* lexer) {
 bool Expr::parse_expr() {
     text_.clear();
     rpn_tokens_.clear();
-    set_location(g_asm.location());
+    set_location(g_errors().location());
 
     bool ok = true;
     try {

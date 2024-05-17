@@ -17,20 +17,25 @@ Parser::Parser() {
 }
 
 Parser::~Parser() {
-    for (auto& expr : exprs_)
-        delete expr;
+    delete_exprs();
 }
 
 bool Parser::parse(const string& filename) {
     if (!source_reader_.open(filename))
         return false;
-    start_error_count_ = g_asm.error_count();
-    parse();
-    return start_error_count_ == g_asm.error_count();
+    start_error_count_ = g_errors().count();
+    return parse();
+}
+
+void Parser::delete_exprs() {
+    for (auto& expr : exprs_)
+        delete expr;
+    exprs_.clear();
+    const_exprs_.clear();
 }
 
 void Parser::error(ErrCode err_code) {
-    g_asm.error(err_code, lexer_.peek_text());
+    g_errors().error(err_code, lexer_.peek_text());
     lexer_.flush();
 }
 
@@ -43,7 +48,7 @@ bool Parser::parse() {
             continue;           
         parse_line();
     }
-    return start_error_count_ == g_asm.error_count();
+    return start_error_count_ == g_errors().count();
 }
 
 void Parser::parse_line() {
@@ -56,6 +61,8 @@ void Parser::parse_line() {
 void Parser::parse_main() {
     parse_label();
     while (true) {
+        delete_exprs();
+
         while (!lexer_.at_end() && match_eos()) {
         }
         if (lexer_.at_end())
@@ -194,20 +201,20 @@ bool Parser::expr_in_parens() {
 
 void Parser::warn_if_expr_in_parens() {
     if (expr_in_parens())
-        g_asm.warning(ErrExprInParens);
+        g_errors().warning(ErrExprInParens);
 }
 
 void Parser::error_if_expr_not_in_parens() {
     if (!expr_in_parens())
-        g_asm.error(ErrExprNotInParens);
+        g_errors().error(ErrExprNotInParens);
 }
 
 void Parser::error_illegal_ident() {
-    g_asm.error(ErrIllegalIdent);
+    g_errors().error(ErrIllegalIdent);
 }
 
 void Parser::error_int_range(int value) {
-    g_asm.error(ErrIntRange, int_to_hex(value, 2));
+    g_errors().error(ErrIntRange, int_to_hex(value, 2));
 }
 
 Instr* Parser::add_opcode(int opcode) {
@@ -347,7 +354,7 @@ Instr* Parser::add_call_function_n(const string& name) {
 }
 
 void Parser::add_restart(int arg) {
-    cpu_t cpu = g_asm.options().cpu();
+    cpu_t cpu = g_options().cpu();
     if (arg > 0 && arg < 8)
         arg *= 8;
     switch (arg) {

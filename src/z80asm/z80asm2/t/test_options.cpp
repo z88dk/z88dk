@@ -158,7 +158,7 @@ void test_option_cpu1() {
 int exec_option_cpu1_invalid() {
     Options opts;
     opts.set_cpu("xpto");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 void test_option_cpu2() {
@@ -818,7 +818,7 @@ int exec_option_verbose1() {
     opts.parse_args({ "-v", "-IXIY", "test~.asm" });
     remove("test~.asm");
     remove("z88dk-z80asm.lib");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 int exec_option_verbose2() {
@@ -833,7 +833,7 @@ int exec_option_verbose2() {
     remove("test~.asm");
     remove("z88dk-z80asm.lib");
     xassert(0 == putenv((char*)"Z80ASM="));
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 void test_option_lib_filename() {
@@ -937,28 +937,28 @@ int exec_option_origin1() {
     Options opts;
 
     opts.parse_option("-r");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 int exec_option_origin2() {
     Options opts;
 
     opts.parse_option("-r=");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 int exec_option_origin3() {
     Options opts;
 
     opts.parse_option("-r=$");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 int exec_option_origin4() {
     Options opts;
 
     opts.parse_option("-r=-1");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 void test_option_filler1() {
@@ -1015,35 +1015,35 @@ int exec_option_filler1() {
     Options opts;
 
     opts.parse_option("-f");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 int exec_option_filler2() {
     Options opts;
 
     opts.parse_option("-f=");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 int exec_option_filler3() {
     Options opts;
 
     opts.parse_option("-f=$");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 int exec_option_filler4() {
     Options opts;
 
     opts.parse_option("-f=-1");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 int exec_option_filler5() {
     Options opts;
 
     opts.parse_option("-f=$100");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 void test_option_appmake() {
@@ -1824,7 +1824,7 @@ void test_option_float_format4() {
 int exec_option_float_format() {
     Options opts;
     opts.parse_option("-float=xpto");
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 void test_option_input_files1() {
@@ -1855,7 +1855,7 @@ int exec_option_input_files1() {
     Options opts;
     opts.parse_args({ "test~.o" });
     xassert(opts.input_files().size() == 0);
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 void test_option_input_files2() {
@@ -1874,6 +1874,7 @@ void test_option_input_files2() {
 void test_option_input_files3() {
     remove("test~.asm");
     test_spew("test~.o", OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
+    OK(0 == system("perl -e 'sleep(1)'"));
 
     Options opts;
     opts.parse_args({ "test~" });
@@ -1918,7 +1919,7 @@ int exec_option_input_files4() {
     Options opts;
     opts.parse_args({ "-test~.asm" });
     xassert(opts.input_files().size() == 0);
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 // test m4 pre-processor
@@ -2062,7 +2063,7 @@ int exec_option_input_files8() {
     remove("test1~.lst");
     remove("test2~.lst");
 
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 // environment variables
@@ -2091,7 +2092,7 @@ int exec_option_input_files9() {
 
     xassert(0 == putenv((char*)"TEST="));
 
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 // non-existent environment variable is empty
@@ -2118,7 +2119,7 @@ int exec_option_input_files10() {
     remove("test2~.asm");
     remove("test1~.lst");
 
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 // use globs in command line
@@ -2181,7 +2182,7 @@ int exec_option_input_files13() {
     Options opts;
     opts.parse_args({ "test*~.asm" });
 
-    return g_asm.exit_code();
+    return g_errors().exit_code();
 }
 
 // use globs in recursive list file name

@@ -15,38 +15,30 @@
 using namespace std;
 
 Assembler::Assembler() {
-    locations_.emplace_back();          // stack always has at least one element
 }
 
 Assembler::~Assembler() {
+    clear();
 }
 
 void Assembler::clear() {
-    locations_.clear();
-    locations_.emplace_back();          // stack always has at least one element
+    options_.clear();
     errors_.clear();
-    filename_.clear();
-    object_ = nullptr;
-    parser_ = nullptr;
-    defines_.clear();
-    global_symbols_.clear();
+    delete_object();
     asmpc_ = nullptr;
-    start_errors_ = 0;
 }
 
 bool Assembler::assemble(const string& filename) {
     if (options_.verbose())
         cout << "Assembling '" << filename << "'" << endl;
 
-    start_errors_ = errors_.count();
+    int start_errors = errors_.count();
 
     // create object and parser
-    filename_ = filename;
-    object_ = new Object(filename);
-    parser_ = new Parser();
+    add_object(filename);
 
     // clear globals
-    global_symbols_.clear();
+    copy_defines();
 
     // assemble
     assemble1();
@@ -54,93 +46,58 @@ bool Assembler::assemble(const string& filename) {
     if (options_.verbose())
         cout << endl;
 
-    filename_.clear();
-    delete object_; object_ = nullptr;
-    delete parser_; parser_ = nullptr;
+    delete_object();
 
     // exit true if no more errors
-    return !got_errors();
+    return start_errors == errors_.count();
 }
 
 Options& Assembler::options() {
     return options_;
 }
 
-void Assembler::push_location(const Location& location) {
-    locations_.push_back(location);
-    errors_.set_location(location);
+Errors& Assembler::errors() {
+    return errors_;
 }
 
-void Assembler::pop_location() {
-    if (locations_.size() > 1)
-        locations_.pop_back();
-    else
-        locations_.back().clear();
-    errors_.set_location(locations_.back());
+void Assembler::add_object(const string& filename) {
+    delete_object();
+    object_ = new Object(filename);
 }
 
-const Location& Assembler::location() const {
-    return locations_.back();
+Object& Assembler::object() {
+    xassert(object_);
+    return *object_;
 }
 
-void Assembler::set_location(const Location& location) {
-    locations_.back() = location;
-    errors_.set_location(location);
+void Assembler::delete_object() {
+    if (object_) {
+        delete object_;
+        object_ = nullptr;
+    }
 }
 
-void Assembler::clear_location() {
-    locations_.back().clear();
-    errors_.clear_location();
-}
+void Assembler::copy_defines() {
+    for (auto& it : options_.defines()) {
+        string name = it.first;
+        int value = it.second;
 
-void Assembler::set_source_line(const string& line) {
-    errors_.set_source_line(line);
-}
+        Module& module1 = cur_module();
 
-void Assembler::set_expanded_line(const string& line) {
-    errors_.set_expanded_line(line);
-}
+        Section* section = module1.cur_section();
+        xassert(section);
 
-string Assembler::source_line() {
-    return errors_.source_line();
-}
+        Symbol* symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, section, value);
+        symbol->set_global_def();
 
-string Assembler::expanded_line() {
-    return errors_.expanded_line();
-}
-
-int Assembler::error_count() const {
-    return errors_.count();
-}
-
-int Assembler::exit_code() const {
-    return errors_.count() == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
-}
-
-void Assembler::set_error_output(ostream& os) {
-    errors_.set_output(os);
-}
-
-void Assembler::error(ErrCode err_code, const string& argument) {
-    errors_.error(err_code, argument);
-}
-
-void Assembler::error(ErrCode err_code, int argument) {
-    errors_.error(err_code, argument);
-}
-
-void Assembler::warning(ErrCode err_code, const string& argument) {
-    errors_.warning(err_code, argument);
-}
-
-void Assembler::warning(ErrCode err_code, int argument) {
-    errors_.warning(err_code, argument);
+        module1.symtab().insert(symbol);
+    }
 }
 
 string Assembler::autolabel() {
     static int n = 0;
     ostringstream oss;
-    oss << "z80asm$" << setw(4) << setfill('0') << n++;
+    oss << "z80asm$" << setw(5) << setfill('0') << n++;
     return oss.str();
 }
 
@@ -152,7 +109,7 @@ Symbol* Assembler::add_asmpc_instr() {
 
 Symbol* Assembler::add_label(const string& name) {
     Instr* instr = add_instr();
-    Symbol* label = add_symbol(name);
+    Symbol* label = define_symbol(name);
     if (label) {
         label->set_type(TYPE_ADDRESS);
         instr->set_label(label);
@@ -168,7 +125,7 @@ Symbol* Assembler::asmpc() const {
 }
 
 Instr* Assembler::add_instr() {
-    Instr* instr = cur_module()->cur_section()->add_instr();
+    Instr* instr = cur_module().cur_section()->add_instr();
     return instr;
 }
 
@@ -179,233 +136,179 @@ Instr* Assembler::add_instr(int opcode) {
 }
 
 Symbol* Assembler::find_symbol(const string& name) {
-    Symbol* symbol = find_local_symbol(name);
-    if (!symbol)
-        symbol = find_global_symbol(name);
-    if (!symbol)
-        symbol = find_global_define(name);
-    return symbol;
+    return object().cur_module().symtab().find(name);
 }
 
-Symbol* Assembler::add_symbol(const string& name) {
-    Module* module1 = cur_module();
-    xassert(module1);
+Symbol* Assembler::define_symbol(const string& name, int value) {
+    Expr* expr = new Expr(std::to_string(value));
+    return add_equ(name, expr);
+}
 
+void Assembler::undefine_symbol(const string& name) {
+    Module& module1 = cur_module();
+
+    // check if already defined
+    Symbol* symbol = module1.symtab().erase(name);
+    if (symbol) {
+        // set to zero and remove any instr/expr
+        symbol->set_value(0);
+        if (symbol->expr()) {
+            delete symbol->expr();
+            symbol->set_expr(nullptr);
+        }
+        if (symbol->instr())
+            symbol->set_instr(nullptr);
+
+        // save in deleted, in case any expression referes to it
+        module1.symtab().push_deleted(symbol);
+    }
+}
+
+Symbol* Assembler::add_equ(const string& name, Expr* expr) {
+    Module& module1 = cur_module();
+
+    ExprResult res = expr->eval();
+    
     // check if already defined
     Symbol* symbol = find_symbol(name);
     if (!symbol) {                              // new symbol
-        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, module1->cur_section());
-        bool ok = module1->local_symbols()->insert(symbol);
-        xassert(ok);
-        return symbol;
-    }
-    else if (symbol->is_global_def()) {         // global define, make a copy
-        ExprResult res = symbol->eval();
-        xassert(res.ok());
-        int value = res.value();
-        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, module1->cur_section());
-        symbol->set_value(value);
-        bool ok = module1->local_symbols()->insert(symbol);
+        symbol = new Symbol(name, SCOPE_LOCAL, res.type(), module1.cur_section());
+        if (res.type() == TYPE_CONSTANT) {
+            symbol->set_value(res.value());
+            delete expr;
+        }
+        else {
+            symbol->set_expr(expr);
+        }
+        bool ok = module1.symtab().insert(symbol);
         xassert(ok);
         return symbol;
     }
     else if (symbol->type() == TYPE_UNDEFINED) {// already declared
-        symbol->set_type(TYPE_CONSTANT);
-        symbol->set_location(location());
+        if (symbol->scope() == SCOPE_EXTERN)
+            symbol->set_scope(SCOPE_PUBLIC);
+        symbol->set_type(res.type());
+        symbol->set_expr(expr);
+        symbol->set_location(errors_.location());
+        symbol->set_section(module1.cur_section());
         return symbol;
     }
     else {                                      // already defined
-        error(ErrDuplicateDefinition, name);
+        delete expr;
+        errors_.error(ErrDuplicateDefinition, name);
         return nullptr;
     }
 }
 
 Symbol* Assembler::use_symbol(const string& name) {
-    Module* module1 = cur_module();
-    xassert(module1);
+    Module& module1 = cur_module();
 
     // check if already defined
     Symbol* symbol = find_symbol(name);
     if (!symbol) {                               // new symbol
-        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_UNDEFINED, module1->cur_section());
-        bool ok = module1->local_symbols()->insert(symbol);
-        xassert(ok);
-    }
-    else if (symbol->is_global_def()) {         // global define, make a copy
-        ExprResult res = symbol->eval();
-        xassert(res.ok());
-        int value = res.value();
-        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, module1->cur_section());
-        symbol->set_value(value);
-        bool ok = module1->local_symbols()->insert(symbol);
+        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_UNDEFINED, module1.cur_section());
+        bool ok = module1.symtab().insert(symbol);
         xassert(ok);
     }
     symbol->set_touched();
     return symbol;
 }
 
-Symbol* Assembler::add_define(const string& name, int value) {
-    Symbol* symbol = defines_.find(name);
-    if (symbol) {                   // already defined
-        ExprResult res = symbol->eval();
-        if (!res.ok()) {
-            res.error();
-            return nullptr;
-        }
-        else if (res.value() != value) {
-            error(ErrDuplicateDefinition, name);
-            return nullptr;
-        }
-        else {
-            return symbol;          // OK, already defined but same value
-        }
-    }
-    else {
-        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, nullptr);
-        symbol->set_global_def();
-        bool ok = defines_.insert(symbol);
-        xassert(ok);
-        return symbol;
-    }
-}
-
-void Assembler::erase_define(const string& name) {
-    Symbol* symbol = defines_.erase(name);
-    if (symbol)
-        delete symbol;
-}
-
 Symbol* Assembler::declare_extern(const string& name) {
-    Module* module1 = cur_module();
-    xassert(module1);
+    Module& module1 = cur_module();
 
     // check if already defined
     Symbol* symbol = find_symbol(name);
-    if (!symbol) {                               // new symbol
-        symbol = new Symbol(name, SCOPE_EXTERN, TYPE_UNDEFINED, module1->cur_section());
-        bool ok = global_symbols_.insert(symbol);
+    if (symbol) {                               // already defined
+        sym_scope_t scope = symbol->scope();
+        if (scope != SCOPE_EXTERN)
+            errors_.error(ErrSymbolRedeclaration, name);
+    }
+    else {                                      // new symbol
+        symbol = new Symbol(name, SCOPE_EXTERN, TYPE_UNDEFINED, module1.cur_section());
+        bool ok = module1.symtab().insert(symbol);
         xassert(ok);
     }
-    else if (symbol->is_global_def()) {         // global define, make a copy
-        ExprResult res = symbol->eval();
-        xassert(res.ok());
-        int value = res.value();
-        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, module1->cur_section());
-        symbol->set_value(value);
-        bool ok = module1->local_symbols()->insert(symbol);
-        xassert(ok);
-    }
-    symbol->set_touched();
     return symbol;
 }
 
 Symbol* Assembler::declare_public(const string& name) {
-    Module* module1 = cur_module();
-    xassert(module1);
+    Module& module1 = cur_module();
 
     // check if already defined
     Symbol* symbol = find_symbol(name);
-    if (!symbol) {                               // new symbol
-        symbol = new Symbol(name, SCOPE_PUBLIC, TYPE_UNDEFINED, module1->cur_section());
-        bool ok = global_symbols_.insert(symbol);
+    if (symbol) {                               // already defined
+        sym_scope_t scope = symbol->scope();
+        if (scope == SCOPE_LOCAL)
+            symbol->set_scope(SCOPE_PUBLIC);
+        else if (scope != SCOPE_PUBLIC)
+            errors_.error(ErrSymbolRedeclaration, name);
+    }
+    else {                                      // new symbol
+        symbol = new Symbol(name, SCOPE_PUBLIC, TYPE_UNDEFINED, module1.cur_section());
+        bool ok = module1.symtab().insert(symbol);
         xassert(ok);
     }
-    else if (symbol->is_global_def()) {         // global define, make a copy
-        ExprResult res = symbol->eval();
-        xassert(res.ok());
-        int value = res.value();
-        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, module1->cur_section());
-        symbol->set_value(value);
-        bool ok = module1->local_symbols()->insert(symbol);
-        xassert(ok);
-    }
-    symbol->set_touched();
     return symbol;
 }
 
 Symbol* Assembler::declare_global(const string& name) {
-    Module* module1 = cur_module();
-    xassert(module1);
+    Module& module1 = cur_module();
 
     // check if already defined
     Symbol* symbol = find_symbol(name);
-    if (!symbol) {                               // new symbol
-        symbol = new Symbol(name, SCOPE_GLOBAL, TYPE_UNDEFINED, module1->cur_section());
-        bool ok = global_symbols_.insert(symbol);
+    if (symbol) {                               // already defined
+        sym_scope_t scope = symbol->scope();
+        if (scope == SCOPE_LOCAL)
+            symbol->set_scope(SCOPE_GLOBAL);
+        else if (scope != SCOPE_GLOBAL)
+            errors_.error(ErrSymbolRedeclaration, name);
+    }
+    else {                                      // new symbol
+        symbol = new Symbol(name, SCOPE_GLOBAL, TYPE_UNDEFINED, module1.cur_section());
+        bool ok = module1.symtab().insert(symbol);
         xassert(ok);
     }
-    else if (symbol->is_global_def()) {         // global define, make a copy
-        ExprResult res = symbol->eval();
-        xassert(res.ok());
-        int value = res.value();
-        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, module1->cur_section());
-        symbol->set_value(value);
-        bool ok = module1->local_symbols()->insert(symbol);
-        xassert(ok);
-    }
-    symbol->set_touched();
     return symbol;
 }
 
-Module* Assembler::cur_module() {
-    if (!object_)
-        return nullptr;
-    Module* module1 = object_->cur_module();
-    return module1;         
-}
-
-Symbol* Assembler::find_local_symbol(const string& name) {
-    Module* module1 = cur_module();
-    if (module1)
-        return module1->local_symbols()->find(name);
-    else
-        return nullptr;
-}
-
-Symbol* Assembler::find_global_symbol(const string& name) {
-    return global_symbols_.find(name);
-}
-
-Symbol* Assembler::find_global_define(const string& name) {
-    return defines_.find(name);
-}
-
-bool Assembler::got_errors() const {
-    return start_errors_ != errors_.count();
+Module& Assembler::cur_module() {
+    return object().cur_module();
 }
 
 void Assembler::assemble1() {
+    int start_errors = errors_.count();
+
     // create parent directory of object file
-    string o_filename = file_o_filename(filename_);
+    string o_filename = file_o_filename(object().filename());
     string parent_dir = file_parent_path(o_filename);
     if (!file_is_directory(parent_dir)) {
         if (!file_create_directories(parent_dir)) {
-            error(ErrDirCreate, parent_dir);
+            errors_.error(ErrDirCreate, parent_dir);
             perror(parent_dir.c_str());
             return;
         }
     }
 
-    parser_->parse(filename_);
-    if (got_errors())
+    object().parse();
+    if (start_errors != errors_.count())
         return;
 
     check_relative_jumps();
-    if (got_errors())
+    if (start_errors != errors_.count())
         return;
 
     patch_local_exprs();
-    if (got_errors())
+    if (start_errors != errors_.count())
         return;
 
     check_undefined_symbols();
-    if (got_errors())
+    if (start_errors != errors_.count())
         return;
 
     write_obj_file(o_filename);
-    if (got_errors())
+    if (start_errors != errors_.count())
         return;
-
 }
 
 void Assembler::check_relative_jumps() {

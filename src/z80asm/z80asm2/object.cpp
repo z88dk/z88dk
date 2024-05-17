@@ -143,7 +143,7 @@ void Module::clear_all() {
     sections_.clear();
     section_by_name_.clear();
     cur_section_ = nullptr;
-    local_symbols_.clear();
+    symtab_.clear();
 }
 
 void Module::create_default_section() {
@@ -166,8 +166,8 @@ Section* Module::cur_section() const {
     return cur_section_;
 }
 
-Symtab* Module::local_symbols() {
-    return &local_symbols_;
+Symtab& Module::symtab() {
+    return symtab_;
 }
 
 //-----------------------------------------------------------------------------
@@ -184,6 +184,10 @@ Object::~Object() {
 void Object::clear() {
     clear_all();
     create_default_module();
+}
+
+const string& Object::filename() const {
+    return filename_;
 }
 
 void Object::clear_all() {
@@ -210,8 +214,11 @@ void Object::select_module(const string& name) {
         cur_module_ = it->second;
 }
 
-Module* Object::cur_module() const {
+Module& Object::cur_module() const {
     xassert(cur_module_);
-    return cur_module_;
+    return *cur_module_;
 }
 
+bool Object::parse() {
+    return parser_.parse(filename_);
+}

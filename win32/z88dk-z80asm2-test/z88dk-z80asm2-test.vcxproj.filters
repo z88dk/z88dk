@@ -84,7 +84,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_zfloat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_options_driver.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_symtab_driver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

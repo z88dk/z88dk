@@ -22,6 +22,51 @@ using namespace std;
 #define COPYRIGHT_MSG	"Z80 Macro Assembler " Z88DK_VERSION "\n(c) " COPYRIGHT
 
 
+Options::Options() {
+    clear();        // set defaults
+}
+
+void Options::clear() {
+    cpu_ = CPU_Z80;
+    got_cpu_option_ = false;
+    ti83_ = false;
+    ti83plus_ = false;
+    swap_ixiy_ = IXIY_NO_SWAP;
+    got_swap_ixiy_option_ = false;
+    verbose_ = false;
+    upper_case_ = false;
+    raw_strings_ = false;
+    opt_speed_ = false;
+    debug_ = false;
+    lib_filename_.clear();
+    lib_for_all_cpus_ = false;
+    output_dir_.clear();
+    bin_filename_.clear();
+    make_bin_ = false;
+    split_bin_ = false;
+    date_stamp_ = false;
+    relocatable_ = false;
+    reloc_info_ = false;
+    origin_ = ORG_NOT_DEFINED;
+    filler_ = 0;
+    symtable_ = false;
+    list_file_ = false;
+    map_file_ = false;
+    global_def_ = false;
+    appmake_ = APPMAKE_NONE;
+    debug_z80asm_ = false;
+    m4_options_.clear();
+    include_path_.clear();
+    library_path_.clear();
+    libraries_.clear();
+    consol_obj_filename_.clear();
+    defines_.clear();
+    float_format_.clear();
+    got_float_format_option_ = false;
+    input_files_.clear();
+    file_reader_.clear();
+}
+
 void Options::parse_args(const vector<string>& args) {
     if (args.empty())
         exit_copyright();
@@ -44,7 +89,7 @@ void Options::parse_args(const vector<string>& args) {
         cout << endl;
     }
 
-    if (g_asm.error_count())
+    if (g_errors().count())
         return;
 
     bool got_dash_dash = false;
@@ -59,7 +104,7 @@ void Options::parse_args(const vector<string>& args) {
         else
             parse_file(arg1);
 
-        if (g_asm.error_count())
+        if (g_errors().count())
             return;
     }
 
@@ -87,7 +132,7 @@ void Options::parse_option(const string& arg) {
 	}																	
 #include "options.def"
 
-    g_asm.error(ErrIllegalOption, arg);
+    g_errors().error(ErrIllegalOption, arg);
 }
 
 void Options::parse_file(const string& arg_) {
@@ -274,7 +319,7 @@ void Options::symbol_define(const string& name, int value) {
     auto it = defines_.find(name);
     if (it != defines_.end()) {     // already exists
         if (value != it->second)
-            g_asm.error(ErrDuplicateDefinition, name);
+            g_errors().error(ErrDuplicateDefinition, name);
     }
     else {                          // new symbol
         defines_[name] = value;
@@ -439,8 +484,8 @@ void Options::set_cpu(const string& name) {
         if (id != CPU_UNDEF)
             set_cpu(id);
         else {
-            g_asm.error(ErrIllegalCpuOption, name);
-            g_asm.error(ErrCpusList, cpu_list());
+            g_errors().error(ErrIllegalCpuOption, name);
+            g_errors().error(ErrCpusList, cpu_list());
         }
     }
 }
@@ -482,7 +527,7 @@ void Options::set_origin(int origin) {
 void Options::set_origin(const string& arg) {
     int value = 0;
     if (!parse_opt_int(value, arg) || value < 0)	// value can be >0xffff for banked address
-        g_asm.error(ErrInvalidOrgOption, arg);
+        g_errors().error(ErrInvalidOrgOption, arg);
     else
         set_origin(value);
 }
@@ -494,7 +539,7 @@ void Options::set_filler(int filler) {
 void Options::set_filler(const string& arg) {
     int value = 0;
     if (!parse_opt_int(value, arg) || value < 0 || value > 0xFF)
-        g_asm.error(ErrInvalidFillerOption, arg);
+        g_errors().error(ErrInvalidFillerOption, arg);
     else
         set_filler(value);
 }
@@ -526,8 +571,8 @@ void Options::set_float_format(float_format_t format) {
 
 void Options::set_float_format(const string& format) {
     if (!float_format_.set_text(format)) {
-        g_asm.error(ErrIllegalFloatOption, format);
-        g_asm.error(ErrFloatFormatsList, FloatFormat::get_all_formats());
+        g_errors().error(ErrIllegalFloatOption, format);
+        g_errors().error(ErrFloatFormatsList, FloatFormat::get_all_formats());
     }
     else {
         got_float_format_option_ = true;
@@ -631,7 +676,7 @@ void Options::parse_define(const string& opt_arg) {
         ident = opt_arg.substr(0, equal_pos);
 
     if (!is_ident(ident))
-        g_asm.error(ErrIllegalIdent, ident);
+        g_errors().error(ErrIllegalIdent, ident);
     else {
         if (equal_pos == string::npos) {
             symbol_define(ident, 1);
@@ -641,7 +686,7 @@ void Options::parse_define(const string& opt_arg) {
             if (parse_opt_int(value, opt_arg.substr(equal_pos + 1)))
                 symbol_define(ident, value);
             else
-                g_asm.error(ErrInvalidDefineOption, opt_arg);
+                g_errors().error(ErrInvalidDefineOption, opt_arg);
         }
     }
 }
@@ -736,12 +781,12 @@ void Options::post_parsing_actions() {
 
     // check if -d and -m* were given
     if (date_stamp_ && lib_for_all_cpus_) {
-        g_asm.error(ErrDateAndMstarIncompatible);
+        g_errors().error(ErrDateAndMstarIncompatible);
     }
 
     // check if we have any file to process
     if (input_files_.empty()) {
-        g_asm.error(ErrNoSrcFile);
+        g_errors().error(ErrNoSrcFile);
     }
 
     // make output directory if needed
@@ -864,7 +909,7 @@ void Options::expand_source_glob(const string& pattern_) {
         }
 
         if (!found)
-            g_asm.error(ErrGlobNoFiles, pattern);
+            g_errors().error(ErrGlobNoFiles, pattern);
     }
 }
 
@@ -877,12 +922,12 @@ void Options::expand_list_glob(const string& pattern_) {
         if (file_is_regular_file(file))
             files.push_back(file);		// only one file
         else
-            g_asm.error(ErrFileNotFound, pattern);
+            g_errors().error(ErrFileNotFound, pattern);
     }
     else {
         file_expand_glob(files, pattern);			// list of files
         if (files.empty())
-            g_asm.error(ErrGlobNoFiles, pattern);
+            g_errors().error(ErrGlobNoFiles, pattern);
     }
 
     for (auto& file : files) {
@@ -927,7 +972,7 @@ bool Options::search_source(const string& filename, string& out_filename) {
         if (verbose_)
             cout << "% " << m4_cmd << endl;
         if (0 != system(m4_cmd.c_str())) {
-            g_asm.error(ErrCmdFailed, m4_cmd);
+            g_errors().error(ErrCmdFailed, m4_cmd);
             perror("m4");
             return false;
         }
@@ -975,8 +1020,8 @@ bool Options::search_source(const string& filename, string& out_filename) {
             return true;
 
         // not found, avoid cascade of errors
-        if (!g_asm.error_count())
-            g_asm.error(ErrFileNotFound, filename);
+        if (!g_errors().count())
+            g_errors().error(ErrFileNotFound, filename);
 
         return false;
     }
@@ -986,7 +1031,7 @@ bool Options::check_source(const string& filename, string& out_filename) {
     out_filename.clear();
 
     // avoid cascade of errors
-    if (g_asm.error_count()) {
+    if (g_errors().count()) {
         out_filename = file_norm_path(filename);
         return true;
     }
@@ -1020,7 +1065,7 @@ bool Options::check_source(const string& filename, string& out_filename) {
                 out_filename = obj_file;
                 if (!lib_for_all_cpus_)
                     if (!file_is_object_file(obj_file))
-                        g_asm.error(ErrNotObjFile, obj_file);
+                        g_errors().error(ErrNotObjFile, obj_file);
             }
             else
                 out_filename = src_file;
@@ -1031,7 +1076,7 @@ bool Options::check_source(const string& filename, string& out_filename) {
             out_filename = obj_file;
             if (!lib_for_all_cpus_)
                 if (!file_is_object_file(obj_file))
-                    g_asm.error(ErrNotObjFile, obj_file);
+                    g_errors().error(ErrNotObjFile, obj_file);
             return true;
         }
         else {
@@ -1048,7 +1093,7 @@ bool Options::check_source(const string& filename, string& out_filename) {
         out_filename = obj_file;
         if (!lib_for_all_cpus_)
             if (!file_is_object_file(obj_file))
-                g_asm.error(ErrNotObjFile, obj_file);
+                g_errors().error(ErrNotObjFile, obj_file);
         return true;
     }
     else {

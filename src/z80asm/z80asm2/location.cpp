@@ -88,7 +88,7 @@ string to_string(const Location& location) {
 //-----------------------------------------------------------------------------
 
 HasLocation::HasLocation()
-    : location_(g_asm.location()) {
+    : location_(g_errors().location()) {
 }
 
 const Location& HasLocation::location() const {

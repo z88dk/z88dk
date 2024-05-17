@@ -9,6 +9,7 @@
 #include "location.h"
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 // error code
@@ -20,27 +21,40 @@ enum ErrCode {
 // output error messages
 class Errors {
 public:
+    Errors();
     void clear();
+
     void set_output(ostream& os);
-    int count() const { return count_; }
+
+    int count() const;
+    int exit_code() const;
+    const Location& location() const;
+    const string& source_line();
+    const string& expanded_line();
+
     void error(ErrCode err_code, const string& argument = "");
     void error(ErrCode err_code, int argument);
     void warning(ErrCode err_code, const string& argument = "");
     void warning(ErrCode err_code, int argument);
+
     void set_source_line(const string& line);
     void set_expanded_line(const string& line);
-    const Location& location() const;
     void set_location(const Location& location);
     void clear_location();
-    string source_line();
-    string expanded_line();
+
+    void push_location(const Location& location);
+    void pop_location();
 
 private:
-    ostream* os_{ &cerr };          // output stream for errors
-    int count_{ 0 };                // count errors
-    string source_line_;            // input line where error detected
-    string expanded_line_;          // input line after macro processing
-    Location location_;             // error location
+    struct SourceLine {
+        Location location;              // source file location
+        string source_line;             // input line where error detected
+        string expanded_line;           // input line after macro expansion
+    };
+
+    ostream* os_;                       // output stream for errors
+    int count_;                         // count errors
+    vector<SourceLine> source_lines_;   // stack of locations
 
     string error_prefix();
     string error_suffix();
