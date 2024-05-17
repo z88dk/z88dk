@@ -813,6 +813,8 @@ int exec_option_verbose1() {
 
     test_spew("test~.asm", "");
     test_spew("z88dk-z80asm.lib", LIB_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
+    xassert(0 == system("perl -e 'sleep(1)'"));
+
     opts.parse_args({ "-v", "-IXIY", "test~.asm" });
     remove("test~.asm");
     remove("z88dk-z80asm.lib");
@@ -825,6 +827,8 @@ int exec_option_verbose2() {
     xassert(0 == putenv((char*)"Z80ASM=-v"));
     test_spew("test~.asm", "");
     test_spew("z88dk-z80asm.lib", LIB_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
+    xassert(0 == system("perl -e 'sleep(1)'"));
+
     opts.parse_args({ "test~.asm" });
     remove("test~.asm");
     remove("z88dk-z80asm.lib");
@@ -1095,6 +1099,7 @@ void test_option_library() {
     fs::create_directories("test~.dir");
     test_spew("test~1.lib", LIB_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
     test_spew("test~.dir/test~2.lib", LIB_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
+    OK(0 == system("perl -e 'sleep(1)'"));
 
     opts.parse_option("-Ltest~.dir");
     opts.parse_option("-ltest~1");
