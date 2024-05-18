@@ -25,10 +25,9 @@ my @states = ($tree);
 my @actions = ('');		# actions start at 1
 my @state_comment = ('');
 my %actions;
-my %keywords;
 
 # read keywords from source
-%keywords = read_keywords("../../src/cpp/keyword.def");
+my %keywords = read_keywords("../../src/cpp/keyword.def");
 my $nr_keywords = scalar(keys %keywords);
 
 # read tokens from source
