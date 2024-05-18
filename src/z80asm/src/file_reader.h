@@ -19,7 +19,7 @@ struct OpenFile {
     bool open(const string& filename);
 };
 
-// reade text files
+// read text files
 struct FileReader {
     list<OpenFile> open_files;
 

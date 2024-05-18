@@ -44,7 +44,7 @@ bool FileReader::open(const string& filename_) {
 
     // open file
     open_files.emplace_back();
-    return open_files.back().open(filename);
+    return open_files.back().open(found_filename);
 }
 
 bool FileReader::getline(string& line) {
