@@ -55,6 +55,7 @@ start:
     call    _main           ; Call user program
 __Exit:
     call    crt0_exit
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     ; How does the program end?
     INCLUDE "crt/classic/crt_terminate.inc"
