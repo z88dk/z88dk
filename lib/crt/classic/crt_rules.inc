@@ -231,6 +231,12 @@
        defc CLIB_DEFAULT_SCREEN_MODE = -1
    ENDIF
 
+   PUBLIC CLIB_EXIT_SCREEN_MODE
+   IFNDEF CLIB_EXIT_SCREEN_MODE
+       defc CLIB_EXIT_SCREEN_MODE = -1
+   ENDIF
+
+
     ; Maximum number of FILEs available
     IF !DEFINED_CLIB_FOPEN_MAX
         DEFC    CLIB_FOPEN_MAX = 10

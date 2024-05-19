@@ -36,7 +36,7 @@ start:
 __Exit:
     push    hl
     call    crt0_exit
-
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
 
     pop     bc
     exx

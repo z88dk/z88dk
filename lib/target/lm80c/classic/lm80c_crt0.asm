@@ -106,6 +106,7 @@ start:
 __Exit:
     push    hl
     call    crt0_exit
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
 
 	; We should probably disable VDP interrupts before doing this
 ;	ld	hl,$45ED	;retn
