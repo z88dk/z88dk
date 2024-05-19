@@ -228,7 +228,7 @@
    ; if needed. So default to an unused value if not
    PUBLIC CLIB_DEFAULT_SCREEN_MODE
    IFNDEF CLIB_DEFAULT_SCREEN_MODE
-       defc CLIB_DEFAULT_SCREEN_MODE = 0
+       defc CLIB_DEFAULT_SCREEN_MODE = -1
    ENDIF
 
     ; Maximum number of FILEs available

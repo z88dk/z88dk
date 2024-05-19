@@ -79,6 +79,8 @@ ENDIF
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
+
     ;ld      a,($F306)
     ;ld      (defltdsk),a
 

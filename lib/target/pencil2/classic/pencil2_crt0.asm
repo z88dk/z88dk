@@ -41,7 +41,7 @@ ENDIF
     defc	CRT_KEY_DEL = 127
     defc	__CPU_CLOCK = 3579545
 
-IF !DEFINED_CLIB_DEFAULT_SCREEN_MODE
+IFNDEF CLIB_DEFAULT_SCREEN_MODE
     defc    CLIB_DEFAULT_SCREEN_MODE = 2
 ENDIF
 
@@ -111,10 +111,7 @@ program:
     INCLUDE "crt/classic/crt_init_sp.inc"
     call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-IF CLIB_DEFAULT_SCREEN_MODE != -1
-    ld      hl,CLIB_DEFAULT_SCREEN_MODE
-    call    vdp_set_mode
-ENDIF
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
     im      1
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
