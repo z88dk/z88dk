@@ -73,6 +73,8 @@ start:
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
+
     call    _main
 
 ; end program

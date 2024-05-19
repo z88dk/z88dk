@@ -45,7 +45,7 @@ ENDIF
     defc TAR__crt_enable_rst = $8080
     defc _z80_rst_38h = tms9918_interrupt
 
-IF !DEFINED_CLIB_DEFAULT_SCREEN_MODE
+IFNDEF CLIB_DEFAULT_SCREEN_MODE
     defc    CLIB_DEFAULT_SCREEN_MODE = 2
 ENDIF
 
@@ -77,10 +77,7 @@ start:
     INCLUDE "crt/classic/crt_init_sp.inc"
     call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
-IF CLIB_DEFAULT_SCREEN_MODE != -1
-    ld      hl,CLIB_DEFAULT_SCREEN_MODE
-    call    vdp_set_mode
-ENDIF
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
     im      1
  
     ; Configure the AY to enable reading the keys

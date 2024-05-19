@@ -17,6 +17,12 @@ IF !DEFINED_CONSOLE_ROWS
 ENDIF
     defc    __CPU_CLOCK = 3580000
 
+    ; Don't change the screenmode by default
+IFNDEF CLIB_DEFAULT_SCREEN_MODE
+    defc CLIB_DEFAULT_SCREEN_MODE = -1
+ENDIF
+
+
 IF (!DEFINED_startup || (startup=1))
     INCLUDE	"target/msx/classic/ram.asm"
 ENDIF

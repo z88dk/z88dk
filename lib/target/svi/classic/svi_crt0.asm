@@ -62,6 +62,8 @@ ELSE
     im      1
     ei
 ENDIF
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
+
     call    _main
 __Exit:
     call    crt0_exit

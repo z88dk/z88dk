@@ -347,6 +347,12 @@ ENDIF
     call    5
     ld      (defltdsk),a
 
+IF __HAVE_TMS99X8
+    ; And include setting an initial screen mode (note inside code_crt_init section)
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
+ENDIF
+
+
     SECTION code_crt_exit
 
     ld      a,(defltdsk)        ;Restore default disc

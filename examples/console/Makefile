@@ -74,5 +74,3 @@ $(eval $(call build_app, $(ADVA_TARGETS), adva.bin, adv_a.c) )
 
 binaries: $(OUTPUT_BINS)
 
-clean:
-	$(RM) -fr build

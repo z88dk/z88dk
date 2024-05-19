@@ -23,6 +23,7 @@ start:
     INCLUDE "crt/classic/crt_init_sp.inc"
     call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
 
