@@ -102,6 +102,10 @@ ENDIF
     call    _main
 __Exit:
     call    crt0_exit
+IF CLIB_EXIT_SCREEN_MODE != -1
+    ld      a,CLIB_EXIT_SCREEN_MODE
+    call    asm_sam_set_screenmode
+ENDIF
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"
 

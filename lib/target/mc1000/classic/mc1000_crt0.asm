@@ -14,54 +14,48 @@
 
 
 
-                MODULE  mc1000_crt0
-
-;--------
-; Include zcc_opt.def to find out some info
-;--------
-
-        defc    crt0 = 1
-        INCLUDE "zcc_opt.def"
-
-;--------
-; Some scope definitions
-;--------
-
-        EXTERN    _main           ;main() is always external to crt0 code
-
-        PUBLIC    __Exit         ;jp'd to by exit()
-        PUBLIC    l_dcal          ;jp(hl)
+    MODULE  mc1000_crt0
 
 
-	; Force the interrupt handler to be registered
-	EXTERN	asm_im1_handler
-	defc	IMPORT_asm_im1_handler = asm_im1_handler
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
 
-        defc    CONSOLE_COLUMNS = 32
+    EXTERN  _main           ;main() is always external to crt0 code
+
+    PUBLIC  __Exit         ;jp'd to by exit()
+    PUBLIC  l_dcal          ;jp(hl)
+
+
+    ; Force the interrupt handler to be registered
+    EXTERN  asm_im1_handler
+    defc	IMPORT_asm_im1_handler = asm_im1_handler
+
+
+    defc    CONSOLE_COLUMNS = 32
 IF NEED_ansiterminal
 	defc	CONSOLE_ROWS = 24
 ELSE
-        defc    CONSOLE_ROWS = 16
+    defc    CONSOLE_ROWS = 16
 ENDIF
 
-        IF      !DEFINED_CRT_ORG_CODE
-	   IF (startup=2)
-		defc    CRT_ORG_CODE  = $100  ; Direct M/C mode, including system variables on top 100h bytes
- 	   ELSE
-		defc    CRT_ORG_CODE  = 981	; BASIC startup mode (correct location TBD)
-	   ENDIF
-        ENDIF
+IF      !DEFINED_CRT_ORG_CODE
+  IF (startup=2)
+    defc    CRT_ORG_CODE  = $100  ; Direct M/C mode, including system variables on top 100h bytes
+  ELSE
+    defc    CRT_ORG_CODE  = 981	; BASIC startup mode (correct location TBD)
+  ENDIF
+ENDIF
 
 
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = 0	; 0 = autodetect
-	defc	__CPU_CLOCK = 3579545
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = 0	; 0 = autodetect
+    defc	__CPU_CLOCK = 3579545
+    INCLUDE "crt/classic/crt_rules.inc"
 
-	INCLUDE	"target/mc1000/def/maths_mbf.def"
+    INCLUDE	"target/mc1000/def/maths_mbf.def"
 
-	org     CRT_ORG_CODE
+    org     CRT_ORG_CODE
 
 
 IF (startup=2)
@@ -310,7 +304,7 @@ ELSE
 ENDIF
 
 l_dcal:
-        jp      (hl)
+    jp      (hl)
 
 		
 ; If we were given an address for the BSS then use it

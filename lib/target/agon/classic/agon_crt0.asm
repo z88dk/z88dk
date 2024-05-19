@@ -140,6 +140,10 @@ ENDIF
 __Exit:
     push    hl
     call    crt0_exit
+IFDEF CLIB_EXIT_SCREEN_MODE
+    ld      a,CLIB_EXIT_SCREEN_MODE
+    call    asm_agon_setmode
+ENDIF
     pop     hl
 __restore_sp:
     ld      sp,0

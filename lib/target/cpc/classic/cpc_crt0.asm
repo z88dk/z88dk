@@ -135,7 +135,10 @@ ENDIF
 
 __Exit:
     call    crt0_exit
-
+IF CLIB_EXIT_SCREEN_MODE != -1
+    ld      a,CLIB_EXIT_SCREEN_MODE
+    call    cpc_setmode
+ENDIF
 
     di
     call    cpc_enable_fw_exx_set

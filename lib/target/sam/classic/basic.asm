@@ -65,6 +65,10 @@ __Exit:
     push    hl
     call    crt0_exit
 
+IF CLIB_EXIT_SCREEN_MODE != -1
+    ld      a,CLIB_EXIT_SCREEN_MODE
+    call    asm_sam_set_screenmode
+ENDIF
 
     pop     bc
     INCLUDE "crt/classic/crt_exit_eidi.inc"
