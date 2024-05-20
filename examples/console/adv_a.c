@@ -31,7 +31,7 @@
 
  
  /*
-  *	Using -DDISKBLOCKS on a ZX Spectrum, will require the inclusion of 'zxbasdos.lib' and few extra BASIC lines.
+  *	Using -DDISKBLOCK on a ZX Spectrum, will require the inclusion of 'zxbasdos.lib' and few extra BASIC lines.
   * ZX Microdrive syntax example is given:
   *
   * 5000 STOP
