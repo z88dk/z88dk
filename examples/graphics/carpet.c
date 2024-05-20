@@ -6,26 +6,38 @@
  *
  * Timex 2068
  * zcc +ts2068 -create-app -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -O3 -DWIDE_REZ carpet.c
+ *
  * Commodore 128
  * zcc +c128 -lgfx128hr -create-app -O3 -DWIDE_REZ carpet.c
  *
+ * ZX Spectrum
  * zcc +zx -create-app -O3 carpet.c
  *
- * zx81 ARX (or WRX) modes (better seen with an inverse video mod)
+ * zx81 ARX (or WRX) modes
  * zcc +zx81 -subtype=arx -clib=arx -create-app -O3 carpet.c
+ * zcc +zx81 -subtype=wrx -clib=wrx -create-app -O3 carpet.c
+ *
+ * MSX and Spectravideo SVI
+ * zcc +MSX -create-app -O3 carpet.c
+ * zcc +SVI -create-app -O3 carpet.c
  *
  */
  
 #include <stdio.h>
 #include <graphics.h>
+#include <sys/ioctl.h>
 
 #ifdef SPECTRUM
   #include <arch/zx/spectrum.h>
 #endif
 
-//#ifdef C128
-//  #include <c128/vdc.h>
-//#endif
+#ifdef SVI
+#include <video/tms99x8.h>
+#endif
+
+#ifdef C128
+  #include <c128/vdc.h>
+#endif
 
 #ifdef WIDE_REZ
   unsigned char stencil[256 * 4];
@@ -75,7 +87,22 @@ int main( void )
   zx_cls();
 #endif
 
+#if defined (MSX) || defined (SVI)
+   int mode = 2;
+   console_ioctl(IOCTL_GENCON_SET_MODE, &mode);
+   vdp_color(VDP_INK_DARK_RED, VDP_INK_BLACK, VDP_INK_BLACK);
+#endif
+
   clg();
+
+#ifdef ZX81
+  invhrg();
+#endif
+
+#ifdef C128
+    outvdc(vdcFgBgColor,(vdcDarkRed << 4) | vdcBlack);
+#endif
+
   do_carpet();
   while (getk()!=' ') {};
 }
