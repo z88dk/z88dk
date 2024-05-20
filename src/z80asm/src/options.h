@@ -19,7 +19,7 @@
 using namespace std;
 
 // command line arguments and files
-struct Args {
+struct Options {
 public:
 	void parse_args(const vector<string>& args);
 
@@ -128,7 +128,7 @@ private:
 	string prepend_output_dir(const string& filename);
 };
 
-extern Args g_args;
+extern Options g_options;
 
 extern "C" {
 #endif // __cplusplus

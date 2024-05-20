@@ -13,7 +13,7 @@ done_testing;
 
 # get version and date from hist.c
 sub get_copyright {
-	my $hist = slurp("src/args.cpp");
+	my $hist = slurp("src/options.cpp");
 	my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x or die;
 
 	my $config = slurp("../config.h");

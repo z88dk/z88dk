@@ -5,12 +5,12 @@
 // Repository: https://github.com/z88dk/z88dk
 //-----------------------------------------------------------------------------
 
-#include "args.h"
 #include "errors.h"
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
 #include "modlink.h"
+#include "options.h"
 #include "utlist.h"
 #include "xmalloc.h"
 #include "z80asm_defs.h"

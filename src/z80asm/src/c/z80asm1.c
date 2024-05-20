@@ -7,7 +7,6 @@ License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_licens
 Repository: https://github.com/z88dk/z88dk
 */
 
-#include "args.h"
 #include "die.h"
 #include "directives.h"
 #include "errors.h"
@@ -17,6 +16,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "libfile.h"
 #include "modlink.h"
 #include "module1.h"
+#include "options.h"
 #include "parse1.h"
 #include "scan1.h"
 #include "strpool.h"

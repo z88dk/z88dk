@@ -45,7 +45,7 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\defines.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\cpp\float.h">
+    <ClInclude Include="..\..\src\z80asm\src\cpp\zfloat.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\cpp\lstfile.h">
@@ -162,7 +162,7 @@
     <ClInclude Include="..\..\src\z80asm\src\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\args.h">
+    <ClInclude Include="..\..\src\z80asm\src\options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\file_reader.h">
@@ -251,7 +251,7 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\defines.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\cpp\float.cpp">
+    <ClCompile Include="..\..\src\z80asm\src\cpp\zfloat.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\cpp\lstfile.cpp">
@@ -272,7 +272,7 @@
     <ClCompile Include="..\..\src\z80asm\src\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\args.cpp">
+    <ClCompile Include="..\..\src\z80asm\src\options.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\file_reader.cpp">
@@ -301,7 +301,7 @@
     <None Include="..\..\src\z80asm\src\errors.def">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\src\z80asm\src\args.def">
+    <None Include="..\..\src\z80asm\src\options.def">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

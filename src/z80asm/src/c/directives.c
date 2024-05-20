@@ -9,14 +9,14 @@ Repository: https://github.com/z88dk/z88dk
 Assembly directives.
 */
 
-#include "args.h"
-#include "errors.h"
 #include "codearea.h"
 #include "die.h"
 #include "directives.h"
+#include "errors.h"
 #include "fileutil.h"
 #include "if.h"
 #include "module1.h"
+#include "options.h"
 #include "parse1.h"
 #include "strpool.h"
 #include "strutil.h"
@@ -24,8 +24,8 @@ Assembly directives.
 #include "types.h"
 #include "utstring.h"
 #include "xassert.h"
-#include "z80asm1.h"
 #include "z80asm_defs.h"
+#include "z80asm1.h"
 
 static void check_org_align();
 

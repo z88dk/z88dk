@@ -44,13 +44,13 @@ open(my $aux_c, ">", $output_aux_file_source) or die "$output_aux_file_source: $
 
 say $aux_h <<END;
 #pragma once
-#include "args.h"
 #include "codearea.h"
 #include "directives.h"
 #include "errors.h"
 #include "expr1.h"
 #include "if.h"
 #include "opcodes.h"
+#include "options.h"
 #include "parse1.h"
 #include "str.h"
 

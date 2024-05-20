@@ -8,7 +8,6 @@ Repository: https://github.com/z88dk/z88dk
 */
 
 #include "alloc.h"
-#include "args.h"
 #include "codearea.h"
 #include "errors.h"
 #include "expr1.h"
@@ -16,6 +15,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "if.h"
 #include "libfile.h"
 #include "modlink.h"
+#include "options.h"
 #include "parse1.h"
 #include "reloc_code.h"
 #include "scan1.h"
@@ -28,8 +28,8 @@ Repository: https://github.com/z88dk/z88dk
 #include "utstring.h"
 #include "xassert.h"
 #include "xmalloc.h"
-#include "z80asm1.h"
 #include "z80asm_defs.h"
+#include "z80asm1.h"
 #include "zobjfile.h"
 #include <ctype.h>
 #include <limits.h>

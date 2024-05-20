@@ -190,9 +190,9 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\z80asm\src\args.h" />
+    <ClInclude Include="..\..\src\z80asm\src\options.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\defines.h" />
-    <ClInclude Include="..\..\src\z80asm\src\cpp\float.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpp\zfloat.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\lstfile.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\preproc.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\scan2.h" />
@@ -237,9 +237,9 @@
     <ClInclude Include="..\..\src\z80asm\src\utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80asm\src\args.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\defines.cpp" />
-    <ClCompile Include="..\..\src\z80asm\src\cpp\float.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\zfloat.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\lstfile.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\main.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\preproc.cpp" />
@@ -275,7 +275,7 @@
     <ClCompile Include="..\..\src\z80asm\src\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\z80asm\src\args.def" />
+    <None Include="..\..\src\z80asm\src\options.def" />
     <None Include="..\..\src\z80asm\src\cpp\float.def" />
     <None Include="..\..\src\z80asm\src\cpp\keyword.def" />
     <None Include="..\..\src\z80asm\src\cpp\scan2.def" />

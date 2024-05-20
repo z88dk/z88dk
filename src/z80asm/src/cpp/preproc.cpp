@@ -5,16 +5,16 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "args.h"
 #include "errors.h"
-#include "zfloat.h"
 #include "if.h"
+#include "options.h"
 #include "preproc.h"
 #include "scan2.h"
 #include "strpool.h"
 #include "utils.h"
 #include "utils2.h"
 #include "xassert.h"
+#include "zfloat.h"
 #include <cassert>
 using namespace std;
 
@@ -158,7 +158,7 @@ bool Preproc::open(const string& filename_) {
 	string filename = fs::path(filename_).generic_string();
 
 	// search file in path
-	string found_filename = g_args.search_include_path(filename);
+	string found_filename = g_options.search_include_path(filename);
 
 	// check for recursive includes
 	if (recursive_include(found_filename)) {
@@ -564,7 +564,7 @@ bool Preproc::check_reptx() {
 }
 
 bool Preproc::check_gbz80_opcodes() {
-    if (g_args.get_cpu() != CPU_GBZ80)
+    if (g_options.get_cpu() != CPU_GBZ80)
         return false;
 
     ScannedLine out;
@@ -1293,7 +1293,7 @@ void Preproc::do_c_line() {
     set_error_location(location().filename.c_str(), location().line_num);
 
     // add debug symbol
-    if (g_args.debug) {
+    if (g_options.debug) {
         string symbol_name = "__C_LINE_" + std::to_string(location().line_num) +
             "_" + url_encode(location().filename);
         if (!find_local_symbol(symbol_name.c_str())) {

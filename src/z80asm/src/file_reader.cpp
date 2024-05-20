@@ -4,10 +4,10 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "args.h"
-#include "utils.h"
-#include "file_reader.h"
 #include "errors.h"
+#include "file_reader.h"
+#include "options.h"
+#include "utils.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ bool FileReader::open(const string& filename_) {
     string filename = fs::path(filename_).generic_string();
 
     // search file in path
-    string found_filename = g_args.search_include_path(filename);
+    string found_filename = g_options.search_include_path(filename);
 
     // check for recursive includes
     if (recursive_include(found_filename)) {

@@ -6,14 +6,14 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "args.h"
 #include "if.h"
+#include "options.h"
 #include "scan2.h"
 #include "utils.h"
 #include "utils2.h"
-#include <unordered_map>
 #include <cassert>
 #include <cmath>
+#include <unordered_map>
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -352,7 +352,7 @@ bool FileScanner::get_token_line(ScannedLine& line) {
     line.clear();
     string str, error;
     int quote = 0;
-    bool raw_strings = g_args.raw_strings;
+    bool raw_strings = g_options.raw_strings;
     m_got_error = false;
     m_blank_before = false;
 
@@ -931,7 +931,7 @@ yy55:
 			{ str = string(p0, p);
 
                               // to upper
-                              if (g_args.ucase) str = str_toupper(str);
+                              if (g_options.ucase) str = str_toupper(str);
 
                               // handle af' et all
                               Keyword keyword = keyword_lookup(str);
@@ -942,7 +942,7 @@ yy55:
                               }
 
                               // check for -IXIY
-                              if (g_args.get_swap_ixiy() != IXIY_NO_SWAP) {
+                              if (g_options.get_swap_ixiy() != IXIY_NO_SWAP) {
                                 switch (keyword) {
                                 case Keyword::IX: case Keyword::IXH: case Keyword::IXL:
                                 case Keyword::IY: case Keyword::IYH: case Keyword::IYL:
