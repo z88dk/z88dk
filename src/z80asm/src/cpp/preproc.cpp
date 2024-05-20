@@ -7,7 +7,7 @@
 
 #include "args.h"
 #include "errors.h"
-#include "float.h"
+#include "zfloat.h"
 #include "if.h"
 #include "preproc.h"
 #include "scan2.h"
@@ -1218,8 +1218,10 @@ void Preproc::do_setfloat() {
 		sublexer.next();
 		if (!sublexer.peek().is(TType::Newline))
 			g_errors.error(ErrSyntax);
-		else if (!g_float_format.set_text(format))
+		else if (!g_float_format.set_text(format)) {
 			g_errors.error(ErrIllegalFloatFormat, format);
+			g_errors.error(ErrFloatFormatsList, FloatFormat::get_all_formats());
+		}
 		else {
             for (auto& define : FloatFormat::get_all_defines()) {
                 undefine_static_def_sym(define.c_str());

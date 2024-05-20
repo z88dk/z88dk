@@ -4,6 +4,10 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#ifndef X
+#define X(code, message)
+#endif
+
 // X(code, message)
 X(ErrOk, "ok")
 
@@ -26,7 +30,10 @@ X(ErrInvalidDefineOption, "invalid define (-Dvar=value) option")
 X(ErrInvalidFillerOption, "invalid filler (-f) option")
 X(ErrCmdFailed, "command failed")
 X(ErrIllegalCpuOption, "illegal -m option")
+X(ErrCpusList, "list of available CPUs")
 X(ErrDateAndMstarIncompatible, "cannot build libraries with -m* and -d")
+X(ErrIllegalFloatOption, "illegal -float option")
+X(ErrFloatFormatsList, "list of available float formats")
 
 // lexer
 X(ErrInvalidChar, "invalid character")
@@ -47,7 +54,6 @@ X(ErrExprRecursion, "recursive expression")
 X(ErrMacroArgsNumber, "number of macro arguments")
 X(ErrExprEval, "expression evaluation")
 X(ErrIllegalFloatFormat, "illegal float format")
-X(ErrIllegalFloatOption, "illegal -float option")
 
 // assembler
 X(ErrExprInParens, "interpreting indirect value as immediate")

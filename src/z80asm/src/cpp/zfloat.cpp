@@ -4,7 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "float.h"
+#include "zfloat.h"
 #include "if.h"
 #include "utils2.h"
 #include "xassert.h"
@@ -256,6 +256,7 @@ vector<uint8_t> float_to_zx(double value) {
 // 1 byte exponent
 // 4 bytes mantissa, with first bit replaced by sign bit
 vector<uint8_t> float_to_zx81(double value) {
+
     if (value == 0.0) {
         return vector<uint8_t>{0, 0, 0, 0, 0};
     }
@@ -577,8 +578,8 @@ double FloatExpr::parse_func2(double(*f)(double, double)) {
 string FloatFormat::get_type() const {
 	// map Format::ieee32 -> "ieee32", ...
 	static unordered_map<Format, string> map = {
-#		define X(type)	{ Format::type, #type },
-#		include "float.def"
+#define X(type)	{ Format::type, #type },
+#include "zfloat.def"
 	};
 
 	auto found = map.find(m_format);
@@ -594,8 +595,8 @@ string FloatFormat::get_define() const {
 bool FloatFormat::set_text(const string& text) {
 	// map "ieee32" -> Format::ieee32, ...
 	static unordered_map<string, Format> map = {
-#		define X(type)	{ #type, Format::type },
-#		include "float.def"
+#define X(type)	{ #type, Format::type },
+#include "zfloat.def"
 	};
 
 	auto found = map.find(text);
@@ -609,25 +610,26 @@ bool FloatFormat::set_text(const string& text) {
 
 vector<uint8_t> FloatFormat::float_to_bytes(double value) {
 	switch (m_format) {
-#		define X(type)	case Format::type: return float_to_##type(value);
-#		include "float.def"
+#define X(type)	case Format::type: return float_to_##type(value);
+#include "zfloat.def"
 	default:
 		xassert(0); return vector<uint8_t>();
 	}
 }
 
-string FloatFormat::get_formats() {
-	string out;
-#	define X(type)	out += #type ",";
-#	include "float.def"
-	if (!out.empty()) out.pop_back();	// remove end comma
-	return out;
+string FloatFormat::get_all_formats() {
+	string formats;
+#define X(type)	formats += string(#type) + ",";
+#include "zfloat.def"
+	if (!formats.empty()) 
+		formats.pop_back();	// remove end comma
+	return formats;
 }
 
 vector<string> FloatFormat::get_all_defines() {
     string all_defines;
-#	define X(type)	all_defines += str_toupper(string("__FLOAT_") + #type + "__") + " ";
-#	include "float.def"
+#define X(type)	all_defines += str_toupper(string("__FLOAT_") + #type + "__") + " ";
+#include "zfloat.def"
 
     return split(all_defines);
 }

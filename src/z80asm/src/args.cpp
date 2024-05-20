@@ -6,7 +6,7 @@
 
 #include "../config.h"
 #include "args.h"
-#include "cpp/float.h"
+#include "cpp/zfloat.h"
 #include "file_reader.h"
 #include "cpp/scan2.h"
 #include "errors.h"
@@ -406,13 +406,17 @@ string Args::expand_env_vars(string text) {
 }
 
 void Args::set_float_format(const string& format) {
-	if (!g_float_format.set_text(format))
-		g_errors.error(ErrIllegalFloatFormat, format);
+	if (!g_float_format.set_text(format)) {
+        g_errors.error(ErrIllegalFloatFormat, format);
+        g_errors.error(ErrFloatFormatsList, FloatFormat::get_all_formats());
+	}		
 }
 
 void Args::set_float_option(const string& format) {
-	if (!g_float_format.set_text(format))
-		g_errors.error(ErrIllegalFloatOption, format);
+	if (!g_float_format.set_text(format)) {
+        g_errors.error(ErrIllegalFloatOption, format);
+        g_errors.error(ErrFloatFormatsList, FloatFormat::get_all_formats());
+	}		
 }
 
 void Args::set_origin(const string& opt_arg) {
@@ -889,9 +893,11 @@ void Args::set_cpu(const string& name) {
         int id = cpu_id(name.c_str());
         if (id != CPU_UNDEF)
             set_cpu(id);
-        else 
+        else {
             g_errors.error(ErrIllegalCpuOption, name);
-    }
+            g_errors.error(ErrCpusList, cpu_list());
+		}
+	}
 }
 
 void Args::set_filler(const string& opt_arg) {

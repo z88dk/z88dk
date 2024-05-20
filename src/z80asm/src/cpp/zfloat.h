@@ -39,8 +39,8 @@ private:
 class FloatFormat {
 public:
 	enum class Format {
-#		define X(type)		type,
-#		include "float.def"
+#define X(type)		type,
+#include "zfloat.def"
 	};
 
 	Format get() const { return m_format; }
@@ -51,7 +51,7 @@ public:
 
 	vector<uint8_t> float_to_bytes(double value);
 
-	static string get_formats();
+    static string get_all_formats();
     static vector<string> get_all_defines();
 
 private:

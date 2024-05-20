@@ -12,6 +12,7 @@ use Math::Trig;
 spew("${test}.asm", "");
 capture_nok("z88dk-z80asm -float=x ${test}.asm", <<END);
 error: illegal -float option: x
+error: list of available float formats: genmath,math48,ieee16,ieee32,ieee64,z80,zx81,zx,z88,mbfs,mbf40,mbf64,am9511
 END
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
@@ -32,6 +33,8 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		setfloat xx
 END_ASM
 $test.asm:1: error: illegal float format: xx
+  ^---- setfloat xx
+$test.asm:1: error: list of available float formats: genmath,math48,ieee16,ieee32,ieee64,z80,zx81,zx,z88,mbfs,mbf40,mbf64,am9511
   ^---- setfloat xx
 END_ERR
 
