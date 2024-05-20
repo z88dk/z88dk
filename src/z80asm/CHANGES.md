@@ -1,6 +1,19 @@
 Z88DK Z80 Module Assembler Change Log
 =====================================
 
+2024
+----
+2024-01-09 Issue #2474: cleanup build_ldflags$$.exe
+2024-01-09 Fix #2476 replace "/d/" by "d:" on msys2
+2024-01-21 update __FLOAT_XXX__ variables with setfloat
+2024-03-02 Fix #2502 wrong representation of 0.0 in -float=zx81
+2024-03-04 allow @files to be searched in -I include path
+2024-03-29 Fix #2514: skip test in SNAPcraft
+2024-03-29 Fix #2507: remove debug info for m68k-atari-mint-gcc
+2024-04-22 Fix #2521: only convert "ld (0xff00+N)" to "ldh" on gbz80
+2024-05-11 Fix #2535 compilation issue in msys2
+2024-05-14 Fix #2536 add string argument to ASSERT
+
 2023
 ----
 2023-03-16 Fix #2066: use boost::filesystem as fallback to std::filesystem from C++17
@@ -23,11 +36,15 @@ Z88DK Z80 Module Assembler Change Log
 2023-10-05 Fix #2402: add support of kc160
 2023-10-16 Fix #2420: detect '-lstdc++fs', remove external Perl dependencies
 2023-10-16 Fix #2417: accept file names with spaces in list files without quotes
+2023-12-15 Fix #2456: skip z80asm tests that use zsdcc
+2023-12-15 Fix #2456: fix big-endian reading in strtable_parse
 2023-10-17 Fix #2422: Parallel build issues
 2023-10-17 Fix #2422: Ignore mkdir error if dir exists
 2023-10-19 Fix #2418: move DEFC alias to section of copied symbol
 2023-11-30 Fix "add dd,NNN" on ez80 ADL mode
 2323-12-21 Fix #2463: add m4 preprocessing to z80asm
+2323-12-25 Fix #2466 z80asm equate definition that is similar to asm z80 opcode instruction causes assembler error message
+2323-12-30 Fix #2469: if expression depends on one symbol and ASMPC do not convert it to the section of the symbol
 
 2022
 ----
