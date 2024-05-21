@@ -31,6 +31,23 @@
 #define VERTICAL   1
 #define HORIZONTAL 0
 
+
+// Enum all the dot coordinates.
+// The third parameter is a flag, reset when 'taken' by the player.
+
+char dots[] = {
+	5,5,0, 5,59,0, 54,5,0, 54,59,0, 11,5,0, 11,59,0, 60,5,0, 60,59,0,
+	17,5,0, 17,59,0, 66,5,0, 66,59,1 ,23,5,0, 23,59,0, 72,5,0, 72,59,0, 29,5,0, 29,59,0,
+	78,5,0, 78,59,0, 35,5,0, 35,59,0, 84,5,0, 84,59,0, 41,5,0, 41,59,0,
+	90,5,0, 90,59,0, 14,14,0, 14,50,0, 57,14,0, 57,50,0, 20,14,0, 20,50,0,
+	63,14,0, 63,50,0, 26,14,0, 26,50,0, 69,14,0, 69,50,0, 32,14,0, 32,50,0,
+	75,14,0, 75,50,0, 38,50,0, 81,14,0, 81,50,0,
+	60,23,0, 60,41,0, 23,23,0, 23,41,0, 29,23,0, 29,41,0, 66,23,0, 66,41,0, 35,23,0, 35,41,0,
+	72,23,0, 72,41,0, 5,11,0, 90,11,0, 5,17,0, 90,17,0, 5,23,0, 90,23,0,
+	5,29,0, 90,29,0, 5,35,0, 90,35,0, 5,41,0, 90,41,0, 5,47,0, 90,47,0,
+	5,53,0, 90,53,0, 14,20,0, 81,20,0, 14,38,0, 81,38,0, 14,26,0, 81,26,0, 14,44,0, 81,44,0,  0
+	};
+	
 char corners[] = {
 	MOVE_UP,    20, 20, MOVE_RIGHT, 20, 20,
 	MOVE_UP,    11, 11, MOVE_RIGHT, 11, 11,
@@ -177,16 +194,17 @@ struct player {
 };
 
 char scoretxt[7];
-  int x,y,b,c;
-  int stick;
-  int score;
+int x,y,b,c;
+int stick;
+int score;
 
 show_score (int sc)
 {
     sprintf (scoretxt,"%06u",sc);
+    //clga (34,29,30,5);
     for (x=0; x<6; x++) {
-      putsprite (spr_and, 34+5*x, 29, blank);
-      putsprite (spr_or, 34+5*x, 29, &numbers[(scoretxt[x]-48)*7]);
+      putsprite (SPR_AND, 34+5*x, 29, blank);
+      putsprite (SPR_OR, 34+5*x, 29, &numbers[(scoretxt[x]-48)*7]);
     }
 }
 
@@ -196,6 +214,11 @@ draw_board ()
 
 	clg();
 	
+	for (x=0; dots[x]; x+=3) {
+		plot(dots[x],dots[x+1]);
+		dots[x+2]=1;
+	}
+
 	// Screen border
 
 	draw(0,0,95,0);
@@ -238,26 +261,13 @@ draw_board ()
 	draw(86,9,86,22);
 	draw(86,42,86,54);
 
-/*
-	for (x=0 ; x!=4; x++)
-	{
-	   for (y=0 ; y!=3; y++)
-	   {
-	     plot (5+x*9,5+y*9);
-	     plot (90-x*9,5+y*9);
-	     plot (5+x*9,59-y*9);
-	     plot (90-x*9,59-y*9);
-	   }
-	}
-*/
-
 }
 
 
 draw_sprite(struct player *the_player)
 {
-	  putsprite(SPR_AND,the_player->oldx,the_player->oldy,the_player->oldsprite);
-          putsprite(SPR_OR,the_player->x,the_player->y,the_player->sprite);
+	  putsprite(SPR_XOR,the_player->oldx,the_player->oldy,the_player->oldsprite);
+          putsprite(SPR_XOR,the_player->x,the_player->y,the_player->sprite);
 }
 
 
@@ -372,6 +382,9 @@ main()
 	player2.sprite=car_right;
 	player2.oldsprite=car_right;
 
+	putsprite(SPR_XOR,player1.x,player1.y,player1.oldsprite);
+	putsprite(SPR_XOR,player2.x,player2.y,player2.oldsprite);
+
 	while (1) 
 	{
 
@@ -412,7 +425,7 @@ main()
 		if (x<20) bit_fx3(7);
 			bit_fx3(2);
 	#else
-		for (x=0 ; x<800; x++) {}
+		csleep(30);
 	#endif
 		}
 		for (x=0 ; x<27; x+=9) {
@@ -420,7 +433,7 @@ main()
 	#ifdef SOUND
 			bit_fx3(2);			
 	#else
-		for (x=0 ; x<800; x++) {}
+		csleep(30);
 	#endif
 		}
 		  exit(score);
@@ -465,7 +478,12 @@ main()
 	  draw_sprite(player2);
 	  
 	  
+	#ifdef FAST
+	  score++;
+	#else
 	  show_score(score++);
+	#endif
+
 	#ifdef SOUND
 	  bit_click();
 	#endif
