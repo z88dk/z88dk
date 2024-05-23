@@ -194,7 +194,7 @@ struct player {
 };
 
 char scoretxt[7];
-int x,y,b,c;
+int x,y,z;
 int stick;
 int score;
 
@@ -202,9 +202,9 @@ show_score (int sc)
 {
     sprintf (scoretxt,"%06u",sc);
     //clga (34,29,30,5);
-    for (x=0; x<6; x++) {
-      putsprite (SPR_AND, 34+5*x, 29, blank);
-      putsprite (SPR_OR, 34+5*x, 29, &numbers[(scoretxt[x]-48)*7]);
+    for (z=0; z<6; z++) {
+      putsprite (SPR_AND, 34+5*z, 29, blank);
+      putsprite (SPR_OR, 34+5*z, 29, &numbers[(scoretxt[z]-48)*7]);
     }
 }
 
@@ -328,6 +328,21 @@ player_step(struct player *the_player)
 }
 
 
+eat_dot() {
+	#ifdef SOUND
+	  bit_click();
+	#endif
+	show_score(score++);
+	#ifdef SOUND
+	  bit_click();
+	#endif
+	  xorplot (dots[x],dots[x+1]);
+	dots[x+2]=0;
+	#ifdef SOUND
+	  bit_click();
+	#endif
+}
+
 
 main()
 {
@@ -391,30 +406,36 @@ main()
 	  player_save(player1);
 	  player_save(player2);
 
-/*
-// Unfinished steering control variant, example on how to use multipoint()
-
-	  b = multipoint(HORIZONTAL, 8, player1.x, player1.y+7);
-	  c = multipoint(HORIZONTAL, 8, player1.x, player1.y+8);   // Extra check to avoid confusion with side borders
-	  if ((joystick(stick) & MOVE_DOWN) && (player1.direction & (MOVE_LEFT | MOVE_RIGHT)) && ((b ==1)||((b==128)&&(c==0))))
-	      player1.y+=9;
-	  
-	  b = multipoint(HORIZONTAL, 8, player1.x, player1.y-2);
-	  c = multipoint(HORIZONTAL, 8, player1.x, player1.y-3);   // Extra check to avoid confusion with side borders
-	  if ((joystick(stick) & MOVE_UP) && (player1.direction & (MOVE_LEFT)) && ((b ==1)||((b==128)&&(c==0))))
-	      player1.y-=9;
-	  if ((joystick(stick) & MOVE_UP) && (player1.direction & (MOVE_RIGHT)) && ((b ==128)||((b==1)&&(c==0))))
-	      player1.y-=9;
-	  
-	  b = multipoint(VERTICAL, 8, player1.x+7, player1.y);
-	  c = multipoint(VERTICAL, 8, player1.x+8, player1.y);   // Extra check to avoid confusion with horizontal borders
-	  if ((joystick(stick) & MOVE_RIGHT) && (player1.direction == MOVE_DOWN) && ((b ==1)||((b==128)&&(c==0))))
-	      player1.x+=9;
-	  if ((joystick(stick) & MOVE_RIGHT) && (player1.direction == MOVE_UP) && ((b==1)||((b==128)&&(c==0))))
-	      player1.x+=9;
-*/
-	  
 	  player_step(player1);
+
+	  if (player1.direction == MOVE_RIGHT) {
+		  	for (x=0; dots[x]; x+=3) {
+				if (dots[x+2]&&(dots[x]==(player1.x+5))&&(dots[x+1]==(player1.y+3)))
+					eat_dot();
+			}
+	  }
+
+	  if (player1.direction == MOVE_LEFT) {
+		  	for (x=0; dots[x]; x+=3) {
+				if (dots[x+2]&&(dots[x]==(player1.x))&&(dots[x+1]==(player1.y+3)))
+					eat_dot();
+			}
+	  }
+
+	  if (player1.direction == MOVE_DOWN) {
+		  	for (x=0; dots[x]; x+=3) {
+				if (dots[x+2]&&(dots[x+1]==(player1.y+6))&&(dots[x]==(player1.x+3)))
+					eat_dot();
+			}
+	  }
+
+	  if (player1.direction == MOVE_UP) {
+		  	for (x=0; dots[x]; x+=3) {
+				if (dots[x+2]&&(dots[x+1]==(player1.y))&&(dots[x]==(player1.x+2)))
+					eat_dot();
+			}
+	  }
+
 	  player_step(player2);
 
 	  // Collision
@@ -478,11 +499,11 @@ main()
 	  draw_sprite(player2);
 	  
 	  
-	#ifdef FAST
-	  score++;
-	#else
-	  show_score(score++);
-	#endif
+//	#ifdef FAST
+//	  score++;
+//	#else
+//	  show_score(score++);
+//	#endif
 
 	#ifdef SOUND
 	  bit_click();
