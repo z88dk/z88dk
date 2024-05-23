@@ -1259,11 +1259,13 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
     char namebuf[NAMESIZE];
     Type *type;
     int   flags = 0;
+    int isfar = 0;
 
     if ( base_type != NULL && *base_type != NULL ) {
         type = CALLOC(1,sizeof(*type));
         *type = **base_type;
     } else {
+        if ( amatch("__far") ) isfar = 1;
         if ( (type = parse_type()) == NULL ) {
             return NULL;
         }
@@ -1318,6 +1320,8 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
 
     if ( type->kind == KIND_FUNC ) {
         type->flags |= flags;
+    } else if ( isfar ) {
+        type->flags |= FARACC;
     }
 
     // Validate that structs are not weak if we have an instance

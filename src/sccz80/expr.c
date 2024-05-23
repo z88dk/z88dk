@@ -590,7 +590,7 @@ int heira(LVALUE *lval)
         if (lval->indirect_kind)
             return 0;
         /* global & non-array */
-        address(lval->symbol);
+        gen_address(lval->symbol);
         lval->indirect_kind = lval->symbol->ctype->kind;
         return 0;
     }
@@ -850,11 +850,13 @@ int heirb(LVALUE* lval)
                 return k;
         }
     if (ptr && ptr->ctype->kind == KIND_FUNC) {
-        address(ptr);
+        gen_address(ptr);
         lval->symbol = NULL;  // TODO: Can we actually set it correctly here? - Needed for verification of func ptr arguments
         lval->ltype = ptr->ctype;
         lval->flags = ptr->flags;
         return 0;
+    } else if ( ptr && ptr->ctype->flags & FARACC ) {
+        lval->flags = FARACC;
     }
     return k;
 }

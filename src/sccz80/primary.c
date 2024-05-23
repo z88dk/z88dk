@@ -104,7 +104,7 @@ int primary(LVALUE* lval)
                     return (1);
                 }
                 /* Handle arrays... */
-                address(ptr);
+                gen_address(ptr);
                 /* djm sommat here about pointer types? */
                 lval->indirect_kind = lval->ptr_type = ptr->type;
                 if ( ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY )

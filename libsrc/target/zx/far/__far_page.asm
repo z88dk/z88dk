@@ -2,12 +2,16 @@ SECTION code_l_sccz80_far
 PUBLIC  __far_page
 
 EXTERN  __far_end
-EXTERN  __msx_bank_mappings
 
-; Support up to 96k of heap, but...
-; last 32k conflict with other things 
-pages:
-    defb    1,3,4,6,0,7
+PUBLIC  __zx_bank_mappings
+
+; Support up to 128k of heap, but...
+; last 64k conflict with other things 
+; Last 32k really conflict
+;
+; Mapping from bank -> far in l_far_mapaddr.asm
+__zx_bank_mappings:
+    defb    1,3,4,6,0,7,2,5
 
 ; Entry: ebc = logical address
 ;         a' = local memory page
@@ -34,7 +38,7 @@ __far_page:
     ; hl = offset within bank
     push    hl
     push    de
-    ld      hl,pages
+    ld      hl,__zx_bank_mappings
     ld      e,d
     ld      d,0
     add     hl,de

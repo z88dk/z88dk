@@ -320,6 +320,7 @@
 	EXTERN	lp_pptr
 
 	EXTERN	l_farcall	; Long call
+	EXTERN  l_far_mapaddr	; Map __banked to __far
 
 ;--------------------------------------------------
 ; Routines for handling 16 bit fixed point for sccz80

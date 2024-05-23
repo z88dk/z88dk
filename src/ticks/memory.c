@@ -355,9 +355,11 @@ static void msx_init(void)
     for ( i = 0; i < 256; i++ ) {
         msx_banks[i] = calloc(16384,1);
     }
+    msx_mmu[0] = 0x00;
+    msx_mmu[1] = 0x01;
+    msx_mmu[2] = 0x02;
+    msx_mmu[3] = 0x03;
 
-
-    standard_init();
     get_mem_addr = msx_get_memory_addr;
     handle_out = msx_handle_out;
     handle_in = msx_handle_in;
@@ -367,10 +369,7 @@ static uint8_t *msx_get_memory_addr(uint32_t pc, memtype type)
 {
   int segment = pc / 16384;
 
-  if ( msx_mmu[segment] != 0xff ) {
-    return &msx_banks[msx_mmu[segment]][pc % 16384];
-  }
-  return &mem[pc & 65535];
+  return &msx_banks[msx_mmu[segment]][pc % 16384];
 }
 
 static int msx_handle_in(int port)

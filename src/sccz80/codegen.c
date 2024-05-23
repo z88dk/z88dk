@@ -287,6 +287,18 @@ static void switch_namespace(char *name)
  */
 void gen_load_static(SYMBOL* sym)
 {
+    if ( sym->ctype->flags & FARACC ) {
+        LVALUE lval={0};
+
+        // Load the address and convert it
+        gen_address(sym);
+        
+        lval.ltype = sym->ctype;
+        lval.flags = FARACC;
+        lval.indirect_kind = sym->ctype->kind;
+        gen_load_indirect(&lval);
+        return;
+    }
     switch_namespace(sym->ctype->namespace);
     if (sym->ctype->kind == KIND_CHAR) {
         if ( (sym->ctype->isunsigned) == 0 )  {
@@ -323,10 +335,10 @@ void gen_load_static(SYMBOL* sym)
 
 #endif
     } else if (sym->ctype->kind == KIND_DOUBLE && c_fp_size > 4 ) {
-        address(sym);
+        gen_address(sym);
         dcallrts("dload", KIND_DOUBLE);
     } else if (sym->ctype->kind == KIND_LONGLONG ) {
-        address(sym);
+        gen_address(sym);
         callrts("l_i64_load");
     } else if (sym->ctype->kind == KIND_LONG || (sym->ctype->kind == KIND_DOUBLE && c_fp_size == 4) || sym->ctype->kind == KIND_CPTR ) {  // 4 byte doubles only
         if ( IS_GBZ80() ) {
@@ -378,13 +390,31 @@ int getloc(SYMBOL* sym, int off)
     return (offs);
 }
 
+
+void gen_address(SYMBOL* ptr)
+{
+    if ( ptr->ctype->flags & FARACC ) {
+        outfmt("\tld\thl,+(%s%s %% 65536)\n", dopref(ptr) ? Z80ASM_PREFIX : "", ptr->name);
+        outfmt("\tld\tde,+(%s%s / 65536)\n",  dopref(ptr) ? Z80ASM_PREFIX : "", ptr->name);
+        callrts("l_far_mapaddr");
+    } else {
+        immed();
+        outname(ptr->name, dopref(ptr));
+        nl();
+        if ( ptr->ctype->kind == KIND_CPTR ) {
+            const2(0);
+        }
+    }
+}
+
+
 /* Store the primary register into the specified */
 /*      static memory cell */
 void gen_store_static(SYMBOL* sym)
 {
     switch_namespace(sym->ctype->namespace);
     if (sym->ctype->kind == KIND_DOUBLE && c_fp_size > 4 ) {
-        address(sym);
+        gen_address(sym);
         dcallrts("dstore", KIND_DOUBLE);
     } else if (sym->ctype->kind == KIND_CHAR) {
         ol("ld\ta,l");
