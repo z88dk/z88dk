@@ -12,8 +12,12 @@
         ==============
         
         zcc +<target> -lndos -create-app -ocollider -DSOUND -DJOYSTICK_DIALOG collider.c
-		
-		(-DSOUND and -DJOYSTICK_DIALOG can be removed where not applicable)
+        
+        Minimum graphics resolution required: 96x64
+        Use -pragma-redirect=fputc_cons=putc4x6 if text and graphics aren't mixed natively
+        
+        
+        (-DSOUND and -DJOYSTICK_DIALOG can be removed where not applicable)
 
 */
 
@@ -193,6 +197,9 @@ struct player {
         void	*oldsprite;
 };
 
+struct player player1;
+struct player player2;
+
 char scoretxt[7];
 int x,y,z;
 int stick;
@@ -346,8 +353,6 @@ eat_dot() {
 
 main()
 {
-	struct player player1;
-	struct player player2;
 
 	clg();
 	
@@ -357,6 +362,8 @@ main()
 	
  /****  JOYSTICK CHOICE  ****/
 #ifdef JOYSTICK_DIALOG
+
+//	printf("%c",12);
 
 	putsprite(SPR_OR,0,0, logo);
 	printf("\n\n");
@@ -498,12 +505,6 @@ main()
 	  draw_sprite(player1);
 	  draw_sprite(player2);
 	  
-	  
-//	#ifdef FAST
-//	  score++;
-//	#else
-//	  show_score(score++);
-//	#endif
 
 	#ifdef SOUND
 	  bit_click();
