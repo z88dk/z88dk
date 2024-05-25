@@ -256,6 +256,7 @@ Type *make_array(Type *base_type,int32_t len)
     Type *type = CALLOC(1,sizeof(*type));
     type->kind = KIND_ARRAY;
     type->ptr = base_type;
+    type->flags = base_type->flags;
     type->len = len;
     if ( len > 0 ) {
         type->size = len * base_type->size;
@@ -1573,6 +1574,10 @@ void type_describe(Type *type, UT_string *output)
 
     if ( type->isvolatile ) {
         utstring_printf(output,"volatile ");
+    }
+
+    if ( type->flags & FARACC ) {
+        utstring_printf(output,"__far ");
     }
    
     switch ( type->kind ) {

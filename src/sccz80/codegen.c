@@ -1041,6 +1041,9 @@ int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar)
         outfmt("\tld\tbc,%d\n",type->size);
         ol("ldir");
         return type->size;
+    } else if ( expr == KIND_ARRAY && (type->flags & FARACC) ) {
+        lpush();
+        return 4;
     }
     // Default push the word
     push("hl");
