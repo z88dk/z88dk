@@ -1266,7 +1266,7 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
         type = CALLOC(1,sizeof(*type));
         *type = **base_type;
     } else {
-        if ( amatch("__far") ) isfar = 1;
+        if ( amatch("__banked") ) isfar = 1;
         if ( (type = parse_type()) == NULL ) {
             return NULL;
         }
@@ -1577,7 +1577,7 @@ void type_describe(Type *type, UT_string *output)
     }
 
     if ( type->flags & FARACC ) {
-        utstring_printf(output,"__far ");
+        utstring_printf(output,"__banked ");
     }
    
     switch ( type->kind ) {

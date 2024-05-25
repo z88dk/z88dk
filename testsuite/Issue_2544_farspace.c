@@ -1,9 +1,9 @@
-extern __far char arr[];
+extern __banked char arr[];
 
 extern void func2(char *__far ptr);
 
-extern __far int i;
-extern __far char *cptr;
+extern __banked int i;
+extern __banked char *cptr;
 
 void array_degrade()
 {
