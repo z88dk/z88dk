@@ -1,0 +1,87 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._array_degrade
+	push	bc
+	ld	hl,+(_arr % 65536)
+	ld	de,+(_arr / 65536)
+	call	l_far_mapaddr
+	ld	bc,10
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	push	de
+	push	hl
+	call	_func2
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._int_arith
+	ld	hl,+(_i % 65536)
+	ld	de,+(_i / 65536)
+	call	l_far_mapaddr
+	call	lp_gint
+	push	hl
+	call	l_gint4sp	;
+	pop	de
+	add	hl,de
+	ret
+
+
+
+._int_ptr
+	ld	hl,+(_i % 65536)
+	ld	de,+(_i / 65536)
+	call	l_far_mapaddr
+	push	de
+	push	hl
+	call	_intfunc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._getptr
+	ld	hl,+(_cptr % 65536)
+	ld	de,+(_cptr / 65536)
+	call	l_far_mapaddr
+	call	lp_gint
+	call	l_gchar
+	ret
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_arr
+	GLOBAL	_func2
+	GLOBAL	_i
+	GLOBAL	_cptr
+	GLOBAL	_array_degrade
+	GLOBAL	_int_arith
+	GLOBAL	_intfunc
+	GLOBAL	_int_ptr
+	GLOBAL	_getptr
+
+
+
+

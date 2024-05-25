@@ -484,7 +484,7 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
         lval->ptr_type = lval->ltype->ptr->kind;
     lval->val_type = lval->indirect_kind = lval->ltype->kind;
 
-    if ( old_type->kind == KIND_CPTR || (lval->flags & FARACC)) {
+    if ( old_type->kind == KIND_CPTR || (old_type->kind != KIND_PTR && (lval->flags & FARACC) )  ) {
         lval->flags |= FARACC;
     } else {
         lval->flags &= ~FARACC;
