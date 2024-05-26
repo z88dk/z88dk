@@ -19,6 +19,13 @@ void test_remove_all_blanks();
 void test_replace_all();
 void test_ipow();
 void test_int_to_hex();
+void test_swrite_int16();
+void test_swrite_int32();
+void test_swrite_string();
+void test_sread_int16();
+void test_sread_int32();
+void test_sread_string();
+void test_string_table();
 
 int main(int argc, char* argv[]) {
 	xassert_init(argv[0]);
@@ -45,6 +52,13 @@ int main(int argc, char* argv[]) {
         test_replace_all();
         test_ipow();
         test_int_to_hex();
+        test_swrite_int16();
+        test_swrite_int32();
+        test_swrite_string();
+        test_sread_int16();
+        test_sread_int32();
+        test_sread_string();
+        test_string_table();
     }
 
     done_testing();

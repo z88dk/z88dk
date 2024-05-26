@@ -33,5 +33,7 @@ int main(int argc, char* argv[]) {
     if (g_errors().count())
         return EXIT_FAILURE;
 
+    // call linker
+
     exit(g_errors().exit_code());
 }

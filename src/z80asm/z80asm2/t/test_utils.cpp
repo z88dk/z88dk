@@ -8,6 +8,7 @@
 #include "t/test.h"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 using namespace std;
 
 void test_is_ident_start() {
@@ -134,4 +135,123 @@ void test_int_to_hex() {
     IS(int_to_hex(10, 2), "$0a");
     IS(int_to_hex(255, 2), "$ff");
     IS(int_to_hex(256, 2), "$100");
+}
+
+void test_swrite_int16() {
+    ostringstream oss;
+    swrite_int16(0x1234, oss);
+    IS(oss.str().size(), 2);
+    IS(oss.str()[0], 0x34);
+    IS(oss.str()[1], 0x12);
+}
+
+void test_swrite_int32() {
+    ostringstream oss;
+    swrite_int32(0x12345678, oss);
+    IS(oss.str().size(), 4);
+    IS(oss.str()[0], 0x78);
+    IS(oss.str()[1], 0x56);
+    IS(oss.str()[2], 0x34);
+    IS(oss.str()[3], 0x12);
+}
+
+void test_swrite_string() {
+    ostringstream oss1;
+    swrite_string("", oss1);
+    IS(oss1.str().size(), 2);
+    IS(oss1.str()[0], 0);
+    IS(oss1.str()[1], 0);
+
+    ostringstream oss2;
+    swrite_string("hello", oss2);
+    IS(oss2.str().size(), 7);
+    IS(oss2.str()[0], 5);
+    IS(oss2.str()[1], 0);
+    IS(oss2.str()[2], 'h');
+    IS(oss2.str()[3], 'e');
+    IS(oss2.str()[4], 'l');
+    IS(oss2.str()[5], 'l');
+    IS(oss2.str()[6], 'o');
+}
+
+void test_sread_int16() {
+    istringstream iss1("\x34\x12");
+    IS(sread_int16(iss1), 0x1234);
+
+    istringstream iss2("\xff\xff");
+    IS(sread_int16(iss2), -1);
+}
+
+void test_sread_int32() {
+    istringstream iss1("\x78\x56\x34\x12");
+    IS(sread_int32(iss1), 0x12345678);
+
+    istringstream iss2("\xff\xff\xff\xff");
+    IS(sread_int32(iss2), -1);
+}
+
+void test_sread_string() {
+    char bytes1[] = { 0, 0 };
+    istringstream iss1(string(std::begin(bytes1), std::end(bytes1)));
+    IS(sread_string(iss1), "");
+
+    char bytes2[] = { 5, 0, 'h', 'e', 'l', 'l', 'o' };
+    istringstream iss2(string(std::begin(bytes2), std::end(bytes2)));
+    IS(sread_string(iss2), "hello");
+}
+
+void test_string_table() {
+    StringTable st;
+
+    IS(st.count(), 1);
+    IS(st.lookup(0), "");
+    NOK(st.find("hello"));
+
+    IS(st.add_string("hello"), 1);
+    IS(st.count(), 2);
+    IS(st.lookup(0), "");
+    IS(st.lookup(1), "hello");
+    OK(st.find("hello"));
+
+    // write string table
+    ofstream os("test~.bin", ios::binary);
+    OK(os.is_open());
+    IS(st.write(os), 0);
+    os.close();
+
+    // read it back
+    ifstream is("test~.bin", ios::binary);
+    OK(is.is_open());
+    IS(sread_int32(is), 2);     // size of table
+    IS(sread_int32(is), 8);     // size of strings, aligned
+    IS(sread_int32(is), 0);     // index of ""
+    IS(sread_int32(is), 1);     // index of "hello"
+    char buffer[16];
+    is.read(buffer, sizeof(buffer));
+    IS(is.gcount(), 8);
+    IS(buffer[0], 0);           // "" terminator
+    IS(buffer[1], 'h');
+    IS(buffer[2], 'e');
+    IS(buffer[3], 'l');
+    IS(buffer[4], 'l');
+    IS(buffer[5], 'o');
+    IS(buffer[6], 0);           // "hello" terminator
+    IS(buffer[7], 0);           // filler
+    OK(is.eof());
+
+    // read st from file
+    st.clear();
+    IS(st.count(), 1);
+    IS(st.lookup(0), "");
+
+    st.read(is, 0);             // read from pos 0
+    NOK(is.eof());
+    is.close();
+
+    IS(st.count(), 2);
+    IS(st.lookup(0), "");
+    IS(st.lookup(1), "hello");
+    OK(st.find("hello"));
+
+    remove("test~.bin");
 }

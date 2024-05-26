@@ -26,27 +26,33 @@ class Assembler;
 
 class Instr : public HasLocation {
 public:
-    Instr(int offset, int phased_asmpc);
+    Instr(int offset_asmpc, int phased_asmpc);
     virtual ~Instr();
     Instr(const Instr& other) = delete;
     Instr& operator=(const Instr& other) = delete;
     void clear();
 
-    void set_bytes(int opcode);             // decompose 0xfd213412 in 4 bytes
-    int offset() const;
+    int offset_asmpc() const;
     int phased_asmpc() const;
     int asmpc() const;                      // get offset or phased_asmpc
-    const Bytes& bytes() const;
-    const list<Patch*>& patches() const;
+    int size() const;
+    Bytes& bytes();
+    list<Patch*>& patches();
     Symbol* label() const;
+
+    void set_offset_asmpc(int asmpc);
+    void set_phased_asmpc(int asmpc);
+    void set_bytes(int opcode);             // decompose 0xfd213412 in 4 bytes
+    void do_patch(Patch* patch);
     void set_label(Symbol* label);
     void add_byte(int byte);
     void add_patch(Patch* patch);
 
 private:
-    int offset_{ 0 };                       // offset in bytes from start of section
+    int offset_asmpc_{ 0 };                 // offset in bytes from start of section
     int phased_asmpc_{ ORG_NOT_DEFINED };   // address inside ASMPC phase
-    Bytes bytes_;                           // bytes of the instruction with placeholders for patches
+    Bytes bytes_;                           // bytes of the instruction
+                                            // with placeholders for patches
     list<Patch*> patches_;                  // patches for each variable expression
     Symbol* label_{ nullptr };              // weak pointer to label if any
 };
@@ -62,13 +68,24 @@ public:
     void clear();
 
     const string& name() const;
-    auto begin() { return instrs_.begin(); }
-    auto end() { return instrs_.end(); }
+    int origin() const;
+    int align() const;
+    list<Instr*>& instrs();
     int size() const;
+
+    void set_origin(int origin);
+    void set_align(int align);
+
     Instr* add_instr();
+    Instr* add_instr(int opcode);
+    void check_relative_jumps();
+    void compute_addresses();
+    void patch_local_exprs();
 
 private:
     string name_;                           // name of section, may be ""
+    int origin_{ ORG_NOT_DEFINED };         // ORG value
+    int align_{ 1 };                        // ALIGN value
     list<Instr*> instrs_;                   // list of assembled instructions
 
     int phased_asmpc() const;
@@ -84,11 +101,16 @@ public:
     Module& operator=(const Module& other) = delete;
     void clear();
 
-    auto begin() { return sections_.begin(); }
-    auto end() { return sections_.end(); }
+    const string& name() const;
+
+    list<Section*>& sections();
     void select_section(const string& name);
-    Section* cur_section() const;
+    Section& cur_section() const;
     Symtab& symtab();
+    void check_relative_jumps();
+    void compute_addresses();
+    void patch_local_exprs();
+    void check_undefined_symbols();
 
 private:
     string name_;                           // name based on filename, or given by directive
@@ -113,11 +135,16 @@ public:
 
     const string& filename() const;
 
-    auto begin() { return modules_.begin(); }
-    auto end() { return modules_.end(); }
+    list<Module*>& modules();
     void select_module(const string& name);
     Module& cur_module() const;
+
     bool parse();
+    void check_relative_jumps();
+    void compute_addresses();
+    void patch_local_exprs();
+    void check_undefined_symbols();
+    void write_obj_file(const string& o_filename);
 
 private:
     Parser parser_;                         // parser of input

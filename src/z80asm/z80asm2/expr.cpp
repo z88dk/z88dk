@@ -203,13 +203,28 @@ ExprResult ExprResult::combine(const ExprResult& a, const ExprResult& b, TkCode 
 //-----------------------------------------------------------------------------
 
 Expr::Expr(const string& expr_text) {
+    section_ = &g_section();
     Lexer lexer(expr_text);
     if (!parse_expr(&lexer))
         g_errors().error(ErrSyntaxExpr, expr_text);
 }
 
+Expr* Expr::clone() const {
+    Expr* copy = new Expr();
+    copy->text_ = text_;
+    copy->section_ = section_;
+    copy->rpn_tokens_.insert(copy->rpn_tokens_.end(), rpn_tokens_.begin(), rpn_tokens_.end());
+    copy->lexer_ = nullptr;
+    copy->parsing_if_ = false;
+    return copy;
+}
+
 const string& Expr::text() const {
     return text_;
+}
+
+Section* Expr::section() const {
+    return section_;
 }
 
 bool Expr::parse_expr(Lexer* lexer) {
@@ -803,12 +818,24 @@ void Expr::parse_primary() {
 
 //-----------------------------------------------------------------------------
 
-Patch::Patch(range_t range, Expr* expr)
-    : range_(range), expr_(expr) {
+Patch::Patch(range_t range, int offset, Expr* expr)
+    : range_(range), offset_(offset), expr_(expr) {
 }
 
 Patch::~Patch() {
     delete expr_;
+}
+
+range_t Patch::range() const {
+    return range_;
+}
+
+int Patch::offset() const {
+    return offset_;
+}
+
+Expr* Patch::expr() {
+    return expr_;
 }
 
 int Patch::size() const {

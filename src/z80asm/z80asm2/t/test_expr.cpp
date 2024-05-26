@@ -61,6 +61,8 @@ void test_error_expr_result() {
 //-----------------------------------------------------------------------------
 
 void test_empty_expr() {
+    g_asm.clear();
+    g_asm.add_object("test~.asm");
     ostringstream oss;
     g_errors().set_output(oss);
     Expr expr;
@@ -72,4 +74,6 @@ void test_empty_expr() {
     OK(res.ok());
 
     g_errors().clear();
+    g_asm.delete_object();
+    g_asm.clear();
 }

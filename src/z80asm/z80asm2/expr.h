@@ -53,8 +53,10 @@ private:
 class Expr : public HasLocation {
 public:
     Expr(const string& expr_text = "0");
+    Expr* clone() const;
 
     const string& text() const;
+    Section* section() const;
 
     bool parse_expr(Lexer* lexer);      // parse normal expression, creates symbols
     bool parse_if_expr(Lexer* lexer);   // parse expression of IF, does not create symbols
@@ -65,6 +67,7 @@ public:
 
 private:
     string text_;                       // expression text
+    Section* section_;                  // current section
     vector<Token> rpn_tokens_;			// rpn of expression tokens
     Lexer* lexer_{ nullptr };           // lexer with expression to be parsed
     bool parsing_if_{ false };          // if true, parsing IF
@@ -92,14 +95,18 @@ private:
 
 class Patch {
 public:
-    Patch(range_t range, Expr* expr);
+    Patch(range_t range, int offset, Expr* expr);
     virtual ~Patch();
     Patch(const Patch& other) = delete;
     Patch& operator=(const Patch& other) = delete;
 
+    range_t range() const;
+    int offset() const;
+    Expr* expr();
     int size() const;
 
 private:
     range_t range_{ RANGE_UNDEFINED };  // type of patch
+    int offset_{ 0 };                   // offset to start of instruction
     Expr*   expr_;                      // holds the expresion from source
 };

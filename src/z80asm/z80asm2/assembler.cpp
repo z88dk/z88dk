@@ -41,7 +41,9 @@ bool Assembler::assemble(const string& filename) {
     copy_defines();
 
     // assemble
+    g_errors().push_location(Location(filename));
     assemble1();
+    g_errors().pop_location();
 
     if (options_.verbose())
         cout << endl;
@@ -82,15 +84,10 @@ void Assembler::copy_defines() {
         string name = it.first;
         int value = it.second;
 
-        Module& module1 = cur_module();
-
-        Section* section = module1.cur_section();
-        xassert(section);
-
-        Symbol* symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, section, value);
+        Symbol* symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, &g_section(), value);
         symbol->set_global_def();
 
-        module1.symtab().insert(symbol);
+        g_symtab().insert(symbol);
     }
 }
 
@@ -125,7 +122,7 @@ Symbol* Assembler::asmpc() const {
 }
 
 Instr* Assembler::add_instr() {
-    Instr* instr = cur_module().cur_section()->add_instr();
+    Instr* instr = g_section().add_instr();
     return instr;
 }
 
@@ -136,7 +133,7 @@ Instr* Assembler::add_instr(int opcode) {
 }
 
 Symbol* Assembler::find_symbol(const string& name) {
-    return object().cur_module().symtab().find(name);
+    return g_symtab().find(name);
 }
 
 Symbol* Assembler::define_symbol(const string& name, int value) {
@@ -145,10 +142,8 @@ Symbol* Assembler::define_symbol(const string& name, int value) {
 }
 
 void Assembler::undefine_symbol(const string& name) {
-    Module& module1 = cur_module();
-
     // check if already defined
-    Symbol* symbol = module1.symtab().erase(name);
+    Symbol* symbol = g_symtab().erase(name);
     if (symbol) {
         // set to zero and remove any instr/expr
         symbol->set_value(0);
@@ -160,19 +155,17 @@ void Assembler::undefine_symbol(const string& name) {
             symbol->set_instr(nullptr);
 
         // save in deleted, in case any expression referes to it
-        module1.symtab().push_deleted(symbol);
+        g_symtab().push_deleted(symbol);
     }
 }
 
 Symbol* Assembler::add_equ(const string& name, Expr* expr) {
-    Module& module1 = cur_module();
-
     ExprResult res = expr->eval();
     
     // check if already defined
     Symbol* symbol = find_symbol(name);
     if (!symbol) {                              // new symbol
-        symbol = new Symbol(name, SCOPE_LOCAL, res.type(), module1.cur_section());
+        symbol = new Symbol(name, SCOPE_LOCAL, res.type(), &g_section());
         if (res.type() == TYPE_CONSTANT) {
             symbol->set_value(res.value());
             delete expr;
@@ -180,17 +173,27 @@ Symbol* Assembler::add_equ(const string& name, Expr* expr) {
         else {
             symbol->set_expr(expr);
         }
-        bool ok = module1.symtab().insert(symbol);
+        bool ok = g_symtab().insert(symbol);
         xassert(ok);
         return symbol;
     }
     else if (symbol->type() == TYPE_UNDEFINED) {// already declared
         if (symbol->scope() == SCOPE_EXTERN)
             symbol->set_scope(SCOPE_PUBLIC);
-        symbol->set_type(res.type());
-        symbol->set_expr(expr);
+
         symbol->set_location(errors_.location());
-        symbol->set_section(module1.cur_section());
+        symbol->set_section(&g_section());
+
+        if (res.ok()) {
+            symbol->set_type(TYPE_CONSTANT);
+            symbol->set_value(res.value());
+            delete expr;
+        }
+        else {
+            symbol->set_type(TYPE_COMPUTED);
+            symbol->set_expr(expr);
+        }
+        
         return symbol;
     }
     else {                                      // already defined
@@ -201,13 +204,11 @@ Symbol* Assembler::add_equ(const string& name, Expr* expr) {
 }
 
 Symbol* Assembler::use_symbol(const string& name) {
-    Module& module1 = cur_module();
-
     // check if already defined
     Symbol* symbol = find_symbol(name);
     if (!symbol) {                               // new symbol
-        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_UNDEFINED, module1.cur_section());
-        bool ok = module1.symtab().insert(symbol);
+        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_UNDEFINED, &g_section());
+        bool ok = g_symtab().insert(symbol);
         xassert(ok);
     }
     symbol->set_touched();
@@ -215,8 +216,6 @@ Symbol* Assembler::use_symbol(const string& name) {
 }
 
 Symbol* Assembler::declare_extern(const string& name) {
-    Module& module1 = cur_module();
-
     // check if already defined
     Symbol* symbol = find_symbol(name);
     if (symbol) {                               // already defined
@@ -225,16 +224,14 @@ Symbol* Assembler::declare_extern(const string& name) {
             errors_.error(ErrSymbolRedeclaration, name);
     }
     else {                                      // new symbol
-        symbol = new Symbol(name, SCOPE_EXTERN, TYPE_UNDEFINED, module1.cur_section());
-        bool ok = module1.symtab().insert(symbol);
+        symbol = new Symbol(name, SCOPE_EXTERN, TYPE_UNDEFINED, &g_section());
+        bool ok = g_symtab().insert(symbol);
         xassert(ok);
     }
     return symbol;
 }
 
 Symbol* Assembler::declare_public(const string& name) {
-    Module& module1 = cur_module();
-
     // check if already defined
     Symbol* symbol = find_symbol(name);
     if (symbol) {                               // already defined
@@ -245,16 +242,14 @@ Symbol* Assembler::declare_public(const string& name) {
             errors_.error(ErrSymbolRedeclaration, name);
     }
     else {                                      // new symbol
-        symbol = new Symbol(name, SCOPE_PUBLIC, TYPE_UNDEFINED, module1.cur_section());
-        bool ok = module1.symtab().insert(symbol);
+        symbol = new Symbol(name, SCOPE_PUBLIC, TYPE_UNDEFINED, &g_section());
+        bool ok = g_symtab().insert(symbol);
         xassert(ok);
     }
     return symbol;
 }
 
 Symbol* Assembler::declare_global(const string& name) {
-    Module& module1 = cur_module();
-
     // check if already defined
     Symbol* symbol = find_symbol(name);
     if (symbol) {                               // already defined
@@ -265,15 +260,11 @@ Symbol* Assembler::declare_global(const string& name) {
             errors_.error(ErrSymbolRedeclaration, name);
     }
     else {                                      // new symbol
-        symbol = new Symbol(name, SCOPE_GLOBAL, TYPE_UNDEFINED, module1.cur_section());
-        bool ok = module1.symtab().insert(symbol);
+        symbol = new Symbol(name, SCOPE_GLOBAL, TYPE_UNDEFINED, &g_section());
+        bool ok = g_symtab().insert(symbol);
         xassert(ok);
     }
     return symbol;
-}
-
-Module& Assembler::cur_module() {
-    return object().cur_module();
 }
 
 void Assembler::assemble1() {
@@ -294,36 +285,19 @@ void Assembler::assemble1() {
     if (start_errors != errors_.count())
         return;
 
-    check_relative_jumps();
+    object().check_relative_jumps();
     if (start_errors != errors_.count())
         return;
 
-    patch_local_exprs();
+    object().patch_local_exprs();
     if (start_errors != errors_.count())
         return;
 
-    check_undefined_symbols();
+    object().check_undefined_symbols();
     if (start_errors != errors_.count())
         return;
 
-    write_obj_file(o_filename);
+    object().write_obj_file(o_filename);
     if (start_errors != errors_.count())
         return;
 }
-
-void Assembler::check_relative_jumps() {
-    // TODO
-}
-
-void Assembler::patch_local_exprs() {
-    // TODO
-}
-
-void Assembler::check_undefined_symbols() {
-    // TODO
-}
-
-void Assembler::write_obj_file(const string& /*filename*/) {
-    // TODO
-}
-

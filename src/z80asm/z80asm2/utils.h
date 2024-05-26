@@ -6,10 +6,12 @@
 
 #pragma once
 
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -53,3 +55,33 @@ string int_to_hex(T i, int width) {
         << std::hex << i << std::dec;
     return ss.str();
 }
+
+//-----------------------------------------------------------------------------
+// string table
+//-----------------------------------------------------------------------------
+
+// read/write binary data from/to streams
+void swrite_int16(int n, ostream& os);
+void swrite_int32(int n, ostream& os);
+void swrite_string(const string& s, ostream& os);
+
+int sread_int16(istream& is);
+int sread_int32(istream& is);
+string sread_string(istream& is);
+
+class StringTable {
+public:
+    StringTable();
+    void clear();
+
+    int add_string(const string& str);
+    const string& lookup(int id);
+    bool find(const string& str);
+    size_t count() const;
+    streampos write(ofstream& os);
+    void read(ifstream& is, streampos start_fpos);
+
+private:
+    vector<string> list_;
+    unordered_map<string, int> hash_;
+};

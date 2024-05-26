@@ -67,7 +67,6 @@ private:
     Object* object_;                // object file
     Symbol* asmpc_{ nullptr };      // asmpc of current statement
 
-    Module& cur_module();           // nullptr if none
     void assemble1();               // worker of assemble()
     void check_relative_jumps();    // change JR to JP if needed
     void patch_local_exprs();       // patch values of expressions

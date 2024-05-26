@@ -7,6 +7,7 @@
 #pragma once
 
 #include "errors.h"
+#include "utils.h"
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -19,7 +20,9 @@ using namespace std;
 #define SIGNATURE_SIZE			8
 #define SIGNATURE_BASE_SIZE		6
 #define OBJ_FILE_SIGNATURE		"Z80RMF"
+#define OBJ_FILE_HEADER         OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION)
 #define LIB_FILE_SIGNATURE		"Z80LMF"
+#define LIB_FILE_HEADER         LIB_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION)
 
 // default file name extensions
 #define EXT_ASM     ".asm"    
@@ -62,6 +65,7 @@ string file_reloc_filename(const string& bin_filename);
 
 istream& safe_getline(istream& is, string& t);
 
+// one open file
 class OpenFile {
 public:
     OpenFile();

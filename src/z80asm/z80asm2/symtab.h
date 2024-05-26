@@ -80,9 +80,11 @@ public:
     Symbol* find(const string& name);       // nullptr if not found
     Symbol* erase(const string& name);      // nullptr if not found
     void push_deleted(Symbol* symbol);      // store in deleted_ list
+    void check_undefined_symbols();
 
 private:
-    unordered_map<string, Symbol*> symbols_;// holds symbols
+    list<Symbol*> symbols_;                 // holds symbols in order created
     list<Symbol*> deleted_;                 // holds deleted symbols that may still be
                                             // referenced by expressions
+    unordered_map<string, Symbol*> map_;    // map for quick searches
 };

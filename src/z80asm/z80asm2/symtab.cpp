@@ -117,18 +117,21 @@ Symtab::~Symtab() {
 }
 
 void Symtab::clear() {
-    for (auto& it : symbols_)
-        delete it.second;
+    for (auto& symbol : symbols_)
+        delete symbol;
     symbols_.clear();
+
     for (auto& symbol : deleted_)
         delete symbol;
     deleted_.clear();
+
+    map_.clear();
 }
 
 bool Symtab::insert(Symbol* symbol) {
     string name = symbol->name();
-    auto it = symbols_.find(name);
-    if (it != symbols_.end()) {
+    auto it = map_.find(name);
+    if (it != map_.end()) {
         if (str_begins_with(name, "__CDBINFO__"))
             return true;	// ignore duplicates of these
         else {
@@ -137,24 +140,26 @@ bool Symtab::insert(Symbol* symbol) {
         }
     }
     else {
-        symbols_[name] = symbol;
+        symbols_.push_back(symbol);
+        map_[name] = symbol;
         return true;
     }
 }
 
 Symbol* Symtab::find(const string& name) {
-    auto it = symbols_.find(name);
-    if (it != symbols_.end())
+    auto it = map_.find(name);
+    if (it != map_.end())
         return it->second;
     else
         return nullptr;
 }
 
 Symbol* Symtab::erase(const string& name) {
-    auto it = symbols_.find(name);
-    if (it != symbols_.end()) {
+    auto it = map_.find(name);
+    if (it != map_.end()) {
         Symbol* symbol = it->second;
-        symbols_.erase(it);
+        symbols_.remove(symbol);
+        map_.erase(it);
         return symbol;
     }
     else
@@ -163,4 +168,15 @@ Symbol* Symtab::erase(const string& name) {
 
 void Symtab::push_deleted(Symbol* symbol) {
     deleted_.push_back(symbol);
+}
+
+void Symtab::check_undefined_symbols() {
+    for (auto& symbol : symbols_) {
+        if (symbol->type() == TYPE_UNDEFINED &&
+            symbol->scope() != SCOPE_EXTERN) {
+            g_errors().push_location(symbol->location());
+            g_errors().error(ErrUndefinedSymbol, symbol->name());
+            g_errors().pop_location();
+        }
+    }
 }
