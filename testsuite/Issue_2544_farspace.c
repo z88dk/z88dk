@@ -1,7 +1,7 @@
-extern __banked char arr[];
 
 extern void func2(char *__far ptr);
 
+extern __banked char arr[];
 extern __banked int i;
 extern __banked char *cptr;
 
@@ -27,4 +27,9 @@ void int_ptr(int j)
 char getptr()
 {
     return *cptr;
+}
+
+char *__far return_intptr_arith()
+{
+    return &i + 2;
 }
