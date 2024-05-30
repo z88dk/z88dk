@@ -10,6 +10,8 @@
 ; startup=15 - 64 rows, on exit requires BREAK to get back to text mode
 ; startup=16 - 64 rows, on exit returns immediately to text mode
 ; startup=17 - 4 levels grayscale, 64 rows
+; startup=18 - 128 rows, on exit requires BREAK to get back to text mode
+; startup=19 - 128 rows, on exit returns immediately to text mode
 ;
 ;
 ; - - - - - - -
@@ -34,7 +36,7 @@ PUBLIC	zx_slow
 PUBLIC	_zx_slow
 
 
-IF ((startup=13)|(startup=15))
+IF ((startup=13)|(startup=15)|(startup=18))
 hrgbrkflag:
         defb    0
 ENDIF
@@ -214,10 +216,14 @@ gray_patch:
 
 
 IF (startup>=15)
+IF (startup>=18)
+        LD   BC,$0808                           ; 10                    B=Number of character sets. C=Number of lines in a row.
+ELSE
         LD   BC,$0408                           ; 10                    B=Number of character sets. C=Number of lines in a row.
-else
+ENDIF
+ELSE
         LD   BC,$0C08                           ; 10                    B=Number of character sets. C=Number of lines in a row.
-endif
+ENDIF
 
 ; Force the LNCTR to reset so that characters are output starting with their top line.
 
@@ -296,9 +302,13 @@ HRG_postproc:
 
 HRG_blank_patch:	; WARNING: the values change due to the patching, don't tune here !!
 IF (startup>=15)
+IF (startup>=18)
+        add     70
+ELSE
         add     140    ; more blank lines for fast application code and correct sync
         			; For the WRX version Siegfried Engel reports that values between 
         			; 80 and 159 worked fine on both a normal TV and an LCD one
+ENDIF
 ; ELSE
 ;        add		-8             ; reduce by 8 scan lines
 ENDIF
@@ -321,7 +331,7 @@ ARX_DRIVER_VSYNC:
 
         call    $0220          ; first PUSH register, then do VSYNC and get KEYBD
 
-IF ((startup=13)|(startup=15))
+IF ((startup=13)|(startup=15)|(startup=18))
         ;call    $0F46          ; check break (space) key
         LD      A,$7F           ; read port $7FFE - keys B,N,M,.,SPACE.
         IN      A,($FE)         ;
@@ -334,7 +344,7 @@ IF ((startup=13)|(startup=15))
 nobrkk:
 
 ELSE
-IF ((startup=14)|(startup=16))
+IF ((startup=14)|(startup=16)|(startup=19))
         SCF
 ENDIF
         nop
@@ -349,7 +359,7 @@ ENDIF
 
         pop     ix
 
-IF ((startup=13)|(startup=15))
+IF ((startup=13)|(startup=15)|(startup=18))
 		jp		c,nobrkk2
         ld      a,$1e           ; the I register is restored with the MSB address
         ld      i,a             ; of the ROM pattern table in case of BREAK key down
