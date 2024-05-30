@@ -7,7 +7,7 @@
 ; Original function name: "HRG_Tool_TXTcopy"
 ;--------------------------------------------------------------
 ;
-;	$Id: copytxt_arx.asm,v 1.5 2017-01-02 22:58:00 aralbrec Exp $
+;	$Id: copytxt_arx.asm $
 ;
 ;----------------------------------------------------------------
 ;
@@ -33,11 +33,17 @@ _copytxt:
     ld      de, ($400C)                 ; D_FILE
 
     inc     de
-  IF    FORzx81hrg64
+
+  IF    FORzx81hr64
     ld      b, 8
   ELSE
-    ld      b, 24
+     IF    FORzx81hr128
+       ld      b, 16
+     ELSE
+       ld      b, 24
+     ENDIF
   ENDIF
+
     ld      c, 0
 
 HRG_TXTcopyLoop:
