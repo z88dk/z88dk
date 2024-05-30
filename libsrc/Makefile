@@ -149,7 +149,7 @@ TOCREATE += $(call check_target,z9001,z9001_clib.lib)
 TOCREATE += $(call check_target,zx, zx_clib.lib mzx.lib mzx_tiny.lib zxrom.lib)
 TOCREATE += $(call check_target,zxvgs, zxvgs.lib)
 TOCREATE += $(call check_target,zx80, zx80_clib.lib)
-TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib gfx81hr384.lib m81.lib m81_tiny.lib)
+TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr128.lib gfx81hr192.lib gfx81hr384.lib m81.lib m81_tiny.lib)
 TOCREATE += $(call check_target,zxn, zxn_clib.lib zxfcntl)
 
 
@@ -568,7 +568,19 @@ gfx81hr64.lib: $(TARGET_CLIB_OBJS) gfx81udg.lib
 	TARGET=zx81mt64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81mt64 -DMTHRG -x$(OUTPUT_DIRECTORY)/gfx81mt64 @$(TARGET_DIRECTORY)/zx81/gfx81mt.lst
 	$(call zx81deps)
 
-gfx81hr192.lib: $(TARGET_CLIB_OBJS) gfx81hr64.lib
+gfx81hr128.lib: $(TARGET_CLIB_OBJS) gfx81hr64.lib
+	@echo ''
+	@echo '--- Building ZX81 High Resolution Libraries (128 rows)  ---'
+	@echo ''
+	$(call zx81deps)
+	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81hr128
+	TARGET=zx81hr128 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr128 -x$(OUTPUT_DIRECTORY)/gfx81hr128 @$(TARGET_DIRECTORY)/zx81/gfx81hr.lst
+	$(call zx81deps)
+	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81hr128
+	TARGET=zx81hr128 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr128 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx128 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
+	$(call zx81deps)
+
+gfx81hr192.lib: $(TARGET_CLIB_OBJS) gfx81hr128.lib
 	@echo ''
 	@echo '--- Building ZX81 High Resolution Libraries (192 rows)  ---'
 	@echo ''
