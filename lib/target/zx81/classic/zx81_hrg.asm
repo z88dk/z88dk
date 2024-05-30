@@ -36,7 +36,7 @@ PUBLIC	_zx_slow
 ; Normal raster or grayscale display
 
 IF (((startup>=5)&(startup<13))|(startup>=25))
- IF ((startup=7)|(startup=27))
+ IF ((startup=7)|(startup=27)|(startup=8)|(startup=9))
   IF DEFINED_MEM8K
     DEFC  TOPOFRAM    = $6000
     DEFC  BASE_VRAM   = $5000
@@ -73,7 +73,7 @@ ELSE
 ENDIF
 
 
-IF ((startup=3)|(startup=5)|(startup=23)|(startup=20)|(startup=25))
+IF ((startup=3)|(startup=5)|(startup=8)|(startup=23)|(startup=20)|(startup=25))
 hrgbrkflag:
         defb    0
 ENDIF
@@ -269,7 +269,11 @@ ELSE					; WRX
 
         ld      de,32           ; 32 bytes offset is added to HL for next hline
 IF (((startup>=5)&(startup<13))|(startup>=25))
+  IF ((startup=8)|(startup=9))
+        ld      b,128           ; wrx128
+  ELSE
         ld      b,64            ; 64 lines per hires screen
+  ENDIF
 ELSE
         ld      b,192            ; 192 lines per hires screen
 ENDIF
@@ -303,9 +307,13 @@ ENDIF
 ; if we run in 64 lines mode we need to increase the number of border's lines
 
 IF (((startup>=5)&(startup<13))|(startup>=25))
+  IF ((startup=8)|(startup=9))
+        add     70
+  ELSE
         add     140             ; more blank lines for fast application code and correct sync
         			; Siegfried Engel reports that values between 80 and 159 worked
         			; fine on both a normal TV and an LCD one
+  ENDIF
 ENDIF
 
         ld      c,a            ; load C with MARGIN
@@ -323,7 +331,7 @@ pointedbyix:
 
         call    $0220          ; first PUSH register, then do VSYNC and get KEYBD
 
-IF ((startup=3)|(startup=5)|(startup=20))
+IF ((startup=3)|(startup=5)|(startup=8)|(startup=20))
         ;call    $0F46          ; check break (space) key
         LD      A,$7F           ; read port $7FFE - keys B,N,M,.,SPACE.
         IN      A,($FE)         ;
@@ -338,7 +346,7 @@ ENDIF
 
         pop     ix
 
-IF ((startup=3)|(startup=5)|(startup=20))
+IF ((startup=3)|(startup=5)|(startup=8)|(startup=20))
 		jp		c,nobrkk2
         ld      a,$1e           ; the I register is restored with the MSB address
         ld      i,a             ; of the ROM pattern table in case of BREAK key down
