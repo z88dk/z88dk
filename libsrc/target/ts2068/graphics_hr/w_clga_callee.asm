@@ -1,47 +1,55 @@
 
+; "Clear area" on the TS2068
+; 2024 rework by Stefano Bodrato
 ;
-;       Z88 Graphics Functions - Small C+ stubs
-;
-;       Written around the Interlogic Standard Library
-;
-;       Stubs Written by D Morris - 30/9/98
-;
-;
-;	$Id: w_clga.asm $
-;
+; Usage: clga(int tlx, int tly, int tlx2, int tly2)
+
+    SECTION code_graphics
+
+    PUBLIC  clga_callee
+    PUBLIC  _clga_callee
+
+    PUBLIC  asm_clga
 
 
-;Usage: clga(struct *pixels)
-
-
-    INCLUDE "graphics/grafix.inc"
-    SECTION code_clib
-    PUBLIC  clga
-    PUBLIC  _clga
+    EXTERN  swapgfxbk
+    EXTERN  __graphics_end
     EXTERN  w_pixeladdress
+    INCLUDE "graphics/grafix.inc"
 
-clga:
-_clga:
-    push    ix                          ;save callers
-    ld      ix, 2
-    add     ix, sp
-    ld      h, (ix+9)                   ; x
+
+clga_callee:
+_clga_callee:
+
+    pop     af  ; ret addr
+    pop     de  ; tly2
+    pop     hl  ; tlx2
+    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    pop     de  ; tly1
+    pop     hl  ; tlx1
+    push    af                          ; ret addr
+    exx
+
+asm_clga:
+
+    push    ix
+  IF    NEED_swapgfxbk=1
+    call    swapgfxbk
+  ENDIF
+
+    push    hl           ; width
+    ld      a,e          ; height
+    exx  ; hl=x
+         ; de=y
+    pop     bc           ; width
+    ld      ixl, a       ; height (ix forgotten)
+	
     ld      a, 1
     cp      h
-    jr      c, clga_exit
-    ld      e, (ix+6)                   ; y
+    jp      c, __graphics_end
     ld      a, maxy
     cp      e
-    jr      c, clga_exit
-
-    ld      a, (ix+2)                   ; height
-    ld      c, (ix+4)                   ; width
-    ld      b, (ix+5)                   ; width
-    ld      d, 0                        ;
-    ld      l, (ix+8)                   ; x
-
-    ld      ixl, a                      ; ix forgotten
-    ld      d, 0
+    jp      c, __graphics_end
 
     push    bc
     call    w_pixeladdress
@@ -56,8 +64,8 @@ next:
     ld      l, a
     pop     bc
 outer_loop:
-    push    bc                          ; 1
-    push    de                          ; 2
+    push    bc            ; 1 (width)
+    push    de            ; 2 (height)
     ld      a, l
     ld      h, l
     cp      127
@@ -111,13 +119,12 @@ wypad:
     pop     de                          ; 2
     pop     bc                          ; 1
     dec     ixl
-    jr      z, clga_exit
+    jp      z, __graphics_end
     call    incy
-    jr      c, clga_exit
+    jp      c, __graphics_end
     jr      outer_loop
-clga_exit:
-    pop     ix
-    ret
+
+
 ; (hl) mask
 ; de - screen address
 INC_X:
