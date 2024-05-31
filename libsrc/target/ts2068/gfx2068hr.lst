@@ -1,9 +1,6 @@
-target/ts2068/graphics_hr/zx_hardcopy
 target/ts2068/graphics_hr/xorborder
-target/ts2068/graphics_hr/w_clga_callee
 target/ts2068/graphics_hr/fill
 target/ts2068/graphics_hr/w_putsprite
 target/ts2068/graphics_hr/w_stencil_render
 target/ts2068/graphics_hr/w_bksave
 target/ts2068/graphics_hr/w_bkrestore
-@gfx/wide/gfx_wide.lst
