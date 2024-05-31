@@ -10,7 +10,7 @@ target/ts2068/obj/ts2068/call_extrom
 @target/zx/stdio/stdio.lst
 @stdio/ansicore.lst
 @stdio/stdio.lst
-target/ts2068/graphics_hr/zx_hardcopy
+@target/ts2068/gfx2068hr.lst
 @target/zx-common/timex_zxn_graphics.lst
 ;gfx/wide/obj/ts2068/w_stencil_render2
 @gfx/wide/gfx_wide.lst
