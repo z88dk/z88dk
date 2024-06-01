@@ -104,11 +104,13 @@ int primary(LVALUE* lval)
                     return (1);
                 }
                 /* Handle arrays... */
-                address(ptr);
+                gen_address(ptr);
                 /* djm sommat here about pointer types? */
                 lval->indirect_kind = lval->ptr_type = ptr->type;
-                if ( ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY )
+                if ( ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY ) {
+                    if ( ptr->ctype->flags & FARACC ) { lval->flags |= FARACC; }
                     lval->ptr_type = lval->ltype->ptr->kind;
+                }
                 return (0);
             } else {
                 lval->symbol = ptr;
@@ -130,7 +132,7 @@ int primary(LVALUE* lval)
                 lval->val_type = KIND_INT;
                 lval->ptr_type = KIND_NONE;
                 lval->indirect_kind = KIND_NONE;
-	        return(1);
+	            return(1);
             } else {
                 /* assume it's a function we haven't seen yet */
                 /* NB value set to 0 */

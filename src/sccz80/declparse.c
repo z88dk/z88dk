@@ -256,6 +256,7 @@ Type *make_array(Type *base_type,int32_t len)
     Type *type = CALLOC(1,sizeof(*type));
     type->kind = KIND_ARRAY;
     type->ptr = base_type;
+    type->flags = base_type->flags;
     type->len = len;
     if ( len > 0 ) {
         type->size = len * base_type->size;
@@ -1259,11 +1260,13 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
     char namebuf[NAMESIZE];
     Type *type;
     int   flags = 0;
+    int isfar = 0;
 
     if ( base_type != NULL && *base_type != NULL ) {
         type = CALLOC(1,sizeof(*type));
         *type = **base_type;
     } else {
+        if ( amatch("__banked") ) isfar = 1;
         if ( (type = parse_type()) == NULL ) {
             return NULL;
         }
@@ -1318,6 +1321,8 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
 
     if ( type->kind == KIND_FUNC ) {
         type->flags |= flags;
+    } else if ( isfar ) {
+        type->flags |= FARACC;
     }
 
     // Validate that structs are not weak if we have an instance
@@ -1569,6 +1574,10 @@ void type_describe(Type *type, UT_string *output)
 
     if ( type->isvolatile ) {
         utstring_printf(output,"volatile ");
+    }
+
+    if ( type->flags & FARACC ) {
+        utstring_printf(output,"__banked ");
     }
    
     switch ( type->kind ) {

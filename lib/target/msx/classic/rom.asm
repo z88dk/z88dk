@@ -199,6 +199,42 @@ banked_call:
   ENDIF
     push    bc
     ret
+
+    ; Paging routines used by far memory
+    PUBLIC  GET_P2
+    PUBLIC  PUT_P2
+    PUBLIC  __far_map_bank
+
+; Used to page in memory for far pointers
+;
+; Entry: hl = physical address
+;       ebc = logical address (i.e. __far)
+;         d = virtual bank (which may be mapped to physical bank)
+; Exit: debchl = preserved
+;       
+__far_map_bank:
+    push    de
+    push    hl
+    ld      a,d
+    inc     a           ;The first valid bank is 1
+    call    PUT_P2
+    pop     hl
+    pop     de
+    ret
+
+
+GET_P2:
+    ld      a,(__current_bank)
+    ret
+
+PUT_P2:
+    ld      (__current_bank),a
+    ld      (MAPPER_ADDRESS_8000),a
+  IF MAPPER_ADDRESS_A000 != 0
+    inc     a
+    ld      (MAPPER_ADDRESS_A000),a
+  ENDIF
+    ret
 ENDIF
 
 
