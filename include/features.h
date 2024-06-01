@@ -3421,7 +3421,7 @@
 #define __HAVE_COLOUR 1
 #define __HAVE_FARHEAP 1
 #define __HAVE_BANKED_CALL 1
-// #define __HAVE_BANKED_FAR_MAPPING 0
+#define __HAVE_BANKED_FAR_MAPPING 1
 
 #elif defined(__MSX__)  && defined(CLIB_MSXDOS2)
 #define __HAVE_KEYBOARD 1
@@ -3457,7 +3457,7 @@
 #define __HAVE_COLOUR 1
 #define __HAVE_FARHEAP 1
 #define __HAVE_BANKED_CALL 1
-// #define __HAVE_BANKED_FAR_MAPPING 0
+#define __HAVE_BANKED_FAR_MAPPING 1
 
 #elif defined(__MSX2__)  && defined(__ROM__)
 #define __HAVE_KEYBOARD 1
@@ -3493,7 +3493,7 @@
 #define __HAVE_COLOUR 1
 // #define __HAVE_FARHEAP 0
 #define __HAVE_BANKED_CALL 1
-// #define __HAVE_BANKED_FAR_MAPPING 0
+#define __HAVE_BANKED_FAR_MAPPING 1
 
 #elif defined(__MSX__)  && defined(__ROM__)
 #define __HAVE_KEYBOARD 1
@@ -3529,7 +3529,7 @@
 #define __HAVE_COLOUR 1
 // #define __HAVE_FARHEAP 0
 #define __HAVE_BANKED_CALL 1
-// #define __HAVE_BANKED_FAR_MAPPING 0
+#define __HAVE_BANKED_FAR_MAPPING 1
 
 #elif defined(__MSX__)
 #define __HAVE_KEYBOARD 1
