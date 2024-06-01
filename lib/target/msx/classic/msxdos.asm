@@ -415,6 +415,26 @@ __msx_bank_mappings:
 bank_mappings:
     defs        256	    ;This is far too many
 
+; Entry: hl = physical address
+;       ebc = logical address (i.e. __far)
+;         d = virtual bank (which may be mapped to physical bank)
+; Exit: debchl = preserved
+;       
+    PUBLIC  __far_map_bank
+    
+__far_map_bank:
+    push    hl
+    push    de
+    ld      hl,__msx_bank_mappings + 1
+    ld      e,d
+    ld      d,0
+    add     hl,de
+    ld      a,(hl)
+    call    PUT_P2
+    pop     de
+    pop     hl
+    ret
+
     PUBLIC PUT_P0
     PUBLIC PUT_P1
     PUBLIC PUT_P2

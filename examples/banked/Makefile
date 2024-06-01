@@ -4,9 +4,10 @@ all: binaries
 include ../../support/multitarget_build/Makefile
 
 
-BANK_TARGETS = msx gb zx sms cpc aqplus
+BANK_TARGETS = msx msx_msxdos2 gb zx sms cpc aqplus
 OUTPUT_BINS += $(foreach target, $(BANK_TARGETS),  build/$(target)/bank.bin )
 CFLAGS_msx_bank = -subtype=rom -pragma-define:MAPPER_ASCII16
+CFLAGS_msx_msxdos2 = -pragma-define:CRT_DISABLELOADER=0
 CFLAGS_zx_bank = -lndos
 CFLAGS_sms_bank = --generic-console -pragma-redirect:CRT_FONT=_font_8x8_zx_system -pragma-define:CRT_ENABLE_BANKED_CALLS=1
 CFLAGS_cpc_bank = -lndos --generic-console -pragma-redirect:CRT_FONT=_font_8x8_zx_system -subtype=dsk

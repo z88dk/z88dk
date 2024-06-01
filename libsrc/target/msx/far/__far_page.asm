@@ -2,7 +2,7 @@ SECTION code_l_sccz80_far
 PUBLIC  __far_page
 
 EXTERN  PUT_P2
-EXTERN  __msx_bank_mappings
+EXTERN  __far_map_bank
 
 ; Entry: ebc = logical address
 ;         a' = local memory page
@@ -27,18 +27,7 @@ __far_page:
     or      @10000000	;Map to 0x8000 page
     ld      h,a
     ld      l,c
-    ; hl = offset within bank
-    push    hl
-    push    de
-    ld      hl,__msx_bank_mappings + 1
-    ld      e,d
-    ld      d,0
-    add     hl,de
-    ld      a,(hl)
-    call    PUT_P2
-    pop     de
-    pop     hl
-    ret
+    jp      __far_map_bank
 
 localfar:
     ex     af,af

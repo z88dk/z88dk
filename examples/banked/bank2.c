@@ -15,9 +15,8 @@
 #pragma bank 2
 #endif
 
-#pragma dataseg DATA_2
 
-int b4_val = 4;
+const int banked_val = 4;
 
 int func_bank2() {
     // printf is in common code

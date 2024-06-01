@@ -7,7 +7,7 @@
 #include "banking.h"
 
 
-extern __far int b4_val;
+extern __banked int banked_val;
 
 int main() {
     int val;
@@ -19,7 +19,7 @@ int main() {
     val = func_bank1();
     printf("Returned value from bank calls is %d\n",val);
 #ifdef __HAVE_BANKED_FAR_MAPPING
-    printf("Bank 4 value is %d\n",b4_val);
+    printf("Bank 4 value is %d\n",banked_val);
 #endif
     while(1) {}
 }
