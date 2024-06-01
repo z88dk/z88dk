@@ -380,6 +380,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if ( !operator_is_comparison(oper)) {
             errorfmt("Invalid pointer arithmetic",1);
         } else {
+            if ( (!lval->ptr_type && !lval1_wasconst) || (!lval2->ptr_type && !lval2->is_const) ) {
+                warningfmt("incompatible-pointer-types", "Comparison of pointer with non-pointer value");
+            }
             lval->binop = oper;
             (*oper)(lval);
         }
