@@ -110,7 +110,10 @@ string Token::to_string() const {
     case TType::String:
         return string_bytes(m_svalue);
     default:
-        return tokens[static_cast<int>(m_type)];
+        if (g_options.get_swap_ixiy() != IXIY_NO_SWAP)
+            return str_swap_x_y(tokens[static_cast<int>(m_type)]);
+        else
+            return tokens[static_cast<int>(m_type)];
     }
 }
 
