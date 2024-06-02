@@ -218,7 +218,7 @@ void test_file_is_object_file() {
     NOK(file_is_object_file("test~.o"));
 
     test_spew("test~.o", OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
-    OK(0 == system("perl -e 'sleep(2)'"));
+    OK(0 == system("perl -e 'sleep(1)'"));
     OK(file_is_object_file("test~.o"));
 
     remove("test~.o");
@@ -242,7 +242,7 @@ void test_file_is_library_file() {
     NOK(file_is_library_file("test~.lib"));
 
     test_spew("test~.lib", LIB_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
-    OK(0 == system("perl -e 'sleep(2)'"));
+    OK(0 == system("perl -e 'sleep(1)'"));
     OK(file_is_library_file("test~.lib"));
 
     remove("test~.lib");
