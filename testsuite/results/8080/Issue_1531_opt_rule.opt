@@ -39,9 +39,7 @@
 	call	l_sub
 	ld	a,h
 	or	l
-	jp	nz,ASMPC+4
-	scf
-	jp	nc,i_5	;
+	jp	nz,i_5	;
 	ld	hl,i_1+0
 	push	hl
 	call	_func
