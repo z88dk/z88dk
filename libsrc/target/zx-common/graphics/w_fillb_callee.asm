@@ -1,18 +1,18 @@
 
-; Faster "Clear area" in TS2068 MODE6
+; Faster "Filled box" in TS2068 MODE6
 ; 2024 rework by Stefano Bodrato
 ;
-; Usage: clga(int tlx, int tly, int tlx2, int tly2)
+; Usage: fillb(int tlx, int tly, int tlx2, int tly2)
 
     SECTION code_graphics
 
-    PUBLIC  clga_callee
-    PUBLIC  _clga_callee
+    PUBLIC  fillb_callee
+    PUBLIC  _fillb_callee
 
-    PUBLIC  asm_clga
+    PUBLIC  asm_fillb
 
     EXTERN  __zx_screenmode
-    EXTERN  w_respixel
+    EXTERN  w_plotpixel
     EXTERN  w_area
 
 IF    FORts2068|FORzxn
@@ -27,19 +27,19 @@ ENDIF
     INCLUDE "graphics/grafix.inc"
 
 
-clga_callee:
-_clga_callee:
+fillb_callee:
+_fillb_callee:
 
     pop     af  ; ret addr
     pop     de  ; tly2
     pop     hl  ; tlx2
-    exx                                 ; w_respixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
     pop     de  ; tly1
     pop     hl  ; tlx1
     push    af                          ; ret addr
     exx
 
-asm_clga:
+asm_fillb:
 
 IF    FORts2068|FORzxn
     ld      a, (__zx_screenmode)
@@ -53,7 +53,7 @@ ENDIF
   IF    NEED_swapgfxbk=1
     call    swapgfxbk
   ENDIF
-    ld      ix, w_respixel
+    ld      ix, w_plotpixel
     call    w_area
 
   IF    NEED_swapgfxbk
@@ -113,7 +113,9 @@ outer_loop:
     jr      z, fill1
 inner_loop0:
     ld      a, (de)
+    cpl
     and     h
+    cpl
     ld      (de), a
     dec     bc
     rrc     h
@@ -136,7 +138,7 @@ fill1:
     jr      z, last
 
 inner_loop1:
-    xor     a
+    ld      a,255
     ld      (de), a
     call    inc_x_MODE6
     jr      c, wypad
@@ -150,7 +152,9 @@ last:
     ld      b, a
 inner_loop2:
     ld      a, (de)
+    cpl
     and     h
+    cpl
     ld      (de), a
     rrc     h
     jr      nc, wypad
