@@ -2131,10 +2131,43 @@
 	ld	a,(hl)
 	sub	%eval(%1 256 %%)
 
+%title simplify comparison with zero for z80
+	ld	a,h
+	or	l
+	jr	nz,ASMPC+3
+	scf
+	jp	nc,%1	;%5
+=
+	ld	a,h
+	or	l
+	jp	nz,%1	;%5
+
+%title simplify comparison with zero for 8080
+	ld	a,h
+	or	l
+	jp	nz,ASMPC+4
+	scf
+	jp	nc,%1	;%5
+=
+	ld	a,h
+	or	l
+	jp	nz,%1	;%5
+
 	xor	a
 	sub	(hl)
 	and	a
 	jr	nz,ASMPC+3
+	scf
+	jp	nc,%1	;%5
+=
+	ld	a,(hl)
+	and	a
+	jp	nz,%1	;%5
+
+	xor	a
+	sub	(hl)
+	and	a
+	jp	nz,ASMPC+4
 	scf
 	jp	nc,%1	;%5
 =
