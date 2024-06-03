@@ -1,5 +1,5 @@
 
-; "Clear area" on the TS2068
+; Faster "Clear area" in TS2068 MODE6
 ; 2024 rework by Stefano Bodrato
 ;
 ; Usage: clga(int tlx, int tly, int tlx2, int tly2)
@@ -11,15 +11,19 @@
 
     PUBLIC  asm_clga
 
-IF    FORzxn
     EXTERN  __zx_screenmode
     EXTERN  w_respixel
     EXTERN  w_area
+
+IF    FORts2068|FORzxn
+    EXTERN  inc_x_MODE6
+    EXTERN  inc_y_MODE6
+    EXTERN  pixeladdress_MODE6
+    EXTERN  __gfx_fatpix
 ENDIF
 
     EXTERN  swapgfxbk
     EXTERN  __graphics_end
-    EXTERN  w_pixeladdress
     INCLUDE "graphics/grafix.inc"
 
 
@@ -29,7 +33,7 @@ _clga_callee:
     pop     af  ; ret addr
     pop     de  ; tly2
     pop     hl  ; tlx2
-    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_respixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
     pop     de  ; tly1
     pop     hl  ; tlx1
     push    af                          ; ret addr
@@ -37,11 +41,13 @@ _clga_callee:
 
 asm_clga:
 
-IF    FORzxn
-
+IF    FORts2068|FORzxn
     ld      a, (__zx_screenmode)
+    and     7
     cp      6
     jp      z,w_area_ts2068
+ENDIF
+
 
     push    ix
   IF    NEED_swapgfxbk=1
@@ -59,23 +65,26 @@ IF    FORzxn
     ret
   ENDIF
 
+IF    FORts2068|FORzxn
 w_area_ts2068:
-ELSE
-
-
 ;;   TS2068 High Resolution mode
     push    ix
   IF    NEED_swapgfxbk=1
     call    swapgfxbk
   ENDIF
 
-    push    hl           ; width
+    ld      a, (__gfx_fatpix)
+    and     a
     ld      a,e          ; height
+    jr      z, not_fatpix
+    add     hl, hl
+not_fatpix:
+    push    hl           ; width
     exx  ; hl=x
          ; de=y
     pop     bc           ; width
     ld      ixl, a       ; height (ix forgotten)
-	
+
     ld      a, 1
     cp      h
     jp      c, __graphics_end
@@ -84,7 +93,7 @@ ELSE
     jp      c, __graphics_end
 
     push    bc
-    call    w_pixeladdress
+    call    pixeladdress_MODE6
     ld      b, a
     ld      a, 1
     jr      z, next
@@ -113,7 +122,7 @@ inner_loop0:
     or      c
     jr      nz, inner_loop0
 fill:
-    call    INC_X
+    call    inc_x_MODE6
     jr      c, wypad
 fill1:
     push    bc
@@ -129,7 +138,7 @@ fill1:
 inner_loop1:
     xor     a
     ld      (de), a
-    call    INC_X
+    call    inc_x_MODE6
     jr      c, wypad
     djnz    inner_loop1
 
@@ -152,48 +161,8 @@ wypad:
     pop     bc                          ; 1
     dec     ixl
     jp      z, __graphics_end
-    call    incy
+    call    inc_y_MODE6
     jp      c, __graphics_end
     jr      outer_loop
 
-
-; (hl) mask
-; de - screen address
-INC_X:
-    bit     5, d
-    jr      nz, first
-    set     5, d
-    or      a
-    ret
-first:
-    res     5, d
-    inc     e
-    ld      a, e
-    and     $1f
-    ret     nz
-    scf
-    ret
-
-incy:
-    inc     d
-    ld      a, d
-    and     $07
-    ret     nz
-
-    ld      a, d
-    sub     $08
-    ld      d, a
-    ld      a, e
-    add     a, $20
-    ld      e, a
-    ret     nc
-
-    ld      a, d
-    add     a, $08
-    ld      d, a
-
-    and     95
-    cp      $58
-    ccf
-    ret
 ENDIF
