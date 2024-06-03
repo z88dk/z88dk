@@ -182,8 +182,11 @@ pattern1:
 ; Colour the pixel we were just on and step to the next column
 nextcol:
     ld      a, (__zx_screenmode)
+	and     7
+  IF    FORts2068|zxn
     cp      6
-    jr      z, nextcol_hires            ;No colour in hires
+    jp      z, nextcol_hires            ;No colour in hires
+  ENDIF
     cp      2                           ;High colour
     jr      nz, standard_modes
     set     5, h
@@ -219,6 +222,7 @@ standard_modes:
     inc     hl
     ret
 
+  IF    FORts2068|zxn
 nextcol_hires:
     ld      a, h
     xor     @00100000
@@ -227,3 +231,4 @@ nextcol_hires:
     ret     nc
     inc     hl
     ret
+  ENDIF
