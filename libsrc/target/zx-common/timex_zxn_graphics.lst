@@ -1,4 +1,5 @@
 target/zx-common/graphics/obj/${TARGET}/__set_zx_pixel_colour
+target/zx-common/graphics/obj/${TARGET}/hl_inc_x_MODE6
 target/zx-common/graphics/obj/${TARGET}/inc_x_MODE6
 target/zx-common/graphics/obj/${TARGET}/inc_y_MODE6
 target/zx-common/graphics/obj/${TARGET}/res_MODE0
@@ -26,6 +27,7 @@ target/zx-common/graphics/obj/${TARGET}/w_pointxy
 target/zx-common/graphics/obj/${TARGET}/asm_zxn_tilemap_palette
 target/zx-common/graphics/obj/${TARGET}/textpixl
 target/zx-common/graphics/obj/${TARGET}/getmaxy
+target/zx-common/graphics/obj/${TARGET}/w_putsprite
 target/zx-common/graphics/obj/${TARGET}/w_stencil_render
 target/zx-common/graphics/obj/${TARGET}/w_clga_callee
 target/zx-common/graphics/obj/${TARGET}/w_xorclga_callee

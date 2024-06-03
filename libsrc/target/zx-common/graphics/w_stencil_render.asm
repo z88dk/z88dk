@@ -27,7 +27,10 @@
     ; but it is assembled as part of zx-common
     EXTERN  SCREEN_BASE
   ENDIF
-
+  IF    FORts2068|zxn
+    EXTERN  hl_inc_x_MODE6
+  ENDIF
+  
 ;
 ;    $Id: w_stencil_render.asm,v 1.6 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
@@ -182,8 +185,11 @@ pattern1:
 ; Colour the pixel we were just on and step to the next column
 nextcol:
     ld      a, (__zx_screenmode)
+	and     7
+  IF    FORts2068|zxn
     cp      6
-    jr      z, nextcol_hires            ;No colour in hires
+    jp      z, hl_inc_x_MODE6            ;No colour in hires
+  ENDIF
     cp      2                           ;High colour
     jr      nz, standard_modes
     set     5, h
@@ -216,14 +222,5 @@ standard_modes:
     ld      (hl), a
     ; And increment the column
     pop     hl
-    inc     hl
-    ret
-
-nextcol_hires:
-    ld      a, h
-    xor     @00100000
-    cp      h
-    ld      h, a
-    ret     nc
     inc     hl
     ret
