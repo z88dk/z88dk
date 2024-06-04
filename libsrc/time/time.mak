@@ -10,7 +10,7 @@ TIME_NEWLIB_TARGETS := time/obj/newlib-z80-time \
 		time/obj/newlib-r2ka-time \
 		time/obj/newlib-ixiy-time \
 		time/obj/newlib-8080-time \
-		time/obj/newlib-8080-time \
+		time/obj/newlib-8085-time \
 		time/obj/newlib-gbz80-time \
 		time/obj/newlib-ez80_z80-time \
 		time/obj/newlib-z180-time \
