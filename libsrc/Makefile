@@ -1815,7 +1815,7 @@ test8080_clib.lib: $(TARGET_CLIB_OBJS) testrcm4k_clib.lib
 	$(call buildgeneric,test)
 	TARGET=test TYPE=8080 $(LIBLINKER2) -m8080 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test8080_clib @$(TARGET_DIRECTORY)/test/test8080.lst
 
-test8085_clib.lib: $(TARGET_CLIB_OBJS) test8085_clib.lib
+test8085_clib.lib: $(TARGET_CLIB_OBJS) test8080_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (8085) ---'
 	@echo ''
