@@ -292,5 +292,5 @@ void StringTable::read(ifstream& is, streampos start_fpos) {
     }
 
     // seek to start pos
-    is.seekg(start_fpos);
+    is.seekg(cur_fpos);
 }

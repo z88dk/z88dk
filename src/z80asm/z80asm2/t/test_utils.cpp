@@ -217,6 +217,8 @@ void test_string_table() {
     ofstream os("test~.bin", ios::binary);
     OK(os.is_open());
     IS(st.write(os), 0);
+    swrite_int32(12345, os);
+    swrite_int32(67890, os);
     os.close();
 
     // read it back
@@ -226,7 +228,7 @@ void test_string_table() {
     IS(sread_int32(is), 8);     // size of strings, aligned
     IS(sread_int32(is), 0);     // index of ""
     IS(sread_int32(is), 1);     // index of "hello"
-    char buffer[16];
+    char buffer[8];
     is.read(buffer, sizeof(buffer));
     IS(is.gcount(), 8);
     IS(buffer[0], 0);           // "" terminator
@@ -237,15 +239,15 @@ void test_string_table() {
     IS(buffer[5], 'o');
     IS(buffer[6], 0);           // "hello" terminator
     IS(buffer[7], 0);           // filler
-    OK(is.eof());
 
-    // read st from file
+    // read st from file, keep input position
     st.clear();
     IS(st.count(), 1);
     IS(st.lookup(0), "");
 
-    st.read(is, 0);             // read from pos 0
-    NOK(is.eof());
+    IS(sread_int32(is), 12345);
+    st.read(is, 0);             // read from pos 0, keep input position
+    IS(sread_int32(is), 67890);
     is.close();
 
     IS(st.count(), 2);
