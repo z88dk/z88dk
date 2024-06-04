@@ -16,6 +16,7 @@ STRINGS_NEWLIB_TARGETS := strings/obj/newlib-z80-strings \
 		strings/obj/newlib-r2ka-strings \
 		strings/obj/newlib-ixiy-strings \
 		strings/obj/newlib-8080-strings \
+		strings/obj/newlib-8085-strings \
 		strings/obj/newlib-gbz80-strings \
 		strings/obj/newlib-ez80_z80-strings \
 		strings/obj/newlib-z180-strings \
@@ -30,6 +31,7 @@ STRINGS_OBJS := $(addprefix strings/obj/z80/, $(STRINGS_OBJECTS)) \
 	$(addprefix strings/obj/ixiy/,$(STRINGS_OBJECTS)) \
 	$(addprefix strings/obj/z80n/,$(STRINGS_OBJECTS)) \
 	$(addprefix strings/obj/8080/,$(STRINGS_8080_OBJECTS)) \
+	$(addprefix strings/obj/8085/,$(STRINGS_8080_OBJECTS)) \
 	$(addprefix strings/obj/gbz80/,$(STRINGS_GBZ80_OBJECTS)) \
 	$(addprefix strings/obj/z180/,$(STRINGS_OBJECTS)) \
 	$(addprefix strings/obj/ez80_z80/,$(STRINGS_OBJECTS))  \
@@ -45,6 +47,7 @@ strings: $(STRINGS_OBJS) $(STRINGS_NEWLIB_TARGETS)
 $(eval $(call buildbit,strings,z80,test))
 $(eval $(call buildbit,strings,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,strings,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,strings,8085,test,-clib=8085,-m8085))
 $(eval $(call buildbit,strings,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,strings,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,strings,r4k,test,-clib=rabbit4k,-mr4k))
@@ -59,6 +62,7 @@ $(eval $(call buildnew,strings,r4k,-mr4k,$(STRINGS_NEWLIBGLOBS),$(CTYPE_NEWLIBGL
 $(eval $(call buildnew,strings,z80n,-mz80n,$(STRINGS_NEWLIBGLOBS),$(CTYPE_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,strings,ixiy,-mz80 -IXIY,$(STRINGS_NEWLIBGLOBS),$(CTYPE_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,strings,8080,-m8080,$(STRINGS_NEWLIBGLOBS),$(CTYPE_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,strings,8085,-m8085,$(STRINGS_NEWLIBGLOBS),$(CTYPE_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,strings,gbz80,-mgbz80,$(STRINGS_NEWLIBGLOBS),$(CTYPE_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,strings,z180,-mz180,$(STRINGS_NEWLIBGLOBS),$(CTYPE_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,strings,ez80_z80,-mez80_z80,$(STRINGS_NEWLIBGLOBS),$(CTYPE_NEWLIBGLOBS_ex)))

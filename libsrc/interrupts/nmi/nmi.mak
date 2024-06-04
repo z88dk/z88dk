@@ -9,6 +9,7 @@ INT_NMI_OBJS := $(addprefix interrupts/nmi/obj/z80/, $(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/ixiy/,$(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/z80n/,$(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/8080/,$(INT_NMI_OBJECTS)) \
+	$(addprefix interrupts/nmi/obj/8085/,$(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/gbz80/,$(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/z180/,$(INT_NMI_OBJECTS)) \
 	$(addprefix interrupts/nmi/obj/ez80_z80/,$(INT_NMI_OBJECTS)) \
@@ -26,6 +27,7 @@ $(eval $(call buildbit,interrupts/nmi,z80,test))
 $(eval $(call buildbit,interrupts/nmi,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,interrupts/nmi,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,interrupts/nmi,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,interrupts/nmi,8085,test,-clib=8085,-m8085))
 $(eval $(call buildbit,interrupts/nmi,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,interrupts/nmi,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,interrupts/nmi,ez80_z80,test,-clib=ez80_z80,-mez80_z80))

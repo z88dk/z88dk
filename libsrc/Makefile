@@ -17,8 +17,8 @@ TOCREATE =
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
 CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxh19.lib gfxvio.lib
-GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib preempt.lib sp1-all
-GENLIBS += 8080_opt.lib 8085_opt.lib  
+GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib 8085_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib preempt.lib sp1-all
+GENLIBS += 8080_opt.lib 8085_opt.lib
 GENLIBS += gfxtek.lib gfxregis.lib
 
 
@@ -2208,7 +2208,14 @@ z80iy_crt0.lib: $(DIRS) $(OBJS) z180_crt0.lib
 	$(MAKE) -C z80_crt0s
 	TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8080_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
-8085_opt.lib: $(DIRS) $(OBJS) 8080_opt.lib
+8085_crt0.lib: $(DIRS) $(OBJS) 8080_opt.lib
+	@echo ''
+	@echo '--- Building 8085 crt Library ---'
+	@echo ''
+	$(call buildcrt)
+	TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8085_crt0 @$(LISTFILE_DIRECTORY)/8085.lst
+
+8085_opt.lib: $(DIRS) $(OBJS) 8085_crt0.lib
 	@echo ''
 	@echo '--- Building 8085 optimised crt routines---'
 	@echo ''
