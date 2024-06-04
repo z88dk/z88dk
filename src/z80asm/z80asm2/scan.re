@@ -199,7 +199,7 @@ bool Lexer::set_text(const string& text) {
     clear();
     string str;
     int quote = 0;
-    bool raw_strings = g_options().raw_strings();
+    bool raw_strings = g_options.raw_strings();
     bool got_error = false;
     bool blank_before = false;
     const char* p = text.c_str();
@@ -217,7 +217,7 @@ main_loop:
                                      blank_before = false; } while (0)
         /*!re2c
             end             { p--; goto end; }
-            *               { g_errors().error(ErrInvalidChar, p0); got_error = true; goto end; }
+            *               { g_errors.error(ErrInvalidChar, p0); got_error = true; goto end; }
             ws+             { blank_before = true; continue; }
             ';'             { goto end; }
             '#'             { PUSH_TOKEN1(TK_HASH); continue; }
@@ -281,7 +281,7 @@ main_loop:
             ident "'"?      { str = string(p0, p);
 
                               // to upper
-                              if (g_options().upper_case()) str = str_toupper(str);
+                              if (g_options.upper_case()) str = str_toupper(str);
 
                               // handle af' et all
                               Keyword keyword = keyword_lookup(str);
@@ -292,7 +292,7 @@ main_loop:
                               }
 
                               // check for -IXIY
-                              if (g_options().swap_ixiy() != IXIY_NO_SWAP) {
+                              if (g_options.swap_ixiy() != IXIY_NO_SWAP) {
                                   switch (keyword) {
                                   case KW_IX: case KW_IXH: case KW_IXL:
                                   case KW_IY: case KW_IYH: case KW_IYL:
@@ -336,7 +336,7 @@ string_loop:
                                  else { str.push_back( (c) & 0xff ); } } while (0)
 
         /*!re2c
-            end             { p--; g_errors().error(ErrMissingQuote, pstr); got_error = true; goto end; }
+            end             { p--; g_errors.error(ErrMissingQuote, pstr); got_error = true; goto end; }
             *               { str.push_back(*p0); continue; }
             '"'             { if (quote == 2) {
                                   PUSH_TOKEN2(TK_STRING, str);
@@ -349,7 +349,7 @@ string_loop:
                             }
             "'"             { if (quote == 1) {
                                   if (str.length() != 1) {
-                                      g_errors().error(ErrInvalidCharConst, pstr); got_error = true; goto end;
+                                      g_errors.error(ErrInvalidCharConst, pstr); got_error = true; goto end;
                                   }
                                   else {
                                       PUSH_TOKEN2(TK_INTEGER, str[0]);

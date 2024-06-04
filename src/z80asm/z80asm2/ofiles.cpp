@@ -15,14 +15,14 @@ OFileWriter::OFileWriter(const string& o_filename)
 }
 
 bool OFileWriter::write() {
-    if (g_options().verbose())
+    if (g_options.verbose())
         cout << "Writing object file '" << o_filename_ << "'" << endl;
 
     // create temp file
     string temp_filename = o_filename_ + "~";
     ofstream os{ temp_filename, ios::binary };
     if (!os.is_open()) {
-        g_errors().error(ErrFileCreate, temp_filename);
+        g_errors.error(ErrFileCreate, temp_filename);
         perror(temp_filename.c_str());
         return false;
     }
@@ -35,7 +35,7 @@ bool OFileWriter::write() {
     std::remove(o_filename_.c_str());
     int rv = std::rename(temp_filename.c_str(), o_filename_.c_str());
     if (rv != 0) {
-        g_errors().error(ErrFileRename, temp_filename);
+        g_errors.error(ErrFileRename, temp_filename);
         perror(temp_filename.c_str());
         return false;
     }
@@ -50,8 +50,8 @@ streampos OFileWriter::write(ofstream& os) {
     os.write(OBJ_FILE_HEADER, sizeof(OBJ_FILE_HEADER) - 1);
 
     // write CPU
-    swrite_int32(g_options().cpu(), os);
-    swrite_int32(g_options().swap_ixiy(), os);
+    swrite_int32(g_options.cpu(), os);
+    swrite_int32(g_options.swap_ixiy(), os);
 
     // write placeholders for 6 pointers
     streampos header_fpos = os.tellp();

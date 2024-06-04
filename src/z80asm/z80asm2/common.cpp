@@ -6,4 +6,6 @@
 
 #include "common.h"
 
+Options g_options;
+Errors g_errors;
 Assembler g_asm;

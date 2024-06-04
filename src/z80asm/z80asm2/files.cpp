@@ -77,7 +77,7 @@ string file_replace_extension(const string& filename_, const string& extension) 
 
 string file_prepend_output_dir(const string& filename_) {
     string filename = file_norm_path(filename_);
-    string output_dir = file_norm_path(g_options().output_dir());
+    string output_dir = file_norm_path(g_options.output_dir());
     if (output_dir.empty())
         return filename;
     else {
@@ -312,7 +312,7 @@ string file_bin_filename(const string& filename_, const string& section) {
     string filename = file_norm_path(filename_);
     fs::path file_path, file_ext;
 
-    string bin_filename = g_options().bin_filename();
+    string bin_filename = g_options.bin_filename();
     if (bin_filename.empty()) {
         file_path = filename;
         file_ext = EXT_BIN;
@@ -401,7 +401,7 @@ OpenFile::OpenFile() {
 
 OpenFile::~OpenFile() {
     for (int i = 0; i < count_open_; i++)
-        g_options().include_path().pop_back();
+        g_options.include_path().pop_back();
 }
 
 const string& OpenFile::filename() const {
@@ -418,7 +418,7 @@ bool OpenFile::open(const string& filename) {
     location_ = Location(filename);
     ifs_.open(filename, ios::binary);
     if (!ifs_.is_open()) {
-        g_errors().error(ErrFileOpen, filename);
+        g_errors.error(ErrFileOpen, filename);
         perror(filename.c_str());
         return false;
     }
@@ -426,10 +426,10 @@ bool OpenFile::open(const string& filename) {
         string parent_dir = fs::path(filename).parent_path().generic_string();
         if (!parent_dir.empty()) {
             count_open_++;
-            g_options().include_path().push_back(parent_dir);
+            g_options.include_path().push_back(parent_dir);
         }
-        g_errors().clear_location();
-        g_errors().set_location(location_);
+        g_errors.clear_location();
+        g_errors.set_location(location_);
         return true;
     }
 }
@@ -444,8 +444,8 @@ bool OpenFile::getline(string& line) {
     bool ok = ifs_.is_open() && !safe_getline(ifs_, line).eof();
     if (ok) {
         location_.inc_line_num();
-        g_errors().set_location(location_);
-        g_errors().set_source_line(line);
+        g_errors.set_location(location_);
+        g_errors.set_source_line(line);
         return true;
     }
     else
@@ -486,11 +486,11 @@ bool FileReader::open(const string& filename_) {
     string filename = fs::path(filename_).generic_string();
 
     // search file in path
-    string found_filename = file_search_path(filename, g_options().include_path());
+    string found_filename = file_search_path(filename, g_options.include_path());
 
     // check for recursive includes
     if (recursive_include(found_filename)) {
-        g_errors().error(ErrIncludeRecursion, filename);
+        g_errors.error(ErrIncludeRecursion, filename);
         return false;
     }
 
@@ -508,9 +508,9 @@ bool FileReader::getline(string& line) {
             return true;
         else {
             open_files_.pop_back();
-            g_errors().clear_location();
+            g_errors.clear_location();
             if (!open_files_.empty())
-                g_errors().set_location(open_files_.back().location());
+                g_errors.set_location(open_files_.back().location());
         }
     }
 }
@@ -541,7 +541,7 @@ bool SourceReader::getline1(string& line) {
             ok = FileReader::getline1(cont_line);
             line += cont_line;
         }
-        g_errors().set_source_line(line);
+        g_errors.set_source_line(line);
         return true;
     }
 }

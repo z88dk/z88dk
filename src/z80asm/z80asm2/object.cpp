@@ -88,16 +88,16 @@ void Instr::do_patch(Patch* patch) {
             if (jump_value >= -128 && jump_value <= 127)
                 bytes_[offset] = jump_value & 0xff;
             else
-                g_errors().error(ErrIntRange, jump_value);
+                g_errors.error(ErrIntRange, jump_value);
             break;
         case RANGE_BYTE_UNSIGNED:
             if (value < -128 || value > 255)
-                g_errors().warning(ErrIntRange, value);
+                g_errors.warning(ErrIntRange, value);
             bytes_[offset] = value & 0xff;
             break;
         case RANGE_BYTE_SIGNED:
             if (value < -128 || value > 127)
-                g_errors().warning(ErrIntRange, value);
+                g_errors.warning(ErrIntRange, value);
             bytes_[offset] = value & 0xff;
             break;
         case RANGE_WORD:
@@ -116,13 +116,13 @@ void Instr::do_patch(Patch* patch) {
             break;
         case RANGE_BYTE_TO_WORD_UNSIGNED:
             if (value < 0 || value > 255)
-                g_errors().warning(ErrIntRange, value);
+                g_errors.warning(ErrIntRange, value);
             bytes_[offset + 0] = value & 0xff;
             bytes_[offset + 1] = 0;
             break;
         case RANGE_BYTE_TO_WORD_SIGNED:
             if (value < -128 || value > 127)
-                g_errors().warning(ErrIntRange, value);
+                g_errors.warning(ErrIntRange, value);
             bytes_[offset + 0] = value & 0xff;
             bytes_[offset + 1] = (value & 0x80) ? 0xff : 0;
             break;
@@ -134,7 +134,7 @@ void Instr::do_patch(Patch* patch) {
         case RANGE_HIGH_OFFSET:
             if ((value & 0xff00) != 0) {
                 if ((value & 0xff00) != 0xff00)
-                    g_errors().warning(ErrIntRange, value);
+                    g_errors.warning(ErrIntRange, value);
             }
             bytes_[offset] = value & 0xff;
             break;
@@ -259,7 +259,7 @@ void Section::compute_addresses() {
 
 void Section::patch_local_exprs() {
     for (auto& instr : instrs_) {
-        g_errors().push_location(instr->location());
+        g_errors.push_location(instr->location());
 
         for (auto it = instr->patches().begin(); it != instr->patches().end(); ++it) {
             Patch* patch = *it;
@@ -278,7 +278,7 @@ void Section::patch_local_exprs() {
             }
         }
 
-        g_errors().pop_location();
+        g_errors.pop_location();
     }
 }
 

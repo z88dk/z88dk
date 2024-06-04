@@ -107,7 +107,7 @@ void test_lexer_ident() {
 }
 
 void test_lexer_uppercase() {
-    g_options().set_upper_case(true);
+    g_options.set_upper_case(true);
 
     Lexer l;
     OK(l.set_text("af af'start _abc$123"));
@@ -135,12 +135,12 @@ void test_lexer_uppercase() {
     IS(l.peek(0).code(), TK_END);
     OK(l.at_end());
 
-    g_options().set_upper_case(false);
+    g_options.set_upper_case(false);
 }
 
 void test_lexer_swap_ixiy() {
     Lexer l;
-    g_options().set_swap_ixiy(IXIY_NO_SWAP);
+    g_options.set_swap_ixiy(IXIY_NO_SWAP);
     OK(l.set_text("hl ix iy h ixh iyh l ixl iyl"));
 
     IS(l.peek(0).code(), TK_IDENT);
@@ -182,7 +182,7 @@ void test_lexer_swap_ixiy() {
     IS(l.peek(9).code(), TK_END);
 
 
-    g_options().set_swap_ixiy(IXIY_SWAP);
+    g_options.set_swap_ixiy(IXIY_SWAP);
     OK(l.set_text("hl ix iy h ixh iyh l ixl iyl"));
 
     IS(l.peek(0).code(), TK_IDENT);
@@ -223,7 +223,7 @@ void test_lexer_swap_ixiy() {
 
     IS(l.peek(9).code(), TK_END);
 
-    g_options().set_swap_ixiy(IXIY_SOFT_SWAP);
+    g_options.set_swap_ixiy(IXIY_SOFT_SWAP);
     OK(l.set_text("hl ix iy h ixh iyh l ixl iyl"));
 
     IS(l.peek(0).code(), TK_IDENT);
@@ -264,7 +264,7 @@ void test_lexer_swap_ixiy() {
 
     IS(l.peek(9).code(), TK_END);
 
-    g_options().set_swap_ixiy(IXIY_NO_SWAP);
+    g_options.set_swap_ixiy(IXIY_NO_SWAP);
 }
 
 void test_lexer_integer() {
@@ -374,7 +374,7 @@ void test_lexer_floating() {
 void test_lexer_string() {
     Lexer l;
 
-    g_options().set_raw_strings(false);
+    g_options.set_raw_strings(false);
     OK(l.set_text("\"\\1\\x02\\a\\b\\e\\f\\n\\r\\t\\v\\\\hello\""));
 
     IS(l.peek(0).code(), TK_STRING);
@@ -382,7 +382,7 @@ void test_lexer_string() {
 
     IS(l.peek(1).code(), TK_END);
 
-    g_options().set_raw_strings(true);
+    g_options.set_raw_strings(true);
     OK(l.set_text("\"\\1\\x02\\a\\b\\e\\f\\n\\r\\t\\v\\\\hello\""));
 
     IS(l.peek(0).code(), TK_STRING);
@@ -390,13 +390,13 @@ void test_lexer_string() {
 
     IS(l.peek(1).code(), TK_END);
 
-    g_options().set_raw_strings(false);
+    g_options.set_raw_strings(false);
 }
 
 void test_lexer_file_string() {
     Lexer l;
 
-    g_options().set_raw_strings(false);
+    g_options.set_raw_strings(false);
     OK(l.set_text("include \"dir\\tab\\newline\""));
 
     IS(l.peek(0).code(), TK_IDENT);
@@ -455,52 +455,52 @@ void test_lexer_file_string() {
 
 void test_lexer_invalid_char() {
     ostringstream oss;
-    g_errors().set_output(oss);
+    g_errors.set_output(oss);
     Lexer l;
     NOK(l.set_text("` hello world"));
     IS(oss.str(), "error: invalid character: ` hello world\n");
     OK(l.at_end());
-    g_errors().clear();
+    g_errors.clear();
 }
 
 void test_lexer_invalid_double_quoted_string() {
     ostringstream oss;
-    g_errors().set_output(oss);
+    g_errors.set_output(oss);
     Lexer l;
     NOK(l.set_text("\"hello world"));
     IS(oss.str(), "error: missing quote: \"hello world\n");
     OK(l.at_end());
-    g_errors().clear();
+    g_errors.clear();
 }
 
 void test_lexer_invalid_single_quoted_string() {
     ostringstream oss;
-    g_errors().set_output(oss);
+    g_errors.set_output(oss);
     Lexer l;
     NOK(l.set_text("'hello world"));
     IS(oss.str(), "error: missing quote: 'hello world\n");
     OK(l.at_end());
-    g_errors().clear();
+    g_errors.clear();
 }
 
 void test_lexer_invalid_character_constant1() {
     ostringstream oss;
-    g_errors().set_output(oss);
+    g_errors.set_output(oss);
     Lexer l;
     NOK(l.set_text("''"));
     IS(oss.str(), "error: invalid character constant: ''\n");
     OK(l.at_end());
-    g_errors().clear();
+    g_errors.clear();
 }
 
 void test_lexer_invalid_character_constant2() {
     ostringstream oss;
-    g_errors().set_output(oss);
+    g_errors.set_output(oss);
     Lexer l;
     NOK(l.set_text("'ab'"));
     IS(oss.str(), "error: invalid character constant: 'ab'\n");
     OK(l.at_end());
-    g_errors().clear();
+    g_errors.clear();
 }
 
 void test_character_constant() {

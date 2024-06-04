@@ -89,7 +89,7 @@ void Options::parse_args(const vector<string>& args) {
         cout << endl;
     }
 
-    if (g_errors().count())
+    if (g_errors.count())
         return;
 
     bool got_dash_dash = false;
@@ -104,7 +104,7 @@ void Options::parse_args(const vector<string>& args) {
         else
             parse_file(arg1);
 
-        if (g_errors().count())
+        if (g_errors.count())
             return;
     }
 
@@ -132,7 +132,7 @@ void Options::parse_option(const string& arg) {
 	}																	
 #include "options.def"
 
-    g_errors().error(ErrIllegalOption, arg);
+    g_errors.error(ErrIllegalOption, arg);
 }
 
 void Options::parse_file(const string& arg_) {
@@ -319,7 +319,7 @@ void Options::symbol_define(const string& name, int value) {
     auto it = defines_.find(name);
     if (it != defines_.end()) {     // already exists
         if (value != it->second)
-            g_errors().error(ErrDuplicateDefinition, name);
+            g_errors.error(ErrDuplicateDefinition, name);
     }
     else {                          // new symbol
         defines_[name] = value;
@@ -484,8 +484,8 @@ void Options::set_cpu(const string& name) {
         if (id != CPU_UNDEF)
             set_cpu(id);
         else {
-            g_errors().error(ErrIllegalCpuOption, name);
-            g_errors().error(ErrCpusList, cpu_list());
+            g_errors.error(ErrIllegalCpuOption, name);
+            g_errors.error(ErrCpusList, cpu_list());
         }
     }
 }
@@ -527,7 +527,7 @@ void Options::set_origin(int origin) {
 void Options::set_origin(const string& arg) {
     int value = 0;
     if (!parse_opt_int(value, arg) || value < 0)	// value can be >0xffff for banked address
-        g_errors().error(ErrInvalidOrgOption, arg);
+        g_errors.error(ErrInvalidOrgOption, arg);
     else
         set_origin(value);
 }
@@ -539,7 +539,7 @@ void Options::set_filler(int filler) {
 void Options::set_filler(const string& arg) {
     int value = 0;
     if (!parse_opt_int(value, arg) || value < 0 || value > 0xFF)
-        g_errors().error(ErrInvalidFillerOption, arg);
+        g_errors.error(ErrInvalidFillerOption, arg);
     else
         set_filler(value);
 }
@@ -571,8 +571,8 @@ void Options::set_float_format(float_format_t format) {
 
 void Options::set_float_format(const string& format) {
     if (!float_format_.set_text(format)) {
-        g_errors().error(ErrIllegalFloatOption, format);
-        g_errors().error(ErrFloatFormatsList, FloatFormat::get_all_formats());
+        g_errors.error(ErrIllegalFloatOption, format);
+        g_errors.error(ErrFloatFormatsList, FloatFormat::get_all_formats());
     }
     else {
         got_float_format_option_ = true;
@@ -676,7 +676,7 @@ void Options::parse_define(const string& opt_arg) {
         ident = opt_arg.substr(0, equal_pos);
 
     if (!is_ident(ident))
-        g_errors().error(ErrIllegalIdent, ident);
+        g_errors.error(ErrIllegalIdent, ident);
     else {
         if (equal_pos == string::npos) {
             symbol_define(ident, 1);
@@ -686,7 +686,7 @@ void Options::parse_define(const string& opt_arg) {
             if (parse_opt_int(value, opt_arg.substr(equal_pos + 1)))
                 symbol_define(ident, value);
             else
-                g_errors().error(ErrInvalidDefineOption, opt_arg);
+                g_errors.error(ErrInvalidDefineOption, opt_arg);
         }
     }
 }
@@ -781,12 +781,12 @@ void Options::post_parsing_actions() {
 
     // check if -d and -m* were given
     if (date_stamp_ && lib_for_all_cpus_) {
-        g_errors().error(ErrDateAndMstarIncompatible);
+        g_errors.error(ErrDateAndMstarIncompatible);
     }
 
     // check if we have any file to process
     if (input_files_.empty()) {
-        g_errors().error(ErrNoSrcFile);
+        g_errors.error(ErrNoSrcFile);
     }
 
     // make output directory if needed
@@ -909,7 +909,7 @@ void Options::expand_source_glob(const string& pattern_) {
         }
 
         if (!found)
-            g_errors().error(ErrGlobNoFiles, pattern);
+            g_errors.error(ErrGlobNoFiles, pattern);
     }
 }
 
@@ -922,12 +922,12 @@ void Options::expand_list_glob(const string& pattern_) {
         if (file_is_regular_file(file))
             files.push_back(file);		// only one file
         else
-            g_errors().error(ErrFileNotFound, pattern);
+            g_errors.error(ErrFileNotFound, pattern);
     }
     else {
         file_expand_glob(files, pattern);			// list of files
         if (files.empty())
-            g_errors().error(ErrGlobNoFiles, pattern);
+            g_errors.error(ErrGlobNoFiles, pattern);
     }
 
     for (auto& file : files) {
@@ -972,7 +972,7 @@ bool Options::search_source(const string& filename, string& out_filename) {
         if (verbose_)
             cout << "% " << m4_cmd << endl;
         if (0 != system(m4_cmd.c_str())) {
-            g_errors().error(ErrCmdFailed, m4_cmd);
+            g_errors.error(ErrCmdFailed, m4_cmd);
             perror("m4");
             return false;
         }
@@ -1020,8 +1020,8 @@ bool Options::search_source(const string& filename, string& out_filename) {
             return true;
 
         // not found, avoid cascade of errors
-        if (!g_errors().count())
-            g_errors().error(ErrFileNotFound, filename);
+        if (!g_errors.count())
+            g_errors.error(ErrFileNotFound, filename);
 
         return false;
     }
@@ -1031,7 +1031,7 @@ bool Options::check_source(const string& filename, string& out_filename) {
     out_filename.clear();
 
     // avoid cascade of errors
-    if (g_errors().count()) {
+    if (g_errors.count()) {
         out_filename = file_norm_path(filename);
         return true;
     }
@@ -1065,7 +1065,7 @@ bool Options::check_source(const string& filename, string& out_filename) {
                 out_filename = obj_file;
                 if (!lib_for_all_cpus_)
                     if (!file_is_object_file(obj_file))
-                        g_errors().error(ErrNotObjFile, obj_file);
+                        g_errors.error(ErrNotObjFile, obj_file);
             }
             else
                 out_filename = src_file;
@@ -1076,7 +1076,7 @@ bool Options::check_source(const string& filename, string& out_filename) {
             out_filename = obj_file;
             if (!lib_for_all_cpus_)
                 if (!file_is_object_file(obj_file))
-                    g_errors().error(ErrNotObjFile, obj_file);
+                    g_errors.error(ErrNotObjFile, obj_file);
             return true;
         }
         else {
@@ -1093,7 +1093,7 @@ bool Options::check_source(const string& filename, string& out_filename) {
         out_filename = obj_file;
         if (!lib_for_all_cpus_)
             if (!file_is_object_file(obj_file))
-                g_errors().error(ErrNotObjFile, obj_file);
+                g_errors.error(ErrNotObjFile, obj_file);
         return true;
     }
     else {

@@ -135,7 +135,7 @@ bool Symtab::insert(Symbol* symbol) {
         if (str_begins_with(name, "__CDBINFO__"))
             return true;	// ignore duplicates of these
         else {
-            g_errors().error(ErrDuplicateDefinition, name);
+            g_errors.error(ErrDuplicateDefinition, name);
             return false;
         }
     }
@@ -174,9 +174,9 @@ void Symtab::check_undefined_symbols() {
     for (auto& symbol : symbols_) {
         if (symbol->type() == TYPE_UNDEFINED &&
             symbol->scope() != SCOPE_EXTERN) {
-            g_errors().push_location(symbol->location());
-            g_errors().error(ErrUndefinedSymbol, symbol->name());
-            g_errors().pop_location();
+            g_errors.push_location(symbol->location());
+            g_errors.error(ErrUndefinedSymbol, symbol->name());
+            g_errors.pop_location();
         }
     }
 }

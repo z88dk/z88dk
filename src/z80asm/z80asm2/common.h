@@ -18,12 +18,12 @@
 // library base name
 #define Z80ASM_LIB_BASE	Z80ASM_PROG
 
-// application class
+// global objects
+extern Options g_options;
+extern Errors g_errors;
 extern Assembler g_asm;
 
 // shortcuts
-inline Options& g_options() { return g_asm.options(); }
-inline Errors& g_errors() { return g_asm.errors(); }
 inline Module& g_module() { return g_asm.object().cur_module(); }
 inline Section& g_section() { return g_module().cur_section(); }
 inline Symtab& g_symtab() { return g_module().symtab(); }

@@ -72,8 +72,8 @@ void test_simplest_file() {
 void test_changed_cpu() {
     g_asm.clear();
     g_asm.add_object("test~.asm");
-    g_options().set_cpu(CPU_Z180);
-    g_options().set_swap_ixiy(IXIY_SWAP);
+    g_options.set_cpu(CPU_Z180);
+    g_options.set_swap_ixiy(IXIY_SWAP);
 
     OFileWriter ofile("test~.o");
     ofile.write();
@@ -123,6 +123,7 @@ void test_changed_cpu() {
 
     ifs.close();
 
+    g_options.clear();
     g_asm.delete_object();
     g_asm.clear();
     remove("test~.o");
@@ -261,7 +262,7 @@ void test_add_expression() {
     g_asm.add_object("test~.asm");
     g_section().set_origin(0x1000);
     g_section().set_align(4);
-    g_errors().set_location(Location("test~.asm", 11));
+    g_errors.set_location(Location("test~.asm", 11));
     Instr* instr = g_section().add_instr(0x3e);
     instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 1, new Expr("3*4")));
     g_section().add_instr(0xc9);
@@ -346,7 +347,7 @@ void test_add_defc_and_extern() {
     g_section().set_origin(0x1000);
     g_section().set_align(4);
     g_asm.declare_extern("XSIZE");
-    g_errors().set_location(Location("test~.asm", 11));
+    g_errors.set_location(Location("test~.asm", 11));
     Instr* instr = g_section().add_instr(0x3e);
     instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 1, new Expr("SIZE")));
     g_asm.add_equ("SIZE", new Expr("XSIZE"));
@@ -460,7 +461,7 @@ void test_add_label() {
     g_section().set_origin(0x1000);
     g_section().set_align(4);
     g_asm.declare_extern("XSIZE");
-    g_errors().set_location(Location("test~.asm", 11));
+    g_errors.set_location(Location("test~.asm", 11));
     g_asm.add_label("START");
     Instr* instr = g_section().add_instr(0x3e);
     instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 1, new Expr("SIZE")));

@@ -167739,7 +167739,7 @@ static int accept_stt[33851] = {
 };
 
 void Parser::parse_action(int action) {
-cpu_t cpu = g_options().cpu();
+cpu_t cpu = g_options.cpu();
 switch (action) {
 case 1:
 // KW_ACI expr TK_END | 

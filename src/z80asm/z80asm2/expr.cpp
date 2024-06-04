@@ -40,7 +40,7 @@ const string& ExprException::err_arg() const {
 }
 
 void ExprException::error() {
-    g_errors().error(err_code_, err_arg_);
+    g_errors.error(err_code_, err_arg_);
 }
 
 //-----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ const string& ExprResult::err_arg() const {
 
 void ExprResult::error() {
     if (!ok())
-        g_errors().error(err_code_, err_arg_);
+        g_errors.error(err_code_, err_arg_);
 }
 
 void ExprResult::set_type(sym_type_t type) {
@@ -206,7 +206,7 @@ Expr::Expr(const string& expr_text) {
     section_ = &g_section();
     Lexer lexer(expr_text);
     if (!parse_expr(&lexer))
-        g_errors().error(ErrSyntaxExpr, expr_text);
+        g_errors.error(ErrSyntaxExpr, expr_text);
 }
 
 Expr* Expr::clone() const {
@@ -508,7 +508,7 @@ bool Expr::parse_expr1(Lexer* lexer) {
 bool Expr::parse_expr() {
     text_.clear();
     rpn_tokens_.clear();
-    set_location(g_errors().location());
+    set_location(g_errors.location());
 
     bool ok = true;
     try {

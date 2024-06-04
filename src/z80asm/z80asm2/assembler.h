@@ -29,12 +29,6 @@ public:
     // assemble source file
     bool assemble(const string& filename);              // assemble one source file
 
-    // command line options
-    Options& options();
-
-    // errors
-    Errors& errors();
-
     // object file
     void add_object(const string& filename);
     Object& object();                                   // asserts object was added
@@ -62,8 +56,6 @@ public:
     Symbol* declare_global(const string& name);
 
 private:
-    Options options_;               // command line options
-    Errors errors_;                 // handle errors
     Object* object_;                // object file
     Symbol* asmpc_{ nullptr };      // asmpc of current statement
 

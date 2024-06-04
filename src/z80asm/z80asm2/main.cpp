@@ -19,21 +19,21 @@ int main(int argc, char* argv[]) {
 
     // parse command line
     vector<string> args{ argv + 1, argv + argc };
-    g_options().parse_args(args);
-    if (g_errors().count())
+    g_options.parse_args(args);
+    if (g_errors.count())
         return EXIT_FAILURE;
 
     // asssemble required files
-    if (!g_options().lib_for_all_cpus()) {
-        for (auto& file : g_options().input_files()) {
+    if (!g_options.lib_for_all_cpus()) {
+        for (auto& file : g_options.input_files()) {
             if (file_extension(file) != EXT_O)
                 g_asm.assemble(file);
         }
     }
-    if (g_errors().count())
+    if (g_errors.count())
         return EXIT_FAILURE;
 
     // call linker
 
-    exit(g_errors().exit_code());
+    exit(g_errors.exit_code());
 }

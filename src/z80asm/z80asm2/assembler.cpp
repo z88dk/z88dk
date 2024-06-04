@@ -22,17 +22,15 @@ Assembler::~Assembler() {
 }
 
 void Assembler::clear() {
-    options_.clear();
-    errors_.clear();
     delete_object();
     asmpc_ = nullptr;
 }
 
 bool Assembler::assemble(const string& filename) {
-    if (options_.verbose())
+    if (g_options.verbose())
         cout << "Assembling '" << filename << "'" << endl;
 
-    int start_errors = errors_.count();
+    int start_errors = g_errors.count();
 
     // create object and parser
     add_object(filename);
@@ -41,25 +39,17 @@ bool Assembler::assemble(const string& filename) {
     copy_defines();
 
     // assemble
-    g_errors().push_location(Location(filename));
+    g_errors.push_location(Location(filename));
     assemble1();
-    g_errors().pop_location();
+    g_errors.pop_location();
 
-    if (options_.verbose())
+    if (g_options.verbose())
         cout << endl;
 
     delete_object();
 
     // exit true if no more errors
-    return start_errors == errors_.count();
-}
-
-Options& Assembler::options() {
-    return options_;
-}
-
-Errors& Assembler::errors() {
-    return errors_;
+    return start_errors == g_errors.count();
 }
 
 void Assembler::add_object(const string& filename) {
@@ -80,7 +70,7 @@ void Assembler::delete_object() {
 }
 
 void Assembler::copy_defines() {
-    for (auto& it : options_.defines()) {
+    for (auto& it : g_options.defines()) {
         string name = it.first;
         int value = it.second;
 
@@ -181,7 +171,7 @@ Symbol* Assembler::add_equ(const string& name, Expr* expr) {
         if (symbol->scope() == SCOPE_EXTERN)
             symbol->set_scope(SCOPE_PUBLIC);
 
-        symbol->set_location(errors_.location());
+        symbol->set_location(g_errors.location());
         symbol->set_section(&g_section());
 
         if (res.ok()) {
@@ -198,7 +188,7 @@ Symbol* Assembler::add_equ(const string& name, Expr* expr) {
     }
     else {                                      // already defined
         delete expr;
-        errors_.error(ErrDuplicateDefinition, name);
+        g_errors.error(ErrDuplicateDefinition, name);
         return nullptr;
     }
 }
@@ -221,7 +211,7 @@ Symbol* Assembler::declare_extern(const string& name) {
     if (symbol) {                               // already defined
         sym_scope_t scope = symbol->scope();
         if (scope != SCOPE_EXTERN)
-            errors_.error(ErrSymbolRedeclaration, name);
+            g_errors.error(ErrSymbolRedeclaration, name);
     }
     else {                                      // new symbol
         symbol = new Symbol(name, SCOPE_EXTERN, TYPE_UNDEFINED, &g_section());
@@ -239,7 +229,7 @@ Symbol* Assembler::declare_public(const string& name) {
         if (scope == SCOPE_LOCAL)
             symbol->set_scope(SCOPE_PUBLIC);
         else if (scope != SCOPE_PUBLIC)
-            errors_.error(ErrSymbolRedeclaration, name);
+            g_errors.error(ErrSymbolRedeclaration, name);
     }
     else {                                      // new symbol
         symbol = new Symbol(name, SCOPE_PUBLIC, TYPE_UNDEFINED, &g_section());
@@ -257,7 +247,7 @@ Symbol* Assembler::declare_global(const string& name) {
         if (scope == SCOPE_LOCAL)
             symbol->set_scope(SCOPE_GLOBAL);
         else if (scope != SCOPE_GLOBAL)
-            errors_.error(ErrSymbolRedeclaration, name);
+            g_errors.error(ErrSymbolRedeclaration, name);
     }
     else {                                      // new symbol
         symbol = new Symbol(name, SCOPE_GLOBAL, TYPE_UNDEFINED, &g_section());
@@ -268,36 +258,36 @@ Symbol* Assembler::declare_global(const string& name) {
 }
 
 void Assembler::assemble1() {
-    int start_errors = errors_.count();
+    int start_errors = g_errors.count();
 
     // create parent directory of object file
     string o_filename = file_o_filename(object().filename());
     string parent_dir = file_parent_path(o_filename);
     if (!file_is_directory(parent_dir)) {
         if (!file_create_directories(parent_dir)) {
-            errors_.error(ErrDirCreate, parent_dir);
+            g_errors.error(ErrDirCreate, parent_dir);
             perror(parent_dir.c_str());
             return;
         }
     }
 
     object().parse();
-    if (start_errors != errors_.count())
+    if (start_errors != g_errors.count())
         return;
 
     object().check_relative_jumps();
-    if (start_errors != errors_.count())
+    if (start_errors != g_errors.count())
         return;
 
     object().patch_local_exprs();
-    if (start_errors != errors_.count())
+    if (start_errors != g_errors.count())
         return;
 
     object().check_undefined_symbols();
-    if (start_errors != errors_.count())
+    if (start_errors != g_errors.count())
         return;
 
     object().write_obj_file(o_filename);
-    if (start_errors != errors_.count())
+    if (start_errors != g_errors.count())
         return;
 }
