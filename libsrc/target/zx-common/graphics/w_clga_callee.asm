@@ -15,10 +15,10 @@
     EXTERN  w_respixel
     EXTERN  w_area
 
+    EXTERN  w_pixeladdress
+    EXTERN  inc_y_MODE6
 IF    FORts2068|FORzxn
     EXTERN  inc_x_MODE6
-    EXTERN  inc_y_MODE6
-    EXTERN  pixeladdress_MODE6
     EXTERN  __gfx_fatpix
 ENDIF
 
@@ -41,11 +41,12 @@ _clga_callee:
 
 asm_clga:
 
-IF    FORts2068|FORzxn
     ld      a, (__zx_screenmode)
     and     7
+    jp      z,fast_clga
+IF    FORts2068|FORzxn
     cp      6
-    jp      z,w_area_ts2068
+    jp      z,fast_clga
 ENDIF
 
 
@@ -65,20 +66,22 @@ ENDIF
     ret
   ENDIF
 
-IF    FORts2068|FORzxn
-w_area_ts2068:
-;;   TS2068 High Resolution mode
+
+fast_clga:
+;;   TS2068 High Resolution and standard mode
     push    ix
   IF    NEED_swapgfxbk=1
     call    swapgfxbk
   ENDIF
 
+IF    FORts2068|FORzxn
     ld      a, (__gfx_fatpix)
     and     a
     ld      a,e          ; height
     jr      z, not_fatpix
     add     hl, hl
 not_fatpix:
+ENDIF
     push    hl           ; width
     exx  ; hl=x
          ; de=y
@@ -93,7 +96,7 @@ not_fatpix:
     jp      c, __graphics_end
 
     push    bc
-    call    pixeladdress_MODE6
+    call    w_pixeladdress
     ld      b, a
     ld      a, 1
     jr      z, next
@@ -122,7 +125,9 @@ inner_loop0:
     or      c
     jr      nz, inner_loop0
 fill:
-    call    inc_x_MODE6
+
+    call    next_column
+
     jr      c, wypad
 fill1:
     push    bc
@@ -138,7 +143,7 @@ fill1:
 inner_loop1:
     xor     a
     ld      (de), a
-    call    inc_x_MODE6
+    call    next_column
     jr      c, wypad
     djnz    inner_loop1
 
@@ -165,4 +170,20 @@ wypad:
     jp      c, __graphics_end
     jr      outer_loop
 
+
+next_column:
+    ex      af,af
+IF    FORts2068|FORzxn
+    ld      a, (__zx_screenmode)
+    and     a
+    jr      z,_mode0
+    call    inc_x_MODE6
+    ex      af,af
+    jr      _mode6
+_mode0:
 ENDIF
+    inc     de
+_mode6:
+    ex      af,af
+	ret
+
