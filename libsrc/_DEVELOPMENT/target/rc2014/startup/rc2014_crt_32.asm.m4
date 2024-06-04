@@ -333,7 +333,7 @@ ENDIF
 
     SECTION data_crt
 
-include "../../../../lib/crt/classic/crt_runtime_selection.asm" 
+include "../../../../lib/crt/classic/crt_runtime_selection.inc" 
 
     SECTION bss_crt
 

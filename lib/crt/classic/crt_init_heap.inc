@@ -45,6 +45,7 @@ ELIF __crt_stack_size > 0
   IFDEF CRT_HEAP_ADDRESS
     ld      de,CRT_HEAP_ADDRESS
   ELSE
+    EXTERN  __BSS_END_tail
     ld      de,__BSS_END_tail
   ENDIF
     and     a
@@ -68,6 +69,7 @@ ELIF DEFINED_CRT_HEAP_AMALLOC
   IFDEF CRT_HEAP_ADDRESS
     ld      bc,CRT_HEAP_ADDRESS
   ELSE
+    EXTERN  __BSS_END_tail
     ld      bc,__BSS_END_tail
   ENDIF
 
