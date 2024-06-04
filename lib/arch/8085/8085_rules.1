@@ -304,40 +304,40 @@
 	call	l_eq
 =
 	ld	bc,%1
-	call	l_eq	;bc==hl
+	call	l_eq_hlbc	;bc==hl
 
 	ld	hl,(_%1
 	call	l_eq
 =
 	ld	hl,(_%1
 	ld	bc,de
-	call	l_eq	;bc==hl
+	call	l_eq_hlbc	;bc==hl
 
 	pop	de
-	call	l_eq
+	call	l_eq_hlbc
 =
 	pop	bc
-	call	l_eq	;bc==hl
+	call	l_eq_hlbc	;bc==hl
 
 %title inequality comparisons
 	ld	de,%1
 	call	l_ne
 =
 	ld	bc,%1
-	call	l_ne	;bc!=hl
+	call	l_ne_hlbc	;bc!=hl
 
 	ld	hl,(_%1
 	call	l_ne
 =
 	ld	hl,(_%1
 	ld	bc,de
-	call	l_ne	;bc!=hl
+	call	l_ne_hlbc	;bc!=hl
 
 	pop	de
 	call	l_ne
 =
 	pop	bc
-	call	l_ne	;bc!=hl
+	call	l_ne_hlbc	;bc!=hl
 
 %title Clear up a misoptimisation
 	push	de

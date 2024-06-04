@@ -10,9 +10,11 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_eq
+PUBLIC l_eq_hlbc
 
 .l_eq
-
+    ld bc,de
+.l_eq_hlbc
     ; bc == hl
     ; carry set if true
 

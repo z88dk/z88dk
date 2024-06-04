@@ -10,9 +10,13 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_ne
+PUBLIC l_ne_hlbc
 
 .l_ne
 
+    ld bc,de
+
+.l_ne_hlbc
     ; BC != HL
     ; set carry if true
 
