@@ -4,6 +4,7 @@
 ;
 ;       6/9/98  djm
 ;       13/5/99 djm Added carry conditions...
+;       2024/6  feilipu modified for 8085 SUB
 
 SECTION code_clib
 SECTION code_l_sccz80
@@ -12,11 +13,10 @@ PUBLIC l_ne
 
 .l_ne
 
-    ; DE != HL
+    ; BC != HL
     ; set carry if true
 
-    or a
-    sbc hl,de
+    sub hl,bc
 
     scf
     ld hl,1

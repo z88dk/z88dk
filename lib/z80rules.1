@@ -189,6 +189,7 @@
 	push	hl
 	push	de
 
+%notcpu 8085
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_gint	;%9

@@ -10,19 +10,19 @@ SECTION code_l_sccz80
 
 PUBLIC l_eq
 
-l_eq:
+.l_eq
 
-   ; de == hl
-   ; carry set if true
-   
-   or a
-   sbc hl,de
-   
-   scf
-	inc hl
-   ret z
-	
-   xor a
-   ld l,a
-   ld h,a
-   ret
+    ; de == hl
+    ; carry set if true
+
+    or a
+    sbc hl,de
+
+    scf
+    inc hl
+    ret z
+
+    xor a
+    ld l,a
+    ld h,a
+    ret
