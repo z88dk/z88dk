@@ -9,9 +9,13 @@
     EXTERN  __zx_screenmode
     EXTERN  __generic_putsprite
 
-IF    FORts2068|FORzxn
     EXTERN  w_pixeladdress
+    EXTERN  asm_zx_saddrpdown
+    EXTERN  __zx_console_attr
+
+IF    FORts2068|FORzxn
     EXTERN  hl_inc_x_MODE6
+    EXTERN  __gfx_fatpix
 ENDIF
 
     EXTERN  swapgfxbk
@@ -22,17 +26,19 @@ ENDIF
 putsprite:
 _putsprite:
 
-IF    FORts2068|FORzxn
     ld      a, (__zx_screenmode)
     and     7
+    jr      z,fast_putsprite
+IF    FORts2068|FORzxn
     cp      6
-    jr      z,putsprite_hr
+    jr      z,fast_putsprite
 ENDIF
 
     jp      __generic_putsprite
 
-IF    FORts2068|FORzxn
-putsprite_hr:
+
+
+fast_putsprite:
 
     push    ix
 
@@ -69,9 +75,20 @@ putsprite_hr:
       ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c
-    ld      (oldx), hl
-    ld      (cury), de
+
+;; IF    FORts2068|FORzxn
+;;     ld      a, (__gfx_fatpix)
+;;     and     a
+;;     jr      z, not_fatpix
+;; 	
+;;     ; TODO: fatpix mode scaling (SMC ?)
+;; 
+;; not_fatpix:
+;; ENDIF
+
     call    w_pixeladdress
+	ld      (_saddr+1), de
+	ld      (_saddr1+1), de
       ; @@@@@@@@@@@@
     ld      hl, offsets_table
     ld      c, a
@@ -115,9 +132,18 @@ _noplot:
        ;@@@@@@@@@@
        ;Go to next byte
        ;@@@@@@@@@@
-	ex      af,af
+IF    FORts2068|FORzxn
+    ex      af,af
+    ld      a, (__zx_screenmode)
+    and     a
+    jr      z,_mode0
     call    hl_inc_x_MODE6
-	ex      af,af
+    ex      af,af
+    jr      _notedge
+_mode0:
+    ex      af,af
+ENDIF
+    inc     hl
        ;@@@@@@@@@@
 
 _notedge:
@@ -127,13 +153,10 @@ _notedge:
        ;@@@@@@@@@@
        ;Go to next line
        ;@@@@@@@@@@
-    ld      hl, (oldx)
-    ld      de, (cury)
-    inc     de
-    ld      (cury), de
-    call    w_pixeladdress
-    ld      h, d
-    ld      l, e
+_saddr:
+	ld      hl, 0
+    call    asm_zx_saddrpdown
+    ld      (_saddr+1), hl
        ;@@@@@@@@@@
     pop     de
     pop     bc                          ;Restore data
@@ -172,9 +195,18 @@ wnoplot:
        ;@@@@@@@@@@
        ;Go to next byte
        ;@@@@@@@@@@
-	ex      af,af
+IF    FORts2068|FORzxn
+    ex      af,af
+    ld      a, (__zx_screenmode)
+    and     a
+    jr      z,_wmode0
     call    hl_inc_x_MODE6
-	ex      af,af
+    ex      af,af
+    jr      wnotedge
+_wmode0:
+    ex      af,af
+ENDIF
+    inc     hl
        ;@@@@@@@@@@
 
 wnotedge:
@@ -190,13 +222,10 @@ nextline:
        ;@@@@@@@@@@
        ;Go to next line
        ;@@@@@@@@@@
-    ld      hl, (oldx)
-    ld      de, (cury)
-    inc     de
-    ld      (cury), de
-    call    w_pixeladdress
-    ld      h, d
-    ld      l, e
+_saddr1:
+	ld      hl, 0
+    call    asm_zx_saddrpdown
+    ld      (_saddr1+1), hl
        ;@@@@@@@@@@
     pop     de
 
@@ -218,15 +247,7 @@ wover_1:
     jr      nextline
 
 
-    SECTION bss_graphics
-oldx:
-    defw    0
-cury:
-    defw    0
-
-
     SECTION rodata_clib
 offsets_table:
     defb    1, 2, 4, 8, 16, 32, 64, 128
 
-ENDIF
