@@ -10,6 +10,7 @@ TIME_NEWLIB_TARGETS := time/obj/newlib-z80-time \
 		time/obj/newlib-r2ka-time \
 		time/obj/newlib-ixiy-time \
 		time/obj/newlib-8080-time \
+		time/obj/newlib-8085-time \
 		time/obj/newlib-gbz80-time \
 		time/obj/newlib-ez80_z80-time \
 		time/obj/newlib-z180-time \
@@ -23,6 +24,7 @@ TIME_OBJS := $(addprefix time/obj/z80/, $(TIME_OBJECTS)) \
 	$(addprefix time/obj/ixiy/,$(TIME_OBJECTS)) \
 	$(addprefix time/obj/z80n/,$(TIME_OBJECTS)) \
 	$(addprefix time/obj/8080/,$(TIME_OBJECTS)) \
+	$(addprefix time/obj/8085/,$(TIME_OBJECTS)) \
 	$(addprefix time/obj/gbz80/,$(TIME_OBJECTS)) \
 	$(addprefix time/obj/ez80_z80/,$(TIME_OBJECTS)) \
 	$(addprefix time/obj/z180/,$(TIME_OBJECTS)) \
@@ -40,6 +42,7 @@ time: $(TIME_OBJS) $(TIME_NEWLIB_TARGETS)
 $(eval $(call buildbit,time,z80,test))
 $(eval $(call buildbit,time,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,time,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,time,8085,test,-clib=8085,-m8085))
 $(eval $(call buildbit,time,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,time,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,time,r4k,test,-clib=rabbit4k,-mr4k))
@@ -54,6 +57,7 @@ $(eval $(call buildnew,time,r4k,-mr4k,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)
 $(eval $(call buildnew,time,z80n,-mz80n,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,time,ixiy,-mz80 -IXIY,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,time,8080,-m8080,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,time,8085,-m8085,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,time,gbz80,-mgbz80,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,time,z180,-mz180,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,time,ez80_z80,-mez80_z80,$(TIME_NEWLIBGLOBS),$(TIME_NEWLIBGLOBS_ex)))
