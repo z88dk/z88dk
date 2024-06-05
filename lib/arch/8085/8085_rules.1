@@ -300,43 +300,71 @@
 	sub	hl,bc	;l_sub
 
 %title equality comparisons
+	ld	de,%1	;%5
+	call	l_eq
+=
+	ld	bc,%1	;%5
+	call	l_eq_hlbc	;bc==hl
+
 	ld	de,%1
 	call	l_eq
 =
 	ld	bc,%1
 	call	l_eq_hlbc	;bc==hl
 
+	pop	de
+	call	l_eq
+=
+	pop	bc
+	call	l_eq_hlbc	;bc==hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_eq
+=
+	ld	bc,_%1
+	call	l_eq_hlbc	;bc==hl
+
+	ex	de,hl
 	ld	hl,(_%1
 	call	l_eq
 =
+	ld	bc,hl
 	ld	hl,(_%1
-	ld	bc,de
-	call	l_eq_hlbc	;bc==hl
-
-	pop	de
-	call	l_eq_hlbc
-=
-	pop	bc
 	call	l_eq_hlbc	;bc==hl
 
 %title inequality comparisons
+	ld	de,%1	;%5
+	call	l_ne
+=
+	ld	bc,%1	;%5
+	call	l_ne_hlbc	;bc!=hl
+
 	ld	de,%1
 	call	l_ne
 =
 	ld	bc,%1
 	call	l_ne_hlbc	;bc!=hl
 
-	ld	hl,(_%1
-	call	l_ne
-=
-	ld	hl,(_%1
-	ld	bc,de
-	call	l_ne_hlbc	;bc!=hl
-
 	pop	de
 	call	l_ne
 =
 	pop	bc
+	call	l_ne_hlbc	;bc!=hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_ne
+=
+	ld	bc,_%1
+	call	l_ne_hlbc	;bc!=hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_ne
+=
+	ld	bc,hl
+	ld	hl,(_%1
 	call	l_ne_hlbc	;bc!=hl
 
 %title Clear up a misoptimisation
