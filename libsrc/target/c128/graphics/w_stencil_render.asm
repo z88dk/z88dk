@@ -55,7 +55,7 @@ yloop:
     ld      a, b
     and     c
     cp      255
-    jr      z, __graphics_end
+    jp      z, __graphics_end
     push    bc
 
     ld      d, b
