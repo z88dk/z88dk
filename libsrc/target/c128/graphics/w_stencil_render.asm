@@ -97,10 +97,10 @@ yloop:
     ld      (pattern2+1), a
 
     push    bc
-    ld      (cury), bc
+    ;ld      (cury), bc
     ld      d, b
     ld      e, c
-    ld      (curx), hl
+    ;ld      (curx), hl
     call    w_pixeladdress              ; bitpos0 = pixeladdress(x,y)
     call    leftbitmask                 ; LeftBitMask(bitpos0)
     pop     bc
@@ -261,9 +261,3 @@ pattern1:
     ret
 
 
-
-    SECTION bss_clib
-curx:
-    defw    0
-cury:
-    defw    0
