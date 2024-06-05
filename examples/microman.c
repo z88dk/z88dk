@@ -691,7 +691,11 @@ void eatpill ()
   dots--;
   for (a=0; a<GHOSTS; a++) g[a].eaten=0;
   basepic=wgh;
+#if SIZE==10
+  scared=300;
+#else
   scared=180;
+#endif
 }
 
 
@@ -738,7 +742,11 @@ void move_ghost()
 #ifdef COMPACT
   if ( (g[a].y==(SIZE2*8-1)) && (g[a].x>=(SIZE2*8-1)) && (g[a].x<=(SIZE2*10-1)) )
 #else
+#if SIZE==10
+  if ( (g[a].y==(SIZE2*10-1)) && (g[a].x>=(SIZE2*11-1)) && (g[a].x<=(SIZE2*11-1)) )
+#else
   if ( (g[a].y==(SIZE2*10-1)) && (g[a].x>=(SIZE2*8-1)) && (g[a].x<=(SIZE2*10-1)) )
+#endif
 #endif
     return;
 
@@ -849,7 +857,7 @@ draw_board:
           } else {
             putsprite (spr_or, i*SIZE2+1, j*SIZE2, pill);
             putsprite (spr_or, (18-i)*SIZE2+1, j*SIZE2, pill);
-		  }
+          }
 #else
           plot (i*SIZE2+(SIZE2/2)-MPMARGIN+1, j*SIZE2+(SIZE2/2));
           plot ((18-i)*SIZE2+(SIZE2/2)-MPMARGIN+1, j*SIZE2+(SIZE2/2));
@@ -1129,7 +1137,11 @@ do_game:
 #if SIZE==6
             putsprite (spr_and, (x+SIZE2-1)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
 #else
+#if SIZE==10
+            putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2+1, y/SIZE2*SIZE2, pill);
+#else
             putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
+#endif
 #endif
           }
           y--;
@@ -1227,8 +1239,13 @@ do_game:
       if ( (abs((g[a].x+CENTER) - (x+CENTER)) <= (SIZE)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (1)) ||
         (abs((g[a].x+CENTER) - (x+CENTER)) <= (1)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (SIZE)) )
     #else
+    #if SIZE == 10
+      if ( ((abs((g[a].x+CENTER) - (x+CENTER)) <= (SIZE+MPMARGIN+3)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (4))) ||
+        (abs((g[a].x+CENTER) - (x+CENTER)) <= (4)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (SIZE+MPMARGIN+3)) )
+    #else
       if ( ((abs((g[a].x+CENTER) - (x+CENTER)) <= (SIZE+MPMARGIN)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (2))) ||
         (abs((g[a].x+CENTER) - (x+CENTER)) <= (2)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (SIZE+MPMARGIN)) )
+    #endif
     #endif
         if ((scared>0)&&(g[a].eaten==0)) {
           // Ghost has been eaten
