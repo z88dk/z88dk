@@ -14,27 +14,34 @@
 
     INCLUDE "graphics/grafix.inc"
 
-    SECTION code_clib
+    SECTION code_graphics
+
     PUBLIC  stencil_render
     PUBLIC  _stencil_render
+
     EXTERN  dither_pattern
 	;EXTERN	l_cmp
 
-	;EXTERN swapgfxbk
+	EXTERN swapgfxbk
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
 	;EXTERN swapgfxbk1
+    EXTERN  __graphics_end
+
+    EXTERN  __c128_vaddr
 
 ;
 ;	$Id: w_stencil_render.asm -- stefano Exp $
 ;
 
-stencil_render_exit:
-    pop     ix                          ;restore callers
-    ret
 stencil_render:
 _stencil_render:
-    push    ix                          ;save callers
+
+    push    ix
+  IF    NEED_swapgfxbk=1
+    call    swapgfxbk
+  ENDIF
+
     ld      ix, 4
     add     ix, sp
 
@@ -48,7 +55,7 @@ yloop:
     ld      a, b
     and     c
     cp      255
-    jr      z, stencil_render_exit
+    jr      z, __graphics_end
     push    bc
 
     ld      d, b
@@ -124,43 +131,12 @@ yloop:
 noobt:
     ld      a, b
 
-
-
     push    af
 
     push    de
 
     push    bc
-    ex      af, af
-    ld      d, 18
-    ld      bc, 0d600h
-    out     (c), d
-rrloop1:
-    in      a, (c)
-    rla
-    jp      nc, rrloop1
-    inc     c
-    out     (c), h
-
-    dec     c
-    inc     d
-    out     (c), d
-rrloop5:
-    in      a, (c)
-    rla
-    jp      nc, rrloop5
-    inc     c
-    out     (c), l
-
-    dec     c
-    ld      a, 31
-    out     (c), a
-rrloop6:
-    in      a, (c)
-    rla
-    jp      nc, rrloop6
-    inc     c
-    ex      af, af
+    call    __c128_vaddr
 ;-------
     out     (c), a
 ;-------
@@ -198,43 +174,12 @@ fill_row_loop:                          ; do
     ld      a, b
 			;ld	(hl),a			; (offset) = pattern
 
-
-
     push    af
 
     push    de
 
     push    bc
-    ex      af, af
-    ld      d, 18
-    ld      bc, 0d600h
-    out     (c), d
-rloop1:
-    in      a, (c)
-    rla
-    jp      nc, rloop1
-    inc     c
-    out     (c), h
-
-    dec     c
-    inc     d
-    out     (c), d
-rloop5:
-    in      a, (c)
-    rla
-    jp      nc, rloop5
-    inc     c
-    out     (c), l
-
-    dec     c
-    ld      a, 31
-    out     (c), a
-rloop6:
-    in      a, (c)
-    rla
-    jp      nc, rloop6
-    inc     c
-    ex      af, af
+    call    __c128_vaddr
 ;-------
     out     (c), a
 ;-------
@@ -272,36 +217,8 @@ bitmaskr:
 			;ld	(hl),a
 
     push    de
-    ex      af, af
-    ld      d, 18
-    ld      bc, 0d600h
-    out     (c), d
-loop4:
-    in      a, (c)
-    rla
-    jp      nc, loop4
-    inc     c
-    out     (c), h
 
-    dec     c
-    inc     d
-    out     (c), d
-loop5:
-    in      a, (c)
-    rla
-    jp      nc, loop5
-    inc     c
-    out     (c), l
-
-    dec     c
-    ld      a, 31
-    out     (c), a
-loop6:
-    in      a, (c)
-    rla
-    jp      nc, loop6
-    inc     c
-    ex      af, af
+    call    __c128_vaddr
 ;-------
     out     (c), a
 ;-------
@@ -323,37 +240,8 @@ onebyte:
 mask_pattern:
     push    bc
     push    de
-    ex      af, af
-    ld      d, 18
-    ld      bc, 0d600h
-    out     (c), d
-loop1:
-    in      a, (c)
-    rla
-    jp      nc, loop1
-    inc     c
-    out     (c), h
 
-    dec     c
-    inc     d
-    out     (c), d
-loop2:
-    in      a, (c)
-    rla
-    jp      nc, loop2
-    inc     c
-    out     (c), l
-
-    dec     c
-    ld      a, 31
-    out     (c), a
-loop3:
-    in      a, (c)
-    rla
-    jp      nc, loop3
-    inc     c
-
-    ex      af, af
+    call    __c128_vaddr
 ;-------
     in      e, (c)
 
