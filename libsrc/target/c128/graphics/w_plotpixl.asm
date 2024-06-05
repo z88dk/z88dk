@@ -1,9 +1,11 @@
     INCLUDE "graphics/grafix.inc"
 
-    SECTION code_clib
+    SECTION code_graphics
     PUBLIC  w_plotpixel
 
     EXTERN  l_cmp
+
+    EXTERN  __c128_vaddr
     EXTERN  w_pixeladdress
 
     EXTERN  __gfx_coords
@@ -55,70 +57,12 @@ plot_position:
     djnz    plot_position
 or_pixel:
 
-    ex      af, af
-    ld      d, 18
-    ld      bc, 0d600h
-    out     (c), d
-loop1:
-    in      a, (c)
-    rla
-    jp      nc, loop1
-    inc     c
-    out     (c), h
-
-    dec     c
-    inc     d
-    out     (c), d
-loop2:
-    in      a, (c)
-    rla
-    jp      nc, loop2
-    inc     c
-    out     (c), l
-
-    dec     c
-    ld      a, 31
-    out     (c), a
-loop3:
-    in      a, (c)
-    rla
-    jp      nc, loop3
-    inc     c
-
-    ex      af, af
+    call    __c128_vaddr
     in      e, (c)
+
     or      e                           ; set pixel in current byte
-    ex      af, af
 
-    dec     c
-    dec     d
-    out     (c), d
-loop4:
-    in      a, (c)
-    rla
-    jp      nc, loop4
-    inc     c
-    out     (c), h
-
-    dec     c
-    inc     d
-    out     (c), d
-loop5:
-    in      a, (c)
-    rla
-    jp      nc, loop5
-    inc     c
-    out     (c), l
-
-    dec     c
-    ld      a, 31
-    out     (c), a
-loop6:
-    in      a, (c)
-    rla
-    jp      nc, loop6
-    inc     c
-    ex      af, af
+    call    __c128_vaddr
     out     (c), a
 
     ret
