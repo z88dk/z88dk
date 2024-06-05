@@ -3148,6 +3148,7 @@ $notcpu 8085
 =
 	call	z,%1
 
+%title Cleanup ==
 	scf
 	jr	z,ASMPC+3
 	ccf
@@ -3161,15 +3162,26 @@ $notcpu 8085
 =
 	jp	z,%1	;%5
 
+%title Cleanup !=
 	scf
-	jr	z,ASMPC+3
+	jr	nz,ASMPC+3
+	ccf
+	jp	nc,%1	;%5
+=
+	jp	z,%1	;%5
+
+%title Cleanup != and ==
+	scf
+	jr	%1z,ASMPC+3
 	ccf
 	ld	hl,0	;const
 	rl	l
 =
 	ld	hl,1	;const
-	jr	z,ASMPC+3
+	jr	%1z,ASMPC+3
 	dec	hl
+
+
 
 	jr	z,ASMPC+3
 	scf
