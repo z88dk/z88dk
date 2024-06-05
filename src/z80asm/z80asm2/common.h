@@ -21,9 +21,10 @@
 // global objects
 extern Options g_options;
 extern Errors g_errors;
+extern Symtab g_global_symbols;
 extern Assembler g_asm;
 
 // shortcuts
 inline Module& g_module() { return g_asm.object().cur_module(); }
 inline Section& g_section() { return g_module().cur_section(); }
-inline Symtab& g_symtab() { return g_module().symtab(); }
+inline Symtab& g_local_symbols() { return g_module().symbols(); }

@@ -17,6 +17,8 @@ using namespace std;
 
 void test_symtab_define_symbol_command_line_1() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_options.parse_option("-DVAR");
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
@@ -37,10 +39,13 @@ void test_symtab_define_symbol_command_line_1() {
     g_options.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_symbol_command_line_10() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_options.parse_option("-DVAR=10");
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
@@ -62,10 +67,13 @@ void test_symtab_define_symbol_command_line_10() {
     g_options.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_symbol_command_line_duplicate_equal() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_options.parse_option("-DVAR=10");
     g_options.parse_option("-DVAR=10");
     g_asm.add_object("test~.asm");
@@ -86,10 +94,13 @@ void test_symtab_define_symbol_command_line_duplicate_equal() {
     g_options.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_symbol_command_line_duplicate_different() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     ostringstream oss;
     g_errors.set_output(oss);
     g_options.parse_option("-DVAR");
@@ -100,10 +111,13 @@ void test_symtab_define_symbol_command_line_duplicate_different() {
     g_errors.clear();
     g_options.clear();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_symbol_command_and_source_equ() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     ostringstream oss;
     g_errors.set_output(oss);
     g_options.parse_option("-DVAR");
@@ -119,10 +133,13 @@ void test_symtab_define_symbol_command_and_source_equ() {
     g_options.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_symbol_command_and_source_label() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     ostringstream oss;
     g_errors.set_output(oss);
     g_options.parse_option("-DVAR");
@@ -137,10 +154,13 @@ void test_symtab_define_symbol_command_and_source_label() {
     g_options.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_symbol_command_and_source_public_use() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_options.parse_option("-DVAR");
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
@@ -165,10 +185,13 @@ void test_symtab_define_symbol_command_and_source_public_use() {
     g_options.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_symbol_command_and_source_global_use() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_options.parse_option("-DVAR");
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
@@ -193,10 +216,13 @@ void test_symtab_define_symbol_command_and_source_global_use() {
     g_options.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_symbol_command_and_source_extern_use() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     ostringstream oss;
     g_errors.set_output(oss);
     g_options.parse_option("-DVAR");
@@ -205,12 +231,15 @@ void test_symtab_define_symbol_command_and_source_extern_use() {
     g_errors.set_location(Location("test~.asm", 21));
     g_asm.declare_extern("VAR");
     OK(g_errors.count());
-    IS(oss.str(), "test~.asm:21: error: symbol redeclaration: VAR\n");
+    IS(oss.str(),
+        "test~.asm:21: error: symbol redeclaration: VAR\n"
+        "test~.asm:21: error: symbol redeclaration: VAR\n");
 
     g_errors.clear();
     g_options.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -219,6 +248,8 @@ void test_symtab_define_symbol_command_and_source_extern_use() {
 
 void test_symtab_define_symbol() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
@@ -241,10 +272,13 @@ void test_symtab_define_symbol() {
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_undefine() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
@@ -297,10 +331,13 @@ void test_symtab_define_undefine() {
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_undefine_define() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
@@ -358,11 +395,14 @@ void test_symtab_define_undefine_define() {
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_and_equ() {
-    ostringstream oss;
     g_asm.clear();
+    g_global_symbols.clear();
+
+    ostringstream oss;
     g_errors.set_output(oss);
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
@@ -378,11 +418,14 @@ void test_symtab_define_and_equ() {
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_and_label() {
-    ostringstream oss;
     g_asm.clear();
+    g_global_symbols.clear();
+
+    ostringstream oss;
     g_errors.set_output(oss);
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
@@ -397,11 +440,14 @@ void test_symtab_define_and_label() {
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_and_define() {
-    ostringstream oss;
     g_asm.clear();
+    g_global_symbols.clear();
+
+    ostringstream oss;
     g_errors.set_output(oss);
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
@@ -416,10 +462,13 @@ void test_symtab_define_and_define() {
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_and_public() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
@@ -446,10 +495,13 @@ void test_symtab_define_and_public() {
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_public_and_define() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
@@ -476,10 +528,13 @@ void test_symtab_public_and_define() {
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_and_global() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
@@ -506,10 +561,13 @@ void test_symtab_define_and_global() {
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_global_and_define() {
     g_asm.clear();
+    g_global_symbols.clear();
+
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
@@ -536,11 +594,14 @@ void test_symtab_global_and_define() {
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_define_and_extern() {
-    ostringstream oss;
     g_asm.clear();
+    g_global_symbols.clear();
+
+    ostringstream oss;
     g_errors.set_output(oss);
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
@@ -550,16 +611,21 @@ void test_symtab_define_and_extern() {
     g_asm.declare_extern("VAR");
 
     OK(g_errors.count());
-    IS(oss.str(), "test~.asm:21: error: symbol redeclaration: VAR\n");
+    IS(oss.str(),
+        "test~.asm:21: error: symbol redeclaration: VAR\n"
+        "test~.asm:21: error: symbol redeclaration: VAR\n");
 
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 
 void test_symtab_extern_and_define() {
-    ostringstream oss;
     g_asm.clear();
+    g_global_symbols.clear();
+
+    ostringstream oss;
     g_errors.set_output(oss);
     g_asm.add_object("test~.asm");
     g_asm.copy_defines();
@@ -588,5 +654,6 @@ void test_symtab_extern_and_define() {
     g_errors.clear();
     g_asm.delete_object();
     g_asm.clear();
+    g_global_symbols.clear();
 }
 

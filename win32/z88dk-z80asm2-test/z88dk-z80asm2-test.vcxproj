@@ -156,8 +156,8 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_symtab.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_symtab_driver.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_utils.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_utils_driver.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\t\test_zfloat.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\zfloat.cpp" />

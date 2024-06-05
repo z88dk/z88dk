@@ -78,8 +78,8 @@ public:
     void clear();                           // delete all symbols
     bool insert(Symbol* symbol);            // false if already exists
     Symbol* find(const string& name);       // nullptr if not found
-    Symbol* erase(const string& name);      // nullptr if not found
-    void push_deleted(Symbol* symbol);      // store in deleted_ list
+    void erase(const string& name);         // remove from symbols_, save a zero value in deleted_
+    Symbol* extract(const string& name);    // remove from symbols and return it
     void check_undefined_symbols();
 
 private:

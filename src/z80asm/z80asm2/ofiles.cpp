@@ -96,7 +96,8 @@ streampos OFileWriter::write_exprs(ofstream& os) {
     }
 
     // write expressions of DEFC symbols
-    write_exprs(g_symtab(), os);
+    write_exprs(g_global_symbols, os);
+    write_exprs(g_local_symbols(), os);
 
     // return -1 if no expressions written
     streampos end_fpos = os.tellp();
@@ -159,7 +160,8 @@ void OFileWriter::write_expr(const string& target_name, Instr* instr, Patch* pat
 streampos OFileWriter::write_symbols(ofstream& os) {
     streampos start_fpos = os.tellp();
 
-    write_symbols(g_symtab(), os);
+    write_symbols(g_global_symbols, os);
+    write_symbols(g_local_symbols(), os);
 
     // return -1 if no symbols written
     streampos end_fpos = os.tellp();
@@ -203,7 +205,7 @@ void OFileWriter::write_symbols(Symtab& symtab, ofstream& os) {
 streampos OFileWriter::write_externs(ofstream& os) {
     streampos start_fpos = os.tellp();
 
-    write_externs(g_symtab(), os);
+    write_externs(g_global_symbols, os);
 
     // return -1 if no symbols written
     streampos end_fpos = os.tellp();

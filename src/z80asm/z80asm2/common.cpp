@@ -8,4 +8,5 @@
 
 Options g_options;
 Errors g_errors;
+Symtab g_global_symbols;
 Assembler g_asm;
