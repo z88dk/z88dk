@@ -1,5 +1,6 @@
 target/c128/graphics/clg
 target/c128/graphics/w_pixladdr
+target/c128/graphics/__c128_vaddr
 target/c128/graphics/w_plotpixl
 target/c128/graphics/w_respixl
 target/c128/graphics/w_xorpixl

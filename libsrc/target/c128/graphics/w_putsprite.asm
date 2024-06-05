@@ -55,7 +55,9 @@ _putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
+  IF    NEED_swapgfxbk=1
     call    swapgfxbk
+  ENDIF
         ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c
