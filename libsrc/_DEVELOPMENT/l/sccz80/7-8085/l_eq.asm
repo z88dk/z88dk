@@ -13,7 +13,10 @@ PUBLIC l_eq
 PUBLIC l_eq_hlbc
 
 .l_eq
+    ; de == hl
+
     ld bc,de
+
 .l_eq_hlbc
     ; bc == hl
     ; carry set if true

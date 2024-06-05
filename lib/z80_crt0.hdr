@@ -93,9 +93,9 @@
 	EXTERN	l_xor		;Int logical xor
 	EXTERN	l_and		;Int logical and
 	EXTERN	l_eq		;Int equality
-	EXTERN	l_eq_hlbc	;Int equality (hl==bc)
+	EXTERN	l_eq_hlbc	;Int equality bc == hl
 	EXTERN	l_ne		;Int inequality
-	EXTERN	l_ne_hlbc	;Int inequality
+	EXTERN	l_ne_hlbc	;Int inequality bc != hl
 	EXTERN	l_gt		;Int signed de >  hl
 	EXTERN	l_le		;Int signed de <= hl
 	EXTERN	l_ge		;Int signed de >= hl

@@ -13,11 +13,12 @@ PUBLIC l_ne
 PUBLIC l_ne_hlbc
 
 .l_ne
+    ; de != hl
 
     ld bc,de
 
 .l_ne_hlbc
-    ; BC != HL
+    ; bc != hl
     ; set carry if true
 
     sub hl,bc
