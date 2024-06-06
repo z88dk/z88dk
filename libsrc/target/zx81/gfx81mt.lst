@@ -12,4 +12,6 @@ target/zx81/graphics_hr/mt_hrg_on
 target/zx81/graphics_hr/mt_hrg_off
 target/zx81/graphics_hr/mt_invhrg
 gfx/narrow/obj/${TARGET}/clrarea2
+gfx/narrow/obj/${TARGET}/fillarea2
+gfx/narrow/obj/${TARGET}/xorclrarea2
 @gfx/narrow/gfx_narrow.lst

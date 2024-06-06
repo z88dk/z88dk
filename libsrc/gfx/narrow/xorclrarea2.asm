@@ -1,13 +1,13 @@
 
     SECTION smc_clib
 
-    PUBLIC  cleararea
+    PUBLIC  xorclrarea
 
     EXTERN  pixeladdress
     EXTERN  leftbitmask, rightbitmask
 
 ;
-;    $Id: clrarea2.asm $
+;    $Id: xorclrarea2.asm $
 ;
 
 ; ***********************************************************************
@@ -28,7 +28,7 @@
 ;   AFBCDEHL/.... different
 ;
 
-cleararea:
+xorclrarea:
     ld      (coord+1), hl               ; SMC: remember y,x
     inc     b
     push    bc                          ; remember height
@@ -37,6 +37,7 @@ cleararea:
     call    pixeladdress                ; bitpos0 = pixeladdress(x,y)
     pop     hl
     call    leftbitmask                 ; LeftBitMask(bitpos0)
+	cpl
     ld      (bitmaskl1+1), a            ; SMC
     ld      (bitmaskl2+1), a            ; SMC
     pop     bc
@@ -68,18 +69,18 @@ rowbytes1:
     jr      nz, clear_row               ; area is within one byte...
     ld      a, (hl)
 bitmaskl1:
-    and     0                           ; preserve bits of leftmost side of byte
+    xor     0                           ; preserve bits of leftmost side of byte
     ld      b, a
     ld      a, (hl)
 bitmaskr1:
-    and     0                           ; preserve bits of rightmost side of byte
+    xor     0                           ; preserve bits of rightmost side of byte
     or      b                           ; merge preserved bits of left side
     ld      (hl), a                     ; (offset) = byte
     jr      clear_nextrow               ; else
 clear_row:                              ; clear area is defined as rows of bytes
     ld      a, (hl)
 bitmaskl2:
-    and     0                           ; preserve only leftmost bits (outside of area)
+    xor     0                           ; preserve only leftmost bits (outside of area)
     ld      (hl), a                     ; (offset) = (offset) AND bitmask0
     inc     hl                          ; offset += 1 (8 bits)
 rowbytes2:
@@ -87,13 +88,15 @@ rowbytes2:
     dec     b                           ; --r
     jr      z, row_cleared              ; if    ( r )
 clear_row_loop:                         ; do
-    ld      (hl), 0                     ; (offset) = 0
+    ld      a, (hl)
+    cpl
+    ld      (hl),a
     inc     hl                          ; offset += 1 (8 bits)
     djnz    clear_row_loop              ; while ( r-- != 0 )
 row_cleared:
     ld      a, (hl)                     ; byte = (adr1)
 bitmaskr2:
-    and     0
+    xor     0
     ld      (hl), a                     ; preserve only rightmost side of byte (outside area)
 
 clear_nextrow:
@@ -112,5 +115,4 @@ height:
     jr      nz, clear_height
     pop     bc
 
-end_cleararea:
     ret
