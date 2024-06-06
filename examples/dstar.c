@@ -110,7 +110,7 @@
  *      zcc +cpm -subtype=bw2 -create-app -Dspritesize=21 dstar.c
  *
  *      ZX81, various HRG flavours (see also the specific target version):
- *      zcc +zx81 -O3 -clib=mt  -create-app -Dspritesize=15 dstar.c
+ *      zcc +zx81 -O3 -clib=mt  -create-app -Dspritesize=10 dstar.c
  *      zcc +zx81 -O3 -clib=g007  -create-app -Dspritesize=16 dstar.c 
  *      zcc +zx81 -O3 -clib=arx -subtype=arx  -create-app -Dspritesize=16 dstar.c
  *      zcc +zx81 -O3 -clib=wrx -subtype=wrx  -create-app -Dspritesize=16 dstar.c
