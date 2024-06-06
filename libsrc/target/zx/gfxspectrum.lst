@@ -10,6 +10,8 @@ target/zx-common/graphics/obj/zx/__set_zx_pixel_colour
 target/zx-common/graphics/obj/zx/pixladdr_MODE0
 target/zx/graphics/clg
 target/zx/graphics/clrarea2
+gfx/narrow/obj/${TARGET}/fillarea2
+gfx/narrow/obj/${TARGET}/xorclrarea2
 target/zx/graphics/putsprite
 target/zx/graphics/bksave
 target/zx/graphics/bkrestore
