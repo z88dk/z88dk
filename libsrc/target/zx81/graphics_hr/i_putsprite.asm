@@ -145,13 +145,8 @@ _evenrow:
     pop     de
     pop     bc                          ;Restore data
     djnz    _oloop
-
-  IF    NEED_swapgfxbk
     jp      __graphics_end
-  ELSE
-    pop     ix
-    ret
-  ENDIF
+
 
 putspritew:
     ld      d, a
