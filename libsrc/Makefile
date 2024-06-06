@@ -897,14 +897,14 @@ aquarius_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C target/aquarius
 	TARGET=aquarius TYPE=z80 $(LIBLINKER) -DFORaquarius -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(TARGET_DIRECTORY)/aquarius/aquarius.lst
 
-gfxaq48.lib: $(TARGET_CLIB_OBJS)
+gfxaq48.lib: $(TARGET_CLIB_OBJS) aquarius_clib.lib
 	@echo ''
 	@echo '--- Building Mattel Aquarius 80x48 Graphics lib ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=aquarius SUBTYPE=aq48 FLAVOUR="text narrow"
 	TARGET=aq48 TYPE=z80 $(LIBLINKER) -DFORaq48 -x$(OUTPUT_DIRECTORY)/gfxaq48 @$(TARGET_DIRECTORY)/aquarius/gfxaq48.lst
 
-aqplus.lib: $(TARGET_CLIB_OBJS)
+aqplus.lib: $(TARGET_CLIB_OBJS) aquarius_clib.lib
 	@echo ''
 	@echo '--- Building Mattel Aquarius Plus lib ---'
 	@echo ''
