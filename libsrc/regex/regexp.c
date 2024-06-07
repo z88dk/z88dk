@@ -203,7 +203,7 @@ regexp *regcomp(char *exp)
 	regsize = 0L;
 	regcode = &regdummy;
 	regc(MAGIC);
-	if (reg(0, &flags) == (char)NULL)
+	if (reg(0, &flags) == NULL)
 		return(NULL);
 
 	/* Small enough for pointer-storage convention? */
@@ -220,7 +220,7 @@ regexp *regcomp(char *exp)
 	regnpar = 1;
 	regcode = r->program;
 	regc(MAGIC);
-	if (reg(0, &flags) == (char)NULL)
+	if (reg(0, &flags) == NULL)
 		return(NULL);
 
 	/* Dig out information for optimizations. */
@@ -810,12 +810,12 @@ static int regmatch(char *prog)/* 0 failure, 1 success */
 			}
 			break;
 		case ANYOF:
-			if (*reginput == '\0' || strchr(OPERAND(scan), *reginput) == (char)NULL)
+			if (*reginput == '\0' || strchr(OPERAND(scan), *reginput) == NULL)
 				return(0);
 			reginput++;
 			break;
 		case ANYBUT:
-			if (*reginput == '\0' || strchr(OPERAND(scan), *reginput) != (char)NULL)
+			if (*reginput == '\0' || strchr(OPERAND(scan), *reginput) != NULL)
 				return(0);
 			reginput++;
 			break;
@@ -969,13 +969,13 @@ static int regrepeat(char *p)
 		}
 		break;
 	case ANYOF:
-		while (*scan != '\0' && strchr(opnd, *scan) != (char)NULL) {
+		while (*scan != '\0' && strchr(opnd, *scan) != NULL) {
 			count++;
 			scan++;
 		}
 		break;
 	case ANYBUT:
-		while (*scan != '\0' && strchr(opnd, *scan) == (char)NULL) {
+		while (*scan != '\0' && strchr(opnd, *scan) == NULL) {
 			count++;
 			scan++;
 		}
