@@ -78,7 +78,7 @@ ELIF DEFINED_CRT_HEAP_AMALLOC
 
   IF __CPU_8085__
     sub     hl,bc   ; hl = total free memory
-  ELIF __CPU_8080__ || __CPU_GBZ80
+  ELIF __CPU_8080__ || __CPU_GBZ80__
     ld      a,l
     sub     c
     ld      l,a
@@ -101,7 +101,7 @@ ELIF DEFINED_CRT_HEAP_AMALLOC
     and     h
     ld      h,a
     ex      de,hl
-   ELIF __CPU_8080__ || __CPU_GBZ80
+   ELIF __CPU_8080__ || __CPU_GBZ80__
     and     a
     ld      a,d
     rra
