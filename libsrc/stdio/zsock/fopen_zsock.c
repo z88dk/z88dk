@@ -47,7 +47,7 @@ FILE *fopen_zsock(char *name)
 		fp->desc.ptr=(uint8_t *)len;
 		fp->flags=_IOEXTRA|_IOUSE;
 		fp->ungetc=0;
-			fp->extra = zsock_trampoline;
+		fp->extra = zsock_trampoline;
 		return fp;
 	}
 	return NULL;	/* Failed */

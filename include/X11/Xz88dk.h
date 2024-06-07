@@ -107,8 +107,8 @@ struct _XWIN {
 	int	full_width;
 	int	full_height;
 	char	*title;
-        char    *icon;
-        char    *background;
+	char	*icon;
+	char	*background;
 };
 
 

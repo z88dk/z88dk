@@ -14,18 +14,19 @@
 extern char *_Xsmallfont;
 
 
-void XSetStandardProperties(Display *display, Window win, char *window_name, char *icon_name, char *icon_pixmap, char **argv, int argc, int *size_hints) {
+void XSetStandardProperties(Display *display, Window win, char *window_name, char *icon_name, char *icon_pixmap, char **argv, int argc, int *size_hints)
+{
 
 	struct _XWIN *mywin;
-	
+
 	mywin = (void *) win;
 	mywin->title = window_name;
 	mywin->icon = icon_pixmap;
-	
+
 	_x_proportional = mywin->x + 8;
 	_y_proportional = mywin->y + 2;
 
-	for (_X_int1=0; (window_name[_X_int1] != 0 ) && (_x_proportional < (mywin->a_x + mywin->width)); _xfputc(window_name[_X_int1++], &_Xsmallfont, True));
+	for (_X_int1=0; (window_name[_X_int1] != 0 ) && (_x_proportional < (mywin->a_x + mywin->width)); _xfputc(window_name[_X_int1++], (char *) &_Xsmallfont, True));
 
 	if (icon_pixmap != NULL)
 	{
@@ -35,5 +36,4 @@ void XSetStandardProperties(Display *display, Window win, char *window_name, cha
 		// We suppose we have a small icon (16x16)
 		putsprite (SPR_OR, mywin->x + mywin->width - 2 - icon_pixmap[0], mywin->y, icon_pixmap);
 	}
-
 }
