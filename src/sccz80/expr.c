@@ -756,6 +756,7 @@ int heirb(LVALUE* lval)
                 // Function returing pointer
                 if ( ispointer(lval->ltype) ) {
                     lval->val_type = lval->ltype->kind;
+                    lval->ptr_type = lval->ltype->kind;
                     lval->indirect_kind = lval->ltype->kind;
                 }
             }
