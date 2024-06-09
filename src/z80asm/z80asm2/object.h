@@ -106,7 +106,7 @@ public:
     list<Section*>& sections();
     void select_section(const string& name);
     Section& cur_section() const;
-    Symtab& symtab();
+    Symtab& symbols();
     void check_relative_jumps();
     void compute_addresses();
     void patch_local_exprs();
@@ -117,7 +117,7 @@ private:
     list<Section*> sections_;               // list of sections in this module
     unordered_map<string, Section*> section_by_name_;   // index sections by name
     Section* cur_section_{ nullptr };       // current section
-    Symtab symtab_;                         // all symbols
+    Symtab symbols_;                        // all symbols
 
     void clear_all();
     void create_default_section();          // create default section (named "")

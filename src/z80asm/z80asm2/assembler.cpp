@@ -77,7 +77,7 @@ void Assembler::copy_defines() {
         Symbol* symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, &g_section(), value);
         symbol->set_global_def();
 
-        g_symtab().insert(symbol);
+        g_local_symbols().insert(symbol);
     }
 }
 
@@ -123,7 +123,7 @@ Instr* Assembler::add_instr(int opcode) {
 }
 
 Symbol* Assembler::find_symbol(const string& name) {
-    return g_symtab().find(name);
+    return g_local_symbols().find(name);
 }
 
 Symbol* Assembler::define_symbol(const string& name, int value) {
@@ -132,21 +132,7 @@ Symbol* Assembler::define_symbol(const string& name, int value) {
 }
 
 void Assembler::undefine_symbol(const string& name) {
-    // check if already defined
-    Symbol* symbol = g_symtab().erase(name);
-    if (symbol) {
-        // set to zero and remove any instr/expr
-        symbol->set_value(0);
-        if (symbol->expr()) {
-            delete symbol->expr();
-            symbol->set_expr(nullptr);
-        }
-        if (symbol->instr())
-            symbol->set_instr(nullptr);
-
-        // save in deleted, in case any expression referes to it
-        g_symtab().push_deleted(symbol);
-    }
+    g_local_symbols().erase(name);
 }
 
 Symbol* Assembler::add_equ(const string& name, Expr* expr) {
@@ -163,13 +149,12 @@ Symbol* Assembler::add_equ(const string& name, Expr* expr) {
         else {
             symbol->set_expr(expr);
         }
-        bool ok = g_symtab().insert(symbol);
+        bool ok = g_local_symbols().insert(symbol);
         xassert(ok);
         return symbol;
     }
-    else if (symbol->type() == TYPE_UNDEFINED) {// already declared
-        if (symbol->scope() == SCOPE_EXTERN)
-            symbol->set_scope(SCOPE_PUBLIC);
+    else if (symbol->type() == TYPE_UNDEFINED &&
+        symbol->scope() != SCOPE_EXTERN) { // already declared
 
         symbol->set_location(g_errors.location());
         symbol->set_section(&g_section());
@@ -189,6 +174,9 @@ Symbol* Assembler::add_equ(const string& name, Expr* expr) {
     else {                                      // already defined
         delete expr;
         g_errors.error(ErrDuplicateDefinition, name);
+        g_errors.push_location(symbol->location());
+        g_errors.error(ErrDuplicateDefinition, name);
+        g_errors.pop_location();
         return nullptr;
     }
 }
@@ -198,7 +186,7 @@ Symbol* Assembler::use_symbol(const string& name) {
     Symbol* symbol = find_symbol(name);
     if (!symbol) {                               // new symbol
         symbol = new Symbol(name, SCOPE_LOCAL, TYPE_UNDEFINED, &g_section());
-        bool ok = g_symtab().insert(symbol);
+        bool ok = g_local_symbols().insert(symbol);
         xassert(ok);
     }
     symbol->set_touched();
@@ -206,55 +194,43 @@ Symbol* Assembler::use_symbol(const string& name) {
 }
 
 Symbol* Assembler::declare_extern(const string& name) {
-    // check if already defined
-    Symbol* symbol = find_symbol(name);
-    if (symbol) {                               // already defined
-        sym_scope_t scope = symbol->scope();
-        if (scope != SCOPE_EXTERN)
-            g_errors.error(ErrSymbolRedeclaration, name);
-    }
-    else {                                      // new symbol
-        symbol = new Symbol(name, SCOPE_EXTERN, TYPE_UNDEFINED, &g_section());
-        bool ok = g_symtab().insert(symbol);
-        xassert(ok);
-    }
-    return symbol;
+    return make_global(name, SCOPE_EXTERN);
 }
 
 Symbol* Assembler::declare_public(const string& name) {
-    // check if already defined
-    Symbol* symbol = find_symbol(name);
-    if (symbol) {                               // already defined
-        sym_scope_t scope = symbol->scope();
-        if (scope == SCOPE_LOCAL)
-            symbol->set_scope(SCOPE_PUBLIC);
-        else if (scope != SCOPE_PUBLIC)
-            g_errors.error(ErrSymbolRedeclaration, name);
-    }
-    else {                                      // new symbol
-        symbol = new Symbol(name, SCOPE_PUBLIC, TYPE_UNDEFINED, &g_section());
-        bool ok = g_symtab().insert(symbol);
-        xassert(ok);
-    }
-    return symbol;
+    return make_global(name, SCOPE_PUBLIC);
 }
 
 Symbol* Assembler::declare_global(const string& name) {
-    // check if already defined
-    Symbol* symbol = find_symbol(name);
-    if (symbol) {                               // already defined
-        sym_scope_t scope = symbol->scope();
-        if (scope == SCOPE_LOCAL)
-            symbol->set_scope(SCOPE_GLOBAL);
-        else if (scope != SCOPE_GLOBAL)
-            g_errors.error(ErrSymbolRedeclaration, name);
-    }
-    else {                                      // new symbol
-        symbol = new Symbol(name, SCOPE_GLOBAL, TYPE_UNDEFINED, &g_section());
-        bool ok = g_symtab().insert(symbol);
+    return make_global(name, SCOPE_GLOBAL);
+}
+
+Symbol* Assembler::make_global(const string& name, sym_scope_t new_scope) {
+    // check if symbol exists
+    Symbol* symbol = g_local_symbols().find(name);
+    if (!symbol) {
+        symbol = new Symbol(name, new_scope, TYPE_UNDEFINED, &g_section());
+        bool ok = g_local_symbols().insert(symbol);
         xassert(ok);
     }
-    return symbol;
+    else {
+        sym_scope_t cur_scope = symbol->scope();
+        if (new_scope == SCOPE_EXTERN && symbol->type() != TYPE_UNDEFINED) {
+            g_errors.error(ErrSymbolRedeclaration, name);
+            g_errors.push_location(symbol->location());
+            g_errors.error(ErrSymbolRedeclaration, name);
+            g_errors.pop_location();
+        }
+        else if (cur_scope != SCOPE_LOCAL && cur_scope != new_scope) {
+            g_errors.error(ErrSymbolRedeclaration, name);
+            g_errors.push_location(symbol->location());
+            g_errors.error(ErrSymbolRedeclaration, name);
+            g_errors.pop_location();
+        }
+        else
+            symbol->set_scope(new_scope);
+    }
+	return symbol;
 }
 
 void Assembler::assemble1() {

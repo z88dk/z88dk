@@ -317,7 +317,7 @@ void Module::clear_all() {
     sections_.clear();
     section_by_name_.clear();
     cur_section_ = nullptr;
-    symtab_.clear();
+    symbols_.clear();
 }
 
 void Module::create_default_section() {
@@ -344,8 +344,8 @@ Section& Module::cur_section() const {
     return *cur_section_;
 }
 
-Symtab& Module::symtab() {
-    return symtab_;
+Symtab& Module::symbols() {
+    return symbols_;
 }
 
 void Module::check_relative_jumps() {
@@ -364,7 +364,7 @@ void Module::patch_local_exprs() {
 }
 
 void Module::check_undefined_symbols() {
-    symtab_.check_undefined_symbols();
+    symbols_.check_undefined_symbols();
 }
 
 //-----------------------------------------------------------------------------

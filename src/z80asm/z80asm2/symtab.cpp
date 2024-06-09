@@ -136,6 +136,9 @@ bool Symtab::insert(Symbol* symbol) {
             return true;	// ignore duplicates of these
         else {
             g_errors.error(ErrDuplicateDefinition, name);
+            g_errors.push_location(symbol->location());
+            g_errors.error(ErrDuplicateDefinition, name);
+            g_errors.pop_location();
             return false;
         }
     }
@@ -154,21 +157,28 @@ Symbol* Symtab::find(const string& name) {
         return nullptr;
 }
 
-Symbol* Symtab::erase(const string& name) {
+void Symtab::erase(const string& name) {
     auto it = map_.find(name);
-    if (it != map_.end()) {
-        Symbol* symbol = it->second;
-        symbols_.remove(symbol);
-        map_.erase(it);
-        return symbol;
-    }
-    else
-        return nullptr;
-}
+    if (it == map_.end())
+        return;
 
-void Symtab::push_deleted(Symbol* symbol) {
+    Symbol* symbol = it->second;
+    symbols_.remove(symbol);
+    map_.erase(it);
+
+    // set to zero and remove any instr/expr
+    symbol->set_value(0);
+    if (symbol->expr()) {
+        delete symbol->expr();
+        symbol->set_expr(nullptr);
+    }
+    if (symbol->instr())
+        symbol->set_instr(nullptr);
+
+    // save in deleted, in case any expression referes to it
     deleted_.push_back(symbol);
 }
+
 
 void Symtab::check_undefined_symbols() {
     for (auto& symbol : symbols_) {
