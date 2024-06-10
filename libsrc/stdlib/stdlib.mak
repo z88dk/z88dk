@@ -14,11 +14,13 @@ STDLIB_GBZ80_OBJECTS := $(STDLIB_CFILES:.c=.o) $(STDLIB_GBZ80_AFILES:.asm=.o)
 STDLIB_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"
 STDLIB_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/stdlib/z80/*.asm $(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm
 
-STDLIB_8080_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm" \
+STDLIB_8080_NEWLIBGLOBS := \
+        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm" \
         "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/abs*.asm" \
         "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/labs*.asm" \
         "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atoi*.asm" \
         "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol.asm" \
+        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol_fastcall.asm" \
         "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/itoa*.asm" \
         "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtol.asm" \
         "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtol_callee.asm" \
@@ -29,7 +31,8 @@ STDLIB_8080_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm" \
         "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm" \
         $(NEWLIB_DIRECTORY)/stdlib/z80/__stdlib_seed.asm
 
-STDLIB_8080_NEWLIBGLOBS_ex := $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm) \
+STDLIB_8080_NEWLIBGLOBS_ex := \
+        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm) \
         $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/abs*.asm) \
         $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/labs*.asm) \
         $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atoi*.asm) \
@@ -51,7 +54,8 @@ STDLIB_8085_NEWLIBGLOBS_ex := $(STDLIB_8080_NEWLIBGLOBS_ex)
 STDLIB_GBZ80_NEWLIBGLOBS := $(STDLIB_8080_NEWLIBGLOBS)
 STDLIB_GBZ80_NEWLIBGLOBS_ex := $(STDLIB_8080_NEWLIBGLOBS_ex)
 
-STDLIB_NEWLIB_TARGETS := stdlib/obj/newlib-z80-stdlib \
+STDLIB_NEWLIB_TARGETS := \
+		stdlib/obj/newlib-z80-stdlib \
 		stdlib/obj/newlib-z80n-stdlib \
 		stdlib/obj/newlib-r2ka-stdlib \
 		stdlib/obj/newlib-ixiy-stdlib \
@@ -65,7 +69,8 @@ STDLIB_NEWLIB_TARGETS := stdlib/obj/newlib-z80-stdlib \
 
 STDLIB_OBJECTS := $(STDLIB_CFILES:.c=.o) $(STDLIB_AFILES:.asm=.o)
 
-STDLIB_OBJS := $(addprefix stdlib/obj/z80/, $(STDLIB_OBJECTS)) \
+STDLIB_OBJS := \
+	$(addprefix stdlib/obj/z80/, $(STDLIB_OBJECTS)) \
 	$(addprefix stdlib/obj/r2ka/,$(STDLIB_OBJECTS)) \
 	$(addprefix stdlib/obj/ixiy/,$(STDLIB_OBJECTS)) \
 	$(addprefix stdlib/obj/z80n/,$(STDLIB_OBJECTS)) \
