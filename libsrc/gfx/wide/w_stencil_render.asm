@@ -14,6 +14,7 @@
     INCLUDE "graphics/grafix.inc"
 
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
+
     SECTION code_graphics
     PUBLIC  stencil_render
     PUBLIC  _stencil_render
@@ -25,10 +26,16 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
     ;EXTERN swapgfxbk1
+	
+	EXTERN __generic_w_curx
+	EXTERN __generic_w_cury
+	EXTERN __generic_w_incx
+
 
 ;
-;    $Id: w_stencil_render.asm,v 1.6 2016-07-14 17:44:17 pauloscustodio Exp $
+;    $Id: w_stencil_render.asm $
 ;
+
 
 stencil_exit:
     pop     ix
@@ -94,8 +101,10 @@ yloop:
     ld      (pattern2+1), a
 
     push    bc
+    ld      (__generic_w_cury),bc
     ld      d, b
     ld      e, c
+    ld      (__generic_w_curx),hl
     call    w_pixeladdress              ; bitpos0 = pixeladdress(x,y)
     call    leftbitmask                 ; LeftBitMask(bitpos0)
     pop     bc
@@ -127,8 +136,11 @@ noobt:
     ld      a, b
     ld      (hl), a                     ; (offset) = (offset) AND bitmask0
 
-    inc     hl
-
+;    inc     hl
+    push    de
+    call    __generic_w_incx
+	pop     de
+    
     ld      a, h
     cp      d
     jr      nz, pattern2
@@ -142,7 +154,10 @@ fill_row_loop:                          ; do
     ld      a, b
     ld      (hl), a                     ; (offset) = pattern
 
-    inc     hl
+;    inc     hl
+    push    de
+    call    __generic_w_incx
+	pop     de
 
     ld      a, h
     cp      d
@@ -179,4 +194,6 @@ pattern1:
     or      e                           ; mix with masked data
     pop     de
     ret
+
+
 ENDIF
