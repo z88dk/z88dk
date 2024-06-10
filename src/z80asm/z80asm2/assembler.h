@@ -12,6 +12,7 @@
 #include "options.h"
 #include "symtab.h"
 #include <iostream>
+#include <list>
 #include <string>
 using namespace std;
 
@@ -31,8 +32,8 @@ public:
 
     // object file
     void add_object(const string& filename);
-    Object& object();                                   // asserts object was added
-    void delete_object();
+    Object& cur_object();                               // asserts object was added
+    void delete_objects();
     void copy_defines();            // copy defines to locals
 
     // labels
@@ -56,7 +57,7 @@ public:
     Symbol* declare_global(const string& name);
 
 private:
-    Object* object_;                // object file
+    list<Object*> objects_;         // object file
     Symbol* asmpc_{ nullptr };      // asmpc of current statement
 
     Symbol* make_global(const string& name, sym_scope_t new_scope);

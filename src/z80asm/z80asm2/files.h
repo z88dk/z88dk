@@ -15,15 +15,6 @@
 #include <vector>
 using namespace std;
 
-// object file signature
-#define OBJ_FILE_VERSION		18
-#define SIGNATURE_SIZE			8
-#define SIGNATURE_BASE_SIZE		6
-#define OBJ_FILE_SIGNATURE		"Z80RMF"
-#define OBJ_FILE_HEADER         OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION)
-#define LIB_FILE_SIGNATURE		"Z80LMF"
-#define LIB_FILE_HEADER         LIB_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION)
-
 // default file name extensions
 #define EXT_ASM     ".asm"    
 #define EXT_LIS		".lis"    
@@ -47,8 +38,6 @@ string file_parent_path(const string& filename);
 bool file_is_regular_file(const string& filename);
 bool file_is_directory(const string& filename);
 bool file_create_directories(const string& dirname);
-bool file_is_object_file(const string& filename);
-bool file_is_library_file(const string& filename);
 string file_current_path();
 void file_expand_glob(vector<string>& result, const string& pattern);
 bool file_newer(const string& filename1, const string& filename2);

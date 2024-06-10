@@ -200,54 +200,6 @@ void test_file_create_directories() {
     remove("test~.x");
 }
 
-void test_file_is_object_file() {
-    remove("test~.o");
-    OK(0 == system("perl -e 'sleep(1)'"));
-    NOK(file_is_object_file("test~.o"));
-
-    test_spew("test~.o", "");
-    OK(0 == system("perl -e 'sleep(1)'"));
-    NOK(file_is_object_file("test~.o"));
-
-    test_spew("test~.o", "12345678");
-    OK(0 == system("perl -e 'sleep(1)'"));
-    NOK(file_is_object_file("test~.o"));
-
-    test_spew("test~.o", OBJ_FILE_SIGNATURE "00" "xx");
-    OK(0 == system("perl -e 'sleep(1)'"));
-    NOK(file_is_object_file("test~.o"));
-
-    test_spew("test~.o", OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
-    OK(0 == system("perl -e 'sleep(1)'"));
-    OK(file_is_object_file("test~.o"));
-
-    remove("test~.o");
-}
-
-void test_file_is_library_file() {
-    remove("test~.lib");
-    OK(0 == system("perl -e 'sleep(1)'"));
-    NOK(file_is_library_file("test~.lib"));
-
-    test_spew("test~.lib", "");
-    OK(0 == system("perl -e 'sleep(1)'"));
-    NOK(file_is_library_file("test~.lib"));
-
-    test_spew("test~.lib", "12345678");
-    OK(0 == system("perl -e 'sleep(1)'"));
-    NOK(file_is_library_file("test~.lib"));
-
-    test_spew("test~.lib", LIB_FILE_SIGNATURE "00" "xx");
-    OK(0 == system("perl -e 'sleep(1)'"));
-    NOK(file_is_library_file("test~.lib"));
-
-    test_spew("test~.lib", LIB_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
-    OK(0 == system("perl -e 'sleep(1)'"));
-    OK(file_is_library_file("test~.lib"));
-
-    remove("test~.lib");
-}
-
 void test_file_current_path() {
     IS(file_current_path(), fs::current_path().generic_string());
 }

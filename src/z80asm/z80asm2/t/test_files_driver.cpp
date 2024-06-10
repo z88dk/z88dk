@@ -14,8 +14,6 @@ void test_file_parent_path();
 void test_file_is_regular_file();
 void test_file_is_directory();
 void test_file_create_directories();
-void test_file_is_object_file();
-void test_file_is_library_file();
 void test_file_current_path();
 void test_file_expand_glob();
 void test_file_newer();
@@ -56,8 +54,6 @@ int main(int argc, char* argv[]) {
         test_file_is_regular_file();
         test_file_is_directory();
         test_file_create_directories();
-        test_file_is_object_file();
-        test_file_is_library_file();
         test_file_current_path();
         test_file_expand_glob();
         test_file_newer();

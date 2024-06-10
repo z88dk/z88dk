@@ -7,6 +7,7 @@
 #include "../../config.h"       // Z88DK_VERSION
 #include "common.h"
 #include "files.h"
+#include "ofiles.h"
 #include "options.h"
 #include "utils.h"
 #include "xassert.h"

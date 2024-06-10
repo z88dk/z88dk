@@ -74,6 +74,6 @@ void test_empty_expr() {
     OK(res.ok());
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }

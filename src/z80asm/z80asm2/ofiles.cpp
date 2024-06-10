@@ -7,14 +7,90 @@
 #include "common.h"
 #include "ofiles.h"
 #include "xassert.h"
+#include <iostream>
 using namespace std;
 
+//-----------------------------------------------------------------------------
+
+static bool check_signature(const string& filename, const string& signature_base, int version,
+                            bool do_error, bool is_lib) {
+    ifstream ifs(filename, ios::binary);
+
+    // open file
+    if (!ifs.is_open()) {
+        if (do_error) {
+            g_errors.error(ErrFileOpen, filename);
+            perror(filename.c_str());
+        }
+        return false;
+    }
+
+    // read signature
+    char buffer[SIGNATURE_SIZE];
+    ifs.read(buffer, sizeof(buffer));
+    if (ifs.gcount() != sizeof(buffer)) {
+        if (do_error) 
+            g_errors.error(is_lib ? ErrNotLibFile : ErrNotObjFile, filename);
+        return false;
+    }
+
+    // check signature_base
+    string got_signature_base = string(buffer, buffer + SIGNATURE_BASE_SIZE);
+    if (got_signature_base != signature_base) {
+        if (do_error) 
+            g_errors.error(is_lib ? ErrNotLibFile : ErrNotObjFile, filename);
+        return false;
+    }
+
+    // check version
+    int got_version = atoi(buffer + SIGNATURE_BASE_SIZE);
+    if (got_version != version) {
+        if (do_error) 
+            g_errors.error(is_lib ? ErrLibFileVersion : ErrObjFileVersion, filename);
+        return false;
+    }
+
+    // libraries may contain multiple cpu-ixiy combinations
+    if (is_lib || g_options.lib_for_all_cpus()) 
+        return true;
+
+    // only for object files...
+
+    // has right CPU?
+    cpu_t cpu_id = (cpu_t)sread_int32(ifs);
+    if (!cpu_compatible(g_options.cpu(), cpu_id)) {
+        if (do_error)
+            g_errors.error(ErrCPUIncompatible, filename);
+        return false;
+    }
+
+    // has right -XIIY?
+    swap_ixiy_t swap_ixiy = (swap_ixiy_t)sread_int32(ifs);
+    if (!ixiy_compatible(g_options.swap_ixiy(), swap_ixiy)) {
+        if (do_error)
+            g_errors.error(ErrIXIYIncompatible, filename);
+        return false;
+    }
+
+    // ok
+    return true;
+}
+
+bool file_is_object_file(const string& filename, bool do_error) {
+    return check_signature(filename, OBJ_FILE_SIGNATURE, OBJ_FILE_VERSION, do_error, false);
+}
+
+bool file_is_library_file(const string& filename, bool do_error) {
+    return check_signature(filename, LIB_FILE_SIGNATURE, OBJ_FILE_VERSION, do_error, true);
+}
+
+//-----------------------------------------------------------------------------
 
 OFileWriter::OFileWriter(const string& o_filename)
     : o_filename_(o_filename) {
 }
 
-bool OFileWriter::write() {
+void OFileWriter::write() {
     if (g_options.verbose())
         cout << "Writing object file '" << o_filename_ << "'" << endl;
 
@@ -24,7 +100,7 @@ bool OFileWriter::write() {
     if (!os.is_open()) {
         g_errors.error(ErrFileCreate, temp_filename);
         perror(temp_filename.c_str());
-        return false;
+        return;
     }
 
     // write contents
@@ -37,13 +113,11 @@ bool OFileWriter::write() {
     if (rv != 0) {
         g_errors.error(ErrFileRename, temp_filename);
         perror(temp_filename.c_str());
-        return false;
+        return;
     }
-
-    return true;
 }
 
-streampos OFileWriter::write(ofstream& os) {
+void OFileWriter::write(ofstream& os) {
     streampos start_fpos = os.tellp();
 
     // write header
@@ -79,8 +153,6 @@ streampos OFileWriter::write(ofstream& os) {
 #undef WRITE_PTR
 
     os.seekp(end_fpos);
-
-    return start_fpos;
 }
 
 streampos OFileWriter::write_exprs(ofstream& os) {
@@ -273,4 +345,10 @@ void OFileWriter::write_sections(Section* section, ofstream& os) {
     size_t aligned_size = (size + (sizeof(int32_t) - 1)) & ~(sizeof(int32_t) - 1);
     size_t extra_bytes = aligned_size - size;
     os.write(align, extra_bytes);
+}
+
+//-----------------------------------------------------------------------------
+
+OFileReader::OFileReader(const string& o_filename)
+    : o_filename_(o_filename) {
 }

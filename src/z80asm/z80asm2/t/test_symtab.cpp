@@ -36,7 +36,7 @@ void test_symtab_define_symbol_command_line_1() {
     IS(res.value(), 1);
 
     g_options.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -62,7 +62,7 @@ void test_symtab_define_symbol_command_line_10() {
     IS(res.value(), 10);
 
     g_options.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -87,7 +87,7 @@ void test_symtab_define_symbol_command_line_duplicate_equal() {
     IS(res.value(), 10);
 
     g_options.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -124,7 +124,7 @@ void test_symtab_define_symbol_command_and_source_equ() {
 
     g_errors.clear();
     g_options.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -145,7 +145,7 @@ void test_symtab_define_symbol_command_and_source_label() {
 
     g_errors.clear();
     g_options.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -174,7 +174,7 @@ void test_symtab_define_symbol_command_and_source_public_use() {
     IS(res.value(), 1);
 
     g_options.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -203,7 +203,7 @@ void test_symtab_define_symbol_command_and_source_global_use() {
     IS(res.value(), 1);
 
     g_options.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -224,7 +224,7 @@ void test_symtab_define_symbol_command_and_source_extern_use() {
 
     g_errors.clear();
     g_options.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -255,7 +255,7 @@ void test_symtab_define_symbol() {
     IS(res.value(), 1);
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -312,7 +312,7 @@ void test_symtab_define_undefine() {
     IS(res1.value(), 0);
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -374,7 +374,7 @@ void test_symtab_define_undefine_define() {
     IS(res3.value(), 2);
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -399,7 +399,7 @@ void test_symtab_define_and_equ() {
         "test~.asm:21: error: duplicate definition: VAR\n");
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -422,7 +422,7 @@ void test_symtab_define_and_label() {
         "test~.asm:21: error: duplicate definition: VAR\n");
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -446,7 +446,7 @@ void test_symtab_define_and_define() {
         "test~.asm:21: error: duplicate definition: VAR\n");
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -477,7 +477,7 @@ void test_symtab_define_and_public() {
     IS(res.value(), 1);
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -508,7 +508,7 @@ void test_symtab_public_and_define() {
     IS(res.value(), 1);
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -539,7 +539,7 @@ void test_symtab_define_and_global() {
     IS(res.value(), 1);
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -570,7 +570,7 @@ void test_symtab_global_and_define() {
     IS(res.value(), 1);
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -592,7 +592,7 @@ void test_symtab_define_and_extern() {
         "test~.asm:21: error: symbol redeclaration: VAR\n");
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 
@@ -630,7 +630,7 @@ void test_symtab_extern_and_define() {
     IS(res.value(), 0);
 
     g_errors.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
 }
 

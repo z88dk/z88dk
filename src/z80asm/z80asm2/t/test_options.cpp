@@ -6,6 +6,7 @@
 
 #include "../../config.h"       // Z88DK_VERSION
 #include "common.h"
+#include "ofiles.h"
 #include "options.h"
 #include "utils.h"
 #include "t/test.h"
@@ -1871,10 +1872,17 @@ void test_option_input_files2() {
     remove("test~.xxx");
 }
 
+static void write_empty_object_file(const string& filename) {
+    char cpu_ixiy_data[] = { 1,0,0,0, 0,0,0,0 };
+    test_spew(filename,
+        string(OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION))+
+        string(std::begin(cpu_ixiy_data), std::end(cpu_ixiy_data)));
+    OK(0 == system("perl -e 'sleep(1)'"));
+}
+
 void test_option_input_files3() {
     remove("test~.asm");
-    test_spew("test~.o", OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
-    OK(0 == system("perl -e 'sleep(1)'"));
+    write_empty_object_file("test~.o");
 
     Options opts;
     opts.parse_args({ "test~" });
@@ -1953,7 +1961,7 @@ void test_option_input_files5() {
 }
 
 void test_option_input_files6() {
-    test_spew("test~.o", OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
+    write_empty_object_file("test~.o");
     OK(0 == system("perl -e 'sleep(1)'"));
     test_spew("test~.asm", "");
 
@@ -1964,7 +1972,7 @@ void test_option_input_files6() {
     IS(opts.input_files()[0], "test~.asm");
 
     test_spew("test~.asm", "");
-    test_spew("test~.o", OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION) "xx");
+    write_empty_object_file("test~.o");
 
     // now skips compile
     opts = Options();

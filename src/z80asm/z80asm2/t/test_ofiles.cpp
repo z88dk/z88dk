@@ -12,6 +12,244 @@
 #include <fstream>
 using namespace std;
 
+void test_file_is_object_file1() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    remove("test~.o");
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    NOK(file_is_object_file("test~.o"));
+    IS(oss.str(), "");
+
+    NOK(file_is_object_file("test~.o", true));
+    IS(oss.str(), "error: file open: test~.o\n");
+
+    g_errors.clear();
+    remove("test~.o");
+}
+
+void test_file_is_object_file2() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    test_spew("test~.o", "");
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    NOK(file_is_object_file("test~.o"));
+    IS(oss.str(), "");
+
+    NOK(file_is_object_file("test~.o", true));
+    IS(oss.str(), "error: not an object file: test~.o\n");
+
+    g_errors.clear();
+    remove("test~.o");
+}
+
+void test_file_is_object_file3() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    test_spew("test~.o", "12345678");
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    NOK(file_is_object_file("test~.o"));
+    IS(oss.str(), "");
+
+    NOK(file_is_object_file("test~.o", true));
+    IS(oss.str(), "error: not an object file: test~.o\n");
+
+    g_errors.clear();
+    remove("test~.o");
+}
+
+void test_file_is_object_file4() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    test_spew("test~.o", OBJ_FILE_SIGNATURE "00" "xx");
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    NOK(file_is_object_file("test~.o"));
+    IS(oss.str(), "");
+
+    NOK(file_is_object_file("test~.o", true));
+    IS(oss.str(), "error: invalid object file version: test~.o\n");
+
+    g_errors.clear();
+    remove("test~.o");
+}
+
+void test_file_is_object_file5() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    char cpu_ixiy_data[] = { -1,-1,-1,-1, -1,-1,-1,-1 };
+    test_spew("test~.o",
+        string(OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION)) +
+        string(std::begin(cpu_ixiy_data), std::end(cpu_ixiy_data)));
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    NOK(file_is_object_file("test~.o"));
+    IS(oss.str(), "");
+
+    NOK(file_is_object_file("test~.o", true));
+    IS(oss.str(), "error: CPU incompatible: test~.o\n");
+
+    g_errors.clear();
+    remove("test~.o");
+}
+
+void test_file_is_object_file6() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    char cpu_ixiy_data[] = { 1,0,0,0, -1,-1,-1,-1 };
+    test_spew("test~.o",
+        string(OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION)) +
+        string(std::begin(cpu_ixiy_data), std::end(cpu_ixiy_data)));
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    NOK(file_is_object_file("test~.o"));
+    IS(oss.str(), "");
+
+    NOK(file_is_object_file("test~.o", true));
+    IS(oss.str(), "error: -IXIY incompatible: test~.o\n");
+
+    g_errors.clear();
+    remove("test~.o");
+}
+
+void test_file_is_object_file7() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    char cpu_ixiy_data[] = { 1,0,0,0, 0,0,0,0 };
+    test_spew("test~.o",
+        string(OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION)) +
+        string(std::begin(cpu_ixiy_data), std::end(cpu_ixiy_data)));
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    OK(file_is_object_file("test~.o"));
+    IS(oss.str(), "");
+
+    OK(file_is_object_file("test~.o", true));
+    IS(oss.str(), "");
+
+    g_errors.clear();
+    remove("test~.o");
+}
+
+void test_file_is_object_file8() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+    g_options.set_cpu("*");
+
+    char cpu_ixiy_data[] = { -1,-1,-1,-1, -1,-1,-1,-1 };
+    test_spew("test~.o",
+        string(OBJ_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION)) +
+        string(std::begin(cpu_ixiy_data), std::end(cpu_ixiy_data)));
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    OK(file_is_object_file("test~.o"));
+    IS(oss.str(), "");
+
+    OK(file_is_object_file("test~.o", true));
+    IS(oss.str(), "");
+
+    g_options.clear();
+    g_errors.clear();
+    remove("test~.o");
+}
+
+void test_file_is_library_file1() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    remove("test~.lib");
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    NOK(file_is_library_file("test~.lib"));
+    IS(oss.str(), "");
+
+    NOK(file_is_library_file("test~.lib", true));
+    IS(oss.str(), "error: file open: test~.lib\n");
+
+    g_errors.clear();
+    remove("test~.lib");
+}
+
+void test_file_is_library_file2() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    test_spew("test~.lib", "");
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    NOK(file_is_library_file("test~.lib"));
+    IS(oss.str(), "");
+
+    NOK(file_is_library_file("test~.lib", true));
+    IS(oss.str(), "error: not a library file: test~.lib\n");
+
+    g_errors.clear();
+    remove("test~.lib");
+}
+
+void test_file_is_library_file3() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    test_spew("test~.lib", "12345678");
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    NOK(file_is_library_file("test~.lib"));
+    IS(oss.str(), "");
+
+    NOK(file_is_library_file("test~.lib", true));
+    IS(oss.str(), "error: not a library file: test~.lib\n");
+
+    g_errors.clear();
+    remove("test~.lib");
+}
+
+void test_file_is_library_file4() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    test_spew("test~.lib", LIB_FILE_SIGNATURE "00" "xx");
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    NOK(file_is_library_file("test~.lib"));
+    IS(oss.str(), "");
+
+    NOK(file_is_library_file("test~.lib", true));
+    IS(oss.str(), "error: invalid library file version: test~.lib\n");
+
+    g_errors.clear();
+    remove("test~.lib");
+}
+
+void test_file_is_library_file5() {
+    ostringstream oss;
+    g_errors.set_output(oss);
+
+    char cpu_ixiy_data[] = { -1,-1,-1,-1, -1,-1,-1,-1 };
+    test_spew("test~.lib",
+        string(LIB_FILE_SIGNATURE TOSTR(OBJ_FILE_VERSION)) +
+        string(std::begin(cpu_ixiy_data), std::end(cpu_ixiy_data)));
+    OK(0 == system("perl -e 'sleep(1)'"));
+
+    OK(file_is_library_file("test~.lib"));
+    IS(oss.str(), "");
+
+    OK(file_is_library_file("test~.lib", true));
+    IS(oss.str(), "");
+
+    g_errors.clear();
+    remove("test~.lib");
+}
+
 void test_simplest_file() {
     g_asm.clear();
     g_asm.add_object("test~.asm");
@@ -64,7 +302,7 @@ void test_simplest_file() {
 
     ifs.close();
 
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
     remove("test~.o");
 }
@@ -124,7 +362,7 @@ void test_changed_cpu() {
     ifs.close();
 
     g_options.clear();
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
     remove("test~.o");
 }
@@ -187,7 +425,7 @@ void test_add_1_byte_of_code() {
 
     ifs.close();
 
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
     remove("test~.o");
 }
@@ -252,7 +490,7 @@ void test_define_org() {
 
     ifs.close();
 
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
     remove("test~.o");
 }
@@ -336,7 +574,7 @@ void test_add_expression() {
 
     ifs.close();
 
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
     remove("test~.o");
 }
@@ -450,9 +688,9 @@ void test_add_defc_and_extern() {
 
     ifs.close();
 
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
-    //remove("test~.o");
+    remove("test~.o");
 }
 
 void test_add_label() {
@@ -575,7 +813,7 @@ void test_add_label() {
 
     ifs.close();
 
-    g_asm.delete_object();
+    g_asm.delete_objects();
     g_asm.clear();
     remove("test~.o");
 }

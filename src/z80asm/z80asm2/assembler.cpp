@@ -22,7 +22,7 @@ Assembler::~Assembler() {
 }
 
 void Assembler::clear() {
-    delete_object();
+    delete_objects();
     asmpc_ = nullptr;
 }
 
@@ -46,27 +46,23 @@ bool Assembler::assemble(const string& filename) {
     if (g_options.verbose())
         cout << endl;
 
-    delete_object();
-
     // exit true if no more errors
     return start_errors == g_errors.count();
 }
 
 void Assembler::add_object(const string& filename) {
-    delete_object();
-    object_ = new Object(filename);
+    objects_.push_back(new Object(filename));
 }
 
-Object& Assembler::object() {
-    xassert(object_);
-    return *object_;
+Object& Assembler::cur_object() {
+    xassert(!objects_.empty());
+    return *objects_.back();
 }
 
-void Assembler::delete_object() {
-    if (object_) {
-        delete object_;
-        object_ = nullptr;
-    }
+void Assembler::delete_objects() {
+    for (auto& object : objects_) 
+        delete object;
+    objects_.clear();
 }
 
 void Assembler::copy_defines() {
@@ -237,7 +233,7 @@ void Assembler::assemble1() {
     int start_errors = g_errors.count();
 
     // create parent directory of object file
-    string o_filename = file_o_filename(object().filename());
+    string o_filename = file_o_filename(cur_object().filename());
     string parent_dir = file_parent_path(o_filename);
     if (!file_is_directory(parent_dir)) {
         if (!file_create_directories(parent_dir)) {
@@ -247,23 +243,23 @@ void Assembler::assemble1() {
         }
     }
 
-    object().parse();
+    cur_object().parse();
     if (start_errors != g_errors.count())
         return;
 
-    object().check_relative_jumps();
+    cur_object().check_relative_jumps();
     if (start_errors != g_errors.count())
         return;
 
-    object().patch_local_exprs();
+    cur_object().patch_local_exprs();
     if (start_errors != g_errors.count())
         return;
 
-    object().check_undefined_symbols();
+    cur_object().check_undefined_symbols();
     if (start_errors != g_errors.count())
         return;
 
-    object().write_obj_file(o_filename);
+    cur_object().write_obj_file(o_filename);
     if (start_errors != g_errors.count())
         return;
 }

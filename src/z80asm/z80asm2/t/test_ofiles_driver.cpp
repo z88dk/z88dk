@@ -4,6 +4,19 @@
 #include <string>
 using namespace std;
 
+void test_file_is_object_file1();
+void test_file_is_object_file2();
+void test_file_is_object_file3();
+void test_file_is_object_file4();
+void test_file_is_object_file5();
+void test_file_is_object_file6();
+void test_file_is_object_file7();
+void test_file_is_object_file8();
+void test_file_is_library_file1();
+void test_file_is_library_file2();
+void test_file_is_library_file3();
+void test_file_is_library_file4();
+void test_file_is_library_file5();
 void test_simplest_file();
 void test_changed_cpu();
 void test_add_1_byte_of_code();
@@ -22,6 +35,19 @@ int main(int argc, char* argv[]) {
         DIAG("invalid test " << arg);
     }
     else {
+        test_file_is_object_file1();
+        test_file_is_object_file2();
+        test_file_is_object_file3();
+        test_file_is_object_file4();
+        test_file_is_object_file5();
+        test_file_is_object_file6();
+        test_file_is_object_file7();
+        test_file_is_object_file8();
+        test_file_is_library_file1();
+        test_file_is_library_file2();
+        test_file_is_library_file3();
+        test_file_is_library_file4();
+        test_file_is_library_file5();
         test_simplest_file();
         test_changed_cpu();
         test_add_1_byte_of_code();

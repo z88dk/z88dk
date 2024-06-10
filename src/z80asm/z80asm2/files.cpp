@@ -139,40 +139,6 @@ bool file_create_directories(const string& dirname) {
     }
 }
 
-static bool check_signature(const string& filename, const string& signature_base, int version) {
-    ifstream ifs(filename, ios::binary);
-
-    // open file
-    if (!ifs.is_open())
-        return false;
-
-    // read signature
-    char buffer[SIGNATURE_SIZE];
-    ifs.read(buffer, sizeof(buffer));
-    if (ifs.gcount() != sizeof(buffer))
-        return false;
-
-    // check signature_base
-    string got_signature_base = string(buffer, buffer + SIGNATURE_BASE_SIZE);
-    if (got_signature_base != signature_base)
-        return false;
-
-    // check version
-    int got_version = atoi(buffer + SIGNATURE_BASE_SIZE);
-    if (got_version != version)
-        return false;
-
-    return true;
-}
-
-bool file_is_object_file(const string& filename) {
-    return check_signature(filename, OBJ_FILE_SIGNATURE, OBJ_FILE_VERSION);
-}
-
-bool file_is_library_file(const string& filename) {
-    return check_signature(filename, LIB_FILE_SIGNATURE, OBJ_FILE_VERSION);
-}
-
 string file_current_path() {
     return file_norm_path(fs::current_path().generic_string());
 }
