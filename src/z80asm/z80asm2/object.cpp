@@ -205,6 +205,10 @@ int Section::align() const {
     return align_;
 }
 
+bool Section::section_split() const {
+    return section_split_;
+}
+
 list<Instr*>& Section::instrs() {
     return instrs_;
 }
@@ -217,11 +221,25 @@ int Section::size() const {
 }
 
 void Section::set_origin(int origin) {
-    origin_ = origin;
+    if (origin >= 0 || origin == ORG_NOT_DEFINED) {
+        origin_ = origin;
+        section_split_ = false;
+    }
+    else if (origin == ORG_SECTION_SPLIT) {
+        origin_ = ORG_NOT_DEFINED;
+        section_split_ = true;
+    }
+    else {
+        xassert(0);
+    }
 }
 
 void Section::set_align(int align) {
     align_ = align;
+}
+
+void Section::set_section_split(bool f) {
+    section_split_ = f;
 }
 
 Instr* Section::add_instr() {

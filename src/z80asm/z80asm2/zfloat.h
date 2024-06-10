@@ -6,8 +6,8 @@
 
 #pragma once
 
+#include "utils.h"
 #include "scan.h"
-#include <cstdint>
 #include <string>
 #include <vector>
 using namespace std;
@@ -52,7 +52,7 @@ public:
     void set(float_format_t format);
     bool set_text(const string& text);
 
-    vector<uint8_t> float_to_bytes(double value);
+    vector<byte_t> float_to_bytes(double value);
 
     static string get_all_formats();
     static vector<string> get_all_defines();
@@ -61,16 +61,16 @@ private:
     float_format_t float_format_;
 };
 
-vector<uint8_t> float_to_genmath(double value);
-vector<uint8_t> float_to_math48(double value);
-vector<uint8_t> float_to_z80(double value);
-vector<uint8_t> float_to_ieee16(double value);
-vector<uint8_t> float_to_ieee32(double value);
-vector<uint8_t> float_to_ieee64(double value);
-vector<uint8_t> float_to_zx(double value);
-vector<uint8_t> float_to_zx81(double value);
-vector<uint8_t> float_to_z88(double value);
-vector<uint8_t> float_to_mbfs(double value);
-vector<uint8_t> float_to_mbf40(double value);
-vector<uint8_t> float_to_mbf64(double value);
-vector<uint8_t> float_to_am9511(double value);
+vector<byte_t> float_to_genmath(double value);
+vector<byte_t> float_to_math48(double value);
+vector<byte_t> float_to_z80(double value);
+vector<byte_t> float_to_ieee16(double value);
+vector<byte_t> float_to_ieee32(double value);
+vector<byte_t> float_to_ieee64(double value);
+vector<byte_t> float_to_zx(double value);
+vector<byte_t> float_to_zx81(double value);
+vector<byte_t> float_to_z88(double value);
+vector<byte_t> float_to_mbfs(double value);
+vector<byte_t> float_to_mbf40(double value);
+vector<byte_t> float_to_mbf64(double value);
+vector<byte_t> float_to_am9511(double value);

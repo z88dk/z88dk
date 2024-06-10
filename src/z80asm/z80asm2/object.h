@@ -18,8 +18,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 
-typedef uint8_t Byte;
-typedef vector<Byte> Bytes;
+typedef vector<byte_t> Bytes;
 class Assembler;
 
 //-----------------------------------------------------------------------------
@@ -70,11 +69,14 @@ public:
     const string& name() const;
     int origin() const;
     int align() const;
+    bool section_split() const;
+
     list<Instr*>& instrs();
     int size() const;
 
     void set_origin(int origin);
     void set_align(int align);
+    void set_section_split(bool f);
 
     Instr* add_instr();
     Instr* add_instr(int opcode);
@@ -86,6 +88,7 @@ private:
     string name_;                           // name of section, may be ""
     int origin_{ ORG_NOT_DEFINED };         // ORG value
     int align_{ 1 };                        // ALIGN value
+    bool section_split_{ false };           // split this section in output
     list<Instr*> instrs_;                   // list of assembled instructions
 
     int phased_asmpc() const;

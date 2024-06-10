@@ -26,7 +26,9 @@ int main(int argc, char* argv[]) {
     // asssemble required files
     if (!g_options.lib_for_all_cpus()) {
         for (auto& file : g_options.input_files()) {
-            if (file_extension(file) != EXT_O)
+            if (file_extension(file) == EXT_O)
+                g_asm.load_object(file);
+            else
                 g_asm.assemble(file);
         }
     }

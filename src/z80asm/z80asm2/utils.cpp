@@ -170,12 +170,10 @@ int sread_int16(istream& is) {
 }
 
 int sread_int32(istream& is) {
-    char buffer[sizeof(int32_t)];
-    is.read(buffer, sizeof(buffer));
+    byte_t buffer[sizeof(int32_t)];
+    is.read((char*)buffer, sizeof(buffer));
     xassert(is.gcount() == sizeof(buffer));
-    int res = (int)(int32_t)((buffer[0] & 0xff) | ((buffer[1] & 0xff) << 8)
-        | ((buffer[2] & 0xff) << 16) | ((buffer[3] & 0xff) << 24));
-    return res;
+    return sread_int32(&buffer[0]);
 }
 
 string sread_string(istream& is) {
@@ -185,6 +183,14 @@ string sread_string(istream& is) {
     is.read(&out[0], len);
     xassert(is.gcount() == len);
     return out;
+}
+
+int sread_int32(const byte_t* mem) {
+    return (int)(int32_t)(
+        ((mem[0] << 0) & 0x000000ffL) |
+        ((mem[1] << 8) & 0x0000ff00L) |
+        ((mem[2] << 16) & 0x00ff0000L) |
+        ((mem[3] << 24) & 0xff000000L));
 }
 
 StringTable::StringTable() {
@@ -293,4 +299,19 @@ void StringTable::read(ifstream& is, streampos start_fpos) {
 
     // seek to start pos
     is.seekg(cur_fpos);
+}
+
+void StringTable::parse(const byte_t* mem) {
+    clear();
+
+    const byte_t* p = mem;
+    int num_strings = sread_int32(p); p += sizeof(int32_t);
+    p += sizeof(int32_t);   // string size
+
+    const char* strings = (const char*)p + num_strings * sizeof(int32_t);
+    for (int id = 0; id < num_strings; id++) {
+        uint_t pos = sread_int32(p); p += sizeof(int32_t);
+        const char* str = strings + pos;
+        xassert(id == add_string(str));
+    }
 }

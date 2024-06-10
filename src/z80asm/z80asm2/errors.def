@@ -14,6 +14,7 @@ X(ErrOk, "ok")
 // files
 X(ErrFileNotFound, "file not found")
 X(ErrFileOpen, "file open")
+X(ErrFileRead, "file read")
 X(ErrIncludeRecursion, "include recursion")
 X(ErrNotLibFile, "not a library file")
 X(ErrNotObjFile, "not an object file")

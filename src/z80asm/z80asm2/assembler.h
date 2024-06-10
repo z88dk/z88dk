@@ -28,7 +28,10 @@ public:
     void clear();
 
     // assemble source file
-    bool assemble(const string& filename);              // assemble one source file
+    void assemble(const string& asm_filename);          // assemble one source file
+
+    // load object file
+    void load_object(const string& o_filename);
 
     // object file
     void add_object(const string& filename);
@@ -66,4 +69,5 @@ private:
     void patch_local_exprs();       // patch values of expressions
     void check_undefined_symbols(); // check for undefined symbols
     void write_obj_file(const string& filename);    // write object file
+    void load_object1();            // worker of object loader
 };

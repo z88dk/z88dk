@@ -56,18 +56,57 @@ private:
     void write_sections(Section* section, ofstream& os);
 };
 
+// binary file reader
+class BinFileReader {
+public:
+    BinFileReader(const string& filename);
+
+    const string& filename() const;
+    size_t base_addr() const;
+    void set_base_addr(size_t addr);
+
+    void read();
+
+    size_t tell() const;
+    void seek(size_t addr);
+    const byte_t* ptr() const;
+    int read_int32();
+
+private:
+    string filename_;               // filename
+    vector<byte_t> bytes_;          // bytes from file
+    size_t base_addr_{ 0 };         // offset from start of file
+    size_t pos_{ 0 };               // current read position
+
+};
+
 // read object files
 class OFileReader {
 public:
     OFileReader(const string& o_filename);
 
-    bool check_cpu_swap();      // false if for different CPU/IXIY combination
-    void read_symbols();        // read defined symbols
-    void read();                // read into g_asm
+    void read();                    // read into g_asm
 
 private:
-    string o_filename_;
-    StringTable string_table_;
-    set<string> defined_symbols_;
-    vector<uint8_t> bytes_;
+    BinFileReader bin_file_;        // file reader
+    StringTable string_table_;      // string table from file
+
+    bool seek_ptr(int n);
+    bool seek_modname();
+    bool seek_exprs();
+    bool seek_defined_names();
+    bool seek_external_names();
+    bool seek_sections();
+    bool seek_string_table();
+
+    int read_int32();
+    string read_string();
+
+    void read1();
+    void parse_string_table();
+    void parse_modname();
+    void parse_sections();
+    void parse_defined_names();
+    void parse_external_names();
+    void parse_exprs();
 };

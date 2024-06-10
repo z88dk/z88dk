@@ -6,6 +6,7 @@
 
 #include "assembler.h"
 #include "common.h"
+#include "ofiles.h"
 #include "object.h"
 #include "parser.h"
 #include "xassert.h"
@@ -26,28 +27,39 @@ void Assembler::clear() {
     asmpc_ = nullptr;
 }
 
-bool Assembler::assemble(const string& filename) {
+void Assembler::assemble(const string& asm_filename) {
     if (g_options.verbose())
-        cout << "Assembling '" << filename << "'" << endl;
-
-    int start_errors = g_errors.count();
+        cout << "Assembling '" << asm_filename << "'" << endl;
 
     // create object and parser
-    add_object(filename);
+    add_object(asm_filename);
 
     // clear globals
     copy_defines();
 
     // assemble
-    g_errors.push_location(Location(filename));
+    g_errors.push_location(Location(asm_filename));
     assemble1();
     g_errors.pop_location();
 
     if (g_options.verbose())
         cout << endl;
+}
 
-    // exit true if no more errors
-    return start_errors == g_errors.count();
+void Assembler::load_object(const string& o_filename) {
+    if (g_options.verbose())
+        cout << "Appending object file '" << o_filename << "'" << endl;
+
+    // create object
+    add_object(o_filename);
+
+    // load object
+    g_errors.push_location(Location(o_filename));
+    load_object1();
+    g_errors.pop_location();
+
+    if (g_options.verbose())
+        cout << endl;
 }
 
 void Assembler::add_object(const string& filename) {
@@ -262,4 +274,11 @@ void Assembler::assemble1() {
     cur_object().write_obj_file(o_filename);
     if (start_errors != g_errors.count())
         return;
+}
+
+void Assembler::load_object1() {
+    string o_filename = cur_object().filename();
+
+    OFileReader ofile(o_filename);
+    ofile.read();
 }

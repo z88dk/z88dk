@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -14,6 +15,11 @@
 #include <unordered_map>
 #include <vector>
 using namespace std;
+
+typedef uint8_t byte_t;
+typedef uint16_t word_t;
+typedef uint32_t dword_t;
+typedef unsigned int uint_t;
 
 // number of elements of array
 #define NUM_ELEMS(a)    (sizeof(a) / sizeof(a[0]))
@@ -69,6 +75,8 @@ int sread_int16(istream& is);
 int sread_int32(istream& is);
 string sread_string(istream& is);
 
+int sread_int32(const byte_t* mem);
+
 class StringTable {
 public:
     StringTable();
@@ -80,6 +88,7 @@ public:
     size_t count() const;
     streampos write(ofstream& os);
     void read(ifstream& is, streampos start_fpos);
+    void parse(const byte_t* mem);
 
 private:
     vector<string> list_;

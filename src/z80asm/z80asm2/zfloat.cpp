@@ -18,14 +18,14 @@ using namespace std;
 // unions to access to float and double raw bytes
 union myfloat {
     float   value;
-    uint8_t bytes[4];
+    byte_t  bytes[4];
 };
 static_assert(sizeof(float) == 4, "expected 4 bytes");
 static_assert(sizeof(myfloat) == 4, "expected 4 bytes");
 
 union mydouble {
     double	 value;
-    uint8_t  bytes[8];
+    byte_t   bytes[8];
     uint64_t raw;	// 1 bit sign, 11 bits exponent, 52 bits mantissa, bias 1023
 };
 static const int mydouble_exp_bias = 1023;
@@ -47,8 +47,8 @@ static bool is_big_endian() {
 }
 
 // copy bytes to vector<>, reversing order if big endian
-static vector<uint8_t> get_bytes(uint8_t bytes[], int size) {
-    vector<uint8_t>	out;
+static vector<byte_t> get_bytes(byte_t bytes[], int size) {
+    vector<byte_t>	out;
     if (is_big_endian()) {	// invert byte order
         for (int i = size - 1; i >= 0; i--)
             out.push_back(bytes[i]);
@@ -66,9 +66,9 @@ static vector<uint8_t> get_bytes(uint8_t bytes[], int size) {
 static inline const int MAX_MANTISSA_SIZE = 7;
 
 struct fp_decomposed {
-    uint8_t   exponent{ 0 };
-    uint8_t   sign{ 0 };
-    uint8_t   mantissa[MAX_MANTISSA_SIZE + 1]{ 0 };
+    byte_t   exponent{ 0 };
+    byte_t   sign{ 0 };
+    byte_t   mantissa[MAX_MANTISSA_SIZE + 1]{ 0 };
 };
 
 static void decompose_float(double raw, fp_decomposed* fs, int mant_bytes, int exp_bias) {
@@ -81,7 +81,7 @@ static void decompose_float(double raw, fp_decomposed* fs, int mant_bytes, int e
         mant_bytes = MAX_MANTISSA_SIZE;
 
     fs->exponent = fs->sign = 0;
-    memset(fs->mantissa, 0, sizeof(uint8_t) * (MAX_MANTISSA_SIZE + 1));
+    memset(fs->mantissa, 0, sizeof(byte_t) * (MAX_MANTISSA_SIZE + 1));
     if (x == 0.0)
         return;
 
@@ -123,8 +123,8 @@ static void decompose_float(double raw, fp_decomposed* fs, int mant_bytes, int e
         fs->sign = 1;
 }
 
-static vector<uint8_t> pack32bit_float(uint32_t val) {
-    vector<uint8_t> fa;
+static vector<byte_t> pack32bit_float(uint32_t val) {
+    vector<byte_t> fa;
     fa.resize(4);
 
     fa[0] = val & 0xff;
@@ -135,10 +135,10 @@ static vector<uint8_t> pack32bit_float(uint32_t val) {
     return fa;
 }
 
-static vector<uint8_t> dofloat_z80(double value,
+static vector<byte_t> dofloat_z80(double value,
     int fp_size = 6, int mant_bytes = 5, int exp_bias = 128, int fudge_offset = 0) {
 
-    vector<uint8_t> fa;
+    vector<byte_t> fa;
     fa.resize(fp_size);
 
     struct fp_decomposed fs = { 0 };
@@ -156,25 +156,25 @@ static vector<uint8_t> dofloat_z80(double value,
     return fa;
 }
 
-vector<uint8_t> float_to_genmath(double value) {
+vector<byte_t> float_to_genmath(double value) {
     return dofloat_z80(value, 6, 5, 128, 0);
 }
 
-vector<uint8_t> float_to_math48(double value) {
+vector<byte_t> float_to_math48(double value) {
     return float_to_genmath(value);		// same format as genmath
 }
 
-vector<uint8_t> float_to_z80(double value) {
+vector<byte_t> float_to_z80(double value) {
     return float_to_genmath(value);		// same format as genmath
 }
 
 // convert to ieee-754 16 bits
-vector<uint8_t> float_to_ieee16(double value) {
+vector<byte_t> float_to_ieee16(double value) {
     int fp_size = 2;
     int mant_bytes = 2;
     int exp_bias = 14;
 
-    vector<uint8_t> fa;
+    vector<byte_t> fa;
     fa.resize(fp_size);
 
     if (isnan(value)) {
@@ -214,14 +214,14 @@ vector<uint8_t> float_to_ieee16(double value) {
 }
 
 // convert to ieee-754 32 bits
-vector<uint8_t> float_to_ieee32(double value) {
+vector<byte_t> float_to_ieee32(double value) {
     myfloat f;
     f.value = static_cast<float>(value);
     return get_bytes(f.bytes, static_cast<int>(sizeof(f)));
 }
 
 // convert to ieee-754 64 bits
-vector<uint8_t> float_to_ieee64(double value) {
+vector<byte_t> float_to_ieee64(double value) {
     mydouble f;
     f.value = value;
     return get_bytes(f.bytes, static_cast<int>(sizeof(f)));
@@ -229,10 +229,10 @@ vector<uint8_t> float_to_ieee64(double value) {
 
 // if integer: 0, 0, low, high, 0 (positive) | 0, 255, low, high, 0 (negative)
 // else: same as zx81
-vector<uint8_t> float_to_zx(double value) {
+vector<byte_t> float_to_zx(double value) {
     if (floor(value) == value && fabs(value) <= 65535.0) {
         int ivalue = static_cast<int>(floor(value));
-        vector<uint8_t>	out;
+        vector<byte_t>	out;
 
         out.push_back(0);
         if (value >= 0.0)
@@ -251,13 +251,13 @@ vector<uint8_t> float_to_zx(double value) {
 
 // 1 byte exponent
 // 4 bytes mantissa, with first bit replaced by sign bit
-vector<uint8_t> float_to_zx81(double value) {
+vector<byte_t> float_to_zx81(double value) {
 
     if (value == 0.0) {
-        return vector<uint8_t>{0, 0, 0, 0, 0};
+        return vector<byte_t>{0, 0, 0, 0, 0};
     }
     else {
-        vector<uint8_t>	out;
+        vector<byte_t>	out;
         mydouble f;
         f.value = value;
 
@@ -279,14 +279,14 @@ vector<uint8_t> float_to_zx81(double value) {
     }
 }
 
-vector<uint8_t> float_to_z88(double value) {
+vector<byte_t> float_to_z88(double value) {
     return dofloat_z80(value, 6, 4, 127, 1);	// leading zero + 5 bytes
 }
 
-vector<uint8_t> float_to_mbfs(double value) {
+vector<byte_t> float_to_mbfs(double value) {
     int fp_size = 4;
 
-    vector<uint8_t> fa;
+    vector<byte_t> fa;
     fa.resize(fp_size);
 
     struct fp_decomposed fs = { 0 };
@@ -307,10 +307,10 @@ vector<uint8_t> float_to_mbfs(double value) {
     return pack32bit_float(fp_value);
 }
 
-vector<uint8_t> float_to_mbf40(double value) {
+vector<byte_t> float_to_mbf40(double value) {
     int fp_size = 6;			// 5 bytes + trailing zero
 
-    vector<uint8_t> fa;
+    vector<byte_t> fa;
     fa.resize(fp_size);
 
     struct fp_decomposed fs = { 0 };
@@ -324,10 +324,10 @@ vector<uint8_t> float_to_mbf40(double value) {
     return fa;
 }
 
-vector<uint8_t> float_to_mbf64(double value) {
+vector<byte_t> float_to_mbf64(double value) {
     int fp_size = 8;
 
-    vector<uint8_t> fa;
+    vector<byte_t> fa;
     fa.resize(fp_size);
 
     struct fp_decomposed fs = { 0 };
@@ -341,10 +341,10 @@ vector<uint8_t> float_to_mbf64(double value) {
     return fa;
 }
 
-vector<uint8_t> float_to_am9511(double value) {
+vector<byte_t> float_to_am9511(double value) {
     int fp_size = 4;
 
-    vector<uint8_t> fa;
+    vector<byte_t> fa;
     fa.resize(fp_size);
 
     struct fp_decomposed fs = { 0 };
@@ -640,12 +640,12 @@ bool FloatFormat::set_text(const string& text) {
     }
 }
 
-vector<uint8_t> FloatFormat::float_to_bytes(double value) {
+vector<byte_t> FloatFormat::float_to_bytes(double value) {
     switch (float_format_) {
 #define X(type)	        case FLOAT_##type: return float_to_##type(value);
 #include "zfloat.def"
     default:
-        xassert(0); return vector<uint8_t>();
+        xassert(0); return vector<byte_t>();
     }
 }
 

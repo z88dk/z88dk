@@ -349,6 +349,313 @@ void OFileWriter::write_sections(Section* section, ofstream& os) {
 
 //-----------------------------------------------------------------------------
 
+BinFileReader::BinFileReader(const string& filename)
+    : filename_(filename), base_addr_(0), pos_(0) {
+}
+
+const string& BinFileReader::filename() const {
+    return filename_;
+}
+
+size_t BinFileReader::base_addr() const {
+    return base_addr_;
+}
+
+void BinFileReader::set_base_addr(size_t addr) {
+    base_addr_ = addr;
+}
+
+void BinFileReader::read() {
+    bytes_.clear();
+
+    ifstream ifs(filename_, ios::binary);
+    if (!ifs.is_open()) {
+        g_errors.error(ErrFileOpen, filename_);
+        perror(filename_.c_str());
+        return;
+    }
+    ifs.seekg(0, ios_base::end);
+    size_t size = ifs.tellg();
+    ifs.seekg(0, std::ios_base::beg);
+
+    bytes_.resize(size);
+    ifs.read((char*) &bytes_[0], size);
+    if (size != (size_t)ifs.gcount()) {
+        g_errors.error(ErrFileRead, filename_);
+        return;
+    }
+}
+
+size_t BinFileReader::tell() const {
+    return pos_ - base_addr_;
+}
+
+void BinFileReader::seek(size_t addr) {
+    pos_ = base_addr_ + addr;
+    xassert(pos_ - base_addr_ <= bytes_.size());
+}
+
+const byte_t* BinFileReader::ptr() const {
+    xassert(pos_ - base_addr_ <= bytes_.size());
+    return &bytes_[pos_ - base_addr_];
+}
+
+int BinFileReader::read_int32() {
+    xassert(pos_ - base_addr_ + sizeof(int32_t) <= bytes_.size());
+    int n = sread_int32(ptr());
+    pos_ += sizeof(int32_t);
+    return n;
+}
+
+//-----------------------------------------------------------------------------
+
 OFileReader::OFileReader(const string& o_filename)
-    : o_filename_(o_filename) {
+    : bin_file_(o_filename) {
+}
+
+void OFileReader::read() {
+    g_errors.push_location(Location(bin_file_.filename()));
+    read1();
+    g_errors.pop_location();
+}
+
+bool OFileReader::seek_ptr(int n) {
+    bin_file_.seek(SIGNATURE_SIZE + (2 + n) * sizeof(int32_t));
+    int ptr = bin_file_.read_int32();
+    return ptr >= 0;
+}
+
+bool OFileReader::seek_modname() {
+    return seek_ptr(0);
+}
+
+bool OFileReader::seek_exprs() {
+    return seek_ptr(1);
+}
+
+bool OFileReader::seek_defined_names() {
+    return seek_ptr(2);
+}
+
+bool OFileReader::seek_external_names() {
+    return seek_ptr(3);
+}
+
+bool OFileReader::seek_sections() {
+    return seek_ptr(4);
+}
+
+bool OFileReader::seek_string_table() {
+    return seek_ptr(5);
+}
+
+int OFileReader::read_int32() {
+    return bin_file_.read_int32();
+}
+
+string OFileReader::read_string() {
+    int n = read_int32();
+    return string_table_.lookup(n);
+}
+
+void OFileReader::read1() {
+    int start_errors = g_errors.count();
+    if (!file_is_object_file(bin_file_.filename(), true))
+        return;
+
+    parse_string_table();
+    if (start_errors != g_errors.count())
+        return;
+
+    parse_modname();
+    if (start_errors != g_errors.count())
+        return;
+
+    parse_sections();
+    if (start_errors != g_errors.count())
+        return;
+
+    parse_defined_names();
+    if (start_errors != g_errors.count())
+        return;
+
+    parse_external_names();
+    if (start_errors != g_errors.count())
+        return;
+
+    parse_exprs();
+    if (start_errors != g_errors.count())
+        return;
+}
+
+void OFileReader::parse_string_table() {
+    size_t save_pos = bin_file_.tell();
+    if (!seek_string_table())
+        g_errors.error(ErrNotObjFile, bin_file_.filename());
+    else 
+        string_table_.parse(bin_file_.ptr());
+   
+    bin_file_.seek(save_pos);
+}
+
+void OFileReader::parse_modname() {
+    if (!seek_modname())
+        g_errors.error(ErrNotObjFile, bin_file_.filename());
+    else {
+        string modname = read_string();
+        g_object().select_module(modname);
+    }
+}
+
+void OFileReader::parse_sections() {
+    if (!seek_sections())
+        return;
+
+    bool first_section = true;
+    while (true) {				// read sections until end marker
+        int code_size = read_int32();
+        if (code_size < 0)		// end marker
+            break;
+
+        // next section
+        string section_name = read_string();
+        g_module().select_section(section_name);
+
+        int origin = read_int32();
+        g_section().set_origin(origin);
+
+        int align = read_int32();
+        g_section().set_align(align);
+
+        // if creating relocatable code, ignore origin 
+        if (g_options.relocatable() && g_section().origin() >= 0) {
+            g_errors.warning(ErrOrgIgnored,
+                string("file ") + bin_file_.filename() + ", section " + section_name);
+
+            g_section().set_origin(ORG_NOT_DEFINED);
+            g_section().set_section_split(false);
+        }
+
+        // if running appmake, ignore origin except for first module
+        if (g_options.appmake() && g_section().origin() >= 0 && !first_section) {
+            g_errors.warning(ErrOrgIgnored,
+                string("file ") + bin_file_.filename() + ", section " + section_name);
+
+            g_section().set_origin(ORG_NOT_DEFINED);
+            g_section().set_section_split(false);
+        }
+
+        // load bytes to section
+        Instr* instr = g_section().add_instr();
+        instr->bytes().resize(code_size);
+        memcpy(&instr->bytes()[0], bin_file_.ptr(), code_size);
+
+        // align to dword size
+        int aligned_size = ((code_size + (sizeof(int32_t) - 1)) & ~(sizeof(int32_t) - 1));
+        bin_file_.seek(bin_file_.tell() + aligned_size);
+
+        first_section = false;
+    }
+}
+
+void OFileReader::parse_defined_names() {
+    if (!seek_defined_names())
+        return;
+
+    while (true) {				// read symbols until end marker
+        sym_scope_t scope = (sym_scope_t)read_int32();			// scope of symbol
+        if (scope == SCOPE_NONE)								// end marker
+            break;
+        else if (scope == SCOPE_LOCAL || scope == SCOPE_PUBLIC) {
+            // ok
+        }
+        else {
+            g_errors.error(ErrNotObjFile, bin_file_.filename());
+            break;
+        }
+
+        sym_type_t type = (sym_type_t)read_int32();				// type of symbol
+
+        string section_name = read_string();                    // section
+        g_module().select_section(section_name);
+
+        int value = read_int32();					            // value
+        string name = read_string();                            // symbol name
+
+        string source_filename = read_string();                 // where defined
+        int line_num = read_int32();                            // where defined
+
+        g_errors.push_location(Location(source_filename, line_num));
+
+        Symbol* symbol = new Symbol(name, scope, type, &g_section(), value);
+        g_local_symbols().insert(symbol);
+
+        g_errors.pop_location();
+    }
+}
+
+void OFileReader::parse_external_names() {
+    if (!seek_external_names())
+        return;
+
+    while (true) {				// read symbols until end marker
+        string name = read_string();
+        if (name.empty())
+            break;
+
+        Symbol* symbol = new Symbol(name, SCOPE_EXTERN, TYPE_UNDEFINED, &g_section(), 0);
+        g_local_symbols().insert(symbol);
+    }
+}
+
+void OFileReader::parse_exprs() {
+    if (!seek_exprs())
+        return;
+
+    while (true) {				// read expressions until end marker
+        range_t range = (range_t)read_int32();
+        if (range == RANGE_UNDEFINED)         // end marker
+            break;
+
+        string source_filename = read_string();                 // where defined
+        int line_num = read_int32();                            // where defined
+        g_errors.push_location(Location(source_filename, line_num));
+
+        string section_name = read_string();                    // section
+        g_module().select_section(section_name);
+
+        // patch location
+        /*int asmpc =*/ read_int32();
+        int code_pos = read_int32();
+        /*int opcode_size =*/ read_int32();
+
+        // expression
+        string target_name = read_string();
+        string expr_text = read_string();
+
+        // call parser to interpret expression
+        Expr* expr = new Expr;
+        Lexer lexer(expr_text);                                 // parse error
+        if (!expr->parse_expr(&lexer)) {
+            g_errors.error(ErrSyntaxExpr, expr_text);
+            delete expr;
+        }
+        else if (!target_name.empty()) {                        // assignment
+            xassert(range == RANGE_ASSIGNMENT);
+            Symbol* symbol = g_local_symbols().find(target_name);
+            xassert(symbol);
+            symbol->set_type(TYPE_COMPUTED);
+            symbol->set_section(&g_section());
+            symbol->set_expr(expr);
+            symbol->set_location(g_errors.location());
+        }
+        else {                                                  // patch
+            xassert(range != RANGE_ASSIGNMENT);
+            Patch* patch = new Patch(range, code_pos, expr);
+            Instr* instr = g_section().instrs().back();
+            instr->patches().push_back(patch);
+        }
+
+        g_errors.pop_location();
+    }
 }
