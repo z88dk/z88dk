@@ -45,10 +45,11 @@ STDLIB_8080_NEWLIBGLOBS_ex := $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*ra
         $(wildcard $(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm) \
         $(NEWLIB_DIRECTORY)/stdlib/z80/__stdlib_seed.asm
 
+STDLIB_8085_NEWLIBGLOBS := $(STDLIB_8080_NEWLIBGLOBS)
+STDLIB_8085_NEWLIBGLOBS_ex := $(STDLIB_8080_NEWLIBGLOBS_ex)
+
 STDLIB_GBZ80_NEWLIBGLOBS := $(STDLIB_8080_NEWLIBGLOBS)
 STDLIB_GBZ80_NEWLIBGLOBS_ex := $(STDLIB_8080_NEWLIBGLOBS_ex)
-
-
 
 STDLIB_NEWLIB_TARGETS := stdlib/obj/newlib-z80-stdlib \
 		stdlib/obj/newlib-z80n-stdlib \
@@ -102,7 +103,7 @@ $(eval $(call buildnew,stdlib,r4k,-mr4k,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLO
 $(eval $(call buildnew,stdlib,z80n,-mz80n,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,stdlib,ixiy,-mz80 -IXIY,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,stdlib,8080,-m8080,$(STDLIB_8080_NEWLIBGLOBS),$(STDLIB_8080_NEWLIBGLOBS_ex)))
-$(eval $(call buildnew,stdlib,8085,-m8085,$(STDLIB_8080_NEWLIBGLOBS),$(STDLIB_8080_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,stdlib,8085,-m8085,$(STDLIB_8085_NEWLIBGLOBS),$(STDLIB_8085_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,stdlib,gbz80,-mgbz80,$(STDLIB_GBZ80_NEWLIBGLOBS),$(STDLIB_GBZ80_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,stdlib,z180,-mz180,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,stdlib,ez80_z80,-mez80_z80,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
