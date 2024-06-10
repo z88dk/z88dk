@@ -12,7 +12,6 @@ games/obj/${TARGET}/joystick
 target/kc/graphics/clg
 target/kc/graphics/w_pixladdr
 target/kc/graphics/swapgfxbk
-target/kc/graphics/w_stencil_render
 # Take portable drawing routines to avoid using both index registers
 graphics/retrofit/obj/${TYPE}/draw_callee
 graphics/retrofit/obj/${TYPE}/drawr_callee
@@ -38,6 +37,10 @@ gfx/portable/obj/${TYPE}/xordrawr
 gfx/portable/obj/${TYPE}/xordrawto
 
 gfx/wide/obj/${TARGET}/w_putsprite
+gfx/wide/obj/${TARGET}/w_stencil_render
+gfx/wide/obj/${TARGET}/w_clga_callee_smc
+gfx/wide/obj/${TARGET}/w_xorclga_callee_smc
+gfx/wide/obj/${TARGET}/w_fillb_callee_smc
 gfx/wide/obj/${TARGET}/w_dcircle_square
 @gfx/wide/gfx_wide.lst
 @games/games_joystick.lst
