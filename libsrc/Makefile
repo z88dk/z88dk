@@ -16,7 +16,7 @@ TOCREATE =
 # $2 = libs
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
-CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxh19.lib gfxvio.lib
+CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpm8085_clib.lib cpmdevice.lib cpmdevice_8080.lib cpmdevice_8085.lib gfxh19.lib gfxvio.lib
 GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib 8085_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib preempt.lib sp1-all
 GENLIBS += 8080_opt.lib 8085_opt.lib
 GENLIBS += gfxtek.lib gfxregis.lib
@@ -784,11 +784,35 @@ cpm_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=gsx FLAVOUR=wide
 	TARGET=gsx TYPE=z80 $(LIBLINKER) -DFORcpm -DFORgsx -x$(OUTPUT_DIRECTORY)/gfxgsx @$(TARGET_DIRECTORY)/cpm/gfxgsx.lst
 
+cpmdevice.lib: cpm_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Device fnctl Library ---'
+	@echo ''
+	TARGET=cpm TYPE=z80 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
+
 cpm8080_clib.lib: $(TARGET_CLIB_OBJS) cpm_clib.lib
 	@echo ''
 	@echo '--- Building CP/M Library (8080)---'
 	@echo ''
 	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(TARGET_DIRECTORY)/cpm/cpm_8080.lst
+
+cpmdevice_8080.lib: cpm8080_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Device fnctl Library (8080) ---'
+	@echo ''
+	TARGET=cpm TYPE=8080 DEVICE=device $(LIBLINKER) -m8080 -x$(OUTPUT_DIRECTORY)/cpmdevice_8080 @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
+
+cpm8085_clib.lib: $(TARGET_CLIB_OBJS) cpm_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Library (8085)---'
+	@echo ''
+	TARGET=cpm TYPE=8085 DEVICE=nodevice $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8085_clib @$(TARGET_DIRECTORY)/cpm/cpm_8080.lst
+
+cpmdevice_8085.lib: cpm8085_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Device fnctl Library (8085) ---'
+	@echo ''
+	TARGET=cpm TYPE=8085 DEVICE=device $(LIBLINKER) -m8085 -x$(OUTPUT_DIRECTORY)/cpmdevice_8085 @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
 
 cpmixiy_clib.lib: $(TARGET_CLIB_OBJS) cpm_clib.lib
 	@echo ''
@@ -801,20 +825,6 @@ cpmz180_clib.lib: $(TARGET_CLIB_OBJS) cpm_clib.lib
 	@echo '--- Building CP/M Library (z180)---'
 	@echo ''
 	TARGET=cpm TYPE=z180 DEVICE=nodevice $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmz180_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst
-
-
-cpmdevice.lib: cpm_clib.lib
-	@echo ''
-	@echo '--- Building CP/M Device fnctl Library ---'
-	@echo ''
-	TARGET=cpm TYPE=z80 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
-
-cpmdevice_8080.lib: cpm8080_clib.lib
-	@echo ''
-	@echo '--- Building CP/M Device fnctl Library (8080) ---'
-	@echo ''
-	TARGET=cpm TYPE=8080 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice_8080 @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
-
 
 # Sorcerer Exidy lib - Stefano
 srr_clib.lib: $(TARGET_CLIB_OBJS)

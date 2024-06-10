@@ -4,7 +4,9 @@ stdlib/c/sccz80/abs_fastcall
 stdlib/c/sccz80/atexit
 stdlib/c/sccz80/atof
 stdlib/c/sccz80/atoi
+stdlib/c/sccz80/atoi_fastcall
 stdlib/c/sccz80/atol
+stdlib/c/sccz80/atol_fastcall
 stdlib/c/sccz80/atoll
 stdlib/c/sccz80/atoll_callee
 stdlib/c/sccz80/at_quick_exit
