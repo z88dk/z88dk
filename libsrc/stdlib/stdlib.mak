@@ -2,11 +2,13 @@ STDLIB_AFILES := $(notdir $(wildcard stdlib/*.asm))
 STDLIB_CFILES := unbcd.c wcmatch.c getopt.c
 
 STDLIB_8080_AFILES := $(notdir $(filter-out $(wildcard stdlib/*sqrt*.asm stdlib/*inp*.asm stdlib/*outp*.asm stdlib/*extract*.asm) , $(wildcard stdlib/*.asm))) $(patsubst stdlib/%,%,$(wildcard stdlib/8080/*.asm))
+STDLIB_8085_AFILES := $(notdir $(filter-out $(wildcard stdlib/*sqrt*.asm stdlib/*inp*.asm stdlib/*outp*.asm stdlib/*extract*.asm) , $(wildcard stdlib/*.asm))) $(patsubst stdlib/%,%,$(wildcard stdlib/8080/*.asm))
 STDLIB_GBZ80_AFILES := $(notdir $(filter-out $(wildcard stdlib/*sqrt*.asm stdlib/*inp*.asm stdlib/*outp*.asm stdlib/*extract*.asm) , $(wildcard stdlib/*.asm))) $(patsubst stdlib/%,%,$(wildcard stdlib/8080/*.asm))
 
 
 STDLIB_OBJECTS := $(STDLIB_CFILES:.c=.o) $(STDLIB_AFILES:.asm=.o)
 STDLIB_8080_OBJECTS := $(STDLIB_CFILES:.c=.o) $(STDLIB_8080_AFILES:.asm=.o)
+STDLIB_8085_OBJECTS := $(STDLIB_CFILES:.c=.o) $(STDLIB_8085_AFILES:.asm=.o)
 STDLIB_GBZ80_OBJECTS := $(STDLIB_CFILES:.c=.o) $(STDLIB_GBZ80_AFILES:.asm=.o)
 
 STDLIB_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"
@@ -67,7 +69,7 @@ STDLIB_OBJS := $(addprefix stdlib/obj/z80/, $(STDLIB_OBJECTS)) \
 	$(addprefix stdlib/obj/ixiy/,$(STDLIB_OBJECTS)) \
 	$(addprefix stdlib/obj/z80n/,$(STDLIB_OBJECTS)) \
 	$(addprefix stdlib/obj/8080/,$(STDLIB_8080_OBJECTS)) \
-	$(addprefix stdlib/obj/8085/,$(STDLIB_8080_OBJECTS)) \
+	$(addprefix stdlib/obj/8085/,$(STDLIB_8085_OBJECTS)) \
 	$(addprefix stdlib/obj/gbz80/,$(STDLIB_GBZ80_OBJECTS)) \
 	$(addprefix stdlib/obj/ez80_z80/,$(STDLIB_OBJECTS)) \
 	$(addprefix stdlib/obj/z180/,$(STDLIB_OBJECTS)) \
