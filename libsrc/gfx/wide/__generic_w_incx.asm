@@ -1,7 +1,10 @@
 
+;
+
 PUBLIC __generic_w_incx
-PUBLIC __generic_w_curx
-PUBLIC __generic_w_cury
+
+EXTERN __generic_w_curx
+EXTERN __generic_w_cury
 
 EXTERN  w_pixeladdress
 
@@ -10,6 +13,8 @@ SECTION code_graphics
 
 __generic_w_incx:
     push    af
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ;push    de
     ld      hl,(curx)
     ld      de,8
@@ -20,10 +25,8 @@ __generic_w_incx:
     ld      h,d
     ld      l,e
     ;pop de
+ENDIF
+
     pop af
-	ret
+    ret
 
-
-	SECTION		bss_graphics
-__generic_w_curx:	defw 0
-__generic_w_cury:	defw 0
