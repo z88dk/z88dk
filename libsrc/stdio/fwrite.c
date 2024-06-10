@@ -6,7 +6,7 @@
 
 
 
-#ifdef __8080
+#if CPU_8080 || CPU_8085
 int fwrite(void *ptr, size_t size, size_t nmemb, FILE *fp) {
     if ( (fp->flags & (_IOUSE|_IOWRITE|_IOSYSTEM)) == (_IOUSE|_IOWRITE)) {
     unsigned int len = size * nmemb;

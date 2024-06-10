@@ -76,11 +76,3 @@ call_trampoline:
 ENDIF
 #endasm
 
-
-
-
-
-
-    
-
-
