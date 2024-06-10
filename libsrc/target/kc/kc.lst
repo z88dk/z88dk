@@ -23,8 +23,8 @@ graphics/retrofit/obj/${TYPE}/xordraw_callee
 graphics/retrofit/obj/${TYPE}/xordrawr_callee
 graphics/retrofit/obj/${TYPE}/xordrawto_callee
 gfx/portable/obj/${TYPE}/commondraw
-gfx/portable/obj/${TYPE}/commondrawr
-gfx/portable/obj/${TYPE}/commondrawto
+gfx/portable/obj/${TYPE}/w_commondrawr
+gfx/portable/obj/${TYPE}/w_commondrawto
 gfx/portable/obj/${TYPE}/draw
 gfx/portable/obj/${TYPE}/drawr
 gfx/portable/obj/${TYPE}/drawto
