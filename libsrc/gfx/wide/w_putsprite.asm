@@ -19,6 +19,10 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  swapgfxbk
     EXTERN  __graphics_end
 
+	EXTERN __generic_w_curx
+	EXTERN __generic_w_cury
+	EXTERN __generic_w_incx
+
     INCLUDE "graphics/grafix.inc"
 
 ; __gfx_coords: d,e (vert-horz)
@@ -64,9 +68,9 @@ ___putsprite:
   ENDIF                                 ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c
-    ld      (curx), hl
+    ld      (__generic_w_curx), hl
     ld      (oldx), hl
-    ld      (cury), de
+    ld      (__generic_w_cury), de
     call    w_pixeladdress
       ; @@@@@@@@@@@@
     ld      hl, offsets_table
@@ -111,20 +115,10 @@ _noplot:
        ;@@@@@@@@@@
        ;Go to next byte
        ;@@@@@@@@@@
-    push    bc
+	   
     push    de
-    ex      af, af
-    ld      hl, (curx)
-    ld      de, 8
-    add     hl, de
-    ld      de, (cury)
-    ld      (curx), hl
-    call    w_pixeladdress
-    ld      h, d
-    ld      l, e
-    ex      af, af
+	   call __generic_w_incx
     pop     de
-    pop     bc
        ;@@@@@@@@@@
 
 _notedge:
@@ -135,10 +129,10 @@ _notedge:
        ;Go to next line
        ;@@@@@@@@@@
     ld      hl, (oldx)
-    ld      (curx), hl
-    ld      de, (cury)
+    ld      (__generic_w_curx), hl
+    ld      de, (__generic_w_cury)
     inc     de
-    ld      (cury), de
+    ld      (__generic_w_cury), de
     call    w_pixeladdress
     ld      h, d
     ld      l, e
@@ -180,20 +174,9 @@ wnoplot:
        ;@@@@@@@@@@
        ;Go to next byte
        ;@@@@@@@@@@
-    push    bc
     push    de
-    ex      af, af
-    ld      hl, (curx)
-    ld      de, 8
-    add     hl, de
-    ld      de, (cury)
-    ld      (curx), hl
-    call    w_pixeladdress
-    ld      h, d
-    ld      l, e
-    ex      af, af
+	   call __generic_w_incx
     pop     de
-    pop     bc
        ;@@@@@@@@@@
 
 wnotedge:
@@ -210,10 +193,10 @@ nextline:
        ;Go to next line
        ;@@@@@@@@@@
     ld      hl, (oldx)
-    ld      (curx), hl
-    ld      de, (cury)
+    ld      (__generic_w_curx), hl
+    ld      de, (__generic_w_cury)
     inc     de
-    ld      (cury), de
+    ld      (__generic_w_cury), de
     call    w_pixeladdress
     ld      h, d
     ld      l, e
@@ -238,13 +221,8 @@ wover_1:
     jr      nextline
 
 
-
     SECTION bss_graphics
 oldx:
-    defw    0
-curx:
-    defw    0
-cury:
     defw    0
 
 
