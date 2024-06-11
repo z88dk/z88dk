@@ -33,7 +33,7 @@ int writebyte(int myfile, int byte)
 		flos_lastfile=flosfile;
 	}
 	
-	if (write_bytes_to_file( (flosfile)->name, &byte, get_bank(), 1) != 0)
+	if (write_bytes_to_file( (flosfile)->name, (char *)&byte, get_bank(), 1) != 0)
 		return (-1);
 
 	flosfile->position++;
