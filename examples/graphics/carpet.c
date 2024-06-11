@@ -5,10 +5,16 @@
  * z88dk version by Stefano Bodrato, Apr. 2024
  *
  * Timex 2068
- * zcc +ts2068 -create-app -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -O3 -DWIDE_REZ carpet.c
+ * zcc +ts2068 -create-app -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -O3 -DWIDE_REZ -DFAT_PIXEL carpet.c
  *
  * Commodore 128
- * zcc +c128 -lgfx128hr -create-app -O3 -DWIDE_REZ carpet.c
+ * zcc +c128 -lgfx128hr -create-app -O3 -DWIDE_REZ -DFAT_PIXEL carpet.c
+ *
+ * Otrona Attachè
+ * zcc +cpm -subtype=attache -create-app -O3 -DWIDE_REZ carpet.c
+ *
+ * KC85
+ * zcc +kc -create-app -O3 -DWIDE_REZ carpet.c
  *
  * ZX Spectrum
  * zcc +zx -create-app -O3 carpet.c
@@ -48,7 +54,7 @@
 void box (x,y,x1,y1,n)
 {
 	stencil_init(stencil);
-#ifdef WIDE_REZ
+#if defined (FAT_PIXEL)
 	stencil_add_side(x*2,y,x*2,y1,stencil);
 	stencil_add_side(x1*2,y,x1*2,y1,stencil);
 #else

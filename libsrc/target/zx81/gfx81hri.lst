@@ -1,8 +1,13 @@
 target/zx81/graphics_hr/clg
 target/zx81/graphics_hr/_clg_hr
 target/zx81/graphics_hr/i_pixladdr
+target/zx81/graphics_hr/invhrg
+target/zx81/graphics_hr/copytxt
+target/zx81/graphics_hr/hrg_tune_left
+target/zx81/graphics_hr/hrg_tune_right
 target/zx81/graphics_hr/i_putsprite
 target/zx81/graphics_hr/i_clga_callee
 target/zx81/graphics_hr/i_xorclga_callee
 target/zx81/graphics_hr/i_fillb_callee
+gfx/wide/obj/${TARGET}/w_dcircle_square
 @gfx/wide/gfx_wide.lst
