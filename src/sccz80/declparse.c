@@ -1698,7 +1698,6 @@ int type_matches_pointer(Type *t1, Type *t2)
         }
     }
 
-
     if ( p2->kind  == KIND_VOID ) {
         if ( p1->isvolatile == 0 && p2->isvolatile)
             return 0;
@@ -1723,7 +1722,8 @@ int type_matches(Type *t1, Type *t2)
 {
     int i;
 
-    if ( t1->kind != t2->kind && !(ispointer(t1) && t2->kind == KIND_ARRAY) && !(ispointer(t2) && t1->kind == KIND_ARRAY) )
+    // Allow promotion up to a CPTR
+    if ( t1->kind != t2->kind && !(ispointer(t1) && t2->kind == KIND_ARRAY) && !(ispointer(t2) && t1->kind == KIND_ARRAY) && !(t1->kind == KIND_CPTR && (t2->kind == KIND_PTR || t2->kind == KIND_ARRAY)))
         return 0;
 
     if ( t1->isunsigned != t2->isunsigned )
