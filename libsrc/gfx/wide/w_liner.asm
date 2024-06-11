@@ -75,9 +75,8 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__&&!__CPU_Z180__
 ;      ------------------------------------------
 
 w_line_r:
-    ;push    bc
-    ;push    de                  ; preserve relative vertical distance
-    ;push    hl                  ; preserve relative horizontal distance
+
+    ld      (plot_sub_addr),ix
 
     push    de
     push    hl
@@ -139,7 +138,7 @@ init_drawloop:
     srl     h                           ; i = INT(BC/2)
     rr      l
     push    hl
-    pop     iy
+    pop     ix
 
     ld      h, b
     ld      l, c
@@ -147,10 +146,10 @@ init_drawloop:
 drawloop:
     push    bc                          ; FOR N=BC TO 1 STEP -1
 
-    add     iy, de                      ; i = i + DE
+    add     ix, de                      ; i = i + DE
 
-    ; cmp hl,iy
-    ld      a, iyh
+    ; cmp hl,ix
+    ld      a, ixh
     add     $80
     ld      b, a
     ld      a, h
@@ -159,7 +158,7 @@ drawloop:
     jr      nz, noteq2
     ;ret    nz
     ld      a, l
-    cp      iyl
+    cp      ixl
 
 noteq2:
     jp      c, i_greater                ;      if i < HL
@@ -170,12 +169,12 @@ noteq2:
     jp      check_plot                  ;      else
 i_greater:
 
-    ld      a, iyl                      ; (IY)  i = i - HL
+    ld      a, ixl                      ; (IX)  i = i - HL
     sub     l
-    ld      iyl, a
-    ld      a, iyh
+    ld      ixl, a
+    ld      a, ixh
     sbc     a, h
-    ld      iyh, a
+    ld      ixh, a
 
     exx
     push    de                          ;      inx = direc_x: iny = direc_y
@@ -208,11 +207,15 @@ incx:
     inc     hl
 zx:
 
+    push    ix
 plot_point:
+    ld   ix,(plot_sub_addr)
     ld      bc, plot_RET
     push    bc                          ;      hl,de = (x0,y0)...
     jp      (ix)                        ;      execute PLOT at (x0,y0)
 plot_RET:
+    pop     ix
+	
     pop     de                          ;      restore distances...
     pop     hl
 
@@ -224,6 +227,7 @@ plot_RET:
 ;-------------- -------------- -------------- --------------
 exit_draw:
     ret
+
 
 ;.exit_draw            pop    hl            ; restore relative horizontal distance
 ;                    pop    de            ; restore relative vertical distance
@@ -278,4 +282,11 @@ abs:
     sbc     hl, de                      ; convert negative integer
     pop     de
     ret
+
+
+SECTION bss_graphics
+
+plot_sub_addr: defw 0
+
+
 ENDIF
