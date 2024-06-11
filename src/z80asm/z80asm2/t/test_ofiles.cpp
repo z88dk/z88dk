@@ -303,6 +303,15 @@ void test_simplest_file() {
     ifs.close();
 
     g_asm.delete_objects();
+
+    // read it back
+    g_asm.load_object("test~.o");
+    IS(g_module().name(), "test~");
+    IS(g_section().name(), "");
+    IS(g_section().origin(), ORG_NOT_DEFINED);
+    IS(g_section().align(), 1);
+    IS(g_section().size(), 0);
+
     g_asm.clear();
     remove("test~.o");
 }
@@ -360,9 +369,17 @@ void test_changed_cpu() {
     IS(string(&buffer[1]), "test~");    // string 1
 
     ifs.close();
+    g_asm.delete_objects();
+
+    // read it back
+    g_asm.load_object("test~.o");
+    IS(g_module().name(), "test~");
+    IS(g_section().name(), "");
+    IS(g_section().origin(), ORG_NOT_DEFINED);
+    IS(g_section().align(), 1);
+    IS(g_section().size(), 0);
 
     g_options.clear();
-    g_asm.delete_objects();
     g_asm.clear();
     remove("test~.o");
 }
@@ -426,6 +443,18 @@ void test_add_1_byte_of_code() {
     ifs.close();
 
     g_asm.delete_objects();
+
+    // read it back
+    g_asm.load_object("test~.o");
+    IS(g_module().name(), "test~");
+    IS(g_section().name(), "");
+    IS(g_section().origin(), ORG_NOT_DEFINED);
+    IS(g_section().align(), 1);
+    IS(g_section().size(), 1);
+    IS(g_section().instrs().size(), 1);
+    IS(g_section().instrs()[0]->bytes().size(), 1);
+    IS(g_section().instrs()[0]->bytes()[0], 0xc9);
+
     g_asm.clear();
     remove("test~.o");
 }
@@ -489,8 +518,19 @@ void test_define_org() {
     IS(string(&buffer[1]), "test~");    // string 1
 
     ifs.close();
-
     g_asm.delete_objects();
+
+    // read it back
+    g_asm.load_object("test~.o");
+    IS(g_module().name(), "test~");
+    IS(g_section().name(), "");
+    IS(g_section().origin(), 0x1000);
+    IS(g_section().align(), 4);
+    IS(g_section().size(), 1);
+    IS(g_section().instrs().size(), 1);
+    IS(g_section().instrs()[0]->bytes().size(), 1);
+    IS(g_section().instrs()[0]->bytes()[0], 0xc9);
+
     g_asm.clear();
     remove("test~.o");
 }
@@ -573,8 +613,25 @@ void test_add_expression() {
     IS(string(&buffer[15]), "test~");   // string 3
 
     ifs.close();
-
     g_asm.delete_objects();
+
+    // read it back
+    g_asm.load_object("test~.o");
+    IS(g_module().name(), "test~");
+    IS(g_section().name(), "");
+    IS(g_section().origin(), 0x1000);
+    IS(g_section().align(), 4);
+    IS(g_section().size(), 3);
+    IS(g_section().instrs().size(), 1);
+    IS(g_section().instrs()[0]->bytes().size(), 3);
+    IS(g_section().instrs()[0]->bytes()[0], 0x3e);
+    IS(g_section().instrs()[0]->bytes()[1], 0);
+    IS(g_section().instrs()[0]->bytes()[2], 0xc9);
+    IS(g_section().instrs()[0]->patches().size(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->range(), RANGE_BYTE_UNSIGNED);
+    IS(g_section().instrs()[0]->patches()[0]->offset(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->expr()->text(), "3*4");
+
     g_asm.clear();
     remove("test~.o");
 }
@@ -687,8 +744,37 @@ void test_add_defc_and_extern() {
     IS(string(&buffer[22]), "test~");   // string 4
 
     ifs.close();
-
     g_asm.delete_objects();
+
+    // read it back
+    g_asm.load_object("test~.o");
+    IS(g_module().name(), "test~");
+    IS(g_section().name(), "");
+    IS(g_section().origin(), 0x1000);
+    IS(g_section().align(), 4);
+
+    OK(g_local_symbols().find("XSIZE"));
+    IS(g_local_symbols().find("XSIZE")->scope(), SCOPE_EXTERN);
+    IS(g_local_symbols().find("XSIZE")->type(), TYPE_UNDEFINED);
+    IS(g_local_symbols().find("XSIZE")->section()->name(), "");
+
+    OK(g_local_symbols().find("SIZE"));
+    IS(g_local_symbols().find("SIZE")->scope(), SCOPE_LOCAL);
+    IS(g_local_symbols().find("SIZE")->type(), TYPE_COMPUTED);
+    IS(g_local_symbols().find("SIZE")->section()->name(), "");
+    IS(g_local_symbols().find("SIZE")->expr()->text(), "XSIZE");
+
+    IS(g_section().size(), 3);
+    IS(g_section().instrs().size(), 1);
+    IS(g_section().instrs()[0]->bytes().size(), 3);
+    IS(g_section().instrs()[0]->bytes()[0], 0x3e);
+    IS(g_section().instrs()[0]->bytes()[1], 0);
+    IS(g_section().instrs()[0]->bytes()[2], 0xc9);
+    IS(g_section().instrs()[0]->patches().size(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->range(), RANGE_BYTE_UNSIGNED);
+    IS(g_section().instrs()[0]->patches()[0]->offset(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->expr()->text(), "SIZE");
+
     g_asm.clear();
     remove("test~.o");
 }
@@ -812,8 +898,52 @@ void test_add_label() {
     IS(string(&buffer[28]), "test~");   // string 5
 
     ifs.close();
-
     g_asm.delete_objects();
+
+    // read it back
+    g_asm.load_object("test~.o");
+    IS(g_module().name(), "test~");
+    IS(g_section().name(), "");
+    IS(g_section().origin(), 0x1000);
+    IS(g_section().align(), 4);
+
+    OK(g_local_symbols().find("START"));
+    IS(g_local_symbols().find("START")->scope(), SCOPE_LOCAL);
+    IS(g_local_symbols().find("START")->type(), TYPE_ADDRESS);
+    IS(g_local_symbols().find("START")->section()->name(), "");
+    ExprResult res = g_local_symbols().find("START")->eval();
+    OK(res.ok());
+    IS(res.type(), TYPE_ADDRESS);
+    IS(res.value(), 0);
+
+    OK(g_local_symbols().find("XSIZE"));
+    IS(g_local_symbols().find("XSIZE")->scope(), SCOPE_EXTERN);
+    IS(g_local_symbols().find("XSIZE")->type(), TYPE_UNDEFINED);
+    IS(g_local_symbols().find("XSIZE")->section()->name(), "");
+    res = g_local_symbols().find("XSIZE")->eval();
+    NOK(res.ok());
+    IS(res.type(), TYPE_UNDEFINED);
+
+    OK(g_local_symbols().find("SIZE"));
+    IS(g_local_symbols().find("SIZE")->scope(), SCOPE_LOCAL);
+    IS(g_local_symbols().find("SIZE")->type(), TYPE_COMPUTED);
+    IS(g_local_symbols().find("SIZE")->section()->name(), "");
+    IS(g_local_symbols().find("SIZE")->expr()->text(), "XSIZE");
+    res = g_local_symbols().find("SIZE")->eval();
+    NOK(res.ok());
+    IS(res.type(), TYPE_UNDEFINED);
+
+    IS(g_section().size(), 3);
+    IS(g_section().instrs().size(), 1);
+    IS(g_section().instrs()[0]->bytes().size(), 3);
+    IS(g_section().instrs()[0]->bytes()[0], 0x3e);
+    IS(g_section().instrs()[0]->bytes()[1], 0);
+    IS(g_section().instrs()[0]->bytes()[2], 0xc9);
+    IS(g_section().instrs()[0]->patches().size(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->range(), RANGE_BYTE_UNSIGNED);
+    IS(g_section().instrs()[0]->patches()[0]->offset(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->expr()->text(), "SIZE");
+
     g_asm.clear();
     remove("test~.o");
 }

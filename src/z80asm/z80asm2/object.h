@@ -11,7 +11,6 @@
 #include "parser.h"
 #include "symtab.h"
 #include <cstdint>
-#include <list>
 #include <string>
 #include <vector>
 using namespace std;
@@ -36,7 +35,7 @@ public:
     int asmpc() const;                      // get offset or phased_asmpc
     int size() const;
     Bytes& bytes();
-    list<Patch*>& patches();
+    vector<Patch*>& patches();
     Symbol* label() const;
 
     void set_offset_asmpc(int asmpc);
@@ -52,7 +51,7 @@ private:
     int phased_asmpc_{ ORG_NOT_DEFINED };   // address inside ASMPC phase
     Bytes bytes_;                           // bytes of the instruction
                                             // with placeholders for patches
-    list<Patch*> patches_;                  // patches for each variable expression
+    vector<Patch*> patches_;                // patches for each variable expression
     Symbol* label_{ nullptr };              // weak pointer to label if any
 };
 
@@ -71,7 +70,7 @@ public:
     int align() const;
     bool section_split() const;
 
-    list<Instr*>& instrs();
+    vector<Instr*>& instrs();
     int size() const;
 
     void set_origin(int origin);
@@ -89,7 +88,7 @@ private:
     int origin_{ ORG_NOT_DEFINED };         // ORG value
     int align_{ 1 };                        // ALIGN value
     bool section_split_{ false };           // split this section in output
-    list<Instr*> instrs_;                   // list of assembled instructions
+    vector<Instr*> instrs_;                 // list of assembled instructions
 
     int phased_asmpc() const;
 };
@@ -106,7 +105,7 @@ public:
 
     const string& name() const;
 
-    list<Section*>& sections();
+    vector<Section*>& sections();
     void select_section(const string& name);
     Section& cur_section() const;
     Symtab& symbols();
@@ -117,7 +116,7 @@ public:
 
 private:
     string name_;                           // name based on filename, or given by directive
-    list<Section*> sections_;               // list of sections in this module
+    vector<Section*> sections_;             // list of sections in this module
     unordered_map<string, Section*> section_by_name_;   // index sections by name
     Section* cur_section_{ nullptr };       // current section
     Symtab symbols_;                        // all symbols
@@ -138,7 +137,7 @@ public:
 
     const string& filename() const;
 
-    list<Module*>& modules();
+    vector<Module*>& modules();
     void select_module(const string& name);
     Module& cur_module() const;
 
@@ -152,7 +151,7 @@ public:
 private:
     Parser parser_;                         // parser of input
     string filename_;                       // name based on filename
-    list<Module*> modules_;                 // list of modules in this object
+    vector<Module*> modules_;               // vector of modules in this object
     unordered_map<string, Module*> module_by_name_; // index modules by name
     Module* cur_module_{ nullptr };         // current module
 

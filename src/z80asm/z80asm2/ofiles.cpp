@@ -423,7 +423,12 @@ void OFileReader::read() {
 bool OFileReader::seek_ptr(int n) {
     bin_file_.seek(SIGNATURE_SIZE + (2 + n) * sizeof(int32_t));
     int ptr = bin_file_.read_int32();
-    return ptr >= 0;
+    if (ptr < 0)
+        return false;
+    else {
+        bin_file_.seek(ptr);
+        return true;
+    }
 }
 
 bool OFileReader::seek_modname() {
@@ -462,6 +467,10 @@ string OFileReader::read_string() {
 void OFileReader::read1() {
     int start_errors = g_errors.count();
     if (!file_is_object_file(bin_file_.filename(), true))
+        return;
+
+    bin_file_.read();
+    if (start_errors != g_errors.count())
         return;
 
     parse_string_table();
@@ -548,8 +557,10 @@ void OFileReader::parse_sections() {
 
         // load bytes to section
         Instr* instr = g_section().add_instr();
-        instr->bytes().resize(code_size);
-        memcpy(&instr->bytes()[0], bin_file_.ptr(), code_size);
+        if (code_size > 0) {
+            instr->bytes().resize(code_size);
+            memcpy(&instr->bytes()[0], bin_file_.ptr(), code_size);
+        }
 
         // align to dword size
         int aligned_size = ((code_size + (sizeof(int32_t) - 1)) & ~(sizeof(int32_t) - 1));

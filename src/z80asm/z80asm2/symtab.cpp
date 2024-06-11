@@ -104,7 +104,7 @@ ExprResult Symbol::eval1() {
     else if (instr_)
         return ExprResult(TYPE_ADDRESS, instr_->asmpc());
     else
-        return ExprResult(TYPE_CONSTANT, value_);
+        return ExprResult(type_, value_);
 }
 
 //-----------------------------------------------------------------------------
@@ -163,7 +163,7 @@ void Symtab::erase(const string& name) {
         return;
 
     Symbol* symbol = it->second;
-    symbols_.remove(symbol);
+    symbols_.erase(std::remove(symbols_.begin(), symbols_.end(), symbol), symbols_.end());
     map_.erase(it);
 
     // set to zero and remove any instr/expr

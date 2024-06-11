@@ -104,9 +104,11 @@ Symbol* Assembler::add_asmpc_instr() {
 
 Symbol* Assembler::add_label(const string& name) {
     Instr* instr = add_instr();
-    Symbol* label = define_symbol(name);
+    Symbol* label = define_symbol(name, instr->asmpc());
     if (label) {
         label->set_type(TYPE_ADDRESS);
+        label->set_instr(instr);
+        label->set_touched();
         instr->set_label(label);
         return label;
     }

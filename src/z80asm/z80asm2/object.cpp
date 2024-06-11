@@ -9,6 +9,7 @@
 #include "object.h"
 #include "ofiles.h"
 #include "xassert.h"
+#include <cstring>
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -64,7 +65,7 @@ Bytes& Instr::bytes() {
     return bytes_;
 }
 
-list<Patch*>& Instr::patches() {
+vector<Patch*>& Instr::patches() {
     return patches_;
 }
 
@@ -209,7 +210,7 @@ bool Section::section_split() const {
     return section_split_;
 }
 
-list<Instr*>& Section::instrs() {
+vector<Instr*>& Section::instrs() {
     return instrs_;
 }
 
@@ -342,7 +343,7 @@ void Module::create_default_section() {
     select_section("");                     // create "" section
 }
 
-list<Section*>& Module::sections() {
+vector<Section*>& Module::sections() {
     return sections_;
 }
 
@@ -418,7 +419,7 @@ void Object::create_default_module() {
     select_module(file_basename(filename_));
 }
 
-list<Module*>& Object::modules() {
+vector<Module*>& Object::modules() {
     return modules_;
 }
 

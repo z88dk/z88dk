@@ -12,7 +12,6 @@
 #include "options.h"
 #include "symtab.h"
 #include <iostream>
-#include <list>
 #include <string>
 using namespace std;
 
@@ -60,7 +59,7 @@ public:
     Symbol* declare_global(const string& name);
 
 private:
-    list<Object*> objects_;         // object file
+    vector<Object*> objects_;       // object file
     Symbol* asmpc_{ nullptr };      // asmpc of current statement
 
     Symbol* make_global(const string& name, sym_scope_t new_scope);

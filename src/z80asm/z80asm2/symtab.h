@@ -9,9 +9,9 @@
 #include "expr.h"
 #include "location.h"
 #include "z80asm_defs.h"
-#include <list>
 #include <string>
 #include <unordered_map>
+#include <vector>
 using namespace std;
 
 class Assembler;
@@ -82,8 +82,8 @@ public:
     void check_undefined_symbols();
 
 private:
-    list<Symbol*> symbols_;                 // holds symbols in order created
-    list<Symbol*> deleted_;                 // holds deleted symbols that may still be
+    vector<Symbol*> symbols_;               // holds symbols in order created
+    vector<Symbol*> deleted_;               // holds deleted symbols that may still be
                                             // referenced by expressions
     unordered_map<string, Symbol*> map_;    // map for quick searches
 };
