@@ -158,7 +158,7 @@ typedef struct filestr FILE;
 /* Number of open files, this can be overridden by the crt0, but the 10 is the default for classic */
 #ifndef FOPEN_MAX
 extern void *_FOPEN_MAX;
-#define FOPEN_MAX &_FOPEN_MAX
+#define FOPEN_MAX (int)&_FOPEN_MAX
 #endif
 
 
