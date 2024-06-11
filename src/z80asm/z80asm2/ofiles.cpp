@@ -7,6 +7,7 @@
 #include "common.h"
 #include "ofiles.h"
 #include "xassert.h"
+#include <cstring>
 #include <iostream>
 using namespace std;
 
