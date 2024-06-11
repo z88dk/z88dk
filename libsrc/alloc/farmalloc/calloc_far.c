@@ -43,8 +43,8 @@ void *__far calloc_far (size_t nmemb, size_t size)
 	if (msize > SIZE_MAX)
 		return(0);
 
-	if (ptr = malloc_far(msize))
-		memsetf(ptr, 0, msize);
+	if (ptr = malloc_far((size_t)msize))
+		memsetf(ptr, 0, (size_t)msize);
 
 	return(ptr);
 }
