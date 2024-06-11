@@ -19,12 +19,12 @@
  */
 #ifndef CLIB_OPEN_MAX
 extern void *_CLIB_OPEN_MAX;
-#define CLIB_OPEN_MAX &_CLIB_OPEN_MAX
+#define CLIB_OPEN_MAX (int)&_CLIB_OPEN_MAX
 #endif
 
 
 
-#define MAXFILE (int)CLIB_OPEN_MAX
+#define MAXFILE CLIB_OPEN_MAX
 
 /* If you want fileio to support devices then link with -lcpmdevice.
  * This adds the following devices: CON: RDR: PUN: LST: without this
