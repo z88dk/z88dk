@@ -542,7 +542,7 @@ void test_add_expression() {
     g_section().set_align(4);
     g_errors.set_location(Location("test~.asm", 11));
     Instr* instr = g_section().add_instr(0x3e);
-    instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 1, new Expr("3*4")));
+    instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 0, 1, 2, new Expr("3*4")));
     g_section().add_instr(0xc9);
     OFileWriter ofile("test~.o");
     ofile.write();
@@ -629,7 +629,9 @@ void test_add_expression() {
     IS(g_section().instrs()[0]->bytes()[2], 0xc9);
     IS(g_section().instrs()[0]->patches().size(), 1);
     IS(g_section().instrs()[0]->patches()[0]->range(), RANGE_BYTE_UNSIGNED);
-    IS(g_section().instrs()[0]->patches()[0]->offset(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->asmpc(), 0);
+    IS(g_section().instrs()[0]->patches()[0]->offset_patch(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->opcode_size(), 2);
     IS(g_section().instrs()[0]->patches()[0]->expr()->text(), "3*4");
 
     g_asm.clear();
@@ -644,7 +646,7 @@ void test_add_defc_and_extern() {
     g_asm.declare_extern("XSIZE");
     g_errors.set_location(Location("test~.asm", 11));
     Instr* instr = g_section().add_instr(0x3e);
-    instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 1, new Expr("SIZE")));
+    instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 0, 1, 2, new Expr("SIZE")));
     g_asm.add_equ("SIZE", new Expr("XSIZE"));
     g_section().add_instr(0xc9);
     OFileWriter ofile("test~.o");
@@ -772,7 +774,9 @@ void test_add_defc_and_extern() {
     IS(g_section().instrs()[0]->bytes()[2], 0xc9);
     IS(g_section().instrs()[0]->patches().size(), 1);
     IS(g_section().instrs()[0]->patches()[0]->range(), RANGE_BYTE_UNSIGNED);
-    IS(g_section().instrs()[0]->patches()[0]->offset(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->asmpc(), 0);
+    IS(g_section().instrs()[0]->patches()[0]->offset_patch(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->opcode_size(), 2);
     IS(g_section().instrs()[0]->patches()[0]->expr()->text(), "SIZE");
 
     g_asm.clear();
@@ -788,7 +792,7 @@ void test_add_label() {
     g_errors.set_location(Location("test~.asm", 11));
     g_asm.add_label("START");
     Instr* instr = g_section().add_instr(0x3e);
-    instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 1, new Expr("SIZE")));
+    instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 0, 1, 2, new Expr("SIZE")));
     g_asm.add_equ("SIZE", new Expr("XSIZE"));
     g_section().add_instr(0xc9);
     OFileWriter ofile("test~.o");
@@ -941,7 +945,9 @@ void test_add_label() {
     IS(g_section().instrs()[0]->bytes()[2], 0xc9);
     IS(g_section().instrs()[0]->patches().size(), 1);
     IS(g_section().instrs()[0]->patches()[0]->range(), RANGE_BYTE_UNSIGNED);
-    IS(g_section().instrs()[0]->patches()[0]->offset(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->asmpc(), 0);
+    IS(g_section().instrs()[0]->patches()[0]->offset_patch(), 1);
+    IS(g_section().instrs()[0]->patches()[0]->opcode_size(), 2);
     IS(g_section().instrs()[0]->patches()[0]->expr()->text(), "SIZE");
 
     g_asm.clear();

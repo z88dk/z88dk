@@ -70,8 +70,8 @@ vector<Patch*>& Instr::patches() {
 }
 
 void Instr::do_patch(Patch* patch) {
-    size_t offset = patch->offset();
-    xassert(offset + patch->size() <= bytes_.size());
+    size_t offset_patch = patch->offset_patch();
+    xassert(offset_patch + patch->patch_size() <= bytes_.size());
 
     ExprResult res = patch->expr()->eval();
     if (!res.ok())
@@ -85,67 +85,67 @@ void Instr::do_patch(Patch* patch) {
             xassert(0);
             break;
         case RANGE_JR_OFFSET:
-            jump_value = value - (asmpc() + (int)offset + (int)patch->size());
+            jump_value = value - (patch->asmpc() + patch->opcode_size());
             if (jump_value >= -128 && jump_value <= 127)
-                bytes_[offset] = jump_value & 0xff;
+                bytes_[offset_patch] = jump_value & 0xff;
             else
                 g_errors.error(ErrIntRange, jump_value);
             break;
         case RANGE_BYTE_UNSIGNED:
             if (value < -128 || value > 255)
                 g_errors.warning(ErrIntRange, value);
-            bytes_[offset] = value & 0xff;
+            bytes_[offset_patch] = value & 0xff;
             break;
         case RANGE_BYTE_SIGNED:
             if (value < -128 || value > 127)
                 g_errors.warning(ErrIntRange, value);
-            bytes_[offset] = value & 0xff;
+            bytes_[offset_patch] = value & 0xff;
             break;
         case RANGE_WORD:
-            bytes_[offset + 0] = value & 0xff;
-            bytes_[offset + 1] = (value >> 8) & 0xff;
+            bytes_[offset_patch + 0] = value & 0xff;
+            bytes_[offset_patch + 1] = (value >> 8) & 0xff;
             break;
         case RANGE_WORD_BE:
-            bytes_[offset + 0] = (value >> 8) & 0xff;
-            bytes_[offset + 1] = value & 0xff;
+            bytes_[offset_patch + 0] = (value >> 8) & 0xff;
+            bytes_[offset_patch + 1] = value & 0xff;
             break;
         case RANGE_DWORD:
-            bytes_[offset + 0] = value & 0xff;
-            bytes_[offset + 1] = (value >> 8) & 0xff;
-            bytes_[offset + 2] = (value >> 16) & 0xff;
-            bytes_[offset + 3] = (value >> 24) & 0xff;
+            bytes_[offset_patch + 0] = value & 0xff;
+            bytes_[offset_patch + 1] = (value >> 8) & 0xff;
+            bytes_[offset_patch + 2] = (value >> 16) & 0xff;
+            bytes_[offset_patch + 3] = (value >> 24) & 0xff;
             break;
         case RANGE_BYTE_TO_WORD_UNSIGNED:
             if (value < 0 || value > 255)
                 g_errors.warning(ErrIntRange, value);
-            bytes_[offset + 0] = value & 0xff;
-            bytes_[offset + 1] = 0;
+            bytes_[offset_patch + 0] = value & 0xff;
+            bytes_[offset_patch + 1] = 0;
             break;
         case RANGE_BYTE_TO_WORD_SIGNED:
             if (value < -128 || value > 127)
                 g_errors.warning(ErrIntRange, value);
-            bytes_[offset + 0] = value & 0xff;
-            bytes_[offset + 1] = (value & 0x80) ? 0xff : 0;
+            bytes_[offset_patch + 0] = value & 0xff;
+            bytes_[offset_patch + 1] = (value & 0x80) ? 0xff : 0;
             break;
         case RANGE_PTR24:
-            bytes_[offset + 0] = value & 0xff;
-            bytes_[offset + 1] = (value >> 8) & 0xff;
-            bytes_[offset + 2] = (value >> 16) & 0xff;
+            bytes_[offset_patch + 0] = value & 0xff;
+            bytes_[offset_patch + 1] = (value >> 8) & 0xff;
+            bytes_[offset_patch + 2] = (value >> 16) & 0xff;
             break;
         case RANGE_HIGH_OFFSET:
             if ((value & 0xff00) != 0) {
                 if ((value & 0xff00) != 0xff00)
                     g_errors.warning(ErrIntRange, value);
             }
-            bytes_[offset] = value & 0xff;
+            bytes_[offset_patch] = value & 0xff;
             break;
         case RANGE_ASSIGNMENT:
             xassert(0);
             break;
         case RANGE_JRE_OFFSET:
-            jump_value = value - (asmpc() + (int)offset + (int)patch->size());
-            bytes_[offset + 0] = jump_value & 0xff;
-            bytes_[offset + 1] = (jump_value >> 8) & 0xff;
+            jump_value = value - (patch->asmpc() + patch->opcode_size());
+            bytes_[offset_patch + 0] = jump_value & 0xff;
+            bytes_[offset_patch + 1] = (jump_value >> 8) & 0xff;
             break;
         default:
             xassert(0);
@@ -157,12 +157,19 @@ Symbol* Instr::label() const {
     return label_;
 }
 
-void Instr::set_offset_asmpc(int asmpc) {
-    offset_asmpc_ = asmpc;
+void Instr::set_offset_asmpc(int offset_asmpc) {
+    int delta = offset_asmpc - offset_asmpc_;
+    offset_asmpc_ += delta;
+    for (auto& patch : patches_) {
+        patch->set_asmpc(asmpc());
+        patch->set_offset_patch(patch->offset_patch() + delta);
+    }
 }
 
-void Instr::set_phased_asmpc(int asmpc) {
-    phased_asmpc_ = asmpc;
+void Instr::set_phased_asmpc(int phased_asmpc) {
+    phased_asmpc_ = phased_asmpc;
+    for (auto& patch : patches_)
+        patch->set_asmpc(asmpc());
 }
 
 void Instr::set_label(Symbol* label) {
@@ -175,7 +182,7 @@ void Instr::add_byte(int byte) {
 
 void Instr::add_patch(Patch* patch) {
     patches_.push_back(patch);
-    for (int i = 0; i < patch->size(); i++)
+    for (int i = 0; i < patch->patch_size(); i++)
         add_byte(0);
 }
 

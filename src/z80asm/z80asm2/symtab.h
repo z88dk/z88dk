@@ -78,7 +78,7 @@ public:
     void clear();                           // delete all symbols
     bool insert(Symbol* symbol);            // false if already exists
     Symbol* find(const string& name);       // nullptr if not found
-    void erase(const string& name);         // remove from symbols_, save a zero value in deleted_
+    void remove(const string& name);        // remove from symbols_, save a zero value in deleted_
     void check_undefined_symbols();
 
 private:

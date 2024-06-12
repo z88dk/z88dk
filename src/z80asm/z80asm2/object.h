@@ -38,8 +38,8 @@ public:
     vector<Patch*>& patches();
     Symbol* label() const;
 
-    void set_offset_asmpc(int asmpc);
-    void set_phased_asmpc(int asmpc);
+    void set_offset_asmpc(int offset_asmpc);
+    void set_phased_asmpc(int phased_asmpc);
     void set_bytes(int opcode);             // decompose 0xfd213412 in 4 bytes
     void do_patch(Patch* patch);
     void set_label(Symbol* label);

@@ -818,8 +818,9 @@ void Expr::parse_primary() {
 
 //-----------------------------------------------------------------------------
 
-Patch::Patch(range_t range, int offset, Expr* expr)
-    : range_(range), offset_(offset), expr_(expr) {
+Patch::Patch(range_t range, int asmpc, int offset_patch, int opcode_size, Expr* expr)
+    : range_(range), asmpc_(asmpc), offset_patch_(offset_patch)
+    , opcode_size_(opcode_size), expr_(expr) {
 }
 
 Patch::~Patch() {
@@ -830,14 +831,30 @@ range_t Patch::range() const {
     return range_;
 }
 
-int Patch::offset() const {
-    return offset_;
+int Patch::asmpc() const {
+    return asmpc_;
+}
+
+int Patch::offset_patch() const {
+    return offset_patch_;
+}
+
+int Patch::opcode_size() const {
+    return opcode_size_;
 }
 
 Expr* Patch::expr() {
     return expr_;
 }
 
-int Patch::size() const {
+int Patch::patch_size() const {
     return range_size(range_);
+}
+
+void Patch::set_asmpc(int asmpc) {
+    asmpc_ = asmpc;
+}
+
+void Patch::set_offset_patch(int offset_patch) {
+    offset_patch_ = offset_patch;
 }

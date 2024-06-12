@@ -237,7 +237,9 @@ Instr* Parser::add_opcode(int opcode, range_t range, int delta) {
     }
 
     // create and add patch
-    Patch* patch = new Patch(range, instr->size(), expr);
+    Patch* patch = new Patch(range,
+        instr->asmpc(), instr->offset_asmpc() + instr->size(), instr->size() + range_size(range),
+        expr);
     instr->add_patch(patch);
     return instr;
 }
@@ -270,7 +272,9 @@ Instr* Parser::add_opcode_n_n(int opcode) {
     Expr* expr = exprs_.front();
     exprs_.pop_front();
 
-    Patch* patch = new Patch(RANGE_BYTE_UNSIGNED, instr->size(), expr);
+    Patch* patch = new Patch(RANGE_BYTE_UNSIGNED,
+        instr->asmpc(), instr->offset_asmpc() + instr->size(), instr->size() + range_size(RANGE_BYTE_UNSIGNED),
+        expr);
     instr->add_patch(patch);
     return instr;
 }
@@ -319,7 +323,9 @@ Instr* Parser::add_opcode_idx_n(int opcode) {
     exprs_.pop_front();
 
     // create and add patch
-    Patch* patch = new Patch(RANGE_BYTE_UNSIGNED, instr->size(), expr);
+    Patch* patch = new Patch(RANGE_BYTE_UNSIGNED,
+        instr->asmpc(), instr->offset_asmpc() + instr->size(), instr->size() + range_size(RANGE_BYTE_UNSIGNED),
+        expr);
     instr->add_patch(patch);
     return instr;
 }
@@ -348,7 +354,9 @@ Instr* Parser::add_call_function_n(const string& name) {
     Expr* expr = exprs_.front();
     exprs_.pop_front();
 
-    Patch* patch = new Patch(RANGE_BYTE_UNSIGNED, instr->size(), expr);
+    Patch* patch = new Patch(RANGE_BYTE_UNSIGNED,
+        instr->asmpc(), instr->offset_asmpc() + instr->size(), instr->size() + range_size(RANGE_BYTE_UNSIGNED),
+        expr);
     instr->add_patch(patch);
     return instr;
 }

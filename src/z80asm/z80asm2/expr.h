@@ -95,18 +95,25 @@ private:
 
 class Patch {
 public:
-    Patch(range_t range, int offset, Expr* expr);
+    Patch(range_t range, int asmpc, int offset_patch, int opcode_size, Expr* expr);
     virtual ~Patch();
     Patch(const Patch& other) = delete;
     Patch& operator=(const Patch& other) = delete;
 
     range_t range() const;
-    int offset() const;
+    int asmpc() const;
+    int offset_patch() const;
+    int opcode_size() const;
     Expr* expr();
-    int size() const;
+    int patch_size() const;
+
+    void set_asmpc(int asmpc);
+    void set_offset_patch(int offset_patch);
 
 private:
     range_t range_{ RANGE_UNDEFINED };  // type of patch
-    int offset_{ 0 };                   // offset to start of instruction
+    int     asmpc_{ 0 };                // asmpc used to compute JR offset
+    int     offset_patch_{ 0 };         // offset from start of module section to start of patch
+    int     opcode_size_{ 0 };          // size of this opcode used to compute JR offset
     Expr*   expr_;                      // holds the expresion from source
 };

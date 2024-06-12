@@ -10,6 +10,7 @@
 #include "symtab.h"
 #include "utils.h"
 #include "xassert.h"
+#include <algorithm>
 using namespace std;
 
 Symbol::Symbol(const string& name, sym_scope_t scope, sym_type_t type, Section* section, int value)
@@ -157,7 +158,7 @@ Symbol* Symtab::find(const string& name) {
         return nullptr;
 }
 
-void Symtab::erase(const string& name) {
+void Symtab::remove(const string& name) {
     auto it = map_.find(name);
     if (it == map_.end())
         return;

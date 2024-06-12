@@ -42,8 +42,8 @@ private:
 
     streampos write_exprs(ofstream& os);
     void write_exprs(Symtab& symtab, ofstream& os);
-    void write_patch_expr(Instr* instr, Patch* patch, ofstream& os);
-    void write_expr(const string& target_name, Instr* instr, Patch* patch, ofstream& os);
+    void write_patch_expr(Patch* patch, ofstream& os);
+    void write_expr(const string& target_name, Patch* patch, ofstream& os);
 
     streampos write_symbols(ofstream& os);
     void write_symbols(Symtab& symtab, ofstream& os);

@@ -142,7 +142,7 @@ Symbol* Assembler::define_symbol(const string& name, int value) {
 }
 
 void Assembler::undefine_symbol(const string& name) {
-    g_local_symbols().erase(name);
+    g_local_symbols().remove(name);
 }
 
 Symbol* Assembler::add_equ(const string& name, Expr* expr) {

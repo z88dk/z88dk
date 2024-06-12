@@ -163,7 +163,7 @@ streampos OFileWriter::write_exprs(ofstream& os) {
     for (auto& section : g_module().sections()) {
         for (auto& instr : section->instrs()) {
             for (auto& patch : instr->patches()) {
-                write_patch_expr(instr, patch, os);
+                write_patch_expr(patch, os);
             }
         }
     }
@@ -185,19 +185,19 @@ void OFileWriter::write_exprs(Symtab& symtab, ofstream& os) {
     for (auto& symbol : symtab) {
         if (symbol->is_touched() && !symbol->is_global_def()) {
             if (symbol->type() == TYPE_COMPUTED) {
-                Patch* patch = new Patch(RANGE_WORD, 0, symbol->expr()->clone());
-                write_expr(symbol->name(), nullptr, patch, os);
+                Patch* patch = new Patch(RANGE_ASSIGNMENT, 0, 0, 0, symbol->expr()->clone());
+                write_expr(symbol->name(), patch, os);
                 delete patch;
             }
         }
     }
 }
 
-void OFileWriter::write_patch_expr(Instr* instr, Patch* patch, ofstream& os) {
-    write_expr("", instr, patch, os);
+void OFileWriter::write_patch_expr(Patch* patch, ofstream& os) {
+    write_expr("", patch, os);
 }
 
-void OFileWriter::write_expr(const string& target_name, Instr* instr, Patch* patch, ofstream& os) {
+void OFileWriter::write_expr(const string& target_name, Patch* patch, ofstream& os) {
     // store type
     if (target_name.empty())
         swrite_int32(patch->range(), os);
@@ -211,16 +211,9 @@ void OFileWriter::write_expr(const string& target_name, Instr* instr, Patch* pat
     // store section name
     swrite_int32(string_table_.add_string(patch->expr()->section()->name()), os);
 
-    if (instr) {
-        swrite_int32(instr->asmpc(), os);			        // ASMPC
-        swrite_int32(instr->asmpc() + patch->offset(), os); // code position
-        swrite_int32(instr->size(), os);            // opcode size
-    }
-    else {
-        swrite_int32(0, os);			            // ASMPC
-        swrite_int32(0, os);			            // code position
-        swrite_int32(0, os);                        // opcode size
-    }
+    swrite_int32(patch->asmpc(), os);			// ASMPC
+    swrite_int32(patch->offset_patch(), os);    // code position
+    swrite_int32(patch->opcode_size(), os);     // opcode size
 
     // target symbol for expression
     swrite_int32(string_table_.add_string(target_name), os);
@@ -637,9 +630,9 @@ void OFileReader::parse_exprs() {
         g_module().select_section(section_name);
 
         // patch location
-        /*int asmpc =*/ read_int32();
+        int asmpc = read_int32();
         int code_pos = read_int32();
-        /*int opcode_size =*/ read_int32();
+        int opcode_size = read_int32();
 
         // expression
         string target_name = read_string();
@@ -663,8 +656,8 @@ void OFileReader::parse_exprs() {
         }
         else {                                                  // patch
             xassert(range != RANGE_ASSIGNMENT);
-            Patch* patch = new Patch(range, code_pos, expr);
             Instr* instr = g_section().instrs().back();
+            Patch* patch = new Patch(range, asmpc, code_pos, opcode_size, expr);
             instr->patches().push_back(patch);
         }
 
