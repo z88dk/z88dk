@@ -19,7 +19,7 @@ void test_symtab_define_symbol_command_line_1() {
     g_asm.clear();
 
     g_options.parse_option("-DVAR");
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     Symbol* symbol = g_asm.use_symbol("VAR");
     OK(symbol);
@@ -44,7 +44,7 @@ void test_symtab_define_symbol_command_line_10() {
     g_asm.clear();
 
     g_options.parse_option("-DVAR=10");
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     OK(g_errors.count() == 0);
 
@@ -71,7 +71,7 @@ void test_symtab_define_symbol_command_line_duplicate_equal() {
 
     g_options.parse_option("-DVAR=10");
     g_options.parse_option("-DVAR=10");
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     Symbol* symbol = g_asm.use_symbol("VAR");
     OK(symbol);
@@ -112,7 +112,7 @@ void test_symtab_define_symbol_command_and_source_equ() {
     ostringstream oss;
     g_errors.set_output(oss);
     g_options.parse_option("-DVAR");
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
     Expr* expr = new Expr("1");
@@ -134,7 +134,7 @@ void test_symtab_define_symbol_command_and_source_label() {
     ostringstream oss;
     g_errors.set_output(oss);
     g_options.parse_option("-DVAR");
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
     g_asm.add_label("VAR");
@@ -153,7 +153,7 @@ void test_symtab_define_symbol_command_and_source_public_use() {
     g_asm.clear();
 
     g_options.parse_option("-DVAR");
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
     g_asm.declare_public("VAR");
@@ -182,7 +182,7 @@ void test_symtab_define_symbol_command_and_source_global_use() {
     g_asm.clear();
 
     g_options.parse_option("-DVAR");
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
     g_asm.declare_global("VAR");
@@ -213,7 +213,7 @@ void test_symtab_define_symbol_command_and_source_extern_use() {
     ostringstream oss;
     g_errors.set_output(oss);
     g_options.parse_option("-DVAR");
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
     g_asm.declare_extern("VAR");
@@ -235,7 +235,7 @@ void test_symtab_define_symbol_command_and_source_extern_use() {
 void test_symtab_define_symbol() {
     g_asm.clear();
 
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
     g_asm.define_symbol("VAR", 1);
@@ -262,7 +262,7 @@ void test_symtab_define_symbol() {
 void test_symtab_define_undefine() {
     g_asm.clear();
 
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
 
@@ -319,7 +319,7 @@ void test_symtab_define_undefine() {
 void test_symtab_define_undefine_define() {
     g_asm.clear();
 
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
 
@@ -383,7 +383,7 @@ void test_symtab_define_and_equ() {
 
     ostringstream oss;
     g_errors.set_output(oss);
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
 
     g_errors.set_location(Location("test~.asm", 21));
@@ -408,7 +408,7 @@ void test_symtab_define_and_label() {
 
     ostringstream oss;
     g_errors.set_output(oss);
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
 
     g_errors.set_location(Location("test~.asm", 21));
@@ -431,7 +431,7 @@ void test_symtab_define_and_define() {
 
     ostringstream oss;
     g_errors.set_output(oss);
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
 
     g_errors.set_location(Location("test~.asm", 21));
@@ -453,7 +453,7 @@ void test_symtab_define_and_define() {
 void test_symtab_define_and_public() {
     g_asm.clear();
 
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
 
@@ -484,7 +484,7 @@ void test_symtab_define_and_public() {
 void test_symtab_public_and_define() {
     g_asm.clear();
 
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
 
@@ -515,7 +515,7 @@ void test_symtab_public_and_define() {
 void test_symtab_define_and_global() {
     g_asm.clear();
 
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
 
@@ -546,7 +546,7 @@ void test_symtab_define_and_global() {
 void test_symtab_global_and_define() {
     g_asm.clear();
 
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
 
@@ -579,7 +579,7 @@ void test_symtab_define_and_extern() {
 
     ostringstream oss;
     g_errors.set_output(oss);
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
     g_errors.set_location(Location("test~.asm", 21));
 
@@ -601,7 +601,7 @@ void test_symtab_extern_and_define() {
 
     ostringstream oss;
     g_errors.set_output(oss);
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_asm.copy_defines();
 
     g_errors.set_location(Location("test~.asm", 21));

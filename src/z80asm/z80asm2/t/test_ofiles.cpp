@@ -252,10 +252,11 @@ void test_file_is_library_file5() {
 
 void test_simplest_file() {
     g_asm.clear();
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
 
     OFileWriter ofile("test~.o");
     ofile.write();
+    OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
     char buffer[1024];
@@ -318,12 +319,13 @@ void test_simplest_file() {
 
 void test_changed_cpu() {
     g_asm.clear();
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_options.set_cpu(CPU_Z180);
     g_options.set_swap_ixiy(IXIY_SWAP);
 
     OFileWriter ofile("test~.o");
     ofile.write();
+    OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
     char buffer[1024];
@@ -386,11 +388,12 @@ void test_changed_cpu() {
 
 void test_add_1_byte_of_code() {
     g_asm.clear();
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_section().add_instr(0xc9);
 
     OFileWriter ofile("test~.o");
     ofile.write();
+    OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
     char buffer[1024];
@@ -461,13 +464,14 @@ void test_add_1_byte_of_code() {
 
 void test_define_org() {
     g_asm.clear();
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_section().set_origin(0x1000);
     g_section().set_align(4);
     g_section().add_instr(0xc9);
 
     OFileWriter ofile("test~.o");
     ofile.write();
+    OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
     char buffer[1024];
@@ -537,7 +541,7 @@ void test_define_org() {
 
 void test_add_expression() {
     g_asm.clear();
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_section().set_origin(0x1000);
     g_section().set_align(4);
     g_errors.set_location(Location("test~.asm", 11));
@@ -546,6 +550,7 @@ void test_add_expression() {
     g_section().add_instr(0xc9);
     OFileWriter ofile("test~.o");
     ofile.write();
+    OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
     char buffer[1024];
@@ -640,7 +645,7 @@ void test_add_expression() {
 
 void test_add_defc_and_extern() {
     g_asm.clear();
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_section().set_origin(0x1000);
     g_section().set_align(4);
     g_asm.declare_extern("XSIZE");
@@ -651,6 +656,7 @@ void test_add_defc_and_extern() {
     g_section().add_instr(0xc9);
     OFileWriter ofile("test~.o");
     ofile.write();
+    OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
     char buffer[BUFSIZ];
@@ -785,7 +791,7 @@ void test_add_defc_and_extern() {
 
 void test_add_label() {
     g_asm.clear();
-    g_asm.add_object("test~.asm");
+    g_asm.add_object("test~.asm", "test~.o");
     g_section().set_origin(0x1000);
     g_section().set_align(4);
     g_asm.declare_extern("XSIZE");
@@ -797,6 +803,7 @@ void test_add_label() {
     g_section().add_instr(0xc9);
     OFileWriter ofile("test~.o");
     ofile.write();
+    OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
     char buffer[BUFSIZ];

@@ -1117,28 +1117,40 @@ void test_option_library() {
 void test_option_consol_obj_filename() {
     Options opts;
 
-    test_spew("test~.asm", "");
+    test_spew("test1~.asm", "");
+    test_spew("test2~.asm", "");
 
     opts = Options();
     OK(opts.consol_obj_filename().empty());
+    OK(opts.obj_filename().empty());
 
     opts = Options();
-    opts.parse_args({ "test~.asm" });
+    opts.parse_args({ "test1~.asm" });
     OK(opts.consol_obj_filename().empty());
+    OK(opts.obj_filename().empty());
 
     opts = Options();
-    opts.parse_args({ "-b", "test~.asm" });
+    opts.parse_args({ "-b", "test1~.asm" });
     OK(opts.consol_obj_filename().empty());
+    OK(opts.obj_filename().empty());
 
     opts = Options();
-    opts.parse_args({ "-b", "-otest~.o", "test~.asm" });
+    opts.parse_args({ "-b", "-otest~.o", "test1~.asm" });
     OK(opts.consol_obj_filename().empty());
+    OK(opts.obj_filename().empty());
 
     opts = Options();
-    opts.parse_args({ "-otest~.o", "test~.asm" });
-    IS(opts.consol_obj_filename(),"test~.o");
+    opts.parse_args({ "-otest~.o", "test1~.asm" });
+    OK(opts.consol_obj_filename().empty());
+    IS(opts.obj_filename(), "test~.o");
 
-    remove("test~.asm");
+    opts = Options();
+    opts.parse_args({ "-otest~.o", "test1~.asm", "test2~.asm"});
+    IS(opts.consol_obj_filename(), "test~.o");
+    OK(opts.obj_filename().empty());
+
+    remove("test1~.asm");
+    remove("test2~.asm");
 }
 
 void test_option_defines() {

@@ -395,8 +395,8 @@ void Module::check_undefined_symbols() {
 
 //-----------------------------------------------------------------------------
 
-Object::Object(const string& filename)
-    : filename_(filename) {
+Object::Object(const string& asm_filename, const string& obj_filename)
+    : asm_filename_(asm_filename), obj_filename_(obj_filename) {
     create_default_module();
 }
 
@@ -409,8 +409,12 @@ void Object::clear() {
     create_default_module();
 }
 
-const string& Object::filename() const {
-    return filename_;
+const string& Object::asm_filename() const {
+    return asm_filename_;
+}
+
+const string& Object::obj_filename() const {
+    return obj_filename_;
 }
 
 void Object::clear_all() {
@@ -423,7 +427,7 @@ void Object::clear_all() {
 }
 
 void Object::create_default_module() {
-    select_module(file_basename(filename_));
+    select_module(file_basename(obj_filename_));
 }
 
 vector<Module*>& Object::modules() {
@@ -447,7 +451,7 @@ Module& Object::cur_module() const {
 }
 
 bool Object::parse() {
-    return parser_.parse(filename_);
+    return parser_.parse(asm_filename_);
 }
 
 void Object::check_relative_jumps() {
@@ -470,7 +474,7 @@ void Object::check_undefined_symbols() {
         module1->check_undefined_symbols();
 }
 
-void Object::write_obj_file(const string& o_filename) {
-    OFileWriter ofile(o_filename);
+void Object::write_obj_file(const string& obj_filename) {
+    OFileWriter ofile(obj_filename);
     ofile.write();
 }

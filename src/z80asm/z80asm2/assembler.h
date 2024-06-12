@@ -30,10 +30,10 @@ public:
     void assemble(const string& asm_filename);          // assemble one source file
 
     // load object file
-    void load_object(const string& o_filename);
+    void load_object(const string& obj_filename);
 
     // object file
-    void add_object(const string& filename);
+    void add_object(const string& asm_filename, const string& obj_filename);
     Object& cur_object();                               // asserts object was added
     void delete_objects();
     void copy_defines();            // copy defines to locals

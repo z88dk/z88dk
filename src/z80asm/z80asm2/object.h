@@ -129,13 +129,14 @@ private:
 
 class Object {
 public:
-    Object(const string& filename);
+    Object(const string& asm_filename, const string& obj_filename);
     virtual ~Object();
     Object(const Object& other) = delete;
     Object& operator=(const Object& other) = delete;
     void clear();
 
-    const string& filename() const;
+    const string& asm_filename() const;
+    const string& obj_filename() const;
 
     vector<Module*>& modules();
     void select_module(const string& name);
@@ -146,11 +147,12 @@ public:
     void compute_addresses();
     void patch_local_exprs();
     void check_undefined_symbols();
-    void write_obj_file(const string& o_filename);
+    void write_obj_file(const string& obj_filename);
 
 private:
     Parser parser_;                         // parser of input
-    string filename_;                       // name based on filename
+    string asm_filename_;                   // source filename
+    string obj_filename_;                   // object filename
     vector<Module*> modules_;               // vector of modules in this object
     unordered_map<string, Module*> module_by_name_; // index modules by name
     Module* cur_module_{ nullptr };         // current module

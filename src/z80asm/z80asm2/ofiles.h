@@ -32,12 +32,12 @@ bool file_is_library_file(const string& filename, bool do_error = false);
 // write object files
 class OFileWriter {
 public:
-    OFileWriter(const string& o_filename);
+    OFileWriter(const string& obj_filename);
     void write();		// write g_asm
     void write(ofstream& os);
 
 private:
-    string o_filename_;
+    string obj_filename_;
     StringTable string_table_;
 
     streampos write_exprs(ofstream& os);
@@ -83,7 +83,7 @@ private:
 // read object files
 class OFileReader {
 public:
-    OFileReader(const string& o_filename);
+    OFileReader(const string& obj_filename);
 
     void read();                    // read into g_asm
 

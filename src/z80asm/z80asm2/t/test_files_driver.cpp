@@ -19,7 +19,7 @@ void test_file_expand_glob();
 void test_file_newer();
 void test_file_asm_filename();
 void test_file_lis_filename();
-void test_file_o_filename();
+void test_file_obj_filename();
 void test_file_def_filename();
 void test_file_bin_filename();
 void test_file_lib_filename();
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
         test_file_newer();
         test_file_asm_filename();
         test_file_lis_filename();
-        test_file_o_filename();
+        test_file_obj_filename();
         test_file_def_filename();
         test_file_bin_filename();
         test_file_lib_filename();

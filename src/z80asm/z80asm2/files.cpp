@@ -261,7 +261,7 @@ string file_lis_filename(const string& filename) {
     return file_prepend_output_dir(file_replace_extension(filename, EXT_LIS));
 }
 
-string file_o_filename(const string& filename) {
+string file_obj_filename(const string& filename) {
     return file_prepend_output_dir(file_replace_extension(filename, EXT_O));
 }
 

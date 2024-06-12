@@ -31,8 +31,12 @@ void Assembler::assemble(const string& asm_filename) {
     if (g_options.verbose())
         cout << "Assembling '" << asm_filename << "'" << endl;
 
+    // object file name
+    string obj_filename = g_options.obj_filename().empty() ?
+        file_obj_filename(asm_filename) : g_options.obj_filename();
+
     // create object and parser
-    add_object(asm_filename);
+    add_object(asm_filename, obj_filename);
 
     // clear globals
     copy_defines();
@@ -46,15 +50,15 @@ void Assembler::assemble(const string& asm_filename) {
         cout << endl;
 }
 
-void Assembler::load_object(const string& o_filename) {
+void Assembler::load_object(const string& obj_filename) {
     if (g_options.verbose())
-        cout << "Appending object file '" << o_filename << "'" << endl;
+        cout << "Appending object file '" << obj_filename << "'" << endl;
 
     // create object
-    add_object(o_filename);
+    add_object(file_asm_filename(obj_filename), obj_filename);
 
     // load object
-    g_errors.push_location(Location(o_filename));
+    g_errors.push_location(Location(obj_filename));
     load_object1();
     g_errors.pop_location();
 
@@ -62,8 +66,8 @@ void Assembler::load_object(const string& o_filename) {
         cout << endl;
 }
 
-void Assembler::add_object(const string& filename) {
-    objects_.push_back(new Object(filename));
+void Assembler::add_object(const string& asm_filename, const string& obj_filename) {
+    objects_.push_back(new Object(asm_filename, obj_filename));
 }
 
 Object& Assembler::cur_object() {
@@ -247,8 +251,8 @@ void Assembler::assemble1() {
     int start_errors = g_errors.count();
 
     // create parent directory of object file
-    string o_filename = file_o_filename(cur_object().filename());
-    string parent_dir = file_parent_path(o_filename);
+    string obj_filename = g_object().obj_filename();
+    string parent_dir = file_parent_path(obj_filename);
     if (!file_is_directory(parent_dir)) {
         if (!file_create_directories(parent_dir)) {
             g_errors.error(ErrDirCreate, parent_dir);
@@ -273,14 +277,14 @@ void Assembler::assemble1() {
     if (start_errors != g_errors.count())
         return;
 
-    cur_object().write_obj_file(o_filename);
+    cur_object().write_obj_file(obj_filename);
     if (start_errors != g_errors.count())
         return;
 }
 
 void Assembler::load_object1() {
-    string o_filename = cur_object().filename();
+    string obj_filename = cur_object().obj_filename();
 
-    OFileReader ofile(o_filename);
+    OFileReader ofile(obj_filename);
     ofile.read();
 }

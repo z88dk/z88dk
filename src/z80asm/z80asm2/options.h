@@ -56,7 +56,8 @@ public:
     const string& lib_filename() const;	// -x option
     bool lib_for_all_cpus() const;      // build multi-target library
     const string& output_dir() const;	// -O option
-    const string& bin_filename() const;	// -o option
+    const string& obj_filename() const; // -o option with one source
+    const string& bin_filename() const;	// -o option with multiple sources
     bool make_bin() const;		        // -b option
     bool split_bin() const;		        // -split-bin option
     bool date_stamp() const;		    // -d option
@@ -114,7 +115,8 @@ private:
     string	lib_filename_;				// -x option
     bool    lib_for_all_cpus_;          // build multi-target library
     string	output_dir_;				// -O option
-    string	bin_filename_;				// -o option
+    string  obj_filename_;              // -o option with one source
+    string	bin_filename_;				// -o option with multiple sources
     bool	make_bin_;      		    // -b option
     bool	split_bin_;         		// -split-bin option
     bool	date_stamp_;		        // -d option
@@ -150,7 +152,6 @@ private:
 
     // option actions
     void post_parsing_actions();
-    void set_consol_obj_options();
     void define_assembly_defines();
 
     // z80asm library

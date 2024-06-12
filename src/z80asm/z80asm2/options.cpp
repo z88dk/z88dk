@@ -236,6 +236,10 @@ const string& Options::output_dir() const {
     return output_dir_;
 }
 
+const string& Options::obj_filename() const {
+    return obj_filename_;
+}
+
 const string& Options::bin_filename() const {
     return bin_filename_;
 }
@@ -778,7 +782,18 @@ string Options::expand_env_vars(string text) {
 }
 
 void Options::post_parsing_actions() {
-    set_consol_obj_options();
+    // make consolidated object
+    if (!make_bin_ && !bin_filename_.empty()) {
+        if (input_files_.size() == 1) {
+            consol_obj_filename_.clear();
+            obj_filename_ = bin_filename_;
+        }
+        else {
+            consol_obj_filename_ = bin_filename_;
+            obj_filename_.clear();
+        }
+        bin_filename_.clear();
+    }
 
     // check if -d and -m* were given
     if (date_stamp_ && lib_for_all_cpus_) {
@@ -797,14 +812,6 @@ void Options::post_parsing_actions() {
 
     define_assembly_defines();
     include_z80asm_lib();
-}
-
-// make consolidated object
-void Options::set_consol_obj_options() {
-    if (!make_bin_ && !bin_filename_.empty()) {
-        consol_obj_filename_ = bin_filename_;
-        bin_filename_.clear();
-    }
 }
 
 void Options::define_assembly_defines() {
@@ -1001,23 +1008,23 @@ bool Options::search_source(const string& filename, string& out_filename) {
             return true;
 
         // check filename with .o extension
-        string o_file = filename + EXT_O;
-        if (check_source(o_file, out_filename))
+        string obj_file = filename + EXT_O;
+        if (check_source(obj_file, out_filename))
             return true;
 
         // check filename with .o extension in include path
-        found_file = file_search_path(o_file, include_path_);
-        if (found_file != o_file && check_source(found_file, out_filename))
+        found_file = file_search_path(obj_file, include_path_);
+        if (found_file != obj_file && check_source(found_file, out_filename))
             return true;
 
         // check object file in the output directory
-        o_file = file_o_filename(filename);
-        if (check_source(o_file, out_filename))
+        obj_file = file_obj_filename(filename);
+        if (check_source(obj_file, out_filename))
             return true;
 
         // check filename with .o extension in include path
-        found_file = file_search_path(o_file, include_path_);
-        if (found_file != o_file && check_source(found_file, out_filename))
+        found_file = file_search_path(obj_file, include_path_);
+        if (found_file != obj_file && check_source(found_file, out_filename))
             return true;
 
         // not found, avoid cascade of errors
@@ -1048,7 +1055,7 @@ bool Options::check_source(const string& filename, string& out_filename) {
     else if (file_is_regular_file(filename)) {  // any other extension is considered ASM
         got_obj = false;
         src_file = filename;
-        obj_file = file_o_filename(filename);
+        obj_file = file_obj_filename(filename);
     }
     else {
         return false;

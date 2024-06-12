@@ -87,16 +87,16 @@ bool file_is_library_file(const string& filename, bool do_error) {
 
 //-----------------------------------------------------------------------------
 
-OFileWriter::OFileWriter(const string& o_filename)
-    : o_filename_(o_filename) {
+OFileWriter::OFileWriter(const string& obj_filename)
+    : obj_filename_(obj_filename) {
 }
 
 void OFileWriter::write() {
     if (g_options.verbose())
-        cout << "Writing object file '" << o_filename_ << "'" << endl;
+        cout << "Writing object file '" << obj_filename_ << "'" << endl;
 
     // create temp file
-    string temp_filename = o_filename_ + "~";
+    string temp_filename = obj_filename_ + "~";
     ofstream os{ temp_filename, ios::binary };
     if (!os.is_open()) {
         g_errors.error(ErrFileCreate, temp_filename);
@@ -109,8 +109,8 @@ void OFileWriter::write() {
 
     // delete old object and rename temp file
     os.close();
-    std::remove(o_filename_.c_str());
-    int rv = std::rename(temp_filename.c_str(), o_filename_.c_str());
+    std::remove(obj_filename_.c_str());
+    int rv = std::rename(temp_filename.c_str(), obj_filename_.c_str());
     if (rv != 0) {
         g_errors.error(ErrFileRename, temp_filename);
         perror(temp_filename.c_str());
@@ -403,8 +403,8 @@ int BinFileReader::read_int32() {
 
 //-----------------------------------------------------------------------------
 
-OFileReader::OFileReader(const string& o_filename)
-    : bin_file_(o_filename) {
+OFileReader::OFileReader(const string& obj_filename)
+    : bin_file_(obj_filename) {
 }
 
 void OFileReader::read() {

@@ -327,33 +327,33 @@ void test_file_lis_filename() {
     g_options.set_output_dir();
 }
 
-void test_file_o_filename() {
+void test_file_obj_filename() {
     g_options.set_output_dir();
-    IS(file_o_filename(""), ".o");
-    IS(file_o_filename("x"), "x.o");
-    IS(file_o_filename("x.asm"), "x.o");
-    IS(file_o_filename("dir/x.asm"), "dir/x.o");
-    IS(file_o_filename("/dir/x.asm"), "/dir/x.o");
-    IS(file_o_filename("\\dir\\x.asm"), "/dir/x.o");
-    IS(file_o_filename("c:\\dir\\x.asm"), "c:/dir/x.o");
+    IS(file_obj_filename(""), ".o");
+    IS(file_obj_filename("x"), "x.o");
+    IS(file_obj_filename("x.asm"), "x.o");
+    IS(file_obj_filename("dir/x.asm"), "dir/x.o");
+    IS(file_obj_filename("/dir/x.asm"), "/dir/x.o");
+    IS(file_obj_filename("\\dir\\x.asm"), "/dir/x.o");
+    IS(file_obj_filename("c:\\dir\\x.asm"), "c:/dir/x.o");
 
     g_options.set_output_dir("/obj");
-    IS(file_o_filename(""), "/obj/.o");
-    IS(file_o_filename("x"), "/obj/x.o");
-    IS(file_o_filename("x.asm"), "/obj/x.o");
-    IS(file_o_filename("dir/x.asm"), "/obj/dir/x.o");
-    IS(file_o_filename("/dir/x.asm"), "/obj/dir/x.o");
-    IS(file_o_filename("\\dir\\x.asm"), "/obj/dir/x.o");
-    IS(file_o_filename("c:\\dir\\x.asm"), "/obj/c/dir/x.o");
+    IS(file_obj_filename(""), "/obj/.o");
+    IS(file_obj_filename("x"), "/obj/x.o");
+    IS(file_obj_filename("x.asm"), "/obj/x.o");
+    IS(file_obj_filename("dir/x.asm"), "/obj/dir/x.o");
+    IS(file_obj_filename("/dir/x.asm"), "/obj/dir/x.o");
+    IS(file_obj_filename("\\dir\\x.asm"), "/obj/dir/x.o");
+    IS(file_obj_filename("c:\\dir\\x.asm"), "/obj/c/dir/x.o");
 
     g_options.set_output_dir("c:\\obj");
-    IS(file_o_filename(""), "c:/obj/.o");
-    IS(file_o_filename("x"), "c:/obj/x.o");
-    IS(file_o_filename("x.asm"), "c:/obj/x.o");
-    IS(file_o_filename("dir/x.asm"), "c:/obj/dir/x.o");
-    IS(file_o_filename("/dir/x.asm"), "c:/obj/dir/x.o");
-    IS(file_o_filename("\\dir\\x.asm"), "c:/obj/dir/x.o");
-    IS(file_o_filename("c:\\dir\\x.asm"), "c:/obj/c/dir/x.o");
+    IS(file_obj_filename(""), "c:/obj/.o");
+    IS(file_obj_filename("x"), "c:/obj/x.o");
+    IS(file_obj_filename("x.asm"), "c:/obj/x.o");
+    IS(file_obj_filename("dir/x.asm"), "c:/obj/dir/x.o");
+    IS(file_obj_filename("/dir/x.asm"), "c:/obj/dir/x.o");
+    IS(file_obj_filename("\\dir\\x.asm"), "c:/obj/dir/x.o");
+    IS(file_obj_filename("c:\\dir\\x.asm"), "c:/obj/c/dir/x.o");
 
     g_options.set_output_dir();
 }

@@ -44,7 +44,7 @@ bool file_newer(const string& filename1, const string& filename2);
 
 string file_asm_filename(const string& filename);
 string file_lis_filename(const string& filename);
-string file_o_filename(const string& filename);
+string file_obj_filename(const string& filename);
 string file_def_filename(const string& filename);
 string file_bin_filename(const string& filename, const string& section = "");
 string file_lib_filename(const string& filename);
