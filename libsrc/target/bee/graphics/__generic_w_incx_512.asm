@@ -3,11 +3,6 @@
 
 PUBLIC __generic_w_incx
 
-EXTERN __generic_w_curx
-EXTERN __generic_w_cury
-
-EXTERN  w_pixeladdress
-
 SECTION code_graphics
 
 
