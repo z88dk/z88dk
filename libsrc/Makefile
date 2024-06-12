@@ -945,7 +945,7 @@ microbee.lib: cpm_clib.lib
 	@echo '--- Building MicroBee Library (CP/M & graphics) ---'
 	@echo ''
 	$(MAKE) -C games TARGET=bee
-	$(MAKE) -C gfx TARGET=bee FLAVOUR="gencon narrow"
+	$(MAKE) -C gfx TARGET=bee FLAVOUR="gencon text6 narrow"
 	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/microbee.lib @$(TARGET_DIRECTORY)/bee/beecpm.lst
 	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/gfxbee.lib @$(TARGET_DIRECTORY)/bee/beegfx.lst
 	$(MAKE) -C gfx TARGET=bee FLAVOUR="wide" SUBTYPE=beehr
