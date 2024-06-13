@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "files.h"
+#include "ofiles.h"
 #include "stack_trace.h"
 #include "xmalloc.h"
 #include "xassert.h"
@@ -23,7 +24,7 @@ int main(int argc, char* argv[]) {
     if (g_errors.count())
         return EXIT_FAILURE;
 
-    // asssemble required files
+    // asssemble or load object files
     if (!g_options.lib_for_all_cpus()) {
         for (auto& file : g_options.input_files()) {
             if (file_extension(file) == EXT_O)
@@ -31,11 +32,19 @@ int main(int argc, char* argv[]) {
             else
                 g_asm.assemble(file);
         }
+
+        if (g_errors.count())
+            return EXIT_FAILURE;
     }
-    if (g_errors.count())
-        return EXIT_FAILURE;
 
-    // call linker
+    // make library
+    if (!g_options.lib_filename().empty()) {
+        LibFileWriter lib_writer(g_options.lib_filename());
+        lib_writer.write();
 
-    exit(g_errors.exit_code());
+        if (g_errors.count())
+            return EXIT_FAILURE;
+    }
+
+    return g_errors.exit_code();
 }

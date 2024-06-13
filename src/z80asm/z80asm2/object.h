@@ -113,6 +113,7 @@ public:
     void compute_addresses();
     void patch_local_exprs();
     void check_undefined_symbols();
+    void get_defined_symbols(StringTable& st);
 
 private:
     string name_;                           // name based on filename, or given by directive
@@ -148,6 +149,7 @@ public:
     void patch_local_exprs();
     void check_undefined_symbols();
     void write_obj_file(const string& obj_filename);
+    void get_defined_symbols(StringTable& st);
 
 private:
     Parser parser_;                         // parser of input

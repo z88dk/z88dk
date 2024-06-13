@@ -191,3 +191,11 @@ void Symtab::check_undefined_symbols() {
         }
     }
 }
+
+void Symtab::get_defined_symbols(StringTable& st) {
+    for (auto& symbol : symbols_) {
+        if (symbol->type() != TYPE_UNDEFINED) {
+            st.add_string(symbol->name());
+        }
+    }
+}

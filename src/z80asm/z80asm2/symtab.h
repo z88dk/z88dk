@@ -8,6 +8,7 @@
 
 #include "expr.h"
 #include "location.h"
+#include "utils.h"
 #include "z80asm_defs.h"
 #include <string>
 #include <unordered_map>
@@ -80,6 +81,7 @@ public:
     Symbol* find(const string& name);       // nullptr if not found
     void remove(const string& name);        // remove from symbols_, save a zero value in deleted_
     void check_undefined_symbols();
+    void get_defined_symbols(StringTable& st);
 
 private:
     vector<Symbol*> symbols_;               // holds symbols in order created

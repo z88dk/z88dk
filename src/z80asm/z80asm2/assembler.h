@@ -32,11 +32,15 @@ public:
     // load object file
     void load_object(const string& obj_filename);
 
-    // object file
+    // object files
     void add_object(const string& asm_filename, const string& obj_filename);
-    Object& cur_object();                               // asserts object was added
     void delete_objects();
-    void copy_defines();            // copy defines to locals
+    vector<Object*>& objects();                         // list of all objects
+    Object& cur_object();                               // asserts object was added
+    void set_cur_object(size_t index);                  // set current
+
+    // copy defines to locals
+    void copy_defines();
 
     // labels
     static string autolabel();
@@ -61,6 +65,7 @@ public:
 private:
     vector<Object*> objects_;       // object file
     Symbol* asmpc_{ nullptr };      // asmpc of current statement
+    size_t  cur_object_id_{ 0 };    // index of current object
 
     Symbol* make_global(const string& name, sym_scope_t new_scope);
     void assemble1();               // worker of assemble()

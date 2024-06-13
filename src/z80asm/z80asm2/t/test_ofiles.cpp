@@ -254,8 +254,8 @@ void test_simplest_file() {
     g_asm.clear();
     g_asm.add_object("test~.asm", "test~.o");
 
-    OFileWriter ofile("test~.o");
-    ofile.write();
+    ObjFileWriter obj_file("test~.o");
+    obj_file.write();
     OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
@@ -323,8 +323,8 @@ void test_changed_cpu() {
     g_options.set_cpu(CPU_Z180);
     g_options.set_swap_ixiy(IXIY_SWAP);
 
-    OFileWriter ofile("test~.o");
-    ofile.write();
+    ObjFileWriter obj_file("test~.o");
+    obj_file.write();
     OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
@@ -391,8 +391,8 @@ void test_add_1_byte_of_code() {
     g_asm.add_object("test~.asm", "test~.o");
     g_section().add_instr(0xc9);
 
-    OFileWriter ofile("test~.o");
-    ofile.write();
+    ObjFileWriter obj_file("test~.o");
+    obj_file.write();
     OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
@@ -469,8 +469,8 @@ void test_define_org() {
     g_section().set_align(4);
     g_section().add_instr(0xc9);
 
-    OFileWriter ofile("test~.o");
-    ofile.write();
+    ObjFileWriter obj_file("test~.o");
+    obj_file.write();
     OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
@@ -548,8 +548,8 @@ void test_add_expression() {
     Instr* instr = g_section().add_instr(0x3e);
     instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 0, 1, 2, new Expr("3*4")));
     g_section().add_instr(0xc9);
-    OFileWriter ofile("test~.o");
-    ofile.write();
+    ObjFileWriter obj_file("test~.o");
+    obj_file.write();
     OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
@@ -654,8 +654,8 @@ void test_add_defc_and_extern() {
     instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 0, 1, 2, new Expr("SIZE")));
     g_asm.add_equ("SIZE", new Expr("XSIZE"));
     g_section().add_instr(0xc9);
-    OFileWriter ofile("test~.o");
-    ofile.write();
+    ObjFileWriter obj_file("test~.o");
+    obj_file.write();
     OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);
@@ -801,8 +801,8 @@ void test_add_label() {
     instr->add_patch(new Patch(RANGE_BYTE_UNSIGNED, 0, 1, 2, new Expr("SIZE")));
     g_asm.add_equ("SIZE", new Expr("XSIZE"));
     g_section().add_instr(0xc9);
-    OFileWriter ofile("test~.o");
-    ofile.write();
+    ObjFileWriter obj_file("test~.o");
+    obj_file.write();
     OK(0 == system("perl -e 'sleep(1)'"));
 
     ifstream ifs("test~.o", ios::binary);

@@ -30,9 +30,9 @@ bool file_is_object_file(const string& filename, bool do_error = false);
 bool file_is_library_file(const string& filename, bool do_error = false);
 
 // write object files
-class OFileWriter {
+class ObjFileWriter {
 public:
-    OFileWriter(const string& obj_filename);
+    ObjFileWriter(const string& obj_filename);
     void write();		// write g_asm
     void write(ofstream& os);
 
@@ -56,6 +56,22 @@ private:
     void write_sections(Section* section, ofstream& os);
 };
 
+// write library files
+class LibFileWriter {
+public:
+    LibFileWriter(const string& lib_filename);
+
+    void write();		// write g_asm
+    void write(ofstream& os);
+
+private:
+    string lib_filename_;           // filename
+    StringTable defined_symbols_;   // list of defined symbols
+
+    void create_objs_for_all_cpus();
+    void write_all_objects(ofstream& os);
+};
+
 // binary file reader
 class BinFileReader {
 public:
@@ -70,6 +86,7 @@ public:
     size_t tell() const;
     void seek(size_t addr);
     const byte_t* ptr() const;
+    size_t size() const;
     int read_int32();
 
 private:
@@ -81,9 +98,9 @@ private:
 };
 
 // read object files
-class OFileReader {
+class ObjFileReader {
 public:
-    OFileReader(const string& obj_filename);
+    ObjFileReader(const string& obj_filename);
 
     void read();                    // read into g_asm
 

@@ -87,11 +87,11 @@ bool file_is_library_file(const string& filename, bool do_error) {
 
 //-----------------------------------------------------------------------------
 
-OFileWriter::OFileWriter(const string& obj_filename)
+ObjFileWriter::ObjFileWriter(const string& obj_filename)
     : obj_filename_(obj_filename) {
 }
 
-void OFileWriter::write() {
+void ObjFileWriter::write() {
     if (g_options.verbose())
         cout << "Writing object file '" << obj_filename_ << "'" << endl;
 
@@ -118,7 +118,7 @@ void OFileWriter::write() {
     }
 }
 
-void OFileWriter::write(ofstream& os) {
+void ObjFileWriter::write(ofstream& os) {
     streampos start_fpos = os.tellp();
 
     // write header
@@ -156,7 +156,7 @@ void OFileWriter::write(ofstream& os) {
     os.seekp(end_fpos);
 }
 
-streampos OFileWriter::write_exprs(ofstream& os) {
+streampos ObjFileWriter::write_exprs(ofstream& os) {
     streampos start_fpos = os.tellp();
 
     // write patch expressions
@@ -181,7 +181,7 @@ streampos OFileWriter::write_exprs(ofstream& os) {
     }
 }
 
-void OFileWriter::write_exprs(Symtab& symtab, ofstream& os) {
+void ObjFileWriter::write_exprs(Symtab& symtab, ofstream& os) {
     for (auto& symbol : symtab) {
         if (symbol->is_touched() && !symbol->is_global_def()) {
             if (symbol->type() == TYPE_COMPUTED) {
@@ -193,11 +193,11 @@ void OFileWriter::write_exprs(Symtab& symtab, ofstream& os) {
     }
 }
 
-void OFileWriter::write_patch_expr(Patch* patch, ofstream& os) {
+void ObjFileWriter::write_patch_expr(Patch* patch, ofstream& os) {
     write_expr("", patch, os);
 }
 
-void OFileWriter::write_expr(const string& target_name, Patch* patch, ofstream& os) {
+void ObjFileWriter::write_expr(const string& target_name, Patch* patch, ofstream& os) {
     // store type
     if (target_name.empty())
         swrite_int32(patch->range(), os);
@@ -222,7 +222,7 @@ void OFileWriter::write_expr(const string& target_name, Patch* patch, ofstream& 
     swrite_int32(string_table_.add_string(patch->expr()->text()), os);
 }
 
-streampos OFileWriter::write_symbols(ofstream& os) {
+streampos ObjFileWriter::write_symbols(ofstream& os) {
     streampos start_fpos = os.tellp();
 
     write_symbols(g_local_symbols(), os);
@@ -237,7 +237,7 @@ streampos OFileWriter::write_symbols(ofstream& os) {
     }
 }
 
-void OFileWriter::write_symbols(Symtab& symtab, ofstream& os) {
+void ObjFileWriter::write_symbols(Symtab& symtab, ofstream& os) {
     for (auto& symbol : symtab) {
         if (symbol->type() != TYPE_UNDEFINED) {
             // write scope
@@ -266,7 +266,7 @@ void OFileWriter::write_symbols(Symtab& symtab, ofstream& os) {
     }
 }
 
-streampos OFileWriter::write_externs(ofstream& os) {
+streampos ObjFileWriter::write_externs(ofstream& os) {
     streampos start_fpos = os.tellp();
 
     write_externs(g_local_symbols(), os);
@@ -281,7 +281,7 @@ streampos OFileWriter::write_externs(ofstream& os) {
     }
 }
 
-void OFileWriter::write_externs(Symtab& symtab, ofstream& os) {
+void ObjFileWriter::write_externs(Symtab& symtab, ofstream& os) {
     for (auto& symbol : symtab) {
         if (symbol->scope() == SCOPE_EXTERN ||
             (symbol->scope() == SCOPE_GLOBAL && symbol->type() == TYPE_UNDEFINED)) {
@@ -290,13 +290,13 @@ void OFileWriter::write_externs(Symtab& symtab, ofstream& os) {
     }
 }
 
-streampos OFileWriter::write_modname(ofstream& os) {
+streampos ObjFileWriter::write_modname(ofstream& os) {
     streampos start_fpos = os.tellp();
     swrite_int32(string_table_.add_string(g_module().name()), os);
     return start_fpos;
 }
 
-streampos OFileWriter::write_sections(ofstream& os) {
+streampos ObjFileWriter::write_sections(ofstream& os) {
     streampos start_fpos = os.tellp();
 
     for (auto& section : g_module().sections()) {
@@ -313,7 +313,7 @@ streampos OFileWriter::write_sections(ofstream& os) {
     }
 }
 
-void OFileWriter::write_sections(Section* section, ofstream& os) {
+void ObjFileWriter::write_sections(Section* section, ofstream& os) {
     // alignment data
     static const char align[sizeof(int32_t)] = { 0 };
 
@@ -339,6 +339,137 @@ void OFileWriter::write_sections(Section* section, ofstream& os) {
     size_t aligned_size = (size + (sizeof(int32_t) - 1)) & ~(sizeof(int32_t) - 1);
     size_t extra_bytes = aligned_size - size;
     os.write(align, extra_bytes);
+}
+
+//-----------------------------------------------------------------------------
+
+LibFileWriter::LibFileWriter(const string& lib_filename)
+    : lib_filename_(lib_filename) {
+}
+
+void LibFileWriter::write() {
+    if (g_options.verbose())
+        cout << "Creating library '" << lib_filename_ << "'" << endl;
+
+    // create temp file
+    string temp_filename = lib_filename_ + "~";
+    ofstream os{ temp_filename, ios::binary };
+    if (!os.is_open()) {
+        g_errors.error(ErrFileCreate, temp_filename);
+        perror(temp_filename.c_str());
+        return;
+    }
+
+    // write contents
+    write(os);
+    if (g_errors.count()) {
+        os.close();
+        std::remove(temp_filename.c_str());
+        return;
+    }
+
+    // delete old object and rename temp file
+    os.close();
+    std::remove(lib_filename_.c_str());
+    int rv = std::rename(temp_filename.c_str(), lib_filename_.c_str());
+    if (rv != 0) {
+        g_errors.error(ErrFileRename, temp_filename);
+        perror(temp_filename.c_str());
+        return;
+    }
+}
+
+void LibFileWriter::write(ofstream& os) {
+    // write header
+    os.write(LIB_FILE_HEADER, sizeof(LIB_FILE_HEADER) - 1);
+
+    // placeholder for defined symbols table
+    streampos st_ptr = os.tellp();
+    swrite_int32(-1, os);                   // placeholder
+
+    // assemble all cpu/ixiy combinations
+    if (g_options.lib_for_all_cpus()) 
+        create_objs_for_all_cpus();
+    if (g_errors.count())
+        return;
+
+    // write object files
+    write_all_objects(os);
+    if (g_errors.count())
+        return;
+
+    // write end marker
+    swrite_int32(-1, os);           // next = -1 - last module
+    swrite_int32(0, os);            // size = 0  - deleted
+
+    // write string table
+    streampos st_pos = defined_symbols_.write(os);
+    os.seekp(st_ptr);
+    swrite_int32((int)st_pos, os);
+    os.seekp(0, ios_base::end);
+}
+
+void LibFileWriter::create_objs_for_all_cpus() {
+    // libraries have no_swap and swap object files
+    // libraries built with -IXIY-soft have only soft-swap object files
+    swap_ixiy_t current_swap_ixiy = g_options.swap_ixiy();
+    swap_ixiy_t first_ixiy, last_ixiy;
+    if (current_swap_ixiy == IXIY_SOFT_SWAP) {
+        first_ixiy = last_ixiy = IXIY_SOFT_SWAP;
+    }
+    else {
+        first_ixiy = IXIY_NO_SWAP;
+        last_ixiy = IXIY_SWAP;
+    }
+
+    // assemble or include object for each cpu-ixiy combination and append to library
+    for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
+        g_options.set_cpu((cpu_t)*cpu);
+
+        for (int ixiy = (int)first_ixiy; ixiy <= (int)last_ixiy; ixiy++) {
+            g_options.set_swap_ixiy((swap_ixiy_t)ixiy);
+
+            for (size_t i = 0; i < g_options.input_files().size(); i++) {
+                string filename = g_options.input_files()[i];
+                string asm_filename = file_asm_filename(filename);
+                g_asm.assemble(asm_filename);
+
+                if (g_errors.count())
+                    return;
+            }
+        }
+    }
+}
+
+void LibFileWriter::write_all_objects(ofstream& os) {
+    // get all assebled objects
+    for (size_t i = 0; i < g_asm.objects().size(); i++) {
+        g_asm.set_cur_object(i);
+
+        if (g_options.verbose())
+            cout << "Adding '" << g_object().obj_filename() << "' to library" << endl;
+
+        // header position
+        streampos header_pos = os.tellp();
+
+        // read object file blob
+        BinFileReader obj(g_object().obj_filename());
+        obj.read();
+        if (g_errors.count())
+            return;
+
+        // write file pointer of next file
+        swrite_int32((int)header_pos + 2 * sizeof(int32_t) + (int)obj.size(), os);
+
+        // write module size
+        swrite_int32((int)obj.size(), os);
+
+        // write object blob
+        os.write((const char*)obj.ptr(), obj.size());
+
+        // lookup defined symbols in object file
+        g_object().get_defined_symbols(defined_symbols_);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -394,6 +525,10 @@ const byte_t* BinFileReader::ptr() const {
     return &bytes_[pos_ - base_addr_];
 }
 
+size_t BinFileReader::size() const {
+    return bytes_.size();
+}
+
 int BinFileReader::read_int32() {
     xassert(pos_ - base_addr_ + sizeof(int32_t) <= bytes_.size());
     int n = sread_int32(ptr());
@@ -403,17 +538,17 @@ int BinFileReader::read_int32() {
 
 //-----------------------------------------------------------------------------
 
-OFileReader::OFileReader(const string& obj_filename)
+ObjFileReader::ObjFileReader(const string& obj_filename)
     : bin_file_(obj_filename) {
 }
 
-void OFileReader::read() {
+void ObjFileReader::read() {
     g_errors.push_location(Location(bin_file_.filename()));
     read1();
     g_errors.pop_location();
 }
 
-bool OFileReader::seek_ptr(int n) {
+bool ObjFileReader::seek_ptr(int n) {
     bin_file_.seek(SIGNATURE_SIZE + (2 + n) * sizeof(int32_t));
     int ptr = bin_file_.read_int32();
     if (ptr < 0)
@@ -424,40 +559,40 @@ bool OFileReader::seek_ptr(int n) {
     }
 }
 
-bool OFileReader::seek_modname() {
+bool ObjFileReader::seek_modname() {
     return seek_ptr(0);
 }
 
-bool OFileReader::seek_exprs() {
+bool ObjFileReader::seek_exprs() {
     return seek_ptr(1);
 }
 
-bool OFileReader::seek_defined_names() {
+bool ObjFileReader::seek_defined_names() {
     return seek_ptr(2);
 }
 
-bool OFileReader::seek_external_names() {
+bool ObjFileReader::seek_external_names() {
     return seek_ptr(3);
 }
 
-bool OFileReader::seek_sections() {
+bool ObjFileReader::seek_sections() {
     return seek_ptr(4);
 }
 
-bool OFileReader::seek_string_table() {
+bool ObjFileReader::seek_string_table() {
     return seek_ptr(5);
 }
 
-int OFileReader::read_int32() {
+int ObjFileReader::read_int32() {
     return bin_file_.read_int32();
 }
 
-string OFileReader::read_string() {
+string ObjFileReader::read_string() {
     int n = read_int32();
     return string_table_.lookup(n);
 }
 
-void OFileReader::read1() {
+void ObjFileReader::read1() {
     int start_errors = g_errors.count();
     if (!file_is_object_file(bin_file_.filename(), true))
         return;
@@ -491,7 +626,7 @@ void OFileReader::read1() {
         return;
 }
 
-void OFileReader::parse_string_table() {
+void ObjFileReader::parse_string_table() {
     size_t save_pos = bin_file_.tell();
     if (!seek_string_table())
         g_errors.error(ErrNotObjFile, bin_file_.filename());
@@ -501,7 +636,7 @@ void OFileReader::parse_string_table() {
     bin_file_.seek(save_pos);
 }
 
-void OFileReader::parse_modname() {
+void ObjFileReader::parse_modname() {
     if (!seek_modname())
         g_errors.error(ErrNotObjFile, bin_file_.filename());
     else {
@@ -510,7 +645,7 @@ void OFileReader::parse_modname() {
     }
 }
 
-void OFileReader::parse_sections() {
+void ObjFileReader::parse_sections() {
     if (!seek_sections())
         return;
 
@@ -563,7 +698,7 @@ void OFileReader::parse_sections() {
     }
 }
 
-void OFileReader::parse_defined_names() {
+void ObjFileReader::parse_defined_names() {
     if (!seek_defined_names())
         return;
 
@@ -599,7 +734,7 @@ void OFileReader::parse_defined_names() {
     }
 }
 
-void OFileReader::parse_external_names() {
+void ObjFileReader::parse_external_names() {
     if (!seek_external_names())
         return;
 
@@ -613,7 +748,7 @@ void OFileReader::parse_external_names() {
     }
 }
 
-void OFileReader::parse_exprs() {
+void ObjFileReader::parse_exprs() {
     if (!seek_exprs())
         return;
 

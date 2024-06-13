@@ -393,6 +393,10 @@ void Module::check_undefined_symbols() {
     symbols_.check_undefined_symbols();
 }
 
+void Module::get_defined_symbols(StringTable& st) {
+    symbols_.get_defined_symbols(st);
+}
+
 //-----------------------------------------------------------------------------
 
 Object::Object(const string& asm_filename, const string& obj_filename)
@@ -475,6 +479,11 @@ void Object::check_undefined_symbols() {
 }
 
 void Object::write_obj_file(const string& obj_filename) {
-    OFileWriter ofile(obj_filename);
-    ofile.write();
+    ObjFileWriter obj_file(obj_filename);
+    obj_file.write();
+}
+
+void Object::get_defined_symbols(StringTable& st) {
+    for (auto& module1 : modules_)
+        module1->get_defined_symbols(st);
 }

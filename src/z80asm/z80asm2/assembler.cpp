@@ -68,17 +68,29 @@ void Assembler::load_object(const string& obj_filename) {
 
 void Assembler::add_object(const string& asm_filename, const string& obj_filename) {
     objects_.push_back(new Object(asm_filename, obj_filename));
+    cur_object_id_ = objects_.size() - 1;
 }
 
 Object& Assembler::cur_object() {
     xassert(!objects_.empty());
-    return *objects_.back();
+    return *objects_[cur_object_id_];
+}
+
+void Assembler::set_cur_object(size_t index) {
+    xassert(!objects_.empty());
+    xassert(index < objects_.size());
+    cur_object_id_ = index;
 }
 
 void Assembler::delete_objects() {
     for (auto& object : objects_) 
         delete object;
     objects_.clear();
+    cur_object_id_ = -1;
+}
+
+vector<Object*>& Assembler::objects() {
+    return objects_;
 }
 
 void Assembler::copy_defines() {
@@ -285,6 +297,6 @@ void Assembler::assemble1() {
 void Assembler::load_object1() {
     string obj_filename = cur_object().obj_filename();
 
-    OFileReader ofile(obj_filename);
-    ofile.read();
+    ObjFileReader obj_file(obj_filename);
+    obj_file.read();
 }
