@@ -13,6 +13,7 @@
 #include <iostream>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -75,13 +76,10 @@ private:
 // binary file reader
 class BinFileReader {
 public:
-    BinFileReader(const string& filename);
+    BinFileReader();
+    BinFileReader(const byte_t* ptr, size_t size);
 
-    const string& filename() const;
-    size_t base_addr() const;
-    void set_base_addr(size_t addr);
-
-    void read();
+    void read(const string& filename);
 
     size_t tell() const;
     void seek(size_t addr);
@@ -90,10 +88,10 @@ public:
     int read_int32();
 
 private:
-    string filename_;               // filename
-    vector<byte_t> bytes_;          // bytes from file
-    size_t base_addr_{ 0 };         // offset from start of file
+    const byte_t* bytes_{ nullptr };// point to data
+    size_t  size_{ 0 };             // data size
     size_t pos_{ 0 };               // current read position
+    vector<byte_t> own_bytes_;      // bytes from read file
 
 };
 
@@ -101,10 +99,16 @@ private:
 class ObjFileReader {
 public:
     ObjFileReader(const string& obj_filename);
+    ObjFileReader(const byte_t* ptr, size_t size);
 
     void read();                    // read into g_asm
+    bool cpu_compatible();          // check if cpu is compatible
+    bool swap_ixiy_compatible();    // check if swap_ixiy is compatible
+    string read_modname();          // read modname from data
+    void get_public_names(set<string>& symbols);
 
 private:
+    string obj_filename_;           // file name
     BinFileReader bin_file_;        // file reader
     StringTable string_table_;      // string table from file
 
@@ -126,4 +130,44 @@ private:
     void parse_defined_names();
     void parse_external_names();
     void parse_exprs();
+
+    void collect_public_names(set<string>& symbols);
+};
+
+// read library files
+class LibFileReader {
+public:
+    LibFileReader(const string& lib_filename);
+
+    void read();                                // read library to memory
+    bool resolve_symbol(const string& name);    // load object if symbol defined in library
+
+private:
+    struct obj_location_t {
+        const byte_t* ptr;
+        size_t size;
+    };
+
+    string lib_filename_;                       // file name
+    BinFileReader bin_file_;                    // file reader
+    StringTable defined_symbols_;               // string table from file - all defined symbols
+    unordered_map<string, obj_location_t> symbol_objects_; // map of each defined symbol to its position in bin_file_
+
+    void read1();
+    void parse_string_table();
+};
+
+// list of all searched libraries
+class SearchedLibs {
+public:
+    SearchedLibs();
+    virtual ~SearchedLibs();
+    SearchedLibs(SearchedLibs& other) = delete;
+    SearchedLibs& operator=(SearchedLibs& other) = delete;
+
+    void read();                                // read libraries from each -l path
+    bool resolve_symbol(const string& name);    // load object if symbol defined in library
+
+private:
+    vector<LibFileReader*> lib_files_;          // list of loaded libraries
 };

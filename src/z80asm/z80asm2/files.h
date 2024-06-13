@@ -18,7 +18,7 @@ using namespace std;
 // default file name extensions
 #define EXT_ASM     ".asm"    
 #define EXT_LIS		".lis"    
-#define EXT_O		".o"	  
+#define EXT_OBJ		".o"	  
 #define EXT_DEF     ".def"    
 #define EXT_BIN     ".bin"    
 #define EXT_LIB     ".lib"    

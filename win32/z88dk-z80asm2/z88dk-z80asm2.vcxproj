@@ -140,6 +140,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\files.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\linker.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\main.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\object.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\files.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\linker.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\object.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\ofiles.h" />

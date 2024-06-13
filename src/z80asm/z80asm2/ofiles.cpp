@@ -453,8 +453,8 @@ void LibFileWriter::write_all_objects(ofstream& os) {
         streampos header_pos = os.tellp();
 
         // read object file blob
-        BinFileReader obj(g_object().obj_filename());
-        obj.read();
+        BinFileReader obj;
+        obj.read(g_object().obj_filename());
         if (g_errors.count())
             return;
 
@@ -468,69 +468,67 @@ void LibFileWriter::write_all_objects(ofstream& os) {
         os.write((const char*)obj.ptr(), obj.size());
 
         // lookup defined symbols in object file
-        g_object().get_defined_symbols(defined_symbols_);
+        g_object().get_public_names(defined_symbols_);
     }
 }
 
 //-----------------------------------------------------------------------------
 
-BinFileReader::BinFileReader(const string& filename)
-    : filename_(filename), base_addr_(0), pos_(0) {
+BinFileReader::BinFileReader() {
+    bytes_ = (byte_t*)"";
+    size_ = pos_ = 0;
 }
 
-const string& BinFileReader::filename() const {
-    return filename_;
+BinFileReader::BinFileReader(const byte_t* ptr, size_t size) {
+    bytes_ = ptr;
+    size_ = size;
+    pos_ = 0;
 }
 
-size_t BinFileReader::base_addr() const {
-    return base_addr_;
-}
+void BinFileReader::read(const string& filename) {
+    own_bytes_.clear();
 
-void BinFileReader::set_base_addr(size_t addr) {
-    base_addr_ = addr;
-}
-
-void BinFileReader::read() {
-    bytes_.clear();
-
-    ifstream ifs(filename_, ios::binary);
+    ifstream ifs(filename, ios::binary);
     if (!ifs.is_open()) {
-        g_errors.error(ErrFileOpen, filename_);
-        perror(filename_.c_str());
+        g_errors.error(ErrFileOpen, filename);
+        perror(filename.c_str());
         return;
     }
     ifs.seekg(0, ios_base::end);
     size_t size = ifs.tellg();
     ifs.seekg(0, std::ios_base::beg);
 
-    bytes_.resize(size);
-    ifs.read((char*) &bytes_[0], size);
+    own_bytes_.resize(size);
+    ifs.read((char*)&bytes_[0], size);
     if (size != (size_t)ifs.gcount()) {
-        g_errors.error(ErrFileRead, filename_);
+        g_errors.error(ErrFileRead, filename);
         return;
     }
+
+    bytes_ = &own_bytes_[0];
+    size_ = own_bytes_.size();
 }
 
 size_t BinFileReader::tell() const {
-    return pos_ - base_addr_;
+    return pos_;
 }
 
 void BinFileReader::seek(size_t addr) {
-    pos_ = base_addr_ + addr;
-    xassert(pos_ - base_addr_ <= bytes_.size());
+    pos_ = addr;
+    xassert(pos_ <= size_);
 }
 
 const byte_t* BinFileReader::ptr() const {
-    xassert(pos_ - base_addr_ <= bytes_.size());
-    return &bytes_[pos_ - base_addr_];
+    xassert(pos_ <= size_);
+    return bytes_ + pos_;
 }
 
 size_t BinFileReader::size() const {
-    return bytes_.size();
+    return size_;
 }
 
 int BinFileReader::read_int32() {
-    xassert(pos_ - base_addr_ + sizeof(int32_t) <= bytes_.size());
+    xassert(pos_  + sizeof(int32_t) <= size_);
     int n = sread_int32(ptr());
     pos_ += sizeof(int32_t);
     return n;
@@ -539,13 +537,44 @@ int BinFileReader::read_int32() {
 //-----------------------------------------------------------------------------
 
 ObjFileReader::ObjFileReader(const string& obj_filename)
-    : bin_file_(obj_filename) {
+    : obj_filename_(obj_filename), bin_file_() {
+}
+
+ObjFileReader::ObjFileReader(const byte_t* ptr, size_t size)
+    : obj_filename_(), bin_file_(ptr, size) {
 }
 
 void ObjFileReader::read() {
-    g_errors.push_location(Location(bin_file_.filename()));
+    g_errors.push_location(Location(obj_filename_));
     read1();
     g_errors.pop_location();
+}
+
+bool ObjFileReader::cpu_compatible() {
+    bin_file_.seek(SIGNATURE_SIZE);
+    cpu_t cpu_id = (cpu_t)bin_file_.read_int32();
+    return ::cpu_compatible(g_options.cpu(), cpu_id);
+}
+
+bool ObjFileReader::swap_ixiy_compatible() {
+    bin_file_.seek(SIGNATURE_SIZE + sizeof(int32_t));
+    swap_ixiy_t swap_ixiy = (swap_ixiy_t)bin_file_.read_int32();
+    return ::ixiy_compatible(g_options.swap_ixiy(), swap_ixiy);
+}
+
+void ObjFileReader::get_public_names(set<string>& symbols) {
+    int start_errors = g_errors.count();
+
+    symbols.clear();
+
+    parse_string_table();
+    if (start_errors != g_errors.count())
+        return;
+
+    collect_public_names(symbols);
+    if (start_errors != g_errors.count())
+        return;
+
 }
 
 bool ObjFileReader::seek_ptr(int n) {
@@ -594,10 +623,13 @@ string ObjFileReader::read_string() {
 
 void ObjFileReader::read1() {
     int start_errors = g_errors.count();
-    if (!file_is_object_file(bin_file_.filename(), true))
-        return;
 
-    bin_file_.read();
+    if (!obj_filename_.empty()) {
+        if (!file_is_object_file(obj_filename_, true))
+            return;
+
+        bin_file_.read(obj_filename_);
+    }
     if (start_errors != g_errors.count())
         return;
 
@@ -629,7 +661,7 @@ void ObjFileReader::read1() {
 void ObjFileReader::parse_string_table() {
     size_t save_pos = bin_file_.tell();
     if (!seek_string_table())
-        g_errors.error(ErrNotObjFile, bin_file_.filename());
+        g_errors.error(ErrNotObjFile, obj_filename_);
     else 
         string_table_.parse(bin_file_.ptr());
    
@@ -638,7 +670,7 @@ void ObjFileReader::parse_string_table() {
 
 void ObjFileReader::parse_modname() {
     if (!seek_modname())
-        g_errors.error(ErrNotObjFile, bin_file_.filename());
+        g_errors.error(ErrNotObjFile, obj_filename_);
     else {
         string modname = read_string();
         g_object().select_module(modname);
@@ -668,7 +700,7 @@ void ObjFileReader::parse_sections() {
         // if creating relocatable code, ignore origin 
         if (g_options.relocatable() && g_section().origin() >= 0) {
             g_errors.warning(ErrOrgIgnored,
-                string("file ") + bin_file_.filename() + ", section " + section_name);
+                string("file ") + obj_filename_ + ", section " + section_name);
 
             g_section().set_origin(ORG_NOT_DEFINED);
             g_section().set_section_split(false);
@@ -677,7 +709,7 @@ void ObjFileReader::parse_sections() {
         // if running appmake, ignore origin except for first module
         if (g_options.appmake() && g_section().origin() >= 0 && !first_section) {
             g_errors.warning(ErrOrgIgnored,
-                string("file ") + bin_file_.filename() + ", section " + section_name);
+                string("file ") + obj_filename_ + ", section " + section_name);
 
             g_section().set_origin(ORG_NOT_DEFINED);
             g_section().set_section_split(false);
@@ -710,7 +742,7 @@ void ObjFileReader::parse_defined_names() {
             // ok
         }
         else {
-            g_errors.error(ErrNotObjFile, bin_file_.filename());
+            g_errors.error(ErrNotObjFile, obj_filename_);
             break;
         }
 
@@ -798,4 +830,153 @@ void ObjFileReader::parse_exprs() {
 
         g_errors.pop_location();
     }
+}
+
+void ObjFileReader::collect_public_names(set<string>& symbols) {
+    if (!seek_defined_names())
+        return;
+
+    while (true) {				// read symbols until end marker
+        sym_scope_t scope = (sym_scope_t)read_int32();			// scope of symbol
+        if (scope == SCOPE_NONE)								// end marker
+            break;
+        else if (scope == SCOPE_LOCAL || scope == SCOPE_PUBLIC) {
+            // ok
+        }
+        else {
+            g_errors.error(ErrNotObjFile, obj_filename_);
+            break;
+        }
+
+        sym_type_t type = (sym_type_t)read_int32();				// type of symbol
+
+        string section_name = read_string();                    // section
+
+        int value = read_int32();					            // value
+        string name = read_string();                            // symbol name
+
+        string source_filename = read_string();                 // where defined
+        int line_num = read_int32();                            // where defined
+
+        if (scope != SCOPE_LOCAL && type != TYPE_UNDEFINED) {
+            symbols.insert(name);
+        }
+    }
+}
+
+string ObjFileReader::read_modname() {
+    xassert(seek_modname());
+    string modname = read_string();
+    return modname;
+}
+
+//-----------------------------------------------------------------------------
+
+LibFileReader::LibFileReader(const string& lib_filename)
+    : lib_filename_(lib_filename) {
+}
+
+void LibFileReader::read() {
+    g_errors.push_location(Location(lib_filename_));
+    read1();
+    g_errors.pop_location();
+}
+
+bool LibFileReader::resolve_symbol(const string& name) {
+    if (!defined_symbols_.find(name))
+        return false;                       // not defined in any of the object files
+
+    auto it = symbol_objects_.find(name);
+    if (it == symbol_objects_.end())
+        return false;                       // not defined in any of the object files
+
+    // symbol defined, load it into g_asm
+    ObjFileReader obj(it->second.ptr, it->second.size);
+    string modname = obj.read_modname();
+    g_asm.add_object(modname + EXT_ASM, modname + EXT_OBJ);
+    obj.read();
+    return true;
+}
+
+void LibFileReader::read1() {
+    int start_errors = g_errors.count();
+    if (!file_is_library_file(lib_filename_, true))
+        return;
+
+    bin_file_.read(lib_filename_);
+    if (start_errors != g_errors.count())
+        return;
+
+    parse_string_table();
+    if (start_errors != g_errors.count())
+        return;
+
+    // search all object files for defined symbols, fill symbol_objects_
+    symbol_objects_.clear();
+    size_t next_pos = SIGNATURE_SIZE + sizeof(int32_t);
+    while (next_pos != -1 && next_pos < bin_file_.size()) {     // for each object file
+        bin_file_.seek(next_pos);
+        next_pos = bin_file_.read_int32();
+        size_t module_size = bin_file_.read_int32();
+
+        if (module_size > 0) {                                  // if not deleted
+            ObjFileReader obj(bin_file_.ptr(), module_size);
+
+            if (obj.cpu_compatible() && obj.swap_ixiy_compatible()) {   // if cpu and ixiy compatible
+
+                set<string> symbols;
+                obj.get_public_names(symbols);               // get all defined symbols
+
+                if (start_errors != g_errors.count())
+                    return;
+
+                for (auto& symbol : symbols) {
+                    // if already defined, ignore
+                    auto it = symbol_objects_.find(symbol);
+                    if (it == symbol_objects_.end()) {          // not already defined in a previous object file
+                        symbol_objects_[symbol] = { bin_file_.ptr(), module_size };     // cache it
+                    }
+                }
+            }
+        }
+    }
+}
+
+void LibFileReader::parse_string_table() {
+    bin_file_.seek(SIGNATURE_SIZE);
+    int ptr = bin_file_.read_int32();
+    bin_file_.seek(ptr);
+    defined_symbols_.parse(bin_file_.ptr());
+}
+
+//-----------------------------------------------------------------------------
+
+SearchedLibs::SearchedLibs() {
+}
+
+SearchedLibs::~SearchedLibs() {
+    for (auto& lib : lib_files_)
+        delete lib;
+}
+
+void SearchedLibs::read() {
+    int start_errors = g_errors.count();
+
+    for (auto& filename : g_options.libraries()) {
+        filename = file_search_path(filename, g_options.library_path());
+        LibFileReader* lib = new LibFileReader(filename);
+        lib_files_.push_back(lib);
+
+        lib->read();
+        if (start_errors != g_errors.count())
+            return;
+    }
+}
+
+bool SearchedLibs::resolve_symbol(const string& name) {
+    for (auto& lib : lib_files_) {
+        if (lib->resolve_symbol(name))
+            return true;
+    }
+    return false;
 }

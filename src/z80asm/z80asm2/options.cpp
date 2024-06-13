@@ -167,7 +167,7 @@ void Options::exit_help() {
         << endl
         << "  File types recognized or created by z80asm:" << endl
         << "    " EXT_ASM "   = source file" << endl
-        << "    " EXT_O "     = object file" << endl
+        << "    " EXT_OBJ "     = object file" << endl
         << "    " EXT_LIS "   = list file" << endl
         << "    " EXT_BIN "   = Z80 binary file" << endl
         << "    " EXT_SYM "   = symbols file" << endl
@@ -1008,7 +1008,7 @@ bool Options::search_source(const string& filename, string& out_filename) {
             return true;
 
         // check filename with .o extension
-        string obj_file = filename + EXT_O;
+        string obj_file = filename + EXT_OBJ;
         if (check_source(obj_file, out_filename))
             return true;
 
@@ -1047,7 +1047,7 @@ bool Options::check_source(const string& filename, string& out_filename) {
     string src_file, obj_file;
     bool got_obj = false;
 
-    if (file_extension(filename) == EXT_O) {
+    if (file_extension(filename) == EXT_OBJ) {
         got_obj = true;
         src_file = file_asm_filename(filename);
         obj_file = filename;

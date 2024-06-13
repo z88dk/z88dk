@@ -393,8 +393,8 @@ void Module::check_undefined_symbols() {
     symbols_.check_undefined_symbols();
 }
 
-void Module::get_defined_symbols(StringTable& st) {
-    symbols_.get_defined_symbols(st);
+void Module::get_public_names(StringTable& st) {
+    symbols_.get_public_names(st);
 }
 
 //-----------------------------------------------------------------------------
@@ -483,7 +483,7 @@ void Object::write_obj_file(const string& obj_filename) {
     obj_file.write();
 }
 
-void Object::get_defined_symbols(StringTable& st) {
+void Object::get_public_names(StringTable& st) {
     for (auto& module1 : modules_)
-        module1->get_defined_symbols(st);
+        module1->get_public_names(st);
 }
