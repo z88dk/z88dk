@@ -201,9 +201,11 @@ nextcol:
 standard_modes:
     ; We are on a standard zx screen
     push    hl
+  IF    FORts2068|zxn
     ld      a, h
     and     @00100000
     ld      c, a                        ;Save page flag
+  ENDIF
     ld      a, h
     rrca
     rrca
