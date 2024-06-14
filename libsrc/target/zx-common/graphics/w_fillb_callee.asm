@@ -17,8 +17,8 @@
 
     EXTERN  w_pixeladdress
     EXTERN  inc_y_MODE6
-IF    FORts2068|FORzxn
     EXTERN  inc_x_MODE6
+IF    FORts2068|FORzxn
     EXTERN  __gfx_fatpix
 ENDIF
 
@@ -128,7 +128,7 @@ inner_loop0:
     jr      nz, inner_loop0
 fill:
 
-    call    next_column
+    call    inc_x_MODE6
 
     jr      c, wypad
 fill1:
@@ -145,7 +145,7 @@ fill1:
 inner_loop1:
     ld      a,255
     ld      (de), a
-    call    next_column
+    call    inc_x_MODE6
     jr      c, wypad
     djnz    inner_loop1
 
@@ -173,21 +173,4 @@ wypad:
     call    inc_y_MODE6
     jp      c, __graphics_end
     jr      outer_loop
-
-
-next_column:
-    ex      af,af
-IF    FORts2068|FORzxn
-    ld      a, (__zx_screenmode)
-    and     a
-    jr      z,_mode0
-    call    inc_x_MODE6
-    ex      af,af
-    jr      _mode6
-_mode0:
-ENDIF
-    inc     de
-_mode6:
-    ex      af,af
-	ret
 
