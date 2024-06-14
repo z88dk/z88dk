@@ -378,11 +378,14 @@ ENDIF
 IF !DEFINED_basegraphics
     PUBLIC  base_graphics
 base_graphics:
-    defw    0                   ;Address of graphics map
+    defw    0                   ;address of graphics map
 ENDIF
 
 IF __clib_malloc_heap_size > 0
     PUBLIC  _heap
+    ; The heap pointer will be wiped at bss initialisation.
+    ; Its value (based on __tail) will be set later if set
+    ; by sbrk() during AMALLOC initialisation.
 _heap:
     defw    0,0                 ;populated by crt_heap_init.inc
 __autoheap:
@@ -391,8 +394,8 @@ __autoheap:
 ELIF DEFINED_CRT_HEAP_AMALLOC ||  __crt_stack_size > 0
     PUBLIC  _heap
 _heap:
-    defw 0
-    defw 0
+    defw    0                   ;populated by crt_heap_init.inc
+    defw    0
 
 ENDIF
 
