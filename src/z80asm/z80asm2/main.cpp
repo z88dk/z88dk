@@ -46,18 +46,17 @@ int main(int argc, char* argv[]) {
         if (g_errors.count())
             return EXIT_FAILURE;
     }
-
     // make binary
-    if (g_options.make_bin()) {
+    else if (g_options.make_bin()) {
         xassert(!g_asm.objects().empty());
         string bin_filename = file_bin_filename(g_asm.objects()[0]->obj_filename());
 
         Linker linker(bin_filename);
-        linker.pull_library_modules();
+        linker.link_library_modules();
         if (g_errors.count())
             return EXIT_FAILURE;
 
-        linker.link();
+        linker.allocate_addresses();
         if (g_errors.count())
             return EXIT_FAILURE;
 

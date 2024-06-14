@@ -393,6 +393,10 @@ void Module::check_undefined_symbols() {
     symbols_.check_undefined_symbols();
 }
 
+void Module::remove_globals() {
+    symbols_.remove_globals();
+}
+
 void Module::get_public_names(StringTable& st) {
     symbols_.get_public_names(st);
 }
@@ -476,6 +480,11 @@ void Object::patch_local_exprs() {
 void Object::check_undefined_symbols() {
     for (auto& module1 : modules_)
         module1->check_undefined_symbols();
+}
+
+void Object::remove_globals() {
+    for (auto& module1 : modules_)
+        module1->remove_globals();
 }
 
 void Object::write_obj_file(const string& obj_filename) {

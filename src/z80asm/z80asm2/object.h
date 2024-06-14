@@ -113,6 +113,7 @@ public:
     void compute_addresses();
     void patch_local_exprs();
     void check_undefined_symbols();
+    void remove_globals();
     void get_public_names(StringTable& st);
 
 private:
@@ -148,6 +149,7 @@ public:
     void compute_addresses();
     void patch_local_exprs();
     void check_undefined_symbols();
+    void remove_globals();
     void write_obj_file(const string& obj_filename);
     void get_public_names(StringTable& st);
 

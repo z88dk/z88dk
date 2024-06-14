@@ -13,8 +13,8 @@
 #include <algorithm>
 using namespace std;
 
-Symbol::Symbol(const string& name, sym_scope_t scope, sym_type_t type, Section* section, int value)
-    : name_(name), scope_(scope), type_(type), value_(value), section_(section) {
+Symbol::Symbol(const string& name, sym_scope_t scope, sym_type_t type, int value)
+    : name_(name), scope_(scope), type_(type), value_(value), section_(&g_section()) {
 }
 
 Symbol::~Symbol() {
@@ -27,73 +27,130 @@ const string& Symbol::name() const {
 }
 
 sym_scope_t Symbol::scope() const {
-    return scope_;
+    if (alias_)
+        return alias_->scope();
+    else
+        return scope_;
 }
 
 sym_type_t Symbol::type() const {
-    return type_;
+    if (alias_)
+        return alias_->type();
+    else
+        return type_;
 }
 
 Section* Symbol::section() const {
-    return section_;
+    if (alias_)
+        return alias_->section();
+    else
+        return section_;
 }
 
 Expr* Symbol::expr() const {
-    return expr_;
+    if (alias_)
+        return alias_->expr();
+    else
+        return expr_;
 }
 
 Instr* Symbol::instr() const {
-    return instr_;
+    if (alias_)
+        return alias_->instr();
+    else
+        return instr_;
 }
 
 bool Symbol::is_touched() const {
-    return is_touched_;
+    if (alias_)
+        return alias_->is_touched();
+    else
+        return is_touched_;
 }
 
 bool Symbol::is_global_def() const {
-    return is_global_def_;
+    if (alias_)
+        return alias_->scope();
+    else
+        return is_global_def_;
+}
+
+bool Symbol::is_alias() const {
+    return alias_ != nullptr;
 }
 
 void Symbol::set_scope(sym_scope_t scope) {
-    scope_ = scope;
+    if (alias_)
+        alias_->set_scope(scope);
+    else
+        scope_ = scope;
 }
 
 void Symbol::set_type(sym_type_t type) {
-    type_ = type;
+    if (alias_)
+        alias_->set_type(type);
+    else
+        type_ = type;
 }
 
 void Symbol::set_section(Section* section) {
-    section_ = section;
+    if (alias_)
+        return alias_->set_section(section);
+    else
+        section_ = section;
 }
 
 void Symbol::set_value(int value) {
-    value_ = value;
+    if (alias_)
+        return alias_->set_value(value);
+    else
+        value_ = value;
 }
 
 void Symbol::set_expr(Expr* expr) {
-    expr_ = expr;
+    if (alias_)
+        return alias_->set_expr(expr);
+    else
+        expr_ = expr;
 }
 
 void Symbol::set_instr(Instr* instr) {
-    instr_ = instr;
+    if (alias_)
+        return alias_->set_instr(instr);
+    else
+        instr_ = instr;
 }
 
 void Symbol::set_touched(bool f) {
-    is_touched_ = f;
+    if (alias_)
+        return alias_->set_touched(f);
+    else
+        is_touched_ = f;
 }
 
 void Symbol::set_global_def(bool f) {
-    is_global_def_ = f;
+    if (alias_)
+        return alias_->set_global_def(f);
+    else
+        is_global_def_ = f;
+}
+
+void Symbol::set_alias(Symbol* other) {
+    alias_ = other;
 }
 
 ExprResult Symbol::eval() {
-    if (recurse_count_ != 0)
-        return ExprResult(TYPE_UNDEFINED, 0, ErrExprRecursion);
+    if (alias_)
+        return alias_->eval();
     else {
-        recurse_count_++;
-        ExprResult result = eval1();
-        recurse_count_--;
-        return result;
+        if (recurse_count_ != 0)
+            return ExprResult(TYPE_UNDEFINED, 0, ErrExprRecursion);
+        else {
+            recurse_count_++;
+            ExprResult result = eval1();
+            recurse_count_--;
+            return result;
+        }
     }
 }
 
@@ -178,6 +235,17 @@ void Symtab::remove(const string& name) {
 
     // save in deleted, in case any expression referes to it
     deleted_.push_back(symbol);
+}
+
+void Symtab::remove_globals() {
+    for (auto& symbol : symbols_) {
+        if (symbol->scope() == SCOPE_GLOBAL) {
+            if (symbol->type() == TYPE_UNDEFINED)
+                symbol->set_scope(SCOPE_EXTERN);
+            else
+                symbol->set_scope(SCOPE_PUBLIC);
+        }
+    }
 }
 
 

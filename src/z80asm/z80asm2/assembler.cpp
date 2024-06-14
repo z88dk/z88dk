@@ -98,7 +98,7 @@ void Assembler::copy_defines() {
         string name = it.first;
         int value = it.second;
 
-        Symbol* symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, &g_section(), value);
+        Symbol* symbol = new Symbol(name, SCOPE_LOCAL, TYPE_CONSTANT, value);
         symbol->set_global_def();
 
         g_local_symbols().insert(symbol);
@@ -167,7 +167,7 @@ Symbol* Assembler::add_equ(const string& name, Expr* expr) {
     // check if already defined
     Symbol* symbol = find_symbol(name);
     if (!symbol) {                              // new symbol
-        symbol = new Symbol(name, SCOPE_LOCAL, res.type(), &g_section());
+        symbol = new Symbol(name, SCOPE_LOCAL, res.type());
         if (res.type() == TYPE_CONSTANT) {
             symbol->set_value(res.value());
             delete expr;
@@ -211,7 +211,7 @@ Symbol* Assembler::use_symbol(const string& name) {
     // check if already defined
     Symbol* symbol = find_symbol(name);
     if (!symbol) {                               // new symbol
-        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_UNDEFINED, &g_section());
+        symbol = new Symbol(name, SCOPE_LOCAL, TYPE_UNDEFINED);
         bool ok = g_local_symbols().insert(symbol);
         xassert(ok);
     }
@@ -235,7 +235,7 @@ Symbol* Assembler::make_global(const string& name, sym_scope_t new_scope) {
     // check if symbol exists
     Symbol* symbol = g_local_symbols().find(name);
     if (!symbol) {
-        symbol = new Symbol(name, new_scope, TYPE_UNDEFINED, &g_section());
+        symbol = new Symbol(name, new_scope, TYPE_UNDEFINED);
         bool ok = g_local_symbols().insert(symbol);
         xassert(ok);
     }
@@ -274,6 +274,10 @@ void Assembler::assemble1() {
     }
 
     cur_object().parse();
+    if (start_errors != g_errors.count())
+        return;
+
+    cur_object().remove_globals();
     if (start_errors != g_errors.count())
         return;
 

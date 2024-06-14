@@ -23,7 +23,7 @@ class Instr;
 
 class Symbol : public HasLocation {
 public:
-    Symbol(const string& name, sym_scope_t scope, sym_type_t type, Section* section, int value = 0);
+    Symbol(const string& name, sym_scope_t scope, sym_type_t type, int value = 0);
     virtual ~Symbol();
     Symbol(const Symbol& other) = delete;
     Symbol& operator=(const Symbol& other) = delete;
@@ -37,6 +37,7 @@ public:
 
     bool is_touched() const;
     bool is_global_def() const;
+    bool is_alias() const;
 
     void set_scope(sym_scope_t scope);
     void set_type(sym_type_t type);
@@ -46,7 +47,8 @@ public:
     void set_instr(Instr* instr);
     void set_touched(bool f = true);
     void set_global_def(bool f = true);
-
+    void set_alias(Symbol* other);
+    
     ExprResult eval();				    // compute value
 
 private:
@@ -60,6 +62,7 @@ private:
     bool        is_touched_{ false };   // if true, gets written to object file
     bool        is_global_def_{ false };// is defined by -D
     int         recurse_count_{ 0 };    // check for recursive expressions
+    Symbol*     alias_{ nullptr };      // this symbol has an alias in other module
 
     ExprResult eval1();
 };
@@ -80,6 +83,7 @@ public:
     bool insert(Symbol* symbol);            // false if already exists
     Symbol* find(const string& name);       // nullptr if not found
     void remove(const string& name);        // remove from symbols_, save a zero value in deleted_
+    void remove_globals();                  // replace GLOBAL either by EXTERN or PUBLIC
     void check_undefined_symbols();
     void get_public_names(StringTable& st);
 

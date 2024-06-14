@@ -8,19 +8,21 @@
 
 #include "symtab.h"
 #include <string>
+#include <vector>
 using namespace std;
 
 class Linker {
 public:
     Linker(const string& bin_filename);
 
-    void pull_library_modules();
-    void link();
+    void link_library_modules();
+    void allocate_addresses();
     void write_bin_files();
 
 private:
     string bin_filename_;
-    Symtab global_symbols_;
+    Symtab global_symbols_;             // globals in the order defined
 
-    void update_global_symbols();
+    void load_global_symbols();         // load global_symbols_
+    void link_extern_symbols(vector<Symbol*>& unresolved);   // link all possible extern symbols, return unresolved
 };

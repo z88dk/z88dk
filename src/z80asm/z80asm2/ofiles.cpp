@@ -241,6 +241,7 @@ void ObjFileWriter::write_symbols(Symtab& symtab, ofstream& os) {
     for (auto& symbol : symtab) {
         if (symbol->type() != TYPE_UNDEFINED) {
             // write scope
+            xassert(symbol->scope() != SCOPE_GLOBAL);       // all were replaced by EXTERN or PUBLIC
             swrite_int32((int)symbol->scope(), os);
 
             // write type
@@ -283,8 +284,8 @@ streampos ObjFileWriter::write_externs(ofstream& os) {
 
 void ObjFileWriter::write_externs(Symtab& symtab, ofstream& os) {
     for (auto& symbol : symtab) {
-        if (symbol->scope() == SCOPE_EXTERN ||
-            (symbol->scope() == SCOPE_GLOBAL && symbol->type() == TYPE_UNDEFINED)) {
+        xassert(symbol->scope() != SCOPE_GLOBAL);       // all were replaced by EXTERN or PUBLIC
+        if (symbol->scope() == SCOPE_EXTERN) {
             swrite_int32(string_table_.add_string(symbol->name()), os);
         }
     }
@@ -759,7 +760,7 @@ void ObjFileReader::parse_defined_names() {
 
         g_errors.push_location(Location(source_filename, line_num));
 
-        Symbol* symbol = new Symbol(name, scope, type, &g_section(), value);
+        Symbol* symbol = new Symbol(name, scope, type, value);
         g_local_symbols().insert(symbol);
 
         g_errors.pop_location();
@@ -775,7 +776,7 @@ void ObjFileReader::parse_external_names() {
         if (name.empty())
             break;
 
-        Symbol* symbol = new Symbol(name, SCOPE_EXTERN, TYPE_UNDEFINED, &g_section(), 0);
+        Symbol* symbol = new Symbol(name, SCOPE_EXTERN, TYPE_UNDEFINED, 0);
         g_local_symbols().insert(symbol);
     }
 }
@@ -848,17 +849,17 @@ void ObjFileReader::collect_public_names(set<string>& symbols) {
             break;
         }
 
-        sym_type_t type = (sym_type_t)read_int32();				// type of symbol
+        /*sym_type_t type =*/ (sym_type_t)read_int32();			// type of symbol
 
-        string section_name = read_string();                    // section
+        /*string section_name =*/ read_string();                // section
 
-        int value = read_int32();					            // value
+        /*int value =*/ read_int32();					        // value
         string name = read_string();                            // symbol name
 
-        string source_filename = read_string();                 // where defined
-        int line_num = read_int32();                            // where defined
+        /*string source_filename =*/ read_string();             // where defined
+        /*int line_num =*/ read_int32();                        // where defined
 
-        if (scope != SCOPE_LOCAL && type != TYPE_UNDEFINED) {
+        if (scope == SCOPE_PUBLIC) {
             symbols.insert(name);
         }
     }
@@ -914,7 +915,7 @@ void LibFileReader::read1() {
     // search all object files for defined symbols, fill symbol_objects_
     symbol_objects_.clear();
     size_t next_pos = SIGNATURE_SIZE + sizeof(int32_t);
-    while (next_pos != -1 && next_pos < bin_file_.size()) {     // for each object file
+    while (next_pos != (size_t)-1 && next_pos < bin_file_.size()) {     // for each object file
         bin_file_.seek(next_pos);
         next_pos = bin_file_.read_int32();
         size_t module_size = bin_file_.read_int32();
