@@ -27,6 +27,7 @@
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_asinh.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_atan.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_atan2.asm
+../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_atan2_callee.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_atanh.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_ceil.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_cos.asm
