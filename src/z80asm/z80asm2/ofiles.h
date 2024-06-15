@@ -162,8 +162,8 @@ class SearchedLibs {
 public:
     SearchedLibs();
     virtual ~SearchedLibs();
-    SearchedLibs(SearchedLibs& other) = delete;
-    SearchedLibs& operator=(SearchedLibs& other) = delete;
+    SearchedLibs(const SearchedLibs& other) = delete;
+    SearchedLibs& operator=(const SearchedLibs& other) = delete;
 
     void read();                                // read libraries from each -l path
     bool resolve_symbol(const string& name);    // load object if symbol defined in library

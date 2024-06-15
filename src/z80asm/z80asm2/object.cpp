@@ -250,6 +250,21 @@ void Section::set_section_split(bool f) {
     section_split_ = f;
 }
 
+void Section::relocate_addresses(int address) {
+    if (instrs_.empty())
+        return;
+
+    int delta = address - instrs_[0]->offset_asmpc();
+    for (auto& instr : instrs_) {
+        instr->set_offset_asmpc(address);
+        address += instr->size();
+
+        for (auto& patch : instr->patches()) {
+            patch->set_offset_patch(patch->offset_patch() + delta);
+        }
+    }
+}
+
 Instr* Section::add_instr() {
     Instr* instr = new Instr(size(), phased_asmpc());
     instrs_.push_back(instr);
@@ -356,13 +371,16 @@ vector<Section*>& Module::sections() {
 
 void Module::select_section(const string& name) {
     auto it = section_by_name_.find(name);
-    if (it == section_by_name_.end()) {
+    if (it != section_by_name_.end())
+        cur_section_ = it->second;
+    else {
         cur_section_ = new Section(name);
         sections_.push_back(cur_section_);
         section_by_name_[name] = cur_section_;
+
+        // add memory section with this name
+        g_asm.mem_sections().select_mem_section(name);
     }
-    else
-        cur_section_ = it->second;
 }
 
 Section& Module::cur_section() const {
@@ -496,3 +514,143 @@ void Object::get_public_names(StringTable& st) {
     for (auto& module1 : modules_)
         module1->get_public_names(st);
 }
+
+//-----------------------------------------------------------------------------
+
+MemSection::MemSection(const string& name)
+    : name_(name) {
+}
+
+const string& MemSection::name() const {
+    return name_;
+}
+
+int MemSection::size() const {
+    int size = 0;
+    for (auto& section : sections_)
+        size += section->size();
+    return size;
+}
+
+void MemSection::clear_sections() {
+    sections_.clear();
+}
+
+void MemSection::add_section(Section* section) {
+    sections_.push_back(section);           // weak pointer
+}
+
+int MemSection::origin() const {
+    int origin = ORG_NOT_DEFINED;
+    for (auto& section : sections_) {
+        int section_origin = section->origin();
+        if (section_origin != ORG_NOT_DEFINED) {
+            if (origin == ORG_NOT_DEFINED)
+                origin = section_origin;
+            else {
+                g_errors.push_location(section->location());
+                g_errors.warning(ErrOrgIgnored, section_origin);
+                g_errors.pop_location();
+            }
+        }
+    }
+    return origin;
+}
+
+int MemSection::align() const {
+    int align = 1;
+    for (auto& section : sections_) {
+        int section_align = section->align();
+        if (section_align > align)
+            align = section_align;
+    }
+    return align;
+}
+
+bool MemSection::section_split() const {
+    for (auto& section : sections_) {
+        if (section->section_split())
+            return true;
+    }
+    return false;
+}
+
+void MemSection::relocate_addresses(int address) {
+    for (auto& section : sections_) {
+        section->relocate_addresses(address);
+        address += section->size();
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+MemSections::MemSections() {
+}
+
+MemSections::~MemSections() {
+    for (auto& mem_section : mem_sections_)
+        delete mem_section;
+}
+
+MemSection* MemSections::select_mem_section(const string& name) {
+    auto it = mem_section_by_name_.find(name);
+    if (it != mem_section_by_name_.end())
+        return it->second;
+    else {
+        MemSection* mem_section = new MemSection(name);
+        mem_sections_.push_back(mem_section);
+        mem_section_by_name_[name] = mem_section;
+        return mem_section;
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+int MemArea::address() const {
+    return address_;
+}
+
+int MemArea::max_size() const {
+    return max_size_;
+}
+
+void MemArea::set_address_size(int address, int max_size) {
+    if (max_size == 0)
+        max_size = 0x10000 - (address & 0xffff);
+    address_ = address;
+    max_size_ = max_size;
+    check_size();
+}
+
+void MemArea::add_section(Section* section) {
+    if (sections_.size() == 1) {            // first section added
+        int origin = section->origin();
+        if (origin >= 0)
+            set_address_size(origin);
+    }
+    check_size();
+}
+
+void MemArea::relocate_addresses() {
+    int address = address_;
+}
+
+void MemArea::check_size() {
+    int segment_size = size();
+    if (segment_size > max_size_)
+        g_errors.error(ErrSegmentOverflow, segment_size);
+}
+
+//-----------------------------------------------------------------------------
+
+MemMap::MemMap() {
+}
+
+MemMap::~MemMap() {
+}
+
+void MemMap::relocate_addresses() {
+    for (auto& mem_area : mem_areas_)
+        mem_area->relocate_addresses();
+}
+

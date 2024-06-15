@@ -12,6 +12,7 @@
 #include "symtab.h"
 #include <cstdint>
 #include <string>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -57,7 +58,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class Section {
+class Section : public HasLocation {
 public:
     Section(const string& name);
     virtual ~Section();
@@ -76,6 +77,7 @@ public:
     void set_origin(int origin);
     void set_align(int align);
     void set_section_split(bool f);
+    void relocate_addresses(int address);   // relocate addresses of instructions
 
     Instr* add_instr();
     Instr* add_instr(int opcode);
@@ -116,6 +118,9 @@ public:
     void remove_globals();
     void get_public_names(StringTable& st);
 
+    auto begin() { return sections_.begin(); }
+    auto end() { return sections_.end(); }
+
 private:
     string name_;                           // name based on filename, or given by directive
     vector<Section*> sections_;             // list of sections in this module
@@ -153,6 +158,9 @@ public:
     void write_obj_file(const string& obj_filename);
     void get_public_names(StringTable& st);
 
+    auto begin() { return modules_.begin(); }
+    auto end() { return modules_.end(); }
+
 private:
     Parser parser_;                         // parser of input
     string asm_filename_;                   // source filename
@@ -163,4 +171,82 @@ private:
 
     void clear_all();
     void create_default_module();           // create default module
+};
+
+//-----------------------------------------------------------------------------
+
+// all sections with the same name
+class MemSection {
+public:
+    MemSection(const string& name);
+
+    const string& name() const;
+    int size() const;
+
+    void clear_sections();                  // clear list
+    void add_section(Section* section);     // append one section
+
+    int origin() const;                     // first origin from all sections
+    int align() const;                      // biggest align from all section
+    bool section_split() const;             // true if any section has section_split=t
+
+    void relocate_addresses(int address);   // relocate addresses in all sections
+
+private:
+    string name_;                           // name of area=section
+    vector<Section*> sections_;             // weak pointers to sections
+};
+
+// all defined sections in the code, in the order defined
+class MemSections {
+public:
+    MemSections();
+    virtual ~MemSections();
+    MemSections(const MemSections& other) = delete;
+    MemSections& operator=(const MemSections& other) = delete;
+
+    MemSection* select_mem_section(const string& name); // add mem_section if not found
+
+private:
+    vector<MemSection*> mem_sections_;          // list of memory areas in the order seen in code
+    unordered_map<string, MemSection*> mem_section_by_name_;  // index by name
+};
+
+// group of sections in one memory area
+class MemGroup {
+public:
+    MemGroup();
+
+private:
+    int address_{ 0 };                      // start address
+    int max_size_{ 0x10000 };               // max size
+
+};
+
+class MemArea {
+public:
+    MemArea(const string& name);
+
+    int address() const;
+    int max_size() const;
+
+    void set_address_size(int address, int max_size = 0);
+
+
+
+    void check_size();                      // check for segment overflow
+};
+
+//-----------------------------------------------------------------------------
+
+class MemMap {
+public:
+    MemMap();
+    virtual ~MemMap();
+    MemMap(const MemMap& other) = delete;
+    MemMap& operator=(const MemMap& other) = delete;
+
+    void relocate_addresses();                  // relocate addresses in all sections
+
+
 };

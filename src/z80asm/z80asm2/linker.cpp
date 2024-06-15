@@ -46,7 +46,25 @@ void Linker::link_library_modules() {
 }
 
 void Linker::allocate_addresses() {
+    // add sections to memory map
+    for (MemArea* mem_area : g_asm.mem_map()) {     // for each area in the order created
+        string name = mem_area->name();
 
+        mem_area->clear_sections();                 // collect all sections with same name
+        for (size_t i = 0; i < g_asm.objects().size(); i++) {
+            g_asm.set_cur_object(i);                // for each object
+            for (auto& module1 : g_asm.cur_object()) {  // for each module
+                for (auto& section : *module1) {        // for each section
+                    if (section->name() == name) {      // collect it into memory area
+                        mem_area->add_section(section);
+                    }
+                }
+            }
+        }
+    }
+
+    // relocate addresses
+    g_asm.mem_map().relocate_addresses();
 }
 
 void Linker::write_bin_files()

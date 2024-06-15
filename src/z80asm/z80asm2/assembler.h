@@ -33,11 +33,14 @@ public:
     void load_object(const string& obj_filename);
 
     // object files
+    vector<Object*>& objects();                         // list of all objects
     void add_object(const string& asm_filename, const string& obj_filename);
     void delete_objects();
-    vector<Object*>& objects();                         // list of all objects
     Object& cur_object();                               // asserts object was added
     void set_cur_object(size_t index);                  // set current
+
+    // memory map
+    MemSections& mem_sections();
 
     // copy defines to locals
     void copy_defines();
@@ -64,6 +67,7 @@ public:
 
 private:
     vector<Object*> objects_;       // object file
+    MemSections mem_sections_;      // all sections in order defined
     Symbol* asmpc_{ nullptr };      // asmpc of current statement
     size_t  cur_object_id_{ 0 };    // index of current object
 

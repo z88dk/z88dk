@@ -500,7 +500,7 @@ void BinFileReader::read(const string& filename) {
     ifs.seekg(0, std::ios_base::beg);
 
     own_bytes_.resize(size);
-    ifs.read((char*)&bytes_[0], size);
+    ifs.read((char*)&own_bytes_[0], size);
     if (size != (size_t)ifs.gcount()) {
         g_errors.error(ErrFileRead, filename);
         return;

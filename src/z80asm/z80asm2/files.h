@@ -59,8 +59,8 @@ class OpenFile {
 public:
     OpenFile();
     virtual ~OpenFile();
-    OpenFile(OpenFile& other) = delete;
-    OpenFile& operator=(OpenFile& other) = delete;
+    OpenFile(const OpenFile& other) = delete;
+    OpenFile& operator=(const OpenFile& other) = delete;
 
     const string& filename() const;
     Location& location();
