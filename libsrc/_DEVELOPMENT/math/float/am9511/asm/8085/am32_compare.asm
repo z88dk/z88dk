@@ -201,7 +201,7 @@ PUBLIC  asm_am9511_compare_sccz80
     ld hl,(de)          ;left MSW
     add hl,hl
     inc h
-    dec h
+    dec h               ;adjust Z flag for exponent
 
     jp NC,return_positive
     jp Z,return_positive    ;both left and right are zero
@@ -214,6 +214,9 @@ PUBLIC  asm_am9511_compare_sccz80
     ld de,hl+2          ;(de) right MSW
     ld hl,(de)          ;right MSW
     add hl,hl
+    inc h
+    dec h               ;adjust Z flag for exponent
+
     jp NC,return_positive
     jp return_negative
 

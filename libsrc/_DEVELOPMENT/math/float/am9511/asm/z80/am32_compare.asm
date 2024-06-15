@@ -194,7 +194,7 @@ PUBLIC  asm_am9511_compare_sccz80
     ;   left dehl' = float
     exx                 ;left
     sla e
-    rl d
+    rl d                ;adjust Z flag for exponent
     jr NC,return_positive
     jr Z,return_positive    ;both left and right are zero
     jr return_negative
@@ -204,7 +204,7 @@ PUBLIC  asm_am9511_compare_sccz80
     ;   right dehl' = (cpl if negative)float non-zero
     exx                 ;right
     sla e
-    rl d
+    rl d                ;adjust Z flag for exponent
     jr NC,return_positive
     jr return_negative
 

@@ -45,12 +45,31 @@ void test_comparison()
 {
      FLOAT a = 10.0;
      FLOAT b = -2.0;
+     FLOAT c =  0.0;
 
+     Assert( a != b, "a != b");
      Assert( a > b, "a > b");
      Assert( a >= b, "a >= b");
-     Assert( a != b, "a != b");
-     Assert( b < a, "b < a");
      Assert( b <= a, "b <= a");
+     Assert( b < a, "b < a");
+
+     Assert( a != 0, "a != 0");
+     Assert( a > 0, "a > 0");
+     Assert( a >= 0, "a >= 0");
+     Assert( 0 <= a, "0 <= a");
+     Assert( 0 < a, "0 < a");
+
+     Assert( c > b, "c > b");
+     Assert( c >= b, "c >= b");
+     Assert( b <= c, "b <= c");
+     Assert( b < c, "b < c");
+
+     Assert( a >= a, "a >= a");
+     Assert( a <= a, "a <= a");
+
+     Assert( b >= b, "b >= b");
+     Assert( b <= b, "b <= b");
+
      Assert( a == a, "a == a");
      Assert( !(a != a), "!(a != a)");
 }
