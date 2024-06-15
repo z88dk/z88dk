@@ -46,18 +46,25 @@ ENDIF
 ; for that as well
 IF __crt_org_graphics > 0 || __crt_org_far > 0
     SECTION	HIMEM
+
+IF __crt_org_graphics > 0
+    org	__crt_org_graphics
+ELIF  __crt_org_far > 0
+    org	__crt_org_far
+ENDIF
     SECTION code_himem
     SECTION rodata_himem
     SECTION data_himem
     SECTION bss_himem
-IF __crt_org_graphics
-    org	__crt_org_graphics
+IF __crt_org_graphics > 0
     SECTION smc_clib
     SECTION code_graphics
     SECTION rodata_graphics
     SECTION data_graphics
     SECTION bss_graphics
-ELIF __crt_org_far
+ENDIF
+
+IF __crt_org_far > 0
     SECTION code_far
     SECTION code_l_sccz80_far
     SECTION data_far
