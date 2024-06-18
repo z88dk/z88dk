@@ -17,7 +17,6 @@ target/g800/games/bit_open
 target/g800/games/bit_open_di
 target/g800/games/bit_close
 target/g800/games/bit_close_ei
-games/joystick
 @games/games.lst
 
 target/g800/graphics/clsgraph_850
