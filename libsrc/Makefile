@@ -1703,6 +1703,7 @@ tiki100.lib: cpm_clib.lib
 	@echo ''
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=tiki100
 	$(MAKE) -C psg TARGET=cpm SUBTYPE=tiki100
+	$(MAKE) -C games TARGET=cpm SUBTYPE=tiki100
 	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(TARGET_DIRECTORY)/tiki100/tiki100.lst
 
 # RCM2/3000 lib
