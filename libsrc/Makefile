@@ -1923,6 +1923,7 @@ x07_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building Canon X-07 Library ---'
 	@echo ''
 	$(call buildgeneric,x07)
+	$(MAKE) -C games TARGET=x07
 	TARGET=x07 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(TARGET_DIRECTORY)/x07/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
