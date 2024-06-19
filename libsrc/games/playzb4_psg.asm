@@ -6,7 +6,7 @@
 ; PSG version (generic)
 
 ;
-;$Id: playzb4_psg.asm $
+;$Id: playzb4.asm $
 ;
 
 ; extern void __LIB__ playzb4(uchar *SamStart, ushort SamLen);
@@ -22,6 +22,11 @@
 
 playzb4:
 _playzb4:
+  IF    __CPU_GBZ80__||__CPU_INTEL__||__CPU_RABBIT__
+
+     ret
+
+  ELSE
 
 ;call    csv
 ;ld      l,(ix+6)        ;sample start addr
@@ -178,3 +183,4 @@ PSG_SAMPLE_TABLE:
     defb 07,05,05,06,06,00,01,07,03,04,04,00,08,02,03,04
     defb 04,05,07,00,06,01,08,07,04,05,05,06,06,09,09,11
 
+ENDIF
