@@ -1203,6 +1203,7 @@ nascom_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building NASCOM Library (std and CP/M)---'
 	@echo ''
 	$(call buildgeneric,nascom,"gencon narrow")
+	$(MAKE) -C games TARGET=nascom
 	TARGET=nascom TYPE=z80 $(LIBLINKER) -DFORnascom -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascom_clib @$(TARGET_DIRECTORY)/nascom/nascom.lst
 	TARGET=nascom TYPE=z80 $(LIBLINKER) -DFORnascom -DFORnascomcpm -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascomcpm @$(TARGET_DIRECTORY)/nascom/nascomcpm.lst
 
