@@ -16,6 +16,8 @@
 
     PUBLIC  playzb4
     PUBLIC  _playzb4
+    
+    EXTERN  psg_init
 
 playzb4:
 _playzb4:
@@ -29,34 +31,45 @@ _playzb4:
 ;-------------------------------------
 ; Resets the PSG (Tiki100 $16,$17.  MSX=$A0,$A1)
 ;-------------------------------------
+
+        call    psg_init
+
         xor     a
+        ;ld      e,a
         ld      bc,$ff17      ; $17
         out     ($16),a
         inc     a
         out     (c),b
+
         out     ($16),a
         inc     a
         out     (c),b
+
         out     ($16),a
         inc     a
         out     (c),b
+
         out     ($16),a
         inc     a
         out     (c),b
+
         out     ($16),a
         inc     a
         out     (c),b
+
         out     ($16),a
         inc     a
         out     (c),b
+
         out     ($16),a
         inc     a
         out     (c),b
+
         out     ($16),a
         ld      b,$bf
         out     (c),b
-		exx
-		
+        exx
+        
     pop     bc
     pop     de                          ;sample length
     pop     hl                          ;sample start addr
@@ -92,7 +105,7 @@ rep1:
 ;
 play_sample:
 
-	; Tuned for a 4mhz CPU
+    ; Tuned for a 4mhz CPU
     ld      b, 20
 rep1b:                                  ;repeat
     djnz    rep1b
@@ -106,7 +119,7 @@ rep1b:                                  ;repeat
     ld e,(hl)
     inc h
     ld h,(hl)
-    ld a,8
+    ld a,8          ; YM volume level register
     out ($16),a     ; play as fast as possible
     inc a
     out (c),b
@@ -115,9 +128,9 @@ rep1b:                                  ;repeat
     inc a
     out ($16),a
     out (c),h
-	exx
-	ret
-	
+    exx
+    ret
+    
 
 
 PSG_SAMPLE_TABLE:
