@@ -20,10 +20,10 @@ target/msx/psg/asm_wyz_hardware_out
 target/msx/psg/asm_vt2_hardware_out
 target/msx/psg/asm_arkos_msx_smc
 target/msx/psg/asm_arkos_msx_rom
-@psg/ay/psg.lst
 @psg/ay/vt2/psg_vt2.lst
 @psg/ay/wyz/psg_wyz.lst
 @psg/ay/arkos/psg_arkos.lst
+@psg/ay/psg.lst
 target/msx/games/joystick
 target/msx/games/bit_open
 target/msx/games/bit_open_di
