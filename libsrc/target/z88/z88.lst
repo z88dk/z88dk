@@ -41,7 +41,6 @@ target/z88/stdlib/sleep
 
 target/z88/time/clock
 target/z88/time/time
-games/joystick
 target/z88/games/bit_open
 target/z88/games/bit_open_di
 target/z88/games/bit_close

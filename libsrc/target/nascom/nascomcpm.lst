@@ -9,4 +9,4 @@ target/nascom/stdio/ansi/f_ansi_scrollup
 target/nascom/graphics/textpixl6
 @stdio/ansicore.lst
 @gfx/gencon/gfx_gencon6.lst
-games/joystick
+@games/games.lst

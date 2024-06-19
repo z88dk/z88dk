@@ -1203,6 +1203,7 @@ nascom_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building NASCOM Library (std and CP/M)---'
 	@echo ''
 	$(call buildgeneric,nascom,"gencon narrow")
+	$(MAKE) -C games TARGET=nascom
 	TARGET=nascom TYPE=z80 $(LIBLINKER) -DFORnascom -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascom_clib @$(TARGET_DIRECTORY)/nascom/nascom.lst
 	TARGET=nascom TYPE=z80 $(LIBLINKER) -DFORnascom -DFORnascomcpm -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascomcpm @$(TARGET_DIRECTORY)/nascom/nascomcpm.lst
 
@@ -1577,6 +1578,7 @@ nc_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	$(call buildgeneric,nc)
 	$(MAKE) -C target/nc100
+	$(MAKE) -C games TARGET=nc
 	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(TARGET_DIRECTORY)/nc100/nc100.lst
 
 # NC-100 graphics lib - Stefano
@@ -1693,6 +1695,7 @@ newbrain_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	$(call buildgeneric,newbrain)
 	$(MAKE) -C target/newbrain
+	$(MAKE) -C games TARGET=newbrain
 	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(TARGET_DIRECTORY)/newbrain/newbrain.lst
 	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_cpm @$(TARGET_DIRECTORY)/newbrain/newbrain_cpm.lst
 
@@ -1921,6 +1924,7 @@ x07_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building Canon X-07 Library ---'
 	@echo ''
 	$(call buildgeneric,x07)
+	$(MAKE) -C games TARGET=x07
 	TARGET=x07 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(TARGET_DIRECTORY)/x07/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
