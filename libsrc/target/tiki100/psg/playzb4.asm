@@ -1,7 +1,8 @@
 ;
-;Based on the SG C Tools 1.7
-;(C) 1993 Steve Goldsmith
+; Based on an article by
+; Laurens Holst, Ricardo Bittencourt, Arturo Ragozini
 ;
+
 ; PSG version (TIKI100, 4mhz CPU)
 ; calibrated for a fixed 8khz bitrate
 
@@ -32,43 +33,43 @@ _playzb4:
 ; Resets the PSG (Tiki100 $16,$17.  MSX=$A0,$A1)
 ;-------------------------------------
 
-        call    psg_init
+    call    psg_init
 
-        xor     a
-        ;ld      e,a
-        ld      bc,$ff17      ; $17
-        out     ($16),a
-        inc     a
-        out     (c),b
+    xor     a
+    ;ld      e,a
+    ld      bc,$ff17      ; $17
+    out     ($16),a
+    inc     a
+    out     (c),b
 
-        out     ($16),a
-        inc     a
-        out     (c),b
+    out     ($16),a
+    inc     a
+    out     (c),b
 
-        out     ($16),a
-        inc     a
-        out     (c),b
+    out     ($16),a
+    inc     a
+    out     (c),b
 
-        out     ($16),a
-        inc     a
-        out     (c),b
+    out     ($16),a
+    inc     a
+    out     (c),b
 
-        out     ($16),a
-        inc     a
-        out     (c),b
+    out     ($16),a
+    inc     a
+    out     (c),b
 
-        out     ($16),a
-        inc     a
-        out     (c),b
+    out     ($16),a
+    inc     a
+    out     (c),b
 
-        out     ($16),a
-        inc     a
-        out     (c),b
+    out     ($16),a
+    inc     a
+    out     (c),b
 
-        out     ($16),a
-        ld      b,$bf
-        out     (c),b
-        exx
+    out     ($16),a
+    ld      b,$bf
+    out     (c),b
+    exx
         
     pop     bc
     pop     de                          ;sample length
@@ -81,7 +82,7 @@ rep1:
 
     ld      a, (hl)                     ; a = sample byte
     and     $f0                         ; 4 bit nibble
-    ld      bc,$ff17      ; $17
+
     call    play_sample
 
     ld      a, (hl)                     ; a = sample byte
@@ -90,6 +91,7 @@ rep1:
     rlca                                ;
     rlca                                ;
     and     $f0                         ; 4 bit nibble
+
     call    play_sample
 
     inc     hl                          ; hl = hl+1
