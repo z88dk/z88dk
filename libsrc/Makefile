@@ -1578,6 +1578,7 @@ nc_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	$(call buildgeneric,nc)
 	$(MAKE) -C target/nc100
+	$(MAKE) -C games TARGET=nc
 	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(TARGET_DIRECTORY)/nc100/nc100.lst
 
 # NC-100 graphics lib - Stefano
