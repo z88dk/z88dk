@@ -17,7 +17,7 @@ public:
 
     void link_library_modules();
     void allocate_addresses();
-    void write_bin_files();
+    void write();
 
 private:
     string bin_filename_;

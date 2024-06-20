@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
         if (g_errors.count())
             return EXIT_FAILURE;
 
-        linker.write_bin_files();
+        linker.write();
         if (g_errors.count())
             return EXIT_FAILURE;
     }

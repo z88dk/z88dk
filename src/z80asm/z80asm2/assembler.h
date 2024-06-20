@@ -40,7 +40,7 @@ public:
     void set_cur_object(size_t index);                  // set current
 
     // memory map
-    MemSections& mem_sections();
+    SectionAreas& section_areas();
 
     // copy defines to locals
     void copy_defines();
@@ -67,7 +67,7 @@ public:
 
 private:
     vector<Object*> objects_;       // object file
-    MemSections mem_sections_;      // all sections in order defined
+    SectionAreas section_areas_;    // all section areas in order defined
     Symbol* asmpc_{ nullptr };      // asmpc of current statement
     size_t  cur_object_id_{ 0 };    // index of current object
 

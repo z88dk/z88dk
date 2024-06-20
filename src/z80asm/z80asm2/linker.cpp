@@ -47,7 +47,7 @@ void Linker::link_library_modules() {
 
 void Linker::allocate_addresses() {
     // add sections to memory map
-    for (MemArea* mem_area : g_asm.mem_map()) {     // for each area in the order created
+    for (MemoryArea* mem_area : g_asm.mem_map()) {     // for each area in the order created
         string name = mem_area->name();
 
         mem_area->clear_sections();                 // collect all sections with same name
@@ -67,7 +67,7 @@ void Linker::allocate_addresses() {
     g_asm.mem_map().relocate_addresses();
 }
 
-void Linker::write_bin_files()
+void Linker::write()
 {
 }
 

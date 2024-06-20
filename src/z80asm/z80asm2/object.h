@@ -176,9 +176,9 @@ private:
 //-----------------------------------------------------------------------------
 
 // all sections with the same name
-class MemSection {
+class SectionArea {
 public:
-    MemSection(const string& name);
+    SectionArea(const string& name);
 
     const string& name() const;
     int size() const;
@@ -189,8 +189,9 @@ public:
     int origin() const;                     // first origin from all sections
     int align() const;                      // biggest align from all section
     bool section_split() const;             // true if any section has section_split=t
-
     void relocate_addresses(int address);   // relocate addresses in all sections
+
+    vector<Section*>& sections();
 
 private:
     string name_;                           // name of area=section
@@ -198,55 +199,61 @@ private:
 };
 
 // all defined sections in the code, in the order defined
-class MemSections {
+class SectionAreas {
 public:
-    MemSections();
-    virtual ~MemSections();
-    MemSections(const MemSections& other) = delete;
-    MemSections& operator=(const MemSections& other) = delete;
+    SectionAreas();
+    virtual ~SectionAreas();
+    SectionAreas(const SectionAreas& other) = delete;
+    SectionAreas& operator=(const SectionAreas& other) = delete;
 
-    MemSection* select_mem_section(const string& name); // add mem_section if not found
+    SectionArea* select_section_area(const string& name); // add section_area if not found
 
 private:
-    vector<MemSection*> mem_sections_;          // list of memory areas in the order seen in code
-    unordered_map<string, MemSection*> mem_section_by_name_;  // index by name
+    vector<SectionArea*> section_areas_;  // list of memory areas in the order seen in code
+    unordered_map<string, SectionArea*> area_by_name_;  // index by name
 };
 
-// group of sections in one memory area
-class MemGroup {
+// one memory area resulting in one output binary file
+class MemoryArea {
 public:
-    MemGroup();
+    MemoryArea();
+    virtual ~MemoryArea();
+    MemoryArea(const MemoryArea& other) = delete;
+    MemoryArea& operator=(const MemoryArea& other) = delete;
+
+    void clear();
+
+    int address() const;
+    int max_size() const;
+    void set_address_size(int address, int max_size = 0);
+    int size();
+    string name();
+
+    void add_section_area(SectionArea* section_area);
+    void relocate_addresses();                  // relocate addresses in all sections
+    void write(const string& filename);
 
 private:
     int address_{ 0 };                      // start address
     int max_size_{ 0x10000 };               // max size
-
-};
-
-class MemArea {
-public:
-    MemArea(const string& name);
-
-    int address() const;
-    int max_size() const;
-
-    void set_address_size(int address, int max_size = 0);
-
-
+    vector<SectionArea*> section_areas_;
 
     void check_size();                      // check for segment overflow
 };
 
-//-----------------------------------------------------------------------------
-
-class MemMap {
+// linker memory map
+class MemoryMap {
 public:
-    MemMap();
-    virtual ~MemMap();
-    MemMap(const MemMap& other) = delete;
-    MemMap& operator=(const MemMap& other) = delete;
+    MemoryMap();
+    virtual ~MemoryMap();
+    MemoryMap(const MemoryMap& other) = delete;
+    MemoryMap& operator=(const MemoryMap& other) = delete;
 
+    void clear();
+    void add_memory_area(MemoryArea* memory_area);
     void relocate_addresses();                  // relocate addresses in all sections
+    void write(const string& bin_filename);     // write all binary files
 
-
+private:
+    vector<MemoryArea*> areas_;                 // memory areas
 };

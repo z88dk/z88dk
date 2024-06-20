@@ -82,8 +82,8 @@ void Assembler::set_cur_object(size_t index) {
     cur_object_id_ = index;
 }
 
-MemSections& Assembler::mem_sections() {
-    return mem_sections_;
+SectionAreas& Assembler::section_areas() {
+    return section_areas_;
 }
 
 void Assembler::delete_objects() {

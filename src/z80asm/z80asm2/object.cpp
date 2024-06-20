@@ -379,7 +379,7 @@ void Module::select_section(const string& name) {
         section_by_name_[name] = cur_section_;
 
         // add memory section with this name
-        g_asm.mem_sections().select_mem_section(name);
+        g_asm.section_areas().select_section_area(name);
     }
 }
 
@@ -517,30 +517,30 @@ void Object::get_public_names(StringTable& st) {
 
 //-----------------------------------------------------------------------------
 
-MemSection::MemSection(const string& name)
+SectionArea::SectionArea(const string& name)
     : name_(name) {
 }
 
-const string& MemSection::name() const {
+const string& SectionArea::name() const {
     return name_;
 }
 
-int MemSection::size() const {
+int SectionArea::size() const {
     int size = 0;
     for (auto& section : sections_)
         size += section->size();
     return size;
 }
 
-void MemSection::clear_sections() {
+void SectionArea::clear_sections() {
     sections_.clear();
 }
 
-void MemSection::add_section(Section* section) {
+void SectionArea::add_section(Section* section) {
     sections_.push_back(section);           // weak pointer
 }
 
-int MemSection::origin() const {
+int SectionArea::origin() const {
     int origin = ORG_NOT_DEFINED;
     for (auto& section : sections_) {
         int section_origin = section->origin();
@@ -557,7 +557,7 @@ int MemSection::origin() const {
     return origin;
 }
 
-int MemSection::align() const {
+int SectionArea::align() const {
     int align = 1;
     for (auto& section : sections_) {
         int section_align = section->align();
@@ -567,7 +567,7 @@ int MemSection::align() const {
     return align;
 }
 
-bool MemSection::section_split() const {
+bool SectionArea::section_split() const {
     for (auto& section : sections_) {
         if (section->section_split())
             return true;
@@ -575,46 +575,77 @@ bool MemSection::section_split() const {
     return false;
 }
 
-void MemSection::relocate_addresses(int address) {
+void SectionArea::relocate_addresses(int address) {
     for (auto& section : sections_) {
         section->relocate_addresses(address);
         address += section->size();
     }
 }
 
+vector<Section*>& SectionArea::sections() {
+    return sections_;
+}
+
 //-----------------------------------------------------------------------------
 
-MemSections::MemSections() {
+SectionAreas::SectionAreas() {
 }
 
-MemSections::~MemSections() {
-    for (auto& mem_section : mem_sections_)
-        delete mem_section;
+SectionAreas::~SectionAreas() {
+    for (auto& section_area : section_areas_)
+        delete section_area;
 }
 
-MemSection* MemSections::select_mem_section(const string& name) {
-    auto it = mem_section_by_name_.find(name);
-    if (it != mem_section_by_name_.end())
+SectionArea* SectionAreas::select_section_area(const string& name) {
+    auto it = area_by_name_.find(name);
+    if (it != area_by_name_.end())
         return it->second;
     else {
-        MemSection* mem_section = new MemSection(name);
-        mem_sections_.push_back(mem_section);
-        mem_section_by_name_[name] = mem_section;
-        return mem_section;
+        SectionArea* section_area = new SectionArea(name);
+        section_areas_.push_back(section_area);
+        area_by_name_[name] = section_area;
+        return section_area;
     }
 }
 
 //-----------------------------------------------------------------------------
 
-int MemArea::address() const {
+MemoryArea::MemoryArea() {
+}
+
+MemoryArea::~MemoryArea() {
+    clear();
+}
+
+void MemoryArea::clear() {
+    for (auto& section_area : section_areas_)
+        delete section_area;
+    section_areas_.clear();
+}
+
+int MemoryArea::address() const {
     return address_;
 }
 
-int MemArea::max_size() const {
+int MemoryArea::max_size() const {
     return max_size_;
 }
 
-void MemArea::set_address_size(int address, int max_size) {
+int MemoryArea::size() {
+    int area_size = 0;
+    for (auto& section_area : section_areas_)
+        area_size += section_area->size();
+    return area_size;
+}
+
+string MemoryArea::name() {
+    if (section_areas_.empty())
+        return "";
+    else
+        return section_areas_[0]->name()
+}
+
+void MemoryArea::set_address_size(int address, int max_size) {
     if (max_size == 0)
         max_size = 0x10000 - (address & 0xffff);
     address_ = address;
@@ -622,35 +653,84 @@ void MemArea::set_address_size(int address, int max_size) {
     check_size();
 }
 
-void MemArea::add_section(Section* section) {
-    if (sections_.size() == 1) {            // first section added
-        int origin = section->origin();
-        if (origin >= 0)
-            set_address_size(origin);
-    }
+void MemoryArea::add_section_area(SectionArea* section_area) {
+    section_areas_.push_back(section_area);
     check_size();
 }
 
-void MemArea::relocate_addresses() {
+void MemoryArea::relocate_addresses() {
     int address = address_;
+    for (auto& section_area : section_areas_) {
+        section_area->relocate_addresses(address);
+        address += section_area->size();
+    }
+
 }
 
-void MemArea::check_size() {
-    int segment_size = size();
-    if (segment_size > max_size_)
-        g_errors.error(ErrSegmentOverflow, segment_size);
+void MemoryArea::write(const string& filename) {
+    if (g_options.verbose())
+        cout << "Writing '" << filename << "'" << endl;
+
+    ofstream ofs(filename, ios::binary);
+    if (!ofs.is_open()) {
+        g_errors.error(ErrFileCreate, filename);
+        perror(filename.c_str());
+    }
+    else {
+        for (auto& section_area : section_areas_) {
+            for (auto& section : section_area->sections()) {
+                for (auto& instr : section->instrs()) {
+                    ofs.write((const char*)&instr->bytes()[0], instr->size());
+                }
+            }
+        }
+    }
+}
+
+void MemoryArea::check_size() {
+    int area_size = size();
+    if (area_size > max_size_)
+        g_errors.error(ErrSegmentOverflow, area_size);
 }
 
 //-----------------------------------------------------------------------------
 
-MemMap::MemMap() {
+MemoryMap::MemoryMap() {
 }
 
-MemMap::~MemMap() {
+MemoryMap::~MemoryMap() {
+    clear();
 }
 
-void MemMap::relocate_addresses() {
-    for (auto& mem_area : mem_areas_)
-        mem_area->relocate_addresses();
+void MemoryMap::clear() {
+    for (auto& area : areas_)
+        delete area;
+    areas_.clear();
+}
+
+void MemoryMap::add_memory_area(MemoryArea* memory_area) {
+    areas_.push_back(memory_area);
+}
+
+void MemoryMap::relocate_addresses() {
+    for (auto& area : areas_)
+        area->relocate_addresses();
+}
+
+void MemoryMap::write(const string& bin_filename) {
+    xassert(!areas_.empty());
+    if (areas_.size() == 1)
+        areas_[0]->write(bin_filename);
+    else {
+        for (auto& area : areas_) {
+            string name = area->name();     // name of first section in area
+            string this_filename = bin_filename;
+            if (!name.empty())
+                this_filename += string("_") + name;
+            this_filename += EXT_BIN;
+
+            area->write(this_filename);
+        }
+    }
 }
 
