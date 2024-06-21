@@ -3,7 +3,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.265+ ...now on GIT $
+# $Id: Makefile $
 
 
 include Make.config
