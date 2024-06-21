@@ -855,6 +855,7 @@ mz2500_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sharp MZ-2500 Library ---'
 	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=mz2500
 	$(call buildgeneric,mz2500)
 	TARGET=mz2500 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz2500 -x$(OUTPUT_DIRECTORY)/mz2500_clib @$(TARGET_DIRECTORY)/mz2500/mz2500.lst
 
@@ -964,6 +965,7 @@ gemini.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Gemini Galaxy Library (CP/M & graphics) ---'
 	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=gemini
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="narrow" SUBTYPE=gemini
 	TARGET=gemini TYPE=z80 $(LIBLINKER) -DFORgemini -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gemini.lib @$(TARGET_DIRECTORY)/gemini/gemini.lst
 
@@ -1639,6 +1641,7 @@ pcw.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Amstrad PCW Library ---'
 	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=pcw
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=pcw
 	TARGET=pcw TYPE=z80 $(LIBLINKER) -DFORpcw -x$(OUTPUT_DIRECTORY)/pcw @$(TARGET_DIRECTORY)/pcw/pcw.lst
 
