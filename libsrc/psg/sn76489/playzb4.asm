@@ -3,30 +3,34 @@
 ; Laurens Holst, Ricardo Bittencourt, Arturo Ragozini
 ;
 
-; PSG version (generic)
+; Reworked for the SN76489 (a.k.a. SN76494,SN76496,TMS9919,SN94624)
+
+; ATM we have a fixed delay, tested on Sharp MZ800.
+
 
 ;
-;$Id: playzb4.asm $
+; $Id: playzb4.asm $
 ;
 
 ; extern void __LIB__ playzb4(uchar *SamStart, ushort SamLen);
 ; play 4 bit pulse wave encoded data using sid master volume
+
+IF  !__CPU_INTEL__&!__CPU_RABBIT__&!__CPU_GBZ80__
 
     SECTION code_clib
 
     PUBLIC  playzb4
     PUBLIC  _playzb4
     
-    EXTERN  psg_init
-    EXTERN  asm_set_psg
+    EXTERN  bit_open
+
+
+    INCLUDE "sn76489.inc"
+
+
 
 playzb4:
 _playzb4:
-  IF    __CPU_GBZ80__||__CPU_INTEL__||__CPU_RABBIT__
-
-     ret
-
-  ELSE
 
 ;call    csv
 ;ld      l,(ix+6)        ;sample start addr
@@ -35,37 +39,10 @@ _playzb4:
 ;ld      d,(ix+9)
 
 ;-------------------------------------
-; Resets the PSG (Tiki100 $16,$17.  MSX=$A0,$A1)
+; Use the 1-bit initialization code
 ;-------------------------------------
 
-    call    psg_init
-
-    ld      l,0
-    ld      e,$ff
-
-    call asm_set_psg
-    inc     l
-
-    call asm_set_psg
-    inc     l
-
-    call asm_set_psg
-    inc     l
-
-    call asm_set_psg
-    inc     l
-
-    call asm_set_psg
-    inc     l
-
-    call asm_set_psg
-    inc     l
-
-    call asm_set_psg
-    inc     l
-
-    ld      e,$bf
-    call asm_set_psg
+    call    bit_open
 
     pop     bc
     pop     de                          ;sample length
@@ -102,8 +79,15 @@ rep1:
 
 ;
 play_sample:
+
+    ; Tuned for a 4mhz CPU
+    ld      b, 20
+rep1b:                                  ;repeat
+    djnz    rep1b
+
     exx
-	ld d,0
+
+    ld d,0
     ld e,a
     ld hl,PSG_SAMPLE_TABLE
     add hl,de
@@ -113,18 +97,30 @@ play_sample:
     inc h
     ld h,(hl)
 
-    push de
-    ld l,8          ; YM volume level register
-    call asm_set_psg
-	pop de
 
-    ld e,d
-    inc l
-    call asm_set_psg
+; channel 0 ($00) + set volume command ($90) + attenuation (max=$0F)
+	ld a,$9F
+	xor e
+	out (psgport),a
+  IF    PSGLatchPort
+    in      a, (PSGLatchPort)
+  ENDIF
 
-    ld e,h
-    inc l
-    call asm_set_psg
+; channel 1 ($20) + set volume command ($90) + attenuation (max=$0F)
+	ld a,$20+$9F
+	xor d
+	out (psgport),a
+  IF    PSGLatchPort
+    in      a, (PSGLatchPort)
+  ENDIF
+
+; channel 2 ($30) + set volume command ($90) + attenuation (max=$0F)
+	ld a,$40+$9F
+	xor h
+	out (psgport),a
+  IF    PSGLatchPort
+    in      a, (PSGLatchPort)
+  ENDIF
 
     exx
     ret
