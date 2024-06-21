@@ -453,6 +453,7 @@ px4.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building PX-4/HC-40 Library ---'
 	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=px4
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=px4 FLAVOUR="narrow"
 	TARGET=px4 TYPE=z80 $(LIBLINKER) -DFORpx4 -x$(OUTPUT_DIRECTORY)/px4 @$(TARGET_DIRECTORY)/px4/px4.lst
 
@@ -461,6 +462,7 @@ px8.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building PX-8/Geneva Library ---'
 	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=px8
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=px8 FLAVOUR="wide"
 	TARGET=px8 TYPE=z80 $(LIBLINKER) -DFORpx8 -x$(OUTPUT_DIRECTORY)/px8 @$(TARGET_DIRECTORY)/px8/px8.lst
 
@@ -745,6 +747,7 @@ rc700.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building RC-700 Library ---'
 	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=rc700
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=rc700
 	TARGET=rc700 TYPE=z80 $(LIBLINKER) -DFORrc700 -x$(OUTPUT_DIRECTORY)/rc700 @$(TARGET_DIRECTORY)/rc700/rc700.lst
 
@@ -1146,6 +1149,7 @@ bic.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building A5105 Library ---'
 	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=bic
 	$(MAKE) -C video/upd7220 TARGET=bic
 	$(MAKE) -C psg TARGET=cpm SUBTYPE=bic
 	TARGET=bic TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORbic -x$(OUTPUT_DIRECTORY)/bic @$(TARGET_DIRECTORY)/bic/bic.lst
