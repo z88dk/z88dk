@@ -1358,8 +1358,10 @@ fp1100_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Casio FP-1100 Library ---'
 	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=fp1100
 	$(call buildgeneric,fp1100,wide)
 	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_clib @$(TARGET_DIRECTORY)/fp1100/fp1100.lst
+	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_cpm @$(TARGET_DIRECTORY)/fp1100/fp1100_cpm.lst
 
 # Z80 TV Game
 z80tvgame_clib.lib: $(TARGET_CLIB_OBJS)
