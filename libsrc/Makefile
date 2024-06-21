@@ -133,7 +133,7 @@ TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
 TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxtrs80m2.lib gfxtrs80m4.lib gfxeg2000.lib grafyx4_3.lib grafyx4.lib gfxhrg1.lib)
 TOCREATE += $(call check_target,ts2068, ts2068_clib.lib m2068.lib)
 TOCREATE += $(call check_target,tvc,tvc_clib.lib tvc_romgfx.lib)
-TOCREATE += $(call check_target,v1050,v1050.lib $(CPMLIBS))
+TOCREATE += $(call check_target,v1050,.lib $(CPMLIBS))
 TOCREATE += $(call check_target,vector06c,vector06c_clib.lib)
 TOCREATE += $(call check_target,vg5k,vg5k_clib.lib)
 TOCREATE += $(call check_target,vz,vz_clib.lib)
@@ -469,6 +469,7 @@ v1050.lib: cpm_clib.lib
 	@echo ''
 	@echo '--- Building Visual 1050 Library (CP/M) ---'
 	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=v1050
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=v1050
 	TARGET=v1050 TYPE=z80 $(LIBLINKER) -DFORv1050 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/v1050.lib @$(TARGET_DIRECTORY)/v1050/v1050.lst
 
@@ -1114,6 +1115,7 @@ excali64_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building Excalibur 64 Library ---'
 	@echo ''
 	$(call buildgeneric,excali64,"gencon narrow")
+	$(MAKE) -C games TARGET=excali64
 	$(MAKE) -C video/mc6845 TARGET=excali64
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_clib @$(TARGET_DIRECTORY)/excali64/excali64.lst
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_cpm @$(TARGET_DIRECTORY)/excali64/excali64_cpm.lst
@@ -1952,6 +1954,7 @@ sos_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building S-OS (The Sentinel) Library ---'
 	@echo ''
 	$(call buildgeneric,sos)
+	$(MAKE) -C games TARGET=sos
 	$(MAKE) -C target/sos
 	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(TARGET_DIRECTORY)/sos/sos.lst
 
