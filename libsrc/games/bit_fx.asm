@@ -132,7 +132,9 @@ zap0:
     call    bit_open_di
     ld      h, 4
 zap0_1:
-    ld      b, (hl)
+    ld      a, (hl)
+	or		8
+	ld      b,a
     dec     hl
 zap0_2:
   IF    __CPU_INTEL__
