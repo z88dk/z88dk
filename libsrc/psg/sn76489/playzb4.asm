@@ -102,16 +102,25 @@ rep1b:                                  ;repeat
 	ld a,$9F
 	xor e
 	out (psgport),a
+  IF    PSGLatchPort
+    in      a, (PSGLatchPort)
+  ENDIF
 
 ; channel 1 ($20) + set volume command ($90) + attenuation (max=$0F)
 	ld a,$20+$9F
 	xor d
 	out (psgport),a
+  IF    PSGLatchPort
+    in      a, (PSGLatchPort)
+  ENDIF
 
 ; channel 2 ($30) + set volume command ($90) + attenuation (max=$0F)
-	ld a,$30+$9F
+	ld a,$40+$9F
 	xor h
 	out (psgport),a
+  IF    PSGLatchPort
+    in      a, (PSGLatchPort)
+  ENDIF
 
     exx
     ret
