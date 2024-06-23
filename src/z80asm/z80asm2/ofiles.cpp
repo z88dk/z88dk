@@ -894,6 +894,10 @@ bool LibFileReader::resolve_symbol(const string& name) {
     // symbol defined, load it into g_asm
     ObjFileReader obj(it->second.ptr, it->second.size);
     string modname = obj.read_modname();
+
+    if (g_options.verbose())
+        cout << "Linking library module '" << modname << "'" << endl;
+
     g_asm.add_object(modname + EXT_ASM, modname + EXT_OBJ);
     obj.read();
     return true;

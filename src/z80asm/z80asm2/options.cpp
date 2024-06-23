@@ -316,6 +316,10 @@ string Options::consol_obj_filename() const {
     return file_prepend_output_dir(consol_obj_filename_);
 }
 
+bool Options::is_consol_obj() const {
+    return !consol_obj_filename_.empty();
+}
+
 unordered_map<string, int>& Options::defines() {
     return defines_;
 }

@@ -39,8 +39,8 @@ public:
     Object& cur_object();                               // asserts object was added
     void set_cur_object(size_t index);                  // set current
 
-    // memory map
-    SectionAreas& section_areas();
+    // section names
+    SectionNames& section_names();
 
     // copy defines to locals
     void copy_defines();
@@ -67,7 +67,7 @@ public:
 
 private:
     vector<Object*> objects_;       // object file
-    SectionAreas section_areas_;    // all section areas in order defined
+    SectionNames section_names_;    // all sections names in order defined
     Symbol* asmpc_{ nullptr };      // asmpc of current statement
     size_t  cur_object_id_{ 0 };    // index of current object
 

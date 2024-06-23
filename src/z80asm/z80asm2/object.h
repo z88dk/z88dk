@@ -11,6 +11,7 @@
 #include "parser.h"
 #include "symtab.h"
 #include <cstdint>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -58,7 +59,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class Section : public HasLocation {
+class Section {
 public:
     Section(const string& name);
     virtual ~Section();
@@ -175,6 +176,22 @@ private:
 
 //-----------------------------------------------------------------------------
 
+// list of section names in the order created
+class SectionNames {
+public:
+    void clear();
+
+    void add(const string& name);
+    const vector<string>& names() const;
+
+private:
+    vector<string> names_;          // names of sections in the order created
+    set<string> has_name_;          // check if section in list
+};
+
+#if 0
+//-----------------------------------------------------------------------------
+
 // all sections with the same name
 class SectionArea {
 public:
@@ -257,3 +274,4 @@ public:
 private:
     vector<MemoryArea*> areas_;                 // memory areas
 };
+#endif

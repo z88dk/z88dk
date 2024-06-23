@@ -370,6 +370,7 @@ vector<Section*>& Module::sections() {
 }
 
 void Module::select_section(const string& name) {
+    // add to module list
     auto it = section_by_name_.find(name);
     if (it != section_by_name_.end())
         cur_section_ = it->second;
@@ -377,10 +378,10 @@ void Module::select_section(const string& name) {
         cur_section_ = new Section(name);
         sections_.push_back(cur_section_);
         section_by_name_[name] = cur_section_;
-
-        // add memory section with this name
-        g_asm.section_areas().select_section_area(name);
     }
+
+    // add to global list
+    g_asm.section_names().add(name);
 }
 
 Section& Module::cur_section() const {
@@ -515,6 +516,26 @@ void Object::get_public_names(StringTable& st) {
         module1->get_public_names(st);
 }
 
+//-----------------------------------------------------------------------------
+
+void SectionNames::clear() {
+    names_.clear();
+    has_name_.clear();
+}
+
+void SectionNames::add(const string& name) {
+    auto it = has_name_.find(name);
+    if (it == has_name_.end()) {     // new section
+        names_.push_back(name);
+        has_name_.insert(name);
+    }
+}
+
+const vector<string>& SectionNames::names() const {
+    return names_;
+}
+
+#if 0
 //-----------------------------------------------------------------------------
 
 SectionArea::SectionArea(const string& name)
@@ -734,3 +755,4 @@ void MemoryMap::write(const string& bin_filename) {
     }
 }
 
+#endif

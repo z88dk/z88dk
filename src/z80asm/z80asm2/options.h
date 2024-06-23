@@ -75,6 +75,7 @@ public:
     vector<string>& library_path();		// -L option
     vector<string>& libraries();        // -l option
     string consol_obj_filename() const; // -o without -b options
+    bool is_consol_obj() const;         // -o without -b options
     unordered_map<string, int>& defines(); // -D option
     void symbol_define(const string& name, int value = 1);
     void symbol_undefine(const string& name);

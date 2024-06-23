@@ -24,6 +24,7 @@ Assembler::~Assembler() {
 
 void Assembler::clear() {
     delete_objects();
+    section_names().clear();
     asmpc_ = nullptr;
 }
 
@@ -82,8 +83,8 @@ void Assembler::set_cur_object(size_t index) {
     cur_object_id_ = index;
 }
 
-SectionAreas& Assembler::section_areas() {
-    return section_areas_;
+SectionNames& Assembler::section_names() {
+    return section_names_;
 }
 
 void Assembler::delete_objects() {
