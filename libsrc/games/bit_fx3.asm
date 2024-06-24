@@ -55,7 +55,7 @@ blirp:
 expl:
     push    af
     ld      a, SOUND_ONEBIT_mask
-    ld      h, 0
+    ld      h, bit_fx3/256
     ld      l, b
     and     (hl)
     ld      l, a
@@ -72,7 +72,7 @@ dly:
 
     push    af
     ld      a, SOUND_ONEBIT_mask
-    ld      h, 0
+    ld      h, bit_fx3/256
     ld      l, b
     and     (hl)
     ld      l, a
@@ -105,7 +105,7 @@ blirp2:
 blrp:
     push    af
     ld      a, SOUND_ONEBIT_mask
-    ld      h, 0
+    ld      h, bit_fx3/256
     ld      l, b
     and     (hl)
     ld      l, a
@@ -146,7 +146,7 @@ dlya:
 ; Steam engine
 coff:
     call    bit_open_di
-    ld      hl, 0
+    ld      hl, bit_fx3
 coff2:
     push    af
     ld      a, SOUND_ONEBIT_mask
@@ -176,7 +176,7 @@ blurp:
 blurp2:
     push    af
     ld      a, SOUND_ONEBIT_mask
-    ld      h, 0
+    ld      h, bit_fx3/256
     ld      l, b
     and     (hl)
     ld      l, a
