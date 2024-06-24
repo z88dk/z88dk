@@ -54,7 +54,7 @@ table:
 DeepSpace:
     call    bit_open_di
 DS_LENGHT:
-    ld      b, 100
+    ld      b, 40
 ds_loop:
     dec     h
     jr      nz, ds_jump
@@ -202,7 +202,7 @@ ts_FR_2:
 Clackson2:
     call    bit_open_di
 CS_LENGHT:
-    ld      b, 200
+    ld      b, 30
 cs_loop:
     dec     h
     jr      nz, cs_jump
@@ -403,7 +403,7 @@ expl:
     push    hl
     push    af
     ld      a, SOUND_ONEBIT_mask
-    ld      h, 0
+    ld      h, bit_fx2/256
     and     (hl)
     ld      l, a
     pop     af
