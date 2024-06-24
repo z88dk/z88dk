@@ -130,11 +130,9 @@ fx5_2:
 ;Eating sound
 zap0:
     call    bit_open_di
-    ld      h, 4
+    ld      h, (zap1/256)+1
 zap0_1:
-    ld      a, (hl)
-	or		8
-	ld      b,a
+    ld      b, (hl)
     dec     hl
 zap0_2:
   IF    __CPU_INTEL__
@@ -150,6 +148,7 @@ zap0_2:
 
     ld      e, a
     ld      a, h
+	sub		zap1/256
     or      l
     jr      z, zap0_3
     ld      a, e
@@ -163,7 +162,7 @@ zap0_3:
 clackson:
     call    bit_open_di
 clackson_LENGHT:
-    ld      b, 90
+    ld      b, 40
 clackson_loop:
     dec     h
     jr      nz, clackson_jump
