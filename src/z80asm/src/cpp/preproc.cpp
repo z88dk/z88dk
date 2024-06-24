@@ -995,21 +995,32 @@ void Preproc::do_macro_call(shared_ptr<Macro> macro) {
 		}
 	}
 
-	// create new level of macro expansion
-	m_levels.emplace_back(&defines());
+    // #2566: do a textual replacement of macro parameters in the body
+    ScannedLine body = macro->body();
+    body.append(m_line.peek_tokens());                              // append rest of the macro call line
 
-	// create macros in the new level for each argument
-    for (unsigned i = 0; i < macro->args().size(); i++) {
+    for (unsigned i = 0; i < macro->args().size(); i++) {           // for each macro argument
         string arg = macro->args()[i];
         ScannedLine param = i < params.size() ? params[i] : ScannedLine();
-		shared_ptr<Macro> param_macro = make_shared<Macro>(arg, param);
-		defines().add(param_macro);
-	}
+        ScannedLine new_body;
+        while (!body.at_end()) {
+            Token token = body.peek();
+            if (token.is(TType::Ident) && token.svalue() == arg) {
+                new_body.append(param);                             // expand macro argument
+            }
+            else {
+                new_body.append({ token });
+            }
+            body.next();
+        }
+        body = new_body;
+    }
 
-	// create lines from body; append rest of the macro call line
-    ScannedLine body = macro->body();
-    body.append(m_line.peek_tokens());
-	m_levels.back().split_lines(body);
+	// create new level of macro expansion, so that exitm can unroll
+	m_levels.emplace_back(&defines());
+
+	// create lines from body
+    m_levels.back().split_lines(body);
 }
 
 void Preproc::do_local() {
