@@ -243,8 +243,8 @@ int gal_exec(char* target)
         }
 
         /* basic */
-        for (i = 0; i < (screenmode ? basicgraphlen : basicdeflen); i++) { /* block name string */
-            writebyte_cksum(screenmode ? basicgraphdef[i] : basicdef[i], fpout, &checksum);
+        for (i = 0; i < (screenmode == 1 ? basicgraphlen : basicdeflen); i++) { /* block name string */
+            writebyte_cksum(screenmode == 1 ? basicgraphdef[i] : basicdef[i], fpout, &checksum);
         }
 
         writebyte(255 - (checksum % 256), fpout); /* data checksum */
