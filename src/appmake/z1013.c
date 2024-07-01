@@ -99,7 +99,7 @@ int z1013_exec(char* target)
     }
 
     writeword(pos, fpout);
-    writeword(pos + len, fpout);
+    writeword(pos + len - 1, fpout);
     writeword(pos, fpout);
 
     /* 6 bytes set to zero */
