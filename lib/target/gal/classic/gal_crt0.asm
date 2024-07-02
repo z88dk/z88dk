@@ -53,6 +53,12 @@ start:
     call	crt0_init
     INCLUDE	"crt/classic/crt_init_atexit.inc"
 
+IF CLIB_DEFAULT_SCREEN_MODE > 0
+    EXTERN  __gal_set_mode
+    ld      a,CLIB_DEFAULT_SCREEN_MODE
+    call    __gal_set_mode
+ENDIF
+
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
@@ -93,6 +99,7 @@ IF CLIB_DISABLE_MODE1 = 1
     PUBLIC  pointxy_MODE1
     PUBLIC  pixeladdress_MODE1
     PUBLIC  scrollup_MODE1
+    PUBLIC  putsprite_MODE1
     defc    vpeek_MODE1 = vpeek_noop
     defc    printc_MODE1 = noop
     defc    plot_MODE1 = noop
@@ -101,6 +108,7 @@ IF CLIB_DISABLE_MODE1 = 1
     defc    pointxy_MODE1 = noop
     defc    pixeladdress_MODE1 = noop
     defc    scrollup_MODE1 = noop
+    defc    putsprite_MODE1 = noop
     PUBLIC  __CLIB_DISABLE_MODE1
     defc    __CLIB_DISABLE_MODE1 = 1
 ELSE

@@ -20,6 +20,8 @@
     PUBLIC  CLIB_GENCON_CAPS
     defc    CLIB_GENCON_CAPS=CAPS_MODE0
 
+    PUBLIC  __gal_set_mode
+
     defc    CAPS_MODE0=0
     defc    CAPS_MODE1=CAP_GENCON_INVERSE|CAP_GENCON_CUSTOM_FONT|CAP_GENCON_UDGS|CAP_GENCON_BOLD|CAP_GENCON_UNDERLINE
 
@@ -47,9 +49,11 @@ check_mode:
     ld      a, __CLIB_DISABLE_MODE1
     and     a
     jr      nz, failure
-    ld      hl, $1020
     ld      a, c
+    ; Entry: a = screenmode
+__gal_set_mode:
     and     a
+    ld      hl, $1020
     ld      c, $80
     ld      d, CAPS_MODE0
     jr      z, set_mode
