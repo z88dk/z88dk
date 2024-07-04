@@ -36,12 +36,25 @@ putsprite_MODE1:
     inc     hl
 
     inc     hl
-    ld      a, (hl)                     ; and/or/xor mode
+    ld      c, (hl)                     ; and/or/xor mode
+    inc     hl
+    ld      b,(hl)                      ;cpl/nop
+    ; We need to swap the operations around
+    ld      a,c
+    cp      174                         ;xor
+    jr      z,modify
+    cp      182
+    jr      nz,not_or
+    ld      bc,166+47*256               ; CPL - AND (HL)
+    jr      modify
+not_or:
+    ld      bc,182                      ; OR (HL)
+modify:
+    ld      a,c     
     ld      (ortype+1), a               ; Self modifying code
     ld      (ortype2+1), a              ; Self modifying code
 
-    inc     hl
-    ld      a, (hl)
+    ld      a, b
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
