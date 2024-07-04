@@ -11,5 +11,6 @@ target/hgmc/graphics/pixladdr
 target/hgmc/graphics/clg
 ; Take the optimised bitmapped stencil render
 gfx/narrow/obj/hgmc/stencil_render
+gfx/narrow/obj/hgmc/putsprite
 @gfx/narrow/gfx_narrow.lst
 @games/games_joystick.lst

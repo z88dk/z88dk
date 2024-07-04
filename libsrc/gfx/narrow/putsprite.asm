@@ -102,7 +102,11 @@ ortype:
     ld      (hl), a
     ld      a, e
 _noplot:
+IF BITS_reversed = 1
+    rlca
+ELSE
     rrca
+ENDIF
     jr      nc, _notedge                ;Test if edge of byte reached
     inc     hl                          ;Go to next byte
 _notedge:
@@ -151,7 +155,11 @@ ortype2:
     ld      (hl), a
     ld      a, e
 wnoplot:
+IF BITS_reversed = 1
+    rlca
+ELSE
     rrca
+ENDIF
     jr      nc, wnotedge                ;Test if edge of byte reached
     inc     hl                          ;Go to next byte
 wnotedge:
