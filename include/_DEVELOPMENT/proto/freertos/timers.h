@@ -37,7 +37,6 @@ include(__link__.m4)
 
 #include <freertos/task.h>
 
-
 /* *INDENT-OFF* */
 #ifdef __cplusplus
     extern "C" {

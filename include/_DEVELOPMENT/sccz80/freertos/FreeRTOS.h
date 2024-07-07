@@ -53,12 +53,6 @@
  */
 #include <stdint.h> /* READ COMMENT ABOVE. */
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-    extern "C" {
-#endif
-/* *INDENT-ON* */
-
 /* Acceptable values for configTICK_TYPE_WIDTH_IN_BITS. */
 #define TICK_TYPE_WIDTH_16_BITS    0
 #define TICK_TYPE_WIDTH_32_BITS    1
@@ -132,6 +126,12 @@
     #include <freertos/picolibc-freertos.h>
 
 #endif /* if ( configUSE_PICOLIBC_TLS == 1 ) */
+
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+    extern "C" {
+#endif
+/* *INDENT-ON* */
 
 #ifndef configUSE_C_RUNTIME_TLS_SUPPORT
     #define configUSE_C_RUNTIME_TLS_SUPPORT    0
