@@ -7,7 +7,8 @@
         defc CRT_ORG_CODE  = 40000
     ENDIF
 
-
+    defc    __bdos = $F37D
+    
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1
 
@@ -50,4 +51,8 @@ l_dcal:
 
     INCLUDE "crt/classic/crt_runtime_selection.inc"
     INCLUDE "crt/classic/crt_section.inc"
+
+IF CLIB_MSXDOS = 1
+    INCLUDE "crt/classic/crt_cpm_fcntl.inc"
+ENDIF
 
