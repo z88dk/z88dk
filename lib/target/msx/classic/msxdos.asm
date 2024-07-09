@@ -3,6 +3,7 @@
 
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1
+    defc    __bdos=5
 
     IFNDEF CRT_ORG_CODE
         defc CRT_ORG_CODE = $100   ; MSXDOS

@@ -35,6 +35,12 @@ IF startup = 3
     INCLUDE	"target/msx/classic/rom.asm"
 ENDIF
 
+
+IFDEF __bdos
+    PUBLIC  __bdos
+ENDIF
+
+
     ; And include handling disabling screenmodes
     INCLUDE "crt/classic/tms99x8/tms99x8_mode_disable.inc"
 
