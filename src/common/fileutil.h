@@ -12,10 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifdef _WIN32
 #include <direct.h>
 #endif
@@ -26,6 +22,9 @@ extern "C" {
 #include <glob.h>
 #include <dirent.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // pathname manipulation - strings are allocated in spool, no need to free
 
