@@ -24,6 +24,7 @@ target/gal/stdio/ansi/f_ansi_dline
 target/gal/stdio/ansi/f_ansi_scrollup
 target/gal/time/clock
 target/gal/graphics/cleargraphics
+target/gal/graphics/clrarea
 target/gal/graphics/getmaxx
 target/gal/graphics/getmaxy
 target/gal/graphics/plotpixl
