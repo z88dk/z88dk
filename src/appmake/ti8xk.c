@@ -518,7 +518,8 @@ static void handle_page_branches(unsigned char* buffer, int size, struct FoundLa
 
 int ti8xk_exec(char *target)
 {
-    FILE *fp, *fp2;
+    FILE *fp = NULL;
+    FILE *fp2 = NULL;
     int size, tempnum, pnt, field_sz, pages, i, siglength, total_size, f;
     struct FoundLabels* labels[1024] = {NULL};
     unsigned char *buffer;
@@ -563,7 +564,7 @@ int ti8xk_exec(char *target)
             exit_log(1,"Failed to open input file: %s\n", binname);
         size = i = get_file_size(fp);
         buffer = (unsigned char *) calloc(1, size+256);
-        fread(buffer, size, 1, fp); // To memory
+        (void) !fread(buffer, size, 1, fp); // To memory - (void) ! to suppress warn unused result
 
         if (size >= 0x4000) {
             free(buffer);
@@ -605,7 +606,7 @@ int ti8xk_exec(char *target)
             FILE* page_fp = fopen_bin(fileName, NULL);
             int psize = get_file_size(page_fp);
             size = i = pageStart + psize;
-            fread(buffer+pageStart, psize, 1, page_fp);
+            (void) !fread(buffer+pageStart, psize, 1, page_fp); // (void) ! to suppress warn unused result
             fclose(page_fp);
 
             if (firstPage) // If first page

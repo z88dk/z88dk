@@ -131,7 +131,8 @@ int gal_exec(char* target)
     char filename[FILENAME_MAX + 1];
     char wavfile[FILENAME_MAX + 1];
     int c, i;
-    int len, screenmode, after_header;
+    int len, screenmode;
+    int after_header = 0;
 
     unsigned long checksum;
     FILE *fpin, *fpout;
