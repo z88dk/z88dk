@@ -10,14 +10,18 @@
 
 ; Entry  h = x
 ;        l = y
+
 ; Exit: hl = address
-;	 a = pixel number
+;       a  = pixel number
+
 ; Uses: a, bc, de, hl
+
 pixeladdress_MODE1:
 
-	; add y-times the nuber of bytes per line (32)
+    ; add y-times the nuber of bytes per line (32)
     ld      e, h
     ld      h, 0
+    ld      d, h
     add     hl, hl
     add     hl, hl
     add     hl, hl
@@ -27,11 +31,11 @@ pixeladdress_MODE1:
     srl     e
     srl     e
     srl     e
-    ld      d, 0
+    ;ld      d, 0
+    add     hl, de
+    ld      e, $20
     add     hl, de
     ld      de, ($2a6a)
-    add     hl, de
-    ld      de, $20
     add     hl, de
     and     7
     ret
