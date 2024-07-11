@@ -809,7 +809,8 @@ void openin(void)
             if (c_verbose)
                 fprintf(stderr, "Compiling: %s\n", Filename);
             ncomp++;
-            fread(bombuf, sizeof(char), 3, input);
+            // (void) ! to suppress warn unused result
+            (void) !fread(bombuf, sizeof(char), 3, input);
             if ( memcmp(bombuf, utf8bom, 3) ) {
                 rewind(input);
             }
