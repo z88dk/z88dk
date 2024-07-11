@@ -40,6 +40,7 @@ vdp_vpoke_direct:
 IF  VDP_DATA>=256
     ld      bc, VDP_DATA
 ENDIF
+    ex      af,af
     VDPOUT  (VDP_DATA)
     ret
 
