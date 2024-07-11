@@ -20,16 +20,9 @@
 
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
-    EXTERN  __zx_screenmode
-    EXTERN  __zx_console_attr
-  IF    FORsam
-    ; This code won't work on the same due to the lack of correct paging
-    ; but it is assembled as part of zx-common
-    EXTERN  SCREEN_BASE
-  ENDIF
-  IF    FORts2068|zxn
+
     EXTERN  hl_inc_x_MODE6
-  ENDIF
+
   
 ;
 ;    $Id: w_stencil_render.asm,v 1.6 2016-07-14 17:44:17 pauloscustodio Exp $
@@ -130,7 +123,7 @@ yloop:
 noobt:
     ld      a, b
     ld      (hl), a                     ; (offset) = (offset) AND bitmask0
-    call    nextcol
+    call    hl_inc_x_MODE6
 
     ld      a, h
     cp      d
@@ -144,7 +137,7 @@ pattern2:
 fill_row_loop:                          ; do
     ld      a, b
     ld      (hl), a                     ; (offset) = pattern
-    call    nextcol
+    call    hl_inc_x_MODE6
 
     ld      a, h
     cp      d
@@ -157,7 +150,7 @@ bitmaskr:
     ld      a, 0
     call    mask_pattern
     ld      (hl), a
-    call    nextcol
+    call    hl_inc_x_MODE6
     jp      yloop
 
 
@@ -182,47 +175,3 @@ pattern1:
     pop     de
     ret
 
-; Colour the pixel we were just on and step to the next column
-nextcol:
-    ld      a, (__zx_screenmode)
-	and     7
-  IF    FORts2068|zxn
-    cp      6
-    jp      z, hl_inc_x_MODE6            ;No colour in hires
-  ENDIF
-    cp      2                           ;High colour
-    jr      nz, standard_modes
-    set     5, h
-    ld      a, (__zx_console_attr)
-    ld      (hl), a
-    res     5, h
-    inc     hl
-    ret
-standard_modes:
-    ; We are on a standard zx screen
-    push    hl
-  IF    FORts2068|zxn
-    ld      a, h
-    and     @00100000
-    ld      c, a                        ;Save page flag
-  ENDIF
-    ld      a, h
-    rrca
-    rrca
-    rrca
-    and     3
-  IF    FORsam
-    or      +(SCREEN_BASE/256)+24
-  ELSE
-    or      88
-  ENDIF
-  IF    FORts2068|zxn
-    or      c                           ;Add in screen 1 bit
-  ENDIF
-    ld      h, a
-    ld      a, (__zx_console_attr)
-    ld      (hl), a
-    ; And increment the column
-    pop     hl
-    inc     hl
-    ret

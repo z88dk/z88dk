@@ -13,10 +13,7 @@
     EXTERN  asm_zx_saddrpdown
     EXTERN  __zx_console_attr
 
-IF    FORts2068|FORzxn
     EXTERN  hl_inc_x_MODE6
-    EXTERN  __gfx_fatpix
-ENDIF
 
     EXTERN  swapgfxbk
     EXTERN  __graphics_end
@@ -80,15 +77,15 @@ fast_putsprite:
 ;;     ld      a, (__gfx_fatpix)
 ;;     and     a
 ;;     jr      z, not_fatpix
-;; 	
+;; 
 ;;     ; TODO: fatpix mode scaling (SMC ?)
 ;; 
 ;; not_fatpix:
 ;; ENDIF
 
     call    w_pixeladdress
-	ld      (_saddr+1), de
-	ld      (_saddr1+1), de
+    ld      (_saddr+1), de
+    ld      (_saddr1+1), de
       ; @@@@@@@@@@@@
     ld      hl, offsets_table
     ld      c, a
@@ -132,18 +129,11 @@ _noplot:
        ;@@@@@@@@@@
        ;Go to next byte
        ;@@@@@@@@@@
-IF    FORts2068|FORzxn
-    ex      af,af
-    ld      a, (__zx_screenmode)
-    and     a
-    jr      z,_mode0
+    push    af
+    push    bc
     call    hl_inc_x_MODE6
-    ex      af,af
-    jr      _notedge
-_mode0:
-    ex      af,af
-ENDIF
-    inc     hl
+    pop     bc
+    pop     af
        ;@@@@@@@@@@
 
 _notedge:
@@ -154,7 +144,7 @@ _notedge:
        ;Go to next line
        ;@@@@@@@@@@
 _saddr:
-	ld      hl, 0
+    ld      hl, 0
     call    asm_zx_saddrpdown
     ld      (_saddr+1), hl
        ;@@@@@@@@@@
@@ -195,18 +185,11 @@ wnoplot:
        ;@@@@@@@@@@
        ;Go to next byte
        ;@@@@@@@@@@
-IF    FORts2068|FORzxn
-    ex      af,af
-    ld      a, (__zx_screenmode)
-    and     a
-    jr      z,_wmode0
+    push    af
+    push    bc
     call    hl_inc_x_MODE6
-    ex      af,af
-    jr      wnotedge
-_wmode0:
-    ex      af,af
-ENDIF
-    inc     hl
+    pop     bc
+    pop     af
        ;@@@@@@@@@@
 
 wnotedge:
@@ -223,7 +206,7 @@ nextline:
        ;Go to next line
        ;@@@@@@@@@@
 _saddr1:
-	ld      hl, 0
+    ld      hl, 0
     call    asm_zx_saddrpdown
     ld      (_saddr1+1), hl
        ;@@@@@@@@@@
