@@ -26,17 +26,16 @@ start:
     INCLUDE "crt/classic/crt_init_atexit.inc"
 
 
-    ld      ix,$CC	; Hide function key strings
-    call    msxbios
-    call    _main
-    ld      ix,$d2	; TOTEXT - force text mode on exit
-    call    msxbios
-
     INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
+    ld      ix,$CC	; Hide function key strings
+    call    msxbios
+    call    _main
+    ld      ix,$d2	; TOTEXT - force text mode on exit
+    call    msxbios
 
 __Exit:
     call    crt0_exit
