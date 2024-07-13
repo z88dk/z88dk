@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <cpm.h>
 
+extern void *_CPM_READ_CACHE_ALWAYS;
+#define CPM_READ_CACHE_ALWAYS (int)&_CPM_READ_CACHE_ALWAYS
 
 ssize_t read(int fd, void *buf, size_t len)
 {
@@ -61,7 +63,7 @@ ssize_t read(int fd, void *buf, size_t len)
                 size = len;
             }
             _putoffset(fc->ranrec,record_nr);
-            if ( size == SECSIZE ) {
+            if ( size == SECSIZE && CPM_READ_CACHE_ALWAYS == 0 ) {
                 bdos(CPM_SDMA,buf);
                 if ( bdos(CPM_RRAN,fc) ) {
                     swapuid(uid);

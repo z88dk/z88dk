@@ -16,7 +16,6 @@
 
 ssize_t write(int fd, void *buf, size_t len)
 {
-    unsigned char buffer[SECSIZE+2];
     unsigned char uid;
     struct fcb *fc;
     size_t cnt,size,offset;
