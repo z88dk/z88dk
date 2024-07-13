@@ -12,9 +12,9 @@
 
     ; In bload mode, we can't give DOS an address in 0x4000 -> -0x7fff
     ; to make things "just work", use the read cache always
-IFNDEF CPM_READ_CACHE_ALWAYS
-    defc    CPM_READ_CACHE_ALWAYS = 1
-ENDIF
+    IFNDEF CPM_READ_CACHE_ALWAYS
+        defc    CPM_READ_CACHE_ALWAYS = 1
+    ENDIF
     
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1

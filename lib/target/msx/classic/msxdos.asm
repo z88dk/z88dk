@@ -480,6 +480,7 @@ brksave:    defb    1
 
 IF CRT_DISABLELOADER != 1
     ; Include a lot of banks (org to 0x8000)
+    defc MSXDOS_BANKS = 1
     INCLUDE "target/msx/classic/megarom.asm"
 ENDIF
 
