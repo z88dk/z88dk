@@ -141,6 +141,9 @@ typedef struct arccoordstype {
     int yend;
 } arccoordstype;
 
+//struct arccoordstype bgi_arccoordstype;
+
+
 struct fillsettingstype {
     int pattern;
     int color;
@@ -197,13 +200,13 @@ struct textsettingstype {
 #define	sector(a,b,c,d,e,f)		stencil_init(bgi_stencil);stencil_add_ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,360-(d),360-(c),(e)*GFXSCALEX,(f)*GFXSCALEY,bgi_stencil);stencil_add_lineto((a)*GFXSCALEX,(b)*GFXSCALEY,bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(f)/256)*GFXSCALEY,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);	ellipse((a),(b),(d),(c),(e),(f));drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(f)/256)*GFXSCALEY)
 //#define	ellipse(a,b,c,d,e,f)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,(e)*GFXSCALEX,(f)*GFXSCALEY)
 #define	ellipse(a,b,c,d,e,f)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,(e)*GFXSCALEX,-(f)*GFXSCALEY)
-
 //#define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d);fill((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	fillellipse(a,b,c,d)	stencil_init(bgi_stencil);stencil_add_ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,0,360,(c)*GFXSCALEX,(d)*GFXSCALEY,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse(a,b,0,360,c,d)
 #define	line(a,b,c,d)	draw((a)*GFXSCALEX,(b)*GFXSCALEY,(c)*GFXSCALEX,(d)*GFXSCALEY)
 //#define	line(a,b,c,d)	plot((a)*GFXSCALEX,(b)*GFXSCALEY);drawto((c)*GFXSCALEX,(d)*GFXSCALEY)
 #undef arc
-#define	arc(a,b,c,d,e)	ellipse(a,b,(d),(c),e,e)
+//#define	arc(a,b,c,d,e)	bgi_arccoordstype.x=a;bgi_arccoordstype.y=b;bgi_arccoordstype.xstart=a+icos(e)*c/256;bgi_arccoordstype.ystart==b+isin(e)*c/256;bgi_arccoordstype.xstart=a+icos(e)*d/256;bgi_arccoordstype.ystart==b+isin(e)*d/256;ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,e,e)
+#define	arc(a,b,c,d,e)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,e,e)
 #define	pieslice(a,b,c,d,e)		stencil_init(bgi_stencil);stencil_add_ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,360-(d),360-(c),(e)*GFXSCALEX,(e)*GFXSCALEY,bgi_stencil);stencil_add_lineto((a)*GFXSCALEX,(b)*GFXSCALEY,bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(e)/256)*GFXSCALEY,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse((a),(b),(d),(c),(e),(e));drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(e)/256)*GFXSCALEY)
 #define	drawpoly(a,b)	for(bgi_x=0;bgi_x<((a)-1);bgi_x++){draw(b[bgi_x*2]*GFXSCALEX,b[1+bgi_x*2]*GFXSCALEY,b[2+bgi_x*2]*GFXSCALEX,b[3+bgi_x*2]*GFXSCALEY);}
 #define floodfill(a,b,c)	fill((a)*GFXSCALEX,(b)*GFXSCALEY)
@@ -240,7 +243,8 @@ struct textsettingstype {
 #define	fillellipse(a,b,c,d)	stencil_init(bgi_stencil);stencil_add_ellipse(a,b,0,360,c,d,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse(a,b,0,360,c,d)
 #define	line(a,b,c,d)	draw(a,b,c,d)
 #undef arc
-#define	arc(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e)
+//#define	arc(a,b,c,d,e)	bgi_arccoordstype.x=a;bgi_arccoordstype.y=b;bgi_arccoordstype.xstart=a+icos(e)*c/256;bgi_arccoordstype.ystart==b+isin(e)*c/256;bgi_arccoordstype.xstart=a+icos(e)*d/256;bgi_arccoordstype.ystart==b+isin(e)*d/256;ellipse((a),(b),c,d,e,e)
+#define	arc(a,b,c,d,e)	ellipse((a),(b),c,d,e,e)
 //#define	pieslice(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e);drawto(a,b);drawto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(e)/256))
 #define	pieslice(a,b,c,d,e)		stencil_init(bgi_stencil);stencil_add_ellipse(a,b,360-(d),360-(c),e,e,bgi_stencil);stencil_add_lineto(a,b,bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(e)/256),bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse(a,b,360-(d),360-(c),e,e);drawto(a,b);drawto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(e)/256))
 #define	drawpoly(a,b)	for(bgi_x=0;bgi_x<(a-1);bgi_x++){draw(b[bgi_x*2],b[1+bgi_x*2],b[2+bgi_x*2],b[3+bgi_x*2]);}
