@@ -34,7 +34,7 @@
 
 //#pragma output nogfxglobals
 unsigned char bgi_stencil[256*4];
-int bgi_fillstyle;
+int bgi_fillstyle=11;
 //int bgi_fillcolor;
 //#define	setfillstyle(a,b) bgi_fillstyle=(a?12-a:0);printf("\033[%um",PCDOS_COLORS[b]+30)
 #define	setfillstyle(a,b) bgi_fillstyle=(a?12-a:0)
