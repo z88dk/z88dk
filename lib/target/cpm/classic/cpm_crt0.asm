@@ -360,6 +360,8 @@ ENDIF
     ld      c,14
     call    5
 
+IF __CPU_INTEL__
+
     SECTION bss_crt
 
     PUBLIC  saved_hl            ;Temporary store used by compiler for 8080/8085
@@ -370,3 +372,4 @@ saved_hl:
 saved_de:
     defw    0                   ; Temp store for de
 
+ENDIF

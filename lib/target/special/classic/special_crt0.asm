@@ -76,3 +76,13 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
     INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
     INCLUDE	"crt/classic/crt_section.inc"
+
+    SECTION bss_crt
+
+    PUBLIC  saved_hl            ;Temporary store used by compiler for 8080/8085
+    PUBLIC  saved_de            ;for hl and de
+
+saved_hl:
+    defw    0                   ; Temp store for hl
+saved_de:
+    defw    0                   ; Temp store for de
