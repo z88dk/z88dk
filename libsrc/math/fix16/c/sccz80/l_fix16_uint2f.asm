@@ -2,10 +2,12 @@
 
     SECTION code_clib
 
+    PUBLIC  l_fix16_uchar2f
     PUBLIC  l_fix16_uint2f
     PUBLIC  l_fix16_ulong2f
 
 
+l_fix16_uchar2f:
 l_fix16_uint2f:
 l_fix16_ulong2f:
     ld      a, l
