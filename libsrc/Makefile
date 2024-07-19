@@ -16,7 +16,7 @@ TOCREATE =
 # $2 = libs
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
-CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpm8085_clib.lib cpmdevice.lib cpmdevice_8080.lib cpmdevice_8085.lib gfxh19.lib gfxvio.lib
+CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpm8085_clib.lib cpmdevice.lib cpmdevice_8080.lib cpmdevice_8085.lib cpmdevice_z180.lib gfxh19.lib gfxvio.lib
 GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib 8085_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib preempt.lib sp1-all
 GENLIBS += 8080_opt.lib 8085_opt.lib
 GENLIBS += gfxtek.lib gfxregis.lib
@@ -829,6 +829,12 @@ cpmz180_clib.lib: $(TARGET_CLIB_OBJS) cpm_clib.lib
 	@echo '--- Building CP/M Library (z180)---'
 	@echo ''
 	TARGET=cpm TYPE=z180 DEVICE=nodevice $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmz180_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst
+
+cpmdevice_z180.lib: cpmz180_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Device fnctl Library (z180) ---'
+	@echo ''
+	TARGET=cpm TYPE=z180 DEVICE=device $(LIBLINKER) -mz180 -x$(OUTPUT_DIRECTORY)/cpmdevice_z180 @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
 
 # Sorcerer Exidy lib - Stefano
 srr_clib.lib: $(TARGET_CLIB_OBJS)

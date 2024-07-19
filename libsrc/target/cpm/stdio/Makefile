@@ -17,5 +17,5 @@ clean:
 	$(RM) zcc_opt.def *.err *.o
 
 dirs:
-	@mkdir -p obj/8080 obj/8085 obj/z80
+	@mkdir -p obj/8080 obj/8085 obj/z80 obj/z180
 
