@@ -55,7 +55,6 @@ extern double_t f48_f16_fastcall(half_t x) __z88dk_fastcall;
 #define f48_f16(a) f48_f16_fastcall(a)
 
 
-
 extern half_t f16_f32(float_t x);
 extern half_t f16_f32_fastcall(float_t x) __z88dk_fastcall;
 #define f16_f32(a) f16_f32_fastcall(a)
@@ -83,7 +82,6 @@ extern int32_t i32_f16_fastcall(half_t x) __z88dk_fastcall;
 extern uint32_t u32_f16(half_t x);
 extern uint32_t u32_f16_fastcall(half_t x) __z88dk_fastcall;
 #define u32_f16(a) u32_f16_fastcall(a)
-
 
 
 extern half_t f16_i8(int8_t x);
@@ -133,6 +131,7 @@ extern half_t __LIB__ sqrtf16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ div2f16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ mul2f16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ mul10f16(half_t x) __z88dk_fastcall;
+#define sqrf16(x) mulf16((x),(x))
 
 /* Trigonometric functions */
 extern half_t __LIB__ acosf16(half_t x) __z88dk_fastcall;
