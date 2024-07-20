@@ -1455,6 +1455,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     int savesp;
     Kind save = vartype;
     int callee_cleanup = (currfn->ctype->flags & CALLEE) && (stackargs > 2);
+    int saved_hl = 0;
 
     if ( (currfn->flags & NAKED) == NAKED ) {
         return;
@@ -1499,25 +1500,22 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             Zsp += 2;
         }
 
-        if ( c_notaltreg && ( vartype != KIND_NONE && vartype != KIND_DOUBLE && vartype != KIND_LONGLONG) && abs(Zsp) >= 11 ) {
+        if ( c_notaltreg && vartype == KIND_LONG && abs(Zsp) >= 13 ) { // Return address is considered part of Zsp here, so +2 on modstk code
             // 8080, save hl, pop return int hl
             ol("ld\t(saved_hl),hl");
-            pop("hl");
-        } else {
-            // Pop return address into bc
-            pop("bc");
-            bcused = 1;
+            saved_hl = 1;
         }
-
+        // Pop return address into bc
+        pop("bc");
+   
         if ( Zsp > 0 ) {
             errorfmt("Internal error: Cannot cleanup function by lowering sp: Zsp=%d",1,Zsp);
         }
-        modstk(0, vartype, NO, !bcused);
+        modstk(0, vartype, NO, NO);
 
-        if ( bcused ) {
-            ol("push\tbc");
-        } else {
-            push("hl");
+        ol("push\tbc");
+
+        if (saved_hl) {
             ol("ld\thl,(saved_hl)");
          }
          Zsp = savesp;
@@ -1611,7 +1609,7 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
 
     // Handle short cases
     if (k > 0) {
-        if (k < 11) {
+        if (k < 11 ) {
             if (k & 1) {
                 ol("inc\tsp");
                 --k;
@@ -1664,8 +1662,11 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
         }
         // We're on 8080 and returning a value
         if ( save == KIND_LONG ) {
-            ol("ld\tb,h");
-            ol("ld\tc,l");
+            // usebc=NO for return from callee function
+            if ( usebc ) {
+                ol("ld\tb,h");
+                ol("ld\tc,l");
+            }
         } else if ( ( save != KIND_NONE && save != KIND_DOUBLE)) {
             swap();
         }
@@ -1673,8 +1674,10 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
         ol("add\thl,sp");
         ol("ld\tsp,hl");
         if ( save == KIND_LONG ) {
-            ol("ld\th,b");
-            ol("ld\tl,c");
+            if ( usebc ) {
+                ol("ld\th,b");
+                ol("ld\tl,c");
+            }
         } else if ( ( save != KIND_NONE && save != KIND_DOUBLE)) {
             swap();
         }
