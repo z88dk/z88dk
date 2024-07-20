@@ -234,7 +234,6 @@ void DoLibHeader(void)
     outstr("\n\n\tINCLUDE \"z80_crt0.hdr\"\n\n\n");
     if (c_notaltreg) {
         ol("EXTERN\tsaved_hl");
-        ol("EXTERN\tsaved_de");
     }
     donelibheader = 1;
 }
@@ -1609,7 +1608,7 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
 
     // Handle short cases
     if (k > 0) {
-        if (k < 11 ) {
+        if (k < 11) {
             if (k & 1) {
                 ol("inc\tsp");
                 --k;

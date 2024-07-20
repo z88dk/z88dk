@@ -7,7 +7,6 @@
 
 
 	EXTERN	saved_hl
-	EXTERN	saved_de
 	SECTION	code_compiler
 
 ._size10_i
