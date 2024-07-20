@@ -337,13 +337,9 @@ include "../../../../lib/crt/classic/crt_runtime_selection.inc"
 
     SECTION bss_crt
 
-PUBLIC  saved_hl                ;Temporary store used by compiler
-PUBLIC  saved_de                ;for hl and de
-
+PUBLIC  saved_hl                ;Temporary store used by compiler for 8085
 saved_hl:
-    defw    0                   ; Temp store for hl
-saved_de:
-    defw    0                   ; Temp store for de
+    defw    0                   ;for hl
 
 IF CRT_ENABLE_STDIO = 1 && CLIB_FOPEN_MAX > 0
     PUBLIC  __sgoioblk

@@ -7,7 +7,6 @@
 
 
 	EXTERN	saved_hl
-	EXTERN	saved_de
 	SECTION	data_compiler
 ._A
 	defw	11

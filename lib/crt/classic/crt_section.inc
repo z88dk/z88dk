@@ -117,7 +117,6 @@ _heap:
 ENDIF
 
 IF CLIB_BALLOC_TABLE_SIZE > 0
-
     ; create balloc table
     SECTION data_alloc_balloc
     PUBLIC  __balloc_array
@@ -128,5 +127,10 @@ __balloc_array:
     PUBLIC  __balloc_table
 __balloc_table:
     defs CLIB_BALLOC_TABLE_SIZE * 2
+ENDIF
 
+IF __CPU_INTEL__ || __CPU_GBZ80__
+    PUBLIC  saved_hl            ;Temporary store used by compiler for Intel & GB
+saved_hl:
+    defw    0                   ; Temp store for hl
 ENDIF
