@@ -39,9 +39,6 @@
 
     PUBLIC  s_filetypetable
 
-    PUBLIC  saved_hl                    ;Temporary store used by compiler
-    PUBLIC  saved_de                    ;for hl and de
-
 ; --- OZ related stuff---
 
     PUBLIC  ozactivepage                ;current mem page
@@ -450,10 +447,6 @@ ENDIF
 
     SECTION bss_crt
 
-saved_hl:
-    defw    0                           ; Temp store for hl
-saved_de:
-    defw    0                           ; Temp store for de
 ozactivepage:
     defw    0                           ; Page number for the graph map (0400h for 0A000h)
 ozmodel:
@@ -475,6 +468,7 @@ s_filetypetable:
 
 ; --- settings - leave untouched ---
     SECTION data_crt
+
 ozkeyrepeatspeed:
     defb    5
 ozkeyrepeatdelay:
