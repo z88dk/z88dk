@@ -24,8 +24,8 @@ namespace fs = boost::filesystem;
 #endif
 
 inline bool is_eol(char c) { return c == '\r' || c == '\n'; }
-inline bool is_ident_start(char c) { return c == '_' || isalpha(c); }
-inline bool is_ident(char c) { return c == '_' || isalnum(c); }
+inline bool is_ident_start(char c) { return c == '_' || c == '@' || isalpha(c); }
+inline bool is_ident(char c) { return c == '_' || c == '@' || isalnum(c); }
 
 bool is_ident(const string& ident);
 int char_digit(char c);
