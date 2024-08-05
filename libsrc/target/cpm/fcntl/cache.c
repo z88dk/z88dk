@@ -8,7 +8,7 @@ int cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int for_read)
     // We've already got it cached, just use it
     if ( record_nr == fcb->cached_record ) return 0;
 
-    if ( cpm_cache_flush(fcb)) return -1;
+    if ( cpm_cache_flush(fcb) == -1 ) return -1;
 
     fcb->cached_record = 0xffffffff;
     _putoffset(fcb->ranrec,record_nr);
