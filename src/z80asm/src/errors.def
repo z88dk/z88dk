@@ -58,6 +58,7 @@ X(ErrIllegalFloatFormat, "illegal float format")
 // assembler
 X(ErrExprInParens, "interpreting indirect value as immediate")
 X(ErrIllegalIdent, "illegal identifier")
+X(ErrIllegalLocalLabel, "illegal local label")
 X(ErrIntRange, "integer range")
 X(ErrMissingBlock, "missing {} block")
 X(ErrMissingCloseBlock, "{} block not closed")

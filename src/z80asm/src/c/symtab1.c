@@ -25,7 +25,11 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 #include "strutil.h"
 #include "symtab1.h"
 #include "types.h"
+#include "uthash.h"
+#include "utlist.h"
+#include "utstring.h"
 #include "xassert.h"
+#include "xmalloc.h"
 #include "z80asm1.h"
 #include "zobjfile.h"
 
@@ -719,4 +723,95 @@ void check_undefined_symbols(Symbol1Hash *symtab)
 		}
 	}
 	clear_error_location();
+}
+
+/*-----------------------------------------------------------------------------
+*   Local labels
+*----------------------------------------------------------------------------*/
+
+// one local label
+typedef struct local_label_t {
+    const char* short_name;             // short name @label in strpool
+    const char* long_name;              // long name label@label in strpool
+    int line_num;                       // line_num where defined
+    struct local_label_t* next, * prev; // linked list of labels with same short_name
+} LocalLabel;
+
+// hash table of local labels short name linked to list of LocalLabel
+typedef struct local_labels_t {
+    const char* short_name;             // short name @label in strpool
+    LocalLabel* labels;                 // list of local labels
+    UT_hash_handle hh;                  // hash table handle
+} LocalLabels;
+
+static const char* last_global_label = "";  // last non-local label, used as prefix for each new local label
+static LocalLabels* local_labels = NULL;    // hash table
+
+
+void init_local_labels(void) {
+    xassert(local_labels == NULL);
+
+    last_global_label = spool_add("");
+}
+
+const char* local_labels_add_label(const char* short_name) {
+    const char* p = strchr(short_name, '@');
+    if (p == NULL) {                // standard label, no @
+        last_global_label = spool_add(short_name);
+        return last_global_label;
+    }
+    else if (p == short_name) {     // @label
+        UT_string* long_name;
+        utstring_new(long_name);
+        utstring_printf(long_name, "%s%s", last_global_label, short_name);  // label@label
+
+        // create local label
+        LocalLabel* label = xnew(LocalLabel);
+        label->short_name = spool_add(short_name);
+        label->long_name = spool_add(utstring_body(long_name));
+        label->line_num = get_error_line_num();
+
+        // search hash table
+        LocalLabels* elem;
+        HASH_FIND_STR(local_labels, short_name, elem);
+        if (elem == NULL) {         // new item
+            elem = xnew(LocalLabels);
+            elem->short_name = spool_add(short_name);
+            elem->labels = label;
+            HASH_ADD_KEYPTR(hh, local_labels, elem->short_name, strlen(elem->short_name), elem);
+        }
+        else {                      // item already exists
+            LL_APPEND(elem->labels, label);
+        }
+
+        const char* long_name_str = spool_add(utstring_body(long_name));
+        utstring_free(long_name);
+        return long_name_str;
+    }
+    else {                          // label@label:
+        error(ErrIllegalLocalLabel, short_name);
+        return spool_add(short_name);
+    }
+}
+
+void resolve_local_labels(void) {
+}
+
+void free_local_labels(void) {
+    LocalLabels* elem, * tmp;
+
+    HASH_ITER(hh, local_labels, elem, tmp) {
+        // delete all labels of this entry
+        while (elem->labels) {
+            LocalLabel* label = elem->labels;
+            LL_DELETE(elem->labels, label);
+            xfree(label);
+        }
+
+        // delete entry
+        HASH_DEL(local_labels, elem);
+        xfree(elem);
+    }
+
+    xassert(local_labels == NULL);
 }
