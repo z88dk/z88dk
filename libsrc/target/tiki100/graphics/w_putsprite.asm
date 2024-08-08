@@ -13,6 +13,8 @@
     PUBLIC  putsprite
     PUBLIC  _putsprite
     EXTERN  w_pixeladdress
+    EXTERN  generic_console_get_mode
+    EXTERN  __generic_putsprite
 
     EXTERN  swapgfxbk
     EXTERN  swapgfxbk1
@@ -29,6 +31,9 @@ offsets_table:
 
 putsprite:
 _putsprite:
+    call    generic_console_get_mode
+    dec     a 	;mode 1
+    jp      nz,__generic_putsprite
 
     ld      hl, 2
     add     hl, sp
@@ -39,11 +44,11 @@ _putsprite:
     pop     ix
 
     inc     hl
-    ld      e, (hl)
+    ld      e, (hl)			;y
     inc     hl
     ld      d, (hl)
     inc     hl
-    ld      c, (hl)
+    ld      c, (hl)			;x
     inc     hl
     ld      b, (hl)                     ; x and y __gfx_coords
 
@@ -60,6 +65,7 @@ _putsprite:
 	; @@@@@@@@@@@@
     ld      h, b
     ld      l, c
+
     call    w_pixeladdress
     ld      (rowadr1+1), hl             ; store current row
     ld      (rowadr2+1), hl
