@@ -54,6 +54,7 @@ UT_icd ut_exprs_icd = { sizeof(Expr1*), ut_exprs_init, NULL, ut_exprs_dtor };
 static void ExprOp_init_asmpc(ExprOp* self);
 static void ExprOp_init_number(ExprOp* self, long value);
 static void ExprOp_init_symbol(ExprOp* self, Symbol1* symbol);
+static void ExprOp_init_symbol_name(ExprOp* self, const char* name);
 static void ExprOp_init_operator(ExprOp* self, tokid_t tok, op_type_t op_type);
 
 /*-----------------------------------------------------------------------------
@@ -260,6 +261,12 @@ void ExprOp_init_symbol(ExprOp* self, Symbol1* symbol)
 	self->d.symbol = symbol;
 }
 
+void ExprOp_init_symbol_name(ExprOp* self, const char* name)
+{
+	self->op_type = SYMBOL_NAME_OP;
+	self->d.name = name;
+}
+
 void ExprOp_init_operator(ExprOp* self, tokid_t tok, op_type_t op_type)
 {
 	Operator* op;
@@ -312,6 +319,15 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 			expr->is_computed = false;
 
 		break;
+
+    case SYMBOL_NAME_OP:        // local label, not defined yet
+        expr->result.not_evaluable = true;
+        expr->result.undefined_symbol = true;
+        expr->type = TYPE_UNDEFINED;
+        if (not_defined_error)
+            error(ErrUndefinedSymbol, self->d.name);
+        Calc_push(0);
+        break;
 
 	case ASMPC_OP:
 		if (get_phased_PC() >= 0) {
@@ -424,13 +440,19 @@ static bool Expr_parse_factor(Expr1* self)
 		break;
 
 	case TK_NAME:
-		symptr = get_used_symbol(sym_text(&sym));
+        if (local_labels_is_local(sym_text(&sym))) {
+            const char* short_name = spool_add(sym_text(&sym));
+            ExprOp_init_symbol_name(ExprOpArray_push(self->rpn_ops), short_name);
+            local_labels_add_pending_expr(self);
+        }
+        else {
+            symptr = get_used_symbol(sym_text(&sym));
+            ExprOp_init_symbol(ExprOpArray_push(self->rpn_ops), symptr);
 
-		ExprOp_init_symbol(ExprOpArray_push(self->rpn_ops),
-			symptr);
+            /* copy type */
+            self->type = MAX(self->type, symptr->type);
+        }
 
-		/* copy type */
-		self->type = MAX(self->type, symptr->type);
 		Str_append_n(self->text, sym.tstart, sym.tlen);		/* add identifier to infix expr */
 
 		GetSym();
@@ -628,6 +650,7 @@ long Expr_eval(Expr1* self, bool not_defined_error)
 	self->result.undefined_symbol = false;
 	self->result.extern_symbol = false;
 	self->result.cross_section_addr = false;
+    self->result.has_local_symbol = false;
 
 	self->is_computed = true;
 
@@ -659,7 +682,7 @@ long Expr_eval(Expr1* self, bool not_defined_error)
 	}
 
 	/* need to downgrade to CONSTANT if it is the difference of two addresses */
-	if (Expr_is_addr_diff(self))
+	if (self->type == TYPE_COMPUTED && Expr_is_addr_diff(self))
 		self->type = TYPE_CONSTANT;
 
 	/* need to upgrade to TYPE_COMPUTED if it contains more than one address */
@@ -741,7 +764,7 @@ bool Expr_without_addresses(Expr1* self)
 			num_addresses++;
 			break;
 
-		case NUMBER_OP:
+        case NUMBER_OP:
 		case UNARY_OP:
 		case BINARY_OP:
 		case TERNARY_OP:
@@ -775,7 +798,7 @@ bool Expr_is_recusive(Expr1* self, const char* name)
 				return true;
 			break;
 
-		case ASMPC_OP:
+        case ASMPC_OP:
 		case NUMBER_OP:
 		case UNARY_OP:
 		case BINARY_OP:

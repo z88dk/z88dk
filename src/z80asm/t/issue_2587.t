@@ -5,10 +5,6 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 use Modern::Perl;
 
 spew("${test}.asm", <<'END');
-	@next:
-	  ; do something
-	  djnz @next
-
 	subroutine1:
 	  ld b,2
 	@next:
@@ -40,7 +36,36 @@ check_bin_file("${test}.bin", bytes());
 
 
 spew("${test}.asm", <<'END');
+	@next:
+	  ; do something
 	  djnz @next
+END
+
+capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
+END
+
+
+spew("${test}.asm", <<'END');
+	subroutine1:
+	@next:
+	  ; do something
+	  djnz @prev
+END
+
+capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
+END
+
+
+spew("${test}.asm", <<'END');
+	  djnz @next
+END
+
+capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
+END
+
+
+spew("${test}.asm", <<'END');
+	hello@world:
 END
 
 capture_nok("z88dk-z80asm -b ${test}.asm", <<END);

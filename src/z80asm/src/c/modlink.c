@@ -433,36 +433,38 @@ static int compute_equ_exprs_once(Expr1List* exprs, bool show_error, bool module
 		expr = iter->obj;
 		computed = false;
 
-		if (expr->target_name)
-		{
-			/* touch symbol so that it ends in object file */
-			Symbol1* sym = get_used_symbol(expr->target_name);
-			sym->is_touched = true;
+        if (expr->target_name)
+        {
+            /* touch symbol so that it ends in object file */
+            Symbol1* sym = get_used_symbol(expr->target_name);
+            if (sym != NULL) {      // was not local label
+                sym->is_touched = true;
 
-			/* expressions with symbols from other sections need to be passed to the link phase */
-			if (!module_relative_addr || /* link phase */
-				(Expr_is_local_in_section(expr, CURRENTMODULE, CURRENTSECTION) &&	/* or symbols from other sections */
-					Expr_without_addresses(expr))		/* expression addressees - needs to be computed at link time */
-				)
-			{
-				set_expr_env(expr, module_relative_addr);
-				value = Expr_eval(expr, show_error);
-				if (expr->result.not_evaluable)		/* unresolved */
-				{
-					num_unresolved++;
-				}
-				else if (!expr->is_computed)
-				{
-					/* expression depends on other variables not yet computed */
-				}
-				else
-				{
-					num_computed++;
-					computed = true;
-					update_symbol(expr->target_name, value, expr->type);
-				}
-			}
-		}
+                /* expressions with symbols from other sections need to be passed to the link phase */
+                if (!module_relative_addr || /* link phase */
+                    (Expr_is_local_in_section(expr, CURRENTMODULE, CURRENTSECTION) &&	/* or symbols from other sections */
+                        Expr_without_addresses(expr))		/* expression addressees - needs to be computed at link time */
+                    )
+                {
+                    set_expr_env(expr, module_relative_addr);
+                    value = Expr_eval(expr, show_error);
+                    if (expr->result.not_evaluable)		/* unresolved */
+                    {
+                        num_unresolved++;
+                    }
+                    else if (!expr->is_computed)
+                    {
+                        /* expression depends on other variables not yet computed */
+                    }
+                    else
+                    {
+                        num_computed++;
+                        computed = true;
+                        update_symbol(expr->target_name, value, expr->type);
+                    }
+                }
+            }
+        }
 
 		/* continue loop - delete expression if computed */
 		if (computed)

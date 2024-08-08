@@ -115,7 +115,10 @@ static void do_assemble(const char *src_filename, const char* obj_filename)
 		printf("Assembling '%s'\n", path_canon(src_filename));
 
 	list_open(get_lis_filename(src_filename));
+    init_local_labels();
 	parse_file(src_filename);
+    resolve_local_labels();
+    free_local_labels();
 	asm_MODULE_default();			/* Module1 name must be defined */
 	clear_error_location();
 	Z80pass2(start_errors, obj_filename);	/* call pass 2 even if errors found, to issue pass2 errors */

@@ -15,6 +15,7 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 
 #pragma once
 
+#include <stdbool.h>
 #include "classhash.h"
 #include "sym.h"
 
@@ -109,5 +110,7 @@ extern void check_undefined_symbols(Symbol1Hash *symtab);
 *----------------------------------------------------------------------------*/
 extern void init_local_labels(void);
 extern const char* local_labels_add_label(const char* short_name);
+extern bool local_labels_is_local(const char* name);
+extern void local_labels_add_pending_expr(Expr1* expr);
 extern void resolve_local_labels(void);
 extern void free_local_labels(void);
