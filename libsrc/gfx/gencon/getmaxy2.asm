@@ -18,7 +18,7 @@ ENDIF
     ld      h, 0
     ld      a, (__gfx_fatpix)
     and     a
-    jr      z, skip_double
+    jr      nz, skip_double
     add     hl, hl
 skip_double:
     dec     hl

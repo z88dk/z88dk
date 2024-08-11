@@ -304,6 +304,17 @@
       PUBLIC CLIB_FARHEAP_BANKS
    ENDIF
 
+   IFNDEF CLIB_GFX_FATPIX
+      PUBLIC CLIB_GFX_FATPIX
+      IFDEF TAR__clib_gfx_fatpix
+         defc CLIB_GFX_FATPIX = TAR__clib_gfx_fatpix
+      ELSE
+         defc CLIB_GFX_FATPIX = DEF__clib_gfx_fatpix
+      ENDIF
+   ELSE
+      PUBLIC CLIB_GFX_FATPIX
+   ENDIF
+
    ; Custom memory map
    IF DEFINED_MMAP
        defc __MMAP = MMAP

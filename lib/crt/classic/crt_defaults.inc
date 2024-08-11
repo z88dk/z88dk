@@ -20,3 +20,5 @@
    defc DEF__clib_exit_stack_size      = 32      ;; max number of functions that can be registered with atexit()
 
    defc DEF__clib_banking_stack_size   = 100	 ;; For each bank call we save 2 words on the temporary stack
+
+   defc DEF__clib_gfx_fatpix           = 0       ;; 

@@ -325,7 +325,7 @@ __ZPROTO2(void,,c_unplot,int,x,int,y)
 /* XORs a pixel on screen */
 __ZPROTO2(void,,c_xorplot,int,x,int,y)
 /* Get pixel status */
-__ZPROTO2(void,,c_point,int,x,int,y)
+__ZPROTO2(int,,c_point,int,x,int,y)
 
 
 /* Colour graphics, only few targets are supported */
