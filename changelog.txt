@@ -22,7 +22,9 @@ Future release changes:
 - [zsdcc] Upgraded to SDCC 4.4.0 r14648
 - [z80asm] GBZ80 opcode conversion fixes
 - [z80asm] process file.asm.m4 by m4 and assemble resulting file.asm
-
+- [z80asm] add string argument to ASSERT
+- [z80asm] fix expansion of nested macros with same parameter names
+- [z80asm] add local labels
 
 z88dk v2.3 - 20.12.2023
 
