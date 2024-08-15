@@ -682,7 +682,7 @@ long Expr_eval(Expr1* self, bool not_defined_error)
 	}
 
 	/* need to downgrade to CONSTANT if it is the difference of two addresses */
-	if (self->type == TYPE_COMPUTED && Expr_is_addr_diff(self))
+	if (self->type >= TYPE_ADDRESS && Expr_is_addr_diff(self))
 		self->type = TYPE_CONSTANT;
 
 	/* need to upgrade to TYPE_COMPUTED if it contains more than one address */

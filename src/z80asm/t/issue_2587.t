@@ -32,7 +32,17 @@ spew("${test}.asm", <<'END');
 END
 
 capture_ok("z88dk-z80asm -b ${test}.asm", "");
-check_bin_file("${test}.bin", bytes());
+check_bin_file("${test}.bin", bytes(0x06, 2,
+									0x10, -2,
+									0xc9,
+									0x06, 2,
+									0x10, -2,
+									0xc9,
+									0xfe, 2,
+									0x20, 0,
+									0xc9,
+									0xcd, 0x0e, 0x00,
+									0xc9));
 
 
 spew("${test}.asm", <<'END');
@@ -42,6 +52,8 @@ spew("${test}.asm", <<'END');
 END
 
 capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
+$test.asm:1: error: local label without normal label before it: \@next
+  ^---- \@next:
 END
 
 
@@ -53,6 +65,8 @@ spew("${test}.asm", <<'END');
 END
 
 capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
+$test.asm:4: error: undefined symbol: \@prev
+  ^---- \@prev
 END
 
 
@@ -61,6 +75,8 @@ spew("${test}.asm", <<'END');
 END
 
 capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
+$test.asm:1: error: undefined symbol: \@next
+  ^---- \@next
 END
 
 
@@ -69,6 +85,8 @@ spew("${test}.asm", <<'END');
 END
 
 capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
+$test.asm:1: error: illegal local label: hello\@world
+  ^---- hello\@world:
 END
 
 unlink_testfiles;
