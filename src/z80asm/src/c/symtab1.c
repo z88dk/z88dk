@@ -13,19 +13,26 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
    see t\developer\benchmark_symtab.t
 */
 
+#include "ctype.h"
 #include "die.h"
 #include "errors.h"
 #include "expr1.h"
 #include "fileutil.h"
 #include "if.h"
+#include "limits.h"
 #include "options.h"
 #include "reloc_code.h"
 #include "scan1.h"
+#include "stdint.h"
 #include "str.h"
 #include "strutil.h"
 #include "symtab1.h"
 #include "types.h"
+#include "uthash.h"
+#include "utlist.h"
+#include "utstring.h"
 #include "xassert.h"
+#include "xmalloc.h"
 #include "z80asm1.h"
 #include "zobjfile.h"
 
@@ -139,22 +146,19 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
 *   search for symbol in either local tree or global table,
 *   create undefined symbol if not found, return symbol
 *----------------------------------------------------------------------------*/
-Symbol1 *get_used_symbol(const char *name )
-{
-    Symbol1     *sym;
+Symbol1* get_used_symbol(const char* name) {
+    Symbol1* sym;
 
-    sym = find_symbol( name, CURRENTMODULE->local_symtab );	/* search in local tab */
+    sym = find_symbol(name, CURRENTMODULE->local_symtab);	/* search in local tab */
 
-    if ( sym == NULL )
-    {
+    if (sym == NULL) {
         /* not local */
-        sym = find_symbol( name, global_symtab );			/* search in global tab */
+        sym = find_symbol(name, global_symtab);			/* search in global tab */
 
-        if ( sym == NULL )
-        {
-            sym = Symbol_create( name, 0, TYPE_UNDEFINED, SCOPE_LOCAL, 
-								 CURRENTMODULE, CURRENTSECTION );
-            Symbol1Hash_set( & CURRENTMODULE->local_symtab, name, sym );
+        if (sym == NULL) {
+            sym = Symbol_create(name, 0, TYPE_UNDEFINED, SCOPE_LOCAL,
+                CURRENTMODULE, CURRENTSECTION);
+            Symbol1Hash_set(&CURRENTMODULE->local_symtab, name, sym);
         }
     }
 
@@ -719,4 +723,196 @@ void check_undefined_symbols(Symbol1Hash *symtab)
 		}
 	}
 	clear_error_location();
+}
+
+/*-----------------------------------------------------------------------------
+*   Local labels
+*----------------------------------------------------------------------------*/
+
+// one local label
+typedef struct local_label_t {
+    const char* short_name;             // short name @label in strpool
+    const char* long_name;              // long name label@label in strpool
+    int line_num;                       // line_num where defined
+    struct local_label_t* next, * prev; // linked list of labels with same short_name
+} LocalLabel;
+
+// hash table of local labels short name linked to list of LocalLabel
+typedef struct local_labels_t {
+    const char* short_name;             // short name @label in strpool
+    LocalLabel* labels;                 // list of local labels
+    UT_hash_handle hh;                  // hash table handle
+} LocalLabels;
+
+// list of expressions
+typedef struct expr_list_t {
+    Expr1* expr;
+    struct expr_list_t* next, * prev;
+} ExprList;
+
+static const char* last_global_label = "";  // last non-local label, used as prefix for each new local label
+static LocalLabels* local_labels = NULL;    // hash table
+static ExprList* pending_exprs = NULL;      // list of expressions containing local label references
+
+
+void init_local_labels(void) {
+    xassert(local_labels == NULL);
+    xassert(pending_exprs == NULL);
+
+    last_global_label = spool_add("");
+}
+
+const char* local_labels_add_label(const char* short_name) {
+    const char* p = strchr(short_name, '@');
+    if (p == NULL) {                // standard label, no @
+        last_global_label = spool_add(short_name);
+        return last_global_label;
+    }
+    else if (p == short_name) {     // @label
+        if (*last_global_label == '\0') {
+            error(ErrLocalLabelBeforeNormalLabel, short_name);
+            return short_name;
+        }
+        else {
+            UT_string* long_name;
+            utstring_new(long_name);
+            utstring_printf(long_name, "%s%s", last_global_label, short_name);  // label@label
+
+            // create local label
+            LocalLabel* label = xnew(LocalLabel);
+            label->short_name = spool_add(short_name);
+            label->long_name = spool_add(utstring_body(long_name));
+            label->line_num = get_error_line_num();
+
+            // search hash table
+            LocalLabels* elem;
+            HASH_FIND_STR(local_labels, short_name, elem);
+            if (elem == NULL) {         // new item
+                elem = xnew(LocalLabels);
+                elem->short_name = spool_add(short_name);
+                elem->labels = label;
+                HASH_ADD_KEYPTR(hh, local_labels, elem->short_name, strlen(elem->short_name), elem);
+            }
+            else {                      // item already exists
+                LL_APPEND(elem->labels, label);
+            }
+
+            const char* long_name_str = spool_add(utstring_body(long_name));
+            utstring_free(long_name);
+            return long_name_str;
+        }
+    }
+    else {                          // label@label:
+        error(ErrIllegalLocalLabel, short_name);
+        return spool_add(short_name);
+    }
+}
+
+bool local_labels_is_local(const char* name) {
+    return name[0] == '@';
+}
+
+void local_labels_add_pending_expr(Expr1* expr) {
+    ExprList* elem = xnew(ExprList);
+    elem->expr = expr;
+    LL_APPEND(pending_exprs, elem);
+}
+
+static const char* find_closest_label(const char* short_name, int line_num) {
+    const char* long_name = short_name;     // default is the same
+    int min_distance = INT_MAX;
+
+    // search hash table
+    LocalLabels* elem;
+    HASH_FIND_STR(local_labels, short_name, elem);
+    if (elem == NULL)
+        return short_name;                  // no local label defined
+    else {
+        for (LocalLabel* label = elem->labels; label != NULL; label = label->next) {
+            int distance = abs(line_num - label->line_num);
+            if (distance < min_distance) {
+                long_name = label->long_name;
+                min_distance = distance;
+            }
+        }
+        return long_name;
+    }
+}
+
+static bool is_ident(char c) { return c == '_' || c == '@' || isalnum(c); }
+
+static const char* replace_text(const char* text, const char* short_name, const char* long_name) {
+    UT_string* result;
+    utstring_new(result);
+
+    utstring_printf(result, "%s", text);
+
+    const char* p = text;
+    while ((p = strchr(p, '@')) != NULL) {      // found a '@'
+        if (p == text || !is_ident(p[-1])) {    // at start of line or not after ident
+            if (strncmp(p, short_name, strlen(short_name)) == 0) {      // short name matches
+                if (!is_ident(*(p + strlen(short_name)))) {             // not followed by another ident
+                    utstring_clear(result);
+                    utstring_bincpy(result, text, p - text);            // add prefix 
+                    utstring_printf(result, "%s", long_name);           // add long name
+                    utstring_printf(result, "%s", p + strlen(short_name));  // add suffix
+
+                    size_t offset = p - text;
+                    text = spool_add(utstring_body(result));
+                    p = text + offset + strlen(long_name);
+                }
+            }
+        }
+    }
+
+    const char* result_str = spool_add(utstring_body(result));
+    utstring_free(result);
+    return result_str;
+}
+
+static void resolve_local_expr(Expr1* expr) {
+    for (size_t i = 0; i < ExprOpArray_size(expr->rpn_ops); i++) {
+        ExprOp* expr_op = ExprOpArray_item(expr->rpn_ops, i);
+        if (expr_op->op_type == SYMBOL_NAME_OP) {
+            const char* short_name = expr_op->d.name;
+            const char* long_name = find_closest_label(short_name, expr->line_num);
+
+            expr_op->op_type = SYMBOL_OP;
+            expr_op->d.symbol = get_used_symbol(long_name);
+            Str_set(expr->text, replace_text(expr->text->data, short_name, long_name));
+        }
+    }
+}
+
+void resolve_local_labels(void) {
+    ExprList* elem;
+    for (elem = pending_exprs; elem != NULL; elem = elem->next)
+        resolve_local_expr(elem->expr);
+}
+
+void free_local_labels(void) {
+    LocalLabels* elem, * tmp;
+
+    HASH_ITER(hh, local_labels, elem, tmp) {
+        // delete all labels of this entry
+        while (elem->labels) {
+            LocalLabel* label = elem->labels;
+            LL_DELETE(elem->labels, label);
+            xfree(label);
+        }
+
+        // delete entry
+        HASH_DEL(local_labels, elem);
+        xfree(elem);
+    }
+
+    xassert(local_labels == NULL);
+
+    while (pending_exprs) {
+        ExprList* elem = pending_exprs;
+        LL_DELETE(pending_exprs, elem);
+        xfree(elem);
+    }
+
+    xassert(pending_exprs == NULL);
 }

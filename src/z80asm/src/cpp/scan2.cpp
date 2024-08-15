@@ -380,7 +380,7 @@ yyFillLabel2:
 				case 0x00:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel2;
-						goto yy106;
+						goto yy108;
 					}
 					goto yy8;
 				case '\t':
@@ -849,6 +849,59 @@ yyFillLabel19:
 				case '"': goto yy71;
 				case '0':
 				case '1': goto yy73;
+				case 'A':
+				case 'B':
+				case 'C':
+				case 'D':
+				case 'E':
+				case 'F':
+				case 'G':
+				case 'H':
+				case 'I':
+				case 'J':
+				case 'K':
+				case 'L':
+				case 'M':
+				case 'N':
+				case 'O':
+				case 'P':
+				case 'Q':
+				case 'R':
+				case 'S':
+				case 'T':
+				case 'U':
+				case 'V':
+				case 'W':
+				case 'X':
+				case 'Y':
+				case 'Z':
+				case '_':
+				case 'a':
+				case 'b':
+				case 'c':
+				case 'd':
+				case 'e':
+				case 'f':
+				case 'g':
+				case 'h':
+				case 'i':
+				case 'j':
+				case 'k':
+				case 'l':
+				case 'm':
+				case 'n':
+				case 'o':
+				case 'p':
+				case 'q':
+				case 'r':
+				case 's':
+				case 't':
+				case 'u':
+				case 'v':
+				case 'w':
+				case 'x':
+				case 'y':
+				case 'z': goto yy91;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel19;
@@ -856,11 +909,12 @@ yyFillLabel19:
 					goto yy10;
 			}
 yy54:
-			++p;
+			yyaccept = 3;
+			marker = ++p;
 yyFillLabel20:
 			yych = *p;
 			switch (yych) {
-				case '\'': goto yy91;
+				case '\'': goto yy92;
 				case '0':
 				case '1':
 				case '2':
@@ -924,6 +978,7 @@ yyFillLabel20:
 				case 'x':
 				case 'y':
 				case 'z': goto yy54;
+				case '@': goto yy93;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel20;
@@ -985,8 +1040,8 @@ yy57:
 yyFillLabel21:
 			yych = *p;
 			switch (yych) {
-				case '\n': goto yy92;
-				case '\r': goto yy94;
+				case '\n': goto yy94;
+				case '\r': goto yy96;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel21;
@@ -1003,7 +1058,7 @@ yy60:
 yyFillLabel22:
 			yych = *p;
 			switch (yych) {
-				case '^': goto yy95;
+				case '^': goto yy97;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel22;
@@ -1020,7 +1075,7 @@ yy63:
 yyFillLabel23:
 			yych = *p;
 			switch (yych) {
-				case '|': goto yy96;
+				case '|': goto yy98;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel23;
@@ -1081,7 +1136,7 @@ yy71:
 yyFillLabel25:
 			yych = *p;
 			switch (yych) {
-				case '"': goto yy97;
+				case '"': goto yy99;
 				case '#':
 				case '-': goto yy71;
 				default:
@@ -1096,9 +1151,10 @@ yy72:
 				case 0: goto yy24;
 				case 1: goto yy39;
 				case 2: goto yy10;
-				case 3: goto yy78;
-				case 4: goto yy81;
-				default: goto yy101;
+				case 3: goto yy55;
+				case 4: goto yy78;
+				case 5: goto yy81;
+				default: goto yy103;
 			}
 yy73:
 			++p;
@@ -1122,7 +1178,7 @@ yy76:
 			++p;
 			{ PUSH_TOKEN1(TType::Power); continue; }
 yy77:
-			yyaccept = 3;
+			yyaccept = 4;
 			marker = ++p;
 yyFillLabel27:
 			yych = *p;
@@ -1138,7 +1194,7 @@ yyFillLabel27:
 				case '8':
 				case '9': goto yy77;
 				case 'E':
-				case 'e': goto yy98;
+				case 'e': goto yy100;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel27;
@@ -1183,7 +1239,7 @@ yyFillLabel28:
 					goto yy72;
 			}
 yy80:
-			yyaccept = 4;
+			yyaccept = 5;
 			marker = ++p;
 yyFillLabel29:
 			yych = *p;
@@ -1211,7 +1267,7 @@ yyFillLabel29:
 				case 'd':
 				case 'e':
 				case 'f':
-				case 'h': goto yy100;
+				case 'h': goto yy102;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel29;
@@ -1285,7 +1341,7 @@ yyFillLabel31:
 				case 'c':
 				case 'd':
 				case 'e':
-				case 'f': goto yy102;
+				case 'f': goto yy104;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel31;
@@ -1293,7 +1349,7 @@ yyFillLabel31:
 					goto yy72;
 			}
 yy85:
-			yyaccept = 4;
+			yyaccept = 5;
 			marker = ++p;
 yyFillLabel32:
 			yych = *p;
@@ -1345,30 +1401,169 @@ yy90:
 			{ PUSH_TOKEN1(TType::RShift); continue; }
 yy91:
 			++p;
-			goto yy55;
-yy92:
-			++p;
-yy93:
-			{ line_start = p; peek_text_line(line); continue; }
-yy94:
-			++p;
 yyFillLabel33:
 			yych = *p;
 			switch (yych) {
-				case '\n': goto yy92;
+				case '\'': goto yy92;
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9':
+				case 'A':
+				case 'B':
+				case 'C':
+				case 'D':
+				case 'E':
+				case 'F':
+				case 'G':
+				case 'H':
+				case 'I':
+				case 'J':
+				case 'K':
+				case 'L':
+				case 'M':
+				case 'N':
+				case 'O':
+				case 'P':
+				case 'Q':
+				case 'R':
+				case 'S':
+				case 'T':
+				case 'U':
+				case 'V':
+				case 'W':
+				case 'X':
+				case 'Y':
+				case 'Z':
+				case '_':
+				case 'a':
+				case 'b':
+				case 'c':
+				case 'd':
+				case 'e':
+				case 'f':
+				case 'g':
+				case 'h':
+				case 'i':
+				case 'j':
+				case 'k':
+				case 'l':
+				case 'm':
+				case 'n':
+				case 'o':
+				case 'p':
+				case 'q':
+				case 'r':
+				case 's':
+				case 't':
+				case 'u':
+				case 'v':
+				case 'w':
+				case 'x':
+				case 'y':
+				case 'z': goto yy91;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel33;
 					}
-					goto yy93;
+					goto yy55;
 			}
-yy95:
+yy92:
 			++p;
-			{ PUSH_TOKEN1(TType::LogXor); continue; }
+			goto yy55;
+yy93:
+			++p;
+yyFillLabel34:
+			yych = *p;
+			switch (yych) {
+				case 'A':
+				case 'B':
+				case 'C':
+				case 'D':
+				case 'E':
+				case 'F':
+				case 'G':
+				case 'H':
+				case 'I':
+				case 'J':
+				case 'K':
+				case 'L':
+				case 'M':
+				case 'N':
+				case 'O':
+				case 'P':
+				case 'Q':
+				case 'R':
+				case 'S':
+				case 'T':
+				case 'U':
+				case 'V':
+				case 'W':
+				case 'X':
+				case 'Y':
+				case 'Z':
+				case '_':
+				case 'a':
+				case 'b':
+				case 'c':
+				case 'd':
+				case 'e':
+				case 'f':
+				case 'g':
+				case 'h':
+				case 'i':
+				case 'j':
+				case 'k':
+				case 'l':
+				case 'm':
+				case 'n':
+				case 'o':
+				case 'p':
+				case 'q':
+				case 'r':
+				case 's':
+				case 't':
+				case 'u':
+				case 'v':
+				case 'w':
+				case 'x':
+				case 'y':
+				case 'z': goto yy91;
+				default:
+					if (limit <= p) {
+						if (yyfill() == 0) goto yyFillLabel34;
+					}
+					goto yy72;
+			}
+yy94:
+			++p;
+yy95:
+			{ line_start = p; peek_text_line(line); continue; }
 yy96:
 			++p;
-			{ PUSH_TOKEN1(TType::LogOr); continue; }
+yyFillLabel35:
+			yych = *p;
+			switch (yych) {
+				case '\n': goto yy94;
+				default:
+					if (limit <= p) {
+						if (yyfill() == 0) goto yyFillLabel35;
+					}
+					goto yy95;
+			}
 yy97:
+			++p;
+			{ PUSH_TOKEN1(TType::LogXor); continue; }
+yy98:
+			++p;
+			{ PUSH_TOKEN1(TType::LogOr); continue; }
+yy99:
 			++p;
 			{
                               int n = 0;
@@ -1379,13 +1574,13 @@ yy97:
                               PUSH_TOKEN2(TType::Integer, n);
                               continue;
                             }
-yy98:
+yy100:
 			++p;
-yyFillLabel34:
+yyFillLabel36:
 			yych = *p;
 			switch (yych) {
 				case '+':
-				case '-': goto yy104;
+				case '-': goto yy106;
 				case '0':
 				case '1':
 				case '2':
@@ -1395,22 +1590,22 @@ yyFillLabel34:
 				case '6':
 				case '7':
 				case '8':
-				case '9': goto yy105;
+				case '9': goto yy107;
 				default:
 					if (limit <= p) {
-						if (yyfill() == 0) goto yyFillLabel34;
+						if (yyfill() == 0) goto yyFillLabel36;
 					}
 					goto yy72;
 			}
-yy99:
-			yyaccept = 5;
+yy101:
+			yyaccept = 6;
 			marker = ++p;
-yyFillLabel35:
+yyFillLabel37:
 			yych = *p;
-yy100:
+yy102:
 			switch (yych) {
 				case '0':
-				case '1': goto yy99;
+				case '1': goto yy101;
 				case '2':
 				case '3':
 				case '4':
@@ -1435,15 +1630,15 @@ yy100:
 				case 'h': goto yy83;
 				default:
 					if (limit <= p) {
-						if (yyfill() == 0) goto yyFillLabel35;
+						if (yyfill() == 0) goto yyFillLabel37;
 					}
-					goto yy101;
+					goto yy103;
 			}
-yy101:
+yy103:
 			{ PUSH_TOKEN2(TType::Integer, a2i(p0+2, p, 2)); continue; }
-yy102:
+yy104:
 			++p;
-yyFillLabel36:
+yyFillLabel38:
 			yych = *p;
 			switch (yych) {
 				case '0':
@@ -1467,58 +1662,58 @@ yyFillLabel36:
 				case 'c':
 				case 'd':
 				case 'e':
-				case 'f': goto yy102;
-				default:
-					if (limit <= p) {
-						if (yyfill() == 0) goto yyFillLabel36;
-					}
-					goto yy103;
-			}
-yy103:
-			{ PUSH_TOKEN2(TType::Integer, a2i(p0+2, p, 16)); continue; }
-yy104:
-			++p;
-yyFillLabel37:
-			yych = *p;
-			switch (yych) {
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-				case '9': goto yy105;
-				default:
-					if (limit <= p) {
-						if (yyfill() == 0) goto yyFillLabel37;
-					}
-					goto yy72;
-			}
-yy105:
-			++p;
-yyFillLabel38:
-			yych = *p;
-			switch (yych) {
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-				case '9': goto yy105;
+				case 'f': goto yy104;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel38;
 					}
+					goto yy105;
+			}
+yy105:
+			{ PUSH_TOKEN2(TType::Integer, a2i(p0+2, p, 16)); continue; }
+yy106:
+			++p;
+yyFillLabel39:
+			yych = *p;
+			switch (yych) {
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9': goto yy107;
+				default:
+					if (limit <= p) {
+						if (yyfill() == 0) goto yyFillLabel39;
+					}
+					goto yy72;
+			}
+yy107:
+			++p;
+yyFillLabel40:
+			yych = *p;
+			switch (yych) {
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9': goto yy107;
+				default:
+					if (limit <= p) {
+						if (yyfill() == 0) goto yyFillLabel40;
+					}
 					goto yy78;
 			}
-yy106:
+yy108:
 			{ goto end; }
 		}
 
@@ -1532,32 +1727,32 @@ string_loop:
         
 		{
 			char yych;
-yyFillLabel39:
+yyFillLabel41:
 			yych = *p;
 			switch (yych) {
 				case 0x00:
 					if (limit <= p) {
-						if (yyfill() == 0) goto yyFillLabel39;
-						goto yy135;
+						if (yyfill() == 0) goto yyFillLabel41;
+						goto yy137;
 					}
-					goto yy108;
-				case '\n': goto yy111;
-				case '\r': goto yy113;
-				case '"': goto yy114;
-				case '\'': goto yy115;
-				case '\\': goto yy116;
-				default: goto yy109;
+					goto yy110;
+				case '\n': goto yy113;
+				case '\r': goto yy115;
+				case '"': goto yy116;
+				case '\'': goto yy117;
+				case '\\': goto yy118;
+				default: goto yy111;
 			}
-yy108:
+yy110:
 			++p;
 			{ p--; scan_error(ErrMissingQuote, error); goto end; }
-yy109:
-			++p;
-yy110:
-			{ str.push_back(*p0); continue; }
 yy111:
 			++p;
 yy112:
+			{ str.push_back(*p0); continue; }
+yy113:
+			++p;
+yy114:
 			{ if (raw_strings) {
                                 str.append(string(p0, p));
                                 error = "started at " + m_location.filename +
@@ -1569,19 +1764,19 @@ yy112:
                                 scan_error(ErrMissingQuote, error); goto end;
                               }
                             }
-yy113:
+yy115:
 			++p;
-yyFillLabel40:
+yyFillLabel42:
 			yych = *p;
 			switch (yych) {
-				case '\n': goto yy111;
+				case '\n': goto yy113;
 				default:
 					if (limit <= p) {
-						if (yyfill() == 0) goto yyFillLabel40;
+						if (yyfill() == 0) goto yyFillLabel42;
 					}
-					goto yy112;
+					goto yy114;
 			}
-yy114:
+yy116:
 			++p;
 			{ if (quote == 2) {
                                 PUSH_TOKEN2(TType::String, str);
@@ -1592,7 +1787,7 @@ yy114:
                                 continue;
                               }
                             }
-yy115:
+yy117:
 			++p;
 			{ if (quote == 1) {
                                 if (str.length() != 1) {
@@ -1609,12 +1804,12 @@ yy115:
                                 continue;
                               }
                             }
-yy116:
+yy118:
 			++p;
-yyFillLabel41:
+yyFillLabel43:
 			yych = *p;
 			switch (yych) {
-				case '\n': goto yy110;
+				case '\n': goto yy112;
 				case '0':
 				case '1':
 				case '2':
@@ -1622,26 +1817,26 @@ yyFillLabel41:
 				case '4':
 				case '5':
 				case '6':
-				case '7': goto yy119;
-				case 'a': goto yy121;
-				case 'b': goto yy122;
-				case 'e': goto yy123;
-				case 'f': goto yy124;
-				case 'n': goto yy125;
-				case 'r': goto yy126;
-				case 't': goto yy127;
-				case 'v': goto yy128;
-				case 'x': goto yy129;
+				case '7': goto yy121;
+				case 'a': goto yy123;
+				case 'b': goto yy124;
+				case 'e': goto yy125;
+				case 'f': goto yy126;
+				case 'n': goto yy127;
+				case 'r': goto yy128;
+				case 't': goto yy129;
+				case 'v': goto yy130;
+				case 'x': goto yy131;
 				default:
 					if (limit <= p) {
-						if (yyfill() == 0) goto yyFillLabel41;
-						goto yy110;
+						if (yyfill() == 0) goto yyFillLabel43;
+						goto yy112;
 					}
-					goto yy117;
+					goto yy119;
 			}
-yy117:
+yy119:
 			++p;
-yy118:
+yy120:
 			{ if (raw_strings) {
                                 str.push_back(*p0); p--;
                               }
@@ -1650,94 +1845,7 @@ yy118:
                               }
                               continue;
                             }
-yy119:
-			++p;
-yyFillLabel42:
-			yych = *p;
-			switch (yych) {
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7': goto yy130;
-				default:
-					if (limit <= p) {
-						if (yyfill() == 0) goto yyFillLabel42;
-					}
-					goto yy120;
-			}
-yy120:
-			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
-                              else { str.push_back(a2i(p0+1, p, 8)); } continue; }
 yy121:
-			++p;
-			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
-                              else { str.push_back('\a'); } continue; }
-yy122:
-			++p;
-			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
-                              else { str.push_back('\b'); } continue; }
-yy123:
-			++p;
-			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
-                              else { str.push_back('\x1b'); } continue; }
-yy124:
-			++p;
-			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
-                              else { str.push_back('\f'); } continue; }
-yy125:
-			++p;
-			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
-                              else { str.push_back('\n'); } continue; }
-yy126:
-			++p;
-			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
-                              else { str.push_back('\r'); } continue; }
-yy127:
-			++p;
-			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
-                              else { str.push_back('\t'); } continue; }
-yy128:
-			++p;
-			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
-                              else { str.push_back('\v'); } continue; }
-yy129:
-			++p;
-yyFillLabel43:
-			yych = *p;
-			switch (yych) {
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-				case '9':
-				case 'A':
-				case 'B':
-				case 'C':
-				case 'D':
-				case 'E':
-				case 'F':
-				case 'a':
-				case 'b':
-				case 'c':
-				case 'd':
-				case 'e':
-				case 'f': goto yy131;
-				default:
-					if (limit <= p) {
-						if (yyfill() == 0) goto yyFillLabel43;
-					}
-					goto yy118;
-			}
-yy130:
 			++p;
 yyFillLabel44:
 			yych = *p;
@@ -1749,13 +1857,48 @@ yyFillLabel44:
 				case '4':
 				case '5':
 				case '6':
-				case '7': goto yy133;
+				case '7': goto yy132;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel44;
 					}
-					goto yy120;
+					goto yy122;
 			}
+yy122:
+			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
+                              else { str.push_back(a2i(p0+1, p, 8)); } continue; }
+yy123:
+			++p;
+			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
+                              else { str.push_back('\a'); } continue; }
+yy124:
+			++p;
+			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
+                              else { str.push_back('\b'); } continue; }
+yy125:
+			++p;
+			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
+                              else { str.push_back('\x1b'); } continue; }
+yy126:
+			++p;
+			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
+                              else { str.push_back('\f'); } continue; }
+yy127:
+			++p;
+			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
+                              else { str.push_back('\n'); } continue; }
+yy128:
+			++p;
+			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
+                              else { str.push_back('\r'); } continue; }
+yy129:
+			++p;
+			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
+                              else { str.push_back('\t'); } continue; }
+yy130:
+			++p;
+			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
+                              else { str.push_back('\v'); } continue; }
 yy131:
 			++p;
 yyFillLabel45:
@@ -1782,23 +1925,75 @@ yyFillLabel45:
 				case 'c':
 				case 'd':
 				case 'e':
-				case 'f': goto yy134;
+				case 'f': goto yy133;
 				default:
 					if (limit <= p) {
 						if (yyfill() == 0) goto yyFillLabel45;
 					}
-					goto yy132;
+					goto yy120;
 			}
 yy132:
-			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
-                              else { str.push_back(a2i(p0+2, p, 16)); } continue; }
+			++p;
+yyFillLabel46:
+			yych = *p;
+			switch (yych) {
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7': goto yy135;
+				default:
+					if (limit <= p) {
+						if (yyfill() == 0) goto yyFillLabel46;
+					}
+					goto yy122;
+			}
 yy133:
 			++p;
-			goto yy120;
+yyFillLabel47:
+			yych = *p;
+			switch (yych) {
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9':
+				case 'A':
+				case 'B':
+				case 'C':
+				case 'D':
+				case 'E':
+				case 'F':
+				case 'a':
+				case 'b':
+				case 'c':
+				case 'd':
+				case 'e':
+				case 'f': goto yy136;
+				default:
+					if (limit <= p) {
+						if (yyfill() == 0) goto yyFillLabel47;
+					}
+					goto yy134;
+			}
 yy134:
-			++p;
-			goto yy132;
+			{ if (raw_strings) { str.push_back(*p0); p = p0+1; }
+                              else { str.push_back(a2i(p0+2, p, 16)); } continue; }
 yy135:
+			++p;
+			goto yy122;
+yy136:
+			++p;
+			goto yy134;
+yy137:
 			{ scan_error(ErrMissingQuote, error); goto end; }
 		}
 

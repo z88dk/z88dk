@@ -56,14 +56,14 @@ static void url_encode(const char *s, char *enc)
 /*-----------------------------------------------------------------------------
 *   LABEL: define a label at the current location
 *----------------------------------------------------------------------------*/
-void asm_LABEL_offset(const char* name, int offset)
-{
+void asm_LABEL_offset(const char* short_name, int offset) {
 	Symbol1* sym;
 
+    const char* long_name = local_labels_add_label(short_name);
 	if (get_phased_PC() >= 0)
-		sym = define_symbol(name, get_phased_PC() + offset, TYPE_CONSTANT);
+		sym = define_symbol(long_name, get_phased_PC() + offset, TYPE_CONSTANT);
 	else
-		sym = define_symbol(name, get_PC() + offset, TYPE_ADDRESS);
+		sym = define_symbol(long_name, get_PC() + offset, TYPE_ADDRESS);
 
 	sym->is_touched = true;
 }

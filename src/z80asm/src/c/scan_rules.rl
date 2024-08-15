@@ -132,7 +132,8 @@ alnum_u = alnum | '_';
 alpha_u = alpha | '_';
 
 /* Name */
-name = alpha_u alnum_u*;
+name1 = alpha_u alnum_u*;
+name = '@' name1 | name1 '@' name1 | name1;
 
 /* Label */
 label = "." hspace0 name | name hspace0 ":";
