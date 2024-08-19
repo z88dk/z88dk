@@ -54,6 +54,8 @@ END
 capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
 $test.asm:1: error: local label without normal label before it: \@next
   ^---- \@next:
+$test.asm:3: error: local label without normal label before it: \@next
+  ^---- djnz \@next
 END
 
 
@@ -65,8 +67,22 @@ spew("${test}.asm", <<'END');
 END
 
 capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
-$test.asm:4: error: undefined symbol: \@prev
-  ^---- \@prev
+$test.asm:4: error: undefined symbol: subroutine1\@prev
+  ^---- subroutine1\@prev
+END
+
+
+spew("${test}.asm", <<'END');
+	subroutine1:
+	@next:
+	  ; do something
+	  djnz @next
+	@next:
+END
+
+capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
+$test.asm:5: error: duplicate definition: subroutine1\@next
+  ^---- \@next:
 END
 
 
@@ -75,19 +91,17 @@ spew("${test}.asm", <<'END');
 END
 
 capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
+$test.asm:1: error: local label without normal label before it: \@next
+  ^---- djnz \@next
 $test.asm:1: error: undefined symbol: \@next
   ^---- \@next
 END
 
 
 spew("${test}.asm", <<'END');
-	hello@world:
+	hello@world@earth:
 END
 
-capture_nok("z88dk-z80asm -b ${test}.asm", <<END);
-$test.asm:1: error: illegal local label: hello\@world
-  ^---- hello\@world:
-END
 
 unlink_testfiles;
 done_testing;

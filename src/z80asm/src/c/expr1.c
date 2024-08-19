@@ -54,7 +54,6 @@ UT_icd ut_exprs_icd = { sizeof(Expr1*), ut_exprs_init, NULL, ut_exprs_dtor };
 static void ExprOp_init_asmpc(ExprOp* self);
 static void ExprOp_init_number(ExprOp* self, long value);
 static void ExprOp_init_symbol(ExprOp* self, Symbol1* symbol);
-static void ExprOp_init_symbol_name(ExprOp* self, const char* name);
 static void ExprOp_init_operator(ExprOp* self, tokid_t tok, op_type_t op_type);
 
 /*-----------------------------------------------------------------------------
@@ -261,12 +260,6 @@ void ExprOp_init_symbol(ExprOp* self, Symbol1* symbol)
 	self->d.symbol = symbol;
 }
 
-void ExprOp_init_symbol_name(ExprOp* self, const char* name)
-{
-	self->op_type = SYMBOL_NAME_OP;
-	self->d.name = name;
-}
-
 void ExprOp_init_operator(ExprOp* self, tokid_t tok, op_type_t op_type)
 {
 	Operator* op;
@@ -319,15 +312,6 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 			expr->is_computed = false;
 
 		break;
-
-    case SYMBOL_NAME_OP:        // local label, not defined yet
-        expr->result.not_evaluable = true;
-        expr->result.undefined_symbol = true;
-        expr->type = TYPE_UNDEFINED;
-        if (not_defined_error)
-            error(ErrUndefinedSymbol, self->d.name);
-        Calc_push(0);
-        break;
 
 	case ASMPC_OP:
 		if (get_phased_PC() >= 0) {
@@ -427,6 +411,7 @@ static bool Expr_parse_ternary_cond(Expr1* expr);
 static bool Expr_parse_factor(Expr1* self)
 {
 	Symbol1* symptr;
+    const char* short_name, * long_name;
 
 	switch (sym.tok)
 	{
@@ -440,20 +425,15 @@ static bool Expr_parse_factor(Expr1* self)
 		break;
 
 	case TK_NAME:
-        if (local_labels_is_local(sym_text(&sym))) {
-            const char* short_name = spool_add(sym_text(&sym));
-            ExprOp_init_symbol_name(ExprOpArray_push(self->rpn_ops), short_name);
-            local_labels_add_pending_expr(self);
-        }
-        else {
-            symptr = get_used_symbol(sym_text(&sym));
-            ExprOp_init_symbol(ExprOpArray_push(self->rpn_ops), symptr);
+        short_name = spool_add(sym_text(&sym));
+        long_name = local_labels_add_label(short_name);
+        symptr = get_used_symbol(long_name);
+        ExprOp_init_symbol(ExprOpArray_push(self->rpn_ops), symptr);
 
-            /* copy type */
-            self->type = MAX(self->type, symptr->type);
-        }
+        /* copy type */
+        self->type = MAX(self->type, symptr->type);
 
-		Str_append_n(self->text, sym.tstart, sym.tlen);		/* add identifier to infix expr */
+		Str_append(self->text, long_name);      /* add identifier to infix expr */
 
 		GetSym();
 		break;
