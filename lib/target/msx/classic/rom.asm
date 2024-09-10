@@ -250,6 +250,7 @@ ENDIF
         defc __crt_model = 1
     ENDIF
 
+
     INCLUDE "crt/classic/crt_runtime_selection.inc"
     INCLUDE "crt/classic/crt_section.inc"
 
@@ -261,7 +262,6 @@ __current_bank:	defb	1
   ELSE
 __current_bank:	defb	2
   ENDIF
-ENDIF
 
    SECTION bss_driver
 
@@ -273,6 +273,5 @@ tempstack:      defs    CLIB_BANKING_STACK_SIZE
 
 tempsp: defw    tempstack + CLIB_BANKING_STACK_SIZE
 
-IF MAPPER_ADDRESS_8000 != 0
     INCLUDE "target/msx/classic/megarom.asm"
 ENDIF
