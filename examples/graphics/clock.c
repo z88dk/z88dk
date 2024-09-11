@@ -16,6 +16,8 @@
  *  zcc +cpm -subtype=mbc200 -DDETAILED -DFULL_HRG -create-app -lndos  -lm clock.c
  * Visual 1050, very high resolution, CP/M 3 supports time/date
  *  zcc +cpm -subtype=v1050 -DDETAILED -DFULL_HRG -Dhires -create-app -lndos  -lm -DHAVE_TIME clock.c
+ * Commodore 128, high resolution
+ *  zcc +c128 -create-app -lgfx128hr -DDETAILED -DFULL_HRG -Dhires  clock.c
 
  *  Add -DHAVE_TIME if the machine has a hardware clock that can be read
 
@@ -29,6 +31,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+
+#ifdef __C128__
+#include <c128/cia.h>
+unsigned char appTOD[4]; // = {0,0,0,0}; /* used to set tod clock to 12 am */
+#endif
 
 #ifdef hires
 #define XDIV 128
@@ -100,6 +107,12 @@ void main()
 	j=atoi(hr);
 #endif
 
+#ifdef __C128__
+  settodcia(cia2,appTOD);
+  setintctrlcia(cia2,ciaClearIcr);
+  settimeracia(cia2,timervalcia(1000),ciaCPUCont); /* set timer to one second */
+#endif
+
 	k=k*5+(j/12);
 	if (k<15)
 		k=k+45;
@@ -156,11 +169,14 @@ void main()
 	x=-1;
 
 	i=0;
-	
-	tm=clock();
-	
+
 	while (getk()!=' ') {
-		tm=clock();
+		#ifdef __C128__
+			gettodcia(cia2,appTOD);
+			tm=appTOD[3];
+		#else	
+			tm=clock();
+		#endif
 		if (i++ == 59) i=0;
 		if (i == 45) {
 			if (x != -1) {
@@ -230,10 +246,14 @@ void main()
 		circle(cx,cy,5,1);
 #endif
 
+#ifdef __C128__
+	while (tm == appTOD[3]) gettodcia(cia2,appTOD);
+	tm=appTOD[3];
+#else
 		//sleep (1);
 		while ((clock() < (tm+CLOCKS_PER_SEC))&&(clock() > CLOCKS_PER_SEC)) {}
 		tm=clock();
-	
+#endif	
 	}
 
 }
