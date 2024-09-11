@@ -35,7 +35,8 @@
 
 #ifdef __C128__
 #include <c128/cia.h>
-unsigned char appTOD[4]; // = {0,0,0,0}; /* used to set tod clock to 12 am */
+// 4 bytes: Hrs, Min, Sec, Ten
+unsigned char appTOD[4];
 #endif
 
 #ifdef hires
@@ -113,9 +114,8 @@ void main()
 #endif
 
 #ifdef __C128__
+  // An initial timer setup kicks it off
   settodcia(cia2,appTOD);
-  //setintctrlcia(cia2,ciaClearIcr);
-  //settimeracia(cia2,timervalcia(1000),ciaCPUCont);
 #endif
 
 	k=k*5+(j/12);
