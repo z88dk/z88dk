@@ -16,8 +16,9 @@
  *  zcc +cpm -subtype=mbc200 -DDETAILED -DFULL_HRG -create-app -lndos  -lm clock.c
  * Visual 1050, very high resolution, CP/M 3 supports time/date
  *  zcc +cpm -subtype=v1050 -DDETAILED -DFULL_HRG -Dhires -create-app -lndos  -lm -DHAVE_TIME clock.c
- * Commodore 128, high resolution
+ * Commodore 128 (high and low resolution)
  *  zcc +c128 -create-app -lgfx128hr -DDETAILED -DFULL_HRG -Dhires  clock.c
+ *  zcc +c128 -create-app -lgfx128 clock.c
 
  *  Add -DHAVE_TIME if the machine has a hardware clock that can be read
 
@@ -72,7 +73,11 @@ int x_hr,y_hr;
 int i,j,k;
 int sz, long_sz, short_sz;
 int cx,cy;
+#ifdef __C128__
+unsigned char tm;
+#else
 long tm;
+#endif
 char hr[10],mn[10];
 
 void main()
@@ -109,8 +114,8 @@ void main()
 
 #ifdef __C128__
   settodcia(cia2,appTOD);
-  setintctrlcia(cia2,ciaClearIcr);
-  settimeracia(cia2,timervalcia(1000),ciaCPUCont); /* set timer to one second */
+  //setintctrlcia(cia2,ciaClearIcr);
+  //settimeracia(cia2,timervalcia(1000),ciaCPUCont);
 #endif
 
 	k=k*5+(j/12);
@@ -173,7 +178,7 @@ void main()
 	while (getk()!=' ') {
 		#ifdef __C128__
 			gettodcia(cia2,appTOD);
-			tm=appTOD[3];
+			tm=appTOD[2];   // seconds field
 		#else	
 			tm=clock();
 		#endif
@@ -247,8 +252,8 @@ void main()
 #endif
 
 #ifdef __C128__
-	while (tm == appTOD[3]) gettodcia(cia2,appTOD);
-	tm=appTOD[3];
+	while (tm == appTOD[2]) gettodcia(cia2,appTOD);
+	tm=appTOD[2];    // seconds field
 #else
 		//sleep (1);
 		while ((clock() < (tm+CLOCKS_PER_SEC))&&(clock() > CLOCKS_PER_SEC)) {}
