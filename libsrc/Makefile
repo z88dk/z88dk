@@ -1682,8 +1682,8 @@ gfx128udg.lib: $(TARGET_CLIB_OBJS) gfx128.lib
 	$(RM) target/c128/graphics/*.o
 	$(RM) target/c128/graphics/udg/*.o
 	$(MAKE) -C target/c128
-	$(MAKE) -C gfx TARGET=c128 FLAVOUR="narrow text6"
-	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128udg -x$(OUTPUT_DIRECTORY)/gfx128udg @$(TARGET_DIRECTORY)/c128/gfx128udg.lst
+	$(MAKE) -C gfx TARGET=c128 FLAVOUR="text6 narrow"  SUBTYPE=c128udg
+	TARGET=c128udg TYPE=z80 $(LIBLINKER) -DFORc128udg -x$(OUTPUT_DIRECTORY)/gfx128udg @$(TARGET_DIRECTORY)/c128/gfx128udg.lst
 
 # C128 HRG graphics lib - Stefano
 gfx128hr.lib: $(TARGET_CLIB_OBJS) gfx128udg.lib
