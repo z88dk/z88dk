@@ -12,11 +12,17 @@
 
 #include <termcap.h>
 #include <conio.h>
+#include <stdlib.h>
 
 #define move(x,y) gotoxy(x,y)
 #define mvaddch(x,y,c) gotoxy(x,y);fputc_cons(c)
+
 #define beep() fputc_cons(7)
 #define flash() fputc_cons(7)
+#define	clear() clrscr()
+#define	erase() clrscr()
+#define refresh() {}
+#define doupdate() {}
 
 // We'd need a trick to get a variadic macro, here
 #define mvprintw(x,y,a) gotoxy(x,y);printf(a)
@@ -26,9 +32,12 @@
 #endif
 
 // show/hide cursor
-#define curs_set(v) v?puts_cons("\033x5"):puts_cons("\033y5")
+#define curs_set(v) {(v==0)?puts_cons("\033x5"):puts_cons("\033y5");}
 
 #define getch() getk()
+#define flushinp() {while(getk()){}}
+
+#define napms(t) msleep(t)
 
 
 // --------------------------------------------------------------------------------------------------------
