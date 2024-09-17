@@ -36,7 +36,7 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
 //#define	textattr(a)		cprintf("\x1b[%dm",a)
 #define	clrscr()		cprintf("\x1b[2J")
-#define	gotoxy(x,y)		cprintf("\x1b[%d;%df",y,x)
+#define	gotoxy(x,y)		cprintf("\x1b[%d;%df",y+1,x+1)
 #define textcolor(a)	        cprintf("\x1b[%um",PCDOS_COLORS[a]+30)
 #define textbackground(a)	cprintf("\x1b[%um",PCDOS_COLORS[a]+40)
 #define textattr(a)	        cprintf("\x1b[%um\033[%um",PCDOS_COLORS[a&0xF]+30,PCDOS_COLORS[a>>4]+40)
