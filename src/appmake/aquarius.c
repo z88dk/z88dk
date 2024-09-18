@@ -9,6 +9,7 @@
  *
  *   Stefano Bodrato - December 2001: first release
  *   Stefano Bodrato - Fall 2022: WAV output options
+ *   Craig Hackney   - September 2024: Addition of .aqx output for Aquarius+
  *
  *   $Id: aquarius.c $
  */
@@ -17,6 +18,7 @@
 
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
+static char				*crtfile	  = NULL;
 static char              audio        = 0;
 static char              fast         = 0;
 static char              khz_22       = 0;
@@ -24,6 +26,7 @@ static char              dumb         = 0;
 static char              loud         = 0;
 static char              help         = 0;
 static char              aqx          = 0;
+static int				 origin       = -1;
 
 static uint8_t           h_lvl;
 static uint8_t           l_lvl;
@@ -40,6 +43,8 @@ option_t aquarius_options[] = {
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
     {  0,  "aqx",      "Output .aqx file for Aquarius+",  OPT_BOOL,  &aqx },
+    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
+    {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -176,10 +181,10 @@ int aquarius_exec(char *target)
 		}
 
 
-	/*
-	 *	Now we try to determine the size of the file
-	 *	to be converted
-	 */
+		/*
+	 	*	Now we try to determine the size of the file
+	 	*	to be converted
+	 	*/
 	 
 		if	(fseek(fpin,0,SEEK_END)) {
 			printf("Couldn't determine size of file\n");
@@ -192,11 +197,49 @@ int aquarius_exec(char *target)
 		
 		fseek(fpin,0L,SEEK_SET);
 		
-	/****************/
-	/* BASIC loader */
-	/****************/
+		if ( aqx ) {
+		    char   crtname[FILENAME_MAX];
+			long loadAddr;
 
-		if ( !aqx ) {
+			// Generate the crtfile name from the binary file name
+			// if it's not passed in on the command line
+			if ( crtfile == NULL ) {
+		        strncpy(crtname, filename, FILENAME_MAX);
+		        suffix_change(crtname, "");
+		        crtfile = crtname;
+			}
+
+			// Override the load and exec address if origin is set from the command line
+			if ( origin >= 0 ) {
+				loadAddr = origin;
+			} else {
+				// Try to find the CRT_ORG_CODE symbol
+				if ( (loadAddr = parameter_search(crtfile, ".map", "CRT_ORG_CODE") ) < 0 )
+			       	exit_log(1, "Error: Could not determine load address. Specify the --org parameter.\n");
+			}
+
+			// Open the output file
+			if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+			    exit_log(1, "Error: Could not create binary file (%s)\n", filename);
+			}
+
+			// Generate the .aqx header
+			writestring("AQPLUSEXEC", fpout);
+			writeword(loadAddr,fpout);	// load address
+			writeword(len,fpout);		// length
+			writeword(loadAddr,fpout);	// exec address
+
+			/* We append the binary file */
+			for (i=0; i<len;i++) {
+				c=getc(fpin);
+				writebyte(c,fpout);
+			}
+
+		} else {
+			/****************/
+			/* BASIC loader */
+			/****************/
+
 			// Create the loader name, we need to take the zdirname, add an underscore, then the filename
 			copy1 = strdup(filename);
 			copy2 = strdup(filename);
@@ -288,29 +331,18 @@ int aquarius_exec(char *target)
 				writebyte(0,fpout);
 
 			fclose(fpout);
-		}
 
 
-		/*********************/
-		/* Binary array file */
-		/*********************/
+			/*********************/
+			/* Binary array file */
+			/*********************/
 
-		/* Write out the header  */
-		if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-			printf("Can't create the data file\n");
-			exit(1);
-		}
+			/* Write out the header  */
+			if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+				printf("Can't create the data file\n");
+				exit(1);
+			}
 
-		if ( aqx ) {
-			sprintf(mybuf,"AQPLUSEXEC");
-			for	(i=0;i<strlen(mybuf);i++)
-				writebyte(mybuf[i],fpout);
-
-			writeword(0x4000,fpout); // load address
-			writeword(len,fpout); // length
-			writeword(0x4000,fpout); // exec address
-
-		} else {
 			// "ffffffffffffffffffffffff 
 
 			/* Write out the header  */
@@ -361,22 +393,22 @@ int aquarius_exec(char *target)
 
 			for	(i=1;i<=41;i++)
 				writebyte(0,fpout);
+
+			/* We append the binary file */
+
+			for (i=0; i<len;i++) {
+				c=getc(fpin);
+				writebyte(c,fpout);
+			}
+
+			/* Now let's append zeroes and close */
+
+			for	(i=1;i<=(len%4);i++)
+				writebyte(0,fpout);
+
+			for	(i=1;i<=38;i++)
+				writebyte(0,fpout);
 		}
-
-	/* We append the binary file */
-
-		for (i=0; i<len;i++) {
-			c=getc(fpin);
-			writebyte(c,fpout);
-		}
-
-	/* Now let's append zeroes and close */
-
-		for	(i=1;i<=(len%4);i++)
-			writebyte(0,fpout);
-
-		for	(i=1;i<=38;i++)
-			writebyte(0,fpout);
 
 		fclose(fpin);
 		fclose(fpout);
