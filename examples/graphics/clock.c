@@ -6,19 +6,23 @@
  *  be sleep(1) or csleep(95) or a delay loop.
  * 
  *  Build examples
- *  zcc +zx -oclock -lndos -create-app -lm  -DDETAILED clock.c
- * ZX81, high resolution mod
- *  zcc +zx81ansi -oclock -startup=3 -lgfx81hr192 -lndos -create-app  -DDETAILED clock.c
- *  zcc +zx81 -oclock -startup=2 -lgfx81 -lndos -create-app  clock.c
+ *
+ * Standard build, e.g. on a ZX Spectrum 
+ *  zcc +zx -oclock -lndos -create-app -DDETAILED clock.c
+ * ZX81, high resolution mod and low resolution
+ *  zcc +zx81 -oclock -clib=ansi -subtype=wrx -create-app -DDETAILED clock.c
+ *  zcc +zx81 -oclock -lgfx81 -create-app  clock.c
  * Timex Sinclair 2068, double resolution on X axis
- *  zcc +ts2068 -pragma-define:CLIB_ZX_CONIO32=1 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -DDETAILED -create-app  -Dhires clock.c
+ *  zcc +ts2068 -oclock -pragma-define:CLIB_ZX_CONIO32=1 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -DDETAILED -create-app  -Dhires clock.c
  * SANYO MBC-200, very high resolution
- *  zcc +cpm -subtype=mbc200 -DDETAILED -DFULL_HRG -create-app -lndos  -lm clock.c
+ *  zcc +cpm -oclock -subtype=mbc200 -DDETAILED -DFULL_HRG -create-app -lndos  clock.c
  * Visual 1050, very high resolution, CP/M 3 supports time/date
- *  zcc +cpm -subtype=v1050 -DDETAILED -DFULL_HRG -Dhires -create-app -lndos  -lm -DHAVE_TIME clock.c
+ *  zcc +cpm -oclock -subtype=v1050 -DDETAILED -DFULL_HRG -Dhires -create-app -lndos  -DHAVE_TIME clock.c
  * Commodore 128 (high and low resolution)
- *  zcc +c128 -create-app -lgfx128hr -DDETAILED -DFULL_HRG -Dhires  clock.c
- *  zcc +c128 -create-app -lgfx128 clock.c
+ *  zcc +c128 -oclock -create-app -lgfx128hr -DDETAILED -DFULL_HRG -Dhires  clock.c
+ *  zcc +c128 -oclock -create-app -lgfx128 clock.c
+ * Philips P2000 (mid resolution)
+ *  zcc +p2000 -oclock -create-app clock.c
 
  *  Add -DHAVE_TIME if the machine has a hardware clock that can be read
 
