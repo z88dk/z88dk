@@ -245,9 +245,8 @@ _basename:
     DEFINE NEED_basename
     INCLUDE "zcc_opt.def"
     UNDEFINE NEED_basename
-    defb    '.'
 __basename_ext:
-    defm    "00"
+    defm    "00.bin"
     defb    0
 
 mainsp:     defw    0
