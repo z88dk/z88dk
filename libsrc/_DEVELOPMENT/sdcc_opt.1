@@ -606,6 +606,14 @@ __xinit_%0
 	call	banked_call
 	defq	%2
 
+	ld	e,%1
+	ld	hl,%2
+	jp  ___sdcc_bcall_ehl
+=
+	call	banked_call
+	defq	%2
+	ret
+
 ;; 
 ;; ez80 instructions
 
