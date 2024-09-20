@@ -930,7 +930,7 @@ aqplus.lib: $(TARGET_CLIB_OBJS) aquarius_clib.lib
 	@echo '--- Building Mattel Aquarius Plus lib ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=aquarius SUBTYPE=aqplus FLAVOUR="wide"
-	TARGET=aqplus TYPE=z80 $(LIBLINKER) -DFORaqplus -x$(OUTPUT_DIRECTORY)/aqplus @$(TARGET_DIRECTORY)/aquarius/aqplus.lst
+	TARGET=aqplus TYPE=z80 $(LIBLINKER) -DFORaqplus -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/aqplus @$(TARGET_DIRECTORY)/aquarius/aqplus.lst
 
 
 # Aussie Byte library - Stefano
