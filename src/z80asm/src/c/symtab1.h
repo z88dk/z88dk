@@ -110,3 +110,4 @@ extern void check_undefined_symbols(Symbol1Hash *symtab);
 *----------------------------------------------------------------------------*/
 extern void init_local_labels(void);
 extern const char* local_labels_add_label(const char* short_name);
+extern const char* local_labels_use_label(const char* short_name);
