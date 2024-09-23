@@ -691,9 +691,8 @@ static disc_spec mz800_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-    .has_skew = 1,
-    .skew_track_start = 0,
-    .skew_tab = { 0, 4, 1, 5, 2, 6, 3, 7 }
+    .has_skew = 0,
+    .side2_sector_numbering = 1
 };
 
 
