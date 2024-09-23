@@ -735,11 +735,15 @@ void init_local_labels(void) {
     last_global_label = spool_add("");
 }
 
-const char* local_labels_add_label(const char* short_name) {
+static const char* local_labels_add_use(bool is_add, const char* short_name) {
     const char* p = strchr(short_name, '@');
     if (p == NULL) {                // standard label, no @
-        last_global_label = spool_add(short_name);
-        return last_global_label;
+        if (is_add) {
+            last_global_label = spool_add(short_name);
+            return last_global_label;
+        }
+        else
+            return short_name;
     }
     else if (p == short_name) {     // @label
         if (*last_global_label == '\0') {
@@ -758,4 +762,12 @@ const char* local_labels_add_label(const char* short_name) {
     else {                          // label@label
         return spool_add(short_name);
     }
+}
+
+const char* local_labels_add_label(const char* short_name) {
+    return local_labels_add_use(true, short_name);
+}
+
+const char* local_labels_use_label(const char* short_name) {
+    return local_labels_add_use(false, short_name);
 }
