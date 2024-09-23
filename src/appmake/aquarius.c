@@ -9,7 +9,7 @@
  *
  *   Stefano Bodrato - December 2001: first release
  *   Stefano Bodrato - Fall 2022: WAV output options
- *   Craig Hackney   - September 2024: Addition of .aqx output for Aquarius+
+ *   Craig Hackney   - September 2024: Addition of .aqex output for Aquarius+
  *
  *   $Id: aquarius.c $
  */
@@ -25,7 +25,7 @@ static char              khz_22       = 0;
 static char              dumb         = 0;
 static char              loud         = 0;
 static char              help         = 0;
-static char              aqx          = 0;
+static char              aqex         = 0;
 static int				 origin       = -1;
 
 static uint8_t           h_lvl;
@@ -42,7 +42,7 @@ option_t aquarius_options[] = {
     {  0,  "22",       "22050hz bitrate option",     OPT_BOOL,  &khz_22 },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
-    {  0,  "aqx",      "Output .aqx file for Aquarius+",  OPT_BOOL,  &aqx },
+    {  0,  "aqex",     "Output .aqex file for Aquarius+",  OPT_BOOL,  &aqex },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
@@ -166,8 +166,8 @@ int aquarius_exec(char *target)
     } else {
 		if ( outfile == NULL ) {
 			strcpy(filename,binname);
-			if ( aqx ) {
-				suffix_change(filename,".aqx");
+			if ( aqex ) {
+				suffix_change(filename,".aqex");
 			} else {
 				suffix_change(filename,".caq");
 			}
@@ -197,7 +197,7 @@ int aquarius_exec(char *target)
 		
 		fseek(fpin,0L,SEEK_SET);
 		
-		if ( aqx ) {
+		if ( aqex ) {
 		    char   crtname[FILENAME_MAX];
 			long loadAddr;
 
