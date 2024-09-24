@@ -26,6 +26,7 @@ static char              dumb         = 0;
 static char              loud         = 0;
 static char              help         = 0;
 static char              aqex         = 0;
+static char              aqx          = 0;
 static int				 origin       = -1;
 
 static uint8_t           h_lvl;
@@ -43,6 +44,7 @@ option_t aquarius_options[] = {
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
     {  0,  "aqex",     "Output .aqex file for Aquarius+",  OPT_BOOL,  &aqex },
+    {  0,  "aqx",      "Output .aqx file for Aquarius+",   OPT_BOOL,  &aqx },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
@@ -168,6 +170,8 @@ int aquarius_exec(char *target)
 			strcpy(filename,binname);
 			if ( aqex ) {
 				suffix_change(filename,".aqex");
+			} else if ( aqx ) {
+				suffix_change(filename,".aqx");
 			} else {
 				suffix_change(filename,".caq");
 			}
@@ -197,9 +201,9 @@ int aquarius_exec(char *target)
 		
 		fseek(fpin,0L,SEEK_SET);
 		
-		if ( aqex ) {
+		if ( aqex || aqx ) {
 		    char   crtname[FILENAME_MAX];
-			long loadAddr;
+			unsigned loadAddr;
 
 			// Generate the crtfile name from the binary file name
 			// if it's not passed in on the command line
@@ -223,11 +227,43 @@ int aquarius_exec(char *target)
 			    exit_log(1, "Error: Could not create binary file (%s)\n", filename);
 			}
 
-			// Generate the .aqx header
-			writestring("AQPLUSEXEC", fpout);
-			writeword(loadAddr,fpout);	// load address
-			writeword(len,fpout);		// length
-			writeword(loadAddr,fpout);	// exec address
+			if (aqex) {
+				// Generate the .aqx header
+				writestring("AQPLUSEXEC", fpout);
+				writeword(loadAddr,fpout);	// load address
+				writeword(len,fpout);		// length
+				writeword(loadAddr,fpout);	// exec address
+			} else {
+				char execAddrStr[16];
+				sprintf(execAddrStr, "($%04x)", loadAddr);
+
+				/* Write out the header  */
+				for	(i=1;i<=12;i++)
+					writebyte(0xff,fpout);
+				writebyte(0x00,fpout);
+				writestring("LOADR",fpout);
+				writebyte(0x00,fpout);
+				for	(i=1;i<=12;i++)
+					writebyte(0xff,fpout);
+				writebyte(0x00,fpout);
+
+				// BASIC program loaded to $3901
+				writeword(0x3912,fpout);	/* points to next line */
+				writeword(0x000a,fpout);	/* Line #10 */
+
+				// X=USR
+				writebyte(0x58,fpout);
+				writebyte(0xb0,fpout);
+				writebyte(0xb5,fpout);
+
+				// ($xxxx)
+				writestring(execAddrStr,fpout); /* start address */
+
+				// Pad to the load address
+				for(i=0; i<(loadAddr-0x390f); i++)
+					writebyte(0x00,fpout);
+
+			}
 
 			/* We append the binary file */
 			for (i=0; i<len;i++) {
