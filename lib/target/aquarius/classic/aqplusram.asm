@@ -65,8 +65,16 @@ setup_far_heap:
     push    af                  ;Save it
     srl     a                   ;/4
     srl     a
-    ld      de,+((((CLIB_FARHEAP_FIRST - AQPLUS_FIRST_BANK) >> 2) +1) % 256)
-    ld      hl,0
+    ;
+    ; Bank number is e:hl[15:14], offset is hl[13:0]
+    ;
+    ; Add 1 to e because this value is used to determine if
+    ; bank should be changed. Since this is far heap, bank is 
+    ; always changed. The 1 is removed before the physical
+    ; address and bank number are calculated.
+    ;
+    ld      de,((CLIB_FARHEAP_FIRST - AQPLUS_FIRST_BANK) >> 2) + 1
+    ld      hl,(CLIB_FARHEAP_FIRST - AQPLUS_FIRST_BANK) << 14
     and     a
     jr      z,handle_residual
     ld      b,a
@@ -251,6 +259,7 @@ _basename:
     DEFINE NEED_basename
     INCLUDE "zcc_opt.def"
     UNDEFINE NEED_basename
+    defm    "_BANK_"
 __basename_ext:
     defm    "00.bin"
     defb    0

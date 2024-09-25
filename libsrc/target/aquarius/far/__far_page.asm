@@ -21,7 +21,7 @@ __far_page:
     rl      d
     rla
     rl      d
-    ; e is now which bank we should look at
+    ; d is now which bank we should look at
     ld      a,b
     and     @00111111      ;Take mod 16384
     or      @11000000	   ;Map to 0xc000 page
