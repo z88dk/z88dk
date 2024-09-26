@@ -14,13 +14,11 @@ l_far_mapaddr:
     ld      a,e    ; If banked address is 0x00nnnn, then address absolutely
     and     a 
     ret     z
-    dec     e      ; __banked starts from 1
     ld      d,0
     srl     e
     rr      d
     srl     e
     rr      d
-    inc     e      ; And far segment is +1
     ld      a,h    ; Map to right offset in the 64k segment
     and     @00111111
     or      d

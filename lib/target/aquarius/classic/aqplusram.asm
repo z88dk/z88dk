@@ -15,7 +15,7 @@ ENDIF
 
 
 IFNDEF CLIB_FARHEAP_FIRST
-    defc CLIB_FARHEAP_FIRST = AQPLUS_FIRST_BANK
+    defc CLIB_FARHEAP_FIRST = 35
 ENDIF
 
 IF CLIB_FARHEAP_BANKS = -1
@@ -65,8 +65,11 @@ setup_far_heap:
     push    af                  ;Save it
     srl     a                   ;/4
     srl     a
-    ld      de,+((((CLIB_FARHEAP_FIRST - AQPLUS_FIRST_BANK) >> 2) +1) % 256)
-    ld      hl,0
+    ;
+    ; Bank number is e:hl[15:14], offset is hl[13:0]
+    ;
+    ld      de,CLIB_FARHEAP_FIRST >> 2
+    ld      hl,CLIB_FARHEAP_FIRST << 14
     and     a
     jr      z,handle_residual
     ld      b,a
@@ -124,7 +127,6 @@ banked_call:
     ld      d,(hl)
     inc     hl
     ld      a,(hl)          ; ...and page
-    add     AQPLUS_FIRST_BANK - 1
     inc     hl
     inc     hl              ; Yes this should be here
     push    hl              ; Push the real return address
@@ -148,25 +150,45 @@ banked_call:
     EXTERN  __esp_send_byte
     EXTERN  __esp_send_bytes
     EXTERN  __esp_read_byte
+    EXTERN  __esp_read_bytes
     EXTERN  asm_strlen
     
-; Load banks 35 -> 63 (we call them 1 ->29 )
+; Load RAM pages 32 -> 63 (we call them bank 0 -> 31)
 loadbanks:
     ; Save current binding
     in      a,(PORT_BANK3)
     push    af
-    ld      a,1
+    xor     a
 loadloop:
     push    af
-    add     AQPLUS_FIRST_BANK - 1  ;We use banks 1 - 29 for compatibility with other targets
+    add     AQPLUS_FIRST_BANK
     out     (PORT_BANK3),a
-    sub     AQPLUS_FIRST_BANK - 1
+    sub     AQPLUS_FIRST_BANK
     call    setext
+    ld      hl,_basename
+    ld      de, $C000
+    call    readFile
+    pop     af
+    inc     a
+    cp      32
+    jr      nz,loadloop
+    pop     af
+    out     (PORT_BANK3),a
+    ret
+
+    PUBLIC  readFile
+    ;
+    ; Read up to 16K from a file on the SD card
+    ;
+    ; Input:
+    ;   hl - Pointer to null terminated file name
+    ;   de - Destination address for file contents
+    ;
+readFile:
     ld      a,ESPCMD_OPEN
     call    __esp_send_cmd
     xor     a                   ;O_RDONLY
     call    __esp_send_byte
-    ld      hl,_basename
     push    hl
     call    asm_strlen
     ld      bc,hl
@@ -175,7 +197,7 @@ loadloop:
     call    __esp_send_bytes
     call    __esp_read_byte     ;Read fd
     bit     7,a
-    jr      nz,next
+    jr      nz, closeAll
     ld      b,a                 ;Keep fd safe
     ld      a,ESPCMD_READ
     call    __esp_send_cmd
@@ -190,34 +212,20 @@ loadloop:
     ; Read result
     call    __esp_read_byte
     and     a
-    jr      nz,next
+    jr      nz, closeAll
     ; Read offered length
     call    __esp_read_byte
     ld      c,a
     call    __esp_read_byte
     ld      b,a
     ; And read into our bank
-    ld      hl,$C000
-loop:
-    ld      a,b
-    or      c
-    jr      z,next
-    call    __esp_read_byte
-    ld      (hl),a
-    inc     hl
-    dec     bc
-    jr      loop
-next:
-    pop     af
-    inc     a
-    cp      29
-    jr      nz,loadloop
+    ex      de, hl
+    call    __esp_read_bytes
+closeAll:
     ; Close all files
     ld      a,ESPCMD_CLOSEALL
     call    __esp_send_cmd
     call    __esp_read_byte     ;Read the response
-    pop     af
-    out     (PORT_BANK3),a
     ret
 
 setext:
@@ -245,6 +253,7 @@ _basename:
     DEFINE NEED_basename
     INCLUDE "zcc_opt.def"
     UNDEFINE NEED_basename
+    defm    "_BANK_"
 __basename_ext:
     defm    "00.bin"
     defb    0

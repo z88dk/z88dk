@@ -15,13 +15,12 @@ __far_page:
     and     a
     jr      z,localfar
     ld      d,e
-    dec     d
     ld      a,b
     rla
     rl      d
     rla
     rl      d
-    ; e is now which bank we should look at
+    ; d is now which bank we should look at
     ld      a,b
     and     @00111111      ;Take mod 16384
     or      @11000000	   ;Map to 0xc000 page
@@ -29,7 +28,6 @@ __far_page:
     ld      l,c
     ; hl = offset within bank
     ld      a,d
-    add     AQPLUS_FIRST_BANK	;0x01xxxx starts at AQPLUS_FIRST_BANK
     out     (PORT_BANK3),a
     ret
 
