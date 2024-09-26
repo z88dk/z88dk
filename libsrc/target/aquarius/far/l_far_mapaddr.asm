@@ -19,7 +19,6 @@ l_far_mapaddr:
     rr      d
     srl     e
     rr      d
-    inc     e      ; And far segment is +1
     ld      a,h    ; Map to right offset in the 64k segment
     and     @00111111
     or      d

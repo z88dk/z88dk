@@ -68,13 +68,8 @@ setup_far_heap:
     ;
     ; Bank number is e:hl[15:14], offset is hl[13:0]
     ;
-    ; Add 1 to e because this value is used to determine if
-    ; bank should be changed. Since this is far heap, bank is 
-    ; always changed. The 1 is removed before the physical
-    ; address and bank number are calculated.
-    ;
-    ld      de,((CLIB_FARHEAP_FIRST - AQPLUS_FIRST_BANK) >> 2) + 1
-    ld      hl,(CLIB_FARHEAP_FIRST - AQPLUS_FIRST_BANK) << 14
+    ld      de,CLIB_FARHEAP_FIRST >> 2
+    ld      hl,CLIB_FARHEAP_FIRST << 14
     and     a
     jr      z,handle_residual
     ld      b,a
@@ -132,7 +127,6 @@ banked_call:
     ld      d,(hl)
     inc     hl
     ld      a,(hl)          ; ...and page
-    add     AQPLUS_FIRST_BANK
     inc     hl
     inc     hl              ; Yes this should be here
     push    hl              ; Push the real return address

@@ -15,7 +15,6 @@ __far_page:
     and     a
     jr      z,localfar
     ld      d,e
-    dec     d
     ld      a,b
     rla
     rl      d
@@ -29,7 +28,6 @@ __far_page:
     ld      l,c
     ; hl = offset within bank
     ld      a,d
-    add     AQPLUS_FIRST_BANK	;0x01xxxx starts at AQPLUS_FIRST_BANK
     out     (PORT_BANK3),a
     ret
 
