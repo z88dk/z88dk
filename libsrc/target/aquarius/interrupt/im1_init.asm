@@ -13,25 +13,21 @@
         defc    IO_IRQMASK=$ee
         defc    IO_IRQSTAT=$ef
         defc    IO_BANK0=$f0
+	defc	INTJMP=$38fb
 
 im1_init:
 _im1_init:
-        ; Ensure BANK0 is R/W
-        in      a, (IO_BANK0)
-        and     $7f
-        out     (IO_BANK0), a
-
-        ; Save info at address $38
-        ld      hl, $38
+        ; Save info at address INTJMP
+        ld      hl, INTJMP
         ld      de, existing_int
         ld      bc, EXISTING_INT_SIZE
         ldir
 
         ; Write code to jump to our handler
-        ld      hl, asm_im1_handler
         ld      a, Z80_OPCODE_JP
-        ld      ($38), a
-        ld      ($39), hl
+        ld      (INTJMP), a
+        ld      hl, asm_im1_handler
+        ld      (INTJMP+1), hl
 
         ; Unmask and clear VBLANK IRQ
         ld      a, $01
