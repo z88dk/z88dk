@@ -33,3 +33,5 @@ target/aquarius/fcntl/write
 target/aquarius/fcntl/writebyte
 target/aquarius/stdio/fputc_cons_aqplus
 target/aquarius/stdio/fgetc_cons_aqplus
+target/aquarius/interrupt/im1_init
+target/aquarius/interrupt/add_raster_int
