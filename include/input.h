@@ -179,6 +179,10 @@ extern uint __LIB__  in_JoyKeyboard(struct in_UDK *u) __z88dk_fastcall;
    #include <arch/sam.h>
    // Adds in_Joystick1/in_Joystick2
 #endif
+#ifdef __AQUARIUSPLUS__
+    #include <arch/aqplus.h>
+   // Adds in_Joystick1/in_Joystick2
+#endif
 
 
 /*

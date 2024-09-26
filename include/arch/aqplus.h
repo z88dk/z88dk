@@ -40,4 +40,8 @@ static __sfr __at 0xF8 IO_PSG2DATA;
 static __sfr __at 0xF9 IO_PSG2ADDR;
 static __sfr __at 0xFB IO_SYSCTRL;
 
+// Joystick Functions
+extern unsigned int  __LIB__ in_Joystick1(void);
+extern unsigned int  __LIB__ in_Joystick2(void);
+
 #endif
