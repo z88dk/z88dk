@@ -29,7 +29,6 @@ target/aquarius/stdio/ansi/f_ansi_cls
 target/aquarius/stdio/ansi/f_ansi_dline
 target/aquarius/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
-target/aquarius/input/in_Joystick
 target/aquarius/input/in_Inkey
 target/aquarius/input/in_KeyPressed
 target/aquarius/input/in_LookupKey
@@ -41,6 +40,7 @@ target/aquarius/games/bit_open
 target/aquarius/games/bit_open_di
 target/aquarius/games/bit_close
 target/aquarius/games/bit_close_ei
+target/aquarius/games/joystick
 target/aquarius/games/keys_joystick
 @games/games.lst
 target/aquarius/psg/asm_wyz_hardware_out

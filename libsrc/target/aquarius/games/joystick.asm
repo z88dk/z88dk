@@ -1,25 +1,34 @@
-	; uint in_Joy1(void)
-	; uint in_Joy2(void)
-
         SECTION code_clib
-        PUBLIC  in_Joystick1
-        PUBLIC  _in_Joystick1
-        PUBLIC  in_Joystick2
-        PUBLIC  _in_Joystick2
+
+	PUBLIC	joystick
+	PUBLIC	_joystick
+
+	EXTERN	joystick_inkey
 
         defc    IO_PSG1DATA=$f6
         defc    IO_PSG1ADDR=$f7
 
-        defc    UP_BIT=0                ; 1
-        defc    DOWN_BIT=1              ; 2
-        defc    LEFT_BIT=2              ; 4
-        defc    RIGHT_BIT=3             ; 8
-        defc    FIRE_BIT=7              ; 128
+        defc    RIGHT_BIT=0             ; 1
+        defc    LEFT_BIT=1              ; 2
+        defc    DOWN_BIT=2              ; 4
+        defc    UP_BIT=3                ; 8
+        defc    FIRE_BIT=4              ; 16
+
+_joystick:
+joystick:
+	ld	a, l
+	cp	1
+	jr	z, in_Joystick1
+	cp	2
+	jr	z, in_Joystick2
+
+	; Try keyboard joystick
+	sub	2
+	jp	joystick_inkey
 
         ; Read controller 1
         ; exit : HL = F000RLDU active high
 in_Joystick1:
-_in_Joystick1:
         push    af
 
         ld      a, 7
@@ -35,7 +44,6 @@ _in_Joystick1:
         ; Read controller 2
         ; exit : HL = F000RLDU active high
 in_Joystick2:
-_in_Joystick2:
         push    af
 
         ld      a, 7
