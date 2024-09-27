@@ -14,6 +14,7 @@
         defc    UP_BIT=3                ; 8
         defc    FIRE_BIT=4              ; 16
 
+        ; exit : HL = 000FUDLR active high
 _joystick:
 joystick:
 	ld	a, l
@@ -27,7 +28,6 @@ joystick:
 	jp	joystick_inkey
 
         ; Read controller 1
-        ; exit : HL = F000RLDU active high
 in_Joystick1:
         push    af
 
@@ -42,7 +42,6 @@ in_Joystick1:
         jr      decodeJoy
 
         ; Read controller 2
-        ; exit : HL = F000RLDU active high
 in_Joystick2:
         push    af
 
