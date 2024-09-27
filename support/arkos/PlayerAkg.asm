@@ -73,7 +73,6 @@ PLY_AKG_HardwareCounter = 0
         ENDIF
         IFDEF PLY_AKG_HARDWARE_AQ
                 PLY_AKG_HardwareCounter = PLY_AKG_HardwareCounter + 1
-                PLY_AKG_HARDWARE_SPECTRUM_OR_MSX = 1
         ENDIF
         IF PLY_AKG_HardwareCounter > 1
                 FAIL 'Only one hardware must be selected!'
@@ -3616,6 +3615,20 @@ dkws (void):    ;Disark macro.
 	dw 26, 25, 24, 22, 21, 20, 19, 18, 17, 16, 15, 14	; Octave 8
 	dw 13, 12, 12, 11, 11, 10, 9, 9, 8, 8, 7, 7	; Octave 9
 	dw 7, 6, 6, 6, 5, 5, 5, 4	; Octave 10
+        ENDIF
+        IFDEF PLY_AKG_HARDWARE_AQ
+        ;PSG running to 1789772 Hz.
+        dw 6841, 6457, 6095, 5753, 5430, 5125, 4837, 4566, 4310, 4068, 3839, 3624   ; Octave 0
+        dw 3420, 3229, 3047, 2876, 2715, 2562, 2419, 2283, 2155, 2034, 1920, 1812   ; Octave 1
+        dw 1710, 1614, 1524, 1438, 1357, 1281, 1209, 1141, 1077, 1017, 960, 906     ; Octave 2
+        dw 855, 807, 762, 719, 679, 641, 605, 571, 539, 508, 480, 453               ; Octave 3
+        dw 428, 404, 381, 360, 339, 320, 302, 285, 269, 254, 240, 226               ; Octave 4
+        dw 214, 202, 190, 180, 170, 160, 151, 143, 135, 127, 120, 113               ; Octave 5
+        dw 107, 101, 95, 90, 85, 80, 76, 71, 67, 64, 60, 57                         ; Octave 6
+        dw 53, 50, 48 ,45, 42, 40, 38, 36, 34, 32, 30, 28                           ; Octave 7
+        dw 27, 25, 24, 22, 21, 20, 19, 18, 17, 16, 15, 14                           ; Octave 8
+        dw 13, 13, 12, 11, 11, 10, 9, 9, 8, 8, 7, 7                                 ; Octave 9
+        dw 7, 6, 6, 6, 5, 5, 5, 4, 4, 4, 4, 4                                       ; Octave 10
         ENDIF
         IFDEF PLY_AKG_HARDWARE_PENTAGON
         ;PSG running to 1750000 Hz.

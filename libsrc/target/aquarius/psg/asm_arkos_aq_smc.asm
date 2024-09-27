@@ -2090,103 +2090,103 @@ PLY_AKG_EFFECT_FORCEPITCHSPEED:
 PLY_AKG_EVENT:
         db      0
 PLY_AKG_PERIODTABLE:
-        dw      6778
-        dw      6398
-        dw      6039
-        dw      5700
-        dw      5380
-        dw      5078
-        dw      4793
-        dw      4524
-        dw      4270
-        dw      4030
-        dw      3804
-        dw      3591
-        dw      3389
-        dw      3199
-        dw      3019
-        dw      2850
-        dw      2690
-        dw      2539
-        dw      2397
-        dw      2262
-        dw      2135
-        dw      2015
-        dw      1902
-        dw      1795
-        dw      1695
-        dw      1599
-        dw      1510
-        dw      1425
-        dw      1345
-        dw      1270
-        dw      1198
-        dw      1131
-        dw      1068
-        dw      1008
-        dw      951
-        dw      898
-        dw      847
-        dw      800
-        dw      755
-        dw      712
-        dw      673
-        dw      635
-        dw      599
-        dw      566
-        dw      534
-        dw      504
-        dw      476
-        dw      449
-        dw      424
-        dw      400
-        dw      377
-        dw      356
-        dw      336
-        dw      317
-        dw      300
-        dw      283
-        dw      267
-        dw      252
-        dw      238
-        dw      224
-        dw      212
-        dw      200
-        dw      189
-        dw      178
-        dw      168
-        dw      159
-        dw      150
-        dw      141
-        dw      133
-        dw      126
-        dw      119
-        dw      112
-        dw      106
-        dw      100
-        dw      94
-        dw      89
-        dw      84
-        dw      79
-        dw      75
+        dw      6841
+        dw      6457
+        dw      6095
+        dw      5753
+        dw      5430
+        dw      5125
+        dw      4837
+        dw      4566
+        dw      4310
+        dw      4068
+        dw      3839
+        dw      3624
+        dw      3420
+        dw      3229
+        dw      3047
+        dw      2876
+        dw      2715
+        dw      2562
+        dw      2419
+        dw      2283
+        dw      2155
+        dw      2034
+        dw      1920
+        dw      1812
+        dw      1710
+        dw      1614
+        dw      1524
+        dw      1438
+        dw      1357
+        dw      1281
+        dw      1209
+        dw      1141
+        dw      1077
+        dw      1017
+        dw      960
+        dw      906
+        dw      855
+        dw      807
+        dw      762
+        dw      719
+        dw      679
+        dw      641
+        dw      605
+        dw      571
+        dw      539
+        dw      508
+        dw      480
+        dw      453
+        dw      428
+        dw      404
+        dw      381
+        dw      360
+        dw      339
+        dw      320
+        dw      302
+        dw      285
+        dw      269
+        dw      254
+        dw      240
+        dw      226
+        dw      214
+        dw      202
+        dw      190
+        dw      180
+        dw      170
+        dw      160
+        dw      151
+        dw      143
+        dw      135
+        dw      127
+        dw      120
+        dw      113
+        dw      107
+        dw      101
+        dw      95
+        dw      90
+        dw      85
+        dw      80
+        dw      76
         dw      71
         dw      67
-        dw      63
-        dw      59
-        dw      56
+        dw      64
+        dw      60
+        dw      57
         dw      53
         dw      50
-        dw      47
+        dw      48
         dw      45
         dw      42
         dw      40
-        dw      37
-        dw      35
-        dw      33
-        dw      31
+        dw      38
+        dw      36
+        dw      34
+        dw      32
         dw      30
         dw      28
-        dw      26
+        dw      27
         dw      25
         dw      24
         dw      22
@@ -2199,7 +2199,7 @@ PLY_AKG_PERIODTABLE:
         dw      15
         dw      14
         dw      13
-        dw      12
+        dw      13
         dw      12
         dw      11
         dw      11
@@ -2217,5 +2217,9 @@ PLY_AKG_PERIODTABLE:
         dw      5
         dw      5
         dw      5
+        dw      4
+        dw      4
+        dw      4
+        dw      4
         dw      4
 
