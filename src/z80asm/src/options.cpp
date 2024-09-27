@@ -245,7 +245,11 @@ string Options::bin_filename(const string& filename, const string& section) {
 }
 
 string Options::lib_filename(const string& filename) {
-	return replace_ext(filename, EXT_LIB);
+    fs::path file_path{ filename };
+    if (file_path.extension() != "")    // # 2606 allow different lib extensions
+        return filename;
+    else
+        return replace_ext(filename, EXT_LIB);
 }
 
 string Options::sym_filename(const string& filename) {

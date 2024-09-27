@@ -15,6 +15,7 @@ Z88DK Z80 Module Assembler Change Log
 2024-05-14 Fix #2536 add string argument to ASSERT
 2024-06-24 Fix #2566 error in expansion of nested macros with same parameter names
 2024-08-15 Fix #2587 add local labels to z80asm
+2024-09-26 Fix #2606: allow different lib extensions
 
 2023
 ----
