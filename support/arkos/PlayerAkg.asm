@@ -15,7 +15,7 @@
 ;       PLY_AKG_HARDWARE_MSX = 1
 ;       PLY_AKG_HARDWARE_SPECTRUM = 1
 ;       PLY_AKG_HARDWARE_PENTAGON = 1
-;       PLY_AKG_HARDWARE_AQPLUS = 1
+;       PLY_AKG_HARDWARE_AQ = 1
 ;       Note that the PRESENCE of this variable is tested, NOT its value.
 ;
 ;       ROM
@@ -71,7 +71,7 @@ PLY_AKG_HardwareCounter = 0
                 PLY_AKG_HardwareCounter = PLY_AKG_HardwareCounter + 1
                 PLY_AKG_HARDWARE_SPECTRUM_OR_PENTAGON = 1
         ENDIF
-        IFDEF PLY_AKG_HARDWARE_AQPLUS
+        IFDEF PLY_AKG_HARDWARE_AQ
                 PLY_AKG_HardwareCounter = PLY_AKG_HardwareCounter + 1
                 PLY_AKG_HARDWARE_SPECTRUM_OR_MSX = 1
         ENDIF
@@ -2141,7 +2141,7 @@ PLY_AKG_PSGHardwarePeriod_Instr: ld hl,0
         
         ENDIF
 
-        IFDEF PLY_AKG_HARDWARE_AQPLUS
+        IFDEF PLY_AKG_HARDWARE_AQ
        
         ld b,a          ;Preserves R7.
         ld a,7
@@ -2267,7 +2267,7 @@ PLY_AKG_PSGHardwarePeriod_Instr: ld hl,0
         out (#f6),a     ;Value.
                         ENDIF ;PLY_CFG_UseHardwareSounds
         
-        ENDIF ; PLY_AKG_HARDWARE_AQPLUS
+        ENDIF ; PLY_AKG_HARDWARE_AQ
 
         
                         IFDEF PLY_CFG_UseHardwareSounds         ;CONFIG SPECIFIC
@@ -2280,7 +2280,7 @@ PLY_AKG_PSGHardwarePeriod_Instr: ld hl,0
         inc a           ;Selects R13 now, even if not changed, because A will be modified.
         out (c),a       ;#fffd + register.
         ENDIF
-        IFDEF PLY_AKG_HARDWARE_AQPLUS
+        IFDEF PLY_AKG_HARDWARE_AQ
         ld a,13         ;Selects R13 now, even if not changed, because A will be modified.
         out (#f7),a     ;Register.
         ENDIF
@@ -2337,7 +2337,7 @@ PLY_AKG_PSGReg13_OldValue: cp 255
         out (c),a       ;#bffd + value
         
         ENDIF
-        IFDEF PLY_AKG_HARDWARE_AQPLUS
+        IFDEF PLY_AKG_HARDWARE_AQ
         out (#f6),a     ;Value.
         ENDIF
                                 IFDEF PLY_CFG_UseRetrig         ;CONFIG SPECIFIC
