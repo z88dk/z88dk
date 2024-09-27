@@ -1,6 +1,6 @@
 # We expect rasm and Diskarg to be in the path, if not fully qualify these lines
 RASM	= rasm.exe
-DISARK	= Disark
+DISARK	= disark
 
 # tool where the magic happens :-)
 ARKOS2Z88DK = ./arkos-to-z88dk.pl
@@ -13,8 +13,9 @@ ARKOS_ZX_SMC_ASM = asm_arkos_zx_smc.asm
 ARKOS_ZX_ROM_ASM = asm_arkos_zx_rom.asm
 ARKOS_CPC_SMC_ASM = asm_arkos_cpc_smc.asm
 ARKOS_CPC_ROM_ASM = asm_arkos_cpc_rom.asm
+ARKOS_AQPLUS_SMC_ASM = asm_arkos_aqplus_smc.asm
 
-PLAYERS = $(ARKOS_MSX_SMC_ASM) $(ARKOS_MSX_ROM_ASM) $(ARKOS_ZX_SMC_ASM) $(ARKOS_ZX_ROM_ASM) $(ARKOS_CPC_SMC_ASM) $(ARKOS_CPC_ROM_ASM)
+PLAYERS = $(ARKOS_MSX_SMC_ASM) $(ARKOS_MSX_ROM_ASM) $(ARKOS_ZX_SMC_ASM) $(ARKOS_ZX_ROM_ASM) $(ARKOS_CPC_SMC_ASM) $(ARKOS_CPC_ROM_ASM) $(ARKOS_AQPLUS_SMC_ASM)
 
 # targets
 .SILENT:
@@ -33,6 +34,7 @@ update-all-players: $(PLAYERS)
 	cp -f $(ARKOS_ZX_ROM_ASM) ../../libsrc/_DEVELOPMENT/arch/zx/arkos
 	cp -f $(ARKOS_ZX_SMC_ASM) ../../libsrc/_DEVELOPMENT/arch/zxn/arkos
 	cp -f $(ARKOS_ZX_ROM_ASM) ../../libsrc/_DEVELOPMENT/arch/zxn/arkos
+	cp -f $(ARKOS_AQPLUS_SMC_ASM) ../../libsrc/target/aquarius/psg
 
 # convert Arkos RASM player source to relocatable Z88DK asm player
 # reference: "Source conversion with Disark" article:
@@ -106,6 +108,16 @@ $(ARKOS_CPC_ROM_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
 	$(RASM) conf_PlayerAkg.asm -o AT2Player -s -sl -sq
 	$(DISARK) AT2Player.bin $(PASMO_ASM) --symbolFile AT2Player.sym --sourceProfile pasmo
 	$(ARKOS2Z88DK) -t zx -r $(PASMO_ASM) > $@
+
+# Aquarius+ running in RAM (self-modifying code), ~3400 bytes
+$(ARKOS_AQPLUS_SMC_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
+	-rm -f conf_PlayerAkg.asm 2>/dev/null
+	echo "PLY_AKG_HARDWARE_AQPLUS = 1" 	>> conf_PlayerAkg.asm
+	echo "PLY_AKG_MANAGE_SOUND_EFFECTS = 1"	>> conf_PlayerAkg.asm
+	cat PlayerAkg.asm 			>> conf_PlayerAkg.asm
+	$(RASM) conf_PlayerAkg.asm -o AT2Player -s -sl -sq
+	$(DISARK) AT2Player.bin $(PASMO_ASM) --symbolFile AT2Player.sym --sourceProfile pasmo
+	$(ARKOS2Z88DK) -t zx $(PASMO_ASM) > $@
 
 clean:
 	@-rm conf_PlayerAkg.asm *.lis *.bin *.tap *.o *.sym $(PASMO_ASM) $(PLAYERS) 2>/dev/null
