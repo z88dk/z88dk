@@ -691,9 +691,8 @@ static disc_spec mz800_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-    .has_skew = 1,
-    .skew_track_start = 0,
-    .skew_tab = { 0, 4, 1, 5, 2, 6, 3, 7 }
+    .has_skew = 0,
+    .side2_sector_numbering = 1
 };
 
 
@@ -719,6 +718,24 @@ static disc_spec mz80_spec = {
     .skew_tab = { 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 },
 	.inverted_sides = 1,
 	.side2_sector_numbering = 1
+};
+
+
+// Sharp MZ-2000
+static disc_spec mz2000_spec = {
+    .name = "MZ2000",
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1
 };
 
 
@@ -2040,6 +2057,7 @@ static struct formats {
     { "nshd8",     "Northstar Virtual 8",   &nshd8_spec, 0, NULL, 1 },
     { "mz80",      "Sharp MZ80A/80B",       &mz80_spec, 0, NULL, 1 },
     { "mz800",     "Sharp MZ800",           &mz800_spec, 0, NULL, 1 },
+    { "mz2000",    "Sharp MZ2000",          &mz2000_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },

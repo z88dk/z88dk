@@ -426,7 +426,7 @@ static bool Expr_parse_factor(Expr1* self)
 
 	case TK_NAME:
         short_name = spool_add(sym_text(&sym));
-        long_name = local_labels_add_label(short_name);
+        long_name = local_labels_use_label(short_name);
         symptr = get_used_symbol(long_name);
         ExprOp_init_symbol(ExprOpArray_push(self->rpn_ops), symptr);
 

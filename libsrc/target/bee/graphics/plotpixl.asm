@@ -8,7 +8,7 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: plotpixl.asm,v 1.2 2016-11-21 11:18:38 stefano Exp $
+;	$Id: plotpixl.asm $
 ;
 
 
@@ -17,7 +17,7 @@
     SECTION code_clib
     PUBLIC  plotpixel
 
-    EXTERN  div3
+    EXTERN  div3_0
     EXTERN  __gfx_coords
 			;EXTERN	base_graphics
 
@@ -41,7 +41,7 @@ plotpixel:
 
     push    bc
 
-    ld      hl, div3
+    ld      hl, div3_0
     ld      d, 0
     ld      e, c
     inc     e
