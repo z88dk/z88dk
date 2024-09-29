@@ -5,8 +5,7 @@
 
 	EXTERN	joystick_inkey
 
-        defc    IO_PSG1DATA=$f6
-        defc    IO_PSG1ADDR=$f7
+	#include "target/aquarius/def/plus.inc"
 
         defc    RIGHT_BIT=0             ; 1
         defc    LEFT_BIT=1              ; 2
