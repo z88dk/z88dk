@@ -15,7 +15,9 @@ ENDIF
 
 
 IFNDEF CLIB_FARHEAP_FIRST
-    defc CLIB_FARHEAP_FIRST = AQPLUS_FIRST_BANK
+    ; Assume RAM pages 32, 33, 34, and 35 are mapped to banks 0, 1, 2, & 3.
+    ; So far heap starts at page 36.
+    defc CLIB_FARHEAP_FIRST = 36
 ENDIF
 
 IF CLIB_FARHEAP_BANKS = -1
@@ -69,7 +71,7 @@ setup_far_heap:
     ; Bank number is e:hl[15:14], offset is hl[13:0]
     ;
     ld      de,CLIB_FARHEAP_FIRST >> 2
-    ld      hl,CLIB_FARHEAP_FIRST << 14
+    ld      hl,0
     and     a
     jr      z,handle_residual
     ld      b,a
