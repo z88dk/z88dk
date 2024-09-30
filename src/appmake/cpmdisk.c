@@ -230,10 +230,10 @@ int skew_sector(disc_handle* h, int j, int track)
     if ( h->spec.has_skew && track + (track * h->spec.sides) >= h->spec.skew_track_start ) {
         for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
             if ( h->spec.skew_tab[sect] == j ) break;
-	    }
+        }
     } else return (j);
-	
-	return (sect);
+
+    return (sect);
 }
 
 
@@ -241,8 +241,8 @@ int skew_sector(disc_handle* h, int j, int track)
 void xorblock(uint8_t *pos, int count, int mask)
 {
     int i;
-	for ( i = 0; i < count; i++ )
-		pos[i] ^= mask;
+    for ( i = 0; i < count; i++ )
+        pos[i] ^= mask;
 }
 
 
@@ -328,38 +328,38 @@ int disc_write_edsk(disc_handle* h, const char* filename)
                 *ptr++ = i; // Track
                 *ptr++ = s; // Side
 
-				// side2_sector_numbering option tested on MAME (Kaypro4)
-				if ( h->spec.side2_sector_numbering || h->spec.inverted_sides ) {
-					// SKEW table introduced to support the Sharp MZ80A, MZ80B..
-					if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) ) {
-						if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
-							*ptr++ = skew_sector(h, j, i) + h->spec.boot_tracks_sector_offset; // Sector ID
-						} else {
-							*ptr++ = skew_sector(h, j, i) + h->spec.first_sector_offset; // Sector ID
-						}
-					} else {
-						if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
-							*ptr++ = skew_sector(h, j, i) + h->spec.boot_tracks_sector_offset + h->spec.sectors_per_track; // Sector ID
-						} else {
-							*ptr++ = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ; // Sector ID
-						}
-					}
-				} else {
-					// Usually implementing SKEW is not necessary (tested on MAME)
-					if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) ) {
-						if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
-							*ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
-						} else {
-							*ptr++ = j + h->spec.first_sector_offset; // Sector ID
-						}
-					} else {
-						if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
-							*ptr++ = j + h->spec.boot_tracks_sector_offset + h->spec.sectors_per_track; // Sector ID
-						} else {
-							*ptr++ = j + h->spec.first_sector_offset + h->spec.sectors_per_track ; // Sector ID
-						}
-					}
-				}
+                // side2_sector_numbering option tested on MAME (Kaypro4)
+                if ( h->spec.side2_sector_numbering || h->spec.inverted_sides ) {
+                    // SKEW table introduced to support the Sharp MZ80A, MZ80B..
+                    if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) ) {
+                        if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+                            *ptr++ = skew_sector(h, j, i) + h->spec.boot_tracks_sector_offset; // Sector ID
+                        } else {
+                            *ptr++ = skew_sector(h, j, i) + h->spec.first_sector_offset; // Sector ID
+                        }
+                    } else {
+                        if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+                            *ptr++ = skew_sector(h, j, i) + h->spec.boot_tracks_sector_offset + h->spec.sectors_per_track; // Sector ID
+                        } else {
+                            *ptr++ = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ; // Sector ID
+                        }
+                    }
+                } else {
+                    // Usually implementing SKEW is not necessary (tested on MAME)
+                    if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) ) {
+                        if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+                            *ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
+                        } else {
+                            *ptr++ = j + h->spec.first_sector_offset; // Sector ID
+                        }
+                    } else {
+                        if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+                            *ptr++ = j + h->spec.boot_tracks_sector_offset + h->spec.sectors_per_track; // Sector ID
+                        } else {
+                            *ptr++ = j + h->spec.first_sector_offset + h->spec.sectors_per_track ; // Sector ID
+                        }
+                    }
+                }
 
                 *ptr++ = sector_size;
                 *ptr++ = 0; // FDC status register 1
@@ -519,10 +519,10 @@ int disc_write_anadisk(disc_handle* h, const char* filename)
                 header[1] = s;
                 header[2] = i;
                 header[3] = s;
-				if ( (! h->spec.side2_sector_numbering) || (! s) )
-					header[4] = skew_sector(h, j, i) + h->spec.first_sector_offset;
-				else
-					header[4] = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ;
+                if ( (! h->spec.side2_sector_numbering) || (! s) )
+                    header[4] = skew_sector(h, j, i) + h->spec.first_sector_offset;
+                else
+                    header[4] = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ;
                 header[5] = sector_size;
                 header[6] = h->spec.sector_size % 256;
                 header[7] = h->spec.sector_size / 256;
@@ -572,38 +572,38 @@ int disc_write_imd(disc_handle* h, const char* filename)
         for (s = 0; s < h->spec.sides; s++) {
             ptr = buffer;
 
-			if (h->spec.disk_mode)
-				*ptr++ = h->spec.disk_mode-1; // Mode + transfer rate
-			else 
-				*ptr++ = 3; // 500 kbps MFM
-			
+            if (h->spec.disk_mode)
+                *ptr++ = h->spec.disk_mode-1; // Mode + transfer rate
+            else 
+                *ptr++ = 3; // 500 kbps MFM
+            
             *ptr++ = i; // track
             *ptr++ = s; // head
             *ptr++ = h->spec.sectors_per_track; // Sectors per track
             *ptr++ = sector_size; // Size of sector
 
             // Write sector map
-			// "If ImageDisk is unable to obtain all sector numbers in a single revolution of the disk, it will report 
-			// 'Unable to determine interleave' and rearrange the sector numbers into a simple sequential list."
-			// In most of the situations the sequential map is the best choice, but on the MZ80A/MZ80B which are
-			// currently the only case with the disk sides swapped.
+            // "If ImageDisk is unable to obtain all sector numbers in a single revolution of the disk, it will report 
+            // 'Unable to determine interleave' and rearrange the sector numbers into a simple sequential list."
+            // In most of the situations the sequential map is the best choice, but on the MZ80A/MZ80B which are
+            // currently the only case with the disk sides swapped.
             // At the moment we use "spec.inverted_sides" to trigger an accurete skew map.
 
-			if (h->spec.inverted_sides) {
-				for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
-					if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
-						*ptr++ = skew_sector(h, j, 99)  +  h->spec.first_sector_offset;
-					else
-						*ptr++ = skew_sector(h, j, 99)  +  h->spec.first_sector_offset + h->spec.sectors_per_track;
-				}
-			} else {
-				for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
-					if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
-						*ptr++ = j  +  h->spec.first_sector_offset;
-					else
-						*ptr++ = j  +  h->spec.first_sector_offset + h->spec.sectors_per_track;
-				}
-			}
+            if (h->spec.inverted_sides) {
+                for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
+                    if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
+                        *ptr++ = skew_sector(h, j, 99)  +  h->spec.first_sector_offset;
+                    else
+                        *ptr++ = skew_sector(h, j, 99)  +  h->spec.first_sector_offset + h->spec.sectors_per_track;
+                }
+            } else {
+                for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
+                    if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
+                        *ptr++ = j  +  h->spec.first_sector_offset;
+                    else
+                        *ptr++ = j  +  h->spec.first_sector_offset + h->spec.sectors_per_track;
+                }
+            }
 
             // And write the header
             fwrite(buffer, ptr - buffer, 1, fp);
@@ -640,10 +640,14 @@ static int first_free_extent(disc_handle* h)
     return -1;
 }
 
+static size_t get_directory_offset(disc_handle* h) {
+    return (h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size));
+}
+
 static size_t find_first_free_directory_entry(disc_handle* h)
 {
-    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
     int i;
+    size_t directory_offset = get_directory_offset(h);
 
     for (i = 0; i < h->spec.directory_entries; i++) {
         if (h->image[directory_offset] == h->spec.filler_byte) {
@@ -672,8 +676,9 @@ disc_handle *cpm_create(disc_spec* spec)
     }
 
     h->write_file = cpm_write_file;
-    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
-    memset(h->image +directory_offset, 0xe5, 512);
+    size_t directory_offset = get_directory_offset(h);
+    //memset(h->image +directory_offset, 0xe5, 512);
+    memset(h->image +directory_offset, h->spec.filler_byte, (h->spec.directory_entries * 32));
     return h;
 }
 
@@ -691,11 +696,8 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
     // Now, write the directory entry, we can start from extent 1
     current_extent = first_free_extent(h);
     // We need to turn that extent into an offset into the disc
-    if ( h->spec.offset ) {
-        offset = h->spec.offset + (current_extent * h->spec.extent_size);
-    } else {
-        offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1) + (current_extent * h->spec.extent_size);
-    }
+    offset = get_directory_offset(h) + (current_extent * h->spec.extent_size);
+
     memcpy(h->image + offset, data, len);
 
     for (i = 0; i <= (num_extents / extents_per_entry); i++) {
@@ -727,15 +729,16 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
                 current_extent++;
             }
         }
-		
-		// Wipe the directory entry if empty (no extents)
-		if (!(direntry[16] | direntry[17]))
-	        memset(direntry, 0, sizeof(direntry));
+        
+        // Wipe the directory entry if empty (no extents)
+        if (!(direntry[16] | direntry[17]))
+            memset(direntry, 0, sizeof(direntry));
 
         memcpy(h->image + directory_offset, direntry, 32);
         directory_offset += 32;
     }
 }
+
 
 // FAT filesystem - we delegate mostly to FatFS
 
@@ -783,14 +786,14 @@ static void fat_write_file(disc_handle* h, char *filename, void* data, size_t le
 // FATFs interface
 
 DSTATUS disk_status (
-	BYTE pdrv		/* Physical drive number to identify the drive */
+    BYTE pdrv        /* Physical drive number to identify the drive */
 )
 {
     return RES_OK;
 }
 
 DSTATUS disk_initialize (
-	BYTE pdrv				/* Physical drive number to identify the drive */
+    BYTE pdrv                /* Physical drive number to identify the drive */
 )
 {
     return RES_OK;
@@ -798,10 +801,10 @@ DSTATUS disk_initialize (
 
 
 DRESULT disk_read (
-	BYTE pdrv,		/* Physical drive number to identify the drive */
-	BYTE *buff,		/* Data buffer to store read data */
-	DWORD sector,	/* Start sector in LBA */
-	UINT count		/* Number of sectors to read */
+    BYTE pdrv,        /* Physical drive number to identify the drive */
+    BYTE *buff,        /* Data buffer to store read data */
+    DWORD sector,    /* Start sector in LBA */
+    UINT count        /* Number of sectors to read */
 )
 {
     disc_read_sector_lba(current_fat_handle, sector, count, buff);
@@ -811,10 +814,10 @@ DRESULT disk_read (
 
 
 DRESULT disk_write (
-	BYTE pdrv,			/* Physical drive number to identify the drive */
-	const BYTE *buff,	/* Data to be written */
-	DWORD sector,		/* Start sector in LBA */
-	UINT count			/* Number of sectors to write */
+    BYTE pdrv,            /* Physical drive number to identify the drive */
+    const BYTE *buff,    /* Data to be written */
+    DWORD sector,        /* Start sector in LBA */
+    UINT count            /* Number of sectors to write */
 )
 {
     disc_write_sector_lba(current_fat_handle, sector, count, buff);
@@ -823,9 +826,9 @@ DRESULT disk_write (
 }
 
 DRESULT disk_ioctl (
-	BYTE pdrv,		/* Physical drive number (0..) */
-	BYTE cmd,		/* Control code */
-	void *buff		/* Buffer to send/receive control data */
+    BYTE pdrv,        /* Physical drive number (0..) */
+    BYTE cmd,        /* Control code */
+    void *buff        /* Buffer to send/receive control data */
 )
 {
     int    val;
