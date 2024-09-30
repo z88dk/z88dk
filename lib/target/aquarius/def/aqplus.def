@@ -2,7 +2,7 @@
 ;
 ; Ports are writable + readable
 
-#include "plus.inc"
+#include "target/aquarius/def/plus.inc"
 
 ; First RAM page that is free for us to use
 defc AQPLUS_FIRST_BANK  = USER_RAM
