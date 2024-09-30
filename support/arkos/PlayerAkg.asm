@@ -15,6 +15,7 @@
 ;       PLY_AKG_HARDWARE_MSX = 1
 ;       PLY_AKG_HARDWARE_SPECTRUM = 1
 ;       PLY_AKG_HARDWARE_PENTAGON = 1
+;       PLY_AKG_HARDWARE_AQ = 1
 ;       Note that the PRESENCE of this variable is tested, NOT its value.
 ;
 ;       ROM
@@ -69,6 +70,9 @@ PLY_AKG_HardwareCounter = 0
         IFDEF PLY_AKG_HARDWARE_PENTAGON
                 PLY_AKG_HardwareCounter = PLY_AKG_HardwareCounter + 1
                 PLY_AKG_HARDWARE_SPECTRUM_OR_PENTAGON = 1
+        ENDIF
+        IFDEF PLY_AKG_HARDWARE_AQ
+                PLY_AKG_HardwareCounter = PLY_AKG_HardwareCounter + 1
         ENDIF
         IF PLY_AKG_HardwareCounter > 1
                 FAIL 'Only one hardware must be selected!'
@@ -2135,7 +2139,135 @@ PLY_AKG_PSGHardwarePeriod_Instr: ld hl,0
                         ENDIF ;PLY_CFG_UseHardwareSounds
         
         ENDIF
+
+        IFDEF PLY_AKG_HARDWARE_AQ
+       
+        ld b,a          ;Preserves R7.
+        ld a,7
+        out (#f7),a     ;Register.
+        ld a,b
+        out (#f6),a     ;Value.
+
+        IFNDEF PLY_AKG_Rom
+dknr3 (void):      
+PLY_AKG_PSGReg01_Instr: ld hl,0
+        ELSE
+        ld hl,(PLY_AKG_PSGReg01_Instr)
+        ENDIF
+        xor a
+        out (#f7),a     ;Register.
+        ld a,l
+        out (#f6),a     ;Value.
+
+        ld a,1
+        out (#f7),a     ;Register.
+        ld a,h
+        out (#f6),a     ;Value.
         
+        IFNDEF PLY_AKG_Rom
+dknr3 (void):
+PLY_AKG_PSGReg23_Instr: ld hl,0
+        ELSE
+        ld hl,(PLY_AKG_PSGReg23_Instr)
+        ENDIF
+        ld a,2
+        out (#f7),a     ;Register.
+        ld a,l
+        out (#f6),a     ;Value.
+
+        ld a,3
+        out (#f7),a     ;Register.
+        ld a,h
+        out (#f6),a     ;Value.
+        
+        IFNDEF PLY_AKG_Rom
+dknr3 (void):
+PLY_AKG_PSGReg45_Instr: ld hl,0
+        ELSE
+        ld hl,(PLY_AKG_PSGReg45_Instr)
+        ENDIF
+        ld a,4
+        out (#f7),a     ;Register.
+        ld a,l
+        out (#f6),a     ;Value.
+
+        ld a,5
+        out (#f7),a     ;Register.
+        ld a,h
+        out (#f6),a     ;Value.
+        
+        ;Register 6.
+                        IFDEF PLY_AKG_Use_NoiseRegister         ;CONFIG SPECIFIC
+        IFNDEF PLY_AKG_Rom
+dknr3 (void):
+PLY_AKG_PSGReg6_8_Instr: ld hl,0          ;L is R6, H is R8. Faster to set a 16 bits register than 2 8-bit.
+PLY_AKG_PSGReg6: equ PLY_AKG_PSGReg6_8_Instr + 1
+PLY_AKG_PSGReg8: equ PLY_AKG_PSGReg6_8_Instr + 2
+        ELSE
+        ld hl,(PLY_AKG_PSGReg6_8_Instr)
+        ENDIF
+        ld a,6
+        out (#f7),a     ;Register.
+        ld a,l
+        out (#f6),a     ;Value.
+        
+        ld a,8
+        out (#f7),a     ;Register.
+        ld a,h
+        out (#f6),a     ;Value.
+                        ELSE
+                ;No noise. Takes care of R8.
+                ld a,8
+                out (#f7),a     ;Register.
+        IFNDEF PLY_AKG_Rom
+PLY_AKG_PSGReg8_Instr: ld a,0
+PLY_AKG_PSGReg8: equ PLY_AKG_PSGReg8_Instr + 1
+        ELSE
+        ld a,(PLY_AKG_PSGReg8)
+        ENDIF
+                out (#f6),a     ;Value.
+                        ENDIF ;PLY_AKG_Use_NoiseRegister
+        
+        ;Register 9 and 10.
+        IFNDEF PLY_AKG_Rom
+dknr3 (void):
+PLY_AKG_PSGReg9_10_Instr: ld hl,0
+PLY_AKG_PSGReg9: equ PLY_AKG_PSGReg9_10_Instr + 1
+PLY_AKG_PSGReg10: equ PLY_AKG_PSGReg9_10_Instr + 2
+        ELSE
+        ld hl,(PLY_AKG_PSGReg9_10_Instr)
+        ENDIF
+        ld a,9
+        out (#f7),a     ;Register.
+        ld a,l
+        out (#f6),a     ;Value.
+        
+        ld a,10
+        out (#f7),a     ;Register.
+        ld a,h
+        out (#f6),a     ;Value.
+        
+                        IFDEF PLY_CFG_UseHardwareSounds         ;CONFIG SPECIFIC
+        ;Register 11 and 12.
+        IFNDEF PLY_AKG_Rom
+dknr3 (void):
+PLY_AKG_PSGHardwarePeriod_Instr: ld hl,0
+        ELSE
+        ld hl,(PLY_AKG_PSGHardwarePeriod_Instr)
+        ENDIF
+        ld a,11
+        out (#f7),a     ;Register.
+        ld a,l
+        out (#f6),a     ;Value.
+        
+        ld a,12
+        out (#f7),a     ;Register.
+        ld a,h
+        out (#f6),a     ;Value.
+                        ENDIF ;PLY_CFG_UseHardwareSounds
+        
+        ENDIF ; PLY_AKG_HARDWARE_AQ
+
         
                         IFDEF PLY_CFG_UseHardwareSounds         ;CONFIG SPECIFIC
         ;R13.
@@ -2146,6 +2278,10 @@ PLY_AKG_PSGHardwarePeriod_Instr: ld hl,0
         IFDEF PLY_AKG_HARDWARE_SPECTRUM_OR_PENTAGON
         inc a           ;Selects R13 now, even if not changed, because A will be modified.
         out (c),a       ;#fffd + register.
+        ENDIF
+        IFDEF PLY_AKG_HARDWARE_AQ
+        ld a,13         ;Selects R13 now, even if not changed, because A will be modified.
+        out (#f7),a     ;Register.
         ENDIF
                                 IFDEF PLY_CFG_UseRetrig         ;CONFIG SPECIFIC
         IFNDEF PLY_AKG_Rom
@@ -2199,6 +2335,9 @@ PLY_AKG_PSGReg13_OldValue: cp 255
         ld b,d
         out (c),a       ;#bffd + value
         
+        ENDIF
+        IFDEF PLY_AKG_HARDWARE_AQ
+        out (#f6),a     ;Value.
         ENDIF
                                 IFDEF PLY_CFG_UseRetrig         ;CONFIG SPECIFIC
         xor a
@@ -3476,6 +3615,20 @@ dkws (void):    ;Disark macro.
 	dw 26, 25, 24, 22, 21, 20, 19, 18, 17, 16, 15, 14	; Octave 8
 	dw 13, 12, 12, 11, 11, 10, 9, 9, 8, 8, 7, 7	; Octave 9
 	dw 7, 6, 6, 6, 5, 5, 5, 4	; Octave 10
+        ENDIF
+        IFDEF PLY_AKG_HARDWARE_AQ
+        ;PSG running to 1789772 Hz.
+        dw 6841, 6457, 6095, 5753, 5430, 5125, 4837, 4566, 4310, 4068, 3839, 3624   ; Octave 0
+        dw 3420, 3229, 3047, 2876, 2715, 2562, 2419, 2283, 2155, 2034, 1920, 1812   ; Octave 1
+        dw 1710, 1614, 1524, 1438, 1357, 1281, 1209, 1141, 1077, 1017, 960, 906     ; Octave 2
+        dw 855, 807, 762, 719, 679, 641, 605, 571, 539, 508, 480, 453               ; Octave 3
+        dw 428, 404, 381, 360, 339, 320, 302, 285, 269, 254, 240, 226               ; Octave 4
+        dw 214, 202, 190, 180, 170, 160, 151, 143, 135, 127, 120, 113               ; Octave 5
+        dw 107, 101, 95, 90, 85, 80, 76, 71, 67, 64, 60, 57                         ; Octave 6
+        dw 53, 50, 48 ,45, 42, 40, 38, 36, 34, 32, 30, 28                           ; Octave 7
+        dw 27, 25, 24, 22, 21, 20, 19, 18, 17, 16, 15, 14                           ; Octave 8
+        dw 13, 13, 12, 11, 11, 10, 9, 9, 8, 8, 7, 7                                 ; Octave 9
+        dw 7, 6, 6, 6, 5, 5, 5, 4, 4, 4, 4, 4                                       ; Octave 10
         ENDIF
         IFDEF PLY_AKG_HARDWARE_PENTAGON
         ;PSG running to 1750000 Hz.

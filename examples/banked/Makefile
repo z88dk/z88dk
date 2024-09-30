@@ -11,7 +11,7 @@ CFLAGS_msx_msxdos2 = -pragma-define:CRT_DISABLELOADER=0
 CFLAGS_zx_bank = -lndos
 CFLAGS_sms_bank = --generic-console -pragma-redirect:CRT_FONT=_font_8x8_zx_system -pragma-define:CRT_ENABLE_BANKED_CALLS=1
 CFLAGS_cpc_bank = -lndos --generic-console -pragma-redirect:CRT_FONT=_font_8x8_zx_system -subtype=dsk
-CFLAGS_aqplus_bank = -subtype=banked -pragma-string:basename=bank --generic-console 
+CFLAGS_aqplus_bank = -subtype=aqx -pragma-string:basename=bank --generic-console
 
 $(eval $(call build_app, $(BANK_TARGETS), bank.bin, main.c bank1.c bank2.c bank3.c bank4.c))
 
