@@ -33,6 +33,8 @@ _im1_init:
         out     (IO_IRQMASK), a
         out     (IO_IRQSTAT), a
 
+	    im	1
+
         ei
         ret
 
@@ -58,6 +60,8 @@ asm_im1_handler:
 
         SECTION code_crt_exit
         di
+	    ; Back to IM0 for return to basic
+	    im	0
         ; Mask the VBLANK IRQ
         in      a, (IO_IRQMASK)
         and     ~IRQ_VBLANK
