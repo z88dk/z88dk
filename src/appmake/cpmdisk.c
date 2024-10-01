@@ -112,17 +112,24 @@ void disc_write_sector_lba(disc_handle *h, int sector_nr, int count, const void 
     }
 }
 
+
+int disc_offset(disc_handle* h, int t, int s)
+{
+    size_t track_length = h->spec.sector_size * h->spec.sectors_per_track;
+
+	if ( h->spec.alternate_sides == 0 ) {
+		return ( track_length * t + ((h->spec.inverted_sides ^ s) * track_length * h->spec.tracks) );
+	} else {
+		return ( track_length * ( 2* t + (h->spec.inverted_sides ^ s)) );
+	}
+}
+
+
 void disc_write_sector(disc_handle *h, int track, int sector, int head, const void *data)
 {
     size_t offset;
-    size_t track_length = h->spec.sectors_per_track * h->spec.sector_size;
 
-    if ( h->spec.alternate_sides == 0 ) {
-        offset = track_length * track + ((h->spec.inverted_sides ^ head) * track_length * h->spec.tracks);
-    } else {
-        offset = track_length * ( 2* track + (h->spec.inverted_sides ^ head));
-    }
-
+    offset = disc_offset(h,track,head);
     offset += sector * h->spec.sector_size;
     memcpy(&h->image[offset], data, h->spec.sector_size);
 }
@@ -149,14 +156,8 @@ void disc_read_sector_lba(disc_handle *h, int sector_nr, int count, void *data)
 void disc_read_sector(disc_handle *h, int track, int sector, int head, void *data)
 {
     size_t offset;
-    size_t track_length = h->spec.sectors_per_track * h->spec.sector_size;
 
-    if ( h->spec.alternate_sides == 0 ) {
-        offset = track_length * track + ((h->spec.inverted_sides ^ head) * track_length * h->spec.tracks);
-    } else {
-        offset = track_length * ( 2* track + (h->spec.inverted_sides ^ head));
-    }
-
+    offset = disc_offset(h,track,head);
     offset += sector * h->spec.sector_size;
     memcpy(data, &h->image[offset], h->spec.sector_size);
 }
@@ -252,7 +253,6 @@ int disc_write_raw(disc_handle* h, const char* filename)
     size_t offs;
     FILE* fp;
     int i, j, s;
-    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
 
     if ((fp = fopen(filename, "wb")) == NULL) {
         return -1;
@@ -260,11 +260,7 @@ int disc_write_raw(disc_handle* h, const char* filename)
 
     for (i = 0; i < h->spec.tracks; i++) {
         for (s = 0; s < h->spec.sides; s++) {
-            if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + ((h->spec.inverted_sides ^ s) * track_length * h->spec.tracks);
-            } else {
-                offs = track_length * ( 2* i + (h->spec.inverted_sides ^ s));
-            }
+            offs = disc_offset(h, i, s);
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                  xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
                  fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
@@ -283,7 +279,6 @@ int disc_write_edsk(disc_handle* h, const char* filename)
     size_t offs;
     FILE* fp;
     int i, j, s;
-    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
     int sector_size = 0;
 
     i = h->spec.sector_size;
@@ -309,12 +304,7 @@ int disc_write_edsk(disc_handle* h, const char* filename)
     for (i = 0; i < h->spec.tracks; i++) {
         for (s = 0; s < h->spec.sides; s++) {
             uint8_t* ptr;
-
-            if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + ((h->spec.inverted_sides ^ s) * track_length * h->spec.tracks);
-            } else {
-                offs = track_length * ( 2* i + (h->spec.inverted_sides ^ s));
-            }
+            offs = disc_offset(h, i, s);
             memset(header, 0, 256);
             memcpy(header, "Track-Info\r\n", 12);
             header[0x10] = i;
@@ -435,13 +425,7 @@ int disc_write_d88(disc_handle* h, const char* filename)
 
     for (i = 0; i < h->spec.tracks; i++) {
         for (s = 0; s < h->spec.sides; s++) {
-
-            if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + ((h->spec.inverted_sides ^ s) * track_length * h->spec.tracks);
-            } else {
-                offs = track_length * ( 2* i + (h->spec.inverted_sides ^ s));
-            }
-
+            offs = disc_offset(h, i, s);
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                  uint8_t *ptr = header;
 
@@ -482,13 +466,10 @@ int disc_write_anadisk(disc_handle* h, const char* filename)
     FILE* fp;
     int i, j, s;
     int sector_size = 0;
-    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
-
 
     if ((fp = fopen(filename, "wb")) == NULL) {
         return -1;
     }
-
 
     i = h->spec.sector_size;
     while (i > 128) {
@@ -498,12 +479,7 @@ int disc_write_anadisk(disc_handle* h, const char* filename)
 
     for (i = 0; i < h->spec.tracks; i++) {
         for (s = 0; s < h->spec.sides; s++) {
-
-            if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + ((h->spec.inverted_sides ^ s) * track_length * h->spec.tracks);
-            } else {
-                offs = track_length * ( 2* i + (h->spec.inverted_sides ^ s));
-            }
+            offs = disc_offset(h, i, s);
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                 uint8_t header[8] = { 0 };
 
@@ -543,7 +519,6 @@ int disc_write_imd(disc_handle* h, const char* filename)
     FILE* fp;
     int i, j, s;
     int sector_size = 0;
-    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
     uint8_t buffer[80];
     uint8_t *ptr;
     time_t tim;
@@ -609,11 +584,7 @@ int disc_write_imd(disc_handle* h, const char* filename)
             fwrite(buffer, ptr - buffer, 1, fp);
 
             // And now write each sector - we don't do compression and all sectors are good
-            if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + ((h->spec.inverted_sides ^ s) * track_length * h->spec.tracks);
-            } else {
-                offs = track_length * ( 2* i + (h->spec.inverted_sides ^ s));
-            }
+            offs = disc_offset(h, i, s);
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                 fputc(1, fp);   // Sector type 1  = has data
                 xorblock(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, h->spec.xor_data);
