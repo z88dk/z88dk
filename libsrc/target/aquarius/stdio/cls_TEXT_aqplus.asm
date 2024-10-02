@@ -10,15 +10,16 @@
         EXTERN  COLOUR_MAP
 
 cls_TEXT:
+        ld      hl, DISPLAY
+        ld      de, DISPLAY+1
+        ld      (hl), 32
+
         in      a, (IO_VCTRL)
         bit     6, a
         jr      z, col40cls
 
 col80cls:
-        ld      hl, DISPLAY
-        ld      de, DISPLAY+1
         ld      bc, 2047
-        ld      (hl), 32
         ldir
 
         ld      hl, DISPLAY
@@ -39,11 +40,9 @@ col80cls:
         ret
 
 col40cls:
-        ld      hl, DISPLAY
-        ld      de, DISPLAY+1
         ld      bc, 1023
-        ld      (hl), 32
         ldir
+
         ld      hl, COLOUR_MAP
         ld      de, COLOUR_MAP+1
         ld      bc, 1023
