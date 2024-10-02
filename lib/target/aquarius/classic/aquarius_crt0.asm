@@ -24,7 +24,16 @@
 
 
     defc    TAR__no_ansifont = 1
+    PUBLIC  DISPLAY
+IF CLIB_AQUARIUS_PLUS = 1
+    defc    CONSOLE_ROWS = 25
+    defc    DISPLAY = $3000
+ELSE
     defc    CONSOLE_ROWS = 24
+    defc    DISPLAY = $3028
+ENDIF
+    PUBLIC  COLOUR_MAP
+    defc    COLOUR_MAP = DISPLAY + 1024
     defc    CONSOLE_COLUMNS = 40
     defc    __CPU_CLOCK = 4000000
 
@@ -76,7 +85,15 @@ l_dcal:
     INCLUDE	"crt/classic/crt_section.inc"
 
     SECTION code_crt_init
+IF CLIB_AQUARIUS_PLUS = 1
+    ; Remap the border color character for aqplus
+    in      a, (IO_VCTRL)
+    or      VCTRL_REMAP_BC
+    out     (IO_VCTRL), a
+    ld      hl,$3000
+ELSE
     ld      hl,$3028
+ENDIF
     ld      (base_graphics),hl
 
 IF CLIB_AQUARIUS_PLUS = 1
