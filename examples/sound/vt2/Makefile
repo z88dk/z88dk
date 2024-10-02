@@ -12,8 +12,6 @@ OUTPUT_BINS += $(foreach target, $(WYZ_TARGETS),  build/$(target)/vt2eg.bin )
 LDFLAGS_zx += -lndos
 LDFLAGS_cpc += -lndos
 
-CFLAGS_aqplus += -subtype=aqx --generic-console
-
 $(eval $(call build_app, $(WYZ_TARGETS), vt2eg.bin, main.c sound.asm ))
 
 binaries: $(OUTPUT_BINS)

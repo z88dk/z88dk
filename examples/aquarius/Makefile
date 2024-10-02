@@ -1,17 +1,15 @@
-CC:=zcc
-CFLAGS:= +aquarius -m -DSOUND -create-app
+SUBDIRS = isr dstar
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
-PROJECTS:= _dstar.caq dstar.aqx
 
-.PHONY: all clean
+.PHONY: subdirs $(SUBDIRS) $(CLEANDIRS)
 
-all: $(PROJECTS)
+subdirs: $(SUBDIRS)
 
-clean:
-	rm -f *.caq *.aqx *.map *.bin
+$(SUBDIRS):
+	$(MAKE) -C $@
 
-_dstar.caq: dstar.c dstar.h
-	$(CC) $(CFLAGS) $< -odstar.bin
+clean: $(CLEANDIRS)
 
-dstar.aqx: dstar.c dstar.h
-	$(CC) $(CFLAGS) -subtype=aqx $< -odstar_aqplus.bin
+$(CLEANDIRS): 
+	$(MAKE) -C $(@:%-clean=%) clean

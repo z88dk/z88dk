@@ -3,8 +3,6 @@
 
         PUBLIC  cls_TEXT
 
-        EXTERN  CONSOLE_COLUMNS
-        EXTERN  CONSOLE_ROWS
         EXTERN  __aquarius_attr
         EXTERN  DISPLAY
         EXTERN  COLOUR_MAP
@@ -19,6 +17,8 @@ cls_TEXT:
         jr      z, col40cls
 
 col80cls:
+        ; Fill entire text ram so we include the
+        ; border character at offset 2047
         ld      bc, 2047
         ldir
 
@@ -32,6 +32,8 @@ col80cls:
         ld      a, (__aquarius_attr)
         ld      (hl), a
         ld      a, b
+        ; Fill entire color ram so we include the
+        ; border color at offset 2047
         ld      bc, 2047
         ldir
 
@@ -40,11 +42,15 @@ col80cls:
         ret
 
 col40cls:
+        ; Fill entire text ram so we include the
+        ; border character at offset 1023
         ld      bc, 1023
         ldir
 
         ld      hl, COLOUR_MAP
         ld      de, COLOUR_MAP+1
+        ; Fill entire color ram so we include the
+        ; border color at offset 1023
         ld      bc, 1023
         ld      a, (__aquarius_attr)
         ld      (hl), a

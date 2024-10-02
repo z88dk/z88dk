@@ -18,7 +18,6 @@ OUTPUT_BINS += $(foreach target, $(ARKOS_ROM_PERIODIC_TARGETS),  build/$(target)
 
 
 CFLAGS_cpc = -subtype=dsk
-CFLAGS_aqplus += -subtype=aqx --generic-console
 
 
 $(eval $(call build_app, $(ARKOS_INT_TARGETS), arkint.bin, arkos_interrupt.c ))

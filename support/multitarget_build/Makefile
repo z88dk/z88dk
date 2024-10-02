@@ -44,8 +44,8 @@ ZCFLAGS_aquarius_rom = -subtype=rom
 ZLDFLAGS_aquarius_rom = 
 
 Z88DKTARGET_aqplus = aquarius
-ZCFLAGS_aqplus = -clib=aqplus
-ZLDFLAGS_aqplus = 
+ZCFLAGS_aqplus = -clib=aqplus -subtype=aqx
+ZLDFLAGS_aqplus =
 
 Z88DKTARGET_bit90 = coleco
 ZCFLAGS_bit90 = -subtype=bit90
