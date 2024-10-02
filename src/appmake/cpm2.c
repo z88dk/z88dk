@@ -105,7 +105,7 @@ static disc_spec actrix_spec = {
 
 static disc_spec ampro_spec = {
     .name = "Ampro",
-    .disk_mode = MFM300,	
+    .disk_mode = MFM300,
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 2,
@@ -208,7 +208,7 @@ static disc_spec archive_spec = {
 
 static disc_spec attache_spec = {
     .name = "Attache",
-    .disk_mode = MFM300,	
+    .disk_mode = MFM300,
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 2,
@@ -670,7 +670,7 @@ static disc_spec kaypro4_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 0,
-	.side2_sector_numbering = 1
+    .side2_sector_numbering = 1
 };
 
 
@@ -712,12 +712,12 @@ static disc_spec mz80_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-	.xor_data = 0xff,
+    .xor_data = 0xff,
     .has_skew = 1,
     .skew_track_start = 0,
     .skew_tab = { 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 },
-	.inverted_sides = 1,
-	.side2_sector_numbering = 1
+    .inverted_sides = 1,
+    .side2_sector_numbering = 1
 };
 
 
@@ -754,6 +754,30 @@ static disc_spec mz2500cpm_spec = {
     .byte_size_extents = 0,
     .first_sector_offset = 1,
     .alternate_sides = 1
+};
+
+
+// Sharp MZ-3500 - 320K
+// Creates good images only in RAW mode, to convert to IMD:
+// BIN2IMD.COM /2 N=40 SS=256 DM=5 SM=1-16 dpb.img a.imd
+
+static disc_spec mz3500_spec = {
+    .name = "MZ3500",
+    .disk_mode = MFM250,
+    .sectors_per_track = 32,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 4, 8, 12, 16, 20, 24, 28,  1, 5, 9, 13, 17, 21, 25, 29,   2, 6, 10, 14, 18, 22, 26, 30,   3, 7, 11, 15, 19, 23, 27, 31 }
 };
 
 
@@ -1566,7 +1590,7 @@ static disc_spec lynx_spec = {
 // Some of the disk images are marked as MFM300
 static disc_spec rainbow_spec = {
     .name = "Rainbow100",
-    .disk_mode = MFM250,	
+    .disk_mode = MFM250,
     .sectors_per_track = 10,
     .tracks = 80,
     .sides = 1,
@@ -1639,7 +1663,7 @@ static disc_spec sagafox_spec = {
     .first_sector_offset = 1,
     .has_skew = 1,
     .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 },
-	.xor_data = 0xff
+    .xor_data = 0xff
 };
 
 
@@ -2042,7 +2066,7 @@ static struct formats {
     { "kaypro4",   "Kaypro 4/10",           &kaypro4_spec,  0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
-	{ "max80cpm3", "Lobo MAX-80 CPM3 SS",   &lobo_spec, 0, NULL, 1 },
+    { "max80cpm3", "Lobo MAX-80 CPM3 SS",   &lobo_spec, 0, NULL, 1 },
     { "microbee-ds40",  "Microbee DS40",    &microbee40_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
     { "micromate", "PMC-101 MicroMate",     &pmc101_spec, 0, NULL, 1 },
@@ -2059,6 +2083,7 @@ static struct formats {
     { "mz800",     "Sharp MZ800",           &mz800_spec, 0, NULL, 1 },
     { "mz2000",    "Sharp MZ2000",          &mz2000_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
+    { "mz3500",    "Sharp MZ3500 (RAW)",    &mz3500_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
     { "pasopia",   "Toshiba Pasopia/T100",  &pasopia_spec, 0, NULL, 1 },
