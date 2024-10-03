@@ -61,12 +61,11 @@ finish:
 
 ROUT:
         XOR     A
-        LD      C, D
 LOUT:
         OUT     (C), A
-        LD      C, E
+        DEC     C
         OUTI
-        LD      C, D
+        INC     C
         INC     A
         CP      13
         JR      NZ, LOUT
@@ -74,7 +73,7 @@ LOUT:
         LD      A, (HL)
         AND     A
         RET     M
-        LD      C, E
+        DEC     C
         OUT     (C), A
         RET
 
@@ -98,11 +97,11 @@ noSkip:
         call    PT3Player_DecodeB
 
         LD      HL, AYREGSA
-        LD      DE, (IO_PSG1ADDR<<8)|IO_PSG1DATA
+        LD      C, IO_PSG1ADDR
         call    ROUT
 
         LD      HL, AYREGSB
-        LD      DE, (IO_PSG2ADDR<<8)|IO_PSG2DATA
+        LD      C, IO_PSG2ADDR
         call    ROUT
 
 skipFrame:
