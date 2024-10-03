@@ -930,23 +930,6 @@ static disc_spec pc88_spec = {
 };
 
 
-static disc_spec qc10_spec = {
-    .name = "QC10",
-    .sectors_per_track = 10,
-    .tracks = 40,
-    .sides = 2,
-    .sector_size = 512,
-    .gap3_length = 0x3e,
-    .filler_byte = 0xe5,
-    .boottracks = 4,
-    .directory_entries = 64,
-    .extent_size = 2048,
-    .byte_size_extents = 1,
-    .first_sector_offset = 1,
-    .alternate_sides = 1,
-};
-
-
 // Epson QX/QC, 10x512 s/t
 // (tracks 0/0 to 1/1 need to be reformatted to 16x256 to boot CP/M)
 static disc_spec qc10_spec = {
@@ -974,7 +957,7 @@ static disc_spec qc10m1_spec = {
     .tracks = 40,
     .sides = 2,
     .sector_size = 256,
-    .gap3_length = 0x17,
+	.gap3_length = 0x17,
     .filler_byte = 0xe5,
     .boottracks = 8,
     .directory_entries = 64,
@@ -983,6 +966,7 @@ static disc_spec qc10m1_spec = {
     .first_sector_offset = 1,
     .alternate_sides = 1
 };
+
 
 
 static disc_spec tiki100_ss_spec = {
