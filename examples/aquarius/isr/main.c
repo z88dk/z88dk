@@ -5,7 +5,7 @@
 #include <sys/ioctl.h>
 #include <arch/aquarius.h>
 
-#define BORDER(a) *((unsigned char *)0x37ff) = (a)
+#define BORDER(a) *((unsigned char *)BORDERCLR) = (a)
 
 isr_t ISR(void)
 {
@@ -14,11 +14,11 @@ isr_t ISR(void)
     unsigned char vline = IO_VLINE; // Read the VLINE value
     unsigned int VCTRL = IO_VCTRL;
 
-    if (VCTRL & 0x40)
+    if (VCTRL & VCRTL_80COL_EN)
     {
         // 80x25 mode so enable 2nd text page
         // to access to color RAM
-        IO_VCTRL = VCTRL | 0x80;
+        IO_VCTRL = VCTRL | VCTRL_TEXT_PAGE;
     }
 
     if (vline < 50)
@@ -56,7 +56,7 @@ isr_t ISR(void)
     IO_VCTRL = VCTRL;
 
     // Clear the VLINE interrupt
-    IO_IRQSTAT = 0x02;
+    IO_IRQSTAT = IRQ_VLINE;
 
     M_RESTORE_MAIN;
 }
@@ -93,7 +93,7 @@ void main(void)
 
     // Enable the VLINE interrupt at line 0
     IO_VIRQLINE = 0;
-    IO_IRQMASK |= IRQ_VLINE;
+    IO_IRQMASK = IRQ_VLINE;
 
     displayInfo();
 
