@@ -1,4 +1,4 @@
-SUBDIRS = isr dstar
+SUBDIRS = isr dstar TurboSound
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 
