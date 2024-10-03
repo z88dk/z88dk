@@ -31,6 +31,7 @@ target/aquarius/fcntl/remove
 target/aquarius/fcntl/rename
 target/aquarius/fcntl/write
 target/aquarius/fcntl/writebyte
+target/aquarius/stdio/bordercolour_aqplus
 target/aquarius/stdio/cls_TEXT_aqplus
 target/aquarius/stdio/printc_TEXT_aqplus
 target/aquarius/stdio/scrollup_TEXT_aqplus

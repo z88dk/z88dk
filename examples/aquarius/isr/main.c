@@ -61,9 +61,14 @@ isr_t ISR(void)
     M_RESTORE_MAIN;
 }
 
-void displayInfo(unsigned char width)
+void displayInfo(void)
 {
-    printf("%cInterrupt example in %dx25 text mode\n", 12, width);
+    unsigned int val;
+
+    console_ioctl(IOCTL_GENCON_CONSOLE_SIZE, &val);
+
+    printf("%cInterrupt example in %dx%d text mode\n", 12, val & 0xff, val >> 8);
+
     for (char a = 1; a < 24; a++)
         printf("Row %d\n", a);
     printf("Press ENTER to scroll");
@@ -75,6 +80,7 @@ void displayInfo(unsigned char width)
 
     getch();
 }
+
 void main(void)
 {
     int val = VCTRL_TEXT_EN | VCTRL_REMAP_BC | VCRTL_80COL_EN;
@@ -89,16 +95,17 @@ void main(void)
     IO_VIRQLINE = 0;
     IO_IRQMASK |= IRQ_VLINE;
 
-    displayInfo(40);
+    displayInfo();
 
     console_ioctl(IOCTL_GENCON_SET_MODE, &val);
 
-    displayInfo(80);
+    displayInfo();
 
     // Back to 40x25 mode
     val = VCTRL_TEXT_EN | VCTRL_REMAP_BC;
     console_ioctl(IOCTL_GENCON_SET_MODE, &val);
 
     // Set border back to black
-    BORDER(0);
+    intrinsic_di();
+    bordercolor(0);
 }
