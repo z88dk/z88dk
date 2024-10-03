@@ -930,6 +930,8 @@ static disc_spec pc88_spec = {
 };
 
 
+// Epson QX/QC, 10x512 s/t
+// (tracks 0/0 to 1/1 need to be reformatted to 16x256 to boot CP/M)
 static disc_spec qc10_spec = {
     .name = "QC10",
     .sectors_per_track = 10,
@@ -943,8 +945,28 @@ static disc_spec qc10_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-    .alternate_sides = 1,
+    .alternate_sides = 1
 };
+
+
+// Epson QX/QC, 16x256 s/t
+static disc_spec qc10m1_spec = {
+    .name = "QC10",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+	.gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 8,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1
+};
+
 
 
 static disc_spec tiki100_ss_spec = {
@@ -2103,6 +2125,7 @@ static struct formats {
     { "lec80t",    "ZX LEC Betadisk 80T",   &zxlec_spec, 0, NULL, 1 },
     { "quorum",    "ZX Quorum,Profi,Hobb.", &quorum_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
+    { "qc10m1",    "Epson QC-10, QX-10",    &qc10m1_spec, 0, NULL, 1 },
     { "rainbow",   "DEC Rainbow/DECmate",   &rainbow_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
     { "sagafox",   "SAGA FOX OS",           &sagafox_spec, 0, NULL, 1 },
