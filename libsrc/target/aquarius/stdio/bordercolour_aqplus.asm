@@ -4,16 +4,17 @@
 
         #include    "target/aquarius/def/plus.inc"
         SECTION code_clib
+	EXTERN	__aquarius_mode
         PUBLIC  bordercolor
         PUBLIC  _bordercolor
 
 bordercolor:
 _bordercolor:
-        in      a, (IO_VCTRL)
+        ld      a, (__aquarius_mode)
         bit     6, a
         jr      nz, col80
 
-	    ; Set the color value
+        ; Set the color value
         ld      a, l
         ld      (BORDERCLR), a
         ret
@@ -23,11 +24,12 @@ col80:
         or      VCTRL_TEXT_PAGE
         out     (IO_VCTRL), a
 
-	    ; Set the color value
+        ; Set the color value
         ld      a, l
         ld      (BORDERCLR), a
 
-	    ; Restore original value
+        ; Restore original value
         ld      a, b
         out     (IO_VCTRL), a
         ret
+

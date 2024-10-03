@@ -5,6 +5,7 @@
 
         EXTERN  xypos_TEXT
         EXTERN  __aquarius_attr
+	EXTERN	__aquarius_mode
 
 
 ; c = x
@@ -15,7 +16,7 @@ printc_TEXT:
         call    xypos_TEXT
         ld      (hl), d
 
-        in      a, (IO_VCTRL)
+        ld      a, (__aquarius_mode)
         bit     6, a
         jr      nz, col80
 

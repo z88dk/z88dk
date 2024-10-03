@@ -76,18 +76,22 @@ ck_mode:
         cp      IOCTL_GENCON_SET_MODE
         jr      nz, failure
         ld      a, e
-        ; VCTRL_MODE_OFF       = (0 << 1),
-        ; VCTRL_TEXT_ENABLE    = (1 << 0),
-        ; VCTRL_MODE_TILEMAP   = (1 << 1),
-        ; VCTRL_MODE_BITMAP    = (2 << 1),
-        ; VCTRL_MODE_MASK      = (3 << 1),
-        ; VCTRL_SPRITES_ENABLE = (1 << 3),
-        ; VCTRL_TEXT_PRIORITY  = (1 << 4),
+        ; VCTRL_MODE_OFF             = (0 << 1),
+        ; VCTRL_TEXT_ENABLE          = (1 << 0),
+        ; VCTRL_MODE_TILEMAP         = (1 << 1),
+        ; VCTRL_MODE_BITMAP (1bpp)   = (2 << 1),
+        ; VCTRL_MODE_MC (4bpp)       = (3 << 1),
+        ; VCTRL_SPRITES_ENABLE       = (1 << 3),
+        ; VCTRL_TEXT_PRIORITY        = (1 << 4),
         ; 1 = mode 0  = text 40x25
-        ; 2 = mode 1 - 64x32 tilemap
-        ; 3 = mode 2  = hires 320x200
-        ; +8 = sprites enable
-        ; +16 = text priority
+        ; 2 = mode 1  = 64x32 tilemap
+        ; 3 = mode 2  = hires 320x200 1bpp
+        ; 4 = mode 3  = lores 160x200 4bpp
+        ; +8   = sprites enable
+        ; +16  = text priority
+        ; +32  = remap border color
+        ; +64  = 80 column text mode
+        ; +128 = select 2nd text page
         ;
         ; If text is enabled, we preferentially print to there
         ;
@@ -104,13 +108,12 @@ setWidth:
         ld      (__console_w), a
         ld      a, b
 
-        ld      b, 25
         ld      c, CLIB_GENCON_CAPS_TEXT
-        bit     1, a
+        bit     0, a
         jr      nz, set_caps
         ld      c, CLIB_GENCON_CAPS_BITMAP
 set_caps:
-        ld      a, b
+        ld      a, 25
         ld      (__console_h), a
         ld      a, c
         ld      (generic_console_caps), a

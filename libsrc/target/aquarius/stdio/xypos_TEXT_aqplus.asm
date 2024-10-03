@@ -8,6 +8,7 @@
         EXTERN  DISPLAY
 
         EXTERN  __aquarius_video_base
+	EXTERN	__aquarius_mode
 
 ; Entry:
 ;       b = row
@@ -41,7 +42,7 @@ xypos:
         ld      c, a                    ;column
         ld      b, 0
 
-        in      a, (IO_VCTRL)
+        ld      a, (__aquarius_mode)
         and     VCRTL_80COL_EN
         jr      z, col40
         add     hl, hl                  ;*80

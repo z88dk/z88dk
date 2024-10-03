@@ -4,6 +4,7 @@
         PUBLIC  cls_TEXT
 
         EXTERN  __aquarius_attr
+	EXTERN	__aquarius_mode
         EXTERN  DISPLAY
         EXTERN  COLOUR_MAP
 
@@ -12,7 +13,7 @@ cls_TEXT:
         ld      de, DISPLAY+1
         ld      (hl), 32
 
-        in      a, (IO_VCTRL)
+        ld      a, (__aquarius_mode)
         bit     6, a
         jr      z, col40cls
 

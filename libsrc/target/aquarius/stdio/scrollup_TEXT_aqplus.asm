@@ -8,12 +8,13 @@
         EXTERN  DISPLAY
         EXTERN  COLOUR_MAP
         EXTERN  __aquarius_attr
+	EXTERN  __aquarius_mode
 
 scrollup_TEXT:
         push    de
         push    bc
 
-        in      a, (IO_VCTRL)
+        ld      a, (__aquarius_mode)
         bit     6, a
         jr      nz, col80
 
