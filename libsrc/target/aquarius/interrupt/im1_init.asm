@@ -16,12 +16,6 @@ im1_init:
 _im1_init:
         di
 
-        ; Save info at address INTJMP
-        ld      hl, INTJMP
-        ld      de, existing_int
-        ld      bc, EXISTING_INT_SIZE
-        ldir
-
         ; Write code to jump to our handler
         ld      a, Z80_OPCODE_JP
         ld      (INTJMP), a
@@ -58,10 +52,18 @@ asm_im1_handler:
         ei
         ret
 
+        SECTION code_crt_init
+        ; Save info at address INTJMP
+        ld      hl, INTJMP
+        ld      de, existing_int
+        ld      bc, EXISTING_INT_SIZE
+        ldir
+
+
         SECTION code_crt_exit
         di
-	    ; Back to IM0 for return to basic
-	    im	0
+	; Back to IM0 for return to basic
+	im	0
         ; Mask the VBLANK IRQ
         in      a, (IO_IRQMASK)
         and     ~IRQ_VBLANK

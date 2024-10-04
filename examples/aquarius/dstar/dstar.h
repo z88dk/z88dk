@@ -1,6 +1,5 @@
 
 #pragma string name DStar
-#pragma output nostreams
 
 
 void putpic (int x, int y, int picture);
