@@ -168,6 +168,10 @@ void main(void)
     IO_VIRQLINE = 0;
     IO_IRQMASK = IRQ_VLINE;
 
+    // Set 40 column mode
+    val = VCTRL_TEXT_EN | VCTRL_REMAP_BC;
+    console_ioctl(IOCTL_GENCON_SET_MODE, &val);
+
     displayInfo();
 
     // Set 80 column mode

@@ -90,6 +90,8 @@ IF CLIB_AQUARIUS_PLUS = 1
     in      a, (IO_VCTRL)
     or      VCTRL_REMAP_BC
     out     (IO_VCTRL), a
+    EXTERN  __aquarius_mode
+    ld      (__aquarius_mode), a
     ld      hl,$3000
 ELSE
     ld      hl,$3028
