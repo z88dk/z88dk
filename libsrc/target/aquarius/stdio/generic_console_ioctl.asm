@@ -133,8 +133,16 @@ failure:
         ld      c, CLIB_AQUARIUS_PLUS
         rr      c
         jr      nc, not_plus
-        ld      a, CLIB_GENCON_CAPS_TEXT
-        ld      (generic_console_caps), a
+
         call    set_default_palette
+
+        ; Remap the border color character for aqplus
+        in      a, (IO_VCTRL)
+        or      VCTRL_REMAP_BC
+        ld      e, a
+        ld      a, IOCTL_GENCON_SET_MODE
+        ; This will setup the mode and screen size
+        ; so that it matches the hardware during init.
+        call    ck_mode
 not_plus:
 

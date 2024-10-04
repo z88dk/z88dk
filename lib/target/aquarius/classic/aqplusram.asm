@@ -250,6 +250,7 @@ conv:
     ret
 
 
+    SECTION data_crt
 ; Use #pragma string basename [basename] to set the name of the file
 _basename:
     DEFINE NEED_basename
@@ -260,6 +261,7 @@ __basename_ext:
     defm    "00.bin"
     defb    0
 
+    SECTION bss_crt
 mainsp:     defw    0
 tempstack:  defs    CLIB_BANKING_STACK_SIZE
 tempsp:     defw    tempstack + CLIB_BANKING_STACK_SIZE

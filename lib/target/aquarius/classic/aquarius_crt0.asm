@@ -85,17 +85,7 @@ l_dcal:
     INCLUDE	"crt/classic/crt_section.inc"
 
     SECTION code_crt_init
-IF CLIB_AQUARIUS_PLUS = 1
-    ; Remap the border color character for aqplus
-    in      a, (IO_VCTRL)
-    or      VCTRL_REMAP_BC
-    out     (IO_VCTRL), a
-    EXTERN  __aquarius_mode
-    ld      (__aquarius_mode), a
-    ld      hl,$3000
-ELSE
-    ld      hl,$3028
-ENDIF
+    ld      hl, DISPLAY
     ld      (base_graphics),hl
 
 IF CLIB_AQUARIUS_PLUS = 1
