@@ -97,7 +97,7 @@ to get this program to compile and run:
   
   #include <arch/zx.h>
   
-  int main()
+  int main(void)
   {
     zx_border(INK_BLACK);
     return 0;
@@ -207,7 +207,7 @@ header files and only a some of them are for use with zsdcc and the
 Spectrum.
 
 The answer can be found by running our compilation command again with -v instead
-of -vn and looking for the -I argument on the zsdccp command. How this affects
+of -vn and looking for the -isystem argument on the z88dk-ucpp command. How this affects
 the compilation is beyond the scope of a getting started guide, but suffice to
 say it shows that when using the zsdcc compiler the header files come from this
 directory:
@@ -234,7 +234,7 @@ zx_border() code come from? The answer is the sdcc_iy standard library specified
 in the zcc compilation command via the -clib argument.
 
 Another peek at the output of zcc with the -v argument shows a -L argument being
-passed into an embedded z80asm command. Again, details are beyond the scope of
+passed into an embedded z88dk-z80asm command. Again, details are beyond the scope of
 this document, but the value for that argument tells us that the library code is
 coming from:
 ```
@@ -255,6 +255,6 @@ can inspect the contents of the library with the z88dk-z80nm command:
 Do a search and you'll find the zx_border() function listed in there.
 
 The actual source code used to build the library is rooted in [z88dk/libsrc/_DEVELOPMENT](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT)
-and a search using the header path `arch/zx` as clue locates the [asm_zx_border.asm](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/arch/zx/misc/z80/asm_zx_border.asm) function in `arch/zx/misc/z80`.
+and a search using the header path `arch/zx` as a clue locates the [asm_zx_border.asm](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/arch/zx/misc/z80/asm_zx_border.asm) function in `arch/zx/misc/z80`.
 
 [... continue to Part 2: Hello World](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md)
