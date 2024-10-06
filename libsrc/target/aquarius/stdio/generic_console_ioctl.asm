@@ -3,8 +3,6 @@
         MODULE  generic_console_ioctl
         PUBLIC  generic_console_ioctl
 
-        PUBLIC  ck_mode
-
         SECTION code_clib
         INCLUDE "ioctl.def"
         INCLUDE "target/aquarius/def/aqplus.def"
