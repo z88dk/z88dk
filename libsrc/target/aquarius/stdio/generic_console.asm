@@ -1,6 +1,7 @@
 ;
 
 
+    INCLUDE "target/aquarius/def/aqplus.def"
 
     SECTION		code_clib
 
@@ -8,12 +9,17 @@
     PUBLIC		generic_console_scrollup
     PUBLIC		generic_console_printc
 
+    EXTERN  CLIB_AQUARIUS_PLUS
+
+
     EXTERN      printc_BITMAP
     EXTERN      printc_TEXT
     EXTERN      cls_BITMAP
     EXTERN      cls_TEXT
     EXTERN      scrollup_BITMAP
     EXTERN      scrollup_TEXT
+
+    EXTERN      ck_mode
 
     EXTERN      __aquarius_mode
 
@@ -57,3 +63,26 @@ generic_console_scrollup:
     bit     2,(hl)
     jp      nz,scrollup_BITMAP
     ret
+
+
+    SECTION code_crt_init
+
+    EXTERN  set_default_palette
+
+    ; On an Aquarius+ we modify the caps so that we can define the font
+    ld      c, CLIB_AQUARIUS_PLUS
+    rr      c
+    jr      nc, not_plus
+
+    call    set_default_palette
+
+    ; Remap the border color character for aqplus
+    in      a, (IO_VCTRL)
+    or      VCTRL_REMAP_BC
+    ld      e, a
+    ld      a, IOCTL_GENCON_SET_MODE
+    ; This will setup the mode and screen size
+    ; so that it matches the hardware during init.
+    call    ck_mode
+not_plus:
+
