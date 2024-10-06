@@ -11,7 +11,6 @@
 
     EXTERN  CLIB_AQUARIUS_PLUS
 
-
     EXTERN      printc_BITMAP
     EXTERN      printc_TEXT
     EXTERN      cls_BITMAP
@@ -19,7 +18,7 @@
     EXTERN      scrollup_BITMAP
     EXTERN      scrollup_TEXT
 
-    EXTERN      ck_mode
+    EXTERN      generic_console_ioctl
 
     EXTERN      __aquarius_mode
 
@@ -79,10 +78,10 @@ generic_console_scrollup:
     ; Remap the border color character for aqplus
     in      a, (IO_VCTRL)
     or      VCTRL_REMAP_BC
-    ld      e, a
+    ld      de, __aquarius_mode
+    ld      (de), a
     ld      a, IOCTL_GENCON_SET_MODE
     ; This will setup the mode and screen size
     ; so that it matches the hardware during init.
-    call    ck_mode
+    call    generic_console_ioctl
 not_plus:
-
