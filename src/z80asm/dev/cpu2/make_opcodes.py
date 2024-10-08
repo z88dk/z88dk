@@ -161,9 +161,15 @@ def build_8080_strict(cpu, **kwargs):
     add(cpu, f"nop", [0x00])
     add(cpu, f"hlt", [0x76])
 
-def build_8080_zilog(cpu):
-    build_8080_strict(cpu, zilog=True)
+def build_8085_strict(cpu, **kwargs):
+    build_8080_strict(cpu, **kwargs)
     
+    add(cpu, f"rim", [0x20])
+    add(cpu, f"sim", [0x30])
+
+def build_8080_z80asm(cpu):
+    build_8080_strict(cpu, zilog=True)
+
     # synthetic opcodes
     
     # restart
@@ -173,12 +179,13 @@ def build_8080_zilog(cpu):
     
     # register pair names
     for rp in ['bc', 'de', 'hl']:
-        for op in ['inx', 'dcx', 'dad', 'push', 'pop']:
-            add_synth(cpu, f"{op} {rp}", [op+" "+rp[0]]);
         add_synth(cpu, f"lxi {rp}, %m", ["lxi "+rp[0]+", %m"])
+        for op in ['inx', 'dcx', 'dad', 'push', 'pop']:
+            add_synth(cpu, f"{op} {rp}", [op+" "+rp[0]])
+            
     for rp in ['bc', 'de']:
         for op in ['stax', 'ldax']:
-            add_synth(cpu, f"{op} {rp}", [op+" "+rp[0]]);
+            add_synth(cpu, f"{op} {rp}", [op+" "+rp[0]])
 
     # 16-bit mov
     for src in ['bc', 'de', 'hl']:
@@ -186,10 +193,12 @@ def build_8080_zilog(cpu):
             if src != dst:
                 add_synth(cpu, f"mov {dst}, {src}", 
                                ["mov "+dst[0]+", "+src[0],
-                                "mov "+dst[1]+", "+src[1]]);
+                                "mov "+dst[1]+", "+src[1]])
 
 build_8080_strict("8080_strict")
-build_8080_zilog("8080")
+build_8085_strict("8085_strict")
+
+build_8080_z80asm("8080")
 
 if len(sys.argv) != 2:
     raise ValueError(f"Usage: make_opcodes.py output.json")
