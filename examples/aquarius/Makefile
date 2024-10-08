@@ -1,4 +1,4 @@
-SUBDIRS = isr dstar TurboSound
+SUBDIRS = isr dstar TurboSound tiles_and_sprites
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 
