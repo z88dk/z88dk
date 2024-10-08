@@ -1,0 +1,524 @@
+|===========================|===========|===========================================================|
+|Assembly                   |CPU        |S Opcodes                                                  |
+|===========================|===========|===========================================================|
+|aci %n                     |8080       |  CE %n                                                    |
+|aci %n                     |8080_strict|  CE %n                                                    |
+|adc a                      |8080       |  88                                                       |
+|adc a                      |8080_strict|  88                                                       |
+|adc b                      |8080       |  81                                                       |
+|adc b                      |8080_strict|  81                                                       |
+|adc c                      |8080       |  82                                                       |
+|adc c                      |8080_strict|  82                                                       |
+|adc d                      |8080       |  83                                                       |
+|adc d                      |8080_strict|  83                                                       |
+|adc e                      |8080       |  84                                                       |
+|adc e                      |8080_strict|  84                                                       |
+|adc h                      |8080       |  85                                                       |
+|adc h                      |8080_strict|  85                                                       |
+|adc l                      |8080       |  86                                                       |
+|adc l                      |8080_strict|  86                                                       |
+|adc m                      |8080       |  87                                                       |
+|adc m                      |8080_strict|  87                                                       |
+|add a                      |8080       |  87                                                       |
+|add a                      |8080_strict|  87                                                       |
+|add b                      |8080       |  80                                                       |
+|add b                      |8080_strict|  80                                                       |
+|add c                      |8080       |  81                                                       |
+|add c                      |8080_strict|  81                                                       |
+|add d                      |8080       |  82                                                       |
+|add d                      |8080_strict|  82                                                       |
+|add e                      |8080       |  83                                                       |
+|add e                      |8080_strict|  83                                                       |
+|add h                      |8080       |  84                                                       |
+|add h                      |8080_strict|  84                                                       |
+|add l                      |8080       |  85                                                       |
+|add l                      |8080_strict|  85                                                       |
+|add m                      |8080       |  86                                                       |
+|add m                      |8080_strict|  86                                                       |
+|adi %n                     |8080       |  C6 %n                                                    |
+|adi %n                     |8080_strict|  C6 %n                                                    |
+|ana a                      |8080       |  A7                                                       |
+|ana a                      |8080_strict|  A7                                                       |
+|ana b                      |8080       |  A0                                                       |
+|ana b                      |8080_strict|  A0                                                       |
+|ana c                      |8080       |  A1                                                       |
+|ana c                      |8080_strict|  A1                                                       |
+|ana d                      |8080       |  A2                                                       |
+|ana d                      |8080_strict|  A2                                                       |
+|ana e                      |8080       |  A3                                                       |
+|ana e                      |8080_strict|  A3                                                       |
+|ana h                      |8080       |  A4                                                       |
+|ana h                      |8080_strict|  A4                                                       |
+|ana l                      |8080       |  A5                                                       |
+|ana l                      |8080_strict|  A5                                                       |
+|ana m                      |8080       |  A6                                                       |
+|ana m                      |8080_strict|  A6                                                       |
+|ani %n                     |8080       |  E6 %n                                                    |
+|ani %n                     |8080_strict|  E6 %n                                                    |
+|call %m                    |8080       |  CD %m %m                                                 |
+|call %m                    |8080_strict|  CD %m %m                                                 |
+|cc %m                      |8080       |  DC %m %m                                                 |
+|cc %m                      |8080_strict|  DC %m %m                                                 |
+|cm %m                      |8080       |  FC %m %m                                                 |
+|cm %m                      |8080_strict|  FC %m %m                                                 |
+|cma                        |8080       |  2F                                                       |
+|cma                        |8080_strict|  2F                                                       |
+|cmc                        |8080       |  3F                                                       |
+|cmc                        |8080_strict|  3F                                                       |
+|cmp a                      |8080       |  BF                                                       |
+|cmp a                      |8080_strict|  BF                                                       |
+|cmp b                      |8080       |  B8                                                       |
+|cmp b                      |8080_strict|  B8                                                       |
+|cmp c                      |8080       |  B9                                                       |
+|cmp c                      |8080_strict|  B9                                                       |
+|cmp d                      |8080       |  BA                                                       |
+|cmp d                      |8080_strict|  BA                                                       |
+|cmp e                      |8080       |  BB                                                       |
+|cmp e                      |8080_strict|  BB                                                       |
+|cmp h                      |8080       |  BC                                                       |
+|cmp h                      |8080_strict|  BC                                                       |
+|cmp l                      |8080       |  BD                                                       |
+|cmp l                      |8080_strict|  BD                                                       |
+|cmp m                      |8080       |  BE                                                       |
+|cmp m                      |8080_strict|  BE                                                       |
+|cnc %m                     |8080       |  D4 %m %m                                                 |
+|cnc %m                     |8080_strict|  D4 %m %m                                                 |
+|cnz %m                     |8080       |  C4 %m %m                                                 |
+|cnz %m                     |8080_strict|  C4 %m %m                                                 |
+|cp %m                      |8080_strict|  F4 %m %m                                                 |
+|cpe %m                     |8080       |  EC %m %m                                                 |
+|cpe %m                     |8080_strict|  EC %m %m                                                 |
+|cpi %n                     |8080       |  FE %n                                                    |
+|cpi %n                     |8080_strict|  FE %n                                                    |
+|cpo %m                     |8080       |  E4 %m %m                                                 |
+|cpo %m                     |8080_strict|  E4 %m %m                                                 |
+|cz %m                      |8080       |  CC %m %m                                                 |
+|cz %m                      |8080_strict|  CC %m %m                                                 |
+|daa                        |8080       |  27                                                       |
+|daa                        |8080_strict|  27                                                       |
+|dad b                      |8080       |  09                                                       |
+|dad b                      |8080_strict|  09                                                       |
+|dad bc                     |8080       |* 09                                                       |
+|dad d                      |8080       |  19                                                       |
+|dad d                      |8080_strict|  19                                                       |
+|dad de                     |8080       |* 19                                                       |
+|dad h                      |8080       |  29                                                       |
+|dad h                      |8080_strict|  29                                                       |
+|dad hl                     |8080       |* 29                                                       |
+|dad sp                     |8080       |  39                                                       |
+|dad sp                     |8080_strict|  39                                                       |
+|dcr a                      |8080       |  3D                                                       |
+|dcr a                      |8080_strict|  3D                                                       |
+|dcr b                      |8080       |  05                                                       |
+|dcr b                      |8080_strict|  05                                                       |
+|dcr c                      |8080       |  0D                                                       |
+|dcr c                      |8080_strict|  0D                                                       |
+|dcr d                      |8080       |  15                                                       |
+|dcr d                      |8080_strict|  15                                                       |
+|dcr e                      |8080       |  1D                                                       |
+|dcr e                      |8080_strict|  1D                                                       |
+|dcr h                      |8080       |  25                                                       |
+|dcr h                      |8080_strict|  25                                                       |
+|dcr l                      |8080       |  2D                                                       |
+|dcr l                      |8080_strict|  2D                                                       |
+|dcr m                      |8080       |  35                                                       |
+|dcr m                      |8080_strict|  35                                                       |
+|dcx b                      |8080       |  0B                                                       |
+|dcx b                      |8080_strict|  0B                                                       |
+|dcx bc                     |8080       |* 0B                                                       |
+|dcx d                      |8080       |  1B                                                       |
+|dcx d                      |8080_strict|  1B                                                       |
+|dcx de                     |8080       |* 1B                                                       |
+|dcx h                      |8080       |  2B                                                       |
+|dcx h                      |8080_strict|  2B                                                       |
+|dcx hl                     |8080       |* 2B                                                       |
+|dcx sp                     |8080       |  3B                                                       |
+|dcx sp                     |8080_strict|  3B                                                       |
+|di                         |8080       |  F3                                                       |
+|di                         |8080_strict|  F3                                                       |
+|ei                         |8080       |  FB                                                       |
+|ei                         |8080_strict|  FB                                                       |
+|hlt                        |8080       |  76                                                       |
+|hlt                        |8080_strict|  76                                                       |
+|in %n                      |8080       |  DB %n                                                    |
+|in %n                      |8080_strict|  DB %n                                                    |
+|inr a                      |8080       |  3C                                                       |
+|inr a                      |8080_strict|  3C                                                       |
+|inr b                      |8080       |  04                                                       |
+|inr b                      |8080_strict|  04                                                       |
+|inr c                      |8080       |  0C                                                       |
+|inr c                      |8080_strict|  0C                                                       |
+|inr d                      |8080       |  14                                                       |
+|inr d                      |8080_strict|  14                                                       |
+|inr e                      |8080       |  1C                                                       |
+|inr e                      |8080_strict|  1C                                                       |
+|inr h                      |8080       |  24                                                       |
+|inr h                      |8080_strict|  24                                                       |
+|inr l                      |8080       |  2C                                                       |
+|inr l                      |8080_strict|  2C                                                       |
+|inr m                      |8080       |  34                                                       |
+|inr m                      |8080_strict|  34                                                       |
+|inx b                      |8080       |  03                                                       |
+|inx b                      |8080_strict|  03                                                       |
+|inx bc                     |8080       |* 03                                                       |
+|inx d                      |8080       |  13                                                       |
+|inx d                      |8080_strict|  13                                                       |
+|inx de                     |8080       |* 13                                                       |
+|inx h                      |8080       |  23                                                       |
+|inx h                      |8080_strict|  23                                                       |
+|inx hl                     |8080       |* 23                                                       |
+|inx sp                     |8080       |  33                                                       |
+|inx sp                     |8080_strict|  33                                                       |
+|jc %m                      |8080       |  DA %m %m                                                 |
+|jc %m                      |8080_strict|  DA %m %m                                                 |
+|jm %m                      |8080       |  FA %m %m                                                 |
+|jm %m                      |8080_strict|  FA %m %m                                                 |
+|jmp %m                     |8080       |  3C %m %m                                                 |
+|jmp %m                     |8080_strict|  3C %m %m                                                 |
+|jnc %m                     |8080       |  D2 %m %m                                                 |
+|jnc %m                     |8080_strict|  D2 %m %m                                                 |
+|jnz %m                     |8080       |  C2 %m %m                                                 |
+|jnz %m                     |8080_strict|  C2 %m %m                                                 |
+|jp %m                      |8080_strict|  F2 %m %m                                                 |
+|jpe %m                     |8080       |  EA %m %m                                                 |
+|jpe %m                     |8080_strict|  EA %m %m                                                 |
+|jpo %m                     |8080       |  E2 %m %m                                                 |
+|jpo %m                     |8080_strict|  E2 %m %m                                                 |
+|jz %m                      |8080       |  CA %m %m                                                 |
+|jz %m                      |8080_strict|  CA %m %m                                                 |
+|lda %m                     |8080       |  3A %m %m                                                 |
+|lda %m                     |8080_strict|  3A %m %m                                                 |
+|ldax b                     |8080       |  0A                                                       |
+|ldax b                     |8080_strict|  0A                                                       |
+|ldax bc                    |8080       |* 0A                                                       |
+|ldax d                     |8080       |  1A                                                       |
+|ldax d                     |8080_strict|  1A                                                       |
+|ldax de                    |8080       |* 1A                                                       |
+|lhld %m                    |8080       |  2A %m %m                                                 |
+|lhld %m                    |8080_strict|  2A %m %m                                                 |
+|lxi b, %m                  |8080       |  01 %m %m                                                 |
+|lxi b, %m                  |8080_strict|  01 %m %m                                                 |
+|lxi bc, %m                 |8080       |* 01 %m %m                                                 |
+|lxi d, %m                  |8080       |  11 %m %m                                                 |
+|lxi d, %m                  |8080_strict|  11 %m %m                                                 |
+|lxi de, %m                 |8080       |* 11 %m %m                                                 |
+|lxi h, %m                  |8080       |  21 %m %m                                                 |
+|lxi h, %m                  |8080_strict|  21 %m %m                                                 |
+|lxi hl, %m                 |8080       |* 21 %m %m                                                 |
+|lxi sp, %m                 |8080       |  31 %m %m                                                 |
+|lxi sp, %m                 |8080_strict|  31 %m %m                                                 |
+|mov a, a                   |8080       |  7F                                                       |
+|mov a, a                   |8080_strict|  7F                                                       |
+|mov a, b                   |8080       |  78                                                       |
+|mov a, b                   |8080_strict|  78                                                       |
+|mov a, c                   |8080       |  79                                                       |
+|mov a, c                   |8080_strict|  79                                                       |
+|mov a, d                   |8080       |  7A                                                       |
+|mov a, d                   |8080_strict|  7A                                                       |
+|mov a, e                   |8080       |  7B                                                       |
+|mov a, e                   |8080_strict|  7B                                                       |
+|mov a, h                   |8080       |  7C                                                       |
+|mov a, h                   |8080_strict|  7C                                                       |
+|mov a, l                   |8080       |  7D                                                       |
+|mov a, l                   |8080_strict|  7D                                                       |
+|mov a, m                   |8080       |  7E                                                       |
+|mov a, m                   |8080_strict|  7E                                                       |
+|mov b, a                   |8080       |  47                                                       |
+|mov b, a                   |8080_strict|  47                                                       |
+|mov b, b                   |8080       |  40                                                       |
+|mov b, b                   |8080_strict|  40                                                       |
+|mov b, c                   |8080       |  41                                                       |
+|mov b, c                   |8080_strict|  41                                                       |
+|mov b, d                   |8080       |  42                                                       |
+|mov b, d                   |8080_strict|  42                                                       |
+|mov b, e                   |8080       |  43                                                       |
+|mov b, e                   |8080_strict|  43                                                       |
+|mov b, h                   |8080       |  44                                                       |
+|mov b, h                   |8080_strict|  44                                                       |
+|mov b, l                   |8080       |  45                                                       |
+|mov b, l                   |8080_strict|  45                                                       |
+|mov b, m                   |8080       |  46                                                       |
+|mov b, m                   |8080_strict|  46                                                       |
+|mov bc, de                 |8080       |* 42,4B                                                    |
+|mov bc, hl                 |8080       |* 44,4D                                                    |
+|mov c, a                   |8080       |  4F                                                       |
+|mov c, a                   |8080_strict|  4F                                                       |
+|mov c, b                   |8080       |  48                                                       |
+|mov c, b                   |8080_strict|  48                                                       |
+|mov c, c                   |8080       |  49                                                       |
+|mov c, c                   |8080_strict|  49                                                       |
+|mov c, d                   |8080       |  4A                                                       |
+|mov c, d                   |8080_strict|  4A                                                       |
+|mov c, e                   |8080       |  4B                                                       |
+|mov c, e                   |8080_strict|  4B                                                       |
+|mov c, h                   |8080       |  4C                                                       |
+|mov c, h                   |8080_strict|  4C                                                       |
+|mov c, l                   |8080       |  4D                                                       |
+|mov c, l                   |8080_strict|  4D                                                       |
+|mov c, m                   |8080       |  4E                                                       |
+|mov c, m                   |8080_strict|  4E                                                       |
+|mov d, a                   |8080       |  57                                                       |
+|mov d, a                   |8080_strict|  57                                                       |
+|mov d, b                   |8080       |  50                                                       |
+|mov d, b                   |8080_strict|  50                                                       |
+|mov d, c                   |8080       |  51                                                       |
+|mov d, c                   |8080_strict|  51                                                       |
+|mov d, d                   |8080       |  52                                                       |
+|mov d, d                   |8080_strict|  52                                                       |
+|mov d, e                   |8080       |  53                                                       |
+|mov d, e                   |8080_strict|  53                                                       |
+|mov d, h                   |8080       |  54                                                       |
+|mov d, h                   |8080_strict|  54                                                       |
+|mov d, l                   |8080       |  55                                                       |
+|mov d, l                   |8080_strict|  55                                                       |
+|mov d, m                   |8080       |  56                                                       |
+|mov d, m                   |8080_strict|  56                                                       |
+|mov de, bc                 |8080       |* 50,59                                                    |
+|mov de, hl                 |8080       |* 54,5D                                                    |
+|mov e, a                   |8080       |  5F                                                       |
+|mov e, a                   |8080_strict|  5F                                                       |
+|mov e, b                   |8080       |  58                                                       |
+|mov e, b                   |8080_strict|  58                                                       |
+|mov e, c                   |8080       |  59                                                       |
+|mov e, c                   |8080_strict|  59                                                       |
+|mov e, d                   |8080       |  5A                                                       |
+|mov e, d                   |8080_strict|  5A                                                       |
+|mov e, e                   |8080       |  5B                                                       |
+|mov e, e                   |8080_strict|  5B                                                       |
+|mov e, h                   |8080       |  5C                                                       |
+|mov e, h                   |8080_strict|  5C                                                       |
+|mov e, l                   |8080       |  5D                                                       |
+|mov e, l                   |8080_strict|  5D                                                       |
+|mov e, m                   |8080       |  5E                                                       |
+|mov e, m                   |8080_strict|  5E                                                       |
+|mov h, a                   |8080       |  67                                                       |
+|mov h, a                   |8080_strict|  67                                                       |
+|mov h, b                   |8080       |  60                                                       |
+|mov h, b                   |8080_strict|  60                                                       |
+|mov h, c                   |8080       |  61                                                       |
+|mov h, c                   |8080_strict|  61                                                       |
+|mov h, d                   |8080       |  62                                                       |
+|mov h, d                   |8080_strict|  62                                                       |
+|mov h, e                   |8080       |  63                                                       |
+|mov h, e                   |8080_strict|  63                                                       |
+|mov h, h                   |8080       |  64                                                       |
+|mov h, h                   |8080_strict|  64                                                       |
+|mov h, l                   |8080       |  65                                                       |
+|mov h, l                   |8080_strict|  65                                                       |
+|mov h, m                   |8080       |  66                                                       |
+|mov h, m                   |8080_strict|  66                                                       |
+|mov hl, bc                 |8080       |* 60,69                                                    |
+|mov hl, de                 |8080       |* 62,6B                                                    |
+|mov l, a                   |8080       |  6F                                                       |
+|mov l, a                   |8080_strict|  6F                                                       |
+|mov l, b                   |8080       |  68                                                       |
+|mov l, b                   |8080_strict|  68                                                       |
+|mov l, c                   |8080       |  69                                                       |
+|mov l, c                   |8080_strict|  69                                                       |
+|mov l, d                   |8080       |  6A                                                       |
+|mov l, d                   |8080_strict|  6A                                                       |
+|mov l, e                   |8080       |  6B                                                       |
+|mov l, e                   |8080_strict|  6B                                                       |
+|mov l, h                   |8080       |  6C                                                       |
+|mov l, h                   |8080_strict|  6C                                                       |
+|mov l, l                   |8080       |  6D                                                       |
+|mov l, l                   |8080_strict|  6D                                                       |
+|mov l, m                   |8080       |  6E                                                       |
+|mov l, m                   |8080_strict|  6E                                                       |
+|mov m, a                   |8080       |  77                                                       |
+|mov m, a                   |8080_strict|  77                                                       |
+|mov m, b                   |8080       |  70                                                       |
+|mov m, b                   |8080_strict|  70                                                       |
+|mov m, c                   |8080       |  71                                                       |
+|mov m, c                   |8080_strict|  71                                                       |
+|mov m, d                   |8080       |  72                                                       |
+|mov m, d                   |8080_strict|  72                                                       |
+|mov m, e                   |8080       |  73                                                       |
+|mov m, e                   |8080_strict|  73                                                       |
+|mov m, h                   |8080       |  74                                                       |
+|mov m, h                   |8080_strict|  74                                                       |
+|mov m, l                   |8080       |  75                                                       |
+|mov m, l                   |8080_strict|  75                                                       |
+|mvi a, %n                  |8080       |  3E %n                                                    |
+|mvi a, %n                  |8080_strict|  3E %n                                                    |
+|mvi b, %n                  |8080       |  06 %n                                                    |
+|mvi b, %n                  |8080_strict|  06 %n                                                    |
+|mvi c, %n                  |8080       |  0E %n                                                    |
+|mvi c, %n                  |8080_strict|  0E %n                                                    |
+|mvi d, %n                  |8080       |  16 %n                                                    |
+|mvi d, %n                  |8080_strict|  16 %n                                                    |
+|mvi e, %n                  |8080       |  1E %n                                                    |
+|mvi e, %n                  |8080_strict|  1E %n                                                    |
+|mvi h, %n                  |8080       |  26 %n                                                    |
+|mvi h, %n                  |8080_strict|  26 %n                                                    |
+|mvi l, %n                  |8080       |  2E %n                                                    |
+|mvi l, %n                  |8080_strict|  2E %n                                                    |
+|mvi m, %n                  |8080       |  36 %n                                                    |
+|mvi m, %n                  |8080_strict|  36 %n                                                    |
+|nop                        |8080       |  00                                                       |
+|nop                        |8080_strict|  00                                                       |
+|ora a                      |8080       |  B7                                                       |
+|ora a                      |8080_strict|  B7                                                       |
+|ora b                      |8080       |  B0                                                       |
+|ora b                      |8080_strict|  B0                                                       |
+|ora c                      |8080       |  B1                                                       |
+|ora c                      |8080_strict|  B1                                                       |
+|ora d                      |8080       |  B2                                                       |
+|ora d                      |8080_strict|  B2                                                       |
+|ora e                      |8080       |  B3                                                       |
+|ora e                      |8080_strict|  B3                                                       |
+|ora h                      |8080       |  B4                                                       |
+|ora h                      |8080_strict|  B4                                                       |
+|ora l                      |8080       |  B5                                                       |
+|ora l                      |8080_strict|  B5                                                       |
+|ora m                      |8080       |  B6                                                       |
+|ora m                      |8080_strict|  B6                                                       |
+|ori %n                     |8080       |  F6 %n                                                    |
+|ori %n                     |8080_strict|  F6 %n                                                    |
+|out %n                     |8080       |  D3 %n                                                    |
+|out %n                     |8080_strict|  D3 %n                                                    |
+|pchl                       |8080       |  E9                                                       |
+|pchl                       |8080_strict|  E9                                                       |
+|pop b                      |8080       |  C1                                                       |
+|pop b                      |8080_strict|  C1                                                       |
+|pop bc                     |8080       |* C1                                                       |
+|pop d                      |8080       |  D1                                                       |
+|pop d                      |8080_strict|  D1                                                       |
+|pop de                     |8080       |* D1                                                       |
+|pop h                      |8080       |  E1                                                       |
+|pop h                      |8080_strict|  E1                                                       |
+|pop hl                     |8080       |* E1                                                       |
+|pop psw                    |8080       |  F1                                                       |
+|pop psw                    |8080_strict|  F1                                                       |
+|push b                     |8080       |  C5                                                       |
+|push b                     |8080_strict|  C5                                                       |
+|push bc                    |8080       |* C5                                                       |
+|push d                     |8080       |  D5                                                       |
+|push d                     |8080_strict|  D5                                                       |
+|push de                    |8080       |* D5                                                       |
+|push h                     |8080       |  E5                                                       |
+|push h                     |8080_strict|  E5                                                       |
+|push hl                    |8080       |* E5                                                       |
+|push psw                   |8080       |  F5                                                       |
+|push psw                   |8080_strict|  F5                                                       |
+|ral                        |8080       |  17                                                       |
+|ral                        |8080_strict|  17                                                       |
+|rar                        |8080       |  1F                                                       |
+|rar                        |8080_strict|  1F                                                       |
+|rc                         |8080       |  D8                                                       |
+|rc                         |8080_strict|  D8                                                       |
+|ret                        |8080       |  C9                                                       |
+|ret                        |8080_strict|  C9                                                       |
+|rlc                        |8080       |  07                                                       |
+|rlc                        |8080_strict|  07                                                       |
+|rm                         |8080       |  F8                                                       |
+|rm                         |8080_strict|  F8                                                       |
+|rnc                        |8080       |  D0                                                       |
+|rnc                        |8080_strict|  D0                                                       |
+|rnz                        |8080       |  C0                                                       |
+|rnz                        |8080_strict|  C0                                                       |
+|rp                         |8080_strict|  F0                                                       |
+|rpe                        |8080       |  E8                                                       |
+|rpe                        |8080_strict|  E8                                                       |
+|rpo                        |8080       |  E0                                                       |
+|rpo                        |8080_strict|  E0                                                       |
+|rrc                        |8080       |  0F                                                       |
+|rrc                        |8080_strict|  0F                                                       |
+|rst 00h                    |8080       |  C7                                                       |
+|rst 00h                    |8080_strict|  C7                                                       |
+|rst 08h                    |8080       |  CF                                                       |
+|rst 08h                    |8080_strict|  CF                                                       |
+|rst 1                      |8080       |* CF                                                       |
+|rst 10h                    |8080       |  D7                                                       |
+|rst 10h                    |8080_strict|  D7                                                       |
+|rst 18h                    |8080       |  DF                                                       |
+|rst 18h                    |8080_strict|  DF                                                       |
+|rst 2                      |8080       |* D7                                                       |
+|rst 20h                    |8080       |  E7                                                       |
+|rst 20h                    |8080_strict|  E7                                                       |
+|rst 28h                    |8080       |  EF                                                       |
+|rst 28h                    |8080_strict|  EF                                                       |
+|rst 3                      |8080       |* DF                                                       |
+|rst 30h                    |8080       |  F7                                                       |
+|rst 30h                    |8080_strict|  F7                                                       |
+|rst 38h                    |8080       |  FF                                                       |
+|rst 38h                    |8080_strict|  FF                                                       |
+|rst 4                      |8080       |* E7                                                       |
+|rst 5                      |8080       |* EF                                                       |
+|rst 6                      |8080       |* F7                                                       |
+|rst 7                      |8080       |* FF                                                       |
+|rz                         |8080       |  C8                                                       |
+|rz                         |8080_strict|  C8                                                       |
+|sbb a                      |8080       |  98                                                       |
+|sbb a                      |8080_strict|  98                                                       |
+|sbb b                      |8080       |  91                                                       |
+|sbb b                      |8080_strict|  91                                                       |
+|sbb c                      |8080       |  92                                                       |
+|sbb c                      |8080_strict|  92                                                       |
+|sbb d                      |8080       |  93                                                       |
+|sbb d                      |8080_strict|  93                                                       |
+|sbb e                      |8080       |  94                                                       |
+|sbb e                      |8080_strict|  94                                                       |
+|sbb h                      |8080       |  95                                                       |
+|sbb h                      |8080_strict|  95                                                       |
+|sbb l                      |8080       |  96                                                       |
+|sbb l                      |8080_strict|  96                                                       |
+|sbb m                      |8080       |  97                                                       |
+|sbb m                      |8080_strict|  97                                                       |
+|sbi %n                     |8080       |  DE %n                                                    |
+|sbi %n                     |8080_strict|  DE %n                                                    |
+|shld %m                    |8080       |  22 %m %m                                                 |
+|shld %m                    |8080_strict|  22 %m %m                                                 |
+|sphl                       |8080       |  F9                                                       |
+|sphl                       |8080_strict|  F9                                                       |
+|sta %m                     |8080       |  32 %m %m                                                 |
+|sta %m                     |8080_strict|  32 %m %m                                                 |
+|stax b                     |8080       |  02                                                       |
+|stax b                     |8080_strict|  02                                                       |
+|stax bc                    |8080       |* 02                                                       |
+|stax d                     |8080       |  12                                                       |
+|stax d                     |8080_strict|  12                                                       |
+|stax de                    |8080       |* 12                                                       |
+|stc                        |8080       |  37                                                       |
+|stc                        |8080_strict|  37                                                       |
+|sub a                      |8080       |  97                                                       |
+|sub a                      |8080_strict|  97                                                       |
+|sub b                      |8080       |  90                                                       |
+|sub b                      |8080_strict|  90                                                       |
+|sub c                      |8080       |  91                                                       |
+|sub c                      |8080_strict|  91                                                       |
+|sub d                      |8080       |  92                                                       |
+|sub d                      |8080_strict|  92                                                       |
+|sub e                      |8080       |  93                                                       |
+|sub e                      |8080_strict|  93                                                       |
+|sub h                      |8080       |  94                                                       |
+|sub h                      |8080_strict|  94                                                       |
+|sub l                      |8080       |  95                                                       |
+|sub l                      |8080_strict|  95                                                       |
+|sub m                      |8080       |  96                                                       |
+|sub m                      |8080_strict|  96                                                       |
+|sui %n                     |8080       |  D6 %n                                                    |
+|sui %n                     |8080_strict|  D6 %n                                                    |
+|xchg                       |8080       |  EB                                                       |
+|xchg                       |8080_strict|  EB                                                       |
+|xra a                      |8080       |  AF                                                       |
+|xra a                      |8080_strict|  AF                                                       |
+|xra b                      |8080       |  A8                                                       |
+|xra b                      |8080_strict|  A8                                                       |
+|xra c                      |8080       |  A9                                                       |
+|xra c                      |8080_strict|  A9                                                       |
+|xra d                      |8080       |  AA                                                       |
+|xra d                      |8080_strict|  AA                                                       |
+|xra e                      |8080       |  AB                                                       |
+|xra e                      |8080_strict|  AB                                                       |
+|xra h                      |8080       |  AC                                                       |
+|xra h                      |8080_strict|  AC                                                       |
+|xra l                      |8080       |  AD                                                       |
+|xra l                      |8080_strict|  AD                                                       |
+|xra m                      |8080       |  AE                                                       |
+|xra m                      |8080_strict|  AE                                                       |
+|xri %n                     |8080       |  EE %n                                                    |
+|xri %n                     |8080_strict|  EE %n                                                    |
+|xthl                       |8080       |  E3                                                       |
+|xthl                       |8080_strict|  E3                                                       |
+|===========================|===========|===========================================================|
