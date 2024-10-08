@@ -1,15 +1,12 @@
 ;
 
 
-    INCLUDE "target/aquarius/def/aqplus.def"
 
     SECTION		code_clib
 
     PUBLIC		generic_console_cls
     PUBLIC		generic_console_scrollup
     PUBLIC		generic_console_printc
-
-    EXTERN  CLIB_AQUARIUS_PLUS
 
     EXTERN      printc_BITMAP
     EXTERN      printc_TEXT
