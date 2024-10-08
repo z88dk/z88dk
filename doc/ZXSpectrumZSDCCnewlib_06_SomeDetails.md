@@ -158,8 +158,8 @@ On the other hand, you can turn off the heap entirely with:
 The default heap size on Spectrum programs is set to -1, which is a special
 value which says "use all the memory above the program's BBS section and the
 below the stack for heap." This is frequently the best option since it allows
-the program to malloc as much memory as possible as it needs it. The problem is
-that the heap memory is formatted for allocation with malloc():
+the program to malloc as much memory as it needs it. The problem is
+that the heap memory is pre-formatted for allocation with malloc():
 
 ```
 |             |
@@ -183,7 +183,7 @@ that the heap memory is formatted for allocation with malloc():
 ```
 
 Normally that's fine, but if you've already loaded something else into that
-memory, having it initialised (e.g. reset to zeroes) in order to use as heap
+memory, having it reinitialised (e.g. reset to zeroes) in order to use as heap
 would be unwelcome. Specifically setting a heap size to zero (or, if you do
 actually need some heap, any other amount which leaves your valuable memory
 areas alone) stops this initialisation of memory. As we'll see in another
