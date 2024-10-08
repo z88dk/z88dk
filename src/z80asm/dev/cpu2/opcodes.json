@@ -17,6 +17,15 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    206,
+                    "%n"
+                ]
+            ],
+            "synth": false
         }
     },
     "adc a": {
@@ -29,6 +38,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    136
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     136
@@ -53,6 +70,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    129
+                ]
+            ],
+            "synth": false
         }
     },
     "adc c": {
@@ -65,6 +90,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    130
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     130
@@ -89,6 +122,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    131
+                ]
+            ],
+            "synth": false
         }
     },
     "adc e": {
@@ -101,6 +142,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    132
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     132
@@ -125,6 +174,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    133
+                ]
+            ],
+            "synth": false
         }
     },
     "adc l": {
@@ -137,6 +194,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    134
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     134
@@ -161,6 +226,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    135
+                ]
+            ],
+            "synth": false
         }
     },
     "add a": {
@@ -173,6 +246,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    135
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     135
@@ -197,6 +278,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    128
+                ]
+            ],
+            "synth": false
         }
     },
     "add c": {
@@ -209,6 +298,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    129
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     129
@@ -233,6 +330,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    130
+                ]
+            ],
+            "synth": false
         }
     },
     "add e": {
@@ -245,6 +350,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    131
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     131
@@ -269,6 +382,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    132
+                ]
+            ],
+            "synth": false
         }
     },
     "add l": {
@@ -287,6 +408,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    133
+                ]
+            ],
+            "synth": false
         }
     },
     "add m": {
@@ -299,6 +428,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    134
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     134
@@ -325,6 +462,15 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    198,
+                    "%n"
+                ]
+            ],
+            "synth": false
         }
     },
     "ana a": {
@@ -337,6 +483,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    167
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     167
@@ -361,6 +515,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    160
+                ]
+            ],
+            "synth": false
         }
     },
     "ana c": {
@@ -373,6 +535,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    161
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     161
@@ -397,6 +567,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    162
+                ]
+            ],
+            "synth": false
         }
     },
     "ana e": {
@@ -409,6 +587,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    163
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     163
@@ -433,6 +619,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    164
+                ]
+            ],
+            "synth": false
         }
     },
     "ana l": {
@@ -451,6 +645,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    165
+                ]
+            ],
+            "synth": false
         }
     },
     "ana m": {
@@ -463,6 +665,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    166
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     166
@@ -489,6 +699,15 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    230,
+                    "%n"
+                ]
+            ],
+            "synth": false
         }
     },
     "call %m": {
@@ -503,6 +722,16 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    205,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     205,
@@ -533,6 +762,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    220,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "cm %m": {
@@ -547,6 +786,16 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    252,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     252,
@@ -573,6 +822,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    47
+                ]
+            ],
+            "synth": false
         }
     },
     "cmc": {
@@ -585,6 +842,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    63
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     63
@@ -609,6 +874,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    191
+                ]
+            ],
+            "synth": false
         }
     },
     "cmp b": {
@@ -621,6 +894,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    184
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     184
@@ -645,6 +926,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    185
+                ]
+            ],
+            "synth": false
         }
     },
     "cmp d": {
@@ -657,6 +946,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    186
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     186
@@ -681,6 +978,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    187
+                ]
+            ],
+            "synth": false
         }
     },
     "cmp h": {
@@ -693,6 +998,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    188
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     188
@@ -717,6 +1030,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    189
+                ]
+            ],
+            "synth": false
         }
     },
     "cmp m": {
@@ -729,6 +1050,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    190
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     190
@@ -749,6 +1078,16 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    212,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     212,
@@ -779,10 +1118,30 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    196,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "cp %m": {
         "8080_strict": {
+            "opcodes": [
+                [
+                    244,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     244,
@@ -813,6 +1172,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    236,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "cpi %n": {
@@ -826,6 +1195,15 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    254,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     254,
@@ -847,6 +1225,16 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    228,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     228,
@@ -877,6 +1265,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    204,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "daa": {
@@ -895,6 +1293,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    39
+                ]
+            ],
+            "synth": false
         }
     },
     "dad b": {
@@ -907,6 +1313,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    9
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     9
@@ -941,6 +1355,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    25
+                ]
+            ],
+            "synth": false
         }
     },
     "dad de": {
@@ -963,6 +1385,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    41
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     41
@@ -997,6 +1427,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    57
+                ]
+            ],
+            "synth": false
         }
     },
     "dcr a": {
@@ -1009,6 +1447,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    61
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     61
@@ -1033,6 +1479,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    5
+                ]
+            ],
+            "synth": false
         }
     },
     "dcr c": {
@@ -1045,6 +1499,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    13
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     13
@@ -1069,6 +1531,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    21
+                ]
+            ],
+            "synth": false
         }
     },
     "dcr e": {
@@ -1081,6 +1551,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    29
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     29
@@ -1105,6 +1583,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    37
+                ]
+            ],
+            "synth": false
         }
     },
     "dcr l": {
@@ -1117,6 +1603,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    45
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     45
@@ -1141,6 +1635,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    53
+                ]
+            ],
+            "synth": false
         }
     },
     "dcx b": {
@@ -1153,6 +1655,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    11
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     11
@@ -1187,6 +1697,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    27
+                ]
+            ],
+            "synth": false
         }
     },
     "dcx de": {
@@ -1209,6 +1727,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    43
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     43
@@ -1243,6 +1769,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    59
+                ]
+            ],
+            "synth": false
         }
     },
     "di": {
@@ -1255,6 +1789,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    243
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     243
@@ -1279,6 +1821,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    251
+                ]
+            ],
+            "synth": false
         }
     },
     "hlt": {
@@ -1291,6 +1841,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    118
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     118
@@ -1317,6 +1875,15 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    219,
+                    "%n"
+                ]
+            ],
+            "synth": false
         }
     },
     "inr a": {
@@ -1329,6 +1896,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    60
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     60
@@ -1353,6 +1928,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    4
+                ]
+            ],
+            "synth": false
         }
     },
     "inr c": {
@@ -1365,6 +1948,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    12
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     12
@@ -1389,6 +1980,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    20
+                ]
+            ],
+            "synth": false
         }
     },
     "inr e": {
@@ -1401,6 +2000,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    28
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     28
@@ -1425,6 +2032,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    36
+                ]
+            ],
+            "synth": false
         }
     },
     "inr l": {
@@ -1437,6 +2052,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    44
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     44
@@ -1461,6 +2084,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    52
+                ]
+            ],
+            "synth": false
         }
     },
     "inx b": {
@@ -1473,6 +2104,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    3
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     3
@@ -1507,6 +2146,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    19
+                ]
+            ],
+            "synth": false
         }
     },
     "inx de": {
@@ -1529,6 +2176,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    35
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     35
@@ -1563,6 +2218,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    51
+                ]
+            ],
+            "synth": false
         }
     },
     "jc %m": {
@@ -1577,6 +2240,16 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    218,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     218,
@@ -1607,6 +2280,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    250,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "jmp %m": {
@@ -1621,6 +2304,16 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    60,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     60,
@@ -1651,6 +2344,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    210,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "jnz %m": {
@@ -1673,10 +2376,30 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    194,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "jp %m": {
         "8080_strict": {
+            "opcodes": [
+                [
+                    242,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     242,
@@ -1707,6 +2430,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    234,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "jpo %m": {
@@ -1721,6 +2454,16 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    226,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     226,
@@ -1751,6 +2494,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    202,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "lda %m": {
@@ -1773,6 +2526,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    58,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "ldax b": {
@@ -1785,6 +2548,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    10
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     10
@@ -1813,6 +2584,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    26
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     26
@@ -1851,6 +2630,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    42,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "lxi b, %m": {
@@ -1865,6 +2654,16 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    1,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     1,
@@ -1907,6 +2706,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    17,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "lxi de, %m": {
@@ -1933,6 +2742,16 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    33,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     33,
@@ -1975,6 +2794,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    49,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "mov a, a": {
@@ -1987,6 +2816,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    127
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     127
@@ -2011,6 +2848,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    120
+                ]
+            ],
+            "synth": false
         }
     },
     "mov a, c": {
@@ -2023,6 +2868,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    121
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     121
@@ -2047,6 +2900,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    122
+                ]
+            ],
+            "synth": false
         }
     },
     "mov a, e": {
@@ -2059,6 +2920,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    123
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     123
@@ -2083,6 +2952,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    124
+                ]
+            ],
+            "synth": false
         }
     },
     "mov a, l": {
@@ -2095,6 +2972,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    125
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     125
@@ -2119,6 +3004,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    126
+                ]
+            ],
+            "synth": false
         }
     },
     "mov b, a": {
@@ -2131,6 +3024,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    71
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     71
@@ -2155,6 +3056,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    64
+                ]
+            ],
+            "synth": false
         }
     },
     "mov b, c": {
@@ -2167,6 +3076,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    65
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     65
@@ -2191,6 +3108,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    66
+                ]
+            ],
+            "synth": false
         }
     },
     "mov b, e": {
@@ -2203,6 +3128,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    67
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     67
@@ -2227,6 +3160,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    68
+                ]
+            ],
+            "synth": false
         }
     },
     "mov b, l": {
@@ -2245,6 +3186,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    69
+                ]
+            ],
+            "synth": false
         }
     },
     "mov b, m": {
@@ -2257,6 +3206,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    70
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     70
@@ -2307,6 +3264,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    79
+                ]
+            ],
+            "synth": false
         }
     },
     "mov c, b": {
@@ -2319,6 +3284,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    72
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     72
@@ -2343,6 +3316,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    73
+                ]
+            ],
+            "synth": false
         }
     },
     "mov c, d": {
@@ -2355,6 +3336,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    74
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     74
@@ -2379,6 +3368,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    75
+                ]
+            ],
+            "synth": false
         }
     },
     "mov c, h": {
@@ -2391,6 +3388,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    76
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     76
@@ -2415,6 +3420,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    77
+                ]
+            ],
+            "synth": false
         }
     },
     "mov c, m": {
@@ -2427,6 +3440,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    78
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     78
@@ -2451,6 +3472,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    87
+                ]
+            ],
+            "synth": false
         }
     },
     "mov d, b": {
@@ -2463,6 +3492,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    80
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     80
@@ -2487,6 +3524,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    81
+                ]
+            ],
+            "synth": false
         }
     },
     "mov d, d": {
@@ -2499,6 +3544,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    82
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     82
@@ -2523,6 +3576,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    83
+                ]
+            ],
+            "synth": false
         }
     },
     "mov d, h": {
@@ -2535,6 +3596,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    84
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     84
@@ -2559,6 +3628,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    85
+                ]
+            ],
+            "synth": false
         }
     },
     "mov d, m": {
@@ -2571,6 +3648,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    86
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     86
@@ -2621,6 +3706,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    95
+                ]
+            ],
+            "synth": false
         }
     },
     "mov e, b": {
@@ -2633,6 +3726,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    88
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     88
@@ -2657,6 +3758,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    89
+                ]
+            ],
+            "synth": false
         }
     },
     "mov e, d": {
@@ -2669,6 +3778,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    90
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     90
@@ -2693,6 +3810,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    91
+                ]
+            ],
+            "synth": false
         }
     },
     "mov e, h": {
@@ -2705,6 +3830,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    92
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     92
@@ -2729,6 +3862,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    93
+                ]
+            ],
+            "synth": false
         }
     },
     "mov e, m": {
@@ -2741,6 +3882,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    94
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     94
@@ -2765,6 +3914,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    103
+                ]
+            ],
+            "synth": false
         }
     },
     "mov h, b": {
@@ -2777,6 +3934,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    96
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     96
@@ -2801,6 +3966,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    97
+                ]
+            ],
+            "synth": false
         }
     },
     "mov h, d": {
@@ -2813,6 +3986,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    98
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     98
@@ -2837,6 +4018,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    99
+                ]
+            ],
+            "synth": false
         }
     },
     "mov h, h": {
@@ -2849,6 +4038,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    100
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     100
@@ -2873,6 +4070,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    101
+                ]
+            ],
+            "synth": false
         }
     },
     "mov h, m": {
@@ -2885,6 +4090,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    102
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     102
@@ -2935,6 +4148,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    111
+                ]
+            ],
+            "synth": false
         }
     },
     "mov l, b": {
@@ -2947,6 +4168,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    104
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     104
@@ -2971,6 +4200,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    105
+                ]
+            ],
+            "synth": false
         }
     },
     "mov l, d": {
@@ -2983,6 +4220,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    106
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     106
@@ -3007,6 +4252,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    107
+                ]
+            ],
+            "synth": false
         }
     },
     "mov l, h": {
@@ -3019,6 +4272,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    108
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     108
@@ -3043,6 +4304,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    109
+                ]
+            ],
+            "synth": false
         }
     },
     "mov l, m": {
@@ -3055,6 +4324,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    110
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     110
@@ -3079,6 +4356,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    119
+                ]
+            ],
+            "synth": false
         }
     },
     "mov m, b": {
@@ -3091,6 +4376,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    112
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     112
@@ -3115,6 +4408,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    113
+                ]
+            ],
+            "synth": false
         }
     },
     "mov m, d": {
@@ -3127,6 +4428,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    114
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     114
@@ -3151,6 +4460,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    115
+                ]
+            ],
+            "synth": false
         }
     },
     "mov m, h": {
@@ -3163,6 +4480,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    116
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     116
@@ -3187,6 +4512,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    117
+                ]
+            ],
+            "synth": false
         }
     },
     "mvi a, %n": {
@@ -3200,6 +4533,15 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    62,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     62,
@@ -3227,6 +4569,15 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    6,
+                    "%n"
+                ]
+            ],
+            "synth": false
         }
     },
     "mvi c, %n": {
@@ -3240,6 +4591,15 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    14,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     14,
@@ -3267,6 +4627,15 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    22,
+                    "%n"
+                ]
+            ],
+            "synth": false
         }
     },
     "mvi e, %n": {
@@ -3280,6 +4649,15 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    30,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     30,
@@ -3307,6 +4685,15 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    38,
+                    "%n"
+                ]
+            ],
+            "synth": false
         }
     },
     "mvi l, %n": {
@@ -3320,6 +4707,15 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    46,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     46,
@@ -3347,6 +4743,15 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    54,
+                    "%n"
+                ]
+            ],
+            "synth": false
         }
     },
     "nop": {
@@ -3359,6 +4764,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    0
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     0
@@ -3383,6 +4796,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    183
+                ]
+            ],
+            "synth": false
         }
     },
     "ora b": {
@@ -3395,6 +4816,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    176
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     176
@@ -3419,6 +4848,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    177
+                ]
+            ],
+            "synth": false
         }
     },
     "ora d": {
@@ -3431,6 +4868,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    178
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     178
@@ -3455,6 +4900,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    179
+                ]
+            ],
+            "synth": false
         }
     },
     "ora h": {
@@ -3467,6 +4920,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    180
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     180
@@ -3491,6 +4952,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    181
+                ]
+            ],
+            "synth": false
         }
     },
     "ora m": {
@@ -3503,6 +4972,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    182
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     182
@@ -3522,6 +4999,15 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    246,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     246,
@@ -3549,6 +5035,15 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    211,
+                    "%n"
+                ]
+            ],
+            "synth": false
         }
     },
     "pchl": {
@@ -3567,6 +5062,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    233
+                ]
+            ],
+            "synth": false
         }
     },
     "pop b": {
@@ -3579,6 +5082,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    193
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     193
@@ -3613,6 +5124,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    209
+                ]
+            ],
+            "synth": false
         }
     },
     "pop de": {
@@ -3635,6 +5154,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    225
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     225
@@ -3669,6 +5196,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    241
+                ]
+            ],
+            "synth": false
         }
     },
     "push b": {
@@ -3681,6 +5216,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    197
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     197
@@ -3715,6 +5258,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    213
+                ]
+            ],
+            "synth": false
         }
     },
     "push de": {
@@ -3737,6 +5288,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    229
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     229
@@ -3771,6 +5330,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    245
+                ]
+            ],
+            "synth": false
         }
     },
     "ral": {
@@ -3783,6 +5350,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    23
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     23
@@ -3807,6 +5382,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    31
+                ]
+            ],
+            "synth": false
         }
     },
     "rc": {
@@ -3819,6 +5402,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    216
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     216
@@ -3843,6 +5434,24 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    201
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "rim": {
+        "8085_strict": {
+            "opcodes": [
+                [
+                    32
+                ]
+            ],
+            "synth": false
         }
     },
     "rlc": {
@@ -3855,6 +5464,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    7
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     7
@@ -3879,6 +5496,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    248
+                ]
+            ],
+            "synth": false
         }
     },
     "rnc": {
@@ -3891,6 +5516,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    208
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     208
@@ -3915,10 +5548,26 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    192
+                ]
+            ],
+            "synth": false
         }
     },
     "rp": {
         "8080_strict": {
+            "opcodes": [
+                [
+                    240
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     240
@@ -3943,6 +5592,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    232
+                ]
+            ],
+            "synth": false
         }
     },
     "rpo": {
@@ -3955,6 +5612,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    224
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     224
@@ -3979,6 +5644,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    15
+                ]
+            ],
+            "synth": false
         }
     },
     "rst 00h": {
@@ -3997,6 +5670,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    199
+                ]
+            ],
+            "synth": false
         }
     },
     "rst 08h": {
@@ -4009,6 +5690,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    207
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     207
@@ -4043,6 +5732,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    215
+                ]
+            ],
+            "synth": false
         }
     },
     "rst 18h": {
@@ -4055,6 +5752,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    223
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     223
@@ -4089,6 +5794,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    231
+                ]
+            ],
+            "synth": false
         }
     },
     "rst 28h": {
@@ -4101,6 +5814,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    239
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     239
@@ -4135,6 +5856,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    247
+                ]
+            ],
+            "synth": false
         }
     },
     "rst 38h": {
@@ -4147,6 +5876,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    255
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     255
@@ -4211,6 +5948,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    200
+                ]
+            ],
+            "synth": false
         }
     },
     "sbb a": {
@@ -4223,6 +5968,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    152
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     152
@@ -4247,6 +6000,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    145
+                ]
+            ],
+            "synth": false
         }
     },
     "sbb c": {
@@ -4259,6 +6020,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    146
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     146
@@ -4283,6 +6052,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    147
+                ]
+            ],
+            "synth": false
         }
     },
     "sbb e": {
@@ -4295,6 +6072,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    148
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     148
@@ -4319,6 +6104,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    149
+                ]
+            ],
+            "synth": false
         }
     },
     "sbb l": {
@@ -4331,6 +6124,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    150
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     150
@@ -4355,6 +6156,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    151
+                ]
+            ],
+            "synth": false
         }
     },
     "sbi %n": {
@@ -4368,6 +6177,15 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    222,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     222,
@@ -4397,6 +6215,26 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    34,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "sim": {
+        "8085_strict": {
+            "opcodes": [
+                [
+                    48
+                ]
+            ],
+            "synth": false
         }
     },
     "sphl": {
@@ -4409,6 +6247,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    249
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     249
@@ -4437,6 +6283,16 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    50,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
         }
     },
     "stax b": {
@@ -4449,6 +6305,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    2
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     2
@@ -4483,6 +6347,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    18
+                ]
+            ],
+            "synth": false
         }
     },
     "stax de": {
@@ -4511,6 +6383,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    55
+                ]
+            ],
+            "synth": false
         }
     },
     "sub a": {
@@ -4523,6 +6403,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    151
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     151
@@ -4547,6 +6435,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    144
+                ]
+            ],
+            "synth": false
         }
     },
     "sub c": {
@@ -4559,6 +6455,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    145
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     145
@@ -4583,6 +6487,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    146
+                ]
+            ],
+            "synth": false
         }
     },
     "sub e": {
@@ -4595,6 +6507,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    147
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     147
@@ -4619,6 +6539,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    148
+                ]
+            ],
+            "synth": false
         }
     },
     "sub l": {
@@ -4637,6 +6565,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    149
+                ]
+            ],
+            "synth": false
         }
     },
     "sub m": {
@@ -4649,6 +6585,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    150
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     150
@@ -4675,6 +6619,15 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    214,
+                    "%n"
+                ]
+            ],
+            "synth": false
         }
     },
     "xchg": {
@@ -4687,6 +6640,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    235
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     235
@@ -4711,6 +6672,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    175
+                ]
+            ],
+            "synth": false
         }
     },
     "xra b": {
@@ -4723,6 +6692,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    168
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     168
@@ -4747,6 +6724,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    169
+                ]
+            ],
+            "synth": false
         }
     },
     "xra d": {
@@ -4759,6 +6744,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    170
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     170
@@ -4783,6 +6776,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    171
+                ]
+            ],
+            "synth": false
         }
     },
     "xra h": {
@@ -4795,6 +6796,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    172
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     172
@@ -4819,6 +6828,14 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    173
+                ]
+            ],
+            "synth": false
         }
     },
     "xra m": {
@@ -4831,6 +6848,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    174
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     174
@@ -4857,6 +6882,15 @@
                 ]
             ],
             "synth": false
+        },
+        "8085_strict": {
+            "opcodes": [
+                [
+                    238,
+                    "%n"
+                ]
+            ],
+            "synth": false
         }
     },
     "xthl": {
@@ -4869,6 +6903,14 @@
             "synth": false
         },
         "8080_strict": {
+            "opcodes": [
+                [
+                    227
+                ]
+            ],
+            "synth": false
+        },
+        "8085_strict": {
             "opcodes": [
                 [
                     227
