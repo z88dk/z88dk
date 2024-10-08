@@ -20,6 +20,11 @@ extern void __LIB__  kbd_click(char *sound) __z88dk_fastcall;
 // New non_standard sounds
 #define KBD_SND_LO  "\x03\x02\x00\x00\x0F\x0F\x0F\x32\x80\x47\x1D\x20\xF6\xAF\xED"
 
+// 'VALET' (pop-up configuration and hardcopy tool), usually opens by pressing CTRL-ESC
+#define valet_enable() asm("ld\thl,0xDA81\nld\t(hl),0\n");
+#define valet_disable() asm("ld\thl,0xDA81\nld\t(hl),0xFF\n");
+#define enter_valet() asm("ld\thl,0xDA81\nld\t(hl),0\nld\thl,0xDA83\nld\t(hl),0xFF\n");
+
 
 //////////////////////////////////////////////////////////////////
 //    OTRONA ATTACHE' CMOS settings (valid after reboot only)
