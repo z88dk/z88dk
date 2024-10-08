@@ -124,25 +124,3 @@ failure:
         scf
         ret
 
-
-        SECTION code_crt_init
-
-        EXTERN  set_default_palette
-
-        ; On an Aquarius+ we modify the caps so that we can define the font
-        ld      c, CLIB_AQUARIUS_PLUS
-        rr      c
-        jr      nc, not_plus
-
-        call    set_default_palette
-
-        ; Remap the border color character for aqplus
-        in      a, (IO_VCTRL)
-        or      VCTRL_REMAP_BC
-        ld      e, a
-        ld      a, IOCTL_GENCON_SET_MODE
-        ; This will setup the mode and screen size
-        ; so that it matches the hardware during init.
-        call    ck_mode
-not_plus:
-

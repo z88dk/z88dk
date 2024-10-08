@@ -90,6 +90,25 @@ l_dcal:
 
 IF CLIB_AQUARIUS_PLUS = 1
     INCLUDE	"target/aquarius/classic/banks.asm"
-ENDIF
-    
 
+  IF __HAVE_GENCON = 1
+    INCLUDE "ioctl.def"
+    SECTION code_crt_init
+    EXTERN  set_default_palette
+    EXTERN  generic_console_ioctl
+    EXTERN  __aquarius_mode
+
+    call    set_default_palette
+
+    ; Remap the border color character for aqplus
+    in      a, (IO_VCTRL)
+    or      VCTRL_REMAP_BC
+    ld      de, __aquarius_mode
+    ld      (de), a
+    ld      a, IOCTL_GENCON_SET_MODE
+    ; This will setup the mode and screen size
+    ; so that it matches the hardware during init.
+    call    generic_console_ioctl
+  ENDIF
+
+ENDIF
