@@ -80,7 +80,7 @@ def build_8080_strict(cpu, **kwargs):
     add(cpu, f"sphl", [0xf9])
     
     # jump
-    add(cpu, f"jmp %m", [0x3c, '%m', '%m'])
+    add(cpu, f"jmp %m", [0xc3, '%m', '%m'])
     for fname, fi in flags.items():
         add(cpu, f"j{fname} %m", [0xc2+8*fi, '%m', '%m'])
     add(cpu, f"pchl", [0xe9])
@@ -96,8 +96,8 @@ def build_8080_strict(cpu, **kwargs):
         add(cpu, f"r{fname}", [0xc0+8*fi])
     
     # restart
-    for addr in range(0, 0x40, 8):
-        add(cpu, f"rst {addr:02x}h", [0xc7+addr])
+    for n in range(8):
+        add(cpu, f"rst {n}", [0xc7+8*n])
     
     # increment and decrement
     for rname, ri in reg8m.items():
@@ -111,7 +111,7 @@ def build_8080_strict(cpu, **kwargs):
     # add
     for rname, ri in reg8m.items():
         add(cpu, f"add {rname}", [0x80+ri])
-        add(cpu, f"adc {rname}", [0x81+ri])
+        add(cpu, f"adc {rname}", [0x88+ri])
 
     add(cpu, f"adi %n", [0xc6, '%n'])
     add(cpu, f"aci %n", [0xce, '%n'])
@@ -122,7 +122,7 @@ def build_8080_strict(cpu, **kwargs):
     # subtract
     for rname, ri in reg8m.items():
         add(cpu, f"sub {rname}", [0x90+ri])
-        add(cpu, f"sbb {rname}", [0x91+ri])
+        add(cpu, f"sbb {rname}", [0x98+ri])
 
     add(cpu, f"sui %n", [0xd6, '%n'])
     add(cpu, f"sbi %n", [0xde, '%n'])
@@ -203,7 +203,7 @@ def build_8080_zilog(cpu, **kwargs):
     add(cpu, f"ld sp, hl", [0xf9])
     
     # jump
-    add(cpu, f"jp %m", [0x3c, '%m', '%m'])
+    add(cpu, f"jp %m", [0xc3, '%m', '%m'])
     for fname, fi in flags.items():
         add(cpu, f"jp {fname}, %m", [0xc2+8*fi, '%m', '%m'])
     add(cpu, f"jp (hl)", [0xe9])
@@ -228,7 +228,7 @@ def build_8080_zilog(cpu, **kwargs):
     # add
     for rname, ri in reg8m.items():
         add(cpu, f"add a, {rname}", [0x80+ri])
-        add(cpu, f"adc a, {rname}", [0x81+ri])
+        add(cpu, f"adc a, {rname}", [0x88+ri])
 
     add(cpu, f"add a, %n", [0xc6, '%n'])
     add(cpu, f"adc a, %n", [0xce, '%n'])
@@ -238,7 +238,7 @@ def build_8080_zilog(cpu, **kwargs):
 
     # subtract
     for rname, ri in reg8m.items():
-        add(cpu, f"sbc a, {rname}", [0x91+ri])
+        add(cpu, f"sbc a, {rname}", [0x98+ri])
 
     add(cpu, f"sub %n", [0xd6, '%n'])
     add(cpu, f"sbc a, %n", [0xde, '%n'])
@@ -286,9 +286,9 @@ def build_8080(cpu):
     # synthetic opcodes
     
     # restart
-    for i in range(1, 8):
-        addr = 8*i
-        add_synth(cpu, f"rst {i}", [f"rst {addr:02x}h"])
+    for addr in range(8, 0x40, 8):
+        i = addr // 8
+        add_synth(cpu, f"rst {addr:02x}h", [f"rst {i}"])
     
     # register pair names
     for rp in ['bc', 'de', 'hl']:
@@ -311,13 +311,13 @@ def build_8080(cpu):
                                ["ld "+dst[0]+", "+src[0],
                                 "ld "+dst[1]+", "+src[1]])
 
-build_8080_strict("8080_strict")
-build_8085_strict("8085_strict")
-build_8080("8080")
-
 if len(sys.argv) != 2:
     raise ValueError(f"Usage: make_opcodes.py output.json")
 output = sys.argv[1]
 
-f = open(output, "w")
-f.write(json.dumps(table, indent=4, sort_keys=True))
+build_8080_strict("8080_strict")
+build_8085_strict("8085_strict")
+build_8080("8080")
+
+with open(output, 'w') as f:
+    f.write(json.dumps(table, indent=4, sort_keys=True))
