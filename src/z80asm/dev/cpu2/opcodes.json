@@ -54,6 +54,97 @@
             "synth": false
         }
     },
+    "adc a, %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    206,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "adc a, (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    135
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "adc a, a": {
+        "8080": {
+            "opcodes": [
+                [
+                    136
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "adc a, b": {
+        "8080": {
+            "opcodes": [
+                [
+                    129
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "adc a, c": {
+        "8080": {
+            "opcodes": [
+                [
+                    130
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "adc a, d": {
+        "8080": {
+            "opcodes": [
+                [
+                    131
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "adc a, e": {
+        "8080": {
+            "opcodes": [
+                [
+                    132
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "adc a, h": {
+        "8080": {
+            "opcodes": [
+                [
+                    133
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "adc a, l": {
+        "8080": {
+            "opcodes": [
+                [
+                    134
+                ]
+            ],
+            "synth": false
+        }
+    },
     "adc b": {
         "8080": {
             "opcodes": [
@@ -262,6 +353,97 @@
             "synth": false
         }
     },
+    "add a, %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    198,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add a, (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    134
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add a, a": {
+        "8080": {
+            "opcodes": [
+                [
+                    135
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add a, b": {
+        "8080": {
+            "opcodes": [
+                [
+                    128
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add a, c": {
+        "8080": {
+            "opcodes": [
+                [
+                    129
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add a, d": {
+        "8080": {
+            "opcodes": [
+                [
+                    130
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add a, e": {
+        "8080": {
+            "opcodes": [
+                [
+                    131
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add a, h": {
+        "8080": {
+            "opcodes": [
+                [
+                    132
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add a, l": {
+        "8080": {
+            "opcodes": [
+                [
+                    133
+                ]
+            ],
+            "synth": false
+        }
+    },
     "add b": {
         "8080": {
             "opcodes": [
@@ -387,6 +569,46 @@
             "opcodes": [
                 [
                     132
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add hl, bc": {
+        "8080": {
+            "opcodes": [
+                [
+                    9
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add hl, de": {
+        "8080": {
+            "opcodes": [
+                [
+                    25
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add hl, hl": {
+        "8080": {
+            "opcodes": [
+                [
+                    41
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "add hl, sp": {
+        "8080": {
+            "opcodes": [
+                [
+                    57
                 ]
             ],
             "synth": false
@@ -681,6 +903,97 @@
             "synth": false
         }
     },
+    "and %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    230,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "and (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    166
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "and a": {
+        "8080": {
+            "opcodes": [
+                [
+                    167
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "and b": {
+        "8080": {
+            "opcodes": [
+                [
+                    160
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "and c": {
+        "8080": {
+            "opcodes": [
+                [
+                    161
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "and d": {
+        "8080": {
+            "opcodes": [
+                [
+                    162
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "and e": {
+        "8080": {
+            "opcodes": [
+                [
+                    163
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "and h": {
+        "8080": {
+            "opcodes": [
+                [
+                    164
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "and l": {
+        "8080": {
+            "opcodes": [
+                [
+                    165
+                ]
+            ],
+            "synth": false
+        }
+    },
     "ani %n": {
         "8080": {
             "opcodes": [
@@ -742,6 +1055,102 @@
             "synth": false
         }
     },
+    "call c, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    220,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "call m, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    252,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "call nc, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    212,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "call nz, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    196,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "call p, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    244,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "call pe, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    236,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "call po, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    228,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "call z, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    204,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
     "cc %m": {
         "8080": {
             "opcodes": [
@@ -769,6 +1178,16 @@
                     220,
                     "%m",
                     "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ccf": {
+        "8080": {
+            "opcodes": [
+                [
+                    63
                 ]
             ],
             "synth": false
@@ -1152,6 +1571,97 @@
             "synth": false
         }
     },
+    "cp %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    254,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "cp (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    190
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "cp a": {
+        "8080": {
+            "opcodes": [
+                [
+                    191
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "cp b": {
+        "8080": {
+            "opcodes": [
+                [
+                    184
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "cp c": {
+        "8080": {
+            "opcodes": [
+                [
+                    185
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "cp d": {
+        "8080": {
+            "opcodes": [
+                [
+                    186
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "cp e": {
+        "8080": {
+            "opcodes": [
+                [
+                    187
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "cp h": {
+        "8080": {
+            "opcodes": [
+                [
+                    188
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "cp l": {
+        "8080": {
+            "opcodes": [
+                [
+                    189
+                ]
+            ],
+            "synth": false
+        }
+    },
     "cpe %m": {
         "8080": {
             "opcodes": [
@@ -1208,6 +1718,16 @@
                 [
                     254,
                     "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "cpl": {
+        "8080": {
+            "opcodes": [
+                [
+                    47
                 ]
             ],
             "synth": false
@@ -1779,6 +2299,126 @@
             "synth": false
         }
     },
+    "dec (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    53
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "dec a": {
+        "8080": {
+            "opcodes": [
+                [
+                    61
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "dec b": {
+        "8080": {
+            "opcodes": [
+                [
+                    5
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "dec bc": {
+        "8080": {
+            "opcodes": [
+                [
+                    11
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "dec c": {
+        "8080": {
+            "opcodes": [
+                [
+                    13
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "dec d": {
+        "8080": {
+            "opcodes": [
+                [
+                    21
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "dec de": {
+        "8080": {
+            "opcodes": [
+                [
+                    27
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "dec e": {
+        "8080": {
+            "opcodes": [
+                [
+                    29
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "dec h": {
+        "8080": {
+            "opcodes": [
+                [
+                    37
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "dec hl": {
+        "8080": {
+            "opcodes": [
+                [
+                    43
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "dec l": {
+        "8080": {
+            "opcodes": [
+                [
+                    45
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "dec sp": {
+        "8080": {
+            "opcodes": [
+                [
+                    59
+                ]
+            ],
+            "synth": false
+        }
+    },
     "di": {
         "8080": {
             "opcodes": [
@@ -1826,6 +2466,36 @@
             "opcodes": [
                 [
                     251
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ex (sp), hl": {
+        "8080": {
+            "opcodes": [
+                [
+                    227
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ex de, hl": {
+        "8080": {
+            "opcodes": [
+                [
+                    235
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "halt": {
+        "8080": {
+            "opcodes": [
+                [
+                    118
                 ]
             ],
             "synth": false
@@ -1881,6 +2551,137 @@
                 [
                     219,
                     "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "in a, (%n)": {
+        "8080": {
+            "opcodes": [
+                [
+                    219,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    52
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc a": {
+        "8080": {
+            "opcodes": [
+                [
+                    60
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc b": {
+        "8080": {
+            "opcodes": [
+                [
+                    4
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc bc": {
+        "8080": {
+            "opcodes": [
+                [
+                    3
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc c": {
+        "8080": {
+            "opcodes": [
+                [
+                    12
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc d": {
+        "8080": {
+            "opcodes": [
+                [
+                    20
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc de": {
+        "8080": {
+            "opcodes": [
+                [
+                    19
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc e": {
+        "8080": {
+            "opcodes": [
+                [
+                    28
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc h": {
+        "8080": {
+            "opcodes": [
+                [
+                    36
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc hl": {
+        "8080": {
+            "opcodes": [
+                [
+                    35
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc l": {
+        "8080": {
+            "opcodes": [
+                [
+                    44
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "inc sp": {
+        "8080": {
+            "opcodes": [
+                [
+                    51
                 ]
             ],
             "synth": false
@@ -2389,6 +3190,16 @@
         }
     },
     "jp %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    60,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        },
         "8080_strict": {
             "opcodes": [
                 [
@@ -2403,6 +3214,112 @@
             "opcodes": [
                 [
                     242,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "jp (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    233
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "jp c, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    218,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "jp m, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    250,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "jp nc, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    210,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "jp nz, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    194,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "jp p, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    242,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "jp pe, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    234,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "jp po, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    226,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "jp z, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    202,
                     "%m",
                     "%m"
                 ]
@@ -2501,6 +3418,948 @@
                     202,
                     "%m",
                     "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (%m), a": {
+        "8080": {
+            "opcodes": [
+                [
+                    50,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (%m), hl": {
+        "8080": {
+            "opcodes": [
+                [
+                    34,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (bc), a": {
+        "8080": {
+            "opcodes": [
+                [
+                    2
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (de), a": {
+        "8080": {
+            "opcodes": [
+                [
+                    18
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (hl), %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    54,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (hl), a": {
+        "8080": {
+            "opcodes": [
+                [
+                    119
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (hl), b": {
+        "8080": {
+            "opcodes": [
+                [
+                    112
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (hl), c": {
+        "8080": {
+            "opcodes": [
+                [
+                    113
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (hl), d": {
+        "8080": {
+            "opcodes": [
+                [
+                    114
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (hl), e": {
+        "8080": {
+            "opcodes": [
+                [
+                    115
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (hl), h": {
+        "8080": {
+            "opcodes": [
+                [
+                    116
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld (hl), l": {
+        "8080": {
+            "opcodes": [
+                [
+                    117
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    62,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, (%m)": {
+        "8080": {
+            "opcodes": [
+                [
+                    58,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, (bc)": {
+        "8080": {
+            "opcodes": [
+                [
+                    10
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, (de)": {
+        "8080": {
+            "opcodes": [
+                [
+                    26
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    126
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, a": {
+        "8080": {
+            "opcodes": [
+                [
+                    127
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, b": {
+        "8080": {
+            "opcodes": [
+                [
+                    120
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, c": {
+        "8080": {
+            "opcodes": [
+                [
+                    121
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, d": {
+        "8080": {
+            "opcodes": [
+                [
+                    122
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, e": {
+        "8080": {
+            "opcodes": [
+                [
+                    123
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, h": {
+        "8080": {
+            "opcodes": [
+                [
+                    124
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld a, l": {
+        "8080": {
+            "opcodes": [
+                [
+                    125
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld b, %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    6,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld b, (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    70
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld b, a": {
+        "8080": {
+            "opcodes": [
+                [
+                    71
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld b, b": {
+        "8080": {
+            "opcodes": [
+                [
+                    64
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld b, c": {
+        "8080": {
+            "opcodes": [
+                [
+                    65
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld b, d": {
+        "8080": {
+            "opcodes": [
+                [
+                    66
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld b, e": {
+        "8080": {
+            "opcodes": [
+                [
+                    67
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld b, h": {
+        "8080": {
+            "opcodes": [
+                [
+                    68
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld b, l": {
+        "8080": {
+            "opcodes": [
+                [
+                    69
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld bc, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    1,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld bc, de": {
+        "8080": {
+            "opcodes": [
+                [
+                    66
+                ],
+                [
+                    75
+                ]
+            ],
+            "synth": true
+        }
+    },
+    "ld bc, hl": {
+        "8080": {
+            "opcodes": [
+                [
+                    68
+                ],
+                [
+                    77
+                ]
+            ],
+            "synth": true
+        }
+    },
+    "ld c, %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    14,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld c, (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    78
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld c, a": {
+        "8080": {
+            "opcodes": [
+                [
+                    79
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld c, b": {
+        "8080": {
+            "opcodes": [
+                [
+                    72
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld c, c": {
+        "8080": {
+            "opcodes": [
+                [
+                    73
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld c, d": {
+        "8080": {
+            "opcodes": [
+                [
+                    74
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld c, e": {
+        "8080": {
+            "opcodes": [
+                [
+                    75
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld c, h": {
+        "8080": {
+            "opcodes": [
+                [
+                    76
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld c, l": {
+        "8080": {
+            "opcodes": [
+                [
+                    77
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld d, %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    22,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld d, (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    86
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld d, a": {
+        "8080": {
+            "opcodes": [
+                [
+                    87
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld d, b": {
+        "8080": {
+            "opcodes": [
+                [
+                    80
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld d, c": {
+        "8080": {
+            "opcodes": [
+                [
+                    81
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld d, d": {
+        "8080": {
+            "opcodes": [
+                [
+                    82
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld d, e": {
+        "8080": {
+            "opcodes": [
+                [
+                    83
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld d, h": {
+        "8080": {
+            "opcodes": [
+                [
+                    84
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld d, l": {
+        "8080": {
+            "opcodes": [
+                [
+                    85
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld de, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    17,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld de, bc": {
+        "8080": {
+            "opcodes": [
+                [
+                    80
+                ],
+                [
+                    89
+                ]
+            ],
+            "synth": true
+        }
+    },
+    "ld de, hl": {
+        "8080": {
+            "opcodes": [
+                [
+                    84
+                ],
+                [
+                    93
+                ]
+            ],
+            "synth": true
+        }
+    },
+    "ld e, %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    30,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld e, (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    94
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld e, a": {
+        "8080": {
+            "opcodes": [
+                [
+                    95
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld e, b": {
+        "8080": {
+            "opcodes": [
+                [
+                    88
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld e, c": {
+        "8080": {
+            "opcodes": [
+                [
+                    89
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld e, d": {
+        "8080": {
+            "opcodes": [
+                [
+                    90
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld e, e": {
+        "8080": {
+            "opcodes": [
+                [
+                    91
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld e, h": {
+        "8080": {
+            "opcodes": [
+                [
+                    92
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld e, l": {
+        "8080": {
+            "opcodes": [
+                [
+                    93
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld h, %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    38,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld h, (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    102
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld h, a": {
+        "8080": {
+            "opcodes": [
+                [
+                    103
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld h, b": {
+        "8080": {
+            "opcodes": [
+                [
+                    96
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld h, c": {
+        "8080": {
+            "opcodes": [
+                [
+                    97
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld h, d": {
+        "8080": {
+            "opcodes": [
+                [
+                    98
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld h, e": {
+        "8080": {
+            "opcodes": [
+                [
+                    99
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld h, h": {
+        "8080": {
+            "opcodes": [
+                [
+                    100
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld h, l": {
+        "8080": {
+            "opcodes": [
+                [
+                    101
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld hl, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    33,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld hl, (%m)": {
+        "8080": {
+            "opcodes": [
+                [
+                    42,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld hl, bc": {
+        "8080": {
+            "opcodes": [
+                [
+                    96
+                ],
+                [
+                    105
+                ]
+            ],
+            "synth": true
+        }
+    },
+    "ld hl, de": {
+        "8080": {
+            "opcodes": [
+                [
+                    98
+                ],
+                [
+                    107
+                ]
+            ],
+            "synth": true
+        }
+    },
+    "ld l, %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    46,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld l, (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    110
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld l, a": {
+        "8080": {
+            "opcodes": [
+                [
+                    111
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld l, b": {
+        "8080": {
+            "opcodes": [
+                [
+                    104
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld l, c": {
+        "8080": {
+            "opcodes": [
+                [
+                    105
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld l, d": {
+        "8080": {
+            "opcodes": [
+                [
+                    106
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld l, e": {
+        "8080": {
+            "opcodes": [
+                [
+                    107
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld l, h": {
+        "8080": {
+            "opcodes": [
+                [
+                    108
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld l, l": {
+        "8080": {
+            "opcodes": [
+                [
+                    109
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld sp, %m": {
+        "8080": {
+            "opcodes": [
+                [
+                    49,
+                    "%m",
+                    "%m"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ld sp, hl": {
+        "8080": {
+            "opcodes": [
+                [
+                    249
                 ]
             ],
             "synth": false
@@ -4780,6 +6639,97 @@
             "synth": false
         }
     },
+    "or %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    246,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "or (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    182
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "or a": {
+        "8080": {
+            "opcodes": [
+                [
+                    183
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "or b": {
+        "8080": {
+            "opcodes": [
+                [
+                    176
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "or c": {
+        "8080": {
+            "opcodes": [
+                [
+                    177
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "or d": {
+        "8080": {
+            "opcodes": [
+                [
+                    178
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "or e": {
+        "8080": {
+            "opcodes": [
+                [
+                    179
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "or h": {
+        "8080": {
+            "opcodes": [
+                [
+                    180
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "or l": {
+        "8080": {
+            "opcodes": [
+                [
+                    181
+                ]
+            ],
+            "synth": false
+        }
+    },
     "ora a": {
         "8080": {
             "opcodes": [
@@ -5046,6 +6996,17 @@
             "synth": false
         }
     },
+    "out (%n), a": {
+        "8080": {
+            "opcodes": [
+                [
+                    211,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
     "pchl": {
         "8080": {
             "opcodes": [
@@ -5067,6 +7028,16 @@
             "opcodes": [
                 [
                     233
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "pop af": {
+        "8080": {
+            "opcodes": [
+                [
+                    241
                 ]
             ],
             "synth": false
@@ -5105,7 +7076,7 @@
                     193
                 ]
             ],
-            "synth": true
+            "synth": false
         }
     },
     "pop d": {
@@ -5141,7 +7112,7 @@
                     209
                 ]
             ],
-            "synth": true
+            "synth": false
         }
     },
     "pop h": {
@@ -5177,7 +7148,7 @@
                     225
                 ]
             ],
-            "synth": true
+            "synth": false
         }
     },
     "pop psw": {
@@ -5201,6 +7172,16 @@
             "opcodes": [
                 [
                     241
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "push af": {
+        "8080": {
+            "opcodes": [
+                [
+                    245
                 ]
             ],
             "synth": false
@@ -5239,7 +7220,7 @@
                     197
                 ]
             ],
-            "synth": true
+            "synth": false
         }
     },
     "push d": {
@@ -5275,7 +7256,7 @@
                     213
                 ]
             ],
-            "synth": true
+            "synth": false
         }
     },
     "push h": {
@@ -5311,7 +7292,7 @@
                     229
                 ]
             ],
-            "synth": true
+            "synth": false
         }
     },
     "push psw": {
@@ -5444,11 +7425,101 @@
             "synth": false
         }
     },
+    "ret c": {
+        "8080": {
+            "opcodes": [
+                [
+                    216
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ret m": {
+        "8080": {
+            "opcodes": [
+                [
+                    248
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ret nc": {
+        "8080": {
+            "opcodes": [
+                [
+                    208
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ret nz": {
+        "8080": {
+            "opcodes": [
+                [
+                    192
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ret p": {
+        "8080": {
+            "opcodes": [
+                [
+                    240
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ret pe": {
+        "8080": {
+            "opcodes": [
+                [
+                    232
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ret po": {
+        "8080": {
+            "opcodes": [
+                [
+                    224
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "ret z": {
+        "8080": {
+            "opcodes": [
+                [
+                    200
+                ]
+            ],
+            "synth": false
+        }
+    },
     "rim": {
         "8085_strict": {
             "opcodes": [
                 [
                     32
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "rla": {
+        "8080": {
+            "opcodes": [
+                [
+                    23
                 ]
             ],
             "synth": false
@@ -5472,6 +7543,16 @@
             "synth": false
         },
         "8085_strict": {
+            "opcodes": [
+                [
+                    7
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "rlca": {
+        "8080": {
             "opcodes": [
                 [
                     7
@@ -5628,6 +7709,16 @@
             "synth": false
         }
     },
+    "rra": {
+        "8080": {
+            "opcodes": [
+                [
+                    31
+                ]
+            ],
+            "synth": false
+        }
+    },
     "rrc": {
         "8080": {
             "opcodes": [
@@ -5646,6 +7737,16 @@
             "synth": false
         },
         "8085_strict": {
+            "opcodes": [
+                [
+                    15
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "rrca": {
+        "8080": {
             "opcodes": [
                 [
                     15
@@ -6166,6 +8267,97 @@
             "synth": false
         }
     },
+    "sbc a, %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    222,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "sbc a, (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    151
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "sbc a, a": {
+        "8080": {
+            "opcodes": [
+                [
+                    152
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "sbc a, b": {
+        "8080": {
+            "opcodes": [
+                [
+                    145
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "sbc a, c": {
+        "8080": {
+            "opcodes": [
+                [
+                    146
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "sbc a, d": {
+        "8080": {
+            "opcodes": [
+                [
+                    147
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "sbc a, e": {
+        "8080": {
+            "opcodes": [
+                [
+                    148
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "sbc a, h": {
+        "8080": {
+            "opcodes": [
+                [
+                    149
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "sbc a, l": {
+        "8080": {
+            "opcodes": [
+                [
+                    150
+                ]
+            ],
+            "synth": false
+        }
+    },
     "sbi %n": {
         "8080": {
             "opcodes": [
@@ -6190,6 +8382,16 @@
                 [
                     222,
                     "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "scf": {
+        "8080": {
+            "opcodes": [
+                [
+                    55
                 ]
             ],
             "synth": false
@@ -6388,6 +8590,17 @@
             "opcodes": [
                 [
                     55
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "sub %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    214,
+                    "%n"
                 ]
             ],
             "synth": false
@@ -6651,6 +8864,97 @@
             "opcodes": [
                 [
                     235
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "xor %n": {
+        "8080": {
+            "opcodes": [
+                [
+                    238,
+                    "%n"
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "xor (hl)": {
+        "8080": {
+            "opcodes": [
+                [
+                    174
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "xor a": {
+        "8080": {
+            "opcodes": [
+                [
+                    175
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "xor b": {
+        "8080": {
+            "opcodes": [
+                [
+                    168
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "xor c": {
+        "8080": {
+            "opcodes": [
+                [
+                    169
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "xor d": {
+        "8080": {
+            "opcodes": [
+                [
+                    170
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "xor e": {
+        "8080": {
+            "opcodes": [
+                [
+                    171
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "xor h": {
+        "8080": {
+            "opcodes": [
+                [
+                    172
+                ]
+            ],
+            "synth": false
+        }
+    },
+    "xor l": {
+        "8080": {
+            "opcodes": [
+                [
+                    173
                 ]
             ],
             "synth": false
