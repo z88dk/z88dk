@@ -13,3 +13,6 @@
 [submodule "ext/regex"]
 	path = ext/regex
 	url = https://github.com/z88dk/regex.git
+[submodule "src/z80asm/dev/cpu2/z80pack"]
+	path = src/z80asm/dev/cpu2/z80pack
+	url = https://github.com/udo-munk/z80pack.git
