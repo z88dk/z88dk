@@ -161,15 +161,128 @@ def build_8080_strict(cpu, **kwargs):
     add(cpu, f"nop", [0x00])
     add(cpu, f"hlt", [0x76])
 
+def build_8080_zilog(cpu, **kwargs):
+    reg8 = {'b':0, 'c':1, 'd':2, 'e':3, 'h':4, 'l':5, 'a':7}
+    reg8m = {'b':0, 'c':1, 'd':2, 'e':3, 'h':4, 'l':5, '(hl)':6, 'a':7}
+    reg16bdhsp = {'bc':0, 'de':1, 'hl':2, 'sp':3}
+    reg16bd = {'bc':0, 'de':1}
+    reg16bdhpsw = {'bc':0, 'de':1, 'hl':2, 'af':3}
+    flags={'nz':0, 'z':1, 'nc':2, 'c':3, 'po':4, 'pe':5, 'p':6, 'm':7}
+    
+    # move, load and store
+    for dname, di in reg8.items():
+        for sname, si in reg8.items():
+            add(cpu, f"ld {dname}, {sname}", [0x40+di*8+si])
+
+    for rname, ri in reg8.items():
+        add(cpu, f"ld (hl), {rname}", [0x70+ri])
+        add(cpu, f"ld {rname}, (hl)", [0x46+8*ri])
+        
+    for rname, ri in reg8m.items():
+        add(cpu, f"ld {rname}, %n", [0x06+8*ri, '%n'])
+
+    for rname, ri in reg16bdhsp.items():
+        add(cpu, f"ld {rname}, %m", [0x01+16*ri, '%m', '%m'])
+
+    for rname, ri in reg16bd.items():
+        add(cpu, f"ld ({rname}), a", [0x02+16*ri])
+        add(cpu, f"ld a, ({rname})", [0x0a+16*ri])
+
+    add(cpu, f"ld (%m), a", [0x32, '%m', '%m'])
+    add(cpu, f"ld a, (%m)", [0x3a, '%m', '%m'])
+    add(cpu, f"ld (%m), hl", [0x22, '%m', '%m'])
+    add(cpu, f"ld hl, (%m)", [0x2a, '%m', '%m'])
+    add(cpu, f"ex de, hl", [0xeb])
+
+    # stack ops
+    for rname, ri in reg16bdhpsw.items():
+        add(cpu, f"push {rname}", [0xc5+16*ri])
+        add(cpu, f"pop {rname}", [0xc1+16*ri])
+        
+    add(cpu, f"ex (sp), hl", [0xe3])
+    add(cpu, f"ld sp, hl", [0xf9])
+    
+    # jump
+    add(cpu, f"jp %m", [0x3c, '%m', '%m'])
+    for fname, fi in flags.items():
+        add(cpu, f"jp {fname}, %m", [0xc2+8*fi, '%m', '%m'])
+    add(cpu, f"jp (hl)", [0xe9])
+    
+    # call
+    for fname, fi in flags.items():
+        add(cpu, f"call {fname}, %m", [0xc4+8*fi, '%m', '%m'])
+    
+    # return
+    for fname, fi in flags.items():
+        add(cpu, f"ret {fname}", [0xc0+8*fi])
+    
+    # increment and decrement
+    for rname, ri in reg8m.items():
+        add(cpu, f"inc {rname}", [0x04+8*ri])
+        add(cpu, f"dec {rname}", [0x05+8*ri])
+
+    for rname, ri in reg16bdhsp.items():
+        add(cpu, f"inc {rname}", [0x03+16*ri])
+        add(cpu, f"dec {rname}", [0x0b+16*ri])
+    
+    # add
+    for rname, ri in reg8m.items():
+        add(cpu, f"add a, {rname}", [0x80+ri])
+        add(cpu, f"adc a, {rname}", [0x81+ri])
+
+    add(cpu, f"add a, %n", [0xc6, '%n'])
+    add(cpu, f"adc a, %n", [0xce, '%n'])
+
+    for rname, ri in reg16bdhsp.items():
+        add(cpu, f"add hl, {rname}", [0x09+16*ri])
+
+    # subtract
+    for rname, ri in reg8m.items():
+        add(cpu, f"sbc a, {rname}", [0x91+ri])
+
+    add(cpu, f"sub %n", [0xd6, '%n'])
+    add(cpu, f"sbc a, %n", [0xde, '%n'])
+
+    # logical
+    for rname, ri in reg8m.items():
+        add(cpu, f"and {rname}", [0xa0+ri])
+        add(cpu, f"xor {rname}", [0xa8+ri])
+        add(cpu, f"or {rname}", [0xb0+ri])
+        add(cpu, f"cp {rname}", [0xb8+ri])
+    
+    add(cpu, f"and %n", [0xe6, '%n'])
+    add(cpu, f"xor %n", [0xee, '%n'])
+    add(cpu, f"or %n", [0xf6, '%n'])
+    add(cpu, f"cp %n", [0xfe, '%n'])
+
+    # rotate
+    add(cpu, f"rlca", [0x07])
+    add(cpu, f"rrca", [0x0f])
+    add(cpu, f"rla", [0x17])
+    add(cpu, f"rra", [0x1f])
+    
+    # specials
+    add(cpu, f"cpl", [0x2f])
+    add(cpu, f"scf", [0x37])
+    add(cpu, f"ccf", [0x3f])
+    
+    # input/output
+    add(cpu, f"in a, (%n)", [0xdb, '%n'])
+    add(cpu, f"out (%n), a", [0xd3, '%n'])
+    
+    # control
+    add(cpu, f"halt", [0x76])
+
 def build_8085_strict(cpu, **kwargs):
     build_8080_strict(cpu, **kwargs)
     
     add(cpu, f"rim", [0x20])
     add(cpu, f"sim", [0x30])
 
-def build_8080_z80asm(cpu):
+def build_8080(cpu):
     build_8080_strict(cpu, zilog=True)
-
+    build_8080_zilog(cpu)
+    
     # synthetic opcodes
     
     # restart
@@ -180,7 +293,7 @@ def build_8080_z80asm(cpu):
     # register pair names
     for rp in ['bc', 'de', 'hl']:
         add_synth(cpu, f"lxi {rp}, %m", ["lxi "+rp[0]+", %m"])
-        for op in ['inx', 'dcx', 'dad', 'push', 'pop']:
+        for op in ['inx', 'dcx', 'dad']:
             add_synth(cpu, f"{op} {rp}", [op+" "+rp[0]])
             
     for rp in ['bc', 'de']:
@@ -194,11 +307,13 @@ def build_8080_z80asm(cpu):
                 add_synth(cpu, f"mov {dst}, {src}", 
                                ["mov "+dst[0]+", "+src[0],
                                 "mov "+dst[1]+", "+src[1]])
+                add_synth(cpu, f"ld {dst}, {src}", 
+                               ["ld "+dst[0]+", "+src[0],
+                                "ld "+dst[1]+", "+src[1]])
 
 build_8080_strict("8080_strict")
 build_8085_strict("8085_strict")
-
-build_8080_z80asm("8080")
+build_8080("8080")
 
 if len(sys.argv) != 2:
     raise ValueError(f"Usage: make_opcodes.py output.json")
