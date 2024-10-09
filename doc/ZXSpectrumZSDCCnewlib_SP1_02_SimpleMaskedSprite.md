@@ -195,7 +195,7 @@ extern unsigned char circle_masked[];
 
 struct sp1_Rect full_screen = {0, 0, 32, 24};
 
-int main()
+int main(void)
 {
   struct sp1_ss  *circle_sprite;
   unsigned char x;
@@ -322,7 +322,7 @@ typedef struct
 
 CIRCLE_SPRITE circle_sprites[NUM_SPRITES];
 
-int main()
+int main(void)
 {
   unsigned char i;
 
