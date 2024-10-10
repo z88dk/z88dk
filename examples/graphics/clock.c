@@ -18,7 +18,7 @@
  *  zcc +cpm -oclock -subtype=mbc200 -DDETAILED -DFULL_HRG -create-app -lndos  clock.c
  * Otrona attachè, high resolution, supports time/date
  *  zcc +cpm -oclock -subtype=attache -DDETAILED  -create-app -lndos -DHAVE_TIME clock.c
- * Visual 1050, very high resolution, CP/M 3 supports time/date
+ * Visual 1050, very high resolution, CP/M 3 supports time/date (use John Elliott's DATE501 solve Y2K issues)
  *  zcc +cpm -oclock -subtype=v1050 -DDETAILED -DFULL_HRG -Dhires -create-app -lndos  -DHAVE_TIME clock.c
  * Commodore 128 (high and low resolution)
  *  zcc +c128 -oclock -create-app -lgfx128hr -DDETAILED -DFULL_HRG -Dhires  clock.c
