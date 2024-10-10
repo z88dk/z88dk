@@ -248,7 +248,7 @@ the next frame each time the sprite moves on screen. Our character runs from
 left to right, so we can move to the next frame each time he moves one pixel.
 
 An alternative approach might be to advance to the next frame each time a timer
-expires. This has the advantage that the sprite can be animated event when it's
+expires. This has the advantage that the sprite can be animated even when it's
 stationary, but it doesn't really work for our *runner* character. Another
 approach is to react to the user's input, which might be made to work with our
 *runner* as long as the user only ever presses the *right* key. :)
@@ -325,7 +325,7 @@ extern unsigned char runner_f1[];
 
 struct sp1_Rect full_screen = {0, 0, 32, 24};
 
-int main()
+int main(void)
 {
   struct sp1_ss  *runner_sprite;
   unsigned char   x;
@@ -477,7 +477,7 @@ struct
 arrow_state[] = { {IN_KEY_SCANCODE_o, arrow_left,  -1},
                   {IN_KEY_SCANCODE_p, arrow_right, +1} };
 
-int main()
+int main(void)
 {
   struct sp1_ss  *arrow_sprite;
 
