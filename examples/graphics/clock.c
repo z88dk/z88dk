@@ -16,6 +16,8 @@
  *  zcc +ts2068 -oclock -pragma-define:CLIB_ZX_CONIO32=1 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -DDETAILED -create-app  -Dhires clock.c
  * SANYO MBC-200, very high resolution
  *  zcc +cpm -oclock -subtype=mbc200 -DDETAILED -DFULL_HRG -create-app -lndos  clock.c
+ * Otrona attachè, high resolution, supports time/date
+ *  zcc +cpm -oclock -subtype=attache -DDETAILED  -create-app -lndos -DHAVE_TIME clock.c
  * Visual 1050, very high resolution, CP/M 3 supports time/date
  *  zcc +cpm -oclock -subtype=v1050 -DDETAILED -DFULL_HRG -Dhires -create-app -lndos  -DHAVE_TIME clock.c
  * Commodore 128 (high and low resolution)
@@ -259,7 +261,7 @@ void main()
 	while (tm == appTOD[2]) gettodcia(cia2,appTOD);
 	tm=appTOD[2];    // seconds field
 #else
-		//sleep (1);
+//		sleep (1);
 		while ((clock() < (tm+CLOCKS_PER_SEC))&&(clock() > CLOCKS_PER_SEC)) {}
 		tm=clock();
 #endif	
