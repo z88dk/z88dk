@@ -159,7 +159,7 @@ extern unsigned char bubble_col2[];
 
 struct sp1_Rect full_screen = {0, 0, 32, 24};
 
-int main()
+int main(void)
 {
   struct sp1_ss *bubble_sprite;
   unsigned char x;
@@ -219,7 +219,7 @@ the listing above, just achieved slightly differently.
 ### A Bigger Example
 
 Here's an example of a bigger *mothership* type of sprite, seen in [ZX
-Paintbrush](http://www.zx-modules.de/zxpaintbrush/zxpaintbrush.html) as graphic and mask:
+Paintbrush](https://www.alessandrogrussu.it/zx-modules.html) as graphic and mask:
 
 ![alt text](images/mothership.png "mothership sprite")
 
@@ -520,7 +520,7 @@ extern unsigned char mothership_col6[];
 
 struct sp1_Rect full_screen = {0, 0, 32, 24};
 
-int main()
+int main(void)
 {
   struct sp1_ss  *mothership_sprite;
   unsigned char x;
@@ -622,7 +622,7 @@ void initialiseColour(unsigned int count, struct sp1_cs *c)
   c->attr      = INK_BLUE;
 }
 
-int main()
+int main(void)
 {
   struct sp1_ss  *bubble_sprite;
   unsigned char x;
@@ -690,7 +690,6 @@ struct sp1_Rect full_screen = {0, 0, 32, 24};
 
 void initialiseColour(unsigned int count, struct sp1_cs *c)
 {
-
   if( count == 2 || count == 3 || count == 4 )
   {
     c->attr_mask = SP1_AMASK_INK;
@@ -717,7 +716,7 @@ void invalidateAntenna(unsigned int count, struct sp1_update *u)
 
 struct sp1_ss  *mothership_sprite;
 
-int main()
+int main(void)
 {
   unsigned char y;
 
