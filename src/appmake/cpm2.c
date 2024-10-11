@@ -2142,7 +2142,7 @@ static struct formats {
     { "omikron",   "TRS80 I Omikron",       &omikron_spec, 0, NULL, 1 },
     { "lifeboat",  "TRS80 II Lifeboat",     &lifeboat_spec, 0, NULL, 1 },
     { "fmgcpm",    "TRS80 II FMG CP/M",     &fmgcpm_spec, 0, NULL, 1 },
-    { "ptcpm",     "TRS80 II PickelsTrout", &ptcpm_spec, 0, NULL, 1 },
+    { "ptcpm",     "TRS80 II P&T or Plus",  &ptcpm_spec, 0, NULL, 1 },
     { "holmes",    "TRS80 Holmes VID-80",   &holmes_spec, 0, NULL, 1 },
     { "merchant",  "TRS80 III MemMerchant", &merchant_spec, 0, NULL, 1 },
     { "compactor", "TRS80 III Hurricane C", &hurricane_spec, 0, NULL, 1 },
