@@ -44,7 +44,7 @@ generates the interrupt signal in sync with the TV picture it's generating, and
 it does so 50 times a second. This 50Hz signal is the Spectrum's interrupt, and
 it's this which we'll be using from Z88DK.
 
-The second key detail the reader needs to understand is concept of the
+The second key detail the reader needs to understand is the concept of the
 [interrupt mode 2](https://www.z88dk.org/wiki/doku.php?id=library:interrupts#im_2) "identifier
 byte supplied by the interrupting peripheral". On the Spectrum the interrupting
 peripheral, the video hardware, doesn't supply this identifier byte. It
@@ -238,7 +238,7 @@ IM2_DEFINE_ISR(isr)
 #define TABLE_ADDR             ((void*)(TABLE_HIGH_BYTE*UI_256))
 #define JUMP_POINT             ((unsigned char*)( (unsigned int)(JUMP_POINT_HIGH_BYTE*UI_256) + JUMP_POINT_HIGH_BYTE ))
 
-int main()
+int main(void)
 {
   memset( TABLE_ADDR, JUMP_POINT_HIGH_BYTE, 257 );
 
@@ -447,7 +447,7 @@ IM2_DEFINE_ISR_WITH_BASIC(isr)
 #define TABLE_ADDR             ((void*)(TABLE_HIGH_BYTE*UI_256))
 #define JUMP_POINT             ((unsigned char*)( (unsigned int)(JUMP_POINT_HIGH_BYTE*UI_256) + JUMP_POINT_HIGH_BYTE ))
 
-int main()
+int main(void)
 {
   /*
    * Initialise the ticker and its buffer

@@ -58,7 +58,7 @@ simple:
 #include <arch/zx.h>
 #include <input.h>
 
-int main()
+int main(void)
 {
 
   while( 1 )
@@ -104,7 +104,7 @@ the information we're seeing from the keyboard:
 #include <stdio.h>
 #include <input.h>
 
-int main()
+int main(void)
 {
   unsigned char c;
 
@@ -176,7 +176,7 @@ an example which reads 5 keys and shows the results:
 #include <input.h>
 #include <arch/zx.h>
 
-int main()
+int main(void)
 {
   zx_cls(PAPER_WHITE);
   while( 1 ) {
@@ -227,7 +227,7 @@ scancode. For example:
 #include <input.h>
 #include <arch/zx.h>
 
-int main()
+int main(void)
 {
   uint16_t dollar_scancode = in_key_scancode('$');
 
@@ -266,7 +266,7 @@ scancode for BREAK, which is CAPS+Space like this:
 #include <input.h>
 #include <arch/zx.h>
 
-int main()
+int main(void)
 {
   /* Space, plus top bit set means CAPS */
   uint16_t break_scancode = IN_KEY_SCANCODE_SPACE | 0x8000;
@@ -300,7 +300,7 @@ which Fuse is quite happy with):
 #include <input.h>
 #include <arch/zx.h>
 
-int main()
+int main(void)
 {
   uint16_t kempston_input;
 
@@ -378,7 +378,7 @@ diagonal positions and/or pressing fire makes the border swirl with colour.
 #include <input.h>
 #include <arch/zx.h>
 
-int main()
+int main(void)
 {
   uint16_t kempston_input;
 

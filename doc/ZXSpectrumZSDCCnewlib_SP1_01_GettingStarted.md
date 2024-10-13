@@ -132,7 +132,7 @@ Save this listing to a file named 'circle.c':
 
 extern unsigned char circle[];
 
-int main()
+int main(void)
 {
   static struct sp1_Rect full_screen = {0, 0, 32, 24};
   struct sp1_ss  *circle_sprite;
