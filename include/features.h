@@ -1248,7 +1248,7 @@
 #define __HAVE_VIDEO_MC6845 1
 // #define __HAVE_VIDEO_VDP 0
 // #define __HAVE_VIDEO_V9938 0
-// #define __HAVE_JOYSTICK 0
+#define __HAVE_JOYSTICK 1
 #define __HARDWARE_JOY1_INDEX 0
 #define __HARDWARE_JOY2_INDEX 0
 #define __GENCON_CUSTOM_FONT 0
@@ -1284,7 +1284,7 @@
 #define __HAVE_VIDEO_MC6845 1
 // #define __HAVE_VIDEO_VDP 0
 // #define __HAVE_VIDEO_V9938 0
-// #define __HAVE_JOYSTICK 0
+#define __HAVE_JOYSTICK 1
 #define __HARDWARE_JOY1_INDEX 0
 #define __HARDWARE_JOY2_INDEX 0
 #define __GENCON_CUSTOM_FONT 0
