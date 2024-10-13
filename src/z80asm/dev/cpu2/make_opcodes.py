@@ -35,13 +35,22 @@ def add_synth(cpu, instr, sub_instrs):
             opcodes.append(sub_opcodes)
     add1(cpu, instr, opcodes, True)
 
-def build_8080_strict(cpu, **kwargs):
+def get_cpu_list():
+    global table
+    
+    cpus = set()
+    for opcode in table:
+        for cpu in table[opcode]:
+            cpus.add(cpu)
+    return sorted(list(cpus))
+
+def add_8080_base(cpu, remove_p_flag):
     reg8 = {'b':0, 'c':1, 'd':2, 'e':3, 'h':4, 'l':5, 'a':7}
     reg8m = {'b':0, 'c':1, 'd':2, 'e':3, 'h':4, 'l':5, 'm':6, 'a':7}
     reg16bdhsp = {'b':0, 'd':1, 'h':2, 'sp':3}
     reg16bd = {'b':0, 'd':1}
     reg16bdhpsw = {'b':0, 'd':1, 'h':2, 'psw':3}
-    if 'zilog' in kwargs:   # cp=compare, jp=jump
+    if remove_p_flag:       # cp=compare, jp=jump
         flags={'nz':0, 'z':1, 'nc':2, 'c':3, 'po':4, 'pe':5, 'm':7}
     else:                   # cp=call p, jp=jmp p
         flags={'nz':0, 'z':1, 'nc':2, 'c':3, 'po':4, 'pe':5, 'p':6, 'm':7}
@@ -161,7 +170,41 @@ def build_8080_strict(cpu, **kwargs):
     add(cpu, f"nop", [0x00])
     add(cpu, f"hlt", [0x76])
 
-def build_8080_zilog(cpu, **kwargs):
+def add_8085_base(cpu, remove_p_flag):
+    add(cpu, f"rim", [0x20])
+    add(cpu, f"sim", [0x30])
+
+def add_8085_undocumented(cpu):
+    add(cpu, "dsub", [0x08])
+    
+    add(cpu, "arhl", [0x10])
+    add(cpu, "rrhl", [0x10])
+    
+    add(cpu, "rdel", [0x18])
+    add(cpu, "rlde", [0x18])
+    
+    add(cpu, "ldhi %n", [0x28, '%n'])
+    add(cpu, "adi hl, %n", [0x28, '%n'])
+
+    add(cpu, "ldsi %n", [0x38, '%n'])
+    add(cpu, "adi sp, %n", [0x38, '%n'])
+    
+    add(cpu, "rstv", [0xcb])
+    add(cpu, "ovrst8", [0xcb])
+    
+    add(cpu, "shlx", [0xd9])
+    add(cpu, "shlde", [0xd9])
+
+    add(cpu, "lhlx", [0xed])
+    add(cpu, "lhlde", [0xed])
+    
+    add(cpu, "jnx5 %m", [0xdd, '%m', '%m'])
+    add(cpu, "jnk %m", [0xdd, '%m', '%m'])
+
+    add(cpu, "jx5 %m", [0xfd, '%m', '%m'])
+    add(cpu, "jk %m", [0xfd, '%m', '%m'])
+
+def add_z80_base(cpu):
     reg8 = {'b':0, 'c':1, 'd':2, 'e':3, 'h':4, 'l':5, 'a':7}
     reg8m = {'b':0, 'c':1, 'd':2, 'e':3, 'h':4, 'l':5, '(hl)':6, 'a':7}
     reg16bdhsp = {'bc':0, 'de':1, 'hl':2, 'sp':3}
@@ -273,51 +316,108 @@ def build_8080_zilog(cpu, **kwargs):
     # control
     add(cpu, f"halt", [0x76])
 
-def build_8085_strict(cpu, **kwargs):
-    build_8080_strict(cpu, **kwargs)
-    
-    add(cpu, f"rim", [0x20])
-    add(cpu, f"sim", [0x30])
+def add_emulated_func(cpu, opcode, function):
+    global table
 
-def build_8080(cpu):
-    build_8080_strict(cpu, zilog=True)
-    build_8080_zilog(cpu)
-    
-    # synthetic opcodes
-    
-    # restart
-    for addr in range(8, 0x40, 8):
-        i = addr // 8
-        add_synth(cpu, f"rst {addr:02x}h", [f"rst {i}"])
-    
-    # register pair names
-    for rp in ['bc', 'de', 'hl']:
-        add_synth(cpu, f"lxi {rp}, %m", ["lxi "+rp[0]+", %m"])
-        for op in ['inx', 'dcx', 'dad']:
-            add_synth(cpu, f"{op} {rp}", [op+" "+rp[0]])
+    if opcode not in table:
+        table[opcode] = {}
+    if cpu not in table[opcode]:
+        table[opcode][cpu] = {'synth':True, 
+                              'opcodes':[[0xcd, '@'+function]]}
+        
+def add_emulated_synth(cpu, opcode, sub_opcodes):
+    global table
+
+    if opcode not in table:
+        table[opcode] = {}
+    if cpu not in table[opcode]:
+        add_synth(cpu, opcode, sub_opcodes)
+        
+def add_synth_opcodes():
+    for cpu in get_cpu_list():
+        if not re.search(r'_strict$', cpu):
+            # restart
+            for addr in range(8, 0x40, 8):
+                i = addr // 8
+                add_emulated_synth(cpu, f"rst {addr:02x}h", [f"rst {i}"])
             
-    for rp in ['bc', 'de']:
-        for op in ['stax', 'ldax']:
-            add_synth(cpu, f"{op} {rp}", [op+" "+rp[0]])
+            # register pair names
+            for rp in ['bc', 'de', 'hl']:
+                add_emulated_synth(cpu, f"lxi {rp}, %m", ["lxi "+rp[0]+", %m"])
+                for op in ['inx', 'dcx', 'dad']:
+                    add_emulated_synth(cpu, f"{op} {rp}", [op+" "+rp[0]])
+                    
+            for rp in ['bc', 'de']:
+                for op in ['stax', 'ldax']:
+                    add_emulated_synth(cpu, f"{op} {rp}", [op+" "+rp[0]])
 
-    # 16-bit mov
-    for src in ['bc', 'de', 'hl']:
-        for dst in ['bc', 'de', 'hl']:
-            if src != dst:
-                add_synth(cpu, f"mov {dst}, {src}", 
-                               ["mov "+dst[0]+", "+src[0],
-                                "mov "+dst[1]+", "+src[1]])
-                add_synth(cpu, f"ld {dst}, {src}", 
-                               ["ld "+dst[0]+", "+src[0],
-                                "ld "+dst[1]+", "+src[1]])
+            # 16-bit mov
+            for src in ['bc', 'de', 'hl']:
+                for dst in ['bc', 'de', 'hl']:
+                    if src != dst:
+                        add_emulated_synth(cpu, f"mov {dst}, {src}", 
+                                       ["mov "+dst[0]+", "+src[0],
+                                        "mov "+dst[1]+", "+src[1]])
+                        add_emulated_synth(cpu, f"ld {dst}, {src}", 
+                                       ["ld "+dst[0]+", "+src[0],
+                                        "ld "+dst[1]+", "+src[1]])
+                                        
+            # 8085 dsub
+            if cpu == "8085":
+                add_emulated_synth(cpu, "sub hl, bc", ["dsub"])
+            else:
+                add_emulated_func(cpu, "dsub", "__z80asm__sub_hl_bc")
+                add_emulated_func(cpu, "sub hl, bc", "__z80asm__sub_hl_bc")
+            
+            # 8085 arhl, rrhl
+            if cpu == "8080":
+                add_emulated_func(cpu, "sra hl", "__z80asm__sra_hl")
+                add_emulated_func(cpu, "arhl", "__z80asm__sra_hl")
+                add_emulated_func(cpu, "rrhl", "__z80asm__sra_hl")
+            elif cpu == "8085":
+                add_emulated_synth(cpu, "sra hl", ["rrhl"])
+            else:
+                add_emulated_synth(cpu, "sra hl", ["sra h", "rr l"])
+                add_emulated_synth(cpu, "arhl", ["sra h", "rr l"])
+                add_emulated_synth(cpu, "rrhl", ["sra h", "rr l"])
+            
+            # 8085 rdel, rlde
+            if cpu == "8080":
+                add_emulated_func(cpu, "rl de", "__z80asm__rl_de")
+                add_emulated_func(cpu, "rdel", "__z80asm__rl_de")
+                add_emulated_func(cpu, "rlde", "__z80asm__rl_de")
+            elif cpu == "8085":
+                add_emulated_synth(cpu, "rl de", ["rlde"])
+            else:
+                add_emulated_synth(cpu, "rl de", ["rl e", "rl d"])
+                add_emulated_synth(cpu, "rdel", ["rl e", "rl d"])
+                add_emulated_synth(cpu, "rlde", ["rl e", "rl d"])
+    
+def add_opcodes():
+    for cpu in ["8080_strict"]:
+        add_8080_base(cpu, False)
+        
+    for cpu in ["8080"]:
+        add_8080_base(cpu, True)
+        add_z80_base(cpu)
+    
+    for cpu in ["8085_strict"]:
+        add_8080_base(cpu, False)
+        add_8085_base(cpu, False)
+        
+    for cpu in ["8085"]:
+        add_8080_base(cpu, True)
+        add_8085_base(cpu, True)
+        add_z80_base(cpu)
+        add_8085_undocumented(cpu)
+
+    add_synth_opcodes()    
+
 
 if len(sys.argv) != 2:
     raise ValueError(f"Usage: make_opcodes.py output.json")
 output = sys.argv[1]
 
-build_8080_strict("8080_strict")
-build_8085_strict("8085_strict")
-build_8080("8080")
-
+add_opcodes()
 with open(output, 'w') as f:
     f.write(json.dumps(table, indent=4, sort_keys=True))

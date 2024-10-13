@@ -38,6 +38,8 @@ def format_opcodes(opcodes):
         for byte in bytes:
             if re.match(r'^\d+$', str(byte)):
                 hex_dump.append(f"{byte:02X}")
+            elif re.match(r'@\w+', str(byte)):
+                hex_dump.append(str(byte))
             else:
                 if len(byte) != 2:
                     raise ValueError(f"unexpected byte {byte}")
