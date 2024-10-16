@@ -8,7 +8,7 @@
 enum diskmode{ DEFAULT, FM500, FM300, FM250, MFM500, MFM300, MFM250 };
 
 typedef struct {
-    const char *name;			// Name of the format
+    const char *name;           // Name of the format
     // Generic parameters
     uint8_t   sectors_per_track;
     uint16_t  tracks;
@@ -24,7 +24,7 @@ typedef struct {
     uint8_t   byte_size_extents; /* If set, extends in directories are single byte */
     uint8_t   first_sector_offset; /* If set, first sector in Track-Info is 1, else 0 */
     uint8_t   boot_tracks_sector_offset;   /* Sector offset for boot tracks (0 = ignore) */
-    uint32_t  offset;		/* Offset to directory (format kludge) */
+    uint32_t  offset;            /* Offset to directory (format kludge) */
 
     // FAT parameters
     uint8_t   number_of_fats;
@@ -32,7 +32,7 @@ typedef struct {
     uint16_t  cluster_size;
 
     // Hardware/Image peculiarities
-    uint8_t   disk_mode;	/* 0..5: 500,300,250 kbps FM .. 500,300,250 kbps MFM */
+    uint8_t   disk_mode;    /* 0..5: 500,300,250 kbps FM .. 500,300,250 kbps MFM */
 
     // Image layout
     uint8_t   alternate_sides;
@@ -73,6 +73,7 @@ extern int disc_write_edsk(disc_handle *h, const char *filename);
 extern int disc_write_d88(disc_handle *h, const char *filename);
 extern int disc_write_anadisk(disc_handle* h, const char* filename);
 extern int disc_write_imd(disc_handle* h, const char* filename);
+extern int disc_write_dmk(disc_handle* h, const char* filename);
 extern void disc_print_writers(FILE *fp);
 
 

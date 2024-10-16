@@ -31,6 +31,18 @@ typedef struct {
 } d88_sct_t;
 
 
+// dmk media type
+typedef struct
+{
+    uint8_t writeProtected;
+    uint8_t numTracks;
+    uint8_t trackLen[2];
+    uint8_t flags;
+    uint8_t reserved[7];
+    uint8_t format[4];
+} dmk_header_t;
+
+
 struct disc_handle_s {
     disc_spec  spec;
 
@@ -194,6 +206,7 @@ struct container {
     { "d88",        ".D88", "d88 format",                  disc_write_d88 },
     { "ana",        ".dump", "Anadisk format",             disc_write_anadisk },
     { "imd",        ".imd", "IMD (Imagedisk) format",      disc_write_imd },
+    { "dmk",        ".dmk", "dmk (TRS-80/MSX) format",     disc_write_dmk },
     { "raw",        ".img", "Raw image",                   disc_write_raw },
     { NULL, NULL, NULL }
 };
@@ -497,7 +510,7 @@ int disc_write_anadisk(disc_handle* h, const char* filename)
                 if ( (! h->spec.side2_sector_numbering) || (! s) )
                     header[4] = skew_sector(h, j, i) + h->spec.first_sector_offset;
                 else
-                    header[4] = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ;
+                    header[4] = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track;
                 header[5] = sector_size;
                 header[6] = h->spec.sector_size % 256;
                 header[7] = h->spec.sector_size / 256;
@@ -591,6 +604,160 @@ int disc_write_imd(disc_handle* h, const char* filename)
             }
         }
     }
+    fclose(fp);
+    return 0;
+}
+
+
+static uint16_t dmk_crc(uint16_t crc, uint8_t val)
+{
+    int i,c;
+
+    c=crc;
+    for (i = 8; i < 16; ++i) {
+        c = (c << 1) ^ ((((c ^ (val << i)) & 0x8000) ? 0x1021 : 0));
+    }
+    
+    return (c);
+}
+
+
+int disc_write_dmk(disc_handle* h, const char* filename)
+{
+    dmk_header_t header;
+    size_t offs;
+    FILE* fp;
+    int i, j, s;
+    int x;
+    int rawTrackLen,rawSectorLen,dmkTrackLen;
+    int sector_size = 0;
+    int gap1 = 50;
+    int gap2 = 22;
+    int gap4a = 80;
+    int gap4b = 182;
+
+    int pos;
+    uint16_t crc;  // CRC checksum
+    uint8_t *cp;   // ptr for CRC checksum creation
+
+    i = h->spec.sector_size;
+    while (i > 128) {
+        sector_size++;
+        i /= 2;
+    }
+
+    if ((fp = fopen(filename, "wb")) == NULL) {
+        return -1;
+    }
+    
+    // Disk header
+    rawSectorLen = 12 + 3 + 1 + 6 + gap2 + 12 + 4 + h->spec.sector_size + 2 +  h->spec.gap3_length;
+    rawTrackLen  = gap4a + 12 + 4 + gap1 + h->spec.sectors_per_track * rawSectorLen + gap4b;
+    dmkTrackLen  = rawTrackLen + 128;
+
+    memset(&header, 0, sizeof(header));
+    header.numTracks = h->spec.tracks;
+    header.trackLen[0] = dmkTrackLen & 0xff;
+    header.trackLen[1] = dmkTrackLen >> 8;
+    header.flags = ((h->spec.sides == 2) ? 0 : (1 << 4));
+    if (h->spec.disk_mode > FM250)
+        header.flags += (1 << 6); // double density (MFM)
+
+    fwrite(&header, sizeof(header), 1, fp);
+
+    // Tracks
+
+    uint8_t **addrPos = calloc(h->spec.sectors_per_track, sizeof(uint8_t *));
+    uint8_t **dataPos = calloc(h->spec.sectors_per_track, sizeof(uint8_t *));
+    uint8_t *buf = calloc(dmkTrackLen, sizeof(char));
+
+    uint8_t *ip = &buf[0];   // pointer in IDAM table
+    uint8_t *tp = &buf[128]; // pointer in actual track data
+
+    memset(tp, 0x4e, gap4a);  tp +=gap4a;
+    memset(tp, 0x00, 12);     tp += 12;
+    memset(tp, 0xc2, 3);      tp += 3;
+    memset(tp, 0xfc, 1);      tp++;
+    memset(tp, 0x4e, gap1);   tp += gap1;
+
+    // We prepare the skeleton for a track
+    // and the pointer vectors for IDAM entry and data block for each sector
+    for (j = 0; j < h->spec.sectors_per_track; ++j) {
+
+        memset(tp, 0x00, 12);     tp += 12;    // sync
+        memset(tp, 0xa1, 3);      tp += 3;     // ID addr mark
+        pos = tp - &buf[0];
+        *ip++ = pos & 0xff;
+        *ip++ = (pos >> 8) | 0x80;  // double density (MFM) sector
+        memset(tp, 0xfe, 1);      tp++;        // ID addr mark (cont)
+
+        // ----  (overwritten later) ----
+        addrPos[j] = (uint8_t *)tp;
+        memset(tp, 0x00, 6);      tp += 6;     // C H R N CRC (overwritten later)
+        // ------------------------------
+
+        memset(tp, 0x4e, gap2);   tp += gap2;  // gap2
+        memset(tp, 0x00, 12);     tp += 12;    // sync
+        memset(tp, 0xa1, 3);      tp += 3;     // data mark
+        memset(tp, 0xfb, 1);      tp++;
+
+        // ----  (overwritten later) ----
+        dataPos[j] = (uint8_t *)tp;
+        memset(tp, 0x00, h->spec.sector_size);  tp += h->spec.sector_size; // sector data (overwritten later)
+        memset(tp, 0x00, 2);      tp += 2;     // CRC (overwritten later)
+        memset(tp, 0x4e, h->spec.gap3_length);   tp += h->spec.gap3_length;
+        // ------------------------------
+    }
+
+    memset(tp, 0x4e, gap4b);   //tp += gap4b;
+
+    for (i = 0; i < h->spec.tracks; i++) {
+        for (s = 0; s < h->spec.sides; s++) {
+            offs = track_offset(h, i, s);
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+
+                // ---  IDAM ---
+                uint8_t *ap = addrPos[j];
+                *ap++ = i;
+                *ap++ = s;
+                *ap++ = j + h->spec.first_sector_offset;  //*ap++ = j + 1;
+                *ap++ = h->spec.sector_size >> 8;   // Sector size code
+                
+                // CRC of ID Address Mark (IDAM)
+                crc = 0xffff;
+                cp = ap - 8;
+                for (x = 0; x < 8; ++x) {
+                    crc = dmk_crc(crc, cp[x]);
+                }
+                *ap++ = crc >> 8;
+                *ap++ = crc & 0xff;
+                
+                // ---  DATA ---
+                uint8_t *dp = dataPos[j];
+                //inf.read(dp, sectorSize);
+                memcpy (dp, h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size);
+                xorblock (dp, h->spec.sector_size, h->spec.xor_data);
+                dp += h->spec.sector_size;
+                
+                // CRC of sector data block
+                crc = 0xffff;
+                cp = dp - h->spec.sector_size - 4;
+                for (int x = 0; x < h->spec.sector_size + 4; ++x) {
+                    crc = dmk_crc(crc, cp[x]);
+                }
+                *dp++ = crc >> 8;
+                *dp++ = crc & 0xff;
+
+            }
+            //outf.write(&buf[0], dmkTrackLen);
+            fwrite(&buf[0], dmkTrackLen, 1, fp);
+        }
+    }
+    
+    free(addrPos);
+    free(dataPos);
+    free(buf);
+
     fclose(fp);
     return 0;
 }
