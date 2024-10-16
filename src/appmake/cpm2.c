@@ -1218,6 +1218,25 @@ static disc_spec g3_holte30_spec = {
     .first_sector_offset = 0
 };
 
+// Genie III (TRS80 clone) Holte CP/M 2.2
+static disc_spec g3_holte22_spec = {
+    .name = "GIII_HOLTE",
+    .disk_mode = MFM300,
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 192,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 0
+};
+
+
 static disc_spec svi40ss_spec = {
     .name = "SVI40SS",
     .sectors_per_track = 17,
@@ -2106,6 +2125,7 @@ static struct formats {
     { "kaypro4",   "Kaypro 4/10",           &kaypro4_spec,  0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
+    { "g3holte22", "Genie III Holte 2.2",   &g3_holte22_spec, 0, NULL, 1 },
     { "g3holte30", "Genie III Holte 3.0",   &g3_holte30_spec, 0, NULL, 1 },
     { "max80cpm3", "Lobo MAX-80 CPM3 SS",   &lobo_spec, 0, NULL, 1 },
     { "microbee-ds40",  "Microbee DS40",    &microbee40_spec, 0, NULL, 1 },
