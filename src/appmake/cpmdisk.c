@@ -609,16 +609,18 @@ int disc_write_imd(disc_handle* h, const char* filename)
 }
 
 
-static uint16_t dmk_crc(uint16_t crc, uint8_t val)
+static uint16_t dmk_crc(uint8_t *cp, int sz)
 {
-    int i,c;
+    int x,i,crc;
 
-    c=crc;
-    for (i = 8; i < 16; ++i) {
-        c = (c << 1) ^ ((((c ^ (val << i)) & 0x8000) ? 0x1021 : 0));
-    }
+	crc = 0xffff;
+	for (x = 0; x < sz; ++x) {
+		for (i = 8; i < 16; ++i) {
+			crc = (crc << 1) ^ ((((crc ^ (cp[x] << i)) & 0x8000) ? 0x1021 : 0));
+		}
+	}
     
-    return (c);
+    return (crc);
 }
 
 
@@ -628,7 +630,6 @@ int disc_write_dmk(disc_handle* h, const char* filename)
     size_t offs;
     FILE* fp;
     int i, j, s;
-    int x;
     int rawTrackLen,rawSectorLen,dmkTrackLen;
     int sector_size = 0;
     int gap1 = 50;
@@ -638,7 +639,6 @@ int disc_write_dmk(disc_handle* h, const char* filename)
 
     int pos;
     uint16_t crc;  // CRC checksum
-    uint8_t *cp;   // ptr for CRC checksum creation
 
     i = h->spec.sector_size;
     while (i > 128) {
@@ -659,9 +659,14 @@ int disc_write_dmk(disc_handle* h, const char* filename)
     header.numTracks = h->spec.tracks;
     header.trackLen[0] = dmkTrackLen & 0xff;
     header.trackLen[1] = dmkTrackLen >> 8;
+
+	// Bit 4, if set, means this is a single sided ONLY disk. 
     header.flags = ((h->spec.sides == 2) ? 0 : (1 << 4));
-    if (h->spec.disk_mode > FM250)
-        header.flags += (1 << 6); // double density (MFM)
+
+	// Bit 6, if set, means this disk is to be single density size
+	// and the emulator will access one byte instead of two when doing I/O in single density
+    if (h->spec.disk_mode < MFM500)
+        header.flags += (1 << 6);
 
     fwrite(&header, sizeof(header), 1, fp);
 
@@ -688,7 +693,13 @@ int disc_write_dmk(disc_handle* h, const char* filename)
         memset(tp, 0xa1, 3);      tp += 3;     // ID addr mark
         pos = tp - &buf[0];
         *ip++ = pos & 0xff;
-        *ip++ = (pos >> 8) | 0x80;  // double density (MFM) sector
+		// Bit 15 is set if the sector is double density.
+		if (h->spec.disk_mode < MFM500)
+			*ip++ = (pos >> 8);  // single density
+		else
+			*ip++ = (pos >> 8) | 0x80;  // double density (MFM) sector
+
+		// Track pointed by the IDAM pointer
         memset(tp, 0xfe, 1);      tp++;        // ID addr mark (cont)
 
         // ----  (overwritten later) ----
@@ -724,32 +735,22 @@ int disc_write_dmk(disc_handle* h, const char* filename)
                 *ap++ = h->spec.sector_size >> 8;   // Sector size code
                 
                 // CRC of ID Address Mark (IDAM)
-                crc = 0xffff;
-                cp = ap - 8;
-                for (x = 0; x < 8; ++x) {
-                    crc = dmk_crc(crc, cp[x]);
-                }
+                crc = dmk_crc(ap - 8, 8);
                 *ap++ = crc >> 8;
                 *ap++ = crc & 0xff;
                 
                 // ---  DATA ---
                 uint8_t *dp = dataPos[j];
-                //inf.read(dp, sectorSize);
                 memcpy (dp, h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size);
                 xorblock (dp, h->spec.sector_size, h->spec.xor_data);
                 dp += h->spec.sector_size;
                 
                 // CRC of sector data block
-                crc = 0xffff;
-                cp = dp - h->spec.sector_size - 4;
-                for (int x = 0; x < h->spec.sector_size + 4; ++x) {
-                    crc = dmk_crc(crc, cp[x]);
-                }
+                crc = dmk_crc(dp - h->spec.sector_size - 4, h->spec.sector_size + 4);
                 *dp++ = crc >> 8;
                 *dp++ = crc & 0xff;
 
             }
-            //outf.write(&buf[0], dmkTrackLen);
             fwrite(&buf[0], dmkTrackLen, 1, fp);
         }
     }
