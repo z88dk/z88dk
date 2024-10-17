@@ -1201,6 +1201,7 @@ static disc_spec lnw80_spec = {
 };
 
 // Genie III (TRS80 clone) Holte CP/M 3.0
+// also good for Genie IIIs on B: with KK CP/M 2.2
 static disc_spec g3_holte30_spec = {
     .name = "GIII_HOLTE",
     .disk_mode = MFM300,
