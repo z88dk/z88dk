@@ -1200,6 +1200,26 @@ static disc_spec lnw80_spec = {
     .skew_tab = { 0,5,10,15,2,7,12,17,4,9,14,1,6,11,16,3,8,13 }
 };
 
+// Genie IIs (TRS80 clone) GS CP/M
+static disc_spec g2s_gscpm_spec = {
+    .name = "GII_GSCPM",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 256,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_tab = { 0,2,4,1,3 }	
+};
+
 // Genie III (TRS80 clone) Holte CP/M 3.0
 // also good for Genie IIIs on B: with KK CP/M 2.2
 static disc_spec g3_holte30_spec = {
@@ -1235,6 +1255,28 @@ static disc_spec g3_holte22_spec = {
     .extent_size = 2048,
     .byte_size_extents = 0,
     .first_sector_offset = 0
+};
+
+// Genie III (TRS80 clone) LOWE CP/M 2.2
+// a.k.a. "lowe patch" or "lowe fritz"
+static disc_spec g3_lowe22_spec = {
+    .name = "GIII_LOWE",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 6,
+    .directory_entries = 128,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 10, 12, 14, 16, 1, 3, 5, 7, 9, 11, 13, 15, 17 },
+    .side2_sector_numbering = 1
 };
 
 
@@ -2126,8 +2168,10 @@ static struct formats {
     { "kaypro4",   "Kaypro 4/10",           &kaypro4_spec,  0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
+    { "g2sgs",     "Genie II GS CP/M",      &g2s_gscpm_spec, 0, NULL, 1 },
     { "g3holte22", "Genie III Holte 2.2",   &g3_holte22_spec, 0, NULL, 1 },
     { "g3holte30", "Genie III Holte 3.0",   &g3_holte30_spec, 0, NULL, 1 },
+    { "g3lowe22",  "Genie III Lowe 2.2",    &g3_lowe22_spec, 0, NULL, 1 },
     { "max80cpm3", "Lobo MAX-80 CPM3 SS",   &lobo_spec, 0, NULL, 1 },
     { "microbee-ds40",  "Microbee DS40",    &microbee40_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
