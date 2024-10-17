@@ -1237,6 +1237,28 @@ static disc_spec g3_holte22_spec = {
     .first_sector_offset = 0
 };
 
+// Genie III (TRS80 clone) LOWE CP/M 2.2
+// a.k.a. "lowe patch" or "lowe fritz"
+static disc_spec g3_lowe22_spec = {
+    .name = "GIII_LOWE",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 6,
+    .directory_entries = 128,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 10, 12, 14, 16, 1, 3, 5, 7, 9, 11, 13, 15, 17 },
+    .side2_sector_numbering = 1
+};
+
 
 static disc_spec svi40ss_spec = {
     .name = "SVI40SS",
@@ -2128,6 +2150,7 @@ static struct formats {
     { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
     { "g3holte22", "Genie III Holte 2.2",   &g3_holte22_spec, 0, NULL, 1 },
     { "g3holte30", "Genie III Holte 3.0",   &g3_holte30_spec, 0, NULL, 1 },
+    { "g3lowe22",  "Genie III Lowe 2.2",    &g3_lowe22_spec, 0, NULL, 1 },
     { "max80cpm3", "Lobo MAX-80 CPM3 SS",   &lobo_spec, 0, NULL, 1 },
     { "microbee-ds40",  "Microbee DS40",    &microbee40_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
