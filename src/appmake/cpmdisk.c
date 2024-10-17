@@ -736,8 +736,22 @@ int disc_write_dmk(disc_handle* h, const char* filename)
                     *ap++ = skew_sector(h, j, i) + h->spec.first_sector_offset;       //sector
                 else
                     *ap++ = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ;   //sector (2nd side)
-                *ap++ = h->spec.sector_size >> 8;   // Sector size code
-                
+
+				// Sector size code
+				switch (h->spec.sector_size) {
+					case 1024:
+						*ap++ = 3;
+						break;
+					case 256:
+						*ap++ = 1;
+						break;
+					case 128:
+						*ap++ = 0;
+						break;
+					default:
+						*ap++ = 2;	// e.g. 512
+				};
+				
                 // CRC of ID Address Mark (IDAM)
                 crc = dmk_crc(ap - 8, 8);
                 *ap++ = crc >> 8;
