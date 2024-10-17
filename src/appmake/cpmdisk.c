@@ -731,14 +731,18 @@ int disc_write_dmk(disc_handle* h, const char* filename)
                 uint8_t *ap = addrPos[j];
                 *ap++ = i;
                 *ap++ = s;
-                *ap++ = j + h->spec.first_sector_offset;  //*ap++ = j + 1;
+                //*ap++ = j + h->spec.first_sector_offset;  //*ap++ = j + 1;
+                if ( (! h->spec.side2_sector_numbering) || (! (h->spec.inverted_sides ^ s)) )
+					*ap++ = skew_sector(h, j, i) + h->spec.first_sector_offset;       //sector
+				else
+					*ap++ = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track ;   //sector (2nd side)
                 *ap++ = h->spec.sector_size >> 8;   // Sector size code
                 
                 // CRC of ID Address Mark (IDAM)
                 crc = dmk_crc(ap - 8, 8);
                 *ap++ = crc >> 8;
                 *ap++ = crc & 0xff;
-                
+
                 // ---  DATA ---
                 uint8_t *dp = dataPos[j];
                 memcpy (dp, h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size);
