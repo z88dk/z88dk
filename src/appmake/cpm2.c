@@ -1200,7 +1200,7 @@ static disc_spec lnw80_spec = {
     .skew_tab = { 0,5,10,15,2,7,12,17,4,9,14,1,6,11,16,3,8,13 }
 };
 
-// Genie IIs (TRS80 clone) Klaus Kaempf CP/M
+// Genie IIs (TRS80 clone) Klaus Kaempf CP/M System disk
 static disc_spec g2s_kkcpm_spec = {
     .name = "GII_KKCPM",
     .disk_mode = MFM250,
@@ -1212,6 +1212,26 @@ static disc_spec g2s_kkcpm_spec = {
     .gap3_length = 0x52,
     .filler_byte = 0xe5,
     .boottracks = 6,
+    .directory_entries = 256,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_tab = { 0,2,4,1,3 }	
+};
+
+// Genie IIs (TRS80 clone) Klaus Kaempf CP/M Data disk (B:)
+static disc_spec g2s_kkcpmb_spec = {
+    .name = "GII_KKCPMB",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 0,
     .directory_entries = 256,
     .extent_size = 4096,
     .byte_size_extents = 1,
@@ -2190,6 +2210,7 @@ static struct formats {
     { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
     { "g2sgs",     "Genie II GS CP/M",      &g2s_gscpm_spec, 0, NULL, 1 },
     { "g2skk",     "Genie II KK CP/M",      &g2s_kkcpm_spec, 0, NULL, 1 },
+    { "g2skkb",    "Genie II KK CP/M B:",   &g2s_kkcpmb_spec, 0, NULL, 1 },
     { "g3holte22", "Genie III Holte 2.2",   &g3_holte22_spec, 0, NULL, 1 },
     { "g3holte30", "Genie III Holte 3.0",   &g3_holte30_spec, 0, NULL, 1 },
     { "g3lowe22",  "Genie III Lowe 2.2",    &g3_lowe22_spec, 0, NULL, 1 },
