@@ -88,12 +88,15 @@ ENDIF
 IF CRT_ENABLE_COMMANDLINE = 1
     ld      hl,$80
     ld      a,(hl)
-    ld      b,0
+    ld      b,h
     and     a
     jp      z,argv_done
     ld      c,a
-    inc     hl
     add     hl,bc   ;now points to the end of the command line
+    inc     hl
+    ld      (hl),0
+    dec     hl
+    dec     c
     INCLUDE	"crt/classic/crt_command_line.inc"
     push    hl	;argv
     push    bc	;argc

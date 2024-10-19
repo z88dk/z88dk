@@ -36,9 +36,6 @@ argv_loop_2:
     inc     c
 IF CRT_COMMANDLINE_REDIRECTION = 1
         EXTERN freopen
-        xor     a
-        add     b
-        jr      nz,no_redir_stdout
         ld      a,(hl)
         cp      '>'
         jr      nz,no_redir_stdout
@@ -66,6 +63,7 @@ noappendb:
         pop     bc
         pop     hl
         dec     hl
+        dec     c
         jr      argv_zloop
 no_redir_stdout:
         ld      a,(hl)
@@ -85,7 +83,8 @@ no_redir_stdout:
         pop     hl
         pop     bc
         pop     hl
-        dec	    hl
+        dec     hl
+        dec     c
         jr      argv_zloop
 no_redir_stdin:
 ENDIF
