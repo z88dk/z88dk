@@ -1297,10 +1297,31 @@ static disc_spec g3_holte22_spec = {
     .first_sector_offset = 0
 };
 
-// Genie III (TRS80 clone) LOWE CP/M 2.2
+
+// Genie III (TRS80 clone) LOWE CP/M 2.2a in drive A:
+// For drive B:, see the next definition
+static disc_spec g3_lowe22a_spec = {
+    .name = "GIII_LOWEAA",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 0,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .side2_sector_numbering = 1,
+    .first_sector_offset = 0
+};
+
+// Genie III (TRS80 clone) LOWE CP/M 2.2 in drive A:
 // a.k.a. "lowe patch" or "lowe fritz"
-static disc_spec g3_lowe22_spec = {
-    .name = "GIII_LOWE",
+static disc_spec g3_lowe22b_spec = {
+    .name = "GIII_LOWEB",
     .disk_mode = MFM250,
     .sectors_per_track = 18,
     .tracks = 80,
@@ -2213,7 +2234,8 @@ static struct formats {
     { "g2skkb",    "Genie II KK CP/M B:",   &g2s_kkcpmb_spec, 0, NULL, 1 },
     { "g3holte22", "Genie III Holte 2.2",   &g3_holte22_spec, 0, NULL, 1 },
     { "g3holte30", "Genie III Holte 3.0",   &g3_holte30_spec, 0, NULL, 1 },
-    { "g3lowe22",  "Genie III Lowe 2.2",    &g3_lowe22_spec, 0, NULL, 1 },
+    { "g3lowe22a", "Genie III Lowe 2.2a",   &g3_lowe22a_spec, 0, NULL, 1 },
+    { "g3lowe22b", "Genie III Lowe 2.2b",   &g3_lowe22b_spec, 0, NULL, 1 },
     { "max80cpm3", "Lobo MAX-80 CPM3 SS",   &lobo_spec, 0, NULL, 1 },
     { "microbee-ds40",  "Microbee DS40",    &microbee40_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
