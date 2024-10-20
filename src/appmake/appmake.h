@@ -113,6 +113,9 @@ extern option_t  hex_options[];
 extern int       homelab_exec(char *target);
 extern option_t  homelab_options[];
 
+extern int       hector_exec(char *target);
+extern option_t  hector_options[];
+
 extern int       inject_exec(char *target);
 extern option_t  inject_options[];
 extern char      inject_longhelp[];
@@ -380,6 +383,10 @@ struct {
       "Glue several output binaries into a single binary representing memory",
        NULL,
        glue_exec, glue_options },
+    { "bin2hk7",  "hector",  "(C) 2024 z88dk",
+      "Creates a .k7 file for Hector emulators",
+      NULL,
+      hector_exec,    hector_options },
     { "bin2hex",  "hex",      "(C) 2001 Dominic Morris & Jeff Brown",
       "Creates an intel hex record suitable for embedded devices",
       NULL,
