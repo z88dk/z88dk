@@ -1200,7 +1200,7 @@ static disc_spec lnw80_spec = {
     .skew_tab = { 0,5,10,15,2,7,12,17,4,9,14,1,6,11,16,3,8,13 }
 };
 
-// Genie IIs (TRS80 clone) Klaus Kaempf CP/M System disk
+// Genie IIs / Genie III (TRS80 clone) Klaus Kaempf CP/M System disk
 static disc_spec g2s_kkcpm_spec = {
     .name = "GII_KKCPM",
     .disk_mode = MFM250,
@@ -2230,7 +2230,7 @@ static struct formats {
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
     { "g2sgs",     "Genie II GS CP/M",      &g2s_gscpm_spec, 0, NULL, 1 },
-    { "g2skk",     "Genie II KK CP/M",      &g2s_kkcpm_spec, 0, NULL, 1 },
+    { "g2skk",     "Genie II/III KK CP/M",  &g2s_kkcpm_spec, 0, NULL, 1 },
     { "g2skkb",    "Genie II KK CP/M B:",   &g2s_kkcpmb_spec, 0, NULL, 1 },
     { "g3holte22", "Genie III Holte 2.2",   &g3_holte22_spec, 0, NULL, 1 },
     { "g3holte30", "Genie III Holte 3.0",   &g3_holte30_spec, 0, NULL, 1 },
