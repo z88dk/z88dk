@@ -13,6 +13,8 @@ INSTALL 	?= install
 Z80ASM_EXE	?= ../../$(PROJ)
 SRC			:= $(wildcard *.asm)
 
+TASKS ?= 9
+
 all:		$(PROJ).lib
 
 $(PROJ).lib: $(SRC) $(PROJ)_lib.lst Makefile
@@ -29,4 +31,4 @@ install::
 
 test: all
 	cp $(Z80ASM_EXE) $(PROJ)
-	perl -S prove --state=slow,save -j9 t/*.t
+	perl -S prove --state=slow,save -j$(TASKS) t/*.t
