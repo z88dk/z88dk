@@ -1029,6 +1029,18 @@ for my $cpu (@CPUS) {
 		add($cpu, "ld de, hl+%u",	[0x28, '%u']);
 	}
 	elsif ($gameboy) {
+		add($cpu, "ldhi %n",		[push_dd('hl')],
+									[ld_dd_m('de'), '%n', 0],
+									[add_hl_dd('de')],
+									[push_dd('hl')], [push_dd('de')],
+									[pop_dd('hl')], [pop_dd('de')],
+									[pop_dd('hl')]);
+		add($cpu, "adi hl, %n",		[push_dd('hl')],
+									[ld_dd_m('de'), '%n', 0],
+									[add_hl_dd('de')],
+									[push_dd('hl')], [push_dd('de')],
+									[pop_dd('hl')], [pop_dd('de')],
+									[pop_dd('hl')]);
 		add($cpu, "ld de, hl+%u",	[push_dd('hl')],
 									[ld_dd_m('de'), '%u', 0],
 									[add_hl_dd('de')],
@@ -1037,6 +1049,16 @@ for my $cpu (@CPUS) {
 									[pop_dd('hl')]);
 	}
 	else {
+		add($cpu, "ldhi %n",		[push_dd('hl')],
+									[ld_dd_m('de'), '%n', 0],
+									[add_hl_dd('de')],
+									[ex_de_hl()],
+									[pop_dd('hl')]);
+		add($cpu, "adi hl, %n",		[push_dd('hl')],
+									[ld_dd_m('de'), '%n', 0],
+									[add_hl_dd('de')],
+									[ex_de_hl()],
+									[pop_dd('hl')]);
 		add($cpu, "ld de, hl+%u",	[push_dd('hl')],
 									[ld_dd_m('de'), '%u', 0],
 									[add_hl_dd('de')],
@@ -1327,6 +1349,28 @@ for my $cpu (@CPUS) {
 		add($cpu, "ld de, sp+%u",	[0x38, '%u']);
     }
     elsif ($gameboy) {
+		add($cpu, "ldsi %n",	
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')],
+					[ld_dd_m('hl'), '%n', 0],		# ld hl, %n
+					[add_hl_dd('sp')],				# add hl, sp
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')]);
+		add($cpu, "adi sp, %n",	
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')],
+					[ld_dd_m('hl'), '%n', 0],		# ld hl, %n
+					[add_hl_dd('sp')],				# add hl, sp
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')]);
 		add($cpu, "ld de, sp+%u",	
 					[push_dd('hl')],				# ex de, hl
 					[push_dd('de')],
@@ -1340,6 +1384,16 @@ for my $cpu (@CPUS) {
 					[pop_dd('de')]);
     }
     else {
+		add($cpu, "ldsi %n",	
+					[ex_de_hl()],               	# ex de, hl
+					[ld_dd_m('hl'), '%n', 0],		# ld hl, %n
+					[add_hl_dd('sp')],				# add hl, sp
+					[ex_de_hl()]);					# ex de, hl
+		add($cpu, "adi sp, %n",	
+					[ex_de_hl()],               	# ex de, hl
+					[ld_dd_m('hl'), '%n', 0],		# ld hl, %n
+					[add_hl_dd('sp')],				# add hl, sp
+					[ex_de_hl()]);					# ex de, hl
 		add($cpu, "ld de, sp+%u",	
 					[ex_de_hl()],               	# ex de, hl
 					[ld_dd_m('hl'), '%u', 0],		# ld hl, %n
@@ -1358,7 +1412,137 @@ for my $cpu (@CPUS) {
 		add($cpu, "lhlde",			[0xED]);
 		add($cpu, "ld hl, (de)",	[0xED]);
 	}
-
+    elsif ($gameboy) {
+		# Store HL at address pointed by DE
+		add($cpu, "shlx",			
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')],
+					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+					[dec_dd('hl')],					# dec hl
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')]);
+		add($cpu, "shlde",			
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')],
+					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+					[dec_dd('hl')],					# dec hl
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')]);
+		add($cpu, "ld (de), hl",			
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')],
+					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+					[dec_dd('hl')],					# dec hl
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')]);
+		
+		# Load HL from address pointed by DE
+		add($cpu, "lhlx",			
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')],
+					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+					[dec_dd('hl')],					# dec hl
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')]);
+		add($cpu, "lhlde",			
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')],
+					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+					[dec_dd('hl')],					# dec hl
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')]);
+		add($cpu, "ld hl, (de)",			
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')],
+					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+					[dec_dd('hl')],					# dec hl
+					[push_dd('hl')],				# ex de, hl
+					[push_dd('de')],
+					[pop_dd('hl')],
+					[pop_dd('de')]);
+	}
+	else {
+		# Store HL at address pointed by DE
+		add($cpu, "shlx",			
+					[ex_de_hl()],               	# ex de, hl
+					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+					[dec_dd('hl')],					# dec hl
+					[ex_de_hl()]);               	# ex de, hl
+		add($cpu, "shlde",			
+					[ex_de_hl()],               	# ex de, hl
+					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+					[dec_dd('hl')],					# dec hl
+					[ex_de_hl()]);               	# ex de, hl
+		add($cpu, "ld (de), hl",			
+					[ex_de_hl()],               	# ex de, hl
+					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+					[dec_dd('hl')],					# dec hl
+					[ex_de_hl()]);               	# ex de, hl
+		
+		# Load HL from address pointed by DE
+		add($cpu, "lhlx",			
+					[ex_de_hl()],               	# ex de, hl
+					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+					[dec_dd('hl')],					# dec hl
+					[ex_de_hl()]);               	# ex de, hl
+		add($cpu, "lhlde",			
+					[ex_de_hl()],               	# ex de, hl
+					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+					[dec_dd('hl')],					# dec hl
+					[ex_de_hl()]);               	# ex de, hl
+		add($cpu, "ld hl, (de)",			
+					[ex_de_hl()],               	# ex de, hl
+					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+					[inc_dd('hl')],					# inc hl
+					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+					[dec_dd('hl')],					# dec hl
+					[ex_de_hl()]);               	# ex de, hl
+	}
+	
 	# lea
 	if ($ez80_any) {
 		add_suf($cpu, "lea ix, ix+%d", [0xED, 0x32, '%d']);

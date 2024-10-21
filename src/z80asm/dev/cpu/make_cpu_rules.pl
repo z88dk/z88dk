@@ -455,6 +455,9 @@ sub parse_code_opcode {
 	elsif ($bin =~ s/ %u 0$//) {
 		$stmt = "DO_stmt_n_0";
 	}
+	elsif ($bin =~ s/ %n 0$//) {
+		$stmt = "DO_stmt_n_0";
+	}
 	elsif ($bin =~ s/ %s 0$//) {
 		$stmt = "DO_stmt_s_0";
 	}
