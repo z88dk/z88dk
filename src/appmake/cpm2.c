@@ -302,6 +302,22 @@ static disc_spec osborne_sd_spec = {
 };
 
 
+static disc_spec dmv_ss_spec = {
+    .name = "NCR DMV",
+    .disk_mode = MFM300,
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x50,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
 static disc_spec dmv_spec = {
     .name = "NCR DMV",
     .disk_mode = MFM300,
@@ -2218,6 +2234,7 @@ static struct formats {
     { "corvboot",  "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
     { "datamax",   "Datamax-8000, 8in",     &bigboard_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
+    { "dmvss",     "NCR Decision Mate SS",  &dmv_ss_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "eagle2",    "Eagle II",              &eagle2_spec, 0, NULL, 1 },
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
