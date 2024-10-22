@@ -84,7 +84,7 @@ int hector_exec(char* target)
     }
 
     writebyte(5, fpout);        // Header
-    writeword(origin, fpout);
+    writeword(pos, fpout);
     writeword(len, fpout);
     writebyte(0xff, fpout);
 
@@ -104,6 +104,14 @@ int hector_exec(char* target)
             writebyte(c, fpout);
         }
     }
+
+    // And write the end of the block
+    writebyte(0x05, fpout);
+    writeword(pos, fpout);
+    writebyte(0x00, fpout); //??
+    writebyte(0xc0, fpout);
+    writebyte(0xfd, fpout);
+    
 
     fclose(fpin);
     fclose(fpout);

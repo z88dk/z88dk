@@ -28,7 +28,7 @@ IFNDEF      CRT_ORG_CODE
 ENDIF
 
     ; Default, don't change the stack pointer
-    defc    TAR__register_sp = 0xc000
+    defc    TAR__register_sp = 0x5f00
     ; Default, 32 functions can be registered for atexit()
     defc    TAR__clib_exit_stack_size = 16
     ; Default, return to caller

@@ -1,0 +1,4 @@
+target/hector/stdio/getk
+target/hector/stdio/fgetc_cons
+target/hector/stdio/fputc_cons_native
+@stdio/stdio.lst
