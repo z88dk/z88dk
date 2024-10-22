@@ -24,13 +24,13 @@
 
 
 IFNDEF      CRT_ORG_CODE
-    defc    CRT_ORG_CODE = 0x4c00
+    defc    CRT_ORG_CODE = 0x5000
 ENDIF
 
     ; Default, don't change the stack pointer
-    defc    TAR__register_sp = 0x5f00
+    defc    TAR__register_sp = 0x5fc0
     ; Default, 32 functions can be registered for atexit()
-    defc    TAR__clib_exit_stack_size = 16
+    defc    TAR__clib_exit_stack_size = 2
     ; Default, return to caller
     defc    TAR__crt_on_exit = 0x10002
 

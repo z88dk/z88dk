@@ -15,8 +15,13 @@ _fputc_cons_native:
     add     hl, sp
     ld      a, (hl)
     cp      12
-    jp      z,$0573
+    jp      z,cls
     call    asm_toupper
     ld      c,a
     call    $0c67
     ret
+
+cls:
+    ld      hl,0
+    ld      ($49a6),hl
+    jp      $0573

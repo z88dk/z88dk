@@ -37,7 +37,7 @@ int hector_exec(char* target)
     FILE* fpin;
     FILE* fpout;
     int len;
-    long pos;
+    long pos, sp;
     int c, i, j;
 
     if (help)
@@ -65,6 +65,9 @@ int hector_exec(char* target)
         if ((pos = get_org_addr(crtfile)) == -1) {
             exit_log(1,"Could not find parameter CRT_ORG_CODE (not z88dk compiled?)\n");
         }
+        if ( ( sp = parameter_search(crtfile, ".map", "__register_sp")) == -1) {
+            exit_log(1,"Could not find parameter REGISTER_SP (not z88dk compiled?)\n");
+        }
     }
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
@@ -82,6 +85,8 @@ int hector_exec(char* target)
         fclose(fpin);
         exit_log(1,"Can't open output file\n");
     }
+
+
 
     writebyte(5, fpout);        // Header
     writeword(pos, fpout);
@@ -104,6 +109,19 @@ int hector_exec(char* target)
             writebyte(c, fpout);
         }
     }
+
+    // We need to write a little bootstrap file (basically jump to org)
+
+    writebyte(5, fpout);        // Header
+    writeword(0x4c00, fpout);
+    writeword(6, fpout);
+    writebyte(0xff, fpout);
+
+    writebyte(6, fpout);    // length of block
+    writebyte(0x31, fpout); // ld sp
+    writeword(sp, fpout);
+    writebyte(195,fpout);
+    writeword(pos, fpout);
 
     // And write the end of the block
     writebyte(0x05, fpout);
