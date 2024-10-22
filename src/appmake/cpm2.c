@@ -690,6 +690,29 @@ static disc_spec kaypro4_spec = {
 };
 
 
+// Philips used TEAC FD55-A with 40 tracks and 160 KB capacity each one (=Philips P2010)
+// later Philips took TEAC FD55-F 80 track drives with 640 KB capacity (=Philips P2012).
+// SSDD 96 tpi 5.25" - 256 x 16,  should work also on P2000C
+static disc_spec philips_spec = {
+    .name = "PHILIPS",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 128,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0,2,4,6,8,10,12,14,1,3,5,7,9,11,13,15 }
+};
+
+
 // Sharp MZ-800 Personal CP/M
 // a valid boot track on side 0 should have SKEW4,
 // ..on side 1 SKEW8, 16 tracks x 256 sectors
@@ -2275,6 +2298,7 @@ static struct formats {
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
     { "pasopia",   "Toshiba Pasopia/T100",  &pasopia_spec, 0, NULL, 1 },
+    { "philips",   "Philips P2012/P2000C",  &philips_spec, 0, NULL, 1 },
     { "pc6001",    "NEC PC6001/6601",       &pc6001_spec, 0, NULL, 1 },
     { "pc8001",    "NEC PC8001",            &pc8001_spec, 0, NULL, 1 },
     { "pc88",      "NEC PC8001/8801,FM7/8", &pc88_spec, 0, NULL, 1 },
