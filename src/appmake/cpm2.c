@@ -302,6 +302,22 @@ static disc_spec osborne_sd_spec = {
 };
 
 
+static disc_spec dmv_ss_spec = {
+    .name = "NCR DMV",
+    .disk_mode = MFM300,
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x50,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
 static disc_spec dmv_spec = {
     .name = "NCR DMV",
     .disk_mode = MFM300,
@@ -671,6 +687,29 @@ static disc_spec kaypro4_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 0,
     .side2_sector_numbering = 1
+};
+
+
+// Philips used TEAC FD55-A with 40 tracks and 160 KB capacity each one (=Philips P2010)
+// later Philips took TEAC FD55-F 80 track drives with 640 KB capacity (=Philips P2012).
+// SSDD 96 tpi 5.25" - 256 x 16,  should work also on P2000C
+static disc_spec philips_spec = {
+    .name = "PHILIPS",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 128,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0,2,4,6,8,10,12,14,1,3,5,7,9,11,13,15 }
 };
 
 
@@ -1200,7 +1239,8 @@ static disc_spec lnw80_spec = {
     .skew_tab = { 0,5,10,15,2,7,12,17,4,9,14,1,6,11,16,3,8,13 }
 };
 
-// Genie IIs (TRS80 clone) Klaus Kaempf CP/M System disk
+//  (TRS80 clone) Genie IIs / Genie III / Genie IIIs
+//  Klaus Kaempf CP/M System disk
 static disc_spec g2s_kkcpm_spec = {
     .name = "GII_KKCPM",
     .disk_mode = MFM250,
@@ -2217,6 +2257,7 @@ static struct formats {
     { "corvboot",  "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
     { "datamax",   "Datamax-8000, 8in",     &bigboard_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
+    { "dmvss",     "NCR Decision Mate SS",  &dmv_ss_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "eagle2",    "Eagle II",              &eagle2_spec, 0, NULL, 1 },
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
@@ -2230,7 +2271,7 @@ static struct formats {
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
     { "g2sgs",     "Genie II GS CP/M",      &g2s_gscpm_spec, 0, NULL, 1 },
-    { "g2skk",     "Genie II KK CP/M",      &g2s_kkcpm_spec, 0, NULL, 1 },
+    { "g2skk",     "Genie II/III/IIIs KK",  &g2s_kkcpm_spec, 0, NULL, 1 },
     { "g2skkb",    "Genie II KK CP/M B:",   &g2s_kkcpmb_spec, 0, NULL, 1 },
     { "g3holte22", "Genie III Holte 2.2",   &g3_holte22_spec, 0, NULL, 1 },
     { "g3holte30", "Genie III Holte 3.0",   &g3_holte30_spec, 0, NULL, 1 },
@@ -2257,6 +2298,7 @@ static struct formats {
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
     { "pasopia",   "Toshiba Pasopia/T100",  &pasopia_spec, 0, NULL, 1 },
+    { "philips",   "Philips P2012/P2000C",  &philips_spec, 0, NULL, 1 },
     { "pc6001",    "NEC PC6001/6601",       &pc6001_spec, 0, NULL, 1 },
     { "pc8001",    "NEC PC8001",            &pc8001_spec, 0, NULL, 1 },
     { "pc88",      "NEC PC8001/8801,FM7/8", &pc88_spec, 0, NULL, 1 },
