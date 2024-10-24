@@ -31,9 +31,10 @@ char *str;      /* output string */
         }
         i = f ;
         scale = 2.0 ;
-        while ( i-- )
+        while ( i-- ) {
                 scale *= 10.0 ;
         x += 1.0 / scale ;
+        }
         /* count places before decimal & scale the number */
         i = 0 ;
         scale = 1.0 ;
@@ -41,9 +42,9 @@ char *str;      /* output string */
                 scale *= 10.0 ;
                 i++ ;
         }
-	if ( i == 0 )
-	    *str++ = '0';
-
+        if ( i == 0 ) {
+                *str++ = '0';
+        }
         while ( i-- ) {
                 /* output digits before decimal */
                 scale = floor(0.5 + scale * 0.1 ) ;

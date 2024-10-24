@@ -15,5 +15,5 @@ extern double _halfpi;
 
 double acos(double x)
 {
-	return ( _halfpi - asin(x) );
+    return ( _halfpi - asin(x) );
 }
