@@ -45,6 +45,7 @@ fputc_cons_native:
     ld      a, 10
   ENDIF
 
+    ld      ix, CHPUT                   ; Print char
 nocrlf:
     cp      12                          ; CLS ?
     jr      nz, nocls
