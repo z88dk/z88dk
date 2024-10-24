@@ -19,6 +19,8 @@ PROJ		:= z88dk-$(BARE_PROJ)
 TARGET_EXE	:= $(PROJ)$(EXESUFFIX)
 TARGET_LIB	:= $(PROJ).lib
 
+TASKS ?= 9
+
 CC 			?= gcc
 CXX			?= g++
 INSTALL 	?= install
@@ -131,7 +133,7 @@ ifeq ($(CROSS),0)
   ifeq ($(DEVELOPER),1)
 	perl asmstyle.pl dev/z80asm_lib/*.asm
   endif
-	$(MAKE) -C dev/z80asm_lib
+	$(MAKE) TASKS=$(TASKS) -C dev/z80asm_lib
 	cp dev/z80asm_lib/$(TARGET_LIB) .
   ifdef ZCCCFG
 	cp dev/z80asm_lib/$(TARGET_LIB) $(ZCCCFG)/../
@@ -206,7 +208,7 @@ $(eval $(call MAKE_RE2C,src/cpp/scan2))
 
 test: $(TARGET_EXE) $(TARGET_LIB)
 	$(MAKE) -C dev/z80asm_lib test
-	perl -S prove --state=slow,save -j9 t/*.t
+	perl -S prove --state=slow,save -j$(TASKS) t/*.t
 
 testzcc : $(TARGET_EXE)
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c

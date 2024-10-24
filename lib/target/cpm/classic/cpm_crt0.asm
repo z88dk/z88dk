@@ -160,6 +160,9 @@ IF CRT_ENABLE_COMMANDLINE = 1
     ;inc	hl
     ld      c,a
     add     hl,bc   ;now points to the end of the command line
+    inc     hl
+    ld      (hl),0
+    dec     hl
     dec     c
     INCLUDE	"crt/classic/crt_command_line.inc"
     push    hl	;argv
