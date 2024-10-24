@@ -33,8 +33,8 @@ char *str;      /* output string */
         scale = 2.0 ;
         while ( i-- ) {
                 scale *= 10.0 ;
-        x += 1.0 / scale ;
         }
+        x += 1.0 / scale ;
         /* count places before decimal & scale the number */
         i = 0 ;
         scale = 1.0 ;
