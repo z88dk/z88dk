@@ -654,6 +654,22 @@ static disc_spec bondwell2_spec = {
 };
 
 
+static disc_spec itt3030_spec = {
+    .name = "ITT 3030",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 70,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .first_sector_offset = 1
+};
+
+
 static disc_spec kayproii_spec = {
     .name = "KayproII",
     .disk_mode = MFM300,
@@ -697,7 +713,7 @@ static disc_spec philips_spec = {
     .name = "PHILIPS",
     .disk_mode = MFM250,
     .sectors_per_track = 16,
-    .tracks = 80,
+    .tracks = 160,
     .sides = 2,
     .sector_size = 256,
     .gap3_length = 0x17,
@@ -2266,6 +2282,7 @@ static struct formats {
     { "gnat10",    "Gnat System 10",        &gnat_spec, 0, NULL, 1 },
     { "hp125",     "HP 125/120",            &hp125_spec, 0, NULL, 1 },
     { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
+    { "itt3030",   "ITT 3030",              &itt3030_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "kaypro4",   "Kaypro 4/10",           &kaypro4_spec,  0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
