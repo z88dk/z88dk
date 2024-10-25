@@ -14,17 +14,48 @@ import re
 import sys
 
 table = {}
+cpus = []
 
-ASSEMBLY_SIZE = 28-1
-CPU_SIZE = 12-1
-OPCODES_SIZE = 60-1
+ASSEMBLY_SIZE = 25
+ALL_CPUS_SIZE = 92
+CPU_SIZE = 11
+OPCODES_SIZE = 51
+
+def collect_cpus():
+    global cpus
+    
+    cpus = []
+    for opcode in sorted(table):
+        for cpu in sorted(table[opcode]):
+            if cpu not in cpus:
+                cpus.append(cpu)
+    cpus.sort()
 
 def align(size, text):
     if len(text) > size:
         raise ValueError(f"{text} length > {size}")
     return text + " "*(size - len(text))
 
-def write_row(f, assembly, cpu, opcodes):
+def write_cpus_row(f, assembly, in_cpus):
+    global cpus
+    
+    output = "|" + align(ASSEMBLY_SIZE, assembly)
+    output += "|"
+    for cpu in cpus:
+        if cpu in in_cpus:
+            output += cpu
+        else:
+            output += "-" + " "*(len(cpu)-1)
+        output += " "
+    output = output[:-1] + "|\n"
+    f.write(output)
+
+def write_cpus_title(f, assembly, cpus):
+    f.write("|" + align(ASSEMBLY_SIZE, assembly)
+          + "|" + align(ALL_CPUS_SIZE, cpus)
+          + "|\n")
+
+def write_opcodes_row(f, assembly, cpu, opcodes):
     f.write("|" + align(ASSEMBLY_SIZE, assembly)
           + "|" + align(CPU_SIZE, cpu)
           + "|" + align(OPCODES_SIZE, opcodes) 
@@ -48,18 +79,38 @@ def format_opcodes(opcodes):
     output += ",".join(code)
     return output
 
-def write_table(f):
+def write_table_cpus():
+    global cpus
+
+    write_cpus_title(f, "="*ASSEMBLY_SIZE, "="*ALL_CPUS_SIZE)
+    write_cpus_title(f, "Assembly", "CPUs")
+    write_cpus_title(f, "="*ASSEMBLY_SIZE, "="*ALL_CPUS_SIZE)
+
+    for opcode in sorted(table):
+        write_cpus_row(f, opcode, table[opcode])
+    
+    write_cpus_title(f, "="*ASSEMBLY_SIZE, "="*ALL_CPUS_SIZE)
+    f.write("\n")
+
+def write_table_opcodes():
     global table
     
-    write_row(f, "="*ASSEMBLY_SIZE, "="*CPU_SIZE, "="*OPCODES_SIZE)
-    write_row(f, "Assembly", "CPU", "S Opcodes")
-    write_row(f, "="*ASSEMBLY_SIZE, "="*CPU_SIZE, "="*OPCODES_SIZE)
+    write_opcodes_row(f, "="*ASSEMBLY_SIZE, "="*CPU_SIZE, "="*OPCODES_SIZE)
+    write_opcodes_row(f, "Assembly", "CPU", "S Opcodes")
+    write_opcodes_row(f, "="*ASSEMBLY_SIZE, "="*CPU_SIZE, "="*OPCODES_SIZE)
     
     for opcode in sorted(table):
         for cpu in sorted(table[opcode]):
-            write_row(f, opcode, cpu, format_opcodes(table[opcode][cpu]))
+            write_opcodes_row(f, opcode, cpu, format_opcodes(table[opcode][cpu]))
 
-    write_row(f, "="*ASSEMBLY_SIZE, "="*CPU_SIZE, "="*OPCODES_SIZE)
+    write_opcodes_row(f, "="*ASSEMBLY_SIZE, "="*CPU_SIZE, "="*OPCODES_SIZE)
+    f.write("\n")
+
+def write_table(f):
+    write_table_cpus()
+    f.write("\n")
+    write_table_opcodes()
+    f.write("\n")
 
 if len(sys.argv) != 3:
     raise ValueError(f"Usage: make_table.py input.json output.txt")
@@ -68,5 +119,6 @@ output = sys.argv[2]
 
 with open(input, 'r') as f:
     table = json.load(f)
+    collect_cpus()
 with open(output, 'w') as f:
     write_table(f)
