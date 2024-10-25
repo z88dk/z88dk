@@ -1863,6 +1863,23 @@ static disc_spec alphatro_spec = {
 };
 
 
+static disc_spec alphatP2_spec = {
+    .disk_mode = MFM250,           // 300 kbps MFM, visible only when using the IMD format
+    .name = "Alphatronic P2",
+    .sectors_per_track = 16,
+    .tracks = 38,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1
+};
+
+
 // "FOX OS" for the SAGA FOX
 // (Torino - Italy)
 static disc_spec sagafox_spec = {
@@ -2249,6 +2266,7 @@ static struct formats {
 } formats[] = {
     { "actrixss",  "Accesss Matrix SS",     &actrixss_spec, 0, NULL, 1 },
     { "actrix",    "Accesss Matrix DS",     &actrix_spec, 0, NULL, 1 },
+    { "alphatp2",  "TA Alphatronic P2",     &alphatP2_spec, 0, NULL, 1 },
     { "alphatro",  "Alphatronic PC",        &alphatro_spec, 0, NULL, 1 },
     { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
     { "altos580",  "Altos 580",             &altos580_spec, 0, NULL, 1 },
