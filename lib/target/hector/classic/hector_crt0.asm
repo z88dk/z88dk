@@ -37,6 +37,9 @@ ENDIF
     defc    __CPU_CLOCK = 2000000
     INCLUDE "crt/classic/crt_rules.inc"
 
+    defc    CONSOLE_COLUMNS = 28
+    defc    CONSOLE_ROWS = 9
+
 
     org    	CRT_ORG_CODE
 
