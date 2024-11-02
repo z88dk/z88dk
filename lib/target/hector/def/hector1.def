@@ -1,0 +1,7 @@
+
+
+
+defc HEC_SCREEN = $4000			;Address of screen
+defc HEC_STRIDE = 32			;Width of display memory
+
+defc HEC_MAXY   = 78			;Highest usable row

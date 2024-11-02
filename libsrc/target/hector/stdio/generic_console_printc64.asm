@@ -9,9 +9,7 @@ EXTERN  generic_console_udg32
 EXTERN  generic_console_flags
 EXTERN  __MODE1_attr
 
-
-    defc    SCREEN = 0x4000
-    defc    STRIDE = 32
+INCLUDE "target/hector/def/hector1.def"
 
 
 generic_console_printc64:
@@ -30,10 +28,10 @@ printc64_notudg:
     dec     h
     add     hl,de
     push    hl		;Save font
-	ld      hl,SCREEN
+	ld      hl,HEC_SCREEN
     add     hl,bc
     pop     de
-    ; hl = screen address to place
+    ; hl = HEC_SCREEN address to place
     ; de = font
 
     ld      a, (generic_console_flags)
@@ -43,7 +41,6 @@ printc64_notudg:
     ld      b, 8
 printc64_1:
     push    bc
-    ld      a, (de)
     xor     c
     push    de
     ld      de, (__MODE1_attr)
@@ -67,7 +64,7 @@ printc64_is_paper:
     ld      a, l                        ;save what's left of character
     pop     hl
     ld      (hl), c
-    ld      de, STRIDE
+    ld      de, HEC_STRIDE
     add     hl, de
     pop     de
     inc     de

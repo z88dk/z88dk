@@ -4,6 +4,7 @@ target/hector/stdio/fputc_cons_native
 target/hector/stdio/generic_console
 target/hector/stdio/generic_console_printc32
 target/hector/stdio/generic_console_printc64
+target/hector/stdio/generic_console_vpeek
 target/hector/stdio/CRT_FONT
 target/hector/stdio/CRT_FONT_64
 target/hector/stdio/conio_vars

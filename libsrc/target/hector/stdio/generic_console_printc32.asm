@@ -1,5 +1,3 @@
-
-
 MODULE  generic_console_printc32
 
 SECTION code_driver
@@ -10,8 +8,8 @@ EXTERN  generic_console_udg32
 EXTERN  generic_console_flags
 EXTERN  __MODE1_attr
 
-    defc    SCREEN = 0x4000
-    defc    STRIDE = 32
+INCLUDE "target/hector/def/hector1.def"
+
 
 generic_console_printc32:
     and     128
@@ -29,11 +27,11 @@ not_udg:
     dec     h
     add     hl,de
     push    hl		;Save font
-	ld      hl,SCREEN
+	ld      hl,HEC_SCREEN
     ld      l,c
     add     hl,bc
     pop     de
-    ; hl = screen address to place
+    ; hl = HEC_SCREEN address to place
     ; de = font
 
     ld      a, (generic_console_flags)
@@ -73,7 +71,7 @@ is_paper:
     inc     hl
     pop     bc
     djnz    printc32_2
-    ld      de, STRIDE - 2
+    ld      de, HEC_STRIDE - 2
     add     hl, de
     pop     de
     inc     de
