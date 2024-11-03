@@ -4,8 +4,8 @@
     EXTERN  screendollar
     EXTERN  screendollar_with_count
     EXTERN  generic_console_font32
+    EXTERN  generic_console_font64
     EXTERN  generic_console_udg32
-    EXTERN  CRT_FONT_64
 
     INCLUDE "target/hector/def/hector1.def"
 
@@ -83,11 +83,7 @@ no_overflow_MODE2:
     jr      gotit
 
 try_64col:
-    ld      hl,CRT_FONT_64
-    ld      a,h
-    or      l
-    scf
-    jr      z,gotit
+    ld      hl,(generic_console_font64)
     push    de
     ex      de,hl
     ; Copy the top nibble to lower nibble
@@ -108,6 +104,13 @@ copy64:
     ex      de,hl
     pop     de          ;buffer back
     call    screendollar
+    jr      nc,gotit
+    ;; Try UDGs again - this time only half the character
+    ld      hl,(generic_console_udg32)
+    ld      b,128
+    call    screendollar_with_count
+    jr      nc,gotit
+    add     128
 gotit:
     ex      af,af           ; Save those flags
     ld      hl,8            ; Dump our temporary buffer

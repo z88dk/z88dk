@@ -4,7 +4,7 @@ MODULE  generic_console_printc64
 SECTION code_driver
 PUBLIC  generic_console_printc64
 
-EXTERN  CRT_FONT_64
+EXTERN  generic_console_font64
 EXTERN  generic_console_udg32
 EXTERN  generic_console_flags
 EXTERN  __MODE1_attr
@@ -15,7 +15,7 @@ INCLUDE "target/hector/def/hector1.def"
 generic_console_printc64:
     and     128
     ld      a,d
-    ld      de,CRT_FONT_64
+    ld      de,(generic_console_font64)
     jr      z,printc64_notudg
     sub     128 - 32
     ld      de,(generic_console_udg32)
@@ -28,8 +28,15 @@ printc64_notudg:
     dec     h
     add     hl,de
     ex      de,hl
-	ld      hl,HEC_SCREEN
+    ld      hl,HEC_SCREEN
+IF FORhector1
     add     hl,bc
+ELSE
+    ; 64 bytes a row
+    add     hl,bc
+    ld      c,0
+    add     hl,bc
+ENDIF
     ; hl = HEC_SCREEN address to place
     ; de = font
 

@@ -28,8 +28,19 @@ not_udg:
     add     hl,de
     push    hl		;Save font
 	ld      hl,HEC_SCREEN
+IF FORhector1
     ld      l,c
     add     hl,bc
+ELSE
+    ; 64 bytes a row
+    ld      a,c
+    ld      c,0
+    add     hl,bc
+    add     hl,bc
+    ld      c,a
+    ld      b,0
+    add     hl,bc
+ENDIF
     pop     de
     ; hl = HEC_SCREEN address to place
     ; de = font
