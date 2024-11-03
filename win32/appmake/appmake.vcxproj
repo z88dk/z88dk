@@ -46,6 +46,7 @@
     <ClCompile Include="..\..\src\appmake\galaksija.c" />
     <ClCompile Include="..\..\src\appmake\gb.c" />
     <ClCompile Include="..\..\src\appmake\glue.c" />
+    <ClCompile Include="..\..\src\appmake\hector.c" />
     <ClCompile Include="..\..\src\appmake\hex.c" />
     <ClCompile Include="..\..\src\appmake\homelab.c" />
     <ClCompile Include="..\..\src\appmake\inject.c" />

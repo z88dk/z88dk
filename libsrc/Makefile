@@ -54,6 +54,7 @@ TOCREATE += $(call check_target,gemini,gemini.lib $(CPMLIBS))
 TOCREATE += $(call check_target,gb,gb_clib.lib)
 TOCREATE += $(call check_target,gl,gl_clib.lib)
 TOCREATE += $(call check_target,gl6000,gl6000_clib.lib)
+TOCREATE += $(call check_target,hector,hector1_clib.lib)
 TOCREATE += $(call check_target,hemc,hemc_clib.lib)
 TOCREATE += $(call check_target,hgmc,hgmc_clib.lib)
 TOCREATE += $(call check_target,homelab,homelab_clib.lib)
@@ -1564,6 +1565,14 @@ z80retro_cpm.lib: cpm_clib.lib
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=z80retro
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=z80retro
 	TARGET=z80retro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80retro -x$(OUTPUT_DIRECTORY)/z80retro_cpm @$(TARGET_DIRECTORY)/z80retro/z80retro.lst
+
+# Hector/Victor/Lambda - dom
+hector1_clib.lib: $(TARGET_CLIB_OBJS)
+	@echo ''
+	@echo '--- Building Hector/Victor/Lambda Library ---'
+	@echo ''
+	$(call buildgeneric,hector,"gencon narrow")
+	TARGET=hector TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhector1 -x$(OUTPUT_DIRECTORY)/hector1_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
 
 
 # Genius Leader 2000/4000 - dom
