@@ -27,10 +27,9 @@ printc64_notudg:
     add     hl,hl
     dec     h
     add     hl,de
-    push    hl		;Save font
+    ex      de,hl
 	ld      hl,HEC_SCREEN
     add     hl,bc
-    pop     de
     ; hl = HEC_SCREEN address to place
     ; de = font
 
@@ -41,6 +40,7 @@ printc64_notudg:
     ld      b, 8
 printc64_1:
     push    bc
+    ld      a,(de)
     xor     c
     push    de
     ld      de, (__MODE1_attr)
@@ -61,7 +61,6 @@ printc64_is_paper:
     sla     e
     sla     e
     djnz    printc64_2
-    ld      a, l                        ;save what's left of character
     pop     hl
     ld      (hl), c
     ld      de, HEC_STRIDE
