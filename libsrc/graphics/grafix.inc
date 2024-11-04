@@ -864,6 +864,27 @@ IF FORtim011
    defc    WANT_swapgfxbk = 0
 ENDIF
 
+IF FORinteract
+   DEFINE gotgfx
+   defc maxx = 112
+   defc maxy = 77
+   defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORhector
+   DEFINE gotgfx
+   defc maxx = 112
+   defc maxy = 77
+   defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORhector2
+   DEFINE gotgfx
+   defc maxx = 242
+   defc maxy = 226  
+   defc    WANT_swapgfxbk = 0
+ENDIF
+
 ; Catch all to sort things out
 
 IF !gotgfx

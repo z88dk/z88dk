@@ -2,6 +2,11 @@
 
 
 defc HEC_SCREEN = $4000			;Address of screen
-defc HEC_STRIDE = 32			;Width of display memory
 
+IF FORhector1
+defc HEC_STRIDE = 32			;Width of display memory
 defc HEC_MAXY   = 78			;Highest usable row
+ELSE
+defc HEC_STRIDE = 64			;Width of display memory
+defc HEC_MAXY   = 232			;Highest usable row
+ENDIF

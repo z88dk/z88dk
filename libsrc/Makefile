@@ -1572,6 +1572,7 @@ hector1_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building Hector/Victor/Lambda Library ---'
 	@echo ''
 	$(call buildgeneric,hector,"gencon narrow")
+	$(MAKE) -C target/hector SUBTYPE=hector1
 	TARGET=hector TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhector1 -x$(OUTPUT_DIRECTORY)/hector1_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
 
 
