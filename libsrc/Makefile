@@ -1567,7 +1567,7 @@ z80retro_cpm.lib: cpm_clib.lib
 	TARGET=z80retro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80retro -x$(OUTPUT_DIRECTORY)/z80retro_cpm @$(TARGET_DIRECTORY)/z80retro/z80retro.lst
 
 # Hector/Victor/Lambda - dom
-hector1_clib.lib: $(TARGET_CLIB_OBJS)
+hector1_clib.lib: $(TARGET_CLIB_OBJS) 
 	@echo ''
 	@echo '--- Building Hector/Victor/Lambda Library ---'
 	@echo ''
@@ -1577,7 +1577,7 @@ hector1_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=hector TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhector1 -x$(OUTPUT_DIRECTORY)/hector1_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
 
 # Hector/Victor/Lambda - dom
-hectorhr_clib.lib: $(TARGET_CLIB_OBJS)
+hectorhr_clib.lib: $(TARGET_CLIB_OBJS) hector1_clib.lib
 	@echo ''
 	@echo '--- Building HectorHR Library ---'
 	@echo ''	
