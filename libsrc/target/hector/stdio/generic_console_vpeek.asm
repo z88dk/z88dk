@@ -45,24 +45,22 @@ ENDIF
 handle_per_line:
     push    bc
     push    hl                          ;save buffer
-    ld      h, @00000001
+    ld      h, @0000000
     ld      c, 0                        ;resulting byte
     ld      a, 2                        ;we need to do this loop twice
 handle_nibble:
     push    af
-    ld      l, @11000000
+    ld      l, @00000011
     ld      b, 4                        ;4 pixels in a byte
 handle_0:
     ld      a, (de)
     and     l
     jr      z, not_set
-    ld      a, c
-    or      h
-    ld      c, a
+    scf
 not_set:
-    sla     h
-    srl     l
-    srl     l
+    rl      c
+    sla     l
+    sla     l
     djnz    handle_0
     inc     de
     pop     af
@@ -101,7 +99,7 @@ try_64col:
     ld      b,8
 copy64:
     ld      a,(hl)
-    and     @00001111
+    and     @11110000
     ld      c,a
     rlca
     rlca
