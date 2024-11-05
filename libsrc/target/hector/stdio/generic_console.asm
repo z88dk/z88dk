@@ -14,7 +14,11 @@
     EXTERN  generic_console_printc32
     EXTERN  generic_console_printc64
 
+IF FORhectorhr
+    defc    generic_console_printc = generic_console_printc32
+ELSE
     defc    generic_console_printc = generic_console_printc64
+ENDIF
 
     EXTERN  generic_console_flags
     EXTERN  CRT_FONT

@@ -878,10 +878,10 @@ IF FORhector
    defc    WANT_swapgfxbk = 0
 ENDIF
 
-IF FORhector2
+IF FORhectorhr
    DEFINE gotgfx
-   defc maxx = 242
-   defc maxy = 226  
+   defc maxx = 240
+   defc maxy = 226
    defc    WANT_swapgfxbk = 0
 ENDIF
 

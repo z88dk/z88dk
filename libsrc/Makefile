@@ -1571,9 +1571,20 @@ hector1_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Hector/Victor/Lambda Library ---'
 	@echo ''
-	$(call buildgeneric,hector,"gencon narrow")
+	$(call buildgeneric,hector)
+	$(MAKE) -C gfx TARGET=hector FLAVOUR=narrow SUBTYPE=hector1
 	$(MAKE) -C target/hector SUBTYPE=hector1
 	TARGET=hector TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhector1 -x$(OUTPUT_DIRECTORY)/hector1_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
+
+# Hector/Victor/Lambda - dom
+hectorhr_clib.lib: $(TARGET_CLIB_OBJS)
+	@echo ''
+	@echo '--- Building HectorHR Library ---'
+	@echo ''	
+	$(call buildgeneric,hector)
+	$(MAKE) -C gfx TARGET=hector FLAVOUR=narrow SUBTYPE=hectorhr
+	$(MAKE) -C target/hector SUBTYPE=hectorhr
+	TARGET=hectorhr TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhectorhr -x$(OUTPUT_DIRECTORY)/hectorhr_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
 
 
 # Genius Leader 2000/4000 - dom

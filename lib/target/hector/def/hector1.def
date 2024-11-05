@@ -1,12 +1,67 @@
 
 
 
-defc HEC_SCREEN = $4000			;Address of screen
 
 IF FORhector1
+defc HEC_SCREEN = $4000			;Address of screen
 defc HEC_STRIDE = 32			;Width of display memory
 defc HEC_MAXY   = 78			;Highest usable row
-ELSE
+
+
+defc FW_PUTC    = $0c67
+defc FW_GETC    = $07e0
+defc FW_POLLC   = $07e7
+defc FW_CLS     = $0573
+
+ENDIF
+
+IF FORhectorhr
+defc HEC_SCREEN = $c000			;Address of screen
 defc HEC_STRIDE = 64			;Width of display memory
 defc HEC_MAXY   = 232			;Highest usable row
+
+
+defc FW_PUTC    = $0c67
+defc FW_GETC    = $07e0
+defc FW_POLLC   = $07e7
+defc FW_CLS     = $0573
+
+
+
 ENDIF
+
+;
+; Palette colours - 3 bits each
+;
+; ..222000
+;
+; 0 = black
+; 1 = red
+; 2 = green
+; 3 = yellow
+; 4 = blue
+; 5 = magenta
+; 6 = cyan
+; 7 = white
+;
+defc IO_COLOUR_A      = 0x1000  ;Pens c0/c2
+; Bit 6 turns on half bright for c2 
+defc IO_COLOUR_B      = 0x1800  ;Pens c1/c3
+
+defc IO_KBD_0         = 0x3800
+defc IO_KBD_1         = 0x3801
+defc IO_KBD_2         = 0x3802
+defc IO_KBD_3         = 0x3803
+defc IO_KBD_4         = 0x3804
+defc IO_KBD_5         = 0x3805
+defc IO_KBD_6         = 0x3806
+defc IO_KBD_7         = 0x3807
+
+
+; HR, HRX models - memory mapped registers
+defc IO_MODE_HR_VRAM  = 0x800         ;VRAM 5Nhz
+defc IO_MODE_H1_VRAM  = 0x804         ;VRAM, 1.75Mhz
+defc IO_MODE_HR_RAM   = 0x808         ;RAM, 5Mhz
+defc IO_MODE_H1_RAM   = 0x80c         ;RAM, 1.75Mhz
+
+

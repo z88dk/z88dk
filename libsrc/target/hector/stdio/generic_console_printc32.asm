@@ -31,6 +31,7 @@ not_udg:
 IF FORhector1
     ld      l,c
     add     hl,bc
+    add     hl,bc
 ELSE
     ; 64 bytes a row
     ld      a,c
@@ -39,6 +40,7 @@ ELSE
     add     hl,bc
     ld      c,a
     ld      b,0
+    add     hl,bc
     add     hl,bc
 ENDIF
     pop     de
