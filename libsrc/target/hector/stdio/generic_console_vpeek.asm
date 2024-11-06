@@ -23,41 +23,49 @@ generic_console_vpeek:
     ld      sp, hl
     push    hl                          ;Save buffer
     ex      de, hl                      ;get it into de
+IF FORhector1
+    ; 64 column font
     ld      h, b                        ; 32 * 8
     ld      l, c
     ld      bc, HEC_SCREEN
-        ; b7   b6   b5   b4   b3   b2   b1   b0
-         ; p0-1 p1-1 p2-1 p3-1 p0-0 p1-0 p2-0 p3-0
     ld      c, l
     add     hl, bc                      ;hl = screen
+ELSE
+    ; 32 column font
+    ld      h,b                         ;*256
+    ld      l,0
+    add     hl,hl                       ;*512
+    ld      b,0                         ;+x
+    add     hl,bc
+    ld      b,+(HEC_SCREEN /256)
+    add     hl,bc                       ;+x
+ENDIF
     ex      de, hl
     ld      b, 8
-handle_MODE2_per_line:
+handle_per_line:
     push    bc
     push    hl                          ;save buffer
-    ld      h, @00000001
+    ld      h, @0000000
     ld      c, 0                        ;resulting byte
     ld      a, 2                        ;we need to do this loop twice
-handle_mode1_nibble:
+handle_nibble:
     push    af
-    ld      l, @11000000
+    ld      l, @00000011
     ld      b, 4                        ;4 pixels in a byte
-handle_MODE2_0:
+handle_0:
     ld      a, (de)
     and     l
     jr      z, not_set
-    ld      a, c
-    or      h
-    ld      c, a
+    scf
 not_set:
-    sla     h
-    srl     l
-    srl     l
-    djnz    handle_MODE2_0
+    rl      c
+    sla     l
+    sla     l
+    djnz    handle_0
     inc     de
     pop     af
     dec     a
-    jr      nz, handle_mode1_nibble
+    jr      nz, handle_nibble
     pop     hl                          ;buffer
     ld      (hl), c
     inc     hl
@@ -68,7 +76,7 @@ not_set:
     inc     d
 no_overflow_MODE2:
     pop     bc
-    djnz    handle_MODE2_per_line
+    djnz    handle_per_line
 
 
     ld      hl,(generic_console_font32)
@@ -91,7 +99,7 @@ try_64col:
     ld      b,8
 copy64:
     ld      a,(hl)
-    and     @00001111
+    and     @11110000
     ld      c,a
     rlca
     rlca

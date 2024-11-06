@@ -161,6 +161,10 @@ Z88DKTARGET_zx_rom = zx
 ZCFLAGS_zx_rom = -subtype=rom
 ZLDFLAGS_zx_rom = -lndos
 
+Z88DKTARGET_hectorhr = hector
+ZCFLAGS_hectorhr = -clib=hectorhr
+ZLDFLAGS_hectorhr = 
+
 
 # Setup the CP/M mappings to +cpm
 CPMSUBTYPES = aussie px px8 pxansi px4 px4ansi einstein einstein256 attache osborne1 kaypro83 \

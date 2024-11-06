@@ -26,7 +26,7 @@ pixeladdress:
     add     hl, hl
     add     hl, hl
     add     hl, hl
-IF FORhector2
+IF FORhectorhr
     add     hl,hl
 ENDIF
     ld      a, e                        ;4 pixels per byte

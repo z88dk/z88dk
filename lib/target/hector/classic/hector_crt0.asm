@@ -24,21 +24,33 @@
 
 
 IFNDEF      CRT_ORG_CODE
-    defc    CRT_ORG_CODE = 0x5000
+    IFDEF __HECTORHR
+        defc    CRT_ORG_CODE = 0x6000
+    ELSE
+        defc    CRT_ORG_CODE = 0x5000
+    ENDIF
 ENDIF
 
-    ; Default, don't change the stack pointer
+; Default, don't change the stack pointer
+IFDEF __HECTORHR
+    defc    TAR__register_sp = 0xc000
+    defc    __CPU_CLOCK = 5000000
+    defc    CONSOLE_COLUMNS = 30
+    defc    CONSOLE_ROWS = 28
+ELSE
     defc    TAR__register_sp = 0x5fc0
-    ; Default, 32 functions can be registered for atexit()
+    defc    __CPU_CLOCK = 2000000
+    ; 64 column fonts
+    defc    CONSOLE_COLUMNS = 28
+    defc    CONSOLE_ROWS = 9
+ENDIF
+    ; Default, 2 functions can be registered for atexit()
     defc    TAR__clib_exit_stack_size = 2
     ; Default, return to caller
     defc    TAR__crt_on_exit = 0x10002
 
-    defc    __CPU_CLOCK = 2000000
     INCLUDE "crt/classic/crt_rules.inc"
 
-    defc    CONSOLE_COLUMNS = 28
-    defc    CONSOLE_ROWS = 9
 
 
     org    	CRT_ORG_CODE
@@ -58,6 +70,11 @@ start:
     INCLUDE "crt/classic/crt_init_interrupt_mode.inc"
     ; Turn on interrupts if desired
     INCLUDE "crt/classic/crt_init_eidi.inc"
+
+IF __HECTORHR
+    ; Force VRAM to be paged in
+    ld      (0x800),a
+ENDIF
 
     ; Entry to the user code
     call    _main

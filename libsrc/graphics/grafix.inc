@@ -871,17 +871,17 @@ IF FORinteract
    defc    WANT_swapgfxbk = 0
 ENDIF
 
-IF FORhector
+IF FORhector1
    DEFINE gotgfx
    defc maxx = 112
    defc maxy = 77
    defc    WANT_swapgfxbk = 0
 ENDIF
 
-IF FORhector2
+IF FORhectorhr
    DEFINE gotgfx
-   defc maxx = 242
-   defc maxy = 226  
+   defc maxx = 240
+   defc maxy = 226
    defc    WANT_swapgfxbk = 0
 ENDIF
 
