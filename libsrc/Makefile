@@ -1574,7 +1574,7 @@ hector1_clib.lib: $(TARGET_CLIB_OBJS)
 	$(call buildgeneric,hector)
 	$(MAKE) -C gfx TARGET=hector FLAVOUR=narrow SUBTYPE=hector1
 	$(MAKE) -C target/hector SUBTYPE=hector1
-	TARGET=hector TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhector1 -x$(OUTPUT_DIRECTORY)/hector1_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
+	TARGET=hector1 TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhector1 -x$(OUTPUT_DIRECTORY)/hector1_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
 
 # Hector/Victor/Lambda - dom
 hectorhr_clib.lib: $(TARGET_CLIB_OBJS) hector1_clib.lib

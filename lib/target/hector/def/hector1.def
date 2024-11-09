@@ -21,10 +21,10 @@ defc HEC_STRIDE = 64			;Width of display memory
 defc HEC_MAXY   = 232			;Highest usable row
 
 
-defc FW_PUTC    = $0c67
+defc FW_PUTC    = $0441
 defc FW_GETC    = $07e0
 defc FW_POLLC   = $07e7
-defc FW_CLS     = $0573
+defc FW_CLS     = $0d2f
 
 
 
