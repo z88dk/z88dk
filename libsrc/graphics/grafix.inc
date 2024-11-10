@@ -873,6 +873,7 @@ ENDIF
 
 IF FORhector1
    DEFINE gotgfx
+   DEFINE GFX_noclip
    defc maxx = 112
    defc maxy = 77
    defc    WANT_swapgfxbk = 0

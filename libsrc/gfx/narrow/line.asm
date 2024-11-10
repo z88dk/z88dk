@@ -45,6 +45,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 Line:
     push    de
     push    hl
+IFNDEF GFX_noclip
   IF    maxx<>256
     ld      a, h
     cp      maxx
@@ -61,6 +62,7 @@ Line:
     cp      maxy
     jr      nc, exit_line               ; y1    coordinate out    of range
   ENDIF
+ENDIF
     ld      (__gfx_coords), hl          ; the starting    point is now default
     push    hl
     push    de
