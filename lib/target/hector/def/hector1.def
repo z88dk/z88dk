@@ -8,7 +8,7 @@ defc HEC_STRIDE = 32			;Width of display memory
 defc HEC_MAXY   = 78			;Highest usable row
 
 
-defc FW_PUTC    = $0c67
+defc FW_PUTC    = $055b         ;prints a character e=x,d=y,c=char ; $0c67 = print and increment print position
 defc FW_GETC    = $07e0
 defc FW_POLLC   = $07e7
 defc FW_CLS     = $0573
@@ -21,11 +21,10 @@ defc HEC_STRIDE = 64			;Width of display memory
 defc HEC_MAXY   = 232			;Highest usable row
 
 
-defc FW_PUTC    = $0441
-defc FW_GETC    = $07e0
+defc FW_PUTC    = $0d18     ;$0c63     ;e=x, d=y, c=char   4853 = basic print char
+defc FW_GETC    = $07e0     ;Exit: a = key pressed
 defc FW_POLLC   = $07e7
 defc FW_CLS     = $0d2f
-
 
 
 ENDIF
