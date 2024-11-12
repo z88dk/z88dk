@@ -1,3 +1,9 @@
 target/hector/obj/${TARGET}/**/*.o
 @stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
+input/obj/${TYPE}/in_WaitForKey
+input/obj/${TYPE}/in_GetKey
+input/obj/${TYPE}/in_WaitForNoKey
+input/obj/${TYPE}/in_GetKeyReset
+input/obj/${TYPE}/in_GetKeyVariables
+input/obj/${TYPE}/fgetc_cons_inkey
