@@ -23,6 +23,7 @@ _joystick:
     ; Read the hardware joystick here
     ex      af,af
     ld      a,($3807)
+    cpl
     ;bit 0 = j0 left
     ;bit 1 = j0 right
     ;bit 2 = j0 up
@@ -60,8 +61,9 @@ normalise:
     ld      e,a
     ld      d,0
     ld      hl,joystick_table
-    add     hl,bc
+    add     hl,de
     ld      a,(hl)
+    or      c
     ld      l,a
     ld      h,0
     ret
