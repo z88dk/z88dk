@@ -2,8 +2,6 @@
 ; This table translates key presses into ascii codes.
 ; Also used by 'GetKey' and 'LookupKey'.  An effort has been made for
 ; this key translation table to emulate a PC keyboard with the 'CTRL'
-; key represented by FUNC
-; http://www43.tok2.com/home/cmpslv/Pv2000/EnrPV.htm
 
 SECTION rodata_clib
 PUBLIC in_keytranstbl
@@ -13,7 +11,7 @@ PUBLIC in_keytranstbl
 ;
 ;
 
-;Unshifted - bit 0....bit 7!v
+;Unshifted - bit 0....bit 7
 	defb	 '*', ' ',  13,   9,   8,   6, 255, 255	;* SP RET TAB BKSPC CAPS CTRL SHIFT
 	defb	 '2', '1', '0', '/', '.', '-', '-', '+'	; 2 1 0 / . - - +
 	defb	 255, '9', '8', '7', '6', '5', '4', '3'	;UN 9 8 7 6 5 4 3 
