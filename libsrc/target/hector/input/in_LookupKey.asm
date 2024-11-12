@@ -39,14 +39,14 @@ _in_LookupKey:
     cp      56*2
     jr      c, not_function_table
     sub     56*2
-    set     7, l
+    set     6, l
     jr      shift
 
 not_function_table:
-    cp      80
+    cp      56
     jr      c, shift
-    sub     80
-    set     6, l
+    sub     56
+    set     7, l
 
 shift:
     ld      h, a                        ;Save character

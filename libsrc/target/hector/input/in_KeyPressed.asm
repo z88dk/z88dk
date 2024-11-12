@@ -25,7 +25,7 @@ _in_KeyPressed:
     cp      c
     jr      nz,fail
 
-    ld      a,l
+    ld      a,l 
     and     @00000111
     ld      e,a
     ld      d,0
@@ -36,6 +36,7 @@ _in_KeyPressed:
     cpl
     and     c
     cp      c
+    jr      nz,fail
     ld      hl,1
     scf
     ret

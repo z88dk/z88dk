@@ -1572,6 +1572,7 @@ hector1_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo '--- Building Hector/Victor/Lambda Library ---'
 	@echo ''
 	$(call buildgeneric,hector)
+	$(MAKE) -C games TARGET=hector SUBTYPE=hector1
 	$(MAKE) -C gfx TARGET=hector FLAVOUR=narrow SUBTYPE=hector1
 	$(MAKE) -C target/hector SUBTYPE=hector1
 	TARGET=hector1 TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhector1 -x$(OUTPUT_DIRECTORY)/hector1_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
@@ -1582,6 +1583,7 @@ hectorhr_clib.lib: $(TARGET_CLIB_OBJS) hector1_clib.lib
 	@echo '--- Building HectorHR Library ---'
 	@echo ''	
 	$(call buildgeneric,hector)
+	$(MAKE) -C games TARGET=hector SUBTYPE=hectorhr
 	$(MAKE) -C gfx TARGET=hector FLAVOUR=narrow SUBTYPE=hectorhr
 	$(MAKE) -C target/hector SUBTYPE=hectorhr
 	TARGET=hectorhr TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhectorhr -x$(OUTPUT_DIRECTORY)/hectorhr_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
