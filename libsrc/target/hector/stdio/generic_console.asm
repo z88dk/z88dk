@@ -28,12 +28,11 @@ ENDIF
 
     INCLUDE "target/hector/def/hector1.def"
 
-generic_console_set_attribute:
-	ret
 
 generic_console_set_ink:
     call    conio_map_colour
     ld      (__MODE1_attr), a
+generic_console_set_attribute:
     ret
 
 generic_console_set_paper:
