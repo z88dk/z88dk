@@ -2321,15 +2321,15 @@
 // #define __HAVE_JOYSTICK 0
 #define __HARDWARE_JOY1_INDEX -1
 #define __HARDWARE_JOY2_INDEX -1
-#define __GENCON_CUSTOM_FONT 1
-#define __GENCON_MAX_UDGS 128
-#define __GENCON_MAX_UDGS_WITH_CUSTOM_FONT 128
-#define __HAVE_GFX 1
-#define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 1
-#define __HAVE_GFX_XORPLOT 1
-#define __HAVE_COLOUR 1
-#define __HAVE_COLOUR_MAPPING 1
+#define __GENCON_CUSTOM_FONT 0
+#define __GENCON_MAX_UDGS 0
+#define __GENCON_MAX_UDGS_WITH_CUSTOM_FONT 0
+// #define __HAVE_GFX 0
+// #define __HAVE_GFX_COLOUR 0
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
+// #define __HAVE_COLOUR 0
+// #define __HAVE_COLOUR_MAPPING 0
 // #define __HAVE_FARHEAP 0
 // #define __HAVE_BANKED_CALL 0
 // #define __HAVE_BANKED_FAR_MAPPING 0
