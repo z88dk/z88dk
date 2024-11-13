@@ -32,9 +32,9 @@ jobs:
     - name: Install libiconv
       run: |
         set -ex
-        wget https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libiconv-1.17-1-any.pkg.tar.zst
-        zstd -d mingw-w64-x86_64-libiconv-1.17-1-any.pkg.tar.zst
-        ( mkdir mingw-w64-x86_64-libiconv-1.17-1-any && cd mingw-w64-x86_64-libiconv-1.17-1-any && tar xvf ../mingw-w64-x86_64-libiconv-1.17-1-any.pkg.tar && cd mingw64 && rsync -avhH . /usr/x86_64-w64-mingw32 )
+        wget https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libiconv-1.17-4-any.pkg.tar.zst
+        zstd -d mingw-w64-x86_64-libiconv-1.17-4-any.pkg.tar.zst
+        ( mkdir mingw-w64-x86_64-libiconv-1.17-4-any && cd mingw-w64-x86_64-libiconv-1.17-4-any && tar xvf ../mingw-w64-x86_64-libiconv-1.17-4-any.pkg.tar && cd mingw64 && rsync -avhH . /usr/x86_64-w64-mingw32 )
     - name: Install zlib
       run: |
         set -ex
