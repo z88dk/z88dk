@@ -31,12 +31,14 @@ ENDIF
 
 generic_console_set_ink:
     call    conio_map_colour
+    and     3
     ld      (__MODE1_attr), a
 generic_console_set_attribute:
     ret
 
 generic_console_set_paper:
     call    conio_map_colour
+    and     3
     ld      (__MODE1_attr+1), a
     ret
 
