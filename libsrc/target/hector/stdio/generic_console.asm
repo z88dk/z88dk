@@ -21,7 +21,7 @@ ELSE
 ENDIF
 
     EXTERN  generic_console_flags
-    EXTERN  CRT_FONT
+    EXTERN  conio_map_colour
 
     EXTERN  __MODE1_attr
 
@@ -32,12 +32,12 @@ generic_console_set_attribute:
 	ret
 
 generic_console_set_ink:
-    and     3
+    call    conio_map_colour
     ld      (__MODE1_attr), a
     ret
 
 generic_console_set_paper:
-    and     3
+    call    conio_map_colour
     ld      (__MODE1_attr+1), a
     ret
 
@@ -70,7 +70,7 @@ generic_console_scrollup:
 
 
 
-
+IF 0
 ; 5e8, convert colour to byte
 conv_to_byte:
     and       $03                           ;[05e8] e6 03
@@ -87,3 +87,18 @@ conv_to_byte:
     add       c                             ;[05f4] 81
     pop       bc                            ;[05f5] c1
     ret
+ENDIF
+
+    SECTION code_crt_init
+
+    ; Set the palette to black, blue, red, white
+    EXTERN  __hector_reg_0x1000
+    EXTERN  __hector_reg_0x1800
+    
+    ld      a,@00001000         ;p2 = red, p0 = black
+    ld      (0x1000),a
+    ld      (__hector_reg_0x1000),a
+    ld      a,@00111100         ;p3 = white, p1 = blue
+    ld      (0x1800),a
+    ld      (__hector_reg_0x1800),a
+
