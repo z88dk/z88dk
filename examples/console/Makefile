@@ -26,7 +26,7 @@ $(eval $(call build_app, $(WORLD_TARGETS), world.bin, world.c) )
 
 # Hello world using conio features
 
-CONIO_TARGETS = abc80 ace adam alphatro aquarius aqplus bee cpc coleco cpm fp1100 gb hemc hgmc homelab homelab2 \
+CONIO_TARGETS = abc80 ace adam alphatro aquarius aqplus bee cpc coleco cpm fp1100 gb hector hectorhr  hemc hgmc homelab homelab2 \
 	kramermc laser500 mc1000 mikro80 nabu \
 	nascom ondra pmd85 pv1000 pps rx78 sam spc1000 srr super80 super80_vduem trs80 vg5k vz z1013 zx80 zx81 \
 	msx msx2_rom pv2000 sc3000 smc777 svi m5 mtx multi8 z80tvgame z9001 vector06c zx \
