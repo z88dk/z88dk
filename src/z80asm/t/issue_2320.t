@@ -473,152 +473,143 @@ END
 
 capture_ok("z88dk-z80asm -mz80 $test.a.asm", "");
 capture_ok("z88dk-z80asm -mr3k $test.b.asm", "");
-capture_ok("z88dk-z80asm -v -x$test.lib -m* ".quote_os("$test.*.o"), <<END);
-% z88dk-z80asm -v -x$test.lib -m* ${\os_quoted("$test.*.o")}
+capture_ok("z88dk-z80asm -v -x$test.lib -m* ".quote_os("$test.*.o"), <<'END');
+% z88dk-z80asm -v -xtest_t_issue_2320.lib -m* "test_t_issue_2320.*.o"
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
-Creating library '$test.lib'
+Creating library 'test_t_issue_2320.lib'
 Predefined constant: __CPU_Z80N__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Adding $test.a.o to library
-Skipping $test.b.o - different CPU-IXIY combination
+Adding test_t_issue_2320.a.o to library
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __CPU_Z180__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __CPU_R800__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __CPU_KC160_Z80__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __CPU_Z80_STRICT__ = 1
-Predefined constant: __CPU_ZILOG__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __CPU_R3K__ = 1
 Predefined constant: __CPU_RABBIT__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Adding $test.b.o to library
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __CPU_8085__ = 1
-Predefined constant: __CPU_INTEL__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __CPU_R5K__ = 1
-Predefined constant: __CPU_RABBIT__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __CPU_EZ80_Z80__ = 1
-Predefined constant: __CPU_ZILOG__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __CPU_EZ80__ = 1
-Predefined constant: __CPU_ZILOG__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __CPU_R2KA__ = 1
-Predefined constant: __CPU_RABBIT__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __CPU_GBZ80__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __CPU_8080__ = 1
 Predefined constant: __CPU_INTEL__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __CPU_8085__ = 1
+Predefined constant: __CPU_INTEL__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __CPU_R5K__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __CPU_EZ80_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __CPU_EZ80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __CPU_R2KA__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __CPU_GBZ80__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __CPU_R4K__ = 1
 Predefined constant: __CPU_RABBIT__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __CPU_KC160__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Skipping $test.a.o - different CPU-IXIY combination
-Skipping $test.b.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320.b.o - different CPU-IXIY combination
 
 END
 
@@ -668,344 +659,323 @@ END
 
 capture_ok("z88dk-z80asm -mz80 $test.a.asm", "");
 capture_ok("z88dk-z80asm -mr3k $test.b.asm", "");
-capture_ok("z88dk-z80asm -v -x$test.lib -m* ".quote_os("$test.*.asm"), <<END);
-% z88dk-z80asm -v -x$test.lib -m* ${\os_quoted("$test.*.asm")}
+capture_ok("z88dk-z80asm -v -x$test.lib -m* ".quote_os("$test.*.asm"), <<'END');
+% z88dk-z80asm -v -xtest_t_issue_2320.lib -m* "test_t_issue_2320.*.asm"
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
-Creating library '$test.lib'
+Creating library 'test_t_issue_2320.lib'
 Predefined constant: __CPU_Z80N__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __CPU_Z180__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __CPU_R800__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __CPU_KC160_Z80__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __CPU_Z80_STRICT__ = 1
-Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __CPU_R3K__ = 1
 Predefined constant: __CPU_RABBIT__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __CPU_8085__ = 1
 Predefined constant: __CPU_INTEL__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __CPU_R5K__ = 1
-Predefined constant: __CPU_RABBIT__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __CPU_EZ80_Z80__ = 1
-Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __CPU_EZ80__ = 1
-Predefined constant: __CPU_ZILOG__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __CPU_R2KA__ = 1
-Predefined constant: __CPU_RABBIT__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __CPU_GBZ80__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
-
-Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
-
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
-
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __CPU_8080__ = 1
 Predefined constant: __CPU_INTEL__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
+
+Predefined constant: __CPU_R5K__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
+
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
+
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
+
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
+
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
+
+Predefined constant: __CPU_EZ80_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
+
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
+
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
+
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
+
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
+
+Predefined constant: __CPU_EZ80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
+
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
+
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
+
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
+
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
+
+Predefined constant: __CPU_R2KA__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
+
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
+
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
+
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
+
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
+
+Predefined constant: __CPU_GBZ80__ = 1
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
+
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
+
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
+
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
+
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __CPU_R4K__ = 1
 Predefined constant: __CPU_RABBIT__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __CPU_KC160__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 Predefined constant: __SWAP_IX_IY__ = 1
-Assembling '$test.a.asm'
-Writing object file '$test.a.o'
+Assembling 'test_t_issue_2320.a.asm'
+Writing object file 'test_t_issue_2320.a.o'
 
-Assembling '$test.b.asm'
-Writing object file '$test.b.o'
+Assembling 'test_t_issue_2320.b.asm'
+Writing object file 'test_t_issue_2320.b.o'
 
-Adding $test.a.o to library
-Adding $test.b.o to library
+Adding test_t_issue_2320.a.o to library
+Adding test_t_issue_2320.b.o to library
 
 END
 

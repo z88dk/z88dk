@@ -32,6 +32,7 @@ my @CPUS = qw( z80 z80_strict z80n z180
 			   r800 
 			   r2ka r3k r4k r5k 
 			   8080 8085 
+			   8080_strict 8085_strict
 			   gbz80 
 			   kc160 kc160_z80
 );
@@ -42,7 +43,7 @@ my %opcodes;
 # operand values
 my %V = (
 	b=>0, c=>1, d=>2, e=>3, h=>4, l=>5, '(hl)'=>6, f=>6, m=>6, a=>7,
-	bc=>0, de=>1, hl=>2, sp=>3, af=>3,
+	bc=>0, de=>1, hl=>2, sp=>3, af=>3, psw=>3,
 	pw=>0, px=>1, py=>2, pz=>3,
 	ix=>0xDD, iy=>0xFD, 
 	add=>0, adc=>1, sub=>2, sbc=>3, and=>4, xor=>5, or=>6, cp=>7, 
@@ -90,14 +91,170 @@ for my $cpu (@CPUS) {
 	my $ez80_z80	= ($cpu =~ /^ez80_z80/);
 	my $ez80_adl	= ($cpu =~ /^ez80$/);
 	my $zilog		= ($cpu =~ /^z|^ez|^r800/);
-	my $i8080		= ($cpu =~ /^8080/);
-	my $i8085		= ($cpu =~ /^8085/);
-	my $intel 		= ($cpu =~ /^80/);
+	my $i8080		= ($cpu =~ /^8080$/);
+	my $i8085		= ($cpu =~ /^8085$/);
+	my $intel 		= ($cpu =~ /^808.$/);
 	my $gameboy		= ($cpu =~ /^gbz80/);
 	my $kc160_any	= ($cpu =~ /^kc160/);
 	my $kc160_ext	= ($cpu =~ /^kc160$/);
 	my $kc160_z80	= ($cpu =~ /^kc160_z80/);
 
+	#--------------------------------------------------------------------------
+	# 8080 and 8085 strict
+	#--------------------------------------------------------------------------
+
+	if ($cpu =~ /^808._strict$/) {
+
+		# move, load and store
+		for my $d (qw(     b c d e h l a )) { 
+			for my $s (qw( b c d e h l a )) {
+				add($cpu, "mov $d, $s", [ld_r_r($d, $s)]);
+			}
+		}
+
+		for my $r (qw( b c d e h l a )) { 
+			add($cpu, "mov m, $r", [ld_r_r('(hl)', $r)]);
+			add($cpu, "mov $r, m", [ld_r_r($r, '(hl)')]);
+		}
+
+		for my $r (qw( b c d e h l m a )) { 
+			add($cpu, "mvi $r, %n", [ld_r_n($r), '%n']);
+		}
+		
+		for my $dd (qw( bc de hl sp )) {
+			my $d = ($dd eq 'sp') ? $dd : substr($dd,0,1);		# B, D, H
+			add($cpu, "lxi $d, %m",  [ld_dd_m($dd), '%m', '%m']);
+		}
+		
+		for my $dd (qw( bc de )) {
+			my $d = substr($dd,0,1);		# B, D
+			add($cpu, "stax $d",  [0x02+16*$V{$dd}]);
+			add($cpu, "ldax $d",  [0x0a+16*$V{$dd}]);
+		}
+		
+		add($cpu, "sta %m", [0x32, '%m', '%m']);
+		add($cpu, "lda %m", [0x3a, '%m', '%m']);
+		add($cpu, "shld %m", [0x22, '%m', '%m']);
+		add($cpu, "lhld %m", [0x2a, '%m', '%m']);
+		add($cpu, "xchg", [0xeb]);
+		
+		# stack ops
+		for my $dd (qw( bc de hl psw )) {
+			my $d = ($dd eq 'psw') ? $dd : substr($dd,0,1);		# B, D, H
+			add($cpu, "push $d", [0xc5+16*$V{$dd}]);
+			add($cpu, "pop $d", [0xc1+16*$V{$dd}]);
+		}
+
+		add($cpu, "xthl", [0xe3]);
+		add($cpu, "sphl", [0xf9]);
+
+		# jump
+		add($cpu, "jmp %m", [0xc3, '%m', '%m']);
+		for my $_f (qw( _nz _z _nc _c _po _pe _p _m )) { 
+			my $f = substr($_f, 1);	# remove leading _
+			add($cpu, "j$f %m", [0xc2+8*$V{$_f}, '%m', '%m']);
+		}
+		add($cpu, "pchl", [0xe9]);
+		
+		# call
+		add($cpu, "call %m", [0xcd, '%m', '%m']);
+		for my $_f (qw( _nz _z _nc _c _po _pe _p _m )) { 
+			my $f = substr($_f, 1);	# remove leading _
+			add($cpu, "c$f %m", [0xc4+8*$V{$_f}, '%m', '%m'])
+		}
+
+		# return
+		add($cpu, "ret", [0xc9]);
+		for my $_f (qw( _nz _z _nc _c _po _pe _p _m )) { 
+			my $f = substr($_f, 1);	# remove leading _
+			add($cpu, "r$f", [0xc0+8*$V{$_f}]);
+		}
+
+		# restart
+		add($cpu, "rst %c", ["0xc7+%c"]);
+		
+		# increment and decrement
+		for my $r (qw( b c d e h l m a )) { 
+			add($cpu, "inr $r", [0x04+8*$V{$r}]);
+			add($cpu, "dcr $r", [0x05+8*$V{$r}]);
+		}
+
+		for my $dd (qw( bc de hl sp )) {
+			my $d = ($dd eq 'sp') ? $dd : substr($dd,0,1);		# B, D, H
+			add($cpu, "inx $d", [0x03+16*$V{$dd}]);
+			add($cpu, "dcx $d", [0x0b+16*$V{$dd}]);
+		}
+
+		# add
+		for my $r (qw( b c d e h l m a )) { 
+			add($cpu, "add $r", [0x80+$V{$r}]);
+			add($cpu, "adc $r", [0x88+$V{$r}]);
+		}
+		
+		add($cpu, "adi %n", [0xc6, '%n']);
+		add($cpu, "aci %n", [0xce, '%n']);
+
+		for my $dd (qw( bc de hl sp )) {
+			my $d = ($dd eq 'sp') ? $dd : substr($dd,0,1);		# B, D, H
+			add($cpu, "dad $d", [0x09+16*$V{$dd}]);
+		}
+
+		# subtract
+		for my $r (qw( b c d e h l m a )) { 
+			add($cpu, "sub $r", [0x90+$V{$r}]);
+			add($cpu, "sbb $r", [0x98+$V{$r}]);
+		}
+		
+		add($cpu, "sui %n", [0xd6, '%n']);
+		add($cpu, "sbi %n", [0xde, '%n']);
+
+		# logical
+		for my $r (qw( b c d e h l m a )) { 
+			add($cpu, "ana $r", [0xa0+$V{$r}]);
+			add($cpu, "xra $r", [0xa8+$V{$r}]);
+			add($cpu, "ora $r", [0xb0+$V{$r}]);
+			add($cpu, "cmp $r", [0xb8+$V{$r}]);
+		}
+		
+		add($cpu, "ani %n", [0xe6, '%n']);
+		add($cpu, "xri %n", [0xee, '%n']);
+		add($cpu, "ori %n", [0xf6, '%n']);
+		add($cpu, "cpi %n", [0xfe, '%n']);
+
+		# rotate
+		add($cpu, "rlc", [0x07]);
+		add($cpu, "rrc", [0x0f]);
+		add($cpu, "ral", [0x17]);
+		add($cpu, "rar", [0x1f]);
+    
+		# specials
+		add($cpu, "daa", [0x27]);
+		add($cpu, "cma", [0x2f]);
+		add($cpu, "stc", [0x37]);
+		add($cpu, "cmc", [0x3f]);
+		
+		# input/output
+		add($cpu, "in %n", [0xdb, '%n']);
+		add($cpu, "out %n", [0xd3, '%n']);
+		
+		# control
+		add($cpu, "ei", [0xfb]);
+		add($cpu, "di", [0xf3]);
+		add($cpu, "nop", [0x00]);
+		add($cpu, "hlt", [0x76]);
+
+		if ($cpu =~ /^8085_strict$/) {
+			add($cpu, "rim", [0x20]);
+			add($cpu, "sim", [0x30]);
+		}
+
+		next;
+	}
+	
+	#--------------------------------------------------------------------------
+	# other CPUs
+	#--------------------------------------------------------------------------
+	
 	#--------------------------------------------------------------------------
 	# 8-bit load
 	#--------------------------------------------------------------------------

@@ -31,6 +31,8 @@ typedef enum {
     CPU_R5K         = 14,
     CPU_KC160       = 15,
     CPU_KC160_Z80   = 16,
+    CPU_8080_STRICT = 17,
+    CPU_8085_STRICT = 18,
 
     CPU_UNDEF       = -1,
 } cpu_t;

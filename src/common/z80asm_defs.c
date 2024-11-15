@@ -40,20 +40,22 @@ typedef struct {
 static cpu_lookup_t cpu_lut[] = {
     { "z80",        CPU_Z80,            CPU_Z80_STRICT,     },  // 1
     { "z80_strict", CPU_Z80_STRICT,     CPU_8080,           },  // 2
-    { "z180",       CPU_Z180,           CPU_Z80_STRICT,     },  // 3
+    { "z180",       CPU_Z180,           CPU_8080,           },  // 3
     { "ez80_z80",   CPU_EZ80_Z80,       CPU_UNDEF,          },  // 4
     { "ez80",       CPU_EZ80,           CPU_UNDEF,          },  // 5
     { "z80n",       CPU_Z80N,           CPU_Z80,            },  // 6
     { "r2ka",       CPU_R2KA,           CPU_UNDEF,          },  // 7
     { "r3k",        CPU_R3K,            CPU_R2KA,           },  // 8
     { "gbz80",      CPU_GBZ80,          CPU_UNDEF,          },  // 9
-    { "8080",       CPU_8080,           CPU_UNDEF,          },  // 10
-    { "8085",       CPU_8085,           CPU_8080,           },  // 11
-    { "r800",       CPU_R800,           CPU_Z80_STRICT,     },  // 12
+    { "8080",       CPU_8080,           CPU_8080_STRICT,    },  // 10
+    { "8085",       CPU_8085,           CPU_8085_STRICT,    },  // 11
+    { "r800",       CPU_R800,           CPU_8080,           },  // 12
     { "r4k",        CPU_R4K,            CPU_UNDEF,          },  // 13
     { "r5k",        CPU_R5K,            CPU_R4K,            },  // 14
     { "kc160",      CPU_KC160,          CPU_UNDEF,          },  // 15
-    { "kc160_z80",  CPU_KC160_Z80,      CPU_Z80_STRICT,     },  // 16
+    { "kc160_z80",  CPU_KC160_Z80,      CPU_8080,           },  // 16
+    { "8080_strict",CPU_8080_STRICT,    CPU_UNDEF,          },  // 17
+    { "8085_strict",CPU_8085_STRICT,    CPU_UNDEF,          },  // 18
 };
 
 static cpu_lookup_t* cpu_lu_hash = NULL;        // lookup from cpu name

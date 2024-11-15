@@ -77,6 +77,9 @@ for my $cpu (@CPUS) {
 					$skip = 1 if $asm =~ /\d+/;		# nn
 				}
 			}
+			
+			# cp is compare in z80, call positive in 8080
+			$skip = 1 if $asm =~ /^cp (0x1234|-128|0|127|255)$/;
 
 			push @test, sprintf(" %-31s; Error", $asm) unless $skip;
 		}

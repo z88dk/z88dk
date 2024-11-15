@@ -434,6 +434,8 @@ spew("$test.asm", <<'END_ASM');
 	if __CPU_INTEL__		: defm "intel "			: endif
 	if __CPU_8080__			: defm "8080 "			: endif
 	if __CPU_8085__			: defm "8085 "			: endif
+	if __CPU_8080_STRICT__	: defm "8080_strict "	: endif
+	if __CPU_8085_STRICT__	: defm "8085_strict "	: endif
 													
 	if __CPU_ZILOG__		: defm "zilog "			: endif
 	if __CPU_Z80__			: defm "z80 "			: endif
@@ -479,6 +481,8 @@ END_ASM
 my %defines = (
 	8080		=> "intel 8080 ",
 	8085		=> "intel 8085 ",
+	'8080_strict'=> "intel 8080_strict ",
+	'8085_strict'=> "intel 8085_strict ",
 	z80			=> "zilog z80 ",
 	z80_strict	=> "zilog z80_strict ",
 	z80n		=> "zilog z80n ",
