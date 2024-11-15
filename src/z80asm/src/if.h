@@ -109,14 +109,15 @@ bool sfile_is_c_source();
 // code area
 int get_PC();
 int get_phased_PC();
+const char* get_cur_section_name(void);
 
 // list file
 void list_open(const char* list_file);
 void list_close();
-void list_source_line(const char* filename, int line_num, int asmpc, int phased_pc, const char* text);
-void list_expanded_line(int asmpc, int phased_pc, const char* text);
+void list_source_line(const char* filename, int line_num, const char* section, int asmpc, int phased_pc, const char* text);
+void list_expanded_line(const char* section, int asmpc, int phased_pc, const char* text);
 void list_append_bytes(int value, int num_bytes);
-void list_patch_bytes(int asmpc, int value, int num_bytes);
+void list_patch_bytes(const char* section, int asmpc, int value, int num_bytes);
 void list_end_line();
 void list_got_source_line(const char* filename, int line_num, const char* text);
 void list_got_expanded_line(const char* text);

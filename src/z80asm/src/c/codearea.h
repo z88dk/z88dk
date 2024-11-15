@@ -93,6 +93,7 @@ extern Section1 *new_section(const char *name );
 /* get/set current section */
 extern Section1 *get_cur_section( void );
 extern Section1 *set_cur_section( Section1 *section );
+extern const char* get_cur_section_name(void);
 
 #define CURRENTSECTION	(get_cur_section())
 

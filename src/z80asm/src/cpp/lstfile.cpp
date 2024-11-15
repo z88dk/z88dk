@@ -39,6 +39,7 @@ void LstFile::open(const string& filename) {
 			m_patch_pos.clear();
 			m_line_started = false;
 			m_location.clear();
+            m_section.clear();
 			m_asmpc = 0;
 			m_phased_pc = 0;
 			m_bytes.clear();
@@ -55,12 +56,13 @@ void LstFile::close() {
 	}
 }
 
-void LstFile::source_line(Location location, int asmpc, int phased_pc, const string& text) {
+void LstFile::source_line(Location location, const string& section, int asmpc, int phased_pc, const string& text) {
 	if (m_ofs.is_open()) {
 		out_line();
 
 		m_line_started = true;
 		m_location = location;
+        m_section = section;
 		m_asmpc = asmpc;
 		m_phased_pc = phased_pc;
 		m_bytes.clear();
@@ -68,13 +70,14 @@ void LstFile::source_line(Location location, int asmpc, int phased_pc, const str
 	}
 }
 
-void LstFile::expanded_line(int asmpc, int phased_pc, const string& text) {
+void LstFile::expanded_line(const string& section, int asmpc, int phased_pc, const string& text) {
 	if (m_ofs.is_open()) {
 		out_line();
 
 		m_line_started = true;
         m_location.set_line_num(0);
-		m_asmpc = asmpc;
+        m_section = section;
+        m_asmpc = asmpc;
 		m_phased_pc = phased_pc;
 		m_bytes.clear();
 		m_text = text;
@@ -82,19 +85,17 @@ void LstFile::expanded_line(int asmpc, int phased_pc, const string& text) {
 }
 
 void LstFile::append_bytes(const vector<uint8_t>& bytes) {
-	if (m_ofs.is_open()) {
-		for (size_t i = 0; i < bytes.size(); i++)
-			m_bytes.push_back(bytes[i]);
-	}
+	if (m_ofs.is_open()) 
+        m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
 }
 
-void LstFile::patch_bytes(int asmpc, const vector<uint8_t>& bytes) {
+void LstFile::patch_bytes(const string& section, int asmpc, const vector<uint8_t>& bytes) {
 	if (m_ofs.is_open()) {
 		out_line();									// output any pending bytes
 
 		for (int i = 0; i < static_cast<int>(bytes.size()); i++) {
 			int addr = asmpc + i;
-			auto it = m_patch_pos.find(addr);
+            auto it = m_patch_pos.find(patch_pos_key(section, addr));
 			xassert(it != m_patch_pos.end());		// address must exist
 
 			m_ofs.seekp(it->second);				// seek position and patch in file
@@ -174,7 +175,7 @@ void LstFile::out_bytes(int row) {
 	for (int i = start_idx; i < end_idx; i++) {
 		if (i < static_cast<int>(m_bytes.size())) {
 			int addr = start_addr + i - start_idx;
-			m_patch_pos[addr] = m_ofs.tellp();
+            m_patch_pos[patch_pos_key(m_section, addr)] = m_ofs.tellp();
 			m_ofs << setw(2)
 				<< setfill('0')
 				<< hex
@@ -191,6 +192,12 @@ int LstFile::num_rows() {
 	return (static_cast<int>(m_bytes.size()) + BytesWidth / 2 - 1) / (BytesWidth / 2);
 }
 
+string LstFile::patch_pos_key(const string& section, int addr) {
+    ostringstream oss;
+    oss << section << ":" << addr;
+    return oss.str();
+}
+
 //-----------------------------------------------------------------------------
 void list_open(const char* list_file) {
 	g_list_file.open(list_file);
@@ -200,13 +207,13 @@ void list_close() {
 	g_list_file.close();
 }
 
-void list_source_line(const char* filename, int line_num,
+void list_source_line(const char* filename, int line_num, const char* section,
 	int asmpc, int phased_pc, const char* text) {
-	g_list_file.source_line(Location(filename, line_num), asmpc, phased_pc, text);
+    g_list_file.source_line(Location(filename, line_num), section, asmpc, phased_pc, text);
 }
 
-void list_expanded_line(int asmpc, int phased_pc, const char* text) {
-	g_list_file.expanded_line(asmpc, phased_pc, text);
+void list_expanded_line(const char* section, int asmpc, int phased_pc, const char* text) {
+	g_list_file.expanded_line(section, asmpc, phased_pc, text);
 }
 
 void list_append_bytes(int value, int num_bytes) {
@@ -218,14 +225,14 @@ void list_append_bytes(int value, int num_bytes) {
 	g_list_file.append_bytes(bytes);
 }
 
-void list_patch_bytes(int asmpc, int value, int num_bytes) {
+void list_patch_bytes(const char* section, int asmpc, int value, int num_bytes) {
 	if (asmpc >= 0) {
 		vector<uint8_t> bytes;
 		for (int i = 0; i < num_bytes; i++) {
 			bytes.push_back(value & 0xff);
 			value >>= 8;
 		}
-		g_list_file.patch_bytes(asmpc, bytes);
+		g_list_file.patch_bytes(section, asmpc, bytes);
 	}
 }
 
@@ -237,7 +244,7 @@ void list_end_line() {
 void list_got_source_line(const char* filename, int line_num, const char* text) {
 	if (filename && list_is_on()) {
 		list_source_line(filename, line_num,
-			get_PC(), get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
+			get_cur_section_name(), get_PC(), get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
 			text);
 	}
 }
@@ -247,7 +254,7 @@ void list_got_expanded_line(const char* text) {
 	if (list_is_on() && g_options.verbose) {
 		string line = string("      + ") + text;
 		list_expanded_line(
-			get_PC(), get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
+            get_cur_section_name(), get_PC(), get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
 			line.c_str());
 	}
 }

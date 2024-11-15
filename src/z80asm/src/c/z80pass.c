@@ -161,10 +161,10 @@ void Z80pass2(int start_errors, const char* obj_filename)
 		if (option_list_file()) {
 			if (expr->range == RANGE_WORD_BE) {
 				int swapped = ((value & 0xFF00) >> 8) | ((value & 0x00FF) << 8);
-				list_patch_bytes(expr->listpos, swapped, range_size(expr->range));
+				list_patch_bytes(get_cur_section_name(), expr->listpos, swapped, range_size(expr->range));
 			}
 			else {
-				list_patch_bytes(expr->listpos, value, range_size(expr->range));
+				list_patch_bytes(get_cur_section_name(), expr->listpos, value, range_size(expr->range));
 			}
 		}
 

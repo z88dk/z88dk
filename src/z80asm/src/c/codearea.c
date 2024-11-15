@@ -167,16 +167,19 @@ Section1 *new_section( const char *name )
 /*-----------------------------------------------------------------------------
 *   get/set current section
 *----------------------------------------------------------------------------*/
-Section1 *get_cur_section( void )
-{
-	init_module();
-	return g_cur_section;
+Section1* get_cur_section(void) {
+    init_module();
+    return g_cur_section;
 }
 
-Section1 *set_cur_section( Section1 *section )
-{
-	init_module();
-	return (g_cur_section = section);		/* assign and return */
+Section1* set_cur_section(Section1* section) {
+    init_module();
+    return (g_cur_section = section);		/* assign and return */
+}
+
+const char* get_cur_section_name(void) {
+    init_module();
+    return spool_add(g_cur_section->name);
 }
 
 /*-----------------------------------------------------------------------------
