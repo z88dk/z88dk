@@ -28,6 +28,7 @@ TOCREATE += $(call check_target,abc80,abc80_clib.lib)
 TOCREATE += $(call check_target,abc800,abc800_clib.lib)
 TOCREATE += $(call check_target,adam,adam.lib $(CPMLIBS))
 TOCREATE += $(call check_target,agon,agon_clib.lib)
+TOCREATE += $(call check_target,alphatp2,alphatp2_clib.lib)
 TOCREATE += $(call check_target,alphatro,alphatro_clib.lib)
 TOCREATE += $(call check_target,aquarius,aquarius_clib.lib gfxaq48.lib aqplus.lib)
 TOCREATE += $(call check_target,attache,attache.lib $(CPMLIBS))
@@ -1587,6 +1588,14 @@ hectorhr_clib.lib: $(TARGET_CLIB_OBJS) hector1_clib.lib
 	$(MAKE) -C gfx TARGET=hector FLAVOUR=narrow SUBTYPE=hectorhr
 	$(MAKE) -C target/hector SUBTYPE=hectorhr
 	TARGET=hectorhr TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhectorhr -x$(OUTPUT_DIRECTORY)/hectorhr_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
+
+# Alphatro P2 - dom
+alphatp2_clib.lib: $(TARGET_CLIB_OBJS) 
+	@echo ''
+	@echo '--- Building Alpha P2 Library ---'
+	@echo ''
+	$(call buildgeneric,alphatp2)
+	TARGET=alphatp2 TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -DFORalphatp2 -x$(OUTPUT_DIRECTORY)/alphatp2_clib @$(TARGET_DIRECTORY)/alphatp2/alphatp2.lst
 
 
 # Genius Leader 2000/4000 - dom

@@ -1,0 +1,16 @@
+
+
+
+
+
+defc CSTS = $0052	; Test keyboard
+			; No key:		a = 0x00, nc,z
+			; Key			a = 0xff, nc, nz
+			; Error			a = 0xff,  c
+
+
+
+defc DISPE = $00b6	;Output to screen, c = character
+
+
+defc TASTE = $00b3	;Read from keyboard a = key, c = 1
