@@ -36,6 +36,7 @@ jobs:
           perl-doc
           perl-YAML-Tiny
           mingw64/mingw-w64-x86_64-gcc
+          mingw64/mingw-w64-x86_64-pkg-config
           mingw64/mingw-w64-x86_64-libxml2
           mingw64/mingw-w64-x86_64-ragel
           mingw64/mingw-w64-x86_64-boost

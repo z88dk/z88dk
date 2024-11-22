@@ -73,6 +73,9 @@ extern option_t  acetap_options[];
 extern int       adam_exec(char *target);
 extern option_t  adam_options[];
 
+extern int       alphatp2_exec(char *target);
+extern option_t  alphatp2_options[];
+
 extern int       aquarius_exec(char *target);
 extern option_t  aquarius_options[];
 
@@ -331,6 +334,10 @@ struct {
       "Generates a .DDP for ADAM machines",
       NULL,
       adam_exec,    adam_options },
+    { "bin2p2",   "alphatp2",    "(C) 2024 z88dk",
+      "Generates a .img file for Alphatronic TP2",
+      NULL,
+      alphatp2_exec,    alphatp2_options },
     { "bin2caq",  "aquarius", "(C) 2001 Stefano Bodrato",
       "Creates a BASIC loader file and binary stored in variable array format",
       NULL,
