@@ -11,16 +11,12 @@ IF __clib_exit_stack_size > 0
     ld      d,h
     ld      e,l
     ld      hl,__exit_atexit_funcs
-    ld      a,l
+    ld      a,e
     ld      (hl+),a
-    ld      a,h
+    ld      a,d
     ld      (hl+),a
-  ELIF __CPU_INTEL__
-    ld      hl,0
-    add     hl,sp
-    ld      (__exit_atexit_funcs),hl
   ELSE
-    ld      (__exit_atexit_funcs),sp
+    ld      (__exit_atexit_funcs),hl
   ENDIF
 ENDIF
 
