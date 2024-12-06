@@ -77,7 +77,7 @@ IF  NEEDunplot|NEEDplot
 noset_blue:
     ld      (hl), a
     ld      a, b                        ;Switch to green plane
-    or      @00000011
+    or      @00000101
     out     ($2a), a
     ld      a, (hl)
     and     e
@@ -87,7 +87,7 @@ noset_blue:
 noset_green:
     ld      (hl), a
     ld      a, b                        ;Switch to red plane
-    or      @00000101
+    or      @00000011
     out     ($2a), a
     ld      a, (hl)
     and     e

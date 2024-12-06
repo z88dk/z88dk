@@ -119,7 +119,7 @@ no_bold:
 
     ex      af, af
     ld      a, b
-    or      @00000011
+    or      @00000101
     out     ($2a), a
     ex      af, af
     exx
@@ -140,7 +140,7 @@ no_bold:
 
     ex      af, af
     ld      a, b
-    or      @00000101
+    or      @00000011
     out     ($2a), a
     ex      af, af
     exx
