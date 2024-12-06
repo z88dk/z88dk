@@ -82,7 +82,7 @@ run_ok("zcc +zx -m -debug ${test}.c ${test}1.asm -o ${test}.bin");
 
 (my $test_expanded = $test) =~ s/([^a-z0-9])/ sprintf("_%02x", ord($1)) /ige;
 my @map = grep {!/zcc|crt0/ && /$test_expanded|_main|_one/} path("${test}.map")->lines;
-__ASM_LINE_2_test_5ft_5foption_5fdebug1_2easmspew("${test}1.map", @map);
+spew("${test}1.map", @map);
 
 check_text_file("${test}1.map", <<'END');
 __ASM_LINE_2_test_5ft_5foption_5fdebug1_2easm = $80D0 ; addr, local, , test_t_option_debug1_asm, , test_t_option_debug1.asm:2
