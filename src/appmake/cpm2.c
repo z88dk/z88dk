@@ -1865,9 +1865,9 @@ static disc_spec alphatro_spec = {
 
 static disc_spec alphatP2_spec = {
     .disk_mode = MFM250,           // 300 kbps MFM, visible only when using the IMD format
-    .name = "Alphatronic P2",
+    .name = "AlphatP2",
     .sectors_per_track = 16,
-    .tracks = 38,
+    .tracks = 40,
     .sides = 1,
     .sector_size = 256,
     .gap3_length = 0x17,
@@ -2255,6 +2255,24 @@ static disc_spec x820_spec = {
 };
 
 
+static disc_spec nokiamikromikko320_spec = {
+      .name = "Nokia MikroMikko 320k",
+      .sectors_per_track = 8,
+      .tracks = 80,
+      .sides = 1,
+      .sector_size = 512,
+      .gap3_length = 0x2a, //?
+      .filler_byte = 0xe5,
+      .boottracks = 2,
+      .directory_entries = 128,
+      .alternate_sides = 0,
+      .extent_size = 2048,
+      .byte_size_extents = 1, 
+      .first_sector_offset = 1,
+      .has_skew = 1,  // Skew=3
+      .skew_tab = { 0, 3, 6, 1, 4, 7, 2, 5 },
+    };
+
 static struct formats {
      const char    *name;
      const char    *description;
@@ -2316,6 +2334,7 @@ static struct formats {
     { "microbee-ds40",  "Microbee DS40",    &microbee40_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
     { "micromate", "PMC-101 MicroMate",     &pmc101_spec, 0, NULL, 1 },
+    { "mikko-320", "Nokia Mikro Mikko 320kb", &nokiamikromikko320_spec, 0, NULL, 1},
     { "morrow2",   "Morrow MD 2 (SS)",      &md2_spec, 0, NULL, 1 },
     { "morrow3",   "Morrow MD 3 (DS)",      &md3_spec, 0, NULL, 1 },
     { "mbc1000",   "Sanyo MBC-1000/1150",   &mbc1000_spec, 0, NULL, 1 },
