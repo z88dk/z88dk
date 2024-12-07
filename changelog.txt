@@ -9,12 +9,15 @@ Future release changes:
 - [classic] Support more ways of configuring the heap size
 - [classic] Additional pragma support for interrupts added to targets
 - [classic] +aquarius: Support for far heap (-clib=aqplus)
-- [classic] +cpm: Support for for far heap (PCW)
+- [classic] +cpm: Stack now setup correctly when running on CP/M Plus
+- [classic] +cpm: Support for many new disc formats
+- [classic] +cpm: Support for far heap (PCW)
+- [classic] +hector: New target
 - [classic] +msx: Support for far heap (MSXDOS)
+- [classic] +sam: Support for far heap 
 - [classic] +zx: Support for far heap 
-- [classic] -llib3d is now integratted into target library
-- [classic] +cpm Stack now setup correctly when running on CP/M Plus
 - [classic] +zx81 ARX hires graphics updates
+- [classic] -llib3d is now integratted into target library
 - [classic] More near-heap size choice pragmas
 - [classic] More modularised crt setup
 - [newlib] Resolve and correct library build issues with .asm.m4 files
