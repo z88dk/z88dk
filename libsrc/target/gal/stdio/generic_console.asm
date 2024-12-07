@@ -85,7 +85,10 @@ generic_console_printc_3:
     ret
 
 convert_character:
-        ; Issue #2139 suggests converting ' to a block character
+    ; Allow printing of the graphics chars directly
+    cp      128
+    ret     nc
+    ; Issue #2139 suggests converting ' to a block character
     cp      39
     jr      nz, not_apostrophe
     ld      a, 129
