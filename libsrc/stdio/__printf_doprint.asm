@@ -6,6 +6,8 @@
     EXTERN  __printf_get_fp
     EXTERN  __printf_get_print_function
 
+
+
 ; Print a character
 ; Entry: a = character to print
 __printf_doprint:
@@ -17,7 +19,7 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
 ELSE
     push    ix
     ; Save the far pointer on z80
-IF __CPU_Z80__
+IF __CPU_Z80__ && !__SWAP_IX_IY__
     exx
     push    bc
     push    de
@@ -49,7 +51,7 @@ ELSE
 ENDIF
     jp      (hl)
 doprint_return:
-IF __CPU_Z80__
+IF __CPU_Z80__ && !__SWAP_IX_IY__
     ex      af,af
     pop     af
     ex      af,af
