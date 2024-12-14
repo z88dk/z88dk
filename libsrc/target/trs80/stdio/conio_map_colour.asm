@@ -119,7 +119,7 @@ table2:
     defb    $3                          ;LIGHTBLUE -> LIGHT BLUE
     defb    $5                          ;LIGHTGREEN -> LIGHT GREEN
     defb    $9                          ;LIGHTCYAN -> CYAN2
-    defb    $3                          ;LIGHTRED -> LIGHT RED
+    defb    $6                          ;LIGHTRED -> LIGHT RED
     defb    $2                          ;LIGHTMAGENTA -> LIGHT MAGENTA
     defb    $c                          ;YELLOW -> YELLOW
     defb    $0                          ;WHITE -> BRIGHT WHITE
