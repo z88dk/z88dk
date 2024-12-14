@@ -13,6 +13,7 @@
     EXTERN  CONSOLE_COLUMNS
     EXTERN  CONSOLE_ROWS
     EXTERN  CRT_FONT
+    EXTERN  generic_console_flags
 
     defc    DISPLAY=0x2400
     defc    CHAR_TABLE=0x2C00
@@ -33,7 +34,7 @@ generic_console_set_attribute:
 
 ; c = x
 ; b = y
-; a = character to print
+; a = d = character to print
 ; e = raw
 generic_console_printc:
     push    de
@@ -42,7 +43,10 @@ generic_console_printc:
     rr      e
     jr      c, is_raw
 	; In non-raw mode characters > 128 are udgs
-    res     7, a
+    res     7, d
+    ld      a, (generic_console_flags)
+    and     128
+    or      d
 is_raw:
     ld      (hl), a
     ret
@@ -56,6 +60,10 @@ is_raw:
 generic_console_vpeek:
     call    xypos
     ld      a, (hl)
+    and     127
+    cp      32
+    ret     nc
+    add     128
     and     a
     ret
 
