@@ -113,6 +113,28 @@ static inline int check_special_macro(char *name)
 int c99_compliant = 1;
 int c99_hosted = 1;
 
+static void define_static_macro(const char *name, const char *value)
+{
+	struct macro *m;
+
+#ifndef LOW_MEM
+	struct token t;
+#endif
+	m = new_macro();
+#ifdef LOW_MEM
+	m->cval.t = getmem(strlen(value) + 2);
+	m->cval.t[0] = NUMBER;
+	mmv(m->cval.t + 1, value, strlen(value) + 1);
+	m->cval.length = strlen(value) + 2;
+#else
+	t.type = NUMBER;
+	t.line = 0;
+	t.name = sdup(value);
+	aol(m->val.t, m->val.nt, t, TOKEN_LIST_MEMG);
+#endif
+	HTT_put(&macros, m, name);
+}
+
 /*
  * add the special macros to the macro table
  */
@@ -147,6 +169,9 @@ static void add_special_macros(void)
 #endif
 		HTT_put(&macros, m, "__STDC_VERSION__");
 	}
+
+	define_static_macro("__SIZEOF_SIZE_T__", "2");
+
 	if (c99_hosted) {
 #ifndef LOW_MEM
 		struct token t;

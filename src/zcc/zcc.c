@@ -382,6 +382,7 @@ static char  *c_altmathflags = NULL;        /* "-math-z88 -D__NATIVE_MATH__"; */
 static char  *c_startuplib = "z80_crt0";
 static char  *c_genmathlib = "genmath@{ZCC_LIBCPU}";
 static int    c_stylecpp = outspecified;
+static char  *c_swallow_mf = NULL;
 
 static char  *c_extension = NULL;
 static char  *c_assembler = NULL;
@@ -568,6 +569,9 @@ static option options[] = {
     { 0, "lstcwd", OPT_BOOL|OPT_DOUBLE_DASH,  "Paths in .lst files are relative to the current working dir" , &lstcwd, NULL, 0},
     { 0, "custom-copt-rules", OPT_STRING,  "Custom user copt rules" , &c_coptrules_user, NULL, 0},
     { 'M', NULL, OPT_BOOL|OPT_PRIVATE,  "Swallow -M option in configs" , &swallow_M, NULL, 0},
+    { 0, "MD", OPT_BOOL|OPT_PRIVATE,  "Ignore -MD" , &swallow_M, NULL, 0},
+    { 0, "MT", OPT_BOOL|OPT_PRIVATE,  "Ignore -MT" , &c_swallow_mf, NULL, 0},
+    { 0, "MF", OPT_STRING|OPT_PRIVATE,  "Ignore -MF" , &c_swallow_mf, NULL, 0},
     { 0, "vn", OPT_BOOL_FALSE|OPT_PRIVATE,  "Turn off command tracing" , &verbose, NULL, 0},
     { 0, "no-cleanup", OPT_BOOL_FALSE, "Don't cleanup temporary files", &cleanup, NULL, 0 },
     { 0, "", 0, NULL },
@@ -768,8 +772,8 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
     }
 
     if (verbose) {
-        printf("%s\n", buffer);
-        fflush(stdout);
+        fprintf(stderr, "%s\n", buffer);
+        fflush(stderr);
     }
 
     status = system(buffer);
