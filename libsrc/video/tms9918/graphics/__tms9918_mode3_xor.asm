@@ -40,7 +40,6 @@ __tms9918_mode3_xor:
 done_rotate:
     ld      c, a
     ld      a, (hl)
-    and     b
     xor     c
     ld      (hl), a
     jp      __tms9918_pix_return3
