@@ -28,15 +28,13 @@ __tms9918_mode3_xor:
 
     ld      a, (__tms9918_attribute)
     and     @11110000
-    ld      b, @00001111
     bit     0, c
     jr      z, done_rotate
     rrca
     rrca
     rrca
     rrca
-    and     b
-    ld      b, @11110000
+    and     @00001111
 done_rotate:
     ld      c, a
     ld      a, (hl)
