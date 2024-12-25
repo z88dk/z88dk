@@ -230,13 +230,17 @@ IF (startup=0 || startup=1)
 	IF TSE				; TSE Kernel
 		call	_tseForceYield	; Task-switch back to shell (can return...)
 		jp	start		; begin again if needed...
-	ENDIF				;
-	tiei:	ei			;
+	ELSE
+		ei			;
+		call	$50		; B_JUMP(_jforcecmdnochar)
+		DEFW      4027h;
+		ret			;
+        ENDIF
+
+        tiei:   ei
 	IF DEFINED_GRAYlib		;
 	cpygraph:
 	ENDIF				;
-		call	$50		; B_JUMP(_jforcecmdnochar)
-		DEFW      4027h;
 	tidi:	ret			;
 
 ENDIF
