@@ -1645,11 +1645,16 @@ int main(int argc, char **argv)
         case OBJFILE:
             break;
         default:
-            if (strcmp(filelist[i], original_filenames[i]) == 0)
-                fprintf(stderr, "Filetype of %s unrecognized\n", filelist[i]);
-            else
-                fprintf(stderr, "Filetype of %s (%s) unrecognized\n", filelist[i], original_filenames[i]);
-            exit(1);
+            {
+                struct stat sb;
+                if (stat(original_filenames[i], &sb) != 0) 
+                    fprintf(stderr, "File %s not found\n", filelist[i]);
+                else if (strcmp(filelist[i], original_filenames[i]) == 0)
+                    fprintf(stderr, "Filetype of %s unrecognized\n", filelist[i]);
+                 else
+                    fprintf(stderr, "Filetype of %s (%s) unrecognized\n", filelist[i], original_filenames[i]);
+                exit(1);
+            }
         }
     }
 
