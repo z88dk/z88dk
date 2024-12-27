@@ -41,6 +41,7 @@ static char             *app_name = NULL;
 
 // Command args
 static char             *binname         = NULL;
+static char             *crtfile         = NULL;
 static char             *outfile         = NULL;
 static char             *other_pages     = NULL;
 static char              help            =0;
@@ -56,6 +57,7 @@ option_t ti8xk_options[] = {
     { 'p', "other-pages", "A comma separated list of the pages without any spaces (ex main.o,page_1.o)", OPT_STR, &other_pages},
     { 'b', "binfile",  "Linked binary file",                OPT_STR,   &binname },
     { 'o', "output",   "Name of output file",               OPT_STR,   &outfile },
+    { 'c', "crt0file", "crt0 file used in linking",         OPT_STR,   &crtfile },
     {  0,  NULL,       NULL,                                OPT_NONE,  NULL }
 };
 
@@ -559,7 +561,7 @@ int ti8xk_exec(char *target)
 
 
     if (single_page) {
-        fp = fopen_bin(binname, NULL);
+        fp = fopen_bin(binname, crtfile);
         if (!fp)
             exit_log(1,"Failed to open input file: %s\n", binname);
         size = i = get_file_size(fp);
