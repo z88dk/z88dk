@@ -809,11 +809,8 @@
  lhlde                          ; ED
  lhlx                           ; ED
  lxi b, 0x1234                  ; 01 34 12
- lxi bc, 0x1234                 ; 01 34 12
  lxi d, 0x1234                  ; 11 34 12
- lxi de, 0x1234                 ; 11 34 12
  lxi h, 0x1234                  ; 21 34 12
- lxi hl, 0x1234                 ; 21 34 12
  lxi sp, 0x1234                 ; 31 34 12
  mov a, a                       ; 7F
  mov a, b                       ; 78
@@ -984,7 +981,7 @@
  r_c                            ; D8
  r_eq                           ; C8
  r_geu                          ; D0
- r_gtu                          ; CA 85 08 DA 85 08 C9
+ r_gtu                          ; CA 7C 08 DA 7C 08 C9
  r_leu                          ; C8 D8
  r_ltu                          ; D8
  r_m                            ; F8
@@ -1006,7 +1003,7 @@
  ret c                          ; D8
  ret eq                         ; C8
  ret geu                        ; D0
- ret gtu                        ; CA A2 08 DA A2 08 C9
+ ret gtu                        ; CA 99 08 DA 99 08 C9
  ret leu                        ; C8 D8
  ret ltu                        ; D8
  ret m                          ; F8
@@ -1020,7 +1017,7 @@
  ret v                          ; E8
  ret z                          ; C8
  rgeu                           ; D0
- rgtu                           ; CA B7 08 DA B7 08 C9
+ rgtu                           ; CA AE 08 DA AE 08 C9
  rim                            ; 20
  rl bc                          ; CD @__z80asm__rl_bc
  rl de                          ; 18

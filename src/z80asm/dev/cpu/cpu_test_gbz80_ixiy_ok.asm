@@ -747,11 +747,8 @@
  lhlde                          ; E5 D5 E1 D1 5E 23 56 2B E5 D5 E1 D1
  lhlx                           ; E5 D5 E1 D1 5E 23 56 2B E5 D5 E1 D1
  lxi b, 0x1234                  ; 01 34 12
- lxi bc, 0x1234                 ; 01 34 12
  lxi d, 0x1234                  ; 11 34 12
- lxi de, 0x1234                 ; 11 34 12
  lxi h, 0x1234                  ; 21 34 12
- lxi hl, 0x1234                 ; 21 34 12
  lxi sp, 0x1234                 ; 31 34 12
  mov a, a                       ; 7F
  mov a, b                       ; 78

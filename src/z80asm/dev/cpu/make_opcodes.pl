@@ -776,8 +776,7 @@ for my $cpu (@CPUS) {
 			add($cpu, "ld.lis $dd, %m", [0x49], [ld_dd_m($dd), '%m', '%m']);
 		}
 		
-		add($cpu, "lxi $dd, %m", [ld_dd_m($dd), '%m', '%m']);
-		add($cpu, "lxi $d, %m",	 [ld_dd_m($dd), '%m', '%m']) if $d ne $dd;
+		add($cpu, "lxi $d, %m",	 [ld_dd_m($dd), '%m', '%m']);
 		
 		if (($zilog || $rabbit || $kc160_any) && $dd eq 'hl') {
 			for my $x (qw( ix iy )) {

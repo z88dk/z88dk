@@ -2938,11 +2938,8 @@
  lirx                           ; ED B4
  lprx                           ; ED B7
  lxi b, 0x1234                  ; 01 34 12
- lxi bc, 0x1234                 ; 01 34 12
  lxi d, 0x1234                  ; 11 34 12
- lxi de, 0x1234                 ; 11 34 12
  lxi h, 0x1234                  ; 21 34 12
- lxi hl, 0x1234                 ; 21 34 12
  lxi sp, 0x1234                 ; 31 34 12
  mirr a                         ; ED 24
  mirror a                       ; ED 24
