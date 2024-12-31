@@ -2824,9 +2824,7 @@
  ld sp, iy                      ; DD F9
  lda 0x1234                     ; 3A 34 12
  ldax b                         ; 0A
- ldax bc                        ; 0A
  ldax d                         ; 1A
- ldax de                        ; 1A
  ldd                            ; ED A8
  ldd (bc), a                    ; 02 0B
  ldd (de), -128                 ; EB 36 80 EB 1B
@@ -5305,9 +5303,7 @@
  sta 0x1234                     ; 32 34 12
  stae                           ; ED 95
  stax b                         ; 02
- stax bc                        ; 02
  stax d                         ; 12
- stax de                        ; 12
  stc                            ; 37
  sub (hl)                       ; 96
  sub (hl+)                      ; 96 23

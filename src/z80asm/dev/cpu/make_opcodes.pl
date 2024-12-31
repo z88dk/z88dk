@@ -153,12 +153,10 @@ for my $cpu (@CPUS) {
 		
 		# LD A, (dd)
 		add_x($cpu, "ld a, ($dd)", [ld_a_idd($dd)]);
-		add($cpu, "ldax $dd", [ld_a_idd($dd)]);
 		add($cpu, "ldax $d", [ld_a_idd($dd)]);
 		
 		# LD (dd), A
 		add_x($cpu, "ld ($dd), a", [ld_idd_a($dd)]);
-		add($cpu, "stax $dd", [ld_idd_a($dd)]);
 		add($cpu, "stax $d", [ld_idd_a($dd)]);
 		
 		# LD a, (dd+) / LD a, (dd-)

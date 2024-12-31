@@ -2758,9 +2758,7 @@
  ld.sil (0x123456), a           ; 52 32 56 34 12
  ld.sil a, (0x123456)           ; 52 3A 56 34 12
  ldax b                         ; 0A
- ldax bc                        ; 0A
  ldax d                         ; 1A
- ldax de                        ; 1A
  ldd                            ; ED A8
  ldd (bc), a                    ; 02 0B
  ldd (de), -128                 ; EB 36 80 EB 1B
@@ -4545,9 +4543,7 @@
  srl.lis (iy+126)               ; 49 FD CB 7E 3E
  srl.lis (iy-128)               ; 49 FD CB 80 3E
  stax b                         ; 02
- stax bc                        ; 02
  stax d                         ; 12
- stax de                        ; 12
  stc                            ; 37
  stmix                          ; ED 7D
  sub (hl)                       ; 96

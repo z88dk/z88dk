@@ -667,9 +667,7 @@
  ld sp, hl                      ; F9
  lda 0x1234                     ; FA 34 12
  ldax b                         ; 0A
- ldax bc                        ; 0A
  ldax d                         ; 1A
- ldax de                        ; 1A
  ldd                            ; CD @__z80asm__ldd
  ldd (bc), a                    ; 02 0B
  ldd (de), a                    ; 12 1B
@@ -1211,9 +1209,7 @@
  srl l                          ; CB 3D
  sta 0x1234                     ; EA 34 12
  stax b                         ; 02
- stax bc                        ; 02
  stax d                         ; 12
- stax de                        ; 12
  stc                            ; 37
  stop                           ; 10 00
  sub (hl)                       ; 96

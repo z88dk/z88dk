@@ -2758,9 +2758,7 @@
  ld.sis sp, (0x1234)            ; 40 ED 7B 34 12
  ld.sis sp, 0x1234              ; 40 31 34 12
  ldax b                         ; 0A
- ldax bc                        ; 0A
  ldax d                         ; 1A
- ldax de                        ; 1A
  ldd                            ; ED A8
  ldd (bc), a                    ; 02 0B
  ldd (de), -128                 ; EB 36 80 EB 1B
@@ -4543,9 +4541,7 @@
  srl.sil (iy+126)               ; 52 FD CB 7E 3E
  srl.sil (iy-128)               ; 52 FD CB 80 3E
  stax b                         ; 02
- stax bc                        ; 02
  stax d                         ; 12
- stax de                        ; 12
  stc                            ; 37
  stmix                          ; ED 7D
  sub (hl)                       ; 96

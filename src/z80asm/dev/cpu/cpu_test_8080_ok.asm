@@ -696,9 +696,7 @@
  ld sp, hl                      ; F9
  lda 0x1234                     ; 3A 34 12
  ldax b                         ; 0A
- ldax bc                        ; 0A
  ldax d                         ; 1A
- ldax de                        ; 1A
  ldd                            ; CD @__z80asm__ldd
  ldd (bc), a                    ; 02 0B
  ldd (de), -128                 ; EB 36 80 EB 1B
@@ -968,7 +966,7 @@
  r_c                            ; D8
  r_eq                           ; C8
  r_geu                          ; D0
- r_gtu                          ; CA D6 08 DA D6 08 C9
+ r_gtu                          ; CA D4 08 DA D4 08 C9
  r_leu                          ; C8 D8
  r_ltu                          ; D8
  r_m                            ; F8
@@ -990,7 +988,7 @@
  ret c                          ; D8
  ret eq                         ; C8
  ret geu                        ; D0
- ret gtu                        ; CA F5 08 DA F5 08 C9
+ ret gtu                        ; CA F3 08 DA F3 08 C9
  ret leu                        ; C8 D8
  ret ltu                        ; D8
  ret m                          ; F8
@@ -1004,7 +1002,7 @@
  ret v                          ; E8
  ret z                          ; C8
  rgeu                           ; D0
- rgtu                           ; CA 0A 09 DA 0A 09 C9
+ rgtu                           ; CA 08 09 DA 08 09 C9
  rl bc                          ; CD @__z80asm__rl_bc
  rl de                          ; CD @__z80asm__rl_de
  rl hl                          ; CD @__z80asm__rl_hl
@@ -1102,9 +1100,7 @@
  sra hl                         ; CD @__z80asm__sra_hl
  sta 0x1234                     ; 32 34 12
  stax b                         ; 02
- stax bc                        ; 02
  stax d                         ; 12
- stax de                        ; 12
  stc                            ; 37
  sub (hl)                       ; 96
  sub (hl+)                      ; 96 23
