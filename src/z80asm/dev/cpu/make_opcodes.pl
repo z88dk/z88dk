@@ -1936,10 +1936,8 @@ for my $cpu (@CPUS) {
 	for my $dd (qw( bc de hl sp )) {
 		my $dd1 = ($dd eq 'sp') ? $dd : substr($dd,0,1);		# B, D, H
 		
-		add($cpu, "inx $dd",	[inc_dd($dd)]);
-		add($cpu, "inx $dd1",	[inc_dd($dd)]) if $dd ne $dd1;
-		add($cpu, "dcx $dd",	[dec_dd($dd)]);
-		add($cpu, "dcx $dd1",	[dec_dd($dd)]) if $dd ne $dd1;
+		add($cpu, "inx $dd1",	[inc_dd($dd)]);
+		add($cpu, "dcx $dd1",	[dec_dd($dd)]);
 	}
 
 	# OR

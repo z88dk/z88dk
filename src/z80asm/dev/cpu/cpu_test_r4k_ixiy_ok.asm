@@ -3143,11 +3143,8 @@
  dcr l                          ; 2D
  dcr m                          ; 35
  dcx b                          ; 0B
- dcx bc                         ; 0B
  dcx d                          ; 1B
- dcx de                         ; 1B
  dcx h                          ; 2B
- dcx hl                         ; 2B
  dcx sp                         ; 3B
  dec (hl)                       ; 35
  dec (hl+)                      ; 35 23
@@ -3279,11 +3276,8 @@
  inr l                          ; 2C
  inr m                          ; 34
  inx b                          ; 03
- inx bc                         ; 03
  inx d                          ; 13
- inx de                         ; 13
  inx h                          ; 23
- inx hl                         ; 23
  inx sp                         ; 33
  ioe adc (hl)                   ; DB 7F 8E
  ioe adc (hl+)                  ; DB 7F 8E 23

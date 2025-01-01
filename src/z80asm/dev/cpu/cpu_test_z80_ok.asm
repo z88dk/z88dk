@@ -558,11 +558,8 @@
  dcr l                          ; 2D
  dcr m                          ; 35
  dcx b                          ; 0B
- dcx bc                         ; 0B
  dcx d                          ; 1B
- dcx de                         ; 1B
  dcx h                          ; 2B
- dcx hl                         ; 2B
  dcx sp                         ; 3B
  dec (hl)                       ; 35
  dec (hl+)                      ; 35 23
@@ -680,16 +677,13 @@
  inr l                          ; 2C
  inr m                          ; 34
  inx b                          ; 03
- inx bc                         ; 03
  inx d                          ; 13
- inx de                         ; 13
  inx h                          ; 23
- inx hl                         ; 23
  inx sp                         ; 33
  j_c 0x1234                     ; DA 34 12
  j_eq 0x1234                    ; CA 34 12
  j_geu 0x1234                   ; D2 34 12
- j_gtu 0x1234                   ; CA A5 06 D2 34 12
+ j_gtu 0x1234                   ; CA 9F 06 D2 34 12
  j_leu 0x1234                   ; CA 34 12 DA 34 12
  j_ltu 0x1234                   ; DA 34 12
  j_m 0x1234                     ; FA 34 12
@@ -705,7 +699,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA DB 06 D2 34 12
+ jgtu 0x1234                    ; CA D5 06 D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jm 0x1234                      ; FA 34 12
@@ -718,7 +712,7 @@
  jmp c, 0x1234                  ; DA 34 12
  jmp eq, 0x1234                 ; CA 34 12
  jmp geu, 0x1234                ; D2 34 12
- jmp gtu, 0x1234                ; CA 02 07 D2 34 12
+ jmp gtu, 0x1234                ; CA FC 06 D2 34 12
  jmp leu, 0x1234                ; CA 34 12 DA 34 12
  jmp ltu, 0x1234                ; DA 34 12
  jmp m, 0x1234                  ; FA 34 12
@@ -744,7 +738,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA 50 07 D2 34 12
+ jp gtu, 0x1234                 ; CA 4A 07 D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp m, 0x1234                   ; FA 34 12
