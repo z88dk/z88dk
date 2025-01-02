@@ -51,6 +51,7 @@ is_raw:
     ld      (hl), a
     ret
 
+
 ;Entry: c = x,
 ;       b = y
 ;       e = rawmode
@@ -58,8 +59,12 @@ is_raw:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
+    ld      a,e
     call    xypos
+    rrca
     ld      a, (hl)
+    ccf
+    ret     nc
     and     127
     cp      32
     ret     nc
