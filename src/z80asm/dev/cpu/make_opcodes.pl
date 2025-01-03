@@ -2584,9 +2584,11 @@ for my $cpu (@CPUS) {
 	# JP
 	if ($ez80_z80) {
 		add($cpu, "jp %m",		[jp(), '%m', '%m']);
+		add($cpu, "jmp %m",		[jp(), '%m', '%m']);
 	}
 	elsif ($ez80_adl) {
 		add($cpu, "jp %m",		[jp(), '%m', '%m', '%m']);
+		add($cpu, "jmp %m",		[jp(), '%m', '%m', '%m']);
 	}
 	
 	if ($ez80_any) {
@@ -2595,6 +2597,7 @@ for my $cpu (@CPUS) {
 	}
 	else {
 		add($cpu, "jp %m",		[jp(), '%m', '%m']);
+		add($cpu, "jmp %m",		[jp(), '%m', '%m']);
 	}
 	
 	for my $_f (qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m 

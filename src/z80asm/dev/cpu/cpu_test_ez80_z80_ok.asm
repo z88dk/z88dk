@@ -1281,6 +1281,7 @@
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jm 0x1234                      ; FA 34 12
+ jmp 0x1234                     ; C3 34 12
  jnc 0x1234                     ; D2 34 12
  jne 0x1234                     ; C2 34 12
  jnv 0x1234                     ; E2 34 12
@@ -1294,7 +1295,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA C4 0F D2 34 12
+ jp gtu, 0x1234                 ; CA C7 0F D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp m, 0x1234                   ; FA 34 12
@@ -1314,7 +1315,7 @@
  jp.lil c, 0x123456             ; 5B DA 56 34 12
  jp.lil eq, 0x123456            ; 5B CA 56 34 12
  jp.lil geu, 0x123456           ; 5B D2 56 34 12
- jp.lil gtu, 0x123456           ; 5B CA 11 10 00 5B D2 56 34 12
+ jp.lil gtu, 0x123456           ; 5B CA 14 10 00 5B D2 56 34 12
  jp.lil leu, 0x123456           ; 5B CA 56 34 12 5B DA 56 34 12
  jp.lil ltu, 0x123456           ; 5B DA 56 34 12
  jp.lil m, 0x123456             ; 5B FA 56 34 12
@@ -1334,7 +1335,7 @@
  jp.sis c, 0x1234               ; 40 DA 34 12
  jp.sis eq, 0x1234              ; 40 CA 34 12
  jp.sis geu, 0x1234             ; 40 D2 34 12
- jp.sis gtu, 0x1234             ; 40 CA 72 10 40 D2 34 12
+ jp.sis gtu, 0x1234             ; 40 CA 75 10 40 D2 34 12
  jp.sis leu, 0x1234             ; 40 CA 34 12 40 DA 34 12
  jp.sis ltu, 0x1234             ; 40 DA 34 12
  jp.sis m, 0x1234               ; 40 FA 34 12

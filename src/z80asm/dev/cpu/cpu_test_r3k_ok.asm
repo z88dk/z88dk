@@ -5694,6 +5694,7 @@
  jltu 0x1234                    ; DA 34 12
  jlz 0x1234                     ; E2 34 12
  jm 0x1234                      ; FA 34 12
+ jmp 0x1234                     ; C3 34 12
  jnc 0x1234                     ; D2 34 12
  jne 0x1234                     ; C2 34 12
  jnv 0x1234                     ; E2 34 12
@@ -5707,7 +5708,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA D3 59 D2 34 12
+ jp gtu, 0x1234                 ; CA D6 59 D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp lo, 0x1234                  ; EA 34 12
  jp ltu, 0x1234                 ; DA 34 12

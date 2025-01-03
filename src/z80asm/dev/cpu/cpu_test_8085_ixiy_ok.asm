@@ -335,6 +335,7 @@
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jm 0x1234                      ; FA 34 12
+ jmp 0x1234                     ; C3 34 12
  jnc 0x1234                     ; D2 34 12
  jne 0x1234                     ; C2 34 12
  jnk 0x1234                     ; DD 34 12
@@ -348,7 +349,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA AD 02 D2 34 12
+ jp gtu, 0x1234                 ; CA B0 02 D2 34 12
  jp k,0x1234                    ; FD 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
@@ -369,7 +370,7 @@
  jr c, 0x1234                   ; DA 34 12
  jr eq, 0x1234                  ; CA 34 12
  jr geu, 0x1234                 ; D2 34 12
- jr gtu, 0x1234                 ; CA F2 02 D2 34 12
+ jr gtu, 0x1234                 ; CA F5 02 D2 34 12
  jr leu, 0x1234                 ; CA 34 12 DA 34 12
  jr ltu, 0x1234                 ; DA 34 12
  jr nc, 0x1234                  ; D2 34 12
@@ -921,7 +922,7 @@
  ret c                          ; D8
  ret eq                         ; C8
  ret geu                        ; D0
- ret gtu                        ; CA B8 07 DA B8 07 C9
+ ret gtu                        ; CA BB 07 DA BB 07 C9
  ret leu                        ; C8 D8
  ret ltu                        ; D8
  ret m                          ; F8
@@ -935,7 +936,7 @@
  ret v                          ; E8
  ret z                          ; C8
  rgeu                           ; D0
- rgtu                           ; CA CD 07 DA CD 07 C9
+ rgtu                           ; CA D0 07 DA D0 07 C9
  rim                            ; 20
  rl bc                          ; CD @__z80asm__rl_bc
  rl de                          ; 18
