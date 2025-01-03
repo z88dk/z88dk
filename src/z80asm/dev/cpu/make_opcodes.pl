@@ -2582,21 +2582,19 @@ for my $cpu (@CPUS) {
 	}
 	
 	# JP
-	for my $jump ('jmp', 'jp') {
-		if ($ez80_z80) {
-			add($cpu, "$jump %m",		[jp(), '%m', '%m']);
-		}
-		elsif ($ez80_adl) {
-			add($cpu, "$jump %m",		[jp(), '%m', '%m', '%m']);
-		}
-		
-		if ($ez80_any) {
-			add($cpu, "$jump.sis %m",	[0x40], [jp(), '%m', '%m']);
-			add($cpu, "$jump.lil %m",	[0x5B], [jp(), '%m', '%m', '%m']);
-		}
-		else {
-			add($cpu, "$jump %m",		[jp(), '%m', '%m']);
-		}
+	if ($ez80_z80) {
+		add($cpu, "jp %m",		[jp(), '%m', '%m']);
+	}
+	elsif ($ez80_adl) {
+		add($cpu, "jp %m",		[jp(), '%m', '%m', '%m']);
+	}
+	
+	if ($ez80_any) {
+		add($cpu, "jp.sis %m",	[0x40], [jp(), '%m', '%m']);
+		add($cpu, "jp.lil %m",	[0x5B], [jp(), '%m', '%m', '%m']);
+	}
+	else {
+		add($cpu, "jp %m",		[jp(), '%m', '%m']);
 	}
 	
 	for my $_f (qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m 
@@ -2608,74 +2606,72 @@ for my $cpu (@CPUS) {
 		next if $f !~ /^(nz|z|nc|c|eq|ne|geu|ltu|gtu|leu)$/ && $gameboy;
 		
 		# TODO: Rabbit LJP not supported
-		for my $jump ('jmp', 'jp') {
-			if ($ez80_z80) {
-				if ($f eq 'gtu') {
-					add($cpu, "$jump $f, %m",	[jp_f('_eq'),  '%t', '%t'],
-												[jp_f('_geu'), '%m', '%m']);
-				}
-				elsif ($f eq 'leu') {
-					add($cpu, "$jump $f, %m",	[jp_f('_eq'),  '%m', '%m'],
-												[jp_f('_ltu'), '%m', '%m']);
-				}
-				else {
-					add($cpu, "$jump $f, %m",	[jp_f($_f), '%m', '%m']);
-				}
+		if ($ez80_z80) {
+			if ($f eq 'gtu') {
+				add($cpu, "jp $f, %m",	[jp_f('_eq'),  '%t', '%t'],
+										[jp_f('_geu'), '%m', '%m']);
 			}
-			elsif ($ez80_adl) {
-				if ($f eq 'gtu') {
-					add($cpu, "$jump $f, %m",	[jp_f('_eq'),  '%t', '%t', '%t'],
-												[jp_f('_geu'), '%m', '%m', '%m']);
-				}
-				elsif ($f eq 'leu') {
-					add($cpu, "$jump $f, %m",	[jp_f('_eq'),  '%m', '%m', '%m'],
-												[jp_f('_ltu'), '%m', '%m', '%m']);
-				}
-				else {
-					add($cpu, "$jump $f, %m",	[jp_f($_f), '%m', '%m', '%m']);
-				}
-			}
-			
-			if ($ez80_any) {
-				if ($f eq 'gtu') {
-					add($cpu, "$jump.sis $f, %m",	[0x40], [jp_f('_eq'),  '%t', '%t'],
-													[0x40], [jp_f('_geu'), '%m', '%m']);
-				}
-				elsif ($f eq 'leu') {
-					add($cpu, "$jump.sis $f, %m",	[0x40], [jp_f('_eq'),  '%m', '%m'],
-													[0x40], [jp_f('_ltu'), '%m', '%m']);
-				}
-				else {
-					add($cpu, "$jump.sis $f, %m",	[0x40], [jp_f($_f), '%m', '%m']);
-				}
-			
-				if ($f eq 'gtu') {
-					add($cpu, "$jump.lil $f, %m",	[0x5B], [jp_f('_eq'),  '%t', '%t', '%t'],
-													[0x5B], [jp_f('_geu'), '%m', '%m', '%m']);
-				}
-				elsif ($f eq 'leu') {
-					add($cpu, "$jump.lil $f, %m",	[0x5B], [jp_f('_eq'),  '%m', '%m', '%m'],
-													[0x5B], [jp_f('_ltu'), '%m', '%m', '%m']);
-				}
-				else {
-					add($cpu, "$jump.lil $f, %m",	[0x5B], [jp_f($_f), '%m', '%m', '%m']);
-				}
+			elsif ($f eq 'leu') {
+				add($cpu, "jp $f, %m",	[jp_f('_eq'),  '%m', '%m'],
+										[jp_f('_ltu'), '%m', '%m']);
 			}
 			else {
-				if ($f eq 'gtu') {
-					add($cpu, "$jump $f, %m",	[jp_f('_eq'),  '%t', '%t'],
-												[jp_f('_geu'), '%m', '%m']);
-				}
-				elsif ($f eq 'leu') {
-					add($cpu, "$jump $f, %m",	[jp_f('_eq'),  '%m', '%m'],
-												[jp_f('_ltu'), '%m', '%m']);
-				}
-				else {
-					add($cpu, "$jump $f, %m",	[jp_f($_f), '%m', '%m']);
-				}
+				add($cpu, "jp $f, %m",	[jp_f($_f), '%m', '%m']);
+			}
+		}
+		elsif ($ez80_adl) {
+			if ($f eq 'gtu') {
+				add($cpu, "jp $f, %m",	[jp_f('_eq'),  '%t', '%t', '%t'],
+										[jp_f('_geu'), '%m', '%m', '%m']);
+			}
+			elsif ($f eq 'leu') {
+				add($cpu, "jp $f, %m",	[jp_f('_eq'),  '%m', '%m', '%m'],
+										[jp_f('_ltu'), '%m', '%m', '%m']);
+			}
+			else {
+				add($cpu, "jp $f, %m",	[jp_f($_f), '%m', '%m', '%m']);
 			}
 		}
 		
+		if ($ez80_any) {
+			if ($f eq 'gtu') {
+				add($cpu, "jp.sis $f, %m",	[0x40], [jp_f('_eq'),  '%t', '%t'],
+											[0x40], [jp_f('_geu'), '%m', '%m']);
+			}
+			elsif ($f eq 'leu') {
+				add($cpu, "jp.sis $f, %m",	[0x40], [jp_f('_eq'),  '%m', '%m'],
+											[0x40], [jp_f('_ltu'), '%m', '%m']);
+			}
+			else {
+				add($cpu, "jp.sis $f, %m",	[0x40], [jp_f($_f), '%m', '%m']);
+			}
+		
+			if ($f eq 'gtu') {
+				add($cpu, "jp.lil $f, %m",	[0x5B], [jp_f('_eq'),  '%t', '%t', '%t'],
+											[0x5B], [jp_f('_geu'), '%m', '%m', '%m']);
+			}
+			elsif ($f eq 'leu') {
+				add($cpu, "jp.lil $f, %m",	[0x5B], [jp_f('_eq'),  '%m', '%m', '%m'],
+											[0x5B], [jp_f('_ltu'), '%m', '%m', '%m']);
+			}
+			else {
+				add($cpu, "jp.lil $f, %m",	[0x5B], [jp_f($_f), '%m', '%m', '%m']);
+			}
+		}
+		else {
+			if ($f eq 'gtu') {
+				add($cpu, "jp $f, %m",		[jp_f('_eq'),  '%t', '%t'],
+											[jp_f('_geu'), '%m', '%m']);
+			}
+			elsif ($f eq 'leu') {
+				add($cpu, "jp $f, %m",		[jp_f('_eq'),  '%m', '%m'],
+											[jp_f('_ltu'), '%m', '%m']);
+			}
+			else {
+				add($cpu, "jp $f, %m",		[jp_f($_f), '%m', '%m']);
+			}
+		}
+
 		if ($f ne 'p') {
 			if ($f eq 'gtu') {
 				add($cpu, "j$f %m",	[jp_f('_eq'),  '%t', '%t'],
@@ -2689,62 +2685,40 @@ for my $cpu (@CPUS) {
 				add($cpu, "j$f %m",	[jp_f($_f), '%m', '%m']);
 			}
 		}
-
-		if ($f eq 'gtu') {
-			add($cpu, "j_$f %m",	[jp_f('_eq'),  '%t', '%t'],
-									[jp_f('_geu'), '%m', '%m']);
-		}
-		elsif ($f eq 'leu') {
-			add($cpu, "j_$f %m",	[jp_f('_eq'),  '%m', '%m'],
-									[jp_f('_ltu'), '%m', '%m']);
-		}
-		else {
-			add($cpu, "j_$f %m",	[jp_f($_f), '%m', '%m']);
-		}
 	}
 	
 	if ($r4k || $r5k) {
 		for ([gt=>0xA2], [lt=>0xB2], [gtu=>0xAA], [v=>0xBA]) {
 			my($f, $opc) = @$_;
-			for my $instr ("jp $f,", "jmp $f,", "j$f", "j_$f") {
-				add($cpu, "$instr %m",	[$opc, '%m', '%m']);
-			}
+			add($cpu, "jp $f, %m",	[$opc, '%m', '%m']);
+			add($cpu, "j$f %m",		[$opc, '%m', '%m']);
 		}
 	}
     
-	for my $jump ('jmp', 'jp') {
-		add_suf($cpu, "$jump (hl)",	[0xE9]);
-	}
+
+	add_suf($cpu, "jp (hl)",		[0xE9]);
 	add($cpu, "pchl",				[0xE9]);
 	
 	if (!$intel && !$gameboy) {
-		for my $jump ('jmp', 'jp') {
-			for my $x (qw( ix iy )) {
-				add_suf($cpu, "$jump ($x)", [$V{$x}, 0xE9]);
-			}
+		for my $x (qw( ix iy )) {
+			add_suf($cpu, "jp ($x)", [$V{$x}, 0xE9]);
 		}
 	} 
 
 	if ($kc160_ext) {
-		for my $jump ('jmp', 'jp') {
 			for my $p (qw( x y a p z )) {
-				add($cpu, "$jump (${p}hl)", [$V{"const1_$p"}], [0xE9]);
+				add($cpu, "jp (${p}hl)", [$V{"const1_$p"}], [0xE9]);
 				for my $x (qw( ix iy )) {
-					add($cpu, "$jump (${p}${x})", [$V{"const1_$p"}], [$V{$x}, 0xE9]);
+					add($cpu, "jp (${p}${x})", [$V{"const1_$p"}], [$V{$x}, 0xE9]);
 				}				
 			}
-		}			
 	}
 	
-	for my $jump ('jmp', 'jp') {
-		add($cpu, "$jump (bc)", [push_dd('bc')], [ret()]);
-		add($cpu, "$jump (de)", [push_dd('de')], [ret()]);
-	}
+	add($cpu, "jp (bc)", [push_dd('bc')], [ret()]);
+	add($cpu, "jp (de)", [push_dd('de')], [ret()]);
 	
 	if ($z80n) {
-		for my $jump ('jmp', 'jp') {
-			add($cpu, "$jump (c)",			[0xED, 0x98]);
-		}
+		add($cpu, "jp (c)",			[0xED, 0x98]);
 	}
     
 	# JP3
@@ -2817,27 +2791,27 @@ for my $cpu (@CPUS) {
 		# TODO: Rabbit LCALL, LRET not supported
 		if ($rabbit) {
 			if ($f =~ /^(nz|z|nc|c|ne|eq|geu|ltu)$/) {
-				for my $call ("call $f,", "c$f", "c_$f") {
+				for my $call ("call $f,", "c$f") {
 					add($cpu, "$call %m",	[jr_f($_inv_f), '%t'],	# jump !flag
 											[call(), '%m', '%m']);	# call 
 				}
 			}		
 			elsif ($f eq 'gtu') {
-				for my $call ("call $f,", "c$f", "c_$f") {
+				for my $call ("call $f,", "c$f") {
 					add($cpu, "$call %m",	[jr_f('_eq'),  '%t'],
 											[jr_f('_ltu'), '%t'],
 											[call(), '%m', '%m']);
 				}			
 			}
 			elsif ($f eq 'leu') {
-				for my $call ("call $f,", "c$f", "c_$f") {
+				for my $call ("call $f,", "c$f") {
 					add($cpu, "$call %m",	[jr_f('_eq'),  '%t3'],
 											[jr_f('_geu'), '%t'],
 											[call(), '%m', '%m']);
 				}
 			}
 			else {
-				for my $call ("call $f,", "c$f", "c_$f") {
+				for my $call ("call $f,", "c$f") {
 					next if $call eq "cp";
 					add($cpu, "$call %m",	[jp_f($_inv_f), '%t', '%t'], # jump !flag
 											[call(), '%m', '%m']);		 # call 
@@ -2847,7 +2821,7 @@ for my $cpu (@CPUS) {
 		elsif ($ez80_any) {
 			if ($ez80_z80) {
 				if ($f eq 'gtu') {
-					for my $call ("call $f,", "c$f", "c_$f") {
+					for my $call ("call $f,", "c$f") {
 						add($cpu, "$call %m",		[jr_f('_eq'),  '%t'],
 													[jr_f('_ltu'), '%t'],
 													[call(), '%m', '%m']);
@@ -2869,7 +2843,7 @@ for my $cpu (@CPUS) {
 											
 				}
 				elsif ($f eq 'leu') {
-					for my $call ("call $f,", "c$f", "c_$f") {
+					for my $call ("call $f,", "c$f") {
 						add($cpu, "$call %m",		[jr_f('_eq'),  '%t3'],
 													[jr_f('_geu'), '%t'],
 													[call(), '%m', '%m']);
@@ -2889,7 +2863,7 @@ for my $cpu (@CPUS) {
 													[0x52], [call(), '%m', '%m', '%m']);
 				}
 				else {
-					for my $call ("call $f,", "c$f", "c_$f") {
+					for my $call ("call $f,", "c$f") {
 						next if $call eq "cp";
 						add($cpu, "$call %m",	[call_f($_f), '%m', '%m']);
 					}
@@ -2902,7 +2876,7 @@ for my $cpu (@CPUS) {
 			}
 			elsif ($ez80_adl) {
 				if ($f eq 'gtu') {
-					for my $call ("call $f,", "c$f", "c_$f") {
+					for my $call ("call $f,", "c$f") {
 						add($cpu, "$call %m",		[jr_f('_eq'),  '%t'],
 													[jr_f('_ltu'), '%t'],
 													[call(), '%m', '%m', '%m']);
@@ -2922,7 +2896,7 @@ for my $cpu (@CPUS) {
 													[0x5B], [call(), '%m', '%m', '%m']);
 				}
 				elsif ($f eq 'leu') {
-					for my $call ("call $f,", "c$f", "c_$f") {
+					for my $call ("call $f,", "c$f") {
 						add($cpu, "$call %m",		[jr_f('_eq'),  '%t4'],
 													[jr_f('_geu'), '%t'],
 													[call(), '%m', '%m', '%m']);
@@ -2942,7 +2916,7 @@ for my $cpu (@CPUS) {
 													[0x5B], [call(), '%m', '%m', '%m']);
 				}
 				else {
-					for my $call ("call $f,", "c$f", "c_$f") {
+					for my $call ("call $f,", "c$f") {
 						next if $call eq "cp";
 						add($cpu, "$call %m",	[call_f($_f), '%m', '%m', '%m']);
 					}
@@ -2956,21 +2930,21 @@ for my $cpu (@CPUS) {
 		}
 		elsif ($intel) {
 			if ($f eq 'gtu') {
-				for my $call ("call $f,", "c$f", "c_$f") {
+				for my $call ("call $f,", "c$f") {
 					add($cpu, "$call %m",	[jp_f('_eq'),  '%t', '%t'],
 											[jp_f('_ltu'), '%t', '%t'],
 											[call(), '%m', '%m']);
 				}			
 			}
 			elsif ($f eq 'leu') {
-				for my $call ("call $f,", "c$f", "c_$f") {
+				for my $call ("call $f,", "c$f") {
 					add($cpu, "$call %m",	[jp_f('_eq'),  '%t3', '%t3'],
 											[jp_f('_geu'), '%t',  '%t'],
 											[call(), '%m', '%m']);
 				}
 			}
 			else {
-				for my $call ("call $f,", "c$f", "c_$f") {
+				for my $call ("call $f,", "c$f") {
 					next if $call eq "cp";
 					add($cpu, "$call %m",	[call_f($_f), '%m', '%m']);
 				}
@@ -2978,21 +2952,21 @@ for my $cpu (@CPUS) {
 		}
 		else {
 			if ($f eq 'gtu') {
-				for my $call ("call $f,", "c$f", "c_$f") {
+				for my $call ("call $f,", "c$f") {
 					add($cpu, "$call %m",	[jr_f('_eq'),  '%t'],
 											[jr_f('_ltu'), '%t'],
 											[call(), '%m', '%m']);
 				}			
 			}
 			elsif ($f eq 'leu') {
-				for my $call ("call $f,", "c$f", "c_$f") {
+				for my $call ("call $f,", "c$f") {
 					add($cpu, "$call %m",	[jr_f('_eq'),  '%t3'],
 											[jr_f('_geu'), '%t'],
 											[call(), '%m', '%m']);
 				}
 			}
 			else {
-				for my $call ("call $f,", "c$f", "c_$f") {
+				for my $call ("call $f,", "c$f") {
 					next if $call eq "cp";
 					add($cpu, "$call %m",	[call_f($_f), '%m', '%m']);
 				}
@@ -3029,40 +3003,40 @@ for my $cpu (@CPUS) {
 		
 		if ($intel) {
 			if ($f eq 'gtu') {
-				for my $ret ("ret $f", "r$f", "r_$f") {
+				for my $ret ("ret $f", "r$f") {
 					add($cpu, "$ret",		[jp_f('_eq'),  '%t', '%t'],
 											[jp_f('_ltu'), '%t', '%t'],
 											[ret()]);
 				}
 			}
 			elsif ($f eq 'leu') {
-				for my $ret ("ret $f", "r$f", "r_$f") {
+				for my $ret ("ret $f", "r$f") {
 					add($cpu, "$ret",		[ret_f('_eq')],
 											[ret_f('_ltu')]);
 				}
 			}
 			else {
-				for my $ret ("ret $f", "r$f", "r_$f") {
+				for my $ret ("ret $f", "r$f") {
 					add($cpu, "$ret",		[ret_f($_f)]);
 				}
 			}
 		}
 		else {
 			if ($f eq 'gtu') {
-				for my $ret ("ret $f", "r$f", "r_$f") {
+				for my $ret ("ret $f", "r$f") {
 					add($cpu, "$ret",		[jr_f('_eq'),  '%t'],
 											[jr_f('_ltu'), '%t'],
 											[ret()]);
 				}
 			}
 			elsif ($f eq 'leu') {
-				for my $ret ("ret $f", "r$f", "r_$f") {
+				for my $ret ("ret $f", "r$f") {
 					add($cpu, "$ret",		[ret_f('_eq')],
 											[ret_f('_ltu')]);
 				}
 			}
 			else {
-				for my $ret ("ret $f", "r$f", "r_$f") {
+				for my $ret ("ret $f", "r$f") {
 					add($cpu, "$ret",		[ret_f($_f)]);
 				}
 			}
@@ -3123,18 +3097,12 @@ for my $cpu (@CPUS) {
 
 		# Jump on flag X5/K is set
 		add($cpu, "jx5 %m",		[0xFD, '%m', '%m']);
-		add($cpu, "jp x5,%m",	[0xFD, '%m', '%m']);
-		add($cpu, "jmp x5,%m",	[0xFD, '%m', '%m']);
 		add($cpu, "jk %m",		[0xFD, '%m', '%m']);
 		add($cpu, "jp k,%m",	[0xFD, '%m', '%m']);
-		add($cpu, "jmp k,%m",	[0xFD, '%m', '%m']);
 
 		add($cpu, "jnx5 %m",	[0xDD, '%m', '%m']);
-		add($cpu, "jp nx5,%m",	[0xDD, '%m', '%m']);
-		add($cpu, "jmp nx5,%m",	[0xDD, '%m', '%m']);
 		add($cpu, "jnk %m",		[0xDD, '%m', '%m']);
 		add($cpu, "jp nk,%m",	[0xDD, '%m', '%m']);
-		add($cpu, "jmp nk,%m",	[0xDD, '%m', '%m']);
 	}
 
 	#--------------------------------------------------------------------------

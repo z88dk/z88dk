@@ -3930,8 +3930,6 @@
  bsra de, b                     ; Error
  bsrf de, b                     ; Error
  bsrl de, b                     ; Error
- c_lo 0x1234                    ; Error
- c_lz 0x1234                    ; Error
  call lo, 0x1234                ; Error
  call lz, 0x1234                ; Error
  call.sil 0x123456              ; Error
@@ -7938,45 +7936,11 @@
  ipset 2                        ; Error
  ipset 3                        ; Error
  ipset 4                        ; Error
- j_gt 0x1234                    ; Error
- j_lo 0x1234                    ; Error
- j_lt 0x1234                    ; Error
- j_lz 0x1234                    ; Error
  jgt 0x1234                     ; Error
  jk 0x1234                      ; Error
  jlo 0x1234                     ; Error
  jlt 0x1234                     ; Error
  jlz 0x1234                     ; Error
- jmp (ahl)                      ; Error
- jmp (aix)                      ; Error
- jmp (aiy)                      ; Error
- jmp (c)                        ; Error
- jmp (phl)                      ; Error
- jmp (pix)                      ; Error
- jmp (piy)                      ; Error
- jmp (xhl)                      ; Error
- jmp (xix)                      ; Error
- jmp (xiy)                      ; Error
- jmp (yhl)                      ; Error
- jmp (yix)                      ; Error
- jmp (yiy)                      ; Error
- jmp (zhl)                      ; Error
- jmp (zix)                      ; Error
- jmp (ziy)                      ; Error
- jmp gt, 0x1234                 ; Error
- jmp k,0x1234                   ; Error
- jmp lo, 0x1234                 ; Error
- jmp lt, 0x1234                 ; Error
- jmp lz, 0x1234                 ; Error
- jmp nk,0x1234                  ; Error
- jmp nx5,0x1234                 ; Error
- jmp x5,0x1234                  ; Error
- jmp.l (hl)                     ; Error
- jmp.l (ix)                     ; Error
- jmp.l (iy)                     ; Error
- jmp.lis (hl)                   ; Error
- jmp.lis (ix)                   ; Error
- jmp.lis (iy)                   ; Error
  jnk 0x1234                     ; Error
  jnx5 0x1234                    ; Error
  jp (ahl)                       ; Error
@@ -8001,8 +7965,6 @@
  jp lt, 0x1234                  ; Error
  jp lz, 0x1234                  ; Error
  jp nk,0x1234                   ; Error
- jp nx5,0x1234                  ; Error
- jp x5,0x1234                   ; Error
  jp.l (hl)                      ; Error
  jp.l (ix)                      ; Error
  jp.l (iy)                      ; Error
@@ -14307,8 +14269,6 @@
  push.lis iy                    ; Error
  pxad                           ; Error
  pxdn                           ; Error
- r_lo                           ; Error
- r_lz                           ; Error
  rdmode                         ; Error
  res -1, (ahl)                  ; Error
  res -1, (aix)                  ; Error

@@ -38,7 +38,7 @@ sub test_cond {
 		for my $a ($b-1, $b, $b+1) {
 
 			# test jump
-			for my $jump ("jr $flag,", "jp $flag,", "j$flag", "j_$flag") {
+			for my $jump ("jr $flag,", "jp $flag,", "j$flag") {
 				$ticks->add(<<END, L=>$func->($a, $b));
 							ld l, -1
 							
@@ -55,7 +55,7 @@ END
 			}
 			
 			# test call
-			for my $call ("call $flag,", "c$flag", "c_$flag") {
+			for my $call ("call $flag,", "c$flag") {
 				$ticks->add(<<END, L=>$func->($a, $b));
 							ld l, 0
 							
@@ -72,7 +72,7 @@ END
 			}
 			
 			# test ret
-			for my $ret ("ret $flag", "r$flag", "r_$flag") {
+			for my $ret ("ret $flag", "r$flag") {
 				$ticks->add(<<END, L=>$func->($a, $b));
 							ld l, 0
 							

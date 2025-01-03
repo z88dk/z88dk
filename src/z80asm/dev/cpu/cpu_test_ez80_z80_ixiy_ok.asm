@@ -655,22 +655,6 @@
  bool hl                        ; F5 7C B5 28 03 21 01 00 F1
  bool ix                        ; F5 FD 7C FD B5 28 04 FD 21 01 00 F1
  bool iy                        ; F5 DD 7C DD B5 28 04 DD 21 01 00 F1
- c_c 0x1234                     ; DC 34 12
- c_eq 0x1234                    ; CC 34 12
- c_geu 0x1234                   ; D4 34 12
- c_gtu 0x1234                   ; 28 05 38 03 CD 34 12
- c_leu 0x1234                   ; 28 02 30 03 CD 34 12
- c_ltu 0x1234                   ; DC 34 12
- c_m 0x1234                     ; FC 34 12
- c_nc 0x1234                    ; D4 34 12
- c_ne 0x1234                    ; C4 34 12
- c_nv 0x1234                    ; E4 34 12
- c_nz 0x1234                    ; C4 34 12
- c_p 0x1234                     ; F4 34 12
- c_pe 0x1234                    ; EC 34 12
- c_po 0x1234                    ; E4 34 12
- c_v 0x1234                     ; EC 34 12
- c_z 0x1234                     ; CC 34 12
  call (hl)                      ; CD @__z80asm__call_hl
  call (ix)                      ; CD @__z80asm__call_iy
  call (iy)                      ; CD @__z80asm__call_ix
@@ -1290,91 +1274,13 @@
  inx d                          ; 13
  inx h                          ; 23
  inx sp                         ; 33
- j_c 0x1234                     ; DA 34 12
- j_eq 0x1234                    ; CA 34 12
- j_geu 0x1234                   ; D2 34 12
- j_gtu 0x1234                   ; CA C9 0F D2 34 12
- j_leu 0x1234                   ; CA 34 12 DA 34 12
- j_ltu 0x1234                   ; DA 34 12
- j_m 0x1234                     ; FA 34 12
- j_nc 0x1234                    ; D2 34 12
- j_ne 0x1234                    ; C2 34 12
- j_nv 0x1234                    ; E2 34 12
- j_nz 0x1234                    ; C2 34 12
- j_p 0x1234                     ; F2 34 12
- j_pe 0x1234                    ; EA 34 12
- j_po 0x1234                    ; E2 34 12
- j_v 0x1234                     ; EA 34 12
- j_z 0x1234                     ; CA 34 12
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA FF 0F D2 34 12
+ jgtu 0x1234                    ; CA 91 0F D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jm 0x1234                      ; FA 34 12
- jmp (bc)                       ; C5 C9
- jmp (de)                       ; D5 C9
- jmp (hl)                       ; E9
- jmp (ix)                       ; FD E9
- jmp (iy)                       ; DD E9
- jmp 0x1234                     ; C3 34 12
- jmp c, 0x1234                  ; DA 34 12
- jmp eq, 0x1234                 ; CA 34 12
- jmp geu, 0x1234                ; D2 34 12
- jmp gtu, 0x1234                ; CA 26 10 D2 34 12
- jmp leu, 0x1234                ; CA 34 12 DA 34 12
- jmp ltu, 0x1234                ; DA 34 12
- jmp m, 0x1234                  ; FA 34 12
- jmp nc, 0x1234                 ; D2 34 12
- jmp ne, 0x1234                 ; C2 34 12
- jmp nv, 0x1234                 ; E2 34 12
- jmp nz, 0x1234                 ; C2 34 12
- jmp p, 0x1234                  ; F2 34 12
- jmp pe, 0x1234                 ; EA 34 12
- jmp po, 0x1234                 ; E2 34 12
- jmp v, 0x1234                  ; EA 34 12
- jmp z, 0x1234                  ; CA 34 12
- jmp.l (hl)                     ; 49 E9
- jmp.l (ix)                     ; 49 FD E9
- jmp.l (iy)                     ; 49 DD E9
- jmp.lil 0x123456               ; 5B C3 56 34 12
- jmp.lil c, 0x123456            ; 5B DA 56 34 12
- jmp.lil eq, 0x123456           ; 5B CA 56 34 12
- jmp.lil geu, 0x123456          ; 5B D2 56 34 12
- jmp.lil gtu, 0x123456          ; 5B CA 73 10 00 5B D2 56 34 12
- jmp.lil leu, 0x123456          ; 5B CA 56 34 12 5B DA 56 34 12
- jmp.lil ltu, 0x123456          ; 5B DA 56 34 12
- jmp.lil m, 0x123456            ; 5B FA 56 34 12
- jmp.lil nc, 0x123456           ; 5B D2 56 34 12
- jmp.lil ne, 0x123456           ; 5B C2 56 34 12
- jmp.lil nv, 0x123456           ; 5B E2 56 34 12
- jmp.lil nz, 0x123456           ; 5B C2 56 34 12
- jmp.lil p, 0x123456            ; 5B F2 56 34 12
- jmp.lil pe, 0x123456           ; 5B EA 56 34 12
- jmp.lil po, 0x123456           ; 5B E2 56 34 12
- jmp.lil v, 0x123456            ; 5B EA 56 34 12
- jmp.lil z, 0x123456            ; 5B CA 56 34 12
- jmp.lis (hl)                   ; 49 E9
- jmp.lis (ix)                   ; 49 FD E9
- jmp.lis (iy)                   ; 49 DD E9
- jmp.sis 0x1234                 ; 40 C3 34 12
- jmp.sis c, 0x1234              ; 40 DA 34 12
- jmp.sis eq, 0x1234             ; 40 CA 34 12
- jmp.sis geu, 0x1234            ; 40 D2 34 12
- jmp.sis gtu, 0x1234            ; 40 CA D4 10 40 D2 34 12
- jmp.sis leu, 0x1234            ; 40 CA 34 12 40 DA 34 12
- jmp.sis ltu, 0x1234            ; 40 DA 34 12
- jmp.sis m, 0x1234              ; 40 FA 34 12
- jmp.sis nc, 0x1234             ; 40 D2 34 12
- jmp.sis ne, 0x1234             ; 40 C2 34 12
- jmp.sis nv, 0x1234             ; 40 E2 34 12
- jmp.sis nz, 0x1234             ; 40 C2 34 12
- jmp.sis p, 0x1234              ; 40 F2 34 12
- jmp.sis pe, 0x1234             ; 40 EA 34 12
- jmp.sis po, 0x1234             ; 40 E2 34 12
- jmp.sis v, 0x1234              ; 40 EA 34 12
- jmp.sis z, 0x1234              ; 40 CA 34 12
  jnc 0x1234                     ; D2 34 12
  jne 0x1234                     ; C2 34 12
  jnv 0x1234                     ; E2 34 12
@@ -1388,7 +1294,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA 2F 11 D2 34 12
+ jp gtu, 0x1234                 ; CA C4 0F D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp m, 0x1234                   ; FA 34 12
@@ -1408,7 +1314,7 @@
  jp.lil c, 0x123456             ; 5B DA 56 34 12
  jp.lil eq, 0x123456            ; 5B CA 56 34 12
  jp.lil geu, 0x123456           ; 5B D2 56 34 12
- jp.lil gtu, 0x123456           ; 5B CA 7C 11 00 5B D2 56 34 12
+ jp.lil gtu, 0x123456           ; 5B CA 11 10 00 5B D2 56 34 12
  jp.lil leu, 0x123456           ; 5B CA 56 34 12 5B DA 56 34 12
  jp.lil ltu, 0x123456           ; 5B DA 56 34 12
  jp.lil m, 0x123456             ; 5B FA 56 34 12
@@ -1428,7 +1334,7 @@
  jp.sis c, 0x1234               ; 40 DA 34 12
  jp.sis eq, 0x1234              ; 40 CA 34 12
  jp.sis geu, 0x1234             ; 40 D2 34 12
- jp.sis gtu, 0x1234             ; 40 CA DD 11 40 D2 34 12
+ jp.sis gtu, 0x1234             ; 40 CA 72 10 40 D2 34 12
  jp.sis leu, 0x1234             ; 40 CA 34 12 40 DA 34 12
  jp.sis ltu, 0x1234             ; 40 DA 34 12
  jp.sis m, 0x1234               ; 40 FA 34 12
@@ -3471,22 +3377,6 @@
  push.lis hl                    ; 49 E5
  push.lis ix                    ; 49 FD E5
  push.lis iy                    ; 49 DD E5
- r_c                            ; D8
- r_eq                           ; C8
- r_geu                          ; D0
- r_gtu                          ; 28 03 38 01 C9
- r_leu                          ; C8 D8
- r_ltu                          ; D8
- r_m                            ; F8
- r_nc                           ; D0
- r_ne                           ; C0
- r_nv                           ; E0
- r_nz                           ; C0
- r_p                            ; F0
- r_pe                           ; E8
- r_po                           ; E0
- r_v                            ; E8
- r_z                            ; C8
  ral                            ; 17
  rar                            ; 1F
  rc                             ; D8

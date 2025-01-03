@@ -197,16 +197,6 @@
  bit 7, h                       ; CB 7C
  bit 7, l                       ; CB 7D
  bool hl                        ; F5 7C B5 CA C4 01 21 01 00 F1
- c_c 0x1234                     ; DC 34 12
- c_eq 0x1234                    ; CC 34 12
- c_geu 0x1234                   ; D4 34 12
- c_gtu 0x1234                   ; 28 05 38 03 CD 34 12
- c_leu 0x1234                   ; 28 02 30 03 CD 34 12
- c_ltu 0x1234                   ; DC 34 12
- c_nc 0x1234                    ; D4 34 12
- c_ne 0x1234                    ; C4 34 12
- c_nz 0x1234                    ; C4 34 12
- c_z 0x1234                     ; CC 34 12
  call (hl)                      ; CD @__z80asm__call_hl
  call 0x1234                    ; CD 34 12
  call c, 0x1234                 ; DC 34 12
@@ -382,36 +372,12 @@
  inx d                          ; 13
  inx h                          ; 23
  inx sp                         ; 33
- j_c 0x1234                     ; DA 34 12
- j_eq 0x1234                    ; CA 34 12
- j_geu 0x1234                   ; D2 34 12
- j_gtu 0x1234                   ; CA 2F 03 D2 34 12
- j_leu 0x1234                   ; CA 34 12 DA 34 12
- j_ltu 0x1234                   ; DA 34 12
- j_nc 0x1234                    ; D2 34 12
- j_ne 0x1234                    ; C2 34 12
- j_nz 0x1234                    ; C2 34 12
- j_z 0x1234                     ; CA 34 12
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 53 03 D2 34 12
+ jgtu 0x1234                    ; CA 09 03 D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
- jmp (bc)                       ; C5 C9
- jmp (de)                       ; D5 C9
- jmp (hl)                       ; E9
- jmp 0x1234                     ; C3 34 12
- jmp c, 0x1234                  ; DA 34 12
- jmp eq, 0x1234                 ; CA 34 12
- jmp geu, 0x1234                ; D2 34 12
- jmp gtu, 0x1234                ; CA 73 03 D2 34 12
- jmp leu, 0x1234                ; CA 34 12 DA 34 12
- jmp ltu, 0x1234                ; DA 34 12
- jmp nc, 0x1234                 ; D2 34 12
- jmp ne, 0x1234                 ; C2 34 12
- jmp nz, 0x1234                 ; C2 34 12
- jmp z, 0x1234                  ; CA 34 12
  jnc 0x1234                     ; D2 34 12
  jne 0x1234                     ; C2 34 12
  jnz 0x1234                     ; C2 34 12
@@ -422,7 +388,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA A8 03 D2 34 12
+ jp gtu, 0x1234                 ; CA 32 03 D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp nc, 0x1234                  ; D2 34 12
@@ -899,16 +865,6 @@
  push h                         ; E5
  push hl                        ; E5
  push psw                       ; F5
- r_c                            ; D8
- r_eq                           ; C8
- r_geu                          ; D0
- r_gtu                          ; 28 03 38 01 C9
- r_leu                          ; C8 D8
- r_ltu                          ; D8
- r_nc                           ; D0
- r_ne                           ; C0
- r_nz                           ; C0
- r_z                            ; C8
  ral                            ; 17
  rar                            ; 1F
  rc                             ; D8

@@ -1669,10 +1669,6 @@
  bsra de, b                     ; Error
  bsrf de, b                     ; Error
  bsrl de, b                     ; Error
- c_nv 0x1234                    ; Error
- c_nv 0x123456                  ; Error
- c_v 0x1234                     ; Error
- c_v 0x123456                   ; Error
  call nv, 0x1234                ; Error
  call nv, 0x123456              ; Error
  call v, 0x1234                 ; Error
@@ -2770,76 +2766,7 @@
  ioi set 8, (iy-128)            ; Error
  ipset -1                       ; Error
  ipset 4                        ; Error
- j_nv 0x1234                    ; Error
  jk 0x1234                      ; Error
- jmp (ahl)                      ; Error
- jmp (aix)                      ; Error
- jmp (aiy)                      ; Error
- jmp (c)                        ; Error
- jmp (phl)                      ; Error
- jmp (pix)                      ; Error
- jmp (piy)                      ; Error
- jmp (xhl)                      ; Error
- jmp (xix)                      ; Error
- jmp (xiy)                      ; Error
- jmp (yhl)                      ; Error
- jmp (yix)                      ; Error
- jmp (yiy)                      ; Error
- jmp (zhl)                      ; Error
- jmp (zix)                      ; Error
- jmp (ziy)                      ; Error
- jmp k,0x1234                   ; Error
- jmp nk,0x1234                  ; Error
- jmp nv, 0x1234                 ; Error
- jmp nv, 0x123456               ; Error
- jmp nx5,0x1234                 ; Error
- jmp x5,0x1234                  ; Error
- jmp.l (hl)                     ; Error
- jmp.l (ix)                     ; Error
- jmp.l (iy)                     ; Error
- jmp.lil 0x123456               ; Error
- jmp.lil c, 0x123456            ; Error
- jmp.lil eq, 0x123456           ; Error
- jmp.lil geu, 0x123456          ; Error
- jmp.lil gtu, 0x123456          ; Error
- jmp.lil leu, 0x123456          ; Error
- jmp.lil ltu, 0x123456          ; Error
- jmp.lil m, 0x123456            ; Error
- jmp.lil nc, 0x123456           ; Error
- jmp.lil ne, 0x123456           ; Error
- jmp.lil nv, 0x123456           ; Error
- jmp.lil nz, 0x123456           ; Error
- jmp.lil p, 0x123456            ; Error
- jmp.lil pe, 0x123456           ; Error
- jmp.lil po, 0x123456           ; Error
- jmp.lil v, 0x123456            ; Error
- jmp.lil z, 0x123456            ; Error
- jmp.lis (hl)                   ; Error
- jmp.lis (ix)                   ; Error
- jmp.lis (iy)                   ; Error
- jmp.s (hl)                     ; Error
- jmp.s (ix)                     ; Error
- jmp.s (iy)                     ; Error
- jmp.sil (hl)                   ; Error
- jmp.sil (ix)                   ; Error
- jmp.sil (iy)                   ; Error
- jmp.sis 0x1234                 ; Error
- jmp.sis c, 0x1234              ; Error
- jmp.sis eq, 0x1234             ; Error
- jmp.sis geu, 0x1234            ; Error
- jmp.sis gtu, 0x1234            ; Error
- jmp.sis leu, 0x1234            ; Error
- jmp.sis ltu, 0x1234            ; Error
- jmp.sis m, 0x1234              ; Error
- jmp.sis nc, 0x1234             ; Error
- jmp.sis ne, 0x1234             ; Error
- jmp.sis nv, 0x1234             ; Error
- jmp.sis nz, 0x1234             ; Error
- jmp.sis p, 0x1234              ; Error
- jmp.sis pe, 0x1234             ; Error
- jmp.sis po, 0x1234             ; Error
- jmp.sis v, 0x1234              ; Error
- jmp.sis z, 0x1234              ; Error
  jnk 0x1234                     ; Error
  jnv 0x1234                     ; Error
  jnx5 0x1234                    ; Error
@@ -2863,8 +2790,6 @@
  jp nk,0x1234                   ; Error
  jp nv, 0x1234                  ; Error
  jp nv, 0x123456                ; Error
- jp nx5,0x1234                  ; Error
- jp x5,0x1234                   ; Error
  jp.l (hl)                      ; Error
  jp.l (ix)                      ; Error
  jp.l (iy)                      ; Error
@@ -8864,8 +8789,6 @@
  push.sil iy                    ; Error
  pxad                           ; Error
  pxdn                           ; Error
- r_nv                           ; Error
- r_v                            ; Error
  rdmode                         ; Error
  res -1, (ahl)                  ; Error
  res -1, (aix)                  ; Error
