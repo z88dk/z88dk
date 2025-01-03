@@ -282,6 +282,7 @@ static char           *m4arg = NULL;
 static char           *coptarg = NULL;
 static char           *pragincname = NULL;  /* File containing pragmas to append to zcc_opt.def */
 static char           *zccopt = NULL;       /* Text to append to zcc_opt.def */
+static char           *c_target = NULL;     // Placeholder, unused
 static char           *c_subtype = NULL;
 static char           *c_clib = NULL;
 static int             c_startup = -2;
@@ -483,6 +484,7 @@ static option options[] = {
     { 0, "mkc160", OPT_ASSIGN|OPT_INT, "Generate output for the KC160 (z80 mode)", &c_cpu, NULL, CPU_TYPE_KC160 },
 
     { 0, "", OPT_HEADER, "Target options:", NULL, NULL, 0 },
+    { 0, "target", OPT_STRING, "Set the target (alternative to + syntax)", &c_target, NULL, 0 },
     { 0, "subtype", OPT_STRING,  "Set the target subtype" , &c_subtype, NULL, 0},
     { 0, "clib", OPT_STRING,  "Set the target clib type" , &c_clib, NULL, 0},
     { 0, "crt0", OPT_STRING,  "Override the crt0 assembler file to use" , &c_crt0, NULL, 0},
@@ -979,6 +981,10 @@ int main(int argc, char **argv)
         if (aa[0] == '+') {
             strcpy(configuration, aa);
             break;
+        } else if ( strncmp(aa, "-target=", 8) == 0 ) {
+            strcpy(configuration, "+");
+            strcat(configuration, aa + 8);
+            break;
         } else if (aa[0] == '@') {
             struct tokens_list_s* tokens = gather_from_list_file(aa + 1);
 
@@ -994,7 +1000,7 @@ int main(int argc, char **argv)
     }
 
     if (strlen(configuration) == 0) {
-        fprintf(stderr, "A config file must be specified with +file\n\n");
+        fprintf(stderr, "A config file must be specified with +file or with -target=[target]\n\n");
         print_help_text(argv[0]);
         exit(1);
     }
@@ -3322,7 +3328,7 @@ void find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t 
         return;
     }
     /* Without a config file, we should just print usage and then exit */
-    fprintf(stderr, "A config file must be specified with +file\n\n");
+    fprintf(stderr, "A config file must be specified with +file or with -target=[target]\n\n");
     print_help_text(program);
     exit(1);
 }
