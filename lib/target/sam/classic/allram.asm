@@ -59,7 +59,6 @@ CRT_START:
 initialise:
     di
     in      a,(LMPR)
-    and     31
     ld      (sysvarpage + 0x8000),a
     ; Page this page into low memory
     in      a,(HMPR)
@@ -76,6 +75,9 @@ setup_in_low_memory:
     out     (HMPR),a
     ;; And fall into program
 program:
+IF __crt_on_exit = 0x10002
+    ld      (restoresp+1),sp
+ENDIF
     ; Make room for the atexit() stack
     ld      sp,stacktop
     call    crt0_init
@@ -106,8 +108,25 @@ IF CLIB_EXIT_SCREEN_MODE != -1
     ld      a,CLIB_EXIT_SCREEN_MODE
     call    asm_sam_set_screenmode
 ENDIF
+IF __crt_on_exit = 0x10002
+    di
+    ; Page us into high memory
+    in      a,(LMPR)
+    and     31
+    out     (HMPR),a
+    jp      exit_in_high_memory + 0x8000
+exit_in_high_memory:
+    ; We're in high memory now, page back in ROM
+    ld      a,(sysvarpage + 0x8000)
+    out     (LMPR),a
+restoresp:
+    ld      sp,0
+    ei
+    ret
+ELSE
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"
+ENDIF
 
 l_dcal:
     jp      (hl)
@@ -119,6 +138,7 @@ highpage:
 ; Page where system variables are stored
 sysvarpage:
         defb    0
+
 
 
 IF CLIB_FARHEAP_BANKS
