@@ -7965,6 +7965,8 @@
  jp lt, 0x1234                  ; Error
  jp lz, 0x1234                  ; Error
  jp nk,0x1234                   ; Error
+ jp nx5,0x1234                  ; Error
+ jp x5,0x1234                   ; Error
  jp.s (hl)                      ; Error
  jp.s (ix)                      ; Error
  jp.s (iy)                      ; Error

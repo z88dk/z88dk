@@ -8886,6 +8886,7 @@
  jp nk,0x1234                   ; Error
  jp nv, 0x1234                  ; Error
  jp nv, 0x123456                ; Error
+ jp nx5,0x1234                  ; Error
  jp p, 0x1234                   ; Error
  jp p, 0x123456                 ; Error
  jp pe, 0x1234                  ; Error
@@ -8894,6 +8895,7 @@
  jp po, 0x123456                ; Error
  jp v, 0x1234                   ; Error
  jp v, 0x123456                 ; Error
+ jp x5,0x1234                   ; Error
  jp.l (hl)                      ; Error
  jp.l (ix)                      ; Error
  jp.l (iy)                      ; Error

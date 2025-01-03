@@ -3101,10 +3101,12 @@ for my $cpu (@CPUS) {
 		# Jump on flag X5/K is set
 		add($cpu, "jx5 %m",		[0xFD, '%m', '%m']);
 		add($cpu, "jk %m",		[0xFD, '%m', '%m']);
+		add($cpu, "jp x5,%m",	[0xFD, '%m', '%m']);
 		add($cpu, "jp k,%m",	[0xFD, '%m', '%m']);
 
 		add($cpu, "jnx5 %m",	[0xDD, '%m', '%m']);
 		add($cpu, "jnk %m",		[0xDD, '%m', '%m']);
+		add($cpu, "jp nx5,%m",	[0xDD, '%m', '%m']);
 		add($cpu, "jp nk,%m",	[0xDD, '%m', '%m']);
 	}
 

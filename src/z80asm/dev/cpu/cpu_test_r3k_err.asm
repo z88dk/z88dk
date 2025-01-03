@@ -3550,6 +3550,8 @@
  jp k,0x1234                    ; Error
  jp lt, 0x1234                  ; Error
  jp nk,0x1234                   ; Error
+ jp nx5,0x1234                  ; Error
+ jp x5,0x1234                   ; Error
  jp.l (hl)                      ; Error
  jp.l (ix)                      ; Error
  jp.l (iy)                      ; Error
