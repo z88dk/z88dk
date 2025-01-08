@@ -5,7 +5,7 @@
     defc    TAR__register_sp = 0xfd00
     defc    TAR__clib_exit_stack_size = 4
     defc    TAR__fputc_cons_generic = 1
-    defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_enable_eidi = $02      ;enable interrupts on
     defc    TAR__crt_on_exit = $10001       ;loop forever
 
     ; Where the screen is located
@@ -23,6 +23,11 @@
 
 program:
     di
+IF __crt_on_exit = 0x10002
+    ld      (restoresp+1),sp
+    in      a,(LMPR)
+    ld      (__entry_lmpr+1),a
+ENDIF
     ; Make room for the atexit() stack
     INCLUDE "crt/classic/crt_init_sp.inc"
     call    crt0_init
@@ -32,9 +37,9 @@ program:
     ; Setup heap between end program and sp
     INCLUDE "crt/classic/crt_init_heap.inc"
 
-    ; Now, page the screen into 0000-0x7fff
     INCLUDE "target/sam/classic/sam_switchmode.inc"
 
+    ; Now, page the screen into 0000-0x7fff
     in      a,(VMPR)
     ld      b,a
     or      @01100000
@@ -77,14 +82,29 @@ IF CLIB_EXIT_SCREEN_MODE != -1
     ld      a,CLIB_EXIT_SCREEN_MODE
     call    asm_sam_set_screenmode
 ENDIF
+IF __crt_on_exit = 0x10002
+    di
+    ; Page us into high memory
+__entry_lmpr:
+    ld      a,0
+    out     (LMPR),a
+    im      1
+restoresp:
+    ld      sp,0
+    ei
+    ret
+ELSE
     INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"
+ENDIF
+
 
 
 ; Paging routines for graphics
 __sam_graphics_pagein:
 __sam_graphics_pageout:
     ret
+
 
 ; Interrupt handler
 
