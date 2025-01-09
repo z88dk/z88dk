@@ -8,7 +8,9 @@ For Linux users follow the instructions on the [installation page](https://githu
 
 `sdcc-z88dk.patch` is the current default standard patch.
 
-`sdcc-14648-z88dk.patch` is the current zsdcc patch, retained for comparison and building against sdcc 4.4.0 r14648.
+`sdcc-15212-z88dk.patch` is the previous zsdcc patch, retained for comparison and building against sdcc 4.5.0 r15212.
+
+`sdcc-14648-z88dk.patch` is the previous zsdcc patch, retained for comparison and building against sdcc 4.4.0 r14648.
 
 `sdcc-9958-z88dk.patch` is the previous z88dk v1.99c zsdcc standard patch, retained for comparison and building against sdcc r9958.
 
