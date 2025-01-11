@@ -28,9 +28,12 @@ for my $asm (sort keys %opcodes) {
 	# check for parens
 	my $parens;
 	if    ($asm =~ /\(%[nmh]\)/) {		$parens = 'expr_in_parens'; }
-	elsif ($asm =~ /%[snmjc]/) {		$parens = 'expr_no_parens'; }
-	else {								$parens = 'no_expr';   }
-		
+	elsif ($asm =~ /%[snmMjJkc]/) {		$parens = 'expr_no_parens'; }
+	elsif ($asm =~ /\(\w+\+%[du]/) {	$parens = 'no_expr'; }
+	elsif ($asm =~ /\w+\+%[du]/) {		$parens = 'no_expr'; }
+	elsif ($asm !~ /%/) {				$parens = 'no_expr';   }
+	else { die $asm; }
+
 	for my $cpu (sort keys %{$opcodes{$asm}}) {
 		my @ops = @{$opcodes{$asm}{$cpu}};
 		
