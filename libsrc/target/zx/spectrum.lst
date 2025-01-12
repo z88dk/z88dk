@@ -1,6 +1,7 @@
 target/zx/graphics/rowtab
 target/zx/obj/${TARGET}/zx_attr
 target/zx/obj/${TARGET}/zx_attr_callee
+target/zx/obj/${TARGET}/zx_cls
 target/zx/obj/${TARGET}/zx_border
 target/zx/obj/${TARGET}/zx_break
 target/zx/obj/${TARGET}/zx_colour
