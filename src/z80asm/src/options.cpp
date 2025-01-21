@@ -1082,6 +1082,10 @@ cpu_t option_cpu() {
 	return g_options.get_cpu();
 }
 
+bool option_strict() {
+    return g_options.get_strict();
+}
+
 void option_set_cpu(int cpu) {
     g_options.set_cpu(cpu);
 }

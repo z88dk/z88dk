@@ -58,6 +58,7 @@ public:
 	cpu_t get_cpu() const { return m_cpu; }
 	bool get_ti83() const { return m_ti83; }
 	bool get_ti83plus() const { return m_ti83plus; }
+    bool get_strict() { return m_strict; }
 
 	bool is_consol_obj_file() const { return !m_consol_obj_file.empty(); }
 	string get_consol_obj_file() const;
@@ -82,6 +83,7 @@ private:
 	cpu_t			m_cpu{ CPU_Z80 };	        // -m option
 	bool			m_ti83{ false };			// -mti83 option
 	bool			m_ti83plus{ false };		// -mti83plus option
+    bool            m_strict{ false };          // -strict option
     bool            m_got_cpu_option{ false };  // got -m option
 	string			m_consol_obj_file;			// -o without -b options
 
@@ -139,6 +141,7 @@ extern "C" {
     swap_ixiy_t option_swap_ixiy();
     void option_set_swap_ixiy(swap_ixiy_t swap_ixiy);
     cpu_t option_cpu();
+    bool option_strict();
     void option_set_cpu(int cpu);
     bool option_ti83();
     bool option_ti83plus();
