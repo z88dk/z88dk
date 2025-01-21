@@ -35,6 +35,7 @@ section code_font
 section code_clib
   include "../../clib_code.inc"
 section code_lib
+section code_home
 section code_compiler
 section code_user
 
