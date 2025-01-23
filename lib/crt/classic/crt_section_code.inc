@@ -16,6 +16,7 @@ IF !__crt_org_far
 ENDIF
     SECTION code_z80
     SECTION rodata_driver       ;Keep it in low memoey
+    SECTION code_home
     SECTION code_compiler
     SECTION code_clib
     SECTION code_compress_zx7
