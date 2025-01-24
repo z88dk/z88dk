@@ -60,6 +60,7 @@ char *c_data_section = "data_compiler";
 char *c_bss_section = "bss_compiler";
 char *c_code_section = "code_compiler";
 char *c_init_section = "code_crt_init";
+char *c_home_section = "code_home";
 
 #include "option.h"
 
