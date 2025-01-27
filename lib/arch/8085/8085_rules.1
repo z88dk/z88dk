@@ -333,6 +333,74 @@
 	ld	hl,(_%1
 	call	l_eq_hlbc	;bc==hl
 
+%title greater than or equal comparisons
+	ld	de,%1	;%5
+	call	l_ge
+=
+	ld	bc,%1	;%5
+	call	l_ge_hlbc	;bc>=hl
+
+	ld	de,%1
+	call	l_ge
+=
+	ld	bc,%1
+	call	l_ge_hlbc	;bc>=hl
+
+	pop	de
+	call	l_ge
+=
+	pop	bc
+	call	l_ge_hlbc	;bc>=hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_ge
+=
+	ld	bc,_%1
+	call	l_ge_hlbc	;bc>=hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_ge
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_ge_hlbc	;bc>=hl
+
+%title greater than comparisons
+	ld	de,%1	;%5
+	call	l_gt
+=
+	ld	bc,%1	;%5
+	call	l_gt_hlbc	;bc>hl
+
+	ld	de,%1
+	call	l_gt
+=
+	ld	bc,%1
+	call	l_gt_hlbc	;bc>hl
+
+	pop	de
+	call	l_gt
+=
+	pop	bc
+	call	l_gt_hlbc	;bc>hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_gt
+=
+	ld	bc,_%1
+	call	l_gt_hlbc	;bc>hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_gt
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_gt_hlbc	;bc>hl
+
 %title inequality comparisons
 	ld	de,%1	;%5
 	call	l_ne
@@ -366,6 +434,74 @@
 	ld	bc,hl
 	ld	hl,(_%1
 	call	l_ne_hlbc	;bc!=hl
+
+%title less than or equal comparisons
+	ld	de,%1	;%5
+	call	l_le
+=
+	ld	bc,%1	;%5
+	call	l_le_hlbc	;bc<=hl
+
+	ld	de,%1
+	call	l_le
+=
+	ld	bc,%1
+	call	l_le_hlbc	;bc<=hl
+
+	pop	de
+	call	l_le
+=
+	pop	bc
+	call	l_le_hlbc	;bc<=hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_le
+=
+	ld	bc,_%1
+	call	l_le_hlbc	;bc<=hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_le
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_le_hlbc	;bc<=hl
+
+%title less than comparisons
+	ld	de,%1	;%5
+	call	l_lt
+=
+	ld	bc,%1	;%5
+	call	l_lt_hlbc	;bc<hl
+
+	ld	de,%1
+	call	l_lt
+=
+	ld	bc,%1
+	call	l_lt_hlbc	;bc<hl
+
+	pop	de
+	call	l_lt
+=
+	pop	bc
+	call	l_lt_hlbc	;bc<hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_lt
+=
+	ld	bc,_%1
+	call	l_lt_hlbc	;bc<hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_lt
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_lt_hlbc	;bc<hl
 
 %title Clear up a misoptimisation
 	push	de
