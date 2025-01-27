@@ -356,7 +356,8 @@
 	ld	hl,_%1
 	call	l_ge
 =
-	ld	bc,_%1
+	ld	bc,hl
+	ld	hl,_%1
 	call	l_ge_hlbc	;bc>=hl
 
 	ex	de,hl
@@ -390,7 +391,8 @@
 	ld	hl,_%1
 	call	l_gt
 =
-	ld	bc,_%1
+	ld	bc,hl
+	ld	hl,_%1
 	call	l_gt_hlbc	;bc>hl
 
 	ex	de,hl
@@ -458,7 +460,8 @@
 	ld	hl,_%1
 	call	l_le
 =
-	ld	bc,_%1
+	ld	bc,hl
+	ld	hl,_%1
 	call	l_le_hlbc	;bc<=hl
 
 	ex	de,hl
@@ -492,7 +495,8 @@
 	ld	hl,_%1
 	call	l_lt
 =
-	ld	bc,_%1
+	ld	bc,hl
+	ld	hl,_%1
 	call	l_lt_hlbc	;bc<hl
 
 	ex	de,hl
