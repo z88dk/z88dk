@@ -3,29 +3,31 @@
 ;       To make startup code smaller and neater!
 ;
 ;       6/9/98  djm
-;       13/5/99 djm Added carry conditions...
-;       2024/6  feilipu modified for 8085 SUB
+;       13/5/99 djm, inverted carry conditions
+;       2025/1  feilipu modified for 8085 SUB
 
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_ne
-PUBLIC l_ne_hlbc
+PUBLIC l_uge
+PUBLIC l_uge_hlbc
 
 EXTERN l_compare_true
 EXTERN l_compare_false
 
-.l_ne
-    ; de != hl
+l_uge:
+
+    ; DE >= HL [unsigned]
 
     ld bc,de
 
-.l_ne_hlbc
-    ; bc != hl
+l_uge_hlbc:
+
     ; set carry if true
 
     sub hl,bc
 
-    jp nz,l_compare_true
+    jp c,l_compare_true
+    jp z,l_compare_true
 
     jp l_compare_false
