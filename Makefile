@@ -107,7 +107,7 @@ ifdef BUILD_SDCC
 		--disable-pdk13-port --disable-pdk14-port \
 		--disable-pdk15-port --disable-pdk16-port \
 		--disable-mos6502-port --disable-mos65c02-port \
-		--disable-r2k-port \
+		--disable-r2k-port --disable-f8-port \
 		--disable-non-free --disable-device-lib \
 		--disable-ucsim --disable-packihx \
 		--disable-sdcpp --disable-sdcdb --disable-sdbinutil
