@@ -2,14 +2,14 @@
 ;   Rewritten for modern z88dk by HeronErin
 ;
 ;
-	MODULE  Ti83plus_App_crt0
+    MODULE  Ti83plus_App_crt0
 
-	DEFINE TI83PLUSAPP	;Used by grayscale interrupt and the such
+    DEFINE TI83PLUSAPP  ;Used by grayscale interrupt and the such
 
 
-	EXTERN	_main		; No matter what set up we have, main is
-				;  always, always external to this file.
-	GLOBAL	__Exit
+    EXTERN  _main		; No matter what set up we have, main is
+                        ;  always, always external to this file.
+    GLOBAL  __Exit
 
 
 
@@ -19,31 +19,32 @@
 ; Begin of (shell) headers
 ;-------------------------
 
-	INCLUDE "Ti83p.def"	; ROM / RAM adresses on Ti83+[SE]
-	defc    crt0 = 1
-	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
+    INCLUDE "Ti83p.def"	; ROM / RAM adresses on Ti83+[SE]
+    defc    crt0 = 1
+    INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 
-	defc	CONSOLE_ROWS = 8
-	defc    TAR__clib_exit_stack_size = 3
-	defc    TAR__register_sp = -1
-	defc	__CPU_CLOCK = 6000000
+    defc	CONSOLE_ROWS = 8
+    defc    TAR__clib_exit_stack_size = 3
+    defc    TAR__register_sp = -1
+    defc	__CPU_CLOCK = 6000000
         
-	
 
 
-; Header data
-	DEFINE ASM
-	DEFINE NOT_DEFAULT_SHELL
 
-	org $4000
+    ; Header data
+    DEFINE ASM
+    DEFINE NOT_DEFAULT_SHELL
+
+    org $4000
 
 
-PUBLIC	cpygraph	; TI calc specific stuff
-PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
-PUBLIC  __crt_org_bss ;
+    PUBLIC	cpygraph	; TI calc specific stuff
+    PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
+    PUBLIC  __crt_org_bss ;
 
-; statVars (531 bytes of free space) See graylib83p.asm
-defc __crt_org_bss =   $8A3A
+    ; See https://github.com/z88dk/z88dk/issues/2657 for thoughts on this
+    ; Graylib can't be used for apps
+    defc __crt_org_bss =   $9872    ;appBackupScreen
 
 ; No header or main is needed for anything other than the first page. (Or a single page apps)
 IF (startup=0 || startup=1)
@@ -183,8 +184,8 @@ ENDIF
 
 start:
 IF DEFINED_GimmeSpeed
-    ld	a,1		; switch to 15MHz (extra fast)
-    rst	28		; bcall(SetExSpeed)
+    ld	    a,1		; switch to 15MHz (extra fast)
+    rst	    28		; bcall(SetExSpeed)
     defw	SetExSpeed	;
 ENDIF				;
     ; ld	(__restore_sp_onexit+1),sp	; This fails, but it still works without it?
@@ -203,14 +204,9 @@ ENDIF				;
     pop     hl
 
 IF DEFINED_GRAYlib
-    IF DEFINED_GimmeSpeed
-        INCLUDE "target/ti83p/classic/gray83pSE.asm"	; 15MHz grayscale interrupt
-    ELSE
-        INCLUDE	"target/ti83p/classic/gray83p.asm"		;  6MHz grayscale interrupt
-    ENDIF
-ELSE
-    INCLUDE	"target/ti83p/classic/intwrap83p.asm"	; Interrupt Wrapper
+    defs    GRAY_LIB_NOT_AVAILABLE_FOR_TI83P_APP
 ENDIF
+    INCLUDE	"target/ti83p/classic/intwrap83p.asm"	; Interrupt Wrapper
 
     im      2		; enable IM2 interrupt
 
@@ -223,8 +219,8 @@ __Exit:     ; exit() jumps to this point
     ld      iy,_IY_TABLE	; Restore flag pointer
     im      1		;
 IF DEFINED_GimmeSpeed		;
-    xor	a		; Switch to 6MHz (normal speed)
-    rst	28		; bcall(SetExSpeed)
+    xor	    a		; Switch to 6MHz (normal speed)
+    rst	    28		; bcall(SetExSpeed)
     defw	SetExSpeed	;
 ENDIF				;
 __restore_sp_onexit:

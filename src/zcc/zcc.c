@@ -3317,9 +3317,35 @@ void find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t 
         if (c_zcc_cfg != NULL) {
             /* Config file in config directory */
             snprintf(buf, buflen, "%s/%s.cfg", c_zcc_cfg, arg + 1);
+            if ( (fp = fopen(buf, "r") ) != NULL ) {
+                fclose(fp);
+                return;
+            }
+            // We can't find the file here, check for ti8x
+            if ( strcmp(arg+1,"ti8x") == 0 ) {
+                fprintf(stderr, "Target ti8x has been requested, the target is now named ti83p\n");
+                snprintf(buf, buflen, "%s/ti83p.cfg", c_zcc_cfg);
+            } else {
+                fprintf(stderr, "Can't find configuration file for target %s in %s\n", arg+1, c_zcc_cfg);
+                exit(1);
+            }
+
             return;
         } else {
             snprintf(buf, buflen, "%s/lib/config/%s.cfg", c_install_dir, arg + 1);
+
+            if ( (fp = fopen(buf, "r") ) != NULL ) {
+                fclose(fp);
+                return;
+            }
+            // We can't find the file here, check for ti8x
+            if ( strcmp(arg+1,"ti8x") == 0 ) {
+                fprintf(stderr, "Target ti8x has been requested, the target is now named ti83p\n");
+                snprintf(buf, buflen, "%s/lib/config/ti83p.cfg", c_install_dir);
+            } else {
+                fprintf(stderr, "Can't find configuration file for target %s in %s/lib/config\n", arg+1, c_install_dir);
+                exit(1);
+            }
         }
         /*
          * User supplied invalid config file, let it fall over back

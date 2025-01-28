@@ -695,6 +695,7 @@ static void parse_trailing_modifiers(Type *type)
 
         } else if ( amatch("__nonbanked")) {
             type->flags &= ~BANKED;
+            type->flags |= NONBANKED;
         } else if ( amatch("__z88dk_sdccdecl")) {
             type->flags |= SDCCDECL;
             type->flags &= ~(SMALLC|FLOATINGDECL);
@@ -1545,6 +1546,10 @@ void flags_describe(Type *type, int32_t flags, UT_string *output)
         utstring_printf(output,"__z88dk_shortcall_hl ");
     }
 
+    if ( flags & NONBANKED ) {
+        utstring_printf(output,"__nonbanked ");
+    }
+
     // BANKED_STYLE_TICALC sets type->funcattrs.params_offset
     if ( type->funcattrs.params_offset && 
            ( c_banked_style != BANKED_STYLE_TICALC || !(type->flags & BANKED)  )
@@ -1853,7 +1858,7 @@ static void declfunc(Type *functype, enum storage_type storage)
     // Reset all local variables
     locptr = STARTLOC;
     // Setup local variables
-    gen_switch_section(c_code_section);
+    gen_switch_section(currfn->flags & NONBANKED ? c_home_section : c_code_section);
     
 
 

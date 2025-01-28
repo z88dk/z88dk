@@ -48,7 +48,8 @@ ENDIF
         ld      a,CLIB_CPM_NATIVE_VT100
         and     a
         jr      nz,cls_ansi
-        ld      a,CLIB_FPUTC_CLS_CODE
+        ld      e,CLIB_FPUTC_CLS_CODE
+        ld      c,2
         jp      __bdos
 
 cls_ansi:

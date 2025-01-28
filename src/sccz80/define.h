@@ -188,6 +188,7 @@ enum symbol_flags {
         HL_CALL = 0x20000,    /* Call via ld hl, (module) call (addr) */
         INTERRUPT = 0x40000,   /* Function is used for interrupts */
         ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
+        NONBANKED = 0x100000,       /* Symbol is in HOME section */
 };
 
 

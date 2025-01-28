@@ -46,8 +46,7 @@ int initials(const char *dropname, Type *type)
         // Initialise a single one
         desize = init(type, 1);
     }
-
-    gen_switch_section(c_code_section); 
+    gen_switch_section(currfn && currfn->flags & NONBANKED ? c_home_section : c_code_section);
     return (desize);
 }
 

@@ -124,6 +124,7 @@ section code_threads
 section code_threads_mutex
 
 section code_lib
+section code_home
 section code_compiler
 section code_user
 
