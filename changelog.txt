@@ -22,7 +22,7 @@ Future release changes:
 - [classic] More modularised crt setup
 - [newlib] Resolve and correct library build issues with .asm.m4 files
 - [sccz80] 8080 codegen fixes
-- [zsdcc] Upgraded to SDCC 4.5.0 r15212
+- [zsdcc] Upgraded to SDCC 4.5.0 r15248
 - [z80asm] GBZ80 opcode conversion fixes
 - [z80asm] process file.asm.m4 by m4 and assemble resulting file.asm
 - [z80asm] add string argument to ASSERT

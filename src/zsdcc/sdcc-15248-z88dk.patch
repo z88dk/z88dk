@@ -2,12 +2,12 @@ Index: ChangeLog
 ===================================================================
 --- ChangeLog	(revision 15212)
 +++ ChangeLog	(working copy)
-@@ -56069,4 +56073,4 @@
+@@ -56138,4 +56142,4 @@
  	* as/mcs51/lklex.c:  accept everything as symbol name in rel-files, bug fix ID 452601
  	* as/mcs51/lksym.c:  accept everything as symbol name in rel-files, bug fix ID 452601
  
--$Revision: 15197 $
-+$Revision: 15212 $
+-$Revision: 15242 $
++$Revision: 15248 $
 Index: src/SDCCasm.c
 ===================================================================
 --- src/SDCCasm.c	(revision 15212)
