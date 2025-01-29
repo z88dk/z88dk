@@ -333,76 +333,6 @@
 	ld	hl,(_%1
 	call	l_eq_hlbc	;bc==hl
 
-%title greater than or equal comparisons
-	ld	de,%1	;%5
-	call	l_ge
-=
-	ld	bc,%1	;%5
-	call	l_ge_hlbc	;bc>=hl
-
-	ld	de,%1
-	call	l_ge
-=
-	ld	bc,%1
-	call	l_ge_hlbc	;bc>=hl
-
-	pop	de
-	call	l_ge
-=
-	pop	bc
-	call	l_ge_hlbc	;bc>=hl
-
-	ex	de,hl
-	ld	hl,_%1
-	call	l_ge
-=
-	ld	bc,hl
-	ld	hl,_%1
-	call	l_ge_hlbc	;bc>=hl
-
-	ex	de,hl
-	ld	hl,(_%1
-	call	l_ge
-=
-	ld	bc,hl
-	ld	hl,(_%1
-	call	l_ge_hlbc	;bc>=hl
-
-%title greater than comparisons
-	ld	de,%1	;%5
-	call	l_gt
-=
-	ld	bc,%1	;%5
-	call	l_gt_hlbc	;bc>hl
-
-	ld	de,%1
-	call	l_gt
-=
-	ld	bc,%1
-	call	l_gt_hlbc	;bc>hl
-
-	pop	de
-	call	l_gt
-=
-	pop	bc
-	call	l_gt_hlbc	;bc>hl
-
-	ex	de,hl
-	ld	hl,_%1
-	call	l_gt
-=
-	ld	bc,hl
-	ld	hl,_%1
-	call	l_gt_hlbc	;bc>hl
-
-	ex	de,hl
-	ld	hl,(_%1
-	call	l_gt
-=
-	ld	bc,hl
-	ld	hl,(_%1
-	call	l_gt_hlbc	;bc>hl
-
 %title inequality comparisons
 	ld	de,%1	;%5
 	call	l_ne
@@ -437,6 +367,92 @@
 	ld	hl,(_%1
 	call	l_ne_hlbc	;bc!=hl
 
+%title greater than or equal comparisons
+	ld	de,%1	;%5
+	call	l_ge
+=
+	ld	bc,%1	;%5
+	call	l_ge_hlbc	;bc>=hl
+
+	ld	de,%1
+	call	l_ge
+=
+	ld	bc,%1
+	call	l_ge_hlbc	;bc>=hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_ge
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_ge_hlbc	;bc>=hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_ge
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_ge_hlbc	;bc>=hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_ge
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_ge_hlbc	;bc>=hl
+
+	pop	de
+	call	l_ge
+=
+	pop	bc
+	call	l_ge_hlbc	;bc>=hl
+
+%title greater than comparisons
+	ld	de,%1	;%5
+	call	l_gt
+=
+	ld	bc,%1	;%5
+	call	l_gt_hlbc	;bc>hl
+
+	ld	de,%1
+	call	l_gt
+=
+	ld	bc,%1
+	call	l_gt_hlbc	;bc>hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_gt
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_gt_hlbc	;bc>hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_gt
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_gt_hlbc	;bc>hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_gt
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_gt_hlbc	;bc>hl
+
+	pop	de
+	call	l_gt
+=
+	pop	bc
+	call	l_gt_hlbc	;bc>hl
+
 %title less than or equal comparisons
 	ld	de,%1	;%5
 	call	l_le
@@ -450,26 +466,34 @@
 	ld	bc,%1
 	call	l_le_hlbc	;bc<=hl
 
+	ld	de,%1
+	ex	de,hl
+	call	l_le
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_le_hlbc	;bc<=hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_le
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_le_hlbc	;bc<=hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_le
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_le_hlbc	;bc<=hl
+
 	pop	de
 	call	l_le
 =
 	pop	bc
-	call	l_le_hlbc	;bc<=hl
-
-	ex	de,hl
-	ld	hl,_%1
-	call	l_le
-=
-	ld	bc,hl
-	ld	hl,_%1
-	call	l_le_hlbc	;bc<=hl
-
-	ex	de,hl
-	ld	hl,(_%1
-	call	l_le
-=
-	ld	bc,hl
-	ld	hl,(_%1
 	call	l_le_hlbc	;bc<=hl
 
 %title less than comparisons
@@ -485,27 +509,207 @@
 	ld	bc,%1
 	call	l_lt_hlbc	;bc<hl
 
+	ld	de,%1
+	ex	de,hl
+	call	l_lt
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_lt_hlbc	;bc<hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_lt
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_lt_hlbc	;bc<hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_lt
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_lt_hlbc	;bc<hl
+
 	pop	de
 	call	l_lt
 =
 	pop	bc
 	call	l_lt_hlbc	;bc<hl
 
+%title unsigned greater than or equal comparisons
+	ld	de,%1	;%5
+	call	l_uge
+=
+	ld	bc,%1	;%5
+	call	l_uge_hlbc	;bc>=hl
+
+	ld	de,%1
+	call	l_uge
+=
+	ld	bc,%1
+	call	l_uge_hlbc	;bc>=hl
+
 	ex	de,hl
 	ld	hl,_%1
-	call	l_lt
+	call	l_uge
 =
 	ld	bc,hl
 	ld	hl,_%1
-	call	l_lt_hlbc	;bc<hl
+	call	l_uge_hlbc	;bc>=hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_uge
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_uge_hlbc	;bc>=hl
 
 	ex	de,hl
 	ld	hl,(_%1
-	call	l_lt
+	call	l_uge
 =
 	ld	bc,hl
 	ld	hl,(_%1
-	call	l_lt_hlbc	;bc<hl
+	call	l_uge_hlbc	;bc>=hl
+
+	pop	de
+	call	l_uge
+=
+	pop	bc
+	call	l_uge_hlbc	;bc>=hl
+
+%title unsigned greater than comparisons
+	ld	de,%1	;%5
+	call	l_ugt
+=
+	ld	bc,%1	;%5
+	call	l_ugt_hlbc	;bc>hl
+
+	ld	de,%1
+	call	l_ugt
+=
+	ld	bc,%1
+	call	l_ugt_hlbc	;bc>hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_ugt
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_ugt_hlbc	;bc>hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_ugt
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_ugt_hlbc	;bc>hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_ugt
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_ugt_hlbc	;bc>hl
+
+	pop	de
+	call	l_ugt
+=
+	pop	bc
+	call	l_ugt_hlbc	;bc>hl
+
+%title unsigned less than or equal comparisons
+	ld	de,%1	;%5
+	call	l_ule
+=
+	ld	bc,%1	;%5
+	call	l_ule_hlbc	;bc<=hl
+
+	ld	de,%1
+	call	l_ule
+=
+	ld	bc,%1
+	call	l_ule_hlbc	;bc<=hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_ule
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_ule_hlbc	;bc<=hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_ule
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_ule_hlbc	;bc<=hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_ule
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_ule_hlbc	;bc<=hl
+
+	pop	de
+	call	l_ule
+=
+	pop	bc
+	call	l_ule_hlbc	;bc<=hl
+
+%title unsigned less than comparisons
+	ld	de,%1	;%5
+	call	l_ult
+=
+	ld	bc,%1	;%5
+	call	l_ult_hlbc	;bc<hl
+
+	ld	de,%1
+	call	l_ult
+=
+	ld	bc,%1
+	call	l_ult_hlbc	;bc<hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_ult
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_ult_hlbc	;bc<hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_ult
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_ult_hlbc	;bc<hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_ult
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_ult_hlbc	;bc<hl
+
+	pop	de
+	call	l_ult
+=
+	pop	bc
+	call	l_ult_hlbc	;bc<hl
 
 %title Clear up a misoptimisation
 	push	de
