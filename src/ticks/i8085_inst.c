@@ -17,7 +17,8 @@
             fb= ~a,             \
             h= ff,              \
             l= v,               \
-            fr= h|l<<8;         \
+            fr= h|l<<8,         \
+            fk=v^(ff&128);      \
         } while(0)
 
 void i8085_rim(uint8_t opcode)
