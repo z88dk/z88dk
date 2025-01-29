@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.4.0 #14648 (Linux)
+; Version 4.5.0 #15248 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -414,7 +414,7 @@ ENDIF
 ;--------------------------------------------------------
 ; Home
 ;--------------------------------------------------------
-	SECTION IGNORE
+	SECTION code_home
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
@@ -456,16 +456,14 @@ l_m32_fmodf_00102:
 	push	de
 	push	hl
 	call	___slong2fs_callee
-	ld	c, l
-	ld	l,(ix+10)
-	ld	b,h
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	push	de
+	ld	c,(ix+10)
+	ld	b,(ix+11)
 	push	bc
+	ld	c,(ix+8)
+	ld	b,(ix+9)
+	push	bc
+	push	de
+	push	hl
 	call	___fsmul_callee
 	push	de
 	push	hl
@@ -477,36 +475,31 @@ l_m32_fmodf_00102:
 	push	hl
 	call	___fssub_callee
 	push	hl
-	ld	c,l
-	ld	b,h
 	push	de
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	push	de
+	ld	c,(ix+10)
+	ld	b,(ix+11)
 	push	bc
+	ld	c,(ix+8)
+	ld	b,(ix+9)
+	push	bc
+	push	de
+	push	hl
 	call	___fslt_callee
+	ld	c, l
 	pop	de
-	pop	bc
-	bit	0, l
+	pop	hl
+	bit	0, c
 	jr	NZ,l_m32_fmodf_00105
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	push	de
+	ld	c,(ix+10)
+	ld	b,(ix+11)
 	push	bc
+	ld	c,(ix+8)
+	ld	b,(ix+9)
+	push	bc
+	push	de
+	push	hl
 	call	___fssub_callee
-	jr	l_m32_fmodf_00106
 l_m32_fmodf_00105:
-	ld	l, c
-	ld	h, b
-l_m32_fmodf_00106:
 l_m32_fmodf_00103:
 	pop	ix
 	ret
