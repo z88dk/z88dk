@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.4.0 #14648 (Linux)
+; Version 4.5.0 #15248 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -414,7 +414,7 @@ ENDIF
 ;--------------------------------------------------------
 ; Home
 ;--------------------------------------------------------
-	SECTION IGNORE
+	SECTION code_home
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
@@ -429,19 +429,21 @@ _m32_modff:
 	ld	l,(ix+8)
 	ld	h,(ix+9)
 	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	hl
-	ld	l,(ix+6)
-	ld	h,(ix+7)
-	push	hl
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	push	hl
+	ld	de,0x0000
+	push	de
+	push	de
+	ld	e,(ix+6)
+	ld	d,(ix+7)
+	push	de
+	ld	e,(ix+4)
+	ld	d,(ix+5)
+	push	de
 	call	___fslt_callee
 	ld	a, l
+	pop	hl
 	or	a, a
 	jr	Z,l_m32_modff_00102
+	push	hl
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	ld	e,(ix+6)
@@ -450,7 +452,6 @@ _m32_modff:
 	ld	c, l
 	ld	b, h
 	pop	hl
-	push	hl
 	ld	(hl), c
 	inc	hl
 	ld	(hl), b
@@ -458,8 +459,12 @@ _m32_modff:
 	ld	(hl), e
 	inc	hl
 	ld	(hl), d
+	dec	hl
+	dec	hl
+	dec	hl
 	jr	l_m32_modff_00103
 l_m32_modff_00102:
+	push	hl
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	ld	e,(ix+6)
@@ -468,7 +473,6 @@ l_m32_modff_00102:
 	ld	c, l
 	ld	b, h
 	pop	hl
-	push	hl
 	ld	(hl), c
 	inc	hl
 	ld	(hl), b
@@ -476,10 +480,11 @@ l_m32_modff_00102:
 	ld	(hl), e
 	inc	hl
 	ld	(hl), d
+	dec	hl
+	dec	hl
+	dec	hl
 l_m32_modff_00103:
-	pop	hl
-	ld	c,(hl)
-	push	hl
+	ld	c, (hl)
 	inc	hl
 	ld	b, (hl)
 	inc	hl
@@ -494,8 +499,7 @@ l_m32_modff_00103:
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	push	hl
-	call	___fssub
-	ld	sp,ix
+	call	___fssub_callee
 	pop	ix
 	ret
 	SECTION IGNORE

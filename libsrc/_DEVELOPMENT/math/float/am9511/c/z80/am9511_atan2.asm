@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.4.0 #14648 (Linux)
+; Version 4.5.0 #15248 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -383,7 +383,7 @@ ENDIF
 ;--------------------------------------------------------
 ; Home
 ;--------------------------------------------------------
-	SECTION IGNORE
+	SECTION code_home
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
@@ -438,7 +438,7 @@ _am9511_atan2:
 	ld	h,(ix-3)
 	push	hl
 	call	___fslt_callee
-	bit	0, l
+	bit	0,l
 	jr	NZ,l_am9511_atan2_00110
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -456,43 +456,39 @@ _am9511_atan2:
 	call	_atan_fastcall
 	push	hl
 	push	de
-	ld	hl,0x0000
-	push	hl
-	push	hl
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
+	ld	bc,0x0000
+	push	bc
+	push	bc
+	ld	c,(ix+10)
+	ld	b,(ix+11)
+	push	bc
+	ld	c,(ix+8)
+	ld	b,(ix+9)
+	push	bc
 	call	___fslt_callee
 	ld	a, l
 	pop	de
-	pop	bc
+	pop	hl
 	or	a, a
 	jp	Z, l_am9511_atan2_00111
 	bit	0,(ix-5)
 	jr	NZ,l_am9511_atan2_00102
-	ld	hl,0x4049
-	push	hl
-	ld	hl,0x0fdb
-	push	hl
-	push	de
+	ld	bc,0x4049
 	push	bc
+	ld	bc,0x0fdb
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
-	ld	c, l
-	ld	b, h
 	jr	l_am9511_atan2_00111
 l_am9511_atan2_00102:
-	ld	hl,0x4049
-	push	hl
-	ld	hl,0x0fdb
-	push	hl
-	push	de
+	ld	bc,0x4049
 	push	bc
+	ld	bc,0x0fdb
+	push	bc
+	push	de
+	push	hl
 	call	___fssub_callee
-	ld	c, l
-	ld	b, h
 	jr	l_am9511_atan2_00111
 l_am9511_atan2_00110:
 	ld	l,(ix+6)
@@ -522,8 +518,6 @@ l_am9511_atan2_00110:
 	push	de
 	push	hl
 	call	___fssub_callee
-	ld	c, l
-	ld	b, h
 	jr	l_am9511_atan2_00111
 l_am9511_atan2_00107:
 	ld	bc,0x3fc9
@@ -533,11 +527,7 @@ l_am9511_atan2_00107:
 	push	de
 	push	hl
 	call	___fsadd_callee
-	ld	c, l
-	ld	b, h
 l_am9511_atan2_00111:
-	ld	l, c
-	ld	h, b
 	jr	l_am9511_atan2_00120
 l_am9511_atan2_00118:
 	ld	l,(ix+6)
