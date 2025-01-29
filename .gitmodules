@@ -1,3 +1,6 @@
+[submodule "UNIXem"]
+	path = ext/UNIXem
+	url = https://github.com/z88dk/UNIXem.git
 [submodule "ext/optparse"]
 	path = ext/optparse
 	url = https://github.com/skeeto/optparse.git
@@ -10,6 +13,3 @@
 [submodule "ext/regex"]
 	path = ext/regex
 	url = https://github.com/z88dk/regex.git
-[submodule "ext/UNIXem"]
-	path = ext/UNIXem
-	url = https://github.com/synesissoftware/UNIXem
