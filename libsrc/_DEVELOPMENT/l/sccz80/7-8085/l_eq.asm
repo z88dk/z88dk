@@ -12,6 +12,9 @@ SECTION code_l_sccz80
 PUBLIC l_eq
 PUBLIC l_eq_hlbc
 
+EXTERN l_compare_true
+EXTERN l_compare_false
+
 .l_eq
     ; de == hl
 
@@ -23,11 +26,6 @@ PUBLIC l_eq_hlbc
 
     sub hl,bc
 
-    scf
-    inc hl
-    ret z
+    jp z,l_compare_true
 
-    xor a
-    ld l,a
-    ld h,a
-    ret
+    jp l_compare_false

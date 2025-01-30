@@ -92,18 +92,26 @@
 	EXTERN	l_or		;Int logical or
 	EXTERN	l_xor		;Int logical xor
 	EXTERN	l_and		;Int logical and
-	EXTERN	l_eq		;Int equality
+	EXTERN	l_eq		;Int equality de == hl
 	EXTERN	l_eq_hlbc	;Int equality bc == hl
-	EXTERN	l_ne		;Int inequality
+	EXTERN	l_ne		;Int inequality de != hl
 	EXTERN	l_ne_hlbc	;Int inequality bc != hl
-	EXTERN	l_gt		;Int signed de >  hl
+	EXTERN	l_gt		;Int signed de > hl
+	EXTERN	l_gt_hlbc	;Int signed bc > hl
 	EXTERN	l_le		;Int signed de <= hl
+	EXTERN	l_le_hlbc	;Int signed bc <= hl
 	EXTERN	l_ge		;Int signed de >= hl
-	EXTERN	l_lt		;Int signed de <  hl
+	EXTERN	l_ge_hlbc	;Int signed bc >= hl
+	EXTERN	l_lt		;Int signed de < hl
+	EXTERN	l_lt_hlbc	;Int signed bc < hl
 	EXTERN	l_uge		;Int unsigned de >= hl
-	EXTERN	l_ult		;Int unsigned de <  hl
-	EXTERN	l_ugt		;Int unsigned de >  hl
+	EXTERN	l_uge_hlbc	;Int unsigned bc >= hl
+	EXTERN	l_ult		;Int unsigned de < hl
+	EXTERN	l_ult_hlbc	;Int unsigned bc < hl
+	EXTERN	l_ugt		;Int unsigned de > hl
+	EXTERN	l_ugt_hlbc	;Int unsigned bc > hl
 	EXTERN	l_ule		;Int unsigned de <= hl
+	EXTERN	l_ule_hlbc	;Int unsigned bc <= hl
 	EXTERN	l_cmp		;Int signed compare
 	EXTERN	l_ucmp		;Int unsigned compare
 	EXTERN	l_asr		;Int signed de >> hl
