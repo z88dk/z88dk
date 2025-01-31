@@ -1513,10 +1513,10 @@ static int cmd_registers(int argc, char **argv)
     } else {  // Original output for non-active tty
         bk.console("pc=%04X, [pc]=%02X,    bc=%04X,  de=%04X,  hl=%04X,  af=%04X, ix=%04X, iy=%04X\n"
                "sp=%04X, [sp]=%04X, bc'=%04X, de'=%04X, hl'=%04X, af'=%04X\n"
-               "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d\n",
+               "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d (8085: K=%d)\n",
                pc, bk.get_memory(pc, MEM_TYPE_INST), regs.c | regs.b << 8, regs.e | regs.d << 8, regs.l | regs.h << 8, bk.f() | regs.a << 8, regs.xl | regs.xh << 8, regs.yl | regs.yh << 8,
                sp, (bk.get_memory(sp+1, MEM_TYPE_DATA) << 8 | bk.get_memory(sp, MEM_TYPE_DATA)), regs.c_ | regs.b_ << 8, regs.e_ | regs.d_ << 8, regs.l_ | regs.h_ << 8, bk.f_() | regs.a_ << 8,
-               (bk.f() & 0x80) ? 1 : 0, (bk.f() & 0x40) ? 1 : 0, (bk.f() & 0x10) ? 1 : 0, (bk.f() & 0x04) ? 1 : 0, (bk.f() & 0x02) ? 1 : 0, (bk.f() & 0x01) ? 1 : 0);
+               (bk.f() & 0x80) ? 1 : 0, (bk.f() & 0x40) ? 1 : 0, (bk.f() & 0x10) ? 1 : 0, (bk.f() & 0x04) ? 1 : 0, (bk.f() & 0x02) ? 1 : 0, (bk.f() & 0x01) ? 1 : 0, (bk.f() & 0x20) ? 1 : 0);
 
         if (regs.clockh || regs.clockl)
         {

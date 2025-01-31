@@ -8,7 +8,11 @@
         fprintf(stderr, "Unimplemented opcode %02x/%s",o,t); \
     } while (0)
 
-
+//                        int q = m_HL.b.l - m_BC.b.l;
+//                                m_AF.b.l = lut_zs[q & 0xff] | ((q >> 8) & CF) | VF | ((m_HL.b.l ^ q ^ m_BC.b.l) & HF) | (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ q) & SF) >> 5);
+//                                m_HL.b.l = q;
+//                                q = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
+//  m_AF.b.l = lut_zs[q & 0xff] | ((q >> 8) & CF) | VF | ((m_HL.b.h ^ q ^ m_BC.b.h) & HF) | (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ q) & SF) >> 5);
 #define SUBHLRR(a, b) do {      \
             mp= l+1+(h<<8);     \
             v= l-b+((h-a)<<8),  \
@@ -18,7 +22,7 @@
             h= ff,              \
             l= v,               \
             fr= h|l<<8,         \
-            fk=v^(ff&128);      \
+            fk=h^(ff&128);      \
         } while(0)
 
 void i8085_rim(uint8_t opcode)
