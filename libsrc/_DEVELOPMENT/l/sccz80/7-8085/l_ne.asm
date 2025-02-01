@@ -26,6 +26,10 @@ EXTERN l_compare_false
 
     sub hl,bc
 
-    jp nz,l_compare_true
+    scf
+    ld hl,1
+    ret nz
 
-    jp l_compare_false
+    ccf
+    dec l
+    ret

@@ -22,10 +22,14 @@ EXTERN l_compare_false
 
 .l_eq_hlbc
     ; bc == hl
-    ; carry set if true
+    ; set carry if true
 
     sub hl,bc
 
-    jp z,l_compare_true
+    scf
+    ld hl,1
+    ret z
 
-    jp l_compare_false
+    ccf
+    dec l
+    ret
