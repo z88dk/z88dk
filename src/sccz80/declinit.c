@@ -312,6 +312,13 @@ static int init(Type *type, int dump)
             type->size = sz;
             type->len = sz;
             return sz;
+        } else if ( type->kind != KIND_PTR) {
+            UT_string  *str;
+            utstring_new(str);
+            utstring_printf(str,"Can't assign char * to type: ");
+            type_describe(type, str);
+            errorfmt("%s", 1, utstring_body(str));
+            utstring_free(str);            
         } else {
             int32_t ivalue = value;
             /* Store the literals in the queue! */

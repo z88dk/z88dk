@@ -1060,7 +1060,6 @@ int declare_local(int local_static)
                     }
 
                     check_pointer_namespace(type, expr_type);
-                    
                     if ( vconst && expr != type->kind ) {
                         // It's a constant that doesn't match the right type
                         LVALUE  lval={0};
@@ -1069,6 +1068,18 @@ int declare_local(int local_static)
                         lval.val_type = type->kind;
                         lval.const_val = val;
                         load_constant(&lval);
+                    } else if ( ispointer(expr_type) && !ispointer(type) ) {
+                        UT_string  *str;
+                        utstring_new(str);
+                        utstring_printf(str,"Incompatible pointer type to non-pointer. From ");
+                        type_describe(expr_type, str);
+                        utstring_printf(str, " to ");
+                        type_describe(type, str);
+                        warningfmt("incompatible-pointer-types","%s", utstring_body(str));
+                        utstring_free(str); 
+                        clearstage(before, start);
+                        //conv type
+                        force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
                     } else {
                         clearstage(before, start);
                         //conv type
