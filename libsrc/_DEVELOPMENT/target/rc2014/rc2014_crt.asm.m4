@@ -5,12 +5,12 @@
 
 include(`zcc_opt.def')
 
-ifdef(`__STARTUP',,`define(`__STARTUP', 16)')
+ifdef(`__STARTUP',,`define(`__STARTUP', 64)')
 ifdef(`__STARTUP_OFFSET',`define(`__STARTUP', eval(__STARTUP + __STARTUP_OFFSET))')
 
 IFNDEF startup
 
-   ; startup undefined so select a default
+   ; startup undefined so select a default - basic
 
    defc startup = __STARTUP
 
@@ -67,6 +67,7 @@ ifelse(__STARTUP, 0,
 ifelse(__STARTUP, 2,
 `
    ; acia drivers installed on stdin, stdout, stderr
+   ; 8085 cpu
 
    IFNDEF __CRTCFG
 
@@ -108,36 +109,13 @@ ifelse(__STARTUP, 4,
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; hbios driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ifelse(__STARTUP, 8,
-`
-   ; romwbw hbios0 drivers installed on stdin, stdout, stderr
-   ; romwbw hbios1 drivers installed on ttyin, ttyout, ttyerr
-
-   IFNDEF __CRTCFG
-
-      defc __CRTCFG = 3
-
-   ENDIF
-
-   IFNDEF __MMAP
-
-      defc __MMAP = 0
-
-   ENDIF
-
-   include(`startup/rc2014_crt_8.asm.m4')
-')
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; uart driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ifelse(__STARTUP, 16,
 `
-   ; basic drivers installed on stdin, stdout, stderr
+   ; uart 16550 drivers installed on stdin, stdout, stderr
+   ; uart 16550 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
 
@@ -155,12 +133,14 @@ ifelse(__STARTUP, 16,
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 8085 basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 8085 uart driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ifelse(__STARTUP, 32,
 `
-   ; basic drivers installed on stdin, stdout, stderr
+   ; uart 16550 drivers installed on stdin, stdout, stderr
+   ; uart 16550 drivers installed on ttyin, ttyout, ttyerr
+   ; 8085 cpu
 
    IFNDEF __CRTCFG
 
@@ -177,19 +157,14 @@ ifelse(__STARTUP, 32,
    include(`startup/rc2014_crt_32.asm.m4')
 ')
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; cp/m native console ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ifelse(__STARTUP, 64,
 `
-
-   ; stdin  = cpm_00_input_cons (bdos function 10)
-   ; stdout = cpm_00_output_cons (bdos function 2)
-   ; stderr = dup(stdout)
-   ; stdrdr = cpm_00_input_reader (bdos function 3)
-   ; stdpun = cpm_00_output_punch (bdos function 4)
-   ; stdlst = cpm_00_output_list (bdos function 5)
+   ; basic drivers installed on stdin, stdout, stderr
 
    IFNDEF __CRTCFG
 
@@ -207,6 +182,31 @@ ifelse(__STARTUP, 64,
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 8085 basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ifelse(__STARTUP, 128,
+`
+   ; basic drivers installed on stdin, stdout, stderr
+   ; 8085 cpu
+
+   IFNDEF __CRTCFG
+
+      defc __CRTCFG = 7
+
+   ENDIF
+
+   IFNDEF __MMAP
+
+      defc __MMAP = 0
+
+   ENDIF
+
+   include(`startup/rc2014_crt_128.asm.m4')
+')
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; none ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -216,7 +216,7 @@ ifelse(__STARTUP, 256,
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 7
+      defc __CRTCFG = 8
 
    ENDIF
 

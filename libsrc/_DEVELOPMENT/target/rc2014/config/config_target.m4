@@ -48,6 +48,11 @@ define(`__IO_SIO_PORT_OFFSET_D', 0x01)  # Port Offset for Data (!A0)
 # define(`__IO_SIO_PORT_OFFSET_C', 0x02)  # Port Offset for Command (A1)
 # define(`__IO_SIO_PORT_OFFSET_D', 0x00)  # Port Offset for Data (A1)
 
+# 16550 UART Port Definitions
+
+define(`__IO_UART_PORTA_BASE', 0xA0)  # Port A Address for UART Module
+define(`__IO_UART_PORTB_BASE', 0xA8)  # Port B Address for UART Module
+
 #
 # END OF USER CONFIGURATION
 ###############################################################
@@ -72,6 +77,8 @@ PUBLIC `__IO_SIO_PORT_OFFSET_A'
 PUBLIC `__IO_SIO_PORT_OFFSET_B'
 PUBLIC `__IO_SIO_PORT_OFFSET_C'
 PUBLIC `__IO_SIO_PORT_OFFSET_D'
+PUBLIC `__IO_UART_PORTA_BASE'
+PUBLIC `__IO_UART_PORTB_BASE'
 ')
 
 dnl#
@@ -94,6 +101,8 @@ defc `__IO_SIO_PORT_OFFSET_A' = __IO_SIO_PORT_OFFSET_A
 defc `__IO_SIO_PORT_OFFSET_B' = __IO_SIO_PORT_OFFSET_B
 defc `__IO_SIO_PORT_OFFSET_C' = __IO_SIO_PORT_OFFSET_C
 defc `__IO_SIO_PORT_OFFSET_D' = __IO_SIO_PORT_OFFSET_D
+defc `__IO_UART_PORTA_BASE' = __IO_UART_PORTA_BASE
+defc `__IO_UART_PORTB_BASE' = __IO_UART_PORTB_BASE
 ')
 
 dnl#
