@@ -47,13 +47,7 @@ sub expand_consts {
 				my @range = find_range($asm, $cpu, @ops);
 				for my $c (@range) {
 					my($asm1, @ops1) = replace_const($c, $asm, @ops);
-					if ($asm =~ /^rst/ && $cpu =~ /^r2ka|^r3k/ && 
-					    ($c == 0 || $c == 8 || $c == 0x30)) {
-						$opcodes_out{$asm1}{$cpu} = [[0xCD, $c, 0]];
-					}
-					else {    
-						$opcodes_out{$asm1}{$cpu} = \@ops1;
-					}
+					$opcodes_out{$asm1}{$cpu} = \@ops1;
 				}
 			}
 			else {
@@ -68,18 +62,13 @@ sub expand_consts {
 sub find_range {
 	my($asm, $cpu, @ops) = @_;
 	
-	if ($asm =~ / rst (\.(s|sil|l|lis))? \s+ %c /x) {
-		return (0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38);
-	}
-	else {
-		for my $op (@ops) {
-			for my $byte (@$op) {
-				if ($byte =~ / %c \( (\d+) \.\. (\d+) \) /x) {
-					return ($1 .. $2);
-				}
-				elsif ($byte =~ / %c \( ( \d+ (, \d+)* ) \) /x) {
-					return (eval $1);
-				}
+	for my $op (@ops) {
+		for my $byte (@$op) {
+			if ($byte =~ / %c \( ([x0-9a-f]+) \.\. ([x0-9a-f]+) \) /xi) {
+				return ($1 .. $2);
+			}
+			elsif ($byte =~ / %c \( ( [x0-9a-f]+ (, [x0-9a-f]+)* ) \) /xi) {
+				return (eval $1);
 			}
 		}
 	}
@@ -90,7 +79,7 @@ sub find_range {
 sub replace_const {
 	my($c, $asm, @ops) = @_;
 
-	my $c_str = ($asm =~ /^rst/ || $c >= 10) ? sprintf("%02Xh", $c) : $c;
+	my $c_str = ($c >= 10) ? sprintf("%02Xh", $c) : $c;
 	$asm =~ s/%c/$c_str/;
 	
 	@ops = @{clone(\@ops)};

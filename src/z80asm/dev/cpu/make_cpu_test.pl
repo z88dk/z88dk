@@ -98,36 +98,7 @@ sub add {
 		$asm =~ s/%j/%m/;
 	}
 	
-	if ($asm =~ /rst(\.(s|sil|l|lis))? %c/) {
-		for my $c (0..8,0x10,0x18,0x20,0x28,0x30,0x38) {
-			my $asm1 = $asm =~ s/%c/$c/r;
-			$c *= 8 if $c < 8;
-			my @bytes1;
-			for (split(' ', $bytes)) {
-				if (s/%c/$c/) {
-					push @bytes1, sprintf("%02X", eval($_)); 
-				}
-				else {
-					push @bytes1, $_;
-				}
-			}
-			my $bytes1 = join(' ', @bytes1);
-			
-			# rabit lacks these restarts
-			if ($cpu =~ /^r2ka|^r3k|^r4k|^r5k/ && ($c==0 || $c==8 || $c==0x30)) {	
-				$bytes1 = sprintf("CD %02X 00", $c);
-			}
-			
-			add($cpu, $asm1, $bytes1);
-		}
-		
-		# create error cases
-		for my $c (-1, 9..15, 17..23, 25..31, 33..39, 41..47, 49..55, 57..64) {
-			(my $asm1 = $asm) =~ s/%c/$c/;
-			$all_opcodes{ALL}{$asm1} = 1;
-		}
-	}
-	elsif ($asm =~ /^ldh .*\(c\)/) {
+	if ($asm =~ /^ldh .*\(c\)/) {
 		add($cpu, $asm =~ s/\(c\)/( c )/r, $bytes);	# ( c ) to break recursion
 		add($cpu, $asm =~ s/ldh /ld /r =~ s/\(c\)/(0xff00+c)/r, $bytes);
 	}

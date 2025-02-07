@@ -28,7 +28,7 @@ for my $cpu (@CPUS) {
 				ENDIF			
 					ld $reg, -1
 					clr $reg
-					rst 0
+					jp 0
 END
 				is $r->{$dd}, 0, "$dd result";
 				

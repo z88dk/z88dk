@@ -348,17 +348,6 @@ sub parse_code {
 			"OBJ_DELETE(expr);",
 			"}";
 	}
-	# handle rst[.l] %c
-	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
-		if ($1) {
-			push @code, 
-				"DO_stmt(".sprintf("0x%02X", $ops[0][0]).");";
-			shift @ops;
-		}
-		for my $op (@ops) {
-			push @code, parse_code_opcode($cpu, $asm, @$op);
-		}
-	}
 	# handle ld dd,(ix+d) -> ld ddl,(ix+d) : ld ddh, (ix+d+1)
 	elsif ($bin =~ /%D/) {
 		for my $i (0 .. $#ops) {
@@ -407,12 +396,6 @@ sub parse_code_opcode {
 		push @code, 
 			"DO_STMT_LABEL();",
 			"add_call_emul_func(\"$func\");";
-	}
-	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
-		push @code, 
-			"DO_STMT_LABEL();",
-			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); }".
-			"else { add_rst_opcode(ctx->expr_value); }";
 	}
 	elsif ($asm =~ /^mmu %c, %n/) {
 		push @code, 

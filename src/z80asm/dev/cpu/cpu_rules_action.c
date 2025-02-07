@@ -65069,6 +65069,7 @@ return true;
 bool cpu_rules_action_5066(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0x98);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65079,6 +65080,7 @@ return true;
 bool cpu_rules_action_5067(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDDB);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65089,6 +65091,7 @@ return true;
 bool cpu_rules_action_5068(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDCB);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65099,6 +65102,7 @@ return true;
 bool cpu_rules_action_5069(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDD3);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65109,6 +65113,7 @@ return true;
 bool cpu_rules_action_5070(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDA3);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65119,6 +65124,7 @@ return true;
 bool cpu_rules_action_5071(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDAB);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65129,6 +65135,7 @@ return true;
 bool cpu_rules_action_5072(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDB3);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65139,6 +65146,7 @@ return true;
 bool cpu_rules_action_5073(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDDB);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65149,6 +65157,7 @@ return true;
 bool cpu_rules_action_5074(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDD3);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65159,6 +65168,7 @@ return true;
 bool cpu_rules_action_5075(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDC3);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65169,6 +65179,7 @@ return true;
 bool cpu_rules_action_5076(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDC3);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65179,6 +65190,7 @@ return true;
 bool cpu_rules_action_5077(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDBB);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -65189,6 +65201,7 @@ return true;
 bool cpu_rules_action_5078(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_jre(0xEDCB);
 break;
 default: error(ErrIllegalIdent, NULL); }
@@ -117349,6 +117362,7 @@ return true;
 bool cpu_rules_action_9569(ParseCtx *ctx, Str *name, Str *stmt_label) {
 switch (option_cpu()) {
 case CPU_Z80N: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_NN(0xED8A);
 break;
 case CPU_R4K: case CPU_R5K: 
@@ -124803,8 +124817,12 @@ switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt(0x49);
-DO_STMT_LABEL();
-if (ctx->expr_error) { error(ErrConstExprExpected, NULL); }else { add_rst_opcode(ctx->expr_value); }
+if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
+switch (ctx->expr_value) {
+case 0: case 1: case 8: case 2: case 16: case 3: case 24: case 4: case 32: case 5: case 40: case 6: case 48: case 7: case 56: break;
+default: error_hex2(ErrIntRange, ctx->expr_value);
+}}
+DO_stmt(0x00+((0xC7+(ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));
 break;
 default: error(ErrIllegalIdent, NULL); }
 
@@ -124816,8 +124834,12 @@ switch (option_cpu()) {
 case CPU_EZ80_Z80: 
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt(0x49);
-DO_STMT_LABEL();
-if (ctx->expr_error) { error(ErrConstExprExpected, NULL); }else { add_rst_opcode(ctx->expr_value); }
+if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
+switch (ctx->expr_value) {
+case 0: case 1: case 8: case 2: case 16: case 3: case 24: case 4: case 32: case 5: case 40: case 6: case 48: case 7: case 56: break;
+default: error_hex2(ErrIntRange, ctx->expr_value);
+}}
+DO_stmt(0x00+((0xC7+(ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));
 break;
 default: error(ErrIllegalIdent, NULL); }
 
@@ -124829,8 +124851,12 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt(0x52);
-DO_STMT_LABEL();
-if (ctx->expr_error) { error(ErrConstExprExpected, NULL); }else { add_rst_opcode(ctx->expr_value); }
+if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
+switch (ctx->expr_value) {
+case 0: case 1: case 8: case 2: case 16: case 3: case 24: case 4: case 32: case 5: case 40: case 6: case 48: case 7: case 56: break;
+default: error_hex2(ErrIntRange, ctx->expr_value);
+}}
+DO_stmt(0x00+((0xC7+(ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));
 break;
 default: error(ErrIllegalIdent, NULL); }
 
@@ -124842,8 +124868,12 @@ switch (option_cpu()) {
 case CPU_EZ80: 
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt(0x52);
-DO_STMT_LABEL();
-if (ctx->expr_error) { error(ErrConstExprExpected, NULL); }else { add_rst_opcode(ctx->expr_value); }
+if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
+switch (ctx->expr_value) {
+case 0: case 1: case 8: case 2: case 16: case 3: case 24: case 4: case 32: case 5: case 40: case 6: case 48: case 7: case 56: break;
+default: error_hex2(ErrIntRange, ctx->expr_value);
+}}
+DO_stmt(0x00+((0xC7+(ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));
 break;
 default: error(ErrIllegalIdent, NULL); }
 
@@ -124851,9 +124881,26 @@ return true;
 }
 
 bool cpu_rules_action_10204(ParseCtx *ctx, Str *name, Str *stmt_label) {
+switch (option_cpu()) {
+case CPU_8080: case CPU_8085: case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160_Z80: case CPU_R800: case CPU_Z180: case CPU_Z80: case CPU_Z80_STRICT: case CPU_Z80N: 
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
-DO_STMT_LABEL();
-if (ctx->expr_error) { error(ErrConstExprExpected, NULL); }else { add_rst_opcode(ctx->expr_value); }
+if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
+switch (ctx->expr_value) {
+case 0: case 1: case 8: case 2: case 16: case 3: case 24: case 4: case 32: case 5: case 40: case 6: case 48: case 7: case 56: break;
+default: error_hex2(ErrIntRange, ctx->expr_value);
+}}
+DO_stmt(0x00+((0xC7+(ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));
+break;
+case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: 
+if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
+if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
+switch (ctx->expr_value) {
+case 2: case 16: case 3: case 24: case 4: case 32: case 5: case 40: case 7: case 56: break;
+default: error_hex2(ErrIntRange, ctx->expr_value);
+}}
+DO_stmt(0x00+((0xC7+(ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));
+break;
+default: error(ErrIllegalIdent, NULL); }
 
 return true;
 }

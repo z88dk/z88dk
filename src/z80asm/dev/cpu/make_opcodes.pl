@@ -2978,7 +2978,14 @@ for my $cpu (@CPUS) {
 	}
 	
 	# RST
-	add_suf($cpu, "rst %c", ["0xC7+%c"]);
+	if ($rabbit) {
+		add_suf($cpu, "rst %c",
+			["0xC7+(%c(2,0x10,3,0x18,4,0x20,5,0x28,7,0x38)<8?%c*8:%c)"]);
+	}
+	else {
+		add_suf($cpu, "rst %c",
+			["0xC7+(%c(0,1,8,2,0x10,3,0x18,4,0x20,5,0x28,6,0x30,7,0x38)<8?%c*8:%c)"]);
+	}
 	
 	# RET
 	add($cpu, "ret", [ret()]);

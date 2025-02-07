@@ -114,7 +114,7 @@ extern bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixi
 #define Z80_JR_FLAG(flag)   (0x20 + ((flag) << 3))
 #define Z80_JP_FLAG(flag)   (0xC2 + ((flag) << 3))
 #define Z80_CALL_FLAG(flag) (0xC4 + ((flag) << 3))
-#define Z80_RST(addr)       (0xC7 + (addr))
+#define Z80_RST(addr)       (0xC7 + ((addr) < 8 ? (addr) * 8 : (addr)))
 
 #define Z80_DEC(reg)        (0x05 + ((reg) << 3))
 #define Z80_INC(reg)        (0x04 + ((reg) << 3))
