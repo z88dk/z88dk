@@ -26,7 +26,7 @@ for my $ixiy ("", "_ixiy") {
 		for my $asm (sort keys %opcodes) {
 			my $asm_ixiy = $asm;
 			if ($ixiy) {
-				$asm_ixiy =~ s/\b(ix|iy)/$1 eq 'ix' ? 'iy' : 'ix'/eg;
+				$asm_ixiy =~ s/([xyapz]i[xy]\b|\b(ix|iy))/ swap_ix_iy($1) /ge;
 			}
 			
 			if (exists $opcodes{$asm_ixiy}{$cpu}) {
@@ -86,6 +86,12 @@ for my $cpu (@CPUS) {
 	say $fh join("\n", sort @test);
 }
 
+
+sub swap_ix_iy {
+	my($str) = @_;
+	$str =~ tr/xy/yx/;
+	return $str;
+}
 
 sub add {
 	my($cpu, $asm, $bytes) = @_;

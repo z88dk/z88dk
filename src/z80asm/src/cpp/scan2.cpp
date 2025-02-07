@@ -35,6 +35,7 @@ static double a2f(const char* start, const char* end) {
 }
 
 static string str_swap_x_y(string str) {
+    // replace IX<->IY, IXH<->IYH, AIX<->AIY, XIX<->YIY
     for (auto& c : str) {
         switch (c) {
         case 'x': c = 'y'; break;
@@ -1004,6 +1005,8 @@ yy55:
                                 switch (keyword) {
                                 case Keyword::IX: case Keyword::IXH: case Keyword::IXL:
                                 case Keyword::IY: case Keyword::IYH: case Keyword::IYL:
+                                case Keyword::AIX: case Keyword::PIX: case Keyword::XIX: case Keyword::YIX: case Keyword::ZIX: 
+                                case Keyword::AIY: case Keyword::PIY: case Keyword::XIY: case Keyword::YIY: case Keyword::ZIY: 
                                   str = str_swap_x_y(str);
                                   keyword = keyword_lookup(str);
                                   break;
