@@ -118,4 +118,6 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_CF_8_BIT'  __IO_CF_8_BIT
 `#define' `__IO_CF_PORT_BASE'  __IO_CF_PORT_BASE
 `#define' `__IO_PIO_PORT_BASE'  __IO_PIO_PORT_BASE
+`#define' `__IO_UART_PORTA_BASE'  __IO_UART_PORTA_BASE
+`#define' `__IO_UART_PORTB_BASE'  __IO_UART_PORTB_BASE
 ')
