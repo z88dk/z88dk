@@ -31,7 +31,7 @@
 			} while(0)
 
 #define DO_stmt_jr( opcode)		_DO_stmt_(jr,		opcode)
-#define DO_stmt_jre( opcode)	_DO_stmt_(jre,		opcode)
+#define DO_stmt_jre(opcode)		_DO_stmt_(jre,		opcode)
 #define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
 #define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
 #define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)

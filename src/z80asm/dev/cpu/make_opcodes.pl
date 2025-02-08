@@ -7,25 +7,41 @@
 #	%n	unsigned byte
 #   %h  high page offset
 #	%m	unsigned word - 16, 24 or 32 bits
+#	%m1	%m+1
 #	%M	unsigned word, big-endian
 #	%j	jr offset
+#	%J	jre offset
 #	%c	constant (im, bit, rst, ...)
 #	%d	signed register indirect offset
-#	%D	%d+1
+#	%D	%d+1						TODO: should be %d1 for consistency
 #	%u	unsigned register indirect offset
 #	%t	temp jump label to end of statement; %t3 to end of statement - 3
 #------------------------------------------------------------------------------
 
 use Modern::Perl;
-use YAML::Tiny;
+BEGIN { 
+	use Path::Tiny;
+	use lib path($0)->dirname;
+	use Opcodes;
+}
 use Clone 'clone';
-use warnings FATAL => 'uninitialized'; 
 use Carp (); 
 $SIG{__DIE__} = \&Carp::confess;
+use warnings FATAL => 'uninitialized'; 
 use Data::Dump 'dump';
 
-@ARGV==1 or die "Usage: $0 output_file.yaml\n";
+@ARGV==1 or die "Usage: $0 output_file.dat\n";
 my $output_file = shift;
+
+my $opcodes = Opcodes->new;
+
+#------------------------------------------------------------------------------
+# Intel
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# OLD STUFF
+#------------------------------------------------------------------------------
 
 my @CPUS = qw( z80 z80_strict z80n z180 
 			   ez80 ez80_z80 
@@ -35,9 +51,6 @@ my @CPUS = qw( z80 z80_strict z80n z180
 			   gbz80 
 			   kc160 kc160_z80
 );
-
-# %opcodes: $opcodes{$asm}{$cpu} = [[@bin],[@bin]]
-my %opcodes;
 
 # operand values
 my %V = (
@@ -376,10 +389,12 @@ for my $cpu (@CPUS) {
 	for my $op (qw( add adc sub sbb ana xra ora cmp )) {
 		for my $r (qw( b c d e h l m a )) {
 			if ($r4k || $r5k) {
-				add($cpu, "$op $r", [0x7F, alu_r($op, $r)]) unless $opcodes{"$op $r"}{$cpu};
+				add($cpu, "$op $r", [0x7F, alu_r($op, $r)]) 
+					unless $opcodes->exists("$op $r", $cpu);
 			}
 			else {
-				add($cpu, "$op $r", [alu_r($op, $r)]) unless $opcodes{"$op $r"}{$cpu};
+				add($cpu, "$op $r", [alu_r($op, $r)]) 
+					unless $opcodes->exists("$op $r", $cpu);
 			}
 		}
 	}
@@ -2181,7 +2196,7 @@ for my $cpu (@CPUS) {
 
 			for my $r (qw( b c d e h l (hl) a )) {
 				add_x($cpu, "$op $r", [0xCB, 8*$V{$op}+$V{$r}]) 
-					unless $opcodes{"$op $r"}{$cpu};
+					unless $opcodes->exists("$op $r", $cpu);
 				
 				# (ix+d) -> r
 				if (($z80 || $z80n) && $r ne '(hl)') {
@@ -3938,8 +3953,7 @@ for my $cpu (@CPUS) {
 #------------------------------------------------------------------------------
 # write file
 #------------------------------------------------------------------------------
-my $yaml = YAML::Tiny->new(\%opcodes);
-$yaml->write($output_file);
+$opcodes->to_file($output_file);
 
 #------------------------------------------------------------------------------
 # opcodes
@@ -3995,10 +4009,14 @@ sub add {
 		}
 	}
 
-	if (defined($opcodes{$asm}{$cpu})) {
-		die "$asm $cpu exists:\n", dump($opcodes{$asm}{$cpu});
+	# add constants
+	my @const;
+	if ($asm =~ /%c/) {
+		@ops = @{clone \@ops };		# make a deep copy
+		@const = find_range($cpu, $asm, \@ops);
 	}
-	$opcodes{$asm}{$cpu} = \@ops;
+	$opcodes->add(Opcode->new(asm => $asm, cpu => $cpu,
+							  const => \@const, ops => \@ops));
 }
 
 sub add_x {
@@ -4138,4 +4156,21 @@ sub add_suf {
 			}
 		}
 	}
+}
+
+sub find_range {
+	my($cpu, $asm, $ops) = @_;
+	
+	for my $op (@$ops) {
+		for my $byte (@$op) {
+			if ($byte =~ s/ %c \( ([x0-9a-f]+) \.\. ([x0-9a-f]+) \) /%c/xi) {
+				return ($1 .. $2);
+			}
+			elsif ($byte =~ s/ %c \( ( [x0-9a-f]+ (, [x0-9a-f]+)* ) \) /%c/xi) {
+				return (eval $1);
+			}
+		}
+	}
+	
+	die "no range found in $asm, $cpu";
 }

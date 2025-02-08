@@ -582,18 +582,26 @@
  altd res 8, l                  ; Error
  altd rl 0, bcde                ; Error
  altd rl 0, jkhl                ; Error
+ altd rl 3, bcde                ; Error
+ altd rl 3, jkhl                ; Error
  altd rl 5, bcde                ; Error
  altd rl 5, jkhl                ; Error
  altd rlc 0, bcde               ; Error
  altd rlc 0, jkhl               ; Error
+ altd rlc 3, bcde               ; Error
+ altd rlc 3, jkhl               ; Error
  altd rlc 5, bcde               ; Error
  altd rlc 5, jkhl               ; Error
  altd rr 0, bcde                ; Error
  altd rr 0, jkhl                ; Error
+ altd rr 3, bcde                ; Error
+ altd rr 3, jkhl                ; Error
  altd rr 5, bcde                ; Error
  altd rr 5, jkhl                ; Error
  altd rrc 0, bcde               ; Error
  altd rrc 0, jkhl               ; Error
+ altd rrc 3, bcde               ; Error
+ altd rrc 3, jkhl               ; Error
  altd rrc 5, bcde               ; Error
  altd rrc 5, jkhl               ; Error
  altd set -1, a                 ; Error
@@ -612,18 +620,26 @@
  altd set 8, l                  ; Error
  altd sla 0, bcde               ; Error
  altd sla 0, jkhl               ; Error
+ altd sla 3, bcde               ; Error
+ altd sla 3, jkhl               ; Error
  altd sla 5, bcde               ; Error
  altd sla 5, jkhl               ; Error
  altd sll 0, bcde               ; Error
  altd sll 0, jkhl               ; Error
+ altd sll 3, bcde               ; Error
+ altd sll 3, jkhl               ; Error
  altd sll 5, bcde               ; Error
  altd sll 5, jkhl               ; Error
  altd sra 0, bcde               ; Error
  altd sra 0, jkhl               ; Error
+ altd sra 3, bcde               ; Error
+ altd sra 3, jkhl               ; Error
  altd sra 5, bcde               ; Error
  altd sra 5, jkhl               ; Error
  altd srl 0, bcde               ; Error
  altd srl 0, jkhl               ; Error
+ altd srl 3, bcde               ; Error
+ altd srl 3, jkhl               ; Error
  altd srl 5, bcde               ; Error
  altd srl 5, jkhl               ; Error
  and (ahl)                      ; Error
@@ -7869,14 +7885,14 @@
  ldf sp, (0x123456)             ; Error
  ldf xix, (0x123456)            ; Error
  ldf yiy, (0x123456)            ; Error
- ldh ( c ), a                   ; Error
  ldh (0), a                     ; Error
  ldh (127), a                   ; Error
  ldh (255), a                   ; Error
- ldh a, ( c )                   ; Error
+ ldh (c), a                     ; Error
  ldh a, (0)                     ; Error
  ldh a, (127)                   ; Error
  ldh a, (255)                   ; Error
+ ldh a, (c)                     ; Error
  ldhl sp, -128                  ; Error
  ldhl sp, 0                     ; Error
  ldhl sp, 126                   ; Error
@@ -10368,8 +10384,18 @@
  rl 0, bcde'                    ; Error
  rl 0, jkhl                     ; Error
  rl 0, jkhl'                    ; Error
+ rl 3, bcde                     ; Error
+ rl 3, bcde'                    ; Error
+ rl 3, jkhl                     ; Error
+ rl 3, jkhl'                    ; Error
+ rl 5, bcde                     ; Error
  rl 5, bcde'                    ; Error
+ rl 5, jkhl                     ; Error
  rl 5, jkhl'                    ; Error
+ rl 6, bcde                     ; Error
+ rl 6, jkhl                     ; Error
+ rl 7, bcde                     ; Error
+ rl 7, jkhl                     ; Error
  rl 9, bcde                     ; Error
  rl 9, jkhl                     ; Error
  rl.l (hl)                      ; Error
@@ -10513,8 +10539,18 @@
  rlc 0, bcde'                   ; Error
  rlc 0, jkhl                    ; Error
  rlc 0, jkhl'                   ; Error
+ rlc 3, bcde                    ; Error
+ rlc 3, bcde'                   ; Error
+ rlc 3, jkhl                    ; Error
+ rlc 3, jkhl'                   ; Error
+ rlc 5, bcde                    ; Error
  rlc 5, bcde'                   ; Error
+ rlc 5, jkhl                    ; Error
  rlc 5, jkhl'                   ; Error
+ rlc 6, bcde                    ; Error
+ rlc 6, jkhl                    ; Error
+ rlc 7, bcde                    ; Error
+ rlc 7, jkhl                    ; Error
  rlc 9, bcde                    ; Error
  rlc 9, jkhl                    ; Error
  rlc.l (hl)                     ; Error
@@ -10664,8 +10700,18 @@
  rr 0, bcde'                    ; Error
  rr 0, jkhl                     ; Error
  rr 0, jkhl'                    ; Error
+ rr 3, bcde                     ; Error
+ rr 3, bcde'                    ; Error
+ rr 3, jkhl                     ; Error
+ rr 3, jkhl'                    ; Error
+ rr 5, bcde                     ; Error
  rr 5, bcde'                    ; Error
+ rr 5, jkhl                     ; Error
  rr 5, jkhl'                    ; Error
+ rr 6, bcde                     ; Error
+ rr 6, jkhl                     ; Error
+ rr 7, bcde                     ; Error
+ rr 7, jkhl                     ; Error
  rr 9, bcde                     ; Error
  rr 9, jkhl                     ; Error
  rr.l (hl)                      ; Error
@@ -10809,8 +10855,18 @@
  rrc 0, bcde'                   ; Error
  rrc 0, jkhl                    ; Error
  rrc 0, jkhl'                   ; Error
+ rrc 3, bcde                    ; Error
+ rrc 3, bcde'                   ; Error
+ rrc 3, jkhl                    ; Error
+ rrc 3, jkhl'                   ; Error
+ rrc 5, bcde                    ; Error
  rrc 5, bcde'                   ; Error
+ rrc 5, jkhl                    ; Error
  rrc 5, jkhl'                   ; Error
+ rrc 6, bcde                    ; Error
+ rrc 6, jkhl                    ; Error
+ rrc 7, bcde                    ; Error
+ rrc 7, jkhl                    ; Error
  rrc 9, bcde                    ; Error
  rrc 9, jkhl                    ; Error
  rrc.l (hl)                     ; Error
@@ -10858,81 +10914,291 @@
  rst -1                         ; Error
  rst 0                          ; Error
  rst 1                          ; Error
+ rst 10                         ; Error
+ rst 11                         ; Error
+ rst 12                         ; Error
+ rst 13                         ; Error
+ rst 14                         ; Error
+ rst 15                         ; Error
+ rst 17                         ; Error
+ rst 18                         ; Error
+ rst 19                         ; Error
+ rst 20                         ; Error
+ rst 21                         ; Error
+ rst 22                         ; Error
+ rst 23                         ; Error
+ rst 25                         ; Error
+ rst 26                         ; Error
+ rst 27                         ; Error
+ rst 28                         ; Error
+ rst 29                         ; Error
+ rst 30                         ; Error
+ rst 31                         ; Error
+ rst 33                         ; Error
+ rst 34                         ; Error
+ rst 35                         ; Error
+ rst 36                         ; Error
+ rst 37                         ; Error
+ rst 38                         ; Error
+ rst 39                         ; Error
+ rst 41                         ; Error
+ rst 42                         ; Error
+ rst 43                         ; Error
+ rst 44                         ; Error
+ rst 45                         ; Error
+ rst 46                         ; Error
+ rst 47                         ; Error
  rst 48                         ; Error
+ rst 49                         ; Error
+ rst 50                         ; Error
+ rst 51                         ; Error
+ rst 52                         ; Error
+ rst 53                         ; Error
+ rst 54                         ; Error
+ rst 55                         ; Error
  rst 57                         ; Error
  rst 6                          ; Error
  rst 8                          ; Error
+ rst 9                          ; Error
  rst v, 63                      ; Error
  rst v, 64                      ; Error
  rst v, 65                      ; Error
  rst.l -1                       ; Error
  rst.l 0                        ; Error
  rst.l 1                        ; Error
+ rst.l 10                       ; Error
+ rst.l 11                       ; Error
+ rst.l 12                       ; Error
+ rst.l 13                       ; Error
+ rst.l 14                       ; Error
+ rst.l 15                       ; Error
  rst.l 16                       ; Error
+ rst.l 17                       ; Error
+ rst.l 18                       ; Error
+ rst.l 19                       ; Error
  rst.l 2                        ; Error
+ rst.l 20                       ; Error
+ rst.l 21                       ; Error
+ rst.l 22                       ; Error
+ rst.l 23                       ; Error
  rst.l 24                       ; Error
+ rst.l 25                       ; Error
+ rst.l 26                       ; Error
+ rst.l 27                       ; Error
+ rst.l 28                       ; Error
+ rst.l 29                       ; Error
  rst.l 3                        ; Error
+ rst.l 30                       ; Error
+ rst.l 31                       ; Error
  rst.l 32                       ; Error
+ rst.l 33                       ; Error
+ rst.l 34                       ; Error
+ rst.l 35                       ; Error
+ rst.l 36                       ; Error
+ rst.l 37                       ; Error
+ rst.l 38                       ; Error
+ rst.l 39                       ; Error
  rst.l 4                        ; Error
  rst.l 40                       ; Error
+ rst.l 41                       ; Error
+ rst.l 42                       ; Error
+ rst.l 43                       ; Error
+ rst.l 44                       ; Error
+ rst.l 45                       ; Error
+ rst.l 46                       ; Error
+ rst.l 47                       ; Error
  rst.l 48                       ; Error
+ rst.l 49                       ; Error
  rst.l 5                        ; Error
+ rst.l 50                       ; Error
+ rst.l 51                       ; Error
+ rst.l 52                       ; Error
+ rst.l 53                       ; Error
+ rst.l 54                       ; Error
+ rst.l 55                       ; Error
  rst.l 56                       ; Error
  rst.l 57                       ; Error
  rst.l 6                        ; Error
  rst.l 7                        ; Error
  rst.l 8                        ; Error
+ rst.l 9                        ; Error
  rst.lis -1                     ; Error
  rst.lis 0                      ; Error
  rst.lis 1                      ; Error
+ rst.lis 10                     ; Error
+ rst.lis 11                     ; Error
+ rst.lis 12                     ; Error
+ rst.lis 13                     ; Error
+ rst.lis 14                     ; Error
+ rst.lis 15                     ; Error
  rst.lis 16                     ; Error
+ rst.lis 17                     ; Error
+ rst.lis 18                     ; Error
+ rst.lis 19                     ; Error
  rst.lis 2                      ; Error
+ rst.lis 20                     ; Error
+ rst.lis 21                     ; Error
+ rst.lis 22                     ; Error
+ rst.lis 23                     ; Error
  rst.lis 24                     ; Error
+ rst.lis 25                     ; Error
+ rst.lis 26                     ; Error
+ rst.lis 27                     ; Error
+ rst.lis 28                     ; Error
+ rst.lis 29                     ; Error
  rst.lis 3                      ; Error
+ rst.lis 30                     ; Error
+ rst.lis 31                     ; Error
  rst.lis 32                     ; Error
+ rst.lis 33                     ; Error
+ rst.lis 34                     ; Error
+ rst.lis 35                     ; Error
+ rst.lis 36                     ; Error
+ rst.lis 37                     ; Error
+ rst.lis 38                     ; Error
+ rst.lis 39                     ; Error
  rst.lis 4                      ; Error
  rst.lis 40                     ; Error
+ rst.lis 41                     ; Error
+ rst.lis 42                     ; Error
+ rst.lis 43                     ; Error
+ rst.lis 44                     ; Error
+ rst.lis 45                     ; Error
+ rst.lis 46                     ; Error
+ rst.lis 47                     ; Error
  rst.lis 48                     ; Error
+ rst.lis 49                     ; Error
  rst.lis 5                      ; Error
+ rst.lis 50                     ; Error
+ rst.lis 51                     ; Error
+ rst.lis 52                     ; Error
+ rst.lis 53                     ; Error
+ rst.lis 54                     ; Error
+ rst.lis 55                     ; Error
  rst.lis 56                     ; Error
  rst.lis 57                     ; Error
  rst.lis 6                      ; Error
  rst.lis 7                      ; Error
  rst.lis 8                      ; Error
+ rst.lis 9                      ; Error
  rst.s -1                       ; Error
  rst.s 0                        ; Error
  rst.s 1                        ; Error
+ rst.s 10                       ; Error
+ rst.s 11                       ; Error
+ rst.s 12                       ; Error
+ rst.s 13                       ; Error
+ rst.s 14                       ; Error
+ rst.s 15                       ; Error
  rst.s 16                       ; Error
+ rst.s 17                       ; Error
+ rst.s 18                       ; Error
+ rst.s 19                       ; Error
  rst.s 2                        ; Error
+ rst.s 20                       ; Error
+ rst.s 21                       ; Error
+ rst.s 22                       ; Error
+ rst.s 23                       ; Error
  rst.s 24                       ; Error
+ rst.s 25                       ; Error
+ rst.s 26                       ; Error
+ rst.s 27                       ; Error
+ rst.s 28                       ; Error
+ rst.s 29                       ; Error
  rst.s 3                        ; Error
+ rst.s 30                       ; Error
+ rst.s 31                       ; Error
  rst.s 32                       ; Error
+ rst.s 33                       ; Error
+ rst.s 34                       ; Error
+ rst.s 35                       ; Error
+ rst.s 36                       ; Error
+ rst.s 37                       ; Error
+ rst.s 38                       ; Error
+ rst.s 39                       ; Error
  rst.s 4                        ; Error
  rst.s 40                       ; Error
+ rst.s 41                       ; Error
+ rst.s 42                       ; Error
+ rst.s 43                       ; Error
+ rst.s 44                       ; Error
+ rst.s 45                       ; Error
+ rst.s 46                       ; Error
+ rst.s 47                       ; Error
  rst.s 48                       ; Error
+ rst.s 49                       ; Error
  rst.s 5                        ; Error
+ rst.s 50                       ; Error
+ rst.s 51                       ; Error
+ rst.s 52                       ; Error
+ rst.s 53                       ; Error
+ rst.s 54                       ; Error
+ rst.s 55                       ; Error
  rst.s 56                       ; Error
  rst.s 57                       ; Error
  rst.s 6                        ; Error
  rst.s 7                        ; Error
  rst.s 8                        ; Error
+ rst.s 9                        ; Error
  rst.sil -1                     ; Error
  rst.sil 0                      ; Error
  rst.sil 1                      ; Error
+ rst.sil 10                     ; Error
+ rst.sil 11                     ; Error
+ rst.sil 12                     ; Error
+ rst.sil 13                     ; Error
+ rst.sil 14                     ; Error
+ rst.sil 15                     ; Error
  rst.sil 16                     ; Error
+ rst.sil 17                     ; Error
+ rst.sil 18                     ; Error
+ rst.sil 19                     ; Error
  rst.sil 2                      ; Error
+ rst.sil 20                     ; Error
+ rst.sil 21                     ; Error
+ rst.sil 22                     ; Error
+ rst.sil 23                     ; Error
  rst.sil 24                     ; Error
+ rst.sil 25                     ; Error
+ rst.sil 26                     ; Error
+ rst.sil 27                     ; Error
+ rst.sil 28                     ; Error
+ rst.sil 29                     ; Error
  rst.sil 3                      ; Error
+ rst.sil 30                     ; Error
+ rst.sil 31                     ; Error
  rst.sil 32                     ; Error
+ rst.sil 33                     ; Error
+ rst.sil 34                     ; Error
+ rst.sil 35                     ; Error
+ rst.sil 36                     ; Error
+ rst.sil 37                     ; Error
+ rst.sil 38                     ; Error
+ rst.sil 39                     ; Error
  rst.sil 4                      ; Error
  rst.sil 40                     ; Error
+ rst.sil 41                     ; Error
+ rst.sil 42                     ; Error
+ rst.sil 43                     ; Error
+ rst.sil 44                     ; Error
+ rst.sil 45                     ; Error
+ rst.sil 46                     ; Error
+ rst.sil 47                     ; Error
  rst.sil 48                     ; Error
+ rst.sil 49                     ; Error
  rst.sil 5                      ; Error
+ rst.sil 50                     ; Error
+ rst.sil 51                     ; Error
+ rst.sil 52                     ; Error
+ rst.sil 53                     ; Error
+ rst.sil 54                     ; Error
+ rst.sil 55                     ; Error
  rst.sil 56                     ; Error
  rst.sil 57                     ; Error
  rst.sil 6                      ; Error
  rst.sil 7                      ; Error
  rst.sil 8                      ; Error
+ rst.sil 9                      ; Error
  rstv                           ; Error
  rv                             ; Error
  sbc (ahl)                      ; Error
@@ -12677,6 +12943,10 @@
  sla 0, bcde'                   ; Error
  sla 0, jkhl                    ; Error
  sla 0, jkhl'                   ; Error
+ sla 3, bcde                    ; Error
+ sla 3, bcde'                   ; Error
+ sla 3, jkhl                    ; Error
+ sla 3, jkhl'                   ; Error
  sla 5, bcde                    ; Error
  sla 5, bcde'                   ; Error
  sla 5, jkhl                    ; Error
@@ -12858,6 +13128,10 @@
  sll 0, bcde'                   ; Error
  sll 0, jkhl                    ; Error
  sll 0, jkhl'                   ; Error
+ sll 3, bcde                    ; Error
+ sll 3, bcde'                   ; Error
+ sll 3, jkhl                    ; Error
+ sll 3, jkhl'                   ; Error
  sll 5, bcde                    ; Error
  sll 5, bcde'                   ; Error
  sll 5, jkhl                    ; Error
@@ -13047,6 +13321,10 @@
  sra 0, bcde'                   ; Error
  sra 0, jkhl                    ; Error
  sra 0, jkhl'                   ; Error
+ sra 3, bcde                    ; Error
+ sra 3, bcde'                   ; Error
+ sra 3, jkhl                    ; Error
+ sra 3, jkhl'                   ; Error
  sra 5, bcde                    ; Error
  sra 5, bcde'                   ; Error
  sra 5, jkhl                    ; Error
@@ -13192,6 +13470,10 @@
  srl 0, bcde'                   ; Error
  srl 0, jkhl                    ; Error
  srl 0, jkhl'                   ; Error
+ srl 3, bcde                    ; Error
+ srl 3, bcde'                   ; Error
+ srl 3, jkhl                    ; Error
+ srl 3, jkhl'                   ; Error
  srl 5, bcde                    ; Error
  srl 5, bcde'                   ; Error
  srl 5, jkhl                    ; Error
