@@ -1690,8 +1690,7 @@ for my $cpu (@CPUS) {
 		my $dd1 = ($dd eq 'sp') ? $dd : substr($dd,0,1);		# B, D, H
 		
 		add_x($cpu, "add hl, $dd",[add_hl_dd($dd)]);
-		add($cpu, "dad $dd",	[add_hl_dd($dd)]);
-		add($cpu, "dad $dd1",	[add_hl_dd($dd)]) if $dd ne $dd1;	
+		add($cpu, "dad $dd1",	[add_hl_dd($dd)]);	
 		
 		if ($zilog || $rabbit || $kc160_any) {
 			for my $x (qw( ix iy )) {

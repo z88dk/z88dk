@@ -249,11 +249,8 @@
  cz 0x1234                      ; CC 34 12
  daa                            ; 27
  dad b                          ; 09
- dad bc                         ; 09
  dad d                          ; 19
- dad de                         ; 19
  dad h                          ; 29
- dad hl                         ; 29
  dad sp                         ; 39
  dcr a                          ; 3D
  dcr b                          ; 05
@@ -330,7 +327,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 75 02 D2 34 12
+ jgtu 0x1234                    ; CA 72 02 D2 34 12
  jk 0x1234                      ; FD 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
@@ -349,7 +346,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA B0 02 D2 34 12
+ jp gtu, 0x1234                 ; CA AD 02 D2 34 12
  jp k,0x1234                    ; FD 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
@@ -372,7 +369,7 @@
  jr c, 0x1234                   ; DA 34 12
  jr eq, 0x1234                  ; CA 34 12
  jr geu, 0x1234                 ; D2 34 12
- jr gtu, 0x1234                 ; CA FB 02 D2 34 12
+ jr gtu, 0x1234                 ; CA F8 02 D2 34 12
  jr leu, 0x1234                 ; CA 34 12 DA 34 12
  jr ltu, 0x1234                 ; DA 34 12
  jr nc, 0x1234                  ; D2 34 12
@@ -924,7 +921,7 @@
  ret c                          ; D8
  ret eq                         ; C8
  ret geu                        ; D0
- ret gtu                        ; CA C1 07 DA C1 07 C9
+ ret gtu                        ; CA BE 07 DA BE 07 C9
  ret leu                        ; C8 D8
  ret ltu                        ; D8
  ret m                          ; F8
@@ -938,7 +935,7 @@
  ret v                          ; E8
  ret z                          ; C8
  rgeu                           ; D0
- rgtu                           ; CA D6 07 DA D6 07 C9
+ rgtu                           ; CA D3 07 DA D3 07 C9
  rim                            ; 20
  rl bc                          ; CD @__z80asm__rl_bc
  rl de                          ; 18

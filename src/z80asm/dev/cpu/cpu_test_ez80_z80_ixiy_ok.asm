@@ -999,11 +999,8 @@
  cz 0x1234                      ; CC 34 12
  daa                            ; 27
  dad b                          ; 09
- dad bc                         ; 09
  dad d                          ; 19
- dad de                         ; 19
  dad h                          ; 29
- dad hl                         ; 29
  dad sp                         ; 39
  dcr a                          ; 3D
  dcr b                          ; 05
@@ -1277,7 +1274,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 91 0F D2 34 12
+ jgtu 0x1234                    ; CA 8E 0F D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jm 0x1234                      ; FA 34 12
@@ -1295,7 +1292,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA C7 0F D2 34 12
+ jp gtu, 0x1234                 ; CA C4 0F D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp m, 0x1234                   ; FA 34 12
@@ -1315,7 +1312,7 @@
  jp.lil c, 0x123456             ; 5B DA 56 34 12
  jp.lil eq, 0x123456            ; 5B CA 56 34 12
  jp.lil geu, 0x123456           ; 5B D2 56 34 12
- jp.lil gtu, 0x123456           ; 5B CA 14 10 00 5B D2 56 34 12
+ jp.lil gtu, 0x123456           ; 5B CA 11 10 00 5B D2 56 34 12
  jp.lil leu, 0x123456           ; 5B CA 56 34 12 5B DA 56 34 12
  jp.lil ltu, 0x123456           ; 5B DA 56 34 12
  jp.lil m, 0x123456             ; 5B FA 56 34 12
@@ -1335,7 +1332,7 @@
  jp.sis c, 0x1234               ; 40 DA 34 12
  jp.sis eq, 0x1234              ; 40 CA 34 12
  jp.sis geu, 0x1234             ; 40 D2 34 12
- jp.sis gtu, 0x1234             ; 40 CA 75 10 40 D2 34 12
+ jp.sis gtu, 0x1234             ; 40 CA 72 10 40 D2 34 12
  jp.sis leu, 0x1234             ; 40 CA 34 12 40 DA 34 12
  jp.sis ltu, 0x1234             ; 40 DA 34 12
  jp.sis m, 0x1234               ; 40 FA 34 12

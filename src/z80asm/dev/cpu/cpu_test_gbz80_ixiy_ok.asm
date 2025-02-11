@@ -302,11 +302,8 @@
  cz 0x1234                      ; CC 34 12
  daa                            ; 27
  dad b                          ; 09
- dad bc                         ; 09
  dad d                          ; 19
- dad de                         ; 19
  dad h                          ; 29
- dad hl                         ; 29
  dad sp                         ; 39
  dcr a                          ; 3D
  dcr b                          ; 05
@@ -375,7 +372,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 09 03 D2 34 12
+ jgtu 0x1234                    ; CA 06 03 D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jmp 0x1234                     ; C3 34 12
@@ -389,7 +386,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA 35 03 D2 34 12
+ jp gtu, 0x1234                 ; CA 32 03 D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp nc, 0x1234                  ; D2 34 12

@@ -2567,11 +2567,8 @@
  cz 0x1234                      ; 20 03 CD 34 12
  daa                            ; CD @__z80asm__daa
  dad b                          ; 09
- dad bc                         ; 09
  dad d                          ; 19
- dad de                         ; 19
  dad h                          ; 29
- dad hl                         ; 29
  dad sp                         ; 39
  dcr a                          ; 3D
  dcr b                          ; 05
@@ -5675,7 +5672,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 75 59 D2 34 12
+ jgtu 0x1234                    ; CA 72 59 D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jlo 0x1234                     ; EA 34 12
  jltu 0x1234                    ; DA 34 12
@@ -5695,7 +5692,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA B1 59 D2 34 12
+ jp gtu, 0x1234                 ; CA AE 59 D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp lo, 0x1234                  ; EA 34 12
  jp ltu, 0x1234                 ; DA 34 12

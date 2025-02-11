@@ -3112,11 +3112,8 @@
  cz 0x1234                      ; 20 03 CD 34 12
  daa                            ; CD @__z80asm__daa
  dad b                          ; 09
- dad bc                         ; 09
  dad d                          ; 19
- dad de                         ; 19
  dad h                          ; 29
- dad hl                         ; 29
  dad sp                         ; 39
  dcr a                          ; 3D
  dcr b                          ; 05
