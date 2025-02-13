@@ -36087,22 +36087,22 @@ ret geu|z180|_||D0
 ret geu|z80|_||D0
 ret geu|z80_strict|_||D0
 ret geu|z80n|_||D0
-ret gtu|8080|_||CA %t %t;DA %t %t;C9
-ret gtu|8085|_||CA %t %t;DA %t %t;C9
-ret gtu|ez80|_||28 %t;38 %t;C9
-ret gtu|ez80_z80|_||28 %t;38 %t;C9
-ret gtu|gbz80|_||28 %t;38 %t;C9
-ret gtu|kc160|_||28 %t;38 %t;C9
-ret gtu|kc160_z80|_||28 %t;38 %t;C9
-ret gtu|r2ka|_||28 %t;38 %t;C9
-ret gtu|r3k|_||28 %t;38 %t;C9
-ret gtu|r4k|_||28 %t;38 %t;C9
-ret gtu|r5k|_||28 %t;38 %t;C9
-ret gtu|r800|_||28 %t;38 %t;C9
-ret gtu|z180|_||28 %t;38 %t;C9
-ret gtu|z80|_||28 %t;38 %t;C9
-ret gtu|z80_strict|_||28 %t;38 %t;C9
-ret gtu|z80n|_||28 %t;38 %t;C9
+ret gtu|8080|_||CA %t %t;D0
+ret gtu|8085|_||CA %t %t;D0
+ret gtu|ez80|_||28 %t;D0
+ret gtu|ez80_z80|_||28 %t;D0
+ret gtu|gbz80|_||28 %t;D0
+ret gtu|kc160|_||28 %t;D0
+ret gtu|kc160_z80|_||28 %t;D0
+ret gtu|r2ka|_||28 %t;D0
+ret gtu|r3k|_||28 %t;D0
+ret gtu|r4k|_||28 %t;D0
+ret gtu|r5k|_||28 %t;D0
+ret gtu|r800|_||28 %t;D0
+ret gtu|z180|_||28 %t;D0
+ret gtu|z80|_||28 %t;D0
+ret gtu|z80_strict|_||28 %t;D0
+ret gtu|z80n|_||28 %t;D0
 ret leu|8080|_||C8;D8
 ret leu|8085|_||C8;D8
 ret leu|ez80|_||C8;D8
@@ -36412,22 +36412,22 @@ rgeu|z180|_||D0
 rgeu|z80|_||D0
 rgeu|z80_strict|_||D0
 rgeu|z80n|_||D0
-rgtu|8080|_||CA %t %t;DA %t %t;C9
-rgtu|8085|_||CA %t %t;DA %t %t;C9
-rgtu|ez80|_||28 %t;38 %t;C9
-rgtu|ez80_z80|_||28 %t;38 %t;C9
-rgtu|gbz80|_||28 %t;38 %t;C9
-rgtu|kc160|_||28 %t;38 %t;C9
-rgtu|kc160_z80|_||28 %t;38 %t;C9
-rgtu|r2ka|_||28 %t;38 %t;C9
-rgtu|r3k|_||28 %t;38 %t;C9
-rgtu|r4k|_||28 %t;38 %t;C9
-rgtu|r5k|_||28 %t;38 %t;C9
-rgtu|r800|_||28 %t;38 %t;C9
-rgtu|z180|_||28 %t;38 %t;C9
-rgtu|z80|_||28 %t;38 %t;C9
-rgtu|z80_strict|_||28 %t;38 %t;C9
-rgtu|z80n|_||28 %t;38 %t;C9
+rgtu|8080|_||CA %t %t;D0
+rgtu|8085|_||CA %t %t;D0
+rgtu|ez80|_||28 %t;D0
+rgtu|ez80_z80|_||28 %t;D0
+rgtu|gbz80|_||28 %t;D0
+rgtu|kc160|_||28 %t;D0
+rgtu|kc160_z80|_||28 %t;D0
+rgtu|r2ka|_||28 %t;D0
+rgtu|r3k|_||28 %t;D0
+rgtu|r4k|_||28 %t;D0
+rgtu|r5k|_||28 %t;D0
+rgtu|r800|_||28 %t;D0
+rgtu|z180|_||28 %t;D0
+rgtu|z80|_||28 %t;D0
+rgtu|z80_strict|_||28 %t;D0
+rgtu|z80n|_||28 %t;D0
 rim|8085|_||20
 rl %c, bcde|r4k|_|1,2,4,8|DD %c==1?0x68:%c==2?0x69:%c==4?0x6B:0x6F
 rl %c, bcde|r5k|_|1,2,4,8|DD %c==1?0x68:%c==2?0x69:%c==4?0x6B:0x6F

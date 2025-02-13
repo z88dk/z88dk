@@ -119145,8 +119145,7 @@ case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160
 DO_STMT_LABEL();
 const char *end_label = autolabel();
 add_opcode_jr_end(0x28, end_label, 0);
-add_opcode_jr_end(0x38, end_label, 0);
-DO_stmt(0xC9);
+DO_stmt(0xD0);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
 break;
@@ -119155,8 +119154,7 @@ case CPU_8080: case CPU_8085:
 DO_STMT_LABEL();
 const char *end_label = autolabel();
 add_opcode_nn_end(0xCA, end_label, 0);
-add_opcode_nn_end(0xDA, end_label, 0);
-DO_stmt(0xC9);
+DO_stmt(0xD0);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
 break;
@@ -119923,8 +119921,7 @@ case CPU_EZ80: case CPU_EZ80_Z80: case CPU_GBZ80: case CPU_KC160: case CPU_KC160
 DO_STMT_LABEL();
 const char *end_label = autolabel();
 add_opcode_jr_end(0x28, end_label, 0);
-add_opcode_jr_end(0x38, end_label, 0);
-DO_stmt(0xC9);
+DO_stmt(0xD0);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
 break;
@@ -119933,8 +119930,7 @@ case CPU_8080: case CPU_8085:
 DO_STMT_LABEL();
 const char *end_label = autolabel();
 add_opcode_nn_end(0xCA, end_label, 0);
-add_opcode_nn_end(0xDA, end_label, 0);
-DO_stmt(0xC9);
+DO_stmt(0xD0);
 asm_LABEL_offset(end_label, get_cur_opcode_size());
 }
 break;

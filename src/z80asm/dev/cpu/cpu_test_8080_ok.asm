@@ -912,7 +912,7 @@
  ret c                          ; D8
  ret eq                         ; C8
  ret geu                        ; D0
- ret gtu                        ; CA 26 08 DA 26 08 C9
+ ret gtu                        ; CA 23 08 D0
  ret leu                        ; C8 D8
  ret ltu                        ; D8
  ret m                          ; F8
@@ -926,7 +926,7 @@
  ret v                          ; E8
  ret z                          ; C8
  rgeu                           ; D0
- rgtu                           ; CA 3B 08 DA 3B 08 C9
+ rgtu                           ; CA 35 08 D0
  rl bc                          ; CD @__z80asm__rl_bc
  rl de                          ; CD @__z80asm__rl_de
  rl hl                          ; CD @__z80asm__rl_hl
