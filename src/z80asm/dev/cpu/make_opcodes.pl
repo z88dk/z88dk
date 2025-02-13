@@ -3028,9 +3028,8 @@ for my $cpu (@CPUS) {
 		if ($intel) {
 			if ($f eq 'gtu') {
 				for my $ret ("ret $f", "r$f") {
-					add($cpu, "$ret",		[jp_f('_eq'),  '%t', '%t'],
-											[jp_f('_ltu'), '%t', '%t'],
-											[ret()]);
+					add($cpu, "$ret",		[jp_f('_z'),  '%t', '%t'],
+											[ret_f('_nc')]);
 				}
 			}
 			elsif ($f eq 'leu') {
@@ -3048,9 +3047,8 @@ for my $cpu (@CPUS) {
 		else {
 			if ($f eq 'gtu') {
 				for my $ret ("ret $f", "r$f") {
-					add($cpu, "$ret",		[jr_f('_eq'),  '%t'],
-											[jr_f('_ltu'), '%t'],
-											[ret()]);
+					add($cpu, "$ret",		[jr_f('_z'),  '%t'],
+											[ret_f('_nc')]);
 				}
 			}
 			elsif ($f eq 'leu') {

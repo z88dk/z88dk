@@ -4920,7 +4920,7 @@
  ret c                          ; D8
  ret eq                         ; C8
  ret geu                        ; D0
- ret gtu                        ; 28 03 38 01 C9
+ ret gtu                        ; 28 01 D0
  ret leu                        ; C8 D8
  ret ltu                        ; D8
  ret m                          ; F8
@@ -4938,7 +4938,7 @@
  retn                           ; ED 45
  retn3                          ; ED 55
  rgeu                           ; D0
- rgtu                           ; 28 03 38 01 C9
+ rgtu                           ; 28 01 D0
  rl (ahl)                       ; 52 CB 16
  rl (aix)                       ; 52 DD CB 00 16
  rl (aix+0)                     ; 52 DD CB 00 16
