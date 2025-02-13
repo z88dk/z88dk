@@ -130,11 +130,25 @@ void add_opcode_n_0(int opcode, struct Expr1* expr)
     Pass2infoExpr(RANGE_BYTE_TO_WORD_UNSIGNED, expr);
 }
 
+/* add opcode followed by 8-bit unsigned expression and two zero bytes */
+void add_opcode_n_0_0(int opcode, struct Expr1* expr)
+{
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_BYTE_TO_PTR_UNSIGNED, expr);
+}
+
 /* add opcode followed by 8-bit signed expression and a 0x00/0xFF byte */
 void add_opcode_s_0(int opcode, struct Expr1* expr)
 {
     add_opcode(opcode);
     Pass2infoExpr(RANGE_BYTE_TO_WORD_SIGNED, expr);
+}
+
+/* add opcode followed by 8-bit signed expression and two zeros or 0xff bytes depending on sign */
+void add_opcode_s_0_0(int opcode, struct Expr1* expr)
+{
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_BYTE_TO_PTR_SIGNED, expr);
 }
 
 /* add opcode followed by 8-bit signed expression */

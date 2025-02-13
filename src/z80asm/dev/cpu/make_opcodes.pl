@@ -36,8 +36,581 @@ my $output_file = shift;
 my $opcodes = Opcodes->new;
 
 #------------------------------------------------------------------------------
-# Intel
+# Operand values
 #------------------------------------------------------------------------------
+
+sub R {
+	return ''.{'b'=>0, 'c'=>1, 'd'=>2, 'e'=>3, 
+			   'h'=>4, 'l'=>5, '(hl)'=>6, 'f'=>6, 'm'=>6, 'a'=>7}->{$_[0]};
+}
+
+sub RP {
+	return ''.{'b'=>0, 'd'=>1, 'h'=>2, 'sp'=>3, 'psw'=>3, 
+			   'bc'=>0, 'de'=>1, 'hl'=>2, 'af'=>3}->{$_[0]};
+}
+
+sub F {
+	return ''.{'nz'=>0, 'z'=>1, 'nc'=>2, 'c'=>3, 
+			   'po'=>4, 'pe'=>5, 'p'=>6, 'm'=>7}->{$_[0]};
+}
+
+sub ALU {
+	return ''.{'add'=>0, 'adc'=>1, 'sub'=>2, 'sbb'=>3,
+											 'sbc'=>3,
+			   'ana'=>4, 'xra'=>5, 'ora'=>6, 'cmp'=>7,
+			   'and'=>4, 'xor'=>5, 'or'=>6,  'cp'=>7,
+			   'adi'=>0, 'aci'=>1, 'sui'=>2, 'sbi'=>3,
+			   'ani'=>4, 'xri'=>5, 'ori'=>6, 'cpi'=>7}->{$_[0]};
+}
+
+#------------------------------------------------------------------------------
+# 8080
+#------------------------------------------------------------------------------
+
+for my $cpu1 ('8080') {
+	for my $strict ('', '_strict') {
+		my $cpu = $cpu1.$strict;
+
+		# MOV r, r
+		for my $d ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+			for my $s ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+				next if $d eq 'm' && $d eq $s;
+				$opcodes->add(Opcode->new(asm=>"mov $d, $s", cpu=>$cpu, 
+							  			  ops=>[[0x40+8*R($d)+R($s)]]));
+			}
+		}
+
+		# LD r, r
+		if (!$strict) {
+			for my $d ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+				for my $s ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+					next if $d eq '(hl)' && $d eq $s;
+					$opcodes->add(Opcode->new(asm=>"ld $d, $s", cpu=>$cpu, 
+											ops=>[[0x40+8*R($d)+R($s)]]));
+				}
+			}
+		}
+
+		# MVI r
+		for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+			$opcodes->add(Opcode->new(asm=>"mvi $r, %n", cpu=>$cpu, 
+									  ops=>[[0x06+8*R($r), '%n']]));
+		}
+
+		# LD r, N
+		if (!$strict) {
+			for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+				$opcodes->add(Opcode->new(asm=>"ld $r, %n", cpu=>$cpu, 
+										ops=>[[0x06+8*R($r), '%n']]));
+			}
+		}
+
+		# LXI rp
+		for my $rp ('b', 'd', 'h', 'sp') {
+			$opcodes->add(Opcode->new(asm=>"lxi $rp, %m", cpu=>$cpu, 
+									  ops=>[[0x01+16*RP($rp), '%m', '%m']]));
+		}
+
+		# LD rp, N
+		if (!$strict) {
+			for my $rp ('bc', 'de', 'hl', 'sp') {
+				$opcodes->add(Opcode->new(asm=>"ld $rp, %m", cpu=>$cpu, 
+										  ops=>[[0x01+16*RP($rp), '%m', '%m']]));
+			}
+		}
+
+		# STAX rp
+		for my $rp ('b', 'd') {
+			$opcodes->add(Opcode->new(asm=>"stax $rp", cpu=>$cpu, 
+									  ops=>[[0x02+16*RP($rp)]]));
+		}
+
+		# LD (rp), A
+		if (!$strict) {
+			for my $rp ('bc', 'de') {
+				$opcodes->add(Opcode->new(asm=>"ld ($rp), a", cpu=>$cpu, 
+										  ops=>[[0x02+16*RP($rp)]]));
+			}
+		}
+
+		# LDAX rp
+		for my $rp ('b', 'd') {
+			$opcodes->add(Opcode->new(asm=>"ldax $rp", cpu=>$cpu, 
+									  ops=>[[0x0A+16*RP($rp)]]));
+		}
+
+		# LD A, (rp)
+		if (!$strict) {
+			for my $rp ('bc', 'de') {
+				$opcodes->add(Opcode->new(asm=>"ld a, ($rp)", cpu=>$cpu, 
+										  ops=>[[0x0A+16*RP($rp)]]));
+			}
+		}
+
+		# STA
+		$opcodes->add(Opcode->new(asm=>"sta %m", cpu=>$cpu, 
+								  ops=>[[0x32, '%m', '%m']]));
+
+		# LD (NN), A
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"ld (%m), a", cpu=>$cpu, 
+									  ops=>[[0x32, '%m', '%m']]));
+		}
+
+		# LDA
+		$opcodes->add(Opcode->new(asm=>"lda %m", cpu=>$cpu, 
+								  ops=>[[0x3A, '%m', '%m']]));
+
+		# LD A, (NN)
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"ld a, (%m)", cpu=>$cpu, 
+									  ops=>[[0x3A, '%m', '%m']]));
+		}
+
+		# SHLD
+		$opcodes->add(Opcode->new(asm=>"shld %m", cpu=>$cpu, 
+								  ops=>[[0x22, '%m', '%m']]));
+
+		# LD (NN), HL
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"ld (%m), hl", cpu=>$cpu, 
+									  ops=>[[0x22, '%m', '%m']]));
+		}
+
+		# LHLD
+		$opcodes->add(Opcode->new(asm=>"lhld %m", cpu=>$cpu, 
+								  ops=>[[0x2A, '%m', '%m']]));
+
+		# LD HL, (NN)
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"ld hl, (%m)", cpu=>$cpu, 
+									  ops=>[[0x2A, '%m', '%m']]));
+		}
+
+		# XCHG
+		$opcodes->add(Opcode->new(asm=>"xchg", cpu=>$cpu, 
+								  ops=>[[0xEB]]));
+
+		# EX DE, HL
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"ex de, hl", cpu=>$cpu, 
+									  ops=>[[0xEB]]));
+		}
+
+		# PUSH rp
+		for my $rp ('b', 'd', 'h', 'psw') {
+			$opcodes->add(Opcode->new(asm=>"push $rp", cpu=>$cpu, 
+									  ops=>[[0xC5+16*RP($rp)]]));
+		}
+
+		# PUSH rp
+		if (!$strict) {
+			for my $rp ('bc', 'de', 'hl', 'af') {
+				$opcodes->add(Opcode->new(asm=>"push $rp", cpu=>$cpu, 
+										  ops=>[[0xC5+16*RP($rp)]]));
+			}
+		}
+
+		# POP rp
+		for my $rp ('b', 'd', 'h', 'psw') {
+			$opcodes->add(Opcode->new(asm=>"pop $rp", cpu=>$cpu, 
+									  ops=>[[0xC1+16*RP($rp)]]));
+		}
+
+		# POP rp
+		if (!$strict) {
+			for my $rp ('bc', 'de', 'hl', 'af') {
+				$opcodes->add(Opcode->new(asm=>"pop $rp", cpu=>$cpu, 
+										  ops=>[[0xC1+16*RP($rp)]]));
+			}
+		}
+
+		# XTHL
+		$opcodes->add(Opcode->new(asm=>"xthl", cpu=>$cpu, 
+								  ops=>[[0xE3]]));
+
+		# EX (SP), HL
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"ex (sp), hl", cpu=>$cpu, 
+									  ops=>[[0xE3]]));
+		}
+
+		# SPHL
+		$opcodes->add(Opcode->new(asm=>"sphl", cpu=>$cpu, 
+								  ops=>[[0xF9]]));
+
+		# LD SP, HL
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"ld sp, hl", cpu=>$cpu, 
+									  ops=>[[0xF9]]));
+		}
+
+		# JMP NN
+		$opcodes->add(Opcode->new(asm=>"jmp %m", cpu=>$cpu, 
+								  ops=>[[0xC3, '%m', '%m']]));
+
+		# JP NN
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"jp %m", cpu=>$cpu, 
+									  ops=>[[0xC3, '%m', '%m']]));
+		}
+
+		# J<FLAG> NN
+		for my $flag ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+			next if !$strict && $flag eq 'p';
+			$opcodes->add(Opcode->new(asm=>"j$flag %m", cpu=>$cpu, 
+									  ops=>[[0xC2+8*F($flag), '%m', '%m']]));
+		}
+
+		# JP FLAG, NN
+		if (!$strict) {
+			for my $flag ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+				$opcodes->add(Opcode->new(asm=>"jp $flag, %m", cpu=>$cpu, 
+										  ops=>[[0xC2+8*F($flag), '%m', '%m']]));
+			}
+		}
+
+		# PCHL
+		$opcodes->add(Opcode->new(asm=>"pchl", cpu=>$cpu, 
+								  ops=>[[0xE9]]));
+
+		# JP (HL)
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"jp (hl)", cpu=>$cpu, 
+									  ops=>[[0xE9]]));
+		}
+
+		# CALL NN
+		$opcodes->add(Opcode->new(asm=>"call %m", cpu=>$cpu, 
+								  ops=>[[0xCD, '%m', '%m']]));
+
+		# C<FLAG> NN
+		for my $flag ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+			next if !$strict && $flag eq 'p';
+			$opcodes->add(Opcode->new(asm=>"c$flag %m", cpu=>$cpu, 
+									  ops=>[[0xC4+8*F($flag), '%m', '%m']]));
+		}
+
+		# CALL FLAG, NN
+		if (!$strict) {
+			for my $flag ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+				$opcodes->add(Opcode->new(asm=>"call $flag, %m", cpu=>$cpu, 
+										  ops=>[[0xC4+8*F($flag), '%m', '%m']]));
+			}
+		}
+
+		# RET
+		$opcodes->add(Opcode->new(asm=>"ret", cpu=>$cpu, 
+								  ops=>[[0xC9]]));
+
+		# R<FLAG>
+		for my $flag ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+			$opcodes->add(Opcode->new(asm=>"r$flag", cpu=>$cpu, 
+									  ops=>[[0xC0+8*F($flag)]]));
+		}
+
+		# RET FLAG
+		if (!$strict) {
+			for my $flag ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+				$opcodes->add(Opcode->new(asm=>"ret $flag", cpu=>$cpu, 
+										  ops=>[[0xC0+8*F($flag)]]));
+			}
+		}
+		
+		# RST NN
+		$opcodes->add(Opcode->new(asm=>"rst %c", cpu=>$cpu, 
+					  const=>[sort {$a<=>$b} 0,1,8, 2,0x10, 3,0x18, 
+											 4,0x20, 5,0x28, 6,0x30, 7,0x38],
+					  ops=>[["0xC7+(%c<8?%c*8:%c)"]]));
+					  
+		# INR r
+		for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+			$opcodes->add(Opcode->new(asm=>"inr $r", cpu=>$cpu, 
+									  ops=>[[0x04+8*R($r)]]));
+		}
+		
+		# INC r
+		if (!$strict) {
+			for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+				$opcodes->add(Opcode->new(asm=>"inc $r", cpu=>$cpu, 
+										ops=>[[0x04+8*R($r)]]));
+			}
+		}
+
+		# DCR r
+		for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+			$opcodes->add(Opcode->new(asm=>"dcr $r", cpu=>$cpu, 
+									  ops=>[[0x05+8*R($r)]]));
+		}
+		
+		# DEC r
+		if (!$strict) {
+			for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+				$opcodes->add(Opcode->new(asm=>"dec $r", cpu=>$cpu, 
+										ops=>[[0x05+8*R($r)]]));
+			}
+		}
+
+		# INX rp
+		for my $rp ('b', 'd', 'h', 'sp') {
+			$opcodes->add(Opcode->new(asm=>"inx $rp", cpu=>$cpu, 
+									  ops=>[[0x03+16*RP($rp)]]));
+		}
+
+		# INC rp
+		if (!$strict) {
+			for my $rp ('bc', 'de', 'hl', 'sp') {
+				$opcodes->add(Opcode->new(asm=>"inc $rp", cpu=>$cpu, 
+										  ops=>[[0x03+16*RP($rp)]]));
+			}
+		}
+
+		# DCX rp
+		for my $rp ('b', 'd', 'h', 'sp') {
+			$opcodes->add(Opcode->new(asm=>"dcx $rp", cpu=>$cpu, 
+									  ops=>[[0x0B+16*RP($rp)]]));
+		}
+
+		# DEC rp
+		if (!$strict) {
+			for my $rp ('bc', 'de', 'hl', 'sp') {
+				$opcodes->add(Opcode->new(asm=>"dec $rp", cpu=>$cpu, 
+										  ops=>[[0x0B+16*RP($rp)]]));
+			}
+		}
+
+		# <ALU> [A,] r
+		for my $alu ('add', 'adc', 'sub', 'sbb', 'ana', 'xra', 'ora', 'cmp') {
+			for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+				$opcodes->add(Opcode->new(asm=>"$alu $r", cpu=>$cpu, 
+										ops=>[[0x80+8*ALU($alu)+R($r)]]));
+			}
+		}
+
+		if (!$strict) {
+			for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
+				my $should_a_ = $alu =~ /add|adc|sbc/ ? "a, " : "";
+				for my $a_ ("", "a, ") {
+					my $synth = $alu eq 'cmp' || $should_a_ ne $a_ ? 1 : 0;
+					for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+						if (!$opcodes->exists("$alu $a_$r", $cpu)) {
+							$opcodes->add(Opcode->new(asm=>"$alu $a_$r", cpu=>$cpu, 
+													ops=>[[0x80+8*ALU($alu)+R($r)]],
+													synth=>$synth));
+						}
+					}
+				}
+			}
+		}
+
+		# ALU N
+		for my $alu ('adi', 'aci', 'sui', 'sbi', 'ani', 'xri', 'ori', 'cpi') {
+			$opcodes->add(Opcode->new(asm=>"$alu %n", cpu=>$cpu, 
+									ops=>[[0xC6+8*ALU($alu), '%n']]));
+		}
+
+		if (!$strict) {
+			for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
+				my $should_a_ = $alu =~ /add|adc|sbc/ ? "a, " : "";
+				for my $a_ ("", "a, ") {
+					my $synth = $alu eq 'cmp' || $should_a_ ne $a_ ? 1 : 0;
+					if (!$opcodes->exists("$alu $a_%n", $cpu)) {
+						$opcodes->add(Opcode->new(asm=>"$alu $a_%n", cpu=>$cpu, 
+												  ops=>[[0xC6+8*ALU($alu), '%n']],
+												  synth=>$synth));
+					}
+				}
+			}
+		}
+
+		# DAD rp
+		for my $rp ('b', 'd', 'h', 'sp') {
+			$opcodes->add(Opcode->new(asm=>"dad $rp", cpu=>$cpu, 
+									  ops=>[[0x09+16*RP($rp)]]));
+		}
+
+		# ADD HL, rp
+		if (!$strict) {
+			for my $rp ('bc', 'de', 'hl', 'sp') {
+				$opcodes->add(Opcode->new(asm=>"add hl, $rp", cpu=>$cpu, 
+										  ops=>[[0x09+16*RP($rp)]]));
+			}
+		}
+		
+		# Rotate
+		$opcodes->add(Opcode->new(asm=>"rlc", cpu=>$cpu, 
+								  ops=>[[0x07]]));
+		$opcodes->add(Opcode->new(asm=>"rrc", cpu=>$cpu, 
+								  ops=>[[0x0F]]));
+		$opcodes->add(Opcode->new(asm=>"ral", cpu=>$cpu, 
+								  ops=>[[0x17]]));
+		$opcodes->add(Opcode->new(asm=>"rar", cpu=>$cpu, 
+								  ops=>[[0x1F]]));
+		
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"rlca", cpu=>$cpu, 
+									  ops=>[[0x07]]));
+			$opcodes->add(Opcode->new(asm=>"rrca", cpu=>$cpu, 
+									  ops=>[[0x0F]]));
+			$opcodes->add(Opcode->new(asm=>"rla", cpu=>$cpu, 
+									  ops=>[[0x17]]));
+			$opcodes->add(Opcode->new(asm=>"rra", cpu=>$cpu, 
+									  ops=>[[0x1F]]));
+		}
+		
+		# Specials
+		$opcodes->add(Opcode->new(asm=>"daa", cpu=>$cpu, 
+								  ops=>[[0x27]]));
+		$opcodes->add(Opcode->new(asm=>"cma", cpu=>$cpu, 
+								  ops=>[[0x2F]]));
+		$opcodes->add(Opcode->new(asm=>"stc", cpu=>$cpu, 
+								  ops=>[[0x37]]));
+		$opcodes->add(Opcode->new(asm=>"cmc", cpu=>$cpu, 
+								  ops=>[[0x3F]]));
+
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"cpl", cpu=>$cpu, 
+									  ops=>[[0x2F]]));
+			$opcodes->add(Opcode->new(asm=>"cpl a", cpu=>$cpu, 
+									  ops=>[[0x2F]]));
+			$opcodes->add(Opcode->new(asm=>"scf", cpu=>$cpu, 
+									  ops=>[[0x37]]));
+			$opcodes->add(Opcode->new(asm=>"ccf", cpu=>$cpu, 
+									  ops=>[[0x3F]]));
+		}
+
+		# Input/Output
+		$opcodes->add(Opcode->new(asm=>"out %n", cpu=>$cpu, 
+								  ops=>[[0xD3, '%n']]));
+		$opcodes->add(Opcode->new(asm=>"in %n", cpu=>$cpu, 
+								  ops=>[[0xDB, '%n']]));
+		
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"out (%n), a", cpu=>$cpu, 
+									  ops=>[[0xD3, '%n']]));
+			$opcodes->add(Opcode->new(asm=>"in a, (%n)", cpu=>$cpu, 
+									  ops=>[[0xDB, '%n']]));
+		}
+	
+		# Control
+		$opcodes->add(Opcode->new(asm=>"nop", cpu=>$cpu, 
+								  ops=>[[0x00]]));
+		$opcodes->add(Opcode->new(asm=>"hlt", cpu=>$cpu, 
+								  ops=>[[0x76]]));
+		$opcodes->add(Opcode->new(asm=>"di", cpu=>$cpu, 
+								  ops=>[[0xF3]]));
+		$opcodes->add(Opcode->new(asm=>"ei", cpu=>$cpu, 
+								  ops=>[[0xFB]]));
+		
+		if (!$strict) {
+			$opcodes->add(Opcode->new(asm=>"halt", cpu=>$cpu, 
+									  ops=>[[0x76]]));
+		}
+	}
+}
+
+#------------------------------------------------------------------------------
+# 8085
+#------------------------------------------------------------------------------
+
+for my $cpu1 ('8085') {
+	for my $strict ('', '_strict') {
+		my $cpu = $cpu1.$strict;
+		
+		# copy 8080
+		my $ori_cpu = '8080'.$strict;
+		for my $asm (sort keys %{$opcodes->opcodes}) {
+			if ($opcodes->exists($asm, $ori_cpu)) {
+				my $opcode = clone($opcodes->opcodes->{$asm}{$ori_cpu});
+				$opcode->{cpu} = $cpu;
+				$opcodes->add($opcode);
+			}
+		}
+		
+		# add 8085
+		$opcodes->add(Opcode->new(asm=>"rim", cpu=>$cpu, 
+								  ops=>[[0x20]]));
+		$opcodes->add(Opcode->new(asm=>"sim", cpu=>$cpu, 
+								  ops=>[[0x30]]));
+								  
+		# undocumented 8080
+		if (!$strict) {
+			# 16-bit subtract
+			for my $asm ("dsub", "sub hl, bc") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0x08]]));
+			}
+			
+			# Rotate HL right
+			for my $asm ("arhl", "rrhl", "sra hl") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0x10]]));
+			}
+			
+			# Rotate DE left
+			for my $asm ("rdel", "rlde", "rl de") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0x18]]));
+			}
+			
+			# LD DE, HL+u
+			# Add 00bb immediate to HL, result to DE (undocumented i8085)
+			for my $asm ("ldhi %n", "adi hl, %n") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0x28, '%n']]));
+			}
+			for my $asm ("ld de, hl+%u") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0x28, '%u']]));
+			}
+
+			# Add 00bb immediate to SP, result to DE
+			for my $asm ("ldsi %n", "adi sp, %n") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0x38, '%n']]));
+			}
+			for my $asm ("ld de, sp+%u") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0x38, '%u']]));
+			}
+			
+			# Restart 8 (0040) if V flag is set
+			for my $asm ("rstv", "ovrst8") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0xCB]]));
+			}
+			for my $asm ("rst v, %c") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  const=>[0x40],
+										  ops=>[[0xCB]]));
+			}
+			
+			# Store HL at address pointed by DE
+			for my $asm ("shlx", "shlde", "ld (de), hl") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0xD9]]));
+			}
+			
+			# Jump on flag X5/K
+			for my $asm ("jx5 %m", "jk %m", "jp x5, %m", "jp k, %m") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0xFD, '%m', '%m']]));
+			}
+			
+			for my $asm ("jnx5 %m", "jnk %m", "jp nx5, %m", "jp nk, %m") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0xDD, '%m', '%m']]));
+			}
+			
+			# Load HL from address pointed by DE
+			for my $asm ("lhlx", "lhlde", "ld hl, (de)") {
+				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+										  ops=>[[0xED]]));
+			}
+			
+		}
+	}
+}
 
 #------------------------------------------------------------------------------
 # OLD STUFF
@@ -53,8 +626,8 @@ my @CPUS = qw( z80 z80_strict z80n z180
 );
 
 # operand values
-my %V = (
-	b=>0, c=>1, d=>2, e=>3, h=>4, l=>5, '(hl)'=>6, f=>6, m=>6, a=>7,
+my %V = ( 
+	'b'=>0, 'c'=>1, 'd'=>2, 'e'=>3, 'h'=>4, 'l'=>5, '(hl)'=>6, 'f'=>6, 'm'=>6, 'a'=>7,
 	bc=>0, de=>1, hl=>2, sp=>3, af=>3,
 	pw=>0, px=>1, py=>2, pz=>3,
 	ix=>0xDD, iy=>0xFD, 
@@ -90,6 +663,8 @@ my %INV_FLAG = qw(	_nz	 _z	  _z   _nz
 # for each CPU
 #------------------------------------------------------------------------------
 for my $cpu (@CPUS) {
+	next if $cpu =~ /^8080|^8085/;
+	
 	my $rabbit		= ($cpu =~ /^r2ka|^r3k|^r4k|^r5k/);
 	my $r3k			= ($cpu =~ /^r3k/);
 	my $r4k			= ($cpu =~ /^r4k/);
@@ -126,7 +701,7 @@ for my $cpu (@CPUS) {
 				add_x($cpu, "ld $d, $s", [0x7F, ld_r_r($d, $s)]);
 			}
 			else {
-				add_x($cpu, "ld $d, $s", [ld_r_r($d, $s)]);
+				add_x($cpu, "ld $d, $s", [ld_r_r($d, $s)]) unless $cpu =~ /^8080|^8085/;
 			}
 		}
 	}
@@ -142,19 +717,19 @@ for my $cpu (@CPUS) {
 				add($cpu, "mov $d, $s", [0x7F, ld_r_r($d, $s)]);
 			}
 			else {
-				add($cpu, "mov $d, $s", [ld_r_r($d, $s)]);
+				add($cpu, "mov $d, $s", [ld_r_r($d, $s)]) unless $cpu =~ /^8080|^8085/;
 			}
 		}
 	}
 
 	# LD r, N / ld (hl), N
 	for my $r (qw( b c d e h l (hl) a )) { 
-		add_x($cpu, "ld $r, %n", [ld_r_n($r), '%n']);
+		add_x($cpu, "ld $r, %n", [ld_r_n($r), '%n']) unless $cpu =~ /^8080|^8085/;
 	}
 
 	# MVI r, N
 	for my $r (qw( b c d e h l m a )) {
-		add($cpu, "mvi $r, %n", [ld_r_n($r), '%n']);
+		add($cpu, "mvi $r, %n", [ld_r_n($r), '%n']) unless $cpu =~ /^8080|^8085/;
 	}
 
 	#--------------------------------------------------------------------------
@@ -165,12 +740,12 @@ for my $cpu (@CPUS) {
 		my $d = substr($dd,0,1);
 		
 		# LD A, (dd)
-		add_x($cpu, "ld a, ($dd)", [ld_a_idd($dd)]);
-		add($cpu, "ldax $d", [ld_a_idd($dd)]);
+		add_x($cpu, "ld a, ($dd)", [ld_a_idd($dd)]) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "ldax $d", [ld_a_idd($dd)]) unless $cpu =~ /^8080|^8085/;
 		
 		# LD (dd), A
-		add_x($cpu, "ld ($dd), a", [ld_idd_a($dd)]);
-		add($cpu, "stax $d", [ld_idd_a($dd)]);
+		add_x($cpu, "ld ($dd), a", [ld_idd_a($dd)]) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "stax $d", [ld_idd_a($dd)]) unless $cpu =~ /^8080|^8085/;
 		
 		# LD a, (dd+) / LD a, (dd-)
 		add_x($cpu, "ld a, ($dd+)", [ld_a_idd($dd)], [inc_dd($dd)]);
@@ -337,11 +912,11 @@ for my $cpu (@CPUS) {
 		add($cpu, "ld.lis a, (%m)",	[0x49], [0x3A, '%m', '%m']);
 	}
 	else {
-		add_x($cpu, "ld (%m), a", [0x32, '%m', '%m']);
-		add($cpu, "sta %m",		[0x32, '%m', '%m']);
+		add_x($cpu, "ld (%m), a", [0x32, '%m', '%m']) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "sta %m",		[0x32, '%m', '%m']) unless $cpu =~ /^8080|^8085/;
 		
-		add_x($cpu, "ld a, (%m)", [0x3A, '%m', '%m']);
-		add($cpu, "lda %m",		[0x3A, '%m', '%m']);
+		add_x($cpu, "ld a, (%m)", [0x3A, '%m', '%m']) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "lda %m",		[0x3A, '%m', '%m']) unless $cpu =~ /^8080|^8085/;
 	}
 	
 	#--------------------------------------------------------------------------
@@ -355,7 +930,7 @@ for my $cpu (@CPUS) {
 					add_x($cpu, "$op $a_$r", 	[0x7F, alu_r($op, $r)]);
 				}
 				else {
-					add_x($cpu, "$op $a_$r", 	[alu_r($op, $r)]);
+					add_x($cpu, "$op $a_$r", 	[alu_r($op, $r)]) unless $cpu =~ /^8080|^8085/;
 				}
 			}
 			
@@ -374,7 +949,7 @@ for my $cpu (@CPUS) {
 		}
 		
 		for my $a_ ('a, ', '') {
-			add_x($cpu, "$op $a_%n", 	[alu_n($op), '%n']);
+			add_x($cpu, "$op $a_%n", 	[alu_n($op), '%n']) unless $cpu =~ /^8080|^8085/;
 			if ($r4k || $r5k) {
 				add_x($cpu, "$op $a_(hl+)",	[0x7F, alu_r($op, '(hl)')], [inc_dd('hl')]);
 				add_x($cpu, "$op $a_(hl-)",	[0x7F, alu_r($op, '(hl)')], [dec_dd('hl')]);
@@ -400,12 +975,12 @@ for my $cpu (@CPUS) {
 	}
 
 	for my $op (qw( adi aci sui sbi ani xri ori cpi )) {
-		add($cpu, "$op %n", [alu_n($op), '%n']);
+		add($cpu, "$op %n", [alu_n($op), '%n']) unless $cpu =~ /^8080|^8085/;
 	}
 
 	for my $r (qw( b c d e h l (hl) a )) { 
-		add_x($cpu, "inc $r", [inc_r($r)]);
-		add_x($cpu, "dec $r", [dec_r($r)]);
+		add_x($cpu, "inc $r", [inc_r($r)]) unless $cpu =~ /^8080|^8085/;
+		add_x($cpu, "dec $r", [dec_r($r)]) unless $cpu =~ /^8080|^8085/;
 	}
 	
 	if ($kc160_ext) {
@@ -426,8 +1001,8 @@ for my $cpu (@CPUS) {
 	
 	
 	for my $r (qw( b c d e h l m a )) {
-		add($cpu, "inr $r", [inc_r($r)]);
-		add($cpu, "dcr $r", [dec_r($r)]);
+		add($cpu, "inr $r", [inc_r($r)]) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "dcr $r", [dec_r($r)]) unless $cpu =~ /^8080|^8085/;
 	}
 
 	add_x($cpu, "inc (hl+)", 	[inc_r('(hl)')], [inc_dd('hl')]);
@@ -453,7 +1028,7 @@ for my $cpu (@CPUS) {
 	}
 	
 	if ($intel || $zilog || $gameboy || $kc160_any) {
-		add($cpu, "daa", [0x27]);
+		add($cpu, "daa", [0x27]) unless $cpu =~ /^8080|^8085/;
 	}
 	else {
 		add($cpu, "daa", [call(), '@__z80asm__daa', '']);
@@ -476,9 +1051,9 @@ for my $cpu (@CPUS) {
 	}			
 	
 	# cpl
-	add($cpu, "cpl", 			[0x2F]);
-	add($cpu, "cma",			[0x2F]);
-	add($cpu, "cpl a", 			[0x2F]);
+	add($cpu, "cpl", 			[0x2F]) unless $cpu =~ /^8080|^8085/;
+	add($cpu, "cma",			[0x2F]) unless $cpu =~ /^8080|^8085/;
+	add($cpu, "cpl a", 			[0x2F]) unless $cpu =~ /^8080|^8085/;
 	if ($rabbit) {
 		add($cpu, "cpl a'", 	[$V{altd}], [0x2F]);
 		add($cpu, "altd cpl",	[$V{altd}], [0x2F]);
@@ -498,14 +1073,14 @@ for my $cpu (@CPUS) {
 	add($cpu, "altd neg",	[$V{altd}], [0xED, 0x44]) if $rabbit;
 	add($cpu, "altd neg a",	[$V{altd}], [0xED, 0x44]) if $rabbit;
 	
-	add($cpu, "ccf", 		[0x3F]);
-	add($cpu, "cmc",		[0x3F]);
+	add($cpu, "ccf", 		[0x3F]) unless $cpu =~ /^8080|^8085/;
+	add($cpu, "cmc",		[0x3F]) unless $cpu =~ /^8080|^8085/;
 	
 	add($cpu, "ccf'", 		[$V{altd}], [0x3F]) if $rabbit;
 	add($cpu, "altd ccf",	[$V{altd}], [0x3F]) if $rabbit;
 	
-	add($cpu, "scf", 		[0x37]);
-	add($cpu, "stc",		[0x37]);
+	add($cpu, "scf", 		[0x37]) unless $cpu =~ /^8080|^8085/;
+	add($cpu, "stc",		[0x37]) unless $cpu =~ /^8080|^8085/;
 
 	add($cpu, "scf'", 		[$V{altd}], [0x37]) if $rabbit;
 	add($cpu, "altd scf",	[$V{altd}], [0x37]) if $rabbit;
@@ -780,7 +1355,7 @@ for my $cpu (@CPUS) {
 			add($cpu, "ld.sis $dd, %m", [0x40], [ld_dd_m($dd), '%m', '%m']);
 		}
 		else {
-			add_x($cpu, "ld $dd, %m",  [ld_dd_m($dd), '%m', '%m']);
+			add_x($cpu, "ld $dd, %m",  [ld_dd_m($dd), '%m', '%m']) unless $cpu =~ /^8080|^8085/;
 		}
 		
 		# #2423 There is an option to load a 2 bytes into an ez80 24 bit register 
@@ -789,7 +1364,7 @@ for my $cpu (@CPUS) {
 			add($cpu, "ld.lis $dd, %m", [0x49], [ld_dd_m($dd), '%m', '%m']);
 		}
 		
-		add($cpu, "lxi $d, %m",	 [ld_dd_m($dd), '%m', '%m']);
+		add($cpu, "lxi $d, %m",	 [ld_dd_m($dd), '%m', '%m']) unless $cpu =~ /^8080|^8085/;
 		
 		if (($zilog || $rabbit || $kc160_any) && $dd eq 'hl') {
 			for my $x (qw( ix iy )) {
@@ -834,8 +1409,8 @@ for my $cpu (@CPUS) {
 		}						
 	}
 	else {
-		add_x($cpu, "ld (%m), hl", 	[0x22, '%m', '%m']);
-		add($cpu, "shld %m",		[0x22, '%m', '%m']);
+		add_x($cpu, "ld (%m), hl", 	[0x22, '%m', '%m']) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "shld %m",		[0x22, '%m', '%m']) unless $cpu =~ /^8080|^8085/;
 	}
 
 	# LD hl, (NN)
@@ -862,8 +1437,8 @@ for my $cpu (@CPUS) {
 		}						
 	}
 	else {
-		add_x($cpu, "ld hl, (%m)", 	[0x2A, '%m', '%m']);
-		add($cpu, "lhld %m",		[0x2A, '%m', '%m']);
+		add_x($cpu, "ld hl, (%m)", 	[0x2A, '%m', '%m']) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "lhld %m",		[0x2A, '%m', '%m']) unless $cpu =~ /^8080|^8085/;
 	}
 
 	# LD dd, (NN) / LD (NN), dd
@@ -1033,51 +1608,6 @@ for my $cpu (@CPUS) {
 		add($cpu, "ld de, hl", 	[ld_r_r('d', 'h')], [ld_r_r('e', 'l')]);	#  8 T
 	}
 
-	# LD DE, HL+u
-	if ($i8085) {
-		# Add 00bb immediate to HL, result to DE (undocumented i8085)
-		add($cpu, "ldhi %n",		[0x28, '%n']);
-		add($cpu, "adi hl, %n",		[0x28, '%n']);
-		add($cpu, "ld de, hl+%u",	[0x28, '%u']);
-	}
-	elsif ($gameboy) {
-		add($cpu, "ldhi %n",		[push_dd('hl')],
-									[ld_dd_m('de'), '%n', 0],
-									[add_hl_dd('de')],
-									[push_dd('hl')], [push_dd('de')],
-									[pop_dd('hl')], [pop_dd('de')],
-									[pop_dd('hl')]);
-		add($cpu, "adi hl, %n",		[push_dd('hl')],
-									[ld_dd_m('de'), '%n', 0],
-									[add_hl_dd('de')],
-									[push_dd('hl')], [push_dd('de')],
-									[pop_dd('hl')], [pop_dd('de')],
-									[pop_dd('hl')]);
-		add($cpu, "ld de, hl+%u",	[push_dd('hl')],
-									[ld_dd_m('de'), '%u', 0],
-									[add_hl_dd('de')],
-									[push_dd('hl')], [push_dd('de')],
-									[pop_dd('hl')], [pop_dd('de')],
-									[pop_dd('hl')]);
-	}
-	else {
-		add($cpu, "ldhi %n",		[push_dd('hl')],
-									[ld_dd_m('de'), '%n', 0],
-									[add_hl_dd('de')],
-									[ex_de_hl()],
-									[pop_dd('hl')]);
-		add($cpu, "adi hl, %n",		[push_dd('hl')],
-									[ld_dd_m('de'), '%n', 0],
-									[add_hl_dd('de')],
-									[ex_de_hl()],
-									[pop_dd('hl')]);
-		add($cpu, "ld de, hl+%u",	[push_dd('hl')],
-									[ld_dd_m('de'), '%u', 0],
-									[add_hl_dd('de')],
-									[ex_de_hl()],
-									[pop_dd('hl')]);
-	}
-    
     # LD DE, IXY
 	if ($z80 || $z80n || $ez80_any || $r800) {
 		add($cpu, "ld de, ix", [$V{ix}, ld_r_r('d', 'h')], [$V{ix}, ld_r_r('e', 'l')]);
@@ -1168,8 +1698,8 @@ for my $cpu (@CPUS) {
 		add($cpu, "ld iy, ix", [$V{ix}, push_dd('hl')], [$V{iy}, pop_dd('hl')]);
 	}
 
-	add_suf($cpu, "ld sp, hl", 	[ld_sp_hl()]);
-	add($cpu, "sphl",			[ld_sp_hl()]);
+	add_suf($cpu, "ld sp, hl", 	[ld_sp_hl()]) unless $cpu =~ /^8080|^8085/;
+	add($cpu, "sphl",			[ld_sp_hl()]) unless $cpu =~ /^8080|^8085/;
 
 	if (!$intel && !$gameboy) {
 		for my $x (qw( ix iy )) {
@@ -1286,11 +1816,11 @@ for my $cpu (@CPUS) {
 	for my $r (qw( bc de hl af )) {
 		my $r1 = ($r eq 'af') ? 'psw' : substr($r,0,1);		# B, D, H, PSW
 
-		add_x($cpu, "push $r",	[push_dd($r)]);
-		add($cpu, "push $r1",	[push_dd($r)]);
+		add_x($cpu, "push $r",	[push_dd($r)]) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "push $r1",	[push_dd($r)]) unless $cpu =~ /^8080|^8085/;
 
-		add_x($cpu, "pop $r",	[pop_dd($r)]);
-		add($cpu, "pop $r1",	[pop_dd($r)]);
+		add_x($cpu, "pop $r",	[pop_dd($r)]) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "pop $r1",	[pop_dd($r)]) unless $cpu =~ /^8080|^8085/;
 		
 		if (!$intel && !$gameboy) {
 			if ($r eq 'hl') {
@@ -1353,208 +1883,6 @@ for my $cpu (@CPUS) {
 		add($cpu, "ld iy, (sp+%d)",			[0xED, 0x9A, '%d']);
 	}
 
-	# undocumented 8085 instructions
-	if ($i8085) {
-		# Add 00bb immediate to SP, result to DE
-		add($cpu, "ldsi %n",		[0x38, '%n']);
-		add($cpu, "adi sp, %n",		[0x38, '%n']);
-		add($cpu, "ld de, sp+%u",	[0x38, '%u']);
-    }
-    elsif ($gameboy) {
-		add($cpu, "ldsi %n",	
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_dd_m('hl'), '%n', 0],		# ld hl, %n
-					[add_hl_dd('sp')],				# add hl, sp
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-		add($cpu, "adi sp, %n",	
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_dd_m('hl'), '%n', 0],		# ld hl, %n
-					[add_hl_dd('sp')],				# add hl, sp
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-		add($cpu, "ld de, sp+%u",	
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_dd_m('hl'), '%u', 0],		# ld hl, %n
-					[add_hl_dd('sp')],				# add hl, sp
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-    }
-    else {
-		add($cpu, "ldsi %n",	
-					[ex_de_hl()],               	# ex de, hl
-					[ld_dd_m('hl'), '%n', 0],		# ld hl, %n
-					[add_hl_dd('sp')],				# add hl, sp
-					[ex_de_hl()]);					# ex de, hl
-		add($cpu, "adi sp, %n",	
-					[ex_de_hl()],               	# ex de, hl
-					[ld_dd_m('hl'), '%n', 0],		# ld hl, %n
-					[add_hl_dd('sp')],				# add hl, sp
-					[ex_de_hl()]);					# ex de, hl
-		add($cpu, "ld de, sp+%u",	
-					[ex_de_hl()],               	# ex de, hl
-					[ld_dd_m('hl'), '%u', 0],		# ld hl, %n
-					[add_hl_dd('sp')],				# add hl, sp
-					[ex_de_hl()]);					# ex de, hl
-    }
-    
-	if ($i8085) {
-		# Store HL at address pointed by DE
-		add($cpu, "shlx",			[0xD9]);
-		add($cpu, "shlde",			[0xD9]);
-		add($cpu, "ld (de), hl",	[0xD9]);
-		
-		# Load HL from address pointed by DE
-		add($cpu, "lhlx",			[0xED]);
-		add($cpu, "lhlde",			[0xED]);
-		add($cpu, "ld hl, (de)",	[0xED]);
-	}
-    elsif ($gameboy) {
-		# Store HL at address pointed by DE
-		add($cpu, "shlx",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-		add($cpu, "shlde",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-		add($cpu, "ld (de), hl",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-		
-		# Load HL from address pointed by DE
-		add($cpu, "lhlx",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-		add($cpu, "lhlde",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-		add($cpu, "ld hl, (de)",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-	}
-	else {
-		# Store HL at address pointed by DE
-		add($cpu, "shlx",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
-		add($cpu, "shlde",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
-		add($cpu, "ld (de), hl",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
-		
-		# Load HL from address pointed by DE
-		add($cpu, "lhlx",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
-		add($cpu, "lhlde",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
-		add($cpu, "ld hl, (de)",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
-	}
-	
 	# lea
 	if ($ez80_any) {
 		add_suf($cpu, "lea ix, ix+%d", [0xED, 0x32, '%d']);
@@ -1601,9 +1929,9 @@ for my $cpu (@CPUS) {
 								[pop_dd('hl')], [pop_dd('de')]);
 	}
 	else {
-		add($cpu, "ex de, hl",	[ex_de_hl()]);
+		add($cpu, "ex de, hl",	[ex_de_hl()]) unless $cpu =~ /^8080|^8085/;
 		add($cpu, "ex hl, de",	[ex_de_hl()]);
-		add($cpu, "xchg",		[ex_de_hl()]);
+		add($cpu, "xchg",		[ex_de_hl()]) unless $cpu =~ /^8080|^8085/;
 		
 		if ($rabbit) {
 			add($cpu, "ex de', hl", 	[0xE3]);
@@ -1661,8 +1989,8 @@ for my $cpu (@CPUS) {
 	}
 	
 	if ($zilog || $intel || $kc160_any) {
-		add_suf($cpu, "ex (sp), hl", 	[0xE3]);
-		add($cpu, "xthl",				[0xE3]);
+		add_suf($cpu, "ex (sp), hl", 	[0xE3]) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "xthl",				[0xE3]) unless $cpu =~ /^8080|^8085/;
 	}
 	elsif ($rabbit) {
 		add($cpu, "ex (sp), hl", 		[0xED, 0x54]);
@@ -1689,8 +2017,8 @@ for my $cpu (@CPUS) {
 	for my $dd (qw( bc de hl sp )) {
 		my $dd1 = ($dd eq 'sp') ? $dd : substr($dd,0,1);		# B, D, H
 		
-		add_x($cpu, "add hl, $dd",[add_hl_dd($dd)]);
-		add($cpu, "dad $dd1",	[add_hl_dd($dd)]);	
+		add_x($cpu, "add hl, $dd",[add_hl_dd($dd)]) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "dad $dd1",	[add_hl_dd($dd)]) unless $cpu =~ /^8080|^8085/;
 		
 		if ($zilog || $rabbit || $kc160_any) {
 			for my $x (qw( ix iy )) {
@@ -1723,9 +2051,9 @@ for my $cpu (@CPUS) {
 		add($cpu, "add bc, a",	[0xED, 0x33]);
 	}
 	else {
-		add($cpu, "add hl, a",	[call(), '@__z80asm__add_hl_a', '']);
-		add($cpu, "add de, a",	[call(), '@__z80asm__add_de_a', '']);
-		add($cpu, "add bc, a",	[call(), '@__z80asm__add_bc_a', '']);
+		#add($cpu, "add hl, a",	[call(), '@__z80asm__add_hl_a', '']);
+		#add($cpu, "add de, a",	[call(), '@__z80asm__add_de_a', '']);
+		#add($cpu, "add bc, a",	[call(), '@__z80asm__add_bc_a', '']);
 	}
 	
 	if ($z80n) {
@@ -1800,14 +2128,10 @@ for my $cpu (@CPUS) {
 	elsif ($gameboy) {
 		add($cpu, "add sp, %s", [0xE8, '%s']);
 	}
-	else {
-		add($cpu, "add sp, %s", [call(), '@__z80asm__add_sp_s'], ['%s']);
-	}
 
 	# ADC
 	for my $dd (qw( bc de hl sp )) {
 		if ($intel || $gameboy) {
-			add($cpu, "adc hl, $dd", [call(), '@__z80asm__adc_hl_'.$dd, '']);
 		}
 		elsif ($kc160_any) {
 			add($cpu, "adc hl, $dd", [adc_hl_dd($dd)]);
@@ -1825,7 +2149,6 @@ for my $cpu (@CPUS) {
 	# SBC/SUB
 	for my $dd (qw( bc de hl sp )) {
 		if ($intel || $gameboy) {
-			add($cpu, "sbc hl, $dd", [call(), '@__z80asm__sbc_hl_'.$dd, '']);
 		}
 		elsif ($kc160_any) {
 			add($cpu, "sbc hl, $dd", [sbc_hl_dd($dd)]);
@@ -1840,17 +2163,10 @@ for my $cpu (@CPUS) {
 		}
 		
         if ($i8085 && $dd eq 'bc') {
-            # 8085 undocumented opcode: double subtract
-            add($cpu, "dsub",			[0x08]);
-            add($cpu, "sub hl, bc",		[0x08]);
         }
         else {
 			if (($r4k || $r5k) && $dd =~ /de/) {
 				add_x($cpu, "sub hl, de",[0x55]);
-			}
-			else {
-				add($cpu, "dsub",       [call(), '@__z80asm__sub_hl_'.$dd, '']) if $dd eq 'bc';
-				add($cpu, "sub hl, $dd",[call(), '@__z80asm__sub_hl_'.$dd, '']);
 			}
         }
 	}
@@ -1922,8 +2238,8 @@ for my $cpu (@CPUS) {
 
 	# INC/DEC
 	for my $dd (qw( bc de hl sp )) {
-		add_x($cpu, "inc $dd", [inc_dd($dd)]);
-		add_x($cpu, "dec $dd", [dec_dd($dd)]);
+		add_x($cpu, "inc $dd", [inc_dd($dd)]) unless $cpu =~ /^8080|^8085/;
+		add_x($cpu, "dec $dd", [dec_dd($dd)]) unless $cpu =~ /^8080|^8085/;
 
 		if ($kc160_ext) {
 			for my $p (qw( x y a z )) {
@@ -1950,8 +2266,8 @@ for my $cpu (@CPUS) {
 	for my $dd (qw( bc de hl sp )) {
 		my $dd1 = ($dd eq 'sp') ? $dd : substr($dd,0,1);		# B, D, H
 		
-		add($cpu, "inx $dd1",	[inc_dd($dd)]);
-		add($cpu, "dcx $dd1",	[dec_dd($dd)]);
+		add($cpu, "inx $dd1",	[inc_dd($dd)]) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "dcx $dd1",	[dec_dd($dd)]) unless $cpu =~ /^8080|^8085/;
 	}
 
 	# OR
@@ -2181,11 +2497,11 @@ for my $cpu (@CPUS) {
 	#--------------------------------------------------------------------------
 
 	for my $op (qw( rlca rrca rla rra )) {
-		add_x($cpu, $op, [rot_a($op)]);
+		add_x($cpu, $op, [rot_a($op)]) unless $cpu =~ /^8080|^8085/;
 	}
 
 	for my $op (qw( rlc  rrc  ral rar )) {
-		add($cpu, $op, [rot_a($op)]);
+		add($cpu, $op, [rot_a($op)]) unless $cpu =~ /^8080|^8085/;
 	}
 
 	if (!$intel) {
@@ -2243,23 +2559,6 @@ for my $cpu (@CPUS) {
         add($cpu, "sra de",	[0xCB, 0x2A], [0xCB, 0x1B]);
     }
     
-    # sra hl (undocumented 8085)
-    if ($i8085) {
-        add($cpu, "arhl",	[0x10]);
-        add($cpu, "rrhl",	[0x10]);
-        add($cpu, "sra hl",	[0x10]);
-    }
-    elsif ($intel) {
-        add($cpu, "arhl",	[call(), '@__z80asm__sra_hl', '']);
-        add($cpu, "rrhl",	[call(), '@__z80asm__sra_hl', '']);
-        add($cpu, "sra hl",	[call(), '@__z80asm__sra_hl', '']);
-    } 
-    else {
-        add($cpu, "arhl",	[0xCB, 0x2C], [0xCB, 0x1D]);
-        add($cpu, "rrhl",	[0xCB, 0x2C], [0xCB, 0x1D]);
-        add($cpu, "sra hl",	[0xCB, 0x2C], [0xCB, 0x1D]);
-    }
-	
 	# rl bc
     if ($intel) {
         add($cpu, "rl bc",	[call(), '@__z80asm__rl_bc', '']);
@@ -2272,25 +2571,10 @@ for my $cpu (@CPUS) {
     }
         
 	# rl de
-    if ($i8085) {                       # undocumented 8085
-		add($cpu, "rdel",	[0x18]);
-		add($cpu, "rlde",	[0x18]);
-		add($cpu, "rl de",	[0x18]);
-    }
-    elsif ($intel) {
-		add($cpu, "rdel",	[call(), '@__z80asm__rl_de', '']);
-		add($cpu, "rlde",	[call(), '@__z80asm__rl_de', '']);
-        add($cpu, "rl de",	[call(), '@__z80asm__rl_de', '']);
-    }
-    elsif ($rabbit) {
+    if ($rabbit) {
 		add($cpu, "rdel",	[0xF3]);
 		add($cpu, "rlde",	[0xF3]);
 		add_x($cpu, "rl de",[0xF3]);
-    }
-    else {
-        add($cpu, "rdel",	[0xCB, 0x13], [0xCB, 0x12]);
-        add($cpu, "rlde",	[0xCB, 0x13], [0xCB, 0x12]);
-        add($cpu, "rl de",	[0xCB, 0x13], [0xCB, 0x12]);
     }
     
     # rl hl
@@ -2394,11 +2678,11 @@ for my $cpu (@CPUS) {
 	# CPU control group
 	#--------------------------------------------------------------------------
 
-	add($cpu, "nop", 		[0x00]);
+	add($cpu, "nop", 		[0x00]) unless $cpu =~ /^8080|^8085/;
 	
 	if (!$rabbit) {
-		add($cpu, "halt",	[0x76]);
-		add($cpu, "hlt",	[0x76]);
+		add($cpu, "halt",	[0x76]) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "hlt",	[0x76]) unless $cpu =~ /^8080|^8085/;
 	}
 	
 	add($cpu, "slp", 	[0xED, 0x76]) if $z180 || $ez80_any;
@@ -2416,8 +2700,8 @@ for my $cpu (@CPUS) {
 	#--------------------------------------------------------------------------
 
 	if (!$rabbit || $intel) {
-		add($cpu, "di", [0xF3]);
-		add($cpu, "ei", [0xFB]);
+		add($cpu, "di", [0xF3]) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "ei", [0xFB]) unless $cpu =~ /^8080|^8085/;
 	}
 	
 	if ($zilog || $kc160_any) {
@@ -2438,9 +2722,6 @@ for my $cpu (@CPUS) {
 	elsif ($kc160_any) {
 		add($cpu, "im %c", [0xED, "%c(0..3)==0?0x46:%c==1?0x56:%c==2?0x5E:0x4E"]);
 	}
-
-	add($cpu, "rim", [0x20]) if $i8085;
-	add($cpu, "sim", [0x30]) if $i8085;
 
 	if ($rabbit) {
 		add_x($cpu, "ld eir, a", [0xED, 0x47]);
@@ -2581,12 +2862,13 @@ for my $cpu (@CPUS) {
 		add($cpu, "jp.lil %m",	[0x5B], [jp(), '%m', '%m', '%m']);
 	}
 	else {
-		add($cpu, "jp %m",		[jp(), '%m', '%m']);
-		add($cpu, "jmp %m",		[jp(), '%m', '%m']);
+		add($cpu, "jp %m",		[jp(), '%m', '%m']) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "jmp %m",		[jp(), '%m', '%m']) unless $cpu =~ /^8080|^8085/;
 	}
 	
-	for my $_f (qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m 
-				    _ne _eq _geu _ltu _gtu _leu )) { 
+	for my $_f (qw( _nz _z _nc _c _po _pe _lz _lo _p _m 
+				    _gtu _leu 
+					_ne _eq _geu _ltu _nv _v )) {
 		my $f = substr($_f, 1);			# remove leading _
 		
 		next if $f =~ /^(lz|lo)$/ && !$rabbit;
@@ -2656,7 +2938,7 @@ for my $cpu (@CPUS) {
 											[jp_f('_ltu'), '%m', '%m']);
 			}
 			else {
-				add($cpu, "jp $f, %m",		[jp_f($_f), '%m', '%m']);
+				add($cpu, "jp $f, %m",		[jp_f($_f), '%m', '%m']) unless $cpu =~ /^8080|^8085/;
 			}
 		}
 
@@ -2670,7 +2952,7 @@ for my $cpu (@CPUS) {
 									[jp_f('_ltu'), '%m', '%m']);
 			}
 			else {
-				add($cpu, "j$f %m",	[jp_f($_f), '%m', '%m']);
+				add($cpu, "j$f %m",	[jp_f($_f), '%m', '%m']) unless $cpu =~ /^8080|^8085/;
 			}
 		}
 	}
@@ -2684,8 +2966,8 @@ for my $cpu (@CPUS) {
 	}
     
 
-	add_suf($cpu, "jp (hl)",		[0xE9]);
-	add($cpu, "pchl",				[0xE9]);
+	add_suf($cpu, "jp (hl)",		[0xE9]) unless $cpu =~ /^8080|^8085/;
+	add($cpu, "pchl",				[0xE9]) unless $cpu =~ /^8080|^8085/;
 	
 	if (!$intel && !$gameboy) {
 		for my $x (qw( ix iy )) {
@@ -2746,7 +3028,7 @@ for my $cpu (@CPUS) {
 		add($cpu, "call.lil %m", [0x5B], [call(), '%m', '%m', '%m']);
 	}
 	else {
-		add($cpu, "call %m", [call(), '%m', '%m']);
+		add($cpu, "call %m", [call(), '%m', '%m']) unless $cpu =~ /^8080|^8085/;
 	}
 	
 	if ($kc160_any) {
@@ -2936,7 +3218,7 @@ for my $cpu (@CPUS) {
 			else {
 				for my $call ("call $f,", "c$f") {
 					next if $call eq "cp";
-					add($cpu, "$call %m",	[call_f($_f), '%m', '%m']);
+					add($cpu, "$call %m",	[call_f($_f), '%m', '%m']) unless $cpu =~ /^8080|^8085/;
 				}
 			}
 		}
@@ -2971,11 +3253,12 @@ for my $cpu (@CPUS) {
 	}
 	else {
 		add_suf($cpu, "rst %c",
-			["0xC7+(%c(0,1,8,2,0x10,3,0x18,4,0x20,5,0x28,6,0x30,7,0x38)<8?%c*8:%c)"]);
+			["0xC7+(%c(0,1,8,2,0x10,3,0x18,4,0x20,5,0x28,6,0x30,7,0x38)<8?%c*8:%c)"])
+			 unless $cpu =~ /^8080|^8085/;
 	}
 	
 	# RET
-	add($cpu, "ret", [ret()]);
+	add($cpu, "ret", [ret()]) unless $cpu =~ /^8080|^8085/;
 	if ($ez80_z80) {
 		add($cpu, "ret.l", 		[0x49], [ret()]);
 		add($cpu, "ret.lis", 	[0x49], [ret()]);
@@ -3013,7 +3296,7 @@ for my $cpu (@CPUS) {
 			}
 			else {
 				for my $ret ("ret $f", "r$f") {
-					add($cpu, "$ret",		[ret_f($_f)]);
+					add($cpu, "$ret",		[ret_f($_f)]) unless $cpu =~ /^8080|^8085/;
 				}
 			}
 		}
@@ -3082,24 +3365,6 @@ for my $cpu (@CPUS) {
 	if ($rabbit) {
 		add_x($cpu, "ld xpc, a", [0xED, 0x67]);
 		add_x($cpu, "ld a, xpc", [0xED, 0x77]);
-	}
-
-	if ($i8085) {
-		# Restart 8 (0040) if V flag is set
-		add($cpu, "rstv",		[0xCB]);
-		add($cpu, "ovrst8",		[0xCB]);
-		add($cpu, "rst v, %c",	[(0xCB-0x40).'+%c('.(0x40).'..'.(0x40).')']);
-
-		# Jump on flag X5/K is set
-		add($cpu, "jx5 %m",		[0xFD, '%m', '%m']);
-		add($cpu, "jk %m",		[0xFD, '%m', '%m']);
-		add($cpu, "jp x5,%m",	[0xFD, '%m', '%m']);
-		add($cpu, "jp k,%m",	[0xFD, '%m', '%m']);
-
-		add($cpu, "jnx5 %m",	[0xDD, '%m', '%m']);
-		add($cpu, "jnk %m",		[0xDD, '%m', '%m']);
-		add($cpu, "jp nx5,%m",	[0xDD, '%m', '%m']);
-		add($cpu, "jp nk,%m",	[0xDD, '%m', '%m']);
 	}
 
 	#--------------------------------------------------------------------------
@@ -3178,8 +3443,8 @@ for my $cpu (@CPUS) {
 
 	# IN A, (n) / OUT (n), A
 	if ($intel || $zilog || $kc160_any) {
-		add($cpu, "in a, (%n)", 		[0xDB, '%n']);
-		add($cpu, "out (%n), a", 		[0xD3, '%n']);
+		add($cpu, "in a, (%n)", 		[0xDB, '%n']) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "out (%n), a", 		[0xD3, '%n']) unless $cpu =~ /^8080|^8085/;
 	}
 	
 	# IN (c)
@@ -3286,8 +3551,8 @@ for my $cpu (@CPUS) {
 	}
 
 	if (!$rabbit && !$gameboy) {
-		add($cpu, "in %n",	[0xDB, '%n']);
-		add($cpu, "out %n",	[0xD3, '%n']);
+		add($cpu, "in %n",	[0xDB, '%n']) unless $cpu =~ /^8080|^8085/;
+		add($cpu, "out %n",	[0xD3, '%n']) unless $cpu =~ /^8080|^8085/;
 	}
 
 	if ($z80n) {

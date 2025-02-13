@@ -38,8 +38,14 @@ void add_opcode_h(int opcode, struct Expr1* expr);
 /* add opcode followed by 8-bit unsigned expression and a zero byte */
 void add_opcode_n_0(int opcode, struct Expr1* expr);
 
+/* add opcode followed by 8-bit unsigned expression and two zero bytes */
+void add_opcode_n_0_0(int opcode, struct Expr1* expr);
+
 /* add opcode followed by 8-bit signed expression and a zero or 0xff byte depending on sign */
 void add_opcode_s_0(int opcode, struct Expr1* expr);
+
+/* add opcode followed by 8-bit signed expression and two zeros or 0xff bytes depending on sign */
+void add_opcode_s_0_0(int opcode, struct Expr1* expr);
 
 /* add opcode followed by 8-bit signed expression */
 void add_opcode_d(int opcode, struct Expr1 *expr);

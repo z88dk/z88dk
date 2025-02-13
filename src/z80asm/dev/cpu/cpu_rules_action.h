@@ -30,13 +30,14 @@
 				add_opcode_##suffix((opcode), expr); \
 			} while(0)
 
-#define DO_stmt_jr( opcode)		_DO_stmt_(jr,		opcode)
-#define DO_stmt_jre(opcode)		_DO_stmt_(jre,		opcode)
-#define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
-#define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
-#define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
-#define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
-#define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
+#define DO_stmt_jr( 	opcode)		_DO_stmt_(jr,		opcode)
+#define DO_stmt_jre(	opcode)		_DO_stmt_(jre,		opcode)
+#define DO_stmt_n(  	opcode)		_DO_stmt_(n,		opcode)
+#define DO_stmt_h(  	opcode)		_DO_stmt_(h,		opcode)
+#define DO_stmt_n_0(	opcode)		_DO_stmt_(n_0,		opcode)
+#define DO_stmt_n_0_0(	opcode)		_DO_stmt_(n_0_0,	opcode)
+#define DO_stmt_s_0(	opcode)		_DO_stmt_(s_0,		opcode)
+#define DO_stmt_d(  	opcode)		_DO_stmt_(d,		opcode)
 
 #define DO_stmt_nn( opcode) \
 			do { \
@@ -11466,6 +11467,3 @@ bool cpu_rules_action_11360(ParseCtx *ctx, Str *name, Str *stmt_label);
 bool cpu_rules_action_11361(ParseCtx *ctx, Str *name, Str *stmt_label);
 bool cpu_rules_action_11362(ParseCtx *ctx, Str *name, Str *stmt_label);
 bool cpu_rules_action_11363(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11364(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11365(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11366(ParseCtx *ctx, Str *name, Str *stmt_label);

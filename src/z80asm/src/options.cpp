@@ -787,6 +787,8 @@ void Options::set_cpu(int cpu) {
 
     undefine_static_symbol("__CPU_8080__");
     undefine_static_symbol("__CPU_8085__");
+    undefine_static_symbol("__CPU_8080_STRICT__");
+    undefine_static_symbol("__CPU_8085_STRICT__");
     undefine_static_symbol("__CPU_INTEL__");
 
     undefine_static_symbol("__CPU_GBZ80__");
@@ -854,9 +856,19 @@ void Options::set_cpu(int cpu) {
         define_static_symbol("__CPU_8080__");
         define_static_symbol("__CPU_INTEL__");
         break;
+    case CPU_8080_STRICT:
+        m_cpu = CPU_8080_STRICT;
+        define_static_symbol("__CPU_8080_STRICT__");
+        define_static_symbol("__CPU_INTEL__");
+        break;
     case CPU_8085:
         m_cpu = CPU_8085;
         define_static_symbol("__CPU_8085__");
+        define_static_symbol("__CPU_INTEL__");
+        break;
+    case CPU_8085_STRICT:
+        m_cpu = CPU_8085_STRICT;
+        define_static_symbol("__CPU_8085_STRICT__");
         define_static_symbol("__CPU_INTEL__");
         break;
     case CPU_GBZ80:

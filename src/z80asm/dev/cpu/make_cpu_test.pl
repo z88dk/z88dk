@@ -75,6 +75,9 @@ for my $cpu (Opcode->cpus) {
 					$skip = 1 if $asm =~ /\d+/;		# nn
 				}
 			}
+			
+			# special case: cp (compare/call positive) always exists
+			$skip = 1 if $asm =~ /^cp (a, )?(0x1234|-128|0|127|255)/i;
 
 			push @test, sprintf(" %-31s; Error", $asm) unless $skip;
 		}

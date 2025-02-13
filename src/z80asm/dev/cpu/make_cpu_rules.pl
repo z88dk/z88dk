@@ -83,13 +83,14 @@ say $aux_h <<END;
 				add_opcode_##suffix((opcode), expr); \\
 			} while(0)
 
-#define DO_stmt_jr( opcode)		_DO_stmt_(jr,		opcode)
-#define DO_stmt_jre(opcode)		_DO_stmt_(jre,		opcode)
-#define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
-#define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
-#define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
-#define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
-#define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
+#define DO_stmt_jr( 	opcode)		_DO_stmt_(jr,		opcode)
+#define DO_stmt_jre(	opcode)		_DO_stmt_(jre,		opcode)
+#define DO_stmt_n(  	opcode)		_DO_stmt_(n,		opcode)
+#define DO_stmt_h(  	opcode)		_DO_stmt_(h,		opcode)
+#define DO_stmt_n_0(	opcode)		_DO_stmt_(n_0,		opcode)
+#define DO_stmt_n_0_0(	opcode)		_DO_stmt_(n_0_0,	opcode)
+#define DO_stmt_s_0(	opcode)		_DO_stmt_(s_0,		opcode)
+#define DO_stmt_d(  	opcode)		_DO_stmt_(d,		opcode)
 
 #define DO_stmt_nn( opcode) \\
 			do { \\
@@ -442,8 +443,14 @@ sub parse_code_opcode {
 	elsif ($bytes =~ s/ %m %m$//) {
 		$stmt = "DO_stmt_nn";
 	}
+	elsif ($bytes =~ s/ %u 0 0$//) {
+		$stmt = "DO_stmt_n_0_0";
+	}
 	elsif ($bytes =~ s/ %u 0$//) {
 		$stmt = "DO_stmt_n_0";
+	}
+	elsif ($bytes =~ s/ %n 0 0$//) {
+		$stmt = "DO_stmt_n_0_0";
 	}
 	elsif ($bytes =~ s/ %n 0$//) {
 		$stmt = "DO_stmt_n_0";

@@ -31,6 +31,8 @@ typedef enum {
     CPU_R5K         = 14,
     CPU_KC160       = 15,
     CPU_KC160_Z80   = 16,
+    CPU_8080_STRICT	= 17,
+    CPU_8085_STRICT	= 18,
 
     CPU_UNDEF       = -1,
 } cpu_t;
@@ -183,6 +185,8 @@ typedef enum {
     RANGE_HIGH_OFFSET           = 10,   // "H"  // byte offset to 0xFF00
     RANGE_ASSIGNMENT            = 11,   // "="  // DEFC expression assigning a symbol
     RANGE_JRE_OFFSET            = 12,   // "j"  // 16-bit relative offset for JRE
+    RANGE_BYTE_TO_PTR_UNSIGNED  = 13,   // "v"  // unsigned byte extended to 24 bits
+    RANGE_BYTE_TO_PTR_SIGNED    = 14,   // "t"  // signed byte sign-extended to 24 bits
 } range_t;
 
 // size of each range in object file
