@@ -8445,90 +8445,85 @@ call c, %m|z180|_||DC %m %m
 call c, %m|z80|_||DC %m %m
 call c, %m|z80_strict|_||DC %m %m
 call c, %m|z80n|_||DC %m %m
-call eq, %m|8080|_||CC %m %m
-call eq, %m|8085|_||CC %m %m
-call eq, %m|ez80|_||CC %m %m %m
-call eq, %m|ez80_z80|_||CC %m %m
-call eq, %m|gbz80|_||CC %m %m
-call eq, %m|kc160|_||CC %m %m
-call eq, %m|kc160_z80|_||CC %m %m
-call eq, %m|r2ka|_||20 %t;CD %m %m
-call eq, %m|r3k|_||20 %t;CD %m %m
-call eq, %m|r4k|_||20 %t;CD %m %m
-call eq, %m|r5k|_||20 %t;CD %m %m
-call eq, %m|r800|_||CC %m %m
-call eq, %m|z180|_||CC %m %m
-call eq, %m|z80|_||CC %m %m
-call eq, %m|z80_strict|_||CC %m %m
-call eq, %m|z80n|_||CC %m %m
-call geu, %m|8080|_||D4 %m %m
-call geu, %m|8085|_||D4 %m %m
-call geu, %m|ez80|_||D4 %m %m %m
-call geu, %m|ez80_z80|_||D4 %m %m
-call geu, %m|gbz80|_||D4 %m %m
-call geu, %m|kc160|_||D4 %m %m
-call geu, %m|kc160_z80|_||D4 %m %m
-call geu, %m|r2ka|_||38 %t;CD %m %m
-call geu, %m|r3k|_||38 %t;CD %m %m
-call geu, %m|r4k|_||38 %t;CD %m %m
-call geu, %m|r5k|_||38 %t;CD %m %m
-call geu, %m|r800|_||D4 %m %m
-call geu, %m|z180|_||D4 %m %m
-call geu, %m|z80|_||D4 %m %m
-call geu, %m|z80_strict|_||D4 %m %m
-call geu, %m|z80n|_||D4 %m %m
-call gtu, %m|8080|_||CA %t %t;DA %t %t;CD %m %m
-call gtu, %m|8085|_||CA %t %t;DA %t %t;CD %m %m
-call gtu, %m|ez80|_||28 %t;38 %t;CD %m %m %m
-call gtu, %m|ez80_z80|_||28 %t;38 %t;CD %m %m
-call gtu, %m|gbz80|_||28 %t;38 %t;CD %m %m
-call gtu, %m|kc160|_||28 %t;38 %t;CD %m %m
-call gtu, %m|kc160_z80|_||28 %t;38 %t;CD %m %m
-call gtu, %m|r2ka|_||28 %t;38 %t;CD %m %m
-call gtu, %m|r3k|_||28 %t;38 %t;CD %m %m
-call gtu, %m|r4k|_||28 %t;38 %t;CD %m %m
-call gtu, %m|r5k|_||28 %t;38 %t;CD %m %m
-call gtu, %m|r800|_||28 %t;38 %t;CD %m %m
-call gtu, %m|z180|_||28 %t;38 %t;CD %m %m
-call gtu, %m|z80|_||28 %t;38 %t;CD %m %m
-call gtu, %m|z80_strict|_||28 %t;38 %t;CD %m %m
-call gtu, %m|z80n|_||28 %t;38 %t;CD %m %m
-call leu, %m|8080|_||CA %t3 %t3;D2 %t %t;CD %m %m
-call leu, %m|8085|_||CA %t3 %t3;D2 %t %t;CD %m %m
-call leu, %m|ez80|_||28 %t4;30 %t;CD %m %m %m
-call leu, %m|ez80_z80|_||28 %t3;30 %t;CD %m %m
-call leu, %m|gbz80|_||28 %t3;30 %t;CD %m %m
-call leu, %m|kc160|_||28 %t3;30 %t;CD %m %m
-call leu, %m|kc160_z80|_||28 %t3;30 %t;CD %m %m
-call leu, %m|r2ka|_||28 %t3;30 %t;CD %m %m
-call leu, %m|r3k|_||28 %t3;30 %t;CD %m %m
-call leu, %m|r4k|_||28 %t3;30 %t;CD %m %m
-call leu, %m|r5k|_||28 %t3;30 %t;CD %m %m
-call leu, %m|r800|_||28 %t3;30 %t;CD %m %m
-call leu, %m|z180|_||28 %t3;30 %t;CD %m %m
-call leu, %m|z80|_||28 %t3;30 %t;CD %m %m
-call leu, %m|z80_strict|_||28 %t3;30 %t;CD %m %m
-call leu, %m|z80n|_||28 %t3;30 %t;CD %m %m
+call eq, %m|8080|X||CC %m %m
+call eq, %m|8085|X||CC %m %m
+call eq, %m|ez80|X||CC %m %m %m
+call eq, %m|ez80_z80|X||CC %m %m
+call eq, %m|gbz80|X||CC %m %m
+call eq, %m|kc160|X||CC %m %m
+call eq, %m|kc160_z80|X||CC %m %m
+call eq, %m|r2ka|X||20 %t;CD %m %m
+call eq, %m|r3k|X||20 %t;CD %m %m
+call eq, %m|r4k|X||20 %t;CD %m %m
+call eq, %m|r5k|X||20 %t;CD %m %m
+call eq, %m|r800|X||CC %m %m
+call eq, %m|z180|X||CC %m %m
+call eq, %m|z80|X||CC %m %m
+call eq, %m|z80n|X||CC %m %m
+call geu, %m|8080|X||D4 %m %m
+call geu, %m|8085|X||D4 %m %m
+call geu, %m|ez80|X||D4 %m %m %m
+call geu, %m|ez80_z80|X||D4 %m %m
+call geu, %m|gbz80|X||D4 %m %m
+call geu, %m|kc160|X||D4 %m %m
+call geu, %m|kc160_z80|X||D4 %m %m
+call geu, %m|r2ka|X||38 %t;CD %m %m
+call geu, %m|r3k|X||38 %t;CD %m %m
+call geu, %m|r4k|X||38 %t;CD %m %m
+call geu, %m|r5k|X||38 %t;CD %m %m
+call geu, %m|r800|X||D4 %m %m
+call geu, %m|z180|X||D4 %m %m
+call geu, %m|z80|X||D4 %m %m
+call geu, %m|z80n|X||D4 %m %m
+call gtu, %m|8080|X||CA %t %t;D4 %m %m
+call gtu, %m|8085|X||CA %t %t;D4 %m %m
+call gtu, %m|ez80|X||28 %t;D4 %m %m %m
+call gtu, %m|ez80_z80|X||28 %t;D4 %m %m
+call gtu, %m|gbz80|X||28 %t;D4 %m %m
+call gtu, %m|kc160|X||28 %t;D4 %m %m
+call gtu, %m|kc160_z80|X||28 %t;D4 %m %m
+call gtu, %m|r2ka|X||28 %t;38 %t;CD %m %m
+call gtu, %m|r3k|X||28 %t;38 %t;CD %m %m
+call gtu, %m|r4k|X||28 %t;38 %t;CD %m %m
+call gtu, %m|r5k|X||28 %t;38 %t;CD %m %m
+call gtu, %m|r800|X||28 %t;D4 %m %m
+call gtu, %m|z180|X||28 %t;D4 %m %m
+call gtu, %m|z80|X||28 %t;D4 %m %m
+call gtu, %m|z80n|X||28 %t;D4 %m %m
+call leu, %m|8080|X||CA %t3 %t3;D2 %t %t;CD %m %m
+call leu, %m|8085|X||CA %t3 %t3;D2 %t %t;CD %m %m
+call leu, %m|ez80|X||28 %t4;30 %t;CD %m %m %m
+call leu, %m|ez80_z80|X||28 %t3;30 %t;CD %m %m
+call leu, %m|gbz80|X||28 %t3;30 %t;CD %m %m
+call leu, %m|kc160|X||28 %t3;30 %t;CD %m %m
+call leu, %m|kc160_z80|X||28 %t3;30 %t;CD %m %m
+call leu, %m|r2ka|X||28 %t3;30 %t;CD %m %m
+call leu, %m|r3k|X||28 %t3;30 %t;CD %m %m
+call leu, %m|r4k|X||28 %t3;30 %t;CD %m %m
+call leu, %m|r5k|X||28 %t3;30 %t;CD %m %m
+call leu, %m|r800|X||28 %t3;30 %t;CD %m %m
+call leu, %m|z180|X||28 %t3;30 %t;CD %m %m
+call leu, %m|z80|X||28 %t3;30 %t;CD %m %m
+call leu, %m|z80n|X||28 %t3;30 %t;CD %m %m
 call lo, %m|r2ka|_||E2 %t %t;CD %m %m
 call lo, %m|r3k|_||E2 %t %t;CD %m %m
 call lo, %m|r4k|_||E2 %t %t;CD %m %m
 call lo, %m|r5k|_||E2 %t %t;CD %m %m
-call ltu, %m|8080|_||DC %m %m
-call ltu, %m|8085|_||DC %m %m
-call ltu, %m|ez80|_||DC %m %m %m
-call ltu, %m|ez80_z80|_||DC %m %m
-call ltu, %m|gbz80|_||DC %m %m
-call ltu, %m|kc160|_||DC %m %m
-call ltu, %m|kc160_z80|_||DC %m %m
-call ltu, %m|r2ka|_||30 %t;CD %m %m
-call ltu, %m|r3k|_||30 %t;CD %m %m
-call ltu, %m|r4k|_||30 %t;CD %m %m
-call ltu, %m|r5k|_||30 %t;CD %m %m
-call ltu, %m|r800|_||DC %m %m
-call ltu, %m|z180|_||DC %m %m
-call ltu, %m|z80|_||DC %m %m
-call ltu, %m|z80_strict|_||DC %m %m
-call ltu, %m|z80n|_||DC %m %m
+call ltu, %m|8080|X||DC %m %m
+call ltu, %m|8085|X||DC %m %m
+call ltu, %m|ez80|X||DC %m %m %m
+call ltu, %m|ez80_z80|X||DC %m %m
+call ltu, %m|gbz80|X||DC %m %m
+call ltu, %m|kc160|X||DC %m %m
+call ltu, %m|kc160_z80|X||DC %m %m
+call ltu, %m|r2ka|X||30 %t;CD %m %m
+call ltu, %m|r3k|X||30 %t;CD %m %m
+call ltu, %m|r4k|X||30 %t;CD %m %m
+call ltu, %m|r5k|X||30 %t;CD %m %m
+call ltu, %m|r800|X||DC %m %m
+call ltu, %m|z180|X||DC %m %m
+call ltu, %m|z80|X||DC %m %m
+call ltu, %m|z80n|X||DC %m %m
 call lz, %m|r2ka|_||EA %t %t;CD %m %m
 call lz, %m|r3k|_||EA %t %t;CD %m %m
 call lz, %m|r4k|_||EA %t %t;CD %m %m
@@ -8588,6 +8583,8 @@ call nv, %m|kc160|_||E4 %m %m
 call nv, %m|kc160_z80|_||E4 %m %m
 call nv, %m|r2ka|_||EA %t %t;CD %m %m
 call nv, %m|r3k|_||EA %t %t;CD %m %m
+call nv, %m|r4k|X||BA %t %t;CD %m %m
+call nv, %m|r5k|X||BA %t %t;CD %m %m
 call nv, %m|r800|_||E4 %m %m
 call nv, %m|z180|_||E4 %m %m
 call nv, %m|z80|_||E4 %m %m
@@ -8662,6 +8659,8 @@ call v, %m|kc160|_||EC %m %m
 call v, %m|kc160_z80|_||EC %m %m
 call v, %m|r2ka|_||E2 %t %t;CD %m %m
 call v, %m|r3k|_||E2 %t %t;CD %m %m
+call v, %m|r4k|X||BA %t3 %t3;18 %t;CD %m %m
+call v, %m|r5k|X||BA %t3 %t3;18 %t;CD %m %m
 call v, %m|r800|_||EC %m %m
 call v, %m|z180|_||EC %m %m
 call v, %m|z80|_||EC %m %m
@@ -8687,16 +8686,16 @@ call.il %m|ez80|_||5B;CD %m %m %m
 call.il %m|ez80_z80|_||52;CD %m %m %m
 call.il c, %m|ez80|_||5B;DC %m %m %m
 call.il c, %m|ez80_z80|_||52;DC %m %m %m
-call.il eq, %m|ez80|_||5B;CC %m %m %m
-call.il eq, %m|ez80_z80|_||52;CC %m %m %m
-call.il geu, %m|ez80|_||5B;D4 %m %m %m
-call.il geu, %m|ez80_z80|_||52;D4 %m %m %m
-call.il gtu, %m|ez80|_||28 %t;38 %t;5B;CD %m %m %m
-call.il gtu, %m|ez80_z80|_||28 %t;38 %t;52;CD %m %m %m
-call.il leu, %m|ez80|_||28 %t5;30 %t;5B;CD %m %m %m
-call.il leu, %m|ez80_z80|_||28 %t5;30 %t;52;CD %m %m %m
-call.il ltu, %m|ez80|_||5B;DC %m %m %m
-call.il ltu, %m|ez80_z80|_||52;DC %m %m %m
+call.il eq, %m|ez80|X||5B;CC %m %m %m
+call.il eq, %m|ez80_z80|X||52;CC %m %m %m
+call.il geu, %m|ez80|X||5B;D4 %m %m %m
+call.il geu, %m|ez80_z80|X||52;D4 %m %m %m
+call.il gtu, %m|ez80|X||28 %t;5B;D4 %m %m %m
+call.il gtu, %m|ez80_z80|X||28 %t;52;D4 %m %m %m
+call.il leu, %m|ez80|X||28 %t5;30 %t;5B;CD %m %m %m
+call.il leu, %m|ez80_z80|X||28 %t5;30 %t;52;CD %m %m %m
+call.il ltu, %m|ez80|X||5B;DC %m %m %m
+call.il ltu, %m|ez80_z80|X||52;DC %m %m %m
 call.il m, %m|ez80|_||5B;FC %m %m %m
 call.il m, %m|ez80_z80|_||52;FC %m %m %m
 call.il nc, %m|ez80|_||5B;D4 %m %m %m
@@ -8721,16 +8720,16 @@ call.is %m|ez80|_||49;CD %m %m
 call.is %m|ez80_z80|_||40;CD %m %m
 call.is c, %m|ez80|_||49;DC %m %m
 call.is c, %m|ez80_z80|_||40;DC %m %m
-call.is eq, %m|ez80|_||49;CC %m %m
-call.is eq, %m|ez80_z80|_||40;CC %m %m
-call.is geu, %m|ez80|_||49;D4 %m %m
-call.is geu, %m|ez80_z80|_||40;D4 %m %m
-call.is gtu, %m|ez80|_||28 %t;38 %t;49;CD %m %m
-call.is gtu, %m|ez80_z80|_||28 %t;38 %t;40;CD %m %m
-call.is leu, %m|ez80|_||28 %t5;30 %t;49;CD %m %m %m
-call.is leu, %m|ez80_z80|_||28 %t5;30 %t;40;CD %m %m %m
-call.is ltu, %m|ez80|_||49;DC %m %m
-call.is ltu, %m|ez80_z80|_||40;DC %m %m
+call.is eq, %m|ez80|X||49;CC %m %m
+call.is eq, %m|ez80_z80|X||40;CC %m %m
+call.is geu, %m|ez80|X||49;D4 %m %m
+call.is geu, %m|ez80_z80|X||40;D4 %m %m
+call.is gtu, %m|ez80|X||28 %t;49;D4 %m %m
+call.is gtu, %m|ez80_z80|X||28 %t;40;D4 %m %m
+call.is leu, %m|ez80|X||28 %t4;30 %t;49;CD %m %m
+call.is leu, %m|ez80_z80|X||28 %t4;30 %t;40;CD %m %m
+call.is ltu, %m|ez80|X||49;DC %m %m
+call.is ltu, %m|ez80_z80|X||40;DC %m %m
 call.is m, %m|ez80|_||49;FC %m %m
 call.is m, %m|ez80_z80|_||40;FC %m %m
 call.is nc, %m|ez80|_||49;D4 %m %m
@@ -8753,11 +8752,11 @@ call.is z, %m|ez80|_||49;CC %m %m
 call.is z, %m|ez80_z80|_||40;CC %m %m
 call.lil %m|ez80|_||5B;CD %m %m %m
 call.lil c, %m|ez80|_||5B;DC %m %m %m
-call.lil eq, %m|ez80|_||5B;CC %m %m %m
-call.lil geu, %m|ez80|_||5B;D4 %m %m %m
-call.lil gtu, %m|ez80|_||28 %t;38 %t;5B;CD %m %m %m
-call.lil leu, %m|ez80|_||28 %t5;30 %t;5B;CD %m %m %m
-call.lil ltu, %m|ez80|_||5B;DC %m %m %m
+call.lil eq, %m|ez80|X||5B;CC %m %m %m
+call.lil geu, %m|ez80|X||5B;D4 %m %m %m
+call.lil gtu, %m|ez80|X||28 %t;5B;D4 %m %m %m
+call.lil leu, %m|ez80|X||28 %t5;30 %t;5B;CD %m %m %m
+call.lil ltu, %m|ez80|X||5B;DC %m %m %m
 call.lil m, %m|ez80|_||5B;FC %m %m %m
 call.lil nc, %m|ez80|_||5B;D4 %m %m %m
 call.lil ne, %m|ez80|_||5B;C4 %m %m %m
@@ -8770,11 +8769,11 @@ call.lil v, %m|ez80|_||5B;EC %m %m %m
 call.lil z, %m|ez80|_||5B;CC %m %m %m
 call.lis %m|ez80|_||49;CD %m %m
 call.lis c, %m|ez80|_||49;DC %m %m
-call.lis eq, %m|ez80|_||49;CC %m %m
-call.lis geu, %m|ez80|_||49;D4 %m %m
-call.lis gtu, %m|ez80|_||28 %t;38 %t;49;CD %m %m
-call.lis leu, %m|ez80|_||28 %t5;30 %t;49;CD %m %m %m
-call.lis ltu, %m|ez80|_||49;DC %m %m
+call.lis eq, %m|ez80|X||49;CC %m %m
+call.lis geu, %m|ez80|X||49;D4 %m %m
+call.lis gtu, %m|ez80|X||28 %t;49;D4 %m %m
+call.lis leu, %m|ez80|X||28 %t4;30 %t;49;CD %m %m
+call.lis ltu, %m|ez80|X||49;DC %m %m
 call.lis m, %m|ez80|_||49;FC %m %m
 call.lis nc, %m|ez80|_||49;D4 %m %m
 call.lis ne, %m|ez80|_||49;C4 %m %m
@@ -8787,11 +8786,11 @@ call.lis v, %m|ez80|_||49;EC %m %m
 call.lis z, %m|ez80|_||49;CC %m %m
 call.sil %m|ez80_z80|_||52;CD %m %m %m
 call.sil c, %m|ez80_z80|_||52;DC %m %m %m
-call.sil eq, %m|ez80_z80|_||52;CC %m %m %m
-call.sil geu, %m|ez80_z80|_||52;D4 %m %m %m
-call.sil gtu, %m|ez80_z80|_||28 %t;38 %t;52;CD %m %m %m
-call.sil leu, %m|ez80_z80|_||28 %t5;30 %t;52;CD %m %m %m
-call.sil ltu, %m|ez80_z80|_||52;DC %m %m %m
+call.sil eq, %m|ez80_z80|X||52;CC %m %m %m
+call.sil geu, %m|ez80_z80|X||52;D4 %m %m %m
+call.sil gtu, %m|ez80_z80|X||28 %t;52;D4 %m %m %m
+call.sil leu, %m|ez80_z80|X||28 %t5;30 %t;52;CD %m %m %m
+call.sil ltu, %m|ez80_z80|X||52;DC %m %m %m
 call.sil m, %m|ez80_z80|_||52;FC %m %m %m
 call.sil nc, %m|ez80_z80|_||52;D4 %m %m %m
 call.sil ne, %m|ez80_z80|_||52;C4 %m %m %m
@@ -8804,11 +8803,11 @@ call.sil v, %m|ez80_z80|_||52;EC %m %m %m
 call.sil z, %m|ez80_z80|_||52;CC %m %m %m
 call.sis %m|ez80_z80|_||40;CD %m %m
 call.sis c, %m|ez80_z80|_||40;DC %m %m
-call.sis eq, %m|ez80_z80|_||40;CC %m %m
-call.sis geu, %m|ez80_z80|_||40;D4 %m %m
-call.sis gtu, %m|ez80_z80|_||28 %t;38 %t;40;CD %m %m
-call.sis leu, %m|ez80_z80|_||28 %t5;30 %t;40;CD %m %m %m
-call.sis ltu, %m|ez80_z80|_||40;DC %m %m
+call.sis eq, %m|ez80_z80|X||40;CC %m %m
+call.sis geu, %m|ez80_z80|X||40;D4 %m %m
+call.sis gtu, %m|ez80_z80|X||28 %t;40;D4 %m %m
+call.sis leu, %m|ez80_z80|X||28 %t4;30 %t;40;CD %m %m
+call.sis ltu, %m|ez80_z80|X||40;DC %m %m
 call.sis m, %m|ez80_z80|_||40;FC %m %m
 call.sis nc, %m|ez80_z80|_||40;D4 %m %m
 call.sis ne, %m|ez80_z80|_||40;C4 %m %m
@@ -8859,70 +8858,66 @@ ccf'|r2ka|_||76;3F
 ccf'|r3k|_||76;3F
 ccf'|r4k|_||76;3F
 ccf'|r5k|_||76;3F
-ceq %m|8080|_||CC %m %m
-ceq %m|8085|_||CC %m %m
-ceq %m|ez80|_||CC %m %m %m
-ceq %m|ez80_z80|_||CC %m %m
-ceq %m|gbz80|_||CC %m %m
-ceq %m|kc160|_||CC %m %m
-ceq %m|kc160_z80|_||CC %m %m
-ceq %m|r2ka|_||20 %t;CD %m %m
-ceq %m|r3k|_||20 %t;CD %m %m
-ceq %m|r4k|_||20 %t;CD %m %m
-ceq %m|r5k|_||20 %t;CD %m %m
-ceq %m|r800|_||CC %m %m
-ceq %m|z180|_||CC %m %m
-ceq %m|z80|_||CC %m %m
-ceq %m|z80_strict|_||CC %m %m
-ceq %m|z80n|_||CC %m %m
-cgeu %m|8080|_||D4 %m %m
-cgeu %m|8085|_||D4 %m %m
-cgeu %m|ez80|_||D4 %m %m %m
-cgeu %m|ez80_z80|_||D4 %m %m
-cgeu %m|gbz80|_||D4 %m %m
-cgeu %m|kc160|_||D4 %m %m
-cgeu %m|kc160_z80|_||D4 %m %m
-cgeu %m|r2ka|_||38 %t;CD %m %m
-cgeu %m|r3k|_||38 %t;CD %m %m
-cgeu %m|r4k|_||38 %t;CD %m %m
-cgeu %m|r5k|_||38 %t;CD %m %m
-cgeu %m|r800|_||D4 %m %m
-cgeu %m|z180|_||D4 %m %m
-cgeu %m|z80|_||D4 %m %m
-cgeu %m|z80_strict|_||D4 %m %m
-cgeu %m|z80n|_||D4 %m %m
-cgtu %m|8080|_||CA %t %t;DA %t %t;CD %m %m
-cgtu %m|8085|_||CA %t %t;DA %t %t;CD %m %m
-cgtu %m|ez80|_||28 %t;38 %t;CD %m %m %m
-cgtu %m|ez80_z80|_||28 %t;38 %t;CD %m %m
-cgtu %m|gbz80|_||28 %t;38 %t;CD %m %m
-cgtu %m|kc160|_||28 %t;38 %t;CD %m %m
-cgtu %m|kc160_z80|_||28 %t;38 %t;CD %m %m
-cgtu %m|r2ka|_||28 %t;38 %t;CD %m %m
-cgtu %m|r3k|_||28 %t;38 %t;CD %m %m
-cgtu %m|r4k|_||28 %t;38 %t;CD %m %m
-cgtu %m|r5k|_||28 %t;38 %t;CD %m %m
-cgtu %m|r800|_||28 %t;38 %t;CD %m %m
-cgtu %m|z180|_||28 %t;38 %t;CD %m %m
-cgtu %m|z80|_||28 %t;38 %t;CD %m %m
-cgtu %m|z80_strict|_||28 %t;38 %t;CD %m %m
-cgtu %m|z80n|_||28 %t;38 %t;CD %m %m
-cleu %m|8080|_||CA %t3 %t3;D2 %t %t;CD %m %m
-cleu %m|8085|_||CA %t3 %t3;D2 %t %t;CD %m %m
-cleu %m|ez80|_||28 %t4;30 %t;CD %m %m %m
-cleu %m|ez80_z80|_||28 %t3;30 %t;CD %m %m
-cleu %m|gbz80|_||28 %t3;30 %t;CD %m %m
-cleu %m|kc160|_||28 %t3;30 %t;CD %m %m
-cleu %m|kc160_z80|_||28 %t3;30 %t;CD %m %m
-cleu %m|r2ka|_||28 %t3;30 %t;CD %m %m
-cleu %m|r3k|_||28 %t3;30 %t;CD %m %m
-cleu %m|r4k|_||28 %t3;30 %t;CD %m %m
-cleu %m|r5k|_||28 %t3;30 %t;CD %m %m
-cleu %m|r800|_||28 %t3;30 %t;CD %m %m
-cleu %m|z180|_||28 %t3;30 %t;CD %m %m
-cleu %m|z80|_||28 %t3;30 %t;CD %m %m
-cleu %m|z80_strict|_||28 %t3;30 %t;CD %m %m
-cleu %m|z80n|_||28 %t3;30 %t;CD %m %m
+ceq %m|8080|X||CC %m %m
+ceq %m|8085|X||CC %m %m
+ceq %m|ez80|X||CC %m %m %m
+ceq %m|ez80_z80|X||CC %m %m
+ceq %m|gbz80|X||CC %m %m
+ceq %m|kc160|X||CC %m %m
+ceq %m|kc160_z80|X||CC %m %m
+ceq %m|r2ka|X||20 %t;CD %m %m
+ceq %m|r3k|X||20 %t;CD %m %m
+ceq %m|r4k|X||20 %t;CD %m %m
+ceq %m|r5k|X||20 %t;CD %m %m
+ceq %m|r800|X||CC %m %m
+ceq %m|z180|X||CC %m %m
+ceq %m|z80|X||CC %m %m
+ceq %m|z80n|X||CC %m %m
+cgeu %m|8080|X||D4 %m %m
+cgeu %m|8085|X||D4 %m %m
+cgeu %m|ez80|X||D4 %m %m %m
+cgeu %m|ez80_z80|X||D4 %m %m
+cgeu %m|gbz80|X||D4 %m %m
+cgeu %m|kc160|X||D4 %m %m
+cgeu %m|kc160_z80|X||D4 %m %m
+cgeu %m|r2ka|X||38 %t;CD %m %m
+cgeu %m|r3k|X||38 %t;CD %m %m
+cgeu %m|r4k|X||38 %t;CD %m %m
+cgeu %m|r5k|X||38 %t;CD %m %m
+cgeu %m|r800|X||D4 %m %m
+cgeu %m|z180|X||D4 %m %m
+cgeu %m|z80|X||D4 %m %m
+cgeu %m|z80n|X||D4 %m %m
+cgtu %m|8080|X||CA %t %t;D4 %m %m
+cgtu %m|8085|X||CA %t %t;D4 %m %m
+cgtu %m|ez80|X||28 %t;D4 %m %m %m
+cgtu %m|ez80_z80|X||28 %t;D4 %m %m
+cgtu %m|gbz80|X||28 %t;D4 %m %m
+cgtu %m|kc160|X||28 %t;D4 %m %m
+cgtu %m|kc160_z80|X||28 %t;D4 %m %m
+cgtu %m|r2ka|X||28 %t;38 %t;CD %m %m
+cgtu %m|r3k|X||28 %t;38 %t;CD %m %m
+cgtu %m|r4k|X||28 %t;38 %t;CD %m %m
+cgtu %m|r5k|X||28 %t;38 %t;CD %m %m
+cgtu %m|r800|X||28 %t;D4 %m %m
+cgtu %m|z180|X||28 %t;D4 %m %m
+cgtu %m|z80|X||28 %t;D4 %m %m
+cgtu %m|z80n|X||28 %t;D4 %m %m
+cleu %m|8080|X||CA %t3 %t3;D2 %t %t;CD %m %m
+cleu %m|8085|X||CA %t3 %t3;D2 %t %t;CD %m %m
+cleu %m|ez80|X||28 %t4;30 %t;CD %m %m %m
+cleu %m|ez80_z80|X||28 %t3;30 %t;CD %m %m
+cleu %m|gbz80|X||28 %t3;30 %t;CD %m %m
+cleu %m|kc160|X||28 %t3;30 %t;CD %m %m
+cleu %m|kc160_z80|X||28 %t3;30 %t;CD %m %m
+cleu %m|r2ka|X||28 %t3;30 %t;CD %m %m
+cleu %m|r3k|X||28 %t3;30 %t;CD %m %m
+cleu %m|r4k|X||28 %t3;30 %t;CD %m %m
+cleu %m|r5k|X||28 %t3;30 %t;CD %m %m
+cleu %m|r800|X||28 %t3;30 %t;CD %m %m
+cleu %m|z180|X||28 %t3;30 %t;CD %m %m
+cleu %m|z80|X||28 %t3;30 %t;CD %m %m
+cleu %m|z80n|X||28 %t3;30 %t;CD %m %m
 clo %m|r2ka|_||E2 %t %t;CD %m %m
 clo %m|r3k|_||E2 %t %t;CD %m %m
 clo %m|r4k|_||E2 %t %t;CD %m %m
@@ -9241,22 +9236,21 @@ clr l'|r2ka|_||76;2E 00
 clr l'|r3k|_||76;2E 00
 clr l'|r4k|_||76;2E 00
 clr l'|r5k|_||76;2E 00
-cltu %m|8080|_||DC %m %m
-cltu %m|8085|_||DC %m %m
-cltu %m|ez80|_||DC %m %m %m
-cltu %m|ez80_z80|_||DC %m %m
-cltu %m|gbz80|_||DC %m %m
-cltu %m|kc160|_||DC %m %m
-cltu %m|kc160_z80|_||DC %m %m
-cltu %m|r2ka|_||30 %t;CD %m %m
-cltu %m|r3k|_||30 %t;CD %m %m
-cltu %m|r4k|_||30 %t;CD %m %m
-cltu %m|r5k|_||30 %t;CD %m %m
-cltu %m|r800|_||DC %m %m
-cltu %m|z180|_||DC %m %m
-cltu %m|z80|_||DC %m %m
-cltu %m|z80_strict|_||DC %m %m
-cltu %m|z80n|_||DC %m %m
+cltu %m|8080|X||DC %m %m
+cltu %m|8085|X||DC %m %m
+cltu %m|ez80|X||DC %m %m %m
+cltu %m|ez80_z80|X||DC %m %m
+cltu %m|gbz80|X||DC %m %m
+cltu %m|kc160|X||DC %m %m
+cltu %m|kc160_z80|X||DC %m %m
+cltu %m|r2ka|X||30 %t;CD %m %m
+cltu %m|r3k|X||30 %t;CD %m %m
+cltu %m|r4k|X||30 %t;CD %m %m
+cltu %m|r5k|X||30 %t;CD %m %m
+cltu %m|r800|X||DC %m %m
+cltu %m|z180|X||DC %m %m
+cltu %m|z80|X||DC %m %m
+cltu %m|z80n|X||DC %m %m
 clz %m|r2ka|_||EA %t %t;CD %m %m
 clz %m|r3k|_||EA %t %t;CD %m %m
 clz %m|r4k|_||EA %t %t;CD %m %m
@@ -9972,6 +9966,8 @@ cnv %m|kc160|_||E4 %m %m
 cnv %m|kc160_z80|_||E4 %m %m
 cnv %m|r2ka|_||EA %t %t;CD %m %m
 cnv %m|r3k|_||EA %t %t;CD %m %m
+cnv %m|r4k|X||BA %t %t;CD %m %m
+cnv %m|r5k|X||BA %t %t;CD %m %m
 cnv %m|r800|_||E4 %m %m
 cnv %m|z180|_||E4 %m %m
 cnv %m|z80|_||E4 %m %m
@@ -10799,6 +10795,8 @@ cv %m|kc160|_||EC %m %m
 cv %m|kc160_z80|_||EC %m %m
 cv %m|r2ka|_||E2 %t %t;CD %m %m
 cv %m|r3k|_||E2 %t %t;CD %m %m
+cv %m|r4k|X||BA %t3 %t3;18 %t;CD %m %m
+cv %m|r5k|X||BA %t3 %t3;18 %t;CD %m %m
 cv %m|r800|_||EC %m %m
 cv %m|z180|_||EC %m %m
 cv %m|z80|_||EC %m %m
@@ -20244,8 +20242,8 @@ jpo %m|z180|_||E2 %m %m
 jpo %m|z80|_||E2 %m %m
 jpo %m|z80_strict|_||E2 %m %m
 jpo %m|z80n|_||E2 %m %m
-jr %j|8080|_||C3 %m %m
-jr %j|8085|_||C3 %m %m
+jr %j|8080|X||C3 %m %m
+jr %j|8085|X||C3 %m %m
 jr %j|ez80|_||18 %j
 jr %j|ez80_z80|_||18 %j
 jr %j|gbz80|_||18 %j
@@ -20260,8 +20258,8 @@ jr %j|z180|_||18 %j
 jr %j|z80|_||18 %j
 jr %j|z80_strict|_||18 %j
 jr %j|z80n|_||18 %j
-jr c, %j|8080|_||DA %m %m
-jr c, %j|8085|_||DA %m %m
+jr c, %j|8080|X||DA %m %m
+jr c, %j|8085|X||DA %m %m
 jr c, %j|ez80|_||38 %j
 jr c, %j|ez80_z80|_||38 %j
 jr c, %j|gbz80|_||38 %j
@@ -20276,92 +20274,87 @@ jr c, %j|z180|_||38 %j
 jr c, %j|z80|_||38 %j
 jr c, %j|z80_strict|_||38 %j
 jr c, %j|z80n|_||38 %j
-jr eq, %j|8080|_||CA %m %m
-jr eq, %j|8085|_||CA %m %m
-jr eq, %j|ez80|_||28 %j
-jr eq, %j|ez80_z80|_||28 %j
-jr eq, %j|gbz80|_||28 %j
-jr eq, %j|kc160|_||28 %j
-jr eq, %j|kc160_z80|_||28 %j
-jr eq, %j|r2ka|_||28 %j
-jr eq, %j|r3k|_||28 %j
-jr eq, %j|r4k|_||28 %j
-jr eq, %j|r5k|_||28 %j
-jr eq, %j|r800|_||28 %j
-jr eq, %j|z180|_||28 %j
-jr eq, %j|z80|_||28 %j
-jr eq, %j|z80_strict|_||28 %j
-jr eq, %j|z80n|_||28 %j
-jr geu, %j|8080|_||D2 %m %m
-jr geu, %j|8085|_||D2 %m %m
-jr geu, %j|ez80|_||30 %j
-jr geu, %j|ez80_z80|_||30 %j
-jr geu, %j|gbz80|_||30 %j
-jr geu, %j|kc160|_||30 %j
-jr geu, %j|kc160_z80|_||30 %j
-jr geu, %j|r2ka|_||30 %j
-jr geu, %j|r3k|_||30 %j
-jr geu, %j|r4k|_||30 %j
-jr geu, %j|r5k|_||30 %j
-jr geu, %j|r800|_||30 %j
-jr geu, %j|z180|_||30 %j
-jr geu, %j|z80|_||30 %j
-jr geu, %j|z80_strict|_||30 %j
-jr geu, %j|z80n|_||30 %j
+jr eq, %j|8080|X||CA %m %m
+jr eq, %j|8085|X||CA %m %m
+jr eq, %j|ez80|X||28 %j
+jr eq, %j|ez80_z80|X||28 %j
+jr eq, %j|gbz80|X||28 %j
+jr eq, %j|kc160|X||28 %j
+jr eq, %j|kc160_z80|X||28 %j
+jr eq, %j|r2ka|X||28 %j
+jr eq, %j|r3k|X||28 %j
+jr eq, %j|r4k|X||28 %j
+jr eq, %j|r5k|X||28 %j
+jr eq, %j|r800|X||28 %j
+jr eq, %j|z180|X||28 %j
+jr eq, %j|z80|X||28 %j
+jr eq, %j|z80n|X||28 %j
+jr geu, %j|8080|X||D2 %m %m
+jr geu, %j|8085|X||D2 %m %m
+jr geu, %j|ez80|X||30 %j
+jr geu, %j|ez80_z80|X||30 %j
+jr geu, %j|gbz80|X||30 %j
+jr geu, %j|kc160|X||30 %j
+jr geu, %j|kc160_z80|X||30 %j
+jr geu, %j|r2ka|X||30 %j
+jr geu, %j|r3k|X||30 %j
+jr geu, %j|r4k|X||30 %j
+jr geu, %j|r5k|X||30 %j
+jr geu, %j|r800|X||30 %j
+jr geu, %j|z180|X||30 %j
+jr geu, %j|z80|X||30 %j
+jr geu, %j|z80n|X||30 %j
 jr gt, %j|r4k|_||A0 %j
 jr gt, %j|r5k|_||A0 %j
-jr gtu, %j|8080|_||CA %t %t;D2 %m %m
-jr gtu, %j|8085|_||CA %t %t;D2 %m %m
-jr gtu, %j|ez80|_||28 %t;30 %j
-jr gtu, %j|ez80_z80|_||28 %t;30 %j
-jr gtu, %j|gbz80|_||28 %t;30 %j
-jr gtu, %j|kc160|_||28 %t;30 %j
-jr gtu, %j|kc160_z80|_||28 %t;30 %j
-jr gtu, %j|r2ka|_||28 %t;30 %j
-jr gtu, %j|r3k|_||28 %t;30 %j
+jr gtu, %j|8080|X||CA %t %t;D2 %m %m
+jr gtu, %j|8085|X||CA %t %t;D2 %m %m
+jr gtu, %j|ez80|X||28 %t;30 %j
+jr gtu, %j|ez80_z80|X||28 %t;30 %j
+jr gtu, %j|gbz80|X||28 %t;30 %j
+jr gtu, %j|kc160|X||28 %t;30 %j
+jr gtu, %j|kc160_z80|X||28 %t;30 %j
+jr gtu, %j|r2ka|X||28 %t;30 %j
+jr gtu, %j|r3k|X||28 %t;30 %j
 jr gtu, %j|r4k|_||A8 %j
 jr gtu, %j|r5k|_||A8 %j
-jr gtu, %j|r800|_||28 %t;30 %j
-jr gtu, %j|z180|_||28 %t;30 %j
-jr gtu, %j|z80|_||28 %t;30 %j
-jr gtu, %j|z80_strict|_||28 %t;30 %j
-jr gtu, %j|z80n|_||28 %t;30 %j
-jr leu, %j|8080|_||CA %m %m;DA %m %m
-jr leu, %j|8085|_||CA %m %m;DA %m %m
-jr leu, %j|ez80|_||28 %j;38 %j
-jr leu, %j|ez80_z80|_||28 %j;38 %j
-jr leu, %j|gbz80|_||28 %j;38 %j
-jr leu, %j|kc160|_||28 %j;38 %j
-jr leu, %j|kc160_z80|_||28 %j;38 %j
-jr leu, %j|r2ka|_||28 %j;38 %j
-jr leu, %j|r3k|_||28 %j;38 %j
-jr leu, %j|r4k|_||28 %j;38 %j
-jr leu, %j|r5k|_||28 %j;38 %j
-jr leu, %j|r800|_||28 %j;38 %j
-jr leu, %j|z180|_||28 %j;38 %j
-jr leu, %j|z80|_||28 %j;38 %j
-jr leu, %j|z80_strict|_||28 %j;38 %j
-jr leu, %j|z80n|_||28 %j;38 %j
+jr gtu, %j|r800|X||28 %t;30 %j
+jr gtu, %j|z180|X||28 %t;30 %j
+jr gtu, %j|z80|X||28 %t;30 %j
+jr gtu, %j|z80n|X||28 %t;30 %j
+jr leu, %j|8080|X||CA %m %m;DA %m %m
+jr leu, %j|8085|X||CA %m %m;DA %m %m
+jr leu, %j|ez80|X||28 %j;38 %j
+jr leu, %j|ez80_z80|X||28 %j;38 %j
+jr leu, %j|gbz80|X||28 %j;38 %j
+jr leu, %j|kc160|X||28 %j;38 %j
+jr leu, %j|kc160_z80|X||28 %j;38 %j
+jr leu, %j|r2ka|X||28 %j;38 %j
+jr leu, %j|r3k|X||28 %j;38 %j
+jr leu, %j|r4k|X||28 %j;38 %j
+jr leu, %j|r5k|X||28 %j;38 %j
+jr leu, %j|r800|X||28 %j;38 %j
+jr leu, %j|z180|X||28 %j;38 %j
+jr leu, %j|z80|X||28 %j;38 %j
+jr leu, %j|z80n|X||28 %j;38 %j
 jr lt, %j|r4k|_||B0 %j
 jr lt, %j|r5k|_||B0 %j
-jr ltu, %j|8080|_||DA %m %m
-jr ltu, %j|8085|_||DA %m %m
-jr ltu, %j|ez80|_||38 %j
-jr ltu, %j|ez80_z80|_||38 %j
-jr ltu, %j|gbz80|_||38 %j
-jr ltu, %j|kc160|_||38 %j
-jr ltu, %j|kc160_z80|_||38 %j
-jr ltu, %j|r2ka|_||38 %j
-jr ltu, %j|r3k|_||38 %j
-jr ltu, %j|r4k|_||38 %j
-jr ltu, %j|r5k|_||38 %j
-jr ltu, %j|r800|_||38 %j
-jr ltu, %j|z180|_||38 %j
-jr ltu, %j|z80|_||38 %j
-jr ltu, %j|z80_strict|_||38 %j
-jr ltu, %j|z80n|_||38 %j
-jr nc, %j|8080|_||D2 %m %m
-jr nc, %j|8085|_||D2 %m %m
+jr ltu, %j|8080|X||DA %m %m
+jr ltu, %j|8085|X||DA %m %m
+jr ltu, %j|ez80|X||38 %j
+jr ltu, %j|ez80_z80|X||38 %j
+jr ltu, %j|gbz80|X||38 %j
+jr ltu, %j|kc160|X||38 %j
+jr ltu, %j|kc160_z80|X||38 %j
+jr ltu, %j|r2ka|X||38 %j
+jr ltu, %j|r3k|X||38 %j
+jr ltu, %j|r4k|X||38 %j
+jr ltu, %j|r5k|X||38 %j
+jr ltu, %j|r800|X||38 %j
+jr ltu, %j|z180|X||38 %j
+jr ltu, %j|z80|X||38 %j
+jr ltu, %j|z80n|X||38 %j
+jr nc, %j|8080|X||D2 %m %m
+jr nc, %j|8085|X||D2 %m %m
 jr nc, %j|ez80|_||30 %j
 jr nc, %j|ez80_z80|_||30 %j
 jr nc, %j|gbz80|_||30 %j
@@ -20376,24 +20369,23 @@ jr nc, %j|z180|_||30 %j
 jr nc, %j|z80|_||30 %j
 jr nc, %j|z80_strict|_||30 %j
 jr nc, %j|z80n|_||30 %j
-jr ne, %j|8080|_||C2 %m %m
-jr ne, %j|8085|_||C2 %m %m
-jr ne, %j|ez80|_||20 %j
-jr ne, %j|ez80_z80|_||20 %j
-jr ne, %j|gbz80|_||20 %j
-jr ne, %j|kc160|_||20 %j
-jr ne, %j|kc160_z80|_||20 %j
-jr ne, %j|r2ka|_||20 %j
-jr ne, %j|r3k|_||20 %j
-jr ne, %j|r4k|_||20 %j
-jr ne, %j|r5k|_||20 %j
-jr ne, %j|r800|_||20 %j
-jr ne, %j|z180|_||20 %j
-jr ne, %j|z80|_||20 %j
-jr ne, %j|z80_strict|_||20 %j
-jr ne, %j|z80n|_||20 %j
-jr nz, %j|8080|_||C2 %m %m
-jr nz, %j|8085|_||C2 %m %m
+jr ne, %j|8080|X||C2 %m %m
+jr ne, %j|8085|X||C2 %m %m
+jr ne, %j|ez80|X||20 %j
+jr ne, %j|ez80_z80|X||20 %j
+jr ne, %j|gbz80|X||20 %j
+jr ne, %j|kc160|X||20 %j
+jr ne, %j|kc160_z80|X||20 %j
+jr ne, %j|r2ka|X||20 %j
+jr ne, %j|r3k|X||20 %j
+jr ne, %j|r4k|X||20 %j
+jr ne, %j|r5k|X||20 %j
+jr ne, %j|r800|X||20 %j
+jr ne, %j|z180|X||20 %j
+jr ne, %j|z80|X||20 %j
+jr ne, %j|z80n|X||20 %j
+jr nz, %j|8080|X||C2 %m %m
+jr nz, %j|8085|X||C2 %m %m
 jr nz, %j|ez80|_||20 %j
 jr nz, %j|ez80_z80|_||20 %j
 jr nz, %j|gbz80|_||20 %j
@@ -20410,8 +20402,8 @@ jr nz, %j|z80_strict|_||20 %j
 jr nz, %j|z80n|_||20 %j
 jr v, %j|r4k|_||B8 %j
 jr v, %j|r5k|_||B8 %j
-jr z, %j|8080|_||CA %m %m
-jr z, %j|8085|_||CA %m %m
+jr z, %j|8080|X||CA %m %m
+jr z, %j|8085|X||CA %m %m
 jr z, %j|ez80|_||28 %j
 jr z, %j|ez80_z80|_||28 %j
 jr z, %j|gbz80|_||28 %j

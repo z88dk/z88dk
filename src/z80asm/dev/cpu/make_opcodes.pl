@@ -2501,43 +2501,14 @@ for my $cpu (@CPUS) {
 
 	# JR
 	if ($intel) {
-		add($cpu, "jr %j",	[jp(), '%m', '%m']);
-		
-		for my $_f (qw( _nz _z _nc _c _ne _eq _geu _ltu _gtu _leu )) { 
-			my $f = substr($_f, 1);	# remove leading _
-			
-			if ($f eq 'gtu') {
-				add($cpu, "jr $f, %j",	[jp_f('_eq'),  '%t', '%t'],
-										[jp_f('_geu'), '%m', '%m']);
-			}
-			elsif ($f eq 'leu') {
-				add($cpu, "jr $f, %j",	[jp_f('_eq'),  '%m', '%m'],
-										[jp_f('_ltu'), '%m', '%m']);
-			}
-			else {
-				add($cpu, "jr $f, %j",	[jp_f($_f), '%m', '%m']);
-			}
-		}
 	} 
 	else {	
 		add($cpu, "jr %j",	[jr(), '%j']);
 		
-		for my $_f (qw( _nz _z _nc _c _ne _eq _geu _ltu _gtu _leu )) { 
+		for my $_f (qw( _nz _z _nc _c )) { 
 			my $f = substr($_f, 1);	# remove leading _
 			
-			next if ($r4k || $r5k) && $f =~ /^(gt|lt|gtu|v)$/;
-			
-			if ($f eq 'gtu') {
-				add($cpu, "jr $f, %j",	[jr_f('_eq'),  '%t'],
-										[jr_f('_geu'), '%j']);
-			}
-			elsif ($f eq 'leu') {
-				add($cpu, "jr $f, %j",	[jr_f('_eq'),  '%j'],
-										[jr_f('_ltu'), '%j']);
-			}
-			else {
-				add($cpu, "jr $f, %j",	[jr_f($_f), '%j']);
-			}
+			add($cpu, "jr $f, %j",	[jr_f($_f), '%j']);
 		}
 	}
 	
@@ -2797,6 +2768,8 @@ for my $cpu (@CPUS) {
 	
 	for my $_f (qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m 
 					_ne _eq _geu _ltu _gtu _leu )) { 
+		next if $_f =~ /^(_eq|_geu|_gtu|_leu|_ltu)$/;
+		
 		my $f = substr($_f, 1);			# remove leading _
 		my $_inv_f = $INV_FLAG{$_f};	# inverted flag
 		my $inv_f = substr($_inv_f, 1);	# remove leading _
@@ -3945,6 +3918,164 @@ for my $cpu (@CPUS) {
 		add($cpu, "div dehl, bc",			[0xED, 0x75]);
 		add($cpu, "divs dehl, bc",			[0xED, 0x7D]);
 	}
+}
+
+#------------------------------------------------------------------------------
+# Synthetic opcodes
+#------------------------------------------------------------------------------
+
+for my $cpu (Opcode->cpus) {
+
+	#--------------------------------------------------------------------------
+	# Jumps
+	#--------------------------------------------------------------------------
+
+	# JR in intel
+	if ($cpu =~ /^(8080|8085)/) {
+		$opcodes->add_synth($cpu, "jr %j", "jp %m");
+		for my $flag ('nz', 'z', 'nc', 'c') {
+			$opcodes->add_synth($cpu, "jr $flag, %j", "jp $flag, %m");
+		}
+	}
+	
+	# ez80 suffixes
+	my @ez80_suffixes = ('');
+	if ($cpu =~ /^ez80_z80$/) {
+		@ez80_suffixes = ('', '.il', '.is', '.sil', '.sis');
+	} 
+	elsif ($cpu =~ /^ez80$/) {
+		@ez80_suffixes = ('', '.il', '.is', '.lil', '.lis');
+	}
+
+	# JP|CALL|RET EQ, NN
+	$opcodes->add_synth($cpu, "jeq %m", "jz %m");
+	$opcodes->add_synth($cpu, "jp eq, %m", "jp z, %m");
+	$opcodes->add_synth($cpu, "jr eq, %j", "jr z, %j");
+	$opcodes->add_synth($cpu, "ceq %m", "cz %m");
+	for my $suf (@ez80_suffixes) {
+		$opcodes->add_synth($cpu, "call$suf eq, %m", "call$suf z, %m");
+	}
+	$opcodes->add_synth($cpu, "req", "rz");
+	$opcodes->add_synth($cpu, "ret eq", "ret z");
+
+	# JP|CALL|RET NE, NN
+	$opcodes->add_synth($cpu, "jne %m", "jnz %m");
+	$opcodes->add_synth($cpu, "jp ne, %m", "jp nz, %m");
+	$opcodes->add_synth($cpu, "jr ne, %j", "jr nz, %j");
+	$opcodes->add_synth($cpu, "cne %m", "cnz %m");
+	for my $suf (@ez80_suffixes) {
+		$opcodes->add_synth($cpu, "call$suf ne, %m", "call$suf nz, %m");
+	}
+	$opcodes->add_synth($cpu, "rne", "rnz");
+	$opcodes->add_synth($cpu, "ret ne", "ret nz");
+
+	# JP|CALL|RET GEU, NN
+	$opcodes->add_synth($cpu, "jgeu %m", "jnc %m");
+	$opcodes->add_synth($cpu, "jp geu, %m", "jp nc, %m");
+	$opcodes->add_synth($cpu, "jr geu, %j", "jr nc, %j");
+	$opcodes->add_synth($cpu, "cgeu %m", "cnc %m");
+	for my $suf (@ez80_suffixes) {
+		$opcodes->add_synth($cpu, "call$suf geu, %m", "call$suf nc, %m");
+	}
+	$opcodes->add_synth($cpu, "rgeu", "rnc");
+	$opcodes->add_synth($cpu, "ret geu", "ret nc");
+
+	# JP|CALL|RET LTU, NN
+	$opcodes->add_synth($cpu, "jltu %m", "jc %m");
+	$opcodes->add_synth($cpu, "jp ltu, %m", "jp c, %m");
+	$opcodes->add_synth($cpu, "jr ltu, %j", "jr c, %j");
+	$opcodes->add_synth($cpu, "cltu %m", "cc %m");
+	for my $suf (@ez80_suffixes) {
+		$opcodes->add_synth($cpu, "call$suf ltu, %m", "call$suf c, %m");
+	}
+	$opcodes->add_synth($cpu, "rltu", "rc");
+	$opcodes->add_synth($cpu, "ret ltu", "ret c");
+
+	# Rabbit lacks "call cc, NN"
+	for (['nz', 'z'], ['nc', 'c'], ['ne', 'eq'], ['geu', 'ltu']) {
+		my($norm, $inv) = @$_;
+		for my $suf (@ez80_suffixes) {
+			$opcodes->add_synth($cpu, "call$suf $norm, %m", "jr $inv, %t", "call$suf %m");
+			$opcodes->add_synth($cpu, "call$suf $inv, %m", "jr $norm, %t", "call$suf %m");
+		}
+	}
+
+	# JP|CALL|RET GTU, NN
+	$opcodes->add_synth($cpu, "jgtu %m", "jz %t", "jnc %m");
+	$opcodes->add_synth($cpu, "jp gtu, %m", "jr z, %t", "jp nc, %m");
+	$opcodes->add_synth($cpu, "jr gtu, %j", "jr z, %t", "jr nc, %j");
+	$opcodes->add_synth($cpu, "cgtu %m", "jr z, %t", "call nc, %m");
+	for my $suf (@ez80_suffixes) {
+		$opcodes->add_synth($cpu, "call$suf gtu, %m", "jr z, %t", "call$suf nc, %m");
+	}
+	$opcodes->add_synth($cpu, "rgtu", "jr z, %t", "rnc");
+	$opcodes->add_synth($cpu, "ret gtu", "jr z, %t", "ret nc");
+
+	# JP|CALL|RET LEU, NN
+	$opcodes->add_synth($cpu, "jleu %m", "jz %m", "jc %m");
+	$opcodes->add_synth($cpu, "jp leu, %m", "jp z, %m", "jp c, %m");
+	$opcodes->add_synth($cpu, "jr leu, %j", "jr z, %j", "jr c, %j");
+	for my $suf (@ez80_suffixes) {
+		# ez80 size of call instuction
+		my $call_size = 3;
+		my $call_opcode = $opcodes->opcodes->{"call$suf %m"}{$cpu};
+		if ($call_opcode) {
+			$call_size = scalar($call_opcode->bytes);
+		}
+
+		$opcodes->add_synth($cpu, "cleu %m", "jr z, %t$call_size", "jr nc, %t", "call %m");
+		$opcodes->add_synth($cpu, "call$suf leu, %m", "jr z, %t$call_size", "jr nc, %t", "call$suf %m");
+	}
+	$opcodes->add_synth($cpu, "rleu", "rz", "rc");
+	$opcodes->add_synth($cpu, "ret leu", "ret z", "ret c");
+
+	# JP|CALL|RET NV, NN
+	if ($cpu =~ /^(r4k|r5k)/) {		# overflow and parity are different flags
+		$opcodes->add_synth($cpu, "jnv %m", "jp nv, %m");
+		$opcodes->add_synth($cpu, "cnv %m", "jp v, %t", "call %m");
+		for my $suf (@ez80_suffixes) {
+			$opcodes->add_synth($cpu, "call$suf nv, %m", "jp v, %t", "call$suf %m");
+		}
+		$opcodes->add_synth($cpu, "rnv", "ret nv");
+	}
+	else {
+		$opcodes->add_synth($cpu, "jnv %m", "jpo %m");
+		$opcodes->add_synth($cpu, "jp nv, %m", "jp po, %m");
+		$opcodes->add_synth($cpu, "cnv %m", "cpo %m");
+		for my $suf (@ez80_suffixes) {
+			$opcodes->add_synth($cpu, "call$suf nv, %m", "call po, %m");
+		}
+		$opcodes->add_synth($cpu, "rnv", "rpo");
+		$opcodes->add_synth($cpu, "ret nv", "ret po");
+	}
+
+	# JP|CALL|RET V, NN
+	if ($cpu =~ /^(r4k|r5k)/) {		# overflow and parity are different flags
+		$opcodes->add_synth($cpu, "jv %m", "jp v %m");
+			for my $suf (@ez80_suffixes) {
+			# ez80 size of call instuction
+			my $call_size = 3;
+			my $call_opcode = $opcodes->opcodes->{"call$suf %m"}{$cpu};
+			if ($call_opcode) {
+				$call_size = scalar($call_opcode->bytes);
+			}
+
+			$opcodes->add_synth($cpu, "cv %m", "jp v, %t$call_size", "jr %t", "call %m");
+			$opcodes->add_synth($cpu, "call$suf v, %m", "jp v, %t$call_size", "jr %t", "call$suf %m");
+		}
+		$opcodes->add_synth($cpu, "rv", "ret v");
+	}
+	else {
+		$opcodes->add_synth($cpu, "jv %m", "jpe %m");
+		$opcodes->add_synth($cpu, "jp v, %m", "jp pe, %m");
+		$opcodes->add_synth($cpu, "cv %m", "cpe %m");
+		for my $suf (@ez80_suffixes) {
+			$opcodes->add_synth($cpu, "call$suf v, %m", "call pe, %m");
+		}
+		$opcodes->add_synth($cpu, "rv", "rpe");
+		$opcodes->add_synth($cpu, "ret v", "ret pe");
+	}		
+	
 }
 
 #------------------------------------------------------------------------------

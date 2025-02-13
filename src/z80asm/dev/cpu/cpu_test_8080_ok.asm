@@ -138,8 +138,8 @@
  call c, 0x1234                 ; DC 34 12
  call eq, 0x1234                ; CC 34 12
  call geu, 0x1234               ; D4 34 12
- call gtu, 0x1234               ; CA 3E 01 DA 3E 01 CD 34 12
- call leu, 0x1234               ; CA 44 01 D2 47 01 CD 34 12
+ call gtu, 0x1234               ; CA 3B 01 D4 34 12
+ call leu, 0x1234               ; CA 41 01 D2 44 01 CD 34 12
  call ltu, 0x1234               ; DC 34 12
  call m, 0x1234                 ; FC 34 12
  call nc, 0x1234                ; D4 34 12
@@ -155,8 +155,8 @@
  ccf                            ; 3F
  ceq 0x1234                     ; CC 34 12
  cgeu 0x1234                    ; D4 34 12
- cgtu 0x1234                    ; CA 7B 01 DA 7B 01 CD 34 12
- cleu 0x1234                    ; CA 81 01 D2 84 01 CD 34 12
+ cgtu 0x1234                    ; CA 75 01 D4 34 12
+ cleu 0x1234                    ; CA 7B 01 D2 7E 01 CD 34 12
  clr (hl)                       ; 36 00
  clr a                          ; 3E 00
  clr b                          ; 06 00
@@ -327,7 +327,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 9A 02 D2 34 12
+ jgtu 0x1234                    ; CA 94 02 D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jm 0x1234                      ; FA 34 12
@@ -343,7 +343,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA CC 02 D2 34 12
+ jp gtu, 0x1234                 ; CA C6 02 D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp m, 0x1234                   ; FA 34 12
@@ -362,7 +362,7 @@
  jr c, 0x1234                   ; DA 34 12
  jr eq, 0x1234                  ; CA 34 12
  jr geu, 0x1234                 ; D2 34 12
- jr gtu, 0x1234                 ; CA 0B 03 D2 34 12
+ jr gtu, 0x1234                 ; CA 05 03 D2 34 12
  jr leu, 0x1234                 ; CA 34 12 DA 34 12
  jr ltu, 0x1234                 ; DA 34 12
  jr nc, 0x1234                  ; D2 34 12
@@ -912,7 +912,7 @@
  ret c                          ; D8
  ret eq                         ; C8
  ret geu                        ; D0
- ret gtu                        ; CA 23 08 D0
+ ret gtu                        ; CA 1D 08 D0
  ret leu                        ; C8 D8
  ret ltu                        ; D8
  ret m                          ; F8
@@ -926,7 +926,7 @@
  ret v                          ; E8
  ret z                          ; C8
  rgeu                           ; D0
- rgtu                           ; CA 35 08 D0
+ rgtu                           ; CA 2F 08 D0
  rl bc                          ; CD @__z80asm__rl_bc
  rl de                          ; CD @__z80asm__rl_de
  rl hl                          ; CD @__z80asm__rl_hl

@@ -662,7 +662,7 @@
  call c, 0x1234                 ; DC 34 12
  call eq, 0x1234                ; CC 34 12
  call geu, 0x1234               ; D4 34 12
- call gtu, 0x1234               ; 28 05 38 03 CD 34 12
+ call gtu, 0x1234               ; 28 03 D4 34 12
  call leu, 0x1234               ; 28 02 30 03 CD 34 12
  call ltu, 0x1234               ; DC 34 12
  call m, 0x1234                 ; FC 34 12
@@ -679,7 +679,7 @@
  call.il c, 0x123456            ; 52 DC 56 34 12
  call.il eq, 0x123456           ; 52 CC 56 34 12
  call.il geu, 0x123456          ; 52 D4 56 34 12
- call.il gtu, 0x123456          ; 28 07 38 05 52 CD 56 34 12
+ call.il gtu, 0x123456          ; 28 05 52 D4 56 34 12
  call.il leu, 0x123456          ; 28 02 30 05 52 CD 56 34 12
  call.il ltu, 0x123456          ; 52 DC 56 34 12
  call.il m, 0x123456            ; 52 FC 56 34 12
@@ -696,8 +696,8 @@
  call.is c, 0x1234              ; 40 DC 34 12
  call.is eq, 0x1234             ; 40 CC 34 12
  call.is geu, 0x1234            ; 40 D4 34 12
- call.is gtu, 0x1234            ; 28 06 38 04 40 CD 34 12
- call.is leu, 0x123456          ; 28 02 30 05 40 CD 56 34 12
+ call.is gtu, 0x1234            ; 28 04 40 D4 34 12
+ call.is leu, 0x1234            ; 28 02 30 04 40 CD 34 12
  call.is ltu, 0x1234            ; 40 DC 34 12
  call.is m, 0x1234              ; 40 FC 34 12
  call.is nc, 0x1234             ; 40 D4 34 12
@@ -713,7 +713,7 @@
  call.sil c, 0x123456           ; 52 DC 56 34 12
  call.sil eq, 0x123456          ; 52 CC 56 34 12
  call.sil geu, 0x123456         ; 52 D4 56 34 12
- call.sil gtu, 0x123456         ; 28 07 38 05 52 CD 56 34 12
+ call.sil gtu, 0x123456         ; 28 05 52 D4 56 34 12
  call.sil leu, 0x123456         ; 28 02 30 05 52 CD 56 34 12
  call.sil ltu, 0x123456         ; 52 DC 56 34 12
  call.sil m, 0x123456           ; 52 FC 56 34 12
@@ -730,8 +730,8 @@
  call.sis c, 0x1234             ; 40 DC 34 12
  call.sis eq, 0x1234            ; 40 CC 34 12
  call.sis geu, 0x1234           ; 40 D4 34 12
- call.sis gtu, 0x1234           ; 28 06 38 04 40 CD 34 12
- call.sis leu, 0x123456         ; 28 02 30 05 40 CD 56 34 12
+ call.sis gtu, 0x1234           ; 28 04 40 D4 34 12
+ call.sis leu, 0x1234           ; 28 02 30 04 40 CD 34 12
  call.sis ltu, 0x1234           ; 40 DC 34 12
  call.sis m, 0x1234             ; 40 FC 34 12
  call.sis nc, 0x1234            ; 40 D4 34 12
@@ -747,7 +747,7 @@
  ccf                            ; 3F
  ceq 0x1234                     ; CC 34 12
  cgeu 0x1234                    ; D4 34 12
- cgtu 0x1234                    ; 28 05 38 03 CD 34 12
+ cgtu 0x1234                    ; 28 03 D4 34 12
  cleu 0x1234                    ; 28 02 30 03 CD 34 12
  clr (hl)                       ; 36 00
  clr (ix)                       ; FD 36 00 00
@@ -1274,7 +1274,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 8E 0F D2 34 12
+ jgtu 0x1234                    ; CA 80 0F D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jm 0x1234                      ; FA 34 12
@@ -1292,7 +1292,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA C4 0F D2 34 12
+ jp gtu, 0x1234                 ; CA B6 0F D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp m, 0x1234                   ; FA 34 12
@@ -1312,7 +1312,7 @@
  jp.lil c, 0x123456             ; 5B DA 56 34 12
  jp.lil eq, 0x123456            ; 5B CA 56 34 12
  jp.lil geu, 0x123456           ; 5B D2 56 34 12
- jp.lil gtu, 0x123456           ; 5B CA 11 10 00 5B D2 56 34 12
+ jp.lil gtu, 0x123456           ; 5B CA 03 10 00 5B D2 56 34 12
  jp.lil leu, 0x123456           ; 5B CA 56 34 12 5B DA 56 34 12
  jp.lil ltu, 0x123456           ; 5B DA 56 34 12
  jp.lil m, 0x123456             ; 5B FA 56 34 12
@@ -1332,7 +1332,7 @@
  jp.sis c, 0x1234               ; 40 DA 34 12
  jp.sis eq, 0x1234              ; 40 CA 34 12
  jp.sis geu, 0x1234             ; 40 D2 34 12
- jp.sis gtu, 0x1234             ; 40 CA 72 10 40 D2 34 12
+ jp.sis gtu, 0x1234             ; 40 CA 64 10 40 D2 34 12
  jp.sis leu, 0x1234             ; 40 CA 34 12 40 DA 34 12
  jp.sis ltu, 0x1234             ; 40 DA 34 12
  jp.sis m, 0x1234               ; 40 FA 34 12

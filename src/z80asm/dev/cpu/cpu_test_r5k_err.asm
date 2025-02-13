@@ -1677,10 +1677,6 @@
  bsra de, b                     ; Error
  bsrf de, b                     ; Error
  bsrl de, b                     ; Error
- call nv, 0x1234                ; Error
- call nv, 0x123456              ; Error
- call v, 0x1234                 ; Error
- call v, 0x123456               ; Error
  call.il 0x123456               ; Error
  call.il c, 0x123456            ; Error
  call.il eq, 0x123456           ; Error
@@ -1703,7 +1699,7 @@
  call.is eq, 0x1234             ; Error
  call.is geu, 0x1234            ; Error
  call.is gtu, 0x1234            ; Error
- call.is leu, 0x123456          ; Error
+ call.is leu, 0x1234            ; Error
  call.is ltu, 0x1234            ; Error
  call.is m, 0x1234              ; Error
  call.is nc, 0x1234             ; Error
@@ -1737,7 +1733,7 @@
  call.lis eq, 0x1234            ; Error
  call.lis geu, 0x1234           ; Error
  call.lis gtu, 0x1234           ; Error
- call.lis leu, 0x123456         ; Error
+ call.lis leu, 0x1234           ; Error
  call.lis ltu, 0x1234           ; Error
  call.lis m, 0x1234             ; Error
  call.lis nc, 0x1234            ; Error
@@ -1771,7 +1767,7 @@
  call.sis eq, 0x1234            ; Error
  call.sis geu, 0x1234           ; Error
  call.sis gtu, 0x1234           ; Error
- call.sis leu, 0x123456         ; Error
+ call.sis leu, 0x1234           ; Error
  call.sis ltu, 0x1234           ; Error
  call.sis m, 0x1234             ; Error
  call.sis nc, 0x1234            ; Error
@@ -1974,8 +1970,6 @@
  cmp.sil a, (iy+0)              ; Error
  cmp.sil a, (iy+126)            ; Error
  cmp.sil a, (iy-128)            ; Error
- cnv 0x1234                     ; Error
- cnv 0x123456                   ; Error
  cp (ahl)                       ; Error
  cp (aix)                       ; Error
  cp (aix+0)                     ; Error
@@ -2182,8 +2176,6 @@
  cpir.lis                       ; Error
  cpir.s                         ; Error
  cpir.sil                       ; Error
- cv 0x1234                      ; Error
- cv 0x123456                    ; Error
  dec (ahl)                      ; Error
  dec (aix)                      ; Error
  dec (aix+0)                    ; Error

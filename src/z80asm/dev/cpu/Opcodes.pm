@@ -18,6 +18,8 @@ package Opcode;
 #	%t	temp jump label to end of statement; %t3 to end of statement - 3
 #------------------------------------------------------------------------------
 
+use Modern::Perl;
+
 my @fields = 	 qw( asm cpu synth const ops );
 use Object::Tiny qw( asm cpu synth const ops );
 use Clone;
@@ -166,6 +168,7 @@ sub from_string {
 
 package Opcodes;
 
+use Modern::Perl;
 use Object::Tiny qw( opcodes );
 
 sub new {
@@ -184,6 +187,96 @@ sub add {
 	}
 	
 	$self->opcodes->{$opcode->asm}{$opcode->cpu} = $opcode;
+}
+
+sub add_synth {
+	my($self, $cpu, $asm, @subasm) = @_;
+	
+	if ($self->exists($asm, $cpu)) {
+		return;
+	}
+
+	if ($cpu =~ /_strict/) {
+		return;
+	}
+
+	my @subops;
+	for my $subasm (@subasm) {
+		# replace 0:%n/0:$u by %m
+		my $extend;
+		if ($subasm =~ s/0:(%[nu])/%m/) {
+			$extend = $1;
+		}
+		
+		# replace %t by %m
+		my $temp_label;
+		if ($subasm =~ s/^((jr|djnz)\b.*)(%t\d*)/$1%j/) {
+			$temp_label = $3;
+		}
+		elsif ($subasm =~ s/(%t\d*)/%m/) {
+			$temp_label = $1;
+		}
+		
+		my $subopcode = $self->opcodes->{$subasm}{$cpu};
+		if (!$subopcode) {
+			return;
+		}
+		
+		for my $op (@{$subopcode->ops}) {
+			my @bytes = @$op;
+
+			# replace %m by %n/$u,0[,0]
+			if ($extend) {
+				my $i = 0;
+				while ($i < @bytes && $bytes[$i] ne '%m') {
+					$i++;
+				}
+				$i < @bytes or die;
+				$bytes[$i++] = $extend;
+				while ($i < @bytes) {
+					$bytes[$i++] = 0;
+				}
+			}
+
+			# replace %m/%j by %t
+			if ($temp_label) {
+				my $i = 0;
+				while ($i < @bytes && $bytes[$i] !~ /%[jm]/) {
+					$i++;
+				}
+				$i < @bytes or die;
+				while ($i < @bytes) {
+					$bytes[$i++] = $temp_label;
+				}
+			}
+			
+			push @subops, \@bytes;
+		}
+	}
+
+	my $opcode = Opcode->new(asm=>$asm, cpu=>$cpu, synth=>1, ops=>\@subops);
+	$self->add($opcode);
+}
+
+sub add_emul {
+	my($self, $cpu, $asm, $func, @args) = @_;
+
+	if ($cpu =~ /_strict/) {
+		return;
+	}
+
+	if (!$self->exists($asm, $cpu)) {
+		if (@args) {
+			$self->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+								   ops=>[[0xCD, '@'.$func, ''], \@args],
+								   synth=>1));
+		}
+		else {
+			$self->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
+								   ops=>[[0xCD, '@'.$func, '']],
+								   synth=>1));
+		}
+	}
 }
 
 sub exists {

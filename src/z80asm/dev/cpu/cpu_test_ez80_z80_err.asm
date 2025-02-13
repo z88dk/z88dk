@@ -3962,7 +3962,7 @@
  call.lis eq, 0x1234            ; Error
  call.lis geu, 0x1234           ; Error
  call.lis gtu, 0x1234           ; Error
- call.lis leu, 0x123456         ; Error
+ call.lis leu, 0x1234           ; Error
  call.lis ltu, 0x1234           ; Error
  call.lis m, 0x1234             ; Error
  call.lis nc, 0x1234            ; Error

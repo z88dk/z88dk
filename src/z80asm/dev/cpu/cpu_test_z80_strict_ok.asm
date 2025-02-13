@@ -324,11 +324,6 @@
  call (iy)                      ; CD @__z80asm__call_iy
  call 0x1234                    ; CD 34 12
  call c, 0x1234                 ; DC 34 12
- call eq, 0x1234                ; CC 34 12
- call geu, 0x1234               ; D4 34 12
- call gtu, 0x1234               ; 28 05 38 03 CD 34 12
- call leu, 0x1234               ; 28 02 30 03 CD 34 12
- call ltu, 0x1234               ; DC 34 12
  call m, 0x1234                 ; FC 34 12
  call nc, 0x1234                ; D4 34 12
  call ne, 0x1234                ; C4 34 12
@@ -341,10 +336,6 @@
  call z, 0x1234                 ; CC 34 12
  cc 0x1234                      ; DC 34 12
  ccf                            ; 3F
- ceq 0x1234                     ; CC 34 12
- cgeu 0x1234                    ; D4 34 12
- cgtu 0x1234                    ; 28 05 38 03 CD 34 12
- cleu 0x1234                    ; 28 02 30 03 CD 34 12
  clr (hl)                       ; 36 00
  clr (ix)                       ; DD 36 00 00
  clr (ix+0)                     ; DD 36 00 00
@@ -366,7 +357,6 @@
  clr ix                         ; DD 21 00 00
  clr iy                         ; FD 21 00 00
  clr l                          ; 2E 00
- cltu 0x1234                    ; DC 34 12
  cm 0x1234                      ; FC 34 12
  cma                            ; 2F
  cmc                            ; 3F
@@ -604,7 +594,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA C0 05 D2 34 12
+ jgtu 0x1234                    ; CA 92 05 D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jm 0x1234                      ; FA 34 12
@@ -622,7 +612,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA F6 05 D2 34 12
+ jp gtu, 0x1234                 ; CA C8 05 D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp m, 0x1234                   ; FA 34 12
@@ -639,13 +629,7 @@
  jpo 0x1234                     ; E2 34 12
  jr ASMPC                       ; 18 FE
  jr c, ASMPC                    ; 38 FE
- jr eq, ASMPC                   ; 28 FE
- jr geu, ASMPC                  ; 30 FE
- jr gtu, ASMPC                  ; 28 02 30 FC
- jr leu, ASMPC                  ; 28 FE 38 FC
- jr ltu, ASMPC                  ; 38 FE
  jr nc, ASMPC                   ; 30 FE
- jr ne, ASMPC                   ; 20 FE
  jr nz, ASMPC                   ; 20 FE
  jr z, ASMPC                    ; 28 FE
  jv 0x1234                      ; EA 34 12

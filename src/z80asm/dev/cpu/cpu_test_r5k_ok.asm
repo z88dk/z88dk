@@ -2931,10 +2931,12 @@
  call m, 0x1234                 ; F2 95 2C CD 34 12
  call nc, 0x1234                ; 38 03 CD 34 12
  call ne, 0x1234                ; 28 03 CD 34 12
+ call nv, 0x1234                ; BA A5 2C CD 34 12
  call nz, 0x1234                ; 28 03 CD 34 12
- call p, 0x1234                 ; FA AA 2C CD 34 12
- call pe, 0x1234                ; E2 B0 2C CD 34 12
- call po, 0x1234                ; EA B6 2C CD 34 12
+ call p, 0x1234                 ; FA B0 2C CD 34 12
+ call pe, 0x1234                ; E2 B6 2C CD 34 12
+ call po, 0x1234                ; EA BC 2C CD 34 12
+ call v, 0x1234                 ; BA C1 2C 18 03 CD 34 12
  call z, 0x1234                 ; 20 03 CD 34 12
  cbm -128                       ; ED 00 80
  cbm 0                          ; ED 00 00
@@ -2947,7 +2949,7 @@
  cgeu 0x1234                    ; 38 03 CD 34 12
  cgtu 0x1234                    ; 28 05 38 03 CD 34 12
  cleu 0x1234                    ; 28 02 30 03 CD 34 12
- clo 0x1234                     ; E2 ED 2C CD 34 12
+ clo 0x1234                     ; E2 FB 2C CD 34 12
  clr (hl)                       ; 36 00
  clr (ix)                       ; DD 36 00 00
  clr (ix+0)                     ; DD 36 00 00
@@ -2980,8 +2982,8 @@
  clr l                          ; 2E 00
  clr l'                         ; 76 2E 00
  cltu 0x1234                    ; 30 03 CD 34 12
- clz 0x1234                     ; EA 56 2D CD 34 12
- cm 0x1234                      ; F2 5C 2D CD 34 12
+ clz 0x1234                     ; EA 64 2D CD 34 12
+ cm 0x1234                      ; F2 6A 2D CD 34 12
  cma                            ; 2F
  cmc                            ; 3F
  cmp (hl)                       ; 7F BE
@@ -3036,6 +3038,7 @@
  cmp m                          ; 7F BE
  cnc 0x1234                     ; 38 03 CD 34 12
  cne 0x1234                     ; 28 03 CD 34 12
+ cnv 0x1234                     ; BA F4 2D CD 34 12
  cnz 0x1234                     ; 28 03 CD 34 12
  convc pw                       ; ED 0E
  convc px                       ; ED 1E
@@ -3098,7 +3101,7 @@
  cp l                           ; 7F BD
  cpd                            ; CD @__z80asm__cpd
  cpdr                           ; CD @__z80asm__cpdr
- cpe 0x1234                     ; E2 7B 2E CD 34 12
+ cpe 0x1234                     ; E2 8F 2E CD 34 12
  cpi                            ; CD @__z80asm__cpi
  cpi -128                       ; FE 80
  cpi 0                          ; FE 00
@@ -3108,7 +3111,8 @@
  cpl                            ; 2F
  cpl a                          ; 2F
  cpl a'                         ; 76 2F
- cpo 0x1234                     ; EA 93 2E CD 34 12
+ cpo 0x1234                     ; EA A7 2E CD 34 12
+ cv 0x1234                      ; BA AC 2E 18 03 CD 34 12
  cz 0x1234                      ; 20 03 CD 34 12
  daa                            ; CD @__z80asm__daa
  dad b                          ; 09

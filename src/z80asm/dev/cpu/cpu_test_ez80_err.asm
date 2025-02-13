@@ -3962,7 +3962,7 @@
  call.sis eq, 0x1234            ; Error
  call.sis geu, 0x1234           ; Error
  call.sis gtu, 0x1234           ; Error
- call.sis leu, 0x123456         ; Error
+ call.sis leu, 0x1234           ; Error
  call.sis ltu, 0x1234           ; Error
  call.sis m, 0x1234             ; Error
  call.sis nc, 0x1234            ; Error

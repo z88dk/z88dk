@@ -4274,7 +4274,17 @@
  bsra de, b                     ; Error
  bsrf de, b                     ; Error
  bsrl de, b                     ; Error
+ call eq, 0x1234                ; Error
+ call eq, 0x123456              ; Error
+ call geu, 0x1234               ; Error
+ call geu, 0x123456             ; Error
+ call gtu, 0x1234               ; Error
+ call gtu, 0x123456             ; Error
+ call leu, 0x1234               ; Error
+ call leu, 0x123456             ; Error
  call lo, 0x1234                ; Error
+ call ltu, 0x1234               ; Error
+ call ltu, 0x123456             ; Error
  call lz, 0x1234                ; Error
  call.il 0x123456               ; Error
  call.il c, 0x123456            ; Error
@@ -4298,7 +4308,7 @@
  call.is eq, 0x1234             ; Error
  call.is geu, 0x1234            ; Error
  call.is gtu, 0x1234            ; Error
- call.is leu, 0x123456          ; Error
+ call.is leu, 0x1234            ; Error
  call.is ltu, 0x1234            ; Error
  call.is m, 0x1234              ; Error
  call.is nc, 0x1234             ; Error
@@ -4332,7 +4342,7 @@
  call.lis eq, 0x1234            ; Error
  call.lis geu, 0x1234           ; Error
  call.lis gtu, 0x1234           ; Error
- call.lis leu, 0x123456         ; Error
+ call.lis leu, 0x1234           ; Error
  call.lis ltu, 0x1234           ; Error
  call.lis m, 0x1234             ; Error
  call.lis nc, 0x1234            ; Error
@@ -4366,7 +4376,7 @@
  call.sis eq, 0x1234            ; Error
  call.sis geu, 0x1234           ; Error
  call.sis gtu, 0x1234           ; Error
- call.sis leu, 0x123456         ; Error
+ call.sis leu, 0x1234           ; Error
  call.sis ltu, 0x1234           ; Error
  call.sis m, 0x1234             ; Error
  call.sis nc, 0x1234            ; Error
@@ -4384,6 +4394,14 @@
  cbm 127                        ; Error
  cbm 255                        ; Error
  ccf'                           ; Error
+ ceq 0x1234                     ; Error
+ ceq 0x123456                   ; Error
+ cgeu 0x1234                    ; Error
+ cgeu 0x123456                  ; Error
+ cgtu 0x1234                    ; Error
+ cgtu 0x123456                  ; Error
+ cleu 0x1234                    ; Error
+ cleu 0x123456                  ; Error
  clo 0x1234                     ; Error
  clr a'                         ; Error
  clr b'                         ; Error
@@ -4399,6 +4417,8 @@
  clr iyh                        ; Error
  clr iyl                        ; Error
  clr l'                         ; Error
+ cltu 0x1234                    ; Error
+ cltu 0x123456                  ; Error
  clz 0x1234                     ; Error
  cmp (ahl)                      ; Error
  cmp (aix)                      ; Error
@@ -8702,8 +8722,14 @@
  jp3 ne, 0x123456               ; Error
  jp3 nz, 0x123456               ; Error
  jp3 z, 0x123456                ; Error
+ jr eq, ASMPC                   ; Error
+ jr geu, ASMPC                  ; Error
  jr gt, ASMPC                   ; Error
+ jr gtu, ASMPC                  ; Error
+ jr leu, ASMPC                  ; Error
  jr lt, ASMPC                   ; Error
+ jr ltu, ASMPC                  ; Error
+ jr ne, ASMPC                   ; Error
  jr v, ASMPC                    ; Error
  jre ASMPC                      ; Error
  jre c, ASMPC                   ; Error
