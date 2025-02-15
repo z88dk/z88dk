@@ -50,8 +50,8 @@ define(`__IO_SIO_PORT_OFFSET_D', 0x01)  # Port Offset for Data (!A0)
 
 # 16550 UART Port Definitions
 
-define(`__IO_UART_PORTA_BASE', 0xA0)  # Port A Address for UART Module
-define(`__IO_UART_PORTB_BASE', 0xA8)  # Port B Address for UART Module
+define(`__IO_UART_PORTA_BASE', 0x80)  # Port A Address for UART Module
+define(`__IO_UART_PORTB_BASE', 0x88)  # Port B Address for UART Module
 
 #
 # END OF USER CONFIGURATION

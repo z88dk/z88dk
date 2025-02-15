@@ -46,8 +46,8 @@ defc __IO_SIO_PORT_OFFSET_A = 0x00
 defc __IO_SIO_PORT_OFFSET_B = 0x02
 defc __IO_SIO_PORT_OFFSET_C = 0x00
 defc __IO_SIO_PORT_OFFSET_D = 0x01
-defc __IO_UART_PORTA_BASE = 0xA0
-defc __IO_UART_PORTB_BASE = 0xA8
+defc __IO_UART_PORTA_BASE = 0x80
+defc __IO_UART_PORTB_BASE = 0x88
 
 
 
@@ -250,31 +250,31 @@ defc __IO_SIO_TX_SIZE      = 0x10
 
 
 
-defc __IO_UARTA_DATA_REGISTER     = 0xa0
-defc __IO_UARTA_IER_REGISTER      = 0xa1
-defc __IO_UARTA_IIR_REGISTER      = 0xa2
-defc __IO_UARTA_FCR_REGISTER      = 0xa2
-defc __IO_UARTA_LCR_REGISTER      = 0xa3
-defc __IO_UARTA_MCR_REGISTER      = 0xa4
-defc __IO_UARTA_LSR_REGISTER      = 0xa5
-defc __IO_UARTA_MSR_REGISTER      = 0xa6
-defc __IO_UARTA_SCRATCH_REGISTER  = 0xa7
+defc __IO_UARTA_DATA_REGISTER     = 0x80
+defc __IO_UARTA_IER_REGISTER      = 0x81
+defc __IO_UARTA_IIR_REGISTER      = 0x82
+defc __IO_UARTA_FCR_REGISTER      = 0x82
+defc __IO_UARTA_LCR_REGISTER      = 0x83
+defc __IO_UARTA_MCR_REGISTER      = 0x84
+defc __IO_UARTA_LSR_REGISTER      = 0x85
+defc __IO_UARTA_MSR_REGISTER      = 0x86
+defc __IO_UARTA_SCRATCH_REGISTER  = 0x87
 
-defc __IO_UARTA_DLL_REGISTER      = 0xa0
-defc __IO_UARTA_DLM_REGISTER      = 0xa1
+defc __IO_UARTA_DLL_REGISTER      = 0x80
+defc __IO_UARTA_DLM_REGISTER      = 0x81
 
-defc __IO_UARTB_DATA_REGISTER     = 0xa8
-defc __IO_UARTB_IER_REGISTER      = 0xa9
-defc __IO_UARTB_IIR_REGISTER      = 0xaa
-defc __IO_UARTB_FCR_REGISTER      = 0xaa
-defc __IO_UARTB_LCR_REGISTER      = 0xab
-defc __IO_UARTB_MCR_REGISTER      = 0xac
-defc __IO_UARTB_LSR_REGISTER      = 0xad
-defc __IO_UARTB_MSR_REGISTER      = 0xae
-defc __IO_UARTB_SCRATCH_REGISTER  = 0xaf
+defc __IO_UARTB_DATA_REGISTER     = 0x88
+defc __IO_UARTB_IER_REGISTER      = 0x89
+defc __IO_UARTB_IIR_REGISTER      = 0x8a
+defc __IO_UARTB_FCR_REGISTER      = 0x8a
+defc __IO_UARTB_LCR_REGISTER      = 0x8b
+defc __IO_UARTB_MCR_REGISTER      = 0x8c
+defc __IO_UARTB_LSR_REGISTER      = 0x8d
+defc __IO_UARTB_MSR_REGISTER      = 0x8e
+defc __IO_UARTB_SCRATCH_REGISTER  = 0x8f
 
-defc __IO_UARTB_DLL_REGISTER      = 0xa8
-defc __IO_UARTB_DLM_REGISTER      = 0xa9
+defc __IO_UARTB_DLL_REGISTER      = 0x88
+defc __IO_UARTB_DLM_REGISTER      = 0x89
 
 defc __IO_UART_IER_ERBI           = 0x01
 defc __IO_UART_IER_ETBEI          = 0x02
@@ -475,6 +475,50 @@ defc __IO_ROM_TOGGLE = 0x38
 defc __IO_RAM_SHADOW_BASE  = 0x58
 
 defc __IO_RAM_SHADOW_AVAILABLE  = 0x00
+
+
+
+
+
+
+
+
+
+
+
+
+
+defc __CPM_RCON = 1
+defc __CPM_WCON = 2
+defc __CPM_RRDR = 3
+defc __CPM_WPUN = 4
+defc __CPM_WLST = 5
+defc __CPM_DCIO = 6
+defc __CPM_GIOB = 7
+defc __CPM_SIOB = 8
+defc __CPM_PRST = 9
+defc __CPM_RCOB = 10
+defc __CPM_ICON = 11
+defc __CPM_VERS = 12
+defc __CPM_RDS  = 13
+defc __CPM_LGIN = 14
+defc __CPM_OPN  = 15
+defc __CPM_CLS  = 16
+defc __CPM_FFST = 17
+defc __CPM_FNXT = 18
+defc __CPM_DEL  = 19
+defc __CPM_READ = 20
+defc __CPM_WRIT = 21
+defc __CPM_MAKE = 22
+defc __CPM_REN  = 23
+defc __CPM_ILOG = 24
+defc __CPM_IDRV = 25
+defc __CPM_SDMA = 26
+defc __CPM_SUID = 32
+defc __CPM_RRAN = 33
+defc __CPM_WRAN = 34
+defc __CPM_CFS  = 35
+defc __CPM_DSEG = 51
 
 
 

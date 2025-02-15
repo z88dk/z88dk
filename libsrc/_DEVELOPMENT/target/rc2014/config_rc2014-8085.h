@@ -43,8 +43,8 @@
 #define __IO_CF_8_BIT  0x01
 #define __IO_CF_PORT_BASE  0x10
 #define __IO_PIO_PORT_BASE  0x20
-#define __IO_UART_PORTA_BASE  0xA0
-#define __IO_UART_PORTB_BASE  0xA8
+#define __IO_UART_PORTA_BASE  0x80
+#define __IO_UART_PORTB_BASE  0x88
 
 
 
@@ -247,31 +247,31 @@
 
 
 
-#define __IO_UARTA_DATA_REGISTER    0xa0
-#define __IO_UARTA_IER_REGISTER     0xa1
-#define __IO_UARTA_IIR_REGISTER     0xa2
-#define __IO_UARTA_FCR_REGISTER     0xa2
-#define __IO_UARTA_LCR_REGISTER     0xa3
-#define __IO_UARTA_MCR_REGISTER     0xa4
-#define __IO_UARTA_LSR_REGISTER     0xa5
-#define __IO_UARTA_MSR_REGISTER     0xa6
-#define __IO_UARTA_SCRATCH_REGISTER 0xa7
+#define __IO_UARTA_DATA_REGISTER    0x80
+#define __IO_UARTA_IER_REGISTER     0x81
+#define __IO_UARTA_IIR_REGISTER     0x82
+#define __IO_UARTA_FCR_REGISTER     0x82
+#define __IO_UARTA_LCR_REGISTER     0x83
+#define __IO_UARTA_MCR_REGISTER     0x84
+#define __IO_UARTA_LSR_REGISTER     0x85
+#define __IO_UARTA_MSR_REGISTER     0x86
+#define __IO_UARTA_SCRATCH_REGISTER 0x87
 
-#define __IO_UARTA_DLL_REGISTER     0xa0
-#define __IO_UARTA_DLM_REGISTER     0xa1
+#define __IO_UARTA_DLL_REGISTER     0x80
+#define __IO_UARTA_DLM_REGISTER     0x81
 
-#define __IO_UARTB_DATA_REGISTER    0xa8
-#define __IO_UARTB_IER_REGISTER     0xa9
-#define __IO_UARTB_IIR_REGISTER     0xaa
-#define __IO_UARTB_FCR_REGISTER     0xaa
-#define __IO_UARTB_LCR_REGISTER     0xab
-#define __IO_UARTB_MCR_REGISTER     0xac
-#define __IO_UARTB_LSR_REGISTER     0xad
-#define __IO_UARTB_MSR_REGISTER     0xae
-#define __IO_UARTB_SCRATCH_REGISTER 0xaf
+#define __IO_UARTB_DATA_REGISTER    0x88
+#define __IO_UARTB_IER_REGISTER     0x89
+#define __IO_UARTB_IIR_REGISTER     0x8a
+#define __IO_UARTB_FCR_REGISTER     0x8a
+#define __IO_UARTB_LCR_REGISTER     0x8b
+#define __IO_UARTB_MCR_REGISTER     0x8c
+#define __IO_UARTB_LSR_REGISTER     0x8d
+#define __IO_UARTB_MSR_REGISTER     0x8e
+#define __IO_UARTB_SCRATCH_REGISTER 0x8f
 
-#define __IO_UARTB_DLL_REGISTER     0xa8
-#define __IO_UARTB_DLM_REGISTER     0xa9
+#define __IO_UARTB_DLL_REGISTER     0x88
+#define __IO_UARTB_DLM_REGISTER     0x89
 
 #define __IO_UART_IER_ERBI          0x01
 #define __IO_UART_IER_ETBEI         0x02
@@ -473,6 +473,50 @@
 #define __IO_RAM_SHADOW_BASE  0x58
 
 #define __IO_RAM_SHADOW_AVAILABLE  0x00
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define __CPM_RCON  1
+#define __CPM_WCON  2
+#define __CPM_RRDR  3
+#define __CPM_WPUN  4
+#define __CPM_WLST  5
+#define __CPM_DCIO  6
+#define __CPM_GIOB  7
+#define __CPM_SIOB  8
+#define __CPM_PRST  9
+#define __CPM_RCOB  10
+#define __CPM_ICON  11
+#define __CPM_VERS  12
+#define __CPM_RDS   13
+#define __CPM_LGIN  14
+#define __CPM_OPN   15
+#define __CPM_CLS   16
+#define __CPM_FFST  17
+#define __CPM_FNXT  18
+#define __CPM_DEL   19
+#define __CPM_READ  20
+#define __CPM_WRIT  21
+#define __CPM_MAKE  22
+#define __CPM_REN   23
+#define __CPM_ILOG  24
+#define __CPM_IDRV  25
+#define __CPM_SDMA  26
+#define __CPM_SUID  32
+#define __CPM_RRAN  33
+#define __CPM_WRAN  34
+#define __CPM_CFS   35
+#define __CPM_DSEG  51
 
 
 
