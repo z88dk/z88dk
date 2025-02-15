@@ -192,6 +192,14 @@ IF (__crt_on_exit = 0x10002)
 
     ld sp,(__sp_or_ret)
 
+    IF (__crt_interrupt_mode_exit >= 0) && (__crt_interrupt_mode_exit <= 2)
+
+        im __crt_interrupt_mode_exit
+
+    ENDIF
+
+    ei
+
    IF CRT_ABPASS > 0
 
         ld a,h
@@ -200,13 +208,6 @@ IF (__crt_on_exit = 0x10002)
 
     ENDIF
 
-    IF (__crt_interrupt_mode_exit >= 0) && (__crt_interrupt_mode_exit <= 2)
-
-        im __crt_interrupt_mode_exit
-
-    ENDIF
-
-    ei
     ret
 
 ELSE

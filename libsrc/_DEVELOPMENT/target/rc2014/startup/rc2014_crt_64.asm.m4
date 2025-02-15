@@ -305,6 +305,8 @@ IF (__crt_on_exit = 0x10002)
     ld sp,hl
     ex de,hl
 
+    ei
+
     IF CRT_ABPASS > 0
 
         ld a,h
@@ -313,7 +315,6 @@ IF (__crt_on_exit = 0x10002)
 
     ENDIF
 
-    ei
     ret
 
 ELSE
