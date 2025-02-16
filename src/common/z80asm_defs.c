@@ -281,13 +281,13 @@ static range_lookup_t range_lu[] = {
     { 'B',      "B",    2 },      // RANGE_WORD_BE
     { 'L',      "L",    4 },      // RANGE_DWORD
     { 'u',      "u",    2 },      // RANGE_BYTE_TO_WORD_UNSIGNED
-    { 'v',      "v",    3 },      // RANGE_BYTE_TO_PTR_UNSIGNED
     { 's',      "s",    2 },      // RANGE_BYTE_TO_WORD_SIGNED
-    { 't',      "t",    3 },      // RANGE_BYTE_TO_PTR_SIGNED
     { 'P',      "P",    3 },      // RANGE_PTR24
     { 'H',      "H",    1 },      // RANGE_HIGH_OFFSET
     { '=',      "=",    2 },      // RANGE_ASSIGNMENT
     { 'j',      "j",    2 },      // RANGE_JRE_OFFSET
+    { 'v',      "v",    3 },      // RANGE_BYTE_TO_PTR_UNSIGNED
+    { 't',      "t",    3 },      // RANGE_BYTE_TO_PTR_SIGNED
 };
 
 // size of each range in object file

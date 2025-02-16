@@ -467,7 +467,8 @@ sub parse_code_opcode {
 	elsif ($bytes =~ s/ %J %J$//) {
 		$stmt = "DO_stmt_jre";
 	}
-	elsif ($bytes =~ s/%c/ctx->expr_value/g) {
+	elsif ($asm =~ /%c/) {
+		$bytes =~ s/%c/ctx->expr_value/g;
 		push @code,
 			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {",
 			"switch (ctx->expr_value) {",

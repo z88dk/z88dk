@@ -11425,9 +11425,7 @@
  ld bc, (ziy-128)               ; Error
  ld bc, (zp:0x1234)             ; Error
  ld bc, bc'                     ; Error
- ld bc, de                      ; Error
  ld bc, de'                     ; Error
- ld bc, hl                      ; Error
  ld bc, hl'                     ; Error
  ld bc, ix                      ; Error
  ld bc, iy                      ; Error
@@ -12282,10 +12280,8 @@
  ld de, (ziy+126)               ; Error
  ld de, (ziy-128)               ; Error
  ld de, (zp:0x1234)             ; Error
- ld de, bc                      ; Error
  ld de, bc'                     ; Error
  ld de, de'                     ; Error
- ld de, hl                      ; Error
  ld de, hl'                     ; Error
  ld de, ix                      ; Error
  ld de, iy                      ; Error
@@ -13075,16 +13071,13 @@
  ld hl, (ziy+126)               ; Error
  ld hl, (ziy-128)               ; Error
  ld hl, (zp:0x1234)             ; Error
- ld hl, bc                      ; Error
  ld hl, bc'                     ; Error
- ld hl, de                      ; Error
  ld hl, de'                     ; Error
  ld hl, hl'                     ; Error
  ld hl, i                       ; Error
  ld hl, ix                      ; Error
  ld hl, iy                      ; Error
  ld hl, lxpc                    ; Error
- ld hl, sp                      ; Error
  ld hl, sp+0                    ; Error
  ld hl, sp+126                  ; Error
  ld hl, sp-128                  ; Error
@@ -18850,7 +18843,6 @@
  rl a'                          ; Error
  rl b                           ; Error
  rl b'                          ; Error
- rl bc                          ; Error
  rl bc'                         ; Error
  rl c                           ; Error
  rl c'                          ; Error
@@ -18861,7 +18853,6 @@
  rl e'                          ; Error
  rl h                           ; Error
  rl h'                          ; Error
- rl hl                          ; Error
  rl hl'                         ; Error
  rl l                           ; Error
  rl l'                          ; Error
@@ -19255,19 +19246,16 @@
  rr a'                          ; Error
  rr b                           ; Error
  rr b'                          ; Error
- rr bc                          ; Error
  rr bc'                         ; Error
  rr c                           ; Error
  rr c'                          ; Error
  rr d                           ; Error
  rr d'                          ; Error
- rr de                          ; Error
  rr de'                         ; Error
  rr e                           ; Error
  rr e'                          ; Error
  rr h                           ; Error
  rr h'                          ; Error
- rr hl                          ; Error
  rr hl'                         ; Error
  rr ix                          ; Error
  rr iy                          ; Error
@@ -19942,10 +19930,6 @@
  sbc hl', de                    ; Error
  sbc hl', hl                    ; Error
  sbc hl', sp                    ; Error
- sbc hl, bc                     ; Error
- sbc hl, de                     ; Error
- sbc hl, hl                     ; Error
- sbc hl, sp                     ; Error
  sbc ixh                        ; Error
  sbc ixl                        ; Error
  sbc iyh                        ; Error
@@ -22236,12 +22220,10 @@
  sra a'                         ; Error
  sra b                          ; Error
  sra b'                         ; Error
- sra bc                         ; Error
  sra c                          ; Error
  sra c'                         ; Error
  sra d                          ; Error
  sra d'                         ; Error
- sra de                         ; Error
  sra e                          ; Error
  sra e'                         ; Error
  sra h                          ; Error
@@ -22610,7 +22592,6 @@
  sub a, iyl                     ; Error
  sub hl', de                    ; Error
  sub hl', jk                    ; Error
- sub hl, de                     ; Error
  sub hl, jk                     ; Error
  sub ixh                        ; Error
  sub ixl                        ; Error

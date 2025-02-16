@@ -209,7 +209,7 @@ void add_opcode_nnn(int opcode, struct Expr1 *expr, int target_offset) {
 		xassert(expr1);
 		
 		add_opcode(opcode);
-		Pass2infoExpr(RANGE_WORD, expr1);
+		Pass2infoExpr(RANGE_PTR24, expr1);
 
 		utstring_free(expr1_text);
 	}

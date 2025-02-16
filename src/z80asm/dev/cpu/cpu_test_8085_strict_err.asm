@@ -12613,6 +12613,7 @@
  ld de, hl+255                  ; Error
  ld de, ix                      ; Error
  ld de, iy                      ; Error
+ ld de, sp                      ; Error
  ld de, sp+0                    ; Error
  ld de, sp+128                  ; Error
  ld de, sp+255                  ; Error
@@ -23109,7 +23110,9 @@
  sub hl', jk                    ; Error
  sub hl, bc                     ; Error
  sub hl, de                     ; Error
+ sub hl, hl                     ; Error
  sub hl, jk                     ; Error
+ sub hl, sp                     ; Error
  sub ixh                        ; Error
  sub ixl                        ; Error
  sub iyh                        ; Error
