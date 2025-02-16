@@ -1472,7 +1472,6 @@
  rar                            ; 1F
  rc                             ; D8
  rdel                           ; CB 13 CB 12
- req                            ; C8
  res 0, (hl)                    ; CB 86
  res 0, (ix)                    ; FD CB 00 86
  res 0, (ix+0)                  ; FD CB 00 86
@@ -1603,25 +1602,15 @@
  res 7, l                       ; CB BD
  ret                            ; C9
  ret c                          ; D8
- ret eq                         ; C8
- ret geu                        ; D0
- ret gtu                        ; 28 01 D0
- ret leu                        ; C8 D8
- ret ltu                        ; D8
  ret m                          ; F8
  ret nc                         ; D0
- ret ne                         ; C0
- ret nv                         ; E0
  ret nz                         ; C0
  ret p                          ; F0
  ret pe                         ; E8
  ret po                         ; E0
- ret v                          ; E8
  ret z                          ; C8
  reti                           ; ED 4D
  retn                           ; ED 45
- rgeu                           ; D0
- rgtu                           ; 28 01 D0
  rl (hl)                        ; CB 16
  rl (ix)                        ; FD CB 00 16
  rl (ix+0)                      ; FD CB 00 16
@@ -1662,12 +1651,8 @@
  rlca                           ; 07
  rld                            ; ED 6F
  rlde                           ; CB 13 CB 12
- rleu                           ; C8 D8
- rltu                           ; D8
  rm                             ; F8
  rnc                            ; D0
- rne                            ; C0
- rnv                            ; E0
  rnz                            ; C0
  rp                             ; F0
  rpe                            ; E8
@@ -1727,7 +1712,6 @@
  rst 6                          ; F7
  rst 7                          ; FF
  rst 8                          ; CF
- rv                             ; E8
  rz                             ; C8
  sbb a                          ; 9F
  sbb b                          ; 98

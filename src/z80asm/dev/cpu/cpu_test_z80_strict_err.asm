@@ -16196,6 +16196,7 @@
  pxad                           ; Error
  pxdn                           ; Error
  rdmode                         ; Error
+ req                            ; Error
  res -1, (ahl)                  ; Error
  res -1, (aix)                  ; Error
  res -1, (aix+0)                ; Error
@@ -17668,8 +17669,16 @@
  res.sil 8, (iy+0)              ; Error
  res.sil 8, (iy+126)            ; Error
  res.sil 8, (iy-128)            ; Error
+ ret eq                         ; Error
+ ret geu                        ; Error
+ ret gtu                        ; Error
+ ret leu                        ; Error
  ret lo                         ; Error
+ ret ltu                        ; Error
  ret lz                         ; Error
+ ret ne                         ; Error
+ ret nv                         ; Error
+ ret v                          ; Error
  ret.l                          ; Error
  ret.l c                        ; Error
  ret.l eq                       ; Error
@@ -17729,6 +17738,8 @@
  retn.lil                       ; Error
  retn.lis                       ; Error
  retn3                          ; Error
+ rgeu                           ; Error
+ rgtu                           ; Error
  rim                            ; Error
  rl (ahl)                       ; Error
  rl (aix)                       ; Error
@@ -18098,8 +18109,12 @@
  rld (xhl)                      ; Error
  rld (yhl)                      ; Error
  rld (zhl)                      ; Error
+ rleu                           ; Error
  rlo                            ; Error
+ rltu                           ; Error
  rlz                            ; Error
+ rne                            ; Error
+ rnv                            ; Error
  rr (ahl)                       ; Error
  rr (aix)                       ; Error
  rr (aix+0)                     ; Error
@@ -18755,6 +18770,7 @@
  rst.sil 8                      ; Error
  rst.sil 9                      ; Error
  rstv                           ; Error
+ rv                             ; Error
  sbc (ahl)                      ; Error
  sbc (aix)                      ; Error
  sbc (aix+0)                    ; Error

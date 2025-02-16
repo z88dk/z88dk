@@ -2990,8 +2990,8 @@ for my $cpu (@CPUS) {
 		add($cpu, "tra",		[0xED, 0x54]);
 	}
 	
-	for my $_f (qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m 
-					_ne _eq _geu _ltu _gtu _leu )) { 
+	for my $_f (qw( _nz _z _nc _c _po _pe _lz _lo _p _m 
+					)) { # _nv _v _ne _eq _geu _ltu _gtu _leu 
 		my $f = substr($_f, 1);			# remove leading _
 
 		next if $f =~ /^(lz|lo)$/ && !$rabbit;
@@ -3000,16 +3000,16 @@ for my $cpu (@CPUS) {
 		
 		if ($intel) {
 			if ($f eq 'gtu') {
-				for my $ret ("ret $f", "r$f") {
-					add($cpu, "$ret",		[jp_f('_z'),  '%t', '%t'],
-											[ret_f('_nc')]);
-				}
+#				for my $ret ("ret $f", "r$f") {
+#					add($cpu, "$ret",		[jp_f('_z'),  '%t', '%t'],
+#											[ret_f('_nc')]);
+#				}
 			}
 			elsif ($f eq 'leu') {
-				for my $ret ("ret $f", "r$f") {
-					add($cpu, "$ret",		[ret_f('_eq')],
-											[ret_f('_ltu')]);
-				}
+#				for my $ret ("ret $f", "r$f") {
+#					add($cpu, "$ret",		[ret_f('_eq')],
+#											[ret_f('_ltu')]);
+#				}
 			}
 			else {
 				for my $ret ("ret $f", "r$f") {
@@ -3019,16 +3019,16 @@ for my $cpu (@CPUS) {
 		}
 		else {
 			if ($f eq 'gtu') {
-				for my $ret ("ret $f", "r$f") {
-					add($cpu, "$ret",		[jr_f('_z'),  '%t'],
-											[ret_f('_nc')]);
-				}
+#				for my $ret ("ret $f", "r$f") {
+#					add($cpu, "$ret",		[jr_f('_z'),  '%t'],
+#											[ret_f('_nc')]);
+#				}
 			}
 			elsif ($f eq 'leu') {
-				for my $ret ("ret $f", "r$f") {
-					add($cpu, "$ret",		[ret_f('_eq')],
-											[ret_f('_ltu')]);
-				}
+#				for my $ret ("ret $f", "r$f") {
+#					add($cpu, "$ret",		[ret_f('_eq')],
+#											[ret_f('_ltu')]);
+#				}
 			}
 			else {
 				for my $ret ("ret $f", "r$f") {
@@ -3039,18 +3039,18 @@ for my $cpu (@CPUS) {
 
 		if ($ez80_z80) {
 			if ($f eq 'gtu') {
-				add($cpu, "ret.l $f",	[jr_f('_eq'),  '%t'],
-										[jr_f('_ltu'), '%t'],
-										[0x49], [ret()]);
-				add($cpu, "ret.lis $f",	[jr_f('_eq'),  '%t'],
-										[jr_f('_ltu'), '%t'],
-										[0x49], [ret()]);
+#				add($cpu, "ret.l $f",	[jr_f('_eq'),  '%t'],
+#										[jr_f('_ltu'), '%t'],
+#										[0x49], [ret()]);
+#				add($cpu, "ret.lis $f",	[jr_f('_eq'),  '%t'],
+#										[jr_f('_ltu'), '%t'],
+#										[0x49], [ret()]);
 			}
 			elsif ($f eq 'leu') {
-				add($cpu, "ret.l $f",	[0x49], [ret_f('_eq')],
-										[0x49], [ret_f('_ltu')]);
-				add($cpu, "ret.lis $f",	[0x49], [ret_f('_eq')],
-										[0x49], [ret_f('_ltu')]);
+#				add($cpu, "ret.l $f",	[0x49], [ret_f('_eq')],
+#										[0x49], [ret_f('_ltu')]);
+#				add($cpu, "ret.lis $f",	[0x49], [ret_f('_eq')],
+#										[0x49], [ret_f('_ltu')]);
 			}
 			else {
 				add($cpu, "ret.l $f",	[0x49], [ret_f($_f)]);
@@ -3059,18 +3059,18 @@ for my $cpu (@CPUS) {
 		}
 		elsif ($ez80_adl) {
 			if ($f eq 'gtu') {
-				add($cpu, "ret.l $f",	[jr_f('_eq'),  '%t'],
-										[jr_f('_ltu'), '%t'],
-										[0x5B], [ret()]);
-				add($cpu, "ret.lil $f",	[jr_f('_eq'),  '%t'],
-										[jr_f('_ltu'), '%t'],
-										[0x5B], [ret()]);
+#				add($cpu, "ret.l $f",	[jr_f('_eq'),  '%t'],
+#										[jr_f('_ltu'), '%t'],
+#										[0x5B], [ret()]);
+#				add($cpu, "ret.lil $f",	[jr_f('_eq'),  '%t'],
+#										[jr_f('_ltu'), '%t'],
+#										[0x5B], [ret()]);
 			}
 			elsif ($f eq 'leu') {
-				add($cpu, "ret.l $f",	[0x5B], [ret_f('_eq')],
-										[0x5B], [ret_f('_ltu')]);
-				add($cpu, "ret.lil $f",	[0x5B], [ret_f('_eq')],
-										[0x5B], [ret_f('_ltu')]);
+#				add($cpu, "ret.l $f",	[0x5B], [ret_f('_eq')],
+#										[0x5B], [ret_f('_ltu')]);
+#				add($cpu, "ret.lil $f",	[0x5B], [ret_f('_eq')],
+#										[0x5B], [ret_f('_ltu')]);
 			}
 			else {
 				add($cpu, "ret.l $f",	[0x5B], [ret_f($_f)]);
@@ -3940,12 +3940,9 @@ for my $cpu (Opcode->cpus) {
 	
 	# ez80 suffixes
 	my @ez80_suffixes = ('');
-	if ($cpu =~ /^ez80_z80$/) {
-		@ez80_suffixes = ('', '.il', '.is', '.sil', '.sis');
+	if ($cpu =~ /^ez80/) {
+		@ez80_suffixes = ('', '.l', '.il', '.is', '.sil', '.lil', '.sis', '.lis');
 	} 
-	elsif ($cpu =~ /^ez80$/) {
-		@ez80_suffixes = ('', '.il', '.is', '.lil', '.lis');
-	}
 
 	# JP|CALL|RET EQ, NN
 	$opcodes->add_synth($cpu, "jeq %m", "jz %m");
@@ -3954,9 +3951,9 @@ for my $cpu (Opcode->cpus) {
 	$opcodes->add_synth($cpu, "ceq %m", "cz %m");
 	for my $suf (@ez80_suffixes) {
 		$opcodes->add_synth($cpu, "call$suf eq, %m", "call$suf z, %m");
+		$opcodes->add_synth($cpu, "ret$suf eq", "ret$suf z");
 	}
 	$opcodes->add_synth($cpu, "req", "rz");
-	$opcodes->add_synth($cpu, "ret eq", "ret z");
 
 	# JP|CALL|RET NE, NN
 	$opcodes->add_synth($cpu, "jne %m", "jnz %m");
@@ -3965,9 +3962,9 @@ for my $cpu (Opcode->cpus) {
 	$opcodes->add_synth($cpu, "cne %m", "cnz %m");
 	for my $suf (@ez80_suffixes) {
 		$opcodes->add_synth($cpu, "call$suf ne, %m", "call$suf nz, %m");
+		$opcodes->add_synth($cpu, "ret$suf ne", "ret$suf nz");
 	}
 	$opcodes->add_synth($cpu, "rne", "rnz");
-	$opcodes->add_synth($cpu, "ret ne", "ret nz");
 
 	# JP|CALL|RET GEU, NN
 	$opcodes->add_synth($cpu, "jgeu %m", "jnc %m");
@@ -3976,9 +3973,9 @@ for my $cpu (Opcode->cpus) {
 	$opcodes->add_synth($cpu, "cgeu %m", "cnc %m");
 	for my $suf (@ez80_suffixes) {
 		$opcodes->add_synth($cpu, "call$suf geu, %m", "call$suf nc, %m");
+		$opcodes->add_synth($cpu, "ret$suf geu", "ret$suf nc");
 	}
 	$opcodes->add_synth($cpu, "rgeu", "rnc");
-	$opcodes->add_synth($cpu, "ret geu", "ret nc");
 
 	# JP|CALL|RET LTU, NN
 	$opcodes->add_synth($cpu, "jltu %m", "jc %m");
@@ -3987,10 +3984,10 @@ for my $cpu (Opcode->cpus) {
 	$opcodes->add_synth($cpu, "cltu %m", "cc %m");
 	for my $suf (@ez80_suffixes) {
 		$opcodes->add_synth($cpu, "call$suf ltu, %m", "call$suf c, %m");
+		$opcodes->add_synth($cpu, "ret$suf ltu", "ret$suf c");
 	}
 	$opcodes->add_synth($cpu, "rltu", "rc");
-	$opcodes->add_synth($cpu, "ret ltu", "ret c");
-
+	
 	# Rabbit lacks "call cc, NN"
 	for (['nz', 'z'], ['nc', 'c'], ['ne', 'eq'], ['geu', 'ltu']) {
 		my($norm, $inv) = @$_;
@@ -4007,9 +4004,9 @@ for my $cpu (Opcode->cpus) {
 	$opcodes->add_synth($cpu, "cgtu %m", "jr z, %t", "call nc, %m");
 	for my $suf (@ez80_suffixes) {
 		$opcodes->add_synth($cpu, "call$suf gtu, %m", "jr z, %t", "call$suf nc, %m");
+		$opcodes->add_synth($cpu, "ret$suf gtu", "jr z, %t", "ret$suf nc");
 	}
 	$opcodes->add_synth($cpu, "rgtu", "jr z, %t", "rnc");
-	$opcodes->add_synth($cpu, "ret gtu", "jr z, %t", "ret nc");
 
 	# JP|CALL|RET LEU, NN
 	$opcodes->add_synth($cpu, "jleu %m", "jz %m", "jc %m");
@@ -4025,9 +4022,9 @@ for my $cpu (Opcode->cpus) {
 
 		$opcodes->add_synth($cpu, "cleu %m", "jr z, %t$call_size", "jr nc, %t", "call %m");
 		$opcodes->add_synth($cpu, "call$suf leu, %m", "jr z, %t$call_size", "jr nc, %t", "call$suf %m");
+		$opcodes->add_synth($cpu, "ret$suf leu", "ret$suf z", "ret$suf c");
 	}
 	$opcodes->add_synth($cpu, "rleu", "rz", "rc");
-	$opcodes->add_synth($cpu, "ret leu", "ret z", "ret c");
 
 	# JP|CALL|RET NV, NN
 	if ($cpu =~ /^(r4k|r5k)/) {		# overflow and parity are different flags
@@ -4043,10 +4040,10 @@ for my $cpu (Opcode->cpus) {
 		$opcodes->add_synth($cpu, "jp nv, %m", "jp po, %m");
 		$opcodes->add_synth($cpu, "cnv %m", "cpo %m");
 		for my $suf (@ez80_suffixes) {
-			$opcodes->add_synth($cpu, "call$suf nv, %m", "call po, %m");
+			$opcodes->add_synth($cpu, "call$suf nv, %m", "call$suf po, %m");
+			$opcodes->add_synth($cpu, "ret$suf nv", "ret$suf po");
 		}
 		$opcodes->add_synth($cpu, "rnv", "rpo");
-		$opcodes->add_synth($cpu, "ret nv", "ret po");
 	}
 
 	# JP|CALL|RET V, NN
@@ -4070,10 +4067,10 @@ for my $cpu (Opcode->cpus) {
 		$opcodes->add_synth($cpu, "jp v, %m", "jp pe, %m");
 		$opcodes->add_synth($cpu, "cv %m", "cpe %m");
 		for my $suf (@ez80_suffixes) {
-			$opcodes->add_synth($cpu, "call$suf v, %m", "call pe, %m");
+			$opcodes->add_synth($cpu, "call$suf v, %m", "call$suf pe, %m");
+			$opcodes->add_synth($cpu, "ret$suf v", "ret$suf pe");
 		}
 		$opcodes->add_synth($cpu, "rv", "rpe");
-		$opcodes->add_synth($cpu, "ret v", "ret pe");
 	}		
 	
 }

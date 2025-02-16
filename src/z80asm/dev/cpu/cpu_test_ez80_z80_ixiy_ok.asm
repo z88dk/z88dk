@@ -3673,7 +3673,7 @@
  ret.l c                        ; 49 D8
  ret.l eq                       ; 49 C8
  ret.l geu                      ; 49 D0
- ret.l gtu                      ; 28 04 38 02 49 C9
+ ret.l gtu                      ; 28 02 49 D0
  ret.l leu                      ; 49 C8 49 D8
  ret.l ltu                      ; 49 D8
  ret.l m                        ; 49 F8
@@ -3690,7 +3690,7 @@
  ret.lis c                      ; 49 D8
  ret.lis eq                     ; 49 C8
  ret.lis geu                    ; 49 D0
- ret.lis gtu                    ; 28 04 38 02 49 C9
+ ret.lis gtu                    ; 28 02 49 D0
  ret.lis leu                    ; 49 C8 49 D8
  ret.lis ltu                    ; 49 D8
  ret.lis m                      ; 49 F8

@@ -3672,7 +3672,7 @@
  ret.l c                        ; 5B D8
  ret.l eq                       ; 5B C8
  ret.l geu                      ; 5B D0
- ret.l gtu                      ; 28 04 38 02 5B C9
+ ret.l gtu                      ; 28 02 5B D0
  ret.l leu                      ; 5B C8 5B D8
  ret.l ltu                      ; 5B D8
  ret.l m                        ; 5B F8
@@ -3689,7 +3689,7 @@
  ret.lil c                      ; 5B D8
  ret.lil eq                     ; 5B C8
  ret.lil geu                    ; 5B D0
- ret.lil gtu                    ; 28 04 38 02 5B C9
+ ret.lil gtu                    ; 28 02 5B D0
  ret.lil leu                    ; 5B C8 5B D8
  ret.lil ltu                    ; 5B D8
  ret.lil m                      ; 5B F8
