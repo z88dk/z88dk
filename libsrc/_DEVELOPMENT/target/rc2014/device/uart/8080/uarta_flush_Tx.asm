@@ -11,22 +11,13 @@ SECTION code_driver_character_output
 PUBLIC _uarta_flush_Tx_di
 PUBLIC _uarta_flush_Tx
 
-EXTERN asm_cpu_push_di, asm_cpu_pop_ei
-
 ._uarta_flush_Tx_di
 
     push af
-    push hl
-
-    call asm_cpu_push_di        ; di
 
     call _uarta_flush_Tx
 
-    call asm_cpu_pop_ei         ; ei
-
-    pop hl
     pop af
-
     ret
 
 ._uarta_flush_Tx

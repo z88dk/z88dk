@@ -262,41 +262,9 @@ ENDIF
 
     ; initialise the ACIA
 
-    EXTERN  aciaControl
+    EXTERN  _acia_init
 
-    EXTERN  aciaRxCount
-    EXTERN  aciaRxIn
-    EXTERN  aciaRxOut
-
-    EXTERN  aciaTxCount
-    EXTERN  aciaTxIn
-    EXTERN  aciaTxOut
-
-    EXTERN  aciaRxBuffer
-    EXTERN  aciaTxBuffer
-
-    ld a,__IO_ACIA_CR_RESET     ; Master Reset the ACIA
-    out (__IO_ACIA_CONTROL_REGISTER),a
-
-    ld a,__IO_ACIA_CR_REI|__IO_ACIA_CR_TDI_RTS0|__IO_ACIA_CR_8N2|__IO_ACIA_CR_CLK_DIV_64
-                                ; load the default ACIA configuration
-                                ; 8n2 at 115200 baud
-                                ; receive interrupt on R6.5 enabled
-                                ; transmit interrupt on R6.5 disabled
-    ld (aciaControl),a          ; write the ACIA control byte echo
-    out (__IO_ACIA_CONTROL_REGISTER),a  ; output to the ACIA control
-
-    ld hl,aciaRxBuffer          ; load Rx buffer pointer home
-    ld (aciaRxIn),hl
-    ld (aciaRxOut),hl
-
-    ld hl,aciaTxBuffer          ; load Tx buffer pointer home
-    ld (aciaTxIn),hl
-    ld (aciaTxOut),hl
-
-    xor a                       ; reset empties the Tx & Rx buffers
-    ld (aciaRxCount),a          ; reset the Rx counter (set 0)
-    ld (aciaTxCount),a          ; reset the Tx counter (set 0)
+    call _acia_init
 
     ld a,$1D
     sim                         ; reset R7.5, set MSE and unmask R6.5

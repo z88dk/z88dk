@@ -43,15 +43,15 @@ define(`__IO_SIO_PORT_OFFSET_D', 0x01)  # Port Offset for Data (!A0)
 
 # Standard SIO/2 Configuration (including Dr Baker)
 
-# define(`__IO_SIO_PORT_OFFSET_A', 0x00)  # Port Offset for A Channel (A0)
-# define(`__IO_SIO_PORT_OFFSET_B', 0x01)  # Port Offset for B Channel (A0)
-# define(`__IO_SIO_PORT_OFFSET_C', 0x02)  # Port Offset for Command (A1)
-# define(`__IO_SIO_PORT_OFFSET_D', 0x00)  # Port Offset for Data (A1)
+# define(`__IO_SIO_PORT_OFFSET_A', 0x00)    # Port Offset for A Channel (A0)
+# define(`__IO_SIO_PORT_OFFSET_B', 0x01)    # Port Offset for B Channel (A0)
+# define(`__IO_SIO_PORT_OFFSET_C', 0x02)    # Port Offset for Command (A1)
+# define(`__IO_SIO_PORT_OFFSET_D', 0x00)    # Port Offset for Data (A1)
 
 # 16550 UART Port Definitions
 
-define(`__IO_UART_PORTA_BASE', 0x80)  # Port A Address for UART Module
-define(`__IO_UART_PORTB_BASE', 0x88)  # Port B Address for UART Module
+define(`__IO_UART_PORTA_BASE', 0x80)    # Port A Address for UART Module
+define(`__IO_UART_PORTB_BASE', 0x88)    # Port B Address for UART Module
 
 #
 # END OF USER CONFIGURATION
@@ -118,6 +118,4 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_CF_8_BIT'  __IO_CF_8_BIT
 `#define' `__IO_CF_PORT_BASE'  __IO_CF_PORT_BASE
 `#define' `__IO_PIO_PORT_BASE'  __IO_PIO_PORT_BASE
-`#define' `__IO_UART_PORTA_BASE'  __IO_UART_PORTA_BASE
-`#define' `__IO_UART_PORTB_BASE'  __IO_UART_PORTB_BASE
 ')

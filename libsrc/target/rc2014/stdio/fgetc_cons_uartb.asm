@@ -1,0 +1,46 @@
+
+    INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
+
+    SECTION code_driver
+
+    PUBLIC  fgetc_cons_uartb
+
+    EXTERN uartbRxCount, uartbRxOut, uartbRxBuffer
+
+.fgetc_cons_uartb
+    ; exit     : l = char received
+    ;
+    ; modifies : af, hl
+
+    ld a,(uartbRxCount)         ; get the number of bytes in the Rx buffer
+    ld l,a                      ; and put it in hl
+    or a                        ; see if there are zero bytes available
+    ret Z                       ; if the count is zero, then return
+
+    sub __IO_UART_RX_EMPTYISH   ; compare the count with the preferred empty size
+    jp C,getc_clean_up_rx       ; if the buffer is too full, don't change the RTS
+
+    in a,(__IO_UARTB_MCR_REGISTER)  ; get the UART B MODEM Control Register
+    and __IO_UART_MCR_DTR           ; set DTR low
+    out (__IO_UARTB_MCR_REGISTER),a ; set the MODEM Control Register
+
+.getc_clean_up_rx
+    ld hl,(uartbRxOut)          ; get the pointer to place where we pop the Rx byte
+    ld a,(hl)                   ; get the Rx byte
+
+    inc l                       ; move the Rx pointer low byte along
+IF __IO_UART_RX_SIZE != 0x100
+    push af
+    ld a,__IO_UART_RX_SIZE-1    ; load the buffer size, (n^2)-1
+    and l                       ; range check
+    or uartbRxBuffer&0xFF       ; locate base
+    ld l,a                      ; return the low byte to l
+    pop af
+ENDIF
+    ld (uartbRxOut),hl          ; write where the next byte should be popped
+
+    ld hl,uartbRxCount
+    dec (hl)                    ; atomically decrement Rx count
+
+    ld l,a                      ; and put it in hl
+    ret
