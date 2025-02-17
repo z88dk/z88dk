@@ -2767,6 +2767,12 @@
  ipset -1                       ; Error
  ipset 4                        ; Error
  jk 0x1234                      ; Error
+ jmp k, 0x1234                  ; Error
+ jmp nk, 0x1234                 ; Error
+ jmp nv, 0x1234                 ; Error
+ jmp nv, 0x123456               ; Error
+ jmp nx5, 0x1234                ; Error
+ jmp x5, 0x1234                 ; Error
  jnk 0x1234                     ; Error
  jnv 0x1234                     ; Error
  jnx5 0x1234                    ; Error

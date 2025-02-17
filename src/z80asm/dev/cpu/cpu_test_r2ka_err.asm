@@ -3549,6 +3549,10 @@
  jgt 0x1234                     ; Error
  jk 0x1234                      ; Error
  jlt 0x1234                     ; Error
+ jmp k, 0x1234                  ; Error
+ jmp nk, 0x1234                 ; Error
+ jmp nx5, 0x1234                ; Error
+ jmp x5, 0x1234                 ; Error
  jnk 0x1234                     ; Error
  jnx5 0x1234                    ; Error
  jp (ahl)                       ; Error

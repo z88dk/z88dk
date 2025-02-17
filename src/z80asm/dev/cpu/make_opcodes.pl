@@ -575,8 +575,13 @@ for my $cpu1 ('8085') {
 										  ops=>[[0x38, '%u']]));
 			}
 			$opcodes->add(Opcode->new(asm=>"ld de, sp", cpu=>$cpu, 
-										ops=>[[0x38, 0]]));
+									  ops=>[[0x38, 0]]));
 
+			# LD HL, SP+u
+			$opcodes->add(Opcode->new(asm=>"ld hl, sp+%u", cpu=>$cpu, 
+									  ops=>[[0xEB], [0x38, '%u'], [0xEB]],
+									  synth=>1));
+			
 			# Restart 8 (0040) if V flag is set
 			for my $asm ("rstv", "ovrst8") {
 				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
@@ -588,8 +593,6 @@ for my $cpu1 ('8085') {
 										  ops=>[[0xCB]]));
 			}
 			
-			### HERE ###
-
 			# Store HL at address pointed by DE
 			for my $asm ("shlx", "shlde", "ld (de), hl") {
 				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
@@ -612,7 +615,6 @@ for my $cpu1 ('8085') {
 				$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
 										  ops=>[[0xED]]));
 			}
-			
 		}
 	}
 }
@@ -813,81 +815,81 @@ for my $cpu (@CPUS) {
 	
 	# LD (DE), r / LD r, (DE), r != a
 	if (!$gameboy) {				# gbz80 does not have ex de, hl
-		add($cpu, "ld b, (de)", [ex_de_hl()], [ld_r_r('b', '(hl)')], [ex_de_hl()]);
-		add($cpu, "ld c, (de)", [ex_de_hl()], [ld_r_r('c', '(hl)')], [ex_de_hl()]);
-		add($cpu, "ld d, (de)", [ex_de_hl()], [ld_r_r('h', '(hl)')], [ex_de_hl()]);
-		add($cpu, "ld e, (de)", [ex_de_hl()], [ld_r_r('l', '(hl)')], [ex_de_hl()]);
-		add($cpu, "ld h, (de)", [ex_de_hl()], [ld_r_r('d', '(hl)')], [ex_de_hl()]);
-		add($cpu, "ld l, (de)", [ex_de_hl()], [ld_r_r('e', '(hl)')], [ex_de_hl()]);
+#		add($cpu, "ld b, (de)", [ex_de_hl()], [ld_r_r('b', '(hl)')], [ex_de_hl()]);
+#		add($cpu, "ld c, (de)", [ex_de_hl()], [ld_r_r('c', '(hl)')], [ex_de_hl()]);
+#		add($cpu, "ld d, (de)", [ex_de_hl()], [ld_r_r('h', '(hl)')], [ex_de_hl()]);
+#		add($cpu, "ld e, (de)", [ex_de_hl()], [ld_r_r('l', '(hl)')], [ex_de_hl()]);
+#		add($cpu, "ld h, (de)", [ex_de_hl()], [ld_r_r('d', '(hl)')], [ex_de_hl()]);
+#		add($cpu, "ld l, (de)", [ex_de_hl()], [ld_r_r('e', '(hl)')], [ex_de_hl()]);
 		
-		add($cpu, "ld b, (de+)", [ex_de_hl()], [ld_r_r('b', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ld c, (de+)", [ex_de_hl()], [ld_r_r('c', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ld d, (de+)", [ex_de_hl()], [ld_r_r('h', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ld e, (de+)", [ex_de_hl()], [ld_r_r('l', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ld h, (de+)", [ex_de_hl()], [ld_r_r('d', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ld l, (de+)", [ex_de_hl()], [ld_r_r('e', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld b, (de+)", [ex_de_hl()], [ld_r_r('b', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld c, (de+)", [ex_de_hl()], [ld_r_r('c', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld d, (de+)", [ex_de_hl()], [ld_r_r('h', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld e, (de+)", [ex_de_hl()], [ld_r_r('l', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld h, (de+)", [ex_de_hl()], [ld_r_r('d', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld l, (de+)", [ex_de_hl()], [ld_r_r('e', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
 		
-		add($cpu, "ldi b, (de)", [ex_de_hl()], [ld_r_r('b', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ldi c, (de)", [ex_de_hl()], [ld_r_r('c', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ldi d, (de)", [ex_de_hl()], [ld_r_r('h', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ldi e, (de)", [ex_de_hl()], [ld_r_r('l', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ldi h, (de)", [ex_de_hl()], [ld_r_r('d', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ldi l, (de)", [ex_de_hl()], [ld_r_r('e', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi b, (de)", [ex_de_hl()], [ld_r_r('b', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi c, (de)", [ex_de_hl()], [ld_r_r('c', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi d, (de)", [ex_de_hl()], [ld_r_r('h', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi e, (de)", [ex_de_hl()], [ld_r_r('l', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi h, (de)", [ex_de_hl()], [ld_r_r('d', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi l, (de)", [ex_de_hl()], [ld_r_r('e', '(hl)')], [ex_de_hl()], [inc_dd('de')]);
 		
-		add($cpu, "ld b, (de-)", [ex_de_hl()], [ld_r_r('b', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ld c, (de-)", [ex_de_hl()], [ld_r_r('c', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ld d, (de-)", [ex_de_hl()], [ld_r_r('h', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ld e, (de-)", [ex_de_hl()], [ld_r_r('l', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ld h, (de-)", [ex_de_hl()], [ld_r_r('d', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ld l, (de-)", [ex_de_hl()], [ld_r_r('e', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld b, (de-)", [ex_de_hl()], [ld_r_r('b', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld c, (de-)", [ex_de_hl()], [ld_r_r('c', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld d, (de-)", [ex_de_hl()], [ld_r_r('h', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld e, (de-)", [ex_de_hl()], [ld_r_r('l', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld h, (de-)", [ex_de_hl()], [ld_r_r('d', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld l, (de-)", [ex_de_hl()], [ld_r_r('e', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
 		
-		add($cpu, "ldd b, (de)", [ex_de_hl()], [ld_r_r('b', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ldd c, (de)", [ex_de_hl()], [ld_r_r('c', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ldd d, (de)", [ex_de_hl()], [ld_r_r('h', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ldd e, (de)", [ex_de_hl()], [ld_r_r('l', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ldd h, (de)", [ex_de_hl()], [ld_r_r('d', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ldd l, (de)", [ex_de_hl()], [ld_r_r('e', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd b, (de)", [ex_de_hl()], [ld_r_r('b', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd c, (de)", [ex_de_hl()], [ld_r_r('c', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd d, (de)", [ex_de_hl()], [ld_r_r('h', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd e, (de)", [ex_de_hl()], [ld_r_r('l', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd h, (de)", [ex_de_hl()], [ld_r_r('d', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd l, (de)", [ex_de_hl()], [ld_r_r('e', '(hl)')], [ex_de_hl()], [dec_dd('de')]);
 		
-		add($cpu, "ld (de), b", [ex_de_hl()], [ld_r_r('(hl)', 'b')], [ex_de_hl()]);
-		add($cpu, "ld (de), c", [ex_de_hl()], [ld_r_r('(hl)', 'c')], [ex_de_hl()]);
-		add($cpu, "ld (de), d", [ex_de_hl()], [ld_r_r('(hl)', 'h')], [ex_de_hl()]);
-		add($cpu, "ld (de), e", [ex_de_hl()], [ld_r_r('(hl)', 'l')], [ex_de_hl()]);
-		add($cpu, "ld (de), h", [ex_de_hl()], [ld_r_r('(hl)', 'd')], [ex_de_hl()]);
-		add($cpu, "ld (de), l", [ex_de_hl()], [ld_r_r('(hl)', 'e')], [ex_de_hl()]);
+#		add($cpu, "ld (de), b", [ex_de_hl()], [ld_r_r('(hl)', 'b')], [ex_de_hl()]);
+#		add($cpu, "ld (de), c", [ex_de_hl()], [ld_r_r('(hl)', 'c')], [ex_de_hl()]);
+#		add($cpu, "ld (de), d", [ex_de_hl()], [ld_r_r('(hl)', 'h')], [ex_de_hl()]);
+#		add($cpu, "ld (de), e", [ex_de_hl()], [ld_r_r('(hl)', 'l')], [ex_de_hl()]);
+#		add($cpu, "ld (de), h", [ex_de_hl()], [ld_r_r('(hl)', 'd')], [ex_de_hl()]);
+#		add($cpu, "ld (de), l", [ex_de_hl()], [ld_r_r('(hl)', 'e')], [ex_de_hl()]);
 		
-		add($cpu, "ld (de+), b", [ex_de_hl()], [ld_r_r('(hl)', 'b')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ld (de+), c", [ex_de_hl()], [ld_r_r('(hl)', 'c')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ld (de+), d", [ex_de_hl()], [ld_r_r('(hl)', 'h')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ld (de+), e", [ex_de_hl()], [ld_r_r('(hl)', 'l')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ld (de+), h", [ex_de_hl()], [ld_r_r('(hl)', 'd')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ld (de+), l", [ex_de_hl()], [ld_r_r('(hl)', 'e')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld (de+), b", [ex_de_hl()], [ld_r_r('(hl)', 'b')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld (de+), c", [ex_de_hl()], [ld_r_r('(hl)', 'c')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld (de+), d", [ex_de_hl()], [ld_r_r('(hl)', 'h')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld (de+), e", [ex_de_hl()], [ld_r_r('(hl)', 'l')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld (de+), h", [ex_de_hl()], [ld_r_r('(hl)', 'd')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld (de+), l", [ex_de_hl()], [ld_r_r('(hl)', 'e')], [ex_de_hl()], [inc_dd('de')]);
 		
-		add($cpu, "ldi (de), b", [ex_de_hl()], [ld_r_r('(hl)', 'b')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ldi (de), c", [ex_de_hl()], [ld_r_r('(hl)', 'c')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ldi (de), d", [ex_de_hl()], [ld_r_r('(hl)', 'h')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ldi (de), e", [ex_de_hl()], [ld_r_r('(hl)', 'l')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ldi (de), h", [ex_de_hl()], [ld_r_r('(hl)', 'd')], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ldi (de), l", [ex_de_hl()], [ld_r_r('(hl)', 'e')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi (de), b", [ex_de_hl()], [ld_r_r('(hl)', 'b')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi (de), c", [ex_de_hl()], [ld_r_r('(hl)', 'c')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi (de), d", [ex_de_hl()], [ld_r_r('(hl)', 'h')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi (de), e", [ex_de_hl()], [ld_r_r('(hl)', 'l')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi (de), h", [ex_de_hl()], [ld_r_r('(hl)', 'd')], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi (de), l", [ex_de_hl()], [ld_r_r('(hl)', 'e')], [ex_de_hl()], [inc_dd('de')]);
 		
-		add($cpu, "ld (de-), b", [ex_de_hl()], [ld_r_r('(hl)', 'b')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ld (de-), c", [ex_de_hl()], [ld_r_r('(hl)', 'c')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ld (de-), d", [ex_de_hl()], [ld_r_r('(hl)', 'h')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ld (de-), e", [ex_de_hl()], [ld_r_r('(hl)', 'l')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ld (de-), h", [ex_de_hl()], [ld_r_r('(hl)', 'd')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ld (de-), l", [ex_de_hl()], [ld_r_r('(hl)', 'e')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld (de-), b", [ex_de_hl()], [ld_r_r('(hl)', 'b')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld (de-), c", [ex_de_hl()], [ld_r_r('(hl)', 'c')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld (de-), d", [ex_de_hl()], [ld_r_r('(hl)', 'h')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld (de-), e", [ex_de_hl()], [ld_r_r('(hl)', 'l')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld (de-), h", [ex_de_hl()], [ld_r_r('(hl)', 'd')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld (de-), l", [ex_de_hl()], [ld_r_r('(hl)', 'e')], [ex_de_hl()], [dec_dd('de')]);
 		
-		add($cpu, "ldd (de), b", [ex_de_hl()], [ld_r_r('(hl)', 'b')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ldd (de), c", [ex_de_hl()], [ld_r_r('(hl)', 'c')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ldd (de), d", [ex_de_hl()], [ld_r_r('(hl)', 'h')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ldd (de), e", [ex_de_hl()], [ld_r_r('(hl)', 'l')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ldd (de), h", [ex_de_hl()], [ld_r_r('(hl)', 'd')], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ldd (de), l", [ex_de_hl()], [ld_r_r('(hl)', 'e')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd (de), b", [ex_de_hl()], [ld_r_r('(hl)', 'b')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd (de), c", [ex_de_hl()], [ld_r_r('(hl)', 'c')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd (de), d", [ex_de_hl()], [ld_r_r('(hl)', 'h')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd (de), e", [ex_de_hl()], [ld_r_r('(hl)', 'l')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd (de), h", [ex_de_hl()], [ld_r_r('(hl)', 'd')], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd (de), l", [ex_de_hl()], [ld_r_r('(hl)', 'e')], [ex_de_hl()], [dec_dd('de')]);
 		
-		add($cpu, "ld (de), %n",  [ex_de_hl()], [ld_r_n('(hl)'), '%n'], [ex_de_hl()]);
-		add($cpu, "ld (de+), %n", [ex_de_hl()], [ld_r_n('(hl)'), '%n'], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ldi (de), %n", [ex_de_hl()], [ld_r_n('(hl)'), '%n'], [ex_de_hl()], [inc_dd('de')]);
-		add($cpu, "ld (de-), %n", [ex_de_hl()], [ld_r_n('(hl)'), '%n'], [ex_de_hl()], [dec_dd('de')]);
-		add($cpu, "ldd (de), %n", [ex_de_hl()], [ld_r_n('(hl)'), '%n'], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ld (de), %n",  [ex_de_hl()], [ld_r_n('(hl)'), '%n'], [ex_de_hl()]);
+#		add($cpu, "ld (de+), %n", [ex_de_hl()], [ld_r_n('(hl)'), '%n'], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ldi (de), %n", [ex_de_hl()], [ld_r_n('(hl)'), '%n'], [ex_de_hl()], [inc_dd('de')]);
+#		add($cpu, "ld (de-), %n", [ex_de_hl()], [ld_r_n('(hl)'), '%n'], [ex_de_hl()], [dec_dd('de')]);
+#		add($cpu, "ldd (de), %n", [ex_de_hl()], [ld_r_n('(hl)'), '%n'], [ex_de_hl()], [dec_dd('de')]);
 	}
 	
 	# LD (NN), A / LD A, (NN)
@@ -955,6 +957,7 @@ for my $cpu (@CPUS) {
 		
 		for my $a_ ('a, ', '') {
 			add_x($cpu, "$op $a_%n", 	[alu_n($op), '%n']);
+			
 			if ($r4k || $r5k) {
 				add_x($cpu, "$op $a_(hl+)",	[0x7F, alu_r($op, '(hl)')], [inc_dd('hl')]);
 				add_x($cpu, "$op $a_(hl-)",	[0x7F, alu_r($op, '(hl)')], [dec_dd('hl')]);
@@ -1577,12 +1580,12 @@ for my $cpu (@CPUS) {
 	
 	# LD BC, IXY
 	if ($z80 || $z80n || $ez80_any || $r800) {
-		add($cpu, "ld bc, ix", [$V{ix}, ld_r_r('b', 'h')], [$V{ix}, ld_r_r('c', 'l')]);
-		add($cpu, "ld bc, iy", [$V{iy}, ld_r_r('b', 'h')], [$V{iy}, ld_r_r('c', 'l')]);
+#		add($cpu, "ld bc, ix", [$V{ix}, ld_r_r('b', 'h')], [$V{ix}, ld_r_r('c', 'l')]);
+#		add($cpu, "ld bc, iy", [$V{iy}, ld_r_r('b', 'h')], [$V{iy}, ld_r_r('c', 'l')]);
 	}
 	elsif (!$intel && !$gameboy) {
-		add($cpu, "ld bc, ix", [$V{ix}, push_dd('hl')], [pop_dd('bc')]);
-		add($cpu, "ld bc, iy", [$V{iy}, push_dd('hl')], [pop_dd('bc')]);
+#		add($cpu, "ld bc, ix", [$V{ix}, push_dd('hl')], [pop_dd('bc')]);
+#		add($cpu, "ld bc, iy", [$V{iy}, push_dd('hl')], [pop_dd('bc')]);
 	}		
 	
 	# LD DE, BC
@@ -1615,12 +1618,12 @@ for my $cpu (@CPUS) {
 
     # LD DE, IXY
 	if ($z80 || $z80n || $ez80_any || $r800) {
-		add($cpu, "ld de, ix", [$V{ix}, ld_r_r('d', 'h')], [$V{ix}, ld_r_r('e', 'l')]);
-		add($cpu, "ld de, iy", [$V{iy}, ld_r_r('d', 'h')], [$V{iy}, ld_r_r('e', 'l')]);
+#		add($cpu, "ld de, ix", [$V{ix}, ld_r_r('d', 'h')], [$V{ix}, ld_r_r('e', 'l')]);
+#		add($cpu, "ld de, iy", [$V{iy}, ld_r_r('d', 'h')], [$V{iy}, ld_r_r('e', 'l')]);
 	}
 	elsif (!$intel && !$gameboy) {
-		add($cpu, "ld de, ix", [$V{ix}, push_dd('hl')], [pop_dd('de')]);
-		add($cpu, "ld de, iy", [$V{iy}, push_dd('hl')], [pop_dd('de')]);
+#		add($cpu, "ld de, ix", [$V{ix}, push_dd('hl')], [pop_dd('de')]);
+#		add($cpu, "ld de, iy", [$V{iy}, push_dd('hl')], [pop_dd('de')]);
 	}
 	
 	# LD HL, BC
@@ -1662,28 +1665,28 @@ for my $cpu (@CPUS) {
 		}
 	}
 	elsif (!$intel && !$gameboy) {
-		add($cpu, "ld hl, ix", [$V{ix}, push_dd('hl')], [pop_dd('hl')]);
-		add($cpu, "ld hl, iy", [$V{iy}, push_dd('hl')], [pop_dd('hl')]);
+#		add($cpu, "ld hl, ix", [$V{ix}, push_dd('hl')], [pop_dd('hl')]);
+#		add($cpu, "ld hl, iy", [$V{iy}, push_dd('hl')], [pop_dd('hl')]);
 	}
 	
 	# LD IXY, BC
 	if ($z80 || $z80n || $ez80_any || $r800) {
-		add($cpu, "ld ix, bc", [$V{ix}, ld_r_r('h', 'b')], [$V{ix}, ld_r_r('l', 'c')]);
-		add($cpu, "ld iy, bc", [$V{iy}, ld_r_r('h', 'b')], [$V{iy}, ld_r_r('l', 'c')]);
+#		add($cpu, "ld ix, bc", [$V{ix}, ld_r_r('h', 'b')], [$V{ix}, ld_r_r('l', 'c')]);
+#		add($cpu, "ld iy, bc", [$V{iy}, ld_r_r('h', 'b')], [$V{iy}, ld_r_r('l', 'c')]);
 	}
 	elsif (!$intel && !$gameboy) {
-		add($cpu, "ld ix, bc", [push_dd('bc')], [$V{ix}, pop_dd('hl')]);
-		add($cpu, "ld iy, bc", [push_dd('bc')], [$V{iy}, pop_dd('hl')]);
+#		add($cpu, "ld ix, bc", [push_dd('bc')], [$V{ix}, pop_dd('hl')]);
+#		add($cpu, "ld iy, bc", [push_dd('bc')], [$V{iy}, pop_dd('hl')]);
 	}
 	
 	# LD IXY, DE
 	if ($z80 || $z80n || $ez80_any || $r800) {
-		add($cpu, "ld ix, de", [$V{ix}, ld_r_r('h', 'd')], [$V{ix}, ld_r_r('l', 'e')]);
-		add($cpu, "ld iy, de", [$V{iy}, ld_r_r('h', 'd')], [$V{iy}, ld_r_r('l', 'e')]);
+#		add($cpu, "ld ix, de", [$V{ix}, ld_r_r('h', 'd')], [$V{ix}, ld_r_r('l', 'e')]);
+#		add($cpu, "ld iy, de", [$V{iy}, ld_r_r('h', 'd')], [$V{iy}, ld_r_r('l', 'e')]);
 	}
 	elsif (!$intel && !$gameboy) {
-		add($cpu, "ld ix, de", [push_dd('de')], [$V{ix}, pop_dd('hl')]);
-		add($cpu, "ld iy, de", [push_dd('de')], [$V{iy}, pop_dd('hl')]);
+#		add($cpu, "ld ix, de", [push_dd('de')], [$V{ix}, pop_dd('hl')]);
+#		add($cpu, "ld iy, de", [push_dd('de')], [$V{iy}, pop_dd('hl')]);
 	}
 	
 	# LD IXY, HL
@@ -1693,14 +1696,14 @@ for my $cpu (@CPUS) {
 		}
 	}
 	elsif (!$intel && !$gameboy) {
-		add($cpu, "ld ix, hl", [push_dd('hl')], [$V{ix}, pop_dd('hl')]);
-		add($cpu, "ld iy, hl", [push_dd('hl')], [$V{iy}, pop_dd('hl')]);
+#		add($cpu, "ld ix, hl", [push_dd('hl')], [$V{ix}, pop_dd('hl')]);
+#		add($cpu, "ld iy, hl", [push_dd('hl')], [$V{iy}, pop_dd('hl')]);
 	}
 	
 	# LD IXY, IXY
 	if (!$intel && !$gameboy) {
-		add($cpu, "ld ix, iy", [$V{iy}, push_dd('hl')], [$V{ix}, pop_dd('hl')]);
-		add($cpu, "ld iy, ix", [$V{ix}, push_dd('hl')], [$V{iy}, pop_dd('hl')]);
+#		add($cpu, "ld ix, iy", [$V{iy}, push_dd('hl')], [$V{ix}, pop_dd('hl')]);
+#		add($cpu, "ld iy, ix", [$V{ix}, push_dd('hl')], [$V{iy}, pop_dd('hl')]);
 	}
 
 	add_suf($cpu, "ld sp, hl", 	[ld_sp_hl()]);
@@ -1901,133 +1904,133 @@ for my $cpu (@CPUS) {
 	}
     elsif ($gameboy) {
 		# Store HL at address pointed by DE
-		add($cpu, "shlx",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-		add($cpu, "shlde",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-		add($cpu, "ld (de), hl",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
+#		add($cpu, "shlx",			
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')],
+#					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+#					[dec_dd('hl')],					# dec hl
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')]);
+#		add($cpu, "shlde",			
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')],
+#					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+#					[dec_dd('hl')],					# dec hl
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')]);
+#		add($cpu, "ld (de), hl",			
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')],
+#					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+#					[dec_dd('hl')],					# dec hl
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')]);
 		
 		# Load HL from address pointed by DE
-		add($cpu, "lhlx",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-		add($cpu, "lhlde",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
-		add($cpu, "ld hl, (de)",			
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')],
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[push_dd('hl')],				# ex de, hl
-					[push_dd('de')],
-					[pop_dd('hl')],
-					[pop_dd('de')]);
+#		add($cpu, "lhlx",			
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')],
+#					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+#					[dec_dd('hl')],					# dec hl
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')]);
+#		add($cpu, "lhlde",			
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')],
+#					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+#					[dec_dd('hl')],					# dec hl
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')]);
+#		add($cpu, "ld hl, (de)",			
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')],
+#					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+#					[dec_dd('hl')],					# dec hl
+#					[push_dd('hl')],				# ex de, hl
+#					[push_dd('de')],
+#					[pop_dd('hl')],
+#					[pop_dd('de')]);
 	}
 	else {
 		# Store HL at address pointed by DE
-		add($cpu, "shlx",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
-		add($cpu, "shlde",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
-		add($cpu, "ld (de), hl",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('(hl)', 'e')],			# ld (hl), e
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('(hl)', 'd')],			# ld (hl), d
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
-		
-		# Load HL from address pointed by DE
-		add($cpu, "lhlx",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
-		add($cpu, "lhlde",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
-		add($cpu, "ld hl, (de)",			
-					[ex_de_hl()],               	# ex de, hl
-					[ld_r_r('e', '(hl)')],			# ld e, (hl)
-					[inc_dd('hl')],					# inc hl
-					[ld_r_r('d', '(hl)')],			# ld d, (hl)
-					[dec_dd('hl')],					# dec hl
-					[ex_de_hl()]);               	# ex de, hl
+#		add($cpu, "shlx",			
+#					[ex_de_hl()],               	# ex de, hl
+#					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+#					[dec_dd('hl')],					# dec hl
+#					[ex_de_hl()]);               	# ex de, hl
+#		add($cpu, "shlde",			
+#					[ex_de_hl()],               	# ex de, hl
+#					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+#					[dec_dd('hl')],					# dec hl
+#					[ex_de_hl()]);               	# ex de, hl
+#		add($cpu, "ld (de), hl",			
+#					[ex_de_hl()],               	# ex de, hl
+#					[ld_r_r('(hl)', 'e')],			# ld (hl), e
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('(hl)', 'd')],			# ld (hl), d
+#					[dec_dd('hl')],					# dec hl
+#					[ex_de_hl()]);               	# ex de, hl
+#		
+#		# Load HL from address pointed by DE
+#		add($cpu, "lhlx",			
+#					[ex_de_hl()],               	# ex de, hl
+#					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+#					[dec_dd('hl')],					# dec hl
+#					[ex_de_hl()]);               	# ex de, hl
+#		add($cpu, "lhlde",			
+#					[ex_de_hl()],               	# ex de, hl
+#					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+#					[dec_dd('hl')],					# dec hl
+#					[ex_de_hl()]);               	# ex de, hl
+#		add($cpu, "ld hl, (de)",			
+#					[ex_de_hl()],               	# ex de, hl
+#					[ld_r_r('e', '(hl)')],			# ld e, (hl)
+#					[inc_dd('hl')],					# inc hl
+#					[ld_r_r('d', '(hl)')],			# ld d, (hl)
+#					[dec_dd('hl')],					# dec hl
+#					[ex_de_hl()]);               	# ex de, hl
 	}
 	
 	# lea
@@ -4466,6 +4469,14 @@ for my $cpu (Opcode->cpus) {
 		$opcodes->add_synth($cpu, "rv", "rpe");
 	}		
 	
+	# JMP
+	$opcodes->add_synth($cpu, "jmp %m", "jp %m");
+	for my $flag ('nz', 'z', 'nc', 'c', 'po', 'pe', 'nv', 'v', 'lz', 'lo', 'p', 'm',
+				  'ne', 'eq', 'geu', 'ltu', 'gtu', 'leu',
+				  'nk', 'k', 'nx5', 'x5') {
+		$opcodes->add_synth($cpu, "jmp $flag, %m", "jp $flag, %m");
+	}
+
 	#--------------------------------------------------------------------------
 	# 16-bit load
 	#--------------------------------------------------------------------------
@@ -4484,12 +4495,116 @@ for my $cpu (Opcode->cpus) {
 	$opcodes->add_synth($cpu, "ld hl, sp", "ld hl, 0:%m", "add hl, sp");
 
 	# LD DE, SP
-	$opcodes->add_synth($cpu, "ld de, sp",
-						"ex de, hl", "ld hl, sp", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld de, sp", "ex de, hl", "ld hl, sp", "ex de, hl");
 
 	# LD IXY, SP
 	for my $x ('ix', 'iy') {
 		$opcodes->add_synth($cpu, "ld $x, sp", "ld $x, 0:%m", "add $x, sp");
+	}
+	
+	# LD IXY, rp
+	for my $rp ('bc', 'de', 'hl') {
+		my($h, $l) = split //, $rp;
+		for my $x ('ix', 'iy') {
+			if ($rp ne 'hl') {
+				$opcodes->add_synth($cpu, "ld $x, $rp", 
+									"ld ${x}h, $h", "ld ${x}l, $l");
+			}
+			$opcodes->add_synth($cpu, "ld $x, $rp", 
+								"push $rp", "pop $x");
+		}
+	}
+	
+	# LD rp, IXY
+	for my $rp ('bc', 'de', 'hl') {
+		my($h, $l) = split //, $rp;
+		for my $x ('ix', 'iy') {
+			if ($rp ne 'hl') {
+				$opcodes->add_synth($cpu, "ld $rp, $x", 
+									"ld $h, ${x}h", "ld $l, ${x}l");
+			}
+			$opcodes->add_synth($cpu, "ld $rp, $x", 
+								"push $x", "pop $rp");
+		}
+	}
+	
+	# LD x1, x2
+	for my $x1 ('ix', 'iy') {
+		for my $x2 ('ix', 'iy') {
+			if ($x1 ne $x2) {
+				$opcodes->add_synth($cpu, "ld $x1, $x2", 
+									"push $x2", "pop $x1");
+			}
+		}
+	}
+	
+	#--------------------------------------------------------------------------
+	# DE indirect load
+	#--------------------------------------------------------------------------
+
+	$opcodes->add_synth($cpu, "ld b, (de)", "ex de, hl", "ld b, (hl)", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld c, (de)", "ex de, hl", "ld c, (hl)", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld d, (de)", "ex de, hl", "ld h, (hl)", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld e, (de)", "ex de, hl", "ld l, (hl)", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld h, (de)", "ex de, hl", "ld d, (hl)", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld l, (de)", "ex de, hl", "ld e, (hl)", "ex de, hl");
+	
+	$opcodes->add_synth($cpu, "ld (de), b", "ex de, hl", "ld (hl), b", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld (de), c", "ex de, hl", "ld (hl), c", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld (de), d", "ex de, hl", "ld (hl), h", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld (de), e", "ex de, hl", "ld (hl), l", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld (de), h", "ex de, hl", "ld (hl), d", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld (de), l", "ex de, hl", "ld (hl), e", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld (de), %n", "ex de, hl", "ld (hl), %n", "ex de, hl");
+	
+	#--------------------------------------------------------------------------
+	# Post-increment/decrement
+	#--------------------------------------------------------------------------
+
+	for my $rp ('bc', 'de', 'hl') {
+		for my $r ('b', 'c', 'd', 'e', 'h', 'l') {
+			$opcodes->add_synth($cpu, "ld $r, ($rp+)", "ld $r, ($rp)", "inc $rp");
+			$opcodes->add_synth($cpu, "ldi $r, ($rp)", "ld $r, ($rp)", "inc $rp");
+
+			$opcodes->add_synth($cpu, "ld $r, ($rp-)", "ld $r, ($rp)", "dec $rp");
+			$opcodes->add_synth($cpu, "ldd $r, ($rp)", "ld $r, ($rp)", "dec $rp");
+			
+			if ($rp eq 'hl') {
+				$opcodes->add_synth($cpu, "ld $r, (${rp}i)", "ld $r, ($rp)", "inc $rp");
+				$opcodes->add_synth($cpu, "ld $r, (${rp}d)", "ld $r, ($rp)", "dec $rp");
+			}
+		}
+	}
+
+	for my $rp ('bc', 'de', 'hl') {
+		for my $r ('b', 'c', 'd', 'e', 'h', 'l', '%n') {
+			$opcodes->add_synth($cpu, "ld ($rp+), $r", "ld ($rp), $r", "inc $rp");
+			$opcodes->add_synth($cpu, "ldi ($rp), $r", "ld ($rp), $r", "inc $rp");
+
+			$opcodes->add_synth($cpu, "ld ($rp-), $r", "ld ($rp), $r", "dec $rp");
+			$opcodes->add_synth($cpu, "ldd ($rp), $r", "ld ($rp), $r", "dec $rp");
+
+			if ($rp eq 'hl') {
+				$opcodes->add_synth($cpu, "ld (${rp}i), $r", "ld ($rp), $r", "inc $rp");
+				$opcodes->add_synth($cpu, "ld (${rp}d), $r", "ld ($rp), $r", "dec $rp");
+			}
+		}
+	}
+
+	for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
+		for my $a_ ('a, ', '') {
+			$opcodes->add_synth($cpu, "$alu $a_(hl+)", "$alu $a_(hl)", "inc hl");
+			$opcodes->add_synth($cpu, "$alu $a_(hli)", "$alu $a_(hl)", "inc hl");
+			$opcodes->add_synth($cpu, "$alu $a_(hl-)", "$alu $a_(hl)", "dec hl");
+			$opcodes->add_synth($cpu, "$alu $a_(hld)", "$alu $a_(hl)", "dec hl");
+		}
+	}
+	
+	for my $alu ('inc', 'dec') {
+		$opcodes->add_synth($cpu, "$alu (hl+)", "$alu (hl)", "inc hl");
+		$opcodes->add_synth($cpu, "$alu (hli)", "$alu (hl)", "inc hl");
+		$opcodes->add_synth($cpu, "$alu (hl-)", "$alu (hl)", "dec hl");
+		$opcodes->add_synth($cpu, "$alu (hld)", "$alu (hl)", "dec hl");
 	}
 	
 	#--------------------------------------------------------------------------
@@ -4513,6 +4628,88 @@ for my $cpu (Opcode->cpus) {
 							"ld hl, 0:$var", "add hl, sp", 
 							"ex de, hl");
 	}
+
+	#--------------------------------------------------------------------------
+	# 16-bit indirect load
+	#--------------------------------------------------------------------------
+
+	# LD BC, (HL)
+	$opcodes->add_synth($cpu, "ld bc, (hl)", 
+						"ld c, (hl)", "inc hl", "ld b, (hl)", "dec hl");
+	$opcodes->add_synth($cpu, "ld bc, (de)", 
+						"ex de, hl",
+						"ld c, (hl)", "inc hl", "ld b, (hl)", "dec hl",
+						"ex de, hl");
+						
+	$opcodes->add_synth($cpu, "ld bc, (hl+)", 
+						"ld c, (hl)", "inc hl", "ld b, (hl)", "inc hl");
+	$opcodes->add_synth($cpu, "ld bc, (de+)", 
+						"ex de, hl",
+						"ld c, (hl)", "inc hl", "ld b, (hl)", "inc hl",
+						"ex de, hl");
+						
+	$opcodes->add_synth($cpu, "ldi bc, (hl)", 
+						"ld c, (hl)", "inc hl", "ld b, (hl)", "inc hl");
+	$opcodes->add_synth($cpu, "ldi bc, (de)", 
+						"ex de, hl",
+						"ld c, (hl)", "inc hl", "ld b, (hl)", "inc hl",
+						"ex de, hl");
+
+	# LD (HL), BC
+	$opcodes->add_synth($cpu, "ld (hl), bc", 
+						"ld (hl), c", "inc hl", "ld (hl), b", "dec hl");
+	$opcodes->add_synth($cpu, "ld (de), bc", 
+						"ex de, hl",
+						"ld (hl), c", "inc hl", "ld (hl), b", "dec hl",
+						"ex de, hl");
+						
+	$opcodes->add_synth($cpu, "ld (hl+), bc", 
+						"ld (hl), c", "inc hl", "ld (hl), b", "inc hl");
+	$opcodes->add_synth($cpu, "ld (de+), bc", 
+						"ex de, hl",
+						"ld (hl), c", "inc hl", "ld (hl), b", "inc hl",
+						"ex de, hl");
+
+	$opcodes->add_synth($cpu, "ldi (hl), bc", 
+						"ld (hl), c", "inc hl", "ld (hl), b", "inc hl");
+	$opcodes->add_synth($cpu, "ldi (de), bc", 
+						"ex de, hl",
+						"ld (hl), c", "inc hl", "ld (hl), b", "inc hl",
+						"ex de, hl");
+					
+	# LD HL, (DE)
+	$opcodes->add_synth($cpu, "ld hl, (de)", 
+						"ex de, hl",
+						"ld e, (hl)", "inc hl", "ld d, (hl)", "dec hl",
+						"ex de, hl");
+	$opcodes->add_synth($cpu, "lhlx", "ld hl, (de)");
+	$opcodes->add_synth($cpu, "lhlde", "ld hl, (de)");
+	
+	$opcodes->add_synth($cpu, "ld hl, (de+)", 
+						"ex de, hl",
+						"ld e, (hl)", "inc hl", "ld d, (hl)", "inc hl",
+						"ex de, hl");
+	$opcodes->add_synth($cpu, "ldi hl, (de)", 
+						"ex de, hl",
+						"ld e, (hl)", "inc hl", "ld d, (hl)", "inc hl",
+						"ex de, hl");
+	
+	# LD (DE), HL
+	$opcodes->add_synth($cpu, "ld (de), hl", 
+						"ex de, hl",
+						"ld (hl), e", "inc hl", "ld (hl), d", "dec hl",
+						"ex de, hl");
+	$opcodes->add_synth($cpu, "shlx", "ld (de), hl");
+	$opcodes->add_synth($cpu, "shlde", "ld (de), hl");
+
+	$opcodes->add_synth($cpu, "ld (de+), hl", 
+						"ex de, hl",
+						"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
+						"ex de, hl");
+	$opcodes->add_synth($cpu, "ldi (de), hl", 
+						"ex de, hl",
+						"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
+						"ex de, hl");
 
 	#--------------------------------------------------------------------------
 	# 16-bit ALU
