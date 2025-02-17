@@ -36,16 +36,10 @@ IFNDEF CRT_ENABLE_STDIO
 ENDIF
 
 PUBLIC  fgetc_cons
-EXTERN  fgetc_cons_acia
+EXTERN  fgetc_cons_uarta
 
     defc DEFINED_fgetc_cons = 1
-    defc fgetc_cons = fgetc_cons_acia
-
-PUBLIC  fputc_cons
-EXTERN  fputc_cons_acia
-
-    defc DEFINED_fputc_cons = 1
-    defc fputc_cons = fputc_cons_acia
+    defc fgetc_cons = fgetc_cons_uarta
 
 PUBLIC __CRT_KEY_DEL
 IFDEF CRT_KEY_DEL
@@ -260,43 +254,35 @@ ENDIF
 
     include "../../../../lib/crt/classic/crt_init_heap.inc"
 
-    ; initialise the ACIA
+    ; initialise the uarta
 
-    EXTERN  aciaControl
+    EXTERN  uartaControl
 
-    EXTERN  aciaRxCount
-    EXTERN  aciaRxIn
-    EXTERN  aciaRxOut
+    EXTERN  uartaRxCount
+    EXTERN  uartaRxIn
+    EXTERN  uartaRxOut
 
-    EXTERN  aciaTxCount
-    EXTERN  aciaTxIn
-    EXTERN  aciaTxOut
+    EXTERN  uartaRxBuffer
 
-    EXTERN  aciaRxBuffer
-    EXTERN  aciaTxBuffer
+    ld a,__IO_uarta_CR_RESET     ; Master Reset the uarta
+    out (__IO_uarta_CONTROL_REGISTER),a
 
-    ld a,__IO_ACIA_CR_RESET     ; Master Reset the ACIA
-    out (__IO_ACIA_CONTROL_REGISTER),a
-
-    ld a,__IO_ACIA_CR_REI|__IO_ACIA_CR_TDI_RTS0|__IO_ACIA_CR_8N2|__IO_ACIA_CR_CLK_DIV_64
-                                ; load the default ACIA configuration
+    ld a,__IO_uarta_CR_REI|__IO_uarta_CR_TDI_RTS0|__IO_uarta_CR_8N2|__IO_uarta_CR_CLK_DIV_64
+                                ; load the default uarta configuration
                                 ; 8n2 at 115200 baud
                                 ; receive interrupt on R6.5 enabled
                                 ; transmit interrupt on R6.5 disabled
-    ld (aciaControl),a          ; write the ACIA control byte echo
-    out (__IO_ACIA_CONTROL_REGISTER),a  ; output to the ACIA control
+    ld (uartaControl),a          ; write the uarta control byte echo
+    out (__IO_uarta_CONTROL_REGISTER),a  ; output to the uarta control
 
-    ld hl,aciaRxBuffer          ; load Rx buffer pointer home
-    ld (aciaRxIn),hl
-    ld (aciaRxOut),hl
+    ld hl,uartaRxBuffer          ; load Rx buffer pointer home
+    ld (uartaRxIn),hl
+    ld (uartaRxOut),hl
 
-    ld hl,aciaTxBuffer          ; load Tx buffer pointer home
-    ld (aciaTxIn),hl
-    ld (aciaTxOut),hl
 
     xor a                       ; reset empties the Tx & Rx buffers
-    ld (aciaRxCount),a          ; reset the Rx counter (set 0)
-    ld (aciaTxCount),a          ; reset the Tx counter (set 0)
+    ld (uartaRxCount),a          ; reset the Rx counter (set 0)
+    ld (uartaTxCount),a          ; reset the Tx counter (set 0)
 
     ld a,$1D
     sim                         ; reset R7.5, set MSE and unmask R6.5
@@ -359,9 +345,9 @@ SECTION code_crt_return
 include "../../../../lib/crt/classic/crt_runtime_selection.inc" 
 
 PUBLIC _8085_int65
-EXTERN  acia_interrupt
+EXTERN  uart_interrupt
 
-defc _8085_int65 = acia_interrupt
+defc _8085_int65 = uart_interrupt
 
 include "../crt_jump_vectors_8085.inc"
 

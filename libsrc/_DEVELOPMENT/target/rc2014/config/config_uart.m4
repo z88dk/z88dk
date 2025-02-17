@@ -36,7 +36,7 @@ define(`__IO_UARTB_DLM_REGISTER', 0x`'eval(__IO_UART_PORTB_BASE+01,16))   # Chan
 define(`__IO_UART_IER_ERBI', 0x01)          # Enable Received Data
 define(`__IO_UART_IER_ETBEI', 0x02)         # Enable Transmitter Holding Register Empty
 define(`__IO_UART_IER_ETSI', 0x04)          # Enable Receiver Line Status
-define(`__IO_UART_IER_EDSSI', 0x08)         # Ensable MODEM Status
+define(`__IO_UART_IER_EDSSI', 0x08)         # Enable MODEM Status
 
 # Read Register 2 - Interrupt Identity Register
 
@@ -47,14 +47,25 @@ define(`__IO_UART_IIR_ID_3', 0x08)          # Interrupt ID 3
 define(`__IO_UART_IIR_FIFO_LSB', 0x40)      # FIFO LSB
 define(`__IO_UART_IIR_FIFO_MSB', 0x80)      # FIFO MSB
 
+define(`__IO_UART_IIR_THRE', 0x02)          # Interrupt THR Empty
+define(`__IO_UART_IIR_DATA', 0x04)          # Interrupt Rx Data Available
+define(`__IO_UART_IIR_RLS', 0x06)           # Interrupt Rx Line Status
+define(`__IO_UART_IIR_TIMEOUT', 0x0C)       # Interrupt RX Data Timeout
+define(`__IO_UART_IIR_MASK', 0x0E)          # Interrupt mask
+
 # Write Register 2 - FIFO Control Register
 
-define(`__IO_UART_FCR_FIFO_ENABLE', 0x01)       # FIFO Enabled
+define(`__IO_UART_FCR_FIFO_ENABLE', 0x01)       # FIFO Enabled (Set for Programming)
 define(`__IO_UART_FCR_FIFO_RX_RESET', 0x02)     # Receiver FIFO Reset
 define(`__IO_UART_FCR_FIFO_TX_RESET', 0x04)     # Transmitter FIFO Reset
 define(`__IO_UART_FCR_DMA_MODE_SELECT', 0x08)   # DMA Mode Select
 define(`__IO_UART_FCR_RECEIVER_LSB', 0x40)      # Receiver FIFO Trigger LSB
 define(`__IO_UART_FCR_RECEIVER_MSB', 0x80)      # Receiver FIFO Trigger MSB
+
+define(`__IO_UART_FCR_FIFO_01', 0x00)       # FIFO Trigger 01 Bytes
+define(`__IO_UART_FCR_FIFO_04', 0x40)       # FIFO Trigger 04 Bytes
+define(`__IO_UART_FCR_FIFO_08', 0x80)       # FIFO Trigger 08 Bytes
+define(`__IO_UART_FCR_FIFO_14', 0xC0)       # FIFO Trigger 14 Bytes
 
 # Write Register 3 - Line Control Register
 
@@ -102,10 +113,17 @@ define(`__IO_UART_MSR_DCD', 0x80)
 
 # 16550 UART driver
 
-define(`__IO_UART_RX_SIZE', 0x100)      # Size of the Rx Buffer
-define(`__IO_UART_RX_FULLISH', 0x`'eval(__IO_UART_RX_SIZE-16,16))
+define(`__IO_UART_RX_SIZE', 0x100)      # Size of the Rx Buffer (greater than 0x20)
+define(`__IO_UART_RX_FULLISH', 0x`'eval(__IO_UART_RX_SIZE-32,16))
                                         # Fullness of the Rx Buffer, when NOT_RTS is signalled
-define(`__IO_UART_RX_EMPTYISH', 0x08)   # Fullness of the Rx Buffer, when RTS is signalled
+define(`__IO_UART_RX_EMPTYISH', 0x10)   # Fullness of the Rx Buffer, when RTS is signalled
+
+define(`__IO_UART_DLL_115200', 0x01)    # Divisor Latch LSB for 115,200 baud
+define(`__IO_UART_DLL_57600', 0x02)     # Divisor Latch LSB for 57,600 baud
+define(`__IO_UART_DLL_38400', 0x03)     # Divisor Latch LSB for 38,400 baud
+define(`__IO_UART_DLL_19200', 0x06)     # Divisor Latch LSB for 19,200 baud
+define(`__IO_UART_DLL_9600', 0x0C)      # Divisor Latch LSB for 9,600 baud
+define(`__IO_UART_DLL_2400', 0x30)      # Divisor Latch LSB for 2,400 baud
 
 #
 # END OF USER CONFIGURATION
@@ -157,12 +175,23 @@ PUBLIC `__IO_UART_IIR_ID_3'
 PUBLIC `__IO_UART_IIR_FIFO_LSB'
 PUBLIC `__IO_UART_IIR_FIFO_MSB'
 
+PUBLIC `__IO_UART_IIR_THRE'
+PUBLIC `__IO_UART_IIR_DATA'
+PUBLIC `__IO_UART_IIR_RLS'
+PUBLIC `__IO_UART_IIR_TIMEOUT'
+PUBLIC `__IO_UART_IIR_MASK'
+
 PUBLIC `__IO_UART_FCR_FIFO_ENABLE'
 PUBLIC `__IO_UART_FCR_FIFO_RX_RESET'
 PUBLIC `__IO_UART_FCR_FIFO_TX_RESET'
 PUBLIC `__IO_UART_FCR_DMA_MODE_SELECT'
 PUBLIC `__IO_UART_FCR_RECEIVER_LSB'
 PUBLIC `__IO_UART_FCR_RECEIVER_MSB'
+
+PUBLIC `__IO_UART_FCR_FIFO_01'
+PUBLIC `__IO_UART_FCR_FIFO_04'
+PUBLIC `__IO_UART_FCR_FIFO_08'
+PUBLIC `__IO_UART_FCR_FIFO_14'
 
 PUBLIC `__IO_UART_LCR_5BIT'
 PUBLIC `__IO_UART_LCR_6BIT'
@@ -203,6 +232,13 @@ PUBLIC `__IO_UART_MSR_DCD'
 PUBLIC `__IO_UART_RX_SIZE'
 PUBLIC `__IO_UART_RX_FULLISH'
 PUBLIC `__IO_UART_RX_EMPTYISH'
+
+PUBLIC `__IO_UART_DLL_115200'
+PUBLIC `__IO_UART_DLL_57600'
+PUBLIC `__IO_UART_DLL_38400'
+PUBLIC `__IO_UART_DLL_19200'
+PUBLIC `__IO_UART_DLL_9600'
+PUBLIC `__IO_UART_DLL_2400'
 ')
 
 dnl#
@@ -249,6 +285,12 @@ defc `__IO_UART_IIR_ID_3'           = __IO_UART_IIR_ID_3
 defc `__IO_UART_IIR_FIFO_LSB'       = __IO_UART_IIR_FIFO_LSB
 defc `__IO_UART_IIR_FIFO_MSB'       = __IO_UART_IIR_FIFO_MSB
 
+defc `__IO_UART_IIR_THRE'           = __IO_UART_IIR_THRE
+defc `__IO_UART_IIR_DATA'           = __IO_UART_IIR_DATA
+defc `__IO_UART_IIR_RLS'            = __IO_UART_IIR_RLS
+defc `__IO_UART_IIR_TIMEOUT'        = __IO_UART_IIR_TIMEOUT
+defc `__IO_UART_IIR_MASK'           = __IO_UART_IIR_MASK
+
 defc `__IO_UART_FCR_FIFO_ENABLE'        = __IO_UART_FCR_FIFO_ENABLE
 defc `__IO_UART_FCR_FIFO_RX_RESET'      = __IO_UART_FCR_FIFO_RX_RESET
 defc `__IO_UART_FCR_FIFO_TX_RESET'      = __IO_UART_FCR_FIFO_TX_RESET
@@ -256,11 +298,17 @@ defc `__IO_UART_FCR_DMA_MODE_SELECT'    = __IO_UART_FCR_DMA_MODE_SELECT
 defc `__IO_UART_FCR_RECEIVER_LSB'       = __IO_UART_FCR_RECEIVER_LSB
 defc `__IO_UART_FCR_RECEIVER_MSB'       = __IO_UART_FCR_RECEIVER_MSB
 
+defc `__IO_UART_FCR_FIFO_01'        = __IO_UART_FCR_FIFO_01
+defc `__IO_UART_FCR_FIFO_04'        = __IO_UART_FCR_FIFO_04
+defc `__IO_UART_FCR_FIFO_08'        = __IO_UART_FCR_FIFO_08
+defc `__IO_UART_FCR_FIFO_14'        = __IO_UART_FCR_FIFO_14
+
 defc `__IO_UART_LCR_5BIT'      = __IO_UART_LCR_5BIT
 defc `__IO_UART_LCR_6BIT'      = __IO_UART_LCR_6BIT
 defc `__IO_UART_LCR_7BIT'      = __IO_UART_LCR_7BIT
 defc `__IO_UART_LCR_8BIT'      = __IO_UART_LCR_8BIT
 defc `__IO_UART_LCR_STOP'      = __IO_UART_LCR_STOP
+
 defc `__IO_UART_LCR_PARITY_ENABLE'      = __IO_UART_LCR_PARITY_ENABLE
 defc `__IO_UART_LCR_PARITY_EVEN'        = __IO_UART_LCR_PARITY_EVEN
 defc `__IO_UART_LCR_PARITY_STICK'       = __IO_UART_LCR_PARITY_STICK
@@ -295,6 +343,13 @@ defc `__IO_UART_MSR_DCD'            = __IO_UART_MSR_DCD
 defc `__IO_UART_RX_SIZE'        = __IO_UART_RX_SIZE
 defc `__IO_UART_RX_FULLISH'     = __IO_UART_RX_FULLISH
 defc `__IO_UART_RX_EMPTYISH'    = __IO_UART_RX_EMPTYISH
+
+defc `__IO_UART_DLL_115200'     = __IO_UART_DLL_115200
+defc `__IO_UART_DLL_57600'      = __IO_UART_DLL_57600
+defc `__IO_UART_DLL_38400'      = __IO_UART_DLL_38400
+defc `__IO_UART_DLL_19200'      = __IO_UART_DLL_19200
+defc `__IO_UART_DLL_9600'       = __IO_UART_DLL_9600
+defc `__IO_UART_DLL_2400'       = __IO_UART_DLL_2400
 ')
 
 dnl#
@@ -341,12 +396,23 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_UART_IIR_FIFO_LSB'      __IO_UART_IIR_FIFO_LSB
 `#define' `__IO_UART_IIR_FIFO_MSB'      __IO_UART_IIR_FIFO_MSB
 
+`#define' `__IO_UART_IIR_THRE'          __IO_UART_IIR_THRE
+`#define' `__IO_UART_IIR_DATA'          __IO_UART_IIR_DATA
+`#define' `__IO_UART_IIR_RLS'           __IO_UART_IIR_RLS
+`#define' `__IO_UART_IIR_TIMEOUT'       __IO_UART_IIR_TIMEOUT
+`#define' `__IO_UART_IIR_MASK'          __IO_UART_IIR_MASK
+
 `#define' `__IO_UART_FCR_FIFO_ENABLE'       __IO_UART_FCR_FIFO_ENABLE
 `#define' `__IO_UART_FCR_FIFO_RX_RESET'     __IO_UART_FCR_FIFO_RX_RESET
 `#define' `__IO_UART_FCR_FIFO_TX_RESET'     __IO_UART_FCR_FIFO_TX_RESET
 `#define' `__IO_UART_FCR_DMA_MODE_SELECT'   __IO_UART_FCR_DMA_MODE_SELECT
 `#define' `__IO_UART_FCR_RECEIVER_LSB'      __IO_UART_FCR_RECEIVER_LSB
 `#define' `__IO_UART_FCR_RECEIVER_MSB'      __IO_UART_FCR_RECEIVER_MSB
+
+`#define' `__IO_UART_FCR_FIFO_01'      __IO_UART_FCR_FIFO_01
+`#define' `__IO_UART_FCR_FIFO_04'      __IO_UART_FCR_FIFO_04
+`#define' `__IO_UART_FCR_FIFO_08'      __IO_UART_FCR_FIFO_08
+`#define' `__IO_UART_FCR_FIFO_14'      __IO_UART_FCR_FIFO_14
 
 `#define' `__IO_UART_LCR_5BIT'      __IO_UART_LCR_5BIT
 `#define' `__IO_UART_LCR_6BIT'      __IO_UART_LCR_6BIT
@@ -388,4 +454,11 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_UART_RX_SIZE'        __IO_UART_RX_SIZE
 `#define' `__IO_UART_RX_FULLISH'     __IO_UART_RX_FULLISH
 `#define' `__IO_UART_RX_EMPTYISH'    __IO_UART_RX_EMPTYISH
+
+`#define' `__IO_UART_DLL_115200'     __IO_UART_DLL_115200
+`#define' `__IO_UART_DLL_57600'      __IO_UART_DLL_57600
+`#define' `__IO_UART_DLL_38400'      __IO_UART_DLL_38400
+`#define' `__IO_UART_DLL_19200'      __IO_UART_DLL_19200
+`#define' `__IO_UART_DLL_9600'       __IO_UART_DLL_9600
+`#define' `__IO_UART_DLL_2400'       __IO_UART_DLL_2400
 ')

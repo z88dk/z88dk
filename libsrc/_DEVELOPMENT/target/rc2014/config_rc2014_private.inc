@@ -660,6 +660,12 @@ defc __IO_UART_IIR_ID_3           = 0x08
 defc __IO_UART_IIR_FIFO_LSB       = 0x40
 defc __IO_UART_IIR_FIFO_MSB       = 0x80
 
+defc __IO_UART_IIR_THRE           = 0x02
+defc __IO_UART_IIR_DATA           = 0x04
+defc __IO_UART_IIR_RLS            = 0x06
+defc __IO_UART_IIR_TIMEOUT        = 0x0C
+defc __IO_UART_IIR_MASK           = 0x0E
+
 defc __IO_UART_FCR_FIFO_ENABLE        = 0x01
 defc __IO_UART_FCR_FIFO_RX_RESET      = 0x02
 defc __IO_UART_FCR_FIFO_TX_RESET      = 0x04
@@ -667,11 +673,17 @@ defc __IO_UART_FCR_DMA_MODE_SELECT    = 0x08
 defc __IO_UART_FCR_RECEIVER_LSB       = 0x40
 defc __IO_UART_FCR_RECEIVER_MSB       = 0x80
 
+defc __IO_UART_FCR_FIFO_01        = 0x00
+defc __IO_UART_FCR_FIFO_04        = 0x40
+defc __IO_UART_FCR_FIFO_08        = 0x80
+defc __IO_UART_FCR_FIFO_14        = 0xC0
+
 defc __IO_UART_LCR_5BIT      = 0x00
 defc __IO_UART_LCR_6BIT      = 0x01
 defc __IO_UART_LCR_7BIT      = 0x02
 defc __IO_UART_LCR_8BIT      = 0x03
 defc __IO_UART_LCR_STOP      = 0x04
+
 defc __IO_UART_LCR_PARITY_ENABLE      = 0x08
 defc __IO_UART_LCR_PARITY_EVEN        = 0x10
 defc __IO_UART_LCR_PARITY_STICK       = 0x20
@@ -704,8 +716,15 @@ defc __IO_UART_MSR_RING_INDICATOR = 0x40
 defc __IO_UART_MSR_DCD            = 0x80
 
 defc __IO_UART_RX_SIZE        = 0x100
-defc __IO_UART_RX_FULLISH     = 0xf0
-defc __IO_UART_RX_EMPTYISH    = 0x08
+defc __IO_UART_RX_FULLISH     = 0xe0
+defc __IO_UART_RX_EMPTYISH    = 0x10
+
+defc __IO_UART_DLL_115200     = 0x01
+defc __IO_UART_DLL_57600      = 0x02
+defc __IO_UART_DLL_38400      = 0x03
+defc __IO_UART_DLL_19200      = 0x06
+defc __IO_UART_DLL_9600       = 0x0C
+defc __IO_UART_DLL_2400       = 0x30
 
 
 

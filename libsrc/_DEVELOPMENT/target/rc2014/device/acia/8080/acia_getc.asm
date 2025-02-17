@@ -11,7 +11,6 @@ SECTION code_driver_character_input
 PUBLIC _acia_getc
 
 EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer, aciaControl
-EXTERN asm_z80_push_di, asm_z80_pop_ei
 
 ._acia_getc
     ; exit     : l = char received

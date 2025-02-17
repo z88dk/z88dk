@@ -658,12 +658,23 @@
 #define __IO_UART_IIR_FIFO_LSB      0x40
 #define __IO_UART_IIR_FIFO_MSB      0x80
 
+#define __IO_UART_IIR_THRE          0x02
+#define __IO_UART_IIR_DATA          0x04
+#define __IO_UART_IIR_RLS           0x06
+#define __IO_UART_IIR_TIMEOUT       0x0C
+#define __IO_UART_IIR_MASK          0x0E
+
 #define __IO_UART_FCR_FIFO_ENABLE       0x01
 #define __IO_UART_FCR_FIFO_RX_RESET     0x02
 #define __IO_UART_FCR_FIFO_TX_RESET     0x04
 #define __IO_UART_FCR_DMA_MODE_SELECT   0x08
 #define __IO_UART_FCR_RECEIVER_LSB      0x40
 #define __IO_UART_FCR_RECEIVER_MSB      0x80
+
+#define __IO_UART_FCR_FIFO_01      0x00
+#define __IO_UART_FCR_FIFO_04      0x40
+#define __IO_UART_FCR_FIFO_08      0x80
+#define __IO_UART_FCR_FIFO_14      0xC0
 
 #define __IO_UART_LCR_5BIT      0x00
 #define __IO_UART_LCR_6BIT      0x01
@@ -703,8 +714,15 @@
 #define __IO_UART_MSR_DCD               0x80
 
 #define __IO_UART_RX_SIZE        0x100
-#define __IO_UART_RX_FULLISH     0xf0
-#define __IO_UART_RX_EMPTYISH    0x08
+#define __IO_UART_RX_FULLISH     0xe0
+#define __IO_UART_RX_EMPTYISH    0x10
+
+#define __IO_UART_DLL_115200     0x01
+#define __IO_UART_DLL_57600      0x02
+#define __IO_UART_DLL_38400      0x03
+#define __IO_UART_DLL_19200      0x06
+#define __IO_UART_DLL_9600       0x0C
+#define __IO_UART_DLL_2400       0x30
 
 
 
