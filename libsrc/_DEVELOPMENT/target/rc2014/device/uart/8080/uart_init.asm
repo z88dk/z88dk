@@ -55,14 +55,10 @@ PUBLIC _uart_init
     ; enable the receive interrupt (only)   XXX To do handle line errors
     ld a,__IO_UART_IER_ERBI
     out (__IO_UARTA_IER_REGISTER),a
- 
+
     ; set the control flag, to signal that this channel exists
     ld a,__IO_UARTA_DATA_REGISTER
     ld (uartaControl),a
-
-    ld a,0x10
-    out (__IO_UARTA_SCRATCH_REGISTER),a
-    out (0),a
 
     ; now do UART B
 
@@ -108,15 +104,10 @@ PUBLIC _uart_init
     ; enable the receive interrupt (only)   XXX To do handle line errors
     ld a,__IO_UART_IER_ERBI
     out (__IO_UARTB_IER_REGISTER),a
-    
+
     ; set the control flag, to signal that this channel exists
     ld a,__IO_UARTB_DATA_REGISTER
     ld (uartbControl),a
-
-    in a,(__IO_UARTA_SCRATCH_REGISTER)
-    xor a,0x20
-    out (__IO_UARTA_SCRATCH_REGISTER),a
-    out (0),a
 
     ret
 

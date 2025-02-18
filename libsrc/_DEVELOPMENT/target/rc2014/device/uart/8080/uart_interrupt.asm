@@ -19,11 +19,6 @@ EXTERN uartbControl
     push af
     push hl
 
-    in a,(__IO_UARTA_SCRATCH_REGISTER)
-    or a,0x08
-    out (__IO_UARTA_SCRATCH_REGISTER),a
-    out (0),a
-
 .uarta
     ; check the UART A channel exists
     ld a,(uartaControl)         ; load the control flag
@@ -33,11 +28,6 @@ EXTERN uartbControl
     in a,(__IO_UARTA_IIR_REGISTER)  ; get the status of the UART A
     rrca                        ; check whether an interrupt was generated
     jp C,uartb                  ; if not, go check UART B
-
-    in a,(__IO_UARTA_SCRATCH_REGISTER)
-    xor a,0x01
-    out (__IO_UARTA_SCRATCH_REGISTER),a
-    out (0),a
 
 .rxa_get
     ; read the IIR to access the relevant interrupts
@@ -94,11 +84,6 @@ ENDIF
     in a,(__IO_UARTB_IIR_REGISTER)  ; get the status of the UART B
     rrca                        ; check whether an interrupt was generated
     jp C,end                    ; if not, exit interrupt
-
-    in a,(__IO_UARTA_SCRATCH_REGISTER)
-    xor a,0x02
-    out (__IO_UARTA_SCRATCH_REGISTER),a
-    out (0),a
 
 .rxb_get
     ; read the IIR to access the relevant interrupts
