@@ -6,10 +6,17 @@
 
     PUBLIC  fputc_cons_uarta
 
+EXTERN uartaControl
+
 .fputc_cons_uarta
     ; enter    : (sp+2) = char to output
     ;
     ; modifies : af, de, hl
+
+    ; check the UART A channel exists
+    ld a,(uartaControl)         ; load the control flag
+    or a                        ; check it is non-zero
+    ret Z                       ; return if it doesn't exist
 
     ; check space is available in the Tx FIFO
     in a,(__IO_UARTA_LSR_REGISTER)      ; read the line status register

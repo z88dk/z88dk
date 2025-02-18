@@ -19,6 +19,11 @@ EXTERN uartbControl
     push af
     push hl
 
+    in a,(__IO_UARTA_SCRATCH_REGISTER)
+    or a,0x08
+    out (__IO_UARTA_SCRATCH_REGISTER),a
+    out (0),a
+
 .uarta
     ; check the UART A channel exists
     ld a,(uartaControl)         ; load the control flag
@@ -27,10 +32,15 @@ EXTERN uartbControl
 
     in a,(__IO_UARTA_IIR_REGISTER)  ; get the status of the UART A
     rrca                        ; check whether an interrupt was generated
-    jr C,uartb                  ; if not, go check UART B
+    jp C,uartb                  ; if not, go check UART B
+
+    in a,(__IO_UARTA_SCRATCH_REGISTER)
+    xor a,0x01
+    out (__IO_UARTA_SCRATCH_REGISTER),a
+    out (0),a
 
 .rxa_get
-    ; mask the IIR to access the relevant interrupts
+    ; read the IIR to access the relevant interrupts
     in a,(__IO_UARTA_IIR_REGISTER)  ; get the status of the UART A
     and __IO_UART_IIR_DATA      ; Rx data is available
                                 ; XXX To do handle line errors
@@ -41,7 +51,7 @@ EXTERN uartbControl
 
     ld a,(uartaRxCount)         ; Get the number of bytes in the Rx buffer
     cp __IO_UART_RX_SIZE-1      ; check whether there is space in the buffer
-    jr NC,rxa_dtr               ; buffer full, check DTR
+    jp NC,rxa_dtr               ; buffer full, check DTR
 
     ld a,l                      ; get Rx byte from l
     ld hl,(uartaRxIn)           ; get the pointer to where we poke
@@ -71,8 +81,9 @@ ENDIF
 .rxa_check
     in a,(__IO_UARTA_IIR_REGISTER)  ; get the status of the UART A
     rrca                        ; check whether an interrupt remains
-    jr C,rxa_get                ; another byte received, go get it
+    jp NC,rxa_get               ; another byte received, go get it
 
+    ; now do the same with the UART B channel, because the interrupt is shared
 
 .uartb
     ; check the UART B channel exists
@@ -84,8 +95,13 @@ ENDIF
     rrca                        ; check whether an interrupt was generated
     jp C,end                    ; if not, exit interrupt
 
+    in a,(__IO_UARTA_SCRATCH_REGISTER)
+    xor a,0x02
+    out (__IO_UARTA_SCRATCH_REGISTER),a
+    out (0),a
+
 .rxb_get
-    ; mask the IIR to access the relevant interrupts
+    ; read the IIR to access the relevant interrupts
     in a,(__IO_UARTB_IIR_REGISTER)  ; get the status of the UART B
     and __IO_UART_IIR_DATA      ; Rx data is available
                                 ; XXX To do handle line errors
@@ -96,7 +112,7 @@ ENDIF
 
     ld a,(uartbRxCount)         ; Get the number of bytes in the Rx buffer
     cp __IO_UART_RX_SIZE-1      ; check whether there is space in the buffer
-    jr NC,rxb_dtr               ; buffer full, check DTR
+    jp NC,rxb_dtr               ; buffer full, check DTR
 
     ld a,l                      ; get Rx byte from l
     ld hl,(uartbRxIn)           ; get the pointer to where we poke
@@ -126,7 +142,7 @@ ENDIF
 .rxb_check
     in a,(__IO_UARTB_IIR_REGISTER)  ; get the status of the UART B
     rrca                        ; check whether an interrupt remains
-    jr C,rxb_get                ; another byte received, go get it
+    jp NC,rxb_get               ; another byte received, go get it
 
 .end
     pop hl

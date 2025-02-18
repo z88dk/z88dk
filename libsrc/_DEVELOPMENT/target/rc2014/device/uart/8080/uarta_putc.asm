@@ -10,11 +10,18 @@ SECTION code_driver_character_output
 
 PUBLIC _uarta_putc
 
+EXTERN uartaControl
+
 ._uarta_putc
     ; enter    : l = char to output
     ; exit     : l = 1 if Tx buffer is full
     ;            carry reset
     ; modifies : af, hl
+
+    ; check the UART A channel exists
+    ld a,(uartaControl)         ; load the control flag
+    or a                        ; check it is non-zero
+    ret Z                       ; return if it doesn't exist
 
     ; check space is available in the Tx FIFO
     in a,(__IO_UARTA_LSR_REGISTER)      ; read the line status register

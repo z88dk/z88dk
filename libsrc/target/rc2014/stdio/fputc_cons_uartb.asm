@@ -6,10 +6,17 @@
 
     PUBLIC  fputc_cons_uartb
 
+EXTERN uartbControl
+
 .fputc_cons_uartb
     ; enter    : (sp+2) = char to output
     ;
     ; modifies : af, de, hl
+
+    ; check the UART B channel exists
+    ld a,(uartbControl)         ; load the control flag
+    or a                        ; check it is non-zero
+    ret Z                       ; return if it doesn't exist
 
     ; check space is available in the Tx FIFO
     in a,(__IO_UARTB_LSR_REGISTER)      ; read the line status register
