@@ -23,7 +23,7 @@ PUBLIC _uarta_flush_Tx
 ._uarta_flush_Tx
 
     ; enable and reset the Tx FIFO
-    ld a,__IO_UART_FCR_FIFO_14|__IO_UART_FCR_FIFO_TX_RESET|__IO_UART_FCR_FIFO_ENABLE
+    ld a,__IO_UART_FCR_FIFO_04|__IO_UART_FCR_FIFO_TX_RESET|__IO_UART_FCR_FIFO_ENABLE
     out (__IO_UARTA_FCR_REGISTER),a
 
     ret
