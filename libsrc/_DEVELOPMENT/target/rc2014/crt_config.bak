@@ -175,15 +175,15 @@ IF __CRTCFG = 3
 
    defc TAR__crt_model                 = 3
 
-   defc TAR__register_sp               = 0xFFF0
+   defc TAR__register_sp               = 0
    defc TAR__crt_stack_size            = 256
 
    defc TAR__crt_initialize_bss        = 1
 
    defc TAR__crt_include_preamble      = 0
 
-   defc TAR__crt_org_vector_table      = 0xFFF0
-   defc TAR__crt_interrupt_mode        = 2
+   defc TAR__crt_org_vector_table      = 0
+   defc TAR__crt_interrupt_mode        = 1
    defc TAR__crt_interrupt_mode_exit   = -1
 
    defc TAR__crt_enable_commandline    = 0
@@ -194,7 +194,7 @@ IF __CRTCFG = 3
    defc TAR__crt_enable_eidi           = 0x12
    defc TAR__crt_on_exit               = 0x10001
 
-   defc TAR__crt_enable_rst            = 0
+   defc TAR__crt_enable_rst            = 0x80
    defc TAR__crt_enable_nmi            = 0
 
    ; clib defaults
@@ -222,18 +222,16 @@ IF __CRTCFG = 4
    defc TAR__crt_org_data              = 0x8000
    defc TAR__crt_org_bss               = -1
 
-   defc TAR__crt_model                 = 3
+   defc TAR__crt_model                 = 1
 
-   defc TAR__register_sp               = 0xFFF0
+   defc TAR__register_sp               = 0
    defc TAR__crt_stack_size            = 256
 
    defc TAR__crt_initialize_bss        = 1
 
    defc TAR__crt_include_preamble      = 0
 
-   defc TAR__crt_org_vector_table      = 0xFFF0
-   defc TAR__crt_interrupt_mode        = 2
-   defc TAR__crt_interrupt_mode_exit   = -1
+   defc TAR__crt_org_vector_table      = 0
 
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_commandline_ex = 0
@@ -244,7 +242,12 @@ IF __CRTCFG = 4
    defc TAR__crt_on_exit               = 0x10001
 
    defc TAR__crt_enable_rst            = 0
-   defc TAR__crt_enable_nmi            = 0
+   defc TAR__crt_enable_rst40h         = 0
+
+   defc TAR__crt_enable_trap           = 0
+   defc TAR__crt_enable_int55          = 0
+   defc TAR__crt_enable_int65          = 1
+   defc TAR__crt_enable_int75          = 0
 
    ; clib defaults
 
