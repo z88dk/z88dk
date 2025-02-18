@@ -5,6 +5,7 @@ SECTION code_driver_character_input
 PUBLIC _acia_flush_Rx_di
 PUBLIC _acia_flush_Rx
 
+EXTERN asm_cpu_push_di, asm_cpu_pop_ei
 EXTERN aciaRxCount, aciaRxBuffer, aciaRxIn, aciaRxOut
 
 ._acia_flush_Rx_di
@@ -12,11 +13,11 @@ EXTERN aciaRxCount, aciaRxBuffer, aciaRxIn, aciaRxOut
     push af
     push hl
 
-    di          ; di
+    call asm_cpu_push_di        ; di
 
     call _acia_flush_Rx
 
-    ei          ; ei
+    call asm_cpu_pop_ei         ; ei
 
     pop hl
     pop af

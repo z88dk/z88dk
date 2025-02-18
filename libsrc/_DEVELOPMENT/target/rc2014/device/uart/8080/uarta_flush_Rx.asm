@@ -11,6 +11,7 @@ SECTION code_driver_character_input
 PUBLIC _uarta_flush_Rx_di
 PUBLIC _uarta_flush_Rx
 
+EXTERN asm_cpu_push_di, asm_cpu_pop_ei
 EXTERN uartaRxCount, uartaRxBuffer, uartaRxIn, uartaRxOut
 
 ._uarta_flush_Rx_di
@@ -18,11 +19,11 @@ EXTERN uartaRxCount, uartaRxBuffer, uartaRxIn, uartaRxOut
     push af
     push hl
 
-    di          ; di
+    call asm_cpu_push_di        ; di
 
     call _uarta_flush_Rx
 
-    ei          ; ei
+    call asm_cpu_pop_ei         ; ei
 
     pop hl
     pop af
@@ -32,7 +33,8 @@ EXTERN uartaRxCount, uartaRxBuffer, uartaRxIn, uartaRxOut
 ._uarta_flush_Rx
 
     ; enable and reset the Rx FIFO
-    ld a,__IO_UART_FCR_FIFO_14|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
+    in a,(__IO_UARTA_FCR_REGISTER)
+    or a,__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
     out (__IO_UARTA_FCR_REGISTER),a
 
     xor a
