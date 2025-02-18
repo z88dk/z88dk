@@ -89,14 +89,6 @@
  adi 0                          ; C6 00
  adi 127                        ; C6 7F
  adi 255                        ; C6 FF
- adi hl, -128                   ; E5 11 80 00 19 E5 D5 E1 D1 E1
- adi hl, 0                      ; E5 11 00 00 19 E5 D5 E1 D1 E1
- adi hl, 127                    ; E5 11 7F 00 19 E5 D5 E1 D1 E1
- adi hl, 255                    ; E5 11 FF 00 19 E5 D5 E1 D1 E1
- adi sp, -128                   ; E5 D5 E1 D1 21 80 00 39 E5 D5 E1 D1
- adi sp, 0                      ; E5 D5 E1 D1 21 00 00 39 E5 D5 E1 D1
- adi sp, 127                    ; E5 D5 E1 D1 21 7F 00 39 E5 D5 E1 D1
- adi sp, 255                    ; E5 D5 E1 D1 21 FF 00 39 E5 D5 E1 D1
  ana a                          ; A7
  ana b                          ; A0
  ana c                          ; A1
@@ -208,7 +200,7 @@
  bit 7, e                       ; CB 7B
  bit 7, h                       ; CB 7C
  bit 7, l                       ; CB 7D
- bool hl                        ; F5 7C B5 CA DC 01 21 01 00 F1
+ bool hl                        ; F5 7C B5 CA 84 01 21 01 00 F1
  call (hl)                      ; CD @__z80asm__call_hl
  call 0x1234                    ; CD 34 12
  call c, 0x1234                 ; DC 34 12
@@ -396,14 +388,14 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 32 03 D2 34 12
+ jgtu 0x1234                    ; CA DA 02 D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jmp 0x1234                     ; C3 34 12
  jmp c, 0x1234                  ; DA 34 12
  jmp eq, 0x1234                 ; CA 34 12
  jmp geu, 0x1234                ; D2 34 12
- jmp gtu, 0x1234                ; CA 4D 03 D2 34 12
+ jmp gtu, 0x1234                ; CA F5 02 D2 34 12
  jmp leu, 0x1234                ; CA 34 12 DA 34 12
  jmp ltu, 0x1234                ; DA 34 12
  jmp nc, 0x1234                 ; D2 34 12
@@ -420,7 +412,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA 82 03 D2 34 12
+ jp gtu, 0x1234                 ; CA 2A 03 D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp nc, 0x1234                  ; D2 34 12
@@ -591,6 +583,7 @@
  ld b, e                        ; 43
  ld b, h                        ; 44
  ld b, l                        ; 45
+ ld bc, (0x1234)                ; E5 D5 21 34 12 5E 23 56 62 6B D1 44 4D E1
  ld bc, (de)                    ; E5 D5 E1 D1 4E 23 46 2B E5 D5 E1 D1
  ld bc, (de+)                   ; E5 D5 E1 D1 4E 23 46 23 E5 D5 E1 D1
  ld bc, (hl)                    ; 4E 23 46 2B
@@ -636,6 +629,7 @@
  ld d, e                        ; 53
  ld d, h                        ; 54
  ld d, l                        ; 55
+ ld de, (0x1234)                ; E5 D5 E1 D1 D5 21 34 12 5E 23 56 62 6B D1 E5 D5 E1 D1
  ld de, (hl)                    ; 5E 23 56 2B
  ld de, (hl+)                   ; 5E 23 56 23
  ld de, 0x1234                  ; 11 34 12
@@ -770,10 +764,6 @@
  ldh a, (127)                   ; F0 7F
  ldh a, (255)                   ; F0 FF
  ldh a, (c)                     ; F2
- ldhi -128                      ; E5 11 80 00 19 E5 D5 E1 D1 E1
- ldhi 0                         ; E5 11 00 00 19 E5 D5 E1 D1 E1
- ldhi 127                       ; E5 11 7F 00 19 E5 D5 E1 D1 E1
- ldhi 255                       ; E5 11 FF 00 19 E5 D5 E1 D1 E1
  ldhl sp, -128                  ; F8 80
  ldhl sp, 0                     ; F8 00
  ldhl sp, 126                   ; F8 7E
@@ -827,10 +817,6 @@
  ldi l, (de)                    ; E5 D5 E1 D1 5E E5 D5 E1 D1 13
  ldi l, (hl)                    ; 6E 23
  ldir                           ; CD @__z80asm__ldir
- ldsi -128                      ; E5 D5 E1 D1 21 80 00 39 E5 D5 E1 D1
- ldsi 0                         ; E5 D5 E1 D1 21 00 00 39 E5 D5 E1 D1
- ldsi 127                       ; E5 D5 E1 D1 21 7F 00 39 E5 D5 E1 D1
- ldsi 255                       ; E5 D5 E1 D1 21 FF 00 39 E5 D5 E1 D1
  lhld 0x1234                    ; D5 21 34 12 5E 23 56 62 6B D1
  lhlde                          ; E5 D5 E1 D1 5E 23 56 2B E5 D5 E1 D1
  lhlx                           ; E5 D5 E1 D1 5E 23 56 2B E5 D5 E1 D1

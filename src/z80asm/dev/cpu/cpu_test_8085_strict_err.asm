@@ -5454,6 +5454,8 @@
  div hl, a                      ; Error
  divs dehl, bc                  ; Error
  divs hl, a                     ; Error
+ djnz 0x1234                    ; Error
+ djnz b, 0x1234                 ; Error
  dsub                           ; Error
  dwjnz ASMPC                    ; Error
  dwjnz bc', ASMPC               ; Error

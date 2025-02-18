@@ -206,7 +206,10 @@ sub add_synth {
 	for my $subasm (@subasm) {
 		# replace 0:%n/0:$u by %m
 		my $extend;
-		if ($subasm =~ s/0:(%[num])/%m/) {
+		if ($subasm =~ s/0:(%n)/%n/) {
+			$extend = $1;
+		}
+		elsif ($subasm =~ s/0:(%[msu])/%m/) {
 			$extend = $1;
 		}
 		
@@ -230,11 +233,11 @@ sub add_synth {
 			# replace %m by %n/$u,0[,0]
 			if ($extend) {
 				my $i = 0;
-				while ($i < @bytes && $bytes[$i] ne '%m') {
+				while ($i < @bytes && $bytes[$i] !~ /%[nm]/) {
 					$i++;
 				}
 				$i < @bytes or die;
-				if ($extend eq '%m') {
+				if ($extend =~ /%[nm]/) {
 					$bytes[$i++] = 0;
 				}
 				else {

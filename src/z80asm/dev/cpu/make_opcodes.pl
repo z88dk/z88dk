@@ -4332,6 +4332,8 @@ for my $cpu (Opcode->cpus) {
 		for my $flag ('nz', 'z', 'nc', 'c') {
 			$opcodes->add_synth($cpu, "jr $flag, %j", "jp $flag, %m");
 		}
+		$opcodes->add_synth($cpu, "djnz %j", "dec b", "jp nz, %m");
+		$opcodes->add_synth($cpu, "djnz b, %j", "dec b", "jp nz, %m");
 	}
 	
 	# ez80 suffixes
@@ -4477,6 +4479,16 @@ for my $cpu (Opcode->cpus) {
 		$opcodes->add_synth($cpu, "jmp $flag, %m", "jp $flag, %m");
 	}
 
+	# CALL (HL|IXY)
+	for my $rp ('hl') {
+		$opcodes->add_emul($cpu, "call ($rp)", "__z80asm__call_$rp");
+	}
+	if ($opcodes->exists("ld ix, %m", $cpu)) {
+		for my $rp ('ix', 'iy') {
+			$opcodes->add_emul($cpu, "call ($rp)", "__z80asm__call_$rp");
+		}
+	}
+	
 	#--------------------------------------------------------------------------
 	# 16-bit load
 	#--------------------------------------------------------------------------
@@ -4562,7 +4574,7 @@ for my $cpu (Opcode->cpus) {
 	#--------------------------------------------------------------------------
 
 	for my $rp ('bc', 'de', 'hl') {
-		for my $r ('b', 'c', 'd', 'e', 'h', 'l') {
+		for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
 			$opcodes->add_synth($cpu, "ld $r, ($rp+)", "ld $r, ($rp)", "inc $rp");
 			$opcodes->add_synth($cpu, "ldi $r, ($rp)", "ld $r, ($rp)", "inc $rp");
 
@@ -4577,7 +4589,7 @@ for my $cpu (Opcode->cpus) {
 	}
 
 	for my $rp ('bc', 'de', 'hl') {
-		for my $r ('b', 'c', 'd', 'e', 'h', 'l', '%n') {
+		for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a', '%n') {
 			$opcodes->add_synth($cpu, "ld ($rp+), $r", "ld ($rp), $r", "inc $rp");
 			$opcodes->add_synth($cpu, "ldi ($rp), $r", "ld ($rp), $r", "inc $rp");
 
@@ -4628,7 +4640,25 @@ for my $cpu (Opcode->cpus) {
 							"ld hl, 0:$var", "add hl, sp", 
 							"ex de, hl");
 	}
+	
+	# LD HL, SP+s
+	$opcodes->add_synth($cpu, "ld hl, sp+%s", 
+						"ld hl, 0:%s", "add hl, sp");
 
+	#--------------------------------------------------------------------------
+	# 16-bit memory load
+	#--------------------------------------------------------------------------
+
+	$opcodes->add_synth($cpu, "ld bc, (%m)", 
+						"push hl", "ld hl, (%m)", "ld bc, hl", "pop hl");
+	$opcodes->add_synth($cpu, "ld (%m), bc", 
+						"push hl", "ld hl, bc", "ld (%m), hl", "pop hl");
+	
+	$opcodes->add_synth($cpu, "ld de, (%m)", 
+						"ex de, hl", "ld hl, (%m)", "ex de, hl");
+	$opcodes->add_synth($cpu, "ld (%m), de", 
+						"ex de, hl", "ld (%m), hl", "ex de, hl");
+	
 	#--------------------------------------------------------------------------
 	# 16-bit indirect load
 	#--------------------------------------------------------------------------
@@ -4711,6 +4741,21 @@ for my $cpu (Opcode->cpus) {
 						"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
 						"ex de, hl");
 
+	#--------------------------------------------------------------------------
+	# ALU
+	#--------------------------------------------------------------------------
+	
+	for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+		$opcodes->add_synth($cpu, "clr $r", "ld $r, 0:%n"); 
+	}
+	
+	for my $rp ('bc', 'de', 'hl', 'ix', 'iy') {
+		$opcodes->add_synth($cpu, "clr $rp", "ld $rp, 0:%m");
+	}
+
+	$opcodes->add_synth($cpu, "neg", "cpl", "inc a");
+	$opcodes->add_synth($cpu, "neg a", "cpl", "inc a");
+	
 	#--------------------------------------------------------------------------
 	# 16-bit ALU
 	#--------------------------------------------------------------------------

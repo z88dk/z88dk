@@ -33,9 +33,9 @@ for my $asm (sort keys %{$opcodes->opcodes}) {
 	# check for parens
 	my $parens;
 	if    ($asm =~ /\(%[nmh]\)/) {		$parens = 'expr_in_parens'; }
+	elsif ($asm =~ /\(\w+\+%[dsu]/) {	$parens = 'no_expr'; }
+	elsif ($asm =~ /\w+\+%[dsu]/) {		$parens = 'no_expr'; }
 	elsif ($asm =~ /%[snmMjJkc]/) {		$parens = 'expr_no_parens'; }
-	elsif ($asm =~ /\(\w+\+%[du]/) {	$parens = 'no_expr'; }
-	elsif ($asm =~ /\w+\+%[du]/) {		$parens = 'no_expr'; }
 	elsif ($asm !~ /%/) {				$parens = 'no_expr';   }
 	else { die $asm; }
 
@@ -367,7 +367,7 @@ sub parse_code {
 				my $opcode0 = ($ops[$i+0][0] << 8) + $ops[$i+0][1];
 				my $opcode1 = ($ops[$i+1][0] << 8) + $ops[$i+1][1];
 				push @code, 
-					"DO_stmt_idx_idx1(".sprintf("0x%04X, 0x%04X", $opcode0, $opcode1).");";
+					"DO_stmt_idx_idx1(".sprintf("0x%04XLL, 0x%04XLL", $opcode0, $opcode1).");";
 			}
 			elsif ($ops[$i][2]//'' eq '%D') {
 				# handled above
@@ -408,13 +408,13 @@ sub parse_code_opcode {
 		push @code, 
 			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {",
 			"if (ctx->expr_value < 0 || ctx->expr_value > 7) error_hex2(ErrIntRange, ctx->expr_value);",
-			"DO_stmt_n(0xED9150 + ctx->expr_value);}";
+			"DO_stmt_n(0xED9150LL + ctx->expr_value);}";
 	}
 	elsif ($asm =~ /^mmu %c, a/) {
 		push @code, 
 			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {",
 			"if (ctx->expr_value < 0 || ctx->expr_value > 7) error_hex2(ErrIntRange, ctx->expr_value);",
-			"DO_stmt(0xED9250 + ctx->expr_value);}";
+			"DO_stmt(0xED9250LL + ctx->expr_value);}";
 	}
 	elsif ($bytes =~ s/ %d %n$//) {
 		$stmt = "DO_stmt_idx_n";
@@ -517,7 +517,7 @@ sub parse_code_opcode {
 			}
 		}
 		
-		my $opc = "0x".join('', @bytes);
+		my $opc = "0x".join('', @bytes)."LL";
 		for (0..$#expr) {
 			next unless defined $expr[$_];
 			my $bytes_shift = scalar(@bytes) - $_ - 1;
