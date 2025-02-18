@@ -27,7 +27,7 @@ EXTERN uartaRxCount, uartaRxOut, uartaRxBuffer
     jp C,getc_clean_up_rx       ; if the buffer is too full, don't change the RTS
 
     in a,(__IO_UARTA_MCR_REGISTER)  ; get the UART A MODEM Control Register
-    and __IO_UART_MCR_DTR           ; set DTR low
+    or __IO_UART_MCR_DTR            ; set DTR low
     out (__IO_UARTA_MCR_REGISTER),a ; set the MODEM Control Register
 
 .getc_clean_up_rx
