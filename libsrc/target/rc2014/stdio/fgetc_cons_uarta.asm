@@ -15,7 +15,7 @@
     ld a,(uartaRxCount)         ; get the number of bytes in the Rx buffer
     ld l,a                      ; and put it in hl
     or a                        ; see if there are zero bytes available
-    ret Z                       ; if the count is zero, then return
+    jp Z,fgetc_cons_uarta       ; if the count is zero, then wait
 
     sub __IO_UART_RX_EMPTYISH   ; compare the count with the preferred empty size
     jp C,getc_clean_up_rx       ; if the buffer is too full, don't change the RTS
