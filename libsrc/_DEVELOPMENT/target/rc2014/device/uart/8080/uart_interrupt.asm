@@ -64,9 +64,9 @@ ENDIF
     sub __IO_UART_RX_FULLISH    ; compare the count with the preferred full size
     jp C,rxa_check              ; leave the DTR low, and check for Rx/Tx possibility
 
-    in a,(__IO_UARTA_MCR_REGISTER)  ; get the UART A MODEM Control Register
-    and ~__IO_UART_MCR_DTR          ; set DTR high
-    out (__IO_UARTA_MCR_REGISTER),a ; set the MODEM Control Register
+    in a,(__IO_UARTA_MCR_REGISTER)              ; get the UART A MODEM Control Register
+    and ~(__IO_UART_MCR_RTS|__IO_UART_MCR_DTR)  ; set RTS & DTR high
+    out (__IO_UARTA_MCR_REGISTER),a             ; set the MODEM Control Register
 
 .rxa_check
     in a,(__IO_UARTA_IIR_REGISTER)  ; get the status of the UART A
@@ -120,9 +120,9 @@ ENDIF
     sub __IO_UART_RX_FULLISH    ; compare the count with the preferred full size
     jp C,rxb_check              ; leave the DTR low, and check for Rx/Tx possibility
 
-    in a,(__IO_UARTB_MCR_REGISTER)  ; get the UART B MODEM Control Register
-    and ~__IO_UART_MCR_DTR          ; set DTR high
-    out (__IO_UARTB_MCR_REGISTER),a ; set the MODEM Control Register
+    in a,(__IO_UARTB_MCR_REGISTER)              ; get the UART B MODEM Control Register
+    and ~(__IO_UART_MCR_RTS|__IO_UART_MCR_DTR)  ; set RTS & DTR high
+    out (__IO_UARTB_MCR_REGISTER),a             ; set the MODEM Control Register
 
 .rxb_check
     in a,(__IO_UARTB_IIR_REGISTER)  ; get the status of the UART B
