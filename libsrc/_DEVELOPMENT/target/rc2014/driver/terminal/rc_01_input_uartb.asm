@@ -1,8 +1,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; rc_01_input_hbios0 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; rc_01_input_uartb ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
-; The keyboard is read via hbios0 library routines.
+; The keyboard is read via uartb library routines.
 ;
 ;   * Keyboard reads are blocking.
 ;
@@ -17,7 +17,7 @@
 ; ;;;;;;;;;;;;;;;;;;;;
 ;
 ; CONSOLE_01_INPUT_TERMINAL (root, abstract)
-; RC_01_INPUT_HBIOS0 (concrete)
+; RC_01_INPUT_uartb (concrete)
 ;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; MESSAGES CONSUMED FROM STDIO
@@ -105,28 +105,28 @@
 SECTION code_driver
 SECTION code_driver_terminal_input
 
-PUBLIC rc_01_input_hbios0
+PUBLIC rc_01_input_uartb
 
 EXTERN ITERM_MSG_GETC, ITERM_MSG_INTERRUPT, ITERM_MSG_REJECT, STDIO_MSG_FLSH
 
 EXTERN console_01_input_terminal
-EXTERN rc_01_input_hbios0_iterm_msg_getc
-EXTERN rc_01_input_hbios0_iterm_msg_interrupt
-EXTERN rc_01_input_hbios0_iterm_msg_reject
-EXTERN rc_01_input_hbios0_stdio_msg_flsh
+EXTERN rc_01_input_uartb_iterm_msg_getc
+EXTERN rc_01_input_uartb_iterm_msg_interrupt
+EXTERN rc_01_input_uartb_iterm_msg_reject
+EXTERN rc_01_input_uartb_stdio_msg_flsh
 
-rc_01_input_hbios0:
+rc_01_input_uartb:
 
    cp ITERM_MSG_GETC
-   jp z, rc_01_input_hbios0_iterm_msg_getc
+   jp z, rc_01_input_uartb_iterm_msg_getc
    
    cp ITERM_MSG_INTERRUPT
-   jp z, rc_01_input_hbios0_iterm_msg_interrupt
+   jp z, rc_01_input_uartb_iterm_msg_interrupt
 
    cp ITERM_MSG_REJECT
-   jp z, rc_01_input_hbios0_iterm_msg_reject
+   jp z, rc_01_input_uartb_iterm_msg_reject
    
    cp STDIO_MSG_FLSH
-   jp z, rc_01_input_hbios0_stdio_msg_flsh
+   jp z, rc_01_input_uartb_stdio_msg_flsh
    
    jp console_01_input_terminal    ; forward to library

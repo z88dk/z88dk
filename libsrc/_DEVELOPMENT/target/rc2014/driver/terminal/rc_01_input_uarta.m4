@@ -1,8 +1,8 @@
 dnl############################################################
-dnl##         RC_01_INPUT_HBIOS0 STATIC INSTANTIATOR         ##
+dnl##         RC_01_INPUT_UARTA STATIC INSTANTIATOR          ##
 dnl############################################################
 dnl##                                                        ##
-dnl## m4_rc_01_input_hbios0(...)                             ##
+dnl## m4_rc_01_input_uarta(...)                              ##
 dnl##                                                        ##
 dnl## $1 = label attached to FILE or 0 if fd only            ##
 dnl## $2 = label attached to output FDSTRUCT or 0 if none    ##
@@ -11,12 +11,12 @@ dnl## $4 = size of edit buffer attached to FDSTRUCT or 0     ##
 dnl##                                                        ##
 dnl############################################################
 
-define(`m4_rc_01_input_hbios0',dnl
+define(`m4_rc_01_input_uarta',dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
-   ; driver: rc_01_input_hbios0
+   ; driver: rc_01_input_uarta
    ; fd    : __I_FCNTL_NUM_FD
    ; mode  : read only
    ; type  : 001 = input terminal
@@ -81,7 +81,7 @@ define(`m4_rc_01_input_hbios0',dnl
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_input_terminal_fdriver
-   EXTERN rc_01_input_hbios0
+   EXTERN rc_01_input_uarta
    
    __i_fcntl_heap_`'__I_FCNTL_NUM_HEAP:
    
@@ -103,7 +103,7 @@ define(`m4_rc_01_input_hbios0',dnl
       ; jump to driver
       
       defb 195
-      defw rc_01_input_hbios0
+      defw rc_01_input_uarta
       
       ; flags
       ; reference_count

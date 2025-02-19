@@ -14,9 +14,9 @@ EXTERN aciaTxCount, aciaTxBuffer, aciaTxIn, aciaTxOut
     push hl
 
     call asm_cpu_push_di        ; di
-    
+
     call _acia_flush_Tx
-    
+
     call asm_cpu_pop_ei         ; ei
 
     pop hl

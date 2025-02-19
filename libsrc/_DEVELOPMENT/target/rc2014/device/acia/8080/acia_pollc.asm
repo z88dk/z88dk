@@ -13,7 +13,7 @@ EXTERN aciaRxCount
     ; modifies : af, hl
 
     ld a,(aciaRxCount)	        ; load the Rx bytes in buffer
-    ld l,a	                    ; load result
+    ld l,a                      ; load result
     or a                        ; check whether there are non-zero count
     ret Z                       ; return if zero count
 

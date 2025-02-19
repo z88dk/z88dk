@@ -1,20 +1,20 @@
 dnl############################################################
-dnl##        RC_01_OUTPUT_HBIOS0 STATIC INSTANTIATOR         ##
+dnl##        RC_01_OUTPUT_UARTA STATIC INSTANTIATOR          ##
 dnl############################################################
 dnl##                                                        ##
-dnl## m4_rc_01_output_hbios0(...)                            ##
+dnl## m4_rc_01_output_uarta(...)                             ##
 dnl##                                                        ##
 dnl## $1 = label attached to FILE or 0 if fd only            ##
 dnl## $2 = ioctl_flags (16 bits)                             ##
 dnl##                                                        ##
 dnl############################################################
 
-define(`m4_rc_01_output_hbios0',dnl
+define(`m4_rc_01_output_uarta',dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
-   ; driver: rc_01_output_hbios0
+   ; driver: rc_01_output_uarta
    ; fd    : __I_FCNTL_NUM_FD
    ; mode  : write only
    ; type  : 002 = output terminal
@@ -77,7 +77,7 @@ define(`m4_rc_01_output_hbios0',dnl
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN rc_01_output_hbios0
+   EXTERN rc_01_output_uarta
    
    __i_fcntl_heap_`'__I_FCNTL_NUM_HEAP:
    
@@ -99,7 +99,7 @@ define(`m4_rc_01_output_hbios0',dnl
       ; jump to driver
       
       defb 195
-      defw rc_01_output_hbios0
+      defw rc_01_output_uarta
       
       ; flags
       ; reference_count

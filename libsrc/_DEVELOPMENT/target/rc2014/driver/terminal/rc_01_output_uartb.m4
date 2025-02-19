@@ -1,32 +1,28 @@
 dnl############################################################
-dnl##         RC_01_INPUT_HBIOS1 STATIC INSTANTIATOR         ##
+dnl##        RC_01_OUTPUT_UARTB STATIC INSTANTIATOR          ##
 dnl############################################################
 dnl##                                                        ##
-dnl## m4_rc_01_input_hbios1(...)                             ##
+dnl## m4_rc_01_output_uartb(...)                             ##
 dnl##                                                        ##
 dnl## $1 = label attached to FILE or 0 if fd only            ##
-dnl## $2 = label attached to output FDSTRUCT or 0 if none    ##
-dnl## $3 = ioctl_flags (16 bits)                             ##
-dnl## $4 = size of edit buffer attached to FDSTRUCT or 0     ##
+dnl## $2 = ioctl_flags (16 bits)                             ##
 dnl##                                                        ##
 dnl############################################################
 
-define(`m4_rc_01_input_hbios1',dnl
+define(`m4_rc_01_output_uartb',dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
-   ; driver: rc_01_input_hbios1
+   ; driver: rc_01_output_uartb
    ; fd    : __I_FCNTL_NUM_FD
-   ; mode  : read only
-   ; type  : 001 = input terminal
-   ; tie   : `ifelse($2,0,`(none)',$2)'
+   ; mode  : write only
+   ; type  : 002 = output terminal
    ;
-   ; ioctl_flags   : $3
-   ; buffer size   : $4 bytes
+   ; ioctl_flags   : $2
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   `ifelse($1,0,,dnl
+   
+   `ifelse($1,0,,dnl   
    
    SECTION data_clib
    SECTION data_stdio
@@ -55,8 +51,8 @@ define(`m4_rc_01_input_hbios1',dnl
       ; conversion flags
       ; ungetc
 
-      defb 0x40      ; read + stdio manages ungetc + normal file type
-      defb 0x02      ; last operation was read
+      defb 0x80         ; write + normal file type
+      defb 0            ; last operation was write
       defb 0
       defb 0
       
@@ -80,42 +76,42 @@ define(`m4_rc_01_input_hbios1',dnl
    
    SECTION data_fcntl_stdio_heap_body
    
-   EXTERN console_01_input_terminal_fdriver
-   EXTERN rc_01_input_hbios1
+   EXTERN console_01_output_terminal_fdriver
+   EXTERN rc_01_output_uartb
    
    __i_fcntl_heap_`'__I_FCNTL_NUM_HEAP:
    
       ; heap header
       
       defw __i_fcntl_heap_`'incr(__I_FCNTL_NUM_HEAP)
-      defw `eval($4 + 34)'
+      defw 23
       defw ifelse(__I_FCNTL_NUM_HEAP,0,0,__i_fcntl_heap_`'decr(__I_FCNTL_NUM_HEAP))
-   
-   __i_fcntl_fdstruct_`'__I_FCNTL_NUM_FD:
 
+   __i_fcntl_fdstruct_`'__I_FCNTL_NUM_FD:
+   
       ; FDSTRUCT structure
       
       ; call to first entry to driver
       
       defb 205
-      defw console_01_input_terminal_fdriver
+      defw console_01_output_terminal_fdriver
       
       ; jump to driver
       
       defb 195
-      defw rc_01_input_hbios1
+      defw rc_01_output_uartb
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x01      ; stdio handles ungetc + type = input terminal
+      defb 0x02      ; type = output terminal
       defb `ifelse($1,0,1,2)'
-      defb 0x01      ; read only
+      defb 0x02      ; write only
       
       ; ioctl_flags
       
-      defw $3
+      defw $2
       
       ; mtx_plain
       
@@ -125,30 +121,9 @@ define(`m4_rc_01_input_hbios1',dnl
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
-      ; tied output terminal
-      ; pending_char
-      ; read_index
-      
-      defw `ifelse($2,0,0,$2)'
-      defb 0
-      defw 0
-      
-      ; b_array_t edit_buffer
-      
-      defw `ifelse($4,0,0,__edit_buffer_`'__I_FCNTL_NUM_FD)'
-      defw 0
-      defw $4
-      
-      `ifelse($4,0,,dnl
-      
-      ; reserve space for edit buffer
-      
-      __edit_buffer_`'__I_FCNTL_NUM_FD:   defs $4
-      )'
-
    `define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))'dnl
-   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + $4 + 34))'dnl
+   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + 23))'dnl
    `define(`__I_FCNTL_NUM_HEAP', incr(__I_FCNTL_NUM_HEAP))'dnl
-   
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 )dnl
