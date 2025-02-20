@@ -204,12 +204,9 @@ sub add_synth {
 
 	my @subops;
 	for my $subasm (@subasm) {
-		# replace 0:%n/0:$u by %m
+		# replace 0:%s/0:$u by %m
 		my $extend;
-		if ($subasm =~ s/0:(%n)/%n/) {
-			$extend = $1;
-		}
-		elsif ($subasm =~ s/0:(%[msu])/%m/) {
+		if ($subasm =~ s/0:(%[nsu])/%m/) {
 			$extend = $1;
 		}
 		
@@ -222,27 +219,58 @@ sub add_synth {
 			$temp_label = $1;
 		}
 		
+		# replace %D by %d
+		my $dis_plus_1;
+		if ($subasm =~ s/(%D)/%d/) {
+			$dis_plus_1 = $1;
+		}
+		
+		# replace 00/0000 by %n/%m
+		my $zero;
+		if ($subasm =~ s/\b0000\b/%m/) {
+			$zero = '%m';
+		}
+		elsif ($subasm =~ s/\b00\b/%n/) {
+			$zero = '%n';
+		}
+		
+		# replace 01/0001 by %n/%m
+		my $one;
+		if ($subasm =~ s/\b0001\b/%m/) {
+			$one = '%m';
+		}
+		elsif ($subasm =~ s/\b01\b/%n/) {
+			$one = '%n';
+		}
+		
+		# replace 02/0002 by %n/%m
+		my $two;
+		if ($subasm =~ s/\b0002\b/%m/) {
+			$two = '%m';
+		}
+		elsif ($subasm =~ s/\b02\b/%n/) {
+			$two = '%n';
+		}
+		
+		# get opcode
 		my $subopcode = $self->opcodes->{$subasm}{$cpu};
 		if (!$subopcode) {
+			#say "$cpu $asm - $subasm - not found";
 			return;
 		}
 		
+		# remap bytes
 		for my $op (@{$subopcode->ops}) {
 			my @bytes = @$op;
 
-			# replace %m by %n/$u,0[,0]
+			# replace %m by %s/$u,0[,0]
 			if ($extend) {
 				my $i = 0;
-				while ($i < @bytes && $bytes[$i] !~ /%[nm]/) {
+				while ($i < @bytes && $bytes[$i] ne '%m') {
 					$i++;
 				}
 				$i < @bytes or die;
-				if ($extend =~ /%[nm]/) {
-					$bytes[$i++] = 0;
-				}
-				else {
-					$bytes[$i++] = $extend;
-				}
+				$bytes[$i++] = $extend;
 				while ($i < @bytes) {
 					$bytes[$i++] = 0;
 				}
@@ -259,6 +287,52 @@ sub add_synth {
 					$bytes[$i++] = $temp_label;
 				}
 			}
+			
+			# replace %d by %D
+			if ($dis_plus_1) {
+				for (@bytes) {
+					s/%d/$dis_plus_1/;
+				}
+			}
+
+			# replace %n/%m by zero
+			if ($zero) {
+				my $i = 0;
+				while ($i < @bytes && $bytes[$i] !~ /%[mn]/) {
+					$i++;
+				}
+				$i < @bytes or die;
+				while ($i < @bytes) {
+					$bytes[$i++] = 0;
+				}
+			}
+			
+			# replace %n/%m by one
+			if ($one) {
+				my $i = 0;
+				while ($i < @bytes && $bytes[$i] !~ /%[mn]/) {
+					$i++;
+				}
+				$i < @bytes or die;
+				$bytes[$i++] = 1;
+				while ($i < @bytes) {
+					$bytes[$i++] = 0;
+				}
+			}
+
+			# replace %n/%m by two
+			if ($two) {
+				my $i = 0;
+				while ($i < @bytes && $bytes[$i] !~ /%[mn]/) {
+					$i++;
+				}
+				$i < @bytes or die;
+				$bytes[$i++] = 2;
+				while ($i < @bytes) {
+					$bytes[$i++] = 0;
+				}
+			}
+			#say "$asm - $subasm - @bytes";
 			
 			push @subops, \@bytes;
 		}

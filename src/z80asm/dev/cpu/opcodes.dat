@@ -86,36 +86,6 @@ adc (hl-)|z180|_||8E;2B
 adc (hl-)|z80|_||8E;2B
 adc (hl-)|z80_strict|_||8E;2B
 adc (hl-)|z80n|_||8E;2B
-adc (hld)|8080|X||8E;2B
-adc (hld)|8085|X||8E;2B
-adc (hld)|ez80|X||8E;2B
-adc (hld)|ez80_z80|X||8E;2B
-adc (hld)|gbz80|X||8E;2B
-adc (hld)|kc160|X||8E;2B
-adc (hld)|kc160_z80|X||8E;2B
-adc (hld)|r2ka|X||8E;2B
-adc (hld)|r3k|X||8E;2B
-adc (hld)|r4k|X||7F 8E;2B
-adc (hld)|r5k|X||7F 8E;2B
-adc (hld)|r800|X||8E;2B
-adc (hld)|z180|X||8E;2B
-adc (hld)|z80|X||8E;2B
-adc (hld)|z80n|X||8E;2B
-adc (hli)|8080|X||8E;23
-adc (hli)|8085|X||8E;23
-adc (hli)|ez80|X||8E;23
-adc (hli)|ez80_z80|X||8E;23
-adc (hli)|gbz80|X||8E;23
-adc (hli)|kc160|X||8E;23
-adc (hli)|kc160_z80|X||8E;23
-adc (hli)|r2ka|X||8E;23
-adc (hli)|r3k|X||8E;23
-adc (hli)|r4k|X||7F 8E;23
-adc (hli)|r5k|X||7F 8E;23
-adc (hli)|r800|X||8E;23
-adc (hli)|z180|X||8E;23
-adc (hli)|z80|X||8E;23
-adc (hli)|z80n|X||8E;23
 adc (ix)|ez80|_||DD 8E 00
 adc (ix)|ez80_z80|_||DD 8E 00
 adc (ix)|kc160|_||DD 8E 00
@@ -335,36 +305,6 @@ adc a, (hl-)|z180|_||8E;2B
 adc a, (hl-)|z80|_||8E;2B
 adc a, (hl-)|z80_strict|_||8E;2B
 adc a, (hl-)|z80n|_||8E;2B
-adc a, (hld)|8080|X||8E;2B
-adc a, (hld)|8085|X||8E;2B
-adc a, (hld)|ez80|X||8E;2B
-adc a, (hld)|ez80_z80|X||8E;2B
-adc a, (hld)|gbz80|X||8E;2B
-adc a, (hld)|kc160|X||8E;2B
-adc a, (hld)|kc160_z80|X||8E;2B
-adc a, (hld)|r2ka|X||8E;2B
-adc a, (hld)|r3k|X||8E;2B
-adc a, (hld)|r4k|X||7F 8E;2B
-adc a, (hld)|r5k|X||7F 8E;2B
-adc a, (hld)|r800|X||8E;2B
-adc a, (hld)|z180|X||8E;2B
-adc a, (hld)|z80|X||8E;2B
-adc a, (hld)|z80n|X||8E;2B
-adc a, (hli)|8080|X||8E;23
-adc a, (hli)|8085|X||8E;23
-adc a, (hli)|ez80|X||8E;23
-adc a, (hli)|ez80_z80|X||8E;23
-adc a, (hli)|gbz80|X||8E;23
-adc a, (hli)|kc160|X||8E;23
-adc a, (hli)|kc160_z80|X||8E;23
-adc a, (hli)|r2ka|X||8E;23
-adc a, (hli)|r3k|X||8E;23
-adc a, (hli)|r4k|X||7F 8E;23
-adc a, (hli)|r5k|X||7F 8E;23
-adc a, (hli)|r800|X||8E;23
-adc a, (hli)|z180|X||8E;23
-adc a, (hli)|z80|X||8E;23
-adc a, (hli)|z80n|X||8E;23
 adc a, (ix)|ez80|_||DD 8E 00
 adc a, (ix)|ez80_z80|_||DD 8E 00
 adc a, (ix)|kc160|_||DD 8E 00
@@ -679,9 +619,11 @@ adc hl', sp|r2ka|_||76;ED 7A
 adc hl', sp|r3k|_||76;ED 7A
 adc hl', sp|r4k|_||76;ED 7A
 adc hl', sp|r5k|_||76;ED 7A
+adc hl, bc|8080|X||CD @__z80asm__adc_hl_bc 
+adc hl, bc|8085|X||CD @__z80asm__adc_hl_bc 
 adc hl, bc|ez80|_||ED 4A
 adc hl, bc|ez80_z80|_||ED 4A
-adc hl, bc|gbz80|_||CD @__z80asm__adc_hl_bc 
+adc hl, bc|gbz80|X||CD @__z80asm__adc_hl_bc 
 adc hl, bc|kc160|_||ED 4A
 adc hl, bc|kc160_z80|_||ED 4A
 adc hl, bc|r2ka|_||ED 4A
@@ -693,9 +635,11 @@ adc hl, bc|z180|_||ED 4A
 adc hl, bc|z80|_||ED 4A
 adc hl, bc|z80_strict|_||ED 4A
 adc hl, bc|z80n|_||ED 4A
+adc hl, de|8080|X||CD @__z80asm__adc_hl_de 
+adc hl, de|8085|X||CD @__z80asm__adc_hl_de 
 adc hl, de|ez80|_||ED 5A
 adc hl, de|ez80_z80|_||ED 5A
-adc hl, de|gbz80|_||CD @__z80asm__adc_hl_de 
+adc hl, de|gbz80|X||CD @__z80asm__adc_hl_de 
 adc hl, de|kc160|_||ED 5A
 adc hl, de|kc160_z80|_||ED 5A
 adc hl, de|r2ka|_||ED 5A
@@ -707,9 +651,11 @@ adc hl, de|z180|_||ED 5A
 adc hl, de|z80|_||ED 5A
 adc hl, de|z80_strict|_||ED 5A
 adc hl, de|z80n|_||ED 5A
+adc hl, hl|8080|X||CD @__z80asm__adc_hl_hl 
+adc hl, hl|8085|X||CD @__z80asm__adc_hl_hl 
 adc hl, hl|ez80|_||ED 6A
 adc hl, hl|ez80_z80|_||ED 6A
-adc hl, hl|gbz80|_||CD @__z80asm__adc_hl_hl 
+adc hl, hl|gbz80|X||CD @__z80asm__adc_hl_hl 
 adc hl, hl|kc160|_||ED 6A
 adc hl, hl|kc160_z80|_||ED 6A
 adc hl, hl|r2ka|_||ED 6A
@@ -721,9 +667,11 @@ adc hl, hl|z180|_||ED 6A
 adc hl, hl|z80|_||ED 6A
 adc hl, hl|z80_strict|_||ED 6A
 adc hl, hl|z80n|_||ED 6A
+adc hl, sp|8080|X||CD @__z80asm__adc_hl_sp 
+adc hl, sp|8085|X||CD @__z80asm__adc_hl_sp 
 adc hl, sp|ez80|_||ED 7A
 adc hl, sp|ez80_z80|_||ED 7A
-adc hl, sp|gbz80|_||CD @__z80asm__adc_hl_sp 
+adc hl, sp|gbz80|X||CD @__z80asm__adc_hl_sp 
 adc hl, sp|kc160|_||ED 7A
 adc hl, sp|kc160_z80|_||ED 7A
 adc hl, sp|r2ka|_||ED 7A
@@ -944,36 +892,6 @@ add (hl-)|z180|_||86;2B
 add (hl-)|z80|_||86;2B
 add (hl-)|z80_strict|_||86;2B
 add (hl-)|z80n|_||86;2B
-add (hld)|8080|X||86;2B
-add (hld)|8085|X||86;2B
-add (hld)|ez80|X||86;2B
-add (hld)|ez80_z80|X||86;2B
-add (hld)|gbz80|X||86;2B
-add (hld)|kc160|X||86;2B
-add (hld)|kc160_z80|X||86;2B
-add (hld)|r2ka|X||86;2B
-add (hld)|r3k|X||86;2B
-add (hld)|r4k|X||7F 86;2B
-add (hld)|r5k|X||7F 86;2B
-add (hld)|r800|X||86;2B
-add (hld)|z180|X||86;2B
-add (hld)|z80|X||86;2B
-add (hld)|z80n|X||86;2B
-add (hli)|8080|X||86;23
-add (hli)|8085|X||86;23
-add (hli)|ez80|X||86;23
-add (hli)|ez80_z80|X||86;23
-add (hli)|gbz80|X||86;23
-add (hli)|kc160|X||86;23
-add (hli)|kc160_z80|X||86;23
-add (hli)|r2ka|X||86;23
-add (hli)|r3k|X||86;23
-add (hli)|r4k|X||7F 86;23
-add (hli)|r5k|X||7F 86;23
-add (hli)|r800|X||86;23
-add (hli)|z180|X||86;23
-add (hli)|z80|X||86;23
-add (hli)|z80n|X||86;23
 add (ix)|ez80|_||DD 86 00
 add (ix)|ez80_z80|_||DD 86 00
 add (ix)|kc160|_||DD 86 00
@@ -1193,36 +1111,6 @@ add a, (hl-)|z180|_||86;2B
 add a, (hl-)|z80|_||86;2B
 add a, (hl-)|z80_strict|_||86;2B
 add a, (hl-)|z80n|_||86;2B
-add a, (hld)|8080|X||86;2B
-add a, (hld)|8085|X||86;2B
-add a, (hld)|ez80|X||86;2B
-add a, (hld)|ez80_z80|X||86;2B
-add a, (hld)|gbz80|X||86;2B
-add a, (hld)|kc160|X||86;2B
-add a, (hld)|kc160_z80|X||86;2B
-add a, (hld)|r2ka|X||86;2B
-add a, (hld)|r3k|X||86;2B
-add a, (hld)|r4k|X||7F 86;2B
-add a, (hld)|r5k|X||7F 86;2B
-add a, (hld)|r800|X||86;2B
-add a, (hld)|z180|X||86;2B
-add a, (hld)|z80|X||86;2B
-add a, (hld)|z80n|X||86;2B
-add a, (hli)|8080|X||86;23
-add a, (hli)|8085|X||86;23
-add a, (hli)|ez80|X||86;23
-add a, (hli)|ez80_z80|X||86;23
-add a, (hli)|gbz80|X||86;23
-add a, (hli)|kc160|X||86;23
-add a, (hli)|kc160_z80|X||86;23
-add a, (hli)|r2ka|X||86;23
-add a, (hli)|r3k|X||86;23
-add a, (hli)|r4k|X||7F 86;23
-add a, (hli)|r5k|X||7F 86;23
-add a, (hli)|r800|X||86;23
-add a, (hli)|z180|X||86;23
-add a, (hli)|z80|X||86;23
-add a, (hli)|z80n|X||86;23
 add a, (ix)|ez80|_||DD 86 00
 add a, (ix)|ez80_z80|_||DD 86 00
 add a, (ix)|kc160|_||DD 86 00
@@ -1457,33 +1345,35 @@ add b|z180|_||80
 add b|z80|_||80
 add b|z80_strict|_||80
 add b|z80n|_||80
-add bc, %m|ez80|_||E5;21 %m %m %m;09;44;4D;E1
-add bc, %m|ez80_z80|_||E5;21 %m %m;09;44;4D;E1
-add bc, %m|gbz80|_||E5;21 %m %m;09;44;4D;E1
-add bc, %m|kc160|_||E5;21 %m %m;09;44;4D;E1
-add bc, %m|kc160_z80|_||E5;21 %m %m;09;44;4D;E1
-add bc, %m|r2ka|_||E5;21 %m %m;09;44;4D;E1
-add bc, %m|r3k|_||E5;21 %m %m;09;44;4D;E1
-add bc, %m|r4k|_||E5;21 %m %m;09;7F 44;7F 4D;E1
-add bc, %m|r5k|_||E5;21 %m %m;09;7F 44;7F 4D;E1
-add bc, %m|r800|_||E5;21 %m %m;09;44;4D;E1
-add bc, %m|z180|_||E5;21 %m %m;09;44;4D;E1
-add bc, %m|z80|_||E5;21 %m %m;09;44;4D;E1
-add bc, %m|z80_strict|_||E5;21 %m %m;09;44;4D;E1
+add bc, %m|8080|X||E5;21 %m %m;09;44;4D;E1
+add bc, %m|8085|X||E5;21 %m %m;09;44;4D;E1
+add bc, %m|ez80|X||E5;21 %m %m %m;09;44;4D;E1
+add bc, %m|ez80_z80|X||E5;21 %m %m;09;44;4D;E1
+add bc, %m|gbz80|X||E5;21 %m %m;09;44;4D;E1
+add bc, %m|kc160|X||E5;21 %m %m;09;44;4D;E1
+add bc, %m|kc160_z80|X||E5;21 %m %m;09;44;4D;E1
+add bc, %m|r2ka|X||E5;21 %m %m;09;44;4D;E1
+add bc, %m|r3k|X||E5;21 %m %m;09;44;4D;E1
+add bc, %m|r4k|X||E5;21 %m %m;09;91;E1
+add bc, %m|r5k|X||E5;21 %m %m;09;91;E1
+add bc, %m|r800|X||E5;21 %m %m;09;44;4D;E1
+add bc, %m|z180|X||E5;21 %m %m;09;44;4D;E1
+add bc, %m|z80|X||E5;21 %m %m;09;44;4D;E1
 add bc, %m|z80n|_||ED 36 %m %m
-add bc, a|ez80|_||CD @__z80asm__add_bc_a 
-add bc, a|ez80_z80|_||CD @__z80asm__add_bc_a 
-add bc, a|gbz80|_||CD @__z80asm__add_bc_a 
-add bc, a|kc160|_||CD @__z80asm__add_bc_a 
-add bc, a|kc160_z80|_||CD @__z80asm__add_bc_a 
-add bc, a|r2ka|_||CD @__z80asm__add_bc_a 
-add bc, a|r3k|_||CD @__z80asm__add_bc_a 
-add bc, a|r4k|_||CD @__z80asm__add_bc_a 
-add bc, a|r5k|_||CD @__z80asm__add_bc_a 
-add bc, a|r800|_||CD @__z80asm__add_bc_a 
-add bc, a|z180|_||CD @__z80asm__add_bc_a 
-add bc, a|z80|_||CD @__z80asm__add_bc_a 
-add bc, a|z80_strict|_||CD @__z80asm__add_bc_a 
+add bc, a|8080|X||CD @__z80asm__add_bc_a 
+add bc, a|8085|X||CD @__z80asm__add_bc_a 
+add bc, a|ez80|X||CD @__z80asm__add_bc_a 
+add bc, a|ez80_z80|X||CD @__z80asm__add_bc_a 
+add bc, a|gbz80|X||CD @__z80asm__add_bc_a 
+add bc, a|kc160|X||CD @__z80asm__add_bc_a 
+add bc, a|kc160_z80|X||CD @__z80asm__add_bc_a 
+add bc, a|r2ka|X||CD @__z80asm__add_bc_a 
+add bc, a|r3k|X||CD @__z80asm__add_bc_a 
+add bc, a|r4k|X||CD @__z80asm__add_bc_a 
+add bc, a|r5k|X||CD @__z80asm__add_bc_a 
+add bc, a|r800|X||CD @__z80asm__add_bc_a 
+add bc, a|z180|X||CD @__z80asm__add_bc_a 
+add bc, a|z80|X||CD @__z80asm__add_bc_a 
 add bc, a|z80n|_||ED 33
 add c|8080|_||81
 add c|8080_strict|_||81
@@ -1521,33 +1411,35 @@ add d|z180|_||82
 add d|z80|_||82
 add d|z80_strict|_||82
 add d|z80n|_||82
-add de, %m|ez80|_||E5;21 %m %m %m;19;54;5D;E1
-add de, %m|ez80_z80|_||E5;21 %m %m;19;54;5D;E1
-add de, %m|gbz80|_||E5;21 %m %m;19;54;5D;E1
-add de, %m|kc160|_||E5;21 %m %m;19;54;5D;E1
-add de, %m|kc160_z80|_||E5;21 %m %m;19;54;5D;E1
-add de, %m|r2ka|_||E5;21 %m %m;19;54;5D;E1
-add de, %m|r3k|_||E5;21 %m %m;19;54;5D;E1
-add de, %m|r4k|_||E5;21 %m %m;19;7F 54;7F 5D;E1
-add de, %m|r5k|_||E5;21 %m %m;19;7F 54;7F 5D;E1
-add de, %m|r800|_||E5;21 %m %m;19;54;5D;E1
-add de, %m|z180|_||E5;21 %m %m;19;54;5D;E1
-add de, %m|z80|_||E5;21 %m %m;19;54;5D;E1
-add de, %m|z80_strict|_||E5;21 %m %m;19;54;5D;E1
+add de, %m|8080|X||E5;21 %m %m;19;54;5D;E1
+add de, %m|8085|X||E5;21 %m %m;19;54;5D;E1
+add de, %m|ez80|X||E5;21 %m %m %m;19;54;5D;E1
+add de, %m|ez80_z80|X||E5;21 %m %m;19;54;5D;E1
+add de, %m|gbz80|X||E5;21 %m %m;19;54;5D;E1
+add de, %m|kc160|X||E5;21 %m %m;19;54;5D;E1
+add de, %m|kc160_z80|X||E5;21 %m %m;19;54;5D;E1
+add de, %m|r2ka|X||E5;21 %m %m;19;54;5D;E1
+add de, %m|r3k|X||E5;21 %m %m;19;54;5D;E1
+add de, %m|r4k|X||E5;21 %m %m;19;B1;E1
+add de, %m|r5k|X||E5;21 %m %m;19;B1;E1
+add de, %m|r800|X||E5;21 %m %m;19;54;5D;E1
+add de, %m|z180|X||E5;21 %m %m;19;54;5D;E1
+add de, %m|z80|X||E5;21 %m %m;19;54;5D;E1
 add de, %m|z80n|_||ED 35 %m %m
-add de, a|ez80|_||CD @__z80asm__add_de_a 
-add de, a|ez80_z80|_||CD @__z80asm__add_de_a 
-add de, a|gbz80|_||CD @__z80asm__add_de_a 
-add de, a|kc160|_||CD @__z80asm__add_de_a 
-add de, a|kc160_z80|_||CD @__z80asm__add_de_a 
-add de, a|r2ka|_||CD @__z80asm__add_de_a 
-add de, a|r3k|_||CD @__z80asm__add_de_a 
-add de, a|r4k|_||CD @__z80asm__add_de_a 
-add de, a|r5k|_||CD @__z80asm__add_de_a 
-add de, a|r800|_||CD @__z80asm__add_de_a 
-add de, a|z180|_||CD @__z80asm__add_de_a 
-add de, a|z80|_||CD @__z80asm__add_de_a 
-add de, a|z80_strict|_||CD @__z80asm__add_de_a 
+add de, a|8080|X||CD @__z80asm__add_de_a 
+add de, a|8085|X||CD @__z80asm__add_de_a 
+add de, a|ez80|X||CD @__z80asm__add_de_a 
+add de, a|ez80_z80|X||CD @__z80asm__add_de_a 
+add de, a|gbz80|X||CD @__z80asm__add_de_a 
+add de, a|kc160|X||CD @__z80asm__add_de_a 
+add de, a|kc160_z80|X||CD @__z80asm__add_de_a 
+add de, a|r2ka|X||CD @__z80asm__add_de_a 
+add de, a|r3k|X||CD @__z80asm__add_de_a 
+add de, a|r4k|X||CD @__z80asm__add_de_a 
+add de, a|r5k|X||CD @__z80asm__add_de_a 
+add de, a|r800|X||CD @__z80asm__add_de_a 
+add de, a|z180|X||CD @__z80asm__add_de_a 
+add de, a|z80|X||CD @__z80asm__add_de_a 
 add de, a|z80n|_||ED 32
 add e|8080|_||83
 add e|8080_strict|_||83
@@ -1603,33 +1495,35 @@ add hl', sp|r2ka|_||76;39
 add hl', sp|r3k|_||76;39
 add hl', sp|r4k|_||76;39
 add hl', sp|r5k|_||76;39
-add hl, %m|ez80|_||D5;11 %m %m %m;19;D1
-add hl, %m|ez80_z80|_||D5;11 %m %m;19;D1
-add hl, %m|gbz80|_||D5;11 %m %m;19;D1
-add hl, %m|kc160|_||D5;11 %m %m;19;D1
-add hl, %m|kc160_z80|_||D5;11 %m %m;19;D1
-add hl, %m|r2ka|_||D5;11 %m %m;19;D1
-add hl, %m|r3k|_||D5;11 %m %m;19;D1
-add hl, %m|r4k|_||D5;11 %m %m;19;D1
-add hl, %m|r5k|_||D5;11 %m %m;19;D1
-add hl, %m|r800|_||D5;11 %m %m;19;D1
-add hl, %m|z180|_||D5;11 %m %m;19;D1
-add hl, %m|z80|_||D5;11 %m %m;19;D1
-add hl, %m|z80_strict|_||D5;11 %m %m;19;D1
+add hl, %m|8080|X||D5;11 %m %m;19;D1
+add hl, %m|8085|X||D5;11 %m %m;19;D1
+add hl, %m|ez80|X||D5;11 %m %m %m;19;D1
+add hl, %m|ez80_z80|X||D5;11 %m %m;19;D1
+add hl, %m|gbz80|X||D5;11 %m %m;19;D1
+add hl, %m|kc160|X||D5;11 %m %m;19;D1
+add hl, %m|kc160_z80|X||D5;11 %m %m;19;D1
+add hl, %m|r2ka|X||D5;11 %m %m;19;D1
+add hl, %m|r3k|X||D5;11 %m %m;19;D1
+add hl, %m|r4k|X||D5;11 %m %m;19;D1
+add hl, %m|r5k|X||D5;11 %m %m;19;D1
+add hl, %m|r800|X||D5;11 %m %m;19;D1
+add hl, %m|z180|X||D5;11 %m %m;19;D1
+add hl, %m|z80|X||D5;11 %m %m;19;D1
 add hl, %m|z80n|_||ED 34 %m %m
-add hl, a|ez80|_||CD @__z80asm__add_hl_a 
-add hl, a|ez80_z80|_||CD @__z80asm__add_hl_a 
-add hl, a|gbz80|_||CD @__z80asm__add_hl_a 
-add hl, a|kc160|_||CD @__z80asm__add_hl_a 
-add hl, a|kc160_z80|_||CD @__z80asm__add_hl_a 
-add hl, a|r2ka|_||CD @__z80asm__add_hl_a 
-add hl, a|r3k|_||CD @__z80asm__add_hl_a 
-add hl, a|r4k|_||CD @__z80asm__add_hl_a 
-add hl, a|r5k|_||CD @__z80asm__add_hl_a 
-add hl, a|r800|_||CD @__z80asm__add_hl_a 
-add hl, a|z180|_||CD @__z80asm__add_hl_a 
-add hl, a|z80|_||CD @__z80asm__add_hl_a 
-add hl, a|z80_strict|_||CD @__z80asm__add_hl_a 
+add hl, a|8080|X||CD @__z80asm__add_hl_a 
+add hl, a|8085|X||CD @__z80asm__add_hl_a 
+add hl, a|ez80|X||CD @__z80asm__add_hl_a 
+add hl, a|ez80_z80|X||CD @__z80asm__add_hl_a 
+add hl, a|gbz80|X||CD @__z80asm__add_hl_a 
+add hl, a|kc160|X||CD @__z80asm__add_hl_a 
+add hl, a|kc160_z80|X||CD @__z80asm__add_hl_a 
+add hl, a|r2ka|X||CD @__z80asm__add_hl_a 
+add hl, a|r3k|X||CD @__z80asm__add_hl_a 
+add hl, a|r4k|X||CD @__z80asm__add_hl_a 
+add hl, a|r5k|X||CD @__z80asm__add_hl_a 
+add hl, a|r800|X||CD @__z80asm__add_hl_a 
+add hl, a|z180|X||CD @__z80asm__add_hl_a 
+add hl, a|z80|X||CD @__z80asm__add_hl_a 
 add hl, a|z80n|_||ED 31
 add hl, bc|8080|_||09
 add hl, bc|8085|_||09
@@ -1861,20 +1755,21 @@ add m|z180|_||86
 add m|z80|_||86
 add m|z80_strict|_||86
 add m|z80n|_||86
-add sp, %s|ez80|_||CD @__z80asm__add_sp_s;%s
-add sp, %s|ez80_z80|_||CD @__z80asm__add_sp_s;%s
+add sp, %s|8080|X||CD @__z80asm__add_sp_s ;%s
+add sp, %s|8085|X||CD @__z80asm__add_sp_s ;%s
+add sp, %s|ez80|X||CD @__z80asm__add_sp_s ;%s
+add sp, %s|ez80_z80|X||CD @__z80asm__add_sp_s ;%s
 add sp, %s|gbz80|_||E8 %s
-add sp, %s|kc160|_||CD @__z80asm__add_sp_s;%s
-add sp, %s|kc160_z80|_||CD @__z80asm__add_sp_s;%s
+add sp, %s|kc160|X||CD @__z80asm__add_sp_s ;%s
+add sp, %s|kc160_z80|X||CD @__z80asm__add_sp_s ;%s
 add sp, %s|r2ka|_||27 %s
 add sp, %s|r3k|_||27 %s
 add sp, %s|r4k|_||27 %s
 add sp, %s|r5k|_||27 %s
-add sp, %s|r800|_||CD @__z80asm__add_sp_s;%s
-add sp, %s|z180|_||CD @__z80asm__add_sp_s;%s
-add sp, %s|z80|_||CD @__z80asm__add_sp_s;%s
-add sp, %s|z80_strict|_||CD @__z80asm__add_sp_s;%s
-add sp, %s|z80n|_||CD @__z80asm__add_sp_s;%s
+add sp, %s|r800|X||CD @__z80asm__add_sp_s ;%s
+add sp, %s|z180|X||CD @__z80asm__add_sp_s ;%s
+add sp, %s|z80|X||CD @__z80asm__add_sp_s ;%s
+add sp, %s|z80n|X||CD @__z80asm__add_sp_s ;%s
 add xhl, bc|kc160|_||40;09
 add xhl, de|kc160|_||40;19
 add xhl, hl|kc160|_||40;29
@@ -2033,8 +1928,36 @@ adi %n|z180|_||C6 %n
 adi %n|z80|_||C6 %n
 adi %n|z80_strict|_||C6 %n
 adi %n|z80n|_||C6 %n
+adi hl, %n|8080|X||E5;11 %n 00;19;EB;E1
 adi hl, %n|8085|_||28 %n
+adi hl, %n|ez80|X||E5;11 %n 00 00;19;EB;E1
+adi hl, %n|ez80_z80|X||E5;11 %n 00;19;EB;E1
+adi hl, %n|gbz80|X||E5;11 %n 00;19;D5;E5;D1;E1;E1
+adi hl, %n|kc160|X||E5;11 %n 00;19;EB;E1
+adi hl, %n|kc160_z80|X||E5;11 %n 00;19;EB;E1
+adi hl, %n|r2ka|X||E5;11 %n 00;19;EB;E1
+adi hl, %n|r3k|X||E5;11 %n 00;19;EB;E1
+adi hl, %n|r4k|X||E5;11 %n 00;19;EB;E1
+adi hl, %n|r5k|X||E5;11 %n 00;19;EB;E1
+adi hl, %n|r800|X||E5;11 %n 00;19;EB;E1
+adi hl, %n|z180|X||E5;11 %n 00;19;EB;E1
+adi hl, %n|z80|X||E5;11 %n 00;19;EB;E1
+adi hl, %n|z80n|X||E5;11 %n 00;19;EB;E1
+adi sp, %n|8080|X||EB;21 %n 00;39;EB
 adi sp, %n|8085|_||38 %n
+adi sp, %n|ez80|X||EB;21 %n 00 00;39;EB
+adi sp, %n|ez80_z80|X||EB;21 %n 00;39;EB
+adi sp, %n|gbz80|X||D5;E5;D1;E1;21 %n 00;39;D5;E5;D1;E1
+adi sp, %n|kc160|X||EB;21 %n 00;39;EB
+adi sp, %n|kc160_z80|X||EB;21 %n 00;39;EB
+adi sp, %n|r2ka|X||EB;21 %n 00;39;EB
+adi sp, %n|r3k|X||EB;21 %n 00;39;EB
+adi sp, %n|r4k|X||EB;21 %n 00;39;EB
+adi sp, %n|r5k|X||EB;21 %n 00;39;EB
+adi sp, %n|r800|X||EB;21 %n 00;39;EB
+adi sp, %n|z180|X||EB;21 %n 00;39;EB
+adi sp, %n|z80|X||EB;21 %n 00;39;EB
+adi sp, %n|z80n|X||EB;21 %n 00;39;EB
 altd adc %n|r2ka|_||76;CE %n
 altd adc %n|r3k|_||76;CE %n
 altd adc %n|r4k|_||76;CE %n
@@ -7538,36 +7461,6 @@ and (hl-)|z180|_||A6;2B
 and (hl-)|z80|_||A6;2B
 and (hl-)|z80_strict|_||A6;2B
 and (hl-)|z80n|_||A6;2B
-and (hld)|8080|X||A6;2B
-and (hld)|8085|X||A6;2B
-and (hld)|ez80|X||A6;2B
-and (hld)|ez80_z80|X||A6;2B
-and (hld)|gbz80|X||A6;2B
-and (hld)|kc160|X||A6;2B
-and (hld)|kc160_z80|X||A6;2B
-and (hld)|r2ka|X||A6;2B
-and (hld)|r3k|X||A6;2B
-and (hld)|r4k|X||7F A6;2B
-and (hld)|r5k|X||7F A6;2B
-and (hld)|r800|X||A6;2B
-and (hld)|z180|X||A6;2B
-and (hld)|z80|X||A6;2B
-and (hld)|z80n|X||A6;2B
-and (hli)|8080|X||A6;23
-and (hli)|8085|X||A6;23
-and (hli)|ez80|X||A6;23
-and (hli)|ez80_z80|X||A6;23
-and (hli)|gbz80|X||A6;23
-and (hli)|kc160|X||A6;23
-and (hli)|kc160_z80|X||A6;23
-and (hli)|r2ka|X||A6;23
-and (hli)|r3k|X||A6;23
-and (hli)|r4k|X||7F A6;23
-and (hli)|r5k|X||7F A6;23
-and (hli)|r800|X||A6;23
-and (hli)|z180|X||A6;23
-and (hli)|z80|X||A6;23
-and (hli)|z80n|X||A6;23
 and (ix)|ez80|_||DD A6 00
 and (ix)|ez80_z80|_||DD A6 00
 and (ix)|kc160|_||DD A6 00
@@ -7785,36 +7678,6 @@ and a, (hl-)|z180|_||A6;2B
 and a, (hl-)|z80|_||A6;2B
 and a, (hl-)|z80_strict|_||A6;2B
 and a, (hl-)|z80n|_||A6;2B
-and a, (hld)|8080|X||A6;2B
-and a, (hld)|8085|X||A6;2B
-and a, (hld)|ez80|X||A6;2B
-and a, (hld)|ez80_z80|X||A6;2B
-and a, (hld)|gbz80|X||A6;2B
-and a, (hld)|kc160|X||A6;2B
-and a, (hld)|kc160_z80|X||A6;2B
-and a, (hld)|r2ka|X||A6;2B
-and a, (hld)|r3k|X||A6;2B
-and a, (hld)|r4k|X||7F A6;2B
-and a, (hld)|r5k|X||7F A6;2B
-and a, (hld)|r800|X||A6;2B
-and a, (hld)|z180|X||A6;2B
-and a, (hld)|z80|X||A6;2B
-and a, (hld)|z80n|X||A6;2B
-and a, (hli)|8080|X||A6;23
-and a, (hli)|8085|X||A6;23
-and a, (hli)|ez80|X||A6;23
-and a, (hli)|ez80_z80|X||A6;23
-and a, (hli)|gbz80|X||A6;23
-and a, (hli)|kc160|X||A6;23
-and a, (hli)|kc160_z80|X||A6;23
-and a, (hli)|r2ka|X||A6;23
-and a, (hli)|r3k|X||A6;23
-and a, (hli)|r4k|X||7F A6;23
-and a, (hli)|r5k|X||7F A6;23
-and a, (hli)|r800|X||A6;23
-and a, (hli)|z180|X||A6;23
-and a, (hli)|z80|X||A6;23
-and a, (hli)|z80n|X||A6;23
 and a, (ix)|ez80|_||DD A6 00
 and a, (ix)|ez80_z80|_||DD A6 00
 and a, (ix)|kc160|_||DD A6 00
@@ -8103,34 +7966,36 @@ and hl', de|r2ka|_||76;DC
 and hl', de|r3k|_||76;DC
 and hl', de|r4k|_||76;DC
 and hl', de|r5k|_||76;DC
-and hl, bc|ez80|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, bc|ez80_z80|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, bc|gbz80|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, bc|kc160|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, bc|kc160_z80|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, bc|r2ka|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, bc|r3k|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, bc|r4k|_||F5;7F 7C;7F A0;7F 67;7F 7D;7F A1;7F 6F;F1
-and hl, bc|r5k|_||F5;7F 7C;7F A0;7F 67;7F 7D;7F A1;7F 6F;F1
-and hl, bc|r800|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, bc|z180|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, bc|z80|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, bc|z80_strict|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, bc|z80n|_||F5;7C;A0;67;7D;A1;6F;F1
-and hl, de|ez80|_||F5;7C;A2;67;7D;A3;6F;F1
-and hl, de|ez80_z80|_||F5;7C;A2;67;7D;A3;6F;F1
-and hl, de|gbz80|_||F5;7C;A2;67;7D;A3;6F;F1
-and hl, de|kc160|_||F5;7C;A2;67;7D;A3;6F;F1
-and hl, de|kc160_z80|_||F5;7C;A2;67;7D;A3;6F;F1
+and hl, bc|8080|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|8085|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|ez80|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|ez80_z80|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|gbz80|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|kc160|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|kc160_z80|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|r2ka|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|r3k|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|r4k|X||F5;7F 7C;7F A0;7F 67;7F 7D;7F A1;7F 6F;F1
+and hl, bc|r5k|X||F5;7F 7C;7F A0;7F 67;7F 7D;7F A1;7F 6F;F1
+and hl, bc|r800|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|z180|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|z80|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, bc|z80n|X||F5;7C;A0;67;7D;A1;6F;F1
+and hl, de|8080|X||F5;7C;A2;67;7D;A3;6F;F1
+and hl, de|8085|X||F5;7C;A2;67;7D;A3;6F;F1
+and hl, de|ez80|X||F5;7C;A2;67;7D;A3;6F;F1
+and hl, de|ez80_z80|X||F5;7C;A2;67;7D;A3;6F;F1
+and hl, de|gbz80|X||F5;7C;A2;67;7D;A3;6F;F1
+and hl, de|kc160|X||F5;7C;A2;67;7D;A3;6F;F1
+and hl, de|kc160_z80|X||F5;7C;A2;67;7D;A3;6F;F1
 and hl, de|r2ka|_||DC
 and hl, de|r3k|_||DC
 and hl, de|r4k|_||DC
 and hl, de|r5k|_||DC
-and hl, de|r800|_||F5;7C;A2;67;7D;A3;6F;F1
-and hl, de|z180|_||F5;7C;A2;67;7D;A3;6F;F1
-and hl, de|z80|_||F5;7C;A2;67;7D;A3;6F;F1
-and hl, de|z80_strict|_||F5;7C;A2;67;7D;A3;6F;F1
-and hl, de|z80n|_||F5;7C;A2;67;7D;A3;6F;F1
+and hl, de|r800|X||F5;7C;A2;67;7D;A3;6F;F1
+and hl, de|z180|X||F5;7C;A2;67;7D;A3;6F;F1
+and hl, de|z80|X||F5;7C;A2;67;7D;A3;6F;F1
+and hl, de|z80n|X||F5;7C;A2;67;7D;A3;6F;F1
 and ix, bc|ez80|_||F5;DD 7C;A0;DD 67;DD 7D;A1;DD 6F;F1
 and ix, bc|ez80_z80|_||F5;DD 7C;A0;DD 67;DD 7D;A1;DD 6F;F1
 and ix, bc|r800|_||F5;DD 7C;A0;DD 67;DD 7D;A1;DD 6F;F1
@@ -8497,50 +8362,49 @@ bit.sil %c, (ix)|ez80|_|0,1,2,3,4,5,6,7|52;DD CB 00 70+8*%c
 bit.sil %c, (ix+%d)|ez80|_|0,1,2,3,4,5,6,7|52;DD CB %d 70+8*%c
 bit.sil %c, (iy)|ez80|_|0,1,2,3,4,5,6,7|52;FD CB 00 70+8*%c
 bit.sil %c, (iy+%d)|ez80|_|0,1,2,3,4,5,6,7|52;FD CB %d 70+8*%c
-bool hl|ez80|_||F5;7C;B5;28 %t1;21 01 00;F1
-bool hl|ez80_z80|_||F5;7C;B5;28 %t1;21 01 00;F1
-bool hl|gbz80|_||F5;7C;B5;CA %t1 %t1;21 01 00;F1
-bool hl|kc160|_||F5;7C;B5;28 %t1;21 01 00;F1
-bool hl|kc160_z80|_||F5;7C;B5;28 %t1;21 01 00;F1
+bool hl|8080|X||F5;7C;B5;CA %t1 %t1;21 01 00;F1
+bool hl|8085|X||F5;7C;B5;CA %t1 %t1;21 01 00;F1
+bool hl|ez80|X||F5;7C;B5;28 %t1;21 01 00 00;F1
+bool hl|ez80_z80|X||F5;7C;B5;28 %t1;21 01 00;F1
+bool hl|gbz80|X||F5;7C;B5;28 %t1;21 01 00;F1
+bool hl|kc160|X||F5;7C;B5;28 %t1;21 01 00;F1
+bool hl|kc160_z80|X||F5;7C;B5;28 %t1;21 01 00;F1
 bool hl|r2ka|_||CC
 bool hl|r3k|_||CC
 bool hl|r4k|_||CC
 bool hl|r5k|_||CC
-bool hl|r800|_||F5;7C;B5;28 %t1;21 01 00;F1
-bool hl|z180|_||F5;7C;B5;28 %t1;21 01 00;F1
-bool hl|z80|_||F5;7C;B5;28 %t1;21 01 00;F1
-bool hl|z80_strict|_||F5;7C;B5;28 %t1;21 01 00;F1
-bool hl|z80n|_||F5;7C;B5;28 %t1;21 01 00;F1
+bool hl|r800|X||F5;7C;B5;28 %t1;21 01 00;F1
+bool hl|z180|X||F5;7C;B5;28 %t1;21 01 00;F1
+bool hl|z80|X||F5;7C;B5;28 %t1;21 01 00;F1
+bool hl|z80n|X||F5;7C;B5;28 %t1;21 01 00;F1
 bool hl'|r2ka|_||76;CC
 bool hl'|r3k|_||76;CC
 bool hl'|r4k|_||76;CC
 bool hl'|r5k|_||76;CC
-bool ix|ez80|_||F5;DD 7C;DD B5;28 %t1;DD 21 01 00;F1
-bool ix|ez80_z80|_||F5;DD 7C;DD B5;28 %t1;DD 21 01 00;F1
-bool ix|kc160|_||F5;E5;DD E5;E1;7C;B5;28 %t5;21 01 00;E5;DD E1;E1;F1
-bool ix|kc160_z80|_||F5;E5;DD E5;E1;7C;B5;28 %t5;21 01 00;E5;DD E1;E1;F1
+bool ix|ez80|X||F5;DD 7C;DD B5;28 %t1;DD 21 01 00 00;F1
+bool ix|ez80_z80|X||F5;DD 7C;DD B5;28 %t1;DD 21 01 00;F1
+bool ix|kc160|X||F5;E5;DD E5;E1;7C;B5;28 %t2;DD 21 01 00;E1;F1
+bool ix|kc160_z80|X||F5;E5;DD E5;E1;7C;B5;28 %t2;DD 21 01 00;E1;F1
 bool ix|r2ka|_||DD CC
 bool ix|r3k|_||DD CC
 bool ix|r4k|_||DD CC
 bool ix|r5k|_||DD CC
-bool ix|r800|_||F5;DD 7C;DD B5;28 %t1;DD 21 01 00;F1
-bool ix|z180|_||F5;E5;DD E5;E1;7C;B5;28 %t5;21 01 00;E5;DD E1;E1;F1
-bool ix|z80|_||F5;E5;DD E5;E1;7C;B5;28 %t5;21 01 00;E5;DD E1;E1;F1
-bool ix|z80_strict|_||F5;E5;DD E5;E1;7C;B5;28 %t5;21 01 00;E5;DD E1;E1;F1
-bool ix|z80n|_||F5;DD 7C;DD B5;28 %t1;DD 21 01 00;F1
-bool iy|ez80|_||F5;FD 7C;FD B5;28 %t1;FD 21 01 00;F1
-bool iy|ez80_z80|_||F5;FD 7C;FD B5;28 %t1;FD 21 01 00;F1
-bool iy|kc160|_||F5;E5;FD E5;E1;7C;B5;28 %t5;21 01 00;E5;FD E1;E1;F1
-bool iy|kc160_z80|_||F5;E5;FD E5;E1;7C;B5;28 %t5;21 01 00;E5;FD E1;E1;F1
+bool ix|r800|X||F5;DD 7C;DD B5;28 %t1;DD 21 01 00;F1
+bool ix|z180|X||F5;E5;DD E5;E1;7C;B5;28 %t2;DD 21 01 00;E1;F1
+bool ix|z80|X||F5;DD 7C;DD B5;28 %t1;DD 21 01 00;F1
+bool ix|z80n|X||F5;DD 7C;DD B5;28 %t1;DD 21 01 00;F1
+bool iy|ez80|X||F5;FD 7C;FD B5;28 %t1;FD 21 01 00 00;F1
+bool iy|ez80_z80|X||F5;FD 7C;FD B5;28 %t1;FD 21 01 00;F1
+bool iy|kc160|X||F5;E5;FD E5;E1;7C;B5;28 %t2;FD 21 01 00;E1;F1
+bool iy|kc160_z80|X||F5;E5;FD E5;E1;7C;B5;28 %t2;FD 21 01 00;E1;F1
 bool iy|r2ka|_||FD CC
 bool iy|r3k|_||FD CC
 bool iy|r4k|_||FD CC
 bool iy|r5k|_||FD CC
-bool iy|r800|_||F5;FD 7C;FD B5;28 %t1;FD 21 01 00;F1
-bool iy|z180|_||F5;E5;FD E5;E1;7C;B5;28 %t5;21 01 00;E5;FD E1;E1;F1
-bool iy|z80|_||F5;E5;FD E5;E1;7C;B5;28 %t5;21 01 00;E5;FD E1;E1;F1
-bool iy|z80_strict|_||F5;E5;FD E5;E1;7C;B5;28 %t5;21 01 00;E5;FD E1;E1;F1
-bool iy|z80n|_||F5;FD 7C;FD B5;28 %t1;FD 21 01 00;F1
+bool iy|r800|X||F5;FD 7C;FD B5;28 %t1;FD 21 01 00;F1
+bool iy|z180|X||F5;E5;FD E5;E1;7C;B5;28 %t2;FD 21 01 00;E1;F1
+bool iy|z80|X||F5;FD 7C;FD B5;28 %t1;FD 21 01 00;F1
+bool iy|z80n|X||F5;FD 7C;FD B5;28 %t1;FD 21 01 00;F1
 brlc de, b|z80n|_||ED 2C
 bsla de, b|z80n|_||ED 28
 bsra de, b|z80n|_||ED 29
@@ -9556,36 +9420,6 @@ cmp (hl-)|z180|_||BE;2B
 cmp (hl-)|z80|_||BE;2B
 cmp (hl-)|z80_strict|_||BE;2B
 cmp (hl-)|z80n|_||BE;2B
-cmp (hld)|8080|X||BE;2B
-cmp (hld)|8085|X||BE;2B
-cmp (hld)|ez80|X||BE;2B
-cmp (hld)|ez80_z80|X||BE;2B
-cmp (hld)|gbz80|X||BE;2B
-cmp (hld)|kc160|X||BE;2B
-cmp (hld)|kc160_z80|X||BE;2B
-cmp (hld)|r2ka|X||BE;2B
-cmp (hld)|r3k|X||BE;2B
-cmp (hld)|r4k|X||7F BE;2B
-cmp (hld)|r5k|X||7F BE;2B
-cmp (hld)|r800|X||BE;2B
-cmp (hld)|z180|X||BE;2B
-cmp (hld)|z80|X||BE;2B
-cmp (hld)|z80n|X||BE;2B
-cmp (hli)|8080|X||BE;23
-cmp (hli)|8085|X||BE;23
-cmp (hli)|ez80|X||BE;23
-cmp (hli)|ez80_z80|X||BE;23
-cmp (hli)|gbz80|X||BE;23
-cmp (hli)|kc160|X||BE;23
-cmp (hli)|kc160_z80|X||BE;23
-cmp (hli)|r2ka|X||BE;23
-cmp (hli)|r3k|X||BE;23
-cmp (hli)|r4k|X||7F BE;23
-cmp (hli)|r5k|X||7F BE;23
-cmp (hli)|r800|X||BE;23
-cmp (hli)|z180|X||BE;23
-cmp (hli)|z80|X||BE;23
-cmp (hli)|z80n|X||BE;23
 cmp (ix)|ez80|_||DD BE 00
 cmp (ix)|ez80_z80|_||DD BE 00
 cmp (ix)|kc160|_||DD BE 00
@@ -9745,36 +9579,6 @@ cmp a, (hl-)|z180|_||BE;2B
 cmp a, (hl-)|z80|_||BE;2B
 cmp a, (hl-)|z80_strict|_||BE;2B
 cmp a, (hl-)|z80n|_||BE;2B
-cmp a, (hld)|8080|X||BE;2B
-cmp a, (hld)|8085|X||BE;2B
-cmp a, (hld)|ez80|X||BE;2B
-cmp a, (hld)|ez80_z80|X||BE;2B
-cmp a, (hld)|gbz80|X||BE;2B
-cmp a, (hld)|kc160|X||BE;2B
-cmp a, (hld)|kc160_z80|X||BE;2B
-cmp a, (hld)|r2ka|X||BE;2B
-cmp a, (hld)|r3k|X||BE;2B
-cmp a, (hld)|r4k|X||7F BE;2B
-cmp a, (hld)|r5k|X||7F BE;2B
-cmp a, (hld)|r800|X||BE;2B
-cmp a, (hld)|z180|X||BE;2B
-cmp a, (hld)|z80|X||BE;2B
-cmp a, (hld)|z80n|X||BE;2B
-cmp a, (hli)|8080|X||BE;23
-cmp a, (hli)|8085|X||BE;23
-cmp a, (hli)|ez80|X||BE;23
-cmp a, (hli)|ez80_z80|X||BE;23
-cmp a, (hli)|gbz80|X||BE;23
-cmp a, (hli)|kc160|X||BE;23
-cmp a, (hli)|kc160_z80|X||BE;23
-cmp a, (hli)|r2ka|X||BE;23
-cmp a, (hli)|r3k|X||BE;23
-cmp a, (hli)|r4k|X||7F BE;23
-cmp a, (hli)|r5k|X||7F BE;23
-cmp a, (hli)|r800|X||BE;23
-cmp a, (hli)|z180|X||BE;23
-cmp a, (hli)|z80|X||BE;23
-cmp a, (hli)|z80n|X||BE;23
 cmp a, (ix)|ez80|_||DD BE 00
 cmp a, (ix)|ez80_z80|_||DD BE 00
 cmp a, (ix)|kc160|_||DD BE 00
@@ -10345,36 +10149,6 @@ cp (hl-)|z180|_||BE;2B
 cp (hl-)|z80|_||BE;2B
 cp (hl-)|z80_strict|_||BE;2B
 cp (hl-)|z80n|_||BE;2B
-cp (hld)|8080|X||BE;2B
-cp (hld)|8085|X||BE;2B
-cp (hld)|ez80|X||BE;2B
-cp (hld)|ez80_z80|X||BE;2B
-cp (hld)|gbz80|X||BE;2B
-cp (hld)|kc160|X||BE;2B
-cp (hld)|kc160_z80|X||BE;2B
-cp (hld)|r2ka|X||BE;2B
-cp (hld)|r3k|X||BE;2B
-cp (hld)|r4k|X||7F BE;2B
-cp (hld)|r5k|X||7F BE;2B
-cp (hld)|r800|X||BE;2B
-cp (hld)|z180|X||BE;2B
-cp (hld)|z80|X||BE;2B
-cp (hld)|z80n|X||BE;2B
-cp (hli)|8080|X||BE;23
-cp (hli)|8085|X||BE;23
-cp (hli)|ez80|X||BE;23
-cp (hli)|ez80_z80|X||BE;23
-cp (hli)|gbz80|X||BE;23
-cp (hli)|kc160|X||BE;23
-cp (hli)|kc160_z80|X||BE;23
-cp (hli)|r2ka|X||BE;23
-cp (hli)|r3k|X||BE;23
-cp (hli)|r4k|X||7F BE;23
-cp (hli)|r5k|X||7F BE;23
-cp (hli)|r800|X||BE;23
-cp (hli)|z180|X||BE;23
-cp (hli)|z80|X||BE;23
-cp (hli)|z80n|X||BE;23
 cp (ix)|ez80|_||DD BE 00
 cp (ix)|ez80_z80|_||DD BE 00
 cp (ix)|kc160|_||DD BE 00
@@ -10532,36 +10306,6 @@ cp a, (hl-)|z180|_||BE;2B
 cp a, (hl-)|z80|_||BE;2B
 cp a, (hl-)|z80_strict|_||BE;2B
 cp a, (hl-)|z80n|_||BE;2B
-cp a, (hld)|8080|X||BE;2B
-cp a, (hld)|8085|X||BE;2B
-cp a, (hld)|ez80|X||BE;2B
-cp a, (hld)|ez80_z80|X||BE;2B
-cp a, (hld)|gbz80|X||BE;2B
-cp a, (hld)|kc160|X||BE;2B
-cp a, (hld)|kc160_z80|X||BE;2B
-cp a, (hld)|r2ka|X||BE;2B
-cp a, (hld)|r3k|X||BE;2B
-cp a, (hld)|r4k|X||7F BE;2B
-cp a, (hld)|r5k|X||7F BE;2B
-cp a, (hld)|r800|X||BE;2B
-cp a, (hld)|z180|X||BE;2B
-cp a, (hld)|z80|X||BE;2B
-cp a, (hld)|z80n|X||BE;2B
-cp a, (hli)|8080|X||BE;23
-cp a, (hli)|8085|X||BE;23
-cp a, (hli)|ez80|X||BE;23
-cp a, (hli)|ez80_z80|X||BE;23
-cp a, (hli)|gbz80|X||BE;23
-cp a, (hli)|kc160|X||BE;23
-cp a, (hli)|kc160_z80|X||BE;23
-cp a, (hli)|r2ka|X||BE;23
-cp a, (hli)|r3k|X||BE;23
-cp a, (hli)|r4k|X||7F BE;23
-cp a, (hli)|r5k|X||7F BE;23
-cp a, (hli)|r800|X||BE;23
-cp a, (hli)|z180|X||BE;23
-cp a, (hli)|z80|X||BE;23
-cp a, (hli)|z80n|X||BE;23
 cp a, (ix)|ez80|_||DD BE 00
 cp a, (ix)|ez80_z80|_||DD BE 00
 cp a, (ix)|kc160|_||DD BE 00
@@ -10944,15 +10688,17 @@ cp.sil a, (ix)|ez80|_||52;DD BE 00
 cp.sil a, (ix+%d)|ez80|_||52;DD BE %d
 cp.sil a, (iy)|ez80|_||52;FD BE 00
 cp.sil a, (iy+%d)|ez80|_||52;FD BE %d
+cpd|8080|X||CD @__z80asm__cpd 
+cpd|8085|X||CD @__z80asm__cpd 
 cpd|ez80|_||ED A9
 cpd|ez80_z80|_||ED A9
-cpd|gbz80|_||CD @__z80asm__cpd 
+cpd|gbz80|X||CD @__z80asm__cpd 
 cpd|kc160|_||ED A9
 cpd|kc160_z80|_||ED A9
-cpd|r2ka|_||CD @__z80asm__cpd 
-cpd|r3k|_||CD @__z80asm__cpd 
-cpd|r4k|_||CD @__z80asm__cpd 
-cpd|r5k|_||CD @__z80asm__cpd 
+cpd|r2ka|X||CD @__z80asm__cpd 
+cpd|r3k|X||CD @__z80asm__cpd 
+cpd|r4k|X||CD @__z80asm__cpd 
+cpd|r5k|X||CD @__z80asm__cpd 
 cpd|r800|_||ED A9
 cpd|z180|_||ED A9
 cpd|z80|_||ED A9
@@ -10964,15 +10710,17 @@ cpd.l|ez80_z80|_||49;ED A9
 cpd.lis|ez80_z80|_||49;ED A9
 cpd.s|ez80|_||52;ED A9
 cpd.sil|ez80|_||52;ED A9
+cpdr|8080|X||CD @__z80asm__cpdr 
+cpdr|8085|X||CD @__z80asm__cpdr 
 cpdr|ez80|_||ED B9
 cpdr|ez80_z80|_||ED B9
-cpdr|gbz80|_||CD @__z80asm__cpdr 
+cpdr|gbz80|X||CD @__z80asm__cpdr 
 cpdr|kc160|_||ED B9
 cpdr|kc160_z80|_||ED B9
-cpdr|r2ka|_||CD @__z80asm__cpdr 
-cpdr|r3k|_||CD @__z80asm__cpdr 
-cpdr|r4k|_||CD @__z80asm__cpdr 
-cpdr|r5k|_||CD @__z80asm__cpdr 
+cpdr|r2ka|X||CD @__z80asm__cpdr 
+cpdr|r3k|X||CD @__z80asm__cpdr 
+cpdr|r4k|X||CD @__z80asm__cpdr 
+cpdr|r5k|X||CD @__z80asm__cpdr 
 cpdr|r800|_||ED B9
 cpdr|z180|_||ED B9
 cpdr|z80|_||ED B9
@@ -11001,15 +10749,17 @@ cpe %m|z180|_||EC %m %m
 cpe %m|z80|_||EC %m %m
 cpe %m|z80_strict|_||EC %m %m
 cpe %m|z80n|_||EC %m %m
+cpi|8080|X||CD @__z80asm__cpi 
+cpi|8085|X||CD @__z80asm__cpi 
 cpi|ez80|_||ED A1
 cpi|ez80_z80|_||ED A1
-cpi|gbz80|_||CD @__z80asm__cpi 
+cpi|gbz80|X||CD @__z80asm__cpi 
 cpi|kc160|_||ED A1
 cpi|kc160_z80|_||ED A1
-cpi|r2ka|_||CD @__z80asm__cpi 
-cpi|r3k|_||CD @__z80asm__cpi 
-cpi|r4k|_||CD @__z80asm__cpi 
-cpi|r5k|_||CD @__z80asm__cpi 
+cpi|r2ka|X||CD @__z80asm__cpi 
+cpi|r3k|X||CD @__z80asm__cpi 
+cpi|r4k|X||CD @__z80asm__cpi 
+cpi|r5k|X||CD @__z80asm__cpi 
 cpi|r800|_||ED A1
 cpi|z180|_||ED A1
 cpi|z80|_||ED A1
@@ -11039,15 +10789,17 @@ cpi.l|ez80_z80|_||49;ED A1
 cpi.lis|ez80_z80|_||49;ED A1
 cpi.s|ez80|_||52;ED A1
 cpi.sil|ez80|_||52;ED A1
+cpir|8080|X||CD @__z80asm__cpir 
+cpir|8085|X||CD @__z80asm__cpir 
 cpir|ez80|_||ED B1
 cpir|ez80_z80|_||ED B1
-cpir|gbz80|_||CD @__z80asm__cpir 
+cpir|gbz80|X||CD @__z80asm__cpir 
 cpir|kc160|_||ED B1
 cpir|kc160_z80|_||ED B1
-cpir|r2ka|_||CD @__z80asm__cpir 
-cpir|r3k|_||CD @__z80asm__cpir 
-cpir|r4k|_||CD @__z80asm__cpir 
-cpir|r5k|_||CD @__z80asm__cpir 
+cpir|r2ka|X||CD @__z80asm__cpir 
+cpir|r3k|X||CD @__z80asm__cpir 
+cpir|r4k|X||CD @__z80asm__cpir 
+cpir|r5k|X||CD @__z80asm__cpir 
 cpir|r800|_||ED B1
 cpir|z180|_||ED B1
 cpir|z80|_||ED B1
@@ -11504,36 +11256,6 @@ dec (hl-)|z180|_||35;2B
 dec (hl-)|z80|_||35;2B
 dec (hl-)|z80_strict|_||35;2B
 dec (hl-)|z80n|_||35;2B
-dec (hld)|8080|X||35;2B
-dec (hld)|8085|X||35;2B
-dec (hld)|ez80|X||35;2B
-dec (hld)|ez80_z80|X||35;2B
-dec (hld)|gbz80|X||35;2B
-dec (hld)|kc160|X||35;2B
-dec (hld)|kc160_z80|X||35;2B
-dec (hld)|r2ka|X||35;2B
-dec (hld)|r3k|X||35;2B
-dec (hld)|r4k|X||35;2B
-dec (hld)|r5k|X||35;2B
-dec (hld)|r800|X||35;2B
-dec (hld)|z180|X||35;2B
-dec (hld)|z80|X||35;2B
-dec (hld)|z80n|X||35;2B
-dec (hli)|8080|X||35;23
-dec (hli)|8085|X||35;23
-dec (hli)|ez80|X||35;23
-dec (hli)|ez80_z80|X||35;23
-dec (hli)|gbz80|X||35;23
-dec (hli)|kc160|X||35;23
-dec (hli)|kc160_z80|X||35;23
-dec (hli)|r2ka|X||35;23
-dec (hli)|r3k|X||35;23
-dec (hli)|r4k|X||35;23
-dec (hli)|r5k|X||35;23
-dec (hli)|r800|X||35;23
-dec (hli)|z180|X||35;23
-dec (hli)|z80|X||35;23
-dec (hli)|z80n|X||35;23
 dec (ix)|ez80|_||DD 35 00
 dec (ix)|ez80_z80|_||DD 35 00
 dec (ix)|kc160|_||DD 35 00
@@ -12041,7 +11763,7 @@ ex (sp), hl|8080|_||E3
 ex (sp), hl|8085|_||E3
 ex (sp), hl|ez80|_||E3
 ex (sp), hl|ez80_z80|_||E3
-ex (sp), hl|gbz80|_||CD @__z80asm__ex_sp_hl 
+ex (sp), hl|gbz80|X||CD @__z80asm__ex_sp_hl 
 ex (sp), hl|kc160|_||E3
 ex (sp), hl|kc160_z80|_||E3
 ex (sp), hl|r2ka|_||ED 54
@@ -12126,22 +11848,62 @@ ex bc', hl|r4k|_||ED 74
 ex bc', hl|r5k|_||ED 74
 ex bc', hl'|r4k|_||76;ED 74
 ex bc', hl'|r5k|_||76;ED 74
-ex bc, hl|ez80|_||E5;C5;E1;C1
-ex bc, hl|ez80_z80|_||E5;C5;E1;C1
-ex bc, hl|gbz80|_||E5;C5;E1;C1
-ex bc, hl|kc160|_||E5;C5;E1;C1
-ex bc, hl|kc160_z80|_||E5;C5;E1;C1
-ex bc, hl|r2ka|_||E5;C5;E1;C1
-ex bc, hl|r3k|_||E5;C5;E1;C1
+ex bc, de|8080|X||C5;D5;C1;D1
+ex bc, de|8085|X||C5;D5;C1;D1
+ex bc, de|ez80|X||C5;D5;C1;D1
+ex bc, de|ez80_z80|X||C5;D5;C1;D1
+ex bc, de|gbz80|X||C5;D5;C1;D1
+ex bc, de|kc160|X||C5;D5;C1;D1
+ex bc, de|kc160_z80|X||C5;D5;C1;D1
+ex bc, de|r2ka|X||C5;D5;C1;D1
+ex bc, de|r3k|X||C5;D5;C1;D1
+ex bc, de|r4k|X||C5;D5;C1;D1
+ex bc, de|r5k|X||C5;D5;C1;D1
+ex bc, de|r800|X||C5;D5;C1;D1
+ex bc, de|z180|X||C5;D5;C1;D1
+ex bc, de|z80|X||C5;D5;C1;D1
+ex bc, de|z80n|X||C5;D5;C1;D1
+ex bc, hl|8080|X||C5;E5;C1;E1
+ex bc, hl|8085|X||C5;E5;C1;E1
+ex bc, hl|ez80|X||C5;E5;C1;E1
+ex bc, hl|ez80_z80|X||C5;E5;C1;E1
+ex bc, hl|gbz80|X||C5;E5;C1;E1
+ex bc, hl|kc160|X||C5;E5;C1;E1
+ex bc, hl|kc160_z80|X||C5;E5;C1;E1
+ex bc, hl|r2ka|X||C5;E5;C1;E1
+ex bc, hl|r3k|X||C5;E5;C1;E1
 ex bc, hl|r4k|_||B3
 ex bc, hl|r5k|_||B3
-ex bc, hl|r800|_||E5;C5;E1;C1
-ex bc, hl|z180|_||E5;C5;E1;C1
-ex bc, hl|z80|_||E5;C5;E1;C1
-ex bc, hl|z80_strict|_||E5;C5;E1;C1
-ex bc, hl|z80n|_||E5;C5;E1;C1
+ex bc, hl|r800|X||C5;E5;C1;E1
+ex bc, hl|z180|X||C5;E5;C1;E1
+ex bc, hl|z80|X||C5;E5;C1;E1
+ex bc, hl|z80n|X||C5;E5;C1;E1
 ex bc, hl'|r4k|_||76;B3
 ex bc, hl'|r5k|_||76;B3
+ex bc, ix|ez80|X||C5;DD E5;C1;DD E1
+ex bc, ix|ez80_z80|X||C5;DD E5;C1;DD E1
+ex bc, ix|kc160|X||C5;DD E5;C1;DD E1
+ex bc, ix|kc160_z80|X||C5;DD E5;C1;DD E1
+ex bc, ix|r2ka|X||C5;DD E5;C1;DD E1
+ex bc, ix|r3k|X||C5;DD E5;C1;DD E1
+ex bc, ix|r4k|X||C5;DD E5;C1;DD E1
+ex bc, ix|r5k|X||C5;DD E5;C1;DD E1
+ex bc, ix|r800|X||C5;DD E5;C1;DD E1
+ex bc, ix|z180|X||C5;DD E5;C1;DD E1
+ex bc, ix|z80|X||C5;DD E5;C1;DD E1
+ex bc, ix|z80n|X||C5;DD E5;C1;DD E1
+ex bc, iy|ez80|X||C5;FD E5;C1;FD E1
+ex bc, iy|ez80_z80|X||C5;FD E5;C1;FD E1
+ex bc, iy|kc160|X||C5;FD E5;C1;FD E1
+ex bc, iy|kc160_z80|X||C5;FD E5;C1;FD E1
+ex bc, iy|r2ka|X||C5;FD E5;C1;FD E1
+ex bc, iy|r3k|X||C5;FD E5;C1;FD E1
+ex bc, iy|r4k|X||C5;FD E5;C1;FD E1
+ex bc, iy|r5k|X||C5;FD E5;C1;FD E1
+ex bc, iy|r800|X||C5;FD E5;C1;FD E1
+ex bc, iy|z180|X||C5;FD E5;C1;FD E1
+ex bc, iy|z80|X||C5;FD E5;C1;FD E1
+ex bc, iy|z80n|X||C5;FD E5;C1;FD E1
 ex bcde, jkhl|r4k|_||B4
 ex bcde, jkhl|r5k|_||B4
 ex de', hl|r2ka|_||E3
@@ -12152,11 +11914,26 @@ ex de', hl'|r2ka|_||76;E3
 ex de', hl'|r3k|_||76;E3
 ex de', hl'|r4k|_||76;E3
 ex de', hl'|r5k|_||76;E3
+ex de, bc|8080|X||D5;C5;D1;C1
+ex de, bc|8085|X||D5;C5;D1;C1
+ex de, bc|ez80|X||D5;C5;D1;C1
+ex de, bc|ez80_z80|X||D5;C5;D1;C1
+ex de, bc|gbz80|X||D5;C5;D1;C1
+ex de, bc|kc160|X||D5;C5;D1;C1
+ex de, bc|kc160_z80|X||D5;C5;D1;C1
+ex de, bc|r2ka|X||D5;C5;D1;C1
+ex de, bc|r3k|X||D5;C5;D1;C1
+ex de, bc|r4k|X||D5;C5;D1;C1
+ex de, bc|r5k|X||D5;C5;D1;C1
+ex de, bc|r800|X||D5;C5;D1;C1
+ex de, bc|z180|X||D5;C5;D1;C1
+ex de, bc|z80|X||D5;C5;D1;C1
+ex de, bc|z80n|X||D5;C5;D1;C1
 ex de, hl|8080|_||EB
 ex de, hl|8085|_||EB
 ex de, hl|ez80|_||EB
 ex de, hl|ez80_z80|_||EB
-ex de, hl|gbz80|_||E5;D5;E1;D1
+ex de, hl|gbz80|X||D5;E5;D1;E1
 ex de, hl|kc160|_||EB
 ex de, hl|kc160_z80|_||EB
 ex de, hl|r2ka|_||EB
@@ -12172,6 +11949,30 @@ ex de, hl'|r2ka|_||76;EB
 ex de, hl'|r3k|_||76;EB
 ex de, hl'|r4k|_||76;EB
 ex de, hl'|r5k|_||76;EB
+ex de, ix|ez80|X||D5;DD E5;D1;DD E1
+ex de, ix|ez80_z80|X||D5;DD E5;D1;DD E1
+ex de, ix|kc160|X||D5;DD E5;D1;DD E1
+ex de, ix|kc160_z80|X||D5;DD E5;D1;DD E1
+ex de, ix|r2ka|X||D5;DD E5;D1;DD E1
+ex de, ix|r3k|X||D5;DD E5;D1;DD E1
+ex de, ix|r4k|X||D5;DD E5;D1;DD E1
+ex de, ix|r5k|X||D5;DD E5;D1;DD E1
+ex de, ix|r800|X||D5;DD E5;D1;DD E1
+ex de, ix|z180|X||D5;DD E5;D1;DD E1
+ex de, ix|z80|X||D5;DD E5;D1;DD E1
+ex de, ix|z80n|X||D5;DD E5;D1;DD E1
+ex de, iy|ez80|X||D5;FD E5;D1;FD E1
+ex de, iy|ez80_z80|X||D5;FD E5;D1;FD E1
+ex de, iy|kc160|X||D5;FD E5;D1;FD E1
+ex de, iy|kc160_z80|X||D5;FD E5;D1;FD E1
+ex de, iy|r2ka|X||D5;FD E5;D1;FD E1
+ex de, iy|r3k|X||D5;FD E5;D1;FD E1
+ex de, iy|r4k|X||D5;FD E5;D1;FD E1
+ex de, iy|r5k|X||D5;FD E5;D1;FD E1
+ex de, iy|r800|X||D5;FD E5;D1;FD E1
+ex de, iy|z180|X||D5;FD E5;D1;FD E1
+ex de, iy|z80|X||D5;FD E5;D1;FD E1
+ex de, iy|z80n|X||D5;FD E5;D1;FD E1
 ex hl', bc|r4k|_||76;B3
 ex hl', bc|r5k|_||76;B3
 ex hl', bc'|r4k|_||76;ED 74
@@ -12188,25 +11989,28 @@ ex hl', jk|r4k|_||76;B9
 ex hl', jk|r5k|_||76;B9
 ex hl', jk'|r4k|_||76;ED 7C
 ex hl', jk'|r5k|_||76;ED 7C
-ex hl, bc|ez80|_||E5;C5;E1;C1
-ex hl, bc|ez80_z80|_||E5;C5;E1;C1
-ex hl, bc|gbz80|_||E5;C5;E1;C1
-ex hl, bc|kc160|_||E5;C5;E1;C1
-ex hl, bc|kc160_z80|_||E5;C5;E1;C1
-ex hl, bc|r2ka|_||E5;C5;E1;C1
-ex hl, bc|r3k|_||E5;C5;E1;C1
+ex hl, bc|8080|X||E5;C5;E1;C1
+ex hl, bc|8085|X||E5;C5;E1;C1
+ex hl, bc|ez80|X||E5;C5;E1;C1
+ex hl, bc|ez80_z80|X||E5;C5;E1;C1
+ex hl, bc|gbz80|X||E5;C5;E1;C1
+ex hl, bc|kc160|X||E5;C5;E1;C1
+ex hl, bc|kc160_z80|X||E5;C5;E1;C1
+ex hl, bc|r2ka|X||E5;C5;E1;C1
+ex hl, bc|r3k|X||E5;C5;E1;C1
 ex hl, bc|r4k|_||B3
 ex hl, bc|r5k|_||B3
-ex hl, bc|r800|_||E5;C5;E1;C1
-ex hl, bc|z180|_||E5;C5;E1;C1
-ex hl, bc|z80|_||E5;C5;E1;C1
-ex hl, bc|z80_strict|_||E5;C5;E1;C1
-ex hl, bc|z80n|_||E5;C5;E1;C1
+ex hl, bc|r800|X||E5;C5;E1;C1
+ex hl, bc|z180|X||E5;C5;E1;C1
+ex hl, bc|z80|X||E5;C5;E1;C1
+ex hl, bc|z80n|X||E5;C5;E1;C1
 ex hl, bc'|r4k|_||ED 74
 ex hl, bc'|r5k|_||ED 74
+ex hl, de|8080|X||EB
+ex hl, de|8085|X||EB
 ex hl, de|ez80|_||EB
 ex hl, de|ez80_z80|_||EB
-ex hl, de|gbz80|_||E5;D5;E1;D1
+ex hl, de|gbz80|X||E5;D5;E1;D1
 ex hl, de|kc160|_||EB
 ex hl, de|kc160_z80|_||EB
 ex hl, de|r2ka|_||EB
@@ -12222,10 +12026,130 @@ ex hl, de'|r2ka|_||E3
 ex hl, de'|r3k|_||E3
 ex hl, de'|r4k|_||E3
 ex hl, de'|r5k|_||E3
+ex hl, ix|ez80|X||E5;DD E5;E1;DD E1
+ex hl, ix|ez80_z80|X||E5;DD E5;E1;DD E1
+ex hl, ix|kc160|X||E5;DD E5;E1;DD E1
+ex hl, ix|kc160_z80|X||E5;DD E5;E1;DD E1
+ex hl, ix|r2ka|X||E5;DD E5;E1;DD E1
+ex hl, ix|r3k|X||E5;DD E5;E1;DD E1
+ex hl, ix|r4k|X||E5;DD E5;E1;DD E1
+ex hl, ix|r5k|X||E5;DD E5;E1;DD E1
+ex hl, ix|r800|X||E5;DD E5;E1;DD E1
+ex hl, ix|z180|X||E5;DD E5;E1;DD E1
+ex hl, ix|z80|X||E5;DD E5;E1;DD E1
+ex hl, ix|z80n|X||E5;DD E5;E1;DD E1
+ex hl, iy|ez80|X||E5;FD E5;E1;FD E1
+ex hl, iy|ez80_z80|X||E5;FD E5;E1;FD E1
+ex hl, iy|kc160|X||E5;FD E5;E1;FD E1
+ex hl, iy|kc160_z80|X||E5;FD E5;E1;FD E1
+ex hl, iy|r2ka|X||E5;FD E5;E1;FD E1
+ex hl, iy|r3k|X||E5;FD E5;E1;FD E1
+ex hl, iy|r4k|X||E5;FD E5;E1;FD E1
+ex hl, iy|r5k|X||E5;FD E5;E1;FD E1
+ex hl, iy|r800|X||E5;FD E5;E1;FD E1
+ex hl, iy|z180|X||E5;FD E5;E1;FD E1
+ex hl, iy|z80|X||E5;FD E5;E1;FD E1
+ex hl, iy|z80n|X||E5;FD E5;E1;FD E1
 ex hl, jk|r4k|_||B9
 ex hl, jk|r5k|_||B9
 ex hl, jk'|r4k|_||ED 7C
 ex hl, jk'|r5k|_||ED 7C
+ex ix, bc|ez80|X||DD E5;C5;DD E1;C1
+ex ix, bc|ez80_z80|X||DD E5;C5;DD E1;C1
+ex ix, bc|kc160|X||DD E5;C5;DD E1;C1
+ex ix, bc|kc160_z80|X||DD E5;C5;DD E1;C1
+ex ix, bc|r2ka|X||DD E5;C5;DD E1;C1
+ex ix, bc|r3k|X||DD E5;C5;DD E1;C1
+ex ix, bc|r4k|X||DD E5;C5;DD E1;C1
+ex ix, bc|r5k|X||DD E5;C5;DD E1;C1
+ex ix, bc|r800|X||DD E5;C5;DD E1;C1
+ex ix, bc|z180|X||DD E5;C5;DD E1;C1
+ex ix, bc|z80|X||DD E5;C5;DD E1;C1
+ex ix, bc|z80n|X||DD E5;C5;DD E1;C1
+ex ix, de|ez80|X||DD E5;D5;DD E1;D1
+ex ix, de|ez80_z80|X||DD E5;D5;DD E1;D1
+ex ix, de|kc160|X||DD E5;D5;DD E1;D1
+ex ix, de|kc160_z80|X||DD E5;D5;DD E1;D1
+ex ix, de|r2ka|X||DD E5;D5;DD E1;D1
+ex ix, de|r3k|X||DD E5;D5;DD E1;D1
+ex ix, de|r4k|X||DD E5;D5;DD E1;D1
+ex ix, de|r5k|X||DD E5;D5;DD E1;D1
+ex ix, de|r800|X||DD E5;D5;DD E1;D1
+ex ix, de|z180|X||DD E5;D5;DD E1;D1
+ex ix, de|z80|X||DD E5;D5;DD E1;D1
+ex ix, de|z80n|X||DD E5;D5;DD E1;D1
+ex ix, hl|ez80|X||DD E5;E5;DD E1;E1
+ex ix, hl|ez80_z80|X||DD E5;E5;DD E1;E1
+ex ix, hl|kc160|X||DD E5;E5;DD E1;E1
+ex ix, hl|kc160_z80|X||DD E5;E5;DD E1;E1
+ex ix, hl|r2ka|X||DD E5;E5;DD E1;E1
+ex ix, hl|r3k|X||DD E5;E5;DD E1;E1
+ex ix, hl|r4k|X||DD E5;E5;DD E1;E1
+ex ix, hl|r5k|X||DD E5;E5;DD E1;E1
+ex ix, hl|r800|X||DD E5;E5;DD E1;E1
+ex ix, hl|z180|X||DD E5;E5;DD E1;E1
+ex ix, hl|z80|X||DD E5;E5;DD E1;E1
+ex ix, hl|z80n|X||DD E5;E5;DD E1;E1
+ex ix, iy|ez80|X||DD E5;FD E5;DD E1;FD E1
+ex ix, iy|ez80_z80|X||DD E5;FD E5;DD E1;FD E1
+ex ix, iy|kc160|X||DD E5;FD E5;DD E1;FD E1
+ex ix, iy|kc160_z80|X||DD E5;FD E5;DD E1;FD E1
+ex ix, iy|r2ka|X||DD E5;FD E5;DD E1;FD E1
+ex ix, iy|r3k|X||DD E5;FD E5;DD E1;FD E1
+ex ix, iy|r4k|X||DD E5;FD E5;DD E1;FD E1
+ex ix, iy|r5k|X||DD E5;FD E5;DD E1;FD E1
+ex ix, iy|r800|X||DD E5;FD E5;DD E1;FD E1
+ex ix, iy|z180|X||DD E5;FD E5;DD E1;FD E1
+ex ix, iy|z80|X||DD E5;FD E5;DD E1;FD E1
+ex ix, iy|z80n|X||DD E5;FD E5;DD E1;FD E1
+ex iy, bc|ez80|X||FD E5;C5;FD E1;C1
+ex iy, bc|ez80_z80|X||FD E5;C5;FD E1;C1
+ex iy, bc|kc160|X||FD E5;C5;FD E1;C1
+ex iy, bc|kc160_z80|X||FD E5;C5;FD E1;C1
+ex iy, bc|r2ka|X||FD E5;C5;FD E1;C1
+ex iy, bc|r3k|X||FD E5;C5;FD E1;C1
+ex iy, bc|r4k|X||FD E5;C5;FD E1;C1
+ex iy, bc|r5k|X||FD E5;C5;FD E1;C1
+ex iy, bc|r800|X||FD E5;C5;FD E1;C1
+ex iy, bc|z180|X||FD E5;C5;FD E1;C1
+ex iy, bc|z80|X||FD E5;C5;FD E1;C1
+ex iy, bc|z80n|X||FD E5;C5;FD E1;C1
+ex iy, de|ez80|X||FD E5;D5;FD E1;D1
+ex iy, de|ez80_z80|X||FD E5;D5;FD E1;D1
+ex iy, de|kc160|X||FD E5;D5;FD E1;D1
+ex iy, de|kc160_z80|X||FD E5;D5;FD E1;D1
+ex iy, de|r2ka|X||FD E5;D5;FD E1;D1
+ex iy, de|r3k|X||FD E5;D5;FD E1;D1
+ex iy, de|r4k|X||FD E5;D5;FD E1;D1
+ex iy, de|r5k|X||FD E5;D5;FD E1;D1
+ex iy, de|r800|X||FD E5;D5;FD E1;D1
+ex iy, de|z180|X||FD E5;D5;FD E1;D1
+ex iy, de|z80|X||FD E5;D5;FD E1;D1
+ex iy, de|z80n|X||FD E5;D5;FD E1;D1
+ex iy, hl|ez80|X||FD E5;E5;FD E1;E1
+ex iy, hl|ez80_z80|X||FD E5;E5;FD E1;E1
+ex iy, hl|kc160|X||FD E5;E5;FD E1;E1
+ex iy, hl|kc160_z80|X||FD E5;E5;FD E1;E1
+ex iy, hl|r2ka|X||FD E5;E5;FD E1;E1
+ex iy, hl|r3k|X||FD E5;E5;FD E1;E1
+ex iy, hl|r4k|X||FD E5;E5;FD E1;E1
+ex iy, hl|r5k|X||FD E5;E5;FD E1;E1
+ex iy, hl|r800|X||FD E5;E5;FD E1;E1
+ex iy, hl|z180|X||FD E5;E5;FD E1;E1
+ex iy, hl|z80|X||FD E5;E5;FD E1;E1
+ex iy, hl|z80n|X||FD E5;E5;FD E1;E1
+ex iy, ix|ez80|X||FD E5;DD E5;FD E1;DD E1
+ex iy, ix|ez80_z80|X||FD E5;DD E5;FD E1;DD E1
+ex iy, ix|kc160|X||FD E5;DD E5;FD E1;DD E1
+ex iy, ix|kc160_z80|X||FD E5;DD E5;FD E1;DD E1
+ex iy, ix|r2ka|X||FD E5;DD E5;FD E1;DD E1
+ex iy, ix|r3k|X||FD E5;DD E5;FD E1;DD E1
+ex iy, ix|r4k|X||FD E5;DD E5;FD E1;DD E1
+ex iy, ix|r5k|X||FD E5;DD E5;FD E1;DD E1
+ex iy, ix|r800|X||FD E5;DD E5;FD E1;DD E1
+ex iy, ix|z180|X||FD E5;DD E5;FD E1;DD E1
+ex iy, ix|z80|X||FD E5;DD E5;FD E1;DD E1
+ex iy, ix|z80n|X||FD E5;DD E5;FD E1;DD E1
 ex jk', hl|r4k|_||ED 7C
 ex jk', hl|r5k|_||ED 7C
 ex jk', hl'|r4k|_||76;ED 7C
@@ -12567,36 +12491,6 @@ inc (hl-)|z180|_||34;2B
 inc (hl-)|z80|_||34;2B
 inc (hl-)|z80_strict|_||34;2B
 inc (hl-)|z80n|_||34;2B
-inc (hld)|8080|X||34;2B
-inc (hld)|8085|X||34;2B
-inc (hld)|ez80|X||34;2B
-inc (hld)|ez80_z80|X||34;2B
-inc (hld)|gbz80|X||34;2B
-inc (hld)|kc160|X||34;2B
-inc (hld)|kc160_z80|X||34;2B
-inc (hld)|r2ka|X||34;2B
-inc (hld)|r3k|X||34;2B
-inc (hld)|r4k|X||34;2B
-inc (hld)|r5k|X||34;2B
-inc (hld)|r800|X||34;2B
-inc (hld)|z180|X||34;2B
-inc (hld)|z80|X||34;2B
-inc (hld)|z80n|X||34;2B
-inc (hli)|8080|X||34;23
-inc (hli)|8085|X||34;23
-inc (hli)|ez80|X||34;23
-inc (hli)|ez80_z80|X||34;23
-inc (hli)|gbz80|X||34;23
-inc (hli)|kc160|X||34;23
-inc (hli)|kc160_z80|X||34;23
-inc (hli)|r2ka|X||34;23
-inc (hli)|r3k|X||34;23
-inc (hli)|r4k|X||34;23
-inc (hli)|r5k|X||34;23
-inc (hli)|r800|X||34;23
-inc (hli)|z180|X||34;23
-inc (hli)|z80|X||34;23
-inc (hli)|z80n|X||34;23
 inc (ix)|ez80|_||DD 34 00
 inc (ix)|ez80_z80|_||DD 34 00
 inc (ix)|kc160|_||DD 34 00
@@ -20129,6 +20023,36 @@ jmp %m|z180|_||C3 %m %m
 jmp %m|z80|_||C3 %m %m
 jmp %m|z80_strict|_||C3 %m %m
 jmp %m|z80n|_||C3 %m %m
+jmp (bc)|8080|X||C5;C9
+jmp (bc)|8085|X||C5;C9
+jmp (bc)|ez80|X||C5;C9
+jmp (bc)|ez80_z80|X||C5;C9
+jmp (bc)|gbz80|X||C5;C9
+jmp (bc)|kc160|X||C5;C9
+jmp (bc)|kc160_z80|X||C5;C9
+jmp (bc)|r2ka|X||C5;C9
+jmp (bc)|r3k|X||C5;C9
+jmp (bc)|r4k|X||C5;C9
+jmp (bc)|r5k|X||C5;C9
+jmp (bc)|r800|X||C5;C9
+jmp (bc)|z180|X||C5;C9
+jmp (bc)|z80|X||C5;C9
+jmp (bc)|z80n|X||C5;C9
+jmp (de)|8080|X||D5;C9
+jmp (de)|8085|X||D5;C9
+jmp (de)|ez80|X||D5;C9
+jmp (de)|ez80_z80|X||D5;C9
+jmp (de)|gbz80|X||D5;C9
+jmp (de)|kc160|X||D5;C9
+jmp (de)|kc160_z80|X||D5;C9
+jmp (de)|r2ka|X||D5;C9
+jmp (de)|r3k|X||D5;C9
+jmp (de)|r4k|X||D5;C9
+jmp (de)|r5k|X||D5;C9
+jmp (de)|r800|X||D5;C9
+jmp (de)|z180|X||D5;C9
+jmp (de)|z80|X||D5;C9
+jmp (de)|z80n|X||D5;C9
 jmp c, %m|8080|X||DA %m %m
 jmp c, %m|8085|X||DA %m %m
 jmp c, %m|ez80|X||DA %m %m %m
@@ -20461,6 +20385,8 @@ jp %m|z80n|_||C3 %m %m
 jp (ahl)|kc160|_||52;E9
 jp (aix)|kc160|_||52;DD E9
 jp (aiy)|kc160|_||52;FD E9
+jp (bc)|8080|X||C5;C9
+jp (bc)|8085|X||C5;C9
 jp (bc)|ez80|_||C5;C9
 jp (bc)|ez80_z80|_||C5;C9
 jp (bc)|gbz80|_||C5;C9
@@ -20476,6 +20402,8 @@ jp (bc)|z80|_||C5;C9
 jp (bc)|z80_strict|_||C5;C9
 jp (bc)|z80n|_||C5;C9
 jp (c)|z80n|_||ED 98
+jp (de)|8080|X||D5;C9
+jp (de)|8085|X||D5;C9
 jp (de)|ez80|_||D5;C9
 jp (de)|ez80_z80|_||D5;C9
 jp (de)|gbz80|_||D5;C9
@@ -21276,6 +21204,8 @@ ld (%m), jk|r4k|_||89 %m %m
 ld (%m), jk|r5k|_||89 %m %m
 ld (%m), jkhl|r4k|_||84 %m %m
 ld (%m), jkhl|r5k|_||84 %m %m
+ld (%m), sp|8080|X||E5;21 02 00;39;22 %m %m;E1
+ld (%m), sp|8085|X||E5;21 02 00;39;22 %m %m;E1
 ld (%m), sp|ez80|_||ED 73 %m %m %m
 ld (%m), sp|ez80_z80|_||ED 73 %m %m
 ld (%m), sp|gbz80|_||08 %m %m
@@ -21428,7 +21358,7 @@ ld (de), %n|8080|X||EB;36 %n;EB
 ld (de), %n|8085|X||EB;36 %n;EB
 ld (de), %n|ez80|X||EB;36 %n;EB
 ld (de), %n|ez80_z80|X||EB;36 %n;EB
-ld (de), %n|gbz80|X||E5;D5;E1;D1;36 %n;E5;D5;E1;D1
+ld (de), %n|gbz80|X||D5;E5;D1;E1;36 %n;D5;E5;D1;E1
 ld (de), %n|kc160|X||EB;36 %n;EB
 ld (de), %n|kc160_z80|X||EB;36 %n;EB
 ld (de), %n|r2ka|X||EB;36 %n;EB
@@ -21459,7 +21389,7 @@ ld (de), b|8080|X||EB;70;EB
 ld (de), b|8085|X||EB;70;EB
 ld (de), b|ez80|X||EB;70;EB
 ld (de), b|ez80_z80|X||EB;70;EB
-ld (de), b|gbz80|X||E5;D5;E1;D1;70;E5;D5;E1;D1
+ld (de), b|gbz80|X||D5;E5;D1;E1;70;D5;E5;D1;E1
 ld (de), b|kc160|X||EB;70;EB
 ld (de), b|kc160_z80|X||EB;70;EB
 ld (de), b|r2ka|X||EB;70;EB
@@ -21474,7 +21404,7 @@ ld (de), bc|8080|X||EB;71;23;70;2B;EB
 ld (de), bc|8085|X||EB;71;23;70;2B;EB
 ld (de), bc|ez80|X||EB;71;23;70;2B;EB
 ld (de), bc|ez80_z80|X||EB;71;23;70;2B;EB
-ld (de), bc|gbz80|X||E5;D5;E1;D1;71;23;70;2B;E5;D5;E1;D1
+ld (de), bc|gbz80|X||D5;E5;D1;E1;71;23;70;2B;D5;E5;D1;E1
 ld (de), bc|kc160|X||EB;71;23;70;2B;EB
 ld (de), bc|kc160_z80|X||EB;71;23;70;2B;EB
 ld (de), bc|r2ka|X||EB;71;23;70;2B;EB
@@ -21489,7 +21419,7 @@ ld (de), c|8080|X||EB;71;EB
 ld (de), c|8085|X||EB;71;EB
 ld (de), c|ez80|X||EB;71;EB
 ld (de), c|ez80_z80|X||EB;71;EB
-ld (de), c|gbz80|X||E5;D5;E1;D1;71;E5;D5;E1;D1
+ld (de), c|gbz80|X||D5;E5;D1;E1;71;D5;E5;D1;E1
 ld (de), c|kc160|X||EB;71;EB
 ld (de), c|kc160_z80|X||EB;71;EB
 ld (de), c|r2ka|X||EB;71;EB
@@ -21504,7 +21434,7 @@ ld (de), d|8080|X||EB;74;EB
 ld (de), d|8085|X||EB;74;EB
 ld (de), d|ez80|X||EB;74;EB
 ld (de), d|ez80_z80|X||EB;74;EB
-ld (de), d|gbz80|X||E5;D5;E1;D1;74;E5;D5;E1;D1
+ld (de), d|gbz80|X||D5;E5;D1;E1;74;D5;E5;D1;E1
 ld (de), d|kc160|X||EB;74;EB
 ld (de), d|kc160_z80|X||EB;74;EB
 ld (de), d|r2ka|X||EB;74;EB
@@ -21519,7 +21449,7 @@ ld (de), e|8080|X||EB;75;EB
 ld (de), e|8085|X||EB;75;EB
 ld (de), e|ez80|X||EB;75;EB
 ld (de), e|ez80_z80|X||EB;75;EB
-ld (de), e|gbz80|X||E5;D5;E1;D1;75;E5;D5;E1;D1
+ld (de), e|gbz80|X||D5;E5;D1;E1;75;D5;E5;D1;E1
 ld (de), e|kc160|X||EB;75;EB
 ld (de), e|kc160_z80|X||EB;75;EB
 ld (de), e|r2ka|X||EB;75;EB
@@ -21534,7 +21464,7 @@ ld (de), h|8080|X||EB;72;EB
 ld (de), h|8085|X||EB;72;EB
 ld (de), h|ez80|X||EB;72;EB
 ld (de), h|ez80_z80|X||EB;72;EB
-ld (de), h|gbz80|X||E5;D5;E1;D1;72;E5;D5;E1;D1
+ld (de), h|gbz80|X||D5;E5;D1;E1;72;D5;E5;D1;E1
 ld (de), h|kc160|X||EB;72;EB
 ld (de), h|kc160_z80|X||EB;72;EB
 ld (de), h|r2ka|X||EB;72;EB
@@ -21549,7 +21479,7 @@ ld (de), hl|8080|X||EB;73;23;72;2B;EB
 ld (de), hl|8085|_||D9
 ld (de), hl|ez80|X||EB;73;23;72;2B;EB
 ld (de), hl|ez80_z80|X||EB;73;23;72;2B;EB
-ld (de), hl|gbz80|X||E5;D5;E1;D1;73;23;72;2B;E5;D5;E1;D1
+ld (de), hl|gbz80|X||D5;E5;D1;E1;73;23;72;2B;D5;E5;D1;E1
 ld (de), hl|kc160|X||EB;73;23;72;2B;EB
 ld (de), hl|kc160_z80|X||EB;73;23;72;2B;EB
 ld (de), hl|r2ka|X||EB;73;23;72;2B;EB
@@ -21564,7 +21494,7 @@ ld (de), l|8080|X||EB;73;EB
 ld (de), l|8085|X||EB;73;EB
 ld (de), l|ez80|X||EB;73;EB
 ld (de), l|ez80_z80|X||EB;73;EB
-ld (de), l|gbz80|X||E5;D5;E1;D1;73;E5;D5;E1;D1
+ld (de), l|gbz80|X||D5;E5;D1;E1;73;D5;E5;D1;E1
 ld (de), l|kc160|X||EB;73;EB
 ld (de), l|kc160_z80|X||EB;73;EB
 ld (de), l|r2ka|X||EB;73;EB
@@ -21579,7 +21509,7 @@ ld (de+), %n|8080|X||EB;36 %n;EB;13
 ld (de+), %n|8085|X||EB;36 %n;EB;13
 ld (de+), %n|ez80|X||EB;36 %n;EB;13
 ld (de+), %n|ez80_z80|X||EB;36 %n;EB;13
-ld (de+), %n|gbz80|X||E5;D5;E1;D1;36 %n;E5;D5;E1;D1;13
+ld (de+), %n|gbz80|X||D5;E5;D1;E1;36 %n;D5;E5;D1;E1;13
 ld (de+), %n|kc160|X||EB;36 %n;EB;13
 ld (de+), %n|kc160_z80|X||EB;36 %n;EB;13
 ld (de+), %n|r2ka|X||EB;36 %n;EB;13
@@ -21610,7 +21540,7 @@ ld (de+), b|8080|X||EB;70;EB;13
 ld (de+), b|8085|X||EB;70;EB;13
 ld (de+), b|ez80|X||EB;70;EB;13
 ld (de+), b|ez80_z80|X||EB;70;EB;13
-ld (de+), b|gbz80|X||E5;D5;E1;D1;70;E5;D5;E1;D1;13
+ld (de+), b|gbz80|X||D5;E5;D1;E1;70;D5;E5;D1;E1;13
 ld (de+), b|kc160|X||EB;70;EB;13
 ld (de+), b|kc160_z80|X||EB;70;EB;13
 ld (de+), b|r2ka|X||EB;70;EB;13
@@ -21625,7 +21555,7 @@ ld (de+), bc|8080|X||EB;71;23;70;23;EB
 ld (de+), bc|8085|X||EB;71;23;70;23;EB
 ld (de+), bc|ez80|X||EB;71;23;70;23;EB
 ld (de+), bc|ez80_z80|X||EB;71;23;70;23;EB
-ld (de+), bc|gbz80|X||E5;D5;E1;D1;71;23;70;23;E5;D5;E1;D1
+ld (de+), bc|gbz80|X||D5;E5;D1;E1;71;23;70;23;D5;E5;D1;E1
 ld (de+), bc|kc160|X||EB;71;23;70;23;EB
 ld (de+), bc|kc160_z80|X||EB;71;23;70;23;EB
 ld (de+), bc|r2ka|X||EB;71;23;70;23;EB
@@ -21640,7 +21570,7 @@ ld (de+), c|8080|X||EB;71;EB;13
 ld (de+), c|8085|X||EB;71;EB;13
 ld (de+), c|ez80|X||EB;71;EB;13
 ld (de+), c|ez80_z80|X||EB;71;EB;13
-ld (de+), c|gbz80|X||E5;D5;E1;D1;71;E5;D5;E1;D1;13
+ld (de+), c|gbz80|X||D5;E5;D1;E1;71;D5;E5;D1;E1;13
 ld (de+), c|kc160|X||EB;71;EB;13
 ld (de+), c|kc160_z80|X||EB;71;EB;13
 ld (de+), c|r2ka|X||EB;71;EB;13
@@ -21655,7 +21585,7 @@ ld (de+), d|8080|X||EB;74;EB;13
 ld (de+), d|8085|X||EB;74;EB;13
 ld (de+), d|ez80|X||EB;74;EB;13
 ld (de+), d|ez80_z80|X||EB;74;EB;13
-ld (de+), d|gbz80|X||E5;D5;E1;D1;74;E5;D5;E1;D1;13
+ld (de+), d|gbz80|X||D5;E5;D1;E1;74;D5;E5;D1;E1;13
 ld (de+), d|kc160|X||EB;74;EB;13
 ld (de+), d|kc160_z80|X||EB;74;EB;13
 ld (de+), d|r2ka|X||EB;74;EB;13
@@ -21670,7 +21600,7 @@ ld (de+), e|8080|X||EB;75;EB;13
 ld (de+), e|8085|X||EB;75;EB;13
 ld (de+), e|ez80|X||EB;75;EB;13
 ld (de+), e|ez80_z80|X||EB;75;EB;13
-ld (de+), e|gbz80|X||E5;D5;E1;D1;75;E5;D5;E1;D1;13
+ld (de+), e|gbz80|X||D5;E5;D1;E1;75;D5;E5;D1;E1;13
 ld (de+), e|kc160|X||EB;75;EB;13
 ld (de+), e|kc160_z80|X||EB;75;EB;13
 ld (de+), e|r2ka|X||EB;75;EB;13
@@ -21685,7 +21615,7 @@ ld (de+), h|8080|X||EB;72;EB;13
 ld (de+), h|8085|X||EB;72;EB;13
 ld (de+), h|ez80|X||EB;72;EB;13
 ld (de+), h|ez80_z80|X||EB;72;EB;13
-ld (de+), h|gbz80|X||E5;D5;E1;D1;72;E5;D5;E1;D1;13
+ld (de+), h|gbz80|X||D5;E5;D1;E1;72;D5;E5;D1;E1;13
 ld (de+), h|kc160|X||EB;72;EB;13
 ld (de+), h|kc160_z80|X||EB;72;EB;13
 ld (de+), h|r2ka|X||EB;72;EB;13
@@ -21700,7 +21630,7 @@ ld (de+), hl|8080|X||EB;73;23;72;23;EB
 ld (de+), hl|8085|X||EB;73;23;72;23;EB
 ld (de+), hl|ez80|X||EB;73;23;72;23;EB
 ld (de+), hl|ez80_z80|X||EB;73;23;72;23;EB
-ld (de+), hl|gbz80|X||E5;D5;E1;D1;73;23;72;23;E5;D5;E1;D1
+ld (de+), hl|gbz80|X||D5;E5;D1;E1;73;23;72;23;D5;E5;D1;E1
 ld (de+), hl|kc160|X||EB;73;23;72;23;EB
 ld (de+), hl|kc160_z80|X||EB;73;23;72;23;EB
 ld (de+), hl|r2ka|X||EB;73;23;72;23;EB
@@ -21715,7 +21645,7 @@ ld (de+), l|8080|X||EB;73;EB;13
 ld (de+), l|8085|X||EB;73;EB;13
 ld (de+), l|ez80|X||EB;73;EB;13
 ld (de+), l|ez80_z80|X||EB;73;EB;13
-ld (de+), l|gbz80|X||E5;D5;E1;D1;73;E5;D5;E1;D1;13
+ld (de+), l|gbz80|X||D5;E5;D1;E1;73;D5;E5;D1;E1;13
 ld (de+), l|kc160|X||EB;73;EB;13
 ld (de+), l|kc160_z80|X||EB;73;EB;13
 ld (de+), l|r2ka|X||EB;73;EB;13
@@ -21730,7 +21660,7 @@ ld (de-), %n|8080|X||EB;36 %n;EB;1B
 ld (de-), %n|8085|X||EB;36 %n;EB;1B
 ld (de-), %n|ez80|X||EB;36 %n;EB;1B
 ld (de-), %n|ez80_z80|X||EB;36 %n;EB;1B
-ld (de-), %n|gbz80|X||E5;D5;E1;D1;36 %n;E5;D5;E1;D1;1B
+ld (de-), %n|gbz80|X||D5;E5;D1;E1;36 %n;D5;E5;D1;E1;1B
 ld (de-), %n|kc160|X||EB;36 %n;EB;1B
 ld (de-), %n|kc160_z80|X||EB;36 %n;EB;1B
 ld (de-), %n|r2ka|X||EB;36 %n;EB;1B
@@ -21761,7 +21691,7 @@ ld (de-), b|8080|X||EB;70;EB;1B
 ld (de-), b|8085|X||EB;70;EB;1B
 ld (de-), b|ez80|X||EB;70;EB;1B
 ld (de-), b|ez80_z80|X||EB;70;EB;1B
-ld (de-), b|gbz80|X||E5;D5;E1;D1;70;E5;D5;E1;D1;1B
+ld (de-), b|gbz80|X||D5;E5;D1;E1;70;D5;E5;D1;E1;1B
 ld (de-), b|kc160|X||EB;70;EB;1B
 ld (de-), b|kc160_z80|X||EB;70;EB;1B
 ld (de-), b|r2ka|X||EB;70;EB;1B
@@ -21776,7 +21706,7 @@ ld (de-), c|8080|X||EB;71;EB;1B
 ld (de-), c|8085|X||EB;71;EB;1B
 ld (de-), c|ez80|X||EB;71;EB;1B
 ld (de-), c|ez80_z80|X||EB;71;EB;1B
-ld (de-), c|gbz80|X||E5;D5;E1;D1;71;E5;D5;E1;D1;1B
+ld (de-), c|gbz80|X||D5;E5;D1;E1;71;D5;E5;D1;E1;1B
 ld (de-), c|kc160|X||EB;71;EB;1B
 ld (de-), c|kc160_z80|X||EB;71;EB;1B
 ld (de-), c|r2ka|X||EB;71;EB;1B
@@ -21791,7 +21721,7 @@ ld (de-), d|8080|X||EB;74;EB;1B
 ld (de-), d|8085|X||EB;74;EB;1B
 ld (de-), d|ez80|X||EB;74;EB;1B
 ld (de-), d|ez80_z80|X||EB;74;EB;1B
-ld (de-), d|gbz80|X||E5;D5;E1;D1;74;E5;D5;E1;D1;1B
+ld (de-), d|gbz80|X||D5;E5;D1;E1;74;D5;E5;D1;E1;1B
 ld (de-), d|kc160|X||EB;74;EB;1B
 ld (de-), d|kc160_z80|X||EB;74;EB;1B
 ld (de-), d|r2ka|X||EB;74;EB;1B
@@ -21806,7 +21736,7 @@ ld (de-), e|8080|X||EB;75;EB;1B
 ld (de-), e|8085|X||EB;75;EB;1B
 ld (de-), e|ez80|X||EB;75;EB;1B
 ld (de-), e|ez80_z80|X||EB;75;EB;1B
-ld (de-), e|gbz80|X||E5;D5;E1;D1;75;E5;D5;E1;D1;1B
+ld (de-), e|gbz80|X||D5;E5;D1;E1;75;D5;E5;D1;E1;1B
 ld (de-), e|kc160|X||EB;75;EB;1B
 ld (de-), e|kc160_z80|X||EB;75;EB;1B
 ld (de-), e|r2ka|X||EB;75;EB;1B
@@ -21821,7 +21751,7 @@ ld (de-), h|8080|X||EB;72;EB;1B
 ld (de-), h|8085|X||EB;72;EB;1B
 ld (de-), h|ez80|X||EB;72;EB;1B
 ld (de-), h|ez80_z80|X||EB;72;EB;1B
-ld (de-), h|gbz80|X||E5;D5;E1;D1;72;E5;D5;E1;D1;1B
+ld (de-), h|gbz80|X||D5;E5;D1;E1;72;D5;E5;D1;E1;1B
 ld (de-), h|kc160|X||EB;72;EB;1B
 ld (de-), h|kc160_z80|X||EB;72;EB;1B
 ld (de-), h|r2ka|X||EB;72;EB;1B
@@ -21836,7 +21766,7 @@ ld (de-), l|8080|X||EB;73;EB;1B
 ld (de-), l|8085|X||EB;73;EB;1B
 ld (de-), l|ez80|X||EB;73;EB;1B
 ld (de-), l|ez80_z80|X||EB;73;EB;1B
-ld (de-), l|gbz80|X||E5;D5;E1;D1;73;E5;D5;E1;D1;1B
+ld (de-), l|gbz80|X||D5;E5;D1;E1;73;D5;E5;D1;E1;1B
 ld (de-), l|kc160|X||EB;73;EB;1B
 ld (de-), l|kc160_z80|X||EB;73;EB;1B
 ld (de-), l|r2ka|X||EB;73;EB;1B
@@ -21899,18 +21829,17 @@ ld (hl), bc|8080|X||71;23;70;2B
 ld (hl), bc|8085|X||71;23;70;2B
 ld (hl), bc|ez80|_||ED 0F
 ld (hl), bc|ez80_z80|_||ED 0F
-ld (hl), bc|gbz80|_||71;23;70;2B
-ld (hl), bc|kc160|_||71;23;70;2B
-ld (hl), bc|kc160_z80|_||71;23;70;2B
-ld (hl), bc|r2ka|_||71;23;70;2B
-ld (hl), bc|r3k|_||71;23;70;2B
-ld (hl), bc|r4k|_||71;23;70;2B
-ld (hl), bc|r5k|_||71;23;70;2B
-ld (hl), bc|r800|_||71;23;70;2B
-ld (hl), bc|z180|_||71;23;70;2B
-ld (hl), bc|z80|_||71;23;70;2B
-ld (hl), bc|z80_strict|_||71;23;70;2B
-ld (hl), bc|z80n|_||71;23;70;2B
+ld (hl), bc|gbz80|X||71;23;70;2B
+ld (hl), bc|kc160|X||71;23;70;2B
+ld (hl), bc|kc160_z80|X||71;23;70;2B
+ld (hl), bc|r2ka|X||71;23;70;2B
+ld (hl), bc|r3k|X||71;23;70;2B
+ld (hl), bc|r4k|X||71;23;70;2B
+ld (hl), bc|r5k|X||71;23;70;2B
+ld (hl), bc|r800|X||71;23;70;2B
+ld (hl), bc|z180|X||71;23;70;2B
+ld (hl), bc|z80|X||71;23;70;2B
+ld (hl), bc|z80n|X||71;23;70;2B
 ld (hl), bcde|r4k|_||DD 1B
 ld (hl), bcde|r5k|_||DD 1B
 ld (hl), c|8080|_||71
@@ -21945,20 +21874,21 @@ ld (hl), d|z180|_||72
 ld (hl), d|z80|_||72
 ld (hl), d|z80_strict|_||72
 ld (hl), d|z80n|_||72
+ld (hl), de|8080|X||73;23;72;2B
+ld (hl), de|8085|X||73;23;72;2B
 ld (hl), de|ez80|_||ED 1F
 ld (hl), de|ez80_z80|_||ED 1F
-ld (hl), de|gbz80|_||73;23;72;2B
-ld (hl), de|kc160|_||73;23;72;2B
-ld (hl), de|kc160_z80|_||73;23;72;2B
-ld (hl), de|r2ka|_||73;23;72;2B
-ld (hl), de|r3k|_||73;23;72;2B
-ld (hl), de|r4k|_||73;23;72;2B
-ld (hl), de|r5k|_||73;23;72;2B
-ld (hl), de|r800|_||73;23;72;2B
-ld (hl), de|z180|_||73;23;72;2B
-ld (hl), de|z80|_||73;23;72;2B
-ld (hl), de|z80_strict|_||73;23;72;2B
-ld (hl), de|z80n|_||73;23;72;2B
+ld (hl), de|gbz80|X||73;23;72;2B
+ld (hl), de|kc160|X||73;23;72;2B
+ld (hl), de|kc160_z80|X||73;23;72;2B
+ld (hl), de|r2ka|X||73;23;72;2B
+ld (hl), de|r3k|X||73;23;72;2B
+ld (hl), de|r4k|X||73;23;72;2B
+ld (hl), de|r5k|X||73;23;72;2B
+ld (hl), de|r800|X||73;23;72;2B
+ld (hl), de|z180|X||73;23;72;2B
+ld (hl), de|z80|X||73;23;72;2B
+ld (hl), de|z80n|X||73;23;72;2B
 ld (hl), e|8080|_||73
 ld (hl), e|8085|_||73
 ld (hl), e|ez80|_||73
@@ -21991,46 +21921,45 @@ ld (hl), h|z180|_||74
 ld (hl), h|z80|_||74
 ld (hl), h|z80_strict|_||74
 ld (hl), h|z80n|_||74
+ld (hl), hl|8080|X||F5;7C;75;23;77;F1;2B
+ld (hl), hl|8085|X||F5;7C;75;23;77;F1;2B
 ld (hl), hl|ez80|_||ED 2F
 ld (hl), hl|ez80_z80|_||ED 2F
-ld (hl), hl|gbz80|_||F5;7C;75;23;77;F1;2B
-ld (hl), hl|kc160|_||F5;7C;75;23;77;F1;2B
-ld (hl), hl|kc160_z80|_||F5;7C;75;23;77;F1;2B
+ld (hl), hl|gbz80|X||F5;7C;75;23;77;F1;2B
+ld (hl), hl|kc160|X||F5;7C;75;23;77;F1;2B
+ld (hl), hl|kc160_z80|X||F5;7C;75;23;77;F1;2B
 ld (hl), hl|r2ka|_||DD F4 00
 ld (hl), hl|r3k|_||DD F4 00
 ld (hl), hl|r4k|_||DD F4 00
 ld (hl), hl|r5k|_||DD F4 00
-ld (hl), hl|r800|_||F5;7C;75;23;77;F1;2B
-ld (hl), hl|z180|_||F5;7C;75;23;77;F1;2B
-ld (hl), hl|z80|_||F5;7C;75;23;77;F1;2B
-ld (hl), hl|z80_strict|_||F5;7C;75;23;77;F1;2B
-ld (hl), hl|z80n|_||F5;7C;75;23;77;F1;2B
+ld (hl), hl|r800|X||F5;7C;75;23;77;F1;2B
+ld (hl), hl|z180|X||F5;7C;75;23;77;F1;2B
+ld (hl), hl|z80|X||F5;7C;75;23;77;F1;2B
+ld (hl), hl|z80n|X||F5;7C;75;23;77;F1;2B
 ld (hl), ix|ez80|_||ED 3F
 ld (hl), ix|ez80_z80|_||ED 3F
-ld (hl), ix|kc160|_||D5;DD E5;D1;73;23;72;2B;D1
-ld (hl), ix|kc160_z80|_||D5;DD E5;D1;73;23;72;2B;D1
-ld (hl), ix|r2ka|_||D5;DD E5;D1;73;23;72;2B;D1
-ld (hl), ix|r3k|_||D5;DD E5;D1;73;23;72;2B;D1
-ld (hl), ix|r4k|_||D5;DD E5;D1;73;23;72;2B;D1
-ld (hl), ix|r5k|_||D5;DD E5;D1;73;23;72;2B;D1
-ld (hl), ix|r800|_||D5;DD E5;D1;73;23;72;2B;D1
-ld (hl), ix|z180|_||D5;DD E5;D1;73;23;72;2B;D1
-ld (hl), ix|z80|_||D5;DD E5;D1;73;23;72;2B;D1
-ld (hl), ix|z80_strict|_||D5;DD E5;D1;73;23;72;2B;D1
-ld (hl), ix|z80n|_||D5;DD E5;D1;73;23;72;2B;D1
+ld (hl), ix|kc160|X||D5;DD E5;D1;73;23;72;D1;2B
+ld (hl), ix|kc160_z80|X||D5;DD E5;D1;73;23;72;D1;2B
+ld (hl), ix|r2ka|X||D5;DD E5;D1;73;23;72;D1;2B
+ld (hl), ix|r3k|X||D5;DD E5;D1;73;23;72;D1;2B
+ld (hl), ix|r4k|X||D5;DD E5;D1;73;23;72;D1;2B
+ld (hl), ix|r5k|X||D5;DD E5;D1;73;23;72;D1;2B
+ld (hl), ix|r800|X||D5;DD E5;D1;73;23;72;D1;2B
+ld (hl), ix|z180|X||D5;DD E5;D1;73;23;72;D1;2B
+ld (hl), ix|z80|X||D5;DD E5;D1;73;23;72;D1;2B
+ld (hl), ix|z80n|X||D5;DD E5;D1;73;23;72;D1;2B
 ld (hl), iy|ez80|_||ED 3E
 ld (hl), iy|ez80_z80|_||ED 3E
-ld (hl), iy|kc160|_||D5;FD E5;D1;73;23;72;2B;D1
-ld (hl), iy|kc160_z80|_||D5;FD E5;D1;73;23;72;2B;D1
-ld (hl), iy|r2ka|_||D5;FD E5;D1;73;23;72;2B;D1
-ld (hl), iy|r3k|_||D5;FD E5;D1;73;23;72;2B;D1
-ld (hl), iy|r4k|_||D5;FD E5;D1;73;23;72;2B;D1
-ld (hl), iy|r5k|_||D5;FD E5;D1;73;23;72;2B;D1
-ld (hl), iy|r800|_||D5;FD E5;D1;73;23;72;2B;D1
-ld (hl), iy|z180|_||D5;FD E5;D1;73;23;72;2B;D1
-ld (hl), iy|z80|_||D5;FD E5;D1;73;23;72;2B;D1
-ld (hl), iy|z80_strict|_||D5;FD E5;D1;73;23;72;2B;D1
-ld (hl), iy|z80n|_||D5;FD E5;D1;73;23;72;2B;D1
+ld (hl), iy|kc160|X||D5;FD E5;D1;73;23;72;D1;2B
+ld (hl), iy|kc160_z80|X||D5;FD E5;D1;73;23;72;D1;2B
+ld (hl), iy|r2ka|X||D5;FD E5;D1;73;23;72;D1;2B
+ld (hl), iy|r3k|X||D5;FD E5;D1;73;23;72;D1;2B
+ld (hl), iy|r4k|X||D5;FD E5;D1;73;23;72;D1;2B
+ld (hl), iy|r5k|X||D5;FD E5;D1;73;23;72;D1;2B
+ld (hl), iy|r800|X||D5;FD E5;D1;73;23;72;D1;2B
+ld (hl), iy|z180|X||D5;FD E5;D1;73;23;72;D1;2B
+ld (hl), iy|z80|X||D5;FD E5;D1;73;23;72;D1;2B
+ld (hl), iy|z80n|X||D5;FD E5;D1;73;23;72;D1;2B
 ld (hl), jkhl|r4k|_||FD 1B
 ld (hl), jkhl|r5k|_||FD 1B
 ld (hl), l|8080|_||75
@@ -22105,18 +22034,17 @@ ld (hl+), bc|8080|X||71;23;70;23
 ld (hl+), bc|8085|X||71;23;70;23
 ld (hl+), bc|ez80|_||ED 0F;23;23
 ld (hl+), bc|ez80_z80|_||ED 0F;23;23
-ld (hl+), bc|gbz80|_||71;23;70;23
-ld (hl+), bc|kc160|_||71;23;70;23
-ld (hl+), bc|kc160_z80|_||71;23;70;23
-ld (hl+), bc|r2ka|_||71;23;70;23
-ld (hl+), bc|r3k|_||71;23;70;23
-ld (hl+), bc|r4k|_||71;23;70;23
-ld (hl+), bc|r5k|_||71;23;70;23
-ld (hl+), bc|r800|_||71;23;70;23
-ld (hl+), bc|z180|_||71;23;70;23
-ld (hl+), bc|z80|_||71;23;70;23
-ld (hl+), bc|z80_strict|_||71;23;70;23
-ld (hl+), bc|z80n|_||71;23;70;23
+ld (hl+), bc|gbz80|X||71;23;70;23
+ld (hl+), bc|kc160|X||71;23;70;23
+ld (hl+), bc|kc160_z80|X||71;23;70;23
+ld (hl+), bc|r2ka|X||71;23;70;23
+ld (hl+), bc|r3k|X||71;23;70;23
+ld (hl+), bc|r4k|X||71;23;70;23
+ld (hl+), bc|r5k|X||71;23;70;23
+ld (hl+), bc|r800|X||71;23;70;23
+ld (hl+), bc|z180|X||71;23;70;23
+ld (hl+), bc|z80|X||71;23;70;23
+ld (hl+), bc|z80n|X||71;23;70;23
 ld (hl+), c|8080|X||71;23
 ld (hl+), c|8085|X||71;23
 ld (hl+), c|ez80|_||71;23
@@ -22149,20 +22077,21 @@ ld (hl+), d|z180|_||72;23
 ld (hl+), d|z80|_||72;23
 ld (hl+), d|z80_strict|_||72;23
 ld (hl+), d|z80n|_||72;23
+ld (hl+), de|8080|X||73;23;72;23
+ld (hl+), de|8085|X||73;23;72;23
 ld (hl+), de|ez80|_||ED 1F;23;23
 ld (hl+), de|ez80_z80|_||ED 1F;23;23
-ld (hl+), de|gbz80|_||73;23;72;23
-ld (hl+), de|kc160|_||73;23;72;23
-ld (hl+), de|kc160_z80|_||73;23;72;23
-ld (hl+), de|r2ka|_||73;23;72;23
-ld (hl+), de|r3k|_||73;23;72;23
-ld (hl+), de|r4k|_||73;23;72;23
-ld (hl+), de|r5k|_||73;23;72;23
-ld (hl+), de|r800|_||73;23;72;23
-ld (hl+), de|z180|_||73;23;72;23
-ld (hl+), de|z80|_||73;23;72;23
-ld (hl+), de|z80_strict|_||73;23;72;23
-ld (hl+), de|z80n|_||73;23;72;23
+ld (hl+), de|gbz80|X||73;23;72;23
+ld (hl+), de|kc160|X||73;23;72;23
+ld (hl+), de|kc160_z80|X||73;23;72;23
+ld (hl+), de|r2ka|X||73;23;72;23
+ld (hl+), de|r3k|X||73;23;72;23
+ld (hl+), de|r4k|X||73;23;72;23
+ld (hl+), de|r5k|X||73;23;72;23
+ld (hl+), de|r800|X||73;23;72;23
+ld (hl+), de|z180|X||73;23;72;23
+ld (hl+), de|z80|X||73;23;72;23
+ld (hl+), de|z80n|X||73;23;72;23
 ld (hl+), e|8080|X||73;23
 ld (hl+), e|8085|X||73;23
 ld (hl+), e|ez80|_||73;23
@@ -22195,42 +22124,45 @@ ld (hl+), h|z180|_||74;23
 ld (hl+), h|z80|_||74;23
 ld (hl+), h|z80_strict|_||74;23
 ld (hl+), h|z80n|_||74;23
+ld (hl+), hl|8080|X||F5;7C;75;23;77;F1;23
+ld (hl+), hl|8085|X||F5;7C;75;23;77;F1;23
 ld (hl+), hl|ez80|_||ED 2F;23;23
 ld (hl+), hl|ez80_z80|_||ED 2F;23;23
-ld (hl+), hl|gbz80|_||F5;7C;75;23;77;F1;23
-ld (hl+), hl|kc160|_||F5;7C;75;23;77;F1;23
-ld (hl+), hl|kc160_z80|_||F5;7C;75;23;77;F1;23
-ld (hl+), hl|r800|_||F5;7C;75;23;77;F1;23
-ld (hl+), hl|z180|_||F5;7C;75;23;77;F1;23
-ld (hl+), hl|z80|_||F5;7C;75;23;77;F1;23
-ld (hl+), hl|z80_strict|_||F5;7C;75;23;77;F1;23
-ld (hl+), hl|z80n|_||F5;7C;75;23;77;F1;23
+ld (hl+), hl|gbz80|X||F5;7C;75;23;77;F1;23
+ld (hl+), hl|kc160|X||F5;7C;75;23;77;F1;23
+ld (hl+), hl|kc160_z80|X||F5;7C;75;23;77;F1;23
+ld (hl+), hl|r2ka|X||F5;7C;75;23;77;F1;23
+ld (hl+), hl|r3k|X||F5;7C;75;23;77;F1;23
+ld (hl+), hl|r4k|X||F5;7F 7C;75;23;77;F1;23
+ld (hl+), hl|r5k|X||F5;7F 7C;75;23;77;F1;23
+ld (hl+), hl|r800|X||F5;7C;75;23;77;F1;23
+ld (hl+), hl|z180|X||F5;7C;75;23;77;F1;23
+ld (hl+), hl|z80|X||F5;7C;75;23;77;F1;23
+ld (hl+), hl|z80n|X||F5;7C;75;23;77;F1;23
 ld (hl+), ix|ez80|_||ED 3F;23;23
 ld (hl+), ix|ez80_z80|_||ED 3F;23;23
-ld (hl+), ix|kc160|_||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), ix|kc160_z80|_||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), ix|r2ka|_||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), ix|r3k|_||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), ix|r4k|_||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), ix|r5k|_||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), ix|r800|_||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), ix|z180|_||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), ix|z80|_||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), ix|z80_strict|_||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), ix|z80n|_||D5;DD E5;D1;73;23;72;23;D1
+ld (hl+), ix|kc160|X||D5;DD E5;D1;73;23;72;D1;23
+ld (hl+), ix|kc160_z80|X||D5;DD E5;D1;73;23;72;D1;23
+ld (hl+), ix|r2ka|X||D5;DD E5;D1;73;23;72;D1;23
+ld (hl+), ix|r3k|X||D5;DD E5;D1;73;23;72;D1;23
+ld (hl+), ix|r4k|X||D5;DD E5;D1;73;23;72;D1;23
+ld (hl+), ix|r5k|X||D5;DD E5;D1;73;23;72;D1;23
+ld (hl+), ix|r800|X||D5;DD E5;D1;73;23;72;D1;23
+ld (hl+), ix|z180|X||D5;DD E5;D1;73;23;72;D1;23
+ld (hl+), ix|z80|X||D5;DD E5;D1;73;23;72;D1;23
+ld (hl+), ix|z80n|X||D5;DD E5;D1;73;23;72;D1;23
 ld (hl+), iy|ez80|_||ED 3E;23;23
 ld (hl+), iy|ez80_z80|_||ED 3E;23;23
-ld (hl+), iy|kc160|_||D5;FD E5;D1;73;23;72;23;D1
-ld (hl+), iy|kc160_z80|_||D5;FD E5;D1;73;23;72;23;D1
-ld (hl+), iy|r2ka|_||D5;FD E5;D1;73;23;72;23;D1
-ld (hl+), iy|r3k|_||D5;FD E5;D1;73;23;72;23;D1
-ld (hl+), iy|r4k|_||D5;FD E5;D1;73;23;72;23;D1
-ld (hl+), iy|r5k|_||D5;FD E5;D1;73;23;72;23;D1
-ld (hl+), iy|r800|_||D5;FD E5;D1;73;23;72;23;D1
-ld (hl+), iy|z180|_||D5;FD E5;D1;73;23;72;23;D1
-ld (hl+), iy|z80|_||D5;FD E5;D1;73;23;72;23;D1
-ld (hl+), iy|z80_strict|_||D5;FD E5;D1;73;23;72;23;D1
-ld (hl+), iy|z80n|_||D5;FD E5;D1;73;23;72;23;D1
+ld (hl+), iy|kc160|X||D5;FD E5;D1;73;23;72;D1;23
+ld (hl+), iy|kc160_z80|X||D5;FD E5;D1;73;23;72;D1;23
+ld (hl+), iy|r2ka|X||D5;FD E5;D1;73;23;72;D1;23
+ld (hl+), iy|r3k|X||D5;FD E5;D1;73;23;72;D1;23
+ld (hl+), iy|r4k|X||D5;FD E5;D1;73;23;72;D1;23
+ld (hl+), iy|r5k|X||D5;FD E5;D1;73;23;72;D1;23
+ld (hl+), iy|r800|X||D5;FD E5;D1;73;23;72;D1;23
+ld (hl+), iy|z180|X||D5;FD E5;D1;73;23;72;D1;23
+ld (hl+), iy|z80|X||D5;FD E5;D1;73;23;72;D1;23
+ld (hl+), iy|z80n|X||D5;FD E5;D1;73;23;72;D1;23
 ld (hl+), l|8080|X||75;23
 ld (hl+), l|8085|X||75;23
 ld (hl+), l|ez80|_||75;23
@@ -22674,15 +22606,6 @@ ld (ix), bc|ez80|_||DD 0F 00
 ld (ix), bc|ez80_z80|_||DD 0F 00
 ld (ix), bc|kc160|_||ED 85 00
 ld (ix), bc|kc160_z80|_||ED 85 00
-ld (ix), bc|r2ka|_||DD 71 00;DD 70 01
-ld (ix), bc|r3k|_||DD 71 00;DD 70 01
-ld (ix), bc|r4k|_||DD 71 00;DD 70 01
-ld (ix), bc|r5k|_||DD 71 00;DD 70 01
-ld (ix), bc|r800|_||DD 71 00;DD 70 01
-ld (ix), bc|z180|_||DD 71 00;DD 70 01
-ld (ix), bc|z80|_||DD 71 00;DD 70 01
-ld (ix), bc|z80_strict|_||DD 71 00;DD 70 01
-ld (ix), bc|z80n|_||DD 71 00;DD 70 01
 ld (ix), bcde|r4k|_||DD CF 00
 ld (ix), bcde|r5k|_||DD CF 00
 ld (ix), c|ez80|_||DD 71 00
@@ -22715,15 +22638,6 @@ ld (ix), de|ez80|_||DD 1F 00
 ld (ix), de|ez80_z80|_||DD 1F 00
 ld (ix), de|kc160|_||ED 95 00
 ld (ix), de|kc160_z80|_||ED 95 00
-ld (ix), de|r2ka|_||DD 73 00;DD 72 01
-ld (ix), de|r3k|_||DD 73 00;DD 72 01
-ld (ix), de|r4k|_||DD 73 00;DD 72 01
-ld (ix), de|r5k|_||DD 73 00;DD 72 01
-ld (ix), de|r800|_||DD 73 00;DD 72 01
-ld (ix), de|z180|_||DD 73 00;DD 72 01
-ld (ix), de|z80|_||DD 73 00;DD 72 01
-ld (ix), de|z80_strict|_||DD 73 00;DD 72 01
-ld (ix), de|z80n|_||DD 73 00;DD 72 01
 ld (ix), e|ez80|_||DD 73 00
 ld (ix), e|ez80_z80|_||DD 73 00
 ld (ix), e|kc160|_||DD 73 00
@@ -22758,37 +22672,14 @@ ld (ix), hl|r2ka|_||F4 00
 ld (ix), hl|r3k|_||F4 00
 ld (ix), hl|r4k|_||F4 00
 ld (ix), hl|r5k|_||F4 00
-ld (ix), hl|r800|_||DD 75 00;DD 74 01
-ld (ix), hl|z180|_||DD 75 00;DD 74 01
-ld (ix), hl|z80|_||DD 75 00;DD 74 01
-ld (ix), hl|z80_strict|_||DD 75 00;DD 74 01
-ld (ix), hl|z80n|_||DD 75 00;DD 74 01
 ld (ix), ix|ez80|_||DD 3F 00
 ld (ix), ix|ez80_z80|_||DD 3F 00
 ld (ix), ix|kc160|_||ED 81 00
 ld (ix), ix|kc160_z80|_||ED 81 00
-ld (ix), ix|r2ka|_||DD E5;ED 54;DD 75 00;DD 74 01;ED 54;DD E1
-ld (ix), ix|r3k|_||DD E5;ED 54;DD 75 00;DD 74 01;ED 54;DD E1
-ld (ix), ix|r4k|_||DD E5;ED 54;DD 75 00;DD 74 01;ED 54;DD E1
-ld (ix), ix|r5k|_||DD E5;ED 54;DD 75 00;DD 74 01;ED 54;DD E1
-ld (ix), ix|r800|_||DD E5;E3;DD 75 00;DD 74 01;E3;DD E1
-ld (ix), ix|z180|_||DD E5;E3;DD 75 00;DD 74 01;E3;DD E1
-ld (ix), ix|z80|_||DD E5;E3;DD 75 00;DD 74 01;E3;DD E1
-ld (ix), ix|z80_strict|_||DD E5;E3;DD 75 00;DD 74 01;E3;DD E1
-ld (ix), ix|z80n|_||DD E5;E3;DD 75 00;DD 74 01;E3;DD E1
 ld (ix), iy|ez80|_||DD 3E 00
 ld (ix), iy|ez80_z80|_||DD 3E 00
 ld (ix), iy|kc160|_||ED 91 00
 ld (ix), iy|kc160_z80|_||ED 91 00
-ld (ix), iy|r2ka|_||FD E5;ED 54;DD 75 00;DD 74 01;ED 54;FD E1
-ld (ix), iy|r3k|_||FD E5;ED 54;DD 75 00;DD 74 01;ED 54;FD E1
-ld (ix), iy|r4k|_||FD E5;ED 54;DD 75 00;DD 74 01;ED 54;FD E1
-ld (ix), iy|r5k|_||FD E5;ED 54;DD 75 00;DD 74 01;ED 54;FD E1
-ld (ix), iy|r800|_||FD E5;E3;DD 75 00;DD 74 01;E3;FD E1
-ld (ix), iy|z180|_||FD E5;E3;DD 75 00;DD 74 01;E3;FD E1
-ld (ix), iy|z80|_||FD E5;E3;DD 75 00;DD 74 01;E3;FD E1
-ld (ix), iy|z80_strict|_||FD E5;E3;DD 75 00;DD 74 01;E3;FD E1
-ld (ix), iy|z80n|_||FD E5;E3;DD 75 00;DD 74 01;E3;FD E1
 ld (ix), jkhl|r4k|_||FD CF 00
 ld (ix), jkhl|r5k|_||FD CF 00
 ld (ix), l|ez80|_||DD 75 00
@@ -22855,15 +22746,14 @@ ld (ix+%d), bc|ez80|_||DD 0F %d
 ld (ix+%d), bc|ez80_z80|_||DD 0F %d
 ld (ix+%d), bc|kc160|_||ED 85 %d
 ld (ix+%d), bc|kc160_z80|_||ED 85 %d
-ld (ix+%d), bc|r2ka|_||DD 71 %d;DD 70 %D
-ld (ix+%d), bc|r3k|_||DD 71 %d;DD 70 %D
-ld (ix+%d), bc|r4k|_||DD 71 %d;DD 70 %D
-ld (ix+%d), bc|r5k|_||DD 71 %d;DD 70 %D
-ld (ix+%d), bc|r800|_||DD 71 %d;DD 70 %D
-ld (ix+%d), bc|z180|_||DD 71 %d;DD 70 %D
-ld (ix+%d), bc|z80|_||DD 71 %d;DD 70 %D
-ld (ix+%d), bc|z80_strict|_||DD 71 %d;DD 70 %D
-ld (ix+%d), bc|z80n|_||DD 71 %d;DD 70 %D
+ld (ix+%d), bc|r2ka|X||DD 71 %d;DD 70 %D
+ld (ix+%d), bc|r3k|X||DD 71 %d;DD 70 %D
+ld (ix+%d), bc|r4k|X||DD 71 %d;DD 70 %D
+ld (ix+%d), bc|r5k|X||DD 71 %d;DD 70 %D
+ld (ix+%d), bc|r800|X||DD 71 %d;DD 70 %D
+ld (ix+%d), bc|z180|X||DD 71 %d;DD 70 %D
+ld (ix+%d), bc|z80|X||DD 71 %d;DD 70 %D
+ld (ix+%d), bc|z80n|X||DD 71 %d;DD 70 %D
 ld (ix+%d), bcde|r4k|_||DD CF %d
 ld (ix+%d), bcde|r5k|_||DD CF %d
 ld (ix+%d), c|ez80|_||DD 71 %d
@@ -22896,15 +22786,14 @@ ld (ix+%d), de|ez80|_||DD 1F %d
 ld (ix+%d), de|ez80_z80|_||DD 1F %d
 ld (ix+%d), de|kc160|_||ED 95 %d
 ld (ix+%d), de|kc160_z80|_||ED 95 %d
-ld (ix+%d), de|r2ka|_||DD 73 %d;DD 72 %D
-ld (ix+%d), de|r3k|_||DD 73 %d;DD 72 %D
-ld (ix+%d), de|r4k|_||DD 73 %d;DD 72 %D
-ld (ix+%d), de|r5k|_||DD 73 %d;DD 72 %D
-ld (ix+%d), de|r800|_||DD 73 %d;DD 72 %D
-ld (ix+%d), de|z180|_||DD 73 %d;DD 72 %D
-ld (ix+%d), de|z80|_||DD 73 %d;DD 72 %D
-ld (ix+%d), de|z80_strict|_||DD 73 %d;DD 72 %D
-ld (ix+%d), de|z80n|_||DD 73 %d;DD 72 %D
+ld (ix+%d), de|r2ka|X||DD 73 %d;DD 72 %D
+ld (ix+%d), de|r3k|X||DD 73 %d;DD 72 %D
+ld (ix+%d), de|r4k|X||DD 73 %d;DD 72 %D
+ld (ix+%d), de|r5k|X||DD 73 %d;DD 72 %D
+ld (ix+%d), de|r800|X||DD 73 %d;DD 72 %D
+ld (ix+%d), de|z180|X||DD 73 %d;DD 72 %D
+ld (ix+%d), de|z80|X||DD 73 %d;DD 72 %D
+ld (ix+%d), de|z80n|X||DD 73 %d;DD 72 %D
 ld (ix+%d), e|ez80|_||DD 73 %d
 ld (ix+%d), e|ez80_z80|_||DD 73 %d
 ld (ix+%d), e|kc160|_||DD 73 %d
@@ -22939,37 +22828,34 @@ ld (ix+%d), hl|r2ka|_||F4 %d
 ld (ix+%d), hl|r3k|_||F4 %d
 ld (ix+%d), hl|r4k|_||F4 %d
 ld (ix+%d), hl|r5k|_||F4 %d
-ld (ix+%d), hl|r800|_||DD 75 %d;DD 74 %D
-ld (ix+%d), hl|z180|_||DD 75 %d;DD 74 %D
-ld (ix+%d), hl|z80|_||DD 75 %d;DD 74 %D
-ld (ix+%d), hl|z80_strict|_||DD 75 %d;DD 74 %D
-ld (ix+%d), hl|z80n|_||DD 75 %d;DD 74 %D
+ld (ix+%d), hl|r800|X||DD 75 %d;DD 74 %D
+ld (ix+%d), hl|z180|X||DD 75 %d;DD 74 %D
+ld (ix+%d), hl|z80|X||DD 75 %d;DD 74 %D
+ld (ix+%d), hl|z80n|X||DD 75 %d;DD 74 %D
 ld (ix+%d), ix|ez80|_||DD 3F %d
 ld (ix+%d), ix|ez80_z80|_||DD 3F %d
 ld (ix+%d), ix|kc160|_||ED 81 %d
 ld (ix+%d), ix|kc160_z80|_||ED 81 %d
-ld (ix+%d), ix|r2ka|_||DD E5;ED 54;DD 75 %d;DD 74 %D;ED 54;DD E1
-ld (ix+%d), ix|r3k|_||DD E5;ED 54;DD 75 %d;DD 74 %D;ED 54;DD E1
-ld (ix+%d), ix|r4k|_||DD E5;ED 54;DD 75 %d;DD 74 %D;ED 54;DD E1
-ld (ix+%d), ix|r5k|_||DD E5;ED 54;DD 75 %d;DD 74 %D;ED 54;DD E1
-ld (ix+%d), ix|r800|_||DD E5;E3;DD 75 %d;DD 74 %D;E3;DD E1
-ld (ix+%d), ix|z180|_||DD E5;E3;DD 75 %d;DD 74 %D;E3;DD E1
-ld (ix+%d), ix|z80|_||DD E5;E3;DD 75 %d;DD 74 %D;E3;DD E1
-ld (ix+%d), ix|z80_strict|_||DD E5;E3;DD 75 %d;DD 74 %D;E3;DD E1
-ld (ix+%d), ix|z80n|_||DD E5;E3;DD 75 %d;DD 74 %D;E3;DD E1
+ld (ix+%d), ix|r2ka|X||E5;DD 7C;F4 %d;E1
+ld (ix+%d), ix|r3k|X||E5;DD 7C;F4 %d;E1
+ld (ix+%d), ix|r4k|X||E5;DD 7C;F4 %d;E1
+ld (ix+%d), ix|r5k|X||E5;DD 7C;F4 %d;E1
+ld (ix+%d), ix|r800|X||E5;DD E5;E1;DD 75 %d;DD 74 %D;E1
+ld (ix+%d), ix|z180|X||E5;DD E5;E1;DD 75 %d;DD 74 %D;E1
+ld (ix+%d), ix|z80|X||E5;DD E5;E1;DD 75 %d;DD 74 %D;E1
+ld (ix+%d), ix|z80n|X||E5;DD E5;E1;DD 75 %d;DD 74 %D;E1
 ld (ix+%d), iy|ez80|_||DD 3E %d
 ld (ix+%d), iy|ez80_z80|_||DD 3E %d
 ld (ix+%d), iy|kc160|_||ED 91 %d
 ld (ix+%d), iy|kc160_z80|_||ED 91 %d
-ld (ix+%d), iy|r2ka|_||FD E5;ED 54;DD 75 %d;DD 74 %D;ED 54;FD E1
-ld (ix+%d), iy|r3k|_||FD E5;ED 54;DD 75 %d;DD 74 %D;ED 54;FD E1
-ld (ix+%d), iy|r4k|_||FD E5;ED 54;DD 75 %d;DD 74 %D;ED 54;FD E1
-ld (ix+%d), iy|r5k|_||FD E5;ED 54;DD 75 %d;DD 74 %D;ED 54;FD E1
-ld (ix+%d), iy|r800|_||FD E5;E3;DD 75 %d;DD 74 %D;E3;FD E1
-ld (ix+%d), iy|z180|_||FD E5;E3;DD 75 %d;DD 74 %D;E3;FD E1
-ld (ix+%d), iy|z80|_||FD E5;E3;DD 75 %d;DD 74 %D;E3;FD E1
-ld (ix+%d), iy|z80_strict|_||FD E5;E3;DD 75 %d;DD 74 %D;E3;FD E1
-ld (ix+%d), iy|z80n|_||FD E5;E3;DD 75 %d;DD 74 %D;E3;FD E1
+ld (ix+%d), iy|r2ka|X||E5;FD 7C;F4 %d;E1
+ld (ix+%d), iy|r3k|X||E5;FD 7C;F4 %d;E1
+ld (ix+%d), iy|r4k|X||E5;FD 7C;F4 %d;E1
+ld (ix+%d), iy|r5k|X||E5;FD 7C;F4 %d;E1
+ld (ix+%d), iy|r800|X||E5;FD E5;E1;DD 75 %d;DD 74 %D;E1
+ld (ix+%d), iy|z180|X||E5;FD E5;E1;DD 75 %d;DD 74 %D;E1
+ld (ix+%d), iy|z80|X||E5;FD E5;E1;DD 75 %d;DD 74 %D;E1
+ld (ix+%d), iy|z80n|X||E5;FD E5;E1;DD 75 %d;DD 74 %D;E1
 ld (ix+%d), jkhl|r4k|_||FD CF %d
 ld (ix+%d), jkhl|r5k|_||FD CF %d
 ld (ix+%d), l|ez80|_||DD 75 %d
@@ -23036,15 +22922,6 @@ ld (iy), bc|ez80|_||FD 0F 00
 ld (iy), bc|ez80_z80|_||FD 0F 00
 ld (iy), bc|kc160|_||ED 84 00
 ld (iy), bc|kc160_z80|_||ED 84 00
-ld (iy), bc|r2ka|_||FD 71 00;FD 70 01
-ld (iy), bc|r3k|_||FD 71 00;FD 70 01
-ld (iy), bc|r4k|_||FD 71 00;FD 70 01
-ld (iy), bc|r5k|_||FD 71 00;FD 70 01
-ld (iy), bc|r800|_||FD 71 00;FD 70 01
-ld (iy), bc|z180|_||FD 71 00;FD 70 01
-ld (iy), bc|z80|_||FD 71 00;FD 70 01
-ld (iy), bc|z80_strict|_||FD 71 00;FD 70 01
-ld (iy), bc|z80n|_||FD 71 00;FD 70 01
 ld (iy), bcde|r4k|_||DD DF 00
 ld (iy), bcde|r5k|_||DD DF 00
 ld (iy), c|ez80|_||FD 71 00
@@ -23077,15 +22954,6 @@ ld (iy), de|ez80|_||FD 1F 00
 ld (iy), de|ez80_z80|_||FD 1F 00
 ld (iy), de|kc160|_||ED 94 00
 ld (iy), de|kc160_z80|_||ED 94 00
-ld (iy), de|r2ka|_||FD 73 00;FD 72 01
-ld (iy), de|r3k|_||FD 73 00;FD 72 01
-ld (iy), de|r4k|_||FD 73 00;FD 72 01
-ld (iy), de|r5k|_||FD 73 00;FD 72 01
-ld (iy), de|r800|_||FD 73 00;FD 72 01
-ld (iy), de|z180|_||FD 73 00;FD 72 01
-ld (iy), de|z80|_||FD 73 00;FD 72 01
-ld (iy), de|z80_strict|_||FD 73 00;FD 72 01
-ld (iy), de|z80n|_||FD 73 00;FD 72 01
 ld (iy), e|ez80|_||FD 73 00
 ld (iy), e|ez80_z80|_||FD 73 00
 ld (iy), e|kc160|_||FD 73 00
@@ -23120,37 +22988,14 @@ ld (iy), hl|r2ka|_||FD F4 00
 ld (iy), hl|r3k|_||FD F4 00
 ld (iy), hl|r4k|_||FD F4 00
 ld (iy), hl|r5k|_||FD F4 00
-ld (iy), hl|r800|_||FD 75 00;FD 74 01
-ld (iy), hl|z180|_||FD 75 00;FD 74 01
-ld (iy), hl|z80|_||FD 75 00;FD 74 01
-ld (iy), hl|z80_strict|_||FD 75 00;FD 74 01
-ld (iy), hl|z80n|_||FD 75 00;FD 74 01
 ld (iy), ix|ez80|_||FD 3E 00
 ld (iy), ix|ez80_z80|_||FD 3E 00
 ld (iy), ix|kc160|_||ED 80 00
 ld (iy), ix|kc160_z80|_||ED 80 00
-ld (iy), ix|r2ka|_||DD E5;ED 54;FD 75 00;FD 74 01;ED 54;DD E1
-ld (iy), ix|r3k|_||DD E5;ED 54;FD 75 00;FD 74 01;ED 54;DD E1
-ld (iy), ix|r4k|_||DD E5;ED 54;FD 75 00;FD 74 01;ED 54;DD E1
-ld (iy), ix|r5k|_||DD E5;ED 54;FD 75 00;FD 74 01;ED 54;DD E1
-ld (iy), ix|r800|_||DD E5;E3;FD 75 00;FD 74 01;E3;DD E1
-ld (iy), ix|z180|_||DD E5;E3;FD 75 00;FD 74 01;E3;DD E1
-ld (iy), ix|z80|_||DD E5;E3;FD 75 00;FD 74 01;E3;DD E1
-ld (iy), ix|z80_strict|_||DD E5;E3;FD 75 00;FD 74 01;E3;DD E1
-ld (iy), ix|z80n|_||DD E5;E3;FD 75 00;FD 74 01;E3;DD E1
 ld (iy), iy|ez80|_||FD 3F 00
 ld (iy), iy|ez80_z80|_||FD 3F 00
 ld (iy), iy|kc160|_||ED 90 00
 ld (iy), iy|kc160_z80|_||ED 90 00
-ld (iy), iy|r2ka|_||FD E5;ED 54;FD 75 00;FD 74 01;ED 54;FD E1
-ld (iy), iy|r3k|_||FD E5;ED 54;FD 75 00;FD 74 01;ED 54;FD E1
-ld (iy), iy|r4k|_||FD E5;ED 54;FD 75 00;FD 74 01;ED 54;FD E1
-ld (iy), iy|r5k|_||FD E5;ED 54;FD 75 00;FD 74 01;ED 54;FD E1
-ld (iy), iy|r800|_||FD E5;E3;FD 75 00;FD 74 01;E3;FD E1
-ld (iy), iy|z180|_||FD E5;E3;FD 75 00;FD 74 01;E3;FD E1
-ld (iy), iy|z80|_||FD E5;E3;FD 75 00;FD 74 01;E3;FD E1
-ld (iy), iy|z80_strict|_||FD E5;E3;FD 75 00;FD 74 01;E3;FD E1
-ld (iy), iy|z80n|_||FD E5;E3;FD 75 00;FD 74 01;E3;FD E1
 ld (iy), jkhl|r4k|_||FD DF 00
 ld (iy), jkhl|r5k|_||FD DF 00
 ld (iy), l|ez80|_||FD 75 00
@@ -23217,15 +23062,14 @@ ld (iy+%d), bc|ez80|_||FD 0F %d
 ld (iy+%d), bc|ez80_z80|_||FD 0F %d
 ld (iy+%d), bc|kc160|_||ED 84 %d
 ld (iy+%d), bc|kc160_z80|_||ED 84 %d
-ld (iy+%d), bc|r2ka|_||FD 71 %d;FD 70 %D
-ld (iy+%d), bc|r3k|_||FD 71 %d;FD 70 %D
-ld (iy+%d), bc|r4k|_||FD 71 %d;FD 70 %D
-ld (iy+%d), bc|r5k|_||FD 71 %d;FD 70 %D
-ld (iy+%d), bc|r800|_||FD 71 %d;FD 70 %D
-ld (iy+%d), bc|z180|_||FD 71 %d;FD 70 %D
-ld (iy+%d), bc|z80|_||FD 71 %d;FD 70 %D
-ld (iy+%d), bc|z80_strict|_||FD 71 %d;FD 70 %D
-ld (iy+%d), bc|z80n|_||FD 71 %d;FD 70 %D
+ld (iy+%d), bc|r2ka|X||FD 71 %d;FD 70 %D
+ld (iy+%d), bc|r3k|X||FD 71 %d;FD 70 %D
+ld (iy+%d), bc|r4k|X||FD 71 %d;FD 70 %D
+ld (iy+%d), bc|r5k|X||FD 71 %d;FD 70 %D
+ld (iy+%d), bc|r800|X||FD 71 %d;FD 70 %D
+ld (iy+%d), bc|z180|X||FD 71 %d;FD 70 %D
+ld (iy+%d), bc|z80|X||FD 71 %d;FD 70 %D
+ld (iy+%d), bc|z80n|X||FD 71 %d;FD 70 %D
 ld (iy+%d), bcde|r4k|_||DD DF %d
 ld (iy+%d), bcde|r5k|_||DD DF %d
 ld (iy+%d), c|ez80|_||FD 71 %d
@@ -23258,15 +23102,14 @@ ld (iy+%d), de|ez80|_||FD 1F %d
 ld (iy+%d), de|ez80_z80|_||FD 1F %d
 ld (iy+%d), de|kc160|_||ED 94 %d
 ld (iy+%d), de|kc160_z80|_||ED 94 %d
-ld (iy+%d), de|r2ka|_||FD 73 %d;FD 72 %D
-ld (iy+%d), de|r3k|_||FD 73 %d;FD 72 %D
-ld (iy+%d), de|r4k|_||FD 73 %d;FD 72 %D
-ld (iy+%d), de|r5k|_||FD 73 %d;FD 72 %D
-ld (iy+%d), de|r800|_||FD 73 %d;FD 72 %D
-ld (iy+%d), de|z180|_||FD 73 %d;FD 72 %D
-ld (iy+%d), de|z80|_||FD 73 %d;FD 72 %D
-ld (iy+%d), de|z80_strict|_||FD 73 %d;FD 72 %D
-ld (iy+%d), de|z80n|_||FD 73 %d;FD 72 %D
+ld (iy+%d), de|r2ka|X||FD 73 %d;FD 72 %D
+ld (iy+%d), de|r3k|X||FD 73 %d;FD 72 %D
+ld (iy+%d), de|r4k|X||FD 73 %d;FD 72 %D
+ld (iy+%d), de|r5k|X||FD 73 %d;FD 72 %D
+ld (iy+%d), de|r800|X||FD 73 %d;FD 72 %D
+ld (iy+%d), de|z180|X||FD 73 %d;FD 72 %D
+ld (iy+%d), de|z80|X||FD 73 %d;FD 72 %D
+ld (iy+%d), de|z80n|X||FD 73 %d;FD 72 %D
 ld (iy+%d), e|ez80|_||FD 73 %d
 ld (iy+%d), e|ez80_z80|_||FD 73 %d
 ld (iy+%d), e|kc160|_||FD 73 %d
@@ -23301,37 +23144,34 @@ ld (iy+%d), hl|r2ka|_||FD F4 %d
 ld (iy+%d), hl|r3k|_||FD F4 %d
 ld (iy+%d), hl|r4k|_||FD F4 %d
 ld (iy+%d), hl|r5k|_||FD F4 %d
-ld (iy+%d), hl|r800|_||FD 75 %d;FD 74 %D
-ld (iy+%d), hl|z180|_||FD 75 %d;FD 74 %D
-ld (iy+%d), hl|z80|_||FD 75 %d;FD 74 %D
-ld (iy+%d), hl|z80_strict|_||FD 75 %d;FD 74 %D
-ld (iy+%d), hl|z80n|_||FD 75 %d;FD 74 %D
+ld (iy+%d), hl|r800|X||FD 75 %d;FD 74 %D
+ld (iy+%d), hl|z180|X||FD 75 %d;FD 74 %D
+ld (iy+%d), hl|z80|X||FD 75 %d;FD 74 %D
+ld (iy+%d), hl|z80n|X||FD 75 %d;FD 74 %D
 ld (iy+%d), ix|ez80|_||FD 3E %d
 ld (iy+%d), ix|ez80_z80|_||FD 3E %d
 ld (iy+%d), ix|kc160|_||ED 80 %d
 ld (iy+%d), ix|kc160_z80|_||ED 80 %d
-ld (iy+%d), ix|r2ka|_||DD E5;ED 54;FD 75 %d;FD 74 %D;ED 54;DD E1
-ld (iy+%d), ix|r3k|_||DD E5;ED 54;FD 75 %d;FD 74 %D;ED 54;DD E1
-ld (iy+%d), ix|r4k|_||DD E5;ED 54;FD 75 %d;FD 74 %D;ED 54;DD E1
-ld (iy+%d), ix|r5k|_||DD E5;ED 54;FD 75 %d;FD 74 %D;ED 54;DD E1
-ld (iy+%d), ix|r800|_||DD E5;E3;FD 75 %d;FD 74 %D;E3;DD E1
-ld (iy+%d), ix|z180|_||DD E5;E3;FD 75 %d;FD 74 %D;E3;DD E1
-ld (iy+%d), ix|z80|_||DD E5;E3;FD 75 %d;FD 74 %D;E3;DD E1
-ld (iy+%d), ix|z80_strict|_||DD E5;E3;FD 75 %d;FD 74 %D;E3;DD E1
-ld (iy+%d), ix|z80n|_||DD E5;E3;FD 75 %d;FD 74 %D;E3;DD E1
+ld (iy+%d), ix|r2ka|X||E5;DD 7C;FD F4 %d;E1
+ld (iy+%d), ix|r3k|X||E5;DD 7C;FD F4 %d;E1
+ld (iy+%d), ix|r4k|X||E5;DD 7C;FD F4 %d;E1
+ld (iy+%d), ix|r5k|X||E5;DD 7C;FD F4 %d;E1
+ld (iy+%d), ix|r800|X||E5;DD E5;E1;FD 75 %d;FD 74 %D;E1
+ld (iy+%d), ix|z180|X||E5;DD E5;E1;FD 75 %d;FD 74 %D;E1
+ld (iy+%d), ix|z80|X||E5;DD E5;E1;FD 75 %d;FD 74 %D;E1
+ld (iy+%d), ix|z80n|X||E5;DD E5;E1;FD 75 %d;FD 74 %D;E1
 ld (iy+%d), iy|ez80|_||FD 3F %d
 ld (iy+%d), iy|ez80_z80|_||FD 3F %d
 ld (iy+%d), iy|kc160|_||ED 90 %d
 ld (iy+%d), iy|kc160_z80|_||ED 90 %d
-ld (iy+%d), iy|r2ka|_||FD E5;ED 54;FD 75 %d;FD 74 %D;ED 54;FD E1
-ld (iy+%d), iy|r3k|_||FD E5;ED 54;FD 75 %d;FD 74 %D;ED 54;FD E1
-ld (iy+%d), iy|r4k|_||FD E5;ED 54;FD 75 %d;FD 74 %D;ED 54;FD E1
-ld (iy+%d), iy|r5k|_||FD E5;ED 54;FD 75 %d;FD 74 %D;ED 54;FD E1
-ld (iy+%d), iy|r800|_||FD E5;E3;FD 75 %d;FD 74 %D;E3;FD E1
-ld (iy+%d), iy|z180|_||FD E5;E3;FD 75 %d;FD 74 %D;E3;FD E1
-ld (iy+%d), iy|z80|_||FD E5;E3;FD 75 %d;FD 74 %D;E3;FD E1
-ld (iy+%d), iy|z80_strict|_||FD E5;E3;FD 75 %d;FD 74 %D;E3;FD E1
-ld (iy+%d), iy|z80n|_||FD E5;E3;FD 75 %d;FD 74 %D;E3;FD E1
+ld (iy+%d), iy|r2ka|X||E5;FD 7C;FD F4 %d;E1
+ld (iy+%d), iy|r3k|X||E5;FD 7C;FD F4 %d;E1
+ld (iy+%d), iy|r4k|X||E5;FD 7C;FD F4 %d;E1
+ld (iy+%d), iy|r5k|X||E5;FD 7C;FD F4 %d;E1
+ld (iy+%d), iy|r800|X||E5;FD E5;E1;FD 75 %d;FD 74 %D;E1
+ld (iy+%d), iy|z180|X||E5;FD E5;E1;FD 75 %d;FD 74 %D;E1
+ld (iy+%d), iy|z80|X||E5;FD E5;E1;FD 75 %d;FD 74 %D;E1
+ld (iy+%d), iy|z80n|X||E5;FD E5;E1;FD 75 %d;FD 74 %D;E1
 ld (iy+%d), jkhl|r4k|_||FD DF %d
 ld (iy+%d), jkhl|r5k|_||FD DF %d
 ld (iy+%d), l|ez80|_||FD 75 %d
@@ -24930,7 +24770,7 @@ ld b, (de)|8080|X||EB;46;EB
 ld b, (de)|8085|X||EB;46;EB
 ld b, (de)|ez80|X||EB;46;EB
 ld b, (de)|ez80_z80|X||EB;46;EB
-ld b, (de)|gbz80|X||E5;D5;E1;D1;46;E5;D5;E1;D1
+ld b, (de)|gbz80|X||D5;E5;D1;E1;46;D5;E5;D1;E1
 ld b, (de)|kc160|X||EB;46;EB
 ld b, (de)|kc160_z80|X||EB;46;EB
 ld b, (de)|r2ka|X||EB;46;EB
@@ -24945,7 +24785,7 @@ ld b, (de+)|8080|X||EB;46;EB;13
 ld b, (de+)|8085|X||EB;46;EB;13
 ld b, (de+)|ez80|X||EB;46;EB;13
 ld b, (de+)|ez80_z80|X||EB;46;EB;13
-ld b, (de+)|gbz80|X||E5;D5;E1;D1;46;E5;D5;E1;D1;13
+ld b, (de+)|gbz80|X||D5;E5;D1;E1;46;D5;E5;D1;E1;13
 ld b, (de+)|kc160|X||EB;46;EB;13
 ld b, (de+)|kc160_z80|X||EB;46;EB;13
 ld b, (de+)|r2ka|X||EB;46;EB;13
@@ -24960,7 +24800,7 @@ ld b, (de-)|8080|X||EB;46;EB;1B
 ld b, (de-)|8085|X||EB;46;EB;1B
 ld b, (de-)|ez80|X||EB;46;EB;1B
 ld b, (de-)|ez80_z80|X||EB;46;EB;1B
-ld b, (de-)|gbz80|X||E5;D5;E1;D1;46;E5;D5;E1;D1;1B
+ld b, (de-)|gbz80|X||D5;E5;D1;E1;46;D5;E5;D1;E1;1B
 ld b, (de-)|kc160|X||EB;46;EB;1B
 ld b, (de-)|kc160_z80|X||EB;46;EB;1B
 ld b, (de-)|r2ka|X||EB;46;EB;1B
@@ -25453,7 +25293,7 @@ ld bc, (de)|8080|X||EB;4E;23;46;2B;EB
 ld bc, (de)|8085|X||EB;4E;23;46;2B;EB
 ld bc, (de)|ez80|X||EB;4E;23;46;2B;EB
 ld bc, (de)|ez80_z80|X||EB;4E;23;46;2B;EB
-ld bc, (de)|gbz80|X||E5;D5;E1;D1;4E;23;46;2B;E5;D5;E1;D1
+ld bc, (de)|gbz80|X||D5;E5;D1;E1;4E;23;46;2B;D5;E5;D1;E1
 ld bc, (de)|kc160|X||EB;4E;23;46;2B;EB
 ld bc, (de)|kc160_z80|X||EB;4E;23;46;2B;EB
 ld bc, (de)|r2ka|X||EB;4E;23;46;2B;EB
@@ -25468,7 +25308,7 @@ ld bc, (de+)|8080|X||EB;4E;23;46;23;EB
 ld bc, (de+)|8085|X||EB;4E;23;46;23;EB
 ld bc, (de+)|ez80|X||EB;4E;23;46;23;EB
 ld bc, (de+)|ez80_z80|X||EB;4E;23;46;23;EB
-ld bc, (de+)|gbz80|X||E5;D5;E1;D1;4E;23;46;23;E5;D5;E1;D1
+ld bc, (de+)|gbz80|X||D5;E5;D1;E1;4E;23;46;23;D5;E5;D1;E1
 ld bc, (de+)|kc160|X||EB;4E;23;46;23;EB
 ld bc, (de+)|kc160_z80|X||EB;4E;23;46;23;EB
 ld bc, (de+)|r2ka|X||EB;4E;23;46;23;EB
@@ -25483,86 +25323,64 @@ ld bc, (hl)|8080|X||4E;23;46;2B
 ld bc, (hl)|8085|X||4E;23;46;2B
 ld bc, (hl)|ez80|_||ED 07
 ld bc, (hl)|ez80_z80|_||ED 07
-ld bc, (hl)|gbz80|_||4E;23;46;2B
-ld bc, (hl)|kc160|_||4E;23;46;2B
-ld bc, (hl)|kc160_z80|_||4E;23;46;2B
-ld bc, (hl)|r2ka|_||4E;23;46;2B
-ld bc, (hl)|r3k|_||4E;23;46;2B
-ld bc, (hl)|r4k|_||4E;23;46;2B
-ld bc, (hl)|r5k|_||4E;23;46;2B
-ld bc, (hl)|r800|_||4E;23;46;2B
-ld bc, (hl)|z180|_||4E;23;46;2B
-ld bc, (hl)|z80|_||4E;23;46;2B
-ld bc, (hl)|z80_strict|_||4E;23;46;2B
-ld bc, (hl)|z80n|_||4E;23;46;2B
+ld bc, (hl)|gbz80|X||4E;23;46;2B
+ld bc, (hl)|kc160|X||4E;23;46;2B
+ld bc, (hl)|kc160_z80|X||4E;23;46;2B
+ld bc, (hl)|r2ka|X||4E;23;46;2B
+ld bc, (hl)|r3k|X||4E;23;46;2B
+ld bc, (hl)|r4k|X||4E;23;46;2B
+ld bc, (hl)|r5k|X||4E;23;46;2B
+ld bc, (hl)|r800|X||4E;23;46;2B
+ld bc, (hl)|z180|X||4E;23;46;2B
+ld bc, (hl)|z80|X||4E;23;46;2B
+ld bc, (hl)|z80n|X||4E;23;46;2B
 ld bc, (hl+)|8080|X||4E;23;46;23
 ld bc, (hl+)|8085|X||4E;23;46;23
 ld bc, (hl+)|ez80|_||ED 07;23;23
 ld bc, (hl+)|ez80_z80|_||ED 07;23;23
-ld bc, (hl+)|gbz80|_||4E;23;46;23
-ld bc, (hl+)|kc160|_||4E;23;46;23
-ld bc, (hl+)|kc160_z80|_||4E;23;46;23
-ld bc, (hl+)|r2ka|_||4E;23;46;23
-ld bc, (hl+)|r3k|_||4E;23;46;23
-ld bc, (hl+)|r4k|_||4E;23;46;23
-ld bc, (hl+)|r5k|_||4E;23;46;23
-ld bc, (hl+)|r800|_||4E;23;46;23
-ld bc, (hl+)|z180|_||4E;23;46;23
-ld bc, (hl+)|z80|_||4E;23;46;23
-ld bc, (hl+)|z80_strict|_||4E;23;46;23
-ld bc, (hl+)|z80n|_||4E;23;46;23
+ld bc, (hl+)|gbz80|X||4E;23;46;23
+ld bc, (hl+)|kc160|X||4E;23;46;23
+ld bc, (hl+)|kc160_z80|X||4E;23;46;23
+ld bc, (hl+)|r2ka|X||4E;23;46;23
+ld bc, (hl+)|r3k|X||4E;23;46;23
+ld bc, (hl+)|r4k|X||4E;23;46;23
+ld bc, (hl+)|r5k|X||4E;23;46;23
+ld bc, (hl+)|r800|X||4E;23;46;23
+ld bc, (hl+)|z180|X||4E;23;46;23
+ld bc, (hl+)|z80|X||4E;23;46;23
+ld bc, (hl+)|z80n|X||4E;23;46;23
 ld bc, (ix)|ez80|_||DD 07 00
 ld bc, (ix)|ez80_z80|_||DD 07 00
 ld bc, (ix)|kc160|_||ED 8D 00
 ld bc, (ix)|kc160_z80|_||ED 8D 00
-ld bc, (ix)|r2ka|_||DD 4E 00;DD 46 01
-ld bc, (ix)|r3k|_||DD 4E 00;DD 46 01
-ld bc, (ix)|r4k|_||DD 4E 00;DD 46 01
-ld bc, (ix)|r5k|_||DD 4E 00;DD 46 01
-ld bc, (ix)|r800|_||DD 4E 00;DD 46 01
-ld bc, (ix)|z180|_||DD 4E 00;DD 46 01
-ld bc, (ix)|z80|_||DD 4E 00;DD 46 01
-ld bc, (ix)|z80_strict|_||DD 4E 00;DD 46 01
-ld bc, (ix)|z80n|_||DD 4E 00;DD 46 01
 ld bc, (ix+%d)|ez80|_||DD 07 %d
 ld bc, (ix+%d)|ez80_z80|_||DD 07 %d
 ld bc, (ix+%d)|kc160|_||ED 8D %d
 ld bc, (ix+%d)|kc160_z80|_||ED 8D %d
-ld bc, (ix+%d)|r2ka|_||DD 4E %d;DD 46 %D
-ld bc, (ix+%d)|r3k|_||DD 4E %d;DD 46 %D
-ld bc, (ix+%d)|r4k|_||DD 4E %d;DD 46 %D
-ld bc, (ix+%d)|r5k|_||DD 4E %d;DD 46 %D
-ld bc, (ix+%d)|r800|_||DD 4E %d;DD 46 %D
-ld bc, (ix+%d)|z180|_||DD 4E %d;DD 46 %D
-ld bc, (ix+%d)|z80|_||DD 4E %d;DD 46 %D
-ld bc, (ix+%d)|z80_strict|_||DD 4E %d;DD 46 %D
-ld bc, (ix+%d)|z80n|_||DD 4E %d;DD 46 %D
+ld bc, (ix+%d)|r2ka|X||DD 4E %d;DD 46 %D
+ld bc, (ix+%d)|r3k|X||DD 4E %d;DD 46 %D
+ld bc, (ix+%d)|r4k|X||DD 4E %d;DD 46 %D
+ld bc, (ix+%d)|r5k|X||DD 4E %d;DD 46 %D
+ld bc, (ix+%d)|r800|X||DD 4E %d;DD 46 %D
+ld bc, (ix+%d)|z180|X||DD 4E %d;DD 46 %D
+ld bc, (ix+%d)|z80|X||DD 4E %d;DD 46 %D
+ld bc, (ix+%d)|z80n|X||DD 4E %d;DD 46 %D
 ld bc, (iy)|ez80|_||FD 07 00
 ld bc, (iy)|ez80_z80|_||FD 07 00
 ld bc, (iy)|kc160|_||ED 8C 00
 ld bc, (iy)|kc160_z80|_||ED 8C 00
-ld bc, (iy)|r2ka|_||FD 4E 00;FD 46 01
-ld bc, (iy)|r3k|_||FD 4E 00;FD 46 01
-ld bc, (iy)|r4k|_||FD 4E 00;FD 46 01
-ld bc, (iy)|r5k|_||FD 4E 00;FD 46 01
-ld bc, (iy)|r800|_||FD 4E 00;FD 46 01
-ld bc, (iy)|z180|_||FD 4E 00;FD 46 01
-ld bc, (iy)|z80|_||FD 4E 00;FD 46 01
-ld bc, (iy)|z80_strict|_||FD 4E 00;FD 46 01
-ld bc, (iy)|z80n|_||FD 4E 00;FD 46 01
 ld bc, (iy+%d)|ez80|_||FD 07 %d
 ld bc, (iy+%d)|ez80_z80|_||FD 07 %d
 ld bc, (iy+%d)|kc160|_||ED 8C %d
 ld bc, (iy+%d)|kc160_z80|_||ED 8C %d
-ld bc, (iy+%d)|r2ka|_||FD 4E %d;FD 46 %D
-ld bc, (iy+%d)|r3k|_||FD 4E %d;FD 46 %D
-ld bc, (iy+%d)|r4k|_||FD 4E %d;FD 46 %D
-ld bc, (iy+%d)|r5k|_||FD 4E %d;FD 46 %D
-ld bc, (iy+%d)|r800|_||FD 4E %d;FD 46 %D
-ld bc, (iy+%d)|z180|_||FD 4E %d;FD 46 %D
-ld bc, (iy+%d)|z80|_||FD 4E %d;FD 46 %D
-ld bc, (iy+%d)|z80_strict|_||FD 4E %d;FD 46 %D
-ld bc, (iy+%d)|z80n|_||FD 4E %d;FD 46 %D
+ld bc, (iy+%d)|r2ka|X||FD 4E %d;FD 46 %D
+ld bc, (iy+%d)|r3k|X||FD 4E %d;FD 46 %D
+ld bc, (iy+%d)|r4k|X||FD 4E %d;FD 46 %D
+ld bc, (iy+%d)|r5k|X||FD 4E %d;FD 46 %D
+ld bc, (iy+%d)|r800|X||FD 4E %d;FD 46 %D
+ld bc, (iy+%d)|z180|X||FD 4E %d;FD 46 %D
+ld bc, (iy+%d)|z80|X||FD 4E %d;FD 46 %D
+ld bc, (iy+%d)|z80n|X||FD 4E %d;FD 46 %D
 ld bc, (pix)|kc160|_||5B;ED 8D 00
 ld bc, (pix+%d)|kc160|_||5B;ED 8D %d
 ld bc, (piy)|kc160|_||5B;ED 8C 00
@@ -25874,7 +25692,7 @@ ld c, (de)|8080|X||EB;4E;EB
 ld c, (de)|8085|X||EB;4E;EB
 ld c, (de)|ez80|X||EB;4E;EB
 ld c, (de)|ez80_z80|X||EB;4E;EB
-ld c, (de)|gbz80|X||E5;D5;E1;D1;4E;E5;D5;E1;D1
+ld c, (de)|gbz80|X||D5;E5;D1;E1;4E;D5;E5;D1;E1
 ld c, (de)|kc160|X||EB;4E;EB
 ld c, (de)|kc160_z80|X||EB;4E;EB
 ld c, (de)|r2ka|X||EB;4E;EB
@@ -25889,7 +25707,7 @@ ld c, (de+)|8080|X||EB;4E;EB;13
 ld c, (de+)|8085|X||EB;4E;EB;13
 ld c, (de+)|ez80|X||EB;4E;EB;13
 ld c, (de+)|ez80_z80|X||EB;4E;EB;13
-ld c, (de+)|gbz80|X||E5;D5;E1;D1;4E;E5;D5;E1;D1;13
+ld c, (de+)|gbz80|X||D5;E5;D1;E1;4E;D5;E5;D1;E1;13
 ld c, (de+)|kc160|X||EB;4E;EB;13
 ld c, (de+)|kc160_z80|X||EB;4E;EB;13
 ld c, (de+)|r2ka|X||EB;4E;EB;13
@@ -25904,7 +25722,7 @@ ld c, (de-)|8080|X||EB;4E;EB;1B
 ld c, (de-)|8085|X||EB;4E;EB;1B
 ld c, (de-)|ez80|X||EB;4E;EB;1B
 ld c, (de-)|ez80_z80|X||EB;4E;EB;1B
-ld c, (de-)|gbz80|X||E5;D5;E1;D1;4E;E5;D5;E1;D1;1B
+ld c, (de-)|gbz80|X||D5;E5;D1;E1;4E;D5;E5;D1;E1;1B
 ld c, (de-)|kc160|X||EB;4E;EB;1B
 ld c, (de-)|kc160_z80|X||EB;4E;EB;1B
 ld c, (de-)|r2ka|X||EB;4E;EB;1B
@@ -26385,7 +26203,7 @@ ld d, (de)|8080|X||EB;66;EB
 ld d, (de)|8085|X||EB;66;EB
 ld d, (de)|ez80|X||EB;66;EB
 ld d, (de)|ez80_z80|X||EB;66;EB
-ld d, (de)|gbz80|X||E5;D5;E1;D1;66;E5;D5;E1;D1
+ld d, (de)|gbz80|X||D5;E5;D1;E1;66;D5;E5;D1;E1
 ld d, (de)|kc160|X||EB;66;EB
 ld d, (de)|kc160_z80|X||EB;66;EB
 ld d, (de)|r2ka|X||EB;66;EB
@@ -26400,7 +26218,7 @@ ld d, (de+)|8080|X||EB;66;EB;13
 ld d, (de+)|8085|X||EB;66;EB;13
 ld d, (de+)|ez80|X||EB;66;EB;13
 ld d, (de+)|ez80_z80|X||EB;66;EB;13
-ld d, (de+)|gbz80|X||E5;D5;E1;D1;66;E5;D5;E1;D1;13
+ld d, (de+)|gbz80|X||D5;E5;D1;E1;66;D5;E5;D1;E1;13
 ld d, (de+)|kc160|X||EB;66;EB;13
 ld d, (de+)|kc160_z80|X||EB;66;EB;13
 ld d, (de+)|r2ka|X||EB;66;EB;13
@@ -26415,7 +26233,7 @@ ld d, (de-)|8080|X||EB;66;EB;1B
 ld d, (de-)|8085|X||EB;66;EB;1B
 ld d, (de-)|ez80|X||EB;66;EB;1B
 ld d, (de-)|ez80_z80|X||EB;66;EB;1B
-ld d, (de-)|gbz80|X||E5;D5;E1;D1;66;E5;D5;E1;D1;1B
+ld d, (de-)|gbz80|X||D5;E5;D1;E1;66;D5;E5;D1;E1;1B
 ld d, (de-)|kc160|X||EB;66;EB;1B
 ld d, (de-)|kc160_z80|X||EB;66;EB;1B
 ld d, (de-)|r2ka|X||EB;66;EB;1B
@@ -26887,7 +26705,7 @@ ld de, (%m)|8080|X||EB;2A %m %m;EB
 ld de, (%m)|8085|X||EB;2A %m %m;EB
 ld de, (%m)|ez80|_||ED 5B %m %m %m
 ld de, (%m)|ez80_z80|_||ED 5B %m %m
-ld de, (%m)|gbz80|X||E5;D5;E1;D1;D5;21 %m %m;5E;23;56;62;6B;D1;E5;D5;E1;D1
+ld de, (%m)|gbz80|X||D5;E5;D1;E1;D5;21 %m %m;5E;23;56;62;6B;D1;D5;E5;D1;E1
 ld de, (%m)|kc160|_||ED 5B %m %m
 ld de, (%m)|kc160_z80|_||ED 5B %m %m
 ld de, (%m)|r2ka|_||ED 5B %m %m
@@ -26904,86 +26722,68 @@ ld de, (aix)|kc160|_||52;ED 9D 00
 ld de, (aix+%d)|kc160|_||52;ED 9D %d
 ld de, (aiy)|kc160|_||52;ED 9C 00
 ld de, (aiy+%d)|kc160|_||52;ED 9C %d
+ld de, (hl)|8080|X||5E;23;56;2B
+ld de, (hl)|8085|X||5E;23;56;2B
 ld de, (hl)|ez80|_||ED 17
 ld de, (hl)|ez80_z80|_||ED 17
-ld de, (hl)|gbz80|_||5E;23;56;2B
-ld de, (hl)|kc160|_||5E;23;56;2B
-ld de, (hl)|kc160_z80|_||5E;23;56;2B
-ld de, (hl)|r2ka|_||5E;23;56;2B
-ld de, (hl)|r3k|_||5E;23;56;2B
-ld de, (hl)|r4k|_||5E;23;56;2B
-ld de, (hl)|r5k|_||5E;23;56;2B
-ld de, (hl)|r800|_||5E;23;56;2B
-ld de, (hl)|z180|_||5E;23;56;2B
-ld de, (hl)|z80|_||5E;23;56;2B
-ld de, (hl)|z80_strict|_||5E;23;56;2B
-ld de, (hl)|z80n|_||5E;23;56;2B
+ld de, (hl)|gbz80|X||5E;23;56;2B
+ld de, (hl)|kc160|X||5E;23;56;2B
+ld de, (hl)|kc160_z80|X||5E;23;56;2B
+ld de, (hl)|r2ka|X||5E;23;56;2B
+ld de, (hl)|r3k|X||5E;23;56;2B
+ld de, (hl)|r4k|X||5E;23;56;2B
+ld de, (hl)|r5k|X||5E;23;56;2B
+ld de, (hl)|r800|X||5E;23;56;2B
+ld de, (hl)|z180|X||5E;23;56;2B
+ld de, (hl)|z80|X||5E;23;56;2B
+ld de, (hl)|z80n|X||5E;23;56;2B
+ld de, (hl+)|8080|X||5E;23;56;23
+ld de, (hl+)|8085|X||5E;23;56;23
 ld de, (hl+)|ez80|_||ED 17;23;23
 ld de, (hl+)|ez80_z80|_||ED 17;23;23
-ld de, (hl+)|gbz80|_||5E;23;56;23
-ld de, (hl+)|kc160|_||5E;23;56;23
-ld de, (hl+)|kc160_z80|_||5E;23;56;23
-ld de, (hl+)|r2ka|_||5E;23;56;23
-ld de, (hl+)|r3k|_||5E;23;56;23
-ld de, (hl+)|r4k|_||5E;23;56;23
-ld de, (hl+)|r5k|_||5E;23;56;23
-ld de, (hl+)|r800|_||5E;23;56;23
-ld de, (hl+)|z180|_||5E;23;56;23
-ld de, (hl+)|z80|_||5E;23;56;23
-ld de, (hl+)|z80_strict|_||5E;23;56;23
-ld de, (hl+)|z80n|_||5E;23;56;23
+ld de, (hl+)|gbz80|X||5E;23;56;23
+ld de, (hl+)|kc160|X||5E;23;56;23
+ld de, (hl+)|kc160_z80|X||5E;23;56;23
+ld de, (hl+)|r2ka|X||5E;23;56;23
+ld de, (hl+)|r3k|X||5E;23;56;23
+ld de, (hl+)|r4k|X||5E;23;56;23
+ld de, (hl+)|r5k|X||5E;23;56;23
+ld de, (hl+)|r800|X||5E;23;56;23
+ld de, (hl+)|z180|X||5E;23;56;23
+ld de, (hl+)|z80|X||5E;23;56;23
+ld de, (hl+)|z80n|X||5E;23;56;23
 ld de, (ix)|ez80|_||DD 17 00
 ld de, (ix)|ez80_z80|_||DD 17 00
 ld de, (ix)|kc160|_||ED 9D 00
 ld de, (ix)|kc160_z80|_||ED 9D 00
-ld de, (ix)|r2ka|_||DD 5E 00;DD 56 01
-ld de, (ix)|r3k|_||DD 5E 00;DD 56 01
-ld de, (ix)|r4k|_||DD 5E 00;DD 56 01
-ld de, (ix)|r5k|_||DD 5E 00;DD 56 01
-ld de, (ix)|r800|_||DD 5E 00;DD 56 01
-ld de, (ix)|z180|_||DD 5E 00;DD 56 01
-ld de, (ix)|z80|_||DD 5E 00;DD 56 01
-ld de, (ix)|z80_strict|_||DD 5E 00;DD 56 01
-ld de, (ix)|z80n|_||DD 5E 00;DD 56 01
 ld de, (ix+%d)|ez80|_||DD 17 %d
 ld de, (ix+%d)|ez80_z80|_||DD 17 %d
 ld de, (ix+%d)|kc160|_||ED 9D %d
 ld de, (ix+%d)|kc160_z80|_||ED 9D %d
-ld de, (ix+%d)|r2ka|_||DD 5E %d;DD 56 %D
-ld de, (ix+%d)|r3k|_||DD 5E %d;DD 56 %D
-ld de, (ix+%d)|r4k|_||DD 5E %d;DD 56 %D
-ld de, (ix+%d)|r5k|_||DD 5E %d;DD 56 %D
-ld de, (ix+%d)|r800|_||DD 5E %d;DD 56 %D
-ld de, (ix+%d)|z180|_||DD 5E %d;DD 56 %D
-ld de, (ix+%d)|z80|_||DD 5E %d;DD 56 %D
-ld de, (ix+%d)|z80_strict|_||DD 5E %d;DD 56 %D
-ld de, (ix+%d)|z80n|_||DD 5E %d;DD 56 %D
+ld de, (ix+%d)|r2ka|X||DD 5E %d;DD 56 %D
+ld de, (ix+%d)|r3k|X||DD 5E %d;DD 56 %D
+ld de, (ix+%d)|r4k|X||DD 5E %d;DD 56 %D
+ld de, (ix+%d)|r5k|X||DD 5E %d;DD 56 %D
+ld de, (ix+%d)|r800|X||DD 5E %d;DD 56 %D
+ld de, (ix+%d)|z180|X||DD 5E %d;DD 56 %D
+ld de, (ix+%d)|z80|X||DD 5E %d;DD 56 %D
+ld de, (ix+%d)|z80n|X||DD 5E %d;DD 56 %D
 ld de, (iy)|ez80|_||FD 17 00
 ld de, (iy)|ez80_z80|_||FD 17 00
 ld de, (iy)|kc160|_||ED 9C 00
 ld de, (iy)|kc160_z80|_||ED 9C 00
-ld de, (iy)|r2ka|_||FD 5E 00;FD 56 01
-ld de, (iy)|r3k|_||FD 5E 00;FD 56 01
-ld de, (iy)|r4k|_||FD 5E 00;FD 56 01
-ld de, (iy)|r5k|_||FD 5E 00;FD 56 01
-ld de, (iy)|r800|_||FD 5E 00;FD 56 01
-ld de, (iy)|z180|_||FD 5E 00;FD 56 01
-ld de, (iy)|z80|_||FD 5E 00;FD 56 01
-ld de, (iy)|z80_strict|_||FD 5E 00;FD 56 01
-ld de, (iy)|z80n|_||FD 5E 00;FD 56 01
 ld de, (iy+%d)|ez80|_||FD 17 %d
 ld de, (iy+%d)|ez80_z80|_||FD 17 %d
 ld de, (iy+%d)|kc160|_||ED 9C %d
 ld de, (iy+%d)|kc160_z80|_||ED 9C %d
-ld de, (iy+%d)|r2ka|_||FD 5E %d;FD 56 %D
-ld de, (iy+%d)|r3k|_||FD 5E %d;FD 56 %D
-ld de, (iy+%d)|r4k|_||FD 5E %d;FD 56 %D
-ld de, (iy+%d)|r5k|_||FD 5E %d;FD 56 %D
-ld de, (iy+%d)|r800|_||FD 5E %d;FD 56 %D
-ld de, (iy+%d)|z180|_||FD 5E %d;FD 56 %D
-ld de, (iy+%d)|z80|_||FD 5E %d;FD 56 %D
-ld de, (iy+%d)|z80_strict|_||FD 5E %d;FD 56 %D
-ld de, (iy+%d)|z80n|_||FD 5E %d;FD 56 %D
+ld de, (iy+%d)|r2ka|X||FD 5E %d;FD 56 %D
+ld de, (iy+%d)|r3k|X||FD 5E %d;FD 56 %D
+ld de, (iy+%d)|r4k|X||FD 5E %d;FD 56 %D
+ld de, (iy+%d)|r5k|X||FD 5E %d;FD 56 %D
+ld de, (iy+%d)|r800|X||FD 5E %d;FD 56 %D
+ld de, (iy+%d)|z180|X||FD 5E %d;FD 56 %D
+ld de, (iy+%d)|z80|X||FD 5E %d;FD 56 %D
+ld de, (iy+%d)|z80n|X||FD 5E %d;FD 56 %D
 ld de, (pix)|kc160|_||5B;ED 9D 00
 ld de, (pix+%d)|kc160|_||5B;ED 9D %d
 ld de, (piy)|kc160|_||5B;ED 9C 00
@@ -27078,7 +26878,7 @@ ld de, hl+%u|8080|X||E5;11 %u 00;19;EB;E1
 ld de, hl+%u|8085|_||28 %u
 ld de, hl+%u|ez80|X||E5;11 %u 00 00;19;EB;E1
 ld de, hl+%u|ez80_z80|X||E5;11 %u 00;19;EB;E1
-ld de, hl+%u|gbz80|X||E5;11 %u 00;19;E5;D5;E1;D1;E1
+ld de, hl+%u|gbz80|X||E5;11 %u 00;19;D5;E5;D1;E1;E1
 ld de, hl+%u|kc160|X||E5;11 %u 00;19;EB;E1
 ld de, hl+%u|kc160_z80|X||E5;11 %u 00;19;EB;E1
 ld de, hl+%u|r2ka|X||E5;11 %u 00;19;EB;E1
@@ -27117,7 +26917,7 @@ ld de, sp|8080|X||EB;21 00 00;39;EB
 ld de, sp|8085|_||38 00
 ld de, sp|ez80|X||EB;21 00 00;39;EB
 ld de, sp|ez80_z80|X||EB;21 00 00;39;EB
-ld de, sp|gbz80|X||E5;D5;E1;D1;F8 00;E5;D5;E1;D1
+ld de, sp|gbz80|X||D5;E5;D1;E1;F8 00;D5;E5;D1;E1
 ld de, sp|kc160|X||EB;ED 26;EB
 ld de, sp|kc160_z80|X||EB;ED 26;EB
 ld de, sp|r2ka|X||EB;21 00 00;39;EB
@@ -27132,7 +26932,7 @@ ld de, sp+%u|8080|X||EB;21 %u 00;39;EB
 ld de, sp+%u|8085|_||38 %u
 ld de, sp+%u|ez80|X||EB;21 %u 00 00;39;EB
 ld de, sp+%u|ez80_z80|X||EB;21 %u 00;39;EB
-ld de, sp+%u|gbz80|X||E5;D5;E1;D1;21 %u 00;39;E5;D5;E1;D1
+ld de, sp+%u|gbz80|X||D5;E5;D1;E1;21 %u 00;39;D5;E5;D1;E1
 ld de, sp+%u|kc160|X||EB;21 %u 00;39;EB
 ld de, sp+%u|kc160_z80|X||EB;21 %u 00;39;EB
 ld de, sp+%u|r2ka|X||EB;21 %u 00;39;EB
@@ -27236,7 +27036,7 @@ ld e, (de)|8080|X||EB;6E;EB
 ld e, (de)|8085|X||EB;6E;EB
 ld e, (de)|ez80|X||EB;6E;EB
 ld e, (de)|ez80_z80|X||EB;6E;EB
-ld e, (de)|gbz80|X||E5;D5;E1;D1;6E;E5;D5;E1;D1
+ld e, (de)|gbz80|X||D5;E5;D1;E1;6E;D5;E5;D1;E1
 ld e, (de)|kc160|X||EB;6E;EB
 ld e, (de)|kc160_z80|X||EB;6E;EB
 ld e, (de)|r2ka|X||EB;6E;EB
@@ -27251,7 +27051,7 @@ ld e, (de+)|8080|X||EB;6E;EB;13
 ld e, (de+)|8085|X||EB;6E;EB;13
 ld e, (de+)|ez80|X||EB;6E;EB;13
 ld e, (de+)|ez80_z80|X||EB;6E;EB;13
-ld e, (de+)|gbz80|X||E5;D5;E1;D1;6E;E5;D5;E1;D1;13
+ld e, (de+)|gbz80|X||D5;E5;D1;E1;6E;D5;E5;D1;E1;13
 ld e, (de+)|kc160|X||EB;6E;EB;13
 ld e, (de+)|kc160_z80|X||EB;6E;EB;13
 ld e, (de+)|r2ka|X||EB;6E;EB;13
@@ -27266,7 +27066,7 @@ ld e, (de-)|8080|X||EB;6E;EB;1B
 ld e, (de-)|8085|X||EB;6E;EB;1B
 ld e, (de-)|ez80|X||EB;6E;EB;1B
 ld e, (de-)|ez80_z80|X||EB;6E;EB;1B
-ld e, (de-)|gbz80|X||E5;D5;E1;D1;6E;E5;D5;E1;D1;1B
+ld e, (de-)|gbz80|X||D5;E5;D1;E1;6E;D5;E5;D1;E1;1B
 ld e, (de-)|kc160|X||EB;6E;EB;1B
 ld e, (de-)|kc160_z80|X||EB;6E;EB;1B
 ld e, (de-)|r2ka|X||EB;6E;EB;1B
@@ -27751,7 +27551,7 @@ ld h, (de)|8080|X||EB;56;EB
 ld h, (de)|8085|X||EB;56;EB
 ld h, (de)|ez80|X||EB;56;EB
 ld h, (de)|ez80_z80|X||EB;56;EB
-ld h, (de)|gbz80|X||E5;D5;E1;D1;56;E5;D5;E1;D1
+ld h, (de)|gbz80|X||D5;E5;D1;E1;56;D5;E5;D1;E1
 ld h, (de)|kc160|X||EB;56;EB
 ld h, (de)|kc160_z80|X||EB;56;EB
 ld h, (de)|r2ka|X||EB;56;EB
@@ -27766,7 +27566,7 @@ ld h, (de+)|8080|X||EB;56;EB;13
 ld h, (de+)|8085|X||EB;56;EB;13
 ld h, (de+)|ez80|X||EB;56;EB;13
 ld h, (de+)|ez80_z80|X||EB;56;EB;13
-ld h, (de+)|gbz80|X||E5;D5;E1;D1;56;E5;D5;E1;D1;13
+ld h, (de+)|gbz80|X||D5;E5;D1;E1;56;D5;E5;D1;E1;13
 ld h, (de+)|kc160|X||EB;56;EB;13
 ld h, (de+)|kc160_z80|X||EB;56;EB;13
 ld h, (de+)|r2ka|X||EB;56;EB;13
@@ -27781,7 +27581,7 @@ ld h, (de-)|8080|X||EB;56;EB;1B
 ld h, (de-)|8085|X||EB;56;EB;1B
 ld h, (de-)|ez80|X||EB;56;EB;1B
 ld h, (de-)|ez80_z80|X||EB;56;EB;1B
-ld h, (de-)|gbz80|X||E5;D5;E1;D1;56;E5;D5;E1;D1;1B
+ld h, (de-)|gbz80|X||D5;E5;D1;E1;56;D5;E5;D1;E1;1B
 ld h, (de-)|kc160|X||EB;56;EB;1B
 ld h, (de-)|kc160_z80|X||EB;56;EB;1B
 ld h, (de-)|r2ka|X||EB;56;EB;1B
@@ -28292,7 +28092,7 @@ ld hl, (de)|8080|X||EB;5E;23;56;2B;EB
 ld hl, (de)|8085|_||ED
 ld hl, (de)|ez80|X||EB;5E;23;56;2B;EB
 ld hl, (de)|ez80_z80|X||EB;5E;23;56;2B;EB
-ld hl, (de)|gbz80|X||E5;D5;E1;D1;5E;23;56;2B;E5;D5;E1;D1
+ld hl, (de)|gbz80|X||D5;E5;D1;E1;5E;23;56;2B;D5;E5;D1;E1
 ld hl, (de)|kc160|X||EB;5E;23;56;2B;EB
 ld hl, (de)|kc160_z80|X||EB;5E;23;56;2B;EB
 ld hl, (de)|r2ka|X||EB;5E;23;56;2B;EB
@@ -28307,7 +28107,7 @@ ld hl, (de+)|8080|X||EB;5E;23;56;23;EB
 ld hl, (de+)|8085|X||EB;5E;23;56;23;EB
 ld hl, (de+)|ez80|X||EB;5E;23;56;23;EB
 ld hl, (de+)|ez80_z80|X||EB;5E;23;56;23;EB
-ld hl, (de+)|gbz80|X||E5;D5;E1;D1;5E;23;56;23;E5;D5;E1;D1
+ld hl, (de+)|gbz80|X||D5;E5;D1;E1;5E;23;56;23;D5;E5;D1;E1
 ld hl, (de+)|kc160|X||EB;5E;23;56;23;EB
 ld hl, (de+)|kc160_z80|X||EB;5E;23;56;23;EB
 ld hl, (de+)|r2ka|X||EB;5E;23;56;23;EB
@@ -28318,34 +28118,40 @@ ld hl, (de+)|r800|X||EB;5E;23;56;23;EB
 ld hl, (de+)|z180|X||EB;5E;23;56;23;EB
 ld hl, (de+)|z80|X||EB;5E;23;56;23;EB
 ld hl, (de+)|z80n|X||EB;5E;23;56;23;EB
+ld hl, (hl)|8080|X||F5;7E;23;66;6F;F1
+ld hl, (hl)|8085|X||F5;7E;23;66;6F;F1
 ld hl, (hl)|ez80|_||ED 27
 ld hl, (hl)|ez80_z80|_||ED 27
-ld hl, (hl)|gbz80|_||F5;7E;23;66;6F;F1
-ld hl, (hl)|kc160|_||F5;7E;23;66;6F;F1
-ld hl, (hl)|kc160_z80|_||F5;7E;23;66;6F;F1
+ld hl, (hl)|gbz80|X||F5;7E;23;66;6F;F1
+ld hl, (hl)|kc160|X||F5;7E;23;66;6F;F1
+ld hl, (hl)|kc160_z80|X||F5;7E;23;66;6F;F1
 ld hl, (hl)|r2ka|_||DD E4 00
 ld hl, (hl)|r3k|_||DD E4 00
 ld hl, (hl)|r4k|_||DD E4 00
 ld hl, (hl)|r5k|_||DD E4 00
-ld hl, (hl)|r800|_||F5;7E;23;66;6F;F1
-ld hl, (hl)|z180|_||F5;7E;23;66;6F;F1
-ld hl, (hl)|z80|_||F5;7E;23;66;6F;F1
-ld hl, (hl)|z80_strict|_||F5;7E;23;66;6F;F1
-ld hl, (hl)|z80n|_||F5;7E;23;66;6F;F1
+ld hl, (hl)|r800|X||F5;7E;23;66;6F;F1
+ld hl, (hl)|z180|X||F5;7E;23;66;6F;F1
+ld hl, (hl)|z80|X||F5;7E;23;66;6F;F1
+ld hl, (hl)|z80n|X||F5;7E;23;66;6F;F1
 ld hl, (hl+%d)|r2ka|_||DD E4 %d
 ld hl, (hl+%d)|r3k|_||DD E4 %d
 ld hl, (hl+%d)|r4k|_||DD E4 %d
 ld hl, (hl+%d)|r5k|_||DD E4 %d
+ld hl, (hl+)|8080|X||F5;7E;23;66;6F;F1;23
+ld hl, (hl+)|8085|X||F5;7E;23;66;6F;F1;23
 ld hl, (hl+)|ez80|_||ED 27;23;23
 ld hl, (hl+)|ez80_z80|_||ED 27;23;23
-ld hl, (hl+)|gbz80|_||F5;7E;23;66;6F;F1
-ld hl, (hl+)|kc160|_||F5;7E;23;66;6F;F1
-ld hl, (hl+)|kc160_z80|_||F5;7E;23;66;6F;F1
-ld hl, (hl+)|r800|_||F5;7E;23;66;6F;F1
-ld hl, (hl+)|z180|_||F5;7E;23;66;6F;F1
-ld hl, (hl+)|z80|_||F5;7E;23;66;6F;F1
-ld hl, (hl+)|z80_strict|_||F5;7E;23;66;6F;F1
-ld hl, (hl+)|z80n|_||F5;7E;23;66;6F;F1
+ld hl, (hl+)|gbz80|X||F5;7E;23;66;6F;F1;23
+ld hl, (hl+)|kc160|X||F5;7E;23;66;6F;F1;23
+ld hl, (hl+)|kc160_z80|X||F5;7E;23;66;6F;F1;23
+ld hl, (hl+)|r2ka|X||F5;7E;23;66;6F;F1;23
+ld hl, (hl+)|r3k|X||F5;7E;23;66;6F;F1;23
+ld hl, (hl+)|r4k|X||F5;7E;23;66;7F 6F;F1;23
+ld hl, (hl+)|r5k|X||F5;7E;23;66;7F 6F;F1;23
+ld hl, (hl+)|r800|X||F5;7E;23;66;6F;F1;23
+ld hl, (hl+)|z180|X||F5;7E;23;66;6F;F1;23
+ld hl, (hl+)|z80|X||F5;7E;23;66;6F;F1;23
+ld hl, (hl+)|z80n|X||F5;7E;23;66;6F;F1;23
 ld hl, (ix)|ez80|_||DD 27 00
 ld hl, (ix)|ez80_z80|_||DD 27 00
 ld hl, (ix)|kc160|_||ED AD 00
@@ -28354,11 +28160,6 @@ ld hl, (ix)|r2ka|_||E4 00
 ld hl, (ix)|r3k|_||E4 00
 ld hl, (ix)|r4k|_||E4 00
 ld hl, (ix)|r5k|_||E4 00
-ld hl, (ix)|r800|_||DD 6E 00;DD 66 01
-ld hl, (ix)|z180|_||DD 6E 00;DD 66 01
-ld hl, (ix)|z80|_||DD 6E 00;DD 66 01
-ld hl, (ix)|z80_strict|_||DD 6E 00;DD 66 01
-ld hl, (ix)|z80n|_||DD 6E 00;DD 66 01
 ld hl, (ix+%d)|ez80|_||DD 27 %d
 ld hl, (ix+%d)|ez80_z80|_||DD 27 %d
 ld hl, (ix+%d)|kc160|_||ED AD %d
@@ -28367,11 +28168,10 @@ ld hl, (ix+%d)|r2ka|_||E4 %d
 ld hl, (ix+%d)|r3k|_||E4 %d
 ld hl, (ix+%d)|r4k|_||E4 %d
 ld hl, (ix+%d)|r5k|_||E4 %d
-ld hl, (ix+%d)|r800|_||DD 6E %d;DD 66 %D
-ld hl, (ix+%d)|z180|_||DD 6E %d;DD 66 %D
-ld hl, (ix+%d)|z80|_||DD 6E %d;DD 66 %D
-ld hl, (ix+%d)|z80_strict|_||DD 6E %d;DD 66 %D
-ld hl, (ix+%d)|z80n|_||DD 6E %d;DD 66 %D
+ld hl, (ix+%d)|r800|X||DD 6E %d;DD 66 %D
+ld hl, (ix+%d)|z180|X||DD 6E %d;DD 66 %D
+ld hl, (ix+%d)|z80|X||DD 6E %d;DD 66 %D
+ld hl, (ix+%d)|z80n|X||DD 6E %d;DD 66 %D
 ld hl, (iy)|ez80|_||FD 27 00
 ld hl, (iy)|ez80_z80|_||FD 27 00
 ld hl, (iy)|kc160|_||ED AC 00
@@ -28380,11 +28180,6 @@ ld hl, (iy)|r2ka|_||FD E4 00
 ld hl, (iy)|r3k|_||FD E4 00
 ld hl, (iy)|r4k|_||FD E4 00
 ld hl, (iy)|r5k|_||FD E4 00
-ld hl, (iy)|r800|_||FD 6E 00;FD 66 01
-ld hl, (iy)|z180|_||FD 6E 00;FD 66 01
-ld hl, (iy)|z80|_||FD 6E 00;FD 66 01
-ld hl, (iy)|z80_strict|_||FD 6E 00;FD 66 01
-ld hl, (iy)|z80n|_||FD 6E 00;FD 66 01
 ld hl, (iy+%d)|ez80|_||FD 27 %d
 ld hl, (iy+%d)|ez80_z80|_||FD 27 %d
 ld hl, (iy+%d)|kc160|_||ED AC %d
@@ -28393,11 +28188,10 @@ ld hl, (iy+%d)|r2ka|_||FD E4 %d
 ld hl, (iy+%d)|r3k|_||FD E4 %d
 ld hl, (iy+%d)|r4k|_||FD E4 %d
 ld hl, (iy+%d)|r5k|_||FD E4 %d
-ld hl, (iy+%d)|r800|_||FD 6E %d;FD 66 %D
-ld hl, (iy+%d)|z180|_||FD 6E %d;FD 66 %D
-ld hl, (iy+%d)|z80|_||FD 6E %d;FD 66 %D
-ld hl, (iy+%d)|z80_strict|_||FD 6E %d;FD 66 %D
-ld hl, (iy+%d)|z80n|_||FD 6E %d;FD 66 %D
+ld hl, (iy+%d)|r800|X||FD 6E %d;FD 66 %D
+ld hl, (iy+%d)|z180|X||FD 6E %d;FD 66 %D
+ld hl, (iy+%d)|z80|X||FD 6E %d;FD 66 %D
+ld hl, (iy+%d)|z80n|X||FD 6E %d;FD 66 %D
 ld hl, (pix)|kc160|_||5B;ED AD 00
 ld hl, (pix+%d)|kc160|_||5B;ED AD %d
 ld hl, (piy)|kc160|_||5B;ED AC 00
@@ -28607,84 +28401,68 @@ ld ix, (aix)|kc160|_||52;ED 89 00
 ld ix, (aix+%d)|kc160|_||52;ED 89 %d
 ld ix, (aiy)|kc160|_||52;ED 88 00
 ld ix, (aiy+%d)|kc160|_||52;ED 88 %d
+ld ix, (hl)|8080|X||D5;5E;23;56;D1;2B
+ld ix, (hl)|8085|X||D5;5E;23;56;D1;2B
 ld ix, (hl)|ez80|_||ED 37
 ld ix, (hl)|ez80_z80|_||ED 37
-ld ix, (hl)|kc160|_||D5;5E;23;56;2B;D5;DD E1;D1
-ld ix, (hl)|kc160_z80|_||D5;5E;23;56;2B;D5;DD E1;D1
-ld ix, (hl)|r2ka|_||D5;5E;23;56;2B;D5;DD E1;D1
-ld ix, (hl)|r3k|_||D5;5E;23;56;2B;D5;DD E1;D1
-ld ix, (hl)|r4k|_||D5;5E;23;56;2B;D5;DD E1;D1
-ld ix, (hl)|r5k|_||D5;5E;23;56;2B;D5;DD E1;D1
-ld ix, (hl)|r800|_||D5;5E;23;56;2B;D5;DD E1;D1
-ld ix, (hl)|z180|_||D5;5E;23;56;2B;D5;DD E1;D1
-ld ix, (hl)|z80|_||D5;5E;23;56;2B;D5;DD E1;D1
-ld ix, (hl)|z80_strict|_||D5;5E;23;56;2B;D5;DD E1;D1
-ld ix, (hl)|z80n|_||D5;5E;23;56;2B;D5;DD E1;D1
+ld ix, (hl)|gbz80|X||D5;5E;23;56;D1;2B
+ld ix, (hl)|kc160|X||D5;5E;23;56;D1;2B
+ld ix, (hl)|kc160_z80|X||D5;5E;23;56;D1;2B
+ld ix, (hl)|r2ka|X||D5;5E;23;56;D1;2B
+ld ix, (hl)|r3k|X||D5;5E;23;56;D1;2B
+ld ix, (hl)|r4k|X||D5;5E;23;56;D1;2B
+ld ix, (hl)|r5k|X||D5;5E;23;56;D1;2B
+ld ix, (hl)|r800|X||D5;5E;23;56;D1;2B
+ld ix, (hl)|z180|X||D5;5E;23;56;D1;2B
+ld ix, (hl)|z80|X||D5;5E;23;56;D1;2B
+ld ix, (hl)|z80n|X||D5;5E;23;56;D1;2B
+ld ix, (hl+)|8080|X||D5;5E;23;56;D1;23
+ld ix, (hl+)|8085|X||D5;5E;23;56;D1;23
 ld ix, (hl+)|ez80|_||ED 37;23;23
 ld ix, (hl+)|ez80_z80|_||ED 37;23;23
-ld ix, (hl+)|kc160|_||D5;5E;23;56;23;D5;DD E1;D1
-ld ix, (hl+)|kc160_z80|_||D5;5E;23;56;23;D5;DD E1;D1
-ld ix, (hl+)|r2ka|_||D5;5E;23;56;23;D5;DD E1;D1
-ld ix, (hl+)|r3k|_||D5;5E;23;56;23;D5;DD E1;D1
-ld ix, (hl+)|r4k|_||D5;5E;23;56;23;D5;DD E1;D1
-ld ix, (hl+)|r5k|_||D5;5E;23;56;23;D5;DD E1;D1
-ld ix, (hl+)|r800|_||D5;5E;23;56;23;D5;DD E1;D1
-ld ix, (hl+)|z180|_||D5;5E;23;56;23;D5;DD E1;D1
-ld ix, (hl+)|z80|_||D5;5E;23;56;23;D5;DD E1;D1
-ld ix, (hl+)|z80_strict|_||D5;5E;23;56;23;D5;DD E1;D1
-ld ix, (hl+)|z80n|_||D5;5E;23;56;23;D5;DD E1;D1
+ld ix, (hl+)|gbz80|X||D5;5E;23;56;D1;23
+ld ix, (hl+)|kc160|X||D5;5E;23;56;D1;23
+ld ix, (hl+)|kc160_z80|X||D5;5E;23;56;D1;23
+ld ix, (hl+)|r2ka|X||D5;5E;23;56;D1;23
+ld ix, (hl+)|r3k|X||D5;5E;23;56;D1;23
+ld ix, (hl+)|r4k|X||D5;5E;23;56;D1;23
+ld ix, (hl+)|r5k|X||D5;5E;23;56;D1;23
+ld ix, (hl+)|r800|X||D5;5E;23;56;D1;23
+ld ix, (hl+)|z180|X||D5;5E;23;56;D1;23
+ld ix, (hl+)|z80|X||D5;5E;23;56;D1;23
+ld ix, (hl+)|z80n|X||D5;5E;23;56;D1;23
 ld ix, (ix)|ez80|_||DD 37 00
 ld ix, (ix)|ez80_z80|_||DD 37 00
 ld ix, (ix)|kc160|_||ED 89 00
 ld ix, (ix)|kc160_z80|_||ED 89 00
-ld ix, (ix)|r2ka|_||DD E5;ED 54;DD 6E 00;DD 66 01;ED 54;DD E1
-ld ix, (ix)|r3k|_||DD E5;ED 54;DD 6E 00;DD 66 01;ED 54;DD E1
-ld ix, (ix)|r4k|_||DD E5;ED 54;DD 6E 00;DD 66 01;ED 54;DD E1
-ld ix, (ix)|r5k|_||DD E5;ED 54;DD 6E 00;DD 66 01;ED 54;DD E1
-ld ix, (ix)|r800|_||DD E5;E3;DD 6E 00;DD 66 01;E3;DD E1
-ld ix, (ix)|z180|_||DD E5;E3;DD 6E 00;DD 66 01;E3;DD E1
-ld ix, (ix)|z80|_||DD E5;E3;DD 6E 00;DD 66 01;E3;DD E1
-ld ix, (ix)|z80_strict|_||DD E5;E3;DD 6E 00;DD 66 01;E3;DD E1
-ld ix, (ix)|z80n|_||DD E5;E3;DD 6E 00;DD 66 01;E3;DD E1
 ld ix, (ix+%d)|ez80|_||DD 37 %d
 ld ix, (ix+%d)|ez80_z80|_||DD 37 %d
 ld ix, (ix+%d)|kc160|_||ED 89 %d
 ld ix, (ix+%d)|kc160_z80|_||ED 89 %d
-ld ix, (ix+%d)|r2ka|_||DD E5;ED 54;DD 6E %d;DD 66 %D;ED 54;DD E1
-ld ix, (ix+%d)|r3k|_||DD E5;ED 54;DD 6E %d;DD 66 %D;ED 54;DD E1
-ld ix, (ix+%d)|r4k|_||DD E5;ED 54;DD 6E %d;DD 66 %D;ED 54;DD E1
-ld ix, (ix+%d)|r5k|_||DD E5;ED 54;DD 6E %d;DD 66 %D;ED 54;DD E1
-ld ix, (ix+%d)|r800|_||DD E5;E3;DD 6E %d;DD 66 %D;E3;DD E1
-ld ix, (ix+%d)|z180|_||DD E5;E3;DD 6E %d;DD 66 %D;E3;DD E1
-ld ix, (ix+%d)|z80|_||DD E5;E3;DD 6E %d;DD 66 %D;E3;DD E1
-ld ix, (ix+%d)|z80_strict|_||DD E5;E3;DD 6E %d;DD 66 %D;E3;DD E1
-ld ix, (ix+%d)|z80n|_||DD E5;E3;DD 6E %d;DD 66 %D;E3;DD E1
+ld ix, (ix+%d)|r2ka|X||E5;E4 %d;DD 7D;E1
+ld ix, (ix+%d)|r3k|X||E5;E4 %d;DD 7D;E1
+ld ix, (ix+%d)|r4k|X||E5;E4 %d;DD 7D;E1
+ld ix, (ix+%d)|r5k|X||E5;E4 %d;DD 7D;E1
+ld ix, (ix+%d)|r800|X||E5;DD 6E %d;DD 66 %D;E5;DD E1;E1
+ld ix, (ix+%d)|z180|X||E5;DD 6E %d;DD 66 %D;E5;DD E1;E1
+ld ix, (ix+%d)|z80|X||E5;DD 6E %d;DD 66 %D;E5;DD E1;E1
+ld ix, (ix+%d)|z80n|X||E5;DD 6E %d;DD 66 %D;E5;DD E1;E1
 ld ix, (iy)|ez80|_||FD 31 00
 ld ix, (iy)|ez80_z80|_||FD 31 00
 ld ix, (iy)|kc160|_||ED 88 00
 ld ix, (iy)|kc160_z80|_||ED 88 00
-ld ix, (iy)|r2ka|_||DD E5;ED 54;FD 6E 00;FD 66 01;ED 54;DD E1
-ld ix, (iy)|r3k|_||DD E5;ED 54;FD 6E 00;FD 66 01;ED 54;DD E1
-ld ix, (iy)|r4k|_||DD E5;ED 54;FD 6E 00;FD 66 01;ED 54;DD E1
-ld ix, (iy)|r5k|_||DD E5;ED 54;FD 6E 00;FD 66 01;ED 54;DD E1
-ld ix, (iy)|r800|_||DD E5;E3;FD 6E 00;FD 66 01;E3;DD E1
-ld ix, (iy)|z180|_||DD E5;E3;FD 6E 00;FD 66 01;E3;DD E1
-ld ix, (iy)|z80|_||DD E5;E3;FD 6E 00;FD 66 01;E3;DD E1
-ld ix, (iy)|z80_strict|_||DD E5;E3;FD 6E 00;FD 66 01;E3;DD E1
-ld ix, (iy)|z80n|_||DD E5;E3;FD 6E 00;FD 66 01;E3;DD E1
 ld ix, (iy+%d)|ez80|_||FD 31 %d
 ld ix, (iy+%d)|ez80_z80|_||FD 31 %d
 ld ix, (iy+%d)|kc160|_||ED 88 %d
 ld ix, (iy+%d)|kc160_z80|_||ED 88 %d
-ld ix, (iy+%d)|r2ka|_||DD E5;ED 54;FD 6E %d;FD 66 %D;ED 54;DD E1
-ld ix, (iy+%d)|r3k|_||DD E5;ED 54;FD 6E %d;FD 66 %D;ED 54;DD E1
-ld ix, (iy+%d)|r4k|_||DD E5;ED 54;FD 6E %d;FD 66 %D;ED 54;DD E1
-ld ix, (iy+%d)|r5k|_||DD E5;ED 54;FD 6E %d;FD 66 %D;ED 54;DD E1
-ld ix, (iy+%d)|r800|_||DD E5;E3;FD 6E %d;FD 66 %D;E3;DD E1
-ld ix, (iy+%d)|z180|_||DD E5;E3;FD 6E %d;FD 66 %D;E3;DD E1
-ld ix, (iy+%d)|z80|_||DD E5;E3;FD 6E %d;FD 66 %D;E3;DD E1
-ld ix, (iy+%d)|z80_strict|_||DD E5;E3;FD 6E %d;FD 66 %D;E3;DD E1
-ld ix, (iy+%d)|z80n|_||DD E5;E3;FD 6E %d;FD 66 %D;E3;DD E1
+ld ix, (iy+%d)|r2ka|X||E5;FD E4 %d;DD 7D;E1
+ld ix, (iy+%d)|r3k|X||E5;FD E4 %d;DD 7D;E1
+ld ix, (iy+%d)|r4k|X||E5;FD E4 %d;DD 7D;E1
+ld ix, (iy+%d)|r5k|X||E5;FD E4 %d;DD 7D;E1
+ld ix, (iy+%d)|r800|X||E5;FD 6E %d;FD 66 %D;E5;DD E1;E1
+ld ix, (iy+%d)|z180|X||E5;FD 6E %d;FD 66 %D;E5;DD E1;E1
+ld ix, (iy+%d)|z80|X||E5;FD 6E %d;FD 66 %D;E5;DD E1;E1
+ld ix, (iy+%d)|z80n|X||E5;FD 6E %d;FD 66 %D;E5;DD E1;E1
 ld ix, (pix)|kc160|_||5B;ED 89 00
 ld ix, (pix+%d)|kc160|_||5B;ED 89 %d
 ld ix, (piy)|kc160|_||5B;ED 88 00
@@ -28924,84 +28702,68 @@ ld iy, (aix)|kc160|_||52;ED 99 00
 ld iy, (aix+%d)|kc160|_||52;ED 99 %d
 ld iy, (aiy)|kc160|_||52;ED 98 00
 ld iy, (aiy+%d)|kc160|_||52;ED 98 %d
+ld iy, (hl)|8080|X||D5;5E;23;56;D1;2B
+ld iy, (hl)|8085|X||D5;5E;23;56;D1;2B
 ld iy, (hl)|ez80|_||ED 31
 ld iy, (hl)|ez80_z80|_||ED 31
-ld iy, (hl)|kc160|_||D5;5E;23;56;2B;D5;FD E1;D1
-ld iy, (hl)|kc160_z80|_||D5;5E;23;56;2B;D5;FD E1;D1
-ld iy, (hl)|r2ka|_||D5;5E;23;56;2B;D5;FD E1;D1
-ld iy, (hl)|r3k|_||D5;5E;23;56;2B;D5;FD E1;D1
-ld iy, (hl)|r4k|_||D5;5E;23;56;2B;D5;FD E1;D1
-ld iy, (hl)|r5k|_||D5;5E;23;56;2B;D5;FD E1;D1
-ld iy, (hl)|r800|_||D5;5E;23;56;2B;D5;FD E1;D1
-ld iy, (hl)|z180|_||D5;5E;23;56;2B;D5;FD E1;D1
-ld iy, (hl)|z80|_||D5;5E;23;56;2B;D5;FD E1;D1
-ld iy, (hl)|z80_strict|_||D5;5E;23;56;2B;D5;FD E1;D1
-ld iy, (hl)|z80n|_||D5;5E;23;56;2B;D5;FD E1;D1
+ld iy, (hl)|gbz80|X||D5;5E;23;56;D1;2B
+ld iy, (hl)|kc160|X||D5;5E;23;56;D1;2B
+ld iy, (hl)|kc160_z80|X||D5;5E;23;56;D1;2B
+ld iy, (hl)|r2ka|X||D5;5E;23;56;D1;2B
+ld iy, (hl)|r3k|X||D5;5E;23;56;D1;2B
+ld iy, (hl)|r4k|X||D5;5E;23;56;D1;2B
+ld iy, (hl)|r5k|X||D5;5E;23;56;D1;2B
+ld iy, (hl)|r800|X||D5;5E;23;56;D1;2B
+ld iy, (hl)|z180|X||D5;5E;23;56;D1;2B
+ld iy, (hl)|z80|X||D5;5E;23;56;D1;2B
+ld iy, (hl)|z80n|X||D5;5E;23;56;D1;2B
+ld iy, (hl+)|8080|X||D5;5E;23;56;D1;23
+ld iy, (hl+)|8085|X||D5;5E;23;56;D1;23
 ld iy, (hl+)|ez80|_||ED 31;23;23
 ld iy, (hl+)|ez80_z80|_||ED 31;23;23
-ld iy, (hl+)|kc160|_||D5;5E;23;56;23;D5;FD E1;D1
-ld iy, (hl+)|kc160_z80|_||D5;5E;23;56;23;D5;FD E1;D1
-ld iy, (hl+)|r2ka|_||D5;5E;23;56;23;D5;FD E1;D1
-ld iy, (hl+)|r3k|_||D5;5E;23;56;23;D5;FD E1;D1
-ld iy, (hl+)|r4k|_||D5;5E;23;56;23;D5;FD E1;D1
-ld iy, (hl+)|r5k|_||D5;5E;23;56;23;D5;FD E1;D1
-ld iy, (hl+)|r800|_||D5;5E;23;56;23;D5;FD E1;D1
-ld iy, (hl+)|z180|_||D5;5E;23;56;23;D5;FD E1;D1
-ld iy, (hl+)|z80|_||D5;5E;23;56;23;D5;FD E1;D1
-ld iy, (hl+)|z80_strict|_||D5;5E;23;56;23;D5;FD E1;D1
-ld iy, (hl+)|z80n|_||D5;5E;23;56;23;D5;FD E1;D1
+ld iy, (hl+)|gbz80|X||D5;5E;23;56;D1;23
+ld iy, (hl+)|kc160|X||D5;5E;23;56;D1;23
+ld iy, (hl+)|kc160_z80|X||D5;5E;23;56;D1;23
+ld iy, (hl+)|r2ka|X||D5;5E;23;56;D1;23
+ld iy, (hl+)|r3k|X||D5;5E;23;56;D1;23
+ld iy, (hl+)|r4k|X||D5;5E;23;56;D1;23
+ld iy, (hl+)|r5k|X||D5;5E;23;56;D1;23
+ld iy, (hl+)|r800|X||D5;5E;23;56;D1;23
+ld iy, (hl+)|z180|X||D5;5E;23;56;D1;23
+ld iy, (hl+)|z80|X||D5;5E;23;56;D1;23
+ld iy, (hl+)|z80n|X||D5;5E;23;56;D1;23
 ld iy, (ix)|ez80|_||DD 31 00
 ld iy, (ix)|ez80_z80|_||DD 31 00
 ld iy, (ix)|kc160|_||ED 99 00
 ld iy, (ix)|kc160_z80|_||ED 99 00
-ld iy, (ix)|r2ka|_||FD E5;ED 54;DD 6E 00;DD 66 01;ED 54;FD E1
-ld iy, (ix)|r3k|_||FD E5;ED 54;DD 6E 00;DD 66 01;ED 54;FD E1
-ld iy, (ix)|r4k|_||FD E5;ED 54;DD 6E 00;DD 66 01;ED 54;FD E1
-ld iy, (ix)|r5k|_||FD E5;ED 54;DD 6E 00;DD 66 01;ED 54;FD E1
-ld iy, (ix)|r800|_||FD E5;E3;DD 6E 00;DD 66 01;E3;FD E1
-ld iy, (ix)|z180|_||FD E5;E3;DD 6E 00;DD 66 01;E3;FD E1
-ld iy, (ix)|z80|_||FD E5;E3;DD 6E 00;DD 66 01;E3;FD E1
-ld iy, (ix)|z80_strict|_||FD E5;E3;DD 6E 00;DD 66 01;E3;FD E1
-ld iy, (ix)|z80n|_||FD E5;E3;DD 6E 00;DD 66 01;E3;FD E1
 ld iy, (ix+%d)|ez80|_||DD 31 %d
 ld iy, (ix+%d)|ez80_z80|_||DD 31 %d
 ld iy, (ix+%d)|kc160|_||ED 99 %d
 ld iy, (ix+%d)|kc160_z80|_||ED 99 %d
-ld iy, (ix+%d)|r2ka|_||FD E5;ED 54;DD 6E %d;DD 66 %D;ED 54;FD E1
-ld iy, (ix+%d)|r3k|_||FD E5;ED 54;DD 6E %d;DD 66 %D;ED 54;FD E1
-ld iy, (ix+%d)|r4k|_||FD E5;ED 54;DD 6E %d;DD 66 %D;ED 54;FD E1
-ld iy, (ix+%d)|r5k|_||FD E5;ED 54;DD 6E %d;DD 66 %D;ED 54;FD E1
-ld iy, (ix+%d)|r800|_||FD E5;E3;DD 6E %d;DD 66 %D;E3;FD E1
-ld iy, (ix+%d)|z180|_||FD E5;E3;DD 6E %d;DD 66 %D;E3;FD E1
-ld iy, (ix+%d)|z80|_||FD E5;E3;DD 6E %d;DD 66 %D;E3;FD E1
-ld iy, (ix+%d)|z80_strict|_||FD E5;E3;DD 6E %d;DD 66 %D;E3;FD E1
-ld iy, (ix+%d)|z80n|_||FD E5;E3;DD 6E %d;DD 66 %D;E3;FD E1
+ld iy, (ix+%d)|r2ka|X||E5;E4 %d;FD 7D;E1
+ld iy, (ix+%d)|r3k|X||E5;E4 %d;FD 7D;E1
+ld iy, (ix+%d)|r4k|X||E5;E4 %d;FD 7D;E1
+ld iy, (ix+%d)|r5k|X||E5;E4 %d;FD 7D;E1
+ld iy, (ix+%d)|r800|X||E5;DD 6E %d;DD 66 %D;E5;FD E1;E1
+ld iy, (ix+%d)|z180|X||E5;DD 6E %d;DD 66 %D;E5;FD E1;E1
+ld iy, (ix+%d)|z80|X||E5;DD 6E %d;DD 66 %D;E5;FD E1;E1
+ld iy, (ix+%d)|z80n|X||E5;DD 6E %d;DD 66 %D;E5;FD E1;E1
 ld iy, (iy)|ez80|_||FD 37 00
 ld iy, (iy)|ez80_z80|_||FD 37 00
 ld iy, (iy)|kc160|_||ED 98 00
 ld iy, (iy)|kc160_z80|_||ED 98 00
-ld iy, (iy)|r2ka|_||FD E5;ED 54;FD 6E 00;FD 66 01;ED 54;FD E1
-ld iy, (iy)|r3k|_||FD E5;ED 54;FD 6E 00;FD 66 01;ED 54;FD E1
-ld iy, (iy)|r4k|_||FD E5;ED 54;FD 6E 00;FD 66 01;ED 54;FD E1
-ld iy, (iy)|r5k|_||FD E5;ED 54;FD 6E 00;FD 66 01;ED 54;FD E1
-ld iy, (iy)|r800|_||FD E5;E3;FD 6E 00;FD 66 01;E3;FD E1
-ld iy, (iy)|z180|_||FD E5;E3;FD 6E 00;FD 66 01;E3;FD E1
-ld iy, (iy)|z80|_||FD E5;E3;FD 6E 00;FD 66 01;E3;FD E1
-ld iy, (iy)|z80_strict|_||FD E5;E3;FD 6E 00;FD 66 01;E3;FD E1
-ld iy, (iy)|z80n|_||FD E5;E3;FD 6E 00;FD 66 01;E3;FD E1
 ld iy, (iy+%d)|ez80|_||FD 37 %d
 ld iy, (iy+%d)|ez80_z80|_||FD 37 %d
 ld iy, (iy+%d)|kc160|_||ED 98 %d
 ld iy, (iy+%d)|kc160_z80|_||ED 98 %d
-ld iy, (iy+%d)|r2ka|_||FD E5;ED 54;FD 6E %d;FD 66 %D;ED 54;FD E1
-ld iy, (iy+%d)|r3k|_||FD E5;ED 54;FD 6E %d;FD 66 %D;ED 54;FD E1
-ld iy, (iy+%d)|r4k|_||FD E5;ED 54;FD 6E %d;FD 66 %D;ED 54;FD E1
-ld iy, (iy+%d)|r5k|_||FD E5;ED 54;FD 6E %d;FD 66 %D;ED 54;FD E1
-ld iy, (iy+%d)|r800|_||FD E5;E3;FD 6E %d;FD 66 %D;E3;FD E1
-ld iy, (iy+%d)|z180|_||FD E5;E3;FD 6E %d;FD 66 %D;E3;FD E1
-ld iy, (iy+%d)|z80|_||FD E5;E3;FD 6E %d;FD 66 %D;E3;FD E1
-ld iy, (iy+%d)|z80_strict|_||FD E5;E3;FD 6E %d;FD 66 %D;E3;FD E1
-ld iy, (iy+%d)|z80n|_||FD E5;E3;FD 6E %d;FD 66 %D;E3;FD E1
+ld iy, (iy+%d)|r2ka|X||E5;FD E4 %d;FD 7D;E1
+ld iy, (iy+%d)|r3k|X||E5;FD E4 %d;FD 7D;E1
+ld iy, (iy+%d)|r4k|X||E5;FD E4 %d;FD 7D;E1
+ld iy, (iy+%d)|r5k|X||E5;FD E4 %d;FD 7D;E1
+ld iy, (iy+%d)|r800|X||E5;FD 6E %d;FD 66 %D;E5;FD E1;E1
+ld iy, (iy+%d)|z180|X||E5;FD 6E %d;FD 66 %D;E5;FD E1;E1
+ld iy, (iy+%d)|z80|X||E5;FD 6E %d;FD 66 %D;E5;FD E1;E1
+ld iy, (iy+%d)|z80n|X||E5;FD 6E %d;FD 66 %D;E5;FD E1;E1
 ld iy, (pix)|kc160|_||5B;ED 99 00
 ld iy, (pix+%d)|kc160|_||5B;ED 99 %d
 ld iy, (piy)|kc160|_||5B;ED 98 00
@@ -29415,7 +29177,7 @@ ld l, (de)|8080|X||EB;5E;EB
 ld l, (de)|8085|X||EB;5E;EB
 ld l, (de)|ez80|X||EB;5E;EB
 ld l, (de)|ez80_z80|X||EB;5E;EB
-ld l, (de)|gbz80|X||E5;D5;E1;D1;5E;E5;D5;E1;D1
+ld l, (de)|gbz80|X||D5;E5;D1;E1;5E;D5;E5;D1;E1
 ld l, (de)|kc160|X||EB;5E;EB
 ld l, (de)|kc160_z80|X||EB;5E;EB
 ld l, (de)|r2ka|X||EB;5E;EB
@@ -29430,7 +29192,7 @@ ld l, (de+)|8080|X||EB;5E;EB;13
 ld l, (de+)|8085|X||EB;5E;EB;13
 ld l, (de+)|ez80|X||EB;5E;EB;13
 ld l, (de+)|ez80_z80|X||EB;5E;EB;13
-ld l, (de+)|gbz80|X||E5;D5;E1;D1;5E;E5;D5;E1;D1;13
+ld l, (de+)|gbz80|X||D5;E5;D1;E1;5E;D5;E5;D1;E1;13
 ld l, (de+)|kc160|X||EB;5E;EB;13
 ld l, (de+)|kc160_z80|X||EB;5E;EB;13
 ld l, (de+)|r2ka|X||EB;5E;EB;13
@@ -29445,7 +29207,7 @@ ld l, (de-)|8080|X||EB;5E;EB;1B
 ld l, (de-)|8085|X||EB;5E;EB;1B
 ld l, (de-)|ez80|X||EB;5E;EB;1B
 ld l, (de-)|ez80_z80|X||EB;5E;EB;1B
-ld l, (de-)|gbz80|X||E5;D5;E1;D1;5E;E5;D5;E1;D1;1B
+ld l, (de-)|gbz80|X||D5;E5;D1;E1;5E;D5;E5;D1;E1;1B
 ld l, (de-)|kc160|X||EB;5E;EB;1B
 ld l, (de-)|kc160_z80|X||EB;5E;EB;1B
 ld l, (de-)|r2ka|X||EB;5E;EB;1B
@@ -31554,9 +31316,11 @@ ldax d|z180|_||1A
 ldax d|z80|_||1A
 ldax d|z80_strict|_||1A
 ldax d|z80n|_||1A
+ldd|8080|X||CD @__z80asm__ldd 
+ldd|8085|X||CD @__z80asm__ldd 
 ldd|ez80|_||ED A8
 ldd|ez80_z80|_||ED A8
-ldd|gbz80|_||CD @__z80asm__ldd 
+ldd|gbz80|X||CD @__z80asm__ldd 
 ldd|kc160|_||ED A8
 ldd|kc160_z80|_||ED A8
 ldd|r2ka|_||ED A8
@@ -31588,7 +31352,7 @@ ldd (de), %n|8080|X||EB;36 %n;EB;1B
 ldd (de), %n|8085|X||EB;36 %n;EB;1B
 ldd (de), %n|ez80|X||EB;36 %n;EB;1B
 ldd (de), %n|ez80_z80|X||EB;36 %n;EB;1B
-ldd (de), %n|gbz80|X||E5;D5;E1;D1;36 %n;E5;D5;E1;D1;1B
+ldd (de), %n|gbz80|X||D5;E5;D1;E1;36 %n;D5;E5;D1;E1;1B
 ldd (de), %n|kc160|X||EB;36 %n;EB;1B
 ldd (de), %n|kc160_z80|X||EB;36 %n;EB;1B
 ldd (de), %n|r2ka|X||EB;36 %n;EB;1B
@@ -31619,7 +31383,7 @@ ldd (de), b|8080|X||EB;70;EB;1B
 ldd (de), b|8085|X||EB;70;EB;1B
 ldd (de), b|ez80|X||EB;70;EB;1B
 ldd (de), b|ez80_z80|X||EB;70;EB;1B
-ldd (de), b|gbz80|X||E5;D5;E1;D1;70;E5;D5;E1;D1;1B
+ldd (de), b|gbz80|X||D5;E5;D1;E1;70;D5;E5;D1;E1;1B
 ldd (de), b|kc160|X||EB;70;EB;1B
 ldd (de), b|kc160_z80|X||EB;70;EB;1B
 ldd (de), b|r2ka|X||EB;70;EB;1B
@@ -31634,7 +31398,7 @@ ldd (de), c|8080|X||EB;71;EB;1B
 ldd (de), c|8085|X||EB;71;EB;1B
 ldd (de), c|ez80|X||EB;71;EB;1B
 ldd (de), c|ez80_z80|X||EB;71;EB;1B
-ldd (de), c|gbz80|X||E5;D5;E1;D1;71;E5;D5;E1;D1;1B
+ldd (de), c|gbz80|X||D5;E5;D1;E1;71;D5;E5;D1;E1;1B
 ldd (de), c|kc160|X||EB;71;EB;1B
 ldd (de), c|kc160_z80|X||EB;71;EB;1B
 ldd (de), c|r2ka|X||EB;71;EB;1B
@@ -31649,7 +31413,7 @@ ldd (de), d|8080|X||EB;74;EB;1B
 ldd (de), d|8085|X||EB;74;EB;1B
 ldd (de), d|ez80|X||EB;74;EB;1B
 ldd (de), d|ez80_z80|X||EB;74;EB;1B
-ldd (de), d|gbz80|X||E5;D5;E1;D1;74;E5;D5;E1;D1;1B
+ldd (de), d|gbz80|X||D5;E5;D1;E1;74;D5;E5;D1;E1;1B
 ldd (de), d|kc160|X||EB;74;EB;1B
 ldd (de), d|kc160_z80|X||EB;74;EB;1B
 ldd (de), d|r2ka|X||EB;74;EB;1B
@@ -31664,7 +31428,7 @@ ldd (de), e|8080|X||EB;75;EB;1B
 ldd (de), e|8085|X||EB;75;EB;1B
 ldd (de), e|ez80|X||EB;75;EB;1B
 ldd (de), e|ez80_z80|X||EB;75;EB;1B
-ldd (de), e|gbz80|X||E5;D5;E1;D1;75;E5;D5;E1;D1;1B
+ldd (de), e|gbz80|X||D5;E5;D1;E1;75;D5;E5;D1;E1;1B
 ldd (de), e|kc160|X||EB;75;EB;1B
 ldd (de), e|kc160_z80|X||EB;75;EB;1B
 ldd (de), e|r2ka|X||EB;75;EB;1B
@@ -31679,7 +31443,7 @@ ldd (de), h|8080|X||EB;72;EB;1B
 ldd (de), h|8085|X||EB;72;EB;1B
 ldd (de), h|ez80|X||EB;72;EB;1B
 ldd (de), h|ez80_z80|X||EB;72;EB;1B
-ldd (de), h|gbz80|X||E5;D5;E1;D1;72;E5;D5;E1;D1;1B
+ldd (de), h|gbz80|X||D5;E5;D1;E1;72;D5;E5;D1;E1;1B
 ldd (de), h|kc160|X||EB;72;EB;1B
 ldd (de), h|kc160_z80|X||EB;72;EB;1B
 ldd (de), h|r2ka|X||EB;72;EB;1B
@@ -31694,7 +31458,7 @@ ldd (de), l|8080|X||EB;73;EB;1B
 ldd (de), l|8085|X||EB;73;EB;1B
 ldd (de), l|ez80|X||EB;73;EB;1B
 ldd (de), l|ez80_z80|X||EB;73;EB;1B
-ldd (de), l|gbz80|X||E5;D5;E1;D1;73;E5;D5;E1;D1;1B
+ldd (de), l|gbz80|X||D5;E5;D1;E1;73;D5;E5;D1;E1;1B
 ldd (de), l|kc160|X||EB;73;EB;1B
 ldd (de), l|kc160_z80|X||EB;73;EB;1B
 ldd (de), l|r2ka|X||EB;73;EB;1B
@@ -31885,7 +31649,7 @@ ldd b, (de)|8080|X||EB;46;EB;1B
 ldd b, (de)|8085|X||EB;46;EB;1B
 ldd b, (de)|ez80|X||EB;46;EB;1B
 ldd b, (de)|ez80_z80|X||EB;46;EB;1B
-ldd b, (de)|gbz80|X||E5;D5;E1;D1;46;E5;D5;E1;D1;1B
+ldd b, (de)|gbz80|X||D5;E5;D1;E1;46;D5;E5;D1;E1;1B
 ldd b, (de)|kc160|X||EB;46;EB;1B
 ldd b, (de)|kc160_z80|X||EB;46;EB;1B
 ldd b, (de)|r2ka|X||EB;46;EB;1B
@@ -31916,7 +31680,7 @@ ldd c, (de)|8080|X||EB;4E;EB;1B
 ldd c, (de)|8085|X||EB;4E;EB;1B
 ldd c, (de)|ez80|X||EB;4E;EB;1B
 ldd c, (de)|ez80_z80|X||EB;4E;EB;1B
-ldd c, (de)|gbz80|X||E5;D5;E1;D1;4E;E5;D5;E1;D1;1B
+ldd c, (de)|gbz80|X||D5;E5;D1;E1;4E;D5;E5;D1;E1;1B
 ldd c, (de)|kc160|X||EB;4E;EB;1B
 ldd c, (de)|kc160_z80|X||EB;4E;EB;1B
 ldd c, (de)|r2ka|X||EB;4E;EB;1B
@@ -31947,7 +31711,7 @@ ldd d, (de)|8080|X||EB;66;EB;1B
 ldd d, (de)|8085|X||EB;66;EB;1B
 ldd d, (de)|ez80|X||EB;66;EB;1B
 ldd d, (de)|ez80_z80|X||EB;66;EB;1B
-ldd d, (de)|gbz80|X||E5;D5;E1;D1;66;E5;D5;E1;D1;1B
+ldd d, (de)|gbz80|X||D5;E5;D1;E1;66;D5;E5;D1;E1;1B
 ldd d, (de)|kc160|X||EB;66;EB;1B
 ldd d, (de)|kc160_z80|X||EB;66;EB;1B
 ldd d, (de)|r2ka|X||EB;66;EB;1B
@@ -31978,7 +31742,7 @@ ldd e, (de)|8080|X||EB;6E;EB;1B
 ldd e, (de)|8085|X||EB;6E;EB;1B
 ldd e, (de)|ez80|X||EB;6E;EB;1B
 ldd e, (de)|ez80_z80|X||EB;6E;EB;1B
-ldd e, (de)|gbz80|X||E5;D5;E1;D1;6E;E5;D5;E1;D1;1B
+ldd e, (de)|gbz80|X||D5;E5;D1;E1;6E;D5;E5;D1;E1;1B
 ldd e, (de)|kc160|X||EB;6E;EB;1B
 ldd e, (de)|kc160_z80|X||EB;6E;EB;1B
 ldd e, (de)|r2ka|X||EB;6E;EB;1B
@@ -32009,7 +31773,7 @@ ldd h, (de)|8080|X||EB;56;EB;1B
 ldd h, (de)|8085|X||EB;56;EB;1B
 ldd h, (de)|ez80|X||EB;56;EB;1B
 ldd h, (de)|ez80_z80|X||EB;56;EB;1B
-ldd h, (de)|gbz80|X||E5;D5;E1;D1;56;E5;D5;E1;D1;1B
+ldd h, (de)|gbz80|X||D5;E5;D1;E1;56;D5;E5;D1;E1;1B
 ldd h, (de)|kc160|X||EB;56;EB;1B
 ldd h, (de)|kc160_z80|X||EB;56;EB;1B
 ldd h, (de)|r2ka|X||EB;56;EB;1B
@@ -32040,7 +31804,7 @@ ldd l, (de)|8080|X||EB;5E;EB;1B
 ldd l, (de)|8085|X||EB;5E;EB;1B
 ldd l, (de)|ez80|X||EB;5E;EB;1B
 ldd l, (de)|ez80_z80|X||EB;5E;EB;1B
-ldd l, (de)|gbz80|X||E5;D5;E1;D1;5E;E5;D5;E1;D1;1B
+ldd l, (de)|gbz80|X||D5;E5;D1;E1;5E;D5;E5;D1;E1;1B
 ldd l, (de)|kc160|X||EB;5E;EB;1B
 ldd l, (de)|kc160_z80|X||EB;5E;EB;1B
 ldd l, (de)|r2ka|X||EB;5E;EB;1B
@@ -32149,9 +31913,11 @@ ldd.sil d, (hl)|ez80|_||52;56;2B
 ldd.sil e, (hl)|ez80|_||52;5E;2B
 ldd.sil h, (hl)|ez80|_||52;66;2B
 ldd.sil l, (hl)|ez80|_||52;6E;2B
+lddr|8080|X||CD @__z80asm__lddr 
+lddr|8085|X||CD @__z80asm__lddr 
 lddr|ez80|_||ED B8
 lddr|ez80_z80|_||ED B8
-lddr|gbz80|_||CD @__z80asm__lddr 
+lddr|gbz80|X||CD @__z80asm__lddr 
 lddr|kc160|_||ED B8
 lddr|kc160_z80|_||ED B8
 lddr|r2ka|_||ED B8
@@ -32286,11 +32052,27 @@ ldh (%h), a|gbz80|_||E0 %h
 ldh (c), a|gbz80|_||E2
 ldh a, (%h)|gbz80|_||F0 %h
 ldh a, (c)|gbz80|_||F2
+ldhi %n|8080|X||E5;11 %n 00;19;EB;E1
 ldhi %n|8085|_||28 %n
+ldhi %n|ez80|X||E5;11 %n 00 00;19;EB;E1
+ldhi %n|ez80_z80|X||E5;11 %n 00;19;EB;E1
+ldhi %n|gbz80|X||E5;11 %n 00;19;D5;E5;D1;E1;E1
+ldhi %n|kc160|X||E5;11 %n 00;19;EB;E1
+ldhi %n|kc160_z80|X||E5;11 %n 00;19;EB;E1
+ldhi %n|r2ka|X||E5;11 %n 00;19;EB;E1
+ldhi %n|r3k|X||E5;11 %n 00;19;EB;E1
+ldhi %n|r4k|X||E5;11 %n 00;19;EB;E1
+ldhi %n|r5k|X||E5;11 %n 00;19;EB;E1
+ldhi %n|r800|X||E5;11 %n 00;19;EB;E1
+ldhi %n|z180|X||E5;11 %n 00;19;EB;E1
+ldhi %n|z80|X||E5;11 %n 00;19;EB;E1
+ldhi %n|z80n|X||E5;11 %n 00;19;EB;E1
 ldhl sp, %s|gbz80|_||F8 %s
+ldi|8080|X||CD @__z80asm__ldi 
+ldi|8085|X||CD @__z80asm__ldi 
 ldi|ez80|_||ED A0
 ldi|ez80_z80|_||ED A0
-ldi|gbz80|_||CD @__z80asm__ldi 
+ldi|gbz80|X||CD @__z80asm__ldi 
 ldi|kc160|_||ED A0
 ldi|kc160_z80|_||ED A0
 ldi|r2ka|_||ED A0
@@ -32322,7 +32104,7 @@ ldi (de), %n|8080|X||EB;36 %n;EB;13
 ldi (de), %n|8085|X||EB;36 %n;EB;13
 ldi (de), %n|ez80|X||EB;36 %n;EB;13
 ldi (de), %n|ez80_z80|X||EB;36 %n;EB;13
-ldi (de), %n|gbz80|X||E5;D5;E1;D1;36 %n;E5;D5;E1;D1;13
+ldi (de), %n|gbz80|X||D5;E5;D1;E1;36 %n;D5;E5;D1;E1;13
 ldi (de), %n|kc160|X||EB;36 %n;EB;13
 ldi (de), %n|kc160_z80|X||EB;36 %n;EB;13
 ldi (de), %n|r2ka|X||EB;36 %n;EB;13
@@ -32353,7 +32135,7 @@ ldi (de), b|8080|X||EB;70;EB;13
 ldi (de), b|8085|X||EB;70;EB;13
 ldi (de), b|ez80|X||EB;70;EB;13
 ldi (de), b|ez80_z80|X||EB;70;EB;13
-ldi (de), b|gbz80|X||E5;D5;E1;D1;70;E5;D5;E1;D1;13
+ldi (de), b|gbz80|X||D5;E5;D1;E1;70;D5;E5;D1;E1;13
 ldi (de), b|kc160|X||EB;70;EB;13
 ldi (de), b|kc160_z80|X||EB;70;EB;13
 ldi (de), b|r2ka|X||EB;70;EB;13
@@ -32368,7 +32150,7 @@ ldi (de), bc|8080|X||EB;71;23;70;23;EB
 ldi (de), bc|8085|X||EB;71;23;70;23;EB
 ldi (de), bc|ez80|X||EB;71;23;70;23;EB
 ldi (de), bc|ez80_z80|X||EB;71;23;70;23;EB
-ldi (de), bc|gbz80|X||E5;D5;E1;D1;71;23;70;23;E5;D5;E1;D1
+ldi (de), bc|gbz80|X||D5;E5;D1;E1;71;23;70;23;D5;E5;D1;E1
 ldi (de), bc|kc160|X||EB;71;23;70;23;EB
 ldi (de), bc|kc160_z80|X||EB;71;23;70;23;EB
 ldi (de), bc|r2ka|X||EB;71;23;70;23;EB
@@ -32383,7 +32165,7 @@ ldi (de), c|8080|X||EB;71;EB;13
 ldi (de), c|8085|X||EB;71;EB;13
 ldi (de), c|ez80|X||EB;71;EB;13
 ldi (de), c|ez80_z80|X||EB;71;EB;13
-ldi (de), c|gbz80|X||E5;D5;E1;D1;71;E5;D5;E1;D1;13
+ldi (de), c|gbz80|X||D5;E5;D1;E1;71;D5;E5;D1;E1;13
 ldi (de), c|kc160|X||EB;71;EB;13
 ldi (de), c|kc160_z80|X||EB;71;EB;13
 ldi (de), c|r2ka|X||EB;71;EB;13
@@ -32398,7 +32180,7 @@ ldi (de), d|8080|X||EB;74;EB;13
 ldi (de), d|8085|X||EB;74;EB;13
 ldi (de), d|ez80|X||EB;74;EB;13
 ldi (de), d|ez80_z80|X||EB;74;EB;13
-ldi (de), d|gbz80|X||E5;D5;E1;D1;74;E5;D5;E1;D1;13
+ldi (de), d|gbz80|X||D5;E5;D1;E1;74;D5;E5;D1;E1;13
 ldi (de), d|kc160|X||EB;74;EB;13
 ldi (de), d|kc160_z80|X||EB;74;EB;13
 ldi (de), d|r2ka|X||EB;74;EB;13
@@ -32413,7 +32195,7 @@ ldi (de), e|8080|X||EB;75;EB;13
 ldi (de), e|8085|X||EB;75;EB;13
 ldi (de), e|ez80|X||EB;75;EB;13
 ldi (de), e|ez80_z80|X||EB;75;EB;13
-ldi (de), e|gbz80|X||E5;D5;E1;D1;75;E5;D5;E1;D1;13
+ldi (de), e|gbz80|X||D5;E5;D1;E1;75;D5;E5;D1;E1;13
 ldi (de), e|kc160|X||EB;75;EB;13
 ldi (de), e|kc160_z80|X||EB;75;EB;13
 ldi (de), e|r2ka|X||EB;75;EB;13
@@ -32428,7 +32210,7 @@ ldi (de), h|8080|X||EB;72;EB;13
 ldi (de), h|8085|X||EB;72;EB;13
 ldi (de), h|ez80|X||EB;72;EB;13
 ldi (de), h|ez80_z80|X||EB;72;EB;13
-ldi (de), h|gbz80|X||E5;D5;E1;D1;72;E5;D5;E1;D1;13
+ldi (de), h|gbz80|X||D5;E5;D1;E1;72;D5;E5;D1;E1;13
 ldi (de), h|kc160|X||EB;72;EB;13
 ldi (de), h|kc160_z80|X||EB;72;EB;13
 ldi (de), h|r2ka|X||EB;72;EB;13
@@ -32443,7 +32225,7 @@ ldi (de), hl|8080|X||EB;73;23;72;23;EB
 ldi (de), hl|8085|X||EB;73;23;72;23;EB
 ldi (de), hl|ez80|X||EB;73;23;72;23;EB
 ldi (de), hl|ez80_z80|X||EB;73;23;72;23;EB
-ldi (de), hl|gbz80|X||E5;D5;E1;D1;73;23;72;23;E5;D5;E1;D1
+ldi (de), hl|gbz80|X||D5;E5;D1;E1;73;23;72;23;D5;E5;D1;E1
 ldi (de), hl|kc160|X||EB;73;23;72;23;EB
 ldi (de), hl|kc160_z80|X||EB;73;23;72;23;EB
 ldi (de), hl|r2ka|X||EB;73;23;72;23;EB
@@ -32458,7 +32240,7 @@ ldi (de), l|8080|X||EB;73;EB;13
 ldi (de), l|8085|X||EB;73;EB;13
 ldi (de), l|ez80|X||EB;73;EB;13
 ldi (de), l|ez80_z80|X||EB;73;EB;13
-ldi (de), l|gbz80|X||E5;D5;E1;D1;73;E5;D5;E1;D1;13
+ldi (de), l|gbz80|X||D5;E5;D1;E1;73;D5;E5;D1;E1;13
 ldi (de), l|kc160|X||EB;73;EB;13
 ldi (de), l|kc160_z80|X||EB;73;EB;13
 ldi (de), l|r2ka|X||EB;73;EB;13
@@ -32521,18 +32303,17 @@ ldi (hl), bc|8080|X||71;23;70;23
 ldi (hl), bc|8085|X||71;23;70;23
 ldi (hl), bc|ez80|_||ED 0F;23;23
 ldi (hl), bc|ez80_z80|_||ED 0F;23;23
-ldi (hl), bc|gbz80|_||71;23;70;23
-ldi (hl), bc|kc160|_||71;23;70;23
-ldi (hl), bc|kc160_z80|_||71;23;70;23
-ldi (hl), bc|r2ka|_||71;23;70;23
-ldi (hl), bc|r3k|_||71;23;70;23
-ldi (hl), bc|r4k|_||71;23;70;23
-ldi (hl), bc|r5k|_||71;23;70;23
-ldi (hl), bc|r800|_||71;23;70;23
-ldi (hl), bc|z180|_||71;23;70;23
-ldi (hl), bc|z80|_||71;23;70;23
-ldi (hl), bc|z80_strict|_||71;23;70;23
-ldi (hl), bc|z80n|_||71;23;70;23
+ldi (hl), bc|gbz80|X||71;23;70;23
+ldi (hl), bc|kc160|X||71;23;70;23
+ldi (hl), bc|kc160_z80|X||71;23;70;23
+ldi (hl), bc|r2ka|X||71;23;70;23
+ldi (hl), bc|r3k|X||71;23;70;23
+ldi (hl), bc|r4k|X||71;23;70;23
+ldi (hl), bc|r5k|X||71;23;70;23
+ldi (hl), bc|r800|X||71;23;70;23
+ldi (hl), bc|z180|X||71;23;70;23
+ldi (hl), bc|z80|X||71;23;70;23
+ldi (hl), bc|z80n|X||71;23;70;23
 ldi (hl), c|8080|X||71;23
 ldi (hl), c|8085|X||71;23
 ldi (hl), c|ez80|_||71;23
@@ -32565,20 +32346,21 @@ ldi (hl), d|z180|_||72;23
 ldi (hl), d|z80|_||72;23
 ldi (hl), d|z80_strict|_||72;23
 ldi (hl), d|z80n|_||72;23
+ldi (hl), de|8080|X||73;23;72;23
+ldi (hl), de|8085|X||73;23;72;23
 ldi (hl), de|ez80|_||ED 1F;23;23
 ldi (hl), de|ez80_z80|_||ED 1F;23;23
-ldi (hl), de|gbz80|_||73;23;72;23
-ldi (hl), de|kc160|_||73;23;72;23
-ldi (hl), de|kc160_z80|_||73;23;72;23
-ldi (hl), de|r2ka|_||73;23;72;23
-ldi (hl), de|r3k|_||73;23;72;23
-ldi (hl), de|r4k|_||73;23;72;23
-ldi (hl), de|r5k|_||73;23;72;23
-ldi (hl), de|r800|_||73;23;72;23
-ldi (hl), de|z180|_||73;23;72;23
-ldi (hl), de|z80|_||73;23;72;23
-ldi (hl), de|z80_strict|_||73;23;72;23
-ldi (hl), de|z80n|_||73;23;72;23
+ldi (hl), de|gbz80|X||73;23;72;23
+ldi (hl), de|kc160|X||73;23;72;23
+ldi (hl), de|kc160_z80|X||73;23;72;23
+ldi (hl), de|r2ka|X||73;23;72;23
+ldi (hl), de|r3k|X||73;23;72;23
+ldi (hl), de|r4k|X||73;23;72;23
+ldi (hl), de|r5k|X||73;23;72;23
+ldi (hl), de|r800|X||73;23;72;23
+ldi (hl), de|z180|X||73;23;72;23
+ldi (hl), de|z80|X||73;23;72;23
+ldi (hl), de|z80n|X||73;23;72;23
 ldi (hl), e|8080|X||73;23
 ldi (hl), e|8085|X||73;23
 ldi (hl), e|ez80|_||73;23
@@ -32611,42 +32393,45 @@ ldi (hl), h|z180|_||74;23
 ldi (hl), h|z80|_||74;23
 ldi (hl), h|z80_strict|_||74;23
 ldi (hl), h|z80n|_||74;23
+ldi (hl), hl|8080|X||F5;7C;75;23;77;F1;23
+ldi (hl), hl|8085|X||F5;7C;75;23;77;F1;23
 ldi (hl), hl|ez80|_||ED 2F;23;23
 ldi (hl), hl|ez80_z80|_||ED 2F;23;23
-ldi (hl), hl|gbz80|_||F5;7C;75;23;77;F1;23
-ldi (hl), hl|kc160|_||F5;7C;75;23;77;F1;23
-ldi (hl), hl|kc160_z80|_||F5;7C;75;23;77;F1;23
-ldi (hl), hl|r800|_||F5;7C;75;23;77;F1;23
-ldi (hl), hl|z180|_||F5;7C;75;23;77;F1;23
-ldi (hl), hl|z80|_||F5;7C;75;23;77;F1;23
-ldi (hl), hl|z80_strict|_||F5;7C;75;23;77;F1;23
-ldi (hl), hl|z80n|_||F5;7C;75;23;77;F1;23
+ldi (hl), hl|gbz80|X||F5;7C;75;23;77;F1;23
+ldi (hl), hl|kc160|X||F5;7C;75;23;77;F1;23
+ldi (hl), hl|kc160_z80|X||F5;7C;75;23;77;F1;23
+ldi (hl), hl|r2ka|X||F5;7C;75;23;77;F1;23
+ldi (hl), hl|r3k|X||F5;7C;75;23;77;F1;23
+ldi (hl), hl|r4k|X||F5;7F 7C;75;23;77;F1;23
+ldi (hl), hl|r5k|X||F5;7F 7C;75;23;77;F1;23
+ldi (hl), hl|r800|X||F5;7C;75;23;77;F1;23
+ldi (hl), hl|z180|X||F5;7C;75;23;77;F1;23
+ldi (hl), hl|z80|X||F5;7C;75;23;77;F1;23
+ldi (hl), hl|z80n|X||F5;7C;75;23;77;F1;23
 ldi (hl), ix|ez80|_||ED 3F;23;23
 ldi (hl), ix|ez80_z80|_||ED 3F;23;23
-ldi (hl), ix|kc160|_||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), ix|kc160_z80|_||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), ix|r2ka|_||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), ix|r3k|_||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), ix|r4k|_||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), ix|r5k|_||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), ix|r800|_||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), ix|z180|_||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), ix|z80|_||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), ix|z80_strict|_||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), ix|z80n|_||D5;DD E5;D1;73;23;72;23;D1
+ldi (hl), ix|kc160|X||D5;DD E5;D1;73;23;72;D1;23
+ldi (hl), ix|kc160_z80|X||D5;DD E5;D1;73;23;72;D1;23
+ldi (hl), ix|r2ka|X||D5;DD E5;D1;73;23;72;D1;23
+ldi (hl), ix|r3k|X||D5;DD E5;D1;73;23;72;D1;23
+ldi (hl), ix|r4k|X||D5;DD E5;D1;73;23;72;D1;23
+ldi (hl), ix|r5k|X||D5;DD E5;D1;73;23;72;D1;23
+ldi (hl), ix|r800|X||D5;DD E5;D1;73;23;72;D1;23
+ldi (hl), ix|z180|X||D5;DD E5;D1;73;23;72;D1;23
+ldi (hl), ix|z80|X||D5;DD E5;D1;73;23;72;D1;23
+ldi (hl), ix|z80n|X||D5;DD E5;D1;73;23;72;D1;23
 ldi (hl), iy|ez80|_||ED 3E;23;23
 ldi (hl), iy|ez80_z80|_||ED 3E;23;23
-ldi (hl), iy|kc160|_||D5;FD E5;D1;73;23;72;23;D1
-ldi (hl), iy|kc160_z80|_||D5;FD E5;D1;73;23;72;23;D1
-ldi (hl), iy|r2ka|_||D5;FD E5;D1;73;23;72;23;D1
-ldi (hl), iy|r3k|_||D5;FD E5;D1;73;23;72;23;D1
-ldi (hl), iy|r4k|_||D5;FD E5;D1;73;23;72;23;D1
-ldi (hl), iy|r5k|_||D5;FD E5;D1;73;23;72;23;D1
-ldi (hl), iy|r800|_||D5;FD E5;D1;73;23;72;23;D1
-ldi (hl), iy|z180|_||D5;FD E5;D1;73;23;72;23;D1
-ldi (hl), iy|z80|_||D5;FD E5;D1;73;23;72;23;D1
-ldi (hl), iy|z80_strict|_||D5;FD E5;D1;73;23;72;23;D1
-ldi (hl), iy|z80n|_||D5;FD E5;D1;73;23;72;23;D1
+ldi (hl), iy|kc160|X||D5;FD E5;D1;73;23;72;D1;23
+ldi (hl), iy|kc160_z80|X||D5;FD E5;D1;73;23;72;D1;23
+ldi (hl), iy|r2ka|X||D5;FD E5;D1;73;23;72;D1;23
+ldi (hl), iy|r3k|X||D5;FD E5;D1;73;23;72;D1;23
+ldi (hl), iy|r4k|X||D5;FD E5;D1;73;23;72;D1;23
+ldi (hl), iy|r5k|X||D5;FD E5;D1;73;23;72;D1;23
+ldi (hl), iy|r800|X||D5;FD E5;D1;73;23;72;D1;23
+ldi (hl), iy|z180|X||D5;FD E5;D1;73;23;72;D1;23
+ldi (hl), iy|z80|X||D5;FD E5;D1;73;23;72;D1;23
+ldi (hl), iy|z80n|X||D5;FD E5;D1;73;23;72;D1;23
 ldi (hl), l|8080|X||75;23
 ldi (hl), l|8085|X||75;23
 ldi (hl), l|ez80|_||75;23
@@ -32715,7 +32500,7 @@ ldi b, (de)|8080|X||EB;46;EB;13
 ldi b, (de)|8085|X||EB;46;EB;13
 ldi b, (de)|ez80|X||EB;46;EB;13
 ldi b, (de)|ez80_z80|X||EB;46;EB;13
-ldi b, (de)|gbz80|X||E5;D5;E1;D1;46;E5;D5;E1;D1;13
+ldi b, (de)|gbz80|X||D5;E5;D1;E1;46;D5;E5;D1;E1;13
 ldi b, (de)|kc160|X||EB;46;EB;13
 ldi b, (de)|kc160_z80|X||EB;46;EB;13
 ldi b, (de)|r2ka|X||EB;46;EB;13
@@ -32746,7 +32531,7 @@ ldi bc, (de)|8080|X||EB;4E;23;46;23;EB
 ldi bc, (de)|8085|X||EB;4E;23;46;23;EB
 ldi bc, (de)|ez80|X||EB;4E;23;46;23;EB
 ldi bc, (de)|ez80_z80|X||EB;4E;23;46;23;EB
-ldi bc, (de)|gbz80|X||E5;D5;E1;D1;4E;23;46;23;E5;D5;E1;D1
+ldi bc, (de)|gbz80|X||D5;E5;D1;E1;4E;23;46;23;D5;E5;D1;E1
 ldi bc, (de)|kc160|X||EB;4E;23;46;23;EB
 ldi bc, (de)|kc160_z80|X||EB;4E;23;46;23;EB
 ldi bc, (de)|r2ka|X||EB;4E;23;46;23;EB
@@ -32761,23 +32546,22 @@ ldi bc, (hl)|8080|X||4E;23;46;23
 ldi bc, (hl)|8085|X||4E;23;46;23
 ldi bc, (hl)|ez80|_||ED 07;23;23
 ldi bc, (hl)|ez80_z80|_||ED 07;23;23
-ldi bc, (hl)|gbz80|_||4E;23;46;23
-ldi bc, (hl)|kc160|_||4E;23;46;23
-ldi bc, (hl)|kc160_z80|_||4E;23;46;23
-ldi bc, (hl)|r2ka|_||4E;23;46;23
-ldi bc, (hl)|r3k|_||4E;23;46;23
-ldi bc, (hl)|r4k|_||4E;23;46;23
-ldi bc, (hl)|r5k|_||4E;23;46;23
-ldi bc, (hl)|r800|_||4E;23;46;23
-ldi bc, (hl)|z180|_||4E;23;46;23
-ldi bc, (hl)|z80|_||4E;23;46;23
-ldi bc, (hl)|z80_strict|_||4E;23;46;23
-ldi bc, (hl)|z80n|_||4E;23;46;23
+ldi bc, (hl)|gbz80|X||4E;23;46;23
+ldi bc, (hl)|kc160|X||4E;23;46;23
+ldi bc, (hl)|kc160_z80|X||4E;23;46;23
+ldi bc, (hl)|r2ka|X||4E;23;46;23
+ldi bc, (hl)|r3k|X||4E;23;46;23
+ldi bc, (hl)|r4k|X||4E;23;46;23
+ldi bc, (hl)|r5k|X||4E;23;46;23
+ldi bc, (hl)|r800|X||4E;23;46;23
+ldi bc, (hl)|z180|X||4E;23;46;23
+ldi bc, (hl)|z80|X||4E;23;46;23
+ldi bc, (hl)|z80n|X||4E;23;46;23
 ldi c, (de)|8080|X||EB;4E;EB;13
 ldi c, (de)|8085|X||EB;4E;EB;13
 ldi c, (de)|ez80|X||EB;4E;EB;13
 ldi c, (de)|ez80_z80|X||EB;4E;EB;13
-ldi c, (de)|gbz80|X||E5;D5;E1;D1;4E;E5;D5;E1;D1;13
+ldi c, (de)|gbz80|X||D5;E5;D1;E1;4E;D5;E5;D1;E1;13
 ldi c, (de)|kc160|X||EB;4E;EB;13
 ldi c, (de)|kc160_z80|X||EB;4E;EB;13
 ldi c, (de)|r2ka|X||EB;4E;EB;13
@@ -32808,7 +32592,7 @@ ldi d, (de)|8080|X||EB;66;EB;13
 ldi d, (de)|8085|X||EB;66;EB;13
 ldi d, (de)|ez80|X||EB;66;EB;13
 ldi d, (de)|ez80_z80|X||EB;66;EB;13
-ldi d, (de)|gbz80|X||E5;D5;E1;D1;66;E5;D5;E1;D1;13
+ldi d, (de)|gbz80|X||D5;E5;D1;E1;66;D5;E5;D1;E1;13
 ldi d, (de)|kc160|X||EB;66;EB;13
 ldi d, (de)|kc160_z80|X||EB;66;EB;13
 ldi d, (de)|r2ka|X||EB;66;EB;13
@@ -32835,25 +32619,26 @@ ldi d, (hl)|z180|_||56;23
 ldi d, (hl)|z80|_||56;23
 ldi d, (hl)|z80_strict|_||56;23
 ldi d, (hl)|z80n|_||56;23
+ldi de, (hl)|8080|X||5E;23;56;23
+ldi de, (hl)|8085|X||5E;23;56;23
 ldi de, (hl)|ez80|_||ED 17;23;23
 ldi de, (hl)|ez80_z80|_||ED 17;23;23
-ldi de, (hl)|gbz80|_||5E;23;56;23
-ldi de, (hl)|kc160|_||5E;23;56;23
-ldi de, (hl)|kc160_z80|_||5E;23;56;23
-ldi de, (hl)|r2ka|_||5E;23;56;23
-ldi de, (hl)|r3k|_||5E;23;56;23
-ldi de, (hl)|r4k|_||5E;23;56;23
-ldi de, (hl)|r5k|_||5E;23;56;23
-ldi de, (hl)|r800|_||5E;23;56;23
-ldi de, (hl)|z180|_||5E;23;56;23
-ldi de, (hl)|z80|_||5E;23;56;23
-ldi de, (hl)|z80_strict|_||5E;23;56;23
-ldi de, (hl)|z80n|_||5E;23;56;23
+ldi de, (hl)|gbz80|X||5E;23;56;23
+ldi de, (hl)|kc160|X||5E;23;56;23
+ldi de, (hl)|kc160_z80|X||5E;23;56;23
+ldi de, (hl)|r2ka|X||5E;23;56;23
+ldi de, (hl)|r3k|X||5E;23;56;23
+ldi de, (hl)|r4k|X||5E;23;56;23
+ldi de, (hl)|r5k|X||5E;23;56;23
+ldi de, (hl)|r800|X||5E;23;56;23
+ldi de, (hl)|z180|X||5E;23;56;23
+ldi de, (hl)|z80|X||5E;23;56;23
+ldi de, (hl)|z80n|X||5E;23;56;23
 ldi e, (de)|8080|X||EB;6E;EB;13
 ldi e, (de)|8085|X||EB;6E;EB;13
 ldi e, (de)|ez80|X||EB;6E;EB;13
 ldi e, (de)|ez80_z80|X||EB;6E;EB;13
-ldi e, (de)|gbz80|X||E5;D5;E1;D1;6E;E5;D5;E1;D1;13
+ldi e, (de)|gbz80|X||D5;E5;D1;E1;6E;D5;E5;D1;E1;13
 ldi e, (de)|kc160|X||EB;6E;EB;13
 ldi e, (de)|kc160_z80|X||EB;6E;EB;13
 ldi e, (de)|r2ka|X||EB;6E;EB;13
@@ -32884,7 +32669,7 @@ ldi h, (de)|8080|X||EB;56;EB;13
 ldi h, (de)|8085|X||EB;56;EB;13
 ldi h, (de)|ez80|X||EB;56;EB;13
 ldi h, (de)|ez80_z80|X||EB;56;EB;13
-ldi h, (de)|gbz80|X||E5;D5;E1;D1;56;E5;D5;E1;D1;13
+ldi h, (de)|gbz80|X||D5;E5;D1;E1;56;D5;E5;D1;E1;13
 ldi h, (de)|kc160|X||EB;56;EB;13
 ldi h, (de)|kc160_z80|X||EB;56;EB;13
 ldi h, (de)|r2ka|X||EB;56;EB;13
@@ -32915,7 +32700,7 @@ ldi hl, (de)|8080|X||EB;5E;23;56;23;EB
 ldi hl, (de)|8085|X||EB;5E;23;56;23;EB
 ldi hl, (de)|ez80|X||EB;5E;23;56;23;EB
 ldi hl, (de)|ez80_z80|X||EB;5E;23;56;23;EB
-ldi hl, (de)|gbz80|X||E5;D5;E1;D1;5E;23;56;23;E5;D5;E1;D1
+ldi hl, (de)|gbz80|X||D5;E5;D1;E1;5E;23;56;23;D5;E5;D1;E1
 ldi hl, (de)|kc160|X||EB;5E;23;56;23;EB
 ldi hl, (de)|kc160_z80|X||EB;5E;23;56;23;EB
 ldi hl, (de)|r2ka|X||EB;5E;23;56;23;EB
@@ -32926,47 +32711,56 @@ ldi hl, (de)|r800|X||EB;5E;23;56;23;EB
 ldi hl, (de)|z180|X||EB;5E;23;56;23;EB
 ldi hl, (de)|z80|X||EB;5E;23;56;23;EB
 ldi hl, (de)|z80n|X||EB;5E;23;56;23;EB
+ldi hl, (hl)|8080|X||F5;7E;23;66;6F;F1;23
+ldi hl, (hl)|8085|X||F5;7E;23;66;6F;F1;23
 ldi hl, (hl)|ez80|_||ED 27;23;23
 ldi hl, (hl)|ez80_z80|_||ED 27;23;23
-ldi hl, (hl)|gbz80|_||F5;7E;23;66;6F;F1
-ldi hl, (hl)|kc160|_||F5;7E;23;66;6F;F1
-ldi hl, (hl)|kc160_z80|_||F5;7E;23;66;6F;F1
-ldi hl, (hl)|r800|_||F5;7E;23;66;6F;F1
-ldi hl, (hl)|z180|_||F5;7E;23;66;6F;F1
-ldi hl, (hl)|z80|_||F5;7E;23;66;6F;F1
-ldi hl, (hl)|z80_strict|_||F5;7E;23;66;6F;F1
-ldi hl, (hl)|z80n|_||F5;7E;23;66;6F;F1
+ldi hl, (hl)|gbz80|X||F5;7E;23;66;6F;F1;23
+ldi hl, (hl)|kc160|X||F5;7E;23;66;6F;F1;23
+ldi hl, (hl)|kc160_z80|X||F5;7E;23;66;6F;F1;23
+ldi hl, (hl)|r2ka|X||F5;7E;23;66;6F;F1;23
+ldi hl, (hl)|r3k|X||F5;7E;23;66;6F;F1;23
+ldi hl, (hl)|r4k|X||F5;7E;23;66;7F 6F;F1;23
+ldi hl, (hl)|r5k|X||F5;7E;23;66;7F 6F;F1;23
+ldi hl, (hl)|r800|X||F5;7E;23;66;6F;F1;23
+ldi hl, (hl)|z180|X||F5;7E;23;66;6F;F1;23
+ldi hl, (hl)|z80|X||F5;7E;23;66;6F;F1;23
+ldi hl, (hl)|z80n|X||F5;7E;23;66;6F;F1;23
+ldi ix, (hl)|8080|X||D5;5E;23;56;D1;23
+ldi ix, (hl)|8085|X||D5;5E;23;56;D1;23
 ldi ix, (hl)|ez80|_||ED 37;23;23
 ldi ix, (hl)|ez80_z80|_||ED 37;23;23
-ldi ix, (hl)|kc160|_||D5;5E;23;56;23;D5;DD E1;D1
-ldi ix, (hl)|kc160_z80|_||D5;5E;23;56;23;D5;DD E1;D1
-ldi ix, (hl)|r2ka|_||D5;5E;23;56;23;D5;DD E1;D1
-ldi ix, (hl)|r3k|_||D5;5E;23;56;23;D5;DD E1;D1
-ldi ix, (hl)|r4k|_||D5;5E;23;56;23;D5;DD E1;D1
-ldi ix, (hl)|r5k|_||D5;5E;23;56;23;D5;DD E1;D1
-ldi ix, (hl)|r800|_||D5;5E;23;56;23;D5;DD E1;D1
-ldi ix, (hl)|z180|_||D5;5E;23;56;23;D5;DD E1;D1
-ldi ix, (hl)|z80|_||D5;5E;23;56;23;D5;DD E1;D1
-ldi ix, (hl)|z80_strict|_||D5;5E;23;56;23;D5;DD E1;D1
-ldi ix, (hl)|z80n|_||D5;5E;23;56;23;D5;DD E1;D1
+ldi ix, (hl)|gbz80|X||D5;5E;23;56;D1;23
+ldi ix, (hl)|kc160|X||D5;5E;23;56;D1;23
+ldi ix, (hl)|kc160_z80|X||D5;5E;23;56;D1;23
+ldi ix, (hl)|r2ka|X||D5;5E;23;56;D1;23
+ldi ix, (hl)|r3k|X||D5;5E;23;56;D1;23
+ldi ix, (hl)|r4k|X||D5;5E;23;56;D1;23
+ldi ix, (hl)|r5k|X||D5;5E;23;56;D1;23
+ldi ix, (hl)|r800|X||D5;5E;23;56;D1;23
+ldi ix, (hl)|z180|X||D5;5E;23;56;D1;23
+ldi ix, (hl)|z80|X||D5;5E;23;56;D1;23
+ldi ix, (hl)|z80n|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|8080|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|8085|X||D5;5E;23;56;D1;23
 ldi iy, (hl)|ez80|_||ED 31;23;23
 ldi iy, (hl)|ez80_z80|_||ED 31;23;23
-ldi iy, (hl)|kc160|_||D5;5E;23;56;23;D5;FD E1;D1
-ldi iy, (hl)|kc160_z80|_||D5;5E;23;56;23;D5;FD E1;D1
-ldi iy, (hl)|r2ka|_||D5;5E;23;56;23;D5;FD E1;D1
-ldi iy, (hl)|r3k|_||D5;5E;23;56;23;D5;FD E1;D1
-ldi iy, (hl)|r4k|_||D5;5E;23;56;23;D5;FD E1;D1
-ldi iy, (hl)|r5k|_||D5;5E;23;56;23;D5;FD E1;D1
-ldi iy, (hl)|r800|_||D5;5E;23;56;23;D5;FD E1;D1
-ldi iy, (hl)|z180|_||D5;5E;23;56;23;D5;FD E1;D1
-ldi iy, (hl)|z80|_||D5;5E;23;56;23;D5;FD E1;D1
-ldi iy, (hl)|z80_strict|_||D5;5E;23;56;23;D5;FD E1;D1
-ldi iy, (hl)|z80n|_||D5;5E;23;56;23;D5;FD E1;D1
+ldi iy, (hl)|gbz80|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|kc160|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|kc160_z80|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|r2ka|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|r3k|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|r4k|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|r5k|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|r800|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|z180|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|z80|X||D5;5E;23;56;D1;23
+ldi iy, (hl)|z80n|X||D5;5E;23;56;D1;23
 ldi l, (de)|8080|X||EB;5E;EB;13
 ldi l, (de)|8085|X||EB;5E;EB;13
 ldi l, (de)|ez80|X||EB;5E;EB;13
 ldi l, (de)|ez80_z80|X||EB;5E;EB;13
-ldi l, (de)|gbz80|X||E5;D5;E1;D1;5E;E5;D5;E1;D1;13
+ldi l, (de)|gbz80|X||D5;E5;D1;E1;5E;D5;E5;D1;E1;13
 ldi l, (de)|kc160|X||EB;5E;EB;13
 ldi l, (de)|kc160_z80|X||EB;5E;EB;13
 ldi l, (de)|r2ka|X||EB;5E;EB;13
@@ -33115,9 +32909,11 @@ ldi.sil hl, (hl)|ez80|_||52;ED 27;23;23
 ldi.sil ix, (hl)|ez80|_||52;ED 37;23;23
 ldi.sil iy, (hl)|ez80|_||52;ED 31;23;23
 ldi.sil l, (hl)|ez80|_||52;6E;23
+ldir|8080|X||CD @__z80asm__ldir 
+ldir|8085|X||CD @__z80asm__ldir 
 ldir|ez80|_||ED B0
 ldir|ez80_z80|_||ED B0
-ldir|gbz80|_||CD @__z80asm__ldir 
+ldir|gbz80|X||CD @__z80asm__ldir 
 ldir|kc160|_||ED B0
 ldir|kc160_z80|_||ED B0
 ldir|r2ka|_||ED B0
@@ -33302,7 +33098,21 @@ ldp iy, (%m)|r4k|_||FD 6D %m %m
 ldp iy, (%m)|r5k|_||FD 6D %m %m
 ldpirx|z80n|_||ED B7
 ldrx|z80n|_||ED BC
+ldsi %n|8080|X||EB;21 %n 00;39;EB
 ldsi %n|8085|_||38 %n
+ldsi %n|ez80|X||EB;21 %n 00 00;39;EB
+ldsi %n|ez80_z80|X||EB;21 %n 00;39;EB
+ldsi %n|gbz80|X||D5;E5;D1;E1;21 %n 00;39;D5;E5;D1;E1
+ldsi %n|kc160|X||EB;21 %n 00;39;EB
+ldsi %n|kc160_z80|X||EB;21 %n 00;39;EB
+ldsi %n|r2ka|X||EB;21 %n 00;39;EB
+ldsi %n|r3k|X||EB;21 %n 00;39;EB
+ldsi %n|r4k|X||EB;21 %n 00;39;EB
+ldsi %n|r5k|X||EB;21 %n 00;39;EB
+ldsi %n|r800|X||EB;21 %n 00;39;EB
+ldsi %n|z180|X||EB;21 %n 00;39;EB
+ldsi %n|z80|X||EB;21 %n 00;39;EB
+ldsi %n|z80n|X||EB;21 %n 00;39;EB
 ldws|z80n|_||ED A5
 lea bc, ix|ez80|_||ED 02 00
 lea bc, ix|ez80_z80|_||ED 02 00
@@ -33445,7 +33255,7 @@ lhlde|8080|X||EB;5E;23;56;2B;EB
 lhlde|8085|_||ED
 lhlde|ez80|X||EB;5E;23;56;2B;EB
 lhlde|ez80_z80|X||EB;5E;23;56;2B;EB
-lhlde|gbz80|X||E5;D5;E1;D1;5E;23;56;2B;E5;D5;E1;D1
+lhlde|gbz80|X||D5;E5;D1;E1;5E;23;56;2B;D5;E5;D1;E1
 lhlde|kc160|X||EB;5E;23;56;2B;EB
 lhlde|kc160_z80|X||EB;5E;23;56;2B;EB
 lhlde|r2ka|X||EB;5E;23;56;2B;EB
@@ -33460,7 +33270,7 @@ lhlx|8080|X||EB;5E;23;56;2B;EB
 lhlx|8085|_||ED
 lhlx|ez80|X||EB;5E;23;56;2B;EB
 lhlx|ez80_z80|X||EB;5E;23;56;2B;EB
-lhlx|gbz80|X||E5;D5;E1;D1;5E;23;56;2B;E5;D5;E1;D1
+lhlx|gbz80|X||D5;E5;D1;E1;5E;23;56;2B;D5;E5;D1;E1
 lhlx|kc160|X||EB;5E;23;56;2B;EB
 lhlx|kc160_z80|X||EB;5E;23;56;2B;EB
 lhlx|r2ka|X||EB;5E;23;56;2B;EB
@@ -35023,36 +34833,6 @@ or (hl-)|z180|_||B6;2B
 or (hl-)|z80|_||B6;2B
 or (hl-)|z80_strict|_||B6;2B
 or (hl-)|z80n|_||B6;2B
-or (hld)|8080|X||B6;2B
-or (hld)|8085|X||B6;2B
-or (hld)|ez80|X||B6;2B
-or (hld)|ez80_z80|X||B6;2B
-or (hld)|gbz80|X||B6;2B
-or (hld)|kc160|X||B6;2B
-or (hld)|kc160_z80|X||B6;2B
-or (hld)|r2ka|X||B6;2B
-or (hld)|r3k|X||B6;2B
-or (hld)|r4k|X||7F B6;2B
-or (hld)|r5k|X||7F B6;2B
-or (hld)|r800|X||B6;2B
-or (hld)|z180|X||B6;2B
-or (hld)|z80|X||B6;2B
-or (hld)|z80n|X||B6;2B
-or (hli)|8080|X||B6;23
-or (hli)|8085|X||B6;23
-or (hli)|ez80|X||B6;23
-or (hli)|ez80_z80|X||B6;23
-or (hli)|gbz80|X||B6;23
-or (hli)|kc160|X||B6;23
-or (hli)|kc160_z80|X||B6;23
-or (hli)|r2ka|X||B6;23
-or (hli)|r3k|X||B6;23
-or (hli)|r4k|X||7F B6;23
-or (hli)|r5k|X||7F B6;23
-or (hli)|r800|X||B6;23
-or (hli)|z180|X||B6;23
-or (hli)|z80|X||B6;23
-or (hli)|z80n|X||B6;23
 or (ix)|ez80|_||DD B6 00
 or (ix)|ez80_z80|_||DD B6 00
 or (ix)|kc160|_||DD B6 00
@@ -35270,36 +35050,6 @@ or a, (hl-)|z180|_||B6;2B
 or a, (hl-)|z80|_||B6;2B
 or a, (hl-)|z80_strict|_||B6;2B
 or a, (hl-)|z80n|_||B6;2B
-or a, (hld)|8080|X||B6;2B
-or a, (hld)|8085|X||B6;2B
-or a, (hld)|ez80|X||B6;2B
-or a, (hld)|ez80_z80|X||B6;2B
-or a, (hld)|gbz80|X||B6;2B
-or a, (hld)|kc160|X||B6;2B
-or a, (hld)|kc160_z80|X||B6;2B
-or a, (hld)|r2ka|X||B6;2B
-or a, (hld)|r3k|X||B6;2B
-or a, (hld)|r4k|X||7F B6;2B
-or a, (hld)|r5k|X||7F B6;2B
-or a, (hld)|r800|X||B6;2B
-or a, (hld)|z180|X||B6;2B
-or a, (hld)|z80|X||B6;2B
-or a, (hld)|z80n|X||B6;2B
-or a, (hli)|8080|X||B6;23
-or a, (hli)|8085|X||B6;23
-or a, (hli)|ez80|X||B6;23
-or a, (hli)|ez80_z80|X||B6;23
-or a, (hli)|gbz80|X||B6;23
-or a, (hli)|kc160|X||B6;23
-or a, (hli)|kc160_z80|X||B6;23
-or a, (hli)|r2ka|X||B6;23
-or a, (hli)|r3k|X||B6;23
-or a, (hli)|r4k|X||7F B6;23
-or a, (hli)|r5k|X||7F B6;23
-or a, (hli)|r800|X||B6;23
-or a, (hli)|z180|X||B6;23
-or a, (hli)|z80|X||B6;23
-or a, (hli)|z80n|X||B6;23
 or a, (ix)|ez80|_||DD B6 00
 or a, (ix)|ez80_z80|_||DD B6 00
 or a, (ix)|kc160|_||DD B6 00
@@ -39456,36 +39206,6 @@ sbc (hl-)|z180|_||9E;2B
 sbc (hl-)|z80|_||9E;2B
 sbc (hl-)|z80_strict|_||9E;2B
 sbc (hl-)|z80n|_||9E;2B
-sbc (hld)|8080|X||9E;2B
-sbc (hld)|8085|X||9E;2B
-sbc (hld)|ez80|X||9E;2B
-sbc (hld)|ez80_z80|X||9E;2B
-sbc (hld)|gbz80|X||9E;2B
-sbc (hld)|kc160|X||9E;2B
-sbc (hld)|kc160_z80|X||9E;2B
-sbc (hld)|r2ka|X||9E;2B
-sbc (hld)|r3k|X||9E;2B
-sbc (hld)|r4k|X||7F 9E;2B
-sbc (hld)|r5k|X||7F 9E;2B
-sbc (hld)|r800|X||9E;2B
-sbc (hld)|z180|X||9E;2B
-sbc (hld)|z80|X||9E;2B
-sbc (hld)|z80n|X||9E;2B
-sbc (hli)|8080|X||9E;23
-sbc (hli)|8085|X||9E;23
-sbc (hli)|ez80|X||9E;23
-sbc (hli)|ez80_z80|X||9E;23
-sbc (hli)|gbz80|X||9E;23
-sbc (hli)|kc160|X||9E;23
-sbc (hli)|kc160_z80|X||9E;23
-sbc (hli)|r2ka|X||9E;23
-sbc (hli)|r3k|X||9E;23
-sbc (hli)|r4k|X||7F 9E;23
-sbc (hli)|r5k|X||7F 9E;23
-sbc (hli)|r800|X||9E;23
-sbc (hli)|z180|X||9E;23
-sbc (hli)|z80|X||9E;23
-sbc (hli)|z80n|X||9E;23
 sbc (ix)|ez80|_||DD 9E 00
 sbc (ix)|ez80_z80|_||DD 9E 00
 sbc (ix)|kc160|_||DD 9E 00
@@ -39703,36 +39423,6 @@ sbc a, (hl-)|z180|_||9E;2B
 sbc a, (hl-)|z80|_||9E;2B
 sbc a, (hl-)|z80_strict|_||9E;2B
 sbc a, (hl-)|z80n|_||9E;2B
-sbc a, (hld)|8080|X||9E;2B
-sbc a, (hld)|8085|X||9E;2B
-sbc a, (hld)|ez80|X||9E;2B
-sbc a, (hld)|ez80_z80|X||9E;2B
-sbc a, (hld)|gbz80|X||9E;2B
-sbc a, (hld)|kc160|X||9E;2B
-sbc a, (hld)|kc160_z80|X||9E;2B
-sbc a, (hld)|r2ka|X||9E;2B
-sbc a, (hld)|r3k|X||9E;2B
-sbc a, (hld)|r4k|X||7F 9E;2B
-sbc a, (hld)|r5k|X||7F 9E;2B
-sbc a, (hld)|r800|X||9E;2B
-sbc a, (hld)|z180|X||9E;2B
-sbc a, (hld)|z80|X||9E;2B
-sbc a, (hld)|z80n|X||9E;2B
-sbc a, (hli)|8080|X||9E;23
-sbc a, (hli)|8085|X||9E;23
-sbc a, (hli)|ez80|X||9E;23
-sbc a, (hli)|ez80_z80|X||9E;23
-sbc a, (hli)|gbz80|X||9E;23
-sbc a, (hli)|kc160|X||9E;23
-sbc a, (hli)|kc160_z80|X||9E;23
-sbc a, (hli)|r2ka|X||9E;23
-sbc a, (hli)|r3k|X||9E;23
-sbc a, (hli)|r4k|X||7F 9E;23
-sbc a, (hli)|r5k|X||7F 9E;23
-sbc a, (hli)|r800|X||9E;23
-sbc a, (hli)|z180|X||9E;23
-sbc a, (hli)|z80|X||9E;23
-sbc a, (hli)|z80n|X||9E;23
 sbc a, (ix)|ez80|_||DD 9E 00
 sbc a, (ix)|ez80_z80|_||DD 9E 00
 sbc a, (ix)|kc160|_||DD 9E 00
@@ -40583,7 +40273,7 @@ shlde|8080|X||EB;73;23;72;2B;EB
 shlde|8085|_||D9
 shlde|ez80|X||EB;73;23;72;2B;EB
 shlde|ez80_z80|X||EB;73;23;72;2B;EB
-shlde|gbz80|X||E5;D5;E1;D1;73;23;72;2B;E5;D5;E1;D1
+shlde|gbz80|X||D5;E5;D1;E1;73;23;72;2B;D5;E5;D1;E1
 shlde|kc160|X||EB;73;23;72;2B;EB
 shlde|kc160_z80|X||EB;73;23;72;2B;EB
 shlde|r2ka|X||EB;73;23;72;2B;EB
@@ -40598,7 +40288,7 @@ shlx|8080|X||EB;73;23;72;2B;EB
 shlx|8085|_||D9
 shlx|ez80|X||EB;73;23;72;2B;EB
 shlx|ez80_z80|X||EB;73;23;72;2B;EB
-shlx|gbz80|X||E5;D5;E1;D1;73;23;72;2B;E5;D5;E1;D1
+shlx|gbz80|X||D5;E5;D1;E1;73;23;72;2B;D5;E5;D1;E1
 shlx|kc160|X||EB;73;23;72;2B;EB
 shlx|kc160_z80|X||EB;73;23;72;2B;EB
 shlx|r2ka|X||EB;73;23;72;2B;EB
@@ -41973,36 +41663,6 @@ sub (hl-)|z180|_||96;2B
 sub (hl-)|z80|_||96;2B
 sub (hl-)|z80_strict|_||96;2B
 sub (hl-)|z80n|_||96;2B
-sub (hld)|8080|X||96;2B
-sub (hld)|8085|X||96;2B
-sub (hld)|ez80|X||96;2B
-sub (hld)|ez80_z80|X||96;2B
-sub (hld)|gbz80|X||96;2B
-sub (hld)|kc160|X||96;2B
-sub (hld)|kc160_z80|X||96;2B
-sub (hld)|r2ka|X||96;2B
-sub (hld)|r3k|X||96;2B
-sub (hld)|r4k|X||7F 96;2B
-sub (hld)|r5k|X||7F 96;2B
-sub (hld)|r800|X||96;2B
-sub (hld)|z180|X||96;2B
-sub (hld)|z80|X||96;2B
-sub (hld)|z80n|X||96;2B
-sub (hli)|8080|X||96;23
-sub (hli)|8085|X||96;23
-sub (hli)|ez80|X||96;23
-sub (hli)|ez80_z80|X||96;23
-sub (hli)|gbz80|X||96;23
-sub (hli)|kc160|X||96;23
-sub (hli)|kc160_z80|X||96;23
-sub (hli)|r2ka|X||96;23
-sub (hli)|r3k|X||96;23
-sub (hli)|r4k|X||7F 96;23
-sub (hli)|r5k|X||7F 96;23
-sub (hli)|r800|X||96;23
-sub (hli)|z180|X||96;23
-sub (hli)|z80|X||96;23
-sub (hli)|z80n|X||96;23
 sub (ix)|ez80|_||DD 96 00
 sub (ix)|ez80_z80|_||DD 96 00
 sub (ix)|kc160|_||DD 96 00
@@ -42222,36 +41882,6 @@ sub a, (hl-)|z180|_||96;2B
 sub a, (hl-)|z80|_||96;2B
 sub a, (hl-)|z80_strict|_||96;2B
 sub a, (hl-)|z80n|_||96;2B
-sub a, (hld)|8080|X||96;2B
-sub a, (hld)|8085|X||96;2B
-sub a, (hld)|ez80|X||96;2B
-sub a, (hld)|ez80_z80|X||96;2B
-sub a, (hld)|gbz80|X||96;2B
-sub a, (hld)|kc160|X||96;2B
-sub a, (hld)|kc160_z80|X||96;2B
-sub a, (hld)|r2ka|X||96;2B
-sub a, (hld)|r3k|X||96;2B
-sub a, (hld)|r4k|X||7F 96;2B
-sub a, (hld)|r5k|X||7F 96;2B
-sub a, (hld)|r800|X||96;2B
-sub a, (hld)|z180|X||96;2B
-sub a, (hld)|z80|X||96;2B
-sub a, (hld)|z80n|X||96;2B
-sub a, (hli)|8080|X||96;23
-sub a, (hli)|8085|X||96;23
-sub a, (hli)|ez80|X||96;23
-sub a, (hli)|ez80_z80|X||96;23
-sub a, (hli)|gbz80|X||96;23
-sub a, (hli)|kc160|X||96;23
-sub a, (hli)|kc160_z80|X||96;23
-sub a, (hli)|r2ka|X||96;23
-sub a, (hli)|r3k|X||96;23
-sub a, (hli)|r4k|X||7F 96;23
-sub a, (hli)|r5k|X||7F 96;23
-sub a, (hli)|r800|X||96;23
-sub a, (hli)|z180|X||96;23
-sub a, (hli)|z80|X||96;23
-sub a, (hli)|z80n|X||96;23
 sub a, (ix)|ez80|_||DD 96 00
 sub a, (ix)|ez80_z80|_||DD 96 00
 sub a, (ix)|kc160|_||DD 96 00
@@ -42914,7 +42544,7 @@ xchg|8085|_||EB
 xchg|8085_strict|_||EB
 xchg|ez80|_||EB
 xchg|ez80_z80|_||EB
-xchg|gbz80|_||E5;D5;E1;D1
+xchg|gbz80|X||D5;E5;D1;E1
 xchg|kc160|_||EB
 xchg|kc160_z80|_||EB
 xchg|r2ka|_||EB
@@ -42995,36 +42625,6 @@ xor (hl-)|z180|_||AE;2B
 xor (hl-)|z80|_||AE;2B
 xor (hl-)|z80_strict|_||AE;2B
 xor (hl-)|z80n|_||AE;2B
-xor (hld)|8080|X||AE;2B
-xor (hld)|8085|X||AE;2B
-xor (hld)|ez80|X||AE;2B
-xor (hld)|ez80_z80|X||AE;2B
-xor (hld)|gbz80|X||AE;2B
-xor (hld)|kc160|X||AE;2B
-xor (hld)|kc160_z80|X||AE;2B
-xor (hld)|r2ka|X||AE;2B
-xor (hld)|r3k|X||AE;2B
-xor (hld)|r4k|X||7F AE;2B
-xor (hld)|r5k|X||7F AE;2B
-xor (hld)|r800|X||AE;2B
-xor (hld)|z180|X||AE;2B
-xor (hld)|z80|X||AE;2B
-xor (hld)|z80n|X||AE;2B
-xor (hli)|8080|X||AE;23
-xor (hli)|8085|X||AE;23
-xor (hli)|ez80|X||AE;23
-xor (hli)|ez80_z80|X||AE;23
-xor (hli)|gbz80|X||AE;23
-xor (hli)|kc160|X||AE;23
-xor (hli)|kc160_z80|X||AE;23
-xor (hli)|r2ka|X||AE;23
-xor (hli)|r3k|X||AE;23
-xor (hli)|r4k|X||7F AE;23
-xor (hli)|r5k|X||7F AE;23
-xor (hli)|r800|X||AE;23
-xor (hli)|z180|X||AE;23
-xor (hli)|z80|X||AE;23
-xor (hli)|z80n|X||AE;23
 xor (ix)|ez80|_||DD AE 00
 xor (ix)|ez80_z80|_||DD AE 00
 xor (ix)|kc160|_||DD AE 00
@@ -43242,36 +42842,6 @@ xor a, (hl-)|z180|_||AE;2B
 xor a, (hl-)|z80|_||AE;2B
 xor a, (hl-)|z80_strict|_||AE;2B
 xor a, (hl-)|z80n|_||AE;2B
-xor a, (hld)|8080|X||AE;2B
-xor a, (hld)|8085|X||AE;2B
-xor a, (hld)|ez80|X||AE;2B
-xor a, (hld)|ez80_z80|X||AE;2B
-xor a, (hld)|gbz80|X||AE;2B
-xor a, (hld)|kc160|X||AE;2B
-xor a, (hld)|kc160_z80|X||AE;2B
-xor a, (hld)|r2ka|X||AE;2B
-xor a, (hld)|r3k|X||AE;2B
-xor a, (hld)|r4k|X||7F AE;2B
-xor a, (hld)|r5k|X||7F AE;2B
-xor a, (hld)|r800|X||AE;2B
-xor a, (hld)|z180|X||AE;2B
-xor a, (hld)|z80|X||AE;2B
-xor a, (hld)|z80n|X||AE;2B
-xor a, (hli)|8080|X||AE;23
-xor a, (hli)|8085|X||AE;23
-xor a, (hli)|ez80|X||AE;23
-xor a, (hli)|ez80_z80|X||AE;23
-xor a, (hli)|gbz80|X||AE;23
-xor a, (hli)|kc160|X||AE;23
-xor a, (hli)|kc160_z80|X||AE;23
-xor a, (hli)|r2ka|X||AE;23
-xor a, (hli)|r3k|X||AE;23
-xor a, (hli)|r4k|X||7F AE;23
-xor a, (hli)|r5k|X||7F AE;23
-xor a, (hli)|r800|X||AE;23
-xor a, (hli)|z180|X||AE;23
-xor a, (hli)|z80|X||AE;23
-xor a, (hli)|z80n|X||AE;23
 xor a, (ix)|ez80|_||DD AE 00
 xor a, (ix)|ez80_z80|_||DD AE 00
 xor a, (ix)|kc160|_||DD AE 00
@@ -43870,7 +43440,7 @@ xthl|8085|_||E3
 xthl|8085_strict|_||E3
 xthl|ez80|_||E3
 xthl|ez80_z80|_||E3
-xthl|gbz80|_||CD @__z80asm__ex_sp_hl 
+xthl|gbz80|X||CD @__z80asm__ex_sp_hl 
 xthl|kc160|_||E3
 xthl|kc160_z80|_||E3
 xthl|r2ka|_||ED 54
