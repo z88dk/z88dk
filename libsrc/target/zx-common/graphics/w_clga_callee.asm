@@ -64,9 +64,7 @@ ENDIF
   IF    NEED_swapgfxbk
     jp      __graphics_end
   ELSE
-    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-    ENDIF
     ret
   ENDIF
 
