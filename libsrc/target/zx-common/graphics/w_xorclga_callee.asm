@@ -12,11 +12,13 @@
     PUBLIC  asm_xorclga
 
     EXTERN  __zx_screenmode
+IF    !FORts2068
     EXTERN  w_xorpixel
     EXTERN  w_area
+ENDIF
 
     EXTERN  w_pixeladdress
-    EXTERN  inc_y_MODE6
+    EXTERN  asm_zx_saddrpdown
     EXTERN  inc_x_MODE6
 IF    FORts2068|FORzxn
     EXTERN  __gfx_fatpix
@@ -43,12 +45,14 @@ asm_xorclga:
 
     ld      a, (__zx_screenmode)
     and     7
-    jp      z,fast_xorclga
-IF    FORts2068|FORzxn
+    jp      z,fast_xorclga_m0
+
+IF !FORts2068
+
+IF FORzxn
     cp      6
     jp      z,fast_xorclga
 ENDIF
-
 
     push    ix
   IF    NEED_swapgfxbk=1
@@ -60,28 +64,36 @@ ENDIF
   IF    NEED_swapgfxbk
     jp      __graphics_end
   ELSE
-    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-    ENDIF
     ret
   ENDIF
 
+ENDIF
+
+fast_xorclga_m0:
+
+IF FORts2068 | FORzxn
+    ld   (__gfx_fatpix),a
+ENDIF
 
 fast_xorclga:
+
+
+IF    FORts2068|FORzxn
+    ld      a, (__gfx_fatpix)
+    and     a
+    jr      z, not_fatpix
+    add     hl, hl
+not_fatpix:
+ENDIF
+
 ;;   TS2068 High Resolution and standard mode
     push    ix
   IF    NEED_swapgfxbk=1
     call    swapgfxbk
   ENDIF
 
-IF    FORts2068|FORzxn
-    ld      a, (__gfx_fatpix)
-    and     a
     ld      a,e          ; height
-    jr      z, not_fatpix
-    add     hl, hl
-not_fatpix:
-ENDIF
     push    hl           ; width
     exx  ; hl=x
          ; de=y
@@ -173,7 +185,10 @@ wypad:
     pop     bc                          ; 1
     dec     ixl
     jp      z, __graphics_end
-    call    inc_y_MODE6
+    ex      de,hl
+    call    asm_zx_saddrpdown
+    ex      de,hl
     jp      c, __graphics_end
     jr      outer_loop
+
 

@@ -12,8 +12,10 @@
     PUBLIC  asm_clga
 
     EXTERN  __zx_screenmode
+IF    !FORts2068
     EXTERN  w_respixel
     EXTERN  w_area
+ENDIF
 
     EXTERN  w_pixeladdress
     EXTERN  asm_zx_saddrpdown
@@ -43,12 +45,14 @@ asm_clga:
 
     ld      a, (__zx_screenmode)
     and     7
-    jp      z,fast_clga
-IF    FORts2068|FORzxn
+    jp      z,fast_clga_m0
+
+IF !FORts2068
+
+IF FORzxn
     cp      6
     jp      z,fast_clga
 ENDIF
-
 
     push    ix
   IF    NEED_swapgfxbk=1
@@ -60,22 +64,28 @@ ENDIF
   IF    NEED_swapgfxbk
     jp      __graphics_end
   ELSE
-    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-    ENDIF
     ret
   ENDIF
 
+ENDIF
+
+fast_clga_m0:
+
+IF FORts2068 | FORzxn
+    ld   (__gfx_fatpix),a
+ENDIF
 
 fast_clga:
 
-;IF    FORts2068|FORzxn
-;    ld      a, (__gfx_fatpix)
-;    and     a
-;    jr      z, not_fatpix
-;    add     hl, hl
-;not_fatpix:
-;ENDIF
+
+IF    FORts2068|FORzxn
+    ld      a, (__gfx_fatpix)
+    and     a
+    jr      z, not_fatpix
+    add     hl, hl
+not_fatpix:
+ENDIF
 
 ;;   TS2068 High Resolution and standard mode
     push    ix

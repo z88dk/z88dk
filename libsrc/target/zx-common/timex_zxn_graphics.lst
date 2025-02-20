@@ -1,7 +1,6 @@
 target/zx-common/graphics/obj/${TARGET}/__set_zx_pixel_colour
 target/zx-common/graphics/obj/${TARGET}/hl_inc_x_MODE6
 target/zx-common/graphics/obj/${TARGET}/inc_x_MODE6
-target/zx-common/graphics/obj/${TARGET}/inc_y_MODE6
 target/zx-common/graphics/obj/${TARGET}/res_MODE0
 target/zx-common/graphics/obj/${TARGET}/pointxy_MODE0
 target/zx-common/graphics/obj/${TARGET}/plot_MODE6
