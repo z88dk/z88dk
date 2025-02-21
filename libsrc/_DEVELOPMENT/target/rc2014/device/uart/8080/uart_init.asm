@@ -15,7 +15,7 @@ PUBLIC _uart_init
 ._uart_init
     ; initialise the UART(s)
 
-    ; confirm UART A exists by checking the UART divisor latch register
+    ; confirm UART A exists by checking the UART divisor latch & scratch registers
     xor a
     out (__IO_UARTA_IER_REGISTER),a         ; clear any enabled interrupts
 
@@ -26,6 +26,11 @@ PUBLIC _uart_init
     out (__IO_UARTA_DLM_REGISTER),a         ; write it to UART A DLM register
     in a,(__IO_UARTA_DLM_REGISTER)          ; read it back
 
+    rrca
+    out (__IO_UARTA_SCRATCH_REGISTER),a     ; write it to UART A SCRATCH register
+    in a,(__IO_UARTA_SCRATCH_REGISTER)      ; read it back
+
+    rlca
     cp $a5
     jp NZ,uart_enable_b                     ; doesn't exist, try UART B
 
@@ -64,7 +69,7 @@ PUBLIC _uart_init
 
 .uart_enable_b
 
-    ; confirm it exists by checking the UART divisor latch register
+    ; confirm UART B exists by checking the UART divisor latch & scratch registers
     xor a
     out (__IO_UARTB_IER_REGISTER),a         ; clear any enabled interrupts
 
@@ -75,6 +80,11 @@ PUBLIC _uart_init
     out (__IO_UARTB_DLM_REGISTER),a         ; write it to UART B DLM register
     in a,(__IO_UARTB_DLM_REGISTER)          ; read it back
 
+    rrca
+    out (__IO_UARTB_SCRATCH_REGISTER),a     ; write it to UART B SCRATCH register
+    in a,(__IO_UARTB_SCRATCH_REGISTER)      ; read it back
+
+    rlca
     cp $a5
     ret NZ                                  ; doesn't exist, just return
 
