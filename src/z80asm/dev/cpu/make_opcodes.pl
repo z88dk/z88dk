@@ -4781,3 +4781,4 @@ sub find_range {
 	
 	die "no range found in $asm, $cpu";
 }
+
