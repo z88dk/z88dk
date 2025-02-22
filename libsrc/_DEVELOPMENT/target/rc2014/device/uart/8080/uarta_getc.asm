@@ -19,7 +19,6 @@ EXTERN uartaRxCount, uartaRxOut, uartaRxBuffer
     ; modifies : af, hl
 
     ld a,(uartaRxCount)         ; get the number of bytes in the Rx buffer
-    ld l,a                      ; and put it in hl
     or a                        ; see if there are zero bytes available
     ret Z                       ; if the count is zero, then return
 

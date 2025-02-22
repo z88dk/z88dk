@@ -13,7 +13,6 @@
     ; modifies : af, hl
 
     ld a,(uartbRxCount)         ; get the number of bytes in the Rx buffer
-    ld l,a                      ; and put it in hl
     or a                        ; see if there are zero bytes available
     jp Z,fgetc_cons_uartb       ; if the count is zero, then wait
 
