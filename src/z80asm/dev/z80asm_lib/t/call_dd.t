@@ -25,7 +25,7 @@ for my $cpu (@CPUS) {
 					ld a, 0
 					ld $dd, r1
 					call ($dd)
-					rst 0
+					jp 0
 					
 				r1:	inc a
 					ret
