@@ -11,9 +11,12 @@
 
     EXTERN  w_pixeladdress
     EXTERN  asm_zx_saddrpdown
-    EXTERN  __zx_console_attr
+    ;EXTERN  __zx_console_attr
 
     EXTERN  hl_inc_x_MODE6
+IF    FORts2068|FORzxn
+    EXTERN  __gfx_fatpix
+ENDIF
 
     EXTERN  swapgfxbk
     EXTERN  __graphics_end
@@ -25,14 +28,25 @@ _putsprite:
 
     ld      a, (__zx_screenmode)
     and     7
-    jr      z,fast_putsprite
-IF    FORts2068|FORzxn
+    jr      z,fast_putsprite_m0
+
+IF !FORts2068
+
+IF    FORzxn
     cp      6
     jr      z,fast_putsprite
 ENDIF
 
     jp      __generic_putsprite
 
+ENDIF
+
+
+fast_putsprite_m0:
+
+IF FORts2068 | FORzxn
+    ld   (__gfx_fatpix),a
+ENDIF
 
 
 fast_putsprite:
@@ -66,22 +80,28 @@ fast_putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-  IF    NEED_swapgfxbk=1
+  IF    NEED_swapgfxbk
     call    swapgfxbk
   ENDIF
       ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c
 
-;; IF    FORts2068|FORzxn
-;;     ld      a, (__gfx_fatpix)
-;;     and     a
-;;     jr      z, not_fatpix
-;; 
-;;     ; TODO: fatpix mode scaling (SMC ?)
-;; 
-;; not_fatpix:
-;; ENDIF
+; TODO: fatpixel in TS2068 HR mode
+;IF    FORts2068|FORzxn
+;    ld      a, (__gfx_fatpix)
+;    and     a
+;    jr      z, not_fatpix
+;    
+;    ;add hl,hl
+;    ld a,$0f    ; RRCA
+;    
+;    ; TODO: fatpix mode scaling (SMC ?)
+;not_fatpix:
+;    ld (_noplot),a
+;    ld (wnoplot),a
+;
+;ENDIF
 
     call    w_pixeladdress
     ld      (_saddr+1), de
@@ -122,6 +142,9 @@ ortype:
     ld      (hl), a
     ld      a, e
 _noplot:
+IF    FORts2068|FORzxn
+    nop
+ENDIF
     rrca
 
     jr      nc, _notedge                ;Test if edge of byte reached
@@ -179,6 +202,9 @@ ortype2:
     ld      (hl), a
     ld      a, e
 wnoplot:
+IF    FORts2068|FORzxn
+    nop
+ENDIF
     rrca
     jr      nc, wnotedge                ;Test if edge of byte reached
 
