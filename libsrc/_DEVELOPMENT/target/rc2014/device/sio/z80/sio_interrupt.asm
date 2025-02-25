@@ -68,16 +68,9 @@ __siob_interrupt_rx_char:
 
 siob_rx_get:
         in a,(__IO_SIOB_DATA_REGISTER)  ; move Rx byte from the SIOB to A
-        ld l,a                      ; put it in L
-
-        ld a,(siobRxCount)          ; get the number of bytes in the Rx buffer      
-        cp __IO_SIO_RX_SIZE-1       ; check whether there is space in the buffer
-        jr NC,siob_rx_check         ; buffer full, check whether we need to drain H/W FIFO
-
-        ld a,l                      ; get Rx byte from l
-
         ld hl,(siobRxIn)            ; get the pointer to where we poke
         ld (hl),a                   ; write the Rx byte to the siobRxIn target
+
         inc l                       ; move the Rx pointer low byte along
 IF __IO_SIO_RX_SIZE != 0x100
         ld a,__IO_SIO_RX_SIZE-1     ; load the buffer size, (n^2)-1
@@ -92,7 +85,7 @@ ENDIF
 
         ld a,(siobRxCount)          ; get the current Rx count
         cp __IO_SIO_RX_FULLISH      ; compare the count with the preferred full size
-        jp NZ,siob_rx_check         ; if the buffer is fullish reset the RTS line
+        jp NC,siob_rx_check         ; if the buffer is fullish reset the RTS line
                                     ; this means getting characters will be slower
                                     ; when the buffer is fullish,
                                     ; but we stop the lemmings.
@@ -176,14 +169,6 @@ __sioa_interrupt_rx_char:
 
 sioa_rx_get:
         in a,(__IO_SIOA_DATA_REGISTER)  ; move Rx byte from the SIOA to A
-        ld l,a                      ; put it in L
-
-        ld a,(sioaRxCount)          ; get the number of bytes in the Rx buffer      
-        cp __IO_SIO_RX_SIZE-1       ; check whether there is space in the buffer
-        jr NC,sioa_rx_check         ; buffer full, check whether we need to drain H/W FIFO
-
-        ld a,l                      ; get Rx byte from l
-
         ld hl,(sioaRxIn)            ; get the pointer to where we poke
         ld (hl),a                   ; write the Rx byte to the sioaRxIn target
 
@@ -201,7 +186,7 @@ ENDIF
 
         ld a,(sioaRxCount)          ; get the current Rx count
         cp __IO_SIO_RX_FULLISH      ; compare the count with the preferred full size
-        jp NZ,sioa_rx_check         ; if the buffer is fullish reset the RTS line
+        jp NC,sioa_rx_check         ; if the buffer is fullish reset the RTS line
                                     ; this means getting characters will be slower
                                     ; when the buffer is fullish,
                                     ; but we stop the lemmings.
