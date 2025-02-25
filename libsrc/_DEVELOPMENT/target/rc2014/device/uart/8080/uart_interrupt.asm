@@ -37,13 +37,6 @@ EXTERN uartbControl
     jp Z,uartb                  ; if not, go check UART B
 
     in a,(__IO_UARTA_DATA_REGISTER) ; Get the received byte from the UART A
-    ld l,a                      ; move Rx byte to l
-
-    ld a,(uartaRxCount)         ; Get the number of bytes in the Rx buffer
-    cp __IO_UART_RX_SIZE-1      ; check whether there is space in the buffer
-    jp NC,rxa_dtr               ; buffer full, check DTR
-
-    ld a,l                      ; get Rx byte from l
     ld hl,(uartaRxIn)           ; get the pointer to where we poke
     ld (hl),a                   ; write the Rx byte to the uartaRxIn address
 
@@ -59,14 +52,13 @@ ENDIF
     ld hl,uartaRxCount
     inc (hl)                    ; atomically increment Rx buffer count
 
-.rxa_dtr
     ld a,(uartaRxCount)         ; get the current Rx count
     sub __IO_UART_RX_FULLISH    ; compare the count with the preferred full size
     jp C,rxa_check              ; leave the DTR low, and check for Rx/Tx possibility
 
-    in a,(__IO_UARTA_MCR_REGISTER)              ; get the UART A MODEM Control Register
-    and ~(__IO_UART_MCR_RTS|__IO_UART_MCR_DTR)  ; set RTS & DTR high
-    out (__IO_UARTA_MCR_REGISTER),a             ; set the MODEM Control Register
+    in a,(__IO_UARTA_MCR_REGISTER)  ; get the UART A MODEM Control Register
+    and ~__IO_UART_MCR_RTS          ; set RTS high
+    out (__IO_UARTA_MCR_REGISTER),a ; set the MODEM Control Register
 
 .rxa_check
     in a,(__IO_UARTA_IIR_REGISTER)  ; get the status of the UART A
@@ -93,13 +85,6 @@ ENDIF
     jp Z,end                    ; if not exit
 
     in a,(__IO_UARTB_DATA_REGISTER) ; Get the received byte from the UART B
-    ld l,a                      ; move Rx byte to l
-
-    ld a,(uartbRxCount)         ; Get the number of bytes in the Rx buffer
-    cp __IO_UART_RX_SIZE-1      ; check whether there is space in the buffer
-    jp NC,rxb_dtr               ; buffer full, check DTR
-
-    ld a,l                      ; get Rx byte from l
     ld hl,(uartbRxIn)           ; get the pointer to where we poke
     ld (hl),a                   ; write the Rx byte to the uartbRxIn address
 
@@ -115,14 +100,13 @@ ENDIF
     ld hl,uartbRxCount
     inc (hl)                    ; atomically increment Rx buffer count
 
-.rxb_dtr
     ld a,(uartbRxCount)         ; get the current Rx count
     sub __IO_UART_RX_FULLISH    ; compare the count with the preferred full size
     jp C,rxb_check              ; leave the DTR low, and check for Rx/Tx possibility
 
-    in a,(__IO_UARTB_MCR_REGISTER)              ; get the UART B MODEM Control Register
-    and ~(__IO_UART_MCR_RTS|__IO_UART_MCR_DTR)  ; set RTS & DTR high
-    out (__IO_UARTB_MCR_REGISTER),a             ; set the MODEM Control Register
+    in a,(__IO_UARTB_MCR_REGISTER)  ; get the UART B MODEM Control Register
+    and ~__IO_UART_MCR_RTS          ; set RTS high
+    out (__IO_UARTB_MCR_REGISTER),a ; set the MODEM Control Register
 
 .rxb_check
     in a,(__IO_UARTB_IIR_REGISTER)  ; get the status of the UART B

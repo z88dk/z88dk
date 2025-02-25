@@ -25,9 +25,9 @@ EXTERN uartbRxCount, uartbRxOut, uartbRxBuffer
     sub __IO_UART_RX_EMPTYISH   ; compare the count with the preferred empty size
     jp C,getc_clean_up_rx       ; if the buffer is too full, don't change the RTS
 
-    in a,(__IO_UARTB_MCR_REGISTER)          ; get the UART B MODEM Control Register
-    or __IO_UART_MCR_RTS|__IO_UART_MCR_DTR  ; set RTS & DTR low
-    out (__IO_UARTB_MCR_REGISTER),a         ; set the MODEM Control Register
+    in a,(__IO_UARTB_MCR_REGISTER)  ; get the UART B MODEM Control Register
+    or __IO_UART_MCR_RTS            ; set RTS low
+    out (__IO_UARTB_MCR_REGISTER),a ; set the MODEM Control Register
 
 .getc_clean_up_rx
     ld hl,(uartbRxOut)          ; get the pointer to place where we pop the Rx byte
