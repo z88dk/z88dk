@@ -19,17 +19,9 @@ acia_interrupt:
     jr      NC, tx_send                 ; if not, go check for bytes to transmit
 
 rx_get:
-    in      a, (__IO_ACIA_DATA_REGISTER)
-                                        ; Get the received byte from the ACIA
-    ld      l, a                        ; move Rx byte to l
-
-    ld      a, (aciaRxCount)            ; get the number of bytes in the Rx buffer
-    cp      __IO_ACIA_RX_SIZE-1         ; check whether there is space in the buffer
-    jr      NC, tx_check                ; buffer full, check if we can send something
-
-    ld      a, l                        ; get Rx byte from l
-    ld      hl, (aciaRxIn)              ; get the pointer to where we poke
-    ld      (hl), a                     ; write the Rx byte to the aciaRxIn address
+    in      a, (__IO_ACIA_DATA_REGISTER)    ; Get the received byte from the ACIA
+    ld      hl, (aciaRxIn)                  ; get the pointer to where we poke
+    ld      (hl), a                         ; write the Rx byte to the aciaRxIn address
 
     inc     l                           ; move the Rx pointer low byte along
   IF    __IO_ACIA_RX_SIZE!=0x100
