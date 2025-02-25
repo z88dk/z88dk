@@ -21,7 +21,7 @@
         ret Z                       ; if the count is zero, then return
 
         cp __IO_SIO_RX_EMPTYISH     ; compare the count with the preferred empty size
-        jp NZ,getc_clean_up         ; if the buffer NOT emptyish, don't change the RTS
+        jp NC,getc_clean_up         ; if the buffer NOT emptyish, don't change the RTS
                                     ; this means retrieving characters will be slower
                                     ; when the buffer is emptyish.
                                     ; Better than the reverse case.
