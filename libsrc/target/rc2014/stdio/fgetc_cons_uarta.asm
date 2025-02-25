@@ -17,7 +17,7 @@
     jp Z,fgetc_cons_uarta       ; if the count is zero, then wait
 
     sub __IO_UART_RX_EMPTYISH   ; compare the count with the preferred empty size
-    jp C,getc_clean_up_rx       ; if the buffer is too full, don't change the RTS
+    jp NC,getc_clean_up_rx      ; if the buffer is too full, don't change the RTS
 
     in a,(__IO_UARTA_MCR_REGISTER)  ; get the UART A MODEM Control Register
     or __IO_UART_MCR_RTS            ; set RTS low

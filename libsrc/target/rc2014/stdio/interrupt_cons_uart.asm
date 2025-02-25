@@ -50,7 +50,7 @@ ENDIF
 
     ld a,(uartaRxCount)         ; get the current Rx count
     sub __IO_UART_RX_FULLISH    ; compare the count with the preferred full size
-    jp C,rxa_check              ; leave the DTR low, and check for Rx/Tx possibility
+    jp C,rxa_check              ; leave the RTS low, and check for Rx/Tx possibility
 
     in a,(__IO_UARTA_MCR_REGISTER)  ; get the UART A MODEM Control Register
     and ~__IO_UART_MCR_RTS          ; set RTS high
@@ -98,7 +98,7 @@ ENDIF
 
     ld a,(uartbRxCount)         ; get the current Rx count
     sub __IO_UART_RX_FULLISH    ; compare the count with the preferred full size
-    jp C,rxb_check              ; leave the DTR low, and check for Rx/Tx possibility
+    jp C,rxb_check              ; leave the RTS low, and check for Rx/Tx possibility
 
     in a,(__IO_UARTB_MCR_REGISTER)  ; get the UART B MODEM Control Register
     and ~__IO_UART_MCR_RTS          ; set RTS high
