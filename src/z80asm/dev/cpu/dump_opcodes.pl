@@ -53,11 +53,11 @@ sub expand_consts {
 				my @range = @{$opcode->const};
 				for my $c (@range) {
 					my $opcode1 = replace_const($c, $opcode);
-					$opcodes_out->add1($opcode1);
+					$opcodes_out->add($opcode1);
 				}
 			}
 			else {
-				$opcodes_out->add1($opcode);
+				$opcodes_out->add($opcode);
 			}
 		}
 	}

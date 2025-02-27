@@ -844,8 +844,6 @@
  ldsi 127                       ; EB 21 7F 00 39 EB
  ldsi 255                       ; EB 21 FF 00 39 EB
  lhld 0x1234                    ; 2A 34 12
- lhlde                          ; EB 5E 23 56 2B EB
- lhlx                           ; EB 5E 23 56 2B EB
  lxi b, 0x1234                  ; 01 34 12
  lxi bc, 0x1234                 ; 01 34 12
  lxi d, 0x1234                  ; 11 34 12
@@ -1026,7 +1024,7 @@
  r_c                            ; D8
  r_eq                           ; C8
  r_geu                          ; D0
- r_gtu                          ; CA 89 09 D0
+ r_gtu                          ; CA 7D 09 D0
  r_leu                          ; C8 D8
  r_ltu                          ; D8
  r_m                            ; F8
@@ -1048,7 +1046,7 @@
  ret c                          ; D8
  ret eq                         ; C8
  ret geu                        ; D0
- ret gtu                        ; CA A5 09 D0
+ ret gtu                        ; CA 99 09 D0
  ret leu                        ; C8 D8
  ret ltu                        ; D8
  ret m                          ; F8
@@ -1062,7 +1060,7 @@
  ret v                          ; E8
  ret z                          ; C8
  rgeu                           ; D0
- rgtu                           ; CA B7 09 D0
+ rgtu                           ; CA AB 09 D0
  rl bc                          ; CD @__z80asm__rl_bc
  rl de                          ; CD @__z80asm__rl_de
  rl hl                          ; CD @__z80asm__rl_hl
@@ -1156,8 +1154,6 @@
  sbi 255                        ; DE FF
  scf                            ; 37
  shld 0x1234                    ; 22 34 12
- shlde                          ; EB 73 23 72 2B EB
- shlx                           ; EB 73 23 72 2B EB
  sphl                           ; F9
  sra bc                         ; CD @__z80asm__sra_bc
  sra de                         ; CD @__z80asm__sra_de

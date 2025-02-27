@@ -180,7 +180,7 @@ sub new {
 	return $self;
 }
 
-sub add1 {
+sub add {
 	my($self, $opcode) = @_;
 	my $asm = $opcode->asm;
 	my $cpu = $opcode->cpu;
@@ -192,76 +192,9 @@ sub add1 {
 	}
 	
 	$self->opcodes->{$asm}{$cpu} = $opcode;
-}
-
-sub _is_post_increment {
-	my($asm) = @_;
-	if ($asm =~ /\((bc|de|hl)\)/) {		# (bc), (de), (hl)
-		my $rp = $1;
-		if ($asm =~ /altd|ioe|ioi|
-				 	 call|jp|jmp|ldi|ldd|
-				 	 ld\s\w\w+'?,\s\(\w\w+\)|
-				 	 ld\s\(\w\w+\),\s\w\w+/x) {	# exceptions
-			return 0;
-		}
-		else {
-			return $rp;
-		}
-	}
-	else {
-		return 0;
-	}
-}
-
-sub add {
-	my($self, $opcode) = @_;
-	my $asm = $opcode->asm;
-	my $cpu = $opcode->cpu;
-
-	$self->add1($opcode);
-
-	# add post-increment/decrement sythetic opcodes
-	if (my $rp = _is_post_increment($asm)) {
-		for (['inc', '+', 'i'], ['dec', '-', 'd']) {
-			my($action, $operator, $suffix) = @$_;
-			my $action_opcode = $self->opcodes->{"$action $rp"}{$cpu};
-			if (!$action_opcode) {
-				warn "opcode not found: $cpu; $asm; $action $rp" if $ENV{DEBUG};
-			}
-			else {
-				# (bc+)
-				(my $new_asm = $asm) =~ s/\($rp\)/($rp$operator)/;
-				my @subops = @{$opcode->ops};
-				my @action_ops = @{$action_opcode->ops};
-
-				my $new_opcode = Opcode->new(asm=>$new_asm, cpu=>$cpu, 
-											 const=>clone($opcode->const),
-											 ops=>[@subops, @action_ops],
-											 synth=>1);
-				$self->add1($new_opcode);
-
-				# (hli)
-				if ($rp eq 'hl') {
-					($new_asm = $asm) =~ s/\($rp\)/($rp$suffix)/;
-
-					my $new_opcode = Opcode->new(asm=>$new_asm, cpu=>$cpu, 
-												const=>clone($opcode->const),
-												ops=>[@subops, @action_ops],
-												synth=>1);
-					$self->add1($new_opcode);
-				}
-
-				# ldi
-				if (($new_asm = $asm) =~ s/^ld\s/ld$suffix /) {
-					$new_opcode = Opcode->new(asm=>$new_asm, cpu=>$cpu, 
-											  const=>clone($opcode->const),
-											  ops=>[@subops, @action_ops],
-											  synth=>1);
-					$self->add1($new_opcode);
-				}
-			}
-		}
-	}
+	
+	#use Carp 'longmess';
+	#warn "$cpu\t$asm\n".longmess() if $asm eq "ld (ix), bc";
 }
 
 sub copy_cpu {
@@ -273,24 +206,21 @@ sub copy_cpu {
 			$opcode->{cpu} = $new_cpu;
 
 			if ($filter->($opcode)) {
-				$self->add1($opcode);
+				$self->add($opcode);
 			}
 		}
 	}
 }
 
-sub add_synth1 {
+sub add_synth {
 	my($self, $cpu, $asm, @subasm) = @_;
 	
 	if ($self->exists($asm, $cpu)) {
 		return;
 	}
 
-	if ($cpu =~ /_strict/) {
-		return;
-	}
-
 	my @subops;
+	my @const;
 	for my $subasm (@subasm) {
 		# replace 0:%s/0:$u by %m
 		my $extend;
@@ -311,6 +241,18 @@ sub add_synth1 {
 		my $dis_plus_1;
 		if ($subasm =~ s/(%D)/%d/) {
 			$dis_plus_1 = $1;
+		}
+		
+		# replace +00 by +%d
+		my $plus_zero;
+		if ($subasm =~ s/\+00\b/=%d/) {
+			$plus_zero = '%d';
+		}
+		
+		# replace +01 by +%D
+		my $plus_one;
+		if ($subasm =~ s/\+01\b/=%D/) {
+			$plus_zero = '%D';
 		}
 		
 		# replace 00/0000 by %n/%m
@@ -346,6 +288,11 @@ sub add_synth1 {
 			warn "opcode not found: $cpu; $asm; $subasm" if $ENV{DEBUG};
 			return;
 		}
+
+		# get consts
+		if (@{$subopcode->const}) {
+			@const = @{clone $subopcode->const};
+		}
 		
 		# remap bytes
 		for my $op (@{$subopcode->ops}) {
@@ -357,10 +304,12 @@ sub add_synth1 {
 				while ($i < @bytes && $bytes[$i] ne '%m') {
 					$i++;
 				}
-				$i < @bytes or die;
-				$bytes[$i++] = $extend;
-				while ($i < @bytes) {
-					$bytes[$i++] = 0;
+				if ($i < @bytes) {
+					$bytes[$i++] = $extend;
+					while ($i < @bytes) {
+						$bytes[$i++] = 0;
+					}
+					$extend = 0;
 				}
 			}
 
@@ -370,28 +319,60 @@ sub add_synth1 {
 				while ($i < @bytes && $bytes[$i] !~ /%[jm]/) {
 					$i++;
 				}
-				$i < @bytes or die;
-				while ($i < @bytes) {
-					$bytes[$i++] = $temp_label;
+				if ($i < @bytes) {
+					while ($i < @bytes) {
+						$bytes[$i++] = $temp_label;
+					}
+					$temp_label = 0;
 				}
 			}
 			
 			# replace %d by %D
 			if ($dis_plus_1) {
+				my $count = 0;
 				for (@bytes) {
-					s/%d/$dis_plus_1/;
+					$count += s/%d/$dis_plus_1/;
+				}
+				if ($count) {
+					$dis_plus_1 = 0;
 				}
 			}
 
+			# replace %d by 0
+			if ($plus_zero) {
+				my $i = 0;
+				while ($i < @bytes && $bytes[$i] !~ /%[d]/) {
+					$i++;
+				}
+				if ($i < @bytes) {
+					$bytes[$i++] = 0;
+					$plus_zero = 0;
+				}
+			}
+			
+			# replace %d by 1
+			if ($plus_one) {
+				my $i = 0;
+				while ($i < @bytes && $bytes[$i] !~ /%[d]/) {
+					$i++;
+				}
+				if ($i < @bytes) {
+					$bytes[$i++] = 1;
+					$plus_one = 0;
+				}
+			}
+			
 			# replace %n/%m by zero
 			if ($zero) {
 				my $i = 0;
 				while ($i < @bytes && $bytes[$i] !~ /%[mn]/) {
 					$i++;
 				}
-				$i < @bytes or die;
-				while ($i < @bytes) {
-					$bytes[$i++] = 0;
+				if ($i < @bytes) {
+					while ($i < @bytes) {
+						$bytes[$i++] = 0;
+					}
+					$zero = 0;
 				}
 			}
 			
@@ -401,10 +382,12 @@ sub add_synth1 {
 				while ($i < @bytes && $bytes[$i] !~ /%[mn]/) {
 					$i++;
 				}
-				$i < @bytes or die;
-				$bytes[$i++] = 1;
-				while ($i < @bytes) {
-					$bytes[$i++] = 0;
+				if ($i < @bytes) {
+					$bytes[$i++] = 1;
+					while ($i < @bytes) {
+						$bytes[$i++] = 0;
+					}
+					$one = 0;
 				}
 			}
 
@@ -414,51 +397,25 @@ sub add_synth1 {
 				while ($i < @bytes && $bytes[$i] !~ /%[mn]/) {
 					$i++;
 				}
-				$i < @bytes or die;
-				$bytes[$i++] = 2;
-				while ($i < @bytes) {
-					$bytes[$i++] = 0;
+				if ($i < @bytes) {
+					$bytes[$i++] = 2;
+					while ($i < @bytes) {
+						$bytes[$i++] = 0;
+					}
+					$two = 0;
 				}
 			}
-			#say "$asm - $subasm - @bytes";
 			
 			push @subops, \@bytes;
 		}
 	}
 
-	my $opcode = Opcode->new(asm=>$asm, cpu=>$cpu, synth=>1, ops=>\@subops);
+	my $opcode = Opcode->new(asm=>$asm, cpu=>$cpu, const=>\@const, synth=>1, ops=>\@subops);
 	$self->add($opcode);
-}
-
-sub add_synth {
-	my($self, $cpu, $asm, @subasm) = @_;
-	
-	if ($self->exists($asm, $cpu)) {
-		return;
-	}
-
-	if ($cpu =~ /_strict/) {
-		return;
-	}
-
-	$self->add_synth1($cpu, $asm, @subasm);
-
-	# add post-increment/decrement sythetic opcodes
-	if (my $rp = _is_post_increment($asm)) {
-		for (['inc', '+'], ['dec', '-']) {
-			my($action, $operator) = @$_;
-			(my $post_asm = $asm) =~ s/\($rp\)/($rp$operator)/;
-			$self->add_synth1($cpu, $post_asm, [@subasm, "$action $rp"]);
-		}
-	}
 }
 
 sub add_emul {
 	my($self, $cpu, $asm, $func, @args) = @_;
-
-	if ($cpu =~ /_strict/) {
-		return;
-	}
 
 	if (!$self->exists($asm, $cpu)) {
 		if (@args) {
@@ -483,7 +440,7 @@ sub exists {
 	else {
 		return 0;
 	}
-}	
+}
 
 # input/output to data file
 sub to_file {
@@ -509,7 +466,7 @@ sub from_file {
 	
 	while (<$fh>) {
 		my $opcode = Opcode->from_string($_);
-		$self->add1($opcode);
+		$self->add($opcode);
 	}
 	return $self;
 }
