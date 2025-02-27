@@ -3997,49 +3997,28 @@
  rrhl                           ; CB 2C CB 1D
  rsmix                          ; ED 7E
  rst 0                          ; C7
- rst 1                          ; CF
  rst 16                         ; D7
- rst 2                          ; D7
  rst 24                         ; DF
- rst 3                          ; DF
  rst 32                         ; E7
- rst 4                          ; E7
  rst 40                         ; EF
  rst 48                         ; F7
- rst 5                          ; EF
  rst 56                         ; FF
- rst 6                          ; F7
- rst 7                          ; FF
  rst 8                          ; CF
  rst.s 0                        ; 52 C7
- rst.s 1                        ; 52 CF
  rst.s 16                       ; 52 D7
- rst.s 2                        ; 52 D7
  rst.s 24                       ; 52 DF
- rst.s 3                        ; 52 DF
  rst.s 32                       ; 52 E7
- rst.s 4                        ; 52 E7
  rst.s 40                       ; 52 EF
  rst.s 48                       ; 52 F7
- rst.s 5                        ; 52 EF
  rst.s 56                       ; 52 FF
- rst.s 6                        ; 52 F7
- rst.s 7                        ; 52 FF
  rst.s 8                        ; 52 CF
  rst.sil 0                      ; 52 C7
- rst.sil 1                      ; 52 CF
  rst.sil 16                     ; 52 D7
- rst.sil 2                      ; 52 D7
  rst.sil 24                     ; 52 DF
- rst.sil 3                      ; 52 DF
  rst.sil 32                     ; 52 E7
- rst.sil 4                      ; 52 E7
  rst.sil 40                     ; 52 EF
  rst.sil 48                     ; 52 F7
- rst.sil 5                      ; 52 EF
  rst.sil 56                     ; 52 FF
- rst.sil 6                      ; 52 F7
- rst.sil 7                      ; 52 FF
  rst.sil 8                      ; 52 CF
  rv                             ; E8
  rz                             ; C8

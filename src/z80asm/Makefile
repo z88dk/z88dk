@@ -183,7 +183,8 @@ $(TARGET_EXE): src/c/cpu_rules.h src/c/cpu_rules_action.c src/c/cpu_rules_action
 
 ifeq ($(DEVELOPER),1)
 src/c/cpu_rules.h src/c/cpu_rules_action.c src/c/cpu_rules_action.h: \
-			$(wildcard dev/cpu/*.pl dev/cpu/*.y) dev/cpu/Makefile Makefile
+			$(wildcard dev/cpu/*.pl dev/cpu/*.pm dev/cpu/*.dat) \
+			dev/cpu/Makefile Makefile
 	$(MAKE) -C dev/cpu
 	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
 	cp dev/cpu/cpu_rules_action.c src/c/cpu_rules_action.c

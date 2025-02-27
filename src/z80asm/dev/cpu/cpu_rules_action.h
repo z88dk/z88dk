@@ -35,6 +35,7 @@
 #define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
 #define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
 #define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
+#define DO_stmt_n_0_0(	opcode)		_DO_stmt_(n_0_0,	opcode)
 #define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
 #define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
 
