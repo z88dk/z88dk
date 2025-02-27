@@ -65,7 +65,7 @@ loop:
 		ld		a, b
 		or		c
 		jr 		nz, loop
-		jp 0
+		jp 		0
 END
 
 path("$test-new.asm")->spew(<<'END');
@@ -85,7 +85,7 @@ loop:
 		dec 	c       
 		jr 		nz,loop 
 		djnz    loop 
-		jp 0
+		jp 		0
 END
 
 my %data;
