@@ -7,25 +7,33 @@
 #	%n	unsigned byte
 #   %h  high page offset
 #	%m	unsigned word - 16, 24 or 32 bits
+#	%m1	%m+1
 #	%M	unsigned word, big-endian
 #	%j	jr offset
+#	%J	jre offset
 #	%c	constant (im, bit, rst, ...)
 #	%d	signed register indirect offset
-#	%D	%d+1
+#	%D	%d+1						TODO: should be %d1 for consistency
 #	%u	unsigned register indirect offset
 #	%t	temp jump label to end of statement; %t3 to end of statement - 3
 #------------------------------------------------------------------------------
 
 use Modern::Perl;
-use YAML::Tiny;
+BEGIN { 
+	use Path::Tiny;
+	use lib path($0)->dirname;
+	use Opcodes;
+}
 use Clone 'clone';
-use warnings FATAL => 'uninitialized'; 
 use Carp (); 
 $SIG{__DIE__} = \&Carp::confess;
+use warnings FATAL => 'uninitialized'; 
 use Data::Dump 'dump';
 
-@ARGV==1 or die "Usage: $0 output_file.yaml\n";
+@ARGV==1 or die "Usage: $0 output_file.dat\n";
 my $output_file = shift;
+
+my $opcodes = Opcodes->new;
 
 my @CPUS = qw( z80 z80_strict z80n z180 
 			   ez80 ez80_z80 
@@ -35,9 +43,6 @@ my @CPUS = qw( z80 z80_strict z80n z180
 			   gbz80 
 			   kc160 kc160_z80
 );
-
-# %opcodes: $opcodes{$asm}{$cpu} = [[@bin],[@bin]]
-my %opcodes;
 
 # operand values
 my %V = (
@@ -364,6 +369,7 @@ for my $cpu (@CPUS) {
 		
 		for my $a_ ('a, ', '') {
 			add_x($cpu, "$op $a_%n", 	[alu_n($op), '%n']);
+			
 			if ($r4k || $r5k) {
 				add_x($cpu, "$op $a_(hl+)",	[0x7F, alu_r($op, '(hl)')], [inc_dd('hl')]);
 				add_x($cpu, "$op $a_(hl-)",	[0x7F, alu_r($op, '(hl)')], [dec_dd('hl')]);
@@ -378,10 +384,12 @@ for my $cpu (@CPUS) {
 	for my $op (qw( add adc sub sbb ana xra ora cmp )) {
 		for my $r (qw( b c d e h l m a )) {
 			if ($r4k || $r5k) {
-				add($cpu, "$op $r", [0x7F, alu_r($op, $r)]) unless $opcodes{"$op $r"}{$cpu};
+				add($cpu, "$op $r", [0x7F, alu_r($op, $r)]) 
+					unless $opcodes->exists($cpu, "$op $r");
 			}
 			else {
-				add($cpu, "$op $r", [alu_r($op, $r)]) unless $opcodes{"$op $r"}{$cpu};
+				add($cpu, "$op $r", [alu_r($op, $r)]) 
+					unless $opcodes->exists($cpu, "$op $r");
 			}
 		}
 	}
@@ -2186,7 +2194,7 @@ for my $cpu (@CPUS) {
 
 			for my $r (qw( b c d e h l (hl) a )) {
 				add_x($cpu, "$op $r", [0xCB, 8*$V{$op}+$V{$r}]) 
-					unless $opcodes{"$op $r"}{$cpu};
+					unless $opcodes->exists($cpu, "$op $r");
 				
 				# (ix+d) -> r
 				if (($z80 || $z80n) && $r ne '(hl)') {
@@ -3006,7 +3014,22 @@ for my $cpu (@CPUS) {
 	}
 	
 	# RST
-	add_suf($cpu, "rst %c", ["0xC7+%c"]);
+#	if ($rabbit) {
+#		add_suf($cpu, "rst %c",
+#			["0xC7+(%c(2,0x10,3,0x18,4,0x20,5,0x28,7,0x38)<8?%c*8:%c)"]);
+#	}
+#	else {
+#		add_suf($cpu, "rst %c",
+#			["0xC7+(%c(0,1,8,2,0x10,3,0x18,4,0x20,5,0x28,6,0x30,7,0x38)<8?%c*8:%c)"]);
+#	}
+	if ($rabbit) {
+		add_suf($cpu, "rst %c",
+			["0xC7+(%c(0x10,0x18,0x20,0x28,0x38)<8?%c*8:%c)"]);
+	}
+	else {
+		add_suf($cpu, "rst %c",
+			["0xC7+(%c(0,8,0x10,0x18,0x20,0x28,0x30,0x38)<8?%c*8:%c)"]);
+	}
 	
 	# RET
 	add($cpu, "ret", [ret()]);
@@ -3963,8 +3986,7 @@ for my $cpu (@CPUS) {
 #------------------------------------------------------------------------------
 # write file
 #------------------------------------------------------------------------------
-my $yaml = YAML::Tiny->new(\%opcodes);
-$yaml->write($output_file);
+$opcodes->to_file($output_file);
 
 #------------------------------------------------------------------------------
 # opcodes
@@ -4020,10 +4042,14 @@ sub add {
 		}
 	}
 
-	if (defined($opcodes{$asm}{$cpu})) {
-		die "$asm $cpu exists:\n", dump($opcodes{$asm}{$cpu});
+	# add constants
+	my @const;
+	if ($asm =~ /%c/) {
+		@ops = @{clone \@ops };		# make a deep copy
+		@const = find_range($cpu, $asm, \@ops);
 	}
-	$opcodes{$asm}{$cpu} = \@ops;
+	$opcodes->add(Opcode->new(asm => $asm, cpu => $cpu,
+							  const => \@const, ops => \@ops));
 }
 
 sub add_x {
@@ -4164,3 +4190,21 @@ sub add_suf {
 		}
 	}
 }
+
+sub find_range {
+	my($cpu, $asm, $ops) = @_;
+	
+	for my $op (@$ops) {
+		for my $byte (@$op) {
+			if ($byte =~ s/ %c \( ([x0-9a-f]+) \.\. ([x0-9a-f]+) \) /%c/xi) {
+				return ($1 .. $2);
+			}
+			elsif ($byte =~ s/ %c \( ( [x0-9a-f]+ (, [x0-9a-f]+)* ) \) /%c/xi) {
+				return (eval $1);
+			}
+		}
+	}
+	
+	die "no range found in $asm, $cpu";
+}
+

@@ -896,6 +896,7 @@ END
 		for my $cpu (@::CPUS) {
 			SKIP: {
 				skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+				skip "$cpu not supported" if $cpu =~ /_strict/;
 				
 				for my $opts (@opts) {
 					# run ticks

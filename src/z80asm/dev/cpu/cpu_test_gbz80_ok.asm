@@ -694,14 +694,14 @@
  ldd h, (hl)                    ; 66 2B
  ldd l, (hl)                    ; 6E 2B
  lddr                           ; CD @__z80asm__lddr
- ldh ( c ), a                   ; E2
  ldh (0), a                     ; E0 00
  ldh (127), a                   ; E0 7F
  ldh (255), a                   ; E0 FF
- ldh a, ( c )                   ; F2
+ ldh (c), a                     ; E2
  ldh a, (0)                     ; F0 00
  ldh a, (127)                   ; F0 7F
  ldh a, (255)                   ; F0 FF
+ ldh a, (c)                     ; F2
  ldhi -128                      ; E5 11 80 00 19 E5 D5 E1 D1 E1
  ldhi 0                         ; E5 11 00 00 19 E5 D5 E1 D1 E1
  ldhi 127                       ; E5 11 7F 00 19 E5 D5 E1 D1 E1
@@ -1057,19 +1057,12 @@
  rrd                            ; CD @__z80asm__rrd
  rrhl                           ; CB 2C CB 1D
  rst 0                          ; C7
- rst 1                          ; CF
  rst 16                         ; D7
- rst 2                          ; D7
  rst 24                         ; DF
- rst 3                          ; DF
  rst 32                         ; E7
- rst 4                          ; E7
  rst 40                         ; EF
  rst 48                         ; F7
- rst 5                          ; EF
  rst 56                         ; FF
- rst 6                          ; F7
- rst 7                          ; FF
  rst 8                          ; CF
  rz                             ; C8
  sbb a                          ; 9F

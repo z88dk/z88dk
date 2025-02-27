@@ -7,12 +7,12 @@ use Modern::Perl;
 # test error
 z80asm_nok("-mcc", "", "", <<END);
 error: illegal -m option: cc
-error: list of available CPUs: 8080,8085,ez80,ez80_z80,gbz80,kc160,kc160_z80,r2ka,r3k,r4k,r5k,r800,z180,z80,z80_strict,z80n
+error: list of available CPUs: 8080,8080_strict,8085,8085_strict,ez80,ez80_z80,gbz80,kc160,kc160_z80,r2ka,r3k,r4k,r5k,r800,z180,z80,z80_strict,z80n
 END
 
 z80asm_nok("-m=cc", "", "", <<END);
 error: illegal -m option: cc
-error: list of available CPUs: 8080,8085,ez80,ez80_z80,gbz80,kc160,kc160_z80,r2ka,r3k,r4k,r5k,r800,z180,z80,z80_strict,z80n
+error: list of available CPUs: 8080,8080_strict,8085,8085_strict,ez80,ez80_z80,gbz80,kc160,kc160_z80,r2ka,r3k,r4k,r5k,r800,z180,z80,z80_strict,z80n
 END
 
 # Test cpu opcode files created by ../dev/cpu/cpu.pl
@@ -105,7 +105,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 			run_ok("z88dk-dis -m$dis_cpu $file_bin > $test.asm");
 
 			# assemble
-			run_ok("z88dk-z80asm -m$cpu -b -l $test.asm 2> $test.err");
+			run_ok("z88dk-z80asm -m$dis_cpu -b -l $test.asm 2> $test.err");
 			is slurp("$test.err"), "", "check errors";
 			
 			# compare
