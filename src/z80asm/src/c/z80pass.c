@@ -131,6 +131,15 @@ void Z80pass2(int start_errors, const char* obj_filename)
 				patch_byte(expr->code_pos + 1, 0);
 				break;
 
+            case RANGE_BYTE_TO_PTR_UNSIGNED:
+                if (value < 0 || value > 255)
+                    warning_hex2(ErrIntRange, value);
+
+                patch_byte(expr->code_pos, (byte_t)value);
+                patch_byte(expr->code_pos + 1, 0);
+                patch_byte(expr->code_pos + 2, 0);
+                break;
+
 			case RANGE_BYTE_TO_WORD_SIGNED:
 				if (value < -128 || value > 127)
                     warning_hex2(ErrIntRange, value);
@@ -138,6 +147,15 @@ void Z80pass2(int start_errors, const char* obj_filename)
 				patch_byte(expr->code_pos, (byte_t)value);
 				patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
 				break;
+
+            case RANGE_BYTE_TO_PTR_SIGNED:
+                if (value < -128 || value > 127)
+                    warning_hex2(ErrIntRange, value);
+
+                patch_byte(expr->code_pos, (byte_t)value);
+                patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
+                patch_byte(expr->code_pos + 2, value < 0 || value > 127 ? 0xff : 0);
+                break;
 
 			case RANGE_PTR24:
 				patch_byte(expr->code_pos + 0, (byte_t)((value >> 0) & 0xff));

@@ -31,6 +31,8 @@ typedef enum {
     CPU_R5K         = 14,
     CPU_KC160       = 15,
     CPU_KC160_Z80   = 16,
+    CPU_8080_STRICT	= 17,
+    CPU_8085_STRICT	= 18,
 
     CPU_UNDEF       = -1,
 } cpu_t;
@@ -114,7 +116,7 @@ extern bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixi
 #define Z80_JR_FLAG(flag)   (0x20 + ((flag) << 3))
 #define Z80_JP_FLAG(flag)   (0xC2 + ((flag) << 3))
 #define Z80_CALL_FLAG(flag) (0xC4 + ((flag) << 3))
-#define Z80_RST(addr)       (0xC7 + (addr))
+#define Z80_RST(addr)       (0xC7 + ((addr) < 8 ? (addr) * 8 : (addr)))
 
 #define Z80_DEC(reg)        (0x05 + ((reg) << 3))
 #define Z80_INC(reg)        (0x04 + ((reg) << 3))
@@ -183,6 +185,8 @@ typedef enum {
     RANGE_HIGH_OFFSET           = 10,   // "H"  // byte offset to 0xFF00
     RANGE_ASSIGNMENT            = 11,   // "="  // DEFC expression assigning a symbol
     RANGE_JRE_OFFSET            = 12,   // "j"  // 16-bit relative offset for JRE
+    RANGE_BYTE_TO_PTR_UNSIGNED  = 13,   // "v"  // unsigned byte extended to 24 bits
+    RANGE_BYTE_TO_PTR_SIGNED    = 14,   // "t"  // signed byte sign-extended to 24 bits
 } range_t;
 
 // size of each range in object file
