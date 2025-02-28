@@ -115,10 +115,11 @@ sub add {
 			
 			# rabit lacks these restarts
 			if ($cpu =~ /^r2ka|^r3k|^r4k|^r5k/ && ($c==0 || $c==8 || $c==0x30)) {	
-				$bytes1 = sprintf("CD %02X 00", $c);
+				# Rabbits lack these restarts
 			}
-			
-			add($cpu, $asm1, $bytes1);
+			else {
+				add($cpu, $asm1, $bytes1);
+			}
 		}
 		
 		# create error cases

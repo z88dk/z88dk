@@ -13002,6 +13002,8 @@
  rrd (zhl)                      ; Error
  rsmix                          ; Error
  rst -1                         ; Error
+ rst 0                          ; Error
+ rst 1                          ; Error
  rst 10                         ; Error
  rst 11                         ; Error
  rst 12                         ; Error
@@ -13036,6 +13038,7 @@
  rst 45                         ; Error
  rst 46                         ; Error
  rst 47                         ; Error
+ rst 48                         ; Error
  rst 49                         ; Error
  rst 50                         ; Error
  rst 51                         ; Error
@@ -13046,11 +13049,13 @@
  rst 57                         ; Error
  rst 58                         ; Error
  rst 59                         ; Error
+ rst 6                          ; Error
  rst 60                         ; Error
  rst 61                         ; Error
  rst 62                         ; Error
  rst 63                         ; Error
  rst 64                         ; Error
+ rst 8                          ; Error
  rst 9                          ; Error
  rst v, 63                      ; Error
  rst v, 64                      ; Error

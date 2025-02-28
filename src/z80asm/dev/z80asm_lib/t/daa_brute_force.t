@@ -60,7 +60,7 @@ for my $cpu (@CPUS) {
 			}
 		}
 
-		push @asm, "rst 0";
+		push @asm, "jp 0";
 		my $r = ticks(join("\n", @asm), "-m$cpu");
 		my $data = 0;
 		for (@in) {
