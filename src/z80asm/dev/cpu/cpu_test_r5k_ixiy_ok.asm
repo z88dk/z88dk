@@ -9344,8 +9344,6 @@
  rrca'                          ; 76 0F
  rrd                            ; CD @__z80asm__rrd
  rrhl                           ; CB 2C CB 1D
- rst 0                          ; CD 00 00
- rst 1                          ; CD 08 00
  rst 16                         ; D7
  rst 2                          ; D7
  rst 24                         ; DF
@@ -9353,12 +9351,9 @@
  rst 32                         ; E7
  rst 4                          ; E7
  rst 40                         ; EF
- rst 48                         ; CD 30 00
  rst 5                          ; EF
  rst 56                         ; FF
- rst 6                          ; CD 30 00
  rst 7                          ; FF
- rst 8                          ; CD 08 00
  rz                             ; C8
  sbb a                          ; 7F 9F
  sbb b                          ; 7F 98
