@@ -289,13 +289,14 @@ void add_rst_opcode(int arg) {
     case 0x00: case 0x08: case 0x30:
         if (option_cpu() == CPU_R2KA || option_cpu() == CPU_R3K ||
             option_cpu() == CPU_R4K || option_cpu() == CPU_R5K)
-            add_opcode(0xCD0000 + (arg << 8));
+            error_hex2(ErrIntRange, arg);
         else
             add_opcode(0xC7 + arg);
         break;
     case 0x10: case 0x18: case 0x20: case 0x28: case 0x38:
         add_opcode(0xC7 + arg); break;
-    default: error_hex2(ErrIntRange, arg);
+    default:
+        error_hex2(ErrIntRange, arg);
     }
 }
 
