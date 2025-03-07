@@ -24,8 +24,9 @@ plotpixel:
     in      a, (c)                   ; read data
     or      d
     call    setx                     ; to prevent automatic increment of lcd driver
+    exx
     out     (c), a                   ; write data
-	
+
     pop     hl
     pop     bc
     pop     af
