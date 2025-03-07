@@ -60,11 +60,13 @@ rbytes:
 
 
 rloop:
+    push    bc
     call    sety
     call    setx
-    in      a, (0x41)                   ;dummy read
-    in      a, (0x41)                   ;read data
+    in      a, (c)                   ;dummy read
+    in      a, (c)                   ;read data
     ld      (ix+4), a
+    pop     bc
 
     ld      a, 8
     add     l
