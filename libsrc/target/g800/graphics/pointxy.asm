@@ -1,4 +1,5 @@
-    SECTION code_clib
+
+    SECTION code_graphics
 
     PUBLIC  pointxy
 
@@ -15,13 +16,12 @@ pointxy:
     call    getpat
 
     call    setx
-    in      a, (0x41)                   ;dummy read
-    in      a, (0x41)                   ;read data
+    in      a, (c)                   ;dummy read
+    in      a, (c)                   ;read data
 
-    and     b
+    and     d
     pop     bc
 
-      ;cp 0
     ret
 
 
