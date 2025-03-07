@@ -19,9 +19,12 @@ sety:
     and     0x0f
     or      0xb0
     call    out40
+    exx
+    ld      bc,41h                      ; output data port, it must be survive through getpat and setx
+    exx
+    ld      bc,41h                      ; input data port, it must be survive through getpat and setx
     pop     af
 
-    ld      bc,41h                       ; data port, it must be survive through getpat and setx
     ret
 
 ; make pattern
