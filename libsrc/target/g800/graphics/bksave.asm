@@ -55,8 +55,8 @@ bksaves:
     push    bc
 
 rbytes:
-    ld      b, 0                        ; SMC	; Y byte count
-    ld      l, 0                        ; SMC	; Y pos
+    ld      b, 0                        ; SMC - Y byte count
+    ld      l, 0                        ; SMC - Y pos
 
 
 rloop:
