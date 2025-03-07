@@ -1,70 +1,92 @@
-    section code_clib
+    section smc_clib
 
-    public  sety
     public  setx
+    public  sety
     public  getpat
 
 sety:
 ; set y position
-; in:  l = y position
+; in:  h,l = x,y position
     push    af
 
-    ld      a, 0x40                     ; set startline to 0
-    call    out40
+    ld      a, 0xc0                     ; set startline to 0
+    call    out58
+
+    ld      a,h
+    sub     30
+    ld      e,a
+
+    ld      d,0xb8
+    jr      nc,left_half
+
+    ; right half
+    ld      d,0xbc
+    ld      a,30                        ; mirror the x coordinates
+    sub     e
+
+left_half:
+    add     30
+    ld      e,a                         ; save the x coordinates
 
     ld      a, l
     sra     a
     sra     a
     sra     a                           ; a=y/8
     and     0x0f
-    or      0xb0
-    call    out40
+    add     d                           ; left/right half offset
+    ld      (setx_val+1),a
     pop     af
+
+; TODO:  This needs to be fixed!!
+    ld      bc,5Ah                       ; data port, it must be survive through getpat and setx
     ret
+
 
 ; make pattern
 ; in: l = y position
-; out b = pattern
+; out d = pattern
 getpat:
     ld      a, l
     and     0x07                        ;a=y%8
     inc     a
-    ld      b, 0x1
+    ld      d, 0x1
 loop_shift:
     dec     a
     ret     z
-    sla     b
+    sla     d
     jp      loop_shift
+
 
 ; set x position
 setx:
     push    af
 
-      ; lower 4bit of x(h)
-    ld      a, h
-    and     0x0F
-    call    out40
+      ; lower 4bit of x(e)
+setx_val:
+    ld      a, 0
+    call    out58
 
-      ; higher 4bit of x(h)
-    ld      a, h
+      ; higher 4bit of x(e)
+    ld      a, e
     sra     a
     sra     a
     sra     a
     sra     a
     and     0x0f
     or      0x10
-    call    out40
+    call    out58
 
     pop     af
     ret
 
 ; write to lcd driver
-out40:
+out58:
     push    af
-loop40:
-    in      a, (0x40)
+loop59:
+    in      a, (0x59)
     and     0x80
-    jp      nz, loop40
+    jp      nz, loop59
     pop     af
-    out     (0x40), a
+    out     (0x58), a
     ret
+
