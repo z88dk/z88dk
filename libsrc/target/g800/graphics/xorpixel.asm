@@ -24,6 +24,7 @@ xorpixel:
     in      a, (c)                   ; read data
     xor     d
     call    setx                     ; to prevent automatic increment of lcd driver
+    exx
     out     (c), a                   ; write data
 
     pop     hl
