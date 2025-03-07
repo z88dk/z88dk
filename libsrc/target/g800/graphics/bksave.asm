@@ -55,16 +55,18 @@ bksaves:
     push    bc
 
 rbytes:
-    ld      b, 0                        ; SMC	; Y byte count
-    ld      l, 0                        ; SMC	; Y pos
+    ld      b, 0                        ; SMC - Y byte count
+    ld      l, 0                        ; SMC - Y pos
 
 
 rloop:
+    push    bc
     call    sety
     call    setx
-    in      a, (0x41)                   ;dummy read
-    in      a, (0x41)                   ;read data
+    in      a, (c)                   ;dummy read
+    in      a, (c)                   ;read data
     ld      (ix+4), a
+    pop     bc
 
     ld      a, 8
     add     l

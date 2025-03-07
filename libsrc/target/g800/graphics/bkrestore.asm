@@ -53,16 +53,20 @@ bkrestores:
     push    bc
 
 rbytes:
-    ld      b, 0                        ; SMC	; Y byte count
-    ld      l, 0                        ; SMC	; Y pos
+    ld      b, 0                        ; SMC - Y byte count
+    ld      l, 0                        ; SMC - Y pos
 
 
 rloop:
+    push    bc
     call    sety
     call    setx
-;      in a,(0x41) ;dummy read
+    ;in      a, (c)                   ;dummy read
     ld      a, (ix+4)
-    out     (0x41), a                   ;write data  (auto-increment)
+    exx
+    out     (c), a                   ;write data  (auto-increment)
+    exx
+    pop     bc
 
     ld      a, 8
     add     l

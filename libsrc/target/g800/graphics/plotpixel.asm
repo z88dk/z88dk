@@ -19,11 +19,14 @@ plotpixel:
     call    sety
     call    getpat
     call    setx
-    in      a, (0x41)                   ;dummy read
-    in      a, (0x41)                   ;read data
-    or      b
-    call    setx                        ; to prevent automatic increment of lcd driver
-    out     (0x41), a                   ;write data
+
+    in      a, (c)                   ; dummy read
+    in      a, (c)                   ; read data
+    or      d
+    call    setx                     ; to prevent automatic increment of lcd driver
+    exx
+    out     (c), a                   ; write data
+
     pop     hl
     pop     bc
     pop     af
