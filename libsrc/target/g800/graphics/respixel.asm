@@ -6,7 +6,7 @@
     EXTERN  sety
     EXTERN  setx
     EXTERN  getpat
-	
+
     EXTERN  __gfx_coords
 
 ; in: hl=(x,y)
@@ -27,6 +27,7 @@ respixel:
     in      a, (c)                   ;read data
     and     d
     call    setx                     ; to prevent automatic increment of lcd driver
+    exx
     out     (c), a                   ;write data
 	
     pop     hl
