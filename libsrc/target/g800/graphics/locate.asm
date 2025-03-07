@@ -38,7 +38,12 @@ left_half:
     pop     af
 
 ; TODO:  This needs to be fixed!!
-    ld      bc,5Ah                       ; data port, it must be survive through getpat and setx
+    exx
+	ld      bc,56h                       ; output data port, it must be survive through getpat and setx
+    ;ld      bc,5Ah                       ; output data port, it must be survive through getpat and setx
+    exx
+	ld      bc,59h                       ; input data port, it must be survive through getpat and setx
+    ;ld      bc,5Bh                       ; input data port, it must be survive through getpat and setx
     ret
 
 
@@ -87,6 +92,7 @@ loop59:
     and     0x80
     jp      nz, loop59
     pop     af
+    out     (0x54), a
     out     (0x58), a
     ret
 
