@@ -639,7 +639,6 @@
  ld hl, (0x1234)                ; D5 21 34 12 5E 23 56 62 6B D1
  ld hl, (de)                    ; E5 D5 E1 D1 5E 23 56 2B E5 D5 E1 D1
  ld hl, (hl)                    ; F5 7E 23 66 6F F1
- ld hl, (hl+)                   ; F5 7E 23 66 6F F1
  ld hl, 0x1234                  ; 21 34 12
  ld hl, bc                      ; 60 69
  ld hl, de                      ; 62 6B
@@ -736,7 +735,6 @@
  ldi de, (hl)                   ; 5E 23 56 23
  ldi e, (hl)                    ; 5E 23
  ldi h, (hl)                    ; 66 23
- ldi hl, (hl)                   ; F5 7E 23 66 6F F1
  ldi l, (hl)                    ; 6E 23
  ldir                           ; CD @__z80asm__ldir
  ldsi -128                      ; E5 D5 E1 D1 21 80 00 39 E5 D5 E1 D1
