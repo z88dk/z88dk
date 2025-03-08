@@ -9,41 +9,32 @@ sety:
 ; in:  h,l = x,y position
     push    af
 
-    ld      a, 0xc0                     ; set startline to 0
+    ld      a, 0xc0                     ; set scroll startline to 0
     call    out58
 
     ld      a,h
-    sub     30
-    ld      e,a
+    sub     60                          ; check if x is in the left half of the display
 
-    ld      d,0xb8
-    jr      nc,left_half
+    ld      a,0xb8
+	ld		(setx_half+1),a
+    jr      c,left_half
 
     ; right half
-    ld      d,0xbc
-    ld      a,30                        ; mirror the x coordinates
-    sub     e
-
+    ld      a,0xbc
+	ld		(setx_half+1),a
+    ld      a,120                       ; mirror the x coordinates
+    sub     h                           ; adjust x
+	ld      h,a
+	
 left_half:
-    add     30
-    ld      e,a                         ; save the x coordinates
-
-    ld      a, l
-    sra     a
-    sra     a
-    sra     a                           ; a=y/8
-    and     0x0f
-    add     d                           ; left/right half offset
-    ld      (setx_val+1),a
     pop     af
 
-; TODO:  This needs to be fixed!!
+
+; NOTE:  This is valid for the E200/G, NOT for the G815!
     exx
-	ld      bc,56h                       ; output data port, it must be survive through getpat and setx
-    ;ld      bc,5Ah                       ; output data port, it must be survive through getpat and setx
+    ld      bc,5Ah                       ; output data port, it must be survive through getpat and setx
     exx
-	ld      bc,59h                       ; input data port, it must be survive through getpat and setx
-    ;ld      bc,5Bh                       ; input data port, it must be survive through getpat and setx
+    ld      bc,5Bh                       ; input data port, it must be survive through getpat and setx
     ret
 
 
@@ -66,19 +57,18 @@ loop_shift:
 setx:
     push    af
 
-      ; lower 4bit of x(e)
-setx_val:
-    ld      a, 0
+    ld      a, l
+    rra
+    rra
+    rra                           ; a=y/8
+    and     0x0f
+setx_half:
+    add     0
     call    out58
 
       ; higher 4bit of x(e)
-    ld      a, e
-    sra     a
-    sra     a
-    sra     a
-    sra     a
-    and     0x0f
-    or      0x10
+    ld      a, h
+    add     0x40
     call    out58
 
     pop     af
@@ -92,7 +82,8 @@ loop59:
     and     0x80
     jp      nz, loop59
     pop     af
-    out     (0x54), a
+;    out     (0x54), a
+x_port:
     out     (0x58), a
     ret
 

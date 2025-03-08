@@ -13,9 +13,9 @@ sety:
     call    out40
 
     ld      a, l
-    sra     a
-    sra     a
-    sra     a                           ; a=y/8
+    rra
+    rra
+    rra                               ; a=y/8
     and     0x0f
     or      0xb0
     call    out40
@@ -52,10 +52,10 @@ setx:
 
       ; higher 4bit of x(h)
     ld      a, h
-    sra     a
-    sra     a
-    sra     a
-    sra     a
+    rra
+    rra
+    rra
+    rra
     and     0x0f
     or      0x10
     call    out40
