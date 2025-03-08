@@ -18,7 +18,8 @@ __z80asm__sbc_hl_sp:
         ex      de, hl                  ; subtrahed to de
 
         push    af
-        ld      hl, sp+8                ; minuend to hl, compensate for return address, DE and BC in stack
+        ld      hl, 8
+        add     hl, sp                  ; minuend to hl, compensate for return address, DE and BC in stack
         pop     af
 
         ld      a, e

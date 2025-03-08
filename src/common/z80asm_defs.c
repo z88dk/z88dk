@@ -38,8 +38,8 @@ typedef struct {
 //-----------------------------------------------------------------------------
 
 static cpu_lookup_t cpu_lut[] = {
-    { "z80",        CPU_Z80,            CPU_8080,           },  // 1
-    { "z80_strict", CPU_Z80_STRICT,     CPU_Z80,            },  // 2
+    { "z80",        CPU_Z80,            CPU_Z80_STRICT,     },  // 1
+    { "z80_strict", CPU_Z80_STRICT,     CPU_8080,           },  // 2
     { "z180",       CPU_Z180,           CPU_Z80_STRICT,     },  // 3
     { "ez80_z80",   CPU_EZ80_Z80,       CPU_UNDEF,          },  // 4
     { "ez80",       CPU_EZ80,           CPU_UNDEF,          },  // 5
