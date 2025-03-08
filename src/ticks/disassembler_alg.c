@@ -687,7 +687,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         else if ( q == 1 && z == 1 && israbbit6k()) {
                             BUF_PRINTF("%-10s%s", y == 3 ? "mul" : "mulu", "hl,de");
                         } else if ( y == 5 && z == 5 ) {
-                            // 6d page
+                            //0x6d page
                             READ_BYTE(state, b);
 
                             uint8_t x = b >> 6;
@@ -695,6 +695,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             uint8_t z = b & 0x07;
                             uint8_t p = (y & 0x06) >> 1;
                             uint8_t q = y & 0x01;
+
+                           // printf("x=%d y=%d z=%d p=%d q=%d\n",x,y,z,p,q);
 
                             if ( z == 0 && q == 0 ) BUF_PRINTF("%-10s%s,(%s%s)", "ld",r4k_16b_table[x], r4k_ps_table[p], handle_displacement(state, opbuf1,sizeof(opbuf1)));
                             else if ( z == 1 && q == 0 ) BUF_PRINTF("%-10s(%s%s),%s", "ld",r4k_ps_table[p], handle_displacement(state, opbuf1,sizeof(opbuf1)), r4k_16b_table[x]);
@@ -712,6 +714,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             else if ( z == 6 && q == 1 ) BUF_PRINTF("%-10s%s,%s+hl", "ld", r4k_ps_table[x], r4k_ps_table[p]);
                             else if ( x == 1 && y == 5 && z == 5 && q == 1 ) BUF_PRINTF("%-10sl,l","ld");
                             else if ( x == 1 && y == 7 && z == 7 && q == 1 ) BUF_PRINTF("%-10sa,a","ld");
+                            else if ( z == 5 && q == 1 && p < 2 ) BUF_PRINTF("%-10s%s", p ? "sbox" : "inc", r4k_ps_table[x]);
+                            else if ( z == 7 && q == 1 && p < 2 ) BUF_PRINTF("%-10s%s", p ? "ibox" : "dec", r4k_ps_table[x]);
                             else BUF_PRINTF("%-10s","nop");
                         } else BUF_PRINTF("%-10s","nop");
                     } else if ( israbbit() && z == 4 && y == 7 && state->index ) {
@@ -734,7 +738,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             BUF_PRINTF("%-10s","idet");
                         }
                     } else if ( israbbit4k() && z == 7 && y == 7 ) {
-                        // 7f page - moved instructions
+                        // 0x7f page - moved instructions
                         READ_BYTE(state, b);
 
                         uint8_t x = b >> 6;
