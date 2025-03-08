@@ -9,6 +9,7 @@ target/g800/stdio/ansi/f_ansi_dline
 target/g800/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
 target/g800/graphics/locate
+target/g800/graphics/getmaxx_e200
 target/g800/graphics/getmaxy
 target/g800/graphics/clsgraph
 @target/g800/g800_common.lst
