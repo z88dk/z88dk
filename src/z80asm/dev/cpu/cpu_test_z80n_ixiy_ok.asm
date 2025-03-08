@@ -2486,7 +2486,6 @@
  ld hl, (0x1234)                ; 2A 34 12
  ld hl, (de)                    ; EB 5E 23 56 2B EB
  ld hl, (hl)                    ; F5 7E 23 66 6F F1
- ld hl, (hl+)                   ; F5 7E 23 66 6F F1
  ld hl, (ix)                    ; FD 6E 00 FD 66 01
  ld hl, (ix+0)                  ; FD 6E 00 FD 66 01
  ld hl, (ix+126)                ; FD 6E 7E FD 66 7F
@@ -2917,7 +2916,6 @@
  ldi e, (hl)                    ; 5E 23
  ldi h, (de)                    ; EB 56 EB 13
  ldi h, (hl)                    ; 66 23
- ldi hl, (hl)                   ; F5 7E 23 66 6F F1
  ldi ix, (hl)                   ; D5 5E 23 56 23 D5 FD E1 D1
  ldi iy, (hl)                   ; D5 5E 23 56 23 D5 DD E1 D1
  ldi l, (de)                    ; EB 5E EB 13
