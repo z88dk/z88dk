@@ -3568,11 +3568,11 @@
  jmp (zix)                      ; Error
  jmp (ziy)                      ; Error
  jmp gt, 0x1234                 ; Error
- jmp k,0x1234                   ; Error
+ jmp k, 0x1234                  ; Error
  jmp lt, 0x1234                 ; Error
- jmp nk,0x1234                  ; Error
- jmp nx5,0x1234                 ; Error
- jmp x5,0x1234                  ; Error
+ jmp nk, 0x1234                 ; Error
+ jmp nx5, 0x1234                ; Error
+ jmp x5, 0x1234                 ; Error
  jmp.l (hl)                     ; Error
  jmp.l (ix)                     ; Error
  jmp.l (iy)                     ; Error
@@ -3638,11 +3638,11 @@
  jp (zix)                       ; Error
  jp (ziy)                       ; Error
  jp gt, 0x1234                  ; Error
- jp k,0x1234                    ; Error
+ jp k, 0x1234                   ; Error
  jp lt, 0x1234                  ; Error
- jp nk,0x1234                   ; Error
- jp nx5,0x1234                  ; Error
- jp x5,0x1234                   ; Error
+ jp nk, 0x1234                  ; Error
+ jp nx5, 0x1234                 ; Error
+ jp x5, 0x1234                  ; Error
  jp.l (hl)                      ; Error
  jp.l (ix)                      ; Error
  jp.l (iy)                      ; Error
@@ -7108,7 +7108,6 @@
  ld hl, (aiy+0)                 ; Error
  ld hl, (aiy+126)               ; Error
  ld hl, (aiy-128)               ; Error
- ld hl, (hl+)                   ; Error
  ld hl, (pix)                   ; Error
  ld hl, (pix+0)                 ; Error
  ld hl, (pix+126)               ; Error
@@ -8595,7 +8594,6 @@
  ld.l h, (iy+126)               ; Error
  ld.l h, (iy-128)               ; Error
  ld.l hl, (hl)                  ; Error
- ld.l hl, (hl+)                 ; Error
  ld.l hl, (ix)                  ; Error
  ld.l hl, (ix+0)                ; Error
  ld.l hl, (ix+126)              ; Error
@@ -8958,7 +8956,6 @@
  ld.lis h, (iy+126)             ; Error
  ld.lis h, (iy-128)             ; Error
  ld.lis hl, (hl)                ; Error
- ld.lis hl, (hl+)               ; Error
  ld.lis hl, (ix)                ; Error
  ld.lis hl, (ix+0)              ; Error
  ld.lis hl, (ix+126)            ; Error
@@ -9301,7 +9298,6 @@
  ld.s h, (iy+126)               ; Error
  ld.s h, (iy-128)               ; Error
  ld.s hl, (hl)                  ; Error
- ld.s hl, (hl+)                 ; Error
  ld.s hl, (ix)                  ; Error
  ld.s hl, (ix+0)                ; Error
  ld.s hl, (ix+126)              ; Error
@@ -9644,7 +9640,6 @@
  ld.sil h, (iy+126)             ; Error
  ld.sil h, (iy-128)             ; Error
  ld.sil hl, (hl)                ; Error
- ld.sil hl, (hl+)               ; Error
  ld.sil hl, (ix)                ; Error
  ld.sil hl, (ix+0)              ; Error
  ld.sil hl, (ix+126)            ; Error
@@ -9862,7 +9857,6 @@
  ldhl sp, 0                     ; Error
  ldhl sp, 126                   ; Error
  ldi (hl), hl                   ; Error
- ldi hl, (hl)                   ; Error
  ldi xy                         ; Error
  ldi.l                          ; Error
  ldi.l (bc), a                  ; Error
@@ -9893,7 +9887,6 @@
  ldi.l de, (hl)                 ; Error
  ldi.l e, (hl)                  ; Error
  ldi.l h, (hl)                  ; Error
- ldi.l hl, (hl)                 ; Error
  ldi.l ix, (hl)                 ; Error
  ldi.l iy, (hl)                 ; Error
  ldi.l l, (hl)                  ; Error
@@ -9926,7 +9919,6 @@
  ldi.lis de, (hl)               ; Error
  ldi.lis e, (hl)                ; Error
  ldi.lis h, (hl)                ; Error
- ldi.lis hl, (hl)               ; Error
  ldi.lis ix, (hl)               ; Error
  ldi.lis iy, (hl)               ; Error
  ldi.lis l, (hl)                ; Error
@@ -9959,7 +9951,6 @@
  ldi.s de, (hl)                 ; Error
  ldi.s e, (hl)                  ; Error
  ldi.s h, (hl)                  ; Error
- ldi.s hl, (hl)                 ; Error
  ldi.s ix, (hl)                 ; Error
  ldi.s iy, (hl)                 ; Error
  ldi.s l, (hl)                  ; Error
@@ -9992,7 +9983,6 @@
  ldi.sil de, (hl)               ; Error
  ldi.sil e, (hl)                ; Error
  ldi.sil h, (hl)                ; Error
- ldi.sil hl, (hl)               ; Error
  ldi.sil ix, (hl)               ; Error
  ldi.sil iy, (hl)               ; Error
  ldi.sil l, (hl)                ; Error

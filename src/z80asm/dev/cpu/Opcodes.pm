@@ -193,6 +193,7 @@ sub add {
 	
 	$self->opcodes->{$asm}{$cpu} = $opcode;
 	
+	say STDERR "add ", $opcode->cpu, " ", $opcode->asm if $ENV{DEBUG};
 	#use Carp 'longmess';
 	#warn "$cpu\t$asm\n".longmess() if $asm eq "ld (ix), bc";
 }
@@ -206,28 +207,30 @@ sub copy_cpu {
 			$opcode->{cpu} = $new_cpu;
 
 			if ($filter->($opcode)) {
-				$self->add1($opcode);
+				$self->add($opcode);
 			}
 		}
 	}
 }
 
 sub add_synth {
-	my($self, $cpu, $asm, $subasm) = @_;
+	my($self, $cpu, $asm, @asm_statements) = @_;
 	
 	if ($self->exists($cpu, $asm)) {
 		return;
 	}
 
+	say STDERR "try add ", $cpu, " ", $asm if $ENV{DEBUG};
+
 	my @subops;
-	my @subasm = split(/\n/, $subasm);
+	my @subasm = split(/\n| : /, join("\n", @asm_statements));
 	for my $subasm (@subasm) {
 		$subasm =~ s/^\s+//; $subasm =~ s/\s+$//;
 		
 		# get opcode
-		my $subopcode = search_opcode($cpu, $asm);
+		my $subopcode = $self->search_opcode($cpu, $subasm);
 		if (!$subopcode) {
-			warn "opcode not found: $cpu; $asm" if $ENV{DEBUG};
+			say STDERR "opcode not found: $cpu, $asm" if $ENV{DEBUG};
 			return;
 		}
 		
@@ -276,7 +279,7 @@ sub search_opcode {
 	
 	# replace %m/%n
 	for my $wildcard ('%m', '%n') {
-		if (($asm1 = $asm) =~ s/0x([0-9a-f]+)/$wildcard/i) {
+		if (($asm1 = $asm) =~ s/0x([0-9a-fA-F]+)/$wildcard/) {
 			my $value = hex($1);
 			my $opcode = $self->opcodes->{$asm1}{$cpu};
 			if ($opcode) {
@@ -286,7 +289,7 @@ sub search_opcode {
 	}
 
 	# replace 0:%s/0:%u
-	if (($asm1 = $asm) =~ s/0:([su])/%m/i) {
+	if (($asm1 = $asm) =~ s/0:(%[sun])/%m/) {
 		my $wildcard = $1;
 		my $opcode = $self->opcodes->{$asm1}{$cpu};
 		if ($opcode) {
@@ -295,16 +298,29 @@ sub search_opcode {
 	}
 	
 	# replace %tN by %m
-	if (($asm1 = $asm) =~ s/(%t\d)/%m/i) {
-		my $wildcard = $1;
-		my $opcode = $self->opcodes->{$asm1}{$cpu};
-		if ($opcode) {
-			return $self->_replace_opcode_text($opcode, '%m', $wildcard);
+	# Note: jr %j can have %j in bytes, or %m in case of 8080
+	for my $wildcard ('%m', '%j') {
+		if (($asm1 = $asm) =~ s/(%t\d?)/$wildcard/) {
+			my $temp = $1;
+			my $opcode = $self->opcodes->{$asm1}{$cpu};
+			if ($opcode) {
+				my @bytes = $opcode->bytes;
+				my $bytes = "@bytes";
+				if ($bytes =~ /%m/) {
+					return $self->_replace_opcode_text($opcode, '%m', $temp);
+				}
+				elsif ($bytes =~ /%j/) {
+					return $self->_replace_opcode_text($opcode, '%j', $temp);
+				}
+				else {
+					die $opcode->asm," $bytes";
+				}
+			}
 		}
 	}
 	
 	# replace %D by %d
-	if (($asm1 = $asm) =~ s/%D/%d/i) {
+	if (($asm1 = $asm) =~ s/%D/%d/) {
 		my $opcode = $self->opcodes->{$asm1}{$cpu};
 		if ($opcode) {
 			return $self->_replace_opcode_text($opcode, '%d', '%D');
@@ -322,17 +338,19 @@ sub _replace_opcode_nn {
 	my($self, $opcode, $wildcard, $value) = @_;
 	$opcode = clone($opcode); 	# make deep copy
 	for my $op ($opcode->ops) {
-		if ($wildcard) {
-			my $i = 0;
-			while ($i < ${@$op} && $op->[$i] ne $wildcard) {
-				$i++;
-			}
-			if ($i < ${@$op}) {
-				while ($i < ${@$op} && $op->[$i] eq $wildcard) {
-					$op->[$i++] = $value & 0xff;
-					$value >>= 8;
+		for my $bytes (@$op) {
+			if ($wildcard) {
+				my $i = 0;
+				while ($i < @$bytes && $bytes->[$i] ne $wildcard) {
+					$i++;
 				}
-				$wildcard = undef;
+				if ($i < @$bytes) {
+					while ($i < @$bytes && $bytes->[$i] eq $wildcard) {
+						$bytes->[$i++] = $value & 0xff;
+						$value >>= 8;
+					}
+					$wildcard = undef;
+				}
 			}
 		}
 	}
@@ -343,17 +361,19 @@ sub _replace_opcode_su {
 	my($self, $opcode, $wildcard) = @_;
 	$opcode = clone($opcode); 	# make deep copy
 	for my $op ($opcode->ops) {
-		if ($wildcard) {
-			my $i = 0;
-			while ($i < ${@$op} && $op->[$i] ne '%m') {
-				$i++;
-			}
-			if ($i < ${@$op}) {
-				$op->[$i++] = $wildcard;
-				while ($i < ${@$op}) {
-					$op->[$i++] = 0;
+		for my $bytes (@$op) {
+			if ($wildcard) {
+				my $i = 0;
+				while ($i < @$bytes && $bytes->[$i] ne '%m') {
+					$i++;
 				}
-				$wildcard = undef;
+				if ($i < @$bytes) {
+					$bytes->[$i++] = $wildcard;
+					while ($i < @$bytes) {
+						$bytes->[$i++] = 0;
+					}
+					$wildcard = undef;
+				}
 			}
 		}
 	}
@@ -363,17 +383,18 @@ sub _replace_opcode_su {
 sub _replace_opcode_text {
 	my($self, $opcode, $find, $replace) = @_;
 	$opcode = clone($opcode); 	# make deep copy
+	my $found;
 	for my $op ($opcode->ops) {
-		if ($find) {
-			my $i = 0;
-			while ($i < ${@$op} && $op->[$i] ne $find) {
-				$i++;
-			}
-			if ($i < ${@$op}) {
-				while ($i < ${@$op}) {
-					$op->[$i++] = $replace;
+		for my $bytes (@$op) {
+			if (!$found) {
+				my $i = 0;
+				while ($i < @$bytes) {
+					if ($bytes->[$i] eq $find) {
+						$bytes->[$i] = $replace;
+						$found = 1;
+					}
+					$i++;
 				}
-				$find = undef;
 			}
 		}
 	}
