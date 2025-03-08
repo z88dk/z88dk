@@ -1225,6 +1225,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     else if ( q == 1 && z == 1 && y == 3 && israbbit4k()) BUF_PRINTF("%-10s","exp");
                                     else if ( q == 1 && z == 2 && y == 5 && israbbit4k()) BUF_PRINTF("%-10s(hl)","call");
                                     else if ( q == 1 && z == 2 && y == 7 && israbbit4k()) BUF_PRINTF("%-10s(jkhl)","llcall");
+                                    else if ( q == 1 && z == 6 && y == 1 && israbbit6k()) BUF_PRINTF("%-10sjkhl,bcde","adc");
                                     else if ( q == 1 && z == 6 && y == 3 && israbbit6k()) BUF_PRINTF("%-10sjkhl,bcde","sbc");
                                     else if ( q == 1 && z == 6 && y == 5 && israbbit4k()) BUF_PRINTF("%-10sjkhl,bcde","xor");
                                     else if ( q == 1 && z == 6 && y == 7 && israbbit4k()) BUF_PRINTF("%-10shl,(sp+hl)","ld");
