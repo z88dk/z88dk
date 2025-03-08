@@ -13,8 +13,10 @@ __z80asm__ldir:
         inc     b
         inc     c
 loop:
-        ld      a, (hl+)
-        ld      (de+), a
+        ld      a, (hl)
+        inc     hl
+        ld      (de), a
+        inc     de
 
         ; iterate
         dec     c

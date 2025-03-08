@@ -13,8 +13,10 @@ __z80asm__lddr:
         inc     b
         inc     c
 loop:
-        ld      a, (hl-)
-        ld      (de-), a
+        ld      a, (hl)
+        dec     hl
+        ld      (de), a
+        dec     de
 
         ; iterate
         dec     c
