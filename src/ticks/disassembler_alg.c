@@ -714,8 +714,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             else if ( z == 6 && q == 1 ) BUF_PRINTF("%-10s%s,%s+hl", "ld", r4k_ps_table[x], r4k_ps_table[p]);
                             else if ( x == 1 && y == 5 && z == 5 && q == 1 ) BUF_PRINTF("%-10sl,l","ld");
                             else if ( x == 1 && y == 7 && z == 7 && q == 1 ) BUF_PRINTF("%-10sa,a","ld");
-                            else if ( z == 5 && q == 1 && p < 2 ) BUF_PRINTF("%-10s%s", p ? "sbox" : "inc", r4k_ps_table[x]);
-                            else if ( z == 7 && q == 1 && p < 2 ) BUF_PRINTF("%-10s%s", p ? "ibox" : "dec", r4k_ps_table[x]);
+                            else if ( z == 5 && q == 1 && p < 2 && israbbit6k() ) BUF_PRINTF("%-10s%s", p ? "sbox" : "inc", r4k_ps_table[x]);
+                            else if ( z == 7 && q == 1 && p < 2 && israbbit6k() ) BUF_PRINTF("%-10s%s", p ? "ibox" : "dec", r4k_ps_table[x]);
                             else BUF_PRINTF("%-10s","nop");
                         } else BUF_PRINTF("%-10s","nop");
                     } else if ( israbbit() && z == 4 && y == 7 && state->index ) {
