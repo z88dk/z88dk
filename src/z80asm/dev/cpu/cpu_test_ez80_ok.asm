@@ -4409,7 +4409,6 @@
  set.sil 7, (iy+0)              ; 52 FD CB 00 FE
  set.sil 7, (iy+126)            ; 52 FD CB 7E FE
  set.sil 7, (iy-128)            ; 52 FD CB 80 FE
- shld 0x123456                  ; 22 56 34 12
  shlde                          ; EB 73 23 72 2B EB
  shlx                           ; EB 73 23 72 2B EB
  sla (hl)                       ; CB 26

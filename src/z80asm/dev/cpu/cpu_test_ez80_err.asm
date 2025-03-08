@@ -18128,6 +18128,7 @@
  setsysp 0x1234                 ; Error
  setusr                         ; Error
  setusrp 0x1234                 ; Error
+ shld 0x1234                    ; Error
  sim                            ; Error
  sla (ahl)                      ; Error
  sla (aix)                      ; Error

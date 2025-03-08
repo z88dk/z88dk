@@ -13,6 +13,7 @@ use Modern::Perl;
 for my $cpu (@CPUS) {
 	SKIP: {
 		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+		skip "$cpu does not have clr" if $cpu =~ /^z80_strict/;
 
 		for my $dd (qw( B  C  D  E  H  L  BC  DE  HL  IX IY 
 						B_ C_ D_ E_ H_ L_ BC_ DE_ HL_       )) {
