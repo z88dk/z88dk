@@ -19,6 +19,8 @@ static char *r4k_cc_table[] = { "gt", "gtu", "lt", "v" };
 static char *r4k_ps_table[] = { "pw", "px", "py", "pz" };
 static char *r4k_32b_table[] = { "bcde", "jkhl" };
 static char *r4k_16b_table[] = { "bc", "de", "ix", "iy" }; // Used for 6d page
+static char *r4k_rp2_table[] = { "bc", "de", "hl", "jk"};
+
 
 static char *kc160_p_table[] = {  "a", "xp", "yp", "zp" };
 
@@ -488,7 +490,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
             uint8_t z = b & 0x07;
             uint8_t p = (y & 0x06) >> 1;
             uint8_t q = y & 0x01;
-
+            //printf("Index %d x=%d y=%d z=%d p=%d q=%d\n",state->index, x,y,z,p,q);
             switch ( x ) {
                 case 0:
                     //printf("Index %d x=%d y=%d z=%d p=%d q=%d\n",state->index, x,y,z,p,q);
@@ -547,6 +549,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                 else if ( p == 1 ) BUF_PRINTF("%-10s(%sde),a",handle_ez80_am(state,"ld"),handle_kc_prefix(state->kc_prefix));
                                 else if ( p == 2 && !isgbz80()) BUF_PRINTF("%-10s(%s%s),%s",handle_ez80_am(state,"ld"),handle_kc_segment(state->kc_prefix),handle_addr16(state, opbuf1, sizeof(opbuf1)),handle_hl(state->index));
                                 else if ( p == 2 && isgbz80() ) BUF_PRINTF("%-10s(hl+),a","ld");
+                                else if ( p == 3 && state->index && israbbit6k() ) BUF_PRINTF("%-10s%s","swap", r4k_32b_table[state->index - 1]);
                                 else if ( p == 3 && !isgbz80() ) BUF_PRINTF("%-10s(%s%s),a",handle_ez80_am(state,"ld"),handle_kc_segment(state->kc_prefix),handle_addr16(state, opbuf1, sizeof(opbuf1)));
                                 else if ( p == 3 && isgbz80() ) BUF_PRINTF("%-10s(hl-),a","ld");                            
                             } else if ( q == 1 ) {
@@ -680,7 +683,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         else if ( y == 2 && z == 4 ) BUF_PRINTF("%-10shl,de","xor");
                         else if ( y == 3 && z == 3 && (israbbit3k()|israbbit4k()) && state->prefix != 0x76) BUF_PRINTF("%-10s", "idet");
                         else if ( y == 3 && z == 3 ) BUF_PRINTF("%-10se,e","ld");
-                        else if ( y == 4 && z == 4 && israbbit6k() ) { state->prefix = 0x64; BUF_PRINTF("altsd "); continue; }
+                        else if ( b == 0x64 && israbbit6k() ) { state->prefix = 0x64; BUF_PRINTF("altsd "); continue; }
                         else if ( q == 1 && z == 1 && israbbit6k()) {
                             BUF_PRINTF("%-10s%s", y == 3 ? "mul" : "mulu", "hl,de");
                         } else if ( y == 5 && z == 5 ) {
@@ -778,7 +781,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                     break;
                 case 2: /* x = 2 */
                     if ( israbbit4k()) {
-                        //printf("x=%d y=%d z=%d p=%d q=%d\n",x,y,z,p,q);
+                       // printf("x=%d y=%d z=%d p=%d q=%d\n",x,y,z,p,q);
                         if ( state->index && q == 1 && z == 0 ) BUF_PRINTF("%-10s1,%s", rot_table[p+4], r4k_32b_table[state->index-1]);
                         else if ( state->index && q == 1 && z == 1 ) BUF_PRINTF("%-10s2,%s", rot_table[p+4], r4k_32b_table[state->index-1]);
                         else if ( state->index && q == 1 && z == 3 ) BUF_PRINTF("%-10s4,%s", rot_table[p+4], r4k_32b_table[state->index-1]);
@@ -786,6 +789,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         else if ( state->index && q == 1 && z == 5 ) BUF_PRINTF("%-10s%s,%s", "ld", r4k_ps_table[p], r4k_32b_table[state->index-1]);
                         else if ( state->index && q == 1 && z == 7 ) BUF_PRINTF("%-10s%s,%s", "ldl", r4k_ps_table[p], rp2_table[state->index]);
                         else if ( state->index && z == 6 ) BUF_PRINTF("%-10s%s", alu_table[y], handle_register8(state, z, opbuf1, sizeof(opbuf1)));
+                        else if ( state->index && z <= 3 && israbbit6k()) BUF_PRINTF("%-10s%s,(%s%s)", alu_table[y + (z&1)], z & 2 ? "jkhl" : "hl", handle_hl(state->index), handle_displacement(state, opbuf1, sizeof(opbuf1)));
                         else if ( q == 0 && z == 5 ) BUF_PRINTF("%-10shl,(%s%s)", "ld", r4k_ps_table[p], handle_displacement(state, opbuf1, sizeof(opbuf1)));
                         else if ( q == 0 && z == 6 ) BUF_PRINTF("%-10s(%s%s),hl", "ld", r4k_ps_table[p], handle_displacement(state, opbuf1, sizeof(opbuf1)));
                         else if ( q == 1 && z == 3 ) BUF_PRINTF("%-10sa,(%s+hl)", "ld", r4k_ps_table[p]);
@@ -1060,6 +1064,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                                 if ( y == 0 ) BUF_PRINTF("%-10s","neg");
                                                 else if ( y == 1 && israbbit4k() ) BUF_PRINTF("%-10sbc","test");
                                                 else if ( y == 2 ) BUF_PRINTF("%-10s(sp),hl","ex");
+                                                else if ( y == 3 && israbbit6k() ) BUF_PRINTF("%-10sde","test");
                                                 else if ( y == 4 ) BUF_PRINTF("%-10s(hl),hl","ldp");
                                                 else if ( y == 5 ) BUF_PRINTF("%-10shl,(hl)","ldp");
                                                 else if ( y == 6 && israbbit4k() ) BUF_PRINTF("%-10sbc',hl","ex");
@@ -1178,9 +1183,9 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                         else if ( b == 0xb7 ) BUF_PRINTF("ldpirx");
                                         else if ( b == 0xbc ) BUF_PRINTF("lddrx");
                                         else BUF_PRINTF("nop");
-                                    } else {
-                                        BUF_PRINTF("nop");
-                                    }
+                                    } else if ( z == 6 && q == 0 && israbbit6k()) BUF_PRINTF("%-10s%s", "tstnull", r4k_ps_table[p]);
+                                    else if ( z == 7 && q == 0 && israbbit4k()) BUF_PRINTF("%-10s%s","swap", handle_register8(state, p, opbuf1, sizeof(opbuf1)));
+                                    else BUF_PRINTF("nop");
                                     break;
                                 } else if ( x == 3 ) {
                                     if ( z == 0 && (israbbit3k()||israbbit4k()) ) {
@@ -1220,8 +1225,11 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     else if ( q == 1 && z == 1 && y == 3 && israbbit4k()) BUF_PRINTF("%-10s","exp");
                                     else if ( q == 1 && z == 2 && y == 5 && israbbit4k()) BUF_PRINTF("%-10s(hl)","call");
                                     else if ( q == 1 && z == 2 && y == 7 && israbbit4k()) BUF_PRINTF("%-10s(jkhl)","llcall");
+                                    else if ( q == 1 && z == 6 && y == 3 && israbbit6k()) BUF_PRINTF("%-10sjkhl,bcde","sbc");
                                     else if ( q == 1 && z == 6 && y == 5 && israbbit4k()) BUF_PRINTF("%-10sjkhl,bcde","xor");
                                     else if ( q == 1 && z == 6 && y == 7 && israbbit4k()) BUF_PRINTF("%-10shl,(sp+hl)","ld");
+                                    else if ( z == 7 && q == 1 && israbbit6k()) BUF_PRINTF("%-10s%s", "swap", r4k_rp2_table[p]);
+                                    else if ( z == 7 && q == 0 && israbbit4k()) BUF_PRINTF("%-10s%s","swap", handle_register8(state, p+4, opbuf1, sizeof(opbuf1)));
                                     else if ( b == 0xfe ) BUF_PRINTF("trap");
                                     else BUF_PRINTF("nop");
                                 }
@@ -1235,7 +1243,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             else if ( p == 1 ) BUF_PRINTF("%-10s%s,(iy%s)", "ld", r4k_32b_table[state->index-1], handle_displacement(state,opbuf1,sizeof(opbuf1)));
                             else if ( p == 2 ) BUF_PRINTF("%-10s%s,(sp+%s)", "ld", r4k_32b_table[state->index-1], handle_immed8(state,opbuf1,sizeof(opbuf1)));
                             else if ( p == 3 ) BUF_PRINTF("%-10s%s,(sp+hl)", "ld", r4k_32b_table[state->index-1]);
-                        } else  BUF_PRINTF("%-10s%s", alu_table[y], handle_immed8(state, opbuf1, sizeof(opbuf1)));                    
+                        } else if ( b == 0xc6 && state->index && israbbit6k() ) BUF_PRINTF("%-10s%s,%s", "add", handle_hl(state->index), handle_displacement(state,opbuf1,sizeof(opbuf1)));
+                        else BUF_PRINTF("%-10s%s", alu_table[y], handle_immed8(state, opbuf1, sizeof(opbuf1)));                    
                     } else if ( z == 7 ) {
                         if ( q == 1 && state->index && israbbit4k() ) {
                             if ( p == 0 ) BUF_PRINTF("%-10s(ix%s),%s", "ld", handle_displacement(state,opbuf1,sizeof(opbuf1)), r4k_32b_table[state->index-1]);

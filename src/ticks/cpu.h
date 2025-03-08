@@ -24,7 +24,7 @@ extern int c_adl_mode;
 #define is808x() ( (c_cpu & (CPU_8080|CPU_8085)) )
 #define isgbz80() ( (c_cpu & CPU_GBZ80) == CPU_GBZ80 )
 #define isr800() ( (c_cpu & CPU_R800) == CPU_R800 )
-#define israbbit() ( c_cpu & (CPU_R2KA|CPU_R3K|CPU_R4K))
+#define israbbit() ( c_cpu & (CPU_R2KA|CPU_R3K|CPU_R4K|CPU_R6K))
 #define israbbit3k() ( c_cpu & (CPU_R3K))
 extern int israbbit4k(void);
 extern int israbbit6k(void);

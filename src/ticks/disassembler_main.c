@@ -39,6 +39,7 @@ static void usage(char *program)
     printf("  -mr3k          Disassemble Rabbit 3000 code\n");
     printf("  -mr4k          Disassemble Rabbit 4000 code\n");
     printf("  -mr5k          Disassemble Rabbit 5000 code\n");
+    printf("  -mr6k          Disassemble Rabbit 6000 code\n");
     printf("  -mr800         Disassemble R800 code\n");
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
     printf("  -m8080         Disassemble 8080 code (with z80 mnemonics)\n");
