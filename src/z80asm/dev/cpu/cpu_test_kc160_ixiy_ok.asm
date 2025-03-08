@@ -3628,7 +3628,6 @@
  ld hl, (aiy-128)               ; 52 ED AD 80
  ld hl, (de)                    ; EB 5E 23 56 2B EB
  ld hl, (hl)                    ; F5 7E 23 66 6F F1
- ld hl, (hl+)                   ; F5 7E 23 66 6F F1
  ld hl, (ix)                    ; ED AC 00
  ld hl, (ix+0)                  ; ED AC 00
  ld hl, (ix+126)                ; ED AC 7E
@@ -4183,7 +4182,6 @@
  ldi e, (hl)                    ; 5E 23
  ldi h, (de)                    ; EB 56 EB 13
  ldi h, (hl)                    ; 66 23
- ldi hl, (hl)                   ; F5 7E 23 66 6F F1
  ldi ix, (hl)                   ; D5 5E 23 56 23 D5 FD E1 D1
  ldi iy, (hl)                   ; D5 5E 23 56 23 D5 DD E1 D1
  ldi l, (de)                    ; EB 5E EB 13

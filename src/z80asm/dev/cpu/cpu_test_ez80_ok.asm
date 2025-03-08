@@ -1918,7 +1918,6 @@
  ld hl, (0x123456)              ; 2A 56 34 12
  ld hl, (de)                    ; EB 5E 23 56 2B EB
  ld hl, (hl)                    ; ED 27
- ld hl, (hl+)                   ; ED 27 23 23
  ld hl, (ix)                    ; DD 27 00
  ld hl, (ix+0)                  ; DD 27 00
  ld hl, (ix+126)                ; DD 27 7E
@@ -2353,7 +2352,6 @@
  ld.s h, (iy+126)               ; 52 FD 66 7E
  ld.s h, (iy-128)               ; 52 FD 66 80
  ld.s hl, (hl)                  ; 52 ED 27
- ld.s hl, (hl+)                 ; 52 ED 27 23 23
  ld.s hl, (ix)                  ; 52 DD 27 00
  ld.s hl, (ix+0)                ; 52 DD 27 00
  ld.s hl, (ix+126)              ; 52 DD 27 7E
@@ -2694,7 +2692,6 @@
  ld.sil h, (iy+126)             ; 52 FD 66 7E
  ld.sil h, (iy-128)             ; 52 FD 66 80
  ld.sil hl, (hl)                ; 52 ED 27
- ld.sil hl, (hl+)               ; 52 ED 27 23 23
  ld.sil hl, (ix)                ; 52 DD 27 00
  ld.sil hl, (ix+0)              ; 52 DD 27 00
  ld.sil hl, (ix+126)            ; 52 DD 27 7E
@@ -2897,7 +2894,6 @@
  ldi e, (hl)                    ; 5E 23
  ldi h, (de)                    ; EB 56 EB 13
  ldi h, (hl)                    ; 66 23
- ldi hl, (hl)                   ; ED 27 23 23
  ldi ix, (hl)                   ; ED 37 23 23
  ldi iy, (hl)                   ; ED 31 23 23
  ldi l, (de)                    ; EB 5E EB 13
@@ -2931,7 +2927,6 @@
  ldi.s de, (hl)                 ; 52 ED 17 23 23
  ldi.s e, (hl)                  ; 52 5E 23
  ldi.s h, (hl)                  ; 52 66 23
- ldi.s hl, (hl)                 ; 52 ED 27 23 23
  ldi.s ix, (hl)                 ; 52 ED 37 23 23
  ldi.s iy, (hl)                 ; 52 ED 31 23 23
  ldi.s l, (hl)                  ; 52 6E 23
@@ -2964,7 +2959,6 @@
  ldi.sil de, (hl)               ; 52 ED 17 23 23
  ldi.sil e, (hl)                ; 52 5E 23
  ldi.sil h, (hl)                ; 52 66 23
- ldi.sil hl, (hl)               ; 52 ED 27 23 23
  ldi.sil ix, (hl)               ; 52 ED 37 23 23
  ldi.sil iy, (hl)               ; 52 ED 31 23 23
  ldi.sil l, (hl)                ; 52 6E 23
@@ -4415,6 +4409,7 @@
  set.sil 7, (iy+0)              ; 52 FD CB 00 FE
  set.sil 7, (iy+126)            ; 52 FD CB 7E FE
  set.sil 7, (iy-128)            ; 52 FD CB 80 FE
+ shld 0x123456                  ; 22 56 34 12
  shlde                          ; EB 73 23 72 2B EB
  shlx                           ; EB 73 23 72 2B EB
  sla (hl)                       ; CB 26

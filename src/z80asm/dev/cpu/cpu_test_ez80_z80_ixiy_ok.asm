@@ -1918,7 +1918,6 @@
  ld hl, (0x1234)                ; 2A 34 12
  ld hl, (de)                    ; EB 5E 23 56 2B EB
  ld hl, (hl)                    ; ED 27
- ld hl, (hl+)                   ; ED 27 23 23
  ld hl, (ix)                    ; FD 27 00
  ld hl, (ix+0)                  ; FD 27 00
  ld hl, (ix+126)                ; FD 27 7E
@@ -2347,7 +2346,6 @@
  ld.l h, (iy+126)               ; 49 DD 66 7E
  ld.l h, (iy-128)               ; 49 DD 66 80
  ld.l hl, (hl)                  ; 49 ED 27
- ld.l hl, (hl+)                 ; 49 ED 27 23 23
  ld.l hl, (ix)                  ; 49 FD 27 00
  ld.l hl, (ix+0)                ; 49 FD 27 00
  ld.l hl, (ix+126)              ; 49 FD 27 7E
@@ -2708,7 +2706,6 @@
  ld.lis h, (iy+126)             ; 49 DD 66 7E
  ld.lis h, (iy-128)             ; 49 DD 66 80
  ld.lis hl, (hl)                ; 49 ED 27
- ld.lis hl, (hl+)               ; 49 ED 27 23 23
  ld.lis hl, (ix)                ; 49 FD 27 00
  ld.lis hl, (ix+0)              ; 49 FD 27 00
  ld.lis hl, (ix+126)            ; 49 FD 27 7E
@@ -2897,7 +2894,6 @@
  ldi e, (hl)                    ; 5E 23
  ldi h, (de)                    ; EB 56 EB 13
  ldi h, (hl)                    ; 66 23
- ldi hl, (hl)                   ; ED 27 23 23
  ldi ix, (hl)                   ; ED 31 23 23
  ldi iy, (hl)                   ; ED 37 23 23
  ldi l, (de)                    ; EB 5E EB 13
@@ -2931,7 +2927,6 @@
  ldi.l de, (hl)                 ; 49 ED 17 23 23
  ldi.l e, (hl)                  ; 49 5E 23
  ldi.l h, (hl)                  ; 49 66 23
- ldi.l hl, (hl)                 ; 49 ED 27 23 23
  ldi.l ix, (hl)                 ; 49 ED 31 23 23
  ldi.l iy, (hl)                 ; 49 ED 37 23 23
  ldi.l l, (hl)                  ; 49 6E 23
@@ -2964,7 +2959,6 @@
  ldi.lis de, (hl)               ; 49 ED 17 23 23
  ldi.lis e, (hl)                ; 49 5E 23
  ldi.lis h, (hl)                ; 49 66 23
- ldi.lis hl, (hl)               ; 49 ED 27 23 23
  ldi.lis ix, (hl)               ; 49 ED 31 23 23
  ldi.lis iy, (hl)               ; 49 ED 37 23 23
  ldi.lis l, (hl)                ; 49 6E 23

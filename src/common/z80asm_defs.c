@@ -38,8 +38,8 @@ typedef struct {
 //-----------------------------------------------------------------------------
 
 static cpu_lookup_t cpu_lut[] = {
-    { "z80",        CPU_Z80,            CPU_Z80_STRICT,     },  // 1
-    { "z80_strict", CPU_Z80_STRICT,     CPU_8080,           },  // 2
+    { "z80",        CPU_Z80,            CPU_8080,           },  // 1
+    { "z80_strict", CPU_Z80_STRICT,     CPU_Z80,            },  // 2
     { "z180",       CPU_Z180,           CPU_Z80_STRICT,     },  // 3
     { "ez80_z80",   CPU_EZ80_Z80,       CPU_UNDEF,          },  // 4
     { "ez80",       CPU_EZ80,           CPU_UNDEF,          },  // 5
@@ -54,8 +54,8 @@ static cpu_lookup_t cpu_lut[] = {
     { "r5k",        CPU_R5K,            CPU_R4K,            },  // 14
     { "kc160",      CPU_KC160,          CPU_UNDEF,          },  // 15
     { "kc160_z80",  CPU_KC160_Z80,      CPU_Z80_STRICT,     },  // 16
-    { "8080_strict",CPU_8080_STRICT,    CPU_UNDEF,          },  // 17
-    { "8085_strict",CPU_8085_STRICT,    CPU_8080_STRICT,    },  // 18
+    { "8080_strict",CPU_8080_STRICT,    CPU_8080,           },  // 17
+    { "8085_strict",CPU_8085_STRICT,    CPU_8085,           },  // 18
 };
 
 static cpu_lookup_t* cpu_lu_hash = NULL;        // lookup from cpu name
