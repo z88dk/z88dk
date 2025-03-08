@@ -33,7 +33,7 @@
 extern unsigned char a,b,c,d,e,h,l,j,k;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_,j_,k_;
 extern unsigned char xh, xl, yh, yl;
-extern unsigned char ioi, ioe, altd;
+extern unsigned char ioi, ioe, altd, alts;
 
 extern unsigned short ff, fr, fa, fb, fk, pc, sp, mp;
 extern unsigned short ff_, fr_, fa_, fb_;

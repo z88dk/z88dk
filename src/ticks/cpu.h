@@ -15,8 +15,9 @@ extern int c_adl_mode;
 #define CPU_8085        256
 #define CPU_EZ80        512
 #define CPU_R4K         1024
-#define CPU_KC160       2048
-#define CPU_KC160_Z80   4096
+#define CPU_R6K         2048
+#define CPU_KC160       4096
+#define CPU_KC160_Z80   8192
 
 #define is8080() ( (c_cpu & CPU_8080) )
 #define is8085() ( (c_cpu & CPU_8085) )
@@ -26,6 +27,7 @@ extern int c_adl_mode;
 #define israbbit() ( c_cpu & (CPU_R2KA|CPU_R3K|CPU_R4K))
 #define israbbit3k() ( c_cpu & (CPU_R3K))
 extern int israbbit4k(void);
+extern int israbbit6k(void);
 #define isz180() ( c_cpu & (CPU_Z180))
 #define isez80() ( c_cpu & (CPU_EZ80))
 #define isz80n() ( c_cpu & CPU_Z80N )
