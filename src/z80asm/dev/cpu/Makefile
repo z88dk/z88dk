@@ -8,7 +8,7 @@
 OPCODES = opcodes.dat
 
 all: $(OPCODES)
-$(OPCODES): make_opcodes.pl Opcodes.pm Makefile
+$(OPCODES): make_opcodes.pl Opcodes.pm $(wildcard opcodes_*.pl) Makefile
 	perl make_opcodes.pl $(OPCODES) && dos2unix $(OPCODES) 2> /dev/null
 
 all: opcodes.txt

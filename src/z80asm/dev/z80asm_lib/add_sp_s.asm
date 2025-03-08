@@ -9,7 +9,8 @@ __z80asm__add_sp_s:
         ld      (save_hl+1), hl         ; save hl - cannot use stack
         ld      (save_de+1), de         ; save de - cannot use stack
         pop     hl                      ; return address
-        ld      a, (hl+)                ; signed offset to add to stack
+        ld      a, (hl)                 ; signed offset to add to stack
+        inc     hl
         ld      (return+1), hl          ; save return address
 
         ld      hl, 0

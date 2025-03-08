@@ -6,8 +6,10 @@
 
 __z80asm__ldd:
         push    af                      ;Save incoming flags
-        ld      a, (hl-)
-        ld      (de-), a
+        ld      a, (hl)
+        dec     hl
+        ld      (de), a
+        dec     de
         dec     bc
   IF    !__CPU_GBZ80__
 										; No point emulating pv on gbz80 since flag doesn't exist
