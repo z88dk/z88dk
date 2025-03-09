@@ -322,11 +322,16 @@
             st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ? 8 : isr800() ? 1 : iskc160() ? 2 : 5; \
         } while (0)
 
-#define PUSH(a, b) do {         \
+#define PUSH(a, b, a_, b_) do {         \
           ioi=ioe=0;            \
-          st+= isez80() ? 3 :israbbit() ? 10 : is8085() ? 12 : isgbz80() ? 16 : isr800() ? 4 : iskc160() ? 3 : 11,              \
-          put_memory(--sp,a),   \
-          put_memory(--sp,b);   \
+          st+= isez80() ? 3 :israbbit() ? 10 : is8085() ? 12 : isgbz80() ? 16 : isr800() ? 4 : iskc160() ? 3 : 11;              \
+          if (alts) { \
+            put_memory(--sp,a_),   \
+            put_memory(--sp,b_);   \
+          } else { \
+            put_memory(--sp,a),   \
+            put_memory(--sp,b);   \
+          } \
         } while (0)
 
 #define POP(a, b, a_, b_) do {          \
@@ -3068,23 +3073,23 @@ int main (int argc, char **argv){
         if ( israbbit6k() && ih == 0 ) {
             r6k_add_xy_d(opc, iy);
         } else {
-            PUSH(b, c);
+            PUSH(b, c, b_, c_);
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xd5: // PUSH DE
-        PUSH(d, e);
+        PUSH(d, e, d_, e_);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xe5: // PUSH HL // PUSH IX // PUSH IY
         if( ih )
-          PUSH(h, l);
+          PUSH(h, l, h_, l_);
         else if( iy )
-          PUSH(yh, yl);
+          PUSH(yh, yl, yh, yl);
         else
-          PUSH(xh, xl);
+          PUSH(xh, xl, xh, xl);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xf5: // PUSH AF
         if (israbbit4k() && ih==0) r4k_push_r32(opc, iy);
-        else PUSH(a, f());
+        else PUSH(a, f(), a_, f_());
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xc3: // JP nn
         st+= isez80() ? 4 : israbbit() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 12 : isr800() ? 3 : iskc160() ? 3 : 10;
@@ -3406,6 +3411,7 @@ int main (int argc, char **argv){
       case 0xed: // OP ED // (8085) LD HL,(DE) // (R4K) LD BCDE,PY, LD JKHL, PY
         if ( is8085() ) { // (8085) LD HL,(DE) (LHLDE)
           if ( get_memory_inst(pc) != 0xfe) i8085_ld_hl_ide(opc);
+          else handle_ed_page(); // Just for the hook code
         } else if ( is8080() ) {
           if ( get_memory_inst(pc) == 0xfe) handle_ed_page();
           else printf("%04x: ILLEGAL 8080 prefix 0xED\n",pc-1);

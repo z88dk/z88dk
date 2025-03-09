@@ -1746,6 +1746,40 @@ void r6k_add_xy_d(uint8_t opc, uint8_t iy)
 }
 
 
+#define ALU_OP(oper, r, lhs, rhs) do { \
+    switch (oper) {                    \
+        case 0: /* add*/               \
+            r = rhs + lhs;              \
+            carry = r < rhs;           \
+            break;                     \
+        case 1: /* adc */              \
+            r = rhs + lhs + carry;      \
+            carry = r < rhs;           \
+            break;                     \
+        case 2: /* sub */              \
+            r = lhs - rhs;              \
+            carry = r > lhs;           \
+            break;                     \
+        case 3: /* sbc */              \
+            r = lhs - rhs - carry;      \
+            carry = r > lhs;           \
+            break;                     \
+        case 4: /* and */              \
+            r = rhs & lhs;              \
+            break;                     \
+        case 5: /* xor */              \
+            r = rhs ^ lhs;              \
+            break;                     \
+        case 6: /* or */               \
+            r = rhs | lhs;              \
+            break;                     \
+        case 7: /* cp */               \
+            carry = rhs > lhs;          \
+            zero = (lhs == rhs);        \
+            break;                     \
+    }                                  \
+} while(0)
+
 // alu a,(ps+d)
 void r6k_49_alu_a_psd(uint8_t opcode)
 {
@@ -1757,37 +1791,8 @@ void r6k_49_alu_a_psd(uint8_t opcode)
     uint8_t  carry = ((altd ? ff_ : ff) >> 8) & 1;
     uint8_t  zero;
 
-    switch ((opcode >> 4) & 0x07 ) {
-        case 0: // add
-            r = val + r8;
-            carry = r < val;
-            break;
-        case 1: // adc
-            r = val + r8 + carry;
-            carry = r < val;
-            break;
-        case 2: // sub
-            r = val - r8;
-            carry = r > val;
-            break;
-        case 3: // sbc
-            r = val - r8 - carry;
-            carry = r > val;
-            break;
-        case 4: // and
-            r = val & r8;
-            break;
-        case 5: // xor
-            r = val ^ r8;
-            break;
-        case 6: // or
-            r = val | r8;
-            break;
-        case 7: // cp
-            carry = r8 > val;
-            zero = (r8 == val);
-            break;
-    }
+    ALU_OP( ((opcode >> 4) & 0x07), r, r8, val);
+
     if ( altd ) a_ = r; else a = r;
     
     if ( altd ) { fr_ = zero; ff_ = carry << 8; }
@@ -1808,37 +1813,8 @@ void r6k_49_alu_hl_psd(uint8_t opcode)
     uint8_t  carry = ((altd ? ff_ : ff) >> 8) & 1;
     uint8_t  zero;
 
-    switch ((opcode >> 4) & 0x07 ) {
-        case 0: // add
-            r = val + r16;
-            carry = r < val;
-            break;
-        case 1: // adc
-            r = val + r16 + carry;
-            carry = r < val;
-            break;
-        case 2: // sub
-            r = val - r16;
-            carry = r > val;
-            break;
-        case 3: // sbc
-            r = val - r16 - carry;
-            carry = r > val;
-            break;
-        case 4: // and
-            r = val & r16;
-            break;
-        case 5: // xor
-            r = val ^ r16;
-            break;
-        case 6: // or
-            r = val | r16;
-            break;
-        case 7: // cp
-            carry = r16 > val;
-            zero = (r16 == val);
-            break;
-    }
+    ALU_OP( ((opcode >> 4) & 0x07), r, r16, val);
+
     *lsb = r & 0xff;
     *msb = (r >> 8) & 0xff;
     
@@ -1872,37 +1848,7 @@ void r6k_49_alu_jkhl_psd(uint8_t opcode)
     uint8_t  carry = ((altd ? ff_ : ff) >> 8) & 1;
     uint8_t  zero;
 
-    switch ((opcode >> 4) & 0x07 ) {
-        case 0: // add
-            r = val + r32;
-            carry = r < val;
-            break;
-        case 1: // adc
-            r = val + r32 + carry;
-            carry = r < val;
-            break;
-        case 2: // sub
-            r = val - r32;
-            carry = r > val;
-            break;
-        case 3: // sbc
-            r = val - r32 - carry;
-            carry = r > val;
-            break;
-        case 4: // and
-            r = val & r32;
-            break;
-        case 5: // xor
-            r = val ^ r32;
-            break;
-        case 6: // or
-            r = val | r32;
-            break;
-        case 7: // cp
-            carry = r32 > val;
-            zero = (r32 == val);
-            break;
-    }
+    ALU_OP( ((opcode >> 4) & 0x07), r, r32, val);
 
     *reg32[0] = (r >> 0)  & 0xff;
     *reg32[1] = (r >> 8)  & 0xff;
