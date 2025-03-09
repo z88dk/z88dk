@@ -213,36 +213,36 @@
 
 #define ADD(b, n)  do {        \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= b)); \
-          else fr= a= (ff= (fa= a)+(fb= b)); \
+          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= b)); \
+          else fr= a= (ff= (fa= (alts?a_:a))+(fb= b)); \
           fk = 0; \
       } while (0)
 
 #define ADC(b, n)  do {         \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= b)+(ff_>>8&1)); \
-          fr= a= (ff= (fa= a)+(fb= b)+(ff>>8&1)); \
+          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= b)+(ff_>>8&1)); \
+          else fr= a= (ff= (fa= (alts?a_:a))+(fb= b)+(ff>>8&1)); \
           fk = 0; \
         } while (0)
 
 #define SUB(b, n)  do {         \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= ~b)+1); \
-          else fr= a= (ff= (fa= a)+(fb= ~b)+1); \
+          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= ~b)+1); \
+          else fr= a= (ff= (fa= (alts?a_:a))+(fb= ~b)+1); \
           fk = 0; \
         } while (0)
 
 #define SBC(b, n) do {             \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= ~b)+(ff_>>8&1^1)); \
-          else fr= a= (ff= (fa= a)+(fb= ~b)+(ff>>8&1^1)); \
+          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= ~b)+(ff_>>8&1^1)); \
+          else fr= a= (ff= (fa= (alts?a_:a))+(fb= ~b)+(ff>>8&1^1)); \
           fk = 0; \
         } while (0)
 
 #define AND(b, n) do {          \
           st+= n;               \
-          if ( altd ) { fa_= ~(a_= ff_= fr_= a&b); fb_= 0;} \
-          else { fa= ~(a= ff= fr= a&b);  fb= 0; } \
+          if ( altd ) { fa_= ~(a_= ff_= fr_= (alts?a_:a)&b); fb_= 0;} \
+          else { fa= ~(a= ff= fr= (alts?a_:a)&b);  fb= 0; } \
           fk = 0; \
       } while (0)
 
@@ -252,11 +252,11 @@
           st+= n;                    \
           if ( altd ) {              \
             fa_= 256                 \
-              | (ff_= fr_= a_= a^b); \
+              | (ff_= fr_= a_= (alts?a_:a)^b); \
             fb_= 0;                  \
           } else {                   \
             fa= 256                  \
-              | (ff= fr= a^= b);     \
+              | (ff= fr= a= (alts?a_:a)^b);     \
             fb= 0;                   \
           }                          \
           fk = 0; \
@@ -266,11 +266,11 @@
           st += n;                     \
           if ( altd ) {                \
             fa_= 256                   \
-              | (ff_= fr_= a_ = a|b);  \
+              | (ff_= fr_= a_ = (alts?a_:a)|b);  \
             fb_= 0;                    \
           } else {                     \
             fa= 256                    \
-              | (ff= fr= a|= b);       \
+              | (ff= fr= a= (alts?a_:a)|b);       \
             fb= 0;                     \
           } \
           fk = 0; \
@@ -281,13 +281,13 @@
 #define CP(b, n) do {           \
           st+= n;               \
           if (altd) {           \
-            fr_= (fa_= a)-b;    \
+            fr_= (fa_= (alts?a_:a))-b;    \
             fb_= ~b;            \
             ff_= fr_  & -41     \
                 | b   &  40;    \
             fr_&= 255;          \
           } else {              \
-            fr= (fa= a)-b;      \
+            fr= (fa= (alts?a_:a))-b;      \
             fb= ~b;             \
             ff= fr  & -41       \
                 | b   &  40;    \
@@ -683,6 +683,7 @@
 
 #define RABBIT4k_UNDEFINED() do { \
     fprintf(stderr, "Invalid R4K opcode at %04x", pc-1); \
+    ih=1;altd=0,alts=0;ioi=0;ioe=0;break; \
 } while(0)
 
 
@@ -1343,8 +1344,8 @@ int main (int argc, char **argv){
         else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else if ( altd ) { b_ = b; st += 2; ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
       case 0x49: // LD C,C // (R6K) 0x49 page
-        if (israbbit4k() && ih == 0) r4k_rlc_r32(opc, iy);
-        else if ( israbbit6k() ) { r6k_handle_49_page(); break; }
+        if (israbbit4k() && ih == 0) { r4k_rlc_r32(opc, iy); ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
+        else if ( israbbit6k() ) { r6k_handle_49_page(); ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
         else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else if ( altd ) { c_ = c; st += 2; ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
       case 0x52: // LD D,D
@@ -1353,12 +1354,12 @@ int main (int argc, char **argv){
       case 0x5b: // LD E,E
         if ( altd ) { e_ = e; st += 2; ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
       case 0x64: // LD H,H // (RCM) LDP (XY),HL // (R6K) altsd
-        if ( israbbit() && ih==0) rxk_ldp_irr_hl(opc, PREFIX(ih, iy));
+        if ( israbbit() && ih==0) { rxk_ldp_irr_hl(opc, PREFIX(ih, iy)); ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
         else if ( israbbit6k()) { ih=1;altd=1,alts=1;ioi=0;ioe=0; st+=2; break; }
         else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else if ( altd ) { h_ = h; st += 2; ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
       case 0x6d: // LD L,L // (RCM) LDP IXY,(nm) // 6d page
-        if ( israbbit() && ih==0) rxk_ldp_rr_inm(opc, PREFIX(ih, iy));
+        if ( israbbit() && ih==0) { rxk_ldp_rr_inm(opc, PREFIX(ih, iy)); break; }
         else if ( israbbit4k() ) { // 0x6d page
             r4k_handle_6d_page();
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break; 
@@ -3684,25 +3685,26 @@ static void handle_r4k_7f_page(void)
             LDRR(a, l, a_,4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x80: // ADD A,B
-            ADD(b, 4);
+            ADD(alts ? b_ : b, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x81: // ADD A,C
-            ADD(c, 4);
+            ADD(alts ? c_ : c, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x82: // ADD A,D
-            ADD(d, 4);
+            ADD(alts ? d_ : d, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x83: // ADD A,E
-            ADD(e, 4);
+            ADD(alts ? e_ : e, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x84: // ADD A,H
-            ADD(h, 4);
+            ADD(alts ? h_ : h, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x85: // ADD A,L
-            ADD(l, 4);
+            ADD(alts ? l_ : l, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x86: // ADD A,(HL)
-            ADD(get_memory_data(l|h<<8), 7);
+            w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
+            ADD(w, 5);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x87: // ADD A,A
             st+= 4;
@@ -3710,25 +3712,26 @@ static void handle_r4k_7f_page(void)
             else fr= a= (ff= 2*(fa= fb= a));
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x88: // ADC A,B
-            ADC(b, 4);
+            ADC(alts ? b_ : b, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x89: // ADC A,C
-            ADC(c, 4);
+            ADC(alts ? c_ : c, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x8a: // ADC A,D
-            ADC(d, 4);
+            ADC(alts ? d_ : d, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x8b: // ADC A,E
-            ADC(e, 4);
+            ADC(alts ? e_ : e, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x8c: // ADC A,H
-            ADC(h, 4);
+            ADC(alts ? h_ : h, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x8d: // ADC A,L
-            ADC(l, 4);
+            ADC(alts ? l_ : l, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x8e: // ADC A,(HL)
-            ADC(get_memory_data(l|h<<8), 7);
+            w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
+            ADC(w, 5);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x8f: // ADC A,A
             st+=4;
@@ -3736,25 +3739,26 @@ static void handle_r4k_7f_page(void)
             else fr= a= (ff= 2*(fa= fb= a)+(ff>>8&1));
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x90: // SUB B
-            SUB(b, 4);
+            SUB(alts ? b_ : b, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x91: // SUB C
-            SUB(c, 4);
+            SUB(alts ? c_ : c, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x92: // SUB D
-            SUB(d, 4);
+            SUB(alts ? d_ : d, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x93: // SUB E
-            SUB(e, 4);
+            SUB(alts ? e_ : e, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x94: // SUB H
-            SUB(h, 4);
+            SUB(alts ? h_ : h, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x95: // SUB L
-            SUB(l, 4);
+            SUB(alts ? l_ : l, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x96: // SUB (HL)
-            SUB(get_memory_data(l|h<<8), 7);
+            w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
+            SUB(w, 7);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x97: // SUB A
             st+=4;
@@ -3767,25 +3771,26 @@ static void handle_r4k_7f_page(void)
             }
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x98: // SBC A,B
-            SBC(b, 4);
+            SBC(alts ? b_ : b, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x99: // SBC A,C
-            SBC(c,  4);
+            SBC(alts ? c_ : c,  4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x9a: // SBC A,D
-            SBC(d,  4);
+            SBC(alts ? d_ : d,  4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x9b: // SBC A,E
-            SBC(e, 4);
+            SBC(alts ? e_ : e, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x9c: // SBC A,H
-            SBC(h, 4);
+            SBC(alts ? h_ : h, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x9d: // SBC A,L
-            SBC(l, 4);
+            SBC(alts ? l_ : l, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x9e: // SBC A,(HL)
-            SBC(get_memory_data(l|h<<8), 7);
+            w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
+            SBC(w,5);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x9f: // SBC A,A
             st+=  4;
@@ -3798,25 +3803,26 @@ static void handle_r4k_7f_page(void)
             }
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa0: // AND B
-            AND(b, 4);
+            AND(alts ? b_ : b, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa1: // AND C
-            AND(c, 4);
+            AND(alts ? c_ : c, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa2: // AND D
-            AND(d, 4);
+            AND(alts ? d_ : d, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa3: // AND E
-            AND(e,  4);
+            AND(alts ? e_ : e,  4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa4: // AND H
-            AND(h, 4);
+            AND(alts ? h_ : h, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa5: // AND L 
-            AND(l,  4);
+            AND(alts ? l_ : l,  4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa6: // AND (HL) // AND (IX+d) // AND (IY+d)
-            AND(get_memory_data(l|h<<8), 7);
+            w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
+            AND(w, 5);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa7: // AND A
             st+= 4;
@@ -3829,25 +3835,26 @@ static void handle_r4k_7f_page(void)
             }
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa8: // XOR B
-            XOR(b, 4);
+            XOR(alts ? b_ : b, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa9: // XOR C
-            XOR(c, 4);
+            XOR(alts ? c_ : c, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xaa: // XOR D
-            XOR(d, 4);
+            XOR(alts ? d_ : d, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xab: // XOR E
-            XOR(e, 4);
+            XOR(alts ? e_ : e, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xac: // XOR H
-            XOR(h, 4);
+            XOR(alts ? h_ : h, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xad: // XOR L 
-            XOR(l, 4);
+            XOR(alts ? l_ : l, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xae: // XOR (HL)
-            XOR(get_memory_data(l|h<<8), 7);
+            w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
+            XOR(w, 5);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xaf: // XOR A
             st+= 4;
@@ -3855,25 +3862,26 @@ static void handle_r4k_7f_page(void)
             else { a= ff= fr= fb= 0; fa=256; }
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb0: // OR B
-            OR(b, 4);
+            OR(alts ? b_ : b, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb1: // OR C
-            OR(c, 4);
+            OR(alts ? c_ : c, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb2: // OR D
-            OR(d, 4);
+            OR(alts ? d_ : d, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb3: // OR E
-            OR(e, 4);
+            OR(alts ? e_ : e, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb4: // OR H
-            OR(h, 4);
+            OR(alts ? h_ : h, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb5: // OR L
-            OR(l, 4);
+            OR(alts ? l_ : l, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb6: // OR (HL) // OR (IX+d) // OR (IY+d)
-            OR(get_memory_data(l|h<<8),7);
+            w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
+            OR(w,5);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb7: // OR A
             st+= 4;
@@ -3888,41 +3896,41 @@ static void handle_r4k_7f_page(void)
             }
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb8: // CP B
-            CP(b, 4);
+            CP(alts ? b_ : b, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb9: // CP C
-            CP(c, 4);
+            CP(alts ? c_ : c, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xba: // CP D
-            CP(d, 4);
+            CP(alts ? d_ : d, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xbb: // CP E
-            CP(e, 4);
+            CP(alts ? e_ : e, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xbc: // CP H
-            CP(h, 4);
+            CP(alts ? h_ : h, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xbd: // CP L 
-            CP(l, 4);
+            CP(alts ? l_ : l, 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xbe: // CP (HL) 
-            w= get_memory_data(l|h<<8);
-            CP(w, 7);
+            w= alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
+            CP(w, 5);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xbf: // CP A
             st+= 4;
             if ( altd ) {
                 fr_= 0;
-                fb_= ~(fa_= a);
+                fb_= ~(fa_= alts ? a_ : a);
                 ff_= a&40;
             } else {
                 fr= 0;
-                fb= ~(fa= a);
+                fb= ~(fa= alts ? a_ : a);
                 ff= a&40;
             }
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         default:
-            t += 4;
+            st += 4;
             ih=1;altd=0,alts=0;ioi=0;ioe=0;
             break;
         }
