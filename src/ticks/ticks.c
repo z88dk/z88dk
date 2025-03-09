@@ -1333,11 +1333,13 @@ int main (int argc, char **argv){
         st+= israbbit() ? 2 : isz180() ? 3 : iskc160() ? 1 : isr800() ? 1 : 4;
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         break;
-      case 0x40: // LD B,B
-        if ( israbbit4k() ) RABBIT4k_UNDEFINED();
+      case 0x40: // LD B,B // (R6K) alts
+        if ( israbbit6k()) { ih=1;altd=0,alts=1;ioi=0;ioe=0; st+=2; break; }
+        else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else if ( altd ) { b_ = b; st += 2; ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
-      case 0x49: // LD C,C
+      case 0x49: // LD C,C // (R6K) 0x49 page
         if (israbbit4k() && ih == 0) r4k_rlc_r32(opc, iy);
+        else if ( israbbit6k() ) { r6k_handle_49_page(); break; }
         else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else if ( altd ) { c_ = c; st += 2; ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
       case 0x52: // LD D,D
@@ -1345,8 +1347,9 @@ int main (int argc, char **argv){
         else if ( altd ) { d_ = d; st += 2; ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
       case 0x5b: // LD E,E
         if ( altd ) { e_ = e; st += 2; ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
-      case 0x64: // LD H,H // (RCM) LDP (XY),HL
+      case 0x64: // LD H,H // (RCM) LDP (XY),HL // (R6K) altsd
         if ( israbbit() && ih==0) rxk_ldp_irr_hl(opc, PREFIX(ih, iy));
+        else if ( israbbit6k()) { ih=1;altd=1,alts=1;ioi=0;ioe=0; st+=2; break; }
         else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else if ( altd ) { h_ = h; st += 2; ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
       case 0x6d: // LD L,L // (RCM) LDP IXY,(nm) // 6d page
@@ -1438,6 +1441,8 @@ int main (int argc, char **argv){
           LDPR(h, l, a);
           DECW(h,l);
           st = save + 8;
+        } else if (israbbit6k() && ih == 0 ) { // (R6K) swap bcde,jkhl (ix,iy prefix)
+            r6k_swap_r32(opc, iy);
         } else {
             st+= isez80() ? 4 : israbbit() ? 10 : isr800() ? 4 : iskc160() ? 3 :13;
             t= get_memory_inst(pc++);
@@ -1969,8 +1974,9 @@ int main (int argc, char **argv){
         if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else LDRR(b, e, e_,LDrr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0x44: // LD B,H // LD B,IXh // LD B,IYh
-        if ( israbbit4k() ) RABBIT4k_UNDEFINED();
+      case 0x44: // LD B,H // LD B,IXh // LD B,IYh // (R6K) ex jkhl,bcde'
+        if ( israbbit6k() ) r6k_ex_jkhl_bcde1();
+        else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else if( ih ) {
           LDRR(b, h, b_,LDrr_TICKS);
         } else if( iy && canixh() )
@@ -2110,8 +2116,9 @@ int main (int argc, char **argv){
         else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else LDRR(e, b, e_,LDrr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0x59: // LD E,C
+      case 0x59: // LD E,C // (R6K) mul hl,de
         if (israbbit4k() && ih == 0) r4k_rrc_r32(opc, iy);
+        else if ( israbbit6k()) r6k_mul_hl_de();
         else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else LDRR(e, c, e_,LDrr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
@@ -2251,8 +2258,9 @@ int main (int argc, char **argv){
         else if ( canixh() )
           LDRR(xl, b, xl,isez80() ? 1 : isr800() ? 1 : 4);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0x69: // LD L,C // LD IXl,C // LD IYl,C
+      case 0x69: // LD L,C // LD IXl,C // LD IYl,C // (R6K) mulu hl,de
         if ( israbbit4k() && ih == 0) r4k_rl_r32(opc, iy);
+        else if ( israbbit6k()) r6k_mulu_hl_de();
         else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else if( ih )
           LDRR(l, c, l_,LDrr_TICKS);
@@ -2748,8 +2756,8 @@ int main (int argc, char **argv){
         if ( israbbit4k() ) { // LD JK.nm
             if (ih==0) r4k_sll_r32(opc,iy);
             else {
-                if ( altd ) LDRRIM(h_,l_);
-                else LDRRIM(h, l);
+                if ( altd ) LDRRIM(j_,k_);
+                else LDRRIM(j, k);
             }
         } else { XOR(c,ALUr_TICKS); }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
@@ -4594,12 +4602,11 @@ static void handle_ed_page(void)
         break;
 
 
-    case 0xcd: case 0xce: case 0xcf:
-    case 0xdd: case 0xde: case 0xdf:
+    case 0xcd: case 0xce:
+    case 0xdd: case 0xde:
     case 0xe7:
-    case 0xed: case 0xef:
+    case 0xed:
     case 0xf7:
-    case 0xff:
         st+= 8; break;
 
 
@@ -4803,14 +4810,16 @@ static void handle_ed_page(void)
 
 
 
-    case 0x4c:   // (Z180) MLT BC // (KC160) call3 lmn
+    case 0x4c:   // (Z180) MLT BC // (KC160) call3 lmn // (R4K) TEST BC
         if ( iskc160() ) kc160_call3(opc);
         else if ( canz180() ) z180_mlt(opc);
+        else if ( israbbit4k()) r4k_test_rp2(opc, 0); //
         else UNDOCUMENTED_NEG();
         break;
-    case 0x5c:   // (Z180) MLT DE
+    case 0x5c:   // (Z180) MLT DE // (R6K) TEST DE
         if ( canz180() ) z180_mlt(opc);
-         else UNDOCUMENTED_NEG();
+        else if ( israbbit4k()) r4k_test_rp2(opc, 1);
+        else UNDOCUMENTED_NEG();
         break;
     case 0x6c:   // (Z180) MLT HL // (R4K) LDP HL,(HL)
         if (israbbit()) rxk_ldp_hl_irr(opc, 0xed);
@@ -5142,6 +5151,14 @@ static void handle_ed_page(void)
         } else {
             st += 8;
         }
+        break;
+
+    case 0xcf: // (R6K) swap bc
+    case 0xdf: // (R6K) swap de
+    case 0xef: // (R6K) swap hl
+    case 0xff: // (R6K) swap jk
+        if ( israbbit6k() ) r6k_swap_rp2(opc);
+        else st+= 8;
         break;
 
     case 0xfd: 

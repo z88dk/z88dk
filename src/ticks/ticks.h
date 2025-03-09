@@ -272,6 +272,15 @@ extern void r4k_xor_hl_de(uint8_t opcode);
 extern void r4k_flag_cc_hl(uint8_t opcode, uint8_t set);
 extern void r4k_setsysp_mn(uint8_t opcode);
 extern void r4k_exp(uint8_t opcode);
+extern void r4k_test_rp2(uint8_t opcode, uint8_t rp2);
+
+// r6k
+extern void r6k_swap_rp2(uint8_t opcode);
+extern void r6k_mul_hl_de(void);
+extern void r6k_mulu_hl_de(void);
+extern void r6k_handle_49_page(void);
+extern void r6k_ex_jkhl_bcde1(void);
+extern void r6k_swap_r32(uint8_t opcode, uint8_t isjkhl);
 
 // rxk
 extern void rxk_ld_hl_ispn(uint8_t opcode, uint8_t ih, uint8_t iy);
