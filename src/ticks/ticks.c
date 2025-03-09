@@ -213,36 +213,36 @@
 
 #define ADD(b, n)  do {        \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= b)); \
-          else fr= a= (ff= (fa= (alts?a_:a))+(fb= b)); \
+          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= b)); \
+          else fr= a= (ff= (fa= a)+(fb= b)); \
           fk = 0; \
       } while (0)
 
 #define ADC(b, n)  do {         \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= b)+(ff_>>8&1)); \
-          else fr= a= (ff= (fa= (alts?a_:a))+(fb= b)+(ff>>8&1)); \
+          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= b)+(ff_>>8&1)); \
+          else fr= a= (ff= (fa= a)+(fb= b)+(ff>>8&1)); \
           fk = 0; \
         } while (0)
 
 #define SUB(b, n)  do {         \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= ~b)+1); \
-          else fr= a= (ff= (fa= (alts?a_:a))+(fb= ~b)+1); \
+          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= ~b)+1); \
+          else fr= a= (ff= (fa= a)+(fb= ~b)+1); \
           fk = 0; \
         } while (0)
 
 #define SBC(b, n) do {             \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= ~b)+(ff_>>8&1^1)); \
-          else fr= a= (ff= (fa= (alts?a_:a))+(fb= ~b)+(ff>>8&1^1)); \
+          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= ~b)+(ff_>>8&1^1)); \
+          else fr= a= (ff= (fa= a)+(fb= ~b)+(ff>>8&1^1)); \
           fk = 0; \
         } while (0)
 
 #define AND(b, n) do {          \
           st+= n;               \
-          if ( altd ) { fa_= ~(a_= ff_= fr_= (alts?a_:a)&b); fb_= 0;} \
-          else { fa= ~(a= ff= fr= (alts?a_:a)&b);  fb= 0; } \
+          if ( altd ) { fa_= ~(a_= ff_= fr_= a&b); fb_= 0;} \
+          else { fa= ~(a= ff= fr= a&b);  fb= 0; } \
           fk = 0; \
       } while (0)
 
@@ -252,11 +252,11 @@
           st+= n;                    \
           if ( altd ) {              \
             fa_= 256                 \
-              | (ff_= fr_= a_= (alts?a_:a)^b); \
+              | (ff_= fr_= a_= a^b); \
             fb_= 0;                  \
           } else {                   \
             fa= 256                  \
-              | (ff= fr= a= (alts?a_:a)^b);     \
+              | (ff= fr= a= a^b);     \
             fb= 0;                   \
           }                          \
           fk = 0; \
@@ -266,11 +266,11 @@
           st += n;                     \
           if ( altd ) {                \
             fa_= 256                   \
-              | (ff_= fr_= a_ = (alts?a_:a)|b);  \
+              | (ff_= fr_= a_ = a|b);  \
             fb_= 0;                    \
           } else {                     \
             fa= 256                    \
-              | (ff= fr= a= (alts?a_:a)|b);       \
+              | (ff= fr= a= a|b);       \
             fb= 0;                     \
           } \
           fk = 0; \
@@ -281,13 +281,13 @@
 #define CP(b, n) do {           \
           st+= n;               \
           if (altd) {           \
-            fr_= (fa_= (alts?a_:a))-b;    \
+            fr_= (fa_= a)-b;    \
             fb_= ~b;            \
             ff_= fr_  & -41     \
                 | b   &  40;    \
             fr_&= 255;          \
           } else {              \
-            fr= (fa= (alts?a_:a))-b;      \
+            fr= (fa= a)-b;      \
             fb= ~b;             \
             ff= fr  & -41       \
                 | b   &  40;    \
