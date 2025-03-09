@@ -213,36 +213,36 @@
 
 #define ADD(b, n)  do {        \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= b)); \
-          else fr= a= (ff= (fa= a)+(fb= b)); \
+          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= b)); \
+          else fr= a= (ff= (fa= (alts?a_:a))+(fb= b)); \
           fk = 0; \
       } while (0)
 
 #define ADC(b, n)  do {         \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= b)+(ff_>>8&1)); \
-          else fr= a= (ff= (fa= a)+(fb= b)+(ff>>8&1)); \
+          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= b)+(ff_>>8&1)); \
+          else fr= a= (ff= (fa= (alts?a_:a))+(fb= b)+(ff>>8&1)); \
           fk = 0; \
         } while (0)
 
 #define SUB(b, n)  do {         \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= ~b)+1); \
-          else fr= a= (ff= (fa= a)+(fb= ~b)+1); \
+          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= ~b)+1); \
+          else fr= a= (ff= (fa= (alts?a_:a))+(fb= ~b)+1); \
           fk = 0; \
         } while (0)
 
 #define SBC(b, n) do {             \
           st+= n;               \
-          if ( altd ) fr_= a_= (ff_= (fa_= a)+(fb_= ~b)+(ff_>>8&1^1)); \
-          else fr= a= (ff= (fa= a)+(fb= ~b)+(ff>>8&1^1)); \
+          if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= ~b)+(ff_>>8&1^1)); \
+          else fr= a= (ff= (fa= (alts?a_:a))+(fb= ~b)+(ff>>8&1^1)); \
           fk = 0; \
         } while (0)
 
 #define AND(b, n) do {          \
           st+= n;               \
-          if ( altd ) { fa_= ~(a_= ff_= fr_= a&b); fb_= 0;} \
-          else { fa= ~(a= ff= fr= a&b);  fb= 0; } \
+          if ( altd ) { fa_= ~(a_= ff_= fr_= (alts?a_:a)&b); fb_= 0;} \
+          else { fa= ~(a= ff= fr= (alts?a_:a)&b);  fb= 0; } \
           fk = 0; \
       } while (0)
 
@@ -252,11 +252,11 @@
           st+= n;                    \
           if ( altd ) {              \
             fa_= 256                 \
-              | (ff_= fr_= a_= a^b); \
+              | (ff_= fr_= a_= (alts?a_:a)^b); \
             fb_= 0;                  \
           } else {                   \
             fa= 256                  \
-              | (ff= fr= a= a^b);     \
+              | (ff= fr= a= (alts?a_:a)^b);     \
             fb= 0;                   \
           }                          \
           fk = 0; \
@@ -266,11 +266,11 @@
           st += n;                     \
           if ( altd ) {                \
             fa_= 256                   \
-              | (ff_= fr_= a_ = a|b);  \
+              | (ff_= fr_= a_ = (alts?a_:a)|b);  \
             fb_= 0;                    \
           } else {                     \
             fa= 256                    \
-              | (ff= fr= a= a|b);       \
+              | (ff= fr= a= (alts?a_:a)|b);       \
             fb= 0;                     \
           } \
           fk = 0; \
@@ -281,13 +281,13 @@
 #define CP(b, n) do {           \
           st+= n;               \
           if (altd) {           \
-            fr_= (fa_= a)-b;    \
+            fr_= (fa_= (alts?a_:a))-b;    \
             fb_= ~b;            \
             ff_= fr_  & -41     \
                 | b   &  40;    \
             fr_&= 255;          \
           } else {              \
-            fr= (fa= a)-b;      \
+            fr= (fa= (alts?a_:a))-b;      \
             fb= ~b;             \
             ff= fr  & -41       \
                 | b   &  40;    \
@@ -3535,6 +3535,7 @@ int main (int argc, char **argv){
 static void handle_r4k_7f_page(void)
 {
     uint8_t opc;
+
     if (ih) {
         // 7f page - 8 bit operations moved out from main page
         r++;
@@ -3685,22 +3686,22 @@ static void handle_r4k_7f_page(void)
             LDRR(a, l, a_,4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x80: // ADD A,B
-            ADD(alts ? b_ : b, 4);
+            ADD((alts ? b_ : b), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x81: // ADD A,C
-            ADD(alts ? c_ : c, 4);
+            ADD((alts ? c_ : c), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x82: // ADD A,D
-            ADD(alts ? d_ : d, 4);
+            ADD((alts ? d_ : d), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x83: // ADD A,E
-            ADD(alts ? e_ : e, 4);
+            ADD((alts ? e_ : e), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x84: // ADD A,H
-            ADD(alts ? h_ : h, 4);
+            ADD((alts ? h_ : h), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x85: // ADD A,L
-            ADD(alts ? l_ : l, 4);
+            ADD((alts ? l_ : l), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x86: // ADD A,(HL)
             w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
@@ -3712,22 +3713,22 @@ static void handle_r4k_7f_page(void)
             else fr= a= (ff= 2*(fa= fb= a));
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x88: // ADC A,B
-            ADC(alts ? b_ : b, 4);
+            ADC((alts ? b_ : b), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x89: // ADC A,C
-            ADC(alts ? c_ : c, 4);
+            ADC((alts ? c_ : c), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x8a: // ADC A,D
-            ADC(alts ? d_ : d, 4);
+            ADC((alts ? d_ : d), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x8b: // ADC A,E
-            ADC(alts ? e_ : e, 4);
+            ADC((alts ? e_ : e), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x8c: // ADC A,H
-            ADC(alts ? h_ : h, 4);
+            ADC((alts ? h_ : h), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x8d: // ADC A,L
-            ADC(alts ? l_ : l, 4);
+            ADC((alts ? l_ : l), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x8e: // ADC A,(HL)
             w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
@@ -3739,22 +3740,22 @@ static void handle_r4k_7f_page(void)
             else fr= a= (ff= 2*(fa= fb= a)+(ff>>8&1));
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x90: // SUB B
-            SUB(alts ? b_ : b, 4);
+            SUB((alts ? b_ : b), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x91: // SUB C
-            SUB(alts ? c_ : c, 4);
+            SUB((alts ? c_ : c), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x92: // SUB D
-            SUB(alts ? d_ : d, 4);
+            SUB((alts ? d_ : d), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x93: // SUB E
-            SUB(alts ? e_ : e, 4);
+            SUB((alts ? e_ : e), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-        case 0x94: // SUB H
-            SUB(alts ? h_ : h, 4);
+        case 0x94: // SUB H(
+            SUB((alts ? h_ : h), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x95: // SUB L
-            SUB(alts ? l_ : l, 4);
+            SUB((alts ? l_ : l), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x96: // SUB (HL)
             w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
@@ -3771,22 +3772,22 @@ static void handle_r4k_7f_page(void)
             }
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x98: // SBC A,B
-            SBC(alts ? b_ : b, 4);
+            SBC((alts ? b_ : b), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x99: // SBC A,C
-            SBC(alts ? c_ : c,  4);
+            SBC((alts ? c_ : c), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x9a: // SBC A,D
-            SBC(alts ? d_ : d,  4);
+            SBC((alts ? d_ : d), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x9b: // SBC A,E
-            SBC(alts ? e_ : e, 4);
+            SBC((alts ? e_ : e), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x9c: // SBC A,H
-            SBC(alts ? h_ : h, 4);
+            SBC((alts ? h_ : h), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x9d: // SBC A,L
-            SBC(alts ? l_ : l, 4);
+            SBC((alts ? l_ : l), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0x9e: // SBC A,(HL)
             w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
@@ -3803,22 +3804,22 @@ static void handle_r4k_7f_page(void)
             }
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa0: // AND B
-            AND(alts ? b_ : b, 4);
+            AND((alts ? b_ : b), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa1: // AND C
-            AND(alts ? c_ : c, 4);
+            AND((alts ? c_ : c), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa2: // AND D
-            AND(alts ? d_ : d, 4);
+            AND((alts ? d_ : d), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa3: // AND E
-            AND(alts ? e_ : e,  4);
+            AND((alts ? e_ : e), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa4: // AND H
-            AND(alts ? h_ : h, 4);
+            AND((alts ? h_ : h), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa5: // AND L 
-            AND(alts ? l_ : l,  4);
+            AND((alts ? l_ : l), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa6: // AND (HL) // AND (IX+d) // AND (IY+d)
             w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
@@ -3835,22 +3836,22 @@ static void handle_r4k_7f_page(void)
             }
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa8: // XOR B
-            XOR(alts ? b_ : b, 4);
+            XOR((alts ? b_ : b), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xa9: // XOR C
-            XOR(alts ? c_ : c, 4);
+            XOR((alts ? c_ : c), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xaa: // XOR D
-            XOR(alts ? d_ : d, 4);
+            XOR((alts ? d_ : d), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xab: // XOR E
-            XOR(alts ? e_ : e, 4);
+            XOR((alts ? e_ : e), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xac: // XOR H
-            XOR(alts ? h_ : h, 4);
+            XOR((alts ? h_ : h), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xad: // XOR L 
-            XOR(alts ? l_ : l, 4);
+            XOR((alts ? l_ : l), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xae: // XOR (HL)
             w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
@@ -3862,22 +3863,22 @@ static void handle_r4k_7f_page(void)
             else { a= ff= fr= fb= 0; fa=256; }
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb0: // OR B
-            OR(alts ? b_ : b, 4);
+            OR((alts ? b_ : b), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb1: // OR C
-            OR(alts ? c_ : c, 4);
+            OR((alts ? c_ : c), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb2: // OR D
-            OR(alts ? d_ : d, 4);
+            OR((alts ? d_ : d), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb3: // OR E
-            OR(alts ? e_ : e, 4);
+            OR((alts ? e_ : e), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb4: // OR H
-            OR(alts ? h_ : h, 4);
+            OR((alts ? h_ : h), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb5: // OR L
-            OR(alts ? l_ : l, 4);
+            OR((alts ? l_ : l), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb6: // OR (HL) // OR (IX+d) // OR (IY+d)
             w = alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
@@ -3896,22 +3897,22 @@ static void handle_r4k_7f_page(void)
             }
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb8: // CP B
-            CP(alts ? b_ : b, 4);
+            CP((alts ? b_ : b), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xb9: // CP C
-            CP(alts ? c_ : c, 4);
+            CP((alts ? c_ : c), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xba: // CP D
-            CP(alts ? d_ : d, 4);
+            CP((alts ? d_ : d), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xbb: // CP E
-            CP(alts ? e_ : e, 4);
+            CP((alts ? e_ : e), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xbc: // CP H
-            CP(alts ? h_ : h, 4);
+            CP((alts ? h_ : h), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xbd: // CP L 
-            CP(alts ? l_ : l, 4);
+            CP((alts ? l_ : l), 4);
             ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
         case 0xbe: // CP (HL) 
             w= alts ? get_memory_data(l_|h_<<8) : get_memory_data(l|h<<8);
