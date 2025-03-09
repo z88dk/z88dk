@@ -1547,7 +1547,7 @@ void r4k_cp_jkhl_bcde(uint8_t opcode)
 void r4k_alu_jkhl_bcde(uint8_t opcode)
 {
     int op = (opcode >> 3) & 0x07;
-    char *types[] = { "add", "!!", "sub", "!!", "and", "xor", "or", "!!" };
+    char *types[] = { "add", "adc", "sub", "sbc", "and", "xor", "or", "!!" };
     char  buf[100];
 
     snprintf(buf, sizeof(buf),"%s jkhl,bcde", types[op]);
@@ -1727,6 +1727,25 @@ void r6k_swap_r32(uint8_t opcode, uint8_t isjkhl)
     st += 4;
 }
 
+void r6k_add_xy_d(uint8_t opc, uint8_t iy)
+{
+    uint16_t t = (get_memory_inst(pc++)^128)-128;
+    // TODO: altd Flags?
+    uint16_t v;
+
+    if ( iy == 0 ) {
+        t += xh << 8 | xl;
+        xh = (t >> 8) & 0xff;
+        xl = (t >> 0) & 0xff;
+    } else {
+        t +=  v = yh << 8 | yl;
+        yh = (t >> 8) & 0xff;
+        yl = (t >> 0) & 0xff;
+    }
+    st += 6;
+}
+
+
 // alu a,(ps+d)
 void r6k_49_alu_a_psd(uint8_t opcode)
 {
@@ -1828,6 +1847,18 @@ void r6k_49_alu_hl_psd(uint8_t opcode)
     st += 16;
 }
 
+void r6k_tstnull_ps(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "tstnull ps");
+    st+= 4;
+}
+
+void r6k_swap_r(uint8_t opcode)
+{
+    UNIMPLEMENTED(0xed00|opcode, "swap r");
+    st += 4;
+}
+
 
 // alu jkhl,(ps+d)
 void r6k_49_alu_jkhl_psd(uint8_t opcode)
@@ -1882,6 +1913,16 @@ void r6k_49_alu_jkhl_psd(uint8_t opcode)
     else { fr = zero; ff_ = carry << 8; }
     st += 16;
 }
+
+void r6k_alu_hl_xyd(uint8_t opcode, uint8_t iy)
+{
+    UNIMPLEMENTED((iy ? 0xfd00 : 0xdd00) | opcode, "alu hl,(xy+d)");
+
+}
+
+void r6k_alu_jkhl_xyd(uint8_t opcode, uint8_t iy)
+{
+    UNIMPLEMENTED((iy ? 0xfd00 : 0xdd00) | opcode, "alu jkhl,(xy+d)");}
 
 
 

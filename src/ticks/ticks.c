@@ -2412,23 +2412,27 @@ int main (int argc, char **argv){
         else
           LDRPI(xh, xl, a);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0x80: // ADD A,B
-        if ( israbbit4k() ) RABBIT4k_UNDEFINED();
+      case 0x80: // ADD A,B // (R6K) add hl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_hl_xyd(opc, iy);
+        else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else ADD(b,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0x81: // ADD A,C / (R4K) LD HL,BC
-        if ( israbbit4k() ) {  // LD HL,BC
+      case 0x81: // ADD A,C / (R4K) LD HL,BC // (R6K) adc hl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_hl_xyd(opc, iy);
+        else if ( israbbit4k() ) {  // LD HL,BC
             if ( altd ) { h_ = b; l_ = c; }
             else { h = b; l = c; }
             st+=2; 
         } else ADD(c,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0x82: // ADD A,D // (R4k) LDF (lmn),HL
-        if (israbbit4k()) r4k_ldf_ilmn_hl(opc);
+      case 0x82: // ADD A,D // (R4k) LDF (lmn),HL // (R6k) add jkhl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_jkhl_xyd(opc, iy);
+        else if (israbbit4k()) r4k_ldf_ilmn_hl(opc);
         else ADD(d,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0x83: // ADD A,E // (R4K) LD (mn),BCDE
-        if (israbbit4k()) r4k_ld_imn_r32(opc, 0);
+      case 0x83: // ADD A,E // (R4K) LD (mn),BCDE // (R6k) adc jkhl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_jkhl_xyd(opc, iy);
+        else if (israbbit4k()) r4k_ld_imn_r32(opc, 0);
         else ADD(e,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x84: // ADD A,H // ADD A,IXh // ADD A,IYh // (R4K) LD (mn),JKHL
@@ -2531,23 +2535,27 @@ int main (int argc, char **argv){
             else fr= a= (ff= 2*(fa= fb= a)+(ff>>8&1));
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0x90: // SUB B
-        if ( israbbit4k() ) RABBIT4k_UNDEFINED();
+      case 0x90: // SUB B // (R6K) sub hl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_hl_xyd(opc, iy);
+        else if ( israbbit4k() ) RABBIT4k_UNDEFINED();
         else SUB(b,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0x91: // SUB C / (R4K) LD BC,HL
-        if ( israbbit4k() ) { // LD BC,HL
+      case 0x91: // SUB C / (R4K) LD BC,HL // (R6K) sbc hl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_hl_xyd(opc, iy);
+        else if ( israbbit4k() ) { // LD BC,HL
             if ( altd ) { b_ = h; c_ = l; }
             else { b = h; c = l; }
             st+=2; 
         } else SUB(c,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0x92: // SUB D // (R4K) LDF HL,(lmn)
-        if (israbbit4k()) r4k_ldf_hl_ilmn(opc);
+      case 0x92: // SUB D // (R4K) LDF HL,(lmn) // (R6K) sub jkhl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_jkhl_xyd(opc, iy);
+        else if (israbbit4k()) r4k_ldf_hl_ilmn(opc);
         else SUB(d,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0x93: // SUB E // (R4K) LD BCDE,(mn)
-        if (israbbit4k()) r4k_ld_r32_imn(opc, 0);
+      case 0x93: // SUB E // (R4K) LD BCDE,(mn) // (R6K) sbc jkhl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_jkhl_xyd(opc, iy);
+        else if (israbbit4k()) r4k_ld_r32_imn(opc, 0);
         else SUB(e,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x94: // SUB H // SUB IXh // SUB IYh // (R4K) LD BCDE,(mn)
@@ -2665,8 +2673,9 @@ int main (int argc, char **argv){
             }
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0xa0:
-        if ( israbbit4k() ) { // JR GT,s8
+      case 0xa0: // (R6K) and hl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_hl_xyd(opc, iy);
+        else if ( israbbit4k() ) { // JR GT,s8
           st += 5;
           if (F_GT(f()))
             pc += (get_memory_inst(pc) ^ 128) - 127;
@@ -2676,15 +2685,17 @@ int main (int argc, char **argv){
           AND(b, ALUr_TICKS);
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0xa1: // AND C // LD HL,DE (R4K)
-        if ( israbbit4k() ) {  // LD HL,DE
+      case 0xa1: // AND C // LD HL,DE (R4K) // (R6K) xor hl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_hl_xyd(opc, iy);
+        else if ( israbbit4k() ) {  // LD HL,DE
             if ( altd ) { h_ = d; l_ = e; }
             else { h = d; l = e; }
             st+=2;
         } else AND(c, ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0xa2: // AND D / (R4K) JP GT,mn
-        if ( israbbit4k() ) { // JP GT,nn
+      case 0xa2: // AND D / (R4K) JP GT,mn // (R6K) and jkhl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_jkhl_xyd(opc, iy);
+        else if ( israbbit4k() ) { // JP GT,nn
             if (ih) {
                 long long sst = st;
                 JPCI(F_GT(f()));
@@ -2692,8 +2703,9 @@ int main (int argc, char **argv){
             }
         } else { AND(d, ALUr_TICKS); }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0xa3: // AND E // (R4K) LD BCDE,d
-        if (israbbit4k()) r4k_ld_r32_d(opc,0);
+      case 0xa3: // AND E // (R4K) LD BCDE,d // (R6K) xor jkhl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_jkhl_xyd(opc, iy);
+        else if (israbbit4k()) r4k_ld_r32_d(opc,0);
         else AND(e, ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xa4: // AND H // AND IXh // AND IYh // (R4K) LD JKHL,d
@@ -2819,8 +2831,9 @@ int main (int argc, char **argv){
             else { a= ff= fr= fb= 0; fa=256; }
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0xb0:
-        if ( israbbit4k() ) {  // JR LT, s8
+      case 0xb0: // (R6K) or hl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_hl_xyd(opc, iy);
+        else if ( israbbit4k() ) {  // JR LT, s8
           st += 5;
           if (F_LT(f()))
             pc += (get_memory_inst(pc) ^ 128) - 127;
@@ -2830,15 +2843,17 @@ int main (int argc, char **argv){
           OR(b,ALUr_TICKS);
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0xb1: // OR C // LD DE,HL (R4K)
-        if ( israbbit4k() ) {  // LD DE,HL
+      case 0xb1: // OR C // LD DE,HL (R4K) // (R6K) cp hl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_hl_xyd(opc, iy);
+        else if ( israbbit4k() ) {  // LD DE,HL
             if ( altd ) { d_ = h; e_ = l; }
             else { d = h; e = l; }
             st+=2;
         } else OR(c,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0xb2: // OR D / (R4K) JP LT,mn
-        if ( israbbit4k() ) { // JP LT,mn
+      case 0xb2: // OR D / (R4K) JP LT,mn // (R6K) or jkhl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_jkhl_xyd(opc, iy);
+        else if ( israbbit4k() ) { // JP LT,mn
             if (ih) {
                 long long sst = st;
                 JPCI(F_LT(f()));
@@ -2846,8 +2861,9 @@ int main (int argc, char **argv){
             }
         } else { OR(d,ALUr_TICKS); }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0xb3: // OR E / (R4K) EX BC,HL
-        if ( israbbit4k() ) r4k_ex_bc_hl(opc); // EX BC,HL
+      case 0xb3: // OR E / (R4K) EX BC,HL // (R6K) cp jkhl,(ixy+d)
+        if (israbbit6k() && ih == 0 ) r6k_alu_jkhl_xyd(opc, iy);
+        else if ( israbbit4k() ) r4k_ex_bc_hl(opc); // EX BC,HL
         else OR(e,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xb4: // OR H // OR IXh // OR IYh // (R4K) EX JKHL,BCDE
@@ -3048,8 +3064,12 @@ int main (int argc, char **argv){
             a= get_memory_data(sp++);
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
-      case 0xc5: // PUSH BC
-        PUSH(b, c);
+      case 0xc5: // PUSH BC // (R6K) add ix,d // add iy,d
+        if ( israbbit6k() && ih == 0 ) {
+            r6k_add_xy_d(opc, iy);
+        } else {
+            PUSH(b, c);
+        }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xd5: // PUSH DE
         PUSH(d, e);
@@ -3386,7 +3406,6 @@ int main (int argc, char **argv){
       case 0xed: // OP ED // (8085) LD HL,(DE) // (R4K) LD BCDE,PY, LD JKHL, PY
         if ( is8085() ) { // (8085) LD HL,(DE) (LHLDE)
           if ( get_memory_inst(pc) != 0xfe) i8085_ld_hl_ide(opc);
-          else handle_ed_page();
         } else if ( is8080() ) {
           if ( get_memory_inst(pc) == 0xfe) handle_ed_page();
           else printf("%04x: ILLEGAL 8080 prefix 0xED\n",pc-1);
@@ -4135,8 +4154,9 @@ static void handle_ed_page(void)
         else if ( isz80n()) z80n_ldws();
         else st += 8;
         break;
-    case 0xb7: // (ZXN) LDPIR // (KC160) LDF (lmn),SP
-        if ( iskc160() ) kc160_ldf_ilmn_rr(opc); // LDF (lmn),SP
+    case 0xb7: // (ZXN) LDPIR // (KC160) LDF (lmn),SP // (R6K) SWAP E
+        if ( israbbit6k()) r6k_swap_r(opc);
+        else if ( iskc160() ) kc160_ldf_ilmn_rr(opc); // LDF (lmn),SP
         else if ( isz80n()) z80n_ldpirx();
         else st += 8;
         break;
@@ -4413,6 +4433,12 @@ static void handle_ed_page(void)
         else st += israbbit() ? 4 : 8;
         break;
 
+    case 0xce: // (R6K) ADC JKHL,BCDE
+    case 0xde: // (R6K) SBC JKHL,BCDE
+        if ( israbbit6k()) r4k_alu_jkhl_bcde(opc);
+        else st += israbbit() ? 4 : 8;
+        break;
+
     case 0x7f: // (R3K) RDMODE // (KC160) MULS DE,HL
         if ( iskc160()) kc160_muls_de_hl(opc);
         else if (c_cpu & (CPU_R3K|CPU_R4K)) r3k_rdmode(opc);
@@ -4505,12 +4531,14 @@ static void handle_ed_page(void)
         else if ( isez80() ) ez80_ind2(opc);
         else st += israbbit() ? 4 : 8;
         break;
-    case 0xc7: // (EZ80) LD I,HL
-        if ( isez80() ) ez80_ld_i_hl(opc);
+    case 0xc7: // (EZ80) LD I,HL // (R6K) SWAP H
+        if ( israbbit6k()) r6k_swap_r(opc);
+        else if ( isez80() ) ez80_ld_i_hl(opc);
         else st += israbbit() ? 4 : 8;
         break;
-    case 0xd7: // (EZ80) LD HL,I
-        if ( isez80() ) ez80_ld_hl_i(opc);
+    case 0xd7: // (EZ80) LD HL,I // (R6K) SWAP L
+        if ( israbbit6k()) r6k_swap_r(opc);
+        else if ( isez80() ) ez80_ld_hl_i(opc);
         else st += israbbit() ? 4 : 8;
         break;
 
@@ -4523,21 +4551,27 @@ static void handle_ed_page(void)
         else st += 8;
         break;
 
+    case 0x86: // (KC160) LD (SP+d),BC // (R6K) TSTNULL PW
+    case 0x96: // (KC160) LD (SP+d),DE // (R6K) TSTNULL PX
+    case 0xa6: // (KC160) LD (SP+d),HL // (R6K) TSTNULL PY
+    case 0xb6: // (KC160) LD (SP+d),SP // (R6K) TSTNULL PZ
+        if ( israbbit6k()) r6k_tstnull_ps(opc);
+        else if ( iskc160() ) kc160_ld_ixysd_rr(opc);
+        else st+= 8;
+        break;
+
     case 0x85: // (KC160) LD (IX+d),BC
-    case 0x86: // (KC160) LD (SP+d),BC
     case 0x95: // (KC160) LD (SP+d),DE
-    case 0x96: // (KC160) LD (SP+d),DE
-    case 0xa6: // (KC160) LD (SP+d),HL
-    case 0xb6: // (KC160) LD (SP+d),SP
         if ( iskc160() ) kc160_ld_ixysd_rr(opc);
         else st+= 8;
         break;
 
 
-    case 0x87: // (KC160) LDF (lmn),BC
-    case 0x97: // (KC160) LDF (lmn),DE
-    case 0xa7: // (KC160) LDF (lmn),HL
-        if ( iskc160() ) kc160_ldf_ilmn_rr(opc);
+    case 0x87: // (KC160) LDF (lmn),BC // (R6K) SWAP B
+    case 0x97: // (KC160) LDF (lmn),DE // (R6K) SWAP C
+    case 0xa7: // (KC160) LDF (lmn),HL // (R6K) SWAP D
+        if ( israbbit6k()) r6k_swap_r(opc);
+        else if ( iskc160() ) kc160_ldf_ilmn_rr(opc);
         else st += 8;
         break;
 
@@ -4602,12 +4636,16 @@ static void handle_ed_page(void)
         break;
 
 
-    case 0xcd: case 0xce:
-    case 0xdd: case 0xde:
-    case 0xe7:
+    case 0xcd: 
+    case 0xdd:
     case 0xed:
-    case 0xf7:
         st+= 8; break;
+
+    case 0xe7: // (R6K) SWAP (HL)
+    case 0xf7: // (R6K) SWAP A
+        if ( israbbit6k()) r6k_swap_r(opc);
+        else st+=8;
+        break;
 
 
 
@@ -4818,7 +4856,7 @@ static void handle_ed_page(void)
         break;
     case 0x5c:   // (Z180) MLT DE // (R6K) TEST DE
         if ( canz180() ) z180_mlt(opc);
-        else if ( israbbit4k()) r4k_test_rp2(opc, 1);
+        else if ( israbbit6k()) r4k_test_rp2(opc, 1);
         else UNDOCUMENTED_NEG();
         break;
     case 0x6c:   // (Z180) MLT HL // (R4K) LDP HL,(HL)
