@@ -16,6 +16,55 @@ uint32_t pw_,px_,py_,pz_;
 #define SWAPR(r1,r2) { t = (r1); (r1) = (r2); (r1) = t; }
 
 
+// TODO: Flags may be wrong...
+#define ALU_OP(oper, r, lhs, rhs) do { \
+    uint8_t  carry = (((alts && (oper == 1 || oper == 3)) ? ff_ : ff) >> 8) & 1; \
+    uint8_t zero = 0; /* Set by all ops */   \
+    switch (oper) {                    \
+        case 0: /* add*/               \
+            r = rhs + lhs;             \
+            carry = r < rhs;           \
+            zero = r == 0;             \
+            break;                     \
+        case 1: /* adc */              \
+            r = rhs + lhs + carry;     \
+            carry = r < rhs;           \
+            zero = r == 0;             \
+            break;                     \
+        case 2: /* sub */              \
+            r = lhs - rhs;             \
+            carry = r > lhs;           \
+            zero = r == 0;             \
+            break;                     \
+        case 3: /* sbc */              \
+            r = lhs - rhs - carry;     \
+            carry = r > lhs;           \
+            zero = r == 0;             \
+            break;                     \
+        case 4: /* and */              \
+            r = rhs & lhs;             \
+            zero = r == 0;             \
+            carry = 0;                 \
+            break;                     \
+        case 5: /* xor */              \
+            r = rhs ^ lhs;             \
+            zero = r == 0;             \
+            carry = 0;                 \
+            break;                     \
+        case 6: /* or */               \
+            r = rhs | lhs;             \
+            zero = r == 0;             \
+            carry = 0;                 \
+            break;                     \
+        case 7: /* cp */               \
+            carry = rhs > lhs;         \
+            zero = (lhs == rhs);       \
+            break;                     \
+    }                                  \
+    if ( altd  ) { fr_ = zero; ff_ = carry << 8; } \
+    else { fr = zero; ff_ = carry << 8; } \
+} while(0)
+
 
 static uint32_t read_ps(uint8_t reg)
 {
@@ -138,7 +187,7 @@ static uint32_t ps8se(uint32_t ps, uint8_t offs)
     return ps;
 }
 
-static uint8_t *get_rr_msb_ptr(int reg)
+static uint8_t *get_rr_msb_ptr(int reg, uint8_t alt)
 {
     uint8_t *r, *r_;
 
@@ -156,11 +205,11 @@ static uint8_t *get_rr_msb_ptr(int reg)
         r = &yh; r_ = &yh;
         break;
     }
-    if ( altd ) return r_;
+    if ( alt ) return r_;
     return r;
 }
 
-static uint8_t *get_rr_lsb_ptr(int reg)
+static uint8_t *get_rr_lsb_ptr(int reg, uint8_t alt)
 {
     uint8_t *r, *r_;
 
@@ -178,11 +227,11 @@ static uint8_t *get_rr_lsb_ptr(int reg)
         r = &yl; r_ = &yl;
         break;
     }
-    if ( altd ) return r_;
+    if ( alt ) return r_;
     return r;
 }
 
-static uint8_t *get_rp2_msb_ptr(int reg)
+static uint8_t *get_rp2_msb_ptr(int reg, uint8_t alt)
 {
     uint8_t *r, *r_;
 
@@ -200,11 +249,11 @@ static uint8_t *get_rp2_msb_ptr(int reg)
         r = &j; r_ = &j_;
         break;
     }
-    if ( altd ) return r_;
+    if ( alt ) return r_;
     return r;
 }
 
-static uint8_t *get_rp2_lsb_ptr(int reg)
+static uint8_t *get_rp2_lsb_ptr(int reg, uint8_t alt)
 {
     uint8_t *r, *r_;
 
@@ -222,7 +271,7 @@ static uint8_t *get_rp2_lsb_ptr(int reg)
         r = &k; r_ = &k_;
         break;
     }
-    if ( altd ) return r_;
+    if ( alt ) return r_;
     return r;
 }
 
@@ -341,8 +390,8 @@ static void r4k_ld_rr_ipsd(uint8_t opcode)
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
     uint8_t *dm, *dl;
 
-    dm = get_rr_msb_ptr(dreg);
-    dl = get_rr_lsb_ptr(dreg);
+    dm = get_rr_msb_ptr(dreg, altd);
+    dl = get_rr_lsb_ptr(dreg, altd);
     
     *dl = get_memory(addr, MEM_TYPE_PHYSICAL);
     *dm = get_memory(ps8se(addr, 1), MEM_TYPE_PHYSICAL);
@@ -360,8 +409,8 @@ static void r4k_ld_ipdd_rr(uint8_t opcode)
 
     altd = 0;
 
-    dm = get_rr_msb_ptr(dreg);
-    dl = get_rr_lsb_ptr(dreg);
+    dm = get_rr_msb_ptr(dreg, altd);
+    dl = get_rr_lsb_ptr(dreg, altd);
 
     put_memory_physical(addr,*dl);
     put_memory_physical(ps8se(addr,1),*dm);
@@ -379,8 +428,8 @@ static void r4k_ld_rr_ipshl(uint8_t opcode)
     uint32_t addr = ps16se(ps,h<<8|l);
     uint8_t *dm, *dl;
 
-    dm = get_rr_msb_ptr(dreg);
-    dl = get_rr_lsb_ptr(dreg);
+    dm = get_rr_msb_ptr(dreg, altd);
+    dl = get_rr_lsb_ptr(dreg, altd);
     
     *dl = get_memory(addr, MEM_TYPE_PHYSICAL);
     *dm = get_memory(ps8se(addr, 1), MEM_TYPE_PHYSICAL);
@@ -398,8 +447,8 @@ static void r4k_ld_ipdhl_rr(uint8_t opcode)
 
     altd = 0;
 
-    dm = get_rr_msb_ptr(dreg);
-    dl = get_rr_lsb_ptr(dreg);
+    dm = get_rr_msb_ptr(dreg, alts);
+    dl = get_rr_lsb_ptr(dreg, alts);
 
     put_memory_physical(addr,*dl);
     put_memory_physical(ps8se(addr,1),*dm);
@@ -1141,8 +1190,8 @@ void r4k_ldf_rr_ilmn(uint8_t opcode)
     uint32_t addr;
     uint8_t *dm, *dl;
 
-    dm = get_rr_msb_ptr(dreg);
-    dl = get_rr_lsb_ptr(dreg);
+    dm = get_rr_msb_ptr(dreg, altd);
+    dl = get_rr_lsb_ptr(dreg, altd);
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
            (get_memory(pc + 1, MEM_TYPE_INST) << 0 ) |
@@ -1162,8 +1211,8 @@ void r4k_ldf_ilmn_rr(uint8_t opcode)
     uint8_t *dm, *dl;
 
     altd = 0;
-    dm = get_rr_msb_ptr(dreg);
-    dl = get_rr_lsb_ptr(dreg);
+    dm = get_rr_msb_ptr(dreg, alts);
+    dl = get_rr_lsb_ptr(dreg, alts);
 
 
     addr = (get_memory(pc + 0, MEM_TYPE_INST) << 0 ) |
@@ -1371,28 +1420,49 @@ void r4k_neg_hl(uint8_t opcode)
 
 void r4k_xor_hl_de(uint8_t opcode)
 {
-     UNIMPLEMENTED(opcode, "xor hl,de");
+    uint16_t hl = *get_rp2_lsb_ptr(2, alts) | (*get_rp2_msb_ptr(2,alts) << 8);
+    uint16_t de = *get_rp2_lsb_ptr(1, alts) | (*get_rp2_msb_ptr(1,alts) << 8);
+    uint16_t r;
+
+    ALU_OP(5, r, hl, de);
+
+    *get_rp2_lsb_ptr(2, altd) = r & 0xff;
+    *get_rp2_msb_ptr(2, altd) = (r >> 8) & 0xff;
+
+    st += 4;
 }
 
 void r4k_test_hlxy(uint8_t opcode, uint8_t prefix)
 {
+    uint16_t val, r;
+
     switch (prefix) {
     case 0x00:
-        UNIMPLEMENTED(opcode, "test hl");
+        val = *get_rp2_lsb_ptr(2, alts) | (*get_rp2_msb_ptr(2,alts) << 8);
         break;
     case 0xdd:
-        UNIMPLEMENTED(0xdd00|opcode, "test ix");
+        val = xl | (xh << 8);
         break;
     case 0xfd:
-        UNIMPLEMENTED(0xfd00|opcode, "test iy");
+        val = yl | (yh << 8);
         break;
     }
+    ALU_OP(7, r, val, 0); // CP
+    st += 4;
 }
 
 // test bc, (R6K) test de 
 void r4k_test_rp2(uint8_t opcode, uint8_t rp2)
 {
-    UNIMPLEMENTED( 0xed00 | opcode, "test rp2");
+    uint16_t val, r;
+
+    if ( opcode == 0x4c ) { // test bc
+        val = *get_rp2_lsb_ptr(0, alts) | (*get_rp2_msb_ptr(0,alts) << 8);
+    } else {
+        val = *get_rp2_lsb_ptr(1, alts) | (*get_rp2_msb_ptr(1,alts) << 8);
+    }
+    ALU_OP(7, r, val, 0); // CP
+    st += 4;
 }
 
 void r4k_test_r32(uint8_t opcode, uint8_t isjkhl)
@@ -1533,11 +1603,17 @@ void r4k_cp_hl_d(uint8_t opcode)
     UNIMPLEMENTED( 0xed00|opcode, "cp hl,d");
     st += 4;
 }
+
 void r4k_cp_hl_de(uint8_t opcode)
 {
-    UNIMPLEMENTED( 0xed00|opcode, "cp hl,de");
+    uint16_t hl = *get_rp2_lsb_ptr(2, alts) | (*get_rp2_msb_ptr(2,alts) << 8);
+    uint16_t de = *get_rp2_lsb_ptr(1, alts) | (*get_rp2_msb_ptr(1,alts) << 8);
+    uint16_t r;
+
+    ALU_OP(7, r, hl, de);
     st += 4;
 }
+
 void r4k_cp_jkhl_bcde(uint8_t opcode)
 {
     UNIMPLEMENTED( 0xed00|opcode, "cp jkhl,bcde");
@@ -1655,12 +1731,18 @@ void r6k_dec_ps(uint8_t opcode)
 void r6k_swap_rp2(uint8_t opcode)
 {
     uint8_t reg = ((opcode & 0xf0) >> 4) - 0x0c; // 0 =bc, 1=de, 2=hl, 3 = jk
-    uint8_t *lsb = get_rp2_lsb_ptr(reg);
-    uint8_t *msb = get_rp2_msb_ptr(reg);
+    uint8_t *slsb = get_rp2_lsb_ptr(reg, alts);
+    uint8_t *smsb = get_rp2_lsb_ptr(reg, alts);
+    uint8_t *dlsb = get_rp2_lsb_ptr(reg, altd);
+    uint8_t *dmsb = get_rp2_lsb_ptr(reg, altd); 
     uint8_t t;
 
-    SWAPR(*msb, *lsb);
-
+    if ( dmsb == smsb ) {
+        SWAPR(*smsb, *slsb);
+    } else {
+        SWAPR(*dmsb, *slsb);
+        SWAPR(*dlsb, *smsb);
+    }
     st += 4;
 }
 
@@ -1746,82 +1828,181 @@ void r6k_add_xy_d(uint8_t opc, uint8_t iy)
 }
 
 
-#define ALU_OP(oper, r, lhs, rhs) do { \
-    switch (oper) {                    \
-        case 0: /* add*/               \
-            r = rhs + lhs;              \
-            carry = r < rhs;           \
-            break;                     \
-        case 1: /* adc */              \
-            r = rhs + lhs + carry;      \
-            carry = r < rhs;           \
-            break;                     \
-        case 2: /* sub */              \
-            r = lhs - rhs;              \
-            carry = r > lhs;           \
-            break;                     \
-        case 3: /* sbc */              \
-            r = lhs - rhs - carry;      \
-            carry = r > lhs;           \
-            break;                     \
-        case 4: /* and */              \
-            r = rhs & lhs;              \
-            break;                     \
-        case 5: /* xor */              \
-            r = rhs ^ lhs;              \
-            break;                     \
-        case 6: /* or */               \
-            r = rhs | lhs;              \
-            break;                     \
-        case 7: /* cp */               \
-            carry = rhs > lhs;          \
-            zero = (lhs == rhs);        \
-            break;                     \
-    }                                  \
-} while(0)
-
 // alu a,(ps+d)
-void r6k_49_alu_a_psd(uint8_t opcode)
+void r6k_alu_a_psd(uint8_t opcode)
 {
     uint32_t r;
     uint32_t ps = read_ps(opcode & 0x03);
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
     uint8_t val = get_memory(addr, MEM_TYPE_PHYSICAL);
     uint8_t r8 =  alts ? a_ : a;
-    uint8_t  carry = ((altd ? ff_ : ff) >> 8) & 1;
-    uint8_t  zero;
 
     ALU_OP( ((opcode >> 4) & 0x07), r, r8, val);
 
     if ( altd ) a_ = r; else a = r;
-    
-    if ( altd ) { fr_ = zero; ff_ = carry << 8; }
-    else { fr = zero; ff_ = carry << 8; }
-    st += 16;
+
+    st += 10;
+}
+
+// alu a,(sp+n)
+void r6k_alu_a_spn(uint8_t opcode)
+{
+    uint8_t r;
+    uint16_t addr = (sp + get_memory_inst(pc++));
+    uint8_t val = get_memory(addr, MEM_TYPE_DATA);
+    uint8_t r8 =  alts ? a_ : a;
+
+    ALU_OP( ((opcode >> 4) & 0x07), r, r8, val);
+
+    if ( altd ) a_ = r; else a = r;
+
+    st += 10;
 }
 
 // alu hl,(ps+d)
-void r6k_49_alu_hl_psd(uint8_t opcode)
+void r6k_alu_hl_psd(uint8_t opcode)
+{
+    uint16_t r;
+    uint32_t ps = read_ps(opcode & 0x03);
+    uint32_t addr = ps8se(ps,get_memory_inst(pc++));
+    uint16_t val = get_memory(addr, MEM_TYPE_PHYSICAL) | (get_memory(addr+1, MEM_TYPE_PHYSICAL) << 8);
+    uint16_t r16 = (*get_rp2_msb_ptr(2,alts) << 8) | *get_rp2_lsb_ptr(2,alts);
+
+    ALU_OP( ((opcode >> 4) & 0x07), r, r16, val);
+
+    *get_rp2_lsb_ptr(2,altd) = r & 0xff;
+    *get_rp2_msb_ptr(2,altd) = (r >> 8) & 0xff;
+
+    st += 12;
+}
+
+
+// alu hl,(ixy+d)
+void r6k_alu_hl_xyd(uint8_t opcode, uint8_t iy)
+{
+    uint8_t oper = (opcode & 1) + ((((opcode - 0x80) >> 4) & 0x0f) * 2);
+    uint8_t msb = iy ? yh : yh;
+    uint8_t lsb = iy ? yl : xl;
+    uint16_t  addr = (msb << 8|lsb) + (get_memory_inst(pc++)^128)-128;
+    uint16_t  rhs = (get_memory(addr + 1, MEM_TYPE_DATA) << 8) | get_memory(addr + 0, MEM_TYPE_DATA);
+    uint16_t  lhs = (*get_rp2_msb_ptr(2,alts) << 8) | (*get_rp2_lsb_ptr(2,alts));  // get hl
+    uint16_t  r;
+
+    ALU_OP(oper, r, lhs, rhs);
+
+    *get_rp2_msb_ptr(2,altd) = (r >> 8 ) & 0xff;
+    *get_rp2_lsb_ptr(2,altd) = (r >> 0 ) & 0xff;
+
+    st += 12;
+}
+
+// alu hl,(sp+n)
+void r6k_alu_hl_spn(uint8_t opcode)
+{
+    uint16_t r;
+    uint16_t addr = (sp + get_memory_inst(pc++));
+    uint16_t val = get_memory(addr, MEM_TYPE_DATA) | (get_memory(addr+1, MEM_TYPE_DATA) << 8);
+    uint16_t r16 = (*get_rp2_msb_ptr(2,alts) << 8) | *get_rp2_lsb_ptr(2,alts);
+
+    ALU_OP( ((opcode >> 4) & 0x07), r, r16, val);
+
+    *get_rp2_lsb_ptr(2,altd) = r & 0xff;
+    *get_rp2_msb_ptr(2,altd) = (r >> 8) & 0xff;
+    
+
+    st += 12;
+}
+
+
+
+// alu jkhl,(ps+d)
+void r6k_alu_jkhl_psd(uint8_t opcode)
 {
     uint32_t r;
     uint32_t ps = read_ps(opcode & 0x03);
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
-    uint16_t val = get_memory(addr, MEM_TYPE_PHYSICAL) | (get_memory(addr+1, MEM_TYPE_PHYSICAL) << 8);
-    uint8_t *lsb = get_rp2_lsb_ptr(2); // hl
-    uint8_t *msb = get_rp2_msb_ptr(2); // hl
-    uint32_t r16 = (*msb << 8) | *lsb;
-    uint8_t  carry = ((altd ? ff_ : ff) >> 8) & 1;
-    uint8_t  zero;
+    uint32_t val = get_memory(addr, MEM_TYPE_PHYSICAL) | (get_memory(addr+1, MEM_TYPE_PHYSICAL) << 8) | (get_memory(addr+2, MEM_TYPE_PHYSICAL) << 16) | (get_memory(addr+3, MEM_TYPE_PHYSICAL) << 24);
+    uint8_t **reg32 = get_r32_source_ptr(1);
+    uint32_t r32 = (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r16, val);
 
-    *lsb = r & 0xff;
-    *msb = (r >> 8) & 0xff;
-    
-    if ( altd ) { fr_ = zero; ff_ = carry << 8; }
-    else { fr = zero; ff_ = carry << 8; }
+    ALU_OP( ((opcode >> 4) & 0x07), r, r32, val);
+
+    reg32 = get_r32_dest_ptr(1);
+    *reg32[0] = (r >> 0)  & 0xff;
+    *reg32[1] = (r >> 8)  & 0xff;
+    *reg32[2] = (r >> 16) & 0xff;
+    *reg32[3] = (r >> 24) & 0xff;
+
     st += 16;
 }
+
+// alu jkhl,ps
+void r6k_alu_jkhl_ps(uint8_t opcode)
+{
+    uint32_t r;
+    uint32_t val = read_ps(opcode & 0x03);
+    uint8_t **reg32 = get_r32_source_ptr(1);
+    uint32_t r32 = (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
+
+    ALU_OP( ((opcode >> 4) & 0x07), r, r32, val);
+
+    reg32 = get_r32_dest_ptr(1);
+    *reg32[0] = (r >> 0)  & 0xff;
+    *reg32[1] = (r >> 8)  & 0xff;
+    *reg32[2] = (r >> 16) & 0xff;
+    *reg32[3] = (r >> 24) & 0xff;
+
+    st += 4;
+}
+
+
+// alu jkhl,(ixy+d)
+void r6k_alu_jkhl_xyd(uint8_t opcode, uint8_t iy)
+{
+    uint8_t oper = (opcode & 1) + ((((opcode - 0x80) >> 4) & 0x0f) * 2);
+    uint8_t msb = iy ? yh : yh;
+    uint8_t lsb = iy ? yl : xl;
+    uint16_t  addr = (msb << 8|lsb) + (get_memory_inst(pc++)^128)-128;
+    uint32_t  rhs = (get_memory(addr + 3, MEM_TYPE_DATA) << 24) | (get_memory(addr + 2, MEM_TYPE_DATA) << 16) | (get_memory(addr + 1, MEM_TYPE_DATA) << 8) | get_memory(addr + 0, MEM_TYPE_DATA);
+    uint8_t  **r32ptr = get_r32_source_ptr(1);
+    uint32_t  lhs = (*r32ptr[3] << 24) | (*r32ptr[2] << 16) | (*r32ptr[1] << 8) | *r32ptr[0];
+    uint16_t  r;
+
+    ALU_OP(oper, r, lhs, rhs);
+
+    r32ptr = get_r32_dest_ptr(1);
+    *r32ptr[0] = (r >> 0  ) & 0xff;
+    *r32ptr[1] = (r >> 8  ) & 0xff;
+    *r32ptr[2] = (r >> 16 ) & 0xff;
+    *r32ptr[3] = (r >> 24 ) & 0xff;
+
+    st += 16;
+}
+
+// alu jkhl,(sp+n)
+void r6k_alu_jkhl_spn(uint8_t opcode)
+{
+    uint16_t addr = (sp + get_memory_inst(pc++));
+    uint32_t  rhs = (get_memory(addr + 3, MEM_TYPE_DATA) << 24) | (get_memory(addr + 2, MEM_TYPE_DATA) << 16) | (get_memory(addr + 1, MEM_TYPE_DATA) << 8) | get_memory(addr + 0, MEM_TYPE_DATA);
+    uint8_t  **r32ptr = get_r32_source_ptr(1);
+    uint32_t  lhs = (*r32ptr[3] << 24) | (*r32ptr[2] << 16) | (*r32ptr[1] << 8) | *r32ptr[0];
+    uint16_t  r;
+
+    ALU_OP(((opcode >> 4) & 0x07), r, lhs, rhs);
+
+    r32ptr = get_r32_dest_ptr(1);
+    *r32ptr[0] = (r >> 0  ) & 0xff;
+    *r32ptr[1] = (r >> 8  ) & 0xff;
+    *r32ptr[2] = (r >> 16 ) & 0xff;
+    *r32ptr[3] = (r >> 24 ) & 0xff;
+
+    st += 16;
+}
+
+
+
+
 
 void r6k_tstnull_ps(uint8_t opcode)
 {
@@ -1831,44 +2012,10 @@ void r6k_tstnull_ps(uint8_t opcode)
 
 void r6k_swap_r(uint8_t opcode)
 {
+    // Doc suggests that that this is a mirror?
     UNIMPLEMENTED(0xed00|opcode, "swap r");
     st += 4;
 }
-
-
-// alu jkhl,(ps+d)
-void r6k_49_alu_jkhl_psd(uint8_t opcode)
-{
-    uint32_t r;
-    uint32_t ps = read_ps(opcode & 0x03);
-    uint32_t addr = ps8se(ps,get_memory_inst(pc++));
-    uint32_t val = get_memory(addr, MEM_TYPE_PHYSICAL) | (get_memory(addr+1, MEM_TYPE_PHYSICAL) << 8) | (get_memory(addr+2, MEM_TYPE_PHYSICAL) << 16) | (get_memory(addr+3, MEM_TYPE_PHYSICAL) << 24);
-    uint8_t **reg32 = get_r32_dest_ptr(1);
-    uint32_t r32 = (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
-    uint8_t  carry = ((altd ? ff_ : ff) >> 8) & 1;
-    uint8_t  zero;
-
-    ALU_OP( ((opcode >> 4) & 0x07), r, r32, val);
-
-    *reg32[0] = (r >> 0)  & 0xff;
-    *reg32[1] = (r >> 8)  & 0xff;
-    *reg32[2] = (r >> 16) & 0xff;
-    *reg32[3] = (r >> 24) & 0xff;
-
-    if ( altd ) { fr_ = zero; ff_ = carry << 8; }
-    else { fr = zero; ff_ = carry << 8; }
-    st += 16;
-}
-
-void r6k_alu_hl_xyd(uint8_t opcode, uint8_t iy)
-{
-    UNIMPLEMENTED((iy ? 0xfd00 : 0xdd00) | opcode, "alu hl,(xy+d)");
-
-}
-
-void r6k_alu_jkhl_xyd(uint8_t opcode, uint8_t iy)
-{
-    UNIMPLEMENTED((iy ? 0xfd00 : 0xdd00) | opcode, "alu jkhl,(xy+d)");}
 
 
 
@@ -1947,37 +2094,37 @@ void r6k_handle_49_page(void)
         case 0x0e:  // alu jkhl,(py+d)
         case 0x0d:  // alu jkhl,(px+d)
         case 0x0c:  // alu jkhl,(pw+d) 
-            r6k_49_alu_jkhl_psd(opc);
+            r6k_alu_jkhl_psd(opc);
             break;
         case 0x0b:  // alu hl,(pz+d)
         case 0x0a:  // alu hl,(py+d)
         case 0x09:  // alu hl,(px+d)
         case 0x08:  // alu hl,(pw+d) 
-            r6k_49_alu_hl_psd(opc);
+            r6k_alu_hl_psd(opc);
             break;
         case 0x07:  // alu a,(pz+d)
         case 0x06:  // alu a,(py+d)
         case 0x05:  // alu a,(px+d)
         case 0x04:  // alu a,(pw+d) 
-            r6k_49_alu_a_psd(opc);
+            r6k_alu_a_psd(opc);
             break;
         case 0x03:  // alu jkhl,pz
         case 0x02:  // alu jkhl,py
         case 0x01:  // alu jkhl,px
         case 0x00:  // alu jkhl,pw
-            UNIMPLEMENTED(0x4900|opc, "alu jkhl,ps)");
+            r6k_alu_jkhl_ps(opc);
             break;
         }
    } else if ( (opc & 0x0f) >= 0x09 ) {
         switch ( opc & 0x0f ) {
         case 0x09:
-            UNIMPLEMENTED(0x4900|opc, "alu a,(sp+n)");
+            r6k_alu_a_spn(opc);
             break;
         case 0x0a:
-            UNIMPLEMENTED(0x4900|opc, "alu hl,(sp+n)");
+            r6k_alu_hl_spn(opc);
             break;
         case 0x0b:
-            UNIMPLEMENTED(0x4900|opc, "alu jkhl,(sp+n)");
+            r6k_alu_jkhl_spn(opc);
             break;
         case 0x0c:
             UNIMPLEMENTED(0x4900|opc, "slXreg");
