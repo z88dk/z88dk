@@ -28,7 +28,7 @@
 
 ._negate
 	ld	hl,(sp+2)
-	neg	hl
+	call	l_neg
 	ret
 
 
