@@ -1372,3 +1372,10 @@ int israbbit4k(void)
 {
     return 0;
 }
+
+
+int israbbit6k(void)
+{
+    return 0;
+}
+

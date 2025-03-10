@@ -39,6 +39,7 @@ static void usage(char *program)
     printf("  -mr3k          Disassemble Rabbit 3000 code\n");
     printf("  -mr4k          Disassemble Rabbit 4000 code\n");
     printf("  -mr5k          Disassemble Rabbit 5000 code\n");
+    printf("  -mr6k          Disassemble Rabbit 6000 code\n");
     printf("  -mr800         Disassemble R800 code\n");
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
     printf("  -m8080         Disassemble 8080 code (with z80 mnemonics)\n");
@@ -117,6 +118,8 @@ int main(int argc, char **argv)
                     c_cpu = CPU_R4K;
                 } else if ( strcmp(&argv[0][1],"mr5k") == 0 ) {
                     c_cpu = CPU_R4K;
+                } else if ( strcmp(&argv[0][1],"mr6k") == 0 ) {
+                    c_cpu = CPU_R6K;
                 } else if ( strcmp(&argv[0][1],"mr800") == 0 ) {
                     c_cpu = CPU_R800;
                 } else if ( strcmp(&argv[0][1],"mgbz80") == 0 ) {
@@ -203,5 +206,10 @@ uint8_t get_memory(uint32_t pc, memtype type)
 
 int israbbit4k(void)
 {
-    return c_cpu & CPU_R4K;
+    return c_cpu & (CPU_R4K|CPU_R6K);
+}
+
+int israbbit6k(void)
+{
+    return c_cpu & (CPU_R6K);
 }

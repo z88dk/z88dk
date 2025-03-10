@@ -178,12 +178,11 @@ void rxk_ld_hl_xy(uint8_t opcode, uint8_t prefix)
     if ( prefix == 0xfd ) {
         if ( altd ) { h_ = yh; l_ = yl; }
         else { h = yh; l = yl; }
-        st += 4;
     } else {
         if ( altd ) { h_ = xh; l_ = xl; }
         else { h = xh; l = xl; }
-        st += 4;
     }
+    st += 4;
 }
 
 void rxk_ld_xy_hl(uint8_t opcode, uint8_t prefix)
