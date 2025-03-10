@@ -78,10 +78,22 @@ IF FORvz
     defc    WANT_swapgfxbk = 0
 ENDIF
 
-IF FORg800
+IF FORg850
     DEFINE gotgfx
-    defc maxx    = 143    ; display size of the PC-G850
-    defc maxy    = 47    ; (a different "getmaxy" is provided for G800 and smaller ones)
+    defc maxx    = 144    ; display size of the PC-G850
+    defc maxy    = 48
+ENDIF
+
+IF FORg815
+    DEFINE gotgfx
+    defc maxx    = 144    ; display size of the PC-G815
+    defc maxy    = 32
+ENDIF
+
+IF FORe200
+    DEFINE gotgfx
+    defc maxx    = 120    ; display size of the PC-E200
+    defc maxy    = 32
 ENDIF
 
 IF FORh19
