@@ -13,7 +13,7 @@ sety:
     call    out58
 
     ld      a,h
-    sub     60                          ; check if x is in the left half of the display
+    sub     72                          ; check if x is in the left half of the display
 
     ld      a,0xb8
 	ld		(setx_half+1),a
@@ -22,19 +22,34 @@ sety:
     ; right half
     ld      a,0xbc
 	ld		(setx_half+1),a
-    ld      a,120                       ; mirror the x coordinates
+    ld      a,144                       ; mirror the x coordinates
     sub     h                           ; adjust x
 	ld      h,a
-	
 left_half:
+	
+	ld		a,h
+	sub		60
+	jr      c,first_blocks_a
+	ld		h,a
+first_blocks_a:
+	ld		a,54h
+	jr      c,first_blocks_b
+	ld		a,58h
+first_blocks_b:
+	ld		(x_port+1),a
+	inc     a
+	ld		(loop59+1),a
+	inc		a
+    exx
+	ld		b,0
+	ld		c,a
+	exx
+	inc     a
+	ld		b,0
+	ld		c,a
+
     pop     af
 
-
-; NOTE:  This is valid for the E200/G, NOT for the G815!
-    exx
-    ld      bc,5Ah                       ; output data port, it must be survive through getpat and setx
-    exx
-    ld      bc,5Bh                       ; input data port, it must be survive through getpat and setx
     ret
 
 
