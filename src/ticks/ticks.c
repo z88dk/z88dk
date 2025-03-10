@@ -1055,6 +1055,8 @@ int main (int argc, char **argv){
             c_cpu = CPU_R4K;
           } else if ( strcmp(&argv[0][1],"mr5k") == 0 ) {
             c_cpu = CPU_R4K;
+          } else if ( strcmp(&argv[0][1],"mr6k") == 0 ) {
+            c_cpu = CPU_R6K;
           } else if ( strcmp(&argv[0][1],"mez80_z80") == 0 ) {
             c_cpu = CPU_EZ80;
           } else if ( strcmp(&argv[0][1],"mgbz80") == 0 ) {

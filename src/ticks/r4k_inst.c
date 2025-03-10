@@ -1750,7 +1750,7 @@ void r6k_swap_rp2(uint8_t opcode)
 void r6k_mul_hl_de(void)
 {
     // JK:HL = HL • DE
-    int32_t result = (( (int32_t)(int8_t)d * 256 ) + e) * (( (int32_t)(int8_t)b * 256 ) + c);
+    int32_t result = (( (int32_t)(int8_t)d * 256 ) + e) * (( (int32_t)(int8_t)h * 256 ) + l);
     j = (result >> 24) & 0xff;
     k = (result >> 16) & 0xff;
     h  = (result >> 8 ) & 0xff;

@@ -99,6 +99,7 @@ static option  sccz80_opts[] = {
     { 0, "mr2ka", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000A", &c_cpu, NULL, CPU_R2KA },
     { 0, "mr3k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 3000", &c_cpu, NULL, CPU_R3K },
     { 0, "mr4k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 4000", &c_cpu, NULL, CPU_R4K },
+    { 0, "mr6k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 4000", &c_cpu, NULL, CPU_R4K|CPU_R6K },
     { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the Gameboy CPU", &c_cpu, NULL, CPU_GBZ80 },
     { 0, "mkc160", OPT_ASSIGN|OPT_INT, "Generate output for the KC160", &c_cpu, NULL, CPU_KC160 },
     { 0, "", OPT_HEADER, "Code generation options", NULL, NULL, 0 },
