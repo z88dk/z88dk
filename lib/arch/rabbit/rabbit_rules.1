@@ -318,11 +318,20 @@
 
 %check 0 <= %1 <= 254
 	push	hl
-	call	l_gint%1sp	;%2
+	ld	hl,(sp+%1)
 	pop	de
 =
 	ex	de,hl
 	ld	hl,(sp+%eval(%1 2 -))
+
+%check 0 <= %1 <= 254
+	call	l_gint%1sp	;%2
+=
+	ld	hl,(sp+%1)
+
+	call	l_neg
+=
+	neg	hl
 
 %notcpu r2ka
 %notcpu r3k

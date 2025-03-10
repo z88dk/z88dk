@@ -1415,7 +1415,15 @@ void r4k_flag_cc_hl(uint8_t opcode, uint8_t set)
 
 void r4k_neg_hl(uint8_t opcode)
 {
-     UNIMPLEMENTED(opcode, "neg hl");
+    uint16_t hl = *get_rp2_lsb_ptr(2, alts) | (*get_rp2_msb_ptr(2,alts) << 8);
+    uint16_t r;
+
+    ALU_OP(2, r, 0, hl);
+
+    *get_rp2_lsb_ptr(2, altd) = r & 0xff;
+    *get_rp2_msb_ptr(2, altd) = (r >> 8) & 0xff;
+    
+    st += 2;
 }
 
 void r4k_xor_hl_de(uint8_t opcode)
@@ -1447,7 +1455,7 @@ void r4k_test_hlxy(uint8_t opcode, uint8_t prefix)
         val = yl | (yh << 8);
         break;
     }
-    ALU_OP(7, r, val, 0); // CP
+    ALU_OP(6, r, val, 0); // OR
     st += 4;
 }
 
@@ -1461,20 +1469,40 @@ void r4k_test_rp2(uint8_t opcode, uint8_t rp2)
     } else {
         val = *get_rp2_lsb_ptr(1, alts) | (*get_rp2_msb_ptr(1,alts) << 8);
     }
-    ALU_OP(7, r, val, 0); // CP
+    ALU_OP(6, r, val, 0); // OR
     st += 4;
 }
 
 void r4k_test_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    if (isjkhl) UNIMPLEMENTED( 0xfd00 | opcode, "test jkhl");
-    else UNIMPLEMENTED( 0xdd00 | opcode, "test bcde");
+    uint8_t **reg32 = get_r32_source_ptr(isjkhl);
+    uint32_t r32 = (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
+    uint32_t r;
+
+    ALU_OP(6, r, r32, 0); // OR
+
+    st += 4;
 }
 
 void r4k_neg_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    if (isjkhl) UNIMPLEMENTED( 0xfd00 | opcode, "neg jkhl");
-    else UNIMPLEMENTED( 0xdd00 | opcode, "neg bcde");
+    uint8_t **reg32 = get_r32_source_ptr(isjkhl);
+    uint32_t r32 = (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
+    uint32_t r;
+    
+    ALU_OP(2, r, 0, r32);
+
+    *get_rp2_lsb_ptr(2, altd) = r & 0xff;
+    *get_rp2_msb_ptr(2, altd) = (r >> 8) & 0xff;
+    
+
+    reg32 = get_r32_dest_ptr(isjkhl);
+    *reg32[0] = (r >> 0)  & 0xff;
+    *reg32[1] = (r >> 8)  & 0xff;
+    *reg32[2] = (r >> 16) & 0xff;
+    *reg32[3] = (r >> 24) & 0xff;
+
+    st += 4;
 }
 
 void r4k_rlb_a_r32(uint8_t opcode, uint8_t isjkhl)
@@ -1600,7 +1628,12 @@ void r4k_ld_htr_a(uint8_t opcode)
 
 void r4k_cp_hl_d(uint8_t opcode)
 {
-    UNIMPLEMENTED( 0xed00|opcode, "cp hl,d");
+    uint16_t compare = (get_memory_inst(pc++)^128)-128;
+    uint16_t r;
+    uint16_t hl = *get_rp2_lsb_ptr(2, alts) | (*get_rp2_msb_ptr(2,alts) << 8);
+
+    ALU_OP(7, r, hl, compare);
+    
     st += 4;
 }
 
@@ -1616,19 +1649,44 @@ void r4k_cp_hl_de(uint8_t opcode)
 
 void r4k_cp_jkhl_bcde(uint8_t opcode)
 {
-    UNIMPLEMENTED( 0xed00|opcode, "cp jkhl,bcde");
+    uint32_t r;
+    uint8_t **reg32;
+    uint32_t jkhl;
+    uint32_t bcde;
+
+    reg32 = get_r32_source_ptr(1);
+    jkhl =  (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
+
+    reg32 = get_r32_source_ptr(0);
+    bcde =  (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
+
+    ALU_OP(7, r, jkhl, bcde); // CP
+
     st += 4;
 }
 
+// Note cp jkhl,bcde uses a different opcode and doesn't enter via here
 void r4k_alu_jkhl_bcde(uint8_t opcode)
 {
     int op = (opcode >> 3) & 0x07;
-    char *types[] = { "add", "adc", "sub", "sbc", "and", "xor", "or", "!!" };
-    char  buf[100];
+    uint32_t r;
+    uint8_t **reg32;
+    uint32_t jkhl;
+    uint32_t bcde;
 
-    snprintf(buf, sizeof(buf),"%s jkhl,bcde", types[op]);
+    reg32 = get_r32_source_ptr(1);
+    jkhl =  (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
 
-    UNIMPLEMENTED( 0xed00|opcode, buf);
+    reg32 = get_r32_source_ptr(0);
+    bcde =  (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
+
+    ALU_OP(op, r, jkhl, bcde);
+
+    reg32 = get_r32_dest_ptr(1);
+    *reg32[0] = (r >> 0)  & 0xff;
+    *reg32[1] = (r >> 8)  & 0xff;
+    *reg32[2] = (r >> 16) & 0xff;
+    *reg32[3] = (r >> 24) & 0xff;
     st += 4;
 }
 
