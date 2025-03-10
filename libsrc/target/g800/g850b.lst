@@ -1,6 +1,3 @@
 target/g800/stdio/fgetc_cons_850
 target/g800/stdio/getk_850
-target/g800/graphics/locate_850
-target/g800/graphics/getmaxy_850
-target/g800/graphics/clsgraph_850
 @target/g800/g800_common.lst
