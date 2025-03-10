@@ -273,6 +273,9 @@ extern void r4k_flag_cc_hl(uint8_t opcode, uint8_t set);
 extern void r4k_setsysp_mn(uint8_t opcode);
 extern void r4k_exp(uint8_t opcode);
 extern void r4k_test_rp2(uint8_t opcode, uint8_t rp2);
+extern void r4k_ld_hl_bc(uint8_t opcode);
+extern void r4k_ld_hl_de(uint8_t opcode);
+extern void r4k_ld_de_hl(uint8_t opcode);
 
 // r6k
 extern void r6k_swap_rp2(uint8_t opcode);
