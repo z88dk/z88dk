@@ -1492,10 +1492,6 @@ void r4k_neg_r32(uint8_t opcode, uint8_t isjkhl)
     
     ALU_OP(2, r, 0, r32);
 
-    *get_rp2_lsb_ptr(2, altd) = r & 0xff;
-    *get_rp2_msb_ptr(2, altd) = (r >> 8) & 0xff;
-    
-
     reg32 = get_r32_dest_ptr(isjkhl);
     *reg32[0] = (r >> 0)  & 0xff;
     *reg32[1] = (r >> 8)  & 0xff;
