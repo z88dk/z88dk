@@ -151,7 +151,7 @@ ELSE
     and     0x0f
 setx_half:
     or      0xb8                  ; SMC
-    and     0xbf
+;    and     0xbf
     call    outp_disp
 
       ; higher 4bit of x(e)
@@ -168,11 +168,19 @@ ENDIF
 outp_disp:
     push    af
 busy_check:
+IF FORg850
     in      a, (0x40)
+ELSE
+    in      a, (0x59)
+ENDIF
     and     0x80
     jp      nz, busy_check
     pop     af
 x_port:
+IF FORg850
     out     (0x40), a
+ELSE
+    out     (0x58), a
+ENDIF
     ret
 
