@@ -161,6 +161,9 @@
 
 
 /* Single sprite memory usage, including bytes for its size */
+#if (spritesize == 4)
+  #define spritemem 5
+#endif
 #if (spritesize == 10)
   #define spritemem 22
 #endif
