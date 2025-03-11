@@ -9144,22 +9144,45 @@
  ipset 3                        ; Error
  ipset 4                        ; Error
  j_c 0x1234                     ; Error
+ j_c, 0x1234                    ; Error
+ j_eq 0x1234                    ; Error
+ j_geu 0x1234                   ; Error
  j_gt 0x1234                    ; Error
+ j_gtu 0x1234                   ; Error
+ j_leu 0x1234                   ; Error
  j_lo 0x1234                    ; Error
  j_lt 0x1234                    ; Error
+ j_ltu 0x1234                   ; Error
  j_lz 0x1234                    ; Error
  j_m 0x1234                     ; Error
+ j_m, 0x1234                    ; Error
  j_nc 0x1234                    ; Error
+ j_nc, 0x1234                   ; Error
+ j_ne 0x1234                    ; Error
+ j_nv 0x1234                    ; Error
  j_nz 0x1234                    ; Error
+ j_nz, 0x1234                   ; Error
  j_p 0x1234                     ; Error
+ j_p, 0x1234                    ; Error
  j_pe 0x1234                    ; Error
+ j_pe, 0x1234                   ; Error
  j_po 0x1234                    ; Error
+ j_po, 0x1234                   ; Error
+ j_v 0x1234                     ; Error
  j_z 0x1234                     ; Error
+ j_z, 0x1234                    ; Error
+ jc 0x1234                      ; Error
+ jeq 0x1234                     ; Error
+ jgeu 0x1234                    ; Error
  jgt 0x1234                     ; Error
+ jgtu 0x1234                    ; Error
  jk 0x1234                      ; Error
+ jleu 0x1234                    ; Error
  jlo 0x1234                     ; Error
  jlt 0x1234                     ; Error
+ jltu 0x1234                    ; Error
  jlz 0x1234                     ; Error
+ jm 0x1234                      ; Error
  jmp (ahl)                      ; Error
  jmp (aix)                      ; Error
  jmp (aiy)                      ; Error
@@ -9267,8 +9290,12 @@
  jmp.sis po, 0x1234             ; Error
  jmp.sis v, 0x1234              ; Error
  jmp.sis z, 0x1234              ; Error
+ jnc 0x1234                     ; Error
+ jne 0x1234                     ; Error
  jnk 0x1234                     ; Error
+ jnv 0x1234                     ; Error
  jnx5 0x1234                    ; Error
+ jnz 0x1234                     ; Error
  jp (ahl)                       ; Error
  jp (aix)                       ; Error
  jp (aiy)                       ; Error
@@ -9290,6 +9317,8 @@
  jp (zhl)                       ; Error
  jp (zix)                       ; Error
  jp (ziy)                       ; Error
+ jp 0x1234                      ; Error
+ jp 0x123456                    ; Error
  jp c, 0x1234                   ; Error
  jp c, 0x123456                 ; Error
  jp eq, 0x1234                  ; Error
@@ -9387,6 +9416,9 @@
  jp3 ne, 0x123456               ; Error
  jp3 nz, 0x123456               ; Error
  jp3 z, 0x123456                ; Error
+ jpe 0x1234                     ; Error
+ jpo 0x1234                     ; Error
+ jr 0x1234                      ; Error
  jr c, 0x1234                   ; Error
  jr eq, 0x1234                  ; Error
  jr geu, 0x1234                 ; Error
@@ -9397,7 +9429,9 @@
  jr ne, 0x1234                  ; Error
  jr nz, 0x1234                  ; Error
  jr z, 0x1234                   ; Error
+ jv 0x1234                      ; Error
  jx5 0x1234                     ; Error
+ jz 0x1234                      ; Error
  ld (0x1234), a                 ; Error
  ld (0x1234), bc                ; Error
  ld (0x1234), bcde              ; Error

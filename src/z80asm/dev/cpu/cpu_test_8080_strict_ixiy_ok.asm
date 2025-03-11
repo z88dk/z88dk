@@ -122,32 +122,15 @@
  inx d                          ; 13
  inx h                          ; 23
  inx sp                         ; 33
- j_eq 0x1234                    ; CA 34 12
- j_geu 0x1234                   ; D2 34 12
- j_gtu 0x1234                   ; CA EB 00 D2 34 12
- j_leu 0x1234                   ; CA 34 12 DA 34 12
- j_ltu 0x1234                   ; DA 34 12
- j_ne 0x1234                    ; C2 34 12
- j_nv 0x1234                    ; E2 34 12
- j_v 0x1234                     ; EA 34 12
- jc 0x1234                      ; DA 34 12
- jeq 0x1234                     ; CA 34 12
- jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 0C 01 D2 34 12
- jleu 0x1234                    ; CA 34 12 DA 34 12
- jltu 0x1234                    ; DA 34 12
- jm 0x1234                      ; FA 34 12
+ jc, 0x1234                     ; DA 34 12
+ jm, 0x1234                     ; FA 34 12
  jmp 0x1234                     ; C3 34 12
- jnc 0x1234                     ; D2 34 12
- jne 0x1234                     ; C2 34 12
- jnv 0x1234                     ; E2 34 12
- jnz 0x1234                     ; C2 34 12
- jp 0x1234                      ; F2 34 12
- jpe 0x1234                     ; EA 34 12
- jpo 0x1234                     ; E2 34 12
- jr 0x1234                      ; F2 34 12
- jv 0x1234                      ; EA 34 12
- jz 0x1234                      ; CA 34 12
+ jnc, 0x1234                    ; D2 34 12
+ jnz, 0x1234                    ; C2 34 12
+ jp, 0x1234                     ; F2 34 12
+ jpe, 0x1234                    ; EA 34 12
+ jpo, 0x1234                    ; E2 34 12
+ jz, 0x1234                     ; CA 34 12
  lda 0x1234                     ; 3A 34 12
  ldax b                         ; 0A
  ldax d                         ; 1A

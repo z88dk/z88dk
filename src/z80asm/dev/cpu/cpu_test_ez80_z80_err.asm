@@ -7946,15 +7946,25 @@
  ipset 2                        ; Error
  ipset 3                        ; Error
  ipset 4                        ; Error
+ j_c, 0x1234                    ; Error
  j_gt 0x1234                    ; Error
  j_lo 0x1234                    ; Error
  j_lt 0x1234                    ; Error
  j_lz 0x1234                    ; Error
+ j_m, 0x1234                    ; Error
+ j_nc, 0x1234                   ; Error
+ j_nz, 0x1234                   ; Error
+ j_p, 0x1234                    ; Error
+ j_pe, 0x1234                   ; Error
+ j_po, 0x1234                   ; Error
+ j_z, 0x1234                    ; Error
+ jc, 0x1234                     ; Error
  jgt 0x1234                     ; Error
  jk 0x1234                      ; Error
  jlo 0x1234                     ; Error
  jlt 0x1234                     ; Error
  jlz 0x1234                     ; Error
+ jm, 0x1234                     ; Error
  jmp (ahl)                      ; Error
  jmp (aix)                      ; Error
  jmp (aiy)                      ; Error
@@ -7985,8 +7995,10 @@
  jmp.sil (hl)                   ; Error
  jmp.sil (ix)                   ; Error
  jmp.sil (iy)                   ; Error
+ jnc, 0x1234                    ; Error
  jnk 0x1234                     ; Error
  jnx5 0x1234                    ; Error
+ jnz, 0x1234                    ; Error
  jp (ahl)                       ; Error
  jp (aix)                       ; Error
  jp (aiy)                       ; Error
@@ -8011,6 +8023,7 @@
  jp nk, 0x1234                  ; Error
  jp nx5, 0x1234                 ; Error
  jp x5, 0x1234                  ; Error
+ jp, 0x1234                     ; Error
  jp.s (hl)                      ; Error
  jp.s (ix)                      ; Error
  jp.s (iy)                      ; Error
@@ -8028,6 +8041,8 @@
  jp3 ne, 0x123456               ; Error
  jp3 nz, 0x123456               ; Error
  jp3 z, 0x123456                ; Error
+ jpe, 0x1234                    ; Error
+ jpo, 0x1234                    ; Error
  jr gt, ASMPC                   ; Error
  jr lt, ASMPC                   ; Error
  jr v, ASMPC                    ; Error
@@ -8045,6 +8060,7 @@
  jre v, ASMPC                   ; Error
  jre z, ASMPC                   ; Error
  jx5 0x1234                     ; Error
+ jz, 0x1234                     ; Error
  ld (0x1234), bcde              ; Error
  ld (0x1234), jk                ; Error
  ld (0x1234), jkhl              ; Error

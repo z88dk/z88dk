@@ -41,12 +41,14 @@ my $opcodes = Opcodes->new;
 
 sub R {
 	return ''.{'b'=>0, 'c'=>1, 'd'=>2, 'e'=>3, 
-			   'h'=>4, 'l'=>5, '(hl)'=>6, 'f'=>6, 'm'=>6, 'a'=>7}->{$_[0]};
+			   'h'=>4, 'l'=>5, '(hl)'=>6, 'f'=>6, 'm'=>6, 'a'=>7,
+			   'ixh'=>4, 'ixl'=>5, 'iyh'=>4, 'iyl'=>5}->{$_[0]};
 }
 
 sub RP {
 	return ''.{'b'=>0, 'd'=>1, 'h'=>2, 'sp'=>3, 'psw'=>3, 
-			   'bc'=>0, 'de'=>1, 'hl'=>2, 'af'=>3}->{$_[0]};
+			   'bc'=>0, 'de'=>1, 'hl'=>2, 'af'=>3,
+			   'ix'=>2, 'iy'=>2}->{$_[0]};
 }
 
 sub F {
@@ -63,6 +65,18 @@ sub ALU {
 			   'ani'=>4, 'xri'=>5, 'ori'=>6, 'cpi'=>7}->{$_[0]};
 }
 
+sub ROT {
+	return ''.{'rlc'=>0, 'rrc'=>1, 'rl'=>2, 'rr'=>3,
+			   'sla'=>4, 'sra'=>5, 'sll'=>6, 'srl'=>7}->{$_[0]};
+}
+
+sub BIT {
+	return ''.{'bit'=>1, 'res'=>2, 'set'=>3}->{$_[0]};
+}
+sub PFX {
+	return ''.{'ix'=>0xDD, 'iy'=>0xFD}->{$_[0]};
+}
+
 #------------------------------------------------------------------------------
 # 8080
 #------------------------------------------------------------------------------
@@ -71,127 +85,27 @@ for my $cpu1 ('8080') {
 	for my $strict ('', '_strict') {
 		my $cpu = $cpu1.$strict;
 
-		# INX rp
-		for my $rp ('b', 'd', 'h', 'sp') {
-			$opcodes->add(Opcode->new(asm=>"inx $rp", cpu=>$cpu, 
-									  ops=>[[0x03+16*RP($rp)]]));
-		}
-		if (!$strict) {
-			for my $rp ('bc', 'de', 'hl') {
-				$opcodes->add(Opcode->new(asm=>"inx $rp", cpu=>$cpu, 
-										  ops=>[[0x03+16*RP($rp)]]));
-			}
-		}
-
-		# INC rp
-		if (!$strict) {
-			for my $rp ('bc', 'de', 'hl', 'sp') {
-				$opcodes->add(Opcode->new(asm=>"inc $rp", cpu=>$cpu, 
-										  ops=>[[0x03+16*RP($rp)]]));
-			}
-		}
-
-		# DCX rp
-		for my $rp ('b', 'd', 'h', 'sp') {
-			$opcodes->add(Opcode->new(asm=>"dcx $rp", cpu=>$cpu, 
-									  ops=>[[0x0B+16*RP($rp)]]));
-		}
-		if (!$strict) {
-			for my $rp ('bc', 'de', 'hl') {
-				$opcodes->add(Opcode->new(asm=>"dcx $rp", cpu=>$cpu, 
-										  ops=>[[0x0B+16*RP($rp)]]));
-			}
-		}
-
-		# DEC rp
-		if (!$strict) {
-			for my $rp ('bc', 'de', 'hl', 'sp') {
-				$opcodes->add(Opcode->new(asm=>"dec $rp", cpu=>$cpu, 
-										  ops=>[[0x0B+16*RP($rp)]]));
-			}
-		}
-
-		# INR r
-		for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
-			$opcodes->add(Opcode->new(asm=>"inr $r", cpu=>$cpu, 
-									  ops=>[[0x04+8*R($r)]]));
-		}
-		
-		# INC r
-		if (!$strict) {
-			for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
-				$opcodes->add(Opcode->new(asm=>"inc $r", cpu=>$cpu, 
-										  ops=>[[0x04+8*R($r)]]));
-			}
-		}
-
-		# DCR r
-		for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
-			$opcodes->add(Opcode->new(asm=>"dcr $r", cpu=>$cpu, 
-									  ops=>[[0x05+8*R($r)]]));
-		}
-		
-		# DEC r
-		if (!$strict) {
-			for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
-				$opcodes->add(Opcode->new(asm=>"dec $r", cpu=>$cpu, 
-										  ops=>[[0x05+8*R($r)]]));
-			}
-		}
-
-		# MOV r, r
-		for my $d ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
-			for my $s ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
-				next if $d eq 'm' && $d eq $s;
-				$opcodes->add(Opcode->new(asm=>"mov $d, $s", cpu=>$cpu, 
-							  			  ops=>[[0x40+8*R($d)+R($s)]]));
-			}
-		}
-
 		# LD r, r
-		if (!$strict) {
-			for my $d ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
-				for my $s ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
-					next if $d eq '(hl)' && $d eq $s;
-					$opcodes->add(Opcode->new(asm=>"ld $d, $s", cpu=>$cpu, 
-											ops=>[[0x40+8*R($d)+R($s)]]));
-				}
-			}
-		}
-
-		# MVI r
-		for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
-			$opcodes->add(Opcode->new(asm=>"mvi $r, %n", cpu=>$cpu, 
-									  ops=>[[0x06+8*R($r), '%n']]));
-		}
-
+		add_ld_r_r_8080($opcodes, $cpu);
+		add_ld_r_r_z80($opcodes, $cpu) if !$strict;
+		
 		# LD r, N
-		if (!$strict) {
-			for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
-				$opcodes->add(Opcode->new(asm=>"ld $r, %n", cpu=>$cpu, 
-										ops=>[[0x06+8*R($r), '%n']]));
-			}
-		}
+		add_ld_r_N_8080($opcodes, $cpu);
+		add_ld_r_N_z80($opcodes, $cpu) if !$strict;
 
-		# LXI rp
-		for my $rp ('b', 'd', 'h', 'sp') {
-			$opcodes->add(Opcode->new(asm=>"lxi $rp, %m", cpu=>$cpu, 
-									  ops=>[[0x01+16*RP($rp), '%m', '%m']]));
-		}
-		if (!$strict) {
-			for my $rp ('bc', 'de', 'hl') {
-				$opcodes->add(Opcode->new(asm=>"lxi $rp, %m", cpu=>$cpu, 
-										  ops=>[[0x01+16*RP($rp), '%m', '%m']]));
-			}
-		}
+		# LD rp, NN
+		add_ld_rp1_NN_8080($opcodes, $cpu);
+		add_ld_rp2_NN_8080($opcodes, $cpu) if !$strict;
+		add_ld_rp_NN_z80($opcodes, $cpu) if !$strict;
 
-		# LD rp, N
-		if (!$strict) {
-			for my $rp ('bc', 'de', 'hl', 'sp') {
-				$opcodes->add(Opcode->new(asm=>"ld $rp, %m", cpu=>$cpu, 
-										  ops=>[[0x01+16*RP($rp), '%m', '%m']]));
-			}
-		}
+		# INC/DEC r
+		add_inc_dec_r_8080($opcodes, $cpu);
+		add_inc_dec_r_z80($opcodes, $cpu) if !$strict;
+
+		# INC/DEC rp
+		add_inc_dec_rp1_8080($opcodes, $cpu);
+		add_inc_dec_rp2_8080($opcodes, $cpu) if !$strict;
+		add_inc_dec_rp_z80($opcodes, $cpu) if !$strict;
 
 		# STAX rp
 		for my $rp ('b', 'd') {
@@ -273,43 +187,13 @@ for my $cpu1 ('8080') {
 									  ops=>[[0x2A, '%m', '%m']]));
 		}
 
-		# XCHG
-		$opcodes->add(Opcode->new(asm=>"xchg", cpu=>$cpu, 
-								  ops=>[[0xEB]]));
-
 		# EX DE, HL
-		if (!$strict) {
-			$opcodes->add(Opcode->new(asm=>"ex de, hl", cpu=>$cpu, 
-									  ops=>[[0xEB]]));
-		}
+		add_ex_de_hl_8080($opcodes, $cpu);
+		add_ex_de_hl_z80($opcodes, $cpu) if !$strict;
 
-		# PUSH rp
-		for my $rp ('b', 'd', 'h', 'psw') {
-			$opcodes->add(Opcode->new(asm=>"push $rp", cpu=>$cpu, 
-									  ops=>[[0xC5+16*RP($rp)]]));
-		}
-
-		# PUSH rp
-		if (!$strict) {
-			for my $rp ('bc', 'de', 'hl', 'af') {
-				$opcodes->add(Opcode->new(asm=>"push $rp", cpu=>$cpu, 
-										  ops=>[[0xC5+16*RP($rp)]]));
-			}
-		}
-
-		# POP rp
-		for my $rp ('b', 'd', 'h', 'psw') {
-			$opcodes->add(Opcode->new(asm=>"pop $rp", cpu=>$cpu, 
-									  ops=>[[0xC1+16*RP($rp)]]));
-		}
-
-		# POP rp
-		if (!$strict) {
-			for my $rp ('bc', 'de', 'hl', 'af') {
-				$opcodes->add(Opcode->new(asm=>"pop $rp", cpu=>$cpu, 
-										  ops=>[[0xC1+16*RP($rp)]]));
-			}
-		}
+		# PUSH/POP rp
+		add_push_pop_rp_8080($opcodes, $cpu);
+		add_push_pop_rp_z80($opcodes, $cpu) if !$strict;
 
 		# XTHL
 		$opcodes->add(Opcode->new(asm=>"xthl", cpu=>$cpu, 
@@ -330,6 +214,10 @@ for my $cpu1 ('8080') {
 			$opcodes->add(Opcode->new(asm=>"ld sp, hl", cpu=>$cpu, 
 									  ops=>[[0xF9]]));
 		}
+
+		# Jump
+		add_jumps_8080($opcodes, $cpu, $strict);	# do jp if strict
+		add_jumps_z80($opcodes, $cpu) if !$strict;
 
 		# JMP NN
 		$opcodes->add(Opcode->new(asm=>"jmp %m", cpu=>$cpu, 
@@ -426,63 +314,18 @@ for my $cpu1 ('8080') {
 					  const=>[sort {$a<=>$b} 0, 8, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38],
 					  ops=>[["0xC7+(%c<8?%c*8:%c)"]]));
 					  
-		# <ALU> [A,] r
-		for my $alu ('add', 'adc', 'sub', 'sbb', 'ana', 'xra', 'ora', 'cmp') {
-			for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
-				$opcodes->add(Opcode->new(asm=>"$alu $r", cpu=>$cpu, 
-										  ops=>[[0x80+8*ALU($alu)+R($r)]]));
-			}
-		}
-
-		if (!$strict) {
-			for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
-				for my $a_ ("", "a, ") {
-					for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
-						if (!$opcodes->exists($cpu, "$alu $a_$r")) {
-							$opcodes->add(Opcode->new(asm=>"$alu $a_$r", cpu=>$cpu, 
-													  ops=>[[0x80+8*ALU($alu)+R($r)]]));
-						}
-					}
-				}
-			}
-		}
+		# ALU [A,] r
+		add_alu8_r_8080($opcodes, $cpu);
+		add_alu8_r_z80($opcodes, $cpu) if !$strict;
 
 		# ALU N
-		for my $alu ('adi', 'aci', 'sui', 'sbi', 'ani', 'xri', 'ori', 'cpi') {
-			$opcodes->add(Opcode->new(asm=>"$alu %n", cpu=>$cpu, 
-									ops=>[[0xC6+8*ALU($alu), '%n']]));
-		}
+		add_alu8_N_8080($opcodes, $cpu);
+		add_alu8_N_z80($opcodes, $cpu) if !$strict;
 
-		if (!$strict) {
-			for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
-				for my $a_ ("", "a, ") {
-					if (!$opcodes->exists($cpu, "$alu $a_%n")) {
-						$opcodes->add(Opcode->new(asm=>"$alu $a_%n", cpu=>$cpu, 
-												  ops=>[[0xC6+8*ALU($alu), '%n']]));
-					}
-				}
-			}
-		}
-
-		# DAD rp
-		for my $rp ('b', 'd', 'h', 'sp') {
-			$opcodes->add(Opcode->new(asm=>"dad $rp", cpu=>$cpu, 
-									  ops=>[[0x09+16*RP($rp)]]));
-		}
-		if (!$strict) {
-			for my $rp ('bc', 'de', 'hl') {
-				$opcodes->add(Opcode->new(asm=>"dad $rp", cpu=>$cpu, 
-										  ops=>[[0x09+16*RP($rp)]]));
-			}
-		}
-
-		# ADD HL, rp
-		if (!$strict) {
-			for my $rp ('bc', 'de', 'hl', 'sp') {
-				$opcodes->add(Opcode->new(asm=>"add hl, $rp", cpu=>$cpu, 
-										  ops=>[[0x09+16*RP($rp)]]));
-			}
-		}
+		# ADD rp
+		add_add16_rp1_8080($opcodes, $cpu);
+		add_add16_rp2_8080($opcodes, $cpu) if !$strict;
+		add_add16_rp_z80($opcodes, $cpu) if !$strict;
 
 		# Rotate
 		$opcodes->add(Opcode->new(asm=>"rlc", cpu=>$cpu, 
@@ -564,10 +407,49 @@ for my $cpu1 ('8085') {
 	for my $strict ('', '_strict') {
 		my $cpu = $cpu1.$strict;
 		
-		# copy 8080
-		my $ori_cpu = '8080'.$strict;
-		$opcodes->copy_cpu($ori_cpu, $cpu, sub {1});
+		# LD r, r
+		add_ld_r_r_8080($opcodes, $cpu);
+		add_ld_r_r_z80($opcodes, $cpu) if !$strict;
 		
+		# LD r, N
+		add_ld_r_N_8080($opcodes, $cpu);
+		add_ld_r_N_z80($opcodes, $cpu) if !$strict;
+		
+		# LD rp, NN
+		add_ld_rp1_NN_8080($opcodes, $cpu);
+		add_ld_rp2_NN_8080($opcodes, $cpu) if !$strict;
+		add_ld_rp_NN_z80($opcodes, $cpu) if !$strict;
+
+		# INC/DEC r
+		add_inc_dec_r_8080($opcodes, $cpu);
+		add_inc_dec_r_z80($opcodes, $cpu) if !$strict;
+
+		# INC/DEC rp
+		add_inc_dec_rp1_8080($opcodes, $cpu);
+		add_inc_dec_rp2_8080($opcodes, $cpu) if !$strict;
+		add_inc_dec_rp_z80($opcodes, $cpu) if !$strict;
+
+		# ALU [A,] r
+		add_alu8_r_8080($opcodes, $cpu);
+		add_alu8_r_z80($opcodes, $cpu) if !$strict;
+
+		# ALU N
+		add_alu8_N_8080($opcodes, $cpu);
+		add_alu8_N_z80($opcodes, $cpu) if !$strict;
+		
+		# ADD rp
+		add_add16_rp1_8080($opcodes, $cpu);
+		add_add16_rp2_8080($opcodes, $cpu) if !$strict;
+		add_add16_rp_z80($opcodes, $cpu) if !$strict;
+
+		# EX DE, HL
+		add_ex_de_hl_8080($opcodes, $cpu);
+		add_ex_de_hl_z80($opcodes, $cpu) if !$strict;
+
+		# PUSH/POP rp
+		add_push_pop_rp_8080($opcodes, $cpu);
+		add_push_pop_rp_z80($opcodes, $cpu) if !$strict;
+
 		# add 8085
 		$opcodes->add(Opcode->new(asm=>"rim", cpu=>$cpu, 
 								  ops=>[[0x20]]));
@@ -668,6 +550,470 @@ for my $cpu1 ('8085') {
 }
 
 #------------------------------------------------------------------------------
+# z80
+#------------------------------------------------------------------------------
+
+for my $cpu1 ('z80') {
+	for my $strict ('', '_strict') {
+		my $cpu = $cpu1.$strict;
+		
+		# LD r, r
+		add_ld_r_r_8080($opcodes, $cpu) if !$strict;
+		add_ld_r_r_z80($opcodes, $cpu);
+		add_ld_r_r_idx_lh($opcodes, $cpu) if !$strict;
+		add_ld_r_N_idx_lh($opcodes, $cpu) if !$strict;
+
+		# LD r, N
+		add_ld_r_N_8080($opcodes, $cpu) if !$strict;
+		add_ld_r_N_z80($opcodes, $cpu);
+
+		# LD rp, NN
+		add_ld_rp1_NN_8080($opcodes, $cpu) if !$strict;
+		add_ld_rp2_NN_8080($opcodes, $cpu) if !$strict;
+		add_ld_rp_NN_z80($opcodes, $cpu);
+
+		# INC/DEC r
+		add_inc_dec_r_8080($opcodes, $cpu) if !$strict;
+		add_inc_dec_r_z80($opcodes, $cpu);
+
+		# INC/DEC rp
+		add_inc_dec_rp1_8080($opcodes, $cpu) if !$strict;
+		add_inc_dec_rp2_8080($opcodes, $cpu) if !$strict;
+		add_inc_dec_rp_z80($opcodes, $cpu);
+
+		# ALU [A,] r
+		add_alu8_r_8080($opcodes, $cpu) if !$strict;
+		add_alu8_r_z80($opcodes, $cpu);
+		add_alu8_idx($opcodes, $cpu);
+		add_alu8_idx_lh($opcodes, $cpu) if !$strict;
+
+		# ALU N
+		add_alu8_N_8080($opcodes, $cpu) if !$strict;
+		add_alu8_N_z80($opcodes, $cpu);
+
+		# ADD rp
+		add_add16_rp1_8080($opcodes, $cpu) if !$strict;
+		add_add16_rp2_8080($opcodes, $cpu) if !$strict;
+		add_add16_rp_z80($opcodes, $cpu);
+		add_add16_idx($opcodes, $cpu);
+		add_alu16_rp_z80($opcodes, $cpu);
+
+		# EX DE, HL
+		add_ex_de_hl_8080($opcodes, $cpu) if !$strict;
+		add_ex_de_hl_z80($opcodes, $cpu);
+
+		# PUSH/POP rp
+		add_push_pop_rp_8080($opcodes, $cpu) if !$strict;
+		add_push_pop_rp_z80($opcodes, $cpu);
+
+		# ROT r
+		add_rot_z80($opcodes, $cpu);
+		add_rot_z80_undocumented($opcodes, $cpu) if !$strict;
+
+		# BIT r
+		add_bit_res_set_z80($opcodes, $cpu);
+		add_bit_res_set_z80_idx($opcodes, $cpu);
+	}
+}
+
+#------------------------------------------------------------------------------
+# add intructions
+#------------------------------------------------------------------------------
+
+sub add_ld_r_r_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $d ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+		for my $s ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+			next if $d eq 'm' && $d eq $s;
+			$opcodes->add(Opcode->new(asm=>"mov $d, $s", cpu=>$cpu, 
+									  ops=>[[0x40+8*R($d)+R($s)]]));
+		}
+	}
+}
+
+sub add_ld_r_r_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $d ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+		for my $s ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+			next if $d eq '(hl)' && $d eq $s;
+			$opcodes->add(Opcode->new(asm=>"ld $d, $s", cpu=>$cpu, 
+									  ops=>[[0x40+8*R($d)+R($s)]]));
+		}
+	}
+}
+
+sub add_ld_r_r_idx_lh {
+	my($opcodes, $cpu) = @_;
+	
+	for my $x ('ix', 'iy') {
+		for my $d ('b', 'c', 'd', 'e', $x.'h', $x.'l', 'a') {
+			for my $s ('b', 'c', 'd', 'e', $x.'h', $x.'l', 'a') {
+				next if $d !~ /$x/ && $s !~ /$x/; # no ixh, ixl, iyh, iyl
+				$opcodes->add(Opcode->new(asm=>"ld $d, $s", cpu=>$cpu, 
+										  ops=>[[PFX($x), 0x40+8*R($d)+R($s)]]));
+			}
+		}
+	}
+}
+
+sub add_ld_r_N_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+		$opcodes->add(Opcode->new(asm=>"mvi $r, %n", cpu=>$cpu, 
+								  ops=>[[0x06+8*R($r), '%n']]));
+	}
+}
+
+sub add_ld_r_N_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+		$opcodes->add(Opcode->new(asm=>"ld $r, %n", cpu=>$cpu, 
+								  ops=>[[0x06+8*R($r), '%n']]));
+	}
+}
+
+sub add_ld_r_N_idx_lh {
+	my($opcodes, $cpu) = @_;
+	
+	for my $x ('ix', 'iy') {
+		for my $r ($x.'h', $x.'l') {
+			$opcodes->add(Opcode->new(asm=>"ld $r, %n", cpu=>$cpu, 
+									  ops=>[[PFX($x), 0x06+8*R($r), '%n']]));
+		}
+	}
+}
+
+sub add_ld_rp1_NN_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('b', 'd', 'h', 'sp') {
+		$opcodes->add(Opcode->new(asm=>"lxi $rp, %m", cpu=>$cpu, 
+								  ops=>[[0x01+16*RP($rp), '%m', '%m']]));
+	}
+}
+
+sub add_ld_rp2_NN_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('bc', 'de', 'hl') {
+		$opcodes->add(Opcode->new(asm=>"lxi $rp, %m", cpu=>$cpu, 
+								  ops=>[[0x01+16*RP($rp), '%m', '%m']]));
+	}
+}
+
+sub add_ld_rp_NN_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('bc', 'de', 'hl', 'sp') {
+		$opcodes->add(Opcode->new(asm=>"ld $rp, %m", cpu=>$cpu, 
+								  ops=>[[0x01+16*RP($rp), '%m', '%m']]));
+	}
+}
+
+sub add_inc_dec_r_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+		$opcodes->add(Opcode->new(asm=>"inr $r", cpu=>$cpu, 
+								  ops=>[[0x04+8*R($r)]]));
+		$opcodes->add(Opcode->new(asm=>"dcr $r", cpu=>$cpu, 
+								  ops=>[[0x05+8*R($r)]]));
+	}
+}
+
+sub add_inc_dec_r_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+		$opcodes->add(Opcode->new(asm=>"inc $r", cpu=>$cpu, 
+								  ops=>[[0x04+8*R($r)]]));
+		$opcodes->add(Opcode->new(asm=>"dec $r", cpu=>$cpu, 
+								  ops=>[[0x05+8*R($r)]]));
+	}
+}
+
+sub add_inc_dec_rp1_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('b', 'd', 'h', 'sp') {
+		$opcodes->add(Opcode->new(asm=>"inx $rp", cpu=>$cpu, 
+								  ops=>[[0x03+16*RP($rp)]]));
+		$opcodes->add(Opcode->new(asm=>"dcx $rp", cpu=>$cpu, 
+								  ops=>[[0x0B+16*RP($rp)]]));
+	}
+}
+
+sub add_inc_dec_rp2_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('bc', 'de', 'hl') {
+		$opcodes->add(Opcode->new(asm=>"inx $rp", cpu=>$cpu, 
+								  ops=>[[0x03+16*RP($rp)]]));
+		$opcodes->add(Opcode->new(asm=>"dcx $rp", cpu=>$cpu, 
+								  ops=>[[0x0B+16*RP($rp)]]));
+	}
+}
+
+sub add_inc_dec_rp_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('bc', 'de', 'hl', 'sp') {
+		$opcodes->add(Opcode->new(asm=>"inc $rp", cpu=>$cpu, 
+								  ops=>[[0x03+16*RP($rp)]]));
+		$opcodes->add(Opcode->new(asm=>"dec $rp", cpu=>$cpu, 
+								  ops=>[[0x0B+16*RP($rp)]]));
+	}
+}
+
+sub add_alu8_r_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $alu ('add', 'adc', 'sub', 'sbb', 'ana', 'xra', 'ora', 'cmp') {
+		for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+			$opcodes->add(Opcode->new(asm=>"$alu $r", cpu=>$cpu, 
+									  ops=>[[0x80+8*ALU($alu)+R($r)]]));
+		}
+	}
+}
+
+sub add_alu8_r_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
+		for my $a_ ("", "a, ") {
+			for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+				if (!$opcodes->exists($cpu, "$alu $a_$r")) {
+					$opcodes->add(Opcode->new(asm=>"$alu $a_$r", cpu=>$cpu, 
+											  ops=>[[0x80+8*ALU($alu)+R($r)]]));
+				}
+			}
+		}
+	}
+}
+
+sub add_alu8_N_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $alu ('adi', 'aci', 'sui', 'sbi', 'ani', 'xri', 'ori', 'cpi') {
+		$opcodes->add(Opcode->new(asm=>"$alu %n", cpu=>$cpu, 
+								  ops=>[[0xC6+8*ALU($alu), '%n']]));
+	}
+}
+
+sub add_alu8_N_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
+		for my $a_ ("", "a, ") {
+			if (!$opcodes->exists($cpu, "$alu $a_%n")) {
+				$opcodes->add(Opcode->new(asm=>"$alu $a_%n", cpu=>$cpu, 
+										  ops=>[[0xC6+8*ALU($alu), '%n']]));
+			}
+		}
+	}
+}
+
+sub add_alu8_idx {
+	my($opcodes, $cpu) = @_;
+	
+	for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
+		for my $a_ ("", "a, ") {
+			for my $x ('ix', 'iy') {
+				$opcodes->add(Opcode->new(asm=>"$alu $a_($x+%d)", cpu=>$cpu, 
+										  ops=>[[PFX($x), 0x86+8*ALU($alu), '%d']]));
+				$opcodes->add(Opcode->new(asm=>"$alu $a_($x)", cpu=>$cpu, 
+										  ops=>[[PFX($x), 0x86+8*ALU($alu), 0]]));
+			}
+		}
+	}
+}
+
+sub add_alu8_idx_lh {
+	my($opcodes, $cpu) = @_;
+	
+	for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
+		for my $a_ ("", "a, ") {
+			for my $x ('ix', 'iy') {
+				for my $r ('h', 'l') {
+					$opcodes->add(Opcode->new(asm=>"$alu $a_$x$r", cpu=>$cpu, 
+											  ops=>[[PFX($x), 0x80+8*ALU($alu)+R($r)]]));
+				}
+			}
+		}
+	}
+}
+
+sub add_add16_rp1_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('b', 'd', 'h', 'sp') {
+		$opcodes->add(Opcode->new(asm=>"dad $rp", cpu=>$cpu, 
+								  ops=>[[0x09+16*RP($rp)]]));
+	}
+}
+
+sub add_add16_rp2_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('bc', 'de', 'hl') {
+		$opcodes->add(Opcode->new(asm=>"dad $rp", cpu=>$cpu, 
+								  ops=>[[0x09+16*RP($rp)]]));
+	}
+}
+
+sub add_add16_rp_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('bc', 'de', 'hl', 'sp') {
+		$opcodes->add(Opcode->new(asm=>"add hl, $rp", cpu=>$cpu, 
+								  ops=>[[0x09+16*RP($rp)]]));
+	}
+}
+
+sub add_add16_idx {
+	my($opcodes, $cpu) = @_;
+	
+	for my $x ('ix', 'iy') {
+		for my $rp ('bc', 'de', $x, 'sp') {
+			$opcodes->add(Opcode->new(asm=>"add $x, $rp", cpu=>$cpu, 
+									  ops=>[[PFX($x), 0x09+16*RP($rp)]]));
+		}
+	}
+}
+
+sub add_alu16_rp_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('bc', 'de', 'hl', 'sp') {
+		$opcodes->add(Opcode->new(asm=>"sbc hl, $rp", cpu=>$cpu, 
+								  ops=>[[0xED, 0x42+16*RP($rp)]]));
+		$opcodes->add(Opcode->new(asm=>"adc hl, $rp", cpu=>$cpu, 
+								  ops=>[[0xED, 0x4A+16*RP($rp)]]));
+	}
+}
+
+sub add_ex_de_hl_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	$opcodes->add(Opcode->new(asm=>"xchg", cpu=>$cpu, 
+							  ops=>[[0xEB]]));
+}
+
+sub add_ex_de_hl_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	$opcodes->add(Opcode->new(asm=>"ex de, hl", cpu=>$cpu, 
+							  ops=>[[0xEB]]));
+}
+
+sub add_push_pop_rp_8080 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('b', 'd', 'h', 'psw') {
+		$opcodes->add(Opcode->new(asm=>"push $rp", cpu=>$cpu, 
+								  ops=>[[0xC5+16*RP($rp)]]));
+		$opcodes->add(Opcode->new(asm=>"pop $rp", cpu=>$cpu, 
+								  ops=>[[0xC1+16*RP($rp)]]));
+	}
+}
+
+sub add_push_pop_rp_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	for my $rp ('bc', 'de', 'hl', 'af') {
+		$opcodes->add(Opcode->new(asm=>"push $rp", cpu=>$cpu, 
+								  ops=>[[0xC5+16*RP($rp)]]));
+		$opcodes->add(Opcode->new(asm=>"pop $rp", cpu=>$cpu, 
+								  ops=>[[0xC1+16*RP($rp)]]));
+	}
+}
+
+sub add_rot_z80 {
+	my($opcodes, $cpu) = @_;
+
+	for my $op ('rlc', 'rrc', 'rl', 'rr', 'sla', 'sra', 'srl') {
+		for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+			$opcodes->add(Opcode->new(asm=>"$op $r", cpu=>$cpu, 
+									  ops=>[[0xCB, 8*ROT($op)+R($r)]]));
+		}
+	}
+}
+
+sub add_rot_z80_undocumented {
+	my($opcodes, $cpu) = @_;
+
+	for my $op ('sll') {
+		for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+			$opcodes->add(Opcode->new(asm=>"$op $r", cpu=>$cpu, 
+									  ops=>[[0xCB, 8*ROT($op)+R($r)]]));
+		}
+	}
+}
+
+sub add_bit_res_set_z80 {
+	my($opcodes, $cpu) = @_;
+
+	for my $op ('bit', 'res', 'set') {
+		for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+			$opcodes->add(Opcode->new(asm=>"$op %c, $r", cpu=>$cpu, 
+									  ops=>[[0xCB, (0x40*BIT($op)+R($r))."+8*%c"]],
+									  const=>[0, 1, 2, 3, 4, 5, 6, 7]));
+		}
+	}
+}
+
+sub add_bit_res_set_z80_idx {
+	my($opcodes, $cpu) = @_;
+
+	for my $op ('bit', 'res', 'set') {
+		for my $x ('ix', 'iy') {
+			$opcodes->add(Opcode->new(asm=>"$op %c, ($x+%d)", cpu=>$cpu, 
+										ops=>[[PFX($x), 0xCB, '%d', 
+										       (0x40*BIT($op)+6)."+8*%c"]],
+										const=>[0, 1, 2, 3, 4, 5, 6, 7]));
+			$opcodes->add(Opcode->new(asm=>"$op %c, ($x)", cpu=>$cpu, 
+										ops=>[[PFX($x), 0xCB, 0, 
+										       (0x40*BIT($op)+6)."+8*%c"]],
+										const=>[0, 1, 2, 3, 4, 5, 6, 7]));
+		}
+	}
+}
+
+sub add_jumps_8080 {
+	my($opcodes, $cpu, $strict) = @_;
+	
+	$opcodes->add(Opcode->new(asm=>"jmp %m", cpu=>$cpu, 
+							  ops=>[[0xC3, '%m', '%m']]));
+
+	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		$opcodes->add(Opcode->new(asm=>"jmp $f, %m", cpu=>$cpu, 
+								  ops=>[[0xC2+8*F($f), '%m', '%m']]))
+			if !$strict;
+		$opcodes->add(Opcode->new(asm=>"j$f, %m", cpu=>$cpu, 
+								  ops=>[[0xC2+8*F($f), '%m', '%m']]))
+			if $strict || $f ne 'p';
+		$opcodes->add(Opcode->new(asm=>"j_$f, %m", cpu=>$cpu, 
+								  ops=>[[0xC2+8*F($f), '%m', '%m']]))
+			if !$strict;
+	}
+}
+
+sub add_jumps_z80 {
+	my($opcodes, $cpu) = @_;
+	
+	$opcodes->add(Opcode->new(asm=>"jp %m", cpu=>$cpu, 
+							  ops=>[[0xC3, '%m', '%m']]));
+
+	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		$opcodes->add(Opcode->new(asm=>"jp $f, %m", cpu=>$cpu, 
+								  ops=>[[0xC2+8*F($f), '%m', '%m']]));
+	}
+}
+#------------------------------------------------------------------------------
 # OLD STUFF
 #------------------------------------------------------------------------------
 
@@ -718,7 +1064,7 @@ my %INV_FLAG = qw(	_nz	 _z	  _z   _nz
 # for each CPU
 #------------------------------------------------------------------------------
 for my $cpu (@CPUS) {
-	next if $cpu =~ /^8080|^8085/;
+	next if $cpu =~ /^(8080|8085|z80)(_strict)?$/;
 	
 	my $rabbit		= ($cpu =~ /^r2ka|^r3k|^r4k|^r5k/);
 	my $r3k			= ($cpu =~ /^r3k/);
@@ -5081,6 +5427,20 @@ for my $cpu (Opcode->cpus) {
 								"ld a, h", "$op $h", "ld h, a",
 								"ld a, l", "$op $l", "ld l, a",
 								"pop af");
+		}
+	}
+
+	# AND|OR|XOR IXY, rp
+	for my $op ('and', 'or', 'xor') {
+		for my $x ('ix', 'iy') {
+			for my $rp ('bc', 'de') {
+				my($h, $l) = split //, $rp;
+				$opcodes->add_synth($cpu, "$op $x, $rp",
+									"push af",
+									"ld a, ${x}h", "$op $h", "ld ${x}h, a",
+									"ld a, ${x}l", "$op $l", "ld ${x}l, a",
+									"pop af");
+			}
 		}
 	}
 
