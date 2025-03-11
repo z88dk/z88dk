@@ -575,18 +575,26 @@
           }                       \
         } while ( 0 )
 
-#define RES(n, r)               \
-          st += CBr_TICKS, \
-          r&= n
+#define RES(n, r, r_)               do { \
+          uint8_t _t = alts ? r_ : r; \
+          st += CBr_TICKS;           \
+          _t&= n;                     \
+          if (altd) r_ = _t;          \
+          else r = _t;                \
+        } while (0)
 
 #define RESHL(n)                \
           st += isez80() ? 3 : israbbit() ? 10 : isz180() ? 13 : isgbz80() ? 16 : isr800() ? 5 : iskc160() ? 6 : 15, \
           t = l|h<<8, \
           put_memory(t, get_memory_data(t) & n)
 
-#define SET(n, r)               \
-          st += CBr_TICKS, \
-          r|= n
+#define SET(n, r, r_)               do { \
+          uint8_t  _t = alts ? r_ : r; \
+          st += CBr_TICKS;           \
+          _t|= n;                     \
+          if (altd) r_ = _t;          \
+          else r = _t;                \
+        } while (0)
 
 #define SETHL(n)                \
           st += isez80() ? 3 : israbbit() ? 10 : isz180() ? 13 : isgbz80() ? 16 :  isr800() ? 5 : iskc160() ? 6 : 15, \
@@ -3418,6 +3426,8 @@ int main (int argc, char **argv){
         ih=1;altd=0,alts=0;ioi=0;ioe=0;//break;
     }
   } while ( pc != end && st < counter  );
+
+
   if ( alarmtime != 0 ) {
      if ( rc2014_mode ) exit(l);
       /* We running as a test, we should never reach the end, so exit with error */
@@ -5399,134 +5409,134 @@ static void handle_cb_page(void)
         case 0x7d:  BIT(128, l); break;                  // BIT 7,L
         case 0x7e:  BITHL(128); break;                   // BIT 7,(HL)
         case 0x7f:  BIT(128, a); break;                  // BIT 7,A
-        case 0x80:  RES(254, b); break;                  // RES 0,B
-        case 0x81:  RES(254, c); break;                  // RES 0,C
-        case 0x82:  RES(254, d); break;                  // RES 0,D
-        case 0x83:  RES(254, e); break;                  // RES 0,E
-        case 0x84:  RES(254, h); break;                  // RES 0,H
-        case 0x85:  RES(254, l); break;                  // RES 0,L
+        case 0x80:  RES(254, b, b_); break;                  // RES 0,B
+        case 0x81:  RES(254, c, c_); break;                  // RES 0,C
+        case 0x82:  RES(254, d, d_); break;                  // RES 0,D
+        case 0x83:  RES(254, e, e_); break;                  // RES 0,E
+        case 0x84:  RES(254, h, h_); break;                  // RES 0,H
+        case 0x85:  RES(254, l, l_); break;                  // RES 0,L
         case 0x86:  RESHL(254); break;                   // RES 0,(HL)
-        case 0x87:  RES(254, a); break;                  // RES 0,A
-        case 0x88:  RES(253, b); break;                  // RES 1,B
-        case 0x89:  RES(253, c); break;                  // RES 1,C
-        case 0x8a:  RES(253, d); break;                  // RES 1,D
-        case 0x8b:  RES(253, e); break;                  // RES 1,E
-        case 0x8c:  RES(253, h); break;                  // RES 1,H
-        case 0x8d:  RES(253, l); break;                  // RES 1,L
+        case 0x87:  RES(254, a, a_); break;                  // RES 0,A
+        case 0x88:  RES(253, b, b_); break;                  // RES 1,B
+        case 0x89:  RES(253, c, c_); break;                  // RES 1,C
+        case 0x8a:  RES(253, d, d_); break;                  // RES 1,D
+        case 0x8b:  RES(253, e, e_); break;                  // RES 1,E
+        case 0x8c:  RES(253, h, h_); break;                  // RES 1,H
+        case 0x8d:  RES(253, l, l_); break;                  // RES 1,L
         case 0x8e:  RESHL(253); break;                   // RES 1,(HL)
-        case 0x8f:  RES(253, a); break;                  // RES 1,A
-        case 0x90:  RES(251, b); break;                  // RES 2,B
-        case 0x91:  RES(251, c); break;                  // RES 2,C
-        case 0x92:  RES(251, d); break;                  // RES 2,D
-        case 0x93:  RES(251, e); break;                  // RES 2,E
-        case 0x94:  RES(251, h); break;                  // RES 2,H
-        case 0x95:  RES(251, l); break;                  // RES 2,L
+        case 0x8f:  RES(253, a, a_); break;                  // RES 1,A
+        case 0x90:  RES(251, b, b_); break;                  // RES 2,B
+        case 0x91:  RES(251, c, c_); break;                  // RES 2,C
+        case 0x92:  RES(251, d, d_); break;                  // RES 2,D
+        case 0x93:  RES(251, e, e_); break;                  // RES 2,E
+        case 0x94:  RES(251, h, h_); break;                  // RES 2,H
+        case 0x95:  RES(251, l, l_); break;                  // RES 2,L
         case 0x96:  RESHL(251); break;                   // RES 2,(HL)
-        case 0x97:  RES(251, a); break;                  // RES 2,A
-        case 0x98:  RES(247, b); break;                  // RES 3,B
-        case 0x99:  RES(247, c); break;                  // RES 3,C
-        case 0x9a:  RES(247, d); break;                  // RES 3,D
-        case 0x9b:  RES(247, e); break;                  // RES 3,E
-        case 0x9c:  RES(247, h); break;                  // RES 3,H
-        case 0x9d:  RES(247, l); break;                  // RES 3,L
+        case 0x97:  RES(251, a, a_); break;                  // RES 2,A
+        case 0x98:  RES(247, b, b_); break;                  // RES 3,B
+        case 0x99:  RES(247, c, c_); break;                  // RES 3,C
+        case 0x9a:  RES(247, d, d_); break;                  // RES 3,D
+        case 0x9b:  RES(247, e, e_); break;                  // RES 3,E
+        case 0x9c:  RES(247, h, h_); break;                  // RES 3,H
+        case 0x9d:  RES(247, l, l_); break;                  // RES 3,L
         case 0x9e:  RESHL(247); break;                   // RES 3,(HL)
-        case 0x9f:  RES(247, a); break;                  // RES 3,A
-        case 0xa0:  RES(239, b); break;                  // RES 4,B
-        case 0xa1:  RES(239, c); break;                  // RES 4,C
-        case 0xa2:  RES(239, d); break;                  // RES 4,D
-        case 0xa3:  RES(239, e); break;                  // RES 4,E
-        case 0xa4:  RES(239, h); break;                  // RES 4,H
-        case 0xa5:  RES(239, l); break;                  // RES 4,L
+        case 0x9f:  RES(247, a, a_); break;                  // RES 3,A
+        case 0xa0:  RES(239, b, b_); break;                  // RES 4,B
+        case 0xa1:  RES(239, c, c_); break;                  // RES 4,C
+        case 0xa2:  RES(239, d, d_); break;                  // RES 4,D
+        case 0xa3:  RES(239, e, e_); break;                  // RES 4,E
+        case 0xa4:  RES(239, h, h_); break;                  // RES 4,H
+        case 0xa5:  RES(239, l, l_); break;                  // RES 4,L
         case 0xa6:  RESHL(239); break;                   // RES 4,(HL)
-        case 0xa7:  RES(239, a); break;                  // RES 4,A
-        case 0xa8:  RES(223, b); break;                  // RES 5,B
-        case 0xa9:  RES(223, c); break;                  // RES 5,C
-        case 0xaa:  RES(223, d); break;                  // RES 5,D
-        case 0xab:  RES(223, e); break;                  // RES 5,E
-        case 0xac:  RES(223, h); break;                  // RES 5,H
-        case 0xad:  RES(223, l); break;                  // RES 5,L
+        case 0xa7:  RES(239, a, a_); break;                  // RES 4,A
+        case 0xa8:  RES(223, b, b_); break;                  // RES 5,B
+        case 0xa9:  RES(223, c, c_); break;                  // RES 5,C
+        case 0xaa:  RES(223, d, d_); break;                  // RES 5,D
+        case 0xab:  RES(223, e, e_); break;                  // RES 5,E
+        case 0xac:  RES(223, h, h_); break;                  // RES 5,H
+        case 0xad:  RES(223, l, l_); break;                  // RES 5,L
         case 0xae:  RESHL(223); break;                   // RES 5,(HL)
-        case 0xaf:  RES(223, a); break;                  // RES 5,A
-        case 0xb0:  RES(191, b); break;                  // RES 6,B
-        case 0xb1:  RES(191, c); break;                  // RES 6,C
-        case 0xb2:  RES(191, d); break;                  // RES 6,D
-        case 0xb3:  RES(191, e); break;                  // RES 6,E
-        case 0xb4:  RES(191, h); break;                  // RES 6,H
-        case 0xb5:  RES(191, l); break;                  // RES 6,L
+        case 0xaf:  RES(223, a, a_); break;                  // RES 5,A
+        case 0xb0:  RES(191, b, b_); break;                  // RES 6,B
+        case 0xb1:  RES(191, c, c_); break;                  // RES 6,C
+        case 0xb2:  RES(191, d, d_); break;                  // RES 6,D
+        case 0xb3:  RES(191, e, e_); break;                  // RES 6,E
+        case 0xb4:  RES(191, h, h_); break;                  // RES 6,H
+        case 0xb5:  RES(191, l, l_); break;                  // RES 6,L
         case 0xb6:  RESHL(191); break;                   // RES 6,(HL)
-        case 0xb7:  RES(191, a); break;                  // RES 6,A
-        case 0xb8:  RES(127, b); break;                  // RES 7,B
-        case 0xb9:  RES(127, c); break;                  // RES 7,C
-        case 0xba:  RES(127, d); break;                  // RES 7,D
-        case 0xbb:  RES(127, e); break;                  // RES 7,E
-        case 0xbc:  RES(127, h); break;                  // RES 7,H
-        case 0xbd:  RES(127, l); break;                  // RES 7,L
+        case 0xb7:  RES(191, a, a_); break;                  // RES 6,A
+        case 0xb8:  RES(127, b, b_); break;                  // RES 7,B
+        case 0xb9:  RES(127, c, c_); break;                  // RES 7,C
+        case 0xba:  RES(127, d, d_); break;                  // RES 7,D
+        case 0xbb:  RES(127, e, e_); break;                  // RES 7,E
+        case 0xbc:  RES(127, h, h_); break;                  // RES 7,H
+        case 0xbd:  RES(127, l, l_); break;                  // RES 7,L
         case 0xbe:  RESHL(127); break;                   // RES 7,(HL)
-        case 0xbf:  RES(127, a); break;                  // RES 7,A
-        case 0xc0:  SET(1, b); break;                    // SET 0,B
-        case 0xc1:  SET(1, c); break;                    // SET 0,C
-        case 0xc2:  SET(1, d); break;                    // SET 0,D
-        case 0xc3:  SET(1, e); break;                    // SET 0,E
-        case 0xc4:  SET(1, h); break;                    // SET 0,H
-        case 0xc5:  SET(1, l); break;                    // SET 0,L
+        case 0xbf:  RES(127, a, a_); break;                  // RES 7,A
+        case 0xc0:  SET(1, b, b_); break;                    // SET 0,B
+        case 0xc1:  SET(1, c, c_); break;                    // SET 0,C
+        case 0xc2:  SET(1, d, d_); break;                    // SET 0,D
+        case 0xc3:  SET(1, e, e_); break;                    // SET 0,E
+        case 0xc4:  SET(1, h, h_); break;                    // SET 0,H
+        case 0xc5:  SET(1, l, l_); break;                    // SET 0,L
         case 0xc6:  SETHL(1); break;                     // SET 0,(HL)
-        case 0xc7:  SET(1, a); break;                    // SET 0,A
-        case 0xc8:  SET(2, b); break;                    // SET 1,B
-        case 0xc9:  SET(2, c); break;                    // SET 1,C
-        case 0xca:  SET(2, d); break;                    // SET 1,D
-        case 0xcb:  SET(2, e); break;                    // SET 1,E
-        case 0xcc:  SET(2, h); break;                    // SET 1,H
-        case 0xcd:  SET(2, l); break;                    // SET 1,L
+        case 0xc7:  SET(1, a, a_); break;                    // SET 0,A
+        case 0xc8:  SET(2, b, b_); break;                    // SET 1,B
+        case 0xc9:  SET(2, c, c_); break;                    // SET 1,C
+        case 0xca:  SET(2, d, d_); break;                    // SET 1,D
+        case 0xcb:  SET(2, e, e_); break;                    // SET 1,E
+        case 0xcc:  SET(2, h, h_); break;                    // SET 1,H
+        case 0xcd:  SET(2, l, l_); break;                    // SET 1,L
         case 0xce:  SETHL(2); break;                     // SET 1,(HL)
-        case 0xcf:  SET(2, a); break;                    // SET 1,A
-        case 0xd0:  SET(4, b); break;                    // SET 2,B
-        case 0xd1:  SET(4, c); break;                    // SET 2,C
-        case 0xd2:  SET(4, d); break;                    // SET 2,D
-        case 0xd3:  SET(4, e); break;                    // SET 2,E
-        case 0xd4:  SET(4, h); break;                    // SET 2,H
-        case 0xd5:  SET(4, l); break;                    // SET 2,L
+        case 0xcf:  SET(2, a, a_); break;                    // SET 1,A
+        case 0xd0:  SET(4, b, b_); break;                    // SET 2,B
+        case 0xd1:  SET(4, c, c_); break;                    // SET 2,C
+        case 0xd2:  SET(4, d, d_); break;                    // SET 2,D
+        case 0xd3:  SET(4, e, e_); break;                    // SET 2,E
+        case 0xd4:  SET(4, h, h_); break;                    // SET 2,H
+        case 0xd5:  SET(4, l, l_); break;                    // SET 2,L
         case 0xd6:  SETHL(4); break;                     // SET 2,(HL)
-        case 0xd7:  SET(4, a); break;                    // SET 2,A
-        case 0xd8:  SET(8, b); break;                    // SET 3,B
-        case 0xd9:  SET(8, c); break;                    // SET 3,C
-        case 0xda:  SET(8, d); break;                    // SET 3,D
-        case 0xdb:  SET(8, e); break;                    // SET 3,E
-        case 0xdc:  SET(8, h); break;                    // SET 3,H
-        case 0xdd:  SET(8, l); break;                    // SET 3,L
+        case 0xd7:  SET(4, a, a_); break;                    // SET 2,A
+        case 0xd8:  SET(8, b, b_); break;                    // SET 3,B
+        case 0xd9:  SET(8, c, c_); break;                    // SET 3,C
+        case 0xda:  SET(8, d, d_); break;                    // SET 3,D
+        case 0xdb:  SET(8, e, e_); break;                    // SET 3,E
+        case 0xdc:  SET(8, h, h_); break;                    // SET 3,H
+        case 0xdd:  SET(8, l, l_); break;                    // SET 3,L
         case 0xde:  SETHL(8); break;                     // SET 3,(HL)
-        case 0xdf:  SET(8, a); break;                    // SET 3,A
-        case 0xe0:  SET(16, b); break;                   // SET 4,B
-        case 0xe1:  SET(16, c); break;                   // SET 4,C
-        case 0xe2:  SET(16, d); break;                   // SET 4,D
-        case 0xe3:  SET(16, e); break;                   // SET 4,E
-        case 0xe4:  SET(16, h); break;                   // SET 4,H
-        case 0xe5:  SET(16, l); break;                   // SET 4,L
+        case 0xdf:  SET(8, a, a_); break;                    // SET 3,A
+        case 0xe0:  SET(16, b, b_); break;                   // SET 4,B
+        case 0xe1:  SET(16, c, c_); break;                   // SET 4,C
+        case 0xe2:  SET(16, d, d_); break;                   // SET 4,D
+        case 0xe3:  SET(16, e, e_); break;                   // SET 4,E
+        case 0xe4:  SET(16, h, h_); break;                   // SET 4,H
+        case 0xe5:  SET(16, l, l_); break;                   // SET 4,L
         case 0xe6:  SETHL(16); break;                    // SET 4,(HL)
-        case 0xe7:  SET(16, a); break;                   // SET 4,A
-        case 0xe8:  SET(32, b); break;                   // SET 5,B
-        case 0xe9:  SET(32, c); break;                   // SET 5,C
-        case 0xea:  SET(32, d); break;                   // SET 5,D
-        case 0xeb:  SET(32, e); break;                   // SET 5,E
-        case 0xec:  SET(32, h); break;                   // SET 5,H
-        case 0xed:  SET(32, l); break;                   // SET 5,L
+        case 0xe7:  SET(16, a, a_); break;                   // SET 4,A
+        case 0xe8:  SET(32, b, b_); break;                   // SET 5,B
+        case 0xe9:  SET(32, c, c_); break;                   // SET 5,C
+        case 0xea:  SET(32, d, d_); break;                   // SET 5,D
+        case 0xeb:  SET(32, e, e_); break;                   // SET 5,E
+        case 0xec:  SET(32, h, h_); break;                   // SET 5,H
+        case 0xed:  SET(32, l, l_); break;                   // SET 5,L
         case 0xee:  SETHL(32); break;                    // SET 5,(HL)
-        case 0xef:  SET(32, a); break;                   // SET 5,A
-        case 0xf0:  SET(64, b); break;                   // SET 6,B
-        case 0xf1:  SET(64, c); break;                   // SET 6,C
-        case 0xf2:  SET(64, d); break;                   // SET 6,D
-        case 0xf3:  SET(64, e); break;                   // SET 6,E
-        case 0xf4:  SET(64, h); break;                   // SET 6,H
-        case 0xf5:  SET(64, l); break;                   // SET 6,L
+        case 0xef:  SET(32, a, a_); break;                   // SET 5,A
+        case 0xf0:  SET(64, b, b_); break;                   // SET 6,B
+        case 0xf1:  SET(64, c, c_); break;                   // SET 6,C
+        case 0xf2:  SET(64, d, d_); break;                   // SET 6,D
+        case 0xf3:  SET(64, e, e_); break;                   // SET 6,E
+        case 0xf4:  SET(64, h, h_); break;                   // SET 6,H
+        case 0xf5:  SET(64, l, l_); break;                   // SET 6,L
         case 0xf6:  SETHL(64); break;                    // SET 6,(HL)
-        case 0xf7:  SET(64, a); break;                   // SET 6,A
-        case 0xf8:  SET(128, b); break;                  // SET 7,B
-        case 0xf9:  SET(128, c); break;                  // SET 7,C
-        case 0xfa:  SET(128, d); break;                  // SET 7,D
-        case 0xfb:  SET(128, e); break;                  // SET 7,E
-        case 0xfc:  SET(128, h); break;                  // SET 7,H
-        case 0xfd:  SET(128, l); break;                  // SET 7,L
+        case 0xf7:  SET(64, a, a_); break;                   // SET 6,A
+        case 0xf8:  SET(128, b, b_); break;                  // SET 7,B
+        case 0xf9:  SET(128, c, c_); break;                  // SET 7,C
+        case 0xfa:  SET(128, d, d_); break;                  // SET 7,D
+        case 0xfb:  SET(128, e, e_); break;                  // SET 7,E
+        case 0xfc:  SET(128, h, h_); break;                  // SET 7,H
+        case 0xfd:  SET(128, l, l_); break;                  // SET 7,L
         case 0xfe:  SETHL(128); break;                   // SET 7,(HL)
-        case 0xff:  SET(128, a); break;                  // SET 7,A
+        case 0xff:  SET(128, a, a_); break;                  // SET 7,A
         }
     else{
         st+= isz180() ? 9 : 11;
@@ -5623,134 +5633,134 @@ static void handle_cb_page(void)
         case 0x78: case 0x79: case 0x7a: case 0x7b:      // BIT 7,(IX+d) // BIT 7,(IY+d)
         case 0x7c: case 0x7d: case 0x7e: case 0x7f:
                     BITI(128); break;
-        case 0x80: RES(254, t); put_memory(mp, b=t); break;    // LD B,RES 0,(IX+d) // LD B,RES 0,(IY+d)
-        case 0x81: RES(254, t); put_memory(mp, c=t); break;    // LD C,RES 0,(IX+d) // LD C,RES 0,(IY+d)
-        case 0x82: RES(254, t); put_memory(mp, d=t); break;    // LD D,RES 0,(IX+d) // LD D,RES 0,(IY+d)
-        case 0x83: RES(254, t); put_memory(mp, e=t); break;    // LD E,RES 0,(IX+d) // LD E,RES 0,(IY+d)
-        case 0x84: RES(254, t); put_memory(mp, h=t); break;    // LD H,RES 0,(IX+d) // LD H,RES 0,(IY+d)
-        case 0x85: RES(254, t); put_memory(mp, l=t); break;    // LD L,RES 0,(IX+d) // LD L,RES 0,(IY+d)
-        case 0x86: RES(254, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 0,(IX+d) // RES 0,(IY+d)
-        case 0x87: RES(254, t); put_memory(mp, a=t); break;    // LD A,RES 0,(IX+d) // LD A,RES 0,(IY+d)
-        case 0x88: RES(253, t); put_memory(mp, b=t); break;    // LD B,RES 1,(IX+d) // LD B,RES 1,(IY+d)
-        case 0x89: RES(253, t); put_memory(mp, c=t); break;    // LD C,RES 1,(IX+d) // LD C,RES 1,(IY+d)
-        case 0x8a: RES(253, t); put_memory(mp, d=t); break;    // LD D,RES 1,(IX+d) // LD D,RES 1,(IY+d)
-        case 0x8b: RES(253, t); put_memory(mp, e=t); break;    // LD E,RES 1,(IX+d) // LD E,RES 1,(IY+d)
-        case 0x8c: RES(253, t); put_memory(mp, h=t); break;    // LD H,RES 1,(IX+d) // LD H,RES 1,(IY+d)
-        case 0x8d: RES(253, t); put_memory(mp, l=t); break;    // LD L,RES 1,(IX+d) // LD L,RES 1,(IY+d)
-        case 0x8e: RES(253, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 1,(IX+d) // RES 1,(IY+d)
-        case 0x8f: RES(253, t); put_memory(mp, a=t); break;    // LD A,RES 1,(IX+d) // LD A,RES 1,(IY+d)
-        case 0x90: RES(251, t); put_memory(mp, b=t); break;    // LD B,RES 2,(IX+d) // LD B,RES 2,(IY+d)
-        case 0x91: RES(251, t); put_memory(mp, c=t); break;    // LD C,RES 2,(IX+d) // LD C,RES 2,(IY+d)
-        case 0x92: RES(251, t); put_memory(mp, d=t); break;    // LD D,RES 2,(IX+d) // LD D,RES 2,(IY+d)
-        case 0x93: RES(251, t); put_memory(mp, e=t); break;    // LD E,RES 2,(IX+d) // LD E,RES 2,(IY+d)
-        case 0x94: RES(251, t); put_memory(mp, h=t); break;    // LD H,RES 2,(IX+d) // LD H,RES 2,(IY+d)
-        case 0x95: RES(251, t); put_memory(mp, l=t); break;    // LD L,RES 2,(IX+d) // LD L,RES 2,(IY+d)
-        case 0x96: RES(251, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 2,(IX+d) // RES 2,(IY+d)
-        case 0x97: RES(251, t); put_memory(mp, a=t); break;    // LD A,RES 2,(IX+d) // LD A,RES 2,(IY+d)
-        case 0x98: RES(247, t); put_memory(mp, b=t); break;    // LD B,RES 3,(IX+d) // LD B,RES 3,(IY+d)
-        case 0x99: RES(247, t); put_memory(mp, c=t); break;    // LD C,RES 3,(IX+d) // LD C,RES 3,(IY+d)
-        case 0x9a: RES(247, t); put_memory(mp, d=t); break;    // LD D,RES 3,(IX+d) // LD D,RES 3,(IY+d)
-        case 0x9b: RES(247, t); put_memory(mp, e=t); break;    // LD E,RES 3,(IX+d) // LD E,RES 3,(IY+d)
-        case 0x9c: RES(247, t); put_memory(mp, h=t); break;    // LD H,RES 3,(IX+d) // LD H,RES 3,(IY+d)
-        case 0x9d: RES(247, t); put_memory(mp, l=t); break;    // LD L,RES 3,(IX+d) // LD L,RES 3,(IY+d)
-        case 0x9e: RES(247, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 3,(IX+d) // RES 3,(IY+d)
-        case 0x9f: RES(247, t); put_memory(mp, a=t); break;    // LD A,RES 3,(IX+d) // LD A,RES 3,(IY+d)
-        case 0xa0: RES(239, t); put_memory(mp, b=t); break;    // LD B,RES 4,(IX+d) // LD B,RES 4,(IY+d)
-        case 0xa1: RES(239, t); put_memory(mp, c=t); break;    // LD C,RES 4,(IX+d) // LD C,RES 4,(IY+d)
-        case 0xa2: RES(239, t); put_memory(mp, d=t); break;    // LD D,RES 4,(IX+d) // LD D,RES 4,(IY+d)
-        case 0xa3: RES(239, t); put_memory(mp, e=t); break;    // LD E,RES 4,(IX+d) // LD E,RES 4,(IY+d)
-        case 0xa4: RES(239, t); put_memory(mp, h=t); break;    // LD H,RES 4,(IX+d) // LD H,RES 4,(IY+d)
-        case 0xa5: RES(239, t); put_memory(mp, l=t); break;    // LD L,RES 4,(IX+d) // LD L,RES 4,(IY+d)
-        case 0xa6: RES(239, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 4,(IX+d) // RES 4,(IY+d)
-        case 0xa7: RES(239, t); put_memory(mp, a=t); break;    // LD A,RES 4,(IX+d) // LD A,RES 4,(IY+d)
-        case 0xa8: RES(223, t); put_memory(mp, b=t); break;    // LD B,RES 5,(IX+d) // LD B,RES 5,(IY+d)
-        case 0xa9: RES(223, t); put_memory(mp, c=t); break;    // LD C,RES 5,(IX+d) // LD C,RES 5,(IY+d)
-        case 0xaa: RES(223, t); put_memory(mp, d=t); break;    // LD D,RES 5,(IX+d) // LD D,RES 5,(IY+d)
-        case 0xab: RES(223, t); put_memory(mp, e=t); break;    // LD E,RES 5,(IX+d) // LD E,RES 5,(IY+d)
-        case 0xac: RES(223, t); put_memory(mp, h=t); break;    // LD H,RES 5,(IX+d) // LD H,RES 5,(IY+d)
-        case 0xad: RES(223, t); put_memory(mp, l=t); break;    // LD L,RES 5,(IX+d) // LD L,RES 5,(IY+d)
-        case 0xae: RES(223, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 5,(IX+d) // RES 5,(IY+d)
-        case 0xaf: RES(223, t); put_memory(mp, a=t); break;    // LD A,RES 5,(IX+d) // LD A,RES 5,(IY+d)
-        case 0xb0: RES(191, t); put_memory(mp, b=t); break;    // LD B,RES 6,(IX+d) // LD B,RES 6,(IY+d)
-        case 0xb1: RES(191, t); put_memory(mp, c=t); break;    // LD C,RES 6,(IX+d) // LD C,RES 6,(IY+d)
-        case 0xb2: RES(191, t); put_memory(mp, d=t); break;    // LD D,RES 6,(IX+d) // LD D,RES 6,(IY+d)
-        case 0xb3: RES(191, t); put_memory(mp, e=t); break;    // LD E,RES 6,(IX+d) // LD E,RES 6,(IY+d)
-        case 0xb4: RES(191, t); put_memory(mp, h=t); break;    // LD H,RES 6,(IX+d) // LD H,RES 6,(IY+d)
-        case 0xb5: RES(191, t); put_memory(mp, l=t); break;    // LD L,RES 6,(IX+d) // LD L,RES 6,(IY+d)
-        case 0xb6: RES(191, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 6,(IX+d) // RES 6,(IY+d)
-        case 0xb7: RES(191, t); put_memory(mp, a=t); break;    // LD A,RES 6,(IX+d) // LD A,RES 6,(IY+d)
-        case 0xb8: RES(127, t); put_memory(mp, b=t); break;    // LD B,RES 7,(IX+d) // LD B,RES 7,(IY+d)
-        case 0xb9: RES(127, t); put_memory(mp, c=t); break;    // LD C,RES 7,(IX+d) // LD C,RES 7,(IY+d)
-        case 0xba: RES(127, t); put_memory(mp, d=t); break;    // LD D,RES 7,(IX+d) // LD D,RES 7,(IY+d)
-        case 0xbb: RES(127, t); put_memory(mp, e=t); break;    // LD E,RES 7,(IX+d) // LD E,RES 7,(IY+d)
-        case 0xbc: RES(127, t); put_memory(mp, h=t); break;    // LD H,RES 7,(IX+d) // LD H,RES 7,(IY+d)
-        case 0xbd: RES(127, t); put_memory(mp, l=t); break;    // LD L,RES 7,(IX+d) // LD L,RES 7,(IY+d)
-        case 0xbe: RES(127, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 7,(IX+d) // RES 7,(IY+d)
-        case 0xbf: RES(127, t); put_memory(mp, a=t); break;    // LD A,RES 7,(IX+d) // LD A,RES 7,(IY+d)
-        case 0xc0: SET(1, t); put_memory(mp, b=t); break;      // LD B,SET 0,(IX+d) // LD B,SET 0,(IY+d)
-        case 0xc1: SET(1, t); put_memory(mp, c=t); break;      // LD C,SET 0,(IX+d) // LD C,SET 0,(IY+d)
-        case 0xc2: SET(1, t); put_memory(mp, d=t); break;      // LD D,SET 0,(IX+d) // LD D,SET 0,(IY+d)
-        case 0xc3: SET(1, t); put_memory(mp, e=t); break;      // LD E,SET 0,(IX+d) // LD E,SET 0,(IY+d)
-        case 0xc4: SET(1, t); put_memory(mp, h=t); break;      // LD H,SET 0,(IX+d) // LD H,SET 0,(IY+d)
-        case 0xc5: SET(1, t); put_memory(mp, l=t); break;      // LD L,SET 0,(IX+d) // LD L,SET 0,(IY+d)
-        case 0xc6: SET(1, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;         // SET 0,(IX+d) // SET 0,(IY+d)
-        case 0xc7: SET(1, t); put_memory(mp, a=t); break;      // LD A,SET 0,(IX+d) // LD A,SET 0,(IY+d)
-        case 0xc8: SET(2, t); put_memory(mp, b=t); break;      // LD B,SET 1,(IX+d) // LD B,SET 1,(IY+d)
-        case 0xc9: SET(2, t); put_memory(mp, c=t); break;      // LD C,SET 1,(IX+d) // LD C,SET 1,(IY+d)
-        case 0xca: SET(2, t); put_memory(mp, d=t); break;      // LD D,SET 1,(IX+d) // LD D,SET 1,(IY+d)
-        case 0xcb: SET(2, t); put_memory(mp, e=t); break;      // LD E,SET 1,(IX+d) // LD E,SET 1,(IY+d)
-        case 0xcc: SET(2, t); put_memory(mp, h=t); break;      // LD H,SET 1,(IX+d) // LD H,SET 1,(IY+d)
-        case 0xcd: SET(2, t); put_memory(mp, l=t); break;      // LD L,SET 1,(IX+d) // LD L,SET 1,(IY+d)
-        case 0xce: SET(2, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;         // SET 1,(IX+d) // SET 1,(IY+d)
-        case 0xcf: SET(2, t); put_memory(mp, a=t); break;      // LD A,SET 1,(IX+d) // LD A,SET 1,(IY+d)
-        case 0xd0: SET(4, t); put_memory(mp, b=t); break;      // LD B,SET 2,(IX+d) // LD B,SET 2,(IY+d)
-        case 0xd1: SET(4, t); put_memory(mp, c=t); break;      // LD C,SET 2,(IX+d) // LD C,SET 2,(IY+d)
-        case 0xd2: SET(4, t); put_memory(mp, d=t); break;      // LD D,SET 2,(IX+d) // LD D,SET 2,(IY+d)
-        case 0xd3: SET(4, t); put_memory(mp, e=t); break;      // LD E,SET 2,(IX+d) // LD E,SET 2,(IY+d)
-        case 0xd4: SET(4, t); put_memory(mp, h=t); break;      // LD H,SET 2,(IX+d) // LD H,SET 2,(IY+d)
-        case 0xd5: SET(4, t); put_memory(mp, l=t); break;      // LD L,SET 2,(IX+d) // LD L,SET 2,(IY+d)
-        case 0xd6: SET(4, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;         // SET 2,(IX+d) // SET 2,(IY+d)
-        case 0xd7: SET(4, t); put_memory(mp, a=t); break;      // LD A,SET 2,(IX+d) // LD A,SET 2,(IY+d)
-        case 0xd8: SET(8, t); put_memory(mp, b=t); break;      // LD B,SET 3,(IX+d) // LD B,SET 3,(IY+d)
-        case 0xd9: SET(8, t); put_memory(mp, c=t); break;      // LD C,SET 3,(IX+d) // LD C,SET 3,(IY+d)
-        case 0xda: SET(8, t); put_memory(mp, d=t); break;      // LD D,SET 3,(IX+d) // LD D,SET 3,(IY+d)
-        case 0xdb: SET(8, t); put_memory(mp, e=t); break;      // LD E,SET 3,(IX+d) // LD E,SET 3,(IY+d)
-        case 0xdc: SET(8, t); put_memory(mp, h=t); break;      // LD H,SET 3,(IX+d) // LD H,SET 3,(IY+d)
-        case 0xdd: SET(8, t); put_memory(mp, l=t); break;      // LD L,SET 3,(IX+d) // LD L,SET 3,(IY+d)
-        case 0xde: SET(8, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;         // SET 3,(IX+d) // SET 3,(IY+d)
-        case 0xdf: SET(8, t); put_memory(mp, a=t); break;      // LD A,SET 3,(IX+d) // LD A,SET 3,(IY+d)
-        case 0xe0: SET(16, t); put_memory(mp, b=t); break;     // LD B,SET 4,(IX+d) // LD B,SET 4,(IY+d)
-        case 0xe1: SET(16, t); put_memory(mp, c=t); break;     // LD C,SET 4,(IX+d) // LD C,SET 4,(IY+d)
-        case 0xe2: SET(16, t); put_memory(mp, d=t); break;     // LD D,SET 4,(IX+d) // LD D,SET 4,(IY+d)
-        case 0xe3: SET(16, t); put_memory(mp, e=t); break;     // LD E,SET 4,(IX+d) // LD E,SET 4,(IY+d)
-        case 0xe4: SET(16, t); put_memory(mp, h=t); break;     // LD H,SET 4,(IX+d) // LD H,SET 4,(IY+d)
-        case 0xe5: SET(16, t); put_memory(mp, l=t); break;     // LD L,SET 4,(IX+d) // LD L,SET 4,(IY+d)
-        case 0xe6: SET(16, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;        // SET 4,(IX+d) // SET 4,(IY+d)
-        case 0xe7: SET(16, t); put_memory(mp, a=t); break;     // LD A,SET 4,(IX+d) // LD A,SET 4,(IY+d)
-        case 0xe8: SET(32, t); put_memory(mp, b=t); break;     // LD B,SET 5,(IX+d) // LD B,SET 5,(IY+d)
-        case 0xe9: SET(32, t); put_memory(mp, c=t); break;     // LD C,SET 5,(IX+d) // LD C,SET 5,(IY+d)
-        case 0xea: SET(32, t); put_memory(mp, d=t); break;     // LD D,SET 5,(IX+d) // LD D,SET 5,(IY+d)
-        case 0xeb: SET(32, t); put_memory(mp, e=t); break;     // LD E,SET 5,(IX+d) // LD E,SET 5,(IY+d)
-        case 0xec: SET(32, t); put_memory(mp, h=t); break;     // LD H,SET 5,(IX+d) // LD H,SET 5,(IY+d)
-        case 0xed: SET(32, t); put_memory(mp, l=t); break;     // LD L,SET 5,(IX+d) // LD L,SET 5,(IY+d)
-        case 0xee: SET(32, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;        // SET 5,(IX+d) // SET 5,(IY+d)
-        case 0xef: SET(32, t); put_memory(mp, a=t); break;     // LD A,SET 5,(IX+d) // LD A,SET 5,(IY+d)
-        case 0xf0: SET(64, t); put_memory(mp, b=t); break;     // LD B,SET 6,(IX+d) // LD B,SET 6,(IY+d)
-        case 0xf1: SET(64, t); put_memory(mp, c=t); break;     // LD C,SET 6,(IX+d) // LD C,SET 6,(IY+d)
-        case 0xf2: SET(64, t); put_memory(mp, d=t); break;     // LD D,SET 6,(IX+d) // LD D,SET 6,(IY+d)
-        case 0xf3: SET(64, t); put_memory(mp, e=t); break;     // LD E,SET 6,(IX+d) // LD E,SET 6,(IY+d)
-        case 0xf4: SET(64, t); put_memory(mp, h=t); break;     // LD H,SET 6,(IX+d) // LD H,SET 6,(IY+d)
-        case 0xf5: SET(64, t); put_memory(mp, l=t); break;     // LD L,SET 6,(IX+d) // LD L,SET 6,(IY+d)
-        case 0xf6: SET(64, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;        // SET 6,(IX+d) // SET 6,(IY+d)
-        case 0xf7: SET(64, t); put_memory(mp, a=t); break;     // LD A,SET 6,(IX+d) // LD A,SET 6,(IY+d)
-        case 0xf8: SET(128, t); put_memory(mp, b=t); break;    // LD B,SET 7,(IX+d) // LD B,SET 7,(IY+d)
-        case 0xf9: SET(128, t); put_memory(mp, c=t); break;    // LD C,SET 7,(IX+d) // LD C,SET 7,(IY+d)
-        case 0xfa: SET(128, t); put_memory(mp, d=t); break;    // LD D,SET 7,(IX+d) // LD D,SET 7,(IY+d)
-        case 0xfb: SET(128, t); put_memory(mp, e=t); break;    // LD E,SET 7,(IX+d) // LD E,SET 7,(IY+d)
-        case 0xfc: SET(128, t); put_memory(mp, h=t); break;    // LD H,SET 7,(IX+d) // LD H,SET 7,(IY+d)
-        case 0xfd: SET(128, t); put_memory(mp, l=t); break;    // LD L,SET 7,(IX+d) // LD L,SET 7,(IY+d)
-        case 0xfe: SET(128, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // SET 7,(IX+d) // SET 7,(IY+d)
-        case 0xff: SET(128, t); put_memory(mp, a=t); break;    // LD A,SET 7,(IX+d) // LD A,SET 7,(IY+d)
+        case 0x80: RES(254, t, t); put_memory(mp, b=t); break;    // LD B,RES 0,(IX+d) // LD B,RES 0,(IY+d)
+        case 0x81: RES(254, t, t); put_memory(mp, c=t); break;    // LD C,RES 0,(IX+d) // LD C,RES 0,(IY+d)
+        case 0x82: RES(254, t, t); put_memory(mp, d=t); break;    // LD D,RES 0,(IX+d) // LD D,RES 0,(IY+d)
+        case 0x83: RES(254, t, t); put_memory(mp, e=t); break;    // LD E,RES 0,(IX+d) // LD E,RES 0,(IY+d)
+        case 0x84: RES(254, t, t); put_memory(mp, h=t); break;    // LD H,RES 0,(IX+d) // LD H,RES 0,(IY+d)
+        case 0x85: RES(254, t, t); put_memory(mp, l=t); break;    // LD L,RES 0,(IX+d) // LD L,RES 0,(IY+d)
+        case 0x86: RES(254, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 0,(IX+d) // RES 0,(IY+d)
+        case 0x87: RES(254, t, t); put_memory(mp, a=t); break;    // LD A,RES 0,(IX+d) // LD A,RES 0,(IY+d)
+        case 0x88: RES(253, t, t); put_memory(mp, b=t); break;    // LD B,RES 1,(IX+d) // LD B,RES 1,(IY+d)
+        case 0x89: RES(253, t, t); put_memory(mp, c=t); break;    // LD C,RES 1,(IX+d) // LD C,RES 1,(IY+d)
+        case 0x8a: RES(253, t, t); put_memory(mp, d=t); break;    // LD D,RES 1,(IX+d) // LD D,RES 1,(IY+d)
+        case 0x8b: RES(253, t, t); put_memory(mp, e=t); break;    // LD E,RES 1,(IX+d) // LD E,RES 1,(IY+d)
+        case 0x8c: RES(253, t, t); put_memory(mp, h=t); break;    // LD H,RES 1,(IX+d) // LD H,RES 1,(IY+d)
+        case 0x8d: RES(253, t, t); put_memory(mp, l=t); break;    // LD L,RES 1,(IX+d) // LD L,RES 1,(IY+d)
+        case 0x8e: RES(253, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 1,(IX+d) // RES 1,(IY+d)
+        case 0x8f: RES(253, t, t); put_memory(mp, a=t); break;    // LD A,RES 1,(IX+d) // LD A,RES 1,(IY+d)
+        case 0x90: RES(251, t, t); put_memory(mp, b=t); break;    // LD B,RES 2,(IX+d) // LD B,RES 2,(IY+d)
+        case 0x91: RES(251, t, t); put_memory(mp, c=t); break;    // LD C,RES 2,(IX+d) // LD C,RES 2,(IY+d)
+        case 0x92: RES(251, t, t); put_memory(mp, d=t); break;    // LD D,RES 2,(IX+d) // LD D,RES 2,(IY+d)
+        case 0x93: RES(251, t, t); put_memory(mp, e=t); break;    // LD E,RES 2,(IX+d) // LD E,RES 2,(IY+d)
+        case 0x94: RES(251, t, t); put_memory(mp, h=t); break;    // LD H,RES 2,(IX+d) // LD H,RES 2,(IY+d)
+        case 0x95: RES(251, t, t); put_memory(mp, l=t); break;    // LD L,RES 2,(IX+d) // LD L,RES 2,(IY+d)
+        case 0x96: RES(251, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 2,(IX+d) // RES 2,(IY+d)
+        case 0x97: RES(251, t, t); put_memory(mp, a=t); break;    // LD A,RES 2,(IX+d) // LD A,RES 2,(IY+d)
+        case 0x98: RES(247, t, t); put_memory(mp, b=t); break;    // LD B,RES 3,(IX+d) // LD B,RES 3,(IY+d)
+        case 0x99: RES(247, t, t); put_memory(mp, c=t); break;    // LD C,RES 3,(IX+d) // LD C,RES 3,(IY+d)
+        case 0x9a: RES(247, t, t); put_memory(mp, d=t); break;    // LD D,RES 3,(IX+d) // LD D,RES 3,(IY+d)
+        case 0x9b: RES(247, t, t); put_memory(mp, e=t); break;    // LD E,RES 3,(IX+d) // LD E,RES 3,(IY+d)
+        case 0x9c: RES(247, t, t); put_memory(mp, h=t); break;    // LD H,RES 3,(IX+d) // LD H,RES 3,(IY+d)
+        case 0x9d: RES(247, t, t); put_memory(mp, l=t); break;    // LD L,RES 3,(IX+d) // LD L,RES 3,(IY+d)
+        case 0x9e: RES(247, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 3,(IX+d) // RES 3,(IY+d)
+        case 0x9f: RES(247, t, t); put_memory(mp, a=t); break;    // LD A,RES 3,(IX+d) // LD A,RES 3,(IY+d)
+        case 0xa0: RES(239, t, t); put_memory(mp, b=t); break;    // LD B,RES 4,(IX+d) // LD B,RES 4,(IY+d)
+        case 0xa1: RES(239, t, t); put_memory(mp, c=t); break;    // LD C,RES 4,(IX+d) // LD C,RES 4,(IY+d)
+        case 0xa2: RES(239, t, t); put_memory(mp, d=t); break;    // LD D,RES 4,(IX+d) // LD D,RES 4,(IY+d)
+        case 0xa3: RES(239, t, t); put_memory(mp, e=t); break;    // LD E,RES 4,(IX+d) // LD E,RES 4,(IY+d)
+        case 0xa4: RES(239, t, t); put_memory(mp, h=t); break;    // LD H,RES 4,(IX+d) // LD H,RES 4,(IY+d)
+        case 0xa5: RES(239, t, t); put_memory(mp, l=t); break;    // LD L,RES 4,(IX+d) // LD L,RES 4,(IY+d)
+        case 0xa6: RES(239, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 4,(IX+d) // RES 4,(IY+d)
+        case 0xa7: RES(239, t, t); put_memory(mp, a=t); break;    // LD A,RES 4,(IX+d) // LD A,RES 4,(IY+d)
+        case 0xa8: RES(223, t, t); put_memory(mp, b=t); break;    // LD B,RES 5,(IX+d) // LD B,RES 5,(IY+d)
+        case 0xa9: RES(223, t, t); put_memory(mp, c=t); break;    // LD C,RES 5,(IX+d) // LD C,RES 5,(IY+d)
+        case 0xaa: RES(223, t, t); put_memory(mp, d=t); break;    // LD D,RES 5,(IX+d) // LD D,RES 5,(IY+d)
+        case 0xab: RES(223, t, t); put_memory(mp, e=t); break;    // LD E,RES 5,(IX+d) // LD E,RES 5,(IY+d)
+        case 0xac: RES(223, t, t); put_memory(mp, h=t); break;    // LD H,RES 5,(IX+d) // LD H,RES 5,(IY+d)
+        case 0xad: RES(223, t, t); put_memory(mp, l=t); break;    // LD L,RES 5,(IX+d) // LD L,RES 5,(IY+d)
+        case 0xae: RES(223, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 5,(IX+d) // RES 5,(IY+d)
+        case 0xaf: RES(223, t, t); put_memory(mp, a=t); break;    // LD A,RES 5,(IX+d) // LD A,RES 5,(IY+d)
+        case 0xb0: RES(191, t, t); put_memory(mp, b=t); break;    // LD B,RES 6,(IX+d) // LD B,RES 6,(IY+d)
+        case 0xb1: RES(191, t, t); put_memory(mp, c=t); break;    // LD C,RES 6,(IX+d) // LD C,RES 6,(IY+d)
+        case 0xb2: RES(191, t, t); put_memory(mp, d=t); break;    // LD D,RES 6,(IX+d) // LD D,RES 6,(IY+d)
+        case 0xb3: RES(191, t, t); put_memory(mp, e=t); break;    // LD E,RES 6,(IX+d) // LD E,RES 6,(IY+d)
+        case 0xb4: RES(191, t, t); put_memory(mp, h=t); break;    // LD H,RES 6,(IX+d) // LD H,RES 6,(IY+d)
+        case 0xb5: RES(191, t, t); put_memory(mp, l=t); break;    // LD L,RES 6,(IX+d) // LD L,RES 6,(IY+d)
+        case 0xb6: RES(191, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 6,(IX+d) // RES 6,(IY+d)
+        case 0xb7: RES(191, t, t); put_memory(mp, a=t); break;    // LD A,RES 6,(IX+d) // LD A,RES 6,(IY+d)
+        case 0xb8: RES(127, t, t); put_memory(mp, b=t); break;    // LD B,RES 7,(IX+d) // LD B,RES 7,(IY+d)
+        case 0xb9: RES(127, t, t); put_memory(mp, c=t); break;    // LD C,RES 7,(IX+d) // LD C,RES 7,(IY+d)
+        case 0xba: RES(127, t, t); put_memory(mp, d=t); break;    // LD D,RES 7,(IX+d) // LD D,RES 7,(IY+d)
+        case 0xbb: RES(127, t, t); put_memory(mp, e=t); break;    // LD E,RES 7,(IX+d) // LD E,RES 7,(IY+d)
+        case 0xbc: RES(127, t, t); put_memory(mp, h=t); break;    // LD H,RES 7,(IX+d) // LD H,RES 7,(IY+d)
+        case 0xbd: RES(127, t, t); put_memory(mp, l=t); break;    // LD L,RES 7,(IX+d) // LD L,RES 7,(IY+d)
+        case 0xbe: RES(127, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 7,(IX+d) // RES 7,(IY+d)
+        case 0xbf: RES(127, t, t); put_memory(mp, a=t); break;    // LD A,RES 7,(IX+d) // LD A,RES 7,(IY+d)
+        case 0xc0: SET(1, t, t); put_memory(mp, b=t); break;      // LD B,SET 0,(IX+d) // LD B,SET 0,(IY+d)
+        case 0xc1: SET(1, t, t); put_memory(mp, c=t); break;      // LD C,SET 0,(IX+d) // LD C,SET 0,(IY+d)
+        case 0xc2: SET(1, t, t); put_memory(mp, d=t); break;      // LD D,SET 0,(IX+d) // LD D,SET 0,(IY+d)
+        case 0xc3: SET(1, t, t); put_memory(mp, e=t); break;      // LD E,SET 0,(IX+d) // LD E,SET 0,(IY+d)
+        case 0xc4: SET(1, t, t); put_memory(mp, h=t); break;      // LD H,SET 0,(IX+d) // LD H,SET 0,(IY+d)
+        case 0xc5: SET(1, t, t); put_memory(mp, l=t); break;      // LD L,SET 0,(IX+d) // LD L,SET 0,(IY+d)
+        case 0xc6: SET(1, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;         // SET 0,(IX+d) // SET 0,(IY+d)
+        case 0xc7: SET(1, t, t); put_memory(mp, a=t); break;      // LD A,SET 0,(IX+d) // LD A,SET 0,(IY+d)
+        case 0xc8: SET(2, t, t); put_memory(mp, b=t); break;      // LD B,SET 1,(IX+d) // LD B,SET 1,(IY+d)
+        case 0xc9: SET(2, t, t); put_memory(mp, c=t); break;      // LD C,SET 1,(IX+d) // LD C,SET 1,(IY+d)
+        case 0xca: SET(2, t, t); put_memory(mp, d=t); break;      // LD D,SET 1,(IX+d) // LD D,SET 1,(IY+d)
+        case 0xcb: SET(2, t, t); put_memory(mp, e=t); break;      // LD E,SET 1,(IX+d) // LD E,SET 1,(IY+d)
+        case 0xcc: SET(2, t, t); put_memory(mp, h=t); break;      // LD H,SET 1,(IX+d) // LD H,SET 1,(IY+d)
+        case 0xcd: SET(2, t, t); put_memory(mp, l=t); break;      // LD L,SET 1,(IX+d) // LD L,SET 1,(IY+d)
+        case 0xce: SET(2, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;         // SET 1,(IX+d) // SET 1,(IY+d)
+        case 0xcf: SET(2, t, t); put_memory(mp, a=t); break;      // LD A,SET 1,(IX+d) // LD A,SET 1,(IY+d)
+        case 0xd0: SET(4, t, t); put_memory(mp, b=t); break;      // LD B,SET 2,(IX+d) // LD B,SET 2,(IY+d)
+        case 0xd1: SET(4, t, t); put_memory(mp, c=t); break;      // LD C,SET 2,(IX+d) // LD C,SET 2,(IY+d)
+        case 0xd2: SET(4, t, t); put_memory(mp, d=t); break;      // LD D,SET 2,(IX+d) // LD D,SET 2,(IY+d)
+        case 0xd3: SET(4, t, t); put_memory(mp, e=t); break;      // LD E,SET 2,(IX+d) // LD E,SET 2,(IY+d)
+        case 0xd4: SET(4, t, t); put_memory(mp, h=t); break;      // LD H,SET 2,(IX+d) // LD H,SET 2,(IY+d)
+        case 0xd5: SET(4, t, t); put_memory(mp, l=t); break;      // LD L,SET 2,(IX+d) // LD L,SET 2,(IY+d)
+        case 0xd6: SET(4, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;         // SET 2,(IX+d) // SET 2,(IY+d)
+        case 0xd7: SET(4, t, t); put_memory(mp, a=t); break;      // LD A,SET 2,(IX+d) // LD A,SET 2,(IY+d)
+        case 0xd8: SET(8, t, t); put_memory(mp, b=t); break;      // LD B,SET 3,(IX+d) // LD B,SET 3,(IY+d)
+        case 0xd9: SET(8, t, t); put_memory(mp, c=t); break;      // LD C,SET 3,(IX+d) // LD C,SET 3,(IY+d)
+        case 0xda: SET(8, t, t); put_memory(mp, d=t); break;      // LD D,SET 3,(IX+d) // LD D,SET 3,(IY+d)
+        case 0xdb: SET(8, t, t); put_memory(mp, e=t); break;      // LD E,SET 3,(IX+d) // LD E,SET 3,(IY+d)
+        case 0xdc: SET(8, t, t); put_memory(mp, h=t); break;      // LD H,SET 3,(IX+d) // LD H,SET 3,(IY+d)
+        case 0xdd: SET(8, t, t); put_memory(mp, l=t); break;      // LD L,SET 3,(IX+d) // LD L,SET 3,(IY+d)
+        case 0xde: SET(8, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;         // SET 3,(IX+d) // SET 3,(IY+d)
+        case 0xdf: SET(8, t, t); put_memory(mp, a=t); break;      // LD A,SET 3,(IX+d) // LD A,SET 3,(IY+d)
+        case 0xe0: SET(16, t, t); put_memory(mp, b=t); break;     // LD B,SET 4,(IX+d) // LD B,SET 4,(IY+d)
+        case 0xe1: SET(16, t, t); put_memory(mp, c=t); break;     // LD C,SET 4,(IX+d) // LD C,SET 4,(IY+d)
+        case 0xe2: SET(16, t, t); put_memory(mp, d=t); break;     // LD D,SET 4,(IX+d) // LD D,SET 4,(IY+d)
+        case 0xe3: SET(16, t, t); put_memory(mp, e=t); break;     // LD E,SET 4,(IX+d) // LD E,SET 4,(IY+d)
+        case 0xe4: SET(16, t, t); put_memory(mp, h=t); break;     // LD H,SET 4,(IX+d) // LD H,SET 4,(IY+d)
+        case 0xe5: SET(16, t, t); put_memory(mp, l=t); break;     // LD L,SET 4,(IX+d) // LD L,SET 4,(IY+d)
+        case 0xe6: SET(16, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;        // SET 4,(IX+d) // SET 4,(IY+d)
+        case 0xe7: SET(16, t, t); put_memory(mp, a=t); break;     // LD A,SET 4,(IX+d) // LD A,SET 4,(IY+d)
+        case 0xe8: SET(32, t, t); put_memory(mp, b=t); break;     // LD B,SET 5,(IX+d) // LD B,SET 5,(IY+d)
+        case 0xe9: SET(32, t, t); put_memory(mp, c=t); break;     // LD C,SET 5,(IX+d) // LD C,SET 5,(IY+d)
+        case 0xea: SET(32, t, t); put_memory(mp, d=t); break;     // LD D,SET 5,(IX+d) // LD D,SET 5,(IY+d)
+        case 0xeb: SET(32, t, t); put_memory(mp, e=t); break;     // LD E,SET 5,(IX+d) // LD E,SET 5,(IY+d)
+        case 0xec: SET(32, t, t); put_memory(mp, h=t); break;     // LD H,SET 5,(IX+d) // LD H,SET 5,(IY+d)
+        case 0xed: SET(32, t, t); put_memory(mp, l=t); break;     // LD L,SET 5,(IX+d) // LD L,SET 5,(IY+d)
+        case 0xee: SET(32, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;        // SET 5,(IX+d) // SET 5,(IY+d)
+        case 0xef: SET(32, t, t); put_memory(mp, a=t); break;     // LD A,SET 5,(IX+d) // LD A,SET 5,(IY+d)
+        case 0xf0: SET(64, t, t); put_memory(mp, b=t); break;     // LD B,SET 6,(IX+d) // LD B,SET 6,(IY+d)
+        case 0xf1: SET(64, t, t); put_memory(mp, c=t); break;     // LD C,SET 6,(IX+d) // LD C,SET 6,(IY+d)
+        case 0xf2: SET(64, t, t); put_memory(mp, d=t); break;     // LD D,SET 6,(IX+d) // LD D,SET 6,(IY+d)
+        case 0xf3: SET(64, t, t); put_memory(mp, e=t); break;     // LD E,SET 6,(IX+d) // LD E,SET 6,(IY+d)
+        case 0xf4: SET(64, t, t); put_memory(mp, h=t); break;     // LD H,SET 6,(IX+d) // LD H,SET 6,(IY+d)
+        case 0xf5: SET(64, t, t); put_memory(mp, l=t); break;     // LD L,SET 6,(IX+d) // LD L,SET 6,(IY+d)
+        case 0xf6: SET(64, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;        // SET 6,(IX+d) // SET 6,(IY+d)
+        case 0xf7: SET(64, t, t); put_memory(mp, a=t); break;     // LD A,SET 6,(IX+d) // LD A,SET 6,(IY+d)
+        case 0xf8: SET(128, t, t); put_memory(mp, b=t); break;    // LD B,SET 7,(IX+d) // LD B,SET 7,(IY+d)
+        case 0xf9: SET(128, t, t); put_memory(mp, c=t); break;    // LD C,SET 7,(IX+d) // LD C,SET 7,(IY+d)
+        case 0xfa: SET(128, t, t); put_memory(mp, d=t); break;    // LD D,SET 7,(IX+d) // LD D,SET 7,(IY+d)
+        case 0xfb: SET(128, t, t); put_memory(mp, e=t); break;    // LD E,SET 7,(IX+d) // LD E,SET 7,(IY+d)
+        case 0xfc: SET(128, t, t); put_memory(mp, h=t); break;    // LD H,SET 7,(IX+d) // LD H,SET 7,(IY+d)
+        case 0xfd: SET(128, t, t); put_memory(mp, l=t); break;    // LD L,SET 7,(IX+d) // LD L,SET 7,(IY+d)
+        case 0xfe: SET(128, t, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // SET 7,(IX+d) // SET 7,(IY+d)
+        case 0xff: SET(128, t, t); put_memory(mp, a=t); break;    // LD A,SET 7,(IX+d) // LD A,SET 7,(IY+d)
         }
     }
 }
