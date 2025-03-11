@@ -1,3 +1,7 @@
+ aci -128                       ; Error
+ aci 0                          ; Error
+ aci 127                        ; Error
+ aci 255                        ; Error
  adc (ahl)                      ; Error
  adc (aix)                      ; Error
  adc (aix+0)                    ; Error
@@ -7,6 +11,9 @@
  adc (aiy+0)                    ; Error
  adc (aiy+126)                  ; Error
  adc (aiy-128)                  ; Error
+ adc (hl)                       ; Error
+ adc (hl+)                      ; Error
+ adc (hl-)                      ; Error
  adc (ix)                       ; Error
  adc (ix+0)                     ; Error
  adc (ix+126)                   ; Error
@@ -51,6 +58,11 @@
  adc (ziy+0)                    ; Error
  adc (ziy+126)                  ; Error
  adc (ziy-128)                  ; Error
+ adc -128                       ; Error
+ adc 0                          ; Error
+ adc 127                        ; Error
+ adc 255                        ; Error
+ adc a                          ; Error
  adc a', (hl)                   ; Error
  adc a', (hl+)                  ; Error
  adc a', (hl-)                  ; Error
@@ -82,6 +94,9 @@
  adc a, (aiy+0)                 ; Error
  adc a, (aiy+126)               ; Error
  adc a, (aiy-128)               ; Error
+ adc a, (hl)                    ; Error
+ adc a, (hl+)                   ; Error
+ adc a, (hl-)                   ; Error
  adc a, (ix)                    ; Error
  adc a, (ix+0)                  ; Error
  adc a, (ix+126)                ; Error
@@ -126,14 +141,30 @@
  adc a, (ziy+0)                 ; Error
  adc a, (ziy+126)               ; Error
  adc a, (ziy-128)               ; Error
+ adc a, -128                    ; Error
+ adc a, 0                       ; Error
+ adc a, 127                     ; Error
+ adc a, 255                     ; Error
+ adc a, a                       ; Error
+ adc a, b                       ; Error
+ adc a, c                       ; Error
+ adc a, d                       ; Error
+ adc a, e                       ; Error
+ adc a, h                       ; Error
  adc a, ixh                     ; Error
  adc a, ixl                     ; Error
  adc a, iyh                     ; Error
  adc a, iyl                     ; Error
+ adc a, l                       ; Error
  adc ahl, bc                    ; Error
  adc ahl, de                    ; Error
  adc ahl, hl                    ; Error
  adc ahl, sp                    ; Error
+ adc b                          ; Error
+ adc c                          ; Error
+ adc d                          ; Error
+ adc e                          ; Error
+ adc h                          ; Error
  adc hl', bc                    ; Error
  adc hl', de                    ; Error
  adc hl', hl                    ; Error
@@ -142,6 +173,8 @@
  adc ixl                        ; Error
  adc iyh                        ; Error
  adc iyl                        ; Error
+ adc l                          ; Error
+ adc m                          ; Error
  adc xhl, bc                    ; Error
  adc xhl, de                    ; Error
  adc xhl, hl                    ; Error
@@ -267,6 +300,9 @@
  add (aiy+0)                    ; Error
  add (aiy+126)                  ; Error
  add (aiy-128)                  ; Error
+ add (hl)                       ; Error
+ add (hl+)                      ; Error
+ add (hl-)                      ; Error
  add (ix)                       ; Error
  add (ix+0)                     ; Error
  add (ix+126)                   ; Error
@@ -311,6 +347,11 @@
  add (ziy+0)                    ; Error
  add (ziy+126)                  ; Error
  add (ziy-128)                  ; Error
+ add -128                       ; Error
+ add 0                          ; Error
+ add 127                        ; Error
+ add 255                        ; Error
+ add a                          ; Error
  add a', (hl)                   ; Error
  add a', (hl+)                  ; Error
  add a', (hl-)                  ; Error
@@ -342,6 +383,9 @@
  add a, (aiy+0)                 ; Error
  add a, (aiy+126)               ; Error
  add a, (aiy-128)               ; Error
+ add a, (hl)                    ; Error
+ add a, (hl+)                   ; Error
+ add a, (hl-)                   ; Error
  add a, (ix)                    ; Error
  add a, (ix+0)                  ; Error
  add a, (ix+126)                ; Error
@@ -386,10 +430,21 @@
  add a, (ziy+0)                 ; Error
  add a, (ziy+126)               ; Error
  add a, (ziy-128)               ; Error
+ add a, -128                    ; Error
+ add a, 0                       ; Error
+ add a, 127                     ; Error
+ add a, 255                     ; Error
+ add a, a                       ; Error
+ add a, b                       ; Error
+ add a, c                       ; Error
+ add a, d                       ; Error
+ add a, e                       ; Error
+ add a, h                       ; Error
  add a, ixh                     ; Error
  add a, ixl                     ; Error
  add a, iyh                     ; Error
  add a, iyl                     ; Error
+ add a, l                       ; Error
  add ahl, bc                    ; Error
  add ahl, de                    ; Error
  add ahl, hl                    ; Error
@@ -402,12 +457,27 @@
  add aiy, de                    ; Error
  add aiy, iy                    ; Error
  add aiy, sp                    ; Error
+ add b                          ; Error
+ add bc, 0x1234                 ; Error
+ add bc, 0x123456               ; Error
+ add c                          ; Error
+ add d                          ; Error
+ add de, 0x1234                 ; Error
+ add de, 0x123456               ; Error
+ add e                          ; Error
+ add h                          ; Error
  add hl', bc                    ; Error
  add hl', de                    ; Error
  add hl', hl                    ; Error
  add hl', jk                    ; Error
  add hl', sp                    ; Error
+ add hl, 0x1234                 ; Error
+ add hl, 0x123456               ; Error
+ add hl, bc                     ; Error
+ add hl, de                     ; Error
+ add hl, hl                     ; Error
  add hl, jk                     ; Error
+ add hl, sp                     ; Error
  add ix, bc                     ; Error
  add ix, de                     ; Error
  add ix, ix                     ; Error
@@ -422,6 +492,8 @@
  add iyl                        ; Error
  add jkhl', bcde                ; Error
  add jkhl, bcde                 ; Error
+ add l                          ; Error
+ add m                          ; Error
  add xhl, bc                    ; Error
  add xhl, de                    ; Error
  add xhl, hl                    ; Error
@@ -594,6 +666,18 @@
  add.sil iy, de                 ; Error
  add.sil iy, iy                 ; Error
  add.sil iy, sp                 ; Error
+ adi -128                       ; Error
+ adi 0                          ; Error
+ adi 127                        ; Error
+ adi 255                        ; Error
+ adi hl, -128                   ; Error
+ adi hl, 0                      ; Error
+ adi hl, 127                    ; Error
+ adi hl, 255                    ; Error
+ adi sp, -128                   ; Error
+ adi sp, 0                      ; Error
+ adi sp, 127                    ; Error
+ adi sp, 255                    ; Error
  altd adc (hl)                  ; Error
  altd adc (hl+)                 ; Error
  altd adc (hl-)                 ; Error
@@ -3251,6 +3335,14 @@
  altd xor hl, de                ; Error
  altd xor jkhl, bcde            ; Error
  altd xor l                     ; Error
+ ana a                          ; Error
+ ana b                          ; Error
+ ana c                          ; Error
+ ana d                          ; Error
+ ana e                          ; Error
+ ana h                          ; Error
+ ana l                          ; Error
+ ana m                          ; Error
  and (ahl)                      ; Error
  and (aix)                      ; Error
  and (aix+0)                    ; Error
@@ -3260,6 +3352,9 @@
  and (aiy+0)                    ; Error
  and (aiy+126)                  ; Error
  and (aiy-128)                  ; Error
+ and (hl)                       ; Error
+ and (hl+)                      ; Error
+ and (hl-)                      ; Error
  and (ix)                       ; Error
  and (ix+0)                     ; Error
  and (ix+126)                   ; Error
@@ -3304,6 +3399,11 @@
  and (ziy+0)                    ; Error
  and (ziy+126)                  ; Error
  and (ziy-128)                  ; Error
+ and -128                       ; Error
+ and 0                          ; Error
+ and 127                        ; Error
+ and 255                        ; Error
+ and a                          ; Error
  and a', (hl)                   ; Error
  and a', (hl+)                  ; Error
  and a', (hl-)                  ; Error
@@ -3335,6 +3435,9 @@
  and a, (aiy+0)                 ; Error
  and a, (aiy+126)               ; Error
  and a, (aiy-128)               ; Error
+ and a, (hl)                    ; Error
+ and a, (hl+)                   ; Error
+ and a, (hl-)                   ; Error
  and a, (ix)                    ; Error
  and a, (ix+0)                  ; Error
  and a, (ix+126)                ; Error
@@ -3379,11 +3482,29 @@
  and a, (ziy+0)                 ; Error
  and a, (ziy+126)               ; Error
  and a, (ziy-128)               ; Error
+ and a, -128                    ; Error
+ and a, 0                       ; Error
+ and a, 127                     ; Error
+ and a, 255                     ; Error
+ and a, a                       ; Error
+ and a, b                       ; Error
+ and a, c                       ; Error
+ and a, d                       ; Error
+ and a, e                       ; Error
+ and a, h                       ; Error
  and a, ixh                     ; Error
  and a, ixl                     ; Error
  and a, iyh                     ; Error
  and a, iyl                     ; Error
+ and a, l                       ; Error
+ and b                          ; Error
+ and c                          ; Error
+ and d                          ; Error
+ and e                          ; Error
+ and h                          ; Error
  and hl', de                    ; Error
+ and hl, bc                     ; Error
+ and hl, de                     ; Error
  and ix, bc                     ; Error
  and ix, de                     ; Error
  and ixh                        ; Error
@@ -3394,6 +3515,7 @@
  and iyl                        ; Error
  and jkhl', bcde                ; Error
  and jkhl, bcde                 ; Error
+ and l                          ; Error
  and.l (hl)                     ; Error
  and.l (hl+)                    ; Error
  and.l (hl-)                    ; Error
@@ -3482,6 +3604,10 @@
  and.sil a, (iy+0)              ; Error
  and.sil a, (iy+126)            ; Error
  and.sil a, (iy-128)            ; Error
+ ani -128                       ; Error
+ ani 0                          ; Error
+ ani 127                        ; Error
+ ani 255                        ; Error
  bit -1, (ahl)                  ; Error
  bit -1, (aix)                  ; Error
  bit -1, (aix+0)                ; Error
@@ -4452,6 +4578,7 @@
  bit.sil 8, (iy+0)              ; Error
  bit.sil 8, (iy+126)            ; Error
  bit.sil 8, (iy-128)            ; Error
+ bool hl                        ; Error
  bool hl'                       ; Error
  bool ix                        ; Error
  bool iy                        ; Error
@@ -4692,6 +4819,9 @@
  cmp (aiy+0)                    ; Error
  cmp (aiy+126)                  ; Error
  cmp (aiy-128)                  ; Error
+ cmp (hl)                       ; Error
+ cmp (hl+)                      ; Error
+ cmp (hl-)                      ; Error
  cmp (ix)                       ; Error
  cmp (ix+0)                     ; Error
  cmp (ix+126)                   ; Error
@@ -4736,6 +4866,11 @@
  cmp (ziy+0)                    ; Error
  cmp (ziy+126)                  ; Error
  cmp (ziy-128)                  ; Error
+ cmp -128                       ; Error
+ cmp 0                          ; Error
+ cmp 127                        ; Error
+ cmp 255                        ; Error
+ cmp a                          ; Error
  cmp a, (ahl)                   ; Error
  cmp a, (aix)                   ; Error
  cmp a, (aix+0)                 ; Error
@@ -4745,6 +4880,9 @@
  cmp a, (aiy+0)                 ; Error
  cmp a, (aiy+126)               ; Error
  cmp a, (aiy-128)               ; Error
+ cmp a, (hl)                    ; Error
+ cmp a, (hl+)                   ; Error
+ cmp a, (hl-)                   ; Error
  cmp a, (ix)                    ; Error
  cmp a, (ix+0)                  ; Error
  cmp a, (ix+126)                ; Error
@@ -4789,10 +4927,26 @@
  cmp a, (ziy+0)                 ; Error
  cmp a, (ziy+126)               ; Error
  cmp a, (ziy-128)               ; Error
+ cmp a, -128                    ; Error
+ cmp a, 0                       ; Error
+ cmp a, 127                     ; Error
+ cmp a, 255                     ; Error
+ cmp a, a                       ; Error
+ cmp a, b                       ; Error
+ cmp a, c                       ; Error
+ cmp a, d                       ; Error
+ cmp a, e                       ; Error
+ cmp a, h                       ; Error
  cmp a, ixh                     ; Error
  cmp a, ixl                     ; Error
  cmp a, iyh                     ; Error
  cmp a, iyl                     ; Error
+ cmp a, l                       ; Error
+ cmp b                          ; Error
+ cmp c                          ; Error
+ cmp d                          ; Error
+ cmp e                          ; Error
+ cmp h                          ; Error
  cmp hl, -128                   ; Error
  cmp hl, 0                      ; Error
  cmp hl, 126                    ; Error
@@ -4802,6 +4956,8 @@
  cmp iyh                        ; Error
  cmp iyl                        ; Error
  cmp jkhl, bcde                 ; Error
+ cmp l                          ; Error
+ cmp m                          ; Error
  cmp.l (hl)                     ; Error
  cmp.l (hl+)                    ; Error
  cmp.l (hl-)                    ; Error
@@ -4917,6 +5073,9 @@
  cp (aiy+0)                     ; Error
  cp (aiy+126)                   ; Error
  cp (aiy-128)                   ; Error
+ cp (hl)                        ; Error
+ cp (hl+)                       ; Error
+ cp (hl-)                       ; Error
  cp (ix)                        ; Error
  cp (ix+0)                      ; Error
  cp (ix+126)                    ; Error
@@ -4961,6 +5120,7 @@
  cp (ziy+0)                     ; Error
  cp (ziy+126)                   ; Error
  cp (ziy-128)                   ; Error
+ cp a                           ; Error
  cp a, (ahl)                    ; Error
  cp a, (aix)                    ; Error
  cp a, (aix+0)                  ; Error
@@ -4970,6 +5130,9 @@
  cp a, (aiy+0)                  ; Error
  cp a, (aiy+126)                ; Error
  cp a, (aiy-128)                ; Error
+ cp a, (hl)                     ; Error
+ cp a, (hl+)                    ; Error
+ cp a, (hl-)                    ; Error
  cp a, (ix)                     ; Error
  cp a, (ix+0)                   ; Error
  cp a, (ix+126)                 ; Error
@@ -5014,10 +5177,22 @@
  cp a, (ziy+0)                  ; Error
  cp a, (ziy+126)                ; Error
  cp a, (ziy-128)                ; Error
+ cp a, a                        ; Error
+ cp a, b                        ; Error
+ cp a, c                        ; Error
+ cp a, d                        ; Error
+ cp a, e                        ; Error
+ cp a, h                        ; Error
  cp a, ixh                      ; Error
  cp a, ixl                      ; Error
  cp a, iyh                      ; Error
  cp a, iyl                      ; Error
+ cp a, l                        ; Error
+ cp b                           ; Error
+ cp c                           ; Error
+ cp d                           ; Error
+ cp e                           ; Error
+ cp h                           ; Error
  cp hl, -128                    ; Error
  cp hl, 0                       ; Error
  cp hl, 126                     ; Error
@@ -5027,6 +5202,7 @@
  cp iyh                         ; Error
  cp iyl                         ; Error
  cp jkhl, bcde                  ; Error
+ cp l                           ; Error
  cp.l (hl)                      ; Error
  cp.l (hl+)                     ; Error
  cp.l (hl-)                     ; Error
@@ -5127,6 +5303,10 @@
  cpdr.sil                       ; Error
  cpe 0x1234                     ; Error
  cpe 0x123456                   ; Error
+ cpi -128                       ; Error
+ cpi 0                          ; Error
+ cpi 127                        ; Error
+ cpi 255                        ; Error
  cpi x                          ; Error
  cpi.l                          ; Error
  cpi.lis                        ; Error
@@ -5146,6 +5326,28 @@
  cv 0x123456                    ; Error
  cz 0x1234                      ; Error
  cz 0x123456                    ; Error
+ dad b                          ; Error
+ dad bc                         ; Error
+ dad d                          ; Error
+ dad de                         ; Error
+ dad h                          ; Error
+ dad hl                         ; Error
+ dad sp                         ; Error
+ dcr a                          ; Error
+ dcr b                          ; Error
+ dcr c                          ; Error
+ dcr d                          ; Error
+ dcr e                          ; Error
+ dcr h                          ; Error
+ dcr l                          ; Error
+ dcr m                          ; Error
+ dcx b                          ; Error
+ dcx bc                         ; Error
+ dcx d                          ; Error
+ dcx de                         ; Error
+ dcx h                          ; Error
+ dcx hl                         ; Error
+ dcx sp                         ; Error
  dec (ahl)                      ; Error
  dec (aix)                      ; Error
  dec (aix+0)                    ; Error
@@ -5155,6 +5357,9 @@
  dec (aiy+0)                    ; Error
  dec (aiy+126)                  ; Error
  dec (aiy-128)                  ; Error
+ dec (hl)                       ; Error
+ dec (hl+)                      ; Error
+ dec (hl-)                      ; Error
  dec (ix)                       ; Error
  dec (ix+0)                     ; Error
  dec (ix+126)                   ; Error
@@ -5199,6 +5404,7 @@
  dec (ziy+0)                    ; Error
  dec (ziy+126)                  ; Error
  dec (ziy-128)                  ; Error
+ dec a                          ; Error
  dec a'                         ; Error
  dec abc                        ; Error
  dec ade                        ; Error
@@ -5206,13 +5412,21 @@
  dec aix                        ; Error
  dec aiy                        ; Error
  dec asp                        ; Error
+ dec b                          ; Error
  dec b'                         ; Error
+ dec bc                         ; Error
  dec bc'                        ; Error
+ dec c                          ; Error
  dec c'                         ; Error
+ dec d                          ; Error
  dec d'                         ; Error
+ dec de                         ; Error
  dec de'                        ; Error
+ dec e                          ; Error
  dec e'                         ; Error
+ dec h                          ; Error
  dec h'                         ; Error
+ dec hl                         ; Error
  dec hl'                        ; Error
  dec ix                         ; Error
  dec ixh                        ; Error
@@ -5220,7 +5434,9 @@
  dec iy                         ; Error
  dec iyh                        ; Error
  dec iyl                        ; Error
+ dec l                          ; Error
  dec l'                         ; Error
+ dec sp                         ; Error
  dec xbc                        ; Error
  dec xde                        ; Error
  dec xhl                        ; Error
@@ -5449,6 +5665,9 @@
  inc (aiy+0)                    ; Error
  inc (aiy+126)                  ; Error
  inc (aiy-128)                  ; Error
+ inc (hl)                       ; Error
+ inc (hl+)                      ; Error
+ inc (hl-)                      ; Error
  inc (ix)                       ; Error
  inc (ix+0)                     ; Error
  inc (ix+126)                   ; Error
@@ -5493,6 +5712,7 @@
  inc (ziy+0)                    ; Error
  inc (ziy+126)                  ; Error
  inc (ziy-128)                  ; Error
+ inc a                          ; Error
  inc a'                         ; Error
  inc abc                        ; Error
  inc ade                        ; Error
@@ -5500,13 +5720,21 @@
  inc aix                        ; Error
  inc aiy                        ; Error
  inc asp                        ; Error
+ inc b                          ; Error
  inc b'                         ; Error
+ inc bc                         ; Error
  inc bc'                        ; Error
+ inc c                          ; Error
  inc c'                         ; Error
+ inc d                          ; Error
  inc d'                         ; Error
+ inc de                         ; Error
  inc de'                        ; Error
+ inc e                          ; Error
  inc e'                         ; Error
+ inc h                          ; Error
  inc h'                         ; Error
+ inc hl                         ; Error
  inc hl'                        ; Error
  inc ix                         ; Error
  inc ixh                        ; Error
@@ -5514,7 +5742,9 @@
  inc iy                         ; Error
  inc iyh                        ; Error
  inc iyl                        ; Error
+ inc l                          ; Error
  inc l'                         ; Error
+ inc sp                         ; Error
  inc xbc                        ; Error
  inc xde                        ; Error
  inc xhl                        ; Error
@@ -5675,6 +5905,21 @@
  inirx.lis                      ; Error
  inirx.s                        ; Error
  inirx.sil                      ; Error
+ inr a                          ; Error
+ inr b                          ; Error
+ inr c                          ; Error
+ inr d                          ; Error
+ inr e                          ; Error
+ inr h                          ; Error
+ inr l                          ; Error
+ inr m                          ; Error
+ inx b                          ; Error
+ inx bc                         ; Error
+ inx d                          ; Error
+ inx de                         ; Error
+ inx h                          ; Error
+ inx hl                         ; Error
+ inx sp                         ; Error
  ioe adc (hl)                   ; Error
  ioe adc (hl+)                  ; Error
  ioe adc (hl-)                  ; Error
@@ -9058,10 +9303,44 @@
  jmp (zhl)                      ; Error
  jmp (zix)                      ; Error
  jmp (ziy)                      ; Error
+ jmp 0x1234                     ; Error
+ jmp 0x123456                   ; Error
+ jmp c, 0x1234                  ; Error
+ jmp c, 0x123456                ; Error
+ jmp eq, 0x1234                 ; Error
+ jmp eq, 0x123456               ; Error
+ jmp geu, 0x1234                ; Error
+ jmp geu, 0x123456              ; Error
  jmp gt, 0x1234                 ; Error
+ jmp gtu, 0x1234                ; Error
+ jmp gtu, 0x123456              ; Error
+ jmp leu, 0x1234                ; Error
+ jmp leu, 0x123456              ; Error
  jmp lo, 0x1234                 ; Error
  jmp lt, 0x1234                 ; Error
+ jmp ltu, 0x1234                ; Error
+ jmp ltu, 0x123456              ; Error
  jmp lz, 0x1234                 ; Error
+ jmp m, 0x1234                  ; Error
+ jmp m, 0x123456                ; Error
+ jmp nc, 0x1234                 ; Error
+ jmp nc, 0x123456               ; Error
+ jmp ne, 0x1234                 ; Error
+ jmp ne, 0x123456               ; Error
+ jmp nv, 0x1234                 ; Error
+ jmp nv, 0x123456               ; Error
+ jmp nz, 0x1234                 ; Error
+ jmp nz, 0x123456               ; Error
+ jmp p, 0x1234                  ; Error
+ jmp p, 0x123456                ; Error
+ jmp pe, 0x1234                 ; Error
+ jmp pe, 0x123456               ; Error
+ jmp po, 0x1234                 ; Error
+ jmp po, 0x123456               ; Error
+ jmp v, 0x1234                  ; Error
+ jmp v, 0x123456                ; Error
+ jmp z, 0x1234                  ; Error
+ jmp z, 0x123456                ; Error
  jmp.l (hl)                     ; Error
  jmp.l (ix)                     ; Error
  jmp.l (iy)                     ; Error
@@ -9118,7 +9397,6 @@
  jp (bc)                        ; Error
  jp (c)                         ; Error
  jp (de)                        ; Error
- jp (hl)                        ; Error
  jp (ix)                        ; Error
  jp (iy)                        ; Error
  jp (phl)                       ; Error
@@ -9133,11 +9411,44 @@
  jp (zhl)                       ; Error
  jp (zix)                       ; Error
  jp (ziy)                       ; Error
+ jp 0x1234                      ; Error
+ jp 0x123456                    ; Error
+ jp c, 0x1234                   ; Error
+ jp c, 0x123456                 ; Error
+ jp eq, 0x1234                  ; Error
+ jp eq, 0x123456                ; Error
+ jp geu, 0x1234                 ; Error
+ jp geu, 0x123456               ; Error
  jp gt, 0x1234                  ; Error
+ jp gtu, 0x1234                 ; Error
+ jp gtu, 0x123456               ; Error
+ jp leu, 0x1234                 ; Error
+ jp leu, 0x123456               ; Error
  jp lo, 0x1234                  ; Error
  jp lt, 0x1234                  ; Error
+ jp ltu, 0x1234                 ; Error
+ jp ltu, 0x123456               ; Error
  jp lz, 0x1234                  ; Error
- jp, 0x1234                     ; Error
+ jp m, 0x1234                   ; Error
+ jp m, 0x123456                 ; Error
+ jp nc, 0x1234                  ; Error
+ jp nc, 0x123456                ; Error
+ jp ne, 0x1234                  ; Error
+ jp ne, 0x123456                ; Error
+ jp nv, 0x1234                  ; Error
+ jp nv, 0x123456                ; Error
+ jp nz, 0x1234                  ; Error
+ jp nz, 0x123456                ; Error
+ jp p, 0x1234                   ; Error
+ jp p, 0x123456                 ; Error
+ jp pe, 0x1234                  ; Error
+ jp pe, 0x123456                ; Error
+ jp po, 0x1234                  ; Error
+ jp po, 0x123456                ; Error
+ jp v, 0x1234                   ; Error
+ jp v, 0x123456                 ; Error
+ jp z, 0x1234                   ; Error
+ jp z, 0x123456                 ; Error
  jp.l (hl)                      ; Error
  jp.l (ix)                      ; Error
  jp.l (iy)                      ; Error
@@ -9199,20 +9510,12 @@
  jpo 0x1234                     ; Error
  jv 0x1234                      ; Error
  jz 0x1234                      ; Error
- ld (0x1234), a                 ; Error
- ld (0x1234), bc                ; Error
  ld (0x1234), bcde              ; Error
- ld (0x1234), de                ; Error
- ld (0x1234), hl                ; Error
  ld (0x1234), ix                ; Error
  ld (0x1234), iy                ; Error
  ld (0x1234), jk                ; Error
  ld (0x1234), jkhl              ; Error
  ld (0x1234), sp                ; Error
- ld (0x123456), a               ; Error
- ld (0x123456), bc              ; Error
- ld (0x123456), de              ; Error
- ld (0x123456), hl              ; Error
  ld (0x123456), ix              ; Error
  ld (0x123456), iy              ; Error
  ld (0x123456), sp              ; Error
@@ -9397,22 +9700,83 @@
  ld (aiy-128), sp               ; Error
  ld (aiy-128), xix              ; Error
  ld (aiy-128), yiy              ; Error
- ld (bc), a                     ; Error
  ld (bc+), a                    ; Error
  ld (bc-), a                    ; Error
  ld (c), a                      ; Error
- ld (de), a                     ; Error
+ ld (de), hl                    ; Error
+ ld (de+), -128                 ; Error
+ ld (de+), 0                    ; Error
+ ld (de+), 127                  ; Error
+ ld (de+), 255                  ; Error
  ld (de+), a                    ; Error
+ ld (de+), b                    ; Error
+ ld (de+), c                    ; Error
+ ld (de+), d                    ; Error
+ ld (de+), e                    ; Error
+ ld (de+), h                    ; Error
+ ld (de+), l                    ; Error
+ ld (de-), -128                 ; Error
+ ld (de-), 0                    ; Error
+ ld (de-), 127                  ; Error
+ ld (de-), 255                  ; Error
  ld (de-), a                    ; Error
+ ld (de-), b                    ; Error
+ ld (de-), c                    ; Error
+ ld (de-), d                    ; Error
+ ld (de-), e                    ; Error
+ ld (de-), h                    ; Error
+ ld (de-), l                    ; Error
+ ld (hl), bc                    ; Error
  ld (hl), bcde                  ; Error
+ ld (hl), de                    ; Error
+ ld (hl), hl                    ; Error
  ld (hl), ix                    ; Error
  ld (hl), iy                    ; Error
  ld (hl), jkhl                  ; Error
+ ld (hl+), -128                 ; Error
+ ld (hl+), 0                    ; Error
+ ld (hl+), 127                  ; Error
+ ld (hl+), 255                  ; Error
+ ld (hl+), a                    ; Error
+ ld (hl+), b                    ; Error
+ ld (hl+), bc                   ; Error
+ ld (hl+), c                    ; Error
+ ld (hl+), d                    ; Error
+ ld (hl+), de                   ; Error
+ ld (hl+), e                    ; Error
+ ld (hl+), h                    ; Error
+ ld (hl+), hl                   ; Error
  ld (hl+), ix                   ; Error
  ld (hl+), iy                   ; Error
+ ld (hl+), l                    ; Error
  ld (hl+0), hl                  ; Error
  ld (hl+126), hl                ; Error
+ ld (hl-), -128                 ; Error
+ ld (hl-), 0                    ; Error
+ ld (hl-), 127                  ; Error
+ ld (hl-), 255                  ; Error
+ ld (hl-), a                    ; Error
+ ld (hl-), b                    ; Error
+ ld (hl-), c                    ; Error
+ ld (hl-), d                    ; Error
+ ld (hl-), e                    ; Error
+ ld (hl-), h                    ; Error
+ ld (hl-), l                    ; Error
  ld (hl-128), hl                ; Error
+ ld (hld), a                    ; Error
+ ld (hld), b                    ; Error
+ ld (hld), c                    ; Error
+ ld (hld), d                    ; Error
+ ld (hld), e                    ; Error
+ ld (hld), h                    ; Error
+ ld (hld), l                    ; Error
+ ld (hli), a                    ; Error
+ ld (hli), b                    ; Error
+ ld (hli), c                    ; Error
+ ld (hli), d                    ; Error
+ ld (hli), e                    ; Error
+ ld (hli), h                    ; Error
+ ld (hli), l                    ; Error
  ld (ix), -128                  ; Error
  ld (ix), 0                     ; Error
  ld (ix), 127                   ; Error
@@ -10674,8 +11038,6 @@
  ld a', iir                     ; Error
  ld a', l                       ; Error
  ld a', xpc                     ; Error
- ld a, (0x1234)                 ; Error
- ld a, (0x123456)               ; Error
  ld a, (0xff00+c)               ; Error
  ld a, (a:0x1234)               ; Error
  ld a, (abc)                    ; Error
@@ -10689,13 +11051,15 @@
  ld a, (aiy+0)                  ; Error
  ld a, (aiy+126)                ; Error
  ld a, (aiy-128)                ; Error
- ld a, (bc)                     ; Error
  ld a, (bc+)                    ; Error
  ld a, (bc-)                    ; Error
  ld a, (c)                      ; Error
- ld a, (de)                     ; Error
  ld a, (de+)                    ; Error
  ld a, (de-)                    ; Error
+ ld a, (hl+)                    ; Error
+ ld a, (hl-)                    ; Error
+ ld a, (hld)                    ; Error
+ ld a, (hli)                    ; Error
  ld a, (ix)                     ; Error
  ld a, (ix+0)                   ; Error
  ld a, (ix+126)                 ; Error
@@ -11114,6 +11478,12 @@
  ld b, (aiy+0)                  ; Error
  ld b, (aiy+126)                ; Error
  ld b, (aiy-128)                ; Error
+ ld b, (de+)                    ; Error
+ ld b, (de-)                    ; Error
+ ld b, (hl+)                    ; Error
+ ld b, (hl-)                    ; Error
+ ld b, (hld)                    ; Error
+ ld b, (hli)                    ; Error
  ld b, (ix)                     ; Error
  ld b, (ix+0)                   ; Error
  ld b, (ix+126)                 ; Error
@@ -11432,8 +11802,6 @@
  ld bc', hl'                    ; Error
  ld bc', ix                     ; Error
  ld bc', iy                     ; Error
- ld bc, (0x1234)                ; Error
- ld bc, (0x123456)              ; Error
  ld bc, (a:0x1234)              ; Error
  ld bc, (aix)                   ; Error
  ld bc, (aix+0)                 ; Error
@@ -11443,6 +11811,8 @@
  ld bc, (aiy+0)                 ; Error
  ld bc, (aiy+126)               ; Error
  ld bc, (aiy-128)               ; Error
+ ld bc, (hl)                    ; Error
+ ld bc, (hl+)                   ; Error
  ld bc, (ix)                    ; Error
  ld bc, (ix+0)                  ; Error
  ld bc, (ix+126)                ; Error
@@ -11633,6 +12003,12 @@
  ld c, (aiy+0)                  ; Error
  ld c, (aiy+126)                ; Error
  ld c, (aiy-128)                ; Error
+ ld c, (de+)                    ; Error
+ ld c, (de-)                    ; Error
+ ld c, (hl+)                    ; Error
+ ld c, (hl-)                    ; Error
+ ld c, (hld)                    ; Error
+ ld c, (hli)                    ; Error
  ld c, (ix)                     ; Error
  ld c, (ix+0)                   ; Error
  ld c, (ix+126)                 ; Error
@@ -11954,6 +12330,12 @@
  ld d, (aiy+0)                  ; Error
  ld d, (aiy+126)                ; Error
  ld d, (aiy-128)                ; Error
+ ld d, (de+)                    ; Error
+ ld d, (de-)                    ; Error
+ ld d, (hl+)                    ; Error
+ ld d, (hl-)                    ; Error
+ ld d, (hld)                    ; Error
+ ld d, (hli)                    ; Error
  ld d, (ix)                     ; Error
  ld d, (ix+0)                   ; Error
  ld d, (ix+126)                 ; Error
@@ -12272,8 +12654,6 @@
  ld de', hl'                    ; Error
  ld de', ix                     ; Error
  ld de', iy                     ; Error
- ld de, (0x1234)                ; Error
- ld de, (0x123456)              ; Error
  ld de, (a:0x1234)              ; Error
  ld de, (aix)                   ; Error
  ld de, (aix+0)                 ; Error
@@ -12283,6 +12663,8 @@
  ld de, (aiy+0)                 ; Error
  ld de, (aiy+126)               ; Error
  ld de, (aiy-128)               ; Error
+ ld de, (hl)                    ; Error
+ ld de, (hl+)                   ; Error
  ld de, (ix)                    ; Error
  ld de, (ix+0)                  ; Error
  ld de, (ix+126)                ; Error
@@ -12354,8 +12736,15 @@
  ld de, bc'                     ; Error
  ld de, de'                     ; Error
  ld de, hl'                     ; Error
+ ld de, hl+0                    ; Error
+ ld de, hl+128                  ; Error
+ ld de, hl+255                  ; Error
  ld de, ix                      ; Error
  ld de, iy                      ; Error
+ ld de, sp                      ; Error
+ ld de, sp+0                    ; Error
+ ld de, sp+128                  ; Error
+ ld de, sp+255                  ; Error
  ld e', (hl)                    ; Error
  ld e', (hl+)                   ; Error
  ld e', (hl-)                   ; Error
@@ -12389,6 +12778,12 @@
  ld e, (aiy+0)                  ; Error
  ld e, (aiy+126)                ; Error
  ld e, (aiy-128)                ; Error
+ ld e, (de+)                    ; Error
+ ld e, (de-)                    ; Error
+ ld e, (hl+)                    ; Error
+ ld e, (hl-)                    ; Error
+ ld e, (hld)                    ; Error
+ ld e, (hli)                    ; Error
  ld e, (ix)                     ; Error
  ld e, (ix+0)                   ; Error
  ld e, (ix+126)                 ; Error
@@ -12711,6 +13106,12 @@
  ld h, (aiy+0)                  ; Error
  ld h, (aiy+126)                ; Error
  ld h, (aiy-128)                ; Error
+ ld h, (de+)                    ; Error
+ ld h, (de-)                    ; Error
+ ld h, (hl+)                    ; Error
+ ld h, (hl-)                    ; Error
+ ld h, (hld)                    ; Error
+ ld h, (hli)                    ; Error
  ld h, (ix)                     ; Error
  ld h, (ix+0)                   ; Error
  ld h, (ix+126)                 ; Error
@@ -13043,8 +13444,6 @@
  ld hl', ix                     ; Error
  ld hl', iy                     ; Error
  ld hl', lxpc                   ; Error
- ld hl, (0x1234)                ; Error
- ld hl, (0x123456)              ; Error
  ld hl, (a:0x1234)              ; Error
  ld hl, (aix)                   ; Error
  ld hl, (aix+0)                 ; Error
@@ -13054,6 +13453,8 @@
  ld hl, (aiy+0)                 ; Error
  ld hl, (aiy+126)               ; Error
  ld hl, (aiy-128)               ; Error
+ ld hl, (de)                    ; Error
+ ld hl, (hl)                    ; Error
  ld hl, (hl+0)                  ; Error
  ld hl, (hl+126)                ; Error
  ld hl, (hl-128)                ; Error
@@ -13135,6 +13536,10 @@
  ld hl, ix                      ; Error
  ld hl, iy                      ; Error
  ld hl, lxpc                    ; Error
+ ld hl, sp                      ; Error
+ ld hl, sp+0                    ; Error
+ ld hl, sp+126                  ; Error
+ ld hl, sp-128                  ; Error
  ld htr, a                      ; Error
  ld i, a                        ; Error
  ld i, hl                       ; Error
@@ -13490,6 +13895,12 @@
  ld l, (aiy+0)                  ; Error
  ld l, (aiy+126)                ; Error
  ld l, (aiy-128)                ; Error
+ ld l, (de+)                    ; Error
+ ld l, (de-)                    ; Error
+ ld l, (hl+)                    ; Error
+ ld l, (hl-)                    ; Error
+ ld l, (hld)                    ; Error
+ ld l, (hli)                    ; Error
  ld l, (ix)                     ; Error
  ld l, (ix+0)                   ; Error
  ld l, (ix+126)                 ; Error
@@ -15763,15 +16174,44 @@
  ld.sis iy, 0x1234              ; Error
  ld.sis sp, (0x1234)            ; Error
  ld.sis sp, 0x1234              ; Error
- lda 0x1234                     ; Error
- ldax b                         ; Error
- ldax bc                        ; Error
- ldax d                         ; Error
- ldax de                        ; Error
  ldd (bc), a                    ; Error
+ ldd (de), -128                 ; Error
+ ldd (de), 0                    ; Error
+ ldd (de), 127                  ; Error
+ ldd (de), 255                  ; Error
  ldd (de), a                    ; Error
+ ldd (de), b                    ; Error
+ ldd (de), c                    ; Error
+ ldd (de), d                    ; Error
+ ldd (de), e                    ; Error
+ ldd (de), h                    ; Error
+ ldd (de), l                    ; Error
+ ldd (hl), -128                 ; Error
+ ldd (hl), 0                    ; Error
+ ldd (hl), 127                  ; Error
+ ldd (hl), 255                  ; Error
+ ldd (hl), a                    ; Error
+ ldd (hl), b                    ; Error
+ ldd (hl), c                    ; Error
+ ldd (hl), d                    ; Error
+ ldd (hl), e                    ; Error
+ ldd (hl), h                    ; Error
+ ldd (hl), l                    ; Error
  ldd a, (bc)                    ; Error
  ldd a, (de)                    ; Error
+ ldd a, (hl)                    ; Error
+ ldd b, (de)                    ; Error
+ ldd b, (hl)                    ; Error
+ ldd c, (de)                    ; Error
+ ldd c, (hl)                    ; Error
+ ldd d, (de)                    ; Error
+ ldd d, (hl)                    ; Error
+ ldd e, (de)                    ; Error
+ ldd e, (hl)                    ; Error
+ ldd h, (de)                    ; Error
+ ldd h, (hl)                    ; Error
+ ldd l, (de)                    ; Error
+ ldd l, (hl)                    ; Error
  ldd xy                         ; Error
  ldd.l                          ; Error
  ldd.l (bc), a                  ; Error
@@ -15923,17 +16363,60 @@
  ldh a, (127)                   ; Error
  ldh a, (255)                   ; Error
  ldh a, (c)                     ; Error
+ ldhi -128                      ; Error
+ ldhi 0                         ; Error
+ ldhi 127                       ; Error
+ ldhi 255                       ; Error
  ldhl sp, -128                  ; Error
  ldhl sp, 0                     ; Error
  ldhl sp, 126                   ; Error
  ldi (bc), a                    ; Error
+ ldi (de), -128                 ; Error
+ ldi (de), 0                    ; Error
+ ldi (de), 127                  ; Error
+ ldi (de), 255                  ; Error
  ldi (de), a                    ; Error
+ ldi (de), b                    ; Error
+ ldi (de), c                    ; Error
+ ldi (de), d                    ; Error
+ ldi (de), e                    ; Error
+ ldi (de), h                    ; Error
+ ldi (de), l                    ; Error
+ ldi (hl), -128                 ; Error
+ ldi (hl), 0                    ; Error
+ ldi (hl), 127                  ; Error
+ ldi (hl), 255                  ; Error
+ ldi (hl), a                    ; Error
+ ldi (hl), b                    ; Error
+ ldi (hl), bc                   ; Error
+ ldi (hl), c                    ; Error
+ ldi (hl), d                    ; Error
+ ldi (hl), de                   ; Error
+ ldi (hl), e                    ; Error
+ ldi (hl), h                    ; Error
+ ldi (hl), hl                   ; Error
  ldi (hl), ix                   ; Error
  ldi (hl), iy                   ; Error
+ ldi (hl), l                    ; Error
  ldi a, (bc)                    ; Error
  ldi a, (de)                    ; Error
+ ldi a, (hl)                    ; Error
+ ldi b, (de)                    ; Error
+ ldi b, (hl)                    ; Error
+ ldi bc, (hl)                   ; Error
+ ldi c, (de)                    ; Error
+ ldi c, (hl)                    ; Error
+ ldi d, (de)                    ; Error
+ ldi d, (hl)                    ; Error
+ ldi de, (hl)                   ; Error
+ ldi e, (de)                    ; Error
+ ldi e, (hl)                    ; Error
+ ldi h, (de)                    ; Error
+ ldi h, (hl)                    ; Error
  ldi ix, (hl)                   ; Error
  ldi iy, (hl)                   ; Error
+ ldi l, (de)                    ; Error
+ ldi l, (hl)                    ; Error
  ldi xy                         ; Error
  ldi.l                          ; Error
  ldi.l (bc), a                  ; Error
@@ -16157,6 +16640,10 @@
  ldp iy, (0x1234)               ; Error
  ldpirx                         ; Error
  ldrx                           ; Error
+ ldsi -128                      ; Error
+ ldsi 0                         ; Error
+ ldsi 127                       ; Error
+ ldsi 255                       ; Error
  ldws                           ; Error
  lea bc, ix                     ; Error
  lea bc, ix+0                   ; Error
@@ -16358,7 +16845,8 @@
  lea.sil iy, iy+0               ; Error
  lea.sil iy, iy+126             ; Error
  lea.sil iy, iy-128             ; Error
- lhld 0x1234                    ; Error
+ lhlde                          ; Error
+ lhlx                           ; Error
  lirx                           ; Error
  lprx                           ; Error
  lsddr                          ; Error
@@ -16519,6 +17007,9 @@
  or (aiy+0)                     ; Error
  or (aiy+126)                   ; Error
  or (aiy-128)                   ; Error
+ or (hl)                        ; Error
+ or (hl+)                       ; Error
+ or (hl-)                       ; Error
  or (ix)                        ; Error
  or (ix+0)                      ; Error
  or (ix+126)                    ; Error
@@ -16563,6 +17054,11 @@
  or (ziy+0)                     ; Error
  or (ziy+126)                   ; Error
  or (ziy-128)                   ; Error
+ or -128                        ; Error
+ or 0                           ; Error
+ or 127                         ; Error
+ or 255                         ; Error
+ or a                           ; Error
  or a', (hl)                    ; Error
  or a', (hl+)                   ; Error
  or a', (hl-)                   ; Error
@@ -16594,6 +17090,9 @@
  or a, (aiy+0)                  ; Error
  or a, (aiy+126)                ; Error
  or a, (aiy-128)                ; Error
+ or a, (hl)                     ; Error
+ or a, (hl+)                    ; Error
+ or a, (hl-)                    ; Error
  or a, (ix)                     ; Error
  or a, (ix+0)                   ; Error
  or a, (ix+126)                 ; Error
@@ -16638,11 +17137,29 @@
  or a, (ziy+0)                  ; Error
  or a, (ziy+126)                ; Error
  or a, (ziy-128)                ; Error
+ or a, -128                     ; Error
+ or a, 0                        ; Error
+ or a, 127                      ; Error
+ or a, 255                      ; Error
+ or a, a                        ; Error
+ or a, b                        ; Error
+ or a, c                        ; Error
+ or a, d                        ; Error
+ or a, e                        ; Error
+ or a, h                        ; Error
  or a, ixh                      ; Error
  or a, ixl                      ; Error
  or a, iyh                      ; Error
  or a, iyl                      ; Error
+ or a, l                        ; Error
+ or b                           ; Error
+ or c                           ; Error
+ or d                           ; Error
+ or e                           ; Error
+ or h                           ; Error
  or hl', de                     ; Error
+ or hl, bc                      ; Error
+ or hl, de                      ; Error
  or ix, bc                      ; Error
  or ix, de                      ; Error
  or ixh                         ; Error
@@ -16653,6 +17170,7 @@
  or iyl                         ; Error
  or jkhl', bcde                 ; Error
  or jkhl, bcde                  ; Error
+ or l                           ; Error
  or.l (hl)                      ; Error
  or.l (hl+)                     ; Error
  or.l (hl-)                     ; Error
@@ -16741,6 +17259,18 @@
  or.sil a, (iy+0)               ; Error
  or.sil a, (iy+126)             ; Error
  or.sil a, (iy-128)             ; Error
+ ora a                          ; Error
+ ora b                          ; Error
+ ora c                          ; Error
+ ora d                          ; Error
+ ora e                          ; Error
+ ora h                          ; Error
+ ora l                          ; Error
+ ora m                          ; Error
+ ori -128                       ; Error
+ ori 0                          ; Error
+ ori 127                        ; Error
+ ori 255                        ; Error
  otd2r                          ; Error
  otd2r.l                        ; Error
  otd2r.lis                      ; Error
@@ -16875,7 +17405,6 @@
  outi2.s                        ; Error
  outi2.sil                      ; Error
  outinb                         ; Error
- pchl                           ; Error
  pea ix                         ; Error
  pea ix+0                       ; Error
  pea ix+126                     ; Error
@@ -19590,8 +20119,6 @@
  rst 7                          ; Error
  rst 8                          ; Error
  rst 9                          ; Error
- rst v, 63                      ; Error
- rst v, 65                      ; Error
  rst.l -1                       ; Error
  rst.l 0                        ; Error
  rst.l 1                        ; Error
@@ -19830,6 +20357,14 @@
  rst.sil 9                      ; Error
  rv                             ; Error
  rz                             ; Error
+ sbb a                          ; Error
+ sbb b                          ; Error
+ sbb c                          ; Error
+ sbb d                          ; Error
+ sbb e                          ; Error
+ sbb h                          ; Error
+ sbb l                          ; Error
+ sbb m                          ; Error
  sbc (ahl)                      ; Error
  sbc (aix)                      ; Error
  sbc (aix+0)                    ; Error
@@ -19839,6 +20374,9 @@
  sbc (aiy+0)                    ; Error
  sbc (aiy+126)                  ; Error
  sbc (aiy-128)                  ; Error
+ sbc (hl)                       ; Error
+ sbc (hl+)                      ; Error
+ sbc (hl-)                      ; Error
  sbc (ix)                       ; Error
  sbc (ix+0)                     ; Error
  sbc (ix+126)                   ; Error
@@ -19883,6 +20421,11 @@
  sbc (ziy+0)                    ; Error
  sbc (ziy+126)                  ; Error
  sbc (ziy-128)                  ; Error
+ sbc -128                       ; Error
+ sbc 0                          ; Error
+ sbc 127                        ; Error
+ sbc 255                        ; Error
+ sbc a                          ; Error
  sbc a', (hl)                   ; Error
  sbc a', (hl+)                  ; Error
  sbc a', (hl-)                  ; Error
@@ -19914,6 +20457,9 @@
  sbc a, (aiy+0)                 ; Error
  sbc a, (aiy+126)               ; Error
  sbc a, (aiy-128)               ; Error
+ sbc a, (hl)                    ; Error
+ sbc a, (hl+)                   ; Error
+ sbc a, (hl-)                   ; Error
  sbc a, (ix)                    ; Error
  sbc a, (ix+0)                  ; Error
  sbc a, (ix+126)                ; Error
@@ -19958,14 +20504,30 @@
  sbc a, (ziy+0)                 ; Error
  sbc a, (ziy+126)               ; Error
  sbc a, (ziy-128)               ; Error
+ sbc a, -128                    ; Error
+ sbc a, 0                       ; Error
+ sbc a, 127                     ; Error
+ sbc a, 255                     ; Error
+ sbc a, a                       ; Error
+ sbc a, b                       ; Error
+ sbc a, c                       ; Error
+ sbc a, d                       ; Error
+ sbc a, e                       ; Error
+ sbc a, h                       ; Error
  sbc a, ixh                     ; Error
  sbc a, ixl                     ; Error
  sbc a, iyh                     ; Error
  sbc a, iyl                     ; Error
+ sbc a, l                       ; Error
  sbc ahl, bc                    ; Error
  sbc ahl, de                    ; Error
  sbc ahl, hl                    ; Error
  sbc ahl, sp                    ; Error
+ sbc b                          ; Error
+ sbc c                          ; Error
+ sbc d                          ; Error
+ sbc e                          ; Error
+ sbc h                          ; Error
  sbc hl', bc                    ; Error
  sbc hl', de                    ; Error
  sbc hl', hl                    ; Error
@@ -19974,6 +20536,7 @@
  sbc ixl                        ; Error
  sbc iyh                        ; Error
  sbc iyl                        ; Error
+ sbc l                          ; Error
  sbc xhl, bc                    ; Error
  sbc xhl, de                    ; Error
  sbc xhl, hl                    ; Error
@@ -20090,6 +20653,10 @@
  sbc.sil hl, de                 ; Error
  sbc.sil hl, hl                 ; Error
  sbc.sil hl, sp                 ; Error
+ sbi -128                       ; Error
+ sbi 0                          ; Error
+ sbi 127                        ; Error
+ sbi 255                        ; Error
  sbox a                         ; Error
  sbox a'                        ; Error
  scf                            ; Error
@@ -21698,8 +22265,8 @@
  setsysp 0x1234                 ; Error
  setusr                         ; Error
  setusrp 0x1234                 ; Error
- shld 0x1234                    ; Error
- shld 0x123456                  ; Error
+ shlde                          ; Error
+ shlx                           ; Error
  sla (ahl)                      ; Error
  sla (aix)                      ; Error
  sla (aix+0)                    ; Error
@@ -22495,12 +23062,7 @@
  srl.sil (iy+0)                 ; Error
  srl.sil (iy+126)               ; Error
  srl.sil (iy-128)               ; Error
- sta 0x1234                     ; Error
  stae                           ; Error
- stax b                         ; Error
- stax bc                        ; Error
- stax d                         ; Error
- stax de                        ; Error
  stc                            ; Error
  stmix                          ; Error
  stop                           ; Error
@@ -22513,6 +23075,9 @@
  sub (aiy+0)                    ; Error
  sub (aiy+126)                  ; Error
  sub (aiy-128)                  ; Error
+ sub (hl)                       ; Error
+ sub (hl+)                      ; Error
+ sub (hl-)                      ; Error
  sub (ix)                       ; Error
  sub (ix+0)                     ; Error
  sub (ix+126)                   ; Error
@@ -22557,6 +23122,11 @@
  sub (ziy+0)                    ; Error
  sub (ziy+126)                  ; Error
  sub (ziy-128)                  ; Error
+ sub -128                       ; Error
+ sub 0                          ; Error
+ sub 127                        ; Error
+ sub 255                        ; Error
+ sub a                          ; Error
  sub a', (hl)                   ; Error
  sub a', (hl+)                  ; Error
  sub a', (hl-)                  ; Error
@@ -22588,6 +23158,9 @@
  sub a, (aiy+0)                 ; Error
  sub a, (aiy+126)               ; Error
  sub a, (aiy-128)               ; Error
+ sub a, (hl)                    ; Error
+ sub a, (hl+)                   ; Error
+ sub a, (hl-)                   ; Error
  sub a, (ix)                    ; Error
  sub a, (ix+0)                  ; Error
  sub a, (ix+126)                ; Error
@@ -22632,10 +23205,26 @@
  sub a, (ziy+0)                 ; Error
  sub a, (ziy+126)               ; Error
  sub a, (ziy-128)               ; Error
+ sub a, -128                    ; Error
+ sub a, 0                       ; Error
+ sub a, 127                     ; Error
+ sub a, 255                     ; Error
+ sub a, a                       ; Error
+ sub a, b                       ; Error
+ sub a, c                       ; Error
+ sub a, d                       ; Error
+ sub a, e                       ; Error
+ sub a, h                       ; Error
  sub a, ixh                     ; Error
  sub a, ixl                     ; Error
  sub a, iyh                     ; Error
  sub a, iyl                     ; Error
+ sub a, l                       ; Error
+ sub b                          ; Error
+ sub c                          ; Error
+ sub d                          ; Error
+ sub e                          ; Error
+ sub h                          ; Error
  sub hl', de                    ; Error
  sub hl', jk                    ; Error
  sub hl, jk                     ; Error
@@ -22645,6 +23234,8 @@
  sub iyl                        ; Error
  sub jkhl', bcde                ; Error
  sub jkhl, bcde                 ; Error
+ sub l                          ; Error
+ sub m                          ; Error
  sub.l (hl)                     ; Error
  sub.l (hl+)                    ; Error
  sub.l (hl-)                    ; Error
@@ -22733,6 +23324,10 @@
  sub.sil a, (iy+0)              ; Error
  sub.sil a, (iy+126)            ; Error
  sub.sil a, (iy-128)            ; Error
+ sui -128                       ; Error
+ sui 0                          ; Error
+ sui 127                        ; Error
+ sui 255                        ; Error
  sures                          ; Error
  swap                           ; Error
  swap (hl)                      ; Error
@@ -22832,6 +23427,9 @@
  xor (aiy+0)                    ; Error
  xor (aiy+126)                  ; Error
  xor (aiy-128)                  ; Error
+ xor (hl)                       ; Error
+ xor (hl+)                      ; Error
+ xor (hl-)                      ; Error
  xor (ix)                       ; Error
  xor (ix+0)                     ; Error
  xor (ix+126)                   ; Error
@@ -22876,6 +23474,11 @@
  xor (ziy+0)                    ; Error
  xor (ziy+126)                  ; Error
  xor (ziy-128)                  ; Error
+ xor -128                       ; Error
+ xor 0                          ; Error
+ xor 127                        ; Error
+ xor 255                        ; Error
+ xor a                          ; Error
  xor a', (hl)                   ; Error
  xor a', (hl+)                  ; Error
  xor a', (hl-)                  ; Error
@@ -22907,6 +23510,9 @@
  xor a, (aiy+0)                 ; Error
  xor a, (aiy+126)               ; Error
  xor a, (aiy-128)               ; Error
+ xor a, (hl)                    ; Error
+ xor a, (hl+)                   ; Error
+ xor a, (hl-)                   ; Error
  xor a, (ix)                    ; Error
  xor a, (ix+0)                  ; Error
  xor a, (ix+126)                ; Error
@@ -22951,11 +23557,29 @@
  xor a, (ziy+0)                 ; Error
  xor a, (ziy+126)               ; Error
  xor a, (ziy-128)               ; Error
+ xor a, -128                    ; Error
+ xor a, 0                       ; Error
+ xor a, 127                     ; Error
+ xor a, 255                     ; Error
+ xor a, a                       ; Error
+ xor a, b                       ; Error
+ xor a, c                       ; Error
+ xor a, d                       ; Error
+ xor a, e                       ; Error
+ xor a, h                       ; Error
  xor a, ixh                     ; Error
  xor a, ixl                     ; Error
  xor a, iyh                     ; Error
  xor a, iyl                     ; Error
+ xor a, l                       ; Error
+ xor b                          ; Error
+ xor c                          ; Error
+ xor d                          ; Error
+ xor e                          ; Error
+ xor h                          ; Error
  xor hl', de                    ; Error
+ xor hl, bc                     ; Error
+ xor hl, de                     ; Error
  xor ix, bc                     ; Error
  xor ix, de                     ; Error
  xor ixh                        ; Error
@@ -22966,6 +23590,7 @@
  xor iyl                        ; Error
  xor jkhl', bcde                ; Error
  xor jkhl, bcde                 ; Error
+ xor l                          ; Error
  xor.l (hl)                     ; Error
  xor.l (hl+)                    ; Error
  xor.l (hl-)                    ; Error
@@ -23054,4 +23679,16 @@
  xor.sil a, (iy+0)              ; Error
  xor.sil a, (iy+126)            ; Error
  xor.sil a, (iy-128)            ; Error
+ xra a                          ; Error
+ xra b                          ; Error
+ xra c                          ; Error
+ xra d                          ; Error
+ xra e                          ; Error
+ xra h                          ; Error
+ xra l                          ; Error
+ xra m                          ; Error
+ xri -128                       ; Error
+ xri 0                          ; Error
+ xri 127                        ; Error
+ xri 255                        ; Error
  xthl                           ; Error

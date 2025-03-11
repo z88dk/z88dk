@@ -7946,25 +7946,14 @@
  ipset 2                        ; Error
  ipset 3                        ; Error
  ipset 4                        ; Error
- j_c, 0x1234                    ; Error
  j_gt 0x1234                    ; Error
  j_lo 0x1234                    ; Error
  j_lt 0x1234                    ; Error
  j_lz 0x1234                    ; Error
- j_m, 0x1234                    ; Error
- j_nc, 0x1234                   ; Error
- j_nz, 0x1234                   ; Error
- j_p, 0x1234                    ; Error
- j_pe, 0x1234                   ; Error
- j_po, 0x1234                   ; Error
- j_z, 0x1234                    ; Error
- jc, 0x1234                     ; Error
  jgt 0x1234                     ; Error
- jk 0x1234                      ; Error
  jlo 0x1234                     ; Error
  jlt 0x1234                     ; Error
  jlz 0x1234                     ; Error
- jm, 0x1234                     ; Error
  jmp (ahl)                      ; Error
  jmp (aix)                      ; Error
  jmp (aiy)                      ; Error
@@ -7982,23 +7971,15 @@
  jmp (zix)                      ; Error
  jmp (ziy)                      ; Error
  jmp gt, 0x1234                 ; Error
- jmp k, 0x1234                  ; Error
  jmp lo, 0x1234                 ; Error
  jmp lt, 0x1234                 ; Error
  jmp lz, 0x1234                 ; Error
- jmp nk, 0x1234                 ; Error
- jmp nx5, 0x1234                ; Error
- jmp x5, 0x1234                 ; Error
  jmp.l (hl)                     ; Error
  jmp.l (ix)                     ; Error
  jmp.l (iy)                     ; Error
  jmp.lis (hl)                   ; Error
  jmp.lis (ix)                   ; Error
  jmp.lis (iy)                   ; Error
- jnc, 0x1234                    ; Error
- jnk 0x1234                     ; Error
- jnx5 0x1234                    ; Error
- jnz, 0x1234                    ; Error
  jp (ahl)                       ; Error
  jp (aix)                       ; Error
  jp (aiy)                       ; Error
@@ -8016,14 +7997,9 @@
  jp (zix)                       ; Error
  jp (ziy)                       ; Error
  jp gt, 0x1234                  ; Error
- jp k, 0x1234                   ; Error
  jp lo, 0x1234                  ; Error
  jp lt, 0x1234                  ; Error
  jp lz, 0x1234                  ; Error
- jp nk, 0x1234                  ; Error
- jp nx5, 0x1234                 ; Error
- jp x5, 0x1234                  ; Error
- jp, 0x1234                     ; Error
  jp.l (hl)                      ; Error
  jp.l (ix)                      ; Error
  jp.l (iy)                      ; Error
@@ -8041,8 +8017,6 @@
  jp3 ne, 0x123456               ; Error
  jp3 nz, 0x123456               ; Error
  jp3 z, 0x123456                ; Error
- jpe, 0x1234                    ; Error
- jpo, 0x1234                    ; Error
  jr gt, ASMPC                   ; Error
  jr lt, ASMPC                   ; Error
  jr v, ASMPC                    ; Error
@@ -8059,8 +8033,6 @@
  jre nz, ASMPC                  ; Error
  jre v, ASMPC                   ; Error
  jre z, ASMPC                   ; Error
- jx5 0x1234                     ; Error
- jz, 0x1234                     ; Error
  ld (0x1234), bcde              ; Error
  ld (0x1234), jk                ; Error
  ld (0x1234), jkhl              ; Error
@@ -14249,7 +14221,6 @@
  outi2.l                        ; Error
  outi2.lis                      ; Error
  outinb                         ; Error
- ovrst8                         ; Error
  pea.l ix                       ; Error
  pea.l ix+0                     ; Error
  pea.l ix+126                   ; Error
@@ -15681,7 +15652,6 @@
  reti.lis                       ; Error
  retn.lis                       ; Error
  retn3                          ; Error
- rim                            ; Error
  rl (ahl)                       ; Error
  rl (aix)                       ; Error
  rl (aix+0)                     ; Error
@@ -16401,9 +16371,6 @@
  rst 6                          ; Error
  rst 7                          ; Error
  rst 9                          ; Error
- rst v, 63                      ; Error
- rst v, 64                      ; Error
- rst v, 65                      ; Error
  rst.l -1                       ; Error
  rst.l 0                        ; Error
  rst.l 1                        ; Error
@@ -16624,7 +16591,6 @@
  rst.sil 6                      ; Error
  rst.sil 7                      ; Error
  rst.sil 9                      ; Error
- rstv                           ; Error
  sbc (ahl)                      ; Error
  sbc (aix)                      ; Error
  sbc (aix+0)                    ; Error
@@ -18144,7 +18110,7 @@
  setsysp 0x1234                 ; Error
  setusr                         ; Error
  setusrp 0x1234                 ; Error
- sim                            ; Error
+ shld 0x1234                    ; Error
  sla (ahl)                      ; Error
  sla (aix)                      ; Error
  sla (aix+0)                    ; Error
