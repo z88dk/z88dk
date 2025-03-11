@@ -49,7 +49,7 @@ TOCREATE += $(call check_target,embedded,embedded_clib.lib)
 TOCREATE += $(call check_target,enterprise,enterprise_clib.lib gfxep.lib gfxephr.lib)
 TOCREATE += $(call check_target,excali64,excali64_clib.lib $(CPMLIBS))
 TOCREATE += $(call check_target,fp1100,fp1100_clib.lib)
-TOCREATE += $(call check_target,g800,g800_clib.lib)
+TOCREATE += $(call check_target,g850,g850_clib.lib)
 TOCREATE += $(call check_target,gal,gal_clib.lib)
 TOCREATE += $(call check_target,gemini,gemini.lib $(CPMLIBS))
 TOCREATE += $(call check_target,gb,gb_clib.lib)
@@ -1784,15 +1784,24 @@ gal_clib.lib: $(TARGET_CLIB_OBJS)
 	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(TARGET_DIRECTORY)/gal/gal.lst
 
 # Sharp PC-G8xx/E2xx - Stefano Bodrato
-g800_clib.lib: $(TARGET_CLIB_OBJS)
+g850_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sharp PC-G8xx/E2xx Library ---'
 	@echo ''
 	$(call buildgeneric,g800)
-	$(MAKE) -C games TARGET=g800
-	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g800_clib @$(TARGET_DIRECTORY)/g800/g800.lst
-	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850_clib @$(TARGET_DIRECTORY)/g800/g850.lst
-	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850b @$(TARGET_DIRECTORY)/g800/g850b.lst
+	$(MAKE) -C gfx TARGET=g800 FLAVOUR="narrow" SUBTYPE=g815
+	$(MAKE) -C gfx TARGET=g800 FLAVOUR="narrow" SUBTYPE=e200
+	$(MAKE) -C gfx TARGET=g800 FLAVOUR="narrow" SUBTYPE=g850
+	$(MAKE) -C games TARGET=g800 SUBTYPE=g815
+	$(MAKE) -C games TARGET=g800 SUBTYPE=e200
+	$(MAKE) -C games TARGET=g800 SUBTYPE=g850
+	$(MAKE) -C target/g800 TARGET=e200
+	$(MAKE) -C target/g800 TARGET=g815
+	$(MAKE) -C target/g800 TARGET=g850
+	TARGET=e200 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/e200_clib @$(TARGET_DIRECTORY)/g800/g800.lst
+	TARGET=g815 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g815_clib @$(TARGET_DIRECTORY)/g800/g800.lst
+	TARGET=g850 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850_clib @$(TARGET_DIRECTORY)/g800/g850.lst
+	TARGET=g850 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850b @$(TARGET_DIRECTORY)/g800/g850b.lst
 
 # Camputers Lynx - Stefano Bodrato
 lynx_clib.lib: $(TARGET_CLIB_OBJS)

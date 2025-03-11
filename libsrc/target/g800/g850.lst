@@ -9,7 +9,4 @@ target/g800/stdio/ansi/f_ansi_cls_850
 stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/g800/stdio/ansi/f_ansi_scrollup_850
 @stdio/stdio.lst
-target/g800/graphics/locate_850
-target/g800/graphics/getmaxy_850
-target/g800/graphics/clsgraph_850
 @target/g800/g800_common.lst
