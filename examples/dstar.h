@@ -51,37 +51,32 @@ char Board[144];        /* Space for decompressed Level */
 #endif
 
 
-#if (spritesize == 4)
+#if ((spritesize == 4) | (spritesize == 3))
 char sprites[]={
-       4,4,
+       4,3,
        0x00,	// empty sprite
        0x00,
        0x00,
-       0x00,
  
-       4,4,
+       4,3,
        0xE0,	//1=edge,
        0xE0,
        0xE0,
-       0x00,
  
-       4,4,
+       4,3,
        0x40,	//2=bubble
        0xA0,
        0x40,
-       0x00,
- 
-       4,4,
+
+       4,3,
        0x40,	//3=moveable ball
        0xE0,
        0x40,
-       0x00,
 
-       4,4,
+       4,3,
        0xE0,	//4=moveable block
        0xA0,
-       0xE0,
-       0x00
+       0xE0
 };
 #endif
 
