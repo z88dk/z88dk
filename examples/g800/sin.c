@@ -7,18 +7,18 @@ void main() {
   int x, y;
   clg();
 
-  for (x = 0; x < 144; x++) {
-    y = (int)(24 * (1.0 - sin(x / 144.0 * 3.14 * 8)));
+  for (x = 0; x < getmaxx(); x++) {
+    y = (int)(getmaxy()/2.0 * (1.0 - sin((float) x / (float) getmaxx() * 3.14 * 8)));
     plot(x, y);
   }
 
   sleep(1);  // sleep 1 second
 
   clg();
-  plot(0,24);
+  plot(0,getmaxy()/2);
 
-  for (x = 0; x < 144; x++) {
-    y = (int)(24 * (1.0 - sin(x / 144.0 * 3.14 * 8)));
+  for (x = 0; x < getmaxx(); x++) {
+    y = (int)(getmaxy()/2.0 * (1.0 - sin((float) x / (float) getmaxx() * 3.14 * 8)));
      drawto(x,y);
   }
 
