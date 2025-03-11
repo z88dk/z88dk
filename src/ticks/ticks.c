@@ -531,18 +531,19 @@
           }                     \
         } while (0)
 
-#define BIT(n, r) do {          \
+#define BIT(n, r, r_) do {          \
+          uint8_t _t = alts ? r_ : r; \
           st += isez80() ? 2 : israbbit() ? 4 : isz180() ? 6 : isr800() ? 2 : 8; \
           if (altd) {           \
             ff_= ff_  & -256    \
-                | r   &   40    \
-                | (fr_= r & n), \
+                | _t   &   40    \
+                | (fr_= _t & n), \
             fa_= ~fr_,          \
             fb_= 0;             \
           } else {              \
             ff= ff  & -256      \
-                | r   &   40    \
-                | (fr= r & n),  \
+                | _t   &   40    \
+                | (fr= _t & n),  \
             fa= ~fr,            \
             fb= 0;              \
           }                     \
@@ -963,6 +964,7 @@ int main (int argc, char **argv){
     printf("  -mr3k          Emulate a Rabbit 3000\n"),
     printf("  -mr4k          Emulate a Rabbit 4000\n"),
     printf("  -mr5k          Emulate a Rabbit 5000\n"),
+    printf("  -mr6k          Emulate a Rabbit 6000\n"),
     printf("  -mz80n         Emulate a Spectrum Next z80n\n"),
     printf("  -mez80_z80     Emulate an ez80 (z80 mode)\n"),
     printf("  -mr800         Emulate a r800 (ticks may not be accurate)\n"),
@@ -1377,7 +1379,7 @@ int main (int argc, char **argv){
         } else if ( altd ) { l_ = l; st += 2; ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }
       case 0x7f: // LD A,A
         if ( israbbit4k() ) { // 0x7f page
-            if (ih==0) r4k_rrb_a_r32(opc, iy);
+            if (ih==0) r4k_rrb_a_r32(opc, iy); // rra 8,bcde/jkhl
             else handle_r4k_7f_page();
         } else {
           if ( altd ) { a_ = a; st += 2; break; }
@@ -2324,7 +2326,7 @@ int main (int argc, char **argv){
           LDRPI(xh, xl, l);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x6f: // LD L,A // LD IXl,A // LD IYl,A
-        if (israbbit4k() && ih==0) r4k_rlb_a_r32(opc, iy);
+        if (israbbit4k() && ih==0) r4k_rlb_a_r32(opc, iy); // rla 8,bcde/jkhl
         else if( ih )
           LDRR(l, a, l_, a_, LDrr_TICKS);
         else if( iy && canixh() )
@@ -2999,13 +3001,13 @@ int main (int argc, char **argv){
         } else {
             st+=ALUr_TICKS;
             if ( altd ) {
-            fr_= 0;
-            fb_= ~(fa_= a);
-            ff_= a&40;
+                fr_= 0;
+                fb_= ~(fa_= a);
+                ff_= a&40;
             } else {
-            fr= 0;
-            fb= ~(fa= a);
-            ff= a&40;
+                fr= 0;
+                fb= ~(fa= a);
+                ff= a&40;
             }
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
@@ -3013,16 +3015,16 @@ int main (int argc, char **argv){
         RET(isez80() ? 5 : israbbit() ?  8 : isz180() ? 9 : isgbz80() ? 8 : isr800() ? 3 : iskc160() ? 4 : 10);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xc0: // RET NZ
-        RETCI(fr);
+        RETCI(altd ? fr_ : fr);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xc8: // RET Z
-        RETC(fr);
+        RETC(altd ? fr_ : fr);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xd0: // RET NC
-        RETC(ff&256);
+        RETC(altd ? (ff_&256) : (ff&256));
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xd8: // RET C
-        RETCI(ff&256);
+        RETCI(altd ? (ff_&256) : (ff&256));
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xe0: // RET PO
 		if ( isgbz80()) { // LDH (n),A - I/O
@@ -3043,12 +3045,12 @@ int main (int argc, char **argv){
 		  a = get_memory_data(0xFF00 + t);
 		  st+= 12;
 		} else {
-          RETC(ff&128);
+          RETC( altd ? (ff_&128) : (ff&128));
 		}
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xf8: // RET M
         if ( isgbz80() ) gbz80_ld_hl_spd();
-        else RETCI(ff&128);
+        else RETCI( altd ? (ff_&128) : (ff&128));
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xc1: // POP BC
         POP(b, c, b_, c_);
@@ -5345,70 +5347,70 @@ static void handle_cb_page(void)
                     SRL(u,u);
                     put_memory(t, u); break;
         case 0x3f:  SRL(a,a_); break;                       // SRL A
-        case 0x40:  BIT(1, b); break;                    // BIT 0,B
-        case 0x41:  BIT(1, c); break;                    // BIT 0,C
-        case 0x42:  BIT(1, d); break;                    // BIT 0,D
-        case 0x43:  BIT(1, e); break;                    // BIT 0,E
-        case 0x44:  BIT(1, h); break;                    // BIT 0,H
-        case 0x45:  BIT(1, l); break;                    // BIT 0,L
+        case 0x40:  BIT(1, b, b_); break;                    // BIT 0,B
+        case 0x41:  BIT(1, c, c_); break;                    // BIT 0,C
+        case 0x42:  BIT(1, d, d_); break;                    // BIT 0,D
+        case 0x43:  BIT(1, e, e_); break;                    // BIT 0,E
+        case 0x44:  BIT(1, h, h_); break;                    // BIT 0,H
+        case 0x45:  BIT(1, l, l_); break;                    // BIT 0,L
         case 0x46:  BITHL(1); break;                     // BIT 0,(HL)
-        case 0x47:  BIT(1, a); break;                    // BIT 0,A
-        case 0x48:  BIT(2, b); break;                    // BIT 1,B
-        case 0x49:  BIT(2, c); break;                    // BIT 1,C
-        case 0x4a:  BIT(2, d); break;                    // BIT 1,D
-        case 0x4b:  BIT(2, e); break;                    // BIT 1,E
-        case 0x4c:  BIT(2, h); break;                    // BIT 1,H
-        case 0x4d:  BIT(2, l); break;                    // BIT 1,L
+        case 0x47:  BIT(1, a, a_); break;                    // BIT 0,A
+        case 0x48:  BIT(2, b, b_); break;                    // BIT 1,B
+        case 0x49:  BIT(2, c, c_); break;                    // BIT 1,C
+        case 0x4a:  BIT(2, d, d_); break;                    // BIT 1,D
+        case 0x4b:  BIT(2, e, e_); break;                    // BIT 1,E
+        case 0x4c:  BIT(2, h, h_); break;                    // BIT 1,H
+        case 0x4d:  BIT(2, l, l_); break;                    // BIT 1,L
         case 0x4e:  BITHL(2); break;                     // BIT 1,(HL)
-        case 0x4f:  BIT(2, a); break;                    // BIT 1,A
-        case 0x50:  BIT(4, b); break;                    // BIT 2,B
-        case 0x51:  BIT(4, c); break;                    // BIT 2,C
-        case 0x52:  BIT(4, d); break;                    // BIT 2,D
-        case 0x53:  BIT(4, e); break;                    // BIT 2,E
-        case 0x54:  BIT(4, h); break;                    // BIT 2,H
-        case 0x55:  BIT(4, l); break;                    // BIT 2,L
+        case 0x4f:  BIT(2, a, a_); break;                    // BIT 1,A
+        case 0x50:  BIT(4, b, b_); break;                    // BIT 2,B
+        case 0x51:  BIT(4, c, c_); break;                    // BIT 2,C
+        case 0x52:  BIT(4, d, d_); break;                    // BIT 2,D
+        case 0x53:  BIT(4, e, e_); break;                    // BIT 2,E
+        case 0x54:  BIT(4, h, h_); break;                    // BIT 2,H
+        case 0x55:  BIT(4, l, l_); break;                    // BIT 2,L
         case 0x56:  BITHL(4); break;                     // BIT 2,(HL)
-        case 0x57:  BIT(4, a); break;                    // BIT 2,A
-        case 0x58:  BIT(8, b); break;                    // BIT 3,B
-        case 0x59:  BIT(8, c); break;                    // BIT 3,C
-        case 0x5a:  BIT(8, d); break;                    // BIT 3,D
-        case 0x5b:  BIT(8, e); break;                    // BIT 3,E
-        case 0x5c:  BIT(8, h); break;                    // BIT 3,H
-        case 0x5d:  BIT(8, l); break;                    // BIT 3,L
+        case 0x57:  BIT(4, a, a_); break;                    // BIT 2,A
+        case 0x58:  BIT(8, b, b_); break;                    // BIT 3,B
+        case 0x59:  BIT(8, c, c_); break;                    // BIT 3,C
+        case 0x5a:  BIT(8, d, d_); break;                    // BIT 3,D
+        case 0x5b:  BIT(8, e, e_); break;                    // BIT 3,E
+        case 0x5c:  BIT(8, h, h_); break;                    // BIT 3,H
+        case 0x5d:  BIT(8, l, l_); break;                    // BIT 3,L
         case 0x5e:  BITHL(8); break;                     // BIT 3,(HL)
-        case 0x5f:  BIT(8, a); break;                    // BIT 3,A
-        case 0x60:  BIT(16, b); break;                   // BIT 4,B
-        case 0x61:  BIT(16, c); break;                   // BIT 4,C
-        case 0x62:  BIT(16, d); break;                   // BIT 4,D
-        case 0x63:  BIT(16, e); break;                   // BIT 4,E
-        case 0x64:  BIT(16, h); break;                   // BIT 4,H
-        case 0x65:  BIT(16, l); break;                   // BIT 4,L
+        case 0x5f:  BIT(8, a, a_); break;                    // BIT 3,A
+        case 0x60:  BIT(16, b, b_); break;                   // BIT 4,B
+        case 0x61:  BIT(16, c, c_); break;                   // BIT 4,C
+        case 0x62:  BIT(16, d, d_); break;                   // BIT 4,D
+        case 0x63:  BIT(16, e, e_); break;                   // BIT 4,E
+        case 0x64:  BIT(16, h, h_); break;                   // BIT 4,H
+        case 0x65:  BIT(16, l, l_); break;                   // BIT 4,L
         case 0x66:  BITHL(16); break;                    // BIT 4,(HL)
-        case 0x67:  BIT(16, a); break;                   // BIT 4,A
-        case 0x68:  BIT(32, b); break;                   // BIT 5,B
-        case 0x69:  BIT(32, c); break;                   // BIT 5,C
-        case 0x6a:  BIT(32, d); break;                   // BIT 5,D
-        case 0x6b:  BIT(32, e); break;                   // BIT 5,E
-        case 0x6c:  BIT(32, h); break;                   // BIT 5,H
-        case 0x6d:  BIT(32, l); break;                   // BIT 5,L
+        case 0x67:  BIT(16, a, a_); break;                   // BIT 4,A
+        case 0x68:  BIT(32, b, b_); break;                   // BIT 5,B
+        case 0x69:  BIT(32, c, c_); break;                   // BIT 5,C
+        case 0x6a:  BIT(32, d, d_); break;                   // BIT 5,D
+        case 0x6b:  BIT(32, e, e_); break;                   // BIT 5,E
+        case 0x6c:  BIT(32, h, h_); break;                   // BIT 5,H
+        case 0x6d:  BIT(32, l, l_); break;                   // BIT 5,L
         case 0x6e:  BITHL(32); break;                    // BIT 5,(HL)
-        case 0x6f:  BIT(32, a); break;                   // BIT 5,A
-        case 0x70:  BIT(64, b); break;                   // BIT 6,B
-        case 0x71:  BIT(64, c); break;                   // BIT 6,C
-        case 0x72:  BIT(64, d); break;                   // BIT 6,D
-        case 0x73:  BIT(64, e); break;                   // BIT 6,E
-        case 0x74:  BIT(64, h); break;                   // BIT 6,H
-        case 0x75:  BIT(64, l); break;                   // BIT 6,L
+        case 0x6f:  BIT(32, a, a_); break;                   // BIT 5,A
+        case 0x70:  BIT(64, b, b_); break;                   // BIT 6,B
+        case 0x71:  BIT(64, c, c_); break;                   // BIT 6,C
+        case 0x72:  BIT(64, d, d_); break;                   // BIT 6,D
+        case 0x73:  BIT(64, e, e_); break;                   // BIT 6,E
+        case 0x74:  BIT(64, h, h_); break;                   // BIT 6,H
+        case 0x75:  BIT(64, l, l_); break;                   // BIT 6,L
         case 0x76:  BITHL(64); break;                    // BIT 6,(HL)
-        case 0x77:  BIT(64, a); break;                   // BIT 6,A
-        case 0x78:  BIT(128, b); break;                  // BIT 7,B
-        case 0x79:  BIT(128, c); break;                  // BIT 7,C
-        case 0x7a:  BIT(128, d); break;                  // BIT 7,D
-        case 0x7b:  BIT(128, e); break;                  // BIT 7,E
-        case 0x7c:  BIT(128, h); break;                  // BIT 7,H
-        case 0x7d:  BIT(128, l); break;                  // BIT 7,L
+        case 0x77:  BIT(64, a, a_); break;                   // BIT 6,A
+        case 0x78:  BIT(128, b, b_); break;                  // BIT 7,B
+        case 0x79:  BIT(128, c, c_); break;                  // BIT 7,C
+        case 0x7a:  BIT(128, d, d_); break;                  // BIT 7,D
+        case 0x7b:  BIT(128, e, e_); break;                  // BIT 7,E
+        case 0x7c:  BIT(128, h, h_); break;                  // BIT 7,H
+        case 0x7d:  BIT(128, l, l_); break;                  // BIT 7,L
         case 0x7e:  BITHL(128); break;                   // BIT 7,(HL)
-        case 0x7f:  BIT(128, a); break;                  // BIT 7,A
+        case 0x7f:  BIT(128, a, a_); break;                  // BIT 7,A
         case 0x80:  RES(254, b, b_); break;                  // RES 0,B
         case 0x81:  RES(254, c, c_); break;                  // RES 0,C
         case 0x82:  RES(254, d, d_); break;                  // RES 0,D

@@ -1543,23 +1543,87 @@ void r4k_ld_de_hl(uint8_t opcode)
 
 void r4k_rlb_a_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rlb a,r32");
+    // {A, BCDE} = {BCDE, A}
+    uint8_t **src;
+    uint8_t **dest;
+    uint8_t t;
+
+    src = get_r32_source_ptr(isjkhl);
+    dest = get_r32_dest_ptr(isjkhl);
+
+    t = alts ? a_ : a;
+    if ( altd ) a_ = *src[3]; else a = *src[3];
+    *dest[3] = *src[2];
+    *dest[2] = *src[1];
+    *dest[1] = *src[0];
+    *dest[0] = t;
+    
+    st += 4;
+
 }
 
 void r4k_rrb_a_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rrb a,r32");
-}
+    // {A, BCDE} = {E, A, BCD}
+    uint8_t **src;
+    uint8_t **dest;
+    uint8_t t;
 
+    src = get_r32_source_ptr(isjkhl);  // [0] = lsb
+    dest = get_r32_dest_ptr(isjkhl);
+
+    t = *src[0];
+    *dest[0] = *src[1];
+    *dest[1] = *src[2];
+    *dest[2] = *src[3];
+    *dest[3] = alts ? a_ : a;
+    if ( altd ) a_ = t; else a = t;
+    
+    st += 4;
+}
 
 void r4k_rlc_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rlc n,r32");
+    uint8_t **src;
+    uint8_t **dest;
+    uint8_t t;
+
+    src = get_r32_source_ptr(isjkhl);  // [0] = lsb
+    dest = get_r32_dest_ptr(isjkhl);
+
+    if ( opcode == 0x4f ) {
+        // JKHL = {KHL, J}
+        t = *src[3];
+        *dest[3] = *src[2];
+        *dest[2] = *src[1];
+        *dest[1] = *src[0];
+        *dest[0] = t;
+        st += 4;
+    } else {
+        UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rlc n,r32");
+    }
 }
 
 void r4k_rrc_r32(uint8_t opcode, uint8_t isjkhl)
 {
-    UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rrc n,r32");
+    uint8_t **src;
+    uint8_t **dest;
+    uint8_t t;
+
+    src = get_r32_source_ptr(isjkhl);  // [0] = lsb
+    dest = get_r32_dest_ptr(isjkhl);
+
+    if ( opcode == 0x5f ) {
+        // BCDE = {E, BCD}
+        t = *src[0];
+        *dest[0] = *src[1];
+        *dest[1] = *src[2];
+        *dest[2] = *src[3];
+        *dest[3] = t;
+        st += 4;
+    } else {
+        UNIMPLEMENTED( (isjkhl ? 0xfd00 : 0xdd00) | opcode, "rrc n,r32");
+    }
 }
 
 void r4k_rl_r32(uint8_t opcode, uint8_t isjkhl)
