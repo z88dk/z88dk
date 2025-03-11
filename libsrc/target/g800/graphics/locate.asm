@@ -105,19 +105,30 @@ ENDIF
 ; in: l = y position
 ; out d = pattern
 getpat:
-    ld      a, l
 
+IF FORe200
+    push    hl
+    ld      e,h
+    ld      h,0
+    push    de
+    ld      de,mod7_tab                 ;a=y%7
+    add     hl,de
+    pop     de
+    ld      a,(hl)
+    pop     hl
+    ld      d,a
+    ret
+ELSE
+    ld      a, l
     ld      d, 0x1
     and     0x07                        ;a=y%8
-;IF !FORg850
-;    ret     z
-;ENDIF
     inc     a
 loop_shift:
     dec     a
     ret     z
     sla     d
     jp      loop_shift
+ENDIF
 
 
 ; set x position
@@ -143,12 +154,24 @@ IF FORg850
 
 ELSE
 
-    ; G815 and E200
+IF FORg815
     ld      a, l
     rra
     rra
     rra                           ; a=y/8
     and     0x0f
+ELSE
+    push    hl
+    ld      e,h
+    ld      h,0
+    push    de
+    ld      de,div7_tab           ; a=y/7
+    add     hl,de
+    pop     de
+    ld      a,(hl)
+    pop     hl
+ENDIF
+
 setx_half:
     or      0xb8                  ; SMC
 ;    and     0xbf
@@ -184,3 +207,21 @@ ELSE
 ENDIF
     ret
 
+
+IF FORe200
+
+SECTION rodata_graphics
+
+div7_tab:
+defb 0,0,0,0,0,0,0
+defb 1,1,1,1,1,1,1
+defb 2,2,2,2,2,2,2
+defb 3,3,3,3,3,3,3
+
+mod7_tab:
+defb 1,2,4,8,16,32,64
+defb 1,2,4,8,16,32,64
+defb 1,2,4,8,16,32,64
+defb 1,2,4,8,16,32,64
+
+ENDIF
