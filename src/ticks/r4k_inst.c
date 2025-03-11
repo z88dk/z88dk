@@ -1492,10 +1492,6 @@ void r4k_neg_r32(uint8_t opcode, uint8_t isjkhl)
     
     ALU_OP(2, r, 0, r32);
 
-    *get_rp2_lsb_ptr(2, altd) = r & 0xff;
-    *get_rp2_msb_ptr(2, altd) = (r >> 8) & 0xff;
-    
-
     reg32 = get_r32_dest_ptr(isjkhl);
     *reg32[0] = (r >> 0)  & 0xff;
     *reg32[1] = (r >> 8)  & 0xff;
@@ -1503,6 +1499,46 @@ void r4k_neg_r32(uint8_t opcode, uint8_t isjkhl)
     *reg32[3] = (r >> 24) & 0xff;
 
     st += 4;
+}
+
+void r4k_ld_hl_bc(uint8_t opcode)
+{
+    uint8_t sl = alts ? c_ : c;
+    uint8_t sh = alts ? b_ : b;
+
+    if ( altd ) {
+        h_ = sh; l_ = sl;
+    } else {
+        h = sh; l = sl;
+    }
+    st+=2; 
+}
+
+
+void r4k_ld_hl_de(uint8_t opcode)
+{
+    uint8_t sl = alts ? e_ : e;
+    uint8_t sh = alts ? d_ : d;
+
+    if ( altd ) {
+        h_ = sh; l_ = sl;
+    } else {
+        h = sh; l = sl;
+    }
+    st+=2; 
+}
+
+void r4k_ld_de_hl(uint8_t opcode)
+{
+    uint8_t sl = alts ? l_ : l;
+    uint8_t sh = alts ? h_ : h;
+
+    if ( altd ) {
+        d_ = sh; e_ = sl;
+    } else {
+        d = sh; e = sl;
+    }
+    st+=2; 
 }
 
 void r4k_rlb_a_r32(uint8_t opcode, uint8_t isjkhl)
