@@ -93,7 +93,7 @@ ENDIF
 IF FORe200
     DEFINE gotgfx
     defc maxx    = 120    ; display size of the PC-E200
-    defc maxy    = 32
+    defc maxy    = 28
 ENDIF
 
 IF FORh19
