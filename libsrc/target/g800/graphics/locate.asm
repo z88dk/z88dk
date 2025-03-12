@@ -51,7 +51,7 @@ ELSE
 ;    out     (0x58), a
 
     ld      a,h
-    sub     maxx/2                      ; check if x is in the left half of the display
+    sub     (maxx-1)/2                      ; check if x is in the left half of the display
 
     ld      a,0xb8
     ld      (setx_half+1),a
@@ -60,7 +60,7 @@ ELSE
     ; right half
     ld      a,0xbc
     ld      (setx_half+1),a
-    ld      a,maxx                      ; mirror the x coordinates
+    ld      a,maxx-1                    ; mirror the x coordinates
     sub     h                           ; adjust x
     ld      h,a
 left_half:
@@ -126,7 +126,7 @@ ELSE
 loop_shift:
     dec     a
     ret     z
-    sla     d
+    rl      d
     jp      loop_shift
 ENDIF
 
@@ -159,7 +159,7 @@ IF FORg815
     rra
     rra
     rra                           ; a=y/8
-    and     0x0f
+    and     0x07
 ELSE
     push    hl
     ld      e,h
