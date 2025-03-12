@@ -6,9 +6,9 @@ cleargraphics:
 _cleargraphics:
     ld      a, ' '
 IF FORg850
-    ld      b, 24*4
-ELSE
     ld      b, 24*6
+ELSE
+    ld      b, 24*4
 ENDIF
     ld      de, 0
     call      $bfee
