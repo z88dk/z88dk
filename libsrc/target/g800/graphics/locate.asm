@@ -51,7 +51,7 @@ ELSE
 ;    out     (0x58), a
 
     ld      a,h
-    sub     (maxx-1)/2                      ; check if x is in the left half of the display
+    sub     maxx/2                      ; check if x is in the left half of the display
 
     ld      a,0xb8
     ld      (setx_half+1),a
@@ -75,6 +75,7 @@ IF FORe200
 ELSE
 
     ld      a,h
+	
     sub     60
     jr      c,first_blocks_a
     ld      h,a
