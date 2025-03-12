@@ -10,7 +10,7 @@
 ;     original code by Patrick Davidson (TI 85)
 ;
 ;
-;    $Id: putsprite_smc.asm,v 1.3 2016-07-02 09:01:35 dom Exp $
+;    $Id: putsprite_smc.asm$
 ;
 
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
@@ -30,7 +30,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 putsprite:
 _putsprite:
 ___putsprite:
-
+    push    ix
     ld      hl, 2
     add     hl, sp
     ld      e, (hl)
@@ -124,5 +124,6 @@ noblock:
     pop     af
     pop     bc                          ;Restore data
     djnz    oloop
+    pop     ix
     ret
 ENDIF
