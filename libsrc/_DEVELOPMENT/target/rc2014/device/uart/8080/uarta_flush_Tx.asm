@@ -8,19 +8,19 @@ ENDIF
 SECTION code_driver
 SECTION code_driver_character_output
 
-PUBLIC _uarta_flush_Tx_di
-PUBLIC _uarta_flush_Tx
+PUBLIC _uarta_flush_tx_di
+PUBLIC _uarta_flush_tx
 
-._uarta_flush_Tx_di
+._uarta_flush_tx_di
 
     push af
 
-    call _uarta_flush_Tx
+    call _uarta_flush_tx
 
     pop af
     ret
 
-._uarta_flush_Tx
+._uarta_flush_tx
 
     ; enable and reset the Tx FIFO
     ld a,__IO_UART_FCR_FIFO_04|__IO_UART_FCR_FIFO_TX_RESET|__IO_UART_FCR_FIFO_ENABLE

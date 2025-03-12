@@ -8,20 +8,20 @@ ENDIF
 SECTION code_driver
 SECTION code_driver_character_input
 
-PUBLIC _uartb_flush_Rx_di
-PUBLIC _uartb_flush_Rx
+PUBLIC _uartb_flush_rx_di
+PUBLIC _uartb_flush_rx
 
 EXTERN asm_cpu_push_di, asm_cpu_pop_ei
 EXTERN uartbRxCount, uartbRxBuffer, uartbRxIn, uartbRxOut
 
-._uartb_flush_Rx_di
+._uartb_flush_rx_di
 
     push af
     push hl
 
     call asm_cpu_push_di        ; di
 
-    call _uartb_flush_Rx
+    call _uartb_flush_rx
 
     call asm_cpu_pop_ei         ; ei
 
@@ -30,10 +30,10 @@ EXTERN uartbRxCount, uartbRxBuffer, uartbRxIn, uartbRxOut
 
     ret
 
-._uartb_flush_Rx
+._uartb_flush_rx
 
     ; enable and reset the Rx FIFO
-    ld a,__IO_UART_FCR_FIFO_04|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
+    ld a,__IO_UART_FCR_FIFO_08|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
     out (__IO_UARTB_FCR_REGISTER),a
 
     xor a

@@ -114,7 +114,7 @@ define(`__IO_UART_MSR_DCD', 0x80)
 # 16550 UART driver
 
 define(`__IO_UART_RX_SIZE', 0x100)      # Size of the Rx Buffer (greater than 0x20)
-define(`__IO_UART_RX_FULLISH', 0x`'eval(__IO_UART_RX_SIZE-32,16))
+define(`__IO_UART_RX_FULLISH', 0x`'eval(__IO_UART_RX_SIZE-16,16))
                                         # Fullness of the Rx Buffer, when NOT_RTS is signalled
 define(`__IO_UART_RX_EMPTYISH', 0x10)   # Fullness of the Rx Buffer, when RTS is signalled
 

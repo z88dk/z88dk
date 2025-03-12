@@ -19,7 +19,6 @@ EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer, aciaControl
     ; modifies : af, hl
 
     ld a,(aciaRxCount)          ; get the number of bytes in the Rx buffer
-    ld l,a                      ; and put it in hl
     or a                        ; see if there are zero bytes available
     ret Z                       ; if the count is zero, then return
 

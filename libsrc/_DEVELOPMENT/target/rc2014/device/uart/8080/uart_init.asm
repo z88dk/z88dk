@@ -7,7 +7,7 @@ ENDIF
 
 SECTION code_driver
 
-EXTERN _uarta_flush_Rx, _uartb_flush_Rx
+EXTERN _uarta_flush_rx, _uartb_flush_rx
 EXTERN uartaControl, uartbControl
 
 PUBLIC _uart_init
@@ -50,10 +50,10 @@ PUBLIC _uart_init
     out (__IO_UARTA_FCR_REGISTER),a
 
     ; set up modem control register to enable auto flow control, interrupt line, and RTS
-    ld a,__IO_UART_MCR_AUTO_FLOW_CONTROL|__IO_UART_MCR_INT_ENABLE|__IO_UART_MCR_RTS
+    ld a,__IO_UART_MCR_AUTO_FLOW_CONTROL|__IO_UART_MCR_INT_ENABLE|__IO_UART_MCR_RTS|__IO_UART_MCR_DTR
     out (__IO_UARTA_MCR_REGISTER),a
 
-    call _uarta_flush_Rx                    ; clear the software receive buffer
+    call _uarta_flush_rx                    ; clear the software receive buffer
 
     ; enable the receive interrupt (only)   XXX To do handle line errors
     ld a,__IO_UART_IER_ERBI
@@ -102,10 +102,10 @@ PUBLIC _uart_init
     out (__IO_UARTB_FCR_REGISTER),a
 
     ; set up modem control register to enable auto flow control, interrupt line, and RTS
-    ld a,__IO_UART_MCR_AUTO_FLOW_CONTROL|__IO_UART_MCR_INT_ENABLE|__IO_UART_MCR_RTS
+    ld a,__IO_UART_MCR_AUTO_FLOW_CONTROL|__IO_UART_MCR_INT_ENABLE|__IO_UART_MCR_RTS|__IO_UART_MCR_DTR
     out (__IO_UARTB_MCR_REGISTER),a
 
-    call _uartb_flush_Rx                    ; clear the software receive buffer 
+    call _uartb_flush_rx                    ; clear the software receive buffer 
 
     ; enable the receive interrupt (only)   XXX To do handle line errors
     ld a,__IO_UART_IER_ERBI

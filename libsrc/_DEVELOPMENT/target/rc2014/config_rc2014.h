@@ -712,7 +712,7 @@
 #define __IO_UART_MSR_DCD               0x80
 
 #define __IO_UART_RX_SIZE        0x100
-#define __IO_UART_RX_FULLISH     0xe0
+#define __IO_UART_RX_FULLISH     0xf0
 #define __IO_UART_RX_EMPTYISH    0x10
 
 #define __IO_UART_DLL_115200     0x01

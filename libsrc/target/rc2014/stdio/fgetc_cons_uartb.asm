@@ -16,11 +16,11 @@
     or a                        ; see if there are zero bytes available
     jp Z,fgetc_cons_uartb       ; if the count is zero, then wait
 
-    sub __IO_UART_RX_EMPTYISH   ; compare the count with the preferred empty size
-    jp NC,getc_clean_up_rx      ; if the buffer is too full, don't change the RTS
+    cp __IO_UART_RX_EMPTYISH    ; compare the count with the preferred empty size
+    jp NZ,getc_clean_up_rx      ; if the buffer is too full, don't change the RTS
 
     in a,(__IO_UARTB_MCR_REGISTER)  ; get the UART B MODEM Control Register
-    or __IO_UART_MCR_RTS            ; set RTS low
+    or __IO_UART_MCR_RTS|__IO_UART_MCR_DTR  ; set RTS and DTR low
     out (__IO_UARTB_MCR_REGISTER),a ; set the MODEM Control Register
 
 .getc_clean_up_rx
