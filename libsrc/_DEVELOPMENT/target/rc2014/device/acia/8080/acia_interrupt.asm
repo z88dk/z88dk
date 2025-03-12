@@ -21,7 +21,7 @@ EXTERN aciaTxCount, aciaTxOut, aciaTxBuffer, aciaControl
     jr NC,tx_send               ; if not, go check for bytes to transmit 
 
 .rx_get
-    in a,(__IO_ACIA_DATA_REGISTER)    ; Get the received byte from the ACIA 
+    in a,(__IO_ACIA_DATA_REGISTER)    ; get the received byte from the ACIA 
     ld hl,(aciaRxIn)            ; get the pointer to where we poke
     ld (hl),a                   ; write the Rx byte to the aciaRxIn address
 
@@ -39,7 +39,7 @@ ENDIF
 
     ld a,(aciaRxCount)          ; get the current Rx count
     cp __IO_ACIA_RX_FULLISH     ; compare the count with the preferred full size
-    jp NZ,tx_check              ; leave the RTS low, and check for Rx/Tx possibility
+    jp NZ,rx_check              ; leave the RTS low, and check for Rx/Tx possibility
 
     ld a,(aciaControl)          ; get the ACIA control echo byte
     and ~__IO_ACIA_CR_TEI_MASK  ; mask out the Tx interrupt bits
@@ -47,7 +47,7 @@ ENDIF
     ld (aciaControl),a          ; write the ACIA control echo byte back
     out (__IO_ACIA_CONTROL_REGISTER),a  ; set the ACIA CTRL register
 
-.tx_check
+.rx_check
     in a,(__IO_ACIA_STATUS_REGISTER)  ; get the status of the ACIA
     rrca                        ; check whether a byte has been received, via __IO_ACIA_SR_RDRF
     jr C,rx_get                 ; another byte received, go get it
