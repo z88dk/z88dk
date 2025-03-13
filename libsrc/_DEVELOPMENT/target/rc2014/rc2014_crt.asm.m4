@@ -90,7 +90,7 @@ ifelse(__STARTUP, 2,
 
 ifelse(__STARTUP, 4,
 `
-   ; sioa drivers installed on stdin, stdout, stderr,
+   ; sioa drivers installed on stdin, stdout, stderr
    ; siob drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
