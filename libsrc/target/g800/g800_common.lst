@@ -8,6 +8,7 @@ target/g800/games/bit_close
 target/g800/games/bit_close_ei
 @games/games.lst
 gfx/narrow/obj/${TARGET}/getsprite2
+gfx/narrow/obj/${TARGET}/putsprite3
 target/g800/graphics/obj/${TARGET}/plotpixel
 target/g800/graphics/obj/${TARGET}/point
 target/g800/graphics/obj/${TARGET}/pointxy
