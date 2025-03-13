@@ -96,15 +96,23 @@ oloopx:
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      c, (ix+2)                   ;Load one line of image
 ELSE
-    ld      bc,(__spr_bitmap)
-    ld      a,(bc)
+    push    hl
+    ld      hl,(__spr_bitmap)
+    ld      a,(hl)
+    pop     hl
     ld      c,a
 ENDIF
     ;ld    b,a    ;Load width
     ld      b, 0                        ; Better, start from zero !!
 
 iloopx:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+    ld      c,a
+ENDIF
     jr      nc, noplotx                 ;See if a plot is needed
 
     pop     af
@@ -200,15 +208,23 @@ oloopa:
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      c, (ix+2)                   ;Load one line of image
 ELSE
-    ld      bc,(__spr_bitmap)
-    ld      a,(bc)
+    push    hl
+    ld      hl,(__spr_bitmap)
+    ld      a,(hl)
+    pop     hl
     ld      c,a
 ENDIF
     ;ld    b,a    ;Load width
     ld      b, 0                        ; Better, start from zero !!
 
 iloopa:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+    ld      c,a
+ENDIF
     jr      nc, noplota                 ;See if a plot is needed
 
     pop     af
@@ -305,15 +321,23 @@ oloopo:
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      c, (ix+2)                   ;Load one line of image
 ELSE
-    ld      bc,(__spr_bitmap)
-    ld      a,(bc)
+    push    hl
+    ld      hl,(__spr_bitmap)
+    ld      a,(hl)
+    pop     hl
     ld      c,a
 ENDIF
     ;ld    b,a    ;Load width
     ld      b, 0                        ; Better, start from zero !!
 
 iloopo:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+    ld      c,a
+ENDIF
     jr      nc, noploto                 ;See if a plot is needed
 
     pop     af
