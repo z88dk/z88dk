@@ -14,7 +14,7 @@
 ; $Id: putsprite3.asm $
 ;
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
+
     SECTION smc_clib
 
     PUBLIC  putsprite
@@ -30,7 +30,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     INCLUDE "graphics/grafix.inc"
 
 ; __gfx_coords: h,l (vert-horz)
-; sprite: (ix)
+; sprite: (__spr_bitmap+1)
 
 putsprite:
 _putsprite:
@@ -43,9 +43,8 @@ ___putsprite:
     ld      e, (hl)
     inc     hl
     ld      d, (hl)                     ;sprite address
-    push    ix
+
     push    de
-    pop     ix
 
     inc     hl
     ld      e, (hl)
@@ -56,19 +55,18 @@ ___putsprite:
     inc     hl
 
     inc     hl
+
     ld      a, (hl)                     ; and/or/xor mode
 
     cp      166                         ; and(hl) opcode
     jr      nz, nodoand
     ld      hl, respixel
-    ld      (called+1), hl
     jr      doxor
 nodoand:
 
     cp      182                         ; or(hl) opcode
     jr      nz, nodoor
     ld      hl, plotpixel
-    ld      (called+1), hl
     jr      doxor
 
     ; 182 - or
@@ -76,25 +74,43 @@ nodoand:
 
 nodoor:
     ld      hl, xorpixel
-    ld      (called+1), hl
 
 doxor:
+    ld      (called+1), hl
+
+    pop     hl
+    ld      a,(hl)                      ; Width
+    push    af                          ; Width
+    inc     hl
+    ld      a,(hl)                      ; Height
+    ld      b,a
+    inc     hl
+    ld      (__spr_bitmap+1),hl
+
     ld      h, d
     ld      l, e
 
-    ld      a, (ix+0)                   ; Width
-    ld      b, (ix+1)                   ; Height
 oloopx:
     push    bc                          ;Save # of rows
     push    af
 
+    push    hl
+    ld      hl,(__spr_bitmap+1)
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+
     ;ld    b,a    ;Load width
     ld      b, 0                        ; Better, start from zero !!
 
-    ld      c, (ix+2)                   ;Load one line of image
-
 iloopx:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+    ld      c,a
+ENDIF
     jr      nc, noplotx                 ;See if a plot is needed
 
     push    hl
@@ -120,8 +136,14 @@ noplotx:
 
     jr      nz, noblkx
 
-    inc     ix
-    ld      c, (ix+2)                   ;Load next byte of image
+    push    hl
+.__spr_bitmap
+    ld      hl,0
+    inc     hl
+    ld      (__spr_bitmap+1),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
 
     jr      noblockx
 
@@ -136,8 +158,14 @@ noblkx:
     jr      nz, iloopx
 
 blockx:
-    inc     ix
-    ld      c, (ix+2)                   ;Load next byte of image
+    push    hl
+    ld      hl,(__spr_bitmap+1)
+    inc     hl
+    ld      (__spr_bitmap+1),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+
     jr      iloopx
 
 noblockx:
@@ -150,9 +178,6 @@ noblockx:
   IF    NEED_swapgfxbk
     jp      __graphics_end
   ELSE
-    IF  !__CPU_INTEL__&!__CPU_GBZ80__
-    pop     ix
-    ENDIF
     ret
   ENDIF
-ENDIF
+

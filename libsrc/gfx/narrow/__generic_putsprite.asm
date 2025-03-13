@@ -4,6 +4,7 @@
 ; modified by Stefano Bodrato - Jan 2001
 ;
 ; Sept 2003 - Stefano: Fixed bug for sprites wider than 8.
+; March 2025 - Stefano: 8080 and gbz80 CPU compatibility
 ;
 ; Much More Generic version
 ; Uses plotpixel, respixel and xorpixel
@@ -11,7 +12,6 @@
 ;
 
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  __generic_putsprite
 
@@ -35,9 +35,14 @@ __generic_putsprite:
     ld      e, (hl)
     inc     hl
     ld      d, (hl)                     ;sprite address
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
     push    de
     pop     ix
+ELSE
+    push    de
+ENDIF
 
     inc     hl
     ld      e, (hl)
@@ -48,6 +53,25 @@ __generic_putsprite:
     inc     hl
 
     inc     hl
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    ld      a, (ix+0)                   ; Width
+    push    af
+    ld      b, (ix+1)                   ; Height
+ELSE
+    ex      (sp),hl
+    inc     hl
+    ld      a,(hl)                      ; Height
+    ld      b,a
+    inc     hl
+    ld      (__spr_bitmap),hl
+    dec     hl
+    dec     hl
+    ld      a,(hl)                      ; Width
+    ex      (sp),hl
+    push    af                          ; Width
+ENDIF
+
     ld      a, (hl)                     ; and/or/xor mode
 
     ld      h, d
@@ -63,19 +87,32 @@ __generic_putsprite:
     ; 174 - xor
 
 doxor:
-    ld      a, (ix+0)                   ; Width
-    ld      b, (ix+1)                   ; Height
+    pop     af                   ; Width
+
 oloopx:
     push    bc                          ;Save # of rows
     push    af
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
     ;ld    b,a    ;Load width
     ld      b, 0                        ; Better, start from zero !!
 
-    ld      c, (ix+2)                   ;Load one line of image
-
 iloopx:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+    ld      c,a
+ENDIF
     jr      nc, noplotx                 ;See if a plot is needed
 
     pop     af
@@ -103,8 +140,18 @@ noplotx:
 
     jr      nz, noblkx
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     inc     ix
-    ld      c, (ix+2)                   ;Load next byte of image
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
 
     jr      noblockx
 
@@ -119,8 +166,18 @@ noblkx:
     jr      nz, iloopx
 
 blockx:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     inc     ix
-    ld      c, (ix+2)                   ;Load next byte of image
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
     jr      iloopx
 
 noblockx:
@@ -130,7 +187,7 @@ noblockx:
     pop     af
     pop     bc                          ;Restore data
     djnz    oloopx
-    ;pop    ix
+
   IF    NEED_swapgfxbk
     jp      __graphics_end
   ELSE
@@ -142,19 +199,32 @@ noblockx:
 
 
 doand:
-    ld      a, (ix+0)                   ; Width
-    ld      b, (ix+1)                   ; Height
+    pop     af                   ; Width
+
 oloopa:
     push    bc                          ;Save # of rows
     push    af
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
     ;ld    b,a    ;Load width
     ld      b, 0                        ; Better, start from zero !!
 
-    ld      c, (ix+2)                   ;Load one line of image
-
 iloopa:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+    ld      c,a
+ENDIF
     jr      nc, noplota                 ;See if a plot is needed
 
     pop     af
@@ -182,8 +252,18 @@ noplota:
 
     jr      nz, noblka
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     inc     ix
-    ld      c, (ix+2)                   ;Load next byte of image
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
 
     jr      noblocka
 
@@ -198,8 +278,18 @@ noblka:
     jr      nz, iloopa
 
 blocka:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     inc     ix
-    ld      c, (ix+2)                   ;Load next byte of image
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
     jr      iloopa
 
 noblocka:
@@ -208,26 +298,46 @@ noblocka:
     pop     af
     pop     bc                          ;Restore data
     djnz    oloopa
-    ;pop    ix
+
+  IF    NEED_swapgfxbk
     jp      __graphics_end
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
+    ENDIF
+    ret
+  ENDIF
 
 
 
 
 door:
-    ld      a, (ix+0)                   ; Width
-    ld      b, (ix+1)                   ; Height
+    pop     af                   ; Width
+
 oloopo:
     push    bc                          ;Save # of rows
     push    af
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
     ;ld    b,a    ;Load width
     ld      b, 0                        ; Better, start from zero !!
 
-    ld      c, (ix+2)                   ;Load one line of image
-
 iloopo:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+    ld      c,a
+ENDIF
     jr      nc, noploto                 ;See if a plot is needed
 
     pop     af
@@ -255,8 +365,18 @@ noploto:
 
     jr      nz, noblko
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     inc     ix
-    ld      c, (ix+2)                   ;Load next byte of image
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
 
     jr      noblocko
 
@@ -271,8 +391,18 @@ noblko:
     jr      nz, iloopo
 
 blocko:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     inc     ix
-    ld      c, (ix+2)                   ;Load next byte of image
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
     jr      iloopo
 
 noblocko:
@@ -282,7 +412,7 @@ noblocko:
     pop     af
     pop     bc                          ;Restore data
     djnz    oloopo
-    ;pop    ix
+
   IF    NEED_swapgfxbk
     jp      __graphics_end
   ELSE
@@ -291,4 +421,17 @@ noblocko:
     ENDIF
     ret
   ENDIF
+
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+
+; Z80 has got index registers
+
+ELSE
+
+    SECTION bss_graphics
+
+__spr_bitmap:
+    defw    0
+
 ENDIF
