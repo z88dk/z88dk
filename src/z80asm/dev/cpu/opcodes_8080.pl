@@ -28,6 +28,21 @@ for my $cpu1 ('8080') {
         add_xchg($cpu);
         add_ex_de_hl($cpu) if !$strict;
         
+		add_alu_r_8080($cpu);
+		add_alu_r_z80($cpu) if !$strict;
+		add_alu_r_extra($cpu) if !$strict;
+		
+		add_alu_N_8080($cpu);
+		add_alu_N_z80($cpu) if !$strict;
+		add_alu_N_extra($cpu) if !$strict;
+		
+		add_inr_dcr_r($cpu);
+		add_inc_dec_r($cpu) if !$strict;
+		
+		add_inx_dcx_r($cpu);
+		add_inx_dcx_rp($cpu) if !$strict;
+		add_inc_dec_rp($cpu) if !$strict;
+		
         add_pchl($cpu);
         add_jp_hl($cpu) if !$strict;
 

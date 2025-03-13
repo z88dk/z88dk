@@ -33,6 +33,30 @@ for my $cpu1 ('z80') {
         add_xchg($cpu) if !$strict;
         add_ex_de_hl($cpu);
         
+		add_alu_r_8080($cpu) if !$strict;
+		add_alu_r_z80($cpu);
+		add_alu_r_extra($cpu) if !$strict;
+		
+		add_alu_idx($cpu);
+		add_alu_idx_extra($cpu) if !$strict;
+		
+		add_alu_ixh($cpu) if !$strict;
+		add_alu_ixh_extra($cpu) if !$strict;
+		
+		add_alu_N_8080($cpu) if !$strict;
+		add_alu_N_z80($cpu);
+		add_alu_N_extra($cpu) if !$strict;
+		
+		add_inr_dcr_r($cpu) if !$strict;
+		add_inc_dec_r($cpu);
+		add_inc_dec_idx($cpu);
+		add_inc_dec_ixh($cpu) if !$strict;
+		
+		add_inx_dcx_r($cpu) if !$strict;
+		add_inx_dcx_rp($cpu) if !$strict;
+		add_inc_dec_rp($cpu);
+		add_inc_dec_ix($cpu);
+
         add_pchl($cpu) if !$strict;
         add_jp_hl($cpu);
         add_jp_ix($cpu);

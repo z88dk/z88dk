@@ -14,26 +14,41 @@ for my $cpu1 ('8085') {
 		add_lxi_r_NN($cpu);
         add_lxi_rp_NN($cpu) if !$strict;
         add_ld_rp_NN($cpu) if !$strict;
-		
+
         add_lda_sta($cpu);
         add_ld_a_iNN($cpu) if !$strict;
-        
+
         add_lhld_shld($cpu);
         add_ld_hl_iNN($cpu) if !$strict;
 
         add_ldax_stax_r($cpu);
         add_ldax_stax_rp($cpu) if !$strict;
         add_ld_a_ibc($cpu) if !$strict;
-        
+
         add_xchg($cpu);
         add_ex_de_hl($cpu) if !$strict;
         
+		add_alu_r_8080($cpu);
+		add_alu_r_z80($cpu) if !$strict;
+		add_alu_r_extra($cpu) if !$strict;
+		
+		add_alu_N_8080($cpu);
+		add_alu_N_z80($cpu) if !$strict;
+		add_alu_N_extra($cpu) if !$strict;
+		
+		add_inr_dcr_r($cpu);
+		add_inc_dec_r($cpu) if !$strict;
+		
+		add_inx_dcx_r($cpu);
+		add_inx_dcx_rp($cpu) if !$strict;
+		add_inc_dec_rp($cpu) if !$strict;
+		
         add_pchl($cpu);
         add_jp_hl($cpu) if !$strict;
 
         add_push_pop_r($cpu);
         add_push_pop_rp($cpu) if !$strict;
-        
+
 if(0){
 		# INC/DEC r
 		add_inc_dec_r_8080($opcodes, $cpu);
