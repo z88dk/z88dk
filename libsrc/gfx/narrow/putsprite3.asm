@@ -94,15 +94,23 @@ oloopx:
     push    bc                          ;Save # of rows
     push    af
 
-    ld      bc,(__spr_bitmap+1)
-    ld      a,(bc)
+    push    hl
+    ld      hl,(__spr_bitmap+1)
+    ld      a,(hl)
+    pop     hl
     ld      c,a
 
     ;ld    b,a    ;Load width
     ld      b, 0                        ; Better, start from zero !!
 
 iloopx:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+    ld      c,a
+ENDIF
     jr      nc, noplotx                 ;See if a plot is needed
 
     push    hl
