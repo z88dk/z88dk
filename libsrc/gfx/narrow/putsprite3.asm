@@ -61,14 +61,12 @@ ___putsprite:
     cp      166                         ; and(hl) opcode
     jr      nz, nodoand
     ld      hl, respixel
-    ld      (called+1), hl
     jr      doxor
 nodoand:
 
     cp      182                         ; or(hl) opcode
     jr      nz, nodoor
     ld      hl, plotpixel
-    ld      (called+1), hl
     jr      doxor
 
     ; 182 - or
@@ -76,9 +74,9 @@ nodoand:
 
 nodoor:
     ld      hl, xorpixel
-    ld      (called+1), hl
 
 doxor:
+    ld      (called+1), hl
 
     pop     hl
     ld      a,(hl)                      ; Width
