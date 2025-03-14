@@ -27,7 +27,7 @@
     EXTERN	cpm_platform_init
     EXTERN    _main		;main() is always external to crt0
 
-    PUBLIC    __Exit		;jp'd to by exit()
+    PUBLIC    __Exit		;jumped to by exit()
     PUBLIC    l_dcal		;jp(hl)
 
     defc    TAR__clib_exit_stack_size = 32
@@ -343,6 +343,19 @@ ENDIF
 
 IF __BEE__
     INCLUDE "target/bee/classic/bee_premium.inc"
+ENDIF
+
+IF WANT_DEVICE_STDPUN
+    EXTERN _stdpun_device
+    setup_static_fp(__stdpun,_stdpun_device)
+ENDIF
+IF WANT_DEVICE_STDRDR
+    EXTERN _stdrdr_device
+    setup_static_fp(__stdrdr,_stdrdr_device)
+ENDIF
+IF WANT_DEVICE_STDLST
+    EXTERN _stdlst_device
+    setup_static_fp(__stdlst,_stdlst_device)
 ENDIF
 
     SECTION code_crt_init

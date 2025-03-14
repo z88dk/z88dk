@@ -2,9 +2,9 @@ include ../../../Make.config
 
 TARGET = cpm
 
-
+CFILES = $(wildcard *.c)
 ASMFILES = $(wildcard *.asm)
-OBJECTS = $(ASMFILES:.asm=.o)
+OBJECTS = $(ASMFILES:.asm=.o) $(CFILES:.c=.o)
 
 AFLAGS += -DSTANDARDESCAPECHARS
 

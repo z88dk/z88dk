@@ -23,27 +23,8 @@ ENDIF
 
     SECTION code_crt_init
 crt0_init:
-    EXTERN  __BSS_head
-    EXTERN  __BSS_END_tail
-IF CRT_INITIALIZE_BSS = 1
-    xor     a
-    ld      hl,__BSS_head
-    ld      bc,__BSS_END_tail - __BSS_head - 1
-  IF !__CPU_INTEL__ && !__CPU_GBZ80__
-    ld      de,__BSS_head + 1
-    ld      (hl),a
-    ldir
-  ELSE
-    inc     b
-    inc     c
-init_8080:
-    ld      (hl+),a
-    dec     c
-    jr      NZ,init_8080
-    dec     b
-    jr      NZ,init_8080
-  ENDIF
-ENDIF
+    INCLUDE "crt/classic/crt_initialise_bss.inc"
+
 
 IF CRT_ENABLE_STDIO = 1 && CLIB_FOPEN_MAX > 0
     ; Setup std* streams
@@ -54,33 +35,8 @@ IF CRT_ENABLE_STDIO = 1 && CLIB_FOPEN_MAX > 0
     ld      hl,__sgoioblk+22
     ld      (hl),21 ;stderr
 ENDIF
-IF ( __crt_model = 1 )
-    ; Just copy the DATA section
-    EXTERN  __ROMABLE_END_tail
-    EXTERN  __DATA_head
-    EXTERN  __DATA_END_tail
-    ld      hl,__ROMABLE_END_tail
-    ld      de,__DATA_head
-    ld      bc,__DATA_END_tail - __DATA_head
-  IF __CPU_INTEL__
-    EXTERN  asm_memcpy
-    call    asm_memcpy
-  ELSE
-    ldir
-  ENDIF
-ELIF ( __crt_model >= 2 )
-    EXTERN  __ROMABLE_END_tail
-    EXTERN  __DATA_head
-    ld      hl,__ROMABLE_END_tail
-    ld      de,__DATA_head
-  IF ( __crt_model = 2)
-    EXTERN  asm_dzx7_standard
-    call    asm_dzx7_standard
-  ELIF ( __crt_model = 3)
-    EXTERN  asm_dzx0_standard
-    call    asm_dzx0_standard
-  ENDIF
-ENDIF
+    INCLUDE "crt/classic/crt_copy_data_section.inc"
+
 
     SECTION code_crt_init_exit
     ret

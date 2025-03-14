@@ -321,3 +321,34 @@
    ELSE
        defc __MMAP = 0
    ENDIF
+
+
+    ; Macro to allow setting up a FILE * as pointing via a trampoline
+    ;
+    ; n = FILE number (0 = stdin, 1 = stdout, 2 = stderr)
+    ; trampoline = address of trampoline function
+    MACRO setup_fp  n, trampoline
+        ld      hl,+(__sgoioblk + 2 +  (n * 10))
+        ld      (hl),33         ;_IOEXTRA|_IOUSE (stdio.h)
+        inc     hl              ;ungetc
+        inc     hl
+        ld      (hl), +( trampoline % 256)
+        inc     hl
+        ld      (hl), +( trampoline / 256)
+    ENDM
+
+    ; Macro to allow setting up a static FILE 
+    MACRO setup_static_fp  device, trampoline
+        SECTION bss_crt
+        PUBLIC  device
+device:   defs    10
+
+        SECTION code_crt_init
+        ld      hl, device + 2
+        ld      (hl),33         ;_IOEXTRA|_IOUSE (stdio.h)
+        inc     hl              ;ungetc
+        inc     hl
+        ld      (hl), +( trampoline % 256)
+        inc     hl
+        ld      (hl), +( trampoline / 256)
+    ENDM

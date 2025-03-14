@@ -170,6 +170,25 @@ extern struct filestr _sgoioblk_end;
 #define stdout &_sgoioblk[1]
 #define stderr &_sgoioblk[2]
 
+#ifdef __CPM
+//
+// File descriptors to represent other CP/M devices
+//
+// These are not enabled by default, to enable them add:
+//
+// -pragma-define:WANT_DEVICE_STDPUN=1
+// -pragma-define:WANT_DEVICE_STDRDR=1
+// -pragma-define:WANT_DEVICE_STDLST=1
+//
+// To the command line/pragma file
+extern FILE _stdpun;
+#define stdpun &_stdpun
+extern FILE _stdlst;
+#define stdlst &_stdlst
+extern FILE _stdrdr;
+#define stdrdr &_stdrdr
+#endif
+
 /* ---- FIXME These are not enabled but allow compilation to proceed --- */
 #define ttyin  &_sgoioblk[3]
 #define ttyout &_sgoioblk[4]
