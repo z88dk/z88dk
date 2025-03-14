@@ -1,10 +1,10 @@
 /*
- * Extra MSG device for stdpub
+ * Extra MSG device for stdrdr
  */
 
 #define STDIO_ASM
 #include <stdio.h>
-#include <arch/cpm/cpm.h>
+#include <cpm.h>
 
 #asm
 	SECTION code_clib
