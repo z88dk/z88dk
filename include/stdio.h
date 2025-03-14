@@ -170,6 +170,10 @@ extern struct filestr _sgoioblk_end;
 #define stdout &_sgoioblk[1]
 #define stderr &_sgoioblk[2]
 
+/* ---- FIXME These are not enabled but allow compilation to proceed --- */
+#define ttyin  &_sgoioblk[3]
+#define ttyout &_sgoioblk[4]
+#define ttyerr &_sgoioblk[5]
 
 #define clearerr(f)
 extern FILE __LIB__ *fopen_zsock(char *name);
