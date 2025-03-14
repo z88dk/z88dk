@@ -216,7 +216,11 @@ sub copy_cpu {
 sub add_synth {
 	my($self, $cpu, $asm, @asm_statements) = @_;
 	
-	if ($self->exists($cpu, $asm)) {
+	if ($self->exists($cpu, $asm)) {	# opcode already exists
+		return;
+	}
+	
+	if ($cpu =~ /_strict/) {			# no sythetic opcodes in strict mode
 		return;
 	}
 
@@ -246,6 +250,10 @@ sub add_synth {
 
 sub add_emul {
 	my($self, $cpu, $asm, $func, @args) = @_;
+
+	if ($cpu =~ /_strict/) {			# no sythetic opcodes in strict mode
+		return;
+	}
 
 	if (!$self->exists($cpu, $asm)) {
 		if (@args) {

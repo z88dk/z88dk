@@ -43,12 +43,65 @@ for my $cpu1 ('8080') {
 		add_inx_dcx_rp($cpu) if !$strict;
 		add_inc_dec_rp($cpu) if !$strict;
 		
+		add_dad_r($cpu);
+		add_dad_rp($cpu) if !$strict;
+		add_add_hl_rp($cpu) if !$strict;
+		
+		add_daa($cpu);
+		add_cma($cpu);
+		add_cpl($cpu) if !$strict;
+		add_cmc($cpu);
+		add_ccf($cpu) if !$strict;
+		add_stc($cpu);
+		add_scf($cpu) if !$strict;
+		
+		add_rot_a_8080($cpu);
+		add_rot_a_z80($cpu) if !$strict;
+		
+		add_jmp($cpu);
+		add_jp($cpu) if !$strict;
+		add_jflag($cpu);
+		add_j_flag($cpu) if !$strict;
+		add_jp_8080($cpu) if $strict;
+		add_jp_flag($cpu) if !$strict;
+		add_jmp_flag($cpu) if !$strict;
+		
         add_pchl($cpu);
         add_jp_hl($cpu) if !$strict;
+        add_jmp_hl($cpu) if !$strict;
 
+		add_call($cpu);
+		add_cflag($cpu);
+		add_c_flag($cpu) if !$strict;
+		add_cp_8080($cpu) if $strict;
+		add_call_flag($cpu) if !$strict;
+		
+		add_ret($cpu);
+		add_rflag($cpu);
+		add_r_flag($cpu) if !$strict;
+		add_ret_flag($cpu) if !$strict;
+		
+		add_rst($cpu);
+		
         add_push_pop_r($cpu);
         add_push_pop_rp($cpu) if !$strict;
 
+		add_xthl($cpu);
+		add_ex_isp_hl($cpu) if !$strict;
+		
+		add_sphl($cpu);
+		add_ld_sp_hl($cpu) if !$strict;
+		
+		add_in_N($cpu);
+		add_in_a_N($cpu) if !$strict;
+		add_out_N($cpu);
+		add_out_N_a($cpu) if !$strict;
+		
+		add_ei_di($cpu);
+		add_hlt($cpu);
+		add_halt($cpu) if !$strict;
+		add_nop($cpu);
+		
 if(0){
 		# INC/DEC r
 		add_inc_dec_r_8080($opcodes, $cpu);
