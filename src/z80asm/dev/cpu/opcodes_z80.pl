@@ -34,7 +34,9 @@ for my $cpu1 ('z80') {
         
         add_xchg($cpu) if !$strict;
         add_ex_de_hl($cpu);
-        
+        add_ex_af_af($cpu);
+        add_exx($cpu);
+
 		add_alu_r_8080($cpu) if !$strict;
 		add_alu_r_z80($cpu);
 		add_alu_r_extra($cpu) if !$strict;
@@ -68,6 +70,7 @@ for my $cpu1 ('z80') {
 		add_daa($cpu);
 		add_cma($cpu) if !$strict;
 		add_cpl($cpu);
+		add_cpl_a($cpu) if !$strict;
 		add_cmc($cpu) if !$strict;
 		add_ccf($cpu);
 		add_stc($cpu) if !$strict;
@@ -142,51 +145,18 @@ for my $cpu1 ('z80') {
 		add_hlt($cpu) if !$strict;
 		add_halt($cpu);
 		add_nop($cpu);
+        add_im($cpu);
+        add_ld_i_r($cpu);
+		add_reti_retn($cpu);
+		add_neg($cpu);
+		add_neg_a($cpu) if !$strict;
+		add_rld_rrd($cpu);
 		
-if(0){
-		# INC/DEC r
-		add_inc_dec_r_8080($opcodes, $cpu) if !$strict;
-		add_inc_dec_r_z80($opcodes, $cpu);
-
-		# INC/DEC rp
-		add_inc_dec_rp1_8080($opcodes, $cpu) if !$strict;
-		add_inc_dec_rp2_8080($opcodes, $cpu) if !$strict;
-		add_inc_dec_rp_z80($opcodes, $cpu);
-
-		# ALU [A,] r
-		add_alu8_r_8080($opcodes, $cpu) if !$strict;
-		add_alu8_r_z80($opcodes, $cpu);
-		add_alu8_idx($opcodes, $cpu);
-		add_alu8_idx_lh($opcodes, $cpu) if !$strict;
-
-		# ALU N
-		add_alu8_N_8080($opcodes, $cpu) if !$strict;
-		add_alu8_N_z80($opcodes, $cpu);
-
-		# ADD rp
-		add_add16_rp1_8080($opcodes, $cpu) if !$strict;
-		add_add16_rp2_8080($opcodes, $cpu) if !$strict;
-		add_add16_rp_z80($opcodes, $cpu);
-		add_add16_idx($opcodes, $cpu);
-		add_alu16_rp_z80($opcodes, $cpu);
-
-		# EX DE, HL
-		add_ex_de_hl_8080($opcodes, $cpu) if !$strict;
-		add_ex_de_hl_z80($opcodes, $cpu);
-
-		# PUSH/POP rp
-		add_push_pop_rp_8080($opcodes, $cpu) if !$strict;
-		add_push_pop_rp_z80($opcodes, $cpu);
-
-		# ROT r
-		add_rot_z80($opcodes, $cpu);
-		add_rot_z80_undocumented($opcodes, $cpu) if !$strict;
-
-		# BIT r
-		add_bit_res_set_z80($opcodes, $cpu);
-		add_bit_res_set_z80_idx($opcodes, $cpu);
-	}
-}
+        add_block_move($cpu);
+        add_block_search($cpu);
+        add_block_input($cpu);
+        add_block_output($cpu);
+    }
 }
 
 1;

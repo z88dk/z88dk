@@ -187,6 +187,10 @@ for my $cpu (Opcode->cpus) {
 	# Exchange group
 	#--------------------------------------------------------------------------
 
+    for my $asm ("ex af', af", "ex af, af") {
+        add_synth($cpu, $asm, "ex af, af'");
+    }
+    
 	for my $asm ("ex bc, hl", "ex hl, bc") {
 		add_synth($cpu, $asm, "push hl : push bc : pop hl : pop bc");
 	}
@@ -211,6 +215,23 @@ for my $cpu (Opcode->cpus) {
 			next if $rp1 eq $rp2;
 			my($h2, $l2) = split //, $rp2;
 			add_synth($cpu, "ld $rp1, $rp2", "ld $h1, $h2", "ld $l1, $l2");
+		}
+	}
+
+	# LD BC|DE|HL, IX / LD IX, BC|DE|HL
+	for my $rp ('bc', 'de') {
+		my($h, $l) = split //, $rp;
+		for my $x ('ix', 'iy') {
+			add_synth($cpu, "ld $rp, $x", "ld $h, ${x}h", "ld $l, ${x}l");
+			add_synth($cpu, "ld $x, $rp", "ld ${x}h, $h", "ld ${x}l, $l");
+		}
+	}
+
+	# all the others via push-pop
+	for my $rp1 ('bc', 'de', 'hl', 'ix', 'iy') {
+		for my $rp2 ('bc', 'de', 'hl', 'ix', 'iy') {
+			next if $rp1 eq $rp2;
+			add_synth($cpu, "ld $rp1, $rp2", "push $rp2", "pop $rp1");
 		}
 	}
 
@@ -241,12 +262,22 @@ for my $cpu (Opcode->cpus) {
 							"ex de, hl");
 	
 	# LD HL, SP+s
-	if ($cpu !~ /8085/) {		# 8085: ld hl, sp+%u
-		add_synth($cpu, "ld hl, sp+%s", 
-							"ld hl, 0:%s", "add hl, sp");
-	}
-	add_synth($cpu, "ld hl, sp", 
-							"ld hl, 0x0000", "add hl, sp");
+    if ($cpu =~ /^8085/) {
+        add_synth($cpu, "ld hl, sp+%u", 
+							"ex de, hl", 
+							"ld de, sp+%u", 
+							"ex de, hl");
+        add_synth($cpu, "ld hl, sp", 
+							"ex de, hl", 
+							"ld de, sp", 
+							"ex de, hl");
+    }
+    else {
+        add_synth($cpu, "ld hl, sp+%s", 
+                            "ld hl, 0:%s", "add hl, sp");
+        add_synth($cpu, "ld hl, sp", 
+                            "ld hl, 0x0000", "add hl, sp");
+    }
 	
 	#--------------------------------------------------------------------------
 	# 16-bit memory load
@@ -301,12 +332,75 @@ for my $cpu (Opcode->cpus) {
 							"pop af", "inc hl");
 	}
 
+	# LD (HL), IX|IY
+	for my $x ('ix', 'iy') {
+		add_synth($cpu, "ld (hl), $x", 
+							"push de",
+							"push $x", "pop de",
+							"ld (hl), e", "inc hl", "ld (hl), d", "dec hl",
+							"pop de");
+		add_synth($cpu, "ld (hl+), $x", 
+							"push de",
+							"push $x", "pop de",
+							"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
+							"pop de");
+		add_synth($cpu, "ldi (hl), $x", 
+							"push de",
+							"push $x", "pop de",
+							"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
+							"pop de");
+	}
+
+	# LD (IX+d), BC|DE|HL|IX|IY
+	for my $x ('ix', 'iy') {
+		add_synth($cpu, "ld ($x+%d), bc", "ld ($x+%d), c", "ld ($x+%D), b");
+		add_synth($cpu, "ld ($x), bc", "ld ($x), c", "ld ($x+0x01), b");
+
+		add_synth($cpu, "ld ($x+%d), de", "ld ($x+%d), e", "ld ($x+%D), d");
+		add_synth($cpu, "ld ($x), de", "ld ($x), e", "ld ($x+0x01), d");
+
+		if ($cpu !~ /^r\dk/) {	# not yet for Rabbits
+			add_synth($cpu, "ld ($x+%d), hl", "ld ($x+%d), l", "ld ($x+%D), h");
+			add_synth($cpu, "ld ($x), hl", "ld ($x), l", "ld ($x+0x01), h");
+		}
+
+		for my $x1 ('ix', 'iy') {
+			add_synth($cpu, "ld ($x+%d), $x1",
+					  "push $x1", "ex (sp), hl",
+					  "ld ($x+%d), l", "ld ($x+%D), h",
+					  "ex (sp), hl", "pop $x1");
+			add_synth($cpu, "ld ($x), $x1",
+					  "push $x1", "ex (sp), hl",
+					  "ld ($x), l", "ld ($x+0x01), h",
+					  "ex (sp), hl", "pop $x1");
+		}
+	}
+
 	# LD HL, (HL)
 	add_synth($cpu, "ld hl, (hl)",
 						"push af", 
 						"ld a, (hl)", "inc hl", "ld h, (hl)", "ld l, a",
 						"pop af");
 	
+	# LD IX, (HL)
+	for my $x ('ix', 'iy') {
+		add_synth($cpu, "ld $x, (hl)",
+						"push de",
+						"ld e, (hl)", "inc hl", "ld d, (hl)", "dec hl",
+						"push de", "pop $x",
+						"pop de");
+		add_synth($cpu, "ld $x, (hl+)",
+						"push de",
+						"ld e, (hl)", "inc hl", "ld d, (hl)", "inc hl",
+						"push de", "pop $x",
+						"pop de");
+		add_synth($cpu, "ldi $x, (hl)",
+						"push de",
+						"ld e, (hl)", "inc hl", "ld d, (hl)", "inc hl",
+						"push de", "pop $x",
+						"pop de");
+	}
+
 	# LD BC|DE, (HL)
 	for my $rp ('bc', 'de') {
 		my($h, $l) = split //, $rp;
@@ -327,7 +421,30 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, "lhlx", "ld hl, (de)");
 		add_synth($cpu, "lhlde", "ld hl, (de)");
 	}
-		
+	
+	# LD BC|DE|HL|IX, (IX+d)
+	for my $x ('ix', 'iy') {
+		add_synth($cpu, "ld bc, ($x+%d)", "ld c, ($x+%d)", "ld b, ($x+%D)");
+		add_synth($cpu, "ld bc, ($x)", "ld c, ($x)", "ld b, ($x+0x01)");
+
+		add_synth($cpu, "ld de, ($x+%d)", "ld e, ($x+%d)", "ld d, ($x+%D)");
+		add_synth($cpu, "ld de, ($x)", "ld e, ($x)", "ld d, ($x+0x01)");
+
+		add_synth($cpu, "ld hl, ($x+%d)", "ld l, ($x+%d)", "ld h, ($x+%D)");
+		add_synth($cpu, "ld hl, ($x)", "ld l, ($x)", "ld h, ($x+0x01)");
+
+		for my $x1 ('ix', 'iy') {
+			add_synth($cpu, "ld $x1, ($x+%d)",
+					  "push $x1", "ex (sp), hl",
+					  "ld l, ($x+%d)", "ld h, ($x+%D)",
+					  "ex (sp), hl", "pop $x1");
+			add_synth($cpu, "ld $x1, ($x)",
+					  "push $x1", "ex (sp), hl",
+					  "ld l, ($x)", "ld h, ($x+0x01)",
+					  "ex (sp), hl", "pop $x1");
+		}
+	}
+
 	# LD (DE), HL
 	if ($cpu !~ /^gbz80/) {		# gameboy lacks ex de, hl
 		add_synth($cpu, "ld (de), hl", 

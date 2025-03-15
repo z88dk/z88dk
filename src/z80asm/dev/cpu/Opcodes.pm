@@ -285,8 +285,8 @@ sub search_opcode {
 	
 	my $asm1;
 	
-	# replace %m/%n
-	for my $wildcard ('%m', '%n') {
+	# replace %m/%n/%d
+	for my $wildcard ('%m', '%n', '%d') {
 		if (($asm1 = $asm) =~ s/0x([0-9a-fA-F]+)/$wildcard/) {
 			my $value = hex($1);
 			my $opcode = $self->opcodes->{$asm1}{$cpu};
