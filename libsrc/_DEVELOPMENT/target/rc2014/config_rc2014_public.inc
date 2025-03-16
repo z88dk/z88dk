@@ -1321,9 +1321,9 @@ defc __IO_UART_MSR_DSR            = 0x20
 defc __IO_UART_MSR_RING_INDICATOR = 0x40
 defc __IO_UART_MSR_DCD            = 0x80
 
-defc __IO_UART_RX_SIZE        = 0x100
-defc __IO_UART_RX_FULLISH     = 0xf0
-defc __IO_UART_RX_EMPTYISH    = 0x10
+defc __IO_UART_RX_SIZE        = 0x80
+defc __IO_UART_RX_FULLISH     = 0x70
+defc __IO_UART_RX_EMPTYISH    = 0x08
 
 defc __IO_UART_DLL_115200     = 0x01
 defc __IO_UART_DLL_57600      = 0x02

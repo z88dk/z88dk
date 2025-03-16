@@ -711,9 +711,9 @@
 #define __IO_UART_MSR_RING_INDICATOR    0x40
 #define __IO_UART_MSR_DCD               0x80
 
-#define __IO_UART_RX_SIZE        0x100
-#define __IO_UART_RX_FULLISH     0xf0
-#define __IO_UART_RX_EMPTYISH    0x10
+#define __IO_UART_RX_SIZE        0x80
+#define __IO_UART_RX_FULLISH     0x70
+#define __IO_UART_RX_EMPTYISH    0x08
 
 #define __IO_UART_DLL_115200     0x01
 #define __IO_UART_DLL_57600      0x02

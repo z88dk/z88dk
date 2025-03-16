@@ -113,10 +113,10 @@ define(`__IO_UART_MSR_DCD', 0x80)
 
 # 16550 UART driver
 
-define(`__IO_UART_RX_SIZE', 0x100)      # Size of the Rx Buffer (greater than 0x20)
+define(`__IO_UART_RX_SIZE', 0x80)       # Size of the Rx Buffer (greater than 0x20)
 define(`__IO_UART_RX_FULLISH', 0x`'eval(__IO_UART_RX_SIZE-16,16))
                                         # Fullness of the Rx Buffer, when NOT_RTS is signalled
-define(`__IO_UART_RX_EMPTYISH', 0x10)   # Fullness of the Rx Buffer, when RTS is signalled
+define(`__IO_UART_RX_EMPTYISH', 0x08)   # Fullness of the Rx Buffer, when RTS is signalled
 
 define(`__IO_UART_DLL_115200', 0x01)    # Divisor Latch LSB for 115,200 baud
 define(`__IO_UART_DLL_57600', 0x02)     # Divisor Latch LSB for 57,600 baud
