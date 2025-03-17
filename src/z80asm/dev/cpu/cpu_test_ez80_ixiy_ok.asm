@@ -3089,6 +3089,7 @@
  lea.sil iy, iy+0               ; 52 ED 32 00
  lea.sil iy, iy+126             ; 52 ED 32 7E
  lea.sil iy, iy-128             ; 52 ED 32 80
+ lhld 0x123456                  ; 2A 56 34 12
  lhlde                          ; EB 5E 23 56 2B EB
  lhlx                           ; EB 5E 23 56 2B EB
  lxi b, 0x1234                  ; 01 34 12
@@ -3197,6 +3198,17 @@
  mvi m, 255                     ; 36 FF
  neg                            ; ED 44
  neg a                          ; ED 44
+ neg b                          ; F5 78 2F 47 04 F1
+ neg bc                         ; F5 78 2F 47 79 2F 4F 03 F1
+ neg c                          ; F5 79 2F 4F 0C F1
+ neg d                          ; F5 7A 2F 57 14 F1
+ neg de                         ; F5 7A 2F 57 7B 2F 5F 13 F1
+ neg e                          ; F5 7B 2F 5F 1C F1
+ neg h                          ; F5 7C 2F 67 24 F1
+ neg hl                         ; F5 7C 2F 67 7D 2F 6F 23 F1
+ neg ix                         ; F5 FD 7C 2F FD 67 FD 7D 2F FD 6F FD 23 F1
+ neg iy                         ; F5 DD 7C 2F DD 67 DD 7D 2F DD 6F DD 23 F1
+ neg l                          ; F5 7D 2F 6F 2C F1
  nop                            ; 00
  or (hl)                        ; B6
  or (hl+)                       ; B6 23
@@ -4409,6 +4421,7 @@
  set.sil 7, (iy+0)              ; 52 DD CB 00 FE
  set.sil 7, (iy+126)            ; 52 DD CB 7E FE
  set.sil 7, (iy-128)            ; 52 DD CB 80 FE
+ shld 0x123456                  ; 22 56 34 12
  shlde                          ; EB 73 23 72 2B EB
  shlx                           ; EB 73 23 72 2B EB
  sla (hl)                       ; CB 26

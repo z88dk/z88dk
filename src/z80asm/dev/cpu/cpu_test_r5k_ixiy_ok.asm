@@ -8782,12 +8782,22 @@
  neg                            ; ED 44
  neg a                          ; ED 44
  neg a'                         ; 76 ED 44
+ neg b                          ; F5 7F 78 2F 7F 47 04 F1
+ neg bc                         ; F5 7F 78 2F 7F 47 7F 79 2F 7F 4F 03 F1
  neg bcde                       ; DD 4D
  neg bcde'                      ; 76 DD 4D
+ neg c                          ; F5 7F 79 2F 7F 4F 0C F1
+ neg d                          ; F5 7F 7A 2F 7F 57 14 F1
+ neg de                         ; F5 7F 7A 2F 7F 57 7F 7B 2F 7F 5F 13 F1
+ neg e                          ; F5 7F 7B 2F 7F 5F 1C F1
+ neg h                          ; F5 7F 7C 2F 7F 67 24 F1
  neg hl                         ; 4D
  neg hl'                        ; 76 4D
+ neg ix                         ; E5 FD E5 E1 7F 7C 2F 7F 67 7F 7D 2F 7F 6F 23 E5 FD E1 E1
+ neg iy                         ; E5 DD E5 E1 7F 7C 2F 7F 67 7F 7D 2F 7F 6F 23 E5 DD E1 E1
  neg jkhl                       ; FD 4D
  neg jkhl'                      ; 76 FD 4D
+ neg l                          ; F5 7F 7D 2F 7F 6F 2C F1
  nop                            ; 00
  or (hl)                        ; 7F B6
  or (hl+)                       ; 7F B6 23

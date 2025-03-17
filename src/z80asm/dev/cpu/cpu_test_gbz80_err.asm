@@ -11327,8 +11327,6 @@
  ld bc', hl'                    ; Error
  ld bc', ix                     ; Error
  ld bc', iy                     ; Error
- ld bc, (0x1234)                ; Error
- ld bc, (0x123456)              ; Error
  ld bc, (a:0x1234)              ; Error
  ld bc, (aix)                   ; Error
  ld bc, (aix+0)                 ; Error
@@ -12173,8 +12171,6 @@
  ld de', hl'                    ; Error
  ld de', ix                     ; Error
  ld de', iy                     ; Error
- ld de, (0x1234)                ; Error
- ld de, (0x123456)              ; Error
  ld de, (a:0x1234)              ; Error
  ld de, (aix)                   ; Error
  ld de, (aix+0)                 ; Error
@@ -16401,8 +16397,9 @@
  neg a'                         ; Error
  neg bcde                       ; Error
  neg bcde'                      ; Error
- neg hl                         ; Error
  neg hl'                        ; Error
+ neg ix                         ; Error
+ neg iy                         ; Error
  neg jkhl                       ; Error
  neg jkhl'                      ; Error
  nextreg -128, -128             ; Error

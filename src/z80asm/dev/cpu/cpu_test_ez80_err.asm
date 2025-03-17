@@ -13887,7 +13887,6 @@
  lea.lis iy, iy+0               ; Error
  lea.lis iy, iy+126             ; Error
  lea.lis iy, iy-128             ; Error
- lhld 0x1234                    ; Error
  lirx                           ; Error
  lprx                           ; Error
  lsddr                          ; Error
@@ -14014,7 +14013,6 @@
  neg a'                         ; Error
  neg bcde                       ; Error
  neg bcde'                      ; Error
- neg hl                         ; Error
  neg hl'                        ; Error
  neg jkhl                       ; Error
  neg jkhl'                      ; Error
@@ -18128,7 +18126,6 @@
  setsysp 0x1234                 ; Error
  setusr                         ; Error
  setusrp 0x1234                 ; Error
- shld 0x1234                    ; Error
  sim                            ; Error
  sla (ahl)                      ; Error
  sla (aix)                      ; Error

@@ -23,7 +23,7 @@ $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 			r800 
 			r2ka r3k r4k r5k 
 			8080 8085 
-			gbz80 
+			gbz80 gbz80_strict 
 			kc160 kc160_z80
 );
 
@@ -545,19 +545,19 @@ sub read_map_file {
 #------------------------------------------------------------------------------
 sub cpu_compatible {
 	my($code_cpu, $lib_cpu) = @_;
+	
+	# unstrictify CPU
+	for ($code_cpu, $lib_cpu) {
+		s/_strict$//;
+	}
+	
 	if ($code_cpu eq $lib_cpu) {
 		return 1;
 	}
-	elsif ($code_cpu eq "z80_strict" && $lib_cpu eq "8080") {
+	elsif ($code_cpu eq "z80" && $lib_cpu eq "8080") {
 		return 1;
 	}
-	elsif ($code_cpu eq "z80" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
-		return 1;
-	}
-	elsif ($code_cpu eq "z80n" && ($lib_cpu eq "8080" || $lib_cpu eq "z80" || $lib_cpu eq "z80_strict")) {
-		return 1;
-	}
-	elsif ($code_cpu eq "z180" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
+	elsif ($code_cpu eq "z180" && $lib_cpu eq "8080") {
 		return 1;
 	}
 	elsif ($code_cpu eq "ez80") {
@@ -566,7 +566,7 @@ sub cpu_compatible {
 	elsif ($code_cpu eq "ez80_z80") {
 		return 0;
 	}
-	elsif ($code_cpu eq "r800" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
+	elsif ($code_cpu eq "z80n" && ($lib_cpu eq "8080" || $lib_cpu eq "z80")) {
 		return 1;
 	}
 	elsif ($code_cpu eq "r2ka") {
@@ -581,19 +581,22 @@ sub cpu_compatible {
 	elsif ($code_cpu eq "r5k" && $lib_cpu eq "r4k") {
 		return 1;
 	}
+	elsif ($code_cpu eq "gbz80") {
+		return 0;
+	}
 	elsif ($code_cpu eq "8080") {
 		return 0;
 	}
 	elsif ($code_cpu eq "8085" && $lib_cpu eq "8080") {
 		return 1;
 	}
-	elsif ($code_cpu eq "gbz80") {
-		return 0;
+	elsif ($code_cpu eq "r800" && $lib_cpu eq "8080") {
+		return 1;
 	}
 	elsif ($code_cpu eq "kc160") {
 		return 0;
 	}
-	elsif ($code_cpu eq "kc160_z80" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
+	elsif ($code_cpu eq "kc160_z80" && $lib_cpu eq "8080") {
 		return 1;
 	}
 	else {
@@ -785,12 +788,12 @@ END
 		my $cond = ($dd =~ /IX|IY/i) ? "!__CPU_INTEL__ && !__CPU_GBZ80__" : "1";
 		return <<END;
 						IF $cond
-							ld ($res_addr), $dd
+								ld ($res_addr), $dd
 						ELSE
-							push hl
-							ld hl, 0
-							ld ($res_addr), hl
-							pop hl
+								push hl
+								ld hl, 0
+								ld ($res_addr), hl
+								pop hl
 						ENDIF
 END
 	}
