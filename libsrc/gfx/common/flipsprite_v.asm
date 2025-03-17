@@ -8,15 +8,12 @@
 ;
 
 
-    SECTION smc_clib
+    SECTION code_graphics
 
     PUBLIC  flipsprite_v
     PUBLIC  _flipsprite_v
     PUBLIC  ___flipsprite_v
 
-
-; __gfx_coords: h,l (vert-horz)
-; sprite: (__spr_bitmap+1)
 
 flipsprite_v:
 _flipsprite_v:
@@ -112,3 +109,4 @@ hloop:
 
     pop     hl                           ; keep the pointer to the sprite address
     ret
+
