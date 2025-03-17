@@ -16440,6 +16440,7 @@
  lea.sil iy, iy+126             ; Error
  lea.sil iy, iy-128             ; Error
  lhld 0x1234                    ; Error
+ lhld 0x123456                  ; Error
  lhlde                          ; Error
  lhlx                           ; Error
  lirx                           ; Error
@@ -16671,12 +16672,22 @@
  mvi m, 255                     ; Error
  neg a                          ; Error
  neg a'                         ; Error
+ neg b                          ; Error
+ neg bc                         ; Error
  neg bcde                       ; Error
  neg bcde'                      ; Error
+ neg c                          ; Error
+ neg d                          ; Error
+ neg de                         ; Error
+ neg e                          ; Error
+ neg h                          ; Error
  neg hl                         ; Error
  neg hl'                        ; Error
+ neg ix                         ; Error
+ neg iy                         ; Error
  neg jkhl                       ; Error
  neg jkhl'                      ; Error
+ neg l                          ; Error
  nextreg -128, -128             ; Error
  nextreg -128, a                ; Error
  nextreg 0, 0                   ; Error
@@ -21582,6 +21593,7 @@
  setusr                         ; Error
  setusrp 0x1234                 ; Error
  shld 0x1234                    ; Error
+ shld 0x123456                  ; Error
  shlde                          ; Error
  shlx                           ; Error
  sim                            ; Error

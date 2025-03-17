@@ -42,6 +42,7 @@ my @CPUS = (qw(
 	8085
 	8085_strict
 	gbz80
+	gbz80_strict
 	kc160
 	kc160_z80
 ));
@@ -302,6 +303,15 @@ sub search_opcode {
 		my $opcode = $self->opcodes->{$asm1}{$cpu};
 		if ($opcode) {
 			return $self->_replace_opcode_su($opcode, $wildcard);
+		}
+	}
+	
+	# replace %mN my %m
+	if (($asm1 = $asm) =~ s/(%m\d)/%m/) {
+		my $temp = $1;
+		my $opcode = $self->opcodes->{$asm1}{$cpu};
+		if ($opcode) {
+			return $self->_replace_opcode_text($opcode, '%m', $temp);
 		}
 	}
 	

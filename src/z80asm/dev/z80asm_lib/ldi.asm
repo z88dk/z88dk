@@ -6,10 +6,8 @@
 
 __z80asm__ldi:
         push    af                      ;Save incoming flags
-        ld      a, (hl)
-        inc     hl
-        ld      (de), a
-        inc     de
+        ld      a, (hl+)
+        ld      (de+), a
         dec     bc
   IF    !__CPU_GBZ80__
                               ; There's no point setting PV flag on a gbz80 since flag doesn't exist

@@ -3,6 +3,7 @@
 BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
+use warnings FATAL => 'all';
 
 #-------------------------------------------------------------------------------
 # test IF
@@ -433,7 +434,9 @@ END_ERR
 spew("$test.asm", <<'END_ASM');
 	if __CPU_INTEL__		: defm "intel "			: endif
 	if __CPU_8080__			: defm "8080 "			: endif
+	if __CPU_8080_STRICT__	: defm "8080_strict "	: endif
 	if __CPU_8085__			: defm "8085 "			: endif
+	if __CPU_8085_STRICT__	: defm "8085_strict "	: endif
 													
 	if __CPU_ZILOG__		: defm "zilog "			: endif
 	if __CPU_Z80__			: defm "z80 "			: endif
@@ -446,6 +449,7 @@ spew("$test.asm", <<'END_ASM');
 	if __CPU_R800__			: defm "r800 "			: endif
 													
 	if __CPU_GBZ80__		: defm "gbz80 "			: endif
+	if __CPU_GBZ80_STRICT__	: defm "gbz80_strict "	: endif
 													
 	if __CPU_KC160__		: defm "kc160 " 		: endif
 	if __CPU_KC160_Z80__	: defm "kc160_z80 " 	: endif
@@ -478,7 +482,9 @@ END_ASM
 
 my %defines = (
 	8080		=> "intel 8080 ",
+	'8080_strict'=> "intel 8080_strict ",
 	8085		=> "intel 8085 ",
+	'8085_strict'=> "intel 8085_strict ",
 	z80			=> "zilog z80 ",
 	z80_strict	=> "zilog z80_strict ",
 	z80n		=> "zilog z80n ",
@@ -487,6 +493,7 @@ my %defines = (
 	ez80_z80	=> "zilog ez80_z80 ",
 	r800		=> "r800 ",
 	gbz80		=> "gbz80 ",
+	gbz80_strict=> "gbz80_strict ",
 	kc160		=> "kc160 ",
 	kc160_z80	=> "kc160_z80 ",
 	r2ka		=> "rabbit r2ka ",

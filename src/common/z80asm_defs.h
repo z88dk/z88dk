@@ -33,6 +33,7 @@ typedef enum {
     CPU_KC160_Z80   = 16,
     CPU_8080_STRICT	= 17,
     CPU_8085_STRICT	= 18,
+    CPU_GBZ80_STRICT= 19,
 
     CPU_UNDEF       = -1,
 } cpu_t;
@@ -45,6 +46,12 @@ extern const char* cpu_name(cpu_t id);
 
 // lookup cpu name, return cpu_t, CPU_UNDEF if not found
 extern cpu_t cpu_id(const char* name);
+
+// check if CPU is strict
+extern bool cpu_is_strict(cpu_t id);
+
+// return non-strict version of cpu
+extern cpu_t cpu_unstrictify(cpu_t id);
 
 // static comma-separated list of cpu names
 extern const char* cpu_list();

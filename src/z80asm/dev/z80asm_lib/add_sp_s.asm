@@ -9,14 +9,13 @@ __z80asm__add_sp_s:
         ld      (save_hl+1), hl         ; save hl - cannot use stack
         ld      (save_de+1), de         ; save de - cannot use stack
         pop     hl                      ; return address
-        ld      a, (hl)                 ; signed offset to add to stack
-        inc     hl
+        ld      a, (hl+)                ; signed offset to add to stack
         ld      (return+1), hl          ; save return address
 
         ld      hl, 0
         add     hl, sp                  ; HL = SP
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+  IF    !__CPU_INTEL__
         bit     7, a
   ELSE
         ld      d, a

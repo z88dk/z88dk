@@ -10376,7 +10376,6 @@
  muluw hl, sp                   ; Error
  neg bcde                       ; Error
  neg bcde'                      ; Error
- neg hl                         ; Error
  neg hl'                        ; Error
  neg jkhl                       ; Error
  neg jkhl'                      ; Error

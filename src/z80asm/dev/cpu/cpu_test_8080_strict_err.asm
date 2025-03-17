@@ -17077,12 +17077,22 @@
  neg                            ; Error
  neg a                          ; Error
  neg a'                         ; Error
+ neg b                          ; Error
+ neg bc                         ; Error
  neg bcde                       ; Error
  neg bcde'                      ; Error
+ neg c                          ; Error
+ neg d                          ; Error
+ neg de                         ; Error
+ neg e                          ; Error
+ neg h                          ; Error
  neg hl                         ; Error
  neg hl'                        ; Error
+ neg ix                         ; Error
+ neg iy                         ; Error
  neg jkhl                       ; Error
  neg jkhl'                      ; Error
+ neg l                          ; Error
  nextreg -128, -128             ; Error
  nextreg -128, a                ; Error
  nextreg 0, 0                   ; Error

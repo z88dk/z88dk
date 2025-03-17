@@ -29,10 +29,18 @@ for my $cpu (Opcode->cpus) {
 		for my $flag ('nz', 'z', 'nc', 'c') {
 			add_synth($cpu, "jr $flag, %j", "jp $flag, %m");
 		}
+	}
+
+	# DJNZ
+	if ($cpu =~ /^(8080|8085)/) {
 		add_synth($cpu, "djnz %j", "dec b", "jp nz, %m");
 		add_synth($cpu, "djnz b, %j", "dec b", "jp nz, %m");
 	}
-	
+	elsif ($cpu =~ /^gbz80/) {
+		add_synth($cpu, "djnz %j", "dec b", "jr nz, %j");
+		add_synth($cpu, "djnz b, %j", "dec b", "jr nz, %j");
+	}
+
 	# JP|CALL|RET EQ, NN
 	add_synth($cpu, "jeq %m", "jz %m");
 	add_synth($cpu, "j_eq %m", "jz %m");
@@ -195,12 +203,11 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, $asm, "push hl : push bc : pop hl : pop bc");
 	}
 	
+	add_synth($cpu, "ex de, hl", "push hl : push de : pop hl : pop de");
 	add_synth($cpu, "ex hl, de", "ex de, hl");
+	add_synth($cpu, "xchg", "ex de, hl");
 
-
-	if ($cpu !~ /^(8080|8085)/) {
-		add_emul($cpu, "ex (sp), hl", "__z80asm__ex_sp_hl");
-	}
+	add_emul($cpu, "ex (sp), hl", "__z80asm__ex_sp_hl");
 	
 	add_synth($cpu, "xthl", "ex (sp), hl");
 	
@@ -283,23 +290,57 @@ for my $cpu (Opcode->cpus) {
 	# 16-bit memory load
 	#--------------------------------------------------------------------------
 
-	if ($cpu !~ /^gbz80/) {
-		add_synth($cpu, "ld bc, (%m)", 
-							"push hl", "ld hl, (%m)", "ld bc, hl", "pop hl");
-		add_synth($cpu, "ld (%m), bc", 
-							"push hl", "ld hl, bc", "ld (%m), hl", "pop hl");
-		
-		add_synth($cpu, "ld de, (%m)", 
-							"ex de, hl", "ld hl, (%m)", "ex de, hl");
-		add_synth($cpu, "ld (%m), de", 
-							"ex de, hl", "ld (%m), hl", "ex de, hl");
-		
-		# LD (NN), SP - account for the pushed hl on the stack
-		add_synth($cpu, "ld (%m), sp", 
-							"push hl",
-							"ld hl, 0x0002", "add hl, sp", "ld (%m), hl",
-							"pop hl");
-	}
+	add_synth($cpu, "ld bc, (%m)", 
+						"push hl", 
+						"ld hl, (%m) : ld bc, hl", 
+						"pop hl");
+	add_synth($cpu, "ld bc, (%m)", 
+						"push af",
+						"ld a, (%m) : ld c, a : ld a, (%m1) : ld b, a",
+						"pop af");
+						
+	add_synth($cpu, "ld (%m), bc", 
+						"push hl", 
+						"ld hl, bc : ld (%m), hl", 
+						"pop hl");
+	add_synth($cpu, "ld (%m), bc", 
+						"push af", 
+						"ld a, c : ld (%m), a : ld a, b : ld (%m1), a", 
+						"pop af");
+	
+	add_synth($cpu, "ld de, (%m)", 
+						"ex de, hl", "ld hl, (%m)", "ex de, hl");
+	add_synth($cpu, "ld de, (%m)", 
+						"push af",
+						"ld a, (%m) : ld e, a : ld a, (%m1) : ld d, a",
+						"pop af");
+						
+	add_synth($cpu, "ld (%m), de", 
+						"ex de, hl", "ld (%m), hl", "ex de, hl");
+	add_synth($cpu, "ld (%m), de", 
+						"push af", 
+						"ld a, e : ld (%m), a : ld a, d : ld (%m1), a", 
+						"pop af");
+	
+	# LD HL, (NN) / LD (NN), HL
+	add_synth($cpu, "ld hl, (%m)", 
+						"push af",
+						"ld a, (%m) : ld l, a : ld a, (%m1) : ld h, a",
+						"pop af");
+						
+	add_synth($cpu, "ld (%m), hl", 
+						"push af", 
+						"ld a, l : ld (%m), a : ld a, h : ld (%m1), a", 
+						"pop af");
+
+	add_synth($cpu, "lhld %m", "ld hl, (%m)");
+	add_synth($cpu, "shld %m", "ld (%m), hl");
+	
+	# LD (NN), SP - account for the pushed hl on the stack
+	add_synth($cpu, "ld (%m), sp", 
+						"push hl",
+						"ld hl, 0x0002", "add hl, sp", "ld (%m), hl",
+						"pop hl");
 	
 	#--------------------------------------------------------------------------
 	# 16-bit indirect load
@@ -413,14 +454,12 @@ for my $cpu (Opcode->cpus) {
 	}
 	
 	# LD HL, (DE)
-	if ($cpu !~ /^gbz80/) {		# gameboy lacks ex de, hl
-		add_synth($cpu, "ld hl, (de)", 
-							"ex de, hl",
-							"ld e, (hl)", "inc hl", "ld d, (hl)", "dec hl",
-							"ex de, hl");
-		add_synth($cpu, "lhlx", "ld hl, (de)");
-		add_synth($cpu, "lhlde", "ld hl, (de)");
-	}
+	add_synth($cpu, "ld hl, (de)", 
+						"ex de, hl",
+						"ld e, (hl)", "inc hl", "ld d, (hl)", "dec hl",
+						"ex de, hl");
+	add_synth($cpu, "lhlx", "ld hl, (de)");
+	add_synth($cpu, "lhlde", "ld hl, (de)");
 	
 	# LD BC|DE|HL|IX, (IX+d)
 	for my $x ('ix', 'iy') {
@@ -446,14 +485,12 @@ for my $cpu (Opcode->cpus) {
 	}
 
 	# LD (DE), HL
-	if ($cpu !~ /^gbz80/) {		# gameboy lacks ex de, hl
-		add_synth($cpu, "ld (de), hl", 
-							"ex de, hl",
-							"ld (hl), e", "inc hl", "ld (hl), d", "dec hl",
-							"ex de, hl");
-		add_synth($cpu, "shlx", "ld (de), hl");
-		add_synth($cpu, "shlde", "ld (de), hl");
-	}
+	add_synth($cpu, "ld (de), hl", 
+						"ex de, hl",
+						"ld (hl), e", "inc hl", "ld (hl), d", "dec hl",
+						"ex de, hl");
+	add_synth($cpu, "shlx", "ld (de), hl");
+	add_synth($cpu, "shlde", "ld (de), hl");
 	
 	#--------------------------------------------------------------------------
 	# ALU
@@ -495,8 +532,38 @@ for my $cpu (Opcode->cpus) {
 	}
 	
 	# NEG
-	add_synth($cpu, "neg", "cpl", "inc a");
-	add_synth($cpu, "neg a", "cpl", "inc a");
+	add_synth($cpu, "neg", "cpl : inc a");
+	add_synth($cpu, "neg a", "cpl : inc a");
+
+	for my $r ('b', 'c', 'd', 'e', 'h', 'l') {
+		for my $tick ("", "'") {
+			add_synth($cpu, "neg $r$tick", 
+							"push af",
+							"ld a, $r$tick : cpl : ld $r$tick, a : inc $r$tick",
+							"pop af");
+		}
+	}
+
+	for my $rp ('bc', 'de', 'hl') {
+		for my $tick ("", "'") {
+			my($h, $l) = split //, $rp;
+			add_synth($cpu, "neg $rp$tick", 
+						"push af",
+						"ld a, $h$tick : cpl : ld $h$tick, a : ld a, $l$tick : cpl : ld $l$tick, a : inc $rp$tick",
+						"pop af");
+		}
+	}
+
+	for my $x ('ix', 'iy') {
+		add_synth($cpu, "neg $x", 
+					"push af",
+					"ld a, ${x}h : cpl : ld ${x}h, a : ld a, ${x}l : cpl : ld ${x}l, a : inc $x",
+					"pop af");
+		add_synth($cpu, "neg $x", 
+					"push hl : push $x : pop hl",
+					"ld a, h : cpl : ld h, a : ld a, l : cpl : ld l, a : inc hl",
+					"push hl : pop $x : pop hl");
+	}
 
 	# DAA
 	add_emul($cpu, "daa", "__z80asm__daa");
