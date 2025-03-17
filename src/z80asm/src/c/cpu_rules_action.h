@@ -11621,5 +11621,3 @@ bool cpu_rules_action_11514(ParseCtx *ctx, Str *name, Str *stmt_label);
 bool cpu_rules_action_11515(ParseCtx *ctx, Str *name, Str *stmt_label);
 bool cpu_rules_action_11516(ParseCtx *ctx, Str *name, Str *stmt_label);
 bool cpu_rules_action_11517(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11518(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11519(ParseCtx *ctx, Str *name, Str *stmt_label);

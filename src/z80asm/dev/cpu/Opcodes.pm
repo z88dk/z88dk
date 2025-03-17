@@ -42,6 +42,7 @@ my @CPUS = (qw(
 	8085
 	8085_strict
 	gbz80
+	gbz80_strict
 	kc160
 	kc160_z80
 ));

@@ -23,7 +23,7 @@ $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 			r800 
 			r2ka r3k r4k r5k 
 			8080 8085 
-			gbz80 
+			gbz80 gbz80_strict 
 			kc160 kc160_z80
 );
 
@@ -581,13 +581,22 @@ sub cpu_compatible {
 	elsif ($code_cpu eq "r5k" && $lib_cpu eq "r4k") {
 		return 1;
 	}
-	elsif ($code_cpu eq "8080") {
-		return 0;
-	}
-	elsif ($code_cpu eq "8085" && $lib_cpu eq "8080") {
+	elsif ($code_cpu eq "8080" && $lib_cpu eq "8080_strict") {
 		return 1;
 	}
-	elsif ($code_cpu eq "gbz80") {
+	elsif ($code_cpu eq "8080_strict") {
+		return 0;
+	}
+	elsif ($code_cpu eq "8085" && ($lib_cpu eq "8085_strict" || $lib_cpu eq "8080_strict" || $lib_cpu eq "8080")) {
+		return 1;
+	}
+	elsif ($code_cpu eq "8085_strict" && $lib_cpu eq "8085_strict") {
+		return 1;
+	}
+	elsif ($code_cpu eq "gbz80" && $lib_cpu eq "gbz80_strict") {
+		return 1;
+	}
+	elsif ($code_cpu eq "gbz80_strict") {
 		return 0;
 	}
 	elsif ($code_cpu eq "kc160") {

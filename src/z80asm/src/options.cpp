@@ -792,6 +792,7 @@ void Options::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_INTEL__");
 
     undefine_static_symbol("__CPU_GBZ80__");
+    undefine_static_symbol("__CPU_GBZ80_STRICT__");
 
     undefine_static_symbol("__CPU_KC160__");
     undefine_static_symbol("__CPU_KC160_Z80__");
@@ -874,6 +875,10 @@ void Options::set_cpu(int cpu) {
     case CPU_GBZ80:
         m_cpu = CPU_GBZ80;
         define_static_symbol("__CPU_GBZ80__");
+        break;
+    case CPU_GBZ80_STRICT:
+        m_cpu = CPU_GBZ80_STRICT;
+        define_static_symbol("__CPU_GBZ80_STRICT__");
         break;
     case CPU_KC160:
         m_cpu = CPU_KC160;
