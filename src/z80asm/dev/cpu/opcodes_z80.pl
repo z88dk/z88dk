@@ -147,11 +147,12 @@ for my $cpu1 ('z80') {
 		add_nop($cpu);
         add_im($cpu);
         add_ld_i_r($cpu);
-		add_reti_retn($cpu);
+		add_reti($cpu);
+		add_retn($cpu);
 		add_neg($cpu);
 		add_neg_a($cpu) if !$strict;
 		add_rld_rrd($cpu);
-		
+
         add_block_move($cpu);
         add_block_search($cpu);
         add_block_input($cpu);

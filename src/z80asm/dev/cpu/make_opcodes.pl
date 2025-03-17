@@ -219,15 +219,64 @@ sub add_ld_ix_NN {
 sub add_lda_sta {
 	my($cpu) = @_;
 	
-	add_opcode($cpu, "sta %m", [0x32, '%m', '%m']);
-	add_opcode($cpu, "lda %m", [0x3A, '%m', '%m']);
+	if ($cpu =~ /gbz80/) {
+		add_opcode($cpu, "sta %m", [0xEA, '%m', '%m']);
+		add_opcode($cpu, "lda %m", [0xFA, '%m', '%m']);
+	} 
+	else {
+		add_opcode($cpu, "sta %m", [0x32, '%m', '%m']);
+		add_opcode($cpu, "lda %m", [0x3A, '%m', '%m']);
+	}
 }
 
 sub add_ld_a_iNN {
 	my($cpu) = @_;
 	
-	add_opcode($cpu, "ld (%m), a", [0x32, '%m', '%m']);
-	add_opcode($cpu, "ld a, (%m)", [0x3A, '%m', '%m']);
+	if ($cpu =~ /gbz80/) {
+		add_opcode($cpu, "ld (%m), a", [0xEA, '%m', '%m']);
+		add_opcode($cpu, "ld a, (%m)", [0xFA, '%m', '%m']);
+	} 
+	else {
+		add_opcode($cpu, "ld (%m), a", [0x32, '%m', '%m']);
+		add_opcode($cpu, "ld a, (%m)", [0x3A, '%m', '%m']);
+	}
+}
+
+sub add_ld_a_ic_gbz80 {
+	my($cpu) = @_;
+	
+	add_opcode($cpu, "ld a, (c)", [0xF2]);
+	add_opcode($cpu, "ld (c), a", [0xE2]);
+
+	add_opcode($cpu, "ldh a, (c)", [0xF2]);
+	add_opcode($cpu, "ldh (c), a", [0xE2]);
+}
+
+sub add_ld_a_hli_hld_gbz80 {
+	my($cpu) = @_;
+	
+	add_opcode($cpu, "ld a, (hl+)", [0x2A]);
+	add_opcode($cpu, "ld a, (hli)", [0x2A]);
+	add_opcode($cpu, "ldi a, (hl)", [0x2A]);
+
+	add_opcode($cpu, "ld a, (hl-)", [0x3A]);
+	add_opcode($cpu, "ld a, (hld)", [0x3A]);
+	add_opcode($cpu, "ldd a, (hl)", [0x3A]);
+
+	add_opcode($cpu, "ld (hl-), a", [0x32]);
+	add_opcode($cpu, "ld (hld), a", [0x32]);
+	add_opcode($cpu, "ldd (hl), a", [0x32]);
+
+	add_opcode($cpu, "ld (hl+), a", [0x22]);
+	add_opcode($cpu, "ld (hli), a", [0x22]);
+	add_opcode($cpu, "ldi (hl), a", [0x22]);
+}
+
+sub add_ldh_a_iN_gbz80 {
+	my($cpu) = @_;
+	
+	add_opcode($cpu, "ldh a, (%h)", [0xF0, '%h']);
+	add_opcode($cpu, "ldh (%h), a", [0xE0, '%h']);
 }
 
 sub add_lhld_shld {
@@ -704,6 +753,14 @@ sub add_rot_idx_r_undocumented {
 	}
 }				
 	
+sub add_swap_gbz80 {
+	my($cpu) = @_;
+
+	for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
+		add_opcode($cpu, "swap $r", [0xCB, 0x30+R($r)]);
+	}
+}
+
 sub add_bit_res_set_z80 {
 	my($cpu) = @_;
 
@@ -791,6 +848,7 @@ sub add_jflag {
 	my($cpu) = @_;
 	
 	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		next if $cpu =~ /gbz80/ && $f !~ /nz|z|nc|c/;
 		add_opcode($cpu, "j$f %m", [0xC2+8*F($f), '%m', '%m']) if $f ne 'p';
 	}
 }
@@ -799,6 +857,7 @@ sub add_j_flag {
 	my($cpu) = @_;
 	
 	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		next if $cpu =~ /gbz80/ && $f !~ /nz|z|nc|c/;
 		add_opcode($cpu, "j_$f %m", [0xC2+8*F($f), '%m', '%m']);
 	}
 }
@@ -815,6 +874,7 @@ sub add_jp_flag {
 	my($cpu) = @_;
 	
 	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		next if $cpu =~ /gbz80/ && $f !~ /nz|z|nc|c/;
 		add_opcode($cpu, "jp $f, %m", [0xC2+8*F($f), '%m', '%m']);
 	}
 }
@@ -823,6 +883,7 @@ sub add_jmp_flag {
 	my($cpu) = @_;
 	
 	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		next if $cpu =~ /gbz80/ && $f !~ /nz|z|nc|c/;
 		add_opcode($cpu, "jmp $f, %m", [0xC2+8*F($f), '%m', '%m']);
 	}
 }
@@ -871,6 +932,7 @@ sub add_cflag {
 	my($cpu) = @_;
 	
 	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		next if $cpu =~ /gbz80/ && $f !~ /nz|z|nc|c/;
 		add_opcode($cpu, "c$f %m", [0xC4+8*F($f), '%m', '%m']) if $f ne 'p';
 	}
 }
@@ -879,6 +941,7 @@ sub add_c_flag {
 	my($cpu) = @_;
 	
 	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		next if $cpu =~ /gbz80/ && $f !~ /nz|z|nc|c/;
 		add_opcode($cpu, "c_$f %m", [0xC4+8*F($f), '%m', '%m']);
 	}
 }
@@ -895,6 +958,7 @@ sub add_call_flag {
 	my($cpu) = @_;
 	
 	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		next if $cpu =~ /gbz80/ && $f !~ /nz|z|nc|c/;
 		add_opcode($cpu, "call $f, %m", [0xC4+8*F($f), '%m', '%m']);
 	}
 }
@@ -909,6 +973,7 @@ sub add_rflag {
 	my($cpu) = @_;
 	
 	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		next if $cpu =~ /gbz80/ && $f !~ /nz|z|nc|c/;
 		add_opcode($cpu, "r$f", [0xC0+8*F($f)]);
 	}
 }
@@ -917,6 +982,7 @@ sub add_r_flag {
 	my($cpu) = @_;
 	
 	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		next if $cpu =~ /gbz80/ && $f !~ /nz|z|nc|c/;
 		add_opcode($cpu, "r_$f", [0xC0+8*F($f)]);
 	}
 }
@@ -925,6 +991,7 @@ sub add_ret_flag {
 	my($cpu) = @_;
 	
 	for my $f ('nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm') {
+		next if $cpu =~ /gbz80/ && $f !~ /nz|z|nc|c/;
 		add_opcode($cpu, "ret $f", [0xC0+8*F($f)]);
 	}
 }
@@ -1097,6 +1164,12 @@ sub add_halt {
 	add_opcode($cpu, "halt", [0x76]);
 }
 
+sub add_stop_gbz80 {
+	my($cpu) = @_;
+	
+	add_opcode($cpu, "stop", [0x10, 0]);
+}
+
 sub add_nop {
 	my($cpu) = @_;
 	
@@ -1151,6 +1224,27 @@ sub add_ldsi_N {
 	}
 	add_opcode($cpu, "ld de, sp+%u", [0x38, '%u']);
 	add_opcode($cpu, "ld de, sp", [0x38, 0]);
+}
+
+sub add_ld_hl_sp_plus_s_gbz80 {
+	my($cpu) = @_;
+
+	add_opcode($cpu, "ldhl sp, %s", [0xF8, '%s']);
+	add_opcode($cpu, "ld hl, sp+%s", [0xF8, '%s']);
+
+	add_opcode($cpu, "ld hl, sp", [0xF8, 0]);
+}
+
+sub add_ld_iNN_sp_gbz80 {
+	my($cpu) = @_;
+
+	add_opcode($cpu, "ld (%m), sp", [0x08, '%m', '%m']);
+}
+
+sub add_add_sp_s_gbz80 {
+	my($cpu) = @_;
+
+	add_opcode($cpu, "add sp, %s", [0xE8, '%s']);
 }
 
 sub add_rstv {
@@ -1244,10 +1338,20 @@ sub add_ld_i_r {
 	add_opcode($cpu, "ld a, r", [0xED, 0x5F]);
 }
 
-sub add_reti_retn {
+sub add_reti {
 	my($cpu) = @_;
 
-	add_opcode($cpu, "reti", [0xED, 0x4D]);
+	if ($cpu =~ /gbz80/) {
+		add_opcode($cpu, "reti", [0xD9]);
+	}
+	else {
+		add_opcode($cpu, "reti", [0xED, 0x4D]);
+	}
+}
+
+sub add_retn {
+	my($cpu) = @_;
+
 	add_opcode($cpu, "retn", [0xED, 0x45]);
 }
 
@@ -1275,6 +1379,7 @@ sub add_rld_rrd {
 #------------------------------------------------------------------------------
 require "opcodes_8080.pl";
 require "opcodes_8085.pl";
+require "opcodes_gbz80.pl";
 require "opcodes_z80.pl";
 
 #------------------------------------------------------------------------------
@@ -1328,7 +1433,7 @@ my %INV_FLAG = qw(	_nz	 _z	  _z   _nz
 # for each CPU
 #------------------------------------------------------------------------------
 for my $cpu (@CPUS) {
-	next if $cpu =~ /^(8080|8085|z80)(_strict)?$/;
+	next if $cpu =~ /^(8080|8085|z80|gbz80)(_strict)?$/;
 	
 	my $rabbit		= ($cpu =~ /^r2ka|^r3k|^r4k|^r5k/);
 	my $r3k			= ($cpu =~ /^r3k/);

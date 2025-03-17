@@ -17,6 +17,7 @@ my $test_nr;
 for my $cpu (@CPUS) {
 	SKIP: {
 		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+		skip "$cpu not supported by ticks" if $cpu =~ /_strict/;
 
 		my @asm = "ld hl, 0";			# overwrite code with output data
 		my @in;

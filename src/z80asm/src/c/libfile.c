@@ -139,9 +139,8 @@ void make_library(const char *lib_filename) {
 
         // assemble or include object for each cpu-ixiy combination and append to library
         for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
-            // CPU_8080_STRICT and CPU_8085_STRICT are not compatible with z80
-            // due to cp and jp opcodes
-            if (*cpu == CPU_8080_STRICT || *cpu == CPU_8085_STRICT)
+            // only include non-strict cpus in library
+            if (cpu_is_strict(*cpu))
                 continue;
 
             option_set_cpu(*cpu);

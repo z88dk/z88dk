@@ -564,7 +564,8 @@ bool Preproc::check_reptx() {
 }
 
 bool Preproc::check_gbz80_opcodes() {
-    if (g_options.get_cpu() != CPU_GBZ80)
+    cpu_t cpu = g_options.get_cpu();
+    if (cpu != CPU_GBZ80 && cpu != CPU_GBZ80_STRICT)
         return false;
 
     ScannedLine out;
