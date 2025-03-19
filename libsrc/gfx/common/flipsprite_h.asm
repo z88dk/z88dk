@@ -91,13 +91,11 @@ bit_loop_1:
 IF  !__CPU_INTEL__
     rr      (hl)
 ELSE
-    push    bc
-	ld      b,a
+    ld      c,a
     ld      a,(hl)
     rra
     ld      (hl),a
-	ld      a,b
-    pop     bc
+    ld      a,c
 ENDIF
     djnz    bit_loop_1
     ld      (de),a
@@ -115,13 +113,11 @@ bit_loop_2:
 IF  !__CPU_INTEL__
     rl      (hl)
 ELSE
-    push    bc
-	ld      b,a
+    ld      c,a
     ld      a,(hl)
     rla
     ld      (hl),a
-	ld      a,b
-    pop     bc
+    ld      a,c
 ENDIF
     djnz    bit_loop_2
     ex      de,hl
