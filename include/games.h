@@ -50,6 +50,9 @@ extern void __LIB__ putsprite_callee(int ortype, int x, int y, void *sprite) __s
 /* Flip the picture in the sprite data vertically */
 extern void  __LIB__ *flipsprite_v(void *sprite) __z88dk_fastcall;
 
+/* Flip the picture in the sprite data horizontally */
+extern void  __LIB__ *flipsprite_h(void *sprite) __z88dk_fastcall;
+
 /* Invert the graphics bitmap in a sprite */
 extern void  __LIB__ *invsprite(void *sprite) __z88dk_fastcall;
 
