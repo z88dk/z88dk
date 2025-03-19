@@ -23,12 +23,6 @@ _flipsprite_h:
 ___flipsprite_h:
 
 ;   FASTCALL, no need to mess with the stack
-;    ld      hl, 2
-;    add     hl, sp
-;    ld      e, (hl)
-;    inc     hl
-;    ld      d, (hl)                     ;sprite address
-;    ex      de,hl
 
     push    hl
 
@@ -97,11 +91,13 @@ bit_loop_1:
 IF  !__CPU_INTEL__
     rr      (hl)
 ELSE
-    push    af
+    push    bc
+	ld      b,a
     ld      a,(hl)
     rra
     ld      (hl),a
-    pop     af
+	ld      a,b
+    pop     bc
 ENDIF
     djnz    bit_loop_1
     ld      (de),a
@@ -119,11 +115,13 @@ bit_loop_2:
 IF  !__CPU_INTEL__
     rl      (hl)
 ELSE
-    push    af
+    push    bc
+	ld      b,a
     ld      a,(hl)
     rla
     ld      (hl),a
-    pop     af
+	ld      a,b
+    pop     bc
 ENDIF
     djnz    bit_loop_2
     ex      de,hl
