@@ -8,6 +8,8 @@
 ; z80   15    15
 ; z80n  15    15
 
+  IF    !__CPU_STRICT__
+
         SECTION code_l_sccz80
         PUBLIC  __z80asm__adc_hl_sp
 
@@ -20,3 +22,5 @@ carry0:
 
         add     hl, sp
         ret
+
+  ENDIF

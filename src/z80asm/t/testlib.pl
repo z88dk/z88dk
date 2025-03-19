@@ -773,11 +773,22 @@ sub ixiy_compatible {
 			}
 		};
 		return <<END;
+							push hl
 							push af
-							ex (sp), hl
+							pop hl
+
+						IF __CPU_GBZ80__
+							ld a, l
+							ld ($res_addr), a
+							ld a, h
+							ld ($res_addr+1), a
+						ELSE
 							ld ($res_addr), hl
-							ex (sp), hl
+						ENDIF
+
+						    push hl
 							pop af
+							pop hl
 END
 	}
 	
@@ -792,14 +803,36 @@ END
 		};
 
 		my $cond = ($dd =~ /IX|IY/i) ? "!__CPU_INTEL__ && !__CPU_GBZ80__" : "1";
+		my($h, $l) = split //, $dd;
+		my $is_sp = $dd =~ /sp/i ? 1 : 0;
 		return <<END;
 						IF $cond
-							ld ($res_addr), $dd
+						  IF __CPU_GBZ80__
+						    IF $is_sp
+								ld ($res_addr), sp
+						    ELSE
+								push af
+								ld a, $l
+								ld ($res_addr), a
+								ld a, $h
+								ld ($res_addr+1), a
+								pop af
+							ENDIF
+						  ELSE
+								ld ($res_addr), $dd
+						  ENDIF
 						ELSE
-							push hl
-							ld hl, 0
-							ld ($res_addr), hl
-							pop hl
+								push hl
+						  IF __CPU_GBZ80__
+								ld hl, $res_addr
+								ld (hl), 0
+								inc hl
+								ld (hl), 0
+						  ELSE
+								ld hl, 0
+								ld ($res_addr), hl
+						  ENDIF
+								pop hl
 						ENDIF
 END
 	}

@@ -14,7 +14,7 @@ my $ticks = Ticks->new;
 
 for my $dd (qw( HL IX IY )) {
 	for my $v (0, 1, -1) {
-		my $cond = ($dd =~ /IX|IY/i) ? "!__CPU_INTEL__ && !__CPU_GBZ80__" : "1";
+		my $cond = ($dd =~ /IX|IY/i) ? "!__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_GBZ80_STRICT__" : "1";
 		$ticks->add(<<END, 
 			IF $cond
 				ld $dd, $v

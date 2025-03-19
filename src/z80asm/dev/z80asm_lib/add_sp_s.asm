@@ -1,6 +1,8 @@
 ; Substitute for the gbz80 and rabbit add sp, %s instruction
 ; uses self-modifying code
 
+  IF    !__CPU_STRICT__ && !__CPU_GBZ80__
+
         SECTION code_l_sccz80
         PUBLIC  __z80asm__add_sp_s
 
@@ -16,13 +18,13 @@ __z80asm__add_sp_s:
         ld      hl, 0
         add     hl, sp                  ; HL = SP
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+    IF  !__CPU_INTEL__
         bit     7, a
-  ELSE
+    ELSE
         ld      d, a
         and     0x80
         ld      a, d
-  ENDIF
+    ENDIF
         ld      d, 0
 
         jr      z, positive
@@ -46,3 +48,5 @@ save_hl:
 save_de:
         ld      de, 0
 return: jp      0
+
+  ENDIF

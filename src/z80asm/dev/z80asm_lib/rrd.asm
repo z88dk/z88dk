@@ -9,6 +9,8 @@
 ; z80    18    18
 ; z80n   18    18
 
+  IF    !__CPU_STRICT__
+
         SECTION code_l_sccz80
         PUBLIC  __z80asm__rrd
 
@@ -22,7 +24,7 @@ __z80asm__rrd:
 
 dorrd:
 
-  IF    __CPU_INTEL__                   ; a = xi, (hl) = jk --> a = xk, (hl) = ij
+    IF  __CPU_INTEL__                   ; a = xi, (hl) = jk --> a = xk, (hl) = ij
         push    de
         push    hl
 
@@ -58,7 +60,7 @@ dorrd:
 
         ld      a, e                    ; a = xk
         pop     de
-  ELSE
+    ELSE
         srl     a
         rr      (hl)
 
@@ -77,7 +79,9 @@ dorrd:
         rra
         rra
 
-  ENDIF
+    ENDIF
 
         or      a
         ret
+
+  ENDIF

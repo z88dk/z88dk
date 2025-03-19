@@ -8,12 +8,14 @@
 ; z80   16    16
 ; z80n  16    16
 
+  IF    !__CPU_STRICT__
+
         SECTION code_l_sccz80
         PUBLIC  __z80asm__rl_hl
 
 __z80asm__rl_hl:
 
-  IF    __CPU_INTEL__
+    IF  __CPU_INTEL__
         push    af
 
         ld      a, l
@@ -32,9 +34,10 @@ carry0:
         pop     af
         and     a
         ret
-  ELSE
+    ELSE
         rl      l
         rl      h
         ret
-  ENDIF
+    ENDIF
 
+  ENDIF

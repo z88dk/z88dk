@@ -1,6 +1,8 @@
 ; Substitute for z80 cpi instruction
 ; aralbrec 06.2007
 
+  IF    !__CPU_STRICT__
+
         SECTION code_l_sccz80
         PUBLIC  __z80asm__cpi
 
@@ -14,34 +16,34 @@ __z80asm__cpi:
 
         push    af
         ex      (sp), hl
-  IF    __CPU_INTEL__
+    IF  __CPU_INTEL__
         ld      a, l
         and     @11111110
         ld      l, a
-  ELSE
+    ELSE
         res     0, l                    ; clear carry
-  ENDIF
+    ENDIF
 
 rejoin:
 
-  IF    __CPU_INTEL__
+    IF  __CPU_INTEL__
         ld      a, l
         or      @00000100
         ld      l, a
-  ELSE
+    ELSE
         set     2, l                    ; set P/V -> BC != 0
-  ENDIF
+    ENDIF
 
         ld      a, b
         or      c
         jr      nz, exitcpi
-  IF    __CPU_INTEL__
+    IF  __CPU_INTEL__
         ld      a, l
         and     @11111011
         ld      l, a
-  ELSE
+    ELSE
         res     2, l                    ; clear P/V -> BC == 0
-  ENDIF
+    ENDIF
 
 exitcpi:
 
@@ -57,11 +59,13 @@ cpiwcarry:
 
         push    af
         ex      (sp), hl
-  IF    __CPU_INTEL__
+    IF  __CPU_INTEL__
         ld      a, l
         or      @00000001
         ld      l, a
-  ELSE
+    ELSE
         set     0, l                    ; set carry
-  ENDIF
+    ENDIF
         jr      rejoin
+
+  ENDIF

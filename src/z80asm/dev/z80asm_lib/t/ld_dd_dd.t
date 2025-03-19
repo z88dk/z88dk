@@ -19,12 +19,12 @@ for my $s (qw( BC DE HL BC_ DE_ HL_ IX IY )) {
 		if ($s ne $d) {
 			for my $v (32767, 65535) {
 				my $cond_s = ($s =~ /IX|IY/i) ? 
-							"!__CPU_INTEL__ && !__CPU_GBZ80__" : 
+							"!__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_GBZ80_STRICT__" : 
 							($s =~ /_/) ? 
 							"__CPU_RABBIT__" : "1";
 				my $s_ = $s =~ s/_/'/r;
 				my $cond_d = ($d =~ /IX|IY/i) ? 
-							"!__CPU_INTEL__ && !__CPU_GBZ80__" : 
+							"!__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_GBZ80_STRICT__" : 
 							($d =~ /_/) ? 
 							"__CPU_RABBIT__" : "1";
 				my $d_ = $d =~ s/_/'/r;

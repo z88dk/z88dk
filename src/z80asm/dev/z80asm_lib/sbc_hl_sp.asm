@@ -8,6 +8,8 @@
 ; z80    15    15
 ; z80n   15    15
 
+  IF    !__CPU_STRICT__&&!__CPU_GBZ80__
+
         SECTION code_l_sccz80
         PUBLIC  __z80asm__sbc_hl_sp
 
@@ -35,3 +37,5 @@ __z80asm__sbc_hl_sp:
         ld      a, b
         pop     bc
         ret
+
+  ENDIF

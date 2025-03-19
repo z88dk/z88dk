@@ -9,6 +9,8 @@
 ; z80   71    71
 ; z80n   8     8
 
+  IF    !__CPU_STRICT__
+
         SECTION code_l_sccz80
         PUBLIC  __z80asm__add_hl_a
 
@@ -24,3 +26,5 @@ __z80asm__add_hl_a:
 
         pop     af
         ret
+
+  ENDIF

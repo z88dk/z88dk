@@ -29,7 +29,7 @@ for my $x (qw( IX IY )) {
 					jr start
 			var:	defw 0
 			start:
-			IF !__CPU_INTEL__ && !__CPU_GBZ80__
+			IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_GBZ80_STRICT__
 					ld de, 0x5678
 					ld hl, var
 
@@ -65,7 +65,7 @@ for my $x (qw( IX IY )) {
 					jr start
 			var:	defw 0x1234
 			start:
-			IF !__CPU_INTEL__ && !__CPU_GBZ80__
+			IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_GBZ80_STRICT__
 					ld de, 0x5678
 					ld hl, var
 					ld $x, 0

@@ -8,6 +8,8 @@
 ; z80   80    80
 ; z80n  80    80
 
+  IF    !__CPU_STRICT__
+
         SECTION code_l_sccz80
         PUBLIC  __z80asm__sub_hl_de
 
@@ -26,3 +28,5 @@ __z80asm__sub_hl_de:
         ld      a, b
         pop     bc
         ret
+
+  ENDIF

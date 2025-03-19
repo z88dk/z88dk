@@ -8,7 +8,7 @@
 ; z80    19    19
 ; z80n   19    19
 
-  IF    __CPU_GBZ80__
+  IF    __CPU_GBZ80__||__CPU_GBZ80_STRICT__
         SECTION code_l_sccz80
         PUBLIC  __z80asm__ex_sp_hl
 

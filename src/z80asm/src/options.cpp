@@ -769,6 +769,8 @@ string Options::search_path(vector<string>& path, const string& file) {
 }
 
 void Options::set_cpu(int cpu) {
+    undefine_static_symbol("__CPU_STRICT__");
+
     undefine_static_symbol("__CPU_Z80__");
     undefine_static_symbol("__CPU_Z80_STRICT__");
     undefine_static_symbol("__CPU_Z80N__");
@@ -805,6 +807,7 @@ void Options::set_cpu(int cpu) {
         break;
     case CPU_Z80_STRICT:
         m_cpu = CPU_Z80_STRICT;
+        define_static_symbol("__CPU_STRICT__");
         define_static_symbol("__CPU_Z80_STRICT__");
         define_static_symbol("__CPU_ZILOG__");
         break;
@@ -859,6 +862,7 @@ void Options::set_cpu(int cpu) {
         break;
     case CPU_8080_STRICT:
         m_cpu = CPU_8080_STRICT;
+        define_static_symbol("__CPU_STRICT__");
         define_static_symbol("__CPU_8080_STRICT__");
         define_static_symbol("__CPU_INTEL__");
         break;
@@ -869,6 +873,7 @@ void Options::set_cpu(int cpu) {
         break;
     case CPU_8085_STRICT:
         m_cpu = CPU_8085_STRICT;
+        define_static_symbol("__CPU_STRICT__");
         define_static_symbol("__CPU_8085_STRICT__");
         define_static_symbol("__CPU_INTEL__");
         break;
@@ -878,6 +883,7 @@ void Options::set_cpu(int cpu) {
         break;
     case CPU_GBZ80_STRICT:
         m_cpu = CPU_GBZ80_STRICT;
+        define_static_symbol("__CPU_STRICT__");
         define_static_symbol("__CPU_GBZ80_STRICT__");
         break;
     case CPU_KC160:

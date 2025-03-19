@@ -1,6 +1,7 @@
 ; Substitute for the z80 ldir instruction
 ; Doesn't emulate the flags correctly
 
+  IF    !__CPU_STRICT__
 
         SECTION code_l_sccz80
         PUBLIC  __z80asm__ldir
@@ -26,3 +27,5 @@ loop:
 
         pop     af
         ret
+
+  ENDIF

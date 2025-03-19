@@ -2,6 +2,8 @@
 ; aralbrec 02.2008
 ; flag-perfect emulation of cpdr
 
+  IF    !__CPU_STRICT__&&!__CPU_GBZ80__
+
         SECTION code_l_sccz80
         PUBLIC  __z80asm__cpdr
 
@@ -14,13 +16,13 @@ __z80asm__cpdr:
 ; scf clears N and H - must set carry the hard way
         push    af
         ex      (sp), hl
-  IF    __CPU_INTEL__
+    IF  __CPU_INTEL__
         ld      a, l
         or      @00000001
         ld      l, a
-  ELSE
+    ELSE
         set     0, l                    ; set carry
-  ENDIF
+    ENDIF
         jr      retflags
 
 loop:
@@ -49,14 +51,14 @@ enterloop:
 joinbc0:
 
         ex      (sp), hl
-  IF    __CPU_INTEL__
+    IF  __CPU_INTEL__
         ld      a, l
         and     @11111010
         ld      l, a
-  ELSE
+    ELSE
         res     0, l                    ; clear carry
         res     2, l                    ; clear P/V -> BC == 0
-  ENDIF
+    ENDIF
         jr      retflags
 
 match:
@@ -69,17 +71,19 @@ match:
         jr      z, joinbc0
 
         ex      (sp), hl
-  IF    __CPU_INTEL__
+    IF  __CPU_INTEL__
         ld      a, l
         and     @11111110
         or      @00000100
         ld      l, a
-  ELSE
+    ELSE
         res     0, l                    ; clear carry
         set     2, l                    ; set P/V -> BC != 0
-  ENDIF
+    ENDIF
 
 retflags:
         ex      (sp), hl
         pop     af
         ret
+
+  ENDIF

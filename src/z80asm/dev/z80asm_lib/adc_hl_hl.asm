@@ -8,25 +8,29 @@
 ; z80    15    15
 ; z80n   15    15
 
+  IF    !__CPU_STRICT__
+
         SECTION code_l_sccz80
         PUBLIC  __z80asm__adc_hl_hl
 
 __z80asm__adc_hl_hl:
         push    de
 
-  IF    __CPU_INTEL__
+    IF  __CPU_INTEL__
         push    af
         ld      a, 0
         ld      d, a
         rla
         ld      e, a
         pop     af
-  ELSE
+    ELSE
         ld      de, 0
         rl      e                       ; de = carry
-  ENDIF
+    ENDIF
         add     hl, hl
         add     hl, de
 
         pop     de
         ret
+
+  ENDIF
