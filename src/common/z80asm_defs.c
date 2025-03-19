@@ -55,7 +55,7 @@ static cpu_lookup_t cpu_lut[] = {
     { "kc160",      CPU_KC160,          CPU_UNDEF,          },  // 15
     { "kc160_z80",  CPU_KC160_Z80,      CPU_Z80_STRICT,     },  // 16
     { "8080_strict",CPU_8080_STRICT,    CPU_UNDEF,          },  // 17
-    { "8085_strict",CPU_8085_STRICT,    CPU_8080,           },  // 18
+    { "8085_strict",CPU_8085_STRICT,    CPU_8080_STRICT,    },  // 18
     { "gbz80_strict",CPU_GBZ80_STRICT,  CPU_UNDEF,          },  // 19
 };
 
