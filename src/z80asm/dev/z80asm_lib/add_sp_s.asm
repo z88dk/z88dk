@@ -1,7 +1,7 @@
 ; Substitute for the gbz80 and rabbit add sp, %s instruction
 ; uses self-modifying code
 
-  IF    !__CPU_STRICT__ && !__CPU_GBZ80__
+  IF    !__CPU_STRICT__&&!__CPU_GBZ80__
 
         SECTION code_l_sccz80
         PUBLIC  __z80asm__add_sp_s

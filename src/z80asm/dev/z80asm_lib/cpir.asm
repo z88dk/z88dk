@@ -2,10 +2,14 @@
 ; aralbrec 02.2008
 ; flag-perfect emulation of cpir
 
-  IF    !__CPU_STRICT__&&!__CPU_GBZ80__
+  IF    !__CPU_STRICT__
 
         SECTION code_l_sccz80
         PUBLIC  __z80asm__cpir
+
+    IF  __CPU_GBZ80__
+        EXTERN  __z80asm__ex_sp_hl
+    ENDIF
 
 __z80asm__cpir:
 
@@ -15,7 +19,11 @@ __z80asm__cpir:
 
 ; scf clears N and H - must set carry the hard way
         push    af
+    IF  __CPU_GBZ80__
+        call    __z80asm__ex_sp_hl
+    ELSE
         ex      (sp), hl
+    ENDIF
     IF  __CPU_INTEL__
         ld      a, l
         or      @00000001
@@ -40,7 +48,12 @@ enterloop:
         jr      nz, loop
 
         inc     b
+    IF  __CPU_GBZ80__
+        dec     b
+        jr      nz, loop
+    ELSE
         djnz    loop
+    ENDIF
 
 ; .nomatch
 
@@ -50,7 +63,11 @@ enterloop:
 
 joinbc0:
 
+    IF  __CPU_GBZ80__
+        call    __z80asm__ex_sp_hl
+    ELSE
         ex      (sp), hl
+    ENDIF
     IF  __CPU_INTEL__
         ld      a, l
         and     @11111010
@@ -70,7 +87,11 @@ match:
         or      c
         jr      z, joinbc0
 
+    IF  __CPU_GBZ80__
+        call    __z80asm__ex_sp_hl
+    ELSE
         ex      (sp), hl
+    ENDIF
     IF  __CPU_INTEL__
         ld      a, l
         and     @11111110
@@ -82,7 +103,11 @@ match:
     ENDIF
 
 retflags:
+    IF  __CPU_GBZ80__
+        call    __z80asm__ex_sp_hl
+    ELSE
         ex      (sp), hl
+    ENDIF
         pop     af
         ret
 

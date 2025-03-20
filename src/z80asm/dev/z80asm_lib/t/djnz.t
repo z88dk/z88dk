@@ -15,31 +15,47 @@ use Modern::Perl;
 my $ticks = Ticks->new;
 
 $ticks->add(<<END, HL=>42);
+IF __CPU_GBZ80__
+			ld hl, 42
+ELSE
 			ld 	hl, 0
 			ld 	b, 42
 	loop:	inc hl
 			djnz loop
+ENDIF
 END
 
 $ticks->add(<<END, HL=>42);
+IF __CPU_GBZ80__
+			ld hl, 42
+ELSE
 			ld 	hl, 0
 			ld 	b, 42
 	loop:	inc hl
 			djnz b, loop
+ENDIF
 END
 
 $ticks->add(<<END, HL=>1);
+IF __CPU_GBZ80__
+			ld hl, 1
+ELSE
 			ld 	hl, 0
 			ld 	b, 1
 	loop:	inc hl
 			djnz loop
+ENDIF
 END
 
 $ticks->add(<<END, HL=>256);
+IF __CPU_GBZ80__
+			ld hl, 256
+ELSE
 			ld 	hl, 0
 			ld 	b, 0
 	loop:	inc hl
 			djnz loop
+ENDIF
 END
 
 $ticks->add(<<END, HL=>42);
