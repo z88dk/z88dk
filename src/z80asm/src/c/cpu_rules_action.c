@@ -5792,7 +5792,7 @@ DO_stmt(0x19LL);
 DO_stmt(0xEBLL);
 DO_stmt(0xE1LL);
 break;
-case CPU_8085: 
+case CPU_8085: case CPU_GBZ80: case CPU_GBZ80_STRICT: 
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_n(0x28LL);
 break;
@@ -78531,7 +78531,7 @@ DO_stmt(0x19LL);
 DO_stmt(0xEBLL);
 DO_stmt(0xE1LL);
 break;
-case CPU_8085: 
+case CPU_8085: case CPU_GBZ80: case CPU_GBZ80_STRICT: 
 DO_stmt_n(0x28LL);
 break;
 case CPU_8080: case CPU_Z80: 
@@ -113910,7 +113910,7 @@ DO_stmt(0x19LL);
 DO_stmt(0xEBLL);
 DO_stmt(0xE1LL);
 break;
-case CPU_8085: 
+case CPU_8085: case CPU_GBZ80: case CPU_GBZ80_STRICT: 
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 DO_stmt_n(0x28LL);
 break;

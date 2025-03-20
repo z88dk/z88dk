@@ -33,6 +33,9 @@ for my $cpu1 ('gbz80') {
 		add_ld_hl_sp_plus_s_gbz80($cpu);
 		add_ld_iNN_sp_gbz80($cpu);
 
+		add_ldhi_N($cpu);
+		add_ldsi_N($cpu);
+		
         add_push_pop_r($cpu) if !$strict;
         add_push_pop_rp($cpu);
         

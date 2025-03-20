@@ -804,7 +804,7 @@ END
 
 		my $cond = ($dd =~ /IX|IY/i) ? "!__CPU_INTEL__ && !__CPU_GBZ80__" : "1";
 		my($h, $l) = split //, $dd;
-		my $is_sp = $dd =~ /sp/i ? 1 : 0;
+		my $is_sp = ($dd =~ /sp/i) ? 1 : 0;
 		return <<END;
 						IF $cond
 						  IF __CPU_GBZ80__
@@ -841,6 +841,7 @@ END
 		my($self, $test_nr, $dd, $value) = @_;
 
 		my($dd_tick, $dd_plain) = $self->_tick_plain_regs($dd);
+		my($h, $l) = split //, $dd_plain;
 		my $res_addr = $self->_alloc_addr(2);
 		push @{$self->tests}, sub {
 			my($t) = @_;
@@ -851,7 +852,16 @@ END
 						IF !__CPU_INTEL__ && !__CPU_GBZ80__
 							exx
 						ENDIF
+						IF __CPU_GBZ80__
+							push af
+							ld a, $l
+							ld ($res_addr), a
+							ld a, $h
+							ld ($res_addr+1), a
+							pop af
+						ELSE
 							ld ($res_addr), $dd_plain
+						ENDIF
 						IF !__CPU_INTEL__ && !__CPU_GBZ80__
 							exx
 						ENDIF

@@ -649,14 +649,6 @@
  adi 0                          ; Error
  adi 127                        ; Error
  adi 255                        ; Error
- adi hl, -128                   ; Error
- adi hl, 0                      ; Error
- adi hl, 127                    ; Error
- adi hl, 255                    ; Error
- adi sp, -128                   ; Error
- adi sp, 0                      ; Error
- adi sp, 127                    ; Error
- adi sp, 255                    ; Error
  altd adc (hl)                  ; Error
  altd adc (hl+)                 ; Error
  altd adc (hl-)                 ; Error
@@ -12654,15 +12646,8 @@
  ld de, de'                     ; Error
  ld de, hl                      ; Error
  ld de, hl'                     ; Error
- ld de, hl+0                    ; Error
- ld de, hl+128                  ; Error
- ld de, hl+255                  ; Error
  ld de, ix                      ; Error
  ld de, iy                      ; Error
- ld de, sp                      ; Error
- ld de, sp+0                    ; Error
- ld de, sp+128                  ; Error
- ld de, sp+255                  ; Error
  ld e', (hl)                    ; Error
  ld e', (hl+)                   ; Error
  ld e', (hl-)                   ; Error
@@ -16281,10 +16266,6 @@
  ldf sp, (0x123456)             ; Error
  ldf xix, (0x123456)            ; Error
  ldf yiy, (0x123456)            ; Error
- ldhi -128                      ; Error
- ldhi 0                         ; Error
- ldhi 127                       ; Error
- ldhi 255                       ; Error
  ldi                            ; Error
  ldi (bc), a                    ; Error
  ldi (de), -128                 ; Error
@@ -16555,10 +16536,6 @@
  ldp iy, (0x1234)               ; Error
  ldpirx                         ; Error
  ldrx                           ; Error
- ldsi -128                      ; Error
- ldsi 0                         ; Error
- ldsi 127                       ; Error
- ldsi 255                       ; Error
  ldws                           ; Error
  lea bc, ix                     ; Error
  lea bc, ix+0                   ; Error

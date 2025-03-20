@@ -29,10 +29,18 @@ for my $cpu (Opcode->cpus) {
 		for my $flag ('nz', 'z', 'nc', 'c') {
 			add_synth($cpu, "jr $flag, %j", "jp $flag, %m");
 		}
+	}
+
+	# DJNZ
+	if ($cpu =~ /^(8080|8085)/) {
 		add_synth($cpu, "djnz %j", "dec b", "jp nz, %m");
 		add_synth($cpu, "djnz b, %j", "dec b", "jp nz, %m");
 	}
-	
+	elsif ($cpu =~ /^gbz80/) {
+		add_synth($cpu, "djnz %j", "dec b", "jr nz, %j");
+		add_synth($cpu, "djnz b, %j", "dec b", "jr nz, %j");
+	}
+
 	# JP|CALL|RET EQ, NN
 	add_synth($cpu, "jeq %m", "jz %m");
 	add_synth($cpu, "j_eq %m", "jz %m");
@@ -195,12 +203,11 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, $asm, "push hl : push bc : pop hl : pop bc");
 	}
 	
+	add_synth($cpu, "ex de, hl", "push hl : push de : pop hl : pop de");
 	add_synth($cpu, "ex hl, de", "ex de, hl");
 
 
-	if ($cpu !~ /^(8080|8085)/) {
-		add_emul($cpu, "ex (sp), hl", "__z80asm__ex_sp_hl");
-	}
+	add_emul($cpu, "ex (sp), hl", "__z80asm__ex_sp_hl");
 	
 	add_synth($cpu, "xthl", "ex (sp), hl");
 	
