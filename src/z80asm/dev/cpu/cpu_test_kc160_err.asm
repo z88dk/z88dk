@@ -7731,6 +7731,7 @@
  ld (0x1234), bcde              ; Error
  ld (0x1234), jk                ; Error
  ld (0x1234), jkhl              ; Error
+ ld (0xff00+c), a               ; Error
  ld (c), a                      ; Error
  ld (hl), bcde                  ; Error
  ld (hl), jkhl                  ; Error
@@ -8076,6 +8077,7 @@
  ld a', iir                     ; Error
  ld a', l                       ; Error
  ld a', xpc                     ; Error
+ ld a, (0xff00+c)               ; Error
  ld a, (c)                      ; Error
  ld a, (ix+a)                   ; Error
  ld a, (iy+a)                   ; Error
@@ -12336,14 +12338,14 @@
  ldf py, (0x123456)             ; Error
  ldf pz', (0x123456)            ; Error
  ldf pz, (0x123456)             ; Error
- ldh (-128), a                  ; Error
  ldh (0), a                     ; Error
  ldh (127), a                   ; Error
  ldh (255), a                   ; Error
- ldh a, (-128)                  ; Error
+ ldh (c), a                     ; Error
  ldh a, (0)                     ; Error
  ldh a, (127)                   ; Error
  ldh a, (255)                   ; Error
+ ldh a, (c)                     ; Error
  ldhl sp, -128                  ; Error
  ldhl sp, 0                     ; Error
  ldhl sp, 126                   ; Error

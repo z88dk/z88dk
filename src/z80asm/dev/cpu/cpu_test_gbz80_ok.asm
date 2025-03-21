@@ -448,12 +448,17 @@
  jr z, ASMPC                    ; 28 FE
  jz 0x1234                      ; CA 34 12
  ld (0x1234), a                 ; EA 34 12
+ ld (0x1234), bc                ; F5 79 EA 34 12 78 EA 35 12 F1
+ ld (0x1234), de                ; F5 7B EA 34 12 7A EA 35 12 F1
+ ld (0x1234), hl                ; F5 7D EA 34 12 7C EA 35 12 F1
  ld (0x1234), sp                ; 08 34 12
+ ld (0xff00+c), a               ; E2
  ld (bc), a                     ; 02
  ld (bc+), a                    ; 02 03
  ld (bc-), a                    ; 02 0B
  ld (c), a                      ; E2
  ld (de), a                     ; 12
+ ld (de), hl                    ; E5 D5 E1 D1 73 23 72 2B E5 D5 E1 D1
  ld (de+), a                    ; 12 13
  ld (de-), a                    ; 12 1B
  ld (hl), -128                  ; 36 80
@@ -510,6 +515,7 @@
  ld (hli), h                    ; 74 23
  ld (hli), l                    ; 75 23
  ld a, (0x1234)                 ; FA 34 12
+ ld a, (0xff00+c)               ; F2
  ld a, (bc)                     ; 0A
  ld a, (bc+)                    ; 0A 03
  ld a, (bc-)                    ; 0A 0B
@@ -549,6 +555,7 @@
  ld b, e                        ; 43
  ld b, h                        ; 44
  ld b, l                        ; 45
+ ld bc, (0x1234)                ; F5 FA 34 12 4F FA 35 12 47 F1
  ld bc, (hl)                    ; 4E 23 46 2B
  ld bc, (hl+)                   ; 4E 23 46 23
  ld bc, 0x1234                  ; 01 34 12
@@ -586,6 +593,7 @@
  ld d, e                        ; 53
  ld d, h                        ; 54
  ld d, l                        ; 55
+ ld de, (0x1234)                ; F5 FA 34 12 5F FA 35 12 57 F1
  ld de, (hl)                    ; 5E 23 56 2B
  ld de, (hl+)                   ; 5E 23 56 23
  ld de, 0x1234                  ; 11 34 12
@@ -630,11 +638,13 @@
  ld h, e                        ; 63
  ld h, h                        ; 64
  ld h, l                        ; 65
+ ld hl, (0x1234)                ; F5 FA 34 12 6F FA 35 12 67 F1
+ ld hl, (de)                    ; E5 D5 E1 D1 5E 23 56 2B E5 D5 E1 D1
  ld hl, (hl)                    ; F5 7E 23 66 6F F1
  ld hl, 0x1234                  ; 21 34 12
  ld hl, bc                      ; 60 69
  ld hl, de                      ; 62 6B
- ld hl, sp                      ; 21 00 00 39
+ ld hl, sp                      ; F8 00
  ld hl, sp+0                    ; F8 00
  ld hl, sp+126                  ; F8 7E
  ld hl, sp-128                  ; F8 80
@@ -685,14 +695,14 @@
  ldd h, (hl)                    ; 66 2B
  ldd l, (hl)                    ; 6E 2B
  lddr                           ; CD @__z80asm__lddr
- ldh (-128), a                  ; E0 80
  ldh (0), a                     ; E0 00
  ldh (127), a                   ; E0 7F
  ldh (255), a                   ; E0 FF
- ldh a, (-128)                  ; F0 80
+ ldh (c), a                     ; E2
  ldh a, (0)                     ; F0 00
  ldh a, (127)                   ; F0 7F
  ldh a, (255)                   ; F0 FF
+ ldh a, (c)                     ; F2
  ldhi -128                      ; 28 80
  ldhi 0                         ; 28 00
  ldhi 127                       ; 28 7F
@@ -733,6 +743,8 @@
  ldsi 0                         ; 38 00
  ldsi 127                       ; 38 7F
  ldsi 255                       ; 38 FF
+ lhlde                          ; E5 D5 E1 D1 5E 23 56 2B E5 D5 E1 D1
+ lhlx                           ; E5 D5 E1 D1 5E 23 56 2B E5 D5 E1 D1
  lxi b, 0x1234                  ; 01 34 12
  lxi bc, 0x1234                 ; 01 34 12
  lxi d, 0x1234                  ; 11 34 12
@@ -1161,6 +1173,8 @@
  set 7, e                       ; CB FB
  set 7, h                       ; CB FC
  set 7, l                       ; CB FD
+ shlde                          ; E5 D5 E1 D1 73 23 72 2B E5 D5 E1 D1
+ shlx                           ; E5 D5 E1 D1 73 23 72 2B E5 D5 E1 D1
  sla (hl)                       ; CB 26
  sla a                          ; CB 27
  sla b                          ; CB 20

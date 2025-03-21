@@ -13445,7 +13445,6 @@
  ld hl, ix                      ; Error
  ld hl, iy                      ; Error
  ld hl, lxpc                    ; Error
- ld hl, sp                      ; Error
  ld htr, a                      ; Error
  ld i, a                        ; Error
  ld i, hl                       ; Error

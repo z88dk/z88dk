@@ -290,23 +290,53 @@ for my $cpu (Opcode->cpus) {
 	# 16-bit memory load
 	#--------------------------------------------------------------------------
 
-	if ($cpu !~ /^gbz80/) {
-		add_synth($cpu, "ld bc, (%m)", 
-							"push hl", "ld hl, (%m)", "ld bc, hl", "pop hl");
-		add_synth($cpu, "ld (%m), bc", 
-							"push hl", "ld hl, bc", "ld (%m), hl", "pop hl");
-		
-		add_synth($cpu, "ld de, (%m)", 
-							"ex de, hl", "ld hl, (%m)", "ex de, hl");
-		add_synth($cpu, "ld (%m), de", 
-							"ex de, hl", "ld (%m), hl", "ex de, hl");
-		
-		# LD (NN), SP - account for the pushed hl on the stack
-		add_synth($cpu, "ld (%m), sp", 
-							"push hl",
-							"ld hl, 0x0002", "add hl, sp", "ld (%m), hl",
-							"pop hl");
-	}
+	add_synth($cpu, "ld bc, (%m)", 
+						"push hl", 
+						"ld hl, (%m) : ld bc, hl", 
+						"pop hl");
+	add_synth($cpu, "ld bc, (%m)", 
+						"push af",
+						"ld a, (%m) : ld c, a : ld a, (%m1) : ld b, a",
+						"pop af");
+						
+	add_synth($cpu, "ld (%m), bc", 
+						"push hl", 
+						"ld hl, bc : ld (%m), hl", 
+						"pop hl");
+	add_synth($cpu, "ld (%m), bc", 
+						"push af", 
+						"ld a, c : ld (%m), a : ld a, b : ld (%m1), a", 
+						"pop af");
+	
+	add_synth($cpu, "ld de, (%m)", 
+						"ex de, hl", "ld hl, (%m)", "ex de, hl");
+	add_synth($cpu, "ld de, (%m)", 
+						"push af",
+						"ld a, (%m) : ld e, a : ld a, (%m1) : ld d, a",
+						"pop af");
+						
+	add_synth($cpu, "ld (%m), de", 
+						"ex de, hl", "ld (%m), hl", "ex de, hl");
+	add_synth($cpu, "ld (%m), de", 
+						"push af", 
+						"ld a, e : ld (%m), a : ld a, d : ld (%m1), a", 
+						"pop af");
+	
+	add_synth($cpu, "ld hl, (%m)", 
+						"push af",
+						"ld a, (%m) : ld l, a : ld a, (%m1) : ld h, a",
+						"pop af");
+						
+	add_synth($cpu, "ld (%m), hl", 
+						"push af", 
+						"ld a, l : ld (%m), a : ld a, h : ld (%m1), a", 
+						"pop af");
+
+	# LD (NN), SP - account for the pushed hl on the stack
+	add_synth($cpu, "ld (%m), sp", 
+						"push hl",
+						"ld hl, 0x0002", "add hl, sp", "ld (%m), hl",
+						"pop hl");
 	
 	#--------------------------------------------------------------------------
 	# 16-bit indirect load
@@ -420,14 +450,12 @@ for my $cpu (Opcode->cpus) {
 	}
 	
 	# LD HL, (DE)
-	if ($cpu !~ /^gbz80/) {		# gameboy lacks ex de, hl
-		add_synth($cpu, "ld hl, (de)", 
-							"ex de, hl",
-							"ld e, (hl)", "inc hl", "ld d, (hl)", "dec hl",
-							"ex de, hl");
-		add_synth($cpu, "lhlx", "ld hl, (de)");
-		add_synth($cpu, "lhlde", "ld hl, (de)");
-	}
+	add_synth($cpu, "ld hl, (de)", 
+						"ex de, hl",
+						"ld e, (hl)", "inc hl", "ld d, (hl)", "dec hl",
+						"ex de, hl");
+	add_synth($cpu, "lhlx", "ld hl, (de)");
+	add_synth($cpu, "lhlde", "ld hl, (de)");
 	
 	# LD BC|DE|HL|IX, (IX+d)
 	for my $x ('ix', 'iy') {
@@ -453,14 +481,12 @@ for my $cpu (Opcode->cpus) {
 	}
 
 	# LD (DE), HL
-	if ($cpu !~ /^gbz80/) {		# gameboy lacks ex de, hl
-		add_synth($cpu, "ld (de), hl", 
-							"ex de, hl",
-							"ld (hl), e", "inc hl", "ld (hl), d", "dec hl",
-							"ex de, hl");
-		add_synth($cpu, "shlx", "ld (de), hl");
-		add_synth($cpu, "shlde", "ld (de), hl");
-	}
+	add_synth($cpu, "ld (de), hl", 
+						"ex de, hl",
+						"ld (hl), e", "inc hl", "ld (hl), d", "dec hl",
+						"ex de, hl");
+	add_synth($cpu, "shlx", "ld (de), hl");
+	add_synth($cpu, "shlde", "ld (de), hl");
 	
 	#--------------------------------------------------------------------------
 	# ALU

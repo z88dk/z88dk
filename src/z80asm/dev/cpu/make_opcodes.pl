@@ -247,6 +247,9 @@ sub add_ld_a_ic_gbz80 {
 	
 	add_opcode($cpu, "ld a, (c)", [0xF2]);
 	add_opcode($cpu, "ld (c), a", [0xE2]);
+
+	add_opcode($cpu, "ldh a, (c)", [0xF2]);
+	add_opcode($cpu, "ldh (c), a", [0xE2]);
 }
 
 sub add_ld_a_hli_hld_gbz80 {
@@ -272,8 +275,8 @@ sub add_ld_a_hli_hld_gbz80 {
 sub add_ldh_a_iN_gbz80 {
 	my($cpu) = @_;
 	
-	add_opcode($cpu, "ldh a, (%n)", [0xF0, '%n']);
-	add_opcode($cpu, "ldh (%n), a", [0xE0, '%n']);
+	add_opcode($cpu, "ldh a, (%h)", [0xF0, '%h']);
+	add_opcode($cpu, "ldh (%h), a", [0xE0, '%h']);
 }
 
 sub add_lhld_shld {
@@ -1228,6 +1231,8 @@ sub add_ld_hl_sp_plus_s_gbz80 {
 
 	add_opcode($cpu, "ldhl sp, %s", [0xF8, '%s']);
 	add_opcode($cpu, "ld hl, sp+%s", [0xF8, '%s']);
+
+	add_opcode($cpu, "ld hl, sp", [0xF8, 0]);
 }
 
 sub add_ld_iNN_sp_gbz80 {

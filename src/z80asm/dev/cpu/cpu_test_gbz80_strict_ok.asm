@@ -173,6 +173,7 @@
  jr z, ASMPC                    ; 28 FE
  ld (0x1234), a                 ; EA 34 12
  ld (0x1234), sp                ; 08 34 12
+ ld (0xff00+c), a               ; E2
  ld (bc), a                     ; 02
  ld (c), a                      ; E2
  ld (de), a                     ; 12
@@ -192,6 +193,7 @@
  ld (hld), a                    ; 32
  ld (hli), a                    ; 22
  ld a, (0x1234)                 ; FA 34 12
+ ld a, (0xff00+c)               ; F2
  ld a, (bc)                     ; 0A
  ld a, (c)                      ; F2
  ld a, (de)                     ; 1A
@@ -281,6 +283,7 @@
  ld h, h                        ; 64
  ld h, l                        ; 65
  ld hl, 0x1234                  ; 21 34 12
+ ld hl, sp                      ; F8 00
  ld hl, sp+0                    ; F8 00
  ld hl, sp+126                  ; F8 7E
  ld hl, sp-128                  ; F8 80
@@ -300,14 +303,14 @@
  ld sp, hl                      ; F9
  ldd (hl), a                    ; 32
  ldd a, (hl)                    ; 3A
- ldh (-128), a                  ; E0 80
  ldh (0), a                     ; E0 00
  ldh (127), a                   ; E0 7F
  ldh (255), a                   ; E0 FF
- ldh a, (-128)                  ; F0 80
+ ldh (c), a                     ; E2
  ldh a, (0)                     ; F0 00
  ldh a, (127)                   ; F0 7F
  ldh a, (255)                   ; F0 FF
+ ldh a, (c)                     ; F2
  ldhi -128                      ; 28 80
  ldhi 0                         ; 28 00
  ldhi 127                       ; 28 7F

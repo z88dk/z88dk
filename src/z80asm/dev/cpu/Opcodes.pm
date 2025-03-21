@@ -306,6 +306,15 @@ sub search_opcode {
 		}
 	}
 	
+	# replace %mN my %m
+	if (($asm1 = $asm) =~ s/(%m\d)/%m/) {
+		my $temp = $1;
+		my $opcode = $self->opcodes->{$asm1}{$cpu};
+		if ($opcode) {
+			return $self->_replace_opcode_text($opcode, '%m', $temp);
+		}
+	}
+	
 	# replace %tN by %m
 	# Note: jr %j can have %j in bytes, or %m in case of 8080
 	for my $wildcard ('%m', '%j') {
