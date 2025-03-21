@@ -1,4 +1,5 @@
 @gfx/common/gfx_common.lst
+gfx/narrow/obj/${TARGET}/__ansichar_4x4
 gfx/narrow/obj/${TARGET}/__gfx_coords
 gfx/narrow/obj/${TARGET}/bkrestore3
 gfx/narrow/obj/${TARGET}/bksave2
