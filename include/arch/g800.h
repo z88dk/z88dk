@@ -13,5 +13,9 @@ extern void __LIB__  lcd_contrast() __z88dk_fastcall;
 extern void __LIB__  lcd_on();
 extern void __LIB__  lcd_off();
 
+// pixel-wise scrolling
+extern void __LIB__  scrollup_1px();
+extern void __LIB__  scrollup_4px();
+
 
 #endif
