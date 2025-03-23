@@ -33,7 +33,8 @@
 extern unsigned char a,b,c,d,e,h,l,j,k;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_,j_,k_;
 extern unsigned char xh, xl, yh, yl;
-extern unsigned char ioi, ioe, altd, alts;
+extern unsigned char i, r7;
+extern unsigned char ioi, ioe, altd, alts, iff, im;
 
 extern unsigned short ff, fr, fa, fb, fk, pc, sp, mp;
 extern unsigned short ff_, fr_, fa_, fb_;
@@ -81,6 +82,9 @@ extern int f_(void);
 #define Z88DK_EINVAL   4
 #define Z88DK_ENFILE   5
 #define Z88DK_ENOMEM   6
+
+extern void setf(int a);
+extern void cpu_run(long long counter, long long stint, int intr, int start, int end);
 
 typedef void (*hook_command)(void);
 
