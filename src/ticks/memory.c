@@ -79,7 +79,7 @@ uint8_t get_memory(uint32_t pc, memtype type)
 uint8_t put_memory(uint16_t pc, uint8_t b)
 {
   bk.debugger_write_memory(pc, b);
-  if (pc < rom_size)
+  if (pc < c_rom_size)
     return *get_memory_addr(pc, MEM_TYPE_DATA);
   else
     return *get_memory_addr(pc, MEM_TYPE_DATA) = b;

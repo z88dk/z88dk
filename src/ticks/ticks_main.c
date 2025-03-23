@@ -13,6 +13,13 @@ extern backend_t ticks_debugger_backend;
 
 static long long counter = 1e8;
 
+static char  *c_output = NULL;
+       int    c_rc2014_mode = 0;
+       int    c_rom_size = 0;
+       int    c_ioport = -1;
+       int    c_autolabel = 0;
+
+
 char   cmd_arguments[255];
 int    cmd_arguments_len = 0;
 
@@ -29,6 +36,102 @@ static void exit_log(int code, char *fmt, ...)
 
     va_end(ap);
     exit(code);
+}
+
+static void write_output()
+{
+    FILE *fh;
+    uint8_t t, r, w;
+
+    if( c_output ){
+        fh= fopen(c_output, "wb+");
+        if( !fh ) {
+            fprintf(stderr, "\nCannot create or write in file: %s\n", c_output);
+            exit(EXIT_FAILURE);
+        }
+
+        if (!strcasecmp(strchr(c_output, '.'), ".sna" ) ) {
+            put_memory(--sp,pc>>8),
+            put_memory(--sp,pc),
+            fwrite(&i, 1, 1, fh),
+            fwrite(&l_, 1, 1, fh),
+            fwrite(&h_, 1, 1, fh),
+            fwrite(&e_, 1, 1, fh),
+            fwrite(&d_, 1, 1, fh),
+            fwrite(&c_, 1, 1, fh),
+            fwrite(&b_, 1, 1, fh),
+            t= f(),
+            ff= ff_,
+            fr= fr_,
+            fa= fa_,
+            fb= fb_,
+            w= f(),
+            fwrite(&w, 1, 1, fh),
+            fwrite(&a_, 1, 1, fh),
+            fwrite(&l, 1, 1, fh),
+            fwrite(&h, 1, 1, fh),
+            fwrite(&e, 1, 1, fh),
+            fwrite(&d, 1, 1, fh),
+            fwrite(&c, 1, 1, fh),
+            fwrite(&b, 1, 1, fh),
+            fwrite(&yl, 1, 1, fh),
+            fwrite(&yh, 1, 1, fh),
+            fwrite(&xl, 1, 1, fh),
+            fwrite(&xh, 1, 1, fh),
+            iff<<= 2,
+            fwrite(&iff, 1, 1, fh),
+            r= ((r&127)|(r7&128)),
+            fwrite(&r, 1, 1, fh),
+            fwrite(&t, 1, 1, fh),
+            fwrite(&a, 1, 1, fh),
+            fwrite(&sp, 2, 1, fh),
+            fwrite(&im, 1, 1, fh),
+            fwrite(&w, 1, 1, fh),
+            fwrite(get_memory_addr(0x4000, MEM_TYPE_INST), 1, 0xc000, fh);
+        } else if ( !strcasecmp(strchr(c_output, '.'), ".scr" ) ) {
+            fwrite(get_memory_addr(0x4000, MEM_TYPE_INST), 1, 0x1b00, fh);
+        } else {
+            fwrite(get_memory_addr(0, MEM_TYPE_INST), 1, 65536, fh);
+            w= f();
+            fwrite(&w, 1, 1, fh);    // 10000 F
+            fwrite(&a, 1, 1, fh);    // 10001 A
+            fwrite(&c, 1, 1, fh);    // 10002 C
+            fwrite(&b, 1, 1, fh);    // 10003 B
+            fwrite(&l, 1, 1, fh);    // 10004 L
+            fwrite(&h, 1, 1, fh);    // 10005 H
+            fwrite(&pc, 2, 1, fh);   // 10006 PCl
+                                    // 10007 PCh
+            fwrite(&sp, 2, 1, fh);   // 10008 SPl
+                                    // 10009 SPh
+            fwrite(&i, 1, 1, fh);    // 1000a I
+            r= ((r&127)|(r7&128));
+            fwrite(&r, 1, 1, fh);    // 1000b R
+            fwrite(&e, 1, 1, fh);    // 1000c E
+            fwrite(&d, 1, 1, fh);    // 1000d D
+            fwrite(&c_, 1, 1, fh);   // 1000e C'
+            fwrite(&b_, 1, 1, fh);   // 1000f B'
+            fwrite(&e_, 1, 1, fh);   // 10010 E'
+            fwrite(&d_, 1, 1, fh);   // 10011 D'
+            fwrite(&l_, 1, 1, fh);   // 10012 L'
+            fwrite(&h_, 1, 1, fh);   // 10013 H'
+            ff= ff_;
+            fr= fr_;
+            fa= fa_;
+            fb= fb_;
+            w= f();
+            fwrite(&w, 1, 1, fh);    // 10014 F'
+            fwrite(&a_, 1, 1, fh);   // 10015 A'
+            fwrite(&yl, 1, 1, fh);   // 10016 IYl
+            fwrite(&yh, 1, 1, fh);   // 10017 IYh
+            fwrite(&xl, 1, 1, fh);   // 10018 IXl
+            fwrite(&xh, 1, 1, fh);   // 10019 IXh
+            fwrite(&iff, 1, 1, fh);  // 1001a IFF
+            fwrite(&im, 1, 1, fh);   // 1001b IM
+            fwrite(&mp, 2, 1, fh);   // 1001c MEMPTRl
+                                     // 1001d MEMPTRh
+        }
+        fclose(fh);
+    }
 }
 
 int main (int argc, char **argv){
@@ -74,6 +177,7 @@ int main (int argc, char **argv){
     printf("  -ide0 <file>   Set file to be ide device 0\n"),
     printf("  -ide1 <file>   Set file to be ide device 1\n"),
     printf("  -iochar X      Set port X to be character input/output\n"),
+    printf("  -output <file> dumps the RAM content to a 64K file\n"),
     printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n"),
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
     printf("  -x <file>      Symbol or map file to read\n"),
@@ -110,7 +214,7 @@ int main (int argc, char **argv){
           end= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 'r':
-          rom_size= strtol(argv[1], NULL, 16);
+          c_rom_size= strtol(argv[1], NULL, 16);
           break;
         case 'i':
           if ( strcmp(&argv[0][1], "ide0") == 0 ) {
@@ -118,7 +222,7 @@ int main (int argc, char **argv){
           } else if ( strcmp(&argv[0][1], "ide1") == 0 ) {
             hook_io_set_ide_device(1, argv[1]);
           } else if ( strcmp(&argv[0][1], "iochar") == 0 ) {
-            ioport = strtol(argv[1], NULL, 10);
+            c_ioport = strtol(argv[1], NULL, 10);
           } else {
             intr= strtol(argv[1], NULL, 10);
           }
@@ -185,6 +289,9 @@ int main (int argc, char **argv){
           argv--;
           argc++;
           break;
+        case 'o':
+          c_output= argv[1];
+          break;
         case 't':
           if (strcmp(&argv[0][1], "trace") == 0) {
             debugger_active = 0;
@@ -240,7 +347,7 @@ int main (int argc, char **argv){
         *get_memory_addr(0x18, MEM_TYPE_INST) = 0xED;
         *get_memory_addr(0x19, MEM_TYPE_INST) = 0xFE;
         *get_memory_addr(0x1a, MEM_TYPE_INST) = 0xC9;
-        rc2014_mode = 1;
+        c_rc2014_mode = 1;
         if (1 != fread(get_memory_addr(pc, MEM_TYPE_INST), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
       } else if( !strcasecmp(strchr(argv[1], '.'), ".com" ) ){
         *get_memory_addr(5, MEM_TYPE_INST) = 0xED;
@@ -283,7 +390,7 @@ int main (int argc, char **argv){
   cpu_run(counter, intr, intr, start, end);
 
   if ( alarmtime != 0 ) {
-     if ( rc2014_mode ) exit(l);
+     if ( c_rc2014_mode ) exit(l);
       /* We running as a test, we should never reach the end, so exit with error */
       exit(1);
   }

@@ -779,10 +779,6 @@ static void handle_cb_page(void);
 
 
 
-int    ioport = -1;
-int    rom_size = 0;
-int    rc2014_mode = 0;
-int    c_autolabel = 0;
 int    break_required = 0;
 
 
