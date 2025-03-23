@@ -129,6 +129,10 @@ static void write_output()
             fwrite(&im, 1, 1, fh);   // 1001b IM
             fwrite(&mp, 2, 1, fh);   // 1001c MEMPTRl
                                      // 1001d MEMPTRh
+
+            long l = 0;
+            fwrite(&l, 4, 1, fh);  // 1001e wavlen
+            fwrite(&l, 4, 1, fh);   // 10022 sttap                      
         }
         fclose(fh);
     }
