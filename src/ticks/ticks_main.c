@@ -398,4 +398,6 @@ int main (int argc, char **argv){
       /* We running as a test, we should never reach the end, so exit with error */
       exit(1);
   }
+
+  write_output();
 }
