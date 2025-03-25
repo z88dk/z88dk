@@ -13,7 +13,7 @@ BEGIN {
 use Carp (); 
 use Data::Dump 'dump'; 
 $SIG{__DIE__} = \&Carp::confess;
-use warnings FATAL => 'uninitialized'; 
+use warnings FATAL => 'all';
 
 @ARGV==2 or die "Usage: $0 input_file.dat output_file.h\n";
 my($input_file, $output_file) = @ARGV;

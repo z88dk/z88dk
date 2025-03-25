@@ -6,157 +6,158 @@ for my $cpu1 ('z80') {
 	for my $strict ('', '_strict') {
 		my $cpu = $cpu1.$strict;
 		
-		add_mov_r_r($cpu) if !$strict;
-        add_mvi_r_N($cpu) if !$strict;
-		add_ld_r_r($cpu);
-        add_ld_r_N($cpu);
-        add_ld_ixh_r($cpu) if !$strict;
-        add_ld_ixh_N($cpu) if !$strict;
-        add_ld_idx_r($cpu);
-        add_ld_idx_N($cpu);
+		add_opcodes($cpu, "mov <r>, <r>") if !$strict;
+        add_opcodes($cpu, "mvi <r>, N") if !$strict;
+		add_opcodes($cpu, "ld <r>, <r>");
+        add_opcodes($cpu, "ld <r>, N");
+        add_opcodes($cpu, "ld <x8>, <r>") if !$strict;
+        add_opcodes($cpu, "ld <x8>, N") if !$strict;
+        add_opcodes($cpu, "ld (<x>+DIS), <r>");
+        add_opcodes($cpu, "ld (<x>+DIS), N");
 		
-		add_lxi_r_NN($cpu) if !$strict;
-        add_lxi_rp_NN($cpu) if !$strict;
-        add_ld_rp_NN($cpu);
-        add_ld_ix_NN($cpu);
+		add_opcodes($cpu, "lxi <r>, NN") if !$strict;
+        add_opcodes($cpu, "lxi <rp>, NN") if !$strict;
+        add_opcodes($cpu, "ld <rp>, NN");
+        add_opcodes($cpu, "ld <x>, NN");
 
-        add_lda_sta($cpu) if !$strict;
-        add_ld_a_iNN($cpu);
+        add_opcodes($cpu, "lda/sta [8080]") if !$strict;
+        add_opcodes($cpu, "ld a, (NN)");
         
-        add_lhld_shld($cpu) if !$strict;
-        add_ld_hl_iNN($cpu);
-        add_ld_ix_iNN($cpu);
-		add_ld_rp_iNN($cpu);
+        add_opcodes($cpu, "lhld/shld [8080]") if !$strict;
+        add_opcodes($cpu, "ld hl, (NN)");
+        add_opcodes($cpu, "ld <x>, (NN)");
+		add_opcodes($cpu, "ld <rp>, (NN)");
 
-        add_ldax_stax_r($cpu) if !$strict;
-        add_ldax_stax_rp($cpu) if !$strict;
-        add_ld_a_ibc($cpu);
+        add_opcodes($cpu, "ldax <r>/stax <r> [8080]") if !$strict;
+        add_opcodes($cpu, "ldax <rp>/stax <rp> [8080]") if !$strict;
+        add_opcodes($cpu, "ld a, (<rp>)");
         
-        add_xchg($cpu) if !$strict;
-        add_ex_de_hl($cpu);
-        add_ex_af_af($cpu);
-        add_exx($cpu);
+        add_opcodes($cpu, "xchg [8080]") if !$strict;
+        add_opcodes($cpu, "ex de, hl");
+        add_opcodes($cpu, "ex af, af'");
+        add_opcodes($cpu, "exx");
 
-		add_alu_r_8080($cpu) if !$strict;
-		add_alu_r_z80($cpu);
-		add_alu_r_extra($cpu) if !$strict;
+		add_opcodes($cpu, "<alu> <r> [8080]") if !$strict;
+		add_opcodes($cpu, "<alu> <r>");
+		add_opcodes($cpu, "<alu-extra> <r>") if !$strict;
 		
-		add_alu_idx($cpu);
-		add_alu_idx_extra($cpu) if !$strict;
+		add_opcodes($cpu, "<alu> (<x>+DIS)");
+		add_opcodes($cpu, "<alu-extra> (<x>+DIS)") if !$strict;
 		
-		add_alu_ixh($cpu) if !$strict;
-		add_alu_ixh_extra($cpu) if !$strict;
+		add_opcodes($cpu, "<alu> <x8>") if !$strict;
+		add_opcodes($cpu, "<alu-extra> <x8>") if !$strict;
 		
-		add_alu_N_8080($cpu) if !$strict;
-		add_alu_N_z80($cpu);
-		add_alu_N_extra($cpu) if !$strict;
+		add_opcodes($cpu, "<alu> N [8080]") if !$strict;
+		add_opcodes($cpu, "<alu> N");
+		add_opcodes($cpu, "<alu-extra> N") if !$strict;
 		
-		add_inr_dcr_r($cpu) if !$strict;
-		add_inc_dec_r($cpu);
-		add_inc_dec_idx($cpu);
-		add_inc_dec_ixh($cpu) if !$strict;
+		add_opcodes($cpu, "inr/dcr <r> [8080]") if !$strict;
+		add_opcodes($cpu, "inc/dec <r>");
+		add_opcodes($cpu, "inc/dec (<x>+DIS)");
+		add_opcodes($cpu, "inc/dec <x8>") if !$strict;
 		
-		add_inx_dcx_r($cpu) if !$strict;
-		add_inx_dcx_rp($cpu) if !$strict;
-		add_inc_dec_rp($cpu);
-		add_inc_dec_ix($cpu);
+		add_opcodes($cpu, "inx/dcx <r> [8080]") if !$strict;
+		add_opcodes($cpu, "inx/dec <rp> [8080]") if !$strict;
+		add_opcodes($cpu, "inc/dec <rp>");
+		add_opcodes($cpu, "inc/dec <x>");
 
-		add_dad_r($cpu) if !$strict;
-		add_dad_rp($cpu) if !$strict;
-		add_add_hl_rp($cpu);
-		add_add_ix_rp($cpu);
-		add_adc_sbc_hl_rp($cpu);
+		add_opcodes($cpu, "dad <r> [8080]") if !$strict;
+		add_opcodes($cpu, "dad <rp> [8080]") if !$strict;
+		add_opcodes($cpu, "add hl, <rp>");
+		add_opcodes($cpu, "add <x>, <rp>");
+		add_opcodes($cpu, "sbc/adc hl, <rp>");
 		
-		add_daa($cpu);
-		add_cma($cpu) if !$strict;
-		add_cpl($cpu);
-		add_cpl_a($cpu) if !$strict;
-		add_cmc($cpu) if !$strict;
-		add_ccf($cpu);
-		add_stc($cpu) if !$strict;
-		add_scf($cpu);
+		add_opcodes($cpu, "daa");
+		add_opcodes($cpu, "cma [8080]") if !$strict;
+		add_opcodes($cpu, "cpl");
+		add_opcodes($cpu, "cpl a") if !$strict;
+		add_opcodes($cpu, "cmc [8080]") if !$strict;
+		add_opcodes($cpu, "ccf");
+		add_opcodes($cpu, "stc [8080]") if !$strict;
+		add_opcodes($cpu, "scf");
 
-		add_rot_a_8080($cpu) if !$strict;
-		add_rot_a_z80($cpu);
+		add_opcodes($cpu, "<rot-a> [8080]") if !$strict;
+		add_opcodes($cpu, "<rot-a>");
 		
-		add_rot_z80($cpu);
-		add_rot_z80_idx($cpu);
-		add_rot_z80_undocumented($cpu) if !$strict;
-		add_rot_z80_idx_undocumented($cpu) if !$strict;
-		add_rot_idx_r_undocumented($cpu) if !$strict;
-		add_bit_res_set_z80($cpu);
-		add_bit_res_set_z80_idx($cpu);
-		add_bit_res_set_z80_idx_r($cpu) if !$strict;
+		add_opcodes($cpu, "<rot> <r>");
+		add_opcodes($cpu, "<rot> (<x>+DIS)");
+		add_opcodes($cpu, "<rot-undoc> <r>") if !$strict;
+		add_opcodes($cpu, "<rot-undoc> (<x>+DIS)") if !$strict;
+		add_opcodes($cpu, "<rot-undoc> (<x>+DIS), <r>") if !$strict;
+		add_opcodes($cpu, "<bit> <b>, <r>");
+		add_opcodes($cpu, "<bit> <b>, (<x>+DIS)");
+		add_opcodes($cpu, "<bit-undoc> <b>, (<x>+DIS), <r>") if !$strict;
 		
-		add_jr($cpu);
-		add_djnz($cpu);
-		add_jr_flag($cpu);
+		add_opcodes($cpu, "jr DIS");
+		add_opcodes($cpu, "djnz DIS");
+		add_opcodes($cpu, "djnz b, DIS") if !$strict;
+		add_opcodes($cpu, "jr <f>, DIS");
 		
-		add_jmp($cpu) if !$strict;
-		add_jp($cpu);
-		add_jflag($cpu) if !$strict;
-		add_j_flag($cpu) if !$strict;
-		add_jp_8080($cpu) if 0;
-		add_jp_flag($cpu);
-		add_jmp_flag($cpu) if !$strict;
+		add_opcodes($cpu, "jmp NN") if !$strict;
+		add_opcodes($cpu, "jp NN");
+		add_opcodes($cpu, "j<f> NN") if !$strict;
+		add_opcodes($cpu, "j_<f> NN") if !$strict;
+		add_opcodes($cpu, "jmp <f>, NN") if !$strict;
+		add_opcodes($cpu, "jp <f>, NN");
 		
-        add_pchl($cpu) if !$strict;
-        add_jp_hl($cpu);
-        add_jp_ix($cpu);
-        add_jmp_hl($cpu) if !$strict;
-        add_jmp_ix($cpu) if !$strict;
+        add_opcodes($cpu, "pchl [8080]") if !$strict;
+        add_opcodes($cpu, "jp (hl)");
+        add_opcodes($cpu, "jp (<x>)");
+        add_opcodes($cpu, "jmp (hl)") if !$strict;
+        add_opcodes($cpu, "jmp (<x>)") if !$strict;
 
-		add_call($cpu);
-		add_cflag($cpu) if !$strict;
-		add_c_flag($cpu) if !$strict;
-		add_cp_8080($cpu) if 0;
-		add_call_flag($cpu);
+		add_opcodes($cpu, "call NN");
+		add_opcodes($cpu, "c<flag> NN") if !$strict;
+		add_opcodes($cpu, "c_<f> NN") if !$strict;
+		add_opcodes($cpu, "call <f>, NN");
 				
-		add_ret($cpu);
-		add_rflag($cpu) if !$strict;
-		add_r_flag($cpu) if !$strict;
-		add_ret_flag($cpu);
+		add_opcodes($cpu, "rst NN");
 		
-		add_rst($cpu);
+		add_opcodes($cpu, "ret");
+		add_opcodes($cpu, "r<f>") if !$strict;
+		add_opcodes($cpu, "r_<f>") if !$strict;
+		add_opcodes($cpu, "ret <f>");
 		
-        add_push_pop_r($cpu) if !$strict;
-        add_push_pop_rp($cpu);
-        add_push_pop_ix($cpu);
+        add_opcodes($cpu, "push/pop <r>") if !$strict;
+        add_opcodes($cpu, "push/pop <rp>");
+        add_opcodes($cpu, "push/pop <x>");
         
-		add_xthl($cpu) if !$strict;
-		add_ex_isp_hl($cpu);
-		add_ex_isp_ix($cpu);
+		add_opcodes($cpu, "xthl [8080]") if !$strict;
+		add_opcodes($cpu, "ex (sp), hl");
+		add_opcodes($cpu, "ex (sp), <x>");
 
-		add_sphl($cpu) if !$strict;
-		add_ld_sp_hl($cpu);
-		add_ld_sp_ix($cpu);
+		add_opcodes($cpu, "sphl [8080]") if !$strict;
+		add_opcodes($cpu, "ld sp, hl");
+		add_opcodes($cpu, "ld sp, <x>");
 		
-		add_in_N($cpu) if !$strict;
-		add_in_a_N($cpu);
-		add_out_N($cpu) if !$strict;
-		add_out_N_a($cpu);
-		add_in_r_c($cpu);
-		add_in_r_c_extra($cpu) if !$strict;
-		add_out_c_r($cpu);
-		add_out_c_r_extra($cpu) if !$strict;
-		add_in_out_undocumented($cpu) if !$strict;
-		
-		add_ei_di($cpu);
-		add_hlt($cpu) if !$strict;
-		add_halt($cpu);
-		add_nop($cpu);
-        add_im($cpu);
-        add_ld_i_r($cpu);
-		add_reti($cpu);
-		add_retn($cpu);
-		add_neg($cpu);
-		add_neg_a($cpu) if !$strict;
-		add_rld_rrd($cpu);
+		add_opcodes($cpu, "in N [8080]") if !$strict;
+		add_opcodes($cpu, "in a, (N)");
+		add_opcodes($cpu, "out N [8080]") if !$strict;
+		add_opcodes($cpu, "out (N), a");
 
-        add_block_move($cpu);
-        add_block_search($cpu);
-        add_block_input($cpu);
-        add_block_output($cpu);
+		add_opcodes($cpu, "in <r>, (c)");
+		add_opcodes($cpu, "in <r>, (bc)") if !$strict;
+		add_opcodes($cpu, "out (c), <r>");
+		add_opcodes($cpu, "out (bc), <r>") if !$strict;
+		add_opcodes($cpu, "in/out-undoc") if !$strict;
+		
+		add_opcodes($cpu, "ei/di");
+		add_opcodes($cpu, "hlt [8080]") if !$strict;
+		add_opcodes($cpu, "halt");
+		add_opcodes($cpu, "nop");
+        add_opcodes($cpu, "im N");
+        add_opcodes($cpu, "ld i/r, a");
+		add_opcodes($cpu, "reti");
+		add_opcodes($cpu, "retn");
+
+		add_opcodes($cpu, "neg");
+		add_opcodes($cpu, "neg a") if !$strict;
+		add_opcodes($cpu, "rld/rrd");
+
+        add_opcodes($cpu, "ldi/ldir/ldd/lddr");
+        add_opcodes($cpu, "cpi/cpir/cpd/cpdr");
+        add_opcodes($cpu, "ini/inir/ind/indr");
+        add_opcodes($cpu, "outi/otir/outd/otdr");
     }
 }
 

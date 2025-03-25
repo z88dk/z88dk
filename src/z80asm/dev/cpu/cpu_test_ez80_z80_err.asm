@@ -4462,14 +4462,6 @@
  im 4                           ; Error
  in f, (bc)                     ; Error
  in f, (c)                      ; Error
- in0 (-128)                     ; Error
- in0 (0)                        ; Error
- in0 (127)                      ; Error
- in0 (255)                      ; Error
- in0 f, (-128)                  ; Error
- in0 f, (0)                     ; Error
- in0 f, (127)                   ; Error
- in0 f, (255)                   ; Error
  inc (ahl)                      ; Error
  inc (aix)                      ; Error
  inc (aix+0)                    ; Error

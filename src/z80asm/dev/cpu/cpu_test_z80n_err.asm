@@ -4967,10 +4967,6 @@
  im -1                          ; Error
  im 3                           ; Error
  im 4                           ; Error
- in0 (-128)                     ; Error
- in0 (0)                        ; Error
- in0 (127)                      ; Error
- in0 (255)                      ; Error
  in0 a, (-128)                  ; Error
  in0 a, (0)                     ; Error
  in0 a, (127)                   ; Error
@@ -4991,10 +4987,6 @@
  in0 e, (0)                     ; Error
  in0 e, (127)                   ; Error
  in0 e, (255)                   ; Error
- in0 f, (-128)                  ; Error
- in0 f, (0)                     ; Error
- in0 f, (127)                   ; Error
- in0 f, (255)                   ; Error
  in0 h, (-128)                  ; Error
  in0 h, (0)                     ; Error
  in0 h, (127)                   ; Error

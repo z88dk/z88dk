@@ -15,7 +15,7 @@ use Clone 'clone';
 use Carp (); 
 use Data::Dump 'dump'; 
 $SIG{__DIE__} = \&Carp::confess;
-use warnings FATAL => 'uninitialized'; 
+use warnings FATAL => 'all';
 
 @ARGV==2 or die "Usage: $0 input_file.dat output_basename\n";
 my($input_file, $output_basename) = @ARGV;
