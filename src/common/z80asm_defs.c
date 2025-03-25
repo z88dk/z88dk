@@ -60,6 +60,7 @@ static cpu_lookup_t cpu_lut[] = {
     { "8080_strict",CPU_8080_STRICT,    CPU_UNDEF,          CPU_8080,       true,   },  // 17
     { "8085_strict",CPU_8085_STRICT,    CPU_8080,           CPU_8085,       true,   },  // 18
     { "gbz80_strict",CPU_GBZ80_STRICT,  CPU_UNDEF,          CPU_GBZ80,      true,   },  // 19
+    { "z180_strict",CPU_Z180_STRICT,  	CPU_8080,          	CPU_Z180,       true,   },  // 20
 };
 
 static cpu_lookup_t* cpu_lu_hash = NULL;        // lookup from cpu name

@@ -16007,10 +16007,8 @@
  otirx.sil                      ; Error
  out (bc), -1                   ; Error
  out (bc), 1                    ; Error
- out (bc), f                    ; Error
  out (c), -1                    ; Error
  out (c), 1                     ; Error
- out (c), f                     ; Error
  outd x                         ; Error
  outd.l                         ; Error
  outd.lis                       ; Error
