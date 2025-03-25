@@ -14,7 +14,7 @@ use Clone 'clone';
 use Text::Table;
 use Carp (); 
 $SIG{__DIE__} = \&Carp::confess;
-use warnings FATAL => 'uninitialized'; 
+use warnings FATAL => 'all';
 
 @ARGV==2 or die "Usage: $0 input_file.dat output_file.txt\n";
 my($input_file, $output_file) = @ARGV;

@@ -262,7 +262,6 @@
  dec sp                         ; 3B
  di                             ; F3
  djnz ASMPC                     ; 10 FE
- djnz b, ASMPC                  ; 10 FE
  ei                             ; FB
  ex (sp), hl                    ; E3
  ex (sp), ix                    ; FD E3

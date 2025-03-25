@@ -19,6 +19,7 @@ package Opcode;
 #------------------------------------------------------------------------------
 
 use Modern::Perl;
+use warnings FATAL => 'all';
 
 my @fields = 	 qw( asm cpu synth const ops );
 use Object::Tiny qw( asm cpu synth const ops );
@@ -30,6 +31,7 @@ my @CPUS = (qw(
 	z80_strict
 	z80n
 	z180
+	z180_strict
 	ez80
 	ez80_z80
 	r800

@@ -34,6 +34,7 @@ typedef enum {
     CPU_8080_STRICT	= 17,
     CPU_8085_STRICT	= 18,
     CPU_GBZ80_STRICT= 19,
+	CPU_Z180_STRICT	= 20,
 
     CPU_UNDEF       = -1,
 } cpu_t;
