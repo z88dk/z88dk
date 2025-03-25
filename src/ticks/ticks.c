@@ -45,14 +45,14 @@
  // ld a,(de) ld a,(bc) ld a,(de)
  // Note, alts does not come into play
 #define LDRP(a, b, r) do {         \
-          st += isez80() ? 2 : israbbit() ? (&a == &h) ? 5 : 6 : isgbz80() ? 8 : isz180() ? 6 : isr800() ? 2 : iskc160() ? 2 : 7, \
-          r= get_memory_data(mp= b|a<<8),   \
+          st += isez80() ? 2 : israbbit() ? (&a == &h) ? 5 : 6 : isgbz80() ? 8 : isz180() ? 6 : isr800() ? 2 : iskc160() ? 2 : 7; \
+          r= get_memory_data(mp= b|a<<8);   \
           ++mp; \
         } while (0)
 
 // ld r,(ix+d)
 #define LDRPI(a, b, r) do {         \
-          st += isez80() ? 3 : israbbit() ? 7 : isz180() ? 11 : isr800() ? 5 : iskc160() ? 3 : 15, \
+          st += isez80() ? 3 : israbbit() ? 7 : isz180() ? 11 : isr800() ? 5 : iskc160() ? 3 : 15; \
           r= get_memory_data(((get_memory_inst(pc++)^128)-128+(b|a<<8))&65535); \
         } while (0)
 

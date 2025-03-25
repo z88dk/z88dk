@@ -11,17 +11,19 @@
 
 extern backend_t ticks_debugger_backend;
 
-static long long counter = 1e8;
-
+static long long c_max_runticks = 1e8;
 static char  *c_output = NULL;
-       int    c_rc2014_mode = 0;
-       int    c_rom_size = 0;
-       int    c_ioport = -1;
-       int    c_autolabel = 0;
+static char  *c_memory_model = "standard";
 
 
-char   cmd_arguments[255];
-int    cmd_arguments_len = 0;
+int    c_rc2014_mode = 0;
+int    c_rom_size = 0;
+int    c_ioport = -1;
+int    c_autolabel = 0;
+
+
+static char   cmd_arguments[255];
+static int    cmd_arguments_len = 0;
 
 
 static void exit_log(int code, char *fmt, ...)
@@ -138,67 +140,74 @@ static void write_output()
     }
 }
 
+static void usage(void)
+{
+    printf("z88dk-ticks is derived from a silent Z80 emulator by Antonio Villena (v0.14c beta)\n\n");
+    printf("  z88dk-ticks [-x <file>] [-pc X] [-start X] [-end X] [-counter X] <input_file>\n\n");
+    printf("  <input_file>   File between 1 and 65536 bytes with Z80 machine code\n");
+    printf("  -trace         outputs register values and disassembly while executing\n");
+    printf("  -pc X          X in hexadecimal is the initial PC value\n");
+    printf("  -start X       X in hexadecimal is the PC condition to start the counter\n");
+    printf("  -end X         X in hexadecimal is the PC condition to exit\n");
+    printf("  -counter X     X in decimal is another condition to exit\n");
+    printf("  -int X         X in decimal are number of cycles for periodic interrupts\n");
+    printf("  -d             Enable debugger\n");
+    printf("  -v             Verbose logging\n");
+    printf("  -l X           Load file to address\n");
+    printf("  -b <model>     Memory model (zxn/zx/z180/msx)\n");
+    printf("  -m8080         Emulate an 8080\n");
+    printf("  -m8085         Emulate an 8085 (mostly)\n");
+    printf("  -mgbz80        Emulate a gbz80 (mostly)\n");
+    printf("  -mz80          Emulate a z80\n");
+    printf("  -mz80_strict   Emulate a z80\n");
+    printf("  -mz180         Emulate a z180\n");
+    printf("  -mr2ka         Emulate a Rabbit 2000\n");
+    printf("  -mr3k          Emulate a Rabbit 3000\n");
+    printf("  -mr4k          Emulate a Rabbit 4000\n");
+    printf("  -mr5k          Emulate a Rabbit 5000\n");
+    printf("  -mr6k          Emulate a Rabbit 6000\n");
+    printf("  -mz80n         Emulate a Spectrum Next z80n\n");
+    printf("  -mez80_z80     Emulate an ez80 (z80 mode)\n");
+    printf("  -mr800         Emulate a r800 (ticks may not be accurate)\n");
+    printf("  -mkc160        Emulate a kc160\n");
+    printf("  -mkc160_z80    Emulate a kc160 (z80 mode)\n");
+    printf("  -ide0 <file>   Set file to be ide device 0\n");
+    printf("  -ide1 <file>   Set file to be ide device 1\n");
+    printf("  -iochar X      Set port X to be character input/output\n");
+    printf("  -output <file> dumps the RAM content to a 64K file\n");
+    printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n");
+    printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n");
+    printf("  -x <file>      Symbol or map file to read\n");
+	printf("  -script <file> Script file to run at the console\n");
+    printf("                 Use before -pc,-start,-end to enable symbols\n\n");
+    printf("  Default values for -pc, -start and -end are 0000 if omitted.\n");
+    printf("  When the program exits, it'll show the number of cycles between start and end trigger in decimal\n\n");
+}
+  
+
 int main (int argc, char **argv){
   int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0, symbol_addr = -1;
   uint8_t opc, w, r, u;
-  char  *memory_model = "standard";
   FILE * fh;
 
   hook_init();
   set_backend(ticks_debugger_backend);
   apu_reset();
 
-  if( argc==1 )
-    printf("z88dk-ticks is derived from a silent Z80 emulator by Antonio Villena (v0.14c beta)\n\n"),
-    printf("  z88dk-ticks [-x <file>] [-pc X] [-start X] [-end X] [-counter X] <input_file>\n\n"),
-    printf("  <input_file>   File between 1 and 65536 bytes with Z80 machine code\n"),
-    printf("  -trace         outputs register values and disassembly while executing\n"),
-    printf("  -pc X          X in hexadecimal is the initial PC value\n"),
-    printf("  -start X       X in hexadecimal is the PC condition to start the counter\n"),
-    printf("  -end X         X in hexadecimal is the PC condition to exit\n"),
-    printf("  -counter X     X in decimal is another condition to exit\n"),
-    printf("  -int X         X in decimal are number of cycles for periodic interrupts\n"),
-    printf("  -d             Enable debugger\n"),
-    printf("  -v             Verbose logging\n"),
-    printf("  -l X           Load file to address\n"),
-    printf("  -b <model>     Memory model (zxn/zx/z180/msx)\n"),
-    printf("  -m8080         Emulate an 8080\n"),
-    printf("  -m8085         Emulate an 8085 (mostly)\n"),
-    printf("  -mgbz80        Emulate a gbz80 (mostly)\n"),
-    printf("  -mz80          Emulate a z80\n"),
-    printf("  -mz80_strict   Emulate a z80\n"),
-    printf("  -mz180         Emulate a z180\n"),
-    printf("  -mr2ka         Emulate a Rabbit 2000\n"),
-    printf("  -mr3k          Emulate a Rabbit 3000\n"),
-    printf("  -mr4k          Emulate a Rabbit 4000\n"),
-    printf("  -mr5k          Emulate a Rabbit 5000\n"),
-    printf("  -mr6k          Emulate a Rabbit 6000\n"),
-    printf("  -mz80n         Emulate a Spectrum Next z80n\n"),
-    printf("  -mez80_z80     Emulate an ez80 (z80 mode)\n"),
-    printf("  -mr800         Emulate a r800 (ticks may not be accurate)\n"),
-    printf("  -mkc160        Emulate a kc160\n"),
-    printf("  -mkc160_z80    Emulate a kc160 (z80 mode)\n"),
-    printf("  -ide0 <file>   Set file to be ide device 0\n"),
-    printf("  -ide1 <file>   Set file to be ide device 1\n"),
-    printf("  -iochar X      Set port X to be character input/output\n"),
-    printf("  -output <file> dumps the RAM content to a 64K file\n"),
-    printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n"),
-    printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
-    printf("  -x <file>      Symbol or map file to read\n"),
-	printf("  -script <file> Script file to run at the console\n"),
-    printf("                 Use before -pc,-start,-end to enable symbols\n\n"),
-    printf("  Default values for -pc, -start and -end are 0000 if omitted.\n"),
-    printf("  When the program exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
+  if( argc==1 ) {
+    usage();
     exit(EXIT_SUCCESS);
+  }
+
   while (argc > 1){
     if( argv[1][0] == '-' && argv[2] )
       switch (argc--, argv++[1][1]){
         case 'w':
           alarmtime = strtol(argv[1], NULL, 10);
-          counter = 400000000LL * alarmtime;
+          c_max_runticks = 400000000LL * alarmtime;
           break;
         case 'b':
-          memory_model = argv[1];
+          c_memory_model = argv[1];
           break;
         case 'p':
           symbol_addr= symbol_resolve(argv[1], NULL);
@@ -235,8 +244,8 @@ int main (int argc, char **argv){
           load_address = pc = strtol(argv[1], NULL, 0);
           break;
         case 'c':
-          sscanf(argv[1], "%llu", &counter);
-          counter<0 && (counter= 9e18);
+          sscanf(argv[1], "%llu", &c_max_runticks);
+          c_max_runticks<0 && (c_max_runticks= 9e18);
           break;
         case 'd':
           debugger_active = 1;
@@ -265,7 +274,7 @@ int main (int argc, char **argv){
             c_cpu = CPU_Z180;
           } else if ( strcmp(&argv[0][1],"mz80n") == 0 ) {
             c_cpu = CPU_Z80N;
-            memory_model = "zxn";
+            c_memory_model = "zxn";
           } else if ( strcmp(&argv[0][1],"mr2ka") == 0 ) {
             c_cpu = CPU_R2KA;
           } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
@@ -328,8 +337,8 @@ int main (int argc, char **argv){
       }
     else{
       if ( israbbit() )
-        memory_model = "rabbit";
-      memory_init(memory_model);
+        c_memory_model = "rabbit";
+      memory_init(c_memory_model);
 
       fh= fopen(argv[1], "rb");
       if( !fh )
@@ -391,7 +400,7 @@ int main (int argc, char **argv){
   }
 
 
-  cpu_run(counter, intr, intr, start, end);
+  cpu_run(c_max_runticks, intr, intr, start, end);
 
   if ( alarmtime != 0 ) {
      if ( c_rc2014_mode ) exit(l);
