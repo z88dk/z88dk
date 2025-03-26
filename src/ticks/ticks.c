@@ -858,6 +858,19 @@ int f(void){
                 ? 154020 >> ((fr ^ fr >> 4) & 15)
                 : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4; // P/V bit 2
                 ;
+    } else if ( isgbz80() ) {
+        // bit 0 = 0 
+        // bit 1 = 0 
+        // bit 2 = 0
+        // bit 3 = 0
+        // bit 4 = carry   0x10
+        // bit 5 = flag h  0x20
+        // bit 6 = flag n  0x40
+        // bit 7 = zero    0x80
+        return (ff >> 4) & 0x40  // carry
+                | ((fr ^ fa ^ fb ^ fb >> 8) & 16) << 1 // H 
+                | (fb >> 8 & 2) << 5  // N
+                | (!fr << 7);
     } else {
         // bit 0 = carry
         // bit 1 = N (subtract flag)
@@ -891,10 +904,37 @@ int f_(void){
 }
 
 void setf(int a){
-  fr= ~a & 64;
-  ff= a|= a<<8;
-  fa= 255 & (fb= a & -129 | (a&4)<<5);
-  fk= (a&0x20)>>5;  // 8085 flag
+    if ( isgbz80() ) {
+        // Rearrange the flag to match z80
+        // bit 0 = 0 
+        // bit 1 = 0 
+        // bit 2 = 0
+        // bit 3 = 0
+        // bit 4 = carry   0x10
+        // bit 5 = flag h  0x20
+        // bit 6 = flag n  0x40
+        // bit 7 = zero    0x80
+        int v = 0;
+
+        v |= (a >> 4) & 0x01;       // Carry
+        v |= ( a >> 1 ) & 0x40;     // Zero
+        v |= ( a >> 5) & 0x02;      // N
+        v |= ( a >> 1 ) & 0x10;     // H
+        a = v;
+    }
+
+    // bit 0 = carry
+    // bit 1 = N (subtract flag)
+    // bit 2 = P/V
+    // bit 3 = copy of A
+    // bit 4 = H half carry
+    // bit 5 = copy of A
+    // bit 6 = Z
+    // bit 7 = S sign flag
+    fr= ~a & 64;
+    ff= a|= a<<8;
+    fa= 255 & (fb= a & -129 | (a&4)<<5);
+    fk= (a&0x20)>>5;  // 8085 flag
 }
 
 // get each of the flags as bools, pass f() or f_() as argument
@@ -2686,6 +2726,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
             // 8085: S Z K AC 0 P V C
             if ( is8085() ) { flags &= 0xf7; }
             else if ( is8080() ) { flags |= 2; flags &= 0xd7; }
+            else if ( isgbz80() ) { flags &= 0xf0; }
 
             setf(flags);
             a= get_memory_data(sp++);
