@@ -260,16 +260,17 @@ ENDIF
 
     include "../../../../lib/crt/classic/crt_init_heap.inc"
 
-    ; initialise the UART
+    ; set interrupt mode
 
-    EXTERN _uart_init
-
-    call _uart_init
-
-    ld a,$1D
+    ld a,$DD
     sim                         ; reset R7.5, set MSE and unmask R6.5
 
 SECTION code_crt_init           ; user and library initialization
+
+    ; The UART must be initialized before main is called
+
+EXTERN _uart_need
+defc NEED = _uart_need
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -327,9 +328,9 @@ SECTION code_crt_return
 include "../../../../lib/crt/classic/crt_runtime_selection.inc" 
 
 PUBLIC _8085_int65
-EXTERN  uart_interrupt
+EXTERN _uart_interrupt
 
-defc _8085_int65 = uart_interrupt
+defc _8085_int65 = _uart_interrupt
 
 include "../crt_jump_vectors_8085.inc"
 

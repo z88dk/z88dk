@@ -6,8 +6,6 @@ target/rc2014/stdio/fputc_cons_uarta
 target/rc2014/stdio/fgetc_cons_uarta
 target/rc2014/stdio/fputc_cons_uartb
 target/rc2014/stdio/fgetc_cons_uartb
-target/rc2014/stdio/interrupt_cons_acia
-target/rc2014/stdio/interrupt_cons_uart
 
 @_DEVELOPMENT/target/rc2014/device/device_8085_sccz80.lst
 @_DEVELOPMENT/target/rc2014/driver/driver_8085_sccz80.lst
