@@ -840,6 +840,24 @@ int f(void){
             | pv            // bit 2 parity
             | pv >> 1       // bit 1 v (cheat)
             ;
+    } else if ( is8080() ) {
+        // bit 0 = carry
+        // bit 1 = 1
+        // bit 2 = P/V
+        // bit 3 = 0
+        // bit 4 = H half carry
+        // bit 5 = 0
+        // bit 6 = Z
+        // bit 7 = S sign flag
+      return  ff & 128  // S bit 7
+            | 0x02      // bit 1 always set
+            | ff >> 8 & 1 // C bit 0, so value 256
+            | !fr << 6    // Z, bit 6
+            | (fr ^ fa ^ fb ^ fb >> 8) & 16 // H (half carry) bit 4
+            | (fa & -256
+                ? 154020 >> ((fr ^ fr >> 4) & 15)
+                : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4; // P/V bit 2
+                ;
     } else {
         // bit 0 = carry
         // bit 1 = N (subtract flag)
@@ -2661,8 +2679,15 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
       case 0xf1: // POP AF // (R4K)
         if (israbbit4k() && ih==0) r4k_pop_r32(opc, iy);
         else {
+            uint8_t flags = get_memory_data(sp++);
             st+= isez80() ? 3 : isgbz80() ? 12 : israbbit() ? 7 : isz180() ? 9 : 10;
-            setf(get_memory_data(sp++));
+
+            // 8080: S Z 0 AC 0 P 1 C
+            // 8085: S Z K AC 0 P V C
+            if ( is8085() ) { flags &= 0xf7; }
+            else if ( is8080() ) { flags |= 2; flags &= 0xd7; }
+
+            setf(flags);
             a= get_memory_data(sp++);
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
