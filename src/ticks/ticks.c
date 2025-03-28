@@ -867,7 +867,7 @@ int f(void){
         // bit 5 = flag h  0x20
         // bit 6 = flag n  0x40
         // bit 7 = zero    0x80
-        return (ff >> 4) & 0x40  // carry
+        return (ff >> 4) & 0x10  // carry
                 | ((fr ^ fa ^ fb ^ fb >> 8) & 16) << 1 // H 
                 | (fb >> 8 & 2) << 5  // N
                 | (!fr << 7);
