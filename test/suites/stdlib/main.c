@@ -14,9 +14,11 @@ int main(int argc, char *argv[])
     res += test_strtol();
     res += test_unbcd();
 #ifndef __8080
+  #ifndef __GBZ80
     res += test_qsort();
     res += test_qsort_newlib();
     res += test_bsearch();
+ #endif
 #endif
 
     return res;
