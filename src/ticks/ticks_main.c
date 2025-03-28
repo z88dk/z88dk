@@ -45,7 +45,10 @@ static void write_output()
     FILE *fh;
     uint8_t t, r, w;
 
+    // Output is used by z80asm tests, pretend that we're a z80 so flags are
+    // written out in that way
     if( c_output ){
+        c_cpu = CPU_Z80;
         fh= fopen(c_output, "wb+");
         if( !fh ) {
             fprintf(stderr, "\nCannot create or write in file: %s\n", c_output);
