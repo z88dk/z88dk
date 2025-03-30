@@ -30,7 +30,7 @@ for my $reg (qw( bc de hl )) {
 					pop		hl
 					
 					; z80n does not update carry
-					IF __CPU_Z80N__
+					IF __CPU_Z80N__ || __CPU_Z80N_STRICT__
 					$set_carry
 					ENDIF
 END

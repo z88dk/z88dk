@@ -772,6 +772,7 @@ void Options::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_Z80__");
     undefine_static_symbol("__CPU_Z80_STRICT__");
     undefine_static_symbol("__CPU_Z80N__");
+    undefine_static_symbol("__CPU_Z80N_STRICT__");
     undefine_static_symbol("__CPU_Z180__");
     undefine_static_symbol("__CPU_Z180_STRICT__");
     undefine_static_symbol("__CPU_EZ80__");
@@ -812,6 +813,11 @@ void Options::set_cpu(int cpu) {
     case CPU_Z80N:
         m_cpu = CPU_Z80N;
         define_static_symbol("__CPU_Z80N__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_Z80N_STRICT:
+        m_cpu = CPU_Z80N_STRICT;
+        define_static_symbol("__CPU_Z80N_STRICT__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_Z180:
