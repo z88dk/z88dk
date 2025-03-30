@@ -27,11 +27,9 @@ use Clone;
 
 # all CPUs
 my @CPUS = (qw(
-	z80
-	z80_strict
-	z80n
-	z180
-	z180_strict
+	z80			z80_strict
+	z80n		z80n_strict
+	z180		z180_strict
 	ez80
 	ez80_z80
 	r800
@@ -39,12 +37,9 @@ my @CPUS = (qw(
 	r3k
 	r4k
 	r5k
-	8080 
-	8080_strict
-	8085
-	8085_strict
-	gbz80
-	gbz80_strict
+	8080 		8080_strict
+	8085		8085_strict
+	gbz80		gbz80_strict
 	kc160
 	kc160_z80
 ));

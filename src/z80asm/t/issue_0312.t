@@ -131,7 +131,6 @@ add("lddrx",			0xED, 0xBC);
 # 12T*  mmu6 NN           ED 91 56 NN      macro: Ram page in slot 48k-56k
 # 12T*  mmu7 NN           ED 91 57 NN      macro: Ram page in slot 56k-64k
 for my $page (0..7) {
-	add("mmu$page 31",	0xED, 0x91, 0x50 + $page, 0x1F);
 	add("mmu $page,31",	0xED, 0x91, 0x50 + $page, 0x1F);
 }
 
@@ -145,7 +144,6 @@ for my $page (0..7) {
 # 12T*  mmu6 a            ED 92 56         macro: Ram page in slot 48k-56k
 # 12T*  mmu7 a            ED 92 57         macro: Ram page in slot 56k-64k
 for my $page (0..7) {
-	add("mmu$page a",	0xED, 0x92, 0x50 + $page);
 	add("mmu $page,a",	0xED, 0x92, 0x50 + $page);
 }
 

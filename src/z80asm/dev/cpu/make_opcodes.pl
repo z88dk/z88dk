@@ -1166,6 +1166,113 @@ sub add_opcodes {
 			add_opcode($cpu, "otdm",  [0xED, 0x8B]);
 			add_opcode($cpu, "otdmr", [0xED, 0x9B]);
 		},
+		"swapnib [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "swapnib",  [0xED, 0x23]);
+		},
+		"swap a [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "swap a",  [0xED, 0x23]);
+		},
+		"mirror a [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "mirror a",  [0xED, 0x24]);
+		},
+		"test N [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "test %n",  [0xED, 0x27, '%n']);
+		},
+		"test a, N [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "test a, %n",  [0xED, 0x27, '%n']);
+		},
+		"tst N [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "tst %n",  [0xED, 0x27, '%n']);
+		},
+		"tst a, N [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "tst a, %n",  [0xED, 0x27, '%n']);
+		},
+		"bsla/bsra/bsrl/bsrf/brlc [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "bsla de, b",  [0xED, 0x28]);
+			add_opcode($cpu, "bsra de, b",  [0xED, 0x29]);
+			add_opcode($cpu, "bsrl de, b",  [0xED, 0x2A]);
+			add_opcode($cpu, "bsrf de, b",  [0xED, 0x2B]);
+			add_opcode($cpu, "brlc de, b",  [0xED, 0x2C]);
+		},
+		"mul d, e [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "mul de",  [0xED, 0x30]);
+			add_opcode($cpu, "mul d, e",  [0xED, 0x30]);
+		},
+		"mlt de [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "mlt de",  [0xED, 0x30]);
+		},
+		"add <rp>, a [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "add hl, a",  [0xED, 0x31]);
+			add_opcode($cpu, "add de, a",  [0xED, 0x32]);
+			add_opcode($cpu, "add bc, a",  [0xED, 0x33]);
+		},
+		"add <rp>, NN [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "add hl, %m",  [0xED, 0x34, '%m', '%m']);
+			add_opcode($cpu, "add de, %m",  [0xED, 0x35, '%m', '%m']);
+			add_opcode($cpu, "add bc, %m",  [0xED, 0x36, '%m', '%m']);
+		},
+		"push NN [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "push %M",  [0xED, 0x8A, '%M', '%M']);
+		},
+		"outinb [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "outinb",  [0xED, 0x90]);
+		},
+		"nextreg N, N [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "nextreg %n, %n",  [0xED, 0x91, '%n', '%n']);
+		},
+		"nextreg N, a [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "nextreg %n, a",  [0xED, 0x92, '%n']);
+		},
+		"pixeldn/pixelad [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "pixeldn",  [0xED, 0x93]);
+			add_opcode($cpu, "pixelad",  [0xED, 0x94]);
+		},
+		"setae [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "setae",  [0xED, 0x95]);
+		},
+		"jp (c) [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "jp (c)",  [0xED, 0x98]);
+		},
+		"jmp (c) [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "jmp (c)",  [0xED, 0x98]);
+		},
+		"ldix/ldws/lddx/ldirx/ldpirx/lddrx [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ldix",  [0xED, 0xA4]);
+			add_opcode($cpu, "ldws",  [0xED, 0xA5]);
+			add_opcode($cpu, "lddx",  [0xED, 0xAC]);
+			add_opcode($cpu, "ldirx",  [0xED, 0xB4]);
+			add_opcode($cpu, "ldpirx",  [0xED, 0xB7]);
+			add_opcode($cpu, "lddrx",  [0xED, 0xBC]);
+		},
+		"mmu B, N [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "mmu %c, %n",  [0xED, 0x91, '0x50+%c', '%n'], [0..7]);
+		},
+		"mmu B, a [z80n]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "mmu %c, a",  [0xED, 0x92, '0x50+%c'], [0..7]);
+		},
 	};
 	
 	$actions->{$key}->($cpu);
@@ -1178,6 +1285,7 @@ require "opcodes_8080.pl";
 require "opcodes_8085.pl";
 require "opcodes_gbz80.pl";
 require "opcodes_z80.pl";
+require "opcodes_z80n.pl";
 require "opcodes_z180.pl";
 
 #------------------------------------------------------------------------------
@@ -1231,7 +1339,7 @@ my %INV_FLAG = qw(	_nz	 _z	  _z   _nz
 # for each CPU
 #------------------------------------------------------------------------------
 for my $cpu (@CPUS) {
-	next if $cpu =~ /^(8080|8085|z80|gbz80|z180)(_strict)?$/;
+	next if $cpu =~ /^(8080|8085|z80|z80n|gbz80|z180)(_strict)?$/;
 	
 	my $rabbit		= ($cpu =~ /^r2ka|^r3k|^r4k|^r5k/);
 	my $r3k			= ($cpu =~ /^r3k/);

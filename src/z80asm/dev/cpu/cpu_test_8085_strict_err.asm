@@ -16730,7 +16730,6 @@
  ldp ix, (0x1234)               ; Error
  ldp iy, (0x1234)               ; Error
  ldpirx                         ; Error
- ldrx                           ; Error
  ldsi -128                      ; Error
  ldsi 0                         ; Error
  ldsi 127                       ; Error
@@ -16938,8 +16937,6 @@
  lea.sil iy, iy-128             ; Error
  lhlde                          ; Error
  lhlx                           ; Error
- lirx                           ; Error
- lprx                           ; Error
  lsddr                          ; Error
  lsdr                           ; Error
  lsidr                          ; Error
@@ -16947,7 +16944,6 @@
  lxi bc, 0x1234                 ; Error
  lxi de, 0x1234                 ; Error
  lxi hl, 0x1234                 ; Error
- mirr a                         ; Error
  mirror a                       ; Error
  mlt bc                         ; Error
  mlt de                         ; Error
@@ -17007,46 +17003,6 @@
  mmu 8, 127                     ; Error
  mmu 8, 255                     ; Error
  mmu 8, a                       ; Error
- mmu0 -128                      ; Error
- mmu0 0                         ; Error
- mmu0 127                       ; Error
- mmu0 255                       ; Error
- mmu0 a                         ; Error
- mmu1 -128                      ; Error
- mmu1 0                         ; Error
- mmu1 127                       ; Error
- mmu1 255                       ; Error
- mmu1 a                         ; Error
- mmu2 -128                      ; Error
- mmu2 0                         ; Error
- mmu2 127                       ; Error
- mmu2 255                       ; Error
- mmu2 a                         ; Error
- mmu3 -128                      ; Error
- mmu3 0                         ; Error
- mmu3 127                       ; Error
- mmu3 255                       ; Error
- mmu3 a                         ; Error
- mmu4 -128                      ; Error
- mmu4 0                         ; Error
- mmu4 127                       ; Error
- mmu4 255                       ; Error
- mmu4 a                         ; Error
- mmu5 -128                      ; Error
- mmu5 0                         ; Error
- mmu5 127                       ; Error
- mmu5 255                       ; Error
- mmu5 a                         ; Error
- mmu6 -128                      ; Error
- mmu6 0                         ; Error
- mmu6 127                       ; Error
- mmu6 255                       ; Error
- mmu6 a                         ; Error
- mmu7 -128                      ; Error
- mmu7 0                         ; Error
- mmu7 127                       ; Error
- mmu7 255                       ; Error
- mmu7 a                         ; Error
  mul                            ; Error
  mul d, e                       ; Error
  mul de                         ; Error
@@ -17093,14 +17049,6 @@
  nextreg 127, a                 ; Error
  nextreg 255, 255               ; Error
  nextreg 255, a                 ; Error
- nreg -128, -128                ; Error
- nreg -128, a                   ; Error
- nreg 0, 0                      ; Error
- nreg 0, a                      ; Error
- nreg 127, 127                  ; Error
- nreg 127, a                    ; Error
- nreg 255, 255                  ; Error
- nreg 255, a                    ; Error
  or (ahl)                       ; Error
  or (aix)                       ; Error
  or (aix+0)                     ; Error
@@ -17393,7 +17341,6 @@
  oti2r.lis                      ; Error
  oti2r.s                        ; Error
  oti2r.sil                      ; Error
- otib                           ; Error
  otim                           ; Error
  otim.l                         ; Error
  otim.lis                       ; Error
@@ -17628,8 +17575,6 @@
  push.sil hl                    ; Error
  push.sil ix                    ; Error
  push.sil iy                    ; Error
- pxad                           ; Error
- pxdn                           ; Error
  r_c                            ; Error
  r_eq                           ; Error
  r_geu                          ; Error
@@ -23146,7 +23091,6 @@
  srl.sil (iy+0)                 ; Error
  srl.sil (iy+126)               ; Error
  srl.sil (iy-128)               ; Error
- stae                           ; Error
  stax bc                        ; Error
  stax de                        ; Error
  stmix                          ; Error
@@ -23406,7 +23350,6 @@
  sub.sil a, (iy+126)            ; Error
  sub.sil a, (iy-128)            ; Error
  sures                          ; Error
- swap                           ; Error
  swap (hl)                      ; Error
  swap a                         ; Error
  swap b                         ; Error
