@@ -92,7 +92,19 @@ sub cpu_flags {
 sub add_opcode {
 	my($cpu, $asm, $ops, $const) = @_;
 	$const ||= [];
-	$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, ops=>[[@$ops]], const=>[@$const]));
+	my @ops;
+	if (@$ops > 1 && 
+	    ($ops->[0] == 0x76 ||						# rabbit
+		 $ops->[0] == 0x40 || $ops->[0] == 0x49 || 
+		 $ops->[0] == 0x52 || $ops->[0] == 0x5B)) {	# ez80
+		my @pfx = shift @$ops;
+		@ops = ([@pfx], [@$ops]);
+	}
+	else {
+		@ops = ([@$ops]);
+	}
+	
+	$opcodes->add(Opcode->new(asm=>$asm, cpu=>$cpu, ops=>\@ops, const=>[@$const]));
 }
 
 sub get_opcode {
@@ -118,6 +130,7 @@ sub add_opcodes {
 			for my $d ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
 				for my $s ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
 					next if $d eq '(hl)' && $d eq $s;
+					next if $cpu =~ /ez80/ && "$s$d" =~ /bb|cc|dd|ee/;
 					add_opcode($cpu, "ld $d, $s", [0x40+8*R($d)+R($s)]);
 				}
 			}
@@ -262,6 +275,7 @@ sub add_opcodes {
 			for my $d ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
 				for my $s ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
 					next if $d eq 'm' && $d eq $s;
+					next if $cpu =~ /ez80/ && "$s$d" =~ /bb|cc|dd|ee/;
 					add_opcode($cpu, "mov $d, $s", [0x40+8*R($d)+R($s)]);
 				}
 			}
@@ -1285,6 +1299,59 @@ sub add_opcodes {
 				add_opcode($cpu, "mmu$b a",  [0xED, 0x92, 0x50+$b]);
 			}
 		},
+		"<alu> (hl) [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp') {
+				my $a_ = ($alu =~ /add|adc|sbc/ ? 'a, ' : '');
+				if (!get_opcode($cpu, "$alu $a_(hl)")) {
+					add_opcode($cpu, "$alu $a_(hl)", [0x86+8*ALU($alu)]);
+					if ($adl_mode) {
+						add_opcode($cpu, "$alu.s $a_(hl)", 
+								   [0x52, 0x86+8*ALU($alu)]);
+					}
+					else {
+						add_opcode($cpu, "$alu.l $a_(hl)", 
+								   [0x49, 0x86+8*ALU($alu)]);
+					}
+				}
+			}
+		},
+		"<alu-extra> (hl) [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp') {
+				for my $a_ ("a, ", "") {
+					if (!get_opcode($cpu, "$alu $a_(hl)")) {
+						add_opcode($cpu, "$alu $a_(hl)", [0x86+8*ALU($alu)]);
+						if ($adl_mode) {
+							add_opcode($cpu, "$alu.s $a_(hl)", 
+									   [0x52, 0x86+8*ALU($alu)]);
+						}
+						else {
+							add_opcode($cpu, "$alu.l $a_(hl)", 
+									   [0x49, 0x86+8*ALU($alu)]);
+						}
+					}
+				}
+			}
+		},
+		"inc/dec <rp> [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			for my $rp ('bc', 'de', 'hl', 'sp') {
+				add_opcode($cpu, "inc $rp", [0x03+16*RP($rp)]);
+				add_opcode($cpu, "dec $rp", [0x0B+16*RP($rp)]);
+				if ($adl_mode) {
+					add_opcode($cpu, "inc.s $rp", [0x52, 0x03+16*RP($rp)]);
+					add_opcode($cpu, "dec.s $rp", [0x52, 0x0B+16*RP($rp)]);
+				}
+				else {
+					add_opcode($cpu, "inc.l $rp", [0x49, 0x03+16*RP($rp)]);
+					add_opcode($cpu, "dec.l $rp", [0x49, 0x0B+16*RP($rp)]);
+				}
+			}
+		},
 	};
 	
 	$actions->{$key}->($cpu);
@@ -1299,6 +1366,7 @@ require "opcodes_gbz80.pl";
 require "opcodes_z80.pl";
 require "opcodes_z80n.pl";
 require "opcodes_z180.pl";
+require "opcodes_ez80.pl";
 
 #------------------------------------------------------------------------------
 # OLD STUFF
@@ -1351,7 +1419,7 @@ my %INV_FLAG = qw(	_nz	 _z	  _z   _nz
 # for each CPU
 #------------------------------------------------------------------------------
 for my $cpu (@CPUS) {
-	next if $cpu =~ /^(8080|8085|z80|z80n|gbz80|z180)(_strict)?$/;
+	next if $cpu =~ /^(8080|8085|z80|z80n|gbz80|z180|ez80|ez80_z80)(_strict)?$/;
 	
 	my $rabbit		= ($cpu =~ /^r2ka|^r3k|^r4k|^r5k/);
 	my $r3k			= ($cpu =~ /^r3k/);
