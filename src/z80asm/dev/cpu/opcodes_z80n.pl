@@ -180,8 +180,10 @@ for my $cpu1 ('z80n') {
 		add_opcodes($cpu, "jp (c) [z80n]");
 		add_opcodes($cpu, "jmp (c) [z80n]") if !$strict;
 		add_opcodes($cpu, "ldix/ldws/lddx/ldirx/ldpirx/lddrx [z80n]");
-		add_opcodes($cpu, "mmu B, N [z80n]");
-		add_opcodes($cpu, "mmu B, a [z80n]");
+		add_opcodes($cpu, "mmu <b>, N [z80n]");
+		add_opcodes($cpu, "mmu<b> N [z80n]") if !$strict;
+		add_opcodes($cpu, "mmu <b>, a [z80n]");
+		add_opcodes($cpu, "mmu<b> a [z80n]") if !$strict;
     }
 }
 

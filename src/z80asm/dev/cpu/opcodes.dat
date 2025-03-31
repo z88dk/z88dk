@@ -34812,6 +34812,22 @@ mmu %c, %n|z80n|_|0,1,2,3,4,5,6,7|ED 91 0x50+%c %n
 mmu %c, %n|z80n_strict|_|0,1,2,3,4,5,6,7|ED 91 0x50+%c %n
 mmu %c, a|z80n|_|0,1,2,3,4,5,6,7|ED 92 0x50+%c
 mmu %c, a|z80n_strict|_|0,1,2,3,4,5,6,7|ED 92 0x50+%c
+mmu0 %n|z80n|_||ED 91 50 %n
+mmu0 a|z80n|_||ED 92 50
+mmu1 %n|z80n|_||ED 91 51 %n
+mmu1 a|z80n|_||ED 92 51
+mmu2 %n|z80n|_||ED 91 52 %n
+mmu2 a|z80n|_||ED 92 52
+mmu3 %n|z80n|_||ED 91 53 %n
+mmu3 a|z80n|_||ED 92 53
+mmu4 %n|z80n|_||ED 91 54 %n
+mmu4 a|z80n|_||ED 92 54
+mmu5 %n|z80n|_||ED 91 55 %n
+mmu5 a|z80n|_||ED 92 55
+mmu6 %n|z80n|_||ED 91 56 %n
+mmu6 a|z80n|_||ED 92 56
+mmu7 %n|z80n|_||ED 91 57 %n
+mmu7 a|z80n|_||ED 92 57
 mov a, a|8080|_||7F
 mov a, a|8080_strict|_||7F
 mov a, a|8085|_||7F
