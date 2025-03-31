@@ -92,6 +92,7 @@ sub cpu_flags {
 sub add_opcode {
 	my($cpu, $asm, $ops, $const) = @_;
 	$const ||= [];
+	# separate prefixes from opcode
 	my @ops;
 	if (@$ops > 1 && 
 	    ($ops->[0] == 0x76 ||						# rabbit
@@ -130,8 +131,18 @@ sub add_opcodes {
 			for my $d ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
 				for my $s ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
 					next if $d eq '(hl)' && $d eq $s;
-					next if $cpu =~ /ez80/ && "$s$d" =~ /bb|cc|dd|ee/;
+					next if $cpu =~ /ez80/ && "$s$d" =~ /bb|cc|dd|ee/;	# .SIS, .LIS, .SIL, .LIL prefixes
 					add_opcode($cpu, "ld $d, $s", [0x40+8*R($d)+R($s)]);
+				}
+			}
+		},
+		"mov <r>, <r>" => sub {
+			my($cpu) = @_;
+			for my $d ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+				for my $s ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+					next if $d eq 'm' && $d eq $s;
+					next if $cpu =~ /ez80/ && "$s$d" =~ /bb|cc|dd|ee/;	# .SIS, .LIS, .SIL, .LIL prefixes
+					add_opcode($cpu, "mov $d, $s", [0x40+8*R($d)+R($s)]);
 				}
 			}
 		},
@@ -139,6 +150,12 @@ sub add_opcodes {
 			my($cpu) = @_;
 			for my $r ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
 				add_opcode($cpu, "ld $r, %n", [0x06+8*R($r), '%n']);
+			}
+		},
+		"mvi <r>, N" => sub {
+			my($cpu) = @_;
+			for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
+				add_opcode($cpu, "mvi $r, %n", [0x06+8*R($r), '%n']);
 			}
 		},
 		"ld <rp>, NN" => sub {
@@ -151,6 +168,18 @@ sub add_opcodes {
 			my($cpu) = @_;
 			for my $x ('ix', 'iy') {
 				add_opcode($cpu, "ld $x, %m", [PFX($x), 0x21, '%m', '%m']);
+			}
+		},
+		"lxi <r>, NN" => sub {
+			my($cpu) = @_;
+			for my $rp ('b', 'd', 'h', 'sp') {
+				add_opcode($cpu, "lxi $rp, %m", [0x01+16*RP($rp), '%m', '%m']);
+			}
+		},
+		"lxi <rp>, NN" => sub {
+			my($cpu) = @_;
+			for my $rp ('bc', 'de', 'hl') {
+				add_opcode($cpu, "lxi $rp, %m", [0x01+16*RP($rp), '%m', '%m']);
 			}
 		},
 		"ld <x8>, <r>" => sub {
@@ -256,34 +285,6 @@ sub add_opcodes {
 			for my $rp ('bc', 'de') {
 				add_opcode($cpu, "ld a, ($rp)", [0x0A+16*RP($rp)]);
 				add_opcode($cpu, "ld ($rp), a", [0x02+16*RP($rp)]);
-			}
-		},
-		"lxi <r>, NN" => sub {
-			my($cpu) = @_;
-			for my $rp ('b', 'd', 'h', 'sp') {
-				add_opcode($cpu, "lxi $rp, %m", [0x01+16*RP($rp), '%m', '%m']);
-			}
-		},
-		"lxi <rp>, NN" => sub {
-			my($cpu) = @_;
-			for my $rp ('bc', 'de', 'hl') {
-				add_opcode($cpu, "lxi $rp, %m", [0x01+16*RP($rp), '%m', '%m']);
-			}
-		},
-		"mov <r>, <r>" => sub {
-			my($cpu) = @_;
-			for my $d ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
-				for my $s ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
-					next if $d eq 'm' && $d eq $s;
-					next if $cpu =~ /ez80/ && "$s$d" =~ /bb|cc|dd|ee/;
-					add_opcode($cpu, "mov $d, $s", [0x40+8*R($d)+R($s)]);
-				}
-			}
-		},
-		"mvi <r>, N" => sub {
-			my($cpu) = @_;
-			for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
-				add_opcode($cpu, "mvi $r, %n", [0x06+8*R($r), '%n']);
 			}
 		},
 		"xchg [8080]" => sub {
@@ -1303,15 +1304,19 @@ sub add_opcodes {
 			my($cpu) = @_;
 			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
 			for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp') {
-				my $a_ = ($alu =~ /add|adc|sbc/ ? 'a, ' : '');
+				my $a_ = ($alu =~ /add|adc|sbc/) ? 'a, ' : '';
 				if (!get_opcode($cpu, "$alu $a_(hl)")) {
 					add_opcode($cpu, "$alu $a_(hl)", [0x86+8*ALU($alu)]);
 					if ($adl_mode) {
 						add_opcode($cpu, "$alu.s $a_(hl)", 
 								   [0x52, 0x86+8*ALU($alu)]);
+						add_opcode($cpu, "$alu.sil $a_(hl)", 
+								   [0x52, 0x86+8*ALU($alu)]);
 					}
 					else {
 						add_opcode($cpu, "$alu.l $a_(hl)", 
+								   [0x49, 0x86+8*ALU($alu)]);
+						add_opcode($cpu, "$alu.lis $a_(hl)", 
 								   [0x49, 0x86+8*ALU($alu)]);
 					}
 				}
@@ -1320,17 +1325,72 @@ sub add_opcodes {
 		"<alu-extra> (hl) [ez80]" => sub {
 			my($cpu) = @_;
 			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
-			for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp') {
+			for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
 				for my $a_ ("a, ", "") {
 					if (!get_opcode($cpu, "$alu $a_(hl)")) {
 						add_opcode($cpu, "$alu $a_(hl)", [0x86+8*ALU($alu)]);
 						if ($adl_mode) {
 							add_opcode($cpu, "$alu.s $a_(hl)", 
 									   [0x52, 0x86+8*ALU($alu)]);
+							add_opcode($cpu, "$alu.sil $a_(hl)", 
+									   [0x52, 0x86+8*ALU($alu)]);
 						}
 						else {
 							add_opcode($cpu, "$alu.l $a_(hl)", 
 									   [0x49, 0x86+8*ALU($alu)]);
+							add_opcode($cpu, "$alu.lis $a_(hl)", 
+									   [0x49, 0x86+8*ALU($alu)]);
+						}
+					}
+				}
+			}
+		},
+		"<alu> (<x>+DIS) [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			for my $x ('ix', 'iy') {
+				for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp') {
+				my $a_ = ($alu =~ /add|adc|sbc/) ? 'a, ' : '';
+					if (!get_opcode($cpu, "$alu $a_($x+%d)")) {
+						add_opcode($cpu, "$alu $a_($x+%d)", [PFX($x), 0x86+8*ALU($alu), '%d']);
+						add_opcode($cpu, "$alu $a_($x)", [PFX($x), 0x86+8*ALU($alu), 0]);
+						if ($adl_mode) {
+							add_opcode($cpu, "$alu.s $a_($x+%d)", [0x52, PFX($x), 0x86+8*ALU($alu), '%d']);
+							add_opcode($cpu, "$alu.sil $a_($x+%d)", [0x52, PFX($x), 0x86+8*ALU($alu), '%d']);
+							add_opcode($cpu, "$alu.s $a_($x)", [0x52, PFX($x), 0x86+8*ALU($alu), 0]);
+							add_opcode($cpu, "$alu.sil $a_($x)", [0x52, PFX($x), 0x86+8*ALU($alu), 0]);
+						}
+						else {
+							add_opcode($cpu, "$alu.l $a_($x+%d)", [0x49, PFX($x), 0x86+8*ALU($alu), '%d']);
+							add_opcode($cpu, "$alu.lis $a_($x+%d)", [0x49, PFX($x), 0x86+8*ALU($alu), '%d']);
+							add_opcode($cpu, "$alu.l $a_($x)", [0x49, PFX($x), 0x86+8*ALU($alu), 0]);
+							add_opcode($cpu, "$alu.lis $a_($x)", [0x49, PFX($x), 0x86+8*ALU($alu), 0]);
+						}
+					}
+				}
+			}
+		},
+		"<alu-extra> (<x>+DIS) [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			for my $x ('ix', 'iy') {
+				for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
+					for my $a_ ("a, ", "") {
+						if (!get_opcode($cpu, "$alu $a_($x+%d)")) {
+							add_opcode($cpu, "$alu $a_($x+%d)", [PFX($x), 0x86+8*ALU($alu), '%d']);
+							add_opcode($cpu, "$alu $a_($x)", [PFX($x), 0x86+8*ALU($alu), 0]);
+							if ($adl_mode) {
+								add_opcode($cpu, "$alu.s $a_($x+%d)", [0x52, PFX($x), 0x86+8*ALU($alu), '%d']);
+								add_opcode($cpu, "$alu.sil $a_($x+%d)", [0x52, PFX($x), 0x86+8*ALU($alu), '%d']);
+								add_opcode($cpu, "$alu.s $a_($x)", [0x52, PFX($x), 0x86+8*ALU($alu), 0]);
+								add_opcode($cpu, "$alu.sil $a_($x)", [0x52, PFX($x), 0x86+8*ALU($alu), 0]);
+							}
+							else {
+								add_opcode($cpu, "$alu.l $a_($x+%d)", [0x49, PFX($x), 0x86+8*ALU($alu), '%d']);
+								add_opcode($cpu, "$alu.lis $a_($x+%d)", [0x49, PFX($x), 0x86+8*ALU($alu), '%d']);
+								add_opcode($cpu, "$alu.l $a_($x)", [0x49, PFX($x), 0x86+8*ALU($alu), 0]);
+								add_opcode($cpu, "$alu.lis $a_($x)", [0x49, PFX($x), 0x86+8*ALU($alu), 0]);
+							}
 						}
 					}
 				}
@@ -1344,11 +1404,15 @@ sub add_opcodes {
 				add_opcode($cpu, "dec $rp", [0x0B+16*RP($rp)]);
 				if ($adl_mode) {
 					add_opcode($cpu, "inc.s $rp", [0x52, 0x03+16*RP($rp)]);
+					add_opcode($cpu, "inc.sil $rp", [0x52, 0x03+16*RP($rp)]);
 					add_opcode($cpu, "dec.s $rp", [0x52, 0x0B+16*RP($rp)]);
+					add_opcode($cpu, "dec.sil $rp", [0x52, 0x0B+16*RP($rp)]);
 				}
 				else {
 					add_opcode($cpu, "inc.l $rp", [0x49, 0x03+16*RP($rp)]);
+					add_opcode($cpu, "inc.lis $rp", [0x49, 0x03+16*RP($rp)]);
 					add_opcode($cpu, "dec.l $rp", [0x49, 0x0B+16*RP($rp)]);
+					add_opcode($cpu, "dec.lis $rp", [0x49, 0x0B+16*RP($rp)]);
 				}
 			}
 		},

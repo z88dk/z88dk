@@ -100,7 +100,7 @@ sub add {
 	my @bytes = $opcode->bytes();
 	my $bytes = "@bytes";
 	
-	#say "$cpu\t$asm\t",$opcode->to_string if $asm =~ /ex \(sp\)/;
+	#say "$cpu\t$asm\t",$opcode->to_string if $asm =~ /adc/;
 	
 	# special case for intel: jr and djnz %j is converted to %m
 	if ($opcode->cpu =~ /^80/ && $asm =~ /^(jr|djnz)/) {

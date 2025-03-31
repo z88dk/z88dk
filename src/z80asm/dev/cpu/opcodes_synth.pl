@@ -717,24 +717,18 @@ for my $cpu (Opcode->cpus) {
 
 	# ALU
 	for my $op ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
-		for my $a_ ("", "a, ", "a', ") {
-			for my $pref (@rabbit_prefixes) {
-				for my $suf (@ez80_suffixes) {
-					add_synth($cpu, "$pref$op$suf $a_(hl+)", "$pref$op$suf $a_(hl)", "inc hl"); 
-					add_synth($cpu, "$pref$op$suf $a_(hl-)", "$pref$op$suf $a_(hl)", "dec hl"); 
-				}
+		for my $a_ ("", "a, ") {
+			for my $suf (@ez80_suffixes) {
+				add_synth($cpu, "$op$suf $a_(hl+)", "$op$suf $a_(hl)", "inc$suf hl"); 
+				add_synth($cpu, "$op$suf $a_(hl-)", "$op$suf $a_(hl)", "dec$suf hl"); 
 			}
 		}
 	}
 	
 	# INC / DEC
 	for my $op ('inc', 'dec') {
-		for my $pref (@rabbit_prefixes) {
-			for my $suf (@ez80_suffixes) {
-				add_synth($cpu, "$pref$op$suf (hl+)", "$pref$op$suf (hl)", "inc hl"); 
-				add_synth($cpu, "$pref$op$suf (hl-)", "$pref$op$suf (hl)", "dec hl"); 
-			}
-		}
+		add_synth($cpu, "$op (hl+)", "$op (hl)", "inc hl"); 
+		add_synth($cpu, "$op (hl-)", "$op (hl)", "dec hl"); 
 	}
 	
 	# LD r, (rp) / LD (rp), r
