@@ -28,7 +28,7 @@ for my $has_asm (0 .. 1) {
 	}
 
 	capture_ok("z88dk-z80asm -v -m* -x$test.1.lib @objs", <<'END');
-% z88dk-z80asm -v -m* -xtest_t_issue_2320_m.1.lib test_t_issue_2320_m.z80.o test_t_issue_2320_m.z80-IXIY.o test_t_issue_2320_m.z80_strict.o test_t_issue_2320_m.z80_strict-IXIY.o test_t_issue_2320_m.z80n.o test_t_issue_2320_m.z80n-IXIY.o test_t_issue_2320_m.z80n_strict.o test_t_issue_2320_m.z80n_strict-IXIY.o test_t_issue_2320_m.z180.o test_t_issue_2320_m.z180-IXIY.o test_t_issue_2320_m.z180_strict.o test_t_issue_2320_m.z180_strict-IXIY.o test_t_issue_2320_m.ez80.o test_t_issue_2320_m.ez80-IXIY.o test_t_issue_2320_m.ez80_z80.o test_t_issue_2320_m.ez80_z80-IXIY.o test_t_issue_2320_m.r800.o test_t_issue_2320_m.r800-IXIY.o test_t_issue_2320_m.r2ka.o test_t_issue_2320_m.r2ka-IXIY.o test_t_issue_2320_m.r3k.o test_t_issue_2320_m.r3k-IXIY.o test_t_issue_2320_m.r4k.o test_t_issue_2320_m.r4k-IXIY.o test_t_issue_2320_m.r5k.o test_t_issue_2320_m.r5k-IXIY.o test_t_issue_2320_m.8080.o test_t_issue_2320_m.8080-IXIY.o test_t_issue_2320_m.8085.o test_t_issue_2320_m.8085-IXIY.o test_t_issue_2320_m.gbz80.o test_t_issue_2320_m.gbz80-IXIY.o test_t_issue_2320_m.gbz80_strict.o test_t_issue_2320_m.gbz80_strict-IXIY.o test_t_issue_2320_m.kc160.o test_t_issue_2320_m.kc160-IXIY.o test_t_issue_2320_m.kc160_z80.o test_t_issue_2320_m.kc160_z80-IXIY.o
+% z88dk-z80asm -v -m* -xtest_t_issue_2320_m.1.lib test_t_issue_2320_m.z80.o test_t_issue_2320_m.z80-IXIY.o test_t_issue_2320_m.z80_strict.o test_t_issue_2320_m.z80_strict-IXIY.o test_t_issue_2320_m.z80n.o test_t_issue_2320_m.z80n-IXIY.o test_t_issue_2320_m.z80n_strict.o test_t_issue_2320_m.z80n_strict-IXIY.o test_t_issue_2320_m.z180.o test_t_issue_2320_m.z180-IXIY.o test_t_issue_2320_m.z180_strict.o test_t_issue_2320_m.z180_strict-IXIY.o test_t_issue_2320_m.ez80.o test_t_issue_2320_m.ez80-IXIY.o test_t_issue_2320_m.ez80_strict.o test_t_issue_2320_m.ez80_strict-IXIY.o test_t_issue_2320_m.ez80_z80.o test_t_issue_2320_m.ez80_z80-IXIY.o test_t_issue_2320_m.ez80_z80_strict.o test_t_issue_2320_m.ez80_z80_strict-IXIY.o test_t_issue_2320_m.r800.o test_t_issue_2320_m.r800-IXIY.o test_t_issue_2320_m.r2ka.o test_t_issue_2320_m.r2ka-IXIY.o test_t_issue_2320_m.r3k.o test_t_issue_2320_m.r3k-IXIY.o test_t_issue_2320_m.r4k.o test_t_issue_2320_m.r4k-IXIY.o test_t_issue_2320_m.r5k.o test_t_issue_2320_m.r5k-IXIY.o test_t_issue_2320_m.8080.o test_t_issue_2320_m.8080-IXIY.o test_t_issue_2320_m.8085.o test_t_issue_2320_m.8085-IXIY.o test_t_issue_2320_m.gbz80.o test_t_issue_2320_m.gbz80-IXIY.o test_t_issue_2320_m.gbz80_strict.o test_t_issue_2320_m.gbz80_strict-IXIY.o test_t_issue_2320_m.kc160.o test_t_issue_2320_m.kc160-IXIY.o test_t_issue_2320_m.kc160_z80.o test_t_issue_2320_m.kc160_z80-IXIY.o
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
@@ -50,8 +50,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -90,8 +94,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -131,8 +139,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -171,8 +183,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -212,8 +228,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -252,8 +272,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -293,8 +317,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -333,8 +361,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -374,8 +406,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -414,8 +450,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -454,8 +494,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Adding test_t_issue_2320_m.r800.o to library
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -494,8 +538,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Adding test_t_issue_2320_m.r800-IXIY.o to library
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -535,8 +583,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -575,8 +627,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -615,8 +671,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -655,8 +715,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -696,8 +760,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Adding test_t_issue_2320_m.ez80_z80.o to library
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -736,8 +804,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Adding test_t_issue_2320_m.ez80_z80-IXIY.o to library
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -777,8 +849,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Adding test_t_issue_2320_m.ez80.o to library
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -817,8 +893,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Adding test_t_issue_2320_m.ez80-IXIY.o to library
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -858,8 +938,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Adding test_t_issue_2320_m.r2ka.o to library
@@ -898,8 +982,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -938,8 +1026,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -978,8 +1070,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -1019,8 +1115,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -1059,8 +1159,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -1100,8 +1204,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -1140,8 +1248,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -1180,8 +1292,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination
@@ -1220,8 +1336,12 @@ Skipping test_t_issue_2320_m.z180_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.z180_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.ez80_z80-IXIY.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_m.ez80_z80_strict-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r800-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m.r2ka.o - different CPU-IXIY combination

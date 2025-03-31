@@ -2924,6 +2924,7 @@
  ldirx                          ; ED B4
  ldix                           ; ED A4
  ldpirx                         ; ED B7
+ ldrx                           ; ED BC
  ldsi -128                      ; EB 21 80 00 39 EB
  ldsi 0                         ; EB 21 00 00 39 EB
  ldsi 127                       ; EB 21 7F 00 39 EB
@@ -2932,6 +2933,8 @@
  lhld 0x1234                    ; 2A 34 12
  lhlde                          ; EB 5E 23 56 2B EB
  lhlx                           ; EB 5E 23 56 2B EB
+ lirx                           ; ED B4
+ lprx                           ; ED B7
  lxi b, 0x1234                  ; 01 34 12
  lxi bc, 0x1234                 ; 01 34 12
  lxi d, 0x1234                  ; 11 34 12
@@ -2939,6 +2942,7 @@
  lxi h, 0x1234                  ; 21 34 12
  lxi hl, 0x1234                 ; 21 34 12
  lxi sp, 0x1234                 ; 31 34 12
+ mirr                           ; ED 24
  mirror a                       ; ED 24
  mlt de                         ; ED 30
  mmu 0, -128                    ; ED 91 50 80
@@ -3140,6 +3144,14 @@
  nextreg 255, 255               ; ED 91 FF FF
  nextreg 255, a                 ; ED 92 FF
  nop                            ; 00
+ nreg -128, -128                ; ED 91 80 80
+ nreg -128, a                   ; ED 92 80
+ nreg 0, 0                      ; ED 91 00 00
+ nreg 0, a                      ; ED 92 00
+ nreg 127, 127                  ; ED 91 7F 7F
+ nreg 127, a                    ; ED 92 7F
+ nreg 255, 255                  ; ED 91 FF FF
+ nreg 255, a                    ; ED 92 FF
  or (hl)                        ; B6
  or (hl+)                       ; B6 23
  or (hl-)                       ; B6 2B
@@ -3211,6 +3223,7 @@
  ori 127                        ; F6 7F
  ori 255                        ; F6 FF
  otdr                           ; ED BB
+ otib                           ; ED 90
  otir                           ; ED B3
  out (-128), a                  ; D3 80
  out (0), a                     ; D3 00
@@ -3265,6 +3278,8 @@
  push ix                        ; DD E5
  push iy                        ; FD E5
  push psw                       ; F5
+ pxad                           ; ED 94
+ pxdn                           ; ED 93
  r_c                            ; D8
  r_eq                           ; C8
  r_geu                          ; D0
@@ -5293,6 +5308,7 @@
  srl h                          ; CB 3C
  srl l                          ; CB 3D
  sta 0x1234                     ; 32 34 12
+ stae                           ; ED 95
  stax b                         ; 02
  stax bc                        ; 02
  stax d                         ; 12
@@ -5359,6 +5375,7 @@
  sui 0                          ; D6 00
  sui 127                        ; D6 7F
  sui 255                        ; D6 FF
+ swap                           ; ED 23
  swap a                         ; ED 23
  swapnib                        ; ED 23
  test -128                      ; ED 27 80

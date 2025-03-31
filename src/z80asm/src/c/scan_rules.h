@@ -18069,7 +18069,9 @@ _eof_trans:
 	case 1236:
 	{te = p;p--;{
 	if (option_cpu() == CPU_EZ80 ||
-option_cpu() == CPU_EZ80_Z80) {
+option_cpu() == CPU_EZ80_Z80 ||
+option_cpu() == CPU_EZ80_STRICT ||
+option_cpu() == CPU_EZ80_Z80_STRICT) {
 		sym.tok = TK_S;
 	}
 	else {
@@ -20282,7 +20284,9 @@ option_cpu() == CPU_EZ80_Z80) {
 	case 606:
 	{{p = ((te))-1;}
 	if (option_cpu() == CPU_EZ80 ||
-option_cpu() == CPU_EZ80_Z80) {
+option_cpu() == CPU_EZ80_Z80 ||
+option_cpu() == CPU_EZ80_STRICT ||
+option_cpu() == CPU_EZ80_Z80_STRICT) {
 		sym.tok = TK_S;
 	}
 	else {
@@ -20294,7 +20298,9 @@ option_cpu() == CPU_EZ80_Z80) {
 	case 607:
 	{{p = ((te))-1;}
 	if (option_cpu() == CPU_EZ80 ||
-option_cpu() == CPU_EZ80_Z80) {
+option_cpu() == CPU_EZ80_Z80 ||
+option_cpu() == CPU_EZ80_STRICT ||
+option_cpu() == CPU_EZ80_Z80_STRICT) {
 		sym.tok = TK_IS;
 	}
 	else {
@@ -20306,7 +20312,9 @@ option_cpu() == CPU_EZ80_Z80) {
 	case 608:
 	{{p = ((te))-1;}
 	if (option_cpu() == CPU_EZ80 ||
-option_cpu() == CPU_EZ80_Z80) {
+option_cpu() == CPU_EZ80_Z80 ||
+option_cpu() == CPU_EZ80_STRICT ||
+option_cpu() == CPU_EZ80_Z80_STRICT) {
 		sym.tok = TK_IL;
 	}
 	else {
@@ -20318,7 +20326,9 @@ option_cpu() == CPU_EZ80_Z80) {
 	case 609:
 	{{p = ((te))-1;}
 	if (option_cpu() == CPU_EZ80 ||
-option_cpu() == CPU_EZ80_Z80) {
+option_cpu() == CPU_EZ80_Z80 ||
+option_cpu() == CPU_EZ80_STRICT ||
+option_cpu() == CPU_EZ80_Z80_STRICT) {
 		sym.tok = TK_SIS;
 	}
 	else {
@@ -20330,7 +20340,9 @@ option_cpu() == CPU_EZ80_Z80) {
 	case 610:
 	{{p = ((te))-1;}
 	if (option_cpu() == CPU_EZ80 ||
-option_cpu() == CPU_EZ80_Z80) {
+option_cpu() == CPU_EZ80_Z80 ||
+option_cpu() == CPU_EZ80_STRICT ||
+option_cpu() == CPU_EZ80_Z80_STRICT) {
 		sym.tok = TK_LIL;
 	}
 	else {
@@ -20342,7 +20354,9 @@ option_cpu() == CPU_EZ80_Z80) {
 	case 611:
 	{{p = ((te))-1;}
 	if (option_cpu() == CPU_EZ80 ||
-option_cpu() == CPU_EZ80_Z80) {
+option_cpu() == CPU_EZ80_Z80 ||
+option_cpu() == CPU_EZ80_STRICT ||
+option_cpu() == CPU_EZ80_Z80_STRICT) {
 		sym.tok = TK_LIS;
 	}
 	else {
@@ -20354,7 +20368,9 @@ option_cpu() == CPU_EZ80_Z80) {
 	case 612:
 	{{p = ((te))-1;}
 	if (option_cpu() == CPU_EZ80 ||
-option_cpu() == CPU_EZ80_Z80) {
+option_cpu() == CPU_EZ80_Z80 ||
+option_cpu() == CPU_EZ80_STRICT ||
+option_cpu() == CPU_EZ80_Z80_STRICT) {
 		sym.tok = TK_SIL;
 	}
 	else {
@@ -20366,7 +20382,9 @@ option_cpu() == CPU_EZ80_Z80) {
 	case 613:
 	{{p = ((te))-1;}
 	if (option_cpu() == CPU_EZ80 ||
-option_cpu() == CPU_EZ80_Z80) {
+option_cpu() == CPU_EZ80_Z80 ||
+option_cpu() == CPU_EZ80_STRICT ||
+option_cpu() == CPU_EZ80_Z80_STRICT) {
 		sym.tok = TK_MB;
 	}
 	else {

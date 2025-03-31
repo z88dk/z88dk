@@ -100,7 +100,7 @@ sub add {
 	my @bytes = $opcode->bytes();
 	my $bytes = "@bytes";
 	
-	#say "$cpu\t$asm\t",$opcode->to_string if $asm =~ /ex \(sp\)/;
+	#say "$cpu\t$asm\t",$opcode->to_string if $asm =~ /adc/;
 	
 	# special case for intel: jr and djnz %j is converted to %m
 	if ($opcode->cpu =~ /^80/ && $asm =~ /^(jr|djnz)/) {
@@ -138,12 +138,16 @@ sub add {
 								 	if ($state == 0) {
 								 		if (s/%s/0x80/e) {
 								 			$state = 1;
-				}
-				}
+										}
+									}
 								 	elsif ($state == 1) {
 								 		s/0/0xFF/e or die $_;
 								 		$state = 2;
-			}
+									}
+									elsif ($state == 2) {
+										s/0/0xFF/e;			# for ez80
+										$state = 3;
+									}
 								 }));
 			
 		$state = 0;
@@ -152,12 +156,16 @@ sub add {
 								 	if ($state == 0) {
 								 		if (s/%s/0x00/e) {
 								 			$state = 1;
-			}
+										}
 								 	}
 								 	elsif ($state == 1) {
 								 		s/0/0x00/e or die $_;
 								 		$state = 2;
 								 	}
+									elsif ($state == 2) {
+										s/0/0x00/e;			# for ez80
+										$state = 3;
+									}
 								 }));
 			
 		if ($asm =~ /%s\+/) {
@@ -167,14 +175,14 @@ sub add {
 										if ($state == 0) {
 											if (s/%s/0x00/e) {
 												$state = 1;
-		}
-		}
+											}
+										}
 										elsif ($state == 1) {
 											s/0/0x00/e or die $_;
 											$state = 2;
-	}
+										}
 									}));
-	}
+		}
 
 		# 7F is a prefix in r4k and r5k, is not single-opcode; use 7E instead
 		$state = 0;	
@@ -183,8 +191,8 @@ sub add {
 								 	if ($state == 0) {
 								 		if (s/%s/0x7E/e) {
 								 			$state = 1;
-	}
-	}
+										}
+									}
 								 	elsif ($state == 1) {
 								 		s/0/0x00/e or die $_;
 								 		$state = 2;
@@ -298,8 +306,8 @@ sub add {
 			if (!$const{$c}) {
 				my $asm_ixiy = $asm =~ s/%c/$c/r;
 				$all_opcodes{ALL}{$asm_ixiy} = 1;
+			}
 		}
-	}
 	}
 	else {
 		my @hex_bytes = @bytes;
@@ -356,6 +364,8 @@ sub compute_labels {
 			@bytes = (@before, sprintf("%02X", ($target) & 0xFF), @after);
 			$bytes = join ' ', @bytes;
 		}
+		
+		#say "$asm; @bytes";
 		
 		die $bytes if $bytes =~ /%/;
 

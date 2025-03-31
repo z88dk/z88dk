@@ -88,8 +88,9 @@ say $aux_h <<END;
 #define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
 #define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
 #define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
-#define DO_stmt_n_0_0(	opcode)		_DO_stmt_(n_0_0,	opcode)
+#define DO_stmt_n_0_0(	opcode)	_DO_stmt_(n_0_0,	opcode)
 #define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
+#define DO_stmt_s_0_0(opcode)	_DO_stmt_(s_0_0,	opcode)
 #define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
 
 #define DO_stmt_nn( opcode) \\
@@ -457,6 +458,9 @@ sub parse_code_opcode {
 	}
 	elsif ($bytes =~ s/ %s 0$//) {
 		$stmt = "DO_stmt_s_0";
+	}
+	elsif ($bytes =~ s/ %s 0 0$//) {
+		$stmt = "DO_stmt_s_0_0";
 	}
 	elsif ($bytes =~ s/ %M %M$//) {
 		$stmt = "DO_stmt_NN";

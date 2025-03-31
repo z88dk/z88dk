@@ -2166,7 +2166,11 @@
  ldirx                          ; ED B4
  ldix                           ; ED A4
  ldpirx                         ; ED B7
+ ldrx                           ; ED BC
  ldws                           ; ED A5
+ lirx                           ; ED B4
+ lprx                           ; ED B7
+ mirr                           ; ED 24
  mirror a                       ; ED 24
  mlt de                         ; ED 30
  mmu 0, -128                    ; ED 91 50 80
@@ -2221,6 +2225,14 @@
  nextreg 255, 255               ; ED 91 FF FF
  nextreg 255, a                 ; ED 92 FF
  nop                            ; 00
+ nreg -128, -128                ; ED 91 80 80
+ nreg -128, a                   ; ED 92 80
+ nreg 0, 0                      ; ED 91 00 00
+ nreg 0, a                      ; ED 92 00
+ nreg 127, 127                  ; ED 91 7F 7F
+ nreg 127, a                    ; ED 92 7F
+ nreg 255, 255                  ; ED 91 FF FF
+ nreg 255, a                    ; ED 92 FF
  or (hl)                        ; B6
  or (ix)                        ; FD B6 00
  or (ix+0)                      ; FD B6 00
@@ -2246,6 +2258,7 @@
  or iyl                         ; DD B5
  or l                           ; B5
  otdr                           ; ED BB
+ otib                           ; ED 90
  otir                           ; ED B3
  out (-128), a                  ; D3 80
  out (0), a                     ; D3 00
@@ -2280,6 +2293,8 @@
  push hl                        ; E5
  push ix                        ; FD E5
  push iy                        ; DD E5
+ pxad                           ; ED 94
+ pxdn                           ; ED 93
  res 0, (hl)                    ; CB 86
  res 0, (ix)                    ; FD CB 00 86
  res 0, (ix), a                 ; FD CB 00 87
@@ -4159,6 +4174,7 @@
  srl e                          ; CB 3B
  srl h                          ; CB 3C
  srl l                          ; CB 3D
+ stae                           ; ED 95
  sub (hl)                       ; 96
  sub (ix)                       ; FD 96 00
  sub (ix+0)                     ; FD 96 00
@@ -4183,6 +4199,7 @@
  sub iyh                        ; DD 94
  sub iyl                        ; DD 95
  sub l                          ; 95
+ swap                           ; ED 23
  swapnib                        ; ED 23
  test -128                      ; ED 27 80
  test 0                         ; ED 27 00

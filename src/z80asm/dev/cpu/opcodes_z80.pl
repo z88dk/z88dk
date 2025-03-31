@@ -38,18 +38,18 @@ for my $cpu1 ('z80') {
         add_opcodes($cpu, "exx");
 
 		add_opcodes($cpu, "<alu> <r> [8080]") if !$strict;
-		add_opcodes($cpu, "<alu> <r>");
-		add_opcodes($cpu, "<alu-extra> <r>") if !$strict;
+		add_opcodes($cpu, "<alu> a, <r>");
+		add_opcodes($cpu, "<alu-extra> a, <r>") if !$strict;
 		
 		add_opcodes($cpu, "<alu> (<x>+DIS)");
 		add_opcodes($cpu, "<alu-extra> (<x>+DIS)") if !$strict;
 		
-		add_opcodes($cpu, "<alu> <x8>") if !$strict;
-		add_opcodes($cpu, "<alu-extra> <x8>") if !$strict;
+		add_opcodes($cpu, "<alu> a, <x8>") if !$strict;
+		add_opcodes($cpu, "<alu-extra> a, <x8>") if !$strict;
 		
 		add_opcodes($cpu, "<alu> N [8080]") if !$strict;
-		add_opcodes($cpu, "<alu> N");
-		add_opcodes($cpu, "<alu-extra> N") if !$strict;
+		add_opcodes($cpu, "<alu> a, N");
+		add_opcodes($cpu, "<alu-extra> a, N") if !$strict;
 		
 		add_opcodes($cpu, "inr/dcr <r> [8080]") if !$strict;
 		add_opcodes($cpu, "inc/dec <r>");
@@ -57,7 +57,7 @@ for my $cpu1 ('z80') {
 		add_opcodes($cpu, "inc/dec <x8>") if !$strict;
 		
 		add_opcodes($cpu, "inx/dcx <r> [8080]") if !$strict;
-		add_opcodes($cpu, "inx/dec <rp> [8080]") if !$strict;
+		add_opcodes($cpu, "inx/dcx <rp> [8080]") if !$strict;
 		add_opcodes($cpu, "inc/dec <rp>");
 		add_opcodes($cpu, "inc/dec <x>");
 

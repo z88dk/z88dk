@@ -301,7 +301,7 @@ void add_call_emul_func(char * emul_func)
 { 
 	declare_extern_symbol(emul_func);
 	Expr1 *emul_expr = parse_expr(emul_func);
-    if (option_cpu() == CPU_EZ80)
+    if (option_cpu() == CPU_EZ80 || option_cpu() == CPU_EZ80_STRICT)
         add_opcode_nnn(0xCD, emul_expr, 0);
     else
         add_opcode_nn(0xCD, emul_expr, 0);

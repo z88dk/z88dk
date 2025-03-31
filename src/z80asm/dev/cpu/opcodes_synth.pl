@@ -44,12 +44,12 @@ for my $cpu (Opcode->cpus) {
 	# JP|CALL|RET EQ, NN
 	add_synth($cpu, "jeq %m", "jz %m");
 	add_synth($cpu, "j_eq %m", "jz %m");
-	add_synth($cpu, "jp eq, %m", "jp z, %m");
-	add_synth($cpu, "jmp eq, %m", "jp z, %m");
 	add_synth($cpu, "jr eq, %j", "jr z, %j");
 	add_synth($cpu, "ceq %m", "cz %m");
 	add_synth($cpu, "c_eq %m", "cz %m");
 	for my $suf (@ez80_suffixes) {
+		add_synth($cpu, "jp$suf eq, %m", "jp$suf z, %m");
+		add_synth($cpu, "jmp$suf eq, %m", "jp$suf z, %m");
 		add_synth($cpu, "call$suf eq, %m", "call$suf z, %m");
 		add_synth($cpu, "ret$suf eq", "ret$suf z");
 	}
@@ -59,12 +59,12 @@ for my $cpu (Opcode->cpus) {
 	# JP|CALL|RET NE, NN
 	add_synth($cpu, "jne %m", "jnz %m");
 	add_synth($cpu, "j_ne %m", "jnz %m");
-	add_synth($cpu, "jp ne, %m", "jp nz, %m");
-	add_synth($cpu, "jmp ne, %m", "jp nz, %m");
 	add_synth($cpu, "jr ne, %j", "jr nz, %j");
 	add_synth($cpu, "cne %m", "cnz %m");
 	add_synth($cpu, "c_ne %m", "cnz %m");
 	for my $suf (@ez80_suffixes) {
+		add_synth($cpu, "jp$suf ne, %m", "jp$suf nz, %m");
+		add_synth($cpu, "jmp$suf ne, %m", "jp$suf nz, %m");
 		add_synth($cpu, "call$suf ne, %m", "call$suf nz, %m");
 		add_synth($cpu, "ret$suf ne", "ret$suf nz");
 	}
@@ -74,12 +74,12 @@ for my $cpu (Opcode->cpus) {
 	# JP|CALL|RET GEU, NN
 	add_synth($cpu, "jgeu %m", "jnc %m");
 	add_synth($cpu, "j_geu %m", "jnc %m");
-	add_synth($cpu, "jp geu, %m", "jp nc, %m");
-	add_synth($cpu, "jmp geu, %m", "jp nc, %m");
 	add_synth($cpu, "jr geu, %j", "jr nc, %j");
 	add_synth($cpu, "cgeu %m", "cnc %m");
 	add_synth($cpu, "c_geu %m", "cnc %m");
 	for my $suf (@ez80_suffixes) {
+		add_synth($cpu, "jp$suf geu, %m", "jp$suf nc, %m");
+		add_synth($cpu, "jmp$suf geu, %m", "jp$suf nc, %m");
 		add_synth($cpu, "call$suf geu, %m", "call$suf nc, %m");
 		add_synth($cpu, "ret$suf geu", "ret$suf nc");
 	}
@@ -89,12 +89,12 @@ for my $cpu (Opcode->cpus) {
 	# JP|CALL|RET LTU, NN
 	add_synth($cpu, "jltu %m", "jc %m");
 	add_synth($cpu, "j_ltu %m", "jc %m");
-	add_synth($cpu, "jp ltu, %m", "jp c, %m");
-	add_synth($cpu, "jmp ltu, %m", "jp c, %m");
 	add_synth($cpu, "jr ltu, %j", "jr c, %j");
 	add_synth($cpu, "cltu %m", "cc %m");
 	add_synth($cpu, "c_ltu %m", "cc %m");
 	for my $suf (@ez80_suffixes) {
+		add_synth($cpu, "jp$suf ltu, %m", "jp$suf c, %m");
+		add_synth($cpu, "jmp$suf ltu, %m", "jp$suf c, %m");
 		add_synth($cpu, "call$suf ltu, %m", "call$suf c, %m");
 		add_synth($cpu, "ret$suf ltu", "ret$suf c");
 	}
@@ -104,12 +104,12 @@ for my $cpu (Opcode->cpus) {
 	# JP|CALL|RET GTU, NN
 	add_synth($cpu, "jgtu %m", "jz %t", "jnc %m");
 	add_synth($cpu, "j_gtu %m", "jz %t", "jnc %m");
-	add_synth($cpu, "jp gtu, %m", "jr z, %t", "jp nc, %m");
-	add_synth($cpu, "jmp gtu, %m", "jr z, %t", "jp nc, %m");
 	add_synth($cpu, "jr gtu, %j", "jr z, %t", "jr nc, %j");
 	add_synth($cpu, "cgtu %m", "jr z, %t", "call nc, %m");
 	add_synth($cpu, "c_gtu %m", "jr z, %t", "call nc, %m");
 	for my $suf (@ez80_suffixes) {
+		add_synth($cpu, "jp$suf gtu, %m", "jr z, %t", "jp$suf nc, %m");
+		add_synth($cpu, "jmp$suf gtu, %m", "jr z, %t", "jp$suf nc, %m");
 		add_synth($cpu, "call$suf gtu, %m", "jr z, %t", "call$suf nc, %m");
 		add_synth($cpu, "ret$suf gtu", "jr z, %t", "ret$suf nc");
 	}
@@ -119,8 +119,6 @@ for my $cpu (Opcode->cpus) {
 	# JP|CALL|RET LEU, NN
 	add_synth($cpu, "jleu %m", "jz %m", "jc %m");
 	add_synth($cpu, "j_leu %m", "jz %m", "jc %m");
-	add_synth($cpu, "jp leu, %m", "jp z, %m", "jp c, %m");
-	add_synth($cpu, "jmp leu, %m", "jp z, %m", "jp c, %m");
 	add_synth($cpu, "jr leu, %j", "jr z, %j", "jr c, %j");
 	for my $suf (@ez80_suffixes) {
 		# ez80 size of call instuction
@@ -132,6 +130,9 @@ for my $cpu (Opcode->cpus) {
 	
 		add_synth($cpu, "cleu %m", "jr z, %t$call_size", "jr nc, %t", "call %m");
 		add_synth($cpu, "c_leu %m", "jr z, %t$call_size", "jr nc, %t", "call %m");
+
+		add_synth($cpu, "jp$suf leu, %m", "jp$suf z, %m", "jp$suf c, %m");
+		add_synth($cpu, "jmp$suf leu, %m", "jp$suf z, %m", "jp$suf c, %m");
 		add_synth($cpu, "call$suf leu, %m", "jr z, %t$call_size", "jr nc, %t", "call$suf %m");
 		add_synth($cpu, "ret$suf leu", "ret$suf z", "ret$suf c");
 	}
@@ -144,11 +145,11 @@ for my $cpu (Opcode->cpus) {
 	else {
 		add_synth($cpu, "jnv %m", "jpo %m");
 		add_synth($cpu, "j_nv %m", "jpo %m");
-		add_synth($cpu, "jp nv, %m", "jp po, %m");
-		add_synth($cpu, "jmp nv, %m", "jp po, %m");
 		add_synth($cpu, "cnv %m", "cpo %m");
 		add_synth($cpu, "c_nv %m", "cpo %m");
 		for my $suf (@ez80_suffixes) {
+			add_synth($cpu, "jp$suf nv, %m", "jp$suf po, %m");
+			add_synth($cpu, "jmp$suf nv, %m", "jp$suf po, %m");
 			add_synth($cpu, "call$suf nv, %m", "call$suf po, %m");
 			add_synth($cpu, "ret$suf nv", "ret$suf po");
 		}
@@ -162,11 +163,11 @@ for my $cpu (Opcode->cpus) {
 	else {
 		add_synth($cpu, "jv %m", "jpe %m");
 		add_synth($cpu, "j_v %m", "jpe %m");
-		add_synth($cpu, "jp v, %m", "jp pe, %m");
-		add_synth($cpu, "jmp v, %m", "jp pe, %m");
 		add_synth($cpu, "cv %m", "cpe %m");
 		add_synth($cpu, "c_v %m", "cpe %m");
 		for my $suf (@ez80_suffixes) {
+			add_synth($cpu, "jp$suf v, %m", "jp$suf pe, %m");
+			add_synth($cpu, "jmp$suf v, %m", "jp$suf pe, %m");
 			add_synth($cpu, "call$suf v, %m", "call$suf pe, %m");
 			add_synth($cpu, "ret$suf v", "ret$suf pe");
 		}
@@ -347,30 +348,50 @@ for my $cpu (Opcode->cpus) {
 	#--------------------------------------------------------------------------
 
 	# LD (HL), BC|DE
-	for my $rp ('bc', 'de') {
-		my($h, $l) = split //, $rp;
-		add_synth($cpu, "ld (hl), $rp", 
-							"ld (hl), $l", "inc hl", "ld (hl), $h", "dec hl");
-		add_synth($cpu, "ld (hl+), $rp", 
-							"ld (hl), $l", "inc hl", "ld (hl), $h", "inc hl");
-		add_synth($cpu, "ldi (hl), $rp", 
-							"ld (hl), $l", "inc hl", "ld (hl), $h", "inc hl");
+	for my $suf (@ez80_suffixes) {
+		for my $rp ('bc', 'de') {
+			my($h, $l) = split //, $rp;
+			if ($cpu =~ /ez80/) {
+				add_synth($cpu, "ld$suf (hl+), $rp", 
+									"ld$suf (hl), $rp", "inc$suf hl", "inc$suf hl");
+				add_synth($cpu, "ldi$suf (hl), $rp", 
+									"ld$suf (hl), $rp", "inc$suf hl", "inc$suf hl");
+			}
+			else {
+				add_synth($cpu, "ld$suf (hl), $rp", 
+									"ld$suf (hl), $l", "inc$suf hl", "ld$suf (hl), $h", "dec$suf hl");
+				add_synth($cpu, "ld$suf (hl+), $rp", 
+									"ld$suf (hl), $l", "inc$suf hl", "ld$suf (hl), $h", "inc$suf hl");
+				add_synth($cpu, "ldi$suf (hl), $rp", 
+									"ld$suf (hl), $l", "inc$suf hl", "ld$suf (hl), $h", "inc$suf hl");
+			}
+		}
 	}
-	
+
 	# LD (HL), HL
-	add_synth($cpu, "ld (hl), hl",
-						"push af", 
-						"ld a, h", "ld (hl), l", "inc hl", "ld (hl), a",
-						"pop af", "dec hl");
 	if ($cpu !~ /^r\dk/) {	# not yet for Rabbits
-		add_synth($cpu, "ld (hl+), hl",
-							"push af", 
-							"ld a, h", "ld (hl), l", "inc hl", "ld (hl), a",
-							"pop af", "inc hl");
-		add_synth($cpu, "ldi (hl), hl",
-							"push af", 
-							"ld a, h", "ld (hl), l", "inc hl", "ld (hl), a",
-							"pop af", "inc hl");
+		if ($cpu =~ /ez80/) {
+			for my $suf (@ez80_suffixes) {
+				add_synth($cpu, "ld$suf (hl+), hl",
+									"ld$suf (hl), hl", "inc$suf hl", "inc$suf hl");
+				add_synth($cpu, "ldi$suf (hl), hl",
+									"ld$suf (hl), hl", "inc$suf hl", "inc$suf hl");
+			}
+		}
+		else {
+			add_synth($cpu, "ld (hl), hl",
+								"push af", 
+								"ld a, h", "ld (hl), l", "inc hl", "ld (hl), a",
+								"pop af", "dec hl");
+			add_synth($cpu, "ld (hl+), hl",
+								"push af", 
+								"ld a, h", "ld (hl), l", "inc hl", "ld (hl), a",
+								"pop af", "inc hl");
+			add_synth($cpu, "ldi (hl), hl",
+								"push af", 
+								"ld a, h", "ld (hl), l", "inc hl", "ld (hl), a",
+								"pop af", "inc hl");
+		}
 	}
 
 	# LD (HL), IX|IY
@@ -380,16 +401,26 @@ for my $cpu (Opcode->cpus) {
 							"push $x", "pop de",
 							"ld (hl), e", "inc hl", "ld (hl), d", "dec hl",
 							"pop de");
-		add_synth($cpu, "ld (hl+), $x", 
-							"push de",
-							"push $x", "pop de",
-							"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
-							"pop de");
-		add_synth($cpu, "ldi (hl), $x", 
-							"push de",
-							"push $x", "pop de",
-							"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
-							"pop de");
+		if ($cpu =~ /ez80/) {
+			for my $suf (@ez80_suffixes) {
+				add_synth($cpu, "ld$suf (hl+), $x", 
+									"ld$suf (hl), $x : inc$suf hl : inc$suf hl");
+				add_synth($cpu, "ldi$suf (hl), $x", 
+									"ld$suf (hl), $x : inc$suf hl : inc$suf hl");
+			}
+		}
+		else {
+			add_synth($cpu, "ld (hl+), $x", 
+								"push de",
+								"push $x", "pop de",
+								"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
+								"pop de");
+			add_synth($cpu, "ldi (hl), $x", 
+								"push de",
+								"push $x", "pop de",
+								"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
+								"pop de");
+		}
 	}
 
 	# LD (IX+d), BC|DE|HL|IX|IY
@@ -430,27 +461,47 @@ for my $cpu (Opcode->cpus) {
 						"ld e, (hl)", "inc hl", "ld d, (hl)", "dec hl",
 						"push de", "pop $x",
 						"pop de");
-		add_synth($cpu, "ld $x, (hl+)",
+		if ($cpu =~ /ez80/) {
+			for my $suf (@ez80_suffixes) {
+				add_synth($cpu, "ld$suf $x, (hl+)",
+							"ld$suf $x, (hl) : inc$suf hl : inc$suf hl");
+				add_synth($cpu, "ldi$suf $x, (hl)",
+							"ld$suf $x, (hl) : inc$suf hl : inc$suf hl");
+			}
+		}
+		else {
+			add_synth($cpu, "ld $x, (hl+)",
 						"push de",
 						"ld e, (hl)", "inc hl", "ld d, (hl)", "inc hl",
 						"push de", "pop $x",
 						"pop de");
-		add_synth($cpu, "ldi $x, (hl)",
+			add_synth($cpu, "ldi $x, (hl)",
 						"push de",
 						"ld e, (hl)", "inc hl", "ld d, (hl)", "inc hl",
 						"push de", "pop $x",
 						"pop de");
+		}	
 	}
 
 	# LD BC|DE, (HL)
 	for my $rp ('bc', 'de') {
 		my($h, $l) = split //, $rp;
-		add_synth($cpu, "ld $rp, (hl)", 
-							"ld $l, (hl)", "inc hl", "ld $h, (hl)", "dec hl");
-		add_synth($cpu, "ld $rp, (hl+)", 
-							"ld $l, (hl)", "inc hl", "ld $h, (hl)", "inc hl");
-		add_synth($cpu, "ldi $rp, (hl)", 
-							"ld $l, (hl)", "inc hl", "ld $h, (hl)", "inc hl");
+		if ($cpu =~ /ez80/) {
+			for my $suf (@ez80_suffixes) {
+				add_synth($cpu, "ld$suf $rp, (hl+)", 
+									"ld$suf $rp, (hl)", "inc$suf hl", "inc$suf hl");
+				add_synth($cpu, "ldi$suf $rp, (hl)", 
+									"ld$suf $rp, (hl)", "inc$suf hl", "inc$suf hl");
+			}
+		}
+		else {
+			add_synth($cpu, "ld $rp, (hl)", 
+								"ld $l, (hl)", "inc hl", "ld $h, (hl)", "dec hl");
+			add_synth($cpu, "ld $rp, (hl+)", 
+								"ld $l, (hl)", "inc hl", "ld $h, (hl)", "inc hl");
+			add_synth($cpu, "ldi $rp, (hl)", 
+								"ld $l, (hl)", "inc hl", "ld $h, (hl)", "inc hl");
+		}
 	}
 	
 	# LD HL, (DE)
@@ -717,84 +768,84 @@ for my $cpu (Opcode->cpus) {
 
 	# ALU
 	for my $op ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
-		for my $a_ ("", "a, ", "a', ") {
-			for my $pref (@rabbit_prefixes) {
-				for my $suf (@ez80_suffixes) {
-					add_synth($cpu, "$pref$op$suf $a_(hl+)", "$pref$op$suf $a_(hl)", "inc hl"); 
-					add_synth($cpu, "$pref$op$suf $a_(hl-)", "$pref$op$suf $a_(hl)", "dec hl"); 
-				}
+		for my $a_ ("", "a, ") {
+			for my $suf (@ez80_suffixes) {
+				add_synth($cpu, "$op$suf $a_(hl+)", "$op$suf $a_(hl)", "inc$suf hl"); 
+				add_synth($cpu, "$op$suf $a_(hl-)", "$op$suf $a_(hl)", "dec$suf hl"); 
 			}
 		}
 	}
 	
 	# INC / DEC
 	for my $op ('inc', 'dec') {
-		for my $pref (@rabbit_prefixes) {
-			for my $suf (@ez80_suffixes) {
-				add_synth($cpu, "$pref$op$suf (hl+)", "$pref$op$suf (hl)", "inc hl"); 
-				add_synth($cpu, "$pref$op$suf (hl-)", "$pref$op$suf (hl)", "dec hl"); 
-			}
+		for my $suf (@ez80_suffixes) {
+			add_synth($cpu, "$op$suf (hl+)", "$op$suf (hl)", "inc$suf hl"); 
+			add_synth($cpu, "$op$suf (hl-)", "$op$suf (hl)", "dec$suf hl"); 
 		}
 	}
 	
 	# LD r, (rp) / LD (rp), r
-	for my $rp ('bc', 'de', 'hl') {
-		for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
-			add_synth($cpu, "ld $r, ($rp+)", "ld $r, ($rp)", "inc $rp"); 
-			add_synth($cpu, "ldi $r, ($rp)", "ld $r, ($rp)", "inc $rp"); 
-			if ($rp eq 'hl') {
-				add_synth($cpu, "ld $r, (hli)", "ld $r, (hl)", "inc hl"); 
-			}
+	for my $suf (@ez80_suffixes) {
+		for my $rp ('bc', 'de', 'hl') {
+			for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
+				add_synth($cpu, "ld$suf $r, ($rp+)", "ld$suf $r, ($rp)", "inc$suf $rp"); 
+				add_synth($cpu, "ldi$suf $r, ($rp)", "ld$suf $r, ($rp)", "inc$suf $rp"); 
+				if ($rp eq 'hl') {
+					add_synth($cpu, "ld$suf $r, (hli)", "ld$suf $r, (hl)", "inc$suf hl"); 
+				}
 
-			add_synth($cpu, "ld $r, ($rp-)", "ld $r, ($rp)", "dec $rp"); 
-			add_synth($cpu, "ldd $r, ($rp)", "ld $r, ($rp)", "dec $rp"); 
-			if ($rp eq 'hl') {
-				add_synth($cpu, "ld $r, (hld)", "ld $r, (hl)", "dec hl"); 
-			}
-			
-			add_synth($cpu, "ld ($rp+), $r", "ld ($rp), $r", "inc $rp"); 
-			add_synth($cpu, "ldi ($rp), $r", "ld ($rp), $r", "inc $rp"); 
-			if ($rp eq 'hl') {
-				add_synth($cpu, "ld (hli), $r", "ld (hl), $r", "inc hl"); 
-			}
+				add_synth($cpu, "ld$suf $r, ($rp-)", "ld$suf $r, ($rp)", "dec$suf $rp"); 
+				add_synth($cpu, "ldd$suf $r, ($rp)", "ld$suf $r, ($rp)", "dec$suf $rp"); 
+				if ($rp eq 'hl') {
+					add_synth($cpu, "ld$suf $r, (hld)", "ld$suf $r, (hl)", "dec$suf hl"); 
+				}
+				
+				add_synth($cpu, "ld$suf ($rp+), $r", "ld$suf ($rp), $r", "inc$suf $rp"); 
+				add_synth($cpu, "ldi$suf ($rp), $r", "ld$suf ($rp), $r", "inc$suf $rp"); 
+				if ($rp eq 'hl') {
+					add_synth($cpu, "ld$suf (hli), $r", "ld$suf (hl), $r", "inc$suf hl"); 
+				}
 
-			add_synth($cpu, "ld ($rp-), $r", "ld ($rp), $r", "dec $rp"); 
-			add_synth($cpu, "ldd ($rp), $r", "ld ($rp), $r", "dec $rp"); 
-			if ($rp eq 'hl') {
-				add_synth($cpu, "ld (hld), $r", "ld (hl), $r", "dec hl"); 
+				add_synth($cpu, "ld$suf ($rp-), $r", "ld$suf ($rp), $r", "dec$suf $rp"); 
+				add_synth($cpu, "ldd$suf ($rp), $r", "ld$suf ($rp), $r", "dec$suf $rp"); 
+				if ($rp eq 'hl') {
+					add_synth($cpu, "ld$suf (hld), $r", "ld$suf (hl), $r", "dec$suf hl"); 
+				}
 			}
-		}
 		
-		add_synth($cpu, "ld ($rp+), %n", "ld ($rp), %n", "inc $rp"); 
-		add_synth($cpu, "ldi ($rp), %n", "ld ($rp), %n", "inc $rp"); 
+			add_synth($cpu, "ld$suf ($rp+), %n", "ld$suf ($rp), %n", "inc$suf $rp"); 
+			add_synth($cpu, "ldi$suf ($rp), %n", "ld$suf ($rp), %n", "inc$suf $rp"); 
 
-		add_synth($cpu, "ld ($rp-), %n", "ld ($rp), %n", "dec $rp"); 
-		add_synth($cpu, "ldd ($rp), %n", "ld ($rp), %n", "dec $rp"); 
+			add_synth($cpu, "ld$suf ($rp-), %n", "ld$suf ($rp), %n", "dec$suf $rp"); 
+			add_synth($cpu, "ldd$suf ($rp), %n", "ld$suf ($rp), %n", "dec$suf $rp"); 
+		}
 	}
 	
 	# LD r, (DE) / LD (DE), r
-	if ($cpu !~ /^gbz80/) {		# gameboy lack ex de, hl
-		for (['b','b'], ['c','c'], ['d','h'], ['e','l'], ['h','d'], ['l','e']) {
-			my($r, $rswap) = @$_;
-			
-			add_synth($cpu, "ld (de), $r", "ex de, hl", "ld (hl), $rswap", "ex de, hl");
-			add_synth($cpu, "ld (de+), $r", "ex de, hl", "ld (hl), $rswap", "ex de, hl", "inc de");
-			add_synth($cpu, "ldi (de), $r", "ex de, hl", "ld (hl), $rswap", "ex de, hl", "inc de");
-			add_synth($cpu, "ld (de-), $r", "ex de, hl", "ld (hl), $rswap", "ex de, hl", "dec de");
-			add_synth($cpu, "ldd (de), $r", "ex de, hl", "ld (hl), $rswap", "ex de, hl", "dec de");
-			
-			add_synth($cpu, "ld $r, (de)", "ex de, hl", "ld $rswap, (hl)", "ex de, hl");
-			add_synth($cpu, "ld $r, (de+)", "ex de, hl", "ld $rswap, (hl)", "ex de, hl", "inc de");
-			add_synth($cpu, "ldi $r, (de)", "ex de, hl", "ld $rswap, (hl)", "ex de, hl", "inc de");
-			add_synth($cpu, "ld $r, (de-)", "ex de, hl", "ld $rswap, (hl)", "ex de, hl", "dec de");
-			add_synth($cpu, "ldd $r, (de)", "ex de, hl", "ld $rswap, (hl)", "ex de, hl", "dec de");
+	for my $suf (@ez80_suffixes) {
+		if ($cpu !~ /^gbz80/) {		# gameboy lack ex de, hl
+			for (['b','b'], ['c','c'], ['d','h'], ['e','l'], ['h','d'], ['l','e']) {
+				my($r, $rswap) = @$_;
+				
+				add_synth($cpu, "ld$suf (de), $r", "ex de, hl", "ld$suf (hl), $rswap", "ex de, hl");
+				add_synth($cpu, "ld$suf (de+), $r", "ex de, hl", "ld$suf (hl), $rswap", "ex de, hl", "inc$suf de");
+				add_synth($cpu, "ldi$suf (de), $r", "ex de, hl", "ld$suf (hl), $rswap", "ex de, hl", "inc$suf de");
+				add_synth($cpu, "ld$suf (de-), $r", "ex de, hl", "ld$suf (hl), $rswap", "ex de, hl", "dec$suf de");
+				add_synth($cpu, "ldd$suf (de), $r", "ex de, hl", "ld$suf (hl), $rswap", "ex de, hl", "dec$suf de");
+				
+				add_synth($cpu, "ld$suf $r, (de)", "ex de, hl", "ld$suf $rswap, (hl)", "ex de, hl");
+				add_synth($cpu, "ld$suf $r, (de+)", "ex de, hl", "ld$suf $rswap, (hl)", "ex de, hl", "inc$suf de");
+				add_synth($cpu, "ldi$suf $r, (de)", "ex de, hl", "ld$suf $rswap, (hl)", "ex de, hl", "inc$suf de");
+				add_synth($cpu, "ld$suf $r, (de-)", "ex de, hl", "ld$suf $rswap, (hl)", "ex de, hl", "dec$suf de");
+				add_synth($cpu, "ldd$suf $r, (de)", "ex de, hl", "ld$suf $rswap, (hl)", "ex de, hl", "dec$suf de");
+			}
+		
+			add_synth($cpu, "ld$suf (de), %n", "ex de, hl", "ld$suf (hl), %n", "ex de, hl");
+			add_synth($cpu, "ld$suf (de+), %n", "ex de, hl", "ld$suf (hl), %n", "ex de, hl", "inc$suf de");
+			add_synth($cpu, "ldi$suf (de), %n", "ex de, hl", "ld$suf (hl), %n", "ex de, hl", "inc$suf de");
+			add_synth($cpu, "ld$suf (de-), %n", "ex de, hl", "ld$suf (hl), %n", "ex de, hl", "dec$suf de");
+			add_synth($cpu, "ldd$suf (de), %n", "ex de, hl", "ld$suf (hl), %n", "ex de, hl", "dec$suf de");
 		}
-	
-		add_synth($cpu, "ld (de), %n", "ex de, hl", "ld (hl), %n", "ex de, hl");
-		add_synth($cpu, "ld (de+), %n", "ex de, hl", "ld (hl), %n", "ex de, hl", "inc de");
-		add_synth($cpu, "ldi (de), %n", "ex de, hl", "ld (hl), %n", "ex de, hl", "inc de");
-		add_synth($cpu, "ld (de-), %n", "ex de, hl", "ld (hl), %n", "ex de, hl", "dec de");
-		add_synth($cpu, "ldd (de), %n", "ex de, hl", "ld (hl), %n", "ex de, hl", "dec de");
 	}
 }
 

@@ -29,18 +29,18 @@ for my $cpu1 ('8080') {
         add_opcodes($cpu, "ex de, hl") if !$strict;
         
 		add_opcodes($cpu, "<alu> <r> [8080]");
-		add_opcodes($cpu, "<alu> <r>") if !$strict;
-		add_opcodes($cpu, "<alu-extra> <r>") if !$strict;
+		add_opcodes($cpu, "<alu> a, <r>") if !$strict;
+		add_opcodes($cpu, "<alu-extra> a, <r>") if !$strict;
 		
 		add_opcodes($cpu, "<alu> N [8080]");
-		add_opcodes($cpu, "<alu> N") if !$strict;
-		add_opcodes($cpu, "<alu-extra> N") if !$strict;
+		add_opcodes($cpu, "<alu> a, N") if !$strict;
+		add_opcodes($cpu, "<alu-extra> a, N") if !$strict;
 		
 		add_opcodes($cpu, "inr/dcr <r> [8080]");
 		add_opcodes($cpu, "inc/dec <r>") if !$strict;
 		
 		add_opcodes($cpu, "inx/dcx <r> [8080]");
-		add_opcodes($cpu, "inx/dec <rp> [8080]") if !$strict;
+		add_opcodes($cpu, "inx/dcx <rp> [8080]") if !$strict;
 		add_opcodes($cpu, "inc/dec <rp>") if !$strict;
 		
 		add_opcodes($cpu, "dad <r> [8080]");
