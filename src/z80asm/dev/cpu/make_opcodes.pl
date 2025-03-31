@@ -1265,13 +1265,25 @@ sub add_opcodes {
 			add_opcode($cpu, "ldpirx",  [0xED, 0xB7]);
 			add_opcode($cpu, "lddrx",  [0xED, 0xBC]);
 		},
-		"mmu B, N [z80n]" => sub {
+		"mmu <b>, N [z80n]" => sub {
 			my($cpu) = @_;
 			add_opcode($cpu, "mmu %c, %n",  [0xED, 0x91, '0x50+%c', '%n'], [0..7]);
 		},
-		"mmu B, a [z80n]" => sub {
+		"mmu<b> N [z80n]" => sub {
+			my($cpu) = @_;
+			for my $b (0..7) {
+				add_opcode($cpu, "mmu$b %n",  [0xED, 0x91, 0x50+$b, '%n']);
+			}
+		},
+		"mmu <b>, a [z80n]" => sub {
 			my($cpu) = @_;
 			add_opcode($cpu, "mmu %c, a",  [0xED, 0x92, '0x50+%c'], [0..7]);
+		},
+		"mmu<b> a [z80n]" => sub {
+			my($cpu) = @_;
+			for my $b (0..7) {
+				add_opcode($cpu, "mmu$b a",  [0xED, 0x92, 0x50+$b]);
+			}
 		},
 	};
 	

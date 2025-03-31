@@ -2981,6 +2981,46 @@
  mmu 7, 127                     ; ED 91 57 7F
  mmu 7, 255                     ; ED 91 57 FF
  mmu 7, a                       ; ED 92 57
+ mmu0 -128                      ; ED 91 50 80
+ mmu0 0                         ; ED 91 50 00
+ mmu0 127                       ; ED 91 50 7F
+ mmu0 255                       ; ED 91 50 FF
+ mmu0 a                         ; ED 92 50
+ mmu1 -128                      ; ED 91 51 80
+ mmu1 0                         ; ED 91 51 00
+ mmu1 127                       ; ED 91 51 7F
+ mmu1 255                       ; ED 91 51 FF
+ mmu1 a                         ; ED 92 51
+ mmu2 -128                      ; ED 91 52 80
+ mmu2 0                         ; ED 91 52 00
+ mmu2 127                       ; ED 91 52 7F
+ mmu2 255                       ; ED 91 52 FF
+ mmu2 a                         ; ED 92 52
+ mmu3 -128                      ; ED 91 53 80
+ mmu3 0                         ; ED 91 53 00
+ mmu3 127                       ; ED 91 53 7F
+ mmu3 255                       ; ED 91 53 FF
+ mmu3 a                         ; ED 92 53
+ mmu4 -128                      ; ED 91 54 80
+ mmu4 0                         ; ED 91 54 00
+ mmu4 127                       ; ED 91 54 7F
+ mmu4 255                       ; ED 91 54 FF
+ mmu4 a                         ; ED 92 54
+ mmu5 -128                      ; ED 91 55 80
+ mmu5 0                         ; ED 91 55 00
+ mmu5 127                       ; ED 91 55 7F
+ mmu5 255                       ; ED 91 55 FF
+ mmu5 a                         ; ED 92 55
+ mmu6 -128                      ; ED 91 56 80
+ mmu6 0                         ; ED 91 56 00
+ mmu6 127                       ; ED 91 56 7F
+ mmu6 255                       ; ED 91 56 FF
+ mmu6 a                         ; ED 92 56
+ mmu7 -128                      ; ED 91 57 80
+ mmu7 0                         ; ED 91 57 00
+ mmu7 127                       ; ED 91 57 7F
+ mmu7 255                       ; ED 91 57 FF
+ mmu7 a                         ; ED 92 57
  mov a, a                       ; 7F
  mov a, b                       ; 78
  mov a, c                       ; 79
