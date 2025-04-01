@@ -9,25 +9,45 @@ for my $cpu1 ('ez80', 'ez80_z80') {
 		add_opcodes($cpu, "<alu> <r> [8080]") if !$strict;
 		add_opcodes($cpu, "<alu> N [8080]") if !$strict;
 		
-		add_opcodes($cpu, "<alu> (hl) [ez80]");
-		add_opcodes($cpu, "<alu-extra> (hl) [ez80]") if !$strict;
+		add_opcodes($cpu, "<alu> a, (hl) [ez80]");
+		add_opcodes($cpu, "<alu-extra> a, (hl) [ez80]") if !$strict;
 		
-		add_opcodes($cpu, "<alu> <x8>");
-		add_opcodes($cpu, "<alu-extra> <x8>") if !$strict;
+		add_opcodes($cpu, "<alu> a, <x8> [ez80]");
+		add_opcodes($cpu, "<alu-extra> a, <x8>") if !$strict;
 		
-		add_opcodes($cpu, "<alu> (<x>+DIS) [ez80]");
-		add_opcodes($cpu, "<alu-extra> (<x>+DIS) [ez80]") if !$strict;
+		add_opcodes($cpu, "<alu> a, (<x>+DIS) [ez80]");
+		add_opcodes($cpu, "<alu-extra> a, (<x>+DIS) [ez80]") if !$strict;
 
-		add_opcodes($cpu, "<alu> N");
-		add_opcodes($cpu, "<alu-extra> N") if !$strict;
+		add_opcodes($cpu, "<alu> a, N");
+		add_opcodes($cpu, "<alu-extra> a, N") if !$strict;
 
-		add_opcodes($cpu, "<alu> <r>");
-		add_opcodes($cpu, "<alu-extra> <r>") if !$strict;
+		add_opcodes($cpu, "<alu> a, <r>");
+		add_opcodes($cpu, "<alu-extra> a, <r>") if !$strict;
 		
+		add_opcodes($cpu, "sbc/adc hl, <rp> [ez80]");
 		
+		add_opcodes($cpu, "dad <r> [8080]") if !$strict;
+		add_opcodes($cpu, "dad <rp> [8080]") if !$strict;
+		add_opcodes($cpu, "add hl, <rp> [ez80]");
+		add_opcodes($cpu, "add <x>, <rp> [ez80]");
+
+		add_opcodes($cpu, "<bit> <b>, (hl) [ez80]");
+		add_opcodes($cpu, "<bit> <b>, (<x>+DIS) [ez80]");
+		add_opcodes($cpu, "<bit> <b>, <r>");
 		
+		add_opcodes($cpu, "c<flag> NN [ez80]") if !$strict;
+		add_opcodes($cpu, "c_<f> NN [ez80]") if !$strict;
+		add_opcodes($cpu, "call NN [ez80]");
+		add_opcodes($cpu, "call <f>, NN [ez80]");
+
+		add_opcodes($cpu, "daa");
+		add_opcodes($cpu, "cmc [8080]") if !$strict;
+		add_opcodes($cpu, "ccf");
+		add_opcodes($cpu, "cma [8080]") if !$strict;
+		add_opcodes($cpu, "cpl");
+		add_opcodes($cpu, "cpl a") if !$strict;
 		
-		
+        add_opcodes($cpu, "cpi/cpir/cpd/cpdr [ez80]");
 		
 		
 		
@@ -75,18 +95,6 @@ for my $cpu1 ('ez80', 'ez80_z80') {
 		#add_opcodes($cpu, "inc/dec <rp>");
 		#add_opcodes($cpu, "inc/dec <x>");
 
-		#add_opcodes($cpu, "dad <r> [8080]") if !$strict;
-		#add_opcodes($cpu, "dad <rp> [8080]") if !$strict;
-		#add_opcodes($cpu, "add hl, <rp>");
-		#add_opcodes($cpu, "add <x>, <rp>");
-		#add_opcodes($cpu, "sbc/adc hl, <rp>");
-
-		#add_opcodes($cpu, "daa");
-		#add_opcodes($cpu, "cma [8080]") if !$strict;
-		#add_opcodes($cpu, "cpl");
-		#add_opcodes($cpu, "cpl a") if !$strict;
-		#add_opcodes($cpu, "cmc [8080]") if !$strict;
-		#add_opcodes($cpu, "ccf");
 		#add_opcodes($cpu, "stc [8080]") if !$strict;
 		#add_opcodes($cpu, "scf");
 
@@ -94,9 +102,7 @@ for my $cpu1 ('ez80', 'ez80_z80') {
 		#add_opcodes($cpu, "<rot-a>");
 		#add_opcodes($cpu, "<rot> <r>");
 		#add_opcodes($cpu, "<rot> (<x>+DIS)");
-		#add_opcodes($cpu, "<bit> <b>, <r>");
-		#add_opcodes($cpu, "<bit> <b>, (<x>+DIS)");
-
+		
 		#add_opcodes($cpu, "jr DIS");
 		#add_opcodes($cpu, "djnz DIS");
 		#add_opcodes($cpu, "djnz b, DIS") if !$strict;
@@ -114,11 +120,6 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         #add_opcodes($cpu, "jp (<x>)");
         #add_opcodes($cpu, "jmp (hl)") if !$strict;
         #add_opcodes($cpu, "jmp (<x>)") if !$strict;
-
-		#add_opcodes($cpu, "call NN");
-		#add_opcodes($cpu, "c<flag> NN") if !$strict;
-		#add_opcodes($cpu, "c_<f> NN") if !$strict;
-		#add_opcodes($cpu, "call <f>, NN");
 
 		#add_opcodes($cpu, "rst NN");
 		
@@ -164,7 +165,6 @@ for my $cpu1 ('ez80', 'ez80_z80') {
 		#add_opcodes($cpu, "rld/rrd");
 
         #add_opcodes($cpu, "ldi/ldir/ldd/lddr");
-        #add_opcodes($cpu, "cpi/cpir/cpd/cpdr");
         #add_opcodes($cpu, "ini/inir/ind/indr");
         #add_opcodes($cpu, "outi/otir/outd/otdr");
         #add_opcodes($cpu, "otim/otimr/otdm/otdmr [z180]");
