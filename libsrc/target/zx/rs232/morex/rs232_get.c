@@ -25,57 +25,57 @@ uint8_t rs232_get(uint8_t *char) __naked __z88dk_fastcall
 
    DI
 
-  LD A,(BV_FLAGS)
-  RES 4,A
-  LD (BV_FLAGS),A
-  
+  push hl
+
+
 CHAN3_INPUT_0:
   LD A,(BV_FLAGS)
-  BIT 4,A                       ; Byte received ?
-  JR Z,CHAN3_INPUT_1
+  BIT 4,A
+  JR Z,CHAN3_INPUT_1            ; Do we have data already ?
   RES 4,A
   LD (BV_FLAGS),A
   LD A,(BV_RECEIVED)
   JR CHAN3_INPUT_3
 
 CHAN3_INPUT_1:
-  CALL RS232_RECEIVE
+  CALL RS232_RECEIVE            ; Deal with handshake signals
+
   PUSH AF
   CALL __BV_BIT_DELAY
   IN A,($FB)
   AND $80
   JR Z,RS232_NO_MORE_DATA
-  CALL RCV_BYTE
+  CALL RCV_BYTE                 ; Receive the actual byte
   LD (BV_RECEIVED),A
   LD A,(BV_FLAGS)
   SET 4,A                       ; Byte received
   LD (BV_FLAGS),A
 RS232_NO_MORE_DATA:
   POP AF
+
 CHAN3_INPUT_3:
-  CP $0A
+  CP $0A                        ; 00001010
   JR Z,CHAN3_INPUT_0
-  CP $1B
+  CP $1B                        ; 00011011
   JR NZ,CHAN3_INPUT_4
-  LD A,$0A
+  LD A,$0A                      ; 00001010
 CHAN3_INPUT_4:
   AND A
 
   EI
   
+  pop de
+  
 	ld	hl,RS_ERR_NO_DATA
 	ret	z
 
-  pop bc
-  pop hl
-  ld  (hl),a
-  push hl
-  push bc
+  ld  (de),a
 
 	ld	hl,RS_ERR_OK  
 
   RET
 
+;---------------------------------------------------------
 ; This entry point is used by the routine at CHAN3_INPUT.
 RS232_RECEIVE:
   LD A,(__BV_HANDSHAKE)
@@ -91,13 +91,12 @@ WAIT_RS232_DATA:
   OUT ($7F),A
   LD (__BV_HANDSHAKE),A           ; update status bits
   CALL __BV_BAUD_DELAY
-; This entry point is used by the routine at CHAN3_INPUT.
+
+; Get character
 RCV_BYTE:
   PUSH BC
   CALL __BV_BIT_DELAY
   LD B,$08
-
-; Get character
 RCV_BYTE_0:
   IN A,($FB)
   RL A
@@ -111,14 +110,14 @@ RCV_BYTE_0:
   DJNZ RCV_BYTE_0
   LD A,C
   CPL
-  AND $7F
+  AND $7F                  ; rip off higher data bit (8n1 = 7n2)
   CALL __BV_BIT_DELAY
   POP BC
   RET
 
 ;--------------------------------------
 
-BV_RECEIVED:  defb 0
+BV_RECEIVED:  defb 0            ; single byte buffer
 BV_FLAGS:     defb 0
 
 #endasm
