@@ -2153,14 +2153,14 @@ krokha_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	$(call buildgeneric,krokha,"gencon portable")
 	$(MAKE) -C games TARGET=krokha
-	TARGET=krokha TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORkrokha -x$(OUTPUT_DIRECTORY)/krokha_clib @$(TARGET_DIRECTORY)/krokha/krokha.lst
+	TARGET=krokha TYPE=8080 $(LIBLINKER) -m8080 -DFORkrokha -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/krokha_clib @$(TARGET_DIRECTORY)/krokha/krokha.lst
 
 radio86_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Radio86 Library ---'
 	@echo ''
 	$(call buildgeneric,radio86,"gencon portable")
-	TARGET=radio86 TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORradio86 -x$(OUTPUT_DIRECTORY)/radio86_clib @$(TARGET_DIRECTORY)/radio86/radio86.lst
+	TARGET=radio86 TYPE=8080 $(LIBLINKER) -m8080 -DFORradio86 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/radio86_clib @$(TARGET_DIRECTORY)/radio86/radio86.lst
 
 # RC2014 (newlib target) using 8085 CPU Module - feilipu
 rc2014-8085_clib.lib: $(TARGET_CLIB_OBJS)
@@ -2173,7 +2173,7 @@ rc2014-8085_clib.lib: $(TARGET_CLIB_OBJS)
 	$(RM) _DEVELOPMENT/target/rc2014/driver/ide/asm/*.o
 	$(RM) _DEVELOPMENT/target/rc2014/driver/diskio/8085/*.o
 	$(call buildgeneric,rc2014,portable)
-	TARGET=rc2014 TYPE=8085 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8085 -DFORrc2014 -x$(OUTPUT_DIRECTORY)/rc2014-8085_clib @$(TARGET_DIRECTORY)/rc2014/rc2014-8085.lst
+	TARGET=rc2014 TYPE=8085 $(LIBLINKER) -m8085 -DFORrc2014 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rc2014-8085_clib @$(TARGET_DIRECTORY)/rc2014/rc2014-8085.lst
 
 gfxvti.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
