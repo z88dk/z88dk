@@ -727,8 +727,10 @@ for my $cpu (Opcode->cpus) {
 	
 	# INC / DEC
 	for my $op ('inc', 'dec') {
-		add_synth($cpu, "$op (hl+)", "$op (hl)", "inc hl"); 
-		add_synth($cpu, "$op (hl-)", "$op (hl)", "dec hl"); 
+		for my $suf (@ez80_suffixes) {
+			add_synth($cpu, "$op$suf (hl+)", "$op$suf (hl)", "inc$suf hl"); 
+			add_synth($cpu, "$op$suf (hl-)", "$op$suf (hl)", "dec$suf hl"); 
+		}
 	}
 	
 	# LD r, (rp) / LD (rp), r

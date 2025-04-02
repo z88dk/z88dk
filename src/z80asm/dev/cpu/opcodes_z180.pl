@@ -51,7 +51,7 @@ for my $cpu1 ('z180') {
 		add_opcodes($cpu, "inc/dec (<x>+DIS)");
 
 		add_opcodes($cpu, "inx/dcx <r> [8080]") if !$strict;
-		add_opcodes($cpu, "inx/dec <rp> [8080]") if !$strict;
+		add_opcodes($cpu, "inx/dcx <rp> [8080]") if !$strict;
 		add_opcodes($cpu, "inc/dec <rp>");
 		add_opcodes($cpu, "inc/dec <x>");
 

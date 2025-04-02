@@ -40,7 +40,7 @@ for my $cpu1 ('8085') {
 		add_opcodes($cpu, "inc/dec <r>") if !$strict;
 		
 		add_opcodes($cpu, "inx/dcx <r> [8080]");
-		add_opcodes($cpu, "inx/dec <rp> [8080]") if !$strict;
+		add_opcodes($cpu, "inx/dcx <rp> [8080]") if !$strict;
 		add_opcodes($cpu, "inc/dec <rp>") if !$strict;
 		
 		add_opcodes($cpu, "dad <r> [8080]");

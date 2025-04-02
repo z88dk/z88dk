@@ -8866,6 +8866,8 @@ c_geu %m|z80|X||D4 %m %m
 c_geu %m|z80n|X||D4 %m %m
 c_gtu %m|8080|X||CA %t %t;D4 %m %m
 c_gtu %m|8085|X||CA %t %t;D4 %m %m
+c_gtu %m|ez80|X||28 %t;D4 %m %m %m
+c_gtu %m|ez80_z80|X||28 %t;D4 %m %m
 c_gtu %m|gbz80|X||28 %t;D4 %m %m
 c_gtu %m|kc160|_||28 %t;38 %t;CD %m %m
 c_gtu %m|kc160_z80|_||28 %t;38 %t;CD %m %m
@@ -8879,6 +8881,8 @@ c_gtu %m|z80|X||28 %t;D4 %m %m
 c_gtu %m|z80n|X||28 %t;D4 %m %m
 c_leu %m|8080|X||CA %t3 %t3;D2 %t %t;CD %m %m
 c_leu %m|8085|X||CA %t3 %t3;D2 %t %t;CD %m %m
+c_leu %m|ez80|X||28 %t4;30 %t;CD %m %m %m
+c_leu %m|ez80_z80|X||28 %t3;30 %t;CD %m %m
 c_leu %m|gbz80|X||28 %t3;30 %t;CD %m %m
 c_leu %m|kc160|_||28 %t3;30 %t;CD %m %m
 c_leu %m|kc160_z80|_||28 %t3;30 %t;CD %m %m
@@ -9164,6 +9168,8 @@ call geu, %m|z80|X||D4 %m %m
 call geu, %m|z80n|X||D4 %m %m
 call gtu, %m|8080|X||CA %t %t;D4 %m %m
 call gtu, %m|8085|X||CA %t %t;D4 %m %m
+call gtu, %m|ez80|X||28 %t;D4 %m %m %m
+call gtu, %m|ez80_z80|X||28 %t;D4 %m %m
 call gtu, %m|gbz80|X||28 %t;D4 %m %m
 call gtu, %m|kc160|_||28 %t;38 %t;CD %m %m
 call gtu, %m|kc160_z80|_||28 %t;38 %t;CD %m %m
@@ -9177,6 +9183,8 @@ call gtu, %m|z80|X||28 %t;D4 %m %m
 call gtu, %m|z80n|X||28 %t;D4 %m %m
 call leu, %m|8080|X||CA %t3 %t3;D2 %t %t;CD %m %m
 call leu, %m|8085|X||CA %t3 %t3;D2 %t %t;CD %m %m
+call leu, %m|ez80|X||28 %t4;30 %t;CD %m %m %m
+call leu, %m|ez80_z80|X||28 %t3;30 %t;CD %m %m
 call leu, %m|gbz80|X||28 %t3;30 %t;CD %m %m
 call leu, %m|kc160|_||28 %t3;30 %t;CD %m %m
 call leu, %m|kc160_z80|_||28 %t3;30 %t;CD %m %m
@@ -9401,6 +9409,10 @@ call.il eq, %m|ez80|X||5B;CC %m %m %m
 call.il eq, %m|ez80_z80|X||52;CC %m %m %m
 call.il geu, %m|ez80|X||5B;D4 %m %m %m
 call.il geu, %m|ez80_z80|X||52;D4 %m %m %m
+call.il gtu, %m|ez80|X||28 %t;5B;D4 %m %m %m
+call.il gtu, %m|ez80_z80|X||28 %t;52;D4 %m %m %m
+call.il leu, %m|ez80|X||28 %t5;30 %t;5B;CD %m %m %m
+call.il leu, %m|ez80_z80|X||28 %t5;30 %t;52;CD %m %m %m
 call.il ltu, %m|ez80|X||5B;DC %m %m %m
 call.il ltu, %m|ez80_z80|X||52;DC %m %m %m
 call.il m, %m|ez80|_||5B;FC %m %m %m
@@ -9449,6 +9461,10 @@ call.is eq, %m|ez80|X||49;CC %m %m
 call.is eq, %m|ez80_z80|X||40;CC %m %m
 call.is geu, %m|ez80|X||49;D4 %m %m
 call.is geu, %m|ez80_z80|X||40;D4 %m %m
+call.is gtu, %m|ez80|X||28 %t;49;D4 %m %m
+call.is gtu, %m|ez80_z80|X||28 %t;40;D4 %m %m
+call.is leu, %m|ez80|X||28 %t4;30 %t;49;CD %m %m
+call.is leu, %m|ez80_z80|X||28 %t4;30 %t;40;CD %m %m
 call.is ltu, %m|ez80|X||49;DC %m %m
 call.is ltu, %m|ez80_z80|X||40;DC %m %m
 call.is m, %m|ez80|_||49;FC %m %m
@@ -9491,6 +9507,8 @@ call.lil c, %m|ez80|_||5B;DC %m %m %m
 call.lil c, %m|ez80_strict|_||5B;DC %m %m %m
 call.lil eq, %m|ez80|X||5B;CC %m %m %m
 call.lil geu, %m|ez80|X||5B;D4 %m %m %m
+call.lil gtu, %m|ez80|X||28 %t;5B;D4 %m %m %m
+call.lil leu, %m|ez80|X||28 %t5;30 %t;5B;CD %m %m %m
 call.lil ltu, %m|ez80|X||5B;DC %m %m %m
 call.lil m, %m|ez80|_||5B;FC %m %m %m
 call.lil m, %m|ez80_strict|_||5B;FC %m %m %m
@@ -9515,6 +9533,8 @@ call.lis c, %m|ez80|_||49;DC %m %m
 call.lis c, %m|ez80_strict|_||49;DC %m %m
 call.lis eq, %m|ez80|X||49;CC %m %m
 call.lis geu, %m|ez80|X||49;D4 %m %m
+call.lis gtu, %m|ez80|X||28 %t;49;D4 %m %m
+call.lis leu, %m|ez80|X||28 %t4;30 %t;49;CD %m %m
 call.lis ltu, %m|ez80|X||49;DC %m %m
 call.lis m, %m|ez80|_||49;FC %m %m
 call.lis m, %m|ez80_strict|_||49;FC %m %m
@@ -9539,6 +9559,8 @@ call.sil c, %m|ez80_z80|_||52;DC %m %m %m
 call.sil c, %m|ez80_z80_strict|_||52;DC %m %m %m
 call.sil eq, %m|ez80_z80|X||52;CC %m %m %m
 call.sil geu, %m|ez80_z80|X||52;D4 %m %m %m
+call.sil gtu, %m|ez80_z80|X||28 %t;52;D4 %m %m %m
+call.sil leu, %m|ez80_z80|X||28 %t5;30 %t;52;CD %m %m %m
 call.sil ltu, %m|ez80_z80|X||52;DC %m %m %m
 call.sil m, %m|ez80_z80|_||52;FC %m %m %m
 call.sil m, %m|ez80_z80_strict|_||52;FC %m %m %m
@@ -9563,6 +9585,8 @@ call.sis c, %m|ez80_z80|_||40;DC %m %m
 call.sis c, %m|ez80_z80_strict|_||40;DC %m %m
 call.sis eq, %m|ez80_z80|X||40;CC %m %m
 call.sis geu, %m|ez80_z80|X||40;D4 %m %m
+call.sis gtu, %m|ez80_z80|X||28 %t;40;D4 %m %m
+call.sis leu, %m|ez80_z80|X||28 %t4;30 %t;40;CD %m %m
 call.sis ltu, %m|ez80_z80|X||40;DC %m %m
 call.sis m, %m|ez80_z80|_||40;FC %m %m
 call.sis m, %m|ez80_z80_strict|_||40;FC %m %m
@@ -9659,6 +9683,8 @@ cgeu %m|z80|X||D4 %m %m
 cgeu %m|z80n|X||D4 %m %m
 cgtu %m|8080|X||CA %t %t;D4 %m %m
 cgtu %m|8085|X||CA %t %t;D4 %m %m
+cgtu %m|ez80|X||28 %t;D4 %m %m %m
+cgtu %m|ez80_z80|X||28 %t;D4 %m %m
 cgtu %m|gbz80|X||28 %t;D4 %m %m
 cgtu %m|kc160|_||28 %t;38 %t;CD %m %m
 cgtu %m|kc160_z80|_||28 %t;38 %t;CD %m %m
@@ -9672,6 +9698,8 @@ cgtu %m|z80|X||28 %t;D4 %m %m
 cgtu %m|z80n|X||28 %t;D4 %m %m
 cleu %m|8080|X||CA %t3 %t3;D2 %t %t;CD %m %m
 cleu %m|8085|X||CA %t3 %t3;D2 %t %t;CD %m %m
+cleu %m|ez80|X||28 %t4;30 %t;CD %m %m %m
+cleu %m|ez80_z80|X||28 %t3;30 %t;CD %m %m
 cleu %m|gbz80|X||28 %t3;30 %t;CD %m %m
 cleu %m|kc160|_||28 %t3;30 %t;CD %m %m
 cleu %m|kc160_z80|_||28 %t3;30 %t;CD %m %m
@@ -11765,6 +11793,8 @@ dcr a|8080|_||3D
 dcr a|8080_strict|_||3D
 dcr a|8085|_||3D
 dcr a|8085_strict|_||3D
+dcr a|ez80|_||3D
+dcr a|ez80_z80|_||3D
 dcr a|gbz80|_||3D
 dcr a|kc160|_||3D
 dcr a|kc160_z80|_||3D
@@ -11780,6 +11810,8 @@ dcr b|8080|_||05
 dcr b|8080_strict|_||05
 dcr b|8085|_||05
 dcr b|8085_strict|_||05
+dcr b|ez80|_||05
+dcr b|ez80_z80|_||05
 dcr b|gbz80|_||05
 dcr b|kc160|_||05
 dcr b|kc160_z80|_||05
@@ -11795,6 +11827,8 @@ dcr c|8080|_||0D
 dcr c|8080_strict|_||0D
 dcr c|8085|_||0D
 dcr c|8085_strict|_||0D
+dcr c|ez80|_||0D
+dcr c|ez80_z80|_||0D
 dcr c|gbz80|_||0D
 dcr c|kc160|_||0D
 dcr c|kc160_z80|_||0D
@@ -11810,6 +11844,8 @@ dcr d|8080|_||15
 dcr d|8080_strict|_||15
 dcr d|8085|_||15
 dcr d|8085_strict|_||15
+dcr d|ez80|_||15
+dcr d|ez80_z80|_||15
 dcr d|gbz80|_||15
 dcr d|kc160|_||15
 dcr d|kc160_z80|_||15
@@ -11825,6 +11861,8 @@ dcr e|8080|_||1D
 dcr e|8080_strict|_||1D
 dcr e|8085|_||1D
 dcr e|8085_strict|_||1D
+dcr e|ez80|_||1D
+dcr e|ez80_z80|_||1D
 dcr e|gbz80|_||1D
 dcr e|kc160|_||1D
 dcr e|kc160_z80|_||1D
@@ -11840,6 +11878,8 @@ dcr h|8080|_||25
 dcr h|8080_strict|_||25
 dcr h|8085|_||25
 dcr h|8085_strict|_||25
+dcr h|ez80|_||25
+dcr h|ez80_z80|_||25
 dcr h|gbz80|_||25
 dcr h|kc160|_||25
 dcr h|kc160_z80|_||25
@@ -11855,6 +11895,8 @@ dcr l|8080|_||2D
 dcr l|8080_strict|_||2D
 dcr l|8085|_||2D
 dcr l|8085_strict|_||2D
+dcr l|ez80|_||2D
+dcr l|ez80_z80|_||2D
 dcr l|gbz80|_||2D
 dcr l|kc160|_||2D
 dcr l|kc160_z80|_||2D
@@ -11870,6 +11912,8 @@ dcr m|8080|_||35
 dcr m|8080_strict|_||35
 dcr m|8085|_||35
 dcr m|8085_strict|_||35
+dcr m|ez80|_||35
+dcr m|ez80_z80|_||35
 dcr m|gbz80|_||35
 dcr m|kc160|_||35
 dcr m|kc160_z80|_||35
@@ -11885,6 +11929,8 @@ dcx b|8080|_||0B
 dcx b|8080_strict|_||0B
 dcx b|8085|_||0B
 dcx b|8085_strict|_||0B
+dcx b|ez80|_||0B
+dcx b|ez80_z80|_||0B
 dcx b|gbz80|_||0B
 dcx b|kc160|_||0B
 dcx b|kc160_z80|_||0B
@@ -11898,6 +11944,8 @@ dcx b|z80|_||0B
 dcx b|z80n|_||0B
 dcx bc|8080|_||0B
 dcx bc|8085|_||0B
+dcx bc|ez80|_||0B
+dcx bc|ez80_z80|_||0B
 dcx bc|gbz80|_||0B
 dcx bc|kc160|_||0B
 dcx bc|kc160_z80|_||0B
@@ -11913,6 +11961,8 @@ dcx d|8080|_||1B
 dcx d|8080_strict|_||1B
 dcx d|8085|_||1B
 dcx d|8085_strict|_||1B
+dcx d|ez80|_||1B
+dcx d|ez80_z80|_||1B
 dcx d|gbz80|_||1B
 dcx d|kc160|_||1B
 dcx d|kc160_z80|_||1B
@@ -11926,6 +11976,8 @@ dcx d|z80|_||1B
 dcx d|z80n|_||1B
 dcx de|8080|_||1B
 dcx de|8085|_||1B
+dcx de|ez80|_||1B
+dcx de|ez80_z80|_||1B
 dcx de|gbz80|_||1B
 dcx de|kc160|_||1B
 dcx de|kc160_z80|_||1B
@@ -11941,6 +11993,8 @@ dcx h|8080|_||2B
 dcx h|8080_strict|_||2B
 dcx h|8085|_||2B
 dcx h|8085_strict|_||2B
+dcx h|ez80|_||2B
+dcx h|ez80_z80|_||2B
 dcx h|gbz80|_||2B
 dcx h|kc160|_||2B
 dcx h|kc160_z80|_||2B
@@ -11954,6 +12008,8 @@ dcx h|z80|_||2B
 dcx h|z80n|_||2B
 dcx hl|8080|_||2B
 dcx hl|8085|_||2B
+dcx hl|ez80|_||2B
+dcx hl|ez80_z80|_||2B
 dcx hl|gbz80|_||2B
 dcx hl|kc160|_||2B
 dcx hl|kc160_z80|_||2B
@@ -11969,6 +12025,8 @@ dcx sp|8080|_||3B
 dcx sp|8080_strict|_||3B
 dcx sp|8085|_||3B
 dcx sp|8085_strict|_||3B
+dcx sp|ez80|_||3B
+dcx sp|ez80_z80|_||3B
 dcx sp|gbz80|_||3B
 dcx sp|kc160|_||3B
 dcx sp|kc160_z80|_||3B
@@ -11987,6 +12045,10 @@ dec (aiy)|kc160|_||52;FD 35 00
 dec (aiy+%d)|kc160|_||52;FD 35 %d
 dec (hl)|8080|_||35
 dec (hl)|8085|_||35
+dec (hl)|ez80|_||35
+dec (hl)|ez80_strict|_||35
+dec (hl)|ez80_z80|_||35
+dec (hl)|ez80_z80_strict|_||35
 dec (hl)|gbz80|_||35
 dec (hl)|gbz80_strict|_||35
 dec (hl)|kc160|_||35
@@ -12004,6 +12066,8 @@ dec (hl)|z80n|_||35
 dec (hl)|z80n_strict|_||35
 dec (hl+)|8080|X||35;23
 dec (hl+)|8085|X||35;23
+dec (hl+)|ez80|X||35;23
+dec (hl+)|ez80_z80|X||35;23
 dec (hl+)|gbz80|X||35;23
 dec (hl+)|kc160|_||35;23
 dec (hl+)|kc160_z80|_||35;23
@@ -12017,6 +12081,8 @@ dec (hl+)|z80|X||35;23
 dec (hl+)|z80n|X||35;23
 dec (hl-)|8080|X||35;2B
 dec (hl-)|8085|X||35;2B
+dec (hl-)|ez80|X||35;2B
+dec (hl-)|ez80_z80|X||35;2B
 dec (hl-)|gbz80|X||35;2B
 dec (hl-)|kc160|_||35;2B
 dec (hl-)|kc160_z80|_||35;2B
@@ -12028,6 +12094,10 @@ dec (hl-)|r800|_||35;2B
 dec (hl-)|z180|X||35;2B
 dec (hl-)|z80|X||35;2B
 dec (hl-)|z80n|X||35;2B
+dec (ix)|ez80|_||DD 35 00
+dec (ix)|ez80_strict|_||DD 35 00
+dec (ix)|ez80_z80|_||DD 35 00
+dec (ix)|ez80_z80_strict|_||DD 35 00
 dec (ix)|kc160|_||DD 35 00
 dec (ix)|kc160_z80|_||DD 35 00
 dec (ix)|r2ka|_||DD 35 00
@@ -12041,6 +12111,10 @@ dec (ix)|z80|_||DD 35 00
 dec (ix)|z80_strict|_||DD 35 00
 dec (ix)|z80n|_||DD 35 00
 dec (ix)|z80n_strict|_||DD 35 00
+dec (ix+%d)|ez80|_||DD 35 %d
+dec (ix+%d)|ez80_strict|_||DD 35 %d
+dec (ix+%d)|ez80_z80|_||DD 35 %d
+dec (ix+%d)|ez80_z80_strict|_||DD 35 %d
 dec (ix+%d)|kc160|_||DD 35 %d
 dec (ix+%d)|kc160_z80|_||DD 35 %d
 dec (ix+%d)|r2ka|_||DD 35 %d
@@ -12054,6 +12128,10 @@ dec (ix+%d)|z80|_||DD 35 %d
 dec (ix+%d)|z80_strict|_||DD 35 %d
 dec (ix+%d)|z80n|_||DD 35 %d
 dec (ix+%d)|z80n_strict|_||DD 35 %d
+dec (iy)|ez80|_||FD 35 00
+dec (iy)|ez80_strict|_||FD 35 00
+dec (iy)|ez80_z80|_||FD 35 00
+dec (iy)|ez80_z80_strict|_||FD 35 00
 dec (iy)|kc160|_||FD 35 00
 dec (iy)|kc160_z80|_||FD 35 00
 dec (iy)|r2ka|_||FD 35 00
@@ -12067,6 +12145,10 @@ dec (iy)|z80|_||FD 35 00
 dec (iy)|z80_strict|_||FD 35 00
 dec (iy)|z80n|_||FD 35 00
 dec (iy)|z80n_strict|_||FD 35 00
+dec (iy+%d)|ez80|_||FD 35 %d
+dec (iy+%d)|ez80_strict|_||FD 35 %d
+dec (iy+%d)|ez80_z80|_||FD 35 %d
+dec (iy+%d)|ez80_z80_strict|_||FD 35 %d
 dec (iy+%d)|kc160|_||FD 35 %d
 dec (iy+%d)|kc160_z80|_||FD 35 %d
 dec (iy+%d)|r2ka|_||FD 35 %d
@@ -12102,6 +12184,10 @@ dec (ziy)|kc160|_||7F;FD 35 00
 dec (ziy+%d)|kc160|_||7F;FD 35 %d
 dec a|8080|_||3D
 dec a|8085|_||3D
+dec a|ez80|_||3D
+dec a|ez80_strict|_||3D
+dec a|ez80_z80|_||3D
+dec a|ez80_z80_strict|_||3D
 dec a|gbz80|_||3D
 dec a|gbz80_strict|_||3D
 dec a|kc160|_||3D
@@ -12129,6 +12215,10 @@ dec aiy|kc160|_||52;FD 2B
 dec asp|kc160|_||52;3B
 dec b|8080|_||05
 dec b|8085|_||05
+dec b|ez80|_||05
+dec b|ez80_strict|_||05
+dec b|ez80_z80|_||05
+dec b|ez80_z80_strict|_||05
 dec b|gbz80|_||05
 dec b|gbz80_strict|_||05
 dec b|kc160|_||05
@@ -12175,6 +12265,10 @@ dec bc'|r4k|_||76;0B
 dec bc'|r5k|_||76;0B
 dec c|8080|_||0D
 dec c|8085|_||0D
+dec c|ez80|_||0D
+dec c|ez80_strict|_||0D
+dec c|ez80_z80|_||0D
+dec c|ez80_z80_strict|_||0D
 dec c|gbz80|_||0D
 dec c|gbz80_strict|_||0D
 dec c|kc160|_||0D
@@ -12196,6 +12290,10 @@ dec c'|r4k|_||76;0D
 dec c'|r5k|_||76;0D
 dec d|8080|_||15
 dec d|8085|_||15
+dec d|ez80|_||15
+dec d|ez80_strict|_||15
+dec d|ez80_z80|_||15
+dec d|ez80_z80_strict|_||15
 dec d|gbz80|_||15
 dec d|gbz80_strict|_||15
 dec d|kc160|_||15
@@ -12242,6 +12340,10 @@ dec de'|r4k|_||76;1B
 dec de'|r5k|_||76;1B
 dec e|8080|_||1D
 dec e|8085|_||1D
+dec e|ez80|_||1D
+dec e|ez80_strict|_||1D
+dec e|ez80_z80|_||1D
+dec e|ez80_z80_strict|_||1D
 dec e|gbz80|_||1D
 dec e|gbz80_strict|_||1D
 dec e|kc160|_||1D
@@ -12263,6 +12365,10 @@ dec e'|r4k|_||76;1D
 dec e'|r5k|_||76;1D
 dec h|8080|_||25
 dec h|8085|_||25
+dec h|ez80|_||25
+dec h|ez80_strict|_||25
+dec h|ez80_z80|_||25
+dec h|ez80_z80_strict|_||25
 dec h|gbz80|_||25
 dec h|gbz80_strict|_||25
 dec h|kc160|_||25
@@ -12307,6 +12413,10 @@ dec hl'|r2ka|_||76;2B
 dec hl'|r3k|_||76;2B
 dec hl'|r4k|_||76;2B
 dec hl'|r5k|_||76;2B
+dec ix|ez80|_||DD 2B
+dec ix|ez80_strict|_||DD 2B
+dec ix|ez80_z80|_||DD 2B
+dec ix|ez80_z80_strict|_||DD 2B
 dec ix|kc160|_||DD 2B
 dec ix|kc160_z80|_||DD 2B
 dec ix|r2ka|_||DD 2B
@@ -12320,14 +12430,26 @@ dec ix|z80|_||DD 2B
 dec ix|z80_strict|_||DD 2B
 dec ix|z80n|_||DD 2B
 dec ix|z80n_strict|_||DD 2B
+dec ixh|ez80|_||DD 25
+dec ixh|ez80_strict|_||DD 25
+dec ixh|ez80_z80|_||DD 25
+dec ixh|ez80_z80_strict|_||DD 25
 dec ixh|r800|_||DD 25
 dec ixh|z80|_||DD 25
 dec ixh|z80n|_||DD 25
 dec ixh|z80n_strict|_||DD 25
+dec ixl|ez80|_||DD 2D
+dec ixl|ez80_strict|_||DD 2D
+dec ixl|ez80_z80|_||DD 2D
+dec ixl|ez80_z80_strict|_||DD 2D
 dec ixl|r800|_||DD 2D
 dec ixl|z80|_||DD 2D
 dec ixl|z80n|_||DD 2D
 dec ixl|z80n_strict|_||DD 2D
+dec iy|ez80|_||FD 2B
+dec iy|ez80_strict|_||FD 2B
+dec iy|ez80_z80|_||FD 2B
+dec iy|ez80_z80_strict|_||FD 2B
 dec iy|kc160|_||FD 2B
 dec iy|kc160_z80|_||FD 2B
 dec iy|r2ka|_||FD 2B
@@ -12341,16 +12463,28 @@ dec iy|z80|_||FD 2B
 dec iy|z80_strict|_||FD 2B
 dec iy|z80n|_||FD 2B
 dec iy|z80n_strict|_||FD 2B
+dec iyh|ez80|_||FD 25
+dec iyh|ez80_strict|_||FD 25
+dec iyh|ez80_z80|_||FD 25
+dec iyh|ez80_z80_strict|_||FD 25
 dec iyh|r800|_||FD 25
 dec iyh|z80|_||FD 25
 dec iyh|z80n|_||FD 25
 dec iyh|z80n_strict|_||FD 25
+dec iyl|ez80|_||FD 2D
+dec iyl|ez80_strict|_||FD 2D
+dec iyl|ez80_z80|_||FD 2D
+dec iyl|ez80_z80_strict|_||FD 2D
 dec iyl|r800|_||FD 2D
 dec iyl|z80|_||FD 2D
 dec iyl|z80n|_||FD 2D
 dec iyl|z80n_strict|_||FD 2D
 dec l|8080|_||2D
 dec l|8085|_||2D
+dec l|ez80|_||2D
+dec l|ez80_strict|_||2D
+dec l|ez80_z80|_||2D
+dec l|ez80_z80_strict|_||2D
 dec l|gbz80|_||2D
 dec l|gbz80_strict|_||2D
 dec l|kc160|_||2D
@@ -12409,42 +12543,110 @@ dec zhl|kc160|_||7F;2B
 dec zix|kc160|_||7F;DD 2B
 dec ziy|kc160|_||7F;FD 2B
 dec zsp|kc160|_||7F;3B
+dec.l (hl)|ez80_z80|_||49;35
+dec.l (hl)|ez80_z80_strict|_||49;35
+dec.l (hl+)|ez80_z80|X||49;35;49;23
+dec.l (hl-)|ez80_z80|X||49;35;49;2B
+dec.l (ix)|ez80_z80|_||49;DD 35 00
+dec.l (ix)|ez80_z80_strict|_||49;DD 35 00
+dec.l (ix+%d)|ez80_z80|_||49;DD 35 %d
+dec.l (ix+%d)|ez80_z80_strict|_||49;DD 35 %d
+dec.l (iy)|ez80_z80|_||49;FD 35 00
+dec.l (iy)|ez80_z80_strict|_||49;FD 35 00
+dec.l (iy+%d)|ez80_z80|_||49;FD 35 %d
+dec.l (iy+%d)|ez80_z80_strict|_||49;FD 35 %d
 dec.l bc|ez80_z80|_||49;0B
 dec.l bc|ez80_z80_strict|_||49;0B
 dec.l de|ez80_z80|_||49;1B
 dec.l de|ez80_z80_strict|_||49;1B
 dec.l hl|ez80_z80|_||49;2B
 dec.l hl|ez80_z80_strict|_||49;2B
+dec.l ix|ez80_z80|_||49;DD 2B
+dec.l ix|ez80_z80_strict|_||49;DD 2B
+dec.l iy|ez80_z80|_||49;FD 2B
+dec.l iy|ez80_z80_strict|_||49;FD 2B
 dec.l sp|ez80_z80|_||49;3B
 dec.l sp|ez80_z80_strict|_||49;3B
+dec.lis (hl)|ez80_z80|_||49;35
+dec.lis (hl)|ez80_z80_strict|_||49;35
+dec.lis (hl+)|ez80_z80|X||49;35;49;23
+dec.lis (hl-)|ez80_z80|X||49;35;49;2B
+dec.lis (ix)|ez80_z80|_||49;DD 35 00
+dec.lis (ix)|ez80_z80_strict|_||49;DD 35 00
+dec.lis (ix+%d)|ez80_z80|_||49;DD 35 %d
+dec.lis (ix+%d)|ez80_z80_strict|_||49;DD 35 %d
+dec.lis (iy)|ez80_z80|_||49;FD 35 00
+dec.lis (iy)|ez80_z80_strict|_||49;FD 35 00
+dec.lis (iy+%d)|ez80_z80|_||49;FD 35 %d
+dec.lis (iy+%d)|ez80_z80_strict|_||49;FD 35 %d
 dec.lis bc|ez80_z80|_||49;0B
 dec.lis bc|ez80_z80_strict|_||49;0B
 dec.lis de|ez80_z80|_||49;1B
 dec.lis de|ez80_z80_strict|_||49;1B
 dec.lis hl|ez80_z80|_||49;2B
 dec.lis hl|ez80_z80_strict|_||49;2B
+dec.lis ix|ez80_z80|_||49;DD 2B
+dec.lis ix|ez80_z80_strict|_||49;DD 2B
+dec.lis iy|ez80_z80|_||49;FD 2B
+dec.lis iy|ez80_z80_strict|_||49;FD 2B
 dec.lis sp|ez80_z80|_||49;3B
 dec.lis sp|ez80_z80_strict|_||49;3B
+dec.s (hl)|ez80|_||52;35
+dec.s (hl)|ez80_strict|_||52;35
+dec.s (hl+)|ez80|X||52;35;52;23
+dec.s (hl-)|ez80|X||52;35;52;2B
+dec.s (ix)|ez80|_||52;DD 35 00
+dec.s (ix)|ez80_strict|_||52;DD 35 00
+dec.s (ix+%d)|ez80|_||52;DD 35 %d
+dec.s (ix+%d)|ez80_strict|_||52;DD 35 %d
+dec.s (iy)|ez80|_||52;FD 35 00
+dec.s (iy)|ez80_strict|_||52;FD 35 00
+dec.s (iy+%d)|ez80|_||52;FD 35 %d
+dec.s (iy+%d)|ez80_strict|_||52;FD 35 %d
 dec.s bc|ez80|_||52;0B
 dec.s bc|ez80_strict|_||52;0B
 dec.s de|ez80|_||52;1B
 dec.s de|ez80_strict|_||52;1B
 dec.s hl|ez80|_||52;2B
 dec.s hl|ez80_strict|_||52;2B
+dec.s ix|ez80|_||52;DD 2B
+dec.s ix|ez80_strict|_||52;DD 2B
+dec.s iy|ez80|_||52;FD 2B
+dec.s iy|ez80_strict|_||52;FD 2B
 dec.s sp|ez80|_||52;3B
 dec.s sp|ez80_strict|_||52;3B
+dec.sil (hl)|ez80|_||52;35
+dec.sil (hl)|ez80_strict|_||52;35
+dec.sil (hl+)|ez80|X||52;35;52;23
+dec.sil (hl-)|ez80|X||52;35;52;2B
+dec.sil (ix)|ez80|_||52;DD 35 00
+dec.sil (ix)|ez80_strict|_||52;DD 35 00
+dec.sil (ix+%d)|ez80|_||52;DD 35 %d
+dec.sil (ix+%d)|ez80_strict|_||52;DD 35 %d
+dec.sil (iy)|ez80|_||52;FD 35 00
+dec.sil (iy)|ez80_strict|_||52;FD 35 00
+dec.sil (iy+%d)|ez80|_||52;FD 35 %d
+dec.sil (iy+%d)|ez80_strict|_||52;FD 35 %d
 dec.sil bc|ez80|_||52;0B
 dec.sil bc|ez80_strict|_||52;0B
 dec.sil de|ez80|_||52;1B
 dec.sil de|ez80_strict|_||52;1B
 dec.sil hl|ez80|_||52;2B
 dec.sil hl|ez80_strict|_||52;2B
+dec.sil ix|ez80|_||52;DD 2B
+dec.sil ix|ez80_strict|_||52;DD 2B
+dec.sil iy|ez80|_||52;FD 2B
+dec.sil iy|ez80_strict|_||52;FD 2B
 dec.sil sp|ez80|_||52;3B
 dec.sil sp|ez80_strict|_||52;3B
 di|8080|_||F3
 di|8080_strict|_||F3
 di|8085|_||F3
 di|8085_strict|_||F3
+di|ez80|_||F3
+di|ez80_strict|_||F3
+di|ez80_z80|_||F3
+di|ez80_z80_strict|_||F3
 di|gbz80|_||F3
 di|gbz80_strict|_||F3
 di|kc160|_||F3
@@ -12466,6 +12668,10 @@ divs hl, a|kc160|_||ED 7C
 divs hl, a|kc160_z80|_||ED 7C
 djnz %j|8080|X||05;C2 %m %m
 djnz %j|8085|X||05;C2 %m %m
+djnz %j|ez80|_||10 %j
+djnz %j|ez80_strict|_||10 %j
+djnz %j|ez80_z80|_||10 %j
+djnz %j|ez80_z80_strict|_||10 %j
 djnz %j|gbz80|X||05;20 %j
 djnz %j|kc160|_||10 %j
 djnz %j|kc160_z80|_||10 %j
@@ -12486,6 +12692,8 @@ djnz b', %j|r4k|_||76 10 %j
 djnz b', %j|r5k|_||76 10 %j
 djnz b, %j|8080|X||05;C2 %m %m
 djnz b, %j|8085|X||05;C2 %m %m
+djnz b, %j|ez80|_||10 %j
+djnz b, %j|ez80_z80|_||10 %j
 djnz b, %j|gbz80|X||05;20 %j
 djnz b, %j|kc160|_||10 %j
 djnz b, %j|kc160_z80|_||10 %j
@@ -12522,6 +12730,10 @@ ei|8080|_||FB
 ei|8080_strict|_||FB
 ei|8085|_||FB
 ei|8085_strict|_||FB
+ei|ez80|_||FB
+ei|ez80_strict|_||FB
+ei|ez80_z80|_||FB
+ei|ez80_z80_strict|_||FB
 ei|gbz80|_||FB
 ei|gbz80_strict|_||FB
 ei|kc160|_||FB
@@ -12535,8 +12747,10 @@ ei|z80n|_||FB
 ei|z80n_strict|_||FB
 ex (sp), hl|8080|_||E3
 ex (sp), hl|8085|_||E3
-ex (sp), hl|ez80|X||CD @__z80asm__ex_sp_hl 
-ex (sp), hl|ez80_z80|X||CD @__z80asm__ex_sp_hl 
+ex (sp), hl|ez80|_||E3
+ex (sp), hl|ez80_strict|_||E3
+ex (sp), hl|ez80_z80|_||E3
+ex (sp), hl|ez80_z80_strict|_||E3
 ex (sp), hl|gbz80|X||CD @__z80asm__ex_sp_hl 
 ex (sp), hl|kc160|_||E3
 ex (sp), hl|kc160_z80|_||E3
@@ -12555,6 +12769,10 @@ ex (sp), hl'|r2ka|_||76;ED 54
 ex (sp), hl'|r3k|_||76;ED 54
 ex (sp), hl'|r4k|_||76;ED 54
 ex (sp), hl'|r5k|_||76;ED 54
+ex (sp), ix|ez80|_||DD E3
+ex (sp), ix|ez80_strict|_||DD E3
+ex (sp), ix|ez80_z80|_||DD E3
+ex (sp), ix|ez80_z80_strict|_||DD E3
 ex (sp), ix|kc160|_||DD E3
 ex (sp), ix|kc160_z80|_||DD E3
 ex (sp), ix|r2ka|_||DD E3
@@ -12568,6 +12786,10 @@ ex (sp), ix|z80|_||DD E3
 ex (sp), ix|z80_strict|_||DD E3
 ex (sp), ix|z80n|_||DD E3
 ex (sp), ix|z80n_strict|_||DD E3
+ex (sp), iy|ez80|_||FD E3
+ex (sp), iy|ez80_strict|_||FD E3
+ex (sp), iy|ez80_z80|_||FD E3
+ex (sp), iy|ez80_z80_strict|_||FD E3
 ex (sp), iy|kc160|_||FD E3
 ex (sp), iy|kc160_z80|_||FD E3
 ex (sp), iy|r2ka|_||FD E3
@@ -12581,6 +12803,8 @@ ex (sp), iy|z80|_||FD E3
 ex (sp), iy|z80_strict|_||FD E3
 ex (sp), iy|z80n|_||FD E3
 ex (sp), iy|z80n_strict|_||FD E3
+ex af', af|ez80|X||08
+ex af', af|ez80_z80|X||08
 ex af', af|kc160|_||08
 ex af', af|kc160_z80|_||08
 ex af', af|r2ka|_||08
@@ -12591,6 +12815,8 @@ ex af', af|r800|_||08
 ex af', af|z180|X||08
 ex af', af|z80|X||08
 ex af', af|z80n|X||08
+ex af, af|ez80|X||08
+ex af, af|ez80_z80|X||08
 ex af, af|kc160|_||08
 ex af, af|kc160_z80|_||08
 ex af, af|r2ka|_||08
@@ -12601,6 +12827,10 @@ ex af, af|r800|_||08
 ex af, af|z180|X||08
 ex af, af|z80|X||08
 ex af, af|z80n|X||08
+ex af, af'|ez80|_||08
+ex af, af'|ez80_strict|_||08
+ex af, af'|ez80_z80|_||08
+ex af, af'|ez80_z80_strict|_||08
 ex af, af'|kc160|_||08
 ex af, af'|kc160_z80|_||08
 ex af, af'|r2ka|_||08
@@ -12645,6 +12875,10 @@ ex de', hl'|r4k|_||76;E3
 ex de', hl'|r5k|_||76;E3
 ex de, hl|8080|_||EB
 ex de, hl|8085|_||EB
+ex de, hl|ez80|_||EB
+ex de, hl|ez80_strict|_||EB
+ex de, hl|ez80_z80|_||EB
+ex de, hl|ez80_z80_strict|_||EB
 ex de, hl|gbz80|X||E5;D5;E1;D1
 ex de, hl|kc160|_||EB
 ex de, hl|kc160_z80|_||EB
@@ -12696,6 +12930,8 @@ ex hl, bc'|r4k|_||ED 74
 ex hl, bc'|r5k|_||ED 74
 ex hl, de|8080|X||EB
 ex hl, de|8085|X||EB
+ex hl, de|ez80|X||EB
+ex hl, de|ez80_z80|X||EB
 ex hl, de|gbz80|X||E5;D5;E1;D1
 ex hl, de|kc160|_||EB
 ex hl, de|kc160_z80|_||EB
@@ -12725,8 +12961,36 @@ ex jk, hl'|r4k|_||76;B9
 ex jk, hl'|r5k|_||76;B9
 ex jkhl, bcde|r4k|_||B4
 ex jkhl, bcde|r5k|_||B4
+ex.l (sp), hl|ez80_z80|_||49;E3
+ex.l (sp), hl|ez80_z80_strict|_||49;E3
+ex.l (sp), ix|ez80_z80|_||49;DD E3
+ex.l (sp), ix|ez80_z80_strict|_||49;DD E3
+ex.l (sp), iy|ez80_z80|_||49;FD E3
+ex.l (sp), iy|ez80_z80_strict|_||49;FD E3
+ex.lis (sp), hl|ez80_z80|_||49;E3
+ex.lis (sp), hl|ez80_z80_strict|_||49;E3
+ex.lis (sp), ix|ez80_z80|_||49;DD E3
+ex.lis (sp), ix|ez80_z80_strict|_||49;DD E3
+ex.lis (sp), iy|ez80_z80|_||49;FD E3
+ex.lis (sp), iy|ez80_z80_strict|_||49;FD E3
+ex.s (sp), hl|ez80|_||52;E3
+ex.s (sp), hl|ez80_strict|_||52;E3
+ex.s (sp), ix|ez80|_||52;DD E3
+ex.s (sp), ix|ez80_strict|_||52;DD E3
+ex.s (sp), iy|ez80|_||52;FD E3
+ex.s (sp), iy|ez80_strict|_||52;FD E3
+ex.sil (sp), hl|ez80|_||52;E3
+ex.sil (sp), hl|ez80_strict|_||52;E3
+ex.sil (sp), ix|ez80|_||52;DD E3
+ex.sil (sp), ix|ez80_strict|_||52;DD E3
+ex.sil (sp), iy|ez80|_||52;FD E3
+ex.sil (sp), iy|ez80_strict|_||52;FD E3
 exp|r4k|_||ED D9
 exp|r5k|_||ED D9
+exx|ez80|_||D9
+exx|ez80_strict|_||D9
+exx|ez80_z80|_||D9
+exx|ez80_z80_strict|_||D9
 exx|kc160|_||D9
 exx|kc160_z80|_||D9
 exx|r2ka|_||D9
@@ -12760,6 +13024,10 @@ fsyscall|r4k|_||ED 55
 fsyscall|r5k|_||ED 55
 halt|8080|_||76
 halt|8085|_||76
+halt|ez80|_||76
+halt|ez80_strict|_||76
+halt|ez80_z80|_||76
+halt|ez80_z80_strict|_||76
 halt|gbz80|_||76
 halt|gbz80_strict|_||76
 halt|kc160|_||76
@@ -12775,6 +13043,8 @@ hlt|8080|_||76
 hlt|8080_strict|_||76
 hlt|8085|_||76
 hlt|8085_strict|_||76
+hlt|ez80|_||76
+hlt|ez80_z80|_||76
 hlt|gbz80|_||76
 hlt|kc160|_||76
 hlt|kc160_z80|_||76
@@ -12787,6 +13057,10 @@ ibox a|r5k|_||ED 12
 idet|r3k|_||5B
 idet|r4k|_||5B
 idet|r5k|_||5B
+im %c|ez80|_|0,1,2|ED %c==0?0x46:%c==1?0x56:0x5E
+im %c|ez80_strict|_|0,1,2|ED %c==0?0x46:%c==1?0x56:0x5E
+im %c|ez80_z80|_|0,1,2|ED %c==0?0x46:%c==1?0x56:0x5E
+im %c|ez80_z80_strict|_|0,1,2|ED %c==0?0x46:%c==1?0x56:0x5E
 im %c|kc160|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x5E:0x4E
 im %c|kc160_z80|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x5E:0x4E
 im %c|r800|_|0,1,2|ED %c==0?0x46:%c==1?0x56:0x5E
@@ -12800,6 +13074,8 @@ in %n|8080|_||DB %n
 in %n|8080_strict|_||DB %n
 in %n|8085|_||DB %n
 in %n|8085_strict|_||DB %n
+in %n|ez80|_||DB %n
+in %n|ez80_z80|_||DB %n
 in %n|kc160|_||DB %n
 in %n|kc160_z80|_||DB %n
 in %n|r800|_||DB %n
@@ -12818,6 +13094,10 @@ in (c)|z80n|_||ED 70
 in (c)|z80n_strict|_||ED 70
 in a, (%n)|8080|_||DB %n
 in a, (%n)|8085|_||DB %n
+in a, (%n)|ez80|_||DB %n
+in a, (%n)|ez80_strict|_||DB %n
+in a, (%n)|ez80_z80|_||DB %n
+in a, (%n)|ez80_z80_strict|_||DB %n
 in a, (%n)|kc160|_||DB %n
 in a, (%n)|kc160_z80|_||DB %n
 in a, (%n)|r800|_||DB %n
@@ -12827,12 +13107,18 @@ in a, (%n)|z80|_||DB %n
 in a, (%n)|z80_strict|_||DB %n
 in a, (%n)|z80n|_||DB %n
 in a, (%n)|z80n_strict|_||DB %n
+in a, (bc)|ez80|_||ED 78
+in a, (bc)|ez80_strict|_||ED 78
+in a, (bc)|ez80_z80|_||ED 78
+in a, (bc)|ez80_z80_strict|_||ED 78
 in a, (bc)|kc160|_||ED 78
 in a, (bc)|kc160_z80|_||ED 78
 in a, (bc)|r800|_||ED 78
 in a, (bc)|z180|_||ED 78
 in a, (bc)|z80|_||ED 78
 in a, (bc)|z80n|_||ED 78
+in a, (c)|ez80|_||ED 78
+in a, (c)|ez80_z80|_||ED 78
 in a, (c)|kc160|_||ED 78
 in a, (c)|kc160_z80|_||ED 78
 in a, (c)|r800|_||ED 78
@@ -12842,12 +13128,18 @@ in a, (c)|z80|_||ED 78
 in a, (c)|z80_strict|_||ED 78
 in a, (c)|z80n|_||ED 78
 in a, (c)|z80n_strict|_||ED 78
+in b, (bc)|ez80|_||ED 40
+in b, (bc)|ez80_strict|_||ED 40
+in b, (bc)|ez80_z80|_||ED 40
+in b, (bc)|ez80_z80_strict|_||ED 40
 in b, (bc)|kc160|_||ED 40
 in b, (bc)|kc160_z80|_||ED 40
 in b, (bc)|r800|_||ED 40
 in b, (bc)|z180|_||ED 40
 in b, (bc)|z80|_||ED 40
 in b, (bc)|z80n|_||ED 40
+in b, (c)|ez80|_||ED 40
+in b, (c)|ez80_z80|_||ED 40
 in b, (c)|kc160|_||ED 40
 in b, (c)|kc160_z80|_||ED 40
 in b, (c)|r800|_||ED 40
@@ -12857,12 +13149,18 @@ in b, (c)|z80|_||ED 40
 in b, (c)|z80_strict|_||ED 40
 in b, (c)|z80n|_||ED 40
 in b, (c)|z80n_strict|_||ED 40
+in c, (bc)|ez80|_||ED 48
+in c, (bc)|ez80_strict|_||ED 48
+in c, (bc)|ez80_z80|_||ED 48
+in c, (bc)|ez80_z80_strict|_||ED 48
 in c, (bc)|kc160|_||ED 48
 in c, (bc)|kc160_z80|_||ED 48
 in c, (bc)|r800|_||ED 48
 in c, (bc)|z180|_||ED 48
 in c, (bc)|z80|_||ED 48
 in c, (bc)|z80n|_||ED 48
+in c, (c)|ez80|_||ED 48
+in c, (c)|ez80_z80|_||ED 48
 in c, (c)|kc160|_||ED 48
 in c, (c)|kc160_z80|_||ED 48
 in c, (c)|r800|_||ED 48
@@ -12872,12 +13170,18 @@ in c, (c)|z80|_||ED 48
 in c, (c)|z80_strict|_||ED 48
 in c, (c)|z80n|_||ED 48
 in c, (c)|z80n_strict|_||ED 48
+in d, (bc)|ez80|_||ED 50
+in d, (bc)|ez80_strict|_||ED 50
+in d, (bc)|ez80_z80|_||ED 50
+in d, (bc)|ez80_z80_strict|_||ED 50
 in d, (bc)|kc160|_||ED 50
 in d, (bc)|kc160_z80|_||ED 50
 in d, (bc)|r800|_||ED 50
 in d, (bc)|z180|_||ED 50
 in d, (bc)|z80|_||ED 50
 in d, (bc)|z80n|_||ED 50
+in d, (c)|ez80|_||ED 50
+in d, (c)|ez80_z80|_||ED 50
 in d, (c)|kc160|_||ED 50
 in d, (c)|kc160_z80|_||ED 50
 in d, (c)|r800|_||ED 50
@@ -12887,12 +13191,18 @@ in d, (c)|z80|_||ED 50
 in d, (c)|z80_strict|_||ED 50
 in d, (c)|z80n|_||ED 50
 in d, (c)|z80n_strict|_||ED 50
+in e, (bc)|ez80|_||ED 58
+in e, (bc)|ez80_strict|_||ED 58
+in e, (bc)|ez80_z80|_||ED 58
+in e, (bc)|ez80_z80_strict|_||ED 58
 in e, (bc)|kc160|_||ED 58
 in e, (bc)|kc160_z80|_||ED 58
 in e, (bc)|r800|_||ED 58
 in e, (bc)|z180|_||ED 58
 in e, (bc)|z80|_||ED 58
 in e, (bc)|z80n|_||ED 58
+in e, (c)|ez80|_||ED 58
+in e, (c)|ez80_z80|_||ED 58
 in e, (c)|kc160|_||ED 58
 in e, (c)|kc160_z80|_||ED 58
 in e, (c)|r800|_||ED 58
@@ -12912,12 +13222,18 @@ in f, (c)|z180|_||ED 70
 in f, (c)|z80|_||ED 70
 in f, (c)|z80n|_||ED 70
 in f, (c)|z80n_strict|_||ED 70
+in h, (bc)|ez80|_||ED 60
+in h, (bc)|ez80_strict|_||ED 60
+in h, (bc)|ez80_z80|_||ED 60
+in h, (bc)|ez80_z80_strict|_||ED 60
 in h, (bc)|kc160|_||ED 60
 in h, (bc)|kc160_z80|_||ED 60
 in h, (bc)|r800|_||ED 60
 in h, (bc)|z180|_||ED 60
 in h, (bc)|z80|_||ED 60
 in h, (bc)|z80n|_||ED 60
+in h, (c)|ez80|_||ED 60
+in h, (c)|ez80_z80|_||ED 60
 in h, (c)|kc160|_||ED 60
 in h, (c)|kc160_z80|_||ED 60
 in h, (c)|r800|_||ED 60
@@ -12927,12 +13243,18 @@ in h, (c)|z80|_||ED 60
 in h, (c)|z80_strict|_||ED 60
 in h, (c)|z80n|_||ED 60
 in h, (c)|z80n_strict|_||ED 60
+in l, (bc)|ez80|_||ED 68
+in l, (bc)|ez80_strict|_||ED 68
+in l, (bc)|ez80_z80|_||ED 68
+in l, (bc)|ez80_z80_strict|_||ED 68
 in l, (bc)|kc160|_||ED 68
 in l, (bc)|kc160_z80|_||ED 68
 in l, (bc)|r800|_||ED 68
 in l, (bc)|z180|_||ED 68
 in l, (bc)|z80|_||ED 68
 in l, (bc)|z80n|_||ED 68
+in l, (c)|ez80|_||ED 68
+in l, (c)|ez80_z80|_||ED 68
 in l, (c)|kc160|_||ED 68
 in l, (c)|kc160_z80|_||ED 68
 in l, (c)|r800|_||ED 68
@@ -12942,18 +13264,46 @@ in l, (c)|z80|_||ED 68
 in l, (c)|z80_strict|_||ED 68
 in l, (c)|z80n|_||ED 68
 in l, (c)|z80n_strict|_||ED 68
+in0 a, (%n)|ez80|_||ED 38 %n
+in0 a, (%n)|ez80_strict|_||ED 38 %n
+in0 a, (%n)|ez80_z80|_||ED 38 %n
+in0 a, (%n)|ez80_z80_strict|_||ED 38 %n
 in0 a, (%n)|z180|_||ED 38 %n
 in0 a, (%n)|z180_strict|_||ED 38 %n
+in0 b, (%n)|ez80|_||ED 00 %n
+in0 b, (%n)|ez80_strict|_||ED 00 %n
+in0 b, (%n)|ez80_z80|_||ED 00 %n
+in0 b, (%n)|ez80_z80_strict|_||ED 00 %n
 in0 b, (%n)|z180|_||ED 00 %n
 in0 b, (%n)|z180_strict|_||ED 00 %n
+in0 c, (%n)|ez80|_||ED 08 %n
+in0 c, (%n)|ez80_strict|_||ED 08 %n
+in0 c, (%n)|ez80_z80|_||ED 08 %n
+in0 c, (%n)|ez80_z80_strict|_||ED 08 %n
 in0 c, (%n)|z180|_||ED 08 %n
 in0 c, (%n)|z180_strict|_||ED 08 %n
+in0 d, (%n)|ez80|_||ED 10 %n
+in0 d, (%n)|ez80_strict|_||ED 10 %n
+in0 d, (%n)|ez80_z80|_||ED 10 %n
+in0 d, (%n)|ez80_z80_strict|_||ED 10 %n
 in0 d, (%n)|z180|_||ED 10 %n
 in0 d, (%n)|z180_strict|_||ED 10 %n
+in0 e, (%n)|ez80|_||ED 18 %n
+in0 e, (%n)|ez80_strict|_||ED 18 %n
+in0 e, (%n)|ez80_z80|_||ED 18 %n
+in0 e, (%n)|ez80_z80_strict|_||ED 18 %n
 in0 e, (%n)|z180|_||ED 18 %n
 in0 e, (%n)|z180_strict|_||ED 18 %n
+in0 h, (%n)|ez80|_||ED 20 %n
+in0 h, (%n)|ez80_strict|_||ED 20 %n
+in0 h, (%n)|ez80_z80|_||ED 20 %n
+in0 h, (%n)|ez80_z80_strict|_||ED 20 %n
 in0 h, (%n)|z180|_||ED 20 %n
 in0 h, (%n)|z180_strict|_||ED 20 %n
+in0 l, (%n)|ez80|_||ED 28 %n
+in0 l, (%n)|ez80_strict|_||ED 28 %n
+in0 l, (%n)|ez80_z80|_||ED 28 %n
+in0 l, (%n)|ez80_z80_strict|_||ED 28 %n
 in0 l, (%n)|z180|_||ED 28 %n
 in0 l, (%n)|z180_strict|_||ED 28 %n
 inc (ahl)|kc160|_||52;34
@@ -12963,6 +13313,10 @@ inc (aiy)|kc160|_||52;FD 34 00
 inc (aiy+%d)|kc160|_||52;FD 34 %d
 inc (hl)|8080|_||34
 inc (hl)|8085|_||34
+inc (hl)|ez80|_||34
+inc (hl)|ez80_strict|_||34
+inc (hl)|ez80_z80|_||34
+inc (hl)|ez80_z80_strict|_||34
 inc (hl)|gbz80|_||34
 inc (hl)|gbz80_strict|_||34
 inc (hl)|kc160|_||34
@@ -12980,6 +13334,8 @@ inc (hl)|z80n|_||34
 inc (hl)|z80n_strict|_||34
 inc (hl+)|8080|X||34;23
 inc (hl+)|8085|X||34;23
+inc (hl+)|ez80|X||34;23
+inc (hl+)|ez80_z80|X||34;23
 inc (hl+)|gbz80|X||34;23
 inc (hl+)|kc160|_||34;23
 inc (hl+)|kc160_z80|_||34;23
@@ -12993,6 +13349,8 @@ inc (hl+)|z80|X||34;23
 inc (hl+)|z80n|X||34;23
 inc (hl-)|8080|X||34;2B
 inc (hl-)|8085|X||34;2B
+inc (hl-)|ez80|X||34;2B
+inc (hl-)|ez80_z80|X||34;2B
 inc (hl-)|gbz80|X||34;2B
 inc (hl-)|kc160|_||34;2B
 inc (hl-)|kc160_z80|_||34;2B
@@ -13004,6 +13362,10 @@ inc (hl-)|r800|_||34;2B
 inc (hl-)|z180|X||34;2B
 inc (hl-)|z80|X||34;2B
 inc (hl-)|z80n|X||34;2B
+inc (ix)|ez80|_||DD 34 00
+inc (ix)|ez80_strict|_||DD 34 00
+inc (ix)|ez80_z80|_||DD 34 00
+inc (ix)|ez80_z80_strict|_||DD 34 00
 inc (ix)|kc160|_||DD 34 00
 inc (ix)|kc160_z80|_||DD 34 00
 inc (ix)|r2ka|_||DD 34 00
@@ -13017,6 +13379,10 @@ inc (ix)|z80|_||DD 34 00
 inc (ix)|z80_strict|_||DD 34 00
 inc (ix)|z80n|_||DD 34 00
 inc (ix)|z80n_strict|_||DD 34 00
+inc (ix+%d)|ez80|_||DD 34 %d
+inc (ix+%d)|ez80_strict|_||DD 34 %d
+inc (ix+%d)|ez80_z80|_||DD 34 %d
+inc (ix+%d)|ez80_z80_strict|_||DD 34 %d
 inc (ix+%d)|kc160|_||DD 34 %d
 inc (ix+%d)|kc160_z80|_||DD 34 %d
 inc (ix+%d)|r2ka|_||DD 34 %d
@@ -13030,6 +13396,10 @@ inc (ix+%d)|z80|_||DD 34 %d
 inc (ix+%d)|z80_strict|_||DD 34 %d
 inc (ix+%d)|z80n|_||DD 34 %d
 inc (ix+%d)|z80n_strict|_||DD 34 %d
+inc (iy)|ez80|_||FD 34 00
+inc (iy)|ez80_strict|_||FD 34 00
+inc (iy)|ez80_z80|_||FD 34 00
+inc (iy)|ez80_z80_strict|_||FD 34 00
 inc (iy)|kc160|_||FD 34 00
 inc (iy)|kc160_z80|_||FD 34 00
 inc (iy)|r2ka|_||FD 34 00
@@ -13043,6 +13413,10 @@ inc (iy)|z80|_||FD 34 00
 inc (iy)|z80_strict|_||FD 34 00
 inc (iy)|z80n|_||FD 34 00
 inc (iy)|z80n_strict|_||FD 34 00
+inc (iy+%d)|ez80|_||FD 34 %d
+inc (iy+%d)|ez80_strict|_||FD 34 %d
+inc (iy+%d)|ez80_z80|_||FD 34 %d
+inc (iy+%d)|ez80_z80_strict|_||FD 34 %d
 inc (iy+%d)|kc160|_||FD 34 %d
 inc (iy+%d)|kc160_z80|_||FD 34 %d
 inc (iy+%d)|r2ka|_||FD 34 %d
@@ -13078,6 +13452,10 @@ inc (ziy)|kc160|_||7F;FD 34 00
 inc (ziy+%d)|kc160|_||7F;FD 34 %d
 inc a|8080|_||3C
 inc a|8085|_||3C
+inc a|ez80|_||3C
+inc a|ez80_strict|_||3C
+inc a|ez80_z80|_||3C
+inc a|ez80_z80_strict|_||3C
 inc a|gbz80|_||3C
 inc a|gbz80_strict|_||3C
 inc a|kc160|_||3C
@@ -13105,6 +13483,10 @@ inc aiy|kc160|_||52;FD 23
 inc asp|kc160|_||52;33
 inc b|8080|_||04
 inc b|8085|_||04
+inc b|ez80|_||04
+inc b|ez80_strict|_||04
+inc b|ez80_z80|_||04
+inc b|ez80_z80_strict|_||04
 inc b|gbz80|_||04
 inc b|gbz80_strict|_||04
 inc b|kc160|_||04
@@ -13151,6 +13533,10 @@ inc bc'|r4k|_||76;03
 inc bc'|r5k|_||76;03
 inc c|8080|_||0C
 inc c|8085|_||0C
+inc c|ez80|_||0C
+inc c|ez80_strict|_||0C
+inc c|ez80_z80|_||0C
+inc c|ez80_z80_strict|_||0C
 inc c|gbz80|_||0C
 inc c|gbz80_strict|_||0C
 inc c|kc160|_||0C
@@ -13172,6 +13558,10 @@ inc c'|r4k|_||76;0C
 inc c'|r5k|_||76;0C
 inc d|8080|_||14
 inc d|8085|_||14
+inc d|ez80|_||14
+inc d|ez80_strict|_||14
+inc d|ez80_z80|_||14
+inc d|ez80_z80_strict|_||14
 inc d|gbz80|_||14
 inc d|gbz80_strict|_||14
 inc d|kc160|_||14
@@ -13218,6 +13608,10 @@ inc de'|r4k|_||76;13
 inc de'|r5k|_||76;13
 inc e|8080|_||1C
 inc e|8085|_||1C
+inc e|ez80|_||1C
+inc e|ez80_strict|_||1C
+inc e|ez80_z80|_||1C
+inc e|ez80_z80_strict|_||1C
 inc e|gbz80|_||1C
 inc e|gbz80_strict|_||1C
 inc e|kc160|_||1C
@@ -13239,6 +13633,10 @@ inc e'|r4k|_||76;1C
 inc e'|r5k|_||76;1C
 inc h|8080|_||24
 inc h|8085|_||24
+inc h|ez80|_||24
+inc h|ez80_strict|_||24
+inc h|ez80_z80|_||24
+inc h|ez80_z80_strict|_||24
 inc h|gbz80|_||24
 inc h|gbz80_strict|_||24
 inc h|kc160|_||24
@@ -13283,6 +13681,10 @@ inc hl'|r2ka|_||76;23
 inc hl'|r3k|_||76;23
 inc hl'|r4k|_||76;23
 inc hl'|r5k|_||76;23
+inc ix|ez80|_||DD 23
+inc ix|ez80_strict|_||DD 23
+inc ix|ez80_z80|_||DD 23
+inc ix|ez80_z80_strict|_||DD 23
 inc ix|kc160|_||DD 23
 inc ix|kc160_z80|_||DD 23
 inc ix|r2ka|_||DD 23
@@ -13296,14 +13698,26 @@ inc ix|z80|_||DD 23
 inc ix|z80_strict|_||DD 23
 inc ix|z80n|_||DD 23
 inc ix|z80n_strict|_||DD 23
+inc ixh|ez80|_||DD 24
+inc ixh|ez80_strict|_||DD 24
+inc ixh|ez80_z80|_||DD 24
+inc ixh|ez80_z80_strict|_||DD 24
 inc ixh|r800|_||DD 24
 inc ixh|z80|_||DD 24
 inc ixh|z80n|_||DD 24
 inc ixh|z80n_strict|_||DD 24
+inc ixl|ez80|_||DD 2C
+inc ixl|ez80_strict|_||DD 2C
+inc ixl|ez80_z80|_||DD 2C
+inc ixl|ez80_z80_strict|_||DD 2C
 inc ixl|r800|_||DD 2C
 inc ixl|z80|_||DD 2C
 inc ixl|z80n|_||DD 2C
 inc ixl|z80n_strict|_||DD 2C
+inc iy|ez80|_||FD 23
+inc iy|ez80_strict|_||FD 23
+inc iy|ez80_z80|_||FD 23
+inc iy|ez80_z80_strict|_||FD 23
 inc iy|kc160|_||FD 23
 inc iy|kc160_z80|_||FD 23
 inc iy|r2ka|_||FD 23
@@ -13317,16 +13731,28 @@ inc iy|z80|_||FD 23
 inc iy|z80_strict|_||FD 23
 inc iy|z80n|_||FD 23
 inc iy|z80n_strict|_||FD 23
+inc iyh|ez80|_||FD 24
+inc iyh|ez80_strict|_||FD 24
+inc iyh|ez80_z80|_||FD 24
+inc iyh|ez80_z80_strict|_||FD 24
 inc iyh|r800|_||FD 24
 inc iyh|z80|_||FD 24
 inc iyh|z80n|_||FD 24
 inc iyh|z80n_strict|_||FD 24
+inc iyl|ez80|_||FD 2C
+inc iyl|ez80_strict|_||FD 2C
+inc iyl|ez80_z80|_||FD 2C
+inc iyl|ez80_z80_strict|_||FD 2C
 inc iyl|r800|_||FD 2C
 inc iyl|z80|_||FD 2C
 inc iyl|z80n|_||FD 2C
 inc iyl|z80n_strict|_||FD 2C
 inc l|8080|_||2C
 inc l|8085|_||2C
+inc l|ez80|_||2C
+inc l|ez80_strict|_||2C
+inc l|ez80_z80|_||2C
+inc l|ez80_z80_strict|_||2C
 inc l|gbz80|_||2C
 inc l|gbz80_strict|_||2C
 inc l|kc160|_||2C
@@ -13385,38 +13811,106 @@ inc zhl|kc160|_||7F;23
 inc zix|kc160|_||7F;DD 23
 inc ziy|kc160|_||7F;FD 23
 inc zsp|kc160|_||7F;33
+inc.l (hl)|ez80_z80|_||49;34
+inc.l (hl)|ez80_z80_strict|_||49;34
+inc.l (hl+)|ez80_z80|X||49;34;49;23
+inc.l (hl-)|ez80_z80|X||49;34;49;2B
+inc.l (ix)|ez80_z80|_||49;DD 34 00
+inc.l (ix)|ez80_z80_strict|_||49;DD 34 00
+inc.l (ix+%d)|ez80_z80|_||49;DD 34 %d
+inc.l (ix+%d)|ez80_z80_strict|_||49;DD 34 %d
+inc.l (iy)|ez80_z80|_||49;FD 34 00
+inc.l (iy)|ez80_z80_strict|_||49;FD 34 00
+inc.l (iy+%d)|ez80_z80|_||49;FD 34 %d
+inc.l (iy+%d)|ez80_z80_strict|_||49;FD 34 %d
 inc.l bc|ez80_z80|_||49;03
 inc.l bc|ez80_z80_strict|_||49;03
 inc.l de|ez80_z80|_||49;13
 inc.l de|ez80_z80_strict|_||49;13
 inc.l hl|ez80_z80|_||49;23
 inc.l hl|ez80_z80_strict|_||49;23
+inc.l ix|ez80_z80|_||49;DD 23
+inc.l ix|ez80_z80_strict|_||49;DD 23
+inc.l iy|ez80_z80|_||49;FD 23
+inc.l iy|ez80_z80_strict|_||49;FD 23
 inc.l sp|ez80_z80|_||49;33
 inc.l sp|ez80_z80_strict|_||49;33
+inc.lis (hl)|ez80_z80|_||49;34
+inc.lis (hl)|ez80_z80_strict|_||49;34
+inc.lis (hl+)|ez80_z80|X||49;34;49;23
+inc.lis (hl-)|ez80_z80|X||49;34;49;2B
+inc.lis (ix)|ez80_z80|_||49;DD 34 00
+inc.lis (ix)|ez80_z80_strict|_||49;DD 34 00
+inc.lis (ix+%d)|ez80_z80|_||49;DD 34 %d
+inc.lis (ix+%d)|ez80_z80_strict|_||49;DD 34 %d
+inc.lis (iy)|ez80_z80|_||49;FD 34 00
+inc.lis (iy)|ez80_z80_strict|_||49;FD 34 00
+inc.lis (iy+%d)|ez80_z80|_||49;FD 34 %d
+inc.lis (iy+%d)|ez80_z80_strict|_||49;FD 34 %d
 inc.lis bc|ez80_z80|_||49;03
 inc.lis bc|ez80_z80_strict|_||49;03
 inc.lis de|ez80_z80|_||49;13
 inc.lis de|ez80_z80_strict|_||49;13
 inc.lis hl|ez80_z80|_||49;23
 inc.lis hl|ez80_z80_strict|_||49;23
+inc.lis ix|ez80_z80|_||49;DD 23
+inc.lis ix|ez80_z80_strict|_||49;DD 23
+inc.lis iy|ez80_z80|_||49;FD 23
+inc.lis iy|ez80_z80_strict|_||49;FD 23
 inc.lis sp|ez80_z80|_||49;33
 inc.lis sp|ez80_z80_strict|_||49;33
+inc.s (hl)|ez80|_||52;34
+inc.s (hl)|ez80_strict|_||52;34
+inc.s (hl+)|ez80|X||52;34;52;23
+inc.s (hl-)|ez80|X||52;34;52;2B
+inc.s (ix)|ez80|_||52;DD 34 00
+inc.s (ix)|ez80_strict|_||52;DD 34 00
+inc.s (ix+%d)|ez80|_||52;DD 34 %d
+inc.s (ix+%d)|ez80_strict|_||52;DD 34 %d
+inc.s (iy)|ez80|_||52;FD 34 00
+inc.s (iy)|ez80_strict|_||52;FD 34 00
+inc.s (iy+%d)|ez80|_||52;FD 34 %d
+inc.s (iy+%d)|ez80_strict|_||52;FD 34 %d
 inc.s bc|ez80|_||52;03
 inc.s bc|ez80_strict|_||52;03
 inc.s de|ez80|_||52;13
 inc.s de|ez80_strict|_||52;13
 inc.s hl|ez80|_||52;23
 inc.s hl|ez80_strict|_||52;23
+inc.s ix|ez80|_||52;DD 23
+inc.s ix|ez80_strict|_||52;DD 23
+inc.s iy|ez80|_||52;FD 23
+inc.s iy|ez80_strict|_||52;FD 23
 inc.s sp|ez80|_||52;33
 inc.s sp|ez80_strict|_||52;33
+inc.sil (hl)|ez80|_||52;34
+inc.sil (hl)|ez80_strict|_||52;34
+inc.sil (hl+)|ez80|X||52;34;52;23
+inc.sil (hl-)|ez80|X||52;34;52;2B
+inc.sil (ix)|ez80|_||52;DD 34 00
+inc.sil (ix)|ez80_strict|_||52;DD 34 00
+inc.sil (ix+%d)|ez80|_||52;DD 34 %d
+inc.sil (ix+%d)|ez80_strict|_||52;DD 34 %d
+inc.sil (iy)|ez80|_||52;FD 34 00
+inc.sil (iy)|ez80_strict|_||52;FD 34 00
+inc.sil (iy+%d)|ez80|_||52;FD 34 %d
+inc.sil (iy+%d)|ez80_strict|_||52;FD 34 %d
 inc.sil bc|ez80|_||52;03
 inc.sil bc|ez80_strict|_||52;03
 inc.sil de|ez80|_||52;13
 inc.sil de|ez80_strict|_||52;13
 inc.sil hl|ez80|_||52;23
 inc.sil hl|ez80_strict|_||52;23
+inc.sil ix|ez80|_||52;DD 23
+inc.sil ix|ez80_strict|_||52;DD 23
+inc.sil iy|ez80|_||52;FD 23
+inc.sil iy|ez80_strict|_||52;FD 23
 inc.sil sp|ez80|_||52;33
 inc.sil sp|ez80_strict|_||52;33
+ind|ez80|_||ED AA
+ind|ez80_strict|_||ED AA
+ind|ez80_z80|_||ED AA
+ind|ez80_z80_strict|_||ED AA
 ind|kc160|_||ED AA
 ind|kc160_z80|_||ED AA
 ind|r800|_||ED AA
@@ -13428,6 +13922,66 @@ ind|z80n|_||ED AA
 ind|z80n_strict|_||ED AA
 ind x|kc160|_||ED EA
 ind x|kc160_z80|_||ED EA
+ind.l|ez80_z80|_||49;ED AA
+ind.l|ez80_z80_strict|_||49;ED AA
+ind.lis|ez80_z80|_||49;ED AA
+ind.lis|ez80_z80_strict|_||49;ED AA
+ind.s|ez80|_||52;ED AA
+ind.s|ez80_strict|_||52;ED AA
+ind.sil|ez80|_||52;ED AA
+ind.sil|ez80_strict|_||52;ED AA
+ind2|ez80|_||ED 8C
+ind2|ez80_strict|_||ED 8C
+ind2|ez80_z80|_||ED 8C
+ind2|ez80_z80_strict|_||ED 8C
+ind2.l|ez80_z80|_||49;ED 8C
+ind2.l|ez80_z80_strict|_||49;ED 8C
+ind2.lis|ez80_z80|_||49;ED 8C
+ind2.lis|ez80_z80_strict|_||49;ED 8C
+ind2.s|ez80|_||52;ED 8C
+ind2.s|ez80_strict|_||52;ED 8C
+ind2.sil|ez80|_||52;ED 8C
+ind2.sil|ez80_strict|_||52;ED 8C
+ind2r|ez80|_||ED 9C
+ind2r|ez80_strict|_||ED 9C
+ind2r|ez80_z80|_||ED 9C
+ind2r|ez80_z80_strict|_||ED 9C
+ind2r.l|ez80_z80|_||49;ED 9C
+ind2r.l|ez80_z80_strict|_||49;ED 9C
+ind2r.lis|ez80_z80|_||49;ED 9C
+ind2r.lis|ez80_z80_strict|_||49;ED 9C
+ind2r.s|ez80|_||52;ED 9C
+ind2r.s|ez80_strict|_||52;ED 9C
+ind2r.sil|ez80|_||52;ED 9C
+ind2r.sil|ez80_strict|_||52;ED 9C
+indm|ez80|_||ED 8A
+indm|ez80_strict|_||ED 8A
+indm|ez80_z80|_||ED 8A
+indm|ez80_z80_strict|_||ED 8A
+indm.l|ez80_z80|_||49;ED 8A
+indm.l|ez80_z80_strict|_||49;ED 8A
+indm.lis|ez80_z80|_||49;ED 8A
+indm.lis|ez80_z80_strict|_||49;ED 8A
+indm.s|ez80|_||52;ED 8A
+indm.s|ez80_strict|_||52;ED 8A
+indm.sil|ez80|_||52;ED 8A
+indm.sil|ez80_strict|_||52;ED 8A
+indmr|ez80|_||ED 9A
+indmr|ez80_strict|_||ED 9A
+indmr|ez80_z80|_||ED 9A
+indmr|ez80_z80_strict|_||ED 9A
+indmr.l|ez80_z80|_||49;ED 9A
+indmr.l|ez80_z80_strict|_||49;ED 9A
+indmr.lis|ez80_z80|_||49;ED 9A
+indmr.lis|ez80_z80_strict|_||49;ED 9A
+indmr.s|ez80|_||52;ED 9A
+indmr.s|ez80_strict|_||52;ED 9A
+indmr.sil|ez80|_||52;ED 9A
+indmr.sil|ez80_strict|_||52;ED 9A
+indr|ez80|_||ED BA
+indr|ez80_strict|_||ED BA
+indr|ez80_z80|_||ED BA
+indr|ez80_z80_strict|_||ED BA
 indr|kc160|_||ED BA
 indr|kc160_z80|_||ED BA
 indr|r800|_||ED BA
@@ -13439,6 +13993,30 @@ indr|z80n|_||ED BA
 indr|z80n_strict|_||ED BA
 indr x|kc160|_||ED FA
 indr x|kc160_z80|_||ED FA
+indr.l|ez80_z80|_||49;ED BA
+indr.l|ez80_z80_strict|_||49;ED BA
+indr.lis|ez80_z80|_||49;ED BA
+indr.lis|ez80_z80_strict|_||49;ED BA
+indr.s|ez80|_||52;ED BA
+indr.s|ez80_strict|_||52;ED BA
+indr.sil|ez80|_||52;ED BA
+indr.sil|ez80_strict|_||52;ED BA
+indrx|ez80|_||ED CA
+indrx|ez80_strict|_||ED CA
+indrx|ez80_z80|_||ED CA
+indrx|ez80_z80_strict|_||ED CA
+indrx.l|ez80_z80|_||49;ED CA
+indrx.l|ez80_z80_strict|_||49;ED CA
+indrx.lis|ez80_z80|_||49;ED CA
+indrx.lis|ez80_z80_strict|_||49;ED CA
+indrx.s|ez80|_||52;ED CA
+indrx.s|ez80_strict|_||52;ED CA
+indrx.sil|ez80|_||52;ED CA
+indrx.sil|ez80_strict|_||52;ED CA
+ini|ez80|_||ED A2
+ini|ez80_strict|_||ED A2
+ini|ez80_z80|_||ED A2
+ini|ez80_z80_strict|_||ED A2
 ini|kc160|_||ED A2
 ini|kc160_z80|_||ED A2
 ini|r800|_||ED A2
@@ -13450,6 +14028,66 @@ ini|z80n|_||ED A2
 ini|z80n_strict|_||ED A2
 ini x|kc160|_||ED E2
 ini x|kc160_z80|_||ED E2
+ini.l|ez80_z80|_||49;ED A2
+ini.l|ez80_z80_strict|_||49;ED A2
+ini.lis|ez80_z80|_||49;ED A2
+ini.lis|ez80_z80_strict|_||49;ED A2
+ini.s|ez80|_||52;ED A2
+ini.s|ez80_strict|_||52;ED A2
+ini.sil|ez80|_||52;ED A2
+ini.sil|ez80_strict|_||52;ED A2
+ini2|ez80|_||ED 84
+ini2|ez80_strict|_||ED 84
+ini2|ez80_z80|_||ED 84
+ini2|ez80_z80_strict|_||ED 84
+ini2.l|ez80_z80|_||49;ED 84
+ini2.l|ez80_z80_strict|_||49;ED 84
+ini2.lis|ez80_z80|_||49;ED 84
+ini2.lis|ez80_z80_strict|_||49;ED 84
+ini2.s|ez80|_||52;ED 84
+ini2.s|ez80_strict|_||52;ED 84
+ini2.sil|ez80|_||52;ED 84
+ini2.sil|ez80_strict|_||52;ED 84
+ini2r|ez80|_||ED 94
+ini2r|ez80_strict|_||ED 94
+ini2r|ez80_z80|_||ED 94
+ini2r|ez80_z80_strict|_||ED 94
+ini2r.l|ez80_z80|_||49;ED 94
+ini2r.l|ez80_z80_strict|_||49;ED 94
+ini2r.lis|ez80_z80|_||49;ED 94
+ini2r.lis|ez80_z80_strict|_||49;ED 94
+ini2r.s|ez80|_||52;ED 94
+ini2r.s|ez80_strict|_||52;ED 94
+ini2r.sil|ez80|_||52;ED 94
+ini2r.sil|ez80_strict|_||52;ED 94
+inim|ez80|_||ED 82
+inim|ez80_strict|_||ED 82
+inim|ez80_z80|_||ED 82
+inim|ez80_z80_strict|_||ED 82
+inim.l|ez80_z80|_||49;ED 82
+inim.l|ez80_z80_strict|_||49;ED 82
+inim.lis|ez80_z80|_||49;ED 82
+inim.lis|ez80_z80_strict|_||49;ED 82
+inim.s|ez80|_||52;ED 82
+inim.s|ez80_strict|_||52;ED 82
+inim.sil|ez80|_||52;ED 82
+inim.sil|ez80_strict|_||52;ED 82
+inimr|ez80|_||ED 92
+inimr|ez80_strict|_||ED 92
+inimr|ez80_z80|_||ED 92
+inimr|ez80_z80_strict|_||ED 92
+inimr.l|ez80_z80|_||49;ED 92
+inimr.l|ez80_z80_strict|_||49;ED 92
+inimr.lis|ez80_z80|_||49;ED 92
+inimr.lis|ez80_z80_strict|_||49;ED 92
+inimr.s|ez80|_||52;ED 92
+inimr.s|ez80_strict|_||52;ED 92
+inimr.sil|ez80|_||52;ED 92
+inimr.sil|ez80_strict|_||52;ED 92
+inir|ez80|_||ED B2
+inir|ez80_strict|_||ED B2
+inir|ez80_z80|_||ED B2
+inir|ez80_z80_strict|_||ED B2
 inir|kc160|_||ED B2
 inir|kc160_z80|_||ED B2
 inir|r800|_||ED B2
@@ -13461,10 +14099,32 @@ inir|z80n|_||ED B2
 inir|z80n_strict|_||ED B2
 inir x|kc160|_||ED F2
 inir x|kc160_z80|_||ED F2
+inir.l|ez80_z80|_||49;ED B2
+inir.l|ez80_z80_strict|_||49;ED B2
+inir.lis|ez80_z80|_||49;ED B2
+inir.lis|ez80_z80_strict|_||49;ED B2
+inir.s|ez80|_||52;ED B2
+inir.s|ez80_strict|_||52;ED B2
+inir.sil|ez80|_||52;ED B2
+inir.sil|ez80_strict|_||52;ED B2
+inirx|ez80|_||ED C2
+inirx|ez80_strict|_||ED C2
+inirx|ez80_z80|_||ED C2
+inirx|ez80_z80_strict|_||ED C2
+inirx.l|ez80_z80|_||49;ED C2
+inirx.l|ez80_z80_strict|_||49;ED C2
+inirx.lis|ez80_z80|_||49;ED C2
+inirx.lis|ez80_z80_strict|_||49;ED C2
+inirx.s|ez80|_||52;ED C2
+inirx.s|ez80_strict|_||52;ED C2
+inirx.sil|ez80|_||52;ED C2
+inirx.sil|ez80_strict|_||52;ED C2
 inr a|8080|_||3C
 inr a|8080_strict|_||3C
 inr a|8085|_||3C
 inr a|8085_strict|_||3C
+inr a|ez80|_||3C
+inr a|ez80_z80|_||3C
 inr a|gbz80|_||3C
 inr a|kc160|_||3C
 inr a|kc160_z80|_||3C
@@ -13480,6 +14140,8 @@ inr b|8080|_||04
 inr b|8080_strict|_||04
 inr b|8085|_||04
 inr b|8085_strict|_||04
+inr b|ez80|_||04
+inr b|ez80_z80|_||04
 inr b|gbz80|_||04
 inr b|kc160|_||04
 inr b|kc160_z80|_||04
@@ -13495,6 +14157,8 @@ inr c|8080|_||0C
 inr c|8080_strict|_||0C
 inr c|8085|_||0C
 inr c|8085_strict|_||0C
+inr c|ez80|_||0C
+inr c|ez80_z80|_||0C
 inr c|gbz80|_||0C
 inr c|kc160|_||0C
 inr c|kc160_z80|_||0C
@@ -13510,6 +14174,8 @@ inr d|8080|_||14
 inr d|8080_strict|_||14
 inr d|8085|_||14
 inr d|8085_strict|_||14
+inr d|ez80|_||14
+inr d|ez80_z80|_||14
 inr d|gbz80|_||14
 inr d|kc160|_||14
 inr d|kc160_z80|_||14
@@ -13525,6 +14191,8 @@ inr e|8080|_||1C
 inr e|8080_strict|_||1C
 inr e|8085|_||1C
 inr e|8085_strict|_||1C
+inr e|ez80|_||1C
+inr e|ez80_z80|_||1C
 inr e|gbz80|_||1C
 inr e|kc160|_||1C
 inr e|kc160_z80|_||1C
@@ -13540,6 +14208,8 @@ inr h|8080|_||24
 inr h|8080_strict|_||24
 inr h|8085|_||24
 inr h|8085_strict|_||24
+inr h|ez80|_||24
+inr h|ez80_z80|_||24
 inr h|gbz80|_||24
 inr h|kc160|_||24
 inr h|kc160_z80|_||24
@@ -13555,6 +14225,8 @@ inr l|8080|_||2C
 inr l|8080_strict|_||2C
 inr l|8085|_||2C
 inr l|8085_strict|_||2C
+inr l|ez80|_||2C
+inr l|ez80_z80|_||2C
 inr l|gbz80|_||2C
 inr l|kc160|_||2C
 inr l|kc160_z80|_||2C
@@ -13570,6 +14242,8 @@ inr m|8080|_||34
 inr m|8080_strict|_||34
 inr m|8085|_||34
 inr m|8085_strict|_||34
+inr m|ez80|_||34
+inr m|ez80_z80|_||34
 inr m|gbz80|_||34
 inr m|kc160|_||34
 inr m|kc160_z80|_||34
@@ -13585,6 +14259,8 @@ inx b|8080|_||03
 inx b|8080_strict|_||03
 inx b|8085|_||03
 inx b|8085_strict|_||03
+inx b|ez80|_||03
+inx b|ez80_z80|_||03
 inx b|gbz80|_||03
 inx b|kc160|_||03
 inx b|kc160_z80|_||03
@@ -13598,6 +14274,8 @@ inx b|z80|_||03
 inx b|z80n|_||03
 inx bc|8080|_||03
 inx bc|8085|_||03
+inx bc|ez80|_||03
+inx bc|ez80_z80|_||03
 inx bc|gbz80|_||03
 inx bc|kc160|_||03
 inx bc|kc160_z80|_||03
@@ -13613,6 +14291,8 @@ inx d|8080|_||13
 inx d|8080_strict|_||13
 inx d|8085|_||13
 inx d|8085_strict|_||13
+inx d|ez80|_||13
+inx d|ez80_z80|_||13
 inx d|gbz80|_||13
 inx d|kc160|_||13
 inx d|kc160_z80|_||13
@@ -13626,6 +14306,8 @@ inx d|z80|_||13
 inx d|z80n|_||13
 inx de|8080|_||13
 inx de|8085|_||13
+inx de|ez80|_||13
+inx de|ez80_z80|_||13
 inx de|gbz80|_||13
 inx de|kc160|_||13
 inx de|kc160_z80|_||13
@@ -13641,6 +14323,8 @@ inx h|8080|_||23
 inx h|8080_strict|_||23
 inx h|8085|_||23
 inx h|8085_strict|_||23
+inx h|ez80|_||23
+inx h|ez80_z80|_||23
 inx h|gbz80|_||23
 inx h|kc160|_||23
 inx h|kc160_z80|_||23
@@ -13654,6 +14338,8 @@ inx h|z80|_||23
 inx h|z80n|_||23
 inx hl|8080|_||23
 inx hl|8085|_||23
+inx hl|ez80|_||23
+inx hl|ez80_z80|_||23
 inx hl|gbz80|_||23
 inx hl|kc160|_||23
 inx hl|kc160_z80|_||23
@@ -13669,6 +14355,8 @@ inx sp|8080|_||33
 inx sp|8080_strict|_||33
 inx sp|8085|_||33
 inx sp|8085_strict|_||33
+inx sp|ez80|_||33
+inx sp|ez80_z80|_||33
 inx sp|gbz80|_||33
 inx sp|kc160|_||33
 inx sp|kc160_z80|_||33
@@ -20322,6 +21010,8 @@ ipset %c|r4k|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
 ipset %c|r5k|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
 j_c %m|8080|_||DA %m %m
 j_c %m|8085|_||DA %m %m
+j_c %m|ez80|_||DA %m %m %m
+j_c %m|ez80_z80|_||DA %m %m
 j_c %m|gbz80|_||DA %m %m
 j_c %m|kc160|_||DA %m %m
 j_c %m|kc160_z80|_||DA %m %m
@@ -20335,6 +21025,8 @@ j_c %m|z80|_||DA %m %m
 j_c %m|z80n|_||DA %m %m
 j_eq %m|8080|X||CA %m %m
 j_eq %m|8085|X||CA %m %m
+j_eq %m|ez80|X||CA %m %m %m
+j_eq %m|ez80_z80|X||CA %m %m
 j_eq %m|gbz80|X||CA %m %m
 j_eq %m|kc160|_||CA %m %m
 j_eq %m|kc160_z80|_||CA %m %m
@@ -20348,6 +21040,8 @@ j_eq %m|z80|X||CA %m %m
 j_eq %m|z80n|X||CA %m %m
 j_geu %m|8080|X||D2 %m %m
 j_geu %m|8085|X||D2 %m %m
+j_geu %m|ez80|X||D2 %m %m %m
+j_geu %m|ez80_z80|X||D2 %m %m
 j_geu %m|gbz80|X||D2 %m %m
 j_geu %m|kc160|_||D2 %m %m
 j_geu %m|kc160_z80|_||D2 %m %m
@@ -20363,6 +21057,8 @@ j_gt %m|r4k|_||A2 %m %m
 j_gt %m|r5k|_||A2 %m %m
 j_gtu %m|8080|X||CA %t %t;D2 %m %m
 j_gtu %m|8085|X||CA %t %t;D2 %m %m
+j_gtu %m|ez80|X||CA %t %t %t;D2 %m %m %m
+j_gtu %m|ez80_z80|X||CA %t %t;D2 %m %m
 j_gtu %m|gbz80|X||CA %t %t;D2 %m %m
 j_gtu %m|kc160|_||CA %t %t;D2 %m %m
 j_gtu %m|kc160_z80|_||CA %t %t;D2 %m %m
@@ -20376,6 +21072,8 @@ j_gtu %m|z80|X||CA %t %t;D2 %m %m
 j_gtu %m|z80n|X||CA %t %t;D2 %m %m
 j_leu %m|8080|X||CA %m %m;DA %m %m
 j_leu %m|8085|X||CA %m %m;DA %m %m
+j_leu %m|ez80|X||CA %m %m %m;DA %m %m %m
+j_leu %m|ez80_z80|X||CA %m %m;DA %m %m
 j_leu %m|gbz80|X||CA %m %m;DA %m %m
 j_leu %m|kc160|_||CA %m %m;DA %m %m
 j_leu %m|kc160_z80|_||CA %m %m;DA %m %m
@@ -20395,6 +21093,8 @@ j_lt %m|r4k|_||B2 %m %m
 j_lt %m|r5k|_||B2 %m %m
 j_ltu %m|8080|X||DA %m %m
 j_ltu %m|8085|X||DA %m %m
+j_ltu %m|ez80|X||DA %m %m %m
+j_ltu %m|ez80_z80|X||DA %m %m
 j_ltu %m|gbz80|X||DA %m %m
 j_ltu %m|kc160|_||DA %m %m
 j_ltu %m|kc160_z80|_||DA %m %m
@@ -20412,6 +21112,8 @@ j_lz %m|r4k|_||E2 %m %m
 j_lz %m|r5k|_||E2 %m %m
 j_m %m|8080|_||FA %m %m
 j_m %m|8085|_||FA %m %m
+j_m %m|ez80|_||FA %m %m %m
+j_m %m|ez80_z80|_||FA %m %m
 j_m %m|kc160|_||FA %m %m
 j_m %m|kc160_z80|_||FA %m %m
 j_m %m|r2ka|_||FA %m %m
@@ -20424,6 +21126,8 @@ j_m %m|z80|_||FA %m %m
 j_m %m|z80n|_||FA %m %m
 j_nc %m|8080|_||D2 %m %m
 j_nc %m|8085|_||D2 %m %m
+j_nc %m|ez80|_||D2 %m %m %m
+j_nc %m|ez80_z80|_||D2 %m %m
 j_nc %m|gbz80|_||D2 %m %m
 j_nc %m|kc160|_||D2 %m %m
 j_nc %m|kc160_z80|_||D2 %m %m
@@ -20437,6 +21141,8 @@ j_nc %m|z80|_||D2 %m %m
 j_nc %m|z80n|_||D2 %m %m
 j_ne %m|8080|X||C2 %m %m
 j_ne %m|8085|X||C2 %m %m
+j_ne %m|ez80|X||C2 %m %m %m
+j_ne %m|ez80_z80|X||C2 %m %m
 j_ne %m|gbz80|X||C2 %m %m
 j_ne %m|kc160|_||C2 %m %m
 j_ne %m|kc160_z80|_||C2 %m %m
@@ -20450,6 +21156,8 @@ j_ne %m|z80|X||C2 %m %m
 j_ne %m|z80n|X||C2 %m %m
 j_nv %m|8080|X||E2 %m %m
 j_nv %m|8085|X||E2 %m %m
+j_nv %m|ez80|X||E2 %m %m %m
+j_nv %m|ez80_z80|X||E2 %m %m
 j_nv %m|kc160|_||E2 %m %m
 j_nv %m|kc160_z80|_||E2 %m %m
 j_nv %m|r2ka|_||E2 %m %m
@@ -20460,6 +21168,8 @@ j_nv %m|z80|X||E2 %m %m
 j_nv %m|z80n|X||E2 %m %m
 j_nz %m|8080|_||C2 %m %m
 j_nz %m|8085|_||C2 %m %m
+j_nz %m|ez80|_||C2 %m %m %m
+j_nz %m|ez80_z80|_||C2 %m %m
 j_nz %m|gbz80|_||C2 %m %m
 j_nz %m|kc160|_||C2 %m %m
 j_nz %m|kc160_z80|_||C2 %m %m
@@ -20473,6 +21183,8 @@ j_nz %m|z80|_||C2 %m %m
 j_nz %m|z80n|_||C2 %m %m
 j_p %m|8080|_||F2 %m %m
 j_p %m|8085|_||F2 %m %m
+j_p %m|ez80|_||F2 %m %m %m
+j_p %m|ez80_z80|_||F2 %m %m
 j_p %m|kc160|_||F2 %m %m
 j_p %m|kc160_z80|_||F2 %m %m
 j_p %m|r2ka|_||F2 %m %m
@@ -20485,6 +21197,8 @@ j_p %m|z80|_||F2 %m %m
 j_p %m|z80n|_||F2 %m %m
 j_pe %m|8080|_||EA %m %m
 j_pe %m|8085|_||EA %m %m
+j_pe %m|ez80|_||EA %m %m %m
+j_pe %m|ez80_z80|_||EA %m %m
 j_pe %m|kc160|_||EA %m %m
 j_pe %m|kc160_z80|_||EA %m %m
 j_pe %m|r2ka|_||EA %m %m
@@ -20497,6 +21211,8 @@ j_pe %m|z80|_||EA %m %m
 j_pe %m|z80n|_||EA %m %m
 j_po %m|8080|_||E2 %m %m
 j_po %m|8085|_||E2 %m %m
+j_po %m|ez80|_||E2 %m %m %m
+j_po %m|ez80_z80|_||E2 %m %m
 j_po %m|kc160|_||E2 %m %m
 j_po %m|kc160_z80|_||E2 %m %m
 j_po %m|r2ka|_||E2 %m %m
@@ -20509,6 +21225,8 @@ j_po %m|z80|_||E2 %m %m
 j_po %m|z80n|_||E2 %m %m
 j_v %m|8080|X||EA %m %m
 j_v %m|8085|X||EA %m %m
+j_v %m|ez80|X||EA %m %m %m
+j_v %m|ez80_z80|X||EA %m %m
 j_v %m|kc160|_||EA %m %m
 j_v %m|kc160_z80|_||EA %m %m
 j_v %m|r2ka|_||EA %m %m
@@ -20521,6 +21239,8 @@ j_v %m|z80|X||EA %m %m
 j_v %m|z80n|X||EA %m %m
 j_z %m|8080|_||CA %m %m
 j_z %m|8085|_||CA %m %m
+j_z %m|ez80|_||CA %m %m %m
+j_z %m|ez80_z80|_||CA %m %m
 j_z %m|gbz80|_||CA %m %m
 j_z %m|kc160|_||CA %m %m
 j_z %m|kc160_z80|_||CA %m %m
@@ -20536,6 +21256,8 @@ jc %m|8080|_||DA %m %m
 jc %m|8080_strict|_||DA %m %m
 jc %m|8085|_||DA %m %m
 jc %m|8085_strict|_||DA %m %m
+jc %m|ez80|_||DA %m %m %m
+jc %m|ez80_z80|_||DA %m %m
 jc %m|gbz80|_||DA %m %m
 jc %m|kc160|_||DA %m %m
 jc %m|kc160_z80|_||DA %m %m
@@ -20549,6 +21271,8 @@ jc %m|z80|_||DA %m %m
 jc %m|z80n|_||DA %m %m
 jeq %m|8080|X||CA %m %m
 jeq %m|8085|X||CA %m %m
+jeq %m|ez80|X||CA %m %m %m
+jeq %m|ez80_z80|X||CA %m %m
 jeq %m|gbz80|X||CA %m %m
 jeq %m|kc160|_||CA %m %m
 jeq %m|kc160_z80|_||CA %m %m
@@ -20562,6 +21286,8 @@ jeq %m|z80|X||CA %m %m
 jeq %m|z80n|X||CA %m %m
 jgeu %m|8080|X||D2 %m %m
 jgeu %m|8085|X||D2 %m %m
+jgeu %m|ez80|X||D2 %m %m %m
+jgeu %m|ez80_z80|X||D2 %m %m
 jgeu %m|gbz80|X||D2 %m %m
 jgeu %m|kc160|_||D2 %m %m
 jgeu %m|kc160_z80|_||D2 %m %m
@@ -20577,6 +21303,8 @@ jgt %m|r4k|_||A2 %m %m
 jgt %m|r5k|_||A2 %m %m
 jgtu %m|8080|X||CA %t %t;D2 %m %m
 jgtu %m|8085|X||CA %t %t;D2 %m %m
+jgtu %m|ez80|X||CA %t %t %t;D2 %m %m %m
+jgtu %m|ez80_z80|X||CA %t %t;D2 %m %m
 jgtu %m|gbz80|X||CA %t %t;D2 %m %m
 jgtu %m|kc160|_||CA %t %t;D2 %m %m
 jgtu %m|kc160_z80|_||CA %t %t;D2 %m %m
@@ -20591,6 +21319,8 @@ jgtu %m|z80n|X||CA %t %t;D2 %m %m
 jk %m|8085|_||FD %m %m
 jleu %m|8080|X||CA %m %m;DA %m %m
 jleu %m|8085|X||CA %m %m;DA %m %m
+jleu %m|ez80|X||CA %m %m %m;DA %m %m %m
+jleu %m|ez80_z80|X||CA %m %m;DA %m %m
 jleu %m|gbz80|X||CA %m %m;DA %m %m
 jleu %m|kc160|_||CA %m %m;DA %m %m
 jleu %m|kc160_z80|_||CA %m %m;DA %m %m
@@ -20610,6 +21340,8 @@ jlt %m|r4k|_||B2 %m %m
 jlt %m|r5k|_||B2 %m %m
 jltu %m|8080|X||DA %m %m
 jltu %m|8085|X||DA %m %m
+jltu %m|ez80|X||DA %m %m %m
+jltu %m|ez80_z80|X||DA %m %m
 jltu %m|gbz80|X||DA %m %m
 jltu %m|kc160|_||DA %m %m
 jltu %m|kc160_z80|_||DA %m %m
@@ -20629,6 +21361,8 @@ jm %m|8080|_||FA %m %m
 jm %m|8080_strict|_||FA %m %m
 jm %m|8085|_||FA %m %m
 jm %m|8085_strict|_||FA %m %m
+jm %m|ez80|_||FA %m %m %m
+jm %m|ez80_z80|_||FA %m %m
 jm %m|kc160|_||FA %m %m
 jm %m|kc160_z80|_||FA %m %m
 jm %m|r2ka|_||FA %m %m
@@ -20731,6 +21465,8 @@ jmp (zix)|kc160|_||7F;DD E9
 jmp (ziy)|kc160|_||7F;FD E9
 jmp c, %m|8080|_||DA %m %m
 jmp c, %m|8085|_||DA %m %m
+jmp c, %m|ez80|_||DA %m %m %m
+jmp c, %m|ez80_z80|_||DA %m %m
 jmp c, %m|gbz80|_||DA %m %m
 jmp c, %m|kc160|_||DA %m %m
 jmp c, %m|kc160_z80|_||DA %m %m
@@ -20744,6 +21480,8 @@ jmp c, %m|z80|_||DA %m %m
 jmp c, %m|z80n|_||DA %m %m
 jmp eq, %m|8080|X||CA %m %m
 jmp eq, %m|8085|X||CA %m %m
+jmp eq, %m|ez80|X||CA %m %m %m
+jmp eq, %m|ez80_z80|X||CA %m %m
 jmp eq, %m|gbz80|X||CA %m %m
 jmp eq, %m|kc160|_||CA %m %m
 jmp eq, %m|kc160_z80|_||CA %m %m
@@ -20757,6 +21495,8 @@ jmp eq, %m|z80|X||CA %m %m
 jmp eq, %m|z80n|X||CA %m %m
 jmp geu, %m|8080|X||D2 %m %m
 jmp geu, %m|8085|X||D2 %m %m
+jmp geu, %m|ez80|X||D2 %m %m %m
+jmp geu, %m|ez80_z80|X||D2 %m %m
 jmp geu, %m|gbz80|X||D2 %m %m
 jmp geu, %m|kc160|_||D2 %m %m
 jmp geu, %m|kc160_z80|_||D2 %m %m
@@ -20772,6 +21512,8 @@ jmp gt, %m|r4k|_||A2 %m %m
 jmp gt, %m|r5k|_||A2 %m %m
 jmp gtu, %m|8080|X||CA %t %t;D2 %m %m
 jmp gtu, %m|8085|X||CA %t %t;D2 %m %m
+jmp gtu, %m|ez80|X||28 %t;D2 %m %m %m
+jmp gtu, %m|ez80_z80|X||28 %t;D2 %m %m
 jmp gtu, %m|gbz80|X||28 %t;D2 %m %m
 jmp gtu, %m|kc160|_||CA %t %t;D2 %m %m
 jmp gtu, %m|kc160_z80|_||CA %t %t;D2 %m %m
@@ -20786,6 +21528,8 @@ jmp gtu, %m|z80n|X||28 %t;D2 %m %m
 jmp k, %m|8085|_||FD %m %m
 jmp leu, %m|8080|X||CA %m %m;DA %m %m
 jmp leu, %m|8085|X||CA %m %m;DA %m %m
+jmp leu, %m|ez80|X||CA %m %m %m;DA %m %m %m
+jmp leu, %m|ez80_z80|X||CA %m %m;DA %m %m
 jmp leu, %m|gbz80|X||CA %m %m;DA %m %m
 jmp leu, %m|kc160|_||CA %m %m;DA %m %m
 jmp leu, %m|kc160_z80|_||CA %m %m;DA %m %m
@@ -20805,6 +21549,8 @@ jmp lt, %m|r4k|_||B2 %m %m
 jmp lt, %m|r5k|_||B2 %m %m
 jmp ltu, %m|8080|X||DA %m %m
 jmp ltu, %m|8085|X||DA %m %m
+jmp ltu, %m|ez80|X||DA %m %m %m
+jmp ltu, %m|ez80_z80|X||DA %m %m
 jmp ltu, %m|gbz80|X||DA %m %m
 jmp ltu, %m|kc160|_||DA %m %m
 jmp ltu, %m|kc160_z80|_||DA %m %m
@@ -20822,6 +21568,8 @@ jmp lz, %m|r4k|_||E2 %m %m
 jmp lz, %m|r5k|_||E2 %m %m
 jmp m, %m|8080|_||FA %m %m
 jmp m, %m|8085|_||FA %m %m
+jmp m, %m|ez80|_||FA %m %m %m
+jmp m, %m|ez80_z80|_||FA %m %m
 jmp m, %m|kc160|_||FA %m %m
 jmp m, %m|kc160_z80|_||FA %m %m
 jmp m, %m|r2ka|_||FA %m %m
@@ -20834,6 +21582,8 @@ jmp m, %m|z80|_||FA %m %m
 jmp m, %m|z80n|_||FA %m %m
 jmp nc, %m|8080|_||D2 %m %m
 jmp nc, %m|8085|_||D2 %m %m
+jmp nc, %m|ez80|_||D2 %m %m %m
+jmp nc, %m|ez80_z80|_||D2 %m %m
 jmp nc, %m|gbz80|_||D2 %m %m
 jmp nc, %m|kc160|_||D2 %m %m
 jmp nc, %m|kc160_z80|_||D2 %m %m
@@ -20847,6 +21597,8 @@ jmp nc, %m|z80|_||D2 %m %m
 jmp nc, %m|z80n|_||D2 %m %m
 jmp ne, %m|8080|X||C2 %m %m
 jmp ne, %m|8085|X||C2 %m %m
+jmp ne, %m|ez80|X||C2 %m %m %m
+jmp ne, %m|ez80_z80|X||C2 %m %m
 jmp ne, %m|gbz80|X||C2 %m %m
 jmp ne, %m|kc160|_||C2 %m %m
 jmp ne, %m|kc160_z80|_||C2 %m %m
@@ -20861,6 +21613,8 @@ jmp ne, %m|z80n|X||C2 %m %m
 jmp nk, %m|8085|_||DD %m %m
 jmp nv, %m|8080|X||E2 %m %m
 jmp nv, %m|8085|X||E2 %m %m
+jmp nv, %m|ez80|X||E2 %m %m %m
+jmp nv, %m|ez80_z80|X||E2 %m %m
 jmp nv, %m|kc160|_||E2 %m %m
 jmp nv, %m|kc160_z80|_||E2 %m %m
 jmp nv, %m|r2ka|_||E2 %m %m
@@ -20872,6 +21626,8 @@ jmp nv, %m|z80n|X||E2 %m %m
 jmp nx5, %m|8085|_||DD %m %m
 jmp nz, %m|8080|_||C2 %m %m
 jmp nz, %m|8085|_||C2 %m %m
+jmp nz, %m|ez80|_||C2 %m %m %m
+jmp nz, %m|ez80_z80|_||C2 %m %m
 jmp nz, %m|gbz80|_||C2 %m %m
 jmp nz, %m|kc160|_||C2 %m %m
 jmp nz, %m|kc160_z80|_||C2 %m %m
@@ -20885,6 +21641,8 @@ jmp nz, %m|z80|_||C2 %m %m
 jmp nz, %m|z80n|_||C2 %m %m
 jmp p, %m|8080|_||F2 %m %m
 jmp p, %m|8085|_||F2 %m %m
+jmp p, %m|ez80|_||F2 %m %m %m
+jmp p, %m|ez80_z80|_||F2 %m %m
 jmp p, %m|kc160|_||F2 %m %m
 jmp p, %m|kc160_z80|_||F2 %m %m
 jmp p, %m|r2ka|_||F2 %m %m
@@ -20897,6 +21655,8 @@ jmp p, %m|z80|_||F2 %m %m
 jmp p, %m|z80n|_||F2 %m %m
 jmp pe, %m|8080|_||EA %m %m
 jmp pe, %m|8085|_||EA %m %m
+jmp pe, %m|ez80|_||EA %m %m %m
+jmp pe, %m|ez80_z80|_||EA %m %m
 jmp pe, %m|kc160|_||EA %m %m
 jmp pe, %m|kc160_z80|_||EA %m %m
 jmp pe, %m|r2ka|_||EA %m %m
@@ -20909,6 +21669,8 @@ jmp pe, %m|z80|_||EA %m %m
 jmp pe, %m|z80n|_||EA %m %m
 jmp po, %m|8080|_||E2 %m %m
 jmp po, %m|8085|_||E2 %m %m
+jmp po, %m|ez80|_||E2 %m %m %m
+jmp po, %m|ez80_z80|_||E2 %m %m
 jmp po, %m|kc160|_||E2 %m %m
 jmp po, %m|kc160_z80|_||E2 %m %m
 jmp po, %m|r2ka|_||E2 %m %m
@@ -20921,6 +21683,8 @@ jmp po, %m|z80|_||E2 %m %m
 jmp po, %m|z80n|_||E2 %m %m
 jmp v, %m|8080|X||EA %m %m
 jmp v, %m|8085|X||EA %m %m
+jmp v, %m|ez80|X||EA %m %m %m
+jmp v, %m|ez80_z80|X||EA %m %m
 jmp v, %m|kc160|_||EA %m %m
 jmp v, %m|kc160_z80|_||EA %m %m
 jmp v, %m|r2ka|_||EA %m %m
@@ -20934,6 +21698,8 @@ jmp v, %m|z80n|X||EA %m %m
 jmp x5, %m|8085|_||FD %m %m
 jmp z, %m|8080|_||CA %m %m
 jmp z, %m|8085|_||CA %m %m
+jmp z, %m|ez80|_||CA %m %m %m
+jmp z, %m|ez80_z80|_||CA %m %m
 jmp z, %m|gbz80|_||CA %m %m
 jmp z, %m|kc160|_||CA %m %m
 jmp z, %m|kc160_z80|_||CA %m %m
@@ -20949,6 +21715,8 @@ jnc %m|8080|_||D2 %m %m
 jnc %m|8080_strict|_||D2 %m %m
 jnc %m|8085|_||D2 %m %m
 jnc %m|8085_strict|_||D2 %m %m
+jnc %m|ez80|_||D2 %m %m %m
+jnc %m|ez80_z80|_||D2 %m %m
 jnc %m|gbz80|_||D2 %m %m
 jnc %m|kc160|_||D2 %m %m
 jnc %m|kc160_z80|_||D2 %m %m
@@ -20962,6 +21730,8 @@ jnc %m|z80|_||D2 %m %m
 jnc %m|z80n|_||D2 %m %m
 jne %m|8080|X||C2 %m %m
 jne %m|8085|X||C2 %m %m
+jne %m|ez80|X||C2 %m %m %m
+jne %m|ez80_z80|X||C2 %m %m
 jne %m|gbz80|X||C2 %m %m
 jne %m|kc160|_||C2 %m %m
 jne %m|kc160_z80|_||C2 %m %m
@@ -20976,6 +21746,8 @@ jne %m|z80n|X||C2 %m %m
 jnk %m|8085|_||DD %m %m
 jnv %m|8080|X||E2 %m %m
 jnv %m|8085|X||E2 %m %m
+jnv %m|ez80|X||E2 %m %m %m
+jnv %m|ez80_z80|X||E2 %m %m
 jnv %m|kc160|_||E2 %m %m
 jnv %m|kc160_z80|_||E2 %m %m
 jnv %m|r2ka|_||E2 %m %m
@@ -20989,6 +21761,8 @@ jnz %m|8080|_||C2 %m %m
 jnz %m|8080_strict|_||C2 %m %m
 jnz %m|8085|_||C2 %m %m
 jnz %m|8085_strict|_||C2 %m %m
+jnz %m|ez80|_||C2 %m %m %m
+jnz %m|ez80_z80|_||C2 %m %m
 jnz %m|gbz80|_||C2 %m %m
 jnz %m|kc160|_||C2 %m %m
 jnz %m|kc160_z80|_||C2 %m %m
@@ -21107,6 +21881,10 @@ jp (zix)|kc160|_||7F;DD E9
 jp (ziy)|kc160|_||7F;FD E9
 jp c, %m|8080|_||DA %m %m
 jp c, %m|8085|_||DA %m %m
+jp c, %m|ez80|_||DA %m %m %m
+jp c, %m|ez80_strict|_||DA %m %m %m
+jp c, %m|ez80_z80|_||DA %m %m
+jp c, %m|ez80_z80_strict|_||DA %m %m
 jp c, %m|gbz80|_||DA %m %m
 jp c, %m|gbz80_strict|_||DA %m %m
 jp c, %m|kc160|_||DA %m %m
@@ -21124,6 +21902,8 @@ jp c, %m|z80n|_||DA %m %m
 jp c, %m|z80n_strict|_||DA %m %m
 jp eq, %m|8080|X||CA %m %m
 jp eq, %m|8085|X||CA %m %m
+jp eq, %m|ez80|X||CA %m %m %m
+jp eq, %m|ez80_z80|X||CA %m %m
 jp eq, %m|gbz80|X||CA %m %m
 jp eq, %m|kc160|_||CA %m %m
 jp eq, %m|kc160_z80|_||CA %m %m
@@ -21137,6 +21917,8 @@ jp eq, %m|z80|X||CA %m %m
 jp eq, %m|z80n|X||CA %m %m
 jp geu, %m|8080|X||D2 %m %m
 jp geu, %m|8085|X||D2 %m %m
+jp geu, %m|ez80|X||D2 %m %m %m
+jp geu, %m|ez80_z80|X||D2 %m %m
 jp geu, %m|gbz80|X||D2 %m %m
 jp geu, %m|kc160|_||D2 %m %m
 jp geu, %m|kc160_z80|_||D2 %m %m
@@ -21152,6 +21934,8 @@ jp gt, %m|r4k|_||A2 %m %m
 jp gt, %m|r5k|_||A2 %m %m
 jp gtu, %m|8080|X||CA %t %t;D2 %m %m
 jp gtu, %m|8085|X||CA %t %t;D2 %m %m
+jp gtu, %m|ez80|X||28 %t;D2 %m %m %m
+jp gtu, %m|ez80_z80|X||28 %t;D2 %m %m
 jp gtu, %m|gbz80|X||28 %t;D2 %m %m
 jp gtu, %m|kc160|_||CA %t %t;D2 %m %m
 jp gtu, %m|kc160_z80|_||CA %t %t;D2 %m %m
@@ -21166,6 +21950,8 @@ jp gtu, %m|z80n|X||28 %t;D2 %m %m
 jp k, %m|8085|_||FD %m %m
 jp leu, %m|8080|X||CA %m %m;DA %m %m
 jp leu, %m|8085|X||CA %m %m;DA %m %m
+jp leu, %m|ez80|X||CA %m %m %m;DA %m %m %m
+jp leu, %m|ez80_z80|X||CA %m %m;DA %m %m
 jp leu, %m|gbz80|X||CA %m %m;DA %m %m
 jp leu, %m|kc160|_||CA %m %m;DA %m %m
 jp leu, %m|kc160_z80|_||CA %m %m;DA %m %m
@@ -21185,6 +21971,8 @@ jp lt, %m|r4k|_||B2 %m %m
 jp lt, %m|r5k|_||B2 %m %m
 jp ltu, %m|8080|X||DA %m %m
 jp ltu, %m|8085|X||DA %m %m
+jp ltu, %m|ez80|X||DA %m %m %m
+jp ltu, %m|ez80_z80|X||DA %m %m
 jp ltu, %m|gbz80|X||DA %m %m
 jp ltu, %m|kc160|_||DA %m %m
 jp ltu, %m|kc160_z80|_||DA %m %m
@@ -21202,6 +21990,10 @@ jp lz, %m|r4k|_||E2 %m %m
 jp lz, %m|r5k|_||E2 %m %m
 jp m, %m|8080|_||FA %m %m
 jp m, %m|8085|_||FA %m %m
+jp m, %m|ez80|_||FA %m %m %m
+jp m, %m|ez80_strict|_||FA %m %m %m
+jp m, %m|ez80_z80|_||FA %m %m
+jp m, %m|ez80_z80_strict|_||FA %m %m
 jp m, %m|kc160|_||FA %m %m
 jp m, %m|kc160_z80|_||FA %m %m
 jp m, %m|r2ka|_||FA %m %m
@@ -21217,6 +22009,10 @@ jp m, %m|z80n|_||FA %m %m
 jp m, %m|z80n_strict|_||FA %m %m
 jp nc, %m|8080|_||D2 %m %m
 jp nc, %m|8085|_||D2 %m %m
+jp nc, %m|ez80|_||D2 %m %m %m
+jp nc, %m|ez80_strict|_||D2 %m %m %m
+jp nc, %m|ez80_z80|_||D2 %m %m
+jp nc, %m|ez80_z80_strict|_||D2 %m %m
 jp nc, %m|gbz80|_||D2 %m %m
 jp nc, %m|gbz80_strict|_||D2 %m %m
 jp nc, %m|kc160|_||D2 %m %m
@@ -21234,6 +22030,8 @@ jp nc, %m|z80n|_||D2 %m %m
 jp nc, %m|z80n_strict|_||D2 %m %m
 jp ne, %m|8080|X||C2 %m %m
 jp ne, %m|8085|X||C2 %m %m
+jp ne, %m|ez80|X||C2 %m %m %m
+jp ne, %m|ez80_z80|X||C2 %m %m
 jp ne, %m|gbz80|X||C2 %m %m
 jp ne, %m|kc160|_||C2 %m %m
 jp ne, %m|kc160_z80|_||C2 %m %m
@@ -21248,6 +22046,8 @@ jp ne, %m|z80n|X||C2 %m %m
 jp nk, %m|8085|_||DD %m %m
 jp nv, %m|8080|X||E2 %m %m
 jp nv, %m|8085|X||E2 %m %m
+jp nv, %m|ez80|X||E2 %m %m %m
+jp nv, %m|ez80_z80|X||E2 %m %m
 jp nv, %m|kc160|_||E2 %m %m
 jp nv, %m|kc160_z80|_||E2 %m %m
 jp nv, %m|r2ka|_||E2 %m %m
@@ -21259,6 +22059,10 @@ jp nv, %m|z80n|X||E2 %m %m
 jp nx5, %m|8085|_||DD %m %m
 jp nz, %m|8080|_||C2 %m %m
 jp nz, %m|8085|_||C2 %m %m
+jp nz, %m|ez80|_||C2 %m %m %m
+jp nz, %m|ez80_strict|_||C2 %m %m %m
+jp nz, %m|ez80_z80|_||C2 %m %m
+jp nz, %m|ez80_z80_strict|_||C2 %m %m
 jp nz, %m|gbz80|_||C2 %m %m
 jp nz, %m|gbz80_strict|_||C2 %m %m
 jp nz, %m|kc160|_||C2 %m %m
@@ -21276,6 +22080,10 @@ jp nz, %m|z80n|_||C2 %m %m
 jp nz, %m|z80n_strict|_||C2 %m %m
 jp p, %m|8080|_||F2 %m %m
 jp p, %m|8085|_||F2 %m %m
+jp p, %m|ez80|_||F2 %m %m %m
+jp p, %m|ez80_strict|_||F2 %m %m %m
+jp p, %m|ez80_z80|_||F2 %m %m
+jp p, %m|ez80_z80_strict|_||F2 %m %m
 jp p, %m|kc160|_||F2 %m %m
 jp p, %m|kc160_z80|_||F2 %m %m
 jp p, %m|r2ka|_||F2 %m %m
@@ -21291,6 +22099,10 @@ jp p, %m|z80n|_||F2 %m %m
 jp p, %m|z80n_strict|_||F2 %m %m
 jp pe, %m|8080|_||EA %m %m
 jp pe, %m|8085|_||EA %m %m
+jp pe, %m|ez80|_||EA %m %m %m
+jp pe, %m|ez80_strict|_||EA %m %m %m
+jp pe, %m|ez80_z80|_||EA %m %m
+jp pe, %m|ez80_z80_strict|_||EA %m %m
 jp pe, %m|kc160|_||EA %m %m
 jp pe, %m|kc160_z80|_||EA %m %m
 jp pe, %m|r2ka|_||EA %m %m
@@ -21306,6 +22118,10 @@ jp pe, %m|z80n|_||EA %m %m
 jp pe, %m|z80n_strict|_||EA %m %m
 jp po, %m|8080|_||E2 %m %m
 jp po, %m|8085|_||E2 %m %m
+jp po, %m|ez80|_||E2 %m %m %m
+jp po, %m|ez80_strict|_||E2 %m %m %m
+jp po, %m|ez80_z80|_||E2 %m %m
+jp po, %m|ez80_z80_strict|_||E2 %m %m
 jp po, %m|kc160|_||E2 %m %m
 jp po, %m|kc160_z80|_||E2 %m %m
 jp po, %m|r2ka|_||E2 %m %m
@@ -21321,6 +22137,8 @@ jp po, %m|z80n|_||E2 %m %m
 jp po, %m|z80n_strict|_||E2 %m %m
 jp v, %m|8080|X||EA %m %m
 jp v, %m|8085|X||EA %m %m
+jp v, %m|ez80|X||EA %m %m %m
+jp v, %m|ez80_z80|X||EA %m %m
 jp v, %m|kc160|_||EA %m %m
 jp v, %m|kc160_z80|_||EA %m %m
 jp v, %m|r2ka|_||EA %m %m
@@ -21334,6 +22152,10 @@ jp v, %m|z80n|X||EA %m %m
 jp x5, %m|8085|_||FD %m %m
 jp z, %m|8080|_||CA %m %m
 jp z, %m|8085|_||CA %m %m
+jp z, %m|ez80|_||CA %m %m %m
+jp z, %m|ez80_strict|_||CA %m %m %m
+jp z, %m|ez80_z80|_||CA %m %m
+jp z, %m|ez80_z80_strict|_||CA %m %m
 jp z, %m|gbz80|_||CA %m %m
 jp z, %m|gbz80_strict|_||CA %m %m
 jp z, %m|kc160|_||CA %m %m
@@ -21349,6 +22171,70 @@ jp z, %m|z80|_||CA %m %m
 jp z, %m|z80_strict|_||CA %m %m
 jp z, %m|z80n|_||CA %m %m
 jp z, %m|z80n_strict|_||CA %m %m
+jp.lil c, %m|ez80|_||5B;DA %m %m
+jp.lil c, %m|ez80_strict|_||5B;DA %m %m
+jp.lil c, %m|ez80_z80|_||5B;DA %m %m
+jp.lil c, %m|ez80_z80_strict|_||5B;DA %m %m
+jp.lil m, %m|ez80|_||5B;FA %m %m
+jp.lil m, %m|ez80_strict|_||5B;FA %m %m
+jp.lil m, %m|ez80_z80|_||5B;FA %m %m
+jp.lil m, %m|ez80_z80_strict|_||5B;FA %m %m
+jp.lil nc, %m|ez80|_||5B;D2 %m %m
+jp.lil nc, %m|ez80_strict|_||5B;D2 %m %m
+jp.lil nc, %m|ez80_z80|_||5B;D2 %m %m
+jp.lil nc, %m|ez80_z80_strict|_||5B;D2 %m %m
+jp.lil nz, %m|ez80|_||5B;C2 %m %m
+jp.lil nz, %m|ez80_strict|_||5B;C2 %m %m
+jp.lil nz, %m|ez80_z80|_||5B;C2 %m %m
+jp.lil nz, %m|ez80_z80_strict|_||5B;C2 %m %m
+jp.lil p, %m|ez80|_||5B;F2 %m %m
+jp.lil p, %m|ez80_strict|_||5B;F2 %m %m
+jp.lil p, %m|ez80_z80|_||5B;F2 %m %m
+jp.lil p, %m|ez80_z80_strict|_||5B;F2 %m %m
+jp.lil pe, %m|ez80|_||5B;EA %m %m
+jp.lil pe, %m|ez80_strict|_||5B;EA %m %m
+jp.lil pe, %m|ez80_z80|_||5B;EA %m %m
+jp.lil pe, %m|ez80_z80_strict|_||5B;EA %m %m
+jp.lil po, %m|ez80|_||5B;E2 %m %m
+jp.lil po, %m|ez80_strict|_||5B;E2 %m %m
+jp.lil po, %m|ez80_z80|_||5B;E2 %m %m
+jp.lil po, %m|ez80_z80_strict|_||5B;E2 %m %m
+jp.lil z, %m|ez80|_||5B;CA %m %m
+jp.lil z, %m|ez80_strict|_||5B;CA %m %m
+jp.lil z, %m|ez80_z80|_||5B;CA %m %m
+jp.lil z, %m|ez80_z80_strict|_||5B;CA %m %m
+jp.sis c, %m|ez80|_||40;DA %m %m
+jp.sis c, %m|ez80_strict|_||40;DA %m %m
+jp.sis c, %m|ez80_z80|_||40;DA %m %m
+jp.sis c, %m|ez80_z80_strict|_||40;DA %m %m
+jp.sis m, %m|ez80|_||40;FA %m %m
+jp.sis m, %m|ez80_strict|_||40;FA %m %m
+jp.sis m, %m|ez80_z80|_||40;FA %m %m
+jp.sis m, %m|ez80_z80_strict|_||40;FA %m %m
+jp.sis nc, %m|ez80|_||40;D2 %m %m
+jp.sis nc, %m|ez80_strict|_||40;D2 %m %m
+jp.sis nc, %m|ez80_z80|_||40;D2 %m %m
+jp.sis nc, %m|ez80_z80_strict|_||40;D2 %m %m
+jp.sis nz, %m|ez80|_||40;C2 %m %m
+jp.sis nz, %m|ez80_strict|_||40;C2 %m %m
+jp.sis nz, %m|ez80_z80|_||40;C2 %m %m
+jp.sis nz, %m|ez80_z80_strict|_||40;C2 %m %m
+jp.sis p, %m|ez80|_||40;F2 %m %m
+jp.sis p, %m|ez80_strict|_||40;F2 %m %m
+jp.sis p, %m|ez80_z80|_||40;F2 %m %m
+jp.sis p, %m|ez80_z80_strict|_||40;F2 %m %m
+jp.sis pe, %m|ez80|_||40;EA %m %m
+jp.sis pe, %m|ez80_strict|_||40;EA %m %m
+jp.sis pe, %m|ez80_z80|_||40;EA %m %m
+jp.sis pe, %m|ez80_z80_strict|_||40;EA %m %m
+jp.sis po, %m|ez80|_||40;E2 %m %m
+jp.sis po, %m|ez80_strict|_||40;E2 %m %m
+jp.sis po, %m|ez80_z80|_||40;E2 %m %m
+jp.sis po, %m|ez80_z80_strict|_||40;E2 %m %m
+jp.sis z, %m|ez80|_||40;CA %m %m
+jp.sis z, %m|ez80_strict|_||40;CA %m %m
+jp.sis z, %m|ez80_z80|_||40;CA %m %m
+jp.sis z, %m|ez80_z80_strict|_||40;CA %m %m
 jp3 %m|kc160|_||ED C3 %m %m %m
 jp3 %m|kc160_z80|_||ED C3 %m %m %m
 jp3 c, %m|kc160|_||ED DA %m %m %m
@@ -21375,6 +22261,8 @@ jpe %m|8080|_||EA %m %m
 jpe %m|8080_strict|_||EA %m %m
 jpe %m|8085|_||EA %m %m
 jpe %m|8085_strict|_||EA %m %m
+jpe %m|ez80|_||EA %m %m %m
+jpe %m|ez80_z80|_||EA %m %m
 jpe %m|kc160|_||EA %m %m
 jpe %m|kc160_z80|_||EA %m %m
 jpe %m|r2ka|_||EA %m %m
@@ -21389,6 +22277,8 @@ jpo %m|8080|_||E2 %m %m
 jpo %m|8080_strict|_||E2 %m %m
 jpo %m|8085|_||E2 %m %m
 jpo %m|8085_strict|_||E2 %m %m
+jpo %m|ez80|_||E2 %m %m %m
+jpo %m|ez80_z80|_||E2 %m %m
 jpo %m|kc160|_||E2 %m %m
 jpo %m|kc160_z80|_||E2 %m %m
 jpo %m|r2ka|_||E2 %m %m
@@ -21401,6 +22291,10 @@ jpo %m|z80|_||E2 %m %m
 jpo %m|z80n|_||E2 %m %m
 jr %j|8080|X||C3 %m %m
 jr %j|8085|X||C3 %m %m
+jr %j|ez80|_||18 %j
+jr %j|ez80_strict|_||18 %j
+jr %j|ez80_z80|_||18 %j
+jr %j|ez80_z80_strict|_||18 %j
 jr %j|gbz80|_||18 %j
 jr %j|gbz80_strict|_||18 %j
 jr %j|kc160|_||18 %j
@@ -21418,6 +22312,10 @@ jr %j|z80n|_||18 %j
 jr %j|z80n_strict|_||18 %j
 jr c, %j|8080|X||DA %m %m
 jr c, %j|8085|X||DA %m %m
+jr c, %j|ez80|_||38 %j
+jr c, %j|ez80_strict|_||38 %j
+jr c, %j|ez80_z80|_||38 %j
+jr c, %j|ez80_z80_strict|_||38 %j
 jr c, %j|gbz80|_||38 %j
 jr c, %j|gbz80_strict|_||38 %j
 jr c, %j|kc160|_||38 %j
@@ -21435,6 +22333,8 @@ jr c, %j|z80n|_||38 %j
 jr c, %j|z80n_strict|_||38 %j
 jr eq, %j|8080|X||CA %m %m
 jr eq, %j|8085|X||CA %m %m
+jr eq, %j|ez80|X||28 %j
+jr eq, %j|ez80_z80|X||28 %j
 jr eq, %j|gbz80|X||28 %j
 jr eq, %j|kc160|_||28 %j
 jr eq, %j|kc160_z80|_||28 %j
@@ -21448,6 +22348,8 @@ jr eq, %j|z80|X||28 %j
 jr eq, %j|z80n|X||28 %j
 jr geu, %j|8080|X||D2 %m %m
 jr geu, %j|8085|X||D2 %m %m
+jr geu, %j|ez80|X||30 %j
+jr geu, %j|ez80_z80|X||30 %j
 jr geu, %j|gbz80|X||30 %j
 jr geu, %j|kc160|_||30 %j
 jr geu, %j|kc160_z80|_||30 %j
@@ -21463,6 +22365,8 @@ jr gt, %j|r4k|_||A0 %j
 jr gt, %j|r5k|_||A0 %j
 jr gtu, %j|8080|X||CA %t %t;D2 %m %m
 jr gtu, %j|8085|X||CA %t %t;D2 %m %m
+jr gtu, %j|ez80|X||28 %t;30 %j
+jr gtu, %j|ez80_z80|X||28 %t;30 %j
 jr gtu, %j|gbz80|X||28 %t;30 %j
 jr gtu, %j|kc160|_||28 %t;30 %j
 jr gtu, %j|kc160_z80|_||28 %t;30 %j
@@ -21476,6 +22380,8 @@ jr gtu, %j|z80|X||28 %t;30 %j
 jr gtu, %j|z80n|X||28 %t;30 %j
 jr leu, %j|8080|X||CA %m %m;DA %m %m
 jr leu, %j|8085|X||CA %m %m;DA %m %m
+jr leu, %j|ez80|X||28 %j;38 %j
+jr leu, %j|ez80_z80|X||28 %j;38 %j
 jr leu, %j|gbz80|X||28 %j;38 %j
 jr leu, %j|kc160|_||28 %j;38 %j
 jr leu, %j|kc160_z80|_||28 %j;38 %j
@@ -21491,6 +22397,8 @@ jr lt, %j|r4k|_||B0 %j
 jr lt, %j|r5k|_||B0 %j
 jr ltu, %j|8080|X||DA %m %m
 jr ltu, %j|8085|X||DA %m %m
+jr ltu, %j|ez80|X||38 %j
+jr ltu, %j|ez80_z80|X||38 %j
 jr ltu, %j|gbz80|X||38 %j
 jr ltu, %j|kc160|_||38 %j
 jr ltu, %j|kc160_z80|_||38 %j
@@ -21504,6 +22412,10 @@ jr ltu, %j|z80|X||38 %j
 jr ltu, %j|z80n|X||38 %j
 jr nc, %j|8080|X||D2 %m %m
 jr nc, %j|8085|X||D2 %m %m
+jr nc, %j|ez80|_||30 %j
+jr nc, %j|ez80_strict|_||30 %j
+jr nc, %j|ez80_z80|_||30 %j
+jr nc, %j|ez80_z80_strict|_||30 %j
 jr nc, %j|gbz80|_||30 %j
 jr nc, %j|gbz80_strict|_||30 %j
 jr nc, %j|kc160|_||30 %j
@@ -21521,6 +22433,8 @@ jr nc, %j|z80n|_||30 %j
 jr nc, %j|z80n_strict|_||30 %j
 jr ne, %j|8080|X||C2 %m %m
 jr ne, %j|8085|X||C2 %m %m
+jr ne, %j|ez80|X||20 %j
+jr ne, %j|ez80_z80|X||20 %j
 jr ne, %j|gbz80|X||20 %j
 jr ne, %j|kc160|_||20 %j
 jr ne, %j|kc160_z80|_||20 %j
@@ -21534,6 +22448,10 @@ jr ne, %j|z80|X||20 %j
 jr ne, %j|z80n|X||20 %j
 jr nz, %j|8080|X||C2 %m %m
 jr nz, %j|8085|X||C2 %m %m
+jr nz, %j|ez80|_||20 %j
+jr nz, %j|ez80_strict|_||20 %j
+jr nz, %j|ez80_z80|_||20 %j
+jr nz, %j|ez80_z80_strict|_||20 %j
 jr nz, %j|gbz80|_||20 %j
 jr nz, %j|gbz80_strict|_||20 %j
 jr nz, %j|kc160|_||20 %j
@@ -21553,6 +22471,10 @@ jr v, %j|r4k|_||B8 %j
 jr v, %j|r5k|_||B8 %j
 jr z, %j|8080|X||CA %m %m
 jr z, %j|8085|X||CA %m %m
+jr z, %j|ez80|_||28 %j
+jr z, %j|ez80_strict|_||28 %j
+jr z, %j|ez80_z80|_||28 %j
+jr z, %j|ez80_z80_strict|_||28 %j
 jr z, %j|gbz80|_||28 %j
 jr z, %j|gbz80_strict|_||28 %j
 jr z, %j|kc160|_||28 %j
@@ -21596,6 +22518,8 @@ jre z, %J|r4k|_||ED CB %J %J
 jre z, %J|r5k|_||ED CB %J %J
 jv %m|8080|X||EA %m %m
 jv %m|8085|X||EA %m %m
+jv %m|ez80|X||EA %m %m %m
+jv %m|ez80_z80|X||EA %m %m
 jv %m|kc160|_||EA %m %m
 jv %m|kc160_z80|_||EA %m %m
 jv %m|r2ka|_||EA %m %m
@@ -21611,6 +22535,8 @@ jz %m|8080|_||CA %m %m
 jz %m|8080_strict|_||CA %m %m
 jz %m|8085|_||CA %m %m
 jz %m|8085_strict|_||CA %m %m
+jz %m|ez80|_||CA %m %m %m
+jz %m|ez80_z80|_||CA %m %m
 jz %m|gbz80|_||CA %m %m
 jz %m|kc160|_||CA %m %m
 jz %m|kc160_z80|_||CA %m %m
@@ -33413,6 +34339,8 @@ mvi m, %n|z80|_||36 %n
 mvi m, %n|z80n|_||36 %n
 neg|8080|X||2F;3C
 neg|8085|X||2F;3C
+neg|ez80|X||2F;3C
+neg|ez80_z80|X||2F;3C
 neg|gbz80|X||2F;3C
 neg|kc160|_||ED 44
 neg|kc160_z80|_||ED 44
@@ -33429,6 +34357,8 @@ neg|z80n|_||ED 44
 neg|z80n_strict|_||ED 44
 neg a|8080|X||2F;3C
 neg a|8085|X||2F;3C
+neg a|ez80|X||2F;3C
+neg a|ez80_z80|X||2F;3C
 neg a|gbz80|X||2F;3C
 neg a|kc160|_||ED 44
 neg a|kc160_z80|_||ED 44
@@ -34563,6 +35493,10 @@ otdm|z180|_||ED 8B
 otdm|z180_strict|_||ED 8B
 otdmr|z180|_||ED 9B
 otdmr|z180_strict|_||ED 9B
+otdr|ez80|_||ED BB
+otdr|ez80_strict|_||ED BB
+otdr|ez80_z80|_||ED BB
+otdr|ez80_z80_strict|_||ED BB
 otdr|kc160|_||ED BB
 otdr|kc160_z80|_||ED BB
 otdr|r800|_||ED BB
@@ -34574,10 +35508,22 @@ otdr|z80n|_||ED BB
 otdr|z80n_strict|_||ED BB
 otdr x|kc160|_||ED FB
 otdr x|kc160_z80|_||ED FB
+otdr.l|ez80_z80|_||49;ED BB
+otdr.l|ez80_z80_strict|_||49;ED BB
+otdr.lis|ez80_z80|_||49;ED BB
+otdr.lis|ez80_z80_strict|_||49;ED BB
+otdr.s|ez80|_||52;ED BB
+otdr.s|ez80_strict|_||52;ED BB
+otdr.sil|ez80|_||52;ED BB
+otdr.sil|ez80_strict|_||52;ED BB
 otim|z180|_||ED 83
 otim|z180_strict|_||ED 83
 otimr|z180|_||ED 93
 otimr|z180_strict|_||ED 93
+otir|ez80|_||ED B3
+otir|ez80_strict|_||ED B3
+otir|ez80_z80|_||ED B3
+otir|ez80_z80_strict|_||ED B3
 otir|kc160|_||ED B3
 otir|kc160_z80|_||ED B3
 otir|r800|_||ED B3
@@ -34589,10 +35535,20 @@ otir|z80n|_||ED B3
 otir|z80n_strict|_||ED B3
 otir x|kc160|_||ED F3
 otir x|kc160_z80|_||ED F3
+otir.l|ez80_z80|_||49;ED B3
+otir.l|ez80_z80_strict|_||49;ED B3
+otir.lis|ez80_z80|_||49;ED B3
+otir.lis|ez80_z80_strict|_||49;ED B3
+otir.s|ez80|_||52;ED B3
+otir.s|ez80_strict|_||52;ED B3
+otir.sil|ez80|_||52;ED B3
+otir.sil|ez80_strict|_||52;ED B3
 out %n|8080|_||D3 %n
 out %n|8080_strict|_||D3 %n
 out %n|8085|_||D3 %n
 out %n|8085_strict|_||D3 %n
+out %n|ez80|_||D3 %n
+out %n|ez80_z80|_||D3 %n
 out %n|kc160|_||D3 %n
 out %n|kc160_z80|_||D3 %n
 out %n|r800|_||D3 %n
@@ -34601,6 +35557,10 @@ out %n|z80|_||D3 %n
 out %n|z80n|_||D3 %n
 out (%n), a|8080|_||D3 %n
 out (%n), a|8085|_||D3 %n
+out (%n), a|ez80|_||D3 %n
+out (%n), a|ez80_strict|_||D3 %n
+out (%n), a|ez80_z80|_||D3 %n
+out (%n), a|ez80_z80_strict|_||D3 %n
 out (%n), a|kc160|_||D3 %n
 out (%n), a|kc160_z80|_||D3 %n
 out (%n), a|r800|_||D3 %n
@@ -34615,30 +35575,50 @@ out (bc), %c|z180|_|0|ED 71
 out (bc), %c|z80|_|0|ED 71
 out (bc), %c|z80n|_|0|ED 71
 out (bc), %c|z80n_strict|_|0|ED 71
+out (bc), a|ez80|_||ED 79
+out (bc), a|ez80_strict|_||ED 79
+out (bc), a|ez80_z80|_||ED 79
+out (bc), a|ez80_z80_strict|_||ED 79
 out (bc), a|kc160|_||ED 79
 out (bc), a|kc160_z80|_||ED 79
 out (bc), a|r800|_||ED 79
 out (bc), a|z180|_||ED 79
 out (bc), a|z80|_||ED 79
 out (bc), a|z80n|_||ED 79
+out (bc), b|ez80|_||ED 41
+out (bc), b|ez80_strict|_||ED 41
+out (bc), b|ez80_z80|_||ED 41
+out (bc), b|ez80_z80_strict|_||ED 41
 out (bc), b|kc160|_||ED 41
 out (bc), b|kc160_z80|_||ED 41
 out (bc), b|r800|_||ED 41
 out (bc), b|z180|_||ED 41
 out (bc), b|z80|_||ED 41
 out (bc), b|z80n|_||ED 41
+out (bc), c|ez80|_||ED 49
+out (bc), c|ez80_strict|_||ED 49
+out (bc), c|ez80_z80|_||ED 49
+out (bc), c|ez80_z80_strict|_||ED 49
 out (bc), c|kc160|_||ED 49
 out (bc), c|kc160_z80|_||ED 49
 out (bc), c|r800|_||ED 49
 out (bc), c|z180|_||ED 49
 out (bc), c|z80|_||ED 49
 out (bc), c|z80n|_||ED 49
+out (bc), d|ez80|_||ED 51
+out (bc), d|ez80_strict|_||ED 51
+out (bc), d|ez80_z80|_||ED 51
+out (bc), d|ez80_z80_strict|_||ED 51
 out (bc), d|kc160|_||ED 51
 out (bc), d|kc160_z80|_||ED 51
 out (bc), d|r800|_||ED 51
 out (bc), d|z180|_||ED 51
 out (bc), d|z80|_||ED 51
 out (bc), d|z80n|_||ED 51
+out (bc), e|ez80|_||ED 59
+out (bc), e|ez80_strict|_||ED 59
+out (bc), e|ez80_z80|_||ED 59
+out (bc), e|ez80_z80_strict|_||ED 59
 out (bc), e|kc160|_||ED 59
 out (bc), e|kc160_z80|_||ED 59
 out (bc), e|r800|_||ED 59
@@ -34650,12 +35630,20 @@ out (bc), f|z180|_||ED 71
 out (bc), f|z80|_||ED 71
 out (bc), f|z80n|_||ED 71
 out (bc), f|z80n_strict|_||ED 71
+out (bc), h|ez80|_||ED 61
+out (bc), h|ez80_strict|_||ED 61
+out (bc), h|ez80_z80|_||ED 61
+out (bc), h|ez80_z80_strict|_||ED 61
 out (bc), h|kc160|_||ED 61
 out (bc), h|kc160_z80|_||ED 61
 out (bc), h|r800|_||ED 61
 out (bc), h|z180|_||ED 61
 out (bc), h|z80|_||ED 61
 out (bc), h|z80n|_||ED 61
+out (bc), l|ez80|_||ED 69
+out (bc), l|ez80_strict|_||ED 69
+out (bc), l|ez80_z80|_||ED 69
+out (bc), l|ez80_z80_strict|_||ED 69
 out (bc), l|kc160|_||ED 69
 out (bc), l|kc160_z80|_||ED 69
 out (bc), l|r800|_||ED 69
@@ -34667,6 +35655,8 @@ out (c), %c|z180|_|0|ED 71
 out (c), %c|z80|_|0|ED 71
 out (c), %c|z80n|_|0|ED 71
 out (c), %c|z80n_strict|_|0|ED 71
+out (c), a|ez80|_||ED 79
+out (c), a|ez80_z80|_||ED 79
 out (c), a|kc160|_||ED 79
 out (c), a|kc160_z80|_||ED 79
 out (c), a|r800|_||ED 79
@@ -34676,6 +35666,8 @@ out (c), a|z80|_||ED 79
 out (c), a|z80_strict|_||ED 79
 out (c), a|z80n|_||ED 79
 out (c), a|z80n_strict|_||ED 79
+out (c), b|ez80|_||ED 41
+out (c), b|ez80_z80|_||ED 41
 out (c), b|kc160|_||ED 41
 out (c), b|kc160_z80|_||ED 41
 out (c), b|r800|_||ED 41
@@ -34685,6 +35677,8 @@ out (c), b|z80|_||ED 41
 out (c), b|z80_strict|_||ED 41
 out (c), b|z80n|_||ED 41
 out (c), b|z80n_strict|_||ED 41
+out (c), c|ez80|_||ED 49
+out (c), c|ez80_z80|_||ED 49
 out (c), c|kc160|_||ED 49
 out (c), c|kc160_z80|_||ED 49
 out (c), c|r800|_||ED 49
@@ -34694,6 +35688,8 @@ out (c), c|z80|_||ED 49
 out (c), c|z80_strict|_||ED 49
 out (c), c|z80n|_||ED 49
 out (c), c|z80n_strict|_||ED 49
+out (c), d|ez80|_||ED 51
+out (c), d|ez80_z80|_||ED 51
 out (c), d|kc160|_||ED 51
 out (c), d|kc160_z80|_||ED 51
 out (c), d|r800|_||ED 51
@@ -34703,6 +35699,8 @@ out (c), d|z80|_||ED 51
 out (c), d|z80_strict|_||ED 51
 out (c), d|z80n|_||ED 51
 out (c), d|z80n_strict|_||ED 51
+out (c), e|ez80|_||ED 59
+out (c), e|ez80_z80|_||ED 59
 out (c), e|kc160|_||ED 59
 out (c), e|kc160_z80|_||ED 59
 out (c), e|r800|_||ED 59
@@ -34717,6 +35715,8 @@ out (c), f|z180|_||ED 71
 out (c), f|z80|_||ED 71
 out (c), f|z80n|_||ED 71
 out (c), f|z80n_strict|_||ED 71
+out (c), h|ez80|_||ED 61
+out (c), h|ez80_z80|_||ED 61
 out (c), h|kc160|_||ED 61
 out (c), h|kc160_z80|_||ED 61
 out (c), h|r800|_||ED 61
@@ -34726,6 +35726,8 @@ out (c), h|z80|_||ED 61
 out (c), h|z80_strict|_||ED 61
 out (c), h|z80n|_||ED 61
 out (c), h|z80n_strict|_||ED 61
+out (c), l|ez80|_||ED 69
+out (c), l|ez80_z80|_||ED 69
 out (c), l|kc160|_||ED 69
 out (c), l|kc160_z80|_||ED 69
 out (c), l|r800|_||ED 69
@@ -34735,20 +35737,52 @@ out (c), l|z80|_||ED 69
 out (c), l|z80_strict|_||ED 69
 out (c), l|z80n|_||ED 69
 out (c), l|z80n_strict|_||ED 69
+out0 (%n), a|ez80|_||ED 39 %n
+out0 (%n), a|ez80_strict|_||ED 39 %n
+out0 (%n), a|ez80_z80|_||ED 39 %n
+out0 (%n), a|ez80_z80_strict|_||ED 39 %n
 out0 (%n), a|z180|_||ED 39 %n
 out0 (%n), a|z180_strict|_||ED 39 %n
+out0 (%n), b|ez80|_||ED 01 %n
+out0 (%n), b|ez80_strict|_||ED 01 %n
+out0 (%n), b|ez80_z80|_||ED 01 %n
+out0 (%n), b|ez80_z80_strict|_||ED 01 %n
 out0 (%n), b|z180|_||ED 01 %n
 out0 (%n), b|z180_strict|_||ED 01 %n
+out0 (%n), c|ez80|_||ED 09 %n
+out0 (%n), c|ez80_strict|_||ED 09 %n
+out0 (%n), c|ez80_z80|_||ED 09 %n
+out0 (%n), c|ez80_z80_strict|_||ED 09 %n
 out0 (%n), c|z180|_||ED 09 %n
 out0 (%n), c|z180_strict|_||ED 09 %n
+out0 (%n), d|ez80|_||ED 11 %n
+out0 (%n), d|ez80_strict|_||ED 11 %n
+out0 (%n), d|ez80_z80|_||ED 11 %n
+out0 (%n), d|ez80_z80_strict|_||ED 11 %n
 out0 (%n), d|z180|_||ED 11 %n
 out0 (%n), d|z180_strict|_||ED 11 %n
+out0 (%n), e|ez80|_||ED 19 %n
+out0 (%n), e|ez80_strict|_||ED 19 %n
+out0 (%n), e|ez80_z80|_||ED 19 %n
+out0 (%n), e|ez80_z80_strict|_||ED 19 %n
 out0 (%n), e|z180|_||ED 19 %n
 out0 (%n), e|z180_strict|_||ED 19 %n
+out0 (%n), h|ez80|_||ED 21 %n
+out0 (%n), h|ez80_strict|_||ED 21 %n
+out0 (%n), h|ez80_z80|_||ED 21 %n
+out0 (%n), h|ez80_z80_strict|_||ED 21 %n
 out0 (%n), h|z180|_||ED 21 %n
 out0 (%n), h|z180_strict|_||ED 21 %n
+out0 (%n), l|ez80|_||ED 29 %n
+out0 (%n), l|ez80_strict|_||ED 29 %n
+out0 (%n), l|ez80_z80|_||ED 29 %n
+out0 (%n), l|ez80_z80_strict|_||ED 29 %n
 out0 (%n), l|z180|_||ED 29 %n
 out0 (%n), l|z180_strict|_||ED 29 %n
+outd|ez80|_||ED AB
+outd|ez80_strict|_||ED AB
+outd|ez80_z80|_||ED AB
+outd|ez80_z80_strict|_||ED AB
 outd|kc160|_||ED AB
 outd|kc160_z80|_||ED AB
 outd|r800|_||ED AB
@@ -34760,6 +35794,18 @@ outd|z80n|_||ED AB
 outd|z80n_strict|_||ED AB
 outd x|kc160|_||ED EB
 outd x|kc160_z80|_||ED EB
+outd.l|ez80_z80|_||49;ED AB
+outd.l|ez80_z80_strict|_||49;ED AB
+outd.lis|ez80_z80|_||49;ED AB
+outd.lis|ez80_z80_strict|_||49;ED AB
+outd.s|ez80|_||52;ED AB
+outd.s|ez80_strict|_||52;ED AB
+outd.sil|ez80|_||52;ED AB
+outd.sil|ez80_strict|_||52;ED AB
+outi|ez80|_||ED A3
+outi|ez80_strict|_||ED A3
+outi|ez80_z80|_||ED A3
+outi|ez80_z80_strict|_||ED A3
 outi|kc160|_||ED A3
 outi|kc160_z80|_||ED A3
 outi|r800|_||ED A3
@@ -34771,6 +35817,14 @@ outi|z80n|_||ED A3
 outi|z80n_strict|_||ED A3
 outi x|kc160|_||ED E3
 outi x|kc160_z80|_||ED E3
+outi.l|ez80_z80|_||49;ED A3
+outi.l|ez80_z80_strict|_||49;ED A3
+outi.lis|ez80_z80|_||49;ED A3
+outi.lis|ez80_z80_strict|_||49;ED A3
+outi.s|ez80|_||52;ED A3
+outi.s|ez80_strict|_||52;ED A3
+outi.sil|ez80|_||52;ED A3
+outi.sil|ez80_strict|_||52;ED A3
 outinb|z80n|_||ED 90
 outinb|z80n_strict|_||ED 90
 ovrst8|8085|_||CB
@@ -41845,6 +42899,8 @@ xchg|8080|_||EB
 xchg|8080_strict|_||EB
 xchg|8085|_||EB
 xchg|8085_strict|_||EB
+xchg|ez80|_||EB
+xchg|ez80_z80|_||EB
 xchg|gbz80|X||E5;D5;E1;D1
 xchg|kc160|_||EB
 xchg|kc160_z80|_||EB
@@ -42795,8 +43851,8 @@ xthl|8080|_||E3
 xthl|8080_strict|_||E3
 xthl|8085|_||E3
 xthl|8085_strict|_||E3
-xthl|ez80|X||CD @__z80asm__ex_sp_hl 
-xthl|ez80_z80|X||CD @__z80asm__ex_sp_hl 
+xthl|ez80|_||E3
+xthl|ez80_z80|_||E3
 xthl|gbz80|X||CD @__z80asm__ex_sp_hl 
 xthl|kc160|_||E3
 xthl|kc160_z80|_||E3
