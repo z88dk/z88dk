@@ -42,11 +42,13 @@ dnl
 dnl## input terminals
 dnl
 dnl#include(`../cpm/driver/terminal/cpm_00_input_cons.m4')
+dnl#include(`../cpm/driver/terminal/cpm_01_input_kbd_dcio.m4')
 dnl#include(`../cpm/driver/character/cpm_00_input_reader.m4')
 dnl
 dnl## output terminals
 dnl
 dnl#include(`../cpm/driver/terminal/cpm_00_output_cons.m4')
+dnl#include(`../cpm/driver/terminal/cpm_01_output_dcio.m4')
 dnl#include(`../cpm/driver/character/cpm_00_output_list.m4')
 dnl#include(`../cpm/driver/character/cpm_00_output_punch.m4')
 dnl
@@ -67,11 +69,11 @@ include(`../clib_instantiate_begin.m4')
 
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
 `
-    include(`../cpm/driver/terminal/cpm_00_input_cons.m4')
-    m4_cpm_00_input_cons(_stdin, 0x0100, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
+    include(`../cpm/driver/terminal/cpm_01_input_kbd_dcio.m4')
+    m4_cpm_01_input_kbd_dcio(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
 
-    include(`../cpm/driver/terminal/cpm_00_output_cons.m4')
-    m4_cpm_00_output_cons(_stdout, 0x0010)
+    include(`../cpm/driver/terminal/cpm_01_output_dcio.m4')
+    m4_cpm_01_output_dcio(_stdout, CRT_OTERM_TERMINAL_FLAGS)
 
     include(`../m4_file_dup.m4')
     m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
