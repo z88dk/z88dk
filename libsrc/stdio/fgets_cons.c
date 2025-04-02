@@ -71,6 +71,11 @@ char *fgets_cons(char *str, size_t max)
             docursor();
         }
     }
+	/* workaround to ignore eventual CR or LF characters on top of an empty buffer */
+	if ((*str=='\r') || (*str=='\n')) {
+		*str=0;
+		return NULL;
+	}
     return ptr ? str : NULL;
 }
 
