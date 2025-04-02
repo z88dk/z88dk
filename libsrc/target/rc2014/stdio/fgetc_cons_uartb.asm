@@ -41,5 +41,15 @@ ENDIF
     ld hl,uartbRxCount
     dec (hl)                    ; atomically decrement Rx count
 
+IF STANDARDESCAPECHARS
+    cp 13                       ; CR ?
+    ld hl,10                    ; LF
+    ret Z
+    cp 10                       ; LF ?
+    ld hl,13                    ; CR
+    ret Z
+ENDIF
+
     ld l,a                      ; and put it in hl
+    ld h,0
     ret

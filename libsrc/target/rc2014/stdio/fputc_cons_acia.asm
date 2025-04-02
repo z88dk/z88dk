@@ -10,36 +10,50 @@
     EXTERN  aciaControl
 
 
-fputc_cons_acia:
+.fputc_cons_acia
     ; enter    : (sp+2) = char to output
     ;
     ; modifies : af, de, hl
+
+    ld      de, sp+2                     ; retrieve Tx character
+    ld      a, (de)
+    ld      e, a
+
+  IF STANDARDESCAPECHARS
+    cp      10                          ; LF ?
+    jp      NZ, fputc_cons_immediate
+    ld      e, 13                       ; CR
+    call    fputc_cons_immediate
+    ld      e, 10                       ; LF
+  ELSE
+    cp      13                          ; CR ?
+    jp      NZ, fputc_cons_immediate
+    call    fputc_cons_immediate
+    ld      e, 10                       ; LF
+  ENDIF
+
+.fputc_cons_immediate
+
     ld      a, (aciaTxCount)            ; get the number of bytes in the Tx buffer
     or      a                           ; check whether the buffer is empty
-    jr      NZ, fputc_cons_tx           ; buffer not empty, so abandon immediate Tx
+    jp      NZ, fputc_cons_tx           ; buffer not empty, so abandon immediate Tx
 
     in      a, (__IO_ACIA_STATUS_REGISTER)
                                         ; get the status of the ACIA
     and     __IO_ACIA_SR_TDRE           ; check whether a byte can be transmitted
-    jr      Z, fputc_cons_tx            ; if not, so abandon immediate Tx
+    jp      Z, fputc_cons_tx            ; if not, so abandon immediate Tx
 
-    ld      de, sp+2                    ; retrieve Tx character
-    ld      a, (de)
-    out     (__IO_ACIA_DATA_REGISTER), a
-                                        ; immediately output the Tx byte to the ACIA
-
+    ld      a, e                        ; get Tx byte
+    out     (__IO_ACIA_DATA_REGISTER),a ; immediately output the Tx byte to the ACIA
     ret                                 ; and just complete
 
-fputc_cons_tx:
+.fputc_cons_tx
     ld      a, (aciaTxCount)            ; Get the number of bytes in the Tx buffer
     cp      __IO_ACIA_TX_SIZE-1         ; check whether there is space in the buffer
-    jr      NC, fputc_cons_tx           ; buffer full, so wait till it has space
-
-    ld      de, sp+2                    ; retrieve Tx character
-    ld      a, (de)
+    jp      NC, fputc_cons_tx           ; buffer full, so wait till it has space
 
     ld      hl, (aciaTxIn)              ; get the pointer to where we poke
-    ld      (hl), a                     ; write the Tx byte to the aciaTxIn
+    ld      (hl), e                     ; write the Tx byte to the aciaTxIn
 
     inc     l                           ; move the Tx pointer, just low byte along
   IF    __IO_ACIA_TX_SIZE!=0x100

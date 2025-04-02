@@ -9,7 +9,7 @@
     EXTERN  aciaControl
 
 
-fgetc_cons_acia:
+.fgetc_cons_acia
     ; exit     : l = char received
     ;
     ; modifies : af, hl
@@ -30,7 +30,7 @@ fgetc_cons_acia:
     out     (__IO_ACIA_CONTROL_REGISTER), a
                                         ; set the ACIA CTRL register
 
-fgetc_cons_rx:
+.fgetc_cons_rx
     ld      hl, (aciaRxOut)             ; get the pointer to place where we pop the Rx byte
     ld      a, (hl)                     ; get the Rx byte
 
@@ -48,5 +48,15 @@ fgetc_cons_rx:
     ld      hl, aciaRxCount
     dec     (hl)                        ; atomically decrement Rx count
 
+  IF STANDARDESCAPECHARS
+    cp      13                          ; CR ?
+    ld      hl, 10                      ; LF
+    ret     Z
+    cp      10                          ; LF ?
+    ld      hl, 13                      ; CR
+    ret     Z
+  ENDIF
+
     ld      l, a                        ; and put it in hl
+    ld      h, 0
     ret
