@@ -2076,6 +2076,8 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     // write all occupied 16k banks but skip 5,2,0
 
+    if (zxnex->mb) nh.RAM_Required = 1;
+
     for (i = 0; i <= ZXN_MAX_BANK; ++i)
     {
         struct memory_bank *mb = &memory->bankspace[bsnum_bank].membank[i];

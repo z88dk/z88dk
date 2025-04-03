@@ -72,6 +72,7 @@ struct zxn_nex
     int            startdelay;
     char           norun;
     char           noreset;
+    char           mb;
 };
 
 extern int  z88dk_ffs(int n);
