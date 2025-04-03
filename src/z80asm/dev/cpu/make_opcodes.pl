@@ -1898,12 +1898,16 @@ sub add_opcodes {
 			for my $f (cpu_flags($cpu)) {
 				if ($adl_mode) {
 					add_opcode($cpu, "jp $f, %m", [0xC2+8*F($f), '%m', '%m', '%m']);
+					add_opcode($cpu, "jp.il $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
+					add_opcode($cpu, "jp.lil $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
+					add_opcode($cpu, "jp.sis $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
 				}
 				else {
 					add_opcode($cpu, "jp $f, %m", [0xC2+8*F($f), '%m', '%m']);
+					add_opcode($cpu, "jp.is $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
+					add_opcode($cpu, "jp.sis $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
+					add_opcode($cpu, "jp.lil $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
 				}
-				add_opcode($cpu, "jp.sis $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
-				add_opcode($cpu, "jp.lil $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m']);
 			}
 		},
 		"jmp <f>, NN [ez80]" => sub {
@@ -1912,9 +1916,15 @@ sub add_opcodes {
 			for my $f (cpu_flags($cpu)) {
 				if ($adl_mode) {
 					add_opcode($cpu, "jmp $f, %m", [0xC2+8*F($f), '%m', '%m', '%m']);
+					add_opcode($cpu, "jmp.il $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
+					add_opcode($cpu, "jmp.lil $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
+					add_opcode($cpu, "jmp.sis $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
 				}
 				else {
 					add_opcode($cpu, "jmp $f, %m", [0xC2+8*F($f), '%m', '%m']);
+					add_opcode($cpu, "jmp.is $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
+					add_opcode($cpu, "jmp.sis $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
+					add_opcode($cpu, "jmp.lil $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
 				}
 			}
 		},
@@ -1940,6 +1950,146 @@ sub add_opcodes {
 				}
 				else {
 					add_opcode($cpu, "j_$f %m", [0xC2+8*F($f), '%m', '%m']);
+				}
+			}
+		},
+		"jp (hl) [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			add_opcode($cpu, "jp (hl)", [0xE9]);
+			if ($adl_mode) {
+				add_opcode($cpu, "jp.s (hl)", [0x52, 0xE9]);
+				add_opcode($cpu, "jp.sil (hl)", [0x52, 0xE9]);
+			}
+			else {
+				add_opcode($cpu, "jp.l (hl)", [0x49, 0xE9]);
+				add_opcode($cpu, "jp.lis (hl)", [0x49, 0xE9]);
+			}
+		},
+		"jmp (hl) [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			add_opcode($cpu, "jmp (hl)", [0xE9]);
+			if ($adl_mode) {
+				add_opcode($cpu, "jmp.s (hl)", [0x52, 0xE9]);
+				add_opcode($cpu, "jmp.sil (hl)", [0x52, 0xE9]);
+			}
+			else {
+				add_opcode($cpu, "jmp.l (hl)", [0x49, 0xE9]);
+				add_opcode($cpu, "jmp.lis (hl)", [0x49, 0xE9]);
+			}
+		},
+		"jp (<x>) [ez80]" => sub {
+			my($cpu) = @_;
+			for my $x ('ix', 'iy') {
+				add_opcode($cpu, "jp ($x)", [PFX($x), 0xE9]);
+				my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+				if ($adl_mode) {
+					add_opcode($cpu, "jp.s ($x)", [0x52, PFX($x), 0xE9]);
+					add_opcode($cpu, "jp.sil ($x)", [0x52, PFX($x), 0xE9]);
+				}
+				else {
+					add_opcode($cpu, "jp.l ($x)", [0x49, PFX($x), 0xE9]);
+					add_opcode($cpu, "jp.lis ($x)", [0x49, PFX($x), 0xE9]);
+				}
+			}
+		},
+		"jmp (<x>) [ez80]" => sub {
+			my($cpu) = @_;
+			for my $x ('ix', 'iy') {
+				add_opcode($cpu, "jmp ($x)", [PFX($x), 0xE9]);
+				my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+				if ($adl_mode) {
+					add_opcode($cpu, "jmp.s ($x)", [0x52, PFX($x), 0xE9]);
+					add_opcode($cpu, "jmp.sil ($x)", [0x52, PFX($x), 0xE9]);
+				}
+				else {
+					add_opcode($cpu, "jmp.l ($x)", [0x49, PFX($x), 0xE9]);
+					add_opcode($cpu, "jmp.lis ($x)", [0x49, PFX($x), 0xE9]);
+				}
+			}
+		},
+		"jp NN [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			if ($adl_mode) {
+				add_opcode($cpu, "jp %m", [0xC3, '%m', '%m', '%m']);
+				add_opcode($cpu, "jp.il %m", [0x5B, 0xC3, '%m', '%m', '%m']);
+				add_opcode($cpu, "jp.lil %m", [0x5B, 0xC3, '%m', '%m', '%m']);
+				add_opcode($cpu, "jp.sis %m", [0x40, 0xC3, '%m', '%m']);
+			}
+			else {
+				add_opcode($cpu, "jp %m", [0xC3, '%m', '%m']);
+				add_opcode($cpu, "jp.is %m", [0x40, 0xC3, '%m', '%m']);
+				add_opcode($cpu, "jp.sis %m", [0x40, 0xC3, '%m', '%m']);
+				add_opcode($cpu, "jp.lil %m", [0x5B, 0xC3, '%m', '%m', '%m']);
+			}
+		},
+		"jmp NN [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			if ($adl_mode) {
+				add_opcode($cpu, "jmp %m", [0xC3, '%m', '%m', '%m']);
+				add_opcode($cpu, "jmp.il %m", [0x5B, 0xC3, '%m', '%m', '%m']);
+				add_opcode($cpu, "jmp.lil %m", [0x5B, 0xC3, '%m', '%m', '%m']);
+				add_opcode($cpu, "jmp.sis %m", [0x40, 0xC3, '%m', '%m']);
+			}
+			else {
+				add_opcode($cpu, "jmp %m", [0xC3, '%m', '%m']);
+				add_opcode($cpu, "jmp.is %m", [0x40, 0xC3, '%m', '%m']);
+				add_opcode($cpu, "jmp.sis %m", [0x40, 0xC3, '%m', '%m']);
+				add_opcode($cpu, "jmp.lil %m", [0x5B, 0xC3, '%m', '%m', '%m']);
+			}
+		},
+		"ld (<x>+DIS), <r> [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			for my $x ('ix', 'iy') {
+				for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
+					add_opcode($cpu, "ld $r, ($x+%d)", 
+							[PFX($x), 0x40+8*R($r)+6, '%d']);
+					add_opcode($cpu, "ld $r, ($x)", 
+							[PFX($x), 0x40+8*R($r)+6, 0]);
+					add_opcode($cpu, "ld ($x+%d), $r", 
+							[PFX($x), 0x40+8*6+R($r), '%d']);
+					add_opcode($cpu, "ld ($x), $r", 
+							[PFX($x), 0x40+8*6+R($r), 0]);
+					if ($adl_mode) {
+						add_opcode($cpu, "ld.s $r, ($x+%d)", 
+								[0x52, PFX($x), 0x40+8*R($r)+6, '%d']);
+						add_opcode($cpu, "ld.sil $r, ($x+%d)", 
+								[0x52, PFX($x), 0x40+8*R($r)+6, '%d']);
+						add_opcode($cpu, "ld.s $r, ($x)", 
+								[0x52, PFX($x), 0x40+8*R($r)+6, 0]);
+						add_opcode($cpu, "ld.sil $r, ($x)", 
+								[0x52, PFX($x), 0x40+8*R($r)+6, 0]);
+						add_opcode($cpu, "ld.s ($x+%d), $r", 
+								[0x52, PFX($x), 0x40+8*6+R($r), '%d']);
+						add_opcode($cpu, "ld.sil ($x+%d), $r", 
+								[0x52, PFX($x), 0x40+8*6+R($r), '%d']);
+						add_opcode($cpu, "ld.s ($x), $r", 
+								[0x52, PFX($x), 0x40+8*6+R($r), 0]);
+						add_opcode($cpu, "ld.sil ($x), $r", 
+								[0x52, PFX($x), 0x40+8*6+R($r), 0]);
+					}
+					else {
+						add_opcode($cpu, "ld.l $r, ($x+%d)", 
+								[0x49, PFX($x), 0x40+8*R($r)+6, '%d']);
+						add_opcode($cpu, "ld.lis $r, ($x+%d)", 
+								[0x49, PFX($x), 0x40+8*R($r)+6, '%d']);
+						add_opcode($cpu, "ld.l $r, ($x)", 
+								[0x49, PFX($x), 0x40+8*R($r)+6, 0]);
+						add_opcode($cpu, "ld.lis $r, ($x)", 
+								[0x49, PFX($x), 0x40+8*R($r)+6, 0]);
+						add_opcode($cpu, "ld.l ($x+%d), $r", 
+								[0x49, PFX($x), 0x40+8*6+R($r), '%d']);
+						add_opcode($cpu, "ld.lis ($x+%d), $r", 
+								[0x49, PFX($x), 0x40+8*6+R($r), '%d']);
+						add_opcode($cpu, "ld.l ($x), $r", 
+								[0x49, PFX($x), 0x40+8*6+R($r), 0]);
+						add_opcode($cpu, "ld.lis ($x), $r", 
+								[0x49, PFX($x), 0x40+8*6+R($r), 0]);
+					}
 				}
 			}
 		},
