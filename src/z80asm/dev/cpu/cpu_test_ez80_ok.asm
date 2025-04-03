@@ -1441,6 +1441,7 @@
  jr z, ASMPC                    ; 28 FE
  jv 0x123456                    ; EA 56 34 12
  jz 0x123456                    ; CA 56 34 12
+ ld (0x123456), a               ; 32 56 34 12
  ld (ix), a                     ; DD 77 00
  ld (ix), b                     ; DD 70 00
  ld (ix), bc                    ; DD 71 00 DD 70 01
@@ -1521,6 +1522,7 @@
  ld (iy-128), h                 ; FD 74 80
  ld (iy-128), hl                ; FD 75 80 FD 74 81
  ld (iy-128), l                 ; FD 75 80
+ ld a, (0x123456)               ; 3A 56 34 12
  ld a, (ix)                     ; DD 7E 00
  ld a, (ix+0)                   ; DD 7E 00
  ld a, (ix+126)                 ; DD 7E 7E
@@ -1530,6 +1532,7 @@
  ld a, (iy+126)                 ; FD 7E 7E
  ld a, (iy-128)                 ; FD 7E 80
  ld a, i                        ; ED 57
+ ld a, mb                       ; ED 6E
  ld a, r                        ; ED 5F
  ld b, (ix)                     ; DD 46 00
  ld b, (ix+0)                   ; DD 46 00
@@ -1604,6 +1607,7 @@
  ld l, (iy+0)                   ; FD 6E 00
  ld l, (iy+126)                 ; FD 6E 7E
  ld l, (iy-128)                 ; FD 6E 80
+ ld mb, a                       ; ED 6D
  ld r, a                        ; ED 4F
  ld.s (ix), a                   ; 52 DD 77 00
  ld.s (ix), b                   ; 52 DD 70 00
@@ -1829,6 +1833,9 @@
  ld.sil l, (iy+0)               ; 52 FD 6E 00
  ld.sil l, (iy+126)             ; 52 FD 6E 7E
  ld.sil l, (iy-128)             ; 52 FD 6E 80
+ ld.sis (0x123456), a           ; 40 32 56 34 12
+ ld.sis a, (0x123456)           ; 40 3A 56 34 12
+ lda 0x123456                   ; 3A 56 34 12
  ldd                            ; CD @__z80asm__ldd
  lddr                           ; CD @__z80asm__lddr
  ldi                            ; CD @__z80asm__ldi
@@ -2684,6 +2691,7 @@
  sra bc                         ; CD @__z80asm__sra_bc
  sra de                         ; CD @__z80asm__sra_de
  sra hl                         ; CD @__z80asm__sra_hl
+ sta 0x123456                   ; 32 56 34 12
  sub (hl)                       ; 96
  sub (hl+)                      ; 96 23
  sub (hl-)                      ; 96 2B

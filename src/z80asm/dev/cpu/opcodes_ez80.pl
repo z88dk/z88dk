@@ -120,16 +120,17 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         add_opcodes($cpu, "ld (<x>+DIS), <r> [ez80]");
         #add_opcodes($cpu, "ld (<x>+DIS), N");
 
-        add_opcodes($cpu, "ld i/r, a");
+        add_opcodes($cpu, "lda/sta [ez80]") if !$strict;
+        add_opcodes($cpu, "ld a, (NN) [ez80]");
 
+
+        add_opcodes($cpu, "ld i/r, a");
+		add_opcodes($cpu, "ld mb, a [ez80]");
 		
 		#add_opcodes($cpu, "lxi <r>, NN") if !$strict;
         #add_opcodes($cpu, "lxi <rp>, NN") if !$strict;
         #add_opcodes($cpu, "ld <rp>, NN");
         #add_opcodes($cpu, "ld <x>, NN");
-
-        #add_opcodes($cpu, "lda/sta [8080]") if !$strict;
-        #add_opcodes($cpu, "ld a, (NN)");
 
         #add_opcodes($cpu, "lhld/shld [8080]") if !$strict;
         #add_opcodes($cpu, "ld hl, (NN)");

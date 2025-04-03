@@ -22804,6 +22804,10 @@ jz %m|z80|_||CA %m %m
 jz %m|z80n|_||CA %m %m
 ld (%m), a|8080|_||32 %m %m
 ld (%m), a|8085|_||32 %m %m
+ld (%m), a|ez80|_||32 %m %m %m
+ld (%m), a|ez80_strict|_||32 %m %m %m
+ld (%m), a|ez80_z80|_||32 %m %m
+ld (%m), a|ez80_z80_strict|_||32 %m %m
 ld (%m), a|gbz80|_||EA %m %m
 ld (%m), a|gbz80_strict|_||EA %m %m
 ld (%m), a|kc160|_||32 %m %m
@@ -25679,6 +25683,10 @@ ld a, %n|z80n|_||3E %n
 ld a, %n|z80n_strict|_||3E %n
 ld a, (%m)|8080|_||3A %m %m
 ld a, (%m)|8085|_||3A %m %m
+ld a, (%m)|ez80|_||3A %m %m %m
+ld a, (%m)|ez80_strict|_||3A %m %m %m
+ld a, (%m)|ez80_z80|_||3A %m %m
+ld a, (%m)|ez80_z80_strict|_||3A %m %m
 ld a, (%m)|gbz80|_||FA %m %m
 ld a, (%m)|gbz80_strict|_||FA %m %m
 ld a, (%m)|kc160|_||3A %m %m
@@ -26148,6 +26156,10 @@ ld a, l|z80|_||7D
 ld a, l|z80_strict|_||7D
 ld a, l|z80n|_||7D
 ld a, l|z80n_strict|_||7D
+ld a, mb|ez80|_||ED 6E
+ld a, mb|ez80_strict|_||ED 6E
+ld a, mb|ez80_z80|_||ED 6E
+ld a, mb|ez80_z80_strict|_||ED 6E
 ld a, r|ez80|_||ED 5F
 ld a, r|ez80_strict|_||ED 5F
 ld a, r|ez80_z80|_||ED 5F
@@ -31419,6 +31431,10 @@ ld l, srl (iy+%d)|z80n|_||FD CB %d 3D
 ld l, srl (iy+%d)|z80n_strict|_||FD CB %d 3D
 ld lxpc, hl|r4k|_||97
 ld lxpc, hl|r5k|_||97
+ld mb, a|ez80|_||ED 6D
+ld mb, a|ez80_strict|_||ED 6D
+ld mb, a|ez80_z80|_||ED 6D
+ld mb, a|ez80_z80_strict|_||ED 6D
 ld pw', (pw)|r4k|_||76;6D 08 00
 ld pw', (pw)|r5k|_||76;6D 08 00
 ld pw', (pw+%d)|r4k|_||76;6D 08 %d
@@ -32336,6 +32352,10 @@ ld.l l, (iy)|ez80_z80|_||49;FD 6E 00
 ld.l l, (iy)|ez80_z80_strict|_||49;FD 6E 00
 ld.l l, (iy+%d)|ez80_z80|_||49;FD 6E %d
 ld.l l, (iy+%d)|ez80_z80_strict|_||49;FD 6E %d
+ld.lil (%m), a|ez80_z80|_||5B;32 %m %m
+ld.lil (%m), a|ez80_z80_strict|_||5B;32 %m %m
+ld.lil a, (%m)|ez80_z80|_||5B;3A %m %m
+ld.lil a, (%m)|ez80_z80_strict|_||5B;3A %m %m
 ld.lis (ix), a|ez80_z80|_||49;DD 77 00
 ld.lis (ix), a|ez80_z80_strict|_||49;DD 77 00
 ld.lis (ix), b|ez80_z80|_||49;DD 70 00
@@ -32672,10 +32692,16 @@ ld.sil l, (iy)|ez80|_||52;FD 6E 00
 ld.sil l, (iy)|ez80_strict|_||52;FD 6E 00
 ld.sil l, (iy+%d)|ez80|_||52;FD 6E %d
 ld.sil l, (iy+%d)|ez80_strict|_||52;FD 6E %d
+ld.sis (%m), a|ez80|_||40;32 %m %m %m
+ld.sis (%m), a|ez80_strict|_||40;32 %m %m %m
+ld.sis a, (%m)|ez80|_||40;3A %m %m %m
+ld.sis a, (%m)|ez80_strict|_||40;3A %m %m %m
 lda %m|8080|_||3A %m %m
 lda %m|8080_strict|_||3A %m %m
 lda %m|8085|_||3A %m %m
 lda %m|8085_strict|_||3A %m %m
+lda %m|ez80|_||3A %m %m %m
+lda %m|ez80_z80|_||3A %m %m
 lda %m|gbz80|_||FA %m %m
 lda %m|kc160|_||3A %m %m
 lda %m|kc160_z80|_||3A %m %m
@@ -42856,6 +42882,8 @@ sta %m|8080|_||32 %m %m
 sta %m|8080_strict|_||32 %m %m
 sta %m|8085|_||32 %m %m
 sta %m|8085_strict|_||32 %m %m
+sta %m|ez80|_||32 %m %m %m
+sta %m|ez80_z80|_||32 %m %m
 sta %m|gbz80|_||EA %m %m
 sta %m|kc160|_||32 %m %m
 sta %m|kc160_z80|_||32 %m %m

@@ -2093,7 +2093,51 @@ sub add_opcodes {
 				}
 			}
 		},
-
+		"ld mb, a [ez80]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld a, mb", [0xED, 0x6E]);
+			add_opcode($cpu, "ld mb, a", [0xED, 0x6D]);
+		},
+		"lda/sta [ez80]" => sub {
+			my($cpu) = @_;
+			if ($cpu =~ /gbz80/) {
+				add_opcode($cpu, "sta %m", [0xEA, '%m', '%m']);
+				add_opcode($cpu, "lda %m", [0xFA, '%m', '%m']);
+			} 
+			else {
+				my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+				if ($adl_mode) {
+					add_opcode($cpu, "sta %m", [0x32, '%m', '%m', '%m']);
+					add_opcode($cpu, "lda %m", [0x3A, '%m', '%m', '%m']);
+				}
+				else {
+					add_opcode($cpu, "sta %m", [0x32, '%m', '%m']);
+					add_opcode($cpu, "lda %m", [0x3A, '%m', '%m']);
+				}
+			}
+		},
+		"ld a, (NN) [ez80]" => sub {
+			my($cpu) = @_;
+			if ($cpu =~ /gbz80/) {
+				add_opcode($cpu, "ld (%m), a", [0xEA, '%m', '%m']);
+				add_opcode($cpu, "ld a, (%m)", [0xFA, '%m', '%m']);
+			} 
+			else {
+				my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+				if ($adl_mode) {
+					add_opcode($cpu, "ld (%m), a", [0x32, '%m', '%m', '%m']);
+					add_opcode($cpu, "ld.sis (%m), a", [0x40, 0x32, '%m', '%m', '%m']);
+					add_opcode($cpu, "ld a, (%m)", [0x3A, '%m', '%m', '%m']);
+					add_opcode($cpu, "ld.sis a, (%m)", [0x40, 0x3A, '%m', '%m', '%m']);
+				}
+				else {
+					add_opcode($cpu, "ld (%m), a", [0x32, '%m', '%m']);
+					add_opcode($cpu, "ld.lil (%m), a", [0x5B, 0x32, '%m', '%m']);
+					add_opcode($cpu, "ld a, (%m)", [0x3A, '%m', '%m']);
+					add_opcode($cpu, "ld.lil a, (%m)", [0x5B, 0x3A, '%m', '%m']);
+				}
+			}
+		},
 	};
 	
 	$actions->{$key}->($cpu);

@@ -809,6 +809,7 @@
  jr nc, ASMPC                   ; 30 FE
  jr nz, ASMPC                   ; 20 FE
  jr z, ASMPC                    ; 28 FE
+ ld (0x1234), a                 ; 32 34 12
  ld (ix), a                     ; FD 77 00
  ld (ix), b                     ; FD 70 00
  ld (ix), c                     ; FD 71 00
@@ -865,6 +866,7 @@
  ld (iy-128), e                 ; DD 73 80
  ld (iy-128), h                 ; DD 74 80
  ld (iy-128), l                 ; DD 75 80
+ ld a, (0x1234)                 ; 3A 34 12
  ld a, (ix)                     ; FD 7E 00
  ld a, (ix+0)                   ; FD 7E 00
  ld a, (ix+126)                 ; FD 7E 7E
@@ -874,6 +876,7 @@
  ld a, (iy+126)                 ; DD 7E 7E
  ld a, (iy-128)                 ; DD 7E 80
  ld a, i                        ; ED 57
+ ld a, mb                       ; ED 6E
  ld a, r                        ; ED 5F
  ld b, (ix)                     ; FD 46 00
  ld b, (ix+0)                   ; FD 46 00
@@ -924,6 +927,7 @@
  ld l, (iy+0)                   ; DD 6E 00
  ld l, (iy+126)                 ; DD 6E 7E
  ld l, (iy-128)                 ; DD 6E 80
+ ld mb, a                       ; ED 6D
  ld r, a                        ; ED 4F
  ld.l (ix), a                   ; 49 FD 77 00
  ld.l (ix), b                   ; 49 FD 70 00
@@ -1037,6 +1041,8 @@
  ld.l l, (iy+0)                 ; 49 DD 6E 00
  ld.l l, (iy+126)               ; 49 DD 6E 7E
  ld.l l, (iy-128)               ; 49 DD 6E 80
+ ld.lil (0x1234), a             ; 5B 32 34 12
+ ld.lil a, (0x1234)             ; 5B 3A 34 12
  ld.lis (ix), a                 ; 49 FD 77 00
  ld.lis (ix), b                 ; 49 FD 70 00
  ld.lis (ix), c                 ; 49 FD 71 00

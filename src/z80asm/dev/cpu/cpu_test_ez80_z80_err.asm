@@ -8126,7 +8126,6 @@
  jre v, ASMPC                   ; Error
  jre z, ASMPC                   ; Error
  jx5 0x1234                     ; Error
- ld (0x1234), a                 ; Error
  ld (0x1234), bc                ; Error
  ld (0x1234), bcde              ; Error
  ld (0x1234), de                ; Error
@@ -9598,7 +9597,6 @@
  ld a', iir                     ; Error
  ld a', l                       ; Error
  ld a', xpc                     ; Error
- ld a, (0x1234)                 ; Error
  ld a, (0xff00+c)               ; Error
  ld a, (a:0x1234)               ; Error
  ld a, (abc)                    ; Error
@@ -13565,7 +13563,8 @@
  ld.sil l, (iy+0)               ; Error
  ld.sil l, (iy+126)             ; Error
  ld.sil l, (iy-128)             ; Error
- lda 0x1234                     ; Error
+ ld.sis (0x123456), a           ; Error
+ ld.sis a, (0x123456)           ; Error
  ldax b                         ; Error
  ldax bc                        ; Error
  ldax d                         ; Error
@@ -18636,7 +18635,6 @@
  srl h'                         ; Error
  srl l                          ; Error
  srl l'                         ; Error
- sta 0x1234                     ; Error
  stax b                         ; Error
  stax bc                        ; Error
  stax d                         ; Error
