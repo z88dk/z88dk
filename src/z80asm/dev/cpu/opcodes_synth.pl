@@ -737,36 +737,38 @@ for my $cpu (Opcode->cpus) {
 	# LD r, (rp) / LD (rp), r
 	for my $rp ('bc', 'de', 'hl') {
 		for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
-			add_synth($cpu, "ld $r, ($rp+)", "ld $r, ($rp)", "inc $rp"); 
-			add_synth($cpu, "ldi $r, ($rp)", "ld $r, ($rp)", "inc $rp"); 
-			if ($rp eq 'hl') {
-				add_synth($cpu, "ld $r, (hli)", "ld $r, (hl)", "inc hl"); 
-			}
+			for my $suf (@ez80_suffixes) {
+				add_synth($cpu, "ld$suf $r, ($rp+)", "ld$suf $r, ($rp)", "inc$suf $rp"); 
+				add_synth($cpu, "ldi $r, ($rp)", "ld $r, ($rp)", "inc $rp"); 
+				if ($rp eq 'hl') {
+					add_synth($cpu, "ld$suf $r, (hli)", "ld$suf $r, (hl)", "inc$suf hl"); 
+				}
 
-			add_synth($cpu, "ld $r, ($rp-)", "ld $r, ($rp)", "dec $rp"); 
-			add_synth($cpu, "ldd $r, ($rp)", "ld $r, ($rp)", "dec $rp"); 
-			if ($rp eq 'hl') {
-				add_synth($cpu, "ld $r, (hld)", "ld $r, (hl)", "dec hl"); 
-			}
-			
-			add_synth($cpu, "ld ($rp+), $r", "ld ($rp), $r", "inc $rp"); 
-			add_synth($cpu, "ldi ($rp), $r", "ld ($rp), $r", "inc $rp"); 
-			if ($rp eq 'hl') {
-				add_synth($cpu, "ld (hli), $r", "ld (hl), $r", "inc hl"); 
-			}
+				add_synth($cpu, "ld$suf $r, ($rp-)", "ld$suf $r, ($rp)", "dec$suf $rp"); 
+				add_synth($cpu, "ldd $r, ($rp)", "ld $r, ($rp)", "dec $rp"); 
+				if ($rp eq 'hl') {
+					add_synth($cpu, "ld$suf $r, (hld)", "ld$suf $r, (hl)", "dec$suf hl"); 
+				}
+				
+				add_synth($cpu, "ld$suf ($rp+), $r", "ld$suf ($rp), $r", "inc$suf $rp"); 
+				add_synth($cpu, "ldi ($rp), $r", "ld ($rp), $r", "inc $rp"); 
+				if ($rp eq 'hl') {
+					add_synth($cpu, "ld$suf (hli), $r", "ld$suf (hl), $r", "inc$suf hl"); 
+				}
 
-			add_synth($cpu, "ld ($rp-), $r", "ld ($rp), $r", "dec $rp"); 
-			add_synth($cpu, "ldd ($rp), $r", "ld ($rp), $r", "dec $rp"); 
-			if ($rp eq 'hl') {
-				add_synth($cpu, "ld (hld), $r", "ld (hl), $r", "dec hl"); 
+				add_synth($cpu, "ld$suf ($rp-), $r", "ld$suf ($rp), $r", "dec$suf $rp"); 
+				add_synth($cpu, "ldd ($rp), $r", "ld ($rp), $r", "dec $rp"); 
+				if ($rp eq 'hl') {
+					add_synth($cpu, "ld$suf (hld), $r", "ld$suf (hl), $r", "dec$suf hl"); 
+				}
 			}
-		}
 		
-		add_synth($cpu, "ld ($rp+), %n", "ld ($rp), %n", "inc $rp"); 
-		add_synth($cpu, "ldi ($rp), %n", "ld ($rp), %n", "inc $rp"); 
+			add_synth($cpu, "ld$suf ($rp+), %n", "ld$suf ($rp), %n", "inc$suf $rp"); 
+			add_synth($cpu, "ldi ($rp), %n", "ld ($rp), %n", "inc $rp"); 
 
-		add_synth($cpu, "ld ($rp-), %n", "ld ($rp), %n", "dec $rp"); 
-		add_synth($cpu, "ldd ($rp), %n", "ld ($rp), %n", "dec $rp"); 
+			add_synth($cpu, "ld$suf ($rp-), %n", "ld$suf ($rp), %n", "dec$suf $rp"); 
+			add_synth($cpu, "ldd ($rp), %n", "ld ($rp), %n", "dec $rp"); 
+		}
 	}
 	
 	# LD r, (DE) / LD (DE), r

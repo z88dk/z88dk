@@ -23007,6 +23007,10 @@ ld (aiy+%d), xix|kc160|_||52;ED 00 %d
 ld (aiy+%d), yiy|kc160|_||52;ED 10 %d
 ld (bc), a|8080|_||02
 ld (bc), a|8085|_||02
+ld (bc), a|ez80|_||02
+ld (bc), a|ez80_strict|_||02
+ld (bc), a|ez80_z80|_||02
+ld (bc), a|ez80_z80_strict|_||02
 ld (bc), a|gbz80|_||02
 ld (bc), a|gbz80_strict|_||02
 ld (bc), a|kc160|_||02
@@ -23024,6 +23028,8 @@ ld (bc), a|z80n|_||02
 ld (bc), a|z80n_strict|_||02
 ld (bc+), a|8080|X||02;03
 ld (bc+), a|8085|X||02;03
+ld (bc+), a|ez80|X||02;03
+ld (bc+), a|ez80_z80|X||02;03
 ld (bc+), a|gbz80|X||02;03
 ld (bc+), a|kc160|_||02;03
 ld (bc+), a|kc160_z80|_||02;03
@@ -23037,6 +23043,8 @@ ld (bc+), a|z80|X||02;03
 ld (bc+), a|z80n|X||02;03
 ld (bc-), a|8080|X||02;0B
 ld (bc-), a|8085|X||02;0B
+ld (bc-), a|ez80|X||02;0B
+ld (bc-), a|ez80_z80|X||02;0B
 ld (bc-), a|gbz80|X||02;0B
 ld (bc-), a|kc160|_||02;0B
 ld (bc-), a|kc160_z80|_||02;0B
@@ -23064,6 +23072,10 @@ ld (de), %n|z80|X||EB;36 %n;EB
 ld (de), %n|z80n|X||EB;36 %n;EB
 ld (de), a|8080|_||12
 ld (de), a|8085|_||12
+ld (de), a|ez80|_||12
+ld (de), a|ez80_strict|_||12
+ld (de), a|ez80_z80|_||12
+ld (de), a|ez80_z80_strict|_||12
 ld (de), a|gbz80|_||12
 ld (de), a|gbz80_strict|_||12
 ld (de), a|kc160|_||12
@@ -23081,6 +23093,8 @@ ld (de), a|z80n|_||12
 ld (de), a|z80n_strict|_||12
 ld (de), b|8080|X||EB;70;EB
 ld (de), b|8085|X||EB;70;EB
+ld (de), b|ez80|X||EB;70;EB
+ld (de), b|ez80_z80|X||EB;70;EB
 ld (de), b|kc160|_||EB;70;EB
 ld (de), b|kc160_z80|_||EB;70;EB
 ld (de), b|r2ka|_||EB;70;EB
@@ -23093,6 +23107,8 @@ ld (de), b|z80|X||EB;70;EB
 ld (de), b|z80n|X||EB;70;EB
 ld (de), c|8080|X||EB;71;EB
 ld (de), c|8085|X||EB;71;EB
+ld (de), c|ez80|X||EB;71;EB
+ld (de), c|ez80_z80|X||EB;71;EB
 ld (de), c|kc160|_||EB;71;EB
 ld (de), c|kc160_z80|_||EB;71;EB
 ld (de), c|r2ka|_||EB;71;EB
@@ -23105,6 +23121,8 @@ ld (de), c|z80|X||EB;71;EB
 ld (de), c|z80n|X||EB;71;EB
 ld (de), d|8080|X||EB;74;EB
 ld (de), d|8085|X||EB;74;EB
+ld (de), d|ez80|X||EB;74;EB
+ld (de), d|ez80_z80|X||EB;74;EB
 ld (de), d|kc160|_||EB;74;EB
 ld (de), d|kc160_z80|_||EB;74;EB
 ld (de), d|r2ka|_||EB;74;EB
@@ -23117,6 +23135,8 @@ ld (de), d|z80|X||EB;74;EB
 ld (de), d|z80n|X||EB;74;EB
 ld (de), e|8080|X||EB;75;EB
 ld (de), e|8085|X||EB;75;EB
+ld (de), e|ez80|X||EB;75;EB
+ld (de), e|ez80_z80|X||EB;75;EB
 ld (de), e|kc160|_||EB;75;EB
 ld (de), e|kc160_z80|_||EB;75;EB
 ld (de), e|r2ka|_||EB;75;EB
@@ -23129,6 +23149,8 @@ ld (de), e|z80|X||EB;75;EB
 ld (de), e|z80n|X||EB;75;EB
 ld (de), h|8080|X||EB;72;EB
 ld (de), h|8085|X||EB;72;EB
+ld (de), h|ez80|X||EB;72;EB
+ld (de), h|ez80_z80|X||EB;72;EB
 ld (de), h|kc160|_||EB;72;EB
 ld (de), h|kc160_z80|_||EB;72;EB
 ld (de), h|r2ka|_||EB;72;EB
@@ -23141,6 +23163,8 @@ ld (de), h|z80|X||EB;72;EB
 ld (de), h|z80n|X||EB;72;EB
 ld (de), hl|8080|X||EB;73;23;72;2B;EB
 ld (de), hl|8085|_||D9
+ld (de), hl|ez80|X||EB;73;23;72;2B;EB
+ld (de), hl|ez80_z80|X||EB;73;23;72;2B;EB
 ld (de), hl|gbz80|X||E5;D5;E1;D1;73;23;72;2B;E5;D5;E1;D1
 ld (de), hl|kc160|_||EB;73;23;72;2B;EB
 ld (de), hl|kc160_z80|_||EB;73;23;72;2B;EB
@@ -23154,6 +23178,8 @@ ld (de), hl|z80|X||EB;73;23;72;2B;EB
 ld (de), hl|z80n|X||EB;73;23;72;2B;EB
 ld (de), l|8080|X||EB;73;EB
 ld (de), l|8085|X||EB;73;EB
+ld (de), l|ez80|X||EB;73;EB
+ld (de), l|ez80_z80|X||EB;73;EB
 ld (de), l|kc160|_||EB;73;EB
 ld (de), l|kc160_z80|_||EB;73;EB
 ld (de), l|r2ka|_||EB;73;EB
@@ -23178,6 +23204,8 @@ ld (de+), %n|z80|X||EB;36 %n;EB;13
 ld (de+), %n|z80n|X||EB;36 %n;EB;13
 ld (de+), a|8080|X||12;13
 ld (de+), a|8085|X||12;13
+ld (de+), a|ez80|X||12;13
+ld (de+), a|ez80_z80|X||12;13
 ld (de+), a|gbz80|X||12;13
 ld (de+), a|kc160|_||12;13
 ld (de+), a|kc160_z80|_||12;13
@@ -23191,6 +23219,8 @@ ld (de+), a|z80|X||12;13
 ld (de+), a|z80n|X||12;13
 ld (de+), b|8080|X||EB;70;EB;13
 ld (de+), b|8085|X||EB;70;EB;13
+ld (de+), b|ez80|X||EB;70;EB;13
+ld (de+), b|ez80_z80|X||EB;70;EB;13
 ld (de+), b|kc160|_||EB;70;EB;13
 ld (de+), b|kc160_z80|_||EB;70;EB;13
 ld (de+), b|r2ka|_||EB;70;EB;13
@@ -23203,6 +23233,8 @@ ld (de+), b|z80|X||EB;70;EB;13
 ld (de+), b|z80n|X||EB;70;EB;13
 ld (de+), c|8080|X||EB;71;EB;13
 ld (de+), c|8085|X||EB;71;EB;13
+ld (de+), c|ez80|X||EB;71;EB;13
+ld (de+), c|ez80_z80|X||EB;71;EB;13
 ld (de+), c|kc160|_||EB;71;EB;13
 ld (de+), c|kc160_z80|_||EB;71;EB;13
 ld (de+), c|r2ka|_||EB;71;EB;13
@@ -23215,6 +23247,8 @@ ld (de+), c|z80|X||EB;71;EB;13
 ld (de+), c|z80n|X||EB;71;EB;13
 ld (de+), d|8080|X||EB;74;EB;13
 ld (de+), d|8085|X||EB;74;EB;13
+ld (de+), d|ez80|X||EB;74;EB;13
+ld (de+), d|ez80_z80|X||EB;74;EB;13
 ld (de+), d|kc160|_||EB;74;EB;13
 ld (de+), d|kc160_z80|_||EB;74;EB;13
 ld (de+), d|r2ka|_||EB;74;EB;13
@@ -23227,6 +23261,8 @@ ld (de+), d|z80|X||EB;74;EB;13
 ld (de+), d|z80n|X||EB;74;EB;13
 ld (de+), e|8080|X||EB;75;EB;13
 ld (de+), e|8085|X||EB;75;EB;13
+ld (de+), e|ez80|X||EB;75;EB;13
+ld (de+), e|ez80_z80|X||EB;75;EB;13
 ld (de+), e|kc160|_||EB;75;EB;13
 ld (de+), e|kc160_z80|_||EB;75;EB;13
 ld (de+), e|r2ka|_||EB;75;EB;13
@@ -23239,6 +23275,8 @@ ld (de+), e|z80|X||EB;75;EB;13
 ld (de+), e|z80n|X||EB;75;EB;13
 ld (de+), h|8080|X||EB;72;EB;13
 ld (de+), h|8085|X||EB;72;EB;13
+ld (de+), h|ez80|X||EB;72;EB;13
+ld (de+), h|ez80_z80|X||EB;72;EB;13
 ld (de+), h|kc160|_||EB;72;EB;13
 ld (de+), h|kc160_z80|_||EB;72;EB;13
 ld (de+), h|r2ka|_||EB;72;EB;13
@@ -23251,6 +23289,8 @@ ld (de+), h|z80|X||EB;72;EB;13
 ld (de+), h|z80n|X||EB;72;EB;13
 ld (de+), l|8080|X||EB;73;EB;13
 ld (de+), l|8085|X||EB;73;EB;13
+ld (de+), l|ez80|X||EB;73;EB;13
+ld (de+), l|ez80_z80|X||EB;73;EB;13
 ld (de+), l|kc160|_||EB;73;EB;13
 ld (de+), l|kc160_z80|_||EB;73;EB;13
 ld (de+), l|r2ka|_||EB;73;EB;13
@@ -23275,6 +23315,8 @@ ld (de-), %n|z80|X||EB;36 %n;EB;1B
 ld (de-), %n|z80n|X||EB;36 %n;EB;1B
 ld (de-), a|8080|X||12;1B
 ld (de-), a|8085|X||12;1B
+ld (de-), a|ez80|X||12;1B
+ld (de-), a|ez80_z80|X||12;1B
 ld (de-), a|gbz80|X||12;1B
 ld (de-), a|kc160|_||12;1B
 ld (de-), a|kc160_z80|_||12;1B
@@ -23288,6 +23330,8 @@ ld (de-), a|z80|X||12;1B
 ld (de-), a|z80n|X||12;1B
 ld (de-), b|8080|X||EB;70;EB;1B
 ld (de-), b|8085|X||EB;70;EB;1B
+ld (de-), b|ez80|X||EB;70;EB;1B
+ld (de-), b|ez80_z80|X||EB;70;EB;1B
 ld (de-), b|kc160|_||EB;70;EB;1B
 ld (de-), b|kc160_z80|_||EB;70;EB;1B
 ld (de-), b|r2ka|_||EB;70;EB;1B
@@ -23300,6 +23344,8 @@ ld (de-), b|z80|X||EB;70;EB;1B
 ld (de-), b|z80n|X||EB;70;EB;1B
 ld (de-), c|8080|X||EB;71;EB;1B
 ld (de-), c|8085|X||EB;71;EB;1B
+ld (de-), c|ez80|X||EB;71;EB;1B
+ld (de-), c|ez80_z80|X||EB;71;EB;1B
 ld (de-), c|kc160|_||EB;71;EB;1B
 ld (de-), c|kc160_z80|_||EB;71;EB;1B
 ld (de-), c|r2ka|_||EB;71;EB;1B
@@ -23312,6 +23358,8 @@ ld (de-), c|z80|X||EB;71;EB;1B
 ld (de-), c|z80n|X||EB;71;EB;1B
 ld (de-), d|8080|X||EB;74;EB;1B
 ld (de-), d|8085|X||EB;74;EB;1B
+ld (de-), d|ez80|X||EB;74;EB;1B
+ld (de-), d|ez80_z80|X||EB;74;EB;1B
 ld (de-), d|kc160|_||EB;74;EB;1B
 ld (de-), d|kc160_z80|_||EB;74;EB;1B
 ld (de-), d|r2ka|_||EB;74;EB;1B
@@ -23324,6 +23372,8 @@ ld (de-), d|z80|X||EB;74;EB;1B
 ld (de-), d|z80n|X||EB;74;EB;1B
 ld (de-), e|8080|X||EB;75;EB;1B
 ld (de-), e|8085|X||EB;75;EB;1B
+ld (de-), e|ez80|X||EB;75;EB;1B
+ld (de-), e|ez80_z80|X||EB;75;EB;1B
 ld (de-), e|kc160|_||EB;75;EB;1B
 ld (de-), e|kc160_z80|_||EB;75;EB;1B
 ld (de-), e|r2ka|_||EB;75;EB;1B
@@ -23336,6 +23386,8 @@ ld (de-), e|z80|X||EB;75;EB;1B
 ld (de-), e|z80n|X||EB;75;EB;1B
 ld (de-), h|8080|X||EB;72;EB;1B
 ld (de-), h|8085|X||EB;72;EB;1B
+ld (de-), h|ez80|X||EB;72;EB;1B
+ld (de-), h|ez80_z80|X||EB;72;EB;1B
 ld (de-), h|kc160|_||EB;72;EB;1B
 ld (de-), h|kc160_z80|_||EB;72;EB;1B
 ld (de-), h|r2ka|_||EB;72;EB;1B
@@ -23348,6 +23400,8 @@ ld (de-), h|z80|X||EB;72;EB;1B
 ld (de-), h|z80n|X||EB;72;EB;1B
 ld (de-), l|8080|X||EB;73;EB;1B
 ld (de-), l|8085|X||EB;73;EB;1B
+ld (de-), l|ez80|X||EB;73;EB;1B
+ld (de-), l|ez80_z80|X||EB;73;EB;1B
 ld (de-), l|kc160|_||EB;73;EB;1B
 ld (de-), l|kc160_z80|_||EB;73;EB;1B
 ld (de-), l|r2ka|_||EB;73;EB;1B
@@ -23377,6 +23431,10 @@ ld (hl), %n|z80n|_||36 %n
 ld (hl), %n|z80n_strict|_||36 %n
 ld (hl), a|8080|_||77
 ld (hl), a|8085|_||77
+ld (hl), a|ez80|_||77
+ld (hl), a|ez80_strict|_||77
+ld (hl), a|ez80_z80|_||77
+ld (hl), a|ez80_z80_strict|_||77
 ld (hl), a|gbz80|_||77
 ld (hl), a|gbz80_strict|_||77
 ld (hl), a|kc160|_||77
@@ -23394,6 +23452,10 @@ ld (hl), a|z80n|_||77
 ld (hl), a|z80n_strict|_||77
 ld (hl), b|8080|_||70
 ld (hl), b|8085|_||70
+ld (hl), b|ez80|_||70
+ld (hl), b|ez80_strict|_||70
+ld (hl), b|ez80_z80|_||70
+ld (hl), b|ez80_z80_strict|_||70
 ld (hl), b|gbz80|_||70
 ld (hl), b|gbz80_strict|_||70
 ld (hl), b|kc160|_||70
@@ -23411,6 +23473,8 @@ ld (hl), b|z80n|_||70
 ld (hl), b|z80n_strict|_||70
 ld (hl), bc|8080|X||71;23;70;2B
 ld (hl), bc|8085|X||71;23;70;2B
+ld (hl), bc|ez80|X||71;23;70;2B
+ld (hl), bc|ez80_z80|X||71;23;70;2B
 ld (hl), bc|gbz80|X||71;23;70;2B
 ld (hl), bc|kc160|_||71;23;70;2B
 ld (hl), bc|kc160_z80|_||71;23;70;2B
@@ -23426,6 +23490,10 @@ ld (hl), bcde|r4k|_||DD 1B
 ld (hl), bcde|r5k|_||DD 1B
 ld (hl), c|8080|_||71
 ld (hl), c|8085|_||71
+ld (hl), c|ez80|_||71
+ld (hl), c|ez80_strict|_||71
+ld (hl), c|ez80_z80|_||71
+ld (hl), c|ez80_z80_strict|_||71
 ld (hl), c|gbz80|_||71
 ld (hl), c|gbz80_strict|_||71
 ld (hl), c|kc160|_||71
@@ -23443,6 +23511,10 @@ ld (hl), c|z80n|_||71
 ld (hl), c|z80n_strict|_||71
 ld (hl), d|8080|_||72
 ld (hl), d|8085|_||72
+ld (hl), d|ez80|_||72
+ld (hl), d|ez80_strict|_||72
+ld (hl), d|ez80_z80|_||72
+ld (hl), d|ez80_z80_strict|_||72
 ld (hl), d|gbz80|_||72
 ld (hl), d|gbz80_strict|_||72
 ld (hl), d|kc160|_||72
@@ -23460,6 +23532,8 @@ ld (hl), d|z80n|_||72
 ld (hl), d|z80n_strict|_||72
 ld (hl), de|8080|X||73;23;72;2B
 ld (hl), de|8085|X||73;23;72;2B
+ld (hl), de|ez80|X||73;23;72;2B
+ld (hl), de|ez80_z80|X||73;23;72;2B
 ld (hl), de|gbz80|X||73;23;72;2B
 ld (hl), de|kc160|_||73;23;72;2B
 ld (hl), de|kc160_z80|_||73;23;72;2B
@@ -23473,6 +23547,10 @@ ld (hl), de|z80|X||73;23;72;2B
 ld (hl), de|z80n|X||73;23;72;2B
 ld (hl), e|8080|_||73
 ld (hl), e|8085|_||73
+ld (hl), e|ez80|_||73
+ld (hl), e|ez80_strict|_||73
+ld (hl), e|ez80_z80|_||73
+ld (hl), e|ez80_z80_strict|_||73
 ld (hl), e|gbz80|_||73
 ld (hl), e|gbz80_strict|_||73
 ld (hl), e|kc160|_||73
@@ -23490,6 +23568,10 @@ ld (hl), e|z80n|_||73
 ld (hl), e|z80n_strict|_||73
 ld (hl), h|8080|_||74
 ld (hl), h|8085|_||74
+ld (hl), h|ez80|_||74
+ld (hl), h|ez80_strict|_||74
+ld (hl), h|ez80_z80|_||74
+ld (hl), h|ez80_z80_strict|_||74
 ld (hl), h|gbz80|_||74
 ld (hl), h|gbz80_strict|_||74
 ld (hl), h|kc160|_||74
@@ -23542,6 +23624,10 @@ ld (hl), jkhl|r4k|_||FD 1B
 ld (hl), jkhl|r5k|_||FD 1B
 ld (hl), l|8080|_||75
 ld (hl), l|8085|_||75
+ld (hl), l|ez80|_||75
+ld (hl), l|ez80_strict|_||75
+ld (hl), l|ez80_z80|_||75
+ld (hl), l|ez80_z80_strict|_||75
 ld (hl), l|gbz80|_||75
 ld (hl), l|gbz80_strict|_||75
 ld (hl), l|kc160|_||75
@@ -23576,6 +23662,8 @@ ld (hl+), %n|z80|X||36 %n;23
 ld (hl+), %n|z80n|X||36 %n;23
 ld (hl+), a|8080|X||77;23
 ld (hl+), a|8085|X||77;23
+ld (hl+), a|ez80|X||77;23
+ld (hl+), a|ez80_z80|X||77;23
 ld (hl+), a|gbz80|_||22
 ld (hl+), a|gbz80_strict|_||22
 ld (hl+), a|kc160|_||77;23
@@ -23590,6 +23678,8 @@ ld (hl+), a|z80|X||77;23
 ld (hl+), a|z80n|X||77;23
 ld (hl+), b|8080|X||70;23
 ld (hl+), b|8085|X||70;23
+ld (hl+), b|ez80|X||70;23
+ld (hl+), b|ez80_z80|X||70;23
 ld (hl+), b|gbz80|X||70;23
 ld (hl+), b|kc160|_||70;23
 ld (hl+), b|kc160_z80|_||70;23
@@ -23603,6 +23693,8 @@ ld (hl+), b|z80|X||70;23
 ld (hl+), b|z80n|X||70;23
 ld (hl+), bc|8080|X||71;23;70;23
 ld (hl+), bc|8085|X||71;23;70;23
+ld (hl+), bc|ez80|X||71;23;70;23
+ld (hl+), bc|ez80_z80|X||71;23;70;23
 ld (hl+), bc|gbz80|X||71;23;70;23
 ld (hl+), bc|kc160|_||71;23;70;23
 ld (hl+), bc|kc160_z80|_||71;23;70;23
@@ -23616,6 +23708,8 @@ ld (hl+), bc|z80|X||71;23;70;23
 ld (hl+), bc|z80n|X||71;23;70;23
 ld (hl+), c|8080|X||71;23
 ld (hl+), c|8085|X||71;23
+ld (hl+), c|ez80|X||71;23
+ld (hl+), c|ez80_z80|X||71;23
 ld (hl+), c|gbz80|X||71;23
 ld (hl+), c|kc160|_||71;23
 ld (hl+), c|kc160_z80|_||71;23
@@ -23629,6 +23723,8 @@ ld (hl+), c|z80|X||71;23
 ld (hl+), c|z80n|X||71;23
 ld (hl+), d|8080|X||72;23
 ld (hl+), d|8085|X||72;23
+ld (hl+), d|ez80|X||72;23
+ld (hl+), d|ez80_z80|X||72;23
 ld (hl+), d|gbz80|X||72;23
 ld (hl+), d|kc160|_||72;23
 ld (hl+), d|kc160_z80|_||72;23
@@ -23642,6 +23738,8 @@ ld (hl+), d|z80|X||72;23
 ld (hl+), d|z80n|X||72;23
 ld (hl+), de|8080|X||73;23;72;23
 ld (hl+), de|8085|X||73;23;72;23
+ld (hl+), de|ez80|X||73;23;72;23
+ld (hl+), de|ez80_z80|X||73;23;72;23
 ld (hl+), de|gbz80|X||73;23;72;23
 ld (hl+), de|kc160|_||73;23;72;23
 ld (hl+), de|kc160_z80|_||73;23;72;23
@@ -23655,6 +23753,8 @@ ld (hl+), de|z80|X||73;23;72;23
 ld (hl+), de|z80n|X||73;23;72;23
 ld (hl+), e|8080|X||73;23
 ld (hl+), e|8085|X||73;23
+ld (hl+), e|ez80|X||73;23
+ld (hl+), e|ez80_z80|X||73;23
 ld (hl+), e|gbz80|X||73;23
 ld (hl+), e|kc160|_||73;23
 ld (hl+), e|kc160_z80|_||73;23
@@ -23668,6 +23768,8 @@ ld (hl+), e|z80|X||73;23
 ld (hl+), e|z80n|X||73;23
 ld (hl+), h|8080|X||74;23
 ld (hl+), h|8085|X||74;23
+ld (hl+), h|ez80|X||74;23
+ld (hl+), h|ez80_z80|X||74;23
 ld (hl+), h|gbz80|X||74;23
 ld (hl+), h|kc160|_||74;23
 ld (hl+), h|kc160_z80|_||74;23
@@ -23710,6 +23812,8 @@ ld (hl+), iy|z80|X||D5;FD E5;D1;73;23;72;23;D1
 ld (hl+), iy|z80n|X||D5;FD E5;D1;73;23;72;23;D1
 ld (hl+), l|8080|X||75;23
 ld (hl+), l|8085|X||75;23
+ld (hl+), l|ez80|X||75;23
+ld (hl+), l|ez80_z80|X||75;23
 ld (hl+), l|gbz80|X||75;23
 ld (hl+), l|kc160|_||75;23
 ld (hl+), l|kc160_z80|_||75;23
@@ -23736,6 +23840,8 @@ ld (hl-), %n|z80|X||36 %n;2B
 ld (hl-), %n|z80n|X||36 %n;2B
 ld (hl-), a|8080|X||77;2B
 ld (hl-), a|8085|X||77;2B
+ld (hl-), a|ez80|X||77;2B
+ld (hl-), a|ez80_z80|X||77;2B
 ld (hl-), a|gbz80|_||32
 ld (hl-), a|gbz80_strict|_||32
 ld (hl-), a|kc160|_||77;2B
@@ -23750,6 +23856,8 @@ ld (hl-), a|z80|X||77;2B
 ld (hl-), a|z80n|X||77;2B
 ld (hl-), b|8080|X||70;2B
 ld (hl-), b|8085|X||70;2B
+ld (hl-), b|ez80|X||70;2B
+ld (hl-), b|ez80_z80|X||70;2B
 ld (hl-), b|gbz80|X||70;2B
 ld (hl-), b|kc160|_||70;2B
 ld (hl-), b|kc160_z80|_||70;2B
@@ -23763,6 +23871,8 @@ ld (hl-), b|z80|X||70;2B
 ld (hl-), b|z80n|X||70;2B
 ld (hl-), c|8080|X||71;2B
 ld (hl-), c|8085|X||71;2B
+ld (hl-), c|ez80|X||71;2B
+ld (hl-), c|ez80_z80|X||71;2B
 ld (hl-), c|gbz80|X||71;2B
 ld (hl-), c|kc160|_||71;2B
 ld (hl-), c|kc160_z80|_||71;2B
@@ -23776,6 +23886,8 @@ ld (hl-), c|z80|X||71;2B
 ld (hl-), c|z80n|X||71;2B
 ld (hl-), d|8080|X||72;2B
 ld (hl-), d|8085|X||72;2B
+ld (hl-), d|ez80|X||72;2B
+ld (hl-), d|ez80_z80|X||72;2B
 ld (hl-), d|gbz80|X||72;2B
 ld (hl-), d|kc160|_||72;2B
 ld (hl-), d|kc160_z80|_||72;2B
@@ -23789,6 +23901,8 @@ ld (hl-), d|z80|X||72;2B
 ld (hl-), d|z80n|X||72;2B
 ld (hl-), e|8080|X||73;2B
 ld (hl-), e|8085|X||73;2B
+ld (hl-), e|ez80|X||73;2B
+ld (hl-), e|ez80_z80|X||73;2B
 ld (hl-), e|gbz80|X||73;2B
 ld (hl-), e|kc160|_||73;2B
 ld (hl-), e|kc160_z80|_||73;2B
@@ -23802,6 +23916,8 @@ ld (hl-), e|z80|X||73;2B
 ld (hl-), e|z80n|X||73;2B
 ld (hl-), h|8080|X||74;2B
 ld (hl-), h|8085|X||74;2B
+ld (hl-), h|ez80|X||74;2B
+ld (hl-), h|ez80_z80|X||74;2B
 ld (hl-), h|gbz80|X||74;2B
 ld (hl-), h|kc160|_||74;2B
 ld (hl-), h|kc160_z80|_||74;2B
@@ -23815,6 +23931,8 @@ ld (hl-), h|z80|X||74;2B
 ld (hl-), h|z80n|X||74;2B
 ld (hl-), l|8080|X||75;2B
 ld (hl-), l|8085|X||75;2B
+ld (hl-), l|ez80|X||75;2B
+ld (hl-), l|ez80_z80|X||75;2B
 ld (hl-), l|gbz80|X||75;2B
 ld (hl-), l|kc160|_||75;2B
 ld (hl-), l|kc160_z80|_||75;2B
@@ -23828,6 +23946,8 @@ ld (hl-), l|z80|X||75;2B
 ld (hl-), l|z80n|X||75;2B
 ld (hld), a|8080|X||77;2B
 ld (hld), a|8085|X||77;2B
+ld (hld), a|ez80|X||77;2B
+ld (hld), a|ez80_z80|X||77;2B
 ld (hld), a|gbz80|_||32
 ld (hld), a|gbz80_strict|_||32
 ld (hld), a|kc160|_||77;2B
@@ -23842,6 +23962,8 @@ ld (hld), a|z80|X||77;2B
 ld (hld), a|z80n|X||77;2B
 ld (hld), b|8080|X||70;2B
 ld (hld), b|8085|X||70;2B
+ld (hld), b|ez80|X||70;2B
+ld (hld), b|ez80_z80|X||70;2B
 ld (hld), b|gbz80|X||70;2B
 ld (hld), b|kc160|_||70;2B
 ld (hld), b|kc160_z80|_||70;2B
@@ -23855,6 +23977,8 @@ ld (hld), b|z80|X||70;2B
 ld (hld), b|z80n|X||70;2B
 ld (hld), c|8080|X||71;2B
 ld (hld), c|8085|X||71;2B
+ld (hld), c|ez80|X||71;2B
+ld (hld), c|ez80_z80|X||71;2B
 ld (hld), c|gbz80|X||71;2B
 ld (hld), c|kc160|_||71;2B
 ld (hld), c|kc160_z80|_||71;2B
@@ -23868,6 +23992,8 @@ ld (hld), c|z80|X||71;2B
 ld (hld), c|z80n|X||71;2B
 ld (hld), d|8080|X||72;2B
 ld (hld), d|8085|X||72;2B
+ld (hld), d|ez80|X||72;2B
+ld (hld), d|ez80_z80|X||72;2B
 ld (hld), d|gbz80|X||72;2B
 ld (hld), d|kc160|_||72;2B
 ld (hld), d|kc160_z80|_||72;2B
@@ -23881,6 +24007,8 @@ ld (hld), d|z80|X||72;2B
 ld (hld), d|z80n|X||72;2B
 ld (hld), e|8080|X||73;2B
 ld (hld), e|8085|X||73;2B
+ld (hld), e|ez80|X||73;2B
+ld (hld), e|ez80_z80|X||73;2B
 ld (hld), e|gbz80|X||73;2B
 ld (hld), e|kc160|_||73;2B
 ld (hld), e|kc160_z80|_||73;2B
@@ -23894,6 +24022,8 @@ ld (hld), e|z80|X||73;2B
 ld (hld), e|z80n|X||73;2B
 ld (hld), h|8080|X||74;2B
 ld (hld), h|8085|X||74;2B
+ld (hld), h|ez80|X||74;2B
+ld (hld), h|ez80_z80|X||74;2B
 ld (hld), h|gbz80|X||74;2B
 ld (hld), h|kc160|_||74;2B
 ld (hld), h|kc160_z80|_||74;2B
@@ -23907,6 +24037,8 @@ ld (hld), h|z80|X||74;2B
 ld (hld), h|z80n|X||74;2B
 ld (hld), l|8080|X||75;2B
 ld (hld), l|8085|X||75;2B
+ld (hld), l|ez80|X||75;2B
+ld (hld), l|ez80_z80|X||75;2B
 ld (hld), l|gbz80|X||75;2B
 ld (hld), l|kc160|_||75;2B
 ld (hld), l|kc160_z80|_||75;2B
@@ -23920,6 +24052,8 @@ ld (hld), l|z80|X||75;2B
 ld (hld), l|z80n|X||75;2B
 ld (hli), a|8080|X||77;23
 ld (hli), a|8085|X||77;23
+ld (hli), a|ez80|X||77;23
+ld (hli), a|ez80_z80|X||77;23
 ld (hli), a|gbz80|_||22
 ld (hli), a|gbz80_strict|_||22
 ld (hli), a|kc160|_||77;23
@@ -23934,6 +24068,8 @@ ld (hli), a|z80|X||77;23
 ld (hli), a|z80n|X||77;23
 ld (hli), b|8080|X||70;23
 ld (hli), b|8085|X||70;23
+ld (hli), b|ez80|X||70;23
+ld (hli), b|ez80_z80|X||70;23
 ld (hli), b|gbz80|X||70;23
 ld (hli), b|kc160|_||70;23
 ld (hli), b|kc160_z80|_||70;23
@@ -23947,6 +24083,8 @@ ld (hli), b|z80|X||70;23
 ld (hli), b|z80n|X||70;23
 ld (hli), c|8080|X||71;23
 ld (hli), c|8085|X||71;23
+ld (hli), c|ez80|X||71;23
+ld (hli), c|ez80_z80|X||71;23
 ld (hli), c|gbz80|X||71;23
 ld (hli), c|kc160|_||71;23
 ld (hli), c|kc160_z80|_||71;23
@@ -23960,6 +24098,8 @@ ld (hli), c|z80|X||71;23
 ld (hli), c|z80n|X||71;23
 ld (hli), d|8080|X||72;23
 ld (hli), d|8085|X||72;23
+ld (hli), d|ez80|X||72;23
+ld (hli), d|ez80_z80|X||72;23
 ld (hli), d|gbz80|X||72;23
 ld (hli), d|kc160|_||72;23
 ld (hli), d|kc160_z80|_||72;23
@@ -23973,6 +24113,8 @@ ld (hli), d|z80|X||72;23
 ld (hli), d|z80n|X||72;23
 ld (hli), e|8080|X||73;23
 ld (hli), e|8085|X||73;23
+ld (hli), e|ez80|X||73;23
+ld (hli), e|ez80_z80|X||73;23
 ld (hli), e|gbz80|X||73;23
 ld (hli), e|kc160|_||73;23
 ld (hli), e|kc160_z80|_||73;23
@@ -23986,6 +24128,8 @@ ld (hli), e|z80|X||73;23
 ld (hli), e|z80n|X||73;23
 ld (hli), h|8080|X||74;23
 ld (hli), h|8085|X||74;23
+ld (hli), h|ez80|X||74;23
+ld (hli), h|ez80_z80|X||74;23
 ld (hli), h|gbz80|X||74;23
 ld (hli), h|kc160|_||74;23
 ld (hli), h|kc160_z80|_||74;23
@@ -23999,6 +24143,8 @@ ld (hli), h|z80|X||74;23
 ld (hli), h|z80n|X||74;23
 ld (hli), l|8080|X||75;23
 ld (hli), l|8085|X||75;23
+ld (hli), l|ez80|X||75;23
+ld (hli), l|ez80_z80|X||75;23
 ld (hli), l|gbz80|X||75;23
 ld (hli), l|kc160|_||75;23
 ld (hli), l|kc160_z80|_||75;23
@@ -25712,6 +25858,10 @@ ld a, (aiy)|kc160|_||52;FD 7E 00
 ld a, (aiy+%d)|kc160|_||52;FD 7E %d
 ld a, (bc)|8080|_||0A
 ld a, (bc)|8085|_||0A
+ld a, (bc)|ez80|_||0A
+ld a, (bc)|ez80_strict|_||0A
+ld a, (bc)|ez80_z80|_||0A
+ld a, (bc)|ez80_z80_strict|_||0A
 ld a, (bc)|gbz80|_||0A
 ld a, (bc)|gbz80_strict|_||0A
 ld a, (bc)|kc160|_||0A
@@ -25729,6 +25879,8 @@ ld a, (bc)|z80n|_||0A
 ld a, (bc)|z80n_strict|_||0A
 ld a, (bc+)|8080|X||0A;03
 ld a, (bc+)|8085|X||0A;03
+ld a, (bc+)|ez80|X||0A;03
+ld a, (bc+)|ez80_z80|X||0A;03
 ld a, (bc+)|gbz80|X||0A;03
 ld a, (bc+)|kc160|_||0A;03
 ld a, (bc+)|kc160_z80|_||0A;03
@@ -25742,6 +25894,8 @@ ld a, (bc+)|z80|X||0A;03
 ld a, (bc+)|z80n|X||0A;03
 ld a, (bc-)|8080|X||0A;0B
 ld a, (bc-)|8085|X||0A;0B
+ld a, (bc-)|ez80|X||0A;0B
+ld a, (bc-)|ez80_z80|X||0A;0B
 ld a, (bc-)|gbz80|X||0A;0B
 ld a, (bc-)|kc160|_||0A;0B
 ld a, (bc-)|kc160_z80|_||0A;0B
@@ -25757,6 +25911,10 @@ ld a, (c)|gbz80|_||F2
 ld a, (c)|gbz80_strict|_||F2
 ld a, (de)|8080|_||1A
 ld a, (de)|8085|_||1A
+ld a, (de)|ez80|_||1A
+ld a, (de)|ez80_strict|_||1A
+ld a, (de)|ez80_z80|_||1A
+ld a, (de)|ez80_z80_strict|_||1A
 ld a, (de)|gbz80|_||1A
 ld a, (de)|gbz80_strict|_||1A
 ld a, (de)|kc160|_||1A
@@ -25774,6 +25932,8 @@ ld a, (de)|z80n|_||1A
 ld a, (de)|z80n_strict|_||1A
 ld a, (de+)|8080|X||1A;13
 ld a, (de+)|8085|X||1A;13
+ld a, (de+)|ez80|X||1A;13
+ld a, (de+)|ez80_z80|X||1A;13
 ld a, (de+)|gbz80|X||1A;13
 ld a, (de+)|kc160|_||1A;13
 ld a, (de+)|kc160_z80|_||1A;13
@@ -25787,6 +25947,8 @@ ld a, (de+)|z80|X||1A;13
 ld a, (de+)|z80n|X||1A;13
 ld a, (de-)|8080|X||1A;1B
 ld a, (de-)|8085|X||1A;1B
+ld a, (de-)|ez80|X||1A;1B
+ld a, (de-)|ez80_z80|X||1A;1B
 ld a, (de-)|gbz80|X||1A;1B
 ld a, (de-)|kc160|_||1A;1B
 ld a, (de-)|kc160_z80|_||1A;1B
@@ -25800,6 +25962,10 @@ ld a, (de-)|z80|X||1A;1B
 ld a, (de-)|z80n|X||1A;1B
 ld a, (hl)|8080|_||7E
 ld a, (hl)|8085|_||7E
+ld a, (hl)|ez80|_||7E
+ld a, (hl)|ez80_strict|_||7E
+ld a, (hl)|ez80_z80|_||7E
+ld a, (hl)|ez80_z80_strict|_||7E
 ld a, (hl)|gbz80|_||7E
 ld a, (hl)|gbz80_strict|_||7E
 ld a, (hl)|kc160|_||7E
@@ -25817,6 +25983,8 @@ ld a, (hl)|z80n|_||7E
 ld a, (hl)|z80n_strict|_||7E
 ld a, (hl+)|8080|X||7E;23
 ld a, (hl+)|8085|X||7E;23
+ld a, (hl+)|ez80|X||7E;23
+ld a, (hl+)|ez80_z80|X||7E;23
 ld a, (hl+)|gbz80|_||2A
 ld a, (hl+)|gbz80_strict|_||2A
 ld a, (hl+)|kc160|_||7E;23
@@ -25831,6 +25999,8 @@ ld a, (hl+)|z80|X||7E;23
 ld a, (hl+)|z80n|X||7E;23
 ld a, (hl-)|8080|X||7E;2B
 ld a, (hl-)|8085|X||7E;2B
+ld a, (hl-)|ez80|X||7E;2B
+ld a, (hl-)|ez80_z80|X||7E;2B
 ld a, (hl-)|gbz80|_||3A
 ld a, (hl-)|gbz80_strict|_||3A
 ld a, (hl-)|kc160|_||7E;2B
@@ -25845,6 +26015,8 @@ ld a, (hl-)|z80|X||7E;2B
 ld a, (hl-)|z80n|X||7E;2B
 ld a, (hld)|8080|X||7E;2B
 ld a, (hld)|8085|X||7E;2B
+ld a, (hld)|ez80|X||7E;2B
+ld a, (hld)|ez80_z80|X||7E;2B
 ld a, (hld)|gbz80|_||3A
 ld a, (hld)|gbz80_strict|_||3A
 ld a, (hld)|kc160|_||7E;2B
@@ -25859,6 +26031,8 @@ ld a, (hld)|z80|X||7E;2B
 ld a, (hld)|z80n|X||7E;2B
 ld a, (hli)|8080|X||7E;23
 ld a, (hli)|8085|X||7E;23
+ld a, (hli)|ez80|X||7E;23
+ld a, (hli)|ez80_z80|X||7E;23
 ld a, (hli)|gbz80|_||2A
 ld a, (hli)|gbz80_strict|_||2A
 ld a, (hli)|kc160|_||7E;23
@@ -26453,6 +26627,8 @@ ld b, (aiy)|kc160|_||52;FD 46 00
 ld b, (aiy+%d)|kc160|_||52;FD 46 %d
 ld b, (de)|8080|X||EB;46;EB
 ld b, (de)|8085|X||EB;46;EB
+ld b, (de)|ez80|X||EB;46;EB
+ld b, (de)|ez80_z80|X||EB;46;EB
 ld b, (de)|kc160|_||EB;46;EB
 ld b, (de)|kc160_z80|_||EB;46;EB
 ld b, (de)|r2ka|_||EB;46;EB
@@ -26465,6 +26641,8 @@ ld b, (de)|z80|X||EB;46;EB
 ld b, (de)|z80n|X||EB;46;EB
 ld b, (de+)|8080|X||EB;46;EB;13
 ld b, (de+)|8085|X||EB;46;EB;13
+ld b, (de+)|ez80|X||EB;46;EB;13
+ld b, (de+)|ez80_z80|X||EB;46;EB;13
 ld b, (de+)|kc160|_||EB;46;EB;13
 ld b, (de+)|kc160_z80|_||EB;46;EB;13
 ld b, (de+)|r2ka|_||EB;46;EB;13
@@ -26477,6 +26655,8 @@ ld b, (de+)|z80|X||EB;46;EB;13
 ld b, (de+)|z80n|X||EB;46;EB;13
 ld b, (de-)|8080|X||EB;46;EB;1B
 ld b, (de-)|8085|X||EB;46;EB;1B
+ld b, (de-)|ez80|X||EB;46;EB;1B
+ld b, (de-)|ez80_z80|X||EB;46;EB;1B
 ld b, (de-)|kc160|_||EB;46;EB;1B
 ld b, (de-)|kc160_z80|_||EB;46;EB;1B
 ld b, (de-)|r2ka|_||EB;46;EB;1B
@@ -26489,6 +26669,10 @@ ld b, (de-)|z80|X||EB;46;EB;1B
 ld b, (de-)|z80n|X||EB;46;EB;1B
 ld b, (hl)|8080|_||46
 ld b, (hl)|8085|_||46
+ld b, (hl)|ez80|_||46
+ld b, (hl)|ez80_strict|_||46
+ld b, (hl)|ez80_z80|_||46
+ld b, (hl)|ez80_z80_strict|_||46
 ld b, (hl)|gbz80|_||46
 ld b, (hl)|gbz80_strict|_||46
 ld b, (hl)|kc160|_||46
@@ -26506,6 +26690,8 @@ ld b, (hl)|z80n|_||46
 ld b, (hl)|z80n_strict|_||46
 ld b, (hl+)|8080|X||46;23
 ld b, (hl+)|8085|X||46;23
+ld b, (hl+)|ez80|X||46;23
+ld b, (hl+)|ez80_z80|X||46;23
 ld b, (hl+)|gbz80|X||46;23
 ld b, (hl+)|kc160|_||46;23
 ld b, (hl+)|kc160_z80|_||46;23
@@ -26519,6 +26705,8 @@ ld b, (hl+)|z80|X||46;23
 ld b, (hl+)|z80n|X||46;23
 ld b, (hl-)|8080|X||46;2B
 ld b, (hl-)|8085|X||46;2B
+ld b, (hl-)|ez80|X||46;2B
+ld b, (hl-)|ez80_z80|X||46;2B
 ld b, (hl-)|gbz80|X||46;2B
 ld b, (hl-)|kc160|_||46;2B
 ld b, (hl-)|kc160_z80|_||46;2B
@@ -26532,6 +26720,8 @@ ld b, (hl-)|z80|X||46;2B
 ld b, (hl-)|z80n|X||46;2B
 ld b, (hld)|8080|X||46;2B
 ld b, (hld)|8085|X||46;2B
+ld b, (hld)|ez80|X||46;2B
+ld b, (hld)|ez80_z80|X||46;2B
 ld b, (hld)|gbz80|X||46;2B
 ld b, (hld)|kc160|_||46;2B
 ld b, (hld)|kc160_z80|_||46;2B
@@ -26545,6 +26735,8 @@ ld b, (hld)|z80|X||46;2B
 ld b, (hld)|z80n|X||46;2B
 ld b, (hli)|8080|X||46;23
 ld b, (hli)|8085|X||46;23
+ld b, (hli)|ez80|X||46;23
+ld b, (hli)|ez80_z80|X||46;23
 ld b, (hli)|gbz80|X||46;23
 ld b, (hli)|kc160|_||46;23
 ld b, (hli)|kc160_z80|_||46;23
@@ -27026,6 +27218,8 @@ ld bc, (aiy)|kc160|_||52;ED 8C 00
 ld bc, (aiy+%d)|kc160|_||52;ED 8C %d
 ld bc, (hl)|8080|X||4E;23;46;2B
 ld bc, (hl)|8085|X||4E;23;46;2B
+ld bc, (hl)|ez80|X||4E;23;46;2B
+ld bc, (hl)|ez80_z80|X||4E;23;46;2B
 ld bc, (hl)|gbz80|X||4E;23;46;2B
 ld bc, (hl)|kc160|_||4E;23;46;2B
 ld bc, (hl)|kc160_z80|_||4E;23;46;2B
@@ -27039,6 +27233,8 @@ ld bc, (hl)|z80|X||4E;23;46;2B
 ld bc, (hl)|z80n|X||4E;23;46;2B
 ld bc, (hl+)|8080|X||4E;23;46;23
 ld bc, (hl+)|8085|X||4E;23;46;23
+ld bc, (hl+)|ez80|X||4E;23;46;23
+ld bc, (hl+)|ez80_z80|X||4E;23;46;23
 ld bc, (hl+)|gbz80|X||4E;23;46;23
 ld bc, (hl+)|kc160|_||4E;23;46;23
 ld bc, (hl+)|kc160_z80|_||4E;23;46;23
@@ -27400,6 +27596,8 @@ ld c, (aiy)|kc160|_||52;FD 4E 00
 ld c, (aiy+%d)|kc160|_||52;FD 4E %d
 ld c, (de)|8080|X||EB;4E;EB
 ld c, (de)|8085|X||EB;4E;EB
+ld c, (de)|ez80|X||EB;4E;EB
+ld c, (de)|ez80_z80|X||EB;4E;EB
 ld c, (de)|kc160|_||EB;4E;EB
 ld c, (de)|kc160_z80|_||EB;4E;EB
 ld c, (de)|r2ka|_||EB;4E;EB
@@ -27412,6 +27610,8 @@ ld c, (de)|z80|X||EB;4E;EB
 ld c, (de)|z80n|X||EB;4E;EB
 ld c, (de+)|8080|X||EB;4E;EB;13
 ld c, (de+)|8085|X||EB;4E;EB;13
+ld c, (de+)|ez80|X||EB;4E;EB;13
+ld c, (de+)|ez80_z80|X||EB;4E;EB;13
 ld c, (de+)|kc160|_||EB;4E;EB;13
 ld c, (de+)|kc160_z80|_||EB;4E;EB;13
 ld c, (de+)|r2ka|_||EB;4E;EB;13
@@ -27424,6 +27624,8 @@ ld c, (de+)|z80|X||EB;4E;EB;13
 ld c, (de+)|z80n|X||EB;4E;EB;13
 ld c, (de-)|8080|X||EB;4E;EB;1B
 ld c, (de-)|8085|X||EB;4E;EB;1B
+ld c, (de-)|ez80|X||EB;4E;EB;1B
+ld c, (de-)|ez80_z80|X||EB;4E;EB;1B
 ld c, (de-)|kc160|_||EB;4E;EB;1B
 ld c, (de-)|kc160_z80|_||EB;4E;EB;1B
 ld c, (de-)|r2ka|_||EB;4E;EB;1B
@@ -27436,6 +27638,10 @@ ld c, (de-)|z80|X||EB;4E;EB;1B
 ld c, (de-)|z80n|X||EB;4E;EB;1B
 ld c, (hl)|8080|_||4E
 ld c, (hl)|8085|_||4E
+ld c, (hl)|ez80|_||4E
+ld c, (hl)|ez80_strict|_||4E
+ld c, (hl)|ez80_z80|_||4E
+ld c, (hl)|ez80_z80_strict|_||4E
 ld c, (hl)|gbz80|_||4E
 ld c, (hl)|gbz80_strict|_||4E
 ld c, (hl)|kc160|_||4E
@@ -27453,6 +27659,8 @@ ld c, (hl)|z80n|_||4E
 ld c, (hl)|z80n_strict|_||4E
 ld c, (hl+)|8080|X||4E;23
 ld c, (hl+)|8085|X||4E;23
+ld c, (hl+)|ez80|X||4E;23
+ld c, (hl+)|ez80_z80|X||4E;23
 ld c, (hl+)|gbz80|X||4E;23
 ld c, (hl+)|kc160|_||4E;23
 ld c, (hl+)|kc160_z80|_||4E;23
@@ -27466,6 +27674,8 @@ ld c, (hl+)|z80|X||4E;23
 ld c, (hl+)|z80n|X||4E;23
 ld c, (hl-)|8080|X||4E;2B
 ld c, (hl-)|8085|X||4E;2B
+ld c, (hl-)|ez80|X||4E;2B
+ld c, (hl-)|ez80_z80|X||4E;2B
 ld c, (hl-)|gbz80|X||4E;2B
 ld c, (hl-)|kc160|_||4E;2B
 ld c, (hl-)|kc160_z80|_||4E;2B
@@ -27479,6 +27689,8 @@ ld c, (hl-)|z80|X||4E;2B
 ld c, (hl-)|z80n|X||4E;2B
 ld c, (hld)|8080|X||4E;2B
 ld c, (hld)|8085|X||4E;2B
+ld c, (hld)|ez80|X||4E;2B
+ld c, (hld)|ez80_z80|X||4E;2B
 ld c, (hld)|gbz80|X||4E;2B
 ld c, (hld)|kc160|_||4E;2B
 ld c, (hld)|kc160_z80|_||4E;2B
@@ -27492,6 +27704,8 @@ ld c, (hld)|z80|X||4E;2B
 ld c, (hld)|z80n|X||4E;2B
 ld c, (hli)|8080|X||4E;23
 ld c, (hli)|8085|X||4E;23
+ld c, (hli)|ez80|X||4E;23
+ld c, (hli)|ez80_z80|X||4E;23
 ld c, (hli)|gbz80|X||4E;23
 ld c, (hli)|kc160|_||4E;23
 ld c, (hli)|kc160_z80|_||4E;23
@@ -27961,6 +28175,8 @@ ld d, (aiy)|kc160|_||52;FD 56 00
 ld d, (aiy+%d)|kc160|_||52;FD 56 %d
 ld d, (de)|8080|X||EB;66;EB
 ld d, (de)|8085|X||EB;66;EB
+ld d, (de)|ez80|X||EB;66;EB
+ld d, (de)|ez80_z80|X||EB;66;EB
 ld d, (de)|kc160|_||EB;66;EB
 ld d, (de)|kc160_z80|_||EB;66;EB
 ld d, (de)|r2ka|_||EB;66;EB
@@ -27973,6 +28189,8 @@ ld d, (de)|z80|X||EB;66;EB
 ld d, (de)|z80n|X||EB;66;EB
 ld d, (de+)|8080|X||EB;66;EB;13
 ld d, (de+)|8085|X||EB;66;EB;13
+ld d, (de+)|ez80|X||EB;66;EB;13
+ld d, (de+)|ez80_z80|X||EB;66;EB;13
 ld d, (de+)|kc160|_||EB;66;EB;13
 ld d, (de+)|kc160_z80|_||EB;66;EB;13
 ld d, (de+)|r2ka|_||EB;66;EB;13
@@ -27985,6 +28203,8 @@ ld d, (de+)|z80|X||EB;66;EB;13
 ld d, (de+)|z80n|X||EB;66;EB;13
 ld d, (de-)|8080|X||EB;66;EB;1B
 ld d, (de-)|8085|X||EB;66;EB;1B
+ld d, (de-)|ez80|X||EB;66;EB;1B
+ld d, (de-)|ez80_z80|X||EB;66;EB;1B
 ld d, (de-)|kc160|_||EB;66;EB;1B
 ld d, (de-)|kc160_z80|_||EB;66;EB;1B
 ld d, (de-)|r2ka|_||EB;66;EB;1B
@@ -27997,6 +28217,10 @@ ld d, (de-)|z80|X||EB;66;EB;1B
 ld d, (de-)|z80n|X||EB;66;EB;1B
 ld d, (hl)|8080|_||56
 ld d, (hl)|8085|_||56
+ld d, (hl)|ez80|_||56
+ld d, (hl)|ez80_strict|_||56
+ld d, (hl)|ez80_z80|_||56
+ld d, (hl)|ez80_z80_strict|_||56
 ld d, (hl)|gbz80|_||56
 ld d, (hl)|gbz80_strict|_||56
 ld d, (hl)|kc160|_||56
@@ -28014,6 +28238,8 @@ ld d, (hl)|z80n|_||56
 ld d, (hl)|z80n_strict|_||56
 ld d, (hl+)|8080|X||56;23
 ld d, (hl+)|8085|X||56;23
+ld d, (hl+)|ez80|X||56;23
+ld d, (hl+)|ez80_z80|X||56;23
 ld d, (hl+)|gbz80|X||56;23
 ld d, (hl+)|kc160|_||56;23
 ld d, (hl+)|kc160_z80|_||56;23
@@ -28027,6 +28253,8 @@ ld d, (hl+)|z80|X||56;23
 ld d, (hl+)|z80n|X||56;23
 ld d, (hl-)|8080|X||56;2B
 ld d, (hl-)|8085|X||56;2B
+ld d, (hl-)|ez80|X||56;2B
+ld d, (hl-)|ez80_z80|X||56;2B
 ld d, (hl-)|gbz80|X||56;2B
 ld d, (hl-)|kc160|_||56;2B
 ld d, (hl-)|kc160_z80|_||56;2B
@@ -28040,6 +28268,8 @@ ld d, (hl-)|z80|X||56;2B
 ld d, (hl-)|z80n|X||56;2B
 ld d, (hld)|8080|X||56;2B
 ld d, (hld)|8085|X||56;2B
+ld d, (hld)|ez80|X||56;2B
+ld d, (hld)|ez80_z80|X||56;2B
 ld d, (hld)|gbz80|X||56;2B
 ld d, (hld)|kc160|_||56;2B
 ld d, (hld)|kc160_z80|_||56;2B
@@ -28053,6 +28283,8 @@ ld d, (hld)|z80|X||56;2B
 ld d, (hld)|z80n|X||56;2B
 ld d, (hli)|8080|X||56;23
 ld d, (hli)|8085|X||56;23
+ld d, (hli)|ez80|X||56;23
+ld d, (hli)|ez80_z80|X||56;23
 ld d, (hli)|gbz80|X||56;23
 ld d, (hli)|kc160|_||56;23
 ld d, (hli)|kc160_z80|_||56;23
@@ -28534,6 +28766,8 @@ ld de, (aiy)|kc160|_||52;ED 9C 00
 ld de, (aiy+%d)|kc160|_||52;ED 9C %d
 ld de, (hl)|8080|X||5E;23;56;2B
 ld de, (hl)|8085|X||5E;23;56;2B
+ld de, (hl)|ez80|X||5E;23;56;2B
+ld de, (hl)|ez80_z80|X||5E;23;56;2B
 ld de, (hl)|gbz80|X||5E;23;56;2B
 ld de, (hl)|kc160|_||5E;23;56;2B
 ld de, (hl)|kc160_z80|_||5E;23;56;2B
@@ -28547,6 +28781,8 @@ ld de, (hl)|z80|X||5E;23;56;2B
 ld de, (hl)|z80n|X||5E;23;56;2B
 ld de, (hl+)|8080|X||5E;23;56;23
 ld de, (hl+)|8085|X||5E;23;56;23
+ld de, (hl+)|ez80|X||5E;23;56;23
+ld de, (hl+)|ez80_z80|X||5E;23;56;23
 ld de, (hl+)|gbz80|X||5E;23;56;23
 ld de, (hl+)|kc160|_||5E;23;56;23
 ld de, (hl+)|kc160_z80|_||5E;23;56;23
@@ -28843,6 +29079,8 @@ ld e, (aiy)|kc160|_||52;FD 5E 00
 ld e, (aiy+%d)|kc160|_||52;FD 5E %d
 ld e, (de)|8080|X||EB;6E;EB
 ld e, (de)|8085|X||EB;6E;EB
+ld e, (de)|ez80|X||EB;6E;EB
+ld e, (de)|ez80_z80|X||EB;6E;EB
 ld e, (de)|kc160|_||EB;6E;EB
 ld e, (de)|kc160_z80|_||EB;6E;EB
 ld e, (de)|r2ka|_||EB;6E;EB
@@ -28855,6 +29093,8 @@ ld e, (de)|z80|X||EB;6E;EB
 ld e, (de)|z80n|X||EB;6E;EB
 ld e, (de+)|8080|X||EB;6E;EB;13
 ld e, (de+)|8085|X||EB;6E;EB;13
+ld e, (de+)|ez80|X||EB;6E;EB;13
+ld e, (de+)|ez80_z80|X||EB;6E;EB;13
 ld e, (de+)|kc160|_||EB;6E;EB;13
 ld e, (de+)|kc160_z80|_||EB;6E;EB;13
 ld e, (de+)|r2ka|_||EB;6E;EB;13
@@ -28867,6 +29107,8 @@ ld e, (de+)|z80|X||EB;6E;EB;13
 ld e, (de+)|z80n|X||EB;6E;EB;13
 ld e, (de-)|8080|X||EB;6E;EB;1B
 ld e, (de-)|8085|X||EB;6E;EB;1B
+ld e, (de-)|ez80|X||EB;6E;EB;1B
+ld e, (de-)|ez80_z80|X||EB;6E;EB;1B
 ld e, (de-)|kc160|_||EB;6E;EB;1B
 ld e, (de-)|kc160_z80|_||EB;6E;EB;1B
 ld e, (de-)|r2ka|_||EB;6E;EB;1B
@@ -28879,6 +29121,10 @@ ld e, (de-)|z80|X||EB;6E;EB;1B
 ld e, (de-)|z80n|X||EB;6E;EB;1B
 ld e, (hl)|8080|_||5E
 ld e, (hl)|8085|_||5E
+ld e, (hl)|ez80|_||5E
+ld e, (hl)|ez80_strict|_||5E
+ld e, (hl)|ez80_z80|_||5E
+ld e, (hl)|ez80_z80_strict|_||5E
 ld e, (hl)|gbz80|_||5E
 ld e, (hl)|gbz80_strict|_||5E
 ld e, (hl)|kc160|_||5E
@@ -28896,6 +29142,8 @@ ld e, (hl)|z80n|_||5E
 ld e, (hl)|z80n_strict|_||5E
 ld e, (hl+)|8080|X||5E;23
 ld e, (hl+)|8085|X||5E;23
+ld e, (hl+)|ez80|X||5E;23
+ld e, (hl+)|ez80_z80|X||5E;23
 ld e, (hl+)|gbz80|X||5E;23
 ld e, (hl+)|kc160|_||5E;23
 ld e, (hl+)|kc160_z80|_||5E;23
@@ -28909,6 +29157,8 @@ ld e, (hl+)|z80|X||5E;23
 ld e, (hl+)|z80n|X||5E;23
 ld e, (hl-)|8080|X||5E;2B
 ld e, (hl-)|8085|X||5E;2B
+ld e, (hl-)|ez80|X||5E;2B
+ld e, (hl-)|ez80_z80|X||5E;2B
 ld e, (hl-)|gbz80|X||5E;2B
 ld e, (hl-)|kc160|_||5E;2B
 ld e, (hl-)|kc160_z80|_||5E;2B
@@ -28922,6 +29172,8 @@ ld e, (hl-)|z80|X||5E;2B
 ld e, (hl-)|z80n|X||5E;2B
 ld e, (hld)|8080|X||5E;2B
 ld e, (hld)|8085|X||5E;2B
+ld e, (hld)|ez80|X||5E;2B
+ld e, (hld)|ez80_z80|X||5E;2B
 ld e, (hld)|gbz80|X||5E;2B
 ld e, (hld)|kc160|_||5E;2B
 ld e, (hld)|kc160_z80|_||5E;2B
@@ -28935,6 +29187,8 @@ ld e, (hld)|z80|X||5E;2B
 ld e, (hld)|z80n|X||5E;2B
 ld e, (hli)|8080|X||5E;23
 ld e, (hli)|8085|X||5E;23
+ld e, (hli)|ez80|X||5E;23
+ld e, (hli)|ez80_z80|X||5E;23
 ld e, (hli)|gbz80|X||5E;23
 ld e, (hli)|kc160|_||5E;23
 ld e, (hli)|kc160_z80|_||5E;23
@@ -29408,6 +29662,8 @@ ld h, (aiy)|kc160|_||52;FD 66 00
 ld h, (aiy+%d)|kc160|_||52;FD 66 %d
 ld h, (de)|8080|X||EB;56;EB
 ld h, (de)|8085|X||EB;56;EB
+ld h, (de)|ez80|X||EB;56;EB
+ld h, (de)|ez80_z80|X||EB;56;EB
 ld h, (de)|kc160|_||EB;56;EB
 ld h, (de)|kc160_z80|_||EB;56;EB
 ld h, (de)|r2ka|_||EB;56;EB
@@ -29420,6 +29676,8 @@ ld h, (de)|z80|X||EB;56;EB
 ld h, (de)|z80n|X||EB;56;EB
 ld h, (de+)|8080|X||EB;56;EB;13
 ld h, (de+)|8085|X||EB;56;EB;13
+ld h, (de+)|ez80|X||EB;56;EB;13
+ld h, (de+)|ez80_z80|X||EB;56;EB;13
 ld h, (de+)|kc160|_||EB;56;EB;13
 ld h, (de+)|kc160_z80|_||EB;56;EB;13
 ld h, (de+)|r2ka|_||EB;56;EB;13
@@ -29432,6 +29690,8 @@ ld h, (de+)|z80|X||EB;56;EB;13
 ld h, (de+)|z80n|X||EB;56;EB;13
 ld h, (de-)|8080|X||EB;56;EB;1B
 ld h, (de-)|8085|X||EB;56;EB;1B
+ld h, (de-)|ez80|X||EB;56;EB;1B
+ld h, (de-)|ez80_z80|X||EB;56;EB;1B
 ld h, (de-)|kc160|_||EB;56;EB;1B
 ld h, (de-)|kc160_z80|_||EB;56;EB;1B
 ld h, (de-)|r2ka|_||EB;56;EB;1B
@@ -29444,6 +29704,10 @@ ld h, (de-)|z80|X||EB;56;EB;1B
 ld h, (de-)|z80n|X||EB;56;EB;1B
 ld h, (hl)|8080|_||66
 ld h, (hl)|8085|_||66
+ld h, (hl)|ez80|_||66
+ld h, (hl)|ez80_strict|_||66
+ld h, (hl)|ez80_z80|_||66
+ld h, (hl)|ez80_z80_strict|_||66
 ld h, (hl)|gbz80|_||66
 ld h, (hl)|gbz80_strict|_||66
 ld h, (hl)|kc160|_||66
@@ -29461,6 +29725,8 @@ ld h, (hl)|z80n|_||66
 ld h, (hl)|z80n_strict|_||66
 ld h, (hl+)|8080|X||66;23
 ld h, (hl+)|8085|X||66;23
+ld h, (hl+)|ez80|X||66;23
+ld h, (hl+)|ez80_z80|X||66;23
 ld h, (hl+)|gbz80|X||66;23
 ld h, (hl+)|kc160|_||66;23
 ld h, (hl+)|kc160_z80|_||66;23
@@ -29474,6 +29740,8 @@ ld h, (hl+)|z80|X||66;23
 ld h, (hl+)|z80n|X||66;23
 ld h, (hl-)|8080|X||66;2B
 ld h, (hl-)|8085|X||66;2B
+ld h, (hl-)|ez80|X||66;2B
+ld h, (hl-)|ez80_z80|X||66;2B
 ld h, (hl-)|gbz80|X||66;2B
 ld h, (hl-)|kc160|_||66;2B
 ld h, (hl-)|kc160_z80|_||66;2B
@@ -29487,6 +29755,8 @@ ld h, (hl-)|z80|X||66;2B
 ld h, (hl-)|z80n|X||66;2B
 ld h, (hld)|8080|X||66;2B
 ld h, (hld)|8085|X||66;2B
+ld h, (hld)|ez80|X||66;2B
+ld h, (hld)|ez80_z80|X||66;2B
 ld h, (hld)|gbz80|X||66;2B
 ld h, (hld)|kc160|_||66;2B
 ld h, (hld)|kc160_z80|_||66;2B
@@ -29500,6 +29770,8 @@ ld h, (hld)|z80|X||66;2B
 ld h, (hld)|z80n|X||66;2B
 ld h, (hli)|8080|X||66;23
 ld h, (hli)|8085|X||66;23
+ld h, (hli)|ez80|X||66;23
+ld h, (hli)|ez80_z80|X||66;23
 ld h, (hli)|gbz80|X||66;23
 ld h, (hli)|kc160|_||66;23
 ld h, (hli)|kc160_z80|_||66;23
@@ -30001,6 +30273,8 @@ ld hl, (aiy)|kc160|_||52;ED AC 00
 ld hl, (aiy+%d)|kc160|_||52;ED AC %d
 ld hl, (de)|8080|X||EB;5E;23;56;2B;EB
 ld hl, (de)|8085|_||ED
+ld hl, (de)|ez80|X||EB;5E;23;56;2B;EB
+ld hl, (de)|ez80_z80|X||EB;5E;23;56;2B;EB
 ld hl, (de)|gbz80|X||E5;D5;E1;D1;5E;23;56;2B;E5;D5;E1;D1
 ld hl, (de)|kc160|_||EB;5E;23;56;2B;EB
 ld hl, (de)|kc160_z80|_||EB;5E;23;56;2B;EB
@@ -30976,6 +31250,8 @@ ld l, (aiy)|kc160|_||52;FD 6E 00
 ld l, (aiy+%d)|kc160|_||52;FD 6E %d
 ld l, (de)|8080|X||EB;5E;EB
 ld l, (de)|8085|X||EB;5E;EB
+ld l, (de)|ez80|X||EB;5E;EB
+ld l, (de)|ez80_z80|X||EB;5E;EB
 ld l, (de)|kc160|_||EB;5E;EB
 ld l, (de)|kc160_z80|_||EB;5E;EB
 ld l, (de)|r2ka|_||EB;5E;EB
@@ -30988,6 +31264,8 @@ ld l, (de)|z80|X||EB;5E;EB
 ld l, (de)|z80n|X||EB;5E;EB
 ld l, (de+)|8080|X||EB;5E;EB;13
 ld l, (de+)|8085|X||EB;5E;EB;13
+ld l, (de+)|ez80|X||EB;5E;EB;13
+ld l, (de+)|ez80_z80|X||EB;5E;EB;13
 ld l, (de+)|kc160|_||EB;5E;EB;13
 ld l, (de+)|kc160_z80|_||EB;5E;EB;13
 ld l, (de+)|r2ka|_||EB;5E;EB;13
@@ -31000,6 +31278,8 @@ ld l, (de+)|z80|X||EB;5E;EB;13
 ld l, (de+)|z80n|X||EB;5E;EB;13
 ld l, (de-)|8080|X||EB;5E;EB;1B
 ld l, (de-)|8085|X||EB;5E;EB;1B
+ld l, (de-)|ez80|X||EB;5E;EB;1B
+ld l, (de-)|ez80_z80|X||EB;5E;EB;1B
 ld l, (de-)|kc160|_||EB;5E;EB;1B
 ld l, (de-)|kc160_z80|_||EB;5E;EB;1B
 ld l, (de-)|r2ka|_||EB;5E;EB;1B
@@ -31012,6 +31292,10 @@ ld l, (de-)|z80|X||EB;5E;EB;1B
 ld l, (de-)|z80n|X||EB;5E;EB;1B
 ld l, (hl)|8080|_||6E
 ld l, (hl)|8085|_||6E
+ld l, (hl)|ez80|_||6E
+ld l, (hl)|ez80_strict|_||6E
+ld l, (hl)|ez80_z80|_||6E
+ld l, (hl)|ez80_z80_strict|_||6E
 ld l, (hl)|gbz80|_||6E
 ld l, (hl)|gbz80_strict|_||6E
 ld l, (hl)|kc160|_||6E
@@ -31029,6 +31313,8 @@ ld l, (hl)|z80n|_||6E
 ld l, (hl)|z80n_strict|_||6E
 ld l, (hl+)|8080|X||6E;23
 ld l, (hl+)|8085|X||6E;23
+ld l, (hl+)|ez80|X||6E;23
+ld l, (hl+)|ez80_z80|X||6E;23
 ld l, (hl+)|gbz80|X||6E;23
 ld l, (hl+)|kc160|_||6E;23
 ld l, (hl+)|kc160_z80|_||6E;23
@@ -31042,6 +31328,8 @@ ld l, (hl+)|z80|X||6E;23
 ld l, (hl+)|z80n|X||6E;23
 ld l, (hl-)|8080|X||6E;2B
 ld l, (hl-)|8085|X||6E;2B
+ld l, (hl-)|ez80|X||6E;2B
+ld l, (hl-)|ez80_z80|X||6E;2B
 ld l, (hl-)|gbz80|X||6E;2B
 ld l, (hl-)|kc160|_||6E;2B
 ld l, (hl-)|kc160_z80|_||6E;2B
@@ -31055,6 +31343,8 @@ ld l, (hl-)|z80|X||6E;2B
 ld l, (hl-)|z80n|X||6E;2B
 ld l, (hld)|8080|X||6E;2B
 ld l, (hld)|8085|X||6E;2B
+ld l, (hld)|ez80|X||6E;2B
+ld l, (hld)|ez80_z80|X||6E;2B
 ld l, (hld)|gbz80|X||6E;2B
 ld l, (hld)|kc160|_||6E;2B
 ld l, (hld)|kc160_z80|_||6E;2B
@@ -31068,6 +31358,8 @@ ld l, (hld)|z80|X||6E;2B
 ld l, (hld)|z80n|X||6E;2B
 ld l, (hli)|8080|X||6E;23
 ld l, (hli)|8085|X||6E;23
+ld l, (hli)|ez80|X||6E;23
+ld l, (hli)|ez80_z80|X||6E;23
 ld l, (hli)|gbz80|X||6E;23
 ld l, (hli)|kc160|_||6E;23
 ld l, (hli)|kc160_z80|_||6E;23
@@ -32240,6 +32532,56 @@ ld zp, xp|kc160|_||ED FC
 ld zp, xp|kc160_z80|_||ED FC
 ld zp, yp|kc160|_||ED F5
 ld zp, yp|kc160_z80|_||ED F5
+ld.l (bc), a|ez80_z80|_||49;02
+ld.l (bc), a|ez80_z80_strict|_||49;02
+ld.l (bc+), a|ez80_z80|X||49;02;49;03
+ld.l (bc-), a|ez80_z80|X||49;02;49;0B
+ld.l (de), a|ez80_z80|_||49;12
+ld.l (de), a|ez80_z80_strict|_||49;12
+ld.l (de+), a|ez80_z80|X||49;12;49;13
+ld.l (de-), a|ez80_z80|X||49;12;49;1B
+ld.l (hl), a|ez80_z80|_||49;77
+ld.l (hl), a|ez80_z80_strict|_||49;77
+ld.l (hl), b|ez80_z80|_||49;70
+ld.l (hl), b|ez80_z80_strict|_||49;70
+ld.l (hl), c|ez80_z80|_||49;71
+ld.l (hl), c|ez80_z80_strict|_||49;71
+ld.l (hl), d|ez80_z80|_||49;72
+ld.l (hl), d|ez80_z80_strict|_||49;72
+ld.l (hl), e|ez80_z80|_||49;73
+ld.l (hl), e|ez80_z80_strict|_||49;73
+ld.l (hl), h|ez80_z80|_||49;74
+ld.l (hl), h|ez80_z80_strict|_||49;74
+ld.l (hl), l|ez80_z80|_||49;75
+ld.l (hl), l|ez80_z80_strict|_||49;75
+ld.l (hl+), a|ez80_z80|X||49;77;49;23
+ld.l (hl+), b|ez80_z80|X||49;70;49;23
+ld.l (hl+), c|ez80_z80|X||49;71;49;23
+ld.l (hl+), d|ez80_z80|X||49;72;49;23
+ld.l (hl+), e|ez80_z80|X||49;73;49;23
+ld.l (hl+), h|ez80_z80|X||49;74;49;23
+ld.l (hl+), l|ez80_z80|X||49;75;49;23
+ld.l (hl-), a|ez80_z80|X||49;77;49;2B
+ld.l (hl-), b|ez80_z80|X||49;70;49;2B
+ld.l (hl-), c|ez80_z80|X||49;71;49;2B
+ld.l (hl-), d|ez80_z80|X||49;72;49;2B
+ld.l (hl-), e|ez80_z80|X||49;73;49;2B
+ld.l (hl-), h|ez80_z80|X||49;74;49;2B
+ld.l (hl-), l|ez80_z80|X||49;75;49;2B
+ld.l (hld), a|ez80_z80|X||49;77;49;2B
+ld.l (hld), b|ez80_z80|X||49;70;49;2B
+ld.l (hld), c|ez80_z80|X||49;71;49;2B
+ld.l (hld), d|ez80_z80|X||49;72;49;2B
+ld.l (hld), e|ez80_z80|X||49;73;49;2B
+ld.l (hld), h|ez80_z80|X||49;74;49;2B
+ld.l (hld), l|ez80_z80|X||49;75;49;2B
+ld.l (hli), a|ez80_z80|X||49;77;49;23
+ld.l (hli), b|ez80_z80|X||49;70;49;23
+ld.l (hli), c|ez80_z80|X||49;71;49;23
+ld.l (hli), d|ez80_z80|X||49;72;49;23
+ld.l (hli), e|ez80_z80|X||49;73;49;23
+ld.l (hli), h|ez80_z80|X||49;74;49;23
+ld.l (hli), l|ez80_z80|X||49;75;49;23
 ld.l (ix), a|ez80_z80|_||49;DD 77 00
 ld.l (ix), a|ez80_z80_strict|_||49;DD 77 00
 ld.l (ix), b|ez80_z80|_||49;DD 70 00
@@ -32296,6 +32638,20 @@ ld.l (iy+%d), h|ez80_z80|_||49;FD 74 %d
 ld.l (iy+%d), h|ez80_z80_strict|_||49;FD 74 %d
 ld.l (iy+%d), l|ez80_z80|_||49;FD 75 %d
 ld.l (iy+%d), l|ez80_z80_strict|_||49;FD 75 %d
+ld.l a, (bc)|ez80_z80|_||49;0A
+ld.l a, (bc)|ez80_z80_strict|_||49;0A
+ld.l a, (bc+)|ez80_z80|X||49;0A;49;03
+ld.l a, (bc-)|ez80_z80|X||49;0A;49;0B
+ld.l a, (de)|ez80_z80|_||49;1A
+ld.l a, (de)|ez80_z80_strict|_||49;1A
+ld.l a, (de+)|ez80_z80|X||49;1A;49;13
+ld.l a, (de-)|ez80_z80|X||49;1A;49;1B
+ld.l a, (hl)|ez80_z80|_||49;7E
+ld.l a, (hl)|ez80_z80_strict|_||49;7E
+ld.l a, (hl+)|ez80_z80|X||49;7E;49;23
+ld.l a, (hl-)|ez80_z80|X||49;7E;49;2B
+ld.l a, (hld)|ez80_z80|X||49;7E;49;2B
+ld.l a, (hli)|ez80_z80|X||49;7E;49;23
 ld.l a, (ix)|ez80_z80|_||49;DD 7E 00
 ld.l a, (ix)|ez80_z80_strict|_||49;DD 7E 00
 ld.l a, (ix+%d)|ez80_z80|_||49;DD 7E %d
@@ -32304,6 +32660,12 @@ ld.l a, (iy)|ez80_z80|_||49;FD 7E 00
 ld.l a, (iy)|ez80_z80_strict|_||49;FD 7E 00
 ld.l a, (iy+%d)|ez80_z80|_||49;FD 7E %d
 ld.l a, (iy+%d)|ez80_z80_strict|_||49;FD 7E %d
+ld.l b, (hl)|ez80_z80|_||49;46
+ld.l b, (hl)|ez80_z80_strict|_||49;46
+ld.l b, (hl+)|ez80_z80|X||49;46;49;23
+ld.l b, (hl-)|ez80_z80|X||49;46;49;2B
+ld.l b, (hld)|ez80_z80|X||49;46;49;2B
+ld.l b, (hli)|ez80_z80|X||49;46;49;23
 ld.l b, (ix)|ez80_z80|_||49;DD 46 00
 ld.l b, (ix)|ez80_z80_strict|_||49;DD 46 00
 ld.l b, (ix+%d)|ez80_z80|_||49;DD 46 %d
@@ -32312,6 +32674,12 @@ ld.l b, (iy)|ez80_z80|_||49;FD 46 00
 ld.l b, (iy)|ez80_z80_strict|_||49;FD 46 00
 ld.l b, (iy+%d)|ez80_z80|_||49;FD 46 %d
 ld.l b, (iy+%d)|ez80_z80_strict|_||49;FD 46 %d
+ld.l c, (hl)|ez80_z80|_||49;4E
+ld.l c, (hl)|ez80_z80_strict|_||49;4E
+ld.l c, (hl+)|ez80_z80|X||49;4E;49;23
+ld.l c, (hl-)|ez80_z80|X||49;4E;49;2B
+ld.l c, (hld)|ez80_z80|X||49;4E;49;2B
+ld.l c, (hli)|ez80_z80|X||49;4E;49;23
 ld.l c, (ix)|ez80_z80|_||49;DD 4E 00
 ld.l c, (ix)|ez80_z80_strict|_||49;DD 4E 00
 ld.l c, (ix+%d)|ez80_z80|_||49;DD 4E %d
@@ -32320,6 +32688,12 @@ ld.l c, (iy)|ez80_z80|_||49;FD 4E 00
 ld.l c, (iy)|ez80_z80_strict|_||49;FD 4E 00
 ld.l c, (iy+%d)|ez80_z80|_||49;FD 4E %d
 ld.l c, (iy+%d)|ez80_z80_strict|_||49;FD 4E %d
+ld.l d, (hl)|ez80_z80|_||49;56
+ld.l d, (hl)|ez80_z80_strict|_||49;56
+ld.l d, (hl+)|ez80_z80|X||49;56;49;23
+ld.l d, (hl-)|ez80_z80|X||49;56;49;2B
+ld.l d, (hld)|ez80_z80|X||49;56;49;2B
+ld.l d, (hli)|ez80_z80|X||49;56;49;23
 ld.l d, (ix)|ez80_z80|_||49;DD 56 00
 ld.l d, (ix)|ez80_z80_strict|_||49;DD 56 00
 ld.l d, (ix+%d)|ez80_z80|_||49;DD 56 %d
@@ -32328,6 +32702,12 @@ ld.l d, (iy)|ez80_z80|_||49;FD 56 00
 ld.l d, (iy)|ez80_z80_strict|_||49;FD 56 00
 ld.l d, (iy+%d)|ez80_z80|_||49;FD 56 %d
 ld.l d, (iy+%d)|ez80_z80_strict|_||49;FD 56 %d
+ld.l e, (hl)|ez80_z80|_||49;5E
+ld.l e, (hl)|ez80_z80_strict|_||49;5E
+ld.l e, (hl+)|ez80_z80|X||49;5E;49;23
+ld.l e, (hl-)|ez80_z80|X||49;5E;49;2B
+ld.l e, (hld)|ez80_z80|X||49;5E;49;2B
+ld.l e, (hli)|ez80_z80|X||49;5E;49;23
 ld.l e, (ix)|ez80_z80|_||49;DD 5E 00
 ld.l e, (ix)|ez80_z80_strict|_||49;DD 5E 00
 ld.l e, (ix+%d)|ez80_z80|_||49;DD 5E %d
@@ -32336,6 +32716,12 @@ ld.l e, (iy)|ez80_z80|_||49;FD 5E 00
 ld.l e, (iy)|ez80_z80_strict|_||49;FD 5E 00
 ld.l e, (iy+%d)|ez80_z80|_||49;FD 5E %d
 ld.l e, (iy+%d)|ez80_z80_strict|_||49;FD 5E %d
+ld.l h, (hl)|ez80_z80|_||49;66
+ld.l h, (hl)|ez80_z80_strict|_||49;66
+ld.l h, (hl+)|ez80_z80|X||49;66;49;23
+ld.l h, (hl-)|ez80_z80|X||49;66;49;2B
+ld.l h, (hld)|ez80_z80|X||49;66;49;2B
+ld.l h, (hli)|ez80_z80|X||49;66;49;23
 ld.l h, (ix)|ez80_z80|_||49;DD 66 00
 ld.l h, (ix)|ez80_z80_strict|_||49;DD 66 00
 ld.l h, (ix+%d)|ez80_z80|_||49;DD 66 %d
@@ -32344,6 +32730,12 @@ ld.l h, (iy)|ez80_z80|_||49;FD 66 00
 ld.l h, (iy)|ez80_z80_strict|_||49;FD 66 00
 ld.l h, (iy+%d)|ez80_z80|_||49;FD 66 %d
 ld.l h, (iy+%d)|ez80_z80_strict|_||49;FD 66 %d
+ld.l l, (hl)|ez80_z80|_||49;6E
+ld.l l, (hl)|ez80_z80_strict|_||49;6E
+ld.l l, (hl+)|ez80_z80|X||49;6E;49;23
+ld.l l, (hl-)|ez80_z80|X||49;6E;49;2B
+ld.l l, (hld)|ez80_z80|X||49;6E;49;2B
+ld.l l, (hli)|ez80_z80|X||49;6E;49;23
 ld.l l, (ix)|ez80_z80|_||49;DD 6E 00
 ld.l l, (ix)|ez80_z80_strict|_||49;DD 6E 00
 ld.l l, (ix+%d)|ez80_z80|_||49;DD 6E %d
@@ -32356,6 +32748,56 @@ ld.lil (%m), a|ez80_z80|_||5B;32 %m %m
 ld.lil (%m), a|ez80_z80_strict|_||5B;32 %m %m
 ld.lil a, (%m)|ez80_z80|_||5B;3A %m %m
 ld.lil a, (%m)|ez80_z80_strict|_||5B;3A %m %m
+ld.lis (bc), a|ez80_z80|_||49;02
+ld.lis (bc), a|ez80_z80_strict|_||49;02
+ld.lis (bc+), a|ez80_z80|X||49;02;49;03
+ld.lis (bc-), a|ez80_z80|X||49;02;49;0B
+ld.lis (de), a|ez80_z80|_||49;12
+ld.lis (de), a|ez80_z80_strict|_||49;12
+ld.lis (de+), a|ez80_z80|X||49;12;49;13
+ld.lis (de-), a|ez80_z80|X||49;12;49;1B
+ld.lis (hl), a|ez80_z80|_||49;77
+ld.lis (hl), a|ez80_z80_strict|_||49;77
+ld.lis (hl), b|ez80_z80|_||49;70
+ld.lis (hl), b|ez80_z80_strict|_||49;70
+ld.lis (hl), c|ez80_z80|_||49;71
+ld.lis (hl), c|ez80_z80_strict|_||49;71
+ld.lis (hl), d|ez80_z80|_||49;72
+ld.lis (hl), d|ez80_z80_strict|_||49;72
+ld.lis (hl), e|ez80_z80|_||49;73
+ld.lis (hl), e|ez80_z80_strict|_||49;73
+ld.lis (hl), h|ez80_z80|_||49;74
+ld.lis (hl), h|ez80_z80_strict|_||49;74
+ld.lis (hl), l|ez80_z80|_||49;75
+ld.lis (hl), l|ez80_z80_strict|_||49;75
+ld.lis (hl+), a|ez80_z80|X||49;77;49;23
+ld.lis (hl+), b|ez80_z80|X||49;70;49;23
+ld.lis (hl+), c|ez80_z80|X||49;71;49;23
+ld.lis (hl+), d|ez80_z80|X||49;72;49;23
+ld.lis (hl+), e|ez80_z80|X||49;73;49;23
+ld.lis (hl+), h|ez80_z80|X||49;74;49;23
+ld.lis (hl+), l|ez80_z80|X||49;75;49;23
+ld.lis (hl-), a|ez80_z80|X||49;77;49;2B
+ld.lis (hl-), b|ez80_z80|X||49;70;49;2B
+ld.lis (hl-), c|ez80_z80|X||49;71;49;2B
+ld.lis (hl-), d|ez80_z80|X||49;72;49;2B
+ld.lis (hl-), e|ez80_z80|X||49;73;49;2B
+ld.lis (hl-), h|ez80_z80|X||49;74;49;2B
+ld.lis (hl-), l|ez80_z80|X||49;75;49;2B
+ld.lis (hld), a|ez80_z80|X||49;77;49;2B
+ld.lis (hld), b|ez80_z80|X||49;70;49;2B
+ld.lis (hld), c|ez80_z80|X||49;71;49;2B
+ld.lis (hld), d|ez80_z80|X||49;72;49;2B
+ld.lis (hld), e|ez80_z80|X||49;73;49;2B
+ld.lis (hld), h|ez80_z80|X||49;74;49;2B
+ld.lis (hld), l|ez80_z80|X||49;75;49;2B
+ld.lis (hli), a|ez80_z80|X||49;77;49;23
+ld.lis (hli), b|ez80_z80|X||49;70;49;23
+ld.lis (hli), c|ez80_z80|X||49;71;49;23
+ld.lis (hli), d|ez80_z80|X||49;72;49;23
+ld.lis (hli), e|ez80_z80|X||49;73;49;23
+ld.lis (hli), h|ez80_z80|X||49;74;49;23
+ld.lis (hli), l|ez80_z80|X||49;75;49;23
 ld.lis (ix), a|ez80_z80|_||49;DD 77 00
 ld.lis (ix), a|ez80_z80_strict|_||49;DD 77 00
 ld.lis (ix), b|ez80_z80|_||49;DD 70 00
@@ -32412,6 +32854,20 @@ ld.lis (iy+%d), h|ez80_z80|_||49;FD 74 %d
 ld.lis (iy+%d), h|ez80_z80_strict|_||49;FD 74 %d
 ld.lis (iy+%d), l|ez80_z80|_||49;FD 75 %d
 ld.lis (iy+%d), l|ez80_z80_strict|_||49;FD 75 %d
+ld.lis a, (bc)|ez80_z80|_||49;0A
+ld.lis a, (bc)|ez80_z80_strict|_||49;0A
+ld.lis a, (bc+)|ez80_z80|X||49;0A;49;03
+ld.lis a, (bc-)|ez80_z80|X||49;0A;49;0B
+ld.lis a, (de)|ez80_z80|_||49;1A
+ld.lis a, (de)|ez80_z80_strict|_||49;1A
+ld.lis a, (de+)|ez80_z80|X||49;1A;49;13
+ld.lis a, (de-)|ez80_z80|X||49;1A;49;1B
+ld.lis a, (hl)|ez80_z80|_||49;7E
+ld.lis a, (hl)|ez80_z80_strict|_||49;7E
+ld.lis a, (hl+)|ez80_z80|X||49;7E;49;23
+ld.lis a, (hl-)|ez80_z80|X||49;7E;49;2B
+ld.lis a, (hld)|ez80_z80|X||49;7E;49;2B
+ld.lis a, (hli)|ez80_z80|X||49;7E;49;23
 ld.lis a, (ix)|ez80_z80|_||49;DD 7E 00
 ld.lis a, (ix)|ez80_z80_strict|_||49;DD 7E 00
 ld.lis a, (ix+%d)|ez80_z80|_||49;DD 7E %d
@@ -32420,6 +32876,12 @@ ld.lis a, (iy)|ez80_z80|_||49;FD 7E 00
 ld.lis a, (iy)|ez80_z80_strict|_||49;FD 7E 00
 ld.lis a, (iy+%d)|ez80_z80|_||49;FD 7E %d
 ld.lis a, (iy+%d)|ez80_z80_strict|_||49;FD 7E %d
+ld.lis b, (hl)|ez80_z80|_||49;46
+ld.lis b, (hl)|ez80_z80_strict|_||49;46
+ld.lis b, (hl+)|ez80_z80|X||49;46;49;23
+ld.lis b, (hl-)|ez80_z80|X||49;46;49;2B
+ld.lis b, (hld)|ez80_z80|X||49;46;49;2B
+ld.lis b, (hli)|ez80_z80|X||49;46;49;23
 ld.lis b, (ix)|ez80_z80|_||49;DD 46 00
 ld.lis b, (ix)|ez80_z80_strict|_||49;DD 46 00
 ld.lis b, (ix+%d)|ez80_z80|_||49;DD 46 %d
@@ -32428,6 +32890,12 @@ ld.lis b, (iy)|ez80_z80|_||49;FD 46 00
 ld.lis b, (iy)|ez80_z80_strict|_||49;FD 46 00
 ld.lis b, (iy+%d)|ez80_z80|_||49;FD 46 %d
 ld.lis b, (iy+%d)|ez80_z80_strict|_||49;FD 46 %d
+ld.lis c, (hl)|ez80_z80|_||49;4E
+ld.lis c, (hl)|ez80_z80_strict|_||49;4E
+ld.lis c, (hl+)|ez80_z80|X||49;4E;49;23
+ld.lis c, (hl-)|ez80_z80|X||49;4E;49;2B
+ld.lis c, (hld)|ez80_z80|X||49;4E;49;2B
+ld.lis c, (hli)|ez80_z80|X||49;4E;49;23
 ld.lis c, (ix)|ez80_z80|_||49;DD 4E 00
 ld.lis c, (ix)|ez80_z80_strict|_||49;DD 4E 00
 ld.lis c, (ix+%d)|ez80_z80|_||49;DD 4E %d
@@ -32436,6 +32904,12 @@ ld.lis c, (iy)|ez80_z80|_||49;FD 4E 00
 ld.lis c, (iy)|ez80_z80_strict|_||49;FD 4E 00
 ld.lis c, (iy+%d)|ez80_z80|_||49;FD 4E %d
 ld.lis c, (iy+%d)|ez80_z80_strict|_||49;FD 4E %d
+ld.lis d, (hl)|ez80_z80|_||49;56
+ld.lis d, (hl)|ez80_z80_strict|_||49;56
+ld.lis d, (hl+)|ez80_z80|X||49;56;49;23
+ld.lis d, (hl-)|ez80_z80|X||49;56;49;2B
+ld.lis d, (hld)|ez80_z80|X||49;56;49;2B
+ld.lis d, (hli)|ez80_z80|X||49;56;49;23
 ld.lis d, (ix)|ez80_z80|_||49;DD 56 00
 ld.lis d, (ix)|ez80_z80_strict|_||49;DD 56 00
 ld.lis d, (ix+%d)|ez80_z80|_||49;DD 56 %d
@@ -32444,6 +32918,12 @@ ld.lis d, (iy)|ez80_z80|_||49;FD 56 00
 ld.lis d, (iy)|ez80_z80_strict|_||49;FD 56 00
 ld.lis d, (iy+%d)|ez80_z80|_||49;FD 56 %d
 ld.lis d, (iy+%d)|ez80_z80_strict|_||49;FD 56 %d
+ld.lis e, (hl)|ez80_z80|_||49;5E
+ld.lis e, (hl)|ez80_z80_strict|_||49;5E
+ld.lis e, (hl+)|ez80_z80|X||49;5E;49;23
+ld.lis e, (hl-)|ez80_z80|X||49;5E;49;2B
+ld.lis e, (hld)|ez80_z80|X||49;5E;49;2B
+ld.lis e, (hli)|ez80_z80|X||49;5E;49;23
 ld.lis e, (ix)|ez80_z80|_||49;DD 5E 00
 ld.lis e, (ix)|ez80_z80_strict|_||49;DD 5E 00
 ld.lis e, (ix+%d)|ez80_z80|_||49;DD 5E %d
@@ -32452,6 +32932,12 @@ ld.lis e, (iy)|ez80_z80|_||49;FD 5E 00
 ld.lis e, (iy)|ez80_z80_strict|_||49;FD 5E 00
 ld.lis e, (iy+%d)|ez80_z80|_||49;FD 5E %d
 ld.lis e, (iy+%d)|ez80_z80_strict|_||49;FD 5E %d
+ld.lis h, (hl)|ez80_z80|_||49;66
+ld.lis h, (hl)|ez80_z80_strict|_||49;66
+ld.lis h, (hl+)|ez80_z80|X||49;66;49;23
+ld.lis h, (hl-)|ez80_z80|X||49;66;49;2B
+ld.lis h, (hld)|ez80_z80|X||49;66;49;2B
+ld.lis h, (hli)|ez80_z80|X||49;66;49;23
 ld.lis h, (ix)|ez80_z80|_||49;DD 66 00
 ld.lis h, (ix)|ez80_z80_strict|_||49;DD 66 00
 ld.lis h, (ix+%d)|ez80_z80|_||49;DD 66 %d
@@ -32460,6 +32946,12 @@ ld.lis h, (iy)|ez80_z80|_||49;FD 66 00
 ld.lis h, (iy)|ez80_z80_strict|_||49;FD 66 00
 ld.lis h, (iy+%d)|ez80_z80|_||49;FD 66 %d
 ld.lis h, (iy+%d)|ez80_z80_strict|_||49;FD 66 %d
+ld.lis l, (hl)|ez80_z80|_||49;6E
+ld.lis l, (hl)|ez80_z80_strict|_||49;6E
+ld.lis l, (hl+)|ez80_z80|X||49;6E;49;23
+ld.lis l, (hl-)|ez80_z80|X||49;6E;49;2B
+ld.lis l, (hld)|ez80_z80|X||49;6E;49;2B
+ld.lis l, (hli)|ez80_z80|X||49;6E;49;23
 ld.lis l, (ix)|ez80_z80|_||49;DD 6E 00
 ld.lis l, (ix)|ez80_z80_strict|_||49;DD 6E 00
 ld.lis l, (ix+%d)|ez80_z80|_||49;DD 6E %d
@@ -32468,6 +32960,56 @@ ld.lis l, (iy)|ez80_z80|_||49;FD 6E 00
 ld.lis l, (iy)|ez80_z80_strict|_||49;FD 6E 00
 ld.lis l, (iy+%d)|ez80_z80|_||49;FD 6E %d
 ld.lis l, (iy+%d)|ez80_z80_strict|_||49;FD 6E %d
+ld.s (bc), a|ez80|_||52;02
+ld.s (bc), a|ez80_strict|_||52;02
+ld.s (bc+), a|ez80|X||52;02;52;03
+ld.s (bc-), a|ez80|X||52;02;52;0B
+ld.s (de), a|ez80|_||52;12
+ld.s (de), a|ez80_strict|_||52;12
+ld.s (de+), a|ez80|X||52;12;52;13
+ld.s (de-), a|ez80|X||52;12;52;1B
+ld.s (hl), a|ez80|_||52;77
+ld.s (hl), a|ez80_strict|_||52;77
+ld.s (hl), b|ez80|_||52;70
+ld.s (hl), b|ez80_strict|_||52;70
+ld.s (hl), c|ez80|_||52;71
+ld.s (hl), c|ez80_strict|_||52;71
+ld.s (hl), d|ez80|_||52;72
+ld.s (hl), d|ez80_strict|_||52;72
+ld.s (hl), e|ez80|_||52;73
+ld.s (hl), e|ez80_strict|_||52;73
+ld.s (hl), h|ez80|_||52;74
+ld.s (hl), h|ez80_strict|_||52;74
+ld.s (hl), l|ez80|_||52;75
+ld.s (hl), l|ez80_strict|_||52;75
+ld.s (hl+), a|ez80|X||52;77;52;23
+ld.s (hl+), b|ez80|X||52;70;52;23
+ld.s (hl+), c|ez80|X||52;71;52;23
+ld.s (hl+), d|ez80|X||52;72;52;23
+ld.s (hl+), e|ez80|X||52;73;52;23
+ld.s (hl+), h|ez80|X||52;74;52;23
+ld.s (hl+), l|ez80|X||52;75;52;23
+ld.s (hl-), a|ez80|X||52;77;52;2B
+ld.s (hl-), b|ez80|X||52;70;52;2B
+ld.s (hl-), c|ez80|X||52;71;52;2B
+ld.s (hl-), d|ez80|X||52;72;52;2B
+ld.s (hl-), e|ez80|X||52;73;52;2B
+ld.s (hl-), h|ez80|X||52;74;52;2B
+ld.s (hl-), l|ez80|X||52;75;52;2B
+ld.s (hld), a|ez80|X||52;77;52;2B
+ld.s (hld), b|ez80|X||52;70;52;2B
+ld.s (hld), c|ez80|X||52;71;52;2B
+ld.s (hld), d|ez80|X||52;72;52;2B
+ld.s (hld), e|ez80|X||52;73;52;2B
+ld.s (hld), h|ez80|X||52;74;52;2B
+ld.s (hld), l|ez80|X||52;75;52;2B
+ld.s (hli), a|ez80|X||52;77;52;23
+ld.s (hli), b|ez80|X||52;70;52;23
+ld.s (hli), c|ez80|X||52;71;52;23
+ld.s (hli), d|ez80|X||52;72;52;23
+ld.s (hli), e|ez80|X||52;73;52;23
+ld.s (hli), h|ez80|X||52;74;52;23
+ld.s (hli), l|ez80|X||52;75;52;23
 ld.s (ix), a|ez80|_||52;DD 77 00
 ld.s (ix), a|ez80_strict|_||52;DD 77 00
 ld.s (ix), b|ez80|_||52;DD 70 00
@@ -32524,6 +33066,20 @@ ld.s (iy+%d), h|ez80|_||52;FD 74 %d
 ld.s (iy+%d), h|ez80_strict|_||52;FD 74 %d
 ld.s (iy+%d), l|ez80|_||52;FD 75 %d
 ld.s (iy+%d), l|ez80_strict|_||52;FD 75 %d
+ld.s a, (bc)|ez80|_||52;0A
+ld.s a, (bc)|ez80_strict|_||52;0A
+ld.s a, (bc+)|ez80|X||52;0A;52;03
+ld.s a, (bc-)|ez80|X||52;0A;52;0B
+ld.s a, (de)|ez80|_||52;1A
+ld.s a, (de)|ez80_strict|_||52;1A
+ld.s a, (de+)|ez80|X||52;1A;52;13
+ld.s a, (de-)|ez80|X||52;1A;52;1B
+ld.s a, (hl)|ez80|_||52;7E
+ld.s a, (hl)|ez80_strict|_||52;7E
+ld.s a, (hl+)|ez80|X||52;7E;52;23
+ld.s a, (hl-)|ez80|X||52;7E;52;2B
+ld.s a, (hld)|ez80|X||52;7E;52;2B
+ld.s a, (hli)|ez80|X||52;7E;52;23
 ld.s a, (ix)|ez80|_||52;DD 7E 00
 ld.s a, (ix)|ez80_strict|_||52;DD 7E 00
 ld.s a, (ix+%d)|ez80|_||52;DD 7E %d
@@ -32532,6 +33088,12 @@ ld.s a, (iy)|ez80|_||52;FD 7E 00
 ld.s a, (iy)|ez80_strict|_||52;FD 7E 00
 ld.s a, (iy+%d)|ez80|_||52;FD 7E %d
 ld.s a, (iy+%d)|ez80_strict|_||52;FD 7E %d
+ld.s b, (hl)|ez80|_||52;46
+ld.s b, (hl)|ez80_strict|_||52;46
+ld.s b, (hl+)|ez80|X||52;46;52;23
+ld.s b, (hl-)|ez80|X||52;46;52;2B
+ld.s b, (hld)|ez80|X||52;46;52;2B
+ld.s b, (hli)|ez80|X||52;46;52;23
 ld.s b, (ix)|ez80|_||52;DD 46 00
 ld.s b, (ix)|ez80_strict|_||52;DD 46 00
 ld.s b, (ix+%d)|ez80|_||52;DD 46 %d
@@ -32540,6 +33102,12 @@ ld.s b, (iy)|ez80|_||52;FD 46 00
 ld.s b, (iy)|ez80_strict|_||52;FD 46 00
 ld.s b, (iy+%d)|ez80|_||52;FD 46 %d
 ld.s b, (iy+%d)|ez80_strict|_||52;FD 46 %d
+ld.s c, (hl)|ez80|_||52;4E
+ld.s c, (hl)|ez80_strict|_||52;4E
+ld.s c, (hl+)|ez80|X||52;4E;52;23
+ld.s c, (hl-)|ez80|X||52;4E;52;2B
+ld.s c, (hld)|ez80|X||52;4E;52;2B
+ld.s c, (hli)|ez80|X||52;4E;52;23
 ld.s c, (ix)|ez80|_||52;DD 4E 00
 ld.s c, (ix)|ez80_strict|_||52;DD 4E 00
 ld.s c, (ix+%d)|ez80|_||52;DD 4E %d
@@ -32548,6 +33116,12 @@ ld.s c, (iy)|ez80|_||52;FD 4E 00
 ld.s c, (iy)|ez80_strict|_||52;FD 4E 00
 ld.s c, (iy+%d)|ez80|_||52;FD 4E %d
 ld.s c, (iy+%d)|ez80_strict|_||52;FD 4E %d
+ld.s d, (hl)|ez80|_||52;56
+ld.s d, (hl)|ez80_strict|_||52;56
+ld.s d, (hl+)|ez80|X||52;56;52;23
+ld.s d, (hl-)|ez80|X||52;56;52;2B
+ld.s d, (hld)|ez80|X||52;56;52;2B
+ld.s d, (hli)|ez80|X||52;56;52;23
 ld.s d, (ix)|ez80|_||52;DD 56 00
 ld.s d, (ix)|ez80_strict|_||52;DD 56 00
 ld.s d, (ix+%d)|ez80|_||52;DD 56 %d
@@ -32556,6 +33130,12 @@ ld.s d, (iy)|ez80|_||52;FD 56 00
 ld.s d, (iy)|ez80_strict|_||52;FD 56 00
 ld.s d, (iy+%d)|ez80|_||52;FD 56 %d
 ld.s d, (iy+%d)|ez80_strict|_||52;FD 56 %d
+ld.s e, (hl)|ez80|_||52;5E
+ld.s e, (hl)|ez80_strict|_||52;5E
+ld.s e, (hl+)|ez80|X||52;5E;52;23
+ld.s e, (hl-)|ez80|X||52;5E;52;2B
+ld.s e, (hld)|ez80|X||52;5E;52;2B
+ld.s e, (hli)|ez80|X||52;5E;52;23
 ld.s e, (ix)|ez80|_||52;DD 5E 00
 ld.s e, (ix)|ez80_strict|_||52;DD 5E 00
 ld.s e, (ix+%d)|ez80|_||52;DD 5E %d
@@ -32564,6 +33144,12 @@ ld.s e, (iy)|ez80|_||52;FD 5E 00
 ld.s e, (iy)|ez80_strict|_||52;FD 5E 00
 ld.s e, (iy+%d)|ez80|_||52;FD 5E %d
 ld.s e, (iy+%d)|ez80_strict|_||52;FD 5E %d
+ld.s h, (hl)|ez80|_||52;66
+ld.s h, (hl)|ez80_strict|_||52;66
+ld.s h, (hl+)|ez80|X||52;66;52;23
+ld.s h, (hl-)|ez80|X||52;66;52;2B
+ld.s h, (hld)|ez80|X||52;66;52;2B
+ld.s h, (hli)|ez80|X||52;66;52;23
 ld.s h, (ix)|ez80|_||52;DD 66 00
 ld.s h, (ix)|ez80_strict|_||52;DD 66 00
 ld.s h, (ix+%d)|ez80|_||52;DD 66 %d
@@ -32572,6 +33158,12 @@ ld.s h, (iy)|ez80|_||52;FD 66 00
 ld.s h, (iy)|ez80_strict|_||52;FD 66 00
 ld.s h, (iy+%d)|ez80|_||52;FD 66 %d
 ld.s h, (iy+%d)|ez80_strict|_||52;FD 66 %d
+ld.s l, (hl)|ez80|_||52;6E
+ld.s l, (hl)|ez80_strict|_||52;6E
+ld.s l, (hl+)|ez80|X||52;6E;52;23
+ld.s l, (hl-)|ez80|X||52;6E;52;2B
+ld.s l, (hld)|ez80|X||52;6E;52;2B
+ld.s l, (hli)|ez80|X||52;6E;52;23
 ld.s l, (ix)|ez80|_||52;DD 6E 00
 ld.s l, (ix)|ez80_strict|_||52;DD 6E 00
 ld.s l, (ix+%d)|ez80|_||52;DD 6E %d
@@ -32580,6 +33172,56 @@ ld.s l, (iy)|ez80|_||52;FD 6E 00
 ld.s l, (iy)|ez80_strict|_||52;FD 6E 00
 ld.s l, (iy+%d)|ez80|_||52;FD 6E %d
 ld.s l, (iy+%d)|ez80_strict|_||52;FD 6E %d
+ld.sil (bc), a|ez80|_||52;02
+ld.sil (bc), a|ez80_strict|_||52;02
+ld.sil (bc+), a|ez80|X||52;02;52;03
+ld.sil (bc-), a|ez80|X||52;02;52;0B
+ld.sil (de), a|ez80|_||52;12
+ld.sil (de), a|ez80_strict|_||52;12
+ld.sil (de+), a|ez80|X||52;12;52;13
+ld.sil (de-), a|ez80|X||52;12;52;1B
+ld.sil (hl), a|ez80|_||52;77
+ld.sil (hl), a|ez80_strict|_||52;77
+ld.sil (hl), b|ez80|_||52;70
+ld.sil (hl), b|ez80_strict|_||52;70
+ld.sil (hl), c|ez80|_||52;71
+ld.sil (hl), c|ez80_strict|_||52;71
+ld.sil (hl), d|ez80|_||52;72
+ld.sil (hl), d|ez80_strict|_||52;72
+ld.sil (hl), e|ez80|_||52;73
+ld.sil (hl), e|ez80_strict|_||52;73
+ld.sil (hl), h|ez80|_||52;74
+ld.sil (hl), h|ez80_strict|_||52;74
+ld.sil (hl), l|ez80|_||52;75
+ld.sil (hl), l|ez80_strict|_||52;75
+ld.sil (hl+), a|ez80|X||52;77;52;23
+ld.sil (hl+), b|ez80|X||52;70;52;23
+ld.sil (hl+), c|ez80|X||52;71;52;23
+ld.sil (hl+), d|ez80|X||52;72;52;23
+ld.sil (hl+), e|ez80|X||52;73;52;23
+ld.sil (hl+), h|ez80|X||52;74;52;23
+ld.sil (hl+), l|ez80|X||52;75;52;23
+ld.sil (hl-), a|ez80|X||52;77;52;2B
+ld.sil (hl-), b|ez80|X||52;70;52;2B
+ld.sil (hl-), c|ez80|X||52;71;52;2B
+ld.sil (hl-), d|ez80|X||52;72;52;2B
+ld.sil (hl-), e|ez80|X||52;73;52;2B
+ld.sil (hl-), h|ez80|X||52;74;52;2B
+ld.sil (hl-), l|ez80|X||52;75;52;2B
+ld.sil (hld), a|ez80|X||52;77;52;2B
+ld.sil (hld), b|ez80|X||52;70;52;2B
+ld.sil (hld), c|ez80|X||52;71;52;2B
+ld.sil (hld), d|ez80|X||52;72;52;2B
+ld.sil (hld), e|ez80|X||52;73;52;2B
+ld.sil (hld), h|ez80|X||52;74;52;2B
+ld.sil (hld), l|ez80|X||52;75;52;2B
+ld.sil (hli), a|ez80|X||52;77;52;23
+ld.sil (hli), b|ez80|X||52;70;52;23
+ld.sil (hli), c|ez80|X||52;71;52;23
+ld.sil (hli), d|ez80|X||52;72;52;23
+ld.sil (hli), e|ez80|X||52;73;52;23
+ld.sil (hli), h|ez80|X||52;74;52;23
+ld.sil (hli), l|ez80|X||52;75;52;23
 ld.sil (ix), a|ez80|_||52;DD 77 00
 ld.sil (ix), a|ez80_strict|_||52;DD 77 00
 ld.sil (ix), b|ez80|_||52;DD 70 00
@@ -32636,6 +33278,20 @@ ld.sil (iy+%d), h|ez80|_||52;FD 74 %d
 ld.sil (iy+%d), h|ez80_strict|_||52;FD 74 %d
 ld.sil (iy+%d), l|ez80|_||52;FD 75 %d
 ld.sil (iy+%d), l|ez80_strict|_||52;FD 75 %d
+ld.sil a, (bc)|ez80|_||52;0A
+ld.sil a, (bc)|ez80_strict|_||52;0A
+ld.sil a, (bc+)|ez80|X||52;0A;52;03
+ld.sil a, (bc-)|ez80|X||52;0A;52;0B
+ld.sil a, (de)|ez80|_||52;1A
+ld.sil a, (de)|ez80_strict|_||52;1A
+ld.sil a, (de+)|ez80|X||52;1A;52;13
+ld.sil a, (de-)|ez80|X||52;1A;52;1B
+ld.sil a, (hl)|ez80|_||52;7E
+ld.sil a, (hl)|ez80_strict|_||52;7E
+ld.sil a, (hl+)|ez80|X||52;7E;52;23
+ld.sil a, (hl-)|ez80|X||52;7E;52;2B
+ld.sil a, (hld)|ez80|X||52;7E;52;2B
+ld.sil a, (hli)|ez80|X||52;7E;52;23
 ld.sil a, (ix)|ez80|_||52;DD 7E 00
 ld.sil a, (ix)|ez80_strict|_||52;DD 7E 00
 ld.sil a, (ix+%d)|ez80|_||52;DD 7E %d
@@ -32644,6 +33300,12 @@ ld.sil a, (iy)|ez80|_||52;FD 7E 00
 ld.sil a, (iy)|ez80_strict|_||52;FD 7E 00
 ld.sil a, (iy+%d)|ez80|_||52;FD 7E %d
 ld.sil a, (iy+%d)|ez80_strict|_||52;FD 7E %d
+ld.sil b, (hl)|ez80|_||52;46
+ld.sil b, (hl)|ez80_strict|_||52;46
+ld.sil b, (hl+)|ez80|X||52;46;52;23
+ld.sil b, (hl-)|ez80|X||52;46;52;2B
+ld.sil b, (hld)|ez80|X||52;46;52;2B
+ld.sil b, (hli)|ez80|X||52;46;52;23
 ld.sil b, (ix)|ez80|_||52;DD 46 00
 ld.sil b, (ix)|ez80_strict|_||52;DD 46 00
 ld.sil b, (ix+%d)|ez80|_||52;DD 46 %d
@@ -32652,6 +33314,12 @@ ld.sil b, (iy)|ez80|_||52;FD 46 00
 ld.sil b, (iy)|ez80_strict|_||52;FD 46 00
 ld.sil b, (iy+%d)|ez80|_||52;FD 46 %d
 ld.sil b, (iy+%d)|ez80_strict|_||52;FD 46 %d
+ld.sil c, (hl)|ez80|_||52;4E
+ld.sil c, (hl)|ez80_strict|_||52;4E
+ld.sil c, (hl+)|ez80|X||52;4E;52;23
+ld.sil c, (hl-)|ez80|X||52;4E;52;2B
+ld.sil c, (hld)|ez80|X||52;4E;52;2B
+ld.sil c, (hli)|ez80|X||52;4E;52;23
 ld.sil c, (ix)|ez80|_||52;DD 4E 00
 ld.sil c, (ix)|ez80_strict|_||52;DD 4E 00
 ld.sil c, (ix+%d)|ez80|_||52;DD 4E %d
@@ -32660,6 +33328,12 @@ ld.sil c, (iy)|ez80|_||52;FD 4E 00
 ld.sil c, (iy)|ez80_strict|_||52;FD 4E 00
 ld.sil c, (iy+%d)|ez80|_||52;FD 4E %d
 ld.sil c, (iy+%d)|ez80_strict|_||52;FD 4E %d
+ld.sil d, (hl)|ez80|_||52;56
+ld.sil d, (hl)|ez80_strict|_||52;56
+ld.sil d, (hl+)|ez80|X||52;56;52;23
+ld.sil d, (hl-)|ez80|X||52;56;52;2B
+ld.sil d, (hld)|ez80|X||52;56;52;2B
+ld.sil d, (hli)|ez80|X||52;56;52;23
 ld.sil d, (ix)|ez80|_||52;DD 56 00
 ld.sil d, (ix)|ez80_strict|_||52;DD 56 00
 ld.sil d, (ix+%d)|ez80|_||52;DD 56 %d
@@ -32668,6 +33342,12 @@ ld.sil d, (iy)|ez80|_||52;FD 56 00
 ld.sil d, (iy)|ez80_strict|_||52;FD 56 00
 ld.sil d, (iy+%d)|ez80|_||52;FD 56 %d
 ld.sil d, (iy+%d)|ez80_strict|_||52;FD 56 %d
+ld.sil e, (hl)|ez80|_||52;5E
+ld.sil e, (hl)|ez80_strict|_||52;5E
+ld.sil e, (hl+)|ez80|X||52;5E;52;23
+ld.sil e, (hl-)|ez80|X||52;5E;52;2B
+ld.sil e, (hld)|ez80|X||52;5E;52;2B
+ld.sil e, (hli)|ez80|X||52;5E;52;23
 ld.sil e, (ix)|ez80|_||52;DD 5E 00
 ld.sil e, (ix)|ez80_strict|_||52;DD 5E 00
 ld.sil e, (ix+%d)|ez80|_||52;DD 5E %d
@@ -32676,6 +33356,12 @@ ld.sil e, (iy)|ez80|_||52;FD 5E 00
 ld.sil e, (iy)|ez80_strict|_||52;FD 5E 00
 ld.sil e, (iy+%d)|ez80|_||52;FD 5E %d
 ld.sil e, (iy+%d)|ez80_strict|_||52;FD 5E %d
+ld.sil h, (hl)|ez80|_||52;66
+ld.sil h, (hl)|ez80_strict|_||52;66
+ld.sil h, (hl+)|ez80|X||52;66;52;23
+ld.sil h, (hl-)|ez80|X||52;66;52;2B
+ld.sil h, (hld)|ez80|X||52;66;52;2B
+ld.sil h, (hli)|ez80|X||52;66;52;23
 ld.sil h, (ix)|ez80|_||52;DD 66 00
 ld.sil h, (ix)|ez80_strict|_||52;DD 66 00
 ld.sil h, (ix+%d)|ez80|_||52;DD 66 %d
@@ -32684,6 +33370,12 @@ ld.sil h, (iy)|ez80|_||52;FD 66 00
 ld.sil h, (iy)|ez80_strict|_||52;FD 66 00
 ld.sil h, (iy+%d)|ez80|_||52;FD 66 %d
 ld.sil h, (iy+%d)|ez80_strict|_||52;FD 66 %d
+ld.sil l, (hl)|ez80|_||52;6E
+ld.sil l, (hl)|ez80_strict|_||52;6E
+ld.sil l, (hl+)|ez80|X||52;6E;52;23
+ld.sil l, (hl-)|ez80|X||52;6E;52;2B
+ld.sil l, (hld)|ez80|X||52;6E;52;2B
+ld.sil l, (hli)|ez80|X||52;6E;52;23
 ld.sil l, (ix)|ez80|_||52;DD 6E 00
 ld.sil l, (ix)|ez80_strict|_||52;DD 6E 00
 ld.sil l, (ix+%d)|ez80|_||52;DD 6E %d
@@ -32717,6 +33409,8 @@ ldax b|8080|_||0A
 ldax b|8080_strict|_||0A
 ldax b|8085|_||0A
 ldax b|8085_strict|_||0A
+ldax b|ez80|_||0A
+ldax b|ez80_z80|_||0A
 ldax b|gbz80|_||0A
 ldax b|kc160|_||0A
 ldax b|kc160_z80|_||0A
@@ -32730,6 +33424,8 @@ ldax b|z80|_||0A
 ldax b|z80n|_||0A
 ldax bc|8080|_||0A
 ldax bc|8085|_||0A
+ldax bc|ez80|_||0A
+ldax bc|ez80_z80|_||0A
 ldax bc|gbz80|_||0A
 ldax bc|kc160|_||0A
 ldax bc|kc160_z80|_||0A
@@ -32745,6 +33441,8 @@ ldax d|8080|_||1A
 ldax d|8080_strict|_||1A
 ldax d|8085|_||1A
 ldax d|8085_strict|_||1A
+ldax d|ez80|_||1A
+ldax d|ez80_z80|_||1A
 ldax d|gbz80|_||1A
 ldax d|kc160|_||1A
 ldax d|kc160_z80|_||1A
@@ -32758,6 +33456,8 @@ ldax d|z80|_||1A
 ldax d|z80n|_||1A
 ldax de|8080|_||1A
 ldax de|8085|_||1A
+ldax de|ez80|_||1A
+ldax de|ez80_z80|_||1A
 ldax de|gbz80|_||1A
 ldax de|kc160|_||1A
 ldax de|kc160_z80|_||1A
@@ -32789,6 +33489,8 @@ ldd|z80n|_||ED A8
 ldd|z80n_strict|_||ED A8
 ldd (bc), a|8080|X||02;0B
 ldd (bc), a|8085|X||02;0B
+ldd (bc), a|ez80|X||02;0B
+ldd (bc), a|ez80_z80|X||02;0B
 ldd (bc), a|gbz80|X||02;0B
 ldd (bc), a|kc160|_||02;0B
 ldd (bc), a|kc160_z80|_||02;0B
@@ -32814,6 +33516,8 @@ ldd (de), %n|z80|X||EB;36 %n;EB;1B
 ldd (de), %n|z80n|X||EB;36 %n;EB;1B
 ldd (de), a|8080|X||12;1B
 ldd (de), a|8085|X||12;1B
+ldd (de), a|ez80|X||12;1B
+ldd (de), a|ez80_z80|X||12;1B
 ldd (de), a|gbz80|X||12;1B
 ldd (de), a|kc160|_||12;1B
 ldd (de), a|kc160_z80|_||12;1B
@@ -32827,6 +33531,8 @@ ldd (de), a|z80|X||12;1B
 ldd (de), a|z80n|X||12;1B
 ldd (de), b|8080|X||EB;70;EB;1B
 ldd (de), b|8085|X||EB;70;EB;1B
+ldd (de), b|ez80|X||EB;70;EB;1B
+ldd (de), b|ez80_z80|X||EB;70;EB;1B
 ldd (de), b|kc160|_||EB;70;EB;1B
 ldd (de), b|kc160_z80|_||EB;70;EB;1B
 ldd (de), b|r2ka|_||EB;70;EB;1B
@@ -32839,6 +33545,8 @@ ldd (de), b|z80|X||EB;70;EB;1B
 ldd (de), b|z80n|X||EB;70;EB;1B
 ldd (de), c|8080|X||EB;71;EB;1B
 ldd (de), c|8085|X||EB;71;EB;1B
+ldd (de), c|ez80|X||EB;71;EB;1B
+ldd (de), c|ez80_z80|X||EB;71;EB;1B
 ldd (de), c|kc160|_||EB;71;EB;1B
 ldd (de), c|kc160_z80|_||EB;71;EB;1B
 ldd (de), c|r2ka|_||EB;71;EB;1B
@@ -32851,6 +33559,8 @@ ldd (de), c|z80|X||EB;71;EB;1B
 ldd (de), c|z80n|X||EB;71;EB;1B
 ldd (de), d|8080|X||EB;74;EB;1B
 ldd (de), d|8085|X||EB;74;EB;1B
+ldd (de), d|ez80|X||EB;74;EB;1B
+ldd (de), d|ez80_z80|X||EB;74;EB;1B
 ldd (de), d|kc160|_||EB;74;EB;1B
 ldd (de), d|kc160_z80|_||EB;74;EB;1B
 ldd (de), d|r2ka|_||EB;74;EB;1B
@@ -32863,6 +33573,8 @@ ldd (de), d|z80|X||EB;74;EB;1B
 ldd (de), d|z80n|X||EB;74;EB;1B
 ldd (de), e|8080|X||EB;75;EB;1B
 ldd (de), e|8085|X||EB;75;EB;1B
+ldd (de), e|ez80|X||EB;75;EB;1B
+ldd (de), e|ez80_z80|X||EB;75;EB;1B
 ldd (de), e|kc160|_||EB;75;EB;1B
 ldd (de), e|kc160_z80|_||EB;75;EB;1B
 ldd (de), e|r2ka|_||EB;75;EB;1B
@@ -32875,6 +33587,8 @@ ldd (de), e|z80|X||EB;75;EB;1B
 ldd (de), e|z80n|X||EB;75;EB;1B
 ldd (de), h|8080|X||EB;72;EB;1B
 ldd (de), h|8085|X||EB;72;EB;1B
+ldd (de), h|ez80|X||EB;72;EB;1B
+ldd (de), h|ez80_z80|X||EB;72;EB;1B
 ldd (de), h|kc160|_||EB;72;EB;1B
 ldd (de), h|kc160_z80|_||EB;72;EB;1B
 ldd (de), h|r2ka|_||EB;72;EB;1B
@@ -32887,6 +33601,8 @@ ldd (de), h|z80|X||EB;72;EB;1B
 ldd (de), h|z80n|X||EB;72;EB;1B
 ldd (de), l|8080|X||EB;73;EB;1B
 ldd (de), l|8085|X||EB;73;EB;1B
+ldd (de), l|ez80|X||EB;73;EB;1B
+ldd (de), l|ez80_z80|X||EB;73;EB;1B
 ldd (de), l|kc160|_||EB;73;EB;1B
 ldd (de), l|kc160_z80|_||EB;73;EB;1B
 ldd (de), l|r2ka|_||EB;73;EB;1B
@@ -32912,6 +33628,8 @@ ldd (hl), %n|z80|X||36 %n;2B
 ldd (hl), %n|z80n|X||36 %n;2B
 ldd (hl), a|8080|X||77;2B
 ldd (hl), a|8085|X||77;2B
+ldd (hl), a|ez80|X||77;2B
+ldd (hl), a|ez80_z80|X||77;2B
 ldd (hl), a|gbz80|_||32
 ldd (hl), a|gbz80_strict|_||32
 ldd (hl), a|kc160|_||77;2B
@@ -32926,6 +33644,8 @@ ldd (hl), a|z80|X||77;2B
 ldd (hl), a|z80n|X||77;2B
 ldd (hl), b|8080|X||70;2B
 ldd (hl), b|8085|X||70;2B
+ldd (hl), b|ez80|X||70;2B
+ldd (hl), b|ez80_z80|X||70;2B
 ldd (hl), b|gbz80|X||70;2B
 ldd (hl), b|kc160|_||70;2B
 ldd (hl), b|kc160_z80|_||70;2B
@@ -32939,6 +33659,8 @@ ldd (hl), b|z80|X||70;2B
 ldd (hl), b|z80n|X||70;2B
 ldd (hl), c|8080|X||71;2B
 ldd (hl), c|8085|X||71;2B
+ldd (hl), c|ez80|X||71;2B
+ldd (hl), c|ez80_z80|X||71;2B
 ldd (hl), c|gbz80|X||71;2B
 ldd (hl), c|kc160|_||71;2B
 ldd (hl), c|kc160_z80|_||71;2B
@@ -32952,6 +33674,8 @@ ldd (hl), c|z80|X||71;2B
 ldd (hl), c|z80n|X||71;2B
 ldd (hl), d|8080|X||72;2B
 ldd (hl), d|8085|X||72;2B
+ldd (hl), d|ez80|X||72;2B
+ldd (hl), d|ez80_z80|X||72;2B
 ldd (hl), d|gbz80|X||72;2B
 ldd (hl), d|kc160|_||72;2B
 ldd (hl), d|kc160_z80|_||72;2B
@@ -32965,6 +33689,8 @@ ldd (hl), d|z80|X||72;2B
 ldd (hl), d|z80n|X||72;2B
 ldd (hl), e|8080|X||73;2B
 ldd (hl), e|8085|X||73;2B
+ldd (hl), e|ez80|X||73;2B
+ldd (hl), e|ez80_z80|X||73;2B
 ldd (hl), e|gbz80|X||73;2B
 ldd (hl), e|kc160|_||73;2B
 ldd (hl), e|kc160_z80|_||73;2B
@@ -32978,6 +33704,8 @@ ldd (hl), e|z80|X||73;2B
 ldd (hl), e|z80n|X||73;2B
 ldd (hl), h|8080|X||74;2B
 ldd (hl), h|8085|X||74;2B
+ldd (hl), h|ez80|X||74;2B
+ldd (hl), h|ez80_z80|X||74;2B
 ldd (hl), h|gbz80|X||74;2B
 ldd (hl), h|kc160|_||74;2B
 ldd (hl), h|kc160_z80|_||74;2B
@@ -32991,6 +33719,8 @@ ldd (hl), h|z80|X||74;2B
 ldd (hl), h|z80n|X||74;2B
 ldd (hl), l|8080|X||75;2B
 ldd (hl), l|8085|X||75;2B
+ldd (hl), l|ez80|X||75;2B
+ldd (hl), l|ez80_z80|X||75;2B
 ldd (hl), l|gbz80|X||75;2B
 ldd (hl), l|kc160|_||75;2B
 ldd (hl), l|kc160_z80|_||75;2B
@@ -33004,6 +33734,8 @@ ldd (hl), l|z80|X||75;2B
 ldd (hl), l|z80n|X||75;2B
 ldd a, (bc)|8080|X||0A;0B
 ldd a, (bc)|8085|X||0A;0B
+ldd a, (bc)|ez80|X||0A;0B
+ldd a, (bc)|ez80_z80|X||0A;0B
 ldd a, (bc)|gbz80|X||0A;0B
 ldd a, (bc)|kc160|_||0A;0B
 ldd a, (bc)|kc160_z80|_||0A;0B
@@ -33017,6 +33749,8 @@ ldd a, (bc)|z80|X||0A;0B
 ldd a, (bc)|z80n|X||0A;0B
 ldd a, (de)|8080|X||1A;1B
 ldd a, (de)|8085|X||1A;1B
+ldd a, (de)|ez80|X||1A;1B
+ldd a, (de)|ez80_z80|X||1A;1B
 ldd a, (de)|gbz80|X||1A;1B
 ldd a, (de)|kc160|_||1A;1B
 ldd a, (de)|kc160_z80|_||1A;1B
@@ -33030,6 +33764,8 @@ ldd a, (de)|z80|X||1A;1B
 ldd a, (de)|z80n|X||1A;1B
 ldd a, (hl)|8080|X||7E;2B
 ldd a, (hl)|8085|X||7E;2B
+ldd a, (hl)|ez80|X||7E;2B
+ldd a, (hl)|ez80_z80|X||7E;2B
 ldd a, (hl)|gbz80|_||3A
 ldd a, (hl)|gbz80_strict|_||3A
 ldd a, (hl)|kc160|_||7E;2B
@@ -33044,6 +33780,8 @@ ldd a, (hl)|z80|X||7E;2B
 ldd a, (hl)|z80n|X||7E;2B
 ldd b, (de)|8080|X||EB;46;EB;1B
 ldd b, (de)|8085|X||EB;46;EB;1B
+ldd b, (de)|ez80|X||EB;46;EB;1B
+ldd b, (de)|ez80_z80|X||EB;46;EB;1B
 ldd b, (de)|kc160|_||EB;46;EB;1B
 ldd b, (de)|kc160_z80|_||EB;46;EB;1B
 ldd b, (de)|r2ka|_||EB;46;EB;1B
@@ -33056,6 +33794,8 @@ ldd b, (de)|z80|X||EB;46;EB;1B
 ldd b, (de)|z80n|X||EB;46;EB;1B
 ldd b, (hl)|8080|X||46;2B
 ldd b, (hl)|8085|X||46;2B
+ldd b, (hl)|ez80|X||46;2B
+ldd b, (hl)|ez80_z80|X||46;2B
 ldd b, (hl)|gbz80|X||46;2B
 ldd b, (hl)|kc160|_||46;2B
 ldd b, (hl)|kc160_z80|_||46;2B
@@ -33069,6 +33809,8 @@ ldd b, (hl)|z80|X||46;2B
 ldd b, (hl)|z80n|X||46;2B
 ldd c, (de)|8080|X||EB;4E;EB;1B
 ldd c, (de)|8085|X||EB;4E;EB;1B
+ldd c, (de)|ez80|X||EB;4E;EB;1B
+ldd c, (de)|ez80_z80|X||EB;4E;EB;1B
 ldd c, (de)|kc160|_||EB;4E;EB;1B
 ldd c, (de)|kc160_z80|_||EB;4E;EB;1B
 ldd c, (de)|r2ka|_||EB;4E;EB;1B
@@ -33081,6 +33823,8 @@ ldd c, (de)|z80|X||EB;4E;EB;1B
 ldd c, (de)|z80n|X||EB;4E;EB;1B
 ldd c, (hl)|8080|X||4E;2B
 ldd c, (hl)|8085|X||4E;2B
+ldd c, (hl)|ez80|X||4E;2B
+ldd c, (hl)|ez80_z80|X||4E;2B
 ldd c, (hl)|gbz80|X||4E;2B
 ldd c, (hl)|kc160|_||4E;2B
 ldd c, (hl)|kc160_z80|_||4E;2B
@@ -33094,6 +33838,8 @@ ldd c, (hl)|z80|X||4E;2B
 ldd c, (hl)|z80n|X||4E;2B
 ldd d, (de)|8080|X||EB;66;EB;1B
 ldd d, (de)|8085|X||EB;66;EB;1B
+ldd d, (de)|ez80|X||EB;66;EB;1B
+ldd d, (de)|ez80_z80|X||EB;66;EB;1B
 ldd d, (de)|kc160|_||EB;66;EB;1B
 ldd d, (de)|kc160_z80|_||EB;66;EB;1B
 ldd d, (de)|r2ka|_||EB;66;EB;1B
@@ -33106,6 +33852,8 @@ ldd d, (de)|z80|X||EB;66;EB;1B
 ldd d, (de)|z80n|X||EB;66;EB;1B
 ldd d, (hl)|8080|X||56;2B
 ldd d, (hl)|8085|X||56;2B
+ldd d, (hl)|ez80|X||56;2B
+ldd d, (hl)|ez80_z80|X||56;2B
 ldd d, (hl)|gbz80|X||56;2B
 ldd d, (hl)|kc160|_||56;2B
 ldd d, (hl)|kc160_z80|_||56;2B
@@ -33119,6 +33867,8 @@ ldd d, (hl)|z80|X||56;2B
 ldd d, (hl)|z80n|X||56;2B
 ldd e, (de)|8080|X||EB;6E;EB;1B
 ldd e, (de)|8085|X||EB;6E;EB;1B
+ldd e, (de)|ez80|X||EB;6E;EB;1B
+ldd e, (de)|ez80_z80|X||EB;6E;EB;1B
 ldd e, (de)|kc160|_||EB;6E;EB;1B
 ldd e, (de)|kc160_z80|_||EB;6E;EB;1B
 ldd e, (de)|r2ka|_||EB;6E;EB;1B
@@ -33131,6 +33881,8 @@ ldd e, (de)|z80|X||EB;6E;EB;1B
 ldd e, (de)|z80n|X||EB;6E;EB;1B
 ldd e, (hl)|8080|X||5E;2B
 ldd e, (hl)|8085|X||5E;2B
+ldd e, (hl)|ez80|X||5E;2B
+ldd e, (hl)|ez80_z80|X||5E;2B
 ldd e, (hl)|gbz80|X||5E;2B
 ldd e, (hl)|kc160|_||5E;2B
 ldd e, (hl)|kc160_z80|_||5E;2B
@@ -33144,6 +33896,8 @@ ldd e, (hl)|z80|X||5E;2B
 ldd e, (hl)|z80n|X||5E;2B
 ldd h, (de)|8080|X||EB;56;EB;1B
 ldd h, (de)|8085|X||EB;56;EB;1B
+ldd h, (de)|ez80|X||EB;56;EB;1B
+ldd h, (de)|ez80_z80|X||EB;56;EB;1B
 ldd h, (de)|kc160|_||EB;56;EB;1B
 ldd h, (de)|kc160_z80|_||EB;56;EB;1B
 ldd h, (de)|r2ka|_||EB;56;EB;1B
@@ -33156,6 +33910,8 @@ ldd h, (de)|z80|X||EB;56;EB;1B
 ldd h, (de)|z80n|X||EB;56;EB;1B
 ldd h, (hl)|8080|X||66;2B
 ldd h, (hl)|8085|X||66;2B
+ldd h, (hl)|ez80|X||66;2B
+ldd h, (hl)|ez80_z80|X||66;2B
 ldd h, (hl)|gbz80|X||66;2B
 ldd h, (hl)|kc160|_||66;2B
 ldd h, (hl)|kc160_z80|_||66;2B
@@ -33169,6 +33925,8 @@ ldd h, (hl)|z80|X||66;2B
 ldd h, (hl)|z80n|X||66;2B
 ldd l, (de)|8080|X||EB;5E;EB;1B
 ldd l, (de)|8085|X||EB;5E;EB;1B
+ldd l, (de)|ez80|X||EB;5E;EB;1B
+ldd l, (de)|ez80_z80|X||EB;5E;EB;1B
 ldd l, (de)|kc160|_||EB;5E;EB;1B
 ldd l, (de)|kc160_z80|_||EB;5E;EB;1B
 ldd l, (de)|r2ka|_||EB;5E;EB;1B
@@ -33181,6 +33939,8 @@ ldd l, (de)|z80|X||EB;5E;EB;1B
 ldd l, (de)|z80n|X||EB;5E;EB;1B
 ldd l, (hl)|8080|X||6E;2B
 ldd l, (hl)|8085|X||6E;2B
+ldd l, (hl)|ez80|X||6E;2B
+ldd l, (hl)|ez80_z80|X||6E;2B
 ldd l, (hl)|gbz80|X||6E;2B
 ldd l, (hl)|kc160|_||6E;2B
 ldd l, (hl)|kc160_z80|_||6E;2B
@@ -33372,6 +34132,8 @@ ldi|z80n|_||ED A0
 ldi|z80n_strict|_||ED A0
 ldi (bc), a|8080|X||02;03
 ldi (bc), a|8085|X||02;03
+ldi (bc), a|ez80|X||02;03
+ldi (bc), a|ez80_z80|X||02;03
 ldi (bc), a|gbz80|X||02;03
 ldi (bc), a|kc160|_||02;03
 ldi (bc), a|kc160_z80|_||02;03
@@ -33397,6 +34159,8 @@ ldi (de), %n|z80|X||EB;36 %n;EB;13
 ldi (de), %n|z80n|X||EB;36 %n;EB;13
 ldi (de), a|8080|X||12;13
 ldi (de), a|8085|X||12;13
+ldi (de), a|ez80|X||12;13
+ldi (de), a|ez80_z80|X||12;13
 ldi (de), a|gbz80|X||12;13
 ldi (de), a|kc160|_||12;13
 ldi (de), a|kc160_z80|_||12;13
@@ -33410,6 +34174,8 @@ ldi (de), a|z80|X||12;13
 ldi (de), a|z80n|X||12;13
 ldi (de), b|8080|X||EB;70;EB;13
 ldi (de), b|8085|X||EB;70;EB;13
+ldi (de), b|ez80|X||EB;70;EB;13
+ldi (de), b|ez80_z80|X||EB;70;EB;13
 ldi (de), b|kc160|_||EB;70;EB;13
 ldi (de), b|kc160_z80|_||EB;70;EB;13
 ldi (de), b|r2ka|_||EB;70;EB;13
@@ -33422,6 +34188,8 @@ ldi (de), b|z80|X||EB;70;EB;13
 ldi (de), b|z80n|X||EB;70;EB;13
 ldi (de), c|8080|X||EB;71;EB;13
 ldi (de), c|8085|X||EB;71;EB;13
+ldi (de), c|ez80|X||EB;71;EB;13
+ldi (de), c|ez80_z80|X||EB;71;EB;13
 ldi (de), c|kc160|_||EB;71;EB;13
 ldi (de), c|kc160_z80|_||EB;71;EB;13
 ldi (de), c|r2ka|_||EB;71;EB;13
@@ -33434,6 +34202,8 @@ ldi (de), c|z80|X||EB;71;EB;13
 ldi (de), c|z80n|X||EB;71;EB;13
 ldi (de), d|8080|X||EB;74;EB;13
 ldi (de), d|8085|X||EB;74;EB;13
+ldi (de), d|ez80|X||EB;74;EB;13
+ldi (de), d|ez80_z80|X||EB;74;EB;13
 ldi (de), d|kc160|_||EB;74;EB;13
 ldi (de), d|kc160_z80|_||EB;74;EB;13
 ldi (de), d|r2ka|_||EB;74;EB;13
@@ -33446,6 +34216,8 @@ ldi (de), d|z80|X||EB;74;EB;13
 ldi (de), d|z80n|X||EB;74;EB;13
 ldi (de), e|8080|X||EB;75;EB;13
 ldi (de), e|8085|X||EB;75;EB;13
+ldi (de), e|ez80|X||EB;75;EB;13
+ldi (de), e|ez80_z80|X||EB;75;EB;13
 ldi (de), e|kc160|_||EB;75;EB;13
 ldi (de), e|kc160_z80|_||EB;75;EB;13
 ldi (de), e|r2ka|_||EB;75;EB;13
@@ -33458,6 +34230,8 @@ ldi (de), e|z80|X||EB;75;EB;13
 ldi (de), e|z80n|X||EB;75;EB;13
 ldi (de), h|8080|X||EB;72;EB;13
 ldi (de), h|8085|X||EB;72;EB;13
+ldi (de), h|ez80|X||EB;72;EB;13
+ldi (de), h|ez80_z80|X||EB;72;EB;13
 ldi (de), h|kc160|_||EB;72;EB;13
 ldi (de), h|kc160_z80|_||EB;72;EB;13
 ldi (de), h|r2ka|_||EB;72;EB;13
@@ -33470,6 +34244,8 @@ ldi (de), h|z80|X||EB;72;EB;13
 ldi (de), h|z80n|X||EB;72;EB;13
 ldi (de), l|8080|X||EB;73;EB;13
 ldi (de), l|8085|X||EB;73;EB;13
+ldi (de), l|ez80|X||EB;73;EB;13
+ldi (de), l|ez80_z80|X||EB;73;EB;13
 ldi (de), l|kc160|_||EB;73;EB;13
 ldi (de), l|kc160_z80|_||EB;73;EB;13
 ldi (de), l|r2ka|_||EB;73;EB;13
@@ -33495,6 +34271,8 @@ ldi (hl), %n|z80|X||36 %n;23
 ldi (hl), %n|z80n|X||36 %n;23
 ldi (hl), a|8080|X||77;23
 ldi (hl), a|8085|X||77;23
+ldi (hl), a|ez80|X||77;23
+ldi (hl), a|ez80_z80|X||77;23
 ldi (hl), a|gbz80|_||22
 ldi (hl), a|gbz80_strict|_||22
 ldi (hl), a|kc160|_||77;23
@@ -33509,6 +34287,8 @@ ldi (hl), a|z80|X||77;23
 ldi (hl), a|z80n|X||77;23
 ldi (hl), b|8080|X||70;23
 ldi (hl), b|8085|X||70;23
+ldi (hl), b|ez80|X||70;23
+ldi (hl), b|ez80_z80|X||70;23
 ldi (hl), b|gbz80|X||70;23
 ldi (hl), b|kc160|_||70;23
 ldi (hl), b|kc160_z80|_||70;23
@@ -33522,6 +34302,8 @@ ldi (hl), b|z80|X||70;23
 ldi (hl), b|z80n|X||70;23
 ldi (hl), bc|8080|X||71;23;70;23
 ldi (hl), bc|8085|X||71;23;70;23
+ldi (hl), bc|ez80|X||71;23;70;23
+ldi (hl), bc|ez80_z80|X||71;23;70;23
 ldi (hl), bc|gbz80|X||71;23;70;23
 ldi (hl), bc|kc160|_||71;23;70;23
 ldi (hl), bc|kc160_z80|_||71;23;70;23
@@ -33535,6 +34317,8 @@ ldi (hl), bc|z80|X||71;23;70;23
 ldi (hl), bc|z80n|X||71;23;70;23
 ldi (hl), c|8080|X||71;23
 ldi (hl), c|8085|X||71;23
+ldi (hl), c|ez80|X||71;23
+ldi (hl), c|ez80_z80|X||71;23
 ldi (hl), c|gbz80|X||71;23
 ldi (hl), c|kc160|_||71;23
 ldi (hl), c|kc160_z80|_||71;23
@@ -33548,6 +34332,8 @@ ldi (hl), c|z80|X||71;23
 ldi (hl), c|z80n|X||71;23
 ldi (hl), d|8080|X||72;23
 ldi (hl), d|8085|X||72;23
+ldi (hl), d|ez80|X||72;23
+ldi (hl), d|ez80_z80|X||72;23
 ldi (hl), d|gbz80|X||72;23
 ldi (hl), d|kc160|_||72;23
 ldi (hl), d|kc160_z80|_||72;23
@@ -33561,6 +34347,8 @@ ldi (hl), d|z80|X||72;23
 ldi (hl), d|z80n|X||72;23
 ldi (hl), de|8080|X||73;23;72;23
 ldi (hl), de|8085|X||73;23;72;23
+ldi (hl), de|ez80|X||73;23;72;23
+ldi (hl), de|ez80_z80|X||73;23;72;23
 ldi (hl), de|gbz80|X||73;23;72;23
 ldi (hl), de|kc160|_||73;23;72;23
 ldi (hl), de|kc160_z80|_||73;23;72;23
@@ -33574,6 +34362,8 @@ ldi (hl), de|z80|X||73;23;72;23
 ldi (hl), de|z80n|X||73;23;72;23
 ldi (hl), e|8080|X||73;23
 ldi (hl), e|8085|X||73;23
+ldi (hl), e|ez80|X||73;23
+ldi (hl), e|ez80_z80|X||73;23
 ldi (hl), e|gbz80|X||73;23
 ldi (hl), e|kc160|_||73;23
 ldi (hl), e|kc160_z80|_||73;23
@@ -33587,6 +34377,8 @@ ldi (hl), e|z80|X||73;23
 ldi (hl), e|z80n|X||73;23
 ldi (hl), h|8080|X||74;23
 ldi (hl), h|8085|X||74;23
+ldi (hl), h|ez80|X||74;23
+ldi (hl), h|ez80_z80|X||74;23
 ldi (hl), h|gbz80|X||74;23
 ldi (hl), h|kc160|_||74;23
 ldi (hl), h|kc160_z80|_||74;23
@@ -33629,6 +34421,8 @@ ldi (hl), iy|z80|X||D5;FD E5;D1;73;23;72;23;D1
 ldi (hl), iy|z80n|X||D5;FD E5;D1;73;23;72;23;D1
 ldi (hl), l|8080|X||75;23
 ldi (hl), l|8085|X||75;23
+ldi (hl), l|ez80|X||75;23
+ldi (hl), l|ez80_z80|X||75;23
 ldi (hl), l|gbz80|X||75;23
 ldi (hl), l|kc160|_||75;23
 ldi (hl), l|kc160_z80|_||75;23
@@ -33642,6 +34436,8 @@ ldi (hl), l|z80|X||75;23
 ldi (hl), l|z80n|X||75;23
 ldi a, (bc)|8080|X||0A;03
 ldi a, (bc)|8085|X||0A;03
+ldi a, (bc)|ez80|X||0A;03
+ldi a, (bc)|ez80_z80|X||0A;03
 ldi a, (bc)|gbz80|X||0A;03
 ldi a, (bc)|kc160|_||0A;03
 ldi a, (bc)|kc160_z80|_||0A;03
@@ -33655,6 +34451,8 @@ ldi a, (bc)|z80|X||0A;03
 ldi a, (bc)|z80n|X||0A;03
 ldi a, (de)|8080|X||1A;13
 ldi a, (de)|8085|X||1A;13
+ldi a, (de)|ez80|X||1A;13
+ldi a, (de)|ez80_z80|X||1A;13
 ldi a, (de)|gbz80|X||1A;13
 ldi a, (de)|kc160|_||1A;13
 ldi a, (de)|kc160_z80|_||1A;13
@@ -33668,6 +34466,8 @@ ldi a, (de)|z80|X||1A;13
 ldi a, (de)|z80n|X||1A;13
 ldi a, (hl)|8080|X||7E;23
 ldi a, (hl)|8085|X||7E;23
+ldi a, (hl)|ez80|X||7E;23
+ldi a, (hl)|ez80_z80|X||7E;23
 ldi a, (hl)|gbz80|_||2A
 ldi a, (hl)|gbz80_strict|_||2A
 ldi a, (hl)|kc160|_||7E;23
@@ -33682,6 +34482,8 @@ ldi a, (hl)|z80|X||7E;23
 ldi a, (hl)|z80n|X||7E;23
 ldi b, (de)|8080|X||EB;46;EB;13
 ldi b, (de)|8085|X||EB;46;EB;13
+ldi b, (de)|ez80|X||EB;46;EB;13
+ldi b, (de)|ez80_z80|X||EB;46;EB;13
 ldi b, (de)|kc160|_||EB;46;EB;13
 ldi b, (de)|kc160_z80|_||EB;46;EB;13
 ldi b, (de)|r2ka|_||EB;46;EB;13
@@ -33694,6 +34496,8 @@ ldi b, (de)|z80|X||EB;46;EB;13
 ldi b, (de)|z80n|X||EB;46;EB;13
 ldi b, (hl)|8080|X||46;23
 ldi b, (hl)|8085|X||46;23
+ldi b, (hl)|ez80|X||46;23
+ldi b, (hl)|ez80_z80|X||46;23
 ldi b, (hl)|gbz80|X||46;23
 ldi b, (hl)|kc160|_||46;23
 ldi b, (hl)|kc160_z80|_||46;23
@@ -33707,6 +34511,8 @@ ldi b, (hl)|z80|X||46;23
 ldi b, (hl)|z80n|X||46;23
 ldi bc, (hl)|8080|X||4E;23;46;23
 ldi bc, (hl)|8085|X||4E;23;46;23
+ldi bc, (hl)|ez80|X||4E;23;46;23
+ldi bc, (hl)|ez80_z80|X||4E;23;46;23
 ldi bc, (hl)|gbz80|X||4E;23;46;23
 ldi bc, (hl)|kc160|_||4E;23;46;23
 ldi bc, (hl)|kc160_z80|_||4E;23;46;23
@@ -33720,6 +34526,8 @@ ldi bc, (hl)|z80|X||4E;23;46;23
 ldi bc, (hl)|z80n|X||4E;23;46;23
 ldi c, (de)|8080|X||EB;4E;EB;13
 ldi c, (de)|8085|X||EB;4E;EB;13
+ldi c, (de)|ez80|X||EB;4E;EB;13
+ldi c, (de)|ez80_z80|X||EB;4E;EB;13
 ldi c, (de)|kc160|_||EB;4E;EB;13
 ldi c, (de)|kc160_z80|_||EB;4E;EB;13
 ldi c, (de)|r2ka|_||EB;4E;EB;13
@@ -33732,6 +34540,8 @@ ldi c, (de)|z80|X||EB;4E;EB;13
 ldi c, (de)|z80n|X||EB;4E;EB;13
 ldi c, (hl)|8080|X||4E;23
 ldi c, (hl)|8085|X||4E;23
+ldi c, (hl)|ez80|X||4E;23
+ldi c, (hl)|ez80_z80|X||4E;23
 ldi c, (hl)|gbz80|X||4E;23
 ldi c, (hl)|kc160|_||4E;23
 ldi c, (hl)|kc160_z80|_||4E;23
@@ -33745,6 +34555,8 @@ ldi c, (hl)|z80|X||4E;23
 ldi c, (hl)|z80n|X||4E;23
 ldi d, (de)|8080|X||EB;66;EB;13
 ldi d, (de)|8085|X||EB;66;EB;13
+ldi d, (de)|ez80|X||EB;66;EB;13
+ldi d, (de)|ez80_z80|X||EB;66;EB;13
 ldi d, (de)|kc160|_||EB;66;EB;13
 ldi d, (de)|kc160_z80|_||EB;66;EB;13
 ldi d, (de)|r2ka|_||EB;66;EB;13
@@ -33757,6 +34569,8 @@ ldi d, (de)|z80|X||EB;66;EB;13
 ldi d, (de)|z80n|X||EB;66;EB;13
 ldi d, (hl)|8080|X||56;23
 ldi d, (hl)|8085|X||56;23
+ldi d, (hl)|ez80|X||56;23
+ldi d, (hl)|ez80_z80|X||56;23
 ldi d, (hl)|gbz80|X||56;23
 ldi d, (hl)|kc160|_||56;23
 ldi d, (hl)|kc160_z80|_||56;23
@@ -33770,6 +34584,8 @@ ldi d, (hl)|z80|X||56;23
 ldi d, (hl)|z80n|X||56;23
 ldi de, (hl)|8080|X||5E;23;56;23
 ldi de, (hl)|8085|X||5E;23;56;23
+ldi de, (hl)|ez80|X||5E;23;56;23
+ldi de, (hl)|ez80_z80|X||5E;23;56;23
 ldi de, (hl)|gbz80|X||5E;23;56;23
 ldi de, (hl)|kc160|_||5E;23;56;23
 ldi de, (hl)|kc160_z80|_||5E;23;56;23
@@ -33783,6 +34599,8 @@ ldi de, (hl)|z80|X||5E;23;56;23
 ldi de, (hl)|z80n|X||5E;23;56;23
 ldi e, (de)|8080|X||EB;6E;EB;13
 ldi e, (de)|8085|X||EB;6E;EB;13
+ldi e, (de)|ez80|X||EB;6E;EB;13
+ldi e, (de)|ez80_z80|X||EB;6E;EB;13
 ldi e, (de)|kc160|_||EB;6E;EB;13
 ldi e, (de)|kc160_z80|_||EB;6E;EB;13
 ldi e, (de)|r2ka|_||EB;6E;EB;13
@@ -33795,6 +34613,8 @@ ldi e, (de)|z80|X||EB;6E;EB;13
 ldi e, (de)|z80n|X||EB;6E;EB;13
 ldi e, (hl)|8080|X||5E;23
 ldi e, (hl)|8085|X||5E;23
+ldi e, (hl)|ez80|X||5E;23
+ldi e, (hl)|ez80_z80|X||5E;23
 ldi e, (hl)|gbz80|X||5E;23
 ldi e, (hl)|kc160|_||5E;23
 ldi e, (hl)|kc160_z80|_||5E;23
@@ -33808,6 +34628,8 @@ ldi e, (hl)|z80|X||5E;23
 ldi e, (hl)|z80n|X||5E;23
 ldi h, (de)|8080|X||EB;56;EB;13
 ldi h, (de)|8085|X||EB;56;EB;13
+ldi h, (de)|ez80|X||EB;56;EB;13
+ldi h, (de)|ez80_z80|X||EB;56;EB;13
 ldi h, (de)|kc160|_||EB;56;EB;13
 ldi h, (de)|kc160_z80|_||EB;56;EB;13
 ldi h, (de)|r2ka|_||EB;56;EB;13
@@ -33820,6 +34642,8 @@ ldi h, (de)|z80|X||EB;56;EB;13
 ldi h, (de)|z80n|X||EB;56;EB;13
 ldi h, (hl)|8080|X||66;23
 ldi h, (hl)|8085|X||66;23
+ldi h, (hl)|ez80|X||66;23
+ldi h, (hl)|ez80_z80|X||66;23
 ldi h, (hl)|gbz80|X||66;23
 ldi h, (hl)|kc160|_||66;23
 ldi h, (hl)|kc160_z80|_||66;23
@@ -33853,6 +34677,8 @@ ldi iy, (hl)|z80|X||D5;5E;23;56;23;D5;FD E1;D1
 ldi iy, (hl)|z80n|X||D5;5E;23;56;23;D5;FD E1;D1
 ldi l, (de)|8080|X||EB;5E;EB;13
 ldi l, (de)|8085|X||EB;5E;EB;13
+ldi l, (de)|ez80|X||EB;5E;EB;13
+ldi l, (de)|ez80_z80|X||EB;5E;EB;13
 ldi l, (de)|kc160|_||EB;5E;EB;13
 ldi l, (de)|kc160_z80|_||EB;5E;EB;13
 ldi l, (de)|r2ka|_||EB;5E;EB;13
@@ -33865,6 +34691,8 @@ ldi l, (de)|z80|X||EB;5E;EB;13
 ldi l, (de)|z80n|X||EB;5E;EB;13
 ldi l, (hl)|8080|X||6E;23
 ldi l, (hl)|8085|X||6E;23
+ldi l, (hl)|ez80|X||6E;23
+ldi l, (hl)|ez80_z80|X||6E;23
 ldi l, (hl)|gbz80|X||6E;23
 ldi l, (hl)|kc160|_||6E;23
 ldi l, (hl)|kc160_z80|_||6E;23
@@ -34099,6 +34927,8 @@ lhld %m|z80|_||2A %m %m
 lhld %m|z80n|_||2A %m %m
 lhlde|8080|X||EB;5E;23;56;2B;EB
 lhlde|8085|_||ED
+lhlde|ez80|X||EB;5E;23;56;2B;EB
+lhlde|ez80_z80|X||EB;5E;23;56;2B;EB
 lhlde|gbz80|X||E5;D5;E1;D1;5E;23;56;2B;E5;D5;E1;D1
 lhlde|kc160|_||EB;5E;23;56;2B;EB
 lhlde|kc160_z80|_||EB;5E;23;56;2B;EB
@@ -34112,6 +34942,8 @@ lhlde|z80|X||EB;5E;23;56;2B;EB
 lhlde|z80n|X||EB;5E;23;56;2B;EB
 lhlx|8080|X||EB;5E;23;56;2B;EB
 lhlx|8085|_||ED
+lhlx|ez80|X||EB;5E;23;56;2B;EB
+lhlx|ez80_z80|X||EB;5E;23;56;2B;EB
 lhlx|gbz80|X||E5;D5;E1;D1;5E;23;56;2B;E5;D5;E1;D1
 lhlx|kc160|_||EB;5E;23;56;2B;EB
 lhlx|kc160_z80|_||EB;5E;23;56;2B;EB
@@ -41505,6 +42337,8 @@ shld %m|z80|_||22 %m %m
 shld %m|z80n|_||22 %m %m
 shlde|8080|X||EB;73;23;72;2B;EB
 shlde|8085|_||D9
+shlde|ez80|X||EB;73;23;72;2B;EB
+shlde|ez80_z80|X||EB;73;23;72;2B;EB
 shlde|gbz80|X||E5;D5;E1;D1;73;23;72;2B;E5;D5;E1;D1
 shlde|kc160|_||EB;73;23;72;2B;EB
 shlde|kc160_z80|_||EB;73;23;72;2B;EB
@@ -41518,6 +42352,8 @@ shlde|z80|X||EB;73;23;72;2B;EB
 shlde|z80n|X||EB;73;23;72;2B;EB
 shlx|8080|X||EB;73;23;72;2B;EB
 shlx|8085|_||D9
+shlx|ez80|X||EB;73;23;72;2B;EB
+shlx|ez80_z80|X||EB;73;23;72;2B;EB
 shlx|gbz80|X||E5;D5;E1;D1;73;23;72;2B;E5;D5;E1;D1
 shlx|kc160|_||EB;73;23;72;2B;EB
 shlx|kc160_z80|_||EB;73;23;72;2B;EB
@@ -42899,6 +43735,8 @@ stax b|8080|_||02
 stax b|8080_strict|_||02
 stax b|8085|_||02
 stax b|8085_strict|_||02
+stax b|ez80|_||02
+stax b|ez80_z80|_||02
 stax b|gbz80|_||02
 stax b|kc160|_||02
 stax b|kc160_z80|_||02
@@ -42912,6 +43750,8 @@ stax b|z80|_||02
 stax b|z80n|_||02
 stax bc|8080|_||02
 stax bc|8085|_||02
+stax bc|ez80|_||02
+stax bc|ez80_z80|_||02
 stax bc|gbz80|_||02
 stax bc|kc160|_||02
 stax bc|kc160_z80|_||02
@@ -42927,6 +43767,8 @@ stax d|8080|_||12
 stax d|8080_strict|_||12
 stax d|8085|_||12
 stax d|8085_strict|_||12
+stax d|ez80|_||12
+stax d|ez80_z80|_||12
 stax d|gbz80|_||12
 stax d|kc160|_||12
 stax d|kc160_z80|_||12
@@ -42940,6 +43782,8 @@ stax d|z80|_||12
 stax d|z80n|_||12
 stax de|8080|_||12
 stax de|8085|_||12
+stax de|ez80|_||12
+stax de|ez80_z80|_||12
 stax de|gbz80|_||12
 stax de|kc160|_||12
 stax de|kc160_z80|_||12

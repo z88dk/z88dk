@@ -2138,6 +2138,47 @@ sub add_opcodes {
 				}
 			}
 		},
+		"ld a, (<rp>) [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			for my $rp ('bc', 'de') {
+				add_opcode($cpu, "ld a, ($rp)", [0x0A+16*RP($rp)]);
+				add_opcode($cpu, "ld ($rp), a", [0x02+16*RP($rp)]);
+				if ($adl_mode) {
+					add_opcode($cpu, "ld.s a, ($rp)", [0x52, 0x0A+16*RP($rp)]);
+					add_opcode($cpu, "ld.sil a, ($rp)", [0x52, 0x0A+16*RP($rp)]);
+					add_opcode($cpu, "ld.s ($rp), a", [0x52, 0x02+16*RP($rp)]);
+					add_opcode($cpu, "ld.sil ($rp), a", [0x52, 0x02+16*RP($rp)]);
+				}
+				else {
+					add_opcode($cpu, "ld.l a, ($rp)", [0x49, 0x0A+16*RP($rp)]);
+					add_opcode($cpu, "ld.lis a, ($rp)", [0x49, 0x0A+16*RP($rp)]);
+					add_opcode($cpu, "ld.l ($rp), a", [0x49, 0x02+16*RP($rp)]);
+					add_opcode($cpu, "ld.lis ($rp), a", [0x49, 0x02+16*RP($rp)]);
+				}
+			}
+		},
+		"ld (hl), <r> [ez80]" => sub {
+			my($cpu) = @_;
+			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+			for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
+				add_opcode($cpu, "ld $r, (hl)", [0x40+8*R($r)+6]);
+				add_opcode($cpu, "ld (hl), $r", [0x40+8*6+R($r)]);
+				if ($adl_mode) {
+					add_opcode($cpu, "ld.s $r, (hl)", [0x52, 0x40+8*R($r)+6]);
+					add_opcode($cpu, "ld.sil $r, (hl)", [0x52, 0x40+8*R($r)+6]);
+					add_opcode($cpu, "ld.s (hl), $r", [0x52, 0x40+8*6+R($r)]);
+					add_opcode($cpu, "ld.sil (hl), $r", [0x52, 0x40+8*6+R($r)]);
+				}
+				else {
+					add_opcode($cpu, "ld.l $r, (hl)", [0x49, 0x40+8*R($r)+6]);
+					add_opcode($cpu, "ld.lis $r, (hl)", [0x49, 0x40+8*R($r)+6]);
+					add_opcode($cpu, "ld.l (hl), $r", [0x49, 0x40+8*6+R($r)]);
+					add_opcode($cpu, "ld.lis (hl), $r", [0x49, 0x40+8*6+R($r)]);
+				}
+			}
+		},
+		
 	};
 	
 	$actions->{$key}->($cpu);

@@ -123,6 +123,10 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         add_opcodes($cpu, "lda/sta [ez80]") if !$strict;
         add_opcodes($cpu, "ld a, (NN) [ez80]");
 
+        add_opcodes($cpu, "ldax <r>/stax <r> [8080]") if !$strict;
+        add_opcodes($cpu, "ldax <rp>/stax <rp> [8080]") if !$strict;
+        add_opcodes($cpu, "ld a, (<rp>) [ez80]");
+        add_opcodes($cpu, "ld (hl), <r> [ez80]");
 
         add_opcodes($cpu, "ld i/r, a");
 		add_opcodes($cpu, "ld mb, a [ez80]");
@@ -137,10 +141,6 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         #add_opcodes($cpu, "ld <x>, (NN)");
 		#add_opcodes($cpu, "ld <rp>, (NN)");
 
-        #add_opcodes($cpu, "ldax <r>/stax <r> [8080]") if !$strict;
-        #add_opcodes($cpu, "ldax <rp>/stax <rp> [8080]") if !$strict;
-        #add_opcodes($cpu, "ld a, (<rp>)");
-
 		#add_opcodes($cpu, "stc [8080]") if !$strict;
 		#add_opcodes($cpu, "scf");
 
@@ -149,7 +149,6 @@ for my $cpu1 ('ez80', 'ez80_z80') {
 		#add_opcodes($cpu, "<rot> <r>");
 		#add_opcodes($cpu, "<rot> (<x>+DIS)");
 		
-
 		#add_opcodes($cpu, "rst NN");
 		
 		#add_opcodes($cpu, "ret");
