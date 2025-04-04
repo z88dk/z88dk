@@ -1,6 +1,8 @@
 #include "stdlib_tests.h"
 #include <stdint.h>
 
+#ifndef __8080
+
 struct lookup {
   int32_t codepoint;
   unsigned char byte1;
@@ -668,3 +670,4 @@ int test_bsearch()
     suite_add_test(bsearch_case1);
     return suite_run();
 }
+#endif

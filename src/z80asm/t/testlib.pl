@@ -112,7 +112,7 @@ sub ticks {
 	(Test::More->builder->is_passing) or die;
 
 	my $cpu = ($options =~ /(?:-m=?)(\S+)/) ? $1 : "z80";
-	run_ok("z88dk-ticks -m$cpu $test.bin -output $test.out");
+	run_ok("z88dk-ticks -z80asm-tests -m$cpu $test.bin -output $test.out");
 
 	(Test::More->builder->is_passing) or die;
 
