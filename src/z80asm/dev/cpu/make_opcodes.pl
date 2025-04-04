@@ -2178,6 +2178,11 @@ sub add_opcodes {
 				}
 			}
 		},
+		"ld i, hl [ez80]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld hl, i", [0xED, 0xD7]);
+			add_opcode($cpu, "ld i, hl", [0xED, 0xC7]);
+		},
 		
 	};
 	

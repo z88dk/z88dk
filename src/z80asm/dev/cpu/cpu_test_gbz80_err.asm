@@ -13101,11 +13101,13 @@
  ld hl, bc'                     ; Error
  ld hl, de'                     ; Error
  ld hl, hl'                     ; Error
+ ld hl, i                       ; Error
  ld hl, ix                      ; Error
  ld hl, iy                      ; Error
  ld hl, lxpc                    ; Error
  ld htr, a                      ; Error
  ld i, a                        ; Error
+ ld i, hl                       ; Error
  ld iir, a                      ; Error
  ld ix, (0x1234)                ; Error
  ld ix, (a:0x1234)              ; Error

@@ -10018,8 +10018,10 @@
  ld hl, bc'                     ; Error
  ld hl, de'                     ; Error
  ld hl, hl'                     ; Error
+ ld hl, i                       ; Error
  ld hl, lxpc                    ; Error
  ld htr, a                      ; Error
+ ld i, hl                       ; Error
  ld iir, a                      ; Error
  ld ix, (pw)                    ; Error
  ld ix, (pw+0)                  ; Error

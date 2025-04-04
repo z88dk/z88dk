@@ -7212,9 +7212,11 @@
  ld hl, (ziy+126)               ; Error
  ld hl, (ziy-128)               ; Error
  ld hl, (zp:0x1234)             ; Error
+ ld hl, i                       ; Error
  ld hl, lxpc                    ; Error
  ld htr, a                      ; Error
  ld i, a                        ; Error
+ ld i, hl                       ; Error
  ld ix, (a:0x1234)              ; Error
  ld ix, (aix)                   ; Error
  ld ix, (aix+0)                 ; Error

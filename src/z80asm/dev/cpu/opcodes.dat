@@ -30447,6 +30447,10 @@ ld hl, hl'|r2ka|_||D9;E5;D9;E1
 ld hl, hl'|r3k|_||D9;E5;D9;E1
 ld hl, hl'|r4k|_||D9;E5;D9;E1
 ld hl, hl'|r5k|_||D9;E5;D9;E1
+ld hl, i|ez80|_||ED D7
+ld hl, i|ez80_strict|_||ED D7
+ld hl, i|ez80_z80|_||ED D7
+ld hl, i|ez80_z80_strict|_||ED D7
 ld hl, ix|kc160|_||DD E5;E1
 ld hl, ix|kc160_z80|_||DD E5;E1
 ld hl, ix|r2ka|_||DD 7C
@@ -30512,6 +30516,10 @@ ld i, a|z80|_||ED 47
 ld i, a|z80_strict|_||ED 47
 ld i, a|z80n|_||ED 47
 ld i, a|z80n_strict|_||ED 47
+ld i, hl|ez80|_||ED C7
+ld i, hl|ez80_strict|_||ED C7
+ld i, hl|ez80_z80|_||ED C7
+ld i, hl|ez80_z80_strict|_||ED C7
 ld iir, a|r2ka|_||ED 4F
 ld iir, a|r3k|_||ED 4F
 ld iir, a|r4k|_||ED 4F

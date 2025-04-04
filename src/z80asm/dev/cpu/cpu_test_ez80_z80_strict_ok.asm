@@ -935,7 +935,9 @@
  ld h, (iy+0)                   ; FD 66 00
  ld h, (iy+126)                 ; FD 66 7E
  ld h, (iy-128)                 ; FD 66 80
+ ld hl, i                       ; ED D7
  ld i, a                        ; ED 47
+ ld i, hl                       ; ED C7
  ld l, (hl)                     ; 6E
  ld l, (ix)                     ; DD 6E 00
  ld l, (ix+0)                   ; DD 6E 00

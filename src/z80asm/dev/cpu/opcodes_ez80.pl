@@ -129,6 +129,7 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         add_opcodes($cpu, "ld (hl), <r> [ez80]");
 
         add_opcodes($cpu, "ld i/r, a");
+        add_opcodes($cpu, "ld i, hl [ez80]");
 		add_opcodes($cpu, "ld mb, a [ez80]");
 		
 		#add_opcodes($cpu, "lxi <r>, NN") if !$strict;

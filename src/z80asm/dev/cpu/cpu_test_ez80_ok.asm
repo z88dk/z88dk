@@ -1718,7 +1718,9 @@
  ld hl, (iy+0)                  ; FD 6E 00 FD 66 01
  ld hl, (iy+126)                ; FD 6E 7E FD 66 7F
  ld hl, (iy-128)                ; FD 6E 80 FD 66 81
+ ld hl, i                       ; ED D7
  ld i, a                        ; ED 47
+ ld i, hl                       ; ED C7
  ld l, (de)                     ; EB 5E EB
  ld l, (de+)                    ; EB 5E EB 13
  ld l, (de-)                    ; EB 5E EB 1B
