@@ -26,6 +26,5 @@ char *gets(char *s)
 	    *end = 0;
         }
     }
-	if (! *ret) return NULL;
     return ret;
 }
