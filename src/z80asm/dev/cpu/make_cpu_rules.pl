@@ -458,6 +458,9 @@ sub parse_code_opcode {
 	elsif ($bytes =~ s/ %s 0$//) {
 		$stmt = "DO_stmt_s_0";
 	}
+	elsif ($bytes =~ s/ %s 0 0$//) {
+		$stmt = "DO_stmt_s_0_0";
+	}
 	elsif ($bytes =~ s/ %M %M$//) {
 		$stmt = "DO_stmt_NN";
 	}

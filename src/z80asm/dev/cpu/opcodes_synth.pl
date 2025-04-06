@@ -350,20 +350,30 @@ for my $cpu (Opcode->cpus) {
 	# LD (HL), BC|DE
 	for my $rp ('bc', 'de') {
 		my($h, $l) = split //, $rp;
+		add_synth($cpu, "ld (hl+), $rp", 
+							"ld (hl), $rp", "inc hl", "inc hl");
+		add_synth($cpu, "ldi (hl), $rp", 
+							"ld (hl), $l", "inc hl", "ld (hl), $h", "inc hl");
+							
 		add_synth($cpu, "ld (hl), $rp", 
 							"ld (hl), $l", "inc hl", "ld (hl), $h", "dec hl");
 		add_synth($cpu, "ld (hl+), $rp", 
 							"ld (hl), $l", "inc hl", "ld (hl), $h", "inc hl");
 		add_synth($cpu, "ldi (hl), $rp", 
-							"ld (hl), $l", "inc hl", "ld (hl), $h", "inc hl");
+							"ld (hl), $rp", "inc hl", "inc hl");
 	}
 	
 	# LD (HL), HL
-	add_synth($cpu, "ld (hl), hl",
-						"push af", 
-						"ld a, h", "ld (hl), l", "inc hl", "ld (hl), a",
-						"pop af", "dec hl");
 	if ($cpu !~ /^r\dk/) {	# not yet for Rabbits
+		add_synth($cpu, "ld (hl+), hl",
+							"ld (hl), hl", "inc hl", "inc hl");
+		add_synth($cpu, "ldi (hl), hl",
+							"ld (hl), hl", "inc hl", "inc hl");
+							
+		add_synth($cpu, "ld (hl), hl",
+							"push af", 
+							"ld a, h", "ld (hl), l", "inc hl", "ld (hl), a",
+							"pop af", "dec hl");
 		add_synth($cpu, "ld (hl+), hl",
 							"push af", 
 							"ld a, h", "ld (hl), l", "inc hl", "ld (hl), a",
@@ -446,6 +456,11 @@ for my $cpu (Opcode->cpus) {
 	# LD BC|DE, (HL)
 	for my $rp ('bc', 'de') {
 		my($h, $l) = split //, $rp;
+		add_synth($cpu, "ld $rp, (hl+)", 
+							"ld $rp, (hl)", "inc hl", "inc hl");
+		add_synth($cpu, "ldi $rp, (hl)", 
+							"ld $rp, (hl)", "inc hl", "inc hl");
+							
 		add_synth($cpu, "ld $rp, (hl)", 
 							"ld $l, (hl)", "inc hl", "ld $h, (hl)", "dec hl");
 		add_synth($cpu, "ld $rp, (hl+)", 
