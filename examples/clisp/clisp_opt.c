@@ -1,7 +1,7 @@
 
 #ifndef FILES
 #asm
-.i_52
+.new_sticker_sub
 	ld	hl,40	;const
 	add	hl,sp
 	ld	sp,hl		; STICKER
