@@ -502,7 +502,7 @@ char gchar() {
 	zx_slow();
 #endif
     if (ug==13) {
-      while (!gets(buf)) {};
+      while (!gets(buf)||(! *buf)) {};
       cpt=0;
     }
 #ifdef ZX81_32K
@@ -723,12 +723,7 @@ l_read(void)
   } else if (ch != '('){         /* t, nil, symbol, or integer */
     token[0] = ch;
 
-// This is a workaround to skip the extra newline character (CR + LF)
-#ifdef __Z80
-    for (i = 0; ; i++){
-#else
     for (i = 1; ; i++){
-#endif
       ch = gchar();
       if (isspace(ch) || iscntrl(ch) || (ch < 0) 
           || (ch == ';') || (ch == '(') || (ch == ')')){
