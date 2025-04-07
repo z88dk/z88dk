@@ -107,7 +107,7 @@
 	exx
 	ret
 =
-	jp	i_52
+	jp	new_sticker_sub
 
 	pop	bc
 	pop	bc
@@ -336,7 +336,7 @@
 	ld	hl,65535	;const
 	ret
 =
-	jp	i_52
+	jp	new_sticker_sub
 
 
 	ld	hl,%1	;const
