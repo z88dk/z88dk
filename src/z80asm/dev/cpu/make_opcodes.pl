@@ -164,8 +164,8 @@ sub add_opcode_ez80_sis_lil {
 	}
 }
 
-# add ez80 suffixes for jump instructions
-sub add_opcode_ez80_jump {
+# add ez80 suffixes for call instructions
+sub add_opcode_ez80_call {
 	my($cpu, $asm, $ops, $const) = @_;
 	my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
 
@@ -192,6 +192,35 @@ sub add_opcode_ez80_jump {
 		add_opcode($cpu, $asm =~ s/^(\w+)/$1.sis/r, [0x40, @ops2bytes], $const);
 		add_opcode($cpu, $asm =~ s/^(\w+)/$1.il/r, [0x52, @ops3bytes], $const);
 		add_opcode($cpu, $asm =~ s/^(\w+)/$1.sil/r, [0x52, @ops3bytes], $const);
+	}
+}
+
+# add ez80 suffixes for jump instructions
+sub add_opcode_ez80_jump {
+	my($cpu, $asm, $ops, $const) = @_;
+	my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
+
+	my @ops2bytes = @{clone($ops)};
+	@ops2bytes > 2 && $ops2bytes[-1] eq '%m' && $ops2bytes[-2] eq '%m' &&
+					  $ops2bytes[-3] ne '%m'
+		or die "expected %m %m, got @ops2bytes";
+		
+	my @ops3bytes = (@ops2bytes, '%m');
+	@ops3bytes > 3 && $ops3bytes[-1] eq '%m' && $ops3bytes[-2] eq '%m' &&
+					  $ops3bytes[-3] eq '%m' && $ops3bytes[-4] ne '%m'
+		or die "expected %m %m %m, got @ops3bytes";
+	
+	if ($adl_mode) {
+		add_opcode($cpu, $asm, [@ops3bytes], $const);
+		add_opcode($cpu, $asm =~ s/^(\w+)/$1.il/r, [0x5B, @ops3bytes], $const);
+		add_opcode($cpu, $asm =~ s/^(\w+)/$1.lil/r, [0x5B, @ops3bytes], $const);
+		add_opcode($cpu, $asm =~ s/^(\w+)/$1.sis/r, [0x40, @ops2bytes], $const);
+	}
+	else {
+		add_opcode($cpu, $asm, [@ops2bytes], $const);
+		add_opcode($cpu, $asm =~ s/^(\w+)/$1.is/r, [0x40, @ops2bytes], $const);
+		add_opcode($cpu, $asm =~ s/^(\w+)/$1.sis/r, [0x40, @ops2bytes], $const);
+		add_opcode($cpu, $asm =~ s/^(\w+)/$1.lil/r, [0x5B, @ops3bytes], $const);
 	}
 }
 
@@ -1470,53 +1499,14 @@ sub add_opcodes {
 		},
 		"call <f>, NN [ez80]" => sub {
 			my($cpu) = @_;
-#			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
 			for my $f (cpu_flags($cpu)) {
-				add_opcode_ez80_jump($cpu, "call $f, %m", 
+				add_opcode_ez80_call($cpu, "call $f, %m", 
 							   [0xC4+8*F($f), '%m', '%m']);
-#				if ($adl_mode) {
-#					add_opcode($cpu, "call $f, %m", 
-#							   [0xC4+8*F($f), '%m', '%m', '%m']);
-#					add_opcode($cpu, "call.is $f, %m", 
-#							   [0x49, 0xC4+8*F($f), '%m', '%m']);
-#					add_opcode($cpu, "call.lis $f, %m", 
-#							   [0x49, 0xC4+8*F($f), '%m', '%m']);
-#					add_opcode($cpu, "call.il $f, %m", 
-#							   [0x5B, 0xC4+8*F($f), '%m', '%m', '%m']);
-#					add_opcode($cpu, "call.lil $f, %m", 
-#							   [0x5B, 0xC4+8*F($f), '%m', '%m', '%m']);
-#				}
-#				else {
-#					add_opcode($cpu, "call $f, %m", 
-#							   [0xC4+8*F($f), '%m', '%m']);
-#					add_opcode($cpu, "call.is $f, %m", 
-#							   [0x40, 0xC4+8*F($f), '%m', '%m']);
-#					add_opcode($cpu, "call.sis $f, %m", 
-#							   [0x40, 0xC4+8*F($f), '%m', '%m']);
-#					add_opcode($cpu, "call.il $f, %m", 
-#							   [0x52, 0xC4+8*F($f), '%m', '%m', '%m']);
-#					add_opcode($cpu, "call.sil $f, %m", 
-#							   [0x52, 0xC4+8*F($f), '%m', '%m', '%m']);
-#				}
 			}
 		},
 		"call NN [ez80]" => sub {
 			my($cpu) = @_;
-			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
-			if ($adl_mode) {
-				add_opcode($cpu, "call %m", [0xCD, '%m', '%m', '%m']);
-				add_opcode($cpu, "call.is %m", [0x49, 0xCD, '%m', '%m']);
-				add_opcode($cpu, "call.lis %m", [0x49, 0xCD, '%m', '%m']);
-				add_opcode($cpu, "call.il %m", [0x5B, 0xCD, '%m', '%m', '%m']);
-				add_opcode($cpu, "call.lil %m", [0x5B, 0xCD, '%m', '%m', '%m']);
-			}
-			else {
-				add_opcode($cpu, "call %m", [0xCD, '%m', '%m']);
-				add_opcode($cpu, "call.is %m", [0x40, 0xCD, '%m', '%m']);
-				add_opcode($cpu, "call.sis %m", [0x40, 0xCD, '%m', '%m']);
-				add_opcode($cpu, "call.il %m", [0x52, 0xCD, '%m', '%m', '%m']);
-				add_opcode($cpu, "call.sil %m", [0x52, 0xCD, '%m', '%m', '%m']);
-			}
+			add_opcode_ez80_call($cpu, "call %m", [0xCD, '%m', '%m']);
 		},
 		"c<flag> NN [ez80]" => sub {
 			my($cpu) = @_;
@@ -1623,38 +1613,16 @@ sub add_opcodes {
 		},
 		"jp <f>, NN [ez80]" => sub {
 			my($cpu) = @_;
-			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
 			for my $f (cpu_flags($cpu)) {
-				if ($adl_mode) {
-					add_opcode($cpu, "jp $f, %m", [0xC2+8*F($f), '%m', '%m', '%m']);
-					add_opcode($cpu, "jp.il $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
-					add_opcode($cpu, "jp.lil $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
-					add_opcode($cpu, "jp.sis $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
-				}
-				else {
-					add_opcode($cpu, "jp $f, %m", [0xC2+8*F($f), '%m', '%m']);
-					add_opcode($cpu, "jp.is $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
-					add_opcode($cpu, "jp.sis $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
-					add_opcode($cpu, "jp.lil $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
-				}
+				add_opcode_ez80_jump($cpu, "jp $f, %m", 
+						[0xC2+8*F($f), '%m', '%m']);
 			}
 		},
 		"jmp <f>, NN [ez80]" => sub {
 			my($cpu) = @_;
-			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
 			for my $f (cpu_flags($cpu)) {
-				if ($adl_mode) {
-					add_opcode($cpu, "jmp $f, %m", [0xC2+8*F($f), '%m', '%m', '%m']);
-					add_opcode($cpu, "jmp.il $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
-					add_opcode($cpu, "jmp.lil $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
-					add_opcode($cpu, "jmp.sis $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
-				}
-				else {
-					add_opcode($cpu, "jmp $f, %m", [0xC2+8*F($f), '%m', '%m']);
-					add_opcode($cpu, "jmp.is $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
-					add_opcode($cpu, "jmp.sis $f, %m", [0x40, 0xC2+8*F($f), '%m', '%m']);
-					add_opcode($cpu, "jmp.lil $f, %m", [0x5B, 0xC2+8*F($f), '%m', '%m', '%m']);
-				}
+				add_opcode_ez80_jump($cpu, "jmp $f, %m", 
+						[0xC2+8*F($f), '%m', '%m']);
 			}
 		},
 		"j<f> NN [ez80]" => sub {
@@ -1704,35 +1672,11 @@ sub add_opcodes {
 		},
 		"jp NN [ez80]" => sub {
 			my($cpu) = @_;
-			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
-			if ($adl_mode) {
-				add_opcode($cpu, "jp %m", [0xC3, '%m', '%m', '%m']);
-				add_opcode($cpu, "jp.il %m", [0x5B, 0xC3, '%m', '%m', '%m']);
-				add_opcode($cpu, "jp.lil %m", [0x5B, 0xC3, '%m', '%m', '%m']);
-				add_opcode($cpu, "jp.sis %m", [0x40, 0xC3, '%m', '%m']);
-			}
-			else {
-				add_opcode($cpu, "jp %m", [0xC3, '%m', '%m']);
-				add_opcode($cpu, "jp.is %m", [0x40, 0xC3, '%m', '%m']);
-				add_opcode($cpu, "jp.sis %m", [0x40, 0xC3, '%m', '%m']);
-				add_opcode($cpu, "jp.lil %m", [0x5B, 0xC3, '%m', '%m', '%m']);
-			}
+			add_opcode_ez80_jump($cpu, "jp %m", [0xC3, '%m', '%m']);
 		},
 		"jmp NN [ez80]" => sub {
 			my($cpu) = @_;
-			my $adl_mode = $cpu =~ /ez80_z80/ ? 0 : 1;
-			if ($adl_mode) {
-				add_opcode($cpu, "jmp %m", [0xC3, '%m', '%m', '%m']);
-				add_opcode($cpu, "jmp.il %m", [0x5B, 0xC3, '%m', '%m', '%m']);
-				add_opcode($cpu, "jmp.lil %m", [0x5B, 0xC3, '%m', '%m', '%m']);
-				add_opcode($cpu, "jmp.sis %m", [0x40, 0xC3, '%m', '%m']);
-			}
-			else {
-				add_opcode($cpu, "jmp %m", [0xC3, '%m', '%m']);
-				add_opcode($cpu, "jmp.is %m", [0x40, 0xC3, '%m', '%m']);
-				add_opcode($cpu, "jmp.sis %m", [0x40, 0xC3, '%m', '%m']);
-				add_opcode($cpu, "jmp.lil %m", [0x5B, 0xC3, '%m', '%m', '%m']);
-			}
+			add_opcode_ez80_jump($cpu, "jmp %m", [0xC3, '%m', '%m']);
 		},
 		"ld (<x>+DIS), <r> [ez80]" => sub {
 			my($cpu) = @_;
