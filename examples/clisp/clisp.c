@@ -46,8 +46,8 @@ z88dk build hints:
 ------------------
 
 Spectrum 
-zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
-zcc +zx -lndos -O3 -create-app -DLARGEMEM=3000 -DGRAPHICS  -DSHORT -DSPECLISP clisp.c
+  zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
+  zcc +zx -lndos -O3 -create-app -DLARGEMEM=3000 -DGRAPHICS  -DSHORT -DSPECLISP clisp.c
 
 zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded), 2 programs needed
   zcc +zx81 -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DINITONLY clisp.c
@@ -63,7 +63,11 @@ zx80 16K, minimalistic version, (add -DGRAPHICS for graphics support)
 
 MicroBee  
   zcc +bee -O3 -create-app -DLARGEMEM=1200 -DGRAPHICS -DNOTIMER -lgfxbee512  clisp.c
-  
+
+Visual 1050
+  zcc +cpm -subtype=v1050 -O3 -create-app -DLARGEMEM=2000 -DGRAPHICS -DFILES clisp.c
+  zcc +cpm -subtype=v1050 -O3 -create-app -DLARGEMEM=5800 -DSHORT -DGRAPHICS -DFILES clisp.c
+
 Plain CP/M with file support to load programs
   zcc +cpm -O3 -create-app -DLARGEMEM=2000 -DFILES clisp.c
   
