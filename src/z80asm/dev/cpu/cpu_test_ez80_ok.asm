@@ -2336,8 +2336,8 @@
  ld.sil l, (iy+0)               ; 52 FD 6E 00
  ld.sil l, (iy+126)             ; 52 FD 6E 7E
  ld.sil l, (iy-128)             ; 52 FD 6E 80
- ld.sis (0x123456), a           ; 40 32 56 34 12
- ld.sis a, (0x123456)           ; 40 3A 56 34 12
+ ld.sis (0x1234), a             ; 40 32 34 12
+ ld.sis a, (0x1234)             ; 40 3A 34 12
  ld.sis bc, 0x1234              ; 40 01 34 12
  ld.sis de, 0x1234              ; 40 11 34 12
  ld.sis hl, 0x1234              ; 40 21 34 12

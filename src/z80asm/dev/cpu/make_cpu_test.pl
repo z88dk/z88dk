@@ -298,8 +298,8 @@ sub add {
 			if (!$const{$c}) {
 				my $asm_ixiy = $asm =~ s/%c/$c/r;
 				$all_opcodes{ALL}{$asm_ixiy} = 1;
+			}
 		}
-	}
 	}
 	else {
 		my @hex_bytes = @bytes;
@@ -356,6 +356,8 @@ sub compute_labels {
 			@bytes = (@before, sprintf("%02X", ($target) & 0xFF), @after);
 			$bytes = join ' ', @bytes;
 		}
+		
+		#say "$asm; @bytes";
 		
 		die $bytes if $bytes =~ /%/;
 

@@ -1209,8 +1209,8 @@
  ld.l l, (iy+0)                 ; 49 DD 6E 00
  ld.l l, (iy+126)               ; 49 DD 6E 7E
  ld.l l, (iy-128)               ; 49 DD 6E 80
- ld.lil (0x1234), a             ; 5B 32 34 12
- ld.lil a, (0x1234)             ; 5B 3A 34 12
+ ld.lil (0x123456), a           ; 5B 32 56 34 12
+ ld.lil a, (0x123456)           ; 5B 3A 56 34 12
  ld.lil bc, 0x123456            ; 5B 01 56 34 12
  ld.lil de, 0x123456            ; 5B 11 56 34 12
  ld.lil hl, 0x123456            ; 5B 21 56 34 12

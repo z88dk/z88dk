@@ -83804,7 +83804,7 @@ if (!ctx->expr_in_parens) return false;
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5BLL);
-add_opcode_nn(0x3A, Expr1_clone(expr), 0);
+add_opcode_nnn(0x3A, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -83923,7 +83923,7 @@ if (!ctx->expr_in_parens) return false;
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x5BLL);
-add_opcode_nn(0x32, Expr1_clone(expr), 0);
+add_opcode_nnn(0x32, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -89892,7 +89892,7 @@ if (!ctx->expr_in_parens) return false;
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40LL);
-add_opcode_nnn(0x3A, Expr1_clone(expr), 0);
+add_opcode_nn(0x3A, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;
@@ -90011,7 +90011,7 @@ if (!ctx->expr_in_parens) return false;
 DO_STMT_LABEL();
 Expr1 *expr = pop_expr(ctx);
 DO_stmt(0x40LL);
-add_opcode_nnn(0x32, Expr1_clone(expr), 0);
+add_opcode_nn(0x32, Expr1_clone(expr), 0);
 OBJ_DELETE(expr);
 }
 break;

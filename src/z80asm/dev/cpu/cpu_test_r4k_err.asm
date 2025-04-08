@@ -6723,8 +6723,8 @@
  ld.l l, (iy+0)                 ; Error
  ld.l l, (iy+126)               ; Error
  ld.l l, (iy-128)               ; Error
- ld.lil (0x1234), a             ; Error
- ld.lil a, (0x1234)             ; Error
+ ld.lil (0x123456), a           ; Error
+ ld.lil a, (0x123456)           ; Error
  ld.lil bc, 0x123456            ; Error
  ld.lil de, 0x123456            ; Error
  ld.lil hl, 0x123456            ; Error
@@ -7403,8 +7403,8 @@
  ld.sil l, (iy+0)               ; Error
  ld.sil l, (iy+126)             ; Error
  ld.sil l, (iy-128)             ; Error
- ld.sis (0x123456), a           ; Error
- ld.sis a, (0x123456)           ; Error
+ ld.sis (0x1234), a             ; Error
+ ld.sis a, (0x1234)             ; Error
  ld.sis bc, 0x1234              ; Error
  ld.sis de, 0x1234              ; Error
  ld.sis hl, 0x1234              ; Error

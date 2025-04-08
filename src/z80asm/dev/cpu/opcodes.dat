@@ -33152,10 +33152,10 @@ ld.l l, (iy)|ez80_z80|_||49;FD 6E 00
 ld.l l, (iy)|ez80_z80_strict|_||49;FD 6E 00
 ld.l l, (iy+%d)|ez80_z80|_||49;FD 6E %d
 ld.l l, (iy+%d)|ez80_z80_strict|_||49;FD 6E %d
-ld.lil (%m), a|ez80_z80|_||5B;32 %m %m
-ld.lil (%m), a|ez80_z80_strict|_||5B;32 %m %m
-ld.lil a, (%m)|ez80_z80|_||5B;3A %m %m
-ld.lil a, (%m)|ez80_z80_strict|_||5B;3A %m %m
+ld.lil (%m), a|ez80_z80|_||5B;32 %m %m %m
+ld.lil (%m), a|ez80_z80_strict|_||5B;32 %m %m %m
+ld.lil a, (%m)|ez80_z80|_||5B;3A %m %m %m
+ld.lil a, (%m)|ez80_z80_strict|_||5B;3A %m %m %m
 ld.lil bc, %m|ez80_z80|_||5B;01 %m %m %m
 ld.lil bc, %m|ez80_z80_strict|_||5B;01 %m %m %m
 ld.lil de, %m|ez80_z80|_||5B;11 %m %m %m
@@ -33918,10 +33918,10 @@ ld.sil l, (iy)|ez80|_||52;FD 6E 00
 ld.sil l, (iy)|ez80_strict|_||52;FD 6E 00
 ld.sil l, (iy+%d)|ez80|_||52;FD 6E %d
 ld.sil l, (iy+%d)|ez80_strict|_||52;FD 6E %d
-ld.sis (%m), a|ez80|_||40;32 %m %m %m
-ld.sis (%m), a|ez80_strict|_||40;32 %m %m %m
-ld.sis a, (%m)|ez80|_||40;3A %m %m %m
-ld.sis a, (%m)|ez80_strict|_||40;3A %m %m %m
+ld.sis (%m), a|ez80|_||40;32 %m %m
+ld.sis (%m), a|ez80_strict|_||40;32 %m %m
+ld.sis a, (%m)|ez80|_||40;3A %m %m
+ld.sis a, (%m)|ez80_strict|_||40;3A %m %m
 ld.sis bc, %m|ez80|_||40;01 %m %m
 ld.sis bc, %m|ez80_strict|_||40;01 %m %m
 ld.sis de, %m|ez80|_||40;11 %m %m
