@@ -41,7 +41,9 @@ typedef struct {
 
 #define READ_BYTE(state,val) do { \
     val = bk.get_memory(state->pc++, MEM_TYPE_INST); \
-    state->instr_bytes[state->len++] = val; \
+    if ( state->len < sizeof(state->instr_bytes)) \
+        state->instr_bytes[state->len++] = val; \
+    else state->len++; \
 } while (0)
 
 #define PEEK_BYTE(state,val) do { \
@@ -1279,7 +1281,11 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
     }
 
     for ( i = state->skip; i < state->len; i++ ) {
-        offs += snprintf(buf + offs, buflen - offs,"%s%02x", i ? " " : "", state->instr_bytes[i]);
+        if ( i < sizeof(state->instr_bytes)) {
+            offs += snprintf(buf + offs, buflen - offs,"%s%02x", i ? " " : "", state->instr_bytes[i]);
+        } else {
+            offs += snprintf(buf + offs, buflen - offs,"%s%s", i == sizeof(state->instr_bytes)  ? " " : "", ".");
+        }
     }
     if (compact <= 1) {
         if ( dolf ) {
