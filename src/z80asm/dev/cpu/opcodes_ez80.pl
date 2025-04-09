@@ -111,14 +111,11 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         add_opcodes($cpu, "jp (<x>) [ez80]");
         add_opcodes($cpu, "jmp (<x>) [ez80]") if !$strict;
 
-		#add_opcodes($cpu, "mov <r>, <r>") if !$strict;
-        #add_opcodes($cpu, "mvi <r>, N") if !$strict;
-		#add_opcodes($cpu, "ld <r>, <r>");
-        #add_opcodes($cpu, "ld <r>, N");
         add_opcodes($cpu, "ld <x8>, <r>");
         add_opcodes($cpu, "ld <x8>, N");
         add_opcodes($cpu, "ld (<x>+DIS), <r> [ez80]");
-        #add_opcodes($cpu, "ld (<x>+DIS), N");
+        add_opcodes($cpu, "ld (<x>+DIS), <rr> [ez80]");
+        add_opcodes($cpu, "ld (<x>+DIS), N [ez80]");
 
         add_opcodes($cpu, "lda/sta [ez80]") if !$strict;
         add_opcodes($cpu, "ld a, (NN) [ez80]");
@@ -132,6 +129,7 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         add_opcodes($cpu, "ld <x>, (hl) [ez80]");
         add_opcodes($cpu, "ld (hl), N [ez80]");
         add_opcodes($cpu, "ld <x>, (<x>+DIS) [ez80]");
+        add_opcodes($cpu, "ld (<x>+DIS), <x> [ez80]");
 
         add_opcodes($cpu, "ld i/r, a");
         add_opcodes($cpu, "ld i, hl [ez80]");
@@ -142,10 +140,19 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         add_opcodes($cpu, "ld <rp>, NN [ez80]");
         add_opcodes($cpu, "ld <x>, NN [ez80]");
 
-        #add_opcodes($cpu, "lhld/shld [8080]") if !$strict;
-        #add_opcodes($cpu, "ld hl, (NN)");
-        #add_opcodes($cpu, "ld <x>, (NN)");
-		#add_opcodes($cpu, "ld <rp>, (NN)");
+        add_opcodes($cpu, "lhld/shld [ez80]") if !$strict;
+        add_opcodes($cpu, "ld hl, (NN) [ez80]");
+        add_opcodes($cpu, "ld <x>, (NN) [ez80]");
+		add_opcodes($cpu, "ld <rp>, (NN) [ez80]");
+
+		add_opcodes($cpu, "mov <r>, <r>") if !$strict;
+		add_opcodes($cpu, "ld <r>, <r>");
+        add_opcodes($cpu, "mvi <r>, N") if !$strict;
+        add_opcodes($cpu, "ld <r>, N");
+
+		add_opcodes($cpu, "sphl [8080]") if !$strict;
+		add_opcodes($cpu, "ld sp, hl [ez80]");
+		add_opcodes($cpu, "ld sp, <x> [ez80]");
 
 		#add_opcodes($cpu, "stc [8080]") if !$strict;
 		#add_opcodes($cpu, "scf");
@@ -165,10 +172,6 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         #add_opcodes($cpu, "push/pop <r>") if !$strict;
         #add_opcodes($cpu, "push/pop <rp>");
         #add_opcodes($cpu, "push/pop <x>");
-
-		#add_opcodes($cpu, "sphl [8080]") if !$strict;
-		#add_opcodes($cpu, "ld sp, hl");
-		#add_opcodes($cpu, "ld sp, <x>");
 
 		#add_opcodes($cpu, "in/out-undoc") if !$strict;
 
