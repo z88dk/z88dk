@@ -40,9 +40,24 @@ for my $cpu1 ('ez80', 'ez80_z80') {
 		add_opcodes($cpu, "call NN [ez80]");
 		add_opcodes($cpu, "call <f>, NN [ez80]");
 
+		add_opcodes($cpu, "rst NN");
+
+		add_opcodes($cpu, "ret [ez80]");
+		add_opcodes($cpu, "r<f>") if !$strict;
+		add_opcodes($cpu, "r_<f>") if !$strict;
+		add_opcodes($cpu, "ret <f> [ez80]");
+
+		add_opcodes($cpu, "reti [ez80]");
+		add_opcodes($cpu, "retn [ez80]");
+
 		add_opcodes($cpu, "daa");
+		
 		add_opcodes($cpu, "cmc [8080]") if !$strict;
 		add_opcodes($cpu, "ccf");
+		
+		add_opcodes($cpu, "stc [8080]") if !$strict;
+		add_opcodes($cpu, "scf");
+
 		add_opcodes($cpu, "cma [8080]") if !$strict;
 		add_opcodes($cpu, "cpl");
 		add_opcodes($cpu, "cpl a") if !$strict;
@@ -75,6 +90,7 @@ for my $cpu1 ('ez80', 'ez80_z80') {
 		add_opcodes($cpu, "hlt [8080]") if !$strict;
 		add_opcodes($cpu, "halt");
         add_opcodes($cpu, "im N");
+		add_opcodes($cpu, "slp [z180]");
 
 		add_opcodes($cpu, "in N [8080]") if !$strict;
 		add_opcodes($cpu, "in a, (N)");
@@ -174,38 +190,32 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         add_opcodes($cpu, "push/pop <rp> [ez80]");
         add_opcodes($cpu, "push/pop <x> [ez80]");
 
-		#add_opcodes($cpu, "stc [8080]") if !$strict;
-		#add_opcodes($cpu, "scf");
-
-		#add_opcodes($cpu, "<rot-a> [8080]") if !$strict;
-		#add_opcodes($cpu, "<rot-a>");
-		#add_opcodes($cpu, "<rot> <r>");
-		#add_opcodes($cpu, "<rot> (<x>+DIS)");
+		add_opcodes($cpu, "<rot-a> [8080]") if !$strict;
+		add_opcodes($cpu, "<rot-a>");
+		add_opcodes($cpu, "<rot> (hl) [ez80]");
+		add_opcodes($cpu, "<rot> (<x>+DIS) [ez80]");
+		add_opcodes($cpu, "<rot> <r>");
 		
-		#add_opcodes($cpu, "rst NN");
+		add_opcodes($cpu, "rld/rrd");
+
+		add_opcodes($cpu, "rsmix/stmix [ez80]");
+
+		add_opcodes($cpu, "tst a, (hl) [ez80]");
+		add_opcodes($cpu, "tst (hl) [ez80]") if !$strict;
+		add_opcodes($cpu, "test a, (hl) [ez80]") if !$strict;
+		add_opcodes($cpu, "test (hl) [ez80]") if !$strict;
 		
-		#add_opcodes($cpu, "ret");
-		#add_opcodes($cpu, "r<f>") if !$strict;
-		#add_opcodes($cpu, "r_<f>") if !$strict;
-		#add_opcodes($cpu, "ret <f>");
-
-
-		#add_opcodes($cpu, "reti");
-		#add_opcodes($cpu, "retn");
-
-		#add_opcodes($cpu, "rld/rrd");
-
-
-		#add_opcodes($cpu, "tst <r> [z180]");
-		#add_opcodes($cpu, "tst a, <r> [z180]") if !$strict;
-		#add_opcodes($cpu, "test <r> [z180]") if !$strict;
-		#add_opcodes($cpu, "test a, <r> [z180]") if !$strict;
-		#add_opcodes($cpu, "tst N [z180]");
-		#add_opcodes($cpu, "tst a, N [z180]") if !$strict;
-		#add_opcodes($cpu, "test N [z180]") if !$strict;
-		#add_opcodes($cpu, "test a, N [z180]") if !$strict;
-		#add_opcodes($cpu, "tstio N [z180]");
-		#add_opcodes($cpu, "slp [z180]");
+		add_opcodes($cpu, "tst a, <r> [z180]");
+		add_opcodes($cpu, "tst <r> [z180]") if !$strict;
+		add_opcodes($cpu, "test <r> [z180]") if !$strict;
+		add_opcodes($cpu, "test a, <r> [z180]") if !$strict;
+		
+		add_opcodes($cpu, "tst a, N [z180]");
+		add_opcodes($cpu, "tst N [z180]") if !$strict;
+		add_opcodes($cpu, "test a, N [z180]") if !$strict;
+		add_opcodes($cpu, "test N [z180]") if !$strict;
+		
+		add_opcodes($cpu, "tstio N [z180]");
 		
 	}
 }
