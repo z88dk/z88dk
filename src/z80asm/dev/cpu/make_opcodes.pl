@@ -89,12 +89,12 @@ sub cpu_flags {
 	}
 }
 
-# if asm has (xx+%d), create opcode with (xx)
+# if asm has xx+%d, create opcode with xx
 sub add_opcode {
 	my($cpu, $asm, $ops, $const) = @_;
 
 	add_opcode_1($cpu, $asm, $ops, $const);
-	if ($asm =~ s/\((\w+)\+%d\)/($1)/) {
+	if ($asm =~ s/ (\w+) \+ %d /$1/x) {
 		my $ops1 = clone($ops);			# do not change callers data
 		for (@$ops1) {
 			s/^%d$/0/;
@@ -1637,12 +1637,14 @@ sub add_opcodes {
 			add_opcode_ez80_s_l($cpu, "inirx", [0xED, 0xC2]);
 			add_opcode_ez80_s_l($cpu, "indrx", [0xED, 0xCA]);
 		},
-		"outi/otir/outd/otdr [ez80]" => sub {
+		"outi/otir/outd/otdr/outi2/outd2 [ez80]" => sub {
 			my($cpu) = @_;
 			add_opcode_ez80_s_l($cpu, "outi", [0xED, 0xA3]);
 			add_opcode_ez80_s_l($cpu, "otir", [0xED, 0xB3]);
 			add_opcode_ez80_s_l($cpu, "outd", [0xED, 0xAB]);
 			add_opcode_ez80_s_l($cpu, "otdr", [0xED, 0xBB]);
+			add_opcode_ez80_s_l($cpu, "outi2", [0xED, 0xA4]);
+			add_opcode_ez80_s_l($cpu, "outd2", [0xED, 0xAC]);
 		},
 		"jp <f>, NN [ez80]" => sub {
 			my($cpu) = @_;
@@ -1913,7 +1915,70 @@ sub add_opcodes {
 				add_opcode_ez80_s_l($cpu, "ld sp, $x", [PFX($x), 0xF9]);
 			}
 		},
-
+		"ldi/ldir/ldd/lddr [ez80]" => sub {
+			my($cpu) = @_;
+			add_opcode_ez80_s_l($cpu, "ldi", [0xED, 0xA0]);
+			add_opcode_ez80_s_l($cpu, "ldir", [0xED, 0xB0]);
+			add_opcode_ez80_s_l($cpu, "ldd", [0xED, 0xA8]);
+			add_opcode_ez80_s_l($cpu, "lddr", [0xED, 0xB8]);
+		},
+		"lea <rr>, <x>+DIS [ez80]" => sub {
+			my($cpu) = @_;
+			for my $rp ('bc', 'de', 'hl') {
+				add_opcode_ez80_s_l($cpu, "lea $rp, ix+%d", 
+							[0xED, 0x02+16*RP($rp), '%d']);
+				add_opcode_ez80_s_l($cpu, "lea $rp, iy+%d", 
+							[0xED, 0x03+16*RP($rp), '%d']);
+			}
+		},
+		"lea <x>, <x>+DIS [ez80]" => sub {
+			my($cpu) = @_;
+			add_opcode_ez80_s_l($cpu, "lea ix, ix+%d", [0xED, 0x32, '%d']);
+			add_opcode_ez80_s_l($cpu, "lea iy, ix+%d", [0xED, 0x55, '%d']);
+			add_opcode_ez80_s_l($cpu, "lea ix, iy+%d", [0xED, 0x54, '%d']);
+			add_opcode_ez80_s_l($cpu, "lea iy, iy+%d", [0xED, 0x33, '%d']);
+		},
+		"pea <x>+DIS [ez80]" => sub {
+			my($cpu) = @_;
+			add_opcode_ez80_s_l($cpu, "pea ix+%d", [0xED, 0x65, '%d']);
+			add_opcode_ez80_s_l($cpu, "pea iy+%d", [0xED, 0x66, '%d']);
+		},
+		"otim/otimr/otdm/otdmr [ez80]" => sub {
+			my($cpu) = @_;
+			add_opcode_ez80_s_l($cpu, "otim",  [0xED, 0x83]);
+			add_opcode_ez80_s_l($cpu, "otimr", [0xED, 0x93]);
+			add_opcode_ez80_s_l($cpu, "otdm",  [0xED, 0x8B]);
+			add_opcode_ez80_s_l($cpu, "otdmr", [0xED, 0x9B]);
+		},
+		"oti2r/otirx/otd2r/otdrx [ez80]" => sub {
+			my($cpu) = @_;
+			add_opcode_ez80_s_l($cpu, "oti2r",  [0xED, 0xB4]);
+			add_opcode_ez80_s_l($cpu, "otirx",  [0xED, 0xC3]);
+			add_opcode_ez80_s_l($cpu, "otd2r",  [0xED, 0xBC]);
+			add_opcode_ez80_s_l($cpu, "otdrx",  [0xED, 0xCB]);
+		},
+		"push/pop <r> [ez80]" => sub {
+			my($cpu) = @_;
+			for my $rp ('b', 'd', 'h', 'psw') {
+				add_opcode($cpu, "push $rp", [0xC5+16*RP($rp)]);
+				add_opcode($cpu, "pop $rp", [0xC1+16*RP($rp)]);
+			}
+		},
+		"push/pop <rp> [ez80]" => sub {
+			my($cpu) = @_;
+			for my $rp ('bc', 'de', 'hl', 'af') {
+				add_opcode_ez80_s_l($cpu, "push $rp", [0xC5+16*RP($rp)]);
+				add_opcode_ez80_s_l($cpu, "pop $rp", [0xC1+16*RP($rp)]);
+			}
+		},
+		"push/pop <x> [ez80]" => sub {
+			my($cpu) = @_;
+			for my $x ('ix', 'iy') {
+				add_opcode_ez80_s_l($cpu, "push $x", [PFX($x), 0xE5]);
+				add_opcode_ez80_s_l($cpu, "pop $x", [PFX($x), 0xE1]);
+			}
+		},
+		
 	};
 	
 	$actions->{$key}->($cpu);
