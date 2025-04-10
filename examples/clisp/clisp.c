@@ -45,6 +45,10 @@ OPTIONS:
 z88dk build hints:
 ------------------
 
+For size optimization use -DSHORT, otherwise add:
+     --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE
+
+
 Spectrum 
   zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
   zcc +zx -lndos -O3 -create-app -DLARGEMEM=3000 -DGRAPHICS  -DSHORT -DSPECLISP clisp.c
@@ -65,15 +69,15 @@ MicroBee
   zcc +bee -O3 -create-app -DLARGEMEM=1200 -DGRAPHICS -DNOTIMER -lgfxbee512  clisp.c
 
 Visual 1050
-  zcc +cpm -subtype=v1050 -O3 -create-app -DLARGEMEM=2000 -DGRAPHICS -DFILES clisp.c
-  zcc +cpm -subtype=v1050 -O3 -create-app -DLARGEMEM=5800 -DSHORT -DGRAPHICS -DFILES clisp.c
+  zcc +cpm -subtype=v1050 -DFILES --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -O3 -create-app -DLARGEMEM=2400 -DGRAPHICS  clisp.c
+
+Osborne 1
+  zcc +cpm -subtype=osborne1 -DFILES --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -O3 -create-app -DLARGEMEM=2400 -DGRAPHICS  clisp.c
+
 
 Plain CP/M with file support to load programs
   zcc +cpm -O3 -create-app -DLARGEMEM=2000 -DFILES clisp.c
   
-For super size optimization, add:
-     --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE
-
 Sharp PC-G815
   zcc +g800 -clib=g815 -O3 -create-app -DNOTIMER -DFORCE_LOWER clisp.c  
 
@@ -719,7 +723,8 @@ l_read(void)
   
   /* skip spaces */
   if ((ch = skip_space()) < 0){  /* eof */
-    return TAG_EOF; 
+    //return TAG_EOF; 
+	return -1;
 
   } else if (ch == ';'){         /* comment */
     while (( ch != '\n' ) && ( ch != '\r') )
