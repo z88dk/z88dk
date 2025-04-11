@@ -1537,8 +1537,8 @@
  ld (hl+), e                    ; 73 23
  ld (hl+), h                    ; 74 23
  ld (hl+), hl                   ; ED 2F 23 23
- ld (hl+), ix                   ; D5 FD E5 D1 73 23 72 23 D1
- ld (hl+), iy                   ; D5 DD E5 D1 73 23 72 23 D1
+ ld (hl+), ix                   ; ED 3E 23 23
+ ld (hl+), iy                   ; ED 3F 23 23
  ld (hl+), l                    ; 75 23
  ld (hl-), -128                 ; 36 80 2B
  ld (hl-), 0                    ; 36 00 2B
@@ -2748,8 +2748,8 @@
  ldi (hl), e                    ; 73 23
  ldi (hl), h                    ; 74 23
  ldi (hl), hl                   ; ED 2F 23 23
- ldi (hl), ix                   ; D5 FD E5 D1 73 23 72 23 D1
- ldi (hl), iy                   ; D5 DD E5 D1 73 23 72 23 D1
+ ldi (hl), ix                   ; ED 3E 23 23
+ ldi (hl), iy                   ; ED 3F 23 23
  ldi (hl), l                    ; 75 23
  ldi a, (bc)                    ; 0A 03
  ldi a, (de)                    ; 1A 13

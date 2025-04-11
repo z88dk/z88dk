@@ -23854,8 +23854,8 @@ ld (hl+), hl|r800|_||F5;7C;75;23;77;F1;23
 ld (hl+), hl|z180|X||F5;7C;75;23;77;F1;23
 ld (hl+), hl|z80|X||F5;7C;75;23;77;F1;23
 ld (hl+), hl|z80n|X||F5;7C;75;23;77;F1;23
-ld (hl+), ix|ez80|X||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), ix|ez80_z80|X||D5;DD E5;D1;73;23;72;23;D1
+ld (hl+), ix|ez80|X||ED 3F;23;23
+ld (hl+), ix|ez80_z80|X||ED 3F;23;23
 ld (hl+), ix|kc160|_||D5;DD E5;D1;73;23;72;23;D1
 ld (hl+), ix|kc160_z80|_||D5;DD E5;D1;73;23;72;23;D1
 ld (hl+), ix|r2ka|_||D5;DD E5;D1;73;23;72;23;D1
@@ -23866,8 +23866,8 @@ ld (hl+), ix|r800|_||D5;DD E5;D1;73;23;72;23;D1
 ld (hl+), ix|z180|X||D5;DD E5;D1;73;23;72;23;D1
 ld (hl+), ix|z80|X||D5;DD E5;D1;73;23;72;23;D1
 ld (hl+), ix|z80n|X||D5;DD E5;D1;73;23;72;23;D1
-ld (hl+), iy|ez80|X||D5;FD E5;D1;73;23;72;23;D1
-ld (hl+), iy|ez80_z80|X||D5;FD E5;D1;73;23;72;23;D1
+ld (hl+), iy|ez80|X||ED 3E;23;23
+ld (hl+), iy|ez80_z80|X||ED 3E;23;23
 ld (hl+), iy|kc160|_||D5;FD E5;D1;73;23;72;23;D1
 ld (hl+), iy|kc160_z80|_||D5;FD E5;D1;73;23;72;23;D1
 ld (hl+), iy|r2ka|_||D5;FD E5;D1;73;23;72;23;D1
@@ -35605,8 +35605,8 @@ ldi (hl), hl|r800|_||F5;7C;75;23;77;F1;23
 ldi (hl), hl|z180|X||F5;7C;75;23;77;F1;23
 ldi (hl), hl|z80|X||F5;7C;75;23;77;F1;23
 ldi (hl), hl|z80n|X||F5;7C;75;23;77;F1;23
-ldi (hl), ix|ez80|X||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), ix|ez80_z80|X||D5;DD E5;D1;73;23;72;23;D1
+ldi (hl), ix|ez80|X||ED 3F;23;23
+ldi (hl), ix|ez80_z80|X||ED 3F;23;23
 ldi (hl), ix|kc160|_||D5;DD E5;D1;73;23;72;23;D1
 ldi (hl), ix|kc160_z80|_||D5;DD E5;D1;73;23;72;23;D1
 ldi (hl), ix|r2ka|_||D5;DD E5;D1;73;23;72;23;D1
@@ -35617,8 +35617,8 @@ ldi (hl), ix|r800|_||D5;DD E5;D1;73;23;72;23;D1
 ldi (hl), ix|z180|X||D5;DD E5;D1;73;23;72;23;D1
 ldi (hl), ix|z80|X||D5;DD E5;D1;73;23;72;23;D1
 ldi (hl), ix|z80n|X||D5;DD E5;D1;73;23;72;23;D1
-ldi (hl), iy|ez80|X||D5;FD E5;D1;73;23;72;23;D1
-ldi (hl), iy|ez80_z80|X||D5;FD E5;D1;73;23;72;23;D1
+ldi (hl), iy|ez80|X||ED 3E;23;23
+ldi (hl), iy|ez80_z80|X||ED 3E;23;23
 ldi (hl), iy|kc160|_||D5;FD E5;D1;73;23;72;23;D1
 ldi (hl), iy|kc160_z80|_||D5;FD E5;D1;73;23;72;23;D1
 ldi (hl), iy|r2ka|_||D5;FD E5;D1;73;23;72;23;D1

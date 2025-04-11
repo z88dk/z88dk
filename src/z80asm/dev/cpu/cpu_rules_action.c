@@ -75447,7 +75447,7 @@ break;
 case CPU_KC160: case CPU_KC160_Z80: 
 DO_stmt(0xED8D00LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt(0xDD4E00LL);
@@ -75466,7 +75466,7 @@ break;
 case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: 
 DO_stmt_idx_idx1(0xDD4ELL, 0xDD46LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt_idx_idx1(0xDD4ELL, 0xDD46LL);
@@ -75485,7 +75485,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800:
 DO_stmt(0xFD4E00LL);
 DO_stmt(0xFD4601LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt(0xFD4E00LL);
@@ -75504,7 +75504,7 @@ break;
 case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: 
 DO_stmt_idx_idx1(0xFD4ELL, 0xFD46LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt_idx_idx1(0xFD4ELL, 0xFD46LL);
@@ -79755,7 +79755,7 @@ break;
 case CPU_KC160: case CPU_KC160_Z80: 
 DO_stmt(0xED9D00LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt(0xDD5E00LL);
@@ -79774,7 +79774,7 @@ break;
 case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: 
 DO_stmt_idx_idx1(0xDD5ELL, 0xDD56LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt_idx_idx1(0xDD5ELL, 0xDD56LL);
@@ -79793,7 +79793,7 @@ case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800:
 DO_stmt(0xFD5E00LL);
 DO_stmt(0xFD5601LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt(0xFD5E00LL);
@@ -79812,7 +79812,7 @@ break;
 case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: case CPU_R800: 
 DO_stmt_idx_idx1(0xFD5ELL, 0xFD56LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt_idx_idx1(0xFD5ELL, 0xFD56LL);
@@ -93287,7 +93287,7 @@ break;
 case CPU_KC160: case CPU_KC160_Z80: 
 DO_stmt(0xEDAD00LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt(0xDD6E00LL);
@@ -93309,7 +93309,7 @@ break;
 case CPU_R800: 
 DO_stmt_idx_idx1(0xDD6ELL, 0xDD66LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt_idx_idx1(0xDD6ELL, 0xDD66LL);
@@ -93331,7 +93331,7 @@ break;
 case CPU_R2KA: case CPU_R3K: case CPU_R4K: case CPU_R5K: 
 DO_stmt(0xFDE400LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt(0xFD6E00LL);
@@ -93353,7 +93353,7 @@ break;
 case CPU_R800: 
 DO_stmt_idx_idx1(0xFD6ELL, 0xFD66LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt_idx_idx1(0xFD6ELL, 0xFD66LL);
@@ -96255,7 +96255,7 @@ DO_stmt(0x72LL);
 DO_stmt(0x23LL);
 DO_stmt(0xD1LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt(0xD5LL);
@@ -96266,6 +96266,13 @@ DO_stmt(0x23LL);
 DO_stmt(0x72LL);
 DO_stmt(0x23LL);
 DO_stmt(0xD1LL);
+break;
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (option_no_synth())
+	error(ErrIllegalIdent, NULL);
+DO_stmt(0xED3FLL);
+DO_stmt(0x23LL);
+DO_stmt(0x23LL);
 break;
 default: error(ErrIllegalIdent, NULL); }
 
@@ -96284,7 +96291,7 @@ DO_stmt(0x72LL);
 DO_stmt(0x23LL);
 DO_stmt(0xD1LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt(0xD5LL);
@@ -96295,6 +96302,13 @@ DO_stmt(0x23LL);
 DO_stmt(0x72LL);
 DO_stmt(0x23LL);
 DO_stmt(0xD1LL);
+break;
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (option_no_synth())
+	error(ErrIllegalIdent, NULL);
+DO_stmt(0xED3ELL);
+DO_stmt(0x23LL);
+DO_stmt(0x23LL);
 break;
 default: error(ErrIllegalIdent, NULL); }
 
@@ -114613,7 +114627,7 @@ DO_stmt(0x72LL);
 DO_stmt(0x23LL);
 DO_stmt(0xD1LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt(0xD5LL);
@@ -114624,6 +114638,13 @@ DO_stmt(0x23LL);
 DO_stmt(0x72LL);
 DO_stmt(0x23LL);
 DO_stmt(0xD1LL);
+break;
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (option_no_synth())
+	error(ErrIllegalIdent, NULL);
+DO_stmt(0xED3FLL);
+DO_stmt(0x23LL);
+DO_stmt(0x23LL);
 break;
 default: error(ErrIllegalIdent, NULL); }
 
@@ -114642,7 +114663,7 @@ DO_stmt(0x72LL);
 DO_stmt(0x23LL);
 DO_stmt(0xD1LL);
 break;
-case CPU_EZ80: case CPU_EZ80_Z80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (option_no_synth())
 	error(ErrIllegalIdent, NULL);
 DO_stmt(0xD5LL);
@@ -114653,6 +114674,13 @@ DO_stmt(0x23LL);
 DO_stmt(0x72LL);
 DO_stmt(0x23LL);
 DO_stmt(0xD1LL);
+break;
+case CPU_EZ80: case CPU_EZ80_Z80: 
+if (option_no_synth())
+	error(ErrIllegalIdent, NULL);
+DO_stmt(0xED3ELL);
+DO_stmt(0x23LL);
+DO_stmt(0x23LL);
 break;
 default: error(ErrIllegalIdent, NULL); }
 

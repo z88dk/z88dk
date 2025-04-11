@@ -391,16 +391,24 @@ for my $cpu (Opcode->cpus) {
 							"push $x", "pop de",
 							"ld (hl), e", "inc hl", "ld (hl), d", "dec hl",
 							"pop de");
-		add_synth($cpu, "ld (hl+), $x", 
-							"push de",
-							"push $x", "pop de",
-							"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
-							"pop de");
-		add_synth($cpu, "ldi (hl), $x", 
-							"push de",
-							"push $x", "pop de",
-							"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
-							"pop de");
+		if ($cpu =~ /ez80/) {
+			add_synth($cpu, "ld (hl+), $x", 
+								"ld (hl), $x : inc hl : inc hl");
+			add_synth($cpu, "ldi (hl), $x", 
+								"ld (hl), $x : inc hl : inc hl");
+		}
+		else {
+			add_synth($cpu, "ld (hl+), $x", 
+								"push de",
+								"push $x", "pop de",
+								"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
+								"pop de");
+			add_synth($cpu, "ldi (hl), $x", 
+								"push de",
+								"push $x", "pop de",
+								"ld (hl), e", "inc hl", "ld (hl), d", "inc hl",
+								"pop de");
+		}
 	}
 
 	# LD (IX+d), BC|DE|HL|IX|IY
