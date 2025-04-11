@@ -40,28 +40,30 @@ typedef struct {
 //-----------------------------------------------------------------------------
 
 static cpu_lookup_t cpu_lut[] = {
-//    name          id                  parent              non-strict      is-strict
-    { "z80",        CPU_Z80,            CPU_8080,           CPU_Z80,        false,  },  // 1
-    { "z80_strict", CPU_Z80_STRICT,     CPU_8080,           CPU_Z80,        true,   },  // 2
-    { "z180",       CPU_Z180,           CPU_8080,           CPU_Z180,       false,  },  // 3
-    { "ez80_z80",   CPU_EZ80_Z80,       CPU_UNDEF,          CPU_EZ80_Z80,   false,  },  // 4
-    { "ez80",       CPU_EZ80,           CPU_UNDEF,          CPU_EZ80,       false,  },  // 5
-    { "z80n",       CPU_Z80N,           CPU_Z80,            CPU_Z80N,       false,  },  // 6
-    { "r2ka",       CPU_R2KA,           CPU_UNDEF,          CPU_R2KA,       false,  },  // 7
-    { "r3k",        CPU_R3K,            CPU_R2KA,           CPU_R3K,        false,  },  // 8
-    { "gbz80",      CPU_GBZ80,          CPU_UNDEF,          CPU_GBZ80,      false,  },  // 9
-    { "8080",       CPU_8080,           CPU_UNDEF,          CPU_8080,       false,  },  // 10
-    { "8085",       CPU_8085,           CPU_8080,           CPU_8085,       false,  },  // 11
-    { "r800",       CPU_R800,           CPU_8080,           CPU_R800,       false,  },  // 12
-    { "r4k",        CPU_R4K,            CPU_UNDEF,          CPU_R4K,        false,  },  // 13
-    { "r5k",        CPU_R5K,            CPU_R4K,            CPU_R5K,        false,  },  // 14
-    { "kc160",      CPU_KC160,          CPU_UNDEF,          CPU_KC160,      false,  },  // 15
-    { "kc160_z80",  CPU_KC160_Z80,      CPU_8080,           CPU_KC160_Z80,  false,  },  // 16
-    { "8080_strict",CPU_8080_STRICT,    CPU_UNDEF,          CPU_8080,       true,   },  // 17
-    { "8085_strict",CPU_8085_STRICT,    CPU_8080,           CPU_8085,       true,   },  // 18
-    { "gbz80_strict",CPU_GBZ80_STRICT,  CPU_UNDEF,          CPU_GBZ80,      true,   },  // 19
-    { "z180_strict",CPU_Z180_STRICT,  	CPU_8080,          	CPU_Z180,       true,   },  // 20
-    { "z80n_strict",CPU_Z80N_STRICT,  	CPU_Z80,          	CPU_Z80N,       true,   },  // 20
+//    name          	id                  parent      non-strict      is-strict
+    { "z80",        	CPU_Z80,            CPU_8080,   CPU_Z80,        false,  },  // 1
+    { "z80_strict", 	CPU_Z80_STRICT,     CPU_8080,   CPU_Z80,        true,   },  // 2
+    { "z180",       	CPU_Z180,           CPU_8080,   CPU_Z180,       false,  },  // 3
+    { "ez80_z80",   	CPU_EZ80_Z80,       CPU_UNDEF,  CPU_EZ80_Z80,   false,  },  // 4
+    { "ez80",       	CPU_EZ80,           CPU_UNDEF,  CPU_EZ80,       false,  },  // 5
+    { "z80n",       	CPU_Z80N,           CPU_Z80,    CPU_Z80N,       false,  },  // 6
+    { "r2ka",       	CPU_R2KA,           CPU_UNDEF,  CPU_R2KA,       false,  },  // 7
+    { "r3k",        	CPU_R3K,            CPU_R2KA,   CPU_R3K,        false,  },  // 8
+    { "gbz80",      	CPU_GBZ80,          CPU_UNDEF,  CPU_GBZ80,      false,  },  // 9
+    { "8080",       	CPU_8080,           CPU_UNDEF,  CPU_8080,       false,  },  // 10
+    { "8085",       	CPU_8085,           CPU_8080,   CPU_8085,       false,  },  // 11
+    { "r800",       	CPU_R800,           CPU_8080,   CPU_R800,       false,  },  // 12
+    { "r4k",        	CPU_R4K,            CPU_UNDEF,  CPU_R4K,        false,  },  // 13
+    { "r5k",        	CPU_R5K,            CPU_R4K,    CPU_R5K,        false,  },  // 14
+    { "kc160",      	CPU_KC160,          CPU_UNDEF,  CPU_KC160,      false,  },  // 15
+    { "kc160_z80",  	CPU_KC160_Z80,      CPU_8080,   CPU_KC160_Z80,  false,  },  // 16
+    { "8080_strict",	CPU_8080_STRICT,    CPU_UNDEF,  CPU_8080,       true,   },  // 17
+    { "8085_strict",	CPU_8085_STRICT,    CPU_8080,   CPU_8085,       true,   },  // 18
+    { "gbz80_strict",	CPU_GBZ80_STRICT,	CPU_UNDEF,  CPU_GBZ80,      true,   },  // 19
+    { "z180_strict",	CPU_Z180_STRICT,  	CPU_8080,   CPU_Z180,       true,   },  // 20
+    { "z80n_strict",	CPU_Z80N_STRICT,  	CPU_Z80,    CPU_Z80N,       true,   },  // 21
+    { "ez80_z80_strict",CPU_EZ80_Z80_STRICT,CPU_UNDEF,  CPU_EZ80_Z80,   true,   },  // 22
+    { "ez80_strict",    CPU_EZ80_STRICT,    CPU_UNDEF,	CPU_EZ80,       true,   },  // 23
 };
 
 static cpu_lookup_t* cpu_lu_hash = NULL;        // lookup from cpu name

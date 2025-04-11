@@ -1343,23 +1343,6 @@
  jmp po, 0x1234                 ; E2 34 12
  jmp v, 0x1234                  ; EA 34 12
  jmp z, 0x1234                  ; CA 34 12
- jmp.is 0x1234                  ; 40 C3 34 12
- jmp.is c, 0x1234               ; 40 DA 34 12
- jmp.is eq, 0x1234              ; 40 CA 34 12
- jmp.is geu, 0x1234             ; 40 D2 34 12
- jmp.is gtu, 0x1234             ; 28 04 40 D2 34 12
- jmp.is leu, 0x1234             ; 40 CA 34 12 40 DA 34 12
- jmp.is ltu, 0x1234             ; 40 DA 34 12
- jmp.is m, 0x1234               ; 40 FA 34 12
- jmp.is nc, 0x1234              ; 40 D2 34 12
- jmp.is ne, 0x1234              ; 40 C2 34 12
- jmp.is nv, 0x1234              ; 40 E2 34 12
- jmp.is nz, 0x1234              ; 40 C2 34 12
- jmp.is p, 0x1234               ; 40 F2 34 12
- jmp.is pe, 0x1234              ; 40 EA 34 12
- jmp.is po, 0x1234              ; 40 E2 34 12
- jmp.is v, 0x1234               ; 40 EA 34 12
- jmp.is z, 0x1234               ; 40 CA 34 12
  jmp.l (hl)                     ; 49 E9
  jmp.l (ix)                     ; 49 DD E9
  jmp.l (iy)                     ; 49 FD E9
@@ -1426,23 +1409,6 @@
  jp po, 0x1234                  ; E2 34 12
  jp v, 0x1234                   ; EA 34 12
  jp z, 0x1234                   ; CA 34 12
- jp.is 0x1234                   ; 40 C3 34 12
- jp.is c, 0x1234                ; 40 DA 34 12
- jp.is eq, 0x1234               ; 40 CA 34 12
- jp.is geu, 0x1234              ; 40 D2 34 12
- jp.is gtu, 0x1234              ; 28 04 40 D2 34 12
- jp.is leu, 0x1234              ; 40 CA 34 12 40 DA 34 12
- jp.is ltu, 0x1234              ; 40 DA 34 12
- jp.is m, 0x1234                ; 40 FA 34 12
- jp.is nc, 0x1234               ; 40 D2 34 12
- jp.is ne, 0x1234               ; 40 C2 34 12
- jp.is nv, 0x1234               ; 40 E2 34 12
- jp.is nz, 0x1234               ; 40 C2 34 12
- jp.is p, 0x1234                ; 40 F2 34 12
- jp.is pe, 0x1234               ; 40 EA 34 12
- jp.is po, 0x1234               ; 40 E2 34 12
- jp.is v, 0x1234                ; 40 EA 34 12
- jp.is z, 0x1234                ; 40 CA 34 12
  jp.l (hl)                      ; 49 E9
  jp.l (ix)                      ; 49 DD E9
  jp.l (iy)                      ; 49 FD E9

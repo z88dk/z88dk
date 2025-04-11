@@ -7969,23 +7969,6 @@
  jmp nk, 0x1234                 ; Error
  jmp nx5, 0x1234                ; Error
  jmp x5, 0x1234                 ; Error
- jmp.il 0x123456                ; Error
- jmp.il c, 0x123456             ; Error
- jmp.il eq, 0x123456            ; Error
- jmp.il geu, 0x123456           ; Error
- jmp.il gtu, 0x123456           ; Error
- jmp.il leu, 0x123456           ; Error
- jmp.il ltu, 0x123456           ; Error
- jmp.il m, 0x123456             ; Error
- jmp.il nc, 0x123456            ; Error
- jmp.il ne, 0x123456            ; Error
- jmp.il nv, 0x123456            ; Error
- jmp.il nz, 0x123456            ; Error
- jmp.il p, 0x123456             ; Error
- jmp.il pe, 0x123456            ; Error
- jmp.il po, 0x123456            ; Error
- jmp.il v, 0x123456             ; Error
- jmp.il z, 0x123456             ; Error
  jmp.s (hl)                     ; Error
  jmp.s (ix)                     ; Error
  jmp.s (iy)                     ; Error
@@ -8018,23 +8001,6 @@
  jp nk, 0x1234                  ; Error
  jp nx5, 0x1234                 ; Error
  jp x5, 0x1234                  ; Error
- jp.il 0x123456                 ; Error
- jp.il c, 0x123456              ; Error
- jp.il eq, 0x123456             ; Error
- jp.il geu, 0x123456            ; Error
- jp.il gtu, 0x123456            ; Error
- jp.il leu, 0x123456            ; Error
- jp.il ltu, 0x123456            ; Error
- jp.il m, 0x123456              ; Error
- jp.il nc, 0x123456             ; Error
- jp.il ne, 0x123456             ; Error
- jp.il nv, 0x123456             ; Error
- jp.il nz, 0x123456             ; Error
- jp.il p, 0x123456              ; Error
- jp.il pe, 0x123456             ; Error
- jp.il po, 0x123456             ; Error
- jp.il v, 0x123456              ; Error
- jp.il z, 0x123456              ; Error
  jp.s (hl)                      ; Error
  jp.s (ix)                      ; Error
  jp.s (iy)                      ; Error

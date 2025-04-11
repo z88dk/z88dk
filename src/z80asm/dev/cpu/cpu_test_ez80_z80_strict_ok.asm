@@ -772,15 +772,6 @@
  jp pe, 0x1234                  ; EA 34 12
  jp po, 0x1234                  ; E2 34 12
  jp z, 0x1234                   ; CA 34 12
- jp.is 0x1234                   ; 40 C3 34 12
- jp.is c, 0x1234                ; 40 DA 34 12
- jp.is m, 0x1234                ; 40 FA 34 12
- jp.is nc, 0x1234               ; 40 D2 34 12
- jp.is nz, 0x1234               ; 40 C2 34 12
- jp.is p, 0x1234                ; 40 F2 34 12
- jp.is pe, 0x1234               ; 40 EA 34 12
- jp.is po, 0x1234               ; 40 E2 34 12
- jp.is z, 0x1234                ; 40 CA 34 12
  jp.l (hl)                      ; 49 E9
  jp.l (ix)                      ; 49 DD E9
  jp.l (iy)                      ; 49 FD E9

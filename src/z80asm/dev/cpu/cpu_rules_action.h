@@ -35,8 +35,9 @@
 #define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
 #define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
 #define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
-#define DO_stmt_n_0_0(	opcode)		_DO_stmt_(n_0_0,	opcode)
+#define DO_stmt_n_0_0(	opcode)	_DO_stmt_(n_0_0,	opcode)
 #define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
+#define DO_stmt_s_0_0(opcode)	_DO_stmt_(s_0_0,	opcode)
 #define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
 
 #define DO_stmt_nn( opcode) \
@@ -11330,71 +11331,3 @@ bool cpu_rules_action_11223(ParseCtx *ctx, Str *name, Str *stmt_label);
 bool cpu_rules_action_11224(ParseCtx *ctx, Str *name, Str *stmt_label);
 bool cpu_rules_action_11225(ParseCtx *ctx, Str *name, Str *stmt_label);
 bool cpu_rules_action_11226(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11227(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11228(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11229(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11230(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11231(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11232(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11233(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11234(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11235(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11236(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11237(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11238(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11239(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11240(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11241(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11242(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11243(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11244(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11245(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11246(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11247(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11248(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11249(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11250(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11251(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11252(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11253(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11254(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11255(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11256(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11257(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11258(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11259(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11260(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11261(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11262(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11263(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11264(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11265(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11266(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11267(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11268(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11269(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11270(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11271(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11272(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11273(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11274(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11275(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11276(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11277(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11278(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11279(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11280(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11281(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11282(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11283(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11284(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11285(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11286(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11287(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11288(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11289(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11290(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11291(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11292(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11293(ParseCtx *ctx, Str *name, Str *stmt_label);
-bool cpu_rules_action_11294(ParseCtx *ctx, Str *name, Str *stmt_label);

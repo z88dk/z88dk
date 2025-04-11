@@ -256,13 +256,11 @@ sub add_opcode_ez80_jump {
 	
 	if ($adl_mode) {
 		add_opcode($cpu, $asm, [@ops3bytes], $const);
-		add_opcode($cpu, $asm =~ s/^(\w+)/$1.il/r, [0x5B, @ops3bytes], $const);
-		add_opcode($cpu, $asm =~ s/^(\w+)/$1.lil/r, [0x5B, @ops3bytes], $const);
 		add_opcode($cpu, $asm =~ s/^(\w+)/$1.sis/r, [0x40, @ops2bytes], $const);
+		add_opcode($cpu, $asm =~ s/^(\w+)/$1.lil/r, [0x5B, @ops3bytes], $const);
 	}
 	else {
 		add_opcode($cpu, $asm, [@ops2bytes], $const);
-		add_opcode($cpu, $asm =~ s/^(\w+)/$1.is/r, [0x40, @ops2bytes], $const);
 		add_opcode($cpu, $asm =~ s/^(\w+)/$1.sis/r, [0x40, @ops2bytes], $const);
 		add_opcode($cpu, $asm =~ s/^(\w+)/$1.lil/r, [0x5B, @ops3bytes], $const);
 	}

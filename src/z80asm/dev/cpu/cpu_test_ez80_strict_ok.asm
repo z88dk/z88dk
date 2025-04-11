@@ -772,15 +772,6 @@
  jp pe, 0x123456                ; EA 56 34 12
  jp po, 0x123456                ; E2 56 34 12
  jp z, 0x123456                 ; CA 56 34 12
- jp.il 0x123456                 ; 5B C3 56 34 12
- jp.il c, 0x123456              ; 5B DA 56 34 12
- jp.il m, 0x123456              ; 5B FA 56 34 12
- jp.il nc, 0x123456             ; 5B D2 56 34 12
- jp.il nz, 0x123456             ; 5B C2 56 34 12
- jp.il p, 0x123456              ; 5B F2 56 34 12
- jp.il pe, 0x123456             ; 5B EA 56 34 12
- jp.il po, 0x123456             ; 5B E2 56 34 12
- jp.il z, 0x123456              ; 5B CA 56 34 12
  jp.lil 0x123456                ; 5B C3 56 34 12
  jp.lil c, 0x123456             ; 5B DA 56 34 12
  jp.lil m, 0x123456             ; 5B FA 56 34 12

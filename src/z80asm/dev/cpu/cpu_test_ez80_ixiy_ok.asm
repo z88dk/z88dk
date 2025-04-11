@@ -1343,23 +1343,6 @@
  jmp po, 0x123456               ; E2 56 34 12
  jmp v, 0x123456                ; EA 56 34 12
  jmp z, 0x123456                ; CA 56 34 12
- jmp.il 0x123456                ; 5B C3 56 34 12
- jmp.il c, 0x123456             ; 5B DA 56 34 12
- jmp.il eq, 0x123456            ; 5B CA 56 34 12
- jmp.il geu, 0x123456           ; 5B D2 56 34 12
- jmp.il gtu, 0x123456           ; 28 05 5B D2 56 34 12
- jmp.il leu, 0x123456           ; 5B CA 56 34 12 5B DA 56 34 12
- jmp.il ltu, 0x123456           ; 5B DA 56 34 12
- jmp.il m, 0x123456             ; 5B FA 56 34 12
- jmp.il nc, 0x123456            ; 5B D2 56 34 12
- jmp.il ne, 0x123456            ; 5B C2 56 34 12
- jmp.il nv, 0x123456            ; 5B E2 56 34 12
- jmp.il nz, 0x123456            ; 5B C2 56 34 12
- jmp.il p, 0x123456             ; 5B F2 56 34 12
- jmp.il pe, 0x123456            ; 5B EA 56 34 12
- jmp.il po, 0x123456            ; 5B E2 56 34 12
- jmp.il v, 0x123456             ; 5B EA 56 34 12
- jmp.il z, 0x123456             ; 5B CA 56 34 12
  jmp.lil 0x123456               ; 5B C3 56 34 12
  jmp.lil c, 0x123456            ; 5B DA 56 34 12
  jmp.lil eq, 0x123456           ; 5B CA 56 34 12
@@ -1426,23 +1409,6 @@
  jp po, 0x123456                ; E2 56 34 12
  jp v, 0x123456                 ; EA 56 34 12
  jp z, 0x123456                 ; CA 56 34 12
- jp.il 0x123456                 ; 5B C3 56 34 12
- jp.il c, 0x123456              ; 5B DA 56 34 12
- jp.il eq, 0x123456             ; 5B CA 56 34 12
- jp.il geu, 0x123456            ; 5B D2 56 34 12
- jp.il gtu, 0x123456            ; 28 05 5B D2 56 34 12
- jp.il leu, 0x123456            ; 5B CA 56 34 12 5B DA 56 34 12
- jp.il ltu, 0x123456            ; 5B DA 56 34 12
- jp.il m, 0x123456              ; 5B FA 56 34 12
- jp.il nc, 0x123456             ; 5B D2 56 34 12
- jp.il ne, 0x123456             ; 5B C2 56 34 12
- jp.il nv, 0x123456             ; 5B E2 56 34 12
- jp.il nz, 0x123456             ; 5B C2 56 34 12
- jp.il p, 0x123456              ; 5B F2 56 34 12
- jp.il pe, 0x123456             ; 5B EA 56 34 12
- jp.il po, 0x123456             ; 5B E2 56 34 12
- jp.il v, 0x123456              ; 5B EA 56 34 12
- jp.il z, 0x123456              ; 5B CA 56 34 12
  jp.lil 0x123456                ; 5B C3 56 34 12
  jp.lil c, 0x123456             ; 5B DA 56 34 12
  jp.lil eq, 0x123456            ; 5B CA 56 34 12
@@ -1971,7 +1937,7 @@
  ld hl, sp                      ; 21 00 00 00 39
  ld hl, sp+0                    ; 21 00 00 00 39
  ld hl, sp+126                  ; 21 7E 00 00 39
- ld hl, sp-128                  ; 21 80 FF 00 39
+ ld hl, sp-128                  ; 21 80 FF FF 39
  ld i, a                        ; ED 47
  ld i, hl                       ; ED C7
  ld ix, (0x123456)              ; FD 2A 56 34 12

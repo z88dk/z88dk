@@ -21811,40 +21811,6 @@ jmp z, %m|r800|_||CA %m %m
 jmp z, %m|z180|_||CA %m %m
 jmp z, %m|z80|_||CA %m %m
 jmp z, %m|z80n|_||CA %m %m
-jmp.il %m|ez80|_||5B;C3 %m %m %m
-jmp.il c, %m|ez80|_||5B;DA %m %m %m
-jmp.il eq, %m|ez80|X||5B;CA %m %m %m
-jmp.il geu, %m|ez80|X||5B;D2 %m %m %m
-jmp.il gtu, %m|ez80|X||28 %t;5B;D2 %m %m %m
-jmp.il leu, %m|ez80|X||5B;CA %m %m %m;5B;DA %m %m %m
-jmp.il ltu, %m|ez80|X||5B;DA %m %m %m
-jmp.il m, %m|ez80|_||5B;FA %m %m %m
-jmp.il nc, %m|ez80|_||5B;D2 %m %m %m
-jmp.il ne, %m|ez80|X||5B;C2 %m %m %m
-jmp.il nv, %m|ez80|X||5B;E2 %m %m %m
-jmp.il nz, %m|ez80|_||5B;C2 %m %m %m
-jmp.il p, %m|ez80|_||5B;F2 %m %m %m
-jmp.il pe, %m|ez80|_||5B;EA %m %m %m
-jmp.il po, %m|ez80|_||5B;E2 %m %m %m
-jmp.il v, %m|ez80|X||5B;EA %m %m %m
-jmp.il z, %m|ez80|_||5B;CA %m %m %m
-jmp.is %m|ez80_z80|_||40;C3 %m %m
-jmp.is c, %m|ez80_z80|_||40;DA %m %m
-jmp.is eq, %m|ez80_z80|X||40;CA %m %m
-jmp.is geu, %m|ez80_z80|X||40;D2 %m %m
-jmp.is gtu, %m|ez80_z80|X||28 %t;40;D2 %m %m
-jmp.is leu, %m|ez80_z80|X||40;CA %m %m;40;DA %m %m
-jmp.is ltu, %m|ez80_z80|X||40;DA %m %m
-jmp.is m, %m|ez80_z80|_||40;FA %m %m
-jmp.is nc, %m|ez80_z80|_||40;D2 %m %m
-jmp.is ne, %m|ez80_z80|X||40;C2 %m %m
-jmp.is nv, %m|ez80_z80|X||40;E2 %m %m
-jmp.is nz, %m|ez80_z80|_||40;C2 %m %m
-jmp.is p, %m|ez80_z80|_||40;F2 %m %m
-jmp.is pe, %m|ez80_z80|_||40;EA %m %m
-jmp.is po, %m|ez80_z80|_||40;E2 %m %m
-jmp.is v, %m|ez80_z80|X||40;EA %m %m
-jmp.is z, %m|ez80_z80|_||40;CA %m %m
 jmp.l (hl)|ez80_z80|_||49;E9
 jmp.l (ix)|ez80_z80|_||49;DD E9
 jmp.l (iy)|ez80_z80|_||49;FD E9
@@ -22405,58 +22371,6 @@ jp z, %m|z80|_||CA %m %m
 jp z, %m|z80_strict|_||CA %m %m
 jp z, %m|z80n|_||CA %m %m
 jp z, %m|z80n_strict|_||CA %m %m
-jp.il %m|ez80|_||5B;C3 %m %m %m
-jp.il %m|ez80_strict|_||5B;C3 %m %m %m
-jp.il c, %m|ez80|_||5B;DA %m %m %m
-jp.il c, %m|ez80_strict|_||5B;DA %m %m %m
-jp.il eq, %m|ez80|X||5B;CA %m %m %m
-jp.il geu, %m|ez80|X||5B;D2 %m %m %m
-jp.il gtu, %m|ez80|X||28 %t;5B;D2 %m %m %m
-jp.il leu, %m|ez80|X||5B;CA %m %m %m;5B;DA %m %m %m
-jp.il ltu, %m|ez80|X||5B;DA %m %m %m
-jp.il m, %m|ez80|_||5B;FA %m %m %m
-jp.il m, %m|ez80_strict|_||5B;FA %m %m %m
-jp.il nc, %m|ez80|_||5B;D2 %m %m %m
-jp.il nc, %m|ez80_strict|_||5B;D2 %m %m %m
-jp.il ne, %m|ez80|X||5B;C2 %m %m %m
-jp.il nv, %m|ez80|X||5B;E2 %m %m %m
-jp.il nz, %m|ez80|_||5B;C2 %m %m %m
-jp.il nz, %m|ez80_strict|_||5B;C2 %m %m %m
-jp.il p, %m|ez80|_||5B;F2 %m %m %m
-jp.il p, %m|ez80_strict|_||5B;F2 %m %m %m
-jp.il pe, %m|ez80|_||5B;EA %m %m %m
-jp.il pe, %m|ez80_strict|_||5B;EA %m %m %m
-jp.il po, %m|ez80|_||5B;E2 %m %m %m
-jp.il po, %m|ez80_strict|_||5B;E2 %m %m %m
-jp.il v, %m|ez80|X||5B;EA %m %m %m
-jp.il z, %m|ez80|_||5B;CA %m %m %m
-jp.il z, %m|ez80_strict|_||5B;CA %m %m %m
-jp.is %m|ez80_z80|_||40;C3 %m %m
-jp.is %m|ez80_z80_strict|_||40;C3 %m %m
-jp.is c, %m|ez80_z80|_||40;DA %m %m
-jp.is c, %m|ez80_z80_strict|_||40;DA %m %m
-jp.is eq, %m|ez80_z80|X||40;CA %m %m
-jp.is geu, %m|ez80_z80|X||40;D2 %m %m
-jp.is gtu, %m|ez80_z80|X||28 %t;40;D2 %m %m
-jp.is leu, %m|ez80_z80|X||40;CA %m %m;40;DA %m %m
-jp.is ltu, %m|ez80_z80|X||40;DA %m %m
-jp.is m, %m|ez80_z80|_||40;FA %m %m
-jp.is m, %m|ez80_z80_strict|_||40;FA %m %m
-jp.is nc, %m|ez80_z80|_||40;D2 %m %m
-jp.is nc, %m|ez80_z80_strict|_||40;D2 %m %m
-jp.is ne, %m|ez80_z80|X||40;C2 %m %m
-jp.is nv, %m|ez80_z80|X||40;E2 %m %m
-jp.is nz, %m|ez80_z80|_||40;C2 %m %m
-jp.is nz, %m|ez80_z80_strict|_||40;C2 %m %m
-jp.is p, %m|ez80_z80|_||40;F2 %m %m
-jp.is p, %m|ez80_z80_strict|_||40;F2 %m %m
-jp.is pe, %m|ez80_z80|_||40;EA %m %m
-jp.is pe, %m|ez80_z80_strict|_||40;EA %m %m
-jp.is po, %m|ez80_z80|_||40;E2 %m %m
-jp.is po, %m|ez80_z80_strict|_||40;E2 %m %m
-jp.is v, %m|ez80_z80|X||40;EA %m %m
-jp.is z, %m|ez80_z80|_||40;CA %m %m
-jp.is z, %m|ez80_z80_strict|_||40;CA %m %m
 jp.l (hl)|ez80_z80|_||49;E9
 jp.l (hl)|ez80_z80_strict|_||49;E9
 jp.l (ix)|ez80_z80|_||49;DD E9

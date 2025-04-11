@@ -18,14 +18,15 @@ my $OBJ_FILE_VERSION = "18";
 use vars '$test', '$null', '@CPUS';
 $test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
 $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
-@CPUS = qw( z80 	z80_strict 
-			z80n 	z80n_strict
-			z180 	z180_strict 
-			ez80 ez80_z80 
+@CPUS = qw( z80 		z80_strict 
+			z80n 		z80n_strict
+			z180 		z180_strict 
+			ez80 		ez80_strict
+			ez80_z80 	ez80_z80_strict
 			r800 
 			r2ka r3k r4k r5k 
 			8080 8085 
-			gbz80 	gbz80_strict 
+			gbz80 		gbz80_strict 
 			kc160 kc160_z80
 );
 
