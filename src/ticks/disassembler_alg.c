@@ -953,7 +953,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             else if ( p == 1 && canindex() ) { 
                                 uint8_t pk;
                                 PEEK_BYTE(state, pk);
-                                if ( pk == 0xdd || pk == 0xfd ) {
+                                if ( (pk == 0xdd || pk == 0xfd) && !israbbit()) {
                                     BUF_PRINTF("%-10s$%02x","defb",b);
                                 } else {
                                     state->index = 1; 
@@ -1252,7 +1252,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             } else if ( p == 3 && canindex() ) {
                                 uint8_t pk;
                                 PEEK_BYTE(state, pk);
-                                if ( pk == 0xdd || pk == 0xfd ) {
+                                if ( (pk == 0xdd || pk == 0xfd)  && !israbbit()) {
                                     BUF_PRINTF("%-10s$%02x","defb",b);
                                 } else {
                                     state->index = 2; 
