@@ -950,7 +950,16 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             if ( state->index && israbbit4k() ) BUF_PRINTF("%-10s%s,%s","ld",r4k_32b_table[state->index-1], r4k_ps_table[p]);
                             else if ( p == 0 ) BUF_PRINTF("%-10s%s", handle_ez80_am(state,"call"), handle_addr16(state, opbuf1, sizeof(opbuf1)));
                             else if ( p == 1 && is8085() ) BUF_PRINTF("%-10snk,%s", handle_ez80_am(state,"jp"),handle_addr16(state, opbuf1, sizeof(opbuf1))    );
-                            else if ( p == 1 && canindex() ) { state->index = 1; continue; }
+                            else if ( p == 1 && canindex() ) { 
+                                uint8_t pk;
+                                PEEK_BYTE(state, pk);
+                                if ( pk == 0xdd || pk == 0xfd ) {
+                                    BUF_PRINTF("%-10s$%02x","defb",b);
+                                } else {
+                                    state->index = 1; 
+                                    continue; 
+                                }
+                            }
                             else if ( p == 2 && is8085() ) BUF_PRINTF("%-10shl,(de)","ld");
                             else if ( p == 2 && canindex() ) { // ED page
                                 READ_BYTE(state, b);
@@ -1240,7 +1249,16 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     else if ( b == 0xfe ) BUF_PRINTF("trap");
                                     else BUF_PRINTF("nop");
                                 }
-                            } else if ( p == 3 && canindex()  ) { state->index = 2; continue; }
+                            } else if ( p == 3 && canindex() ) {
+                                uint8_t pk;
+                                PEEK_BYTE(state, pk);
+                                if ( pk == 0xdd || pk == 0xfd ) {
+                                    BUF_PRINTF("%-10s$%02x","defb",b);
+                                } else {
+                                    state->index = 2; 
+                                    continue; 
+                                }
+                            }
                             else if ( p == 3 && is8085() ) BUF_PRINTF("%-10sk,%s", "jp",handle_addr16(state, opbuf1, sizeof(opbuf1)));
                             else BUF_PRINTF("nop");                            
                         }
