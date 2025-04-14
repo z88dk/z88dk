@@ -782,6 +782,7 @@ void Options::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_ZILOG__");
 
     undefine_static_symbol("__CPU_R800__");
+    undefine_static_symbol("__CPU_R800_STRICT__");
 
     undefine_static_symbol("__CPU_R2KA__");
     undefine_static_symbol("__CPU_R3K__");
@@ -855,6 +856,10 @@ void Options::set_cpu(int cpu) {
     case CPU_R800:
         m_cpu = CPU_R800;
         define_static_symbol("__CPU_R800__");
+        break;
+    case CPU_R800_STRICT:
+        m_cpu = CPU_R800_STRICT;
+        define_static_symbol("__CPU_R800_STRICT__");
         break;
     case CPU_R2KA:
         m_cpu = CPU_R2KA;

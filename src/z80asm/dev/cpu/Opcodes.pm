@@ -32,7 +32,7 @@ my @CPUS = (qw(
 	z180		z180_strict
 	ez80		ez80_strict
 	ez80_z80	ez80_z80_strict
-	r800
+	r800		r800_strict
 	r2ka
 	r3k
 	r4k

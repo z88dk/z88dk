@@ -1063,12 +1063,29 @@ sub add_opcodes {
 				add_opcode($cpu, "out (bc), $r", [0xED, 0x41+8*R($r)]);
 			}
 		},
+		"in f, (c) [r800]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "in f, (c)", [0xED, 0x40+8*6]);
+		},
+		"in f, (bc) [r800]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "in f, (bc)", [0xED, 0x40+8*6]);
+		},
 		"in/out-undoc" => sub {
 			my($cpu) = @_;
 			add_opcode($cpu, "in (c)", [0xED, 0x40+8*6]);
 			add_opcode($cpu, "in (bc)", [0xED, 0x40+8*6]);
 			add_opcode($cpu, "in f, (c)", [0xED, 0x40+8*6]);
 			add_opcode($cpu, "in f, (bc)", [0xED, 0x40+8*6]);
+			add_opcode($cpu, "out (c), %c", [0xED, 0x41+8*6], [0]);
+			add_opcode($cpu, "out (bc), %c", [0xED, 0x41+8*6], [0]);
+			add_opcode($cpu, "out (c), f", [0xED, 0x41+8*6]);
+			add_opcode($cpu, "out (bc), f", [0xED, 0x41+8*6]);
+		},
+		"in/out-undoc [r800]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "in (c)", [0xED, 0x40+8*6]);
+			add_opcode($cpu, "in (bc)", [0xED, 0x40+8*6]);
 			add_opcode($cpu, "out (c), %c", [0xED, 0x41+8*6], [0]);
 			add_opcode($cpu, "out (bc), %c", [0xED, 0x41+8*6], [0]);
 			add_opcode($cpu, "out (c), f", [0xED, 0x41+8*6]);
@@ -2100,6 +2117,18 @@ sub add_opcodes {
 			my($cpu) = @_;
 			add_opcode_ez80_s_l($cpu, "test (hl)", [0xED, 0x04+8*6]);
 		},
+		"mulub a, <r> [r800]" => sub {
+			my($cpu) = @_;
+			for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
+				add_opcode($cpu, "mulub a, $r", [0xED, 0xC1+8*R($r)]);
+			}
+		},
+		"muluw hl, <rr> [r800]" => sub {
+			my($cpu) = @_;
+			for my $rp ('bc', 'de', 'hl', 'sp') {
+				add_opcode($cpu, "muluw hl, $rp", [0xED, 0xC3+16*RP($rp)]);
+			}
+		},
 
 	};
 	
@@ -2116,6 +2145,7 @@ require "opcodes_z80.pl";
 require "opcodes_z80n.pl";
 require "opcodes_z180.pl";
 require "opcodes_ez80.pl";
+require "opcodes_r800.pl";
 
 #------------------------------------------------------------------------------
 # OLD STUFF
@@ -2168,7 +2198,7 @@ my %INV_FLAG = qw(	_nz	 _z	  _z   _nz
 # for each CPU
 #------------------------------------------------------------------------------
 for my $cpu (@CPUS) {
-	next if $cpu =~ /^(8080|8085|z80|z80n|gbz80|z180|ez80|ez80_z80)(_strict)?$/;
+	next if $cpu =~ /^(8080|8085|z80|z80n|gbz80|z180|ez80|ez80_z80|r800)(_strict)?$/;
 	
 	my $rabbit		= ($cpu =~ /^r2ka|^r3k|^r4k|^r5k/);
 	my $r3k			= ($cpu =~ /^r3k/);
