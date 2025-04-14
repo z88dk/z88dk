@@ -2051,6 +2051,12 @@
  ld sp, ix                      ; FD F9
  ld sp, iy                      ; DD F9
  ld.is (0x1234), a              ; 40 32 34 12
+ ld.lis bc, 0x1234              ; 49 01 34 12
+ ld.lis de, 0x1234              ; 49 11 34 12
+ ld.lis hl, 0x1234              ; 49 21 34 12
+ ld.lis ix, 0x1234              ; 49 FD 21 34 12
+ ld.lis iy, 0x1234              ; 49 DD 21 34 12
+ ld.lis sp, 0x1234              ; 49 31 34 12
  ld.s (bc), a                   ; 52 02
  ld.s (bc+), a                  ; 52 02 52 03
  ld.s (bc-), a                  ; 52 02 52 0B

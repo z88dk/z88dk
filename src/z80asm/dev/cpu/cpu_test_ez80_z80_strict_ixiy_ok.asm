@@ -1678,6 +1678,7 @@
  ld.lis bc, (iy+0)              ; 49 DD 07 00
  ld.lis bc, (iy+126)            ; 49 DD 07 7E
  ld.lis bc, (iy-128)            ; 49 DD 07 80
+ ld.lis bc, 0x1234              ; 49 01 34 12
  ld.lis c, (hl)                 ; 49 4E
  ld.lis c, (ix)                 ; 49 FD 4E 00
  ld.lis c, (ix+0)               ; 49 FD 4E 00
@@ -1705,6 +1706,7 @@
  ld.lis de, (iy+0)              ; 49 DD 17 00
  ld.lis de, (iy+126)            ; 49 DD 17 7E
  ld.lis de, (iy-128)            ; 49 DD 17 80
+ ld.lis de, 0x1234              ; 49 11 34 12
  ld.lis e, (hl)                 ; 49 5E
  ld.lis e, (ix)                 ; 49 FD 5E 00
  ld.lis e, (ix+0)               ; 49 FD 5E 00
@@ -1732,6 +1734,7 @@
  ld.lis hl, (iy+0)              ; 49 DD 27 00
  ld.lis hl, (iy+126)            ; 49 DD 27 7E
  ld.lis hl, (iy-128)            ; 49 DD 27 80
+ ld.lis hl, 0x1234              ; 49 21 34 12
  ld.lis ix, (hl)                ; 49 ED 31
  ld.lis ix, (ix)                ; 49 FD 37 00
  ld.lis ix, (ix+0)              ; 49 FD 37 00
@@ -1741,6 +1744,7 @@
  ld.lis ix, (iy+0)              ; 49 DD 31 00
  ld.lis ix, (iy+126)            ; 49 DD 31 7E
  ld.lis ix, (iy-128)            ; 49 DD 31 80
+ ld.lis ix, 0x1234              ; 49 FD 21 34 12
  ld.lis iy, (hl)                ; 49 ED 37
  ld.lis iy, (ix)                ; 49 FD 31 00
  ld.lis iy, (ix+0)              ; 49 FD 31 00
@@ -1750,6 +1754,7 @@
  ld.lis iy, (iy+0)              ; 49 DD 37 00
  ld.lis iy, (iy+126)            ; 49 DD 37 7E
  ld.lis iy, (iy-128)            ; 49 DD 37 80
+ ld.lis iy, 0x1234              ; 49 DD 21 34 12
  ld.lis l, (hl)                 ; 49 6E
  ld.lis l, (ix)                 ; 49 FD 6E 00
  ld.lis l, (ix+0)               ; 49 FD 6E 00
@@ -1759,6 +1764,7 @@
  ld.lis l, (iy+0)               ; 49 DD 6E 00
  ld.lis l, (iy+126)             ; 49 DD 6E 7E
  ld.lis l, (iy-128)             ; 49 DD 6E 80
+ ld.lis sp, 0x1234              ; 49 31 34 12
  ld.lis sp, hl                  ; 49 F9
  ld.lis sp, ix                  ; 49 FD F9
  ld.lis sp, iy                  ; 49 DD F9

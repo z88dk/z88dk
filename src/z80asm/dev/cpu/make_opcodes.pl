@@ -1900,6 +1900,9 @@ sub add_opcodes {
 			for my $rp ('bc', 'de', 'hl', 'sp') {
 				add_opcode_ez80_sis_lil($cpu, "ld $rp, %m", 
 							[0x01+16*RP($rp), '%m', '%m']);
+				# issue #2423
+				add_opcode($cpu, "ld.lis $rp, %m", 
+							[0x49, 0x01+16*RP($rp), '%m', '%m']);
 			}
 		},
 		"ld <x>, NN [ez80]" => sub {
@@ -1907,6 +1910,9 @@ sub add_opcodes {
 			for my $x ('ix', 'iy') {
 				add_opcode_ez80_sis_lil($cpu, "ld $x, %m", 
 							[PFX($x), 0x21, '%m', '%m']);
+				# issue #2423
+				add_opcode($cpu, "ld.lis $x, %m", 
+							[0x49, PFX($x), 0x21, '%m', '%m']);
 			}
 		},
 		"lhld/shld [ez80]" => sub {

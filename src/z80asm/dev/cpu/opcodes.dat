@@ -33935,6 +33935,10 @@ ld.lis b, (iy)|ez80_z80|_||49;FD 46 00
 ld.lis b, (iy)|ez80_z80_strict|_||49;FD 46 00
 ld.lis b, (iy+%d)|ez80_z80|_||49;FD 46 %d
 ld.lis b, (iy+%d)|ez80_z80_strict|_||49;FD 46 %d
+ld.lis bc, %m|ez80|_||49;01 %m %m
+ld.lis bc, %m|ez80_strict|_||49;01 %m %m
+ld.lis bc, %m|ez80_z80|_||49;01 %m %m
+ld.lis bc, %m|ez80_z80_strict|_||49;01 %m %m
 ld.lis bc, (hl)|ez80_z80|_||49;ED 07
 ld.lis bc, (hl)|ez80_z80_strict|_||49;ED 07
 ld.lis bc, (hl+)|ez80_z80|X||49;ED 07;49;23;49;23
@@ -33980,6 +33984,10 @@ ld.lis d, (iy)|ez80_z80|_||49;FD 56 00
 ld.lis d, (iy)|ez80_z80_strict|_||49;FD 56 00
 ld.lis d, (iy+%d)|ez80_z80|_||49;FD 56 %d
 ld.lis d, (iy+%d)|ez80_z80_strict|_||49;FD 56 %d
+ld.lis de, %m|ez80|_||49;11 %m %m
+ld.lis de, %m|ez80_strict|_||49;11 %m %m
+ld.lis de, %m|ez80_z80|_||49;11 %m %m
+ld.lis de, %m|ez80_z80_strict|_||49;11 %m %m
 ld.lis de, (hl)|ez80_z80|_||49;ED 17
 ld.lis de, (hl)|ez80_z80_strict|_||49;ED 17
 ld.lis de, (hl+)|ez80_z80|X||49;ED 17;49;23;49;23
@@ -34025,6 +34033,10 @@ ld.lis h, (iy)|ez80_z80|_||49;FD 66 00
 ld.lis h, (iy)|ez80_z80_strict|_||49;FD 66 00
 ld.lis h, (iy+%d)|ez80_z80|_||49;FD 66 %d
 ld.lis h, (iy+%d)|ez80_z80_strict|_||49;FD 66 %d
+ld.lis hl, %m|ez80|_||49;21 %m %m
+ld.lis hl, %m|ez80_strict|_||49;21 %m %m
+ld.lis hl, %m|ez80_z80|_||49;21 %m %m
+ld.lis hl, %m|ez80_z80_strict|_||49;21 %m %m
 ld.lis hl, (hl)|ez80_z80|_||49;ED 27
 ld.lis hl, (hl)|ez80_z80_strict|_||49;ED 27
 ld.lis hl, (ix)|ez80_z80|_||49;DD 27 00
@@ -34035,6 +34047,10 @@ ld.lis hl, (iy)|ez80_z80|_||49;FD 27 00
 ld.lis hl, (iy)|ez80_z80_strict|_||49;FD 27 00
 ld.lis hl, (iy+%d)|ez80_z80|_||49;FD 27 %d
 ld.lis hl, (iy+%d)|ez80_z80_strict|_||49;FD 27 %d
+ld.lis ix, %m|ez80|_||49;DD 21 %m %m
+ld.lis ix, %m|ez80_strict|_||49;DD 21 %m %m
+ld.lis ix, %m|ez80_z80|_||49;DD 21 %m %m
+ld.lis ix, %m|ez80_z80_strict|_||49;DD 21 %m %m
 ld.lis ix, (hl)|ez80_z80|_||49;ED 37
 ld.lis ix, (hl)|ez80_z80_strict|_||49;ED 37
 ld.lis ix, (hl+)|ez80_z80|X||49;ED 37;49;23;49;23
@@ -34046,6 +34062,10 @@ ld.lis ix, (iy)|ez80_z80|_||49;FD 31 00
 ld.lis ix, (iy)|ez80_z80_strict|_||49;FD 31 00
 ld.lis ix, (iy+%d)|ez80_z80|_||49;FD 31 %d
 ld.lis ix, (iy+%d)|ez80_z80_strict|_||49;FD 31 %d
+ld.lis iy, %m|ez80|_||49;FD 21 %m %m
+ld.lis iy, %m|ez80_strict|_||49;FD 21 %m %m
+ld.lis iy, %m|ez80_z80|_||49;FD 21 %m %m
+ld.lis iy, %m|ez80_z80_strict|_||49;FD 21 %m %m
 ld.lis iy, (hl)|ez80_z80|_||49;ED 31
 ld.lis iy, (hl)|ez80_z80_strict|_||49;ED 31
 ld.lis iy, (hl+)|ez80_z80|X||49;ED 31;49;23;49;23
@@ -34074,6 +34094,10 @@ ld.lis l, (iy)|ez80_z80|_||49;FD 6E 00
 ld.lis l, (iy)|ez80_z80_strict|_||49;FD 6E 00
 ld.lis l, (iy+%d)|ez80_z80|_||49;FD 6E %d
 ld.lis l, (iy+%d)|ez80_z80_strict|_||49;FD 6E %d
+ld.lis sp, %m|ez80|_||49;31 %m %m
+ld.lis sp, %m|ez80_strict|_||49;31 %m %m
+ld.lis sp, %m|ez80_z80|_||49;31 %m %m
+ld.lis sp, %m|ez80_z80_strict|_||49;31 %m %m
 ld.lis sp, hl|ez80_z80|_||49;F9
 ld.lis sp, hl|ez80_z80_strict|_||49;F9
 ld.lis sp, ix|ez80_z80|_||49;DD F9
