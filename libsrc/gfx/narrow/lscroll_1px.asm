@@ -33,42 +33,28 @@ ___lscroll_1px:
   ENDIF
 
 ; clear 1 pixel column on the left
-    ld      b,maxy-1
-loop1:
-    ld      h,0
+; clear 1 pixel column on the right
+    ld      b,maxy
+loop2:
+    ld      h,maxx-1
     ld      l,b
+    dec     l
     push    bc
     call    pixeladdress
     pop     bc
     ld      a,(de)
     and     0x7F
     ld      (de),a
-    djnz    loop1
+    djnz    loop2
 
 ; get the display memory position and size
     ld      h,maxx-1
     ld      l,maxy-1
     call    pixeladdress
-    push    de
-    push    de
-    ld      h,0
-    ld      l,0
-    call    pixeladdress
-    pop     hl
-    and     a
-    sbc     hl,de
-    ld      b,h
-    ld      c,l
-    inc     bc
-    rr      b           ; loop unrolling
-    rr      c
-    and     a
-    rr      b
-    rr      c
-    and     a
-    rr      b
-    rr      c
-    pop     hl
+    ld      h,d
+    ld      l,e
+
+    ld      bc,maxx*maxy/64
 
     sub     a
     push    af    ; CY reset, to be used in the scroll loop
@@ -103,19 +89,6 @@ loop:
     jr nz,loop
     
     pop    af
-
-; clear 1 pixel column on the right
-    ld      b,maxy-1
-loop2:
-    ld      h,maxx-1
-    ld      l,b
-    push    bc
-    call    pixeladdress
-    pop     bc
-    ld      a,(de)
-    and     0xFE
-    ld      (de),a
-    djnz    loop2
 
   IF    NEED_swapgfxbk
     call    swapgfxbk1
