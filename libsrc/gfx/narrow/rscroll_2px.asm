@@ -34,10 +34,11 @@ ___rscroll_2px:
 
 ; 2 blank pixel columns on the right
 ; to avoid the picture to get back in on the left side
-    ld      b,maxy-1
+    ld      b,maxy
 loop2:
     ld      h,maxx-1
     ld      l,b
+    dec     l
     push    bc
     call    pixeladdress
     pop     bc
@@ -50,27 +51,11 @@ loop2:
     ld      h,0
     ld      l,0
     call    pixeladdress
-    push    de
-    push    de
-    ld      h,maxx-1
-    ld      l,maxy-1
-    call    pixeladdress
-    pop     hl
-    and     a
-    ex      de,hl
-    sbc     hl,de
-    ld      b,h
-    ld      c,l
-    inc     bc
-    rr      b           ; loop unrolling
-    rr      c
-    and     a
-    rr      b
-    rr      c
-    and     a
-    rr      b
-    rr      c
-    pop     hl
+    ld      h,d
+    ld      l,e
+
+    ld      bc,maxx*maxy/64
+
     
 ; now, the actual scroll
     ld de,0
@@ -152,21 +137,6 @@ loop:
     ld a,b
     or c
     jr nz,loop
-
-
-; 2 blank pixel columns on the left
-; to avoid the picture to get back in on the right side
-    ld      b,maxy-1
-loop1:
-    ld      h,0
-    ld      l,b
-    push    bc
-    call    pixeladdress
-    pop     bc
-    ld      a,(de)
-    and     0x3F
-    ld      (de),a
-    djnz    loop1
 
   IF    NEED_swapgfxbk
     call    swapgfxbk1
