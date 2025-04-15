@@ -36,7 +36,7 @@ ___lscroll_1px:
 ; clear 1 pixel column on the right
     ld      b,maxy
 loop2:
-    ld      h,maxx-1
+    ld      h,0
     ld      l,b
     dec     l
     push    bc
