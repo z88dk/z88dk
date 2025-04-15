@@ -35,6 +35,7 @@ gfx/narrow/obj/${TARGET}/liner
 gfx/narrow/obj/${TARGET}/lscroll_1px
 gfx/narrow/obj/${TARGET}/lscroll_2px
 gfx/narrow/obj/${TARGET}/lscroll_4px
+gfx/narrow/obj/${TARGET}/lscroll_8px
 gfx/narrow/obj/${TARGET}/move
 gfx/narrow/obj/${TARGET}/multipoint
 gfx/narrow/obj/${TARGET}/multipoint_callee
@@ -51,6 +52,7 @@ gfx/narrow/obj/${TARGET}/respixl
 gfx/narrow/obj/${TARGET}/rscroll_1px
 gfx/narrow/obj/${TARGET}/rscroll_2px
 gfx/narrow/obj/${TARGET}/rscroll_4px
+gfx/narrow/obj/${TARGET}/rscroll_8px
 gfx/narrow/obj/${TARGET}/setpos
 gfx/narrow/obj/${TARGET}/setpos_callee
 gfx/narrow/obj/${TARGET}/setxy
