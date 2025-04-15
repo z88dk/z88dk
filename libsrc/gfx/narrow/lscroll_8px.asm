@@ -46,12 +46,11 @@ loop2:
     djnz    loop2
 
 ; get the display memory position and size
-    ld      h,maxx-1
-    ld      l,maxy-1
+    ld      h,a
+    ld      l,a
     call    pixeladdress
     ld      h,d
     ld      l,e
-	push    hl
     inc     hl
 
     ld      bc,maxx*maxy/8
@@ -59,21 +58,25 @@ loop2:
 
 ; now, the actual scroll
 loop:
-    ldd         ; loop unrolling
-    ldd
-    ldd
-    ldd
-    ldd
-    ldd
-    ldd
-    ldd
+    ldi         ; loop unrolling
+    ldi
+    ldi
+    ldi
+    ldi
+    ldi
+    ldi
 
+    dec bc
     ld a,b
     or c
-    jr nz,loop
-    
-    pop    hl
-	ld (hl),0
+    jr z,end_loop
+    inc bc
+
+    ldi
+    jr loop
+
+end_loop:
+    ld (de),a
 
   IF    NEED_swapgfxbk
     call    swapgfxbk1
