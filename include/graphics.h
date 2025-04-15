@@ -233,6 +233,31 @@ extern void __LIB__ xorcircle_callee(int x, int y, int radius, int skip) __small
 extern void __LIB__ clg(void);
 
 
+/* Scroll the graphics map 1 pixel left */
+extern void __LIB__ lscroll_1px(void);
+
+/* Scroll the graphics map 1 pixel right */
+extern void __LIB__ rscroll_1px(void);
+
+/* Scroll the graphics map 2 pixel left */
+extern void __LIB__ lscroll_2px(void);
+
+/* Scroll the graphics map 2 pixel right */
+extern void __LIB__ rscroll_2px(void);
+
+/* Scroll the graphics map 4 pixel left */
+extern void __LIB__ lscroll_4px(void);
+
+/* Scroll the graphics map 4 pixel right */
+extern void __LIB__ rscroll_4px(void);
+
+/* Scroll the graphics map 8 pixel left */
+extern void __LIB__ lscroll_8px(void);
+
+/* Scroll the graphics map 8 pixel right */
+extern void __LIB__ rscroll_8px(void);
+
+
 /* Clear area of graphics map */
 __ZPROTO4(void,,clga,int,tlx,int,tly,int,tlx2,int,tly2)
 #ifndef __STDC_ABI_ONLY
