@@ -47,8 +47,7 @@ loop2:
     djnz    loop2
 
 ; get the display memory position and size
-    ld      h,0
-    ld      l,0
+    ld      hl,0
     call    pixeladdress
     ld      h,d
     ld      l,e
