@@ -33,7 +33,6 @@ ___lscroll_1px:
   ENDIF
 
 ; clear 1 pixel column on the left
-; clear 1 pixel column on the right
     ld      b,maxy
 loop2:
     ld      h,0
