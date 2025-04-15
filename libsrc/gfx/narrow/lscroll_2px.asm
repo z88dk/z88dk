@@ -36,7 +36,7 @@ ___lscroll_2px:
 ; to avoid the picture to get back in on the right side
     ld      b,maxy
 loop2:
-    ld      h,maxx-1
+    ld      h,0
     ld      l,b
     dec     l
     push    bc
