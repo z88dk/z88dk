@@ -800,7 +800,9 @@ void Options::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_GBZ80_STRICT__");
 
     undefine_static_symbol("__CPU_KC160__");
+    undefine_static_symbol("__CPU_KC160_STRICT__");
     undefine_static_symbol("__CPU_KC160_Z80__");
+    undefine_static_symbol("__CPU_KC160_Z80_STRICT__");
 
     switch (cpu) {
     case CPU_Z80:
@@ -913,9 +915,17 @@ void Options::set_cpu(int cpu) {
         m_cpu = CPU_KC160;
         define_static_symbol("__CPU_KC160__");
         break;
+    case CPU_KC160_STRICT:
+        m_cpu = CPU_KC160_STRICT;
+        define_static_symbol("__CPU_KC160_STRICT__");
+        break;
     case CPU_KC160_Z80:
         m_cpu = CPU_KC160_Z80;
         define_static_symbol("__CPU_KC160_Z80__");
+        break;
+    case CPU_KC160_Z80_STRICT:
+        m_cpu = CPU_KC160_Z80_STRICT;
+        define_static_symbol("__CPU_KC160_Z80_STRICT__");
         break;
     default:
         xassert(0);

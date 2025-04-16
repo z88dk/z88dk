@@ -41,11 +41,23 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, "djnz b, %j", "dec b", "jr nz, %j");
 	}
 
+	# RET3 <F>
+	add_synth($cpu, "ret3 nc", "jr c, %t", "ret3");
+	add_synth($cpu, "ret3 c", "jr nc, %t", "ret3");
+	add_synth($cpu, "ret3 nz", "jr z, %t", "ret3");
+	add_synth($cpu, "ret3 z", "jr nz, %t", "ret3");
+	add_synth($cpu, "ret3 p", "jp m, %t", "ret3");
+	add_synth($cpu, "ret3 m", "jp p, %t", "ret3");
+	add_synth($cpu, "ret3 po", "jp pe, %t", "ret3");
+	add_synth($cpu, "ret3 pe", "jp po, %t", "ret3");
+	
 	# JP|CALL|RET EQ, NN
 	add_synth($cpu, "jeq %m", "jz %m");
 	add_synth($cpu, "j_eq %m", "jz %m");
 	add_synth($cpu, "jr eq, %j", "jr z, %j");
+	add_synth($cpu, "jp3 eq, %m", "jp3 z, %m");
 	add_synth($cpu, "ceq %m", "cz %m");
+	add_synth($cpu, "call3 eq, %m", "call3 z, %m");
 	add_synth($cpu, "c_eq %m", "cz %m");
 	for my $suf (@ez80_suffixes) {
 		add_synth($cpu, "jp$suf eq, %m", "jp$suf z, %m");
@@ -54,13 +66,16 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, "ret$suf eq", "ret$suf z");
 	}
 	add_synth($cpu, "req", "rz");
+	add_synth($cpu, "ret3 eq", "jr nz, %t", "ret3");
 	add_synth($cpu, "r_eq", "rz");
 
 	# JP|CALL|RET NE, NN
 	add_synth($cpu, "jne %m", "jnz %m");
 	add_synth($cpu, "j_ne %m", "jnz %m");
 	add_synth($cpu, "jr ne, %j", "jr nz, %j");
+	add_synth($cpu, "jp3 ne, %m", "jp3 nz, %m");
 	add_synth($cpu, "cne %m", "cnz %m");
+	add_synth($cpu, "call3 ne, %m", "call3 nz, %m");
 	add_synth($cpu, "c_ne %m", "cnz %m");
 	for my $suf (@ez80_suffixes) {
 		add_synth($cpu, "jp$suf ne, %m", "jp$suf nz, %m");
@@ -69,13 +84,16 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, "ret$suf ne", "ret$suf nz");
 	}
 	add_synth($cpu, "rne", "rnz");
+	add_synth($cpu, "ret3 ne", "jr z, %t", "ret3");
 	add_synth($cpu, "r_ne", "rnz");
 
 	# JP|CALL|RET GEU, NN
 	add_synth($cpu, "jgeu %m", "jnc %m");
 	add_synth($cpu, "j_geu %m", "jnc %m");
 	add_synth($cpu, "jr geu, %j", "jr nc, %j");
+	add_synth($cpu, "jp3 geu, %m", "jp3 nc, %m");
 	add_synth($cpu, "cgeu %m", "cnc %m");
+	add_synth($cpu, "call3 geu, %m", "call3 nc, %m");
 	add_synth($cpu, "c_geu %m", "cnc %m");
 	for my $suf (@ez80_suffixes) {
 		add_synth($cpu, "jp$suf geu, %m", "jp$suf nc, %m");
@@ -84,13 +102,16 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, "ret$suf geu", "ret$suf nc");
 	}
 	add_synth($cpu, "rgeu", "rnc");
+	add_synth($cpu, "ret3 geu", "jr c, %t", "ret3");
 	add_synth($cpu, "r_geu", "rnc");
 
 	# JP|CALL|RET LTU, NN
 	add_synth($cpu, "jltu %m", "jc %m");
 	add_synth($cpu, "j_ltu %m", "jc %m");
 	add_synth($cpu, "jr ltu, %j", "jr c, %j");
+	add_synth($cpu, "jp3 ltu, %m", "jp3 c, %m");
 	add_synth($cpu, "cltu %m", "cc %m");
+	add_synth($cpu, "call3 ltu, %m", "call3 c, %m");
 	add_synth($cpu, "c_ltu %m", "cc %m");
 	for my $suf (@ez80_suffixes) {
 		add_synth($cpu, "jp$suf ltu, %m", "jp$suf c, %m");
@@ -99,13 +120,16 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, "ret$suf ltu", "ret$suf c");
 	}
 	add_synth($cpu, "rltu", "rc");
+	add_synth($cpu, "ret3 ltu", "jr nc, %t", "ret3");
 	add_synth($cpu, "r_ltu", "rc");
 	
 	# JP|CALL|RET GTU, NN
 	add_synth($cpu, "jgtu %m", "jz %t", "jnc %m");
 	add_synth($cpu, "j_gtu %m", "jz %t", "jnc %m");
 	add_synth($cpu, "jr gtu, %j", "jr z, %t", "jr nc, %j");
+	add_synth($cpu, "jp3 gtu, %m", "jr z, %t", "jp3 nc, %m");
 	add_synth($cpu, "cgtu %m", "jr z, %t", "call nc, %m");
+	add_synth($cpu, "call3 gtu, %m", "jr z, %t", "call3 nc, %m");
 	add_synth($cpu, "c_gtu %m", "jr z, %t", "call nc, %m");
 	for my $suf (@ez80_suffixes) {
 		add_synth($cpu, "jp$suf gtu, %m", "jr z, %t", "jp$suf nc, %m");
@@ -114,12 +138,14 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, "ret$suf gtu", "jr z, %t", "ret$suf nc");
 	}
 	add_synth($cpu, "rgtu", "jr z, %t", "rnc");
+	add_synth($cpu, "ret3 gtu", "jr z, %t", "jr c, %t", "ret3");
 	add_synth($cpu, "r_gtu", "jr z, %t", "rnc");
 
 	# JP|CALL|RET LEU, NN
 	add_synth($cpu, "jleu %m", "jz %m", "jc %m");
 	add_synth($cpu, "j_leu %m", "jz %m", "jc %m");
 	add_synth($cpu, "jr leu, %j", "jr z, %j", "jr c, %j");
+	add_synth($cpu, "jp3 leu, %m", "jp3 z, %m", "jp3 c, %m");
 	for my $suf (@ez80_suffixes) {
 		# ez80 size of call instuction
 		my $call_size = 3;
@@ -129,6 +155,7 @@ for my $cpu (Opcode->cpus) {
 		}
 	
 		add_synth($cpu, "cleu %m", "jr z, %t$call_size", "jr nc, %t", "call %m");
+		add_synth($cpu, "call3 leu, %m", "jr z, %t$call_size", "jr nc, %t", "call3 %m");
 		add_synth($cpu, "c_leu %m", "jr z, %t$call_size", "jr nc, %t", "call %m");
 
 		add_synth($cpu, "jp$suf leu, %m", "jp$suf z, %m", "jp$suf c, %m");
@@ -137,6 +164,7 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, "ret$suf leu", "ret$suf z", "ret$suf c");
 	}
 	add_synth($cpu, "rleu", "rz", "rc");
+	add_synth($cpu, "ret3 leu", "jr nz, %t", "jr nc, %t", "ret3");
 	add_synth($cpu, "r_leu", "rz", "rc");
 
 	# JP|CALL|RET NV, NN
@@ -145,7 +173,9 @@ for my $cpu (Opcode->cpus) {
 	else {
 		add_synth($cpu, "jnv %m", "jpo %m");
 		add_synth($cpu, "j_nv %m", "jpo %m");
+		add_synth($cpu, "jp3 nv, %m", "jp3 po, %m");
 		add_synth($cpu, "cnv %m", "cpo %m");
+		add_synth($cpu, "call3 nv, %m", "call3 po, %m");
 		add_synth($cpu, "c_nv %m", "cpo %m");
 		for my $suf (@ez80_suffixes) {
 			add_synth($cpu, "jp$suf nv, %m", "jp$suf po, %m");
@@ -154,6 +184,7 @@ for my $cpu (Opcode->cpus) {
 			add_synth($cpu, "ret$suf nv", "ret$suf po");
 		}
 		add_synth($cpu, "rnv", "rpo");
+		add_synth($cpu, "ret3 nv", "jp pe, %t", "ret3");
 		add_synth($cpu, "r_nv", "rpo");
 	}
 
@@ -163,7 +194,9 @@ for my $cpu (Opcode->cpus) {
 	else {
 		add_synth($cpu, "jv %m", "jpe %m");
 		add_synth($cpu, "j_v %m", "jpe %m");
+		add_synth($cpu, "jp3 v, %m", "jp3 pe, %m");
 		add_synth($cpu, "cv %m", "cpe %m");
+		add_synth($cpu, "call3 v, %m", "call3 pe, %m");
 		add_synth($cpu, "c_v %m", "cpe %m");
 		for my $suf (@ez80_suffixes) {
 			add_synth($cpu, "jp$suf v, %m", "jp$suf pe, %m");
@@ -172,6 +205,7 @@ for my $cpu (Opcode->cpus) {
 			add_synth($cpu, "ret$suf v", "ret$suf pe");
 		}
 		add_synth($cpu, "rv", "rpe");
+		add_synth($cpu, "ret3 v", "jp po, %t", "ret3");
 		add_synth($cpu, "r_v", "rpe");
 	}		
 	

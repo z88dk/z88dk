@@ -79,6 +79,16 @@ sub PFX {
 	return ''.{'ix'=>0xDD, 'iy'=>0xFD}->{$_[0]};
 }
 
+sub KC_CONST1 {
+	return ''.{ 'x'=>0x40,  'y'=>0x49, 'a'=>0x52,  'p'=>0x5B,  'z'=>0x7F,
+			   'xp'=>0x40, 'yp'=>0x49, 'a'=>0x52, 'pp'=>0x5B, 'zp'=>0x7F}->{$_[0]};
+}
+
+sub KC_CONST2 {
+	return ''.{ 'x'=>0x40,  'y'=>0x49, 'a'=>0x52,  'z'=>0x7F,
+			   'xp'=>0x40, 'yp'=>0x49, 'a'=>0x52, 'zp'=>0x7F}->{$_[0]};
+}
+
 sub cpu_flags {
 	my($cpu) = @_;
 	if ($cpu =~ /gbz80/) {
@@ -112,7 +122,8 @@ sub add_opcode_1 {
 	if (@$ops > 1 && 
 	    ($ops->[0] == 0x76 ||						# rabbit
 		 $ops->[0] == 0x40 || $ops->[0] == 0x49 || 
-		 $ops->[0] == 0x52 || $ops->[0] == 0x5B)) {	# ez80
+		 $ops->[0] == 0x52 || $ops->[0] == 0x5B ||
+		 $ops->[0] == 0x7F)) {						# ez80 / kc160
 		my @pfx = shift @$ops;
 		@ops = ([@pfx], [@$ops]);
 	}
@@ -289,7 +300,8 @@ sub add_opcodes {
 			for my $d ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
 				for my $s ('b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a') {
 					next if $d eq '(hl)' && $d eq $s;
-					next if $cpu =~ /ez80/ && "$s$d" =~ /bb|cc|dd|ee/;	# .SIS, .LIS, .SIL, .LIL prefixes
+					next if $cpu =~ /ez80/ && "$s$d" =~ /bb|cc|dd|ee/;				# .SIS, .LIS, .SIL, .LIL prefixes
+					next if $cpu =~ /^kc160(_strict)?$/ && "$s$d" =~ /bb|cc|dd|ee|hh|ll|aa/;	# x, y, a, p, z prefixes
 					if (!get_opcode($cpu, "ld $d, $s")) {
 						add_opcode($cpu, "ld $d, $s", [0x40+8*R($d)+R($s)]);
 					}
@@ -301,7 +313,8 @@ sub add_opcodes {
 			for my $d ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
 				for my $s ('b', 'c', 'd', 'e', 'h', 'l', 'm', 'a') {
 					next if $d eq 'm' && $d eq $s;
-					next if $cpu =~ /ez80/ && "$s$d" =~ /bb|cc|dd|ee/;	# .SIS, .LIS, .SIL, .LIL prefixes
+					next if $cpu =~ /ez80/ && "$s$d" =~ /bb|cc|dd|ee/;				# .SIS, .LIS, .SIL, .LIL prefixes
+					next if $cpu =~ /^kc160(_strict)?$/ && "$s$d" =~ /bb|cc|dd|ee|hh|ll|aa/;	# x, y, a, p, z prefixes
 					if (!get_opcode($cpu, "mov $d, $s")) {
 						add_opcode($cpu, "mov $d, $s", [0x40+8*R($d)+R($s)]);
 					}
@@ -1851,7 +1864,7 @@ sub add_opcodes {
 				add_opcode_ez80_s_l($cpu, "ld (hl), $r", [0x40+8*6+R($r)]);
 			}
 		},
-		"ld (hl), <rr> [ez80]" => sub {
+		"ld (hl), <rp> [ez80]" => sub {
 			my($cpu) = @_;
 			for my $rp ('bc', 'de', 'hl') {
 				add_opcode_ez80_s_l($cpu, "ld $rp, (hl)", 
@@ -1974,7 +1987,7 @@ sub add_opcodes {
 						[PFX($x), 0x36, '%d', '%n']);
 			}
 		},
-		"ld (<x>+DIS), <rr> [ez80]" => sub {
+		"ld (<x>+DIS), <rp> [ez80]" => sub {
 			my($cpu) = @_;
 			for my $x ('ix', 'iy') {
 				for my $rp ('bc', 'de', 'hl') {
@@ -2002,7 +2015,7 @@ sub add_opcodes {
 			add_opcode_ez80_s_l($cpu, "ldd", [0xED, 0xA8]);
 			add_opcode_ez80_s_l($cpu, "lddr", [0xED, 0xB8]);
 		},
-		"lea <rr>, <x>+DIS [ez80]" => sub {
+		"lea <rp>, <x>+DIS [ez80]" => sub {
 			my($cpu) = @_;
 			for my $rp ('bc', 'de', 'hl') {
 				add_opcode_ez80_s_l($cpu, "lea $rp, ix+%d", 
@@ -2123,11 +2136,559 @@ sub add_opcodes {
 				add_opcode($cpu, "mulub a, $r", [0xED, 0xC1+8*R($r)]);
 			}
 		},
-		"muluw hl, <rr> [r800]" => sub {
+		"muluw hl, <rp> [r800]" => sub {
 			my($cpu) = @_;
 			for my $rp ('bc', 'de', 'hl', 'sp') {
 				add_opcode($cpu, "muluw hl, $rp", [0xED, 0xC3+16*RP($rp)]);
 			}
+		},
+		"ld (*hl), <r> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
+					add_opcode($cpu, "ld $r, (${p}hl)", [KC_CONST1($p), 0x46+8*R($r)]);
+					add_opcode($cpu, "ld (${p}hl), $r", [KC_CONST1($p), 0x70+R($r)]);
+				}
+			}
+		},
+		"ld (*hl), N [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				add_opcode($cpu, "ld (${p}hl), %n", [KC_CONST1($p), 0x36, '%n']);
+			}
+		},
+		"ld (*<x>+DIS), <r> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $x ('ix', 'iy') {
+				for my $p ('x', 'y', 'a', 'p', 'z') {
+					for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
+						add_opcode($cpu, "ld $r, (${p}${x}+%d)", [KC_CONST1($p), PFX($x), 0x46+8*R($r), '%d']);
+						add_opcode($cpu, "ld (${p}${x}+%d), $r", [KC_CONST1($p), PFX($x), 0x70+R($r), '%d']);
+					}
+				}
+			}
+		},
+		"ld (*<x>+DIS), N [kc160]" => sub {
+			my($cpu) = @_;
+			for my $x ('ix', 'iy') {
+				for my $p ('x', 'y', 'a', 'p', 'z') {
+					add_opcode($cpu, "ld (${p}${x}+%d), %n", [KC_CONST1($p), PFX($x), 0x36, '%d', '%n']);
+				}
+			}
+		},
+		"ld (*<rp>), a [kc160]" => sub {
+			my($cpu) = @_;
+			for my $rp ('bc', 'de') {
+				for my $p ('x', 'y', 'a', 'p', 'z') {
+					add_opcode($cpu, "ld a, (${p}${rp})", [KC_CONST1($p), 0x0A+16*RP($rp)]);
+					add_opcode($cpu, "ld (${p}${rp}), a", [KC_CONST1($p), 0x02+16*RP($rp)]);
+				}
+			}
+		},
+		"ld (*p:NN), a [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('xp', 'yp', 'a', 'pp', 'zp') {
+				add_opcode($cpu, "ld a, (${p}:%m)", [KC_CONST1($p), 0x3A, '%m', '%m']);
+				add_opcode($cpu, "ld (${p}:%m), a", [KC_CONST1($p), 0x32, '%m', '%m']);
+			}
+		},
+		"ld *p, a [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld a, zp",  [0xED, 0xC4]);
+			add_opcode($cpu, "ld a, yp",  [0xED, 0xCC]);
+			add_opcode($cpu, "ld a, xp",  [0xED, 0xC5]);
+			add_opcode($cpu, "ld xp, yp", [0xED, 0xD4]);
+			add_opcode($cpu, "ld xp, zp", [0xED, 0xDC]);
+			add_opcode($cpu, "ld xp, a",  [0xED, 0xD5]);
+			add_opcode($cpu, "ld yp, xp", [0xED, 0xE4]);
+			add_opcode($cpu, "ld yp, a",  [0xED, 0xEC]);
+			add_opcode($cpu, "ld yp, zp", [0xED, 0xE5]);
+			add_opcode($cpu, "ld zp, a",  [0xED, 0xF4]);
+			add_opcode($cpu, "ld zp, xp", [0xED, 0xFC]);
+			add_opcode($cpu, "ld zp, yp", [0xED, 0xF5]);
+		},
+		"ldf (NNN), a [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ldf a, (%m)", [0xED, 0x3B, '%m', '%m', '%m']);
+			add_opcode($cpu, "ldf (%m), a", [0xED, 0x33, '%m', '%m', '%m']);		
+		},
+		"ld (*p:NN), hl [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('xp', 'yp', 'a', 'pp', 'zp') {
+				add_opcode($cpu, "ld hl, (${p}:%m)", [KC_CONST1($p), 0x2A, '%m', '%m']);
+				add_opcode($cpu, "ld (${p}:%m), hl", [KC_CONST1($p), 0x22, '%m', '%m']);
+			}
+		},
+		"ld (*p:NN), <rp> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $rp ('bc', 'de', 'sp') {
+				for my $p ('xp', 'yp', 'a', 'pp', 'zp') {
+					add_opcode($cpu, "ld ${rp}, (${p}:%m)", [KC_CONST1($p), 0xED, 0x4B+16*RP($rp), '%m', '%m']);
+					add_opcode($cpu, "ld (${p}:%m), ${rp}", [KC_CONST1($p), 0xED, 0x43+16*RP($rp), '%m', '%m']);
+				}
+			}
+		},
+		"ld (*p:NN), <x> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $x ('ix', 'iy') {
+				for my $p ('xp', 'yp', 'a', 'pp', 'zp') {
+					add_opcode($cpu, "ld ${x}, (${p}:%m)", [KC_CONST1($p), PFX($x), 0x2A, '%m', '%m']);
+					add_opcode($cpu, "ld (${p}:%m), ${x}", [KC_CONST1($p), PFX($x), 0x22, '%m', '%m']);
+				}
+			}
+		},
+		"ld (<x>+DIS), <rp> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $rp ('bc', 'de', 'hl', 'sp') {
+				add_opcode($cpu, "ld $rp, (ix+%d)", [0xED, 0x8D+16*RP($rp), '%d']);
+				add_opcode($cpu, "ld $rp, (iy+%d)", [0xED, 0x8C+16*RP($rp), '%d']);
+				add_opcode($cpu, "ld (ix+%d), $rp", [0xED, 0x85+16*RP($rp), '%d']);
+				add_opcode($cpu, "ld (iy+%d), $rp", [0xED, 0x84+16*RP($rp), '%d']);
+			}
+		},
+		"ld (sp+DIS), <rp> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $rp ('bc', 'de', 'hl', 'sp') {
+				add_opcode($cpu, "ld $rp, (sp+%d)", [0xED, 0x8E+16*RP($rp), '%d']);
+				add_opcode($cpu, "ld (sp+%d), $rp", [0xED, 0x86+16*RP($rp), '%d']);
+			}
+		},
+		"ldf (NNN), <rp> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $rp ('bc', 'de', 'hl', 'sp') {
+				add_opcode($cpu, "ldf $rp, (%m)", [0xED, 0x8F+16*RP($rp), '%m', '%m', '%m']);
+				add_opcode($cpu, "ldf (%m), $rp", [0xED, 0x87+16*RP($rp), '%m', '%m', '%m']);
+			}
+		},
+		"ld (<x>+DIS), <x> [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld (ix+%d), ix", [0xED, 0x81, '%d']);
+			add_opcode($cpu, "ld (iy+%d), ix", [0xED, 0x80, '%d']);
+			add_opcode($cpu, "ld ix, (ix+%d)", [0xED, 0x89, '%d']);
+			add_opcode($cpu, "ld ix, (iy+%d)", [0xED, 0x88, '%d']);
+
+			add_opcode($cpu, "ld (ix+%d), iy", [0xED, 0x91, '%d']);
+			add_opcode($cpu, "ld (iy+%d), iy", [0xED, 0x90, '%d']);
+			add_opcode($cpu, "ld iy, (ix+%d)", [0xED, 0x99, '%d']);
+			add_opcode($cpu, "ld iy, (iy+%d)", [0xED, 0x98, '%d']);
+		},
+		"ld (sp+DIS), <x> [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld (sp+%d), ix", [0xED, 0x82, '%d']);
+			add_opcode($cpu, "ld (sp+%d), iy", [0xED, 0x92, '%d']);
+			add_opcode($cpu, "ld ix, (sp+%d)", [0xED, 0x8A, '%d']);
+			add_opcode($cpu, "ld iy, (sp+%d)", [0xED, 0x9A, '%d']);
+		},
+		"ldf (NNN), <x> [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ldf (%m), ix", [0xED, 0x83, '%m', '%m', '%m']);
+			add_opcode($cpu, "ldf (%m), iy", [0xED, 0x93, '%m', '%m', '%m']);
+			add_opcode($cpu, "ldf ix, (%m)", [0xED, 0x8B, '%m', '%m', '%m']);
+			add_opcode($cpu, "ldf iy, (%m)", [0xED, 0x9B, '%m', '%m', '%m']);
+		},
+		"ld (*<x>+DIS), <rp> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				for my $rp ('bc', 'de', 'hl', 'sp') {
+					add_opcode($cpu, "ld $rp, (${p}ix+%d)", [KC_CONST1($p), 0xED, 0x8D+16*RP($rp), '%d']);
+					add_opcode($cpu, "ld $rp, (${p}iy+%d)", [KC_CONST1($p), 0xED, 0x8C+16*RP($rp), '%d']);
+					add_opcode($cpu, "ld (${p}ix+%d), $rp", [KC_CONST1($p), 0xED, 0x85+16*RP($rp), '%d']);
+					add_opcode($cpu, "ld (${p}iy+%d), $rp", [KC_CONST1($p), 0xED, 0x84+16*RP($rp), '%d']);
+				}
+			}
+		},
+		"ld (*<x>+DIS), <x> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				add_opcode($cpu, "ld (${p}ix+%d), ix", [KC_CONST1($p), 0xED, 0x81, '%d']);
+				add_opcode($cpu, "ld (${p}iy+%d), ix", [KC_CONST1($p), 0xED, 0x80, '%d']);
+				add_opcode($cpu, "ld ix, (${p}ix+%d)", [KC_CONST1($p), 0xED, 0x89, '%d']);
+				add_opcode($cpu, "ld ix, (${p}iy+%d)", [KC_CONST1($p), 0xED, 0x88, '%d']);
+
+				add_opcode($cpu, "ld (${p}ix+%d), iy", [KC_CONST1($p), 0xED, 0x91, '%d']);
+				add_opcode($cpu, "ld (${p}iy+%d), iy", [KC_CONST1($p), 0xED, 0x90, '%d']);
+				add_opcode($cpu, "ld iy, (${p}ix+%d)", [KC_CONST1($p), 0xED, 0x99, '%d']);
+				add_opcode($cpu, "ld iy, (${p}iy+%d)", [KC_CONST1($p), 0xED, 0x98, '%d']);
+			}
+		},
+		"ld <hl/x>, sp [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld ix, sp", [0xED, 0x06]);
+			add_opcode($cpu, "ld iy, sp", [0xED, 0x16]);
+			add_opcode($cpu, "ld hl, sp", [0xED, 0x26]);
+		},
+		"ld (<x>+DIS), xix [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld (ix+%d), xix", [0xED, 0x01, '%d']);
+			add_opcode($cpu, "ld (iy+%d), xix", [0xED, 0x00, '%d']);
+			add_opcode($cpu, "ld xix, (ix+%d)", [0xED, 0x09, '%d']);
+			add_opcode($cpu, "ld xix, (iy+%d)", [0xED, 0x08, '%d']);
+		},
+		"ld (sp+DIS), xix [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld (sp+%d), xix", [0xED, 0x02, '%d']);
+			add_opcode($cpu, "ld xix, (sp+%d)", [0xED, 0x0A, '%d']);
+		},
+		"ldf (NNN), xix [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ldf (%m), xix", [0xED, 0x03, '%m', '%m', '%m']);
+			add_opcode($cpu, "ldf xix, (%m)", [0xED, 0x0B, '%m', '%m', '%m']);
+		},
+		"ld (<x>+DIS), yiy [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld (ix+%d), yiy", [0xED, 0x11, '%d']);
+			add_opcode($cpu, "ld (iy+%d), yiy", [0xED, 0x10, '%d']);
+			add_opcode($cpu, "ld yiy, (ix+%d)", [0xED, 0x19, '%d']);
+			add_opcode($cpu, "ld yiy, (iy+%d)", [0xED, 0x18, '%d']);
+		},
+		"ld (sp+DIS), yiy [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld (sp+%d), yiy", [0xED, 0x12, '%d']);
+			add_opcode($cpu, "ld yiy, (sp+%d)", [0xED, 0x1A, '%d']);
+		},
+		"ldf (NNN), yiy [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ldf (%m), yiy", [0xED, 0x13, '%m', '%m', '%m']);
+			add_opcode($cpu, "ldf yiy, (%m)", [0xED, 0x1B, '%m', '%m', '%m']);
+		},
+		"ld (<x>+DIS), ahl [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld (ix+%d), ahl", [0xED, 0x21, '%d']);
+			add_opcode($cpu, "ld (iy+%d), ahl", [0xED, 0x20, '%d']);
+			add_opcode($cpu, "ld ahl, (ix+%d)", [0xED, 0x29, '%d']);
+			add_opcode($cpu, "ld ahl, (iy+%d)", [0xED, 0x28, '%d']);
+		},
+		"ld (sp+DIS), ahl [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld (sp+%d), ahl", [0xED, 0x22, '%d']);
+			add_opcode($cpu, "ld ahl, (sp+%d)", [0xED, 0x2A, '%d']);
+		},
+		"ldf (NNN), ahl [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ldf (%m), ahl", [0xED, 0x23, '%m', '%m', '%m']);
+			add_opcode($cpu, "ldf ahl, (%m)", [0xED, 0x2B, '%m', '%m', '%m']);
+		},
+		"ld (*<x>+DIS), xix [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				add_opcode($cpu, "ld xix, (${p}ix+%d)", [KC_CONST1($p), 0xED, 0x09, '%d']);
+				add_opcode($cpu, "ld xix, (${p}iy+%d)", [KC_CONST1($p), 0xED, 0x08, '%d']);
+				add_opcode($cpu, "ld (${p}ix+%d), xix", [KC_CONST1($p), 0xED, 0x01, '%d']);
+				add_opcode($cpu, "ld (${p}iy+%d), xix", [KC_CONST1($p), 0xED, 0x00, '%d']);
+			}
+		},
+		"ld (*<x>+DIS), yiy [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				add_opcode($cpu, "ld yiy, (${p}ix+%d)", [KC_CONST1($p), 0xED, 0x19, '%d']);
+				add_opcode($cpu, "ld yiy, (${p}iy+%d)", [KC_CONST1($p), 0xED, 0x18, '%d']);
+				add_opcode($cpu, "ld (${p}ix+%d), yiy", [KC_CONST1($p), 0xED, 0x11, '%d']);
+				add_opcode($cpu, "ld (${p}iy+%d), yiy", [KC_CONST1($p), 0xED, 0x10, '%d']);
+			}
+		},
+		"ld (*<x>+DIS), ahl [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				add_opcode($cpu, "ld ahl, (${p}ix+%d)", [KC_CONST1($p), 0xED, 0x29, '%d']);
+				add_opcode($cpu, "ld ahl, (${p}iy+%d)", [KC_CONST1($p), 0xED, 0x28, '%d']);
+				add_opcode($cpu, "ld (${p}ix+%d), ahl", [KC_CONST1($p), 0xED, 0x21, '%d']);
+				add_opcode($cpu, "ld (${p}iy+%d), ahl", [KC_CONST1($p), 0xED, 0x20, '%d']);
+			}
+		},
+		"ld <ptr>, NNN [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ld xix, %m", [0xED, 0x0E, '%m', '%m', '%m']);
+			add_opcode($cpu, "ld yiy, %m", [0xED, 0x1E, '%m', '%m', '%m']);
+			add_opcode($cpu, "ld ahl, %m", [0xED, 0x2E, '%m', '%m', '%m']);
+		},
+		"push/pop <ptr> [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "push xix", [0xED, 0x07]);
+			add_opcode($cpu, "push yiy", [0xED, 0x17]);
+			add_opcode($cpu, "push ahl", [0xED, 0x27]);
+			add_opcode($cpu, "pop xix",  [0xED, 0x0F]);
+			add_opcode($cpu, "pop yiy",  [0xED, 0x1F]);
+			add_opcode($cpu, "pop ahl",  [0xED, 0x2F]);
+		},
+		"ldi/ldir/ldd/lddr xy [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ldi xy", [0xED, 0xE0]);
+			add_opcode($cpu, "ldir xy", [0xED, 0xF0]);
+			add_opcode($cpu, "ldd xy", [0xED, 0xE8]);
+			add_opcode($cpu, "lddr xy", [0xED, 0xF8]);
+		},
+		"cpi/cpir/cpd/cpdr x [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "cpi x", [0xED, 0xE1]);
+			add_opcode($cpu, "cpir x", [0xED, 0xF1]);
+			add_opcode($cpu, "cpd x", [0xED, 0xE9]);
+			add_opcode($cpu, "cpdr x", [0xED, 0xF9]);
+		},
+		"ini/inir/ind/indr x [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ini x", [0xED, 0xE2]);
+			add_opcode($cpu, "inir x", [0xED, 0xF2]);
+			add_opcode($cpu, "ind x", [0xED, 0xEA]);
+			add_opcode($cpu, "indr x", [0xED, 0xFA]);
+		},
+		"outi/otir/outd/otdr x [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "outi x", [0xED, 0xE3]);
+			add_opcode($cpu, "otir x", [0xED, 0xF3]);
+			add_opcode($cpu, "outd x", [0xED, 0xEB]);
+			add_opcode($cpu, "otdr x", [0xED, 0xFB]);
+		},
+		"<alu> (*hl) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp') {
+				my $a_ = ($alu =~ /add|adc|sbc/ ? 'a, ' : '');
+				for my $p ('x', 'y', 'a', 'p', 'z') {
+					if (!get_opcode($cpu, "$alu $a_(${p}hl)")) {
+						add_opcode($cpu, "$alu $a_(${p}hl)", 
+									[KC_CONST1($p), 0x86+8*ALU($alu)]);
+					}
+				}
+			}
+		},
+		"<alu-extra> (*hl) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
+				for my $a_ ('a, ', '') {
+					for my $p ('x', 'y', 'a', 'p', 'z') {
+						if (!get_opcode($cpu, "$alu $a_(${p}hl)")) {
+							add_opcode($cpu, "$alu $a_(${p}hl)", 
+										[KC_CONST1($p), 0x86+8*ALU($alu)]);
+						}
+					}
+				}
+			}
+		},
+		"<alu> (*<x>+DIS) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $x ('ix', 'iy') {
+				for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp') {
+					my $a_ = ($alu =~ /add|adc|sbc/ ? 'a, ' : '');
+					for my $p ('x', 'y', 'a', 'p', 'z') {
+						if (!get_opcode($cpu, "$alu $a_($p$x+%d)")) {
+							add_opcode($cpu, "$alu $a_($p$x+%d)", 
+										[KC_CONST1($p), PFX($x), 0x86+8*ALU($alu), '%d']);
+						}
+						if (!get_opcode($cpu, "$alu $a_($p$x)")) {
+							add_opcode($cpu, "$alu $a_($p$x)", 
+										[KC_CONST1($p), PFX($x), 0x86+8*ALU($alu), 0]);
+						}
+					}
+				}
+			}
+		},
+		"<alu-extra> (*<x>+DIS) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $x ('ix', 'iy') {
+				for my $alu ('add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp') {
+					for my $a_ ('a, ', '') {
+						for my $p ('x', 'y', 'a', 'p', 'z') {
+							if (!get_opcode($cpu, "$alu $a_($p$x+%d)")) {
+								add_opcode($cpu, "$alu $a_($p$x+%d)", 
+											[KC_CONST1($p), PFX($x), 0x86+8*ALU($alu), '%d']);
+							}
+							if (!get_opcode($cpu, "$alu $a_($p$x)")) {
+								add_opcode($cpu, "$alu $a_($p$x)", 
+											[KC_CONST1($p), PFX($x), 0x86+8*ALU($alu), 0]);
+							}
+						}
+					}
+				}
+			}
+		},
+		"inc/dec (*hl) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				add_opcode($cpu, "inc (${p}hl)", [KC_CONST1($p), 0x34]);
+				add_opcode($cpu, "dec (${p}hl)", [KC_CONST1($p), 0x35]);
+			}
+		},
+		"inc/dec (*<x>+DIS) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				for my $x ('ix', 'iy') {
+					add_opcode($cpu, "inc ($p$x+%d)", [KC_CONST1($p), PFX($x), 0x34, '%d']);
+					add_opcode($cpu, "dec ($p$x+%d)", [KC_CONST1($p), PFX($x), 0x35, '%d']);
+				}
+			}
+		},
+		"mul/muls hl [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "mul hl", [0xED, 0x76]);
+			add_opcode($cpu, "muls hl", [0xED, 0x7E]);
+		},
+		"mul/muls de, hl [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "mul de, hl", [0xED, 0x77]);
+			add_opcode($cpu, "muls de, hl", [0xED, 0x7F]);
+		},
+		"div/divs hl, a [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "div hl, a", [0xED, 0x74]);
+			add_opcode($cpu, "divs hl, a", [0xED, 0x7C]);
+		},
+		"div/divs dehl, bc [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "div dehl, bc", [0xED, 0x75]);
+			add_opcode($cpu, "divs dehl, bc", [0xED, 0x7D]);
+		},
+		"add *hl, <rp> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'z') {
+				for my $rp ('bc', 'de', 'hl', 'sp') {
+					add_opcode($cpu, "add ${p}hl, $rp", [KC_CONST2($p), 0x09+16*RP($rp)]);
+				}
+			}
+		},
+		"add *<x>, <rp> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'z') {
+				for my $x ('ix', 'iy') {
+					for my $rp ('bc', 'de', $x, 'sp') {
+						add_opcode($cpu, "add $p$x, $rp", [KC_CONST2($p), PFX($x), 0x09+16*RP($rp)]);
+					}
+				}
+			}
+		},
+		"sbc/adc *hl, <rp> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'z') {
+				for my $rp ('bc', 'de', 'hl', 'sp') {
+					add_opcode($cpu, "sbc ${p}hl, $rp", [KC_CONST2($p), 0xED, 0x42+16*RP($rp)]);
+					add_opcode($cpu, "adc ${p}hl, $rp", [KC_CONST2($p), 0xED, 0x4A+16*RP($rp)]);
+				}
+			}
+		},
+		"inc/dec *<rp> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'z') {
+				for my $rp ('bc', 'de', 'hl', 'sp') {
+					add_opcode($cpu, "inc ${p}$rp", [KC_CONST2($p), 0x03+16*RP($rp)]);
+					add_opcode($cpu, "dec ${p}$rp", [KC_CONST2($p), 0x0B+16*RP($rp)]);
+				}
+			}
+		},
+		"inc/dec *<x> [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'z') {
+				for my $x ('ix', 'iy') {
+					add_opcode($cpu, "inc ${p}$x", [KC_CONST2($p), PFX($x), 0x03+16*2]);
+					add_opcode($cpu, "dec ${p}$x", [KC_CONST2($p), PFX($x), 0x0B+16*2]);
+				}
+			}
+		},
+		"<bit> <b>, (*hl) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $op ('bit', 'res', 'set') {
+				for my $p ('x', 'y', 'a', 'p', 'z') {
+					add_opcode($cpu, "$op %c, (${p}hl)",
+							[KC_CONST1($p), 0xCB, (0x40*BIT($op)+6)."+8*%c"],
+							[0, 1, 2, 3, 4, 5, 6, 7]);
+				}
+			}
+		},
+		"<bit> <b>, (*<x>+DIS) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $op ('bit', 'res', 'set') {
+				for my $x ('ix', 'iy') {
+					for my $p ('x', 'y', 'a', 'p', 'z') {
+						add_opcode($cpu, "$op %c, ($p$x+%d)",
+								[KC_CONST1($p), PFX($x), 0xCB, '%d', (0x40*BIT($op)+6)."+8*%c"],
+								[0, 1, 2, 3, 4, 5, 6, 7]);
+					}
+				}
+			}
+		},
+		"<rot> (*hl) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $op ('rlc', 'rrc', 'rl', 'rr', 'sla', 'sra', 'srl') {
+				for my $p ('x', 'y', 'a', 'p', 'z') {
+					add_opcode($cpu, "$op (${p}hl)", 
+							[KC_CONST1($p), 0xCB, 8*ROT($op)+6]);
+				}
+			}
+		},
+		"<rot> (*<x>+DIS) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $x ('ix', 'iy') {
+				for my $op ('rlc', 'rrc', 'rl', 'rr', 'sla', 'sra', 'srl') {
+					for my $p ('x', 'y', 'a', 'p', 'z') {
+						add_opcode($cpu, "$op ($p$x+%d)", 
+								[KC_CONST1($p), PFX($x), 0xCB, '%d', 8*ROT($op)+6]);
+					}
+				}
+			}
+		},
+		"rld/rrd (*hl) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				add_opcode($cpu, "rld (${p}hl)", [KC_CONST1($p), 0xED, 0x6F]);
+				add_opcode($cpu, "rrd (${p}hl)", [KC_CONST1($p), 0xED, 0x67]);
+			}
+		},
+		"jp (*hl) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				add_opcode($cpu, "jp (${p}hl)", [KC_CONST1($p), 0xE9]);
+			}
+		},
+		"jp (*<x>) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				for my $x ('ix', 'iy') {
+					add_opcode($cpu, "jp ($p$x)", [KC_CONST1($p), PFX($x), 0xE9]);
+				}
+			}
+		},
+		"jmp (*hl) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				add_opcode($cpu, "jmp (${p}hl)", [KC_CONST1($p), 0xE9]);
+			}
+		},
+		"jmp (*<x>) [kc160]" => sub {
+			my($cpu) = @_;
+			for my $p ('x', 'y', 'a', 'p', 'z') {
+				for my $x ('ix', 'iy') {
+					add_opcode($cpu, "jmp ($p$x)", [KC_CONST1($p), PFX($x), 0xE9]);
+				}
+			}
+		},
+		"jp3 NNN [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "jp3 %m", [0xED, 0xC3, '%m', '%m', '%m']);
+		},
+		"jp3 <f>, NNN [kc160]" => sub {
+			my($cpu) = @_;
+			for my $f ('nz', 'z', 'nc', 'c') {
+				add_opcode($cpu, "jp3 $f, %m", [0xED, 0xC2+8*F($f), '%m', '%m', '%m']);
+			}
+		},
+		"call3 NNN [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "call3 %m", [0xED, 0x4C, '%m', '%m', '%m']);
+		},
+		"ret3 [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "ret3", [0xED, 0x5C]);
+		},
+		"tra [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "tra", [0xED, 0x54]);
+		},
+		"retn3 [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "retn3", [0xED, 0x55]);
+		},
+		"im N [kc160]" => sub {
+			my($cpu) = @_;
+			add_opcode($cpu, "im %c", 
+					   [0xED, "%c==0?0x46:%c==1?0x56:%c==2?0x5E:0x4E"], 
+					   [0, 1, 2, 3]);
 		},
 
 	};
@@ -2146,6 +2707,7 @@ require "opcodes_z80n.pl";
 require "opcodes_z180.pl";
 require "opcodes_ez80.pl";
 require "opcodes_r800.pl";
+require "opcodes_kc160.pl";
 
 #------------------------------------------------------------------------------
 # OLD STUFF
@@ -2198,7 +2760,7 @@ my %INV_FLAG = qw(	_nz	 _z	  _z   _nz
 # for each CPU
 #------------------------------------------------------------------------------
 for my $cpu (@CPUS) {
-	next if $cpu =~ /^(8080|8085|z80|z80n|gbz80|z180|ez80|ez80_z80|r800)(_strict)?$/;
+	next if $cpu =~ /^(8080|8085|z80|z80n|gbz80|z180|ez80|ez80_z80|r800|kc160|kc160_z80)(_strict)?$/;
 	
 	my $rabbit		= ($cpu =~ /^r2ka|^r3k|^r4k|^r5k/);
 	my $r3k			= ($cpu =~ /^r3k/);

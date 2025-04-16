@@ -1011,12 +1011,12 @@
  bit 7, h                       ; CB 7C
  bit 7, l                       ; CB 7D
  bool hl                        ; F5 7C B5 28 03 21 01 00 F1
- bool ix                        ; F5 E5 DD E5 E1 7C B5 28 03 21 01 00 E5 DD E1 E1 F1
- bool iy                        ; F5 E5 FD E5 E1 7C B5 28 03 21 01 00 E5 FD E1 E1 F1
+ bool ix                        ; F5 E5 DD E5 E1 7C B5 28 04 DD 21 01 00 E1 F1
+ bool iy                        ; F5 E5 FD E5 E1 7C B5 28 04 FD 21 01 00 E1 F1
  c_c 0x1234                     ; DC 34 12
  c_eq 0x1234                    ; CC 34 12
  c_geu 0x1234                   ; D4 34 12
- c_gtu 0x1234                   ; 28 05 38 03 CD 34 12
+ c_gtu 0x1234                   ; 28 03 D4 34 12
  c_leu 0x1234                   ; 28 02 30 03 CD 34 12
  c_ltu 0x1234                   ; DC 34 12
  c_m 0x1234                     ; FC 34 12
@@ -1036,7 +1036,7 @@
  call c, 0x1234                 ; DC 34 12
  call eq, 0x1234                ; CC 34 12
  call geu, 0x1234               ; D4 34 12
- call gtu, 0x1234               ; 28 05 38 03 CD 34 12
+ call gtu, 0x1234               ; 28 03 D4 34 12
  call leu, 0x1234               ; 28 02 30 03 CD 34 12
  call ltu, 0x1234               ; DC 34 12
  call m, 0x1234                 ; FC 34 12
@@ -1050,11 +1050,12 @@
  call v, 0x1234                 ; EC 34 12
  call z, 0x1234                 ; CC 34 12
  call3 0x123456                 ; ED 4C 56 34 12
+ call3 leu, 0x123456            ; 28 04 30 05 ED 4C 56 34 12
  cc 0x1234                      ; DC 34 12
  ccf                            ; 3F
  ceq 0x1234                     ; CC 34 12
  cgeu 0x1234                    ; D4 34 12
- cgtu 0x1234                    ; 28 05 38 03 CD 34 12
+ cgtu 0x1234                    ; 28 03 D4 34 12
  cleu 0x1234                    ; 28 02 30 03 CD 34 12
  clr (hl)                       ; 36 00
  clr (ix)                       ; DD 36 00 00
@@ -1655,7 +1656,7 @@
  j_c 0x1234                     ; DA 34 12
  j_eq 0x1234                    ; CA 34 12
  j_geu 0x1234                   ; D2 34 12
- j_gtu 0x1234                   ; CA F0 15 D2 34 12
+ j_gtu 0x1234                   ; CA EF 15 D2 34 12
  j_leu 0x1234                   ; CA 34 12 DA 34 12
  j_ltu 0x1234                   ; DA 34 12
  j_m 0x1234                     ; FA 34 12
@@ -1671,7 +1672,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 26 16 D2 34 12
+ jgtu 0x1234                    ; CA 25 16 D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jm 0x1234                      ; FA 34 12
@@ -1699,7 +1700,7 @@
  jmp c, 0x1234                  ; DA 34 12
  jmp eq, 0x1234                 ; CA 34 12
  jmp geu, 0x1234                ; D2 34 12
- jmp gtu, 0x1234                ; CA 75 16 D2 34 12
+ jmp gtu, 0x1234                ; 28 03 D2 34 12
  jmp leu, 0x1234                ; CA 34 12 DA 34 12
  jmp ltu, 0x1234                ; DA 34 12
  jmp m, 0x1234                  ; FA 34 12
@@ -1740,7 +1741,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA EB 16 D2 34 12
+ jp gtu, 0x1234                 ; 28 03 D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp m, 0x1234                   ; FA 34 12
@@ -1757,7 +1758,7 @@
  jp3 c, 0x123456                ; ED DA 56 34 12
  jp3 eq, 0x123456               ; ED CA 56 34 12
  jp3 geu, 0x123456              ; ED D2 56 34 12
- jp3 gtu, 0x123456              ; ED CA 30 17 00 ED D2 56 34 12
+ jp3 gtu, 0x123456              ; 28 05 ED D2 56 34 12
  jp3 leu, 0x123456              ; ED CA 56 34 12 ED DA 56 34 12
  jp3 ltu, 0x123456              ; ED DA 56 34 12
  jp3 nc, 0x123456               ; ED D2 56 34 12
@@ -4517,7 +4518,7 @@
  r_c                            ; D8
  r_eq                           ; C8
  r_geu                          ; D0
- r_gtu                          ; 28 03 38 01 C9
+ r_gtu                          ; 28 01 D0
  r_leu                          ; C8 D8
  r_ltu                          ; D8
  r_m                            ; F8
@@ -5027,7 +5028,7 @@
  ret c                          ; D8
  ret eq                         ; C8
  ret geu                        ; D0
- ret gtu                        ; 28 03 38 01 C9
+ ret gtu                        ; 28 01 D0
  ret leu                        ; C8 D8
  ret ltu                        ; D8
  ret m                          ; F8
@@ -5041,11 +5042,27 @@
  ret v                          ; E8
  ret z                          ; C8
  ret3                           ; ED 5C
+ ret3 c                         ; 30 02 ED 5C
+ ret3 eq                        ; 20 02 ED 5C
+ ret3 geu                       ; 38 02 ED 5C
+ ret3 gtu                       ; 28 04 38 02 ED 5C
+ ret3 leu                       ; 20 04 30 02 ED 5C
+ ret3 ltu                       ; 30 02 ED 5C
+ ret3 m                         ; F2 FF 45 ED 5C
+ ret3 nc                        ; 38 02 ED 5C
+ ret3 ne                        ; 28 02 ED 5C
+ ret3 nv                        ; EA 0C 46 ED 5C
+ ret3 nz                        ; 28 02 ED 5C
+ ret3 p                         ; FA 15 46 ED 5C
+ ret3 pe                        ; E2 1A 46 ED 5C
+ ret3 po                        ; EA 1F 46 ED 5C
+ ret3 v                         ; E2 24 46 ED 5C
+ ret3 z                         ; 20 02 ED 5C
  reti                           ; ED 4D
  retn                           ; ED 45
  retn3                          ; ED 55
  rgeu                           ; D0
- rgtu                           ; 28 03 38 01 C9
+ rgtu                           ; 28 01 D0
  rl (ahl)                       ; 52 CB 16
  rl (aix)                       ; 52 DD CB 00 16
  rl (aix+0)                     ; 52 DD CB 00 16

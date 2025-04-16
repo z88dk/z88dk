@@ -432,86 +432,90 @@ END_ERR
 # test CPU-defining constants
 #-------------------------------------------------------------------------------
 spew("$test.asm", <<'END_ASM');
-	if __CPU_INTEL__		: defm "intel "			: endif
-	if __CPU_8080__			: defm "8080 "			: endif
-	if __CPU_8080_STRICT__	: defm "8080_strict "	: endif
-	if __CPU_8085__			: defm "8085 "			: endif
-	if __CPU_8085_STRICT__	: defm "8085_strict "	: endif
+	if __CPU_INTEL__			: defm "intel "				: endif
+	if __CPU_8080__				: defm "8080 "				: endif
+	if __CPU_8080_STRICT__		: defm "8080_strict "		: endif
+	if __CPU_8085__				: defm "8085 "				: endif
+	if __CPU_8085_STRICT__		: defm "8085_strict "		: endif
+															
+	if __CPU_ZILOG__			: defm "zilog "				: endif
+	if __CPU_Z80__				: defm "z80 "				: endif
+	if __CPU_Z80_STRICT__		: defm "z80_strict "		: endif
+	if __CPU_Z80N__				: defm "z80n " 				: endif
+	if __CPU_Z80N_STRICT__		: defm "z80n_strict " 		: endif
+	if __CPU_Z180__				: defm "z180 "				: endif
+	if __CPU_Z180_STRICT__		: defm "z180_strict "		: endif
+	if __CPU_EZ80__				: defm "ez80 "				: endif
+	if __CPU_EZ80_STRICT__		: defm "ez80_strict "		: endif
+	if __CPU_EZ80_Z80__			: defm "ez80_z80 "			: endif
+	if __CPU_EZ80_Z80_STRICT__ 	: defm "ez80_z80_strict " 	: endif
 													
-	if __CPU_ZILOG__		: defm "zilog "			: endif
-	if __CPU_Z80__			: defm "z80 "			: endif
-	if __CPU_Z80_STRICT__	: defm "z80_strict "	: endif
-	if __CPU_Z80N__			: defm "z80n " 			: endif
-	if __CPU_Z80N_STRICT__	: defm "z80n_strict " 	: endif
-	if __CPU_Z180__			: defm "z180 "			: endif
-	if __CPU_Z180_STRICT__	: defm "z180_strict "	: endif
-	if __CPU_EZ80__			: defm "ez80 "			: endif
-	if __CPU_EZ80_STRICT__	: defm "ez80_strict "	: endif
-	if __CPU_EZ80_Z80__		: defm "ez80_z80 "		: endif
-	if __CPU_EZ80_Z80_STRICT__ : defm "ez80_z80_strict " : endif
+	if __CPU_R800__				: defm "r800 "				: endif
+	if __CPU_R800_STRICT__		: defm "r800_strict "		: endif
+															
+	if __CPU_GBZ80__			: defm "gbz80 "				: endif
+	if __CPU_GBZ80_STRICT__		: defm "gbz80_strict "		: endif
+															
+	if __CPU_KC160__			: defm "kc160 " 			: endif
+	if __CPU_KC160_STRICT__		: defm "kc160_strict " 		: endif
+	if __CPU_KC160_Z80__		: defm "kc160_z80 " 		: endif
+	if __CPU_KC160_Z80_STRICT__	: defm "kc160_z80_strict " 	: endif
 													
-	if __CPU_R800__			: defm "r800 "			: endif
-	if __CPU_R800_STRICT__	: defm "r800_strict "	: endif
-													
-	if __CPU_GBZ80__		: defm "gbz80 "			: endif
-	if __CPU_GBZ80_STRICT__	: defm "gbz80_strict "	: endif
-													
-	if __CPU_KC160__		: defm "kc160 " 		: endif
-	if __CPU_KC160_Z80__	: defm "kc160_z80 " 	: endif
-													
-	if __CPU_RABBIT__		: defm "rabbit "		: endif
-	if __CPU_R2KA__			: defm "r2ka "			: endif
-	if __CPU_R3K__			: defm "r3k "			: endif
-	if __CPU_R4K__			: defm "r4k "			: endif
-	if __CPU_R5K__			: defm "r5k "			: endif
-													
-	if __CPU_TI83__			: defm "ti83 "  		: endif
-	if __CPU_TI83PLUS__		: defm "ti83plus "  	: endif
-													
-	if __SWAP_IX_IY__		: defm "-IXIY "			: endif
-	
-	if __FLOAT_GENMATH__	: defm "float_genmath "	: endif
-	if __FLOAT_MATH48__		: defm "float_math48 "  : endif
-	if __FLOAT_IEEE16__		: defm "float_ieee16 "  : endif
-	if __FLOAT_IEEE32__		: defm "float_ieee32 "  : endif
-	if __FLOAT_IEEE64__		: defm "float_ieee64 "  : endif
-	if __FLOAT_Z80__		: defm "float_z80 "  	: endif
-	if __FLOAT_ZX81__		: defm "float_zx81 "  	: endif
-	if __FLOAT_ZX__			: defm "float_zx "  	: endif
-	if __FLOAT_Z88__		: defm "float_z88 "  	: endif
-	if __FLOAT_MBFS__		: defm "float_mbfs "  	: endif
-	if __FLOAT_MBF40__		: defm "float_mbf40 "  	: endif
-	if __FLOAT_MBF64__		: defm "float_mbf64 "  	: endif
-	if __FLOAT_AM9511__		: defm "float_am9511 "  : endif
+	if __CPU_RABBIT__			: defm "rabbit "			: endif
+	if __CPU_R2KA__				: defm "r2ka "				: endif
+	if __CPU_R3K__				: defm "r3k "				: endif
+	if __CPU_R4K__				: defm "r4k "				: endif
+	if __CPU_R5K__				: defm "r5k "				: endif
+															
+	if __CPU_TI83__				: defm "ti83 "  			: endif
+	if __CPU_TI83PLUS__			: defm "ti83plus "  		: endif
+															
+	if __SWAP_IX_IY__			: defm "-IXIY "				: endif
+			
+	if __FLOAT_GENMATH__		: defm "float_genmath "		: endif
+	if __FLOAT_MATH48__			: defm "float_math48 "  	: endif
+	if __FLOAT_IEEE16__			: defm "float_ieee16 "  	: endif
+	if __FLOAT_IEEE32__			: defm "float_ieee32 "  	: endif
+	if __FLOAT_IEEE64__			: defm "float_ieee64 "  	: endif
+	if __FLOAT_Z80__			: defm "float_z80 "  		: endif
+	if __FLOAT_ZX81__			: defm "float_zx81 "  		: endif
+	if __FLOAT_ZX__				: defm "float_zx "  		: endif
+	if __FLOAT_Z88__			: defm "float_z88 "  		: endif
+	if __FLOAT_MBFS__			: defm "float_mbfs "  		: endif
+	if __FLOAT_MBF40__			: defm "float_mbf40 "  		: endif
+	if __FLOAT_MBF64__			: defm "float_mbf64 "  		: endif
+	if __FLOAT_AM9511__			: defm "float_am9511 "  	: endif
 END_ASM
 
 my %defines = (
-	8080		=> "intel 8080 ",
-	'8080_strict'=> "intel 8080_strict ",
-	8085		=> "intel 8085 ",
-	'8085_strict'=> "intel 8085_strict ",
-	z80			=> "zilog z80 ",
-	z80_strict	=> "zilog z80_strict ",
-	z80n		=> "zilog z80n ",
-	z80n_strict	=> "zilog z80n_strict ",
-	z180		=> "zilog z180 ",
-	z180_strict	=> "zilog z180_strict ",
-	ez80		=> "zilog ez80 ",
-	ez80_strict	=> "zilog ez80_strict ",
-	ez80_z80	=> "zilog ez80_z80 ",
-	ez80_z80_strict	=> "zilog ez80_z80_strict ",
-	r800		=> "r800 ",
-	r800_strict	=> "r800_strict ",
-	gbz80		=> "gbz80 ",
-	gbz80_strict=> "gbz80_strict ",
-	kc160		=> "kc160 ",
-	kc160_z80	=> "kc160_z80 ",
-	r2ka		=> "rabbit r2ka ",
-	r3k			=> "rabbit r3k ",
-	r4k			=> "rabbit r4k ",
-	r5k			=> "rabbit r5k ",
-	ti83		=> "zilog z80_strict ti83 ",
-	ti83plus	=> "zilog z80_strict ti83plus ",
+	'8080'				=> "intel 8080 ",
+	'8080_strict'		=> "intel 8080_strict ",
+	'8085'				=> "intel 8085 ",
+	'8085_strict'		=> "intel 8085_strict ",
+	z80					=> "zilog z80 ",
+	z80_strict			=> "zilog z80_strict ",
+	z80n				=> "zilog z80n ",
+	z80n_strict			=> "zilog z80n_strict ",
+	z180				=> "zilog z180 ",
+	z180_strict			=> "zilog z180_strict ",
+	ez80				=> "zilog ez80 ",
+	ez80_strict			=> "zilog ez80_strict ",
+	ez80_z80			=> "zilog ez80_z80 ",
+	ez80_z80_strict		=> "zilog ez80_z80_strict ",
+	r800				=> "r800 ",
+	r800_strict			=> "r800_strict ",
+	gbz80				=> "gbz80 ",
+	gbz80_strict		=> "gbz80_strict ",
+	kc160				=> "kc160 ",
+	kc160_strict		=> "kc160_strict ",
+	kc160_z80			=> "kc160_z80 ",
+	kc160_z80_strict	=> "kc160_z80_strict ",
+	r2ka				=> "rabbit r2ka ",
+	r3k					=> "rabbit r3k ",
+	r4k					=> "rabbit r4k ",
+	r5k					=> "rabbit r5k ",
+	ti83				=> "zilog z80_strict ti83 ",
+	ti83plus			=> "zilog z80_strict ti83plus ",
 );
 
 for my $cpu (@CPUS, qw( ti83 ti83plus )) {

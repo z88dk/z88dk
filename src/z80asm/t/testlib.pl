@@ -27,7 +27,8 @@ $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 			r2ka r3k r4k r5k 
 			8080 8085 
 			gbz80 		gbz80_strict 
-			kc160 kc160_z80
+			kc160		kc160_strict
+			kc160_z80	kc160_z80_strict
 );
 
 unlink_testfiles();

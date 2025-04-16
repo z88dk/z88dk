@@ -52,7 +52,7 @@ for my $cpu1 ('r800') {
 		add_opcodes($cpu, "<alu-extra> a, N") if !$strict;
 
 		add_opcodes($cpu, "mulub a, <r> [r800]");
-		add_opcodes($cpu, "muluw hl, <rr> [r800]");
+		add_opcodes($cpu, "muluw hl, <rp> [r800]");
 		
 		add_opcodes($cpu, "inr/dcr <r> [8080]") if !$strict;
 		add_opcodes($cpu, "inc/dec <r>");

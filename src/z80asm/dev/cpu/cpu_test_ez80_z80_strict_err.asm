@@ -4274,6 +4274,7 @@
  call.sis nv, 0x1234            ; Error
  call.sis v, 0x1234             ; Error
  call3 0x123456                 ; Error
+ call3 leu, 0x123456            ; Error
  cbm -128                       ; Error
  cbm 0                          ; Error
  cbm 127                        ; Error
@@ -17516,6 +17517,22 @@
  ret.lis nv                     ; Error
  ret.lis v                      ; Error
  ret3                           ; Error
+ ret3 c                         ; Error
+ ret3 eq                        ; Error
+ ret3 geu                       ; Error
+ ret3 gtu                       ; Error
+ ret3 leu                       ; Error
+ ret3 ltu                       ; Error
+ ret3 m                         ; Error
+ ret3 nc                        ; Error
+ ret3 ne                        ; Error
+ ret3 nv                        ; Error
+ ret3 nz                        ; Error
+ ret3 p                         ; Error
+ ret3 pe                        ; Error
+ ret3 po                        ; Error
+ ret3 v                         ; Error
+ ret3 z                         ; Error
  reti.lil                       ; Error
  retn.lil                       ; Error
  retn3                          ; Error

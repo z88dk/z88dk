@@ -40,8 +40,8 @@ my @CPUS = (qw(
 	8080 		8080_strict
 	8085		8085_strict
 	gbz80		gbz80_strict
-	kc160
-	kc160_z80
+	kc160		kc160_strict
+	kc160_z80	kc160_z80_strict
 ));
 
 # create constants for each cpu

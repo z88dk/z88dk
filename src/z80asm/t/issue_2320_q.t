@@ -35,7 +35,6 @@ the_answer = 42
 	ifdef __CPU_Z80__			: defm "z80 "			: endif
 	ifdef __CPU_Z80N__			: defm "z80n " 			: endif
 	ifdef __CPU_KC160__			: defm "kc160 " 		: endif
-	ifdef __CPU_KC160_EXT__		: defm "kc160_ext "		: endif
 	ifdef __CPU_KC160_Z80__		: defm "kc160_z80 " 	: endif
 	ifdef __SWAP_IX_IY__		: defm "-IXIY "			: endif
 END

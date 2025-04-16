@@ -39,8 +39,10 @@ typedef enum {
     CPU_EZ80_Z80_STRICT = 22,
     CPU_EZ80_STRICT     = 23,
     CPU_R800_STRICT    	= 24,
+    CPU_KC160_STRICT    = 25,
+    CPU_KC160_Z80_STRICT= 26,
 
-    CPU_UNDEF       = -1,
+    CPU_UNDEF       	= -1,
 } cpu_t;
 
 #define ARCH_TI83_NAME      "ti83"

@@ -185,7 +185,7 @@ exit 0;
 
 sub parser_tokens {
 	local($_) = @_;
-	my $instr_flag = qr/\b(?:call|jp|jmp|jr|jre|jp3|ret|rst|flag)\b/i;
+	my $instr_flag = qr/\b(?:call|call3|jp|jmp|jr|jre|jp3|ret|ret3|rst|flag)\b/i;
 	my $am = qr/\b(?:l|il|is|lil|lis|sil|sis)\b/i;
 	my $flag = qr/\b(?:nz|z|nc|c|po|pe|p|m|lz|lo|nv|v|x5|nx5|k|nk|ne|eq|ltu|leu|gtu|geu|lt|le|gt|ge)\b/i;
 	my $instr_x = qr/\b(cpd|cpdr|cpi|cpir|ind|indr|ini|inir|otdr|otir|outd|outi)\s+(x)\b/i;

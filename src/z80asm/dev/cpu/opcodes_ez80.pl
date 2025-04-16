@@ -133,7 +133,7 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         add_opcodes($cpu, "ld <x8>, <r>");
         add_opcodes($cpu, "ld <x8>, N");
         add_opcodes($cpu, "ld (<x>+DIS), <r> [ez80]");
-        add_opcodes($cpu, "ld (<x>+DIS), <rr> [ez80]");
+        add_opcodes($cpu, "ld (<x>+DIS), <rp> [ez80]");
         add_opcodes($cpu, "ld (<x>+DIS), N [ez80]");
 
         add_opcodes($cpu, "lda/sta [ez80]") if !$strict;
@@ -143,7 +143,7 @@ for my $cpu1 ('ez80', 'ez80_z80') {
         add_opcodes($cpu, "ldax <rp>/stax <rp> [8080]") if !$strict;
         add_opcodes($cpu, "ld a, (<rp>) [ez80]");
         add_opcodes($cpu, "ld (hl), <r> [ez80]");
-        add_opcodes($cpu, "ld (hl), <rr> [ez80]");
+        add_opcodes($cpu, "ld (hl), <rp> [ez80]");
         add_opcodes($cpu, "ld (hl), <x> [ez80]");
         add_opcodes($cpu, "ld (hl), N [ez80]");
         add_opcodes($cpu, "ld (<x>+DIS), <x> [ez80]");
@@ -173,7 +173,7 @@ for my $cpu1 ('ez80', 'ez80_z80') {
 
         add_opcodes($cpu, "ldi/ldir/ldd/lddr [ez80]");
 
-		add_opcodes($cpu, "lea <rr>, <x>+DIS [ez80]");
+		add_opcodes($cpu, "lea <rp>, <x>+DIS [ez80]");
 		add_opcodes($cpu, "lea <x>, <x>+DIS [ez80]");
 		add_opcodes($cpu, "pea <x>+DIS [ez80]");
 		
