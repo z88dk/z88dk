@@ -53,6 +53,8 @@ gfx/narrow/obj/${TARGET}/rscroll_1px
 gfx/narrow/obj/${TARGET}/rscroll_2px
 gfx/narrow/obj/${TARGET}/rscroll_4px
 gfx/narrow/obj/${TARGET}/rscroll_8px
+gfx/narrow/obj/${TARGET}/scrollup_1px
+gfx/narrow/obj/${TARGET}/scrollup_4px
 gfx/narrow/obj/${TARGET}/setpos
 gfx/narrow/obj/${TARGET}/setpos_callee
 gfx/narrow/obj/${TARGET}/setxy
