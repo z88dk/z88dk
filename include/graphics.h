@@ -257,6 +257,12 @@ extern void __LIB__ lscroll_8px(void);
 /* Scroll the graphics map 8 pixel right */
 extern void __LIB__ rscroll_8px(void);
 
+/* Scroll the graphics map 1 pixel up */
+extern void __LIB__  scrollup_1px();
+
+/* Scroll the graphics map 4 pixel up */
+extern void __LIB__  scrollup_4px();
+
 
 /* Clear area of graphics map */
 __ZPROTO4(void,,clga,int,tlx,int,tly,int,tlx2,int,tly2)
