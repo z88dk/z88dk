@@ -1,6 +1,6 @@
 ;
 ; 	ANSI Video handling for the ZX81
-;	By Stefano Bodrato - Apr. 2000
+;	By Stefano Bodrato - Apr. 2025
 ;
 ; 	BEL - chr(7)   Beep it out
 ;
@@ -11,16 +11,16 @@
     SECTION code_clib
     PUBLIC  ansi_BEL
 	
-    EXTERN invhrg
+    EXTERN invtxt
 
 
 ansi_BEL:
-    call invhrg
+    call invtxt
     ld hl,8000
 inv_pause:
     dec hl
 	ld a,h
 	or l
     jr nz,inv_pause
-    jp invhrg
+    jp invtxt
 

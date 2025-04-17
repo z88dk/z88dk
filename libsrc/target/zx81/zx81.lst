@@ -5,8 +5,6 @@ target/zx81/stdio/getk
 target/zx81/stdio/fputc_cons
 target/zx81/stdio/generic_console
 @stdio/ansicore.lst
-target/zx81/stdio/ansi/f_ansi_attr
-target/zx81/stdio/ansi/f_ansi_bel
 @stdio/stdio.lst
 @stdlib/stdlib.lst
 target/zx81/time/clock
