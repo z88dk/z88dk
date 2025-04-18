@@ -322,7 +322,7 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
     }
 
     if ( t2 == KIND_LONGLONG ) {
-        if ( t1 != KIND_LONGLONG) {
+        if ( t1 != KIND_LONGLONG && !kind_is_decimal(t1)) {
             // Just convert down to a 32 bit number regardless of destination type
             // inefficient, but we have just been dealing with 64 bit numbers!
             zconvert_to_long(isunsigned1, t2, isunsigned2);

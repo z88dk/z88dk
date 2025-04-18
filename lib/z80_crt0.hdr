@@ -223,6 +223,10 @@
 	EXTERN	l_f48_ldexp	;FA * pow2(N)
 	EXTERN	l_f48_f16tof	;Convert _Float16 to float
 	EXTERN	l_f48_ftof16	;Convert float to _Float16
+    EXTERN  l_f48_sllong2f
+    EXTERN  l_f48_ullong2f
+    EXTERN  l_f48_f2sllong
+    EXTERN  l_f48_f2ullong
 
 	; 16 bit float ABI
 	EXTERN	l_f16_add
@@ -341,22 +345,22 @@
 	EXTERN	l_f32_fix16tof
 	EXTERN	l_f32_ftofix16
 	EXTERN	l_f48_fix16tof
-        EXTERN  l_f48_ftofix16s
+    EXTERN  l_f48_ftofix16s
 	EXTERN	l_f48_ftofix16
 	EXTERN	l_f64_fix16tof
 	EXTERN	l_f64_ftofix16
 	EXTERN	l_fix16_divu
 	EXTERN	l_fix16_divs
 	EXTERN	l_fix16_f2sint
-	EXTERN	l_fix16_f2slond
+	EXTERN	l_fix16_f2slong
 	EXTERN	l_fix16_f2uint
-	EXTERN	l_fix16_f2ulond
-        EXTERN  l_fix16_uchar2f
-        EXTERN  l_fix16_uint2f
-        EXTERN  l_fix16_ulong2f
-        EXTERN  l_fix16_schar2f
-        EXTERN  l_fix16_sint2f
-        EXTERN  l_fix16_slong2f
+	EXTERN	l_fix16_f2ulong
+    EXTERN  l_fix16_uchar2f
+    EXTERN  l_fix16_uint2f
+    EXTERN  l_fix16_ulong2f
+    EXTERN  l_fix16_schar2f
+    EXTERN  l_fix16_sint2f
+    EXTERN  l_fix16_slong2f
 	EXTERN	l_fix16_inv
 	EXTERN	l_fix16_mul
 	EXTERN	l_fix16_mulu

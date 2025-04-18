@@ -107,6 +107,11 @@
 ../../_DEVELOPMENT/math/float/math48//c/sccz80/cm48_sccz80p_lp_pdoub.asm
 ../../_DEVELOPMENT/math/float/math48//c/sccz80/cm48_sccz80p_minusfa.asm
 ../../_DEVELOPMENT/math/float/math48//c/sccz80/cm48_sccz80p_ufloat.asm
+../../_DEVELOPMENT/math/float/math48/c/sccz80/cm48_sccz80p_f2sllong.asm
+../../_DEVELOPMENT/math/float/math48/c/sccz80/cm48_sccz80p_f2ullong.asm
+../../_DEVELOPMENT/math/float/math48/c/sccz80/cm48_sccz80p_sllong2f.asm
+../../_DEVELOPMENT/math/float/math48/c/sccz80/cm48_sccz80p_ullong2f.asm
+
 ../../_DEVELOPMENT/math/float/math48//c/sdcc_ix/cm48_sdccix_acos.asm
 ../../_DEVELOPMENT/math/float/math48//c/sdcc_ix/cm48_sdccix_acos_fastcall.asm
 ../../_DEVELOPMENT/math/float/math48//c/sdcc_ix/cm48_sdccix_acosh.asm
@@ -717,6 +722,12 @@
 ../../_DEVELOPMENT/math/float/math48//lm/z80/derror_pinfnc.asm
 ../../_DEVELOPMENT/math/float/math48//lm/z80/derror_zc.asm
 ../../_DEVELOPMENT/math/float/math48//lm/z80/derror_znc.asm
+../../_DEVELOPMENT/math/float/math48/lm/c/sccz80/l_f48_f2sllong
+../../_DEVELOPMENT/math/float/math48/lm/c/sccz80/l_f48_f2ullong
+../../_DEVELOPMENT/math/float/math48/lm/c/sccz80/l_f48_sllong2f
+../../_DEVELOPMENT/math/float/math48/lm/c/sccz80/l_f48_ullong2f
+
+
 ../../_DEVELOPMENT/math/float/math48//z80/am48__dtoa_base10.asm
 ../../_DEVELOPMENT/math/float/math48//z80/am48__dtoa_base16.asm
 ../../_DEVELOPMENT/math/float/math48//z80/am48__dtoa_digits.asm
