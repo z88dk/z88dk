@@ -252,8 +252,21 @@ sub add {
 								 	if (/%m/) {
 								 		if    ($state == 0) { s/%m/0x34/e; $state = 1; }
 								 		elsif ($state == 1) { s/%m/0x12/e; $state = 2; }
-	}
+									}
 								 }));
+	}
+	elsif ($bytes =~ /%x %x/) {
+		my $state = 0;
+		add($cpu, $opcode->clone(sub {s/%x/0x5678/}, 
+								 sub {
+								 	if (/%x/) {
+								 		if    ($state == 0) { s/%x/0x78/e; $state = 1; }
+								 		elsif ($state == 1) { s/%x/0x56/e; $state = 2; }
+									}
+								 }));
+	}
+	elsif ($bytes =~ /%x/) {
+		add($cpu, $opcode->clone(sub {s/%x/0x56/}, sub {s/%x/0x56/e}));
 	}
 	elsif ($asm =~ /%M/) {
 		my $state = 0;

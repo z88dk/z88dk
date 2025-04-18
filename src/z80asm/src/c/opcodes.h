@@ -76,8 +76,14 @@ void add_opcode_idx_n(long long opcode, struct Expr1 *idx_expr,
 										 struct Expr1 *n_expr );
 
 /* add opcode followed by two 8-bit expressions */
-void add_opcode_n_n(long long opcode, struct Expr1 *n1_expr,
-									   struct Expr1 *n2_expr );
+void add_opcode_n_n(long long opcode, struct Expr1* n1_expr,
+    struct Expr1* n2_expr);
+
+/* add opcode followed by two 16-bit address and 8-bit segment*/
+void add_opcode_x_nn(long long opcode, struct Expr1* x_expr, struct Expr1* nn_expr);
+
+/* add opcode followed by two 16-bit address and 16-bit segment*/
+void add_opcode_xx_nn(long long opcode, struct Expr1* xx_expr, struct Expr1* nn_expr);
 
 /* add defb opcode with 8-bit data */
 void add_opcode_defb(struct Expr1* expr);
@@ -87,8 +93,8 @@ void add_call_emul_func(char *emul_func);
 
 /* add jump to text label - offset */
 void add_opcode_jr_end(long long opcode, const char* end_label, int offset);
-void add_opcode_nn_end(long long opcode, const char* end_label, int offset);
-void add_opcode_nnn_end(long long opcode, const char* end_label, int offset);
+void add_opcode_jp_nn_end(long long opcode, const char* end_label, int offset);
+void add_opcode_jp_nnn_end(long long opcode, const char* end_label, int offset);
 
 /* add Z88's opcodes */
 void add_Z88_CALL_OZ(int argument);

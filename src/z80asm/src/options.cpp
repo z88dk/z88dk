@@ -785,9 +785,13 @@ void Options::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_R800_STRICT__");
 
     undefine_static_symbol("__CPU_R2KA__");
+    undefine_static_symbol("__CPU_R2KA_STRICT__");
     undefine_static_symbol("__CPU_R3K__");
+    undefine_static_symbol("__CPU_R3K_STRICT__");
     undefine_static_symbol("__CPU_R4K__");
+    undefine_static_symbol("__CPU_R4K_STRICT__");
     undefine_static_symbol("__CPU_R5K__");
+    undefine_static_symbol("__CPU_R5K_STRICT__");
     undefine_static_symbol("__CPU_RABBIT__");
 
     undefine_static_symbol("__CPU_8080__");
@@ -868,9 +872,19 @@ void Options::set_cpu(int cpu) {
         define_static_symbol("__CPU_R2KA__");
         define_static_symbol("__CPU_RABBIT__");
         break;
+    case CPU_R2KA_STRICT:
+        m_cpu = CPU_R2KA_STRICT;
+        define_static_symbol("__CPU_R2KA_STRICT__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
     case CPU_R3K:
         m_cpu = CPU_R3K;
         define_static_symbol("__CPU_R3K__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
+    case CPU_R3K_STRICT:
+        m_cpu = CPU_R3K_STRICT;
+        define_static_symbol("__CPU_R3K_STRICT__");
         define_static_symbol("__CPU_RABBIT__");
         break;
     case CPU_R4K:
@@ -878,9 +892,19 @@ void Options::set_cpu(int cpu) {
         define_static_symbol("__CPU_R4K__");
         define_static_symbol("__CPU_RABBIT__");
         break;
+    case CPU_R4K_STRICT:
+        m_cpu = CPU_R4K_STRICT;
+        define_static_symbol("__CPU_R4K_STRICT__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
     case CPU_R5K:
         m_cpu = CPU_R5K;
         define_static_symbol("__CPU_R5K__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
+    case CPU_R5K_STRICT:
+        m_cpu = CPU_R5K_STRICT;
+        define_static_symbol("__CPU_R5K_STRICT__");
         define_static_symbol("__CPU_RABBIT__");
         break;
     case CPU_8080:

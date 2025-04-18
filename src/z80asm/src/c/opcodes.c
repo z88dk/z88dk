@@ -292,6 +292,22 @@ void add_opcode_n_n(long long opcode, struct Expr1 *n1_expr,
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, n2_expr);
 }
 
+/* add opcode followed by two 16-bit address and 8-bit segment*/
+void add_opcode_x_nn(long long opcode, Expr1* x_expr, Expr1* nn_expr)
+{
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_WORD, nn_expr);
+    Pass2infoExpr(RANGE_BYTE_UNSIGNED, x_expr);
+}
+
+/* add opcode followed by two 16-bit address and 16-bit segment*/
+void add_opcode_xx_nn(long long opcode, Expr1* xx_expr, Expr1* nn_expr)
+{
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_WORD, nn_expr);
+    Pass2infoExpr(RANGE_WORD, xx_expr);
+}
+
 /* add defb opcode with 8-bit data */
 void add_opcode_defb(struct Expr1* expr) {
     Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
@@ -301,7 +317,8 @@ void add_call_emul_func(char * emul_func)
 { 
 	declare_extern_symbol(emul_func);
 	Expr1 *emul_expr = parse_expr(emul_func);
-    if (option_cpu() == CPU_EZ80 || option_cpu() == CPU_EZ80_STRICT)
+    cpu_t cpu = option_cpu();
+    if (cpu == CPU_EZ80 || cpu == CPU_EZ80_STRICT)
         add_opcode_nnn(0xCD, emul_expr, 0);
     else
         add_opcode_nn(0xCD, emul_expr, 0);
@@ -318,7 +335,7 @@ void add_opcode_jr_end(long long opcode, const char* end_label, int offset)
 	utstring_free(target);
 }
 
-void add_opcode_nn_end(long long opcode, const char* end_label, int offset)
+void add_opcode_jp_nn_end(long long opcode, const char* end_label, int offset)
 {
 	UT_string* target;
 	utstring_new(target);
@@ -328,7 +345,7 @@ void add_opcode_nn_end(long long opcode, const char* end_label, int offset)
 	utstring_free(target);
 }
 
-void add_opcode_nnn_end(long long opcode, const char* end_label, int offset)
+void add_opcode_jp_nnn_end(long long opcode, const char* end_label, int offset)
 {
 	UT_string* target;
 	utstring_new(target);
@@ -357,10 +374,11 @@ void add_Z88_CALL_OZ(int argument)
 
 void add_Z88_CALL_PKG(int argument)
 {
-    if (option_cpu() == CPU_R2KA ||
-        option_cpu() == CPU_R3K ||
-        option_cpu() == CPU_R4K ||
-        option_cpu() == CPU_R5K) {
+    cpu_t cpu = option_cpu();
+    if (cpu == CPU_R2KA || cpu == CPU_R2KA_STRICT ||
+        cpu == CPU_R3K  || cpu == CPU_R3K_STRICT  ||
+        cpu == CPU_R4K  || cpu == CPU_R4K_STRICT  ||
+        cpu == CPU_R5K  || cpu == CPU_R5K_STRICT) {
         error_hex4(ErrIntRange, argument);
     }
 	else if (argument >= 0)
@@ -405,7 +423,8 @@ void add_Z88_INVOKE(int argument)
 // (0<=VER<=311, 0<=HOR<=55)  BIG ENDIAN!
 void add_copper_unit_wait(Expr1 *ver, Expr1 *hor)
 { 
-	if (option_cpu() != CPU_Z80N && option_cpu() != CPU_Z80N_STRICT)
+    cpu_t cpu = option_cpu();
+    if (cpu != CPU_Z80N && cpu != CPU_Z80N_STRICT)
 		error(ErrIllegalIdent, NULL);
 	else {
 		char expr_text[MAXLINE];
@@ -423,7 +442,8 @@ void add_copper_unit_wait(Expr1 *ver, Expr1 *hor)
 // (0<= REG <= 127, 0 <= VAL <= 255)  BIG ENDIAN!
 void add_copper_unit_move(Expr1 *reg, Expr1 *val)
 {
-	if (option_cpu() != CPU_Z80N && option_cpu() != CPU_Z80N_STRICT)
+    cpu_t cpu = option_cpu();
+    if (cpu != CPU_Z80N && cpu != CPU_Z80N_STRICT)
 		error(ErrIllegalIdent, NULL);
 	else {
 		char expr_text[MAXLINE];
@@ -441,7 +461,8 @@ void add_copper_unit_move(Expr1 *reg, Expr1 *val)
 // cu.stop   -> 16 - bit encoding 0xffff (impossible cu.wait)
 void add_copper_unit_stop()
 {
-	if (option_cpu() != CPU_Z80N && option_cpu() != CPU_Z80N_STRICT)
+    cpu_t cpu = option_cpu();
+    if (cpu != CPU_Z80N && cpu != CPU_Z80N_STRICT)
 		error(ErrIllegalIdent, NULL);
 	else
 		append_word_be(0xFFFF);
@@ -450,7 +471,8 @@ void add_copper_unit_stop()
 // cu.nop  -> 16 - bit encoding 0x0000 (do nothing cu.move)
 void add_copper_unit_nop()
 {
-	if (option_cpu() != CPU_Z80N && option_cpu() != CPU_Z80N_STRICT)
+    cpu_t cpu = option_cpu();
+    if (cpu != CPU_Z80N && cpu != CPU_Z80N_STRICT)
 		error(ErrIllegalIdent, NULL);
 	else
 		append_word_be(0x0000);

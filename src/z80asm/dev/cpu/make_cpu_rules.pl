@@ -156,6 +156,22 @@ say $aux_h <<END;
 				add_opcode_defb(expr); \\
 			} while(0)
 
+#define DO_stmt_x_nn(opcode) \\
+			do { \\
+			 	Expr1 *nn_expr = pop_expr(ctx); \\
+				Expr1 *x_expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_x_nn((opcode), x_expr, nn_expr); \\
+			} while(0)
+
+#define DO_stmt_xx_nn(opcode) \\
+			do { \\
+			 	Expr1 *nn_expr = pop_expr(ctx); \\
+				Expr1 *xx_expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_xx_nn((opcode), xx_expr, nn_expr); \\
+			} while(0)
+
 
 END
 
@@ -185,7 +201,7 @@ exit 0;
 
 sub parser_tokens {
 	local($_) = @_;
-	my $instr_flag = qr/\b(?:call|call3|jp|jmp|jr|jre|jp3|ret|ret3|rst|flag)\b/i;
+	my $instr_flag = qr/\b(?:call|call3|jp|jmp|jr|jre|jp3|lljp|ret|ret3|rst|flag)\b/i;
 	my $am = qr/\b(?:l|il|is|lil|lis|sil|sis)\b/i;
 	my $flag = qr/\b(?:nz|z|nc|c|po|pe|p|m|lz|lo|nv|v|x5|nx5|k|nk|ne|eq|ltu|leu|gtu|geu|lt|le|gt|ge)\b/i;
 	my $instr_x = qr/\b(cpd|cpdr|cpi|cpir|ind|indr|ini|inir|otdr|otir|outd|outi)\s+(x)\b/i;
@@ -205,7 +221,7 @@ sub parser_tokens {
 		elsif (/\G , 			/gcx) { push @tokens, "_TK_COMMA"; }
 		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
 		elsif (/\G \( %[nmh] \)	/gcx) { push @tokens, "expr"; }
-		elsif (/\G    %[snmMjJ]	/gcx) { push @tokens, "expr"; }
+		elsif (/\G    %[snmMjJx]/gcx) { push @tokens, "expr"; }
 		elsif (/\G \+ %[dsu]	/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[c]		/gcx) { push @tokens, "const_expr"; }
 		elsif (/\G    (\w+)	'	/gcx) { push @tokens, "_TK_".uc($1)."1"; }
@@ -217,6 +233,20 @@ sub parser_tokens {
 		else { die "$_ ; ", substr($_, pos($_)||0) }
 	}
 	return join(' ', ('| label?', @tokens, "_TK_NEWLINE"));
+}
+
+sub multiple_uses_of_expr {
+	my($opcode) = @_;
+	my @ops = @{$opcode->ops};
+	my %found;
+	for my $i (0..$#ops) {
+		for (@{$ops[$i]}) {
+			if (/%m/) {
+				$found{$i}++;
+			}
+		}
+	}
+	return scalar keys %found > 1;
 }
 
 sub parse_code {
@@ -265,11 +295,11 @@ sub parse_code {
 				}
 				elsif ($count_t==2) {
 					push @code,
-						"add_opcode_nn_end(0x".fmthex($bin).", end_label, $target_offset);";
+						"add_opcode_jp_nn_end(0x".fmthex($bin).", end_label, $target_offset);";
 				}
 				elsif ($count_t==3) {	
 					push @code,
-						"add_opcode_nnn_end(0x".fmthex($bin).", end_label, $target_offset);";
+						"add_opcode_jp_nnn_end(0x".fmthex($bin).", end_label, $target_offset);";
 				}
 				else {	
 					die $count_t;
@@ -284,7 +314,7 @@ sub parse_code {
 			"}";
 	}
 	# handle multiple uses of the same expression
-	elsif ($bytes =~ /%m/) {
+	elsif (multiple_uses_of_expr($opcode)) {
 		push @code,
 			"{",
 			"DO_STMT_LABEL();",
@@ -393,11 +423,11 @@ sub parse_code_opcode {
 	my @const = sort {$a <=> $b} @{$opcode->const};
 	my @code;
 
-	#say "$cpu\t$asm\t@bytes";
-	
 	# check for argument type
 	my $stmt = "";
 	my $bytes = join(' ', @bytes);
+	
+	#say "$cpu\t$asm\t@bytes" if $asm =~ /lcall/;
 	
 	if ($bytes =~ s/ \@(\w+)//) {
 		my $func = $1;
@@ -434,6 +464,12 @@ sub parse_code_opcode {
 	}
 	elsif ($bytes =~ s/ %h$//) {
 		$stmt = "DO_stmt_h";
+	}
+	elsif ($bytes =~ s/ %m %m %x %x$//) {
+		$stmt = "DO_stmt_xx_nn";
+	}
+	elsif ($bytes =~ s/ %m %m %x$//) {
+		$stmt = "DO_stmt_x_nn";
 	}
 	elsif ($bytes =~ s/ %m %m %m %m$//) {
 		$stmt = "DO_stmt_nnnn";

@@ -65,8 +65,12 @@ static cpu_lookup_t cpu_lut[] = {
     { "ez80_z80_strict",	CPU_EZ80_Z80_STRICT,	CPU_UNDEF,  CPU_EZ80_Z80,   true,   },  // 22
     { "ez80_strict",    	CPU_EZ80_STRICT,    	CPU_UNDEF,	CPU_EZ80,       true,   },  // 23
     { "r800_strict",   		CPU_R800_STRICT,		CPU_8080,   CPU_R800,       true,   },  // 24
-    { "kc160_strict",   	CPU_KC160_STRICT,		CPU_UNDEF,  CPU_KC160,      true,  },  	// 25
-    { "kc160_z80_strict",	CPU_KC160_Z80_STRICT,	CPU_8080,   CPU_KC160_Z80,  true,  },  	// 26
+    { "kc160_strict",   	CPU_KC160_STRICT,		CPU_UNDEF,  CPU_KC160,      true,   },  // 25
+    { "kc160_z80_strict",	CPU_KC160_Z80_STRICT,	CPU_8080,   CPU_KC160_Z80,  true,   },  // 26
+    { "r2ka_strict",       	CPU_R2KA_STRICT,        CPU_UNDEF,  CPU_R2KA,       true,   },  // 27
+    { "r3k_strict",        	CPU_R3K_STRICT,         CPU_R2KA,   CPU_R3K,        true,   },  // 28
+    { "r4k_strict",        	CPU_R4K_STRICT,         CPU_UNDEF,  CPU_R4K,        true,   },  // 29
+    { "r5k_strict",			CPU_R5K_STRICT,			CPU_R4K,    CPU_R5K,        true,   },  // 30
 };
 
 static cpu_lookup_t* cpu_lu_hash = NULL;        // lookup from cpu name

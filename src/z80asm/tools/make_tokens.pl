@@ -95,6 +95,12 @@ my @tokens = (
 	'JP_LTU', 'JP_LEU', 'JP_GTU', 'JP_GEU', 
 	'JP_LT',  'JP_LE',  'JP_GT',  'JP_GE', 
 
+	'LLJP_NZ', 'LLJP_Z', 'LLJP_NC', 'LLJP_C', 'LLJP_PO', 'LLJP_PE', 'LLJP_P', 'LLJP_M', 
+	'LLJP_LZ', 'LLJP_LO', 'LLJP_NV', 'LLJP_V', 'LLJP_NK', 'LLJP_K', 'LLJP_NX5', 'LLJP_X5',
+	'LLJP_NE', 'LLJP_EQ', 
+	'LLJP_LTU', 'LLJP_LEU', 'LLJP_GTU', 'LLJP_GEU', 
+	'LLJP_LT',  'LLJP_LE',  'LLJP_GT',  'LLJP_GE', 
+
 	'JP3_NZ', 'JP3_Z', 'JP3_NC', 'JP3_C', 'JP3_PO', 'JP3_PE', 'JP3_P', 'JP3_M', 
 	'JP3_LZ', 'JP3_LO', 'JP3_NV', 'JP3_V', 'JP3_NK', 'JP3_K', 'JP3_NX5', 'JP3_X5',
 	'JP3_NE', 'JP3_EQ', 
@@ -175,7 +181,6 @@ my @tokens = (
 	
 	# Indirect 16-bit register
 	'IND_BC', 'IND_DE', 'IND_HL', 'IND_SP', 'IND_IX', 'IND_IY', 'IND_HLI', 'IND_HLD',
-	'IND_PW', 'IND_PX', 'IND_PY', 'IND_PZ', 
 	
 	# 8-bit registers
 	'B', 'C', 'D', 'E', 'H', 'L', 'A', 'F', 'I', 'R', 'M',
@@ -201,6 +206,10 @@ my @tokens = (
 	
 	# 32-bit registers
 	'BCDE', 'DEHL', 'JKHL', 'PW', 'PX', 'PY', 'PZ',
+	
+	# Indirect 32-bit registers
+	'IND_BCDE', 'IND_DEHL', 'IND_JKHL', 
+	'IND_PW', 'IND_PX', 'IND_PY', 'IND_PZ',
 	
 	# alternate registers
 	'B1', 'C1', 'D1', 'E1', 'H1', 'L1', 'A1', 'F1', 'BC1', 'DE1', 'JK1', 'HL1', 'AF1',
@@ -253,7 +262,8 @@ my @tokens = (
 	'SETUSR', 'SURES', 'SYSCALL', 'UMA', 'UMS', 'CBM', 'CLR', 'CONVC', 'CONVD',
 	'COPY', 'COPYR', 'DWJNZ', 'EXP', 'FLAG', 'FSYSCALL', 'IBOX', 'JRE', 'LDF',
 	'LDL', 'MULU', 'RLB', 'RRB', 'SBOX', 'SETSYSP', 'SETUSRP', 'SYSRET', 'SRET',
-
+	'LCALL', 'LJP', 'LLCALL', 'LLJP', 'LRET', 'LLRET',
+	
 	# Z88DK specific opcodes
 	'CALL_OZ', 'CALL_PKG', 'FPP', 'INVOKE',
 
