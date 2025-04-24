@@ -507,6 +507,13 @@ IF FORnascom
     defc blankch    = 32
 ENDIF
 
+IF FORrc700
+    DEFINE gotgfx
+    defc maxx    = 160
+    defc maxy    = 72
+    defc blankch    = 32
+ENDIF
+
 IF FORtrs80
     DEFINE gotgfx
     defc maxx    = 128
