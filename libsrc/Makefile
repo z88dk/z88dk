@@ -750,7 +750,7 @@ rc700.lib: cpm_clib.lib
 	@echo '--- Building RC-700 Library ---'
 	@echo ''
 	$(MAKE) -C games TARGET=cpm SUBTYPE=rc700
-	$(MAKE) -C gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=rc700
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR="text6 narrow" SUBTYPE=rc700
 	TARGET=rc700 TYPE=z80 $(LIBLINKER) -DFORrc700 -x$(OUTPUT_DIRECTORY)/rc700 @$(TARGET_DIRECTORY)/rc700/rc700.lst
 
 x1_cpm.lib: x1_clib.lib
