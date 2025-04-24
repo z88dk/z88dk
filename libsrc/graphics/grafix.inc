@@ -510,7 +510,7 @@ ENDIF
 IF FORrc700
     DEFINE gotgfx
     defc maxx    = 160
-    defc maxy    = 72
+    defc maxy    = 75
     defc blankch    = 32
 ENDIF
 
