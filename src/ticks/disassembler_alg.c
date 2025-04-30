@@ -604,7 +604,12 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                     } else if ( state->index && israbbit4k() && q == 1 && z == 3 ) {
                         BUF_PRINTF("%-10s4,%s", rot_table[p], r4k_32b_table[state->index-1]);
                     } else if ( state->index && israbbit4k() && q == 1 && z == 7 ) {
-                        BUF_PRINTF("%-10s8,%s", rot_table[p], r4k_32b_table[state->index-1]);
+                        if (b == 0x6F)
+                            BUF_PRINTF("%-10sa,%s", "rlb", r4k_32b_table[state->index - 1]);
+                        else if (b == 0x7F)
+                            BUF_PRINTF("%-10sa,%s", "rrb", r4k_32b_table[state->index - 1]);
+                        else
+                            BUF_PRINTF("%-10s8,%s", rot_table[p], r4k_32b_table[state->index-1]);
                     } else if ( state->index && israbbit4k() && q == 1 && z == 4 && p < 2 ) {
                         BUF_PRINTF("%-10s%s","test", p == 0 ? handle_hl(state->index) : r4k_32b_table[state->index-1]);
                     } else if ( state->index && israbbit4k() && q == 1 && p == 0 && z == 5 ) {
