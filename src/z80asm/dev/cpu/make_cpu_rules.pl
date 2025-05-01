@@ -5,9 +5,17 @@
 #------------------------------------------------------------------------------
 
 use Modern::Perl;
-use YAML::Tiny;
+BEGIN { 
+	use Path::Tiny;
+	use lib path($0)->dirname;
+	use Opcodes;
+}
+use Carp (); 
+use Data::Dump 'dump'; 
+$SIG{__DIE__} = \&Carp::confess;
+use warnings FATAL => 'all';
 
-@ARGV==2 or die "Usage: $0 input_file.yaml output_file.h\n";
+@ARGV==2 or die "Usage: $0 input_file.dat output_file.h\n";
 my($input_file, $output_file) = @ARGV;
 
 my $aux_func_name = $output_file =~ s/\..*/_action_/r;
@@ -15,26 +23,26 @@ my $output_aux_file_header = $output_file =~ s/\.\w+$/_action.h/r;
 my $output_aux_file_source = $output_file =~ s/\.\w+$/_action.c/r;
 
 
-my $yaml = YAML::Tiny->read($input_file);
-my %opcodes = %{$yaml->[0]};
+my $opcodes = Opcodes->from_file($input_file);
 
 my %parser;
 
-my @CPUS = sort keys %{$opcodes{"nop"}};
-
-for my $asm (sort keys %opcodes) {
+for my $asm (sort keys %{$opcodes->opcodes}) {
 	my $tokens = parser_tokens($asm);
 	
 	# check for parens
 	my $parens;
 	if    ($asm =~ /\(%[nmh]\)/) {		$parens = 'expr_in_parens'; }
-	elsif ($asm =~ /%[snmjc]/) {		$parens = 'expr_no_parens'; }
-	else {								$parens = 'no_expr';   }
+	elsif ($asm =~ /\(\w+\+%[dsu]/) {	$parens = 'no_expr'; }
+	elsif ($asm =~ /\w+\+%[dsu]/) {		$parens = 'no_expr'; }
+	elsif ($asm =~ /%[snmMjJkc]/) {		$parens = 'expr_no_parens'; }
+	elsif ($asm !~ /%/) {				$parens = 'no_expr';   }
+	else { die $asm; }
 		
-	for my $cpu (sort keys %{$opcodes{$asm}}) {
-		my @ops = @{$opcodes{$asm}{$cpu}};
+	for my $cpu (sort keys %{$opcodes->opcodes->{$asm}}) {
+		my $opcode = $opcodes->opcodes->{$asm}{$cpu};
 		
-		$parser{$tokens}{$cpu}{$parens} = [$asm, @ops];
+		$parser{$tokens}{$cpu}{$parens} = $opcode;
 	}
 }
 
@@ -80,7 +88,9 @@ say $aux_h <<END;
 #define DO_stmt_n(  opcode)		_DO_stmt_(n,		opcode)
 #define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
 #define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
+#define DO_stmt_n_0_0(	opcode)	_DO_stmt_(n_0_0,	opcode)
 #define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
+#define DO_stmt_s_0_0(opcode)	_DO_stmt_(s_0_0,	opcode)
 #define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
 
 #define DO_stmt_nn( opcode) \\
@@ -146,6 +156,22 @@ say $aux_h <<END;
 				add_opcode_defb(expr); \\
 			} while(0)
 
+#define DO_stmt_x_nn(opcode) \\
+			do { \\
+			 	Expr1 *nn_expr = pop_expr(ctx); \\
+				Expr1 *x_expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_x_nn((opcode), x_expr, nn_expr); \\
+			} while(0)
+
+#define DO_stmt_xx_nn(opcode) \\
+			do { \\
+			 	Expr1 *nn_expr = pop_expr(ctx); \\
+				Expr1 *xx_expr = pop_expr(ctx); \\
+				DO_STMT_LABEL(); \\
+				add_opcode_xx_nn((opcode), xx_expr, nn_expr); \\
+			} while(0)
+
 
 END
 
@@ -175,7 +201,7 @@ exit 0;
 
 sub parser_tokens {
 	local($_) = @_;
-	my $instr_flag = qr/\b(?:call|jp|jmp|jr|jre|jp3|ret|rst|flag)\b/i;
+	my $instr_flag = qr/\b(?:call|call3|jp|jmp|jr|jre|jp3|lljp|ret|ret3|rst|flag)\b/i;
 	my $am = qr/\b(?:l|il|is|lil|lis|sil|sis)\b/i;
 	my $flag = qr/\b(?:nz|z|nc|c|po|pe|p|m|lz|lo|nv|v|x5|nx5|k|nk|ne|eq|ltu|leu|gtu|geu|lt|le|gt|ge)\b/i;
 	my $instr_x = qr/\b(cpd|cpdr|cpi|cpir|ind|indr|ini|inir|otdr|otir|outd|outi)\s+(x)\b/i;
@@ -195,7 +221,7 @@ sub parser_tokens {
 		elsif (/\G , 			/gcx) { push @tokens, "_TK_COMMA"; }
 		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
 		elsif (/\G \( %[nmh] \)	/gcx) { push @tokens, "expr"; }
-		elsif (/\G    %[snmMjJ]	/gcx) { push @tokens, "expr"; }
+		elsif (/\G    %[snmMjJx]/gcx) { push @tokens, "expr"; }
 		elsif (/\G \+ %[dsu]	/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[c]		/gcx) { push @tokens, "const_expr"; }
 		elsif (/\G    (\w+)	'	/gcx) { push @tokens, "_TK_".uc($1)."1"; }
@@ -209,20 +235,39 @@ sub parser_tokens {
 	return join(' ', ('| label?', @tokens, "_TK_NEWLINE"));
 }
 
+sub multiple_uses_of_expr {
+	my($opcode) = @_;
+	my @ops = @{$opcode->ops};
+	my %found;
+	for my $i (0..$#ops) {
+		for (@{$ops[$i]}) {
+			if (/%m/) {
+				$found{$i}++;
+			}
+		}
+	}
+	return scalar keys %found > 1;
+}
+
 sub parse_code {
-	my($cpu, $asm, @ops) = @_;
+	my($cpu, $opcode) = @_;
+	my $asm = $opcode->asm;
+	my @ops = @{$opcode->ops};
+	my @bytes = $opcode->bytes;
+	my $bytes = "@bytes";
 	my @code;
 
-	my @bin;
-	for my $op (@ops) {
-		push @bin, @$op;
+	#say "$cpu\t$asm\t$bytes";
+
+	# handle option -no_synth
+	if ($opcode->synth) {
+		push @code,
+			"if (option_no_synth())",
+			"\terror(ErrIllegalIdent, NULL);";
 	}
-	my $bin = "@bin";
-	
-	#say "$cpu\t$asm\t$bin";
 
 	# handle special case of jump to %t
-	if ($bin =~ /%t/) {
+	if ($bytes =~ /%t/) {
 		push @code,
 			"{",
 			"DO_STMT_LABEL();",
@@ -230,7 +275,7 @@ sub parse_code {
 		for my $op (@ops) {
 			my $count_t = scalar(grep {/%t/} @$op);
 			if ($count_t) {
-				my $opcode = 0;
+				my $bin = 0;
 				my $target_offset = 0;
 				for my $i (0 .. $#$op) {
 					if ($op->[$i] =~ /%t(\d*)/) {
@@ -240,28 +285,28 @@ sub parse_code {
 						last;
 					}
 					else {
-						$opcode = ($opcode << 8) | ($op->[$i] & 0xFF);
+						$bin = ($bin << 8) | ($op->[$i] & 0xFF);
 					}
 				}
 				
 				if ($count_t==1) {
 					push @code,
-						"add_opcode_jr_end(0x".fmthex($opcode).", end_label, $target_offset);";
+						"add_opcode_jr_end(0x".fmthex($bin).", end_label, $target_offset);";
 				}
 				elsif ($count_t==2) {
 					push @code,
-						"add_opcode_nn_end(0x".fmthex($opcode).", end_label, $target_offset);";
+						"add_opcode_jp_nn_end(0x".fmthex($bin).", end_label, $target_offset);";
 				}
 				elsif ($count_t==3) {	
 					push @code,
-						"add_opcode_nnn_end(0x".fmthex($opcode).", end_label, $target_offset);";
+						"add_opcode_jp_nnn_end(0x".fmthex($bin).", end_label, $target_offset);";
 				}
 				else {	
 					die $count_t;
 				}				
 			}
 			else {
-				push @code, parse_code_opcode($cpu, $asm, @$op);
+				push @code, parse_code_opcode($cpu, $opcode, @$op);
 			}
 		}
 		push @code, 
@@ -269,7 +314,7 @@ sub parse_code {
 			"}";
 	}
 	# handle multiple uses of the same expression
-	elsif ($bin =~ /%m/) {
+	elsif (multiple_uses_of_expr($opcode)) {
 		push @code,
 			"{",
 			"DO_STMT_LABEL();",
@@ -277,7 +322,7 @@ sub parse_code {
 		for my $op (@ops) {
 			my $count_m = scalar(grep {/%m/} @$op);
 			if ($count_m) {
-				my $opcode = 0;
+				my $bin = 0;
 				my $target_offset = 0;
 				for my $i (0 .. $#$op) {
 					if ($op->[$i] =~ /%m(\d*)/) {
@@ -287,35 +332,36 @@ sub parse_code {
 						last;
 					}
 					else {
-						$opcode = ($opcode << 8) | ($op->[$i] & 0xFF);
+						$bin = ($bin << 8) | ($op->[$i] & 0xFF);
 					}
 				}
 				
 				if ($count_m==2) {
 					push @code,
-						"add_opcode_nn(0x".fmthex($opcode).", Expr1_clone(expr), $target_offset);";
+						"add_opcode_nn(0x".fmthex($bin).", Expr1_clone(expr), $target_offset);";
 				}
 				elsif ($count_m==3) {	
 					push @code,
-						"add_opcode_nnn(0x".fmthex($opcode).", Expr1_clone(expr), $target_offset);";
+						"add_opcode_nnn(0x".fmthex($bin).", Expr1_clone(expr), $target_offset);";
 				}
 				elsif ($count_m==4) {	
 					push @code,
-						"add_opcode_nnnn(0x".fmthex($opcode).", Expr1_clone(expr));";
+						"add_opcode_nnnn(0x".fmthex($bin).", Expr1_clone(expr));";
 				}
 				else {	
 					die $count_m;
 				}				
 			}
 			else {
-				push @code, parse_code_opcode($cpu, $asm, @$op);
+				push @code, parse_code_opcode($cpu, $opcode, @$op);
 			}
 		}
 		push @code, 
 			"OBJ_DELETE(expr);",
 			"}";
 	}
-	elsif ($bin =~ /%j [0-9A-F ]+%j/) {
+	# handle two jump relatives to same address
+	elsif ($bytes =~ /%j \d+ %j/) {
 		push @code,
 			"{",
 			"DO_STMT_LABEL();",
@@ -323,65 +369,48 @@ sub parse_code {
 		for my $op (@ops) {
 			my $count_j = scalar(grep {/%j/} @$op);
 			if ($count_j) {
-				my $opcode = 0;
+				my $bin = 0;
 				for my $i (0 .. $#$op) {
 					last if $op->[$i] =~ /%j/;
-					$opcode = ($opcode << 8) | ($op->[$i] & 0xFF);
+					$bin = ($bin << 8) | ($op->[$i] & 0xFF);
 				}
 				
 				if ($count_j==1) {
 					push @code,
-						"add_opcode_jr(0x".fmthex($opcode).", Expr1_clone(expr));";
+						"add_opcode_jr(0x".fmthex($bin).", Expr1_clone(expr));";
 				}
 				else {	
 					die $count_j;
 				}				
 			}
 			else {
-				push @code, parse_code_opcode($cpu, $asm, @$op);
+				push @code, parse_code_opcode($cpu, $opcode, @$op);
 			}
 		}
 		push @code, 
 			"OBJ_DELETE(expr);",
 			"}";
 	}
-	# handle rst[.l] %c
-	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
-		if ($1) {
-			push @code, 
-				"DO_stmt(".sprintf("0x%02X", $ops[0][0]).");";
-			shift @ops;
-		}
-		for my $op (@ops) {
-			push @code, parse_code_opcode($cpu, $asm, @$op);
-		}
-	}
 	# handle ld dd,(ix+d) -> ld ddl,(ix+d) : ld ddh, (ix+d+1)
-	elsif ($bin =~ /%D/) {
+	elsif ($bytes =~ /%D/) {
 		for my $i (0 .. $#ops) {
 			if (($ops[$i][2]//'') eq '%d' && ($ops[$i+1][2]//'') eq '%D') {
 				my $opcode0 = ($ops[$i+0][0] << 8) + $ops[$i+0][1];
 				my $opcode1 = ($ops[$i+1][0] << 8) + $ops[$i+1][1];
 				push @code, 
-					"DO_stmt_idx_idx1(".sprintf("0x%04X, 0x%04X", $opcode0, $opcode1).");";
+					"DO_stmt_idx_idx1(".sprintf("0x%04XLL, 0x%04XLL", $opcode0, $opcode1).");";
 			}
 			elsif ($ops[$i][2]//'' eq '%D') {
-				# already handled
+				# handled above
 			}
 			else {
-				push @code, parse_code_opcode($cpu, $asm, @{$ops[$i]});
+				push @code, parse_code_opcode($cpu, $opcode, @{$ops[$i]});
 			}
 		}
 	}
-	elsif ($bin =~ /^\d+ %j \d+ %j$/) {
-		my $opcode0 = $ops[0][0];
-		my $opcode1 = $ops[1][0];
-		push @code, 
-			"DO_stmt_jr_jr(".sprintf("0x%02X, 0x%02X", $opcode0, $opcode1).");";
-	}		
 	else {
 		for my $op (@ops) {
-			push @code, parse_code_opcode($cpu, $asm, @$op);
+			push @code, parse_code_opcode($cpu, $opcode, @$op);
 		}
 	}
 	
@@ -389,109 +418,116 @@ sub parse_code {
 }
 
 sub parse_code_opcode {
-	my($cpu, $asm, @bin) = @_;
-	my @bin0 = @bin;
+	my($cpu, $opcode, @bytes) = @_;
+	my $asm = $opcode->asm;
+	my @const = sort {$a <=> $b} @{$opcode->const};
 	my @code;
 
-	#say "$cpu\t$asm\t@bin";
-	
 	# check for argument type
-	my($stmt, $extra_arg) = ("", "");
-	my $bin = join(' ', @bin);
+	my $stmt = "";
+	my $bytes = join(' ', @bytes);
 	
-	if ($bin =~ s/ \@(\w+)//) {
+	#say "$cpu\t$asm\t@bytes" if $asm =~ /lcall/;
+	
+	if ($bytes =~ s/ \@(\w+)//) {
 		my $func = $1;
 		push @code, 
 			"DO_STMT_LABEL();",
 			"add_call_emul_func(\"$func\");";
 	}
-	elsif ($asm =~ /^rst((\.(s|sil|l|lis))?) %c/) {
-		push @code, 
-			"DO_STMT_LABEL();",
-			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); }".
-			"else { add_rst_opcode(ctx->expr_value); }";
-	}
 	elsif ($asm =~ /^mmu %c, %n/) {
 		push @code, 
 			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {",
 			"if (ctx->expr_value < 0 || ctx->expr_value > 7) error_hex2(ErrIntRange, ctx->expr_value);",
-			"DO_stmt_n(0xED9150 + ctx->expr_value);}";
+			"DO_stmt_n(0xED9150LL + ctx->expr_value);}";
 	}
 	elsif ($asm =~ /^mmu %c, a/) {
 		push @code, 
 			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {",
 			"if (ctx->expr_value < 0 || ctx->expr_value > 7) error_hex2(ErrIntRange, ctx->expr_value);",
-			"DO_stmt(0xED9250 + ctx->expr_value);}";
-		my $code = join("\n", @code);
-		return $code;
+			"DO_stmt(0xED9250LL + ctx->expr_value);}";
 	}
-	elsif ($bin =~ s/ %d %n$//) {
+	elsif ($bytes =~ s/ %d %n$//) {
 		$stmt = "DO_stmt_idx_n";
 	}
-	elsif ($bin =~ s/ %n %n$//) {
+	elsif ($bytes =~ s/ %n %n$//) {
 		$stmt = "DO_stmt_n_n";
 	}
-	elsif ($bin =~ s/ %n$//) {
+	elsif ($bytes =~ s/ %n$//) {
 		$stmt = "DO_stmt_n";
 	}
-	elsif ($bin =~ s/ %u$//) {
+	elsif ($bytes =~ s/ %u$//) {
 		$stmt = "DO_stmt_n";
 	}
-	elsif ($bin =~ s/ %s$//) {
+	elsif ($bytes =~ s/ %s$//) {
 		$stmt = "DO_stmt_d";
 	}
-	elsif ($bin =~ s/ %h$//) {
+	elsif ($bytes =~ s/ %h$//) {
 		$stmt = "DO_stmt_h";
 	}
-	elsif ($bin =~ s/ %m %m %m %m$//) {
+	elsif ($bytes =~ s/ %m %m %x %x$//) {
+		$stmt = "DO_stmt_xx_nn";
+	}
+	elsif ($bytes =~ s/ %m %m %x$//) {
+		$stmt = "DO_stmt_x_nn";
+	}
+	elsif ($bytes =~ s/ %m %m %m %m$//) {
 		$stmt = "DO_stmt_nnnn";
 	}
-	elsif ($bin =~ s/ %m %m %m$//) {
+	elsif ($bytes =~ s/ %m %m %m$//) {
 		$stmt = "DO_stmt_nnn";
 	}
-	elsif ($bin =~ s/ %m %m$//) {
+	elsif ($bytes =~ s/ %m %m$//) {
 		$stmt = "DO_stmt_nn";
 	}
-	elsif ($bin =~ s/ %u 0$//) {
+	elsif ($bytes =~ s/ %u 0 0$//) {
+		$stmt = "DO_stmt_n_0_0";
+	}
+	elsif ($bytes =~ s/ %u 0$//) {
 		$stmt = "DO_stmt_n_0";
 	}
-	elsif ($bin =~ s/ %n 0$//) {
+	elsif ($bytes =~ s/ %n 0 0$//) {
+		$stmt = "DO_stmt_n_0_0";
+	}
+	elsif ($bytes =~ s/ %n 0$//) {
 		$stmt = "DO_stmt_n_0";
 	}
-	elsif ($bin =~ s/ %s 0$//) {
+	elsif ($bytes =~ s/ %s 0$//) {
 		$stmt = "DO_stmt_s_0";
 	}
-	elsif ($bin =~ s/ %M %M$//) {
+	elsif ($bytes =~ s/ %s 0 0$//) {
+		$stmt = "DO_stmt_s_0_0";
+	}
+	elsif ($bytes =~ s/ %M %M$//) {
 		$stmt = "DO_stmt_NN";
 	}
-	elsif ($bin =~ s/ %j$//) {
+	elsif ($bytes =~ s/ %j$//) {
 		$stmt = "DO_stmt_jr";
 	}
-	elsif ($bin =~ s/ %J %J$//) {
+	elsif ($bytes =~ s/ %J %J$//) {
 		$stmt = "DO_stmt_jre";
 	}
-	elsif ($bin =~ s/%c\((.*?)\)/ctx->expr_value/) {
-		my @values = eval($1); die "$cpu, $asm, @bin, $1" if $@;
-		$bin =~ s/%c/ctx->expr_value/g;		# replace all other %c in bin
+	elsif ($asm =~ /%c/) {
+		$bytes =~ s/%c/ctx->expr_value/g;
 		push @code,
 			"if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {",
 			"switch (ctx->expr_value) {",
-			join(" ", map {"case $_:"} @values)." break;",
+			join(" ", map {"case $_:"} @const)." break;",
 			"default: error_hex2(ErrIntRange, ctx->expr_value);",
 			"}}";
 			
-		if ($bin =~ s/ %d// || $bin =~ s/%d //) {
+		if ($bytes =~ s/ %d// || $bytes =~ s/%d //) {
 			$stmt = "DO_stmt_idx";
 		} 
 		else {
 			$stmt = "DO_stmt";
 		}
 	}
-	elsif ($bin =~ s/ %d//) {
+	elsif ($bytes =~ s/ %d//) {
 		$stmt = "DO_stmt_idx";
 	}
-	elsif ($bin =~ s/^%s//) {
-		push @code, "DO_stmt_defb();";
+	elsif ($bytes =~ s/^%s//) {
+		push @code, "DO_stmt_defb();";		# call __z80asm__add_sp_s : defb %s
 	}
 	else {
 		$stmt = "DO_stmt";
@@ -499,10 +535,12 @@ sub parse_code_opcode {
 
 	# build statement - need to leave expressions for C compiler
 	if ($stmt) {
-		@bin = split(' ', $bin);	# $bin has %x removed
-		#say "@bin";
+		@bytes = split(' ', $bytes);	# $bytes has %x removed
+
+		#say "@bytes";
+
 		my @expr;
-		for (@bin) {
+		for (@bytes) {
 			if (/[+*?<>]/) {
 				my $offset = 0;
 				if (s/^(\d+)\+//) {
@@ -514,20 +552,20 @@ sub parse_code_opcode {
 			}
 			else {
 				push @expr, undef;
-				$_ = eval($_); die "$cpu, $asm, @bin, $_" if $@;
+				$_ = eval($_); die "$cpu, $asm, @bytes, $_" if $@;
 				$_ = fmthex($_);
 			}
 		}
 		
-		my $opc = "0x".join('', @bin);
+		my $opc = "0x".join('', @bytes)."LL";
 		for (0..$#expr) {
 			next unless defined $expr[$_];
-			my $bytes_shift = scalar(@bin) - $_ - 1;
+			my $bytes_shift = scalar(@bytes) - $_ - 1;
 			$opc .= '+(('.($expr[$_]).')';
 			$opc .= ' << '.($bytes_shift * 8) if $bytes_shift;
 			$opc .= ')';
 		}
-		push @code, $stmt."(".$opc.$extra_arg.");";
+		push @code, $stmt."(".$opc.");";
 	}
 
 	my $code = join("\n", @code);
@@ -537,10 +575,11 @@ sub parse_code_opcode {
 sub merge_cpu {
 	my($t) = @_;
 	my $ret = '';
+	my @cpus = Opcode->cpus();
 	my %code;
 	
 	my $last_code;
-	for my $cpu (@CPUS) {
+	for my $cpu (@cpus) {
 		if (exists $t->{$cpu}) {
 			my $code = merge_parens($cpu, $t->{$cpu});
 			$code{$code}{$cpu}++;
@@ -549,7 +588,7 @@ sub merge_cpu {
 	}
 	
 	if (scalar(keys %code) == 1 && 
-	    scalar(keys %{$code{$last_code}}) == scalar(@CPUS)) {
+	    scalar(keys %{$code{$last_code}}) == scalar(@cpus)) {
 		# no variants
 		$ret .= $last_code."\n";
 	}
@@ -576,22 +615,22 @@ sub merge_parens {
 	
 	if ($t->{no_expr}) {
 		die if $t->{expr_no_parens} || $t->{expr_in_parens};
-		return parse_code($cpu, @{$t->{no_expr}});
+		return parse_code($cpu, $t->{no_expr});
 	}
 	elsif (!$t->{expr_no_parens} && !$t->{expr_in_parens}) {
 		die;
 	}
 	elsif (!$t->{expr_no_parens} && $t->{expr_in_parens}) {
 		return "if (!ctx->expr_in_parens) return false;\n".
-				parse_code($cpu, @{$t->{expr_in_parens}});			
+				parse_code($cpu, $t->{expr_in_parens});			
 	}
 	elsif ($t->{expr_no_parens} && !$t->{expr_in_parens}) {
 		return "if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);\n".
-				parse_code($cpu, @{$t->{expr_no_parens}});
+				parse_code($cpu, $t->{expr_no_parens});
 	}
 	elsif ($t->{expr_no_parens} && $t->{expr_in_parens}) {
-		my $in_parens = parse_code($cpu, @{$t->{expr_in_parens}});
-		my $no_parens = parse_code($cpu, @{$t->{expr_no_parens}});
+		my $in_parens = parse_code($cpu, $t->{expr_in_parens});
+		my $no_parens = parse_code($cpu, $t->{expr_no_parens});
 		return "if (ctx->expr_in_parens) { $in_parens } else { $no_parens }";
 	}
 	else {

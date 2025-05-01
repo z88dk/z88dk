@@ -139,6 +139,10 @@ void make_library(const char *lib_filename) {
 
         // assemble or include object for each cpu-ixiy combination and append to library
         for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
+            // only include non-strict cpus in library
+            if (cpu_is_strict(*cpu))
+                continue;
+
             option_set_cpu(*cpu);
 
             for (swap_ixiy_t ixiy = first_ixiy; ixiy <= last_ixiy; ixiy++) {

@@ -19,7 +19,7 @@ __z80asm__sub_hl_sp:
 
         ld      hl, sp+6                ; minuend to hl, compensate for return address, DE and BC in stack
         ld      a, e
-        sub     a, l
+        sub     l
         ld      e, a
 
         ld      a, d

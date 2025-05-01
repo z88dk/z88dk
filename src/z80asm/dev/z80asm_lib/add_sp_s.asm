@@ -15,7 +15,7 @@ __z80asm__add_sp_s:
         ld      hl, 0
         add     hl, sp                  ; HL = SP
 
-  IF    !__CPU_INTEL__&&!__CPU_GBZ80__
+  IF    !__CPU_INTEL__
         bit     7, a
   ELSE
         ld      d, a

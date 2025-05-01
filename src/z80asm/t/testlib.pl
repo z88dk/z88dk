@@ -18,13 +18,20 @@ my $OBJ_FILE_VERSION = "18";
 use vars '$test', '$null', '@CPUS';
 $test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
 $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
-@CPUS = qw( z80 z80_strict z80n z180 
-			ez80 ez80_z80 
-			r800 
-			r2ka r3k r4k r5k 
+@CPUS = qw( z80 		z80_strict 
+			z80n 		z80n_strict
+			z180 		z180_strict 
+			ez80 		ez80_strict
+			ez80_z80 	ez80_z80_strict
+			r800 		r800_strict
+			r2ka		r2ka_strict
+			r3k			r3k_strict
+			r4k 		r4k_strict 
+			r5k 		r5k_strict
 			8080 8085 
-			gbz80 
-			kc160 kc160_z80
+			gbz80 		gbz80_strict 
+			kc160		kc160_strict
+			kc160_z80	kc160_z80_strict
 );
 
 unlink_testfiles();
@@ -545,19 +552,19 @@ sub read_map_file {
 #------------------------------------------------------------------------------
 sub cpu_compatible {
 	my($code_cpu, $lib_cpu) = @_;
+	
+	# unstrictify CPU
+	for ($code_cpu, $lib_cpu) {
+		s/_strict$//;
+	}
+	
 	if ($code_cpu eq $lib_cpu) {
 		return 1;
 	}
-	elsif ($code_cpu eq "z80_strict" && $lib_cpu eq "8080") {
+	elsif ($code_cpu eq "z80" && $lib_cpu eq "8080") {
 		return 1;
 	}
-	elsif ($code_cpu eq "z80" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
-		return 1;
-	}
-	elsif ($code_cpu eq "z80n" && ($lib_cpu eq "8080" || $lib_cpu eq "z80" || $lib_cpu eq "z80_strict")) {
-		return 1;
-	}
-	elsif ($code_cpu eq "z180" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
+	elsif ($code_cpu eq "z180" && $lib_cpu eq "8080") {
 		return 1;
 	}
 	elsif ($code_cpu eq "ez80") {
@@ -566,7 +573,7 @@ sub cpu_compatible {
 	elsif ($code_cpu eq "ez80_z80") {
 		return 0;
 	}
-	elsif ($code_cpu eq "r800" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
+	elsif ($code_cpu eq "z80n" && ($lib_cpu eq "8080" || $lib_cpu eq "z80")) {
 		return 1;
 	}
 	elsif ($code_cpu eq "r2ka") {
@@ -581,19 +588,22 @@ sub cpu_compatible {
 	elsif ($code_cpu eq "r5k" && $lib_cpu eq "r4k") {
 		return 1;
 	}
+	elsif ($code_cpu eq "gbz80") {
+		return 0;
+	}
 	elsif ($code_cpu eq "8080") {
 		return 0;
 	}
 	elsif ($code_cpu eq "8085" && $lib_cpu eq "8080") {
 		return 1;
 	}
-	elsif ($code_cpu eq "gbz80") {
-		return 0;
+	elsif ($code_cpu eq "r800" && $lib_cpu eq "8080") {
+		return 1;
 	}
 	elsif ($code_cpu eq "kc160") {
 		return 0;
 	}
-	elsif ($code_cpu eq "kc160_z80" && ($lib_cpu eq "8080" || $lib_cpu eq "z80_strict")) {
+	elsif ($code_cpu eq "kc160_z80" && $lib_cpu eq "8080") {
 		return 1;
 	}
 	else {
@@ -785,12 +795,12 @@ END
 		my $cond = ($dd =~ /IX|IY/i) ? "!__CPU_INTEL__ && !__CPU_GBZ80__" : "1";
 		return <<END;
 						IF $cond
-							ld ($res_addr), $dd
+								ld ($res_addr), $dd
 						ELSE
-							push hl
-							ld hl, 0
-							ld ($res_addr), hl
-							pop hl
+								push hl
+								ld hl, 0
+								ld ($res_addr), hl
+								pop hl
 						ENDIF
 END
 	}
@@ -896,6 +906,7 @@ END
 		for my $cpu (@::CPUS) {
 			SKIP: {
 				skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+				skip "$cpu not supported" if $cpu =~ /_strict/;
 				
 				for my $opts (@opts) {
 					# run ticks

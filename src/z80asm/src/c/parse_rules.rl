@@ -506,15 +506,41 @@ Define rules for a ragel-based parser.
 		*--------------------------------------------------------------------*/
 
 		| _TK_ASSUME _TK_ADL _TK_EQUAL const_expr _TK_NEWLINE @{
-			if (option_cpu() != CPU_EZ80 && option_cpu() != CPU_EZ80_Z80)
-				error(ErrIllegalIdent, NULL);
-			else if (ctx->expr_error)
+			if (ctx->expr_error)
 				error(ErrConstExprExpected, NULL);
             else {
-                switch (ctx->expr_value) {
-                case 0: option_set_cpu(CPU_EZ80_Z80); break;
-                case 1: option_set_cpu(CPU_EZ80); break;
-                default: error_hex2(ErrIntRange, ctx->expr_value);
+                switch (option_cpu()) {
+                case CPU_EZ80:
+                    switch (ctx->expr_value) {
+                    case 0: option_set_cpu(CPU_EZ80_Z80); break;
+                    case 1: option_set_cpu(CPU_EZ80); break;
+                    default: error_hex2(ErrIntRange, ctx->expr_value);
+                    }
+                    break;
+                case CPU_EZ80_Z80:
+                    switch (ctx->expr_value) {
+                    case 0: option_set_cpu(CPU_EZ80_Z80); break;
+                    case 1: option_set_cpu(CPU_EZ80); break;
+                    default: error_hex2(ErrIntRange, ctx->expr_value);
+                    }
+                    break;
+                case CPU_EZ80_STRICT:
+                    switch (ctx->expr_value) {
+                    case 0: option_set_cpu(CPU_EZ80_Z80_STRICT); break;
+                    case 1: option_set_cpu(CPU_EZ80_STRICT); break;
+                    default: error_hex2(ErrIntRange, ctx->expr_value);
+                    }
+                    break;
+                case CPU_EZ80_Z80_STRICT:
+                    switch (ctx->expr_value) {
+                    case 0: option_set_cpu(CPU_EZ80_Z80_STRICT); break;
+                    case 1: option_set_cpu(CPU_EZ80_STRICT); break;
+                    default: error_hex2(ErrIntRange, ctx->expr_value);
+                    }
+                    break;
+                default:
+                    error(ErrIllegalIdent, NULL);
+                    break;
                 }
             }
 		}

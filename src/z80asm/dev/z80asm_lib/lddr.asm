@@ -1,7 +1,6 @@
 ; Substitute for the z80 lddr instruction
 ; Doesn't emulate the flags correctly
 
-
         SECTION code_l_sccz80
         PUBLIC  __z80asm__lddr
 
