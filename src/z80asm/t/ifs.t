@@ -470,6 +470,8 @@ spew("$test.asm", <<'END_ASM');
 	if __CPU_R4K_STRICT__		: defm "r4k_strict "		: endif
 	if __CPU_R5K__				: defm "r5k "				: endif
 	if __CPU_R5K_STRICT__		: defm "r5k_strict "		: endif
+	if __CPU_R6K__				: defm "r6k "				: endif
+	if __CPU_R6K_STRICT__		: defm "r6k_strict "		: endif
 															
 	if __CPU_TI83__				: defm "ti83 "  			: endif
 	if __CPU_TI83PLUS__			: defm "ti83plus "  		: endif
@@ -522,6 +524,8 @@ my %defines = (
 	r4k_strict			=> "rabbit r4k_strict ",
 	r5k					=> "rabbit r5k ",
 	r5k_strict			=> "rabbit r5k_strict ",
+	r6k					=> "rabbit r6k ",
+	r6k_strict			=> "rabbit r6k_strict ",
 	ti83				=> "zilog z80_strict ti83 ",
 	ti83plus			=> "zilog z80_strict ti83plus ",
 );

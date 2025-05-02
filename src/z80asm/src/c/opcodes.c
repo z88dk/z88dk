@@ -378,7 +378,8 @@ void add_Z88_CALL_PKG(int argument)
     if (cpu == CPU_R2KA || cpu == CPU_R2KA_STRICT ||
         cpu == CPU_R3K  || cpu == CPU_R3K_STRICT  ||
         cpu == CPU_R4K  || cpu == CPU_R4K_STRICT  ||
-        cpu == CPU_R5K  || cpu == CPU_R5K_STRICT) {
+        cpu == CPU_R5K  || cpu == CPU_R5K_STRICT  ||
+        cpu == CPU_R6K  || cpu == CPU_R6K_STRICT) {
         error_hex4(ErrIntRange, argument);
     }
 	else if (argument >= 0)
