@@ -106,18 +106,16 @@ for my $cpu1 ('8085') {
         # 8085 specific
 		add_opcodes($cpu, "rim/sim [8085]");
 
-        # undocumented 8085
-        if (!$strict) {
-            add_opcodes($cpu, "dsub [8085]");
-            add_opcodes($cpu, "arhl [8085]");
-            add_opcodes($cpu, "rdel [8085]");
-            add_opcodes($cpu, "ldhi N [8085]");
-            add_opcodes($cpu, "ldsi N [8085]");
-            add_opcodes($cpu, "rstv [8085]");
-            add_opcodes($cpu, "shlx [8085]");
-            add_opcodes($cpu, "jx5/jnx5 [8085]");
-            add_opcodes($cpu, "lhlx [8085]");
-        }	
+        # extended 8085
+		add_opcodes($cpu, "dsub [8085]");
+		add_opcodes($cpu, "arhl [8085]");
+		add_opcodes($cpu, "rdel [8085]");
+		add_opcodes($cpu, "ldhi N [8085]");
+		add_opcodes($cpu, "ldsi N [8085]");
+		add_opcodes($cpu, "rstv [8085]");
+		add_opcodes($cpu, "shlx [8085]");
+		add_opcodes($cpu, "jx5/jnx5 [8085]");
+		add_opcodes($cpu, "lhlx [8085]");
     }
 }
 

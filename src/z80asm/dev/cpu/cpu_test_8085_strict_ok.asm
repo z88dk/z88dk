@@ -22,6 +22,14 @@
  adi 0                          ; C6 00
  adi 127                        ; C6 7F
  adi 255                        ; C6 FF
+ adi hl, -128                   ; 28 80
+ adi hl, 0                      ; 28 00
+ adi hl, 127                    ; 28 7F
+ adi hl, 255                    ; 28 FF
+ adi sp, -128                   ; 38 80
+ adi sp, 0                      ; 38 00
+ adi sp, 127                    ; 38 7F
+ adi sp, 255                    ; 38 FF
  ana a                          ; A7
  ana b                          ; A0
  ana c                          ; A1
@@ -34,6 +42,7 @@
  ani 0                          ; E6 00
  ani 127                        ; E6 7F
  ani 255                        ; E6 FF
+ arhl                           ; 10
  call 0x1234                    ; CD 34 12
  cc 0x1234                      ; DC 34 12
  cm 0x1234                      ; FC 34 12
@@ -75,6 +84,7 @@
  dcx h                          ; 2B
  dcx sp                         ; 3B
  di                             ; F3
+ dsub                           ; 08
  ei                             ; FB
  hlt                            ; 76
  in -128                        ; DB 80
@@ -94,18 +104,49 @@
  inx h                          ; 23
  inx sp                         ; 33
  jc 0x1234                      ; DA 34 12
+ jk 0x1234                      ; FD 34 12
  jm 0x1234                      ; FA 34 12
  jmp 0x1234                     ; C3 34 12
+ jmp k, 0x1234                  ; FD 34 12
+ jmp nk, 0x1234                 ; DD 34 12
+ jmp nx5, 0x1234                ; DD 34 12
+ jmp x5, 0x1234                 ; FD 34 12
  jnc 0x1234                     ; D2 34 12
+ jnk 0x1234                     ; DD 34 12
+ jnx5 0x1234                    ; DD 34 12
  jnz 0x1234                     ; C2 34 12
  jp 0x1234                      ; F2 34 12
+ jp k, 0x1234                   ; FD 34 12
+ jp nk, 0x1234                  ; DD 34 12
+ jp nx5, 0x1234                 ; DD 34 12
+ jp x5, 0x1234                  ; FD 34 12
  jpe 0x1234                     ; EA 34 12
  jpo 0x1234                     ; E2 34 12
+ jx5 0x1234                     ; FD 34 12
  jz 0x1234                      ; CA 34 12
+ ld (de), hl                    ; D9
+ ld de, hl+0                    ; 28 00
+ ld de, hl+128                  ; 28 80
+ ld de, hl+255                  ; 28 FF
+ ld de, sp                      ; 38 00
+ ld de, sp+0                    ; 38 00
+ ld de, sp+128                  ; 38 80
+ ld de, sp+255                  ; 38 FF
+ ld hl, (de)                    ; ED
  lda 0x1234                     ; 3A 34 12
  ldax b                         ; 0A
  ldax d                         ; 1A
+ ldhi -128                      ; 28 80
+ ldhi 0                         ; 28 00
+ ldhi 127                       ; 28 7F
+ ldhi 255                       ; 28 FF
+ ldsi -128                      ; 38 80
+ ldsi 0                         ; 38 00
+ ldsi 127                       ; 38 7F
+ ldsi 255                       ; 38 FF
  lhld 0x1234                    ; 2A 34 12
+ lhlde                          ; ED
+ lhlx                           ; ED
  lxi b, 0x1234                  ; 01 34 12
  lxi d, 0x1234                  ; 11 34 12
  lxi h, 0x1234                  ; 21 34 12
@@ -222,6 +263,7 @@
  out 0                          ; D3 00
  out 127                        ; D3 7F
  out 255                        ; D3 FF
+ ovrst8                         ; CB
  pchl                           ; E9
  pop b                          ; C1
  pop d                          ; D1
@@ -234,9 +276,12 @@
  ral                            ; 17
  rar                            ; 1F
  rc                             ; D8
+ rdel                           ; 18
  ret                            ; C9
  rim                            ; 20
+ rl de                          ; 18
  rlc                            ; 07
+ rlde                           ; 18
  rm                             ; F8
  rnc                            ; D0
  rnz                            ; C0
@@ -244,6 +289,7 @@
  rpe                            ; E8
  rpo                            ; E0
  rrc                            ; 0F
+ rrhl                           ; 10
  rst 0                          ; C7
  rst 16                         ; D7
  rst 24                         ; DF
@@ -252,6 +298,8 @@
  rst 48                         ; F7
  rst 56                         ; FF
  rst 8                          ; CF
+ rst v, 64                      ; CB
+ rstv                           ; CB
  rz                             ; C8
  sbb a                          ; 9F
  sbb b                          ; 98
@@ -266,8 +314,11 @@
  sbi 127                        ; DE 7F
  sbi 255                        ; DE FF
  shld 0x1234                    ; 22 34 12
+ shlde                          ; D9
+ shlx                           ; D9
  sim                            ; 30
  sphl                           ; F9
+ sra hl                         ; 10
  sta 0x1234                     ; 32 34 12
  stax b                         ; 02
  stax d                         ; 12
@@ -278,6 +329,7 @@
  sub d                          ; 92
  sub e                          ; 93
  sub h                          ; 94
+ sub hl, bc                     ; 08
  sub l                          ; 95
  sub m                          ; 96
  sui -128                       ; D6 80
