@@ -7,12 +7,12 @@ use Modern::Perl;
 # test error
 z80asm_nok("-mcc", "", "", <<END);
 error: illegal -m option: cc
-error: list of available CPUs: 8080,8080_strict,8085,8085_strict,ez80,ez80_strict,ez80_z80,ez80_z80_strict,gbz80,gbz80_strict,kc160,kc160_strict,kc160_z80,kc160_z80_strict,r2ka,r2ka_strict,r3k,r3k_strict,r4k,r4k_strict,r5k,r5k_strict,r800,r800_strict,z180,z180_strict,z80,z80_strict,z80n,z80n_strict
+error: list of available CPUs: 8080,8080_strict,8085,8085_strict,ez80,ez80_strict,ez80_z80,ez80_z80_strict,gbz80,gbz80_strict,kc160,kc160_strict,kc160_z80,kc160_z80_strict,r2ka,r2ka_strict,r3k,r3k_strict,r4k,r4k_strict,r5k,r5k_strict,r6k,r6k_strict,r800,r800_strict,z180,z180_strict,z80,z80_strict,z80n,z80n_strict
 END
 
 z80asm_nok("-m=cc", "", "", <<END);
 error: illegal -m option: cc
-error: list of available CPUs: 8080,8080_strict,8085,8085_strict,ez80,ez80_strict,ez80_z80,ez80_z80_strict,gbz80,gbz80_strict,kc160,kc160_strict,kc160_z80,kc160_z80_strict,r2ka,r2ka_strict,r3k,r3k_strict,r4k,r4k_strict,r5k,r5k_strict,r800,r800_strict,z180,z180_strict,z80,z80_strict,z80n,z80n_strict
+error: list of available CPUs: 8080,8080_strict,8085,8085_strict,ez80,ez80_strict,ez80_z80,ez80_z80_strict,gbz80,gbz80_strict,kc160,kc160_strict,kc160_z80,kc160_z80_strict,r2ka,r2ka_strict,r3k,r3k_strict,r4k,r4k_strict,r5k,r5k_strict,r6k,r6k_strict,r800,r800_strict,z180,z180_strict,z80,z80_strict,z80n,z80n_strict
 END
 
 # Test cpu opcode files created by ../dev/cpu/cpu.pl
