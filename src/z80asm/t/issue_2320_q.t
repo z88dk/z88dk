@@ -31,6 +31,7 @@ the_answer = 42
 	ifdef __CPU_R3K__			: defm "r3k "			: endif
 	ifdef __CPU_R4K__			: defm "r4k "			: endif
 	ifdef __CPU_R5K__			: defm "r5k "			: endif
+	ifdef __CPU_R6K__			: defm "r6k "			: endif
 	ifdef __CPU_Z180__			: defm "z180 "			: endif
 	ifdef __CPU_Z80__			: defm "z80 "			: endif
 	ifdef __CPU_Z80N__			: defm "z80n " 			: endif

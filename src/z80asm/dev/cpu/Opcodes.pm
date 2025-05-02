@@ -37,6 +37,7 @@ my @CPUS = (qw(
 	r3k			r3k_strict
 	r4k			r4k_strict
 	r5k			r5k_strict
+	r6k			r6k_strict
 	8080 		8080_strict
 	8085		8085_strict
 	gbz80		gbz80_strict

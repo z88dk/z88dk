@@ -28,6 +28,7 @@ $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 			r3k			r3k_strict
 			r4k 		r4k_strict 
 			r5k 		r5k_strict
+			r6k 		r6k_strict
 			8080 8085 
 			gbz80 		gbz80_strict 
 			kc160		kc160_strict
@@ -588,6 +589,9 @@ sub cpu_compatible {
 	elsif ($code_cpu eq "r5k" && $lib_cpu eq "r4k") {
 		return 1;
 	}
+	elsif ($code_cpu eq "r6k" && ($lib_cpu eq "r4k" || $lib_cpu eq "r5k")) {
+		return 1;
+	}
 	elsif ($code_cpu eq "gbz80") {
 		return 0;
 	}
@@ -890,7 +894,7 @@ END
 		my $save_bytes = $self->res_addr;
 		
 		unshift @{$self->asm}, <<END;
-			IF __CPU_R4K__ || __CPU_R5K__
+			IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__
 				;; Enable R4K instruction mode on the R4K
 				ld      a,0xC0
 				ioi ld  (0x0420),a      ;EDMR register (p299 in R4000UM.pdf)

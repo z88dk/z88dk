@@ -71,7 +71,7 @@ $ticks->add(<<END, HL=>42);
 END
 
 $ticks->add(<<END, HL=>1042);
-	IF __CPU_R4K__ || __CPU_R5K__
+	IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__
 			ld 	hl, 0
 			exx
 			ld 	bc, 1042
@@ -85,7 +85,7 @@ $ticks->add(<<END, HL=>1042);
 END
 
 $ticks->add(<<END, HL=>1042);
-	IF __CPU_R4K__ || __CPU_R5K__
+	IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__
 			ld 	hl, 0
 			exx
 			ld 	bc, 1042
@@ -99,7 +99,7 @@ $ticks->add(<<END, HL=>1042);
 END
 
 $ticks->add(<<END, HL=>1042);
-	IF __CPU_R4K__ || __CPU_R5K__
+	IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__
 			ld 	hl, 0
 			ld 	bc, 1042
 	loop:	inc hl
@@ -110,7 +110,7 @@ $ticks->add(<<END, HL=>1042);
 END
 
 $ticks->add(<<END, HL=>1042);
-	IF __CPU_R4K__ || __CPU_R5K__
+	IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__
 			ld 	hl, 0
 			ld 	bc, 1042
 	loop:	inc hl

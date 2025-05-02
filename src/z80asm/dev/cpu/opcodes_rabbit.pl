@@ -1,32 +1,33 @@
 #------------------------------------------------------------------------------
-# r2ka, r3k, r4k, r5k
+# r2ka, r3k, r4k, r5k, r6k
 #------------------------------------------------------------------------------
 
-for my $cpu1 ('r2ka', 'r3k', 'r4k', 'r5k') {
+for my $cpu1 ('r2ka', 'r3k', 'r4k', 'r5k', 'r6k') {
 	for my $strict ('', '_strict') {
 		my $cpu = $cpu1.$strict;
-        my $ge_r3k = $cpu1 eq 'r3k' || $cpu1 eq 'r4k' || $cpu1 eq 'r5k';
-		my $ge_r4k = $cpu1 eq 'r4k' || $cpu1 eq 'r5k';
+        my $ge_r3k = $cpu1 eq 'r3k' || $cpu1 eq 'r4k' || $cpu1 eq 'r5k' || $cpu1 eq 'r6k';
+		my $ge_r4k = $cpu1 eq 'r4k' || $cpu1 eq 'r5k' || $cpu1 eq 'r6k';
+		my $ge_r6k = $cpu1 eq 'r6k';
 
-        if (!$ge_r4k) {
-            add_opcodes($cpu, "<alu> a, <r> [r2ka]");
-            add_opcodes($cpu, "<alu-extra> a, <r> [r2ka]") if !$strict;
-			add_opcodes($cpu, "<alu> <r> [8080]") if !$strict;
-        }
-        else {
+		if ($ge_r4k) {
             add_opcodes($cpu, "<alu> a, <r> [r4k]");
             add_opcodes($cpu, "<alu-extra> a, <r> [r4k]") if !$strict;
 			add_opcodes($cpu, "<alu> <r> [8080/r4k]") if !$strict;
-        }
+		}
+		else {
+            add_opcodes($cpu, "<alu> a, <r> [r2ka]");
+            add_opcodes($cpu, "<alu-extra> a, <r> [r2ka]") if !$strict;
+			add_opcodes($cpu, "<alu> <r> [8080]") if !$strict;
+		}
 
-        if (!$ge_r4k) {
-			add_opcodes($cpu, "<alu> a, (hl) [r2ka]");
-			add_opcodes($cpu, "<alu-extra> a, (hl) [r2ka]") if !$strict;
-        }
-        else {
+		if ($ge_r4k) {
 			add_opcodes($cpu, "<alu> a, (hl) [r4k]");
 			add_opcodes($cpu, "<alu-extra> a, (hl) [r4k]") if !$strict;
-        }
+		}
+		else {
+			add_opcodes($cpu, "<alu> a, (hl) [r2ka]");
+			add_opcodes($cpu, "<alu-extra> a, (hl) [r2ka]") if !$strict;
+		}
 
 		add_opcodes($cpu, "<alu> a, (<x>+DIS) [r2ka]");
 		add_opcodes($cpu, "<alu-extra> a, (<x>+DIS) [r2ka]") if !$strict;
@@ -131,14 +132,14 @@ for my $cpu1 ('r2ka', 'r3k', 'r4k', 'r5k') {
         add_opcodes($cpu, "jmp (hl)") if !$strict;
         add_opcodes($cpu, "jmp (<x>)") if !$strict;
 
-        if (!$ge_r4k) {
-            add_opcodes($cpu, "jp <xf>, NN [r2ka]");
-			add_opcodes($cpu, "j<xf>, NN [r2ka]") if !$strict;
-        }
-        else {
+		if ($ge_r4k) {
             add_opcodes($cpu, "jp <xf>, NN [r4k]");
 			add_opcodes($cpu, "j<xf>, NN [r4k]") if !$strict;
-        }
+		}
+		else {
+            add_opcodes($cpu, "jp <xf>, NN [r2ka]");
+			add_opcodes($cpu, "j<xf>, NN [r2ka]") if !$strict;
+		}
 		
 		add_opcodes($cpu, "jr DIS");
 		add_opcodes($cpu, "jr <f>, DIS");
@@ -288,13 +289,13 @@ for my $cpu1 ('r2ka', 'r3k', 'r4k', 'r5k') {
 		add_opcodes($cpu, "ld (sp+N), hl [r2ka]");
         add_opcodes($cpu, "ld (sp+N), <x> [r2ka]");
 
-        if (!$ge_r4k) {
-    		add_opcodes($cpu, "mov <r>, <r>") if !$strict;
-    		add_opcodes($cpu, "ld <r>, <r> [r2ka]");
-        }
-        else {
+		if ($ge_r4k) {
     		add_opcodes($cpu, "mov <r>, <r> [r4k]") if !$strict;
     		add_opcodes($cpu, "ld <r>, <r> [r4k]");
+		}
+        else {
+    		add_opcodes($cpu, "mov <r>, <r>") if !$strict;
+    		add_opcodes($cpu, "ld <r>, <r> [r2ka]");
         }
 
         add_opcodes($cpu, "mvi <r>, N") if !$strict;

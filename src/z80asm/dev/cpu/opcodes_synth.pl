@@ -193,7 +193,7 @@ for my $cpu (Opcode->cpus) {
 	add_synth($cpu, "r_leu", "rz", "rc");
 
 	# JP|CALL|RET NV, NN
-	if ($cpu =~ /^(r4k|r5k)/) {		# jp v exists
+	if ($cpu =~ /^(r4k|r5k|r6k)/) {		# jp v exists
 		add_synth($cpu, "jnv %m", "jp v, %t", "jp %m");
 		add_synth($cpu, "j_nv %m", "jp v, %t", "jp %m");
 		add_synth($cpu, "jp nv, %m", "jp v, %t", "jp %m");
@@ -225,7 +225,7 @@ for my $cpu (Opcode->cpus) {
 	}
 
 	# JP|CALL|RET V, NN
-	if ($cpu =~ /^(r4k|r5k)/) {		# jp v exists
+	if ($cpu =~ /^(r4k|r5k|r6k)/) {		# jp v exists
 		add_synth($cpu, "jv %m", "jp v, %m");
 		add_synth($cpu, "j_v %m", "jp v, %m");
 		add_synth($cpu, "jre v, %J", "jre v, %J");
