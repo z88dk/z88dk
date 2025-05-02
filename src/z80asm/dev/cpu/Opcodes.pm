@@ -3,7 +3,6 @@ package Opcode;
 #------------------------------------------------------------------------------
 # Build CPU tables
 # asm placeholders:
-#	%s	signed byte
 #	%n	unsigned byte
 #   %h  high page offset
 #	%m	unsigned word - 16, 24 or 32 bits
@@ -12,9 +11,8 @@ package Opcode;
 #	%j	jr offset
 #	%J	jre offset
 #	%c	constant (im, bit, rst, ...)
-#	%d	signed register indirect offset
+#	%d	signed byte
 #	%D	%d+1						TODO: should be %d1 for consistency
-#	%u	unsigned register indirect offset
 #	%t	temp jump label to end of statement; %t3 to end of statement - 3
 #------------------------------------------------------------------------------
 
@@ -37,6 +35,7 @@ my @CPUS = (qw(
 	r3k			r3k_strict
 	r4k			r4k_strict
 	r5k			r5k_strict
+	r6k			r6k_strict
 	8080 		8080_strict
 	8085		8085_strict
 	gbz80		gbz80_strict
@@ -294,12 +293,12 @@ sub search_opcode {
 		}
 	}
 
-	# replace 0:%s/0:%u
-	if (($asm1 = $asm) =~ s/0:(%[sun])/%m/) {
+	# replace 0:%d/0:%n
+	if (($asm1 = $asm) =~ s/0:(%[dn])/%m/) {
 		my $wildcard = $1;
 		my $opcode = $self->opcodes->{$asm1}{$cpu};
 		if ($opcode) {
-			return $self->_replace_opcode_su($opcode, $wildcard);
+			return $self->_replace_opcode_sign_extend($opcode, $wildcard);
 		}
 	}
 	
@@ -372,7 +371,7 @@ sub _replace_opcode_nn {
 	return $opcode;
 }
 
-sub _replace_opcode_su {
+sub _replace_opcode_sign_extend {
 	my($self, $opcode, $wildcard) = @_;
 	$opcode = clone($opcode); 	# make deep copy
 	for my $op ($opcode->ops) {
@@ -382,12 +381,14 @@ sub _replace_opcode_su {
 				while ($i < @$bytes && $bytes->[$i] ne '%m') {
 					$i++;
 				}
-				if ($i < @$bytes) {
-					$bytes->[$i++] = $wildcard;
-					while ($i < @$bytes) {
-						$bytes->[$i++] = 0;
+				while ($i < @$bytes) {
+					if ($wildcard) {
+						$bytes->[$i++] = $wildcard;
+						$wildcard = undef;
 					}
-					$wildcard = undef;
+					else {
+						$bytes->[$i++] = '%s'
+					}
 				}
 			}
 		}

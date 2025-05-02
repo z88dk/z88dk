@@ -45,6 +45,15 @@ Predefined constant: __SWAP_IX_IY__ = 1
 Skipping test_t_issue_2320_a.a.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_a.b.o - different CPU-IXIY combination
 
+Predefined constant: __CPU_R6K__ = 1
+Predefined constant: __CPU_RABBIT__ = 1
+Skipping test_t_issue_2320_a.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_a.b.o - different CPU-IXIY combination
+
+Predefined constant: __SWAP_IX_IY__ = 1
+Skipping test_t_issue_2320_a.a.o - different CPU-IXIY combination
+Skipping test_t_issue_2320_a.b.o - different CPU-IXIY combination
+
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Adding test_t_issue_2320_a.a.o to library

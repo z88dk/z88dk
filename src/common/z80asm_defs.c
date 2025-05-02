@@ -71,6 +71,8 @@ static cpu_lookup_t cpu_lut[] = {
     { "r3k_strict",        	CPU_R3K_STRICT,         CPU_R2KA,   CPU_R3K,        true,   },  // 28
     { "r4k_strict",        	CPU_R4K_STRICT,         CPU_UNDEF,  CPU_R4K,        true,   },  // 29
     { "r5k_strict",			CPU_R5K_STRICT,			CPU_R4K,    CPU_R5K,        true,   },  // 30
+    { "r6k",        		CPU_R6K,            	CPU_R5K,    CPU_R6K,        false,  },  // 31
+    { "r6k_strict",    		CPU_R6K_STRICT,        	CPU_R5K,    CPU_R6K,        true,   },  // 32
 };
 
 static cpu_lookup_t* cpu_lu_hash = NULL;        // lookup from cpu name

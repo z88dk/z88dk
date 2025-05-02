@@ -257,12 +257,20 @@ my @tokens = (
 	# EZ80 specific opcodes
 	
 	# Rabbit specific opcodes
-	'ALTD', 'BOOL', 'IOE', 'IOI', 'IPRES', 'IPSET', 'IDET', 'LDDSR', 'LDISR', 
+	'ALTD', 'ALTS','ALTSD', 'BOOL', 'IOE', 'IOI', 'IPRES', 'IPSET', 'IDET', 'LDDSR', 'LDISR', 
 	'LDP', 'LSDR', 'LSIR', 'LSDDR', 'LSIDR', 'MUL', 'IP', 'SU', 'RDMODE', 
 	'SETUSR', 'SURES', 'SYSCALL', 'UMA', 'UMS', 'CBM', 'CLR', 'CONVC', 'CONVD',
 	'COPY', 'COPYR', 'DWJNZ', 'EXP', 'FLAG', 'FSYSCALL', 'IBOX', 'JRE', 'LDF',
 	'LDL', 'MULU', 'RLB', 'RRB', 'SBOX', 'SETSYSP', 'SETUSRP', 'SYSRET', 'SRET',
 	'LCALL', 'LJP', 'LLCALL', 'LLJP', 'LRET', 'LLRET',
+	'AESIMC', 'AESISR', 'AESMC', 'AESSR', 'CNVC', 'CNVD', 
+	'MD5F1', 'MD5F2', 'MD5F3', 'PLDD', 'PLDDR', 'PLDDSR', 
+	'PLDI', 'PLDIR', 'PLDISR', 'PLSDDR', 'PLSDR', 'PLSIDR', 'PLSIR', 'PUMA', 'PUMS', 
+	'RL1REG', 'RL2REG', 'RL3REG', 'RL4REG', 'RL5REG', 'RL6REG', 'RL7REG', 'RL8REG', 
+	'RR1REG', 'RR2REG', 'RR3REG', 'RR4REG', 'RR5REG', 'RR6REG', 'RR7REG', 'RR8REG', 
+	'SCALL', 'SHAF1', 'SHAF2', 'SHAF3', 'SL1REG', 'SL2REG', 'SL3REG', 'SL4REG', 'SL5REG', 
+	'SL6REG', 'SL7REG', 'SL8REG', 'SR1REG', 'SR2REG', 'SR3REG', 'SR4REG', 'SR5REG', 
+	'SR6REG', 'SR7REG', 'SR8REG', 'TSTNULL',
 	
 	# Z88DK specific opcodes
 	'CALL_OZ', 'CALL_PKG', 'FPP', 'INVOKE',
