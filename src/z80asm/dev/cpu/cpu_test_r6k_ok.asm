@@ -7513,6 +7513,10 @@
  ioi xor a, (iy+0)              ; D3 FD AE 00
  ioi xor a, (iy+126)            ; D3 FD AE 7E
  ioi xor a, (iy-128)            ; D3 FD AE 80
+ ip 0                           ; ED 46
+ ip 1                           ; ED 56
+ ip 2                           ; ED 4E
+ ip 3                           ; ED 5E
  ipres                          ; ED 5D
  ipset 0                        ; ED 46
  ipset 1                        ; ED 56
@@ -7520,12 +7524,12 @@
  ipset 3                        ; ED 5E
  j_c 0x1234                     ; DA 34 12
  j_eq 0x1234                    ; CA 34 12
- j_ge 0x1234                    ; B2 FA 7B C3 34 12
+ j_ge 0x1234                    ; B2 02 7C C3 34 12
  j_geu 0x1234                   ; D2 34 12
  j_gt 0x1234                    ; A2 34 12
  j_gtu 0x1234                   ; AA 34 12
- j_le 0x1234                    ; A2 09 7C C3 34 12
- j_leu 0x1234                   ; AA 0F 7C C3 34 12
+ j_le 0x1234                    ; A2 11 7C C3 34 12
+ j_leu 0x1234                   ; AA 17 7C C3 34 12
  j_lo 0x1234                    ; EA 34 12
  j_lt 0x1234                    ; B2 34 12
  j_ltu 0x1234                   ; DA 34 12
@@ -7533,7 +7537,7 @@
  j_m 0x1234                     ; FA 34 12
  j_nc 0x1234                    ; D2 34 12
  j_ne 0x1234                    ; C2 34 12
- j_nv 0x1234                    ; BA 2A 7C C3 34 12
+ j_nv 0x1234                    ; BA 32 7C C3 34 12
  j_nz 0x1234                    ; C2 34 12
  j_p 0x1234                     ; F2 34 12
  j_pe 0x1234                    ; EA 34 12
@@ -7542,12 +7546,12 @@
  j_z 0x1234                     ; CA 34 12
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
- jge 0x1234                     ; B2 48 7C C3 34 12
+ jge 0x1234                     ; B2 50 7C C3 34 12
  jgeu 0x1234                    ; D2 34 12
  jgt 0x1234                     ; A2 34 12
  jgtu 0x1234                    ; AA 34 12
- jle 0x1234                     ; A2 57 7C C3 34 12
- jleu 0x1234                    ; AA 5D 7C C3 34 12
+ jle 0x1234                     ; A2 5F 7C C3 34 12
+ jleu 0x1234                    ; AA 65 7C C3 34 12
  jlo 0x1234                     ; EA 34 12
  jlt 0x1234                     ; B2 34 12
  jltu 0x1234                    ; DA 34 12
@@ -7572,7 +7576,7 @@
  jmp m, 0x1234                  ; FA 34 12
  jmp nc, 0x1234                 ; D2 34 12
  jmp ne, 0x1234                 ; C2 34 12
- jmp nv, 0x1234                 ; BA A8 7C C3 34 12
+ jmp nv, 0x1234                 ; BA B0 7C C3 34 12
  jmp nz, 0x1234                 ; C2 34 12
  jmp p, 0x1234                  ; F2 34 12
  jmp pe, 0x1234                 ; EA 34 12
@@ -7581,7 +7585,7 @@
  jmp z, 0x1234                  ; CA 34 12
  jnc 0x1234                     ; D2 34 12
  jne 0x1234                     ; C2 34 12
- jnv 0x1234                     ; BA C6 7C C3 34 12
+ jnv 0x1234                     ; BA CE 7C C3 34 12
  jnz 0x1234                     ; C2 34 12
  jp (bc)                        ; C5 C9
  jp (de)                        ; D5 C9
@@ -7591,12 +7595,12 @@
  jp 0x1234                      ; C3 34 12
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
- jp ge, 0x1234                  ; B2 E1 7C C3 34 12
+ jp ge, 0x1234                  ; B2 E9 7C C3 34 12
  jp geu, 0x1234                 ; D2 34 12
  jp gt, 0x1234                  ; A2 34 12
  jp gtu, 0x1234                 ; AA 34 12
- jp le, 0x1234                  ; A2 F0 7C C3 34 12
- jp leu, 0x1234                 ; AA F6 7C C3 34 12
+ jp le, 0x1234                  ; A2 F8 7C C3 34 12
+ jp leu, 0x1234                 ; AA FE 7C C3 34 12
  jp lo, 0x1234                  ; EA 34 12
  jp lt, 0x1234                  ; B2 34 12
  jp ltu, 0x1234                 ; DA 34 12
@@ -7604,7 +7608,7 @@
  jp m, 0x1234                   ; FA 34 12
  jp nc, 0x1234                  ; D2 34 12
  jp ne, 0x1234                  ; C2 34 12
- jp nv, 0x1234                  ; BA 11 7D C3 34 12
+ jp nv, 0x1234                  ; BA 19 7D C3 34 12
  jp nz, 0x1234                  ; C2 34 12
  jp p, 0x1234                   ; F2 34 12
  jp pe, 0x1234                  ; EA 34 12
@@ -7638,7 +7642,7 @@
  jre ltu, ASMPC                 ; ED DB FC FF
  jre nc, ASMPC                  ; ED D3 FC FF
  jre ne, ASMPC                  ; ED C3 FC FF
- jre nv, ASMPC                  ; BA 7D 7D 98 FA FF
+ jre nv, ASMPC                  ; BA 85 7D 98 FA FF
  jre nz, ASMPC                  ; ED C3 FC FF
  jre v, ASMPC                   ; ED BB FC FF
  jre z, ASMPC                   ; ED CB FC FF
@@ -10029,12 +10033,12 @@
  r_m                            ; F8
  r_nc                           ; D0
  r_ne                           ; C0
- r_nv                           ; BA 2D 9B C9
+ r_nv                           ; BA 35 9B C9
  r_nz                           ; C0
  r_p                            ; F0
  r_pe                           ; E8
  r_po                           ; E0
- r_v                            ; BA 36 9B 18 01 C9
+ r_v                            ; BA 3E 9B 18 01 C9
  r_z                            ; C8
  ral                            ; 17
  rar                            ; 1F
@@ -10238,12 +10242,12 @@
  ret m                          ; F8
  ret nc                         ; D0
  ret ne                         ; C0
- ret nv                         ; BA 7A 9D C9
+ ret nv                         ; BA 82 9D C9
  ret nz                         ; C0
  ret p                          ; F0
  ret pe                         ; E8
  ret po                         ; E0
- ret v                          ; BA 83 9D 18 01 C9
+ ret v                          ; BA 8B 9D 18 01 C9
  ret z                          ; C8
  reti                           ; ED 4D
  rgeu                           ; D0
@@ -10346,7 +10350,7 @@
  rm                             ; F8
  rnc                            ; D0
  rne                            ; C0
- rnv                            ; BA 7F 9E C9
+ rnv                            ; BA 87 9E C9
  rnz                            ; C0
  rp                             ; F0
  rpe                            ; E8
@@ -10449,7 +10453,7 @@
  rst 32                         ; E7
  rst 40                         ; EF
  rst 56                         ; FF
- rv                             ; BA 7C 9F 18 01 C9
+ rv                             ; BA 84 9F 18 01 C9
  rz                             ; C8
  sbb a                          ; 7F 9F
  sbb b                          ; 7F 98

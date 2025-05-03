@@ -5972,6 +5972,8 @@
  ioi xor a, (iy+0)              ; Error
  ioi xor a, (iy+126)            ; Error
  ioi xor a, (iy-128)            ; Error
+ ip -1                          ; Error
+ ip 4                           ; Error
  ipset -1                       ; Error
  ipset 4                        ; Error
  j_c 0x1234                     ; Error

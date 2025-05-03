@@ -3744,6 +3744,8 @@
  ioi set 8, (iy+0)              ; Error
  ioi set 8, (iy+126)            ; Error
  ioi set 8, (iy-128)            ; Error
+ ip -1                          ; Error
+ ip 4                           ; Error
  ipset -1                       ; Error
  ipset 4                        ; Error
  j_ge 0x1234                    ; Error

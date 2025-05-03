@@ -59,6 +59,10 @@ sub F {
 			   'nv'=>4, 'v'=>5}->{$_[0]};
 }
 
+sub XF {
+	return ''.{'gt'=>0, 'gtu'=>1, 'lt'=>2, 'v'=>3}->{$_[0]};
+}
+
 sub ALU {
 	return ''.{'add'=>0, 'adc'=>1, 'sub'=>2, 'sbb'=>3,
 											 'sbc'=>3,
@@ -93,7 +97,7 @@ sub KC_CONST2 {
 }
 
 sub RABBIT_CONST {
-	return ''.{ 'altd'=>0x76,  'ioi'=>0xD3, 'ioe'=>0xDB}->{$_[0]};
+	return ''.{'altd'=>0x76, 'alts'=>0x40, 'altsd'=>0x64, 'ioi'=>0xD3, 'ioe'=>0xDB}->{$_[0]};
 }
 
 sub RABBIT_PP {
@@ -137,7 +141,8 @@ sub add_opcode_1 {
 	# separate prefixes from opcode
 	my @ops;
 	while (@$ops > 1 && $ops->[1] =~ /^\d+$/ &&
-	    ($ops->[0] == 0x76 || $ops->[0] == 0xD3 || $ops->[0] == 0xDB || # rabbit
+	    ($ops->[0] == 0x76 || $ops->[0] == 0xD3 || $ops->[0] == 0xDB || 	# rabbit
+		 ($cpu =~ /^r4k/ && ($ops->[0] == 0x40 || $ops->[0] == 0x64)) ||	# rabbit 6k
 		 $ops->[0] == 0x40 || $ops->[0] == 0x49 || 
 		 $ops->[0] == 0x52 || $ops->[0] == 0x5B ||
 		 $ops->[0] == 0x7F)) {						# ez80 / kc160
@@ -3168,9 +3173,11 @@ sub add_opcodes {
 		},
 		"flag <f>, hl [r4k]" => sub {
 			my($cpu) = @_;
-			for (['gt'=>0],['gtu'=>1],['lt'=>2],['v'=>3],['nz'=>4],['z'=>5],['nc'=>6],['c'=>7]) {
-				my($f, $v) = @$_;
-				add_opcode($cpu, "flag $f, hl", [0xED, 0xA4+8*$v]);
+			for my $f ('nz', 'z', 'nc', 'c') {
+				add_opcode($cpu, "flag $f, hl", [0xED, 0xC4+8*F($f)]);
+			}
+			for my $xf ('gt', 'gtu', 'lt', 'v') {
+				add_opcode($cpu, "flag $xf, hl", [0xED, 0xA4+8*XF($xf)]);
 			}
 		},
 		"fsyscall [r4k]" => sub {
@@ -3194,21 +3201,20 @@ sub add_opcodes {
 		"ipset N [r4k]" => sub {
 			my($cpu) = @_;
 			add_opcode($cpu, "ipset %c", [0xED, '%c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E'], [0, 1, 2, 3]);
+			add_opcode($cpu, "ip %c", [0xED, '%c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E'], [0, 1, 2, 3]);
 		},
 		"jp <xf>, NN [r4k]" => sub {
 			my($cpu) = @_;
-			for (['gt'=>0],['gtu'=>1],['lt'=>2],['v'=>3]) {
-				my($f, $v) = @$_;
-				add_opcode($cpu, "jp $f, %m", [0xA2+8*$v, '%m', '%m']);
+			for my $xf ('gt', 'gtu', 'lt', 'v') {
+				add_opcode($cpu, "jp $xf, %m", [0xA2+8*XF($xf), '%m', '%m']);
 			}
 		},
 		"j<xf>, NN [r4k]" => sub {
 			my($cpu) = @_;
-			for (['gt'=>0],['gtu'=>1],['lt'=>2],['v'=>3]) {
-				my($f, $v) = @$_;
-				add_opcode($cpu, "jmp $f, %m", [0xA2+8*$v, '%m', '%m']);
-				add_opcode($cpu, "j$f %m", [0xA2+8*$v, '%m', '%m']);
-				add_opcode($cpu, "j_$f %m", [0xA2+8*$v, '%m', '%m']);
+			for my $xf ('gt', 'gtu', 'lt', 'v') {
+				add_opcode($cpu, "jmp $xf, %m", [0xA2+8*XF($xf), '%m', '%m']);
+				add_opcode($cpu, "j$xf %m", [0xA2+8*XF($xf), '%m', '%m']);
+				add_opcode($cpu, "j_$xf %m", [0xA2+8*XF($xf), '%m', '%m']);
 			}
 		},
 		"jp <xf>, NN [r2ka]" => sub {
@@ -3229,9 +3235,8 @@ sub add_opcodes {
 		},
 		"jr <xf>, DIS [r4k]" => sub {
 			my($cpu) = @_;
-			for (['gt'=>0],['gtu'=>1],['lt'=>2],['v'=>3]) {
-				my($f, $v) = @$_;
-				add_opcode($cpu, "jr $f, %j", [0xA0+8*$v, '%j']);
+			for my $xf ('gt', 'gtu', 'lt', 'v') {
+				add_opcode($cpu, "jr $xf, %j", [0xA0+8*XF($xf), '%j']);
 			}
 		},
 		"jre <f>, EDIS [r4k]" => sub {
@@ -3239,9 +3244,8 @@ sub add_opcodes {
 			for my $f ('nz', 'z', 'nc', 'c') {
 				add_opcode($cpu, "jre $f, %J", [0xED, 0xC3+8*F($f), '%J', '%J']);
 			}
-			for (['gt'=>0],['gtu'=>1],['lt'=>2],['v'=>3]) {
-				my($f, $v) = @$_;
-				add_opcode($cpu, "jre $f, %J", [0xED, 0xA3+8*$v, '%J', '%J']);
+			for my $xf ('gt', 'gtu', 'lt', 'v') {
+				add_opcode($cpu, "jre $xf, %J", [0xED, 0xA3+8*XF($xf), '%J', '%J']);
 			}
 		},
 		"jre EDIS [r4k]" => sub {
@@ -4038,9 +4042,8 @@ sub add_opcodes {
 			for my $f ('nz', 'z', 'nc', 'c') {
 				add_opcode($cpu, "lljp $f, %x, %m", [0xED, 0xC2+8*F($f), '%m', '%m', '%x', '%x']);
 			}
-			for (['gt'=>0],['gtu'=>1],['lt'=>2],['v'=>3]) {
-				my($f, $v) = @$_;
-				add_opcode($cpu, "lljp $f, %x, %m", [0xED, 0xA2+8*$v, '%m', '%m', '%x', '%x']);
+			for my $xf ('gt', 'gtu', 'lt', 'v') {
+				add_opcode($cpu, "lljp $xf, %x, %m", [0xED, 0xA2+8*XF($xf), '%m', '%m', '%x', '%x']);
 			}
 		},
 		"lljp NN, NN [r4k]" => sub {

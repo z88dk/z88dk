@@ -6733,6 +6733,10 @@
  ioi xor a, (iy+0)              ; D3 FD AE 00
  ioi xor a, (iy+126)            ; D3 FD AE 7E
  ioi xor a, (iy-128)            ; D3 FD AE 80
+ ip 0                           ; ED 46
+ ip 1                           ; ED 56
+ ip 2                           ; ED 4E
+ ip 3                           ; ED 5E
  ipres                          ; ED 5D
  ipset 0                        ; ED 46
  ipset 1                        ; ED 56
@@ -6741,7 +6745,7 @@
  j_c 0x1234                     ; DA 34 12
  j_eq 0x1234                    ; CA 34 12
  j_geu 0x1234                   ; D2 34 12
- j_gtu 0x1234                   ; CA E4 6D D2 34 12
+ j_gtu 0x1234                   ; CA EC 6D D2 34 12
  j_leu 0x1234                   ; CA 34 12 DA 34 12
  j_lo 0x1234                    ; EA 34 12
  j_ltu 0x1234                   ; DA 34 12
@@ -6759,7 +6763,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 20 6E D2 34 12
+ jgtu 0x1234                    ; CA 28 6E D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jlo 0x1234                     ; EA 34 12
  jltu 0x1234                    ; DA 34 12

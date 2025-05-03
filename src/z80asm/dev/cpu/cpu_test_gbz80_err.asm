@@ -10093,6 +10093,12 @@
  ioi xor a, (iy+0)              ; Error
  ioi xor a, (iy+126)            ; Error
  ioi xor a, (iy-128)            ; Error
+ ip -1                          ; Error
+ ip 0                           ; Error
+ ip 1                           ; Error
+ ip 2                           ; Error
+ ip 3                           ; Error
+ ip 4                           ; Error
  ipres                          ; Error
  ipset -1                       ; Error
  ipset 0                        ; Error

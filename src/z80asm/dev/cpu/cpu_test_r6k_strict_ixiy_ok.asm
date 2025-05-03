@@ -5304,6 +5304,10 @@
  ioi xor (iy+0)                 ; D3 DD AE 00
  ioi xor (iy+126)               ; D3 DD AE 7E
  ioi xor (iy-128)               ; D3 DD AE 80
+ ip 0                           ; ED 46
+ ip 1                           ; ED 56
+ ip 2                           ; ED 4E
+ ip 3                           ; ED 5E
  ipres                          ; ED 5D
  ipset 0                        ; ED 46
  ipset 1                        ; ED 56

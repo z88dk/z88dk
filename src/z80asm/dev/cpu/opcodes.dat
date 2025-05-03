@@ -37573,6 +37573,16 @@ ioi xor a, (iy+%d)|r3k|_||D3;FD AE %d
 ioi xor a, (iy+%d)|r4k|_||D3;FD AE %d
 ioi xor a, (iy+%d)|r5k|_||D3;FD AE %d
 ioi xor a, (iy+%d)|r6k|_||D3;FD AE %d
+ip %c|r2ka|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
+ip %c|r2ka_strict|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
+ip %c|r3k|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
+ip %c|r3k_strict|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
+ip %c|r4k|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
+ip %c|r4k_strict|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
+ip %c|r5k|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
+ip %c|r5k_strict|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
+ip %c|r6k|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
+ip %c|r6k_strict|_|0,1,2,3|ED %c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E
 ipres|r2ka|_||ED 5D
 ipres|r2ka_strict|_||ED 5D
 ipres|r3k|_||ED 5D
