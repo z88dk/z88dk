@@ -517,9 +517,10 @@ sub parse_r6k_opcodes {
 	my($sheet, $row) = get_spreadsheet($file);
 
 	# parse opcodes
+	my $opcodes = {};
 	my $data;
 	while (defined($data = get_spreadsheet_row($sheet, $row))) {
-		add_spreadsheet_opcode($cpu, $data);
+		parse_r6k_opcode($opcodes, $cpu, $data);
 		$row++;
 	}
 }
@@ -574,8 +575,9 @@ sub get_spreadsheet_row {
 	return \%data;
 }
 
-sub add_spreadsheet_opcode {
-	my($cpu, $data) = @_;
+# parse from Excel data
+sub parse_r6k_opcode {
+	my($opcodes, $cpu, $data) = @_;
 	$data = clone($data);
 
 	# convert multi-byte sequences
@@ -609,42 +611,42 @@ sub add_spreadsheet_opcode {
 		for (@{$data->{ops}}) {
 			s/-+[klmn]-+/%m/;
 		}
-		return add_spreadsheet_opcode($cpu, $data);
+		return parse_r6k_opcode($opcodes, $cpu, $data);
 	}
 	elsif ($data->{asm} =~ /\blmn\b/) {
 		$data->{asm} =~ s/\blmn\b/%m/;
 		for (@{$data->{ops}}) {
 			s/-+[lmn]-+/%m/;
 		}
-		return add_spreadsheet_opcode($cpu, $data);
+		return parse_r6k_opcode($opcodes, $cpu, $data);
 	}
 	elsif ($data->{asm} =~ /\bmn\b/) {
 		$data->{asm} =~ s/\bmn\b/%m/;
 		for (@{$data->{ops}}) {
 			s/-+[mn]-+/%m/;
 		}
-		return add_spreadsheet_opcode($cpu, $data);
+		return parse_r6k_opcode($opcodes, $cpu, $data);
 	}
 	elsif ($data->{asm} =~ /\blxpc\b/) {
 		$data->{asm} =~ s/\blxpc\b/%x/;
 		for (@{$data->{ops}}) {
 			s/-+xp[lh]-+/%x/;
 		}
-		return add_spreadsheet_opcode($cpu, $data);
+		return parse_r6k_opcode($opcodes, $cpu, $data);
 	}
 	elsif ($data->{asm} =~ /\bee\b/) {
 		$data->{asm} =~ s/\bee\b/%J/;
 		for (@{$data->{ops}}) {
 			s/-+\(ee-[34]\)[lh]-+/%J/;
 		}
-		return add_spreadsheet_opcode($cpu, $data);
+		return parse_r6k_opcode($opcodes, $cpu, $data);
 	}
 	elsif ($data->{asm} =~ /IP [0-3]/) {
 		if ($data->{asm} =~ /IP 0/) {
 			$data->{asm} =~ s/[0-3]/%c/;
 			$data->{ops}[1] = '%c==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E';
 			$data->{const} = [0..3];
-			return add_spreadsheet_opcode($cpu, $data);
+			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
 		else {
 			return;
@@ -653,7 +655,7 @@ sub add_spreadsheet_opcode {
 	elsif ($data->{asm} =~ /^(RLA|RRA|RLC|RRC) 8\b/) {
 		$data->{asm} =~ s/8/%c/;
 		$data->{const} = [8];
-		return add_spreadsheet_opcode($cpu, $data);
+		return parse_r6k_opcode($opcodes, $cpu, $data);
 	}
 
 	# convert binary data
@@ -668,34 +670,34 @@ sub add_spreadsheet_opcode {
 		elsif ($data->{ops}[$i] =~ /----d---/) {
 			$data->{ops}[$i] = '%d';
 			$data->{asm} =~ s/\bd\b/%d/;
-			return add_spreadsheet_opcode($cpu, $data);
+			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
 		elsif ($data->{ops}[$i] =~ /----n---/) {
 			$data->{ops}[$i] = '%n';
 			$data->{asm} =~ s/\bn\b/%n/;
-			return add_spreadsheet_opcode($cpu, $data);
+			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
 		elsif ($data->{ops}[$i] =~ /--xpc---?/) {
 			$data->{ops}[$i] = '%x';
 			$data->{asm} =~ s/\bxpc\b/%x/;
-			return add_spreadsheet_opcode($cpu, $data);
+			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
 		elsif ($data->{ops}[$i] =~ /-+\([je]-2\)-+/) {
 			$data->{ops}[$i] = '%j';
 			$data->{asm} =~ s/\b[je]\b/%j/;
-			return add_spreadsheet_opcode($cpu, $data);
+			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
 		elsif ($data->{ops}[$i] =~ /-\(e-3\)-/) {
 			$data->{ops}[$i] = '%j';
 			$data->{asm} =~ s/\be\b/%j/;
-			return add_spreadsheet_opcode($cpu, $data);
+			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
 		elsif ($data->{ops}[$i] =~ /-r-/) {
 			for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/-r-/ sprintf("%03b", R($r)) /e;
 				$data1->{asm} =~ s/\br\b/$r/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -704,7 +706,7 @@ sub add_spreadsheet_opcode {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/-r'/ sprintf("%03b", R($r)) /e;
 				$data1->{asm} =~ s/\br'/$r/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -713,7 +715,7 @@ sub add_spreadsheet_opcode {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/rna/ sprintf("%03b", R($r)) /e;
 				$data1->{asm} =~ s/\br\b/$r/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -722,7 +724,7 @@ sub add_spreadsheet_opcode {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/-f-/ sprintf("%03b", F($f)) /e;
 				$data1->{asm} =~ s/\bf\b/$f/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -731,7 +733,7 @@ sub add_spreadsheet_opcode {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/cc/ sprintf("%02b", F($f)) /e;
 				$data1->{asm} =~ s/\bcc\b/$f/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -740,7 +742,7 @@ sub add_spreadsheet_opcode {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/cx/ sprintf("%02b", XF($xf)) /e;
 				$data1->{asm} =~ s/\bcc\b/$xf/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -750,7 +752,7 @@ sub add_spreadsheet_opcode {
 			$data->{ops}[$i] = $data->{ops}[$i]."+(%c<8?%c*8:%c)";
 			$data->{asm} =~ s/\bv\b/%c/;
 			$data->{const} = [0x10,0x18,0x20,0x28,0x38];
-			return add_spreadsheet_opcode($cpu, $data);
+			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
 		elsif ($data->{ops}[$i] =~ /[01]{2}-b-[01]{3}/) {
 			$data->{ops}[$i] =~ s/-b-/000/;
@@ -758,7 +760,7 @@ sub add_spreadsheet_opcode {
 			$data->{ops}[$i] = $data->{ops}[$i]."+8*%c";
 			$data->{asm} =~ s/\bb\b/%c/;
 			$data->{const} = [0..7];
-			return add_spreadsheet_opcode($cpu, $data);
+			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
 		elsif ($data->{ops}[$i] =~ /bb$/) {
 			$data->{ops}[$i] =~ s/bb$/00/;
@@ -766,14 +768,14 @@ sub add_spreadsheet_opcode {
 			$data->{ops}[$i] = $data->{ops}[$i]."+%c-1";
 			$data->{asm} =~ s/\bb\b/%c/;
 			$data->{const} = [1,2,4];
-			return add_spreadsheet_opcode($cpu, $data);
+			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
 		elsif ($data->{ops}[$i] =~ /ss/) {
 			for my $rp ('bc', 'de', 'hl', 'sp') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/ss/ sprintf("%02b", RP($rp)) /e;
 				$data1->{asm} =~ s/\bss\b/$rp/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -782,16 +784,17 @@ sub add_spreadsheet_opcode {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/dd/ sprintf("%02b", RP($rp)) /e;
 				$data1->{asm} =~ s/\bdd\b/$rp/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /rr/) {
-			for my $rp ('bc', 'de', 'hl', 'sp') {
+			for (['bc'=>0], ['de'=>1], ['ix'=>2], ['iy'=>3]) {
+				my($rp, $v) = @$_;
 				my $data1 = clone($data);
-				$data1->{ops}[$i] =~ s/rr/ sprintf("%02b", RP($rp)) /e;
+				$data1->{ops}[$i] =~ s/rr/ sprintf("%02b", $v) /e;
 				$data1->{asm} =~ s/\brr\b/$rp/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -800,7 +803,7 @@ sub add_spreadsheet_opcode {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/zz/ sprintf("%02b", RP($rp)) /e;
 				$data1->{asm} =~ s/\bzz\b/$rp/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -809,7 +812,7 @@ sub add_spreadsheet_opcode {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/xx/ sprintf("%02b", RP($rp)) /e;
 				$data1->{asm} =~ s/\bxx\b/$rp/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -818,7 +821,7 @@ sub add_spreadsheet_opcode {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/yy/ sprintf("%02b", RP($rp)) /e;
 				$data1->{asm} =~ s/\byy\b/$rp/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -827,7 +830,7 @@ sub add_spreadsheet_opcode {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/p[sdp]/ sprintf("%02b", RABBIT_PP($pp)) /e;
 				$data1->{asm} =~ s/\bp[sdp]\b/$pp/;
-				add_spreadsheet_opcode($cpu, $data1);
+				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
 		}
@@ -839,7 +842,97 @@ sub add_spreadsheet_opcode {
 		}
 	}
 
-	say "$data->{asm}, @{$data->{ops}}, $data->{ad}, $data->{as}, $data->{io}, @{$data->{const}}";
+	dedup_r6k_opcode($opcodes, $cpu, $data);
+}
+
+# find and remove duplicates
+sub dedup_r6k_opcode {
+	my($opcodes, $cpu, $data) = @_;
+
+	my $asm = $data->{asm} = lc($data->{asm});
+	if ($asm eq "ld (%m), hl" && @{$data->{ops}} == 3) {
+		return;		# 0x22 is shorter
+	}
+	elsif ($asm eq "ld hl, (%m)" && @{$data->{ops}} == 3) {
+		return;		# 0x2A is shorter
+	}
+	elsif ($asm eq "ldf (%m), hl" && @{$data->{ops}} == 4) {
+		return;		# 0x82 is shorter
+	}
+	elsif ($asm eq "ldf hl, (%m)" && @{$data->{ops}} == 4) {
+		return;		# 0x92 is shorter
+	}
+	elsif ($asm =~ /ld \(%m\), (bcde|jkhl)/ && @{$data->{ops}} == 4) {
+		return;		# use the three-byte version
+	}
+	elsif ($asm =~ /ld (bcde|jkhl), \(%m\)/ && @{$data->{ops}} == 4) {
+		return;		# use the three-byte version
+	}
+	elsif ($asm =~ /ld (bcde|jkhl), %d/ && @{$data->{ops}} == 3) {
+		return;		# use the two-byte version
+	}
+	elsif ($asm =~ /(add|adc|sbc) a,/ && @{$data->{ops}} == 1) {
+		return;		# use the 0x7F version with two opcodes
+	}
+	elsif ($asm =~ /(sub|and|xor|or|cp) / && @{$data->{ops}} == 1) {
+		return;		# use the 0x7F version with two opcodes
+	}
+	elsif ($asm =~ /ld [abcdehl], [abcdehl]/ && @{$data->{ops}} == 1) {
+		return;		# use the 0x7F version with two opcodes
+	}
+	elsif ($asm =~ /ld [abcdehl], [abcdehl]/ && @{$data->{ops}} == 2 && $data->{ops}[0] == 0x6D) {
+		return;		# use the 0x7F version instead of the 0x6D version
+	}
+	elsif ($asm =~ /(rlc|rrc|rl|rr) (bc|de|hl)/ && @{$data->{ops}} == 2) {
+		return;		# use the single-byte version
+	}
+	elsif ($asm =~ /ld (bc|de|hl), (bc|hl|de)/ && @{$data->{ops}} == 2) {
+		return;		# use the single-byte version
+	}
+	elsif ($asm =~ /ld hl, \((pw|px|py|pz)\+%d\)/ && @{$data->{ops}} == 3) {
+		return;		# use the two-byte version
+	}
+	elsif ($asm =~ /ld \((pw|px|py|pz)\+%d\), hl/ && @{$data->{ops}} == 3) {
+		return;		# use the two-byte version
+	}
+	elsif ($asm =~ /ex (bc|jkhl), (hl|bcde)/ && @{$data->{ops}} == 2) {
+		return;		# use the single-byte version
+	}
+	elsif ($asm =~ /add hl, jk/ && @{$data->{ops}} == 2) {
+		return;		# use the single-byte version
+	}
+	elsif ($asm =~ /jr (gt|gtu|lt|v), %j/ && @{$data->{ops}} == 3) {
+		return;		# use the two-byte version
+	}
+	elsif ($asm =~ /jp (gt|gtu|lt|v), %m/ && @{$data->{ops}} == 4) {
+		return;		# use the three-byte version
+	}
+	elsif ($opcodes->{$asm}{$cpu}) {
+		# duplicate opcode
+		my $prev = $opcodes->{$asm}{$cpu};
+		if ($asm =~ /(rlc|rrc) %c, (bcde|jkhl)/) {
+			# merge two instructions
+			if (@{$data->{const}} == 1 && $data->{const}[0] == 8) {
+				$prev->{const} = [@{$prev->{const}}, @{$data->{const}}];
+				$prev->{ops}[1] = "%c==8?".$data->{ops}[1].":".$prev->{ops}[1];
+			}
+			elsif (@{$prev->{const}} == 1 && $prev->{const}[0] == 8) {
+				$prev->{const} = [@{$data->{const}}, @{$prev->{const}}];
+				$prev->{ops}[1] = "%c==8?".$prev->{ops}[1].":".$data->{ops}[1];
+			}
+			else {
+				die;
+			}
+			say "$prev->{asm}, @{$prev->{ops}}, $prev->{ad}, $prev->{as}, $prev->{io}, @{$prev->{const}}";
+		}
+		else {
+			die "Duplicate opcodes:\n", dump($opcodes->{$asm}{$cpu}), "\n", dump($data), "\n";
+		}
+	}
+	else {
+		$opcodes->{$asm}{$cpu} = $data;
+		say "$data->{asm}, @{$data->{ops}}, $data->{ad}, $data->{as}, $data->{io}, @{$data->{const}}";
+	}
 }
 
 1;
