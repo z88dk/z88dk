@@ -1,4 +1,5 @@
 
+
 ; long strtol( const char * restrict nptr, char ** restrict endptr, int base)
 
 SECTION code_clib
@@ -9,7 +10,22 @@ PUBLIC strtol
 EXTERN asm_strtol
 
 strtol:
-
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld hl,2
+   add hl,sp
+   ld c,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,a
+   jp  asm_strtol
+ELSE
    pop af
    pop bc
    pop de
@@ -19,8 +35,11 @@ strtol:
    push de
    push bc
    push af
-   
-   jp asm_strtol
+   push ix
+   call asm_strtol
+   pop ix
+   ret
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC
