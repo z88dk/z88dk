@@ -5,7 +5,9 @@
 ;	** alternate (smaller) 4bit font option
 
 ;	** ROM font -DROMFONT, or uncomment the next line.
+; ROMFONT is still buggy, it would save 1K of memory.
 ; defc ROMFONT=1
+;
 ; .. to use the ROM font rebuild the libraries and add in your compilation command line the extra parameters:
 ;   -pragma-define:ansifont=0 -pragma-define:ansifont_is_packed=0 -pragma-define:ansicolumns=36
 
@@ -39,11 +41,12 @@
     SECTION code_clib
     PUBLIC  ansi_CHAR
 
-;  IF    ROMFONT
-;    EXTERN  asctozx81
+
+  IF    ROMFONT
+    EXTERN  asctozx81
 ;  ELSE
 ;    EXTERN  ansifont
-;  ENDIF
+  ENDIF
 
 ;    EXTERN  ansicharacter_pixelwidth
 ;    EXTERN  ansifont_is_packed
@@ -70,42 +73,42 @@
 ansi_CHAR:
     ld      hl, char+1
 ; --- TO USE ROM FONT WE NEED TO MAP TO THE ASCII CODES ---
-;;     IF    ROMFONT
-;;       ld      e, a
-;;   
-;;       xor     a
-;;       ld      (UCASE), a
-;;       ld      (UCASE+1), a
-;;       ld      (UCASE+2), a
-;;       ld      a, (BOLD)
-;;       xor     $17                         ; rla
-;;       ld      (UCASE+3), a
-;;   
-;;   
-;;   ;	ld	a,ansifont/256
-;;   ;	cp $1F	; ROM font ?
-;;       ld      a, e
-;;   ;	jr	nz,norom
-;;       ld      (hl), a
-;;       call    asctozx81
-;;   
-;;       ld      e, a
-;;       rla
-;;       ld      a, e
-;;       jr      nc, noupr
-;;       ld      a, $23                      ; inc hl
-;;       ld      (UCASE), a
-;;       ld      a, $b6                      ; or (hl)
-;;       ld      (UCASE+1), a
-;;       ld      a, $2b                      ; dec hl
-;;       ld      (UCASE+2), a
-;;   ;	xor a
-;;   ;	ld	(UCASE+3),a
-;;       ld      a, e
-;;       and     $7f
-;;   noupr:
-;;     ENDIF
-;;   ; --- END OF ROM FONT ADAPTER ---
+     IF    ROMFONT
+       ld      e, a
+   
+       xor     a
+       ld      (UCASE), a
+       ld      (UCASE+1), a
+       ld      (UCASE+2), a
+       ld      a, (BOLD)
+       xor     $17                         ; rla
+       ld      (UCASE+3), a
+   
+   
+   ;	ld	a,ansifont/256
+   ;	cp $1F	; ROM font ?
+       ld      a, e
+   ;	jr	nz,norom
+       ld      (hl), a
+       call    asctozx81
+   
+       ld      e, a
+       rla
+       ld      a, e
+       jr      nc, noupr
+       ld      a, $23                      ; inc hl
+       ld      (UCASE), a
+       ld      a, $b6                      ; or (hl)
+       ld      (UCASE+1), a
+       ld      a, $2b                      ; dec hl
+       ld      (UCASE+2), a
+   ;	xor a
+   ;	ld	(UCASE+3),a
+       ld      a, e
+       and     $7f
+   noupr:
+     ENDIF
+   ; --- END OF ROM FONT ADAPTER ---
 norom:
     ld      (hl), a
     ld      a, (__console_y)            ; Line text position
@@ -175,13 +178,13 @@ RIGA:                                   ; Location on screen
 char:
     ld      b, 'A'                      ; Put here the character to be printed
 
-;  IF    ROMFONT
-;  ;ld hl,ansifont-256
-;    ld      hl, $1E00
-;    xor     a
-;    add     b
-;    jr      z, NOLFONT
-;  ELSE
+  IF    ROMFONT
+  ;ld hl,ansifont-256
+    ld      hl, $1E00
+    xor     a
+    add     b
+    jr      z, NOLFONT
+  ELSE
 
     ;ld      a, ansifont_is_packed
     ;ld      hl, ansifont-(32*12)
@@ -196,15 +199,15 @@ char:
 ;even:
 ;    ld      (ROLL+1), a
 ;    ld      hl, ansifont-128
-got_font_location:
+;got_font_location:
 
-;  ENDIF
+  ENDIF
 
-;  IF    ROMFONT
-;    ld      de, 8
-;  ELSE
+  IF    ROMFONT
+    ld      de, 8
+  ELSE
     ld      de, 11                      ; 6x12
-;  ENDIF
+  ENDIF
 LFONT:
     add     hl, de
     djnz    LFONT
@@ -222,11 +225,11 @@ NOLFONT:
 ;    ENDIF
 ;  ENDIF
 
-;  IF    ROMFONT
-;    ld      c, 8
-;  ELSE
+  IF    ROMFONT
+    ld      c, 8
+  ELSE
     ld      c, 12
-;  ENDIF
+  ENDIF
 
 PRE:
     ld      b, 4
@@ -252,13 +255,13 @@ DTS:
 
     ld      a, (hl)
 
-;   IF    ROMFONT
-; UCASE:
-;     nop
-;     nop
-;     nop
-;     rla                                 ; shift character left to squeeze it as much as possible (36..42 columns still usable)
-;   ENDIF
+   IF    ROMFONT
+UCASE:
+    nop
+    nop
+    nop
+    rla                                 ; shift character left to squeeze it as much as possible (36..42 columns still usable)
+   ENDIF
 
 BOLD:
     nop                                 ;	rla
@@ -276,6 +279,12 @@ BOLD:
 ;    rla
 ;    rla
 ;
+  IF    ROMFONT
+    bit     3,c
+    jr      z,no_wipe
+	xor     a    ; force to blank the bottom of the character
+no_wipe:
+  ELSE
 ; --- trick to save little more than 80 bytes keeping a 6x11 font for a 6x12 matrix --
     dec     c
     jr   nz,no_last
@@ -283,6 +292,7 @@ BOLD:
 no_last:
     inc     c
 ; --- --------------------------- --
+ENDIF
 
 INVRS:
 ;  cpl           ; Set to NOP to disable INVERSE
@@ -299,7 +309,11 @@ UNDRL:
 
 DOTS:
 ;    ld      b, ansicharacter_pixelwidth
-    ld      b, 6
+IF ROMFONT
+    ld      b, 7  ; 36 columns
+ELSE
+    ld      b, 6  ; 42 columns
+ENDIF
 L2:
     rla
     rl      (ix+1)
@@ -330,7 +344,7 @@ even_row:
 
 
 ; 6x12 font (6x11)
-;IF !ROMFONT
+IF !ROMFONT
 
 wrxi_font:
     defb  0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00
@@ -429,5 +443,5 @@ wrxi_font:
     defb  0xE0 , 0x10 , 0x10 , 0x20 , 0x20 , 0x18 , 0x20 , 0x20 , 0x10 , 0x10 , 0xE0
     defb  0x00 , 0x00 , 0x00 , 0x00 , 0x48 , 0xA8 , 0x90 , 0x00 , 0x00 , 0x00 , 0x00
 
-;ENDIF
+ENDIF
 
