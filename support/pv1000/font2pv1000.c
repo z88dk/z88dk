@@ -14,14 +14,14 @@ static char usage[] =
 " -f|--fgcolour=value                  set the foreground colour for all tiles\n"
 " -b|--bgcolour=value                  set the background colour for all tiles\n"
 " -c|--charcode=value                  set the initial character code\n"
-" -s                                   include the section directive\n"
+" -s|--section[=value]                 output the section directive (default=pv1000_tileset)\n"
 ;
 
 static struct optparse_long longopts[] = {
   { "fgcolour", 'f',  OPTPARSE_REQUIRED },
   { "bgcolour", 'b',  OPTPARSE_REQUIRED },
   { "charcode", 'c',  OPTPARSE_REQUIRED },
-  { NULL,       's',  OPTPARSE_NONE },
+  { "section",  's',  OPTPARSE_OPTIONAL },
   { NULL, 0, 0 }
 };
 
@@ -34,7 +34,8 @@ int main(int argc, char **argv)
 	int   fgcolour = 7;
 	int   bgcolour = 0;
 	int   c = 32;
-        int   writesection=0;
+        int   writesection = 0;
+        char  *section = NULL;
 
         optparse_init(&options, argv);
 
@@ -55,7 +56,8 @@ int main(int argc, char **argv)
                 c = atoi(options.optarg);
                 break;
             case 's':
-                writesection=1;
+                writesection = 1;
+                section = options.optarg ? options.optarg : "pv1000_tileset";
                 break;
             }
         }
@@ -72,7 +74,7 @@ int main(int argc, char **argv)
         }
 
         if (writesection) {
-            printf("SECTION pv1000_tileset\n\n");
+            printf("SECTION %s\n\n",section);
         }
 	while	( ( fread(buf, 1, sizeof(buf),fp) ) == 8 ) {
 		printf("; Char %d (%02x)\n",c,c);	
