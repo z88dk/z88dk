@@ -52,7 +52,7 @@
 ;    EXTERN  ansifont
   ENDIF
 
-;    EXTERN  ansicharacter_pixelwidth
+    EXTERN  ansicharacter_pixelwidth
 ;    EXTERN  ansifont_is_packed
 
     EXTERN  base_graphics
@@ -323,12 +323,12 @@ UNDRL:
 ; end of underlined text handling
 
 DOTS:
-;    ld      b, ansicharacter_pixelwidth
-IF ROMFONT
-    ld      b, 7  ; 36 columns
-ELSE
-    ld      b, 6  ; 42 columns
-ENDIF
+    ld      b, ansicharacter_pixelwidth
+;IF ROMFONT
+;    ld      b, 7  ; 36 columns
+;ELSE
+;    ld      b, 6  ; 42 columns
+;ENDIF
 L2:
     rla
     rl      (ix+1)
