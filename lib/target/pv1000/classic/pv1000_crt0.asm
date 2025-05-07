@@ -92,12 +92,15 @@ if (ASMPC<>(10 * 32))
     defs    CODE_ALIGNMENT_ERROR
 endif
 
+    SECTION pv1000_tileset
     ; Lores graphics
     INCLUDE	"target/pv1000/classic/lores.asm"
 
     ; Character map - TODO, redefining it
-IF PV1000_CUSTOM_TILESET
-    INCLUDE	"pv1000_tileset.asm"
+IF PV1000_CUSTOM_TILESET = 2
+    ; Do nothing
+ELIF PV1000_CUSTOM_TILESET
+    INCLUDE	"tileset.asm"
 ELSE
     INCLUDE	"target/pv1000/classic/font.asm"
 ENDIF
