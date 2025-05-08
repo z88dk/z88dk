@@ -3,6 +3,7 @@
 #------------------------------------------------------------------------------
 
 use Modern::Perl;
+use Array::Compare;
 use Data::Dump 'dump';
 
 for my $cpu1 ('r2ka', 'r3k', 'r4k', 'r5k', 'r6k') {
@@ -523,6 +524,13 @@ sub parse_r6k_opcodes {
 		parse_r6k_opcode($opcodes, $cpu, $data);
 		$row++;
 	}
+
+	# create opcodes and all ALTD/ALTS/ALTSD/IOI/IOE variants
+	for my $asm (sort keys %$opcodes) {
+		for my $cpu (sort keys %{$opcodes->{$asm}}) {
+			add_r6k_opcodes($asm, $cpu, $opcodes->{$asm}{$cpu});
+		}
+	}
 }
 
 sub get_spreadsheet {
@@ -575,6 +583,7 @@ sub get_spreadsheet_row {
 	return \%data;
 }
 
+#------------------------------------------------------------------------------
 # parse from Excel data
 sub parse_r6k_opcode {
 	my($opcodes, $cpu, $data) = @_;
@@ -667,17 +676,17 @@ sub parse_r6k_opcode {
 		elsif ($data->{ops}[$i] =~ /^%[dnmjJx]$|^\d{1,3}$|%c/) {
 			# already converted
 		}
-		elsif ($data->{ops}[$i] =~ /----d---/) {
+		elsif ($data->{ops}[$i] =~ /-+d-+/) {
 			$data->{ops}[$i] = '%d';
 			$data->{asm} =~ s/\bd\b/%d/;
 			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
-		elsif ($data->{ops}[$i] =~ /----n---/) {
+		elsif ($data->{ops}[$i] =~ /-+n-+/) {
 			$data->{ops}[$i] = '%n';
 			$data->{asm} =~ s/\bn\b/%n/;
 			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
-		elsif ($data->{ops}[$i] =~ /--xpc---?/) {
+		elsif ($data->{ops}[$i] =~ /-+xpc-+/) {
 			$data->{ops}[$i] = '%x';
 			$data->{asm} =~ s/\bxpc\b/%x/;
 			return parse_r6k_opcode($opcodes, $cpu, $data);
@@ -789,11 +798,10 @@ sub parse_r6k_opcode {
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /rr/) {
-			for (['bc'=>0], ['de'=>1], ['ix'=>2], ['iy'=>3]) {
-				my($rp, $v) = @$_;
+			for my $xrp ('bc', 'de', 'ix', 'iy') {
 				my $data1 = clone($data);
-				$data1->{ops}[$i] =~ s/rr/ sprintf("%02b", $v) /e;
-				$data1->{asm} =~ s/\brr\b/$rp/;
+				$data1->{ops}[$i] =~ s/rr/ sprintf("%02b", XRP($xrp)) /e;
+				$data1->{asm} =~ s/\brr\b/$xrp/;
 				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
@@ -845,73 +853,36 @@ sub parse_r6k_opcode {
 	dedup_r6k_opcode($opcodes, $cpu, $data);
 }
 
+#------------------------------------------------------------------------------
 # find and remove duplicates
 sub dedup_r6k_opcode {
 	my($opcodes, $cpu, $data) = @_;
+	my $ac = Array::Compare->new;
 
 	my $asm = $data->{asm} = lc($data->{asm});
-	if ($asm eq "ld (%m), hl" && @{$data->{ops}} == 3) {
-		return;		# 0x22 is shorter
-	}
-	elsif ($asm eq "ld hl, (%m)" && @{$data->{ops}} == 3) {
-		return;		# 0x2A is shorter
-	}
-	elsif ($asm eq "ldf (%m), hl" && @{$data->{ops}} == 4) {
-		return;		# 0x82 is shorter
-	}
-	elsif ($asm eq "ldf hl, (%m)" && @{$data->{ops}} == 4) {
-		return;		# 0x92 is shorter
-	}
-	elsif ($asm =~ /ld \(%m\), (bcde|jkhl)/ && @{$data->{ops}} == 4) {
-		return;		# use the three-byte version
-	}
-	elsif ($asm =~ /ld (bcde|jkhl), \(%m\)/ && @{$data->{ops}} == 4) {
-		return;		# use the three-byte version
-	}
-	elsif ($asm =~ /ld (bcde|jkhl), %d/ && @{$data->{ops}} == 3) {
-		return;		# use the two-byte version
-	}
-	elsif ($asm =~ /(add|adc|sbc) a,/ && @{$data->{ops}} == 1) {
-		return;		# use the 0x7F version with two opcodes
-	}
-	elsif ($asm =~ /(sub|and|xor|or|cp) / && @{$data->{ops}} == 1) {
-		return;		# use the 0x7F version with two opcodes
-	}
-	elsif ($asm =~ /ld [abcdehl], [abcdehl]/ && @{$data->{ops}} == 1) {
-		return;		# use the 0x7F version with two opcodes
-	}
-	elsif ($asm =~ /ld [abcdehl], [abcdehl]/ && @{$data->{ops}} == 2 && $data->{ops}[0] == 0x6D) {
-		return;		# use the 0x7F version instead of the 0x6D version
-	}
-	elsif ($asm =~ /(rlc|rrc|rl|rr) (bc|de|hl)/ && @{$data->{ops}} == 2) {
-		return;		# use the single-byte version
-	}
-	elsif ($asm =~ /ld (bc|de|hl), (bc|hl|de)/ && @{$data->{ops}} == 2) {
-		return;		# use the single-byte version
-	}
-	elsif ($asm =~ /ld hl, \((pw|px|py|pz)\+%d\)/ && @{$data->{ops}} == 3) {
-		return;		# use the two-byte version
-	}
-	elsif ($asm =~ /ld \((pw|px|py|pz)\+%d\), hl/ && @{$data->{ops}} == 3) {
-		return;		# use the two-byte version
-	}
-	elsif ($asm =~ /ex (bc|jkhl), (hl|bcde)/ && @{$data->{ops}} == 2) {
-		return;		# use the single-byte version
-	}
-	elsif ($asm =~ /add hl, jk/ && @{$data->{ops}} == 2) {
-		return;		# use the single-byte version
-	}
-	elsif ($asm =~ /jr (gt|gtu|lt|v), %j/ && @{$data->{ops}} == 3) {
-		return;		# use the two-byte version
-	}
-	elsif ($asm =~ /jp (gt|gtu|lt|v), %m/ && @{$data->{ops}} == 4) {
-		return;		# use the three-byte version
-	}
-	elsif ($opcodes->{$asm}{$cpu}) {
-		# duplicate opcode
-		my $prev = $opcodes->{$asm}{$cpu};
-		if ($asm =~ /(rlc|rrc) %c, (bcde|jkhl)/) {
-			# merge two instructions
+	#say $asm;
+
+	state %want = (
+		"ld (%m), hl" => [0x22, "%m", "%m"],
+		"ld hl, (%m)" => [0x2A, "%m", "%m"],
+		"ld a, a" => [0x6D, 0x7F],
+		"ld b, b" => [0x7F, 0x40],
+		"ld c, c" => [0x7F, 0x49],
+		"ld d, d" => [0x7F, 0x52],
+		"ld e, e" => [0x7F, 0x5B],
+		"ld h, h" => [0x7F, 0x64],
+		"ld l, l" => [0x7F, 0x6D],
+	);
+
+	my $prev = $opcodes->{$asm}{$cpu};
+	if ($prev) {							# duplicate opcode
+		my @prev_ops = @{$prev->{ops}};
+		my @data_ops = @{$data->{ops}};
+
+		if ($ac->compare(\@prev_ops, \@data_ops)) {
+			return;		# identical opcode
+		}
+		elsif ($data->{asm} =~ /^(rlc|rrc) %c, (bcde|jkhl)/) {	# merge two instructions
 			if (@{$data->{const}} == 1 && $data->{const}[0] == 8) {
 				$prev->{const} = [@{$prev->{const}}, @{$data->{const}}];
 				$prev->{ops}[1] = "%c==8?".$data->{ops}[1].":".$prev->{ops}[1];
@@ -923,16 +894,49 @@ sub dedup_r6k_opcode {
 			else {
 				die;
 			}
-			say "$prev->{asm}, @{$prev->{ops}}, $prev->{ad}, $prev->{as}, $prev->{io}, @{$prev->{const}}";
+		}
+		elsif ($want{$asm}) {
+			my @want_ops = @{$want{$asm}};
+			if ($ac->compare(\@prev_ops, \@want_ops)) {
+				return; 		# already selected correct one
+			}
+			elsif ($ac->compare(\@data_ops, \@want_ops)) {
+				$opcodes->{$asm}{$cpu} = $data;		# select this one
+			}
+			else {
+				return;		# none is correct
+			}
+		}
+		elsif ($prev_ops[0] == 0x7F && $ac->compare(\@prev_ops, [0x7F, @data_ops])) {
+			$opcodes->{$asm}{$cpu} = $prev;
+		}
+		elsif ($data_ops[0] == 0x7F && $ac->compare(\@data_ops, [0x7F, @prev_ops])) {
+			$opcodes->{$asm}{$cpu} = $data;
 		}
 		else {
-			die "Duplicate opcodes:\n", dump($opcodes->{$asm}{$cpu}), "\n", dump($data), "\n";
+			die "Duplicate opcode:\n", hex_dump($prev), "\n", hex_dump($data);
 		}
 	}
 	else {
 		$opcodes->{$asm}{$cpu} = $data;
-		say "$data->{asm}, @{$data->{ops}}, $data->{ad}, $data->{as}, $data->{io}, @{$data->{const}}";
 	}
+}
+
+#------------------------------------------------------------------------------
+# create opcodes and all ALTD/ALTS/ALTSD/IOI/IOE variants
+sub add_r6k_opcodes {
+	my($asm, $cpu, $data) = @_;
+
+	add_opcode($cpu, $asm, $data->{ops}, $data->{const});
+}
+
+#------------------------------------------------------------------------------
+# dump with all numbers in hex
+sub hex_dump {
+	my($data) = @_;
+	my $str = dump($data);
+	$str =~ s/(\d+)/ sprintf("0x%02X", $1) /eg;
+	return $str;
 }
 
 1;
