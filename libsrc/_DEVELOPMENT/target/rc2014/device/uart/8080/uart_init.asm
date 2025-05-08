@@ -46,7 +46,7 @@ PUBLIC _uart_init
     out (__IO_UARTA_LCR_REGISTER),a             ; output to LCR
 
     ; enable and reset the FIFOs
-    ld a,__IO_UART_FCR_FIFO_08|__IO_UART_FCR_FIFO_TX_RESET|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
+    ld a,__IO_UART_FCR_FIFO_04|__IO_UART_FCR_FIFO_TX_RESET|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
     out (__IO_UARTA_FCR_REGISTER),a
 
     ; set up modem control register to enable auto flow control, interrupt line, and RTS
@@ -98,7 +98,7 @@ PUBLIC _uart_init
     out (__IO_UARTB_LCR_REGISTER),a             ; output to LCR
 
     ; enable and reset the FIFOs
-    ld a,__IO_UART_FCR_FIFO_08|__IO_UART_FCR_FIFO_TX_RESET|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
+    ld a,__IO_UART_FCR_FIFO_04|__IO_UART_FCR_FIFO_TX_RESET|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
     out (__IO_UARTB_FCR_REGISTER),a
 
     ; set up modem control register to enable auto flow control, interrupt line, and RTS
