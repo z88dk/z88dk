@@ -56,11 +56,18 @@ Spectrum
 zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded), 2 programs needed
   zcc +zx81 -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DINITONLY clisp.c
   zcc +zx81 -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DNOINIT clisp.c
-  
+
+zx81 48K exp with high resolution graphics (don't change LARGEMEM, space allocation is hardcoded), 2 programs needed
+  zcc +zx81 -clib=wrxansi -subtype=wrx -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DNOTIMER -DSHORT -DGRAPHICS -pragma-output:hrgpage=49152 -DINITONLY clisp.c
+  zcc +zx81 -clib=wrxansi -subtype=wrx -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DNOTIMER -DSHORT -DGRAPHICS -pragma-output:hrgpage=49152 -DNOINIT clisp.c
+
+zx81 48K exp with ultra-high resolution graphics (POKE 16389,255 | NEW | LOAD "")
+  zcc +zx81 -clib=wrxiansi -subtype=wrxi -O3 -create-app -pragma-define:hrgpage=49152 -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -DGRAPHICS -DZX81PHASE -DLARGEMEM=950 clisp.c
+
 zx81 16K, minimalistic version, graphics support
-  zcc +zx81 -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -DGRAPHICS -lgfx81  clisp.c
+  zcc +zx81 -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -DGRAPHICS  clisp.c
 zx81 48K, minimalistic version, graphics support, initial code must be provided @32768
-  zcc +zx81 -O3 -create-app -DMINIMALISTIC -DGRAPHICS -lgfx81  -DZEDIT -DZX81_32K clisp.c
+  zcc +zx81 -O3 -create-app -DMINIMALISTIC -DGRAPHICS -DZEDIT -DZX81_32K clisp.c
 
 zx80 16K, minimalistic version, (add -DGRAPHICS for graphics support)
   zcc +zx80 -DZX81 --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC  clisp.c
@@ -85,8 +92,6 @@ Sharp PC-G850
   zcc +g800 -clib=g850 -O3 -create-app -DNOTIMER -DFORCE_LOWER -DGRAPHICS clisp.c
 
 */
-
-#define HRGPAGE 42000
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -118,7 +123,9 @@ Sharp PC-G850
 #ifdef ZEDIT
 #pragma output STACKPTR=65535
 #else
+#ifndef ZX81PHASE
 #pragma output STACKPTR=49152
+#endif
 #endif
 unsigned int _sp;
 #endif
@@ -291,6 +298,9 @@ enum keywords {
     KW_INCR,    KW_DECR,    KW_EQUAL,   KW_EQMATH
 #endif
 #ifdef GRAPHICS
+#ifdef ZX81PHASE
+   ,KW_PHASE
+#endif
    ,KW_CLS,      KW_PENU,     KW_PEND,
     KW_LEFT,   KW_RIGHT,     KW_FWD
 #endif
@@ -413,6 +423,9 @@ struct s_keywords funcs[] = {
 #endif  // (non MINIMALISTIC)
 
 #ifdef GRAPHICS
+#ifdef ZX81PHASE
+  { "phase",      FTYPE(FTYPE_SYS,     0),               KW_PHASE  },
+#endif
   { "cls",      FTYPE(FTYPE_SYS,     0),               KW_CLS      },
   { "penu",     FTYPE(FTYPE_SYS,     0),               KW_PENU     },
   { "pend",     FTYPE(FTYPE_SYS,     0),               KW_PEND     },
@@ -516,7 +529,7 @@ char gchar() {
 #endif
 
 #ifdef ZX81_32K
-    zx_slow();
+//    zx_slow();
 #endif
     if (ug==13) {
       while (!gets(buf)||(! *buf)) {};
@@ -528,7 +541,7 @@ char gchar() {
       cpt=0;
     }
 #ifdef ZX81_32K
-    zx_fast();
+//    zx_fast();
 #endif
     if ((ug=buf[cpt++]) == 0)  ug=13;
     return (ug);
@@ -577,6 +590,12 @@ void
 main(int argc, char *argv[])
 {
   init();
+
+#ifdef GRAPHICS
+plot(0,getmaxy());
+set_direction (T_NORTH);
+#endif
+
 #ifdef SCHEME
   printf("%cCAMPUS LIsP\nLemon version,\nz88dk SCHEME variant\n",12);
 #else
@@ -1406,6 +1425,11 @@ fcall(long f, long av[2])  /*, int n*/
 #endif
 
 #ifdef GRAPHICS
+#ifdef ZX81PHASE
+  case KW_PHASE:
+    hrg_phase();
+    break;
+#endif
   case KW_CLS:
     plot(0,getmaxy());
     printf("\014");
@@ -1741,8 +1765,15 @@ l_load(long s)
 void
 quit(void)
 {
+#ifdef ZX81PHASE
+ hrg_off();
+#asm
+ rst 0
+#endasm
+#else
   printf("\nBYE\n");
   exit(0);
+#endif
 }
 
 /* END */
