@@ -568,6 +568,13 @@ sub get_spreadsheet_row {
 	return if $asm eq "";
 	
 	$data{asm} = $asm;
+	
+	# fix some typos in input
+	for ($data{asm}) {
+		s/\)\)/)/;
+		s/(SBOX|IBOX) pp/$1 ps/;
+	}
+	
 	$data{ops} = [];
 	for my $col (1..6) {
 		my $opcode = $sheet->get_cell($row, OPCODE+$col-1)->unformatted();
@@ -589,6 +596,8 @@ sub parse_r6k_opcode {
 	my($opcodes, $cpu, $data) = @_;
 	$data = clone($data);
 
+	#say $data->{asm} if $data->{asm} =~ /JRE/i;
+	
 	# convert multi-byte sequences
 	if ($data->{asm} =~ /^FLAG cc, HL$/ && $data->{ops}[1] =~ /111x0100|10011100/) {
 		# non-existing FLAG cc, HL opcodes, see Rabbit6000_Delta4000Instructions.xlsx
@@ -612,7 +621,7 @@ sub parse_r6k_opcode {
 		# non-existing LLJP cc, lxpc, mn opcodes, see Rabbit6000_Delta4000Instructions.xlsx
 		return;
 	}
-	elsif ($data->{asm} =~ /^(ALTD|ALTS|ALTSD|IOE|IOI)$/) {
+	elsif ($data->{asm} =~ /^(ALTD|ALTS|ALTSD|IOE|IOI|ZDMA|ZINTACK)$/) {
 		return;
 	}
 	elsif ($data->{asm} =~ /\bklmn\b/) {
@@ -833,11 +842,12 @@ sub parse_r6k_opcode {
 			}
 			return;
 		}
-		elsif ($data->{ops}[$i] =~ /p[sdp]/) {
+		elsif ($data->{ops}[$i] =~ /(pp|ps|pd)/) {
+			my $got = $1;
 			for my $pp ('pw', 'px', 'py', 'pz') {
 				my $data1 = clone($data);
-				$data1->{ops}[$i] =~ s/p[sdp]/ sprintf("%02b", RABBIT_PP($pp)) /e;
-				$data1->{asm} =~ s/\bp[sdp]\b/$pp/;
+				$data1->{ops}[$i] =~ s/$got/ sprintf("%02b", RABBIT_PP($pp)) /e;
+				$data1->{asm} =~ s/\b$got\b/$pp/;
 				parse_r6k_opcode($opcodes, $cpu, $data1);
 			}
 			return;
@@ -859,25 +869,35 @@ sub dedup_r6k_opcode {
 	my($opcodes, $cpu, $data) = @_;
 	my $ac = Array::Compare->new;
 
-	my $asm = $data->{asm} = lc($data->{asm});
+	# convert letters to lower case except if preceeded by %
+	$data->{asm} =~ s/ (?<!%) [A-Z] / lc($&) /gex;
+	my $asm = $data->{asm};
+	
+	my @data_ops = @{$data->{ops}};
 	#say $asm;
 
 	state %want = (
 		"ld (%m), hl" => [0x22, "%m", "%m"],
 		"ld hl, (%m)" => [0x2A, "%m", "%m"],
-		"ld a, a" => [0x6D, 0x7F],
 		"ld b, b" => [0x7F, 0x40],
 		"ld c, c" => [0x7F, 0x49],
 		"ld d, d" => [0x7F, 0x52],
 		"ld e, e" => [0x7F, 0x5B],
 		"ld h, h" => [0x7F, 0x64],
 		"ld l, l" => [0x7F, 0x6D],
+		"ld a, a" => [0x7F, 0x7F],
 	);
+
+	if ($asm eq "ld hl', bc" && $ac->compare(\@data_ops, [0xED, 0x69])) {
+		return;			# ignore, use [0x76, 0x81]
+	}
+	elsif ($asm eq "ld hl', de" && $ac->compare(\@data_ops, [0xED, 0x61])) {
+		return;			# ignore, use [0x76, 0xA1]
+	}
 
 	my $prev = $opcodes->{$asm}{$cpu};
 	if ($prev) {							# duplicate opcode
 		my @prev_ops = @{$prev->{ops}};
-		my @data_ops = @{$data->{ops}};
 
 		if ($ac->compare(\@prev_ops, \@data_ops)) {
 			return;		# identical opcode
@@ -908,10 +928,10 @@ sub dedup_r6k_opcode {
 			}
 		}
 		elsif ($prev_ops[0] == 0x7F && $ac->compare(\@prev_ops, [0x7F, @data_ops])) {
-			$opcodes->{$asm}{$cpu} = $prev;
+			$opcodes->{$asm}{$cpu} = asm_in_7F_page($asm) ? $prev : $data;
 		}
 		elsif ($data_ops[0] == 0x7F && $ac->compare(\@data_ops, [0x7F, @prev_ops])) {
-			$opcodes->{$asm}{$cpu} = $data;
+			$opcodes->{$asm}{$cpu} = asm_in_7F_page($asm) ? $data : $prev;
 		}
 		else {
 			die "Duplicate opcode:\n", hex_dump($prev), "\n", hex_dump($data);
@@ -923,11 +943,52 @@ sub dedup_r6k_opcode {
 }
 
 #------------------------------------------------------------------------------
+# check if asm is the the 0x7F page
+sub asm_in_7F_page {
+	my($asm) = @_;
+	
+	for ($asm) {
+		if (/^ld [bcdehla], [bcdehla]$/) {
+			return 1;
+		}
+		elsif (/^(add|adc|sbc) a, (\(hl\)|[bcdehla])$/) {
+			return 1;
+		}
+		elsif (/^(sub|and|xor|or|cp) (\(hl\)|[bcdehla])$/) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+}
+
+#------------------------------------------------------------------------------
 # create opcodes and all ALTD/ALTS/ALTSD/IOI/IOE variants
 sub add_r6k_opcodes {
 	my($asm, $cpu, $data) = @_;
 
-	add_opcode($cpu, $asm, $data->{ops}, $data->{const});
+	add_r6k_opcode($asm, $cpu, $data);
+}
+
+#------------------------------------------------------------------------------
+# create one opcode if not already found
+sub add_r6k_opcode {
+	my($asm, $cpu, $data) = @_;
+	my $ac = Array::Compare->new;
+	
+	my $found = get_opcode($cpu, $asm);
+	if ($found && 
+		$ac->compare([$found->bytes], $data->{ops}) && 
+		$ac->compare($found->{const}, $data->{const})) {
+		return;		# already defined
+	}
+	elsif ($found) {
+		die "Duplicate opcode:\n", hex_dump($found), "\n", hex_dump($data);
+	}
+	else {
+		add_opcode($cpu, $asm, $data->{ops}, $data->{const});
+	}	
 }
 
 #------------------------------------------------------------------------------
@@ -935,7 +996,7 @@ sub add_r6k_opcodes {
 sub hex_dump {
 	my($data) = @_;
 	my $str = dump($data);
-	$str =~ s/(\d+)/ sprintf("0x%02X", $1) /eg;
+	$str =~ s/\b(\d+)\b/ sprintf("0x%02X", $1) /eg;
 	return $str;
 }
 

@@ -100,7 +100,7 @@ sub add {
 	my @bytes = $opcode->bytes();
 	my $bytes = "@bytes";
 	
-	#say "$cpu\t$asm\t",$opcode->to_string if $asm =~ /adc/;
+	#say "$cpu\t$asm\t",$opcode->to_string if $asm =~ /jre %J/;
 	
 	# special case for intel: jr and djnz %j is converted to %m
 	if ($opcode->cpu =~ /^80/ && $asm =~ /^(jr|djnz)/) {
@@ -380,7 +380,7 @@ sub compute_labels {
 		
 		#say "$asm; @bytes";
 		
-		die $bytes if $bytes =~ /%/;
+		die "$asm; $bytes" if $bytes =~ /%/;
 
 		$asmpc += $num_bytes;
 		

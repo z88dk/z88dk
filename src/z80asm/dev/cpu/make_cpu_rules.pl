@@ -35,7 +35,7 @@ for my $asm (sort keys %{$opcodes->opcodes}) {
 	if    ($asm =~ /\(%[nmh]\)/) {		$parens = 'expr_in_parens'; }
 	elsif ($asm =~ /\(\w+\+%[dsu]/) {	$parens = 'no_expr'; }
 	elsif ($asm =~ /\w+\+%[dsu]/) {		$parens = 'no_expr'; }
-	elsif ($asm =~ /%[snmMjJkc]/) {		$parens = 'expr_no_parens'; }
+	elsif ($asm =~ /%[snmMjJkcd]/) {	$parens = 'expr_no_parens'; }
 	elsif ($asm !~ /%/) {				$parens = 'no_expr';   }
 	else { die $asm; }
 		
@@ -221,8 +221,8 @@ sub parser_tokens {
 		elsif (/\G , 			/gcx) { push @tokens, "_TK_COMMA"; }
 		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
 		elsif (/\G \( %[nmh] \)	/gcx) { push @tokens, "expr"; }
-		elsif (/\G    %[snmMjJx]/gcx) { push @tokens, "expr"; }
 		elsif (/\G \+ %[dsu]	/gcx) { push @tokens, "expr"; }
+		elsif (/\G    %[snmMjJxd]/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[c]		/gcx) { push @tokens, "const_expr"; }
 		elsif (/\G    (\w+)	'	/gcx) { push @tokens, "_TK_".uc($1)."1"; }
 		elsif (/\G    (\w+)		/gcx) { push @tokens, "_TK_".uc($1); }
@@ -537,18 +537,25 @@ sub parse_code_opcode {
 	if ($stmt) {
 		@bytes = split(' ', $bytes);	# $bytes has %x removed
 
-		#say "@bytes";
+		say "@bytes";
 
 		my @expr;
 		for (@bytes) {
+say "1: $_";
 			if (/[+*?<>]/) {
 				my $offset = 0;
 				if (s/^(\d+)\+//) {
 					$offset = $1;
 				}
+say "2: $_";
+while (/\b(\d+)\b/g) {
+	say $1;
+}
 				$_ =~ s/\b(\d+)\b/ $1 < 10 ? $1 : "0x".fmthex($1) /ge;
+say "3: $_";
 				push @expr, $_;
 				$_ = fmthex($offset);
+say "4: $_";
 			}
 			else {
 				push @expr, undef;

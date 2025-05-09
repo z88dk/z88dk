@@ -128,7 +128,7 @@ sub add_opcode {
 	my($cpu, $asm, $ops, $const) = @_;
 
 	add_opcode_1($cpu, $asm, $ops, $const);
-	if ($asm =~ s/ (\w+) \+ %d /$1/x) {
+	if ($asm =~ s/ \( (\w+) \+ %d \) /($1)/x) {
 		my $ops1 = clone($ops);			# do not change callers data
 		for (@$ops1) {
 			s/^%d$/0/;
@@ -145,7 +145,9 @@ sub add_opcode_1 {
 	my @ops;
 	while (@$ops > 1 && $ops->[1] =~ /^\d+$/ &&
 	    ($ops->[0] == 0x76 || $ops->[0] == 0xD3 || $ops->[0] == 0xDB || 	# rabbit
-		 ($cpu =~ /^r4k/ && ($ops->[0] == 0x40 || $ops->[0] == 0x64)) ||	# rabbit 6k
+		 ($cpu =~ /^r4k/ && ($ops->[0] == 0x40 || $ops->[0] == 0x64)) ||	# rabbit 4k
+		 ($cpu =~ /^r6k/ && ($ops->[0] == 0x40 || $ops->[0] == 0x49 ||
+		 $ops->[0] == 0x64 || $ops->[0] == 0x6D || $ops->[0] == 0x7F)) ||	# rabbit 4k
 		 $ops->[0] == 0x40 || $ops->[0] == 0x49 || 
 		 $ops->[0] == 0x52 || $ops->[0] == 0x5B ||
 		 $ops->[0] == 0x7F)) {						# ez80 / kc160
@@ -1038,15 +1040,15 @@ sub add_opcodes {
 		"rst NN" => sub {
 			my($cpu) = @_;
 			if ($cpu =~ /^r\dk/) {
-				add_opcode($cpu, "rst %c", ["0xC7+(%c<8?%c*8:%c)"],
+				add_opcode($cpu, "rst %c", [0xC7."+(%c<8?%c*8:%c)"],
 						   [0x10,0x18,0x20,0x28,0x38]);
 			}
 			elsif ($cpu =~ /^ez80/) {
-				add_opcode_ez80_s_l($cpu, "rst %c", ["0xC7+(%c<8?%c*8:%c)"],
+				add_opcode_ez80_s_l($cpu, "rst %c", [0xC7."+(%c<8?%c*8:%c)"],
 						   [0,8,0x10,0x18,0x20,0x28,0x30,0x38]);
 			}
 			else {
-				add_opcode($cpu, "rst %c", ["0xC7+(%c<8?%c*8:%c)"],
+				add_opcode($cpu, "rst %c", [0xC7."+(%c<8?%c*8:%c)"],
 						   [0,8,0x10,0x18,0x20,0x28,0x30,0x38]);
 			}
 		},
@@ -1602,7 +1604,7 @@ sub add_opcodes {
 		},
 		"mmu <b>, N [z80n]" => sub {
 			my($cpu) = @_;
-			add_opcode($cpu, "mmu %c, %n",  [0xED, 0x91, '0x50+%c', '%n'], [0..7]);
+			add_opcode($cpu, "mmu %c, %n",  [0xED, 0x91, 0x50."+%c", '%n'], [0..7]);
 		},
 		"mmu<b> N [z80n]" => sub {
 			my($cpu) = @_;
@@ -1612,7 +1614,7 @@ sub add_opcodes {
 		},
 		"mmu <b>, a [z80n]" => sub {
 			my($cpu) = @_;
-			add_opcode($cpu, "mmu %c, a",  [0xED, 0x92, '0x50+%c'], [0..7]);
+			add_opcode($cpu, "mmu %c, a",  [0xED, 0x92, 0x50."+%c"], [0..7]);
 		},
 		"mmu<b> a [z80n]" => sub {
 			my($cpu) = @_;
@@ -4034,7 +4036,7 @@ sub add_opcodes {
 		},
 		"llcall NN, NN [r4k]" => sub {
 			my($cpu) = @_;
-			add_opcode($cpu, "llcall %x, %m", [0xC7, '%m', '%m', '%x', '%x']);
+			add_opcode($cpu, "llcall %x, %m", [0x8F, '%m', '%m', '%x', '%x']);
 		},
 		"llcall (jkhl) [r4k]" => sub {
 			my($cpu) = @_;
@@ -4159,9 +4161,9 @@ sub add_opcodes {
 		},
 		"rl B, bcde/jkhl [r4k]" => sub {
 			my($cpu) = @_;
-			add_opcode_rabbit_altd($cpu, "rl %c, bcde", [0xDD, "0x67+%c"], 
+			add_opcode_rabbit_altd($cpu, "rl %c, bcde", [0xDD, 0x68."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode_rabbit_altd($cpu, "rl %c, jkhl", [0xFD, "0x67+%c"], 
+			add_opcode_rabbit_altd($cpu, "rl %c, jkhl", [0xFD, 0x68."+%c-1"], 
 								[1, 2, 4]);
 		},
 		"rl de [r2ka]" => sub {
@@ -4225,17 +4227,17 @@ sub add_opcodes {
 		},
 		"rlc B, bcde/jkhl [r4k]" => sub {
 			my($cpu) = @_;
-			add_opcode($cpu, "rlc %c, bcde", [0xDD, "0x47+%c"], 
+			add_opcode($cpu, "rlc %c, bcde", [0xDD, "%c==8?".0x4F.":".0x48."+%c-1"], 
 								[1, 2, 4, 8]);
-			add_opcode($cpu, "rlc %c, jkhl", [0xFD, "0x47+%c"], 
+			add_opcode($cpu, "rlc %c, jkhl", [0xFD, "%c==8?".0x4F.":".0x48."+%c-1"], 
 								[1, 2, 4, 8]);
-			add_opcode($cpu, "altd rlc %c, bcde", [RABBIT_CONST('altd'), 0xDD, "0x47+%c"], 
+			add_opcode($cpu, "altd rlc %c, bcde", [RABBIT_CONST('altd'), 0xDD, 0x48."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode($cpu, "altd rlc %c, jkhl", [RABBIT_CONST('altd'), 0xFD, "0x47+%c"], 
+			add_opcode($cpu, "altd rlc %c, jkhl", [RABBIT_CONST('altd'), 0xFD, 0x48."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode($cpu, "rlc %c, bcde'", [RABBIT_CONST('altd'), 0xDD, "0x47+%c"], 
+			add_opcode($cpu, "rlc %c, bcde'", [RABBIT_CONST('altd'), 0xDD, 0x48."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode($cpu, "rlc %c, jkhl'", [RABBIT_CONST('altd'), 0xFD, "0x47+%c"], 
+			add_opcode($cpu, "rlc %c, jkhl'", [RABBIT_CONST('altd'), 0xFD, 0x48."+%c-1"], 
 								[1, 2, 4]);
 		},
 		"rr bc [r4k]" => sub {
@@ -4244,9 +4246,9 @@ sub add_opcodes {
 		},
 		"rr B, bcde/jkhl [r4k]" => sub {
 			my($cpu) = @_;
-			add_opcode_rabbit_altd($cpu, "rr %c, bcde", [0xDD, "0x77+%c"], 
+			add_opcode_rabbit_altd($cpu, "rr %c, bcde", [0xDD, 0x78."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode_rabbit_altd($cpu, "rr %c, jkhl", [0xFD, "0x77+%c"], 
+			add_opcode_rabbit_altd($cpu, "rr %c, jkhl", [0xFD, 0x78."+%c-1"], 
 								[1, 2, 4]);
 		},
 		"rr de/hl [r2ka]" => sub {
@@ -4272,17 +4274,17 @@ sub add_opcodes {
 		},
 		"rrc B, bcde/jkhl [r4k]" => sub {
 			my($cpu) = @_;
-			add_opcode($cpu, "rrc %c, bcde", [0xDD, "0x57+%c"], 
+			add_opcode($cpu, "rrc %c, bcde", [0xDD, "%c==8?".0x5F.":".0x58."+%c-1"], 
 								[1, 2, 4, 8]);
-			add_opcode($cpu, "rrc %c, jkhl", [0xFD, "0x57+%c"], 
+			add_opcode($cpu, "rrc %c, jkhl", [0xFD, "%c==8?".0x5F.":".0x58."+%c-1"], 
 								[1, 2, 4, 8]);
-			add_opcode($cpu, "altd rrc %c, bcde", [RABBIT_CONST('altd'), 0xDD, "0x57+%c"], 
+			add_opcode($cpu, "altd rrc %c, bcde", [RABBIT_CONST('altd'), 0xDD, 0x58."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode($cpu, "altd rrc %c, jkhl", [RABBIT_CONST('altd'), 0xFD, "0x57+%c"], 
+			add_opcode($cpu, "altd rrc %c, jkhl", [RABBIT_CONST('altd'), 0xFD, 0x58."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode($cpu, "rrc %c, bcde'", [RABBIT_CONST('altd'), 0xDD, "0x57+%c"], 
+			add_opcode($cpu, "rrc %c, bcde'", [RABBIT_CONST('altd'), 0xDD, 0x58."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode($cpu, "rrc %c, jkhl'", [RABBIT_CONST('altd'), 0xFD, "0x57+%c"], 
+			add_opcode($cpu, "rrc %c, jkhl'", [RABBIT_CONST('altd'), 0xFD, 0x58."+%c-1"], 
 								[1, 2, 4]);
 		},
 		"scf' [r2ka]" => sub {
@@ -4304,30 +4306,30 @@ sub add_opcodes {
 		},
 		"sla B, bcde/jkhl [r4k]" => sub {
 			my($cpu) = @_;
-			add_opcode_rabbit_altd($cpu, "sla %c, bcde", [0xDD, "0x87+%c"], 
+			add_opcode_rabbit_altd($cpu, "sla %c, bcde", [0xDD, 0x88."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode_rabbit_altd($cpu, "sla %c, jkhl", [0xFD, "0x87+%c"], 
+			add_opcode_rabbit_altd($cpu, "sla %c, jkhl", [0xFD, 0x88."+%c-1"], 
 								[1, 2, 4]);
 		},
 		"sll B, bcde/jkhl [r4k]" => sub {
 			my($cpu) = @_;
-			add_opcode_rabbit_altd($cpu, "sll %c, bcde", [0xDD, "0xA7+%c"], 
+			add_opcode_rabbit_altd($cpu, "sll %c, bcde", [0xDD, 0xA8."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode_rabbit_altd($cpu, "sll %c, jkhl", [0xFD, "0xA7+%c"], 
+			add_opcode_rabbit_altd($cpu, "sll %c, jkhl", [0xFD, 0xA8."+%c-1"], 
 								[1, 2, 4]);
 		},
 		"sra B, bcde/jkhl [r4k]" => sub {
 			my($cpu) = @_;
-			add_opcode_rabbit_altd($cpu, "sra %c, bcde", [0xDD, "0x97+%c"], 
+			add_opcode_rabbit_altd($cpu, "sra %c, bcde", [0xDD, 0x98."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode_rabbit_altd($cpu, "sra %c, jkhl", [0xFD, "0x97+%c"], 
+			add_opcode_rabbit_altd($cpu, "sra %c, jkhl", [0xFD, 0x98."+%c-1"], 
 								[1, 2, 4]);
 		},
 		"srl B, bcde/jkhl [r4k]" => sub {
 			my($cpu) = @_;
-			add_opcode_rabbit_altd($cpu, "srl %c, bcde", [0xDD, "0xB7+%c"], 
+			add_opcode_rabbit_altd($cpu, "srl %c, bcde", [0xDD, 0xB8."+%c-1"], 
 								[1, 2, 4]);
-			add_opcode_rabbit_altd($cpu, "srl %c, jkhl", [0xFD, "0xB7+%c"], 
+			add_opcode_rabbit_altd($cpu, "srl %c, jkhl", [0xFD, 0xB8."+%c-1"], 
 								[1, 2, 4]);
 		},
 		"sub hl, de [r4k]" => sub {
