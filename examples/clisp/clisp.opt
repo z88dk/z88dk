@@ -262,17 +262,6 @@
 	ld	hl,(%1)
 	jp	clisp_opt23
 
-	jp	nc,%1
-	ld	hl,65535	;const
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	ret
-=
-	jp	c,clisp_opt24
-
 	call	clisp_opt21
 	call	_l_eval
 	call	l_pint_pop
