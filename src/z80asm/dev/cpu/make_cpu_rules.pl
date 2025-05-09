@@ -537,25 +537,18 @@ sub parse_code_opcode {
 	if ($stmt) {
 		@bytes = split(' ', $bytes);	# $bytes has %x removed
 
-		say "@bytes";
+		#say "@bytes";
 
 		my @expr;
 		for (@bytes) {
-say "1: $_";
 			if (/[+*?<>]/) {
 				my $offset = 0;
 				if (s/^(\d+)\+//) {
 					$offset = $1;
 				}
-say "2: $_";
-while (/\b(\d+)\b/g) {
-	say $1;
-}
-				$_ =~ s/\b(\d+)\b/ $1 < 10 ? $1 : "0x".fmthex($1) /ge;
-say "3: $_";
+				$_ =~ s/\b(\d+)\b/ $1 < 10 ? $1 : sprintf("0x%02X", $1) /ge;
 				push @expr, $_;
-				$_ = fmthex($offset);
-say "4: $_";
+				$_ = sprintf("0x%02X", $offset);
 			}
 			else {
 				push @expr, undef;
