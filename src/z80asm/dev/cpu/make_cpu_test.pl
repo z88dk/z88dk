@@ -121,22 +121,14 @@ sub add {
 		add($cpu, $opcode->clone(sub {s/%d/0/}, sub {s/%d/0x00/e; s/%D/0x01/e}));
 		add($cpu, $opcode->clone(sub {s/%d/-128/; s/\+-/-/}, sub {s/%d/0x80/e; s/%D/0x81/e}));
 	}
-	elsif ($asm =~ /%u/) {
-		if (! $asm =~ /ld \w\w, \w\w\+%u/) {
-			add($cpu, $opcode->clone(sub {s/%d/0/; s/\+0//}, sub {s/%d/0x00/e; s/%D/0x01/e}));
-		}
-		add($cpu, $opcode->clone(sub {s/%u/0/}, sub {s/%u/0x00/e}));
-		add($cpu, $opcode->clone(sub {s/%u/128/}, sub {s/%u/0x80/e}));
-		add($cpu, $opcode->clone(sub {s/%u/255/}, sub {s/%u/0xFF/e}));
-	}
-	# must be 1-byte opcode so that call to __z80asm__add_sp_s with defb %s after
+	# must be 1-byte opcode so that call to __z80asm__add_sp_d with defb %d after
 	# is diassembled correctly during z80asm tests in cpu.t
-	elsif ($asm =~ /%s/) {
+	elsif ($asm =~ /%d/) {
 		my $state = 0;	
-		add($cpu, $opcode->clone(sub {s/%s/-128/; s/\+-/-/}, 
+		add($cpu, $opcode->clone(sub {s/%d/-128/; s/\+-/-/}, 
 								 sub {
 								 	if ($state == 0) {
-								 		if (s/%s/0x80/e) {
+								 		if (s/%d/0x80/e) {
 								 			$state = 1;
 										}
 									}
@@ -151,10 +143,10 @@ sub add {
 								 }));
 			
 		$state = 0;
-		add($cpu, $opcode->clone(sub {s/%s/0/}, 
+		add($cpu, $opcode->clone(sub {s/%d/0/}, 
 								 sub {
 								 	if ($state == 0) {
-								 		if (s/%s/0x00/e) {
+								 		if (s/%d/0x00/e) {
 								 			$state = 1;
 										}
 								 	}
@@ -168,12 +160,12 @@ sub add {
 									}
 								 }));
 			
-		if ($asm =~ /%s\+/) {
+		if ($asm =~ /%d\+/) {
 			$state = 0;
-			add($cpu, $opcode->clone(sub {s/%s/0/; s/\+0//}, 
+			add($cpu, $opcode->clone(sub {s/%d/0/; s/\+0//}, 
 									sub {
 										if ($state == 0) {
-											if (s/%s/0x00/e) {
+											if (s/%d/0x00/e) {
 												$state = 1;
 											}
 										}
@@ -186,10 +178,10 @@ sub add {
 
 		# 7F is a prefix in r4k and r5k, is not single-opcode; use 7E instead
 		$state = 0;	
-		add($cpu, $opcode->clone(sub {s/%s/126/}, 
+		add($cpu, $opcode->clone(sub {s/%d/126/}, 
 								 sub {
 								 	if ($state == 0) {
-								 		if (s/%s/0x7E/e) {
+								 		if (s/%d/0x7E/e) {
 								 			$state = 1;
 										}
 									}
@@ -200,7 +192,6 @@ sub add {
 								 }));
 	}
 	elsif ($asm =~ /%n/) {
-		add($cpu, $opcode->clone(sub {s/%n/-128/g; s/\+-/-/}, sub {s/%n/0x80/e}));
 		add($cpu, $opcode->clone(sub {s/%n/0/g}, sub {s/%n/0x00/e}));
 		add($cpu, $opcode->clone(sub {s/%n/127/g}, sub {s/%n/0x7F/e}));
 		add($cpu, $opcode->clone(sub {s/%n/255/g}, sub {s/%n/0xFF/e}));

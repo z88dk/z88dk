@@ -367,8 +367,8 @@ for my $cpu (Opcode->cpus) {
 	# 16-bit load plus 8-bit offset
 	#--------------------------------------------------------------------------
 
-	# LD DE, HL+u
-	for my $asm ("ldhi %n", "adi hl, %n", "ld de, hl+%u") {
+	# LD DE, HL+n
+	for my $asm ("ldhi %n", "adi hl, %n", "ld de, hl+%n") {
 		my($var) = $asm =~ /(%\w)/;
 		add_synth($cpu, $asm, 
 							"push hl", 
@@ -376,8 +376,8 @@ for my $cpu (Opcode->cpus) {
 							"pop hl");
 	}
 
-	# LD DE, SP+u
-	for my $asm ("ldsi %n", "adi sp, %n", "ld de, sp+%u") {
+	# LD DE, SP+n
+	for my $asm ("ldsi %n", "adi sp, %n", "ld de, sp+%n") {
 		my($var) = $asm =~ /(%\w)/;
 		add_synth($cpu, $asm, 
 							"ex de, hl", 
@@ -389,11 +389,11 @@ for my $cpu (Opcode->cpus) {
 							"ld hl, 0x0000", "add hl, sp", 
 							"ex de, hl");
 	
-	# LD HL, SP+s
+	# LD HL, SP+d
     if ($cpu =~ /^8085/) {
-        add_synth($cpu, "ld hl, sp+%u", 
+        add_synth($cpu, "ld hl, sp+%n", 
 							"ex de, hl", 
-							"ld de, sp+%u", 
+							"ld de, sp+%n", 
 							"ex de, hl");
         add_synth($cpu, "ld hl, sp", 
 							"ex de, hl", 
@@ -401,8 +401,8 @@ for my $cpu (Opcode->cpus) {
 							"ex de, hl");
     }
     else {
-        add_synth($cpu, "ld hl, sp+%s", 
-                            "ld hl, 0:%s", "add hl, sp");
+        add_synth($cpu, "ld hl, sp+%d", 
+                            "ld hl, 0:%d", "add hl, sp");
         add_synth($cpu, "ld hl, sp", 
                             "ld hl, 0x0000", "add hl, sp");
     }
@@ -767,7 +767,7 @@ for my $cpu (Opcode->cpus) {
 						"pop de");
 	
 	# ADD SP, n
-	add_emul($cpu, "add sp, %s", "__z80asm__add_sp_s", '%s');
+	add_emul($cpu, "add sp, %d", "__z80asm__add_sp_d", '%d');
 
 	# ADD rp, A
 	for my $rp ('bc', 'de', 'hl') {

@@ -33,9 +33,9 @@ for my $asm (sort keys %{$opcodes->opcodes}) {
 	# check for parens
 	my $parens;
 	if    ($asm =~ /\(%[nmh]\)/) {		$parens = 'expr_in_parens'; }
-	elsif ($asm =~ /\(\w+\+%[dsu]/) {	$parens = 'no_expr'; }
-	elsif ($asm =~ /\w+\+%[dsu]/) {		$parens = 'no_expr'; }
-	elsif ($asm =~ /%[snmMjJkcd]/) {	$parens = 'expr_no_parens'; }
+	elsif ($asm =~ /\(\w+\+%[dn]/) {	$parens = 'no_expr'; }
+	elsif ($asm =~ /\w+\+%[dn]/) {		$parens = 'no_expr'; }
+	elsif ($asm =~ /%[nmMjJkcd]/) {		$parens = 'expr_no_parens'; }
 	elsif ($asm !~ /%/) {				$parens = 'no_expr';   }
 	else { die $asm; }
 		
@@ -89,8 +89,8 @@ say $aux_h <<END;
 #define DO_stmt_h(  opcode)		_DO_stmt_(h,		opcode)
 #define DO_stmt_n_0(opcode)		_DO_stmt_(n_0,		opcode)
 #define DO_stmt_n_0_0(	opcode)	_DO_stmt_(n_0_0,	opcode)
-#define DO_stmt_s_0(opcode)		_DO_stmt_(s_0,		opcode)
-#define DO_stmt_s_0_0(opcode)	_DO_stmt_(s_0_0,	opcode)
+#define DO_stmt_d_0(opcode)		_DO_stmt_(s_0,		opcode)
+#define DO_stmt_d_0_0(opcode)	_DO_stmt_(s_0_0,	opcode)
 #define DO_stmt_d(  opcode)		_DO_stmt_(d,		opcode)
 
 #define DO_stmt_nn( opcode) \\
@@ -221,8 +221,8 @@ sub parser_tokens {
 		elsif (/\G , 			/gcx) { push @tokens, "_TK_COMMA"; }
 		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
 		elsif (/\G \( %[nmh] \)	/gcx) { push @tokens, "expr"; }
-		elsif (/\G \+ %[dsu]	/gcx) { push @tokens, "expr"; }
-		elsif (/\G    %[snmMjJxd]/gcx) { push @tokens, "expr"; }
+		elsif (/\G \+ %[dn]		/gcx) { push @tokens, "expr"; }
+		elsif (/\G    %[nmMjJxd]/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[c]		/gcx) { push @tokens, "const_expr"; }
 		elsif (/\G    (\w+)	'	/gcx) { push @tokens, "_TK_".uc($1)."1"; }
 		elsif (/\G    (\w+)		/gcx) { push @tokens, "_TK_".uc($1); }
@@ -456,10 +456,7 @@ sub parse_code_opcode {
 	elsif ($bytes =~ s/ %n$//) {
 		$stmt = "DO_stmt_n";
 	}
-	elsif ($bytes =~ s/ %u$//) {
-		$stmt = "DO_stmt_n";
-	}
-	elsif ($bytes =~ s/ %s$//) {
+	elsif ($bytes =~ s/ %d$//) {
 		$stmt = "DO_stmt_d";
 	}
 	elsif ($bytes =~ s/ %h$//) {
@@ -480,10 +477,10 @@ sub parse_code_opcode {
 	elsif ($bytes =~ s/ %m %m$//) {
 		$stmt = "DO_stmt_nn";
 	}
-	elsif ($bytes =~ s/ %u 0 0$//) {
+	elsif ($bytes =~ s/ %n 0 0$//) {
 		$stmt = "DO_stmt_n_0_0";
 	}
-	elsif ($bytes =~ s/ %u 0$//) {
+	elsif ($bytes =~ s/ %n 0$//) {
 		$stmt = "DO_stmt_n_0";
 	}
 	elsif ($bytes =~ s/ %n 0 0$//) {
@@ -492,11 +489,11 @@ sub parse_code_opcode {
 	elsif ($bytes =~ s/ %n 0$//) {
 		$stmt = "DO_stmt_n_0";
 	}
-	elsif ($bytes =~ s/ %s 0$//) {
-		$stmt = "DO_stmt_s_0";
+	elsif ($bytes =~ s/ %d 0$//) {
+		$stmt = "DO_stmt_d_0";
 	}
-	elsif ($bytes =~ s/ %s 0 0$//) {
-		$stmt = "DO_stmt_s_0_0";
+	elsif ($bytes =~ s/ %d 0 0$//) {
+		$stmt = "DO_stmt_d_0_0";
 	}
 	elsif ($bytes =~ s/ %M %M$//) {
 		$stmt = "DO_stmt_NN";
@@ -526,8 +523,8 @@ sub parse_code_opcode {
 	elsif ($bytes =~ s/ %d//) {
 		$stmt = "DO_stmt_idx";
 	}
-	elsif ($bytes =~ s/^%s//) {
-		push @code, "DO_stmt_defb();";		# call __z80asm__add_sp_s : defb %s
+	elsif ($bytes =~ s/^%d//) {
+		push @code, "DO_stmt_defb();";		# call __z80asm__add_sp_d : defb %d
 	}
 	else {
 		$stmt = "DO_stmt";

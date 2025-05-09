@@ -3,7 +3,6 @@ package Opcode;
 #------------------------------------------------------------------------------
 # Build CPU tables
 # asm placeholders:
-#	%s	signed byte
 #	%n	unsigned byte
 #   %h  high page offset
 #	%m	unsigned word - 16, 24 or 32 bits
@@ -12,9 +11,8 @@ package Opcode;
 #	%j	jr offset
 #	%J	jre offset
 #	%c	constant (im, bit, rst, ...)
-#	%d	signed register indirect offset
+#	%d	signed byte
 #	%D	%d+1						TODO: should be %d1 for consistency
-#	%u	unsigned register indirect offset
 #	%t	temp jump label to end of statement; %t3 to end of statement - 3
 #------------------------------------------------------------------------------
 
@@ -295,8 +293,8 @@ sub search_opcode {
 		}
 	}
 
-	# replace 0:%s/0:%u
-	if (($asm1 = $asm) =~ s/0:(%[sun])/%m/) {
+	# replace 0:%d/0:%n
+	if (($asm1 = $asm) =~ s/0:(%[dn])/%m/) {
 		my $wildcard = $1;
 		my $opcode = $self->opcodes->{$asm1}{$cpu};
 		if ($opcode) {

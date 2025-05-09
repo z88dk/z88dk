@@ -53,7 +53,7 @@ for my $cpu1 ('r2ka', 'r3k', 'r4k', 'r5k', 'r6k') {
 		add_opcodes($cpu, "add hl, <rp> [r2ka]");
 		add_opcodes($cpu, "add <x>, <rp> [r2ka]");
 		add_opcodes($cpu, "sbc/adc hl, <rp> [r2ka]");
-		add_opcodes($cpu, "add sp, %s [r2ka]");
+		add_opcodes($cpu, "add sp, %d [r2ka]");
 		add_opcodes($cpu, "dad <r> [8080]") if !$strict;
 		add_opcodes($cpu, "dad <rp> [8080]") if !$strict;
 
@@ -573,6 +573,8 @@ sub get_spreadsheet_row {
 	for ($data{asm}) {
 		s/\)\)/)/;
 		s/(SBOX|IBOX) pp/$1 ps/;
+		s/LD L\.L/LD L, L/;
+		s/SBC \(/SBC A, (/;
 	}
 	
 	$data{ops} = [];
@@ -596,7 +598,7 @@ sub parse_r6k_opcode {
 	my($opcodes, $cpu, $data) = @_;
 	$data = clone($data);
 
-	#say $data->{asm} if $data->{asm} =~ /JRE/i;
+	#say $data->{asm} if $data->{asm} =~ /LD r/;
 	
 	# convert multi-byte sequences
 	if ($data->{asm} =~ /^FLAG cc, HL$/ && $data->{ops}[1] =~ /111x0100|10011100/) {
@@ -609,19 +611,22 @@ sub parse_r6k_opcode {
 		return;
 	}
 	elsif ($data->{asm} =~ /^JR cc, e$/ && 
-				($data->{ops}[0] =~ /100x0000/ || $data->{ops}[1] =~ /100x0000/)) {
+				($data->{ops}[0] =~ /100x0000|10001000/ || $data->{ops}[1] =~ /100x0000|10001000/)) {
 		# non-existing JR cc, e opcodes, see Rabbit6000_Delta4000Instructions.xlsx
 		return;
 	}
-	elsif ($data->{asm} =~ /^JRE cc, ee$/ && $data->{ops}[1] =~ /111x0011/) {
+	elsif ($data->{asm} =~ /^JRE cc, ee$/ && $data->{ops}[1] =~ /111x0011|10011011/) {
 		# non-existing JRE cc, ee opcodes, see Rabbit6000_Delta4000Instructions.xlsx
 		return;
 	}
-	elsif ($data->{asm} =~ /^LLJP cc, lxpc, mn$/ && $data->{ops}[1] =~ /111x0010/) {
+	elsif ($data->{asm} =~ /^LLJP cc, lxpc, mn$/ && $data->{ops}[1] =~ /111x0010|10011010/) {
 		# non-existing LLJP cc, lxpc, mn opcodes, see Rabbit6000_Delta4000Instructions.xlsx
 		return;
 	}
 	elsif ($data->{asm} =~ /^(ALTD|ALTS|ALTSD|IOE|IOI|ZDMA|ZINTACK)$/) {
+		return;
+	}
+	elsif ($data->{asm} =~ /SP'/) {
 		return;
 	}
 	elsif ($data->{asm} =~ /\bklmn\b/) {
@@ -711,7 +716,7 @@ sub parse_r6k_opcode {
 			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
 		elsif ($data->{ops}[$i] =~ /-r-/) {
-			for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
+			for my $r ('B', 'C', 'D', 'E', 'H', 'L', 'A') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/-r-/ sprintf("%03b", R($r)) /e;
 				$data1->{asm} =~ s/\br\b/$r/;
@@ -720,7 +725,7 @@ sub parse_r6k_opcode {
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /-r'/) {
-			for my $r ('b', 'c', 'd', 'e', 'h', 'l', 'a') {
+			for my $r ('B', 'C', 'D', 'E', 'H', 'L', 'A') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/-r'/ sprintf("%03b", R($r)) /e;
 				$data1->{asm} =~ s/\br'/$r/;
@@ -729,7 +734,7 @@ sub parse_r6k_opcode {
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /rna/) {
-			for my $r ('b', 'c', 'd', 'e', 'h', 'l') {
+			for my $r ('B', 'C', 'D', 'E', 'H', 'L') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/rna/ sprintf("%03b", R($r)) /e;
 				$data1->{asm} =~ s/\br\b/$r/;
@@ -738,7 +743,7 @@ sub parse_r6k_opcode {
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /-f-/) {
-			for my $f ('nz', 'z', 'nc', 'c', 'lz', 'lo', 'p', 'm') {
+			for my $f ('NZ', 'Z', 'NC', 'C', 'LZ', 'LO', 'P', 'M') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/-f-/ sprintf("%03b", F($f)) /e;
 				$data1->{asm} =~ s/\bf\b/$f/;
@@ -747,7 +752,7 @@ sub parse_r6k_opcode {
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /cc/) {
-			for my $f ('nz', 'z', 'nc', 'c') {
+			for my $f ('NZ', 'Z', 'NC', 'C') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/cc/ sprintf("%02b", F($f)) /e;
 				$data1->{asm} =~ s/\bcc\b/$f/;
@@ -756,7 +761,7 @@ sub parse_r6k_opcode {
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /cx/) {
-			for my $xf ('gt', 'gtu', 'lt', 'v') {
+			for my $xf ('GT', 'GTU', 'LT', 'V') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/cx/ sprintf("%02b", XF($xf)) /e;
 				$data1->{asm} =~ s/\bcc\b/$xf/;
@@ -789,7 +794,7 @@ sub parse_r6k_opcode {
 			return parse_r6k_opcode($opcodes, $cpu, $data);
 		}
 		elsif ($data->{ops}[$i] =~ /ss/) {
-			for my $rp ('bc', 'de', 'hl', 'sp') {
+			for my $rp ('BC', 'DE', 'HL', 'SP') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/ss/ sprintf("%02b", RP($rp)) /e;
 				$data1->{asm} =~ s/\bss\b/$rp/;
@@ -798,7 +803,7 @@ sub parse_r6k_opcode {
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /dd/) {
-			for my $rp ('bc', 'de', 'hl', 'sp') {
+			for my $rp ('BC', 'DE', 'HL', 'SP') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/dd/ sprintf("%02b", RP($rp)) /e;
 				$data1->{asm} =~ s/\bdd\b/$rp/;
@@ -807,7 +812,7 @@ sub parse_r6k_opcode {
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /rr/) {
-			for my $xrp ('bc', 'de', 'ix', 'iy') {
+			for my $xrp ('BC', 'DE', 'IX', 'IY') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/rr/ sprintf("%02b", XRP($xrp)) /e;
 				$data1->{asm} =~ s/\brr\b/$xrp/;
@@ -816,7 +821,7 @@ sub parse_r6k_opcode {
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /zz/) {
-			for my $rp ('bc', 'de', 'hl', 'af') {
+			for my $rp ('BC', 'DE', 'HL', 'AF') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/zz/ sprintf("%02b", RP($rp)) /e;
 				$data1->{asm} =~ s/\bzz\b/$rp/;
@@ -825,7 +830,7 @@ sub parse_r6k_opcode {
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /xx/) {
-			for my $rp ('bc', 'de', 'ix', 'sp') {
+			for my $rp ('BC', 'DE', 'IX', 'SP') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/xx/ sprintf("%02b", RP($rp)) /e;
 				$data1->{asm} =~ s/\bxx\b/$rp/;
@@ -834,7 +839,7 @@ sub parse_r6k_opcode {
 			return;
 		}
 		elsif ($data->{ops}[$i] =~ /yy/) {
-			for my $rp ('bc', 'de', 'iy', 'sp') {
+			for my $rp ('BC', 'DE', 'IY', 'SP') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/yy/ sprintf("%02b", RP($rp)) /e;
 				$data1->{asm} =~ s/\byy\b/$rp/;
@@ -844,7 +849,7 @@ sub parse_r6k_opcode {
 		}
 		elsif ($data->{ops}[$i] =~ /(pp|ps|pd)/) {
 			my $got = $1;
-			for my $pp ('pw', 'px', 'py', 'pz') {
+			for my $pp ('PW', 'PX', 'PY', 'PZ') {
 				my $data1 = clone($data);
 				$data1->{ops}[$i] =~ s/$got/ sprintf("%02b", RABBIT_PP($pp)) /e;
 				$data1->{asm} =~ s/\b$got\b/$pp/;
