@@ -644,7 +644,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                 if( b < 0x80  ) {
                                     const char *lhs_vals[] = { "jkhl", "a", "hl", "jkhl"};
                                     uint8_t alu_op = b >> 4;
-                                    uint8_t lhs = (b & 0x18) >> 3;
+                                    uint8_t lhs = (b & 0x0c) >> 2;
                                     uint8_t rhstype = (b & 0x0c) >> 2;
                                     uint8_t psreg = (b & 0x03);
 
