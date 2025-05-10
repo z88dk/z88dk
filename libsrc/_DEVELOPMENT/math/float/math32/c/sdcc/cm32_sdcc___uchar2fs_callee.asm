@@ -10,6 +10,6 @@ cm32_sdcc___uchar2fs_callee:
 	dec	sp
 	pop	hl	;value
 	push	bc
-    ld  l,h
+	ld	l,h
 	ld	h,0
 	jp	m32_float16u
