@@ -3617,7 +3617,7 @@
  ld hl, sp                      ; ED 26
  ld hl, sp+0                    ; 21 00 00 39
  ld hl, sp+126                  ; 21 7E 00 39
- ld hl, sp-128                  ; 21 80 00 39
+ ld hl, sp-128                  ; 21 80 FF 39
  ld i, a                        ; ED 47
  ld ix, (0x1234)                ; DD 2A 34 12
  ld ix, (a:0x1234)              ; 52 DD 2A 34 12

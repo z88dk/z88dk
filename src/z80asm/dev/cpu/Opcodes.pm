@@ -298,7 +298,7 @@ sub search_opcode {
 		my $wildcard = $1;
 		my $opcode = $self->opcodes->{$asm1}{$cpu};
 		if ($opcode) {
-			return $self->_replace_opcode_su($opcode, $wildcard);
+			return $self->_replace_opcode_sign_extend($opcode, $wildcard);
 		}
 	}
 	
@@ -371,7 +371,7 @@ sub _replace_opcode_nn {
 	return $opcode;
 }
 
-sub _replace_opcode_su {
+sub _replace_opcode_sign_extend {
 	my($self, $opcode, $wildcard) = @_;
 	$opcode = clone($opcode); 	# make deep copy
 	for my $op ($opcode->ops) {
@@ -381,12 +381,14 @@ sub _replace_opcode_su {
 				while ($i < @$bytes && $bytes->[$i] ne '%m') {
 					$i++;
 				}
-				if ($i < @$bytes) {
-					$bytes->[$i++] = $wildcard;
-					while ($i < @$bytes) {
-						$bytes->[$i++] = 0;
+				while ($i < @$bytes) {
+					if ($wildcard) {
+						$bytes->[$i++] = $wildcard;
+						$wildcard = undef;
 					}
-					$wildcard = undef;
+					else {
+						$bytes->[$i++] = '%s'
+					}
 				}
 			}
 		}

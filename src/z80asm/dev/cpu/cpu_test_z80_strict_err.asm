@@ -18454,15 +18454,27 @@
  neg jkhl'                      ; Error
  neg l                          ; Error
  nextreg 0, 0                   ; Error
+ nextreg 0, 127                 ; Error
+ nextreg 0, 255                 ; Error
  nextreg 0, a                   ; Error
+ nextreg 127, 0                 ; Error
  nextreg 127, 127               ; Error
+ nextreg 127, 255               ; Error
  nextreg 127, a                 ; Error
+ nextreg 255, 0                 ; Error
+ nextreg 255, 127               ; Error
  nextreg 255, 255               ; Error
  nextreg 255, a                 ; Error
  nreg 0, 0                      ; Error
+ nreg 0, 127                    ; Error
+ nreg 0, 255                    ; Error
  nreg 0, a                      ; Error
+ nreg 127, 0                    ; Error
  nreg 127, 127                  ; Error
+ nreg 127, 255                  ; Error
  nreg 127, a                    ; Error
+ nreg 255, 0                    ; Error
+ nreg 255, 127                  ; Error
  nreg 255, 255                  ; Error
  nreg 255, a                    ; Error
  or (ahl)                       ; Error

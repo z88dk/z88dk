@@ -139,13 +139,12 @@ sub add_opcode_1 {
 	my($cpu, $asm, $ops, $const) = @_;
 	$ops = clone($ops);			# do not change caller's data
 	$const ||= [];
-	# separate prefixes from opcode
+
+	# separate prefixes from opcode becuase of (ix+d) with d at 2nd byte
 	my @ops;
 	while (@$ops > 1 && $ops->[1] =~ /^\d+$/ &&
-	    ($ops->[0] == 0x76 || $ops->[0] == 0xD3 || $ops->[0] == 0xDB || 	# rabbit
-		 ($cpu =~ /^r4k/ && ($ops->[0] == 0x40 || $ops->[0] == 0x64)) ||	# rabbit 4k
-		 ($cpu =~ /^r6k/ && ($ops->[0] == 0x40 || $ops->[0] == 0x49 ||
-		 $ops->[0] == 0x64 || $ops->[0] == 0x6D || $ops->[0] == 0x7F)) ||	# rabbit 4k
+	    ($ops->[0] == 0x76 || $ops->[0] == 0xD3 || $ops->[0] == 0xDB || # rabbit
+		 $ops->[0] == 0x40 || $ops->[0] == 0x64 ||						# rabbit >4k
 		 $ops->[0] == 0x40 || $ops->[0] == 0x49 || 
 		 $ops->[0] == 0x52 || $ops->[0] == 0x5B ||
 		 $ops->[0] == 0x7F)) {						# ez80 / kc160

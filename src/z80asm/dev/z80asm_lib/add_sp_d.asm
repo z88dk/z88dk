@@ -2,9 +2,9 @@
 ; uses self-modifying code
 
         SECTION code_l_sccz80
-        PUBLIC  __z80asm__add_sp_s
+        PUBLIC  __z80asm__add_sp_d
 
-__z80asm__add_sp_s:
+__z80asm__add_sp_d:
         ld      (save_a+1), a           ; save a - cannot use stack
         ld      (save_hl+1), hl         ; save hl - cannot use stack
         ld      (save_de+1), de         ; save de - cannot use stack

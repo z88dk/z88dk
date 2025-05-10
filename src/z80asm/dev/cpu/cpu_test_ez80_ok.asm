@@ -1907,7 +1907,7 @@
  ld hl, sp                      ; 21 00 00 00 39
  ld hl, sp+0                    ; 21 00 00 00 39
  ld hl, sp+126                  ; 21 7E 00 00 39
- ld hl, sp-128                  ; 21 80 00 00 39
+ ld hl, sp-128                  ; 21 80 FF FF 39
  ld i, a                        ; ED 47
  ld i, hl                       ; ED C7
  ld ix, (0x123456)              ; DD 2A 56 34 12

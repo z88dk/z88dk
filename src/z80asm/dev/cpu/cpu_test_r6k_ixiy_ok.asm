@@ -9147,7 +9147,7 @@
  ld hl, sp                      ; 21 00 00 39
  ld hl, sp+0                    ; 21 00 00 39
  ld hl, sp+126                  ; 21 7E 00 39
- ld hl, sp-128                  ; 21 80 00 39
+ ld hl, sp-128                  ; 21 80 FF 39
  ld hl, xpc                     ; 9F
  ld htr, a                      ; ED 40
  ld i, a                        ; ED 47

@@ -642,7 +642,7 @@
  ld hl, sp                      ; 21 00 00 39
  ld hl, sp+0                    ; 21 00 00 39
  ld hl, sp+126                  ; 21 7E 00 39
- ld hl, sp-128                  ; 21 80 00 39
+ ld hl, sp-128                  ; 21 80 FF 39
  ld l, (de)                     ; EB 5E EB
  ld l, (de+)                    ; EB 5E EB 13
  ld l, (de-)                    ; EB 5E EB 1B

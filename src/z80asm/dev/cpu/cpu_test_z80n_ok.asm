@@ -2479,7 +2479,7 @@
  ld hl, sp                      ; 21 00 00 39
  ld hl, sp+0                    ; 21 00 00 39
  ld hl, sp+126                  ; 21 7E 00 39
- ld hl, sp-128                  ; 21 80 00 39
+ ld hl, sp-128                  ; 21 80 FF 39
  ld i, a                        ; ED 47
  ld ix, (0x1234)                ; DD 2A 34 12
  ld ix, (hl)                    ; D5 5E 23 56 2B D5 DD E1 D1
@@ -3084,17 +3084,29 @@
  neg iy                         ; F5 FD 7C 2F FD 67 FD 7D 2F FD 6F FD 23 F1
  neg l                          ; F5 7D 2F 6F 2C F1
  nextreg 0, 0                   ; ED 91 00 00
+ nextreg 0, 127                 ; ED 91 00 00
+ nextreg 0, 255                 ; ED 91 00 00
  nextreg 0, a                   ; ED 92 00
- nextreg 127, 127               ; ED 91 7F 7F
+ nextreg 127, 0                 ; ED 91 7F 00
+ nextreg 127, 127               ; ED 91 7F 00
+ nextreg 127, 255               ; ED 91 7F 00
  nextreg 127, a                 ; ED 92 7F
- nextreg 255, 255               ; ED 91 FF FF
+ nextreg 255, 0                 ; ED 91 FF 00
+ nextreg 255, 127               ; ED 91 FF 00
+ nextreg 255, 255               ; ED 91 FF 00
  nextreg 255, a                 ; ED 92 FF
  nop                            ; 00
  nreg 0, 0                      ; ED 91 00 00
+ nreg 0, 127                    ; ED 91 00 00
+ nreg 0, 255                    ; ED 91 00 00
  nreg 0, a                      ; ED 92 00
- nreg 127, 127                  ; ED 91 7F 7F
+ nreg 127, 0                    ; ED 91 7F 00
+ nreg 127, 127                  ; ED 91 7F 00
+ nreg 127, 255                  ; ED 91 7F 00
  nreg 127, a                    ; ED 92 7F
- nreg 255, 255                  ; ED 91 FF FF
+ nreg 255, 0                    ; ED 91 FF 00
+ nreg 255, 127                  ; ED 91 FF 00
+ nreg 255, 255                  ; ED 91 FF 00
  nreg 255, a                    ; ED 92 FF
  or (hl)                        ; B6
  or (hl+)                       ; B6 23

@@ -3221,40 +3221,40 @@ adi %n|r800|_||C6 %n
 adi %n|z180|_||C6 %n
 adi %n|z80|_||C6 %n
 adi %n|z80n|_||C6 %n
-adi hl, %n|8080|X||E5;11 %n 00;19;EB;E1
+adi hl, %n|8080|X||E5;11 %n %s;19;EB;E1
 adi hl, %n|8085|_||28 %n
 adi hl, %n|8085_strict|_||28 %n
-adi hl, %n|ez80|X||E5;11 %n 00 00;19;EB;E1
-adi hl, %n|ez80_z80|X||E5;11 %n 00;19;EB;E1
-adi hl, %n|gbz80|X||E5;11 %n 00;19;E5;D5;E1;D1;E1
-adi hl, %n|kc160|X||E5;11 %n 00;19;EB;E1
-adi hl, %n|kc160_z80|X||E5;11 %n 00;19;EB;E1
-adi hl, %n|r2ka|X||E5;11 %n 00;19;EB;E1
-adi hl, %n|r3k|X||E5;11 %n 00;19;EB;E1
-adi hl, %n|r4k|X||E5;11 %n 00;19;EB;E1
-adi hl, %n|r5k|X||E5;11 %n 00;19;EB;E1
-adi hl, %n|r6k|X||E5;11 %n 00;19;EB;E1
-adi hl, %n|r800|X||E5;11 %n 00;19;EB;E1
-adi hl, %n|z180|X||E5;11 %n 00;19;EB;E1
-adi hl, %n|z80|X||E5;11 %n 00;19;EB;E1
-adi hl, %n|z80n|X||E5;11 %n 00;19;EB;E1
-adi sp, %n|8080|X||EB;21 %n 00;39;EB
+adi hl, %n|ez80|X||E5;11 %n %s %s;19;EB;E1
+adi hl, %n|ez80_z80|X||E5;11 %n %s;19;EB;E1
+adi hl, %n|gbz80|X||E5;11 %n %s;19;E5;D5;E1;D1;E1
+adi hl, %n|kc160|X||E5;11 %n %s;19;EB;E1
+adi hl, %n|kc160_z80|X||E5;11 %n %s;19;EB;E1
+adi hl, %n|r2ka|X||E5;11 %n %s;19;EB;E1
+adi hl, %n|r3k|X||E5;11 %n %s;19;EB;E1
+adi hl, %n|r4k|X||E5;11 %n %s;19;EB;E1
+adi hl, %n|r5k|X||E5;11 %n %s;19;EB;E1
+adi hl, %n|r6k|X||E5;11 %n %s;19;EB;E1
+adi hl, %n|r800|X||E5;11 %n %s;19;EB;E1
+adi hl, %n|z180|X||E5;11 %n %s;19;EB;E1
+adi hl, %n|z80|X||E5;11 %n %s;19;EB;E1
+adi hl, %n|z80n|X||E5;11 %n %s;19;EB;E1
+adi sp, %n|8080|X||EB;21 %n %s;39;EB
 adi sp, %n|8085|_||38 %n
 adi sp, %n|8085_strict|_||38 %n
-adi sp, %n|ez80|X||EB;21 %n 00 00;39;EB
-adi sp, %n|ez80_z80|X||EB;21 %n 00;39;EB
-adi sp, %n|gbz80|X||E5;D5;E1;D1;21 %n 00;39;E5;D5;E1;D1
-adi sp, %n|kc160|X||EB;21 %n 00;39;EB
-adi sp, %n|kc160_z80|X||EB;21 %n 00;39;EB
-adi sp, %n|r2ka|X||EB;21 %n 00;39;EB
-adi sp, %n|r3k|X||EB;21 %n 00;39;EB
-adi sp, %n|r4k|X||EB;21 %n 00;39;EB
-adi sp, %n|r5k|X||EB;21 %n 00;39;EB
-adi sp, %n|r6k|X||EB;21 %n 00;39;EB
-adi sp, %n|r800|X||EB;21 %n 00;39;EB
-adi sp, %n|z180|X||EB;21 %n 00;39;EB
-adi sp, %n|z80|X||EB;21 %n 00;39;EB
-adi sp, %n|z80n|X||EB;21 %n 00;39;EB
+adi sp, %n|ez80|X||EB;21 %n %s %s;39;EB
+adi sp, %n|ez80_z80|X||EB;21 %n %s;39;EB
+adi sp, %n|gbz80|X||E5;D5;E1;D1;21 %n %s;39;E5;D5;E1;D1
+adi sp, %n|kc160|X||EB;21 %n %s;39;EB
+adi sp, %n|kc160_z80|X||EB;21 %n %s;39;EB
+adi sp, %n|r2ka|X||EB;21 %n %s;39;EB
+adi sp, %n|r3k|X||EB;21 %n %s;39;EB
+adi sp, %n|r4k|X||EB;21 %n %s;39;EB
+adi sp, %n|r5k|X||EB;21 %n %s;39;EB
+adi sp, %n|r6k|X||EB;21 %n %s;39;EB
+adi sp, %n|r800|X||EB;21 %n %s;39;EB
+adi sp, %n|z180|X||EB;21 %n %s;39;EB
+adi sp, %n|z80|X||EB;21 %n %s;39;EB
+adi sp, %n|z80n|X||EB;21 %n %s;39;EB
 aesimc|r6k|_||49;B3
 aesimc|r6k_strict|_||49;B3
 aesisr|r6k|_||49;A3
@@ -10183,74 +10183,74 @@ altd ld bc, (pw)|r4k|_||76;6D 00 00
 altd ld bc, (pw)|r4k_strict|_||76;6D 00 00
 altd ld bc, (pw)|r5k|_||76;6D 00 00
 altd ld bc, (pw)|r5k_strict|_||76;6D 00 00
-altd ld bc, (pw)|r6k|_||76;6D;00 00
-altd ld bc, (pw)|r6k_strict|_||76;6D;00 00
+altd ld bc, (pw)|r6k|_||76;6D 00 00
+altd ld bc, (pw)|r6k_strict|_||76;6D 00 00
 altd ld bc, (pw+%d)|r4k|_||76;6D 00 %d
 altd ld bc, (pw+%d)|r4k_strict|_||76;6D 00 %d
 altd ld bc, (pw+%d)|r5k|_||76;6D 00 %d
 altd ld bc, (pw+%d)|r5k_strict|_||76;6D 00 %d
-altd ld bc, (pw+%d)|r6k|_||76;6D;00 %d
-altd ld bc, (pw+%d)|r6k_strict|_||76;6D;00 %d
+altd ld bc, (pw+%d)|r6k|_||76;6D 00 %d
+altd ld bc, (pw+%d)|r6k_strict|_||76;6D 00 %d
 altd ld bc, (pw+hl)|r4k|_||76;6D 02
 altd ld bc, (pw+hl)|r4k_strict|_||76;6D 02
 altd ld bc, (pw+hl)|r5k|_||76;6D 02
 altd ld bc, (pw+hl)|r5k_strict|_||76;6D 02
-altd ld bc, (pw+hl)|r6k|_||76;6D;02
-altd ld bc, (pw+hl)|r6k_strict|_||76;6D;02
+altd ld bc, (pw+hl)|r6k|_||76;6D 02
+altd ld bc, (pw+hl)|r6k_strict|_||76;6D 02
 altd ld bc, (px)|r4k|_||76;6D 10 00
 altd ld bc, (px)|r4k_strict|_||76;6D 10 00
 altd ld bc, (px)|r5k|_||76;6D 10 00
 altd ld bc, (px)|r5k_strict|_||76;6D 10 00
-altd ld bc, (px)|r6k|_||76;6D;10 00
-altd ld bc, (px)|r6k_strict|_||76;6D;10 00
+altd ld bc, (px)|r6k|_||76;6D 10 00
+altd ld bc, (px)|r6k_strict|_||76;6D 10 00
 altd ld bc, (px+%d)|r4k|_||76;6D 10 %d
 altd ld bc, (px+%d)|r4k_strict|_||76;6D 10 %d
 altd ld bc, (px+%d)|r5k|_||76;6D 10 %d
 altd ld bc, (px+%d)|r5k_strict|_||76;6D 10 %d
-altd ld bc, (px+%d)|r6k|_||76;6D;10 %d
-altd ld bc, (px+%d)|r6k_strict|_||76;6D;10 %d
+altd ld bc, (px+%d)|r6k|_||76;6D 10 %d
+altd ld bc, (px+%d)|r6k_strict|_||76;6D 10 %d
 altd ld bc, (px+hl)|r4k|_||76;6D 12
 altd ld bc, (px+hl)|r4k_strict|_||76;6D 12
 altd ld bc, (px+hl)|r5k|_||76;6D 12
 altd ld bc, (px+hl)|r5k_strict|_||76;6D 12
-altd ld bc, (px+hl)|r6k|_||76;6D;12
-altd ld bc, (px+hl)|r6k_strict|_||76;6D;12
+altd ld bc, (px+hl)|r6k|_||76;6D 12
+altd ld bc, (px+hl)|r6k_strict|_||76;6D 12
 altd ld bc, (py)|r4k|_||76;6D 20 00
 altd ld bc, (py)|r4k_strict|_||76;6D 20 00
 altd ld bc, (py)|r5k|_||76;6D 20 00
 altd ld bc, (py)|r5k_strict|_||76;6D 20 00
-altd ld bc, (py)|r6k|_||76;6D;20 00
-altd ld bc, (py)|r6k_strict|_||76;6D;20 00
+altd ld bc, (py)|r6k|_||76;6D 20 00
+altd ld bc, (py)|r6k_strict|_||76;6D 20 00
 altd ld bc, (py+%d)|r4k|_||76;6D 20 %d
 altd ld bc, (py+%d)|r4k_strict|_||76;6D 20 %d
 altd ld bc, (py+%d)|r5k|_||76;6D 20 %d
 altd ld bc, (py+%d)|r5k_strict|_||76;6D 20 %d
-altd ld bc, (py+%d)|r6k|_||76;6D;20 %d
-altd ld bc, (py+%d)|r6k_strict|_||76;6D;20 %d
+altd ld bc, (py+%d)|r6k|_||76;6D 20 %d
+altd ld bc, (py+%d)|r6k_strict|_||76;6D 20 %d
 altd ld bc, (py+hl)|r4k|_||76;6D 22
 altd ld bc, (py+hl)|r4k_strict|_||76;6D 22
 altd ld bc, (py+hl)|r5k|_||76;6D 22
 altd ld bc, (py+hl)|r5k_strict|_||76;6D 22
-altd ld bc, (py+hl)|r6k|_||76;6D;22
-altd ld bc, (py+hl)|r6k_strict|_||76;6D;22
+altd ld bc, (py+hl)|r6k|_||76;6D 22
+altd ld bc, (py+hl)|r6k_strict|_||76;6D 22
 altd ld bc, (pz)|r4k|_||76;6D 30 00
 altd ld bc, (pz)|r4k_strict|_||76;6D 30 00
 altd ld bc, (pz)|r5k|_||76;6D 30 00
 altd ld bc, (pz)|r5k_strict|_||76;6D 30 00
-altd ld bc, (pz)|r6k|_||76;6D;30 00
-altd ld bc, (pz)|r6k_strict|_||76;6D;30 00
+altd ld bc, (pz)|r6k|_||76;6D 30 00
+altd ld bc, (pz)|r6k_strict|_||76;6D 30 00
 altd ld bc, (pz+%d)|r4k|_||76;6D 30 %d
 altd ld bc, (pz+%d)|r4k_strict|_||76;6D 30 %d
 altd ld bc, (pz+%d)|r5k|_||76;6D 30 %d
 altd ld bc, (pz+%d)|r5k_strict|_||76;6D 30 %d
-altd ld bc, (pz+%d)|r6k|_||76;6D;30 %d
-altd ld bc, (pz+%d)|r6k_strict|_||76;6D;30 %d
+altd ld bc, (pz+%d)|r6k|_||76;6D 30 %d
+altd ld bc, (pz+%d)|r6k_strict|_||76;6D 30 %d
 altd ld bc, (pz+hl)|r4k|_||76;6D 32
 altd ld bc, (pz+hl)|r4k_strict|_||76;6D 32
 altd ld bc, (pz+hl)|r5k|_||76;6D 32
 altd ld bc, (pz+hl)|r5k_strict|_||76;6D 32
-altd ld bc, (pz+hl)|r6k|_||76;6D;32
-altd ld bc, (pz+hl)|r6k_strict|_||76;6D;32
+altd ld bc, (pz+hl)|r6k|_||76;6D 32
+altd ld bc, (pz+hl)|r6k_strict|_||76;6D 32
 altd ld bc, bc|r2ka|_||ED 49
 altd ld bc, bc|r2ka_strict|_||ED 49
 altd ld bc, bc|r3k|_||ED 49
@@ -10759,74 +10759,74 @@ altd ld de, (pw)|r4k|_||76;6D 40 00
 altd ld de, (pw)|r4k_strict|_||76;6D 40 00
 altd ld de, (pw)|r5k|_||76;6D 40 00
 altd ld de, (pw)|r5k_strict|_||76;6D 40 00
-altd ld de, (pw)|r6k|_||76;6D;40;00
-altd ld de, (pw)|r6k_strict|_||76;6D;40;00
+altd ld de, (pw)|r6k|_||76;6D 40 00
+altd ld de, (pw)|r6k_strict|_||76;6D 40 00
 altd ld de, (pw+%d)|r4k|_||76;6D 40 %d
 altd ld de, (pw+%d)|r4k_strict|_||76;6D 40 %d
 altd ld de, (pw+%d)|r5k|_||76;6D 40 %d
 altd ld de, (pw+%d)|r5k_strict|_||76;6D 40 %d
-altd ld de, (pw+%d)|r6k|_||76;6D;40 %d
-altd ld de, (pw+%d)|r6k_strict|_||76;6D;40 %d
+altd ld de, (pw+%d)|r6k|_||76;6D 40 %d
+altd ld de, (pw+%d)|r6k_strict|_||76;6D 40 %d
 altd ld de, (pw+hl)|r4k|_||76;6D 42
 altd ld de, (pw+hl)|r4k_strict|_||76;6D 42
 altd ld de, (pw+hl)|r5k|_||76;6D 42
 altd ld de, (pw+hl)|r5k_strict|_||76;6D 42
-altd ld de, (pw+hl)|r6k|_||76;6D;42
-altd ld de, (pw+hl)|r6k_strict|_||76;6D;42
+altd ld de, (pw+hl)|r6k|_||76;6D 42
+altd ld de, (pw+hl)|r6k_strict|_||76;6D 42
 altd ld de, (px)|r4k|_||76;6D 50 00
 altd ld de, (px)|r4k_strict|_||76;6D 50 00
 altd ld de, (px)|r5k|_||76;6D 50 00
 altd ld de, (px)|r5k_strict|_||76;6D 50 00
-altd ld de, (px)|r6k|_||76;6D;50 00
-altd ld de, (px)|r6k_strict|_||76;6D;50 00
+altd ld de, (px)|r6k|_||76;6D 50 00
+altd ld de, (px)|r6k_strict|_||76;6D 50 00
 altd ld de, (px+%d)|r4k|_||76;6D 50 %d
 altd ld de, (px+%d)|r4k_strict|_||76;6D 50 %d
 altd ld de, (px+%d)|r5k|_||76;6D 50 %d
 altd ld de, (px+%d)|r5k_strict|_||76;6D 50 %d
-altd ld de, (px+%d)|r6k|_||76;6D;50 %d
-altd ld de, (px+%d)|r6k_strict|_||76;6D;50 %d
+altd ld de, (px+%d)|r6k|_||76;6D 50 %d
+altd ld de, (px+%d)|r6k_strict|_||76;6D 50 %d
 altd ld de, (px+hl)|r4k|_||76;6D 52
 altd ld de, (px+hl)|r4k_strict|_||76;6D 52
 altd ld de, (px+hl)|r5k|_||76;6D 52
 altd ld de, (px+hl)|r5k_strict|_||76;6D 52
-altd ld de, (px+hl)|r6k|_||76;6D;52
-altd ld de, (px+hl)|r6k_strict|_||76;6D;52
+altd ld de, (px+hl)|r6k|_||76;6D 52
+altd ld de, (px+hl)|r6k_strict|_||76;6D 52
 altd ld de, (py)|r4k|_||76;6D 60 00
 altd ld de, (py)|r4k_strict|_||76;6D 60 00
 altd ld de, (py)|r5k|_||76;6D 60 00
 altd ld de, (py)|r5k_strict|_||76;6D 60 00
-altd ld de, (py)|r6k|_||76;6D;60 00
-altd ld de, (py)|r6k_strict|_||76;6D;60 00
+altd ld de, (py)|r6k|_||76;6D 60 00
+altd ld de, (py)|r6k_strict|_||76;6D 60 00
 altd ld de, (py+%d)|r4k|_||76;6D 60 %d
 altd ld de, (py+%d)|r4k_strict|_||76;6D 60 %d
 altd ld de, (py+%d)|r5k|_||76;6D 60 %d
 altd ld de, (py+%d)|r5k_strict|_||76;6D 60 %d
-altd ld de, (py+%d)|r6k|_||76;6D;60 %d
-altd ld de, (py+%d)|r6k_strict|_||76;6D;60 %d
+altd ld de, (py+%d)|r6k|_||76;6D 60 %d
+altd ld de, (py+%d)|r6k_strict|_||76;6D 60 %d
 altd ld de, (py+hl)|r4k|_||76;6D 62
 altd ld de, (py+hl)|r4k_strict|_||76;6D 62
 altd ld de, (py+hl)|r5k|_||76;6D 62
 altd ld de, (py+hl)|r5k_strict|_||76;6D 62
-altd ld de, (py+hl)|r6k|_||76;6D;62
-altd ld de, (py+hl)|r6k_strict|_||76;6D;62
+altd ld de, (py+hl)|r6k|_||76;6D 62
+altd ld de, (py+hl)|r6k_strict|_||76;6D 62
 altd ld de, (pz)|r4k|_||76;6D 70 00
 altd ld de, (pz)|r4k_strict|_||76;6D 70 00
 altd ld de, (pz)|r5k|_||76;6D 70 00
 altd ld de, (pz)|r5k_strict|_||76;6D 70 00
-altd ld de, (pz)|r6k|_||76;6D;70 00
-altd ld de, (pz)|r6k_strict|_||76;6D;70 00
+altd ld de, (pz)|r6k|_||76;6D 70 00
+altd ld de, (pz)|r6k_strict|_||76;6D 70 00
 altd ld de, (pz+%d)|r4k|_||76;6D 70 %d
 altd ld de, (pz+%d)|r4k_strict|_||76;6D 70 %d
 altd ld de, (pz+%d)|r5k|_||76;6D 70 %d
 altd ld de, (pz+%d)|r5k_strict|_||76;6D 70 %d
-altd ld de, (pz+%d)|r6k|_||76;6D;70 %d
-altd ld de, (pz+%d)|r6k_strict|_||76;6D;70 %d
+altd ld de, (pz+%d)|r6k|_||76;6D 70 %d
+altd ld de, (pz+%d)|r6k_strict|_||76;6D 70 %d
 altd ld de, (pz+hl)|r4k|_||76;6D 72
 altd ld de, (pz+hl)|r4k_strict|_||76;6D 72
 altd ld de, (pz+hl)|r5k|_||76;6D 72
 altd ld de, (pz+hl)|r5k_strict|_||76;6D 72
-altd ld de, (pz+hl)|r6k|_||76;6D;72
-altd ld de, (pz+hl)|r6k_strict|_||76;6D;72
+altd ld de, (pz+hl)|r6k|_||76;6D 72
+altd ld de, (pz+hl)|r6k_strict|_||76;6D 72
 altd ld de, bc|r2ka|_||ED 59
 altd ld de, bc|r2ka_strict|_||ED 59
 altd ld de, bc|r3k|_||ED 59
@@ -11701,770 +11701,770 @@ altd ld pw, (pw)|r4k|_||76;6D 08 00
 altd ld pw, (pw)|r4k_strict|_||76;6D 08 00
 altd ld pw, (pw)|r5k|_||76;6D 08 00
 altd ld pw, (pw)|r5k_strict|_||76;6D 08 00
-altd ld pw, (pw)|r6k|_||76;6D;08 00
-altd ld pw, (pw)|r6k_strict|_||76;6D;08 00
+altd ld pw, (pw)|r6k|_||76;6D 08 00
+altd ld pw, (pw)|r6k_strict|_||76;6D 08 00
 altd ld pw, (pw+%d)|r4k|_||76;6D 08 %d
 altd ld pw, (pw+%d)|r4k_strict|_||76;6D 08 %d
 altd ld pw, (pw+%d)|r5k|_||76;6D 08 %d
 altd ld pw, (pw+%d)|r5k_strict|_||76;6D 08 %d
-altd ld pw, (pw+%d)|r6k|_||76;6D;08 %d
-altd ld pw, (pw+%d)|r6k_strict|_||76;6D;08 %d
+altd ld pw, (pw+%d)|r6k|_||76;6D 08 %d
+altd ld pw, (pw+%d)|r6k_strict|_||76;6D 08 %d
 altd ld pw, (pw+hl)|r4k|_||76;6D 0A
 altd ld pw, (pw+hl)|r4k_strict|_||76;6D 0A
 altd ld pw, (pw+hl)|r5k|_||76;6D 0A
 altd ld pw, (pw+hl)|r5k_strict|_||76;6D 0A
-altd ld pw, (pw+hl)|r6k|_||76;6D;0A
-altd ld pw, (pw+hl)|r6k_strict|_||76;6D;0A
+altd ld pw, (pw+hl)|r6k|_||76;6D 0A
+altd ld pw, (pw+hl)|r6k_strict|_||76;6D 0A
 altd ld pw, (px)|r4k|_||76;6D 18 00
 altd ld pw, (px)|r4k_strict|_||76;6D 18 00
 altd ld pw, (px)|r5k|_||76;6D 18 00
 altd ld pw, (px)|r5k_strict|_||76;6D 18 00
-altd ld pw, (px)|r6k|_||76;6D;18 00
-altd ld pw, (px)|r6k_strict|_||76;6D;18 00
+altd ld pw, (px)|r6k|_||76;6D 18 00
+altd ld pw, (px)|r6k_strict|_||76;6D 18 00
 altd ld pw, (px+%d)|r4k|_||76;6D 18 %d
 altd ld pw, (px+%d)|r4k_strict|_||76;6D 18 %d
 altd ld pw, (px+%d)|r5k|_||76;6D 18 %d
 altd ld pw, (px+%d)|r5k_strict|_||76;6D 18 %d
-altd ld pw, (px+%d)|r6k|_||76;6D;18 %d
-altd ld pw, (px+%d)|r6k_strict|_||76;6D;18 %d
+altd ld pw, (px+%d)|r6k|_||76;6D 18 %d
+altd ld pw, (px+%d)|r6k_strict|_||76;6D 18 %d
 altd ld pw, (px+hl)|r4k|_||76;6D 1A
 altd ld pw, (px+hl)|r4k_strict|_||76;6D 1A
 altd ld pw, (px+hl)|r5k|_||76;6D 1A
 altd ld pw, (px+hl)|r5k_strict|_||76;6D 1A
-altd ld pw, (px+hl)|r6k|_||76;6D;1A
-altd ld pw, (px+hl)|r6k_strict|_||76;6D;1A
+altd ld pw, (px+hl)|r6k|_||76;6D 1A
+altd ld pw, (px+hl)|r6k_strict|_||76;6D 1A
 altd ld pw, (py)|r4k|_||76;6D 28 00
 altd ld pw, (py)|r4k_strict|_||76;6D 28 00
 altd ld pw, (py)|r5k|_||76;6D 28 00
 altd ld pw, (py)|r5k_strict|_||76;6D 28 00
-altd ld pw, (py)|r6k|_||76;6D;28 00
-altd ld pw, (py)|r6k_strict|_||76;6D;28 00
+altd ld pw, (py)|r6k|_||76;6D 28 00
+altd ld pw, (py)|r6k_strict|_||76;6D 28 00
 altd ld pw, (py+%d)|r4k|_||76;6D 28 %d
 altd ld pw, (py+%d)|r4k_strict|_||76;6D 28 %d
 altd ld pw, (py+%d)|r5k|_||76;6D 28 %d
 altd ld pw, (py+%d)|r5k_strict|_||76;6D 28 %d
-altd ld pw, (py+%d)|r6k|_||76;6D;28 %d
-altd ld pw, (py+%d)|r6k_strict|_||76;6D;28 %d
+altd ld pw, (py+%d)|r6k|_||76;6D 28 %d
+altd ld pw, (py+%d)|r6k_strict|_||76;6D 28 %d
 altd ld pw, (py+hl)|r4k|_||76;6D 2A
 altd ld pw, (py+hl)|r4k_strict|_||76;6D 2A
 altd ld pw, (py+hl)|r5k|_||76;6D 2A
 altd ld pw, (py+hl)|r5k_strict|_||76;6D 2A
-altd ld pw, (py+hl)|r6k|_||76;6D;2A
-altd ld pw, (py+hl)|r6k_strict|_||76;6D;2A
+altd ld pw, (py+hl)|r6k|_||76;6D 2A
+altd ld pw, (py+hl)|r6k_strict|_||76;6D 2A
 altd ld pw, (pz)|r4k|_||76;6D 38 00
 altd ld pw, (pz)|r4k_strict|_||76;6D 38 00
 altd ld pw, (pz)|r5k|_||76;6D 38 00
 altd ld pw, (pz)|r5k_strict|_||76;6D 38 00
-altd ld pw, (pz)|r6k|_||76;6D;38 00
-altd ld pw, (pz)|r6k_strict|_||76;6D;38 00
+altd ld pw, (pz)|r6k|_||76;6D 38 00
+altd ld pw, (pz)|r6k_strict|_||76;6D 38 00
 altd ld pw, (pz+%d)|r4k|_||76;6D 38 %d
 altd ld pw, (pz+%d)|r4k_strict|_||76;6D 38 %d
 altd ld pw, (pz+%d)|r5k|_||76;6D 38 %d
 altd ld pw, (pz+%d)|r5k_strict|_||76;6D 38 %d
-altd ld pw, (pz+%d)|r6k|_||76;6D;38 %d
-altd ld pw, (pz+%d)|r6k_strict|_||76;6D;38 %d
+altd ld pw, (pz+%d)|r6k|_||76;6D 38 %d
+altd ld pw, (pz+%d)|r6k_strict|_||76;6D 38 %d
 altd ld pw, (pz+hl)|r4k|_||76;6D 3A
 altd ld pw, (pz+hl)|r4k_strict|_||76;6D 3A
 altd ld pw, (pz+hl)|r5k|_||76;6D 3A
 altd ld pw, (pz+hl)|r5k_strict|_||76;6D 3A
-altd ld pw, (pz+hl)|r6k|_||76;6D;3A
-altd ld pw, (pz+hl)|r6k_strict|_||76;6D;3A
+altd ld pw, (pz+hl)|r6k|_||76;6D 3A
+altd ld pw, (pz+hl)|r6k_strict|_||76;6D 3A
 altd ld pw, pw|r4k|_||76;6D 07
 altd ld pw, pw|r4k_strict|_||76;6D 07
 altd ld pw, pw|r5k|_||76;6D 07
 altd ld pw, pw|r5k_strict|_||76;6D 07
-altd ld pw, pw|r6k|_||76;6D;07
-altd ld pw, pw|r6k_strict|_||76;6D;07
+altd ld pw, pw|r6k|_||76;6D 07
+altd ld pw, pw|r6k_strict|_||76;6D 07
 altd ld pw, pw+de|r4k|_||76;6D 06
 altd ld pw, pw+de|r4k_strict|_||76;6D 06
 altd ld pw, pw+de|r5k|_||76;6D 06
 altd ld pw, pw+de|r5k_strict|_||76;6D 06
-altd ld pw, pw+de|r6k|_||76;6D;06
-altd ld pw, pw+de|r6k_strict|_||76;6D;06
+altd ld pw, pw+de|r6k|_||76;6D 06
+altd ld pw, pw+de|r6k_strict|_||76;6D 06
 altd ld pw, pw+hl|r4k|_||76;6D 0E
 altd ld pw, pw+hl|r4k_strict|_||76;6D 0E
 altd ld pw, pw+hl|r5k|_||76;6D 0E
 altd ld pw, pw+hl|r5k_strict|_||76;6D 0E
-altd ld pw, pw+hl|r6k|_||76;6D;0E
-altd ld pw, pw+hl|r6k_strict|_||76;6D;0E
+altd ld pw, pw+hl|r6k|_||76;6D 0E
+altd ld pw, pw+hl|r6k_strict|_||76;6D 0E
 altd ld pw, pw+ix|r4k|_||76;6D 04
 altd ld pw, pw+ix|r4k_strict|_||76;6D 04
 altd ld pw, pw+ix|r5k|_||76;6D 04
 altd ld pw, pw+ix|r5k_strict|_||76;6D 04
-altd ld pw, pw+ix|r6k|_||76;6D;04
-altd ld pw, pw+ix|r6k_strict|_||76;6D;04
+altd ld pw, pw+ix|r6k|_||76;6D 04
+altd ld pw, pw+ix|r6k_strict|_||76;6D 04
 altd ld pw, pw+iy|r4k|_||76;6D 05
 altd ld pw, pw+iy|r4k_strict|_||76;6D 05
 altd ld pw, pw+iy|r5k|_||76;6D 05
 altd ld pw, pw+iy|r5k_strict|_||76;6D 05
-altd ld pw, pw+iy|r6k|_||76;6D;05
-altd ld pw, pw+iy|r6k_strict|_||76;6D;05
+altd ld pw, pw+iy|r6k|_||76;6D 05
+altd ld pw, pw+iy|r6k_strict|_||76;6D 05
 altd ld pw, px|r4k|_||76;6D 17
 altd ld pw, px|r4k_strict|_||76;6D 17
 altd ld pw, px|r5k|_||76;6D 17
 altd ld pw, px|r5k_strict|_||76;6D 17
-altd ld pw, px|r6k|_||76;6D;17
-altd ld pw, px|r6k_strict|_||76;6D;17
+altd ld pw, px|r6k|_||76;6D 17
+altd ld pw, px|r6k_strict|_||76;6D 17
 altd ld pw, px+de|r4k|_||76;6D 16
 altd ld pw, px+de|r4k_strict|_||76;6D 16
 altd ld pw, px+de|r5k|_||76;6D 16
 altd ld pw, px+de|r5k_strict|_||76;6D 16
-altd ld pw, px+de|r6k|_||76;6D;16
-altd ld pw, px+de|r6k_strict|_||76;6D;16
+altd ld pw, px+de|r6k|_||76;6D 16
+altd ld pw, px+de|r6k_strict|_||76;6D 16
 altd ld pw, px+hl|r4k|_||76;6D 1E
 altd ld pw, px+hl|r4k_strict|_||76;6D 1E
 altd ld pw, px+hl|r5k|_||76;6D 1E
 altd ld pw, px+hl|r5k_strict|_||76;6D 1E
-altd ld pw, px+hl|r6k|_||76;6D;1E
-altd ld pw, px+hl|r6k_strict|_||76;6D;1E
+altd ld pw, px+hl|r6k|_||76;6D 1E
+altd ld pw, px+hl|r6k_strict|_||76;6D 1E
 altd ld pw, px+ix|r4k|_||76;6D 14
 altd ld pw, px+ix|r4k_strict|_||76;6D 14
 altd ld pw, px+ix|r5k|_||76;6D 14
 altd ld pw, px+ix|r5k_strict|_||76;6D 14
-altd ld pw, px+ix|r6k|_||76;6D;14
-altd ld pw, px+ix|r6k_strict|_||76;6D;14
+altd ld pw, px+ix|r6k|_||76;6D 14
+altd ld pw, px+ix|r6k_strict|_||76;6D 14
 altd ld pw, px+iy|r4k|_||76;6D 15
 altd ld pw, px+iy|r4k_strict|_||76;6D 15
 altd ld pw, px+iy|r5k|_||76;6D 15
 altd ld pw, px+iy|r5k_strict|_||76;6D 15
-altd ld pw, px+iy|r6k|_||76;6D;15
-altd ld pw, px+iy|r6k_strict|_||76;6D;15
+altd ld pw, px+iy|r6k|_||76;6D 15
+altd ld pw, px+iy|r6k_strict|_||76;6D 15
 altd ld pw, py|r4k|_||76;6D 27
 altd ld pw, py|r4k_strict|_||76;6D 27
 altd ld pw, py|r5k|_||76;6D 27
 altd ld pw, py|r5k_strict|_||76;6D 27
-altd ld pw, py|r6k|_||76;6D;27
-altd ld pw, py|r6k_strict|_||76;6D;27
+altd ld pw, py|r6k|_||76;6D 27
+altd ld pw, py|r6k_strict|_||76;6D 27
 altd ld pw, py+de|r4k|_||76;6D 26
 altd ld pw, py+de|r4k_strict|_||76;6D 26
 altd ld pw, py+de|r5k|_||76;6D 26
 altd ld pw, py+de|r5k_strict|_||76;6D 26
-altd ld pw, py+de|r6k|_||76;6D;26
-altd ld pw, py+de|r6k_strict|_||76;6D;26
+altd ld pw, py+de|r6k|_||76;6D 26
+altd ld pw, py+de|r6k_strict|_||76;6D 26
 altd ld pw, py+hl|r4k|_||76;6D 2E
 altd ld pw, py+hl|r4k_strict|_||76;6D 2E
 altd ld pw, py+hl|r5k|_||76;6D 2E
 altd ld pw, py+hl|r5k_strict|_||76;6D 2E
-altd ld pw, py+hl|r6k|_||76;6D;2E
-altd ld pw, py+hl|r6k_strict|_||76;6D;2E
+altd ld pw, py+hl|r6k|_||76;6D 2E
+altd ld pw, py+hl|r6k_strict|_||76;6D 2E
 altd ld pw, py+ix|r4k|_||76;6D 24
 altd ld pw, py+ix|r4k_strict|_||76;6D 24
 altd ld pw, py+ix|r5k|_||76;6D 24
 altd ld pw, py+ix|r5k_strict|_||76;6D 24
-altd ld pw, py+ix|r6k|_||76;6D;24
-altd ld pw, py+ix|r6k_strict|_||76;6D;24
+altd ld pw, py+ix|r6k|_||76;6D 24
+altd ld pw, py+ix|r6k_strict|_||76;6D 24
 altd ld pw, py+iy|r4k|_||76;6D 25
 altd ld pw, py+iy|r4k_strict|_||76;6D 25
 altd ld pw, py+iy|r5k|_||76;6D 25
 altd ld pw, py+iy|r5k_strict|_||76;6D 25
-altd ld pw, py+iy|r6k|_||76;6D;25
-altd ld pw, py+iy|r6k_strict|_||76;6D;25
+altd ld pw, py+iy|r6k|_||76;6D 25
+altd ld pw, py+iy|r6k_strict|_||76;6D 25
 altd ld pw, pz|r4k|_||76;6D 37
 altd ld pw, pz|r4k_strict|_||76;6D 37
 altd ld pw, pz|r5k|_||76;6D 37
 altd ld pw, pz|r5k_strict|_||76;6D 37
-altd ld pw, pz|r6k|_||76;6D;37
-altd ld pw, pz|r6k_strict|_||76;6D;37
+altd ld pw, pz|r6k|_||76;6D 37
+altd ld pw, pz|r6k_strict|_||76;6D 37
 altd ld pw, pz+de|r4k|_||76;6D 36
 altd ld pw, pz+de|r4k_strict|_||76;6D 36
 altd ld pw, pz+de|r5k|_||76;6D 36
 altd ld pw, pz+de|r5k_strict|_||76;6D 36
-altd ld pw, pz+de|r6k|_||76;6D;36
-altd ld pw, pz+de|r6k_strict|_||76;6D;36
+altd ld pw, pz+de|r6k|_||76;6D 36
+altd ld pw, pz+de|r6k_strict|_||76;6D 36
 altd ld pw, pz+hl|r4k|_||76;6D 3E
 altd ld pw, pz+hl|r4k_strict|_||76;6D 3E
 altd ld pw, pz+hl|r5k|_||76;6D 3E
 altd ld pw, pz+hl|r5k_strict|_||76;6D 3E
-altd ld pw, pz+hl|r6k|_||76;6D;3E
-altd ld pw, pz+hl|r6k_strict|_||76;6D;3E
+altd ld pw, pz+hl|r6k|_||76;6D 3E
+altd ld pw, pz+hl|r6k_strict|_||76;6D 3E
 altd ld pw, pz+ix|r4k|_||76;6D 34
 altd ld pw, pz+ix|r4k_strict|_||76;6D 34
 altd ld pw, pz+ix|r5k|_||76;6D 34
 altd ld pw, pz+ix|r5k_strict|_||76;6D 34
-altd ld pw, pz+ix|r6k|_||76;6D;34
-altd ld pw, pz+ix|r6k_strict|_||76;6D;34
+altd ld pw, pz+ix|r6k|_||76;6D 34
+altd ld pw, pz+ix|r6k_strict|_||76;6D 34
 altd ld pw, pz+iy|r4k|_||76;6D 35
 altd ld pw, pz+iy|r4k_strict|_||76;6D 35
 altd ld pw, pz+iy|r5k|_||76;6D 35
 altd ld pw, pz+iy|r5k_strict|_||76;6D 35
-altd ld pw, pz+iy|r6k|_||76;6D;35
-altd ld pw, pz+iy|r6k_strict|_||76;6D;35
+altd ld pw, pz+iy|r6k|_||76;6D 35
+altd ld pw, pz+iy|r6k_strict|_||76;6D 35
 altd ld px, (pw)|r4k|_||76;6D 48 00
 altd ld px, (pw)|r4k_strict|_||76;6D 48 00
 altd ld px, (pw)|r5k|_||76;6D 48 00
 altd ld px, (pw)|r5k_strict|_||76;6D 48 00
-altd ld px, (pw)|r6k|_||76;6D;48 00
-altd ld px, (pw)|r6k_strict|_||76;6D;48 00
+altd ld px, (pw)|r6k|_||76;6D 48 00
+altd ld px, (pw)|r6k_strict|_||76;6D 48 00
 altd ld px, (pw+%d)|r4k|_||76;6D 48 %d
 altd ld px, (pw+%d)|r4k_strict|_||76;6D 48 %d
 altd ld px, (pw+%d)|r5k|_||76;6D 48 %d
 altd ld px, (pw+%d)|r5k_strict|_||76;6D 48 %d
-altd ld px, (pw+%d)|r6k|_||76;6D;48 %d
-altd ld px, (pw+%d)|r6k_strict|_||76;6D;48 %d
+altd ld px, (pw+%d)|r6k|_||76;6D 48 %d
+altd ld px, (pw+%d)|r6k_strict|_||76;6D 48 %d
 altd ld px, (pw+hl)|r4k|_||76;6D 4A
 altd ld px, (pw+hl)|r4k_strict|_||76;6D 4A
 altd ld px, (pw+hl)|r5k|_||76;6D 4A
 altd ld px, (pw+hl)|r5k_strict|_||76;6D 4A
-altd ld px, (pw+hl)|r6k|_||76;6D;4A
-altd ld px, (pw+hl)|r6k_strict|_||76;6D;4A
+altd ld px, (pw+hl)|r6k|_||76;6D 4A
+altd ld px, (pw+hl)|r6k_strict|_||76;6D 4A
 altd ld px, (px)|r4k|_||76;6D 58 00
 altd ld px, (px)|r4k_strict|_||76;6D 58 00
 altd ld px, (px)|r5k|_||76;6D 58 00
 altd ld px, (px)|r5k_strict|_||76;6D 58 00
-altd ld px, (px)|r6k|_||76;6D;58 00
-altd ld px, (px)|r6k_strict|_||76;6D;58 00
+altd ld px, (px)|r6k|_||76;6D 58 00
+altd ld px, (px)|r6k_strict|_||76;6D 58 00
 altd ld px, (px+%d)|r4k|_||76;6D 58 %d
 altd ld px, (px+%d)|r4k_strict|_||76;6D 58 %d
 altd ld px, (px+%d)|r5k|_||76;6D 58 %d
 altd ld px, (px+%d)|r5k_strict|_||76;6D 58 %d
-altd ld px, (px+%d)|r6k|_||76;6D;58 %d
-altd ld px, (px+%d)|r6k_strict|_||76;6D;58 %d
+altd ld px, (px+%d)|r6k|_||76;6D 58 %d
+altd ld px, (px+%d)|r6k_strict|_||76;6D 58 %d
 altd ld px, (px+hl)|r4k|_||76;6D 5A
 altd ld px, (px+hl)|r4k_strict|_||76;6D 5A
 altd ld px, (px+hl)|r5k|_||76;6D 5A
 altd ld px, (px+hl)|r5k_strict|_||76;6D 5A
-altd ld px, (px+hl)|r6k|_||76;6D;5A
-altd ld px, (px+hl)|r6k_strict|_||76;6D;5A
+altd ld px, (px+hl)|r6k|_||76;6D 5A
+altd ld px, (px+hl)|r6k_strict|_||76;6D 5A
 altd ld px, (py)|r4k|_||76;6D 68 00
 altd ld px, (py)|r4k_strict|_||76;6D 68 00
 altd ld px, (py)|r5k|_||76;6D 68 00
 altd ld px, (py)|r5k_strict|_||76;6D 68 00
-altd ld px, (py)|r6k|_||76;6D;68 00
-altd ld px, (py)|r6k_strict|_||76;6D;68 00
+altd ld px, (py)|r6k|_||76;6D 68 00
+altd ld px, (py)|r6k_strict|_||76;6D 68 00
 altd ld px, (py+%d)|r4k|_||76;6D 68 %d
 altd ld px, (py+%d)|r4k_strict|_||76;6D 68 %d
 altd ld px, (py+%d)|r5k|_||76;6D 68 %d
 altd ld px, (py+%d)|r5k_strict|_||76;6D 68 %d
-altd ld px, (py+%d)|r6k|_||76;6D;68 %d
-altd ld px, (py+%d)|r6k_strict|_||76;6D;68 %d
+altd ld px, (py+%d)|r6k|_||76;6D 68 %d
+altd ld px, (py+%d)|r6k_strict|_||76;6D 68 %d
 altd ld px, (py+hl)|r4k|_||76;6D 6A
 altd ld px, (py+hl)|r4k_strict|_||76;6D 6A
 altd ld px, (py+hl)|r5k|_||76;6D 6A
 altd ld px, (py+hl)|r5k_strict|_||76;6D 6A
-altd ld px, (py+hl)|r6k|_||76;6D;6A
-altd ld px, (py+hl)|r6k_strict|_||76;6D;6A
+altd ld px, (py+hl)|r6k|_||76;6D 6A
+altd ld px, (py+hl)|r6k_strict|_||76;6D 6A
 altd ld px, (pz)|r4k|_||76;6D 78 00
 altd ld px, (pz)|r4k_strict|_||76;6D 78 00
 altd ld px, (pz)|r5k|_||76;6D 78 00
 altd ld px, (pz)|r5k_strict|_||76;6D 78 00
-altd ld px, (pz)|r6k|_||76;6D;78 00
-altd ld px, (pz)|r6k_strict|_||76;6D;78 00
+altd ld px, (pz)|r6k|_||76;6D 78 00
+altd ld px, (pz)|r6k_strict|_||76;6D 78 00
 altd ld px, (pz+%d)|r4k|_||76;6D 78 %d
 altd ld px, (pz+%d)|r4k_strict|_||76;6D 78 %d
 altd ld px, (pz+%d)|r5k|_||76;6D 78 %d
 altd ld px, (pz+%d)|r5k_strict|_||76;6D 78 %d
-altd ld px, (pz+%d)|r6k|_||76;6D;78 %d
-altd ld px, (pz+%d)|r6k_strict|_||76;6D;78 %d
+altd ld px, (pz+%d)|r6k|_||76;6D 78 %d
+altd ld px, (pz+%d)|r6k_strict|_||76;6D 78 %d
 altd ld px, (pz+hl)|r4k|_||76;6D 7A
 altd ld px, (pz+hl)|r4k_strict|_||76;6D 7A
 altd ld px, (pz+hl)|r5k|_||76;6D 7A
 altd ld px, (pz+hl)|r5k_strict|_||76;6D 7A
-altd ld px, (pz+hl)|r6k|_||76;6D;7A
-altd ld px, (pz+hl)|r6k_strict|_||76;6D;7A
+altd ld px, (pz+hl)|r6k|_||76;6D 7A
+altd ld px, (pz+hl)|r6k_strict|_||76;6D 7A
 altd ld px, pw|r4k|_||76;6D 47
 altd ld px, pw|r4k_strict|_||76;6D 47
 altd ld px, pw|r5k|_||76;6D 47
 altd ld px, pw|r5k_strict|_||76;6D 47
-altd ld px, pw|r6k|_||76;6D;47
-altd ld px, pw|r6k_strict|_||76;6D;47
+altd ld px, pw|r6k|_||76;6D 47
+altd ld px, pw|r6k_strict|_||76;6D 47
 altd ld px, pw+de|r4k|_||76;6D 46
 altd ld px, pw+de|r4k_strict|_||76;6D 46
 altd ld px, pw+de|r5k|_||76;6D 46
 altd ld px, pw+de|r5k_strict|_||76;6D 46
-altd ld px, pw+de|r6k|_||76;6D;46
-altd ld px, pw+de|r6k_strict|_||76;6D;46
+altd ld px, pw+de|r6k|_||76;6D 46
+altd ld px, pw+de|r6k_strict|_||76;6D 46
 altd ld px, pw+hl|r4k|_||76;6D 4E
 altd ld px, pw+hl|r4k_strict|_||76;6D 4E
 altd ld px, pw+hl|r5k|_||76;6D 4E
 altd ld px, pw+hl|r5k_strict|_||76;6D 4E
-altd ld px, pw+hl|r6k|_||76;6D;4E
-altd ld px, pw+hl|r6k_strict|_||76;6D;4E
+altd ld px, pw+hl|r6k|_||76;6D 4E
+altd ld px, pw+hl|r6k_strict|_||76;6D 4E
 altd ld px, pw+ix|r4k|_||76;6D 44
 altd ld px, pw+ix|r4k_strict|_||76;6D 44
 altd ld px, pw+ix|r5k|_||76;6D 44
 altd ld px, pw+ix|r5k_strict|_||76;6D 44
-altd ld px, pw+ix|r6k|_||76;6D;44
-altd ld px, pw+ix|r6k_strict|_||76;6D;44
+altd ld px, pw+ix|r6k|_||76;6D 44
+altd ld px, pw+ix|r6k_strict|_||76;6D 44
 altd ld px, pw+iy|r4k|_||76;6D 45
 altd ld px, pw+iy|r4k_strict|_||76;6D 45
 altd ld px, pw+iy|r5k|_||76;6D 45
 altd ld px, pw+iy|r5k_strict|_||76;6D 45
-altd ld px, pw+iy|r6k|_||76;6D;45
-altd ld px, pw+iy|r6k_strict|_||76;6D;45
+altd ld px, pw+iy|r6k|_||76;6D 45
+altd ld px, pw+iy|r6k_strict|_||76;6D 45
 altd ld px, px|r4k|_||76;6D 57
 altd ld px, px|r4k_strict|_||76;6D 57
 altd ld px, px|r5k|_||76;6D 57
 altd ld px, px|r5k_strict|_||76;6D 57
-altd ld px, px|r6k|_||76;6D;57
-altd ld px, px|r6k_strict|_||76;6D;57
+altd ld px, px|r6k|_||76;6D 57
+altd ld px, px|r6k_strict|_||76;6D 57
 altd ld px, px+de|r4k|_||76;6D 56
 altd ld px, px+de|r4k_strict|_||76;6D 56
 altd ld px, px+de|r5k|_||76;6D 56
 altd ld px, px+de|r5k_strict|_||76;6D 56
-altd ld px, px+de|r6k|_||76;6D;56
-altd ld px, px+de|r6k_strict|_||76;6D;56
+altd ld px, px+de|r6k|_||76;6D 56
+altd ld px, px+de|r6k_strict|_||76;6D 56
 altd ld px, px+hl|r4k|_||76;6D 5E
 altd ld px, px+hl|r4k_strict|_||76;6D 5E
 altd ld px, px+hl|r5k|_||76;6D 5E
 altd ld px, px+hl|r5k_strict|_||76;6D 5E
-altd ld px, px+hl|r6k|_||76;6D;5E
-altd ld px, px+hl|r6k_strict|_||76;6D;5E
+altd ld px, px+hl|r6k|_||76;6D 5E
+altd ld px, px+hl|r6k_strict|_||76;6D 5E
 altd ld px, px+ix|r4k|_||76;6D 54
 altd ld px, px+ix|r4k_strict|_||76;6D 54
 altd ld px, px+ix|r5k|_||76;6D 54
 altd ld px, px+ix|r5k_strict|_||76;6D 54
-altd ld px, px+ix|r6k|_||76;6D;54
-altd ld px, px+ix|r6k_strict|_||76;6D;54
+altd ld px, px+ix|r6k|_||76;6D 54
+altd ld px, px+ix|r6k_strict|_||76;6D 54
 altd ld px, px+iy|r4k|_||76;6D 55
 altd ld px, px+iy|r4k_strict|_||76;6D 55
 altd ld px, px+iy|r5k|_||76;6D 55
 altd ld px, px+iy|r5k_strict|_||76;6D 55
-altd ld px, px+iy|r6k|_||76;6D;55
-altd ld px, px+iy|r6k_strict|_||76;6D;55
+altd ld px, px+iy|r6k|_||76;6D 55
+altd ld px, px+iy|r6k_strict|_||76;6D 55
 altd ld px, py|r4k|_||76;6D 67
 altd ld px, py|r4k_strict|_||76;6D 67
 altd ld px, py|r5k|_||76;6D 67
 altd ld px, py|r5k_strict|_||76;6D 67
-altd ld px, py|r6k|_||76;6D;67
-altd ld px, py|r6k_strict|_||76;6D;67
+altd ld px, py|r6k|_||76;6D 67
+altd ld px, py|r6k_strict|_||76;6D 67
 altd ld px, py+de|r4k|_||76;6D 66
 altd ld px, py+de|r4k_strict|_||76;6D 66
 altd ld px, py+de|r5k|_||76;6D 66
 altd ld px, py+de|r5k_strict|_||76;6D 66
-altd ld px, py+de|r6k|_||76;6D;66
-altd ld px, py+de|r6k_strict|_||76;6D;66
+altd ld px, py+de|r6k|_||76;6D 66
+altd ld px, py+de|r6k_strict|_||76;6D 66
 altd ld px, py+hl|r4k|_||76;6D 6E
 altd ld px, py+hl|r4k_strict|_||76;6D 6E
 altd ld px, py+hl|r5k|_||76;6D 6E
 altd ld px, py+hl|r5k_strict|_||76;6D 6E
-altd ld px, py+hl|r6k|_||76;6D;6E
-altd ld px, py+hl|r6k_strict|_||76;6D;6E
+altd ld px, py+hl|r6k|_||76;6D 6E
+altd ld px, py+hl|r6k_strict|_||76;6D 6E
 altd ld px, py+ix|r4k|_||76;6D 64
 altd ld px, py+ix|r4k_strict|_||76;6D 64
 altd ld px, py+ix|r5k|_||76;6D 64
 altd ld px, py+ix|r5k_strict|_||76;6D 64
-altd ld px, py+ix|r6k|_||76;6D;64
-altd ld px, py+ix|r6k_strict|_||76;6D;64
+altd ld px, py+ix|r6k|_||76;6D 64
+altd ld px, py+ix|r6k_strict|_||76;6D 64
 altd ld px, py+iy|r4k|_||76;6D 65
 altd ld px, py+iy|r4k_strict|_||76;6D 65
 altd ld px, py+iy|r5k|_||76;6D 65
 altd ld px, py+iy|r5k_strict|_||76;6D 65
-altd ld px, py+iy|r6k|_||76;6D;65
-altd ld px, py+iy|r6k_strict|_||76;6D;65
+altd ld px, py+iy|r6k|_||76;6D 65
+altd ld px, py+iy|r6k_strict|_||76;6D 65
 altd ld px, pz|r4k|_||76;6D 77
 altd ld px, pz|r4k_strict|_||76;6D 77
 altd ld px, pz|r5k|_||76;6D 77
 altd ld px, pz|r5k_strict|_||76;6D 77
-altd ld px, pz|r6k|_||76;6D;77
-altd ld px, pz|r6k_strict|_||76;6D;77
+altd ld px, pz|r6k|_||76;6D 77
+altd ld px, pz|r6k_strict|_||76;6D 77
 altd ld px, pz+de|r4k|_||76;6D 76
 altd ld px, pz+de|r4k_strict|_||76;6D 76
 altd ld px, pz+de|r5k|_||76;6D 76
 altd ld px, pz+de|r5k_strict|_||76;6D 76
-altd ld px, pz+de|r6k|_||76;6D;76
-altd ld px, pz+de|r6k_strict|_||76;6D;76
+altd ld px, pz+de|r6k|_||76;6D 76
+altd ld px, pz+de|r6k_strict|_||76;6D 76
 altd ld px, pz+hl|r4k|_||76;6D 7E
 altd ld px, pz+hl|r4k_strict|_||76;6D 7E
 altd ld px, pz+hl|r5k|_||76;6D 7E
 altd ld px, pz+hl|r5k_strict|_||76;6D 7E
-altd ld px, pz+hl|r6k|_||76;6D;7E
-altd ld px, pz+hl|r6k_strict|_||76;6D;7E
+altd ld px, pz+hl|r6k|_||76;6D 7E
+altd ld px, pz+hl|r6k_strict|_||76;6D 7E
 altd ld px, pz+ix|r4k|_||76;6D 74
 altd ld px, pz+ix|r4k_strict|_||76;6D 74
 altd ld px, pz+ix|r5k|_||76;6D 74
 altd ld px, pz+ix|r5k_strict|_||76;6D 74
-altd ld px, pz+ix|r6k|_||76;6D;74
-altd ld px, pz+ix|r6k_strict|_||76;6D;74
+altd ld px, pz+ix|r6k|_||76;6D 74
+altd ld px, pz+ix|r6k_strict|_||76;6D 74
 altd ld px, pz+iy|r4k|_||76;6D 75
 altd ld px, pz+iy|r4k_strict|_||76;6D 75
 altd ld px, pz+iy|r5k|_||76;6D 75
 altd ld px, pz+iy|r5k_strict|_||76;6D 75
-altd ld px, pz+iy|r6k|_||76;6D;75
-altd ld px, pz+iy|r6k_strict|_||76;6D;75
+altd ld px, pz+iy|r6k|_||76;6D 75
+altd ld px, pz+iy|r6k_strict|_||76;6D 75
 altd ld py, (pw)|r4k|_||76;6D 88 00
 altd ld py, (pw)|r4k_strict|_||76;6D 88 00
 altd ld py, (pw)|r5k|_||76;6D 88 00
 altd ld py, (pw)|r5k_strict|_||76;6D 88 00
-altd ld py, (pw)|r6k|_||76;6D;88 00
-altd ld py, (pw)|r6k_strict|_||76;6D;88 00
+altd ld py, (pw)|r6k|_||76;6D 88 00
+altd ld py, (pw)|r6k_strict|_||76;6D 88 00
 altd ld py, (pw+%d)|r4k|_||76;6D 88 %d
 altd ld py, (pw+%d)|r4k_strict|_||76;6D 88 %d
 altd ld py, (pw+%d)|r5k|_||76;6D 88 %d
 altd ld py, (pw+%d)|r5k_strict|_||76;6D 88 %d
-altd ld py, (pw+%d)|r6k|_||76;6D;88 %d
-altd ld py, (pw+%d)|r6k_strict|_||76;6D;88 %d
+altd ld py, (pw+%d)|r6k|_||76;6D 88 %d
+altd ld py, (pw+%d)|r6k_strict|_||76;6D 88 %d
 altd ld py, (pw+hl)|r4k|_||76;6D 8A
 altd ld py, (pw+hl)|r4k_strict|_||76;6D 8A
 altd ld py, (pw+hl)|r5k|_||76;6D 8A
 altd ld py, (pw+hl)|r5k_strict|_||76;6D 8A
-altd ld py, (pw+hl)|r6k|_||76;6D;8A
-altd ld py, (pw+hl)|r6k_strict|_||76;6D;8A
+altd ld py, (pw+hl)|r6k|_||76;6D 8A
+altd ld py, (pw+hl)|r6k_strict|_||76;6D 8A
 altd ld py, (px)|r4k|_||76;6D 98 00
 altd ld py, (px)|r4k_strict|_||76;6D 98 00
 altd ld py, (px)|r5k|_||76;6D 98 00
 altd ld py, (px)|r5k_strict|_||76;6D 98 00
-altd ld py, (px)|r6k|_||76;6D;98 00
-altd ld py, (px)|r6k_strict|_||76;6D;98 00
+altd ld py, (px)|r6k|_||76;6D 98 00
+altd ld py, (px)|r6k_strict|_||76;6D 98 00
 altd ld py, (px+%d)|r4k|_||76;6D 98 %d
 altd ld py, (px+%d)|r4k_strict|_||76;6D 98 %d
 altd ld py, (px+%d)|r5k|_||76;6D 98 %d
 altd ld py, (px+%d)|r5k_strict|_||76;6D 98 %d
-altd ld py, (px+%d)|r6k|_||76;6D;98 %d
-altd ld py, (px+%d)|r6k_strict|_||76;6D;98 %d
+altd ld py, (px+%d)|r6k|_||76;6D 98 %d
+altd ld py, (px+%d)|r6k_strict|_||76;6D 98 %d
 altd ld py, (px+hl)|r4k|_||76;6D 9A
 altd ld py, (px+hl)|r4k_strict|_||76;6D 9A
 altd ld py, (px+hl)|r5k|_||76;6D 9A
 altd ld py, (px+hl)|r5k_strict|_||76;6D 9A
-altd ld py, (px+hl)|r6k|_||76;6D;9A
-altd ld py, (px+hl)|r6k_strict|_||76;6D;9A
+altd ld py, (px+hl)|r6k|_||76;6D 9A
+altd ld py, (px+hl)|r6k_strict|_||76;6D 9A
 altd ld py, (py)|r4k|_||76;6D A8 00
 altd ld py, (py)|r4k_strict|_||76;6D A8 00
 altd ld py, (py)|r5k|_||76;6D A8 00
 altd ld py, (py)|r5k_strict|_||76;6D A8 00
-altd ld py, (py)|r6k|_||76;6D;A8 00
-altd ld py, (py)|r6k_strict|_||76;6D;A8 00
+altd ld py, (py)|r6k|_||76;6D A8 00
+altd ld py, (py)|r6k_strict|_||76;6D A8 00
 altd ld py, (py+%d)|r4k|_||76;6D A8 %d
 altd ld py, (py+%d)|r4k_strict|_||76;6D A8 %d
 altd ld py, (py+%d)|r5k|_||76;6D A8 %d
 altd ld py, (py+%d)|r5k_strict|_||76;6D A8 %d
-altd ld py, (py+%d)|r6k|_||76;6D;A8 %d
-altd ld py, (py+%d)|r6k_strict|_||76;6D;A8 %d
+altd ld py, (py+%d)|r6k|_||76;6D A8 %d
+altd ld py, (py+%d)|r6k_strict|_||76;6D A8 %d
 altd ld py, (py+hl)|r4k|_||76;6D AA
 altd ld py, (py+hl)|r4k_strict|_||76;6D AA
 altd ld py, (py+hl)|r5k|_||76;6D AA
 altd ld py, (py+hl)|r5k_strict|_||76;6D AA
-altd ld py, (py+hl)|r6k|_||76;6D;AA
-altd ld py, (py+hl)|r6k_strict|_||76;6D;AA
+altd ld py, (py+hl)|r6k|_||76;6D AA
+altd ld py, (py+hl)|r6k_strict|_||76;6D AA
 altd ld py, (pz)|r4k|_||76;6D B8 00
 altd ld py, (pz)|r4k_strict|_||76;6D B8 00
 altd ld py, (pz)|r5k|_||76;6D B8 00
 altd ld py, (pz)|r5k_strict|_||76;6D B8 00
-altd ld py, (pz)|r6k|_||76;6D;B8 00
-altd ld py, (pz)|r6k_strict|_||76;6D;B8 00
+altd ld py, (pz)|r6k|_||76;6D B8 00
+altd ld py, (pz)|r6k_strict|_||76;6D B8 00
 altd ld py, (pz+%d)|r4k|_||76;6D B8 %d
 altd ld py, (pz+%d)|r4k_strict|_||76;6D B8 %d
 altd ld py, (pz+%d)|r5k|_||76;6D B8 %d
 altd ld py, (pz+%d)|r5k_strict|_||76;6D B8 %d
-altd ld py, (pz+%d)|r6k|_||76;6D;B8 %d
-altd ld py, (pz+%d)|r6k_strict|_||76;6D;B8 %d
+altd ld py, (pz+%d)|r6k|_||76;6D B8 %d
+altd ld py, (pz+%d)|r6k_strict|_||76;6D B8 %d
 altd ld py, (pz+hl)|r4k|_||76;6D BA
 altd ld py, (pz+hl)|r4k_strict|_||76;6D BA
 altd ld py, (pz+hl)|r5k|_||76;6D BA
 altd ld py, (pz+hl)|r5k_strict|_||76;6D BA
-altd ld py, (pz+hl)|r6k|_||76;6D;BA
-altd ld py, (pz+hl)|r6k_strict|_||76;6D;BA
+altd ld py, (pz+hl)|r6k|_||76;6D BA
+altd ld py, (pz+hl)|r6k_strict|_||76;6D BA
 altd ld py, pw|r4k|_||76;6D 87
 altd ld py, pw|r4k_strict|_||76;6D 87
 altd ld py, pw|r5k|_||76;6D 87
 altd ld py, pw|r5k_strict|_||76;6D 87
-altd ld py, pw|r6k|_||76;6D;87
-altd ld py, pw|r6k_strict|_||76;6D;87
+altd ld py, pw|r6k|_||76;6D 87
+altd ld py, pw|r6k_strict|_||76;6D 87
 altd ld py, pw+de|r4k|_||76;6D 86
 altd ld py, pw+de|r4k_strict|_||76;6D 86
 altd ld py, pw+de|r5k|_||76;6D 86
 altd ld py, pw+de|r5k_strict|_||76;6D 86
-altd ld py, pw+de|r6k|_||76;6D;86
-altd ld py, pw+de|r6k_strict|_||76;6D;86
+altd ld py, pw+de|r6k|_||76;6D 86
+altd ld py, pw+de|r6k_strict|_||76;6D 86
 altd ld py, pw+hl|r4k|_||76;6D 8E
 altd ld py, pw+hl|r4k_strict|_||76;6D 8E
 altd ld py, pw+hl|r5k|_||76;6D 8E
 altd ld py, pw+hl|r5k_strict|_||76;6D 8E
-altd ld py, pw+hl|r6k|_||76;6D;8E
-altd ld py, pw+hl|r6k_strict|_||76;6D;8E
+altd ld py, pw+hl|r6k|_||76;6D 8E
+altd ld py, pw+hl|r6k_strict|_||76;6D 8E
 altd ld py, pw+ix|r4k|_||76;6D 84
 altd ld py, pw+ix|r4k_strict|_||76;6D 84
 altd ld py, pw+ix|r5k|_||76;6D 84
 altd ld py, pw+ix|r5k_strict|_||76;6D 84
-altd ld py, pw+ix|r6k|_||76;6D;84
-altd ld py, pw+ix|r6k_strict|_||76;6D;84
+altd ld py, pw+ix|r6k|_||76;6D 84
+altd ld py, pw+ix|r6k_strict|_||76;6D 84
 altd ld py, pw+iy|r4k|_||76;6D 85
 altd ld py, pw+iy|r4k_strict|_||76;6D 85
 altd ld py, pw+iy|r5k|_||76;6D 85
 altd ld py, pw+iy|r5k_strict|_||76;6D 85
-altd ld py, pw+iy|r6k|_||76;6D;85
-altd ld py, pw+iy|r6k_strict|_||76;6D;85
+altd ld py, pw+iy|r6k|_||76;6D 85
+altd ld py, pw+iy|r6k_strict|_||76;6D 85
 altd ld py, px|r4k|_||76;6D 97
 altd ld py, px|r4k_strict|_||76;6D 97
 altd ld py, px|r5k|_||76;6D 97
 altd ld py, px|r5k_strict|_||76;6D 97
-altd ld py, px|r6k|_||76;6D;97
-altd ld py, px|r6k_strict|_||76;6D;97
+altd ld py, px|r6k|_||76;6D 97
+altd ld py, px|r6k_strict|_||76;6D 97
 altd ld py, px+de|r4k|_||76;6D 96
 altd ld py, px+de|r4k_strict|_||76;6D 96
 altd ld py, px+de|r5k|_||76;6D 96
 altd ld py, px+de|r5k_strict|_||76;6D 96
-altd ld py, px+de|r6k|_||76;6D;96
-altd ld py, px+de|r6k_strict|_||76;6D;96
+altd ld py, px+de|r6k|_||76;6D 96
+altd ld py, px+de|r6k_strict|_||76;6D 96
 altd ld py, px+hl|r4k|_||76;6D 9E
 altd ld py, px+hl|r4k_strict|_||76;6D 9E
 altd ld py, px+hl|r5k|_||76;6D 9E
 altd ld py, px+hl|r5k_strict|_||76;6D 9E
-altd ld py, px+hl|r6k|_||76;6D;9E
-altd ld py, px+hl|r6k_strict|_||76;6D;9E
+altd ld py, px+hl|r6k|_||76;6D 9E
+altd ld py, px+hl|r6k_strict|_||76;6D 9E
 altd ld py, px+ix|r4k|_||76;6D 94
 altd ld py, px+ix|r4k_strict|_||76;6D 94
 altd ld py, px+ix|r5k|_||76;6D 94
 altd ld py, px+ix|r5k_strict|_||76;6D 94
-altd ld py, px+ix|r6k|_||76;6D;94
-altd ld py, px+ix|r6k_strict|_||76;6D;94
+altd ld py, px+ix|r6k|_||76;6D 94
+altd ld py, px+ix|r6k_strict|_||76;6D 94
 altd ld py, px+iy|r4k|_||76;6D 95
 altd ld py, px+iy|r4k_strict|_||76;6D 95
 altd ld py, px+iy|r5k|_||76;6D 95
 altd ld py, px+iy|r5k_strict|_||76;6D 95
-altd ld py, px+iy|r6k|_||76;6D;95
-altd ld py, px+iy|r6k_strict|_||76;6D;95
+altd ld py, px+iy|r6k|_||76;6D 95
+altd ld py, px+iy|r6k_strict|_||76;6D 95
 altd ld py, py|r4k|_||76;6D A7
 altd ld py, py|r4k_strict|_||76;6D A7
 altd ld py, py|r5k|_||76;6D A7
 altd ld py, py|r5k_strict|_||76;6D A7
-altd ld py, py|r6k|_||76;6D;A7
-altd ld py, py|r6k_strict|_||76;6D;A7
+altd ld py, py|r6k|_||76;6D A7
+altd ld py, py|r6k_strict|_||76;6D A7
 altd ld py, py+de|r4k|_||76;6D A6
 altd ld py, py+de|r4k_strict|_||76;6D A6
 altd ld py, py+de|r5k|_||76;6D A6
 altd ld py, py+de|r5k_strict|_||76;6D A6
-altd ld py, py+de|r6k|_||76;6D;A6
-altd ld py, py+de|r6k_strict|_||76;6D;A6
+altd ld py, py+de|r6k|_||76;6D A6
+altd ld py, py+de|r6k_strict|_||76;6D A6
 altd ld py, py+hl|r4k|_||76;6D AE
 altd ld py, py+hl|r4k_strict|_||76;6D AE
 altd ld py, py+hl|r5k|_||76;6D AE
 altd ld py, py+hl|r5k_strict|_||76;6D AE
-altd ld py, py+hl|r6k|_||76;6D;AE
-altd ld py, py+hl|r6k_strict|_||76;6D;AE
+altd ld py, py+hl|r6k|_||76;6D AE
+altd ld py, py+hl|r6k_strict|_||76;6D AE
 altd ld py, py+ix|r4k|_||76;6D A4
 altd ld py, py+ix|r4k_strict|_||76;6D A4
 altd ld py, py+ix|r5k|_||76;6D A4
 altd ld py, py+ix|r5k_strict|_||76;6D A4
-altd ld py, py+ix|r6k|_||76;6D;A4
-altd ld py, py+ix|r6k_strict|_||76;6D;A4
+altd ld py, py+ix|r6k|_||76;6D A4
+altd ld py, py+ix|r6k_strict|_||76;6D A4
 altd ld py, py+iy|r4k|_||76;6D A5
 altd ld py, py+iy|r4k_strict|_||76;6D A5
 altd ld py, py+iy|r5k|_||76;6D A5
 altd ld py, py+iy|r5k_strict|_||76;6D A5
-altd ld py, py+iy|r6k|_||76;6D;A5
-altd ld py, py+iy|r6k_strict|_||76;6D;A5
+altd ld py, py+iy|r6k|_||76;6D A5
+altd ld py, py+iy|r6k_strict|_||76;6D A5
 altd ld py, pz|r4k|_||76;6D B7
 altd ld py, pz|r4k_strict|_||76;6D B7
 altd ld py, pz|r5k|_||76;6D B7
 altd ld py, pz|r5k_strict|_||76;6D B7
-altd ld py, pz|r6k|_||76;6D;B7
-altd ld py, pz|r6k_strict|_||76;6D;B7
+altd ld py, pz|r6k|_||76;6D B7
+altd ld py, pz|r6k_strict|_||76;6D B7
 altd ld py, pz+de|r4k|_||76;6D B6
 altd ld py, pz+de|r4k_strict|_||76;6D B6
 altd ld py, pz+de|r5k|_||76;6D B6
 altd ld py, pz+de|r5k_strict|_||76;6D B6
-altd ld py, pz+de|r6k|_||76;6D;B6
-altd ld py, pz+de|r6k_strict|_||76;6D;B6
+altd ld py, pz+de|r6k|_||76;6D B6
+altd ld py, pz+de|r6k_strict|_||76;6D B6
 altd ld py, pz+hl|r4k|_||76;6D BE
 altd ld py, pz+hl|r4k_strict|_||76;6D BE
 altd ld py, pz+hl|r5k|_||76;6D BE
 altd ld py, pz+hl|r5k_strict|_||76;6D BE
-altd ld py, pz+hl|r6k|_||76;6D;BE
-altd ld py, pz+hl|r6k_strict|_||76;6D;BE
+altd ld py, pz+hl|r6k|_||76;6D BE
+altd ld py, pz+hl|r6k_strict|_||76;6D BE
 altd ld py, pz+ix|r4k|_||76;6D B4
 altd ld py, pz+ix|r4k_strict|_||76;6D B4
 altd ld py, pz+ix|r5k|_||76;6D B4
 altd ld py, pz+ix|r5k_strict|_||76;6D B4
-altd ld py, pz+ix|r6k|_||76;6D;B4
-altd ld py, pz+ix|r6k_strict|_||76;6D;B4
+altd ld py, pz+ix|r6k|_||76;6D B4
+altd ld py, pz+ix|r6k_strict|_||76;6D B4
 altd ld py, pz+iy|r4k|_||76;6D B5
 altd ld py, pz+iy|r4k_strict|_||76;6D B5
 altd ld py, pz+iy|r5k|_||76;6D B5
 altd ld py, pz+iy|r5k_strict|_||76;6D B5
-altd ld py, pz+iy|r6k|_||76;6D;B5
-altd ld py, pz+iy|r6k_strict|_||76;6D;B5
+altd ld py, pz+iy|r6k|_||76;6D B5
+altd ld py, pz+iy|r6k_strict|_||76;6D B5
 altd ld pz, (pw)|r4k|_||76;6D C8 00
 altd ld pz, (pw)|r4k_strict|_||76;6D C8 00
 altd ld pz, (pw)|r5k|_||76;6D C8 00
 altd ld pz, (pw)|r5k_strict|_||76;6D C8 00
-altd ld pz, (pw)|r6k|_||76;6D;C8 00
-altd ld pz, (pw)|r6k_strict|_||76;6D;C8 00
+altd ld pz, (pw)|r6k|_||76;6D C8 00
+altd ld pz, (pw)|r6k_strict|_||76;6D C8 00
 altd ld pz, (pw+%d)|r4k|_||76;6D C8 %d
 altd ld pz, (pw+%d)|r4k_strict|_||76;6D C8 %d
 altd ld pz, (pw+%d)|r5k|_||76;6D C8 %d
 altd ld pz, (pw+%d)|r5k_strict|_||76;6D C8 %d
-altd ld pz, (pw+%d)|r6k|_||76;6D;C8 %d
-altd ld pz, (pw+%d)|r6k_strict|_||76;6D;C8 %d
+altd ld pz, (pw+%d)|r6k|_||76;6D C8 %d
+altd ld pz, (pw+%d)|r6k_strict|_||76;6D C8 %d
 altd ld pz, (pw+hl)|r4k|_||76;6D CA
 altd ld pz, (pw+hl)|r4k_strict|_||76;6D CA
 altd ld pz, (pw+hl)|r5k|_||76;6D CA
 altd ld pz, (pw+hl)|r5k_strict|_||76;6D CA
-altd ld pz, (pw+hl)|r6k|_||76;6D;CA
-altd ld pz, (pw+hl)|r6k_strict|_||76;6D;CA
+altd ld pz, (pw+hl)|r6k|_||76;6D CA
+altd ld pz, (pw+hl)|r6k_strict|_||76;6D CA
 altd ld pz, (px)|r4k|_||76;6D D8 00
 altd ld pz, (px)|r4k_strict|_||76;6D D8 00
 altd ld pz, (px)|r5k|_||76;6D D8 00
 altd ld pz, (px)|r5k_strict|_||76;6D D8 00
-altd ld pz, (px)|r6k|_||76;6D;D8 00
-altd ld pz, (px)|r6k_strict|_||76;6D;D8 00
+altd ld pz, (px)|r6k|_||76;6D D8 00
+altd ld pz, (px)|r6k_strict|_||76;6D D8 00
 altd ld pz, (px+%d)|r4k|_||76;6D D8 %d
 altd ld pz, (px+%d)|r4k_strict|_||76;6D D8 %d
 altd ld pz, (px+%d)|r5k|_||76;6D D8 %d
 altd ld pz, (px+%d)|r5k_strict|_||76;6D D8 %d
-altd ld pz, (px+%d)|r6k|_||76;6D;D8 %d
-altd ld pz, (px+%d)|r6k_strict|_||76;6D;D8 %d
+altd ld pz, (px+%d)|r6k|_||76;6D D8 %d
+altd ld pz, (px+%d)|r6k_strict|_||76;6D D8 %d
 altd ld pz, (px+hl)|r4k|_||76;6D DA
 altd ld pz, (px+hl)|r4k_strict|_||76;6D DA
 altd ld pz, (px+hl)|r5k|_||76;6D DA
 altd ld pz, (px+hl)|r5k_strict|_||76;6D DA
-altd ld pz, (px+hl)|r6k|_||76;6D;DA
-altd ld pz, (px+hl)|r6k_strict|_||76;6D;DA
+altd ld pz, (px+hl)|r6k|_||76;6D DA
+altd ld pz, (px+hl)|r6k_strict|_||76;6D DA
 altd ld pz, (py)|r4k|_||76;6D E8 00
 altd ld pz, (py)|r4k_strict|_||76;6D E8 00
 altd ld pz, (py)|r5k|_||76;6D E8 00
 altd ld pz, (py)|r5k_strict|_||76;6D E8 00
-altd ld pz, (py)|r6k|_||76;6D;E8 00
-altd ld pz, (py)|r6k_strict|_||76;6D;E8 00
+altd ld pz, (py)|r6k|_||76;6D E8 00
+altd ld pz, (py)|r6k_strict|_||76;6D E8 00
 altd ld pz, (py+%d)|r4k|_||76;6D E8 %d
 altd ld pz, (py+%d)|r4k_strict|_||76;6D E8 %d
 altd ld pz, (py+%d)|r5k|_||76;6D E8 %d
 altd ld pz, (py+%d)|r5k_strict|_||76;6D E8 %d
-altd ld pz, (py+%d)|r6k|_||76;6D;E8 %d
-altd ld pz, (py+%d)|r6k_strict|_||76;6D;E8 %d
+altd ld pz, (py+%d)|r6k|_||76;6D E8 %d
+altd ld pz, (py+%d)|r6k_strict|_||76;6D E8 %d
 altd ld pz, (py+hl)|r4k|_||76;6D EA
 altd ld pz, (py+hl)|r4k_strict|_||76;6D EA
 altd ld pz, (py+hl)|r5k|_||76;6D EA
 altd ld pz, (py+hl)|r5k_strict|_||76;6D EA
-altd ld pz, (py+hl)|r6k|_||76;6D;EA
-altd ld pz, (py+hl)|r6k_strict|_||76;6D;EA
+altd ld pz, (py+hl)|r6k|_||76;6D EA
+altd ld pz, (py+hl)|r6k_strict|_||76;6D EA
 altd ld pz, (pz)|r4k|_||76;6D F8 00
 altd ld pz, (pz)|r4k_strict|_||76;6D F8 00
 altd ld pz, (pz)|r5k|_||76;6D F8 00
 altd ld pz, (pz)|r5k_strict|_||76;6D F8 00
-altd ld pz, (pz)|r6k|_||76;6D;F8 00
-altd ld pz, (pz)|r6k_strict|_||76;6D;F8 00
+altd ld pz, (pz)|r6k|_||76;6D F8 00
+altd ld pz, (pz)|r6k_strict|_||76;6D F8 00
 altd ld pz, (pz+%d)|r4k|_||76;6D F8 %d
 altd ld pz, (pz+%d)|r4k_strict|_||76;6D F8 %d
 altd ld pz, (pz+%d)|r5k|_||76;6D F8 %d
 altd ld pz, (pz+%d)|r5k_strict|_||76;6D F8 %d
-altd ld pz, (pz+%d)|r6k|_||76;6D;F8 %d
-altd ld pz, (pz+%d)|r6k_strict|_||76;6D;F8 %d
+altd ld pz, (pz+%d)|r6k|_||76;6D F8 %d
+altd ld pz, (pz+%d)|r6k_strict|_||76;6D F8 %d
 altd ld pz, (pz+hl)|r4k|_||76;6D FA
 altd ld pz, (pz+hl)|r4k_strict|_||76;6D FA
 altd ld pz, (pz+hl)|r5k|_||76;6D FA
 altd ld pz, (pz+hl)|r5k_strict|_||76;6D FA
-altd ld pz, (pz+hl)|r6k|_||76;6D;FA
-altd ld pz, (pz+hl)|r6k_strict|_||76;6D;FA
+altd ld pz, (pz+hl)|r6k|_||76;6D FA
+altd ld pz, (pz+hl)|r6k_strict|_||76;6D FA
 altd ld pz, pw|r4k|_||76;6D C7
 altd ld pz, pw|r4k_strict|_||76;6D C7
 altd ld pz, pw|r5k|_||76;6D C7
 altd ld pz, pw|r5k_strict|_||76;6D C7
-altd ld pz, pw|r6k|_||76;6D;C7
-altd ld pz, pw|r6k_strict|_||76;6D;C7
+altd ld pz, pw|r6k|_||76;6D C7
+altd ld pz, pw|r6k_strict|_||76;6D C7
 altd ld pz, pw+de|r4k|_||76;6D C6
 altd ld pz, pw+de|r4k_strict|_||76;6D C6
 altd ld pz, pw+de|r5k|_||76;6D C6
 altd ld pz, pw+de|r5k_strict|_||76;6D C6
-altd ld pz, pw+de|r6k|_||76;6D;C6
-altd ld pz, pw+de|r6k_strict|_||76;6D;C6
+altd ld pz, pw+de|r6k|_||76;6D C6
+altd ld pz, pw+de|r6k_strict|_||76;6D C6
 altd ld pz, pw+hl|r4k|_||76;6D CE
 altd ld pz, pw+hl|r4k_strict|_||76;6D CE
 altd ld pz, pw+hl|r5k|_||76;6D CE
 altd ld pz, pw+hl|r5k_strict|_||76;6D CE
-altd ld pz, pw+hl|r6k|_||76;6D;CE
-altd ld pz, pw+hl|r6k_strict|_||76;6D;CE
+altd ld pz, pw+hl|r6k|_||76;6D CE
+altd ld pz, pw+hl|r6k_strict|_||76;6D CE
 altd ld pz, pw+ix|r4k|_||76;6D C4
 altd ld pz, pw+ix|r4k_strict|_||76;6D C4
 altd ld pz, pw+ix|r5k|_||76;6D C4
 altd ld pz, pw+ix|r5k_strict|_||76;6D C4
-altd ld pz, pw+ix|r6k|_||76;6D;C4
-altd ld pz, pw+ix|r6k_strict|_||76;6D;C4
+altd ld pz, pw+ix|r6k|_||76;6D C4
+altd ld pz, pw+ix|r6k_strict|_||76;6D C4
 altd ld pz, pw+iy|r4k|_||76;6D C5
 altd ld pz, pw+iy|r4k_strict|_||76;6D C5
 altd ld pz, pw+iy|r5k|_||76;6D C5
 altd ld pz, pw+iy|r5k_strict|_||76;6D C5
-altd ld pz, pw+iy|r6k|_||76;6D;C5
-altd ld pz, pw+iy|r6k_strict|_||76;6D;C5
+altd ld pz, pw+iy|r6k|_||76;6D C5
+altd ld pz, pw+iy|r6k_strict|_||76;6D C5
 altd ld pz, px|r4k|_||76;6D D7
 altd ld pz, px|r4k_strict|_||76;6D D7
 altd ld pz, px|r5k|_||76;6D D7
 altd ld pz, px|r5k_strict|_||76;6D D7
-altd ld pz, px|r6k|_||76;6D;D7
-altd ld pz, px|r6k_strict|_||76;6D;D7
+altd ld pz, px|r6k|_||76;6D D7
+altd ld pz, px|r6k_strict|_||76;6D D7
 altd ld pz, px+de|r4k|_||76;6D D6
 altd ld pz, px+de|r4k_strict|_||76;6D D6
 altd ld pz, px+de|r5k|_||76;6D D6
 altd ld pz, px+de|r5k_strict|_||76;6D D6
-altd ld pz, px+de|r6k|_||76;6D;D6
-altd ld pz, px+de|r6k_strict|_||76;6D;D6
+altd ld pz, px+de|r6k|_||76;6D D6
+altd ld pz, px+de|r6k_strict|_||76;6D D6
 altd ld pz, px+hl|r4k|_||76;6D DE
 altd ld pz, px+hl|r4k_strict|_||76;6D DE
 altd ld pz, px+hl|r5k|_||76;6D DE
 altd ld pz, px+hl|r5k_strict|_||76;6D DE
-altd ld pz, px+hl|r6k|_||76;6D;DE
-altd ld pz, px+hl|r6k_strict|_||76;6D;DE
+altd ld pz, px+hl|r6k|_||76;6D DE
+altd ld pz, px+hl|r6k_strict|_||76;6D DE
 altd ld pz, px+ix|r4k|_||76;6D D4
 altd ld pz, px+ix|r4k_strict|_||76;6D D4
 altd ld pz, px+ix|r5k|_||76;6D D4
 altd ld pz, px+ix|r5k_strict|_||76;6D D4
-altd ld pz, px+ix|r6k|_||76;6D;D4
-altd ld pz, px+ix|r6k_strict|_||76;6D;D4
+altd ld pz, px+ix|r6k|_||76;6D D4
+altd ld pz, px+ix|r6k_strict|_||76;6D D4
 altd ld pz, px+iy|r4k|_||76;6D D5
 altd ld pz, px+iy|r4k_strict|_||76;6D D5
 altd ld pz, px+iy|r5k|_||76;6D D5
 altd ld pz, px+iy|r5k_strict|_||76;6D D5
-altd ld pz, px+iy|r6k|_||76;6D;D5
-altd ld pz, px+iy|r6k_strict|_||76;6D;D5
+altd ld pz, px+iy|r6k|_||76;6D D5
+altd ld pz, px+iy|r6k_strict|_||76;6D D5
 altd ld pz, py|r4k|_||76;6D E7
 altd ld pz, py|r4k_strict|_||76;6D E7
 altd ld pz, py|r5k|_||76;6D E7
 altd ld pz, py|r5k_strict|_||76;6D E7
-altd ld pz, py|r6k|_||76;6D;E7
-altd ld pz, py|r6k_strict|_||76;6D;E7
+altd ld pz, py|r6k|_||76;6D E7
+altd ld pz, py|r6k_strict|_||76;6D E7
 altd ld pz, py+de|r4k|_||76;6D E6
 altd ld pz, py+de|r4k_strict|_||76;6D E6
 altd ld pz, py+de|r5k|_||76;6D E6
 altd ld pz, py+de|r5k_strict|_||76;6D E6
-altd ld pz, py+de|r6k|_||76;6D;E6
-altd ld pz, py+de|r6k_strict|_||76;6D;E6
+altd ld pz, py+de|r6k|_||76;6D E6
+altd ld pz, py+de|r6k_strict|_||76;6D E6
 altd ld pz, py+hl|r4k|_||76;6D EE
 altd ld pz, py+hl|r4k_strict|_||76;6D EE
 altd ld pz, py+hl|r5k|_||76;6D EE
 altd ld pz, py+hl|r5k_strict|_||76;6D EE
-altd ld pz, py+hl|r6k|_||76;6D;EE
-altd ld pz, py+hl|r6k_strict|_||76;6D;EE
+altd ld pz, py+hl|r6k|_||76;6D EE
+altd ld pz, py+hl|r6k_strict|_||76;6D EE
 altd ld pz, py+ix|r4k|_||76;6D E4
 altd ld pz, py+ix|r4k_strict|_||76;6D E4
 altd ld pz, py+ix|r5k|_||76;6D E4
 altd ld pz, py+ix|r5k_strict|_||76;6D E4
-altd ld pz, py+ix|r6k|_||76;6D;E4
-altd ld pz, py+ix|r6k_strict|_||76;6D;E4
+altd ld pz, py+ix|r6k|_||76;6D E4
+altd ld pz, py+ix|r6k_strict|_||76;6D E4
 altd ld pz, py+iy|r4k|_||76;6D E5
 altd ld pz, py+iy|r4k_strict|_||76;6D E5
 altd ld pz, py+iy|r5k|_||76;6D E5
 altd ld pz, py+iy|r5k_strict|_||76;6D E5
-altd ld pz, py+iy|r6k|_||76;6D;E5
-altd ld pz, py+iy|r6k_strict|_||76;6D;E5
+altd ld pz, py+iy|r6k|_||76;6D E5
+altd ld pz, py+iy|r6k_strict|_||76;6D E5
 altd ld pz, pz|r4k|_||76;6D F7
 altd ld pz, pz|r4k_strict|_||76;6D F7
 altd ld pz, pz|r5k|_||76;6D F7
 altd ld pz, pz|r5k_strict|_||76;6D F7
-altd ld pz, pz|r6k|_||76;6D;F7
-altd ld pz, pz|r6k_strict|_||76;6D;F7
+altd ld pz, pz|r6k|_||76;6D F7
+altd ld pz, pz|r6k_strict|_||76;6D F7
 altd ld pz, pz+de|r4k|_||76;6D F6
 altd ld pz, pz+de|r4k_strict|_||76;6D F6
 altd ld pz, pz+de|r5k|_||76;6D F6
 altd ld pz, pz+de|r5k_strict|_||76;6D F6
-altd ld pz, pz+de|r6k|_||76;6D;F6
-altd ld pz, pz+de|r6k_strict|_||76;6D;F6
+altd ld pz, pz+de|r6k|_||76;6D F6
+altd ld pz, pz+de|r6k_strict|_||76;6D F6
 altd ld pz, pz+hl|r4k|_||76;6D FE
 altd ld pz, pz+hl|r4k_strict|_||76;6D FE
 altd ld pz, pz+hl|r5k|_||76;6D FE
 altd ld pz, pz+hl|r5k_strict|_||76;6D FE
-altd ld pz, pz+hl|r6k|_||76;6D;FE
-altd ld pz, pz+hl|r6k_strict|_||76;6D;FE
+altd ld pz, pz+hl|r6k|_||76;6D FE
+altd ld pz, pz+hl|r6k_strict|_||76;6D FE
 altd ld pz, pz+ix|r4k|_||76;6D F4
 altd ld pz, pz+ix|r4k_strict|_||76;6D F4
 altd ld pz, pz+ix|r5k|_||76;6D F4
 altd ld pz, pz+ix|r5k_strict|_||76;6D F4
-altd ld pz, pz+ix|r6k|_||76;6D;F4
-altd ld pz, pz+ix|r6k_strict|_||76;6D;F4
+altd ld pz, pz+ix|r6k|_||76;6D F4
+altd ld pz, pz+ix|r6k_strict|_||76;6D F4
 altd ld pz, pz+iy|r4k|_||76;6D F5
 altd ld pz, pz+iy|r4k_strict|_||76;6D F5
 altd ld pz, pz+iy|r5k|_||76;6D F5
 altd ld pz, pz+iy|r5k_strict|_||76;6D F5
-altd ld pz, pz+iy|r6k|_||76;6D;F5
-altd ld pz, pz+iy|r6k_strict|_||76;6D;F5
+altd ld pz, pz+iy|r6k|_||76;6D F5
+altd ld pz, pz+iy|r6k_strict|_||76;6D F5
 altd ldd a, (bc)|r2ka|X||76;0A;0B
 altd ldd a, (bc)|r3k|X||76;0A;0B
 altd ldd a, (bc)|r4k|X||76;0A;0B
@@ -21936,14 +21936,14 @@ dec l'|r5k|_||76;2D
 dec l'|r5k_strict|_||76;2D
 dec l'|r6k|_||76;2D
 dec l'|r6k_strict|_||76;2D
-dec pw|r6k|_||6D;0F
-dec pw|r6k_strict|_||6D;0F
-dec px|r6k|_||6D;4F
-dec px|r6k_strict|_||6D;4F
-dec py|r6k|_||6D;8F
-dec py|r6k_strict|_||6D;8F
-dec pz|r6k|_||6D;CF
-dec pz|r6k_strict|_||6D;CF
+dec pw|r6k|_||6D 0F
+dec pw|r6k_strict|_||6D 0F
+dec px|r6k|_||6D 4F
+dec px|r6k_strict|_||6D 4F
+dec py|r6k|_||6D 8F
+dec py|r6k_strict|_||6D 8F
+dec pz|r6k|_||6D CF
+dec pz|r6k_strict|_||6D CF
 dec sp|8080|_||3B
 dec sp|8085|_||3B
 dec sp|ez80|_||3B
@@ -22750,14 +22750,14 @@ ibox a'|r5k|_||76;ED 12
 ibox a'|r5k_strict|_||76;ED 12
 ibox a'|r6k|_||76;ED 12
 ibox a'|r6k_strict|_||76;ED 12
-ibox pw|r6k|_||6D;1F
-ibox pw|r6k_strict|_||6D;1F
-ibox px|r6k|_||6D;5F
-ibox px|r6k_strict|_||6D;5F
-ibox py|r6k|_||6D;9F
-ibox py|r6k_strict|_||6D;9F
-ibox pz|r6k|_||6D;DF
-ibox pz|r6k_strict|_||6D;DF
+ibox pw|r6k|_||6D 1F
+ibox pw|r6k_strict|_||6D 1F
+ibox px|r6k|_||6D 5F
+ibox px|r6k_strict|_||6D 5F
+ibox py|r6k|_||6D 9F
+ibox py|r6k_strict|_||6D 9F
+ibox pz|r6k|_||6D DF
+ibox pz|r6k_strict|_||6D DF
 idet|r3k|_||5B
 idet|r3k_strict|_||5B
 idet|r4k|_||5B
@@ -23781,14 +23781,14 @@ inc l'|r5k|_||76;2C
 inc l'|r5k_strict|_||76;2C
 inc l'|r6k|_||76;2C
 inc l'|r6k_strict|_||76;2C
-inc pw|r6k|_||6D;0D
-inc pw|r6k_strict|_||6D;0D
-inc px|r6k|_||6D;4D
-inc px|r6k_strict|_||6D;4D
-inc py|r6k|_||6D;8D
-inc py|r6k_strict|_||6D;8D
-inc pz|r6k|_||6D;CD
-inc pz|r6k_strict|_||6D;CD
+inc pw|r6k|_||6D 0D
+inc pw|r6k_strict|_||6D 0D
+inc px|r6k|_||6D 4D
+inc px|r6k_strict|_||6D 4D
+inc py|r6k|_||6D 8D
+inc py|r6k_strict|_||6D 8D
+inc pz|r6k|_||6D CD
+inc pz|r6k_strict|_||6D CD
 inc sp|8080|_||33
 inc sp|8085|_||33
 inc sp|ez80|_||33
@@ -43282,8 +43282,8 @@ ld (pw), bc|r4k|_||6D 01 00
 ld (pw), bc|r4k_strict|_||6D 01 00
 ld (pw), bc|r5k|_||6D 01 00
 ld (pw), bc|r5k_strict|_||6D 01 00
-ld (pw), bc|r6k|_||6D;01 00
-ld (pw), bc|r6k_strict|_||6D;01 00
+ld (pw), bc|r6k|_||6D 01 00
+ld (pw), bc|r6k_strict|_||6D 01 00
 ld (pw), bcde|r4k|_||DD 0F 00
 ld (pw), bcde|r4k_strict|_||DD 0F 00
 ld (pw), bcde|r5k|_||DD 0F 00
@@ -43294,8 +43294,8 @@ ld (pw), de|r4k|_||6D 41 00
 ld (pw), de|r4k_strict|_||6D 41 00
 ld (pw), de|r5k|_||6D 41 00
 ld (pw), de|r5k_strict|_||6D 41 00
-ld (pw), de|r6k|_||6D;41 00
-ld (pw), de|r6k_strict|_||6D;41 00
+ld (pw), de|r6k|_||6D 41 00
+ld (pw), de|r6k_strict|_||6D 41 00
 ld (pw), hl|r4k|_||86 00
 ld (pw), hl|r4k_strict|_||86 00
 ld (pw), hl|r5k|_||86 00
@@ -43306,14 +43306,14 @@ ld (pw), ix|r4k|_||6D 81 00
 ld (pw), ix|r4k_strict|_||6D 81 00
 ld (pw), ix|r5k|_||6D 81 00
 ld (pw), ix|r5k_strict|_||6D 81 00
-ld (pw), ix|r6k|_||6D;81 00
-ld (pw), ix|r6k_strict|_||6D;81 00
+ld (pw), ix|r6k|_||6D 81 00
+ld (pw), ix|r6k_strict|_||6D 81 00
 ld (pw), iy|r4k|_||6D C1 00
 ld (pw), iy|r4k_strict|_||6D C1 00
 ld (pw), iy|r5k|_||6D C1 00
 ld (pw), iy|r5k_strict|_||6D C1 00
-ld (pw), iy|r6k|_||6D;C1 00
-ld (pw), iy|r6k_strict|_||6D;C1 00
+ld (pw), iy|r6k|_||6D C1 00
+ld (pw), iy|r6k_strict|_||6D C1 00
 ld (pw), jkhl|r4k|_||FD 0F 00
 ld (pw), jkhl|r4k_strict|_||FD 0F 00
 ld (pw), jkhl|r5k|_||FD 0F 00
@@ -43324,26 +43324,26 @@ ld (pw), pw|r4k|_||6D 09 00
 ld (pw), pw|r4k_strict|_||6D 09 00
 ld (pw), pw|r5k|_||6D 09 00
 ld (pw), pw|r5k_strict|_||6D 09 00
-ld (pw), pw|r6k|_||6D;09 00
-ld (pw), pw|r6k_strict|_||6D;09 00
+ld (pw), pw|r6k|_||6D 09 00
+ld (pw), pw|r6k_strict|_||6D 09 00
 ld (pw), px|r4k|_||6D 49 00
 ld (pw), px|r4k_strict|_||6D 49 00
 ld (pw), px|r5k|_||6D 49 00
 ld (pw), px|r5k_strict|_||6D 49 00
-ld (pw), px|r6k|_||6D;49;00
-ld (pw), px|r6k_strict|_||6D;49;00
+ld (pw), px|r6k|_||6D 49 00
+ld (pw), px|r6k_strict|_||6D 49 00
 ld (pw), py|r4k|_||6D 89 00
 ld (pw), py|r4k_strict|_||6D 89 00
 ld (pw), py|r5k|_||6D 89 00
 ld (pw), py|r5k_strict|_||6D 89 00
-ld (pw), py|r6k|_||6D;89 00
-ld (pw), py|r6k_strict|_||6D;89 00
+ld (pw), py|r6k|_||6D 89 00
+ld (pw), py|r6k_strict|_||6D 89 00
 ld (pw), pz|r4k|_||6D C9 00
 ld (pw), pz|r4k_strict|_||6D C9 00
 ld (pw), pz|r5k|_||6D C9 00
 ld (pw), pz|r5k_strict|_||6D C9 00
-ld (pw), pz|r6k|_||6D;C9 00
-ld (pw), pz|r6k_strict|_||6D;C9 00
+ld (pw), pz|r6k|_||6D C9 00
+ld (pw), pz|r6k_strict|_||6D C9 00
 ld (pw+%d), a|r4k|_||8E %d
 ld (pw+%d), a|r4k_strict|_||8E %d
 ld (pw+%d), a|r5k|_||8E %d
@@ -43354,8 +43354,8 @@ ld (pw+%d), bc|r4k|_||6D 01 %d
 ld (pw+%d), bc|r4k_strict|_||6D 01 %d
 ld (pw+%d), bc|r5k|_||6D 01 %d
 ld (pw+%d), bc|r5k_strict|_||6D 01 %d
-ld (pw+%d), bc|r6k|_||6D;01 %d
-ld (pw+%d), bc|r6k_strict|_||6D;01 %d
+ld (pw+%d), bc|r6k|_||6D 01 %d
+ld (pw+%d), bc|r6k_strict|_||6D 01 %d
 ld (pw+%d), bcde|r4k|_||DD 0F %d
 ld (pw+%d), bcde|r4k_strict|_||DD 0F %d
 ld (pw+%d), bcde|r5k|_||DD 0F %d
@@ -43366,8 +43366,8 @@ ld (pw+%d), de|r4k|_||6D 41 %d
 ld (pw+%d), de|r4k_strict|_||6D 41 %d
 ld (pw+%d), de|r5k|_||6D 41 %d
 ld (pw+%d), de|r5k_strict|_||6D 41 %d
-ld (pw+%d), de|r6k|_||6D;41 %d
-ld (pw+%d), de|r6k_strict|_||6D;41 %d
+ld (pw+%d), de|r6k|_||6D 41 %d
+ld (pw+%d), de|r6k_strict|_||6D 41 %d
 ld (pw+%d), hl|r4k|_||86 %d
 ld (pw+%d), hl|r4k_strict|_||86 %d
 ld (pw+%d), hl|r5k|_||86 %d
@@ -43378,14 +43378,14 @@ ld (pw+%d), ix|r4k|_||6D 81 %d
 ld (pw+%d), ix|r4k_strict|_||6D 81 %d
 ld (pw+%d), ix|r5k|_||6D 81 %d
 ld (pw+%d), ix|r5k_strict|_||6D 81 %d
-ld (pw+%d), ix|r6k|_||6D;81 %d
-ld (pw+%d), ix|r6k_strict|_||6D;81 %d
+ld (pw+%d), ix|r6k|_||6D 81 %d
+ld (pw+%d), ix|r6k_strict|_||6D 81 %d
 ld (pw+%d), iy|r4k|_||6D C1 %d
 ld (pw+%d), iy|r4k_strict|_||6D C1 %d
 ld (pw+%d), iy|r5k|_||6D C1 %d
 ld (pw+%d), iy|r5k_strict|_||6D C1 %d
-ld (pw+%d), iy|r6k|_||6D;C1 %d
-ld (pw+%d), iy|r6k_strict|_||6D;C1 %d
+ld (pw+%d), iy|r6k|_||6D C1 %d
+ld (pw+%d), iy|r6k_strict|_||6D C1 %d
 ld (pw+%d), jkhl|r4k|_||FD 0F %d
 ld (pw+%d), jkhl|r4k_strict|_||FD 0F %d
 ld (pw+%d), jkhl|r5k|_||FD 0F %d
@@ -43396,26 +43396,26 @@ ld (pw+%d), pw|r4k|_||6D 09 %d
 ld (pw+%d), pw|r4k_strict|_||6D 09 %d
 ld (pw+%d), pw|r5k|_||6D 09 %d
 ld (pw+%d), pw|r5k_strict|_||6D 09 %d
-ld (pw+%d), pw|r6k|_||6D;09 %d
-ld (pw+%d), pw|r6k_strict|_||6D;09 %d
+ld (pw+%d), pw|r6k|_||6D 09 %d
+ld (pw+%d), pw|r6k_strict|_||6D 09 %d
 ld (pw+%d), px|r4k|_||6D 49 %d
 ld (pw+%d), px|r4k_strict|_||6D 49 %d
 ld (pw+%d), px|r5k|_||6D 49 %d
 ld (pw+%d), px|r5k_strict|_||6D 49 %d
-ld (pw+%d), px|r6k|_||6D;49 %d
-ld (pw+%d), px|r6k_strict|_||6D;49 %d
+ld (pw+%d), px|r6k|_||6D 49 %d
+ld (pw+%d), px|r6k_strict|_||6D 49 %d
 ld (pw+%d), py|r4k|_||6D 89 %d
 ld (pw+%d), py|r4k_strict|_||6D 89 %d
 ld (pw+%d), py|r5k|_||6D 89 %d
 ld (pw+%d), py|r5k_strict|_||6D 89 %d
-ld (pw+%d), py|r6k|_||6D;89 %d
-ld (pw+%d), py|r6k_strict|_||6D;89 %d
+ld (pw+%d), py|r6k|_||6D 89 %d
+ld (pw+%d), py|r6k_strict|_||6D 89 %d
 ld (pw+%d), pz|r4k|_||6D C9 %d
 ld (pw+%d), pz|r4k_strict|_||6D C9 %d
 ld (pw+%d), pz|r5k|_||6D C9 %d
 ld (pw+%d), pz|r5k_strict|_||6D C9 %d
-ld (pw+%d), pz|r6k|_||6D;C9 %d
-ld (pw+%d), pz|r6k_strict|_||6D;C9 %d
+ld (pw+%d), pz|r6k|_||6D C9 %d
+ld (pw+%d), pz|r6k_strict|_||6D C9 %d
 ld (pw+bc), hl|r4k|_||ED 07
 ld (pw+bc), hl|r4k_strict|_||ED 07
 ld (pw+bc), hl|r5k|_||ED 07
@@ -43432,8 +43432,8 @@ ld (pw+hl), bc|r4k|_||6D 03
 ld (pw+hl), bc|r4k_strict|_||6D 03
 ld (pw+hl), bc|r5k|_||6D 03
 ld (pw+hl), bc|r5k_strict|_||6D 03
-ld (pw+hl), bc|r6k|_||6D;03
-ld (pw+hl), bc|r6k_strict|_||6D;03
+ld (pw+hl), bc|r6k|_||6D 03
+ld (pw+hl), bc|r6k_strict|_||6D 03
 ld (pw+hl), bcde|r4k|_||DD 0D
 ld (pw+hl), bcde|r4k_strict|_||DD 0D
 ld (pw+hl), bcde|r5k|_||DD 0D
@@ -43444,20 +43444,20 @@ ld (pw+hl), de|r4k|_||6D 43
 ld (pw+hl), de|r4k_strict|_||6D 43
 ld (pw+hl), de|r5k|_||6D 43
 ld (pw+hl), de|r5k_strict|_||6D 43
-ld (pw+hl), de|r6k|_||6D;43
-ld (pw+hl), de|r6k_strict|_||6D;43
+ld (pw+hl), de|r6k|_||6D 43
+ld (pw+hl), de|r6k_strict|_||6D 43
 ld (pw+hl), ix|r4k|_||6D 83
 ld (pw+hl), ix|r4k_strict|_||6D 83
 ld (pw+hl), ix|r5k|_||6D 83
 ld (pw+hl), ix|r5k_strict|_||6D 83
-ld (pw+hl), ix|r6k|_||6D;83
-ld (pw+hl), ix|r6k_strict|_||6D;83
+ld (pw+hl), ix|r6k|_||6D 83
+ld (pw+hl), ix|r6k_strict|_||6D 83
 ld (pw+hl), iy|r4k|_||6D C3
 ld (pw+hl), iy|r4k_strict|_||6D C3
 ld (pw+hl), iy|r5k|_||6D C3
 ld (pw+hl), iy|r5k_strict|_||6D C3
-ld (pw+hl), iy|r6k|_||6D;C3
-ld (pw+hl), iy|r6k_strict|_||6D;C3
+ld (pw+hl), iy|r6k|_||6D C3
+ld (pw+hl), iy|r6k_strict|_||6D C3
 ld (pw+hl), jkhl|r4k|_||FD 0D
 ld (pw+hl), jkhl|r4k_strict|_||FD 0D
 ld (pw+hl), jkhl|r5k|_||FD 0D
@@ -43468,26 +43468,26 @@ ld (pw+hl), pw|r4k|_||6D 0B
 ld (pw+hl), pw|r4k_strict|_||6D 0B
 ld (pw+hl), pw|r5k|_||6D 0B
 ld (pw+hl), pw|r5k_strict|_||6D 0B
-ld (pw+hl), pw|r6k|_||6D;0B
-ld (pw+hl), pw|r6k_strict|_||6D;0B
+ld (pw+hl), pw|r6k|_||6D 0B
+ld (pw+hl), pw|r6k_strict|_||6D 0B
 ld (pw+hl), px|r4k|_||6D 4B
 ld (pw+hl), px|r4k_strict|_||6D 4B
 ld (pw+hl), px|r5k|_||6D 4B
 ld (pw+hl), px|r5k_strict|_||6D 4B
-ld (pw+hl), px|r6k|_||6D;4B
-ld (pw+hl), px|r6k_strict|_||6D;4B
+ld (pw+hl), px|r6k|_||6D 4B
+ld (pw+hl), px|r6k_strict|_||6D 4B
 ld (pw+hl), py|r4k|_||6D 8B
 ld (pw+hl), py|r4k_strict|_||6D 8B
 ld (pw+hl), py|r5k|_||6D 8B
 ld (pw+hl), py|r5k_strict|_||6D 8B
-ld (pw+hl), py|r6k|_||6D;8B
-ld (pw+hl), py|r6k_strict|_||6D;8B
+ld (pw+hl), py|r6k|_||6D 8B
+ld (pw+hl), py|r6k_strict|_||6D 8B
 ld (pw+hl), pz|r4k|_||6D CB
 ld (pw+hl), pz|r4k_strict|_||6D CB
 ld (pw+hl), pz|r5k|_||6D CB
 ld (pw+hl), pz|r5k_strict|_||6D CB
-ld (pw+hl), pz|r6k|_||6D;CB
-ld (pw+hl), pz|r6k_strict|_||6D;CB
+ld (pw+hl), pz|r6k|_||6D CB
+ld (pw+hl), pz|r6k_strict|_||6D CB
 ld (px), a|r4k|_||9E 00
 ld (px), a|r4k_strict|_||9E 00
 ld (px), a|r5k|_||9E 00
@@ -43498,8 +43498,8 @@ ld (px), bc|r4k|_||6D 11 00
 ld (px), bc|r4k_strict|_||6D 11 00
 ld (px), bc|r5k|_||6D 11 00
 ld (px), bc|r5k_strict|_||6D 11 00
-ld (px), bc|r6k|_||6D;11 00
-ld (px), bc|r6k_strict|_||6D;11 00
+ld (px), bc|r6k|_||6D 11 00
+ld (px), bc|r6k_strict|_||6D 11 00
 ld (px), bcde|r4k|_||DD 1F 00
 ld (px), bcde|r4k_strict|_||DD 1F 00
 ld (px), bcde|r5k|_||DD 1F 00
@@ -43510,8 +43510,8 @@ ld (px), de|r4k|_||6D 51 00
 ld (px), de|r4k_strict|_||6D 51 00
 ld (px), de|r5k|_||6D 51 00
 ld (px), de|r5k_strict|_||6D 51 00
-ld (px), de|r6k|_||6D;51 00
-ld (px), de|r6k_strict|_||6D;51 00
+ld (px), de|r6k|_||6D 51 00
+ld (px), de|r6k_strict|_||6D 51 00
 ld (px), hl|r4k|_||96 00
 ld (px), hl|r4k_strict|_||96 00
 ld (px), hl|r5k|_||96 00
@@ -43522,14 +43522,14 @@ ld (px), ix|r4k|_||6D 91 00
 ld (px), ix|r4k_strict|_||6D 91 00
 ld (px), ix|r5k|_||6D 91 00
 ld (px), ix|r5k_strict|_||6D 91 00
-ld (px), ix|r6k|_||6D;91 00
-ld (px), ix|r6k_strict|_||6D;91 00
+ld (px), ix|r6k|_||6D 91 00
+ld (px), ix|r6k_strict|_||6D 91 00
 ld (px), iy|r4k|_||6D D1 00
 ld (px), iy|r4k_strict|_||6D D1 00
 ld (px), iy|r5k|_||6D D1 00
 ld (px), iy|r5k_strict|_||6D D1 00
-ld (px), iy|r6k|_||6D;D1 00
-ld (px), iy|r6k_strict|_||6D;D1 00
+ld (px), iy|r6k|_||6D D1 00
+ld (px), iy|r6k_strict|_||6D D1 00
 ld (px), jkhl|r4k|_||FD 1F 00
 ld (px), jkhl|r4k_strict|_||FD 1F 00
 ld (px), jkhl|r5k|_||FD 1F 00
@@ -43540,26 +43540,26 @@ ld (px), pw|r4k|_||6D 19 00
 ld (px), pw|r4k_strict|_||6D 19 00
 ld (px), pw|r5k|_||6D 19 00
 ld (px), pw|r5k_strict|_||6D 19 00
-ld (px), pw|r6k|_||6D;19 00
-ld (px), pw|r6k_strict|_||6D;19 00
+ld (px), pw|r6k|_||6D 19 00
+ld (px), pw|r6k_strict|_||6D 19 00
 ld (px), px|r4k|_||6D 59 00
 ld (px), px|r4k_strict|_||6D 59 00
 ld (px), px|r5k|_||6D 59 00
 ld (px), px|r5k_strict|_||6D 59 00
-ld (px), px|r6k|_||6D;59 00
-ld (px), px|r6k_strict|_||6D;59 00
+ld (px), px|r6k|_||6D 59 00
+ld (px), px|r6k_strict|_||6D 59 00
 ld (px), py|r4k|_||6D 99 00
 ld (px), py|r4k_strict|_||6D 99 00
 ld (px), py|r5k|_||6D 99 00
 ld (px), py|r5k_strict|_||6D 99 00
-ld (px), py|r6k|_||6D;99 00
-ld (px), py|r6k_strict|_||6D;99 00
+ld (px), py|r6k|_||6D 99 00
+ld (px), py|r6k_strict|_||6D 99 00
 ld (px), pz|r4k|_||6D D9 00
 ld (px), pz|r4k_strict|_||6D D9 00
 ld (px), pz|r5k|_||6D D9 00
 ld (px), pz|r5k_strict|_||6D D9 00
-ld (px), pz|r6k|_||6D;D9 00
-ld (px), pz|r6k_strict|_||6D;D9 00
+ld (px), pz|r6k|_||6D D9 00
+ld (px), pz|r6k_strict|_||6D D9 00
 ld (px+%d), a|r4k|_||9E %d
 ld (px+%d), a|r4k_strict|_||9E %d
 ld (px+%d), a|r5k|_||9E %d
@@ -43570,8 +43570,8 @@ ld (px+%d), bc|r4k|_||6D 11 %d
 ld (px+%d), bc|r4k_strict|_||6D 11 %d
 ld (px+%d), bc|r5k|_||6D 11 %d
 ld (px+%d), bc|r5k_strict|_||6D 11 %d
-ld (px+%d), bc|r6k|_||6D;11 %d
-ld (px+%d), bc|r6k_strict|_||6D;11 %d
+ld (px+%d), bc|r6k|_||6D 11 %d
+ld (px+%d), bc|r6k_strict|_||6D 11 %d
 ld (px+%d), bcde|r4k|_||DD 1F %d
 ld (px+%d), bcde|r4k_strict|_||DD 1F %d
 ld (px+%d), bcde|r5k|_||DD 1F %d
@@ -43582,8 +43582,8 @@ ld (px+%d), de|r4k|_||6D 51 %d
 ld (px+%d), de|r4k_strict|_||6D 51 %d
 ld (px+%d), de|r5k|_||6D 51 %d
 ld (px+%d), de|r5k_strict|_||6D 51 %d
-ld (px+%d), de|r6k|_||6D;51 %d
-ld (px+%d), de|r6k_strict|_||6D;51 %d
+ld (px+%d), de|r6k|_||6D 51 %d
+ld (px+%d), de|r6k_strict|_||6D 51 %d
 ld (px+%d), hl|r4k|_||96 %d
 ld (px+%d), hl|r4k_strict|_||96 %d
 ld (px+%d), hl|r5k|_||96 %d
@@ -43594,14 +43594,14 @@ ld (px+%d), ix|r4k|_||6D 91 %d
 ld (px+%d), ix|r4k_strict|_||6D 91 %d
 ld (px+%d), ix|r5k|_||6D 91 %d
 ld (px+%d), ix|r5k_strict|_||6D 91 %d
-ld (px+%d), ix|r6k|_||6D;91 %d
-ld (px+%d), ix|r6k_strict|_||6D;91 %d
+ld (px+%d), ix|r6k|_||6D 91 %d
+ld (px+%d), ix|r6k_strict|_||6D 91 %d
 ld (px+%d), iy|r4k|_||6D D1 %d
 ld (px+%d), iy|r4k_strict|_||6D D1 %d
 ld (px+%d), iy|r5k|_||6D D1 %d
 ld (px+%d), iy|r5k_strict|_||6D D1 %d
-ld (px+%d), iy|r6k|_||6D;D1 %d
-ld (px+%d), iy|r6k_strict|_||6D;D1 %d
+ld (px+%d), iy|r6k|_||6D D1 %d
+ld (px+%d), iy|r6k_strict|_||6D D1 %d
 ld (px+%d), jkhl|r4k|_||FD 1F %d
 ld (px+%d), jkhl|r4k_strict|_||FD 1F %d
 ld (px+%d), jkhl|r5k|_||FD 1F %d
@@ -43612,26 +43612,26 @@ ld (px+%d), pw|r4k|_||6D 19 %d
 ld (px+%d), pw|r4k_strict|_||6D 19 %d
 ld (px+%d), pw|r5k|_||6D 19 %d
 ld (px+%d), pw|r5k_strict|_||6D 19 %d
-ld (px+%d), pw|r6k|_||6D;19 %d
-ld (px+%d), pw|r6k_strict|_||6D;19 %d
+ld (px+%d), pw|r6k|_||6D 19 %d
+ld (px+%d), pw|r6k_strict|_||6D 19 %d
 ld (px+%d), px|r4k|_||6D 59 %d
 ld (px+%d), px|r4k_strict|_||6D 59 %d
 ld (px+%d), px|r5k|_||6D 59 %d
 ld (px+%d), px|r5k_strict|_||6D 59 %d
-ld (px+%d), px|r6k|_||6D;59 %d
-ld (px+%d), px|r6k_strict|_||6D;59 %d
+ld (px+%d), px|r6k|_||6D 59 %d
+ld (px+%d), px|r6k_strict|_||6D 59 %d
 ld (px+%d), py|r4k|_||6D 99 %d
 ld (px+%d), py|r4k_strict|_||6D 99 %d
 ld (px+%d), py|r5k|_||6D 99 %d
 ld (px+%d), py|r5k_strict|_||6D 99 %d
-ld (px+%d), py|r6k|_||6D;99 %d
-ld (px+%d), py|r6k_strict|_||6D;99 %d
+ld (px+%d), py|r6k|_||6D 99 %d
+ld (px+%d), py|r6k_strict|_||6D 99 %d
 ld (px+%d), pz|r4k|_||6D D9 %d
 ld (px+%d), pz|r4k_strict|_||6D D9 %d
 ld (px+%d), pz|r5k|_||6D D9 %d
 ld (px+%d), pz|r5k_strict|_||6D D9 %d
-ld (px+%d), pz|r6k|_||6D;D9 %d
-ld (px+%d), pz|r6k_strict|_||6D;D9 %d
+ld (px+%d), pz|r6k|_||6D D9 %d
+ld (px+%d), pz|r6k_strict|_||6D D9 %d
 ld (px+bc), hl|r4k|_||ED 17
 ld (px+bc), hl|r4k_strict|_||ED 17
 ld (px+bc), hl|r5k|_||ED 17
@@ -43648,8 +43648,8 @@ ld (px+hl), bc|r4k|_||6D 13
 ld (px+hl), bc|r4k_strict|_||6D 13
 ld (px+hl), bc|r5k|_||6D 13
 ld (px+hl), bc|r5k_strict|_||6D 13
-ld (px+hl), bc|r6k|_||6D;13
-ld (px+hl), bc|r6k_strict|_||6D;13
+ld (px+hl), bc|r6k|_||6D 13
+ld (px+hl), bc|r6k_strict|_||6D 13
 ld (px+hl), bcde|r4k|_||DD 1D
 ld (px+hl), bcde|r4k_strict|_||DD 1D
 ld (px+hl), bcde|r5k|_||DD 1D
@@ -43660,20 +43660,20 @@ ld (px+hl), de|r4k|_||6D 53
 ld (px+hl), de|r4k_strict|_||6D 53
 ld (px+hl), de|r5k|_||6D 53
 ld (px+hl), de|r5k_strict|_||6D 53
-ld (px+hl), de|r6k|_||6D;53
-ld (px+hl), de|r6k_strict|_||6D;53
+ld (px+hl), de|r6k|_||6D 53
+ld (px+hl), de|r6k_strict|_||6D 53
 ld (px+hl), ix|r4k|_||6D 93
 ld (px+hl), ix|r4k_strict|_||6D 93
 ld (px+hl), ix|r5k|_||6D 93
 ld (px+hl), ix|r5k_strict|_||6D 93
-ld (px+hl), ix|r6k|_||6D;93
-ld (px+hl), ix|r6k_strict|_||6D;93
+ld (px+hl), ix|r6k|_||6D 93
+ld (px+hl), ix|r6k_strict|_||6D 93
 ld (px+hl), iy|r4k|_||6D D3
 ld (px+hl), iy|r4k_strict|_||6D D3
 ld (px+hl), iy|r5k|_||6D D3
 ld (px+hl), iy|r5k_strict|_||6D D3
-ld (px+hl), iy|r6k|_||6D;D3
-ld (px+hl), iy|r6k_strict|_||6D;D3
+ld (px+hl), iy|r6k|_||6D D3
+ld (px+hl), iy|r6k_strict|_||6D D3
 ld (px+hl), jkhl|r4k|_||FD 1D
 ld (px+hl), jkhl|r4k_strict|_||FD 1D
 ld (px+hl), jkhl|r5k|_||FD 1D
@@ -43684,26 +43684,26 @@ ld (px+hl), pw|r4k|_||6D 1B
 ld (px+hl), pw|r4k_strict|_||6D 1B
 ld (px+hl), pw|r5k|_||6D 1B
 ld (px+hl), pw|r5k_strict|_||6D 1B
-ld (px+hl), pw|r6k|_||6D;1B
-ld (px+hl), pw|r6k_strict|_||6D;1B
+ld (px+hl), pw|r6k|_||6D 1B
+ld (px+hl), pw|r6k_strict|_||6D 1B
 ld (px+hl), px|r4k|_||6D 5B
 ld (px+hl), px|r4k_strict|_||6D 5B
 ld (px+hl), px|r5k|_||6D 5B
 ld (px+hl), px|r5k_strict|_||6D 5B
-ld (px+hl), px|r6k|_||6D;5B
-ld (px+hl), px|r6k_strict|_||6D;5B
+ld (px+hl), px|r6k|_||6D 5B
+ld (px+hl), px|r6k_strict|_||6D 5B
 ld (px+hl), py|r4k|_||6D 9B
 ld (px+hl), py|r4k_strict|_||6D 9B
 ld (px+hl), py|r5k|_||6D 9B
 ld (px+hl), py|r5k_strict|_||6D 9B
-ld (px+hl), py|r6k|_||6D;9B
-ld (px+hl), py|r6k_strict|_||6D;9B
+ld (px+hl), py|r6k|_||6D 9B
+ld (px+hl), py|r6k_strict|_||6D 9B
 ld (px+hl), pz|r4k|_||6D DB
 ld (px+hl), pz|r4k_strict|_||6D DB
 ld (px+hl), pz|r5k|_||6D DB
 ld (px+hl), pz|r5k_strict|_||6D DB
-ld (px+hl), pz|r6k|_||6D;DB
-ld (px+hl), pz|r6k_strict|_||6D;DB
+ld (px+hl), pz|r6k|_||6D DB
+ld (px+hl), pz|r6k_strict|_||6D DB
 ld (py), a|r4k|_||AE 00
 ld (py), a|r4k_strict|_||AE 00
 ld (py), a|r5k|_||AE 00
@@ -43714,8 +43714,8 @@ ld (py), bc|r4k|_||6D 21 00
 ld (py), bc|r4k_strict|_||6D 21 00
 ld (py), bc|r5k|_||6D 21 00
 ld (py), bc|r5k_strict|_||6D 21 00
-ld (py), bc|r6k|_||6D;21 00
-ld (py), bc|r6k_strict|_||6D;21 00
+ld (py), bc|r6k|_||6D 21 00
+ld (py), bc|r6k_strict|_||6D 21 00
 ld (py), bcde|r4k|_||DD 2F 00
 ld (py), bcde|r4k_strict|_||DD 2F 00
 ld (py), bcde|r5k|_||DD 2F 00
@@ -43726,8 +43726,8 @@ ld (py), de|r4k|_||6D 61 00
 ld (py), de|r4k_strict|_||6D 61 00
 ld (py), de|r5k|_||6D 61 00
 ld (py), de|r5k_strict|_||6D 61 00
-ld (py), de|r6k|_||6D;61 00
-ld (py), de|r6k_strict|_||6D;61 00
+ld (py), de|r6k|_||6D 61 00
+ld (py), de|r6k_strict|_||6D 61 00
 ld (py), hl|r4k|_||A6 00
 ld (py), hl|r4k_strict|_||A6 00
 ld (py), hl|r5k|_||A6 00
@@ -43738,14 +43738,14 @@ ld (py), ix|r4k|_||6D A1 00
 ld (py), ix|r4k_strict|_||6D A1 00
 ld (py), ix|r5k|_||6D A1 00
 ld (py), ix|r5k_strict|_||6D A1 00
-ld (py), ix|r6k|_||6D;A1 00
-ld (py), ix|r6k_strict|_||6D;A1 00
+ld (py), ix|r6k|_||6D A1 00
+ld (py), ix|r6k_strict|_||6D A1 00
 ld (py), iy|r4k|_||6D E1 00
 ld (py), iy|r4k_strict|_||6D E1 00
 ld (py), iy|r5k|_||6D E1 00
 ld (py), iy|r5k_strict|_||6D E1 00
-ld (py), iy|r6k|_||6D;E1 00
-ld (py), iy|r6k_strict|_||6D;E1 00
+ld (py), iy|r6k|_||6D E1 00
+ld (py), iy|r6k_strict|_||6D E1 00
 ld (py), jkhl|r4k|_||FD 2F 00
 ld (py), jkhl|r4k_strict|_||FD 2F 00
 ld (py), jkhl|r5k|_||FD 2F 00
@@ -43756,26 +43756,26 @@ ld (py), pw|r4k|_||6D 29 00
 ld (py), pw|r4k_strict|_||6D 29 00
 ld (py), pw|r5k|_||6D 29 00
 ld (py), pw|r5k_strict|_||6D 29 00
-ld (py), pw|r6k|_||6D;29 00
-ld (py), pw|r6k_strict|_||6D;29 00
+ld (py), pw|r6k|_||6D 29 00
+ld (py), pw|r6k_strict|_||6D 29 00
 ld (py), px|r4k|_||6D 69 00
 ld (py), px|r4k_strict|_||6D 69 00
 ld (py), px|r5k|_||6D 69 00
 ld (py), px|r5k_strict|_||6D 69 00
-ld (py), px|r6k|_||6D;69 00
-ld (py), px|r6k_strict|_||6D;69 00
+ld (py), px|r6k|_||6D 69 00
+ld (py), px|r6k_strict|_||6D 69 00
 ld (py), py|r4k|_||6D A9 00
 ld (py), py|r4k_strict|_||6D A9 00
 ld (py), py|r5k|_||6D A9 00
 ld (py), py|r5k_strict|_||6D A9 00
-ld (py), py|r6k|_||6D;A9 00
-ld (py), py|r6k_strict|_||6D;A9 00
+ld (py), py|r6k|_||6D A9 00
+ld (py), py|r6k_strict|_||6D A9 00
 ld (py), pz|r4k|_||6D E9 00
 ld (py), pz|r4k_strict|_||6D E9 00
 ld (py), pz|r5k|_||6D E9 00
 ld (py), pz|r5k_strict|_||6D E9 00
-ld (py), pz|r6k|_||6D;E9 00
-ld (py), pz|r6k_strict|_||6D;E9 00
+ld (py), pz|r6k|_||6D E9 00
+ld (py), pz|r6k_strict|_||6D E9 00
 ld (py+%d), a|r4k|_||AE %d
 ld (py+%d), a|r4k_strict|_||AE %d
 ld (py+%d), a|r5k|_||AE %d
@@ -43786,8 +43786,8 @@ ld (py+%d), bc|r4k|_||6D 21 %d
 ld (py+%d), bc|r4k_strict|_||6D 21 %d
 ld (py+%d), bc|r5k|_||6D 21 %d
 ld (py+%d), bc|r5k_strict|_||6D 21 %d
-ld (py+%d), bc|r6k|_||6D;21 %d
-ld (py+%d), bc|r6k_strict|_||6D;21 %d
+ld (py+%d), bc|r6k|_||6D 21 %d
+ld (py+%d), bc|r6k_strict|_||6D 21 %d
 ld (py+%d), bcde|r4k|_||DD 2F %d
 ld (py+%d), bcde|r4k_strict|_||DD 2F %d
 ld (py+%d), bcde|r5k|_||DD 2F %d
@@ -43798,8 +43798,8 @@ ld (py+%d), de|r4k|_||6D 61 %d
 ld (py+%d), de|r4k_strict|_||6D 61 %d
 ld (py+%d), de|r5k|_||6D 61 %d
 ld (py+%d), de|r5k_strict|_||6D 61 %d
-ld (py+%d), de|r6k|_||6D;61 %d
-ld (py+%d), de|r6k_strict|_||6D;61 %d
+ld (py+%d), de|r6k|_||6D 61 %d
+ld (py+%d), de|r6k_strict|_||6D 61 %d
 ld (py+%d), hl|r4k|_||A6 %d
 ld (py+%d), hl|r4k_strict|_||A6 %d
 ld (py+%d), hl|r5k|_||A6 %d
@@ -43810,14 +43810,14 @@ ld (py+%d), ix|r4k|_||6D A1 %d
 ld (py+%d), ix|r4k_strict|_||6D A1 %d
 ld (py+%d), ix|r5k|_||6D A1 %d
 ld (py+%d), ix|r5k_strict|_||6D A1 %d
-ld (py+%d), ix|r6k|_||6D;A1 %d
-ld (py+%d), ix|r6k_strict|_||6D;A1 %d
+ld (py+%d), ix|r6k|_||6D A1 %d
+ld (py+%d), ix|r6k_strict|_||6D A1 %d
 ld (py+%d), iy|r4k|_||6D E1 %d
 ld (py+%d), iy|r4k_strict|_||6D E1 %d
 ld (py+%d), iy|r5k|_||6D E1 %d
 ld (py+%d), iy|r5k_strict|_||6D E1 %d
-ld (py+%d), iy|r6k|_||6D;E1 %d
-ld (py+%d), iy|r6k_strict|_||6D;E1 %d
+ld (py+%d), iy|r6k|_||6D E1 %d
+ld (py+%d), iy|r6k_strict|_||6D E1 %d
 ld (py+%d), jkhl|r4k|_||FD 2F %d
 ld (py+%d), jkhl|r4k_strict|_||FD 2F %d
 ld (py+%d), jkhl|r5k|_||FD 2F %d
@@ -43828,26 +43828,26 @@ ld (py+%d), pw|r4k|_||6D 29 %d
 ld (py+%d), pw|r4k_strict|_||6D 29 %d
 ld (py+%d), pw|r5k|_||6D 29 %d
 ld (py+%d), pw|r5k_strict|_||6D 29 %d
-ld (py+%d), pw|r6k|_||6D;29 %d
-ld (py+%d), pw|r6k_strict|_||6D;29 %d
+ld (py+%d), pw|r6k|_||6D 29 %d
+ld (py+%d), pw|r6k_strict|_||6D 29 %d
 ld (py+%d), px|r4k|_||6D 69 %d
 ld (py+%d), px|r4k_strict|_||6D 69 %d
 ld (py+%d), px|r5k|_||6D 69 %d
 ld (py+%d), px|r5k_strict|_||6D 69 %d
-ld (py+%d), px|r6k|_||6D;69 %d
-ld (py+%d), px|r6k_strict|_||6D;69 %d
+ld (py+%d), px|r6k|_||6D 69 %d
+ld (py+%d), px|r6k_strict|_||6D 69 %d
 ld (py+%d), py|r4k|_||6D A9 %d
 ld (py+%d), py|r4k_strict|_||6D A9 %d
 ld (py+%d), py|r5k|_||6D A9 %d
 ld (py+%d), py|r5k_strict|_||6D A9 %d
-ld (py+%d), py|r6k|_||6D;A9 %d
-ld (py+%d), py|r6k_strict|_||6D;A9 %d
+ld (py+%d), py|r6k|_||6D A9 %d
+ld (py+%d), py|r6k_strict|_||6D A9 %d
 ld (py+%d), pz|r4k|_||6D E9 %d
 ld (py+%d), pz|r4k_strict|_||6D E9 %d
 ld (py+%d), pz|r5k|_||6D E9 %d
 ld (py+%d), pz|r5k_strict|_||6D E9 %d
-ld (py+%d), pz|r6k|_||6D;E9 %d
-ld (py+%d), pz|r6k_strict|_||6D;E9 %d
+ld (py+%d), pz|r6k|_||6D E9 %d
+ld (py+%d), pz|r6k_strict|_||6D E9 %d
 ld (py+bc), hl|r4k|_||ED 27
 ld (py+bc), hl|r4k_strict|_||ED 27
 ld (py+bc), hl|r5k|_||ED 27
@@ -43864,8 +43864,8 @@ ld (py+hl), bc|r4k|_||6D 23
 ld (py+hl), bc|r4k_strict|_||6D 23
 ld (py+hl), bc|r5k|_||6D 23
 ld (py+hl), bc|r5k_strict|_||6D 23
-ld (py+hl), bc|r6k|_||6D;23
-ld (py+hl), bc|r6k_strict|_||6D;23
+ld (py+hl), bc|r6k|_||6D 23
+ld (py+hl), bc|r6k_strict|_||6D 23
 ld (py+hl), bcde|r4k|_||DD 2D
 ld (py+hl), bcde|r4k_strict|_||DD 2D
 ld (py+hl), bcde|r5k|_||DD 2D
@@ -43876,20 +43876,20 @@ ld (py+hl), de|r4k|_||6D 63
 ld (py+hl), de|r4k_strict|_||6D 63
 ld (py+hl), de|r5k|_||6D 63
 ld (py+hl), de|r5k_strict|_||6D 63
-ld (py+hl), de|r6k|_||6D;63
-ld (py+hl), de|r6k_strict|_||6D;63
+ld (py+hl), de|r6k|_||6D 63
+ld (py+hl), de|r6k_strict|_||6D 63
 ld (py+hl), ix|r4k|_||6D A3
 ld (py+hl), ix|r4k_strict|_||6D A3
 ld (py+hl), ix|r5k|_||6D A3
 ld (py+hl), ix|r5k_strict|_||6D A3
-ld (py+hl), ix|r6k|_||6D;A3
-ld (py+hl), ix|r6k_strict|_||6D;A3
+ld (py+hl), ix|r6k|_||6D A3
+ld (py+hl), ix|r6k_strict|_||6D A3
 ld (py+hl), iy|r4k|_||6D E3
 ld (py+hl), iy|r4k_strict|_||6D E3
 ld (py+hl), iy|r5k|_||6D E3
 ld (py+hl), iy|r5k_strict|_||6D E3
-ld (py+hl), iy|r6k|_||6D;E3
-ld (py+hl), iy|r6k_strict|_||6D;E3
+ld (py+hl), iy|r6k|_||6D E3
+ld (py+hl), iy|r6k_strict|_||6D E3
 ld (py+hl), jkhl|r4k|_||FD 2D
 ld (py+hl), jkhl|r4k_strict|_||FD 2D
 ld (py+hl), jkhl|r5k|_||FD 2D
@@ -43900,26 +43900,26 @@ ld (py+hl), pw|r4k|_||6D 2B
 ld (py+hl), pw|r4k_strict|_||6D 2B
 ld (py+hl), pw|r5k|_||6D 2B
 ld (py+hl), pw|r5k_strict|_||6D 2B
-ld (py+hl), pw|r6k|_||6D;2B
-ld (py+hl), pw|r6k_strict|_||6D;2B
+ld (py+hl), pw|r6k|_||6D 2B
+ld (py+hl), pw|r6k_strict|_||6D 2B
 ld (py+hl), px|r4k|_||6D 6B
 ld (py+hl), px|r4k_strict|_||6D 6B
 ld (py+hl), px|r5k|_||6D 6B
 ld (py+hl), px|r5k_strict|_||6D 6B
-ld (py+hl), px|r6k|_||6D;6B
-ld (py+hl), px|r6k_strict|_||6D;6B
+ld (py+hl), px|r6k|_||6D 6B
+ld (py+hl), px|r6k_strict|_||6D 6B
 ld (py+hl), py|r4k|_||6D AB
 ld (py+hl), py|r4k_strict|_||6D AB
 ld (py+hl), py|r5k|_||6D AB
 ld (py+hl), py|r5k_strict|_||6D AB
-ld (py+hl), py|r6k|_||6D;AB
-ld (py+hl), py|r6k_strict|_||6D;AB
+ld (py+hl), py|r6k|_||6D AB
+ld (py+hl), py|r6k_strict|_||6D AB
 ld (py+hl), pz|r4k|_||6D EB
 ld (py+hl), pz|r4k_strict|_||6D EB
 ld (py+hl), pz|r5k|_||6D EB
 ld (py+hl), pz|r5k_strict|_||6D EB
-ld (py+hl), pz|r6k|_||6D;EB
-ld (py+hl), pz|r6k_strict|_||6D;EB
+ld (py+hl), pz|r6k|_||6D EB
+ld (py+hl), pz|r6k_strict|_||6D EB
 ld (pz), a|r4k|_||BE 00
 ld (pz), a|r4k_strict|_||BE 00
 ld (pz), a|r5k|_||BE 00
@@ -43930,8 +43930,8 @@ ld (pz), bc|r4k|_||6D 31 00
 ld (pz), bc|r4k_strict|_||6D 31 00
 ld (pz), bc|r5k|_||6D 31 00
 ld (pz), bc|r5k_strict|_||6D 31 00
-ld (pz), bc|r6k|_||6D;31 00
-ld (pz), bc|r6k_strict|_||6D;31 00
+ld (pz), bc|r6k|_||6D 31 00
+ld (pz), bc|r6k_strict|_||6D 31 00
 ld (pz), bcde|r4k|_||DD 3F 00
 ld (pz), bcde|r4k_strict|_||DD 3F 00
 ld (pz), bcde|r5k|_||DD 3F 00
@@ -43942,8 +43942,8 @@ ld (pz), de|r4k|_||6D 71 00
 ld (pz), de|r4k_strict|_||6D 71 00
 ld (pz), de|r5k|_||6D 71 00
 ld (pz), de|r5k_strict|_||6D 71 00
-ld (pz), de|r6k|_||6D;71 00
-ld (pz), de|r6k_strict|_||6D;71 00
+ld (pz), de|r6k|_||6D 71 00
+ld (pz), de|r6k_strict|_||6D 71 00
 ld (pz), hl|r4k|_||B6 00
 ld (pz), hl|r4k_strict|_||B6 00
 ld (pz), hl|r5k|_||B6 00
@@ -43954,14 +43954,14 @@ ld (pz), ix|r4k|_||6D B1 00
 ld (pz), ix|r4k_strict|_||6D B1 00
 ld (pz), ix|r5k|_||6D B1 00
 ld (pz), ix|r5k_strict|_||6D B1 00
-ld (pz), ix|r6k|_||6D;B1 00
-ld (pz), ix|r6k_strict|_||6D;B1 00
+ld (pz), ix|r6k|_||6D B1 00
+ld (pz), ix|r6k_strict|_||6D B1 00
 ld (pz), iy|r4k|_||6D F1 00
 ld (pz), iy|r4k_strict|_||6D F1 00
 ld (pz), iy|r5k|_||6D F1 00
 ld (pz), iy|r5k_strict|_||6D F1 00
-ld (pz), iy|r6k|_||6D;F1 00
-ld (pz), iy|r6k_strict|_||6D;F1 00
+ld (pz), iy|r6k|_||6D F1 00
+ld (pz), iy|r6k_strict|_||6D F1 00
 ld (pz), jkhl|r4k|_||FD 3F 00
 ld (pz), jkhl|r4k_strict|_||FD 3F 00
 ld (pz), jkhl|r5k|_||FD 3F 00
@@ -43972,26 +43972,26 @@ ld (pz), pw|r4k|_||6D 39 00
 ld (pz), pw|r4k_strict|_||6D 39 00
 ld (pz), pw|r5k|_||6D 39 00
 ld (pz), pw|r5k_strict|_||6D 39 00
-ld (pz), pw|r6k|_||6D;39 00
-ld (pz), pw|r6k_strict|_||6D;39 00
+ld (pz), pw|r6k|_||6D 39 00
+ld (pz), pw|r6k_strict|_||6D 39 00
 ld (pz), px|r4k|_||6D 79 00
 ld (pz), px|r4k_strict|_||6D 79 00
 ld (pz), px|r5k|_||6D 79 00
 ld (pz), px|r5k_strict|_||6D 79 00
-ld (pz), px|r6k|_||6D;79 00
-ld (pz), px|r6k_strict|_||6D;79 00
+ld (pz), px|r6k|_||6D 79 00
+ld (pz), px|r6k_strict|_||6D 79 00
 ld (pz), py|r4k|_||6D B9 00
 ld (pz), py|r4k_strict|_||6D B9 00
 ld (pz), py|r5k|_||6D B9 00
 ld (pz), py|r5k_strict|_||6D B9 00
-ld (pz), py|r6k|_||6D;B9 00
-ld (pz), py|r6k_strict|_||6D;B9 00
+ld (pz), py|r6k|_||6D B9 00
+ld (pz), py|r6k_strict|_||6D B9 00
 ld (pz), pz|r4k|_||6D F9 00
 ld (pz), pz|r4k_strict|_||6D F9 00
 ld (pz), pz|r5k|_||6D F9 00
 ld (pz), pz|r5k_strict|_||6D F9 00
-ld (pz), pz|r6k|_||6D;F9 00
-ld (pz), pz|r6k_strict|_||6D;F9 00
+ld (pz), pz|r6k|_||6D F9 00
+ld (pz), pz|r6k_strict|_||6D F9 00
 ld (pz+%d), a|r4k|_||BE %d
 ld (pz+%d), a|r4k_strict|_||BE %d
 ld (pz+%d), a|r5k|_||BE %d
@@ -44002,8 +44002,8 @@ ld (pz+%d), bc|r4k|_||6D 31 %d
 ld (pz+%d), bc|r4k_strict|_||6D 31 %d
 ld (pz+%d), bc|r5k|_||6D 31 %d
 ld (pz+%d), bc|r5k_strict|_||6D 31 %d
-ld (pz+%d), bc|r6k|_||6D;31 %d
-ld (pz+%d), bc|r6k_strict|_||6D;31 %d
+ld (pz+%d), bc|r6k|_||6D 31 %d
+ld (pz+%d), bc|r6k_strict|_||6D 31 %d
 ld (pz+%d), bcde|r4k|_||DD 3F %d
 ld (pz+%d), bcde|r4k_strict|_||DD 3F %d
 ld (pz+%d), bcde|r5k|_||DD 3F %d
@@ -44014,8 +44014,8 @@ ld (pz+%d), de|r4k|_||6D 71 %d
 ld (pz+%d), de|r4k_strict|_||6D 71 %d
 ld (pz+%d), de|r5k|_||6D 71 %d
 ld (pz+%d), de|r5k_strict|_||6D 71 %d
-ld (pz+%d), de|r6k|_||6D;71 %d
-ld (pz+%d), de|r6k_strict|_||6D;71 %d
+ld (pz+%d), de|r6k|_||6D 71 %d
+ld (pz+%d), de|r6k_strict|_||6D 71 %d
 ld (pz+%d), hl|r4k|_||B6 %d
 ld (pz+%d), hl|r4k_strict|_||B6 %d
 ld (pz+%d), hl|r5k|_||B6 %d
@@ -44026,14 +44026,14 @@ ld (pz+%d), ix|r4k|_||6D B1 %d
 ld (pz+%d), ix|r4k_strict|_||6D B1 %d
 ld (pz+%d), ix|r5k|_||6D B1 %d
 ld (pz+%d), ix|r5k_strict|_||6D B1 %d
-ld (pz+%d), ix|r6k|_||6D;B1 %d
-ld (pz+%d), ix|r6k_strict|_||6D;B1 %d
+ld (pz+%d), ix|r6k|_||6D B1 %d
+ld (pz+%d), ix|r6k_strict|_||6D B1 %d
 ld (pz+%d), iy|r4k|_||6D F1 %d
 ld (pz+%d), iy|r4k_strict|_||6D F1 %d
 ld (pz+%d), iy|r5k|_||6D F1 %d
 ld (pz+%d), iy|r5k_strict|_||6D F1 %d
-ld (pz+%d), iy|r6k|_||6D;F1 %d
-ld (pz+%d), iy|r6k_strict|_||6D;F1 %d
+ld (pz+%d), iy|r6k|_||6D F1 %d
+ld (pz+%d), iy|r6k_strict|_||6D F1 %d
 ld (pz+%d), jkhl|r4k|_||FD 3F %d
 ld (pz+%d), jkhl|r4k_strict|_||FD 3F %d
 ld (pz+%d), jkhl|r5k|_||FD 3F %d
@@ -44044,26 +44044,26 @@ ld (pz+%d), pw|r4k|_||6D 39 %d
 ld (pz+%d), pw|r4k_strict|_||6D 39 %d
 ld (pz+%d), pw|r5k|_||6D 39 %d
 ld (pz+%d), pw|r5k_strict|_||6D 39 %d
-ld (pz+%d), pw|r6k|_||6D;39 %d
-ld (pz+%d), pw|r6k_strict|_||6D;39 %d
+ld (pz+%d), pw|r6k|_||6D 39 %d
+ld (pz+%d), pw|r6k_strict|_||6D 39 %d
 ld (pz+%d), px|r4k|_||6D 79 %d
 ld (pz+%d), px|r4k_strict|_||6D 79 %d
 ld (pz+%d), px|r5k|_||6D 79 %d
 ld (pz+%d), px|r5k_strict|_||6D 79 %d
-ld (pz+%d), px|r6k|_||6D;79 %d
-ld (pz+%d), px|r6k_strict|_||6D;79 %d
+ld (pz+%d), px|r6k|_||6D 79 %d
+ld (pz+%d), px|r6k_strict|_||6D 79 %d
 ld (pz+%d), py|r4k|_||6D B9 %d
 ld (pz+%d), py|r4k_strict|_||6D B9 %d
 ld (pz+%d), py|r5k|_||6D B9 %d
 ld (pz+%d), py|r5k_strict|_||6D B9 %d
-ld (pz+%d), py|r6k|_||6D;B9 %d
-ld (pz+%d), py|r6k_strict|_||6D;B9 %d
+ld (pz+%d), py|r6k|_||6D B9 %d
+ld (pz+%d), py|r6k_strict|_||6D B9 %d
 ld (pz+%d), pz|r4k|_||6D F9 %d
 ld (pz+%d), pz|r4k_strict|_||6D F9 %d
 ld (pz+%d), pz|r5k|_||6D F9 %d
 ld (pz+%d), pz|r5k_strict|_||6D F9 %d
-ld (pz+%d), pz|r6k|_||6D;F9 %d
-ld (pz+%d), pz|r6k_strict|_||6D;F9 %d
+ld (pz+%d), pz|r6k|_||6D F9 %d
+ld (pz+%d), pz|r6k_strict|_||6D F9 %d
 ld (pz+bc), hl|r4k|_||ED 37
 ld (pz+bc), hl|r4k_strict|_||ED 37
 ld (pz+bc), hl|r5k|_||ED 37
@@ -44080,8 +44080,8 @@ ld (pz+hl), bc|r4k|_||6D 33
 ld (pz+hl), bc|r4k_strict|_||6D 33
 ld (pz+hl), bc|r5k|_||6D 33
 ld (pz+hl), bc|r5k_strict|_||6D 33
-ld (pz+hl), bc|r6k|_||6D;33
-ld (pz+hl), bc|r6k_strict|_||6D;33
+ld (pz+hl), bc|r6k|_||6D 33
+ld (pz+hl), bc|r6k_strict|_||6D 33
 ld (pz+hl), bcde|r4k|_||DD 3D
 ld (pz+hl), bcde|r4k_strict|_||DD 3D
 ld (pz+hl), bcde|r5k|_||DD 3D
@@ -44092,20 +44092,20 @@ ld (pz+hl), de|r4k|_||6D 73
 ld (pz+hl), de|r4k_strict|_||6D 73
 ld (pz+hl), de|r5k|_||6D 73
 ld (pz+hl), de|r5k_strict|_||6D 73
-ld (pz+hl), de|r6k|_||6D;73
-ld (pz+hl), de|r6k_strict|_||6D;73
+ld (pz+hl), de|r6k|_||6D 73
+ld (pz+hl), de|r6k_strict|_||6D 73
 ld (pz+hl), ix|r4k|_||6D B3
 ld (pz+hl), ix|r4k_strict|_||6D B3
 ld (pz+hl), ix|r5k|_||6D B3
 ld (pz+hl), ix|r5k_strict|_||6D B3
-ld (pz+hl), ix|r6k|_||6D;B3
-ld (pz+hl), ix|r6k_strict|_||6D;B3
+ld (pz+hl), ix|r6k|_||6D B3
+ld (pz+hl), ix|r6k_strict|_||6D B3
 ld (pz+hl), iy|r4k|_||6D F3
 ld (pz+hl), iy|r4k_strict|_||6D F3
 ld (pz+hl), iy|r5k|_||6D F3
 ld (pz+hl), iy|r5k_strict|_||6D F3
-ld (pz+hl), iy|r6k|_||6D;F3
-ld (pz+hl), iy|r6k_strict|_||6D;F3
+ld (pz+hl), iy|r6k|_||6D F3
+ld (pz+hl), iy|r6k_strict|_||6D F3
 ld (pz+hl), jkhl|r4k|_||FD 3D
 ld (pz+hl), jkhl|r4k_strict|_||FD 3D
 ld (pz+hl), jkhl|r5k|_||FD 3D
@@ -44116,26 +44116,26 @@ ld (pz+hl), pw|r4k|_||6D 3B
 ld (pz+hl), pw|r4k_strict|_||6D 3B
 ld (pz+hl), pw|r5k|_||6D 3B
 ld (pz+hl), pw|r5k_strict|_||6D 3B
-ld (pz+hl), pw|r6k|_||6D;3B
-ld (pz+hl), pw|r6k_strict|_||6D;3B
+ld (pz+hl), pw|r6k|_||6D 3B
+ld (pz+hl), pw|r6k_strict|_||6D 3B
 ld (pz+hl), px|r4k|_||6D 7B
 ld (pz+hl), px|r4k_strict|_||6D 7B
 ld (pz+hl), px|r5k|_||6D 7B
 ld (pz+hl), px|r5k_strict|_||6D 7B
-ld (pz+hl), px|r6k|_||6D;7B
-ld (pz+hl), px|r6k_strict|_||6D;7B
+ld (pz+hl), px|r6k|_||6D 7B
+ld (pz+hl), px|r6k_strict|_||6D 7B
 ld (pz+hl), py|r4k|_||6D BB
 ld (pz+hl), py|r4k_strict|_||6D BB
 ld (pz+hl), py|r5k|_||6D BB
 ld (pz+hl), py|r5k_strict|_||6D BB
-ld (pz+hl), py|r6k|_||6D;BB
-ld (pz+hl), py|r6k_strict|_||6D;BB
+ld (pz+hl), py|r6k|_||6D BB
+ld (pz+hl), py|r6k_strict|_||6D BB
 ld (pz+hl), pz|r4k|_||6D FB
 ld (pz+hl), pz|r4k_strict|_||6D FB
 ld (pz+hl), pz|r5k|_||6D FB
 ld (pz+hl), pz|r5k_strict|_||6D FB
-ld (pz+hl), pz|r6k|_||6D;FB
-ld (pz+hl), pz|r6k_strict|_||6D;FB
+ld (pz+hl), pz|r6k|_||6D FB
+ld (pz+hl), pz|r6k_strict|_||6D FB
 ld (sp), ahl|kc160|_||ED 22 00
 ld (sp), ahl|kc160_strict|_||ED 22 00
 ld (sp), bc|kc160|_||ED 86 00
@@ -47103,74 +47103,74 @@ ld bc', (pw)|r4k|_||76;6D 00 00
 ld bc', (pw)|r4k_strict|_||76;6D 00 00
 ld bc', (pw)|r5k|_||76;6D 00 00
 ld bc', (pw)|r5k_strict|_||76;6D 00 00
-ld bc', (pw)|r6k|_||76;6D;00 00
-ld bc', (pw)|r6k_strict|_||76;6D;00 00
+ld bc', (pw)|r6k|_||76;6D 00 00
+ld bc', (pw)|r6k_strict|_||76;6D 00 00
 ld bc', (pw+%d)|r4k|_||76;6D 00 %d
 ld bc', (pw+%d)|r4k_strict|_||76;6D 00 %d
 ld bc', (pw+%d)|r5k|_||76;6D 00 %d
 ld bc', (pw+%d)|r5k_strict|_||76;6D 00 %d
-ld bc', (pw+%d)|r6k|_||76;6D;00 %d
-ld bc', (pw+%d)|r6k_strict|_||76;6D;00 %d
+ld bc', (pw+%d)|r6k|_||76;6D 00 %d
+ld bc', (pw+%d)|r6k_strict|_||76;6D 00 %d
 ld bc', (pw+hl)|r4k|_||76;6D 02
 ld bc', (pw+hl)|r4k_strict|_||76;6D 02
 ld bc', (pw+hl)|r5k|_||76;6D 02
 ld bc', (pw+hl)|r5k_strict|_||76;6D 02
-ld bc', (pw+hl)|r6k|_||76;6D;02
-ld bc', (pw+hl)|r6k_strict|_||76;6D;02
+ld bc', (pw+hl)|r6k|_||76;6D 02
+ld bc', (pw+hl)|r6k_strict|_||76;6D 02
 ld bc', (px)|r4k|_||76;6D 10 00
 ld bc', (px)|r4k_strict|_||76;6D 10 00
 ld bc', (px)|r5k|_||76;6D 10 00
 ld bc', (px)|r5k_strict|_||76;6D 10 00
-ld bc', (px)|r6k|_||76;6D;10 00
-ld bc', (px)|r6k_strict|_||76;6D;10 00
+ld bc', (px)|r6k|_||76;6D 10 00
+ld bc', (px)|r6k_strict|_||76;6D 10 00
 ld bc', (px+%d)|r4k|_||76;6D 10 %d
 ld bc', (px+%d)|r4k_strict|_||76;6D 10 %d
 ld bc', (px+%d)|r5k|_||76;6D 10 %d
 ld bc', (px+%d)|r5k_strict|_||76;6D 10 %d
-ld bc', (px+%d)|r6k|_||76;6D;10 %d
-ld bc', (px+%d)|r6k_strict|_||76;6D;10 %d
+ld bc', (px+%d)|r6k|_||76;6D 10 %d
+ld bc', (px+%d)|r6k_strict|_||76;6D 10 %d
 ld bc', (px+hl)|r4k|_||76;6D 12
 ld bc', (px+hl)|r4k_strict|_||76;6D 12
 ld bc', (px+hl)|r5k|_||76;6D 12
 ld bc', (px+hl)|r5k_strict|_||76;6D 12
-ld bc', (px+hl)|r6k|_||76;6D;12
-ld bc', (px+hl)|r6k_strict|_||76;6D;12
+ld bc', (px+hl)|r6k|_||76;6D 12
+ld bc', (px+hl)|r6k_strict|_||76;6D 12
 ld bc', (py)|r4k|_||76;6D 20 00
 ld bc', (py)|r4k_strict|_||76;6D 20 00
 ld bc', (py)|r5k|_||76;6D 20 00
 ld bc', (py)|r5k_strict|_||76;6D 20 00
-ld bc', (py)|r6k|_||76;6D;20 00
-ld bc', (py)|r6k_strict|_||76;6D;20 00
+ld bc', (py)|r6k|_||76;6D 20 00
+ld bc', (py)|r6k_strict|_||76;6D 20 00
 ld bc', (py+%d)|r4k|_||76;6D 20 %d
 ld bc', (py+%d)|r4k_strict|_||76;6D 20 %d
 ld bc', (py+%d)|r5k|_||76;6D 20 %d
 ld bc', (py+%d)|r5k_strict|_||76;6D 20 %d
-ld bc', (py+%d)|r6k|_||76;6D;20 %d
-ld bc', (py+%d)|r6k_strict|_||76;6D;20 %d
+ld bc', (py+%d)|r6k|_||76;6D 20 %d
+ld bc', (py+%d)|r6k_strict|_||76;6D 20 %d
 ld bc', (py+hl)|r4k|_||76;6D 22
 ld bc', (py+hl)|r4k_strict|_||76;6D 22
 ld bc', (py+hl)|r5k|_||76;6D 22
 ld bc', (py+hl)|r5k_strict|_||76;6D 22
-ld bc', (py+hl)|r6k|_||76;6D;22
-ld bc', (py+hl)|r6k_strict|_||76;6D;22
+ld bc', (py+hl)|r6k|_||76;6D 22
+ld bc', (py+hl)|r6k_strict|_||76;6D 22
 ld bc', (pz)|r4k|_||76;6D 30 00
 ld bc', (pz)|r4k_strict|_||76;6D 30 00
 ld bc', (pz)|r5k|_||76;6D 30 00
 ld bc', (pz)|r5k_strict|_||76;6D 30 00
-ld bc', (pz)|r6k|_||76;6D;30 00
-ld bc', (pz)|r6k_strict|_||76;6D;30 00
+ld bc', (pz)|r6k|_||76;6D 30 00
+ld bc', (pz)|r6k_strict|_||76;6D 30 00
 ld bc', (pz+%d)|r4k|_||76;6D 30 %d
 ld bc', (pz+%d)|r4k_strict|_||76;6D 30 %d
 ld bc', (pz+%d)|r5k|_||76;6D 30 %d
 ld bc', (pz+%d)|r5k_strict|_||76;6D 30 %d
-ld bc', (pz+%d)|r6k|_||76;6D;30 %d
-ld bc', (pz+%d)|r6k_strict|_||76;6D;30 %d
+ld bc', (pz+%d)|r6k|_||76;6D 30 %d
+ld bc', (pz+%d)|r6k_strict|_||76;6D 30 %d
 ld bc', (pz+hl)|r4k|_||76;6D 32
 ld bc', (pz+hl)|r4k_strict|_||76;6D 32
 ld bc', (pz+hl)|r5k|_||76;6D 32
 ld bc', (pz+hl)|r5k_strict|_||76;6D 32
-ld bc', (pz+hl)|r6k|_||76;6D;32
-ld bc', (pz+hl)|r6k_strict|_||76;6D;32
+ld bc', (pz+hl)|r6k|_||76;6D 32
+ld bc', (pz+hl)|r6k_strict|_||76;6D 32
 ld bc', bc|r2ka|_||ED 49
 ld bc', bc|r2ka_strict|_||ED 49
 ld bc', bc|r3k|_||ED 49
@@ -47416,74 +47416,74 @@ ld bc, (pw)|r4k|_||6D 00 00
 ld bc, (pw)|r4k_strict|_||6D 00 00
 ld bc, (pw)|r5k|_||6D 00 00
 ld bc, (pw)|r5k_strict|_||6D 00 00
-ld bc, (pw)|r6k|_||6D;00 00
-ld bc, (pw)|r6k_strict|_||6D;00 00
+ld bc, (pw)|r6k|_||6D 00 00
+ld bc, (pw)|r6k_strict|_||6D 00 00
 ld bc, (pw+%d)|r4k|_||6D 00 %d
 ld bc, (pw+%d)|r4k_strict|_||6D 00 %d
 ld bc, (pw+%d)|r5k|_||6D 00 %d
 ld bc, (pw+%d)|r5k_strict|_||6D 00 %d
-ld bc, (pw+%d)|r6k|_||6D;00 %d
-ld bc, (pw+%d)|r6k_strict|_||6D;00 %d
+ld bc, (pw+%d)|r6k|_||6D 00 %d
+ld bc, (pw+%d)|r6k_strict|_||6D 00 %d
 ld bc, (pw+hl)|r4k|_||6D 02
 ld bc, (pw+hl)|r4k_strict|_||6D 02
 ld bc, (pw+hl)|r5k|_||6D 02
 ld bc, (pw+hl)|r5k_strict|_||6D 02
-ld bc, (pw+hl)|r6k|_||6D;02
-ld bc, (pw+hl)|r6k_strict|_||6D;02
+ld bc, (pw+hl)|r6k|_||6D 02
+ld bc, (pw+hl)|r6k_strict|_||6D 02
 ld bc, (px)|r4k|_||6D 10 00
 ld bc, (px)|r4k_strict|_||6D 10 00
 ld bc, (px)|r5k|_||6D 10 00
 ld bc, (px)|r5k_strict|_||6D 10 00
-ld bc, (px)|r6k|_||6D;10 00
-ld bc, (px)|r6k_strict|_||6D;10 00
+ld bc, (px)|r6k|_||6D 10 00
+ld bc, (px)|r6k_strict|_||6D 10 00
 ld bc, (px+%d)|r4k|_||6D 10 %d
 ld bc, (px+%d)|r4k_strict|_||6D 10 %d
 ld bc, (px+%d)|r5k|_||6D 10 %d
 ld bc, (px+%d)|r5k_strict|_||6D 10 %d
-ld bc, (px+%d)|r6k|_||6D;10 %d
-ld bc, (px+%d)|r6k_strict|_||6D;10 %d
+ld bc, (px+%d)|r6k|_||6D 10 %d
+ld bc, (px+%d)|r6k_strict|_||6D 10 %d
 ld bc, (px+hl)|r4k|_||6D 12
 ld bc, (px+hl)|r4k_strict|_||6D 12
 ld bc, (px+hl)|r5k|_||6D 12
 ld bc, (px+hl)|r5k_strict|_||6D 12
-ld bc, (px+hl)|r6k|_||6D;12
-ld bc, (px+hl)|r6k_strict|_||6D;12
+ld bc, (px+hl)|r6k|_||6D 12
+ld bc, (px+hl)|r6k_strict|_||6D 12
 ld bc, (py)|r4k|_||6D 20 00
 ld bc, (py)|r4k_strict|_||6D 20 00
 ld bc, (py)|r5k|_||6D 20 00
 ld bc, (py)|r5k_strict|_||6D 20 00
-ld bc, (py)|r6k|_||6D;20 00
-ld bc, (py)|r6k_strict|_||6D;20 00
+ld bc, (py)|r6k|_||6D 20 00
+ld bc, (py)|r6k_strict|_||6D 20 00
 ld bc, (py+%d)|r4k|_||6D 20 %d
 ld bc, (py+%d)|r4k_strict|_||6D 20 %d
 ld bc, (py+%d)|r5k|_||6D 20 %d
 ld bc, (py+%d)|r5k_strict|_||6D 20 %d
-ld bc, (py+%d)|r6k|_||6D;20 %d
-ld bc, (py+%d)|r6k_strict|_||6D;20 %d
+ld bc, (py+%d)|r6k|_||6D 20 %d
+ld bc, (py+%d)|r6k_strict|_||6D 20 %d
 ld bc, (py+hl)|r4k|_||6D 22
 ld bc, (py+hl)|r4k_strict|_||6D 22
 ld bc, (py+hl)|r5k|_||6D 22
 ld bc, (py+hl)|r5k_strict|_||6D 22
-ld bc, (py+hl)|r6k|_||6D;22
-ld bc, (py+hl)|r6k_strict|_||6D;22
+ld bc, (py+hl)|r6k|_||6D 22
+ld bc, (py+hl)|r6k_strict|_||6D 22
 ld bc, (pz)|r4k|_||6D 30 00
 ld bc, (pz)|r4k_strict|_||6D 30 00
 ld bc, (pz)|r5k|_||6D 30 00
 ld bc, (pz)|r5k_strict|_||6D 30 00
-ld bc, (pz)|r6k|_||6D;30 00
-ld bc, (pz)|r6k_strict|_||6D;30 00
+ld bc, (pz)|r6k|_||6D 30 00
+ld bc, (pz)|r6k_strict|_||6D 30 00
 ld bc, (pz+%d)|r4k|_||6D 30 %d
 ld bc, (pz+%d)|r4k_strict|_||6D 30 %d
 ld bc, (pz+%d)|r5k|_||6D 30 %d
 ld bc, (pz+%d)|r5k_strict|_||6D 30 %d
-ld bc, (pz+%d)|r6k|_||6D;30 %d
-ld bc, (pz+%d)|r6k_strict|_||6D;30 %d
+ld bc, (pz+%d)|r6k|_||6D 30 %d
+ld bc, (pz+%d)|r6k_strict|_||6D 30 %d
 ld bc, (pz+hl)|r4k|_||6D 32
 ld bc, (pz+hl)|r4k_strict|_||6D 32
 ld bc, (pz+hl)|r5k|_||6D 32
 ld bc, (pz+hl)|r5k_strict|_||6D 32
-ld bc, (pz+hl)|r6k|_||6D;32
-ld bc, (pz+hl)|r6k_strict|_||6D;32
+ld bc, (pz+hl)|r6k|_||6D 32
+ld bc, (pz+hl)|r6k_strict|_||6D 32
 ld bc, (sp)|kc160|_||ED 8E 00
 ld bc, (sp)|kc160_strict|_||ED 8E 00
 ld bc, (sp+%d)|kc160|_||ED 8E %d
@@ -49668,74 +49668,74 @@ ld de', (pw)|r4k|_||76;6D 40 00
 ld de', (pw)|r4k_strict|_||76;6D 40 00
 ld de', (pw)|r5k|_||76;6D 40 00
 ld de', (pw)|r5k_strict|_||76;6D 40 00
-ld de', (pw)|r6k|_||76;6D;40;00
-ld de', (pw)|r6k_strict|_||76;6D;40;00
+ld de', (pw)|r6k|_||76;6D 40 00
+ld de', (pw)|r6k_strict|_||76;6D 40 00
 ld de', (pw+%d)|r4k|_||76;6D 40 %d
 ld de', (pw+%d)|r4k_strict|_||76;6D 40 %d
 ld de', (pw+%d)|r5k|_||76;6D 40 %d
 ld de', (pw+%d)|r5k_strict|_||76;6D 40 %d
-ld de', (pw+%d)|r6k|_||76;6D;40 %d
-ld de', (pw+%d)|r6k_strict|_||76;6D;40 %d
+ld de', (pw+%d)|r6k|_||76;6D 40 %d
+ld de', (pw+%d)|r6k_strict|_||76;6D 40 %d
 ld de', (pw+hl)|r4k|_||76;6D 42
 ld de', (pw+hl)|r4k_strict|_||76;6D 42
 ld de', (pw+hl)|r5k|_||76;6D 42
 ld de', (pw+hl)|r5k_strict|_||76;6D 42
-ld de', (pw+hl)|r6k|_||76;6D;42
-ld de', (pw+hl)|r6k_strict|_||76;6D;42
+ld de', (pw+hl)|r6k|_||76;6D 42
+ld de', (pw+hl)|r6k_strict|_||76;6D 42
 ld de', (px)|r4k|_||76;6D 50 00
 ld de', (px)|r4k_strict|_||76;6D 50 00
 ld de', (px)|r5k|_||76;6D 50 00
 ld de', (px)|r5k_strict|_||76;6D 50 00
-ld de', (px)|r6k|_||76;6D;50 00
-ld de', (px)|r6k_strict|_||76;6D;50 00
+ld de', (px)|r6k|_||76;6D 50 00
+ld de', (px)|r6k_strict|_||76;6D 50 00
 ld de', (px+%d)|r4k|_||76;6D 50 %d
 ld de', (px+%d)|r4k_strict|_||76;6D 50 %d
 ld de', (px+%d)|r5k|_||76;6D 50 %d
 ld de', (px+%d)|r5k_strict|_||76;6D 50 %d
-ld de', (px+%d)|r6k|_||76;6D;50 %d
-ld de', (px+%d)|r6k_strict|_||76;6D;50 %d
+ld de', (px+%d)|r6k|_||76;6D 50 %d
+ld de', (px+%d)|r6k_strict|_||76;6D 50 %d
 ld de', (px+hl)|r4k|_||76;6D 52
 ld de', (px+hl)|r4k_strict|_||76;6D 52
 ld de', (px+hl)|r5k|_||76;6D 52
 ld de', (px+hl)|r5k_strict|_||76;6D 52
-ld de', (px+hl)|r6k|_||76;6D;52
-ld de', (px+hl)|r6k_strict|_||76;6D;52
+ld de', (px+hl)|r6k|_||76;6D 52
+ld de', (px+hl)|r6k_strict|_||76;6D 52
 ld de', (py)|r4k|_||76;6D 60 00
 ld de', (py)|r4k_strict|_||76;6D 60 00
 ld de', (py)|r5k|_||76;6D 60 00
 ld de', (py)|r5k_strict|_||76;6D 60 00
-ld de', (py)|r6k|_||76;6D;60 00
-ld de', (py)|r6k_strict|_||76;6D;60 00
+ld de', (py)|r6k|_||76;6D 60 00
+ld de', (py)|r6k_strict|_||76;6D 60 00
 ld de', (py+%d)|r4k|_||76;6D 60 %d
 ld de', (py+%d)|r4k_strict|_||76;6D 60 %d
 ld de', (py+%d)|r5k|_||76;6D 60 %d
 ld de', (py+%d)|r5k_strict|_||76;6D 60 %d
-ld de', (py+%d)|r6k|_||76;6D;60 %d
-ld de', (py+%d)|r6k_strict|_||76;6D;60 %d
+ld de', (py+%d)|r6k|_||76;6D 60 %d
+ld de', (py+%d)|r6k_strict|_||76;6D 60 %d
 ld de', (py+hl)|r4k|_||76;6D 62
 ld de', (py+hl)|r4k_strict|_||76;6D 62
 ld de', (py+hl)|r5k|_||76;6D 62
 ld de', (py+hl)|r5k_strict|_||76;6D 62
-ld de', (py+hl)|r6k|_||76;6D;62
-ld de', (py+hl)|r6k_strict|_||76;6D;62
+ld de', (py+hl)|r6k|_||76;6D 62
+ld de', (py+hl)|r6k_strict|_||76;6D 62
 ld de', (pz)|r4k|_||76;6D 70 00
 ld de', (pz)|r4k_strict|_||76;6D 70 00
 ld de', (pz)|r5k|_||76;6D 70 00
 ld de', (pz)|r5k_strict|_||76;6D 70 00
-ld de', (pz)|r6k|_||76;6D;70 00
-ld de', (pz)|r6k_strict|_||76;6D;70 00
+ld de', (pz)|r6k|_||76;6D 70 00
+ld de', (pz)|r6k_strict|_||76;6D 70 00
 ld de', (pz+%d)|r4k|_||76;6D 70 %d
 ld de', (pz+%d)|r4k_strict|_||76;6D 70 %d
 ld de', (pz+%d)|r5k|_||76;6D 70 %d
 ld de', (pz+%d)|r5k_strict|_||76;6D 70 %d
-ld de', (pz+%d)|r6k|_||76;6D;70 %d
-ld de', (pz+%d)|r6k_strict|_||76;6D;70 %d
+ld de', (pz+%d)|r6k|_||76;6D 70 %d
+ld de', (pz+%d)|r6k_strict|_||76;6D 70 %d
 ld de', (pz+hl)|r4k|_||76;6D 72
 ld de', (pz+hl)|r4k_strict|_||76;6D 72
 ld de', (pz+hl)|r5k|_||76;6D 72
 ld de', (pz+hl)|r5k_strict|_||76;6D 72
-ld de', (pz+hl)|r6k|_||76;6D;72
-ld de', (pz+hl)|r6k_strict|_||76;6D;72
+ld de', (pz+hl)|r6k|_||76;6D 72
+ld de', (pz+hl)|r6k_strict|_||76;6D 72
 ld de', bc|r2ka|_||ED 59
 ld de', bc|r2ka_strict|_||ED 59
 ld de', bc|r3k|_||ED 59
@@ -49981,74 +49981,74 @@ ld de, (pw)|r4k|_||6D 40 00
 ld de, (pw)|r4k_strict|_||6D 40 00
 ld de, (pw)|r5k|_||6D 40 00
 ld de, (pw)|r5k_strict|_||6D 40 00
-ld de, (pw)|r6k|_||6D;40;00
-ld de, (pw)|r6k_strict|_||6D;40;00
+ld de, (pw)|r6k|_||6D 40 00
+ld de, (pw)|r6k_strict|_||6D 40 00
 ld de, (pw+%d)|r4k|_||6D 40 %d
 ld de, (pw+%d)|r4k_strict|_||6D 40 %d
 ld de, (pw+%d)|r5k|_||6D 40 %d
 ld de, (pw+%d)|r5k_strict|_||6D 40 %d
-ld de, (pw+%d)|r6k|_||6D;40 %d
-ld de, (pw+%d)|r6k_strict|_||6D;40 %d
+ld de, (pw+%d)|r6k|_||6D 40 %d
+ld de, (pw+%d)|r6k_strict|_||6D 40 %d
 ld de, (pw+hl)|r4k|_||6D 42
 ld de, (pw+hl)|r4k_strict|_||6D 42
 ld de, (pw+hl)|r5k|_||6D 42
 ld de, (pw+hl)|r5k_strict|_||6D 42
-ld de, (pw+hl)|r6k|_||6D;42
-ld de, (pw+hl)|r6k_strict|_||6D;42
+ld de, (pw+hl)|r6k|_||6D 42
+ld de, (pw+hl)|r6k_strict|_||6D 42
 ld de, (px)|r4k|_||6D 50 00
 ld de, (px)|r4k_strict|_||6D 50 00
 ld de, (px)|r5k|_||6D 50 00
 ld de, (px)|r5k_strict|_||6D 50 00
-ld de, (px)|r6k|_||6D;50 00
-ld de, (px)|r6k_strict|_||6D;50 00
+ld de, (px)|r6k|_||6D 50 00
+ld de, (px)|r6k_strict|_||6D 50 00
 ld de, (px+%d)|r4k|_||6D 50 %d
 ld de, (px+%d)|r4k_strict|_||6D 50 %d
 ld de, (px+%d)|r5k|_||6D 50 %d
 ld de, (px+%d)|r5k_strict|_||6D 50 %d
-ld de, (px+%d)|r6k|_||6D;50 %d
-ld de, (px+%d)|r6k_strict|_||6D;50 %d
+ld de, (px+%d)|r6k|_||6D 50 %d
+ld de, (px+%d)|r6k_strict|_||6D 50 %d
 ld de, (px+hl)|r4k|_||6D 52
 ld de, (px+hl)|r4k_strict|_||6D 52
 ld de, (px+hl)|r5k|_||6D 52
 ld de, (px+hl)|r5k_strict|_||6D 52
-ld de, (px+hl)|r6k|_||6D;52
-ld de, (px+hl)|r6k_strict|_||6D;52
+ld de, (px+hl)|r6k|_||6D 52
+ld de, (px+hl)|r6k_strict|_||6D 52
 ld de, (py)|r4k|_||6D 60 00
 ld de, (py)|r4k_strict|_||6D 60 00
 ld de, (py)|r5k|_||6D 60 00
 ld de, (py)|r5k_strict|_||6D 60 00
-ld de, (py)|r6k|_||6D;60 00
-ld de, (py)|r6k_strict|_||6D;60 00
+ld de, (py)|r6k|_||6D 60 00
+ld de, (py)|r6k_strict|_||6D 60 00
 ld de, (py+%d)|r4k|_||6D 60 %d
 ld de, (py+%d)|r4k_strict|_||6D 60 %d
 ld de, (py+%d)|r5k|_||6D 60 %d
 ld de, (py+%d)|r5k_strict|_||6D 60 %d
-ld de, (py+%d)|r6k|_||6D;60 %d
-ld de, (py+%d)|r6k_strict|_||6D;60 %d
+ld de, (py+%d)|r6k|_||6D 60 %d
+ld de, (py+%d)|r6k_strict|_||6D 60 %d
 ld de, (py+hl)|r4k|_||6D 62
 ld de, (py+hl)|r4k_strict|_||6D 62
 ld de, (py+hl)|r5k|_||6D 62
 ld de, (py+hl)|r5k_strict|_||6D 62
-ld de, (py+hl)|r6k|_||6D;62
-ld de, (py+hl)|r6k_strict|_||6D;62
+ld de, (py+hl)|r6k|_||6D 62
+ld de, (py+hl)|r6k_strict|_||6D 62
 ld de, (pz)|r4k|_||6D 70 00
 ld de, (pz)|r4k_strict|_||6D 70 00
 ld de, (pz)|r5k|_||6D 70 00
 ld de, (pz)|r5k_strict|_||6D 70 00
-ld de, (pz)|r6k|_||6D;70 00
-ld de, (pz)|r6k_strict|_||6D;70 00
+ld de, (pz)|r6k|_||6D 70 00
+ld de, (pz)|r6k_strict|_||6D 70 00
 ld de, (pz+%d)|r4k|_||6D 70 %d
 ld de, (pz+%d)|r4k_strict|_||6D 70 %d
 ld de, (pz+%d)|r5k|_||6D 70 %d
 ld de, (pz+%d)|r5k_strict|_||6D 70 %d
-ld de, (pz+%d)|r6k|_||6D;70 %d
-ld de, (pz+%d)|r6k_strict|_||6D;70 %d
+ld de, (pz+%d)|r6k|_||6D 70 %d
+ld de, (pz+%d)|r6k_strict|_||6D 70 %d
 ld de, (pz+hl)|r4k|_||6D 72
 ld de, (pz+hl)|r4k_strict|_||6D 72
 ld de, (pz+hl)|r5k|_||6D 72
 ld de, (pz+hl)|r5k_strict|_||6D 72
-ld de, (pz+hl)|r6k|_||6D;72
-ld de, (pz+hl)|r6k_strict|_||6D;72
+ld de, (pz+hl)|r6k|_||6D 72
+ld de, (pz+hl)|r6k_strict|_||6D 72
 ld de, (sp)|kc160|_||ED 9E 00
 ld de, (sp)|kc160_strict|_||ED 9E 00
 ld de, (sp+%d)|kc160|_||ED 9E %d
@@ -50157,23 +50157,23 @@ ld de, hl'|r800|X||D9;E5;D9;D1
 ld de, hl'|z180|X||D9;E5;D9;D1
 ld de, hl'|z80|X||D9;E5;D9;D1
 ld de, hl'|z80n|X||D9;E5;D9;D1
-ld de, hl+%n|8080|X||E5;11 %n 00;19;EB;E1
+ld de, hl+%n|8080|X||E5;11 %n %s;19;EB;E1
 ld de, hl+%n|8085|_||28 %n
 ld de, hl+%n|8085_strict|_||28 %n
-ld de, hl+%n|ez80|X||E5;11 %n 00 00;19;EB;E1
-ld de, hl+%n|ez80_z80|X||E5;11 %n 00;19;EB;E1
-ld de, hl+%n|gbz80|X||E5;11 %n 00;19;E5;D5;E1;D1;E1
-ld de, hl+%n|kc160|X||E5;11 %n 00;19;EB;E1
-ld de, hl+%n|kc160_z80|X||E5;11 %n 00;19;EB;E1
-ld de, hl+%n|r2ka|X||E5;11 %n 00;19;EB;E1
-ld de, hl+%n|r3k|X||E5;11 %n 00;19;EB;E1
-ld de, hl+%n|r4k|X||E5;11 %n 00;19;EB;E1
-ld de, hl+%n|r5k|X||E5;11 %n 00;19;EB;E1
-ld de, hl+%n|r6k|X||E5;11 %n 00;19;EB;E1
-ld de, hl+%n|r800|X||E5;11 %n 00;19;EB;E1
-ld de, hl+%n|z180|X||E5;11 %n 00;19;EB;E1
-ld de, hl+%n|z80|X||E5;11 %n 00;19;EB;E1
-ld de, hl+%n|z80n|X||E5;11 %n 00;19;EB;E1
+ld de, hl+%n|ez80|X||E5;11 %n %s %s;19;EB;E1
+ld de, hl+%n|ez80_z80|X||E5;11 %n %s;19;EB;E1
+ld de, hl+%n|gbz80|X||E5;11 %n %s;19;E5;D5;E1;D1;E1
+ld de, hl+%n|kc160|X||E5;11 %n %s;19;EB;E1
+ld de, hl+%n|kc160_z80|X||E5;11 %n %s;19;EB;E1
+ld de, hl+%n|r2ka|X||E5;11 %n %s;19;EB;E1
+ld de, hl+%n|r3k|X||E5;11 %n %s;19;EB;E1
+ld de, hl+%n|r4k|X||E5;11 %n %s;19;EB;E1
+ld de, hl+%n|r5k|X||E5;11 %n %s;19;EB;E1
+ld de, hl+%n|r6k|X||E5;11 %n %s;19;EB;E1
+ld de, hl+%n|r800|X||E5;11 %n %s;19;EB;E1
+ld de, hl+%n|z180|X||E5;11 %n %s;19;EB;E1
+ld de, hl+%n|z80|X||E5;11 %n %s;19;EB;E1
+ld de, hl+%n|z80n|X||E5;11 %n %s;19;EB;E1
 ld de, ix|ez80|X||DD 54;DD 5D
 ld de, ix|ez80_z80|X||DD 54;DD 5D
 ld de, ix|kc160|X||DD E5;D1
@@ -50217,23 +50217,23 @@ ld de, sp|r800|X||EB;21 00 00;39;EB
 ld de, sp|z180|X||EB;21 00 00;39;EB
 ld de, sp|z80|X||EB;21 00 00;39;EB
 ld de, sp|z80n|X||EB;21 00 00;39;EB
-ld de, sp+%n|8080|X||EB;21 %n 00;39;EB
+ld de, sp+%n|8080|X||EB;21 %n %s;39;EB
 ld de, sp+%n|8085|_||38 %n
 ld de, sp+%n|8085_strict|_||38 %n
-ld de, sp+%n|ez80|X||EB;21 %n 00 00;39;EB
-ld de, sp+%n|ez80_z80|X||EB;21 %n 00;39;EB
-ld de, sp+%n|gbz80|X||E5;D5;E1;D1;21 %n 00;39;E5;D5;E1;D1
-ld de, sp+%n|kc160|X||EB;21 %n 00;39;EB
-ld de, sp+%n|kc160_z80|X||EB;21 %n 00;39;EB
-ld de, sp+%n|r2ka|X||EB;21 %n 00;39;EB
-ld de, sp+%n|r3k|X||EB;21 %n 00;39;EB
-ld de, sp+%n|r4k|X||EB;21 %n 00;39;EB
-ld de, sp+%n|r5k|X||EB;21 %n 00;39;EB
-ld de, sp+%n|r6k|X||EB;21 %n 00;39;EB
-ld de, sp+%n|r800|X||EB;21 %n 00;39;EB
-ld de, sp+%n|z180|X||EB;21 %n 00;39;EB
-ld de, sp+%n|z80|X||EB;21 %n 00;39;EB
-ld de, sp+%n|z80n|X||EB;21 %n 00;39;EB
+ld de, sp+%n|ez80|X||EB;21 %n %s %s;39;EB
+ld de, sp+%n|ez80_z80|X||EB;21 %n %s;39;EB
+ld de, sp+%n|gbz80|X||E5;D5;E1;D1;21 %n %s;39;E5;D5;E1;D1
+ld de, sp+%n|kc160|X||EB;21 %n %s;39;EB
+ld de, sp+%n|kc160_z80|X||EB;21 %n %s;39;EB
+ld de, sp+%n|r2ka|X||EB;21 %n %s;39;EB
+ld de, sp+%n|r3k|X||EB;21 %n %s;39;EB
+ld de, sp+%n|r4k|X||EB;21 %n %s;39;EB
+ld de, sp+%n|r5k|X||EB;21 %n %s;39;EB
+ld de, sp+%n|r6k|X||EB;21 %n %s;39;EB
+ld de, sp+%n|r800|X||EB;21 %n %s;39;EB
+ld de, sp+%n|z180|X||EB;21 %n %s;39;EB
+ld de, sp+%n|z80|X||EB;21 %n %s;39;EB
+ld de, sp+%n|z80n|X||EB;21 %n %s;39;EB
 ld e', %n|r2ka|_||76;1E %n
 ld e', %n|r2ka_strict|_||76;1E %n
 ld e', %n|r3k|_||76;1E %n
@@ -52667,22 +52667,22 @@ ld hl, sp|r800|X||21 00 00;39
 ld hl, sp|z180|X||21 00 00;39
 ld hl, sp|z80|X||21 00 00;39
 ld hl, sp|z80n|X||21 00 00;39
-ld hl, sp+%d|8080|X||21 %d 00;39
-ld hl, sp+%d|ez80|X||21 %d 00 00;39
-ld hl, sp+%d|ez80_z80|X||21 %d 00;39
+ld hl, sp+%d|8080|X||21 %d %s;39
+ld hl, sp+%d|ez80|X||21 %d %s %s;39
+ld hl, sp+%d|ez80_z80|X||21 %d %s;39
 ld hl, sp+%d|gbz80|_||F8 %d
 ld hl, sp+%d|gbz80_strict|_||F8 %d
-ld hl, sp+%d|kc160|X||21 %d 00;39
-ld hl, sp+%d|kc160_z80|X||21 %d 00;39
-ld hl, sp+%d|r2ka|X||21 %d 00;39
-ld hl, sp+%d|r3k|X||21 %d 00;39
-ld hl, sp+%d|r4k|X||21 %d 00;39
-ld hl, sp+%d|r5k|X||21 %d 00;39
-ld hl, sp+%d|r6k|X||21 %d 00;39
-ld hl, sp+%d|r800|X||21 %d 00;39
-ld hl, sp+%d|z180|X||21 %d 00;39
-ld hl, sp+%d|z80|X||21 %d 00;39
-ld hl, sp+%d|z80n|X||21 %d 00;39
+ld hl, sp+%d|kc160|X||21 %d %s;39
+ld hl, sp+%d|kc160_z80|X||21 %d %s;39
+ld hl, sp+%d|r2ka|X||21 %d %s;39
+ld hl, sp+%d|r3k|X||21 %d %s;39
+ld hl, sp+%d|r4k|X||21 %d %s;39
+ld hl, sp+%d|r5k|X||21 %d %s;39
+ld hl, sp+%d|r6k|X||21 %d %s;39
+ld hl, sp+%d|r800|X||21 %d %s;39
+ld hl, sp+%d|z180|X||21 %d %s;39
+ld hl, sp+%d|z80|X||21 %d %s;39
+ld hl, sp+%d|z80n|X||21 %d %s;39
 ld hl, sp+%n|8085|X||EB;38 %n;EB
 ld hl, xpc|r6k|_||9F
 ld hl, xpc|r6k_strict|_||9F
@@ -52892,74 +52892,74 @@ ld ix, (pw)|r4k|_||6D 80 00
 ld ix, (pw)|r4k_strict|_||6D 80 00
 ld ix, (pw)|r5k|_||6D 80 00
 ld ix, (pw)|r5k_strict|_||6D 80 00
-ld ix, (pw)|r6k|_||6D;80 00
-ld ix, (pw)|r6k_strict|_||6D;80 00
+ld ix, (pw)|r6k|_||6D 80 00
+ld ix, (pw)|r6k_strict|_||6D 80 00
 ld ix, (pw+%d)|r4k|_||6D 80 %d
 ld ix, (pw+%d)|r4k_strict|_||6D 80 %d
 ld ix, (pw+%d)|r5k|_||6D 80 %d
 ld ix, (pw+%d)|r5k_strict|_||6D 80 %d
-ld ix, (pw+%d)|r6k|_||6D;80 %d
-ld ix, (pw+%d)|r6k_strict|_||6D;80 %d
+ld ix, (pw+%d)|r6k|_||6D 80 %d
+ld ix, (pw+%d)|r6k_strict|_||6D 80 %d
 ld ix, (pw+hl)|r4k|_||6D 82
 ld ix, (pw+hl)|r4k_strict|_||6D 82
 ld ix, (pw+hl)|r5k|_||6D 82
 ld ix, (pw+hl)|r5k_strict|_||6D 82
-ld ix, (pw+hl)|r6k|_||6D;82
-ld ix, (pw+hl)|r6k_strict|_||6D;82
+ld ix, (pw+hl)|r6k|_||6D 82
+ld ix, (pw+hl)|r6k_strict|_||6D 82
 ld ix, (px)|r4k|_||6D 90 00
 ld ix, (px)|r4k_strict|_||6D 90 00
 ld ix, (px)|r5k|_||6D 90 00
 ld ix, (px)|r5k_strict|_||6D 90 00
-ld ix, (px)|r6k|_||6D;90 00
-ld ix, (px)|r6k_strict|_||6D;90 00
+ld ix, (px)|r6k|_||6D 90 00
+ld ix, (px)|r6k_strict|_||6D 90 00
 ld ix, (px+%d)|r4k|_||6D 90 %d
 ld ix, (px+%d)|r4k_strict|_||6D 90 %d
 ld ix, (px+%d)|r5k|_||6D 90 %d
 ld ix, (px+%d)|r5k_strict|_||6D 90 %d
-ld ix, (px+%d)|r6k|_||6D;90 %d
-ld ix, (px+%d)|r6k_strict|_||6D;90 %d
+ld ix, (px+%d)|r6k|_||6D 90 %d
+ld ix, (px+%d)|r6k_strict|_||6D 90 %d
 ld ix, (px+hl)|r4k|_||6D 92
 ld ix, (px+hl)|r4k_strict|_||6D 92
 ld ix, (px+hl)|r5k|_||6D 92
 ld ix, (px+hl)|r5k_strict|_||6D 92
-ld ix, (px+hl)|r6k|_||6D;92
-ld ix, (px+hl)|r6k_strict|_||6D;92
+ld ix, (px+hl)|r6k|_||6D 92
+ld ix, (px+hl)|r6k_strict|_||6D 92
 ld ix, (py)|r4k|_||6D A0 00
 ld ix, (py)|r4k_strict|_||6D A0 00
 ld ix, (py)|r5k|_||6D A0 00
 ld ix, (py)|r5k_strict|_||6D A0 00
-ld ix, (py)|r6k|_||6D;A0 00
-ld ix, (py)|r6k_strict|_||6D;A0 00
+ld ix, (py)|r6k|_||6D A0 00
+ld ix, (py)|r6k_strict|_||6D A0 00
 ld ix, (py+%d)|r4k|_||6D A0 %d
 ld ix, (py+%d)|r4k_strict|_||6D A0 %d
 ld ix, (py+%d)|r5k|_||6D A0 %d
 ld ix, (py+%d)|r5k_strict|_||6D A0 %d
-ld ix, (py+%d)|r6k|_||6D;A0 %d
-ld ix, (py+%d)|r6k_strict|_||6D;A0 %d
+ld ix, (py+%d)|r6k|_||6D A0 %d
+ld ix, (py+%d)|r6k_strict|_||6D A0 %d
 ld ix, (py+hl)|r4k|_||6D A2
 ld ix, (py+hl)|r4k_strict|_||6D A2
 ld ix, (py+hl)|r5k|_||6D A2
 ld ix, (py+hl)|r5k_strict|_||6D A2
-ld ix, (py+hl)|r6k|_||6D;A2
-ld ix, (py+hl)|r6k_strict|_||6D;A2
+ld ix, (py+hl)|r6k|_||6D A2
+ld ix, (py+hl)|r6k_strict|_||6D A2
 ld ix, (pz)|r4k|_||6D B0 00
 ld ix, (pz)|r4k_strict|_||6D B0 00
 ld ix, (pz)|r5k|_||6D B0 00
 ld ix, (pz)|r5k_strict|_||6D B0 00
-ld ix, (pz)|r6k|_||6D;B0 00
-ld ix, (pz)|r6k_strict|_||6D;B0 00
+ld ix, (pz)|r6k|_||6D B0 00
+ld ix, (pz)|r6k_strict|_||6D B0 00
 ld ix, (pz+%d)|r4k|_||6D B0 %d
 ld ix, (pz+%d)|r4k_strict|_||6D B0 %d
 ld ix, (pz+%d)|r5k|_||6D B0 %d
 ld ix, (pz+%d)|r5k_strict|_||6D B0 %d
-ld ix, (pz+%d)|r6k|_||6D;B0 %d
-ld ix, (pz+%d)|r6k_strict|_||6D;B0 %d
+ld ix, (pz+%d)|r6k|_||6D B0 %d
+ld ix, (pz+%d)|r6k_strict|_||6D B0 %d
 ld ix, (pz+hl)|r4k|_||6D B2
 ld ix, (pz+hl)|r4k_strict|_||6D B2
 ld ix, (pz+hl)|r5k|_||6D B2
 ld ix, (pz+hl)|r5k_strict|_||6D B2
-ld ix, (pz+hl)|r6k|_||6D;B2
-ld ix, (pz+hl)|r6k_strict|_||6D;B2
+ld ix, (pz+hl)|r6k|_||6D B2
+ld ix, (pz+hl)|r6k_strict|_||6D B2
 ld ix, (sp)|kc160|_||ED 8A 00
 ld ix, (sp)|kc160_strict|_||ED 8A 00
 ld ix, (sp)|r2ka|_||DD C4 00
@@ -53424,74 +53424,74 @@ ld iy, (pw)|r4k|_||6D C0 00
 ld iy, (pw)|r4k_strict|_||6D C0 00
 ld iy, (pw)|r5k|_||6D C0 00
 ld iy, (pw)|r5k_strict|_||6D C0 00
-ld iy, (pw)|r6k|_||6D;C0 00
-ld iy, (pw)|r6k_strict|_||6D;C0 00
+ld iy, (pw)|r6k|_||6D C0 00
+ld iy, (pw)|r6k_strict|_||6D C0 00
 ld iy, (pw+%d)|r4k|_||6D C0 %d
 ld iy, (pw+%d)|r4k_strict|_||6D C0 %d
 ld iy, (pw+%d)|r5k|_||6D C0 %d
 ld iy, (pw+%d)|r5k_strict|_||6D C0 %d
-ld iy, (pw+%d)|r6k|_||6D;C0 %d
-ld iy, (pw+%d)|r6k_strict|_||6D;C0 %d
+ld iy, (pw+%d)|r6k|_||6D C0 %d
+ld iy, (pw+%d)|r6k_strict|_||6D C0 %d
 ld iy, (pw+hl)|r4k|_||6D C2
 ld iy, (pw+hl)|r4k_strict|_||6D C2
 ld iy, (pw+hl)|r5k|_||6D C2
 ld iy, (pw+hl)|r5k_strict|_||6D C2
-ld iy, (pw+hl)|r6k|_||6D;C2
-ld iy, (pw+hl)|r6k_strict|_||6D;C2
+ld iy, (pw+hl)|r6k|_||6D C2
+ld iy, (pw+hl)|r6k_strict|_||6D C2
 ld iy, (px)|r4k|_||6D D0 00
 ld iy, (px)|r4k_strict|_||6D D0 00
 ld iy, (px)|r5k|_||6D D0 00
 ld iy, (px)|r5k_strict|_||6D D0 00
-ld iy, (px)|r6k|_||6D;D0 00
-ld iy, (px)|r6k_strict|_||6D;D0 00
+ld iy, (px)|r6k|_||6D D0 00
+ld iy, (px)|r6k_strict|_||6D D0 00
 ld iy, (px+%d)|r4k|_||6D D0 %d
 ld iy, (px+%d)|r4k_strict|_||6D D0 %d
 ld iy, (px+%d)|r5k|_||6D D0 %d
 ld iy, (px+%d)|r5k_strict|_||6D D0 %d
-ld iy, (px+%d)|r6k|_||6D;D0 %d
-ld iy, (px+%d)|r6k_strict|_||6D;D0 %d
+ld iy, (px+%d)|r6k|_||6D D0 %d
+ld iy, (px+%d)|r6k_strict|_||6D D0 %d
 ld iy, (px+hl)|r4k|_||6D D2
 ld iy, (px+hl)|r4k_strict|_||6D D2
 ld iy, (px+hl)|r5k|_||6D D2
 ld iy, (px+hl)|r5k_strict|_||6D D2
-ld iy, (px+hl)|r6k|_||6D;D2
-ld iy, (px+hl)|r6k_strict|_||6D;D2
+ld iy, (px+hl)|r6k|_||6D D2
+ld iy, (px+hl)|r6k_strict|_||6D D2
 ld iy, (py)|r4k|_||6D E0 00
 ld iy, (py)|r4k_strict|_||6D E0 00
 ld iy, (py)|r5k|_||6D E0 00
 ld iy, (py)|r5k_strict|_||6D E0 00
-ld iy, (py)|r6k|_||6D;E0 00
-ld iy, (py)|r6k_strict|_||6D;E0 00
+ld iy, (py)|r6k|_||6D E0 00
+ld iy, (py)|r6k_strict|_||6D E0 00
 ld iy, (py+%d)|r4k|_||6D E0 %d
 ld iy, (py+%d)|r4k_strict|_||6D E0 %d
 ld iy, (py+%d)|r5k|_||6D E0 %d
 ld iy, (py+%d)|r5k_strict|_||6D E0 %d
-ld iy, (py+%d)|r6k|_||6D;E0 %d
-ld iy, (py+%d)|r6k_strict|_||6D;E0 %d
+ld iy, (py+%d)|r6k|_||6D E0 %d
+ld iy, (py+%d)|r6k_strict|_||6D E0 %d
 ld iy, (py+hl)|r4k|_||6D E2
 ld iy, (py+hl)|r4k_strict|_||6D E2
 ld iy, (py+hl)|r5k|_||6D E2
 ld iy, (py+hl)|r5k_strict|_||6D E2
-ld iy, (py+hl)|r6k|_||6D;E2
-ld iy, (py+hl)|r6k_strict|_||6D;E2
+ld iy, (py+hl)|r6k|_||6D E2
+ld iy, (py+hl)|r6k_strict|_||6D E2
 ld iy, (pz)|r4k|_||6D F0 00
 ld iy, (pz)|r4k_strict|_||6D F0 00
 ld iy, (pz)|r5k|_||6D F0 00
 ld iy, (pz)|r5k_strict|_||6D F0 00
-ld iy, (pz)|r6k|_||6D;F0 00
-ld iy, (pz)|r6k_strict|_||6D;F0 00
+ld iy, (pz)|r6k|_||6D F0 00
+ld iy, (pz)|r6k_strict|_||6D F0 00
 ld iy, (pz+%d)|r4k|_||6D F0 %d
 ld iy, (pz+%d)|r4k_strict|_||6D F0 %d
 ld iy, (pz+%d)|r5k|_||6D F0 %d
 ld iy, (pz+%d)|r5k_strict|_||6D F0 %d
-ld iy, (pz+%d)|r6k|_||6D;F0 %d
-ld iy, (pz+%d)|r6k_strict|_||6D;F0 %d
+ld iy, (pz+%d)|r6k|_||6D F0 %d
+ld iy, (pz+%d)|r6k_strict|_||6D F0 %d
 ld iy, (pz+hl)|r4k|_||6D F2
 ld iy, (pz+hl)|r4k_strict|_||6D F2
 ld iy, (pz+hl)|r5k|_||6D F2
 ld iy, (pz+hl)|r5k_strict|_||6D F2
-ld iy, (pz+hl)|r6k|_||6D;F2
-ld iy, (pz+hl)|r6k_strict|_||6D;F2
+ld iy, (pz+hl)|r6k|_||6D F2
+ld iy, (pz+hl)|r6k_strict|_||6D F2
 ld iy, (sp)|kc160|_||ED 9A 00
 ld iy, (sp)|kc160_strict|_||ED 9A 00
 ld iy, (sp)|r2ka|_||FD C4 00
@@ -54963,194 +54963,194 @@ ld pw', (pw)|r4k|_||76;6D 08 00
 ld pw', (pw)|r4k_strict|_||76;6D 08 00
 ld pw', (pw)|r5k|_||76;6D 08 00
 ld pw', (pw)|r5k_strict|_||76;6D 08 00
-ld pw', (pw)|r6k|_||76;6D;08 00
-ld pw', (pw)|r6k_strict|_||76;6D;08 00
+ld pw', (pw)|r6k|_||76;6D 08 00
+ld pw', (pw)|r6k_strict|_||76;6D 08 00
 ld pw', (pw+%d)|r4k|_||76;6D 08 %d
 ld pw', (pw+%d)|r4k_strict|_||76;6D 08 %d
 ld pw', (pw+%d)|r5k|_||76;6D 08 %d
 ld pw', (pw+%d)|r5k_strict|_||76;6D 08 %d
-ld pw', (pw+%d)|r6k|_||76;6D;08 %d
-ld pw', (pw+%d)|r6k_strict|_||76;6D;08 %d
+ld pw', (pw+%d)|r6k|_||76;6D 08 %d
+ld pw', (pw+%d)|r6k_strict|_||76;6D 08 %d
 ld pw', (pw+hl)|r4k|_||76;6D 0A
 ld pw', (pw+hl)|r4k_strict|_||76;6D 0A
 ld pw', (pw+hl)|r5k|_||76;6D 0A
 ld pw', (pw+hl)|r5k_strict|_||76;6D 0A
-ld pw', (pw+hl)|r6k|_||76;6D;0A
-ld pw', (pw+hl)|r6k_strict|_||76;6D;0A
+ld pw', (pw+hl)|r6k|_||76;6D 0A
+ld pw', (pw+hl)|r6k_strict|_||76;6D 0A
 ld pw', (px)|r4k|_||76;6D 18 00
 ld pw', (px)|r4k_strict|_||76;6D 18 00
 ld pw', (px)|r5k|_||76;6D 18 00
 ld pw', (px)|r5k_strict|_||76;6D 18 00
-ld pw', (px)|r6k|_||76;6D;18 00
-ld pw', (px)|r6k_strict|_||76;6D;18 00
+ld pw', (px)|r6k|_||76;6D 18 00
+ld pw', (px)|r6k_strict|_||76;6D 18 00
 ld pw', (px+%d)|r4k|_||76;6D 18 %d
 ld pw', (px+%d)|r4k_strict|_||76;6D 18 %d
 ld pw', (px+%d)|r5k|_||76;6D 18 %d
 ld pw', (px+%d)|r5k_strict|_||76;6D 18 %d
-ld pw', (px+%d)|r6k|_||76;6D;18 %d
-ld pw', (px+%d)|r6k_strict|_||76;6D;18 %d
+ld pw', (px+%d)|r6k|_||76;6D 18 %d
+ld pw', (px+%d)|r6k_strict|_||76;6D 18 %d
 ld pw', (px+hl)|r4k|_||76;6D 1A
 ld pw', (px+hl)|r4k_strict|_||76;6D 1A
 ld pw', (px+hl)|r5k|_||76;6D 1A
 ld pw', (px+hl)|r5k_strict|_||76;6D 1A
-ld pw', (px+hl)|r6k|_||76;6D;1A
-ld pw', (px+hl)|r6k_strict|_||76;6D;1A
+ld pw', (px+hl)|r6k|_||76;6D 1A
+ld pw', (px+hl)|r6k_strict|_||76;6D 1A
 ld pw', (py)|r4k|_||76;6D 28 00
 ld pw', (py)|r4k_strict|_||76;6D 28 00
 ld pw', (py)|r5k|_||76;6D 28 00
 ld pw', (py)|r5k_strict|_||76;6D 28 00
-ld pw', (py)|r6k|_||76;6D;28 00
-ld pw', (py)|r6k_strict|_||76;6D;28 00
+ld pw', (py)|r6k|_||76;6D 28 00
+ld pw', (py)|r6k_strict|_||76;6D 28 00
 ld pw', (py+%d)|r4k|_||76;6D 28 %d
 ld pw', (py+%d)|r4k_strict|_||76;6D 28 %d
 ld pw', (py+%d)|r5k|_||76;6D 28 %d
 ld pw', (py+%d)|r5k_strict|_||76;6D 28 %d
-ld pw', (py+%d)|r6k|_||76;6D;28 %d
-ld pw', (py+%d)|r6k_strict|_||76;6D;28 %d
+ld pw', (py+%d)|r6k|_||76;6D 28 %d
+ld pw', (py+%d)|r6k_strict|_||76;6D 28 %d
 ld pw', (py+hl)|r4k|_||76;6D 2A
 ld pw', (py+hl)|r4k_strict|_||76;6D 2A
 ld pw', (py+hl)|r5k|_||76;6D 2A
 ld pw', (py+hl)|r5k_strict|_||76;6D 2A
-ld pw', (py+hl)|r6k|_||76;6D;2A
-ld pw', (py+hl)|r6k_strict|_||76;6D;2A
+ld pw', (py+hl)|r6k|_||76;6D 2A
+ld pw', (py+hl)|r6k_strict|_||76;6D 2A
 ld pw', (pz)|r4k|_||76;6D 38 00
 ld pw', (pz)|r4k_strict|_||76;6D 38 00
 ld pw', (pz)|r5k|_||76;6D 38 00
 ld pw', (pz)|r5k_strict|_||76;6D 38 00
-ld pw', (pz)|r6k|_||76;6D;38 00
-ld pw', (pz)|r6k_strict|_||76;6D;38 00
+ld pw', (pz)|r6k|_||76;6D 38 00
+ld pw', (pz)|r6k_strict|_||76;6D 38 00
 ld pw', (pz+%d)|r4k|_||76;6D 38 %d
 ld pw', (pz+%d)|r4k_strict|_||76;6D 38 %d
 ld pw', (pz+%d)|r5k|_||76;6D 38 %d
 ld pw', (pz+%d)|r5k_strict|_||76;6D 38 %d
-ld pw', (pz+%d)|r6k|_||76;6D;38 %d
-ld pw', (pz+%d)|r6k_strict|_||76;6D;38 %d
+ld pw', (pz+%d)|r6k|_||76;6D 38 %d
+ld pw', (pz+%d)|r6k_strict|_||76;6D 38 %d
 ld pw', (pz+hl)|r4k|_||76;6D 3A
 ld pw', (pz+hl)|r4k_strict|_||76;6D 3A
 ld pw', (pz+hl)|r5k|_||76;6D 3A
 ld pw', (pz+hl)|r5k_strict|_||76;6D 3A
-ld pw', (pz+hl)|r6k|_||76;6D;3A
-ld pw', (pz+hl)|r6k_strict|_||76;6D;3A
+ld pw', (pz+hl)|r6k|_||76;6D 3A
+ld pw', (pz+hl)|r6k_strict|_||76;6D 3A
 ld pw', pw|r4k|_||76;6D 07
 ld pw', pw|r4k_strict|_||76;6D 07
 ld pw', pw|r5k|_||76;6D 07
 ld pw', pw|r5k_strict|_||76;6D 07
-ld pw', pw|r6k|_||76;6D;07
-ld pw', pw|r6k_strict|_||76;6D;07
+ld pw', pw|r6k|_||76;6D 07
+ld pw', pw|r6k_strict|_||76;6D 07
 ld pw', pw+de|r4k|_||76;6D 06
 ld pw', pw+de|r4k_strict|_||76;6D 06
 ld pw', pw+de|r5k|_||76;6D 06
 ld pw', pw+de|r5k_strict|_||76;6D 06
-ld pw', pw+de|r6k|_||76;6D;06
-ld pw', pw+de|r6k_strict|_||76;6D;06
+ld pw', pw+de|r6k|_||76;6D 06
+ld pw', pw+de|r6k_strict|_||76;6D 06
 ld pw', pw+hl|r4k|_||76;6D 0E
 ld pw', pw+hl|r4k_strict|_||76;6D 0E
 ld pw', pw+hl|r5k|_||76;6D 0E
 ld pw', pw+hl|r5k_strict|_||76;6D 0E
-ld pw', pw+hl|r6k|_||76;6D;0E
-ld pw', pw+hl|r6k_strict|_||76;6D;0E
+ld pw', pw+hl|r6k|_||76;6D 0E
+ld pw', pw+hl|r6k_strict|_||76;6D 0E
 ld pw', pw+ix|r4k|_||76;6D 04
 ld pw', pw+ix|r4k_strict|_||76;6D 04
 ld pw', pw+ix|r5k|_||76;6D 04
 ld pw', pw+ix|r5k_strict|_||76;6D 04
-ld pw', pw+ix|r6k|_||76;6D;04
-ld pw', pw+ix|r6k_strict|_||76;6D;04
+ld pw', pw+ix|r6k|_||76;6D 04
+ld pw', pw+ix|r6k_strict|_||76;6D 04
 ld pw', pw+iy|r4k|_||76;6D 05
 ld pw', pw+iy|r4k_strict|_||76;6D 05
 ld pw', pw+iy|r5k|_||76;6D 05
 ld pw', pw+iy|r5k_strict|_||76;6D 05
-ld pw', pw+iy|r6k|_||76;6D;05
-ld pw', pw+iy|r6k_strict|_||76;6D;05
+ld pw', pw+iy|r6k|_||76;6D 05
+ld pw', pw+iy|r6k_strict|_||76;6D 05
 ld pw', px|r4k|_||76;6D 17
 ld pw', px|r4k_strict|_||76;6D 17
 ld pw', px|r5k|_||76;6D 17
 ld pw', px|r5k_strict|_||76;6D 17
-ld pw', px|r6k|_||76;6D;17
-ld pw', px|r6k_strict|_||76;6D;17
+ld pw', px|r6k|_||76;6D 17
+ld pw', px|r6k_strict|_||76;6D 17
 ld pw', px+de|r4k|_||76;6D 16
 ld pw', px+de|r4k_strict|_||76;6D 16
 ld pw', px+de|r5k|_||76;6D 16
 ld pw', px+de|r5k_strict|_||76;6D 16
-ld pw', px+de|r6k|_||76;6D;16
-ld pw', px+de|r6k_strict|_||76;6D;16
+ld pw', px+de|r6k|_||76;6D 16
+ld pw', px+de|r6k_strict|_||76;6D 16
 ld pw', px+hl|r4k|_||76;6D 1E
 ld pw', px+hl|r4k_strict|_||76;6D 1E
 ld pw', px+hl|r5k|_||76;6D 1E
 ld pw', px+hl|r5k_strict|_||76;6D 1E
-ld pw', px+hl|r6k|_||76;6D;1E
-ld pw', px+hl|r6k_strict|_||76;6D;1E
+ld pw', px+hl|r6k|_||76;6D 1E
+ld pw', px+hl|r6k_strict|_||76;6D 1E
 ld pw', px+ix|r4k|_||76;6D 14
 ld pw', px+ix|r4k_strict|_||76;6D 14
 ld pw', px+ix|r5k|_||76;6D 14
 ld pw', px+ix|r5k_strict|_||76;6D 14
-ld pw', px+ix|r6k|_||76;6D;14
-ld pw', px+ix|r6k_strict|_||76;6D;14
+ld pw', px+ix|r6k|_||76;6D 14
+ld pw', px+ix|r6k_strict|_||76;6D 14
 ld pw', px+iy|r4k|_||76;6D 15
 ld pw', px+iy|r4k_strict|_||76;6D 15
 ld pw', px+iy|r5k|_||76;6D 15
 ld pw', px+iy|r5k_strict|_||76;6D 15
-ld pw', px+iy|r6k|_||76;6D;15
-ld pw', px+iy|r6k_strict|_||76;6D;15
+ld pw', px+iy|r6k|_||76;6D 15
+ld pw', px+iy|r6k_strict|_||76;6D 15
 ld pw', py|r4k|_||76;6D 27
 ld pw', py|r4k_strict|_||76;6D 27
 ld pw', py|r5k|_||76;6D 27
 ld pw', py|r5k_strict|_||76;6D 27
-ld pw', py|r6k|_||76;6D;27
-ld pw', py|r6k_strict|_||76;6D;27
+ld pw', py|r6k|_||76;6D 27
+ld pw', py|r6k_strict|_||76;6D 27
 ld pw', py+de|r4k|_||76;6D 26
 ld pw', py+de|r4k_strict|_||76;6D 26
 ld pw', py+de|r5k|_||76;6D 26
 ld pw', py+de|r5k_strict|_||76;6D 26
-ld pw', py+de|r6k|_||76;6D;26
-ld pw', py+de|r6k_strict|_||76;6D;26
+ld pw', py+de|r6k|_||76;6D 26
+ld pw', py+de|r6k_strict|_||76;6D 26
 ld pw', py+hl|r4k|_||76;6D 2E
 ld pw', py+hl|r4k_strict|_||76;6D 2E
 ld pw', py+hl|r5k|_||76;6D 2E
 ld pw', py+hl|r5k_strict|_||76;6D 2E
-ld pw', py+hl|r6k|_||76;6D;2E
-ld pw', py+hl|r6k_strict|_||76;6D;2E
+ld pw', py+hl|r6k|_||76;6D 2E
+ld pw', py+hl|r6k_strict|_||76;6D 2E
 ld pw', py+ix|r4k|_||76;6D 24
 ld pw', py+ix|r4k_strict|_||76;6D 24
 ld pw', py+ix|r5k|_||76;6D 24
 ld pw', py+ix|r5k_strict|_||76;6D 24
-ld pw', py+ix|r6k|_||76;6D;24
-ld pw', py+ix|r6k_strict|_||76;6D;24
+ld pw', py+ix|r6k|_||76;6D 24
+ld pw', py+ix|r6k_strict|_||76;6D 24
 ld pw', py+iy|r4k|_||76;6D 25
 ld pw', py+iy|r4k_strict|_||76;6D 25
 ld pw', py+iy|r5k|_||76;6D 25
 ld pw', py+iy|r5k_strict|_||76;6D 25
-ld pw', py+iy|r6k|_||76;6D;25
-ld pw', py+iy|r6k_strict|_||76;6D;25
+ld pw', py+iy|r6k|_||76;6D 25
+ld pw', py+iy|r6k_strict|_||76;6D 25
 ld pw', pz|r4k|_||76;6D 37
 ld pw', pz|r4k_strict|_||76;6D 37
 ld pw', pz|r5k|_||76;6D 37
 ld pw', pz|r5k_strict|_||76;6D 37
-ld pw', pz|r6k|_||76;6D;37
-ld pw', pz|r6k_strict|_||76;6D;37
+ld pw', pz|r6k|_||76;6D 37
+ld pw', pz|r6k_strict|_||76;6D 37
 ld pw', pz+de|r4k|_||76;6D 36
 ld pw', pz+de|r4k_strict|_||76;6D 36
 ld pw', pz+de|r5k|_||76;6D 36
 ld pw', pz+de|r5k_strict|_||76;6D 36
-ld pw', pz+de|r6k|_||76;6D;36
-ld pw', pz+de|r6k_strict|_||76;6D;36
+ld pw', pz+de|r6k|_||76;6D 36
+ld pw', pz+de|r6k_strict|_||76;6D 36
 ld pw', pz+hl|r4k|_||76;6D 3E
 ld pw', pz+hl|r4k_strict|_||76;6D 3E
 ld pw', pz+hl|r5k|_||76;6D 3E
 ld pw', pz+hl|r5k_strict|_||76;6D 3E
-ld pw', pz+hl|r6k|_||76;6D;3E
-ld pw', pz+hl|r6k_strict|_||76;6D;3E
+ld pw', pz+hl|r6k|_||76;6D 3E
+ld pw', pz+hl|r6k_strict|_||76;6D 3E
 ld pw', pz+ix|r4k|_||76;6D 34
 ld pw', pz+ix|r4k_strict|_||76;6D 34
 ld pw', pz+ix|r5k|_||76;6D 34
 ld pw', pz+ix|r5k_strict|_||76;6D 34
-ld pw', pz+ix|r6k|_||76;6D;34
-ld pw', pz+ix|r6k_strict|_||76;6D;34
+ld pw', pz+ix|r6k|_||76;6D 34
+ld pw', pz+ix|r6k_strict|_||76;6D 34
 ld pw', pz+iy|r4k|_||76;6D 35
 ld pw', pz+iy|r4k_strict|_||76;6D 35
 ld pw', pz+iy|r5k|_||76;6D 35
 ld pw', pz+iy|r5k_strict|_||76;6D 35
-ld pw', pz+iy|r6k|_||76;6D;35
-ld pw', pz+iy|r6k_strict|_||76;6D;35
+ld pw', pz+iy|r6k|_||76;6D 35
+ld pw', pz+iy|r6k_strict|_||76;6D 35
 ld pw, %m|r4k|_||ED 0C %m %m %m %m
 ld pw, %m|r4k_strict|_||ED 0C %m %m %m %m
 ld pw, %m|r5k|_||ED 0C %m %m %m %m
@@ -55167,74 +55167,74 @@ ld pw, (pw)|r4k|_||6D 08 00
 ld pw, (pw)|r4k_strict|_||6D 08 00
 ld pw, (pw)|r5k|_||6D 08 00
 ld pw, (pw)|r5k_strict|_||6D 08 00
-ld pw, (pw)|r6k|_||6D;08 00
-ld pw, (pw)|r6k_strict|_||6D;08 00
+ld pw, (pw)|r6k|_||6D 08 00
+ld pw, (pw)|r6k_strict|_||6D 08 00
 ld pw, (pw+%d)|r4k|_||6D 08 %d
 ld pw, (pw+%d)|r4k_strict|_||6D 08 %d
 ld pw, (pw+%d)|r5k|_||6D 08 %d
 ld pw, (pw+%d)|r5k_strict|_||6D 08 %d
-ld pw, (pw+%d)|r6k|_||6D;08 %d
-ld pw, (pw+%d)|r6k_strict|_||6D;08 %d
+ld pw, (pw+%d)|r6k|_||6D 08 %d
+ld pw, (pw+%d)|r6k_strict|_||6D 08 %d
 ld pw, (pw+hl)|r4k|_||6D 0A
 ld pw, (pw+hl)|r4k_strict|_||6D 0A
 ld pw, (pw+hl)|r5k|_||6D 0A
 ld pw, (pw+hl)|r5k_strict|_||6D 0A
-ld pw, (pw+hl)|r6k|_||6D;0A
-ld pw, (pw+hl)|r6k_strict|_||6D;0A
+ld pw, (pw+hl)|r6k|_||6D 0A
+ld pw, (pw+hl)|r6k_strict|_||6D 0A
 ld pw, (px)|r4k|_||6D 18 00
 ld pw, (px)|r4k_strict|_||6D 18 00
 ld pw, (px)|r5k|_||6D 18 00
 ld pw, (px)|r5k_strict|_||6D 18 00
-ld pw, (px)|r6k|_||6D;18 00
-ld pw, (px)|r6k_strict|_||6D;18 00
+ld pw, (px)|r6k|_||6D 18 00
+ld pw, (px)|r6k_strict|_||6D 18 00
 ld pw, (px+%d)|r4k|_||6D 18 %d
 ld pw, (px+%d)|r4k_strict|_||6D 18 %d
 ld pw, (px+%d)|r5k|_||6D 18 %d
 ld pw, (px+%d)|r5k_strict|_||6D 18 %d
-ld pw, (px+%d)|r6k|_||6D;18 %d
-ld pw, (px+%d)|r6k_strict|_||6D;18 %d
+ld pw, (px+%d)|r6k|_||6D 18 %d
+ld pw, (px+%d)|r6k_strict|_||6D 18 %d
 ld pw, (px+hl)|r4k|_||6D 1A
 ld pw, (px+hl)|r4k_strict|_||6D 1A
 ld pw, (px+hl)|r5k|_||6D 1A
 ld pw, (px+hl)|r5k_strict|_||6D 1A
-ld pw, (px+hl)|r6k|_||6D;1A
-ld pw, (px+hl)|r6k_strict|_||6D;1A
+ld pw, (px+hl)|r6k|_||6D 1A
+ld pw, (px+hl)|r6k_strict|_||6D 1A
 ld pw, (py)|r4k|_||6D 28 00
 ld pw, (py)|r4k_strict|_||6D 28 00
 ld pw, (py)|r5k|_||6D 28 00
 ld pw, (py)|r5k_strict|_||6D 28 00
-ld pw, (py)|r6k|_||6D;28 00
-ld pw, (py)|r6k_strict|_||6D;28 00
+ld pw, (py)|r6k|_||6D 28 00
+ld pw, (py)|r6k_strict|_||6D 28 00
 ld pw, (py+%d)|r4k|_||6D 28 %d
 ld pw, (py+%d)|r4k_strict|_||6D 28 %d
 ld pw, (py+%d)|r5k|_||6D 28 %d
 ld pw, (py+%d)|r5k_strict|_||6D 28 %d
-ld pw, (py+%d)|r6k|_||6D;28 %d
-ld pw, (py+%d)|r6k_strict|_||6D;28 %d
+ld pw, (py+%d)|r6k|_||6D 28 %d
+ld pw, (py+%d)|r6k_strict|_||6D 28 %d
 ld pw, (py+hl)|r4k|_||6D 2A
 ld pw, (py+hl)|r4k_strict|_||6D 2A
 ld pw, (py+hl)|r5k|_||6D 2A
 ld pw, (py+hl)|r5k_strict|_||6D 2A
-ld pw, (py+hl)|r6k|_||6D;2A
-ld pw, (py+hl)|r6k_strict|_||6D;2A
+ld pw, (py+hl)|r6k|_||6D 2A
+ld pw, (py+hl)|r6k_strict|_||6D 2A
 ld pw, (pz)|r4k|_||6D 38 00
 ld pw, (pz)|r4k_strict|_||6D 38 00
 ld pw, (pz)|r5k|_||6D 38 00
 ld pw, (pz)|r5k_strict|_||6D 38 00
-ld pw, (pz)|r6k|_||6D;38 00
-ld pw, (pz)|r6k_strict|_||6D;38 00
+ld pw, (pz)|r6k|_||6D 38 00
+ld pw, (pz)|r6k_strict|_||6D 38 00
 ld pw, (pz+%d)|r4k|_||6D 38 %d
 ld pw, (pz+%d)|r4k_strict|_||6D 38 %d
 ld pw, (pz+%d)|r5k|_||6D 38 %d
 ld pw, (pz+%d)|r5k_strict|_||6D 38 %d
-ld pw, (pz+%d)|r6k|_||6D;38 %d
-ld pw, (pz+%d)|r6k_strict|_||6D;38 %d
+ld pw, (pz+%d)|r6k|_||6D 38 %d
+ld pw, (pz+%d)|r6k_strict|_||6D 38 %d
 ld pw, (pz+hl)|r4k|_||6D 3A
 ld pw, (pz+hl)|r4k_strict|_||6D 3A
 ld pw, (pz+hl)|r5k|_||6D 3A
 ld pw, (pz+hl)|r5k_strict|_||6D 3A
-ld pw, (pz+hl)|r6k|_||6D;3A
-ld pw, (pz+hl)|r6k_strict|_||6D;3A
+ld pw, (pz+hl)|r6k|_||6D 3A
+ld pw, (pz+hl)|r6k_strict|_||6D 3A
 ld pw, (sp)|r4k|_||ED 04 00
 ld pw, (sp)|r4k_strict|_||ED 04 00
 ld pw, (sp)|r5k|_||ED 04 00
@@ -55263,338 +55263,338 @@ ld pw, pw|r4k|_||6D 07
 ld pw, pw|r4k_strict|_||6D 07
 ld pw, pw|r5k|_||6D 07
 ld pw, pw|r5k_strict|_||6D 07
-ld pw, pw|r6k|_||6D;07
-ld pw, pw|r6k_strict|_||6D;07
+ld pw, pw|r6k|_||6D 07
+ld pw, pw|r6k_strict|_||6D 07
 ld pw, pw+%d|r4k|_||6D 0C %d
 ld pw, pw+%d|r4k_strict|_||6D 0C %d
 ld pw, pw+%d|r5k|_||6D 0C %d
 ld pw, pw+%d|r5k_strict|_||6D 0C %d
-ld pw, pw+%d|r6k|_||6D;0C %d
-ld pw, pw+%d|r6k_strict|_||6D;0C %d
+ld pw, pw+%d|r6k|_||6D 0C %d
+ld pw, pw+%d|r6k_strict|_||6D 0C %d
 ld pw, pw+de|r4k|_||6D 06
 ld pw, pw+de|r4k_strict|_||6D 06
 ld pw, pw+de|r5k|_||6D 06
 ld pw, pw+de|r5k_strict|_||6D 06
-ld pw, pw+de|r6k|_||6D;06
-ld pw, pw+de|r6k_strict|_||6D;06
+ld pw, pw+de|r6k|_||6D 06
+ld pw, pw+de|r6k_strict|_||6D 06
 ld pw, pw+hl|r4k|_||6D 0E
 ld pw, pw+hl|r4k_strict|_||6D 0E
 ld pw, pw+hl|r5k|_||6D 0E
 ld pw, pw+hl|r5k_strict|_||6D 0E
-ld pw, pw+hl|r6k|_||6D;0E
-ld pw, pw+hl|r6k_strict|_||6D;0E
+ld pw, pw+hl|r6k|_||6D 0E
+ld pw, pw+hl|r6k_strict|_||6D 0E
 ld pw, pw+ix|r4k|_||6D 04
 ld pw, pw+ix|r4k_strict|_||6D 04
 ld pw, pw+ix|r5k|_||6D 04
 ld pw, pw+ix|r5k_strict|_||6D 04
-ld pw, pw+ix|r6k|_||6D;04
-ld pw, pw+ix|r6k_strict|_||6D;04
+ld pw, pw+ix|r6k|_||6D 04
+ld pw, pw+ix|r6k_strict|_||6D 04
 ld pw, pw+iy|r4k|_||6D 05
 ld pw, pw+iy|r4k_strict|_||6D 05
 ld pw, pw+iy|r5k|_||6D 05
 ld pw, pw+iy|r5k_strict|_||6D 05
-ld pw, pw+iy|r6k|_||6D;05
-ld pw, pw+iy|r6k_strict|_||6D;05
+ld pw, pw+iy|r6k|_||6D 05
+ld pw, pw+iy|r6k_strict|_||6D 05
 ld pw, px|r4k|_||6D 17
 ld pw, px|r4k_strict|_||6D 17
 ld pw, px|r5k|_||6D 17
 ld pw, px|r5k_strict|_||6D 17
-ld pw, px|r6k|_||6D;17
-ld pw, px|r6k_strict|_||6D;17
+ld pw, px|r6k|_||6D 17
+ld pw, px|r6k_strict|_||6D 17
 ld pw, px+%d|r4k|_||6D 1C %d
 ld pw, px+%d|r4k_strict|_||6D 1C %d
 ld pw, px+%d|r5k|_||6D 1C %d
 ld pw, px+%d|r5k_strict|_||6D 1C %d
-ld pw, px+%d|r6k|_||6D;1C %d
-ld pw, px+%d|r6k_strict|_||6D;1C %d
+ld pw, px+%d|r6k|_||6D 1C %d
+ld pw, px+%d|r6k_strict|_||6D 1C %d
 ld pw, px+de|r4k|_||6D 16
 ld pw, px+de|r4k_strict|_||6D 16
 ld pw, px+de|r5k|_||6D 16
 ld pw, px+de|r5k_strict|_||6D 16
-ld pw, px+de|r6k|_||6D;16
-ld pw, px+de|r6k_strict|_||6D;16
+ld pw, px+de|r6k|_||6D 16
+ld pw, px+de|r6k_strict|_||6D 16
 ld pw, px+hl|r4k|_||6D 1E
 ld pw, px+hl|r4k_strict|_||6D 1E
 ld pw, px+hl|r5k|_||6D 1E
 ld pw, px+hl|r5k_strict|_||6D 1E
-ld pw, px+hl|r6k|_||6D;1E
-ld pw, px+hl|r6k_strict|_||6D;1E
+ld pw, px+hl|r6k|_||6D 1E
+ld pw, px+hl|r6k_strict|_||6D 1E
 ld pw, px+ix|r4k|_||6D 14
 ld pw, px+ix|r4k_strict|_||6D 14
 ld pw, px+ix|r5k|_||6D 14
 ld pw, px+ix|r5k_strict|_||6D 14
-ld pw, px+ix|r6k|_||6D;14
-ld pw, px+ix|r6k_strict|_||6D;14
+ld pw, px+ix|r6k|_||6D 14
+ld pw, px+ix|r6k_strict|_||6D 14
 ld pw, px+iy|r4k|_||6D 15
 ld pw, px+iy|r4k_strict|_||6D 15
 ld pw, px+iy|r5k|_||6D 15
 ld pw, px+iy|r5k_strict|_||6D 15
-ld pw, px+iy|r6k|_||6D;15
-ld pw, px+iy|r6k_strict|_||6D;15
+ld pw, px+iy|r6k|_||6D 15
+ld pw, px+iy|r6k_strict|_||6D 15
 ld pw, py|r4k|_||6D 27
 ld pw, py|r4k_strict|_||6D 27
 ld pw, py|r5k|_||6D 27
 ld pw, py|r5k_strict|_||6D 27
-ld pw, py|r6k|_||6D;27
-ld pw, py|r6k_strict|_||6D;27
+ld pw, py|r6k|_||6D 27
+ld pw, py|r6k_strict|_||6D 27
 ld pw, py+%d|r4k|_||6D 2C %d
 ld pw, py+%d|r4k_strict|_||6D 2C %d
 ld pw, py+%d|r5k|_||6D 2C %d
 ld pw, py+%d|r5k_strict|_||6D 2C %d
-ld pw, py+%d|r6k|_||6D;2C %d
-ld pw, py+%d|r6k_strict|_||6D;2C %d
+ld pw, py+%d|r6k|_||6D 2C %d
+ld pw, py+%d|r6k_strict|_||6D 2C %d
 ld pw, py+de|r4k|_||6D 26
 ld pw, py+de|r4k_strict|_||6D 26
 ld pw, py+de|r5k|_||6D 26
 ld pw, py+de|r5k_strict|_||6D 26
-ld pw, py+de|r6k|_||6D;26
-ld pw, py+de|r6k_strict|_||6D;26
+ld pw, py+de|r6k|_||6D 26
+ld pw, py+de|r6k_strict|_||6D 26
 ld pw, py+hl|r4k|_||6D 2E
 ld pw, py+hl|r4k_strict|_||6D 2E
 ld pw, py+hl|r5k|_||6D 2E
 ld pw, py+hl|r5k_strict|_||6D 2E
-ld pw, py+hl|r6k|_||6D;2E
-ld pw, py+hl|r6k_strict|_||6D;2E
+ld pw, py+hl|r6k|_||6D 2E
+ld pw, py+hl|r6k_strict|_||6D 2E
 ld pw, py+ix|r4k|_||6D 24
 ld pw, py+ix|r4k_strict|_||6D 24
 ld pw, py+ix|r5k|_||6D 24
 ld pw, py+ix|r5k_strict|_||6D 24
-ld pw, py+ix|r6k|_||6D;24
-ld pw, py+ix|r6k_strict|_||6D;24
+ld pw, py+ix|r6k|_||6D 24
+ld pw, py+ix|r6k_strict|_||6D 24
 ld pw, py+iy|r4k|_||6D 25
 ld pw, py+iy|r4k_strict|_||6D 25
 ld pw, py+iy|r5k|_||6D 25
 ld pw, py+iy|r5k_strict|_||6D 25
-ld pw, py+iy|r6k|_||6D;25
-ld pw, py+iy|r6k_strict|_||6D;25
+ld pw, py+iy|r6k|_||6D 25
+ld pw, py+iy|r6k_strict|_||6D 25
 ld pw, pz|r4k|_||6D 37
 ld pw, pz|r4k_strict|_||6D 37
 ld pw, pz|r5k|_||6D 37
 ld pw, pz|r5k_strict|_||6D 37
-ld pw, pz|r6k|_||6D;37
-ld pw, pz|r6k_strict|_||6D;37
+ld pw, pz|r6k|_||6D 37
+ld pw, pz|r6k_strict|_||6D 37
 ld pw, pz+%d|r4k|_||6D 3C %d
 ld pw, pz+%d|r4k_strict|_||6D 3C %d
 ld pw, pz+%d|r5k|_||6D 3C %d
 ld pw, pz+%d|r5k_strict|_||6D 3C %d
-ld pw, pz+%d|r6k|_||6D;3C %d
-ld pw, pz+%d|r6k_strict|_||6D;3C %d
+ld pw, pz+%d|r6k|_||6D 3C %d
+ld pw, pz+%d|r6k_strict|_||6D 3C %d
 ld pw, pz+de|r4k|_||6D 36
 ld pw, pz+de|r4k_strict|_||6D 36
 ld pw, pz+de|r5k|_||6D 36
 ld pw, pz+de|r5k_strict|_||6D 36
-ld pw, pz+de|r6k|_||6D;36
-ld pw, pz+de|r6k_strict|_||6D;36
+ld pw, pz+de|r6k|_||6D 36
+ld pw, pz+de|r6k_strict|_||6D 36
 ld pw, pz+hl|r4k|_||6D 3E
 ld pw, pz+hl|r4k_strict|_||6D 3E
 ld pw, pz+hl|r5k|_||6D 3E
 ld pw, pz+hl|r5k_strict|_||6D 3E
-ld pw, pz+hl|r6k|_||6D;3E
-ld pw, pz+hl|r6k_strict|_||6D;3E
+ld pw, pz+hl|r6k|_||6D 3E
+ld pw, pz+hl|r6k_strict|_||6D 3E
 ld pw, pz+ix|r4k|_||6D 34
 ld pw, pz+ix|r4k_strict|_||6D 34
 ld pw, pz+ix|r5k|_||6D 34
 ld pw, pz+ix|r5k_strict|_||6D 34
-ld pw, pz+ix|r6k|_||6D;34
-ld pw, pz+ix|r6k_strict|_||6D;34
+ld pw, pz+ix|r6k|_||6D 34
+ld pw, pz+ix|r6k_strict|_||6D 34
 ld pw, pz+iy|r4k|_||6D 35
 ld pw, pz+iy|r4k_strict|_||6D 35
 ld pw, pz+iy|r5k|_||6D 35
 ld pw, pz+iy|r5k_strict|_||6D 35
-ld pw, pz+iy|r6k|_||6D;35
-ld pw, pz+iy|r6k_strict|_||6D;35
+ld pw, pz+iy|r6k|_||6D 35
+ld pw, pz+iy|r6k_strict|_||6D 35
 ld px', (pw)|r4k|_||76;6D 48 00
 ld px', (pw)|r4k_strict|_||76;6D 48 00
 ld px', (pw)|r5k|_||76;6D 48 00
 ld px', (pw)|r5k_strict|_||76;6D 48 00
-ld px', (pw)|r6k|_||76;6D;48 00
-ld px', (pw)|r6k_strict|_||76;6D;48 00
+ld px', (pw)|r6k|_||76;6D 48 00
+ld px', (pw)|r6k_strict|_||76;6D 48 00
 ld px', (pw+%d)|r4k|_||76;6D 48 %d
 ld px', (pw+%d)|r4k_strict|_||76;6D 48 %d
 ld px', (pw+%d)|r5k|_||76;6D 48 %d
 ld px', (pw+%d)|r5k_strict|_||76;6D 48 %d
-ld px', (pw+%d)|r6k|_||76;6D;48 %d
-ld px', (pw+%d)|r6k_strict|_||76;6D;48 %d
+ld px', (pw+%d)|r6k|_||76;6D 48 %d
+ld px', (pw+%d)|r6k_strict|_||76;6D 48 %d
 ld px', (pw+hl)|r4k|_||76;6D 4A
 ld px', (pw+hl)|r4k_strict|_||76;6D 4A
 ld px', (pw+hl)|r5k|_||76;6D 4A
 ld px', (pw+hl)|r5k_strict|_||76;6D 4A
-ld px', (pw+hl)|r6k|_||76;6D;4A
-ld px', (pw+hl)|r6k_strict|_||76;6D;4A
+ld px', (pw+hl)|r6k|_||76;6D 4A
+ld px', (pw+hl)|r6k_strict|_||76;6D 4A
 ld px', (px)|r4k|_||76;6D 58 00
 ld px', (px)|r4k_strict|_||76;6D 58 00
 ld px', (px)|r5k|_||76;6D 58 00
 ld px', (px)|r5k_strict|_||76;6D 58 00
-ld px', (px)|r6k|_||76;6D;58 00
-ld px', (px)|r6k_strict|_||76;6D;58 00
+ld px', (px)|r6k|_||76;6D 58 00
+ld px', (px)|r6k_strict|_||76;6D 58 00
 ld px', (px+%d)|r4k|_||76;6D 58 %d
 ld px', (px+%d)|r4k_strict|_||76;6D 58 %d
 ld px', (px+%d)|r5k|_||76;6D 58 %d
 ld px', (px+%d)|r5k_strict|_||76;6D 58 %d
-ld px', (px+%d)|r6k|_||76;6D;58 %d
-ld px', (px+%d)|r6k_strict|_||76;6D;58 %d
+ld px', (px+%d)|r6k|_||76;6D 58 %d
+ld px', (px+%d)|r6k_strict|_||76;6D 58 %d
 ld px', (px+hl)|r4k|_||76;6D 5A
 ld px', (px+hl)|r4k_strict|_||76;6D 5A
 ld px', (px+hl)|r5k|_||76;6D 5A
 ld px', (px+hl)|r5k_strict|_||76;6D 5A
-ld px', (px+hl)|r6k|_||76;6D;5A
-ld px', (px+hl)|r6k_strict|_||76;6D;5A
+ld px', (px+hl)|r6k|_||76;6D 5A
+ld px', (px+hl)|r6k_strict|_||76;6D 5A
 ld px', (py)|r4k|_||76;6D 68 00
 ld px', (py)|r4k_strict|_||76;6D 68 00
 ld px', (py)|r5k|_||76;6D 68 00
 ld px', (py)|r5k_strict|_||76;6D 68 00
-ld px', (py)|r6k|_||76;6D;68 00
-ld px', (py)|r6k_strict|_||76;6D;68 00
+ld px', (py)|r6k|_||76;6D 68 00
+ld px', (py)|r6k_strict|_||76;6D 68 00
 ld px', (py+%d)|r4k|_||76;6D 68 %d
 ld px', (py+%d)|r4k_strict|_||76;6D 68 %d
 ld px', (py+%d)|r5k|_||76;6D 68 %d
 ld px', (py+%d)|r5k_strict|_||76;6D 68 %d
-ld px', (py+%d)|r6k|_||76;6D;68 %d
-ld px', (py+%d)|r6k_strict|_||76;6D;68 %d
+ld px', (py+%d)|r6k|_||76;6D 68 %d
+ld px', (py+%d)|r6k_strict|_||76;6D 68 %d
 ld px', (py+hl)|r4k|_||76;6D 6A
 ld px', (py+hl)|r4k_strict|_||76;6D 6A
 ld px', (py+hl)|r5k|_||76;6D 6A
 ld px', (py+hl)|r5k_strict|_||76;6D 6A
-ld px', (py+hl)|r6k|_||76;6D;6A
-ld px', (py+hl)|r6k_strict|_||76;6D;6A
+ld px', (py+hl)|r6k|_||76;6D 6A
+ld px', (py+hl)|r6k_strict|_||76;6D 6A
 ld px', (pz)|r4k|_||76;6D 78 00
 ld px', (pz)|r4k_strict|_||76;6D 78 00
 ld px', (pz)|r5k|_||76;6D 78 00
 ld px', (pz)|r5k_strict|_||76;6D 78 00
-ld px', (pz)|r6k|_||76;6D;78 00
-ld px', (pz)|r6k_strict|_||76;6D;78 00
+ld px', (pz)|r6k|_||76;6D 78 00
+ld px', (pz)|r6k_strict|_||76;6D 78 00
 ld px', (pz+%d)|r4k|_||76;6D 78 %d
 ld px', (pz+%d)|r4k_strict|_||76;6D 78 %d
 ld px', (pz+%d)|r5k|_||76;6D 78 %d
 ld px', (pz+%d)|r5k_strict|_||76;6D 78 %d
-ld px', (pz+%d)|r6k|_||76;6D;78 %d
-ld px', (pz+%d)|r6k_strict|_||76;6D;78 %d
+ld px', (pz+%d)|r6k|_||76;6D 78 %d
+ld px', (pz+%d)|r6k_strict|_||76;6D 78 %d
 ld px', (pz+hl)|r4k|_||76;6D 7A
 ld px', (pz+hl)|r4k_strict|_||76;6D 7A
 ld px', (pz+hl)|r5k|_||76;6D 7A
 ld px', (pz+hl)|r5k_strict|_||76;6D 7A
-ld px', (pz+hl)|r6k|_||76;6D;7A
-ld px', (pz+hl)|r6k_strict|_||76;6D;7A
+ld px', (pz+hl)|r6k|_||76;6D 7A
+ld px', (pz+hl)|r6k_strict|_||76;6D 7A
 ld px', pw|r4k|_||76;6D 47
 ld px', pw|r4k_strict|_||76;6D 47
 ld px', pw|r5k|_||76;6D 47
 ld px', pw|r5k_strict|_||76;6D 47
-ld px', pw|r6k|_||76;6D;47
-ld px', pw|r6k_strict|_||76;6D;47
+ld px', pw|r6k|_||76;6D 47
+ld px', pw|r6k_strict|_||76;6D 47
 ld px', pw+de|r4k|_||76;6D 46
 ld px', pw+de|r4k_strict|_||76;6D 46
 ld px', pw+de|r5k|_||76;6D 46
 ld px', pw+de|r5k_strict|_||76;6D 46
-ld px', pw+de|r6k|_||76;6D;46
-ld px', pw+de|r6k_strict|_||76;6D;46
+ld px', pw+de|r6k|_||76;6D 46
+ld px', pw+de|r6k_strict|_||76;6D 46
 ld px', pw+hl|r4k|_||76;6D 4E
 ld px', pw+hl|r4k_strict|_||76;6D 4E
 ld px', pw+hl|r5k|_||76;6D 4E
 ld px', pw+hl|r5k_strict|_||76;6D 4E
-ld px', pw+hl|r6k|_||76;6D;4E
-ld px', pw+hl|r6k_strict|_||76;6D;4E
+ld px', pw+hl|r6k|_||76;6D 4E
+ld px', pw+hl|r6k_strict|_||76;6D 4E
 ld px', pw+ix|r4k|_||76;6D 44
 ld px', pw+ix|r4k_strict|_||76;6D 44
 ld px', pw+ix|r5k|_||76;6D 44
 ld px', pw+ix|r5k_strict|_||76;6D 44
-ld px', pw+ix|r6k|_||76;6D;44
-ld px', pw+ix|r6k_strict|_||76;6D;44
+ld px', pw+ix|r6k|_||76;6D 44
+ld px', pw+ix|r6k_strict|_||76;6D 44
 ld px', pw+iy|r4k|_||76;6D 45
 ld px', pw+iy|r4k_strict|_||76;6D 45
 ld px', pw+iy|r5k|_||76;6D 45
 ld px', pw+iy|r5k_strict|_||76;6D 45
-ld px', pw+iy|r6k|_||76;6D;45
-ld px', pw+iy|r6k_strict|_||76;6D;45
+ld px', pw+iy|r6k|_||76;6D 45
+ld px', pw+iy|r6k_strict|_||76;6D 45
 ld px', px|r4k|_||76;6D 57
 ld px', px|r4k_strict|_||76;6D 57
 ld px', px|r5k|_||76;6D 57
 ld px', px|r5k_strict|_||76;6D 57
-ld px', px|r6k|_||76;6D;57
-ld px', px|r6k_strict|_||76;6D;57
+ld px', px|r6k|_||76;6D 57
+ld px', px|r6k_strict|_||76;6D 57
 ld px', px+de|r4k|_||76;6D 56
 ld px', px+de|r4k_strict|_||76;6D 56
 ld px', px+de|r5k|_||76;6D 56
 ld px', px+de|r5k_strict|_||76;6D 56
-ld px', px+de|r6k|_||76;6D;56
-ld px', px+de|r6k_strict|_||76;6D;56
+ld px', px+de|r6k|_||76;6D 56
+ld px', px+de|r6k_strict|_||76;6D 56
 ld px', px+hl|r4k|_||76;6D 5E
 ld px', px+hl|r4k_strict|_||76;6D 5E
 ld px', px+hl|r5k|_||76;6D 5E
 ld px', px+hl|r5k_strict|_||76;6D 5E
-ld px', px+hl|r6k|_||76;6D;5E
-ld px', px+hl|r6k_strict|_||76;6D;5E
+ld px', px+hl|r6k|_||76;6D 5E
+ld px', px+hl|r6k_strict|_||76;6D 5E
 ld px', px+ix|r4k|_||76;6D 54
 ld px', px+ix|r4k_strict|_||76;6D 54
 ld px', px+ix|r5k|_||76;6D 54
 ld px', px+ix|r5k_strict|_||76;6D 54
-ld px', px+ix|r6k|_||76;6D;54
-ld px', px+ix|r6k_strict|_||76;6D;54
+ld px', px+ix|r6k|_||76;6D 54
+ld px', px+ix|r6k_strict|_||76;6D 54
 ld px', px+iy|r4k|_||76;6D 55
 ld px', px+iy|r4k_strict|_||76;6D 55
 ld px', px+iy|r5k|_||76;6D 55
 ld px', px+iy|r5k_strict|_||76;6D 55
-ld px', px+iy|r6k|_||76;6D;55
-ld px', px+iy|r6k_strict|_||76;6D;55
+ld px', px+iy|r6k|_||76;6D 55
+ld px', px+iy|r6k_strict|_||76;6D 55
 ld px', py|r4k|_||76;6D 67
 ld px', py|r4k_strict|_||76;6D 67
 ld px', py|r5k|_||76;6D 67
 ld px', py|r5k_strict|_||76;6D 67
-ld px', py|r6k|_||76;6D;67
-ld px', py|r6k_strict|_||76;6D;67
+ld px', py|r6k|_||76;6D 67
+ld px', py|r6k_strict|_||76;6D 67
 ld px', py+de|r4k|_||76;6D 66
 ld px', py+de|r4k_strict|_||76;6D 66
 ld px', py+de|r5k|_||76;6D 66
 ld px', py+de|r5k_strict|_||76;6D 66
-ld px', py+de|r6k|_||76;6D;66
-ld px', py+de|r6k_strict|_||76;6D;66
+ld px', py+de|r6k|_||76;6D 66
+ld px', py+de|r6k_strict|_||76;6D 66
 ld px', py+hl|r4k|_||76;6D 6E
 ld px', py+hl|r4k_strict|_||76;6D 6E
 ld px', py+hl|r5k|_||76;6D 6E
 ld px', py+hl|r5k_strict|_||76;6D 6E
-ld px', py+hl|r6k|_||76;6D;6E
-ld px', py+hl|r6k_strict|_||76;6D;6E
+ld px', py+hl|r6k|_||76;6D 6E
+ld px', py+hl|r6k_strict|_||76;6D 6E
 ld px', py+ix|r4k|_||76;6D 64
 ld px', py+ix|r4k_strict|_||76;6D 64
 ld px', py+ix|r5k|_||76;6D 64
 ld px', py+ix|r5k_strict|_||76;6D 64
-ld px', py+ix|r6k|_||76;6D;64
-ld px', py+ix|r6k_strict|_||76;6D;64
+ld px', py+ix|r6k|_||76;6D 64
+ld px', py+ix|r6k_strict|_||76;6D 64
 ld px', py+iy|r4k|_||76;6D 65
 ld px', py+iy|r4k_strict|_||76;6D 65
 ld px', py+iy|r5k|_||76;6D 65
 ld px', py+iy|r5k_strict|_||76;6D 65
-ld px', py+iy|r6k|_||76;6D;65
-ld px', py+iy|r6k_strict|_||76;6D;65
+ld px', py+iy|r6k|_||76;6D 65
+ld px', py+iy|r6k_strict|_||76;6D 65
 ld px', pz|r4k|_||76;6D 77
 ld px', pz|r4k_strict|_||76;6D 77
 ld px', pz|r5k|_||76;6D 77
 ld px', pz|r5k_strict|_||76;6D 77
-ld px', pz|r6k|_||76;6D;77
-ld px', pz|r6k_strict|_||76;6D;77
+ld px', pz|r6k|_||76;6D 77
+ld px', pz|r6k_strict|_||76;6D 77
 ld px', pz+de|r4k|_||76;6D 76
 ld px', pz+de|r4k_strict|_||76;6D 76
 ld px', pz+de|r5k|_||76;6D 76
 ld px', pz+de|r5k_strict|_||76;6D 76
-ld px', pz+de|r6k|_||76;6D;76
-ld px', pz+de|r6k_strict|_||76;6D;76
+ld px', pz+de|r6k|_||76;6D 76
+ld px', pz+de|r6k_strict|_||76;6D 76
 ld px', pz+hl|r4k|_||76;6D 7E
 ld px', pz+hl|r4k_strict|_||76;6D 7E
 ld px', pz+hl|r5k|_||76;6D 7E
 ld px', pz+hl|r5k_strict|_||76;6D 7E
-ld px', pz+hl|r6k|_||76;6D;7E
-ld px', pz+hl|r6k_strict|_||76;6D;7E
+ld px', pz+hl|r6k|_||76;6D 7E
+ld px', pz+hl|r6k_strict|_||76;6D 7E
 ld px', pz+ix|r4k|_||76;6D 74
 ld px', pz+ix|r4k_strict|_||76;6D 74
 ld px', pz+ix|r5k|_||76;6D 74
 ld px', pz+ix|r5k_strict|_||76;6D 74
-ld px', pz+ix|r6k|_||76;6D;74
-ld px', pz+ix|r6k_strict|_||76;6D;74
+ld px', pz+ix|r6k|_||76;6D 74
+ld px', pz+ix|r6k_strict|_||76;6D 74
 ld px', pz+iy|r4k|_||76;6D 75
 ld px', pz+iy|r4k_strict|_||76;6D 75
 ld px', pz+iy|r5k|_||76;6D 75
 ld px', pz+iy|r5k_strict|_||76;6D 75
-ld px', pz+iy|r6k|_||76;6D;75
-ld px', pz+iy|r6k_strict|_||76;6D;75
+ld px', pz+iy|r6k|_||76;6D 75
+ld px', pz+iy|r6k_strict|_||76;6D 75
 ld px, %m|r4k|_||ED 1C %m %m %m %m
 ld px, %m|r4k_strict|_||ED 1C %m %m %m %m
 ld px, %m|r5k|_||ED 1C %m %m %m %m
@@ -55611,74 +55611,74 @@ ld px, (pw)|r4k|_||6D 48 00
 ld px, (pw)|r4k_strict|_||6D 48 00
 ld px, (pw)|r5k|_||6D 48 00
 ld px, (pw)|r5k_strict|_||6D 48 00
-ld px, (pw)|r6k|_||6D;48 00
-ld px, (pw)|r6k_strict|_||6D;48 00
+ld px, (pw)|r6k|_||6D 48 00
+ld px, (pw)|r6k_strict|_||6D 48 00
 ld px, (pw+%d)|r4k|_||6D 48 %d
 ld px, (pw+%d)|r4k_strict|_||6D 48 %d
 ld px, (pw+%d)|r5k|_||6D 48 %d
 ld px, (pw+%d)|r5k_strict|_||6D 48 %d
-ld px, (pw+%d)|r6k|_||6D;48 %d
-ld px, (pw+%d)|r6k_strict|_||6D;48 %d
+ld px, (pw+%d)|r6k|_||6D 48 %d
+ld px, (pw+%d)|r6k_strict|_||6D 48 %d
 ld px, (pw+hl)|r4k|_||6D 4A
 ld px, (pw+hl)|r4k_strict|_||6D 4A
 ld px, (pw+hl)|r5k|_||6D 4A
 ld px, (pw+hl)|r5k_strict|_||6D 4A
-ld px, (pw+hl)|r6k|_||6D;4A
-ld px, (pw+hl)|r6k_strict|_||6D;4A
+ld px, (pw+hl)|r6k|_||6D 4A
+ld px, (pw+hl)|r6k_strict|_||6D 4A
 ld px, (px)|r4k|_||6D 58 00
 ld px, (px)|r4k_strict|_||6D 58 00
 ld px, (px)|r5k|_||6D 58 00
 ld px, (px)|r5k_strict|_||6D 58 00
-ld px, (px)|r6k|_||6D;58 00
-ld px, (px)|r6k_strict|_||6D;58 00
+ld px, (px)|r6k|_||6D 58 00
+ld px, (px)|r6k_strict|_||6D 58 00
 ld px, (px+%d)|r4k|_||6D 58 %d
 ld px, (px+%d)|r4k_strict|_||6D 58 %d
 ld px, (px+%d)|r5k|_||6D 58 %d
 ld px, (px+%d)|r5k_strict|_||6D 58 %d
-ld px, (px+%d)|r6k|_||6D;58 %d
-ld px, (px+%d)|r6k_strict|_||6D;58 %d
+ld px, (px+%d)|r6k|_||6D 58 %d
+ld px, (px+%d)|r6k_strict|_||6D 58 %d
 ld px, (px+hl)|r4k|_||6D 5A
 ld px, (px+hl)|r4k_strict|_||6D 5A
 ld px, (px+hl)|r5k|_||6D 5A
 ld px, (px+hl)|r5k_strict|_||6D 5A
-ld px, (px+hl)|r6k|_||6D;5A
-ld px, (px+hl)|r6k_strict|_||6D;5A
+ld px, (px+hl)|r6k|_||6D 5A
+ld px, (px+hl)|r6k_strict|_||6D 5A
 ld px, (py)|r4k|_||6D 68 00
 ld px, (py)|r4k_strict|_||6D 68 00
 ld px, (py)|r5k|_||6D 68 00
 ld px, (py)|r5k_strict|_||6D 68 00
-ld px, (py)|r6k|_||6D;68 00
-ld px, (py)|r6k_strict|_||6D;68 00
+ld px, (py)|r6k|_||6D 68 00
+ld px, (py)|r6k_strict|_||6D 68 00
 ld px, (py+%d)|r4k|_||6D 68 %d
 ld px, (py+%d)|r4k_strict|_||6D 68 %d
 ld px, (py+%d)|r5k|_||6D 68 %d
 ld px, (py+%d)|r5k_strict|_||6D 68 %d
-ld px, (py+%d)|r6k|_||6D;68 %d
-ld px, (py+%d)|r6k_strict|_||6D;68 %d
+ld px, (py+%d)|r6k|_||6D 68 %d
+ld px, (py+%d)|r6k_strict|_||6D 68 %d
 ld px, (py+hl)|r4k|_||6D 6A
 ld px, (py+hl)|r4k_strict|_||6D 6A
 ld px, (py+hl)|r5k|_||6D 6A
 ld px, (py+hl)|r5k_strict|_||6D 6A
-ld px, (py+hl)|r6k|_||6D;6A
-ld px, (py+hl)|r6k_strict|_||6D;6A
+ld px, (py+hl)|r6k|_||6D 6A
+ld px, (py+hl)|r6k_strict|_||6D 6A
 ld px, (pz)|r4k|_||6D 78 00
 ld px, (pz)|r4k_strict|_||6D 78 00
 ld px, (pz)|r5k|_||6D 78 00
 ld px, (pz)|r5k_strict|_||6D 78 00
-ld px, (pz)|r6k|_||6D;78 00
-ld px, (pz)|r6k_strict|_||6D;78 00
+ld px, (pz)|r6k|_||6D 78 00
+ld px, (pz)|r6k_strict|_||6D 78 00
 ld px, (pz+%d)|r4k|_||6D 78 %d
 ld px, (pz+%d)|r4k_strict|_||6D 78 %d
 ld px, (pz+%d)|r5k|_||6D 78 %d
 ld px, (pz+%d)|r5k_strict|_||6D 78 %d
-ld px, (pz+%d)|r6k|_||6D;78 %d
-ld px, (pz+%d)|r6k_strict|_||6D;78 %d
+ld px, (pz+%d)|r6k|_||6D 78 %d
+ld px, (pz+%d)|r6k_strict|_||6D 78 %d
 ld px, (pz+hl)|r4k|_||6D 7A
 ld px, (pz+hl)|r4k_strict|_||6D 7A
 ld px, (pz+hl)|r5k|_||6D 7A
 ld px, (pz+hl)|r5k_strict|_||6D 7A
-ld px, (pz+hl)|r6k|_||6D;7A
-ld px, (pz+hl)|r6k_strict|_||6D;7A
+ld px, (pz+hl)|r6k|_||6D 7A
+ld px, (pz+hl)|r6k_strict|_||6D 7A
 ld px, (sp)|r4k|_||ED 14 00
 ld px, (sp)|r4k_strict|_||ED 14 00
 ld px, (sp)|r5k|_||ED 14 00
@@ -55707,338 +55707,338 @@ ld px, pw|r4k|_||6D 47
 ld px, pw|r4k_strict|_||6D 47
 ld px, pw|r5k|_||6D 47
 ld px, pw|r5k_strict|_||6D 47
-ld px, pw|r6k|_||6D;47
-ld px, pw|r6k_strict|_||6D;47
+ld px, pw|r6k|_||6D 47
+ld px, pw|r6k_strict|_||6D 47
 ld px, pw+%d|r4k|_||6D 4C %d
 ld px, pw+%d|r4k_strict|_||6D 4C %d
 ld px, pw+%d|r5k|_||6D 4C %d
 ld px, pw+%d|r5k_strict|_||6D 4C %d
-ld px, pw+%d|r6k|_||6D;4C %d
-ld px, pw+%d|r6k_strict|_||6D;4C %d
+ld px, pw+%d|r6k|_||6D 4C %d
+ld px, pw+%d|r6k_strict|_||6D 4C %d
 ld px, pw+de|r4k|_||6D 46
 ld px, pw+de|r4k_strict|_||6D 46
 ld px, pw+de|r5k|_||6D 46
 ld px, pw+de|r5k_strict|_||6D 46
-ld px, pw+de|r6k|_||6D;46
-ld px, pw+de|r6k_strict|_||6D;46
+ld px, pw+de|r6k|_||6D 46
+ld px, pw+de|r6k_strict|_||6D 46
 ld px, pw+hl|r4k|_||6D 4E
 ld px, pw+hl|r4k_strict|_||6D 4E
 ld px, pw+hl|r5k|_||6D 4E
 ld px, pw+hl|r5k_strict|_||6D 4E
-ld px, pw+hl|r6k|_||6D;4E
-ld px, pw+hl|r6k_strict|_||6D;4E
+ld px, pw+hl|r6k|_||6D 4E
+ld px, pw+hl|r6k_strict|_||6D 4E
 ld px, pw+ix|r4k|_||6D 44
 ld px, pw+ix|r4k_strict|_||6D 44
 ld px, pw+ix|r5k|_||6D 44
 ld px, pw+ix|r5k_strict|_||6D 44
-ld px, pw+ix|r6k|_||6D;44
-ld px, pw+ix|r6k_strict|_||6D;44
+ld px, pw+ix|r6k|_||6D 44
+ld px, pw+ix|r6k_strict|_||6D 44
 ld px, pw+iy|r4k|_||6D 45
 ld px, pw+iy|r4k_strict|_||6D 45
 ld px, pw+iy|r5k|_||6D 45
 ld px, pw+iy|r5k_strict|_||6D 45
-ld px, pw+iy|r6k|_||6D;45
-ld px, pw+iy|r6k_strict|_||6D;45
+ld px, pw+iy|r6k|_||6D 45
+ld px, pw+iy|r6k_strict|_||6D 45
 ld px, px|r4k|_||6D 57
 ld px, px|r4k_strict|_||6D 57
 ld px, px|r5k|_||6D 57
 ld px, px|r5k_strict|_||6D 57
-ld px, px|r6k|_||6D;57
-ld px, px|r6k_strict|_||6D;57
+ld px, px|r6k|_||6D 57
+ld px, px|r6k_strict|_||6D 57
 ld px, px+%d|r4k|_||6D 5C %d
 ld px, px+%d|r4k_strict|_||6D 5C %d
 ld px, px+%d|r5k|_||6D 5C %d
 ld px, px+%d|r5k_strict|_||6D 5C %d
-ld px, px+%d|r6k|_||6D;5C %d
-ld px, px+%d|r6k_strict|_||6D;5C %d
+ld px, px+%d|r6k|_||6D 5C %d
+ld px, px+%d|r6k_strict|_||6D 5C %d
 ld px, px+de|r4k|_||6D 56
 ld px, px+de|r4k_strict|_||6D 56
 ld px, px+de|r5k|_||6D 56
 ld px, px+de|r5k_strict|_||6D 56
-ld px, px+de|r6k|_||6D;56
-ld px, px+de|r6k_strict|_||6D;56
+ld px, px+de|r6k|_||6D 56
+ld px, px+de|r6k_strict|_||6D 56
 ld px, px+hl|r4k|_||6D 5E
 ld px, px+hl|r4k_strict|_||6D 5E
 ld px, px+hl|r5k|_||6D 5E
 ld px, px+hl|r5k_strict|_||6D 5E
-ld px, px+hl|r6k|_||6D;5E
-ld px, px+hl|r6k_strict|_||6D;5E
+ld px, px+hl|r6k|_||6D 5E
+ld px, px+hl|r6k_strict|_||6D 5E
 ld px, px+ix|r4k|_||6D 54
 ld px, px+ix|r4k_strict|_||6D 54
 ld px, px+ix|r5k|_||6D 54
 ld px, px+ix|r5k_strict|_||6D 54
-ld px, px+ix|r6k|_||6D;54
-ld px, px+ix|r6k_strict|_||6D;54
+ld px, px+ix|r6k|_||6D 54
+ld px, px+ix|r6k_strict|_||6D 54
 ld px, px+iy|r4k|_||6D 55
 ld px, px+iy|r4k_strict|_||6D 55
 ld px, px+iy|r5k|_||6D 55
 ld px, px+iy|r5k_strict|_||6D 55
-ld px, px+iy|r6k|_||6D;55
-ld px, px+iy|r6k_strict|_||6D;55
+ld px, px+iy|r6k|_||6D 55
+ld px, px+iy|r6k_strict|_||6D 55
 ld px, py|r4k|_||6D 67
 ld px, py|r4k_strict|_||6D 67
 ld px, py|r5k|_||6D 67
 ld px, py|r5k_strict|_||6D 67
-ld px, py|r6k|_||6D;67
-ld px, py|r6k_strict|_||6D;67
+ld px, py|r6k|_||6D 67
+ld px, py|r6k_strict|_||6D 67
 ld px, py+%d|r4k|_||6D 6C %d
 ld px, py+%d|r4k_strict|_||6D 6C %d
 ld px, py+%d|r5k|_||6D 6C %d
 ld px, py+%d|r5k_strict|_||6D 6C %d
-ld px, py+%d|r6k|_||6D;6C %d
-ld px, py+%d|r6k_strict|_||6D;6C %d
+ld px, py+%d|r6k|_||6D 6C %d
+ld px, py+%d|r6k_strict|_||6D 6C %d
 ld px, py+de|r4k|_||6D 66
 ld px, py+de|r4k_strict|_||6D 66
 ld px, py+de|r5k|_||6D 66
 ld px, py+de|r5k_strict|_||6D 66
-ld px, py+de|r6k|_||6D;66
-ld px, py+de|r6k_strict|_||6D;66
+ld px, py+de|r6k|_||6D 66
+ld px, py+de|r6k_strict|_||6D 66
 ld px, py+hl|r4k|_||6D 6E
 ld px, py+hl|r4k_strict|_||6D 6E
 ld px, py+hl|r5k|_||6D 6E
 ld px, py+hl|r5k_strict|_||6D 6E
-ld px, py+hl|r6k|_||6D;6E
-ld px, py+hl|r6k_strict|_||6D;6E
+ld px, py+hl|r6k|_||6D 6E
+ld px, py+hl|r6k_strict|_||6D 6E
 ld px, py+ix|r4k|_||6D 64
 ld px, py+ix|r4k_strict|_||6D 64
 ld px, py+ix|r5k|_||6D 64
 ld px, py+ix|r5k_strict|_||6D 64
-ld px, py+ix|r6k|_||6D;64
-ld px, py+ix|r6k_strict|_||6D;64
+ld px, py+ix|r6k|_||6D 64
+ld px, py+ix|r6k_strict|_||6D 64
 ld px, py+iy|r4k|_||6D 65
 ld px, py+iy|r4k_strict|_||6D 65
 ld px, py+iy|r5k|_||6D 65
 ld px, py+iy|r5k_strict|_||6D 65
-ld px, py+iy|r6k|_||6D;65
-ld px, py+iy|r6k_strict|_||6D;65
+ld px, py+iy|r6k|_||6D 65
+ld px, py+iy|r6k_strict|_||6D 65
 ld px, pz|r4k|_||6D 77
 ld px, pz|r4k_strict|_||6D 77
 ld px, pz|r5k|_||6D 77
 ld px, pz|r5k_strict|_||6D 77
-ld px, pz|r6k|_||6D;77
-ld px, pz|r6k_strict|_||6D;77
+ld px, pz|r6k|_||6D 77
+ld px, pz|r6k_strict|_||6D 77
 ld px, pz+%d|r4k|_||6D 7C %d
 ld px, pz+%d|r4k_strict|_||6D 7C %d
 ld px, pz+%d|r5k|_||6D 7C %d
 ld px, pz+%d|r5k_strict|_||6D 7C %d
-ld px, pz+%d|r6k|_||6D;7C %d
-ld px, pz+%d|r6k_strict|_||6D;7C %d
+ld px, pz+%d|r6k|_||6D 7C %d
+ld px, pz+%d|r6k_strict|_||6D 7C %d
 ld px, pz+de|r4k|_||6D 76
 ld px, pz+de|r4k_strict|_||6D 76
 ld px, pz+de|r5k|_||6D 76
 ld px, pz+de|r5k_strict|_||6D 76
-ld px, pz+de|r6k|_||6D;76
-ld px, pz+de|r6k_strict|_||6D;76
+ld px, pz+de|r6k|_||6D 76
+ld px, pz+de|r6k_strict|_||6D 76
 ld px, pz+hl|r4k|_||6D 7E
 ld px, pz+hl|r4k_strict|_||6D 7E
 ld px, pz+hl|r5k|_||6D 7E
 ld px, pz+hl|r5k_strict|_||6D 7E
-ld px, pz+hl|r6k|_||6D;7E
-ld px, pz+hl|r6k_strict|_||6D;7E
+ld px, pz+hl|r6k|_||6D 7E
+ld px, pz+hl|r6k_strict|_||6D 7E
 ld px, pz+ix|r4k|_||6D 74
 ld px, pz+ix|r4k_strict|_||6D 74
 ld px, pz+ix|r5k|_||6D 74
 ld px, pz+ix|r5k_strict|_||6D 74
-ld px, pz+ix|r6k|_||6D;74
-ld px, pz+ix|r6k_strict|_||6D;74
+ld px, pz+ix|r6k|_||6D 74
+ld px, pz+ix|r6k_strict|_||6D 74
 ld px, pz+iy|r4k|_||6D 75
 ld px, pz+iy|r4k_strict|_||6D 75
 ld px, pz+iy|r5k|_||6D 75
 ld px, pz+iy|r5k_strict|_||6D 75
-ld px, pz+iy|r6k|_||6D;75
-ld px, pz+iy|r6k_strict|_||6D;75
+ld px, pz+iy|r6k|_||6D 75
+ld px, pz+iy|r6k_strict|_||6D 75
 ld py', (pw)|r4k|_||76;6D 88 00
 ld py', (pw)|r4k_strict|_||76;6D 88 00
 ld py', (pw)|r5k|_||76;6D 88 00
 ld py', (pw)|r5k_strict|_||76;6D 88 00
-ld py', (pw)|r6k|_||76;6D;88 00
-ld py', (pw)|r6k_strict|_||76;6D;88 00
+ld py', (pw)|r6k|_||76;6D 88 00
+ld py', (pw)|r6k_strict|_||76;6D 88 00
 ld py', (pw+%d)|r4k|_||76;6D 88 %d
 ld py', (pw+%d)|r4k_strict|_||76;6D 88 %d
 ld py', (pw+%d)|r5k|_||76;6D 88 %d
 ld py', (pw+%d)|r5k_strict|_||76;6D 88 %d
-ld py', (pw+%d)|r6k|_||76;6D;88 %d
-ld py', (pw+%d)|r6k_strict|_||76;6D;88 %d
+ld py', (pw+%d)|r6k|_||76;6D 88 %d
+ld py', (pw+%d)|r6k_strict|_||76;6D 88 %d
 ld py', (pw+hl)|r4k|_||76;6D 8A
 ld py', (pw+hl)|r4k_strict|_||76;6D 8A
 ld py', (pw+hl)|r5k|_||76;6D 8A
 ld py', (pw+hl)|r5k_strict|_||76;6D 8A
-ld py', (pw+hl)|r6k|_||76;6D;8A
-ld py', (pw+hl)|r6k_strict|_||76;6D;8A
+ld py', (pw+hl)|r6k|_||76;6D 8A
+ld py', (pw+hl)|r6k_strict|_||76;6D 8A
 ld py', (px)|r4k|_||76;6D 98 00
 ld py', (px)|r4k_strict|_||76;6D 98 00
 ld py', (px)|r5k|_||76;6D 98 00
 ld py', (px)|r5k_strict|_||76;6D 98 00
-ld py', (px)|r6k|_||76;6D;98 00
-ld py', (px)|r6k_strict|_||76;6D;98 00
+ld py', (px)|r6k|_||76;6D 98 00
+ld py', (px)|r6k_strict|_||76;6D 98 00
 ld py', (px+%d)|r4k|_||76;6D 98 %d
 ld py', (px+%d)|r4k_strict|_||76;6D 98 %d
 ld py', (px+%d)|r5k|_||76;6D 98 %d
 ld py', (px+%d)|r5k_strict|_||76;6D 98 %d
-ld py', (px+%d)|r6k|_||76;6D;98 %d
-ld py', (px+%d)|r6k_strict|_||76;6D;98 %d
+ld py', (px+%d)|r6k|_||76;6D 98 %d
+ld py', (px+%d)|r6k_strict|_||76;6D 98 %d
 ld py', (px+hl)|r4k|_||76;6D 9A
 ld py', (px+hl)|r4k_strict|_||76;6D 9A
 ld py', (px+hl)|r5k|_||76;6D 9A
 ld py', (px+hl)|r5k_strict|_||76;6D 9A
-ld py', (px+hl)|r6k|_||76;6D;9A
-ld py', (px+hl)|r6k_strict|_||76;6D;9A
+ld py', (px+hl)|r6k|_||76;6D 9A
+ld py', (px+hl)|r6k_strict|_||76;6D 9A
 ld py', (py)|r4k|_||76;6D A8 00
 ld py', (py)|r4k_strict|_||76;6D A8 00
 ld py', (py)|r5k|_||76;6D A8 00
 ld py', (py)|r5k_strict|_||76;6D A8 00
-ld py', (py)|r6k|_||76;6D;A8 00
-ld py', (py)|r6k_strict|_||76;6D;A8 00
+ld py', (py)|r6k|_||76;6D A8 00
+ld py', (py)|r6k_strict|_||76;6D A8 00
 ld py', (py+%d)|r4k|_||76;6D A8 %d
 ld py', (py+%d)|r4k_strict|_||76;6D A8 %d
 ld py', (py+%d)|r5k|_||76;6D A8 %d
 ld py', (py+%d)|r5k_strict|_||76;6D A8 %d
-ld py', (py+%d)|r6k|_||76;6D;A8 %d
-ld py', (py+%d)|r6k_strict|_||76;6D;A8 %d
+ld py', (py+%d)|r6k|_||76;6D A8 %d
+ld py', (py+%d)|r6k_strict|_||76;6D A8 %d
 ld py', (py+hl)|r4k|_||76;6D AA
 ld py', (py+hl)|r4k_strict|_||76;6D AA
 ld py', (py+hl)|r5k|_||76;6D AA
 ld py', (py+hl)|r5k_strict|_||76;6D AA
-ld py', (py+hl)|r6k|_||76;6D;AA
-ld py', (py+hl)|r6k_strict|_||76;6D;AA
+ld py', (py+hl)|r6k|_||76;6D AA
+ld py', (py+hl)|r6k_strict|_||76;6D AA
 ld py', (pz)|r4k|_||76;6D B8 00
 ld py', (pz)|r4k_strict|_||76;6D B8 00
 ld py', (pz)|r5k|_||76;6D B8 00
 ld py', (pz)|r5k_strict|_||76;6D B8 00
-ld py', (pz)|r6k|_||76;6D;B8 00
-ld py', (pz)|r6k_strict|_||76;6D;B8 00
+ld py', (pz)|r6k|_||76;6D B8 00
+ld py', (pz)|r6k_strict|_||76;6D B8 00
 ld py', (pz+%d)|r4k|_||76;6D B8 %d
 ld py', (pz+%d)|r4k_strict|_||76;6D B8 %d
 ld py', (pz+%d)|r5k|_||76;6D B8 %d
 ld py', (pz+%d)|r5k_strict|_||76;6D B8 %d
-ld py', (pz+%d)|r6k|_||76;6D;B8 %d
-ld py', (pz+%d)|r6k_strict|_||76;6D;B8 %d
+ld py', (pz+%d)|r6k|_||76;6D B8 %d
+ld py', (pz+%d)|r6k_strict|_||76;6D B8 %d
 ld py', (pz+hl)|r4k|_||76;6D BA
 ld py', (pz+hl)|r4k_strict|_||76;6D BA
 ld py', (pz+hl)|r5k|_||76;6D BA
 ld py', (pz+hl)|r5k_strict|_||76;6D BA
-ld py', (pz+hl)|r6k|_||76;6D;BA
-ld py', (pz+hl)|r6k_strict|_||76;6D;BA
+ld py', (pz+hl)|r6k|_||76;6D BA
+ld py', (pz+hl)|r6k_strict|_||76;6D BA
 ld py', pw|r4k|_||76;6D 87
 ld py', pw|r4k_strict|_||76;6D 87
 ld py', pw|r5k|_||76;6D 87
 ld py', pw|r5k_strict|_||76;6D 87
-ld py', pw|r6k|_||76;6D;87
-ld py', pw|r6k_strict|_||76;6D;87
+ld py', pw|r6k|_||76;6D 87
+ld py', pw|r6k_strict|_||76;6D 87
 ld py', pw+de|r4k|_||76;6D 86
 ld py', pw+de|r4k_strict|_||76;6D 86
 ld py', pw+de|r5k|_||76;6D 86
 ld py', pw+de|r5k_strict|_||76;6D 86
-ld py', pw+de|r6k|_||76;6D;86
-ld py', pw+de|r6k_strict|_||76;6D;86
+ld py', pw+de|r6k|_||76;6D 86
+ld py', pw+de|r6k_strict|_||76;6D 86
 ld py', pw+hl|r4k|_||76;6D 8E
 ld py', pw+hl|r4k_strict|_||76;6D 8E
 ld py', pw+hl|r5k|_||76;6D 8E
 ld py', pw+hl|r5k_strict|_||76;6D 8E
-ld py', pw+hl|r6k|_||76;6D;8E
-ld py', pw+hl|r6k_strict|_||76;6D;8E
+ld py', pw+hl|r6k|_||76;6D 8E
+ld py', pw+hl|r6k_strict|_||76;6D 8E
 ld py', pw+ix|r4k|_||76;6D 84
 ld py', pw+ix|r4k_strict|_||76;6D 84
 ld py', pw+ix|r5k|_||76;6D 84
 ld py', pw+ix|r5k_strict|_||76;6D 84
-ld py', pw+ix|r6k|_||76;6D;84
-ld py', pw+ix|r6k_strict|_||76;6D;84
+ld py', pw+ix|r6k|_||76;6D 84
+ld py', pw+ix|r6k_strict|_||76;6D 84
 ld py', pw+iy|r4k|_||76;6D 85
 ld py', pw+iy|r4k_strict|_||76;6D 85
 ld py', pw+iy|r5k|_||76;6D 85
 ld py', pw+iy|r5k_strict|_||76;6D 85
-ld py', pw+iy|r6k|_||76;6D;85
-ld py', pw+iy|r6k_strict|_||76;6D;85
+ld py', pw+iy|r6k|_||76;6D 85
+ld py', pw+iy|r6k_strict|_||76;6D 85
 ld py', px|r4k|_||76;6D 97
 ld py', px|r4k_strict|_||76;6D 97
 ld py', px|r5k|_||76;6D 97
 ld py', px|r5k_strict|_||76;6D 97
-ld py', px|r6k|_||76;6D;97
-ld py', px|r6k_strict|_||76;6D;97
+ld py', px|r6k|_||76;6D 97
+ld py', px|r6k_strict|_||76;6D 97
 ld py', px+de|r4k|_||76;6D 96
 ld py', px+de|r4k_strict|_||76;6D 96
 ld py', px+de|r5k|_||76;6D 96
 ld py', px+de|r5k_strict|_||76;6D 96
-ld py', px+de|r6k|_||76;6D;96
-ld py', px+de|r6k_strict|_||76;6D;96
+ld py', px+de|r6k|_||76;6D 96
+ld py', px+de|r6k_strict|_||76;6D 96
 ld py', px+hl|r4k|_||76;6D 9E
 ld py', px+hl|r4k_strict|_||76;6D 9E
 ld py', px+hl|r5k|_||76;6D 9E
 ld py', px+hl|r5k_strict|_||76;6D 9E
-ld py', px+hl|r6k|_||76;6D;9E
-ld py', px+hl|r6k_strict|_||76;6D;9E
+ld py', px+hl|r6k|_||76;6D 9E
+ld py', px+hl|r6k_strict|_||76;6D 9E
 ld py', px+ix|r4k|_||76;6D 94
 ld py', px+ix|r4k_strict|_||76;6D 94
 ld py', px+ix|r5k|_||76;6D 94
 ld py', px+ix|r5k_strict|_||76;6D 94
-ld py', px+ix|r6k|_||76;6D;94
-ld py', px+ix|r6k_strict|_||76;6D;94
+ld py', px+ix|r6k|_||76;6D 94
+ld py', px+ix|r6k_strict|_||76;6D 94
 ld py', px+iy|r4k|_||76;6D 95
 ld py', px+iy|r4k_strict|_||76;6D 95
 ld py', px+iy|r5k|_||76;6D 95
 ld py', px+iy|r5k_strict|_||76;6D 95
-ld py', px+iy|r6k|_||76;6D;95
-ld py', px+iy|r6k_strict|_||76;6D;95
+ld py', px+iy|r6k|_||76;6D 95
+ld py', px+iy|r6k_strict|_||76;6D 95
 ld py', py|r4k|_||76;6D A7
 ld py', py|r4k_strict|_||76;6D A7
 ld py', py|r5k|_||76;6D A7
 ld py', py|r5k_strict|_||76;6D A7
-ld py', py|r6k|_||76;6D;A7
-ld py', py|r6k_strict|_||76;6D;A7
+ld py', py|r6k|_||76;6D A7
+ld py', py|r6k_strict|_||76;6D A7
 ld py', py+de|r4k|_||76;6D A6
 ld py', py+de|r4k_strict|_||76;6D A6
 ld py', py+de|r5k|_||76;6D A6
 ld py', py+de|r5k_strict|_||76;6D A6
-ld py', py+de|r6k|_||76;6D;A6
-ld py', py+de|r6k_strict|_||76;6D;A6
+ld py', py+de|r6k|_||76;6D A6
+ld py', py+de|r6k_strict|_||76;6D A6
 ld py', py+hl|r4k|_||76;6D AE
 ld py', py+hl|r4k_strict|_||76;6D AE
 ld py', py+hl|r5k|_||76;6D AE
 ld py', py+hl|r5k_strict|_||76;6D AE
-ld py', py+hl|r6k|_||76;6D;AE
-ld py', py+hl|r6k_strict|_||76;6D;AE
+ld py', py+hl|r6k|_||76;6D AE
+ld py', py+hl|r6k_strict|_||76;6D AE
 ld py', py+ix|r4k|_||76;6D A4
 ld py', py+ix|r4k_strict|_||76;6D A4
 ld py', py+ix|r5k|_||76;6D A4
 ld py', py+ix|r5k_strict|_||76;6D A4
-ld py', py+ix|r6k|_||76;6D;A4
-ld py', py+ix|r6k_strict|_||76;6D;A4
+ld py', py+ix|r6k|_||76;6D A4
+ld py', py+ix|r6k_strict|_||76;6D A4
 ld py', py+iy|r4k|_||76;6D A5
 ld py', py+iy|r4k_strict|_||76;6D A5
 ld py', py+iy|r5k|_||76;6D A5
 ld py', py+iy|r5k_strict|_||76;6D A5
-ld py', py+iy|r6k|_||76;6D;A5
-ld py', py+iy|r6k_strict|_||76;6D;A5
+ld py', py+iy|r6k|_||76;6D A5
+ld py', py+iy|r6k_strict|_||76;6D A5
 ld py', pz|r4k|_||76;6D B7
 ld py', pz|r4k_strict|_||76;6D B7
 ld py', pz|r5k|_||76;6D B7
 ld py', pz|r5k_strict|_||76;6D B7
-ld py', pz|r6k|_||76;6D;B7
-ld py', pz|r6k_strict|_||76;6D;B7
+ld py', pz|r6k|_||76;6D B7
+ld py', pz|r6k_strict|_||76;6D B7
 ld py', pz+de|r4k|_||76;6D B6
 ld py', pz+de|r4k_strict|_||76;6D B6
 ld py', pz+de|r5k|_||76;6D B6
 ld py', pz+de|r5k_strict|_||76;6D B6
-ld py', pz+de|r6k|_||76;6D;B6
-ld py', pz+de|r6k_strict|_||76;6D;B6
+ld py', pz+de|r6k|_||76;6D B6
+ld py', pz+de|r6k_strict|_||76;6D B6
 ld py', pz+hl|r4k|_||76;6D BE
 ld py', pz+hl|r4k_strict|_||76;6D BE
 ld py', pz+hl|r5k|_||76;6D BE
 ld py', pz+hl|r5k_strict|_||76;6D BE
-ld py', pz+hl|r6k|_||76;6D;BE
-ld py', pz+hl|r6k_strict|_||76;6D;BE
+ld py', pz+hl|r6k|_||76;6D BE
+ld py', pz+hl|r6k_strict|_||76;6D BE
 ld py', pz+ix|r4k|_||76;6D B4
 ld py', pz+ix|r4k_strict|_||76;6D B4
 ld py', pz+ix|r5k|_||76;6D B4
 ld py', pz+ix|r5k_strict|_||76;6D B4
-ld py', pz+ix|r6k|_||76;6D;B4
-ld py', pz+ix|r6k_strict|_||76;6D;B4
+ld py', pz+ix|r6k|_||76;6D B4
+ld py', pz+ix|r6k_strict|_||76;6D B4
 ld py', pz+iy|r4k|_||76;6D B5
 ld py', pz+iy|r4k_strict|_||76;6D B5
 ld py', pz+iy|r5k|_||76;6D B5
 ld py', pz+iy|r5k_strict|_||76;6D B5
-ld py', pz+iy|r6k|_||76;6D;B5
-ld py', pz+iy|r6k_strict|_||76;6D;B5
+ld py', pz+iy|r6k|_||76;6D B5
+ld py', pz+iy|r6k_strict|_||76;6D B5
 ld py, %m|r4k|_||ED 2C %m %m %m %m
 ld py, %m|r4k_strict|_||ED 2C %m %m %m %m
 ld py, %m|r5k|_||ED 2C %m %m %m %m
@@ -56055,74 +56055,74 @@ ld py, (pw)|r4k|_||6D 88 00
 ld py, (pw)|r4k_strict|_||6D 88 00
 ld py, (pw)|r5k|_||6D 88 00
 ld py, (pw)|r5k_strict|_||6D 88 00
-ld py, (pw)|r6k|_||6D;88 00
-ld py, (pw)|r6k_strict|_||6D;88 00
+ld py, (pw)|r6k|_||6D 88 00
+ld py, (pw)|r6k_strict|_||6D 88 00
 ld py, (pw+%d)|r4k|_||6D 88 %d
 ld py, (pw+%d)|r4k_strict|_||6D 88 %d
 ld py, (pw+%d)|r5k|_||6D 88 %d
 ld py, (pw+%d)|r5k_strict|_||6D 88 %d
-ld py, (pw+%d)|r6k|_||6D;88 %d
-ld py, (pw+%d)|r6k_strict|_||6D;88 %d
+ld py, (pw+%d)|r6k|_||6D 88 %d
+ld py, (pw+%d)|r6k_strict|_||6D 88 %d
 ld py, (pw+hl)|r4k|_||6D 8A
 ld py, (pw+hl)|r4k_strict|_||6D 8A
 ld py, (pw+hl)|r5k|_||6D 8A
 ld py, (pw+hl)|r5k_strict|_||6D 8A
-ld py, (pw+hl)|r6k|_||6D;8A
-ld py, (pw+hl)|r6k_strict|_||6D;8A
+ld py, (pw+hl)|r6k|_||6D 8A
+ld py, (pw+hl)|r6k_strict|_||6D 8A
 ld py, (px)|r4k|_||6D 98 00
 ld py, (px)|r4k_strict|_||6D 98 00
 ld py, (px)|r5k|_||6D 98 00
 ld py, (px)|r5k_strict|_||6D 98 00
-ld py, (px)|r6k|_||6D;98 00
-ld py, (px)|r6k_strict|_||6D;98 00
+ld py, (px)|r6k|_||6D 98 00
+ld py, (px)|r6k_strict|_||6D 98 00
 ld py, (px+%d)|r4k|_||6D 98 %d
 ld py, (px+%d)|r4k_strict|_||6D 98 %d
 ld py, (px+%d)|r5k|_||6D 98 %d
 ld py, (px+%d)|r5k_strict|_||6D 98 %d
-ld py, (px+%d)|r6k|_||6D;98 %d
-ld py, (px+%d)|r6k_strict|_||6D;98 %d
+ld py, (px+%d)|r6k|_||6D 98 %d
+ld py, (px+%d)|r6k_strict|_||6D 98 %d
 ld py, (px+hl)|r4k|_||6D 9A
 ld py, (px+hl)|r4k_strict|_||6D 9A
 ld py, (px+hl)|r5k|_||6D 9A
 ld py, (px+hl)|r5k_strict|_||6D 9A
-ld py, (px+hl)|r6k|_||6D;9A
-ld py, (px+hl)|r6k_strict|_||6D;9A
+ld py, (px+hl)|r6k|_||6D 9A
+ld py, (px+hl)|r6k_strict|_||6D 9A
 ld py, (py)|r4k|_||6D A8 00
 ld py, (py)|r4k_strict|_||6D A8 00
 ld py, (py)|r5k|_||6D A8 00
 ld py, (py)|r5k_strict|_||6D A8 00
-ld py, (py)|r6k|_||6D;A8 00
-ld py, (py)|r6k_strict|_||6D;A8 00
+ld py, (py)|r6k|_||6D A8 00
+ld py, (py)|r6k_strict|_||6D A8 00
 ld py, (py+%d)|r4k|_||6D A8 %d
 ld py, (py+%d)|r4k_strict|_||6D A8 %d
 ld py, (py+%d)|r5k|_||6D A8 %d
 ld py, (py+%d)|r5k_strict|_||6D A8 %d
-ld py, (py+%d)|r6k|_||6D;A8 %d
-ld py, (py+%d)|r6k_strict|_||6D;A8 %d
+ld py, (py+%d)|r6k|_||6D A8 %d
+ld py, (py+%d)|r6k_strict|_||6D A8 %d
 ld py, (py+hl)|r4k|_||6D AA
 ld py, (py+hl)|r4k_strict|_||6D AA
 ld py, (py+hl)|r5k|_||6D AA
 ld py, (py+hl)|r5k_strict|_||6D AA
-ld py, (py+hl)|r6k|_||6D;AA
-ld py, (py+hl)|r6k_strict|_||6D;AA
+ld py, (py+hl)|r6k|_||6D AA
+ld py, (py+hl)|r6k_strict|_||6D AA
 ld py, (pz)|r4k|_||6D B8 00
 ld py, (pz)|r4k_strict|_||6D B8 00
 ld py, (pz)|r5k|_||6D B8 00
 ld py, (pz)|r5k_strict|_||6D B8 00
-ld py, (pz)|r6k|_||6D;B8 00
-ld py, (pz)|r6k_strict|_||6D;B8 00
+ld py, (pz)|r6k|_||6D B8 00
+ld py, (pz)|r6k_strict|_||6D B8 00
 ld py, (pz+%d)|r4k|_||6D B8 %d
 ld py, (pz+%d)|r4k_strict|_||6D B8 %d
 ld py, (pz+%d)|r5k|_||6D B8 %d
 ld py, (pz+%d)|r5k_strict|_||6D B8 %d
-ld py, (pz+%d)|r6k|_||6D;B8 %d
-ld py, (pz+%d)|r6k_strict|_||6D;B8 %d
+ld py, (pz+%d)|r6k|_||6D B8 %d
+ld py, (pz+%d)|r6k_strict|_||6D B8 %d
 ld py, (pz+hl)|r4k|_||6D BA
 ld py, (pz+hl)|r4k_strict|_||6D BA
 ld py, (pz+hl)|r5k|_||6D BA
 ld py, (pz+hl)|r5k_strict|_||6D BA
-ld py, (pz+hl)|r6k|_||6D;BA
-ld py, (pz+hl)|r6k_strict|_||6D;BA
+ld py, (pz+hl)|r6k|_||6D BA
+ld py, (pz+hl)|r6k_strict|_||6D BA
 ld py, (sp)|r4k|_||ED 24 00
 ld py, (sp)|r4k_strict|_||ED 24 00
 ld py, (sp)|r5k|_||ED 24 00
@@ -56151,338 +56151,338 @@ ld py, pw|r4k|_||6D 87
 ld py, pw|r4k_strict|_||6D 87
 ld py, pw|r5k|_||6D 87
 ld py, pw|r5k_strict|_||6D 87
-ld py, pw|r6k|_||6D;87
-ld py, pw|r6k_strict|_||6D;87
+ld py, pw|r6k|_||6D 87
+ld py, pw|r6k_strict|_||6D 87
 ld py, pw+%d|r4k|_||6D 8C %d
 ld py, pw+%d|r4k_strict|_||6D 8C %d
 ld py, pw+%d|r5k|_||6D 8C %d
 ld py, pw+%d|r5k_strict|_||6D 8C %d
-ld py, pw+%d|r6k|_||6D;8C %d
-ld py, pw+%d|r6k_strict|_||6D;8C %d
+ld py, pw+%d|r6k|_||6D 8C %d
+ld py, pw+%d|r6k_strict|_||6D 8C %d
 ld py, pw+de|r4k|_||6D 86
 ld py, pw+de|r4k_strict|_||6D 86
 ld py, pw+de|r5k|_||6D 86
 ld py, pw+de|r5k_strict|_||6D 86
-ld py, pw+de|r6k|_||6D;86
-ld py, pw+de|r6k_strict|_||6D;86
+ld py, pw+de|r6k|_||6D 86
+ld py, pw+de|r6k_strict|_||6D 86
 ld py, pw+hl|r4k|_||6D 8E
 ld py, pw+hl|r4k_strict|_||6D 8E
 ld py, pw+hl|r5k|_||6D 8E
 ld py, pw+hl|r5k_strict|_||6D 8E
-ld py, pw+hl|r6k|_||6D;8E
-ld py, pw+hl|r6k_strict|_||6D;8E
+ld py, pw+hl|r6k|_||6D 8E
+ld py, pw+hl|r6k_strict|_||6D 8E
 ld py, pw+ix|r4k|_||6D 84
 ld py, pw+ix|r4k_strict|_||6D 84
 ld py, pw+ix|r5k|_||6D 84
 ld py, pw+ix|r5k_strict|_||6D 84
-ld py, pw+ix|r6k|_||6D;84
-ld py, pw+ix|r6k_strict|_||6D;84
+ld py, pw+ix|r6k|_||6D 84
+ld py, pw+ix|r6k_strict|_||6D 84
 ld py, pw+iy|r4k|_||6D 85
 ld py, pw+iy|r4k_strict|_||6D 85
 ld py, pw+iy|r5k|_||6D 85
 ld py, pw+iy|r5k_strict|_||6D 85
-ld py, pw+iy|r6k|_||6D;85
-ld py, pw+iy|r6k_strict|_||6D;85
+ld py, pw+iy|r6k|_||6D 85
+ld py, pw+iy|r6k_strict|_||6D 85
 ld py, px|r4k|_||6D 97
 ld py, px|r4k_strict|_||6D 97
 ld py, px|r5k|_||6D 97
 ld py, px|r5k_strict|_||6D 97
-ld py, px|r6k|_||6D;97
-ld py, px|r6k_strict|_||6D;97
+ld py, px|r6k|_||6D 97
+ld py, px|r6k_strict|_||6D 97
 ld py, px+%d|r4k|_||6D 9C %d
 ld py, px+%d|r4k_strict|_||6D 9C %d
 ld py, px+%d|r5k|_||6D 9C %d
 ld py, px+%d|r5k_strict|_||6D 9C %d
-ld py, px+%d|r6k|_||6D;9C %d
-ld py, px+%d|r6k_strict|_||6D;9C %d
+ld py, px+%d|r6k|_||6D 9C %d
+ld py, px+%d|r6k_strict|_||6D 9C %d
 ld py, px+de|r4k|_||6D 96
 ld py, px+de|r4k_strict|_||6D 96
 ld py, px+de|r5k|_||6D 96
 ld py, px+de|r5k_strict|_||6D 96
-ld py, px+de|r6k|_||6D;96
-ld py, px+de|r6k_strict|_||6D;96
+ld py, px+de|r6k|_||6D 96
+ld py, px+de|r6k_strict|_||6D 96
 ld py, px+hl|r4k|_||6D 9E
 ld py, px+hl|r4k_strict|_||6D 9E
 ld py, px+hl|r5k|_||6D 9E
 ld py, px+hl|r5k_strict|_||6D 9E
-ld py, px+hl|r6k|_||6D;9E
-ld py, px+hl|r6k_strict|_||6D;9E
+ld py, px+hl|r6k|_||6D 9E
+ld py, px+hl|r6k_strict|_||6D 9E
 ld py, px+ix|r4k|_||6D 94
 ld py, px+ix|r4k_strict|_||6D 94
 ld py, px+ix|r5k|_||6D 94
 ld py, px+ix|r5k_strict|_||6D 94
-ld py, px+ix|r6k|_||6D;94
-ld py, px+ix|r6k_strict|_||6D;94
+ld py, px+ix|r6k|_||6D 94
+ld py, px+ix|r6k_strict|_||6D 94
 ld py, px+iy|r4k|_||6D 95
 ld py, px+iy|r4k_strict|_||6D 95
 ld py, px+iy|r5k|_||6D 95
 ld py, px+iy|r5k_strict|_||6D 95
-ld py, px+iy|r6k|_||6D;95
-ld py, px+iy|r6k_strict|_||6D;95
+ld py, px+iy|r6k|_||6D 95
+ld py, px+iy|r6k_strict|_||6D 95
 ld py, py|r4k|_||6D A7
 ld py, py|r4k_strict|_||6D A7
 ld py, py|r5k|_||6D A7
 ld py, py|r5k_strict|_||6D A7
-ld py, py|r6k|_||6D;A7
-ld py, py|r6k_strict|_||6D;A7
+ld py, py|r6k|_||6D A7
+ld py, py|r6k_strict|_||6D A7
 ld py, py+%d|r4k|_||6D AC %d
 ld py, py+%d|r4k_strict|_||6D AC %d
 ld py, py+%d|r5k|_||6D AC %d
 ld py, py+%d|r5k_strict|_||6D AC %d
-ld py, py+%d|r6k|_||6D;AC %d
-ld py, py+%d|r6k_strict|_||6D;AC %d
+ld py, py+%d|r6k|_||6D AC %d
+ld py, py+%d|r6k_strict|_||6D AC %d
 ld py, py+de|r4k|_||6D A6
 ld py, py+de|r4k_strict|_||6D A6
 ld py, py+de|r5k|_||6D A6
 ld py, py+de|r5k_strict|_||6D A6
-ld py, py+de|r6k|_||6D;A6
-ld py, py+de|r6k_strict|_||6D;A6
+ld py, py+de|r6k|_||6D A6
+ld py, py+de|r6k_strict|_||6D A6
 ld py, py+hl|r4k|_||6D AE
 ld py, py+hl|r4k_strict|_||6D AE
 ld py, py+hl|r5k|_||6D AE
 ld py, py+hl|r5k_strict|_||6D AE
-ld py, py+hl|r6k|_||6D;AE
-ld py, py+hl|r6k_strict|_||6D;AE
+ld py, py+hl|r6k|_||6D AE
+ld py, py+hl|r6k_strict|_||6D AE
 ld py, py+ix|r4k|_||6D A4
 ld py, py+ix|r4k_strict|_||6D A4
 ld py, py+ix|r5k|_||6D A4
 ld py, py+ix|r5k_strict|_||6D A4
-ld py, py+ix|r6k|_||6D;A4
-ld py, py+ix|r6k_strict|_||6D;A4
+ld py, py+ix|r6k|_||6D A4
+ld py, py+ix|r6k_strict|_||6D A4
 ld py, py+iy|r4k|_||6D A5
 ld py, py+iy|r4k_strict|_||6D A5
 ld py, py+iy|r5k|_||6D A5
 ld py, py+iy|r5k_strict|_||6D A5
-ld py, py+iy|r6k|_||6D;A5
-ld py, py+iy|r6k_strict|_||6D;A5
+ld py, py+iy|r6k|_||6D A5
+ld py, py+iy|r6k_strict|_||6D A5
 ld py, pz|r4k|_||6D B7
 ld py, pz|r4k_strict|_||6D B7
 ld py, pz|r5k|_||6D B7
 ld py, pz|r5k_strict|_||6D B7
-ld py, pz|r6k|_||6D;B7
-ld py, pz|r6k_strict|_||6D;B7
+ld py, pz|r6k|_||6D B7
+ld py, pz|r6k_strict|_||6D B7
 ld py, pz+%d|r4k|_||6D BC %d
 ld py, pz+%d|r4k_strict|_||6D BC %d
 ld py, pz+%d|r5k|_||6D BC %d
 ld py, pz+%d|r5k_strict|_||6D BC %d
-ld py, pz+%d|r6k|_||6D;BC %d
-ld py, pz+%d|r6k_strict|_||6D;BC %d
+ld py, pz+%d|r6k|_||6D BC %d
+ld py, pz+%d|r6k_strict|_||6D BC %d
 ld py, pz+de|r4k|_||6D B6
 ld py, pz+de|r4k_strict|_||6D B6
 ld py, pz+de|r5k|_||6D B6
 ld py, pz+de|r5k_strict|_||6D B6
-ld py, pz+de|r6k|_||6D;B6
-ld py, pz+de|r6k_strict|_||6D;B6
+ld py, pz+de|r6k|_||6D B6
+ld py, pz+de|r6k_strict|_||6D B6
 ld py, pz+hl|r4k|_||6D BE
 ld py, pz+hl|r4k_strict|_||6D BE
 ld py, pz+hl|r5k|_||6D BE
 ld py, pz+hl|r5k_strict|_||6D BE
-ld py, pz+hl|r6k|_||6D;BE
-ld py, pz+hl|r6k_strict|_||6D;BE
+ld py, pz+hl|r6k|_||6D BE
+ld py, pz+hl|r6k_strict|_||6D BE
 ld py, pz+ix|r4k|_||6D B4
 ld py, pz+ix|r4k_strict|_||6D B4
 ld py, pz+ix|r5k|_||6D B4
 ld py, pz+ix|r5k_strict|_||6D B4
-ld py, pz+ix|r6k|_||6D;B4
-ld py, pz+ix|r6k_strict|_||6D;B4
+ld py, pz+ix|r6k|_||6D B4
+ld py, pz+ix|r6k_strict|_||6D B4
 ld py, pz+iy|r4k|_||6D B5
 ld py, pz+iy|r4k_strict|_||6D B5
 ld py, pz+iy|r5k|_||6D B5
 ld py, pz+iy|r5k_strict|_||6D B5
-ld py, pz+iy|r6k|_||6D;B5
-ld py, pz+iy|r6k_strict|_||6D;B5
+ld py, pz+iy|r6k|_||6D B5
+ld py, pz+iy|r6k_strict|_||6D B5
 ld pz', (pw)|r4k|_||76;6D C8 00
 ld pz', (pw)|r4k_strict|_||76;6D C8 00
 ld pz', (pw)|r5k|_||76;6D C8 00
 ld pz', (pw)|r5k_strict|_||76;6D C8 00
-ld pz', (pw)|r6k|_||76;6D;C8 00
-ld pz', (pw)|r6k_strict|_||76;6D;C8 00
+ld pz', (pw)|r6k|_||76;6D C8 00
+ld pz', (pw)|r6k_strict|_||76;6D C8 00
 ld pz', (pw+%d)|r4k|_||76;6D C8 %d
 ld pz', (pw+%d)|r4k_strict|_||76;6D C8 %d
 ld pz', (pw+%d)|r5k|_||76;6D C8 %d
 ld pz', (pw+%d)|r5k_strict|_||76;6D C8 %d
-ld pz', (pw+%d)|r6k|_||76;6D;C8 %d
-ld pz', (pw+%d)|r6k_strict|_||76;6D;C8 %d
+ld pz', (pw+%d)|r6k|_||76;6D C8 %d
+ld pz', (pw+%d)|r6k_strict|_||76;6D C8 %d
 ld pz', (pw+hl)|r4k|_||76;6D CA
 ld pz', (pw+hl)|r4k_strict|_||76;6D CA
 ld pz', (pw+hl)|r5k|_||76;6D CA
 ld pz', (pw+hl)|r5k_strict|_||76;6D CA
-ld pz', (pw+hl)|r6k|_||76;6D;CA
-ld pz', (pw+hl)|r6k_strict|_||76;6D;CA
+ld pz', (pw+hl)|r6k|_||76;6D CA
+ld pz', (pw+hl)|r6k_strict|_||76;6D CA
 ld pz', (px)|r4k|_||76;6D D8 00
 ld pz', (px)|r4k_strict|_||76;6D D8 00
 ld pz', (px)|r5k|_||76;6D D8 00
 ld pz', (px)|r5k_strict|_||76;6D D8 00
-ld pz', (px)|r6k|_||76;6D;D8 00
-ld pz', (px)|r6k_strict|_||76;6D;D8 00
+ld pz', (px)|r6k|_||76;6D D8 00
+ld pz', (px)|r6k_strict|_||76;6D D8 00
 ld pz', (px+%d)|r4k|_||76;6D D8 %d
 ld pz', (px+%d)|r4k_strict|_||76;6D D8 %d
 ld pz', (px+%d)|r5k|_||76;6D D8 %d
 ld pz', (px+%d)|r5k_strict|_||76;6D D8 %d
-ld pz', (px+%d)|r6k|_||76;6D;D8 %d
-ld pz', (px+%d)|r6k_strict|_||76;6D;D8 %d
+ld pz', (px+%d)|r6k|_||76;6D D8 %d
+ld pz', (px+%d)|r6k_strict|_||76;6D D8 %d
 ld pz', (px+hl)|r4k|_||76;6D DA
 ld pz', (px+hl)|r4k_strict|_||76;6D DA
 ld pz', (px+hl)|r5k|_||76;6D DA
 ld pz', (px+hl)|r5k_strict|_||76;6D DA
-ld pz', (px+hl)|r6k|_||76;6D;DA
-ld pz', (px+hl)|r6k_strict|_||76;6D;DA
+ld pz', (px+hl)|r6k|_||76;6D DA
+ld pz', (px+hl)|r6k_strict|_||76;6D DA
 ld pz', (py)|r4k|_||76;6D E8 00
 ld pz', (py)|r4k_strict|_||76;6D E8 00
 ld pz', (py)|r5k|_||76;6D E8 00
 ld pz', (py)|r5k_strict|_||76;6D E8 00
-ld pz', (py)|r6k|_||76;6D;E8 00
-ld pz', (py)|r6k_strict|_||76;6D;E8 00
+ld pz', (py)|r6k|_||76;6D E8 00
+ld pz', (py)|r6k_strict|_||76;6D E8 00
 ld pz', (py+%d)|r4k|_||76;6D E8 %d
 ld pz', (py+%d)|r4k_strict|_||76;6D E8 %d
 ld pz', (py+%d)|r5k|_||76;6D E8 %d
 ld pz', (py+%d)|r5k_strict|_||76;6D E8 %d
-ld pz', (py+%d)|r6k|_||76;6D;E8 %d
-ld pz', (py+%d)|r6k_strict|_||76;6D;E8 %d
+ld pz', (py+%d)|r6k|_||76;6D E8 %d
+ld pz', (py+%d)|r6k_strict|_||76;6D E8 %d
 ld pz', (py+hl)|r4k|_||76;6D EA
 ld pz', (py+hl)|r4k_strict|_||76;6D EA
 ld pz', (py+hl)|r5k|_||76;6D EA
 ld pz', (py+hl)|r5k_strict|_||76;6D EA
-ld pz', (py+hl)|r6k|_||76;6D;EA
-ld pz', (py+hl)|r6k_strict|_||76;6D;EA
+ld pz', (py+hl)|r6k|_||76;6D EA
+ld pz', (py+hl)|r6k_strict|_||76;6D EA
 ld pz', (pz)|r4k|_||76;6D F8 00
 ld pz', (pz)|r4k_strict|_||76;6D F8 00
 ld pz', (pz)|r5k|_||76;6D F8 00
 ld pz', (pz)|r5k_strict|_||76;6D F8 00
-ld pz', (pz)|r6k|_||76;6D;F8 00
-ld pz', (pz)|r6k_strict|_||76;6D;F8 00
+ld pz', (pz)|r6k|_||76;6D F8 00
+ld pz', (pz)|r6k_strict|_||76;6D F8 00
 ld pz', (pz+%d)|r4k|_||76;6D F8 %d
 ld pz', (pz+%d)|r4k_strict|_||76;6D F8 %d
 ld pz', (pz+%d)|r5k|_||76;6D F8 %d
 ld pz', (pz+%d)|r5k_strict|_||76;6D F8 %d
-ld pz', (pz+%d)|r6k|_||76;6D;F8 %d
-ld pz', (pz+%d)|r6k_strict|_||76;6D;F8 %d
+ld pz', (pz+%d)|r6k|_||76;6D F8 %d
+ld pz', (pz+%d)|r6k_strict|_||76;6D F8 %d
 ld pz', (pz+hl)|r4k|_||76;6D FA
 ld pz', (pz+hl)|r4k_strict|_||76;6D FA
 ld pz', (pz+hl)|r5k|_||76;6D FA
 ld pz', (pz+hl)|r5k_strict|_||76;6D FA
-ld pz', (pz+hl)|r6k|_||76;6D;FA
-ld pz', (pz+hl)|r6k_strict|_||76;6D;FA
+ld pz', (pz+hl)|r6k|_||76;6D FA
+ld pz', (pz+hl)|r6k_strict|_||76;6D FA
 ld pz', pw|r4k|_||76;6D C7
 ld pz', pw|r4k_strict|_||76;6D C7
 ld pz', pw|r5k|_||76;6D C7
 ld pz', pw|r5k_strict|_||76;6D C7
-ld pz', pw|r6k|_||76;6D;C7
-ld pz', pw|r6k_strict|_||76;6D;C7
+ld pz', pw|r6k|_||76;6D C7
+ld pz', pw|r6k_strict|_||76;6D C7
 ld pz', pw+de|r4k|_||76;6D C6
 ld pz', pw+de|r4k_strict|_||76;6D C6
 ld pz', pw+de|r5k|_||76;6D C6
 ld pz', pw+de|r5k_strict|_||76;6D C6
-ld pz', pw+de|r6k|_||76;6D;C6
-ld pz', pw+de|r6k_strict|_||76;6D;C6
+ld pz', pw+de|r6k|_||76;6D C6
+ld pz', pw+de|r6k_strict|_||76;6D C6
 ld pz', pw+hl|r4k|_||76;6D CE
 ld pz', pw+hl|r4k_strict|_||76;6D CE
 ld pz', pw+hl|r5k|_||76;6D CE
 ld pz', pw+hl|r5k_strict|_||76;6D CE
-ld pz', pw+hl|r6k|_||76;6D;CE
-ld pz', pw+hl|r6k_strict|_||76;6D;CE
+ld pz', pw+hl|r6k|_||76;6D CE
+ld pz', pw+hl|r6k_strict|_||76;6D CE
 ld pz', pw+ix|r4k|_||76;6D C4
 ld pz', pw+ix|r4k_strict|_||76;6D C4
 ld pz', pw+ix|r5k|_||76;6D C4
 ld pz', pw+ix|r5k_strict|_||76;6D C4
-ld pz', pw+ix|r6k|_||76;6D;C4
-ld pz', pw+ix|r6k_strict|_||76;6D;C4
+ld pz', pw+ix|r6k|_||76;6D C4
+ld pz', pw+ix|r6k_strict|_||76;6D C4
 ld pz', pw+iy|r4k|_||76;6D C5
 ld pz', pw+iy|r4k_strict|_||76;6D C5
 ld pz', pw+iy|r5k|_||76;6D C5
 ld pz', pw+iy|r5k_strict|_||76;6D C5
-ld pz', pw+iy|r6k|_||76;6D;C5
-ld pz', pw+iy|r6k_strict|_||76;6D;C5
+ld pz', pw+iy|r6k|_||76;6D C5
+ld pz', pw+iy|r6k_strict|_||76;6D C5
 ld pz', px|r4k|_||76;6D D7
 ld pz', px|r4k_strict|_||76;6D D7
 ld pz', px|r5k|_||76;6D D7
 ld pz', px|r5k_strict|_||76;6D D7
-ld pz', px|r6k|_||76;6D;D7
-ld pz', px|r6k_strict|_||76;6D;D7
+ld pz', px|r6k|_||76;6D D7
+ld pz', px|r6k_strict|_||76;6D D7
 ld pz', px+de|r4k|_||76;6D D6
 ld pz', px+de|r4k_strict|_||76;6D D6
 ld pz', px+de|r5k|_||76;6D D6
 ld pz', px+de|r5k_strict|_||76;6D D6
-ld pz', px+de|r6k|_||76;6D;D6
-ld pz', px+de|r6k_strict|_||76;6D;D6
+ld pz', px+de|r6k|_||76;6D D6
+ld pz', px+de|r6k_strict|_||76;6D D6
 ld pz', px+hl|r4k|_||76;6D DE
 ld pz', px+hl|r4k_strict|_||76;6D DE
 ld pz', px+hl|r5k|_||76;6D DE
 ld pz', px+hl|r5k_strict|_||76;6D DE
-ld pz', px+hl|r6k|_||76;6D;DE
-ld pz', px+hl|r6k_strict|_||76;6D;DE
+ld pz', px+hl|r6k|_||76;6D DE
+ld pz', px+hl|r6k_strict|_||76;6D DE
 ld pz', px+ix|r4k|_||76;6D D4
 ld pz', px+ix|r4k_strict|_||76;6D D4
 ld pz', px+ix|r5k|_||76;6D D4
 ld pz', px+ix|r5k_strict|_||76;6D D4
-ld pz', px+ix|r6k|_||76;6D;D4
-ld pz', px+ix|r6k_strict|_||76;6D;D4
+ld pz', px+ix|r6k|_||76;6D D4
+ld pz', px+ix|r6k_strict|_||76;6D D4
 ld pz', px+iy|r4k|_||76;6D D5
 ld pz', px+iy|r4k_strict|_||76;6D D5
 ld pz', px+iy|r5k|_||76;6D D5
 ld pz', px+iy|r5k_strict|_||76;6D D5
-ld pz', px+iy|r6k|_||76;6D;D5
-ld pz', px+iy|r6k_strict|_||76;6D;D5
+ld pz', px+iy|r6k|_||76;6D D5
+ld pz', px+iy|r6k_strict|_||76;6D D5
 ld pz', py|r4k|_||76;6D E7
 ld pz', py|r4k_strict|_||76;6D E7
 ld pz', py|r5k|_||76;6D E7
 ld pz', py|r5k_strict|_||76;6D E7
-ld pz', py|r6k|_||76;6D;E7
-ld pz', py|r6k_strict|_||76;6D;E7
+ld pz', py|r6k|_||76;6D E7
+ld pz', py|r6k_strict|_||76;6D E7
 ld pz', py+de|r4k|_||76;6D E6
 ld pz', py+de|r4k_strict|_||76;6D E6
 ld pz', py+de|r5k|_||76;6D E6
 ld pz', py+de|r5k_strict|_||76;6D E6
-ld pz', py+de|r6k|_||76;6D;E6
-ld pz', py+de|r6k_strict|_||76;6D;E6
+ld pz', py+de|r6k|_||76;6D E6
+ld pz', py+de|r6k_strict|_||76;6D E6
 ld pz', py+hl|r4k|_||76;6D EE
 ld pz', py+hl|r4k_strict|_||76;6D EE
 ld pz', py+hl|r5k|_||76;6D EE
 ld pz', py+hl|r5k_strict|_||76;6D EE
-ld pz', py+hl|r6k|_||76;6D;EE
-ld pz', py+hl|r6k_strict|_||76;6D;EE
+ld pz', py+hl|r6k|_||76;6D EE
+ld pz', py+hl|r6k_strict|_||76;6D EE
 ld pz', py+ix|r4k|_||76;6D E4
 ld pz', py+ix|r4k_strict|_||76;6D E4
 ld pz', py+ix|r5k|_||76;6D E4
 ld pz', py+ix|r5k_strict|_||76;6D E4
-ld pz', py+ix|r6k|_||76;6D;E4
-ld pz', py+ix|r6k_strict|_||76;6D;E4
+ld pz', py+ix|r6k|_||76;6D E4
+ld pz', py+ix|r6k_strict|_||76;6D E4
 ld pz', py+iy|r4k|_||76;6D E5
 ld pz', py+iy|r4k_strict|_||76;6D E5
 ld pz', py+iy|r5k|_||76;6D E5
 ld pz', py+iy|r5k_strict|_||76;6D E5
-ld pz', py+iy|r6k|_||76;6D;E5
-ld pz', py+iy|r6k_strict|_||76;6D;E5
+ld pz', py+iy|r6k|_||76;6D E5
+ld pz', py+iy|r6k_strict|_||76;6D E5
 ld pz', pz|r4k|_||76;6D F7
 ld pz', pz|r4k_strict|_||76;6D F7
 ld pz', pz|r5k|_||76;6D F7
 ld pz', pz|r5k_strict|_||76;6D F7
-ld pz', pz|r6k|_||76;6D;F7
-ld pz', pz|r6k_strict|_||76;6D;F7
+ld pz', pz|r6k|_||76;6D F7
+ld pz', pz|r6k_strict|_||76;6D F7
 ld pz', pz+de|r4k|_||76;6D F6
 ld pz', pz+de|r4k_strict|_||76;6D F6
 ld pz', pz+de|r5k|_||76;6D F6
 ld pz', pz+de|r5k_strict|_||76;6D F6
-ld pz', pz+de|r6k|_||76;6D;F6
-ld pz', pz+de|r6k_strict|_||76;6D;F6
+ld pz', pz+de|r6k|_||76;6D F6
+ld pz', pz+de|r6k_strict|_||76;6D F6
 ld pz', pz+hl|r4k|_||76;6D FE
 ld pz', pz+hl|r4k_strict|_||76;6D FE
 ld pz', pz+hl|r5k|_||76;6D FE
 ld pz', pz+hl|r5k_strict|_||76;6D FE
-ld pz', pz+hl|r6k|_||76;6D;FE
-ld pz', pz+hl|r6k_strict|_||76;6D;FE
+ld pz', pz+hl|r6k|_||76;6D FE
+ld pz', pz+hl|r6k_strict|_||76;6D FE
 ld pz', pz+ix|r4k|_||76;6D F4
 ld pz', pz+ix|r4k_strict|_||76;6D F4
 ld pz', pz+ix|r5k|_||76;6D F4
 ld pz', pz+ix|r5k_strict|_||76;6D F4
-ld pz', pz+ix|r6k|_||76;6D;F4
-ld pz', pz+ix|r6k_strict|_||76;6D;F4
+ld pz', pz+ix|r6k|_||76;6D F4
+ld pz', pz+ix|r6k_strict|_||76;6D F4
 ld pz', pz+iy|r4k|_||76;6D F5
 ld pz', pz+iy|r4k_strict|_||76;6D F5
 ld pz', pz+iy|r5k|_||76;6D F5
 ld pz', pz+iy|r5k_strict|_||76;6D F5
-ld pz', pz+iy|r6k|_||76;6D;F5
-ld pz', pz+iy|r6k_strict|_||76;6D;F5
+ld pz', pz+iy|r6k|_||76;6D F5
+ld pz', pz+iy|r6k_strict|_||76;6D F5
 ld pz, %m|r4k|_||ED 3C %m %m %m %m
 ld pz, %m|r4k_strict|_||ED 3C %m %m %m %m
 ld pz, %m|r5k|_||ED 3C %m %m %m %m
@@ -56499,74 +56499,74 @@ ld pz, (pw)|r4k|_||6D C8 00
 ld pz, (pw)|r4k_strict|_||6D C8 00
 ld pz, (pw)|r5k|_||6D C8 00
 ld pz, (pw)|r5k_strict|_||6D C8 00
-ld pz, (pw)|r6k|_||6D;C8 00
-ld pz, (pw)|r6k_strict|_||6D;C8 00
+ld pz, (pw)|r6k|_||6D C8 00
+ld pz, (pw)|r6k_strict|_||6D C8 00
 ld pz, (pw+%d)|r4k|_||6D C8 %d
 ld pz, (pw+%d)|r4k_strict|_||6D C8 %d
 ld pz, (pw+%d)|r5k|_||6D C8 %d
 ld pz, (pw+%d)|r5k_strict|_||6D C8 %d
-ld pz, (pw+%d)|r6k|_||6D;C8 %d
-ld pz, (pw+%d)|r6k_strict|_||6D;C8 %d
+ld pz, (pw+%d)|r6k|_||6D C8 %d
+ld pz, (pw+%d)|r6k_strict|_||6D C8 %d
 ld pz, (pw+hl)|r4k|_||6D CA
 ld pz, (pw+hl)|r4k_strict|_||6D CA
 ld pz, (pw+hl)|r5k|_||6D CA
 ld pz, (pw+hl)|r5k_strict|_||6D CA
-ld pz, (pw+hl)|r6k|_||6D;CA
-ld pz, (pw+hl)|r6k_strict|_||6D;CA
+ld pz, (pw+hl)|r6k|_||6D CA
+ld pz, (pw+hl)|r6k_strict|_||6D CA
 ld pz, (px)|r4k|_||6D D8 00
 ld pz, (px)|r4k_strict|_||6D D8 00
 ld pz, (px)|r5k|_||6D D8 00
 ld pz, (px)|r5k_strict|_||6D D8 00
-ld pz, (px)|r6k|_||6D;D8 00
-ld pz, (px)|r6k_strict|_||6D;D8 00
+ld pz, (px)|r6k|_||6D D8 00
+ld pz, (px)|r6k_strict|_||6D D8 00
 ld pz, (px+%d)|r4k|_||6D D8 %d
 ld pz, (px+%d)|r4k_strict|_||6D D8 %d
 ld pz, (px+%d)|r5k|_||6D D8 %d
 ld pz, (px+%d)|r5k_strict|_||6D D8 %d
-ld pz, (px+%d)|r6k|_||6D;D8 %d
-ld pz, (px+%d)|r6k_strict|_||6D;D8 %d
+ld pz, (px+%d)|r6k|_||6D D8 %d
+ld pz, (px+%d)|r6k_strict|_||6D D8 %d
 ld pz, (px+hl)|r4k|_||6D DA
 ld pz, (px+hl)|r4k_strict|_||6D DA
 ld pz, (px+hl)|r5k|_||6D DA
 ld pz, (px+hl)|r5k_strict|_||6D DA
-ld pz, (px+hl)|r6k|_||6D;DA
-ld pz, (px+hl)|r6k_strict|_||6D;DA
+ld pz, (px+hl)|r6k|_||6D DA
+ld pz, (px+hl)|r6k_strict|_||6D DA
 ld pz, (py)|r4k|_||6D E8 00
 ld pz, (py)|r4k_strict|_||6D E8 00
 ld pz, (py)|r5k|_||6D E8 00
 ld pz, (py)|r5k_strict|_||6D E8 00
-ld pz, (py)|r6k|_||6D;E8 00
-ld pz, (py)|r6k_strict|_||6D;E8 00
+ld pz, (py)|r6k|_||6D E8 00
+ld pz, (py)|r6k_strict|_||6D E8 00
 ld pz, (py+%d)|r4k|_||6D E8 %d
 ld pz, (py+%d)|r4k_strict|_||6D E8 %d
 ld pz, (py+%d)|r5k|_||6D E8 %d
 ld pz, (py+%d)|r5k_strict|_||6D E8 %d
-ld pz, (py+%d)|r6k|_||6D;E8 %d
-ld pz, (py+%d)|r6k_strict|_||6D;E8 %d
+ld pz, (py+%d)|r6k|_||6D E8 %d
+ld pz, (py+%d)|r6k_strict|_||6D E8 %d
 ld pz, (py+hl)|r4k|_||6D EA
 ld pz, (py+hl)|r4k_strict|_||6D EA
 ld pz, (py+hl)|r5k|_||6D EA
 ld pz, (py+hl)|r5k_strict|_||6D EA
-ld pz, (py+hl)|r6k|_||6D;EA
-ld pz, (py+hl)|r6k_strict|_||6D;EA
+ld pz, (py+hl)|r6k|_||6D EA
+ld pz, (py+hl)|r6k_strict|_||6D EA
 ld pz, (pz)|r4k|_||6D F8 00
 ld pz, (pz)|r4k_strict|_||6D F8 00
 ld pz, (pz)|r5k|_||6D F8 00
 ld pz, (pz)|r5k_strict|_||6D F8 00
-ld pz, (pz)|r6k|_||6D;F8 00
-ld pz, (pz)|r6k_strict|_||6D;F8 00
+ld pz, (pz)|r6k|_||6D F8 00
+ld pz, (pz)|r6k_strict|_||6D F8 00
 ld pz, (pz+%d)|r4k|_||6D F8 %d
 ld pz, (pz+%d)|r4k_strict|_||6D F8 %d
 ld pz, (pz+%d)|r5k|_||6D F8 %d
 ld pz, (pz+%d)|r5k_strict|_||6D F8 %d
-ld pz, (pz+%d)|r6k|_||6D;F8 %d
-ld pz, (pz+%d)|r6k_strict|_||6D;F8 %d
+ld pz, (pz+%d)|r6k|_||6D F8 %d
+ld pz, (pz+%d)|r6k_strict|_||6D F8 %d
 ld pz, (pz+hl)|r4k|_||6D FA
 ld pz, (pz+hl)|r4k_strict|_||6D FA
 ld pz, (pz+hl)|r5k|_||6D FA
 ld pz, (pz+hl)|r5k_strict|_||6D FA
-ld pz, (pz+hl)|r6k|_||6D;FA
-ld pz, (pz+hl)|r6k_strict|_||6D;FA
+ld pz, (pz+hl)|r6k|_||6D FA
+ld pz, (pz+hl)|r6k_strict|_||6D FA
 ld pz, (sp)|r4k|_||ED 34 00
 ld pz, (sp)|r4k_strict|_||ED 34 00
 ld pz, (sp)|r5k|_||ED 34 00
@@ -56595,146 +56595,146 @@ ld pz, pw|r4k|_||6D C7
 ld pz, pw|r4k_strict|_||6D C7
 ld pz, pw|r5k|_||6D C7
 ld pz, pw|r5k_strict|_||6D C7
-ld pz, pw|r6k|_||6D;C7
-ld pz, pw|r6k_strict|_||6D;C7
+ld pz, pw|r6k|_||6D C7
+ld pz, pw|r6k_strict|_||6D C7
 ld pz, pw+%d|r4k|_||6D CC %d
 ld pz, pw+%d|r4k_strict|_||6D CC %d
 ld pz, pw+%d|r5k|_||6D CC %d
 ld pz, pw+%d|r5k_strict|_||6D CC %d
-ld pz, pw+%d|r6k|_||6D;CC %d
-ld pz, pw+%d|r6k_strict|_||6D;CC %d
+ld pz, pw+%d|r6k|_||6D CC %d
+ld pz, pw+%d|r6k_strict|_||6D CC %d
 ld pz, pw+de|r4k|_||6D C6
 ld pz, pw+de|r4k_strict|_||6D C6
 ld pz, pw+de|r5k|_||6D C6
 ld pz, pw+de|r5k_strict|_||6D C6
-ld pz, pw+de|r6k|_||6D;C6
-ld pz, pw+de|r6k_strict|_||6D;C6
+ld pz, pw+de|r6k|_||6D C6
+ld pz, pw+de|r6k_strict|_||6D C6
 ld pz, pw+hl|r4k|_||6D CE
 ld pz, pw+hl|r4k_strict|_||6D CE
 ld pz, pw+hl|r5k|_||6D CE
 ld pz, pw+hl|r5k_strict|_||6D CE
-ld pz, pw+hl|r6k|_||6D;CE
-ld pz, pw+hl|r6k_strict|_||6D;CE
+ld pz, pw+hl|r6k|_||6D CE
+ld pz, pw+hl|r6k_strict|_||6D CE
 ld pz, pw+ix|r4k|_||6D C4
 ld pz, pw+ix|r4k_strict|_||6D C4
 ld pz, pw+ix|r5k|_||6D C4
 ld pz, pw+ix|r5k_strict|_||6D C4
-ld pz, pw+ix|r6k|_||6D;C4
-ld pz, pw+ix|r6k_strict|_||6D;C4
+ld pz, pw+ix|r6k|_||6D C4
+ld pz, pw+ix|r6k_strict|_||6D C4
 ld pz, pw+iy|r4k|_||6D C5
 ld pz, pw+iy|r4k_strict|_||6D C5
 ld pz, pw+iy|r5k|_||6D C5
 ld pz, pw+iy|r5k_strict|_||6D C5
-ld pz, pw+iy|r6k|_||6D;C5
-ld pz, pw+iy|r6k_strict|_||6D;C5
+ld pz, pw+iy|r6k|_||6D C5
+ld pz, pw+iy|r6k_strict|_||6D C5
 ld pz, px|r4k|_||6D D7
 ld pz, px|r4k_strict|_||6D D7
 ld pz, px|r5k|_||6D D7
 ld pz, px|r5k_strict|_||6D D7
-ld pz, px|r6k|_||6D;D7
-ld pz, px|r6k_strict|_||6D;D7
+ld pz, px|r6k|_||6D D7
+ld pz, px|r6k_strict|_||6D D7
 ld pz, px+%d|r4k|_||6D DC %d
 ld pz, px+%d|r4k_strict|_||6D DC %d
 ld pz, px+%d|r5k|_||6D DC %d
 ld pz, px+%d|r5k_strict|_||6D DC %d
-ld pz, px+%d|r6k|_||6D;DC %d
-ld pz, px+%d|r6k_strict|_||6D;DC %d
+ld pz, px+%d|r6k|_||6D DC %d
+ld pz, px+%d|r6k_strict|_||6D DC %d
 ld pz, px+de|r4k|_||6D D6
 ld pz, px+de|r4k_strict|_||6D D6
 ld pz, px+de|r5k|_||6D D6
 ld pz, px+de|r5k_strict|_||6D D6
-ld pz, px+de|r6k|_||6D;D6
-ld pz, px+de|r6k_strict|_||6D;D6
+ld pz, px+de|r6k|_||6D D6
+ld pz, px+de|r6k_strict|_||6D D6
 ld pz, px+hl|r4k|_||6D DE
 ld pz, px+hl|r4k_strict|_||6D DE
 ld pz, px+hl|r5k|_||6D DE
 ld pz, px+hl|r5k_strict|_||6D DE
-ld pz, px+hl|r6k|_||6D;DE
-ld pz, px+hl|r6k_strict|_||6D;DE
+ld pz, px+hl|r6k|_||6D DE
+ld pz, px+hl|r6k_strict|_||6D DE
 ld pz, px+ix|r4k|_||6D D4
 ld pz, px+ix|r4k_strict|_||6D D4
 ld pz, px+ix|r5k|_||6D D4
 ld pz, px+ix|r5k_strict|_||6D D4
-ld pz, px+ix|r6k|_||6D;D4
-ld pz, px+ix|r6k_strict|_||6D;D4
+ld pz, px+ix|r6k|_||6D D4
+ld pz, px+ix|r6k_strict|_||6D D4
 ld pz, px+iy|r4k|_||6D D5
 ld pz, px+iy|r4k_strict|_||6D D5
 ld pz, px+iy|r5k|_||6D D5
 ld pz, px+iy|r5k_strict|_||6D D5
-ld pz, px+iy|r6k|_||6D;D5
-ld pz, px+iy|r6k_strict|_||6D;D5
+ld pz, px+iy|r6k|_||6D D5
+ld pz, px+iy|r6k_strict|_||6D D5
 ld pz, py|r4k|_||6D E7
 ld pz, py|r4k_strict|_||6D E7
 ld pz, py|r5k|_||6D E7
 ld pz, py|r5k_strict|_||6D E7
-ld pz, py|r6k|_||6D;E7
-ld pz, py|r6k_strict|_||6D;E7
+ld pz, py|r6k|_||6D E7
+ld pz, py|r6k_strict|_||6D E7
 ld pz, py+%d|r4k|_||6D EC %d
 ld pz, py+%d|r4k_strict|_||6D EC %d
 ld pz, py+%d|r5k|_||6D EC %d
 ld pz, py+%d|r5k_strict|_||6D EC %d
-ld pz, py+%d|r6k|_||6D;EC %d
-ld pz, py+%d|r6k_strict|_||6D;EC %d
+ld pz, py+%d|r6k|_||6D EC %d
+ld pz, py+%d|r6k_strict|_||6D EC %d
 ld pz, py+de|r4k|_||6D E6
 ld pz, py+de|r4k_strict|_||6D E6
 ld pz, py+de|r5k|_||6D E6
 ld pz, py+de|r5k_strict|_||6D E6
-ld pz, py+de|r6k|_||6D;E6
-ld pz, py+de|r6k_strict|_||6D;E6
+ld pz, py+de|r6k|_||6D E6
+ld pz, py+de|r6k_strict|_||6D E6
 ld pz, py+hl|r4k|_||6D EE
 ld pz, py+hl|r4k_strict|_||6D EE
 ld pz, py+hl|r5k|_||6D EE
 ld pz, py+hl|r5k_strict|_||6D EE
-ld pz, py+hl|r6k|_||6D;EE
-ld pz, py+hl|r6k_strict|_||6D;EE
+ld pz, py+hl|r6k|_||6D EE
+ld pz, py+hl|r6k_strict|_||6D EE
 ld pz, py+ix|r4k|_||6D E4
 ld pz, py+ix|r4k_strict|_||6D E4
 ld pz, py+ix|r5k|_||6D E4
 ld pz, py+ix|r5k_strict|_||6D E4
-ld pz, py+ix|r6k|_||6D;E4
-ld pz, py+ix|r6k_strict|_||6D;E4
+ld pz, py+ix|r6k|_||6D E4
+ld pz, py+ix|r6k_strict|_||6D E4
 ld pz, py+iy|r4k|_||6D E5
 ld pz, py+iy|r4k_strict|_||6D E5
 ld pz, py+iy|r5k|_||6D E5
 ld pz, py+iy|r5k_strict|_||6D E5
-ld pz, py+iy|r6k|_||6D;E5
-ld pz, py+iy|r6k_strict|_||6D;E5
+ld pz, py+iy|r6k|_||6D E5
+ld pz, py+iy|r6k_strict|_||6D E5
 ld pz, pz|r4k|_||6D F7
 ld pz, pz|r4k_strict|_||6D F7
 ld pz, pz|r5k|_||6D F7
 ld pz, pz|r5k_strict|_||6D F7
-ld pz, pz|r6k|_||6D;F7
-ld pz, pz|r6k_strict|_||6D;F7
+ld pz, pz|r6k|_||6D F7
+ld pz, pz|r6k_strict|_||6D F7
 ld pz, pz+%d|r4k|_||6D FC %d
 ld pz, pz+%d|r4k_strict|_||6D FC %d
 ld pz, pz+%d|r5k|_||6D FC %d
 ld pz, pz+%d|r5k_strict|_||6D FC %d
-ld pz, pz+%d|r6k|_||6D;FC %d
-ld pz, pz+%d|r6k_strict|_||6D;FC %d
+ld pz, pz+%d|r6k|_||6D FC %d
+ld pz, pz+%d|r6k_strict|_||6D FC %d
 ld pz, pz+de|r4k|_||6D F6
 ld pz, pz+de|r4k_strict|_||6D F6
 ld pz, pz+de|r5k|_||6D F6
 ld pz, pz+de|r5k_strict|_||6D F6
-ld pz, pz+de|r6k|_||6D;F6
-ld pz, pz+de|r6k_strict|_||6D;F6
+ld pz, pz+de|r6k|_||6D F6
+ld pz, pz+de|r6k_strict|_||6D F6
 ld pz, pz+hl|r4k|_||6D FE
 ld pz, pz+hl|r4k_strict|_||6D FE
 ld pz, pz+hl|r5k|_||6D FE
 ld pz, pz+hl|r5k_strict|_||6D FE
-ld pz, pz+hl|r6k|_||6D;FE
-ld pz, pz+hl|r6k_strict|_||6D;FE
+ld pz, pz+hl|r6k|_||6D FE
+ld pz, pz+hl|r6k_strict|_||6D FE
 ld pz, pz+ix|r4k|_||6D F4
 ld pz, pz+ix|r4k_strict|_||6D F4
 ld pz, pz+ix|r5k|_||6D F4
 ld pz, pz+ix|r5k_strict|_||6D F4
-ld pz, pz+ix|r6k|_||6D;F4
-ld pz, pz+ix|r6k_strict|_||6D;F4
+ld pz, pz+ix|r6k|_||6D F4
+ld pz, pz+ix|r6k_strict|_||6D F4
 ld pz, pz+iy|r4k|_||6D F5
 ld pz, pz+iy|r4k_strict|_||6D F5
 ld pz, pz+iy|r5k|_||6D F5
 ld pz, pz+iy|r5k_strict|_||6D F5
-ld pz, pz+iy|r6k|_||6D;F5
-ld pz, pz+iy|r6k_strict|_||6D;F5
+ld pz, pz+iy|r6k|_||6D F5
+ld pz, pz+iy|r6k_strict|_||6D F5
 ld r, a|ez80|_||ED 4F
 ld r, a|ez80_strict|_||ED 4F
 ld r, a|ez80_z80|_||ED 4F
@@ -59813,23 +59813,23 @@ ldh a, (%h)|gbz80|_||F0 %h
 ldh a, (%h)|gbz80_strict|_||F0 %h
 ldh a, (c)|gbz80|_||F2
 ldh a, (c)|gbz80_strict|_||F2
-ldhi %n|8080|X||E5;11 %n 00;19;EB;E1
+ldhi %n|8080|X||E5;11 %n %s;19;EB;E1
 ldhi %n|8085|_||28 %n
 ldhi %n|8085_strict|_||28 %n
-ldhi %n|ez80|X||E5;11 %n 00 00;19;EB;E1
-ldhi %n|ez80_z80|X||E5;11 %n 00;19;EB;E1
-ldhi %n|gbz80|X||E5;11 %n 00;19;E5;D5;E1;D1;E1
-ldhi %n|kc160|X||E5;11 %n 00;19;EB;E1
-ldhi %n|kc160_z80|X||E5;11 %n 00;19;EB;E1
-ldhi %n|r2ka|X||E5;11 %n 00;19;EB;E1
-ldhi %n|r3k|X||E5;11 %n 00;19;EB;E1
-ldhi %n|r4k|X||E5;11 %n 00;19;EB;E1
-ldhi %n|r5k|X||E5;11 %n 00;19;EB;E1
-ldhi %n|r6k|X||E5;11 %n 00;19;EB;E1
-ldhi %n|r800|X||E5;11 %n 00;19;EB;E1
-ldhi %n|z180|X||E5;11 %n 00;19;EB;E1
-ldhi %n|z80|X||E5;11 %n 00;19;EB;E1
-ldhi %n|z80n|X||E5;11 %n 00;19;EB;E1
+ldhi %n|ez80|X||E5;11 %n %s %s;19;EB;E1
+ldhi %n|ez80_z80|X||E5;11 %n %s;19;EB;E1
+ldhi %n|gbz80|X||E5;11 %n %s;19;E5;D5;E1;D1;E1
+ldhi %n|kc160|X||E5;11 %n %s;19;EB;E1
+ldhi %n|kc160_z80|X||E5;11 %n %s;19;EB;E1
+ldhi %n|r2ka|X||E5;11 %n %s;19;EB;E1
+ldhi %n|r3k|X||E5;11 %n %s;19;EB;E1
+ldhi %n|r4k|X||E5;11 %n %s;19;EB;E1
+ldhi %n|r5k|X||E5;11 %n %s;19;EB;E1
+ldhi %n|r6k|X||E5;11 %n %s;19;EB;E1
+ldhi %n|r800|X||E5;11 %n %s;19;EB;E1
+ldhi %n|z180|X||E5;11 %n %s;19;EB;E1
+ldhi %n|z80|X||E5;11 %n %s;19;EB;E1
+ldhi %n|z80n|X||E5;11 %n %s;19;EB;E1
 ldhl sp, %d|gbz80|_||F8 %d
 ldhl sp, %d|gbz80_strict|_||F8 %d
 ldi|8080|X||CD @__z80asm__ldi 
@@ -61219,23 +61219,23 @@ ldpirx|z80n|_||ED B7
 ldpirx|z80n_strict|_||ED B7
 ldrx|z80n|_||ED BC
 ldrx|z80n_strict|_||ED BC
-ldsi %n|8080|X||EB;21 %n 00;39;EB
+ldsi %n|8080|X||EB;21 %n %s;39;EB
 ldsi %n|8085|_||38 %n
 ldsi %n|8085_strict|_||38 %n
-ldsi %n|ez80|X||EB;21 %n 00 00;39;EB
-ldsi %n|ez80_z80|X||EB;21 %n 00;39;EB
-ldsi %n|gbz80|X||E5;D5;E1;D1;21 %n 00;39;E5;D5;E1;D1
-ldsi %n|kc160|X||EB;21 %n 00;39;EB
-ldsi %n|kc160_z80|X||EB;21 %n 00;39;EB
-ldsi %n|r2ka|X||EB;21 %n 00;39;EB
-ldsi %n|r3k|X||EB;21 %n 00;39;EB
-ldsi %n|r4k|X||EB;21 %n 00;39;EB
-ldsi %n|r5k|X||EB;21 %n 00;39;EB
-ldsi %n|r6k|X||EB;21 %n 00;39;EB
-ldsi %n|r800|X||EB;21 %n 00;39;EB
-ldsi %n|z180|X||EB;21 %n 00;39;EB
-ldsi %n|z80|X||EB;21 %n 00;39;EB
-ldsi %n|z80n|X||EB;21 %n 00;39;EB
+ldsi %n|ez80|X||EB;21 %n %s %s;39;EB
+ldsi %n|ez80_z80|X||EB;21 %n %s;39;EB
+ldsi %n|gbz80|X||E5;D5;E1;D1;21 %n %s;39;E5;D5;E1;D1
+ldsi %n|kc160|X||EB;21 %n %s;39;EB
+ldsi %n|kc160_z80|X||EB;21 %n %s;39;EB
+ldsi %n|r2ka|X||EB;21 %n %s;39;EB
+ldsi %n|r3k|X||EB;21 %n %s;39;EB
+ldsi %n|r4k|X||EB;21 %n %s;39;EB
+ldsi %n|r5k|X||EB;21 %n %s;39;EB
+ldsi %n|r6k|X||EB;21 %n %s;39;EB
+ldsi %n|r800|X||EB;21 %n %s;39;EB
+ldsi %n|z180|X||EB;21 %n %s;39;EB
+ldsi %n|z80|X||EB;21 %n %s;39;EB
+ldsi %n|z80n|X||EB;21 %n %s;39;EB
 ldws|z80n|_||ED A5
 ldws|z80n_strict|_||ED A5
 lea bc, ix|ez80|_||ED 02 00
@@ -64423,8 +64423,8 @@ or jkhl, (pw)|r6k|_||49;6C 00
 or jkhl, (pw)|r6k_strict|_||49;6C 00
 or jkhl, (pw+%d)|r6k|_||49;6C %d
 or jkhl, (pw+%d)|r6k_strict|_||49;6C %d
-or jkhl, (px)|r6k|_||49;6D;00
-or jkhl, (px)|r6k_strict|_||49;6D;00
+or jkhl, (px)|r6k|_||49;6D 00
+or jkhl, (px)|r6k_strict|_||49;6D 00
 or jkhl, (px+%d)|r6k|_||49;6D %d
 or jkhl, (px+%d)|r6k_strict|_||49;6D %d
 or jkhl, (py)|r6k|_||49;6E 00
@@ -72444,14 +72444,14 @@ sbox a'|r5k|_||76;ED 02
 sbox a'|r5k_strict|_||76;ED 02
 sbox a'|r6k|_||76;ED 02
 sbox a'|r6k_strict|_||76;ED 02
-sbox pw|r6k|_||6D;1D
-sbox pw|r6k_strict|_||6D;1D
-sbox px|r6k|_||6D;5D
-sbox px|r6k_strict|_||6D;5D
-sbox py|r6k|_||6D;9D
-sbox py|r6k_strict|_||6D;9D
-sbox pz|r6k|_||6D;DD
-sbox pz|r6k_strict|_||6D;DD
+sbox pw|r6k|_||6D 1D
+sbox pw|r6k_strict|_||6D 1D
+sbox px|r6k|_||6D 5D
+sbox px|r6k_strict|_||6D 5D
+sbox py|r6k|_||6D 9D
+sbox py|r6k_strict|_||6D 9D
+sbox pz|r6k|_||6D DD
+sbox pz|r6k_strict|_||6D DD
 scall|r6k|_||ED 55
 scall|r6k_strict|_||ED 55
 scf|8080|_||37

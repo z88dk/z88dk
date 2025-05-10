@@ -427,7 +427,7 @@ sub parse_code_opcode {
 	my $stmt = "";
 	my $bytes = join(' ', @bytes);
 	
-	#say "$cpu\t$asm\t@bytes" if $asm =~ /lcall/;
+	#say "$cpu\t$asm\t@bytes";
 	
 	if ($bytes =~ s/ \@(\w+)//) {
 		my $func = $1;
@@ -453,8 +453,20 @@ sub parse_code_opcode {
 	elsif ($bytes =~ s/ %n %n$//) {
 		$stmt = "DO_stmt_n_n";
 	}
+	elsif ($bytes =~ s/ %n %s %s$//) {
+		$stmt = "DO_stmt_n_0_0";
+	}
+	elsif ($bytes =~ s/ %n %s$//) {
+		$stmt = "DO_stmt_n_0";
+	}
 	elsif ($bytes =~ s/ %n$//) {
 		$stmt = "DO_stmt_n";
+	}
+	elsif ($bytes =~ s/ %d %s %s$//) {
+		$stmt = "DO_stmt_d_0_0";
+	}
+	elsif ($bytes =~ s/ %d %s$//) {
+		$stmt = "DO_stmt_d_0";
 	}
 	elsif ($bytes =~ s/ %d$//) {
 		$stmt = "DO_stmt_d";
@@ -476,24 +488,6 @@ sub parse_code_opcode {
 	}
 	elsif ($bytes =~ s/ %m %m$//) {
 		$stmt = "DO_stmt_nn";
-	}
-	elsif ($bytes =~ s/ %n 0 0$//) {
-		$stmt = "DO_stmt_n_0_0";
-	}
-	elsif ($bytes =~ s/ %n 0$//) {
-		$stmt = "DO_stmt_n_0";
-	}
-	elsif ($bytes =~ s/ %n 0 0$//) {
-		$stmt = "DO_stmt_n_0_0";
-	}
-	elsif ($bytes =~ s/ %n 0$//) {
-		$stmt = "DO_stmt_n_0";
-	}
-	elsif ($bytes =~ s/ %d 0$//) {
-		$stmt = "DO_stmt_d_0";
-	}
-	elsif ($bytes =~ s/ %d 0 0$//) {
-		$stmt = "DO_stmt_d_0_0";
 	}
 	elsif ($bytes =~ s/ %M %M$//) {
 		$stmt = "DO_stmt_NN";
@@ -545,7 +539,7 @@ sub parse_code_opcode {
 				}
 				$_ =~ s/\b(\d+)\b/ $1 < 10 ? $1 : sprintf("0x%02X", $1) /ge;
 				push @expr, $_;
-				$_ = sprintf("0x%02X", $offset);
+				$_ = sprintf("%02X", $offset);
 			}
 			else {
 				push @expr, undef;

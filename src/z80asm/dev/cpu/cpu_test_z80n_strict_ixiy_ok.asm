@@ -2184,17 +2184,29 @@
  mul de                         ; ED 30
  neg                            ; ED 44
  nextreg 0, 0                   ; ED 91 00 00
+ nextreg 0, 127                 ; ED 91 00 00
+ nextreg 0, 255                 ; ED 91 00 00
  nextreg 0, a                   ; ED 92 00
- nextreg 127, 127               ; ED 91 7F 7F
+ nextreg 127, 0                 ; ED 91 7F 00
+ nextreg 127, 127               ; ED 91 7F 00
+ nextreg 127, 255               ; ED 91 7F 00
  nextreg 127, a                 ; ED 92 7F
- nextreg 255, 255               ; ED 91 FF FF
+ nextreg 255, 0                 ; ED 91 FF 00
+ nextreg 255, 127               ; ED 91 FF 00
+ nextreg 255, 255               ; ED 91 FF 00
  nextreg 255, a                 ; ED 92 FF
  nop                            ; 00
  nreg 0, 0                      ; ED 91 00 00
+ nreg 0, 127                    ; ED 91 00 00
+ nreg 0, 255                    ; ED 91 00 00
  nreg 0, a                      ; ED 92 00
- nreg 127, 127                  ; ED 91 7F 7F
+ nreg 127, 0                    ; ED 91 7F 00
+ nreg 127, 127                  ; ED 91 7F 00
+ nreg 127, 255                  ; ED 91 7F 00
  nreg 127, a                    ; ED 92 7F
- nreg 255, 255                  ; ED 91 FF FF
+ nreg 255, 0                    ; ED 91 FF 00
+ nreg 255, 127                  ; ED 91 FF 00
+ nreg 255, 255                  ; ED 91 FF 00
  nreg 255, a                    ; ED 92 FF
  or (hl)                        ; B6
  or (ix)                        ; FD B6 00

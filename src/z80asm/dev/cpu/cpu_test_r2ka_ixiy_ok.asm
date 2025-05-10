@@ -7410,7 +7410,7 @@
  ld hl, sp                      ; 21 00 00 39
  ld hl, sp+0                    ; 21 00 00 39
  ld hl, sp+126                  ; 21 7E 00 39
- ld hl, sp-128                  ; 21 80 00 39
+ ld hl, sp-128                  ; 21 80 FF 39
  ld iir, a                      ; ED 4F
  ld ix, (0x1234)                ; FD 2A 34 12
  ld ix, (hl)                    ; D5 5E 23 56 2B D5 FD E1 D1
