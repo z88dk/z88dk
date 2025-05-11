@@ -11,7 +11,7 @@ cm32_sdcc___schar2fs:
 	push	hl
 	push	bc
 	ld	a,l
-	rlca	
+	rlca
 	sbc	a
 	ld	h,a
 	jp	m32_float16

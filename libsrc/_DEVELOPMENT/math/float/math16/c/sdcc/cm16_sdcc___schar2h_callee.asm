@@ -9,9 +9,10 @@ EXTERN asm_f16_f24
 
 .cm16_sdcc___schar2h_callee
     pop bc      ;return
-    pop hl      ;value
     dec sp
+    pop hl      ;value
     push bc
+    ld l,h
 .cm16_sdcc___schar2h_fastcall
     ld a,l
     rlca
