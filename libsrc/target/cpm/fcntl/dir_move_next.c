@@ -11,12 +11,15 @@
 
 #include <cpm.h>
 
-char entry_count;
-char current_entry;
+extern int dir_current_pos;
+
 
 int dir_move_next()
 {
-	current_entry=fc_dirbuf[133];
+        char entry_count;
+        int current_entry;
+
+	current_entry=dir_current_pos;
 	dir_move_first();
 	for (entry_count=0; entry_count<current_entry; entry_count++) bdos(CPM_FNXT,&fc_dir);
 	fc_dirbuf[133]=current_entry+1;
