@@ -22,10 +22,14 @@ int  dir_current_pos;
 
 int dir_move_first()
 {
-	fc_dirbuf=dirbuf;
-	bdos(CPM_SDMA,fc_dirbuf);
-	parsefcb(&fc_dir,"*.*");
-	fc_dirpos=bdos(CPM_FFST,&fc_dir);
-        dir_current_pos = 0;
-	return (fc_dirpos==-1?0x24:0);	// Not knowing what to pass for non-zero, let's simulate FLOS error code $24 (= Reached end of directory)
+    fc_dirbuf = dirbuf;
+
+    bdos(CPM_SDMA,fc_dirbuf);
+    parsefcb(&fc_dir,"*.*");
+
+    fc_dirpos = bdos(CPM_FFST,&fc_dir);
+
+    dir_current_pos = 0;
+
+    return (fc_dirpos==-1?0x24:0);    // Not knowing what to pass for non-zero, let's simulate FLOS error code $24 (= Reached end of directory)
 }
