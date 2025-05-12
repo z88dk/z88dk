@@ -655,7 +655,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                         BUF_PRINTF("(%s%s)", r4k_ps_table[psreg], handle_displacement(state, opbuf1,sizeof(opbuf1)));
                                     }
                                 } else if ( z == 0 ) {
-                                    const char *b49_blocks[] = { "nop", "nop", "pldisr", "plddsr", "pldi", "pldd", "pldir", "plddr", "puma", "pums", "plsidr", "plsddr", "nop", "nop", "plsir", "psldr" };
+                                    const char *b49_blocks[] = { "nop", "nop", "pldisr", "plddsr", "pldi", "pldd", "pldir", "plddr", "puma", "pums", "plsidr", "plsddr", "nop", "nop", "plsir", "plsdr" };
                                     uint8_t oper = (b & 0x78) >> 3;
                                     BUF_PRINTF("%-10s", b49_blocks[oper]);
                                 } else if ( z == 2 && q == 0) {
