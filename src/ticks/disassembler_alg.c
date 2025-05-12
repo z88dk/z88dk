@@ -950,7 +950,10 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         else BUF_PRINTF("%-10s%s,%s", handle_ez80_am(state,"call"), israbbit()?rabbit_cc_table[y]:cc_table[y], handle_addr16(state, opbuf1, sizeof(opbuf1)));
                     } else if ( z == 5 ) {
                         if ( q == 0 && p == 3 && state->index && israbbit4k() ) BUF_PRINTF("%-10s%s", "push", r4k_32b_table[state->index-1]);
-                        else if ( q == 0 ) BUF_PRINTF("%-10s%s",handle_ez80_am(state,"push"),handle_register16_2(state,p, state->index));
+                        else if ( b == 0xc5 && state->index && israbbit6k() ) {
+                                handle_displacement(state, opbuf1, sizeof(opbuf1));
+                                BUF_PRINTF("%-10s%s,%s","add", handle_hl(state->index), opbuf1);
+                        } else if ( q == 0 ) BUF_PRINTF("%-10s%s",handle_ez80_am(state,"push"),handle_register16_2(state,p, state->index));
                         else if ( q == 1 ) {
                             if ( state->index && israbbit4k() ) BUF_PRINTF("%-10s%s,%s","ld",r4k_32b_table[state->index-1], r4k_ps_table[p]);
                             else if ( p == 0 ) BUF_PRINTF("%-10s%s", handle_ez80_am(state,"call"), handle_addr16(state, opbuf1, sizeof(opbuf1)));
