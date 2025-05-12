@@ -58,11 +58,11 @@ zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded), 2 programs 
   zcc +zx81 -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DNOINIT clisp.c
 
 zx81 48K exp with high resolution graphics (don't change LARGEMEM, space allocation is hardcoded), 2 programs needed
-  zcc +zx81 -clib=wrxansi -subtype=wrx -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DNOTIMER -DSHORT -DGRAPHICS -pragma-output:hrgpage=49152 -DINITONLY clisp.c
-  zcc +zx81 -clib=wrxansi -subtype=wrx -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DNOTIMER -DSHORT -DGRAPHICS -pragma-output:hrgpage=49152 -DNOINIT clisp.c
+  zcc +zx81 -clib=wrxansi -subtype=wrx -O3 --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -create-app  -DLARGEMEM=900 -DZX81_32K -DGRAPHICS -pragma-output:hrgpage=49152 -DINITONLY clisp.c
+  zcc +zx81 -clib=wrxansi -subtype=wrx -O3 --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -create-app  -DLARGEMEM=900 -DZX81_32K -DGRAPHICS -pragma-output:hrgpage=49152 -DNOINIT clisp.c
 
 zx81 48K exp with ultra-high resolution graphics (POKE 16389,255 | NEW | LOAD "")
-  zcc +zx81 -clib=wrxiansi -subtype=wrxi -O3 -create-app -pragma-define:hrgpage=49152 -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -DGRAPHICS -DZX81PHASE -DLARGEMEM=950 clisp.c
+  zcc +zx81 -clib=wrxiansi -subtype=wrxi -O3 -create-app -pragma-define:hrgpage=49152 -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -DGRAPHICS -DZX81PHASE -DLARGEMEM=2000 -DSHORT clisp.c
 
 zx81 16K, minimalistic version, graphics support
   zcc +zx81 -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -DGRAPHICS  clisp.c
@@ -123,9 +123,7 @@ Sharp PC-G850
 #ifdef ZEDIT
 #pragma output STACKPTR=65535
 #else
-#ifndef ZX81PHASE
-#pragma output STACKPTR=49152
-#endif
+#pragma output STACKPTR=49151
 #endif
 unsigned int _sp;
 #endif
@@ -1766,10 +1764,8 @@ void
 quit(void)
 {
 #ifdef ZX81PHASE
- hrg_off();
-#asm
- rst 0
-#endasm
+  hrg_off();
+  exit(0);
 #else
   printf("\nBYE\n");
   exit(0);
