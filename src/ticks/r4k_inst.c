@@ -2333,7 +2333,7 @@ void r6k_handle_49_page(void)
             UNIMPLEMENTED(0x4900|opc, "shaf3");
             break;
         case 0xa3:
-            UNIMPLEMENTED(0x4900|opc, "aesir");
+            UNIMPLEMENTED(0x4900|opc, "aesisr");
             break;
         case 0xb3:
             UNIMPLEMENTED(0x4900|opc, "aesimc");

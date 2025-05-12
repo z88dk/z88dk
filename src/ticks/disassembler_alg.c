@@ -664,7 +664,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     BUF_PRINTF("%-10s", b49_aes_b1[oper]);
                                 } else if ( z == 3 && q == 0) {
                                     uint8_t oper = (b & 0x70) >> 4;
-                                    const char *b49_aes_b1[] = { "nop", "nop", "aesir", "aesimc", "md5f1", "md5f2", "md5f3", "nop" };
+                                    const char *b49_aes_b1[] = { "nop", "nop", "aesisr", "aesimc", "md5f1", "md5f2", "md5f3", "nop" };
                                     BUF_PRINTF("%-10s", b49_aes_b1[oper]);
                                 } else if ( z >= 4 && q == 1 ) {
                                     const char *b49_blocks[] = { "sl", "rl", "sr", "rr" };
