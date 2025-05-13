@@ -625,12 +625,13 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                            else if ( b == 0x55 ) BUF_PRINTF("%-10shl,de","sub");
                            else  BUF_PRINTF("%-10shl,jk","add");
                         } else if ( y < 2  ) {
-                            if ( y == 0 && z == 2 ) BUF_PRINTF("%-10shl","rl");
+                            if ( b == 0x42 ) BUF_PRINTF("%-10shl","rl");
+                            else if ( b == 0x44 ) BUF_PRINTF("%-10sjkhl,bcde'","ex");
                             else if ( b == 0x48 ) BUF_PRINTF("%-10shl,%s","cp",handle_displacement(state, opbuf1, sizeof(opbuf1))); // TODO signed
                             else if ( b == 0x4c ) BUF_PRINTF("%-10shl","test");
                             else if ( b == 0x4d ) BUF_PRINTF("%-10shl","neg");
                             else if ( b == 0x40 && israbbit6k() ) { state->prefix = 0x40; BUF_PRINTF("alts "); continue; }
-                            else if ( b == 0x64 && israbbit6k() ) { state->prefix = 0x40; BUF_PRINTF("ex jkhl,bcde'"); }
+                            else if ( b == 0x64 && israbbit6k() ) { state->prefix = 0x40; BUF_PRINTF("altsd"); }
                             else if ( b == 0x49 && israbbit6k() ) { 
                                 // 0x49 page
                                 READ_BYTE(state, b);
@@ -969,14 +970,14 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                 }
                             }
                             else if ( p == 2 && is8085() ) BUF_PRINTF("%-10shl,(de)","ld");
-                            else if ( p == 2 && canindex() ) { // ED page
+                            else if ( p == 2 && canindex() ) { // 0xED page
                                 READ_BYTE(state, b);
                                 uint8_t x = b >> 6;
                                 uint8_t y = ( b & 0x38) >> 3;
                                 uint8_t z = b & 0x07;
                                 uint8_t p = (y & 0x06) >> 1;
                                 uint8_t q = y & 0x01;
-                               //printf("x=%d y=%d z=%dp=%d q=%d\n",x,y,z,p,q);
+                                // printf("x=%d y=%d z=%dp=%d q=%d\n",x,y,z,p,q);
                                 state->index = 0;
                                 if ( x == 0 ) {
                                     if ( israbbit4k() ) {
@@ -1207,7 +1208,9 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                         else if ( b == 0xbc ) BUF_PRINTF("lddrx");
                                         else BUF_PRINTF("nop");
                                     } else if ( z == 6 && q == 0 && israbbit6k()) BUF_PRINTF("%-10s%s", "tstnull", r4k_ps_table[p]);
-                                    else if ( z == 7 && q == 0 && israbbit4k()) BUF_PRINTF("%-10s%s","swap", handle_register8(state, p, opbuf1, sizeof(opbuf1)));
+                                    else if ( z == 6 && q == 1 && israbbit6k()) BUF_PRINTF("%-10s%s", "cnvc", r4k_ps_table[p]);
+                                    else if ( z == 7 && q == 0 && israbbit6k()) BUF_PRINTF("%-10s%s","swap", handle_register8(state, p, opbuf1, sizeof(opbuf1)));
+                                    else if ( z == 7 && q == 1 && israbbit6k()) BUF_PRINTF("%-10s%s", "cnvd", r4k_ps_table[p]);
                                     else BUF_PRINTF("nop");
                                     break;
                                 } else if ( x == 3 ) {
@@ -1253,7 +1256,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     else if ( q == 1 && z == 6 && y == 5 && israbbit4k()) BUF_PRINTF("%-10sjkhl,bcde","xor");
                                     else if ( q == 1 && z == 6 && y == 7 && israbbit4k()) BUF_PRINTF("%-10shl,(sp+hl)","ld");
                                     else if ( z == 7 && q == 1 && israbbit6k()) BUF_PRINTF("%-10s%s", "swap", r4k_rp2_table[p]);
-                                    else if ( z == 7 && q == 0 && israbbit4k()) BUF_PRINTF("%-10s%s","swap", handle_register8(state, p+4, opbuf1, sizeof(opbuf1)));
+                                    else if ( z == 7 && q == 0 && israbbit6k()) BUF_PRINTF("%-10s%s","swap", handle_register8(state, p+4, opbuf1, sizeof(opbuf1)));
                                     else if ( b == 0xfe ) BUF_PRINTF("trap");
                                     else BUF_PRINTF("nop");
                                 }
