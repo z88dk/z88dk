@@ -31,7 +31,8 @@
 	(t (progn nil
 		(right a)
 	    (square n)
-	    (rotate (a (- n c) c))))))
+	    (rotate a (- n c) c)))))
 
 (progn nil
   (init) (rotate 16 24 4))
+
