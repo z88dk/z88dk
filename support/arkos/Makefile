@@ -1,4 +1,4 @@
-# We expect rasm and Diskarg to be in the path, if not fully qualify these lines
+# We expect rasm and Disark to be in the path, if not fully qualify these lines
 RASM	= rasm.exe
 DISARK	= disark
 
@@ -30,11 +30,11 @@ update-all-players: $(PLAYERS)
 	cp -f $(ARKOS_ZX_ROM_ASM) ../../libsrc/target/zx/psg
 	cp -f $(ARKOS_CPC_SMC_ASM) ../../libsrc/target/cpc/psg
 	cp -f $(ARKOS_CPC_ROM_ASM) ../../libsrc/target/cpc/psg
+	cp -f $(ARKOS_AQ_SMC_ASM) ../../libsrc/target/aquarius/psg
 	cp -f $(ARKOS_ZX_SMC_ASM) ../../libsrc/_DEVELOPMENT/arch/zx/arkos	# newlib
 	cp -f $(ARKOS_ZX_ROM_ASM) ../../libsrc/_DEVELOPMENT/arch/zx/arkos
 	cp -f $(ARKOS_ZX_SMC_ASM) ../../libsrc/_DEVELOPMENT/arch/zxn/arkos
 	cp -f $(ARKOS_ZX_ROM_ASM) ../../libsrc/_DEVELOPMENT/arch/zxn/arkos
-	cp -f $(ARKOS_AQ_SMC_ASM) ../../libsrc/target/aquarius/psg
 
 # convert Arkos RASM player source to relocatable Z88DK asm player
 # reference: "Source conversion with Disark" article:
