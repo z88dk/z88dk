@@ -124,4 +124,32 @@
    (t
     (append (flatten (car mylist)) (flatten (cdr mylist))))))
 
+; list length
+(defun list-length (l)
+  (if (null l) 0
+     (+ (list-length (cdr l)) 1)))
+
+; see whether a previously 'qset' object is a member of list
+(defun member (i x)
+  (cond ((null x) nil)
+        ((equal i (car x)) x)
+        (t (member i (cdr x)))))
+
+; list intersection, difference..
+; Example:
+; (setq lst1 '(A b C d))
+; (setq lst2 '(a B C d))
+; (ldifference lst1 lst2)
+
+(defun intersection (x y)
+  (cond ((not (consp x)) nil)
+        ((member (car x) y)
+            (cons (car x) (intersection (cdr x) y)))
+        (t (intersection (cdr x) y))))
+
+(defun ldifference (in out)
+    (cond ((null in) nil)
+          ((member (car in) out) (ldifference (cdr in) out))
+          (t (cons (car in) (ldifference (cdr in) out)))))
+
 
