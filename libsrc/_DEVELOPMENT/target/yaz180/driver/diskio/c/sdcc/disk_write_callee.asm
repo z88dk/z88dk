@@ -28,11 +28,8 @@ _disk_write_callee:
     pop bc
     ex (sp),hl  ; get sector count to hl (return address on stack)
 
-    push af     ; push *buff   
-    push hl     ; push sector count
-    dec sp      ; get BYTE sector count
-    pop af      ; pop sector count into a
-    inc sp      ; balance for sector pop
+    push af     ; push *buff
+    ld a,l      ; load UINT sector count to a
     pop hl      ; pop *buff
 
     jp asm_disk_write
