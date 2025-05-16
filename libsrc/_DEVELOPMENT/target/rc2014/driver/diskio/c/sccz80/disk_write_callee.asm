@@ -13,30 +13,57 @@ EXTERN asm_disk_write
 ;   LBA_t sector,                   /* Start sector in LBA */
 ;   UINT count ) __z88dk_callee;    /* Number of sectors to write (<256) */
 ;
-; entry
-; a = number of sectors (< 256)
-; bcde = LBA specified by the 4 bytes in BCDE
-; hl = the address pointer to the buffer to read from
+; Entry:
+;   a = number of sectors (< 256)
+;   bcde = LBA specified by the 4 bytes in BCDE
+;   hl = the address pointer to the buffer to read from
 ;
+;   Stack: return address (2 bytes), count (1 byte, padded to 2), LBA byte 0 (LSB),
+;           LBA byte 1, LBA byte 2, LBA byte 3 (MSB), buff (2 bytes), pdrv (1 byte, padded to 2)
+; Exit:
+;   A = count, BC = LBA high 16 bits (bytes 2-3), DE = LBA low 16 bits (bytes 0-1),
+;           HL = buffer address
+;   Stack: return address (2 bytes)
+
+IF __CPU_8085__
 
 disk_write_callee:
-    pop hl      ; pop return address
+    ; Store return address in unused pdrv location
+    pop hl      ; Return address in HL
+    ld de,sp+8  ; DE = SP + 8 = address of pdrv
+    ld (de),hl  ; Store return address
 
-    dec sp
-    pop af      ; get BYTE sector count to a
-    inc sp
+    pop bc      ; get UINT sector count to a
+    ld a,c
 
     pop de      ; start sector to bcde
     pop bc
 
-    inc sp      ; bypass *buff
-    inc sp
+    pop hl      ; get *buff
 
-    ex (sp),hl  ; return address on stack, over pdrv
+    ; Stack has return address
+    jp asm_disk_write
 
-    dec sp      ; go back for *buff
-    dec sp
+ELSE
+
+disk_write_callee:
+    ; Store return address in unused pdrv location
+    pop de      ; Return address in DE
+    ld hl,8     ; DE = SP + 8 = address of pdrv
+    add hl,sp
+    ld (hl),e   ; Store return address
+    inc hl
+    ld (hl),d
+
+    pop bc      ; get UINT sector count to a
+    ld a,c
+
+    pop de      ; start sector to bcde
+    pop bc
 
     pop hl      ; get *buff
 
+    ; Stack has return address
     jp asm_disk_write
+
+ENDIF
