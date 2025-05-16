@@ -296,6 +296,23 @@
 (defun revappend (x y)
   (append (reverse x) y))
 
+
+; Build a list with the decimal digits of a numeric value
+(defun number-to-list (n)
+  (if (< n 10)
+    (list n)
+    (append (number-to-list (/ n 10)) (list (rem n 10)))))
+
+; Build a number picking the single the decimal digits from a list
+; e.g. '(1,2,3) -> 123
+(defun list-to-number(ls)
+    (list-to-number1 ls 0))
+
+(defun list-to-number1 (ls n)
+    (if (null ls) n
+        (list-to-number1 (cdr ls) (+ (car ls) (* n 10)))))
+		
+
 ; flatten (tree-to-list conversion)
 (defun flatten (mylist)
   (cond
@@ -432,7 +449,6 @@
 
 
 
-
 ; human friendly comparison
 (defun compare (x y)
       (cond ((equal x y)     'numbers-are-the-same)
@@ -448,3 +464,4 @@
             ((equal op 'divide)   (/ x y))
             (t '(I do not know how to do that))))
 
+
