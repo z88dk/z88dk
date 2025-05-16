@@ -1,6 +1,9 @@
 
 #include "ticks.h"
 #include <stdio.h>
+#include <ctype.h>
+#include <fcntl.h>
+#include <errno.h>
 #ifndef WIN32
 #include <unistd.h>                         // For declarations of isatty()
 #else
@@ -9,6 +12,305 @@
 #endif
 
 static int user_num = 0;
+static int dma_address = 0;
+
+#define NUM_SLOTS 16
+static int slots[NUM_SLOTS];
+
+#define GET_FCB() ((d<<8)|e)
+
+
+
+static int find_slot()
+{
+    int  i;
+
+    for ( i = 0; i < NUM_SLOTS; i++ ) {
+        if ( slots[i] == -1 ) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+
+static int get_random(int fcb)
+{
+    uint8_t r0, r1, r2;
+    int random;
+    /*
+        * get random record number bytes
+        */
+    r0 = get_memory_data(fcb + 33);
+    r1 = get_memory_data(fcb + 34);
+    r2 = get_memory_data(fcb + 35);
+
+    if (r2 > 1 || (r2 == 1 && (r0 || r1))) {
+        random = (-1);
+    } else {
+        random = ((r2 << 16) | ( r1 << 8) | r0) * 128;
+    }
+    return random;
+}
+
+static void set_offset(int fcb, int offset)
+{
+    *get_memory_addr(fcb+32, MEM_TYPE_DATA) = offset & 0x7f;
+    *get_memory_addr(fcb + 12, MEM_TYPE_DATA) = (offset >> 7) & 0x001f;
+    *get_memory_addr(fcb + 14, MEM_TYPE_DATA) = offset >> 12;
+}
+
+
+static void bdos_open_file(void)
+{
+    char filename[15];
+    int fcb = GET_FCB();
+    int extent;
+    int filenoffs = 0;
+    int fd = -1, slot;
+
+    a = 255;   // By default we fail
+
+    // Check extent number inf the FCB
+    extent = get_memory_data(fcb + 12);
+    if ( extent > 31 ) {
+        goto fail;
+    }
+
+    // S2 = 0
+    put_memory(fcb + 14, 0x00);
+
+    // Get the filename
+    for ( i = 1, filenoffs = 0; i < 9; i++ ) {
+        uint8_t c  = get_memory_data(fcb + i );
+        if ( !isspace(c)) {
+            filename[filenoffs++] = tolower(c);
+            filename[filenoffs] = 0;
+        } else break;
+    }
+    for ( i = 9; i < 12; i++ ) {
+        uint8_t c  = (get_memory_data(fcb + i ) & 0x7f);
+        if ( !isspace(c)) {
+            if  ( i == 9 ) filename[filenoffs++] = '.';
+            filename[filenoffs++] = tolower(c);
+            filename[filenoffs] = 0;
+        } else break;
+    }
+
+    if ( (fd = open(filename, O_RDWR)) == -1 ) {
+        goto fail;
+    }
+
+    slot = find_slot();
+    slots[slot] = fd;
+    fd = -1;
+
+    // Now write the slot number into FCB in AL
+    put_memory(fcb + 16, slot & 0xff);
+
+    a = 0x00;
+
+fail:
+    if ( fd != -1 ) close(fd);
+    l = a;
+    h = b = 0;
+}
+
+static void bdos_create_file(void)
+{
+    char filename[15];
+    int fcb = GET_FCB();
+    int extent;
+    int filenoffs = 0;
+    int fd = -1, slot;
+
+    a = 255;   // By default we fail
+
+    // Check extent number in the FCB
+    extent = get_memory_data(fcb + 12);
+    if ( extent > 31 ) {
+        goto fail;
+    }
+
+    // S2 = 0
+    put_memory(fcb + 14, 0x00);
+
+    // Get the filename
+    for ( i = 1, filenoffs = 0; i < 9; i++ ) {
+        uint8_t c  = get_memory_data(fcb + i );
+        if ( !isspace(c)) {
+            filename[filenoffs++] = tolower(c);
+            filename[filenoffs] = 0;
+        } else break;
+    }
+    for ( i = 9; i < 12; i++ ) {
+        uint8_t c  = (get_memory_data(fcb + i ) & 0x7f);
+        if ( !isspace(c)) {
+            if  ( i == 9 ) filename[filenoffs++] = '.';
+            filename[filenoffs++] = tolower(c);
+            filename[filenoffs] = 0;
+        }
+    }
+
+    if ( (fd = open(filename, O_RDWR|O_CREAT, 0666)) == -1 ) {
+        goto fail;
+    }
+
+    slot = find_slot();
+    slots[slot] = fd;
+    fd = -1;
+
+    // Now write the slot number into FCB in AL
+    put_memory(fcb + 16, slot & 0xff);
+
+    a = 0x00;
+
+fail:
+    if ( fd != -1 ) close(fd);
+
+    l = a;
+    h = b = 0;
+}
+
+static void bdos_delete_file(void)
+{
+    char filename[15];
+    int fcb = GET_FCB();
+    int extent;
+    int filenoffs = 0;
+    int fd = -1, slot;
+
+    a = 255;   // By default we fail
+
+
+    // Get the filename
+    for ( i = 1, filenoffs = 0; i < 9; i++ ) {
+        uint8_t c  = get_memory_data(fcb + i );
+        if ( !isspace(c)) {
+            filename[filenoffs++] = tolower(c);
+            filename[filenoffs] = 0;
+        }
+        break;
+    }
+    for ( i = 9; i < 12; i++ ) {
+        uint8_t c  = (get_memory_data(fcb + i ) & 0x7f);
+        if ( !isspace(c)) {
+            if  ( i == 9 ) filename[filenoffs++] = '.';
+            filename[filenoffs++] = tolower(c);
+            filename[filenoffs] = 0;
+        }
+    }
+
+    unlink(filename);
+
+    a = 0x00;
+
+fail:
+    if ( fd != -1 ) close(fd);
+
+    l = a;
+    h = b = 0;
+}
+static void bdos_close_file(void)
+{
+    int fcb = GET_FCB();
+    int slot = get_memory(fcb + 16, MEM_TYPE_DATA);
+    int fd;
+
+    a = 0xff;  // Failure
+
+    if ( slot != 0xff ) {
+        fd = slots[slot];
+
+        if ( fd != -1  ) {
+            close(fd);
+            a = 0;
+            slots[slot] = -1;
+        }
+    }
+}
+
+static void bdos_read_rand(void)
+{
+    int fcb = GET_FCB();
+    int slot, fd;
+    int posn;
+
+    a = 0x01; // Failure: Reading unwritten data
+
+    slot = get_memory_data(fcb + 16);
+
+    if ( (fd = slots[slot] ) == -1 ) {
+        goto fail;
+    }
+
+
+
+
+    posn = get_random(fcb);
+    if ( posn == -1 ) {
+        a = 0x06; // Out of range
+        goto fail;
+    }
+
+    //printf("Read from fd %d slot %d posn %d\n",fd,slot,posn);
+
+    if ( lseek(fd, posn, SEEK_SET) == -1 ) goto fail;
+
+    if ( read(fd, get_memory_addr(dma_address, MEM_TYPE_DATA), 128) <= 0 ) goto fail;
+
+    set_offset(fcb, posn); // Set sequential offset
+
+    a = 0x00; // Success
+
+fail:
+    l = a;
+    h = b = 0;
+}
+
+static void bdos_write_rand(void)
+{
+    int fcb = GET_FCB();
+    int slot, fd;
+    int posn;
+
+    a = 0x01; // Failure: Reading unwritten data
+
+    if ( (slot = get_memory_data(fcb + 16)) == -1 ) {
+        goto fail;
+    }
+    fd = slots[slot];
+
+    posn = get_random(fcb);
+    if ( posn == -1  ) {
+        a = 0x06; // Out of range
+        goto fail;
+    }
+
+    //printf("Write to fd %d slot %d posn %d\n",fd,slot,posn);
+    if ( lseek(fd, posn, SEEK_SET) == -1 ) goto fail;
+
+    if ( write(fd, get_memory_addr(dma_address, MEM_TYPE_DATA), 128) <= 0 ) goto fail;
+
+    set_offset(fcb, posn); // Set sequential offset
+
+    a = 0x00; // Success
+
+fail:
+    l = a;
+    h = b = 0;
+}
+
+static void bdos_set_dma(void)
+{
+    int addr = (d << 8)|e;
+
+    dma_address = addr;
+
+    l = a = 0;
+    h = b = 0;
+}
+
 
 void hook_cpm(void)
 {
@@ -75,12 +377,39 @@ void hook_cpm(void)
         else
             a = l = 0xff; // Selecting an unavailable drive.
         break;
+    case 0x0f: // F_OPEN
+        /* Entered with C=0Fh, DE=FCB address. Returns error codes in BA and HL. */
+        bdos_open_file();
+        break;
+    case 0x10: // F_CLOSE
+        /* Entered with C=10h, DE=FCB address. Returns error codes in BA and HL. */
+        bdos_close_file();
+        break;
+    case 0x13: // F_DELETE
+        bdos_delete_file();
+        break;
+    // case 0x14: // F_READ
+    //     /* Entered with C=14h, DE=address of FCB. Returns error codes in BA and HL. */
+    //     bdos_read();
+    //     break;
+    // case 0x15: // F_WRITE
+    //     /* Entered with C=15h, DE=address of FCB. Returns error codes in BA and HL. */
+    //     bdos_write();
+    //     break;
+    case 0x16: // F_MAKE - create file
+        /* Entered with C=16h, DE=address of FCB. Returns error codes in BA and HL. */
+        bdos_create_file();
+        break;
     case 0x19:  // DRV_GET
         /* Entered with C=19h, E=drive number. Returns L=A=0 or 0FFh. */
         if ( e == 0 )
             a = l = 0;  // Current drive is a
         else
             a = l = 0xff; // Selecting an unavailable drive.
+        break;
+    case 0x1a:  // F_DMAOFF
+        /* Entered with C=1Ah, DE=address. */
+        bdos_set_dma();
         break;
     case 0x20:  // F_USERNUM
         /* Entered with C=20h, E=number. If E=0FFh, returns number in A. */
@@ -90,8 +419,28 @@ void hook_cpm(void)
             if ( e >= 0 && e < 16 )
                 user_num = e;
         break;
+    case 0x21: // F_READRAND
+        /* Entered with C=21h, DE=FCB address. Returns error codes in BA and HL. */
+        bdos_read_rand();
+        break;
+    case 0x22: // F_WRITERAND
+        /* Entered with C=21h, DE=FCB address. Returns error codes in BA and HL. */
+        bdos_write_rand();
+        break;
     default:
         fprintf(stderr,"Unsupported BDOS call %d\n",c);
         break;
     }
 }
+
+
+
+void hook_cpm_init(hook_command *cmds)
+{
+    int  i;
+
+    for (i = 0; i < NUM_SLOTS; i++ ) {
+        slots[i] = -1;
+    }
+}
+

@@ -47,6 +47,7 @@ void hook_init(void)
 {
     hooks[CMD_EXIT] = cmd_exit;
     hook_io_init(hooks);
+    hook_cpm_init(hooks);
     hook_misc_init(hooks);
     hook_console_init(hooks);
 }
