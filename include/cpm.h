@@ -68,6 +68,8 @@ struct fcb {
     uint8_t    use;            /* use flag */
     uint8_t    uid;            /* user id belonging to this file */
     uint8_t    mode;           /* TEXT/BINARY discrimination */
+    uint8_t    rnr_dirty;    /* Set if the rwptr needs to be recalculatd */
+    uint32_t   record_nr;      /* Record number that that rwptr refers to */ 
 
     // 133 bytes used for caching
     unsigned long cached_record;   /* Record number that we have cached */
@@ -203,7 +205,7 @@ extern int __LIB__ bdosh_callee(int func,int arg) __smallc __z88dk_callee;
 
 
 /* Executes the BIOS function (1-85) passing BC and DE as arguments, error status in A on exit */
-extern int __LIB__ bios(int func,int arg,int arg2) __smallc;
+__ZPROTO3(int,,bios,int, func, int, arg, int, arg2)
 /* Executes the BIOS function (1-85) passing BC and DE as arguments, gets the result value from HL on exit */
 extern int __LIB__ biosh(int func,int arg,int arg2) __smallc;
 
