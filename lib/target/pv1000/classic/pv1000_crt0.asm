@@ -69,10 +69,12 @@ endif
     INCLUDE "crt/classic/crt_z80_rsts.inc"
 
 program:
+    im      1
+    di
     INCLUDE "crt/classic/crt_init_sp.inc"
     call    crt0_init
+    call    init_hardware
     INCLUDE "crt/classic/crt_init_atexit.inc"
-    im      1
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
@@ -84,6 +86,27 @@ __Exit:
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
+
+init_hardware:
+    ld      b,8
+    ld      hl,hardware_init
+    ld      c,$f7
+initloop:
+    inc     c
+    outi
+    jr      nz,initloop
+    ret
+
+; Data for initialising the hardware
+hardware_init:
+    defb    $ff     ;->f8   psg
+    defb    $ff     ;->f9
+    defb    $ff     ;->fa
+    defb    $02     ;->fb
+    defb    $03     ;->fc   joystick
+    defb    $00     ;->fd
+    defb    $b8     ;->fe   ;VDP    (VRAM address)
+    defb    $00     ;->ff   ;VDP (pattern base)
 
 ; Font location - this is far too generous - we should add in extra
 ; symbols
