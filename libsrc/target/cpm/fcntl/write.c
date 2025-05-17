@@ -47,7 +47,6 @@ ssize_t write(int fd, void *buf, size_t len)
 #endif
     case U_WRITE:
     case U_RDWR:
-        uid = swapuid(fc->uid);
         while ( len ) {
             unsigned long record_nr = fc->record_nr;
             
@@ -62,15 +61,16 @@ ssize_t write(int fd, void *buf, size_t len)
                 cpm_cache_flush(fc);
 
                 _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
+                uid = swapuid(fc->uid);
                 bdos(CPM_SDMA,buf);
                 if ( bdos(CPM_WRAN,fc) ) {
                     swapuid(uid);
                     return cnt-len;
                 }
+                swapuid(uid);
             } else {  /* Not the required size, read in the record to our cache */
                 if ( record_nr != fc->cached_record ) {
                     if ( cpm_cache_get(fc, record_nr, 0) == - 1 ) {
-                        swapuid(uid);
                         return cnt-len;
                     }
                 }
@@ -85,7 +85,6 @@ ssize_t write(int fd, void *buf, size_t len)
             }
             len -= size;
         }
-        swapuid(uid);
         return cnt-len;
         break;
     default:

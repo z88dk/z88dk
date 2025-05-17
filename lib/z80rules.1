@@ -7204,6 +7204,16 @@ $notcpu 8085
 	ld	h,(hl)
 	ld	l,a
 
+%title Avoid reloading hl
+	push	hl
+	dec	sp
+	ld	hl,1	;const
+	call	l_gintspsp	;%1
+=
+	push	hl
+	dec	sp
+	push	hl
+
 %title Avoid going via stack
 	push	hl
 	ld	hl,%1	;const

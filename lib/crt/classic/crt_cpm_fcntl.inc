@@ -1,8 +1,9 @@
 ; CP/M style FCB support (CP/M + MSXDOS1)
 
 
+    ; Read cache even for sector sized chunks
     IFNDEF CPM_READ_CACHE_ALWAYS
-        defc    CPM_READ_CACHE_ALWAYS = 1
+        defc    CPM_READ_CACHE_ALWAYS = 0
     ENDIF
     PUBLIC  __CPM_READ_CACHE_ALWAYS
     defc    __CPM_READ_CACHE_ALWAYS = CPM_READ_CACHE_ALWAYS

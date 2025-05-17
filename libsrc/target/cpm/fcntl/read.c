@@ -56,7 +56,6 @@ ssize_t read(int fd, void *buf, size_t len)
     case U_READ:
     case U_RDWR:
         cnt = len;
-        uid = swapuid(fc->uid);
         while ( len ) {
             unsigned long record_nr = fc->record_nr;
             
@@ -68,15 +67,16 @@ ssize_t read(int fd, void *buf, size_t len)
             }
             if ( size == SECSIZE && CPM_READ_CACHE_ALWAYS == 0 ) {
                 _putoffset(fc->ranrec,record_nr);
+                uid = swapuid(fc->uid);
                 bdos(CPM_SDMA,buf);
                 if ( bdos(CPM_RRAN,fc) ) {
                     swapuid(uid);
                     return cnt-len;
                 }
+                swapuid(uid);
             } else {
                 if ( record_nr != fc->cached_record ) {
                     if ( cpm_cache_get(fc, record_nr, 1) ) {
-                        swapuid(uid);
                         return cnt-len;
                     }
                 }
@@ -91,7 +91,6 @@ ssize_t read(int fd, void *buf, size_t len)
             }
             len -= size;
         }
-        swapuid(uid);
         return cnt-len;
         break;
     default:
