@@ -25,10 +25,6 @@ EXTERN uartbControl
     or a                        ; check it is non-zero
     jr Z,uartb                  ; try UART B
 
-    in a,(__IO_UARTA_IIR_REGISTER)  ; get the status of the UART A
-    rrca                        ; check whether an interrupt was generated
-    jp C,uartb                  ; if not, go check UART B
-
     ; read the LSR to check for received data
     in a,(__IO_UARTA_LSR_REGISTER)  ; get the status of the UART A data
     rrca                        ; Rx data is available
@@ -73,10 +69,6 @@ ENDIF
     ld a,(uartbControl)         ; load the control flag
     or a                        ; check it is non-zero
     jr Z,end
-
-    in a,(__IO_UARTB_IIR_REGISTER)  ; get the status of the UART B
-    rrca                        ; check whether an interrupt was generated
-    jr C,end                    ; if not, exit interrupt
 
     ; read the LSR to check for received data
     in a,(__IO_UARTB_LSR_REGISTER)  ; get the status of the UART B data
