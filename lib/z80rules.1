@@ -6253,6 +6253,9 @@ $notcpu 8085
 =
 	ld	a,(_%1)
 	ld	(de),a
+	xor	a
+	inc	de
+	ld	(de),a
 	jp	%2	;EOS
 
 %title Use 8 bit load for comparison
