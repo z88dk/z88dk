@@ -30,9 +30,8 @@
 
 ._mul3
 	ld	hl,(_g)
-	push	hl
-	call	l_gint4sp	;
-	pop	de
+	ex	de,hl
+	call	l_gint2sp
 	call	l_mult
 	ret
 
@@ -78,9 +77,8 @@
 
 ._div3
 	ld	hl,(_g)
-	push	hl
-	call	l_gint4sp	;
-	pop	de
+	ex	de,hl
+	call	l_gint2sp
 	call	l_div
 	ret
 
@@ -163,9 +161,8 @@
 
 ._sub3
 	ld	hl,(_g)
-	push	hl
-	call	l_gint4sp	;
-	pop	de
+	ex	de,hl
+	call	l_gint2sp
 	ex	de,hl
 	and	a
 	sbc	hl,de

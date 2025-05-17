@@ -12,18 +12,19 @@
 #include <string.h>
 #include <stdio.h>
 #include <cpm.h>
+#include <stdio.h>
 
 
 ssize_t write(int fd, void *buf, size_t len)
 {
     unsigned char uid;
-    struct fcb *fc;
     size_t cnt,size,offset;
+    struct fcb *fc;
 
-    if ( fd >= MAXFILE )
-    return -1;
+    // if ( fd >= MAXFILE )
+    // return -1;
 
-    fc = &_fcb[fd];
+    fc = fd; // &_fcb[fd];
     cnt = len;
     offset = CPM_WCON;  /* Double use of variable */
 
@@ -48,7 +49,9 @@ ssize_t write(int fd, void *buf, size_t len)
     case U_RDWR:
         uid = swapuid(fc->uid);
         while ( len ) {
-            unsigned long record_nr = fc->rwptr/SECSIZE;
+            unsigned long record_nr = fc->record_nr;
+            
+            if ( fc->rnr_dirty ) { record_nr = fc->record_nr = fc->rwptr/SECSIZE; fc->rnr_dirty = 0; }
             offset = fc->rwptr%SECSIZE;
             if ( (size = SECSIZE-offset) > len ) {
                 size = len;
@@ -65,15 +68,21 @@ ssize_t write(int fd, void *buf, size_t len)
                     return cnt-len;
                 }
             } else {  /* Not the required size, read in the record to our cache */
-                if ( cpm_cache_get(fc, record_nr, 0) == - 1 ) {
-                    swapuid(uid);
-                    return cnt-len;
+                if ( record_nr != fc->cached_record ) {
+                    if ( cpm_cache_get(fc, record_nr, 0) == - 1 ) {
+                        swapuid(uid);
+                        return cnt-len;
+                    }
                 }
-                memcpy(fc->buffer+offset,buf,size);
                 fc->dirty = 1;
+                if ( size == 1 ) fc->buffer[offset] = *((uint8_t *)buf); 
+                else memcpy(fc->buffer+offset,buf,size);
             }
             buf += size;
             fc->rwptr += size;
+            if ( size + offset == SECSIZE) {
+                ++fc->record_nr;
+            }
             len -= size;
         }
         swapuid(uid);

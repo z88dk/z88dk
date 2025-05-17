@@ -69,5 +69,5 @@ int open(char *name, int flags, mode_t mode)
 		fc->use=U_RDWR;
         lseek(fd,0L,SEEK_END);
 	}
-    return fd;
+    return (int)fc;
 }

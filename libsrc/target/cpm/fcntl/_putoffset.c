@@ -12,8 +12,8 @@
 
 void _putoffset(unsigned char *where,long offset)
 {
-    where[0] = ((int)offset) & 0xFF;
-    where[1] = ((int)(offset >> 8 )) & 0xFF;
-    where[2] = ((int)(offset >> 16)) & 0xFF;
+    where[0] = offset & 0xFF;
+    where[1] = ((unsigned long)offset >> 8 ) & 0xFF;
+    where[2] = ((unsigned long)offset >> 16) & 0xFF;
 }
 

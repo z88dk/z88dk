@@ -10,10 +10,9 @@ int swapuid(int id) __z88dk_fastcall __naked  {
     ld      c,CPM_SUID
     ld      e,0xff	;query
 	call __bdos
-    pop     hl
-    cp      l
+    pop     de
+    cp      e
     ret     z           ;Existing id was the same
-    ld      e,l         ;It was different, so set it
     push    af
     ld      c,CPM_SUID
 	call __bdos

@@ -38,7 +38,7 @@ int creat(char *nam, mode_t mode)
     }
     
     fd =  (fc - &_fcb[0]);
-    return fd;
+    return fc;
 }
 
 
