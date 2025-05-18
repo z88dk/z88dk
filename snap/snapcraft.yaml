@@ -1,5 +1,5 @@
 name: z88dk
-base: core20
+base: core24
 summary: Development kit for Z80 machiens
 adopt-info: part-z88dk
 
