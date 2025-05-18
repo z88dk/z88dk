@@ -28,6 +28,14 @@ void main( void ) {
         ply_akg_play();
         intrinsic_ei();
         intrinsic_halt();
+#ifdef __CPC__
+        // kludgy - how can we wait for vsync in a portable way?
+        intrinsic_halt();
+        intrinsic_halt();
+        intrinsic_halt();
+        intrinsic_halt();
+        intrinsic_halt();
+#endif
         // do whatever in your main loop
     }
 }
