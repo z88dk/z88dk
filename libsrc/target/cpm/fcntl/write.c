@@ -12,18 +12,17 @@
 #include <string.h>
 #include <stdio.h>
 #include <cpm.h>
+#include <stdio.h>
 
 
 ssize_t write(int fd, void *buf, size_t len)
 {
     unsigned char uid;
-    struct fcb *fc;
     size_t cnt,size,offset;
+    struct fcb *fc;
 
-    if ( fd >= MAXFILE )
-    return -1;
 
-    fc = &_fcb[fd];
+    fc = (struct fcb *) fd; 
     cnt = len;
     offset = CPM_WCON;  /* Double use of variable */
 
@@ -46,37 +45,64 @@ ssize_t write(int fd, void *buf, size_t len)
 #endif
     case U_WRITE:
     case U_RDWR:
-        uid = swapuid(fc->uid);
-        while ( len ) {
-            unsigned long record_nr = fc->rwptr/SECSIZE;
+        if ( len == 1 ) {
+            unsigned long record_nr = fc->record_nr;
+                
+            if ( fc->rnr_dirty ) { record_nr = fc->record_nr = fc->rwptr/SECSIZE; fc->rnr_dirty = 0; }
             offset = fc->rwptr%SECSIZE;
-            if ( (size = SECSIZE-offset) > len ) {
-                size = len;
-            }
-            if ( size == SECSIZE ) {
-                // Write the full sector now, flush whatever we've got cached so we don't 
-                // write out of order
-                cpm_cache_flush(fc);
 
-                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
-                bdos(CPM_SDMA,buf);
-                if ( bdos(CPM_WRAN,fc) ) {
-                    swapuid(uid);
-                    return cnt-len;
-                }
-            } else {  /* Not the required size, read in the record to our cache */
+             if ( record_nr != fc->cached_record ) {
                 if ( cpm_cache_get(fc, record_nr, 0) == - 1 ) {
-                    swapuid(uid);
-                    return cnt-len;
+                    return 0;
                 }
-                memcpy(fc->buffer+offset,buf,size);
-                fc->dirty = 1;
             }
-            buf += size;
-            fc->rwptr += size;
-            len -= size;
+            fc->dirty = 1;
+            fc->buffer[offset] = *((uint8_t *)buf); 
+            ++fc->rwptr;
+            if ( offset+1 == SECSIZE) {
+                ++fc->record_nr;
+            }
+            return 1;
+        } else {
+            while ( len ) {
+                unsigned long record_nr = fc->record_nr;
+                
+                if ( fc->rnr_dirty ) { record_nr = fc->record_nr = fc->rwptr/SECSIZE; fc->rnr_dirty = 0; }
+                offset = fc->rwptr%SECSIZE;
+                if ( (size = SECSIZE-offset) > len ) {
+                    size = len;
+                }
+                if ( size == SECSIZE ) {
+                    // Write the full sector now, flush whatever we've got cached so we don't 
+                    // write out of order
+                    cpm_cache_flush(fc);
+
+                    _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
+                    uid = swapuid(fc->uid);
+                    bdos(CPM_SDMA,buf);
+                    if ( bdos(CPM_WRAN,fc) ) {
+                        swapuid(uid);
+                        return cnt-len;
+                    }
+                    swapuid(uid);
+                } else {  /* Not the required size, read in the record to our cache */
+                    if ( record_nr != fc->cached_record ) {
+                        if ( cpm_cache_get(fc, record_nr, 0) == - 1 ) {
+                            return cnt-len;
+                        }
+                    }
+                    fc->dirty = 1;
+                    if ( size == 1 ) fc->buffer[offset] = *((uint8_t *)buf); 
+                    else memcpy(fc->buffer+offset,buf,size);
+                }
+                buf += size;
+                fc->rwptr += size;
+                if ( size + offset == SECSIZE) {
+                    ++fc->record_nr;
+                }
+                len -= size;
+            }
         }
-        swapuid(uid);
         return cnt-len;
         break;
     default:

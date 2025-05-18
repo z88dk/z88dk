@@ -4226,6 +4226,23 @@ $notcpu 8085
 	ex	de,hl
 	ld	h,0
 
+%title Cleanup glong & 0xff
+	ld	e,(hl)
+	inc	hl
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ex	de,hl
+	pop	de
+	ld	a,l
+	ld	(de),a
+=
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	ld	l,a
+	ld	h,0
+
 %check 9 <= %1 <= 15
 	ld	e,(hl)
 	inc	hl
@@ -7141,3 +7158,101 @@ $notcpu 8085
 	add	hl,bc
 	jr	nc,ASMPC+3
 	inc	de
+
+%title push/pop around
+%check 2 <= %1 <= 10
+	push	hl
+	call	l_gint%1sp	;
+	pop	de
+=
+	ex	de,hl
+	call	l_gint%eval(%1 2 -)sp
+
+%title 8 bit and of long value
+	call	l_glong
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+	pop	de
+	call	l_pint
+	ld	hl,%2	;const
+=
+	ld	a,(hl)
+	and	%1
+	pop	de
+	ld	(de),a
+	ld	hl,%2	;const
+
+%title avoid subroutine call
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%2	;const
+	add	hl,sp
+	call	l_gint	;%3
+	ex	de,hl
+=
+	ld	hl,%2	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+
+%title Avoid reloading hl
+	push	hl
+	dec	sp
+	ld	hl,1	;const
+	call	l_gintspsp	;%1
+=
+	push	hl
+	dec	sp
+	push	hl
+
+%title Avoid going via stack
+	push	hl
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;%2
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+=
+	ex	de,hl
+	ld	hl,%eval(%1 2 -)	;const
+	add	hl,sp
+	call	l_gint	;%2
+	ld	a,(hl)
+	ld	(de),a
+
+%title Increment long in place
+	push	hl
+	call	l_glong
+	call	l_inclong
+	pop	bc
+	call	l_plong
+	ld	hl,%1
+=
+	call	l_long_inc_mhl
+	ld	hl,%1
+
+%title Increment long in place
+	push	hl
+	call	l_glong
+	call	l_inclong
+	pop	bc
+	call	l_plong
+.%2
+	ld	hl,%3
+=
+	call	l_long_inc_mhl
+.%2
+	ld	hl,%3

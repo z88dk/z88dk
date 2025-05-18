@@ -56,6 +56,7 @@ long lseek(int fd,long posn, int whence)
         return -1L;
     
     fc->rwptr = pos;
+    fc->rnr_dirty = 1;
     return pos;
     
 }

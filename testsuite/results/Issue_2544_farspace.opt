@@ -32,9 +32,8 @@
 	ld	de,+(_i / 65536)
 	call	l_far_mapaddr
 	call	lp_gint
-	push	hl
-	call	l_gint4sp	;
-	pop	de
+	ex	de,hl
+	call	l_gint2sp
 	add	hl,de
 	ret
 
