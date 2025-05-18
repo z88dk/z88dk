@@ -186,6 +186,7 @@
 	EXTERN	l_long_asr_u	;Long unsigned >>
 	EXTERN	l_long_asr_uo	;Long unsigned >> shift in c
 	EXTERN	l_long_case
+	EXTERN	l_long_inc_mhl
 
 ;--------------------------------------------------------------
 ; Floating point support routines, mostly in library

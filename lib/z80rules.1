@@ -7229,3 +7229,27 @@ $notcpu 8085
 	call	l_gint	;%2
 	ld	a,(hl)
 	ld	(de),a
+
+%title Increment long in place
+	push	hl
+	call	l_glong
+	call	l_inclong
+	pop	bc
+	call	l_plong
+	ld	hl,%1
+=
+	call	l_long_inc_mhl
+	ld	hl,%1
+
+%title Increment long in place
+	push	hl
+	call	l_glong
+	call	l_inclong
+	pop	bc
+	call	l_plong
+.%2
+	ld	hl,%3
+=
+	call	l_long_inc_mhl
+.%2
+	ld	hl,%3

@@ -21,10 +21,8 @@ ssize_t write(int fd, void *buf, size_t len)
     size_t cnt,size,offset;
     struct fcb *fc;
 
-    // if ( fd >= MAXFILE )
-    // return -1;
 
-    fc = fd; // &_fcb[fd];
+    fc = (struct fcb *) fd; 
     cnt = len;
     offset = CPM_WCON;  /* Double use of variable */
 

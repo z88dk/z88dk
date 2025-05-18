@@ -17,10 +17,8 @@ int close(int fd)
     struct fcb *fc;
     unsigned char uid;
 
-    // if ( fd >= MAXFILE )
-	// return -1;
+    fc = (struct fcb *) fd; 
 
-    fc = fd; // &_fcb[fd];
     uid = swapuid(fc->uid);      /* Set it to that of the file */
     if ( fc->use < U_CON ) {
         cpm_cache_flush(fc);

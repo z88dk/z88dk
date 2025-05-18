@@ -24,9 +24,7 @@ ssize_t read(int fd, void *buf, size_t len)
     struct fcb *fc;
 
 
-    // if ( fd >= MAXFILE )
-    //    return -1;
-    fc = fd; // &_fcb[fd];
+    fc = (struct fcb *) fd; 
     switch ( fc->use ) {
 #ifdef DEVICES
     case U_RDR:         /* Reader device */
