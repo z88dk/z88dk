@@ -7182,6 +7182,9 @@ $notcpu 8085
 	and	%1
 	pop	de
 	ld	(de),a
+	xor	a
+	inc	de
+	ld	(de),a
 	ld	hl,%2	;const
 
 %title avoid subroutine call
