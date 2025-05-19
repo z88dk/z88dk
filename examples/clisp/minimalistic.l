@@ -87,6 +87,14 @@
 (defun and (x y)
  (not (or (not x) (not y))))
 
+; and on a list of expressions
+; e.g. (and '((> 3 4) t (> 5 4)))
+(defun l_and (exp)
+ (cond
+   ((null exp) t)
+   ((null (eval (car exp))) nil)
+   (t (and (cdr exp)))))
+
 ; equal
 (defun equal (s1 s2)
  (cond ((not (consp s1))
