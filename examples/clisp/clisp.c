@@ -1075,10 +1075,10 @@ special(long f, long a)
 
 #ifndef MINIMALISTIC
   case KW_AND:
-    for (v = TAG_T, t = a; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
+    for (v = TAG_NIL, t = a; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
       if ((v = l_eval(l_car(t))) < 0)
         return -1;
-      if (D_GET_TAG(t) == TAG_NIL)
+      if (D_GET_TAG(v) == TAG_NIL)
         break;
     }
     break;
