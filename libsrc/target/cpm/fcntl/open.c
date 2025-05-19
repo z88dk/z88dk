@@ -47,9 +47,9 @@ int open(char *name, int flags, mode_t mode)
                 swapuid(uid);
                 if ( fd == -1 )
                     return -1;
-                fc = &_fcb[fd];
+                fc = (struct fcb *)fd;
                 fc->use = (flags + 1 ) & 0xff;
-                return fd;
+                return fc;
             }
             swapuid(uid);
             return -1;   /* An error */

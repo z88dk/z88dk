@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/stat.h>
 #ifndef WIN32
 #include <unistd.h>                         // For declarations of isatty()
 #else
@@ -53,6 +54,29 @@ static int get_random(int fcb)
     return random;
 }
 
+
+void get_filename(int fcb, char *filename)
+{
+    int i, filenoffs;
+
+    // Get the filename
+    for ( i = 1, filenoffs = 0; i < 9; i++ ) {
+        uint8_t c  = get_memory_data(fcb + i );
+        if ( !isspace(c)) {
+            filename[filenoffs++] = tolower(c);
+            filename[filenoffs] = 0;
+        } else break;
+    }
+    for ( i = 9; i < 12; i++ ) {
+        uint8_t c  = (get_memory_data(fcb + i ) & 0x7f);
+        if ( !isspace(c)) {
+            if  ( i == 9 ) filename[filenoffs++] = '.';
+            filename[filenoffs++] = tolower(c);
+            filename[filenoffs] = 0;
+        } else break;
+    }
+}
+
 static void set_offset(int fcb, int offset)
 {
     *get_memory_addr(fcb+32, MEM_TYPE_DATA) = offset & 0x7f;
@@ -80,22 +104,8 @@ static void bdos_open_file(void)
     // S2 = 0
     put_memory(fcb + 14, 0x00);
 
-    // Get the filename
-    for ( i = 1, filenoffs = 0; i < 9; i++ ) {
-        uint8_t c  = get_memory_data(fcb + i );
-        if ( !isspace(c)) {
-            filename[filenoffs++] = tolower(c);
-            filename[filenoffs] = 0;
-        } else break;
-    }
-    for ( i = 9; i < 12; i++ ) {
-        uint8_t c  = (get_memory_data(fcb + i ) & 0x7f);
-        if ( !isspace(c)) {
-            if  ( i == 9 ) filename[filenoffs++] = '.';
-            filename[filenoffs++] = tolower(c);
-            filename[filenoffs] = 0;
-        } else break;
-    }
+    get_filename(fcb, filename);
+
 
     if ( (fd = open(filename, O_RDWR)) == -1 ) {
         goto fail;
@@ -136,21 +146,7 @@ static void bdos_create_file(void)
     put_memory(fcb + 14, 0x00);
 
     // Get the filename
-    for ( i = 1, filenoffs = 0; i < 9; i++ ) {
-        uint8_t c  = get_memory_data(fcb + i );
-        if ( !isspace(c)) {
-            filename[filenoffs++] = tolower(c);
-            filename[filenoffs] = 0;
-        } else break;
-    }
-    for ( i = 9; i < 12; i++ ) {
-        uint8_t c  = (get_memory_data(fcb + i ) & 0x7f);
-        if ( !isspace(c)) {
-            if  ( i == 9 ) filename[filenoffs++] = '.';
-            filename[filenoffs++] = tolower(c);
-            filename[filenoffs] = 0;
-        }
-    }
+    get_filename(fcb, filename);
 
     if ( (fd = open(filename, O_RDWR|O_CREAT, 0666)) == -1 ) {
         goto fail;
@@ -311,6 +307,37 @@ static void bdos_set_dma(void)
     h = b = 0;
 }
 
+static void bdos_file_size(void)
+{
+    int fcb = GET_FCB();
+    char filename[15];
+    struct stat sb;
+    
+    a = 0; // Success always for CP/M 2
+    
+    get_filename(fcb, filename);
+
+    put_memory(fcb + 0x21, 0);
+    put_memory(fcb + 0x22, 0);
+    put_memory(fcb + 0x23, 0);
+
+    if ( stat(filename, &sb) == 0 ) {
+        int size = sb.st_size;
+        int numsec;
+
+        numsec = sb.st_size / 128;
+        if ( size % 128 ) numsec++;
+
+        put_memory(fcb + 0x21, numsec % 256);
+        put_memory(fcb + 0x22, numsec / 256);
+        a = 0x00; // Success
+    }
+
+fail:
+    l = a;
+    h = b = 0;
+}
+
 
 void hook_cpm(void)
 {
@@ -426,6 +453,10 @@ void hook_cpm(void)
     case 0x22: // F_WRITERAND
         /* Entered with C=21h, DE=FCB address. Returns error codes in BA and HL. */
         bdos_write_rand();
+        break;
+    case 0x23: // F_SIZE
+        /* Entered with C=23h, DE=FCB address. Returns error codes in BA and HL. */
+        bdos_file_size();
         break;
     default:
         fprintf(stderr,"Unsupported BDOS call %d\n",c);

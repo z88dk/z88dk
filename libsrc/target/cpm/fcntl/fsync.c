@@ -11,14 +11,8 @@
 
 int fsync(int fd)
 {
-    struct fcb *fc;
+    struct fcb *fc = (struct fcb *)fd;
 
-    if ( fd >= MAXFILE ) {
-        // TODO: Set EBADF
-        return -1;
-    }
-
-    fc = &_fcb[fd];
 
     switch ( fc->use ) {
     case U_WRITE:
