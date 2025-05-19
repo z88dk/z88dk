@@ -189,9 +189,9 @@ void rxk_ld_hl_xy(uint8_t opcode, uint8_t prefix)
 void rxk_ld_xy_hl(uint8_t opcode, uint8_t prefix)
 {
     if ( prefix == 0xfd ) {
-        yl = l; yh = h;
+        yl = alts ? l_ : l; yh = alts ? h_ : h;
     } else {
-        xl = l; xh = h;
+        xl = alts ? l_ : l; xh = alts ? h_ : h;
     }
     st += 4;
 }
