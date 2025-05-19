@@ -2209,8 +2209,11 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
       case 0x91: // SUB C / (R4K) LD BC,HL // (R6K) sbc hl,(ixy+d)
         if (israbbit6k() && ih == 0 ) r6k_alu_hl_xyd(opc, iy);
         else if ( israbbit4k() ) { // LD BC,HL
-            if ( altd ) { b_ = h; c_ = l; }
-            else { b = h; c = l; }
+            uint8_t sh = alts ? h_ : h;
+            uint8_t sl = alts ? l_ : l;
+            
+            if ( altd ) { b_ = sh; c_ = sl; }
+            else { b = sh; c = sl; }
             st+=2; 
         } else SUB(c,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
@@ -4361,7 +4364,7 @@ static void handle_ed_page(void)
     case 0x59:                                         // OUT (C),E (RCM) LD DE',BC
         if ( israbbit() ) { // LD DE',BC
             d_ = alts ? b_ : b;
-            e_ = alts ? b_ : c;
+            e_ = alts ? c_ : c;
             st += 4;
         } else {
             OUTR(e);

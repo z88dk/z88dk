@@ -276,10 +276,10 @@ static void bdos_write_rand(void)
 
     a = 0x01; // Failure: Reading unwritten data
 
-    if ( (slot = get_memory_data(fcb + 16)) == -1 ) {
-        goto fail;
-    }
+
+    slot = get_memory_data(fcb + 16);
     fd = slots[slot];
+    if ( fd == -1 ) goto fail;
 
     posn = get_random(fcb);
     if ( posn == -1  ) {
