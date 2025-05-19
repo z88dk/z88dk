@@ -37,26 +37,26 @@
     PUBLIC  joystick
     PUBLIC  _joystick
 
+    EXTERN  __keyscan_vals
+
 joystick:
 _joystick:
-    ld      a, 1                        ;Bit 0 Start, Select -> Output 7,6
-    out     (0xfd), a
-    in      a, (0xfd)
+    ld      de,__keyscan_vals
+    ld      a,(de)      ;Bit 0 Start, Select -> Output 7,6
     rrca
     rrca
     bit     0, l                        ;J2?
-    jr      z, not_j2_1
+    jr      nz, not_j2_1
     rrca
     rrca
 not_j2_1:
     and     @11000000
     ld      h, a                        ;h = return value
 
-    ld      a, 2                        ;Bit 1  = Down, right
-    out     (0xfd), a
-    in      a, (0xfd)
+    inc     de
+    ld      a,(de)                      ;;Bit 1  = Down, right
     bit     0, l                        ;J2?
-    jr      z, not_j2_2
+    jr      nz, not_j2_2
     rrca
     rrca
 not_j2_2:
@@ -69,11 +69,10 @@ not_down:
     set     0, h
 not_right:
 
-    ld      a, 4                        ;Bit 2 = Up, left
-    out     (0xfd), a
-    in      a, (0xfd)
+    inc     de
+    ld      a,(de)                      ;Bit 2 = Up, left
     bit     0, l                        ;J2?
-    jr      z, not_j2_3
+    jr      nz, not_j2_3
     rrca
     rrca
 not_j2_3:
@@ -85,11 +84,11 @@ not_left:
     jr      nc, not_up
     set     3, h
 not_up:
-    ld      a, 8                        ;Bit 3 = Trig 2, Trig 1
-    out     (0xfd), a
-    in      a, (0xfd)
+
+    inc     de
+    ld      a,(de)                      ;Bit 3 = Trig 2, Trig 1
     bit     0, l
-    jr      z, not_j2_4
+    jr      nz, not_j2_4
     rrca
     rrca
 not_j2_4:
